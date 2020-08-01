@@ -28,7 +28,6 @@ arguments
 
 //! future reserved words
 enum implements interface package private protected public
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
 // ECMAScript 1 till 3
 // abstract boolean byte char double final float goto int long native short synchronized throws transient volatile
 
@@ -562,9 +561,9 @@ Proxy(target, handler) {
 }
 
 // JScript
+// https://docs.microsoft.com/en-us/previous-versions/ms950396(v=msdn.10)
 // https://developer.mozilla.org/en-US/docs/Archive/Web/JavaScript/Microsoft_Extensions
 ActiveXObject(servername.typename[, location])
-ConversionError
 Debug {
 	write([str1 [, str2 [, ... [, strN]]]])
 	writeln([str1 [, str2 [, ... [, strN]]]])
@@ -582,12 +581,15 @@ VBArray {
 	toArray()
 	ubound(dimension)
 }
+// Windows Script Host
+// https://msdn.microsoft.com/en-us/library/9bbdkx3k(v=msdn.10)
 WScript {
-	echo()
-	quit()
+	//CreateObject(strProgID[,strPrefix]) 
+	//Echo()
+	//Exec(strCommand)
+	//GetObject(strPathname [,strProgID], [strPrefix])
+	//Quit()
 }
-WinRTError
-// GetObject([pathname] [, class])
 
 // https://developer.mozilla.org/en-US/docs/Web/API
 // https://developer.mozilla.org/en-US/docs/Web/API/Console

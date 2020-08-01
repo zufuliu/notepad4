@@ -21,11 +21,10 @@ NULL
 
 , // 5 class
 "ActiveXObject AggregateError Array ArrayBuffer AsyncFunction AsyncGeneratorFunction Atomics "
-"BigInt BigInt64Array BigUint64Array Boolean ConversionError DataView Date Debug Document "
-"Enumerator Error EvalError EventTarget Float32Array Float64Array FormData Function GeneratorFunction "
-"Int16Array Int32Array Int8Array JSON Map Math Number Object Promise Proxy RangeError ReferenceError Reflect RegExp "
-"Set SharedArrayBuffer String Symbol SyntaxError TypeError URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray "
-"VBArray WScript WeakMap WeakSet WinRTError XMLHttpRequest jQuery "
+"BigInt BigInt64Array BigUint64Array Boolean DataView Date Debug Document Enumerator Error EvalError EventTarget "
+"Float32Array Float64Array FormData Function GeneratorFunction Int16Array Int32Array Int8Array JSON Map Math Number "
+"Object Promise Proxy RangeError ReferenceError Reflect RegExp Set SharedArrayBuffer String Symbol SyntaxError TypeError "
+"URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray VBArray WScript WeakMap WeakSet XMLHttpRequest jQuery "
 
 , // 6 Interface
 NULL
@@ -51,7 +50,7 @@ NULL
 "createProcessingInstruction( createRange( createTextNode( createTreeWalker( "
 "debug( decodeURI( decodeURIComponent( defineProperties( defineProperty( delete( deleteProperty( "
 "dimensions( dir( dirxml( dispatchEvent( "
-"echo( elementFromPoint( encodeURI( encodeURIComponent( endsWith( entries( error( escape( eval( evaluate( every( "
+"elementFromPoint( encodeURI( encodeURIComponent( endsWith( entries( error( escape( eval( evaluate( every( "
 "exception( exchange( exec( exp( expm1( "
 "fetch( fill( filter( finally( find( findIndex( fixed( flat( flatMap( floor( focus( fontcolor( fontsize( for( forEach( "
 "freeze( from( fromCharCode( fromCodePoint( fromEntries( fround( function( "
@@ -75,7 +74,7 @@ NULL
 "of( open( or( overrideMimeType( ownKeys( "
 "padEnd( padStart( parse( parseFloat( parseInt( pop( postMessage( pow( "
 "preventExtensions( print( prompt( propertyIsEnumerable( push( "
-"querySelector( querySelectorAll( queueMicrotask( quit( "
+"querySelector( querySelectorAll( queueMicrotask( "
 "race( random( raw( reduce( reduceRight( reject( releasePointerCapture( "
 "removeAttribute( removeAttributeNS( removeChild( removeEventListener( removeItem( repeat( replace( replaceChild( "
 "requestAnimationFrame( require( resizeBy( resizeTo( resolve( return( reverse( revocable( round( "
