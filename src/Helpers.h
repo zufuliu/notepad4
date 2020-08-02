@@ -91,6 +91,20 @@ NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
 
+// see scintilla/lexlib/CharacterSet.h
+
+NP2_inline BOOL IsASpace(int ch) {
+	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+}
+
+NP2_inline BOOL IsASpaceOrTab(int ch) {
+	return ch == ' ' || ch == '\t';
+}
+
+NP2_inline BOOL IsAlpha(int ch) {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+}
+
 NP2_inline int ToUpperA(int ch) {
 	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }

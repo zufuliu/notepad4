@@ -7256,7 +7256,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 
 	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
 		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
-		if (!isalpha(chPrev) && chPrev != '-' && chPrev != '_') {
+		if (!(IsAlpha(chPrev) || chPrev == '-' || chPrev == '_')) {
 			pvStart += strlen(pszName);
 			while (*pvStart == ' ') {
 				pvStart++;
@@ -7304,7 +7304,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 
 	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
 		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
-		if (!isalpha(chPrev) && chPrev != '-' && chPrev != '_') {
+		if (!(IsAlpha(chPrev) || chPrev == '-' || chPrev == '_')) {
 			pvStart += strlen(pszName);
 			while (*pvStart == ' ') {
 				pvStart++;
