@@ -32,10 +32,10 @@ constexpr bool IsBatOp(int ch, bool inEcho) noexcept {
 		|| (!inEcho && (ch == '=' || ch == '@' || ch == ';' || ch == '*' || ch == ','));
 }
 constexpr bool IsWordStart(int ch) noexcept {
-	return (ch >= 0x80) || (IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch) || ch == '.'));
+	return IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch) || ch == '.');
 }
 constexpr bool IsWordChar(int ch) noexcept {
-	return (ch >= 0x80) || (IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch)));
+	return IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch));
 }
 constexpr bool IsBatVariable(int ch) noexcept {
 	return iswordchar(ch) || ch == '-' || ch == ':' || ch == '=' || ch == '$';
