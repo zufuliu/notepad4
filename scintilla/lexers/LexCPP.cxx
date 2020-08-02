@@ -5,7 +5,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include <string>
 #include <vector>

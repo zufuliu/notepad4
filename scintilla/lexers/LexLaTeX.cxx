@@ -4,7 +4,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -23,11 +22,8 @@ static constexpr bool IsLSpecial(int ch) noexcept {
 	return ch == '#' || ch == '$' || ch == '%' || ch == '&'
 		|| ch == '^' || ch == '_' || ch == '{' || ch == '}' || ch == '~';
 }
-static inline bool IsLWordChar(int ch) noexcept {
-	return (ch < 0x80) && isalnum(ch);
-}
 
-#define IsCmdEnd(pos)	(!IsLWordChar(sc.GetRelative(pos)))
+#define IsCmdEnd(pos)	(!IsAlphaNumeric(sc.GetRelative(pos)))
 
 static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	if (initStyle == SCE_L_COMMENT)
@@ -50,7 +46,7 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 		} else if (sc.state == SCE_L_COMMAND) {
 			if (sc.GetRelative(4) == '`' && (sc.Match("code") || sc.Match("char")))
 				isCatcode = true;
-			if (!IsLWordChar(sc.ch)) {
+			if (!IsAlphaNumeric(sc.ch)) {
 				if (sc.ch == '*' && sc.chNext == '{')
 					sc.Forward();
 				while (IsASpaceOrTab(sc.ch))

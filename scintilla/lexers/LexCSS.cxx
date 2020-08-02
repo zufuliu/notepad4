@@ -11,7 +11,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -27,13 +26,13 @@
 using namespace Scintilla;
 
 
-static inline bool IsAWordChar(int ch) noexcept {
+static constexpr bool IsAWordChar(int ch) noexcept {
 	/* FIXME:
 	 * The CSS spec allows "ISO 10646 characters U+00A1 and higher" to be treated as word chars.
 	 * Unfortunately, we are only getting string bytes here, and not full unicode characters. We cannot guarantee
 	 * that our byte is between U+0080 - U+00A0 (to return false), so we have to allow all characters U+0080 and higher
 	 */
-	return ch >= 0x80 || isalnum(ch) || ch == '-' || ch == '_';
+	return ch >= 0x80 || IsAlphaNumeric(ch) || ch == '-' || ch == '_';
 }
 
 static constexpr bool IsCssOperator(int ch) noexcept {

@@ -21,12 +21,12 @@
 
 using namespace Scintilla;
 
-static inline bool IsAsmWordChar(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '?' || ch == '@' || ch == '$');
+static constexpr bool IsAsmWordChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == '?' || ch == '@' || ch == '$';
 }
-static inline bool IsAsmWordStart(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '.' ||
-		ch == '%' || ch == '@' || ch == '$' || ch == '?' || ch == '#');
+static constexpr bool IsAsmWordStart(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_' || ch == '.' ||
+		ch == '%' || ch == '@' || ch == '$' || ch == '?' || ch == '#';
 }
 static constexpr bool IsAsmOperator(int ch) noexcept {
 	return isoperator(ch) && !(ch == '%' || ch == '$' || ch == '#');

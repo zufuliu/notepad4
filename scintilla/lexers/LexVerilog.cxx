@@ -8,7 +8,6 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -23,12 +22,12 @@
 
 using namespace Scintilla;
 
-static inline bool IsVWordChar(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$');
+static constexpr bool IsVWordChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$';
 }
 
-static inline bool IsVWordStart(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '$');
+static constexpr bool IsVWordStart(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_' || ch == '$';
 }
 
 /*static const char * const verilogWordLists[] = {

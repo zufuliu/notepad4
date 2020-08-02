@@ -4,7 +4,6 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -20,8 +19,8 @@
 using namespace Scintilla;
 
 // Extended to accept accented characters
-static inline bool IsPSWordChar(int ch) noexcept {
-	return ch >= 0x80 || isalnum(ch) || ch == '-' || ch == '_';
+static constexpr bool IsPSWordChar(int ch) noexcept {
+	return ch >= 0x80 || IsAlphaNumeric(ch) || ch == '-' || ch == '_';
 }
 
 /*static const char * const powershellWordLists[] = {

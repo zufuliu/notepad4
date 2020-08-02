@@ -493,11 +493,11 @@ extern struct EditAutoCompletionConfig autoCompletionConfig;
 
 // CharClassify::SetDefaultCharClasses()
 static inline BOOL IsDefaultWordChar(int ch) {
-	return ch >= 0x80 || isalnum(ch) || ch == '_';
+	return ch >= 0x80 || IsAlphaNumeric(ch) || ch == '_';
 }
 
 BOOL IsDocWordChar(int ch) {
-	if (isalnum(ch) || ch == '_' || ch == '.') {
+	if (IsAlphaNumeric(ch) || ch == '_' || ch == '.') {
 		return TRUE;
 	}
 
@@ -1365,12 +1365,12 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	}
 
 	// someone's, don't
-	if (isalnum(chPrev)) {
+	if (IsAlphaNumeric(chPrev)) {
 		// character prefix
 		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL || iLexer == SCLEX_RUST) {
 			const int lower = chPrev | 0x20;
 			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
-			const BOOL bSubWord = chPrev2 >= 0x80 || isalnum(chPrev2);
+			const BOOL bSubWord = chPrev2 >= 0x80 || IsAlphaNumeric(chPrev2);
 
 			switch (iLexer) {
 			case SCLEX_CPP:
@@ -1584,7 +1584,7 @@ void EditAutoCloseXMLTag(void) {
 
 			if (*pCur == '<') {
 				pCur++;
-				while (strchr(":_-.", *pCur) || isalnum((unsigned char)(*pCur))) {
+				while (IsHtmlTagChar(*pCur)) {
 					tchIns[cchIns++] = *pCur;
 					pCur++;
 				}
