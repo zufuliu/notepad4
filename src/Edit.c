@@ -3995,15 +3995,15 @@ void EditJoinLinesEx(void) {
 	Sci_Position cchJoin = 0;
 	BOOL bModified = FALSE;
 	for (Sci_Position i = 0; i < iSelCount; i++) {
-		if (pszText[i] == '\r' || pszText[i] == '\n') {
+		if (IsEOLChar(pszText[i])) {
 			if (pszText[i] == '\r' && pszText[i + 1] == '\n') {
 				i++;
 			}
-			if (!strchr("\r\n", pszText[i + 1]) && pszText[i + 1] != 0) {
+			if (!IsEOLChar(pszText[i + 1]) && pszText[i + 1] != '\0') {
 				pszJoin[cchJoin++] = ' ';
 				bModified = TRUE;
 			} else {
-				while (strchr("\r\n", pszText[i + 1])) {
+				while (IsEOLChar(pszText[i + 1])) {
 					i++;
 					bModified = TRUE;
 				}
@@ -7262,7 +7262,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 	}
 
 	if (pvStart) {
-		while (*pvStart && strchr(":=\"' \t", *pvStart)) {
+		while (*pvStart == ':' || *pvStart == '=' || *pvStart == '\"' || *pvStart == '\'' || *pvStart == ' ' || *pvStart == '\t') {
 			pvStart++;
 		}
 
@@ -7312,7 +7312,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 	if (pvStart) {
 		BOOL bQuoted = FALSE;
 
-		while (*pvStart && strchr(":=\"' \t", *pvStart)) {
+		while (*pvStart == ':' || *pvStart == '=' || *pvStart == '\"' || *pvStart == '\'' || *pvStart == ' ' || *pvStart == '\t') {
 			if (*pvStart == '\'' || *pvStart == '"') {
 				bQuoted = TRUE;
 			}
@@ -7327,7 +7327,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 			pvEnd++;
 		}
 		*pvEnd = '\0';
-		StrTrimA(tch, " \t:=\"'");
+		StrTrimA(tch, ":=\"\' \t");
 
 		*pszValue = '\0';
 		strncpy(pszValue, tch, cchValue);

@@ -93,6 +93,10 @@ NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 
 // see scintilla/lexlib/CharacterSet.h
 
+NP2_inline BOOL IsEOLChar(int ch) {
+	return ch == '\r' || ch == '\n';
+}
+
 NP2_inline BOOL IsASpace(int ch) {
 	return ch == ' ' || (ch >= 0x09 && ch <= 0x0d);
 }

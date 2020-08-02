@@ -902,8 +902,8 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						// RegExp only appears in assignment or function argument
 						//if (HasRegex(lexType) && (isAssignStmt || numRBrace > 0) && (strchr("([{=,:;!%^&*|?~+-", chPrevNonWhite) || followsReturn)
 						const bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
-							|| (numRBrace > 0 && strchr("(,!&|", chPrevNonWhite))	// argument
-							|| (strchr("};", chPrevNonWhite))
+							|| (numRBrace > 0 && (chPrevNonWhite == '(' || chPrevNonWhite == ',' || chPrevNonWhite == '!' || chPrevNonWhite == '&' || chPrevNonWhite == '|'))	// argument
+							|| (chPrevNonWhite == '}' || chPrevNonWhite == ';')
 							|| followsReturn;
 						if (HasRegex(lexType) && isJsRegex
 							&& !(chPrevNonWhite == '+' || chPrevNonWhite == '-' || followsPostfixOperator)) {
