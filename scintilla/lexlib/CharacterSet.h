@@ -190,11 +190,11 @@ constexpr bool isoperator(int ch) noexcept {
 }
 
 constexpr bool IsGraphic(int ch) noexcept {
-	return (ch > 32 && ch < 127);
+	return ch > 32 && ch != 127;
 }
 
 constexpr bool IsPunctuation(int ch) noexcept {
-	return IsGraphic(ch) && !IsAlphaNumeric(ch);
+	return (ch > 32 && ch < 127) && !IsAlphaNumeric(ch);
 }
 
 // Simple case functions for ASCII supersets.

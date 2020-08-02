@@ -52,7 +52,7 @@ constexpr bool IsYAMLOperator(int ch) noexcept {
 
 constexpr bool IsYAMLAnchorChar(int ch) noexcept {
 	// ns-anchor-char ::= ns-char - c-flow-indicator
-	return ch > 32 && ch != 0x7f && !IsYAMLFlowIndicator(ch);
+	return IsGraphic(ch) && !IsYAMLFlowIndicator(ch);
 }
 
 constexpr bool IsYAMLDateTime(int ch, int chNext) noexcept {
