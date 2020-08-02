@@ -101,8 +101,23 @@ NP2_inline BOOL IsASpaceOrTab(int ch) {
 	return ch == ' ' || ch == '\t';
 }
 
+NP2_inline BOOL IsOctalDigit(int ch) {
+	return ch >= '0' && ch <= '7';
+}
+
 NP2_inline BOOL IsAlpha(int ch) {
-	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+	return (ch >= 'a' && ch <= 'z')
+		|| (ch >= 'A' && ch <= 'Z');
+}
+
+NP2_inline BOOL IsAlphaNumeric(int ch) {
+	return ((ch >= '0') && (ch <= '9'))
+		|| ((ch >= 'a') && (ch <= 'z'))
+		|| ((ch >= 'A') && (ch <= 'Z'));
+}
+
+NP2_inline BOOL IsPunctuation(int ch) {
+	return (ch > 32 && ch < 127) && !IsAlphaNumeric(ch);
 }
 
 NP2_inline int ToUpperA(int ch) {
