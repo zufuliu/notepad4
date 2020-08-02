@@ -363,7 +363,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					const Sci_Position pos = LexSkipSpaceTab(i + 3, endPos, styler);
 					chEnd = static_cast<unsigned char>(LexCharAt(pos));
 					// check if End is used to terminate statement
-					if (isalpha(chEnd) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")
+					if (IsAlpha(chEnd) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")
 						|| VBMatchNext(pos, "if") || VBMatchNext(pos, "class") || VBMatchNext(pos, "structure")
 						|| VBMatchNext(pos, "module") || VBMatchNext(pos, "enum") || VBMatchNext(pos, "interface")
 						|| VBMatchNext(pos, "operator") || VBMatchNext(pos, "property") || VBMatchNext(pos, "event")

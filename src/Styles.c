@@ -1811,10 +1811,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	UpdateFoldMarginWidth();
 }
 
-static inline BOOL IsASpace(int ch) {
-	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
-}
-
 //=============================================================================
 // find lexer from script interpreter, which must be first line of the file.
 // Style_SniffShebang()
@@ -2038,7 +2034,7 @@ int Style_GetDocTypeLanguage(void) {
 	}
 	if (*p == '<') {
 		p++;
-		if (!isalpha((unsigned char)(*p))) {
+		if (!IsAlpha(*p)) {
 			return 0;
 		}
 	} else {

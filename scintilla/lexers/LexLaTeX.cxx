@@ -26,9 +26,6 @@ static constexpr bool IsLSpecial(int ch) noexcept {
 static inline bool IsLWordChar(int ch) noexcept {
 	return (ch < 0x80) && isalnum(ch);
 }
-static inline bool IsLWordStart(int ch) noexcept {
-	return (ch < 0x80) && isalpha(ch);
-}
 
 #define IsCmdEnd(pos)	(!IsLWordChar(sc.GetRelative(pos)))
 
@@ -78,7 +75,7 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 						isCatcode = false;
 						sc.SetState(SCE_L_SPECIAL);
 						sc.Forward();
-						if (IsLSpecial(sc.chNext) || (sc.chNext == '\\' && !IsLWordStart(sc.GetRelative(2))))
+						if (IsLSpecial(sc.chNext) || (sc.chNext == '\\' && !IsAlpha(sc.GetRelative(2))))
 							sc.Forward();
 					}
 				}
@@ -101,7 +98,7 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 					isSquareBrace = true;
 				} else if (sc.Match("verb")) {
 					sc.Forward(4);
-					if (!IsLWordStart(sc.ch)) {
+					if (!IsAlpha(sc.ch)) {
 						if (sc.ch == '*')
 							sc.Forward();
 						sc.SetState(SCE_L_DEFAULT);
@@ -199,7 +196,7 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 				if (IsLSpecial(sc.chNext) || sc.chNext == '`' || sc.chNext == '\'' || sc.chNext == '\"') {
 					sc.SetState(SCE_L_SPECIAL);
 					sc.Forward();
-				} else if (IsLWordStart(sc.chNext)) {
+				} else if (IsAlpha(sc.chNext)) {
 					sc.SetState(SCE_L_COMMAND);
 				} else if (sc.chNext == '\\') {
 					sc.SetState(SCE_L_OPERATOR);

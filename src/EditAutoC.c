@@ -445,14 +445,6 @@ void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, int wordLength, i
 }
 
 
-static inline BOOL IsASpaceOrTab(int ch) {
-	return ch == ' ' || ch == '\t';
-}
-
-static inline BOOL IsAAlpha(int ch) {
-	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
-}
-
 static inline BOOL IsEscapeChar(int ch) {
 	return ch == 't' || ch == 'n' || ch == 'r' || ch == 'a' || ch == 'b' || ch == 'v' || ch == 'f'
 		|| ch == '0'
@@ -621,7 +613,7 @@ static inline BOOL IsWordStyleToIgnore(int style) {
 
 // https://en.wikipedia.org/wiki/Printf_format_string
 static inline BOOL IsStringFormatChar(int ch, int style) {
-	if (!IsAAlpha(ch)) {
+	if (!IsAlpha(ch)) {
 		return FALSE;
 	}
 	switch (pLexCurrent->iLexer) {
@@ -1673,7 +1665,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	const char *endPart = NULL;
 	*indent = 0;
 
-	while (*head && length < 63 && IsAAlpha(*head)) {
+	while (*head && length < 63 && IsAlpha(*head)) {
 		word[length] = *head;
 		word_low[length] = (char)((*head) | 0x20);
 		++length;
@@ -1911,7 +1903,7 @@ void EditAutoIndent(void) {
 		const char *endPart = NULL;
 		for (pPos = pLineBuf; *pPos; pPos++) {
 			if (*pPos != ' ' && *pPos != '\t') {
-				if (!indent && IsAAlpha(*pPos)) { // indent on keywords
+				if (!indent && IsAlpha(*pPos)) { // indent on keywords
 					const int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
 					if (IsIndentKeywordStyle(style)) {
 						endPart = EditKeywordIndent(pPos, &indent);

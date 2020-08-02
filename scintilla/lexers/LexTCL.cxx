@@ -28,7 +28,7 @@ static inline bool IsAWordChar(int ch) noexcept {
 }
 
 static inline bool IsAWordStart(int ch) noexcept {
-	return ch >= 0x80 || (ch == ':' || isalpha(ch) || ch == '_');
+	return ch >= 0x80 || (ch == ':' || IsAlpha(ch) || ch == '_');
 }
 
 static constexpr bool IsANumberChar(int ch) noexcept {
