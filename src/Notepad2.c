@@ -5244,7 +5244,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			} else {
 				WCHAR tch[256];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
-				lstrcpyn(pTTT->szText, /*StrChr(tch, L'\n')+1*/tch, 80);
+				lstrcpyn(pTTT->szText, tch, COUNTOF(pTTT->szText));
 			}
 		}
 		break;

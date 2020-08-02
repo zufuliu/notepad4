@@ -3236,7 +3236,8 @@ BOOL Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bD
 			++p;
 		}
 		lstrcpyn(lpszFont, p, cchFont);
-		if ((p = StrChr(lpszFont, L';')) != NULL) {
+		p = StrChr(lpszFont, L';');
+		if (p != NULL) {
 			*p = L'\0';
 		}
 		TrimString(lpszFont);
@@ -3341,7 +3342,8 @@ static BOOL Style_StrGetValueEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen, LPWS
 			++p;
 		}
 		lstrcpyn(lpszValue, p, cchValue);
-		if ((p = StrChr(lpszValue, L';')) != NULL) {
+		p = StrChr(lpszValue, L';');
+		if (p != NULL) {
 			*p = L'\0';
 		}
 		TrimString(lpszValue);
@@ -4301,8 +4303,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						WCHAR wch[MAX_EDITLEXER_EXT_SIZE];
 
 						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
-						if (StrChr(wch, L'|')) {
-							*StrChr(wch, L'|') = 0;
+						LPWSTR p = StrChr(wch, L'|');
+						if (p != NULL) {
+							*p = L'\0';
 						}
 
 						SetDlgItemText(hwnd, IDC_STYLELABEL, wch);
@@ -4319,8 +4322,9 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 						WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE];
 
 						GetDlgItemText(hwnd, IDC_STYLELABELS, wch, COUNTOF(wch));
-						if (StrChr(wch, L'|')) {
-							*StrChr(wch, L'|') = 0;
+						LPWSTR p = StrChr(wch, L'|');
+						if (p != NULL) {
+							*p = L'\0';
 						}
 
 						SetDlgItemText(hwnd, IDC_STYLELABEL, StrEnd(wch) + 1);
