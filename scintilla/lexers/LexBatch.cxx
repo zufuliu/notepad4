@@ -31,11 +31,11 @@ constexpr bool IsBatOp(int ch, bool inEcho) noexcept {
 	return ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '(' || ch == ')'
 		|| (!inEcho && (ch == '=' || ch == '@' || ch == ';' || ch == '*' || ch == ','));
 }
-inline bool IsWordStart(int ch) noexcept {
-	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch) || ch == '.'));
+constexpr bool IsWordStart(int ch) noexcept {
+	return (ch >= 0x80) || (IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch) || ch == '.'));
 }
-inline bool IsWordChar(int ch) noexcept {
-	return (ch >= 0x80) || (isgraph(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch)));
+constexpr bool IsWordChar(int ch) noexcept {
+	return (ch >= 0x80) || (IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch)));
 }
 constexpr bool IsBatVariable(int ch) noexcept {
 	return iswordchar(ch) || ch == '-' || ch == ':' || ch == '=' || ch == '$';
@@ -56,7 +56,7 @@ bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) no
 	if (ch == '^') {
 		if (chNext == '^') {
 			length = (chNext2 == '!') ? 2 : 1;
-		} else if (chNext < 0x80 && ispunct(chNext)) {
+		} else if (IsPunctuation(chNext)) {
 			length = 1;
 		}
 	} else if (ch == '%') {

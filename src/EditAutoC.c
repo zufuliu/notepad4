@@ -1082,7 +1082,7 @@ void EditCompleteUpdateConfig(void) {
 		if (c == L'\0') {
 			break;
 		}
-		if (c < 0x80 && ispunct((unsigned char)c)) {
+		if (IsPunctuation(c)) {
 			autoCompletionConfig.wszAutoCompleteFillUp[k++] = c;
 			if (punctuation) {
 				autoCompletionConfig.szAutoCompleteFillUp[i++] = (char)c;

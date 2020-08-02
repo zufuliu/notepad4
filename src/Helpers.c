@@ -2607,13 +2607,6 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 */
 
 /**
- * Is the character an octal digit?
- */
-static inline BOOL IsOctalDigit(char ch) {
-	return ch >= '0' && ch <= '7';
-}
-
-/**
  * If the character is an hexa digit, get its value.
  */
 static inline int GetHexDigit(char ch) {

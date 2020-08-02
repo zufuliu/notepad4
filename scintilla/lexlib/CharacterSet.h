@@ -121,7 +121,8 @@ constexpr bool IsUpperCase(int ch) noexcept {
 }
 
 constexpr bool IsUpperOrLowerCase(int ch) noexcept {
-	return IsUpperCase(ch) || IsLowerCase(ch);
+	return (ch >= 'A') && (ch <= 'Z')
+		|| (ch >= 'a') && (ch <= 'z');
 }
 
 constexpr bool IsAlpha(int ch) noexcept {
@@ -180,13 +181,20 @@ constexpr bool IsWordCharEx(int ch) noexcept {
 }
 
 constexpr bool isoperator(int ch) noexcept {
-	return
-		(ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
-		ch == '(' || ch == ')' || ch == '-' || ch == '+' ||
-		ch == '=' || ch == '|' || ch == '{' || ch == '}' ||
-		ch == '[' || ch == ']' || ch == ':' || ch == ';' ||
-		ch == '<' || ch == '>' || ch == ',' || ch == '/' ||
-		ch == '?' || ch == '!' || ch == '.' || ch == '~');
+	return ch == '%' || ch == '^' || ch == '&' || ch == '*'
+		|| ch == '(' || ch == ')' || ch == '-' || ch == '+'
+		|| ch == '=' || ch == '|' || ch == '{' || ch == '}'
+		|| ch == '[' || ch == ']' || ch == ':' || ch == ';'
+		|| ch == '<' || ch == '>' || ch == ',' || ch == '/'
+		|| ch == '?' || ch == '!' || ch == '.' || ch == '~';
+}
+
+constexpr bool IsGraphic(int ch) noexcept {
+	return (ch > 32 && ch < 127);
+}
+
+constexpr bool IsPunctuation(int ch) noexcept {
+	return IsGraphic(ch) && !IsAlphaNumeric(ch);
 }
 
 // Simple case functions for ASCII supersets.
