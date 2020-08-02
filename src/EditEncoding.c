@@ -602,19 +602,20 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 
 void Encoding_GetLabel(int iEncoding) {
 	if (StrIsEmpty(mEncoding[iEncoding].wchLabel)) {
-		WCHAR *pwsz;
 		WCHAR wch[256] = L"";
 		GetString(mEncoding[iEncoding].idsName, wch, COUNTOF(wch));
-		if ((pwsz = StrChr(wch, L';')) != NULL) {
+		LPCWSTR pwsz = StrChr(wch, L';');
+		if (pwsz != NULL) {
 #if 0
-			if ((pwsz = StrChr(CharNext(pwsz), L';')) != NULL) {
-				pwsz = CharNext(pwsz);
+			pwsz = StrChr(pwsz + 1, L';');
+			if (pwsz != NULL) {
+				++pwsz;
 			}
 #else
-			pwsz = CharNext(pwsz);
+			++pwsz;
 #endif
 		}
-		if (!pwsz) {
+		if (StrIsEmpty(pwsz)) {
 			pwsz = wch;
 		}
 		if (g_AllEncodingLabel == NULL) {
@@ -747,9 +748,9 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 	// ANSI and OEM
 	for (int id = CPI_DEFAULT; id <= CPI_OEM; id++) {
-		WCHAR *pwsz;
 		GetString(mEncoding[id].idsName, wchBuf, COUNTOF(wchBuf));
-		if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
+		LPWSTR pwsz = StrChr(wchBuf, L';');
+		if (pwsz != NULL) {
 			*pwsz = L'\0';
 		}
 		if (id == CPI_DEFAULT) {
@@ -791,9 +792,9 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				break;
 			}
 			if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
-				WCHAR *pwsz;
 				GetString(mEncoding[id].idsName, wchBuf, COUNTOF(wchBuf));
-				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
+				LPWSTR pwsz = StrChr(wchBuf, L';');
+				if (pwsz != NULL) {
 					*pwsz = L'\0';
 				}
 
@@ -867,12 +868,12 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
-			WCHAR *pwsz;
-
 			lvi.iItem = ListView_GetItemCount(hwnd);
-			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
+			LPWSTR pwsz = StrChr(pEE[i].wch, L';');
+			if (pwsz != NULL) {
 				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
-				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
+				pwsz = StrChr(wchBuf, L';');
+				if (pwsz != NULL) {
 					*pwsz = L'\0';
 				}
 			} else {
@@ -946,12 +947,12 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
 		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
-			WCHAR *pwsz;
-
 			cbei.iItem = ComboBox_GetCount(hwnd);
-			if ((pwsz = StrChr(pEE[i].wch, L';')) != NULL) {
+			LPWSTR pwsz = StrChr(pEE[i].wch, L';');
+			if (pwsz != NULL) {
 				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
-				if ((pwsz = StrChr(wchBuf, L';')) != NULL) {
+				pwsz = StrChr(wchBuf, L';');
+				if (pwsz != NULL) {
 					*pwsz = L'\0';
 				}
 			} else {

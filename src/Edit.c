@@ -1300,45 +1300,43 @@ static BOOL EditTitleCase(LPWSTR pszTextW, int cchTextW) {
 	BOOL bNewWord = TRUE;
 	BOOL bPrevWasSpace = TRUE;
 	for (int i = 0; i < cchTextW; i++) {
-		if (!IsCharAlphaNumeric(pszTextW[i]) && (!StrChr(L"\x0027\x0060\x0384\x2019", pszTextW[i]) || bPrevWasSpace)) {
+		const WCHAR ch = pszTextW[i];
+		if (!IsCharAlphaNumeric(ch) && (!(ch == L'\'' || ch == L'`' || ch == 0xB4 || ch == 0x0384 || ch == 0x2019) || bPrevWasSpace)) {
 			bNewWord = TRUE;
 		} else {
 			if (bNewWord) {
-				if (IsCharLower(pszTextW[i])) {
-					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+				if (IsCharLower(ch)) {
+					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
 					bChanged = TRUE;
 				}
 			} else {
-				if (IsCharUpper(pszTextW[i])) {
-					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+				if (IsCharUpper(ch)) {
+					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
 					bChanged = TRUE;
 				}
 			}
 			bNewWord = FALSE;
 		}
 
-		if (StrChr(L" \r\n\t[](){}", pszTextW[i])) {
-			bPrevWasSpace = TRUE;
-		} else {
-			bPrevWasSpace = FALSE;
-		}
+		bPrevWasSpace = IsASpace(ch) || ch == L'[' || ch == L']' || ch == L'(' || ch == L')' || ch == L'{' || ch == L'}';
 	}
 #else
 	BOOL bNewWord = TRUE;
 	BOOL bWordEnd = TRUE;
 	for (int i = 0; i < cchTextW; i++) {
-		const BOOL bAlphaNumeric = IsCharAlphaNumeric(pszTextW[i]);
-		if (!bAlphaNumeric && (!StrChr(L"\x0027\x2019\x0060\x00B4", pszTextW[i]) || bWordEnd)) {
+		const WCHAR ch = pszTextW[i];
+		const BOOL bAlphaNumeric = IsCharAlphaNumeric(ch);
+		if (!bAlphaNumeric && (!(ch == L'\'' || ch == L'`' || ch == 0xB4 || ch == 0x0384 || ch == 0x2019) || bWordEnd)) {
 			bNewWord = TRUE;
 		} else {
 			if (bNewWord) {
-				if (IsCharLower(pszTextW[i])) {
-					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+				if (IsCharLower(ch)) {
+					pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
 					bChanged = TRUE;
 				}
 			} else {
-				if (IsCharUpper(pszTextW[i])) {
-					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+				if (IsCharUpper(ch)) {
+					pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
 					bChanged = TRUE;
 				}
 			}
@@ -1486,19 +1484,20 @@ void EditSentenceCase(void) {
 	BOOL bNewSentence = TRUE;
 	BOOL bChanged = FALSE;
 	for (int i = 0; i < cchTextW; i++) {
-		if (StrChr(L".;!?\r\n", pszTextW[i])) {
+		const WCHAR ch = pszTextW[i];
+		if (ch == L'.' || ch == L';' || ch == L'!' || ch == L'?' || ch == L'\r' || ch == L'\n') {
 			bNewSentence = TRUE;
 		} else {
-			if (IsCharAlphaNumeric(pszTextW[i])) {
+			if (IsCharAlphaNumeric(ch)) {
 				if (bNewSentence) {
-					if (IsCharLower(pszTextW[i])) {
-						pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+					if (IsCharLower(ch)) {
+						pszTextW[i] = LOWORD(CharUpper((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
 						bChanged = TRUE;
 					}
 					bNewSentence = FALSE;
 				} else {
-					if (IsCharUpper(pszTextW[i])) {
-						pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(pszTextW[i], 0)));
+					if (IsCharUpper(ch)) {
+						pszTextW[i] = LOWORD(CharLower((LPWSTR)(LONG_PTR)MAKELONG(ch, 0)));
 						bChanged = TRUE;
 					}
 				}
@@ -3859,8 +3858,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 	}
 
 #define ISDELIMITER(wc) StrChr(L",;.:-+%&\xA6|/*?!\"\'~\xB4#=", wc)
-#define ISWHITE(wc) StrChr(L" \t", wc)
-#define ISWORDEND(wc) (/*ISDELIMITER(wc) ||*/ StrChr(L" \t\r\n", wc))
+#define ISWHITE(wc)		IsASpaceOrTab(wc)
+#define ISWORDEND(wc)	(/*ISDELIMITER(wc) ||*/ IsASpace(wc))
 
 	int cchConvW = 0;
 	int iLineLength = 0;
@@ -3903,7 +3902,7 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 		//}
 
 		if (ISWHITE(w)) {
-			while (pszTextW[iTextW + 1] == L' ' || pszTextW[iTextW + 1] == L'\t') {
+			while (IsASpaceOrTab(pszTextW[iTextW + 1])) {
 				iTextW++;
 				bModified = TRUE;
 			} // Modified: left out some whitespaces
@@ -6306,13 +6305,13 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 				DStringW_GetDlgItemText(&wszOpen, hwnd, IDC_MODIFY_LINE_PREFIX);
 				const int len = lstrlen(wszOpen.buffer);
 				if (len >= 3) {
-					LPCWSTR pwsz1 = StrChr(wszOpen.buffer, L'<');
-					if (pwsz1 != NULL) {
+					LPCWSTR pwCur = StrChr(wszOpen.buffer, L'<');
+					if (pwCur != NULL) {
 						LPWSTR wchIns = (LPWSTR)NP2HeapAlloc((len + 5) * sizeof(WCHAR));
 						lstrcpy(wchIns, L"</");
 						int	cchIns = 2;
-						const WCHAR *pwCur = pwsz1 + 1;
 
+						++pwCur;
 						while (IsHtmlTagChar(*pwCur)) {
 							wchIns[cchIns++] = *pwCur++;
 						}
@@ -6424,10 +6423,10 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 	IniGetString(INI_SECTION_NAME_FLAGS, L"TimeStamp", L"\\$Date:[^\\$]+\\$ | $Date: %Y/%m/%d %H:%M:%S $", wchFind, COUNTOF(wchFind));
 
 	WCHAR wchTemplate[256] = {0};
-	WCHAR *pwchSep;
-	if ((pwchSep = StrChr(wchFind, L'|')) != NULL) {
+	LPWSTR pwchSep = StrChr(wchFind, L'|');
+	if (pwchSep != NULL) {
 		lstrcpy(wchTemplate, pwchSep + 1);
-		*pwchSep = 0;
+		*pwchSep = L'\0';
 	}
 
 	StrTrim(wchFind, L" ");
