@@ -94,7 +94,7 @@ NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
 // see scintilla/lexlib/CharacterSet.h
 
 NP2_inline BOOL IsASpace(int ch) {
-	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
+	return ch == ' ' || (ch >= 0x09 && ch <= 0x0d);
 }
 
 NP2_inline BOOL IsASpaceOrTab(int ch) {
@@ -111,9 +111,9 @@ NP2_inline BOOL IsAlpha(int ch) {
 }
 
 NP2_inline BOOL IsAlphaNumeric(int ch) {
-	return ((ch >= '0') && (ch <= '9'))
-		|| ((ch >= 'a') && (ch <= 'z'))
-		|| ((ch >= 'A') && (ch <= 'Z'));
+	return (ch >= '0' && ch <= '9')
+		|| (ch >= 'a' && ch <= 'z')
+		|| (ch >= 'A' && ch <= 'Z');
 }
 
 NP2_inline BOOL IsPunctuation(int ch) {
