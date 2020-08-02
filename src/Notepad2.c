@@ -4990,7 +4990,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					return 0;
 				}
 				// Auto close braces/quotes
-				if (strchr("([{<\"\'`,", ch)) {
+				if (ch == '(' || ch == '[' || ch == '{' || ch == '<' || ch == '\"' || ch == '\'' || ch == '`' || ch == ',') {
 					if (autoCompletionConfig.fAutoInsertMask) {
 						EditAutoCloseBraceQuote(ch);
 					}

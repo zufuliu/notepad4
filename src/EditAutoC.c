@@ -472,6 +472,12 @@ static inline BOOL IsCppStringStyle(int style) {
 		|| style == SCE_C_DSTRINGT;
 }
 
+static inline BOOL IsSpecialStart(int ch) {
+	return ch == ':' || ch == '.' || ch == '#' || ch == '@'
+		|| ch == '<' || ch == '\\' || ch == '/' || ch == '-'
+		|| ch == '>' || ch == '$' || ch == '%';
+}
+
 static inline BOOL IsSpecialStartChar(int ch, int chPrev) {
 	return (ch == '.')	// member
 		|| (ch == '#')	// preprocessor
@@ -1273,7 +1279,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 		if (pWList->nWordCount == 0 && iRootLen != 0) {
 			const char *pSubRoot = strpbrk(pWList->pWordStart, ":.#@<\\/->$%");
 			if (pSubRoot) {
-				while (*pSubRoot && strchr(":.#@<\\/->$%", *pSubRoot)) {
+				while (IsSpecialStart(*pSubRoot)) {
 					pSubRoot++;
 				}
 				if (*pSubRoot) {

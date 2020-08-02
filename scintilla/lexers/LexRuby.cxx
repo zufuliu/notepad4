@@ -52,6 +52,12 @@ static constexpr bool isSafeWordcharOrHigh(char ch) noexcept {
 	return isHighBitChar(ch) || IsAlphaNumeric(ch) || ch == '_';
 }
 
+static constexpr bool isEscapeSequence(char ch) {
+	return ch == '\\' || ch == 'a' || ch == 'b' || ch == 'e'
+		|| ch == 'f' || ch == 'n' || ch == 'r' || ch == 's'
+		|| ch == 't' || ch == 'v';
+}
+
 #define MAX_KEYWORD_LENGTH 127
 
 #define STYLE_MASK 63
@@ -809,7 +815,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 				chNext = chNext2;
 				styler.ColourTo(i, SCE_RB_OPERATOR);
 
-				if (!(strchr("\"\'`_-~", chNext2) || isSafeAlpha(chNext2))) {
+				if (!(chNext2 == '\"' || chNext2 == '\'' || chNext2 == '`' || chNext2 == '_' || chNext2 == '-' || chNext2 == '~' || isSafeAlpha(chNext2))) {
 					// It's definitely not a here-doc,
 					// based on Ruby's lexer/parser in the
 					// heredoc_identifier routine.
@@ -1018,7 +1024,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 										inner_string_count,
 										state, brace_counts, Quote);
 				} else {
-					preferRE = (strchr(")}].", ch) == nullptr);
+					preferRE = !(ch == ')' || ch == '}' || ch == ']' || ch == '.');
 				}
 				// Stay in default state
 			} else if (isEOLChar(ch)) {
@@ -1040,8 +1046,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 				if (ch == '='
 					&& isSafeWordcharOrHigh(chPrev)
-					&& (chNext == '('
-						|| strchr(" \t\n\r", chNext) != nullptr)
+					&& (chNext == '(' || IsASpace(chNext))
 					&& (!strcmp(prevWord, "def")
 						|| followsDot(styler.GetStartSegment(), styler))) {
 					// <name>= is a name only when being def'd -- Get it the next time
@@ -1049,7 +1054,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 					// <name>, (op, =), <name>
 				} else if (ch == ':'
 					&& isSafeWordcharOrHigh(chPrev)
-					&& strchr(" \t\n\r", chNext) != nullptr) {
+					&& IsASpace(chNext)) {
 					state = SCE_RB_SYMBOL;
 				} else if ((ch == '?' || ch == '!')
 					&& isSafeWordcharOrHigh(chPrev)
@@ -1103,7 +1108,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 					styler.ColourTo(i, state);
 					state = SCE_RB_DEFAULT;
 					preferRE = false;
-				} else if (strchr("\\ntrfvaebs", chNext)) {
+				} else if (isEscapeSequence(chNext)) {
 					// Terminal escape sequence -- handle it next time
 					// Nothing more to do this time through the loop
 				} else if (chNext == 'C' || chNext == 'M') {
@@ -1281,7 +1286,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 		} else if (state == SCE_RB_POD) {
 			// PODs end with ^=end\s, -- any whitespace can follow =end
-			if (strchr(" \t\n\r", ch) != nullptr
+			if (IsASpace(ch)
 				&& i > 5
 				&& isEOLChar(styler[i - 5])
 				&& isMatch(styler, lengthDoc, i - 4, "=end")) {
@@ -1705,9 +1710,9 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					levelCurrent--;
 			}
 		} else if (style == SCE_RB_OPERATOR) {
-			if (strchr("[{(", ch)) {
+			if (ch == '(' || ch == '{' || ch == '[') {
 				levelCurrent++;
-			} else if (strchr(")}]", ch)) {
+			} else if (ch == ')' || ch == '}' || ch == ']') {
 				// Don't decrement below 0
 				if (levelCurrent > 0)
 					levelCurrent--;
