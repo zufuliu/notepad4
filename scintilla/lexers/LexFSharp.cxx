@@ -4,7 +4,6 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"

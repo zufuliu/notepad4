@@ -4,7 +4,6 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -19,16 +18,9 @@
 
 using namespace Scintilla;
 
-static inline bool IsFWordChar(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '%');
+static constexpr bool IsFWordChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_' || ch == '%';
 }
-static inline bool IsFWordStart(int ch) noexcept {
-	return (ch < 0x80) && isalnum(ch);
-}
-static constexpr bool IsFOperator(int ch) noexcept {
-	return isoperator(ch);
-}
-
 /*static const char *const fortranWordLists[] = {
 	"Primary keywords",
 	"user1",
@@ -140,12 +132,12 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 				sc.SetState(SCE_F_STRING1);
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_F_NUMBER);
-			} else if (IsFWordStart(sc.ch)) {
+			} else if (IsAlphaNumeric(sc.ch)) {
 				sc.SetState(SCE_F_IDENTIFIER);
 			} else if (sc.ch == '.' && IsAlpha(sc.chNext)) {
 				sc.SetState(SCE_F_OPERATOR2);
 				sc.Forward();
-			} else if (IsFOperator(sc.ch)) {
+			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_F_OPERATOR);
 			}
 		}
@@ -198,7 +190,7 @@ static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*in
 
 		//if (style == SCE_F_WORD && stylePrev != SCE_F_WORD) {
 		//	char word[32];
-		//	LexGetRangeLowered(i, styler, IsFWordStart, word, sizeof(word));
+		//	LexGetRangeLowered(i, styler, IsAlphaNumeric, word, sizeof(word));
 		//}
 
 		if (!isspacechar(ch))

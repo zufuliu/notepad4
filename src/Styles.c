@@ -2131,7 +2131,7 @@ BOOL MatchCPPKeyword(const char *p, int index) {
 	while (len < 30 && (*p == '_' || (*p >= 'a' && *p <= 'z'))) {
 		word[len++] = *p++;
 	}
-	if (len == 30 || isalnum((unsigned char)(*p))) {
+	if (len == 30 || IsAlphaNumeric(*p)) {
 		return FALSE;
 	}
 	word[len++] = ' ';

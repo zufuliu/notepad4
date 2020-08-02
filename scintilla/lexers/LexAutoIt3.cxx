@@ -9,7 +9,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -27,12 +26,12 @@ using namespace Scintilla;
 static constexpr bool IsAu3TypeCharacter(int ch) noexcept {
 	return ch == '$';
 }
-static inline bool IsAu3WordChar(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '_');
+static constexpr bool IsAu3WordChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_';
 }
 
-static inline bool IsAu3WordStart(int ch) noexcept {
-	return (ch < 0x80) && (isalnum(ch) || ch == '_' || ch == '@' || ch == '#' || ch == '$' || ch == '.');
+static constexpr bool IsAu3WordStart(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '_' || ch == '@' || ch == '#' || ch == '$' || ch == '.';
 }
 
 static constexpr bool IsAu3Operator(int ch) noexcept {

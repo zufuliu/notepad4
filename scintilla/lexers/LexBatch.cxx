@@ -4,7 +4,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include <vector>
 
@@ -47,11 +46,11 @@ constexpr bool IsMarkVariableNext(int chNext) noexcept {
 	return chNext == '=' || iswordstart(chNext);
 }
 // someone's, don't
-inline bool IsSingleQuotedString(int ch, int chPrev, int chNext) noexcept {
-	return ch == '\'' && !((chPrev >= 0x80 || isalnum(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
+constexpr bool IsSingleQuotedString(int ch, int chPrev, int chNext) noexcept {
+	return ch == '\'' && !((chPrev >= 0x80 || IsAlphaNumeric(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
 }
 // Escape Characters https://www.robvanderwoude.com/escapechars.php
-bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
+constexpr bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
 	length = 0;
 	if (ch == '^') {
 		if (chNext == '^') {

@@ -6313,14 +6313,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 						int	cchIns = 2;
 						const WCHAR *pwCur = pwsz1 + 1;
 
-						while (*pwCur &&
-								*pwCur != L'<' &&
-								*pwCur != L'>' &&
-								*pwCur != L' ' &&
-								*pwCur != L'\t' &&
-								*pwCur != L'\r' &&
-								*pwCur != L'\n' &&
-								(StrChr(L":_-.", *pwCur) || isalnum(*pwCur))) {
+						while (IsHtmlTagChar(*pwCur)) {
 							wchIns[cchIns++] = *pwCur++;
 						}
 
@@ -7331,7 +7324,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 		strncpy(tch, pvStart, COUNTOF(tch) - 1);
 
 		char *pvEnd = tch;
-		while (*pvEnd && (isalnum((unsigned char)(*pvEnd)) || strchr("+-/_", *pvEnd) || (bQuoted && *pvEnd == ' '))) {
+		while (IsAlphaNumeric(*pvEnd) || *pvEnd == '+' || *pvEnd == '-' || *pvEnd == '/' || *pvEnd == '_' || (bQuoted && *pvEnd == ' ')) {
 			pvEnd++;
 		}
 		*pvEnd = '\0';

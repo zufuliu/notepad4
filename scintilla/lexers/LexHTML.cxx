@@ -7,7 +7,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include <string>
 #include <map>
@@ -402,7 +401,7 @@ constexpr int defaultStateForSGML(script_type scriptLanguage) noexcept {
 
 bool issgmlwordchar(int ch) noexcept {
 	return !IsASCII(ch) ||
-		(isalnum(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#' || ch == '[');
+		(IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#' || ch == '[');
 }
 
 constexpr bool InTagState(int state) noexcept {
@@ -1333,7 +1332,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_SGML_SPECIAL:
 			if (!IsUpperCase(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
-				if (IsASCII(ch) && isalnum(ch)) {
+				if (IsAlphaNumeric(ch)) {
 					state = SCE_H_SGML_ERROR;
 				} else {
 					state = SCE_H_SGML_DEFAULT;
@@ -1344,7 +1343,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (ch == ';') {
 				styler.ColourTo(i, StateToPrint);
 				state = SCE_H_SGML_DEFAULT;
-			} else if (!(IsASCII(ch) && isalnum(ch)) && ch != '-' && ch != '.') {
+			} else if (!(IsAlphaNumeric(ch) || ch == '-' || ch == '.')) {
 				styler.ColourTo(i, SCE_H_SGML_ERROR);
 				state = SCE_H_SGML_DEFAULT;
 			}
@@ -1354,7 +1353,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColourTo(i, StateToPrint);
 				state = SCE_H_DEFAULT;
 			}
-			if (ch != '#' && !(IsASCII(ch) && isalnum(ch))	// Should check that '#' follows '&', but it is unlikely anyway...
+			if (ch != '#' && !IsAlphaNumeric(ch)	// Should check that '#' follows '&', but it is unlikely anyway...
 				&& ch != '.' && ch != '-' && ch != '_' && ch != ':') { // valid in XML
 				if (!IsASCII(ch))	// Possibly start of a multibyte character so don't allow this byte to be in entity style
 					styler.ColourTo(i-1, SCE_H_TAGUNKNOWN);

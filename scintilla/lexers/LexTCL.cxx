@@ -7,7 +7,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -23,11 +22,11 @@
 using namespace Scintilla;
 
 // Extended to accept accented characters
-static inline bool IsAWordChar(int ch) noexcept {
-	return ch >= 0x80 || (isalnum(ch) || ch == '_' || ch == ':' || ch == '.'); // : name space separator
+static constexpr bool IsAWordChar(int ch) noexcept {
+	return ch >= 0x80 || (IsAlphaNumeric(ch) || ch == '_' || ch == ':' || ch == '.'); // : name space separator
 }
 
-static inline bool IsAWordStart(int ch) noexcept {
+static constexpr bool IsAWordStart(int ch) noexcept {
 	return ch >= 0x80 || (ch == ':' || IsAlpha(ch) || ch == '_');
 }
 

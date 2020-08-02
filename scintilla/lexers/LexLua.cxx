@@ -9,7 +9,6 @@
 
 #include <cassert>
 #include <cstring>
-#include <cctype>
 
 #include "ILexer.h"
 #include "Scintilla.h"
