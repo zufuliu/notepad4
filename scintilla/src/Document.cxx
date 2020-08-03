@@ -2424,7 +2424,7 @@ void Document::NotifyModified(DocModification mh) {
 }
 
 // Used for word part navigation.
-static bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
+static constexpr bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
 	switch (ch) {
 	case '!':
 	case '"':
@@ -2608,9 +2608,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	if (chSeek == '\0')
 		return -1;
 	const int styBrace = StyleIndexAt(position);
-	int direction = -1;
-	if (chBrace == '(' || chBrace == '[' || chBrace == '{' || chBrace == '<')
-		direction = 1;
+	const int direction = (chBrace < chSeek) ? 1 : -1;
 	int depth = 1;
 	position = useStartPos ? startPos : NextPosition(position, direction);
 	while ((position >= 0) && (position < Length())) {
