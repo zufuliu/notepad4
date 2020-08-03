@@ -46,6 +46,11 @@ public:
 	}
 };
 
+template <typename T, typename... Args>
+constexpr bool AnyOf(T t, Args... args) noexcept {
+	return ((t == args) || ...);
+}
+
 // Functions for classifying characters
 
 constexpr bool IsEOLChar(int ch) noexcept {
