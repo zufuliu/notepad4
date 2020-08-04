@@ -2425,43 +2425,7 @@ void Document::NotifyModified(DocModification mh) {
 
 // Used for word part navigation.
 static constexpr bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
-	switch (ch) {
-	case '!':
-	case '"':
-	case '#':
-	case '$':
-	case '%':
-	case '&':
-	case '\'':
-	case '(':
-	case ')':
-	case '*':
-	case '+':
-	case ',':
-	case '-':
-	case '.':
-	case '/':
-	case ':':
-	case ';':
-	case '<':
-	case '=':
-	case '>':
-	case '?':
-	case '@':
-	case '[':
-	case '\\':
-	case ']':
-	case '^':
-	case '_':
-	case '`':
-	case '{':
-	case '|':
-	case '}':
-	case '~':
-		return true;
-	default:
-		return false;
-	}
+	return IsPunctuation(ch);
 }
 
 bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
@@ -2481,7 +2445,13 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 		if (pos > 0) {
 			ceStart = CharacterAfter(pos);
 			pos -= CharacterBefore(pos).widthBytes;
-			if (IsLowerCase(ceStart.character)) {
+			if (!IsASCII(ceStart.character)) {
+				while (pos > 0 && !IsASCII(CharacterAfter(pos).character)) {
+					pos -= CharacterBefore(pos).widthBytes;
+				}
+				if (IsASCII(CharacterAfter(pos).character))
+					pos += CharacterAfter(pos).widthBytes;
+			} else if (IsLowerCase(ceStart.character)) {
 				while (pos > 0 && IsLowerCase(CharacterAfter(pos).character)) {
 					pos -= CharacterBefore(pos).widthBytes;
 				}
@@ -2499,7 +2469,7 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 				}
 				if (!IsADigit(CharacterAfter(pos).character))
 					pos += CharacterAfter(pos).widthBytes;
-			} else if (IsASCIIPunctuationCharacter(ceStart.character)) {
+			} else if (IsGraphic(ceStart.character)) {
 				while (pos > 0 && IsASCIIPunctuationCharacter(CharacterAfter(pos).character)) {
 					pos -= CharacterBefore(pos).widthBytes;
 				}
@@ -2510,12 +2480,6 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 					pos -= CharacterBefore(pos).widthBytes;
 				}
 				if (!isspacechar(CharacterAfter(pos).character))
-					pos += CharacterAfter(pos).widthBytes;
-			} else if (!IsASCII(ceStart.character)) {
-				while (pos > 0 && !IsASCII(CharacterAfter(pos).character)) {
-					pos -= CharacterBefore(pos).widthBytes;
-				}
-				if (IsASCII(CharacterAfter(pos).character))
 					pos += CharacterAfter(pos).widthBytes;
 			} else {
 				pos += CharacterAfter(pos).widthBytes;
@@ -2553,7 +2517,7 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 	} else if (IsADigit(ceStart.character)) {
 		while (pos < length && IsADigit(CharacterAfter(pos).character))
 			pos += CharacterAfter(pos).widthBytes;
-	} else if (IsASCIIPunctuationCharacter(ceStart.character)) {
+	} else if (IsGraphic(ceStart.character)) {
 		while (pos < length && IsASCIIPunctuationCharacter(CharacterAfter(pos).character))
 			pos += CharacterAfter(pos).widthBytes;
 	} else if (isspacechar(ceStart.character)) {
