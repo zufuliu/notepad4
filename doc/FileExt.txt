@@ -166,6 +166,7 @@ Assembler Source
 	s
 	sx
 	inc
+	cod				Visual C++ assembler output machine code
 	a51				Keil A51
 
 Asymptote Code
