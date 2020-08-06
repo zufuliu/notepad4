@@ -528,12 +528,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	const __m128i vectLF = _mm_set1_epi8('\n');
 	while (ptr + 2*sizeof(__m128i) <= end) {
 		// unaligned loading: line starts at random position.
-		__m128i chunk = _mm_loadu_si128((__m128i *)ptr);
-		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR));
-		uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF));
-		chunk = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
-		maskCR |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectCR))) << sizeof(__m128i);
-		maskLF |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk, vectLF))) << sizeof(__m128i);
+		const __m128i chunk1 = _mm_loadu_si128((__m128i *)ptr);
+		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
+		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectCR));
+		uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m128i);
+		maskLF |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m128i);
 
 		ptr += 2*sizeof(__m128i);
 		if (maskCR) {

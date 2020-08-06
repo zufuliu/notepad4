@@ -51,6 +51,11 @@ constexpr bool AnyOf(T t, Args... args) noexcept {
 	return ((t == args) || ...);
 }
 
+template <typename... Args>
+inline bool AnyOf(const char *s, Args... args) noexcept {
+	return ((::strcmp(s, args) == 0) || ...);
+}
+
 // Functions for classifying characters
 
 constexpr bool IsEOLChar(int ch) noexcept {
@@ -195,11 +200,15 @@ constexpr bool isoperator(int ch) noexcept {
 }
 
 constexpr bool IsGraphic(int ch) noexcept {
+	// excludes C0 control characters and whitespace
 	return ch > 32 && ch != 127;
 }
 
 constexpr bool IsPunctuation(int ch) noexcept {
-	return (ch > 32 && ch < 127) && !IsAlphaNumeric(ch);
+	return (ch > 32 && ch < '0')
+		|| (ch > '9' && ch < 'A')
+		|| (ch > 'Z' && ch < 'a')
+		|| (ch > 'z' && ch < 127);
 }
 
 // Simple case functions for ASCII supersets.
