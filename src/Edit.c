@@ -461,9 +461,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
-	Sci_Line lineCountCRLF = 0;
-	Sci_Line lineCountCR = 0;
-	Sci_Line lineCountLF = 0;
+	DWORD lineCountCRLF = 0;
+	DWORD lineCountCR = 0;
+	DWORD lineCountLF = 0;
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
@@ -604,9 +604,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		}
 	}
 
-	const Sci_Line linesMax = max_pos(max_pos(lineCountCRLF, lineCountCR), lineCountLF);
+	const DWORD linesMax = max_u(max_u(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
-	const Sci_Line linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
+	const DWORD linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
 	int iEOLMode = status->iEOLMode;
 	if (linesMax != linesCount[iEOLMode]) {
 		if (linesMax == lineCountCRLF) {
@@ -621,11 +621,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #if 0
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "EOL time");
-#if defined(_WIN64)
-	printf("%s CR+LF:%" PRId64 ", LF: %" PRId64 ", CR: %" PRId64 "\n", __func__, lineCountCRLF, lineCountLF, lineCountCR);
-#else
-	printf("%s CR+LF:%d, LF: %d, CR: %d\n", __func__, lineCountCRLF, lineCountLF, lineCountCR);
-#endif
+	printf("%s CR+LF:%u, LF: %u, CR: %u\n", __func__, lineCountCRLF, lineCountLF, lineCountCR);
 #endif
 
 	status->iEOLMode = iEOLMode;
