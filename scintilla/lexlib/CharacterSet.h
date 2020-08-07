@@ -51,10 +51,12 @@ constexpr bool AnyOf(T t, Args... args) noexcept {
 	return ((t == args) || ...);
 }
 
+#if defined(_INC_STRING)
 template <typename... Args>
 inline bool AnyOf(const char *s, Args... args) noexcept {
 	return ((::strcmp(s, args) == 0) || ...);
 }
+#endif
 
 // Functions for classifying characters
 

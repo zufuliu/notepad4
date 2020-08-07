@@ -47,16 +47,6 @@
 	// TODO: Function Multiversioning https://gcc.gnu.org/wiki/FunctionMultiVersioning
 #endif
 
-#if NP2_USE_AVX2
-#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(__m256i)
-#elif NP2_USE_SSE2
-#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(__m128i)
-#elif defined(_WIN64)
-#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(uint64_t)
-#else
-#define NP2_ALIGNED_LOAD_ALIGNMENT	sizeof(uint32_t)
-#endif
-
 // for C++20, use functions from <bit> header.
 #if !(NP2_TARGET_ARM64 || NP2_TARGET_ARM32)
 
