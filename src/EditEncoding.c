@@ -1342,7 +1342,7 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		char buffer[sizeof(__m256i) + 1] = { '\0' };
+		NP2_alignas(32) char buffer[sizeof(__m256i) + 1] = { '\0' };
 		if (offset > 0) {
 			buffer[0] = data[offset - 1];
 		}
@@ -1350,8 +1350,8 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 			buffer[i + 1] = data[offset + i];
 		}
 
-		__m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
 		__m256i shifted_bytes = _mm256_load_si256((__m256i *)buffer);
+		__m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
 		if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 			return 0;
 		}
@@ -1497,7 +1497,7 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		char buffer[sizeof(__m128i) + 1] = { '\0' };
+		NP2_alignas(16) char buffer[sizeof(__m128i) + 1] = { '\0' };
 		if (offset > 0) {
 			buffer[0] = data[offset - 1];
 		}
@@ -1505,8 +1505,8 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 			buffer[i + 1] = data[offset + i];
 		}
 
-		__m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
 		__m128i shifted_bytes = _mm_load_si128((__m128i *)(buffer));
+		__m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
 		if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 			return 0;
 		}
@@ -1735,25 +1735,50 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 
 	{
 #if NP2_USE_AVX2
-		while (pt + sizeof(__m256i) <= end) {
-			const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
-			const uint32_t mask = _mm256_movemask_epi8(chunk);
+		while (pt + 2*sizeof(__m256i) <= end) {
+			const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
+			const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
+			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
 			if (mask) {
 				return FALSE;
 			}
-			pt += sizeof(__m256i);
+			pt += 2*sizeof(__m256i);
 		}
+		if (pt < end) {
+			NP2_alignas(32) char buffer[2*sizeof(__m256i)] = {'0'};
+			memcpy(buffer, pt, end - pt + 1);
+
+			const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
+			const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
+			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
+			return mask == 0;
+		}
+		return TRUE;
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		while (pt + 2*sizeof(__m128i) <= end) {
+		while (pt + 4*sizeof(__m128i) <= end) {
 			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
 			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
-			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(chunk1, chunk2));
+			const __m128i chunk3 = _mm_loadu_si128((__m128i *)(pt + 2*sizeof(__m128i)));
+			const __m128i chunk4 = _mm_loadu_si128((__m128i *)(pt + 3*sizeof(__m128i)));
+			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
 			if (mask) {
 				return FALSE;
 			}
-			pt += 2*sizeof(__m128i);
+			pt += 4*sizeof(__m128i);
 		}
+		if (pt < end) {
+			NP2_alignas(16) char buffer[4*sizeof(__m128i)] = {'0'};
+			memcpy(buffer, pt, end - pt + 1);
+
+			const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
+			const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
+			const __m128i chunk3 = _mm_load_si128((__m128i *)(buffer + 2*sizeof(__m128i)));
+			const __m128i chunk4 = _mm_load_si128((__m128i *)(buffer + 3*sizeof(__m128i)));
+			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
+			return mask == 0;
+		}
+		return TRUE;
 		// end NP2_USE_SSE2
 #elif defined(_WIN64)
 		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
@@ -1796,11 +1821,13 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 #endif
 	}
 
+#if !(NP2_USE_AVX2 || NP2_USE_SSE2)
 	while (pt < end && (*pt & 0x80) == 0) {
 		++pt;
 	}
 
 	return pt == end;
+#endif
 }
 
 #if 0

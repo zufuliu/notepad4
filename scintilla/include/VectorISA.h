@@ -10,6 +10,16 @@
 	#endif
 #endif
 
+#if defined(__cplusplus)
+#define NP2_alignas(n)		alignas(n)
+#elif defined(__GNUC__) || defined(__clang__)
+#define NP2_alignas(n)		__attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+#define NP2_alignas(n)		__declspec(align(n))
+#else
+#define NP2_alignas(n)		_Alignas(n)
+#endif
+
 // https://docs.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics
 #include <intrin.h>
 
@@ -55,35 +65,57 @@
 //! but LZCNT is not compatible with BSR, LZCNT = 31 - BSR.
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_ctz(x)		__builtin_ctz(x)
+	#define np2_ctz64(x)	__builtin_ctzll(x)
 #elif defined(_MSC_VER) || defined(__INTEL_COMPILER_BUILD_DATE)
 	#define np2_ctz(x)		_tzcnt_u32(x)
-#elif defined(_WIN32)
+	#define np2_ctz64(x)	_tzcnt_u64(x)
+#else
 	// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=bsf
 	static __forceinline uint32_t np2_ctz(uint32_t value) NP2_noexcept {
 		unsigned long trailing;
 		_BitScanForward(&trailing, value);
 		return trailing;
 	}
-#else
-	#define np2_ctz(x)		_bit_scan_forward(x)
+
+#if defined(_WIN64)
+	static __forceinline uint32_t np2_ctz64(uint64_t value) NP2_noexcept {
+		unsigned long trailing;
+		_BitScanForward64(&trailing, value);
+		return trailing;
+	}
+#endif
 #endif
 
 // count bits set
 #if defined(__clang__) || defined(__GNUC__)
-	#define np2_popcount(x)	__builtin_popcount(x)
+	#define np2_popcount(x)		__builtin_popcount(x)
+	#define np2_popcount64(x)	__builtin_popcountll(x)
 #elif NP2_USE_AVX2
-	#define np2_popcount(x)	_mm_popcnt_u32(x)
+	#define np2_popcount(x)		_mm_popcnt_u32(x)
+	#define np2_popcount64(x)	_mm_popcnt_u64(x)
 #else
 	// https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 	// Bit Twiddling Hacks copyright 1997-2005 Sean Eron Anderson
+	// see also https://github.com/WojciechMula/sse-popcount
 	static __forceinline uint32_t bth_popcount(uint32_t v) NP2_noexcept {
 		v = v - ((v >> 1) & 0x55555555U);
 		v = (v & 0x33333333U) + ((v >> 2) & 0x33333333U);
 		return (((v + (v >> 4)) & 0x0F0F0F0FU) * 0x01010101U) >> 24;
 	}
 
-	//#define np2_popcount(x)	__popcnt(x)
-	#define np2_popcount(x)	bth_popcount(x)
+	//#define np2_popcount(x)		__popcnt(x)
+	#define np2_popcount(x)		bth_popcount(x)
+
+#if defined(_WIN64)
+	static __forceinline uint64_t bth_popcount64(uint64_t v) NP2_noexcept {
+		v = v - ((v >> 1) & UINT64_C(0x5555555555555555));
+		v = (v & UINT64_C(0x3333333333333333)) + ((v >> 2) & UINT64_C(0x3333333333333333));
+		return (((v + (v >> 4)) & UINT64_C(0x0F0F0F0F0F0F0F0F)) * UINT64_C(0x0101010101010101)) >> 56;
+	}
+
+	//#define np2_popcount64(x)	__popcnt64(x)
+	#define np2_popcount64(x)	bth_popcount64(x)
+#endif
 #endif
 
 #endif

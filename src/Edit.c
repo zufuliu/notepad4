@@ -461,34 +461,32 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
-	DWORD lineCountCRLF = 0;
-	DWORD lineCountCR = 0;
-	DWORD lineCountLF = 0;
+	size_t lineCountCRLF = 0;
+	size_t lineCountCR = 0;
+	size_t lineCountLF = 0;
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
-
-	// tools/GenerateTable.py
-	static const uint8_t eolTable[16] = {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
-	};
 
 	const uint8_t *ptr = (const uint8_t *)lpData;
 	// No NULL-terminated requirement for *ptr == '\n'
 	const uint8_t * const end = ptr + cbData - 1;
 
 #if NP2_USE_AVX2
-	const uint32_t LAST_CR_MASK = (1U << (sizeof(__m256i) - 1));
+	const uint64_t LAST_CR_MASK = (UINT64_C(1) << (2*sizeof(__m256i) - 1));
 	const __m256i vectCR = _mm256_set1_epi8('\r');
 	const __m256i vectLF = _mm256_set1_epi8('\n');
-	while (ptr + sizeof(__m256i) <= end) {
+	while (ptr + 2*sizeof(__m256i) <= end) {
 		// unaligned loading: line starts at random position.
-		const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
-		uint32_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectCR));
-		uint32_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, vectLF));
+		const __m256i chunk1 = _mm256_loadu_si256((__m256i *)ptr);
+		const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(ptr + sizeof(__m256i)));
+		uint64_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
+		uint64_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
+		maskLF |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 
-		ptr += sizeof(__m256i);
+		ptr += 2*sizeof(__m256i);
 		if (maskCR) {
 			if (maskCR & LAST_CR_MASK) {
 				maskCR &= LAST_CR_MASK - 1;
@@ -506,23 +504,157 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
-			const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
-			const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			const uint64_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint64_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
 			maskLF = maskCR_LF & maskLF; // LF alone
 			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
 			if (maskCRLF) {
-				lineCountCRLF += np2_popcount(maskCRLF);
+				lineCountCRLF += np2_popcount64(maskCRLF);
 			}
 			if (maskCR) {
-				lineCountCR += np2_popcount(maskCR);
+				lineCountCR += np2_popcount64(maskCR);
 			}
 		}
 		if (maskLF) {
-			lineCountLF += np2_popcount(maskLF);
+			lineCountLF += np2_popcount64(maskLF);
+		}
+	}
+
+	if (ptr < end) {
+		NP2_alignas(32) char buffer[2*sizeof(__m256i)] = {'\0'};
+		memcpy(buffer, ptr, end - ptr + 2);
+		ptr = end + 1;
+
+		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
+		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
+		uint64_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
+		uint64_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
+		maskLF |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
+
+		if (maskCR) {
+			if (maskCR & LAST_CR_MASK) {
+				maskCR &= LAST_CR_MASK - 1;
+				++lineCountCR;
+			}
+
+			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// the bits both set in maskCR and maskLF represents CR+LF;
+			// the bits only set in maskCR or maskLF represents individual CR or LF.
+			const uint64_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint64_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			maskLF = maskCR_LF & maskLF; // LF alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			if (maskCRLF) {
+				lineCountCRLF += np2_popcount64(maskCRLF);
+			}
+			if (maskCR) {
+				lineCountCR += np2_popcount64(maskCR);
+			}
+		}
+		if (maskLF) {
+			lineCountLF += np2_popcount64(maskLF);
 		}
 	}
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
+#if defined(_WIN64)
+	const uint64_t LAST_CR_MASK = (UINT64_C(1) << (4*sizeof(__m128i) - 1));
+	const __m128i vectCR = _mm_set1_epi8('\r');
+	const __m128i vectLF = _mm_set1_epi8('\n');
+	while (ptr + 4*sizeof(__m128i) <= end) {
+		// unaligned loading: line starts at random position.
+		const __m128i chunk1 = _mm_loadu_si128((__m128i *)ptr);
+		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
+		const __m128i chunk3 = _mm_loadu_si128((__m128i *)(ptr + 2*sizeof(__m128i)));
+		const __m128i chunk4 = _mm_loadu_si128((__m128i *)(ptr + 3*sizeof(__m128i)));
+		uint64_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectCR));
+		uint64_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m128i);
+		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m128i);
+		maskCR |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk3, vectCR))) << 2*sizeof(__m128i);
+		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk3, vectLF))) << 2*sizeof(__m128i);
+		maskCR |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectCR))) << 3*sizeof(__m128i);
+		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectLF))) << 3*sizeof(__m128i);
+
+		ptr += 4*sizeof(__m128i);
+		if (maskCR) {
+			if (maskCR & LAST_CR_MASK) {
+				maskCR &= LAST_CR_MASK - 1;
+				if (*ptr == '\n') {
+					// CR+LF across boundary
+					++ptr;
+					++lineCountCRLF;
+				} else {
+					// clear highest bit (last CR) to avoid using following code:
+					// maskCR = (maskCR_LF ^ maskLF) | (maskCR & LAST_CR_MASK);
+					++lineCountCR;
+				}
+			}
+
+			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// the bits both set in maskCR and maskLF represents CR+LF;
+			// the bits only set in maskCR or maskLF represents individual CR or LF.
+			const uint64_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint64_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			maskLF = maskCR_LF & maskLF; // LF alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			if (maskCRLF) {
+				lineCountCRLF += np2_popcount64(maskCRLF);
+			}
+			if (maskCR) {
+				lineCountCR += np2_popcount64(maskCR);
+			}
+		}
+		if (maskLF) {
+			lineCountLF += np2_popcount64(maskLF);
+		}
+	}
+
+	if (ptr < end) {
+		NP2_alignas(16) char buffer[4*sizeof(__m128i)] = {'\0'};
+		memcpy(buffer, ptr, end - ptr + 2);
+		ptr = end + 1;
+
+		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
+		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
+		const __m128i chunk3 = _mm_load_si128((__m128i *)(buffer + 2*sizeof(__m128i)));
+		const __m128i chunk4 = _mm_load_si128((__m128i *)(buffer + 3*sizeof(__m128i)));
+		uint64_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectCR));
+		uint64_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m128i);
+		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m128i);
+		maskCR |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk3, vectCR))) << 2*sizeof(__m128i);
+		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk3, vectLF))) << 2*sizeof(__m128i);
+		maskCR |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectCR))) << 3*sizeof(__m128i);
+		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectLF))) << 3*sizeof(__m128i);
+
+		if (maskCR) {
+			if (maskCR & LAST_CR_MASK) {
+				maskCR &= LAST_CR_MASK - 1;
+				++lineCountCR;
+			}
+
+			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// the bits both set in maskCR and maskLF represents CR+LF;
+			// the bits only set in maskCR or maskLF represents individual CR or LF.
+			const uint64_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint64_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			maskLF = maskCR_LF & maskLF; // LF alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			if (maskCRLF) {
+				lineCountCRLF += np2_popcount64(maskCRLF);
+			}
+			if (maskCR) {
+				lineCountCR += np2_popcount64(maskCR);
+			}
+		}
+		if (maskLF) {
+			lineCountLF += np2_popcount64(maskLF);
+		}
+	}
+	// end _WIN64 NP2_USE_SSE2
+#else
 	const uint32_t LAST_CR_MASK = (1U << (2*sizeof(__m128i) - 1));
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
@@ -568,8 +700,51 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			lineCountLF += np2_popcount(maskLF);
 		}
 	}
-	// end NP2_USE_SSE2
+
+	if (ptr < end) {
+		NP2_alignas(16) char buffer[2*sizeof(__m128i)] = {'\0'};
+		memcpy(buffer, ptr, end - ptr + 2);
+		ptr = end + 1;
+
+		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
+		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
+		uint32_t maskCR = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectCR));
+		uint32_t maskLF = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m128i);
+		maskLF |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m128i);
+
+		if (maskCR) {
+			if (maskCR & LAST_CR_MASK) {
+				maskCR &= LAST_CR_MASK - 1;
+				++lineCountCR;
+			}
+
+			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// the bits both set in maskCR and maskLF represents CR+LF;
+			// the bits only set in maskCR or maskLF represents individual CR or LF.
+			const uint32_t maskCRLF = (maskCR << 1) & maskLF; // CR+LF
+			const uint32_t maskCR_LF = (maskCR << 1) ^ maskLF;// CR alone or LF alone
+			maskLF = maskCR_LF & maskLF; // LF alone
+			maskCR = maskCR_LF ^ maskLF; // CR alone (with one position offset)
+			if (maskCRLF) {
+				lineCountCRLF += np2_popcount(maskCRLF);
+			}
+			if (maskCR) {
+				lineCountCR += np2_popcount(maskCR);
+			}
+		}
+		if (maskLF) {
+			lineCountLF += np2_popcount(maskLF);
+		}
+	}
 #endif
+	// end NP2_USE_SSE2
+#else
+
+	// tools/GenerateTable.py
+	static const uint8_t eolTable[16] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
+	};
 
 	do {
 		// skip to line end
@@ -592,6 +767,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			break;
 		}
 	} while (ptr < end);
+#endif
 
 	if (ptr == end) {
 		switch (*ptr) {
@@ -604,9 +780,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		}
 	}
 
-	const DWORD linesMax = max_u(max_u(lineCountCRLF, lineCountCR), lineCountLF);
+	const size_t linesMax = max_z(max_z(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
-	const DWORD linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
+	const size_t linesCount[3] = { lineCountCRLF, lineCountCR, lineCountLF };
 	int iEOLMode = status->iEOLMode;
 	if (linesMax != linesCount[iEOLMode]) {
 		if (linesMax == lineCountCRLF) {
@@ -621,7 +797,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 #if 0
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "EOL time");
-	printf("%s CR+LF:%u, LF: %u, CR: %u\n", __func__, lineCountCRLF, lineCountLF, lineCountCR);
+	printf("%s CR+LF:%u, LF: %u, CR: %u\n", __func__, (UINT)lineCountCRLF, (UINT)lineCountLF, (UINT)lineCountCR);
 #endif
 
 	status->iEOLMode = iEOLMode;
