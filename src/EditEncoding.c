@@ -1593,7 +1593,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			const uint32_t mask = _mm256_movemask_epi8(chunk);
 			if (mask) {
 				// skip leading and trailing ASCII
-				const DWORD trailing = np2_ctz(mask);
+				const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
 				DWORD leading;
 				_BitScanReverse(&leading, mask);
 
@@ -1602,20 +1602,24 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				do {
 					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
 				} while (temp < endPtr);
-				if (state == UTF8_REJECT) {
+				if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
 					return FALSE;
 				}
+			} else if (state != UTF8_ACCEPT) {
+				return FALSE;
 			}
 			pt += sizeof(__m256i);
 		}
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		while (pt + sizeof(__m128i) <= end) {
-			const __m128i chunk = _mm_loadu_si128((__m128i *)pt);
-			const uint32_t mask = _mm_movemask_epi8(chunk);
+		while (pt + 2*sizeof(__m128i) <= end) {
+			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+			const uint32_t mask = _mm_movemask_epi8(chunk1)
+				| (((uint32_t)_mm_movemask_epi8(chunk2)) << sizeof(__m128i));
 			if (mask) {
 				// skip leading and trailing ASCII
-				const DWORD trailing = np2_ctz(mask);
+				const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
 				DWORD leading;
 				_BitScanReverse(&leading, mask);
 
@@ -1624,20 +1628,19 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				do {
 					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
 				} while (temp < endPtr);
-				if (state == UTF8_REJECT) {
+				if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
 					return FALSE;
 				}
+			} else if (state != UTF8_ACCEPT) {
+				return FALSE;
 			}
-			pt += sizeof(__m128i);
+			pt += 2*sizeof(__m128i);
 		}
 		// end NP2_USE_SSE2
 #elif defined(_WIN64)
 		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
 		while (pt < ptr) {
 			state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-		}
-		if (state == UTF8_REJECT) {
-			return FALSE;
 		}
 
 		const uint64_t *temp = (const uint64_t *)pt;
@@ -1669,6 +1672,8 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				if (state == UTF8_REJECT) {
 					return FALSE;
 				}
+			} else if (state != UTF8_ACCEPT) {
+				return FALSE;
 			}
 			++temp;
 		}
@@ -1678,9 +1683,6 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
 		while (pt < ptr) {
 			state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-		}
-		if (state == UTF8_REJECT) {
-			return FALSE;
 		}
 
 		const uint32_t *temp = (const uint32_t *)pt;
@@ -1704,6 +1706,8 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				if (state == UTF8_REJECT) {
 					return FALSE;
 				}
+			} else if (state != UTF8_ACCEPT) {
+				return FALSE;
 			}
 			++temp;
 		}
@@ -1741,12 +1745,14 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		}
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		while (pt + sizeof(__m128i) <= end) {
-			const __m128i chunk = _mm_loadu_si128((__m128i *)pt);
-			if (_mm_movemask_epi8(chunk)) {
+		while (pt + 2*sizeof(__m128i) <= end) {
+			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(chunk1, chunk2));
+			if (mask) {
 				return FALSE;
 			}
-			pt += sizeof(__m128i);
+			pt += 2*sizeof(__m128i);
 		}
 		// end NP2_USE_SSE2
 #elif defined(_WIN64)
