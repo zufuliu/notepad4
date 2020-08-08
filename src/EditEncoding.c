@@ -606,14 +606,7 @@ void Encoding_GetLabel(int iEncoding) {
 		GetString(mEncoding[iEncoding].idsName, wch, COUNTOF(wch));
 		LPCWSTR pwsz = StrChr(wch, L';');
 		if (pwsz != NULL) {
-#if 0
-			pwsz = StrChr(pwsz + 1, L';');
-			if (pwsz != NULL) {
-				++pwsz;
-			}
-#else
 			++pwsz;
-#endif
 		}
 		if (StrIsEmpty(pwsz)) {
 			pwsz = wch;
@@ -1544,7 +1537,9 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	StopWatch_ShowLog(&watch, "UTF8 time");
 #endif
 	return result;
-#else // end NP2_USE_AVX2
+	// end NP2_USE_AVX2
+#else
+
 #if NP2_USE_SSE2
 	if (did_cpu_supports_ssse3()) {
 		const BOOL result = z_validate_utf8_sse4(pTest, nLength);
@@ -1586,135 +1581,133 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	const uint8_t * const end = pt + nLength;
 	UINT state = UTF8_ACCEPT;
 
-	{
 #if 0 // NP2_USE_AVX2
-		while (pt + sizeof(__m256i) <= end) {
-			const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
-			const uint32_t mask = _mm256_movemask_epi8(chunk);
-			if (mask) {
-				// skip leading and trailing ASCII
-				const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
-				DWORD leading;
-				_BitScanReverse(&leading, mask);
+	while (pt + sizeof(__m256i) <= end) {
+		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		const uint32_t mask = _mm256_movemask_epi8(chunk);
+		if (mask) {
+			// skip leading and trailing ASCII
+			const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
+			DWORD leading;
+			_BitScanReverse(&leading, mask);
 
-				const uint8_t *temp = pt + trailing;
-				const uint8_t * const endPtr = pt + leading + 1;
-				do {
-					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
-				} while (temp < endPtr);
-				if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
-					return FALSE;
-				}
-			} else if (state != UTF8_ACCEPT) {
+			const uint8_t *temp = pt + trailing;
+			const uint8_t * const endPtr = pt + leading + 1;
+			do {
+				state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
+			} while (temp < endPtr);
+			if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
 				return FALSE;
 			}
-			pt += sizeof(__m256i);
+		} else if (state != UTF8_ACCEPT) {
+			return FALSE;
 		}
-		// end NP2_USE_AVX2
-#elif NP2_USE_SSE2
-		while (pt + 2*sizeof(__m128i) <= end) {
-			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
-			const uint32_t mask = _mm_movemask_epi8(chunk1)
-				| (((uint32_t)_mm_movemask_epi8(chunk2)) << sizeof(__m128i));
-			if (mask) {
-				// skip leading and trailing ASCII
-				const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
-				DWORD leading;
-				_BitScanReverse(&leading, mask);
-
-				const uint8_t *temp = pt + trailing;
-				const uint8_t * const endPtr = pt + leading + 1;
-				do {
-					state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
-				} while (temp < endPtr);
-				if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
-					return FALSE;
-				}
-			} else if (state != UTF8_ACCEPT) {
-				return FALSE;
-			}
-			pt += 2*sizeof(__m128i);
-		}
-		// end NP2_USE_SSE2
-#elif defined(_WIN64)
-		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
-		while (pt < ptr) {
-			state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-		}
-
-		const uint64_t *temp = (const uint64_t *)pt;
-		const uint64_t * const temp_end = (const uint64_t *)end;
-		while (temp < temp_end) {
-			const uint64_t val = *temp;
-			if (val & UINT64_C(0x8080808080808080)) {
-#if 0
-				pt = (const uint8_t *)temp;
-				state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[3]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[4]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[5]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[6]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[7]]];
-#else
-				// same as above
-				state = utf8_dfa[256 + state + utf8_dfa[val & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 8) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 16) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 24) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 32) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 40) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 48) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[val >> 56]];
-#endif
-				if (state == UTF8_REJECT) {
-					return FALSE;
-				}
-			} else if (state != UTF8_ACCEPT) {
-				return FALSE;
-			}
-			++temp;
-		}
-		pt = (const uint8_t *)temp;
-		// end _WIN64
-#else
-		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
-		while (pt < ptr) {
-			state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-		}
-
-		const uint32_t *temp = (const uint32_t *)pt;
-		const uint32_t * const temp_end = (const uint32_t *)end;
-		while (temp < temp_end) {
-			const uint32_t val = *temp;
-			if (val & 0x80808080U) {
-#if 0
-				pt = (const uint8_t *)temp;
-				state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
-				state = utf8_dfa[256 + state + utf8_dfa[pt[3]]];
-#else
-				// same as above
-				state = utf8_dfa[256 + state + utf8_dfa[val & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 8) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[(val >> 16) & 255]];
-				state = utf8_dfa[256 + state + utf8_dfa[val >> 24]];
-#endif
-				if (state == UTF8_REJECT) {
-					return FALSE;
-				}
-			} else if (state != UTF8_ACCEPT) {
-				return FALSE;
-			}
-			++temp;
-		}
-		pt = (const uint8_t *)temp;
-		// end _WIN32
-#endif
+		pt += sizeof(__m256i);
 	}
+	// end NP2_USE_AVX2
+#elif NP2_USE_SSE2
+	while (pt + 2*sizeof(__m128i) <= end) {
+		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		const uint32_t mask = _mm_movemask_epi8(chunk1)
+			| (((uint32_t)_mm_movemask_epi8(chunk2)) << sizeof(__m128i));
+		if (mask) {
+			// skip leading and trailing ASCII
+			const DWORD trailing = (state != UTF8_ACCEPT)? 0 : np2_ctz(mask);
+			DWORD leading;
+			_BitScanReverse(&leading, mask);
+
+			const uint8_t *temp = pt + trailing;
+			const uint8_t * const endPtr = pt + leading + 1;
+			do {
+				state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
+			} while (temp < endPtr);
+			if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
+				return FALSE;
+			}
+		} else if (state != UTF8_ACCEPT) {
+			return FALSE;
+		}
+		pt += 2*sizeof(__m128i);
+	}
+	// end NP2_USE_SSE2
+#elif defined(_WIN64)
+	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
+	while (pt < ptr) {
+		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
+	}
+
+	const uint64_t *temp = (const uint64_t *)pt;
+	const uint64_t * const temp_end = (const uint64_t *)end;
+	while (temp < temp_end) {
+		const uint64_t val = *temp;
+		if (val & UINT64_C(0x8080808080808080)) {
+#if 0
+			pt = (const uint8_t *)temp;
+			state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[3]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[4]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[5]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[6]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[7]]];
+#else
+			// same as above
+			state = utf8_dfa[256 + state + utf8_dfa[val & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 8) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 16) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 24) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 32) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 40) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 48) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[val >> 56]];
+#endif
+			if (state == UTF8_REJECT) {
+				return FALSE;
+			}
+		} else if (state != UTF8_ACCEPT) {
+			return FALSE;
+		}
+		++temp;
+	}
+	pt = (const uint8_t *)temp;
+	// end _WIN64
+#else
+	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
+	while (pt < ptr) {
+		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
+	}
+
+	const uint32_t *temp = (const uint32_t *)pt;
+	const uint32_t * const temp_end = (const uint32_t *)end;
+	while (temp < temp_end) {
+		const uint32_t val = *temp;
+		if (val & 0x80808080U) {
+#if 0
+			pt = (const uint8_t *)temp;
+			state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
+			state = utf8_dfa[256 + state + utf8_dfa[pt[3]]];
+#else
+			// same as above
+			state = utf8_dfa[256 + state + utf8_dfa[val & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 8) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[(val >> 16) & 255]];
+			state = utf8_dfa[256 + state + utf8_dfa[val >> 24]];
+#endif
+			if (state == UTF8_REJECT) {
+				return FALSE;
+			}
+		} else if (state != UTF8_ACCEPT) {
+			return FALSE;
+		}
+		++temp;
+	}
+	pt = (const uint8_t *)temp;
+	// end _WIN32
+#endif
 
 	while (pt < end) {
 		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
@@ -1733,95 +1726,94 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	const uint8_t *pt = (const uint8_t *)pTest;
 	const uint8_t * const end = pt + nLength;
 
-	{
 #if NP2_USE_AVX2
-		while (pt + 2*sizeof(__m256i) <= end) {
-			const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
-			const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
-			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
-			if (mask) {
-				return FALSE;
-			}
-			pt += 2*sizeof(__m256i);
+	while (pt + 2*sizeof(__m256i) <= end) {
+		const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
+		const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
+		const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
+		if (mask) {
+			return FALSE;
 		}
-		if (pt < end) {
-			NP2_alignas(32) char buffer[2*sizeof(__m256i)] = {'0'};
-			memcpy(buffer, pt, end - pt + 1);
+		pt += 2*sizeof(__m256i);
+	}
+	if (pt < end) {
+		NP2_alignas(32) char buffer[2*sizeof(__m256i)] = {'0'};
+		memcpy(buffer, pt, end - pt + 1);
 
-			const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
-			const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
-			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
-			return mask == 0;
-		}
-		return TRUE;
-		// end NP2_USE_AVX2
+		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
+		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
+		const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
+		return mask == 0;
+	}
+	return TRUE;
+	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		while (pt + 4*sizeof(__m128i) <= end) {
-			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
-			const __m128i chunk3 = _mm_loadu_si128((__m128i *)(pt + 2*sizeof(__m128i)));
-			const __m128i chunk4 = _mm_loadu_si128((__m128i *)(pt + 3*sizeof(__m128i)));
-			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
-			if (mask) {
-				return FALSE;
-			}
-			pt += 4*sizeof(__m128i);
-		}
-		if (pt < end) {
-			NP2_alignas(16) char buffer[4*sizeof(__m128i)] = {'0'};
-			memcpy(buffer, pt, end - pt + 1);
-
-			const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
-			const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
-			const __m128i chunk3 = _mm_load_si128((__m128i *)(buffer + 2*sizeof(__m128i)));
-			const __m128i chunk4 = _mm_load_si128((__m128i *)(buffer + 3*sizeof(__m128i)));
-			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
-			return mask == 0;
-		}
-		return TRUE;
-		// end NP2_USE_SSE2
-#elif defined(_WIN64)
-		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
-		while (pt < ptr && (*pt & 0x80) == 0) {
-			++pt;
-		}
-		if (pt != ptr) {
+	while (pt + 4*sizeof(__m128i) <= end) {
+		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		const __m128i chunk3 = _mm_loadu_si128((__m128i *)(pt + 2*sizeof(__m128i)));
+		const __m128i chunk4 = _mm_loadu_si128((__m128i *)(pt + 3*sizeof(__m128i)));
+		const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
+		if (mask) {
 			return FALSE;
 		}
+		pt += 4*sizeof(__m128i);
+	}
+	if (pt < end) {
+		NP2_alignas(16) char buffer[4*sizeof(__m128i)] = {'0'};
+		memcpy(buffer, pt, end - pt + 1);
 
-		const uint64_t *temp = (const uint64_t *)pt;
-		const uint64_t * const temp_end = (const uint64_t *)end;
-		while (temp < temp_end) {
-			if (*temp & UINT64_C(0x8080808080808080)) {
-				return FALSE;
-			}
-			++temp;
-		}
-		pt = (const uint8_t *)temp;
-		// end _WIN64
+		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
+		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
+		const __m128i chunk3 = _mm_load_si128((__m128i *)(buffer + 2*sizeof(__m128i)));
+		const __m128i chunk4 = _mm_load_si128((__m128i *)(buffer + 3*sizeof(__m128i)));
+		const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
+		return mask == 0;
+	}
+	return TRUE;
+	// end NP2_USE_SSE2
 #else
-		const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
-		while (pt < ptr && (*pt & 0x80) == 0) {
-			++pt;
-		}
-		if (pt != ptr) {
-			return FALSE;
-		}
 
-		const uint32_t *temp = (const uint32_t *)pt;
-		const uint32_t * const temp_end = (const uint32_t *)end;
-		while (temp < temp_end) {
-			if (*temp & 0x80808080U) {
-				return FALSE;
-			}
-			++temp;
-		}
-		pt = (const uint8_t *)temp;
-		// end _WIN32
-#endif
+#if defined(_WIN64)
+	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
+	while (pt < ptr && (*pt & 0x80) == 0) {
+		++pt;
+	}
+	if (pt != ptr) {
+		return FALSE;
 	}
 
-#if !(NP2_USE_AVX2 || NP2_USE_SSE2)
+	const uint64_t *temp = (const uint64_t *)pt;
+	const uint64_t * const temp_end = (const uint64_t *)end;
+	while (temp < temp_end) {
+		if (*temp & UINT64_C(0x8080808080808080)) {
+			return FALSE;
+		}
+		++temp;
+	}
+	pt = (const uint8_t *)temp;
+	// end _WIN64
+#else
+	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
+	while (pt < ptr && (*pt & 0x80) == 0) {
+		++pt;
+	}
+	if (pt != ptr) {
+		return FALSE;
+	}
+
+	const uint32_t *temp = (const uint32_t *)pt;
+	const uint32_t * const temp_end = (const uint32_t *)end;
+	while (temp < temp_end) {
+		if (*temp & 0x80808080U) {
+			return FALSE;
+		}
+		++temp;
+	}
+	pt = (const uint8_t *)temp;
+	// end _WIN32
+#endif
+
 	while (pt < end && (*pt & 0x80) == 0) {
 		++pt;
 	}

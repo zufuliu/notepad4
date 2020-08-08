@@ -1093,12 +1093,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			chPrev = ch;
 		}
 	} else {
-		// same as above, see EditDetectEOLMode() in Edit.c
-		// tools/GenerateTable.py
-		static const uint8_t eolTable[16] = {
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
-		};
-
 #if NP2_USE_AVX2
 		constexpr uint32_t LAST_CR_MASK = (1U << (sizeof(__m256i) - 1));
 		const __m256i vectCR = _mm256_set1_epi8('\r');
@@ -1224,6 +1218,12 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		}
 		// end NP2_USE_SSE2
 #endif
+
+		// same as above, see EditDetectEOLMode() in Edit.c
+		// tools/GenerateTable.py
+		static const uint8_t eolTable[16] = {
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
+		};
 
 		while (ptr < end) {
 			// skip to line end
