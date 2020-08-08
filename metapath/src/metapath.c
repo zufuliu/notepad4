@@ -220,11 +220,21 @@ static void CleanUpResources(BOOL initialized) {
 	OleUninitialize();
 }
 
+BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) {
+	if (dwCtrlType == CTRL_C_EVENT) {
+		ShowNotifyIcon(hwndMain, FALSE);
+		SendMessage(hwndMain, WM_CLOSE, 0, 0);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 #if 0 // used for Clang UBSan or printing debug message on console.
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+		SetConsoleCtrlHandler(ConsoleHandlerRoutine, TRUE);
 		freopen("CONOUT$", "w", stdout);
 		freopen("CONOUT$", "w", stderr);
 		fprintf(stdout, "\n%s:%d %s\n", __FILE__, __LINE__, __FUNCTION__);
