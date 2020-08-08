@@ -38,6 +38,14 @@ NP2_inline UINT max_u(UINT x, UINT y) {
 	return (x > y) ? x : y;
 }
 
+NP2_inline size_t min_z(size_t x, size_t y) {
+	return (x < y) ? x : y;
+}
+
+NP2_inline size_t max_z(size_t x, size_t y) {
+	return (x > y) ? x : y;
+}
+
 NP2_inline long min_l(long x, long y) {
 	return (x < y) ? x : y;
 }
