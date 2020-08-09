@@ -2754,10 +2754,10 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	UINT count = 0;
 	while (ptr < end) {
 		uint8_t ch = *ptr++;
-		if (ch < 32 && (C0Mask & (1U << ch))) {
+		if (ch < 32 && ((C0Mask >> ch) & 1)) {
 			++count;
 			ch = *ptr++;
-			if ((count >= 8) || (ch < 32 && (C0Mask & (1U << ch)))) {
+			if ((count >= 8) || (ch < 32 && ((C0Mask >> ch) & 1))) {
 				return TRUE;
 			}
 		}
