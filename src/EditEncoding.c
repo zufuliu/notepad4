@@ -1335,7 +1335,9 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		NP2_alignas(32) char buffer[sizeof(__m256i) + 1] = { '\0' };
+		NP2_alignas(32) char buffer[2*sizeof(__m256i)];
+		ZeroMemory_32x2(buffer);
+
 		if (offset > 0) {
 			buffer[0] = data[offset - 1];
 		}
@@ -1488,7 +1490,9 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		NP2_alignas(16) char buffer[sizeof(__m128i) + 1] = { '\0' };
+		NP2_alignas(16) char buffer[2*sizeof(__m128i)];
+		ZeroMemory_16x2(buffer);
+
 		if (offset > 0) {
 			buffer[0] = data[offset - 1];
 		}
@@ -1735,7 +1739,8 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		pt += 2*sizeof(__m256i);
 	}
 	if (pt < end) {
-		NP2_alignas(32) char buffer[2*sizeof(__m256i)] = {'0'};
+		NP2_alignas(32) char buffer[2*sizeof(__m256i)];
+		ZeroMemory_32x2(buffer);
 		memcpy(buffer, pt, end - pt + 1);
 
 		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
@@ -1758,7 +1763,8 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		pt += 4*sizeof(__m128i);
 	}
 	if (pt < end) {
-		NP2_alignas(16) char buffer[4*sizeof(__m128i)] = {'0'};
+		NP2_alignas(16) char buffer[4*sizeof(__m128i)];
+		ZeroMemory_16x4(buffer);
 		memcpy(buffer, pt, end - pt + 1);
 
 		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);

@@ -119,3 +119,33 @@
 #endif
 
 #endif
+
+// fix MSVC 2017 bad code for zero memory
+#if NP2_USE_AVX2
+#define ZeroMemory_32x1(buffer) do { \
+	const __m256i zero = _mm256_setzero_si256();						\
+	_mm256_store_si256((__m256i *)(buffer), zero);						\
+} while (0)
+
+#define ZeroMemory_32x2(buffer) do { \
+	const __m256i zero = _mm256_setzero_si256();						\
+	_mm256_store_si256((__m256i *)(buffer), zero);						\
+	_mm256_store_si256((__m256i *)((buffer) + sizeof(__m256i)), zero);	\
+} while (0)
+#endif
+
+#if NP2_USE_SSE2
+#define ZeroMemory_16x2(buffer) do { \
+	const __m128i zero = _mm_setzero_si128();							\
+	_mm_store_si128((__m128i *)(buffer), zero);							\
+	_mm_store_si128((__m128i *)((buffer) + sizeof(__m128i)), zero);		\
+} while (0)
+
+#define ZeroMemory_16x4(buffer) do { \
+	const __m128i zero = _mm_setzero_si128();							\
+	_mm_store_si128((__m128i *)(buffer), zero);							\
+	_mm_store_si128((__m128i *)((buffer) + sizeof(__m128i)), zero);		\
+	_mm_store_si128((__m128i *)((buffer) + 2*sizeof(__m128i)), zero);	\
+	_mm_store_si128((__m128i *)((buffer) + 3*sizeof(__m128i)), zero);	\
+} while (0)
+#endif

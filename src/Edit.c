@@ -521,7 +521,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 
 	if (ptr < end) {
-		NP2_alignas(32) char buffer[2*sizeof(__m256i)] = {'\0'};
+		NP2_alignas(32) char buffer[2*sizeof(__m256i)];
+		ZeroMemory_32x2(buffer);
 		memcpy(buffer, ptr, end - ptr + 2);
 		ptr = end + 1;
 
@@ -612,7 +613,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 
 	if (ptr < end) {
-		NP2_alignas(16) char buffer[4*sizeof(__m128i)] = {'\0'};
+		NP2_alignas(16) char buffer[4*sizeof(__m128i)];
+		ZeroMemory_16x4(buffer);
 		memcpy(buffer, ptr, end - ptr + 2);
 		ptr = end + 1;
 
@@ -702,7 +704,8 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 
 	if (ptr < end) {
-		NP2_alignas(16) char buffer[2*sizeof(__m128i)] = {'\0'};
+		NP2_alignas(16) char buffer[2*sizeof(__m128i)];
+		ZeroMemory_16x2(buffer);
 		memcpy(buffer, ptr, end - ptr + 2);
 		ptr = end + 1;
 
