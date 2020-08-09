@@ -11,15 +11,6 @@ def GenerateBraceMatchTable():
 	line = ', '.join(hex(c) for c in table)
 	print('BraceMatch:', line)
 
-def GenerateEOLTable():
-	# used in EditDetectEOLMode() and CellBuffer::BasicInsertString()
-	table = [0] * 16
-	table[ord('\n')] = 1
-	table[ord('\r')] = 2
-	line = ', '.join(str(c) for c in table)
-	line = line + ', // %02X - %02X' % (0, 15)
-	print('EOLTable:', line)
-
 def GenerateC0ControlCharacterMask(excludeSeparator):
 	# used in Style_MaybeBinaryFile()
 	bits = ['1'] * 32
@@ -46,5 +37,4 @@ def GenerateC0ControlCharacterMask(excludeSeparator):
 
 if __name__ == '__main__':
 	GenerateBraceMatchTable()
-	GenerateEOLTable()
 	GenerateC0ControlCharacterMask(True)

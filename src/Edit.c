@@ -741,23 +741,18 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	// end NP2_USE_SSE2
 #else
 
-	// tools/GenerateTable.py
-	static const uint8_t eolTable[16] = {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
-	};
-
+	const uint32_t mask = (1 << '\r') | (1 << '\n');
 	do {
 		// skip to line end
-		uint8_t ch;
-		uint8_t type = 0;
-		while (ptr < end && ((ch = *ptr++) > '\r' || (type = eolTable[ch]) == 0)) {
+		uint8_t ch = 0;
+		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
 			// nop
 		}
-		switch (type) {
-		case 1: //'\n'
+		switch (ch) {
+		case '\n':
 			++lineCountLF;
 			break;
-		case 2: //'\r'
+		case '\r':
 			if (*ptr == '\n') {
 				++ptr;
 				++lineCountCRLF;
@@ -7834,7 +7829,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				FoldLevelStack_Push(&levelStack, level);
 				level = levelStack.levelCount;
-				if (state & (1U << level)) {
+				if ((state >> level) & 1) {
 					FoldToggleNode(line, &action, &fToggled);
 					if (level == maxLevel) {
 						line = SciCall_GetLastChild(line);
@@ -7849,7 +7844,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				level -= SC_FOLDLEVELBASE;
-				if (state & (1U << level)) {
+				if ((state >> level) & 1) {
 					FoldToggleNode(line, &action, &fToggled);
 					if (level == maxLevel) {
 						line = SciCall_GetLastChild(line);

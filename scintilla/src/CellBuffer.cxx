@@ -1219,25 +1219,20 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		// end NP2_USE_SSE2
 #endif
 
-		// same as above, see EditDetectEOLMode() in Edit.c
-		// tools/GenerateTable.py
-		static const uint8_t eolTable[16] = {
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, // 00 - 0F
-		};
-
+		constexpr uint32_t mask = (1 << '\r') | (1 << '\n');
 		while (ptr < end) {
 			// skip to line end
-			uint8_t type = 0;
-			while (ptr < end && ((ch = *ptr++) > '\r' || (type = eolTable[ch]) == 0)) {
+			ch = 0;
+			while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
 				// nop
 			}
-			switch (type) {
-			case 2: // '\r'
+			switch (ch) {
+			case '\r':
 				if (*ptr == '\n') {
 					++ptr;
 				}
 				[[fallthrough]];
-			case 1: // '\n'
+			case '\n':
 				if (nPositions == PositionBlockSize) {
 					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
 					lineInsert += nPositions;
