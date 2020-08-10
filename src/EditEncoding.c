@@ -1447,10 +1447,19 @@ int z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_con
 	}
 #else
 	e_3 = _mm_and_si128(_mm_and_si128(e_1, e_2), e_3);
+#if 0
+	NP2_alignas(16) uint64_t dummy[2];
+	_mm_store_si128((__m128i *)dummy, e_3);
+	dummy[0] |= dummy[1];
+	if (dummy[0]) {
+		return 0;
+	}
+#else
 	const int mask = _mm_movemask_epi8(_mm_cmpeq_epi8(e_3, _mm_setzero_si128()));
 	if (mask != 0xFFFF) {
 		return 0;
 	}
+#endif
 #endif
 
 	// Save continuation bits and input bytes for the next round
