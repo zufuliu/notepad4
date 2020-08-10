@@ -481,10 +481,10 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		// unaligned loading: line starts at random position.
 		const __m256i chunk1 = _mm256_loadu_si256((__m256i *)ptr);
 		const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(ptr + sizeof(__m256i)));
-		uint64_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
-		uint64_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
-		maskCR |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
-		maskLF |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
+		uint64_t maskCR = (uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
+		uint64_t maskLF = (uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint64_t)(uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
+		maskLF |= ((uint64_t)(uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 
 		ptr += 2*sizeof(__m256i);
 		if (maskCR) {
@@ -528,10 +528,10 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
 		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
-		uint64_t maskCR = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
-		uint64_t maskLF = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
-		maskCR |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
-		maskLF |= ((uint64_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
+		uint64_t maskCR = (uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectCR));
+		uint64_t maskLF = (uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk1, vectLF));
+		maskCR |= ((uint64_t)(uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectCR))) << sizeof(__m256i);
+		maskLF |= ((uint64_t)(uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 
 		if (maskCR) {
 			if (maskCR & LAST_CR_MASK) {
