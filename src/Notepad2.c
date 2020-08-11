@@ -441,6 +441,9 @@ static void CleanUpResources(BOOL initialized) {
 	if (tchToolbarBitmapDisabled != NULL) {
 		LocalFree(tchToolbarBitmapDisabled);
 	}
+	if (lpSchemeArg) {
+		LocalFree(lpSchemeArg);
+	}
 
 	Encoding_ReleaseResources();
 	Style_ReleaseResources();
@@ -929,6 +932,7 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		if (lpSchemeArg) {
 			Style_SetLexerFromName(szCurFile, lpSchemeArg);
 			LocalFree(lpSchemeArg);
+			lpSchemeArg = NULL;
 		} else {
 			Style_SetLexerFromID(iInitialLexer);
 		}
@@ -7337,6 +7341,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			if (flagLexerSpecified) {
 				if (pLexCurrent->rid == iInitialLexer) {
 					UpdateLineNumberWidth();
+				} else if (lpSchemeArg) {
+					Style_SetLexerFromName(szCurFile, lpSchemeArg);
+					LocalFree(lpSchemeArg);
+					lpSchemeArg = NULL;
 				} else {
 					Style_SetLexerFromID(iInitialLexer);
 				}
@@ -7529,6 +7537,10 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 					if (flagLexerSpecified) {
 						if (pLexCurrent->rid == iInitialLexer) {
 							UpdateLineNumberWidth();
+						} else if (lpSchemeArg) {
+							Style_SetLexerFromName(szCurFile, lpSchemeArg);
+							LocalFree(lpSchemeArg);
+							lpSchemeArg = NULL;
 						} else {
 							Style_SetLexerFromID(iInitialLexer);
 						}
