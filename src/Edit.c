@@ -986,7 +986,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof(statex);
 	if (GlobalMemoryStatusEx(&statex)) {
-		ULONGLONG maxMem = statex.ullTotalPhys/3U;
+		const ULONGLONG maxMem = statex.ullTotalPhys/2U;
 		if (maxMem < (ULONGLONG)maxFileSize) {
 			maxFileSize = (LONGLONG)maxMem;
 		}
