@@ -165,7 +165,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		StopWatch_Start(watch);
 #endif
 		SciCall_SetInitLineCount(lineCount);
-		SciCall_AddText(cbText, lpstrText);
+		SciCall_AppendText(cbText, lpstrText);
 #if 0
 		StopWatch_Stop(watch);
 		StopWatch_ShowLog(&watch, "AddText time");
@@ -176,8 +176,6 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	SciCall_SetUndoCollection(TRUE);
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetSavePoint();
-	SciCall_GotoPos(0);
-	SciCall_ChooseCaretX();
 
 	bFreezeAppTitle = FALSE;
 }
@@ -219,7 +217,9 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	SciCall_SetCodePage(cpDest);
 
 	if (cbText > 0) {
-		SciCall_AddText(cbText, pchText);
+		SciCall_SetModEventMask(SC_MOD_NONE);
+		SciCall_AppendText(cbText, pchText);
+		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -227,8 +227,6 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 
 	SciCall_EmptyUndoBuffer();
 	SciCall_SetUndoCollection(TRUE);
-	SciCall_GotoPos(0);
-	SciCall_ChooseCaretX();
 	if (length == 0 && bSetSavePoint) {
 		SciCall_SetSavePoint();
 	}
@@ -262,7 +260,7 @@ void EditConvertToLargeMode(void) {
 	EditReplaceDocument(pdoc);
 	if (length > 0) {
 		SciCall_SetModEventMask(SC_MOD_NONE);
-		SciCall_AddText(length, pchText);
+		SciCall_AppendText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
 	if (pchText != NULL) {
@@ -271,8 +269,6 @@ void EditConvertToLargeMode(void) {
 
 	SciCall_SetUndoCollection(TRUE);
 	SciCall_EmptyUndoBuffer();
-	SciCall_GotoPos(0);
-	SciCall_ChooseCaretX();
 	SciCall_SetSavePoint();
 
 	Style_SetLexer(pLexCurrent, TRUE);
@@ -8026,7 +8022,6 @@ void EditGotoBlock(int menu) {
 
 	case IDM_EDIT_GOTO_NEXT_BLOCK:
 	case IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK: {
-		SciCall_ColouriseAll();
 		const Sci_Line lineCount = SciCall_GetLineCount();
 		if (iLine >= 0) {
 			iLine = SciCall_GetLastChild(iLine);

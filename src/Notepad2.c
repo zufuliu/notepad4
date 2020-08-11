@@ -666,6 +666,10 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //
 //
 HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
 	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
@@ -952,6 +956,11 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		UpdateToolbar();
 		UpdateStatusbar();
 	}
+
+#if 0
+	StopWatch_Stop(watch);
+	StopWatch_ShowLog(&watch, "InitInstance() time");
+#endif
 	return hwndMain;
 }
 
