@@ -129,7 +129,10 @@ NP2_inline BOOL IsAlphaNumeric(int ch) {
 }
 
 NP2_inline BOOL IsPunctuation(int ch) {
-	return (ch > 32 && ch < 127) && !IsAlphaNumeric(ch);
+	return (ch > 32 && ch < '0')
+		|| (ch > '9' && ch < 'A')
+		|| (ch > 'Z' && ch < 'a')
+		|| (ch > 'z' && ch < 127);
 }
 
 NP2_inline BOOL IsHtmlTagChar(int ch) {

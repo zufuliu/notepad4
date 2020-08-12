@@ -281,12 +281,6 @@ static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 
-const int iLineEndings[3] = {
-	SC_EOL_CRLF,
-	SC_EOL_LF,
-	SC_EOL_CR
-};
-
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
 Sci_Position iMatchesCount = 0;
@@ -3055,7 +3049,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LINEENDINGS_CRLF:
 	case IDM_LINEENDINGS_LF:
 	case IDM_LINEENDINGS_CR: {
-		const int iNewEOLMode = iLineEndings[LOWORD(wParam) - IDM_LINEENDINGS_CRLF];
+		const int iNewEOLMode = GetScintillaEOLMode(LOWORD(wParam) - IDM_LINEENDINGS_CRLF);
 		ConvertLineEndings(iNewEOLMode);
 	}
 	break;
@@ -7238,8 +7232,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		EditSetEmptyText();
 		bModified = FALSE;
 		bReadOnly = FALSE;
-		iEOLMode = iLineEndings[iDefaultEOLMode];
-		SciCall_SetEOLMode(iLineEndings[iDefaultEOLMode]);
+		iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
+		SciCall_SetEOLMode(iEOLMode);
 		iEncoding = iDefaultEncoding;
 		iOriginalEncoding = iDefaultEncoding;
 		SciCall_SetCodePage((iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
@@ -7304,8 +7298,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				CloseHandle(hFile);
 				FileVars_Init(NULL, 0, &fvCurFile);
 				EditSetEmptyText();
-				iEOLMode = iLineEndings[iDefaultEOLMode];
-				SciCall_SetEOLMode(iLineEndings[iDefaultEOLMode]);
+				iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
+				SciCall_SetEOLMode(iEOLMode);
 				if (iSrcEncoding != -1) {
 					iEncoding = iSrcEncoding;
 					iOriginalEncoding = iSrcEncoding;
@@ -7436,7 +7430,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			// diff/patch file may contains content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
-				const int iNewEOLMode = iLineEndings[status.iEOLMode];
+				const int iNewEOLMode = GetScintillaEOLMode(status.iEOLMode);
 				ConvertLineEndings(iNewEOLMode);
 			}
 		}
