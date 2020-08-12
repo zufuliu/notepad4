@@ -1028,7 +1028,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		return FALSE;
 	}
 
-	status->iEOLMode = iLineEndings[iDefaultEOLMode];
+	status->iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 	status->bInconsistent = FALSE;
 	status->totalLineCount = 1;
 

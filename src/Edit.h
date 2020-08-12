@@ -107,7 +107,12 @@ void	EditReplaceDocument(HANDLE pdoc);
 char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
 
-extern const int iLineEndings[3];
+static inline int GetScintillaEOLMode(int mode) {
+#define EOLModeMask (SC_EOL_CRLF | (SC_EOL_LF << 4) | (SC_EOL_CR << 8))
+	return (EOLModeMask >> (mode << 2)) & 0x0f;
+#undef EOLModeMask
+}
+
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *status);
 BOOL	EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
