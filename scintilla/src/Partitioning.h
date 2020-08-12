@@ -107,6 +107,8 @@ public:
 	}
 
 	void ReAllocate(ptrdiff_t newSize) {
+		// + 1 accounts for initial element that is always 0.
+		// + 2 to avoid reallocation.
 		body->ReAllocate(newSize + 2);
 	}
 

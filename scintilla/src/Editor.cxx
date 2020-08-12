@@ -5973,8 +5973,8 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		else
 			return pdoc->LinesTotal();
 
-	case SCI_SETINITLINECOUNT:
-		pdoc->SetInitLineCount(wParam);
+	case SCI_ALLOCATELINES:
+		pdoc->AllocateLines(wParam);
 		break;
 
 	case SCI_GETMODIFY:

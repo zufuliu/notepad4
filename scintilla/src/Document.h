@@ -500,7 +500,7 @@ public:
 	void AllocateLineCharacterIndex(int lineCharacterIndex);
 	void ReleaseLineCharacterIndex(int lineCharacterIndex);
 	Sci::Line LinesTotal() const noexcept;
-	void SetInitLineCount(Sci::Line lineCount);
+	void AllocateLines(Sci::Line lines);
 
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
 	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept;
