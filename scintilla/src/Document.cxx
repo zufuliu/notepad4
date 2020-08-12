@@ -2105,8 +2105,8 @@ Sci::Line Document::LinesTotal() const noexcept {
 	return cb.Lines();
 }
 
-void Document::SetInitLineCount(Sci::Line lineCount) {
-	cb.SetInitLineCount(lineCount);
+void Document::AllocateLines(Sci::Line lines) {
+	cb.AllocateLines(lines);
 }
 
 void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {

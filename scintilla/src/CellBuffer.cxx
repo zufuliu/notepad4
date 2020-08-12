@@ -72,7 +72,7 @@ public:
 	virtual void SetLineStart(Sci::Line line, Sci::Position position) noexcept = 0;
 	virtual void RemoveLine(Sci::Line line) = 0;
 	virtual Sci::Line Lines() const noexcept = 0;
-	virtual void SetInitLineCount(Sci::Line lineCount) = 0;
+	virtual void AllocateLines(Sci::Line lines) = 0;
 	virtual Sci::Line LineFromPosition(Sci::Position pos) const noexcept = 0;
 	virtual Sci::Position LineStart(Sci::Line line) const noexcept = 0;
 	virtual void InsertCharacters(Sci::Line line, CountWidths delta) noexcept = 0;
@@ -132,8 +132,10 @@ public:
 		const Sci::Position widthCurrent = LineWidth(line);
 		starts.InsertText(static_cast<POS>(line), static_cast<POS>(width - widthCurrent));
 	}
-	void SetInitLineCount(Sci::Line lineCount) {
-		starts.ReAllocate(lineCount);
+	void AllocateLines(Sci::Line lines) {
+		if (lines > starts.Partitions()) {
+			starts.ReAllocate(lines);
+		}
 	}
 	void InsertLines(Sci::Line line, Sci::Line lines) {
 		// Insert multiple lines with each temporarily 1 character wide.
@@ -240,13 +242,15 @@ public:
 	Sci::Line Lines() const noexcept override {
 		return static_cast<Sci::Line>(starts.Partitions());
 	}
-	void SetInitLineCount(Sci::Line lineCount) override {
-		starts.ReAllocate(lineCount);
-		if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
-			startsUTF32.SetInitLineCount(lineCount);
-		}
-		if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
-			startsUTF16.SetInitLineCount(lineCount);
+	void AllocateLines(Sci::Line lines) override {
+		if (lines > Lines()) {
+			starts.ReAllocate(lines);
+			if (activeIndices & SC_LINECHARACTERINDEX_UTF32) {
+				startsUTF32.AllocateLines(lines);
+			}
+			if (activeIndices & SC_LINECHARACTERINDEX_UTF16) {
+				startsUTF16.AllocateLines(lines);
+			}
 		}
 	}
 	Sci::Line LineFromPosition(Sci::Position pos) const noexcept override {
@@ -785,8 +789,8 @@ Sci::Line CellBuffer::Lines() const noexcept {
 	return plv->Lines();
 }
 
-void CellBuffer::SetInitLineCount(Sci::Line lineCount) {
-	plv->SetInitLineCount(lineCount);
+void CellBuffer::AllocateLines(Sci::Line lines) {
+	plv->AllocateLines(lines);
 }
 
 Sci::Position CellBuffer::LineStart(Sci::Line line) const noexcept {
@@ -903,9 +907,9 @@ bool CellBuffer::UTF8IsCharacterBoundary(Sci::Position position) const {
 
 void CellBuffer::ResetLineEnds() {
 	// Reinitialize line data -- too much work to preserve
-	const Sci::Line lineCount = plv->Lines();
+	const Sci::Line lines = plv->Lines();
 	plv->Init();
-	plv->SetInitLineCount(lineCount);
+	plv->AllocateLines(lines);
 
 	constexpr Sci::Position position = 0;
 	const Sci::Position length = Length();

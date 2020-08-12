@@ -164,7 +164,7 @@ public:
 	void AllocateLineCharacterIndex(int lineCharacterIndex);
 	void ReleaseLineCharacterIndex(int lineCharacterIndex);
 	Sci::Line Lines() const noexcept;
-	void SetInitLineCount(Sci::Line lineCount);
+	void AllocateLines(Sci::Line lines);
 	Sci::Position LineStart(Sci::Line line) const noexcept;
 	Sci::Position IndexLineStart(Sci::Line line, int lineCharacterIndex) const noexcept;
 	Sci::Line LineFromPosition(Sci::Position pos) const noexcept;

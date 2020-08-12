@@ -164,7 +164,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		StopWatch watch;
 		StopWatch_Start(watch);
 #endif
-		SciCall_SetInitLineCount(lineCount);
+		SciCall_AllocateLines(lineCount);
 		SciCall_AppendText(cbText, lpstrText);
 #if 0
 		StopWatch_Stop(watch);
