@@ -108,9 +108,8 @@ char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 BOOL	EditCopyAppend(HWND hwnd);
 
 static inline int GetScintillaEOLMode(int mode) {
-#define EOLModeMask (SC_EOL_CRLF | (SC_EOL_LF << 4) | (SC_EOL_CR << 8))
-	return (EOLModeMask >> (mode << 2)) & 0x0f;
-#undef EOLModeMask
+	const int mask = SC_EOL_CRLF | (SC_EOL_LF << 4) | (SC_EOL_CR << 8);
+	return (mask >> (mode << 2)) & 0x0f;
 }
 
 struct EditFileIOStatus;

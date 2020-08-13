@@ -8454,6 +8454,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_COUNTCHARACTERS:
 		return pdoc->CountCharacters(wParam, lParam);
 
+	case SCI_COUNTCHARACTERSANDCOLUMNS:
+		pdoc->CountCharactersAndColumns(static_cast<Sci_TextToFind *>(PtrFromSPtr(lParam)));
+		break;
+
 	case SCI_COUNTCODEUNITS:
 		return pdoc->CountUTF16(wParam, lParam);
 

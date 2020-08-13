@@ -408,6 +408,10 @@ NP2_inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position
 	return SciCall(SCI_COUNTCHARACTERS, start, end);
 }
 
+NP2_inline void SciCall_CountCharactersAndColumns(struct Sci_TextToFind *ft) {
+	SciCall(SCI_COUNTCHARACTERSANDCOLUMNS, 0, (LPARAM)ft);
+}
+
 // Multiple Selection and Virtual Space
 
 NP2_inline void SciCall_SetMultipleSelection(BOOL multipleSelection) {

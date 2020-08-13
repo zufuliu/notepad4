@@ -18,7 +18,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
-//#include <chrono>
+#include <chrono>
 
 #include "Platform.h"
 #include "VectorISA.h"
@@ -29,7 +29,7 @@
 #include "Partitioning.h"
 #include "CellBuffer.h"
 #include "UniConversion.h"
-//#include "ElapsedPeriod.h"
+#include "ElapsedPeriod.h"
 
 namespace Scintilla {
 

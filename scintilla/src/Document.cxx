@@ -1531,6 +1531,32 @@ Sci::Position Document::CountCharacters(Sci::Position startPos, Sci::Position en
 	return count;
 }
 
+void Document::CountCharactersAndColumns(Sci_TextToFind *ft) const noexcept {
+	const Sci::Position startPos = ft->chrg.cpMin;
+	const Sci::Position endPos = ft->chrg.cpMax;
+	Sci::Position count = ft->chrgText.cpMin;
+	Sci::Position column = ft->chrgText.cpMax;
+
+	Sci::Position i = startPos;
+	while (i < endPos) {
+		const unsigned char ch = cb.UCharAt(i);
+		if (ch == '\t') {
+			column = NextTab(column, tabInChars);
+			i++;
+		} else if (UTF8IsAscii(ch)) {
+			column++;
+			i++;
+		} else {
+			column++;
+			i = NextPosition(i, 1);
+		}
+		count++;
+	}
+
+	ft->chrgText.cpMin = static_cast<Sci_PositionCR>(count);
+	ft->chrgText.cpMax = static_cast<Sci_PositionCR>(column);
+}
+
 Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept {
 	startPos = MovePositionOutsideChar(startPos, 1, false);
 	endPos = MovePositionOutsideChar(endPos, -1, false);
