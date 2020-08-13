@@ -1,4 +1,4 @@
-The builds (*unsigned*) works for Windows XP or Windows Server 2003 and above. The AVX2 build works for Windows 7 SP1 (or Windows Server 2008 R2 SP1) and above (64-bit only), requires CPU support for [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) and [POPCNT](https://en.wikipedia.org/wiki/Bit_Manipulation_Instruction_Sets), e.g. CPU sold since 2013, such as Intel Core i3, i5, i7, i9 or AMD Excavator, Zen, and more.
+The builds (*unsigned*) works for Windows XP or Windows Server 2003 and above. The AVX2 build works for Windows 7 SP1 (or Windows Server 2008 R2 SP1) and above (64-bit only), requires CPU support for [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions), e.g. CPU sold since 2013, such as Intel Core i3, i5, i7, i9 or AMD Excavator, Zen, and more.
 
 Latest development builds (artifacts in Release configuration for each compiler and platform) are available on https://github.com/zufuliu/notepad2/actions and https://ci.appveyor.com/project/zufuliu/notepad2
 
