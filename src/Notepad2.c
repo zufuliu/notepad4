@@ -1636,8 +1636,6 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetAdditionalCaretsVisible(TRUE);
 	// style both before and after the visible text in the background
 	SciCall_SetIdleStyling(SC_IDLESTYLING_ALL);
-	// cache layout for visible lines
-	SciCall_SetLayoutCache(SC_CACHE_PAGE);
 
 	SciCall_AssignCmdKey((SCK_NEXT + (SCMOD_CTRL << 16)), SCI_PARADOWN);
 	SciCall_AssignCmdKey((SCK_PRIOR + (SCMOD_CTRL << 16)), SCI_PARAUP);
