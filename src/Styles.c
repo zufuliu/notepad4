@@ -1789,6 +1789,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// update style font, color, etc. don't need colorizing (analyzing whole document) again,
 	// thus we not call SciCall_ClearDocumentStyle() in previous block.
 	if (bLexerChanged) {
+		// cache layout for visible lines.
+		// SC_CACHE_PAGE depends on line height, i.e. styles in current lexer.
+		SciCall_SetLayoutCache(SC_CACHE_PAGE);
 #if 0
 		// profile lexer performance
 		SciCall_ColouriseAll();
