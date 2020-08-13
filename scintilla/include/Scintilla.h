@@ -387,6 +387,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_GETLINEINDENTPOSITION 2128
 #define SCI_GETCOLUMN 2129
 #define SCI_COUNTCHARACTERS 2633
+#define SCI_COUNTCHARACTERSANDCOLUMNS 2120
 #define SCI_COUNTCODEUNITS 2715
 #define SCI_SETHSCROLLBAR 2130
 #define SCI_GETHSCROLLBAR 2131

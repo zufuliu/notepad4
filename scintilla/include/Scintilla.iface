@@ -1003,6 +1003,9 @@ get position GetColumn=2129(position pos,)
 # Count characters between two positions.
 fun position CountCharacters=2633(position start, position end)
 
+# Count characters and columns between two positions at the same time.
+fun void CountCharactersAndColumns=2120(,findtext ft)
+
 # Count code units between two positions.
 fun position CountCodeUnits=2715(position start, position end)
 

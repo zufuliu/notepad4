@@ -6935,43 +6935,28 @@ void UpdateStatusbar(void) {
 		return;
 	}
 
-	WCHAR tchLn[32];
-	WCHAR tchLines[32];
-	WCHAR tchCol[32];
-	WCHAR tchCols[32];
-	WCHAR tchCh[32];
-	WCHAR tchChs[32];
-	WCHAR tchSel[32];
-	WCHAR tchSelCh[32];
-	WCHAR tchDocPos[256];
-	WCHAR tchDocSize[32];
-	WCHAR tchLinesSelected[32];
-	WCHAR tchMatchesCount[32];
-
 	const Sci_Position iPos = SciCall_GetCurrentPos();
-
 	const Sci_Line iLine = SciCall_LineFromPosition(iPos);
-	PosToStrW(iLine + 1, tchLn);
-	FormatNumberStr(tchLn);
-
 	const Sci_Line iLines = SciCall_GetLineCount();
-	PosToStrW(iLines, tchLines);
-	FormatNumberStr(tchLines);
 
-	const UINT updateMask = cachedStatusItem.updateMask;
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
-	const Sci_Position iLineStart = SciCall_PositionFromLine(iLine);
-	const Sci_Position iChar = SciCall_CountCharacters(iLineStart, iPos);
-	const Sci_Position iCol = SciCall_GetColumn(iPos) + 1;
+	struct Sci_TextToFind ft = { { SciCall_PositionFromLine(iLine), iPos }, NULL, { 0, 0 }};
+	SciCall_CountCharactersAndColumns(&ft);
+	const Sci_Position iChar = ft.chrgText.cpMin;
+	const Sci_Position iCol = ft.chrgText.cpMax;
 	Sci_Position iLineChar;
 	Sci_Position iLineColumn;
+
+	const UINT updateMask = cachedStatusItem.updateMask;
 	if ((updateMask & StatusBarUpdateMask_LineColumn) || (iLine != cachedStatusItem.iLine)) {
-		const Sci_Position iLineEnd = SciCall_GetLineEndPosition(iLine);
-		iLineChar = iChar + SciCall_CountCharacters(iPos, iLineEnd);
-		iLineColumn = SciCall_GetColumn(iLineEnd);
+		ft.chrg.cpMin = ft.chrg.cpMax;
+		ft.chrg.cpMax = SciCall_GetLineEndPosition(iLine);
+		SciCall_CountCharactersAndColumns(&ft);
+		iLineChar = ft.chrgText.cpMin;
+		iLineColumn = ft.chrgText.cpMax;
 		cachedStatusItem.iLine = iLine;
 		cachedStatusItem.iLineChar = iLineChar;
 		cachedStatusItem.iLineColumn = iLineColumn;
@@ -6984,34 +6969,49 @@ void UpdateStatusbar(void) {
 	StopWatch_ShowLog(&watch, "CountCharacters time");
 #endif
 
-	PosToStrW(iChar + 1, tchCh);
-	PosToStrW(iLineChar, tchChs);
-	FormatNumberStr(tchCh);
-	FormatNumberStr(tchChs);
+	WCHAR tchCurLine[32];
+	WCHAR tchDocLine[32];
+	PosToStrW(iLine + 1, tchCurLine);
+	PosToStrW(iLines, tchDocLine);
+	FormatNumberStr(tchCurLine);
+	FormatNumberStr(tchDocLine);
 
-	PosToStrW(iCol, tchCol);
-	PosToStrW(iLineColumn, tchCols);
-	FormatNumberStr(tchCol);
-	FormatNumberStr(tchCols);
+	WCHAR tchCurColumn[32];
+	WCHAR tchLineColumn[32];
+	PosToStrW(iCol + 1, tchCurColumn);
+	PosToStrW(iLineColumn, tchLineColumn);
+	FormatNumberStr(tchCurColumn);
+	FormatNumberStr(tchLineColumn);
 
+	WCHAR tchCurChar[32];
+	WCHAR tchLineChar[32];
+	PosToStrW(iChar + 1, tchCurChar);
+	PosToStrW(iLineChar, tchLineChar);
+	FormatNumberStr(tchCurChar);
+	FormatNumberStr(tchLineChar);
+
+	WCHAR tchSelByte[32];
+	WCHAR tchSelChar[32];
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	if (iSelStart == iSelEnd) {
-		lstrcpy(tchSel, L"0");
-		lstrcpy(tchSelCh, L"0");
+		lstrcpy(tchSelByte, L"0");
+		lstrcpy(tchSelChar, L"0");
 	} else if (!SciCall_IsRectangleSelection()) {
 		Sci_Position iSel = SciCall_GetSelTextLength() - 1;
-		PosToStrW(iSel, tchSel);
-		FormatNumberStr(tchSel);
+		PosToStrW(iSel, tchSelByte);
+		FormatNumberStr(tchSelByte);
 		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
-		PosToStrW(iSel, tchSelCh);
-		FormatNumberStr(tchSelCh);
+		PosToStrW(iSel, tchSelChar);
+		FormatNumberStr(tchSelChar);
 	} else {
-		lstrcpy(tchSel, L"--");
-		lstrcpy(tchSelCh, L"--");
+		lstrcpy(tchSelByte, L"--");
+		lstrcpy(tchSelChar, L"--");
 	}
 
-	// Print number of lines selected lines in statusbar
+	// Print number of selected lines in statusbar
+	WCHAR tchLinesSelected[32];
+	WCHAR tchMatchesCount[32];
 	if (iSelStart == iSelEnd) {
 		lstrcpy(tchLinesSelected, L"0");
 		lstrcpy(tchMatchesCount, L"0");
@@ -7029,13 +7029,17 @@ void UpdateStatusbar(void) {
 		FormatNumberStr(tchMatchesCount);
 	}
 
-	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchLn, tchLines,
-				 tchCol, tchCols, tchCh, tchChs, tchSelCh, tchSel, tchLinesSelected, tchMatchesCount);
+	WCHAR tchDocPos[256];
+	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchCurLine, tchDocLine,
+				 tchCurColumn, tchLineColumn, tchCurChar, tchLineChar,
+				 tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
+	WCHAR tchDocSize[32];
 	const Sci_Position iBytes = SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
 
 	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
+	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
 	if (updateMask & StatusBarUpdateMask_Lexer) {
 		StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
 	}
@@ -7051,7 +7055,6 @@ void UpdateStatusbar(void) {
 	if (updateMask & StatusBarUpdateMask_DocZoom) {
 		StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
 	}
-	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
 	cachedStatusItem.updateMask = 0;
 }
 
