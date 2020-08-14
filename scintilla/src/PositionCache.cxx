@@ -352,7 +352,7 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 
 LineLayoutCache::LineLayoutCache() :
 	level(0),
-	allInvalidated(false), styleClock(-1), useCount(0) {
+	allInvalidated(false), styleClock(-1) {
 	Allocate(0);
 }
 
@@ -360,38 +360,52 @@ LineLayoutCache::~LineLayoutCache() {
 	Deallocate();
 }
 
+namespace {
+
+// https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+// Bit Twiddling Hacks Copyright 1997-2005 Sean Eron Anderson
+constexpr size_t NextPowerOfTwo(size_t x) noexcept {
+	x--;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+#if SIZE_MAX > UINT_MAX
+	x |= x >> 32;
+#endif
+	x++;
+	return x;
+}
+
+constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
+	return (value + alignment - 1) & (~(alignment - 1));
+}
+
+}
+
 void LineLayoutCache::Allocate(size_t length_) {
-	PLATFORM_ASSERT(cache.empty());
 	allInvalidated = false;
 	cache.resize(length_);
 }
 
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
-	PLATFORM_ASSERT(useCount == 0);
+	// round up cache size to avoid rapidly resizing when linesOnScreen or linesInDoc changed.
 	size_t lengthForLevel = 0;
 	if (level == llcCaret) {
 		lengthForLevel = 1;
 	} else if (level == llcPage) {
-		lengthForLevel = linesOnScreen + 1;
+		lengthForLevel = std::max<size_t>(NextPowerOfTwo(2*linesOnScreen + 1), 128);
 	} else if (level == llcDocument) {
-		lengthForLevel = linesInDoc;
+		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
-	if (lengthForLevel > cache.size()) {
-		Deallocate();
+	if (lengthForLevel != cache.size()) {
 		Allocate(lengthForLevel);
-	} else {
-		if (lengthForLevel < cache.size()) {
-			for (size_t i = lengthForLevel; i < cache.size(); i++) {
-				cache[i].reset();
-			}
-		}
-		cache.resize(lengthForLevel);
 	}
-	PLATFORM_ASSERT(cache.size() == lengthForLevel);
+	PLATFORM_ASSERT(cache.size() >= lengthForLevel);
 }
 
 void LineLayoutCache::Deallocate() noexcept {
-	PLATFORM_ASSERT(useCount == 0);
 	cache.clear();
 }
 
@@ -417,7 +431,7 @@ void LineLayoutCache::SetLevel(int level_) noexcept {
 }
 
 LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
-	Sci::Line linesOnScreen, Sci::Line linesInDoc) {
+	Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine) {
 	AllocateForLevel(linesOnScreen, linesInDoc);
 	if (styleClock != styleClock_) {
 		Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
@@ -429,17 +443,16 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	if (level == llcCaret) {
 		pos = 0;
 	} else if (level == llcPage) {
-		if (lineNumber == lineCaret) {
-			pos = 0;
-		} else if (cache.size() > 1) {
-			pos = 1 + (lineNumber % (cache.size() - 1));
+		const size_t diff = std::min(std::abs(lineNumber - lineCaret), std::abs(lineNumber - topLine));
+		if (diff < cache.size()) {
+			// only cache lines near caret line or top visible line.
+			pos = lineNumber % cache.size();
 		}
 	} else if (level == llcDocument) {
 		pos = lineNumber;
 	}
 	if (pos >= 0) {
-		PLATFORM_ASSERT(useCount == 0);
-		if (!cache.empty() && (pos < static_cast<int>(cache.size()))) {
+		if (!cache.empty() && (static_cast<size_t>(pos) < cache.size())) {
 			if (cache[pos]) {
 				if ((cache[pos]->lineNumber != lineNumber) ||
 					(cache[pos]->maxLineLength < maxChars)) {
@@ -452,7 +465,6 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 			cache[pos]->lineNumber = lineNumber;
 			cache[pos]->inCache = true;
 			ret = cache[pos].get();
-			useCount++;
 		}
 	}
 
@@ -469,8 +481,6 @@ void LineLayoutCache::Dispose(LineLayout *ll) noexcept {
 	if (ll) {
 		if (!ll->inCache) {
 			delete ll;
-		} else {
-			useCount--;
 		}
 	}
 }
@@ -771,24 +781,6 @@ void PositionCache::Clear() noexcept {
 	clock = 1;
 	allClear = true;
 }
-
-#if PositionCacheHashSizeUsePowerOfTwo
-// https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-// Bit Twiddling Hacks Copyright 1997-2005 Sean Eron Anderson
-static constexpr size_t NextPowerOfTwo(size_t x) noexcept {
-	x--;
-	x |= x >> 1;
-	x |= x >> 2;
-	x |= x >> 4;
-	x |= x >> 8;
-	x |= x >> 16;
-#if SIZE_MAX > UINT_MAX
-	x |= x >> 32;
-#endif
-	x++;
-	return x;
-}
-#endif
 
 void PositionCache::SetSize(size_t size_) {
 	Clear();

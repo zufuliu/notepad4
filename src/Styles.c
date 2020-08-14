@@ -1790,8 +1790,14 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// thus we not call SciCall_ClearDocumentStyle() in previous block.
 	if (bLexerChanged) {
 		// cache layout for visible lines.
-		// SC_CACHE_PAGE depends on line height, i.e. styles in current lexer.
+		// SC_CACHE_PAGE depends on line height (i.e. styles in current lexer) and edit window height.
+		//const Sci_Line iLines = SciCall_GetLineCount();
+		//const Sci_Position iBytes = SciCall_GetLength();
+		// cache for each line requires more than 230 bytes memory, python command to make a 1 MiB empty file:
+		// f = open('1mb.txt', 'wb'); f.write(('\n'*1024*1024*1).encode('utf-8')); f.close()
+		//const int cache = (iLines < 1024*1024 || iBytes < 1024*1024)? SC_CACHE_DOCUMENT : SC_CACHE_PAGE;
 		SciCall_SetLayoutCache(SC_CACHE_PAGE);
+
 #if 0
 		// profile lexer performance
 		SciCall_ColouriseAll();
