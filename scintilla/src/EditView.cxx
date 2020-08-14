@@ -329,9 +329,10 @@ LineLayout *EditView::RetrieveLineLayout(Sci::Line lineNumber, const EditModel &
 	const Sci::Position posLineEnd = model.pdoc->LineStart(lineNumber + 1);
 	PLATFORM_ASSERT(posLineEnd >= posLineStart);
 	const Sci::Line lineCaret = model.pdoc->SciLineFromPosition(model.sel.MainCaret());
+	const Sci::Line topLine = model.pcs->DocFromDisplay(model.TopLineOfMain());
 	return llc.Retrieve(lineNumber, lineCaret,
 		static_cast<int>(posLineEnd - posLineStart), model.pdoc->GetStyleClock(),
-		model.LinesOnScreen() + 1, model.pdoc->LinesTotal());
+		model.LinesOnScreen() + 1, model.pdoc->LinesTotal(), topLine);
 }
 
 namespace {
