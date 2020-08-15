@@ -395,7 +395,8 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 	if (level == llcCaret) {
 		lengthForLevel = 1;
 	} else if (level == llcPage) {
-		lengthForLevel = std::max<size_t>(NextPowerOfTwo(2*linesOnScreen + 1), 128);
+		// see comment in Retrieve() method.
+		lengthForLevel = AlignUp(4*linesOnScreen, 64);
 	} else if (level == llcDocument) {
 		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
@@ -438,40 +439,31 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 		styleClock = styleClock_;
 	}
 	allInvalidated = false;
-	Sci::Position pos = -1;
-	LineLayout *ret = nullptr;
-	if (level == llcCaret) {
-		pos = 0;
-	} else if (level == llcPage) {
+
+	size_t pos = 0;
+	if (level == llcPage) {
+		// two arenas, each with two pages to ensure cache efficiency on scrolling.
+		// first arena for lines near caret line or top visible line.
+		// second arena for other lines, e.g. folded lines near top visible line.
 		const size_t diff = std::min(std::abs(lineNumber - lineCaret), std::abs(lineNumber - topLine));
-		if (diff < cache.size()) {
-			// only cache lines near caret line or top visible line.
-			pos = lineNumber % cache.size();
-		}
+		const size_t gap = cache.size() / 2;
+		pos = (lineNumber % gap) + ((diff < gap) ? 0 : gap);
 	} else if (level == llcDocument) {
 		pos = lineNumber;
 	}
-	if (pos >= 0) {
-		if (!cache.empty() && (static_cast<size_t>(pos) < cache.size())) {
-			if (cache[pos]) {
-				if ((cache[pos]->lineNumber != lineNumber) ||
-					(cache[pos]->maxLineLength < maxChars)) {
-					cache[pos].reset();
-				}
-			}
-			if (!cache[pos]) {
-				cache[pos] = std::make_unique<LineLayout>(maxChars);
-			}
-			cache[pos]->lineNumber = lineNumber;
-			cache[pos]->inCache = true;
-			ret = cache[pos].get();
-		}
-	}
 
-	if (!ret) {
-		ret = new LineLayout(maxChars);
-		ret->lineNumber = lineNumber;
+	LineLayout *ret = cache[pos].get();
+	if (ret) {
+		if ((ret->lineNumber != lineNumber) || (ret->maxLineLength < maxChars)) {
+			ret->~LineLayout();
+			ret = new (ret) LineLayout(maxChars);
+		}
+	} else {
+		cache[pos] = std::make_unique<LineLayout>(maxChars);
+		ret = cache[pos].get();
 	}
+	ret->lineNumber = lineNumber;
+	ret->inCache = true;
 
 	return ret;
 }
