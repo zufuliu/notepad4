@@ -172,7 +172,7 @@ public:
 	int GetLevel() const noexcept {
 		return level;
 	}
-	LineLayout *Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
+	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine);
 	void Dispose(LineLayout *ll) noexcept;
 };
