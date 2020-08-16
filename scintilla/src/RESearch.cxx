@@ -848,7 +848,6 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 		if (lp >= endp)	/* if EOS, fail, else fall through. */
 			return 0;
 		[[fallthrough]];
-		// fall through
 	default:			/* regular matching all the way. */
 		while (lp < endp) {
 			Sci::Position offset = 1;

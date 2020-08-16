@@ -48,7 +48,7 @@ public:
 	}
 
 	Sci::Position Length() const noexcept {
-		return starts->PositionFromPartition(starts->Partitions());
+		return starts->Length();
 	}
 
 	Sci::Position Elements() const noexcept {
