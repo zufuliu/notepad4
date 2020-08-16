@@ -32,6 +32,9 @@ enum DrawPhase {
 	drawAll = 0x1FF
 };
 
+// from drawBack to drawCarets
+constexpr int MaxDrawPhaseCount = 9;
+
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept;
 int WidestLineWidth(Surface *surface, const ViewStyle &vs, int styleOffset, const StyledText &st);
 void DrawTextNoClipPhase(Surface *surface, PRectangle rc, const Style &style, XYPOSITION ybase,

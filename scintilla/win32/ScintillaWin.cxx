@@ -39,7 +39,7 @@
 #include <shellapi.h>
 
 #define DebugDragAndDropDataFormat		0
-
+#define MaxDragAndDropDataFormatCount	6
 /*
 CF_VSSTGPROJECTITEMS, CF_VSREFPROJECTITEMS
 https://docs.microsoft.com/en-us/visualstudio/extensibility/ux-guidelines/application-patterns-for-visual-studio
@@ -405,7 +405,8 @@ class ScintillaWin :
 #endif
 
 	// supported drag & drop format
-	std::vector<CLIPFORMAT> dropFormat;
+	CLIPFORMAT dropFormat[MaxDragAndDropDataFormatCount];
+	UINT dropFormatCount;
 
 	//HRESULT hrOle;
 	DropSource ds;
@@ -651,17 +652,19 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 	cfChromiumCustomMIME = GetClipboardFormat(L"Chromium Web Custom MIME Data Format");
 #endif
 
-	dropFormat.push_back(CF_HDROP);
+	UINT index = 0;
+	dropFormat[index++] = CF_HDROP;
 #if EnableDrop_VisualStudioProjectItem
-	dropFormat.push_back(cfVSStgProjectItem);
-	dropFormat.push_back(cfVSRefProjectItem);
+	dropFormat[index++] = cfVSStgProjectItem;
+	dropFormat[index++] = cfVSRefProjectItem;
 #endif
 #if Enable_ChromiumWebCustomMIMEDataFormat
-	dropFormat.push_back(cfChromiumCustomMIME);
+	dropFormat[index++] = cfChromiumCustomMIME;
 #endif
 	// text format comes last
-	dropFormat.push_back(CF_UNICODETEXT);
-	dropFormat.push_back(CF_TEXT);
+	dropFormat[index++] = CF_UNICODETEXT;
+	dropFormat[index++] = CF_TEXT;
+	dropFormatCount = index;
 
 	//hrOle = E_FAIL;
 	wMain = hwnd;
@@ -3553,7 +3556,8 @@ STDMETHODIMP ScintillaWin::DragEnter(LPDATAOBJECT pIDataSource, DWORD grfKeyStat
 	try {
 		//EnumDataSourceFormat("DragEnter", pIDataSource);
 
-		for (const CLIPFORMAT fmt : dropFormat) {
+		for (UINT fmtIndex = 0; fmtIndex < dropFormatCount; fmtIndex++) {
+			const CLIPFORMAT fmt = dropFormat[fmtIndex];
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 			const HRESULT hrHasUText = pIDataSource->QueryGetData(&fmtu);
 			hasOKText = (hrHasUText == S_OK);
@@ -3615,7 +3619,8 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 		HRESULT hr = DV_E_FORMATETC;
 
 		//EnumDataSourceFormat("Drop", pIDataSource);
-		for (const CLIPFORMAT fmt : dropFormat) {
+		for (UINT fmtIndex = 0; fmtIndex < dropFormatCount; fmtIndex++) {
+			const CLIPFORMAT fmt = dropFormat[fmtIndex];
 			FORMATETC fmtu = { fmt, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 			STGMEDIUM medium {};
 			hr = pIDataSource->GetData(&fmtu, &medium);
