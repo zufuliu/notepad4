@@ -71,7 +71,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			alphaFull = 0xff, alphaSide = 0x2f, alphaSide2 = 0x5f
 		};
 		for (int x = 0; x < width; x++) {
-			if (x % 2) {
+			if (x & 1) {
 				// Two halfway columns have a full pixel in middle flanked by light pixels
 				image.SetPixel(x, 0, sacDraw.fore, alphaSide);
 				image.SetPixel(x, 1, sacDraw.fore, alphaFull);
@@ -175,8 +175,8 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 		rcBox.top = rcLine.top + 1;
 		rcBox.bottom = rcLine.bottom;
 		const Surface::GradientOptions options = Surface::GradientOptions::topToBottom;
-		const ColourAlpha start(sacNormal.fore, fillAlpha);
-		const ColourAlpha end(sacNormal.fore, 0);
+		const ColourAlpha start(sacDraw.fore, fillAlpha);
+		const ColourAlpha end(sacDraw.fore, 0);
 		std::vector<ColourStop> stops;
 		switch (sacDraw.style) {
 		case INDIC_GRADIENT:

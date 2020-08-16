@@ -1493,7 +1493,6 @@ void SurfaceD2D::Polygon(const Point *pts, size_t npts, ColourDesired fore, Colo
 				D2DPenColour(fore);
 				pRenderTarget->DrawGeometry(geometry, pBrush);
 			}
-
 			ReleaseUnknown(geometry);
 		}
 	}
@@ -1632,7 +1631,7 @@ void SurfaceD2D::GradientRectangle(PRectangle rc, const std::vector<ColourStop> 
 			pRenderTarget->FillRectangle(&rectangle, pBrushLinear);
 			ReleaseUnknown(pBrushLinear);
 		}
-		ReleaseUnknown(pBrushLinear);
+		ReleaseUnknown(pGradientStops);
 	}
 }
 
