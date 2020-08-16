@@ -14,9 +14,7 @@
 #include "UniConversion.h"
 #include "HanjaDic.h"
 
-namespace Scintilla {
-
-namespace HanjaDict {
+namespace Scintilla::HanjaDict {
 
 interface IRadical;
 interface IHanja;
@@ -105,7 +103,7 @@ int GetHangulOfHanja(wchar_t *inout) noexcept {
 	HanjaDic dict;
 	if (dict.HJdictAvailable()) {
 		const size_t len = lstrlenW(inout);
-		wchar_t conv[UTF8MaxBytes] = { 0 };
+		wchar_t conv[UTF8MaxBytes]{};
 		BSTR bstrHangul = SysAllocString(conv);
 		for (size_t i = 0; i < len; i++) {
 			if (dict.IsHanja(static_cast<int>(inout[i]))) { // Pass hanja only!
@@ -124,5 +122,4 @@ int GetHangulOfHanja(wchar_t *inout) noexcept {
 	return changed;
 }
 
-}
 }

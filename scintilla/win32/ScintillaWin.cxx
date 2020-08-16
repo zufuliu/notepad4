@@ -384,7 +384,7 @@ class ScintillaWin :
 	unsigned int linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
 
-	UINT dpi = USER_DEFAULT_SCREEN_DPI;
+	UINT dpi;
 	ReverseArrowCursor reverseArrowCursor;
 
 	HRGN hRgnUpdate;
@@ -2490,9 +2490,8 @@ void ScintillaWin::SetHorizontalScrollPos() {
 
 bool ScintillaWin::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) {
 	bool modified = false;
-	SCROLLINFO sci = {
-		sizeof(sci), 0, 0, 0, 0, 0, 0
-	};
+	SCROLLINFO sci {};
+	sci.cbSize = sizeof(sci);
 	sci.fMask = SIF_PAGE | SIF_RANGE;
 	GetScrollInfo(SB_VERT, &sci);
 	const Sci::Line vertEndPreferred = nMax;
@@ -3089,7 +3088,7 @@ void ScintillaWin::ImeStartComposition() {
 			// Since the style creation code has been made platform independent,
 			// The logfont for the IME is recreated here.
 			const int styleHere = pdoc->StyleIndexAt(sel.MainCaret());
-			LOGFONTW lf = { };
+			LOGFONTW lf {};
 			const int sizeZoomed = GetFontSizeZoomed(vs.styles[styleHere].size, vs.zoomLevel);
 			// The negative is to allow for leading
 			lf.lfHeight = -::MulDiv(sizeZoomed, dpi, 72*SC_FONT_SIZE_MULTIPLIER);

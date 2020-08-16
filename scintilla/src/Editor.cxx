@@ -5331,7 +5331,7 @@ void Editor::SetAnnotationVisible(int visible) {
 	}
 }
 
-void Editor::SetEOLAnnotationVisible(int visible) {
+void Editor::SetEOLAnnotationVisible(int visible) noexcept {
 	if (vs.eolAnnotationVisible != visible) {
 		vs.eolAnnotationVisible = visible;
 		Redraw();

@@ -367,7 +367,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 
 				marks &= vs.ms[margin].mask;
 
-				PRectangle rcMarker(
+				const PRectangle rcMarker(
 					rcSelMargin.left,
 					static_cast<XYPOSITION>(yposScreen),
 					rcSelMargin.right,

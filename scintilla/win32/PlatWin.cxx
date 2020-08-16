@@ -1090,7 +1090,7 @@ void SurfaceGDI::DrawTextTransparent(PRectangle rc, const Font &font_, XYPOSITIO
 
 XYPOSITION SurfaceGDI::WidthText(const Font &font_, std::string_view text) {
 	SetFont(font_);
-	SIZE sz = { 0, 0 };
+	SIZE sz {};
 	if (!unicodeMode) {
 		::GetTextExtentPoint32A(hdc, text.data(), std::min(static_cast<int>(text.length()), maxLenText), &sz);
 	} else {
@@ -1104,7 +1104,7 @@ void SurfaceGDI::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 	// Zero positions to avoid random behaviour on failure.
 	std::fill(positions, positions + text.length(), 0.0f);
 	SetFont(font_);
-	SIZE sz = { 0, 0 };
+	SIZE sz {};
 	int fit = 0;
 	int i = 0;
 	const int len = static_cast<int>(text.length());
@@ -1587,12 +1587,13 @@ void SurfaceD2D::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fil
 
 namespace {
 
-inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
-	D2D_COLOR_F col;
-	col.r = colour.GetRedComponent();
-	col.g = colour.GetGreenComponent();
-	col.b = colour.GetBlueComponent();
-	col.a = colour.GetAlphaComponent();
+constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
+	D2D_COLOR_F col = {
+		colour.GetRedComponent(),
+		colour.GetGreenComponent(),
+		colour.GetBlueComponent(),
+		colour.GetAlphaComponent()
+	};
 	return col;
 }
 
@@ -2354,7 +2355,7 @@ RECT RectFromMonitor(HMONITOR hMonitor) noexcept {
 	if (GetMonitorInfo(hMonitor, &mi)) {
 		return mi.rcWork;
 	}
-	RECT rc = { 0, 0, 0, 0 };
+	RECT rc {};
 	if (::SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0) == 0) {
 		rc.left = 0;
 		rc.top = 0;
@@ -2369,7 +2370,7 @@ RECT RectFromMonitor(HMONITOR hMonitor) noexcept {
 void Window::SetPositionRelative(PRectangle rc, const Window *relativeTo) noexcept {
 	const DWORD style = GetWindowStyle(HwndFromWindowID(wid));
 	if (style & WS_POPUP) {
-		POINT ptOther = { 0, 0 };
+		POINT ptOther {};
 		::ClientToScreen(HwndFromWindow(*relativeTo), &ptOther);
 		rc.Move(static_cast<XYPOSITION>(ptOther.x), static_cast<XYPOSITION>(ptOther.y));
 
@@ -2398,7 +2399,7 @@ void Window::SetPositionRelative(PRectangle rc, const Window *relativeTo) noexce
 }
 
 PRectangle Window::GetClientPosition() const noexcept {
-	RECT rc = { 0, 0, 0, 0 };
+	RECT rc {};
 	if (wid)
 		::GetClientRect(HwndFromWindowID(wid), &rc);
 	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
@@ -2753,7 +2754,7 @@ PRectangle ListBoxX::GetDesiredRect() {
 	int width = MinClientWidth();
 	HDC hdc = ::GetDC(lb);
 	HFONT oldFont = SelectFont(hdc, fontCopy);
-	SIZE textSize = { 0, 0 };
+	SIZE textSize {};
 	int len = 0;
 	if (widestItem) {
 		len = static_cast<int>(strlen(widestItem));

@@ -1476,7 +1476,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 	rcSegment.right = rcSegment.left + widthEOLAnnotationText;
 
 	const ColourOptional background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
-	ColourDesired textFore = vsDraw.styles[style].fore;
+	const ColourDesired textFore = vsDraw.styles[style].fore;
 	const ColourDesired textBack = TextBackground(model, vsDraw, ll, background, false,
 											false, static_cast<int>(style), -1);
 
