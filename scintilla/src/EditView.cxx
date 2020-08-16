@@ -2433,20 +2433,31 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 
 		Sci::Line lineDocPrevious = -1;	// Used to avoid laying out one document line multiple times
 		AutoLineLayout ll(llc, nullptr);
-		std::vector<DrawPhase> phases;
+		int phaseCount;
+		DrawPhase phases[MaxDrawPhaseCount];
 		if ((phasesDraw == phasesMultiple) && !bufferedDraw) {
-			for (int phase = drawBack; phase < drawFoldLines; phase = phase * 2) {
-				phases.push_back(static_cast<DrawPhase>(phase));
-			}
+			phases[0] = drawBack;
+			phases[1] = drawIndicatorsBack;
+			phases[2] = drawText;
+			phases[3] = drawIndentationGuides;
+			phases[4] = drawIndicatorsFore;
+			phases[5] = drawSelectionTranslucent;
+			phases[6] = drawLineTranslucent;
+			phases[7] = drawFoldLines;
+			phases[8] = drawCarets;
 			if (needDrawFoldLines) {
-				phases.push_back(drawFoldLines);
+				phaseCount = 9;
+			} else {
+				phaseCount = 8;
+				phases[7] = drawCarets;
 			}
-			phases.push_back(drawCarets);
 		} else {
-			phases.push_back(needDrawFoldLines ? drawAll : static_cast<DrawPhase>(drawAll & ~drawFoldLines));
+			phases[0] = needDrawFoldLines ? drawAll : static_cast<DrawPhase>(drawAll & ~drawFoldLines);
+			phaseCount = 1;
 		}
 
-		for (const DrawPhase &phase : phases) {
+		for (int phaseIndex = 0; phaseIndex < phaseCount; phaseIndex++) {
+			const DrawPhase phase = phases[phaseIndex];
 			int ypos = 0;
 			if (!bufferedDraw)
 				ypos += screenLinePaintFirst * vsDraw.lineHeight;
