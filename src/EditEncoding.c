@@ -1750,7 +1750,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	if (pt < end) {
 		NP2_alignas(32) char buffer[2*sizeof(__m256i)];
 		ZeroMemory_32x2(buffer);
-		memcpy(buffer, pt, end - pt + 1);
+		memcpy(buffer, pt, end - pt);
 
 		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
 		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
@@ -1774,7 +1774,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	if (pt < end) {
 		NP2_alignas(16) char buffer[4*sizeof(__m128i)];
 		ZeroMemory_16x4(buffer);
-		memcpy(buffer, pt, end - pt + 1);
+		memcpy(buffer, pt, end - pt);
 
 		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
 		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
