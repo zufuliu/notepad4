@@ -110,8 +110,8 @@ public:
  */
 class CellBuffer {
 private:
-	bool hasStyles;
-	bool largeDocument;
+	const bool hasStyles;
+	const bool largeDocument;
 	SplitVector<char> substance;
 	SplitVector<char> style;
 	bool readOnly;
@@ -149,6 +149,7 @@ public:
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const;
 	const char *BufferPointer();
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
+	const char *StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
 	Sci::Position GapPosition() const noexcept;
 
 	Sci::Position Length() const noexcept;
