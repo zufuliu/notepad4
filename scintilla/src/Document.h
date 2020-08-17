@@ -402,6 +402,9 @@ public:
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {
 		return cb.RangePointer(position, rangeLength);
 	}
+	const char *StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept {
+		return cb.StyleRangePointer(position, rangeLength);
+	}
 	Sci::Position GapPosition() const noexcept {
 		return cb.GapPosition();
 	}

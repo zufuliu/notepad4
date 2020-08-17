@@ -435,6 +435,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			// See if chars, styles, indicators, are all the same
 			int allSame = vstyle.viewEOL ? 0 : (ll->styles[lineLength] ^ model.pdoc->StyleIndexAt(posLineStart + lineLength)); // For eolFilled
 			// Check base line layout
+#if 0
 			if (vstyle.someStylesForceCase) {
 				char chPrevious = '\0';
 				for (Sci::Position numCharsInLine = 0, charInDoc = posLineStart; numCharsInLine < lineLength; ++numCharsInLine, ++charInDoc) {
@@ -450,13 +451,31 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						| (ll->chars[numCharsInLine] ^ model.pdoc->CharAt(charInDoc));
 				}
 			}
-			//const double duration = period.Duration()*1e3;
-			//printf("line=%zd allSame=%d, duration=%f\n", line + 1, allSame, duration);
-			if (allSame == 0) {
-				ll->validity = LineLayout::ValidLevel::positions;
-			} else {
-				ll->validity = LineLayout::ValidLevel::invalid;
+#else
+			if (lineLength != 0) {
+				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
+				const uint8_t *docStyles = reinterpret_cast<const uint8_t *>(model.pdoc->StyleRangePointer(posLineStart, lineLength));
+				if (docStyles) { // HasStyles
+					allSame |= ::memcmp(docStyles, ll->styles.get(), lineLength);
+				}
+				if (docStyles && vstyle.someStylesForceCase) {
+					char chPrevious = '\0';
+					const char *chars = ll->chars.get();
+					const uint8_t *end = docStyles + lineLength;
+					do {
+						const uint8_t styleByte = *docStyles++;
+						const char chDoc = *docChars++;
+						allSame |= CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious) ^ *chars++;
+						chPrevious = chDoc;
+					} while (docStyles < end);
+				} else {
+					allSame |= ::memcmp(docChars, ll->chars.get(), lineLength);
+				}
 			}
+#endif
+			//const double duration = period.Duration()*1e3;
+			//printf("line=%zd (%zd) allSame=%d, duration=%f\n", line + 1, lineLength, allSame, duration);
+			ll->validity = allSame ? LineLayout::ValidLevel::invalid : LineLayout::ValidLevel::positions;
 		} else {
 			ll->validity = LineLayout::ValidLevel::invalid;
 		}
@@ -480,7 +499,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		model.pdoc->GetStyleRange(ll->styles.get(), posLineStart, lineLength);
 		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
 		const int numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
-		const unsigned char styleByteLast = (lineLength > 0) ? (vstyle.viewEOL ? ll->styles[lineLength - 1] : ll->styles[numCharsBeforeEOL]) : 0;
+		const unsigned char styleByteLast = (lineLength != 0) ? (vstyle.viewEOL ? ll->styles[lineLength - 1] : ll->styles[numCharsBeforeEOL]) : 0;
 		if (vstyle.someStylesForceCase) {
 			char chPrevious = '\0';
 			for (int charInLine = 0; charInLine < lineLength; charInLine++) {
