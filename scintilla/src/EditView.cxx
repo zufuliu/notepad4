@@ -456,20 +456,21 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
 				const uint8_t *docStyles = reinterpret_cast<const uint8_t *>(model.pdoc->StyleRangePointer(posLineStart, lineLength));
 				if (docStyles) { // HasStyles
-					allSame |= ::memcmp(docStyles, ll->styles.get(), lineLength);
+					allSame |= ::memcmp(docStyles, ll->styles.get(), lineLength); // NOLINT(bugprone-suspicious-string-compare)
 				}
-				if (docStyles && vstyle.someStylesForceCase) {
+				if (vstyle.someStylesForceCase) {
 					char chPrevious = '\0';
 					const char *chars = ll->chars.get();
-					const uint8_t *end = docStyles + lineLength;
+					const char *end = chars + lineLength;
+					docStyles = ll->styles.get(); // if styles differ, allSame is already non-zero
 					do {
 						const uint8_t styleByte = *docStyles++;
 						const char chDoc = *docChars++;
 						allSame |= CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious) ^ *chars++;
 						chPrevious = chDoc;
-					} while (docStyles < end);
+					} while (chars < end);
 				} else {
-					allSame |= ::memcmp(docChars, ll->chars.get(), lineLength);
+					allSame |= ::memcmp(docChars, ll->chars.get(), lineLength); // NOLINT(bugprone-suspicious-string-compare)
 				}
 			}
 #endif
