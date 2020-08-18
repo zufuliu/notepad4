@@ -351,6 +351,7 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 }
 
 LineLayoutCache::LineLayoutCache() :
+	lastCaretSlot(SIZE_MAX),
 	level(0),
 	allInvalidated(false), styleClock(-1) {
 	Allocate(0);
@@ -396,7 +397,7 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 		lengthForLevel = 1;
 	} else if (level == llcPage) {
 		// see comment in Retrieve() method.
-		lengthForLevel = AlignUp(4*linesOnScreen, 64);
+		lengthForLevel = 1 + AlignUp(4*linesOnScreen, 64);
 	} else if (level == llcDocument) {
 		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
@@ -408,6 +409,7 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 
 void LineLayoutCache::Deallocate() noexcept {
 	cache.clear();
+	lastCaretSlot = SIZE_MAX;
 }
 
 void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
@@ -443,11 +445,24 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	size_t pos = 0;
 	if (level == llcPage) {
 		// two arenas, each with two pages to ensure cache efficiency on scrolling.
-		// first arena for lines near caret line or top visible line.
+		// first arena for lines near top visible line.
 		// second arena for other lines, e.g. folded lines near top visible line.
-		const size_t diff = std::min(std::abs(lineNumber - lineCaret), std::abs(lineNumber - topLine));
+		// TODO: use/cleanup second arena after some periods, e.g. after Editor::WrapLines() finished.
+		const size_t diff = std::abs(lineNumber - topLine);
 		const size_t gap = cache.size() / 2;
-		pos = (lineNumber % gap) + ((diff < gap) ? 0 : gap);
+		pos = 1 + (lineNumber % gap) + ((diff < gap) ? 0 : gap);
+		// first slot reserved for caret line, which is rapidly retrieved.
+		if (lineNumber == lineCaret) {
+			if (lastCaretSlot == 0 && cache[0]->lineNumber == lineCaret) {
+				pos = 0;
+			} else {
+				lastCaretSlot = pos;
+			}
+		} else if (pos == lastCaretSlot) {
+			// save cache for caret line.
+			lastCaretSlot = 0;
+			std::swap(cache[0], cache[pos]);
+		}
 	} else if (level == llcDocument) {
 		pos = lineNumber;
 	}
@@ -455,10 +470,17 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	LineLayout *ret = cache[pos].get();
 	if (ret) {
 		if ((ret->lineNumber != lineNumber) || (ret->maxLineLength < maxChars)) {
+			//printf("USE line=%zd/%zd, caret=%zd/%zu top=%zd, pos=%zu, clock=%d\n",
+			//	lineNumber, ret->lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
 			ret->~LineLayout();
 			ret = new (ret) LineLayout(maxChars);
+		} else {
+			//printf("HIT line=%zd, caret=%zd/%zu top=%zd, pos=%zu, clock=%d, validity=%d\n",
+			//	lineNumber, lineCaret, topLine, lastCaretSlot, pos, styleClock_, ret->validity);
 		}
 	} else {
+		//printf("NEW line=%zd, caret=%zd/%zu top=%zd, pos=%zu, clock=%d\n",
+		//	lineNumber, lineCaret, topLine, lastCaretSlot, pos, styleClock_);
 		cache[pos] = std::make_unique<LineLayout>(maxChars);
 		ret = cache[pos].get();
 	}
