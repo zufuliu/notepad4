@@ -11,7 +11,13 @@ echo | clang-cl -Xclang -dM -E -Xclang -xc++ -
 echo | gcc -dM -E -xc++ -
 
 https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
--fsanitize=undefined,integer
+https://devblogs.microsoft.com/cppblog/addresssanitizer-asan-for-windows-with-msvc/
+	1. add <LLVM Dir>\lib\clang\<version>\lib\windows to Linker -> General -> Additional Library Directories
+	2. add -fsanitize=address,undefined,integer to LLVM -> Additional Compiler Options or C/C++ -> Command Line
+	3. Linker -> Input -> Additional Dependencies for -fsanitize=address:
+		clang_rt.asan_dynamic-x86_64.lib
+		clang_rt.asan_dynamic_runtime_thunk-x86_64.lib
+		copy clang_rt.asan_dynamic-x86_64.dll to exe folder
 
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_NOTEPAD2 L"-UBSan.log");
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_METAPATH L"-UBSan.log");
