@@ -1796,7 +1796,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		// cache for each line requires more than 230 bytes memory, see LineLayout::Resize().
 		// python command to make a 1 MiB empty file:
 		// f = open('1mb.txt', 'wb'); f.write(('\n'*1024*1024*1).encode('utf-8')); f.close()
-		//const int cache = (iLines < 1024*1024 && iBytes < 1024*1024)? SC_CACHE_DOCUMENT : SC_CACHE_PAGE;
+		//const int cache = (iLines < 256 || iBytes < 1024*1024)? SC_CACHE_DOCUMENT : SC_CACHE_PAGE;
 		SciCall_SetLayoutCache(SC_CACHE_PAGE);
 
 #if 0

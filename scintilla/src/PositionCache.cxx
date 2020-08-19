@@ -388,6 +388,9 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 void LineLayoutCache::Allocate(size_t length_) {
 	allInvalidated = false;
 	cache.resize(length_);
+	//printf("%s level=%d, size=%zu/%zu, LineLayout=%zu/%zu, BidiData=%zu, XYPOSITION=%zu\n",
+	//	__func__, level, cache.size(), cache.capacity(), sizeof(LineLayout),
+	//	sizeof(std::unique_ptr<LineLayout>), sizeof(BidiData), sizeof(XYPOSITION));
 }
 
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
@@ -451,7 +454,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 		const size_t diff = std::abs(lineNumber - topLine);
 		const size_t gap = cache.size() / 2;
 		pos = 1 + (lineNumber % gap) + ((diff < gap) ? 0 : gap);
-		// first slot reserved for caret line, which is rapidly retrieved.
+		// first slot reserved for caret line, which is rapidly retrieved when caret blinking.
 		if (lineNumber == lineCaret) {
 			if (lastCaretSlot == 0 && cache[0]->lineNumber == lineCaret) {
 				pos = 0;
@@ -470,17 +473,17 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	LineLayout *ret = cache[pos].get();
 	if (ret) {
 		if ((ret->lineNumber != lineNumber) || (ret->maxLineLength < maxChars)) {
-			//printf("USE line=%zd/%zd, caret=%zd/%zu top=%zd, pos=%zu, clock=%d\n",
+			//printf("USE line=%zd/%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
 			//	lineNumber, ret->lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
 			ret->~LineLayout();
 			ret = new (ret) LineLayout(maxChars);
 		} else {
-			//printf("HIT line=%zd, caret=%zd/%zu top=%zd, pos=%zu, clock=%d, validity=%d\n",
-			//	lineNumber, lineCaret, topLine, lastCaretSlot, pos, styleClock_, ret->validity);
+			//printf("HIT line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d, validity=%d\n",
+			//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_, ret->validity);
 		}
 	} else {
-		//printf("NEW line=%zd, caret=%zd/%zu top=%zd, pos=%zu, clock=%d\n",
-		//	lineNumber, lineCaret, topLine, lastCaretSlot, pos, styleClock_);
+		//printf("NEW line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
+		//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
 		cache[pos] = std::make_unique<LineLayout>(maxChars);
 		ret = cache[pos].get();
 	}
