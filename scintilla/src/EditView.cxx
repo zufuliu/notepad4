@@ -433,7 +433,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		if (lineLength == ll->numCharsInLine) {
 			//ElapsedPeriod period;
 			// See if chars, styles, indicators, are all the same
-			int allSame = vstyle.viewEOL ? 0 : (ll->styles[lineLength] ^ model.pdoc->StyleIndexAt(posLineStart + lineLength)); // For eolFilled
+			int allSame = 0;
 			// Check base line layout
 #if 0
 			if (vstyle.someStylesForceCase) {
@@ -451,28 +451,36 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						| (ll->chars[numCharsInLine] ^ model.pdoc->CharAt(charInDoc));
 				}
 			}
+
+			const int styleByteLast = (posLineEnd == posLineStart) ? 0 : model.pdoc->StyleIndexAt(posLineEnd - 1);
+			allSame |= ll->styles[lineLength] ^ styleByteLast; // For eolFilled
 #else
+			const uint8_t *styles = ll->styles.get();
+			const uint8_t * const end = styles + lineLength;
+
 			if (lineLength != 0) {
+				const char *chars = ll->chars.get();
 				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
 				const uint8_t *docStyles = reinterpret_cast<const uint8_t *>(model.pdoc->StyleRangePointer(posLineStart, lineLength));
 				if (docStyles) { // HasStyles
-					allSame |= ::memcmp(docStyles, ll->styles.get(), lineLength); // NOLINT(bugprone-suspicious-string-compare)
+					allSame |= ::memcmp(docStyles, styles, lineLength); // NOLINT(bugprone-suspicious-string-compare)
 				}
 				if (vstyle.someStylesForceCase) {
 					char chPrevious = '\0';
-					const char *chars = ll->chars.get();
-					const char *end = chars + lineLength;
-					docStyles = ll->styles.get(); // if styles differ, allSame is already non-zero
 					do {
-						const uint8_t styleByte = *docStyles++;
+						// if styles differ, allSame is already non-zero
+						const uint8_t styleByte = *styles++;
 						const char chDoc = *docChars++;
 						allSame |= CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious) ^ *chars++;
 						chPrevious = chDoc;
-					} while (chars < end);
+					} while (styles < end);
 				} else {
-					allSame |= ::memcmp(docChars, ll->chars.get(), lineLength); // NOLINT(bugprone-suspicious-string-compare)
+					allSame |= ::memcmp(docChars, chars, lineLength); // NOLINT(bugprone-suspicious-string-compare)
 				}
 			}
+
+			const int styleByteLast = (posLineEnd == posLineStart) ? 0 : model.pdoc->StyleIndexAt(posLineEnd - 1);
+			allSame |= *end ^ styleByteLast; // For eolFilled
 #endif
 			//const double duration = period.Duration()*1e3;
 			//printf("line=%zd (%zd) allSame=%d, duration=%f\n", line + 1, lineLength, allSame, duration);
@@ -500,7 +508,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		model.pdoc->GetStyleRange(ll->styles.get(), posLineStart, lineLength);
 		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
 		const int numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
-		const unsigned char styleByteLast = (lineLength != 0) ? (vstyle.viewEOL ? ll->styles[lineLength - 1] : ll->styles[numCharsBeforeEOL]) : 0;
+		const unsigned char styleByteLast = (lineLength == 0) ? 0 : ll->styles[lineLength - 1];
 		if (vstyle.someStylesForceCase) {
 			char chPrevious = '\0';
 			for (int charInLine = 0; charInLine < lineLength; charInLine++) {
