@@ -459,12 +459,12 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			const uint8_t * const end = styles + lineLength;
 
 			if (lineLength != 0) {
-				const char *chars = ll->chars.get();
-				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
-				const uint8_t *docStyles = reinterpret_cast<const uint8_t *>(model.pdoc->StyleRangePointer(posLineStart, lineLength));
+				const char *docStyles = model.pdoc->StyleRangePointer(posLineStart, lineLength);
 				if (docStyles) { // HasStyles
 					allSame |= ::memcmp(docStyles, styles, lineLength); // NOLINT(bugprone-suspicious-string-compare)
 				}
+				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
+				const char *chars = ll->chars.get();
 				if (vstyle.someStylesForceCase) {
 					char chPrevious = '\0';
 					do {
