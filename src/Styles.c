@@ -1791,12 +1791,37 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (bLexerChanged) {
 		// cache layout for visible lines.
 		// SC_CACHE_PAGE depends on line height (i.e. styles in current lexer) and edit window height.
-		//const Sci_Line iLines = SciCall_GetLineCount();
-		//const Sci_Position iBytes = SciCall_GetLength();
-		// cache for each line requires more than 230 bytes memory, see LineLayout::Resize().
-		// python command to make a 1 MiB empty file:
-		// f = open('1mb.txt', 'wb'); f.write(('\n'*1024*1024*1).encode('utf-8')); f.close()
-		//const int cache = (iLines < 256 || iBytes < 1024*1024)? SC_CACHE_DOCUMENT : SC_CACHE_PAGE;
+		/* estimated memory usage when using SC_CACHE_DOCUMENT:
+		CellBuffer:
+			docLength*2
+		Document:
+			lineCount*(4 + 4)
+		ContractionState:
+			lineCount*(1 + 1 + 4 + 4)
+
+		base => docLength*2 + lineCount*18
+
+		LineLayoutCache:
+			lineCount*(8 + 136 + 4*ChunkHeaderSize)
+			+ (lineCount + docLength)*(1 + 1 + 4) + lineCount*4
+
+			lineStarts:
+				wrappedLineCount*(ChunkHeaderSize + 20*4) + sum(subLineCount)*4
+			bidiData:
+				lineCount*(ChunkHeaderSize + 48) + (lineCount + docLength)*(8 + 4)
+				=> docLength*12 + lineCount*68
+
+			with memory chunk header size=8, ignore lineStarts and PositionCache
+			cache without bidiData => docLength*6 + lineCount*186
+			cache with bidiData => docLength*18 + lineCount*254
+
+		total without bidiData => docLength*8 + lineCount*204
+		total with bidiData => docLength*20 + lineCount*272
+
+		python command to make a 4 MiB file with new line only:
+		f = open('4mb.txt', 'wb'); f.write(('\n'*1024*1024*4).encode('utf-8')); f.close()
+		*/
+		//const int cache = (SciCall_GetLength() < 4*1024*1024)? SC_CACHE_DOCUMENT : SC_CACHE_PAGE;
 		SciCall_SetLayoutCache(SC_CACHE_PAGE);
 
 #if 0
