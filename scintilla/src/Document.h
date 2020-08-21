@@ -449,7 +449,7 @@ public:
 	int StyleIndexAt(Sci_Position position) const noexcept {
 		return static_cast<unsigned char>(cb.StyleAt(position));
 	}
-	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const {
+	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
 		cb.GetStyleRange(buffer, position, lengthRetrieve);
 	}
 	MarkerMask GetMark(Sci::Line line) const noexcept;

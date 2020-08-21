@@ -215,7 +215,7 @@ public:
 			}
 			RoomFor(insertLength);
 			GapTo(position);
-			std::fill(body.data() + part1Length, body.data() + part1Length + insertLength, v);
+			std::fill_n(body.data() + part1Length, insertLength, v);
 			lengthBody += insertLength;
 			part1Length += insertLength;
 			gapLength -= insertLength;
@@ -303,16 +303,13 @@ public:
 		// Split into up to 2 ranges, before and after the split then use memcpy on each.
 		ptrdiff_t range1Length = 0;
 		if (position < part1Length) {
-			const ptrdiff_t part1AfterPosition = part1Length - position;
-			range1Length = retrieveLength;
-			if (range1Length > part1AfterPosition)
-				range1Length = part1AfterPosition;
+			range1Length = std::min(retrieveLength, part1Length - position);
 		}
-		std::copy(body.data() + position, body.data() + position + range1Length, buffer);
-		buffer += range1Length;
-		position = position + range1Length + gapLength;
+		const T* data = body.data() + position;
+		std::copy_n(data, range1Length, buffer);
+		data += range1Length + gapLength;
 		const ptrdiff_t range2Length = retrieveLength - range1Length;
-		std::copy(body.data() + position, body.data() + position + range2Length, buffer);
+		std::copy_n(data, range2Length, buffer + range1Length);
 	}
 
 	/// Compact the buffer and return a pointer to the first element.

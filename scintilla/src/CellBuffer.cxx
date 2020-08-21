@@ -625,13 +625,13 @@ char CellBuffer::StyleAt(Sci::Position position) const noexcept {
 	return hasStyles ? style.ValueAt(position) : '\0';
 }
 
-void CellBuffer::GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const {
+void CellBuffer::GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
 	if (lengthRetrieve < 0)
 		return;
 	if (position < 0)
 		return;
 	if (!hasStyles) {
-		std::fill(buffer, buffer + lengthRetrieve, static_cast<unsigned char>(0));
+		std::fill_n(buffer, lengthRetrieve, static_cast<unsigned char>(0));
 		return;
 	}
 	if ((position + lengthRetrieve) > style.Length()) {
