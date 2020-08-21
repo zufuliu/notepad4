@@ -146,7 +146,7 @@ public:
 	unsigned char UCharAt(Sci::Position position) const noexcept;
 	void GetCharRange(char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept;
 	char StyleAt(Sci::Position position) const noexcept;
-	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const;
+	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept;
 	const char *BufferPointer();
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
 	const char *StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
