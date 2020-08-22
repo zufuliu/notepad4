@@ -423,13 +423,15 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars != nullptr);
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
-	Sci::Position posLineEnd = model.pdoc->LineStart(line + 1);
 	// If the line is very long, limit the treatment to a length that should fit in the viewport
-	if (posLineEnd > (posLineStart + ll->maxLineLength)) {
-		posLineEnd = posLineStart + ll->maxLineLength;
-	}
-	if (ll->validity == LineLayout::ValidLevel::checkTextAndStyle) {
+	const Sci::Position posLineEnd = std::min(model.pdoc->LineStart(line + 1), posLineStart + ll->maxLineLength);
+	// Hard to cope when too narrow, so just assume there is space
+	width = std::max(width, 20);
+
+	auto validity = ll->validity;
+	if (validity == LineLayout::ValidLevel::checkTextAndStyle) {
 		const Sci::Position lineLength = (vstyle.viewEOL ? posLineEnd : model.pdoc->LineEnd(line)) - posLineStart;
+		validity = LineLayout::ValidLevel::invalid;
 		if (lineLength == ll->numCharsInLine) {
 			//ElapsedPeriod period;
 			// See if chars, styles, indicators, are all the same
@@ -461,8 +463,10 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			if (lineLength != 0) {
 				const char *docStyles = model.pdoc->StyleRangePointer(posLineStart, lineLength);
 				if (docStyles) { // HasStyles
-					allSame |= ::memcmp(docStyles, styles, lineLength); // NOLINT(bugprone-suspicious-string-compare)
+					// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
+					allSame |= memcmp(docStyles, styles, lineLength);
 				}
+
 				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
 				const char *chars = ll->chars.get();
 				if (vstyle.someStylesForceCase) {
@@ -475,7 +479,8 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 						chPrevious = chDoc;
 					} while (styles < end);
 				} else {
-					allSame |= ::memcmp(docChars, chars, lineLength); // NOLINT(bugprone-suspicious-string-compare)
+					// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
+					allSame |= memcmp(docChars, chars, lineLength);
 				}
 			}
 
@@ -483,13 +488,14 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			allSame |= *end ^ styleByteLast; // For eolFilled
 #endif
 			//const double duration = period.Duration()*1e3;
-			//printf("line=%zd (%zd) allSame=%d, duration=%f\n", line + 1, lineLength, allSame, duration);
-			ll->validity = allSame ? LineLayout::ValidLevel::invalid : LineLayout::ValidLevel::positions;
-		} else {
-			ll->validity = LineLayout::ValidLevel::invalid;
+			//printf("check line=%zd (%zd) allSame=%d, duration=%f\n", line + 1, lineLength, allSame, duration);
+			if (allSame == 0) {
+				validity = (ll->widthLine != width)? LineLayout::ValidLevel::positions : LineLayout::ValidLevel::lines;
+			}
 		}
 	}
-	if (ll->validity == LineLayout::ValidLevel::invalid) {
+	if (validity == LineLayout::ValidLevel::invalid) {
+		//ElapsedPeriod period;
 		ll->widthLine = LineLayout::wrapWidthInfinite;
 		ll->lines = 1;
 		if (vstyle.edgeState == EDGE_BACKGROUND) {
@@ -575,13 +581,11 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 		}
 		ll->numCharsInLine = numCharsInLine;
 		ll->numCharsBeforeEOL = numCharsBeforeEOL;
-		ll->validity = LineLayout::ValidLevel::positions;
+		validity = LineLayout::ValidLevel::positions;
+		//const double duration = period.Duration()*1e3;
+		//printf("invalid line=%zd (%d) duration=%f\n", line + 1, lineLength, duration);
 	}
-	// Hard to cope when too narrow, so just assume there is space
-	if (width < 20) {
-		width = 20;
-	}
-	if ((ll->validity == LineLayout::ValidLevel::positions) || (ll->widthLine != width)) {
+	if ((validity == LineLayout::ValidLevel::positions) || (ll->widthLine != width)) {
 		ll->widthLine = width;
 		if (width == LineLayout::wrapWidthInfinite) {
 			ll->lines = 1;
@@ -589,6 +593,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			// Simple common case where line does not need wrapping.
 			ll->lines = 1;
 		} else {
+			//ElapsedPeriod period;
 			if (vstyle.wrapVisualFlags & SC_WRAPVISUALFLAG_END) {
 				width -= static_cast<int>(vstyle.aveCharWidth); // take into account the space for end wrap mark
 			}
@@ -759,9 +764,12 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 				p++;
 			}
 			ll->lines++;
+			//const double duration = period.Duration()*1e3;
+			//printf("wrap line=%zd duration=%f\n", line + 1, duration);
 		}
-		ll->validity = LineLayout::ValidLevel::lines;
+		validity = LineLayout::ValidLevel::lines;
 	}
+	ll->validity = validity;
 }
 
 // Fill the LineLayout bidirectional data fields according to each char style

@@ -262,7 +262,7 @@ public:
 			}
 			RoomFor(insertLength);
 			GapTo(positionToInsert);
-			std::copy(s + positionFrom, s + positionFrom + insertLength, body.data() + part1Length);
+			std::copy_n(s + positionFrom, insertLength, body.data() + part1Length);
 			lengthBody += insertLength;
 			part1Length += insertLength;
 			gapLength -= insertLength;
@@ -315,7 +315,7 @@ public:
 	/// Compact the buffer and return a pointer to the first element.
 	/// Also ensures there is an empty element beyond logical end in case its
 	/// passed to a function expecting a NUL terminated string.
-	T *BufferPointer() {
+	const T *BufferPointer() {
 		RoomFor(1);
 		GapTo(lengthBody);
 		T emptyOne = {};
@@ -325,18 +325,18 @@ public:
 
 	/// Return a pointer to a range of elements, first rearranging the buffer if
 	/// needed to make that range contiguous.
-	T *RangePointer(ptrdiff_t position, ptrdiff_t rangeLength) noexcept {
+	const T *RangePointer(ptrdiff_t position, ptrdiff_t rangeLength) noexcept {
+		const T *data = body.data() + position;
 		if (position < part1Length) {
 			if ((position + rangeLength) > part1Length) {
 				// Range overlaps gap, so move gap to start of range.
 				GapTo(position);
-				return body.data() + position + gapLength;
-			} else {
-				return body.data() + position;
+				data += gapLength;
 			}
 		} else {
-			return body.data() + position + gapLength;
+			data += gapLength;
 		}
+		return data;
 	}
 
 	/// Return the position of the gap within the buffer.
