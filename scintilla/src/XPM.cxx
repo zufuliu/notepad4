@@ -316,24 +316,24 @@ RGBAImage *RGBAImageSet::Get(int ident) const {
 
 /// Give the largest height of the set.
 int RGBAImageSet::GetHeight() const {
-	if (height < 0) {
+	int h = height;
+	if (h < 0) {
 		for (const auto &image : images) {
-			if (height < image.second->GetHeight()) {
-				height = image.second->GetHeight();
-			}
+			h = std::max(h, image.second->GetHeight());
 		}
+		height = h;
 	}
-	return (height > 0) ? height : 0;
+	return std::max(h, 0);
 }
 
 /// Give the largest width of the set.
 int RGBAImageSet::GetWidth() const {
-	if (width < 0) {
+	int w = width;
+	if (w < 0) {
 		for (const auto &image : images) {
-			if (width < image.second->GetWidth()) {
-				width = image.second->GetWidth();
-			}
+			w = std::max(w, image.second->GetWidth());
 		}
+		width = w;
 	}
-	return (width > 0) ? width : 0;
+	return std::max(w, 0);
 }

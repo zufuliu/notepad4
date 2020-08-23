@@ -3466,13 +3466,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
 		if (std::abs(wheelDelta) >= WHEEL_DELTA) {
 			const int nRows = GetVisibleRows();
-			int linesToScroll = 1;
-			if (nRows > 1) {
-				linesToScroll = nRows - 1;
-			}
-			if (linesToScroll > 3) {
-				linesToScroll = 3;
-			}
+			int linesToScroll = std::clamp(nRows - 1, 1, 3);
 			linesToScroll *= (wheelDelta / WHEEL_DELTA);
 			int top = ListBox_GetTopIndex(lb) + linesToScroll;
 			if (top < 0) {

@@ -370,7 +370,7 @@ Sci::Line Editor::MaxScrollPos() const noexcept {
 		retVal -= linesOnScreen - linesOnScreen/4;
 		break;
 	}
-	return (retVal < 0) ? 0 : retVal;
+	return std::max<Sci::Line>(retVal, 0);
 }
 
 SelectionPosition Editor::ClampPositionIntoDocument(SelectionPosition sp) const noexcept {
@@ -523,12 +523,8 @@ void Editor::RedrawSelMargin(Sci::Line line, bool allAfter) noexcept {
 		// Inflate line rectangle if there are image markers with height larger than line height
 		if (vs.largestMarkerHeight > vs.lineHeight) {
 			const int delta = (vs.largestMarkerHeight - vs.lineHeight + 1) / 2;
-			rcLine.top -= delta;
-			rcLine.bottom += delta;
-			if (rcLine.top < rcMarkers.top)
-				rcLine.top = rcMarkers.top;
-			if (rcLine.bottom > rcMarkers.bottom)
-				rcLine.bottom = rcMarkers.bottom;
+			rcLine.top = std::max(rcLine.top - delta, rcMarkers.top);
+			rcLine.bottom = std::min(rcLine.bottom + delta, rcMarkers.bottom);
 		}
 
 		rcMarkers.top = rcLine.top;
@@ -556,8 +552,7 @@ PRectangle Editor::RectangleFromRange(Range r, int overlap) const noexcept {
 	const int leftTextOverlap = ((xOffset == 0) && (vs.leftMarginWidth > 0)) ? 1 : 0;
 	rc.left = static_cast<XYPOSITION>(vs.textStart - leftTextOverlap);
 	rc.top = static_cast<XYPOSITION>((minLine - TopLineOfMain()) * vs.lineHeight - overlap);
-	if (rc.top < rcClientDrawing.top)
-		rc.top = rcClientDrawing.top;
+	rc.top = std::max(rc.top, rcClientDrawing.top);
 	// Extend to right of prepared area if any to prevent artifacts from caret line highlight
 	rc.right = rcClientDrawing.right;
 	rc.bottom = static_cast<XYPOSITION>((maxLine - TopLineOfMain() + 1) * vs.lineHeight + overlap);
@@ -1703,10 +1698,8 @@ void Editor::PaintSelMargin(Surface *surfaceWindow, PRectangle rc) {
 	}
 
 	// Clip vertically to paint area to avoid drawing line numbers
-	if (rcMargin.bottom > rc.bottom)
-		rcMargin.bottom = rc.bottom;
-	if (rcMargin.top < rc.top)
-		rcMargin.top = rc.top;
+	rcMargin.bottom = std::min(rcMargin.bottom, rc.bottom);
+	rcMargin.top = std::max(rcMargin.top, rc.top);
 
 	marginView.PaintMargin(surface, topLine, rc, rcMargin, *this, vs);
 
@@ -2975,9 +2968,9 @@ void Editor::ChangeCaseOfSelection(int caseMapping) {
 		currentNoVS.ClearVirtualSpace();
 		const size_t rangeBytes = currentNoVS.Length();
 		if (rangeBytes > 0) {
-			std::string sText = RangeText(currentNoVS.Start().Position(), currentNoVS.End().Position());
+			const std::string sText = RangeText(currentNoVS.Start().Position(), currentNoVS.End().Position());
 
-			std::string sMapped = CaseMapString(sText, caseMapping);
+			const std::string sMapped = CaseMapString(sText, caseMapping);
 
 			if (sMapped != sText) {
 				size_t firstDifference = 0;
@@ -4030,8 +4023,7 @@ void Editor::Indent(bool forwards) {
 				} else {
 					Sci::Position newColumn = ((pdoc->GetColumn(caretPosition) - 1) / pdoc->tabInChars) *
 						pdoc->tabInChars;
-					if (newColumn < 0)
-						newColumn = 0;
+					newColumn = std::max<Sci::Position>(newColumn, 0);
 					Sci::Position newPos = caretPosition;
 					while (pdoc->GetColumn(newPos) > newColumn)
 						newPos--;
@@ -4205,10 +4197,7 @@ Sci::Position Editor::SearchInTarget(const char *text, Sci::Position length) {
 }
 
 void Editor::GoToLine(Sci::Line lineNo) {
-	if (lineNo > pdoc->LinesTotal())
-		lineNo = pdoc->LinesTotal();
-	if (lineNo < 0)
-		lineNo = 0;
+	lineNo = std::clamp<Sci::Line>(lineNo, 0, pdoc->LinesTotal());
 	SetEmptySelection(pdoc->LineStart(lineNo));
 	ShowCaretAtCurrentPosition();
 	EnsureCaretVisible();
@@ -5105,8 +5094,7 @@ Sci::Position Editor::PositionAfterArea(PRectangle rcArea) const noexcept {
 // affects later lines so style all the viewed text.
 void Editor::StyleToPositionInView(Sci::Position pos) {
 	Sci::Position endWindow = PositionAfterArea(GetClientDrawingRectangle());
-	if (pos > endWindow)
-		pos = endWindow;
+	pos = std::min(pos, endWindow);
 	const int styleAtEnd = pdoc->StyleIndexAt(pos - 1);
 	pdoc->EnsureStyledTo(pos);
 	if ((endWindow > pos) && (styleAtEnd != pdoc->StyleIndexAt(pos - 1))) {
@@ -5220,12 +5208,8 @@ void Editor::CheckForChangeOutsidePaint(Range r) noexcept {
 
 		PRectangle rcRange = RectangleFromRange(r, 0);
 		const PRectangle rcText = GetTextRectangle();
-		if (rcRange.top < rcText.top) {
-			rcRange.top = rcText.top;
-		}
-		if (rcRange.bottom > rcText.bottom) {
-			rcRange.bottom = rcText.bottom;
-		}
+		rcRange.top = std::max(rcRange.top, rcText.top);
+		rcRange.bottom = std::min(rcRange.bottom, rcText.bottom);
 
 		if (!PaintContains(rcRange)) {
 			AbandonPaint();
@@ -5450,7 +5434,6 @@ Sci::Line Editor::ContractedFoldNext(Sci::Line lineStart) const noexcept {
  * and unfold them all.
  */
 void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
-
 	// In case in need of wrapping to ensure DisplayFromDoc works.
 	if (lineDoc >= wrapPending.start) {
 		if (WrapLines(WrapScope::wsAll)) {

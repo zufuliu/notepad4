@@ -335,11 +335,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	maxAscent += extraAscent;
 	maxDescent += extraDescent;
 	lineHeight = maxAscent + maxDescent;
-	lineOverlap = lineHeight / 10;
-	if (lineOverlap < 2)
-		lineOverlap = 2;
-	if (lineOverlap > lineHeight)
-		lineOverlap = lineHeight;
+	lineOverlap = std::clamp(lineHeight / 10, 2, lineHeight);
 
 	someStylesProtected = std::any_of(styles.cbegin(), styles.cend(),
 		[](const Style &style) noexcept { return style.IsProtected(); });
@@ -679,10 +675,12 @@ FontRealised *ViewStyle::Find(const FontSpecification &fs) const {
 }
 
 void ViewStyle::FindMaxAscentDescent() {
+	auto ascent = maxAscent;
+	auto descent = maxDescent;
 	for (const auto &it : fonts) {
-		if (maxAscent < it.second->ascent)
-			maxAscent = it.second->ascent;
-		if (maxDescent < it.second->descent)
-			maxDescent = it.second->descent;
+		ascent = std::max(ascent, it.second->ascent);
+		descent = std::max(descent, it.second->descent);
 	}
+	maxAscent = ascent;
+	maxDescent = descent;
 }

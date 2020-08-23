@@ -29,10 +29,8 @@ public:
 		// end is 1 past end, so end-start is number of elements to change
 		ptrdiff_t i = 0;
 		const ptrdiff_t rangeLength = end - start;
-		ptrdiff_t range1Length = rangeLength;
 		const ptrdiff_t part1Left = this->part1Length - start;
-		if (range1Length > part1Left)
-			range1Length = part1Left;
+		const ptrdiff_t range1Length = std::min(rangeLength, part1Left);
 		while (i < range1Length) {
 			this->body[start++] += delta;
 			i++;

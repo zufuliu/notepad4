@@ -45,11 +45,11 @@ public:
 	}
 
 	Sci::Position First() const noexcept {
-		return (start <= end) ? start : end;
+		return std::min(start, end);
 	}
 
 	Sci::Position Last() const noexcept {
-		return (start > end) ? start : end;
+		return std::max(start, end);
 	}
 
 	// Is the position within the range?

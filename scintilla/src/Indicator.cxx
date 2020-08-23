@@ -71,7 +71,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			alphaFull = 0xff, alphaSide = 0x2f, alphaSide2 = 0x5f
 		};
 		for (int x = 0; x < width; x++) {
-			if (x & 1) {
+			if (x % 2) {
 				// Two halfway columns have a full pixel in middle flanked by light pixels
 				image.SetPixel(x, 0, sacDraw.fore, alphaSide);
 				image.SetPixel(x, 1, sacDraw.fore, alphaFull);
