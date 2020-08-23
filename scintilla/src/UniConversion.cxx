@@ -110,18 +110,7 @@ size_t UTF16Length(std::string_view svu8) noexcept {
 	}
 
 	// Invalid 4-bytes UTF-8 lead byte at string end.
-	//if ((byteCount == 4) && (i != len)) {
-	//	ulen--;
-	//}
-
-	/*
-	Branchless version of above two tests:
-	For 4-bytes UTF-8 lead byte, when the loop is finished, i must
-	in [len, len + 1, len + 2, len + 3], thus (i ^ len) is in [0, 1, 2, 3],
-	where 0 (i.e. i == len) is the only valid case.
-	*/
-	const unsigned mask = (1 << (byteCount & 4)) - 1;
-	if (mask & (i ^ svu8.length())) {
+	if ((byteCount == 4) && (i != svu8.length())) {
 		ulen--;
 	}
 	return ulen;

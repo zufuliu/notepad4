@@ -1469,8 +1469,7 @@ int SCI_METHOD Document::GetLineIndentation(Sci_Position line) const noexcept {
 
 Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent) {
 	const int indentOfLine = GetLineIndentation(line);
-	if (indent < 0)
-		indent = 0;
+	indent = std::max<Sci::Position>(indent, 0);
 	if (indent != indentOfLine) {
 		std::string linebuf = CreateIndentation(indent, tabInChars, !useTabs);
 		const Sci::Position thisLineStart = LineStart(line);

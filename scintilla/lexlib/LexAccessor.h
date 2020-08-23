@@ -37,17 +37,12 @@ private:
 	Sci_Position startPosStyling;
 
 	void Fill(Sci_Position position) noexcept {
+		const Sci_Position m = lenDoc - bufferSize;
 		startPos = position - slopSize;
-		if (startPos + bufferSize > lenDoc) {
-			startPos = lenDoc - bufferSize;
-		}
-		if (startPos < 0) {
-			startPos = 0;
-		}
+		startPos = (startPos > m)? m : startPos;
+		startPos = (startPos < 0)? 0 : startPos;
 		endPos = startPos + bufferSize;
-		if (endPos > lenDoc) {
-			endPos = lenDoc;
-		}
+		endPos = (endPos > lenDoc)? lenDoc : endPos;
 
 		pAccess->GetCharRange(buf, startPos, endPos - startPos);
 		buf[endPos - startPos] = '\0';

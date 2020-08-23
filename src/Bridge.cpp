@@ -273,12 +273,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			lengthDoc = endPos;
 		}
 
-		if (lengthPrinted < 0) {
-			lengthPrinted = 0;
-		}
-		if (lengthDoc > lengthDocMax) {
-			lengthDoc = lengthDocMax;
-		}
+		lengthPrinted = max_pos(lengthPrinted, 0);
+		lengthDoc = min_pos(lengthDoc, lengthDocMax);
 	}
 
 	// We must substract the physical margins from the printable area
