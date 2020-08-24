@@ -54,10 +54,12 @@ protected:
 	/// reallocating if more space needed.
 	void RoomFor(ptrdiff_t insertionLength) {
 		if (gapLength <= insertionLength) {
-			while (growSize < static_cast<ptrdiff_t>(body.size() / 6)) {
+			const ptrdiff_t size = static_cast<ptrdiff_t>(body.size());
+			const ptrdiff_t upper = size / 6;
+			while (growSize < upper) {
 				growSize *= 2;
 			}
-			ReAllocate(body.size() + insertionLength + growSize);
+			ReAllocate(size + insertionLength + growSize);
 		}
 	}
 
@@ -98,7 +100,8 @@ public:
 		if (newSize < 0)
 			throw std::runtime_error("SplitVector::ReAllocate: negative size.");
 
-		if (newSize > static_cast<ptrdiff_t>(body.size())) {
+		const ptrdiff_t size = static_cast<ptrdiff_t>(body.size());
+		if (newSize > size) {
 #if ENABLE_SHOW_DEBUG_INFO
 			printf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
 				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
@@ -107,7 +110,7 @@ public:
 #endif
 			// Move the gap to the end
 			GapTo(lengthBody);
-			gapLength += newSize - static_cast<ptrdiff_t>(body.size());
+			gapLength += newSize - size;
 			// RoomFor implements a growth strategy but so does vector::resize so
 			// ensure vector::resize allocates exactly the amount wanted by
 			// calling reserve first.
