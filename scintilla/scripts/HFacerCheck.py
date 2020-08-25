@@ -15,6 +15,10 @@ def readIFace(path):
 	ifaceDoc = open(path).read()
 	# remove comment
 	ifaceDoc = re.sub('\s+#.+', '', ifaceDoc)
+	# ignore deprecated category
+	index = ifaceDoc.find('cat Deprecated')
+	if index > 0:
+		ifaceDoc = ifaceDoc[:index]
 	return ifaceDoc
 
 def findAPIHoles():
