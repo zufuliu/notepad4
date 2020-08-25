@@ -783,10 +783,6 @@ NP2_inline UINT SciCall_GetCodePage(void) {
 	return (UINT)SciCall(SCI_GETCODEPAGE, 0, 0);
 }
 
-NP2_inline void SciCall_SetBufferedDraw(BOOL buffered) {
-	SciCall(SCI_SETBUFFEREDDRAW, buffered, 0);
-}
-
 NP2_inline void SciCall_SetTechnology(int technology) {
 	SciCall(SCI_SETTECHNOLOGY, technology, 0);
 }

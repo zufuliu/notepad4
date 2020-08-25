@@ -2092,6 +2092,7 @@ sptr_t ScintillaWin::SciMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 #if defined(USE_D2D)
 				DropRenderTarget();
 #endif
+				view.bufferedDraw = technologyNew == SC_TECHNOLOGY_DEFAULT;
 				technology = technologyNew;
 				// Invalidate all cached information including layout.
 				vs.fontsValid = false;
