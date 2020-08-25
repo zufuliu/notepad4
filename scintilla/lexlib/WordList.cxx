@@ -21,21 +21,15 @@ using namespace Scintilla;
  * after each word.
  */
 static char **ArrayFromWordList(char *wordlist, size_t slen, int *len) {
-	int prev = true;
+	int prev = 1;
 	int words = 0;
-	// For rapid determination of whether a character is a separator, build
-	// a look up table, for ASCII only.
-	bool wordSeparator[128] = {};	// Initialise all to false.
-	wordSeparator[static_cast<unsigned char>('\r')] = true;
-	wordSeparator[static_cast<unsigned char>('\n')] = true;
-	wordSeparator[static_cast<unsigned char>(' ')] = true;
-	wordSeparator[static_cast<unsigned char>('\t')] = true;
+	// treat space and C0 control characters as word separators.
 
 	char * const end = wordlist + slen;
 	char *s = wordlist;
 	while (s < end) {
 		const unsigned char ch = *s++;
-		const bool curr = wordSeparator[ch];
+		const int curr = ch <= ' ';
 		if (!curr && prev) {
 			words++;
 		}
@@ -49,7 +43,7 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, int *len) {
 		s = wordlist;
 		while (s < end) {
 			unsigned char ch = *s;
-			if (!wordSeparator[ch]) {
+			if (ch > ' ') {
 				if (!prev) {
 					keywords[wordsStore] = s;
 					wordsStore++;
