@@ -1615,7 +1615,6 @@ HWND EditCreate(HWND hwndParent) {
 
 	InitScintillaHandle(hwnd);
 	Style_InitDefaultColor();
-	SciCall_SetBufferedDraw(iRenderingTechnology == SC_TECHNOLOGY_DEFAULT);
 	SciCall_SetTechnology(iRenderingTechnology);
 	SciCall_SetBidirectional(iBidirectional);
 	SciCall_SetIMEInteraction(bUseInlineIME);
@@ -4273,7 +4272,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_SET_RENDER_TECH_D2DDC: {
 		const int back = iRenderingTechnology;
 		iRenderingTechnology = LOWORD(wParam) - IDM_SET_RENDER_TECH_GDI;
-		SciCall_SetBufferedDraw(iRenderingTechnology == SC_TECHNOLOGY_DEFAULT);
 		SciCall_SetTechnology(iRenderingTechnology);
 		iRenderingTechnology = SciCall_GetTechnology();
 		iBidirectional = SciCall_GetBidirectional();
