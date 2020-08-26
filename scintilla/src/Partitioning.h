@@ -48,7 +48,7 @@ public:
 /// A 0 length interval has a single 0 length partition, numbered 0
 /// If interval not 0 length then each partition non-zero length
 /// When needed, positions after the interval are considered part of the last partition
-/// but the end of the last partition can be found with PositionFromPartition(last+1).
+/// but the end of the last partition can be found with PositionFromPartition(last + 1).
 
 template <typename T>
 class Partitioning {
@@ -199,7 +199,7 @@ public:
 	T PartitionFromPosition(T pos) const noexcept {
 		if (body->Length() <= 1)
 			return 0;
-		if (pos >= (PositionFromPartition(Partitions())))
+		if (pos >= Length())
 			return Partitions() - 1;
 		T lower = 0;
 		T upper = Partitions();
@@ -237,7 +237,7 @@ public:
 			// Positions should be a strictly ascending sequence
 			for (T i = 0; i < Partitions(); i++) {
 				const T pos = PositionFromPartition(i);
-				const T posNext = PositionFromPartition(i+1);
+				const T posNext = PositionFromPartition(i + 1);
 				if (pos > posNext) {
 					throw std::runtime_error("Partitioning: Negative partition.");
 				} else if (pos == posNext) {
