@@ -30,6 +30,7 @@ C/C++ Source
 	xpm				X11 Pixmap Graphic
 	cl				OpenCL Source File
 	cu				CUDA Source File
+	cuh				CUDA Header File
 
 	*.h.in
 
