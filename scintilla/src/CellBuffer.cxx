@@ -106,7 +106,7 @@ public:
 	virtual ~LineStartIndex() = default;
 	bool Allocate(Sci::Line lines) {
 		refCount++;
-		Sci::Position length = starts.PositionFromPartition(starts.Partitions());
+		Sci::Position length = starts.Length();
 		for (Sci::Line line = starts.Partitions(); line < lines; line++) {
 			// Produce an ascending sequence that will be filled in with correct widths later
 			length++;
