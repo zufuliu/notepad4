@@ -84,7 +84,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			}
 			break;
 		case SCE_C_IDENTIFIER:
-			if (!(iswordstart(ch) || ch == '-')) {
+			if (!(iswordstart(ch) || (ch == '-' && chNext != '>'))) {
 				buf[wordLen] = '\0';
 				Sci_PositionU pos = i;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
