@@ -677,7 +677,7 @@ BEGIN
 			END
 			POPUP "RTL レイアウト (GDI)(&R)"
 			BEGIN
-				MENUITEM "Edit ウィンドウ(&E)",			IDM_SET_RTL_LAYOUT_EDIT
+				MENUITEM "編集ウィンドウ(&E)",			IDM_SET_RTL_LAYOUT_EDIT
 				MENUITEM "他のウィンドウ(&O)",			IDM_SET_RTL_LAYOUT_OTHER
 			END
 			POPUP "書字方向 (Direct2D)(&B)"
