@@ -198,13 +198,14 @@ struct RegexError : public std::runtime_error {
  */
 
 class ActionDuration {
-	double duration;
-	const double minDuration;
-	const double maxDuration;
+	double duration = 1e-5;
+	static constexpr double minDuration = 1e-6;
+	static constexpr double maxDuration = 1e-4;
 public:
-	ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept;
+	//ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept;
 	void AddSample(size_t numberActions, double durationOfActions) noexcept;
 	double Duration() const noexcept;
+	Sci::Line LinesInAllowedTime(double secondsAllowed) const noexcept;
 };
 
 /**

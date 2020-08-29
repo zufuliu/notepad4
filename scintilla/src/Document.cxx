@@ -84,9 +84,9 @@ int LexInterface::LineEndTypesSupported() const noexcept {
 	return 0;
 }
 
-ActionDuration::ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept :
-	duration(duration_), minDuration(minDuration_), maxDuration(maxDuration_) {
-}
+//ActionDuration::ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept :
+//	duration(duration_), minDuration(minDuration_), maxDuration(maxDuration_) {
+//}
 
 void ActionDuration::AddSample(size_t numberActions, double durationOfActions) noexcept {
 	// Only adjust for multiple actions to avoid instability
@@ -98,17 +98,23 @@ void ActionDuration::AddSample(size_t numberActions, double durationOfActions) n
 	constexpr double alpha = 0.25;
 
 	const double durationOne = durationOfActions / numberActions;
-	duration = std::clamp(alpha * durationOne + (1.0 - alpha) * duration,
-		minDuration, maxDuration);
+	const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
+	//duration = std::clamp(duration_, minDuration, maxDuration);
+	duration = std::max(duration_, minDuration);
+	//printf("%s actions=%zu, one=%.9f, value=%.9f, [%.9f, %f, %f]\n", __func__,
+	//	numberActions, durationOne, duration_, duration, minDuration, maxDuration);
 }
 
 double ActionDuration::Duration() const noexcept {
 	return duration;
 }
 
+Sci::Line ActionDuration::LinesInAllowedTime(double secondsAllowed) const noexcept {
+	return std::clamp<Sci::Line>(static_cast<Sci::Line>(secondsAllowed / duration), 8, 0x10000);
+}
+
 Document::Document(int options) :
-	cb((options & SC_DOCUMENTOPTION_STYLES_NONE) == 0, (options & SC_DOCUMENTOPTION_TEXT_LARGE) != 0),
-	durationStyleOneLine(0.00001, 0.000001, 0.0001) {
+	cb((options & SC_DOCUMENTOPTION_STYLES_NONE) == 0, (options & SC_DOCUMENTOPTION_TEXT_LARGE) != 0) {
 	refCount = 0;
 #ifdef _WIN32
 	eolMode = SC_EOL_CRLF;
