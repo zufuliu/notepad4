@@ -109,7 +109,7 @@ static constexpr bool IsAllSpacesOrTabs(std::string_view sv) noexcept {
 	return true;
 }
 
-Editor::Editor() : durationWrapOneLine(0.00001, 0.000001, 0.0001) {
+Editor::Editor() {
 	ctrlID = 0;
 
 	stylesValid = false;
@@ -1553,9 +1553,7 @@ bool Editor::WrapLines(WrapScope ws) {
 		} else if (ws == WrapScope::wsIdle) {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
 			constexpr double secondsAllowed = 0.01;
-			const Sci::Line linesInAllowedTime = std::clamp<Sci::Line>(
-				static_cast<Sci::Line>(secondsAllowed / durationWrapOneLine.Duration()),
-				LinesOnScreen() + 50, 0x10000);
+			const Sci::Line linesInAllowedTime = durationWrapOneLine.LinesInAllowedTime(secondsAllowed);
 			lineToWrapEnd = lineToWrap + linesInAllowedTime;
 		}
 		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, pdoc->LinesTotal());
@@ -5116,10 +5114,8 @@ Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolli
 	// Try to keep time taken by styling reasonable so interaction remains smooth.
 	// When scrolling, allow less time to ensure responsive
 	const double secondsAllowed = scrolling ? 0.005 : 0.02;
+	const Sci::Line linesToStyle = pdoc->durationStyleOneLine.LinesInAllowedTime(secondsAllowed);
 
-	const Sci::Line linesToStyle = std::clamp(
-		static_cast<int>(secondsAllowed / pdoc->durationStyleOneLine.Duration()),
-		10, 0x10000);
 	const Sci::Line stylingMaxLine = std::min(
 		pdoc->SciLineFromPosition(pdoc->GetEndStyled()) + linesToStyle,
 		pdoc->LinesTotal());
