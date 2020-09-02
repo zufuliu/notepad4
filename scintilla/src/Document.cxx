@@ -84,33 +84,45 @@ int LexInterface::LineEndTypesSupported() const noexcept {
 	return 0;
 }
 
-//ActionDuration::ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept :
-//	duration(duration_), minDuration(minDuration_), maxDuration(maxDuration_) {
-//}
-
-void ActionDuration::AddSample(size_t numberActions, double durationOfActions) noexcept {
+void ActionDuration::AddSample(Sci::Line numberActions, double durationOfActions) noexcept {
 	// Only adjust for multiple actions to avoid instability
-	if (numberActions < 8)
+#if ActionDuration_MeasureTimeByBytes
+	if (numberActions < ActionDuration_MeasureTimeByBytes) {
 		return;
+	}
+#else
+	if (numberActions < 8) {
+		return;
+	}
+#endif
 
 	// Alpha value for exponential smoothing.
 	// Most recent value contributes 25% to smoothed value.
 	constexpr double alpha = 0.25;
 
+#if ActionDuration_MeasureTimeByBytes
+	const double durationOne = (ActionDuration_MeasureTimeByBytes * durationOfActions) / numberActions;
+#else
 	const double durationOne = durationOfActions / numberActions;
+#endif
 	const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
 	//duration = std::clamp(duration_, minDuration, maxDuration);
 	duration = std::max(duration_, minDuration);
-	//printf("%s actions=%zu, one=%.9f, value=%.9f, [%.9f, %f, %f]\n", __func__,
-	//	numberActions, durationOne, duration_, duration, minDuration, maxDuration);
+	//printf("%s actions=%.9f / %zd, one=%.9f, value=%.9f, [%.9f, %f, %f]\n", __func__,
+	//	durationOfActions, numberActions, durationOne, duration_, duration, minDuration, maxDuration);
 }
 
 double ActionDuration::Duration() const noexcept {
 	return duration;
 }
 
-Sci::Line ActionDuration::LinesInAllowedTime(double secondsAllowed) const noexcept {
-	return std::clamp<Sci::Line>(static_cast<Sci::Line>(secondsAllowed / duration), 8, 0x10000);
+Sci::Line ActionDuration::ActionsInAllowedTime(double secondsAllowed) const noexcept {
+	const Sci::Line actions = std::clamp<Sci::Line>(static_cast<Sci::Line>(secondsAllowed / duration), 8, 0x10000);
+#if ActionDuration_MeasureTimeByBytes
+	return actions * ActionDuration_MeasureTimeByBytes;
+#else
+	return actions;
+#endif
 }
 
 Document::Document(int options) :
@@ -489,6 +501,17 @@ Sci::Position Document::IndexLineStart(Sci::Line line, int lineCharacterIndex) c
 Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const noexcept {
 	return cb.LineFromPositionIndex(pos, lineCharacterIndex);
 }
+
+#if ActionDuration_MeasureTimeByBytes
+Sci::Line Document::LineFromPositionAfter(Sci::Line line, Sci::Position length) const noexcept {
+	const Sci::Position pos = LineStart(line) + length;
+	if (pos >= Length()) {
+		return LinesTotal();
+	}
+	const Sci::Line lineLast = SciLineFromPosition(pos);
+	return lineLast + (!!(line == lineLast));
+}
+#endif
 
 int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
 	const int prev = Levels()->SetLevel(line, level, LinesTotal());
@@ -2246,7 +2269,12 @@ void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
 	ElapsedPeriod epStyling;
 	EnsureStyledTo(pos);
 	const Sci::Line lineLast = SciLineFromPosition(GetEndStyled());
-	durationStyleOneLine.AddSample(lineLast - lineFirst, epStyling.Duration());
+#if ActionDuration_MeasureTimeByBytes
+	const Sci::Line actions = LineStart(lineLast) - LineStart(lineFirst);
+#else
+	const Sci::Line actions = lineLast - lineFirst;
+#endif
+	durationStyleOneLine.AddSample(actions, epStyling.Duration());
 }
 
 void Document::LexerChanged() {

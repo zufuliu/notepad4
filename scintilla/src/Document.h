@@ -197,15 +197,18 @@ struct RegexError : public std::runtime_error {
  * experience.
  */
 
+//#define ActionDuration_MeasureTimeByBytes	0	// measure time by line
+#define ActionDuration_MeasureTimeByBytes	1024
+#define ActionDuration_InitializedMaxBytes	(1024*1024)
+
 class ActionDuration {
 	double duration = 1e-5;
 	static constexpr double minDuration = 1e-6;
 	static constexpr double maxDuration = 1e-4;
 public:
-	//ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept;
-	void AddSample(size_t numberActions, double durationOfActions) noexcept;
+	void AddSample(Sci::Line numberActions, double durationOfActions) noexcept;
 	double Duration() const noexcept;
-	Sci::Line LinesInAllowedTime(double secondsAllowed) const noexcept;
+	Sci::Line ActionsInAllowedTime(double secondsAllowed) const noexcept;
 };
 
 /**
@@ -472,6 +475,9 @@ public:
 	Sci::Position VCHomePosition(Sci::Position position) const noexcept;
 	Sci::Position IndexLineStart(Sci::Line line, int lineCharacterIndex) const noexcept;
 	Sci::Line LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const noexcept;
+#if ActionDuration_MeasureTimeByBytes
+	Sci::Line LineFromPositionAfter(Sci::Line line, Sci::Position length) const noexcept;
+#endif
 
 	int SCI_METHOD SetLevel(Sci_Position line, int level) override;
 	int SCI_METHOD GetLevel(Sci_Position line) const noexcept override;
