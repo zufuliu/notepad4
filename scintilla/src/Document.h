@@ -529,7 +529,7 @@ public:
 	}
 	void EnsureStyledTo(Sci::Position pos);
 	void StyleToAdjustingLineDuration(Sci::Position pos);
-	void LexerChanged();
+	void LexerChanged(bool hasStyles_);
 	int GetStyleClock() const noexcept {
 		return styleClock;
 	}
