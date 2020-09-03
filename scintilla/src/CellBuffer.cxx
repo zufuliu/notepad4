@@ -736,6 +736,19 @@ void CellBuffer::Allocate(Sci::Position newSize) {
 	}
 }
 
+bool CellBuffer::EnsureStyleBuffer(bool hasStyles_) {
+	if (hasStyles != hasStyles_) {
+		hasStyles = hasStyles_;
+		if (hasStyles_) {
+			style.InsertValue(0, substance.Length(), 0);
+		} else {
+			style.DeleteAll();
+		}
+		return true;
+	}
+	return false;
+}
+
 void CellBuffer::SetUTF8Substance(bool utf8Substance_) noexcept {
 	utf8Substance = utf8Substance_;
 }

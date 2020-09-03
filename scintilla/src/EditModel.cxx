@@ -70,7 +70,8 @@ EditModel::EditModel() : braces{} {
 	hotspot = Range(Sci::invalidPosition);
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;
-	pdoc = new Document(SC_DOCUMENTOPTION_DEFAULT);
+	// before setting a lexer, style buffer is useless.
+	pdoc = new Document(SC_DOCUMENTOPTION_STYLES_NONE);
 	pdoc->AddRef();
 	pcs = ContractionStateCreate(pdoc->IsLarge());
 }

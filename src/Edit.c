@@ -148,10 +148,10 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 #if defined(_WIN64)
 	// enable conversion between line endings
 	if (bLargeFileMode || cbText + lineCount >= MAX_NON_UTF8_SIZE) {
-		int options = SciCall_GetDocumentOptions();
-		if (!(options & SC_DOCUMENTOPTION_TEXT_LARGE)) {
-			options |= SC_DOCUMENTOPTION_TEXT_LARGE;
-			HANDLE pdoc = SciCall_CreateDocument(cbText + 1, options);
+		const int mask = SC_DOCUMENTOPTION_TEXT_LARGE | SC_DOCUMENTOPTION_STYLES_NONE;
+		const int options = SciCall_GetDocumentOptions();
+		if ((options & mask) != mask) {
+			HANDLE pdoc = SciCall_CreateDocument(cbText + 1, options | mask);
 			EditReplaceDocument(pdoc);
 			bLargeFileMode = TRUE;
 		}
@@ -972,7 +972,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 #if defined(_WIN64)
 	// less than 1/3 available physical memory:
 	//     1. The buffers we allocated below or when saving file, depends on encoding.
-	//     2. Scintilla's content buffer and style buffer, see CellBuffer class. The style buffer can be disabled by using SCLEX_NULL and SC_DOCUMENTOPTION_STYLES_NONE.
+	//     2. Scintilla's content buffer and style buffer, see CellBuffer class.
+	//        The style buffer is disabled when using SCLEX_NULL (Text File, 2nd Text File).
 	//     3. Extra memory when moving gaps on editing, it may requires more than 2/3 physical memory.
 	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.

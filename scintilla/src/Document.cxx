@@ -2277,7 +2277,10 @@ void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
 	durationStyleOneLine.AddSample(actions, epStyling.Duration());
 }
 
-void Document::LexerChanged() {
+void Document::LexerChanged(bool hasStyles_) {
+	if (cb.EnsureStyleBuffer(hasStyles_)) {
+		endStyled = 0;
+	}
 	// Tell the watchers the lexer has changed.
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifyLexerChanged(this, watcher.userData);
