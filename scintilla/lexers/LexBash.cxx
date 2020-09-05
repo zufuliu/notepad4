@@ -833,10 +833,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		// Comment folding
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
 		if (style == SCE_SH_WORD) {

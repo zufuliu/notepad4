@@ -1245,12 +1245,9 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
+		if (foldComment && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
@@ -1279,41 +1276,25 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		if (atEOL && IsUsingLine(lineCurrent)) {
-			if (!IsUsingLine(lineCurrent - 1) && IsUsingLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsUsingLine(lineCurrent - 1) && !IsUsingLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsUsingLine(lineCurrent + 1) - IsUsingLine(lineCurrent - 1);
 		}
-		//if (hasPreprocessor && atEOL && IsPropertyLine(lineCurrent)) {
-		//	if(!IsPropertyLine(lineCurrent-1) && IsPropertyLine(lineCurrent+1))
-		//		levelNext++;
-		//	else if(IsPropertyLine(lineCurrent-1) && !IsPropertyLine(lineCurrent+1))
-		//		levelNext--;
-		//}
-		if (hasPreprocessor && atEOL && IsIncludeLine(lineCurrent)) {
-			if (!IsIncludeLine(lineCurrent - 1) && IsIncludeLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsIncludeLine(lineCurrent - 1) && !IsIncludeLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (hasPreprocessor && atEOL && IsDefineLine(lineCurrent)) {
-			if (!IsDefineLine(lineCurrent - 1) && IsDefineLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsDefineLine(lineCurrent - 1) && !IsDefineLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (hasPreprocessor && atEOL && IsUnDefLine(lineCurrent)) {
-			if (!IsUnDefLine(lineCurrent - 1) && IsUnDefLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsUnDefLine(lineCurrent - 1) && !IsUnDefLine(lineCurrent + 1))
-				levelNext--;
+		if (hasPreprocessor && atEOL) {
+			if (IsIncludeLine(lineCurrent)) {
+				levelNext += IsIncludeLine(lineCurrent + 1) - IsIncludeLine(lineCurrent - 1);
+			}
+			else if (IsDefineLine(lineCurrent)) {
+				levelNext += IsDefineLine(lineCurrent + 1) - IsDefineLine(lineCurrent - 1);
+			}
+			else if (IsUnDefLine(lineCurrent)) {
+				levelNext += IsUnDefLine(lineCurrent + 1) - IsUnDefLine(lineCurrent - 1);
+			}
+			//else if (IsPropertyLine(lineCurrent)) {
+			//	levelNext += IsPropertyLine(lineCurrent + 1) - IsPropertyLine(lineCurrent - 1);
+			//}
 		}
 
-		if (atEOL && !IsStreamCommentStyle(style) && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext++;
-		}
-		if (atEOL && !IsStreamCommentStyle(style) && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext--;
+		if (atEOL && !IsStreamCommentStyle(style)) {
+			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
 		}
 		if (atEOL && !(hasPreprocessor && IsCppInDefine(i, styler)) && IsOpenBraceLine(lineCurrent + 1, styler)) {
 			levelNext++;

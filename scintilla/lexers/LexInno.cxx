@@ -286,10 +286,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
 		if (ch == '[' && style == SCE_INNO_SECTION) {

@@ -1680,10 +1680,7 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 		/*Mutiline comment patch*/
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (style == SCE_RB_COMMENTLINE) {
 			if (foldComment && stylePrev != SCE_RB_COMMENTLINE) {

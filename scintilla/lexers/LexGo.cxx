@@ -440,8 +440,12 @@ constexpr bool IsInnerStyle(int style) noexcept {
 	return style == SCE_GO_TASK_MARKER || style == SCE_GO_FORMAT_SPECIFIER;
 }
 
+constexpr int GetLineCommentState(int lineState) noexcept {
+	return lineState & GoLineStateMaskLineComment;
+}
+
 void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -449,11 +453,11 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	int lineCommentPrev = 0;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-		lineCommentPrev = styler.GetLineState(lineCurrent - 1) & GoLineStateMaskLineComment;
+		lineCommentPrev = GetLineCommentState(styler.GetLineState(lineCurrent - 1));
 	}
 
 	int levelNext = levelCurrent;
-	int lineCommentCurrent = styler.GetLineState(lineCurrent) & GoLineStateMaskLineComment;
+	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
@@ -468,7 +472,7 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_GO_RAW_STRING || (foldComment && style == SCE_GO_COMMENTBLOCK)) {
+		if (style == SCE_GO_RAW_STRING || (foldComment & (style == SCE_GO_COMMENTBLOCK))) {
 			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
 				levelNext++;
 			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
@@ -483,13 +487,9 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		}
 
 		if (i == lineEndPos) {
-			const int lineCommentNext = styler.GetLineState(lineCurrent + 1) & GoLineStateMaskLineComment;
-			if (foldComment && lineCommentCurrent) {
-				if (!lineCommentPrev && lineCommentNext) {
-					levelNext++;
-				} else if (lineCommentPrev && !lineCommentNext) {
-					levelNext--;
-				}
+			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
+			if (foldComment & lineCommentCurrent) {
+				levelNext += lineCommentNext - lineCommentPrev;
 			}
 
 			const int levelUse = levelCurrent;

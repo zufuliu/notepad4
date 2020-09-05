@@ -216,17 +216,11 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
 		if (atEOL && IsOpenLine(lineCurrent)) {
-			if (!IsOpenLine(lineCurrent - 1) && IsOpenLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsOpenLine(lineCurrent - 1) && !IsOpenLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsOpenLine(lineCurrent + 1) - IsOpenLine(lineCurrent - 1);
 		}
 
 		if (foldPreprocessor && styleNext == SCE_FSHARP_PREPROCESSOR) {
