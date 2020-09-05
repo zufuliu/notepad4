@@ -663,11 +663,13 @@ void LexState::SetLexerModule(const LexerModule *lex) {
 		}
 		interfaceVersion = lvRelease4;
 		lexCurrent = lex;
+		bool hasStyles = true;
 		if (lexCurrent) {
+			hasStyles = lexCurrent->GetLanguage() != SCLEX_NULL;
 			instance = lexCurrent->Create();
 			interfaceVersion = instance->Version();
 		}
-		pdoc->LexerChanged(lex->GetLanguage() != SCLEX_NULL);
+		pdoc->LexerChanged(hasStyles);
 	}
 }
 
