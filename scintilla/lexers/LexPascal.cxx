@@ -398,11 +398,9 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PAS_COMMENTLINE)
 
 static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
+	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
@@ -455,14 +453,9 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			}
 		}
 
-		if (!isspacechar(ch))
-			visibleChars++;
-
 		if (atEOL) {
 			int lev = levelPrev;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if ((levelCurrent > levelPrev) && (visibleChars > 0))
+			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
@@ -471,16 +464,12 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			styler.SetLineState(lineCurrent, newLineState);
 			lineCurrent++;
 			levelPrev = levelCurrent;
-			visibleChars = 0;
 		}
 	}
 
 	// If we didn't reach the EOL in previous loop, store line level and whitespace information.
 	// The rest will be filled in later...
-	int lev = levelPrev;
-	if (visibleChars == 0 && foldCompact)
-		lev |= SC_FOLDLEVELWHITEFLAG;
-	styler.SetLevel(lineCurrent, lev);
+	styler.SetLevel(lineCurrent, levelPrev);
 }
 
 LexerModule lmPascal(SCLEX_PASCAL, ColourisePascalDoc, "pascal", FoldPascalDoc);

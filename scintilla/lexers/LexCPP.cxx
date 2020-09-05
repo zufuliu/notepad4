@@ -1218,7 +1218,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
 	const bool hasPreprocessor = HasPreprocessor(lexType);
@@ -1400,7 +1399,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext++;
 		}
 
-		if (!isspacechar(ch))
+		if (visibleChars == 0 && !isspacechar(ch))
 			visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
@@ -1408,8 +1407,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			//	levelUse = levelMinCurrent;
 			//}
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
