@@ -288,8 +288,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 
 static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
@@ -393,8 +392,6 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
