@@ -429,10 +429,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (foldPreprocessor) {
 			if (style == SCE_PAS_PREPROCESSOR && ch == '{' && chNext == '$') {

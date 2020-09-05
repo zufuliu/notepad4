@@ -249,18 +249,12 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
-
-		if (atEOL && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext++;
-		}
-		if (atEOL && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext--;
+		if (atEOL) {
+		 	if (foldComment && IsCommentLine(lineCurrent)) {
+				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			} else {
+				levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
+			}
 		}
 
 		if (visibleChars == 0 && (ch == '!' || ch == 'i' || ch == 'e' || ch == 'd' || ch == '.')

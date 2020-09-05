@@ -65,8 +65,8 @@ constexpr bool IsVimOp(int ch) noexcept {
 
 enum {
 	VimLineStateMaskAutoCommand = 1, // autocmd
-	VimLineStateMaskLineComment = 2, // line comment
-	VimLineStateMaskLineContinue = 4, // line continue
+	VimLineStateMaskLineComment = 1 << 1, // line comment
+	VimLineStateMaskLineContinue = 1 << 2, // line continue
 };
 
 void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -240,13 +240,13 @@ struct FoldLineState {
 	int lineComment;
 	int lineContinue;
 	constexpr explicit FoldLineState(int lineState) noexcept:
-		lineComment(lineState & VimLineStateMaskLineComment),
-		lineContinue(lineState & VimLineStateMaskLineContinue) {
+		lineComment((lineState >> 1) & 1),
+		lineContinue((lineState >> 2) & 1) {
 	}
 };
 
 void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -290,18 +290,10 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 
 		if (i == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
-			if (foldComment && foldCurrent.lineComment) {
-				if (!foldPrev.lineComment && foldNext.lineComment) {
-					levelNext++;
-				} else if (foldPrev.lineComment && !foldNext.lineComment) {
-					levelNext--;
-				}
+			if (foldComment & foldCurrent.lineComment) {
+				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else {
-				if (!foldCurrent.lineContinue && foldNext.lineContinue) {
-					levelNext++;
-				} else if (foldCurrent.lineContinue && !foldNext.lineContinue) {
-					levelNext--;
-				}
+				levelNext += foldNext.lineContinue - foldCurrent.lineContinue;
 			}
 
 			const int levelUse = levelCurrent;

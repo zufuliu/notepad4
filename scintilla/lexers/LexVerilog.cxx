@@ -186,10 +186,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (foldPreprocessor && ch == '`' && (style == SCE_V_PREPROCESSOR)) {
 			const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);

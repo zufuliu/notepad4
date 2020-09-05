@@ -391,29 +391,16 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 		}
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (foldPreprocessor && atEOL && IsAsmDefineLine(lineCurrent, styler)) {
-			if (!IsAsmDefineLine(lineCurrent - 1, styler) && IsAsmDefineLine(lineCurrent + 1, styler))
-				levelNext++;
-			else if (IsAsmDefineLine(lineCurrent - 1, styler) && !IsAsmDefineLine(lineCurrent + 1, styler))
-				levelNext--;
+			levelNext += IsAsmDefineLine(lineCurrent + 1, styler) - IsAsmDefineLine(lineCurrent - 1, styler);
 		}
-		if (atEOL && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext++;
+		if (atEOL) {
+			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
 		}
-		if (atEOL && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext--;
-		}
-
 		if (atEOL && IsEquLine(lineCurrent, styler)) {
-			if (!IsEquLine(lineCurrent - 1, styler) && IsEquLine(lineCurrent + 1, styler))
-				levelNext++;
-			else if (IsEquLine(lineCurrent - 1, styler) && !IsEquLine(lineCurrent + 1, styler))
-				levelNext--;
+			levelNext += IsEquLine(lineCurrent + 1, styler) - IsEquLine(lineCurrent - 1, styler);
 		}
 		if (style == SCE_ASM_OPERATOR) {
 			if (ch == '{') {

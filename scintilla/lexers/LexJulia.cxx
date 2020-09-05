@@ -492,8 +492,12 @@ constexpr bool IsStringInnerStyle(int style) noexcept {
 	return style == SCE_JULIA_ESCAPECHAR;
 }
 
+constexpr int GetLineCommentState(int lineState) noexcept {
+	return (lineState >> 21) & 1;
+}
+
 void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -501,11 +505,11 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	int lineCommentPrev = 0;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-		lineCommentPrev = styler.GetLineState(lineCurrent - 1) & JuliaLineStateMaskLineComment;
+		lineCommentPrev = GetLineCommentState(styler.GetLineState(lineCurrent - 1));
 	}
 
 	int levelNext = levelCurrent;
-	int lineCommentCurrent = styler.GetLineState(lineCurrent) & JuliaLineStateMaskLineComment;
+	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
@@ -567,13 +571,9 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		}
 
 		if (i == lineEndPos) {
-			const int lineCommentNext = styler.GetLineState(lineCurrent + 1) & JuliaLineStateMaskLineComment;
-			if (foldComment && lineCommentCurrent) {
-				if (!lineCommentPrev && lineCommentNext) {
-					levelNext++;
-				} else if (lineCommentPrev && !lineCommentNext) {
-					levelNext--;
-				}
+			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
+			if (foldComment & lineCommentCurrent) {
+				levelNext += lineCommentNext - lineCommentPrev;
 			}
 
 			const int levelUse = levelCurrent;

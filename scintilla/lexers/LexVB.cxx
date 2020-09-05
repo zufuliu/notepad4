@@ -313,24 +313,16 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineBegin = (visibleChars == 0) && !atEOL;
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
-
-		if (atEOL && IsDimLine(lineCurrent)) {
-			if (!IsDimLine(lineCurrent - 1) && IsDimLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsDimLine(lineCurrent - 1) && !IsDimLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (atEOL && IsConstLine(lineCurrent)) {
-			if (!IsConstLine(lineCurrent - 1) && IsConstLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsConstLine(lineCurrent - 1) && !IsConstLine(lineCurrent + 1))
-				levelNext--;
+		if (atEOL) {
+			if (foldComment && IsCommentLine(lineCurrent)) {
+				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			}
+			else if (IsDimLine(lineCurrent)) {
+				levelNext += IsDimLine(lineCurrent + 1) - IsDimLine(lineCurrent - 1);
+			}
+			else if (IsConstLine(lineCurrent)) {
+				levelNext += IsConstLine(lineCurrent + 1) - IsConstLine(lineCurrent - 1);
+			}
 		}
 
 		if (style == SCE_B_KEYWORD && stylePrev != SCE_B_KEYWORD
