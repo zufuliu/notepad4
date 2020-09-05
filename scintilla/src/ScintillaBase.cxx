@@ -645,7 +645,7 @@ void LexState::SetInstance(ILexer5 *instance_) {
 		instance = nullptr;
 	}
 	instance = instance_;
-	pdoc->LexerChanged(true);
+	pdoc->LexerChanged(GetIdentifier() != SCLEX_NULL);
 }
 
 LexState *ScintillaBase::DocumentLexState() {
@@ -663,13 +663,11 @@ void LexState::SetLexerModule(const LexerModule *lex) {
 		}
 		interfaceVersion = lvRelease4;
 		lexCurrent = lex;
-		bool hasStyles = true;
 		if (lexCurrent) {
-			hasStyles = lexCurrent->GetLanguage() != SCLEX_NULL;
 			instance = lexCurrent->Create();
 			interfaceVersion = instance->Version();
 		}
-		pdoc->LexerChanged(hasStyles);
+		pdoc->LexerChanged(GetIdentifier() != SCLEX_NULL);
 	}
 }
 
