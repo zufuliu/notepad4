@@ -1235,6 +1235,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 	bool isObjCProtocol = false;
+	bool lineCommentCurrent = IsCommentLine(lineCurrent);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -1244,21 +1245,26 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-		}
-		if (foldComment && IsStreamCommentStyle(style)) {
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
-				levelNext--;
+		if (foldComment) {
+			if (lineCommentCurrent) {
+				if (atEOL) {
+					levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+				}
 			}
-		}
-		if (lexType == LEX_D && foldComment && style == SCE_C_DNESTEDCOMMENT) {
-			if (ch == '/' && chNext == '+')
-				levelNext++;
-			else if (ch == '+' && chNext == '/')
-				levelNext--;
+			else if (IsStreamCommentStyle(style)) {
+				if (!IsStreamCommentStyle(stylePrev)) {
+					levelNext++;
+				} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+					levelNext--;
+				}
+			}
+			else if (lexType == LEX_D && style == SCE_C_DNESTEDCOMMENT) {
+				if (ch == '/' && chNext == '+') {
+					levelNext++;
+				} else if (ch == '+' && chNext == '/') {
+					levelNext--;
+				}
+			}
 		}
 		if (lexType == LEX_PHP && IsHear_NowDocStyle(style)) {
 			if (!IsHear_NowDocStyle(stylePrev)) {
@@ -1398,6 +1404,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			//levelMinCurrent = levelCurrent;
 			visibleChars = 0;
 			isObjCProtocol = false;
+			lineCommentCurrent = IsCommentLine(lineCurrent);
 		}
 	}
 }
