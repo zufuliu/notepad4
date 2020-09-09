@@ -7215,10 +7215,10 @@ void EditOpenSelection(int type) {
 extern BOOL bNoEncodingTags;
 extern int fNoFileVariables;
 
-BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
+void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	ZeroMemory(lpfv, sizeof(FILEVARS));
 	if ((fNoFileVariables && bNoEncodingTags) || !lpData || !cbData) {
-		return TRUE;
+		return;
 	}
 
 	char tch[512];
@@ -7227,62 +7227,11 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	const BOOL utf8Sig = IsUTF8Signature(lpData);
 	BOOL bDisableFileVariables = FALSE;
 
-	if (!fNoFileVariables) {
-		int i;
-		if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
-			bDisableFileVariables = TRUE;
-		}
-
-		if (!bDisableFileVariables) {
-			if (FileVars_ParseInt(tch, "tab-width", &i)) {
-				lpfv->iTabWidth = clamp_i(i, 1, 256);
-				lpfv->mask |= FV_TABWIDTH;
-			}
-
-			if (FileVars_ParseInt(tch, "c-basic-indent", &i)) {
-				lpfv->iIndentWidth = clamp_i(i, 0, 256);
-				lpfv->mask |= FV_INDENTWIDTH;
-			}
-
-			if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
-				lpfv->bTabsAsSpaces = i == 0;
-				lpfv->mask |= FV_TABSASSPACES;
-			}
-
-			if (FileVars_ParseInt(tch, "c-tab-always-indent", &i)) {
-				lpfv->bTabIndents = i != 0;
-				lpfv->mask |= FV_TABINDENTS;
-			}
-
-			if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
-				lpfv->fWordWrap = i == 0;
-				lpfv->mask |= FV_WORDWRAP;
-			}
-
-			if (FileVars_ParseInt(tch, "fill-column", &i)) {
-				lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
-				lpfv->mask |= FV_LONGLINESLIMIT;
-			}
-		}
-	}
-
-	if (!utf8Sig && !bNoEncodingTags && !bDisableFileVariables) {
-		if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) ||
-			FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) ||
-			FileVars_ParseStr(tch, "coding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
-			lpfv->mask |= FV_ENCODING;
-		}
-	}
-
-	if (!fNoFileVariables && !bDisableFileVariables) {
-		if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) {
-			lpfv->mask |= FV_MODE;
-		}
-	}
-
-	if (lpfv->mask == 0 && cbData > COUNTOF(tch)) {
-		strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch) - 1);
+	// parse file variables at the beginning or end of the file.
+	BOOL beginning = TRUE;
+	while (TRUE) {
 		if (!fNoFileVariables) {
+			// Emacs file variables
 			int i;
 			if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
 				bDisableFileVariables = TRUE;
@@ -7294,7 +7243,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 					lpfv->mask |= FV_TABWIDTH;
 				}
 
-				if (FileVars_ParseInt(tch, "c-basic-indent", &i)) {
+				if (FileVars_ParseInt(tch, "*basic-indent", &i)) {
 					lpfv->iIndentWidth = clamp_i(i, 0, 256);
 					lpfv->mask |= FV_INDENTWIDTH;
 				}
@@ -7304,7 +7253,7 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 					lpfv->mask |= FV_TABSASSPACES;
 				}
 
-				if (FileVars_ParseInt(tch, "c-tab-always-indent", &i)) {
+				if (FileVars_ParseInt(tch, "*tab-always-indent", &i)) {
 					lpfv->bTabIndents = i != 0;
 					lpfv->mask |= FV_TABINDENTS;
 				}
@@ -7324,23 +7273,32 @@ BOOL FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 		if (!utf8Sig && !bNoEncodingTags && !bDisableFileVariables) {
 			if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) ||
 				FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) ||
-				FileVars_ParseStr(tch, "coding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
+				FileVars_ParseStr(tch, "coding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // Emacs
+				FileVars_ParseStr(tch, "fileencoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // VIM
+				FileVars_ParseStr(tch, "/*!40101 SET NAMES ", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
+				// MySQL dump: /*!40101 SET NAMES utf8mb4 */;
 				lpfv->mask |= FV_ENCODING;
+				break;
 			}
 		}
 
 		if (!fNoFileVariables && !bDisableFileVariables) {
-			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) {
+			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) { // Emacs
 				lpfv->mask |= FV_MODE;
 			}
+		}
+
+		if (beginning && lpfv->mask == 0 && cbData > COUNTOF(tch)) {
+			strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch) - 1);
+			beginning = FALSE;
+		} else {
+			break;
 		}
 	}
 
 	if (lpfv->mask & FV_ENCODING) {
 		lpfv->iEncoding = Encoding_MatchA(lpfv->tchEncoding);
 	}
-
-	return TRUE;
 }
 
 //=============================================================================
@@ -7355,7 +7313,7 @@ extern int iLongLinesLimit;
 extern int iLongLinesLimitG;
 extern int iWrapCol;
 
-BOOL FileVars_Apply(LPCFILEVARS lpfv) {
+void FileVars_Apply(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_TABWIDTH) {
 		iTabWidth = lpfv->iTabWidth;
 	} else {
@@ -7402,8 +7360,32 @@ BOOL FileVars_Apply(LPCFILEVARS lpfv) {
 	SciCall_SetEdgeColumn(iLongLinesLimit);
 
 	iWrapCol = 0;
+}
 
-	return TRUE;
+static LPCSTR FileVars_Find(LPCSTR pszData, LPCSTR pszName) {
+	const BOOL suffix = *pszName == '*';
+	if (suffix) {
+		++pszName;
+	}
+
+	LPCSTR pvStart = pszData;
+	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
+		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
+		const size_t len = strlen(pszName);
+		pvStart += len;
+		// match full name or suffix after hyphen
+		if (!(IsAlphaNumeric(chPrev) || chPrev == '-' || chPrev == '_' || chPrev == '.')
+			|| (suffix && chPrev == '-')) {
+			while (*pvStart == ' ' || *pvStart == '\t') {
+				pvStart++;
+			}
+			if (*pvStart == ':' || *pvStart == '=' || pszName[len - 1] == ' ') {
+				break;
+			}
+		}
+	}
+
+	return pvStart;
 }
 
 //=============================================================================
@@ -7411,23 +7393,7 @@ BOOL FileVars_Apply(LPCFILEVARS lpfv) {
 // FileVars_ParseInt()
 //
 BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
-	LPCSTR pvStart = pszData;
-
-	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
-		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
-		if (!(IsAlpha(chPrev) || chPrev == '-' || chPrev == '_')) {
-			pvStart += strlen(pszName);
-			while (*pvStart == ' ') {
-				pvStart++;
-			}
-			if (*pvStart == ':' || *pvStart == '=') {
-				break;
-			}
-		} else {
-			pvStart += strlen(pszName);
-		}
-	}
-
+	LPCSTR pvStart = FileVars_Find(pszData, pszName);
 	if (pvStart) {
 		while (*pvStart == ':' || *pvStart == '=' || *pvStart == '\"' || *pvStart == '\'' || *pvStart == ' ' || *pvStart == '\t') {
 			pvStart++;
@@ -7459,23 +7425,7 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 // FileVars_ParseStr()
 //
 BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue) {
-	LPCSTR pvStart = pszData;
-
-	while ((pvStart = strstr(pvStart, pszName)) != NULL) {
-		const unsigned char chPrev = (pvStart > pszData) ? *(pvStart - 1) : 0;
-		if (!(IsAlpha(chPrev) || chPrev == '-' || chPrev == '_')) {
-			pvStart += strlen(pszName);
-			while (*pvStart == ' ') {
-				pvStart++;
-			}
-			if (*pvStart == ':' || *pvStart == '=') {
-				break;
-			}
-		} else {
-			pvStart += strlen(pszName);
-		}
-	}
-
+	LPCSTR pvStart = FileVars_Find(pszData, pszName);
 	if (pvStart) {
 		BOOL bQuoted = FALSE;
 

@@ -399,8 +399,8 @@ typedef struct FILEVARS {
 
 typedef const FILEVARS * LPCFILEVARS;
 
-BOOL	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-BOOL	FileVars_Apply(LPCFILEVARS lpfv);
+void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
+void	FileVars_Apply(LPCFILEVARS lpfv);
 BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
 // in EditEncoding.c
