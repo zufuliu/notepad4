@@ -593,19 +593,20 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 			ll->lines = 1;
 		} else {
 			//ElapsedPeriod period;
+			const XYPOSITION aveCharWidth = vstyle.aveCharWidth;
 			if (vstyle.wrapVisualFlags & SC_WRAPVISUALFLAG_END) {
-				width -= static_cast<int>(vstyle.aveCharWidth); // take into account the space for end wrap mark
+				width -= static_cast<int>(aveCharWidth); // take into account the space for end wrap mark
 			}
 			XYPOSITION wrapAddIndent = 0; // This will be added to initial indent of line
 			switch (vstyle.wrapIndentMode) {
 			case SC_WRAPINDENT_FIXED:
-				wrapAddIndent = vstyle.wrapVisualStartIndent * vstyle.aveCharWidth;
+				wrapAddIndent = vstyle.wrapVisualStartIndent * aveCharWidth;
 				break;
 			case SC_WRAPINDENT_INDENT:
-				wrapAddIndent = model.pdoc->IndentSize() * vstyle.aveCharWidth;
+				wrapAddIndent = model.pdoc->IndentSize() * aveCharWidth;
 				break;
 			case SC_WRAPINDENT_DEEPINDENT:
-				wrapAddIndent = model.pdoc->IndentSize() * 2 * vstyle.aveCharWidth;
+				wrapAddIndent = model.pdoc->IndentSize() * 2 * aveCharWidth;
 				break;
 			}
 			ll->wrapIndent = wrapAddIndent;
@@ -618,149 +619,102 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 				}
 			}
 			// Check for text width minimum
-			if (ll->wrapIndent > width - static_cast<int>(vstyle.aveCharWidth) * 15)
+			if (ll->wrapIndent > width - static_cast<int>(aveCharWidth) * 15)
 				ll->wrapIndent = wrapAddIndent;
 			// Check for wrapIndent minimum
-			if ((vstyle.wrapVisualFlags & SC_WRAPVISUALFLAG_START) && (ll->wrapIndent < vstyle.aveCharWidth))
-				ll->wrapIndent = vstyle.aveCharWidth; // Indent to show start visual
+			if ((vstyle.wrapVisualFlags & SC_WRAPVISUALFLAG_START) && (ll->wrapIndent < aveCharWidth))
+				ll->wrapIndent = aveCharWidth; // Indent to show start visual
 			ll->lines = 0;
 			// Calculate line start positions based upon width.
-			Sci::Position lastGoodBreak = 0;
 			Sci::Position lastLineStart = 0;
-			XYACCUMULATOR startOffset = 0;
+			XYACCUMULATOR startOffset = width;
 			Sci::Position p = 0;
-			// cached character property
-			bool validateCache = true;
-			Document::CharacterExtracted cePrev(0, 0);
-			CharClassify::cc ccPrev = CharClassify::ccSpace;
-			WrapBreak wbPrev = WrapBreak::None;
 			const bool isUtf8 = SC_CP_UTF8 == model.pdoc->dbcsCodePage;
 			const WrapMode wrapState = vstyle.wrapState;
-			while (p < ll->numCharsInLine) {
-				if ((ll->positions[p + 1] - startOffset) >= width) {
+			const Sci::Position numCharsInLine = ll->numCharsInLine;
+			while (p < numCharsInLine) {
+				while (p < numCharsInLine && ll->positions[p + 1] < startOffset) {
+					p++;
+				}
+				if (p < numCharsInLine) {
+					// backtrack to find lastGoodBreak
+					Sci::Position lastGoodBreak = p;
+					if (p > 0) {
+						lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
+					}
+					if (wrapState != WrapMode::character) {
+						Sci::Position pos = lastGoodBreak;
+						CharClassify::cc ccPrev = CharClassify::ccSpace;
+						WrapBreak wbPrev = WrapBreak::None;
+						if (wrapState == WrapMode::automatic) {
+							const int character = model.pdoc->CharacterAfter(pos + posLineStart).character;
+							ccPrev = model.pdoc->WordCharacterClass(character);
+							wbPrev = GetWrapBreakEx(character, isUtf8);
+						} else if (wrapState == WrapMode::word) {
+							wbPrev = GetWrapBreak(ll->chars[pos]);
+						}
+						while (pos > lastLineStart) {
+							// style boundary and space
+							if (wrapState != WrapMode::whitespace && (ll->styles[pos - 1] != ll->styles[pos])) {
+								break;
+							}
+							if (IsSpaceOrTab(ll->chars[pos - 1]) && !IsSpaceOrTab(ll->chars[pos])) {
+								break;
+							}
+
+							const Sci::Position posBefore = model.pdoc->MovePositionOutsideChar(pos + posLineStart - 1, -1) - posLineStart;
+							if (wrapState == WrapMode::automatic) {
+								// word boundary
+								// TODO: Unicode Line Breaking Algorithm https://www.unicode.org/reports/tr14/
+								const WrapBreak wbPos = wbPrev;
+								const CharClassify::cc ccPos = ccPrev;
+								const int chPrevious = model.pdoc->CharacterAfter(posBefore + posLineStart).character;
+								ccPrev = model.pdoc->WordCharacterClass(chPrevious);
+								wbPrev = GetWrapBreakEx(chPrevious, isUtf8);
+								if (wbPrev != WrapBreak::Before && wbPos != WrapBreak::After) {
+									if ((ccPrev == CharClassify::ccCJKWord || ccPos == CharClassify::ccCJKWord) ||
+										//(wbPrev == WrapBreak::Both || wbPos == WrapBreak::Both) ||
+										(wbPrev != wbPos && (wbPrev == WrapBreak::After || wbPos == WrapBreak::Before)) ||
+										(ccPrev != ccPos && (wbPrev == WrapBreak::Undefined || wbPos == WrapBreak::Undefined))
+									) {
+										break;
+									}
+								}
+							} else if (wrapState == WrapMode::word) {
+								const WrapBreak wbPos = wbPrev;
+								wbPrev = GetWrapBreak(ll->chars[posBefore]);
+								if (wbPrev != WrapBreak::Before && wbPos != WrapBreak::After) {
+									if (//(wbPrev == WrapBreak::Both || wbPos == WrapBreak::Both) ||
+										(wbPrev != wbPos && (wbPrev == WrapBreak::After || wbPos == WrapBreak::Before))
+									) {
+										break;
+									}
+								}
+							}
+							pos = posBefore;
+						}
+						if (pos > lastLineStart) {
+							lastGoodBreak = pos;
+						}
+					}
 					if (lastGoodBreak == lastLineStart) {
 						// Try moving to start of last character
 						if (p > 0) {
-							lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1)
-								- posLineStart;
+							lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
 						}
 						if (lastGoodBreak == lastLineStart) {
 							// Ensure at least one character on line.
-							lastGoodBreak = model.pdoc->MovePositionOutsideChar(lastGoodBreak + posLineStart + 1, 1)
-								- posLineStart;
+							lastGoodBreak = model.pdoc->MovePositionOutsideChar(lastGoodBreak + posLineStart + 1, 1) - posLineStart;
 						}
 					}
 					lastLineStart = lastGoodBreak;
 					ll->lines++;
-					ll->SetLineStart(ll->lines, static_cast<int>(lastGoodBreak));
-					startOffset = ll->positions[lastGoodBreak];
+					ll->SetLineStart(ll->lines, static_cast<int>(lastLineStart));
+					startOffset = ll->positions[lastLineStart];
 					// take into account the space for start wrap mark and indent
-					startOffset -= ll->wrapIndent;
-					p = lastGoodBreak + 1;
-					validateCache = true;
-					continue;
+					startOffset += width - ll->wrapIndent;
+					p = lastLineStart + 1;
 				}
-				if (p <= 0) {
-					p++;
-					continue;
-				}
-				switch (wrapState) {
-				case WrapMode::automatic:
-					// style boundary and space
-					if (ll->styles[p] != ll->styles[p - 1]) {
-						lastGoodBreak = p;
-						validateCache = true;
-					} else if (IsSpaceOrTab(ll->chars[p - 1])) {
-						if (!IsSpaceOrTab(ll->chars[p])) {
-							lastGoodBreak = p;
-							validateCache = true;
-						}
-					} else {
-						// word boundary
-						// TODO: Unicode Line Breaking Algorithm https://www.unicode.org/reports/tr14/
-						Sci::Position pos = p + posLineStart;
-						if (validateCache) {
-							pos = model.pdoc->MovePositionOutsideChar(pos, -1);
-							cePrev = model.pdoc->CharacterBefore(pos);
-							ccPrev = model.pdoc->WordCharacterClass(cePrev.character);
-							wbPrev = GetWrapBreakEx(cePrev.character, isUtf8);
-						}
-						const Document::CharacterExtracted cePos = model.pdoc->CharacterAfter(pos);
-						const CharClassify::cc ccPos = model.pdoc->WordCharacterClass(cePos.character);
-						const WrapBreak wbPos = GetWrapBreakEx(cePos.character, isUtf8);
-						if (wbPrev != WrapBreak::Before && wbPos != WrapBreak::After) {
-							if ((ccPrev == CharClassify::ccCJKWord || ccPos == CharClassify::ccCJKWord) ||
-								//(wbPrev == WrapBreak::Both || wbPos == WrapBreak::Both) ||
-								(wbPrev != wbPos && (wbPrev == WrapBreak::After || wbPos == WrapBreak::Before)) ||
-								(ccPrev != ccPos && (wbPrev == WrapBreak::Undefined || wbPos == WrapBreak::Undefined))
-							) {
-								lastGoodBreak = pos - posLineStart;
-							}
-						}
-						p = pos + cePos.widthBytes - posLineStart;
-						// model.pdoc->IsCrLf(pos)
-						if (cePos.character == '\r' && model.pdoc->CharAt(pos + 1) == '\n') {
-							p += 1;
-						}
-						cePrev = cePos;
-						ccPrev = ccPos;
-						wbPrev = wbPos;
-						validateCache = false;
-						continue;
-					}
-					break;
-
-				case WrapMode::word:
-					if (ll->styles[p] != ll->styles[p - 1]) {
-						lastGoodBreak = p;
-						validateCache = true;
-					} else if (IsSpaceOrTab(ll->chars[p - 1])) {
-						if (!IsSpaceOrTab(ll->chars[p])) {
-							lastGoodBreak = p;
-							validateCache = true;
-						}
-					} else {
-						Sci::Position pos = p + posLineStart;
-						if (validateCache) {
-							pos = model.pdoc->MovePositionOutsideChar(pos, -1);
-							const Sci::Position posBefore = model.pdoc->MovePositionOutsideChar(pos - 1, -1);
-							wbPrev = GetWrapBreak(model.pdoc->UCharAt(posBefore));
-						}
-						const WrapBreak wbPos = GetWrapBreak(model.pdoc->UCharAt(pos));
-						if (wbPrev != WrapBreak::Before && wbPos != WrapBreak::After) {
-							if (//(wbPrev == WrapBreak::Both || wbPos == WrapBreak::Both) ||
-								(wbPrev != wbPos && (wbPrev == WrapBreak::After || wbPos == WrapBreak::Before))
-							) {
-								lastGoodBreak = pos - posLineStart;
-							}
-						}
-						p = model.pdoc->MovePositionOutsideChar(pos + 1, 1) - posLineStart;
-						wbPrev = wbPos;
-						validateCache = false;
-						continue;
-					}
-					break;
-
-				case WrapMode::whitespace:
-					if (IsSpaceOrTab(ll->chars[p - 1]) && !IsSpaceOrTab(ll->chars[p])) {
-						lastGoodBreak = p;
-					}
-					break;
-
-				case WrapMode::character:
-					if ((ll->styles[p] != ll->styles[p - 1]) || IsSpaceOrTab(ll->chars[p - 1])) {
-						lastGoodBreak = p;
-					} else {
-						lastGoodBreak = model.pdoc->MovePositionOutsideChar(p + posLineStart, -1) - posLineStart;
-						p = model.pdoc->MovePositionOutsideChar(p + 1 + posLineStart, 1) - posLineStart;
-						continue;
-					}
-					break;
-
-				default:
-					break;
-				}
-				p++;
 			}
 			ll->lines++;
 			//const double duration = period.Duration()*1e3;
