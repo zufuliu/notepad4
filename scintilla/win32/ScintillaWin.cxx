@@ -381,7 +381,7 @@ class ScintillaWin :
 	SetCoalescableTimerSig SetCoalescableTimerFn;
 #endif
 
-	unsigned int linesPerScroll;	///< Intellimouse support
+	UINT linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
 
 	UINT dpi;
@@ -1689,7 +1689,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
 		if (std::abs(wheelDelta) >= WHEEL_DELTA && linesPerScroll > 0) {
 			Sci::Line linesToScroll = linesPerScroll;
-			if (linesToScroll == WHEEL_PAGESCROLL) {
+			if (linesPerScroll == WHEEL_PAGESCROLL) {
 				linesToScroll = LinesOnScreen() - 1;
 			}
 			linesToScroll = std::max<Sci::Line>(linesToScroll, 1);
