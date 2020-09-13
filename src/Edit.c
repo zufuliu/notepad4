@@ -970,10 +970,13 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 	// Check if a warning message should be displayed for large files
 #if defined(_WIN64)
-	// less than 1/3 available physical memory:
-	//     1. The buffers we allocated below or when saving file, depends on encoding.
+	// less than 1/2 available physical memory:
+	//     1. Buffers we allocated below or when saving file, depends on encoding.
 	//     2. Scintilla's content buffer and style buffer, see CellBuffer class.
-	//        The style buffer is disabled when using SCLEX_NULL (Text File, 2nd Text File).
+	//        The style buffer is disabled when using SCLEX_NULL (Text File, 2nd Text File, ANSI Art).
+	//        i.e. when default scheme is Text File or 2nd Text File, memory required to load the file
+	//        is about fileSize*2, buffers we allocated below can be reused by system to served
+	//        as Scintilla's style buffer when calling SciCall_SetLexer() inside Style_SetLexer().
 	//     3. Extra memory when moving gaps on editing, it may requires more than 2/3 physical memory.
 	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
@@ -7274,7 +7277,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // XML
 				FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // HTML
 				FileVars_ParseStr(tch, "coding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // Emacs
-				FileVars_ParseStr(tch, "fileencoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // VIM
+				FileVars_ParseStr(tch, "fileencoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // Vim
 				FileVars_ParseStr(tch, "/*!40101 SET NAMES ", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
 				// MySQL dump: /*!40101 SET NAMES utf8mb4 */;
 				// CSS @charset "UTF-8"; is not supported.
