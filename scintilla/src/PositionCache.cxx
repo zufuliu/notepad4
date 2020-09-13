@@ -176,11 +176,8 @@ void LineLayout::SetLineStart(int line, int start) {
 	if ((line >= lenLineStarts) && (line != 0)) {
 		const int newMaxLines = line + 20;
 		std::unique_ptr<int[]> newLineStarts = std::make_unique<int[]>(newMaxLines);
-		for (int i = 0; i < newMaxLines; i++) {
-			if (i < lenLineStarts)
-				newLineStarts[i] = lineStarts[i];
-			else
-				newLineStarts[i] = 0;
+		for (int i = 0; i < lenLineStarts; i++) {
+			newLineStarts[i] = lineStarts[i];
 		}
 		lineStarts = std::move(newLineStarts);
 		lenLineStarts = newMaxLines;

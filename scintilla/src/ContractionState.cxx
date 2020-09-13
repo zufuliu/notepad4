@@ -447,9 +447,10 @@ bool ContractionState<LINE>::SetHeight(Sci::Line lineDoc, int height) {
 		return false;
 	} else if (lineDoc < LinesInDoc()) {
 		EnsureData();
-		if (GetHeight(lineDoc) != height) {
+		const int h = GetHeight(lineDoc);
+		if (h != height) {
 			if (GetVisible(lineDoc)) {
-				displayLines->InsertText(static_cast<LINE>(lineDoc), height - GetHeight(lineDoc));
+				displayLines->InsertText(static_cast<LINE>(lineDoc), height - h);
 			}
 			heights->SetValueAt(static_cast<LINE>(lineDoc), height);
 			Check();
