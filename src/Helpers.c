@@ -144,10 +144,9 @@ BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 			node->key = p;
 			node->value = v;
 			++count;
-			p = StrEnd(v) + 1;
-		} else {
-			p = StrEnd(p) + 1;
+			p = v;
 		}
+		p = StrEnd(p) + 1;
 	} while (*p && count < capacity);
 
 	if (count == 0) {
