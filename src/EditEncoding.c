@@ -1451,7 +1451,7 @@ int z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_con
 #else
 	e_3 = _mm_and_si128(_mm_and_si128(e_1, e_2), e_3);
 #if 0
-	NP2_alignas(16) uint64_t dummy[2];
+	uint64_t dummy[2];
 	_mm_store_si128((__m128i *)dummy, e_3);
 	dummy[0] |= dummy[1];
 	if (dummy[0]) {
