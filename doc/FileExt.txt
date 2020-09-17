@@ -21,6 +21,7 @@ C/C++ Source
 	hxx				C++ Header File
 	hh				C++ Header File
 	inl				C++ Inline File
+	ixx				Visual C++ Module interface
 	pch				Precompiled Header File
 		idl			Interface Definition Language
 		odl			Object Definition Language
