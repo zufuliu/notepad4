@@ -611,7 +611,7 @@ namespace Platform {
 	void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_NORETURN;
 }
 
-#ifdef  NDEBUG
+#ifdef NDEBUG
 #define PLATFORM_ASSERT(c) ((void)0)
 #else
 #define PLATFORM_ASSERT(c) ((c) ? (void)(0) : Scintilla::Platform::Assert(#c, __FILE__, __LINE__))
