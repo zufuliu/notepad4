@@ -12,13 +12,26 @@ def update_all_keyword():
 		('NP2LEX_LLVM', 'stlLLVM.c', 'LLVM.ll', 16, parse_llvm_api_file),
 		('NP2LEX_RUBY', 'stlRuby.c', 'Ruby.rb', 16, parse_ruby_api_file),
 		('NP2LEX_RUST', 'stlRust.c', 'Rust.rs', 16, parse_rust_api_file),
+		# TODO: SQL Dialect, https://github.com/zufuliu/notepad2/issues/31
+		('NP2LEX_SQL', 'stlSQL.c', [
+								'MySQL.sql',
+								'Oracle.sql',
+								'PostgreSQL.sql',
+								'SQL.sql',
+								'SQLite3.sql',
+								'Transact-SQL.sql',
+								], 16, parse_sql_api_files),
 		('NP2LEX_VIM', 'stlVim.c', 'Vim.vim', 16, parse_vim_api_file),
 		# https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt
 		('NP2LEX_WASM', 'stlWASM.c', 'wasm-lexer-keywords.txt', 16, parse_wasm_lexer_keywords),
 	]
 
 	for rid, output, path, count, parse in items:
-		keywordList = parse('lang/' + path)
+		if isinstance(path, str):
+			keywordList = parse('lang/' + path)
+		else:
+			path_list = ['lang/' + name for name in path]
+			keywordList = parse(path_list)
 		if keywordList:
 			output = '../src/EditLexers/' + output
 			UpdateKeywordFile(rid, output, keywordList, count)

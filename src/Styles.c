@@ -1218,11 +1218,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[11] = KeywordAttr_NoLexer;		// Constant
 		attr[12] = KeywordAttr_NoLexer;		// Attribute
 		break;
-	case NP2LEX_SQL:
-		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
-		attr[7] = KeywordAttr_NoLexer;		// Upper Case Type
-		attr[8] = KeywordAttr_NoLexer;		// Upper Case Function
-		break;
 	case NP2LEX_XML:
 		attr[6] = KeywordAttr_NoLexer;		// Attribute
 		attr[7] = KeywordAttr_NoLexer;		// Value
@@ -1267,6 +1262,11 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[9] = KeywordAttr_NoLexer;		// macro
 		attr[10] = KeywordAttr_NoLexer;		// module
 		attr[11] = KeywordAttr_NoLexer;		// function
+		break;
+	case NP2LEX_SQL:
+		attr[3] = KeywordAttr_NoLexer;		// upper case keywords
+		attr[4] = KeywordAttr_NoLexer;		// upper case data types
+		attr[5] = KeywordAttr_NoLexer;		// upper case functions
 		break;
 	case NP2LEX_WASM:
 		attr[3] = KeywordAttr_NoLexer;		// full instruction
