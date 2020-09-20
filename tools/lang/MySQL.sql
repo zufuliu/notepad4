@@ -1,9 +1,9 @@
--- keywords
--- https://dev.mysql.com/doc/refman/8.0/en/keywords.html
--- https://dev.mysql.com/doc/refman/5.7/en/keywords.html
--- https://dev.mysql.com/doc/refman/5.6/en/keywords.html
--- https://dev.mysql.com/doc/refman/5.5/en/keywords.html
--- https://mariadb.com/kb/en/library/reserved-words/
+--! keywords		===========================================================
+-- 8.0.22 https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+-- 5.7.11 https://dev.mysql.com/doc/refman/5.7/en/keywords.html
+-- 5.6.8 https://dev.mysql.com/doc/refman/5.6/en/keywords.html
+-- 5.5.8 https://dev.mysql.com/doc/refman/5.5/en/keywords.html
+-- 2020-09-19 https://mariadb.com/kb/en/library/reserved-words/
 -- A
 ACCESSIBLE (R)
 ACCOUNT					-- added in 5.7.6 (nonreserved)
@@ -28,6 +28,7 @@ ASC (R)
 ASCII
 ASENSITIVE (R)
 AT
+ATTRIBUTE				-- added in 8.0.21 (nonreserved)
 AUTHORS					-- removed in 5.6.8
 AUTOEXTEND_SIZE
 AUTO_INCREMENT
@@ -110,6 +111,7 @@ CUBE (R)				-- became reserved in 8.0.1
 CUME_DIST (R)			-- added in 8.0.2 (reserved)
 CURRENT					-- added in 5.6.4 (nonreserved)
 CURRENT_DATE (R)
+CURRENT_ROLE			-- added in MariaDB 10.0.5
 CURRENT_TIME (R)
 CURRENT_TIMESTAMP (R)
 CURRENT_USER (R)
@@ -153,6 +155,7 @@ DISTINCT (R)
 DISTINCTROW (R)
 DIV (R)
 DO
+DO_DOMAIN_IDS			-- added in MariaDB 10.1.2
 DOUBLE (R)
 DROP (R)
 DUAL (R)
@@ -193,6 +196,7 @@ EXPORT					-- added in 5.6.6 (nonreserved)
 EXTENDED
 EXTENT_SIZE
 -- F
+FAILED_LOGIN_ATTEMPTS	-- added in 8.0.19 (nonreserved)
 FALSE (R)
 FAST
 FAULTS
@@ -254,6 +258,7 @@ HOUR_SECOND (R)
 IDENTIFIED
 IF (R)
 IGNORE (R)
+IGNORE_DOMAIN_IDS		-- added in MariaDB 10.1.2
 IGNORE_SERVER_IDS		-- became nonreserved in 5.5.8
 IMPORT
 IN (R)
@@ -295,6 +300,7 @@ ITERATE (R)
 JOIN (R)
 JSON					-- added in 5.7.8 (nonreserved)
 JSON_TABLE (R)			-- added in 8.0.4 (reserved)
+JSON_VALUE				-- added in 8.0.21 (nonreserved)
 -- K
 KEY (R)
 KEYS (R)
@@ -426,6 +432,7 @@ NUMERIC (R)
 NVARCHAR
 -- O
 OF (R)					-- added in 8.0.1 (reserved)
+OFF						-- added in 8.0.20 (nonreserved)
 OFFSET
 OLD_PASSWORD			-- removed in 5.7.5
 OJ						-- added in 8.0.16 (nonreserved)
@@ -449,7 +456,7 @@ OTHERS					-- added in 8.0.2 (nonreserved)
 OUT (R)
 OUTER (R)
 OUTFILE (R)
-OVER (M)				-- added in 8.0.2 (reserved)
+OVER (M)				-- added in 8.0.2 (reserved), added in MariaDB 10.2.0
 OWNER
 -- P
 PACK_KEYS
@@ -461,6 +468,7 @@ PARTITION (R)			-- became reserved in 5.6.2
 PARTITIONING
 PARTITIONS
 PASSWORD
+PASSWORD_LOCK_TIME		-- added in 8.0.19 (nonreserved)
 PATH					-- added in 8.0.4 (nonreserved)
 PERCENT_RANK (R)		-- added in 8.0.2 (reserved)
 PERSIST					-- became nonreserved in 8.0.16
@@ -472,6 +480,7 @@ PLUGIN_DIR				-- added in 5.6.4 (nonreserved)
 POINT
 POLYGON
 PORT
+POSITION
 PRECEDES				-- added in 5.7.2 (nonreserved)
 PRECEDING				-- added in 8.0.2 (nonreserved)
 PRECISION (R)
@@ -480,6 +489,7 @@ PRESERVE
 PREV
 PRIMARY (R)
 PRIVILEGES
+PRIVILEGE_CHECKS_USER	-- added in 8.0.18 (nonreserved)
 PROCEDURE (R)
 PROCESS					-- added in 8.0.11 (nonreserved)
 PROCESSLIST
@@ -492,6 +502,7 @@ QUARTER
 QUERY
 QUICK
 -- R
+RANDOM					-- added in 8.0.18 (nonreserved)
 RANGE (R)
 RANK (R)				-- added in 8.0.2 (reserved)
 READ (R)
@@ -501,10 +512,11 @@ READ_WRITE (R)
 REAL (R)
 REBUILD
 RECOVER
-RECURSIVE (R)			-- added in 8.0.1 (reserved)
+RECURSIVE (R)			-- added in 8.0.1 (reserved), added in MariaDB 10.2.0
 REDOFILE				-- removed in 8.0.3
 REDO_BUFFER_SIZE
 REDUNDANT
+REF_SYSTEM_ID			-- added in MariaDB 10.1.2
 REFERENCE				-- added in 8.0.11 (nonreserved)
 REFERENCES (R)
 REGEXP (R)
@@ -523,6 +535,8 @@ REPAIR
 REPEAT (R)
 REPEATABLE
 REPLACE (R)
+REPLICA					-- added in 8.0.22 (nonreserved)
+REPLICAS				-- added in 8.0.22 (nonreserved)
 REPLICATE_DO_DB					-- added in 5.7.3 (nonreserved)
 REPLICATE_DO_TABLE				-- added in 5.7.3 (nonreserved)
 REPLICATE_IGNORE_DB				-- added in 5.7.3 (nonreserved)
@@ -532,6 +546,7 @@ REPLICATE_WILD_DO_TABLE			-- added in 5.7.3 (nonreserved)
 REPLICATE_WILD_IGNORE_TABLE		-- added in 5.7.3 (nonreserved)
 REPLICATION
 REQUIRE (R)
+REQUIRE_ROW_FORMAT		-- added in 8.0.19 (nonreserved)
 RESET
 RESIGNAL (R)
 RESOURCE				-- added in 8.0.3 (nonreserved)
@@ -555,7 +570,7 @@ ROLLUP
 ROTATE					-- added in 5.7.11 (nonreserved)
 ROUTINE
 ROW (R)					-- became reserved in 8.0.2
-ROWS (R)				-- became reserved in 8.0.2
+ROWS (R)				-- became reserved in 8.0.2, added in MariaDB 10.2.4
 ROW_COUNT				-- added in 5.6.4 (nonreserved)
 ROW_FORMAT
 ROW_NUMBER (R)			-- added in 8.0.2 (reserved)
@@ -569,6 +584,7 @@ SCHEMA_NAME
 SECOND
 SECONDARY				-- added in 8.0.16 (nonreserved)
 SECONDARY_ENGINE		-- added in 8.0.13 (nonreserved)
+SECONDARY_ENGINE_ATTRIBUTE	-- added in 8.0.21 (nonreserved)
 SECONDARY_LOAD			-- added in 8.0.13 (nonreserved)
 SECONDARY_UNLOAD		-- added in 8.0.13 (nonreserved)
 SECOND_MICROSECOND (R)
@@ -629,14 +645,15 @@ START
 END
 STARTING (R)
 STARTS
-STATS_AUTO_RECALC		-- added in 5.6.6 (nonreserved)
-STATS_PERSISTENT		-- added in 5.6.6 (nonreserved)
-STATS_SAMPLE_PAGES		-- added in 5.6.6 (nonreserved)
+STATS_AUTO_RECALC		-- added in 5.6.6 (nonreserved), added in MariaDB 10.0.4
+STATS_PERSISTENT		-- added in 5.6.6 (nonreserved), added in MariaDB 10.0.4
+STATS_SAMPLE_PAGES		-- added in 5.6.6 (nonreserved), added in MariaDB 10.0.4
 STATUS
 STOP
 STORAGE
 STORED (R)				-- added in 5.7.6 (reserved)
 STRAIGHT_JOIN (R)
+STREAM					-- added in 8.0.20 (nonreserved)
 STRING
 SUBCLASS_ORIGIN
 SUBJECT
@@ -669,6 +686,7 @@ TIMESTAMPDIFF
 TINYBLOB (R)
 TINYINT (R)
 TINYTEXT (R)
+TLS						-- added in 8.0.21 (nonreserved)
 TO (R)
 TRAILING (R)
 TRANSACTION
@@ -726,7 +744,7 @@ WHEN (R)
 WHERE (R)
 WHILE (R)
 END WHILE;
-WINDOW (R)				-- added in 8.0.2 (reserved)
+WINDOW (R)				-- added in 8.0.2 (reserved), added in MariaDB 10.2.0
 WITH (R)
 WITHOUT					-- added in 5.7.5 (nonreserved)
 WORK
@@ -743,61 +761,10 @@ YEAR
 YEAR_MONTH (R)
 -- Z
 ZEROFILL (R)
+ZONE					-- added in 8.0.22 (nonreserved)
 
--- Data Types
--- 11.2 Numeric Types
-BIT
-BOOL
-BOOLEAN
-TINYINT
-SMALLINT
-MEDIUMINT
-INT
-INTEGER
-BIGINT
-SERIAL
-DECIMAL
-DEC
-NUMERIC
-FIXED
-FLOAT
-DOUBLE
-REAL
-FLOAT
--- 11.3 Date and Time Types
-DATE
-DATETIME
-TIMESTAMP
-TIME
-YEAR
--- 11.4 String Types
-CHAR
-NCHAR
-VARCHAR
-NVARCHAR
-BINARY
-VARBINARY
-TINYBLOB
-TINYTEXT
-BLOB
-TEXT
-MEDIUMBLOB
-MEDIUMTEXT
-LONGBLOB
-LONGTEXT
-ENUM
-SET
--- 11.5.1 Spatial Data Types
-GEOMETRY
-POINT
-LINESTRING
-POLYGON
-MULTIPOINT
-MULTILINESTRING
-MULTIPOLYGON
-GEOMETRYCOLLECTION
--- 11.6 The JSON Data Type
-JSON
+-- SQL Statements
+DELIMITER
 
 -- MariaDB 10.3 Oracle Mode
 BODY
@@ -813,18 +780,91 @@ SYSTEM_TIME				-- <= MariaDB 10.3.6 only
 VERSIONING				-- <= MariaDB 10.3.6 only
 WITHOUT					-- <= MariaDB 10.3.6 only
 
--- 12.3.2 Comparison Functions and Operators
+--! Data Types		===========================================================
+-- Numeric Types
+BIT
+BOOL
+BOOLEAN
+BYTE
+TINYINT
+SMALLINT
+MEDIUMINT
+INT
+INT1
+INT2
+INT3
+INT4
+INT8
+INTEGER
+LONG
+BIGINT
+SERIAL
+SIGNED
+DECIMAL
+DEC
+NUMERIC
+FIXED
+FLOAT
+DOUBLE
+REAL
+FLOAT
+FLOAT4
+FLOAT8
+-- Date and Time Types
+DATE
+DATETIME
+TIMESTAMP
+TIME
+YEAR
+MONTH
+DAY
+HOUR
+MINUTE
+SECOND
+-- String Types
+CHAR
+NCHAR
+VARCHAR
+VARCHARACTER
+NVARCHAR
+BINARY
+VARBINARY
+TINYBLOB
+TINYTEXT
+BLOB
+TEXT
+MEDIUMBLOB
+MEDIUMTEXT
+LONGBLOB
+LONGTEXT
+ENUM
+SET
+-- Spatial Data Types
+GEOMETRY
+POINT
+LINESTRING
+POLYGON
+MULTIPOINT
+MULTILINESTRING
+MULTIPOLYGON
+GEOMETRYCOLLECTION
+GEOMCOLLECTION
+-- The JSON Data Type
+JSON
+
+--! Functions		===========================================================
+-- Comparison Functions and Operators
 COALESCE(value, ...)
 GREATEST(value1, value2,...)
 INTERVAL(N, N1, N2, N3, ...)
 ISNULL(expr)
 LEAST(value1, value2, ...)
 STRCMP(expr1, expr2)
--- 12.4 Control Flow Functions
+-- Flow Control Functions
 IF(expr1, expr2, expr3)
 IFNULL(expr1, expr2)
 NULLIF(expr1, expr2)
--- 12.5 String Functions
+-- String Functions
 ASCII(str)
 BIN(N)
 BIT_LENGTH(str)
@@ -875,12 +915,12 @@ UCASE(str)
 UNHEX(str)
 UPPER(str)
 WEIGHT_STRING(str [AS {CHAR | BINARY}(N)] [flags])
--- 12.5.2 Regular Expressions
+-- Regular Expressions
 REGEXP_INSTR(expr, pat [, pos [, occurrence [, return_option [, match_type]]]])
 REGEXP_LIKE(expr, pat [, match_type])
 REGEXP_REPLACE(expr, pat, repl [, pos [, occurrence [, match_type]]])
 REGEXP_SUBSTR(expr, pat [, pos [, occurrence [, match_type]]])
--- 12.6 Numeric Functions and Operators
+-- Numeric Functions and Operators
 ABS(X)
 ACOS(X)
 ASIN(X)
@@ -914,7 +954,7 @@ SIN(X)
 SQRT(X)
 TAN(X)
 TRUNCATE(X, D)
--- 12.7 Date and Time Functions
+-- Date and Time Functions
 ADDDATE(date, INTERVAL expr unit), ADDDATE(expr, days)
 ADDTIME(expr1, expr2)
 CONVERT_TZ(dt, from_tz, to_tz)
@@ -975,16 +1015,16 @@ WEEKDAY(date)
 WEEKOFYEAR(date)
 YEAR(date)
 YEARWEEK(date), YEARWEEK(date, mode)
--- 12.10 Cast Functions and Operators
+-- Cast Functions and Operators
 BINARY
 CAST(expr AS type)
 CONVERT(expr, type), CONVERT(expr USING transcoding_name)
--- 12.11 XML Functions
+-- XML Functions
 ExtractValue(xml_frag, xpath_expr)
 UpdateXML(xml_target, xpath_expr, new_xml)
--- 12.12 Bit Functions and Operators
+-- Bit Functions and Operators
 BIT_COUNT(N)
--- 12.13 Encryption and Compression Functions
+-- Encryption and Compression Functions
 AES_DECRYPT(crypt_str, key_str [, init_vector])
 AES_ENCRYPT(str, key_str [, init_vector])
 COMPRESS(string_to_compress)
@@ -1004,7 +1044,7 @@ STATEMENT_DIGEST_TEXT(statement)
 UNCOMPRESS(string_to_uncompress)
 UNCOMPRESSED_LENGTH(compressed_string)
 VALIDATE_PASSWORD_STRENGTH(str)
--- 12.18.4 Enterprise Encryption Function Descriptions
+-- Enterprise Encryption Function Descriptions
 ASYMMETRIC_DECRYPT(algorithm, crypt_str, key_str)
 ASYMMETRIC_DERIVE(pub_key_str, priv_key_str)
 ASYMMETRIC_ENCRYPT(algorithm, str, key_str)
@@ -1014,7 +1054,7 @@ CREATE_ASYMMETRIC_PRIV_KEY(algorithm, {key_len | dh_secret})
 CREATE_ASYMMETRIC_PUB_KEY(algorithm, priv_key_str)
 CREATE_DH_PARAMETERS(key_len)
 CREATE_DIGEST(digest_type, str)
--- 12.14 Information Functions
+-- Information Functions
 analyse([max_elements [,max_memory]])
 BENCHMARK(count, expr)
 BINLOG_GTID_POS(binlog_filename, binlog_offset)		-- added in MariaDB 10.0.2
@@ -1028,7 +1068,8 @@ DATABASE()
 DECODE_HISTOGRAM(hist_type, histogram)	-- added in MariaDB 10.0.2
 FOUND_ROWS()
 ICU_VERSION()
-LAST_INSERT_ID(), LAST_INSERT_ID(expr)
+LAST_INSERT_ID()
+LAST_INSERT_ID(expr)
 ROLES_GRAPHML()
 ROW_COUNT()
 SCHEMA()
@@ -1036,7 +1077,7 @@ SESSION_USER()
 SYSTEM_USER()
 USER()
 VERSION()
--- 12.15.1 Spatial Function Reference
+-- Spatial Function Reference
 Area()									-- deprecated in 5.7.6
 AsBinary(), AsWKB()						-- deprecated in 5.7.6
 AsText(), AsWKT()						-- deprecated in 5.7.6
@@ -1104,9 +1145,11 @@ PolyFromWKB(), PolygonFromWKB() 		-- deprecated in 5.7.6
 Polygon(ls [, ls] ...)
 SRID()									-- deprecated in 5.7.6
 ST_Area({poly | mpoly})
-ST_AsBinary(g [, options]), ST_AsWKB(g [, options])
+ST_AsBinary(g [, options])
+ST_AsWKB(g [, options])
 ST_AsGeoJSON(g [, max_dec_digits [, options]])
-ST_AsText(g [, options]), ST_AsWKT(g [, options])
+ST_AsText(g [, options])
+ST_AsWKT(g [, options])
 ST_Boundary(g)							-- added in MariaDB 10.1.2
 ST_Buffer(g, d[, strategy1[, strategy2[, strategy3]]])
 ST_Buffer_Strategy(strategy[, points_per_circle])
@@ -1123,14 +1166,20 @@ ST_EndPoint(ls)
 ST_Envelope(g)
 ST_Equals(g1, g2)
 ST_ExteriorRing(poly)
-ST_GeoHash(longitude, latitude, max_length), ST_GeoHash(point, max_length)
-ST_GeomCollFromText(wkt [, srid [, options]]), ST_GeometryCollectionFromText(wkt [, srid [, options]]), ST_GeomCollFromTxt(wkt [, srid [, options]])
-ST_GeomCollFromWKB(wkb [, srid [, options]]), ST_GeometryCollectionFromWKB(wkb [, srid [, options]])
+ST_GeoHash(longitude, latitude, max_length)
+ST_GeoHash(point, max_length)
+ST_GeomCollFromText(wkt [, srid [, options]])
+ST_GeometryCollectionFromText(wkt [, srid [, options]])
+ST_GeomCollFromTxt(wkt [, srid [, options]])
+ST_GeomCollFromWKB(wkb [, srid [, options]])
+ST_GeometryCollectionFromWKB(wkb [, srid [, options]])
 ST_GeometryN(gc, N)
 ST_GeometryType(g)
 ST_GeomFromGeoJSON(str [, options [, srid]])
-ST_GeomFromText(wkt [, srid [, options]]), ST_GeometryFromText(wkt [, srid [, options]])
-ST_GeomFromWKB(wkb [, srid [, options]]), ST_GeometryFromWKB(wkb [, srid [, options]])
+ST_GeomFromText(wkt [, srid [, options]])
+ST_GeometryFromText(wkt [, srid [, options]])
+ST_GeomFromWKB(wkb [, srid [, options]])
+ST_GeometryFromWKB(wkb [, srid [, options]])
 ST_InteriorRingN(poly, N)
 ST_Intersection(g1, g2)
 ST_Intersects(g1, g2)
@@ -1142,19 +1191,28 @@ ST_IsValid(g)
 ST_LatFromGeoHash(geohash_str)
 ST_Latitude(p [, new_latitude_val])		-- added in 8.0.12
 ST_Length(ls)
-ST_LineFromText(wkt [, srid [, options]]), ST_LineStringFromText(wkt [, srid [, options]])
-ST_LineFromWKB(wkb [, srid [, options]]), ST_LineStringFromWKB(wkb [, srid [, options]])
+ST_LineFromText(wkt [, srid [, options]])
+ST_LineStringFromText(wkt [, srid [, options]])
+ST_LineFromWKB(wkb [, srid [, options]])
+ST_LineStringFromWKB(wkb [, srid [, options]])
 ST_LongFromGeoHash(geohash_str)
 ST_Longitude(p [, new_longitude_val])	-- added in 8.0.12
 ST_MakeEnvelope(pt1, pt2)
-ST_MLineFromText(wkt [, srid [, options]]), ST_MultiLineStringFromText(wkt [, srid [, options]])
-ST_MLineFromWKB(wkb [, srid [, options]]), ST_MultiLineStringFromWKB(wkb [, srid [, options]])
-ST_MPointFromText(wkt [, srid [, options]]), ST_MultiPointFromText(wkt [, srid [, options]])
-ST_MPointFromWKB(wkb [, srid [, options]]), ST_MultiPointFromWKB(wkb [, srid [, options]])
-ST_MPolyFromText(wkt [, srid [, options]]), ST_MultiPolygonFromText(wkt [, srid [, options]])
-ST_PolyFromWKB(wkb [, srid [, options]]), ST_PolygonFromWKB(wkb [, srid [, options]])
+ST_MLineFromText(wkt [, srid [, options]])
+ST_MultiLineStringFromText(wkt [, srid [, options]])
+ST_MLineFromWKB(wkb [, srid [, options]])
+ST_MultiLineStringFromWKB(wkb [, srid [, options]])
+ST_MPointFromText(wkt [, srid [, options]])
+ST_MultiPointFromText(wkt [, srid [, options]])
+ST_MPointFromWKB(wkb [, srid [, options]])
+ST_MultiPointFromWKB(wkb [, srid [, options]])
+ST_MPolyFromText(wkt [, srid [, options]])
+ST_MultiPolygonFromText(wkt [, srid [, options]])
+ST_PolyFromWKB(wkb [, srid [, options]])
+ST_PolygonFromWKB(wkb [, srid [, options]])
 ST_NumGeometries(gc)
-ST_NumInteriorRing(poly), ST_NumInteriorRings(poly)
+ST_NumInteriorRing(poly)
+ST_NumInteriorRings(poly)
 ST_NumPoints(ls)
 ST_Overlaps(g1, g2)
 ST_PointFromGeoHash(geohash_str, srid)
@@ -1162,8 +1220,10 @@ ST_PointFromText(wkt [, srid [, options]])
 ST_PointFromWKB(wkb [, srid [, options]])
 ST_PointN(ls, N)
 ST_PointOnSurface(g)					-- added in MariaDB 10.1.2
-ST_PolyFromText(wkt [, srid [, options]]), ST_PolygonFromText(wkt [, srid [, options]])
-ST_MPolyFromWKB(wkb [, srid [, options]]), ST_MultiPolygonFromWKB(wkb [, srid [, options]])
+ST_PolyFromText(wkt [, srid [, options]])
+ST_PolygonFromText(wkt [, srid [, options]])
+ST_MPolyFromWKB(wkb [, srid [, options]])
+ST_MultiPolygonFromWKB(wkb [, srid [, options]])
 ST_Relate(g1, g2, i)					-- added in MariaDB 10.1.2
 ST_Simplify(g, max_distance)
 ST_SRID(g [, srid])
@@ -1182,7 +1242,7 @@ Touches()								-- deprecated in 5.7.6
 Within()								-- deprecated in 5.7.6
 X()										-- deprecated in 5.7.6
 Y()										-- deprecated in 5.7.6
--- 12.16.1 JSON Function Reference
+-- JSON Function Reference
 JSON_APPEND(json_doc, path, val [, path, val] ...)			-- deprecated in 5.7.9
 JSON_ARRAY([val [, val] ...])
 JSON_ARRAY_APPEND(json_doc, path, val [, path, val] ...)
@@ -1210,13 +1270,13 @@ JSON_TABLE(expr, path COLUMNS (column_list) [AS] alias)
 JSON_TYPE(json_val)
 JSON_UNQUOTE(json_val)
 JSON_VALID(val)
--- 12.17 Functions Used with Global Transaction IDs
+-- Functions Used with Global Transaction IDs
 GTID_SUBSET(subset, set)
 GTID_SUBTRACT(set, subset)
 WAIT_FOR_EXECUTED_GTID_SET(gtid_set [, timeout])
 SQL_THREAD_WAIT_AFTER_GTIDS(gtid_set [, timeout])			-- deprecated 5.6.9
 WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(gtid_set [, timeout] [, channel])
--- 12.19.1 Aggregate (GROUP BY) Function Descriptions
+-- Aggregate (GROUP BY) Function Descriptions
 AVG([DISTINCT] expr) [over_clause]
 BIT_AND(expr) [over_clause]
 BIT_OR(expr) [over_clause]
@@ -1237,7 +1297,7 @@ SUM([DISTINCT] expr) [over_clause]
 VAR_POP(expr) [over_clause]
 VAR_SAMP(expr) [over_clause]
 VARIANCE(expr) [over_clause]
--- 12.20 Window Functions
+-- Window Functions
 CUME_DIST() over_clause
 DENSE_RANK() over_clause
 FIRST_VALUE(expr) [null_treatment] over_clause
@@ -1252,7 +1312,7 @@ PERCENTILE_CONT(expr)			-- added in MariaDB 10.3.3
 PERCENTILE_DISC(expr)			-- added in MariaDB 10.3.3
 RANK() over_clause
 ROW_NUMBER() over_clause
--- 12.21 Internal Functions
+-- Internal Functions
 CAN_ACCESS_COLUMN(ARGS)
 CAN_ACCESS_DATABASE(ARGS)
 CAN_ACCESS_TABLE(ARGS)
@@ -1276,9 +1336,10 @@ INTERNAL_MAX_DATA_LENGTH(ARGS)
 INTERNAL_TABLE_ROWS(ARGS)
 INTERNAL_UPDATE_TIME(ARGS)
 IS_VISIBLE_DD_OBJECT(ARGS)
--- 12.20 Miscellaneous Functions
+-- Miscellaneous Functions
 ANY_VALUE(arg)
-BIN_TO_UUID(binary_uuid), BIN_TO_UUID(binary_uuid, swap_flag)
+BIN_TO_UUID(binary_uuid)
+BIN_TO_UUID(binary_uuid, swap_flag)
 DEFAULT(col_name)
 FORMAT(X, D)
 GET_LOCK(str, timeout)
@@ -1303,7 +1364,8 @@ RELEASE_LOCK(str)
 SLEEP(duration)
 UUID()
 UUID_SHORT()
-UUID_TO_BIN(string_uuid), UUID_TO_BIN(string_uuid, swap_flag)
+UUID_TO_BIN(string_uuid)
+UUID_TO_BIN(string_uuid, swap_flag)
 VALUE(col_name)							-- added in MariaDB 10.3.3
 VALUES(col_name)
 

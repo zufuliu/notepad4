@@ -1,5 +1,5 @@
--- https://sqlite.org/lang.html
--- keywords
+-- 3.33.0 https://sqlite.org/lang.html
+--! keywords		===========================================================
 -- https://sqlite.org/lang_keywords.html
 ABORT
 ACTION
@@ -15,10 +15,12 @@ ATTACH
 AUTOINCREMENT
 BEFORE
 BEGIN
+END
 BETWEEN
 BY
 CASCADE
 CASE
+END CASE;
 CAST
 CHECK
 COLLATE
@@ -57,6 +59,7 @@ FOR
 FOREIGN
 FROM
 FULL
+GENERATED
 GLOB
 GROUP
 GROUPS
@@ -87,6 +90,7 @@ NOT
 NOTHING
 NOTNULL
 NULL
+NULLS
 OF
 OFFSET
 ON
@@ -122,6 +126,7 @@ TABLE
 TEMP
 TEMPORARY
 THEN
+END IF;
 TIES
 TO
 TRANSACTION
@@ -141,7 +146,12 @@ WINDOW
 WITH
 WITHOUT
 
--- Datatypes
+-- Collating Sequences
+BINARY
+NOCASE
+RTRIM
+
+--! Data Types		===========================================================
 -- https://sqlite.org/datatype3.html
 TEXT
 NUMERIC
@@ -175,11 +185,8 @@ TINYINT
 UNSIGNED BIGINT
 VARCHAR
 VARYING CHARACTER
--- Collating Sequences
-BINARY
-NOCASE
-RTRIM
 
+--! Functions		============================================================
 -- aggregate functions
 -- https://sqlite.org/lang_aggfunc.html
 avg(X)
@@ -224,6 +231,7 @@ coalesce(X, Y, ...)
 glob(X, Y)
 hex(X)
 ifnull(X, Y)
+iif(X, Y, Z)
 instr(X, Y)
 last_insert_rowid()
 length(X)
@@ -251,6 +259,7 @@ rtrim(X, Y)
 soundex(X)
 sqlite_compileoption_get(N)
 sqlite_compileoption_used(X)
+sqlite_offset(X)
 sqlite_source_id()
 sqlite_version()
 substr(X, Y)
