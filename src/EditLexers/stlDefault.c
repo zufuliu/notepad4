@@ -88,7 +88,7 @@ EDITLEXER lexTextFile = {
 EDITLEXER lex2ndTextFile = {
 	SCLEX_NULL, NP2LEX_2NDTEXTFILE,
 	EDITLEXER_HOLE(L"2nd Text File", Styles_2ndText),
-	L"log; asc",
+	L"log; asc; map; bnf",
 	&Keywords_NULL,
 	Styles_2ndText
 };
