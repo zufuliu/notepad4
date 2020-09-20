@@ -9,6 +9,8 @@ Text File
 2nd Text File
 	log
 	asc				PGP ASCII Armored File
+	map				Linker map file
+	bnf				BNF grammar
 
 C/C++ Source
 	c
