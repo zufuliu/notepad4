@@ -115,7 +115,7 @@ static EDITSTYLE Styles_Go[] = {
 EDITLEXER lexGo = {
 	SCLEX_GO, NP2LEX_GO,
 	EDITLEXER_HOLE(L"Go Source", Styles_Go),
-	L"go",
+	L"go; gop; ql",
 	&Keywords_Go,
 	Styles_Go
 };
