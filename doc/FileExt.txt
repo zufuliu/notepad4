@@ -260,6 +260,8 @@ GN Build Script
 
 Go Source
 	go
+	gop				Go+, https://github.com/goplus/gop
+	ql				Q Language, https://github.com/c4pt0r/qlang
 
 Gradle Build Script
 	gradle

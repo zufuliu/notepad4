@@ -59,6 +59,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Fortran, GNU Fortran
 	* [GN Build](../master/tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](../master/tools/lang/Go.go), up to Go 1.14.
+		* Go+ (GoPlus) and the Q language
 	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 		* blockdiag, seqdiag, actdiag and nwdiag
