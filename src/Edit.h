@@ -216,6 +216,9 @@ void	EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
 #define AUTO_COMPLETION_FILLUP_DEFAULT		L";,()[]{}\\/"
+// timeout for scanning words in document
+#define AUTOC_SCAN_WORDS_MIN_TIMEOUT		50
+#define AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT	500
 enum {
 	AutoCompleteFillUpEnter = 1,
 	AutoCompleteFillUpTab = 2,
@@ -256,6 +259,7 @@ typedef struct EditAutoCompletionConfig {
 	BOOL bCloseTags;
 	BOOL bCompleteWord;
 	BOOL bScanWordsInDocument;
+	DWORD dwScanWordsTimeout;
 	BOOL bEnglistIMEModeOnly;
 	BOOL bIgnoreCase;
 	UINT iVisibleItemCount;
