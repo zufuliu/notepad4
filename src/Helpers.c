@@ -443,6 +443,26 @@ HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height) {
 	return hbmp;
 }
 
+HANDLE WaitableTimer_New(DWORD milliseconds) {
+	HANDLE timer = CreateWaitableTimer(NULL, FALSE, NULL);
+	LARGE_INTEGER dueTime;
+	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds;
+	SetWaitableTimer(timer, &dueTime, 0, NULL, NULL, FALSE);
+	return timer;
+}
+
+void WaitableTimer_Yield(DWORD milliseconds) {
+	HANDLE timer = WaitableTimer_New(milliseconds);
+	while (WaitForSingleObject(timer, 0) != WAIT_OBJECT_0) {
+		MSG msg;
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+	CloseHandle(timer);
+}
+
 //=============================================================================
 //
 // PrivateSetCurrentProcessExplicitAppUserModelID()

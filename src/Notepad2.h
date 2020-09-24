@@ -80,19 +80,14 @@ typedef struct NP2PARAMS {
  * App message used to center MessageBox to the window of the program.
  */
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
-//==== Change Notifications ===================================================
-#define ID_WATCHTIMER		0xA000
-#define APPM_CHANGENOTIFY			(WM_APP + 2)
+#define APPM_CHANGENOTIFY			(WM_APP + 2)	// file change notifications
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
+#define APPM_TRAYMESSAGE			(WM_APP + 4)	// callback message from system tray
 
-//==== Callback Message from System Tray ======================================
-#define APPM_TRAYMESSAGE			(WM_APP + 4)
+#define ID_WATCHTIMER				0xA000	// FILE WATCH TIMER
+#define ID_PASTEBOARDTIMER			0xA001	// PASTE BOARD TIMER
 
-//==== Paste Board Timer ======================================================
-#define ID_PASTEBOARDTIMER			0xA001
-
-//==== Reuse Window Lock Timeout ==============================================
-#define REUSEWINDOWLOCKTIMEOUT		1000
+#define REUSEWINDOWLOCKTIMEOUT		1000	// Reuse Window Lock Timeout
 
 // Settings Version
 enum {

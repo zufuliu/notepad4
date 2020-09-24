@@ -94,19 +94,24 @@ static HMODULE hELSCoreDLL = NULL;
 
 #define MAX_NON_UTF8_SIZE	(UINT_MAX/2 - 16)
 
-static struct EditMarkAllStatus {
+typedef struct EditMarkAllStatus {
+	volatile LONG token;
+	BOOL done;
+	CRITICAL_SECTION criticalSection;
 	int findFlag;
 	Sci_Position iSelCount;
 	LPSTR pszText;
-} editMarkAllStatus;
+} EditMarkAllStatus;
+static EditMarkAllStatus editMarkAllStatus;
 
 void Edit_ReleaseResources(void) {
 	DStringW_Free(&wchPrefixSelection);
 	DStringW_Free(&wchAppendSelection);
 	DStringW_Free(&wchPrefixLines);
 	DStringW_Free(&wchAppendLines);
-	if (editMarkAllStatus.pszText) {
-		NP2HeapFree(editMarkAllStatus.pszText);
+	if (editMarkAllStatus.done) {
+		EditMarkAll_Clear();
+		DeleteCriticalSection(&editMarkAllStatus.criticalSection);
 	}
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	if (hELSCoreDLL != NULL) {
@@ -5622,24 +5627,81 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 extern Sci_Position iMatchesCount;
 
 void EditMarkAll_Clear(void) {
-	if (iMatchesCount == 0) {
-		return;
+	InterlockedIncrement(&editMarkAllStatus.token);
+	if (iMatchesCount != 0) {
+		iMatchesCount = 0;
+		// clear existing indicator
+		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+		SciCall_IndicatorClearRange(0, SciCall_GetLength());
 	}
 
-	iMatchesCount = 0;
-	// clear existing indicator
-	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-	SciCall_IndicatorClearRange(0, SciCall_GetLength());
-
+	EnterCriticalSection(&editMarkAllStatus.criticalSection);
 	if (editMarkAllStatus.pszText) {
-		NP2HeapFree(editMarkAllStatus.pszText);
+		LocalFree(editMarkAllStatus.pszText);
 	}
 	editMarkAllStatus.findFlag = 0;
 	editMarkAllStatus.iSelCount= 0;
 	editMarkAllStatus.pszText = NULL;
+	LeaveCriticalSection(&editMarkAllStatus.criticalSection);
+}
+
+void EditMarkAll_Run(EditMarkAllStatus *status) {
+	const LONG token = status->token;
+
+	struct Sci_TextToFind ttf = {{0, SciCall_GetLength()}, status->pszText, {0, 0}};
+	const Sci_Position iSelCount = status->iSelCount;
+
+	Sci_Position matchCount = 0;
+	UINT index = 0;
+	Sci_Position posList[256];
+
+	BOOL done = FALSE;
+	while (!done) {
+		HANDLE timer = WaitableTimer_New(WaitableTimer_DefaultTimeSlot);
+		while (WaitForSingleObject(timer, 0) != WAIT_OBJECT_0) {
+			const Sci_Position pos = SciCall_FindText(status->findFlag, &ttf);
+			if (pos == -1 || token != editMarkAllStatus.token) {
+				done = TRUE;
+				break;
+			}
+			++matchCount;
+			if (index == COUNTOF(posList)) {
+				iMatchesCount = matchCount;
+				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+				for (UINT i = 0; i < index; i++) {
+					SciCall_IndicatorFillRange(posList[i], iSelCount);
+				}
+				index = 0;
+			}
+			posList[index++] = pos;
+			ttf.chrg.cpMin = ttf.chrgText.cpMax;
+		}
+		CloseHandle(timer);
+		if (token == editMarkAllStatus.token) {
+			iMatchesCount = matchCount;
+			if (index) {
+				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+				for (UINT i = 0; i < index; i++) {
+					SciCall_IndicatorFillRange(posList[i], iSelCount);
+				}
+			}
+			UpdateStatusbar();
+		}
+		if (!done) {
+			WaitableTimer_Yield(WaitableTimer_DefaultYieldTime);
+		}
+	}
+
+	NP2HeapFree(status->pszText);
+	NP2HeapFree(status);
 }
 
 void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
+	if (!editMarkAllStatus.done) {
+		InitializeCriticalSection(&editMarkAllStatus.criticalSection);
+		editMarkAllStatus.done = TRUE;
+	}
+
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5674,40 +5736,31 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	}
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
-	if (!bChanged && findFlag == editMarkAllStatus.findFlag && editMarkAllStatus.iSelCount == iSelCount) {
-		// _stricmp() is not safe for DBCS string.
-		if (memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0) {
-			NP2HeapFree(pszText);
-			return;
+	if (!bChanged) {
+		EnterCriticalSection(&editMarkAllStatus.criticalSection);
+		if (findFlag == editMarkAllStatus.findFlag && editMarkAllStatus.iSelCount == iSelCount) {
+			// _stricmp() is not safe for DBCS string.
+			if (memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0) {
+				NP2HeapFree(pszText);
+				LeaveCriticalSection(&editMarkAllStatus.criticalSection);
+				return;
+			}
 		}
+		LeaveCriticalSection(&editMarkAllStatus.criticalSection);
 	}
 
 	EditMarkAll_Clear();
-	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-
-	SciCall_SetSearchFlags(findFlag);
-	const Sci_Position iDocLen = SciCall_GetLength();
-
-	Sci_Position iPos = 0;
-	do {
-		SciCall_SetTargetRange(iPos, iDocLen);
-		iPos = SciCall_SearchInTarget(iSelCount, pszText);
-		if (iPos == -1) {
-			break;
-		}
-		// mark this match
-		++iMatchesCount;
-		SciCall_IndicatorFillRange(iPos, iSelCount);
-		iPos += iSelCount;
-	} while (iPos < iDocLen);
-
-	if (iMatchesCount > 1) {
-		editMarkAllStatus.findFlag = findFlag;
-		editMarkAllStatus.iSelCount = iSelCount;
-		editMarkAllStatus.pszText = pszText;
-	} else {
-		NP2HeapFree(pszText);
-	}
+	EditMarkAllStatus *status = (EditMarkAllStatus *)NP2HeapAlloc(sizeof(EditMarkAllStatus));
+	status->token = editMarkAllStatus.token;
+	status->findFlag = findFlag;
+	status->iSelCount = iSelCount;
+	status->pszText = pszText;
+	EnterCriticalSection(&editMarkAllStatus.criticalSection);
+	editMarkAllStatus.findFlag = findFlag;
+	editMarkAllStatus.iSelCount = iSelCount;
+	editMarkAllStatus.pszText = StrDupA(pszText);
+	LeaveCriticalSection(&editMarkAllStatus.criticalSection);
+	EditMarkAll_Run(status);
 }
 
 static void ShwowReplaceCount(Sci_Position iCount) {
