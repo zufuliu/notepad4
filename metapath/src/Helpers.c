@@ -328,6 +328,40 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 	return hbmp;
 }
 
+void Handle_Wait(HANDLE handle) {
+	while (WaitForSingleObject(handle, 0) != WAIT_OBJECT_0) {
+		MSG msg;
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+}
+
+void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
+	worker->hwnd = hwnd;
+	worker->eventCancel = CreateEvent(NULL, TRUE, FALSE, NULL);
+	worker->eventDone = CreateEvent(NULL, TRUE, TRUE, NULL);
+	worker->workerThread = NULL;
+}
+
+void BackgroundWorker_Cancel(BackgroundWorker *worker) {
+	SetEvent(worker->eventCancel);
+	Handle_Wait(worker->eventDone);
+	ResetEvent(worker->eventCancel);
+	SetEvent(worker->eventDone);
+	CloseHandle(worker->workerThread);
+	worker->workerThread = NULL;
+}
+
+void BackgroundWorker_Destroy(BackgroundWorker *worker) {
+	SetEvent(worker->eventCancel);
+	Handle_Wait(worker->eventDone);
+	CloseHandle(worker->eventCancel);
+	CloseHandle(worker->eventDone);
+	CloseHandle(worker->workerThread);
+}
+
 //=============================================================================
 //
 // PrivateSetCurrentProcessExplicitAppUserModelID()

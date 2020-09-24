@@ -30,16 +30,13 @@ typedef struct LV_ITEMDATA { // lvid
 typedef const LV_ITEMDATA * LPCLV_ITEMDATA;
 
 //==== DlInit() ===============================================================
-BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader);
+void DirList_Init(HWND hwnd, LPCWSTR pszHeader);
 
 //==== DlDestroy() ============================================================
-BOOL DirList_Destroy(HWND hwnd);
+void DirList_Destroy(HWND hwnd);
 
 //==== DlStartIconThread() ====================================================
-BOOL DirList_StartIconThread(HWND hwnd);
-
-//==== DlTerminateIconThread() ================================================
-BOOL DirList_TerminateIconThread(HWND hwnd);
+void DirList_StartIconThread(HWND hwnd);
 
 //==== DlFill() ===============================================================
 #define DL_FOLDERS			32
