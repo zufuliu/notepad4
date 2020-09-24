@@ -792,8 +792,9 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	ft.lpstrText = pFind;
 	ft.chrg.cpMax = (Sci_PositionCR)iDocLen;
 	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
+	HANDLE timer = WaitableTimer_New(autoCompletionConfig.dwScanWordsTimeout);
 
-	while (iPosFind >= 0 && iPosFind < iDocLen) {
+	while (iPosFind >= 0 && iPosFind < iDocLen && WaitForSingleObject(timer, 0) != WAIT_OBJECT_0) {
 		Sci_Position wordEnd = iPosFind + iRootLen;
 		const int style = SciCall_GetStyleAt(wordEnd - 1);
 		wordEnd = ft.chrgText.cpMax;
@@ -935,6 +936,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 		iPosFind = SciCall_FindText(findFlag, &ft);
 	}
 
+	CloseHandle(timer);
 	if (pFind != onStack) {
 		NP2HeapFree(pFind);
 	}
