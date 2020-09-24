@@ -96,7 +96,7 @@ static HMODULE hELSCoreDLL = NULL;
 
 typedef struct EditMarkAllStatus {
 	volatile LONG token;
-	LONG done;
+	volatile LONG done;
 	CRITICAL_SECTION criticalSection;
 	int findFlag;
 	Sci_Position iSelCount;
@@ -5633,6 +5633,9 @@ void EditMarkAll_Clear(void) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
+	}
+	if (!editMarkAllStatus.done) {
+		return;
 	}
 
 	EnterCriticalSection(&editMarkAllStatus.criticalSection);
