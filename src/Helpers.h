@@ -572,6 +572,11 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
 
+#define WaitableTimer_DefaultTimeSlot		100
+#define WaitableTimer_DefaultYieldTime		50
+HANDLE WaitableTimer_New(DWORD milliseconds);
+void WaitableTimer_Yield(DWORD milliseconds);
+
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 
