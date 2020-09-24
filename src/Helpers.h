@@ -577,6 +577,25 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 HANDLE WaitableTimer_New(DWORD milliseconds);
 void WaitableTimer_Yield(DWORD milliseconds);
 
+typedef struct BackgroundWorker {
+	HWND hwnd;
+	HANDLE eventCancel;
+	HANDLE eventDone;
+	HANDLE workerThread;
+} BackgroundWorker;
+
+void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd);
+void BackgroundWorker_Cancel(BackgroundWorker *worker);
+void BackgroundWorker_Destroy(BackgroundWorker *worker);
+#define BackgroundWorker_Continue(worker)	\
+	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
+#define BackgroundWorker_Begin(worker)		\
+	ResetEvent((worker)->eventDone)
+#define BackgroundWorker_End(worker) do {	\
+		SetEvent((worker)->eventDone);		\
+		ExitThread(0);						\
+	} while (0)
+
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 
