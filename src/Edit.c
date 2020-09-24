@@ -96,7 +96,7 @@ static HMODULE hELSCoreDLL = NULL;
 
 typedef struct EditMarkAllStatus {
 	volatile LONG token;
-	BOOL done;
+	LONG done;
 	CRITICAL_SECTION criticalSection;
 	int findFlag;
 	Sci_Position iSelCount;
@@ -5697,9 +5697,8 @@ void EditMarkAll_Run(EditMarkAllStatus *status) {
 }
 
 void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
-	if (!editMarkAllStatus.done) {
+	if (InterlockedCompareExchange(&editMarkAllStatus.done, 1, 0) == 0) {
 		InitializeCriticalSection(&editMarkAllStatus.criticalSection);
-		editMarkAllStatus.done = TRUE;
 	}
 
 	// get current selection
