@@ -576,6 +576,8 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 #define WaitableTimer_DefaultYieldTime		50
 HANDLE WaitableTimer_New(DWORD milliseconds);
 void WaitableTimer_Yield(DWORD milliseconds);
+#define WaitableTimer_Continue(timer)	\
+	(WaitForSingleObject((timer), 0) != WAIT_OBJECT_0)
 
 typedef struct BackgroundWorker {
 	HWND hwnd;

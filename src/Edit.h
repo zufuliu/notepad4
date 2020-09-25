@@ -210,7 +210,10 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
-void	EditMarkAll_Clear(void);
+LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+NP2_inline void EditMarkAll_Clear(void) {
+	EditMarkAll_ClearEx(0, 0, NULL);
+}
 void	EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
