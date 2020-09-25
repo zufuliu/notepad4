@@ -1,3 +1,4 @@
+-- SQL Server 2019
 --! Data types
 -- https://docs.microsoft.com/en-us/sql/t-sql/data-types/data-types-transact-sql?view=sqlallproducts-allversions
 -- Exact numerics
