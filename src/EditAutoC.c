@@ -794,7 +794,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
 	HANDLE timer = WaitableTimer_New(autoCompletionConfig.dwScanWordsTimeout);
 
-	while (iPosFind >= 0 && iPosFind < iDocLen && WaitForSingleObject(timer, 0) != WAIT_OBJECT_0) {
+	while (iPosFind >= 0 && iPosFind < iDocLen && WaitableTimer_Continue(timer)) {
 		Sci_Position wordEnd = iPosFind + iRootLen;
 		const int style = SciCall_GetStyleAt(wordEnd - 1);
 		wordEnd = ft.chrgText.cpMax;

@@ -970,12 +970,18 @@ static inline void NP2RestoreWind(HWND hwnd) {
 	ShowOwnedPopups(hwnd, TRUE);
 }
 
-static inline void NP2ExitWind(HWND hwnd) {
+static inline void EditMarkAll_Stop(void) {
+	iMatchesCount = 0;
+	EditMarkAll_Clear();
+}
+
+static inline void ExitApplication(HWND hwnd) {
 	if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
 		if (bInFullScreenMode) {
 			bInFullScreenMode = FALSE;
 			ToggleFullScreenMode();
 		}
+		EditMarkAll_Stop();
 		DestroyWindow(hwnd);
 	}
 }
@@ -1040,6 +1046,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (!bShutdownOK) {
 			WINDOWPLACEMENT wndpl;
 
+			EditMarkAll_Stop();
 			// Terminate file watching
 			InstallFileWatching(NULL);
 
@@ -1107,7 +1114,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (bMinimizeToTray) {
 			NP2MinimizeWind(hwnd);
 		} else {
-			NP2ExitWind(hwnd);
+			ExitApplication(hwnd);
 		}
 		break;
 
@@ -1430,7 +1437,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			if (iCmd == IDM_TRAY_RESTORE) {
 				NP2RestoreWind(hwnd);
 			} else if (iCmd == IDM_TRAY_EXIT) {
-				NP2ExitWind(hwnd);
+				ExitApplication(hwnd);
 			}
 		}
 		return TRUE;
@@ -2956,7 +2963,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_FILE_EXIT:
-		NP2ExitWind(hwnd);
+		ExitApplication(hwnd);
 		break;
 
 	case IDM_ENCODING_ANSI:
@@ -4436,12 +4443,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else if (iEscFunction == 1) {
 			SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
 		} else if (iEscFunction == 2) {
-			NP2ExitWind(hwnd);
+			ExitApplication(hwnd);
 		}
 		break;
 
 	case CMD_SHIFTESC:
-		NP2ExitWind(hwnd);
+		ExitApplication(hwnd);
 		break;
 
 	// Newline with toggled auto indent setting
@@ -4881,7 +4888,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDT_FILE_EXIT:
-		NP2ExitWind(hwnd);
+		ExitApplication(hwnd);
 		break;
 
 	case IDT_FILE_SAVEAS:

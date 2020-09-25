@@ -5626,8 +5626,8 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 
 extern Sci_Position iMatchesCount;
 
-void EditMarkAll_Clear(void) {
-	InterlockedIncrement(&editMarkAllStatus.token);
+LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+	const LONG token = InterlockedIncrement(&editMarkAllStatus.token);
 	if (iMatchesCount != 0) {
 		iMatchesCount = 0;
 		// clear existing indicator
@@ -5635,24 +5635,22 @@ void EditMarkAll_Clear(void) {
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
 	}
 	if (!editMarkAllStatus.done) {
-		return;
+		return token;
 	}
 
 	EnterCriticalSection(&editMarkAllStatus.criticalSection);
 	if (editMarkAllStatus.pszText) {
 		LocalFree(editMarkAllStatus.pszText);
 	}
-	editMarkAllStatus.findFlag = 0;
-	editMarkAllStatus.iSelCount= 0;
-	editMarkAllStatus.pszText = NULL;
+	editMarkAllStatus.findFlag = findFlag;
+	editMarkAllStatus.iSelCount= iSelCount;
+	editMarkAllStatus.pszText = pszText ? StrDupA(pszText) : NULL;
 	LeaveCriticalSection(&editMarkAllStatus.criticalSection);
+	return token;
 }
 
-void EditMarkAll_Run(EditMarkAllStatus *status) {
-	const LONG token = status->token;
-
-	struct Sci_TextToFind ttf = {{0, SciCall_GetLength()}, status->pszText, {0, 0}};
-	const Sci_Position iSelCount = status->iSelCount;
+void EditMarkAll_Run(const LONG token, const int findFlag, const Sci_Position iSelCount, LPCSTR pszText) {
+	struct Sci_TextToFind ttf = {{0, SciCall_GetLength()}, pszText, {0, 0}};
 
 	Sci_Position matchCount = 0;
 	UINT index = 0;
@@ -5661,8 +5659,8 @@ void EditMarkAll_Run(EditMarkAllStatus *status) {
 	BOOL done = FALSE;
 	while (!done) {
 		HANDLE timer = WaitableTimer_New(WaitableTimer_DefaultTimeSlot);
-		while (WaitForSingleObject(timer, 0) != WAIT_OBJECT_0) {
-			const Sci_Position pos = SciCall_FindText(status->findFlag, &ttf);
+		while (WaitableTimer_Continue(timer)) {
+			const Sci_Position pos = SciCall_FindText(findFlag, &ttf);
 			if (pos == -1 || token != editMarkAllStatus.token) {
 				done = TRUE;
 				break;
@@ -5689,14 +5687,14 @@ void EditMarkAll_Run(EditMarkAllStatus *status) {
 				}
 			}
 			UpdateStatusbar();
+		} else {
+			done = TRUE;
 		}
 		if (!done) {
 			WaitableTimer_Yield(WaitableTimer_DefaultYieldTime);
+			done = token != editMarkAllStatus.token;
 		}
 	}
-
-	NP2HeapFree(status->pszText);
-	NP2HeapFree(status);
 }
 
 void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
@@ -5740,29 +5738,17 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
 	if (!bChanged) {
 		EnterCriticalSection(&editMarkAllStatus.criticalSection);
-		if (findFlag == editMarkAllStatus.findFlag && editMarkAllStatus.iSelCount == iSelCount) {
+		bChanged = findFlag != editMarkAllStatus.findFlag
+			|| iSelCount != editMarkAllStatus.iSelCount
 			// _stricmp() is not safe for DBCS string.
-			if (memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0) {
-				NP2HeapFree(pszText);
-				LeaveCriticalSection(&editMarkAllStatus.criticalSection);
-				return;
-			}
-		}
+			|| memcmp(pszText, editMarkAllStatus.pszText, iSelCount) != 0;
 		LeaveCriticalSection(&editMarkAllStatus.criticalSection);
 	}
-
-	EditMarkAll_Clear();
-	EditMarkAllStatus *status = (EditMarkAllStatus *)NP2HeapAlloc(sizeof(EditMarkAllStatus));
-	status->token = editMarkAllStatus.token;
-	status->findFlag = findFlag;
-	status->iSelCount = iSelCount;
-	status->pszText = pszText;
-	EnterCriticalSection(&editMarkAllStatus.criticalSection);
-	editMarkAllStatus.findFlag = findFlag;
-	editMarkAllStatus.iSelCount = iSelCount;
-	editMarkAllStatus.pszText = StrDupA(pszText);
-	LeaveCriticalSection(&editMarkAllStatus.criticalSection);
-	EditMarkAll_Run(status);
+	if (bChanged) {
+		const LONG token = EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
+		EditMarkAll_Run(token, findFlag, iSelCount, pszText);
+	}
+	NP2HeapFree(pszText);
 }
 
 static void ShwowReplaceCount(Sci_Position iCount) {
