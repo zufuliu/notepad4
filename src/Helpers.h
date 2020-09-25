@@ -573,9 +573,9 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 }
 
 #define WaitableTimer_DefaultTimeSlot		100
-#define WaitableTimer_DefaultYieldTime		50
+#define WaitableTimer_DefaultDelayTime		50
 HANDLE WaitableTimer_New(DWORD milliseconds);
-void WaitableTimer_Yield(DWORD milliseconds);
+void WaitableTimer_Delay(DWORD milliseconds);
 #define WaitableTimer_Continue(timer)	\
 	(WaitForSingleObject((timer), 0) != WAIT_OBJECT_0)
 
