@@ -446,7 +446,7 @@ HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height) {
 HANDLE WaitableTimer_New(DWORD milliseconds) {
 	HANDLE timer = CreateWaitableTimer(NULL, FALSE, NULL);
 	LARGE_INTEGER dueTime;
-	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds;
+	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds; // convert to 100ns
 	SetWaitableTimer(timer, &dueTime, 0, NULL, NULL, FALSE);
 	return timer;
 }
@@ -461,7 +461,7 @@ void Handle_Wait(HANDLE handle) {
 	}
 }
 
-void WaitableTimer_Yield(DWORD milliseconds) {
+void WaitableTimer_Delay(DWORD milliseconds) {
 	HANDLE timer = WaitableTimer_New(milliseconds);
 	Handle_Wait(timer);
 	CloseHandle(timer);

@@ -5691,7 +5691,7 @@ void EditMarkAll_Run(const LONG token, const int findFlag, const Sci_Position iS
 			done = TRUE;
 		}
 		if (!done) {
-			WaitableTimer_Yield(WaitableTimer_DefaultYieldTime);
+			WaitableTimer_Delay(WaitableTimer_DefaultDelayTime);
 			done = token != editMarkAllStatus.token;
 		}
 	}
