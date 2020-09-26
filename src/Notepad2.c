@@ -7022,7 +7022,6 @@ void UpdateStatusbar(void) {
 	WCHAR tchMatchesCount[32];
 	if (iSelStart == iSelEnd) {
 		lstrcpy(tchLinesSelected, L"0");
-		lstrcpy(tchMatchesCount, L"0");
 	} else {
 		const Sci_Line iStartLine = SciCall_LineFromPosition(iSelStart);
 		const Sci_Line iEndLine = SciCall_LineFromPosition(iSelEnd);
@@ -7033,9 +7032,11 @@ void UpdateStatusbar(void) {
 		}
 		PosToStrW(iLinesSelected, tchLinesSelected);
 		FormatNumberStr(tchLinesSelected);
-		PosToStrW(iMatchesCount, tchMatchesCount);
-		FormatNumberStr(tchMatchesCount);
 	}
+
+	// find all and mark occurrences
+	PosToStrW(iMatchesCount, tchMatchesCount);
+	FormatNumberStr(tchMatchesCount);
 
 	WCHAR tchDocPos[256];
 	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchCurLine, tchDocLine,
