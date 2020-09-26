@@ -2416,8 +2416,8 @@ void EditTabsToSpaces(int nTabWidth, BOOL bOnlyIndentingWS) {
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
-	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
+	tr.chrg.cpMin = iSelStart;
+	tr.chrg.cpMax = iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);
 
@@ -2488,8 +2488,8 @@ void EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS) {
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
-	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
+	tr.chrg.cpMin = iSelStart;
+	tr.chrg.cpMax = iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);
 
@@ -3465,7 +3465,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 
 		char tchBuf[32] = "";
 		struct Sci_TextRange tr;
-		tr.chrg.cpMin = (Sci_PositionCR)iIndentPos;
+		tr.chrg.cpMin = iIndentPos;
 		tr.chrg.cpMax = tr.chrg.cpMin + min_i(31, cchComment);
 		tr.lpstrText = tchBuf;
 		SciCall_GetTextRange(&tr);
@@ -4011,8 +4011,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
-	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
+	tr.chrg.cpMin = iSelStart;
+	tr.chrg.cpMax = iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);
 
@@ -4152,8 +4152,8 @@ void EditJoinLinesEx(void) {
 	char *pszJoin = (char *)NP2HeapAlloc(NP2HeapSize(pszText));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
-	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
+	tr.chrg.cpMin = iSelStart;
+	tr.chrg.cpMax = iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);
 
@@ -4624,8 +4624,8 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
 	struct Sci_TextRange tr;
-	tr.chrg.cpMin = (Sci_PositionCR)iSelStart;
-	tr.chrg.cpMax = (Sci_PositionCR)iSelEnd;
+	tr.chrg.cpMin = iSelStart;
+	tr.chrg.cpMax = iSelEnd;
 	tr.lpstrText = pszText;
 	SciCall_GetTextRange(&tr);
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -5410,8 +5410,8 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
-	ttf.chrg.cpMin = (Sci_PositionCR)SciCall_GetSelectionEnd();
-	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+	ttf.chrg.cpMin = SciCall_GetSelectionEnd();
+	ttf.chrg.cpMax = SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
 	Sci_Position iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
@@ -5473,7 +5473,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
-	ttf.chrg.cpMin = (Sci_PositionCR)max_pos(0, SciCall_GetSelectionStart());
+	ttf.chrg.cpMin = max_pos(0, SciCall_GetSelectionStart());
 	ttf.chrg.cpMax = 0;
 	ttf.lpstrText = szFind2;
 
@@ -5483,7 +5483,7 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 
 	if (iPos == -1 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
-			ttf.chrg.cpMin = (Sci_PositionCR)iLength;
+			ttf.chrg.cpMin = iLength;
 			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 		} else {
 			bSuppressNotFound = TRUE;
@@ -5554,8 +5554,8 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
-	ttf.chrg.cpMin = (Sci_PositionCR)iSelStart; // Start!
-	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+	ttf.chrg.cpMin = iSelStart; // Start!
+	ttf.chrg.cpMax = SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
 	Sci_Position iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
@@ -5588,8 +5588,8 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 	SciCall_ReplaceTargetEx(bReplaceRE, -1, pszReplace2);
 
-	ttf.chrg.cpMin = (Sci_PositionCR)SciCall_GetTargetEnd();
-	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+	ttf.chrg.cpMin = SciCall_GetTargetEnd();
+	ttf.chrg.cpMax = SciCall_GetLength();
 
 	iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
 	bSuppressNotFound = FALSE;
@@ -5813,7 +5813,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
 	ttf.chrg.cpMin = 0;
-	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+	ttf.chrg.cpMax = SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
 	Sci_Position iCount = 0;
@@ -5832,8 +5832,8 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 		SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 		const Sci_Position iReplacedLen = SciCall_ReplaceTargetEx(bReplaceRE, -1, pszReplace2);
 
-		ttf.chrg.cpMin = (Sci_PositionCR)(ttf.chrgText.cpMin + iReplacedLen);
-		ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+		ttf.chrg.cpMin = (ttf.chrgText.cpMin + iReplacedLen);
+		ttf.chrg.cpMax = SciCall_GetLength();
 
 		if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 			break;
@@ -5841,7 +5841,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 
 		if (ttf.chrgText.cpMin == ttf.chrgText.cpMax && !bRegexStartOfLine) {
 			// move to next line after the replacement.
-			ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionAfter(ttf.chrg.cpMin);
+			ttf.chrg.cpMin = SciCall_PositionAfter(ttf.chrg.cpMin);
 		}
 
 		if (bRegexStartOfLine) {
@@ -5849,7 +5849,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 			const Sci_Position ilPos = SciCall_PositionFromLine(iLine);
 
 			if (ilPos == ttf.chrg.cpMin) {
-				ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionFromLine(iLine + 1);
+				ttf.chrg.cpMin = SciCall_PositionFromLine(iLine + 1);
 			}
 			if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 				break;
@@ -5927,8 +5927,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
-	ttf.chrg.cpMin = (Sci_PositionCR)SciCall_GetSelectionStart();
-	ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+	ttf.chrg.cpMin = SciCall_GetSelectionStart();
+	ttf.chrg.cpMax = SciCall_GetLength();
 	ttf.lpstrText = szFind2;
 
 	Sci_Position iCount = 0;
@@ -5950,8 +5950,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 			SciCall_SetTargetRange(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 			const Sci_Position iReplacedLen = SciCall_ReplaceTargetEx(bReplaceRE, -1, pszReplace2);
 
-			ttf.chrg.cpMin = (Sci_PositionCR)(ttf.chrgText.cpMin + iReplacedLen);
-			ttf.chrg.cpMax = (Sci_PositionCR)SciCall_GetLength();
+			ttf.chrg.cpMin = (ttf.chrgText.cpMin + iReplacedLen);
+			ttf.chrg.cpMax = SciCall_GetLength();
 
 			if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 				fCancel = TRUE;
@@ -5959,7 +5959,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 
 			if (ttf.chrgText.cpMin == ttf.chrgText.cpMax && !bRegexStartOfLine) {
 				// move to next line after the replacement.
-				ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionAfter(ttf.chrg.cpMin);
+				ttf.chrg.cpMin = SciCall_PositionAfter(ttf.chrg.cpMin);
 			}
 
 			if (bRegexStartOfLine) {
@@ -5967,7 +5967,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 				const Sci_Position ilPos = SciCall_PositionFromLine(iLine);
 
 				if (ilPos == ttf.chrg.cpMin) {
-					ttf.chrg.cpMin = (Sci_PositionCR)SciCall_PositionFromLine(iLine + 1);
+					ttf.chrg.cpMin = SciCall_PositionFromLine(iLine + 1);
 				}
 				if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 					break;
@@ -6996,12 +6996,12 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 		return NULL;
 	}
 
-	struct Sci_TextToFind ft = { { (Sci_PositionCR)iCurrentPos, 0 }, delimiters, { 0, 0 } };
+	struct Sci_TextToFind ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
 	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX;
 
 	// forward
 	if (iCurrentPos < iLineEnd) {
-		ft.chrg.cpMax = (Sci_PositionCR)iLineEnd;
+		ft.chrg.cpMax = iLineEnd;
 		Sci_Position iPos = SciCall_FindText(findFlag, &ft);
 		if (iPos >= 0) {
 			iPos = ft.chrgText.cpMax;
@@ -7018,7 +7018,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 
 	// backward
 	if (iCurrentPos > iLineStart) {
-		ft.chrg.cpMax = (Sci_PositionCR)iLineStart;
+		ft.chrg.cpMax = iLineStart;
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ft);
 		if (iPos >= 0) {
 			iLineStart = SciCall_PositionAfter(ft.chrgText.cpMin);
@@ -7028,10 +7028,10 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	// Markdown URL: [alt](url)
 	Sci_Position iStartPos = iLineStart;
 	Sci_Position iEndPos = iLineEnd;
-	ft.chrg.cpMax = (Sci_PositionCR)iLineEnd;
+	ft.chrg.cpMax = iLineEnd;
 	ft.lpstrText = "\\(\\w*:?\\.*/";
 	while (iStartPos < iEndPos) {
-		ft.chrg.cpMin = (Sci_PositionCR)iStartPos;
+		ft.chrg.cpMin = iStartPos;
 		Sci_Position iPos = SciCall_FindText(findFlag, &ft);
 		if (iPos == -1) {
 			break;
@@ -7052,7 +7052,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	}
 
 	char *mszSelection = (char *)NP2HeapAlloc(iLineEnd - iLineStart + 1);
-	struct Sci_TextRange tr = { { (Sci_PositionCR)iLineStart, (Sci_PositionCR)iLineEnd }, mszSelection };
+	struct Sci_TextRange tr = { { iLineStart, iLineEnd }, mszSelection };
 	SciCall_GetTextRange(&tr);
 
 	return mszSelection;

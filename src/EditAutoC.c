@@ -790,7 +790,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	}
 
 	ft.lpstrText = pFind;
-	ft.chrg.cpMax = (Sci_PositionCR)iDocLen;
+	ft.chrg.cpMax = iDocLen;
 	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
 	HANDLE timer = WaitableTimer_New(autoCompletionConfig.dwScanWordsTimeout);
 
@@ -848,8 +848,8 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 				char *pWord = pWList->wordBuf + NP2DefaultPointerAlignment;
 				BOOL bChanged = FALSE;
 				tr.lpstrText = pWord;
-				tr.chrg.cpMin = (Sci_PositionCR)iPosFind;
-				tr.chrg.cpMax = (Sci_PositionCR)min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd);
+				tr.chrg.cpMin = iPosFind;
+				tr.chrg.cpMax = min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd);
 				int wordLength = (int)SciCall_GetTextRange(&tr);
 
 				Sci_Position before = SciCall_PositionBefore(iPosFind);
@@ -932,7 +932,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 			}
 		}
 
-		ft.chrg.cpMin = (Sci_PositionCR)wordEnd;
+		ft.chrg.cpMin = wordEnd;
 		iPosFind = SciCall_FindText(findFlag, &ft);
 	}
 
@@ -1229,8 +1229,8 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 
 	struct Sci_TextRange tr = { { 0, 0 }, NULL };
 	tr.lpstrText = pRoot;
-	tr.chrg.cpMin = (Sci_PositionCR)iStartWordPos;
-	tr.chrg.cpMax = (Sci_PositionCR)iCurrentPos;
+	tr.chrg.cpMin = iStartWordPos;
+	tr.chrg.cpMax = iCurrentPos;
 	SciCall_GetTextRange(&tr);
 	iRootLen = (int)strlen(pRoot);
 
@@ -1575,8 +1575,8 @@ void EditAutoCloseXMLTag(void) {
 
 	if (shouldAutoClose) {
 		struct Sci_TextRange tr;
-		tr.chrg.cpMin = (Sci_PositionCR)iStartPos;
-		tr.chrg.cpMax = (Sci_PositionCR)iCurPos;
+		tr.chrg.cpMin = iStartPos;
+		tr.chrg.cpMax = iCurPos;
 		tr.lpstrText = tchBuf;
 		SciCall_GetTextRange(&tr);
 
