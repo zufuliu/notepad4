@@ -753,11 +753,6 @@ static void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) {
 void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	LPCSTR const pRoot = pWList->pWordStart;
 	const int iRootLen = pWList->iStartLen;
-	struct Sci_TextToFind ft = { { 0, 0 }, NULL, { 0, 0 } };
-	struct Sci_TextRange tr = { { 0, 0 }, NULL };
-	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
-	const Sci_Position iDocLen = SciCall_GetLength();
-	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX | (bIgnoreCase ? 0 : SCFIND_MATCHCASE);
 
 	// optimization for small string
 	char onStack[256];
@@ -789,8 +784,11 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 		}
 	}
 
-	ft.lpstrText = pFind;
-	ft.chrg.cpMax = iDocLen;
+	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
+	const Sci_Position iDocLen = SciCall_GetLength();
+	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX | (bIgnoreCase ? 0 : SCFIND_MATCHCASE);
+	struct Sci_TextToFind ft = { { 0, iDocLen }, pFind, { 0, 0 } };
+
 	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
 	HANDLE timer = WaitableTimer_New(autoCompletionConfig.dwScanWordsTimeout);
 
@@ -847,9 +845,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 			if (wordEnd - iPosFind >= iRootLen) {
 				char *pWord = pWList->wordBuf + NP2DefaultPointerAlignment;
 				BOOL bChanged = FALSE;
-				tr.lpstrText = pWord;
-				tr.chrg.cpMin = iPosFind;
-				tr.chrg.cpMax = min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd);
+				struct Sci_TextRange tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRange(&tr);
 
 				Sci_Position before = SciCall_PositionBefore(iPosFind);
@@ -1227,10 +1223,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 		pRoot = (char *)NP2HeapAlloc(iCurrentPos - iStartWordPos + 1);
 	}
 
-	struct Sci_TextRange tr = { { 0, 0 }, NULL };
-	tr.lpstrText = pRoot;
-	tr.chrg.cpMin = iStartWordPos;
-	tr.chrg.cpMax = iCurrentPos;
+	struct Sci_TextRange tr = { { iStartWordPos, iCurrentPos }, pRoot };
 	SciCall_GetTextRange(&tr);
 	iRootLen = (int)strlen(pRoot);
 
@@ -1574,10 +1567,7 @@ void EditAutoCloseXMLTag(void) {
 	}
 
 	if (shouldAutoClose) {
-		struct Sci_TextRange tr;
-		tr.chrg.cpMin = iStartPos;
-		tr.chrg.cpMax = iCurPos;
-		tr.lpstrText = tchBuf;
+		struct Sci_TextRange tr = { { iStartPos, iCurPos }, tchBuf };
 		SciCall_GetTextRange(&tr);
 
 		if (tchBuf[iSize - 2] != '/') {
