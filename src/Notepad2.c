@@ -6951,7 +6951,7 @@ void UpdateStatusbar(void) {
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
-	struct Sci_TextToFind ft = { { SciCall_PositionFromLine(iLine), iPos }, NULL, { 0, 0 }};
+	struct Sci_TextToFind ft = { { SciCall_PositionFromLine(iLine), iPos }, NULL, { 0, 0 } };
 	SciCall_CountCharactersAndColumns(&ft);
 	const Sci_Position iChar = ft.chrgText.cpMin;
 	const Sci_Position iCol = ft.chrgText.cpMax;
