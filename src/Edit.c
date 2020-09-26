@@ -4980,11 +4980,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDPREV, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SAVEPOSITION, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETPOSITION, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
 		if (isReplace) {
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACETEXT, dx, 0, SWP_NOMOVE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_REPLACE, dx, 0, SWP_NOSIZE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACE, dx, 0, SWP_NOSIZE);
-			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEINSEL, dx, 0, SWP_NOSIZE);
 		}
 		EndDeferWindowPos(hdwp);
@@ -5170,8 +5170,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				break;
 
 			case IDC_REPLACEALL:
-				bReplaceInitialized = TRUE;
-				EditReplaceAll(lpefr->hwnd, lpefr, TRUE);
+				if (bIsFindDlg) {
+					EditFindAll(lpefr);
+				} else {
+					bReplaceInitialized = TRUE;
+					EditReplaceAll(lpefr->hwnd, lpefr, TRUE);
+				}
 				break;
 
 			case IDC_REPLACEINSEL:
@@ -5593,19 +5597,35 @@ LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	return token;
 }
 
-void EditMarkAll_Run(const LONG token, const int findFlag, const Sci_Position iSelCount, LPCSTR pszText) {
-	struct Sci_TextToFind ttf = {{0, SciCall_GetLength()}, pszText, {0, 0}};
+void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+	if (InterlockedCompareExchange(&editMarkAllStatus.done, 1, 0) == 0) {
+		InitializeCriticalSection(&editMarkAllStatus.criticalSection);
+	}
+	if (!bChanged) {
+		EnterCriticalSection(&editMarkAllStatus.criticalSection);
+		bChanged = findFlag != editMarkAllStatus.findFlag
+			|| iSelCount != editMarkAllStatus.iSelCount
+			// _stricmp() is not safe for DBCS string.
+			|| memcmp(pszText, editMarkAllStatus.pszText, iSelCount) != 0;
+		LeaveCriticalSection(&editMarkAllStatus.criticalSection);
+		if (!bChanged) {
+			return;
+		}
+	}
+
+	const LONG token = EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
+	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, pszText, { 0, 0 } };
 
 	Sci_Position matchCount = 0;
 	UINT index = 0;
-	Sci_Position posList[256];
+	Sci_Position posList[256*2];
 
 	BOOL done = FALSE;
 	while (!done) {
 		HANDLE timer = WaitableTimer_New(WaitableTimer_DefaultTimeSlot);
 		while (WaitableTimer_Continue(timer)) {
-			const Sci_Position pos = SciCall_FindText(findFlag, &ttf);
-			if (pos == -1 || token != editMarkAllStatus.token) {
+			const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
+			if (iPos == -1 || token != editMarkAllStatus.token) {
 				done = TRUE;
 				break;
 			}
@@ -5613,21 +5633,23 @@ void EditMarkAll_Run(const LONG token, const int findFlag, const Sci_Position iS
 			if (index == COUNTOF(posList)) {
 				iMatchesCount = matchCount;
 				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-				for (UINT i = 0; i < index; i++) {
-					SciCall_IndicatorFillRange(posList[i], iSelCount);
+				for (UINT i = 0; i < index; i += 2) {
+					SciCall_IndicatorFillRange(posList[i], posList[i + 1]);
 				}
 				index = 0;
 			}
-			posList[index++] = pos;
+			posList[index] = ttf.chrgText.cpMin;
+			posList[index + 1] = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
 			ttf.chrg.cpMin = ttf.chrgText.cpMax;
+			index += 2;
 		}
 		CloseHandle(timer);
 		if (token == editMarkAllStatus.token) {
 			iMatchesCount = matchCount;
 			if (index) {
 				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-				for (UINT i = 0; i < index; i++) {
-					SciCall_IndicatorFillRange(posList[i], iSelCount);
+				for (UINT i = 0; i < index; i += 2) {
+					SciCall_IndicatorFillRange(posList[i], posList[i + 1]);
 				}
 			}
 			UpdateStatusbar();
@@ -5642,10 +5664,6 @@ void EditMarkAll_Run(const LONG token, const int findFlag, const Sci_Position iS
 }
 
 void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
-	if (InterlockedCompareExchange(&editMarkAllStatus.done, 1, 0) == 0) {
-		InitializeCriticalSection(&editMarkAllStatus.criticalSection);
-	}
-
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5680,19 +5698,17 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	}
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
-	if (!bChanged) {
-		EnterCriticalSection(&editMarkAllStatus.criticalSection);
-		bChanged = findFlag != editMarkAllStatus.findFlag
-			|| iSelCount != editMarkAllStatus.iSelCount
-			// _stricmp() is not safe for DBCS string.
-			|| memcmp(pszText, editMarkAllStatus.pszText, iSelCount) != 0;
-		LeaveCriticalSection(&editMarkAllStatus.criticalSection);
-	}
-	if (bChanged) {
-		const LONG token = EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
-		EditMarkAll_Run(token, findFlag, iSelCount, pszText);
-	}
+	EditMarkAll_Run(bChanged, findFlag, iSelCount, pszText);
 	NP2HeapFree(pszText);
+}
+
+void EditFindAll(LPEDITFINDREPLACE lpefr) {
+	char szFind2[NP2_FIND_REPLACE_LIMIT];
+	if (!EditPrepareFind(szFind2, lpefr)) {
+		return;
+	}
+
+	EditMarkAll_Run(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
 }
 
 static void ShwowReplaceCount(Sci_Position iCount) {

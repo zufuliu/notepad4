@@ -165,6 +165,7 @@ void	EditSelectLines(BOOL currentBlock, BOOL lineSelection);
 HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
 void	EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
 void	EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+void	EditFindAll(LPEDITFINDREPLACE lpefr);
 BOOL	EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr);
 BOOL	EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
@@ -214,7 +215,8 @@ LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
 NP2_inline void EditMarkAll_Clear(void) {
 	EditMarkAll_ClearEx(0, 0, NULL);
 }
-void	EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
