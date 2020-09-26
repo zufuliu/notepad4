@@ -5380,29 +5380,57 @@ void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
+BOOL EditPrepareFind(char *szFind2, LPEDITFINDREPLACE lpefr) {
+	if (StrIsEmptyA(lpefr->szFind)) {
+		return FALSE;
+	}
+
+	strncpy(szFind2, lpefr->szFind, NP2_FIND_REPLACE_LIMIT);
+	if (lpefr->bTransformBS) {
+		const UINT cpEdit = SciCall_GetCodePage();
+		TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
+	}
+	if (StrIsEmptyA(szFind2)) {
+		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
+		return FALSE;
+	}
+	if (lpefr->bWildcardSearch) {
+		EscapeWildcards(szFind2, lpefr);
+	}
+	return TRUE;
+}
+
+BOOL EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, LPEDITFINDREPLACE lpefr) {
+	if (!EditPrepareFind(szFind2, lpefr)) {
+		return FALSE;
+	}
+
+	*bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
+	if (strcmp(lpefr->szReplace, "^c") == 0) {
+		*bReplaceRE = FALSE;
+		*pszReplace2 = EditGetClipboardText(hwnd);
+	} else {
+		*pszReplace2 = StrDupA(lpefr->szReplace);
+		if (lpefr->bTransformBS) {
+			const UINT cpEdit = SciCall_GetCodePage();
+			TransformBackslashes(*pszReplace2, *bReplaceRE, cpEdit);
+		}
+	}
+
+	if (*pszReplace2 == NULL) {
+		*pszReplace2 = StrDupA("");
+	}
+	return TRUE;
+}
+
 //=============================================================================
 //
 // EditFindNext()
 //
 BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
-	if (StrIsEmptyA(lpefr->szFind)) {
-		return /*EditFindReplaceDlg(hwnd, lpefr, FALSE)*/FALSE;
-	}
-
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
-	if (lpefr->bTransformBS) {
-		const UINT cpEdit = SciCall_GetCodePage();
-		TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
-	}
-
-	if (StrIsEmptyA(szFind2)) {
-		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
+	if (!EditPrepareFind(szFind2, lpefr)) {
 		return FALSE;
-	}
-
-	if (lpefr->bWildcardSearch) {
-		EscapeWildcards(szFind2, lpefr);
 	}
 
 	const Sci_Position iSelPos = SciCall_GetCurrentPos();
@@ -5448,24 +5476,9 @@ BOOL EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 // EditFindPrev()
 //
 BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
-	if (StrIsEmptyA(lpefr->szFind)) {
-		return /*EditFindReplaceDlg(hwnd, lpefr, FALSE)*/FALSE;
-	}
-
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
-	if (lpefr->bTransformBS) {
-		const UINT cpEdit = SciCall_GetCodePage();
-		TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
-	}
-
-	if (StrIsEmptyA(szFind2)) {
-		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
+	if (!EditPrepareFind(szFind2, lpefr)) {
 		return FALSE;
-	}
-
-	if (lpefr->bWildcardSearch) {
-		EscapeWildcards(szFind2, lpefr);
 	}
 
 	const Sci_Position iSelPos = SciCall_GetCurrentPos();
@@ -5512,41 +5525,11 @@ BOOL EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 // EditReplace()
 //
 BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
-	if (StrIsEmptyA(lpefr->szFind)) {
-		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
-	}
-
-	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
-	const UINT cpEdit = SciCall_GetCodePage();
+	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
-	if (lpefr->bTransformBS) {
-		TransformBackslashes(szFind2, bReplaceRE, cpEdit);
-	}
-
-	if (StrIsEmptyA(szFind2)) {
-		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
-		return FALSE;
-	}
-
-	if (lpefr->bWildcardSearch) {
-		EscapeWildcards(szFind2, lpefr);
-	}
-
 	char *pszReplace2;
-	if (strcmp(lpefr->szReplace, "^c") == 0) {
-		bReplaceRE = FALSE;
-		pszReplace2 = EditGetClipboardText(hwnd);
-	} else {
-		//strcpy(szReplace2, lpefr->szReplace);
-		pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS) {
-			TransformBackslashes(pszReplace2, bReplaceRE, cpEdit);
-		}
-	}
-
-	if (pszReplace2 == NULL) {
-		pszReplace2 = StrDupA("");
+	if (!EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr)) {
+		return FALSE;
 	}
 
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
@@ -5767,48 +5750,18 @@ static void ShwowReplaceCount(Sci_Position iCount) {
 // EditReplaceAll()
 //
 BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
-	if (StrIsEmptyA(lpefr->szFind)) {
-		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
-	}
-
-	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
-	const UINT cpEdit = SciCall_GetCodePage();
+	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
-	if (lpefr->bTransformBS) {
-		TransformBackslashes(szFind2, bReplaceRE, cpEdit);
-	}
-
-	if (StrIsEmptyA(szFind2)) {
-		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
+	char *pszReplace2;
+	if (!EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr)) {
 		return FALSE;
 	}
 
 	// Show wait cursor...
 	BeginWaitCursor();
 
-	if (lpefr->bWildcardSearch) {
-		EscapeWildcards(szFind2, lpefr);
-	}
-
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	const BOOL bRegexStartOrEndOfLine = bReplaceRE && ((!strcmp(szFind2, "$") || !strcmp(szFind2, "^") || !strcmp(szFind2, "^$")));
-
-	char *pszReplace2;
-	if (strcmp(lpefr->szReplace, "^c") == 0) {
-		bReplaceRE = FALSE;
-		pszReplace2 = EditGetClipboardText(hwnd);
-	} else {
-		//strcpy(szReplace2, lpefr->szReplace);
-		pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS) {
-			TransformBackslashes(pszReplace2, bReplaceRE, cpEdit);
-		}
-	}
-
-	if (pszReplace2 == NULL) {
-		pszReplace2 = StrDupA("");
-	}
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
@@ -5878,52 +5831,23 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 // EditReplaceAllInSelection()
 //
 BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
-	if (StrIsEmptyA(lpefr->szFind)) {
-		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
-	}
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return FALSE;
 	}
 
-	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
-	const UINT cpEdit = SciCall_GetCodePage();
+	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	strncpy(szFind2, lpefr->szFind, COUNTOF(szFind2));
-	if (lpefr->bTransformBS) {
-		TransformBackslashes(szFind2, bReplaceRE, cpEdit);
-	}
-
-	if (StrIsEmptyA(szFind2)) {
-		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
+	char *pszReplace2;
+	if (!EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr)) {
 		return FALSE;
 	}
 
 	// Show wait cursor...
 	BeginWaitCursor();
 
-	if (lpefr->bWildcardSearch) {
-		EscapeWildcards(szFind2, lpefr);
-	}
-
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	const BOOL bRegexStartOrEndOfLine = bReplaceRE && ((!strcmp(szFind2, "$") || !strcmp(szFind2, "^") || !strcmp(szFind2, "^$")));
-
-	char *pszReplace2;
-	if (strcmp(lpefr->szReplace, "^c") == 0) {
-		bReplaceRE = FALSE;
-		pszReplace2 = EditGetClipboardText(hwnd);
-	} else {
-		//strcpy(szReplace2, lpefr->szReplace);
-		pszReplace2 = StrDupA(lpefr->szReplace);
-		if (lpefr->bTransformBS) {
-			TransformBackslashes(pszReplace2, bReplaceRE, cpEdit);
-		}
-	}
-
-	if (pszReplace2 == NULL) {
-		pszReplace2 = StrDupA("");
-	}
 
 	struct Sci_TextToFind ttf;
 	ZeroMemory(&ttf, sizeof(ttf));
