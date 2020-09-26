@@ -932,7 +932,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 		iPosFind = SciCall_FindText(findFlag, &ft);
 	}
 
-	CloseHandle(timer);
+	WaitableTimer_Destroy(timer);
 	if (pFind != onStack) {
 		NP2HeapFree(pFind);
 	}

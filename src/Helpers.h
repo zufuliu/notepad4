@@ -572,10 +572,22 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
 
+void Handle_Wait(HANDLE handle);
 #define WaitableTimer_DefaultTimeSlot		100
 #define WaitableTimer_DefaultDelayTime		50
+#define WaitableTimer_Create()				CreateWaitableTimer(NULL, FALSE, NULL)
+#define WaitableTimer_Destroy(timer)		CloseHandle(timer)
+NP2_inline void WaitableTimer_Set(HANDLE timer, DWORD milliseconds) {
+	LARGE_INTEGER dueTime;
+	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds; // convert to 100ns
+	SetWaitableTimer(timer, &dueTime, 0, NULL, NULL, FALSE);
+}
 HANDLE WaitableTimer_New(DWORD milliseconds);
-void WaitableTimer_Delay(DWORD milliseconds);
+NP2_inline void WaitableTimer_Delay(HANDLE timer, DWORD milliseconds) {
+	WaitableTimer_Set(timer, milliseconds);
+	Handle_Wait(timer);
+}
+void WaitableTimer_DelayOnce(DWORD milliseconds);
 #define WaitableTimer_Continue(timer)	\
 	(WaitForSingleObject((timer), 0) != WAIT_OBJECT_0)
 
