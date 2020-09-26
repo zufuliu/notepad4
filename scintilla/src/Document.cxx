@@ -1581,8 +1581,8 @@ void Document::CountCharactersAndColumns(Sci_TextToFind *ft) const noexcept {
 		count++;
 	}
 
-	ft->chrgText.cpMin = static_cast<Sci_PositionCR>(count);
-	ft->chrgText.cpMax = static_cast<Sci_PositionCR>(column);
+	ft->chrgText.cpMin = count;
+	ft->chrgText.cpMax = column;
 }
 
 Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept {

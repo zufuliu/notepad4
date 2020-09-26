@@ -363,8 +363,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			}
 		}
 
-		frPrint.chrg.cpMin = (Sci_PositionCR)lengthPrinted;
-		frPrint.chrg.cpMax = (Sci_PositionCR)lengthDoc;
+		frPrint.chrg.cpMin = lengthPrinted;
+		frPrint.chrg.cpMax = lengthDoc;
 
 		lengthPrinted = SciCall_FormatRange(printPage, &frPrint);
 
