@@ -5771,9 +5771,6 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 		return /*EditFindReplaceDlg(hwnd, lpefr, TRUE)*/FALSE;
 	}
 
-	// Show wait cursor...
-	BeginWaitCursor();
-
 	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
 	const UINT cpEdit = SciCall_GetCodePage();
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
@@ -5786,6 +5783,9 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
+
+	// Show wait cursor...
+	BeginWaitCursor();
 
 	if (lpefr->bWildcardSearch) {
 		EscapeWildcards(szFind2, lpefr);
@@ -5886,9 +5886,6 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 		return FALSE;
 	}
 
-	// Show wait cursor...
-	BeginWaitCursor();
-
 	BOOL bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
 	const UINT cpEdit = SciCall_GetCodePage();
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
@@ -5901,6 +5898,9 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
 		return FALSE;
 	}
+
+	// Show wait cursor...
+	BeginWaitCursor();
 
 	if (lpefr->bWildcardSearch) {
 		EscapeWildcards(szFind2, lpefr);
