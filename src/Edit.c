@@ -5621,8 +5621,9 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 	Sci_Position posList[256*2];
 
 	BOOL done = FALSE;
+	HANDLE timer = WaitableTimer_Create();
 	while (!done) {
-		HANDLE timer = WaitableTimer_New(WaitableTimer_DefaultTimeSlot);
+		WaitableTimer_Set(timer, WaitableTimer_DefaultTimeSlot);
 		while (WaitableTimer_Continue(timer)) {
 			const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
 			if (iPos == -1 || token != editMarkAllStatus.token) {
@@ -5643,7 +5644,6 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 			ttf.chrg.cpMin = ttf.chrgText.cpMax;
 			index += 2;
 		}
-		CloseHandle(timer);
 		if (token == editMarkAllStatus.token) {
 			iMatchesCount = matchCount;
 			if (index) {
@@ -5657,10 +5657,11 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 			done = TRUE;
 		}
 		if (!done) {
-			WaitableTimer_Delay(WaitableTimer_DefaultDelayTime);
+			WaitableTimer_Delay(timer, WaitableTimer_DefaultDelayTime);
 			done = token != editMarkAllStatus.token;
 		}
 	}
+	WaitableTimer_Destroy(timer);
 }
 
 void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
