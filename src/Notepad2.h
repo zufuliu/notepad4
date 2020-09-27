@@ -135,7 +135,7 @@ void ShowNotificationA(int notifyPos, LPCSTR lpszText);
 void ShowNotificationW(int notifyPos, LPCWSTR lpszText);
 void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...);
 
-void InstallFileWatching(LPCWSTR lpszFile);
+void InstallFileWatching(BOOL terminate);
 void CALLBACK WatchTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 

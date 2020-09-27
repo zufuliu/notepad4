@@ -820,11 +820,11 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			if (flagChangeNotify == 1) {
 				iFileWatchingMode = 0;
 				bResetFileWatching = TRUE;
-				InstallFileWatching(szCurFile);
+				InstallFileWatching(FALSE);
 			} else if (flagChangeNotify == 2) {
 				iFileWatchingMode = 2;
 				bResetFileWatching = TRUE;
-				InstallFileWatching(szCurFile);
+				InstallFileWatching(FALSE);
 			}
 		}
 	} else {
@@ -1048,7 +1048,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			EditMarkAll_Stop();
 			// Terminate file watching
-			InstallFileWatching(NULL);
+			InstallFileWatching(TRUE);
 
 			// GetWindowPlacement
 			wndpl.length = sizeof(WINDOWPLACEMENT);
@@ -1231,11 +1231,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					if (params->flagChangeNotify == 1) {
 						iFileWatchingMode = 0;
 						bResetFileWatching = TRUE;
-						InstallFileWatching(szCurFile);
+						InstallFileWatching(FALSE);
 					} else if (params->flagChangeNotify == 2) {
 						iFileWatchingMode = 2;
 						bResetFileWatching = TRUE;
-						InstallFileWatching(szCurFile);
+						InstallFileWatching(FALSE);
 					}
 
 					if (0 != params->flagSetEncoding) {
@@ -1387,7 +1387,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (!bRunningWatch) {
-			InstallFileWatching(szCurFile);
+			InstallFileWatching(FALSE);
 		}
 		break;
 
@@ -4374,7 +4374,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_CHANGENOTIFY:
 		if (ChangeNotifyDlg(hwnd)) {
-			InstallFileWatching(szCurFile);
+			InstallFileWatching(FALSE);
 		}
 		break;
 
@@ -7257,7 +7257,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (bResetFileWatching) {
 			iFileWatchingMode = 0;
 		}
-		InstallFileWatching(NULL);
+		InstallFileWatching(TRUE);
 
 		return TRUE;
 	}
@@ -7379,7 +7379,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (!bReload && bResetFileWatching) {
 			iFileWatchingMode = 0;
 		}
-		InstallFileWatching(szCurFile);
+		InstallFileWatching(FALSE);
 
 		// check for binary file (file with unknown encoding: ANSI)
 		const BOOL binary = (iEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
@@ -7590,7 +7590,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			if (bSaveAs && bResetFileWatching) {
 				iFileWatchingMode = 0;
 			}
-			InstallFileWatching(szCurFile);
+			InstallFileWatching(FALSE);
 		}
 	} else if (!status.bCancelDataLoss) {
 		if (StrNotEmpty(szCurFile) != 0) {
@@ -8326,33 +8326,27 @@ void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) {
 // InstallFileWatching()
 //
 //
-void InstallFileWatching(LPCWSTR lpszFile) {
+void InstallFileWatching(BOOL terminate) {
+	terminate = terminate || !iFileWatchingMode || StrIsEmpty(szCurFile);
 	// Terminate
-	if (!iFileWatchingMode || StrIsEmpty(lpszFile)) {
-		if (bRunningWatch) {
-			if (hChangeHandle) {
-				FindCloseChangeNotification(hChangeHandle);
-				hChangeHandle = NULL;
-			}
+	if (bRunningWatch) {
+		if (hChangeHandle) {
+			FindCloseChangeNotification(hChangeHandle);
+			hChangeHandle = NULL;
+		}
+		if (terminate) {
 			KillTimer(NULL, ID_WATCHTIMER);
-			bRunningWatch = FALSE;
-			dwChangeNotifyTime = 0;
 		}
-	} else { // Install
-		// Terminate previous watching
-		if (bRunningWatch) {
-			if (hChangeHandle) {
-				FindCloseChangeNotification(hChangeHandle);
-				hChangeHandle = NULL;
-			}
-			dwChangeNotifyTime = 0;
-		} else {
-			// No previous watching installed, so launch the timer first
-			SetTimer(NULL, ID_WATCHTIMER, dwFileCheckInterval, WatchTimerProc);
-		}
+	}
+
+	bRunningWatch = !terminate;
+	dwChangeNotifyTime = 0;
+	if (!terminate) {
+		// Install
+		SetTimer(NULL, ID_WATCHTIMER, dwFileCheckInterval, WatchTimerProc);
 
 		WCHAR tchDirectory[MAX_PATH];
-		lstrcpy(tchDirectory, lpszFile);
+		lstrcpy(tchDirectory, szCurFile);
 		PathRemoveFileSpec(tchDirectory);
 
 		// Save data of current file
@@ -8366,9 +8360,6 @@ void InstallFileWatching(LPCWSTR lpszFile) {
 						FILE_NOTIFY_CHANGE_ATTRIBUTES	| \
 						FILE_NOTIFY_CHANGE_SIZE			| \
 						FILE_NOTIFY_CHANGE_LAST_WRITE);
-
-		bRunningWatch = TRUE;
-		dwChangeNotifyTime = 0;
 	}
 }
 
