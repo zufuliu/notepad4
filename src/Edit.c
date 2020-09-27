@@ -96,8 +96,6 @@ static HMODULE hELSCoreDLL = NULL;
 
 typedef struct EditMarkAllStatus {
 	volatile LONG token;
-	volatile LONG done;
-	CRITICAL_SECTION criticalSection;
 	int findFlag;
 	Sci_Position iSelCount;
 	LPSTR pszText;
@@ -109,10 +107,6 @@ void Edit_ReleaseResources(void) {
 	DStringW_Free(&wchAppendSelection);
 	DStringW_Free(&wchPrefixLines);
 	DStringW_Free(&wchAppendLines);
-	if (editMarkAllStatus.done) {
-		EditMarkAll_Clear();
-		DeleteCriticalSection(&editMarkAllStatus.criticalSection);
-	}
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	if (hELSCoreDLL != NULL) {
 		FreeLibrary(hELSCoreDLL);
@@ -5582,35 +5576,22 @@ LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
 	}
-	if (!editMarkAllStatus.done) {
-		return token;
-	}
 
-	EnterCriticalSection(&editMarkAllStatus.criticalSection);
 	if (editMarkAllStatus.pszText) {
 		LocalFree(editMarkAllStatus.pszText);
 	}
 	editMarkAllStatus.findFlag = findFlag;
 	editMarkAllStatus.iSelCount= iSelCount;
 	editMarkAllStatus.pszText = pszText ? StrDupA(pszText) : NULL;
-	LeaveCriticalSection(&editMarkAllStatus.criticalSection);
 	return token;
 }
 
 void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
-	if (InterlockedCompareExchange(&editMarkAllStatus.done, 1, 0) == 0) {
-		InitializeCriticalSection(&editMarkAllStatus.criticalSection);
-	}
-	if (!bChanged) {
-		EnterCriticalSection(&editMarkAllStatus.criticalSection);
-		bChanged = findFlag != editMarkAllStatus.findFlag
-			|| iSelCount != editMarkAllStatus.iSelCount
-			// _stricmp() is not safe for DBCS string.
-			|| memcmp(pszText, editMarkAllStatus.pszText, iSelCount) != 0;
-		LeaveCriticalSection(&editMarkAllStatus.criticalSection);
-		if (!bChanged) {
-			return;
-		}
+	if (!bChanged && (findFlag == editMarkAllStatus.findFlag
+		&& iSelCount == editMarkAllStatus.iSelCount
+		// _stricmp() is not safe for DBCS string.
+		&& memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0)) {
+		return;
 	}
 
 	const LONG token = EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
@@ -5618,7 +5599,7 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 
 	Sci_Position matchCount = 0;
 	UINT index = 0;
-	Sci_Position posList[256*2];
+	Sci_Position ranges[256*2];
 
 	BOOL done = FALSE;
 	HANDLE timer = WaitableTimer_Create();
@@ -5626,36 +5607,34 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 		WaitableTimer_Set(timer, WaitableTimer_DefaultTimeSlot);
 		while (WaitableTimer_Continue(timer)) {
 			const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
-			if (iPos == -1 || token != editMarkAllStatus.token) {
+			if (iPos == -1) {
 				done = TRUE;
 				break;
 			}
+
 			++matchCount;
-			if (index == COUNTOF(posList)) {
+			if (index == COUNTOF(ranges)) {
 				iMatchesCount = matchCount;
 				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 				for (UINT i = 0; i < index; i += 2) {
-					SciCall_IndicatorFillRange(posList[i], posList[i + 1]);
+					SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
 				}
 				index = 0;
 			}
-			posList[index] = ttf.chrgText.cpMin;
-			posList[index + 1] = ttf.chrgText.cpMax - ttf.chrgText.cpMin;
+			ranges[index] = iPos;
+			ranges[index + 1] = ttf.chrgText.cpMax - iPos;
 			ttf.chrg.cpMin = ttf.chrgText.cpMax;
 			index += 2;
 		}
-		if (token == editMarkAllStatus.token) {
-			iMatchesCount = matchCount;
-			if (index) {
-				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-				for (UINT i = 0; i < index; i += 2) {
-					SciCall_IndicatorFillRange(posList[i], posList[i + 1]);
-				}
+
+		iMatchesCount = matchCount;
+		if (index) {
+			SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+			for (UINT i = 0; i < index; i += 2) {
+				SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
 			}
-			UpdateStatusbar();
-		} else {
-			done = TRUE;
 		}
+		UpdateStatusbar();
 		if (!done) {
 			WaitableTimer_Delay(timer, WaitableTimer_DefaultDelayTime);
 			done = token != editMarkAllStatus.token;
