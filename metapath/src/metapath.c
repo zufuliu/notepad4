@@ -313,17 +313,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		return FALSE;
 	}
 
-	HWND hwnd;
-	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
-		CleanUpResources(TRUE);
-		return FALSE;
-	}
-
+	InitInstance(hInstance, nShowCmd);
 	HACCEL hAcc = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	MSG msg;
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
-		if (!TranslateAccelerator(hwnd, hAcc, &msg)) {
+		if (!TranslateAccelerator(hwndMain, hAcc, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -361,7 +356,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //  InitInstance()
 //
 //
-HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
+void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
@@ -470,8 +465,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (!ListView_GetItemCount(hwndDirList)) {
 		PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
 	}
-
-	return hwndMain;
 }
 
 //=============================================================================
