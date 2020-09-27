@@ -5779,8 +5779,8 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	// Show wait cursor...
 	BeginWaitCursor();
 
+	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	const BOOL bRegexStartOrEndOfLine = bReplaceRE ? EditCheckEmptyRegex(szFind2) : 0;
-	const BOOL bRegexStartOfLine = bRegexStartOrEndOfLine & EditEmptyRegex_StartOfLine;
 
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
@@ -5859,8 +5859,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	// Show wait cursor...
 	BeginWaitCursor();
 
+	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	const BOOL bRegexStartOrEndOfLine = bReplaceRE ? EditCheckEmptyRegex(szFind2) : 0;
-	const BOOL bRegexStartOfLine = bRegexStartOrEndOfLine & EditEmptyRegex_StartOfLine;
 
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
