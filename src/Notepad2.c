@@ -604,12 +604,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		return FALSE;
 	}
 
-	HWND hwnd;
-	if ((hwnd = InitInstance(hInstance, nShowCmd)) == NULL) {
-		CleanUpResources(TRUE);
-		return FALSE;
-	}
-
+	InitInstance(hInstance, nShowCmd);
 	HACCEL hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	HACCEL hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 	MSG msg;
@@ -621,7 +616,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 			}
 		}
 
-		if (!TranslateAccelerator(hwnd, hAccMain, &msg)) {
+		if (!TranslateAccelerator(hwndMain, hAccMain, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -659,7 +654,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 // InitInstance()
 //
 //
-HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
+void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
@@ -955,7 +950,6 @@ HWND InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "InitInstance() time");
 #endif
-	return hwndMain;
 }
 
 static inline void NP2MinimizeWind(HWND hwnd) {
