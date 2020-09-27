@@ -58,6 +58,8 @@ HWND	hwndMain;
 static HWND hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
 static BOOL bInitDone = FALSE;
+static HACCEL hAccMain;
+static HACCEL hAccFindReplace;
 
 // tab width for notification text
 #define TAB_WIDTH_NOTIFICATION		8
@@ -455,6 +457,28 @@ static void CleanUpResources(BOOL initialized) {
 	OleUninitialize();
 }
 
+static void DispatchMessageMain(MSG *msg) {
+	if (IsWindow(hDlgFindReplace) && (msg->hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg->hwnd))) {
+		if (TranslateAccelerator(hDlgFindReplace, hAccFindReplace, msg) || IsDialogMessage(hDlgFindReplace, msg)) {
+			return;
+		}
+	}
+
+	if (!TranslateAccelerator(hwndMain, hAccMain, msg)) {
+		TranslateMessage(msg);
+		DispatchMessage(msg);
+	}
+}
+
+void Handle_WaitMain(HANDLE handle) {
+	while (WaitForSingleObject(handle, 0) != WAIT_OBJECT_0) {
+		MSG msg;
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			DispatchMessageMain(&msg);
+		}
+	}
+}
+
 BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) {
 	if (dwCtrlType == CTRL_C_EVENT) {
 		SendWMCommand(hwndMain, IDM_FILE_EXIT);
@@ -605,21 +629,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	InitInstance(hInstance, nShowCmd);
-	HACCEL hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
-	HACCEL hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
+	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
+	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 	MSG msg;
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
-		if (IsWindow(hDlgFindReplace) && (msg.hwnd == hDlgFindReplace || IsChild(hDlgFindReplace, msg.hwnd))) {
-			if (TranslateAccelerator(hDlgFindReplace, hAccFindReplace, &msg) || IsDialogMessage(hDlgFindReplace, &msg)) {
-				continue;
-			}
-		}
-
-		if (!TranslateAccelerator(hwndMain, hAccMain, &msg)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+		DispatchMessageMain(&msg);
 	}
 
 	CleanUpResources(TRUE);

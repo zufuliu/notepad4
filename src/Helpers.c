@@ -454,18 +454,6 @@ void Handle_Wait(HANDLE handle) {
 	}
 }
 
-HANDLE WaitableTimer_New(DWORD milliseconds) {
-	HANDLE timer = WaitableTimer_Create();
-	WaitableTimer_Set(timer, milliseconds);
-	return timer;
-}
-
-void WaitableTimer_DelayOnce(DWORD milliseconds) {
-	HANDLE timer = WaitableTimer_New(milliseconds);
-	Handle_Wait(timer);
-	WaitableTimer_Destroy(timer);
-}
-
 void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
 	worker->hwnd = hwnd;
 	worker->eventCancel = CreateEvent(NULL, TRUE, FALSE, NULL);

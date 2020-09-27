@@ -5636,7 +5636,7 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 		}
 		UpdateStatusbar();
 		if (!done) {
-			WaitableTimer_Delay(timer, WaitableTimer_DefaultDelayTime);
+			WaitableTimer_DelayMain(timer, WaitableTimer_DefaultDelayTime);
 			done = token != editMarkAllStatus.token;
 		}
 	}
