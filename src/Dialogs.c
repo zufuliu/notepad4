@@ -935,28 +935,20 @@ extern BOOL bSaveRecentFiles;
 extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
 
-typedef struct ICONTHREADINFO {
-	HWND hwnd;					// HWND of ListView Control
-	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
-	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
-	HANDLE hFileMRUIconThread;
-} ICONTHREADINFO, *LPICONTHREADINFO;
-
 static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
+	BackgroundWorker *worker = (BackgroundWorker *)lpParam;
+
 	WCHAR tch[MAX_PATH] = L"";
 	DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
 
-	LPICONTHREADINFO lpit = (LPICONTHREADINFO)lpParam;
-	ResetEvent(lpit->hTerminatedThread);
-
-	HWND hwnd = lpit->hwnd;
+	HWND hwnd = worker->hwnd;
 	const int iMaxItem = ListView_GetItemCount(hwnd);
 	int iItem = 0;
 
 	LV_ITEM lvi;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
 
-	while (iItem < iMaxItem && WaitForSingleObject(lpit->hExitThread, 0) != WAIT_OBJECT_0) {
+	while (iItem < iMaxItem && BackgroundWorker_Continue(worker)) {
 		lvi.mask = LVIF_TEXT;
 		lvi.pszText = tch;
 		lvi.cchTextMax = COUNTOF(tch);
@@ -1011,8 +1003,7 @@ static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 		iItem++;
 	}
 
-	SetEvent(lpit->hTerminatedThread);
-	ExitThread(0);
+	return 0;
 }
 
 static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
@@ -1023,11 +1014,9 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 		InitWindowCommon(hwndLV);
 
-		LPICONTHREADINFO lpit = (LPICONTHREADINFO)GlobalAlloc(GPTR, sizeof(ICONTHREADINFO));
-		SetProp(hwnd, L"it", (HANDLE)lpit);
-		lpit->hwnd = hwndLV;
-		lpit->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
-		lpit->hTerminatedThread = CreateEvent(NULL, TRUE, TRUE, NULL);
+		BackgroundWorker *worker = (BackgroundWorker *)GlobalAlloc(GPTR, sizeof(BackgroundWorker));
+		SetProp(hwnd, L"it", (HANDLE)worker);
+		BackgroundWorker_Init(worker, hwndLV);
 
 		ResizeDlg_Init(hwnd, cxFileMRUDlg, cyFileMRUDlg, IDC_RESIZEGRIP);
 
@@ -1061,21 +1050,10 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	return TRUE;
 
 	case WM_DESTROY: {
-		LPICONTHREADINFO lpit = (LPICONTHREADINFO)GetProp(hwnd, L"it");
-		SetEvent(lpit->hExitThread);
-		while (WaitForSingleObject(lpit->hTerminatedThread, 0) != WAIT_OBJECT_0) {
-			MSG msg;
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-
-		CloseHandle(lpit->hExitThread);
-		CloseHandle(lpit->hTerminatedThread);
-		CloseHandle(lpit->hFileMRUIconThread);
+		BackgroundWorker *worker = (BackgroundWorker *)GetProp(hwnd, L"it");
+		BackgroundWorker_Destroy(worker);
 		RemoveProp(hwnd, L"it");
-		GlobalFree(lpit);
+		GlobalFree(worker);
 
 		bSaveRecentFiles = IsButtonChecked(hwnd, IDC_SAVEMRU);
 
@@ -1194,18 +1172,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_FILEMRU_UPDATE_VIEW: {
-			LPICONTHREADINFO lpit = (LPICONTHREADINFO)GetProp(hwnd, L"it");
-
-			SetEvent(lpit->hExitThread);
-			while (WaitForSingleObject(lpit->hTerminatedThread, 0) != WAIT_OBJECT_0) {
-				MSG msg;
-				if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-			}
-			ResetEvent(lpit->hExitThread);
-			SetEvent(lpit->hTerminatedThread);
+			BackgroundWorker *worker = (BackgroundWorker *)GetProp(hwnd, L"it");
+			BackgroundWorker_Cancel(worker);
 
 			HWND hwndLV = GetDlgItem(hwnd, IDC_FILEMRU);
 			ListView_DeleteAllItems(hwndLV);
@@ -1231,8 +1199,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			ListView_SetColumnWidth(hwndLV, 0, LVSCW_AUTOSIZE_USEHEADER);
 
-			DWORD dwtid;
-			lpit->hFileMRUIconThread = CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)lpit, 0, &dwtid);
+			worker->workerThread = CreateThread(NULL, 0, FileMRUIconThread, (LPVOID)worker, 0, NULL);
 		}
 		break;
 

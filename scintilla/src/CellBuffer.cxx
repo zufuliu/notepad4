@@ -106,7 +106,7 @@ public:
 	virtual ~LineStartIndex() = default;
 	bool Allocate(Sci::Line lines) {
 		refCount++;
-		Sci::Position length = starts.PositionFromPartition(starts.Partitions());
+		Sci::Position length = starts.Length();
 		for (Sci::Line line = starts.Partitions(); line < lines; line++) {
 			// Produce an ascending sequence that will be filled in with correct widths later
 			length++;
@@ -734,6 +734,19 @@ void CellBuffer::Allocate(Sci::Position newSize) {
 	if (hasStyles) {
 		style.ReAllocate(newSize);
 	}
+}
+
+bool CellBuffer::EnsureStyleBuffer(bool hasStyles_) {
+	if (hasStyles != hasStyles_) {
+		hasStyles = hasStyles_;
+		if (hasStyles_) {
+			style.InsertValue(0, substance.Length(), 0);
+		} else {
+			style.DeleteAll();
+		}
+		return true;
+	}
+	return false;
 }
 
 void CellBuffer::SetUTF8Substance(bool utf8Substance_) noexcept {

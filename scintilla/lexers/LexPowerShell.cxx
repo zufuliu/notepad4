@@ -130,11 +130,9 @@ static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, 
 // level store to make it easy to pick up with each increment
 // and to make it possible to fiddle the current level for "} else {".
 static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
@@ -169,16 +167,12 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 				levelNext--;
 			}
 		}
-		if (!isspacechar(ch))
-			visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			if (foldAtElse) {
 				levelUse = levelMinCurrent;
 			}
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
@@ -187,7 +181,6 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 			lineCurrent++;
 			levelCurrent = levelNext;
 			levelMinCurrent = levelCurrent;
-			visibleChars = 0;
 		}
 	}
 }

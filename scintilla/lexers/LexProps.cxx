@@ -133,7 +133,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 #if ENABLE_FOLD_PROPS_COMMENT
 void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_Position endPos = startPos + lengthDoc;
 	const Sci_Position maxLines = (endPos == styler.Length()) ? styler.GetLine(endPos) : styler.GetLine(endPos - 1);	// Requested last line

@@ -84,31 +84,49 @@ int LexInterface::LineEndTypesSupported() const noexcept {
 	return 0;
 }
 
-ActionDuration::ActionDuration(double duration_, double minDuration_, double maxDuration_) noexcept :
-	duration(duration_), minDuration(minDuration_), maxDuration(maxDuration_) {
-}
-
-void ActionDuration::AddSample(size_t numberActions, double durationOfActions) noexcept {
+void ActionDuration::AddSample(Sci::Line numberActions, double durationOfActions) noexcept {
 	// Only adjust for multiple actions to avoid instability
-	if (numberActions < 8)
+#if ActionDuration_MeasureTimeByBytes
+	if (numberActions < ActionDuration_MeasureTimeByBytes) {
 		return;
+	}
+#else
+	if (numberActions < 8) {
+		return;
+	}
+#endif
 
 	// Alpha value for exponential smoothing.
 	// Most recent value contributes 25% to smoothed value.
 	constexpr double alpha = 0.25;
 
+#if ActionDuration_MeasureTimeByBytes
+	const double durationOne = (ActionDuration_MeasureTimeByBytes * durationOfActions) / numberActions;
+#else
 	const double durationOne = durationOfActions / numberActions;
-	duration = std::clamp(alpha * durationOne + (1.0 - alpha) * duration,
-		minDuration, maxDuration);
+#endif
+	const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
+	//duration = std::clamp(duration_, minDuration, maxDuration);
+	duration = std::max(duration_, minDuration);
+	//printf("%s actions=%.9f / %zd, one=%.9f, value=%.9f, [%.9f, %f, %f]\n", __func__,
+	//	durationOfActions, numberActions, durationOne, duration_, duration, minDuration, maxDuration);
 }
 
 double ActionDuration::Duration() const noexcept {
 	return duration;
 }
 
+Sci::Line ActionDuration::ActionsInAllowedTime(double secondsAllowed) const noexcept {
+	const Sci::Line actions = std::clamp<Sci::Line>(static_cast<Sci::Line>(secondsAllowed / duration), 8, 0x10000);
+#if ActionDuration_MeasureTimeByBytes
+	return actions * ActionDuration_MeasureTimeByBytes;
+#else
+	return actions;
+#endif
+}
+
 Document::Document(int options) :
-	cb((options & SC_DOCUMENTOPTION_STYLES_NONE) == 0, (options & SC_DOCUMENTOPTION_TEXT_LARGE) != 0),
-	durationStyleOneLine(0.00001, 0.000001, 0.0001) {
+	cb((options & SC_DOCUMENTOPTION_STYLES_NONE) == 0, (options & SC_DOCUMENTOPTION_TEXT_LARGE) != 0) {
 	refCount = 0;
 #ifdef _WIN32
 	eolMode = SC_EOL_CRLF;
@@ -483,6 +501,17 @@ Sci::Position Document::IndexLineStart(Sci::Line line, int lineCharacterIndex) c
 Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const noexcept {
 	return cb.LineFromPositionIndex(pos, lineCharacterIndex);
 }
+
+#if ActionDuration_MeasureTimeByBytes
+Sci::Line Document::LineFromPositionAfter(Sci::Line line, Sci::Position length) const noexcept {
+	const Sci::Position pos = LineStart(line) + length;
+	if (pos >= Length()) {
+		return LinesTotal();
+	}
+	const Sci::Line lineLast = SciLineFromPosition(pos);
+	return lineLast + (!!(line == lineLast));
+}
+#endif
 
 int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
 	const int prev = Levels()->SetLevel(line, level, LinesTotal());
@@ -1552,8 +1581,8 @@ void Document::CountCharactersAndColumns(Sci_TextToFind *ft) const noexcept {
 		count++;
 	}
 
-	ft->chrgText.cpMin = static_cast<Sci_PositionCR>(count);
-	ft->chrgText.cpMax = static_cast<Sci_PositionCR>(column);
+	ft->chrgText.cpMin = count;
+	ft->chrgText.cpMax = column;
 }
 
 Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept {
@@ -2240,10 +2269,18 @@ void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
 	ElapsedPeriod epStyling;
 	EnsureStyledTo(pos);
 	const Sci::Line lineLast = SciLineFromPosition(GetEndStyled());
-	durationStyleOneLine.AddSample(lineLast - lineFirst, epStyling.Duration());
+#if ActionDuration_MeasureTimeByBytes
+	const Sci::Line actions = LineStart(lineLast) - LineStart(lineFirst);
+#else
+	const Sci::Line actions = lineLast - lineFirst;
+#endif
+	durationStyleOneLine.AddSample(actions, epStyling.Duration());
 }
 
-void Document::LexerChanged() {
+void Document::LexerChanged(bool hasStyles_) {
+	if (cb.EnsureStyleBuffer(hasStyles_)) {
+		endStyled = 0;
+	}
 	// Tell the watchers the lexer has changed.
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifyLexerChanged(this, watcher.userData);
@@ -2334,10 +2371,12 @@ void Document::AnnotationSetText(Sci::Line line, const char *text) {
 }
 
 void Document::AnnotationSetStyle(Sci::Line line, int style) {
-	Annotations()->SetStyle(line, style);
-	const DocModification mh(SC_MOD_CHANGEANNOTATION, LineStart(line),
-		0, 0, nullptr, line);
-	NotifyModified(mh);
+	if (line >= 0 && line < LinesTotal()) {
+		Annotations()->SetStyle(line, style);
+		const DocModification mh(SC_MOD_CHANGEANNOTATION, LineStart(line),
+			0, 0, nullptr, line);
+		NotifyModified(mh);
+	}
 }
 
 void Document::AnnotationSetStyles(Sci::Line line, const unsigned char *styles) {
@@ -2375,10 +2414,12 @@ void Document::EOLAnnotationSetText(Sci::Line line, const char *text) {
 }
 
 void Document::EOLAnnotationSetStyle(Sci::Line line, int style) {
-	EOLAnnotations()->SetStyle(line, style);
-	const DocModification mh(SC_MOD_CHANGEEOLANNOTATION, LineStart(line),
-		0, 0, nullptr, line);
-	NotifyModified(mh);
+	if (line >= 0 && line < LinesTotal()) {
+		EOLAnnotations()->SetStyle(line, style);
+		const DocModification mh(SC_MOD_CHANGEEOLANNOTATION, LineStart(line),
+			0, 0, nullptr, line);
+		NotifyModified(mh);
+	}
 }
 
 void Document::EOLAnnotationClearAll() {

@@ -572,6 +572,45 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
 
+void Handle_Wait(HANDLE handle);
+void Handle_WaitMain(HANDLE handle);
+#define WaitableTimer_DefaultTimeSlot		100
+#define WaitableTimer_DefaultDelayTime		50
+#define WaitableTimer_Create()				CreateWaitableTimer(NULL, FALSE, NULL)
+#define WaitableTimer_Destroy(timer)		CloseHandle(timer)
+NP2_inline void WaitableTimer_Set(HANDLE timer, DWORD milliseconds) {
+	LARGE_INTEGER dueTime;
+	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds; // convert to 100ns
+	SetWaitableTimer(timer, &dueTime, 0, NULL, NULL, FALSE);
+}
+NP2_inline HANDLE WaitableTimer_New(DWORD milliseconds) {
+	HANDLE timer = WaitableTimer_Create();
+	WaitableTimer_Set(timer, milliseconds);
+	return timer;
+}
+NP2_inline void WaitableTimer_Delay(HANDLE timer, DWORD milliseconds) {
+	WaitableTimer_Set(timer, milliseconds);
+	Handle_Wait(timer);
+}
+NP2_inline void WaitableTimer_DelayMain(HANDLE timer, DWORD milliseconds) {
+	WaitableTimer_Set(timer, milliseconds);
+	Handle_WaitMain(timer);
+}
+#define WaitableTimer_Continue(timer)	\
+	(WaitForSingleObject((timer), 0) != WAIT_OBJECT_0)
+
+typedef struct BackgroundWorker {
+	HWND hwnd;
+	HANDLE eventCancel;
+	HANDLE workerThread;
+} BackgroundWorker;
+
+void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd);
+void BackgroundWorker_Cancel(BackgroundWorker *worker);
+void BackgroundWorker_Destroy(BackgroundWorker *worker);
+#define BackgroundWorker_Continue(worker)	\
+	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
+
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 

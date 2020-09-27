@@ -1656,15 +1656,13 @@ static bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_RB_COMMENTLINE)
 
 static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const WordList &kwFold = *keywordLists[1];
 
 	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
 		false);
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = startPos == 0 ? 0 : (styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK & ~SC_FOLDLEVELBASE);
 	int levelCurrent = levelPrev;
@@ -1682,10 +1680,7 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 		/*Mutiline comment patch*/
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (style == SCE_RB_COMMENTLINE) {
 			if (foldComment && stylePrev != SCE_RB_COMMENTLINE) {
@@ -1731,17 +1726,13 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 		if (atEOL || (i == endPos - 1)) {
 			int lev = levelPrev;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if ((levelCurrent > levelPrev) && (visibleChars > 0))
+			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			styler.SetLevel(lineCurrent, lev | SC_FOLDLEVELBASE);
 			lineCurrent++;
 			levelPrev = levelCurrent;
-			visibleChars = 0;
 			buffer_ends_with_eol = true;
 		} else if (!isspacechar(ch)) {
-			visibleChars++;
 			buffer_ends_with_eol = false;
 		}
 		stylePrev = style;
@@ -1750,9 +1741,7 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	if (!buffer_ends_with_eol) {
 		lineCurrent++;
 		int new_lev = levelCurrent;
-		if (visibleChars == 0 && foldCompact)
-			new_lev |= SC_FOLDLEVELWHITEFLAG;
-		if ((levelCurrent > levelPrev) && (visibleChars > 0))
+		if ((levelCurrent > levelPrev))
 			new_lev |= SC_FOLDLEVELHEADERFLAG;
 		levelCurrent = new_lev;
 	}

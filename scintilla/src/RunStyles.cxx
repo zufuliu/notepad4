@@ -89,7 +89,7 @@ RunStyles<DISTANCE, STYLE>::~RunStyles() = default;
 
 template <typename DISTANCE, typename STYLE>
 DISTANCE RunStyles<DISTANCE, STYLE>::Length() const noexcept {
-	return starts->PositionFromPartition(starts->Partitions());
+	return starts->Length();
 }
 
 template <typename DISTANCE, typename STYLE>

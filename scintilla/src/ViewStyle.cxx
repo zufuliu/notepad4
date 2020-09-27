@@ -10,6 +10,7 @@
 #include <cstring>
 
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <vector>
 #include <map>
@@ -515,6 +516,17 @@ ColourDesired ViewStyle::WrapColour() const noexcept {
 		return whitespaceColours.fore;
 	else
 		return styles[STYLE_DEFAULT].fore;
+}
+
+// Insert new edge in sorted order.
+void ViewStyle::AddMultiEdge(uptr_t wParam, sptr_t lParam) {
+	const int column = static_cast<int>(wParam);
+	theMultiEdge.insert(
+		std::upper_bound(theMultiEdge.begin(), theMultiEdge.end(), column,
+		[](const EdgeProperties &a, const EdgeProperties &b) noexcept {
+			return a.column < b.column;
+		}),
+		EdgeProperties(column, lParam));
 }
 
 bool ViewStyle::SetWrapState(int wrapState_) noexcept {

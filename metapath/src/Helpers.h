@@ -342,6 +342,18 @@ NP2_inline void EndWaitCursor(void) {
 	DestroyCursor(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 }
 
+typedef struct BackgroundWorker {
+	HWND hwnd;
+	HANDLE eventCancel;
+	HANDLE workerThread;
+} BackgroundWorker;
+
+void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd);
+void BackgroundWorker_Cancel(BackgroundWorker *worker);
+void BackgroundWorker_Destroy(BackgroundWorker *worker);
+#define BackgroundWorker_Continue(worker)	\
+	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
+
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 BOOL IsElevated(void);
 BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);

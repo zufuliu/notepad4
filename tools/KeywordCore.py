@@ -140,6 +140,21 @@ def read_api_file(path, comment):
 		sections.append((key, doc))
 	return sections
 
+def to_lower(items):
+	return [item.lower() for item in items]
+
+def has_upper_char(s):
+	return any(ch.isupper() for ch in s)
+
+def to_upper_conditional(items):
+	result = []
+	for item in items:
+		if has_upper_char(item):
+			result.append(item)
+		else:
+			result.append(item.upper())
+	return result
+
 
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
@@ -673,6 +688,51 @@ def parse_rust_api_file(path):
 		('macro', keywordMap['macros'], KeywordAttr.NoLexer),
 		('module', keywordMap['modules'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
+def parse_sql_api_files(path_list):
+	keywordMap = {}
+	for path in path_list:
+		sections = read_api_file(path, '--')
+		for key, doc in sections:
+			items = []
+			min_len = 2
+			if key in ('keywords', 'data types'):
+				items = re.findall(r'\w+', doc)
+			elif key == 'functions':
+				items = re.findall(r'\w+\(', doc)
+				min_len = 3
+			else:
+				raise ValueError('unknown key:', key)
+			items = [item for item in items if len(item) >= min_len]
+			items = to_upper_conditional(items)
+			keywordMap.setdefault(key, set()).update(items)
+
+	upper_keywords = keywordMap['keywords']
+	upper_types = keywordMap['data types']
+	upper_functions = keywordMap['functions']
+	upper_types -= set(['CURSOR', 'SET', 'TABLE'])
+	upper_keywords -= upper_types
+	upper_keywords.add('END-EXEC')
+
+	keywords = set(to_lower(upper_keywords))
+	types = set(to_lower(upper_types))
+	functions = set(to_lower(upper_functions))
+	keywords -= types
+
+	ignores = set(item for item in functions if item[:-1] in keywords or item[:-1] in types)
+	functions -= ignores
+	upper_functions |= ignores
+
+	keywordList = [
+		('keywords', keywords, KeywordAttr.Default),
+		('data types', types, KeywordAttr.Default),
+		('functions', functions, KeywordAttr.Default),
+
+		('upper case keywords', upper_keywords, KeywordAttr.NoLexer),
+		('upper case data types', upper_types, KeywordAttr.NoLexer),
+		('upper case functions', upper_functions, KeywordAttr.NoLexer),
 	]
 	return keywordList
 

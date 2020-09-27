@@ -76,18 +76,17 @@
 #define IDP_POPUP_SUBMENU_TRAY	4
 
 //==== Statusbar ==============================================================
-#define ID_FILEINFO   0
-#define ID_MENUHELP (255 | SBT_NOBORDERS)
+#define ID_FILEINFO		0
+#define ID_MENUHELP		(255 | SBT_NOBORDERS)
 
 //==== Timer for Change Notifications =========================================
-#define ID_TIMER 0xA000
+#define ID_TIMER		0xA000
 
 /**
  * App message used to center MessageBox to the window of the program.
  */
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
-//==== Callback Message from System Tray ======================================
-#define APPM_TRAYMESSAGE			(WM_APP + 4)
+#define APPM_TRAYMESSAGE			(WM_APP + 4) // Callback Message from System Tray
 
 #define INI_SECTION_NAME_METAPATH			L"metapath"
 #define INI_SECTION_NAME_SETTINGS			L"Settings"
@@ -108,7 +107,7 @@
 
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
-HWND InitInstance(HINSTANCE hInstance, int nCmdShow);
+void InitInstance(HINSTANCE hInstance, int nCmdShow);
 BOOL ActivatePrevInst(void);
 void GetRelaunchParameters(LPWSTR szParameters);
 void ShowNotifyIcon(HWND hwnd, BOOL bAdd);

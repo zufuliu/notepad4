@@ -381,7 +381,7 @@ class ScintillaWin :
 	SetCoalescableTimerSig SetCoalescableTimerFn;
 #endif
 
-	unsigned int linesPerScroll;	///< Intellimouse support
+	UINT linesPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
 
 	UINT dpi;
@@ -1689,7 +1689,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
 		if (std::abs(wheelDelta) >= WHEEL_DELTA && linesPerScroll > 0) {
 			Sci::Line linesToScroll = linesPerScroll;
-			if (linesToScroll == WHEEL_PAGESCROLL) {
+			if (linesPerScroll == WHEEL_PAGESCROLL) {
 				linesToScroll = LinesOnScreen() - 1;
 			}
 			linesToScroll = std::max<Sci::Line>(linesToScroll, 1);
@@ -2078,7 +2078,7 @@ sptr_t ScintillaWin::SciMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 			(wParam == SC_TECHNOLOGY_DIRECTWRITE)) {
 			const int technologyNew = static_cast<int>(wParam);
 			if (technology != technologyNew) {
-				if (technologyNew > SC_TECHNOLOGY_DEFAULT) {
+				if (technologyNew != SC_TECHNOLOGY_DEFAULT) {
 #if defined(USE_D2D)
 					if (!LoadD2D())
 						// Failed to load Direct2D or DirectWrite so no effect
@@ -2091,8 +2091,8 @@ sptr_t ScintillaWin::SciMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 				}
 #if defined(USE_D2D)
 				DropRenderTarget();
-#endif
 				view.bufferedDraw = technologyNew == SC_TECHNOLOGY_DEFAULT;
+#endif
 				technology = technologyNew;
 				// Invalidate all cached information including layout.
 				vs.fontsValid = false;

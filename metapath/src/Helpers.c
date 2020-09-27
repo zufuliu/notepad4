@@ -82,10 +82,9 @@ BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection) {
 			node->key = p;
 			node->value = v;
 			++count;
-			p = StrEnd(v) + 1;
-		} else {
-			p = StrDup(p) + 1;
+			p = v;
 		}
+		p = StrEnd(p) + 1;
 	} while (*p && count < capacity);
 
 	section->count = count;
@@ -112,10 +111,9 @@ BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 			node->key = p;
 			node->value = v;
 			++count;
-			p = StrEnd(v) + 1;
-		} else {
-			p = StrEnd(p) + 1;
+			p = v;
 		}
+		p = StrEnd(p) + 1;
 	} while (*p && count < capacity);
 
 	if (count == 0) {
@@ -328,6 +326,41 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 
 	HBITMAP hbmp = (HBITMAP)LoadImage(NULL, szTmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	return hbmp;
+}
+
+void Handle_Wait(HANDLE handle) {
+	while (WaitForSingleObject(handle, 0) != WAIT_OBJECT_0) {
+		MSG msg;
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+}
+
+void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
+	worker->hwnd = hwnd;
+	worker->eventCancel = CreateEvent(NULL, TRUE, FALSE, NULL);
+	worker->workerThread = NULL;
+}
+
+void BackgroundWorker_Cancel(BackgroundWorker *worker) {
+	SetEvent(worker->eventCancel);
+	if (worker->workerThread) {
+		Handle_Wait(worker->workerThread);
+		CloseHandle(worker->workerThread);
+		worker->workerThread = NULL;
+	}
+	ResetEvent(worker->eventCancel);
+}
+
+void BackgroundWorker_Destroy(BackgroundWorker *worker) {
+	SetEvent(worker->eventCancel);
+	if (worker->workerThread) {
+		Handle_Wait(worker->workerThread);
+		CloseHandle(worker->workerThread);
+	}
+	CloseHandle(worker->eventCancel);
 }
 
 //=============================================================================

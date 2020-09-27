@@ -276,9 +276,8 @@ static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) noexcept {
 #define IsVB6Type(line)			IsVBSome(line, 1, styler)
 
 static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
+	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
@@ -314,24 +313,16 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineBegin = (visibleChars == 0) && !atEOL;
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
-
-		if (atEOL && IsDimLine(lineCurrent)) {
-			if (!IsDimLine(lineCurrent - 1) && IsDimLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsDimLine(lineCurrent - 1) && !IsDimLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (atEOL && IsConstLine(lineCurrent)) {
-			if (!IsConstLine(lineCurrent - 1) && IsConstLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsConstLine(lineCurrent - 1) && !IsConstLine(lineCurrent + 1))
-				levelNext--;
+		if (atEOL) {
+			if (foldComment && IsCommentLine(lineCurrent)) {
+				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			}
+			else if (IsDimLine(lineCurrent)) {
+				levelNext += IsDimLine(lineCurrent + 1) - IsDimLine(lineCurrent - 1);
+			}
+			else if (IsConstLine(lineCurrent)) {
+				levelNext += IsConstLine(lineCurrent + 1) - IsConstLine(lineCurrent - 1);
+			}
 		}
 
 		if (style == SCE_B_KEYWORD && stylePrev != SCE_B_KEYWORD
@@ -457,14 +448,12 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				levelNext--;
 		}
 
-		if (!isspacechar(ch))
+		if (visibleChars == 0 && !isspacechar(ch))
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {

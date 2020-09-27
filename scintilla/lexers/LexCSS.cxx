@@ -503,10 +503,8 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
@@ -533,19 +531,14 @@ static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 		}
 		if (atEOL) {
 			int lev = levelPrev;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if ((levelCurrent > levelPrev) && (visibleChars > 0))
+			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
 			levelPrev = levelCurrent;
-			visibleChars = 0;
 		}
-		if (!isspacechar(ch))
-			visibleChars++;
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
 	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;

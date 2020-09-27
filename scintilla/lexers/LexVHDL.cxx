@@ -141,14 +141,12 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &kwFold = *keywordLists[8];
 
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 1) != 0;
 	const bool foldAtBegin = styler.GetPropertyInt("fold.at.Begin", 1) != 0;
 	const bool foldAtParenthese = styler.GetPropertyInt("fold.at.Parenthese", 1) != 0;
 	//const bool foldAtWhen = styler.GetPropertyInt("fold.at.When", 1) != 0; //< fold at when in case statements
 
-	int	 visibleChars = 0;
 	const Sci_PositionU endPos = startPos + length;
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -229,10 +227,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
@@ -357,8 +352,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			}
 		}
 
-		if (!isspacechar(ch))
-			visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
 			if (foldAtElse && (levelMinCurrentElse < levelUse)) {
@@ -368,9 +361,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				levelUse = levelMinCurrentBegin;
 			}
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
@@ -382,7 +372,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			//levelMinCurrent = levelCurrent;
 			levelMinCurrentElse = levelCurrent;
 			levelMinCurrentBegin = levelCurrent;
-			visibleChars = 0;
 		}
 	}
 }

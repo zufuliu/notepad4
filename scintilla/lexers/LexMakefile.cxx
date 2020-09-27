@@ -227,8 +227,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_MAKE_COMMENT)
 
 static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
@@ -250,18 +249,12 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
-
-		if (atEOL && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext++;
-		}
-		if (atEOL && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext--;
+		if (atEOL) {
+		 	if (foldComment && IsCommentLine(lineCurrent)) {
+				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			} else {
+				levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
+			}
 		}
 
 		if (visibleChars == 0 && (ch == '!' || ch == 'i' || ch == 'e' || ch == 'd' || ch == '.')
@@ -284,14 +277,12 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 				levelNext--;
 		}
 
-		if (!isspacechar(ch))
+		if (visibleChars == 0 && !isspacechar(ch))
 			visibleChars++;
 
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {

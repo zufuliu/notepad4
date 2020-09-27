@@ -30,7 +30,7 @@
 //==== DLDATA Structure =======================================================
 
 typedef struct DLDATA { // dl
-	HWND hwnd;					// HWND of ListView Control
+	BackgroundWorker worker;	// where HWND is ListView Control
 	UINT cbidl;					// Size of pidl
 	LPITEMIDLIST pidl;			// Directory Id
 	LPSHELLFOLDER lpsf;			// IShellFolder Interface to pidl
@@ -54,7 +54,7 @@ static const WCHAR *pDirListProp = L"DirListData";
 //
 //  Initializes the DLDATA structure and sets up the listview control
 //
-BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
+void DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 	UNREFERENCED_PARAMETER(pszHeader);
 
 	// Allocate DirListData Property
@@ -62,7 +62,7 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 	SetProp(hwnd, pDirListProp, (HANDLE)lpdl);
 
 	// Setup dl
-	lpdl->hwnd = hwnd;
+	BackgroundWorker_Init(&lpdl->worker, hwnd);
 	lpdl->cbidl = 0;
 	lpdl->pidl = NULL;
 	lpdl->lpsf = NULL;
@@ -85,12 +85,6 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 
 	lpdl->iDefIconFolder = 0;
 	lpdl->iDefIconFile = 0;
-
-	// Icon thread control
-	lpdl->hExitThread = CreateEvent(NULL, TRUE, FALSE, NULL);
-	lpdl->hTerminatedThread = CreateEvent(NULL, TRUE, TRUE, NULL);
-
-	return TRUE;
 }
 
 //=============================================================================
@@ -99,14 +93,10 @@ BOOL DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 //
 //  Free memory used by dl structure
 //
-BOOL DirList_Destroy(HWND hwnd) {
+void DirList_Destroy(HWND hwnd) {
 	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 
-	// Release multithreading objects
-	DirList_TerminateIconThread(hwnd);
-	CloseHandle(lpdl->hExitThread);
-	CloseHandle(lpdl->hTerminatedThread);
-	CloseHandle(lpdl->hIconThread);
+	BackgroundWorker_Destroy(&lpdl->worker);
 
 	if (lpdl->pidl) {
 		CoTaskMemFree((LPVOID)(lpdl->pidl));
@@ -123,8 +113,6 @@ BOOL DirList_Destroy(HWND hwnd) {
 	// Free DirListData Property
 	RemoveProp(hwnd, pDirListProp);
 	GlobalFree(lpdl);
-
-	return FALSE;
 }
 
 //=============================================================================
@@ -133,43 +121,11 @@ BOOL DirList_Destroy(HWND hwnd) {
 //
 //  Start thread to extract file icons in the background
 //
-BOOL DirList_StartIconThread(HWND hwnd) {
+void DirList_StartIconThread(HWND hwnd) {
 	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 
-	DirList_TerminateIconThread(hwnd);
-
-	ResetEvent(lpdl->hExitThread);
-	//ResetEvent(lpdl->hTerminatedThread);
-
-	DWORD dwtid;
-	lpdl->hIconThread = CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, &dwtid);
-
-	return TRUE;
-}
-
-//=============================================================================
-//
-//  DirList_TerminateIconThread()
-//
-//  Terminate Icon Thread and reset multithreading control structures
-//
-BOOL DirList_TerminateIconThread(HWND hwnd) {
-	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
-	SetEvent(lpdl->hExitThread);
-
-	//WaitForSingleObject(lpdl->hTerminatedThread, INFINITE);
-	while (WaitForSingleObject(lpdl->hTerminatedThread, 0) != WAIT_OBJECT_0) {
-		MSG msg;
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
-
-	ResetEvent(lpdl->hExitThread);
-	SetEvent(lpdl->hTerminatedThread);
-
-	return TRUE;
+	BackgroundWorker_Cancel(&lpdl->worker);
+	lpdl->worker.workerThread = CreateThread(NULL, 0, DirList_IconThread, (LPVOID)lpdl, 0, NULL);
 }
 
 //=============================================================================
@@ -190,7 +146,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 	lpdl->iDefIconFile = shfi.iIcon;
 
 	// First of all terminate running icon thread
-	DirList_TerminateIconThread(hwnd);
+	BackgroundWorker_Cancel(&lpdl->worker);
 
 	// A Directory is strongly required
 	if (StrIsEmpty(lpszDir)) {
@@ -349,15 +305,14 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 //
 DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 	LPDLDATA lpdl = (LPDLDATA)lpParam;
-	ResetEvent(lpdl->hTerminatedThread);
+	BackgroundWorker *worker = &lpdl->worker;
 
 	// Exit immediately if DirList_Fill() hasn't been called
 	if (!lpdl->lpsf) {
-		SetEvent(lpdl->hTerminatedThread);
-		ExitThread(0);
+		return 0;
 	}
 
-	HWND hwnd = lpdl->hwnd;
+	HWND hwnd = worker->hwnd;
 	const int iMaxItem = ListView_GetItemCount(hwnd);
 
 	// Get IShellIcon
@@ -369,7 +324,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 #endif
 
 	int iItem = 0;
-	while (iItem < iMaxItem && WaitForSingleObject(lpdl->hExitThread, 0) != WAIT_OBJECT_0) {
+	while (iItem < iMaxItem && BackgroundWorker_Continue(worker)) {
 		LV_ITEM lvi;
 		lvi.iItem = iItem;
 		lvi.mask = LVIF_PARAM;
@@ -444,8 +399,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 #endif
 	}
 
-	SetEvent(lpdl->hTerminatedThread);
-	ExitThread(0);
+	return 0;
 }
 
 //=============================================================================

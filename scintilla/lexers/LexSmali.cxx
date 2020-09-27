@@ -333,11 +333,9 @@ static bool IsAnnotationLine(Sci_Position line, Accessor &styler) noexcept {
 }
 
 static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
@@ -357,10 +355,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
 		if (iswordchar(ch) && style == SCE_SMALI_DIRECTIVE && stylePrev != SCE_SMALI_DIRECTIVE) {
@@ -373,14 +368,9 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 			}
 		}
 
-		if (!isspacechar(ch))
-			visibleChars++;
-
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
@@ -388,7 +378,6 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 			}
 			lineCurrent++;
 			levelCurrent = levelNext;
-			visibleChars = 0;
 		}
 	}
 }

@@ -22,7 +22,7 @@
 
 #define MY_APPNAME					L"Notepad2"
 #define MY_APPNAME_DESCRIPTION		L"Notepad2 Text Editor"
-#define VERSION_FILEVERSION_NUM		VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,VERSION_REV
+#define VERSION_FILEVERSION_NUM		VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD_NUM,VERSION_REV
 #define VERSION_FILEVERSION			STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." \
 									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
 #define VERSION_LEGALCOPYRIGHT_SHORT	L"Copyright \xA9 2004-2020"
@@ -41,7 +41,7 @@
 #define HELP_LINK_FEATURE_REQUEST	L"https://github.com/zufuliu/notepad2/issues"
 #define HELP_LINK_ONLINE_WIKI		L"https://github.com/zufuliu/notepad2/wiki"
 
-#define VERSION_BUILD_INFO_LIB		L",\nScintilla 4.4.4."
+#define VERSION_BUILD_INFO_LIB		L",\nScintilla 4.4.5."
 #define VERSION_BUILD_INFO_FORMAT	L"Compiled on " __DATE__ L" with %s %d.%d.%d" VERSION_BUILD_INFO_LIB
 #if defined(__clang__)
 #define VERSION_BUILD_TOOL_NAME		L"Clang"

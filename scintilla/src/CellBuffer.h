@@ -110,7 +110,7 @@ public:
  */
 class CellBuffer {
 private:
-	const bool hasStyles;
+	bool hasStyles;
 	const bool largeDocument;
 	SplitVector<char> substance;
 	SplitVector<char> style;
@@ -154,6 +154,7 @@ public:
 
 	Sci::Position Length() const noexcept;
 	void Allocate(Sci::Position newSize);
+	bool EnsureStyleBuffer(bool hasStyles_);
 	void SetUTF8Substance(bool utf8Substance_) noexcept;
 	int GetLineEndTypes() const noexcept {
 		return utf8LineEnds;

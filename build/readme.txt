@@ -24,10 +24,11 @@ SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_METAPATH L"-UBSan.log");
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_NOTEPAD2 L"-UBSan.log,print_stacktrace=1");
 SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_METAPATH L"-UBSan.log,print_stacktrace=1");
 
-/wd4201 /wd4204
+/wd4201 /wd4204 /wd4221
 Disabled warnings:
 	C4201: nonstandard extension used: nameless struct/union.
 	C4204: nonstandard extension used: non-constant aggregate initializer.
+	C4221: nonstandard extension used : 'identifier' : cannot be initialized using address of automatic variable.
 
 /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489
 Disabled Code Analysis warnings:

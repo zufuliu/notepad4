@@ -1218,7 +1218,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	//const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
 	const bool hasPreprocessor = HasPreprocessor(lexType);
@@ -1236,6 +1235,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 	bool isObjCProtocol = false;
+	bool lineCommentCurrent = IsCommentLine(lineCurrent);
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -1245,24 +1245,26 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
-			if (!IsStreamCommentStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
-				levelNext--;
+		if (foldComment) {
+			if (lineCommentCurrent) {
+				if (atEOL) {
+					levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+				}
 			}
-		}
-		if (lexType == LEX_D && foldComment && style == SCE_C_DNESTEDCOMMENT) {
-			if (ch == '/' && chNext == '+')
-				levelNext++;
-			else if (ch == '+' && chNext == '/')
-				levelNext--;
+			else if (IsStreamCommentStyle(style)) {
+				if (!IsStreamCommentStyle(stylePrev)) {
+					levelNext++;
+				} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+					levelNext--;
+				}
+			}
+			else if (lexType == LEX_D && style == SCE_C_DNESTEDCOMMENT) {
+				if (ch == '/' && chNext == '+') {
+					levelNext++;
+				} else if (ch == '+' && chNext == '/') {
+					levelNext--;
+				}
+			}
 		}
 		if (lexType == LEX_PHP && IsHear_NowDocStyle(style)) {
 			if (!IsHear_NowDocStyle(stylePrev)) {
@@ -1280,41 +1282,25 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		if (atEOL && IsUsingLine(lineCurrent)) {
-			if (!IsUsingLine(lineCurrent - 1) && IsUsingLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsUsingLine(lineCurrent - 1) && !IsUsingLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsUsingLine(lineCurrent + 1) - IsUsingLine(lineCurrent - 1);
 		}
-		//if (hasPreprocessor && atEOL && IsPropertyLine(lineCurrent)) {
-		//	if(!IsPropertyLine(lineCurrent-1) && IsPropertyLine(lineCurrent+1))
-		//		levelNext++;
-		//	else if(IsPropertyLine(lineCurrent-1) && !IsPropertyLine(lineCurrent+1))
-		//		levelNext--;
-		//}
-		if (hasPreprocessor && atEOL && IsIncludeLine(lineCurrent)) {
-			if (!IsIncludeLine(lineCurrent - 1) && IsIncludeLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsIncludeLine(lineCurrent - 1) && !IsIncludeLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (hasPreprocessor && atEOL && IsDefineLine(lineCurrent)) {
-			if (!IsDefineLine(lineCurrent - 1) && IsDefineLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsDefineLine(lineCurrent - 1) && !IsDefineLine(lineCurrent + 1))
-				levelNext--;
-		}
-		if (hasPreprocessor && atEOL && IsUnDefLine(lineCurrent)) {
-			if (!IsUnDefLine(lineCurrent - 1) && IsUnDefLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsUnDefLine(lineCurrent - 1) && !IsUnDefLine(lineCurrent + 1))
-				levelNext--;
+		if (hasPreprocessor && atEOL) {
+			if (IsIncludeLine(lineCurrent)) {
+				levelNext += IsIncludeLine(lineCurrent + 1) - IsIncludeLine(lineCurrent - 1);
+			}
+			else if (IsDefineLine(lineCurrent)) {
+				levelNext += IsDefineLine(lineCurrent + 1) - IsDefineLine(lineCurrent - 1);
+			}
+			else if (IsUnDefLine(lineCurrent)) {
+				levelNext += IsUnDefLine(lineCurrent + 1) - IsUnDefLine(lineCurrent - 1);
+			}
+			//else if (IsPropertyLine(lineCurrent)) {
+			//	levelNext += IsPropertyLine(lineCurrent + 1) - IsPropertyLine(lineCurrent - 1);
+			//}
 		}
 
-		if (atEOL && !IsStreamCommentStyle(style) && IsBackslashLine(lineCurrent, styler) && !IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext++;
-		}
-		if (atEOL && !IsStreamCommentStyle(style) && !IsBackslashLine(lineCurrent, styler) && IsBackslashLine(lineCurrent - 1, styler)) {
-			levelNext--;
+		if (atEOL && !IsStreamCommentStyle(style)) {
+			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
 		}
 		if (atEOL && !(hasPreprocessor && IsCppInDefine(i, styler)) && IsOpenBraceLine(lineCurrent + 1, styler)) {
 			levelNext++;
@@ -1400,7 +1386,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext++;
 		}
 
-		if (!isspacechar(ch))
+		if (visibleChars == 0 && !isspacechar(ch))
 			visibleChars++;
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
@@ -1408,8 +1394,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			//	levelUse = levelMinCurrent;
 			//}
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
@@ -1420,6 +1404,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			//levelMinCurrent = levelCurrent;
 			visibleChars = 0;
 			isObjCProtocol = false;
+			lineCommentCurrent = IsCommentLine(lineCurrent);
 		}
 	}
 }

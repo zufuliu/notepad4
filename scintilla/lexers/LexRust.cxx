@@ -406,13 +406,13 @@ struct FoldLineState {
 	int lineComment;
 	int pubUse;
 	constexpr explicit FoldLineState(int lineState) noexcept:
-		lineComment(lineState & RustLineStateMaskLineComment),
-		pubUse(lineState & RustLineStateMaskPubUse) {
+		lineComment((lineState >> 25) & 1),
+		pubUse((lineState >> 26) & 1) {
 	}
 };
 
 void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -466,18 +466,10 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		if (i == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
-			if (foldComment && foldCurrent.lineComment) {
-				if (!foldPrev.lineComment && foldNext.lineComment) {
-					levelNext++;
-				} else if (foldPrev.lineComment && !foldNext.lineComment) {
-					levelNext--;
-				}
+			if (foldComment & foldCurrent.lineComment) {
+				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.pubUse) {
-				if (!foldPrev.pubUse && foldNext.pubUse) {
-					levelNext++;
-				} else if (foldPrev.pubUse && !foldNext.pubUse) {
-					levelNext--;
-				}
+				levelNext += foldNext.pubUse - foldPrev.pubUse;
 			}
 
 			const int levelUse = levelCurrent;

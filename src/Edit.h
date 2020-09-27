@@ -163,8 +163,9 @@ void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt);
 void	EditSelectWord(void);
 void	EditSelectLines(BOOL currentBlock, BOOL lineSelection);
 HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
-BOOL	EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
-BOOL	EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+void	EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+void	EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+void	EditFindAll(LPEDITFINDREPLACE lpefr);
 BOOL	EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr);
 BOOL	EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
@@ -210,12 +211,19 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
-void	EditMarkAll_Clear(void);
-void	EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+NP2_inline void EditMarkAll_Clear(void) {
+	EditMarkAll_ClearEx(0, 0, NULL);
+}
+void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
 #define AUTO_COMPLETION_FILLUP_DEFAULT		L";,()[]{}\\/"
+// timeout for scanning words in document
+#define AUTOC_SCAN_WORDS_MIN_TIMEOUT		50
+#define AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT	500
 enum {
 	AutoCompleteFillUpEnter = 1,
 	AutoCompleteFillUpTab = 2,
@@ -256,6 +264,7 @@ typedef struct EditAutoCompletionConfig {
 	BOOL bCloseTags;
 	BOOL bCompleteWord;
 	BOOL bScanWordsInDocument;
+	DWORD dwScanWordsTimeout;
 	BOOL bEnglistIMEModeOnly;
 	BOOL bIgnoreCase;
 	UINT iVisibleItemCount;
@@ -399,8 +408,8 @@ typedef struct FILEVARS {
 
 typedef const FILEVARS * LPCFILEVARS;
 
-BOOL	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-BOOL	FileVars_Apply(LPCFILEVARS lpfv);
+void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
+void	FileVars_Apply(LPCFILEVARS lpfv);
 BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
 // in EditEncoding.c

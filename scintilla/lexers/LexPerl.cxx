@@ -1528,14 +1528,12 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 	const bool foldPOD = styler.GetPropertyInt("fold.perl.pod", 1) != 0;
 	const bool foldPackage = styler.GetPropertyInt("fold.perl.package", 1) != 0;
 	const bool foldCommentExplicit = styler.GetPropertyInt("fold.perl.comment.explicit", 0) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.perl.at.else", 0) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 
 	// Backtrack to previous line in case need to fix its fold status
@@ -1566,10 +1564,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		const bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
 		// Comment folding
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		// {} [] block folding
 		if (style == SCE_PL_OPERATOR) {
@@ -1688,19 +1683,14 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				isPackageLine = false;
 			}
 			lev |= levelCurrent << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if ((levelCurrent > levelPrev) && (visibleChars > 0))
+			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
 			levelPrev = levelCurrent;
-			visibleChars = 0;
 		}
-		if (!isspacechar(ch))
-			visibleChars++;
 		chPrev = ch;
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later

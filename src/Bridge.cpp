@@ -299,6 +299,9 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	GetString(IDS_PRINT_PAGENUM, tchPageFormat, COUNTOF(tchPageFormat));
 	GetString(IDS_PRINTFILE, tchPageStatus, COUNTOF(tchPageStatus));
 
+	// Show wait cursor...
+	BeginWaitCursor();
+
 	BOOL printEmpty = lengthPrinted == lengthDoc;
 	while (lengthPrinted < lengthDoc || printEmpty) {
 		printEmpty = FALSE;
@@ -310,9 +313,6 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		wsprintf(pageString, tchPageFormat, tchNum);
 
 		if (printPage) {
-			// Show wait cursor...
-			BeginWaitCursor();
-
 			// Display current page number in Statusbar
 			WCHAR statusString[128];
 			wsprintf(statusString, tchPageStatus, tchNum);
@@ -363,8 +363,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			}
 		}
 
-		frPrint.chrg.cpMin = (Sci_PositionCR)lengthPrinted;
-		frPrint.chrg.cpMax = (Sci_PositionCR)lengthDoc;
+		frPrint.chrg.cpMin = lengthPrinted;
+		frPrint.chrg.cpMax = lengthDoc;
 
 		lengthPrinted = SciCall_FormatRange(printPage, &frPrint);
 

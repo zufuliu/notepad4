@@ -11,12 +11,8 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #if defined(__MINGW64__) || defined(__MINGW32__)
-#if defined(__has_include) && __has_include(<winres.h>)
-#include <winres.h>
-#else
 #include <afxres.h>
 #include <winresrc.h>
-#endif
 #else
 #include <winres.h>
 #endif
@@ -1030,7 +1026,8 @@ BEGIN
     AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "Close",IDCANCEL,223,41,60,14
+    PUSHBUTTON      "Find &All",IDC_REPLACEALL,223,41,60,14
+    PUSHBUTTON      "Close",IDCANCEL,223,58,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,14,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10

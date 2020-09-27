@@ -570,9 +570,8 @@ static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) noexcept {
 static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const Sci_Position endPos = startPos + length;
 	// get settings from the config files for folding comments and preprocessor lines
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldInComment = styler.GetPropertyInt("fold.comment") == 2;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
+	const bool foldInComment = foldComment == 2;
 	const bool foldpreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
 	// Backtrack to previous line in case need to fix its fold status
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -609,16 +608,12 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	}
 	int levelNext = levelCurrent;
 	//
-	int	visibleChars = 0;
 	int chNext = static_cast<unsigned char>(styler.SafeGetCharAt(startPos));
 	int chPrev = ' ';
 	//
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		const int ch = chNext;
 		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
-		if (IsAu3WordChar(ch)) {
-			visibleChars++;
-		}
 		// get the syle for the current character neede to check in comment
 		const int stylech = styler.StyleAt(i);
 		// get first word for the line for indent check max 9 characters
@@ -750,9 +745,6 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			}
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact) {
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			}
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}
@@ -764,7 +756,6 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			stylePrev = style;
 			style = styleNext;
 			levelCurrent = levelNext;
-			visibleChars = 0;
 			// if the last character is an Underscore then don't reset since the line continues on the next line.
 			if (!(chPrev == '_')) {
 				szKeywordlen = 0;
@@ -777,7 +768,6 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 		// save the last processed character
 		if (!isspacechar(ch)) {
 			chPrev = ch;
-			visibleChars++;
 		}
 	}
 }

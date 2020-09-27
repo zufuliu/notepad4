@@ -810,12 +810,10 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
 static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool isCShell = styler.GetPropertyInt("lexer.bash.csh.language") != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	int skipHereCh = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -835,10 +833,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		// Comment folding
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
 		if (style == SCE_SH_WORD) {
@@ -887,20 +882,15 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 		} else if (style == SCE_SH_HERE_Q && styler.StyleAt(i + 1) == SCE_SH_DEFAULT) {
 			levelCurrent--;
 		}
-		if (!IsASpace(ch))
-			visibleChars++;
 		if (atEOL) {
 			int lev = levelPrev;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if ((levelCurrent > levelPrev) && (visibleChars > 0))
+			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
 			levelPrev = levelCurrent;
-			visibleChars = 0;
 		}
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later

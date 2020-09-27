@@ -261,7 +261,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
 		} else if (sc.state == SCE_LUA_LITERALSTRING || sc.state == SCE_LUA_COMMENT) {
-			if (sc.ch == '[') {
+			if (sc.ch == '[' && sc.state == SCE_LUA_LITERALSTRING) {
 				const int sep = LongDelimCheck(sc);
 				if (sep == 1 && sepCount == 1) {    // [[-only allowed to nest
 					nestLevel++;
@@ -332,29 +332,26 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
 
-static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, LexerWordList, Accessor &styler) {
+static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU lengthDoc = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
+	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 
 	for (Sci_PositionU i = startPos; i < lengthDoc; i++) {
 		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		const int style = styleNext;
+		const int stylePrev = style;
+		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelCurrent++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelCurrent--;
+			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
 		if (style == SCE_LUA_WORD) {
@@ -381,20 +378,23 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initS
 			} else if (ch == '}' || ch == ')') {
 				levelCurrent--;
 			}
-		} else if (style == SCE_LUA_LITERALSTRING || style == SCE_LUA_COMMENT) {
+		} else if (style == SCE_LUA_LITERALSTRING) {
 			if (ch == '[') {
 				levelCurrent++;
 			} else if (ch == ']') {
+				levelCurrent--;
+			}
+		} else if (style == SCE_LUA_COMMENT) {
+			if (stylePrev != style) {
+				levelCurrent++;
+			} else if (styleNext != style) {
 				levelCurrent--;
 			}
 		}
 
 		if (atEOL) {
 			int lev = levelPrev;
-			if (visibleChars == 0 && foldCompact) {
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			}
-			if ((levelCurrent > levelPrev) && (visibleChars > 0)) {
+			if ((levelCurrent > levelPrev)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}
 			if (lev != styler.LevelAt(lineCurrent)) {
@@ -402,10 +402,6 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initS
 			}
 			lineCurrent++;
 			levelPrev = levelCurrent;
-			visibleChars = 0;
-		}
-		if (!isspacechar(ch)) {
-			visibleChars++;
 		}
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later

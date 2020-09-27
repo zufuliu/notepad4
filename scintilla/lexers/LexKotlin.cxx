@@ -388,8 +388,8 @@ struct FoldLineState {
 	int lineComment;
 	int packageImport;
 	constexpr explicit FoldLineState(int lineState) noexcept:
-		lineComment(lineState & KotlinLineStateMaskLineComment),
-		packageImport(lineState & KotlinLineStateMaskImport) {
+		lineComment((lineState >> 14) & 1),
+		packageImport((lineState >> 15) & 1) {
 	}
 };
 
@@ -398,7 +398,7 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 }
 
 void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
+	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
@@ -447,18 +447,10 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 
 		if (i == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
-			if (foldComment && foldCurrent.lineComment) {
-				if (!foldPrev.lineComment && foldNext.lineComment) {
-					levelNext++;
-				} else if (foldPrev.lineComment && !foldNext.lineComment) {
-					levelNext--;
-				}
+			if (foldComment & foldCurrent.lineComment) {
+				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.packageImport) {
-				if (!foldPrev.packageImport && foldNext.packageImport) {
-					levelNext++;
-				} else if (foldPrev.packageImport && !foldNext.packageImport) {
-					levelNext--;
-				}
+				levelNext += foldNext.packageImport - foldPrev.packageImport;
 			}
 
 			const int levelUse = levelCurrent;

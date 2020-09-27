@@ -468,11 +468,9 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const bool foldOnlyBegin = styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldAtElse = styler.GetPropertyInt("fold.sql.at.else", 0) != 0;
-	const bool foldCompact = styler.GetPropertyInt("fold.compact", 0) != 0;
 
 	SQLStates sqlStates;
 	Sci_PositionU endPos = startPos + length;
-	int visibleChars = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0) {
@@ -583,10 +581,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		// Disable explicit folding; it can often cause problems with non-aware code
 		// MySQL needs -- comments to be followed by space or control char
 		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
-			if (!IsCommentLine(lineCurrent - 1) && IsCommentLine(lineCurrent + 1))
-				levelNext++;
-			else if (IsCommentLine(lineCurrent - 1) && !IsCommentLine(lineCurrent + 1))
-				levelNext--;
+			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (style == SCE_SQL_OPERATOR) {
 			if (ch == '(') {
@@ -760,14 +755,9 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext++;
 			}
 		}
-		if (!isspacechar(ch)) {
-			visibleChars++;
-		}
 		if (atEOL || (i == endPos - 1)) {
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			if (lev != styler.LevelAt(lineCurrent)) {
@@ -775,7 +765,6 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 			lineCurrent++;
 			levelCurrent = levelNext;
-			visibleChars = 0;
 			statementFound = false;
 			if (!foldOnlyBegin)
 				sqlStates.Set(lineCurrent, sqlStatesCurrentLine);

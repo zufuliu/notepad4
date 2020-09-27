@@ -59,6 +59,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Fortran, GNU Fortran
 	* [GN Build](../master/tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](../master/tools/lang/Go.go), up to Go 1.14.
+		* Go+ (GoPlus) and the Q language
 	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 		* blockdiag, seqdiag, actdiag and nwdiag
@@ -110,8 +111,12 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* C Shell (csh, tcsh)
 		* M4 Macro, limited support
 	* SQL Query
+		* [SQL Standard](../master/tools/lang/SQL.sql), up to SQL:2016.
 		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
-		* [SQLite3](../master/tools/lang/SQLite3.sql)
+		* [SQLite3](../master/tools/lang/SQLite3.sql), up to 3.33.
+		* [PostgreSQL](../master/tools/lang/PostgreSQL.sql), PostgreSQL 13.
+		* [Transact-SQL](../master/tools/lang/Transact-SQL.sql), SQL Server 2019.
+		* [Oracle](../master/tools/lang/Oracle.sql), Oracle 20, incomplete.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File
