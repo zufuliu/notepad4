@@ -321,11 +321,10 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 	LPDLDATA lpdl = (LPDLDATA)lpParam;
 	BackgroundWorker *worker = &lpdl->worker;
-	BackgroundWorker_Begin(worker);
 
 	// Exit immediately if DirList_Fill() hasn't been called
 	if (!lpdl->lpsf) {
-		BackgroundWorker_End(worker);
+		return 0;
 	}
 
 	HWND hwnd = worker->hwnd;
@@ -417,7 +416,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 #endif
 	}
 
-	BackgroundWorker_End(worker);
+	return 0;
 }
 
 //=============================================================================

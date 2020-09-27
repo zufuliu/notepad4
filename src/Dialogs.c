@@ -937,7 +937,6 @@ extern int cyFileMRUDlg;
 
 static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 	BackgroundWorker *worker = (BackgroundWorker *)lpParam;
-	BackgroundWorker_Begin(worker);
 
 	WCHAR tch[MAX_PATH] = L"";
 	DWORD dwFlags = SHGFI_SMALLICON | SHGFI_SYSICONINDEX | SHGFI_ATTRIBUTES | SHGFI_ATTR_SPECIFIED;
@@ -1004,7 +1003,7 @@ static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 		iItem++;
 	}
 
-	BackgroundWorker_End(worker);
+	return 0;
 }
 
 static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
