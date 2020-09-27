@@ -5360,6 +5360,29 @@ void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
+enum EditEmptyRegex {
+	EditEmptyRegex_NotEmpty = 0,
+	EditEmptyRegex_StartOfLine = 1,
+	EditEmptyRegex_EndOfLine = 2,
+	EditEmptyRegex_EmptyLine = 3,
+};
+
+int EditCheckEmptyRegex(LPCSTR szFind2) {
+	const char ch1 = szFind2[0];
+	const char ch2 = szFind2[1];
+	if (ch1 == '^') {
+		if (ch2 == '\0') {
+			return EditEmptyRegex_StartOfLine;
+		}
+		if (ch2 == '$' && szFind2[2] == '\0') {
+			return EditEmptyRegex_EmptyLine;
+		}
+	} else if (ch1 == '$' && ch2 == '\0') {
+		return EditEmptyRegex_EndOfLine;
+	}
+	return EditEmptyRegex_NotEmpty;
+}
+
 BOOL EditPrepareFind(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return FALSE;
@@ -5606,13 +5629,25 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 	while (!done) {
 		WaitableTimer_Set(timer, WaitableTimer_DefaultTimeSlot);
 		while (WaitableTimer_Continue(timer)) {
-			const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
+			Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
 			if (iPos == -1) {
 				done = TRUE;
 				break;
 			}
 
 			++matchCount;
+			iSelCount = ttf.chrgText.cpMax - iPos;
+			if (iSelCount == 0) {
+				// empty regex
+				iPos = SciCall_PositionAfter(iPos);
+				if (iPos == ttf.chrg.cpMax) {
+					done = TRUE;
+					break;
+				}
+				ttf.chrg.cpMin = iPos;
+				continue;
+			}
+
 			if (index == COUNTOF(ranges)) {
 				iMatchesCount = matchCount;
 				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
@@ -5622,7 +5657,7 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 				index = 0;
 			}
 			ranges[index] = iPos;
-			ranges[index + 1] = ttf.chrgText.cpMax - iPos;
+			ranges[index + 1] = iSelCount;
 			ttf.chrg.cpMin = ttf.chrgText.cpMax;
 			index += 2;
 		}
@@ -5688,6 +5723,33 @@ void EditFindAll(LPEDITFINDREPLACE lpefr) {
 		return;
 	}
 
+	const BOOL bRegexStartOrEndOfLine = (lpefr->fuFlags & SCFIND_REGEXP) ? EditCheckEmptyRegex(szFind2) : 0;
+	if (bRegexStartOrEndOfLine) {
+		const Sci_Line lineCount = SciCall_GetLineCount();
+		Sci_Position matchCount = 0;
+		switch (bRegexStartOrEndOfLine) {
+		case EditEmptyRegex_StartOfLine:
+			matchCount = lineCount - 1;
+			break;
+		case EditEmptyRegex_EndOfLine:
+			matchCount = lineCount;
+			break;
+		default:
+			BeginWaitCursor();
+			for (Sci_Line line = 0; line < lineCount; line++) {
+				if (SciCall_PositionFromLine(line) == SciCall_GetLineEndPosition(line)) {
+					++matchCount;
+				}
+			}
+			EndWaitCursor();
+			break;
+		}
+
+		iMatchesCount = matchCount;
+		UpdateStatusbar();
+		return;
+	}
+
 	EditMarkAll_Run(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
 }
 
@@ -5717,8 +5779,8 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	// Show wait cursor...
 	BeginWaitCursor();
 
-	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
-	const BOOL bRegexStartOrEndOfLine = bReplaceRE && ((!strcmp(szFind2, "$") || !strcmp(szFind2, "^") || !strcmp(szFind2, "^$")));
+	const BOOL bRegexStartOrEndOfLine = bReplaceRE ? EditCheckEmptyRegex(szFind2) : 0;
+	const BOOL bRegexStartOfLine = bRegexStartOrEndOfLine & EditEmptyRegex_StartOfLine;
 
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
@@ -5797,8 +5859,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	// Show wait cursor...
 	BeginWaitCursor();
 
-	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
-	const BOOL bRegexStartOrEndOfLine = bReplaceRE && ((!strcmp(szFind2, "$") || !strcmp(szFind2, "^") || !strcmp(szFind2, "^$")));
+	const BOOL bRegexStartOrEndOfLine = bReplaceRE ? EditCheckEmptyRegex(szFind2) : 0;
+	const BOOL bRegexStartOfLine = bRegexStartOrEndOfLine & EditEmptyRegex_StartOfLine;
 
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
