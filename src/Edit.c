@@ -4968,17 +4968,17 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		HDWP hdwp = BeginDeferWindowPos(isReplace ? 13 : 8);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDCANCEL, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDTEXT, dx, 0, SWP_NOMOVE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_FIND, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDPREV, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SAVEPOSITION, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETPOSITION, dx, 0, SWP_NOSIZE);
-		hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDALL, dx, 0, SWP_NOSIZE);
 		if (isReplace) {
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACETEXT, dx, 0, SWP_NOMOVE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_REPLACE, dx, 0, SWP_NOSIZE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACE, dx, 0, SWP_NOSIZE);
+			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEINSEL, dx, 0, SWP_NOSIZE);
 		}
 		EndDeferWindowPos(hdwp);
@@ -4998,6 +4998,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 			EnableWindow(GetDlgItem(hwnd, IDOK), bEnable);
 			EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), bEnable);
+			EnableWindow(GetDlgItem(hwnd, IDC_FINDALL), bEnable);
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACE), bEnable);
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACEALL), bEnable);
 			EnableWindow(GetDlgItem(hwnd, IDC_REPLACEINSEL), bEnable);
@@ -5036,6 +5037,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDOK:
 		case IDC_FINDPREV:
+		case IDC_FINDALL:
 		case IDC_REPLACE:
 		case IDC_REPLACEALL:
 		case IDC_REPLACEINSEL:
@@ -5052,6 +5054,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			if (!GetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpefr->szFind, COUNTOF(lpefr->szFind))) {
 				EnableWindow(GetDlgItem(hwnd, IDOK), FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_FINDPREV), FALSE);
+				EnableWindow(GetDlgItem(hwnd, IDC_FINDALL), FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_REPLACE), FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_REPLACEALL), FALSE);
 				EnableWindow(GetDlgItem(hwnd, IDC_REPLACEINSEL), FALSE);
@@ -5163,13 +5166,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				EditReplace(lpefr->hwnd, lpefr);
 				break;
 
+			case IDC_FINDALL:
+				EditFindAll(lpefr);
+				break;
+
 			case IDC_REPLACEALL:
-				if (bIsFindDlg) {
-					EditFindAll(lpefr);
-				} else {
-					bReplaceInitialized = TRUE;
-					EditReplaceAll(lpefr->hwnd, lpefr, TRUE);
-				}
+				bReplaceInitialized = TRUE;
+				EditReplaceAll(lpefr->hwnd, lpefr, TRUE);
 				break;
 
 			case IDC_REPLACEINSEL:

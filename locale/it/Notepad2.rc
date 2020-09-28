@@ -1024,18 +1024,17 @@ BEGIN
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
     AUTOCHECKBOX    "C&lose after find",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
     AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
+    DEFPUSHBUTTON   "Find &Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "Find &All",IDC_REPLACEALL,223,41,60,14
-    PUSHBUTTON      "Close",IDCANCEL,223,58,60,14
+    PUSHBUTTON      "&Find All",IDC_FINDALL,223,41,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,14,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
     AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
     CONTROL         "<a>Goto Replace (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,97,80,10
-    CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
-    CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
+    CONTROL         "<a>Save Position (&V)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
+    CONTROL         "<a>Reset Position (&O)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
 END
 
@@ -1056,12 +1055,12 @@ BEGIN
     AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
     AUTOCHECKBOX    "C&lose after replace",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
     AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "&Find Next",IDOK,223,7,60,14
+    DEFPUSHBUTTON   "Find &Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "&Replace",IDC_REPLACE,223,41,60,14
-    PUSHBUTTON      "Replace &All",IDC_REPLACEALL,223,58,60,14
-    PUSHBUTTON      "In &Selection",IDC_REPLACEINSEL,223,75,60,14
-    PUSHBUTTON      "Close",IDCANCEL,223,92,60,14
+    PUSHBUTTON      "&Find All",IDC_FINDALL,223,41,60,14
+    PUSHBUTTON      "&Replace",IDC_REPLACE,223,58,60,14
+    PUSHBUTTON      "Replace &All",IDC_REPLACEALL,223,75,60,14
+    PUSHBUTTON      "In &Selection",IDC_REPLACEINSEL,223,92,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,14,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,14,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
@@ -1069,8 +1068,8 @@ BEGIN
     CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
     AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
     CONTROL         "<a>Goto Find (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,138,127,80,10
-    CONTROL         "<a>Save Position (&O)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
-    CONTROL         "<a>Reset Position (&P)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
+    CONTROL         "<a>Save Position (&V)</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
+    CONTROL         "<a>Reset Position (&O)</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
 END
 
