@@ -5360,29 +5360,6 @@ void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
-enum EditEmptyRegex {
-	EditEmptyRegex_NotEmpty = 0,
-	EditEmptyRegex_StartOfLine = 1,
-	EditEmptyRegex_EndOfLine = 2,
-	EditEmptyRegex_EmptyLine = 3,
-};
-
-int EditCheckEmptyRegex(LPCSTR szFind2) {
-	const char ch1 = szFind2[0];
-	const char ch2 = szFind2[1];
-	if (ch1 == '^') {
-		if (ch2 == '\0') {
-			return EditEmptyRegex_StartOfLine;
-		}
-		if (ch2 == '$' && szFind2[2] == '\0') {
-			return EditEmptyRegex_EmptyLine;
-		}
-	} else if (ch1 == '$' && ch2 == '\0') {
-		return EditEmptyRegex_EndOfLine;
-	}
-	return EditEmptyRegex_NotEmpty;
-}
-
 BOOL EditPrepareFind(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	if (StrIsEmptyA(lpefr->szFind)) {
 		return FALSE;
@@ -5618,6 +5595,16 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 	}
 
 	const LONG token = EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
+	if ((findFlag & SCFIND_REGEXP) && iSelCount == 1) {
+		const char ch = *pszText;
+		if (ch == '^' || ch == '$') {
+			const Sci_Line lineCount = SciCall_GetLineCount();
+			iMatchesCount = lineCount - (ch == '^');
+			UpdateStatusbar();
+			return;
+		}
+	}
+
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, pszText, { 0, 0 } };
 
 	Sci_Position matchCount = 0;
@@ -5658,8 +5645,8 @@ void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR
 			}
 			ranges[index] = iPos;
 			ranges[index + 1] = iSelCount;
-			ttf.chrg.cpMin = ttf.chrgText.cpMax;
 			index += 2;
+			ttf.chrg.cpMin = ttf.chrgText.cpMax;
 		}
 
 		iMatchesCount = matchCount;
@@ -5723,33 +5710,6 @@ void EditFindAll(LPEDITFINDREPLACE lpefr) {
 		return;
 	}
 
-	const BOOL bRegexStartOrEndOfLine = (lpefr->fuFlags & SCFIND_REGEXP) ? EditCheckEmptyRegex(szFind2) : 0;
-	if (bRegexStartOrEndOfLine) {
-		const Sci_Line lineCount = SciCall_GetLineCount();
-		Sci_Position matchCount = 0;
-		switch (bRegexStartOrEndOfLine) {
-		case EditEmptyRegex_StartOfLine:
-			matchCount = lineCount - 1;
-			break;
-		case EditEmptyRegex_EndOfLine:
-			matchCount = lineCount;
-			break;
-		default:
-			BeginWaitCursor();
-			for (Sci_Line line = 0; line < lineCount; line++) {
-				if (SciCall_PositionFromLine(line) == SciCall_GetLineEndPosition(line)) {
-					++matchCount;
-				}
-			}
-			EndWaitCursor();
-			break;
-		}
-
-		iMatchesCount = matchCount;
-		UpdateStatusbar();
-		return;
-	}
-
 	EditMarkAll_Run(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
 }
 
@@ -5780,18 +5740,9 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	BeginWaitCursor();
 
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
-	const BOOL bRegexStartOrEndOfLine = bReplaceRE ? EditCheckEmptyRegex(szFind2) : 0;
-
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	while (SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
-		if (iCount == 0 && bRegexStartOrEndOfLine) {
-			if (0 == SciCall_GetLineEndPosition(0)) {
-				ttf.chrgText.cpMin = 0;
-				ttf.chrgText.cpMax = 0;
-			}
-		}
-
 		if (++iCount == 1) {
 			SciCall_BeginUndoAction();
 		}
@@ -5860,21 +5811,11 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	BeginWaitCursor();
 
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
-	const BOOL bRegexStartOrEndOfLine = bReplaceRE ? EditCheckEmptyRegex(szFind2) : 0;
-
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	BOOL fCancel = FALSE;
 	while (!fCancel && SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
 		if (ttf.chrgText.cpMin >= SciCall_GetSelectionStart() && ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
-
-			if (ttf.chrg.cpMin == 0 && iCount == 0 && bRegexStartOrEndOfLine) {
-				if (0 == SciCall_GetLineEndPosition(0)) {
-					ttf.chrgText.cpMin = 0;
-					ttf.chrgText.cpMax = 0;
-				}
-			}
-
 			if (++iCount == 1) {
 				SciCall_BeginUndoAction();
 			}
