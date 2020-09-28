@@ -51,6 +51,7 @@
 #define IDC_NOWRAP						108
 #define IDC_FINDCLOSE					109
 #define IDC_FINDPREV					110
+#define IDC_FINDALL						111
 #define IDC_REPLACE						112		// Replace
 #define IDC_REPLACEALL					113		// Replace
 #define IDC_REPLACEINSEL				114		// Replace
