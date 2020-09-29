@@ -51,7 +51,7 @@ BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 
 void	Style_DetectBaseFontSize(HWND hwnd);
-HFONT	Style_CreateCodeFont(void);
+HFONT	Style_CreateCodeFont(UINT dpi);
 void	Style_OnDPIChanged(PEDITLEXER pLex);
 void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor(void);
