@@ -16,6 +16,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
+#if 0
 using namespace Scintilla;
 
 static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -52,3 +53,4 @@ static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, in
 }
 
 LexerModule lmMarkdown(SCLEX_MARKDOWN, ColouriseMarkdownDoc, "md", 0);
+#endif
