@@ -4775,7 +4775,7 @@ static void FindReplaceSetFont(HWND hwnd, BOOL monospaced, HFONT *hFontFindRepla
 	if (monospaced) {
 		font = *hFontFindReplaceEdit;
 		if (font == NULL) {
-			*hFontFindReplaceEdit = font = Style_CreateCodeFont();
+			*hFontFindReplaceEdit = font = Style_CreateCodeFont(g_uCurrentDPI);
 		}
 	}
 	if (font == NULL) {
