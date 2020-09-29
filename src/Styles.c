@@ -568,6 +568,22 @@ void Style_DetectBaseFontSize(HWND hwnd) {
 	iBaseFontSize = size;
 }
 
+HFONT Style_CreateCodeFont(void) {
+	const int size = SciCall_StyleGetSizeFractional(STYLE_DEFAULT);
+	const int height = -MulDiv(size, g_uSystemDPI, 72*SC_FONT_SIZE_MULTIPLIER);
+	HFONT font = CreateFont(height,
+						0, 0, 0,
+						FW_NORMAL,
+						FALSE, FALSE, FALSE,
+						DEFAULT_CHARSET,
+						OUT_DEFAULT_PRECIS,
+						CLIP_DEFAULT_PRECIS,
+						DEFAULT_QUALITY,
+						DEFAULT_PITCH,
+						defaultCodeFontName);
+	return font;
+}
+
 void Style_ReleaseResources(void) {
 	NP2HeapFree(g_AllFileExtensions);
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
