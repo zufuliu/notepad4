@@ -4766,6 +4766,27 @@ void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) {
 
 extern BOOL bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
+extern BOOL bFindReplaceUseMonospacedFont;
+
+static void FindReplaceSetFont(HWND hwnd, BOOL monospaced, HFONT *hFontFindReplaceEdit) {
+	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
+	HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
+	HFONT font = NULL;
+	if (monospaced) {
+		font = *hFontFindReplaceEdit;
+		if (font == NULL) {
+			*hFontFindReplaceEdit = font = Style_CreateCodeFont();
+		}
+	}
+	if (font == NULL) {
+		// use font from parent window
+		font = GetWindowFont(hwnd);
+	}
+	SetWindowFont(hwndFind, font, TRUE);
+	if (hwndRepl) {
+		SetWindowFont(hwndRepl, font, TRUE);
+	}
+}
 
 static BOOL CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bFirstTime) {
 	const Sci_Position cchSelection = SciCall_GetSelTextLength() - 1;
@@ -4824,6 +4845,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	static int xFindReplaceDlgSave;
 	static int yFindReplaceDlgSave;
 	static EDITFINDREPLACE efrSave;
+	static HFONT hFontFindReplaceEdit;
 
 	WCHAR tch[NP2_FIND_REPLACE_LIMIT + 32];
 
@@ -4936,6 +4958,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (bFindReplaceTransparentMode) {
 			CheckDlgButton(hwnd, IDC_TRANSPARENT, BST_CHECKED);
 		}
+		if (bFindReplaceUseMonospacedFont) {
+			CheckDlgButton(hwnd, IDC_USEMONOSPACEDFONT, BST_CHECKED);
+			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
+		}
 	}
 	return TRUE;
 
@@ -4957,6 +4983,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	break;
 
 	case WM_DESTROY:
+		if (hFontFindReplaceEdit) {
+			DeleteObject(hFontFindReplaceEdit);
+			hFontFindReplaceEdit = NULL;
+		}
 		ResizeDlg_Destroy(hwnd, &cxFindReplaceDlg, NULL);
 		return FALSE;
 
@@ -5244,6 +5274,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 		}
 		break;
+
+		case IDC_USEMONOSPACEDFONT:
+			bFindReplaceUseMonospacedFont = IsButtonChecked(hwnd, IDC_USEMONOSPACEDFONT);
+			FindReplaceSetFont(hwnd, bFindReplaceUseMonospacedFont, &hFontFindReplaceEdit);
+			break;
 		}
 		return TRUE;
 
