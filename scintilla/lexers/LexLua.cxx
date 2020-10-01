@@ -69,17 +69,15 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	const CharacterSet setEscapeSkip(CharacterSet::setNone, "\"'\\");
 
 	Sci_Position currentLine = styler.GetLine(startPos);
-	// Initialize long string [[ ... ]] or block comment --[[ ... ]] nesting level,
+	// Initialize long string [[ ... ]] or block comment --[[ ... ]],
 	// if we are inside such a string. Block comment was introduced in Lua 5.0,
 	// blocks with separators [=[ ... ]=] in Lua 5.1.
 	// Continuation of a string (\z whitespace escaping) is controlled by stringWs.
-	int nestLevel = 0;
 	int sepCount = 0;
 	int stringWs = 0;
 	if (initStyle == SCE_LUA_LITERALSTRING || initStyle == SCE_LUA_COMMENT ||
 		initStyle == SCE_LUA_STRING || initStyle == SCE_LUA_CHARACTER) {
 		const int lineState = styler.GetLineState(currentLine - 1);
-		nestLevel = lineState >> 9;
 		sepCount = lineState & 0xFF;
 		stringWs = lineState & 0x100;
 	}
@@ -104,7 +102,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			case SCE_LUA_STRING:
 			case SCE_LUA_CHARACTER:
 				// Inside a literal string, block comment or string, we set the line state
-				styler.SetLineState(currentLine, (nestLevel << 9) | stringWs | sepCount);
+				styler.SetLineState(currentLine, stringWs | sepCount);
 				break;
 			default:
 				// Reset the line state
@@ -260,25 +258,11 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.ChangeState(SCE_LUA_STRINGEOL);
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
-		} else if (sc.state == SCE_LUA_LITERALSTRING || sc.state == SCE_LUA_COMMENT) {
-			if (sc.ch == '[' && sc.state == SCE_LUA_LITERALSTRING) {
-				const int sep = LongDelimCheck(sc);
-				if (sep == 1 && sepCount == 1) {    // [[-only allowed to nest
-					nestLevel++;
-					sc.Forward();
-				}
-			} else if (sc.ch == ']') {
-				const int sep = LongDelimCheck(sc);
-				if (sep == 1 && sepCount == 1) {    // un-nest with ]]-only
-					nestLevel--;
-					sc.Forward();
-					if (nestLevel == 0) {
-						sc.ForwardSetState(SCE_LUA_DEFAULT);
-					}
-				} else if (sep > 1 && sep == sepCount) {   // ]=]-style delim
-					sc.Forward(sep);
-					sc.ForwardSetState(SCE_LUA_DEFAULT);
-				}
+		} else if (sc.ch == ']' && (sc.state == SCE_LUA_LITERALSTRING || sc.state == SCE_LUA_COMMENT)) {
+			const int sep = LongDelimCheck(sc);
+			if (sep == sepCount) {   // ]=]-style delim
+				sc.Forward(sep);
+				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
 		}
 
@@ -302,7 +286,6 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				if (sepCount == 0) {
 					sc.SetState(SCE_LUA_OPERATOR);
 				} else {
-					nestLevel = 1;
 					sc.SetState(SCE_LUA_LITERALSTRING);
 					sc.Forward(sepCount);
 				}
@@ -312,7 +295,6 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.Forward(2);
 					sepCount = LongDelimCheck(sc);
 					if (sepCount > 0) {
-						nestLevel = 1;
 						sc.ChangeState(SCE_LUA_COMMENT);
 						sc.Forward(sepCount);
 					}
@@ -378,13 +360,7 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if (ch == '}' || ch == ')') {
 				levelCurrent--;
 			}
-		} else if (style == SCE_LUA_LITERALSTRING) {
-			if (ch == '[') {
-				levelCurrent++;
-			} else if (ch == ']') {
-				levelCurrent--;
-			}
-		} else if (style == SCE_LUA_COMMENT) {
+		} else if (style == SCE_LUA_LITERALSTRING || style == SCE_LUA_COMMENT) {
 			if (stylePrev != style) {
 				levelCurrent++;
 			} else if (styleNext != style) {
