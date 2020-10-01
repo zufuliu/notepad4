@@ -283,10 +283,11 @@ static WIN32_FIND_DATA fdCurFile;
 static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
+EditMarkAllStatus editMarkAllStatus;
+HANDLE idleTaskTimer;
 
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
-Sci_Position iMatchesCount = 0;
 extern int iFontQuality;
 extern int iCaretStyle;
 extern int iOvrCaretStyle;
@@ -629,15 +630,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		return FALSE;
 	}
 
+	// create the timer first, to make flagMatchText working.
+	idleTaskTimer = WaitableTimer_Create();
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 	MSG msg;
 
-	while (GetMessage(&msg, NULL, 0, 0)) {
-		DispatchMessageMain(&msg);
+	while (TRUE) {
+		if (editMarkAllStatus.pending) {
+			WaitableTimer_DelayMain(idleTaskTimer, WaitableTimer_IdleTaskDelayTime);
+			if (editMarkAllStatus.pending) {
+				EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+			}
+		}
+		if (GetMessage(&msg, NULL, 0, 0)) {
+			DispatchMessageMain(&msg);
+		} else {
+			break;
+		}
 	}
 
+	WaitableTimer_Destroy(idleTaskTimer);
 	CleanUpResources(TRUE);
 	return (int)(msg.wParam);
 }
@@ -981,7 +995,7 @@ static inline void NP2RestoreWind(HWND hwnd) {
 }
 
 static inline void EditMarkAll_Stop(void) {
-	iMatchesCount = 0;
+	editMarkAllStatus.matchCount = 0;
 	EditMarkAll_Clear();
 }
 
@@ -4952,24 +4966,27 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (scn->updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
 				UpdateToolbar();
 
+				BOOL updated = FALSE;
 				if (scn->updated & (SC_UPDATE_SELECTION)) {
+					UpdateStatusBarCache_OVRMode(FALSE);
 					// mark occurrences of text currently selected
 					if (bMarkOccurrences) {
 						if (SciCall_IsSelectionEmpty()) {
-							if (iMatchesCount) {
+							if (editMarkAllStatus.matchCount) {
 								EditMarkAll_Clear();
 							}
 						} else {
-							EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+							updated = EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 						}
 					}
-					UpdateStatusBarCache_OVRMode(FALSE);
 				} else if (scn->updated & (SC_UPDATE_CONTENT)) {
-					if (iMatchesCount) {
-						EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
+					if (editMarkAllStatus.matchCount) {
+						updated = EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 					}
 				}
-				UpdateStatusbar();
+				if (!updated) {
+					UpdateStatusbar();
+				}
 
 				// Brace Match
 				if (bMatchBraces) {
@@ -7047,8 +7064,11 @@ void UpdateStatusbar(void) {
 	}
 
 	// find all and mark occurrences
-	PosToStrW(iMatchesCount, tchMatchesCount);
+	PosToStrW(editMarkAllStatus.matchCount, tchMatchesCount);
 	FormatNumberStr(tchMatchesCount);
+	if (editMarkAllStatus.pending) {
+		lstrcat(tchMatchesCount, L" ...");
+	}
 
 	WCHAR tchDocPos[256];
 	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchCurLine, tchDocLine,

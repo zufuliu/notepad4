@@ -94,14 +94,6 @@ static HMODULE hELSCoreDLL = NULL;
 
 #define MAX_NON_UTF8_SIZE	(UINT_MAX/2 - 16)
 
-typedef struct EditMarkAllStatus {
-	volatile LONG token;
-	int findFlag;
-	Sci_Position iSelCount;
-	LPSTR pszText;
-} EditMarkAllStatus;
-static EditMarkAllStatus editMarkAllStatus;
-
 void Edit_ReleaseResources(void) {
 	DStringW_Free(&wchPrefixSelection);
 	DStringW_Free(&wchAppendSelection);
@@ -5604,106 +5596,131 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 // Mark all occurrences of the text currently selected (by Aleksandar Lekov)
 //
 
-extern Sci_Position iMatchesCount;
+extern EditMarkAllStatus editMarkAllStatus;
+extern HANDLE idleTaskTimer;
+#define EditMarkAll_InitializedSize	(1024*1024*1)
+#define EditMarkAll_IncrementSize	(1024*1024*16)
 
-LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
-	const LONG token = InterlockedIncrement(&editMarkAllStatus.token);
-	if (iMatchesCount != 0) {
-		iMatchesCount = 0;
+void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+	if (editMarkAllStatus.matchCount != 0) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
 	}
-
 	if (editMarkAllStatus.pszText) {
 		LocalFree(editMarkAllStatus.pszText);
 	}
+	editMarkAllStatus.pending = FALSE;
 	editMarkAllStatus.findFlag = findFlag;
 	editMarkAllStatus.iSelCount= iSelCount;
 	editMarkAllStatus.pszText = pszText ? StrDupA(pszText) : NULL;
-	return token;
+	editMarkAllStatus.matchCount = 0;
+	editMarkAllStatus.lastMatchPos = 0;
+	editMarkAllStatus.iStartPos = 0;
 }
 
-void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (!bChanged && (findFlag == editMarkAllStatus.findFlag
 		&& iSelCount == editMarkAllStatus.iSelCount
 		// _stricmp() is not safe for DBCS string.
 		&& memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0)) {
-		return;
+		return FALSE;
 	}
 
-	const LONG token = EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
+	EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
 	if ((findFlag & SCFIND_REGEXP) && iSelCount == 1) {
 		const char ch = *pszText;
 		if (ch == '^' || ch == '$') {
 			const Sci_Line lineCount = SciCall_GetLineCount();
-			iMatchesCount = lineCount - (ch == '^');
+			editMarkAllStatus.matchCount = lineCount - (ch == '^');
 			UpdateStatusbar();
-			return;
+			return TRUE;
 		}
 	}
 
-	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, pszText, { 0, 0 } };
+	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+}
 
-	Sci_Position matchCount = 0;
+BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
+	// use increment search to ensure FindText() terminated in expected time.
+	// TODO: dynamic compute increment size with code similar to ActionDuration in Scintilla.
+	const Sci_Position iLength = SciCall_GetLength();
+	Sci_Position iStartPos = status->iStartPos;
+	Sci_Position iMaxLength = status->pending ? EditMarkAll_IncrementSize : EditMarkAll_InitializedSize;
+	iMaxLength = min_pos(iMaxLength + iStartPos, iLength);
+	if (iMaxLength < iLength) {
+		// match on whole line
+		iMaxLength = SciCall_PositionFromLine(SciCall_LineFromPosition(iMaxLength) + 1);
+		if (iMaxLength + EditMarkAll_InitializedSize >= iLength) {
+			iMaxLength = iLength;
+		}
+	}
+
+	// rewind start position
+	const int findFlag = status->findFlag;
+	if ((findFlag & SCFIND_REGEXP)) {
+		// no multiline regex
+	} else {
+		// rewind start position when transform backslash is checked,
+		// all other searching doesn't across lines.
+		iStartPos = max_pos(iStartPos - status->iSelCount + 1, status->lastMatchPos);
+	}
+
+	struct Sci_TextToFind ttf = { { iStartPos, iMaxLength }, status->pszText, { 0, 0 } };
+
+	Sci_Position matchCount = status->matchCount;
 	UINT index = 0;
 	Sci_Position ranges[256*2];
 
-	BOOL done = FALSE;
-	HANDLE timer = WaitableTimer_Create();
-	while (!done) {
-		WaitableTimer_Set(timer, WaitableTimer_DefaultTimeSlot);
-		while (WaitableTimer_Continue(timer)) {
-			Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
-			if (iPos == -1) {
-				done = TRUE;
-				break;
-			}
-
-			++matchCount;
-			iSelCount = ttf.chrgText.cpMax - iPos;
-			if (iSelCount == 0) {
-				// empty regex
-				iPos = SciCall_PositionAfter(iPos);
-				if (iPos == ttf.chrg.cpMax) {
-					done = TRUE;
-					break;
-				}
-				ttf.chrg.cpMin = iPos;
-				continue;
-			}
-
-			if (index == COUNTOF(ranges)) {
-				iMatchesCount = matchCount;
-				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-				for (UINT i = 0; i < index; i += 2) {
-					SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
-				}
-				index = 0;
-			}
-			ranges[index] = iPos;
-			ranges[index + 1] = iSelCount;
-			index += 2;
-			ttf.chrg.cpMin = ttf.chrgText.cpMax;
+	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
+	while (ttf.chrg.cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
+		const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
+		if (iPos == -1) {
+			iStartPos = iMaxLength;
+			break;
 		}
 
-		iMatchesCount = matchCount;
-		if (index) {
+		++matchCount;
+		const Sci_Position iSelCount = ttf.chrgText.cpMax - iPos;
+		if (iSelCount == 0) {
+			// empty regex
+			ttf.chrg.cpMin = SciCall_PositionAfter(iPos);
+			continue;
+		}
+
+		if (index == COUNTOF(ranges)) {
 			SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 			for (UINT i = 0; i < index; i += 2) {
 				SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
 			}
+			index = 0;
 		}
-		UpdateStatusbar();
-		if (!done) {
-			WaitableTimer_DelayMain(timer, WaitableTimer_DefaultDelayTime);
-			done = token != editMarkAllStatus.token;
+		ranges[index] = iPos;
+		ranges[index + 1] = iSelCount;
+		index += 2;
+		ttf.chrg.cpMin = ttf.chrgText.cpMax;
+	}
+	if (index) {
+		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+		for (UINT i = 0; i < index; i += 2) {
+			SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
 		}
 	}
-	WaitableTimer_Destroy(timer);
+
+	iStartPos = max_pos(iStartPos, ttf.chrg.cpMin);
+	const BOOL pending = iStartPos < iLength;
+	status->pending = pending;
+	status->lastMatchPos = ttf.chrg.cpMin;
+	status->iStartPos = iStartPos;
+	if (!pending || matchCount != status->matchCount) {
+		status->matchCount = matchCount;
+		UpdateStatusbar();
+		return TRUE;
+	}
+	return FALSE;
 }
 
-void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
+BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords) {
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5712,7 +5729,7 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	// if nothing selected or multiple lines are selected exit
 	if (iSelCount == 0 || SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
 		EditMarkAll_Clear();
-		return;
+		return FALSE;
 	}
 
 	// scintilla/src/Editor.h SelectionText.LengthWithTerminator()
@@ -5732,14 +5749,15 @@ void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 			} else if (!(ch >= 0x80 || IsDocWordChar(ch))) {
 				NP2HeapFree(pszText);
 				EditMarkAll_Clear();
-				return;
+				return FALSE;
 			}
 		}
 	}
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
-	EditMarkAll_Run(bChanged, findFlag, iSelCount, pszText);
+	bChanged = EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 	NP2HeapFree(pszText);
+	return bChanged;
 }
 
 void EditFindAll(LPEDITFINDREPLACE lpefr) {
@@ -5748,7 +5766,7 @@ void EditFindAll(LPEDITFINDREPLACE lpefr) {
 		return;
 	}
 
-	EditMarkAll_Run(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
+	EditMarkAll_Start(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
 }
 
 static void ShwowReplaceCount(Sci_Position iCount) {

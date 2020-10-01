@@ -574,8 +574,8 @@ NP2_inline BOOL KeyboardIsKeyDown(int key) {
 
 void Handle_Wait(HANDLE handle);
 void Handle_WaitMain(HANDLE handle);
-#define WaitableTimer_DefaultTimeSlot		100
-#define WaitableTimer_DefaultDelayTime		50
+#define WaitableTimer_IdleTaskTimeSlot		100
+#define WaitableTimer_IdleTaskDelayTime		50
 #define WaitableTimer_Create()				CreateWaitableTimer(NULL, FALSE, NULL)
 #define WaitableTimer_Destroy(timer)		CloseHandle(timer)
 NP2_inline void WaitableTimer_Set(HANDLE timer, DWORD milliseconds) {

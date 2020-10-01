@@ -211,12 +211,24 @@ enum {
 	MarkerBitmask_Bookmark = 1 << MarkerNumber_Bookmark,
 };
 
-LONG EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+typedef struct EditMarkAllStatus {
+	BOOL pending;
+	int findFlag;
+	Sci_Position iSelCount;		// length for pszText
+	LPSTR pszText;				// pattern or text to find
+
+	Sci_Position matchCount;	// total match count
+	Sci_Position lastMatchPos;	// last matching position
+	Sci_Position iStartPos;		// previous stop position
+} EditMarkAllStatus;
+
+void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
 NP2_inline void EditMarkAll_Clear(void) {
 	EditMarkAll_ClearEx(0, 0, NULL);
 }
-void EditMarkAll_Run(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText);
-void EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
+BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation
