@@ -328,15 +328,6 @@ HBITMAP LoadBitmapFile(LPCWSTR path) {
 	return hbmp;
 }
 
-void Handle_Wait(HANDLE handle) {
-	while (WaitForSingleObject(handle, 0) != WAIT_OBJECT_0) {
-		MSG msg;
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
-}
 
 void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
 	worker->hwnd = hwnd;
@@ -344,22 +335,28 @@ void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
 	worker->workerThread = NULL;
 }
 
-void BackgroundWorker_Cancel(BackgroundWorker *worker) {
+void BackgroundWorker_Stop(BackgroundWorker *worker) {
 	SetEvent(worker->eventCancel);
 	if (worker->workerThread) {
-		Handle_Wait(worker->workerThread);
+		while (WaitForSingleObject(worker->workerThread, 0) != WAIT_OBJECT_0) {
+			MSG msg;
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
 		CloseHandle(worker->workerThread);
 		worker->workerThread = NULL;
 	}
+}
+
+void BackgroundWorker_Cancel(BackgroundWorker *worker) {
+	BackgroundWorker_Stop(worker->eventCancel);
 	ResetEvent(worker->eventCancel);
 }
 
 void BackgroundWorker_Destroy(BackgroundWorker *worker) {
-	SetEvent(worker->eventCancel);
-	if (worker->workerThread) {
-		Handle_Wait(worker->workerThread);
-		CloseHandle(worker->workerThread);
-	}
+	BackgroundWorker_Stop(worker->eventCancel);
 	CloseHandle(worker->eventCancel);
 }
 

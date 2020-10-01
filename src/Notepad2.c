@@ -284,7 +284,7 @@ static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 EditMarkAllStatus editMarkAllStatus;
-static HANDLE idleDelayTimer;
+HANDLE idleTaskTimer;
 
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
@@ -472,15 +472,6 @@ static void DispatchMessageMain(MSG *msg) {
 	}
 }
 
-void Handle_WaitMain(HANDLE handle) {
-	while (WaitForSingleObject(handle, 0) != WAIT_OBJECT_0) {
-		MSG msg;
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			DispatchMessageMain(&msg);
-		}
-	}
-}
-
 BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) {
 	if (dwCtrlType == CTRL_C_EVENT) {
 		SendWMCommand(hwndMain, IDM_FILE_EXIT);
@@ -631,8 +622,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	// create the timer first, to make flagMatchText working.
-	editMarkAllStatus.timer = WaitableTimer_Create();
-	idleDelayTimer = WaitableTimer_Create();
+	HANDLE timer = idleTaskTimer = WaitableTimer_Create();
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
@@ -640,7 +630,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	while (TRUE) {
 		if (editMarkAllStatus.pending) {
-			HANDLE timer = idleDelayTimer;
 			WaitableTimer_Set(timer, WaitableTimer_IdleTaskDelayTime);
 			while (editMarkAllStatus.pending && WaitableTimer_Continue(timer)) {
 				if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -648,7 +637,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 				}
 			}
 			if (editMarkAllStatus.pending) {
-				EditMarkAll_Continue(&editMarkAllStatus, EditMarkAll_IncrementSize);
+				EditMarkAll_Continue(&editMarkAllStatus, timer, EditMarkAll_IncrementSize);
 			}
 		}
 		if (GetMessage(&msg, NULL, 0, 0)) {
@@ -658,8 +647,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		}
 	}
 
-	WaitableTimer_Destroy(idleDelayTimer);
-	WaitableTimer_Destroy(editMarkAllStatus.timer);
+	WaitableTimer_Destroy(timer);
 	CleanUpResources(TRUE);
 	return (int)(msg.wParam);
 }
@@ -1005,6 +993,7 @@ static inline void NP2RestoreWind(HWND hwnd) {
 static inline void EditMarkAll_Stop(void) {
 	editMarkAllStatus.pending = FALSE;
 	editMarkAllStatus.matchCount = 0;
+	WaitableTimer_Set(idleTaskTimer, 0);
 	EditMarkAll_Clear();
 }
 

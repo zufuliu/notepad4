@@ -5597,6 +5597,7 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 //
 
 extern EditMarkAllStatus editMarkAllStatus;
+extern HANDLE idleTaskTimer;
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (editMarkAllStatus.matchCount != 0) {
@@ -5637,15 +5638,16 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCS
 	}
 
 
-	return EditMarkAll_Continue(&editMarkAllStatus, EditMarkAll_InitializedSize);
+	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer, EditMarkAll_InitializedSize);
 }
 
-BOOL EditMarkAll_Continue(EditMarkAllStatus *status, Sci_Position iMaxLength) {
+BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer, Sci_Position iMaxLength) {
 	// use increment search to ensure FindText() terminated in expected time.
 	// TODO: dynamic compute increment size with code similar to ActionDuration in Scintilla.
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = status->iStartPos;
-	iMaxLength = min_pos(max_pos(iMaxLength, status->iSelCount) + iStartPos, iLength);
+	iMaxLength += iStartPos + status->iSelCount;
+	iMaxLength = min_pos(iMaxLength, iLength);
 	if (iMaxLength < iLength) {
 		// match on whole line to avoid rewinding.
 		iMaxLength = SciCall_PositionFromLine(SciCall_LineFromPosition(iMaxLength) + 1);
@@ -5666,7 +5668,6 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, Sci_Position iMaxLength) {
 	UINT index = 0;
 	Sci_Position ranges[256*2];
 
-	HANDLE timer = status->timer;
 	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
 	while (ttf.chrg.cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);

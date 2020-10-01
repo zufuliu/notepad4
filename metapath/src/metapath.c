@@ -314,11 +314,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	InitInstance(hInstance, nShowCmd);
+	HWND hwnd = hwndMain;
 	HACCEL hAcc = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	MSG msg;
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
-		if (!TranslateAccelerator(hwndMain, hAcc, &msg)) {
+		if (!TranslateAccelerator(hwnd, hAcc, &msg)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
