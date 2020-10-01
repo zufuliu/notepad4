@@ -284,7 +284,7 @@ static EDITFINDREPLACE efrData;
 UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 EditMarkAllStatus editMarkAllStatus;
-HANDLE idleTaskTimer;
+static HANDLE idleDelayTimer;
 
 static int iSortOptions = 0;
 static int iAlignMode	= 0;
@@ -631,7 +631,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	}
 
 	// create the timer first, to make flagMatchText working.
-	idleTaskTimer = WaitableTimer_Create();
+	editMarkAllStatus.timer = WaitableTimer_Create();
+	idleDelayTimer = WaitableTimer_Create();
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
@@ -639,9 +640,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	while (TRUE) {
 		if (editMarkAllStatus.pending) {
-			WaitableTimer_DelayMain(idleTaskTimer, WaitableTimer_IdleTaskDelayTime);
+			HANDLE timer = idleDelayTimer;
+			WaitableTimer_Set(timer, WaitableTimer_IdleTaskDelayTime);
+			while (editMarkAllStatus.pending && WaitableTimer_Continue(timer)) {
+				if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+					DispatchMessageMain(&msg);
+				}
+			}
 			if (editMarkAllStatus.pending) {
-				EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+				EditMarkAll_Continue(&editMarkAllStatus, EditMarkAll_IncrementSize);
 			}
 		}
 		if (GetMessage(&msg, NULL, 0, 0)) {
@@ -651,7 +658,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		}
 	}
 
-	WaitableTimer_Destroy(idleTaskTimer);
+	WaitableTimer_Destroy(idleDelayTimer);
+	WaitableTimer_Destroy(editMarkAllStatus.timer);
 	CleanUpResources(TRUE);
 	return (int)(msg.wParam);
 }
@@ -995,6 +1003,7 @@ static inline void NP2RestoreWind(HWND hwnd) {
 }
 
 static inline void EditMarkAll_Stop(void) {
+	editMarkAllStatus.pending = FALSE;
 	editMarkAllStatus.matchCount = 0;
 	EditMarkAll_Clear();
 }

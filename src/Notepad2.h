@@ -84,8 +84,8 @@ typedef struct NP2PARAMS {
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
 #define APPM_TRAYMESSAGE			(WM_APP + 4)	// callback message from system tray
 
-#define ID_WATCHTIMER				0xA000	// FILE WATCH TIMER
-#define ID_PASTEBOARDTIMER			0xA001	// PASTE BOARD TIMER
+#define ID_WATCHTIMER				0xA000	// file watch timer
+#define ID_PASTEBOARDTIMER			0xA001	// paste board timer
 
 #define REUSEWINDOWLOCKTIMEOUT		1000	// Reuse Window Lock Timeout
 
