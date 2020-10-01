@@ -699,6 +699,7 @@ extern EDITLEXER lexJS;
 extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
 extern EDITLEXER lexVBS;
+extern HANDLE idleTaskTimer;
 
 static int GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
 	if (iCurrentStyle == SCE_H_CDATA) {
@@ -790,7 +791,8 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 	struct Sci_TextToFind ft = { { 0, iDocLen }, pFind, { 0, 0 } };
 
 	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
-	HANDLE timer = WaitableTimer_New(autoCompletionConfig.dwScanWordsTimeout);
+	HANDLE timer = idleTaskTimer;
+	WaitableTimer_Set(timer, autoCompletionConfig.dwScanWordsTimeout);
 
 	while (iPosFind >= 0 && iPosFind < iDocLen && WaitableTimer_Continue(timer)) {
 		Sci_Position wordEnd = iPosFind + iRootLen;
@@ -932,7 +934,6 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 		iPosFind = SciCall_FindText(findFlag, &ft);
 	}
 
-	WaitableTimer_Destroy(timer);
 	if (pFind != onStack) {
 		NP2HeapFree(pFind);
 	}
