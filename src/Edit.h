@@ -216,18 +216,21 @@ typedef struct EditMarkAllStatus {
 	int findFlag;
 	Sci_Position iSelCount;		// length for pszText
 	LPSTR pszText;				// pattern or text to find
-
+	HANDLE timer;
+	BOOL rewind;				// need rewind start position?
 	Sci_Position matchCount;	// total match count
 	Sci_Position lastMatchPos;	// last matching position
 	Sci_Position iStartPos;		// previous stop position
 } EditMarkAllStatus;
+#define EditMarkAll_InitializedSize	(1024*1024*1)
+#define EditMarkAll_IncrementSize	(1024*1024*16)
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
 NP2_inline void EditMarkAll_Clear(void) {
 	EditMarkAll_ClearEx(0, 0, NULL);
 }
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText);
-BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
+BOOL EditMarkAll_Continue(EditMarkAllStatus *status, Sci_Position iMaxLength);
 BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
 // auto completion fill-up characters

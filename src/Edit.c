@@ -5597,9 +5597,6 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 //
 
 extern EditMarkAllStatus editMarkAllStatus;
-extern HANDLE idleTaskTimer;
-#define EditMarkAll_InitializedSize	(1024*1024*1)
-#define EditMarkAll_IncrementSize	(1024*1024*16)
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (editMarkAllStatus.matchCount != 0) {
@@ -5614,6 +5611,7 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	editMarkAllStatus.findFlag = findFlag;
 	editMarkAllStatus.iSelCount= iSelCount;
 	editMarkAllStatus.pszText = pszText ? StrDupA(pszText) : NULL;
+	editMarkAllStatus.rewind = FALSE;
 	editMarkAllStatus.matchCount = 0;
 	editMarkAllStatus.lastMatchPos = 0;
 	editMarkAllStatus.iStartPos = 0;
@@ -5638,18 +5636,18 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCS
 		}
 	}
 
-	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+
+	return EditMarkAll_Continue(&editMarkAllStatus, EditMarkAll_InitializedSize);
 }
 
-BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
+BOOL EditMarkAll_Continue(EditMarkAllStatus *status, Sci_Position iMaxLength) {
 	// use increment search to ensure FindText() terminated in expected time.
 	// TODO: dynamic compute increment size with code similar to ActionDuration in Scintilla.
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = status->iStartPos;
-	Sci_Position iMaxLength = status->pending ? EditMarkAll_IncrementSize : EditMarkAll_InitializedSize;
-	iMaxLength = min_pos(iMaxLength + iStartPos, iLength);
+	iMaxLength = min_pos(max_pos(iMaxLength, status->iSelCount) + iStartPos, iLength);
 	if (iMaxLength < iLength) {
-		// match on whole line
+		// match on whole line to avoid rewinding.
 		iMaxLength = SciCall_PositionFromLine(SciCall_LineFromPosition(iMaxLength) + 1);
 		if (iMaxLength + EditMarkAll_InitializedSize >= iLength) {
 			iMaxLength = iLength;
@@ -5658,11 +5656,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 
 	// rewind start position
 	const int findFlag = status->findFlag;
-	if ((findFlag & SCFIND_REGEXP)) {
-		// no multiline regex
-	} else {
-		// rewind start position when transform backslash is checked,
-		// all other searching doesn't across lines.
+	if (status->rewind) {
 		iStartPos = max_pos(iStartPos - status->iSelCount + 1, status->lastMatchPos);
 	}
 
@@ -5672,6 +5666,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	UINT index = 0;
 	Sci_Position ranges[256*2];
 
+	HANDLE timer = status->timer;
 	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
 	while (ttf.chrg.cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
@@ -5767,6 +5762,12 @@ void EditFindAll(LPEDITFINDREPLACE lpefr) {
 	}
 
 	EditMarkAll_Start(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
+	// rewind start position when transform backslash is checked,
+	// all other searching doesn't across lines.
+	// NOTE: complex fix is needed when multiline regex is supported.
+	if (lpefr->bTransformBS && editMarkAllStatus.pending) {
+		editMarkAllStatus.rewind = strpbrk(szFind2, "\r\n") != NULL;
+	}
 }
 
 static void ShwowReplaceCount(Sci_Position iCount) {
