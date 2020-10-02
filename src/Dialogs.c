@@ -2107,6 +2107,10 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		SetDlgItemInt(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, autoCompletionConfig.iMinNumberLength, FALSE);
 		SendDlgItemMessage(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, EM_LIMITTEXT, 8, 0);
 
+		WCHAR wch[32];
+		wsprintf(wch, L"%u ms", autoCompletionConfig.dwScanWordsTimeout);
+		SetDlgItemText(hwnd, IDC_AUTOC_SCAN_WORDS_TIMEOUT, wch);
+
 		int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
 		if (mask & AutoCompleteFillUpEnter) {
 			CheckDlgButton(hwnd, IDC_AUTOC_FILLUP_ENTER, BST_CHECKED);
@@ -2176,6 +2180,12 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 
 			mask = GetDlgItemInt(hwnd, IDC_AUTOC_MIN_NUMBER_LENGTH, NULL, FALSE);
 			autoCompletionConfig.iMinNumberLength = max_i(mask, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
+
+			WCHAR wch[32];
+			GetDlgItemText(hwnd, IDC_AUTOC_SCAN_WORDS_TIMEOUT, wch, COUNTOF(wch));
+			if (CRTStrToInt(wch, &mask)) {
+				autoCompletionConfig.dwScanWordsTimeout = max_i(mask, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
+			}
 
 			mask = 0;
 			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_ENTER)) {
