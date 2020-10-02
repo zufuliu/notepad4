@@ -507,23 +507,8 @@ static inline void FindSystemDefaultCodeFont(void) {
 }
 
 static inline void FindSystemDefaultTextFont(void) {
-	if (IsVistaAndAbove()) {
-		NONCLIENTMETRICS ncm;
-		ZeroMemory(&ncm, sizeof(ncm));
-		ncm.cbSize = sizeof(ncm);
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
-		if (!IsVistaAndAbove()) {
-			ncm.cbSize -= sizeof(ncm.iPaddedBorderWidth);
-		}
-#endif
-		if (SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0)) {
-			lstrcpyn(systemTextFontName, ncm.lfMessageFont.lfFaceName, COUNTOF(systemTextFontName));
-			return;
-		}
-	}
-
-	// Windows 2000, XP, 2003
-	lstrcpy(systemTextFontName, L"Tahoma");
+	WORD wSize;
+	GetThemedDialogFont(systemTextFontName, &wSize);
 }
 
 void Style_DetectBaseFontSize(HWND hwnd) {

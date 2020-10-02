@@ -5644,7 +5644,6 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCS
 		}
 	}
 
-
 	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
 }
 
@@ -5714,7 +5713,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	iStartPos = max_pos(iStartPos, ttf.chrg.cpMin);
 	const BOOL pending = iStartPos < iLength;
 	if (pending) {
-		// dynamic compute increment size, see ActionDuration in Scintilla.
+		// dynamic compute increment search size, see ActionDuration in Scintilla.
 		QueryPerformanceCounter(&status->watch.end);
 		const double period = StopWatch_Get(&status->watch);
 		iMaxLength = iStartPos - status->iStartPos;
