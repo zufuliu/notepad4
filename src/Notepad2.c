@@ -623,6 +623,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// create the timer first, to make flagMatchText working.
 	HANDLE timer = idleTaskTimer = WaitableTimer_Create();
+	QueryPerformanceFrequency(&editMarkAllStatus.watch.freq);
 	InitInstance(hInstance, nShowCmd);
 	hAccMain = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINWND));
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
@@ -637,7 +638,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 				}
 			}
 			if (editMarkAllStatus.pending) {
-				EditMarkAll_Continue(&editMarkAllStatus, timer, EditMarkAll_IncrementSize);
+				EditMarkAll_Continue(&editMarkAllStatus, timer);
 			}
 		}
 		if (GetMessage(&msg, NULL, 0, 0)) {
