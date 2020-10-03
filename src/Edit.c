@@ -5600,7 +5600,10 @@ extern EditMarkAllStatus editMarkAllStatus;
 extern HANDLE idleTaskTimer;
 #define EditMarkAll_MeasuredSize		(1024*1024)
 #define EditMarkAll_MinDuration			1
-#define EditMarkAll_DefaultDuration		32	// (100 / 32) => 4 MiB on second search
+// (100 / 64) => 2 MiB on second search.
+// increment search size will return to normal after several runs
+// when selection no longer changed, this make continuous selecting smooth.
+#define EditMarkAll_DefaultDuration		64
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (editMarkAllStatus.matchCount != 0) {
