@@ -452,16 +452,17 @@ void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
 
 void BackgroundWorker_Stop(BackgroundWorker *worker) {
 	SetEvent(worker->eventCancel);
-	if (worker->workerThread) {
-		while (WaitForSingleObject(worker->workerThread, 0) != WAIT_OBJECT_0) {
+	HANDLE workerThread = worker->workerThread;
+	if (workerThread) {
+		worker->workerThread = NULL;
+		while (WaitForSingleObject(workerThread, 0) != WAIT_OBJECT_0) {
 			MSG msg;
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
 		}
-		CloseHandle(worker->workerThread);
-		worker->workerThread = NULL;
+		CloseHandle(workerThread);
 	}
 }
 
