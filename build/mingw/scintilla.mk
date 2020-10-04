@@ -35,7 +35,7 @@ $(OBJDIR) :
 	@mkdir -p $(OBJDIR)
 
 $(NAME) : $(lexers_obj) $(lexlib_obj) $(scisrc_obj) $(sciwin32_obj)
-	$(AR) cru $(OBJDIR)/$@ $^
+	$(AR) cru $(BINFOLDER)/obj/$@ $^
 
 $(lexers_obj): $(OBJDIR)/%.obj: $(lexers_dir)/%.cxx
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
@@ -51,3 +51,4 @@ $(sciwin32_obj): $(OBJDIR)/%.obj: $(sciwin32_dir)/%.cxx
 
 clean :
 	@$(RM) -r $(OBJDIR)
+	@$(RM) -r $(BINFOLDER)/obj/$(NAME)
