@@ -2,34 +2,36 @@
 
 PROJ = metapath
 NAME = $(PROJ).exe
-BINDIR = $(BINFOLDER)/$(PROJ)
+OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 SRCDIR = ../../$(PROJ)/src
 
+LDLIBS += -lpsapi
+
 c_src = $(wildcard $(SRCDIR)/*.c)
-c_obj = $(patsubst $(SRCDIR)/%.c,$(BINDIR)/%.obj,$(c_src))
+c_obj = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.obj,$(c_src))
 
 cpp_src = $(wildcard $(SRCDIR)/*.cpp)
-cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(BINDIR)/%.obj,$(cpp_src))
+cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
 
 rc_src = $(wildcard $(SRCDIR)/*.rc)
-rc_obj = $(patsubst $(SRCDIR)/%.rc,$(BINDIR)/%.res,$(rc_src))
+rc_obj = $(patsubst $(SRCDIR)/%.rc,$(OBJDIR)/%.res,$(rc_src))
 
-all : $(BINDIR) $(NAME)
+all : $(OBJDIR) $(NAME)
 
-$(BINDIR) :
-	@mkdir -p $(BINDIR)
+$(OBJDIR) :
+	@mkdir -p $(OBJDIR)
 
 $(NAME) : $(c_obj) $(cpp_obj) $(rc_obj)
-	$(CXX) $^ $(LDFLAGS) $(LDLIBS) -o $(BINDIR)/$@
+	$(CXX) $^ $(LDFLAGS) $(LDLIBS) -o $(BINFOLDER)/$@
 
-$(c_obj): $(BINDIR)/%.obj: $(SRCDIR)/%.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $(BINDIR)/$*.obj
+$(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $(OBJDIR)/$*.obj
 
-$(cpp_obj): $(BINDIR)/%.obj: $(SRCDIR)/%.cpp
-	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $(BINDIR)/$*.obj
+$(cpp_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $(OBJDIR)/$*.obj
 
-$(rc_obj) : $(BINDIR)/%.res: $(SRCDIR)/%.rc
-	$(RC) -c 65001 --preprocessor '$(CC) -E -xc $(RESFLAGS) $(CPPFLAGS)' -O coff $< $(BINDIR)/$*.res
+$(rc_obj) : $(OBJDIR)/%.res: $(SRCDIR)/%.rc
+	$(RC) -c 65001 --preprocessor '$(CC) -E -xc $(RESFLAGS) $(CPPFLAGS)' -O coff $< $(OBJDIR)/$*.res
 
 clean :
-	@$(RM) -r $(BINDIR)
+	@$(RM) -r $(OBJDIR)
