@@ -12,7 +12,7 @@ INCDIR = \
 	-I"../../src/EditLexers" \
 	-I"$(scintilla_dir)/include"
 
-LDFLAGS += -L"$(BINFOLDER)/obj/scintilla"
+LDFLAGS += -L"$(BINFOLDER)/obj"
 
 LDLIBS += -limm32
 
@@ -46,7 +46,8 @@ $(cpp_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
 
 $(rc_obj) : $(OBJDIR)/%.res: $(SRCDIR)/%.rc
-	$(RC) -c 65001 --preprocessor '$(CC) -E -xc $(RESFLAGS) $(CPPFLAGS)' -O coff $< $(OBJDIR)/$*.res
+	$(RC) -c 65001 --preprocessor '$(CC) -E -xc $(RCFLAGS) $(CPPFLAGS)' -O coff $< $(OBJDIR)/$*.res
 
 clean :
 	@$(RM) -r $(OBJDIR)
+	@$(RM) -r $(BINFOLDER)/$(NAME)
