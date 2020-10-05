@@ -7,7 +7,7 @@ defaults:
     shell: cmd
 
 jobs:
-  msvc_build:
+  msvc:
     name: Build with Visual C++
     runs-on: windows-latest
     steps:
@@ -105,24 +105,24 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
           name: Notepad2_Clang_MSVC_en_x64
-          path: 'build\Notepad2_Clang_x64_*.zip'
+          path: 'build\Notepad2_LLVM_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
           name: Notepad2_Clang_MSVC_en_Win32
-          path: 'build\Notepad2_Clang_Win32_*.zip'
+          path: 'build\Notepad2_LLVM_Win32_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
           name: Notepad2_Clang_MSVC_en_AVX2
-          path: 'build\Notepad2_Clang_AVX2_*.zip'
+          path: 'build\Notepad2_LLVM_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
           name: Notepad2_Clang_MSVC_en_ARM64
-          path: 'build\Notepad2_Clang_ARM64_*.zip'
+          path: 'build\Notepad2_LLVM_ARM64_*.zip'
 
     #- uses: actions/upload-artifact@v2
     #  with:
     #      name: Notepad2_Clang_MSVC_en_ARM
-    #      path: 'build\Notepad2_Clang_ARM_*.zip'
+    #      path: 'build\Notepad2_LLVM_ARM_*.zip'
