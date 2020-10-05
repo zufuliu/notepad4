@@ -12,69 +12,141 @@ export LDLIBS += -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -ladvapi32 -l
 	-lshell32 -lole32 -loleaut32 -luuid -luxtheme
 export RCFLAGS += -DRC_INVOKED -DUNICODE -D_UNICODE
 
-# Check if debug mode
-
-ifdef DEBUG
-	CONFIG := Debug
-	export CPPFLAGS += -D_DEBUG
-	export CFLAGS += -g -O0
-	export CXXFLAGS += -g -O0
-	export LDFLAGS += -O0
-	export RCFLAGS += -D_DEBUG
+# Host triplet if specified. e.g. x86_64-w64-mingw32 for 64bit.
+ifdef TRIPLET
+	export CC := $(TRIPLET)-$(if $(Clang),clang,gcc)
+	export CXX := $(TRIPLET)-$(if $(Clang),clang++,g++)
+	export RC := $(TRIPLET)-windres
 else
-	CONFIG := Release
-	export CPPFLAGS += -DNDEBUG
-	export CFLAGS += -O2 -ffast-math -fomit-frame-pointer
-	export CXXFLAGS += -O2 -ffast-math -fno-rtti -fomit-frame-pointer
-	export LDFLAGS += -s -O2 -static -Wl,--gc-sections -ffast-math -fno-rtti -fomit-frame-pointer
+	export CC := $(if $(Clang),clang,gcc)
+	export CXX := $(if $(Clang),clang++,g++)
+	export RC := windres
+endif
+ifdef Clang
+	ifdef LTO
+		LLD := 1
+	endif
 endif
 
 # Detect host architecture
+ifndef ARCH
+	ARCH := $(shell $(CC) -dumpmachine)
+	ifeq (x86_64, $(findstring x86_64, $(ARCH)))
+		ARCH := x64
+	else ifeq (i686, $(findstring i686, $(ARCH)))
+		ARCH := Win32
+	else ifeq (aarch64, $(findstring aarch64, $(ARCH)))
+		ARCH := ARM64
+		LLD := 1
+	else ifeq (armv7, $(findstring armv7, $(ARCH)))
+		ARCH := ARM
+		LLD := 1
+	endif
+endif
 
-ARCH = $(shell $(CC) -dumpmachine)
+# Check build configuration
+LLDFLAGS = $(if $(LLD),-fuse-ld=lld,)
+ifdef DEBUG
+	CONFIG := Debug
+	export CPPFLAGS += -D_DEBUG
+	export CFLAGS += -g -O0 $(LLDFLAGS)
+	export CXXFLAGS += -g -O0 $(LLDFLAGS)
+	export LDFLAGS += -O0 $(LLDFLAGS)
+	export RCFLAGS += -D_DEBUG
+else
+	CONFIG := Release
+	LTOFLAGS = $(if $(LTO),-flto,)
+	export CPPFLAGS += -DNDEBUG
+	export CFLAGS += -O2 -ffast-math -fomit-frame-pointer $(LTOFLAGS) $(LLDFLAGS)
+	export CXXFLAGS += -O2 -ffast-math -fno-rtti -fomit-frame-pointer $(LTOFLAGS) $(LLDFLAGS)
+	export LDFLAGS += -s -O2 -static -Wl,--gc-sections -ffast-math -fno-rtti -fomit-frame-pointer $(LTOFLAGS) $(LLDFLAGS)
+endif
 
-ifeq ($(ARCH), x86_64-w64-mingw32)
-	ARCH := x64
-	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0502 -DWINVER=0x0502
+# llvm-mingw uses libc++, which requires Windows 7+.
+ifeq ($(ARCH), x64)
 	export RCFLAGS += -D_WIN64
-	export LDFLAGS += -Wl,--major-os-version,5 -Wl,--minor-os-version,2 -Wl,--subsystem,windows:5.02
-else ifeq ($(ARCH), i686-w64-mingw32)
-	ARCH := Win32
-	export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501
+	ifdef WIN7
+		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
+		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,1
+		ifeq ($(LLD),)
+			export LDFLAGS += -Wl,--subsystem,windows:6.01
+		endif
+	else
+		# Windows XP 64-bit, Windows Server 2003
+		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0502 -DWINVER=0x0502
+		export LDFLAGS += -Wl,--major-os-version,5 -Wl,--minor-os-version,2
+		ifeq ($(LLD),)
+			export LDFLAGS += -Wl,--subsystem,windows:5.02
+		endif
+	endif
+else ifeq ($(ARCH), AVX2)
+	# Windows 7 SP1, Windows Server 2008 R2 SP1, 64-bit only
+	export CFLAGS += -mavx2 -mpopcnt -mbmi
+	export CXXFLAGS += -mavx2 -mpopcnt -mbmi
+	export RCFLAGS += -D_WIN64
+	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
+	export LDFLAGS += -mavx2 -mpopcnt -mbmi -Wl,--major-os-version,6 -Wl,--minor-os-version,1
+	ifeq ($(LLD),)
+		export LDFLAGS += -Wl,--subsystem,windows:6.01
+	endif
+else ifeq ($(ARCH), Win32)
 	export CFLAGS += -msse2 -mfpmath=sse
 	export CXXFLAGS += -msse2 -mfpmath=sse
 	export RCFLAGS += -DWIN32
-	export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,5 -Wl,--minor-os-version,1 -Wl,--subsystem,windows:5.01
+	ifdef WIN7
+		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
+		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,1
+		ifeq ($(LLD),)
+			export LDFLAGS += -Wl,--subsystem,windows:6.01
+		endif
+	else
+		# Windows XP
+		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501
+		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,5 -Wl,--minor-os-version,1
+		ifeq ($(LLD),)
+			export LDFLAGS += -Wl,--subsystem,windows:5.01
+		endif
+	endif
+else ifeq ($(ARCH), ARM64)
+	# Windows 10 1709, requires llvm-mingw.
+	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00
+	export RCFLAGS += -D_WIN64
+	export LDFLAGS += -Wl,--major-os-version,10 -Wl,--minor-os-version,0
+else ifeq ($(ARCH), ARM)
+	# Windows 8 RT, requires llvm-mingw. LLVM doesn't full support this target.
+	export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0602 -DWINVER=0x0602
+	export RCFLAGS += -DWIN32
+	export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,2
 else
 	$(error '$(ARCH)' is not supported)
 endif
 
-# Host triplet if specified. e.g. x86_64-w64-mingw32 for 64bit.
-
-ifdef TRIPLET
-	export RC := $(TRIPLET)-windres
+# lld linker doesn't need/support subsystem version.
+# see https://github.com/mstorsjo/llvm-mingw/issues/152
+ifeq ($(LLD),)
+	export RCFLAGS += -O coff
 else
-	export RC := windres
+	export RCFLAGS += -O res
+	export LDFLAGS += -Wl,--subsystem,windows
 endif
 
 # Name root build folder
+export BINFOLDER := ../bin/$(if $(Clang),Clang,)$(CONFIG)_$(ARCH)
 
-export BINFOLDER := ../bin/$(CONFIG)_$(ARCH)
+all: metapath scintilla notepad2
 
-all : metapath scintilla notepad2
-
-metapath :
+metapath:
 	$(MAKE) -f metapath.mk
 
 scintilla:
 	$(MAKE) -f scintilla.mk
 
-notepad2 :
+notepad2:
 	$(MAKE) -f scintilla.mk
 	$(MAKE) -f notepad2.mk
 
-clean :
+clean:
 	$(MAKE) -f metapath.mk clean
 	$(MAKE) -f scintilla.mk clean
 	$(MAKE) -f notepad2.mk clean
-	@$(RM) -r $(BINFOLDER)/obj
+	@$(RM) -rf $(BINFOLDER)/obj
