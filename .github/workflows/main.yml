@@ -126,3 +126,78 @@ jobs:
     #  with:
     #      name: Notepad2_Clang_MSVC_en_ARM
     #      path: 'build\Notepad2_LLVM_ARM_*.zip'
+
+  llvm_mingw:
+    name: Build with llvm-mingw
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install LLVM
+      run: |
+        CALL "build\install_mingw" llvm
+
+    - name: Clang x64 Release
+      run: |
+        SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
+        PUSHD "build\mingw"
+        mingw32-make TRIPLET=x86_64-w64-mingw32 Clang=1 LTO=1 -j8
+        POPD
+        CALL "build\make_zip.bat" Clang x64 Release 1
+
+    - name: Clang Win32 Release
+      run: |
+        SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
+        PUSHD "build\mingw"
+        mingw32-make TRIPLET=i686-w64-mingw32 Clang=1 LTO=1 -j8
+        POPD
+        CALL "build\make_zip.bat" Clang Win32 Release 1
+
+    - name: Clang AVX2 Release
+      run: |
+        SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
+        PUSHD "build\mingw"
+        mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX2 Clang=1 LTO=1 -j8
+        POPD
+        CALL "build\make_zip.bat" Clang ARM64 Release 1
+
+    - name: Clang ARM64 Release
+      run: |
+        SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
+        PUSHD "build\mingw"
+        mingw32-make TRIPLET=aarch64-w64-mingw32 Clang=1 LTO=1 -j8
+        POPD
+        CALL "build\make_zip.bat" Clang ARM64 Release 1
+
+    - name: Clang ARM Release
+      run: |
+        SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
+        PUSHD "build\mingw"
+        mingw32-make TRIPLET=armv7-w64-mingw32 Clang=1 LTO=1 -j8
+        POPD
+        CALL "build\make_zip.bat" Clang ARM Release 1
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_llvm_mingw_en_x64
+          path: 'build\Notepad2_Clang_x64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_llvm_mingw_en_Win32
+          path: 'build\Notepad2_Clang_Win32_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_llvm_mingw_en_AVX2
+          path: 'build\Notepad2_Clang_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_llvm_mingw_en_ARM64
+          path: 'build\Notepad2_Clang_ARM64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_llvm_mingw_en_ARM
+          path: 'build\Notepad2_Clang_ARM_*.zip'

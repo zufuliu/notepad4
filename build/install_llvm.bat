@@ -1,5 +1,5 @@
 @ECHO OFF
-@rem used on AppVeyor and GitHub
+@rem used for AppVeyor and GitHub Actions
 
 IF /I "%~1" == "latest" (
   SHIFT
