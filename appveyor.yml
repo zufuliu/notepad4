@@ -168,7 +168,7 @@ for:
     build_script:
       - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
-      - cmd: CALL "build\make_zip.bat" Clang x64 Release 1
+      - cmd: CALL "build\make_zip.bat" LLVM x64 Release 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
@@ -200,7 +200,7 @@ for:
     build_script:
       - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
-      - cmd: CALL "build\make_zip.bat" Clang Win32 Release 1
+      - cmd: CALL "build\make_zip.bat" LLVM Win32 Release 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
@@ -232,7 +232,7 @@ for:
     build_script:
       - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
-      - cmd: CALL "build\make_zip.bat" Clang AVX2 Release 1
+      - cmd: CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
@@ -264,7 +264,7 @@ for:
     build_script:
       - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
-      - cmd: CALL "build\make_zip.bat" Clang ARM64 Release 1
+      - cmd: CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
@@ -295,7 +295,7 @@ for:
     build_script:
       - cmd: CALL "build\install_llvm.bat" 1
       - cmd: CALL "build\VS2017\build.bat" Build ARM LLVMRelease 1
-      - cmd: CALL "build\make_zip.bat" Clang ARM Release 1
+      - cmd: CALL "build\make_zip.bat" LLVM ARM Release 1
 
     artifacts:
       - path: 'build\Notepad2*.zip'
