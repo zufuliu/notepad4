@@ -156,7 +156,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_i18n_x64
+        name: Notepad2_MSVC_i18n_x64
 
   - # Clang x64 Release
     matrix:
@@ -172,7 +172,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_x64
+        name: Notepad2_Clang_MSVC_en_x64
 
   - # MSVC Win32 Release
     matrix:
@@ -188,7 +188,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_i18n_Win32
+        name: Notepad2_MSVC_i18n_Win32
 
   - # Clang Win32 Release
     matrix:
@@ -204,7 +204,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_Win32
+        name: Notepad2_Clang_MSVC_en_Win32
 
   - # MSVC AVX2 Release
     matrix:
@@ -220,7 +220,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_i18n_AVX2
+        name: Notepad2_MSVC_i18n_AVX2
 
   - # Clang AVX2 Release
     matrix:
@@ -236,7 +236,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_AVX2
+        name: Notepad2_Clang_MSVC_en_AVX2
 
   - # MSVC ARM64 Release
     matrix:
@@ -252,7 +252,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_i18n_ARM64
+        name: Notepad2_MSVC_i18n_ARM64
 
   - # Clang ARM64 Release
     matrix:
@@ -268,7 +268,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_ARM64
+        name: Notepad2_Clang_MSVC_en_ARM64
 
   - # MSVC ARM Release
     matrix:
@@ -283,7 +283,7 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_ARM
+        name: Notepad2_MSVC_ARM_en
 
   - # Clang ARM Release
     matrix:
@@ -299,4 +299,4 @@ for:
 
     artifacts:
       - path: 'build\Notepad2*.zip'
-        name: Notepad2_Clang_ARM
+        name: Notepad2_Clang_MSVC_en_ARM
