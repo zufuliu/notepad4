@@ -44,31 +44,31 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_i18n_x64
+          name: Notepad2_MSVC_i18n_x64
           path: 'build\Notepad2_i18n_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_i18n_Win32
+          name: Notepad2_MSVC_i18n_Win32
           path: 'build\Notepad2_i18n_Win32_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_i18n_AVX2
+          name: Notepad2_MSVC_i18n_AVX2
           path: 'build\Notepad2_i18n_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_i18n_ARM64
+          name: Notepad2_MSVC_i18n_ARM64
           path: 'build\Notepad2_i18n_ARM64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_ARM
+          name: Notepad2_MSVC_ARM_en
           path: 'build\Notepad2_ARM_*.zip'
 
-  clang_build:
-    name: Build with Clang
+  llvm_msvc:
+    name: Build with LLVM/MSVC
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -80,49 +80,49 @@ jobs:
     - name: Clang x64 Release
       run: |
         CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
-        CALL "build\make_zip.bat" Clang x64 Release 1
+        CALL "build\make_zip.bat" LLVM x64 Release 1
 
     - name: Clang Win32 Release
       run: |
         CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
-        CALL "build\make_zip.bat" Clang Win32 Release 1
+        CALL "build\make_zip.bat" LLVM Win32 Release 1
 
     - name: Clang AVX2 Release
       run: |
         CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
-        CALL "build\make_zip.bat" Clang AVX2 Release 1
+        CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
     - name: Clang ARM64 Release
       run: |
         CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
-        CALL "build\make_zip.bat" Clang ARM64 Release 1
+        CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
     #- name: Clang ARM Release
     #  run: |
     #    CALL "build\VS2017\build.bat" Build ARM LLVMRelease 1
-    #    CALL "build\make_zip.bat" Clang ARM Release 1
+    #    CALL "build\make_zip.bat" LLVM ARM Release 1
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_x64
+          name: Notepad2_Clang_MSVC_en_x64
           path: 'build\Notepad2_Clang_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_Win32
+          name: Notepad2_Clang_MSVC_en_Win32
           path: 'build\Notepad2_Clang_Win32_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_AVX2
+          name: Notepad2_Clang_MSVC_en_AVX2
           path: 'build\Notepad2_Clang_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_ARM64
+          name: Notepad2_Clang_MSVC_en_ARM64
           path: 'build\Notepad2_Clang_ARM64_*.zip'
 
     #- uses: actions/upload-artifact@v2
     #  with:
-    #      name: Notepad2_Clang_ARM
+    #      name: Notepad2_Clang_MSVC_en_ARM
     #      path: 'build\Notepad2_Clang_ARM_*.zip'
