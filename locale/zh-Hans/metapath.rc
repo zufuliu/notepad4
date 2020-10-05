@@ -8,7 +8,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#if defined(__MINGW64__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 #include <afxres.h>
 #include <winresrc.h>
 #else
