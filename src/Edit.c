@@ -1333,7 +1333,7 @@ void EditInvertCase(void) {
 
 // https://docs.microsoft.com/en-us/windows/win32/intl/transliteration-services
 #include <elscore.h>
-#if defined(__MINGW64__) || defined(__MINGW32__)
+#if defined(__MINGW32__)
 #if defined(__has_include) && __has_include(<elssrvc.h>)
 #include <elssrvc.h>
 #else
@@ -1360,7 +1360,7 @@ static const GUID ELS_GUID_TRANSLITERATION_CYRILLIC_TO_LATIN =
 // {F4DFD825-91A4-489f-855E-9AD9BEE55727}
 static const GUID ELS_GUID_TRANSLITERATION_BENGALI_TO_LATIN =
 	{ 0xF4DFD825, 0x91A4, 0x489f, { 0x85, 0x5E, 0x9A, 0xD9, 0xBE, 0xE5, 0x57, 0x27 } };
-#endif // __MINGW64__ || __MINGW32__
+#endif // __MINGW32__
 #else
 #include <elssrvc.h>
 #endif

@@ -279,7 +279,7 @@ typedef struct EditAutoCompletionConfig {
 	BOOL bCloseTags;
 	BOOL bCompleteWord;
 	BOOL bScanWordsInDocument;
-	DWORD dwScanWordsTimeout;
+	UINT dwScanWordsTimeout;
 	BOOL bEnglistIMEModeOnly;
 	BOOL bIgnoreCase;
 	UINT iVisibleItemCount;

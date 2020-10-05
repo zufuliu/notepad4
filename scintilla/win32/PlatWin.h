@@ -59,16 +59,16 @@
 #endif
 
 // since Windows 10, version 1607
-#if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+#if (defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)) && !defined(__MINGW32__)
 // 1709 was the first version for Windows 10 on ARM64.
-#define NP2_TARGET_ARM64	1
+#define NP2_HAS_GETDPIFORWINDOW					1
 #define GetWindowDPI(hwnd)						GetDpiForWindow(hwnd)
 #define SystemMetricsForDpi(nIndex, dpi)		GetSystemMetricsForDpi((nIndex), (dpi))
 #define AdjustWindowRectForDpi(lpRect, dwStyle, dwExStyle, dpi) \
 		::AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
 
 #else
-#define NP2_TARGET_ARM64	0
+#define NP2_HAS_GETDPIFORWINDOW					0
 #if NP2_FORCE_COMPILE_C_AS_CPP
 #define NP2_noexcept noexcept
 extern UINT GetWindowDPI(HWND hwnd) noexcept;

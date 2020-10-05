@@ -63,7 +63,7 @@ extern UINT g_uSystemDPI;
 extern "C" UINT g_uSystemDPI;
 #endif
 
-#if !NP2_TARGET_ARM64
+#if !NP2_HAS_GETDPIFORWINDOW
 namespace {
 
 using GetDpiForWindowSig = UINT (WINAPI *)(HWND hwnd);
@@ -1350,7 +1350,7 @@ void SurfaceD2D::InitPixMap(int width, int height, Surface *surface_, WindowID w
 	PLATFORM_ASSERT(psurfOther);
 	const D2D1_SIZE_F desiredSize = D2D1::SizeF(static_cast<float>(width), static_cast<float>(height));
 	D2D1_PIXEL_FORMAT desiredFormat;
-#ifdef __MINGW32__
+#if defined(__MINGW32__)
 	desiredFormat.format = DXGI_FORMAT_UNKNOWN;
 #else
 	desiredFormat = psurfOther->pRenderTarget->GetPixelFormat();
@@ -3659,7 +3659,7 @@ void Platform_Finalise(bool fromDllMain) noexcept {
 		}
 	}
 #endif
-#if !NP2_TARGET_ARM64
+#if !NP2_HAS_GETDPIFORWINDOW
 	if (!fromDllMain && hShcoreDLL) {
 		FreeLibrary(hShcoreDLL);
 		hShcoreDLL = {};
