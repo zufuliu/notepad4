@@ -12,11 +12,16 @@ export LDLIBS += -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -ladvapi32 -l
 	-lshell32 -lole32 -loleaut32 -luuid -luxtheme
 export RCFLAGS += -DRC_INVOKED -DUNICODE -D_UNICODE
 
-# Host triplet if specified. e.g. x86_64-w64-mingw32 for 64bit.
+# Target triplet if specified. e.g. x86_64-w64-mingw32 for 64bit.
 ifdef TRIPLET
 	export CC := $(TRIPLET)-$(if $(Clang),clang,gcc)
 	export CXX := $(TRIPLET)-$(if $(Clang),clang++,g++)
 	export RC := $(TRIPLET)-windres
+	# which and where will print not found message
+	DUMMY := $(shell $(RC) -V 2> /dev/null)
+	ifndef DUMMY
+		export RC := windres
+	endif
 else
 	export CC := $(if $(Clang),clang,gcc)
 	export CXX := $(if $(Clang),clang++,g++)
@@ -28,20 +33,20 @@ ifdef Clang
 	endif
 endif
 
-# Detect host architecture
+# Detect target architecture
 ifndef ARCH
 	ARCH := $(shell $(CC) -dumpmachine)
-	ifeq (x86_64, $(findstring x86_64, $(ARCH)))
-		ARCH := x64
-	else ifeq (i686, $(findstring i686, $(ARCH)))
-		ARCH := Win32
-	else ifeq (aarch64, $(findstring aarch64, $(ARCH)))
-		ARCH := ARM64
-		LLD := 1
-	else ifeq (armv7, $(findstring armv7, $(ARCH)))
-		ARCH := ARM
-		LLD := 1
-	endif
+endif
+ifeq (x86_64, $(findstring x86_64, $(ARCH)))
+	ARCH := x64
+else ifeq (i686, $(findstring i686, $(ARCH)))
+	ARCH := Win32
+else ifeq (aarch64, $(findstring aarch64, $(ARCH)))
+	ARCH := ARM64
+	LLD := 1
+else ifeq (armv7, $(findstring armv7, $(ARCH)))
+	ARCH := ARM
+	LLD := 1
 endif
 
 # Check build configuration
