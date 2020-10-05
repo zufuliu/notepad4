@@ -29,12 +29,12 @@ scisrc_obj = $(patsubst $(scisrc_dir)/%.cxx,$(OBJDIR)/%.obj,$(scisrc_src))
 sciwin32_src = $(wildcard $(sciwin32_dir)/*.cxx)
 sciwin32_obj = $(patsubst $(sciwin32_dir)/%.cxx,$(OBJDIR)/%.obj,$(sciwin32_src))
 
-all : $(OBJDIR) $(NAME)
+all: $(OBJDIR) $(NAME)
 
-$(OBJDIR) :
+$(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-$(NAME) : $(lexers_obj) $(lexlib_obj) $(scisrc_obj) $(sciwin32_obj)
+$(NAME): $(lexers_obj) $(lexlib_obj) $(scisrc_obj) $(sciwin32_obj)
 	$(AR) cru $(BINFOLDER)/obj/$@ $^
 
 $(lexers_obj): $(OBJDIR)/%.obj: $(lexers_dir)/%.cxx
@@ -49,6 +49,6 @@ $(scisrc_obj): $(OBJDIR)/%.obj: $(scisrc_dir)/%.cxx
 $(sciwin32_obj): $(OBJDIR)/%.obj: $(sciwin32_dir)/%.cxx
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
 
-clean :
-	@$(RM) -r $(OBJDIR)
-	@$(RM) -r $(BINFOLDER)/obj/$(NAME)
+clean:
+	@$(RM) -rf $(OBJDIR)
+	@$(RM) -f $(BINFOLDER)/obj/$(NAME)

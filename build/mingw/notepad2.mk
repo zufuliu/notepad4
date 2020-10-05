@@ -28,12 +28,12 @@ cpp_obj = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.obj,$(cpp_src))
 rc_src = $(wildcard $(SRCDIR)/*.rc)
 rc_obj = $(patsubst $(SRCDIR)/%.rc,$(OBJDIR)/%.res,$(rc_src))
 
-all : $(OBJDIR) $(NAME)
+all: $(OBJDIR) $(NAME)
 
-$(OBJDIR) :
+$(OBJDIR):
 	@mkdir -p $(OBJDIR)
 
-$(NAME) : $(editlexers_obj) $(c_obj) $(cpp_obj) $(rc_obj)
+$(NAME): $(editlexers_obj) $(c_obj) $(cpp_obj) $(rc_obj)
 	$(CXX) $^ $(LDFLAGS) -lscintilla $(LDLIBS) -o $(BINFOLDER)/$@
 
 $(editlexers_obj): $(OBJDIR)/%.obj: $(editlexers_dir)/%.c
@@ -45,9 +45,9 @@ $(c_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.c
 $(cpp_obj): $(OBJDIR)/%.obj: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCDIR) $< -o $(OBJDIR)/$*.obj
 
-$(rc_obj) : $(OBJDIR)/%.res: $(SRCDIR)/%.rc
-	$(RC) -c 65001 --preprocessor '$(CC) -E -xc $(RCFLAGS) $(CPPFLAGS)' -O coff $< $(OBJDIR)/$*.res
+$(rc_obj): $(OBJDIR)/%.res: $(SRCDIR)/%.rc
+	$(RC) -c 65001 $(CPPFLAGS) $(RCFLAGS) $< $(OBJDIR)/$*.res
 
-clean :
-	@$(RM) -r $(OBJDIR)
-	@$(RM) -r $(BINFOLDER)/$(NAME)
+clean:
+	@$(RM) -rf $(OBJDIR)
+	@$(RM) -f $(BINFOLDER)/$(NAME)
