@@ -54,6 +54,22 @@ NP2_inline long max_l(long x, long y) {
 	return (x > y) ? x : y;
 }
 
+NP2_inline float min_f(float x, float y) {
+	return (x < y) ? x : y;
+}
+
+NP2_inline float max_f(float x, float y) {
+	return (x > y) ? x : y;
+}
+
+NP2_inline double min_d(double x, double y) {
+	return (x < y) ? x : y;
+}
+
+NP2_inline double max_d(double x, double y) {
+	return (x > y) ? x : y;
+}
+
 NP2_inline int clamp_i(int x, int lower, int upper) {
 	return (x < lower) ? lower : (x > upper) ? upper : x;
 }

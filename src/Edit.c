@@ -5593,11 +5593,17 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 //=============================================================================
 //
 // EditMarkAll()
-// Mark all occurrences of the text currently selected (by Aleksandar Lekov)
+// Mark all occurrences of the text currently selected (originally by Aleksandar Lekov)
 //
 
 extern EditMarkAllStatus editMarkAllStatus;
 extern HANDLE idleTaskTimer;
+#define EditMarkAll_MeasuredSize		(1024*1024)
+#define EditMarkAll_MinDuration			1
+// (100 / 64) => 2 MiB on second search.
+// increment search size will return to normal after several runs
+// when selection no longer changed, this make continuous selecting smooth.
+#define EditMarkAll_DefaultDuration		64
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (editMarkAllStatus.matchCount != 0) {
@@ -5608,11 +5614,15 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (editMarkAllStatus.pszText) {
 		LocalFree(editMarkAllStatus.pszText);
 	}
+
 	editMarkAllStatus.pending = FALSE;
 	editMarkAllStatus.findFlag = findFlag;
 	editMarkAllStatus.iSelCount= iSelCount;
 	editMarkAllStatus.pszText = pszText ? StrDupA(pszText) : NULL;
 	editMarkAllStatus.rewind = FALSE;
+	// timing for increment search is only useful for current search.
+	editMarkAllStatus.incrementSize = 1;
+	editMarkAllStatus.duration = EditMarkAll_DefaultDuration;
 	editMarkAllStatus.matchCount = 0;
 	editMarkAllStatus.lastMatchPos = 0;
 	editMarkAllStatus.iStartPos = 0;
@@ -5637,21 +5647,21 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCS
 		}
 	}
 
-
-	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer, EditMarkAll_InitializedSize);
+	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
 }
 
-BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer, Sci_Position iMaxLength) {
+BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	// use increment search to ensure FindText() terminated in expected time.
-	// TODO: dynamic compute increment size with code similar to ActionDuration in Scintilla.
+	QueryPerformanceCounter(&status->watch.begin);
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = status->iStartPos;
+	Sci_Position iMaxLength = status->incrementSize * EditMarkAll_MeasuredSize;
 	iMaxLength += iStartPos + status->iSelCount;
 	iMaxLength = min_pos(iMaxLength, iLength);
 	if (iMaxLength < iLength) {
 		// match on whole line to avoid rewinding.
 		iMaxLength = SciCall_PositionFromLine(SciCall_LineFromPosition(iMaxLength) + 1);
-		if (iMaxLength + EditMarkAll_InitializedSize >= iLength) {
+		if (iMaxLength + EditMarkAll_MeasuredSize >= iLength) {
 			iMaxLength = iLength;
 		}
 	}
@@ -5705,6 +5715,22 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer, Sci_Position 
 
 	iStartPos = max_pos(iStartPos, ttf.chrg.cpMin);
 	const BOOL pending = iStartPos < iLength;
+	if (pending) {
+		// dynamic compute increment search size, see ActionDuration in Scintilla.
+		QueryPerformanceCounter(&status->watch.end);
+		const double period = StopWatch_Get(&status->watch);
+		iMaxLength = iStartPos - status->iStartPos;
+		const double durationOne = (EditMarkAll_MeasuredSize * period) / iMaxLength;
+		const double alpha = 0.25;
+		const double duration_ = alpha * durationOne + (1.0 - alpha) * status->duration;
+		const double duration = max_d(duration_, EditMarkAll_MinDuration);
+		const int incrementSize = 1 + (int)(WaitableTimer_IdleTaskTimeSlot / duration);
+		//printf("match(%zd, %zd) length=%.3f / %zd, one=%.3f, duration=%.3f / %.3f, increment=%d\n",
+		//	status->iStartPos, iStartPos, period, iMaxLength, durationOne, duration, duration_, incrementSize);
+		status->incrementSize = incrementSize;
+		status->duration = duration;
+	}
+
 	status->pending = pending;
 	status->lastMatchPos = ttf.chrg.cpMin;
 	status->iStartPos = iStartPos;
