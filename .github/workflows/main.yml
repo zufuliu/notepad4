@@ -135,7 +135,7 @@ jobs:
 
     - name: Install llvm-mingw
       run: |
-        CALL "build\install_mingw" llvm
+        CALL "build\install_mingw.bat" llvm
 
     - name: Clang x64 Release
       run: |
@@ -195,7 +195,7 @@ jobs:
 
     - name: Install GCC and Clang
       run: |
-        CALL "build\install_mingw" x86_64
+        CALL "build\install_mingw.bat" x86_64
 
     - name: GCC x64 Release
       run: |
@@ -245,7 +245,7 @@ jobs:
 
     - name: Install GCC and Clang
       run: |
-        CALL "build\install_mingw" i686
+        CALL "build\install_mingw.bat" i686
 
     - name: GCC Win32 Release
       run: |
