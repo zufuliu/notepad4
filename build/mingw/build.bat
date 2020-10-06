@@ -5,7 +5,6 @@
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0
 
-SET "JOBS=-j%NUMBER_OF_PROCESSORS%"
 SET "Clang="
 SET "COMPILER=x86_64"
 SET "TARGET=x86_64"
@@ -59,15 +58,15 @@ EXIT /B
 SET "PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%"
 IF /I "%TARGET%" == "AVX2" (
     IF "%Clang%" == "1" (
-        mingw32-make ARCH=AVX2 Clang=1 %JOBS% %ACTION%
+        mingw32-make ARCH=AVX2 Clang=1 LTO=1 %ACTION%
     ) ELSE (
-        mingw32-make ARCH=AVX2 LTO=1 %JOBS% %ACTION%
+        mingw32-make ARCH=AVX2 LTO=1 %ACTION%
     )
 ) ELSE (
     IF "%Clang%" == "1" (
-        mingw32-make Clang=1 %JOBS% %ACTION%
+        mingw32-make Clang=1 LTO=1 %ACTION%
     ) ELSE (
-        mingw32-make LTO=1 %JOBS% %ACTION%
+        mingw32-make LTO=1 %ACTION%
     )
 )
 
@@ -78,9 +77,9 @@ EXIT /B
 :Sub_GCC_i686
 SET "PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%"
 IF "%Clang%" == "1" (
-    mingw32-make Clang=1 %JOBS% %ACTION%
+    mingw32-make Clang=1 LTO=1 %ACTION%
 ) ELSE (
-    mingw32-make %JOBS% %ACTION%
+    mingw32-make %ACTION%
 )
 
 ENDLOCAL
@@ -90,9 +89,9 @@ EXIT /B
 :Sub_llvm_mingw
 SET "PATH=C:\llvm-mingw\bin;C:\msys64\usr\bin;%PATH%"
 IF /I "%TARGET%" == "AVX2" (
-    mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX2 Clang=1 LTO=1 %JOBS% %ACTION%
+    mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX2 Clang=1 LTO=1 %ACTION%
 ) ELSE (
-    mingw32-make TRIPLET=%TARGET%-w64-mingw32 Clang=1 LTO=1 %JOBS% %ACTION%
+    mingw32-make TRIPLET=%TARGET%-w64-mingw32 Clang=1 LTO=1 %ACTION%
 )
 
 ENDLOCAL
