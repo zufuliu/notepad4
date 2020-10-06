@@ -6,8 +6,8 @@
 # Default flags for all configurations and architectures
 
 export CPPFLAGS += -D_WINDOWS -DUNICODE -D_UNICODE
-export CFLAGS += -std=gnu11 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2
-export CXXFLAGS += -std=gnu++17 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2
+export CFLAGS += -std=gnu11 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 $(if $(Clang),-Wcomma,)
+export CXXFLAGS += -std=gnu++17 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 $(if $(Clang),-Wcomma,)
 export LDFLAGS += -mwindows -municode
 export LDLIBS += -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -ladvapi32 -lshlwapi \
 	-lshell32 -lole32 -loleaut32 -luuid -luxtheme

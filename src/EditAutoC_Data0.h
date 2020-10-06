@@ -456,8 +456,9 @@ static NP2_KEYWORDS kwAndroidManifest = {
 // SVG Document
 
 
-NP2_KEYWORDS *np2_LexKeyword;
+static NP2_KEYWORDS *np2_LexKeyword;
 
+// NOLINTNEXTLINE(misc-definitions-in-headers)
 void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 	np2_LexKeyword = NULL;
 	// additional keywords
