@@ -6,8 +6,8 @@
 # Default flags for all configurations and architectures
 
 export CPPFLAGS += -D_WINDOWS -DUNICODE -D_UNICODE
-export CFLAGS += -std=gnu11 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 $(if $(Clang),-Wcomma,)
-export CXXFLAGS += -std=gnu++17 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 $(if $(Clang),-Wcomma,)
+export CFLAGS += -std=gnu11 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 $(if $(CLANG),-Wcomma,)
+export CXXFLAGS += -std=gnu++17 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 $(if $(CLANG),-Wcomma,)
 export LDFLAGS += -mwindows -municode
 export LDLIBS += -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -ladvapi32 -lshlwapi \
 	-lshell32 -lole32 -loleaut32 -luuid -luxtheme
@@ -15,19 +15,19 @@ export RCFLAGS += -DRC_INVOKED -DUNICODE -D_UNICODE
 
 # Target triplet if specified. e.g. x86_64-w64-mingw32 for 64bit.
 ifdef TRIPLET
-	export CC := $(TRIPLET)-$(if $(Clang),clang,gcc)
-	export CXX := $(TRIPLET)-$(if $(Clang),clang++,g++)
+	export CC := $(TRIPLET)-$(if $(CLANG),clang,gcc)
+	export CXX := $(TRIPLET)-$(if $(CLANG),clang++,g++)
 	export RC := $(TRIPLET)-windres
 	# which and where will print not found message on stderr.
 	ifeq (,$(shell which $(RC) 2>/dev/null))
 		export RC := windres
 	endif
 else
-	export CC := $(if $(Clang),clang,gcc)
-	export CXX := $(if $(Clang),clang++,g++)
+	export CC := $(if $(CLANG),clang,gcc)
+	export CXX := $(if $(CLANG),clang++,g++)
 	export RC := windres
 endif
-ifdef Clang
+ifdef CLANG
 	ifdef LTO
 		LLD := 1
 	endif
@@ -81,14 +81,14 @@ ifeq ($(ARCH), x64)
 	ifdef WIN7
 		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
 		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,1
-		ifeq ($(LLD),)
+		ifndef LLD
 			export LDFLAGS += -Wl,--subsystem,windows:6.01
 		endif
 	else
 		# Windows XP 64-bit, Windows Server 2003
 		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0502 -DWINVER=0x0502
 		export LDFLAGS += -Wl,--major-os-version,5 -Wl,--minor-os-version,2
-		ifeq ($(LLD),)
+		ifndef LLD
 			export LDFLAGS += -Wl,--subsystem,windows:5.02
 		endif
 	endif
@@ -99,7 +99,7 @@ else ifeq ($(ARCH), AVX2)
 	export RCFLAGS += -D_WIN64
 	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
 	export LDFLAGS += -mavx2 -mpopcnt -mbmi -Wl,--major-os-version,6 -Wl,--minor-os-version,1
-	ifeq ($(LLD),)
+	ifndef LLD
 		export LDFLAGS += -Wl,--subsystem,windows:6.01
 	endif
 else ifeq ($(ARCH), Win32)
@@ -109,14 +109,14 @@ else ifeq ($(ARCH), Win32)
 	ifdef WIN7
 		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
 		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,1
-		ifeq ($(LLD),)
+		ifndef LLD
 			export LDFLAGS += -Wl,--subsystem,windows:6.01
 		endif
 	else
 		# Windows XP
 		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0501 -DWINVER=0x0501
 		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,5 -Wl,--minor-os-version,1
-		ifeq ($(LLD),)
+		ifndef LLD
 			export LDFLAGS += -Wl,--subsystem,windows:5.01
 		endif
 	endif
@@ -136,7 +136,7 @@ endif
 
 # lld linker doesn't need/support subsystem version.
 # see https://github.com/mstorsjo/llvm-mingw/issues/152
-ifeq ($(LLD),)
+ifndef LLD
 	export RCFLAGS += -O coff
 else
 	export RCFLAGS += -O res
@@ -144,7 +144,7 @@ else
 endif
 
 # Name root build folder
-export BINFOLDER := ../bin/$(if $(Clang),Clang,)$(CONFIG)_$(ARCH)
+export BINFOLDER := ../bin/$(if $(CLANG),Clang,)$(CONFIG)_$(ARCH)
 
 ifndef NUMBER_OF_PROCESSORS
 	NUMBER_OF_PROCESSORS := $(shell nproc)
