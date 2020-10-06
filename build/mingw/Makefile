@@ -1,4 +1,5 @@
 # Main Makefile for notepad2 project
+# TODO: remove the dependency on rm and mkdir (with del, rmdir and mkdir commands).
 
 .PHONY: all
 
@@ -17,8 +18,8 @@ ifdef TRIPLET
 	export CC := $(TRIPLET)-$(if $(Clang),clang,gcc)
 	export CXX := $(TRIPLET)-$(if $(Clang),clang++,g++)
 	export RC := $(TRIPLET)-windres
-	# which and where will print not found message
-	DUMMY := $(shell $(RC) -V 2> /dev/null)
+	# which and where will print not found message on stderr.
+	DUMMY := $(shell $(RC) -V 2>/dev/null)
 	ifndef DUMMY
 		export RC := windres
 	endif

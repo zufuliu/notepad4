@@ -2,7 +2,7 @@
 @rem used for GitHub Actions
 
 @rem https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md#msys2
-SET PATH=C:\msys64\usr\bin;%PATH%;
+SET "PATH=C:\msys64\usr\bin;%PATH%"
 
 @rem we don't need gdb or lldb, which saved the time to install Python and it's dependencies.
 
