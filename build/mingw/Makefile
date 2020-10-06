@@ -1,5 +1,5 @@
 # Main Makefile for notepad2 project
-# TODO: remove the dependency on rm and mkdir (with del, rmdir and mkdir commands).
+# TODO: remove the dependency on rm, mkdir and which (with del, rmdir, mkdir and where commands).
 
 .PHONY: all
 
@@ -19,8 +19,7 @@ ifdef TRIPLET
 	export CXX := $(TRIPLET)-$(if $(Clang),clang++,g++)
 	export RC := $(TRIPLET)-windres
 	# which and where will print not found message on stderr.
-	DUMMY := $(shell $(RC) -V 2>/dev/null)
-	ifndef DUMMY
+	ifeq (,$(shell which $(RC) 2>/dev/null))
 		export RC := windres
 	endif
 else
@@ -48,6 +47,14 @@ else ifeq (aarch64, $(findstring aarch64, $(ARCH)))
 else ifeq (armv7, $(findstring armv7, $(ARCH)))
 	ARCH := ARM
 	LLD := 1
+endif
+ifdef TRIPLET
+	export AR := $(TRIPLET)-ar
+	ifeq (,$(shell which $(AR) 2>/dev/null))
+		export AR := $(if $(LLD),llvm-ar,ar)
+	endif
+else
+	export AR := $(if $(LLD),llvm-ar,ar)
 endif
 
 # Check build configuration
@@ -139,17 +146,21 @@ endif
 # Name root build folder
 export BINFOLDER := ../bin/$(if $(Clang),Clang,)$(CONFIG)_$(ARCH)
 
+ifndef NUMBER_OF_PROCESSORS
+	NUMBER_OF_PROCESSORS := $(shell nproc)
+endif
+
 all: metapath scintilla notepad2
 
 metapath:
-	$(MAKE) -f metapath.mk
+	$(MAKE) -f metapath.mk -j$(NUMBER_OF_PROCESSORS)
 
 scintilla:
-	$(MAKE) -f scintilla.mk
+	$(MAKE) -f scintilla.mk -j$(NUMBER_OF_PROCESSORS)
 
 notepad2:
-	$(MAKE) -f scintilla.mk
-	$(MAKE) -f notepad2.mk
+	$(MAKE) -f scintilla.mk -j$(NUMBER_OF_PROCESSORS)
+	$(MAKE) -f notepad2.mk -j$(NUMBER_OF_PROCESSORS)
 
 clean:
 	$(MAKE) -f metapath.mk clean
