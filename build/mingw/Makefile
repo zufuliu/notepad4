@@ -1,5 +1,5 @@
 # Main Makefile for notepad2 project
-# TODO: remove the dependency on rm, mkdir and which (with del, rmdir, mkdir and where commands).
+# TODO: remove dependencies on rm, mkdir and which (with del, rmdir, mkdir and where commands).
 
 .PHONY: all
 
@@ -49,7 +49,9 @@ else ifeq (armv7, $(findstring armv7, $(ARCH)))
 	LLD := 1
 endif
 ifdef TRIPLET
-	export AR := $(TRIPLET)-ar
+	# llvm-mingw: TRIPLET-ar
+	# mingw-w64: TRIPLET-gcc-ar
+	export AR := $(TRIPLET)-$(if $(LLD),ar,gcc-ar)
 	ifeq (,$(shell which $(AR) 2>/dev/null))
 		export AR := $(if $(LLD),llvm-ar,ar)
 	endif
@@ -108,7 +110,7 @@ else ifeq ($(ARCH), Win32)
 	export RCFLAGS += -DWIN32
 	ifdef WIN7
 		export CPPFLAGS += -DWIN32 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
-		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,1
+		export LDFLAGS += -msse2 -mfpmath=sse -Wl,--major-os-version,6 -Wl,--minor-os-version,1
 		ifndef LLD
 			export LDFLAGS += -Wl,--subsystem,windows:6.01
 		endif
