@@ -1699,7 +1699,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 		}
 		if (wParam & MK_SHIFT) {
 			int charsToScroll = charsPerScroll;
-			if (charsToScroll == WHEEL_PAGESCROLL) {
+			if (charsPerScroll == WHEEL_PAGESCROLL) {
 				const PRectangle rcText = GetTextRectangle();
 				const int pageWidth = static_cast<int>(rcText.Width() * 2 / 3);
 				charsToScroll = pageWidth;
