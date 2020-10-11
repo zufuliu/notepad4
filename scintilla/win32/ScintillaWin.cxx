@@ -97,6 +97,9 @@ Used by VSCode, Atom etc.
 #ifndef WM_DPICHANGED_AFTERPARENT
 #define WM_DPICHANGED_AFTERPARENT	0x02E3
 #endif
+#ifndef SPI_GETWHEELSCROLLCHARS
+#define SPI_GETWHEELSCROLLCHARS		0x006C
+#endif
 
 // Two idle messages SC_WIN_IDLE and SC_WORK_IDLE.
 
@@ -382,6 +385,7 @@ class ScintillaWin :
 #endif
 
 	UINT linesPerScroll;	///< Intellimouse support
+	UINT charsPerScroll;	///< Intellimouse support
 	int wheelDelta; ///< Wheel delta from roll
 
 	UINT dpi;
@@ -627,6 +631,7 @@ ScintillaWin::ScintillaWin(HWND hwnd) {
 #endif
 
 	linesPerScroll = 0;
+	charsPerScroll = 0;
 	wheelDelta = 0;   // Wheel delta from roll
 
 	dpi = GetWindowDPI(hwnd);
@@ -1682,12 +1687,33 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 		// i.e. if datazoomed out only class structures are visible, when datazooming in the control
 		// structures appear, then eventually the individual statements...)
 		if (wParam & MK_SHIFT) {
-			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+			if (vs.wrapState != WrapMode::none || charsPerScroll == 0) {
+				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
+			}
 		}
 
 		// Either SCROLL or ZOOM. We handle the wheel steppings calculation
 		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
-		if (std::abs(wheelDelta) >= WHEEL_DELTA && linesPerScroll > 0) {
+		if (std::abs(wheelDelta) < WHEEL_DELTA) {
+			return 0;
+		}
+		if (wParam & MK_SHIFT) {
+			int charsToScroll = charsPerScroll;
+			if (charsToScroll == WHEEL_PAGESCROLL) {
+				const PRectangle rcText = GetTextRectangle();
+				const int pageWidth = static_cast<int>(rcText.Width() * 2 / 3);
+				charsToScroll = pageWidth;
+			} else {
+				charsToScroll = 1 + static_cast<int>(std::max(charsToScroll, 1) * vs.aveCharWidth);
+			}
+			charsToScroll *= (wheelDelta / WHEEL_DELTA);
+			if (wheelDelta >= 0) {
+				wheelDelta = wheelDelta % WHEEL_DELTA;
+			} else {
+				wheelDelta = -(-wheelDelta % WHEEL_DELTA);
+			}
+			HorizontalScrollTo(xOffset + charsToScroll);
+		} else if (linesPerScroll > 0) {
 			Sci::Line linesToScroll = linesPerScroll;
 			if (linesPerScroll == WHEEL_PAGESCROLL) {
 				linesToScroll = LinesOnScreen() - 1;
@@ -3207,6 +3233,7 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 void ScintillaWin::GetIntelliMouseParameters() noexcept {
 	// This retrieves the number of lines per scroll as configured in the Mouse Properties sheet in Control Panel
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);
+	::SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &charsPerScroll, 0);
 }
 
 void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) {
