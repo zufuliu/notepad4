@@ -68,7 +68,7 @@ jobs:
           path: 'build\Notepad2_ARM_*.zip'
 
   llvm_msvc:
-    name: Build with LLVM/MSVC
+    name: Build with LLVM (Visual C++)
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2

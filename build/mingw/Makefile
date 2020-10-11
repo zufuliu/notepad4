@@ -148,21 +148,16 @@ endif
 # Name root build folder
 export BINFOLDER := ../bin/$(if $(CLANG),Clang,)$(CONFIG)_$(ARCH)
 
-ifndef NUMBER_OF_PROCESSORS
-	NUMBER_OF_PROCESSORS := $(shell nproc)
-endif
-
 all: metapath scintilla notepad2
 
 metapath:
-	$(MAKE) -f metapath.mk -j$(NUMBER_OF_PROCESSORS)
+	$(MAKE) -f metapath.mk
 
 scintilla:
-	$(MAKE) -f scintilla.mk -j$(NUMBER_OF_PROCESSORS)
+	$(MAKE) -f scintilla.mk
 
-notepad2:
-	$(MAKE) -f scintilla.mk -j$(NUMBER_OF_PROCESSORS)
-	$(MAKE) -f notepad2.mk -j$(NUMBER_OF_PROCESSORS)
+notepad2: scintilla
+	$(MAKE) -f notepad2.mk
 
 clean:
 	$(MAKE) -f metapath.mk clean
