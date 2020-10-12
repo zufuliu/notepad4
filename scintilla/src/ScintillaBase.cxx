@@ -171,14 +171,10 @@ int ScintillaBase::KeyCommand(unsigned int iMessage) {
 			EnsureCaretVisible();
 			return 0;
 		case SCI_TAB:
-			if (ac.IsFillUpChar('\t')) {
-				AutoCompleteCompleted(0, SC_AC_TAB);
-			}
+			AutoCompleteCompleted(0, SC_AC_TAB);
 			return 0;
 		case SCI_NEWLINE:
-			if (ac.IsFillUpChar('\n')) {
-				AutoCompleteCompleted(0, SC_AC_NEWLINE);
-			}
+			AutoCompleteCompleted(0, SC_AC_NEWLINE);
 			return 0;
 
 		default:
@@ -394,7 +390,7 @@ void ScintillaBase::AutoCompleteCharacterDeleted() {
 	NotifyParent(scn);
 }
 
-void ScintillaBase::AutoCompleteCompleted(char ch, unsigned int completionMethod) {
+void ScintillaBase::AutoCompleteCompleted(char ch, int completionMethod) {
 	const int item = ac.GetSelection();
 	if (item == -1) {
 		AutoCompleteCancel();
