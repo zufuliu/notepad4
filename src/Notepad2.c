@@ -5069,6 +5069,17 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_AUTOCSELECTION:
 		case SCN_USERLISTSELECTION: {
+			if ((scn->listCompletionMethod == SC_AC_NEWLINE && !(autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpEnter))
+			|| (scn->listCompletionMethod == SC_AC_TAB && !(autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpTab))) {
+				SciCall_AutoCCancel();
+				if (scn->listCompletionMethod == SC_AC_NEWLINE) {
+					SciCall_NewLine();
+				} else {
+					SciCall_Tab();
+				}
+				return 0;
+			}
+
 			LPCSTR text = scn->text;
 			// function/array/template/generic
 			LPSTR braces = (LPSTR)strpbrk(text, "([{<");

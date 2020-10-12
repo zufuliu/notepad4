@@ -68,7 +68,7 @@ protected:
 	int AutoCompleteGetCurrentText(char *buffer) const;
 	void AutoCompleteCharacterAdded(char ch);
 	void AutoCompleteCharacterDeleted();
-	void AutoCompleteCompleted(char ch, unsigned int completionMethod);
+	void AutoCompleteCompleted(char ch, int completionMethod);
 	void AutoCompleteMoveToCurrentWord();
 	void AutoCompleteSelection();
 	void ListNotify(ListBoxEvent *plbe) override;

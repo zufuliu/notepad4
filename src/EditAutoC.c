@@ -1069,12 +1069,6 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 void EditCompleteUpdateConfig(void) {
 	int i = 0;
 	const int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
-	if (mask & AutoCompleteFillUpEnter) {
-		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\n';
-	}
-	if (mask & AutoCompleteFillUpTab) {
-		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\t';
-	}
 	if (mask & AutoCompleteFillUpSpace) {
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = ' ';
 	}
