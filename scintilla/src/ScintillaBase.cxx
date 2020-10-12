@@ -171,10 +171,14 @@ int ScintillaBase::KeyCommand(unsigned int iMessage) {
 			EnsureCaretVisible();
 			return 0;
 		case SCI_TAB:
-			AutoCompleteCompleted(0, SC_AC_TAB);
+			if (ac.IsFillUpChar('\t')) {
+				AutoCompleteCompleted(0, SC_AC_TAB);
+			}
 			return 0;
 		case SCI_NEWLINE:
-			AutoCompleteCompleted(0, SC_AC_NEWLINE);
+			if (ac.IsFillUpChar('\n')) {
+				AutoCompleteCompleted(0, SC_AC_NEWLINE);
+			}
 			return 0;
 
 		default:

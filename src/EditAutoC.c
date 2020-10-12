@@ -1070,7 +1070,6 @@ void EditCompleteUpdateConfig(void) {
 	int i = 0;
 	const int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
 	if (mask & AutoCompleteFillUpEnter) {
-		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\r';
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\n';
 	}
 	if (mask & AutoCompleteFillUpTab) {
@@ -1095,11 +1094,6 @@ void EditCompleteUpdateConfig(void) {
 		}
 	}
 
-	if (i == 0) {
-		autoCompletionConfig.fAutoCompleteFillUpMask = AutoCompleteFillUpEnter;
-		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\r';
-		autoCompletionConfig.szAutoCompleteFillUp[i++] = '\n';
-	}
 	autoCompletionConfig.szAutoCompleteFillUp[i] = '\0';
 	autoCompletionConfig.wszAutoCompleteFillUp[k] = L'\0';
 }
