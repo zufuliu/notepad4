@@ -3,7 +3,7 @@
 
 IF /I "%~1" == "latest" (
   SHIFT
-  curl -fsSL -o "LLVM-10.0.0-win64.exe" "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe"
+  curl -fsSL -o "LLVM-11.0.0-win64.exe" "https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/LLVM-11.0.0-win64.exe"
   LLVM-10.0.0-win64.exe /S
 )
 
