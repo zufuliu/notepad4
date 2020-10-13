@@ -5629,6 +5629,21 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 }
 
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+	// use case sensitive match for ASCII text without letters.
+	if (!(findFlag & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
+		int sensitive = SCFIND_MATCHCASE;
+		const uint8_t *ptr = (const uint8_t *)pszText;
+		uint8_t ch;
+		while ((ch = *ptr++) != 0) {
+			ch |= 0x20;
+			if ((ch & 0x80) != 0 || (ch >= 'a' && ch <= 'z')) {
+				sensitive = 0;
+				break;
+			}
+		}
+		findFlag |= sensitive;
+	}
+
 	if (!bChanged && (findFlag == editMarkAllStatus.findFlag
 		&& iSelCount == editMarkAllStatus.iSelCount
 		// _stricmp() is not safe for DBCS string.
