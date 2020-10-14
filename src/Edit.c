@@ -5604,6 +5604,7 @@ extern HANDLE idleTaskTimer;
 // increment search size will return to normal after several runs
 // when selection no longer changed, this make continuous selecting smooth.
 #define EditMarkAll_DefaultDuration		64
+//static UINT EditMarkAll_Runs;
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	if (editMarkAllStatus.matchCount != 0) {
@@ -5662,11 +5663,13 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCS
 		}
 	}
 
+	//EditMarkAll_Runs = 0;
 	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
 }
 
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	// use increment search to ensure FindText() terminated in expected time.
+	//++EditMarkAll_Runs;
 	QueryPerformanceCounter(&status->watch.begin);
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = status->iStartPos;
@@ -5709,16 +5712,21 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 			continue;
 		}
 
-		if (index == COUNTOF(ranges)) {
-			SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
-			for (UINT i = 0; i < index; i += 2) {
-				SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
+		if (index != 0 && iPos == ttf.chrg.cpMin) {
+			// merge adjacent indicator ranges
+			ranges[index - 1] += iSelCount;
+		} else {
+			if (index == COUNTOF(ranges)) {
+				SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+				for (UINT i = 0; i < index; i += 2) {
+					SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
+				}
+				index = 0;
 			}
-			index = 0;
+			ranges[index] = iPos;
+			ranges[index + 1] = iSelCount;
+			index += 2;
 		}
-		ranges[index] = iPos;
-		ranges[index + 1] = iSelCount;
-		index += 2;
 		ttf.chrg.cpMin = ttf.chrgText.cpMax;
 	}
 	if (index) {
@@ -5740,7 +5748,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		const double duration_ = alpha * durationOne + (1.0 - alpha) * status->duration;
 		const double duration = max_d(duration_, EditMarkAll_MinDuration);
 		const int incrementSize = 1 + (int)(WaitableTimer_IdleTaskTimeSlot / duration);
-		//printf("match(%zd, %zd) length=%.3f / %zd, one=%.3f, duration=%.3f / %.3f, increment=%d\n",
+		//printf("match %3u (%zd, %zd) length=%.3f / %zd, one=%.3f, duration=%.3f / %.3f, increment=%d\n", EditMarkAll_Runs,
 		//	status->iStartPos, iStartPos, period, iMaxLength, durationOne, duration, duration_, incrementSize);
 		status->incrementSize = incrementSize;
 		status->duration = duration;
