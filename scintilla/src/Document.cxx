@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <climits>
 
 #include <stdexcept>
 #include <string>
@@ -2000,7 +2001,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		// Compute actual search ranges needed
 		const Sci::Position lengthFind = *length;
 
-		// character less than safeChar is encoded in single byte in the encoding.
+		// character less than safeChar is encoded in single byte in the encoding,
+		// and not part of any multi-byte sequence.
 		constexpr int safeCharUTF8 = 0x80;		// ASCII
 		constexpr int safeCharDBCS = ' ' + 1;	// C0 control characters
 		constexpr int safeCharSBCS = 256;		// all
@@ -2016,15 +2018,56 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			const unsigned char charStartSearch = search[0];
 			const int safeChar = (SC_CP_UTF8 == dbcsCodePage) ? safeCharUTF8 : ((0 == dbcsCodePage) ? safeCharSBCS : safeCharDBCS);
+			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
+#define FindText_EnableBadCharacterFilter	1
+#if FindText_EnableBadCharacterFilter
+#if SIZE_MAX > UINT_MAX
+			uint64_t charSet[4];
+			constexpr int charSetShift = 6;
+			constexpr int charSetMask = 63;
+			constexpr uint64_t charSetOne = UINT64_C(1);
+#else
+			uint32_t charSet[8];
+			constexpr int charSetShift = 5;
+			constexpr int charSetMask = 31;
+			constexpr uint32_t charSetOne = 1U;
+#endif
+			if (lengthFind > 1) {
+				memset(charSet, 0, sizeof(charSet));
+				const uint8_t *ptr = searchData;
+				uint8_t ch;
+				while ((ch = *ptr++) != 0) {
+					charSet[ch >> charSetShift] |= charSetOne << (ch & charSetMask);
+				}
+			}
+#endif
+
 			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 				const unsigned char leadByte = UCharAt(pos);
 				if (leadByte == charStartSearch) {
 					bool found = (pos + lengthFind) <= limitPos;
+					bool advanced = false;
 					for (int indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
-						found = CharAt(pos + indexSearch) == search[indexSearch];
+						const unsigned char ch = UCharAt(pos + indexSearch);
+						found = ch == searchData[indexSearch];
+						if (!found) {
+#if FindText_EnableBadCharacterFilter
+							advanced = ((charSet[ch >> charSetShift] >> (ch & charSetMask)) & 1) == 0;
+							if (advanced) {
+								// ch not in search string, so next match must after or before it.
+								pos += (indexSearch + 1) * increment;
+								if (ch >= safeChar) {
+									pos = MovePositionOutsideChar(pos, increment, false);
+								}
+							}
+#endif
+						}
 					}
 					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
 						return pos;
+					}
+					if (advanced) {
+						continue;
 					}
 				}
 				if (leadByte < safeChar) {
