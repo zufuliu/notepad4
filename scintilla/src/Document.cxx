@@ -2001,10 +2001,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		// Compute actual search ranges needed
 		const Sci::Position lengthFind = *length;
 
-		// character less than safeChar is encoded in single byte in the encoding,
-		// and not part of any multi-byte sequence.
-		constexpr int safeCharUTF8 = 0x80;		// ASCII
-		constexpr int safeCharDBCS = ' ' + 1;	// C0 control characters
+		// character less than safeChar is encoded in single byte in the encoding.
+		constexpr int safeCharASCII = 0x80;		// UTF-8, DBCS forward search
+		constexpr int safeCharDBCS = ' ' + 1;	// C0 control characters, DBCS backward search
 		constexpr int safeCharSBCS = 256;		// all
 
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
@@ -2017,7 +2016,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		if (caseSensitive) {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			const unsigned char charStartSearch = search[0];
-			const int safeChar = (SC_CP_UTF8 == dbcsCodePage) ? safeCharUTF8 : ((0 == dbcsCodePage) ? safeCharSBCS : safeCharDBCS);
+			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : safeCharDBCS);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 #define FindText_EnableBadCharacterFilter	1
 #if FindText_EnableBadCharacterFilter
