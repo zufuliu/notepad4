@@ -2015,9 +2015,57 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		}
 		if (caseSensitive) {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
-			const unsigned char charStartSearch = search[0];
-			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : safeCharDBCS);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
+			const unsigned char charStartSearch = searchData[0];
+			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : safeCharDBCS);
+#define FindText_UseBoyerMooreHorspoolSundayAlgorithm	1
+#if FindText_UseBoyerMooreHorspoolSundayAlgorithm
+			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
+			// http://www-igm.univ-mlv.fr/~lecroq/string/node1.html
+			// http://www-igm.univ-mlv.fr/~lecroq/string/node19.html
+			// https://www.inf.hs-flensburg.de/lang/algorithmen/pattern/sundayen.htm
+			int shiftTab[256];
+			if (lengthFind != 1) {
+				int shift = static_cast<int>(lengthFind);
+				std::fill_n(shiftTab, 256, shift + 1);
+				const uint8_t *ptr = searchData;
+				uint8_t ch;
+				while ((ch = *ptr++) != 0) {
+					shiftTab[ch] = shift--;
+				}
+			}
+
+			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
+				const unsigned char leadByte = UCharAt(pos);
+				if (charStartSearch == leadByte) {
+					bool found = (pos + lengthFind) <= limitPos;
+					for (int indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
+						const unsigned char ch = UCharAt(pos + indexSearch);
+						found = ch == searchData[indexSearch];
+					}
+					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
+						return pos;
+					}
+				}
+
+				if (lengthFind == 1) {
+					if (leadByte < safeChar) {
+						pos += increment;
+					} else {
+						if (!NextCharacter(pos, increment)) {
+							break;
+						}
+					}
+				} else {
+					const unsigned char lastByte = UCharAt(pos + lengthFind);
+					pos += increment * shiftTab[lastByte];
+					if (lastByte >= safeChar) {
+						pos = MovePositionOutsideChar(pos, increment, false);
+					}
+				}
+			}
+#else
+			// Brute Force Algorithm
 #define FindText_EnableBadCharacterFilter	1
 #if FindText_EnableBadCharacterFilter
 #if SIZE_MAX > UINT_MAX
@@ -2031,7 +2079,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			constexpr int charSetMask = 31;
 			constexpr uint32_t charSetOne = 1U;
 #endif
-			if (lengthFind > 1) {
+			if (lengthFind != 1) {
 				memset(charSet, 0, sizeof(charSet));
 				const uint8_t *ptr = searchData;
 				uint8_t ch;
@@ -2051,8 +2099,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						found = ch == searchData[indexSearch];
 						if (!found) {
 #if FindText_EnableBadCharacterFilter
-							advanced = ((charSet[ch >> charSetShift] >> (ch & charSetMask)) & 1) == 0;
-							if (advanced) {
+							if (!((charSet[ch >> charSetShift] >> (ch & charSetMask)) & 1)) {
+								advanced = true;
 								// ch not in search string, so next match must after or before it.
 								pos += (indexSearch + 1) * increment;
 								if (ch >= safeChar) {
@@ -2077,6 +2125,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					}
 				}
 			}
+#endif
 		} else if (SC_CP_UTF8 == dbcsCodePage) {
 			constexpr size_t maxFoldingExpansion = 4;
 			std::vector<char> searchThing((lengthFind + 1) * UTF8MaxBytes * maxFoldingExpansion + 1);
