@@ -23,8 +23,6 @@ class CharClassify(IntEnum):
 	ccPunctuation = 3
 	ccCJKWord = 4
 
-	OnlyWord = 1 << ccWord
-	OnlyWordPunctuation = (1 << ccWord) | (1 << ccPunctuation)
 	RLEValueBit = 3
 
 CharClassifyOrder = [CharClassify.ccCJKWord, CharClassify.ccWord, CharClassify.ccPunctuation, CharClassify.ccNewLine]
@@ -338,27 +336,16 @@ def getCharClassify(decode, ch):
 def buildCharClassify(cp):
 	decode = codecs.getdecoder(cp)
 	result = {}
-	mask = 0
 	for ch in range(128, 256):
 		cc = getCharClassify(decode, ch)
-		mask |= 1 << cc
 		result[ch] = cc
 
-	if mask == CharClassify.OnlyWord:
-		output = None
-	elif mask == CharClassify.OnlyWordPunctuation:
-		output = [0] * 16
-		for ch, value in result.items():
-			ch -= 128
-			value -= CharClassify.ccWord
-			output[ch >> 3] |= value << (ch & 7)
-	else:
-		output = [0] * 32
-		for ch, value in result.items():
-			ch -= 128
-			output[ch >> 2] |= value << (2 * (ch & 3))
+	output = [0] * 32
+	for ch, value in result.items():
+		ch -= 128
+		output[ch >> 2] |= value << (2 * (ch & 3))
 
-	s = ''.join('%02X' % ch for ch in output) if output else ''
+	s = ''.join('%02X' % ch for ch in output)
 	return s, output
 
 def buildANSICharClassifyTable(filename):

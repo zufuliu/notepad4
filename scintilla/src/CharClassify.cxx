@@ -52,12 +52,8 @@ void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) n
 void CharClassify::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
 	if (chars == nullptr || length <= 0) {
 		memset(charClass + 128, ccWord, 128);
-	} else if (length == 16) {
-		for (int i = 0; i < 128; i++) {
-			const unsigned char w = 1 + ((chars[i >> 3] >> (i & 7)) & 1);
-			charClass[i + 128] = w;
-		}
-	} else if (length == 32) {
+	} else {
+		assert(length == 32);
 		for (int i = 0; i < 128; i++) {
 			const unsigned char w = (chars[i >> 2] >> (2 * (i & 3))) & 3;
 			charClass[i + 128] = w;
