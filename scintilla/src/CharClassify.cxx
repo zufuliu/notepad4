@@ -50,7 +50,7 @@ void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) n
 }
 
 void CharClassify::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
-	if (chars == nullptr || length <= 0) {
+	if (chars == nullptr || length == 0) {
 		memset(charClass + 128, ccWord, 128);
 	} else {
 		assert(length == 32);

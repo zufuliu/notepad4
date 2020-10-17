@@ -392,7 +392,6 @@ def buildANSICharClassifyTable(filename):
 	for item in result.values():
 		for page in item['codepage']:
 			output.append("\tcase %d: // %s" % (page[0], page[1]))
-		output.append("\t\t*length = %d;" % len(item['data']))
 		output.append("\t\treturn ANSICharClassifyTable + %d;" % item['offset'])
 	output.append("\tdefault:")
 	output.append("\t\t*length = 0;")
