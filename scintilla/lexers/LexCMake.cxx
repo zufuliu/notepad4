@@ -368,7 +368,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			if (styleNext != SCE_CMAKE_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (strncmp(buf, "end", 3) == 0) {
+				if (StrStartsWith(buf, "end")) {
 					levelNext--;
 				} else if (strcmp(buf, "if") == 0 || strcmp(buf, "function") == 0 || strcmp(buf, "macro") == 0
 					|| strcmp(buf, "foreach") == 0 || strcmp(buf, "while") == 0) {

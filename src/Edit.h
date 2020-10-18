@@ -28,8 +28,8 @@
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];
 	char	szReplace[512];
-	char	szFindUTF8[3 * 512];
-	char	szReplaceUTF8[3 * 512];
+	char	szFindUTF8[512 * kMaxMultiByteCount];
+	char	szReplaceUTF8[512 * kMaxMultiByteCount];
 	HWND	hwnd;
 	UINT	fuFlags;
 	BOOL	bTransformBS;

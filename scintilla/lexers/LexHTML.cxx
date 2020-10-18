@@ -90,8 +90,8 @@ int PrintScriptingIndicatorOffset(Accessor &styler, Sci_PositionU start, Sci_Pos
 	int iResult = 0;
 	char s[8];
 	GetTextSegment(styler, start, end, s, sizeof(s));
-	if (0 == strncmp(s, "php", 3)) {
-		iResult = 3;
+	if (StrStartsWith(s, "php")) {
+		iResult = CSTRLEN("php");
 	}
 
 	return iResult;

@@ -233,4 +233,12 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 #define CompareNCaseInsensitive		_strnicmp
 #endif
 
+#define COUNTOF(ar)	_countof(ar)
+#define CSTRLEN(s)	(_countof(s) - 1)
+
+#define StrStartsWith(s, prefix)			(strncmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrStartsWithEx(s, prefix, len)		(strncmp((s), (prefix), (len)) == 0)
+#define StrStartsWithCase(s, prefix)		(_strnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrStartsWithCaseEx(s, prefix, len)	(_strnicmp((s), (prefix), (len)) == 0)
+
 }

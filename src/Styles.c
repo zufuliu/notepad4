@@ -1854,7 +1854,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 PEDITLEXER Style_SniffShebang(char *pchText) {
 	if (pchText[0] == '#' && pchText[1] == '!') {
 		size_t len = 0;
-		char *pch = pchText + 2;
+		char *pch = pchText + CSTRLEN("#!");
 		char *name;
 		while (*pch == ' ' || *pch == '\t') {
 			pch++;
@@ -1865,7 +1865,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 			pch++;
 			name = len ? pch : name;
 		}
-		if ((pch - name) >= 3 && (_strnicmp(name, "env", 3) == 0 || _strnicmp(name, "winpty", 6) == 0)) {
+		if (pch >= name + CSTRLEN("env") && (StrStartsWith(name, "env") || StrStartsWith(name, "winpty"))) {
 			while (*pch == ' ' || *pch == '\t') {
 				pch++;
 			}
@@ -1893,76 +1893,76 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 
 		if (len >= 4) {
 			if (len >= 5) {
-				if (!strncmp(name, "python", 5)) {
+				if (StrStartsWith(name, "python")) {
 					return &lexPython;
 				}
-				if (!strncmp(name, "groovy", 5)) {
+				if (StrStartsWith(name, "groovy")) {
 					return &lexGroovy;
 				}
-				if (!strncmp(name, "scala", 5)) {
+				if (StrStartsWith(name, "scala")) {
 					return &lexScala;
 				}
 			}
 
-			if (!strncmp(name, "bash", 4) || !strncmp(name, "dash", 4)) {
+			if (StrStartsWith(name, "bash") || StrStartsWith(name, "dash")) {
 				return &lexBash;
 			}
-			if (!strncmp(name, "tcsh", 4)) {
+			if (StrStartsWith(name, "tcsh")) {
 				np2LexLangIndex = IDM_LEXER_CSHELL;
 				return &lexBash;
 			}
-			if (!strncmp(name, "perl", 4)) {
+			if (StrStartsWith(name, "perl")) {
 				return &lexPerl;
 			}
-			if (!strncmp(name, "ruby", 4)) {
+			if (StrStartsWith(name, "ruby")) {
 				return &lexRuby;
 			}
-			//if (!strncmp(name, "rust", 4)) {
+			//if (StrStartsWith(name, "rust")) {
 			//	return &lexRust;
 			//}
-			if (!strncmp(name, "gawk", 4) || !strncmp(name, "nawk", 4)) {
+			if (StrStartsWith(name, "gawk") || StrStartsWith(name, "nawk")) {
 				return &lexAwk;
 			}
-			if (!strncmp(name, "node", 4)) {
+			if (StrStartsWith(name, "node")) {
 				return &lexJS;
 			}
-			if (!strncmp(name, "wish", 4)) {
+			if (StrStartsWith(name, "wish")) {
 				return &lexTcl;
 			}
-			if (!strncmp(name, "wlua", 4)) {
+			if (StrStartsWith(name, "wlua")) {
 				return &lexLua;
 			}
 		}
 		if (len >= 3) {
-			if (!strncmp(name, "awk", 3)) {
+			if (StrStartsWith(name, "awk")) {
 				return &lexAwk;
 			}
-			if (!strncmp(name, "lua", 3)) {
+			if (StrStartsWith(name, "lua")) {
 				return &lexLua;
 			}
-			if (!strncmp(name, "php", 3)) {
+			if (StrStartsWith(name, "php")) {
 				//np2LexLangIndex = IDM_LEXER_PHP;
 				return &lexPHP;
 			}
-			if (!strncmp(name, "tcl", 3)) {
+			if (StrStartsWith(name, "tcl")) {
 				return &lexTcl;
 			}
-			if (!strncmp(name, "ash", 3) || !strncmp(name, "zsh", 3) || !strncmp(name, "ksh", 3)) {
+			if (StrStartsWith(name, "ash") || StrStartsWith(name, "zsh") || StrStartsWith(name, "ksh")) {
 				return &lexBash;
 			}
-			if (!strncmp(name, "csh", 3)) {
+			if (StrStartsWith(name, "csh")) {
 				np2LexLangIndex = IDM_LEXER_CSHELL;
 				return &lexBash;
 			}
-			if (!strncmp(name, "ipy", 3)) {
+			if (StrStartsWith(name, "ipy")) {
 				return &lexPython;
 			}
 		}
 		if (len >= 2) {
-			if (!strncmp(name, "sh", 2)) {
+			if (StrStartsWith(name, "sh")) {
 				return &lexBash;
 			}
-			if (!strncmp(name, "py", 2)) {
+			if (StrStartsWith(name, "py")) {
 				return &lexPython;
 			}
 		}
@@ -1981,39 +1981,36 @@ int Style_GetDocTypeLanguage(void) {
 	// check DOCTYPE
 	const char *p = StrStrIA(tchText, "<!DOCTYPE");
 	if (p != NULL) {
-		p += 9;
+		p += CSTRLEN("<!DOCTYPE");
 		while (IsASpace(*p)) {
 			++p;
 		}
-		if (!_strnicmp(p, "html", 4)) {
+		if (StrStartsWithCase(p, "html")) {
 			return IDM_LEXER_WEB;
 		}
-		if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
+		if (StrStartsWith(p, "struts") || StrStartsWith(p, "xwork") || StrStartsWith(p, "validators")) {
 			return IDM_LEXER_STRUTS;
 		}
-		if (!strncmp(p, "hibernate", 9)) {
-			p += 9;
-			if (*p == '-') {
-				p++;
-			}
+		if (StrStartsWith(p, "hibernate")) {
+			p += CSTRLEN("hibernate-");
 			if (*p == 'm') {
 				return IDM_LEXER_HIB_MAP;
 			}
 			return IDM_LEXER_HIB_CFG;
 		}
-		//if (!strncmp(p, "plist", 5)) {
+		//if (StrStartsWith(p, "plist")) {
 		//	return IDM_LEXER_PROPERTY_LIST;
 		//}
-		if (!strncmp(p, "schema", 6)) {
+		if (StrStartsWith(p, "schema")) {
 			return IDM_LEXER_XSD;
 		}
-		if (!strncmp(p, "jboss", 5)) {
+		if (StrStartsWith(p, "jboss")) {
 			return IDM_LEXER_JBOSS;
 		}
-		if (!strncmp(p, "beans", 5)) {
+		if (StrStartsWith(p, "beans")) {
 			return IDM_LEXER_SPRING_BEANS;
 		}
-		if (!_strnicmp(p, "module", 6)) {
+		if (StrStartsWithCase(p, "module")) {
 			return IDM_LEXER_CHECKSTYLE;
 		}
 	}
@@ -2022,24 +2019,24 @@ int Style_GetDocTypeLanguage(void) {
 		return IDM_LEXER_PHP;
 	}
 	// check Language
-	if ((p = strstr(tchText, "<%@")) != NULL && (p = StrStrIA(p + 3, "Language")) != NULL) {
-		p += 9;
+	if ((p = strstr(tchText, "<%@")) != NULL && (p = StrStrIA(p + CSTRLEN("<%@"), "Language")) != NULL) {
+		p += CSTRLEN("Language") + 1;
 		while (*p == ' ' || *p == '=' || *p == '\"') {
 			p++;
 		}
-		if (!_strnicmp(p, "C#", 2)) {
+		if (StrStartsWithCase(p, "C#")) {
 			return IDM_LEXER_ASPX_CS;
 		}
-		if (!_strnicmp(p, "VBScript", 7)) {
+		if (StrStartsWithCase(p, "VBScript")) {
 			return IDM_LEXER_ASP_VBS;
 		}
-		if (!_strnicmp(p, "VB", 2)) {
+		if (StrStartsWithCase(p, "VB")) {
 			return IDM_LEXER_ASPX_VB;
 		}
-		if (!_strnicmp(p, "JScript", 7)) {
+		if (StrStartsWithCase(p, "JScript")) {
 			return IDM_LEXER_ASP_JS;
 		}
-		if (!_strnicmp(p, "Java", 4)) {
+		if (StrStartsWithCase(p, "Java")) {
 			return IDM_LEXER_JSP;
 		}
 	}
@@ -2050,15 +2047,15 @@ int Style_GetDocTypeLanguage(void) {
 		if ((p = strchr(p, '<')) == NULL) {
 			return 0;
 		}
-		if (!strncmp(p, "<!--", 4)) {
-			p += 4;
+		if (StrStartsWith(p, "<!--")) {
+			p += CSTRLEN("<!--");
 			if ((p = strstr(p, "-->")) != NULL) {
-				p += 3;
+				p += CSTRLEN("-->");
 			} else {
 				return 0;
 			}
-		} else if (!strncmp(p, "<?", 2) || !strncmp(p, "<!", 2)) {
-			p += 2;
+		} else if (StrStartsWith(p, "<?") || StrStartsWith(p, "<!")) {
+			p += CSTRLEN("<?");
 			if ((p = strchr(p, '>')) != NULL) {
 				p++;
 			} else {
@@ -2077,78 +2074,78 @@ int Style_GetDocTypeLanguage(void) {
 		return 0;
 	}
 
-	//if (!_strnicmp(p, "html", 4))
+	//if (StrStartsWithCase(p, "html"))
 	//	return IDM_LEXER_WEB;
-	if (!strncmp(p, "schema", 6)) {
+	if (StrStartsWith(p, "schema")) {
 		return IDM_LEXER_XSD;
 	}
-	//if (!strncmp(p, "schema", 6) || !strncmp(p, "xsd:schema", 10) || !strncmp(p, "xs:schema", 9))
+	//if (StrStartsWith(p, "schema") || StrStartsWith(p, "xsd:schema") || StrStartsWith(p, "xs:schema"))
 	//	return IDM_LEXER_XSD;
-	//if (!strncmp(p, "xsl:stylesheet", 14))
+	//if (StrStartsWith(p, "xsl:stylesheet"))
 	//	return IDM_LEXER_XSLT;
 
-	if (!strncmp(p, "project", 7)) {
+	if (StrStartsWith(p, "project")) {
 		return IDM_LEXER_ANT_BUILD;
 	}
-	//if (!strncmp(p, "project", 7)) {
-	//	p += 7;
+	//if (StrStartsWith(p, "project")) {
+	//	p += CSTRLEN("project");
 	//	if (strstr(p, "maven") && strstr(p, "POM"))
 	//		return IDM_LEXER_MAVEN_POM;
 	//	return IDM_LEXER_ANT_BUILD;
 	//}
-	if (!strncmp(p, "settings", 8)) {
+	if (StrStartsWith(p, "settings")) {
 		return IDM_LEXER_MAVEN_SETTINGS;
 	}
-	if (!strncmp(p, "ivy", 3)) {
-		if (*(p + 3) == '-') {
+	if (StrStartsWith(p, "ivy")) {
+		if (*(p + CSTRLEN("ivy")) == '-') {
 			return IDM_LEXER_IVY_MODULE;
 		}
 		return IDM_LEXER_IVY_SETTINGS;
 	}
-	if (!strncmp(p, "ruleset", 7)) {
+	if (StrStartsWith(p, "ruleset")) {
 		return IDM_LEXER_PMD_RULESET;
 	}
-	if (!strncmp(p, "module", 6)) {
+	if (StrStartsWith(p, "module")) {
 		return IDM_LEXER_CHECKSTYLE;
 	}
 
-	//if (!strncmp(p, "Server"))
+	//if (StrStartsWith(p, "Server"))
 	//	return IDM_LEXER_TOMCAT;
-	//if (!strncmp(p, "web-app"))
+	//if (StrStartsWith(p, "web-app"))
 	//	return IDM_LEXER_WEB_JAVA;
-	if (!strncmp(p, "struts", 6) || !strncmp(p, "xwork", 5) || !strncmp(p, "validators", 10)) {
+	if (StrStartsWith(p, "struts") || StrStartsWith(p, "xwork") || StrStartsWith(p, "validators")) {
 		return IDM_LEXER_STRUTS;
 	}
-	if (!strncmp(p, "hibernate", 9)) {
-		if (*(p + 10) == 'm') {
+	if (StrStartsWith(p, "hibernate")) {
+		if (p[CSTRLEN("hibernate-")] == 'm') {
 			return IDM_LEXER_HIB_MAP;
 		}
 		return IDM_LEXER_HIB_CFG;
 	}
-	if (!strncmp(p, "jboss", 5)) {
+	if (StrStartsWith(p, "jboss")) {
 		return IDM_LEXER_JBOSS;
 	}
-	if (!strncmp(p, "beans", 5)) {
+	if (StrStartsWith(p, "beans")) {
 		return IDM_LEXER_SPRING_BEANS;
 	}
 
-	//if (!strncmp(p, "configuration", 10))
+	//if (StrStartsWith(p, "configuration"))
 	//	return IDM_LEXER_WEB_NET;
-	//if (!strncmp(p, "root", 4))
+	//if (StrStartsWith(p, "root"))
 	//	return IDM_LEXER_RESX;
-	//if (!strncmp(p, "Canvas", 6))
+	//if (StrStartsWith(p, "Canvas"))
 	//	return IDM_LEXER_XAML;
 
-	//if (!strncmp(p, "plist", 5))
+	//if (StrStartsWith(p, "plist"))
 	//	return IDM_LEXER_PROPERTY_LIST;
-	//if (!strncmp(p, "manifest", 8))
+	//if (StrStartsWith(p, "manifest"))
 	//	return IDM_LEXER_ANDROID_MANIFEST;
-	//if (!strncmp(p, "svg", 3))
+	//if (StrStartsWith(p, "svg"))
 	//	return IDM_LEXER_SVG;
 	const char * const pb = p;
-	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + 6, "xmlns:android")) ||
-			((p = strstr(pb, "View")) != NULL && strstr(p + 4, "xmlns:android")) ||
-			((p = strstr(pb, "menu")) != NULL && strstr(p + 4, "xmlns:android"))) {
+	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + CSTRLEN("Layout"), "xmlns:android")) ||
+			((p = strstr(pb, "View")) != NULL && strstr(p + CSTRLEN("View"), "xmlns:android")) ||
+			((p = strstr(pb, "menu")) != NULL && strstr(p + CSTRLEN("menu"), "xmlns:android"))) {
 		return IDM_LEXER_ANDROID_LAYOUT;
 	}
 
@@ -2219,12 +2216,12 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 			}
 			break;
 		case 'f':	// Matlab function
-			if (strncmp(p, "function", 8) == 0 && (IsASpace(p[8]) || p[8] == '[')) {
+			if (StrStartsWith(p, "function") && (IsASpace(p[CSTRLEN("function")]) || p[CSTRLEN("function")] == '[')) {
 				return &lexMatlab;
 			}
 			break;
 		case 'c':	// Matlab classdef
-			if (strncmp(p, "classdef", 8) == 0 && IsASpace(p[8])) {
+			if (StrStartsWith(p, "classdef") && IsASpace(p[CSTRLEN("classdef")])) {
 				return &lexMatlab;
 			}
 			break;
@@ -2257,9 +2254,9 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 		if (*p == '[') {
 			// bracket at line beginning
 			maybeIni = TRUE;
-		} else if (*p == '-' && p[1] == '-' && p[2] == '-' && IsASpace(p[3])) {
+		} else if (*p == '-' && p[1] == '-' && p[2] == '-' && IsASpace(p[CSTRLEN("---")])) {
 			// `---` at line beginning
-			p += 3;
+			p += CSTRLEN("---");
 			while (*p == ' ' || *p == '\t') {
 				++p;
 			}
@@ -2654,23 +2651,23 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		while (IsASpace(*p)) {
 			++p;
 		}
-		const BOOL bPHP = strncmp(p, "<?php", 5) == 0;
+		const BOOL bPHP = StrStartsWith(p, "<?php");
 		if ((pLexNew->rid == NP2LEX_PHP) ^ bPHP) {
 			pLexNew = &lexHTML;
 			np2LexLangIndex = IDM_LEXER_PHP;
 			bFound = TRUE;
 		} else if (*p == '<') {
-			if (strncmp(p, "<?xml", 5) == 0) {
+			if (StrStartsWith(p, "<?xml")) {
 				// some conf/cfg file is xml
 				pLexNew = &lexXML;
 			} else if (!bFound) {
-				if (_strnicmp(p, "<!DOCTYPE", 9) == 0) {
-					p += 9;
+				if (StrStartsWithCase(p, "<!DOCTYPE")) {
+					p += CSTRLEN("<!DOCTYPE");
 					while (IsASpace(*p)) {
 						++p;
 					}
 				}
-				if (_strnicmp(p, "<html", 5) == 0) {
+				if (StrStartsWithCase(p, "<html")) {
 					pLexNew = &lexHTML;
 				} else if (!fNoHTMLGuess) {
 					if (StrStrIA(p, "<html")) {

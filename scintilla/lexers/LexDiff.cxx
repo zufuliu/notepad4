@@ -32,49 +32,49 @@ int ColouriseDiffLine(const char *lineBuffer) noexcept {
 	// comment lines before the first "diff " or "--- ". If a real
 	// difference starts then each line starting with ' ' is a whitespace
 	// otherwise it is considered a comment (Only in..., Binary file...)
-	if (0 == strncmp(lineBuffer, "diff ", 5)) {
+	if (StrStartsWith(lineBuffer, "diff ")) {
 		return SCE_DIFF_COMMAND;
 	}
-	if (0 == strncmp(lineBuffer, "Index: ", 7)) {  // For subversion's diff
+	if (StrStartsWith(lineBuffer, "Index: ")) {  // For subversion's diff
 		return SCE_DIFF_COMMAND;
 	}
-	if (0 == strncmp(lineBuffer, "---", 3) && lineBuffer[3] != '-') {
+	if (StrStartsWith(lineBuffer, "---") && lineBuffer[CSTRLEN("---")] != '-') {
 		// In a context diff, --- appears in both the header and the position markers
-		if (lineBuffer[3] == ' ' && atoi(lineBuffer + 4) && !strchr(lineBuffer, '/')) {
+		if (lineBuffer[CSTRLEN("---")] == ' ' && atoi(lineBuffer + CSTRLEN("---") + 1) && !strchr(lineBuffer, '/')) {
 			return SCE_DIFF_POSITION;
 		}
-		if (IsEOLChar(lineBuffer[3])) {
+		if (IsEOLChar(lineBuffer[CSTRLEN("---")])) {
 			return SCE_DIFF_POSITION;
 		}
-		if (lineBuffer[3] == ' ') {
+		if (lineBuffer[CSTRLEN("---")] == ' ') {
 			return SCE_DIFF_HEADER;
 		}
 		return SCE_DIFF_DELETED;
 	}
-	if (0 == strncmp(lineBuffer, "+++ ", 4)) {
+	if (StrStartsWith(lineBuffer, "+++ ")) {
 		// I don't know of any diff where "+++ " is a position marker, but for
 		// consistency, do the same as with "--- " and "*** ".
-		if (atoi(lineBuffer + 4) && !strchr(lineBuffer, '/')) {
+		if (atoi(lineBuffer + CSTRLEN("+++ ")) && !strchr(lineBuffer, '/')) {
 			return SCE_DIFF_POSITION;
 		}
 		return SCE_DIFF_HEADER;
 	}
-	if (0 == strncmp(lineBuffer, "====", 4)) {  // For p4's diff
+	if (StrStartsWith(lineBuffer, "====")) {  // For p4's diff
 		return SCE_DIFF_HEADER;
 	}
-	if (0 == strncmp(lineBuffer, "***", 3)) {
+	if (StrStartsWith(lineBuffer, "***")) {
 		// In a context diff, *** appears in both the header and the position markers.
 		// Also ******** is a chunk header, but here it's treated as part of the
 		// position marker since there is no separate style for a chunk header.
-		if (lineBuffer[3] == ' ' && atoi(lineBuffer + 4) && !strchr(lineBuffer, '/')) {
+		if (lineBuffer[CSTRLEN("***")] == ' ' && atoi(lineBuffer + CSTRLEN("***") + 1) && !strchr(lineBuffer, '/')) {
 			return SCE_DIFF_POSITION;
 		}
-		if (lineBuffer[3] == '*') {
+		if (lineBuffer[CSTRLEN("***")] == '*') {
 			return SCE_DIFF_POSITION;
 		}
 		return SCE_DIFF_HEADER;
 	}
-	if (0 == strncmp(lineBuffer, "? ", 2)) {    // For difflib
+	if (StrStartsWith(lineBuffer, "? ")) {    // For difflib
 		return SCE_DIFF_HEADER;
 	}
 	if (lineBuffer[0] == '@') {
@@ -83,16 +83,16 @@ int ColouriseDiffLine(const char *lineBuffer) noexcept {
 	if (IsADigit(lineBuffer[0])) {
 		return SCE_DIFF_POSITION;
 	}
-	if (0 == strncmp(lineBuffer, "++", 2)) {
+	if (StrStartsWith(lineBuffer, "++")) {
 		return SCE_DIFF_PATCH_ADD;
 	}
-	if (0 == strncmp(lineBuffer, "+-", 2)) {
+	if (StrStartsWith(lineBuffer, "+-")) {
 		return SCE_DIFF_PATCH_DELETE;
 	}
-	if (0 == strncmp(lineBuffer, "-+", 2)) {
+	if (StrStartsWith(lineBuffer, "-+")) {
 		return SCE_DIFF_REMOVED_PATCH_ADD;
 	}
-	if (0 == strncmp(lineBuffer, "--", 2)) {
+	if (StrStartsWith(lineBuffer, "--")) {
 		return SCE_DIFF_REMOVED_PATCH_DELETE;
 	}
 	if (lineBuffer[0] == '-' || lineBuffer[0] == '<') {

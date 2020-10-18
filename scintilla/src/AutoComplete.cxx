@@ -265,7 +265,7 @@ void AutoComplete::Select(const char *word) {
 				// Check for exact-case match
 				for (; pivot <= end; pivot++) {
 					lb->GetValue(sortMatrix[pivot], item, maxItemLen);
-					if (strncmp(word, item, lenWord) == 0) {
+					if (StrStartsWithEx(word, item, lenWord)) {
 						location = pivot;
 						break;
 					}
@@ -292,7 +292,7 @@ void AutoComplete::Select(const char *word) {
 				lb->GetValue(sortMatrix[i], item, maxItemLen);
 				if (CompareNCaseInsensitive(word, item, lenWord) != 0)
 					break;
-				if (sortMatrix[i] < sortMatrix[location] && strncmp(word, item, lenWord) == 0)
+				if (sortMatrix[i] < sortMatrix[location] && StrStartsWithEx(word, item, lenWord))
 					location = i;
 			}
 		}
