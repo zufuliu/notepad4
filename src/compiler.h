@@ -82,12 +82,6 @@
 #define NP2_USE_DESIGNATED_INITIALIZER	1
 #endif
 
-#if defined(__cplusplus) || defined(__GNUC__) || defined(__clang__)
-#define EMPTY_BRACE_INITIALIZER			{}
-#else
-#define EMPTY_BRACE_INITIALIZER			{0}
-#endif
-
 #define PP_CONCAT_(x, y)	x##y
 #define PP_CONCAT(x, y)		PP_CONCAT_(x, y)
 
