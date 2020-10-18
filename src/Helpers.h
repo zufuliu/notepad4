@@ -193,6 +193,11 @@ NP2_inline LPWSTR StrStrEx(LPCWSTR pszFirst, LPCWSTR pszSrch, BOOL bIgnoreCase) 
 #define StrHasPrefixCaseEx(s, prefix, len)	(_wcsnicmp((s), (prefix), (len)) == 0)
 #endif
 
+#define StrStartsWith(s, prefix)			(strncmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrStartsWithEx(s, prefix, len)		(strncmp((s), (prefix), (len)) == 0)
+#define StrStartsWithCase(s, prefix)		(_strnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrStartsWithCaseEx(s, prefix, len)	(_strnicmp((s), (prefix), (len)) == 0)
+
 NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
 #if defined(__USE_MINGW_STRTOX)

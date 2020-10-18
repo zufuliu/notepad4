@@ -2862,42 +2862,42 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		Sci_Line lineCount = 0;
 		mszPrefix2 = (char *)NP2HeapAlloc(iPrefixLen * kMaxMultiByteCount + 1);
 		while (!bPrefixNum && (p = strstr(p, "$(")) != NULL) {
-			if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
+			if (StrStartsWith(p, "$(I)")) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(I)"));
 				bPrefixNum = TRUE;
 				iPrefixNum = 0;
 				lineCount = iLineEnd - iLineStart;
 				bPrefixNumPadZero = FALSE;
-			} else if (strncmp(p, "$(0I)", CSTRLEN("$(0I)")) == 0) {
+			} else if (StrStartsWith(p, "$(0I)")) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(0I)"));
 				bPrefixNum = TRUE;
 				iPrefixNum = 0;
 				lineCount = iLineEnd - iLineStart;
 				bPrefixNumPadZero = TRUE;
-			} else if (strncmp(p, "$(N)", CSTRLEN("$(N)")) == 0) {
+			} else if (StrStartsWith(p, "$(N)")) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(N)"));
 				bPrefixNum = TRUE;
 				iPrefixNum = 1;
 				lineCount = iLineEnd - iLineStart + 1;
 				bPrefixNumPadZero = FALSE;
-			} else if (strncmp(p, "$(0N)", CSTRLEN("$(0N)")) == 0) {
+			} else if (StrStartsWith(p, "$(0N)")) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(0N)"));
 				bPrefixNum = TRUE;
 				iPrefixNum = 1;
 				lineCount = iLineEnd - iLineStart + 1;
 				bPrefixNumPadZero = TRUE;
-			} else if (strncmp(p, "$(L)", CSTRLEN("$(L)")) == 0) {
+			} else if (StrStartsWith(p, "$(L)")) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(L)"));
 				bPrefixNum = TRUE;
 				iPrefixNum = iLineStart + 1;
 				lineCount = iLineEnd + 1;
 				bPrefixNumPadZero = FALSE;
-			} else if (strncmp(p, "$(0L)", CSTRLEN("$(0L)")) == 0) {
+			} else if (StrStartsWith(p, "$(0L)")) {
 				*p = 0;
 				strcpy(mszPrefix2, p + CSTRLEN("$(0L)"));
 				bPrefixNum = TRUE;
@@ -2920,42 +2920,42 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		Sci_Line lineCount = 0;
 		mszAppend2 = (char *)NP2HeapAlloc(iAppendLen * kMaxMultiByteCount + 1);
 		while (!bAppendNum && (p = strstr(p, "$(")) != NULL) {
-			if (strncmp(p, "$(I)", CSTRLEN("$(I)")) == 0) {
+			if (StrStartsWith(p, "$(I)")) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(I)"));
 				bAppendNum = TRUE;
 				iAppendNum = 0;
 				lineCount = iLineEnd - iLineStart;
 				bAppendNumPadZero = FALSE;
-			} else if (strncmp(p, "$(0I)", CSTRLEN("$(0I)")) == 0) {
+			} else if (StrStartsWith(p, "$(0I)")) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(0I)"));
 				bAppendNum = TRUE;
 				iAppendNum = 0;
 				lineCount = iLineEnd - iLineStart;
 				bAppendNumPadZero = TRUE;
-			} else if (strncmp(p, "$(N)", CSTRLEN("$(N)")) == 0) {
+			} else if (StrStartsWith(p, "$(N)")) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(N)"));
 				bAppendNum = TRUE;
 				iAppendNum = 1;
 				lineCount = iLineEnd - iLineStart + 1;
 				bAppendNumPadZero = FALSE;
-			} else if (strncmp(p, "$(0N)", CSTRLEN("$(0N)")) == 0) {
+			} else if (StrStartsWith(p, "$(0N)")) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(0N)"));
 				bAppendNum = TRUE;
 				iAppendNum = 1;
 				lineCount = iLineEnd - iLineStart + 1;
 				bAppendNumPadZero = TRUE;
-			} else if (strncmp(p, "$(L)", CSTRLEN("$(L)")) == 0) {
+			} else if (StrStartsWith(p, "$(L)")) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(L)"));
 				bAppendNum = TRUE;
 				iAppendNum = iLineStart + 1;
 				lineCount = iLineEnd + 1;
 				bAppendNumPadZero = FALSE;
-			} else if (strncmp(p, "$(0L)", CSTRLEN("$(0L)")) == 0) {
+			} else if (StrStartsWith(p, "$(0L)")) {
 				*p = 0;
 				strcpy(mszAppend2, p + CSTRLEN("$(0L)"));
 				bAppendNum = TRUE;
@@ -3448,7 +3448,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 		SciCall_GetTextRange(&tr);
 
 		Sci_Position iCommentPos;
-		if (_strnicmp(tchBuf, mszComment, cchComment) == 0) {
+		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment)) {
 			int ch;
 			switch (iAction) {
 			case 0:

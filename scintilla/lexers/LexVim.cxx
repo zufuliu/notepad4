@@ -279,10 +279,10 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			if (styleNext != SCE_VIM_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (strcmp(buf, "if") == 0 || strcmp(buf, "while") == 0 || strncmp(buf, "fun", 3) == 0
+				if (strcmp(buf, "if") == 0 || strcmp(buf, "while") == 0 || StrStartsWith(buf, "fun")
 					|| strcmp(buf, "for") == 0 || strcmp(buf, "try") == 0) {
 					levelNext++;
-				} else if (strncmp(buf, "end", 3) == 0) {
+				} else if (StrStartsWith(buf, "end")) {
 					levelNext--;
 				}
 			}

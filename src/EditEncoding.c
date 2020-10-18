@@ -1929,7 +1929,7 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 //
 BOOL FileVars_IsUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
-		if (_stricmp(lpfv->tchEncoding, "utf-8") == 0 || _strnicmp(lpfv->tchEncoding, "utf8", 3) == 0) {
+		if (_stricmp(lpfv->tchEncoding, "utf-8") == 0 || StrStartsWithCase(lpfv->tchEncoding, "utf8")) {
 			return TRUE;
 		}
 	}
@@ -1944,7 +1944,7 @@ BOOL FileVars_IsUTF8(LPCFILEVARS lpfv) {
 BOOL FileVars_IsNonUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		if (StrNotEmptyA(lpfv->tchEncoding) &&
-				_stricmp(lpfv->tchEncoding, "utf-8") != 0 && _strnicmp(lpfv->tchEncoding, "utf8", 3) != 0) {
+				_stricmp(lpfv->tchEncoding, "utf-8") != 0 && StrStartsWithCase(lpfv->tchEncoding, "utf8")) {
 			return TRUE;
 		}
 	}

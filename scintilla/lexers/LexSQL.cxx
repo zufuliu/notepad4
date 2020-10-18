@@ -123,9 +123,9 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 				//} else if (kw_sqlplus.InListAbbreviated(s, '~')) {
 				//	sc.ChangeState(SCE_SQL_SQLPLUS);
-				//	if (strncmp(s, "rem", 3) == 0) {
+				//	if (StrStartsWith(s, "rem")) {
 				//		nextState = SCE_SQL_SQLPLUS_COMMENT;
-				//	} else if (strncmp(s, "pro", 3) == 0) {
+				//	} else if (StrStartsWith(s, "pro")) {
 				//		nextState = SCE_SQL_SQLPLUS_PROMPT;
 				//	}
 				//} else if (kw_user2.InList(s)) {
