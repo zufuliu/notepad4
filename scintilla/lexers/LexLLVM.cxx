@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for LLVM.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
