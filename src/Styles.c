@@ -4451,7 +4451,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	case WM_MOUSEMOVE:
 		if (fDragging && pCurrentStyle) {
-			TVHITTESTINFO tvht = EMPTY_BRACE_INITIALIZER;
+			TVHITTESTINFO tvht = { { 0, 0 }, 0, NULL };
 
 			//ImageList_DragMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			//ImageList_DragShowNolock(FALSE);
@@ -5082,7 +5082,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			switch (lpnmtv->hdr.code) {
 			case NM_CLICK: {
 				// https://support.microsoft.com/en-us/help/261289/how-to-know-when-the-user-clicks-a-check-box-in-a-treeview-control
-				TVHITTESTINFO tvht = EMPTY_BRACE_INITIALIZER;
+				TVHITTESTINFO tvht = { { 0, 0 }, 0, NULL };
 				DWORD dwpos = GetMessagePos();
 				tvht.pt.x = GET_X_LPARAM(dwpos);
 				tvht.pt.y = GET_Y_LPARAM(dwpos);
@@ -5134,7 +5134,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 
 	case WM_MOUSEMOVE:
 		if (fDragging && hDraggingNode != NULL) {
-			TVHITTESTINFO tvht = EMPTY_BRACE_INITIALIZER;
+			TVHITTESTINFO tvht = { { 0, 0 }, 0, NULL };
 
 			tvht.pt.x = GET_X_LPARAM(lParam);
 			tvht.pt.y = GET_Y_LPARAM(lParam);
