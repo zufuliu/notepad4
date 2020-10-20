@@ -2002,8 +2002,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		const Sci::Position lengthFind = *length;
 
 		// character less than safeChar is encoded in single byte in the encoding.
-		constexpr int safeCharASCII = 0x80;		// UTF-8, DBCS forward search
-		constexpr int safeCharDBCS = ' ' + 1;	// C0 control characters, DBCS backward search
+		constexpr int safeCharASCII = 0x80;		// UTF-8 forward & backward search, DBCS forward search
 		constexpr int safeCharSBCS = 256;		// all
 
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
@@ -2017,11 +2016,11 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 			const unsigned char charStartSearch = searchData[0];
-			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : safeCharDBCS);
+			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : dbcsCharClass->MinTrailByte());
 #define FindText_UseBoyerMooreHorspoolSundayAlgorithm	1
 #if FindText_UseBoyerMooreHorspoolSundayAlgorithm
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
-			// http://www-igm.univ-mlv.fr/~lecroq/string/node1.html
+			// http://www-igm.univ-mlv.fr/~lecroq/string/index.html
 			// http://www-igm.univ-mlv.fr/~lecroq/string/node19.html
 			// https://www.inf.hs-flensburg.de/lang/algorithmen/pattern/sundayen.htm
 			int shiftTab[256];

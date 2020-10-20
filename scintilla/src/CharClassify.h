@@ -90,11 +90,15 @@ public:
 	constexpr int CodePage() const noexcept {
 		return codePage;
 	}
+	constexpr int MinTrailByte() const noexcept {
+		return minTrailByte;
+	}
 
 private:
 	explicit DBCSCharClassify(int codePage_) noexcept;
 
 	const int codePage;
+	int minTrailByte;
 	bool leadByte[256];
 	bool invalidLeadByte[256];
 	bool invalidTrailByte[256];

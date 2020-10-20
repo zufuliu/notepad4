@@ -703,6 +703,7 @@ const unsigned short CharClassifyRLE_CP1361[] = {
 
 DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 	codePage(codePage_),
+	minTrailByte(0x40),
 	leadByte{},
 	invalidLeadByte{},
 	invalidTrailByte{} {
@@ -746,6 +747,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 
 	case 949:
 		// Korean Unified Hangul Code, Wansung KS C-5601-1987
+		minTrailByte = 0x41;
 		SetRange(leadByte, 0x81, 0xFE);
 
 		invalidLeadByte[0x80] = true;
@@ -778,6 +780,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 
 	case 1361:
 		// Korean Johab, KS C-5601-1992
+		minTrailByte = 0x31;
 		SetRange(leadByte, 0x84, 0xD3);
 		SetRange(leadByte, 0xD8, 0xDE);
 		SetRange(leadByte, 0xE0, 0xF9);
