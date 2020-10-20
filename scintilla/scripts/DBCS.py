@@ -77,9 +77,18 @@ def print_dbcs_char_by_tail(code_page, what):
 			i += step
 
 def print_dbcs_test_char(what):
-	print_dbcs_char_by_tail('GBK', what)
-	print_dbcs_char_by_tail('Shift-JIS', what)
-	print_dbcs_char_by_tail('UHC', what)
-	print_dbcs_char_by_tail('Johab', what)
+	print_dbcs_char_by_tail('cp932', what)
+	print_dbcs_char_by_tail('shift_jis', what)
+	print_dbcs_char_by_tail('shift_jis_2004', what)
+	print_dbcs_char_by_tail('shift_jisx0213', what)
+	print_dbcs_char_by_tail('cp936', what)
+	print_dbcs_char_by_tail('gbk', what)
+	print_dbcs_char_by_tail('cp949', what)
+	print_dbcs_char_by_tail('uhc', what)
+	print_dbcs_char_by_tail('cp950', what)
+	print_dbcs_char_by_tail('big5', what)
+	print_dbcs_char_by_tail('big5hkscs', what)
+	print_dbcs_char_by_tail('cp1361', what)
+	print_dbcs_char_by_tail('johab', what)
 
-print_dbcs_test_char(DBCSTailKind.Punctuation)
+print_dbcs_test_char(DBCSTailKind.All)
