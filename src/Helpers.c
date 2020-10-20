@@ -32,6 +32,14 @@
 #include "Helpers.h"
 #include "resource.h"
 
+LPCSTR GetCurrentLogTime(void) {
+	static char buf[16];
+	SYSTEMTIME lt;
+	GetLocalTime(&lt);
+	sprintf(buf, "%02d:%02d:%02d.%03d", lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
+	return buf;
+}
+
 void StopWatch_Show(const StopWatch *watch, LPCWSTR msg) {
 	const double elapsed = StopWatch_Get(watch);
 	WCHAR buf[256];

@@ -3324,7 +3324,7 @@ void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
 }
 
 void ScintillaWin::ScrollMessage(WPARAM wParam) {
-	//DWORD dwStart = timeGetTime();
+	//DWORD dwStart = GetTickCount();
 	//Platform::DebugPrintf("Scroll %x %d\n", wParam, lParam);
 
 	SCROLLINFO sci = {};
