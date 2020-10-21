@@ -1,5 +1,6 @@
 @ECHO OFF
 @rem used for AppVeyor and GitHub Actions
+SETLOCAL ENABLEEXTENSIONS
 
 IF /I "%~1" == "latest" (
   SHIFT
