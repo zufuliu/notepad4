@@ -18,6 +18,8 @@ IF /I "%~1" == "i686" (
 
 IF /I "%~1" == "llvm" (
   SHIFT
-  curl -fsSL -o "llvm-mingw-20200325-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20200325/llvm-mingw-20200325-x86_64.zip"
-  7z x -y -o"C:\" "llvm-mingw-20200325-x86_64.zip" >NUL
+  @rem for CI purpose only, the result binary is dynamic linked against api-ms-win-crt*.dll instead of msvcrt.dll
+  SET "FILE=llvm-mingw-20201020-ucrt-x86_64.zip"
+  curl -fsSL -o "%FILE%" "https://github.com/mstorsjo/llvm-mingw/releases/download/20201020/%FILE%"
+  7z x -y -o"C:\" "%FILE%" >NUL
 )
