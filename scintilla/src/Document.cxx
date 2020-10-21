@@ -2010,7 +2010,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		Sci::Position pos = startPos;
 		if (!forward) {
 			// Back all of a character
-			pos = NextPosition(pos, increment);
+			pos = MovePositionOutsideChar(pos - lengthFind, increment, false);
 		}
 		if (caseSensitive) {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
@@ -2021,22 +2021,30 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			// http://www-igm.univ-mlv.fr/~lecroq/string/index.html
 			// http://www-igm.univ-mlv.fr/~lecroq/string/node19.html
 			// https://www.inf.hs-flensburg.de/lang/algorithmen/pattern/sundayen.htm
-			int shiftTab[256];
+			Sci::Position shiftTable[256];
 			if (lengthFind != 1) {
-				int shift = static_cast<int>(lengthFind);
-				std::fill_n(shiftTab, 256, shift + 1);
-				const uint8_t *ptr = searchData;
-				uint8_t ch;
-				while ((ch = *ptr++) != 0) {
-					shiftTab[ch] = shift--;
+				Sci::Position shift = lengthFind;
+				std::fill_n(shiftTable, std::size(shiftTable), (shift + 1) * increment);
+				if (forward) {
+					const unsigned char *ptr = searchData;
+					while (*ptr != 0) {
+						shiftTable[*ptr++] = shift--;
+					}
+				} else {
+					const unsigned char *ptr = searchData + shift - 1;
+					shift = -shift;
+					while (ptr >= searchData) {
+						shiftTable[*ptr--] = shift++;
+					}
 				}
 			}
 
+			const Sci::Position skip = forward ? lengthFind : -1;
 			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 				const unsigned char leadByte = UCharAt(pos);
 				if (charStartSearch == leadByte) {
 					bool found = (pos + lengthFind) <= limitPos;
-					for (int indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
+					for (Sci::Position indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
 						const unsigned char ch = UCharAt(pos + indexSearch);
 						found = ch == searchData[indexSearch];
 					}
@@ -2054,9 +2062,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						}
 					}
 				} else {
-					const unsigned char lastByte = UCharAt(pos + lengthFind);
-					pos += increment * shiftTab[lastByte];
-					if (lastByte >= safeChar) {
+					const unsigned char nextByte = UCharAt(pos + skip);
+					pos += shiftTable[nextByte];
+					if (nextByte >= safeChar) {
 						pos = MovePositionOutsideChar(pos, increment, false);
 					}
 				}
@@ -2187,7 +2195,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const char * const searchData = searchThing.data();
 			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 				bool found = (pos + lengthFind) <= limitPos;
-				for (int indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
+				for (Sci::Position indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
 					const char ch = CharAt(pos + indexSearch);
 					const char chTest = searchData[indexSearch];
 					if (UTF8IsAscii(ch)) {
