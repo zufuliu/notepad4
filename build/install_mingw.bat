@@ -1,5 +1,6 @@
 @ECHO OFF
 @rem used for GitHub Actions
+SETLOCAL ENABLEEXTENSIONS
 
 @rem https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md#msys2
 SET "PATH=C:\msys64\usr\bin;%PATH%"
