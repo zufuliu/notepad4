@@ -2017,8 +2017,6 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 			const unsigned char charStartSearch = searchData[0];
 			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : dbcsCharClass->MinTrailByte());
-#define FindText_UseBoyerMooreHorspoolSundayAlgorithm	1
-#if FindText_UseBoyerMooreHorspoolSundayAlgorithm
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
 			// http://www-igm.univ-mlv.fr/~lecroq/string/index.html
 			// http://www-igm.univ-mlv.fr/~lecroq/string/node19.html
@@ -2063,68 +2061,6 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					}
 				}
 			}
-#else
-			// Brute Force Algorithm
-#define FindText_EnableBadCharacterFilter	1
-#if FindText_EnableBadCharacterFilter
-#if SIZE_MAX > UINT_MAX
-			uint64_t charSet[4];
-			constexpr int charSetShift = 6;
-			constexpr int charSetMask = 63;
-			constexpr uint64_t charSetOne = UINT64_C(1);
-#else
-			uint32_t charSet[8];
-			constexpr int charSetShift = 5;
-			constexpr int charSetMask = 31;
-			constexpr uint32_t charSetOne = 1U;
-#endif
-			if (lengthFind != 1) {
-				memset(charSet, 0, sizeof(charSet));
-				const uint8_t *ptr = searchData;
-				uint8_t ch;
-				while ((ch = *ptr++) != 0) {
-					charSet[ch >> charSetShift] |= charSetOne << (ch & charSetMask);
-				}
-			}
-#endif
-
-			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
-				const unsigned char leadByte = UCharAt(pos);
-				if (leadByte == charStartSearch) {
-					bool found = (pos + lengthFind) <= limitPos;
-					bool advanced = false;
-					for (int indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
-						const unsigned char ch = UCharAt(pos + indexSearch);
-						found = ch == searchData[indexSearch];
-						if (!found) {
-#if FindText_EnableBadCharacterFilter
-							if (!((charSet[ch >> charSetShift] >> (ch & charSetMask)) & 1)) {
-								advanced = true;
-								// ch not in search string, so next match must after or before it.
-								pos += (indexSearch + 1) * increment;
-								if (ch >= safeChar) {
-									pos = MovePositionOutsideChar(pos, increment, false);
-								}
-							}
-#endif
-						}
-					}
-					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
-						return pos;
-					}
-					if (advanced) {
-						continue;
-					}
-				}
-				if (leadByte < safeChar) {
-					pos += increment;
-				} else {
-					if (!NextCharacter(pos, increment)) {
-						break;
-					}
-				}
-			}
-#endif
 		} else if (SC_CP_UTF8 == dbcsCodePage) {
 			constexpr size_t maxFoldingExpansion = 4;
 			std::vector<char> searchThing((lengthFind + 1) * UTF8MaxBytes * maxFoldingExpansion + 1);
