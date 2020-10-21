@@ -2010,7 +2010,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		Sci::Position pos = startPos;
 		if (!forward) {
 			// Back all of a character
-			pos = MovePositionOutsideChar(pos - lengthFind, increment, false);
+			pos = caseSensitive ? MovePositionOutsideChar(pos - lengthFind, increment, false) : NextPosition(pos, increment);
 		}
 		if (caseSensitive) {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
