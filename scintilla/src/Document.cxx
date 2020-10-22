@@ -1979,17 +1979,18 @@ Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) 
  */
 Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, const char *search,
 	int flags, Sci::Position *length) {
-	if (*length <= 0)
+	if (*length <= 0) {
 		return minPos;
+	}
 	const bool caseSensitive = (flags & SCFIND_MATCHCASE) != 0;
-	const bool word = (flags & SCFIND_WHOLEWORD) != 0;
-	const bool wordStart = (flags & SCFIND_WORDSTART) != 0;
-	const bool regExp = (flags & SCFIND_REGEXP) != 0;
-	if (regExp) {
-		if (!regex)
+	if (flags & SCFIND_REGEXP) {
+		if (!regex) {
 			regex = std::unique_ptr<RegexSearchBase>(CreateRegexSearch(&charClass));
-		return regex->FindText(this, minPos, maxPos, search, caseSensitive, word, wordStart, flags, length);
+		}
+		return regex->FindText(this, minPos, maxPos, search, caseSensitive, flags, length);
 	} else {
+		const bool word = (flags & SCFIND_WHOLEWORD) != 0;
+		const bool wordStart = (flags & SCFIND_WORDSTART) != 0;
 
 		const bool forward = minPos <= maxPos;
 		const int increment = forward ? 1 : -1;
@@ -2008,9 +2009,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
 		const Sci::Position limitPos = std::max(startPos, endPos);
 		Sci::Position pos = startPos;
-		if (!forward) {
+		if (!forward && !caseSensitive) {
 			// Back all of a character
-			pos = caseSensitive ? MovePositionOutsideChar(pos - lengthFind, increment, false) : NextPosition(pos, increment);
+			pos = NextPosition(pos, -1);
 		}
 		if (caseSensitive) {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
@@ -2040,6 +2041,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			}
 
 			const Sci::Position skip = forward ? lengthFind : -1;
+			if (!forward) {
+				pos = MovePositionOutsideChar(pos - lengthFind, -1, false);
+			}
 			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 				const unsigned char leadByte = UCharAt(pos);
 				if (charStartSearch == leadByte) {
@@ -2754,8 +2758,7 @@ public:
 	~BuiltinRegex() override = default;
 
 	Sci::Position FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
-		bool caseSensitive, bool word, bool wordStart, int flags,
-		Sci::Position *length) override;
+		bool caseSensitive, int flags, Sci::Position *length) override;
 
 	const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
 
@@ -3232,13 +3235,11 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 }
 
 Sci::Position BuiltinRegex::FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
-	bool caseSensitive, bool, bool, int flags,
-	Sci::Position *length) {
+	bool caseSensitive, int flags, Sci::Position *length) {
 
 #ifndef NO_CXX11_REGEX
 	if (flags & SCFIND_CXX11REGEX) {
-		return Cxx11RegexFindText(doc, minPos, maxPos, s,
-			caseSensitive, length, search);
+		return Cxx11RegexFindText(doc, minPos, maxPos, s, caseSensitive, length, search);
 	}
 #endif
 
