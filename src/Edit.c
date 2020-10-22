@@ -2066,6 +2066,7 @@ void EditHex2Char(void) {
 					}
 				}
 			} else {
+				wch[cch++] = L'\\';
 				ci = *p++;
 			}
 		} else {
