@@ -96,7 +96,7 @@ static KEYWORDLIST Keywords_ASM = {{
 "prologue qword radix readonly real10 real4 real8 req sbyte scoped sdword seq setif2 sign? small "
 "smallstack sword tbyte tiny use16 use32 uses vararg word wrt zero? "
 "ptrdiff_t size_t int_t uint_t int32_t uint32_t int64_t uint64_t null true false "
-"const _text pdata xdata imagerel "
+"const _text pdata xdata imagerel xmmword ymmword "
 
 , // 5 Extended Instruction
 // XMM SSE SSE2 SSE4
@@ -148,7 +148,7 @@ static KEYWORDLIST Keywords_ASM = {{
 , // 8 GNU Assembler Directive
 "abort align altmacro ascii asciz balign balignl balignw byte code16 code16gcc code32 code64 comm def desc dim double eject else elseif end endef endfunc endif endm endr equ equiv eqv err error even exitm extern fail file fill float func global globl gnu_attribute hidden hword ident if ifdef ifndef incbin include int internal irp irpc lcomm lflags line linkonce list ln loc loc_mark_labels local long macro endm mri noaltmacro nolist octa org p2align p2alignl p2alignw popsection previous print protected psize purgem pushsection quad reloc rept sbttl scl section set short single size skip sleb128 space stabd stabn stabs string string8 string16 string32 string64 struct subsection symver tag text title type uleb128 val version vtable_entry vtable_inherit warning weak weakref word secrel32 "
 " cfi_startproc cfi_endproc cfi_personality cfi_lsda encoding cfi_def_cfa cfi_def_cfa_register cfi_def_cfa_offset cfi_adjust_cfa_offset cfi_offset cfi_rel_offset cfi_register cfi_restore cfi_undefined cfi_same_value cfi_remember_state cfi_return_column cfi_signal_frame cfi_window_save cfi_escape cfi_val_encoded_addr cfi_sections "
-"seh_proc seh_endproc seh_pushreg seh_endprologue seh_stackalloc seh_setframe seh_handler seh_handlerdata "
+"seh_proc seh_endproc seh_pushreg seh_endprologue seh_stackalloc seh_setframe seh_handler seh_handlerdata seh_savexmm "
 
 , // 9 Proprocessor
 "define elif else endif error if ifdef ifndef import include line pragma undef using "
