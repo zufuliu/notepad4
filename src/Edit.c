@@ -5607,20 +5607,20 @@ extern HANDLE idleTaskTimer;
 #define EditMarkAll_DefaultDuration		64
 //static UINT EditMarkAll_Runs;
 
-void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 	if (editMarkAllStatus.matchCount != 0) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
 	}
 	if (editMarkAllStatus.pszText) {
-		LocalFree(editMarkAllStatus.pszText);
+		NP2HeapFree(editMarkAllStatus.pszText);
 	}
 
 	editMarkAllStatus.pending = FALSE;
 	editMarkAllStatus.findFlag = findFlag;
 	editMarkAllStatus.iSelCount= iSelCount;
-	editMarkAllStatus.pszText = pszText ? StrDupA(pszText) : NULL;
+	editMarkAllStatus.pszText = pszText;
 	editMarkAllStatus.rewind = FALSE;
 	// timing for increment search is only useful for current search.
 	editMarkAllStatus.incrementSize = 1;
@@ -5630,7 +5630,7 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
 	editMarkAllStatus.iStartPos = 0;
 }
 
-BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText) {
+BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 	// use case sensitive match for ASCII text without letters.
 	if (!(findFlag & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
 		int sensitive = SCFIND_MATCHCASE;
@@ -5650,6 +5650,7 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCS
 		&& iSelCount == editMarkAllStatus.iSelCount
 		// _stricmp() is not safe for DBCS string.
 		&& memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0)) {
+		NP2HeapFree(pszText);
 		return FALSE;
 	}
 
@@ -5802,14 +5803,13 @@ BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 	}
 
 	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
-	bChanged = EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
-	NP2HeapFree(pszText);
-	return bChanged;
+	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
 void EditFindAll(LPEDITFINDREPLACE lpefr) {
-	char szFind2[NP2_FIND_REPLACE_LIMIT];
+	char *szFind2 = (char *)NP2HeapAlloc(NP2_FIND_REPLACE_LIMIT);
 	if (!EditPrepareFind(szFind2, lpefr)) {
+		NP2HeapFree(szFind2);
 		return;
 	}
 

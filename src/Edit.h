@@ -225,11 +225,11 @@ typedef struct EditMarkAllStatus {
 	StopWatch watch;			// used to dynamic compute increment size
 } EditMarkAllStatus;
 
-void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText);
 NP2_inline void EditMarkAll_Clear(void) {
 	EditMarkAll_ClearEx(0, 0, NULL);
 }
-BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPCSTR pszText);
+BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
 BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
 
