@@ -26,8 +26,6 @@
 #define NP2_LONG_LINE_LIMIT		4096
 
 #define NP2_InvalidSearchFlags	(-1)
-#define SCFIND_WHOLEWORD_BIT	1
-#define SCFIND_MATCHCASE_BIT	2
 
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];

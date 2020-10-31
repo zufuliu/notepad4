@@ -5404,9 +5404,9 @@ int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 		EscapeWildcards(szFind2);
 		searchFlags |= SCFIND_REGEXP;
 	} else if (!(searchFlags & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
-		const BOOL matchCase = !IsStringCaseSensitiveA(szFind2);
-		//printf("%s sensitive=%d\n", __func__, !matchCase);
-		searchFlags |= (matchCase << SCFIND_MATCHCASE_BIT);
+		const BOOL sensitive = IsStringCaseSensitiveA(szFind2);
+		//printf("%s sensitive=%d\n", __func__, sensitive);
+		searchFlags |= ((sensitive - 1) & SCFIND_MATCHCASE);
 	}
 	return searchFlags;
 }
@@ -5791,12 +5791,13 @@ BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 		}
 	}
 	if (!bMarkOccurrencesMatchCase) {
-		bMarkOccurrencesMatchCase = !IsStringCaseSensitiveA(pszText);
-		//printf("%s sensitive=%d\n", __func__, !bMarkOccurrencesMatchCase);
+		const BOOL sensitive = IsStringCaseSensitiveA(pszText);
+		//printf("%s sensitive=%d\n", __func__, sensitive);
+		bMarkOccurrencesMatchCase = sensitive ^ 1;
 	}
 
-	const int findFlag = (bMarkOccurrencesMatchCase << SCFIND_MATCHCASE_BIT)
-		| (bMarkOccurrencesMatchWords << SCFIND_WHOLEWORD_BIT);
+	const int findFlag = (bMarkOccurrencesMatchCase * SCFIND_MATCHCASE)
+		| (bMarkOccurrencesMatchWords * SCFIND_WHOLEWORD);
 	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
