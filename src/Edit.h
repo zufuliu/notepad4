@@ -25,6 +25,10 @@
 #define NP2_FIND_REPLACE_LIMIT	2048
 #define NP2_LONG_LINE_LIMIT		4096
 
+#define NP2_InvalidSearchFlags	(-1)
+#define SCFIND_WHOLEWORD_BIT	1
+#define SCFIND_MATCHCASE_BIT	2
+
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];
 	char	szReplace[512];
@@ -33,7 +37,6 @@ typedef struct EDITFINDREPLACE {
 	HWND	hwnd;
 	UINT	fuFlags;
 	BOOL	bTransformBS;
-	//BOOL	bFindUp;
 	BOOL	bFindClose;
 	BOOL	bReplaceClose;
 	BOOL	bNoFindWrap;
@@ -163,12 +166,12 @@ void	EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt);
 void	EditSelectWord(void);
 void	EditSelectLines(BOOL currentBlock, BOOL lineSelection);
 HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
-void	EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
-void	EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection);
-void	EditFindAll(LPEDITFINDREPLACE lpefr);
-BOOL	EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr);
-BOOL	EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
-BOOL	EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo);
+void	EditFindNext(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+void	EditFindPrev(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
+void	EditFindAll(LPCEDITFINDREPLACE lpefr);
+BOOL	EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr);
+BOOL	EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
+BOOL	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditLineNumDlg(HWND hwnd);
 void	EditModifyLinesDlg(HWND hwnd);
 void	EditEncloseSelectionDlg(HWND hwnd);
