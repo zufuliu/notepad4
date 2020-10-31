@@ -397,6 +397,9 @@ static inline BOOL IsUTF8Signature(const char *p) {
 	return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
 }
 
+BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW);
+BOOL IsStringCaseSensitiveA(LPCSTR pszText);
+
 //void SciInitThemes(HWND hwnd);
 
 #define FV_TABWIDTH				1
