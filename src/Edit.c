@@ -5203,11 +5203,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				EditReplaceAllInSelection(lpefr->hwnd, lpefr, TRUE);
 				break;
 			}
-
-			// Wildcard search will enable regexp, so I turn it off again otherwise it will be on in the gui
-			if (lpefr->bWildcardSearch	&&	(lpefr->fuFlags & SCFIND_REGEXP)) {
-				lpefr->fuFlags ^= SCFIND_REGEXP;
-			}
 		}
 		break;
 
@@ -5363,13 +5358,12 @@ HWND EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace) {
 	return hDlg;
 }
 
-// Wildcard search uses the regexp engine to perform a simple search with * ? as wildcards instead of more advanced and user-unfriendly regexp syntax
-void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
+// Wildcard search uses the regexp engine to perform a simple search with * ?
+// as wildcards instead of more advanced and user-unfriendly regexp syntax.
+static void EscapeWildcards(char *szFind2) {
 	char szWildcardEscaped[NP2_FIND_REPLACE_LIMIT];
 	int iSource = 0;
 	int iDest = 0;
-
-	lpefr->fuFlags |= SCFIND_REGEXP;
 
 	while (szFind2[iSource]) {
 		const char c = szFind2[iSource];
@@ -5391,32 +5385,39 @@ void EscapeWildcards(char *szFind2, LPEDITFINDREPLACE lpefr) {
 	strncpy(szFind2, szWildcardEscaped, COUNTOF(szWildcardEscaped));
 }
 
-BOOL EditPrepareFind(char *szFind2, LPEDITFINDREPLACE lpefr) {
+int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 	if (StrIsEmptyA(lpefr->szFind)) {
-		return FALSE;
+		return NP2_InvalidSearchFlags;
 	}
 
+	int searchFlags = lpefr->fuFlags;
 	strncpy(szFind2, lpefr->szFind, NP2_FIND_REPLACE_LIMIT);
 	if (lpefr->bTransformBS) {
 		const UINT cpEdit = SciCall_GetCodePage();
-		TransformBackslashes(szFind2, (lpefr->fuFlags & SCFIND_REGEXP), cpEdit);
+		TransformBackslashes(szFind2, (searchFlags & SCFIND_REGEXP), cpEdit);
 	}
 	if (StrIsEmptyA(szFind2)) {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
-		return FALSE;
+		return NP2_InvalidSearchFlags;
 	}
 	if (lpefr->bWildcardSearch) {
-		EscapeWildcards(szFind2, lpefr);
+		EscapeWildcards(szFind2);
+		searchFlags |= SCFIND_REGEXP;
+	} else if (!(searchFlags & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
+		const BOOL matchCase = !IsStringCaseSensitiveA(szFind2);
+		//printf("%s sensitive=%d\n", __func__, !matchCase);
+		searchFlags |= (matchCase << SCFIND_MATCHCASE_BIT);
 	}
-	return TRUE;
+	return searchFlags;
 }
 
-BOOL EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, LPEDITFINDREPLACE lpefr) {
-	if (!EditPrepareFind(szFind2, lpefr)) {
-		return FALSE;
+int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bReplaceRE, LPCEDITFINDREPLACE lpefr) {
+	const int searchFlags = EditPrepareFind(szFind2, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
+		return searchFlags;
 	}
 
-	*bReplaceRE = (lpefr->fuFlags & SCFIND_REGEXP);
+	*bReplaceRE = (searchFlags & SCFIND_REGEXP);
 	if (strcmp(lpefr->szReplace, "^c") == 0) {
 		*bReplaceRE = FALSE;
 		*pszReplace2 = EditGetClipboardText(hwnd);
@@ -5431,16 +5432,17 @@ BOOL EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRep
 	if (*pszReplace2 == NULL) {
 		*pszReplace2 = StrDupA("");
 	}
-	return TRUE;
+	return searchFlags;
 }
 
 //=============================================================================
 //
 // EditFindNext()
 //
-void EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
+void EditFindNext(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	if (!EditPrepareFind(szFind2, lpefr)) {
+	const int searchFlags = EditPrepareFind(szFind2, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
 		return;
 	}
 
@@ -5448,13 +5450,13 @@ void EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	const Sci_Position iSelAnchor = SciCall_GetAnchor();
 
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionEnd(), SciCall_GetLength() }, szFind2, { 0, 0 } };
-	Sci_Position iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+	Sci_Position iPos = SciCall_FindText(searchFlags, &ttf);
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
-			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+			iPos = SciCall_FindText(searchFlags, &ttf);
 		} else {
 			bSuppressNotFound = TRUE;
 		}
@@ -5479,9 +5481,10 @@ void EditFindNext(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 //
 // EditFindPrev()
 //
-void EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
+void EditFindPrev(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
-	if (!EditPrepareFind(szFind2, lpefr)) {
+	const int searchFlags = EditPrepareFind(szFind2, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
 		return;
 	}
 
@@ -5489,14 +5492,14 @@ void EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	const Sci_Position iSelAnchor = SciCall_GetAnchor();
 
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), 0 }, szFind2, { 0, 0 } };
-	Sci_Position iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+	Sci_Position iPos = SciCall_FindText(searchFlags, &ttf);
 	const Sci_Position iLength = SciCall_GetLength();
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
 			ttf.chrg.cpMin = iLength;
-			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+			iPos = SciCall_FindText(searchFlags, &ttf);
 		} else {
 			bSuppressNotFound = TRUE;
 		}
@@ -5520,11 +5523,12 @@ void EditFindPrev(LPEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 //
 // EditReplace()
 //
-BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
+BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
-	if (!EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr)) {
+	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
 		return FALSE;
 	}
 
@@ -5532,13 +5536,13 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 
 	struct Sci_TextToFind ttf = { { iSelStart, SciCall_GetLength() }, szFind2, { 0, 0 } };
-	Sci_Position iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+	Sci_Position iPos = SciCall_FindText(searchFlags, &ttf);
 	BOOL bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
-			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+			iPos = SciCall_FindText(searchFlags, &ttf);
 		} else {
 			bSuppressNotFound = TRUE;
 		}
@@ -5565,13 +5569,13 @@ BOOL EditReplace(HWND hwnd, LPEDITFINDREPLACE lpefr) {
 	ttf.chrg.cpMin = SciCall_GetTargetEnd();
 	ttf.chrg.cpMax = SciCall_GetLength();
 
-	iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+	iPos = SciCall_FindText(searchFlags, &ttf);
 	bSuppressNotFound = FALSE;
 
 	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
-			iPos = SciCall_FindText(lpefr->fuFlags, &ttf);
+			iPos = SciCall_FindText(searchFlags, &ttf);
 		} else {
 			bSuppressNotFound = TRUE;
 		}
@@ -5786,25 +5790,25 @@ BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 			}
 		}
 	}
+	if (!bMarkOccurrencesMatchCase) {
+		bMarkOccurrencesMatchCase = !IsStringCaseSensitiveA(pszText);
+		//printf("%s sensitive=%d\n", __func__, !bMarkOccurrencesMatchCase);
+	}
 
-#if 0
-	const BOOL sensitive = IsStringCaseSensitiveA(pszText);
-	printf("%s sensitive=%d\n", __func__, sensitive);
-#endif
-
-	const int findFlag = ((bMarkOccurrencesMatchCase || !IsStringCaseSensitiveA(pszText)) ? SCFIND_MATCHCASE : 0)
-		| (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
+	const int findFlag = (bMarkOccurrencesMatchCase << SCFIND_MATCHCASE_BIT)
+		| (bMarkOccurrencesMatchWords << SCFIND_WHOLEWORD_BIT);
 	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
-void EditFindAll(LPEDITFINDREPLACE lpefr) {
+void EditFindAll(LPCEDITFINDREPLACE lpefr) {
 	char *szFind2 = (char *)NP2HeapAlloc(NP2_FIND_REPLACE_LIMIT);
-	if (!EditPrepareFind(szFind2, lpefr)) {
+	const int searchFlags = EditPrepareFind(szFind2, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
 		NP2HeapFree(szFind2);
 		return;
 	}
 
-	EditMarkAll_Start(FALSE, lpefr->fuFlags, strlen(szFind2), szFind2);
+	EditMarkAll_Start(FALSE, searchFlags, strlen(szFind2), szFind2);
 	// rewind start position when transform backslash is checked,
 	// all other searching doesn't across lines.
 	// NOTE: complex fix is needed when multiline regex is supported.
@@ -5828,11 +5832,12 @@ static void ShwowReplaceCount(Sci_Position iCount) {
 //
 // EditReplaceAll()
 //
-BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
+BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
-	if (!EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr)) {
+	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
 		return FALSE;
 	}
 
@@ -5842,7 +5847,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
-	while (SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
+	while (SciCall_FindText(searchFlags, &ttf) != -1) {
 		if (++iCount == 1) {
 			SciCall_BeginUndoAction();
 		}
@@ -5894,7 +5899,7 @@ BOOL EditReplaceAll(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 //
 // EditReplaceAllInSelection()
 //
-BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInfo) {
+BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return FALSE;
@@ -5903,7 +5908,8 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	BOOL bReplaceRE;
 	char szFind2[NP2_FIND_REPLACE_LIMIT];
 	char *pszReplace2;
-	if (!EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr)) {
+	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
+	if (searchFlags == NP2_InvalidSearchFlags) {
 		return FALSE;
 	}
 
@@ -5914,7 +5920,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bShowInf
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	BOOL fCancel = FALSE;
-	while (!fCancel && SciCall_FindText(lpefr->fuFlags, &ttf) != -1) {
+	while (!fCancel && SciCall_FindText(searchFlags, &ttf) != -1) {
 		if (ttf.chrgText.cpMin >= SciCall_GetSelectionStart() && ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
 			if (++iCount == 1) {
 				SciCall_BeginUndoAction();

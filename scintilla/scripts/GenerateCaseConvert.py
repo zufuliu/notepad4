@@ -254,8 +254,8 @@ def checkUnicodeCaseSensitivity(filename=None):
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <stdint.h>
-
 #define COUNTOF(a)		(sizeof(a) / sizeof(a[0]))
+typedef int BOOL;
 
 typedef struct UnicodeCaseSensitivityRange {
 	uint32_t low;
@@ -266,7 +266,7 @@ typedef struct UnicodeCaseSensitivityRange {
 """)
 		fd.write('\n'.join(output))
 		fd.write(r"""
-int IsCharacterCaseSensitive(uint32_t ch) {
+BOOL IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
 		return (UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1;
 	}
@@ -368,7 +368,7 @@ def updateCaseSensitivity(filename, test=False):
 
 	function = """
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
-static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {{
+static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	const uint32_t lower = ch & 31;
 	ch = (ch - kUnicodeCaseSensitiveFirst) >> 5;
 	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
@@ -385,11 +385,13 @@ static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <stdint.h>
+typedef int BOOL;
+
 """)
 		fd.write('\n'.join(output))
 		fd.write(r"""
 
-int IsCharacterCaseSensitive(uint32_t ch)	{
+BOOL IsCharacterCaseSensitive(uint32_t ch)	{
 	if (ch < kUnicodeCaseSensitiveFirst) {
 		return (UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1;
 	}
