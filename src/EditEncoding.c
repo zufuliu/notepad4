@@ -1968,7 +1968,7 @@ static const uint32_t UnicodeCaseSensitivityMask[] = {
 };
 
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
-static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {
+static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {
 	const uint32_t lower = ch & 31;
 	ch = (ch - kUnicodeCaseSensitiveFirst) >> 5;
 	ch = (UnicodeCaseSensitivityIndex[ch >> 6] << 2) | (ch & 63);
