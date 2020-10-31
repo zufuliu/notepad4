@@ -5631,21 +5631,6 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 }
 
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText) {
-	// use case sensitive match for ASCII text without letters.
-	if (!(findFlag & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
-		int sensitive = SCFIND_MATCHCASE;
-		const uint8_t *ptr = (const uint8_t *)pszText;
-		uint8_t ch;
-		while ((ch = *ptr++) != 0) {
-			ch |= 0x20;
-			if ((ch & 0x80) != 0 || (ch >= 'a' && ch <= 'z')) {
-				sensitive = 0;
-				break;
-			}
-		}
-		findFlag |= sensitive;
-	}
-
 	if (!bChanged && (findFlag == editMarkAllStatus.findFlag
 		&& iSelCount == editMarkAllStatus.iSelCount
 		// _stricmp() is not safe for DBCS string.
@@ -5802,7 +5787,13 @@ BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurr
 		}
 	}
 
-	const int findFlag = (bMarkOccurrencesMatchCase ? SCFIND_MATCHCASE : 0) | (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
+#if 0
+	const BOOL sensitive = IsStringCaseSensitiveA(pszText);
+	printf("%s sensitive=%d\n", __func__, sensitive);
+#endif
+
+	const int findFlag = ((bMarkOccurrencesMatchCase || !IsStringCaseSensitiveA(pszText)) ? SCFIND_MATCHCASE : 0)
+		| (bMarkOccurrencesMatchWords ? SCFIND_WHOLEWORD : 0);
 	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
