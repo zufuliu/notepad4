@@ -253,7 +253,7 @@ def checkUnicodeCaseSensitivity(filename=None):
 	output.append('')
 
 	with open(filename, 'w', encoding='utf-8') as fd:
-		fd.write(r"""#include <stdint.h>
+		fd.write(r"""#include <cstdint>
 #define COUNTOF(a)		(sizeof(a) / sizeof(a[0]))
 typedef int BOOL;
 
@@ -287,8 +287,6 @@ BOOL IsCharacterCaseSensitive(uint32_t ch) {
 }
 
 #if 1
-#include <stdio.h>
-
 """)
 
 		output = []
@@ -302,8 +300,15 @@ BOOL IsCharacterCaseSensitive(uint32_t ch) {
 		fd.write('\n'.join(output))
 
 		fd.write(r"""
+#include <cassert>
+#include <cstdio>
+#include <chrono>
+#include "../src/ElapsedPeriod.h"
+
 int main(void) {
-	for (uint32_t ch = 0; ch < COUNTOF(UnicodeCaseSensitivityTable); ch++) {
+	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
+	Scintilla::ElapsedPeriod period;
+	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
 		const int result = IsCharacterCaseSensitive(ch);
 		const int expect = UnicodeCaseSensitivityTable[ch];
 		if (result != expect) {
@@ -311,9 +316,12 @@ int main(void) {
 			break;
 		}
 	}
+
+	const double duration = period.Duration()*1e3;
+	const double avg = duration/sizeof(UnicodeCaseSensitivityTable);
+	printf("count=%zu, duration=%.6f, avg=%.6f\n", sizeof(UnicodeCaseSensitivityTable), duration, avg);
 	return 0;
 }
-
 #endif
 """)
 
@@ -384,7 +392,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 		return
 
 	with open(filename, 'w', encoding='utf-8') as fd:
-		fd.write(r"""#include <stdint.h>
+		fd.write(r"""#include <cstdint>
 typedef int BOOL;
 
 """)
@@ -415,11 +423,15 @@ BOOL IsCharacterCaseSensitive(uint32_t ch)	{
 		fd.write('\n'.join(output))
 
 		fd.write(r"""
-#include <stdio.h>
-#define COUNTOF(a)		(sizeof(a) / sizeof(a[0]))
+#include <cassert>
+#include <cstdio>
+#include <chrono>
+#include "../src/ElapsedPeriod.h"
 
 int main(void) {
-	for (uint32_t ch = 0; ch < COUNTOF(UnicodeCaseSensitivityTable); ch++) {
+	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
+	Scintilla::ElapsedPeriod period;
+	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
 		const int result = IsCharacterCaseSensitive(ch);
 		const int expect = UnicodeCaseSensitivityTable[ch];
 		if (result != expect) {
@@ -427,13 +439,16 @@ int main(void) {
 			break;
 		}
 	}
+
+	const double duration = period.Duration()*1e3;
+	const double avg = duration/sizeof(UnicodeCaseSensitivityTable);
+	printf("count=%zu, duration=%.6f, avg=%.6f\n", sizeof(UnicodeCaseSensitivityTable), duration, avg);
 	return 0;
 }
-
 #endif
 """)
 
 updateCaseConvert()
-#checkUnicodeCaseSensitivity('caseList.c')
-#updateCaseSensitivity('CaseSensitivity.c', True)
+#checkUnicodeCaseSensitivity('caseList.cpp')
+#updateCaseSensitivity('CaseSensitivity.cpp', True)
 updateCaseSensitivity('../../src/EditEncoding.c')
