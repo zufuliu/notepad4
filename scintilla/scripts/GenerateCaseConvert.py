@@ -158,14 +158,14 @@ def getUnicodeCaseSensitivityGroup(caseList):
 	groups = []
 	count = len(ranges)
 	start = 0
-	total_size = 0
-	header_size = 3*4
+	totalSize = 0
+	headerSize = 3*4
 	while start < count:
 		index = start
 		while index + 1 < count and ranges[index][1] + 256 >= ranges[index + 1][0]:
 			index += 1
 		items = ranges[start:index + 1]
-		size = header_size
+		size = headerSize
 		begin = items[0][0]
 		end = items[-1][1]
 		if len(items) == 1:
@@ -173,24 +173,60 @@ def getUnicodeCaseSensitivityGroup(caseList):
 		else:
 			if begin < 256:
 				begin = 0
-				size -= header_size
+				size -= headerSize
 			word = (end - begin + 32) // 32
 			end = begin + 32*word
 			size += 4*word
-		total_size += size
+		totalSize += size
 		groups.append({
 			'min': begin,
 			'min_hex': hex(begin),
 			'max': end,
 			'max_hex': hex(end),
-			'size': (size, header_size*len(items)),
+			'size': (size, headerSize*len(items)),
 			'count': sum(item[2] for item in items),
 			'ranges': items
 		})
 		start = index + 1
 
-	print('Unicode Case Sensitivity ranges:', len(groups), 'size:', total_size)
+	print('Unicode Case Sensitivity ranges:', len(groups), 'size:', totalSize)
 	return groups
+
+def addCaseSensitivityTest(fd, caseTable, charCount):
+	output = ['', '#if 1']
+	output.append('static const uint8_t UnicodeCaseSensitivityTable[] = {')
+	for i in range(0, charCount, 64):
+		line = ','.join(caseTable[i:i+64])
+		output.append(line + ',')
+	output.append('};')
+	output.append('')
+	fd.write('\n'.join(output))
+
+	fd.write(r"""
+#include <cassert>
+#include <cstdio>
+#include <chrono>
+#include "../src/ElapsedPeriod.h"
+
+int main(void) {
+	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
+	Scintilla::ElapsedPeriod period;
+	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
+		const int result = IsCharacterCaseSensitive(ch);
+		const int expect = UnicodeCaseSensitivityTable[ch];
+		if (result != expect) {
+			printf("case diff: %u %04x %d %d\n", ch, ch, result, expect);
+			break;
+		}
+	}
+
+	const double duration = period.Duration()*1e3;
+	const double avg = duration/sizeof(UnicodeCaseSensitivityTable);
+	printf("count=%zu, duration=%.6f, avg=%.6f\n", sizeof(UnicodeCaseSensitivityTable), duration, avg);
+	return 0;
+}
+#endif
+""")
 
 def checkUnicodeCaseSensitivity(filename=None):
 	caseList = []
@@ -216,9 +252,6 @@ def checkUnicodeCaseSensitivity(filename=None):
 	if not filename:
 		return
 
-	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
-
 	maskTable = []
 	first = groups[0]['max']
 	maxCh = caseList[-1][0]
@@ -227,6 +260,8 @@ def checkUnicodeCaseSensitivity(filename=None):
 		mask = int(''.join(reversed(caseTable[i:i+32])), 2)
 		maskTable.append(mask)
 
+	output = ["// Created with Python %s, Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
 	output.append('#define kUnicodeCaseSensitiveFirst\t0x%04xU' % first)
 	output.append('#define kUnicodeCaseSensitiveMax\t0x%04xU' % maxCh)
 	output.append('')
@@ -285,45 +320,8 @@ BOOL IsCharacterCaseSensitive(uint32_t ch) {
 	}
 	return 0;
 }
-
-#if 1
 """)
-
-		output = []
-		maxCh = groups[-1]['max']
-		output.append('static const uint8_t UnicodeCaseSensitivityTable[] = {')
-		for i in range(0, maxCh, 64):
-			line = ','.join(caseTable[i:i+64])
-			output.append(line + ',')
-		output.append('};')
-		output.append('')
-		fd.write('\n'.join(output))
-
-		fd.write(r"""
-#include <cassert>
-#include <cstdio>
-#include <chrono>
-#include "../src/ElapsedPeriod.h"
-
-int main(void) {
-	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
-	Scintilla::ElapsedPeriod period;
-	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
-		const int result = IsCharacterCaseSensitive(ch);
-		const int expect = UnicodeCaseSensitivityTable[ch];
-		if (result != expect) {
-			printf("case diff: %u %04x %d %d\n", ch, ch, result, expect);
-			break;
-		}
-	}
-
-	const double duration = period.Duration()*1e3;
-	const double avg = duration/sizeof(UnicodeCaseSensitivityTable);
-	printf("count=%zu, duration=%.6f, avg=%.6f\n", sizeof(UnicodeCaseSensitivityTable), duration, avg);
-	return 0;
-}
-#endif
-""")
+		addCaseSensitivityTest(fd, caseTable, groups[-1]['max'])
 
 def updateCaseSensitivity(filename, test=False):
 	caseTable = ['0']*UnicodeCharacterCount
@@ -337,9 +335,9 @@ def updateCaseSensitivity(filename, test=False):
 			caseTable[ch] = '1'
 			maskTable[ch >> 5] |= (1 << (ch & 31))
 
-	count = 1 + (maxCh >> 5)
+	maskCount = 1 + (maxCh >> 5)
 	maskList = maskTable[:(first >> 5)]
-	maskTable = maskTable[len(maskList):count]
+	maskTable = maskTable[len(maskList):maskCount]
 	indexTable = []
 	for mask in maskTable:
 		try:
@@ -349,7 +347,7 @@ def updateCaseSensitivity(filename, test=False):
 			maskList.append(mask)
 		indexTable.append(index)
 
-	print('Unicode Case Sensitivity maskList:', len(maskList), 'indexTable:', len(indexTable), count, maxCh)
+	print('Unicode Case Sensitivity maskList:', len(maskList), 'indexTable:', len(indexTable), maskCount, maxCh)
 
 	args = {
 		'table': 'UnicodeCaseSensitivityIndex',
@@ -361,7 +359,6 @@ def updateCaseSensitivity(filename, test=False):
 
 	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), unicodedata.unidata_version)]
-
 	output.append('#define kUnicodeCaseSensitiveFirst\t0x%04xU' % first)
 	output.append('#define kUnicodeCaseSensitiveMax\t0x%04xU' % maxCh)
 	output.append('')
@@ -408,47 +405,165 @@ BOOL IsCharacterCaseSensitive(uint32_t ch)	{
 	}
 	return IsCharacterCaseSensitiveSecond(ch);
 }
-
-#if 1
 """)
 
-		count *= 32
-		output = []
-		output.append('static const uint8_t UnicodeCaseSensitivityTable[] = {')
-		for i in range(0, count, 64):
-			line = ','.join(caseTable[i:i+64])
-			output.append(line + ',')
-		output.append('};')
-		output.append('')
-		fd.write('\n'.join(output))
+		addCaseSensitivityTest(fd, caseTable, maskCount*32)
 
-		fd.write(r"""
-#include <cassert>
-#include <cstdio>
-#include <chrono>
-#include "../src/ElapsedPeriod.h"
+def updateCaseSensitivityBlock(filename, test=False):
+	def getBitCount(value):
+		return len(bin(value)) - 2
 
-int main(void) {
-	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
-	Scintilla::ElapsedPeriod period;
-	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
-		const int result = IsCharacterCaseSensitive(ch);
-		const int expect = UnicodeCaseSensitivityTable[ch];
-		if (result != expect) {
-			printf("case diff: %u %04x %d %d\n", ch, ch, result, expect);
-			break;
-		}
-	}
+	caseTable = ['0']*UnicodeCharacterCount
+	maskTable = [0] * (UnicodeCharacterCount >> 5)
+	first = 0x600
+	maxCh = 0
 
-	const double duration = period.Duration()*1e3;
-	const double avg = duration/sizeof(UnicodeCaseSensitivityTable);
-	printf("count=%zu, duration=%.6f, avg=%.6f\n", sizeof(UnicodeCaseSensitivityTable), duration, avg);
+	for ch in range(UnicodeCharacterCount):
+		if isCaseSensitive(chr(ch)):
+			maxCh = ch
+			caseTable[ch] = '1'
+			maskTable[ch >> 5] |= (1 << (ch & 31))
+
+	blockSize = 4
+	firstCount = first >> 5
+	maskCount = 1 + (maxCh >> 5)
+	maskCount = blockSize * ((maskCount + blockSize - 1) // blockSize)
+	maskList = maskTable[:firstCount]
+
+	blockList = []
+	blockData = [(0, 0)] * 256
+	blockIndex = [0] * 256
+	maxBlockId = (maskCount // blockSize - 1) >> 8
+	blockBitCount = getBitCount(maxBlockId)
+	indexBitCount = 8 - blockBitCount
+
+	for i in range(firstCount, maskCount, blockSize):
+		block = tuple(maskTable[i:i+blockSize])
+		if sum(block) == 0:
+			continue
+		try:
+			index = blockList.index(block)
+		except ValueError:
+			index = len(blockList)
+			blockList.append(block)
+
+		index += 1
+		blockId = i // blockSize
+		blockSlot = blockId & 0xff
+		if blockData[blockSlot][1]:
+			print('multi block', blockId, blockSlot, blockData[blockSlot], index)
+
+		blockId = blockId >> 8
+		blockData[blockSlot] = (blockId, index)
+		assert getBitCount(blockId) + getBitCount(index) <= 8
+		blockIndex[blockSlot] = index | (blockId << indexBitCount)
+
+	#lines = []
+	#for i in range(0, len(blockData), 8):
+	#	line = ', '.join('(%d,%2d)' % item for item in blockData[i:i+8])
+	#	lines.append(line)
+	#print('\n'.join(lines))
+
+	indexTable = []
+	for block in blockList:
+		for mask in block:
+			try:
+				index = maskList.index(mask)
+			except ValueError:
+				index = len(maskList)
+				maskList.append(mask)
+			indexTable.append(index)
+
+	size = len(blockIndex) + len(indexTable) + len(maskList)*4
+	print('caseBlock', blockSize, len(maskList), len(blockIndex), len(indexTable), size)
+
+	output = ["// Created with Python %s, Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
+	output.append('#define kUnicodeCaseSensitiveFirst\t0x%04xU' % first)
+	output.append('#define kUnicodeCaseSensitiveMax\t0x%04xU' % maxCh)
+	output.append('')
+
+	output.append('static const uint8_t UnicodeCaseSensitivityIndex[] = {')
+	output.append('// block index')
+	for i in range(0, len(blockIndex), 32):
+		line = ', '.join(map(str, blockIndex[i:i+32]))
+		output.append(line + ',')
+	output.append('// mask index')
+	for i in range(0, len(indexTable), 32):
+		line = ', '.join(map(str, indexTable[i:i+32]))
+		output.append(line + ',')
+	output.append('};')
+
+	output.append('')
+	output.append('static const uint32_t UnicodeCaseSensitivityMask[] = {')
+	for i in range(0, len(maskList), 8):
+		line = ', '.join('0x%08xU' % mask for mask in maskList[i:i+8])
+		output.append(line + ',')
+	output.append('};')
+
+	indexMask = (1 << indexBitCount) - 1
+	indexOffset = 256 - blockSize
+	if False and blockSize == 8:
+		function = f"""
+// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
+static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
+	const uint32_t block = ch / {blockSize*32};
+	uint32_t index = UnicodeCaseSensitivityIndex[block & 0xff];
+	index &= ((index >> {indexBitCount}) ^ (block >> 8)) - 1;
+	if (index) {{
+		ch = ch & {hex(blockSize*32 - 1)};
+		index = {indexOffset} + (index & {hex(indexMask)})*{blockSize};
+		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
+		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
+	}}
 	return 0;
-}
-#endif
+}}
+"""
+	else:
+		function = f"""
+// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
+static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
+	const uint32_t block = ch / {blockSize*32};
+	uint32_t index = UnicodeCaseSensitivityIndex[block & 0xff];
+	index &= ((index >> {indexBitCount}) == (block >> 8))? {hex(indexMask)} : 0;
+	if (index) {{
+		ch = ch & {hex(blockSize*32 - 1)};
+		index = {indexOffset} + index*{blockSize};
+		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
+		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
+	}}
+	return 0;
+}}
+"""
+	output.extend(function.splitlines())
+
+	if not test:
+		Regenerate(filename, "//case", output)
+		return
+
+	with open(filename, 'w', encoding='utf-8') as fd:
+		fd.write(r"""#include <cstdint>
+typedef int BOOL;
+
 """)
+		fd.write('\n'.join(output))
+		fd.write(r"""
+
+BOOL IsCharacterCaseSensitive(uint32_t ch) {
+	if (ch < kUnicodeCaseSensitiveFirst) {
+		return (UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1;
+	}
+	if (ch > kUnicodeCaseSensitiveMax) {
+		return 0;
+	}
+	return IsCharacterCaseSensitiveSecond(ch);
+}
+""")
+
+		addCaseSensitivityTest(fd, caseTable, maskCount*32)
 
 updateCaseConvert()
 #checkUnicodeCaseSensitivity('caseList.cpp')
 #updateCaseSensitivity('CaseSensitivity.cpp', True)
 updateCaseSensitivity('../../src/EditEncoding.c')
+#updateCaseSensitivityBlock('caseBlock.cpp', True)
