@@ -1915,6 +1915,8 @@ void EditAutoIndent(void) {
 					if (SciCall_GetLineLength(child)) {
 						indent = 1;
 					}
+				} else {
+					indent = 0;
 				}
 			}
 		}
