@@ -424,18 +424,23 @@ def updateCaseSensitivityBlock(filename, test=False):
 			caseTable[ch] = '1'
 			maskTable[ch >> 5] |= (1 << (ch & 31))
 
-	blockSize = 4
+	blockSizeBit = 2
+	blockSize = 1 << blockSizeBit
 	firstCount = first >> 5
 	maskCount = 1 + (maxCh >> 5)
 	maskCount = blockSize * ((maskCount + blockSize - 1) // blockSize)
 	maskList = maskTable[:firstCount]
 
+	blockIndexValueBit = 7
+	blockIndexCount = 1 << blockIndexValueBit
 	blockList = []
-	blockData = [(0, 0)] * 256
-	blockIndex = [0] * 256
-	maxBlockId = (maskCount // blockSize - 1) >> 8
+	blockData = [(0, 0)] * blockIndexCount
+	blockIndex = [0] * blockIndexCount
+	maxBlockId = (maskCount // blockSize - 1) >> blockIndexValueBit
 	blockBitCount = getBitCount(maxBlockId)
 	indexBitCount = 8 - blockBitCount
+	maxIndex = 1 << indexBitCount
+	overlapped = False
 
 	for i in range(firstCount, maskCount, blockSize):
 		block = tuple(maskTable[i:i+blockSize])
@@ -449,13 +454,15 @@ def updateCaseSensitivityBlock(filename, test=False):
 
 		index += 1
 		blockId = i // blockSize
-		blockSlot = blockId & 0xff
+		blockSlot = blockId & (blockIndexCount - 1)
 		if blockData[blockSlot][1]:
 			print('multi block', blockId, blockSlot, blockData[blockSlot], index)
+		if index > maxIndex:
+			overlapped = True
+			print('overlapped block', blockId, blockSlot, index)
 
-		blockId = blockId >> 8
+		blockId = blockId >> blockIndexValueBit
 		blockData[blockSlot] = (blockId, index)
-		assert getBitCount(blockId) + getBitCount(index) <= 8
 		blockIndex[blockSlot] = index | (blockId << indexBitCount)
 
 	#lines = []
@@ -463,6 +470,8 @@ def updateCaseSensitivityBlock(filename, test=False):
 	#	line = ', '.join('(%d,%2d)' % item for item in blockData[i:i+8])
 	#	lines.append(line)
 	#print('\n'.join(lines))
+	if overlapped:
+		return
 
 	indexTable = []
 	for block in blockList:
@@ -502,33 +511,19 @@ def updateCaseSensitivityBlock(filename, test=False):
 	output.append('};')
 
 	indexMask = (1 << indexBitCount) - 1
-	indexOffset = 256 - blockSize
-	if False and blockSize == 8:
-		function = f"""
+	indexOffset = blockIndexCount - blockSize
+	#index &= ((index >> {indexBitCount}) ^ (block >> {blockIndexValueBit})) ? 0 : {hex(indexMask)};
+	#index &= ((index ^ (block >> {blockIndexValueBit - indexBitCount})) >> {indexBitCount}) ? 0 : {hex(indexMask)};
+	#index &= {hex(indexMask)}ULL >> (((index ^ (block >> {blockIndexValueBit - indexBitCount})) >> {indexBitCount}) * {indexBitCount});
+	function = f"""
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
 static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
-	const uint32_t block = ch / {blockSize*32};
-	uint32_t index = UnicodeCaseSensitivityIndex[block & 0xff];
-	index &= ((index >> {indexBitCount}) ^ (block >> 8)) - 1;
+	const uint32_t block = ch >> {blockSizeBit + 5};
+	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];
+	index &= 0 - (({maxBlockId + 1} - ((index ^ (block >> {blockIndexValueBit - indexBitCount})) >> {indexBitCount})) >> {blockBitCount});
 	if (index) {{
 		ch = ch & {hex(blockSize*32 - 1)};
-		index = {indexOffset} + (index & {hex(indexMask)})*{blockSize};
-		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
-		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
-	}}
-	return 0;
-}}
-"""
-	else:
-		function = f"""
-// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
-static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
-	const uint32_t block = ch / {blockSize*32};
-	uint32_t index = UnicodeCaseSensitivityIndex[block & 0xff];
-	index &= ((index >> {indexBitCount}) == (block >> 8))? {hex(indexMask)} : 0;
-	if (index) {{
-		ch = ch & {hex(blockSize*32 - 1)};
-		index = {indexOffset} + index*{blockSize};
+		index = {indexOffset} + ((index & {hex(indexMask)}) << {blockSizeBit});
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
 		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
 	}}
@@ -565,5 +560,6 @@ BOOL IsCharacterCaseSensitive(uint32_t ch) {
 updateCaseConvert()
 #checkUnicodeCaseSensitivity('caseList.cpp')
 #updateCaseSensitivity('CaseSensitivity.cpp', True)
-updateCaseSensitivity('../../src/EditEncoding.c')
+#updateCaseSensitivity('../../src/EditEncoding.c')
 #updateCaseSensitivityBlock('caseBlock.cpp', True)
+updateCaseSensitivityBlock('../../src/EditEncoding.c')
