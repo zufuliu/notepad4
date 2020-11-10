@@ -512,18 +512,20 @@ def updateCaseSensitivityBlock(filename, test=False):
 
 	indexMask = (1 << indexBitCount) - 1
 	indexOffset = blockIndexCount - blockSize
-	#index &= ((index >> {indexBitCount}) ^ (block >> {blockIndexValueBit})) ? 0 : {hex(indexMask)};
-	#index &= ((index ^ (block >> {blockIndexValueBit - indexBitCount})) >> {indexBitCount}) ? 0 : {hex(indexMask)};
-	#index &= {hex(indexMask)}ULL >> (((index ^ (block >> {blockIndexValueBit - indexBitCount})) >> {indexBitCount}) * {indexBitCount});
 	function = f"""
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
 static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
-	const uint32_t block = ch >> {blockSizeBit + 5};
+	uint32_t block = ch >> {blockSizeBit + 5};
 	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];
-	index &= 0 - (({maxBlockId + 1} - ((index ^ (block >> {blockIndexValueBit - indexBitCount})) >> {indexBitCount})) >> {blockBitCount});
+	block = index ^ (block >> {indexBitCount - blockBitCount});
+#if defined(_MSC_BUILD)
+	index &= (block < {hex(indexMask + 1)}) ? {hex(indexMask)} : 0;
+#else
+	index &= (0 - (block < {hex(indexMask + 1)})) & {hex(indexMask)};
+#endif
 	if (index) {{
 		ch = ch & {hex(blockSize*32 - 1)};
-		index = {indexOffset} + ((index & {hex(indexMask)}) << {blockSizeBit});
+		index = {indexOffset} + (index << {blockSizeBit});
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
 		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
 	}}

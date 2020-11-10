@@ -1958,12 +1958,17 @@ static const uint32_t UnicodeCaseSensitivityMask[] = {
 
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
 static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {
-	const uint32_t block = ch >> 7;
+	uint32_t block = ch >> 7;
 	uint32_t index = UnicodeCaseSensitivityIndex[block & 0x7f];
-	index &= 0 - ((8 - ((index ^ (block >> 2)) >> 5)) >> 3);
+	block = index ^ (block >> 2);
+#if defined(_MSC_BUILD)
+	index &= (block < 0x20) ? 0x1f : 0;
+#else
+	index &= (0 - (block < 0x20)) & 0x1f;
+#endif
 	if (index) {
 		ch = ch & 0x7f;
-		index = 124 + ((index & 0x1f) << 2);
+		index = 124 + (index << 2);
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
 		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
 	}
