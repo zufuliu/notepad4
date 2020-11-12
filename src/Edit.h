@@ -346,6 +346,10 @@ typedef struct NP2ENCODING {
 	LPWSTR wchLabel;
 } NP2ENCODING;
 
+// https://www.unicode.org/faq/utf_bom.html
+#define SURROGATE_OFFSET			(0x10000 - (0xD800 << 10) - 0xDC00)
+#define UTF16_TO_UTF32(lead, trail)	(((lead) << 10) + (trail) + SURROGATE_OFFSET)
+
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
 static inline BOOL IsDBCSCodePage(UINT page) {
 	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;

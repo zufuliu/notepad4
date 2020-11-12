@@ -1993,7 +1993,7 @@ void EditChar2Hex(void) {
 	}
 
 	count *= 2 + MAX_ESCAPE_HEX_DIGIT;
-	char *ch = (char *)NP2HeapAlloc(count + 1);
+	char *ch = (char *)NP2HeapAlloc(count + 10);
 	WCHAR *wch = (WCHAR *)NP2HeapAlloc((count + 1) * sizeof(WCHAR));
 	SciCall_GetSelText(ch);
 
@@ -2006,7 +2006,8 @@ void EditChar2Hex(void) {
 			uesc = 'x';
 		}
 		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)(count + 1)) - 1; // '\0'
-		for (Sci_Position i = 0, j = 0; i < count; i++) {
+		int j = 0;
+		for (Sci_Position i = 0; i < count; i++) {
 			if (wch[i] <= 0xFF) {
 				sprintf(ch + j, "\\x%02X", wch[i] & 0xFF); // \xhh
 				j += 4;
@@ -2014,6 +2015,10 @@ void EditChar2Hex(void) {
 				sprintf(ch + j, "\\%c%04X", uesc, wch[i]); // \uhhhh \xhhhh
 				j += 6;
 			}
+		}
+		if (count == 2 && IS_SURROGATE_PAIR(wch[0], wch[1])) {
+			const UINT ucc = UTF16_TO_UTF32(wch[0], wch[1]);
+			sprintf(ch + j, " U+%X", ucc);
 		}
 	}
 
