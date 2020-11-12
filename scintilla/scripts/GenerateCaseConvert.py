@@ -424,6 +424,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 			caseTable[ch] = '1'
 			maskTable[ch >> 5] |= (1 << (ch & 31))
 
+	# divide characters into blocks, filter out blocks with all character not case sensitive.
 	blockSizeBit = 2
 	blockSize = 1 << blockSizeBit
 	firstCount = first >> 5
@@ -512,12 +513,19 @@ def updateCaseSensitivityBlock(filename, test=False):
 
 	indexMask = (1 << indexBitCount) - 1
 	indexOffset = blockIndexCount - blockSize
+	# the condition is: index != 0 && (index >> indexBitCount) == (block >> blockIndexValueBit)
+	# => index != 0 && ((index >> indexBitCount) ^ (block >> blockIndexValueBit)) == 0
+	# set block = index ^ (block >> (blockIndexValueBit - indexBitCount)
+	# => index != 0 && (block >> indexBitCount) == 0
+	# => index != 0 && block < indexMask + 1
+	# set diff = block - (indexMask + 1), with 2's complement, when diff >= 0, diff >> 8 is zero;
+	# when diff < 0, diff >> 8 has 24-bit (or 32-bit using arithmetic shift right) 1s on the right.
 	function = f"""
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
 static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	uint32_t block = ch >> {blockSizeBit + 5};
 	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];
-	block = index ^ (block >> {indexBitCount - blockBitCount});
+	block = index ^ (block >> {blockIndexValueBit - indexBitCount});
 #if 0//defined(__AVX2__)
 	index &= _bextr_u32(block - {hex(indexMask + 1)}, 8, {indexBitCount});
 #else
