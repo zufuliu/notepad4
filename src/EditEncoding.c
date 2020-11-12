@@ -1989,10 +1989,8 @@ BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW) {
 				return TRUE;
 			}
 		} else {
-			// https://www.unicode.org/faq/utf_bom.html
 			if (IS_SURROGATE_PAIR(ch, *ptr)) {
-				const int SURROGATE_OFFSET = 0x10000 - (0xD800 << 10) - 0xDC00;
-				ch = (ch << 10) + *ptr + SURROGATE_OFFSET;
+				ch = UTF16_TO_UTF32(ch, *ptr);
 				++ptr;
 				if (ch > kUnicodeCaseSensitiveMax) {
 					continue;
