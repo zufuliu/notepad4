@@ -372,7 +372,7 @@ def updateCaseSensitivity(filename, test=False):
 	output.append('};')
 
 	function = """
-// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
+// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax]
 static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	const uint32_t lower = ch & 31;
 	ch = (ch - kUnicodeCaseSensitiveFirst) >> 5;
@@ -521,7 +521,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 	# set diff = block - (indexMask + 1), with 2's complement, when diff >= 0, diff >> 8 is zero;
 	# when diff < 0, diff >> 8 has 24-bit (or 32-bit using arithmetic shift right) 1s on the right.
 	function = f"""
-// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax)
+// case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax]
 static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	uint32_t block = ch >> {blockSizeBit + 5};
 	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];

@@ -1992,8 +1992,15 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		const bool word = (flags & SCFIND_WHOLEWORD) != 0;
 		const bool wordStart = (flags & SCFIND_WORDSTART) != 0;
 
-		const bool forward = minPos <= maxPos;
-		const int increment = forward ? 1 : -1;
+		const Sci::Position direction = maxPos - minPos;
+		//const bool forward = direction >= 0;
+		const int increment = (direction >= 0) ? 1 : -1;
+		// table for the condition: forward ? (pos < endSearch) : (pos >= endSearch)
+        //                   direction >= 0  direction < 0
+        // pos >= endSearch: break           continue
+        // pos < endSearch:  continue        break
+		// i.e. continue search when direction and (pos - endSearch) have opposite signs,
+		// which can be wrote as: (direction ^ (pos - endSearch)) < 0
 
 		// Range endpoints should not be inside DBCS characters, but just in case, move them.
 		const Sci::Position startPos = MovePositionOutsideChar(minPos, increment, false);
@@ -2009,7 +2016,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
 		const Sci::Position limitPos = std::max(startPos, endPos);
 		Sci::Position pos = startPos;
-		if (!forward && !caseSensitive) {
+		if (direction < 0 && !caseSensitive) {
 			// Back all of a character
 			pos = NextPosition(pos, -1);
 		}
@@ -2017,7 +2024,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
 			const unsigned char charStartSearch = searchData[0];
-			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((forward || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : dbcsCharClass->MinTrailByte());
+			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((direction >= 0 || SC_CP_UTF8 == dbcsCodePage) ? safeCharASCII : dbcsCharClass->MinTrailByte());
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
 			// http://www-igm.univ-mlv.fr/~lecroq/string/index.html
 			// http://www-igm.univ-mlv.fr/~lecroq/string/node19.html
@@ -2026,7 +2033,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			if (lengthFind != 1) {
 				Sci::Position shift = lengthFind;
 				std::fill_n(shiftTable, std::size(shiftTable), (shift + 1) * increment);
-				if (forward) {
+				if (direction >= 0) {
 					const unsigned char *ptr = searchData;
 					while (*ptr != 0) {
 						shiftTable[*ptr++] = shift--;
@@ -2040,11 +2047,12 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 
-			const Sci::Position skip = forward ? lengthFind : -1;
-			if (!forward) {
+			const Sci::Position skip = (direction >= 0) ? lengthFind : -1;
+			if (direction < 0) {
 				pos = MovePositionOutsideChar(pos - lengthFind, -1, false);
 			}
-			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
+			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
+			while ((direction ^ (pos - endSearch)) < 0) {
 				const unsigned char leadByte = UCharAt(pos);
 				if (charStartSearch == leadByte) {
 					bool found = (pos + lengthFind) <= limitPos;
@@ -2078,7 +2086,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			std::vector<char> searchThing((lengthFind + 1) * UTF8MaxBytes * maxFoldingExpansion + 1);
 			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
-			while (forward ? (pos < endPos) : (pos >= endPos)) {
+			//while (forward ? (pos < endPos) : (pos >= endPos)) {
+			while ((direction ^ (pos - endPos)) < 0) {
 				int widthFirstCharacter = 0;
 				Sci::Position posIndexDocument = pos;
 				size_t indexSearch = 0;
@@ -2127,7 +2136,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						return pos;
 					}
 				}
-				if (forward) {
+				if (direction >= 0) {
 					pos += widthFirstCharacter;
 				} else {
 					if (!NextCharacter(pos, increment)) {
@@ -2141,7 +2150,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			std::vector<char> searchThing((lengthFind + 1) * maxBytesCharacter * maxFoldingExpansion + 1);
 			const size_t lenSearch = pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(searchThing.data());
-			while (forward ? (pos < endPos) : (pos >= endPos)) {
+			//while (forward ? (pos < endPos) : (pos >= endPos)) {
+			while ((direction ^ (pos - endPos)) < 0) {
 				int widthFirstCharacter = 0;
 				Sci::Position indexDocument = 0;
 				size_t indexSearch = 0;
@@ -2184,7 +2194,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						return pos;
 					}
 				}
-				if (forward) {
+				if (direction >= 0) {
 					pos += widthFirstCharacter;
 				} else {
 					if (!NextCharacter(pos, increment)) {
@@ -2197,7 +2207,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			std::vector<char> searchThing(lengthFind + 1);
 			pcf->Fold(searchThing.data(), searchThing.size(), search, lengthFind);
 			const char * const searchData = searchThing.data();
-			while (forward ? (pos < endSearch) : (pos >= endSearch)) {
+			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
+			while ((direction ^ (pos - endSearch)) < 0) {
 				bool found = (pos + lengthFind) <= limitPos;
 				for (Sci::Position indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
 					const char ch = CharAt(pos + indexSearch);
