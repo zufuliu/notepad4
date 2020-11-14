@@ -1252,6 +1252,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[5] = KeywordAttr_NoLexer;		// function
 		attr[6] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// KDoc
 		break;
+	case NP2LEX_LUA:
+		attr[3] = KeywordAttr_NoLexer;		// standard library
+		break;
 	case NP2LEX_RUBY:
 		attr[1] = KeywordAttr_NoAutoComp;	// code fold
 		attr[2] = KeywordAttr_NoAutoComp;	// re

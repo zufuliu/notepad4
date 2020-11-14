@@ -183,8 +183,7 @@
 #define NP2STYLE_Substitution			63541
 #define NP2STYLE_Modifier				63542
 
-#define NP2STYLE_StringTableMathFunc	63552
-#define NP2STYLE_IOSystemFacility		63553
+#define NP2STYLE_Metamethod				63552
 
 #define NP2STYLE_Bytes					63561
 #define NP2STYLE_RawBytes				63562

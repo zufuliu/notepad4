@@ -548,6 +548,56 @@ def parse_kotlin_api_file(path):
 	]
 	return keywordList
 
+def parse_lua_api_file(path):
+	sections = read_api_file(path, '--')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'metamethod'):
+			keywordMap[key] = doc.split()
+		else:
+			items = re.findall(r'^\s*(\w+\.?:?\w*\(?)', doc, re.MULTILINE)
+			modules = []
+			functions = []
+			for item in items:
+				index = item.find(':')
+				if index > 0:
+					# functions for file handle
+					functions.append(item[index + 1:])
+					continue
+
+				functions.append(item)
+				index = item.find('.')
+				if index >= 0:
+					module = item[:index]
+					modules.append(module)
+					if module == 'string':
+						# string functions in object-oriented style
+						functions.append(item[index + 1:])
+
+			keywordMap[key] = functions
+			keywordMap.setdefault('basic function', []).extend(modules)
+
+			# some values
+			constant = []
+			items = re.findall(r'^"([\w\s]+)"', doc, re.MULTILINE)
+			for item in items:
+				constant.extend(item.split())
+			keywordMap.setdefault('library', []).extend(constant)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'basic function',
+		'metamethod',
+		'library',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('basic function', keywordMap['basic function'], KeywordAttr.Default),
+		('metamethod', keywordMap['metamethod'], KeywordAttr.Default),
+		('standard library', keywordMap['library'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
 def parse_llvm_api_file(path):
 	sections = read_api_file(path, ';')
 	keywordMap = {}
