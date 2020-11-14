@@ -81,7 +81,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](../master/tools/lang/LLVM.ll), up to LLVM 10.
-	* Lua Script
+	* [Lua Script](../master/tools/lang/Lua.lua), up to Lua 5.4.
 	* Makefile, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#makefile)
 		* nmake
 		* gmake

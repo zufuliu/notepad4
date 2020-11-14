@@ -191,8 +191,7 @@
 #define NP2StyleX_Substitution			EDITSTYLE_HOLE(Substitution, L"Substitution")
 #define NP2StyleX_Modifier				EDITSTYLE_HOLE(Modifier, L"Modifier")
 
-#define NP2StyleX_StringTableMathFunc	EDITSTYLE_HOLE(StringTableMathFunc, L"String, Table & Math Function")
-#define NP2StyleX_IOSystemFacility		EDITSTYLE_HOLE(IOSystemFacility, L"Input, Output & System Facility")
+#define NP2StyleX_Metamethod			EDITSTYLE_HOLE(Metamethod, L"Metamethod")
 
 #define NP2StyleX_Bytes					EDITSTYLE_HOLE(Bytes, L"Bytes")
 #define NP2StyleX_RawBytes				EDITSTYLE_HOLE(RawBytes, L"Raw Bytes")
