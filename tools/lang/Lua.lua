@@ -1,7 +1,7 @@
 -- Lua 5.0 to 5.4 https://www.lua.org/manual/
 -- http://lua-users.org/wiki/
 
---! keywords
+--! keywords			=======================================================
 and
 break
 false
@@ -24,7 +24,7 @@ return
 then true
 while
 
---! Metamethod
+--! Metamethod			=======================================================
 -- Metatables and Metamethods
 __add
 __band
@@ -56,7 +56,7 @@ __sub
 __tostring
 __unm
 
---! Basic Function
+--! Basic Function		=======================================================
 _G
 _VERSION
 assert(v [, message])
@@ -94,7 +94,7 @@ warn(msg1, ···)							-- added in Lua 5.4
 xpcall(f, msgh [, arg1, ···])
 module(name [, ···])					-- Modules, removed in Lua 5.2
 
---! library
+--! library				=======================================================
 -- The Standard Libraries
 
 -- Coroutine Manipulation
