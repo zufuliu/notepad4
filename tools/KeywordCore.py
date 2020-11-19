@@ -551,6 +551,7 @@ def parse_kotlin_api_file(path):
 def parse_lua_api_file(path):
 	sections = read_api_file(path, '--')
 	keywordMap = {}
+	constant = []
 	for key, doc in sections:
 		if key in ('keywords', 'metamethod'):
 			keywordMap[key] = doc.split()
@@ -577,13 +578,11 @@ def parse_lua_api_file(path):
 			keywordMap[key] = functions
 			keywordMap.setdefault('basic function', []).extend(modules)
 
-			# some values
-			constant = []
 			items = re.findall(r'^"([\w\s]+)"', doc, re.MULTILINE)
 			for item in items:
 				constant.extend(item.split())
-			keywordMap.setdefault('library', []).extend(constant)
 
+	keywordMap.setdefault('library', []).extend(constant)
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
 		'basic function',
