@@ -2247,15 +2247,16 @@ void Editor::Clear() {
 		}
 		UndoGroup ug(pdoc, (sel.Count() > 1) || singleVirtual);
 		for (size_t r = 0; r < sel.Count(); r++) {
-			if (!RangeContainsProtected(sel.Range(r).caret.Position(), sel.Range(r).caret.Position() + 1)) {
+			const Sci::Position caretPosition = sel.Range(r).caret.Position();
+			if (!RangeContainsProtected(caretPosition, caretPosition + 1)) {
 				if (sel.Range(r).Start().VirtualSpace()) {
 					if (sel.Range(r).anchor < sel.Range(r).caret)
-						sel.Range(r) = SelectionRange(RealizeVirtualSpace(sel.Range(r).anchor.Position(), sel.Range(r).anchor.VirtualSpace()));
+						sel.Range(r) = SelectionRange(RealizeVirtualSpace(caretPosition, sel.Range(r).anchor.VirtualSpace()));
 					else
-						sel.Range(r) = SelectionRange(RealizeVirtualSpace(sel.Range(r).caret.Position(), sel.Range(r).caret.VirtualSpace()));
+						sel.Range(r) = SelectionRange(RealizeVirtualSpace(caretPosition, sel.Range(r).caret.VirtualSpace()));
 				}
-				if ((sel.Count() == 1) || !pdoc->IsPositionInLineEnd(sel.Range(r).caret.Position())) {
-					pdoc->DelChar(sel.Range(r).caret.Position());
+				if ((sel.Count() == 1) || !pdoc->IsPositionInLineEnd(caretPosition)) {
+					pdoc->DelChar(caretPosition);
 					sel.Range(r).ClearVirtualSpace();
 				}  // else multiple selection so don't eat line ends
 			} else {
@@ -2294,6 +2295,38 @@ void Editor::Redo() {
 	}
 }
 
+bool Editor::BackspaceUnindent(bool undo, Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect) {
+	const Sci::Position column = pdoc->GetColumn(caretPosition);
+	const int indentation = pdoc->GetLineIndentation(lineCurrentPos);
+	if (column > 0 && (column <= indentation || pdoc->CharAt(caretPosition - 1) == ' ')) {
+		const int indentationStep = pdoc->IndentSize();
+		Sci::Position indentationChange = column % indentationStep;
+		if (indentationChange == 0) {
+			indentationChange = indentationStep;
+		}
+		if (column <= indentation && pdoc->backspaceUnindents) {
+			UndoGroup ugInner(pdoc, undo);
+			*posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationChange);
+			return true;
+		}
+		if (indentationChange > 1) {
+			const Sci_Position minPos = std::max(lineCurrentPos, caretPosition - indentationChange);
+			Sci::Position pos = caretPosition - 1;
+			while (pos >= minPos && pdoc->CharAt(pos) == ' ') {
+				--pos;
+			}
+			++pos;
+			if (pos == minPos) {
+				UndoGroup ugInner(pdoc, undo);
+				pdoc->DeleteChars(pos, indentationChange);
+				*posSelect = pos;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void Editor::DelCharBack(bool allowLineStartDeletion) {
 	RefreshStyleData();
 	if (!sel.IsRectangular())
@@ -2303,27 +2336,20 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 	UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty());
 	if (sel.Empty()) {
 		for (size_t r = 0; r < sel.Count(); r++) {
-			if (!RangeContainsProtected(sel.Range(r).caret.Position() - 1, sel.Range(r).caret.Position())) {
+			const Sci::Position caretPosition = sel.Range(r).caret.Position();
+			if (!RangeContainsProtected(caretPosition - 1, caretPosition)) {
 				if (sel.Range(r).caret.VirtualSpace()) {
 					sel.Range(r).caret.SetVirtualSpace(sel.Range(r).caret.VirtualSpace() - 1);
 					sel.Range(r).anchor.SetVirtualSpace(sel.Range(r).caret.VirtualSpace());
 				} else {
-					const Sci::Line lineCurrentPos =
-						pdoc->SciLineFromPosition(sel.Range(r).caret.Position());
-					if (allowLineStartDeletion || (pdoc->LineStart(lineCurrentPos) != sel.Range(r).caret.Position())) {
-						if (pdoc->GetColumn(sel.Range(r).caret.Position()) <= pdoc->GetLineIndentation(lineCurrentPos) &&
-							pdoc->GetColumn(sel.Range(r).caret.Position()) > 0 && pdoc->backspaceUnindents) {
-							UndoGroup ugInner(pdoc, !ug.Needed());
-							const int indentation = pdoc->GetLineIndentation(lineCurrentPos);
-							const int indentationStep = pdoc->IndentSize();
-							int indentationChange = indentation % indentationStep;
-							if (indentationChange == 0)
-								indentationChange = indentationStep;
-							const Sci::Position posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationChange);
+					const Sci::Line lineCurrentPos = pdoc->SciLineFromPosition(caretPosition);
+					if (allowLineStartDeletion || (pdoc->LineStart(lineCurrentPos) != caretPosition)) {
+						Sci::Position posSelect;
+						if (BackspaceUnindent(!ug.Needed(), lineCurrentPos, caretPosition, &posSelect)) {
 							// SetEmptySelection
 							sel.Range(r) = SelectionRange(posSelect);
 						} else {
-							pdoc->DelCharBack(sel.Range(r).caret.Position());
+							pdoc->DelCharBack(caretPosition);
 						}
 					}
 				}
@@ -3694,31 +3720,22 @@ int Editor::DelWordOrLine(unsigned int iMessage) {
 		}
 
 		Range rangeDelete;
+		const Sci::Position caretPosition = sel.Range(r).caret.Position();
 		switch (iMessage) {
 		case SCI_DELWORDLEFT:
-			rangeDelete = Range(
-				pdoc->NextWordStart(sel.Range(r).caret.Position(), -1),
-				sel.Range(r).caret.Position());
+			rangeDelete = Range(pdoc->NextWordStart(caretPosition, -1), caretPosition);
 			break;
 		case SCI_DELWORDRIGHT:
-			rangeDelete = Range(
-				sel.Range(r).caret.Position(),
-				pdoc->NextWordStart(sel.Range(r).caret.Position(), 1));
+			rangeDelete = Range(caretPosition, pdoc->NextWordStart(caretPosition, 1));
 			break;
 		case SCI_DELWORDRIGHTEND:
-			rangeDelete = Range(
-				sel.Range(r).caret.Position(),
-				pdoc->NextWordEnd(sel.Range(r).caret.Position(), 1));
+			rangeDelete = Range(caretPosition, pdoc->NextWordEnd(caretPosition, 1));
 			break;
 		case SCI_DELLINELEFT:
-			rangeDelete = Range(
-				pdoc->LineStart(pdoc->LineFromPosition(sel.Range(r).caret.Position())),
-				sel.Range(r).caret.Position());
+			rangeDelete = Range(pdoc->LineStart(pdoc->LineFromPosition(caretPosition)), caretPosition);
 			break;
 		case SCI_DELLINERIGHT:
-			rangeDelete = Range(
-				sel.Range(r).caret.Position(),
-				pdoc->LineEnd(pdoc->LineFromPosition(sel.Range(r).caret.Position())));
+			rangeDelete = Range(caretPosition, pdoc->LineEnd(pdoc->LineFromPosition(caretPosition)));
 			break;
 		}
 		if (!RangeContainsProtected(rangeDelete.start, rangeDelete.end)) {
