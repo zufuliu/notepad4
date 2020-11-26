@@ -2295,17 +2295,22 @@ void Editor::Redo() {
 	}
 }
 
-bool Editor::BackspaceUnindent(bool undo, Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect) {
+bool Editor::BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect) {
+	const char chPrev = pdoc->CharAt(caretPosition - 1);
+	if (!IsSpaceOrTab(chPrev)) {
+		return false;
+	}
+
 	const Sci::Position column = pdoc->GetColumn(caretPosition);
 	const int indentation = pdoc->GetLineIndentation(lineCurrentPos);
-	if (column > 0 && (column <= indentation || pdoc->CharAt(caretPosition - 1) == ' ')) {
+	if (column > 0 && (column <= indentation || chPrev == ' ')) {
 		const int indentationStep = pdoc->IndentSize();
 		Sci::Position indentationChange = column % indentationStep;
 		if (indentationChange == 0) {
 			indentationChange = indentationStep;
 		}
 		if (column <= indentation && pdoc->backspaceUnindents) {
-			UndoGroup ugInner(pdoc, undo);
+			//UndoGroup ugInner(pdoc, !ug.Needed());
 			*posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationChange);
 			return true;
 		}
@@ -2317,7 +2322,6 @@ bool Editor::BackspaceUnindent(bool undo, Sci::Position lineCurrentPos, Sci::Pos
 			}
 			++pos;
 			if (pos == minPos) {
-				UndoGroup ugInner(pdoc, undo);
 				pdoc->DeleteChars(pos, indentationChange);
 				*posSelect = pos;
 				return true;
@@ -2345,7 +2349,7 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 					const Sci::Line lineCurrentPos = pdoc->SciLineFromPosition(caretPosition);
 					if (allowLineStartDeletion || (pdoc->LineStart(lineCurrentPos) != caretPosition)) {
 						Sci::Position posSelect;
-						if (BackspaceUnindent(!ug.Needed(), lineCurrentPos, caretPosition, &posSelect)) {
+						if (BackspaceUnindent(lineCurrentPos, caretPosition, &posSelect)) {
 							// SetEmptySelection
 							sel.Range(r) = SelectionRange(posSelect);
 						} else {
@@ -4018,8 +4022,7 @@ void Editor::Indent(bool forwards) {
 			if (forwards) {
 				pdoc->DeleteChars(sel.Range(r).Start().Position(), sel.Range(r).Length());
 				caretPosition = sel.Range(r).caret.Position();
-				if (pdoc->GetColumn(caretPosition) <= pdoc->GetColumn(pdoc->GetLineIndentPosition(lineCurrentPos)) &&
-					pdoc->tabIndents) {
+				if (pdoc->tabIndents && pdoc->GetColumn(caretPosition) <= pdoc->GetColumn(pdoc->GetLineIndentPosition(lineCurrentPos))) {
 					const int indentation = pdoc->GetLineIndentation(lineCurrentPos);
 					const int indentationStep = pdoc->IndentSize();
 					const Sci::Position posSelect = pdoc->SetLineIndentation(
@@ -4041,14 +4044,14 @@ void Editor::Indent(bool forwards) {
 					}
 				}
 			} else {
-				if (pdoc->GetColumn(caretPosition) <= pdoc->GetLineIndentation(lineCurrentPos) &&
-					pdoc->tabIndents) {
-					const int indentation = pdoc->GetLineIndentation(lineCurrentPos);
+				const Sci::Position column = pdoc->GetColumn(caretPosition);
+				const int indentation = pdoc->tabIndents ? pdoc->GetLineIndentation(lineCurrentPos) : -1;
+				if (column <= indentation) {
 					const int indentationStep = pdoc->IndentSize();
 					const Sci::Position posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationStep);
 					sel.Range(r) = SelectionRange(posSelect);
 				} else {
-					Sci::Position newColumn = ((pdoc->GetColumn(caretPosition) - 1) / pdoc->tabInChars) *
+					Sci::Position newColumn = ((column - 1) / pdoc->tabInChars) *
 						pdoc->tabInChars;
 					newColumn = std::max<Sci::Position>(newColumn, 0);
 					Sci::Position newPos = caretPosition;
