@@ -436,7 +436,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void SelectAll();
 	virtual void Undo();
 	virtual void Redo();
-	bool BackspaceUnindent(bool undo, Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect);
+	bool BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caretPosition, Sci::Position *posSelect);
 	void DelCharBack(bool allowLineStartDeletion);
 	virtual void ClaimSelection() noexcept = 0;
 
