@@ -349,15 +349,9 @@
 #define CMD_INCLINELIMIT				20019	// Alt++
 #define CMD_DECLINELIMIT				20020	// Alt+-
 
-#define CMD_STRINGIFYS					20021	// Ctrl+1
-#define CMD_STRINGIFYD					20022	// Ctrl+2
-#define CMD_STRINGIFYT2					20023	// Ctrl+3
-#define CMD_STRINGIFYT1					20024	// Ctrl+9
-#define CMD_STRINGIFYB					20025	// Ctrl+8
-#define CMD_EMBRACKETR					20026	// Ctrl+4
-#define CMD_EMBRACKETC					20027	// Ctrl+5
-#define CMD_EMBRACKETA					20028	// Ctrl+6
-#define CMD_EMBRACKETS					20029	// Ctrl+7
+#define CMD_ENCLOSE_TRIPLE_SQ			20021	// Ctrl+3
+#define CMD_ENCLOSE_TRIPLE_DQ			20022	// Ctrl+6
+#define CMD_ENCLOSE_TRIPLE_BT			20023	// Ctrl+9
 
 #define CMD_INCREASENUM					20031	// Ctrl+Alt++
 #define CMD_DECREASENUM					20032	// Ctrl+Alt+-
