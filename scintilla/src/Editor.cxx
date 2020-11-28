@@ -1922,14 +1922,45 @@ void Editor::FilterSelections() {
 	}
 }
 
+static constexpr char EncloseSelectionCharacter(char ch) noexcept {
+	switch (ch) {
+	case '(':
+		return ')';
+	case '[':
+		return ']';
+	case '{':
+		return '}';
+	case '<':
+		return '>';
+	case '\"':
+	case '\'':
+	case '`':
+	// see https://github.com/zufuliu/notepad2/issues/255
+	case '*':	// Markdown Italic, reStructuredText Italic, AsciiDoc Bold, QuickBook Bold
+	case '/':	// JavaScript Regex, QuickBook Italic
+	case ':':	// Markdown Emoji, reStructuredText Field List, AsciiDoc Attribute
+	case '_':	// Markdown Italic, AsciiDoc Italic, QuickBook Underline
+	case '|':	// reStructuredText Substitution
+	case '~':	// Markdown Strikethrough
+	case '=':	// QuickBook Teletype
+		return ch;
+	default:
+		return '\0';
+	}
+}
+
 // InsertCharacter inserts a character encoded in document code page.
 void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	if (sv.empty()) {
 		return;
 	}
 	FilterSelections();
+	bool handled = false;
 	{
 		UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
+		// enclose selection on typing punctuation, empty selection will be handled in SCN_CHARADDED.
+		const char encloseCh = (charSource != CharacterSource::directInput || sv.length() != 1
+			|| sel.IsRectangular() || sel.Empty()) ? '\0' : EncloseSelectionCharacter(sv[0]);
 
 		// Vector elements point into selection in order to change selection.
 		std::vector<SelectionRange *> selPtrs;
@@ -1947,9 +1978,19 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 			if (!RangeContainsProtected(currentSel->Start().Position(),
 				currentSel->End().Position())) {
 				Sci::Position positionInsert = currentSel->Start().Position();
+				std::string text;
+				bool forward = false;
 				if (!currentSel->Empty()) {
-					if (currentSel->Length()) {
-						pdoc->DeleteChars(positionInsert, currentSel->Length());
+					const Sci::Position selectionLength = currentSel->Length();
+					if (selectionLength) {
+						if (encloseCh) {
+							forward = currentSel->anchor < currentSel->caret;
+							text.resize(selectionLength + 2);
+							text[0] = sv[0];
+							pdoc->GetCharRange(text.data() + 1, positionInsert, selectionLength);
+							text[selectionLength + 1] = encloseCh;
+						}
+						pdoc->DeleteChars(positionInsert, selectionLength);
 						currentSel->ClearVirtualSpace();
 					} else {
 						// Range is all virtual so collapse to start of virtual space
@@ -1964,10 +2005,24 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 					}
 				}
 				positionInsert = RealizeVirtualSpace(positionInsert, currentSel->caret.VirtualSpace());
-				const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, sv.data(), sv.length());
-				if (lengthInserted > 0) {
-					currentSel->caret.SetPosition(positionInsert + lengthInserted);
-					currentSel->anchor.SetPosition(positionInsert + lengthInserted);
+				if (text.empty()) {
+					const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, sv.data(), sv.length());
+					if (lengthInserted > 0) {
+						currentSel->caret.SetPosition(positionInsert + lengthInserted);
+						currentSel->anchor.SetPosition(positionInsert + lengthInserted);
+					}
+				} else {
+					const Sci::Position lengthInserted = pdoc->InsertString(positionInsert, text.data(), text.length());
+					if (lengthInserted > 0) {
+						handled = true;
+						if (forward) {
+							currentSel->caret.SetPosition(positionInsert + lengthInserted - 1);
+							currentSel->anchor.SetPosition(positionInsert + 1);
+						} else {
+							currentSel->caret.SetPosition(positionInsert + 1);
+							currentSel->anchor.SetPosition(positionInsert + lengthInserted - 1);
+						}
+					}
 				}
 				currentSel->ClearVirtualSpace();
 				// If in wrap mode rewrap current line so EnsureCaretVisible has accurate information
@@ -1998,7 +2053,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	}
 
 	// We don't handle inline IME tentative input characters
-	if (charSource != CharacterSource::tentativeInput) {
+	if (!handled && charSource != CharacterSource::tentativeInput) {
 		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
 			if (sv.length() > 1) {

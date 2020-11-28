@@ -410,12 +410,12 @@ static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
 	}
 }
 
-// temporary fix for issue #77: force InvalidateStyleRedraw().
+// temporary fix for https://github.com/zufuliu/notepad2/issues/77: force InvalidateStyleRedraw().
 static inline void InvalidateStyleRedraw(void) {
 	SciCall_SetViewEOL(bViewEOLs);
 }
 
-// temporary fix for issue #134: Direct2D on arm32
+// temporary fix for https://github.com/zufuliu/notepad2/issues/134: Direct2D on arm32
 static inline int GetDefualtRenderingTechnology(void) {
 #if defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
 	return SC_TECHNOLOGY_DIRECTWRITERETAIN;
@@ -4751,43 +4751,25 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case CMD_EMBRACKETR:	// Ctrl+4
-		EditEncloseSelection(L"(", L")");
-		break;
-	case CMD_EMBRACKETC:	// Ctrl+5
-		EditEncloseSelection(L"{", L"}");
-		break;
-	case CMD_EMBRACKETA:	// Ctrl+6
-		EditEncloseSelection(L"<", L">");
-		break;
-	case CMD_EMBRACKETS:	// Ctrl+7
-		EditEncloseSelection(L"[", L"]");
-		break;
-	case CMD_STRINGIFYS:	// Ctrl+1
-		EditEncloseSelection(L"'", L"'");
-		break;
-	case CMD_STRINGIFYD:	// Ctrl+2
-		EditEncloseSelection(L"\"", L"\"");
-		break;
-	case CMD_STRINGIFYT2:	// Ctrl+3
-		EditEncloseSelection(L"\"\"\"", L"\"\"\"");
-		break;
-	case CMD_STRINGIFYT1:	// Ctrl+9
+	case CMD_ENCLOSE_TRIPLE_SQ:
 		EditEncloseSelection(L"'''", L"'''");
 		break;
-	case CMD_STRINGIFYB:	// Ctrl+8
-		EditEncloseSelection(L"`", L"`");
+	case CMD_ENCLOSE_TRIPLE_DQ:
+		EditEncloseSelection(L"\"\"\"", L"\"\"\"");
+		break;
+	case CMD_ENCLOSE_TRIPLE_BT:
+		EditEncloseSelection(L"```", L"```");
 		break;
 
-	case CMD_INCREASENUM:	// Ctrl+Alt++
+	case CMD_INCREASENUM:
 		EditModifyNumber(TRUE);
 		break;
 
-	case CMD_DECREASENUM:	// Ctrl+Alt+-
+	case CMD_DECREASENUM:
 		EditModifyNumber(FALSE);
 		break;
 
-	case CMD_JUMP2SELSTART:	// Ctrl+'
+	case CMD_JUMP2SELSTART:
 		if (!SciCall_IsRectangleSelection()) {
 			const Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
@@ -4800,7 +4782,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case CMD_JUMP2SELEND:	// Ctrl+.
+	case CMD_JUMP2SELEND:
 		if (!SciCall_IsRectangleSelection()) {
 			const Sci_Position iAnchorPos = SciCall_GetAnchor();
 			const Sci_Position iCursorPos = SciCall_GetCurrentPos();
