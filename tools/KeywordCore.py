@@ -624,6 +624,31 @@ def parse_llvm_api_file(path):
 	]
 	return keywordList
 
+def parse_r_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			items = set(doc.split())
+		else:
+			result = re.findall(r'^[\w\.]+\(?', doc, re.MULTILINE)
+			items = []
+			for item in result:
+				item = item.strip('.')
+				if len(item.rstrip('(')) > 2:
+					items.append(item)
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'package',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('package', keywordMap['package'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
 def parse_ruby_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}

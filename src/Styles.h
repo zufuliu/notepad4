@@ -22,7 +22,7 @@
 #include "EditLexer.h"
 
 // Number of Lexers in pLexArray
-#define NUMLEXERS	64
+#define NUMLEXERS	65
 
 // maximum favorite schemes count, DON'T change.
 #define MAX_FAVORITE_SCHEMES_COUNT			31

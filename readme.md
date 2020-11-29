@@ -103,6 +103,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Boo
 	* PHP Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 	* Windows Rescouce Script
+	* [R](../master/tools/lang/R.r), up to R 4.0.3.
 	* [Ruby](../master/tools/lang/Ruby.rb), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* [Rust](../master/tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
 	* Scala Script
