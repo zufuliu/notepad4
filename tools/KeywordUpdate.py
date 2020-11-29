@@ -11,6 +11,7 @@ def update_all_keyword():
 		('NP2LEX_KOTLIN', 'stlKotlin.c', 'Kotlin.kt', 0, parse_kotlin_api_file),
 		('NP2LEX_LLVM', 'stlLLVM.c', 'LLVM.ll', 0, parse_llvm_api_file),
 		('NP2LEX_LUA', 'stlLua.c', 'Lua.lua', 0, parse_lua_api_file),
+		('NP2LEX_R', 'stlR.c', 'R.r', 0, parse_r_api_file),
 		('NP2LEX_RUBY', 'stlRuby.c', 'Ruby.rb', 0, parse_ruby_api_file),
 		('NP2LEX_RUST', 'stlRust.c', 'Rust.rs', 0, parse_rust_api_file),
 		# TODO: SQL Dialect, https://github.com/zufuliu/notepad2/issues/31

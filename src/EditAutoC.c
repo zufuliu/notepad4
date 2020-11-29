@@ -2059,6 +2059,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_PERL:
 	case SCLEX_POWERSHELL:
 	case SCLEX_PYTHON:
+	case SCLEX_R:
 	case SCLEX_RUBY:
 	case SCLEX_SMALI:
 	case SCLEX_TCL:
@@ -2273,6 +2274,10 @@ void EditToggleCommentBlock(void) {
 
 	case SCLEX_POWERSHELL:
 		EditEncloseSelection(L"<#", L"#>");
+		break;
+
+	case SCLEX_R:
+		EditEncloseSelectionNewLine(L"if (FALSE) {", L"}");
 		break;
 
 	case SCLEX_TCL:

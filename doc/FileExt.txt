@@ -404,6 +404,15 @@ PowerShell Script
 	psm1			PowerShell Script Module File
 
 
+R Code
+	*.R
+	*.rsource
+
+	.Rprofile
+	.Rhistory
+	Rprofile.site
+	Renviron.site
+
 Resource Script
 	rc
 	rc2

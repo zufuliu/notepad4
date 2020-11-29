@@ -105,6 +105,7 @@ extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
 extern EDITLEXER lexPS1;
 
+extern EDITLEXER lexR;
 extern EDITLEXER lexRC;
 extern EDITLEXER lexRust;
 
@@ -209,6 +210,7 @@ static PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexPerl,
 	&lexPS1,
 
+	&lexR,
 	&lexRC,
 	&lexRust,
 
@@ -1254,6 +1256,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		break;
 	case NP2LEX_LUA:
 		attr[3] = KeywordAttr_NoLexer;		// standard library
+		break;
+	case NP2LEX_R:
+		attr[1] = KeywordAttr_NoLexer;		// package
 		break;
 	case NP2LEX_RUBY:
 		attr[1] = KeywordAttr_NoAutoComp;	// code fold
