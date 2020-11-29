@@ -1281,44 +1281,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	}
 }
 
-static inline BOOL DidLexerHasLineComment(int iLexer) {
-	return !(iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_DIFF
-	);
-}
-
-static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
-	return !(iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_BASH
-		|| iLexer == SCLEX_BATCH
-		|| iLexer == SCLEX_CONF
-		|| iLexer == SCLEX_DIFF
-		|| iLexer == SCLEX_GN
-		|| iLexer == SCLEX_LLVM
-		|| iLexer == SCLEX_MAKEFILE
-		|| iLexer == SCLEX_PERL
-		|| iLexer == SCLEX_PROPERTIES
-		|| iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_RUBY
-		|| iLexer == SCLEX_SMALI
-		|| iLexer == SCLEX_TEXINFO
-		|| iLexer == SCLEX_TOML
-		|| iLexer == SCLEX_VB
-		|| iLexer == SCLEX_VBSCRIPT
-		|| iLexer == SCLEX_VIM
-		|| iLexer == SCLEX_YAML
-		|| rid == NP2LEX_AWK
-		|| rid == NP2LEX_JAM
-	);
-}
-
-// Python like indentation based code folding that can use SC_IV_LOOKFORWARD
-static inline BOOL IsPythonLikeFolding(int iLexer) {
-	return iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_YAML;
-}
-
 static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);
 static void Style_SetParsed(const struct DetailStyle *style, int iStyle);
 static inline void Style_SetDefaultStyle(int index) {
