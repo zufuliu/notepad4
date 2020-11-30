@@ -41,10 +41,6 @@ struct EscapeSequence {
 	}
 };
 
-enum {
-	GNLineStateMaskLineComment = 1, // line comment
-};
-
 void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int visibleChars = 0;
 	int lineStateLineComment = 0;
@@ -152,7 +148,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.ch == '#') {
 				sc.SetState(SCE_GN_COMMENT);
 				if (visibleChars == 0) {
-					lineStateLineComment = GNLineStateMaskLineComment;
+					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_GN_STRING);
@@ -190,69 +186,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	sc.Complete();
 }
 
-constexpr int GetLineCommentState(int lineState) noexcept {
-	return lineState & GNLineStateMaskLineComment;
+static_assert(SCE_GN_OPERATOR == SCE_SIMPLE_OPERATOR);
 }
 
-void FoldGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-
-	const Sci_PositionU endPos = startPos + lengthDoc;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int levelCurrent = SC_FOLDLEVELBASE;
-	int lineCommentPrev = 0;
-	if (lineCurrent > 0) {
-		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-		lineCommentPrev = GetLineCommentState(styler.GetLineState(lineCurrent - 1));
-	}
-
-	int levelNext = levelCurrent;
-	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
-	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
-
-	char chNext = styler[startPos];
-	int styleNext = styler.StyleAt(startPos);
-
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
-		const int style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-
-		if (style == SCE_GN_OPERATOR) {
-			if (ch == '{' || ch == '[' || ch == '(') {
-				levelNext++;
-			} else if (ch == '}' || ch == ']' || ch == ')') {
-				levelNext--;
-			}
-		}
-
-		if (i == lineEndPos) {
-			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
-			if (foldComment & lineCommentCurrent) {
-				levelNext += lineCommentNext - lineCommentPrev;
-			}
-
-			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
-			if (levelUse < levelNext) {
-				lev |= SC_FOLDLEVELHEADERFLAG;
-			}
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
-
-			lineCurrent++;
-			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
-			levelCurrent = levelNext;
-			lineCommentPrev = lineCommentCurrent;
-			lineCommentCurrent = lineCommentNext;
-		}
-	}
-}
-
-}
-
-LexerModule lmGN(SCLEX_GN, ColouriseGNDoc, "gn", FoldGNDoc);
+LexerModule lmGN(SCLEX_GN, ColouriseGNDoc, "gn", FoldSimpleDoc);

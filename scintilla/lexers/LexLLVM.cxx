@@ -44,10 +44,6 @@ constexpr bool IsLLVMIdentifierChar(int ch) {
 	return IsIdentifierChar(ch) || ch == '-' || ch == '.';
 }
 
-enum {
-	LLVMLineStateMaskLineComment = 1, // line comment
-};
-
 bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) noexcept {
 	while (styler[pos] != '=') {
 		++pos;
@@ -205,7 +201,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.ch == ';') {
 				sc.SetState(SCE_LLVM_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = LLVMLineStateMaskLineComment;
+					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
 			} else if (sc.ch == '\"' || sc.Match('c', '\"')) {
 				sc.SetState(SCE_LLVM_STRING);
@@ -260,64 +256,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	sc.Complete();
 }
 
-constexpr int GetLineCommentState(int lineState) noexcept {
-	return lineState & LLVMLineStateMaskLineComment;
+static_assert(SCE_LLVM_OPERATOR == SCE_SIMPLE_OPERATOR);
 }
 
-void FoldLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-
-	const Sci_PositionU endPos = startPos + lengthDoc;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int levelCurrent = SC_FOLDLEVELBASE;
-	int lineCommentPrev = 0;
-	if (lineCurrent > 0) {
-		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-		lineCommentPrev = GetLineCommentState(styler.GetLineState(lineCurrent - 1));
-	}
-
-	int levelNext = levelCurrent;
-	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
-	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
-
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int style = styler.StyleAt(i);
-
-		if (style == SCE_LLVM_OPERATOR) {
-			const char ch = styler[i];
-			if (ch == '{' || ch == '[' || ch == '(') {
-				levelNext++;
-			} else if (ch == '}' || ch == ']' || ch == ')') {
-				levelNext--;
-			}
-		}
-
-		if (i == lineEndPos) {
-			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
-			if (foldComment & lineCommentCurrent) {
-				levelNext += lineCommentNext - lineCommentPrev;
-			}
-
-			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
-			if (levelUse < levelNext) {
-				lev |= SC_FOLDLEVELHEADERFLAG;
-			}
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
-
-			lineCurrent++;
-			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
-			levelCurrent = levelNext;
-			lineCommentPrev = lineCommentCurrent;
-			lineCommentCurrent = lineCommentNext;
-		}
-	}
-}
-
-}
-
-LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "llvm", FoldLLVMDoc);
+LexerModule lmLLVM(SCLEX_LLVM, ColouriseLLVMDoc, "llvm", FoldSimpleDoc);

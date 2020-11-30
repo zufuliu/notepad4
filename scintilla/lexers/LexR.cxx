@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for R.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -46,10 +45,6 @@ struct EscapeSequence {
 		--digitsLeft;
 		return digitsLeft <= 0 || !IsHexDigit(ch);
 	}
-};
-
-enum {
-	RLineStateMaskLineComment = 1, // line comment
 };
 
 void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -144,7 +139,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				} else {
 					sc.SetState(SCE_R_COMMENT);
 					if (visibleChars == 0) {
-						lineStateLineComment = RLineStateMaskLineComment;
+						lineStateLineComment = SimpleLineStateMaskLineComment;
 					}
 				}
 			} else if (sc.ch == '\"') {
@@ -179,11 +174,16 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	sc.Complete();
 }
 
-constexpr int GetLineCommentState(int lineState) noexcept {
-	return lineState & RLineStateMaskLineComment;
+static constexpr int GetLineCommentState(int lineState) noexcept {
+	return lineState & SimpleLineStateMaskLineComment;
 }
 
-void FoldRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+static_assert(SCE_R_OPERATOR == SCE_SIMPLE_OPERATOR);
+}
+
+namespace Scintilla {
+
+void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
@@ -203,7 +203,7 @@ void FoldRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/,
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int style = styler.StyleAt(i);
 
-		if (style == SCE_R_OPERATOR) {
+		if (style == SCE_SIMPLE_OPERATOR) {
 			const char ch = styler[i];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
@@ -239,4 +239,4 @@ void FoldRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/,
 
 }
 
-LexerModule lmR(SCLEX_R, ColouriseRDoc, "r", FoldRDoc);
+LexerModule lmR(SCLEX_R, ColouriseRDoc, "r", FoldSimpleDoc);
