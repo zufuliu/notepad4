@@ -335,7 +335,6 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
-	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
@@ -344,8 +343,6 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
@@ -357,6 +354,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				levelNext--;
 			}
 		} else if (style == SCE_CMAKE_OPERATOR) {
+			const char ch = styler[i];
 			if (ch == '(') {
 				levelNext++;
 			} else if (ch == ')') {
@@ -364,7 +362,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			}
 		} else if (style == SCE_CMAKE_WORD) {
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = MakeLowerCase(ch);
+				buf[wordLen++] = MakeLowerCase(styler[i]);
 			}
 			if (styleNext != SCE_CMAKE_WORD) {
 				buf[wordLen] = '\0';
