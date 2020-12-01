@@ -19,7 +19,7 @@ void Scintilla_LoadDpiForWindow(void);
 int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
 #endif
-int Scintilla_LinkLexers(void);
+void Scintilla_LinkLexers(void);
 
 #ifdef __cplusplus
 }
