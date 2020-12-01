@@ -174,7 +174,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	sc.Complete();
 }
 
-static constexpr int GetLineCommentState(int lineState) noexcept {
+constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & SimpleLineStateMaskLineComment;
 }
 
