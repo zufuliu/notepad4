@@ -348,7 +348,6 @@
 #define CMD_FINDPREVSEL					20018	// Ctrl+Shift+F3
 #define CMD_INCLINELIMIT				20019	// Alt++
 #define CMD_DECLINELIMIT				20020	// Alt+-
-
 #define CMD_ENCLOSE_TRIPLE_SQ			20021	// Ctrl+3
 #define CMD_ENCLOSE_TRIPLE_DQ			20022	// Ctrl+6
 #define CMD_ENCLOSE_TRIPLE_BT			20023	// Ctrl+9

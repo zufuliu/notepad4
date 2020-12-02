@@ -40,7 +40,7 @@ public:
 	}
 
 	void AddLexerModules(std::initializer_list<LexerModule *> modules) {
-		lexerCatalogue.insert(std::end(lexerCatalogue), modules);
+		lexerCatalogue.insert(lexerCatalogue.end(), modules);
 	}
 
 	bool Empty() const noexcept {

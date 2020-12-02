@@ -96,6 +96,7 @@ ifeq ($(ARCH), x64)
 	endif
 else ifeq ($(ARCH), AVX2)
 	# Windows 7 SP1, Windows Server 2008 R2 SP1, 64-bit only
+	# TODO: use -march=x86-64-v3 for GCC 11+ or Clang 12+
 	export CFLAGS += -mavx2 -mpopcnt -mbmi
 	export CXXFLAGS += -mavx2 -mpopcnt -mbmi
 	export RCFLAGS += -D_WIN64
