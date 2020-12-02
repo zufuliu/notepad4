@@ -40,7 +40,7 @@
 	// SSE2 enabled by default
 	#define NP2_USE_SSE2		1
 
-	// Clang & GCC use -mavx2 -mpopcnt -mbmi (to enable tzcnt).
+	// Clang and GCC use -mavx2 -mpopcnt -mbmi (to enable tzcnt) or -march=x86-64-v3.
 	// MSVC use /arch:AVX2
 	#if defined(_WIN64) && defined(__AVX2__)
 		#define NP2_USE_AVX2	1
