@@ -214,6 +214,7 @@ enum {
 
 typedef struct EditMarkAllStatus {
 	BOOL pending;
+	BOOL ignoreSelectionUpdate;
 	int findFlag;
 	Sci_Position iSelCount;		// length for pszText
 	LPSTR pszText;				// pattern or text to find
@@ -233,6 +234,7 @@ NP2_inline void EditMarkAll_Clear(void) {
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
 BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+void EditBookmarkSelectAll(void);
 
 // auto completion fill-up characters
 #define MAX_AUTO_COMPLETION_FILLUP_LENGTH	32		// Only 32 ASCII punctuation

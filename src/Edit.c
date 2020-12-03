@@ -5823,6 +5823,18 @@ void EditFindAll(LPCEDITFINDREPLACE lpefr) {
 	}
 }
 
+void EditBookmarkSelectAll(void) {
+	// see SciTEBase::BookmarkSelectAll().
+	Sci_Line line = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
+	if (line >= 0) {
+		editMarkAllStatus.ignoreSelectionUpdate = TRUE;
+		SciCall_SetSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
+		while ((line = SciCall_MarkerNext(line + 1, MarkerBitmask_Bookmark)) >= 0) {
+			SciCall_AddSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
+		}
+	}
+}
+
 static void ShwowReplaceCount(Sci_Position iCount) {
 	if (iCount > 0) {
 		WCHAR tchNum[32];
