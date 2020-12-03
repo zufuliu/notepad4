@@ -2517,6 +2517,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKPREV, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKNEXT, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKTOGGLE, i);
+	EnableCmd(hmenu, BME_EDIT_BOOKMARKSELECT, i);
 	EnableCmd(hmenu, BME_EDIT_BOOKMARKCLEAR, i);
 	EnableCmd(hmenu, IDM_EDIT_GOTOLINE, nonEmpty);
 	EnableCmd(hmenu, IDM_EDIT_GOTO_BLOCK_START, nonEmpty);
@@ -3831,6 +3832,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditToggleBookmarkAt(SciCall_GetCurrentPos());
 		break;
 
+	case BME_EDIT_BOOKMARKSELECT:
+		EditBookmarkSelectAll();
+		break;
+
 	case BME_EDIT_BOOKMARKCLEAR:
 		SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
 		break;
@@ -4956,7 +4961,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (scn->updated & (SC_UPDATE_SELECTION)) {
 					UpdateStatusBarCache_OVRMode(FALSE);
 					// mark occurrences of text currently selected
-					if (bMarkOccurrences) {
+					if (editMarkAllStatus.ignoreSelectionUpdate) {
+						editMarkAllStatus.ignoreSelectionUpdate = FALSE;
+					} else if (bMarkOccurrences) {
 						if (SciCall_IsSelectionEmpty()) {
 							if (editMarkAllStatus.matchCount) {
 								EditMarkAll_Clear();

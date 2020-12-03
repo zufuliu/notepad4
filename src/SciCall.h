@@ -438,6 +438,14 @@ NP2_inline void SciCall_ClearSelections(void) {
 	SciCall(SCI_CLEARSELECTIONS, 0, 0);
 }
 
+NP2_inline void SciCall_SetSelection(Sci_Position caret, Sci_Position anchor) {
+	SciCall(SCI_SETSELECTION, caret, anchor);
+}
+
+NP2_inline void SciCall_AddSelection(Sci_Position caret, Sci_Position anchor) {
+	SciCall(SCI_ADDSELECTION, caret, anchor);
+}
+
 NP2_inline void SciCall_SetRectangularSelectionCaret(Sci_Position caret) {
 	SciCall(SCI_SETRECTANGULARSELECTIONCARET, caret, 0);
 }
