@@ -1015,9 +1015,9 @@ BEGIN
     DEFPUSHBUTTON   "尋找下一個(&N)",IDOK,223,7,60,14
     PUSHBUTTON      "尋找上一個(&P)",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "尋找全部(&F)",IDC_FINDALL,223,41,60,14
-    CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,14,10
-    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,14,10
-    CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,14,10
+    CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,12,10
+    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,12,10
+    CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
     CONTROL         "<a>清除歷史</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
     AUTOCHECKBOX    "離開時透明",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
     AUTOCHECKBOX    "使用等寬字體(&M)",IDC_USEMONOSPACEDFONT,132,85,90,10,WS_TABSTOP
@@ -1050,9 +1050,9 @@ BEGIN
     PUSHBUTTON      "取代(&R)",IDC_REPLACE,223,58,60,14
     PUSHBUTTON      "全部取代(&A)",IDC_REPLACEALL,223,75,60,14
     PUSHBUTTON      "在選區內(&S)",IDC_REPLACEINSEL,223,92,60,14
-    CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,14,10
-    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,14,10
-    CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,14,10
+    CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
+    CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,12,10
+    CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,12,10
     CONTROL         "<a>清除歷史</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>清除歷史</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
     AUTOCHECKBOX    "離開時透明",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
