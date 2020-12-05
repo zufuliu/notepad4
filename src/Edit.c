@@ -5240,7 +5240,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			break;
 
 		case IDACC_REPLACENEXT:
-			if (GetDlgItem(hwnd, IDC_REPLACE) != NULL) {
+			if (GetDlgItem(hwnd, IDC_REPLACETEXT) != NULL) {
 				PostWMCommand(hwnd, IDC_REPLACE);
 			}
 			break;
@@ -5282,7 +5282,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			switch (pnmhdr->idFrom) {
 			case IDC_TOGGLEFINDREPLACE:
 				bSwitchedFindReplace = 1;
-				if (GetDlgItem(hwnd, IDC_REPLACE)) {
+				if (GetDlgItem(hwnd, IDC_REPLACETEXT)) {
 					PostWMCommand(hwndMain, IDM_EDIT_FIND);
 				} else {
 					PostWMCommand(hwndMain, IDM_EDIT_REPLACE);
