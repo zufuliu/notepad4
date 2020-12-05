@@ -8372,13 +8372,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_DROPSELECTIONN:
-		sel.DropSelection(static_cast<size_t>(wParam));
+		sel.DropSelection(wParam);
 		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 		Redraw();
 		break;
 
 	case SCI_SETMAINSELECTION:
-		sel.SetMain(static_cast<size_t>(wParam));
+		sel.SetMain(wParam);
 		ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 		Redraw();
 		break;
