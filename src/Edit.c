@@ -5837,14 +5837,25 @@ void EditToggleBookmarkAt(Sci_Position iPos) {
 }
 
 void EditBookmarkSelectAll(void) {
-	// see SciTEBase::BookmarkSelectAll().
 	Sci_Line line = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
 	if (line >= 0) {
 		editMarkAllStatus.ignoreSelectionUpdate = TRUE;
+		const Sci_Line iCurLine = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 		SciCall_SetSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
+		// set main selection near current line to ensure caret is visible after delete selected lines.
+		size_t main = 0;
+		size_t selection = 0;
+		Sci_Line minDiff = abs_pos(line - iCurLine);
 		while ((line = SciCall_MarkerNext(line + 1, MarkerBitmask_Bookmark)) >= 0) {
 			SciCall_AddSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
+			++selection;
+			const Sci_Line diff = abs_pos(line - iCurLine);
+			if (diff < minDiff) {
+				minDiff = diff;
+				main = selection;
+			}
 		}
+		SciCall_SetMainSelection(main);
 	}
 }
 
