@@ -26,6 +26,7 @@
 #define NP2_LONG_LINE_LIMIT		4096
 
 #define NP2_InvalidSearchFlags	(-1)
+#define NP2_MarkAllMultiline	0x00001000
 
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];
@@ -216,10 +217,9 @@ typedef struct EditMarkAllStatus {
 	BOOL pending;
 	BOOL ignoreSelectionUpdate;
 	int findFlag;
+	int incrementSize;			// increment search size
 	Sci_Position iSelCount;		// length for pszText
 	LPSTR pszText;				// pattern or text to find
-	BOOL rewind;				// need rewind start position?
-	int incrementSize;			// increment search size
 	double duration;			// search duration in milliseconds
 	Sci_Position matchCount;	// total match count
 	Sci_Position lastMatchPos;	// last matching position
@@ -233,7 +233,8 @@ NP2_inline void EditMarkAll_Clear(void) {
 }
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
-BOOL EditMarkAll(BOOL bChanged, BOOL bMarkOccurrencesMatchCase, BOOL bMarkOccurrencesMatchWords);
+BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord);
+void EditToggleBookmarkAt(Sci_Position iPos);
 void EditBookmarkSelectAll(void);
 
 // auto completion fill-up characters
