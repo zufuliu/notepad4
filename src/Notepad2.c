@@ -5009,10 +5009,10 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_CHARADDED: {
-			if (SciCall_IsMultipleSelection()) {
-				// not work for multiple selection.
-				return 0;
-			}
+			//if (SciCall_IsMultipleSelection()) {
+			//	// not work for multiple selection.
+			//	return 0;
+			//}
 			// tentative input characters already ignored in Editor::InsertCharacter()
 			const int ch = scn->ch;
 			if (ch < 0x80) {
