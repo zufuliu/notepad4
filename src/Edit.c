@@ -4997,7 +4997,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		const BOOL isReplace = GetDlgItem(hwnd, IDC_REPLACETEXT) != NULL;
 		ResizeDlg_Size(hwnd, lParam, &dx, NULL);
-		HDWP hdwp = BeginDeferWindowPos(isReplace ? 13 : 8);
+		HDWP hdwp = BeginDeferWindowPos(isReplace ? 13 : 9);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESIZEGRIP2, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDOK, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDTEXT, dx, 0, SWP_NOMOVE);
@@ -5006,11 +5006,11 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_SAVEPOSITION, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_RESETPOSITION, dx, 0, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_FINDALL, dx, 0, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
 		if (isReplace) {
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACETEXT, dx, 0, SWP_NOMOVE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_CLEAR_REPLACE, dx, 0, SWP_NOSIZE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACE, dx, 0, SWP_NOSIZE);
-			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEALL, dx, 0, SWP_NOSIZE);
 			hdwp = DeferCtlPos(hdwp, hwnd, IDC_REPLACEINSEL, dx, 0, SWP_NOSIZE);
 		}
 		EndDeferWindowPos(hdwp);
@@ -5203,12 +5203,16 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				break;
 
 			case IDC_FINDALL:
-				EditFindAll(lpefr);
+				EditFindAll(lpefr, FALSE);
 				break;
 
 			case IDC_REPLACEALL:
-				bReplaceInitialized = TRUE;
-				EditReplaceAll(lpefr->hwnd, lpefr, TRUE);
+				if (bIsFindDlg) {
+					EditFindAll(lpefr, TRUE);
+				} else {
+					bReplaceInitialized = TRUE;
+					EditReplaceAll(lpefr->hwnd, lpefr, TRUE);
+				}
 				break;
 
 			case IDC_REPLACEINSEL:
@@ -5670,8 +5674,25 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
 }
 
-static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, BOOL multiline) {
-	if (multiline) {
+static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, int findFlag, Sci_Position matchCount) {
+	if (findFlag & NP2_MarkAllSelectAll) {
+		UINT i = 0;
+		if (matchCount == 0) {
+			i = 2;
+			SciCall_SetSelection(ranges[0] + ranges[1], ranges[0]);
+		}
+		for (; i < index; i += 2) {
+			SciCall_AddSelection(ranges[i] + ranges[i + 1], ranges[i]);
+		}
+	} else {
+		for (UINT i = 0; i < index; i += 2) {
+			SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
+		}
+	}
+	if (!(findFlag & NP2_MarkAllBookmark)) {
+		return bookmarkLine;
+	}
+	if (findFlag & NP2_MarkAllMultiline) {
 		for (UINT i = 0; i < index; i += 2) {
 			Sci_Line line = SciCall_LineFromPosition(ranges[i]);
 			const Sci_Line lineEnd = SciCall_LineFromPosition(ranges[i + 1]);
@@ -5714,8 +5735,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 
 	// rewind start position
 	const int findFlag = status->findFlag;
-	const BOOL multiline = findFlag & NP2_MarkAllMultiline;
-	if (multiline) {
+	if (findFlag & NP2_MarkAllMultiline) {
 		iStartPos = max_pos(iStartPos - status->iSelCount + 1, status->lastMatchPos);
 	}
 
@@ -5747,12 +5767,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 			ranges[index - 1] += iSelCount;
 		} else {
 			if (index == COUNTOF(ranges)) {
-				for (UINT i = 0; i < index; i += 2) {
-					SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
-				}
-				if (findFlag & NP2_MarkAllBookmark) {
-					bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, multiline);
-				}
+				bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
 				index = 0;
 			}
 			ranges[index] = iPos;
@@ -5762,12 +5777,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		ttf.chrg.cpMin = ttf.chrgText.cpMax;
 	}
 	if (index) {
-		for (UINT i = 0; i < index; i += 2) {
-			SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
-		}
-		if (findFlag & NP2_MarkAllBookmark) {
-			bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, multiline);
-		}
+		bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
 	}
 
 	iStartPos = max_pos(iStartPos, ttf.chrg.cpMin);
@@ -5789,6 +5799,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	}
 
 	status->pending = pending;
+	status->ignoreSelectionUpdate = pending? (findFlag & NP2_MarkAllSelectAll) : FALSE;
 	status->lastMatchPos = ttf.chrg.cpMin;
 	status->iStartPos = iStartPos;
 	status->bookmarkLine = bookmarkLine;
@@ -5845,7 +5856,7 @@ BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark) {
 	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
-void EditFindAll(LPCEDITFINDREPLACE lpefr) {
+void EditFindAll(LPCEDITFINDREPLACE lpefr, BOOL selectAll) {
 	char *szFind2 = (char *)NP2HeapAlloc(NP2_FIND_REPLACE_LIMIT);
 	int searchFlags = EditPrepareFind(szFind2, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
@@ -5853,7 +5864,8 @@ void EditFindAll(LPCEDITFINDREPLACE lpefr) {
 		return;
 	}
 
-	searchFlags |= bFindReplaceFindAllBookmark * NP2_MarkAllBookmark;
+	searchFlags |= (bFindReplaceFindAllBookmark * NP2_MarkAllBookmark)
+		| (selectAll * NP2_MarkAllSelectAll);
 	// rewind start position when transform backslash is checked,
 	// all other searching doesn't across lines.
 	// NOTE: complex fix is needed when multiline regex is supported.

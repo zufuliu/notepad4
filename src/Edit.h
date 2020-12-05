@@ -28,6 +28,7 @@
 #define NP2_InvalidSearchFlags	(-1)
 #define NP2_MarkAllMultiline	0x00001000
 #define NP2_MarkAllBookmark		0x00002000
+#define NP2_MarkAllSelectAll	0x00004000
 
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];
@@ -168,7 +169,7 @@ void	EditSelectLines(BOOL currentBlock, BOOL lineSelection);
 HWND	EditFindReplaceDlg(HWND hwnd, LPEDITFINDREPLACE lpefr, BOOL bReplace);
 void	EditFindNext(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
 void	EditFindPrev(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection);
-void	EditFindAll(LPCEDITFINDREPLACE lpefr);
+void	EditFindAll(LPCEDITFINDREPLACE lpefr, BOOL selectAll);
 BOOL	EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr);
 BOOL	EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
 BOOL	EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo);
