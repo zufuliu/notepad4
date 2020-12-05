@@ -5799,7 +5799,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	}
 
 	status->pending = pending;
-	status->ignoreSelectionUpdate = pending? (findFlag & NP2_MarkAllSelectAll) : FALSE;
+	status->ignoreSelectionUpdate = matchCount ? (findFlag & NP2_MarkAllSelectAll) : FALSE;
 	status->lastMatchPos = ttf.chrg.cpMin;
 	status->iStartPos = iStartPos;
 	status->bookmarkLine = bookmarkLine;
