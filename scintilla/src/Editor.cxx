@@ -2053,7 +2053,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	}
 
 	// We don't handle inline IME tentative input characters
-	if (!handled && charSource != CharacterSource::tentativeInput) {
+	if (!handled && charSource != CharacterSource::tentativeInput && sel.Count() == 1) {
 		int ch = static_cast<unsigned char>(sv[0]);
 		if (pdoc->dbcsCodePage != SC_CP_UTF8) {
 			if (sv.length() > 1) {
