@@ -27,6 +27,7 @@
 
 #define NP2_InvalidSearchFlags	(-1)
 #define NP2_MarkAllMultiline	0x00001000
+#define NP2_MarkAllBookmark		0x00002000
 
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];
@@ -224,6 +225,7 @@ typedef struct EditMarkAllStatus {
 	Sci_Position matchCount;	// total match count
 	Sci_Position lastMatchPos;	// last matching position
 	Sci_Position iStartPos;		// previous stop position
+	Sci_Line bookmarkLine;		// previous bookmark line
 	StopWatch watch;			// used to dynamic compute increment size
 } EditMarkAllStatus;
 
@@ -233,7 +235,7 @@ NP2_inline void EditMarkAll_Clear(void) {
 }
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
-BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord);
+BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark);
 void EditToggleBookmarkAt(Sci_Position iPos);
 void EditBookmarkSelectAll(void);
 
