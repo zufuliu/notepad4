@@ -4765,6 +4765,7 @@ void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) {
 extern BOOL bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
 extern BOOL bFindReplaceUseMonospacedFont;
+extern BOOL bFindReplaceFindAllBookmark;
 
 static void FindReplaceSetFont(HWND hwnd, BOOL monospaced, HFONT *hFontFindReplaceEdit) {
 	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
@@ -4956,6 +4957,9 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		if (bFindReplaceTransparentMode) {
 			CheckDlgButton(hwnd, IDC_TRANSPARENT, BST_CHECKED);
 		}
+		if (bFindReplaceFindAllBookmark) {
+			CheckDlgButton(hwnd, IDC_FINDALLBOOKMARK, BST_CHECKED);
+		}
 		if (bFindReplaceUseMonospacedFont) {
 			CheckDlgButton(hwnd, IDC_USEMONOSPACEDFONT, BST_CHECKED);
 			FindReplaceSetFont(hwnd, TRUE, &hFontFindReplaceEdit);
@@ -5061,6 +5065,10 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 
 		case IDC_TRANSPARENT:
 			bFindReplaceTransparentMode = IsButtonChecked(hwnd, IDC_TRANSPARENT);
+			break;
+
+		case IDC_FINDALLBOOKMARK:
+			bFindReplaceFindAllBookmark = IsButtonChecked(hwnd, IDC_FINDALLBOOKMARK);
 			break;
 
 		case IDOK:
@@ -5621,6 +5629,9 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
+		if ((findFlag | editMarkAllStatus.findFlag) & NP2_MarkAllBookmark) {
+			SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
+		}
 	}
 	if (editMarkAllStatus.pszText) {
 		NP2HeapFree(editMarkAllStatus.pszText);
@@ -5636,6 +5647,7 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 	editMarkAllStatus.matchCount = 0;
 	editMarkAllStatus.lastMatchPos = 0;
 	editMarkAllStatus.iStartPos = 0;
+	editMarkAllStatus.bookmarkLine = -1;
 }
 
 BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText) {
@@ -5660,7 +5672,34 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 
 	//EditMarkAll_Runs = 0;
 	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
+	if (findFlag & NP2_MarkAllBookmark) {
+		Style_SetBookmark();
+	}
 	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+}
+
+static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, BOOL multiline) {
+	if (multiline) {
+		for (UINT i = 0; i < index; i += 2) {
+			Sci_Line line = SciCall_LineFromPosition(ranges[i]);
+			const Sci_Line lineEnd = SciCall_LineFromPosition(ranges[i + 1]);
+			line = max_pos(bookmarkLine + 1, line);
+			while (line <= lineEnd) {
+				SciCall_MarkerAdd(line, MarkerNumber_Bookmark);
+				++line;
+			}
+			bookmarkLine = lineEnd;
+		}
+	} else {
+		for (UINT i = 0; i < index; i += 2) {
+			const Sci_Line line = SciCall_LineFromPosition(ranges[i]);
+			if (line != bookmarkLine) {
+				SciCall_MarkerAdd(line, MarkerNumber_Bookmark);
+				bookmarkLine = line;
+			}
+		}
+	}
+	return bookmarkLine;
 }
 
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
@@ -5683,7 +5722,8 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 
 	// rewind start position
 	const int findFlag = status->findFlag;
-	if (findFlag & NP2_MarkAllMultiline) {
+	const BOOL multiline = findFlag & NP2_MarkAllMultiline;
+	if (multiline) {
 		iStartPos = max_pos(iStartPos - status->iSelCount + 1, status->lastMatchPos);
 	}
 
@@ -5692,6 +5732,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	Sci_Position matchCount = status->matchCount;
 	UINT index = 0;
 	Sci_Position ranges[256*2];
+	Sci_Line bookmarkLine = status->bookmarkLine;
 
 	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
 	while (ttf.chrg.cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
@@ -5717,6 +5758,9 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 				for (UINT i = 0; i < index; i += 2) {
 					SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
 				}
+				if (findFlag & NP2_MarkAllBookmark) {
+					bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, multiline);
+				}
 				index = 0;
 			}
 			ranges[index] = iPos;
@@ -5728,6 +5772,9 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	if (index) {
 		for (UINT i = 0; i < index; i += 2) {
 			SciCall_IndicatorFillRange(ranges[i], ranges[i + 1]);
+		}
+		if (findFlag & NP2_MarkAllBookmark) {
+			bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, multiline);
 		}
 	}
 
@@ -5752,6 +5799,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	status->pending = pending;
 	status->lastMatchPos = ttf.chrg.cpMin;
 	status->iStartPos = iStartPos;
+	status->bookmarkLine = bookmarkLine;
 	if (!pending || matchCount != status->matchCount) {
 		status->matchCount = matchCount;
 		UpdateStatusbar();
@@ -5760,7 +5808,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	return FALSE;
 }
 
-BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord) {
+BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark) {
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5800,7 +5848,8 @@ BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord) {
 	}
 
 	const int findFlag = (matchCase * SCFIND_MATCHCASE)
-		| (wholeWord * SCFIND_WHOLEWORD);
+		| (wholeWord * SCFIND_WHOLEWORD)
+		| (bookmark * NP2_MarkAllBookmark);
 	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
@@ -5812,6 +5861,7 @@ void EditFindAll(LPCEDITFINDREPLACE lpefr) {
 		return;
 	}
 
+	searchFlags |= bFindReplaceFindAllBookmark * NP2_MarkAllBookmark;
 	// rewind start position when transform backslash is checked,
 	// all other searching doesn't across lines.
 	// NOTE: complex fix is needed when multiline regex is supported.
@@ -5825,8 +5875,8 @@ void EditToggleBookmarkAt(Sci_Position iPos) {
 	if (iPos < 0) {
 		iPos = SciCall_GetCurrentPos();
 	}
-	const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
+	const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 	const Sci_MarkerMask bitmask = SciCall_MarkerGet(iLine);
 	if (bitmask & MarkerBitmask_Bookmark) {
 		SciCall_MarkerDelete(iLine, MarkerNumber_Bookmark);
