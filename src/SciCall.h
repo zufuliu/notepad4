@@ -438,6 +438,14 @@ NP2_inline void SciCall_SetVirtualSpaceOptions(int virtualSpaceOptions) {
 	SciCall(SCI_SETVIRTUALSPACEOPTIONS, virtualSpaceOptions, 0);
 }
 
+NP2_inline size_t SciCall_GetSelectionCount(void) {
+	return SciCall(SCI_GETSELECTIONS, 0, 0);
+}
+
+NP2_inline BOOL SciCall_IsMultipleSelection(void) {
+	return SciCall(SCI_GETSELECTIONS, 0, 0) > 1;
+}
+
 NP2_inline BOOL SciCall_IsSelectionEmpty(void) {
 	return (BOOL)SciCall(SCI_GETSELECTIONEMPTY, 0, 0);
 }
