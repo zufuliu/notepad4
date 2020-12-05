@@ -2681,20 +2681,6 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	UpdateWindowTitle();
 }
 
-void EditToggleBookmarkAt(Sci_Position iPos) {
-	const Sci_Line iLine = SciCall_LineFromPosition(iPos);
-
-	const Sci_MarkerMask bitmask = SciCall_MarkerGet(iLine);
-	if (bitmask & MarkerBitmask_Bookmark) {
-		// unset
-		SciCall_MarkerDelete(iLine, MarkerNumber_Bookmark);
-	} else {
-		Style_SetBookmark();
-		// set
-		SciCall_MarkerAdd(iLine, MarkerNumber_Bookmark);
-	}
-}
-
 static inline BOOL IsBraceMatchChar(int ch) {
 #if 0
 	return ch == '(' || ch == ')'
@@ -3829,7 +3815,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case BME_EDIT_BOOKMARKTOGGLE:
-		EditToggleBookmarkAt(SciCall_GetCurrentPos());
+		EditToggleBookmarkAt(-1);
 		break;
 
 	case BME_EDIT_BOOKMARKSELECT:
@@ -4086,24 +4072,24 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_MARKOCCURRENCES_OFF:
-		bMarkOccurrences = !bMarkOccurrences;
+	case IDM_VIEW_MARKOCCURRENCES_CASE:
+	case IDM_VIEW_MARKOCCURRENCES_WORD:
+		switch (LOWORD(wParam)) {
+		case IDM_VIEW_MARKOCCURRENCES_OFF:
+			bMarkOccurrences = !bMarkOccurrences;
+			break;
+		case IDM_VIEW_MARKOCCURRENCES_CASE:
+			bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
+			break;
+		case IDM_VIEW_MARKOCCURRENCES_WORD:
+			bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
+			break;
+		}
 		if (bMarkOccurrences) {
 			EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		} else {
 			EditMarkAll_Clear();
 		}
-		UpdateStatusbar();
-		break;
-
-	case IDM_VIEW_MARKOCCURRENCES_CASE:
-		bMarkOccurrencesMatchCase = !bMarkOccurrencesMatchCase;
-		EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
-		UpdateStatusbar();
-		break;
-
-	case IDM_VIEW_MARKOCCURRENCES_WORD:
-		bMarkOccurrencesMatchWords = !bMarkOccurrencesMatchWords;
-		EditMarkAll(FALSE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords);
 		UpdateStatusbar();
 		break;
 
@@ -4628,7 +4614,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_XSD:
 	case IDM_LEXER_XSLT:
 	case IDM_LEXER_DTD:
-
 	case IDM_LEXER_ANT_BUILD:
 	case IDM_LEXER_MAVEN_POM:
 	case IDM_LEXER_MAVEN_SETTINGS:
@@ -4636,7 +4621,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_IVY_SETTINGS:
 	case IDM_LEXER_PMD_RULESET:
 	case IDM_LEXER_CHECKSTYLE:
-
 	case IDM_LEXER_TOMCAT:
 	case IDM_LEXER_WEB_JAVA:
 	case IDM_LEXER_STRUTS:
@@ -4644,24 +4628,19 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_HIB_MAP:
 	case IDM_LEXER_SPRING_BEANS:
 	case IDM_LEXER_JBOSS:
-
 	case IDM_LEXER_WEB_NET:
 	case IDM_LEXER_RESX:
 	case IDM_LEXER_XAML:
-
 	case IDM_LEXER_PROPERTY_LIST:
 	case IDM_LEXER_ANDROID_MANIFEST:
 	case IDM_LEXER_ANDROID_LAYOUT:
 	case IDM_LEXER_SVG:
-
 	case IDM_LEXER_BASH:
 	case IDM_LEXER_CSHELL:
 	case IDM_LEXER_M4:
-
 	case IDM_LEXER_MATLAB:
 	case IDM_LEXER_OCTAVE:
 	case IDM_LEXER_SCILAB:
-
 	case IDM_LEXER_CSS:
 	case IDM_LEXER_SCSS:
 	case IDM_LEXER_LESS:
@@ -5348,6 +5327,8 @@ void LoadSettings(void) {
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", 0);
 	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", 0);
+	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", 1);
+	bFindReplaceUseMonospacedFont = IniSectionGetBool(pIniSection, L"FindReplaceUseMonospacedFont", 0);
 
 	efrData.bFindClose = IniSectionGetBool(pIniSection, L"CloseFind", 0);
 	efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"CloseReplace", 0);
@@ -5567,8 +5548,6 @@ void LoadSettings(void) {
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
-	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", 1);
-	bFindReplaceUseMonospacedFont = IniSectionGetBool(pIniSection, L"FindReplaceUseMonospacedFont", 0);
 	iValue = IniSectionGetInt(pIniSection, L"EndAtLastLine", 1);
 	iEndAtLastLine = clamp_i(iValue, 0, 4);
 	bEditLayoutRTL = IniSectionGetBool(pIniSection, L"EditLayoutRTL", 0);
@@ -5773,6 +5752,8 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"CloseFind", efrData.bFindClose, 0);
 	IniSectionSetBoolEx(pIniSection, L"CloseReplace", efrData.bReplaceClose, 0);
 	IniSectionSetBoolEx(pIniSection, L"NoFindWrap", efrData.bNoFindWrap, 0);
+	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, 1);
+	IniSectionSetBoolEx(pIniSection, L"FindReplaceUseMonospacedFont", bFindReplaceUseMonospacedFont, 0);
 	if (bSaveFindReplace) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), 0);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD), 0);
@@ -5865,8 +5846,6 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
-	IniSectionSetBoolEx(pIniSection, L"FindReplaceTransparentMode", bFindReplaceTransparentMode, 1);
-	IniSectionSetBoolEx(pIniSection, L"FindReplaceUseMonospacedFont", bFindReplaceUseMonospacedFont, 0);
 	IniSectionSetIntEx(pIniSection, L"EndAtLastLine", iEndAtLastLine, 1);
 	IniSectionSetBoolEx(pIniSection, L"EditLayoutRTL", bEditLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
