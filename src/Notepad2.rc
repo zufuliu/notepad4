@@ -1015,6 +1015,7 @@ BEGIN
     DEFPUSHBUTTON   "Find &Next",IDOK,223,7,60,14
     PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "&Find All",IDC_FINDALL,223,41,60,14
+    PUSHBUTTON      "&Select All",IDC_REPLACEALL,223,58,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
