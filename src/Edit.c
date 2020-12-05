@@ -5231,15 +5231,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			PostWMCommand(hwndMain, IDM_EDIT_REPLACE);
 			break;
 
-		case IDACC_SAVEPOS:
-			GetDlgPos(hwnd, &xFindReplaceDlg, &yFindReplaceDlg);
-			break;
-
-		case IDACC_RESETPOS:
-			CenterDlgInParent(hwnd);
-			xFindReplaceDlg = yFindReplaceDlg = 0;
-			break;
-
 		case IDACC_FINDNEXT:
 			PostWMCommand(hwnd, IDOK);
 			break;
@@ -5335,11 +5326,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			break;
 
 			case IDC_SAVEPOSITION:
-				PostWMCommand(hwnd, IDACC_SAVEPOS);
+				GetDlgPos(hwnd, &xFindReplaceDlg, &yFindReplaceDlg);
 				break;
 
 			case IDC_RESETPOSITION:
-				PostWMCommand(hwnd, IDACC_RESETPOS);
+				CenterDlgInParent(hwnd);
+				xFindReplaceDlg = yFindReplaceDlg = 0;
 				break;
 			}
 			break;
