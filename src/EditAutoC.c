@@ -2050,6 +2050,7 @@ void EditToggleCommentLine(void) {
 		EditToggleLineComments(L"//", FALSE);
 		break;
 
+	case SCLEX_AVS:
 	case SCLEX_CMAKE:
 	case SCLEX_CONF:
 	case SCLEX_GN:
@@ -2173,6 +2174,7 @@ void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 void EditToggleCommentBlock(void) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_ASM:
+	case SCLEX_AVS:
 	case SCLEX_CIL:
 	case SCLEX_CSS:
 	case SCLEX_GO:

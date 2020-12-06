@@ -156,6 +156,60 @@ def to_upper_conditional(items):
 	return result
 
 
+def parse_avisynth_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			items = doc.split()
+			items.extend([item.lower() for item in items])
+			keywordMap[key] = items
+		elif key == 'functions':
+			items = re.findall(r'^(\w+\s+)?(\w+\()', doc, re.MULTILINE)
+			functions = [item[1] for item in items if 'global' not in item[0]]
+			keywordMap['functions'] = functions
+			items = re.findall(r'^global\s+(\w+\(?)', doc, re.MULTILINE)
+			keywordMap['options'] = items
+		elif key == 'properties':
+			items = re.findall(r'clip.(\w+\(?)', doc)
+			properties = []
+			functions = []
+			for item in items:
+				if item[-1] == '(':
+					functions.append(item)
+				else:
+					properties.append(item)
+			items = re.findall(r'^\w+\s+(\w+\(?)', doc, re.MULTILINE)
+			for item in items:
+				if item != 'clip':
+					if item[-1] == '(':
+						functions.append(item)
+					else:
+						properties.append(item)
+			keywordMap[key] = properties
+			keywordMap['functions'].extend(functions)
+		elif key in ('filters', 'plugins'):
+			items = re.findall(r'^(\w+\()', doc, re.MULTILINE)
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'functions',
+		'filters',
+		'plugins',
+		'properties',
+		'options',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('internal functions', keywordMap['functions'], KeywordAttr.MakeLower),
+		('internal filters', keywordMap['filters'], KeywordAttr.MakeLower),
+		('external filters', keywordMap['plugins'], KeywordAttr.MakeLower),
+		('properties', keywordMap['properties'], KeywordAttr.MakeLower),
+		('options', keywordMap['options'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
 	cmakeLang = "ASM C CSharp CUDA CXX Fortran Java RC Swift".split()
