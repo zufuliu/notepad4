@@ -179,6 +179,10 @@ Asymptote Code
 AutoIt3 Script
 	au3
 
+AviSynth Script
+	avs
+	avsi
+
 Awk Script
 	awk
 
@@ -405,8 +409,8 @@ PowerShell Script
 
 
 R Code
-	*.R
-	*.rsource
+	R
+	rsource
 
 	.Rprofile
 	.Rhistory

@@ -230,6 +230,8 @@
 #define NP2STYLE_FPUInstruction			63652
 #define NP2STYLE_ExtendedInstruction	63653
 #define NP2STYLE_DirectiveOperand		63654
+#define NP2STYLE_InternalFilter			63655
+#define NP2STYLE_ExternalFilter			63656
 
 #define NP2STYLE_MagicMethod			63661
 #define NP2STYLE_MagicConstant			63662

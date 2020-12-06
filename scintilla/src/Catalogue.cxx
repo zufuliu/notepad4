@@ -66,7 +66,7 @@ void Scintilla_LinkLexers() {
 	//extern LexerModule lmASY;
 	extern LexerModule lmAU3;
 	//extern LexerModule lmAVE;
-	//extern LexerModule lmAVS;
+	extern LexerModule lmAVS;
 	//extern LexerModule lmBaan;
 	extern LexerModule lmBash;
 	extern LexerModule lmBatch;
@@ -212,7 +212,7 @@ void Scintilla_LinkLexers() {
 		//&lmASY,
 		&lmAU3,
 		//&lmAVE,
-		//&lmAVS,
+		&lmAVS,
 		//&lmBaan,
 		&lmBash,
 		&lmBatch,

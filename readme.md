@@ -37,6 +37,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* NASM
 	* Asymptote Vector Graphics Language
 	* AutoIt Script
+	* [AviSynth Script](../master/tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1
 	* AWK, GNU AWK
 	* Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
 	* C#, Vala, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
