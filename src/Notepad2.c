@@ -7436,9 +7436,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 #endif
 			if (bRestoreView) {
 				SciCall_SetSel(iAnchorPos, iCurPos);
-				Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
-				iCurLine = (iCurLine < 0) ? -iCurLine : iCurLine;
-				if (iCurLine > 5) {
+				const Sci_Line iCurLine = iLine - SciCall_LineFromPosition(SciCall_GetCurrentPos());
+				if (abs_pos(iCurLine) > 5) {
 					EditJumpTo(iLine, iCol);
 				} else {
 					SciCall_EnsureVisible(iDocTopLine);

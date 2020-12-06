@@ -5667,7 +5667,6 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 	}
 
 	//EditMarkAll_Runs = 0;
-	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 	if (findFlag & NP2_MarkAllBookmark) {
 		Style_SetBookmark();
 	}
@@ -5746,6 +5745,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	Sci_Position ranges[256*2];
 	Sci_Line bookmarkLine = status->bookmarkLine;
 
+	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
 	while (ttf.chrg.cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);

@@ -1,6 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for AviSynth, AviSynth+.
+//! Lexer for AviSynth, AviSynth+, GScript.
 
 #include <cassert>
 #include <cstring>
