@@ -5618,6 +5618,7 @@ extern HANDLE idleTaskTimer;
 // increment search size will return to normal after several runs
 // when selection no longer changed, this make continuous selecting smooth.
 #define EditMarkAll_DefaultDuration		64
+#define EditMarkAll_RangeCacheCount		256
 //static UINT EditMarkAll_Runs;
 
 void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
@@ -5676,7 +5677,7 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, int findFlag, Sci_Position matchCount) {
 	if (findFlag & NP2_MarkAllSelectAll) {
 		UINT i = 0;
-		if (matchCount == 0) {
+		if (matchCount <= EditMarkAll_RangeCacheCount) {
 			i = 2;
 			SciCall_SetSelection(ranges[0] + ranges[1], ranges[0]);
 		}
@@ -5738,16 +5739,18 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		iStartPos = max_pos(iStartPos - status->iSelCount + 1, status->lastMatchPos);
 	}
 
-	struct Sci_TextToFind ttf = { { iStartPos, iMaxLength }, status->pszText, { 0, 0 } };
+	Sci_Position cpMin = iStartPos;
+	struct Sci_TextToFind ttf = { { cpMin, iMaxLength }, status->pszText, { 0, 0 } };
 
 	Sci_Position matchCount = status->matchCount;
 	UINT index = 0;
-	Sci_Position ranges[256*2];
+	Sci_Position ranges[EditMarkAll_RangeCacheCount*2];
 	Sci_Line bookmarkLine = status->bookmarkLine;
 
 	SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 	WaitableTimer_Set(timer, WaitableTimer_IdleTaskTimeSlot);
-	while (ttf.chrg.cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
+	while (cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
+		ttf.chrg.cpMin = cpMin;
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
 		if (iPos == -1) {
 			iStartPos = iMaxLength;
@@ -5758,29 +5761,30 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		const Sci_Position iSelCount = ttf.chrgText.cpMax - iPos;
 		if (iSelCount == 0) {
 			// empty regex
-			ttf.chrg.cpMin = SciCall_PositionAfter(iPos);
+			cpMin = SciCall_PositionAfter(iPos);
 			continue;
 		}
 
-		if (index != 0 && iPos == ttf.chrg.cpMin) {
+		if (index != 0 && iPos == cpMin) {
 			// merge adjacent indicator ranges
+			// TODO: don't merge when NP2_MarkAllSelectAll is set.
 			ranges[index - 1] += iSelCount;
 		} else {
+			ranges[index] = iPos;
+			ranges[index + 1] = iSelCount;
+			index += 2;
 			if (index == COUNTOF(ranges)) {
 				bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
 				index = 0;
 			}
-			ranges[index] = iPos;
-			ranges[index + 1] = iSelCount;
-			index += 2;
 		}
-		ttf.chrg.cpMin = ttf.chrgText.cpMax;
+		cpMin = ttf.chrgText.cpMax;
 	}
 	if (index) {
 		bookmarkLine = EditMarkAll_Bookmark(bookmarkLine, ranges, index, findFlag, matchCount);
 	}
 
-	iStartPos = max_pos(iStartPos, ttf.chrg.cpMin);
+	iStartPos = max_pos(iStartPos, cpMin);
 	const BOOL pending = iStartPos < iLength;
 	if (pending) {
 		// dynamic compute increment search size, see ActionDuration in Scintilla.
@@ -5800,7 +5804,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 
 	status->pending = pending;
 	status->ignoreSelectionUpdate = matchCount ? (findFlag & NP2_MarkAllSelectAll) : FALSE;
-	status->lastMatchPos = ttf.chrg.cpMin;
+	status->lastMatchPos = cpMin;
 	status->iStartPos = iStartPos;
 	status->bookmarkLine = bookmarkLine;
 	if (!pending || matchCount != status->matchCount) {
