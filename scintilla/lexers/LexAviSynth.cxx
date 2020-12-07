@@ -82,7 +82,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					int state = SCE_AVS_USERDFN;
 					if (keywordLists[1]->InListPrefixed(s, '(')) {
 						state = SCE_AVS_FUNCTION;
-						if (!insideScript && (strcmp(s, "eval") == 0 || strcmp(s, "gscript") == 0 || strcmp(s, "gscriptEval") == 0)) {
+						if (!insideScript && (strcmp(s, "eval") == 0 || strcmp(s, "gscript") == 0 || strcmp(s, "geval") == 0)) {
 							scriptEval = ScriptEvalState_Name;
 						}
 					} else if (keywordLists[2]->InListPrefixed(s, '(')) {

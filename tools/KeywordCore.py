@@ -171,7 +171,7 @@ def parse_avisynth_api_file(path):
 			items = re.findall(r'^global\s+(\w+\(?)', doc, re.MULTILINE)
 			keywordMap['options'] = items
 		elif key == 'properties':
-			items = re.findall(r'clip.(\w+\(?)', doc)
+			items = re.findall(r'clip\.(\w+\(?)', doc)
 			properties = []
 			functions = []
 			for item in items:
