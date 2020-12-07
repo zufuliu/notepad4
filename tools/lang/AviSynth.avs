@@ -2,13 +2,14 @@
 # 3.6.1 https://github.com/AviSynth/AviSynthPlus
 # http://avisynth.nl/index.php/AviSynth_Syntax
 # http://avisynth.nl/index.php/The_full_AviSynth_grammar
+# https://github.com/nekopanda/AviSynthPlus/wiki/Language-New-Features
 
 #! keywords				=======================================================
 # http://avisynth.nl/index.php/The_full_AviSynth_grammar#Keywords
 __END__
 function global return try catch
 last true false yes no
-clip int float string bool val
+clip int float string bool val func
 # 1.1 http://avisynth.nl/index.php/GScript
 if else while for
 
