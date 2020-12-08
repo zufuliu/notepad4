@@ -127,20 +127,8 @@ extern EDITLEXER lexWASM;
 
 extern EDITLEXER lexYAML;
 
-// the two global styles at the beginning of the array not visible in
-// "Select Scheme" list, don't participate in file extension match.
-#define LEXER_INDEX_MATCH		2	// global styles
-#define ALL_LEXER_COUNT			(NUMLEXERS + LEXER_INDEX_MATCH)
-// the lexer array has three sections:
-// 1. global styles and lexers for text file, not sortable, the order is hard-coded.
-// 2. favorite lexers, sortable, the order is configured by FavoriteSchemes preference.
-// 3. other lexers, grouped by first letter, sorted alphabetical (case insensitive).
-#define LEXER_INDEX_GENERAL		(LEXER_INDEX_MATCH + 2)	// global styles and lexers for text file
-#define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_GENERAL)
-#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	128	// 1 + MAX_FAVORITE_SCHEMES_COUNT*(3 + 1)
-#define MAX_FAVORITE_SCHEMES_SAFE_SIZE		(MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 5) // three digits, one space and NULL
 // This array holds all the lexers...
-static PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
+static PEDITLEXER pLexArray[] = {
 	&lexGlobal,
 	&lex2ndGlobal,
 
@@ -234,6 +222,20 @@ static PEDITLEXER pLexArray[ALL_LEXER_COUNT] = {
 	&lexYAML,
 };
 
+// the two global styles at the beginning of the array not visible in
+// "Select Scheme" list, don't participate in file extension match.
+#define LEXER_INDEX_MATCH		2	// global styles
+#define ALL_LEXER_COUNT			COUNTOF(pLexArray)
+#define MATCH_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_MATCH)
+// the lexer array has three sections:
+// 1. global styles and lexers for text file, not sortable, the order is hard-coded.
+// 2. favorite lexers, sortable, the order is configured by FavoriteSchemes preference.
+// 3. other lexers, grouped by first letter, sorted alphabetical (case insensitive).
+#define LEXER_INDEX_GENERAL		(LEXER_INDEX_MATCH + 2)	// global styles and lexers for text file
+#define GENERAL_LEXER_COUNT		(ALL_LEXER_COUNT - LEXER_INDEX_GENERAL)
+#define MAX_FAVORITE_SCHEMES_CONFIG_SIZE	128	// 1 + MAX_FAVORITE_SCHEMES_COUNT*(3 + 1)
+#define MAX_FAVORITE_SCHEMES_SAFE_SIZE		(MAX_FAVORITE_SCHEMES_CONFIG_SIZE - 5) // three digits, one space and NULL
+
 // system available default monospaced font and proportional font
 static WCHAR systemCodeFontName[LF_FACESIZE];
 static WCHAR systemTextFontName[LF_FACESIZE];
@@ -307,7 +309,7 @@ int		cyStyleSelectDlg;
 int		cxStyleCustomizeDlg;
 int		cyStyleCustomizeDlg;
 
-#define ALL_FILE_EXTENSIONS_BYTE_SIZE	((NUMLEXERS * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
+#define ALL_FILE_EXTENSIONS_BYTE_SIZE	((MATCH_LEXER_COUNT * MAX_EDITLEXER_EXT_SIZE) * sizeof(WCHAR))
 static LPWSTR g_AllFileExtensions = NULL;
 
 // Notepad2.c
@@ -737,7 +739,7 @@ void Style_Load(void) {
 	// file extensions
 	LoadIniSection(INI_SECTION_NAME_FILE_EXTENSIONS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
-	for (UINT iLexer = 0; iLexer < NUMLEXERS; iLexer++) {
+	for (UINT iLexer = 0; iLexer < MATCH_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer + LEXER_INDEX_MATCH];
 		pLex->szExtensions = g_AllFileExtensions + (iLexer * MAX_EDITLEXER_EXT_SIZE);
 		LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->pszName, pLex->iNameLen);
@@ -2984,7 +2986,7 @@ void Style_SetLexerFromID(int rid) {
 }
 
 int Style_GetMatchLexerIndex(int rid) {
-	for (int iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
+	for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		if (pLexArray[iLexer]->rid == rid) {
 			return iLexer;
 		}
@@ -4010,7 +4012,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	groupList[1].count = 0;
 
 	// favorite schemes
-	int iLexer = LEXER_INDEX_GENERAL;
+	UINT iLexer = LEXER_INDEX_GENERAL;
 	while (iLexer < ALL_LEXER_COUNT && pLexArray[iLexer]->iFavoriteOrder) {
 		++iLexer;
 		++groupList[1].count;
