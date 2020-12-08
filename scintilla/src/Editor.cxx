@@ -1935,14 +1935,6 @@ static constexpr char EncloseSelectionCharacter(char ch) noexcept {
 	case '\"':
 	case '\'':
 	case '`':
-	// see https://github.com/zufuliu/notepad2/issues/255
-	case '*':	// Markdown Italic, reStructuredText Italic, AsciiDoc Bold, QuickBook Bold
-	case '/':	// JavaScript Regex, QuickBook Italic
-	case ':':	// Markdown Emoji, reStructuredText Field List, AsciiDoc Attribute
-	case '_':	// Markdown Italic, AsciiDoc Italic, QuickBook Underline
-	case '|':	// reStructuredText Substitution
-	case '~':	// Markdown Strikethrough
-	case '=':	// QuickBook Teletype
 		return ch;
 	default:
 		return '\0';
