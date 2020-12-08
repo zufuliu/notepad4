@@ -5635,12 +5635,13 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 	}
 
 	editMarkAllStatus.pending = FALSE;
+	editMarkAllStatus.ignoreSelectionUpdate = FALSE;
 	editMarkAllStatus.findFlag = findFlag;
-	editMarkAllStatus.iSelCount= iSelCount;
-	// timing for increment search is only useful for current search.
 	editMarkAllStatus.incrementSize = 1;
-	editMarkAllStatus.duration = EditMarkAll_DefaultDuration;
+	editMarkAllStatus.iSelCount= iSelCount;
 	editMarkAllStatus.pszText = pszText;
+	// timing for increment search is only useful for current search.
+	editMarkAllStatus.duration = EditMarkAll_DefaultDuration;
 	editMarkAllStatus.matchCount = 0;
 	editMarkAllStatus.lastMatchPos = 0;
 	editMarkAllStatus.iStartPos = 0;
@@ -5677,7 +5678,7 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, int findFlag, Sci_Position matchCount) {
 	if (findFlag & NP2_MarkAllSelectAll) {
 		UINT i = 0;
-		if (matchCount <= EditMarkAll_RangeCacheCount) {
+		if (matchCount == (Sci_Position)(index/2)) {
 			i = 2;
 			SciCall_SetSelection(ranges[0] + ranges[1], ranges[0]);
 		}
@@ -5752,7 +5753,7 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	while (cpMin < iMaxLength && WaitableTimer_Continue(timer)) {
 		ttf.chrg.cpMin = cpMin;
 		const Sci_Position iPos = SciCall_FindText(findFlag, &ttf);
-		if (iPos == -1) {
+		if (iPos < 0) {
 			iStartPos = iMaxLength;
 			break;
 		}
@@ -5765,9 +5766,8 @@ BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 			continue;
 		}
 
-		if (index != 0 && iPos == cpMin) {
+		if (index != 0 && iPos == cpMin && (findFlag & NP2_MarkAllSelectAll) == 0) {
 			// merge adjacent indicator ranges
-			// TODO: don't merge when NP2_MarkAllSelectAll is set.
 			ranges[index - 1] += iSelCount;
 		} else {
 			ranges[index] = iPos;
