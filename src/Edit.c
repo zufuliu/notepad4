@@ -5696,7 +5696,7 @@ static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *
 	if (findFlag & NP2_MarkAllMultiline) {
 		for (UINT i = 0; i < index; i += 2) {
 			Sci_Line line = SciCall_LineFromPosition(ranges[i]);
-			const Sci_Line lineEnd = SciCall_LineFromPosition(ranges[i + 1]);
+			const Sci_Line lineEnd = SciCall_LineFromPosition(ranges[i] + ranges[i + 1]);
 			line = max_pos(bookmarkLine + 1, line);
 			while (line <= lineEnd) {
 				SciCall_MarkerAdd(line, MarkerNumber_Bookmark);
