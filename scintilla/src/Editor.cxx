@@ -1930,8 +1930,8 @@ static constexpr char EncloseSelectionCharacter(char ch) noexcept {
 		return ']';
 	case '{':
 		return '}';
-	case '<':
-		return '>';
+	//case '<':
+	//	return '>';
 	case '\"':
 	case '\'':
 	case '`':
