@@ -502,7 +502,7 @@ static inline void FindSystemDefaultCodeFont(void) {
 		//L"Inconsolata",		// alternative to Consolas
 	};
 
-	for (UINT i = 0; i < (UINT)COUNTOF(commonCodeFontName); i++) {
+	for (UINT i = 0; i < COUNTOF(commonCodeFontName); i++) {
 		LPCWSTR fontName = commonCodeFontName[i];
 		if (IsFontAvailable(fontName)) {
 			lstrcpy(systemCodeFontName, fontName);
@@ -1478,9 +1478,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		// Add keyword lists
 		for (int i = 0; i < KEYWORDSET_MAX; i++) {
 			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-			const uint8_t attr = currentLexKeywordAttr[i];
-			if (StrNotEmptyA(pKeywords) && !(attr & KeywordAttr_NoLexer)) {
-				SciCall_SetKeywords(i | (attr & KeywordAttr_MakeLower), pKeywords);
+			if (StrNotEmptyA(pKeywords)) {
+				const uint8_t attr = currentLexKeywordAttr[i];
+				if (!(attr & KeywordAttr_NoLexer)) {
+					SciCall_SetKeywords(i | (attr & KeywordAttr_MakeLower), pKeywords);
+				}
 			}
 		}
 
@@ -1630,16 +1632,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	// set folding style; braces are for scoping only
 	{
-		static const int iMarkerIDs[] = {
-			SC_MARKNUM_FOLDEROPEN,
-			SC_MARKNUM_FOLDER,
-			SC_MARKNUM_FOLDERSUB,
-			SC_MARKNUM_FOLDERTAIL,
-			SC_MARKNUM_FOLDEREND,
-			SC_MARKNUM_FOLDEROPENMID,
-			SC_MARKNUM_FOLDERMIDTAIL
-		};
-
 		COLORREF foreColor;
 		COLORREF fillColor;
 		COLORREF highlightColor;
@@ -1679,12 +1671,20 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		}
 #endif
 
-		for (UINT i = 0; i < (UINT)COUNTOF(iMarkerIDs); ++i) {
-			const int marker = iMarkerIDs[i];
+		uint64_t iMarkerIDs = SC_MARKNUM_FOLDEROPEN
+			| ((uint64_t)SC_MARKNUM_FOLDER << 8)
+			| ((uint64_t)SC_MARKNUM_FOLDERSUB << 16)
+			| ((uint64_t)SC_MARKNUM_FOLDERTAIL << 24)
+			| ((uint64_t)SC_MARKNUM_FOLDEREND << 32)
+			| ((uint64_t)SC_MARKNUM_FOLDEROPENMID << 40)
+			| ((uint64_t)SC_MARKNUM_FOLDERMIDTAIL << 48);
+		do {
+			const int marker = (int)(iMarkerIDs & 0xff);
 			SciCall_MarkerSetBack(marker, foreColor);
 			SciCall_MarkerSetFore(marker, backColor);
 			SciCall_MarkerSetBackSelected(marker, highlightColor);
-		}
+			iMarkerIDs >>= 8;
+		} while (iMarkerIDs);
 
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, fillColor);
 		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, fillColor);
@@ -1746,19 +1746,18 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			szValue = Style_FindStyleValue(pLexNew, SCE_PL_SCALAR);
 			if (szValue != NULL) {
 				Style_Parse(&style, szValue);
-				const int scalar[] = {
-					SCE_PL_REGEX_VAR,
-					SCE_PL_REGSUBST_VAR,
-					SCE_PL_BACKTICKS_VAR,
-					SCE_PL_HERE_QQ_VAR,
-					SCE_PL_HERE_QX_VAR,
-					SCE_PL_STRING_QQ_VAR,
-					SCE_PL_STRING_QX_VAR,
-					SCE_PL_STRING_QR_VAR,
-				};
-				for (UINT i = 0; i < COUNTOF(scalar); i++) {
-					Style_SetParsed(&style, scalar[i]);
-				}
+				uint64_t scalar = SCE_PL_REGEX_VAR
+					| ((uint64_t)SCE_PL_REGSUBST_VAR << 8)
+					| ((uint64_t)SCE_PL_BACKTICKS_VAR << 16)
+					| ((uint64_t)SCE_PL_HERE_QQ_VAR << 24)
+					| ((uint64_t)SCE_PL_HERE_QX_VAR << 32)
+					| ((uint64_t)SCE_PL_STRING_QQ_VAR << 40)
+					| ((uint64_t)SCE_PL_STRING_QX_VAR << 48)
+					| ((uint64_t)SCE_PL_STRING_QR_VAR << 56);
+				do {
+					Style_SetParsed(&style, (int)(scalar & 0xff));
+					scalar >>= 8;
+				} while (scalar);
 			}
 		}
 	} else {

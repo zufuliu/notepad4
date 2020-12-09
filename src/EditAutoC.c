@@ -1075,7 +1075,7 @@ void EditCompleteUpdateConfig(void) {
 
 	const BOOL punctuation = mask & AutoCompleteFillUpPunctuation;
 	int k = 0;
-	for (UINT j = 0; j < (UINT)COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
+	for (UINT j = 0; j < COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
 		const WCHAR c = autoCompletionConfig.wszAutoCompleteFillUp[j];
 		if (c == L'\0') {
 			break;
