@@ -667,12 +667,12 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 
-	static const int q_states[] = { SCE_RB_STRING_Q,
-							 SCE_RB_STRING_QQ,
-							 SCE_RB_STRING_QR,
-							 SCE_RB_STRING_QW,
-							 SCE_RB_STRING_QW,
-							 SCE_RB_STRING_QX };
+	constexpr uint64_t q_states = SCE_RB_STRING_Q
+							 | ((uint64_t)SCE_RB_STRING_QQ << 8)
+							 | ((uint64_t)SCE_RB_STRING_QR << 16)
+							 | ((uint64_t)SCE_RB_STRING_QW << 24)
+							 | ((uint64_t)SCE_RB_STRING_QW << 32)
+							 | ((uint64_t)SCE_RB_STRING_QX << 48);
 	static const char* q_chars = "qQrwWx";
 
 	// In most cases a value of 2 should be ample for the code in the
@@ -955,7 +955,7 @@ static void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int init
 					Quote.New();
 					const char *hit = strchr(q_chars, chNext);
 					if (hit != nullptr) {
-						state = q_states[hit - q_chars];
+						state = (int)((q_states >> ((hit - q_chars)*8)) & 0xff);
 						Quote.Open(chNext2);
 						i += 2;
 						ch = chNext2;

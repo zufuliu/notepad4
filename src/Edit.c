@@ -6806,7 +6806,7 @@ void EditInsertUnicodeControlCharacter(int menu) {
 }
 
 void EditShowUnicodeControlCharacter(BOOL bShow) {
-	for (UINT i = 0; i < (UINT)COUNTOF(kUnicodeControlCharacterTable); i++) {
+	for (UINT i = 0; i < COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
 		if (StrIsEmptyA(ucc.representation)) {
 			// built-in
@@ -6952,7 +6952,7 @@ BOOL EditSortDlg(HWND hwnd, int *piSortFlags) {
 }
 
 void EditSelectionAction(int action) {
-	static const LPCWSTR kActionKeys[] = {
+	const LPCWSTR kActionKeys[] = {
 		L"GoogleSearchUrl",
 		L"BingSearchUrl",
 		L"WikiSearchUrl",
