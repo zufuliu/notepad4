@@ -1459,7 +1459,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SciCall_SetProperty("fold.html", "1");
 			SciCall_SetProperty("fold.hypertext.comment", "1");
 			SciCall_SetProperty("fold.hypertext.heredoc", "1");
-			SciCall_SetProperty("lexer.lang.type", ((np2LexLangIndex == IDM_LEXER_PHP)? "1" : "0"));
 			break;
 
 		case NP2LEX_CSS:
