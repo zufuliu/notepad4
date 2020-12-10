@@ -1374,11 +1374,11 @@ void Style_InitDefaultColor(void) {
 	}
 }
 
-LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, int style) {
+LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, UINT style) {
 	const UINT iStyleCount = pLex->iStyleCount;
 	// first style is the default style.
 	for (UINT i = 1; i < iStyleCount; i++) {
-		int iStyle = pLex->Styles[i].iStyle;
+		UINT iStyle = pLex->Styles[i].iStyle;
 		LPCWSTR szValue = pLex->Styles[i].szValue;
 		do {
 			if ((iStyle & 0xFF) == style) {
@@ -1729,7 +1729,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		const UINT iStyleCount = pLexNew->iStyleCount;
 		// first style is the default style.
 		for (UINT i = 1; i < iStyleCount; i++) {
-			int iStyle = pLexNew->Styles[i].iStyle;
+			UINT iStyle = pLexNew->Styles[i].iStyle;
 			szValue = pLexNew->Styles[i].szValue;
 			if (iStyle > 0xFF) {
 				Style_Parse(&style, szValue);
