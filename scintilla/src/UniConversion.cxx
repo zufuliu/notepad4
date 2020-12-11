@@ -11,6 +11,8 @@
 #include <string>
 #include <string_view>
 
+#include "VectorISA.h"
+
 #include "UniConversion.h"
 
 using namespace Scintilla;
@@ -313,6 +315,8 @@ bit 4-7: interval number:
             table[ch] >> 4
 */
 
+namespace {
+
 enum {
 	UTF8_3ByteMask1  = (1 << 5)  | (1 << 3) | (1 << (3 + 1)),
 	UTF8_3ByteMask2  = (1 << 6)  /* tail */ | (1 << (3 + 1)),
@@ -325,7 +329,29 @@ enum {
 	UTF8_4ByteMask3  = (1 << 10) | (1 << 1) | (1 << (3 + 1)) | (1 << (3 + 2)),
 };
 
-#define mask_match(mask, test)	(((mask) & (test)) == (test))
+#if NP2_USE_SSE2
+template <int m1, int m2, int m3, int m4>
+inline bool mask_match(uint32_t mask) noexcept {
+	const __m128i y = _mm_set_epi32(m1, m2, m3, m4);
+	__m128i x = _mm_set1_epi32(mask);
+	mask = _mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(x, y), y));
+	return mask != 0;
+}
+#else
+constexpr bool mask_match(uint32_t mask, uint32_t test) noexcept {
+	return (mask & test) == test;
+}
+
+template <int m1, int m2, int m3, int m4>
+constexpr bool mask_match(uint32_t mask) noexcept {
+	return mask_match(mask, m1)
+		|| mask_match(mask, m2)
+		|| mask_match(mask, m3)
+		|| mask_match(mask, m4);
+}
+#endif
+
+}
 
 const unsigned char UTF8ClassifyTable[256] = {
 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 00 - 0F
@@ -375,8 +401,7 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 		mask = 1 << (mask >> 4);
 		mask |= 1 << (second >> 4);
 		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 1;
-		if (mask_match(mask, UTF8_3ByteMask1) || mask_match(mask, UTF8_3ByteMask2)
-			|| mask_match(mask, UTF8_3ByteMask31) || mask_match(mask, UTF8_3ByteMask32)) {
+		if (mask_match<UTF8_3ByteMask1, UTF8_3ByteMask2, UTF8_3ByteMask31, UTF8_3ByteMask32>(mask)) {
 			const unsigned int codePoint = ((us[0] & 0xF) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
 			if (codePoint == 0xFFFE || codePoint == 0xFFFF || (codePoint >= 0xFDD0 && codePoint <= 0xFDEF)) {
 				// U+FFFE or U+FFFF, FDD0 .. FDEF non-character
@@ -391,8 +416,7 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 		mask |= 1 << (second >> 4);
 		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 1;
 		mask |= (UTF8ClassifyTable[us[3]] & UTF8ClassifyMaskTrailByte) << 2;
-		if (mask_match(mask, UTF8_4ByteMask11) || mask_match(mask, UTF8_4ByteMask12)
-			|| mask_match(mask, UTF8_4ByteMask2) || mask_match(mask, UTF8_4ByteMask3)) {
+		if (mask_match<UTF8_4ByteMask11, UTF8_4ByteMask12, UTF8_4ByteMask2, UTF8_4ByteMask3>(mask)) {
 			unsigned int codePoint = ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
 			codePoint &= 0xFFFF;
 			if (codePoint == 0xFFFE || codePoint == 0xFFFF) {
