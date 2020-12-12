@@ -1999,7 +1999,7 @@ BOOL WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
 void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	WCHAR tch[16];
 	int selIndex = -1;
-	const int levelList[] = {
+	const short levelList[] = {
 		500, 450, 400, 350, 300, 250,
 		200, 175, 150, 125, 100, 75, 50, 25,
 	};
