@@ -11,8 +11,6 @@
 #include <string>
 #include <string_view>
 
-#include "VectorISA.h"
-
 #include "UniConversion.h"
 
 using namespace Scintilla;
@@ -313,51 +311,16 @@ bit 3:   tail byte:
             table[ch] & 8
 bit 4-7: interval number:
             table[ch] >> 4
+combined intervals for second and first UTF8-3 / UTF8-4 bytes:
+bit 6:   UTF8-3: 0x35; 0x16, 0x26, 0x36; 0x17, 0x27
+bit 7:   UTF8-4: 0x28, 0x38; 0x19, 0x29, 0x39; 0x1a
 */
-
-namespace {
-
-enum {
-	UTF8_3ByteMask1  = (1 << 5)  | (1 << 3) | (1 << (3 + 1)),
-	UTF8_3ByteMask2  = (1 << 6)  /* tail */ | (1 << (3 + 1)),
-	UTF8_3ByteMask31 = (1 << 7)  | (1 << 1) | (1 << (3 + 1)),
-	UTF8_3ByteMask32 = (1 << 7)  | (1 << 2) | (1 << (3 + 1)),
-
-	UTF8_4ByteMask11 = (1 << 8)  | (1 << 2) | (1 << (3 + 1)) | (1 << (3 + 2)),
-	UTF8_4ByteMask12 = (1 << 8)  | (1 << 3) | (1 << (3 + 1)) | (1 << (3 + 2)),
-	UTF8_4ByteMask2  = (1 << 9)  /* tail */ | (1 << (3 + 1)) | (1 << (3 + 2)),
-	UTF8_4ByteMask3  = (1 << 10) | (1 << 1) | (1 << (3 + 1)) | (1 << (3 + 2)),
-};
-
-#if NP2_USE_SSE2
-template <int m1, int m2, int m3, int m4>
-inline bool mask_match(uint32_t mask) noexcept {
-	const __m128i y = _mm_set_epi32(m1, m2, m3, m4);
-	__m128i x = _mm_set1_epi32(mask);
-	mask = _mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(x, y), y));
-	return mask != 0;
-}
-#else
-constexpr bool mask_match(uint32_t mask, uint32_t test) noexcept {
-	return (mask & test) == test;
-}
-
-template <int m1, int m2, int m3, int m4>
-constexpr bool mask_match(uint32_t mask) noexcept {
-	return mask_match(mask, m1)
-		|| mask_match(mask, m2)
-		|| mask_match(mask, m3)
-		|| mask_match(mask, m4);
-}
-#endif
-
-}
 
 const unsigned char UTF8ClassifyTable[256] = {
 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 00 - 0F
-0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 10 - 1F
-0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 20 - 2F
-0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 30 - 3F
+0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x41, 0x41, 0x01, 0x81, 0x81, 0x01, 0x01, 0x01, 0x01, 0x01, // 10 - 1F
+0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x41, 0x41, 0x81, 0x81, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 20 - 2F
+0x01, 0x01, 0x01, 0x01, 0x01, 0x41, 0x41, 0x01, 0x81, 0x81, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 30 - 3F
 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 40 - 4F
 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 50 - 5F
 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, // 60 - 6F
@@ -387,21 +350,27 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 		return UTF8MaskInvalid | 1;
 	}
 
-	const unsigned int second = UTF8ClassifyTable[us[1]];
+	unsigned int second = UTF8ClassifyTable[us[1]];
 	if (!(second & UTF8ClassifyMaskTrailByte)) {
 		// Invalid tail byte
 		return UTF8MaskInvalid | 1;
 	}
-
-	switch (byteCount) {
-	case 2:
+	if (byteCount == 2) {
 		return 2;
+	}
 
-	case 3:
-		mask = 1 << (mask >> 4);
-		mask |= 1 << (second >> 4);
-		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 1;
-		if (mask_match<UTF8_3ByteMask1, UTF8_3ByteMask2, UTF8_3ByteMask31, UTF8_3ByteMask32>(mask)) {
+	mask = (mask >> 4) | (second & 0xf0);
+	second = UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte;
+	//constexpr uint64_t UTF8_3ByteMask = UINT64_C(0x006000c000c00000);
+	//constexpr uint64_t UTF8_4ByteMask = UINT64_C(0x0300030006000000);
+	constexpr int UTF8_3ByteMask = 0x40;
+	constexpr int UTF8_4ByteMask = 0x80;
+	constexpr uint32_t UTF8_4ByteTrail = UTF8ClassifyMaskTrailByte | (UTF8ClassifyMaskTrailByte << 1);
+
+	if (byteCount == 3) {
+		//if (second != 0 && (UTF8_3ByteMask & (UINT64_C(1) << mask)))
+		if (second != 0 && (UTF8ClassifyTable[mask] & UTF8_3ByteMask))
+		{
 			const unsigned int codePoint = ((us[0] & 0xF) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
 			if (codePoint == 0xFFFE || codePoint == 0xFFFF || (codePoint >= 0xFDD0 && codePoint <= 0xFDEF)) {
 				// U+FFFE or U+FFFF, FDD0 .. FDEF non-character
@@ -409,14 +378,11 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 			}
 			return 3;
 		}
-		break;
-
-	case 4:
-		mask = 1 << (mask >> 4);
-		mask |= 1 << (second >> 4);
-		mask |= (UTF8ClassifyTable[us[2]] & UTF8ClassifyMaskTrailByte) << 1;
-		mask |= (UTF8ClassifyTable[us[3]] & UTF8ClassifyMaskTrailByte) << 2;
-		if (mask_match<UTF8_4ByteMask11, UTF8_4ByteMask12, UTF8_4ByteMask2, UTF8_4ByteMask3>(mask)) {
+	} else {
+		second |= (UTF8ClassifyTable[us[3]] & UTF8ClassifyMaskTrailByte) << 1;
+		//if (second == UTF8_4ByteTrail && (UTF8_4ByteMask & (UINT64_C(1) << mask)))
+		if (second == UTF8_4ByteTrail && (UTF8ClassifyTable[mask] & UTF8_4ByteMask))
+		{
 			unsigned int codePoint = ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
 			codePoint &= 0xFFFF;
 			if (codePoint == 0xFFFE || codePoint == 0xFFFF) {
@@ -425,7 +391,6 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 			}
 			return 4;
 		}
-		break;
 	}
 
 	return UTF8MaskInvalid | 1;

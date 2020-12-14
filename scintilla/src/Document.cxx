@@ -2285,12 +2285,12 @@ int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *bu
 }
 
 #if 0
-int Document::GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const {
-	return charClass.GetCharsOfClass(characterClass, buffer);
-}
-
 void Document::SetCharacterCategoryOptimization(int countCharacters) {
 	charMap.Optimize(countCharacters);
+}
+
+int Document::CharacterCategoryOptimization() const noexcept {
+	return charMap.Size();
 }
 #endif
 

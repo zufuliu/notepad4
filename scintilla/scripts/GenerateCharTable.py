@@ -74,14 +74,28 @@ def GenerateUTF8Table():
 		mask |= number << 4
 		return mask
 
-	UTF8ClassifyTable = []
-	for i in range(0, 255, 16):
-		line = ', '.join('0x%02X' % MakeUTF8ClassifyMask(ch) for ch in range(i, i + 16)) + ','
-		line += ' // %02X - %02X' % (i, i + 15)
-		UTF8ClassifyTable.append(line)
+	UTF8ClassifyTable = [MakeUTF8ClassifyMask(ch) for ch in range(256)]
+	# combined intervals for second and first UTF8-3 bytes
+	UTF8_3ByteMask = 0
+	for ch in [0x35, 0x16, 0x26, 0x36, 0x17, 0x27]:
+		UTF8_3ByteMask |= 1 << ch
+		UTF8ClassifyTable[ch] |= 0x40
+	# combined intervals for second and first UTF8-4 bytes
+	UTF8_4ByteMask = 0
+	for ch in [0x28, 0x38, 0x19, 0x29, 0x39, 0x1a]:
+		UTF8_4ByteMask |= 1 << ch
+		UTF8ClassifyTable[ch] |= 0x80
 
-	print('UTF8ClassifyTable:', len(UTF8ClassifyTable))
-	print('\n'.join(UTF8ClassifyTable))
+	lines = []
+	for i in range(0, 255, 16):
+		line = ', '.join('0x%02X' % ch for ch in UTF8ClassifyTable[i:i + 16]) + ','
+		line += ' // %02X - %02X' % (i, i + 15)
+		lines.append(line)
+
+	print('UTF8ClassifyTable:', len(UTF8ClassifyTable), len(lines))
+	print('\n'.join(lines))
+	print('UTF8_3ByteMask: 0x%016x' % UTF8_3ByteMask)
+	print('UTF8_4ByteMask: 0x%016x' % UTF8_4ByteMask)
 
 def GetCharName(ch):
 	try:
