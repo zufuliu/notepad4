@@ -372,7 +372,7 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 		if (second != 0 && (UTF8ClassifyTable[mask] & UTF8_3ByteMask))
 		{
 			const unsigned int codePoint = ((us[0] & 0xF) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
-			if (codePoint == 0xFFFE || codePoint == 0xFFFF || (codePoint >= 0xFDD0 && codePoint <= 0xFDEF)) {
+			if (codePoint >= 0xFFFE || (codePoint >= 0xFDD0 && codePoint <= 0xFDEF)) {
 				// U+FFFE or U+FFFF, FDD0 .. FDEF non-character
 				return UTF8MaskInvalid | 3;
 			}
@@ -383,9 +383,8 @@ int UTF8ClassifyMulti(const unsigned char *us, size_t len) noexcept {
 		//if (second == UTF8_4ByteTrail && (UTF8_4ByteMask & (UINT64_C(1) << mask)))
 		if (second == UTF8_4ByteTrail && (UTF8ClassifyTable[mask] & UTF8_4ByteMask))
 		{
-			unsigned int codePoint = ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
-			codePoint &= 0xFFFF;
-			if (codePoint == 0xFFFE || codePoint == 0xFFFF) {
+			const unsigned int codePoint = ((us[1] & 0x0F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
+			if (codePoint >= 0xFFFE) {
 				// *FFFE or *FFFF non-character
 				return UTF8MaskInvalid | 4;
 			}
