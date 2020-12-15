@@ -260,8 +260,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				continue;
 			} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.Match('"', '"', '"'))) {
 				if (sc.state == SCE_KOTLIN_RAWSTRING) {
-					sc.Forward(2);
 					sc.SetState(SCE_KOTLIN_RAWSTRINGEND);
+					sc.Forward(2);
 				}
 				sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 			}
@@ -329,8 +329,9 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				commentLevel = 1;
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
+				sc.Forward(2);
 				sc.ForwardSetState(SCE_KOTLIN_RAWSTRING);
-				sc.Forward();
+				continue;
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_KOTLIN_STRING);
 			} else if (sc.ch == '\'') {
@@ -397,7 +398,7 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_KOTLIN_COMMENTBLOCK || style == SCE_KOTLIN_COMMENTBLOCKDOC;
 }
 
-void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
@@ -416,11 +417,13 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
+	int style = initStyle;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		const int style = styleNext;
+		const int stylePrev = style;
+		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
 		if (IsStreamCommentStyle(style)) {
@@ -434,9 +437,13 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 				}
 			}
 		} else if (style == SCE_KOTLIN_RAWSTRINGSTART) {
-			levelNext++;
+			if (style != stylePrev) {
+				levelNext++;
+			}
 		} else if (style == SCE_KOTLIN_RAWSTRINGEND) {
-			levelNext--;
+			if (style != styleNext) {
+				levelNext--;
+			}
 		} else if (style == SCE_KOTLIN_OPERATOR) {
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
