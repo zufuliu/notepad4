@@ -2038,7 +2038,7 @@ void EditToggleCommentLine(void) {
 		break;
 
 	case SCLEX_CIL:
-	case SCLEX_CSS:
+	case SCLEX_CSS: // for SCSS, LESS, HSS
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
@@ -2100,7 +2100,6 @@ void EditToggleCommentLine(void) {
 		case HTML_TEXT_BLOCK_CDATA:
 		case HTML_TEXT_BLOCK_JS:
 		case HTML_TEXT_BLOCK_PHP:
-		case HTML_TEXT_BLOCK_CSS:
 			EditToggleLineComments(L"//", FALSE);
 			break;
 		}
@@ -2223,10 +2222,6 @@ void EditToggleCommentBlock(void) {
 		switch (block) {
 		case HTML_TEXT_BLOCK_TAG:
 			EditEncloseSelection(L"<!--", L"-->");
-			break;
-
-		case HTML_TEXT_BLOCK_VBS:
-		case HTML_TEXT_BLOCK_PYTHON:
 			break;
 
 		case HTML_TEXT_BLOCK_CDATA:
