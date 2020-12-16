@@ -250,10 +250,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState(SCE_KOTLIN_OPERATOR2);
 				sc.Forward();
 			} else if (curlyBrace && sc.ch == '}') {
-				const int outerState = nestedState.empty()? SCE_KOTLIN_DEFAULT : nestedState.back();
-				if (!nestedState.empty()) {
-					nestedState.pop_back();
-				}
+				const int outerState = TryPopBack(nestedState);
 				--curlyBrace;
 				sc.SetState(SCE_KOTLIN_OPERATOR2);
 				sc.ForwardSetState(outerState);
@@ -354,10 +351,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						nestedState.push_back(SCE_KOTLIN_DEFAULT);
 					} else if (sc.ch == '}') {
 						--curlyBrace;
-						const int outerState = nestedState.empty() ? SCE_KOTLIN_DEFAULT: nestedState.back();
-						if (!nestedState.empty()) {
-							nestedState.pop_back();
-						}
+						const int outerState = TryPopBack(nestedState);
 						sc.ForwardSetState(outerState);
 						continue;
 					}
