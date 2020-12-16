@@ -28,6 +28,14 @@ inline void UnpackLineState(int lineState, int count, std::vector<int>& states) 
 	}
 }
 
+inline int TryPopBack(std::vector<int>& states, int value = 0) {
+	if (!states.empty()) {
+		value = states.back();
+		states.pop_back();
+	}
+	return value;
+}
+
 #if 0
 
 // nested state stack on each line

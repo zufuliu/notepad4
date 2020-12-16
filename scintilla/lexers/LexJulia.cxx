@@ -251,10 +251,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_JULIA_OPERATOR2);
 				sc.Forward();
 			} else if (parenCount && sc.ch == ')') {
-				const int outerState = nestedState.empty()? SCE_JULIA_DEFAULT : nestedState.back();
-				if (!nestedState.empty()) {
-					nestedState.pop_back();
-				}
+				const int outerState = TryPopBack(nestedState);
 				--braceCount;
 				--parenCount;
 				sc.SetState(SCE_JULIA_OPERATOR2);
@@ -449,10 +446,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						nestedState.push_back(SCE_JULIA_DEFAULT);
 					} else if (sc.ch == ')') {
 						--parenCount;
-						const int outerState = nestedState.empty() ? SCE_JULIA_DEFAULT : nestedState.back();
-						if (!nestedState.empty()) {
-							nestedState.pop_back();
-						}
+						const int outerState = TryPopBack(nestedState);
 						sc.ForwardSetState(outerState);
 						continue;
 					}
