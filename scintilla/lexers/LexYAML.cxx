@@ -141,6 +141,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int textIndentCount = 0;
 	int braceCount = 0;
 	int lineType = YAMLLineType_None;
+	int lineStatePrev = 0;
 	EscapeSequence escSeq;
 
 	// backtrack to previous line for better coloring for indented text on typing.
@@ -154,15 +155,15 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
-		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		lineStatePrev = styler.GetLineState(sc.currentLine - 1);
 		/*
 		7: braceCount
 		9: textIndentCount
 		12: indentCount
 		3: lineType
 		*/
-		braceCount = lineState & 0x7f;
-		textIndentCount = (lineState >> 7) & 0x1ff;
+		braceCount = lineStatePrev & 0x7f;
+		textIndentCount = (lineStatePrev >> 7) & 0x1ff;
 	}
 
 	while (sc.More()) {
@@ -188,6 +189,11 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					// inside block scalar or indented text
 					indentCount = textIndentCount + 1;
 				}
+			} else if (sc.state == SCE_YAML_STRING1 || sc.state == SCE_YAML_STRING2) {
+				// multiline quoted string
+				indentCount = (lineStatePrev >> 16) & YAMLLineStateMask_IndentCount;
+				indentEnded = true;
+				visibleChars = 1;
 			}
 		}
 
@@ -418,8 +424,8 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				lineType = YAMLLineType_EmptyLine;
 			}
 
-			const int lineState = braceCount | (textIndentCount << 7) | (indentCount << 16) | (lineType << 28);
-			styler.SetLineState(sc.currentLine, lineState);
+			lineStatePrev = braceCount | (textIndentCount << 7) | (indentCount << 16) | (lineType << 28);
+			styler.SetLineState(sc.currentLine, lineStatePrev);
 			lineType = YAMLLineType_None;
 		}
 		sc.Forward();
