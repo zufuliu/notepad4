@@ -192,6 +192,9 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.state == SCE_YAML_STRING1 || sc.state == SCE_YAML_STRING2) {
 				// multiline quoted string
 				indentCount = (lineStatePrev >> 16) & YAMLLineStateMask_IndentCount;
+				if (indentCount == textIndentCount) {
+					++indentCount;
+				}
 				indentEnded = true;
 				visibleChars = 1;
 			}
@@ -337,8 +340,10 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_YAML_DEFAULT);
 				}
 			} else if (sc.ch == '\'') {
+				textIndentCount = indentCount;
 				sc.SetState(SCE_YAML_STRING1);
 			} else if (sc.ch == '\"') {
+				textIndentCount = indentCount;
 				sc.SetState(SCE_YAML_STRING2);
 			} else if ((sc.ch == '&' || sc.ch == '*') && IsYAMLAnchorChar(sc.chNext)) {
 				sc.SetState((sc.ch == '&')? SCE_YAML_ANCHOR : SCE_YAML_ALIAS);
