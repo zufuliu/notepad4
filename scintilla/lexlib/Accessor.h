@@ -23,7 +23,12 @@ class Accessor : public LexAccessor {
 public:
 	Accessor(IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;
 	int GetPropertyInt(const char *key, int defaultValue = 0) const;
-	int IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept;
+	int IndentAmount(Sci_Position line) noexcept;
+
+	[[deprecated]]
+	int IndentAmount(Sci_Position line, [[maybe_unused]] int * flags, [[maybe_unused]] PFNIsCommentLeader pfnIsCommentLeader = nullptr) noexcept {
+		return IndentAmount(line);
+	}
 };
 
 }

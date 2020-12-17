@@ -26,49 +26,27 @@ int Accessor::GetPropertyInt(const char *key, int defaultValue) const {
 	return pprops->GetInt(key, defaultValue);
 }
 
-int Accessor::IndentAmount(Sci_Position line, int *flags, PFNIsCommentLeader pfnIsCommentLeader) noexcept {
+int Accessor::IndentAmount(Sci_Position line) noexcept {
 	const Sci_Position end = Length();
-	int spaceFlags = 0;
-
-	// Determines the indentation level of the current line and also checks for consistent
-	// indentation compared to the previous line.
-	// Indentation is judged consistent when the indentation whitespace of each line lines
-	// the same or the indentation of one line is a prefix of the other.
-
 	Sci_Position pos = LineStart(line);
-	char ch = (*this)[pos];
-	int indent = 0;
-	bool inPrevPrefix = line > 0;
-	Sci_Position posPrev = inPrevPrefix ? LineStart(line - 1) : 0;
-	while ((ch == ' ' || ch == '\t') && (pos < end)) {
-		if (inPrevPrefix) {
-			const char chPrev = (*this)[posPrev++];
-			if (chPrev == ' ' || chPrev == '\t') {
-				if (chPrev != ch) {
-					spaceFlags |= wsInconsistent;
-				}
-			} else {
-				inPrevPrefix = false;
-			}
-		}
+
+	char ch = '\0';
+	unsigned int indent = 0;
+
+	// TODO: avoid expanding tab, mixed indentation with space and tab is syntax error in languages like Python.
+	while (pos < end) {
+		ch = (*this)[pos++];
 		if (ch == ' ') {
-			spaceFlags |= wsSpace;
 			indent++;
-		} else {	// Tab
-			spaceFlags |= wsTab;
-			if (spaceFlags & wsSpace) {
-				spaceFlags |= wsSpaceTab;
-			}
+		} else if (ch == '\t') {
 			indent = (indent / 4 + 1) * 4;
+		} else {
+			break;
 		}
-		ch = (*this)[++pos];
 	}
 
-	*flags = spaceFlags;
 	indent += SC_FOLDLEVELBASE;
-	// if completely empty line or the start of a comment...
-	if ((LineStart(line) == Length()) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') ||
-		(pfnIsCommentLeader && (*pfnIsCommentLeader)(*this, pos, end - pos))) {
+	if ((pos == end) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')) {
 		return indent | SC_FOLDLEVELWHITEFLAG;
 	}
 	return indent;

@@ -282,9 +282,8 @@ static void exitInnerExpression(const int *p_inner_string_types,
 }
 
 static bool isEmptyLine(Sci_Position pos, Accessor &styler) noexcept {
-	int spaceFlags = 0;
 	const Sci_Position lineCurrent = styler.GetLine(pos);
-	const int indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
+	const int indentCurrent = styler.IndentAmount(lineCurrent);
 	return (indentCurrent & SC_FOLDLEVELWHITEFLAG) != 0;
 }
 

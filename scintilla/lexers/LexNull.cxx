@@ -45,12 +45,11 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 	// for any white space lines
 	// and so we can fix any preceding fold level (which is why we go back
 	// at least one line in all cases)
-	int spaceFlags = 0;
 	Sci_Position lineCurrent = styler.GetLine(startPos);
-	int indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
+	int indentCurrent = styler.IndentAmount(lineCurrent);
 	while (lineCurrent > 0) {
 		lineCurrent--;
-		indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, nullptr);
+		indentCurrent = styler.IndentAmount(lineCurrent);
 		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)){
 			break;
 		}
@@ -65,7 +64,7 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 		int indentNext = indentCurrent;
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
-			indentNext = styler.IndentAmount(lineNext, &spaceFlags, nullptr);
+			indentNext = styler.IndentAmount(lineNext);
 		}
 		const int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
 		if (indentNext & SC_FOLDLEVELWHITEFLAG) {
@@ -75,7 +74,7 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 		// Skip past any blank lines for next indent level info
 		while ((lineNext < docLines) && (indentNext & SC_FOLDLEVELWHITEFLAG)) {
 			lineNext++;
-			indentNext = styler.IndentAmount(lineNext, &spaceFlags, nullptr);
+			indentNext = styler.IndentAmount(lineNext);
 		}
 
 		// Set fold header
