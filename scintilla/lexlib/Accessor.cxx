@@ -47,7 +47,7 @@ int Accessor::IndentAmount(Sci_Position line) noexcept {
 
 	indent += SC_FOLDLEVELBASE;
 	if ((pos == end) || (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')) {
-		return indent | SC_FOLDLEVELWHITEFLAG;
+		indent |= SC_FOLDLEVELWHITEFLAG;
 	}
 	return indent;
 }

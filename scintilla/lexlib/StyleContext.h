@@ -244,6 +244,9 @@ public:
 		if (offset == 0 && !IsWhiteSpace(ch)) {
 			return ch;
 		}
+		if (currentPos + 1 == static_cast<Sci_PositionU>(lineStartNext)) {
+			return '\0';
+		}
 		if (!IsWhiteSpace(chNext)) {
 			return chNext;
 		}
