@@ -335,9 +335,10 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleChars = 1;
 				sc.SetState(SCE_YAML_DOCUMENT);
 				sc.Forward(3);
-				const int chNext = sc.GetLineNextChar(1);
+				const int chNext = sc.GetLineNextChar();
 				if (chNext != '\0') {
 					sc.SetState(SCE_YAML_DEFAULT);
+					// no `continue;` here: a white space is required after document marker.
 				}
 			} else if (sc.ch == '\'') {
 				textIndentCount = indentCount;
@@ -379,7 +380,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_YAML_OPERATOR);
 					sc.ForwardSetState(SCE_YAML_DEFAULT);
 					if (visibleChars == 0 && lineType == YAMLLineType_None) {
-						// spaces after '-' are indentation white space when '- ' followed by key
+						// spaces after '-' are indentation white space when '- ' followed by key.
 						indentBefore = indentCount;
 						indentEnded = false;
 						lineType = YAMLLineType_BlockSequence;
