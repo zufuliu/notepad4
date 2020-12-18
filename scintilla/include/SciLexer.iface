@@ -1,3 +1,13 @@
+## This file defines the interface to Lexilla
+
+## Copyright 2000-2020 by Neil Hodgson <neilh@scintilla.org>
+## The License.txt file describes the conditions under which this software may be distributed.
+
+## Similar file structure as Scintilla.iface but only contains constants.
+
+cat Default
+
+################################################
 # For SciLexer.h
 enu Lexer=SCLEX_
 val SCLEX_CONTAINER=0

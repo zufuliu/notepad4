@@ -7,6 +7,11 @@ hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 4.4.6
 2020-12-01 8533:1fd979759d49
 
+Lexilla (upstream)
+hg clone http://hg.code.sf.net/p/scintilla/lexilla lexilla
+4.4.6
+2020-12-18 8548:decf48246125
+
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 4.4.6
