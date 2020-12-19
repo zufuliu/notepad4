@@ -5,6 +5,7 @@ def update_all_keyword():
 	items = [
 		('NP2LEX_AVS', 'stlAviSynth.c', 'AviSynth.avs', 0, parse_avisynth_api_file),
 		('NP2LEX_CMAKE', 'stlCMake.c', 'CMake.cmake', 0, parse_cmake_api_file),
+		('NP2LEX_DART', 'stlDart.c', 'Dart.dart', 0, parse_dart_api_file),
 		('NP2LEX_GN', 'stlGN.c', 'GN.gn', 0, parse_gn_api_file),
 		('NP2LEX_GO', 'stlGO.c', 'Go.go', 0, parse_go_api_file),
 		('NP2LEX_JS', 'stlJavaScript.c', 'JavaScript.js', 1, parse_javascript_api_file),
@@ -33,8 +34,8 @@ def update_all_keyword():
 		if isinstance(path, str):
 			keywordList = parse('lang/' + path)
 		else:
-			path_list = ['lang/' + name for name in path]
-			keywordList = parse(path_list)
+			pathList = ['lang/' + name for name in path]
+			keywordList = parse(pathList)
 		if keywordList:
 			output = '../src/EditLexers/' + output
 			UpdateKeywordFile(rid, output, keywordList, 16 - count)

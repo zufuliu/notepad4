@@ -70,6 +70,7 @@ extern EDITLEXER lexCMake;
 extern EDITLEXER lexCONF;
 
 extern EDITLEXER lexD;
+extern EDITLEXER lexDart;
 extern EDITLEXER lexDIFF;
 
 extern EDITLEXER lexFSharp;
@@ -164,6 +165,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexCONF,
 
 	&lexD,
+	&lexDart,
 	&lexDIFF,
 
 	&lexFSharp,
@@ -1241,6 +1243,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[6] = KeywordAttr_NoLexer;		// long properties
 		attr[7] = KeywordAttr_NoLexer;		// long variables
 		break;
+	case NP2LEX_DART:
+		attr[4] = KeywordAttr_NoLexer;		// metadata
+		attr[5] = KeywordAttr_NoLexer;		// function
+		break;
 	case NP2LEX_GN:
 		attr[3] = KeywordAttr_NoLexer;		// target variables
 		attr[4] = KeywordAttr_NoLexer;		// placeholders
@@ -1741,7 +1747,23 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 				Style_SetStyles(iStyle, szValue);
 			}
 		}
-		if (iLexer == SCLEX_PERL) {
+		switch (iLexer) {
+		case SCLEX_DART:
+			szValue = Style_FindStyleValue(pLexNew, SCE_DART_TRIPLE_SQ_STRING);
+			if (szValue != NULL) {
+				Style_Parse(&style, szValue);
+				uint32_t styles = SCE_DART_TRIPLE_SQ_STRINGSTART
+					| (SCE_DART_TRIPLE_DQ_STRINGSTART << 8)
+					| (SCE_DART_TRIPLE_SQ_STRINGEND << 16)
+					| (SCE_DART_TRIPLE_DQ_STRINGEND << 24);
+				do {
+					Style_SetParsed(&style, (int)(styles & 0xff));
+					styles >>= 8;
+				} while (styles);
+			}
+			break;
+
+		case SCLEX_PERL:
 			szValue = Style_FindStyleValue(pLexNew, SCE_PL_SCALAR);
 			if (szValue != NULL) {
 				Style_Parse(&style, szValue);
@@ -1758,6 +1780,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 					scalar >>= 8;
 				} while (scalar);
 			}
+			break;
 		}
 	} else {
 		szValue = pLexNew->Styles[ANSIArtStyleIndex_LineNumber].szValue;

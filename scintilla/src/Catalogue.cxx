@@ -86,6 +86,7 @@ void Scintilla_LinkLexers() {
 	//extern LexerModule lmCsound;
 	extern LexerModule lmCss;
 	//extern LexerModule lmD;
+	extern LexerModule lmDart;
 	//extern LexerModule lmDataflex;
 	extern LexerModule lmDiff;
 	//extern LexerModule lmDMAP;
@@ -232,6 +233,7 @@ void Scintilla_LinkLexers() {
 		//&lmCsound,
 		&lmCss,
 		//&lmD,
+		&lmDart,
 		//&lmDataflex,
 		&lmDiff,
 		//&lmDMAP,

@@ -222,10 +222,14 @@ Config File
 	Doxyfile		Doxygen Configuration
 	.*				dot-file
 
+
 D Source
 	d
 	di				D Interface File
 	dd				Ddoc Source File
+
+Dart Source
+	dart
 
 Diff File
 	diff

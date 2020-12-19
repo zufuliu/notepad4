@@ -970,6 +970,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexConfig.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCPP.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCSS.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexDart.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexDiff.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFortran.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexFSharp.cxx" />
@@ -1073,6 +1074,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlCSharp.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCSS.c" />
     <ClCompile Include="..\..\src\EditLexers\stlD.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlDart.c" />
     <ClCompile Include="..\..\src\EditLexers\stlDefault.c" />
     <ClCompile Include="..\..\src\EditLexers\stlFortran.c" />
     <ClCompile Include="..\..\src\EditLexers\stlFSharp.c" />
