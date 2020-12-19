@@ -1063,6 +1063,10 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			return AutoC_AddSpecWord_Finish;
 		}
 	}
+	else if (pLexCurrent->iLexer == SCLEX_DART && ch == '@' && iCurrentStyle == SCE_DART_DEFAULT) {
+		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // metadata
+		return AutoC_AddSpecWord_Keyword;
+	}
 	return 0;
 }
 
@@ -2039,6 +2043,7 @@ void EditToggleCommentLine(void) {
 
 	case SCLEX_CIL:
 	case SCLEX_CSS: // for SCSS, LESS, HSS
+	case SCLEX_DART:
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
@@ -2176,6 +2181,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_AVS:
 	case SCLEX_CIL:
 	case SCLEX_CSS:
+	case SCLEX_DART:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
 	case SCLEX_JSON:

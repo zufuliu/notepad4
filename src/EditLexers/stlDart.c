@@ -40,7 +40,7 @@ static EDITSTYLE Styles_Dart[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_DART_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_DART_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
-	{ SCE_DART_METADATA, NP2StyleX_Annotation, L"fore:#FF8000" },
+	{ SCE_DART_METADATA, NP2StyleX_Metadata, L"fore:#FF8000" },
 	{ SCE_DART_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
 	{ SCE_DART_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
 	{ SCE_DART_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
