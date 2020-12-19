@@ -236,7 +236,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if ((sc.ch == 'b' || sc.ch == 'B') && (sc.chNext == '\'')) {
 				sc.SetState(SCE_SQL_BIT2);
 				sc.Forward();
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SQL_NUMBER);
 			} else if ((sc.ch == '@' && iswordstart(sc.chNext))) {
 				sc.SetState(SCE_SQL_VARIABLE);

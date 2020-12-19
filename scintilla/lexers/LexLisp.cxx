@@ -127,7 +127,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_C_COMMENT;
 				i++;
 				chNext = styler.SafeGetCharAt(i + 1);
-			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
+			} else if (IsNumberStart(ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
 			} else if (iswordstart(ch)) {

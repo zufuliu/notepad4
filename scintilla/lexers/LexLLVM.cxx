@@ -227,7 +227,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_LLVM_COMDAT);
 			} else if (sc.ch == '#' && IsLLVMIdentifierChar(sc.chNext)) {
 				sc.SetState(SCE_LLVM_ATTRIBUTE_GROUP);
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_LLVM_NUMBER);
 			} else if (sc.ch == 'i' && IsADigit(sc.chNext)) {
 				// iN

@@ -207,7 +207,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext)) {
 				sc.SetState(SCE_B_NUMBER);
 				sc.Forward();
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_B_NUMBER);
 			} else if (sc.ch == '_' && isspacechar(sc.chNext)) {
 				sc.SetState(SCE_B_OPERATOR);

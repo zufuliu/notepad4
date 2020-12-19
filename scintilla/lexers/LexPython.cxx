@@ -248,7 +248,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 				sc.SetState(SCE_PY_STRING1);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_PY_STRING2);
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_PY_NUMBER);
 			} else if (IsPyStringPrefix(sc.ch)) {
 				int offset = 0;

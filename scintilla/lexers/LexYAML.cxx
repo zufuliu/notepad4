@@ -370,7 +370,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					textIndentCount = indentCount;
 				}
 				sc.SetState(SCE_YAML_BLOCK_SCALAR);
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_YAML_NUMBER);
 			} else if (IsAlpha(sc.ch) || (sc.ch == '.' && IsAlpha(sc.chNext))) {
 				sc.SetState(SCE_YAML_IDENTIFIER);

@@ -164,7 +164,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (ch == '\"') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_STRING;
-			} else if (chPrevNonWhite == '=' && (IsADigit(ch) || (ch == '.' && IsADigit(chNext)))) {
+			} else if (chPrevNonWhite == '=' && IsNumberStart(ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
 			} else if (chPrevNonWhite == '=' && iswordstart(ch)) {

@@ -163,7 +163,7 @@ static void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (ch == '`') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_STRINGEOL;
-			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
+			} else if (IsNumberStart(ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
 			} else if (visibleChars == 0 && ch == '!' && iswordstart(chNext)) {

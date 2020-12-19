@@ -130,7 +130,7 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 				sc.SetState(SCE_F_STRING2);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_F_STRING1);
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_F_NUMBER);
 			} else if (IsAlphaNumeric(sc.ch)) {
 				sc.SetState(SCE_F_IDENTIFIER);

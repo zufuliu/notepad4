@@ -268,7 +268,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_LUA_DEFAULT) {
-			if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_LUA_NUMBER);
 				if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 					sc.Forward();

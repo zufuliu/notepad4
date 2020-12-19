@@ -896,7 +896,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							varType = 2;
 						sc.SetState(SCE_C_VARIABLE2);
 						sc.Forward();
-					} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+					} else if (IsNumberStart(sc.ch, sc.chNext)) {
 						sc.SetState(SCE_C_NUMBER);
 					} else if (sc.ch == '/') { // bug
 						// RegExp only appears in assignment or function argument
