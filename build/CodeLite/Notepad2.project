@@ -23,6 +23,7 @@
       <File Name="../../scintilla/lexers/LexConfig.cxx"/>
       <File Name="../../scintilla/lexers/LexCPP.cxx"/>
       <File Name="../../scintilla/lexers/LexCSS.cxx"/>
+      <File Name="../../scintilla/lexers/LexDart.cxx"/>
       <File Name="../../scintilla/lexers/LexDiff.cxx"/>
       <File Name="../../scintilla/lexers/LexFortran.cxx"/>
       <File Name="../../scintilla/lexers/LexFSharp.cxx"/>
@@ -181,6 +182,7 @@
       <File Name="../../src/EditLexers/stlCSharp.c"/>
       <File Name="../../src/EditLexers/stlCSS.c"/>
       <File Name="../../src/EditLexers/stlD.c"/>
+      <File Name="../../src/EditLexers/stlDart.c"/>
       <File Name="../../src/EditLexers/stlDefault.c"/>
       <File Name="../../src/EditLexers/stlFortran.c"/>
       <File Name="../../src/EditLexers/stlFSharp.c"/>

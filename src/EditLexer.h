@@ -142,6 +142,8 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_WASM			63070	// SCLEX_WASM		WebAssembly
 #define NP2LEX_TOML			63071	// SCLEX_TOML		TOML File
 #define NP2LEX_GN			63072	// SCLEX_GN			GN Build Script
+#define NP2LEX_DART			63073	// SCLEX_DART		Dart Source
+#define NP2LEX_REBOL		63074	// SCLEX_REBOL		Rebol Script
 
 #define NP2LEX_AVS			63087	// SCLEX_AVS		AviSynth Script
 #define NP2LEX_TEHEX		63088	// SCLEX_TEHEX		Tektronix extended HEX

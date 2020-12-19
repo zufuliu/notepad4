@@ -325,6 +325,44 @@ def parse_cmake_api_file(path):
 	]
 	return keywordList
 
+def parse_dart_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			items = set(doc.split())
+			keywordMap[key] = items
+		elif key == 'libraries':
+			items = re.findall(r'(class|typedef)\s+(\w+)', doc)
+			keywordMap['class'] = [item[1] for item in items]
+
+			items = re.findall(r'(enum)\s+(\w+)', doc)
+			keywordMap['enum'] = [item[1] for item in items]
+
+			items = re.findall(r'@(\w+\(?)', doc)
+			keywordMap['metadata'] = items
+
+			items = re.findall(r'\s\w+\(', doc)
+			keywordMap['function'] = [item.strip() for item in items]
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'class',
+		'enum',
+		'metadata',
+		'function',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('enum', keywordMap['enum'], KeywordAttr.Default),
+		('metadata', keywordMap['metadata'], KeywordAttr.NoLexer),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
 def parse_gn_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
@@ -819,9 +857,9 @@ def parse_rust_api_file(path):
 	]
 	return keywordList
 
-def parse_sql_api_files(path_list):
+def parse_sql_api_files(pathList):
 	keywordMap = {}
-	for path in path_list:
+	for path in pathList:
 		sections = read_api_file(path, '--')
 		for key, doc in sections:
 			items = []
