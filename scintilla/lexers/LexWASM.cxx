@@ -36,10 +36,6 @@ struct EscapeSequence {
 	}
 };
 
-enum {
-	WASMLineStateMaskLineComment = (1 << 8), // line comment
-};
-
 void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const CharacterSet setIdChar(CharacterSet::setAlphaNum, "!#$%&'*+-./:<=>?@\\^_`|~");
 
@@ -55,10 +51,10 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
-		8: commentLevel
 		1: lineStateLineComment
+		8: commentLevel
 		*/
-		commentLevel = lineState & 0xff;
+		commentLevel = (lineState >> 1) & 0xff;
 	}
 
 	while (sc.More()) {
@@ -151,7 +147,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.Match(';', ';')) {
 				sc.SetState(SCE_WASM_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = WASMLineStateMaskLineComment;
+					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
 			} else if (sc.Match('(', ';')) {
 				sc.SetState(SCE_WASM_COMMENTBLOCK);
@@ -187,7 +183,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 }
 
 constexpr int GetLineCommentState(int lineState) noexcept {
-	return (lineState >> 8) & 1;
+	return lineState & SimpleLineStateMaskLineComment;
 }
 
 void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {

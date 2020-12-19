@@ -68,7 +68,6 @@ constexpr bool IsJuliaRegexFlag(int ch) noexcept {
 
 enum {
 	MaxJuliaNestedStateCount = 3,
-	JuliaLineStateMaskLineComment = (1 << 21), // line comment
 };
 
 constexpr int PackState(int state) noexcept {
@@ -132,15 +131,15 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
+		1: lineStateLineComment
+		5: commentLevel
 		8: braceCount
 		8: parenCount
-		5: commentLevel
-		1: lineStateLineComment
 		9: nestedState
 		*/
-		braceCount = lineState & 0xff;
-		parenCount = (lineState >> 8) & 0xff;
-		commentLevel = (lineState >> 16) & 0x1f;
+		commentLevel = (lineState >> 1) & 0x1f;
+		braceCount = (lineState >> 6) & 0xff;
+		parenCount = (lineState >> 14) & 0xff;
 		if (parenCount != 0) {
 			UnpackNestedState(lineState >> 22, parenCount, nestedState);
 		}
@@ -361,7 +360,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else {
 					sc.SetState(SCE_JULIA_COMMENTLINE);
 					if (visibleChars == 0) {
-						lineStateLineComment = JuliaLineStateMaskLineComment;
+						lineStateLineComment = SimpleLineStateMaskLineComment;
 					}
 				}
 			} else if (sc.Match('"', '"', '"')) {
@@ -464,7 +463,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = braceCount | (parenCount << 8) | (commentLevel << 16) | lineStateLineComment;
+			int lineState = (braceCount << 6) | (parenCount << 14) | (commentLevel << 1) | lineStateLineComment;
 			if (parenCount) {
 				lineState |= PackNestedState(nestedState);
 			}
@@ -489,7 +488,7 @@ constexpr bool IsStringInnerStyle(int style) noexcept {
 }
 
 constexpr int GetLineCommentState(int lineState) noexcept {
-	return (lineState >> 21) & 1;
+	return lineState & SimpleLineStateMaskLineComment;
 }
 
 void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {

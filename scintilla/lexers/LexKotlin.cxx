@@ -44,8 +44,8 @@ struct EscapeSequence {
 
 enum {
 	MaxKotlinNestedStateCount = 4,
-	KotlinLineStateMaskLineComment = (1 << 14), // line comment
-	KotlinLineStateMaskImport = (1 << 15), // import
+	KotlinLineStateMaskLineComment = 1, // line comment
+	KotlinLineStateMaskImport = 1 << 1, // import
 };
 
 constexpr int PackState(int state) noexcept {
@@ -97,14 +97,14 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
-		8: curlyBrace
-		6: commentLevel
 		1: lineStateLineComment
 		1: lineStateImport
+		6: commentLevel
+		8: curlyBrace
 		8: nestedState
 		*/
-		curlyBrace = lineState & 0xff;
-		commentLevel = (lineState >> 8) & 0x3f;
+		commentLevel = (lineState >> 2) & 0x3f;
+		curlyBrace = (lineState >> 8) & 0xff;
 		if (curlyBrace) {
 			UnpackNestedState((lineState >> 16) & 0xff, curlyBrace, nestedState);
 		}
@@ -363,7 +363,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = curlyBrace | (commentLevel << 8) | lineStateLineComment | lineStateImport;
+			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineComment | lineStateImport;
 			if (curlyBrace) {
 				lineState |= PackNestedState(nestedState);
 			}
@@ -383,8 +383,8 @@ struct FoldLineState {
 	int lineComment;
 	int packageImport;
 	constexpr explicit FoldLineState(int lineState) noexcept:
-		lineComment((lineState >> 14) & 1),
-		packageImport((lineState >> 15) & 1) {
+		lineComment(lineState & KotlinLineStateMaskLineComment),
+		packageImport((lineState >> 1) & 1) {
 	}
 };
 

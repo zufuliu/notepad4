@@ -55,10 +55,10 @@ bool IsRustRawString(LexAccessor &styler, Sci_PositionU pos, bool start, int &ha
 }
 
 enum {
-	RustLineStateMaskAttribute = (1 << 24), // attribute block
-	RustLineStateMaskLineComment = (1 << 25), // line comment
-	RustLineStateMaskPubUse = (1 << 26), // [pub] use
-	MaxRustCharLiteralLength = 2 + 2 + 2 + 6, // '\u{10FFFF}'
+	RustLineStateMaskLineComment = (1 << 0),	// line comment
+	RustLineStateMaskPubUse = (1 << 1),			// [pub] use
+	RustLineStateMaskAttribute = (1 << 2),		// attribute block
+	MaxRustCharLiteralLength = 2 + 2 + 2 + 6,	// '\u{10FFFF}'
 };
 
 void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -78,9 +78,17 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
-		squareBracket = lineState & 0xff;
-		commentLevel = (lineState >> 8) & 0xff;
-		hashCount = (lineState >> 16) & 0xff;
+		/*
+		1: lineStateLineComment
+		1: lineStatePubUse
+		1: lineStateAttribute
+		8: squareBracket
+		8: commentLevel
+		8: hashCount
+		*/
+		squareBracket = (lineState >> 3) & 0xff;
+		commentLevel = (lineState >> 11) & 0xff;
+		hashCount = (lineState >> 19) & 0xff;
 		lineStateAttribute = lineState & RustLineStateMaskAttribute;
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
@@ -376,7 +384,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			const int lineState = squareBracket | (commentLevel << 8) | (hashCount << 16)
+			const int lineState = (squareBracket << 3) | (commentLevel << 11) | (hashCount << 19)
 				| lineStateAttribute | lineStateLineComment | lineStatePubUse;
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineComment = 0;
@@ -406,8 +414,8 @@ struct FoldLineState {
 	int lineComment;
 	int pubUse;
 	constexpr explicit FoldLineState(int lineState) noexcept:
-		lineComment((lineState >> 25) & 1),
-		pubUse((lineState >> 26) & 1) {
+		lineComment(lineState & RustLineStateMaskLineComment),
+		pubUse((lineState >> 1) & 1) {
 	}
 };
 

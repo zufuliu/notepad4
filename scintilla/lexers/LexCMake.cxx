@@ -52,10 +52,6 @@ bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bra
 	return false;
 }
 
-enum {
-	CMakeLineStateMaskLineComment = (1 << 16), // line comment
-};
-
 void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineComment = 0;
 
@@ -71,7 +67,12 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
-		outerStyle = lineState & 0xff;
+		/*
+		1: lineStateLineComment
+		7: outerStyle
+		8: bracketNumber
+		*/
+		outerStyle = (lineState >> 1) & 0x7f;
 		bracketNumber = (lineState >> 8) & 0xff;
 		if (outerStyle != SCE_CMAKE_DEFAULT) {
 			sc.SetState(outerStyle);
@@ -253,7 +254,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else {
 					sc.SetState(SCE_CMAKE_COMMENT);
 					if (visibleChars == 0) {
-						lineStateLineComment = CMakeLineStateMaskLineComment;
+						lineStateLineComment = SimpleLineStateMaskLineComment;
 					}
 				}
 			} else if (sc.ch == '[' && (sc.chNext == '=' || sc.chNext == '[')) {
@@ -264,7 +265,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.Match('/', '/')) { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);
 				if (visibleChars == 0) {
-					lineStateLineComment = CMakeLineStateMaskLineComment;
+					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
 			} else if (sc.ch == '\"') {
 				outerStyle = SCE_CMAKE_STRING;
@@ -304,7 +305,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, (bracketNumber << 8) | outerStyle | lineStateLineComment);
+			styler.SetLineState(sc.currentLine, (bracketNumber << 8) | (outerStyle << 1) | lineStateLineComment);
 			lineStateLineComment = 0;
 			visibleChars = 0;
 		}
@@ -315,7 +316,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 }
 
 constexpr int GetLineCommentState(int lineState) noexcept {
-	return (lineState >> 16) & 1;
+	return lineState & SimpleLineStateMaskLineComment;
 }
 
 void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
