@@ -53,7 +53,7 @@ constexpr bool AnyOf(T t, Args... args) noexcept {
 
 #if defined(_INC_STRING)
 template <typename... Args>
-inline bool AnyOf(const char *s, Args... args) noexcept {
+inline bool EqualsAny(const char *s, Args... args) noexcept {
 	return ((::strcmp(s, args) == 0) || ...);
 }
 #endif
