@@ -137,7 +137,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (ch == '\'') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_CHARACTER;
-			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
+			} else if (IsNumberStart(ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_C_NUMBER;
 			} else if (ch == '.' && IsAlpha(chNext) && (IsCILOp(chPrev) || IsASpace(chPrev))) {

@@ -85,7 +85,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			sc.SetState(SCE_CMAKE_DEFAULT);
 			break;
 		case SCE_CMAKE_NUMBER:
-			if (!(IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)))) {
+			if (!IsNumberStart(sc.ch, sc.chNext)) {
 				if (IsCmakeChar(sc.ch) || IsCmakeChar(chBeforeNumber)) {
 					sc.ChangeState(SCE_CMAKE_DEFAULT);
 				}

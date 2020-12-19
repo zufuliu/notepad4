@@ -251,7 +251,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (ch == '\'') {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_CHARACTER;
-			} else if (IsADigit(ch) || (ch == '.' && IsADigit(chNext))) {
+			} else if (IsNumberStart(ch, chNext)) {
 				styler.ColourTo(i - 1, state);
 				state = SCE_SMALI_NUMBER;
 			} else if (ch == '.' && visibleChars == 0 && IsAlpha(chNext)) {

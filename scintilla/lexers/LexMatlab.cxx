@@ -246,7 +246,7 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 				isTransposeOperator = true;
 				sc.SetState(SCE_MAT_HEXNUM);
 				sc.Forward();
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				isTransposeOperator = true;
 				sc.SetState(SCE_MAT_NUMBER);
 			} else if (sc.ch == '@' && IsIdentifierStart(sc.chNext)) {

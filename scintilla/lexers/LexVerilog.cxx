@@ -116,7 +116,7 @@ static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int
 		}
 		// Determine if a new state should be entered.
 		if (sc.state == SCE_V_DEFAULT) {
-			if (IsADigit(sc.ch) || (sc.ch == '\'') || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			if (IsNumberStart(sc.ch, sc.chNext) || (sc.ch == '\'')) {
 				sc.SetState(SCE_V_NUMBER);
 			} else if (IsVWordStart(sc.ch)) {
 				sc.SetState(SCE_V_IDENTIFIER);

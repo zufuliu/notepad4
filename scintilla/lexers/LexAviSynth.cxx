@@ -188,8 +188,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				// Avisynth+ 3.6 escaped string
 				sc.SetState(SCE_AVS_ESCAPESTRING);
 				sc.Forward();
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))
-				|| (sc.ch == '$' && IsHexDigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext) || (sc.ch == '$' && IsHexDigit(sc.chNext))) {
 				sc.SetState(SCE_AVS_NUMBER);
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_AVS_IDENTIFIER);

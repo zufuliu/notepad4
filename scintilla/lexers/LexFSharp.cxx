@@ -145,7 +145,7 @@ static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int 
 			} else if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 				sc.SetState(SCE_FSHARP_NUMBER);
 				sc.Forward();
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_FSHARP_NUMBER);
 			} else if (sc.ch == '#' && visibleChars == 0) {
 				if (isspacechar(sc.chNext)) {

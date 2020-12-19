@@ -468,7 +468,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_AU3_STRING);
 				si = 2;
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_AU3_NUMBER);
 				ni = 0;
 			} else if (IsAu3WordStart(sc.ch)) {
