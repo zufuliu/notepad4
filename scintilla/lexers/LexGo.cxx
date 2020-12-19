@@ -54,8 +54,6 @@ enum {
 	GoFunction_Name,
 	GoFunction_Param,
 	GoFunction_Return,
-
-	GoLineStateMaskLineComment = (1 << 0), // line comment
 };
 
 constexpr bool IsFormatSpecifier(uint8_t ch) noexcept {
@@ -366,7 +364,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.Match('/', '/')) {
 				sc.SetState(SCE_GO_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = GoLineStateMaskLineComment;
+					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
 				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
@@ -441,7 +439,7 @@ constexpr bool IsInnerStyle(int style) noexcept {
 }
 
 constexpr int GetLineCommentState(int lineState) noexcept {
-	return lineState & GoLineStateMaskLineComment;
+	return lineState & SimpleLineStateMaskLineComment;
 }
 
 void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
