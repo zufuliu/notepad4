@@ -101,7 +101,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		1: lineStateImport
 		6: commentLevel
 		8: curlyBrace
-		8: nestedState
+		2*4: nestedState
 		*/
 		commentLevel = (lineState >> 2) & 0x3f;
 		curlyBrace = (lineState >> 8) & 0xff;
@@ -138,8 +138,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateImport = KotlinLineStateMaskImport;
 						}
-					} else if (strcmp(s, "break") == 0 || strcmp(s, "continue") == 0 || strcmp(s, "return") == 0
-						|| strcmp(s, "this") == 0 || strcmp(s, "super") == 0) {
+					} else if (EqualsAny(s, "break", "continue", "return", "this", "super")) {
 						kwType = SCE_KOTLIN_LABEL;
 					} else if (((kwType != SCE_KOTLIN_ANNOTATION && kwType != SCE_KOTLIN_ENUM)
 							&& (chBeforeIdentifier != ':' && strcmp(s, "class") == 0))
@@ -186,9 +185,14 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
 			break;
+
 		case SCE_KOTLIN_ANNOTATION:
-			if (!IsWordCharEx(sc.ch)) {
-				// highlight whole package.Name as annotation
+			if (sc.ch == '.') {
+				sc.SetState(SCE_KOTLIN_OPERATOR);
+				sc.ForwardSetState(SCE_KOTLIN_ANNOTATION);
+				continue;
+			}
+			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
 			break;
@@ -199,20 +203,10 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
 			break;
+
 		case SCE_KOTLIN_COMMENTBLOCK:
-			if (sc.Match('*', '/')) {
-				sc.Forward();
-				--commentLevel;
-				if (commentLevel == 0) {
-					sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
-				}
-			} else if (sc.Match('/', '*')) {
-				sc.Forward(2);
-				++commentLevel;
-			}
-			break;
 		case SCE_KOTLIN_COMMENTBLOCKDOC:
-			if (sc.ch == '@' && IsLowerCase(sc.chNext) && isspacechar(sc.chPrev)) {
+			if (sc.state == SCE_KOTLIN_COMMENTBLOCKDOC && sc.ch == '@' && IsLowerCase(sc.chNext) && isspacechar(sc.chPrev)) {
 				sc.SetState(SCE_KOTLIN_COMMENTDOCWORD);
 			} else if (sc.Match('*', '/')) {
 				sc.Forward();

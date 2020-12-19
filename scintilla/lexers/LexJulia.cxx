@@ -135,7 +135,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		5: commentLevel
 		8: braceCount
 		8: parenCount
-		9: nestedState
+		3*3: nestedState
 		*/
 		commentLevel = (lineState >> 1) & 0x1f;
 		braceCount = (lineState >> 6) & 0xff;
