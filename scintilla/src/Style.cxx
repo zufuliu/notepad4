@@ -101,6 +101,7 @@ Style::Style(const Style &source) noexcept : FontSpecification(source), FontMeas
 	visible = source.visible;
 	changeable = source.changeable;
 	hotspot = source.hotspot;
+	font.ClearFont();
 }
 
 Style::~Style() = default;
@@ -110,11 +111,17 @@ Style &Style::operator=(const Style &source) noexcept {
 		return *this;
 	}
 
+#if 1
 	fontName = source.fontName;
 	weight = source.weight;
 	italic = source.italic;
 	size = source.size;
 	characterSet = source.characterSet;
+	FontMeasurements::ClearMeasurements();
+#else
+	(FontSpecification &)(*this) = source;
+	(FontMeasurements &)(*this) = source;
+#endif
 	fore = source.fore;
 	back = source.back;
 	eolFilled = source.eolFilled;
@@ -125,7 +132,6 @@ Style &Style::operator=(const Style &source) noexcept {
 	changeable = source.changeable;
 	hotspot = source.hotspot;
 	font.ClearFont();
-	FontMeasurements::ClearMeasurements();
 	return *this;
 }
 
@@ -135,6 +141,7 @@ void Style::ResetDefault(const char *fontName_) noexcept {
 	italic = false;
 	size = Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER;
 	characterSet = SC_CHARSET_DEFAULT;
+	FontMeasurements::ClearMeasurements();
 	fore = ColourDesired(0, 0, 0);
 	back = ColourDesired(0xff, 0xff, 0xff);
 	eolFilled = false;
@@ -145,7 +152,6 @@ void Style::ResetDefault(const char *fontName_) noexcept {
 	changeable = true;
 	hotspot = false;
 	font.ClearFont();
-	FontMeasurements::ClearMeasurements();
 }
 
 void Style::ClearTo(const Style &source) noexcept {
