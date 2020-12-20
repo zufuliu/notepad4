@@ -195,7 +195,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					// inside block scalar or indented text
 					indentCount = textIndentCount + 1;
 				}
-			} else if (sc.state == SCE_YAML_STRING1 || sc.state == SCE_YAML_STRING2) {
+			} else if (sc.state == SCE_YAML_STRING_SQ || sc.state == SCE_YAML_STRING_DQ) {
 				// multiline quoted string
 				indentCount = GetIndentCount(lineStatePrev);
 				if (indentCount == textIndentCount) {
@@ -272,12 +272,12 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_YAML_STRING1:
+		case SCE_YAML_STRING_SQ:
 			if (sc.ch == '\'') {
 				if (sc.chNext == '\'') {
 					sc.SetState(SCE_YAML_ESCAPECHAR);
 					sc.Forward(2);
-					sc.SetState(SCE_YAML_STRING1);
+					sc.SetState(SCE_YAML_STRING_SQ);
 					continue;
 				}
 
@@ -290,7 +290,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_YAML_STRING2:
+		case SCE_YAML_STRING_DQ:
 			if (sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.chNext);
 				sc.SetState(SCE_YAML_ESCAPECHAR);
@@ -311,7 +311,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					escSeq.resetEscapeState(sc.chNext);
 					sc.Forward();
 				} else {
-					sc.SetState(SCE_YAML_STRING2);
+					sc.SetState(SCE_YAML_STRING_DQ);
 					continue;
 				}
 			}
@@ -348,10 +348,10 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == '\'') {
 				textIndentCount = indentCount;
-				sc.SetState(SCE_YAML_STRING1);
+				sc.SetState(SCE_YAML_STRING_SQ);
 			} else if (sc.ch == '\"') {
 				textIndentCount = indentCount;
-				sc.SetState(SCE_YAML_STRING2);
+				sc.SetState(SCE_YAML_STRING_DQ);
 			} else if ((sc.ch == '&' || sc.ch == '*') && IsYAMLAnchorChar(sc.chNext)) {
 				sc.SetState((sc.ch == '&')? SCE_YAML_ANCHOR : SCE_YAML_ALIAS);
 			} else if (sc.ch == '!') {

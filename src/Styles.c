@@ -1749,13 +1749,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		}
 		switch (iLexer) {
 		case SCLEX_DART:
-			szValue = Style_FindStyleValue(pLexNew, SCE_DART_TRIPLE_SQ_STRING);
+			szValue = Style_FindStyleValue(pLexNew, SCE_DART_TRIPLE_STRING_SQ);
 			if (szValue != NULL) {
 				Style_Parse(&style, szValue);
-				uint32_t styles = SCE_DART_TRIPLE_SQ_STRINGSTART
-					| (SCE_DART_TRIPLE_DQ_STRINGSTART << 8)
-					| (SCE_DART_TRIPLE_SQ_STRINGEND << 16)
-					| (SCE_DART_TRIPLE_DQ_STRINGEND << 24);
+				uint32_t styles = SCE_DART_TRIPLE_STRING_SQSTART
+					| (SCE_DART_TRIPLE_STRING_DQSTART << 8)
+					| (SCE_DART_TRIPLE_STRING_SQEND << 16)
+					| (SCE_DART_TRIPLE_STRING_DQEND << 24);
 				do {
 					Style_SetParsed(&style, (int)(styles & 0xff));
 					styles >>= 8;
