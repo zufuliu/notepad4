@@ -1731,55 +1731,30 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (rid != NP2LEX_ANSI) {
 		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 
-		struct DetailStyle style;
 		const UINT iStyleCount = pLexNew->iStyleCount;
 		// first style is the default style.
 		for (UINT i = 1; i < iStyleCount; i++) {
-			UINT iStyle = pLexNew->Styles[i].iStyle;
+			const UINT iStyle = pLexNew->Styles[i].iStyle;
 			szValue = pLexNew->Styles[i].szValue;
+			const int first = iStyle & 0xff;
+			Style_SetStyles(first, szValue);
 			if (iStyle > 0xFF) {
-				Style_Parse(&style, szValue);
-				do {
-					Style_SetParsed(&style, iStyle & 0xFF);
-					iStyle >>= 8;
-				} while (iStyle);
-			} else {
-				Style_SetStyles(iStyle, szValue);
+				SciCall_CopyStyles(first, iStyle >> 8);
 			}
 		}
 		switch (iLexer) {
 		case SCLEX_DART:
-			szValue = Style_FindStyleValue(pLexNew, SCE_DART_TRIPLE_STRING_SQ);
-			if (szValue != NULL) {
-				Style_Parse(&style, szValue);
-				uint32_t styles = SCE_DART_TRIPLE_STRING_SQSTART
-					| (SCE_DART_TRIPLE_STRING_DQSTART << 8)
-					| (SCE_DART_TRIPLE_STRING_SQEND << 16)
-					| (SCE_DART_TRIPLE_STRING_DQEND << 24);
-				do {
-					Style_SetParsed(&style, (int)(styles & 0xff));
-					styles >>= 8;
-				} while (styles);
-			}
+			SciCall_CopyStyles(SCE_DART_TRIPLE_STRING_DQ, MULTI_STYLE(SCE_DART_TRIPLE_STRING_DQSTART, SCE_DART_TRIPLE_STRING_DQEND, 0, 0));
 			break;
 
 		case SCLEX_PERL:
-			szValue = Style_FindStyleValue(pLexNew, SCE_PL_SCALAR);
-			if (szValue != NULL) {
-				Style_Parse(&style, szValue);
-				uint64_t scalar = SCE_PL_REGEX_VAR
-					| ((uint64_t)SCE_PL_REGSUBST_VAR << 8)
-					| ((uint64_t)SCE_PL_BACKTICKS_VAR << 16)
-					| ((uint64_t)SCE_PL_HERE_QQ_VAR << 24)
-					| ((uint64_t)SCE_PL_HERE_QX_VAR << 32)
-					| ((uint64_t)SCE_PL_STRING_QQ_VAR << 40)
-					| ((uint64_t)SCE_PL_STRING_QX_VAR << 48)
-					| ((uint64_t)SCE_PL_STRING_QR_VAR << 56);
-				do {
-					Style_SetParsed(&style, (int)(scalar & 0xff));
-					scalar >>= 8;
-				} while (scalar);
-			}
+#if defined(_WIN64)
+			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE8(SCE_PL_REGEX_VAR, SCE_PL_REGSUBST_VAR, SCE_PL_BACKTICKS_VAR, SCE_PL_HERE_QQ_VAR,
+				SCE_PL_HERE_QX_VAR, SCE_PL_STRING_QQ_VAR, SCE_PL_STRING_QX_VAR, SCE_PL_STRING_QR_VAR));
+#else
+			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE(SCE_PL_REGEX_VAR, SCE_PL_REGSUBST_VAR, SCE_PL_BACKTICKS_VAR, SCE_PL_HERE_QQ_VAR));
+			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE(SCE_PL_HERE_QX_VAR, SCE_PL_STRING_QQ_VAR, SCE_PL_STRING_QX_VAR, SCE_PL_STRING_QR_VAR));
+#endif
 			break;
 		}
 	} else {
