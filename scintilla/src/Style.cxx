@@ -19,11 +19,11 @@ using namespace Scintilla;
 
 FontAlias::FontAlias() noexcept = default;
 
-FontAlias::FontAlias(const FontAlias &other) noexcept : Font() {
+FontAlias::FontAlias(const FontAlias &other) noexcept {
 	SetID(other.fid);
 }
 
-FontAlias::FontAlias(FontAlias &&other) noexcept : Font() {
+FontAlias::FontAlias(FontAlias &&other) noexcept {
 	SetID(other.fid);
 	other.ClearFont();
 }
@@ -79,23 +79,21 @@ void FontMeasurements::ClearMeasurements() noexcept {
 	sizeZoomed = 2;
 }
 
-Style::Style() noexcept : FontSpecification() {
-	Clear(ColourDesired(0, 0, 0), ColourDesired(0xff, 0xff, 0xff),
-		Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER, nullptr, SC_CHARSET_DEFAULT,
-		SC_WEIGHT_NORMAL, false, false, false, false, caseMixed, true, true, false);
+Style::Style() noexcept {
+	fore = ColourDesired(0, 0, 0);
+	back = ColourDesired(0xff, 0xff, 0xff);
+	eolFilled = false;
+	underline = false;
+	strike = false;
+	caseForce = caseMixed;
+	visible = true;
+	changeable = true;
+	hotspot = false;
 }
 
-Style::Style(const Style &source) noexcept : FontSpecification(), FontMeasurements() {
-	Clear(ColourDesired(0, 0, 0), ColourDesired(0xff, 0xff, 0xff),
-		0, nullptr, SC_CHARSET_DEFAULT,
-		SC_WEIGHT_NORMAL, false, false, false, false, caseMixed, true, true, false);
+Style::Style(const Style &source) noexcept : FontSpecification(source), FontMeasurements(source) {
 	fore = source.fore;
 	back = source.back;
-	characterSet = source.characterSet;
-	weight = source.weight;
-	italic = source.italic;
-	size = source.size;
-	fontName = source.fontName;
 	eolFilled = source.eolFilled;
 	underline = source.underline;
 	strike = source.strike;
@@ -108,66 +106,50 @@ Style::Style(const Style &source) noexcept : FontSpecification(), FontMeasuremen
 Style::~Style() = default;
 
 Style &Style::operator=(const Style &source) noexcept {
-	if (this == &source)
+	if (this == &source) {
 		return *this;
-	Clear(ColourDesired(0, 0, 0), ColourDesired(0xff, 0xff, 0xff),
-		0, nullptr, SC_CHARSET_DEFAULT,
-		SC_WEIGHT_NORMAL, false, false, false, false, caseMixed, true, true, false);
-	fore = source.fore;
-	back = source.back;
-	characterSet = source.characterSet;
+	}
+
+	fontName = source.fontName;
 	weight = source.weight;
 	italic = source.italic;
 	size = source.size;
-	fontName = source.fontName;
+	characterSet = source.characterSet;
+	fore = source.fore;
+	back = source.back;
 	eolFilled = source.eolFilled;
 	underline = source.underline;
 	strike = source.strike;
 	caseForce = source.caseForce;
 	visible = source.visible;
 	changeable = source.changeable;
+	hotspot = source.hotspot;
+	font.ClearFont();
+	FontMeasurements::ClearMeasurements();
 	return *this;
 }
 
-void Style::Clear(ColourDesired fore_, ColourDesired back_, int size_,
-	const char *fontName_, int characterSet_,
-	int weight_, bool italic_, bool eolFilled_,
-	bool underline_, bool strike_, ecaseForced caseForce_,
-	bool visible_, bool changeable_, bool hotspot_) noexcept {
-	fore = fore_;
-	back = back_;
-	characterSet = characterSet_;
-	weight = weight_;
-	italic = italic_;
-	size = size_;
+void Style::ResetDefault(const char *fontName_) noexcept {
 	fontName = fontName_;
-	eolFilled = eolFilled_;
-	underline = underline_;
-	strike = strike_;
-	caseForce = caseForce_;
-	visible = visible_;
-	changeable = changeable_;
-	hotspot = hotspot_;
+	weight = SC_WEIGHT_NORMAL;
+	italic = false;
+	size = Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER;
+	characterSet = SC_CHARSET_DEFAULT;
+	fore = ColourDesired(0, 0, 0);
+	back = ColourDesired(0xff, 0xff, 0xff);
+	eolFilled = false;
+	underline = false;
+	strike = false;
+	caseForce = caseMixed;
+	visible = true;
+	changeable = true;
+	hotspot = false;
 	font.ClearFont();
 	FontMeasurements::ClearMeasurements();
 }
 
 void Style::ClearTo(const Style &source) noexcept {
-	Clear(
-		source.fore,
-		source.back,
-		source.size,
-		source.fontName,
-		source.characterSet,
-		source.weight,
-		source.italic,
-		source.eolFilled,
-		source.underline,
-		source.strike,
-		source.caseForce,
-		source.visible,
-		source.changeable,
-		source.hotspot);
+	*this = source;
 }
 
 void Style::Copy(const Font &font_, const FontMeasurements &fm_) noexcept {

@@ -37,6 +37,9 @@ typedef struct EDITSTYLE {
 } EDITSTYLE, *PEDITSTYLE;
 
 #define EDITSTYLE_BufferSize(iStyleCount)	((iStyleCount) * MAX_EDITSTYLE_VALUE_SIZE * sizeof(WCHAR))
+#define	MULTI_STYLE(a, b, c, d)			((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+#define	MULTI_STYLE8(a, b, c, d, e, f, g, h) \
+	(((int64_t)MULTI_STYLE(a, b, c, d) << 32) | MULTI_STYLE(e, f, g, h))
 
 // Not used by Scintilla lexer, listed for auto completion.
 #define KeywordAttr_NoLexer		1

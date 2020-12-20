@@ -559,6 +559,9 @@ ali SC_CHARSET_8859_15=ISO_8859_15
 # Clear all the styles and make equivalent to the global default style.
 fun void StyleClearAll=2050(,)
 
+# Copy style from sourceIndex to each 8-bit non-zero style index in destStyles.
+fun void CopyStyles=2090(int sourceIndex, int destStyles)
+
 # Set the foreground colour of a style.
 set void StyleSetFore=2051(int style, colour fore)
 

@@ -20,7 +20,7 @@ struct FontSpecification {
 		weight(SC_WEIGHT_NORMAL),
 		italic(false),
 		size(10 * SC_FONT_SIZE_MULTIPLIER),
-		characterSet(0),
+		characterSet(SC_CHARSET_DEFAULT),
 		extraFontFlag(0) {}
 	bool operator==(const FontSpecification &other) const noexcept;
 	bool operator<(const FontSpecification &other) const noexcept;
@@ -60,7 +60,7 @@ public:
 	bool eolFilled;
 	bool underline;
 	bool strike;
-	enum ecaseForced {
+	enum ecaseForced : uint8_t {
 		caseMixed, caseUpper, caseLower, caseCamel
 	};
 	ecaseForced caseForce;
@@ -76,12 +76,7 @@ public:
 	~Style();
 	Style &operator=(const Style &source) noexcept;
 	Style &operator=(Style &&) = delete;
-	void Clear(ColourDesired fore_, ColourDesired back_,
-		int size_,
-		const char *fontName_, int characterSet_,
-		int weight_, bool italic_, bool eolFilled_,
-		bool underline_, bool strike_, ecaseForced caseForce_,
-		bool visible_, bool changeable_, bool hotspot_) noexcept;
+	void ResetDefault(const char *fontName_) noexcept;
 	void ClearTo(const Style &source) noexcept;
 	void Copy(const Font &font_, const FontMeasurements &fm_) noexcept;
 	bool IsProtected() const noexcept {

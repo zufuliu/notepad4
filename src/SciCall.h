@@ -635,6 +635,10 @@ NP2_inline void SciCall_StyleClearAll(void) {
 	SciCall(SCI_STYLECLEARALL, 0, 0);
 }
 
+NP2_inline void SciCall_CopyStyles(size_t sourceIndex, LPARAM destStyles) {
+	SciCall(SCI_COPYSTYLES, sourceIndex, destStyles);	
+}
+
 NP2_inline void SciCall_StyleSetFont(int style, const char *fontName) {
 	SciCall(SCI_STYLESETFONT, style, (LPARAM)fontName);
 }

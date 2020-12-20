@@ -83,7 +83,7 @@ class Face:
 							"Param2Type": p2[0], "Param2Name": p2[1], "Param2Value": p2[2],
 							"Category": currentCategory, "Comment": currentComment
 						}
-						if value in self.values:
+						if currentCategory != 'Deprecated' and value in self.values:
 							raise Exception("Duplicate value " + value + " " + name + " on line:" + str(lineno))
 						self.values[value] = 1
 						self.order.append(name)

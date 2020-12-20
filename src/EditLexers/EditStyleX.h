@@ -1,7 +1,6 @@
 #pragma once
 #include "EditStyle.h"
 // NP2StyleX_
-#define	MULTI_STYLE(a, b, c, d)			((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define EDITSTYLE_HOLE(style, name)		{ NP2STYLE_ ## style, CSTRLEN(name), (name), NULL }
 #define EDITSTYLE_HOLEX(style, name)	{ style, CSTRLEN(name), (name), NULL }
 

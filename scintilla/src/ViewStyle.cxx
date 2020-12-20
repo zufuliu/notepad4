@@ -379,11 +379,7 @@ void ViewStyle::EnsureStyle(size_t index) {
 
 void ViewStyle::ResetDefaultStyle() {
 	fontsValid = false;
-	styles[STYLE_DEFAULT].Clear(ColourDesired(0, 0, 0),
-		ColourDesired(0xff, 0xff, 0xff),
-		Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER, fontNames.Save(Platform::DefaultFont()),
-		SC_CHARSET_DEFAULT,
-		SC_WEIGHT_NORMAL, false, false, false, false, Style::caseMixed, true, true, false);
+	styles[STYLE_DEFAULT].ResetDefault(fontNames.Save(Platform::DefaultFont()));
 }
 
 void ViewStyle::ClearStyles() noexcept {
@@ -399,6 +395,17 @@ void ViewStyle::ClearStyles() noexcept {
 	// Set call tip fore/back to match the values previously set for call tips
 	styles[STYLE_CALLTIP].back = ColourDesired(0xff, 0xff, 0xff);
 	styles[STYLE_CALLTIP].fore = ColourDesired(0x80, 0x80, 0x80);
+}
+
+void ViewStyle::CopyStyles(size_t sourceIndex, size_t destStyles) {
+	EnsureStyle(sourceIndex);
+	const Style &source = styles[sourceIndex];
+	do {
+		const size_t index = destStyles & 0xff;
+		EnsureStyle(index);
+		styles[index].ClearTo(source);
+		destStyles >>= 8;
+	} while (destStyles);
 }
 
 void ViewStyle::SetStyleFontName(int styleIndex, const char *name) {

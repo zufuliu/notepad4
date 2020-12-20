@@ -7214,6 +7214,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
+	case SCI_COPYSTYLES:
+		vs.CopyStyles(wParam, lParam);
+		InvalidateStyleRedraw();
+		break;
+
 	case SCI_STYLESETFORE:
 	case SCI_STYLESETBACK:
 	case SCI_STYLESETBOLD:
