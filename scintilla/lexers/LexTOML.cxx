@@ -188,7 +188,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_TOML_STRING1:
+		case SCE_TOML_STRING_SQ:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_TOML_DEFAULT);
 			} else if (sc.ch == '\'') {
@@ -199,7 +199,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_TOML_DEFAULT);
 			}
 			break;
-		case SCE_TOML_STRING2:
+		case SCE_TOML_STRING_DQ:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_TOML_DEFAULT);
 			} else if (sc.ch == '\\') {
@@ -215,13 +215,13 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_TOML_TRIPLE_STRING1:
+		case SCE_TOML_TRIPLE_STRING_SQ:
 			if (sc.Match('\'', '\'', '\'')) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
 			break;
-		case SCE_TOML_TRIPLE_STRING2:
+		case SCE_TOML_TRIPLE_STRING_DQ:
 			if (sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_TOML_ESCAPECHAR);
@@ -283,15 +283,15 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						lineType = TOMLLineType_CommentLine;
 					}
 				} else if (sc.Match('\'', '\'', '\'')) {
-					sc.SetState(SCE_TOML_TRIPLE_STRING1);
+					sc.SetState(SCE_TOML_TRIPLE_STRING_SQ);
 					sc.Forward(2);
 				} else if (sc.Match('"', '"', '"')) {
-					sc.SetState(SCE_TOML_TRIPLE_STRING2);
+					sc.SetState(SCE_TOML_TRIPLE_STRING_DQ);
 					sc.Forward(2);
 				} else if (sc.ch == '\'') {
-					sc.SetState(SCE_TOML_STRING1);
+					sc.SetState(SCE_TOML_STRING_SQ);
 				} else if (sc.ch == '\"') {
-					sc.SetState(SCE_TOML_STRING2);
+					sc.SetState(SCE_TOML_STRING_DQ);
 				} else if (IsADigit(sc.ch)) {
 					sc.SetState(SCE_TOML_NUMBER);
 				} else if (IsLowerCase(sc.ch)) {
