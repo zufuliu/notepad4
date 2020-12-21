@@ -42,7 +42,7 @@ public:
 	MarkerHandleNumber const *GetMarkerHandleNumber(int which) const noexcept;
 };
 
-class LineMarkers : public PerLine {
+class LineMarkers final : public PerLine {
 	SplitVector<std::unique_ptr<MarkerHandleSet>> markers;
 	/// Handles are allocated sequentially and should never have to be reused as 32 bit ints are very big.
 	int handleCurrent;
@@ -71,7 +71,7 @@ public:
 	int NumberFromLine(Sci::Line line, int which) const noexcept;
 };
 
-class LineLevels : public PerLine {
+class LineLevels final : public PerLine {
 	SplitVector<int> levels;
 public:
 	LineLevels() = default;
@@ -93,7 +93,7 @@ public:
 	int GetLevel(Sci::Line line) const noexcept;
 };
 
-class LineState : public PerLine {
+class LineState final : public PerLine {
 	SplitVector<int> lineStates;
 public:
 	LineState() = default;
