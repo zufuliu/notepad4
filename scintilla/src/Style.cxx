@@ -101,7 +101,6 @@ Style::Style(const Style &source) noexcept : FontSpecification(source), FontMeas
 	visible = source.visible;
 	changeable = source.changeable;
 	hotspot = source.hotspot;
-	font.ClearFont();
 }
 
 Style::~Style() = default;

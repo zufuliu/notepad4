@@ -59,7 +59,7 @@ public:
 	RGBAImage(RGBAImage &&) = default;
 	RGBAImage &operator=(const RGBAImage &) = default;
 	RGBAImage &operator=(RGBAImage &&) = default;
-	virtual ~RGBAImage();
+	~RGBAImage();
 	constexpr int GetHeight() const noexcept {
 		return height;
 	}

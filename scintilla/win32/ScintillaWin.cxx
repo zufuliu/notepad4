@@ -181,7 +181,7 @@ class ScintillaWin; 	// Forward declaration for COM interface subobjects
 
 /**
  */
-class FormatEnumerator : public IEnumFORMATETC {
+class FormatEnumerator final : public IEnumFORMATETC {
 	ULONG ref;
 	ULONG pos;
 	std::vector<CLIPFORMAT> formats;
@@ -204,7 +204,7 @@ public:
 
 /**
  */
-class DropSource : public IDropSource {
+class DropSource final : public IDropSource {
 public:
 	ScintillaWin *sci = nullptr;
 	DropSource() noexcept = default;
@@ -222,7 +222,7 @@ public:
 
 /**
  */
-class DataObject : public IDataObject {
+class DataObject final : public IDataObject {
 public:
 	ScintillaWin *sci = nullptr;
 	DataObject() noexcept = default;
@@ -247,7 +247,7 @@ public:
 
 /**
  */
-class DropTarget : public IDropTarget {
+class DropTarget final : public IDropTarget {
 public:
 	ScintillaWin *sci = nullptr;
 	DropTarget() noexcept = default;
@@ -372,7 +372,7 @@ public:
 
 /**
  */
-class ScintillaWin :
+class ScintillaWin final :
 	public ScintillaBase {
 
 	bool lastKeyDownConsumed;
@@ -2617,7 +2617,7 @@ void ScintillaWin::NotifyURIDropped(const char *list) noexcept {
 	NotifyParent(scn);
 }
 
-class CaseFolderDBCS : public CaseFolderTable {
+class CaseFolderDBCS final : public CaseFolderTable {
 	// Allocate the expandable storage here so that it does not need to be reallocated
 	// for each call to Fold.
 	std::vector<wchar_t> utf16Mixed;

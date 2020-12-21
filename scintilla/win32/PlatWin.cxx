@@ -547,7 +547,7 @@ public:
 };
 using TextPositions = VarBuffer<XYPOSITION, stackBufferLength>;
 
-class SurfaceGDI : public Surface {
+class SurfaceGDI final : public Surface {
 	bool unicodeMode = false;
 	HDC hdc{};
 	bool hdcOwned = false;
@@ -1212,7 +1212,7 @@ constexpr D2D1_RECT_F RectangleFromPRectangle(PRectangle rc) noexcept {
 
 class BlobInline;
 
-class SurfaceD2D : public Surface {
+class SurfaceD2D final : public Surface {
 	bool unicodeMode = false;
 	int x = 0;
 	int y = 0;
@@ -1696,7 +1696,7 @@ void SurfaceD2D::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
 	}
 }
 
-class BlobInline : public IDWriteInlineObject {
+class BlobInline final : public IDWriteInlineObject {
 	XYPOSITION width;
 
 	// IUnknown
@@ -1804,7 +1804,7 @@ COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetBreakConditions(
 	return S_OK;
 }
 
-class ScreenLineLayout : public IScreenLineLayout {
+class ScreenLineLayout final : public IScreenLineLayout {
 	IDWriteTextLayout *textLayout = nullptr;
 	std::string text;
 	std::wstring buffer;
@@ -2577,7 +2577,7 @@ ListBox::ListBox() noexcept = default;
 
 ListBox::~ListBox() = default;
 
-class ListBoxX : public ListBox {
+class ListBoxX final : public ListBox {
 	int lineHeight;
 	FontID fontCopy;
 	int technology;

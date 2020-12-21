@@ -19,7 +19,7 @@
 ******************************************************************************/
 #pragma once
 
-class CDropSource : public IDropSource {
+class CDropSource final : public IDropSource {
 public:
 	CDropSource() noexcept;
 	virtual ~CDropSource() = default;

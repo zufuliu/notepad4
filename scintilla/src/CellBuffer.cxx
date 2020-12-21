@@ -149,7 +149,7 @@ public:
 };
 
 template <typename POS>
-class LineVector : public ILineVector {
+class LineVector final : public ILineVector {
 	Partitioning<POS> starts;
 	PerLine *perLine;
 	LineStartIndex<POS> startsUTF16;
