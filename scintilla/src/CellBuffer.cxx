@@ -90,7 +90,7 @@ public:
 using namespace Scintilla;
 
 template <typename POS>
-class LineStartIndex {
+class LineStartIndex final {
 public:
 	int refCount;
 	Partitioning<POS> starts;
@@ -1064,56 +1064,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		simpleInsertion = false;
 	}
 
-	if (utf8LineEnds) {
-		uint8_t eolTable[256]{};
-		eolTable[static_cast<uint8_t>('\n')] = 1;
-		eolTable[static_cast<uint8_t>('\r')] = 2;
-		// see UniConversion.h for LS, PS and NEL
-		eolTable[0x85] = 4;
-		eolTable[0xa8] = 3;
-		eolTable[0xa9] = 3;
-
-		while (ptr < end) {
-			// skip to line end
-			ch = *ptr++;
-			uint8_t type;
-			while ((type = eolTable[ch]) == 0 && ptr < end) {
-				chBeforePrev = chPrev;
-				chPrev = ch;
-				ch = *ptr++;
-			}
-			switch (type) {
-			case 2: // '\r'
-				if (*ptr == '\n') {
-					++ptr;
-				}
-				[[fallthrough]];
-			case 1: // '\n'
-				positions[nPositions++] = position + ptr - s;
-				if (nPositions == PositionBlockSize) {
-					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-					lineInsert += nPositions;
-					nPositions = 0;
-				}
-				break;
-			case 3:
-			case 4:
-				// LS, PS and NEL
-				if ((type == 3 && chPrev == 0x80 && chBeforePrev == 0xe2) || (type == 4 && chPrev == 0xc2)) {
-					positions[nPositions++] = position + ptr - s;
-					if (nPositions == PositionBlockSize) {
-						plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
-						lineInsert += nPositions;
-						nPositions = 0;
-					}
-				}
-				break;
-			}
-
-			chBeforePrev = chPrev;
-			chPrev = ch;
-		}
-	} else {
+	if (!utf8LineEnds) {
 #if NP2_USE_AVX2
 		constexpr uint32_t LAST_CR_MASK = (1U << (sizeof(__m256i) - 1));
 		const __m256i vectCR = _mm256_set1_epi8('\r');
@@ -1262,6 +1213,55 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 				positions[nPositions++] = position + ptr - s;
 				break;
 			}
+		}
+	} else {
+		uint8_t eolTable[256]{};
+		eolTable[static_cast<uint8_t>('\n')] = 1;
+		eolTable[static_cast<uint8_t>('\r')] = 2;
+		// see UniConversion.h for LS, PS and NEL
+		eolTable[0x85] = 4;
+		eolTable[0xa8] = 3;
+		eolTable[0xa9] = 3;
+
+		while (ptr < end) {
+			// skip to line end
+			ch = *ptr++;
+			uint8_t type;
+			while ((type = eolTable[ch]) == 0 && ptr < end) {
+				chBeforePrev = chPrev;
+				chPrev = ch;
+				ch = *ptr++;
+			}
+			switch (type) {
+			case 2: // '\r'
+				if (*ptr == '\n') {
+					++ptr;
+				}
+				[[fallthrough]];
+			case 1: // '\n'
+				positions[nPositions++] = position + ptr - s;
+				if (nPositions == PositionBlockSize) {
+					plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+					lineInsert += nPositions;
+					nPositions = 0;
+				}
+				break;
+			case 3:
+			case 4:
+				// LS, PS and NEL
+				if ((type == 3 && chPrev == 0x80 && chBeforePrev == 0xe2) || (type == 4 && chPrev == 0xc2)) {
+					positions[nPositions++] = position + ptr - s;
+					if (nPositions == PositionBlockSize) {
+						plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+						lineInsert += nPositions;
+						nPositions = 0;
+					}
+				}
+				break;
+			}
+
+			chBeforePrev = chPrev;
+			chPrev = ch;
 		}
 	}
 
