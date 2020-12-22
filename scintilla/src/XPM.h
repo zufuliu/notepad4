@@ -11,7 +11,7 @@ namespace Scintilla {
 /**
  * Hold a pixmap in XPM format.
  */
-class XPM {
+class XPM final {
 	int height = 1;
 	int width = 1;
 	int nColours = 1;
@@ -46,7 +46,7 @@ private:
 /**
  * A translucent image stored as a sequence of RGBA bytes.
  */
-class RGBAImage {
+class RGBAImage final {
 	int height;
 	int width;
 	float scale;
@@ -84,7 +84,7 @@ public:
 /**
  * A collection of RGBAImage pixmaps indexed by integer id.
  */
-class RGBAImageSet {
+class RGBAImageSet final {
 	typedef std::map<int, std::unique_ptr<RGBAImage>> ImageMap;
 	ImageMap images;
 	mutable int height;	///< Memorize largest height of the set.

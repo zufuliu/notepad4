@@ -45,7 +45,7 @@ public:
 
 /**
  */
-class LineLayout {
+class LineLayout final {
 private:
 	friend class LineLayoutCache;
 	std::unique_ptr<int[]> lineStarts;
@@ -89,7 +89,7 @@ public:
 	LineLayout(LineLayout &&) = delete;
 	void operator=(const LineLayout &) = delete;
 	void operator=(LineLayout &&) = delete;
-	virtual ~LineLayout();
+	~LineLayout();
 	void Resize(int maxLineLength_);
 	void EnsureBidiData();
 	void Free() noexcept;
@@ -145,7 +145,7 @@ struct ScreenLine : public IScreenLine {
 
 /**
  */
-class LineLayoutCache {
+class LineLayoutCache final {
 	std::vector<std::unique_ptr<LineLayout>> cache;
 	size_t lastCaretSlot;
 	int level;
@@ -160,7 +160,7 @@ public:
 	LineLayoutCache(LineLayoutCache &&) = delete;
 	void operator=(const LineLayoutCache &) = delete;
 	void operator=(LineLayoutCache &&) = delete;
-	virtual ~LineLayoutCache();
+	~LineLayoutCache();
 	void Deallocate() noexcept;
 	enum {
 		llcNone = SC_CACHE_NONE,

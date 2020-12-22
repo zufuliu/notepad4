@@ -361,13 +361,9 @@ void ViewStyle::ReleaseAllExtendedStyles() noexcept {
 }
 
 int ViewStyle::AllocateExtendedStyles(int numberStyles) {
-	fontsValid = false;
 	const int startRange = nextExtendedStyle;
 	nextExtendedStyle += numberStyles;
 	EnsureStyle(nextExtendedStyle);
-	for (int i = startRange; i < nextExtendedStyle; i++) {
-		styles[i].ClearTo(styles[STYLE_DEFAULT]);
-	}
 	return startRange;
 }
 
@@ -385,13 +381,12 @@ void ViewStyle::ResetDefaultStyle() {
 void ViewStyle::ClearStyles() noexcept {
 	fontsValid = false;
 	// Reset all styles to be like the default style
-	for (size_t i = 0; i < styles.size(); i++) {
-		if (i != STYLE_DEFAULT) {
-			styles[i].ClearTo(styles[STYLE_DEFAULT]);
-		}
+	const Style &source = styles[STYLE_DEFAULT];
+	for (auto &style : styles) {
+		style.ClearTo(source);
 	}
-	styles[STYLE_LINENUMBER].back = Platform::Chrome();
 
+	styles[STYLE_LINENUMBER].back = Platform::Chrome();
 	// Set call tip fore/back to match the values previously set for call tips
 	styles[STYLE_CALLTIP].back = ColourDesired(0xff, 0xff, 0xff);
 	styles[STYLE_CALLTIP].fore = ColourDesired(0x80, 0x80, 0x80);
@@ -662,13 +657,13 @@ bool ViewStyle::ZoomOut() noexcept {
 
 void ViewStyle::AllocStyles(size_t sizeNew) {
 	fontsValid = false;
-	size_t i = styles.size();
+	const size_t i = styles.size();
 	styles.resize(sizeNew);
-	if (styles.size() > STYLE_DEFAULT) {
-		for (; i < sizeNew; i++) {
-			if (i != STYLE_DEFAULT) {
-				styles[i].ClearTo(styles[STYLE_DEFAULT]);
-			}
+	sizeNew = styles.size();
+	if (sizeNew > STYLE_DEFAULT) {
+		const Style &source = styles[STYLE_DEFAULT];
+		for (auto it = styles.begin() + i; it != styles.end(); ++it) {
+			it->ClearTo(source);
 		}
 	}
 }

@@ -49,7 +49,7 @@ class LineTabstops;
 /**
 * EditView draws the main text area.
 */
-class EditView {
+class EditView final {
 public:
 	PrintParameters printParameters;
 	std::unique_ptr<LineTabstops> ldTabstops;
@@ -99,7 +99,7 @@ public:
 	EditView(EditView &&) = delete;
 	void operator=(const EditView &) = delete;
 	void operator=(EditView &&) = delete;
-	virtual ~EditView();
+	~EditView();
 
 	bool SetTwoPhaseDraw(bool twoPhaseDraw) noexcept;
 	bool SetPhasesDraw(int phases) noexcept;
