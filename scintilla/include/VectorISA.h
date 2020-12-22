@@ -136,16 +136,16 @@
 
 #if NP2_USE_SSE2
 #define ZeroMemory_16x2(buffer) do { \
-	const __m128i zero = _mm_setzero_si128();							\
-	_mm_store_si128((__m128i *)(buffer), zero);							\
-	_mm_store_si128((__m128i *)((buffer) + sizeof(__m128i)), zero);		\
+	const __m128 zero = _mm_setzero_ps();						\
+	_mm_store_ps((float *)(buffer), zero);						\
+	_mm_store_ps((float *)((buffer) + sizeof(__m128)), zero);	\
 } while (0)
 
 #define ZeroMemory_16x4(buffer) do { \
-	const __m128i zero = _mm_setzero_si128();							\
-	_mm_store_si128((__m128i *)(buffer), zero);							\
-	_mm_store_si128((__m128i *)((buffer) + sizeof(__m128i)), zero);		\
-	_mm_store_si128((__m128i *)((buffer) + 2*sizeof(__m128i)), zero);	\
-	_mm_store_si128((__m128i *)((buffer) + 3*sizeof(__m128i)), zero);	\
+	const __m128 zero = _mm_setzero_ps();						\
+	_mm_store_ps((float *)(buffer), zero);						\
+	_mm_store_ps((float *)((buffer) + sizeof(__m128)), zero);	\
+	_mm_store_ps((float *)((buffer) + 2*sizeof(__m128)), zero);	\
+	_mm_store_ps((float *)((buffer) + 3*sizeof(__m128)), zero);	\
 } while (0)
 #endif
