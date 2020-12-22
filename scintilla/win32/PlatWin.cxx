@@ -484,11 +484,6 @@ FontID CreateFontFromParameters(const FontParameters &fp) {
 
 }
 
-Font::Font() noexcept : fid{} {
-}
-
-Font::~Font() = default;
-
 void Font::Create(const FontParameters &fp) {
 	Release();
 	if (fp.faceName)
@@ -2329,8 +2324,6 @@ Surface *Surface::Allocate(int technology) {
 #endif
 }
 
-Window::~Window() = default;
-
 void Window::Destroy() noexcept {
 	if (wid)
 		::DestroyWindow(HwndFromWindowID(wid));
@@ -3530,9 +3523,6 @@ void ListBoxX_Unregister() noexcept {
 	}
 }
 
-}
-
-Menu::Menu() noexcept : mid{} {
 }
 
 void Menu::CreatePopUp() noexcept {

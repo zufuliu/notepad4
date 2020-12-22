@@ -369,18 +369,20 @@ struct FontParameters {
 
 class Font {
 protected:
-	FontID fid;
+	FontID fid{};
 public:
-	Font() noexcept;
+	Font() noexcept = default;
 	// Deleted so Font objects can not be copied
 	Font(const Font &) = delete;
 	Font(Font &&) = delete;
 	Font &operator=(const Font &) = delete;
 	Font &operator=(Font &&) = delete;
+#ifndef PLAT_WIN
 	virtual ~Font();
+#endif
 
-	virtual void Create(const FontParameters &fp);
-	virtual void Release() noexcept;
+	void Create(const FontParameters &fp);
+	void Release() noexcept;
 
 	FontID GetID() const noexcept {
 		return fid;
@@ -486,10 +488,10 @@ public:
  */
 class Window {
 protected:
-	WindowID wid;
+	WindowID wid{};
 
 public:
-	Window() noexcept : wid(nullptr), cursorLast(Cursor::invalid) {}
+	Window() noexcept = default;
 	Window(const Window &source) = delete;
 	Window(Window &&) = delete;
 	Window &operator=(WindowID wid_) noexcept {
@@ -499,7 +501,7 @@ public:
 	}
 	Window &operator=(const Window &) = delete;
 	Window &operator=(Window &&) = delete;
-	virtual ~Window();
+	virtual ~Window() = default;
 	WindowID GetID() const noexcept {
 		return wid;
 	}
@@ -522,7 +524,7 @@ public:
 	PRectangle SCICALL GetMonitorRect(Point pt) const noexcept;
 
 private:
-	Cursor cursorLast;
+	Cursor cursorLast = Cursor::invalid;
 };
 
 /**
@@ -575,9 +577,9 @@ public:
  * Menu management.
  */
 class Menu {
-	MenuID mid;
+	MenuID mid{};
 public:
-	Menu() noexcept;
+	Menu() noexcept = default;
 	MenuID GetID() const noexcept {
 		return mid;
 	}

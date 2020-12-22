@@ -25,43 +25,30 @@
 
 using namespace Scintilla;
 
-LineMarker::LineMarker(const LineMarker &other) {
-	// Defined to avoid pxpm and image being blindly copied, not as a complete copy constructor.
-	markType = other.markType;
-	fore = other.fore;
-	back = other.back;
-	backSelected = other.backSelected;
-	alpha = other.alpha;
-	if (other.pxpm)
-		pxpm = std::make_unique<XPM>(*other.pxpm);
-	else
-		pxpm = nullptr;
-	if (other.image)
-		image = std::make_unique<RGBAImage>(*other.image);
-	else
-		image = nullptr;
-	customDraw = other.customDraw;
+LineMarker::LineMarker(const LineMarker &other) : LineMarkerBase(other) {
+	CopyImage(other);
 }
 
 LineMarker &LineMarker::operator=(const LineMarker &other) {
-	// Defined to avoid pxpm and image being blindly copied, not as a complete assignment operator.
 	if (this != &other) {
-		markType = other.markType;
-		fore = other.fore;
-		back = other.back;
-		backSelected = other.backSelected;
-		alpha = other.alpha;
-		if (other.pxpm)
-			pxpm = std::make_unique<XPM>(*other.pxpm);
-		else
-			pxpm = nullptr;
-		if (other.image)
-			image = std::make_unique<RGBAImage>(*other.image);
-		else
-			image = nullptr;
-		customDraw = other.customDraw;
+		(LineMarkerBase &)(*this) = other;
+		CopyImage(other);
 	}
 	return *this;
+}
+
+void LineMarker::CopyImage(const LineMarker &other) {
+	// Defined to avoid pxpm and image being blindly copied.
+	if (other.pxpm) {
+		pxpm = std::make_unique<XPM>(*other.pxpm);
+	} else {
+		pxpm = nullptr;
+	}
+	if (other.image) {
+		image = std::make_unique<RGBAImage>(*other.image);
+	} else {
+		image = nullptr;
+	}
 }
 
 void LineMarker::SetXPM(const char *textForm) {

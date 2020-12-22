@@ -17,8 +17,6 @@
 
 using namespace Scintilla;
 
-FontAlias::FontAlias() noexcept = default;
-
 FontAlias::FontAlias(const FontAlias &other) noexcept {
 	SetID(other.fid);
 }
@@ -27,12 +25,12 @@ FontAlias::FontAlias(FontAlias &&other) noexcept {
 	SetID(other.fid);
 	other.ClearFont();
 }
-
+#ifndef PLAT_WIN
 FontAlias::~FontAlias() {
 	SetID(FontID{});
 	// ~Font will not release the actual font resource since it is now 0
 }
-
+#endif
 void FontAlias::MakeAlias(const Font &fontOrigin) noexcept {
 	SetID(fontOrigin.GetID());
 }
@@ -91,45 +89,20 @@ Style::Style() noexcept {
 	hotspot = false;
 }
 
-Style::Style(const Style &source) noexcept : FontSpecification(source), FontMeasurements(source) {
-	fore = source.fore;
-	back = source.back;
-	eolFilled = source.eolFilled;
-	underline = source.underline;
-	strike = source.strike;
-	caseForce = source.caseForce;
-	visible = source.visible;
-	changeable = source.changeable;
-	hotspot = source.hotspot;
+Style::Style(const Style &source) noexcept :
+	FontSpecification(source),
+	FontMeasurements(source),
+	StylePod(source) {
 }
-
-Style::~Style() = default;
 
 Style &Style::operator=(const Style &source) noexcept {
 	if (this == &source) {
 		return *this;
 	}
 
-#if 1
-	fontName = source.fontName;
-	weight = source.weight;
-	italic = source.italic;
-	size = source.size;
-	characterSet = source.characterSet;
-	FontMeasurements::ClearMeasurements();
-#else
 	(FontSpecification &)(*this) = source;
 	(FontMeasurements &)(*this) = source;
-#endif
-	fore = source.fore;
-	back = source.back;
-	eolFilled = source.eolFilled;
-	underline = source.underline;
-	strike = source.strike;
-	caseForce = source.caseForce;
-	visible = source.visible;
-	changeable = source.changeable;
-	hotspot = source.hotspot;
+	(StylePod &)(*this) = source;
 	font.ClearFont();
 	return *this;
 }
