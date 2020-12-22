@@ -82,12 +82,6 @@ extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExS
 #endif
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-#define NP2_unreachable()	__builtin_unreachable()
-#else
-#define NP2_unreachable()	__assume(0)
-#endif
-
 namespace Scintilla {
 
 extern void Platform_Initialise(void *hInstance) noexcept;

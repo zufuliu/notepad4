@@ -88,6 +88,12 @@
 	#define SCICALL
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_unreachable()	__builtin_unreachable()
+#else
+#define NP2_unreachable()	__assume(0)
+#endif
+
 namespace Scintilla {
 
 // official Scintilla use dynamic_cast, which requires RTTI.
