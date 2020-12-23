@@ -1328,15 +1328,13 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		NP2_alignas(32) char buffer[2*sizeof(__m256i)];
+		NP2_alignas(32) uint8_t buffer[2*sizeof(__m256i)];
 		ZeroMemory_32x2(buffer);
 
-		if (offset > 0) {
+		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
-		for (uint32_t i = 0; i < len - offset; i++) {
-			buffer[i + 1] = data[offset + i];
-		}
+		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
 
 		__m256i shifted_bytes = _mm256_load_si256((__m256i *)buffer);
 		__m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
@@ -1492,15 +1490,13 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		NP2_alignas(16) char buffer[2*sizeof(__m128i)];
+		NP2_alignas(16) uint8_t buffer[2*sizeof(__m128i)];
 		ZeroMemory_16x2(buffer);
 
-		if (offset > 0) {
+		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
-		for (uint32_t i = 0; i < len - offset; i++) {
-			buffer[i + 1] = data[offset + i];
-		}
+		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
 
 		__m128i shifted_bytes = _mm_load_si128((__m128i *)(buffer));
 		__m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
@@ -1741,9 +1737,9 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		pt += 2*sizeof(__m256i);
 	}
 	if (pt < end) {
-		NP2_alignas(32) char buffer[2*sizeof(__m256i)];
+		NP2_alignas(32) uint8_t buffer[2*sizeof(__m256i)];
 		ZeroMemory_32x2(buffer);
-		memcpy(buffer, pt, end - pt);
+		__movsb(buffer, pt, end - pt);
 
 		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
 		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
@@ -1765,9 +1761,9 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		pt += 4*sizeof(__m128i);
 	}
 	if (pt < end) {
-		NP2_alignas(16) char buffer[4*sizeof(__m128i)];
+		NP2_alignas(16) uint8_t buffer[4*sizeof(__m128i)];
 		ZeroMemory_16x4(buffer);
-		memcpy(buffer, pt, end - pt);
+		__movsb(buffer, pt, end - pt);
 
 		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
 		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
