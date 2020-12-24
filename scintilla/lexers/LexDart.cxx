@@ -157,13 +157,16 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else if (kwType != SCE_DART_DEFAULT) {
 					sc.ChangeState(kwType);
 				} else {
-					const int chNext = sc.GetNextNSChar();
+					const int offset = sc.ch == '?';
+					const int chNext = sc.GetLineNextChar(offset);
 					if (chNext == '(') {
 						sc.ChangeState(SCE_DART_FUNCTION);
 					} else if ((chBeforeIdentifier == '<' && chNext == '>')
 						|| IsIdentifierStartEx(chNext)) {
 						// type<type>
+						// type<type?>
 						// type identifier
+						// type? identifier
 						sc.ChangeState(SCE_DART_CLASS);
 					}
 				}
@@ -317,14 +320,14 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 				continue;
 			} else if (sc.Match('"', '"', '"')) {
-				sc.ChangeState(SCE_DART_TRIPLE_STRING_DQSTART);
+				sc.SetState(SCE_DART_TRIPLE_STRING_DQSTART);
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_DART_TRIPLE_STRING_DQ);
 				continue;
 			} else if (sc.ch == '"') {
 				sc.SetState(SCE_DART_STRING_DQ);
 			} else if (sc.Match('\'', '\'', '\'')) {
-				sc.ChangeState(SCE_DART_TRIPLE_STRING_SQSTART);
+				sc.SetState(SCE_DART_TRIPLE_STRING_SQSTART);
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_DART_TRIPLE_STRING_SQ);
 				continue;
