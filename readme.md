@@ -54,6 +54,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Configuration / Properties File
 		* Apache Configuration File
 	* D
+	* [Dart]((../master/tools/lang/Dart.dart), up to Dart 2.12.
 	* Diff/Patch File
 	* Doxygen
 	* F#
