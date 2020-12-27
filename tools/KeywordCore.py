@@ -902,6 +902,59 @@ def parse_sql_api_files(pathList):
 	]
 	return keywordList
 
+def parse_swift_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'directive':
+			items = re.findall(r'#(\w+\(?)', doc)
+			keywordMap[key] = items
+		elif key == 'attribute':
+			items = re.findall(r'@(\w+\(?)', doc)
+			keywordMap[key] = items
+		elif key == 'library':
+			classes = re.findall(r'class\s+(\w+)', doc)
+			structs = re.findall(r'struct\s+(\w+)', doc)
+			protocols = re.findall(r'protocol\s+(\w+)', doc)
+			enums = re.findall(r'enum\s+(\w+)', doc)
+			items = re.findall(r'func\s+(\w+)', doc)
+			functions = [item + '(' for item in items]
+
+			classes.extend(['AnyObject', 'AnyClass'])
+			items = re.findall(r'typealias\s+(\w+)(\s*=\s*(\w+))?', doc)
+			for alias, _, name in items:
+				if name in classes:
+					classes.append(alias)
+				elif name in structs or name == '':
+					structs.append(alias)
+
+			keywordMap['class'] = classes
+			keywordMap['struct'] = structs
+			keywordMap['protocol'] = protocols
+			keywordMap['enumeration'] = enums
+			keywordMap['function'] = functions
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'class',
+		'struct',
+		'protocol',
+		'enumeration',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('directive', keywordMap['directive'], KeywordAttr.Default),
+		('attribute', keywordMap['attribute'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('struct', keywordMap['struct'], KeywordAttr.Default),
+		('protocol', keywordMap['protocol'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
 def parse_vim_api_file(path):
 	sections = read_api_file(path, '"')
 	keywordMap = {}

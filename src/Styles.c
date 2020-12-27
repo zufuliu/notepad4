@@ -113,6 +113,7 @@ extern EDITLEXER lexRust;
 
 extern EDITLEXER lexScala;
 extern EDITLEXER lexBash;
+extern EDITLEXER lexSwift;
 
 extern EDITLEXER lexTcl;
 extern EDITLEXER lexTexinfo;
@@ -208,6 +209,7 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexScala,
 	&lexBash,
+	&lexSwift,
 
 	&lexTcl,
 	&lexTexinfo,
@@ -1293,6 +1295,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[3] = KeywordAttr_NoLexer;		// upper case keywords
 		attr[4] = KeywordAttr_NoLexer;		// upper case data types
 		attr[5] = KeywordAttr_NoLexer;		// upper case functions
+		break;
+	case NP2LEX_SWIFT:
+		attr[7] = KeywordAttr_NoLexer;		// function
 		break;
 	case NP2LEX_WASM:
 		attr[3] = KeywordAttr_NoLexer;		// full instruction
