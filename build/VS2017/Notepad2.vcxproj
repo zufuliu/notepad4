@@ -1000,6 +1000,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSmali.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexSwift.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTCL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTexinfo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexTOML.cxx" />
@@ -1111,6 +1112,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlScala.c" />
     <ClCompile Include="..\..\src\EditLexers\stlSmali.c" />
     <ClCompile Include="..\..\src\EditLexers\stlSQL.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlSwift.c" />
     <ClCompile Include="..\..\src\EditLexers\stlTcl.c" />
     <ClCompile Include="..\..\src\EditLexers\stlTOML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVB.c" />

@@ -1067,6 +1067,10 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // metadata
 		return AutoC_AddSpecWord_Keyword;
 	}
+	else if (pLexCurrent->iLexer == SCLEX_SWIFT && (ch == '@' || ch == '#') && iCurrentStyle == SCE_SWIFT_DEFAULT) {
+		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(ch == '#') ? 1 : 2]); // directive, attribute
+		return AutoC_AddSpecWord_Keyword;
+	}
 	return 0;
 }
 
@@ -2051,6 +2055,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_KOTLIN:
 	case SCLEX_PASCAL:
 	case SCLEX_RUST:
+	case SCLEX_SWIFT:
 	case SCLEX_VERILOG:
 		EditToggleLineComments(L"//", FALSE);
 		break;
@@ -2189,6 +2194,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_NSIS:
 	case SCLEX_RUST:
 	case SCLEX_SQL:
+	case SCLEX_SWIFT:
 	case SCLEX_VERILOG:
 	case SCLEX_VHDL:
 		EditEncloseSelection(L"/*", L"*/");

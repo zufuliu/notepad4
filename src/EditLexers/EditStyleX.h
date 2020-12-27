@@ -141,6 +141,7 @@
 #define NP2StyleX_Object				EDITSTYLE_HOLE(Object, L"Object")
 #define NP2StyleX_Type					EDITSTYLE_HOLE(Type, L"Type")
 #define NP2StyleX_FunctionDefine		EDITSTYLE_HOLE(FunctionDefine, L"Function Define")
+#define NP2StyleX_Protocol				EDITSTYLE_HOLE(Protocol, L"Protocol")
 
 #define NP2StyleX_Label					EDITSTYLE_HOLE(Label, L"Label")
 #define NP2StyleX_Command				EDITSTYLE_HOLE(Command, L"Command")
