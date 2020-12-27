@@ -70,12 +70,12 @@
 #else
 #define NP2_HAS_GETDPIFORWINDOW					0
 #if NP2_FORCE_COMPILE_C_AS_CPP
-#define NP2_noexcept noexcept
+#define NP2F_noexcept noexcept
 extern UINT GetWindowDPI(HWND hwnd) noexcept;
 extern int SystemMetricsForDpi(int nIndex, UINT dpi) noexcept;
 extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) noexcept;
 #else
-#define NP2_noexcept
+#define NP2F_noexcept
 extern "C" UINT GetWindowDPI(HWND hwnd);
 extern "C" int SystemMetricsForDpi(int nIndex, UINT dpi);
 extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi);
@@ -92,6 +92,45 @@ constexpr RECT RectFromPRectangle(PRectangle prc) noexcept {
 		static_cast<LONG>(prc.right), static_cast<LONG>(prc.bottom) };
 	return rc;
 }
+
+constexpr PRectangle PRectangleFromRect(RECT rc) noexcept {
+	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
+}
+
+#if NP2_USE_SSE2
+inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
+	PRectangle prc;
+	__m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
+	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
+	_mm_store_ps((float *)(&prc), f32x4);
+	return prc;
+}
+
+inline RECT RectFromPRectangleEx(const PRectangle *prc) noexcept {
+	RECT rc;
+	__m128 f32x4 = _mm_load_ps((float *)(prc));
+	__m128i i32x4 = _mm_cvtps_epi32(f32x4);
+	_mm_store_si128((__m128i *)(&rc), i32x4);
+	return rc;
+}
+
+inline RECT RectFromPRectangleEx(PRectangle prc) noexcept {
+	return RectFromPRectangleEx(&prc);
+}
+
+#else
+constexpr PRectangle PRectangleFromRectEx(RECT rc) noexcept {
+	return PRectangleFromRect(rc);
+}
+
+constexpr RECT RectFromPRectangleEx(PRectangle prc) noexcept {
+	return RectFromPRectangle(prc);
+}
+
+constexpr RECT RectFromPRectangleEx(const PRectangle *prc) noexcept {
+	return RectFromPRectangle(*prc);
+}
+#endif
 
 constexpr POINT POINTFromPoint(Point pt) noexcept {
 	return POINT { static_cast<LONG>(pt.x), static_cast<LONG>(pt.y) };
