@@ -102,7 +102,7 @@ def BuildKeywordContent(rid, keywordList, keywordCount=16):
 	nonzero = []
 	for index, item in enumerate(keywordList):
 		comment, items, attr = item
-		lines = MakeKeywordLines(items)
+		lines = MakeKeywordLines(set(items))
 		if index != 0:
 			output.append(", // %d %s" % (index, comment))
 		if lines:

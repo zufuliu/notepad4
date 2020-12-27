@@ -37,13 +37,13 @@ struct EscapeSequence {
 
 bool IsRustRawString(LexAccessor &styler, Sci_PositionU pos, bool start, int &hashCount) noexcept {
 	int count = 0;
-	while (styler.SafeGetCharAt(pos) == '#') {
+	char ch;
+	while ((ch = styler.SafeGetCharAt(pos)) == '#') {
 		++count;
 		++pos;
 	}
 
 	if (start) {
-		const char ch = styler.SafeGetCharAt(pos);
 		if (ch == '\"') {
 			hashCount = count;
 			return true;

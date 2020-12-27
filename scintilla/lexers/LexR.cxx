@@ -148,7 +148,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				sc.SetState(SCE_R_STRING);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_R_BACKTICKS);
-			} else if (IsADigit(sc.ch) || (sc.chPrev != '.' && sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_R_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				chBeforeIdentifier = sc.chPrev;
