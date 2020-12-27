@@ -8,8 +8,8 @@ static KEYWORDLIST Keywords_GN = {{
 , // 1 function
 "action( action_foreach( assert( bundle_data( config( copy( create_bundle( declare_args( defined( "
 "exec_script( executable( foreach( forward_variables_from( "
-"generated_file( get_label_info( get_path_info( get_target_outputs( getenv( group( import( loadable_module( "
-"not_needed( not_needed( pool( print( process_file_template( read_file( rebase_path( "
+"generated_file( get_label_info( get_path_info( get_target_outputs( getenv( group( import( loadable_module( not_needed( "
+"pool( print( process_file_template( read_file( rebase_path( "
 "set_default_toolchain( set_defaults( set_sources_assignment_filter( shared_library( source_set( split_list( "
 "static_library( string_replace( "
 "target( template( tool( toolchain( write_file( "

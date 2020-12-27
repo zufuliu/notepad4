@@ -111,7 +111,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		commentLevel = (lineState >> 2) & 0x3f;
 		curlyBrace = (lineState >> 8) & 0xff;
 		if (curlyBrace) {
-			UnpackNestedState((lineState >> 16) & 0xff, curlyBrace, nestedState);
+			UnpackNestedState(lineState >> 16, curlyBrace, nestedState);
 		}
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
