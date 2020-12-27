@@ -61,7 +61,7 @@ NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	return _wcsicmp(s1, s2) == 0;
 }
 
-#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN7) && !(defined(_MSC_VER) && _MSC_VER >= 1920)
 #define StrHasPrefix(s, prefix)				(FindStringOrdinal(FIND_STARTSWITH, (s), -1, (prefix), CSTRLEN(prefix), FALSE) == 0)
 #define StrHasPrefixEx(s, prefix, len)		(FindStringOrdinal(FIND_STARTSWITH, (s), -1, (prefix), (len), FALSE) == 0)
 #define StrHasPrefixCase(s, prefix)			(FindStringOrdinal(FIND_STARTSWITH, (s), -1, (prefix), CSTRLEN(prefix), TRUE) == 0)
