@@ -84,8 +84,7 @@ void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) 
 }
 
 void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	int lineStateLineComment = 0;
-	int lineStateImport = 0;
+	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
 
 	int kwType = SCE_DART_DEFAULT;
@@ -102,8 +101,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
-		1: lineStateLineComment
-		1: lineStateImport
+		2: lineStateLineType
 		6: commentLevel
 		8: curlyBrace
 		3*4: nestedState
@@ -117,7 +115,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_DART_COMMENTLINE);
-		lineStateLineComment = DartLineStateMaskLineComment;
+		lineStateLineType = DartLineStateMaskLineComment;
 	}
 
 	while (sc.More()) {
@@ -141,7 +139,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ChangeState(SCE_DART_WORD);
 					if (EqualsAny(s, "import", "part")) {
 						if (visibleChars == sc.LengthCurrent()) {
-							lineStateImport = DartLineStateMaskImport;
+							lineStateLineType = DartLineStateMaskImport;
 						}
 					} else if (EqualsAny(s, "as", "class", "extends", "implements", "is", "new", "throw")) {
 						kwType = SCE_DART_CLASS;
@@ -301,7 +299,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '/') ? SCE_DART_COMMENTLINEDOC : SCE_DART_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = DartLineStateMaskLineComment;
+					lineStateLineType = DartLineStateMaskLineComment;
 				}
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
@@ -367,13 +365,12 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineComment | lineStateImport;
+			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineType;
 			if (curlyBrace) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);
-			lineStateLineComment = 0;
-			lineStateImport = 0;
+			lineStateLineType = 0;
 			visibleChars = 0;
 			kwType = SCE_DART_DEFAULT;
 		}
