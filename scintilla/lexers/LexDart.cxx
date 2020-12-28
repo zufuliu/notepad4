@@ -145,6 +145,14 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						kwType = SCE_DART_CLASS;
 					} else if (strcmp(s, "enum") == 0) {
 						kwType = SCE_DART_ENUM;
+					} else if (EqualsAny(s, "break", "continue")) {
+						kwType = SCE_DART_LABEL;
+					}
+					if (kwType != SCE_DART_DEFAULT) {
+						const int chNext = sc.GetLineNextChar();
+						if (!IsIdentifierStartEx(chNext)) {
+							kwType = SCE_DART_DEFAULT;
+						}
 					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_DART_WORD2);

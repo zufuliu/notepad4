@@ -168,6 +168,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							kwType = SCE_SWIFT_ENUM;
 						} else if (strcmp(s, "func") == 0) {
 							kwType = SCE_SWIFT_FUNCTION_DEFINE;
+						} else if (EqualsAny(s, "break", "continue")) {
+							kwType = SCE_SWIFT_LABEL;
 						}
 						if (kwType != SCE_SWIFT_DEFAULT) {
 							const int chNext = sc.GetLineNextChar();
