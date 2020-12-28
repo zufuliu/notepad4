@@ -99,8 +99,7 @@ void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) 
 }
 
 void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	int lineStateLineComment = 0;
-	int lineStateImport = 0;
+	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
 
 	int kwType = SCE_SWIFT_DEFAULT;
@@ -116,8 +115,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
-		1: lineStateLineComment
-		1: lineStateImport
+		2: lineStateLineType
 		6: commentLevel
 		8: parenCount
 		8: delimiterCount
@@ -158,7 +156,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						sc.ChangeState(SCE_SWIFT_WORD);
 						if (strcmp(s, "import") == 0) {
 							if (visibleChars == sc.LengthCurrent()) {
-								lineStateImport = SwiftLineStateMaskImport;
+								lineStateLineType = SwiftLineStateMaskImport;
 							}
 						} else if (EqualsAny(s, "class", "as", "extension", "is", "typealias")) {
 							kwType = SCE_SWIFT_CLASS;
@@ -323,7 +321,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '/' || chNext == ':' || chNext == '!') ? SCE_SWIFT_COMMENTLINEDOC : SCE_SWIFT_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = SwiftLineStateMaskLineComment;
+					lineStateLineType = SwiftLineStateMaskLineComment;
 				}
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
@@ -340,7 +338,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
 			} else if ((sc.ch == '@' || sc.ch == '`') && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState((sc.ch == '@') ? SCE_SWIFT_ATTRIBUTE : SCE_SWIFT_VARIABLE);
+				sc.SetState((sc.ch == '@') ? SCE_SWIFT_ATTRIBUTE : SCE_SWIFT_IDENTIFIER_BT);
 			} else if (sc.ch == '$' && IsIdentifierCharEx(sc.chNext)) {
 				sc.SetState(SCE_SWIFT_VARIABLE);
 			} else if (sc.ch == '#') {
@@ -378,13 +376,12 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (parenCount << 8) | (commentLevel << 2) | (delimiterCount << 16) | lineStateLineComment | lineStateImport;
+			int lineState = (parenCount << 8) | (commentLevel << 2) | (delimiterCount << 16) | lineStateLineType;
 			if (parenCount) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);
-			lineStateLineComment = 0;
-			lineStateImport = 0;
+			lineStateLineType = 0;
 			visibleChars = 0;
 			kwType = SCE_SWIFT_DEFAULT;
 		}

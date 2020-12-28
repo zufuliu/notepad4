@@ -79,8 +79,7 @@ void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) 
 }
 
 void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	int lineStateLineComment = 0;
-	int lineStateImport = 0;
+	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
 
 	int kwType = SCE_KOTLIN_DEFAULT;
@@ -97,8 +96,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
-		1: lineStateLineComment
-		1: lineStateImport
+		2: lineStateLineType
 		6: commentLevel
 		8: curlyBrace
 		2*4: nestedState
@@ -112,7 +110,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_KOTLIN_COMMENTLINE);
-		lineStateLineComment = KotlinLineStateMaskLineComment;
+		lineStateLineType = KotlinLineStateMaskLineComment;
 	}
 
 	while (sc.More()) {
@@ -136,7 +134,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.ChangeState(SCE_KOTLIN_WORD);
 					if (strcmp(s, "import") == 0) {
 						if (visibleChars == sc.LengthCurrent()) {
-							lineStateImport = KotlinLineStateMaskImport;
+							lineStateLineType = KotlinLineStateMaskImport;
 						}
 					} else if (EqualsAny(s, "break", "continue", "return", "this", "super")) {
 						kwType = SCE_KOTLIN_LABEL;
@@ -311,7 +309,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '!' || chNext == '/') ? SCE_KOTLIN_COMMENTLINEDOC : SCE_KOTLIN_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = KotlinLineStateMaskLineComment;
+					lineStateLineType = KotlinLineStateMaskLineComment;
 				}
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
@@ -357,13 +355,12 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineComment | lineStateImport;
+			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineType;
 			if (curlyBrace) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);
-			lineStateLineComment = 0;
-			lineStateImport = 0;
+			lineStateLineType = 0;
 			visibleChars = 0;
 			kwType = SCE_KOTLIN_DEFAULT;
 		}
