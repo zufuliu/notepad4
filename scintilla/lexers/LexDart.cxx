@@ -261,12 +261,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_DART_OPERATOR2);
 				sc.Forward();
-			} else if (curlyBrace && sc.ch == '}') {
-				const int outerState = TryPopBack(nestedState);
-				--curlyBrace;
-				sc.SetState(SCE_DART_OPERATOR2);
-				sc.ForwardSetState(outerState);
-				continue;
 			} else if (sc.ch == '\'' && (sc.state == SCE_DART_STRING_SQ
 				|| (sc.state == SCE_DART_TRIPLE_STRING_SQ && sc.Match('\'', '\'', '\'')))) {
 				if (sc.state == SCE_DART_TRIPLE_STRING_SQ) {
