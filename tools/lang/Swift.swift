@@ -1,7 +1,6 @@
 // 5.3 https://docs.swift.org/
 // https://docs.swift.org/swift-book/
 // https://swift.org/documentation/
-// https://docs.swift.org/swift-book/ReferenceManual/AboutTheLanguageReference.html
 // https://github.com/apple/swift
 
 //! keywords		===========================================================
