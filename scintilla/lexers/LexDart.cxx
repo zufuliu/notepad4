@@ -45,6 +45,12 @@ enum {
 	DartLineStateMaskImport = (1 << 1),	// import
 };
 
+constexpr bool IsDeclarableOperator(int ch) noexcept {
+	// https://github.com/dart-lang/sdk/blob/master/sdk/lib/core/symbol.dart
+	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
+					 '^', '~', '<', '>', '=', '[', ']');
+}
+
 constexpr int PackState(int state) noexcept {
 	switch (state) {
 	case SCE_DART_STRING_SQ:
@@ -197,7 +203,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_DART_SYMBOL_OPERATOR:
-			if (!isoperator(sc.ch)) {
+			if (!IsDeclarableOperator(sc.ch)) {
 				sc.SetState(SCE_DART_DEFAULT);
 			}
 			break;
@@ -341,7 +347,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '#') {
 				if (IsIdentifierStartEx(sc.chNext)) {
 					sc.SetState(SCE_DART_SYMBOL_IDENTIFIER);
-				} else if (isoperator(sc.ch)) {
+				} else if (IsDeclarableOperator(sc.ch)) {
 					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
