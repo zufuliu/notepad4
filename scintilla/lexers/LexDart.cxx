@@ -48,7 +48,7 @@ enum {
 constexpr bool IsDeclarableOperator(int ch) noexcept {
 	// https://github.com/dart-lang/sdk/blob/master/sdk/lib/core/symbol.dart
 	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
-					 '^', '~', '<', '>', '=', '[', ']');
+					 '^', '<', '>', '=', '[', ']');
 }
 
 constexpr int PackState(int state) noexcept {
@@ -283,6 +283,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.ForwardSetState(SCE_DART_DEFAULT);
 			}
 			break;
+
 		case SCE_DART_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
 				const int outerState = escSeq.outerState;
@@ -294,6 +295,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			}
 			break;
+
 		case SCE_DART_VARIABLE:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(variableOuter);
@@ -347,7 +349,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '#') {
 				if (IsIdentifierStartEx(sc.chNext)) {
 					sc.SetState(SCE_DART_SYMBOL_IDENTIFIER);
-				} else if (IsDeclarableOperator(sc.ch)) {
+				} else if (IsDeclarableOperator(sc.chNext)) {
 					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
