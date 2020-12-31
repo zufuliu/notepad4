@@ -2157,8 +2157,7 @@ BEGIN
 	NP2STYLE_IMEIndicator			"IME Indicator"
 	NP2STYLE_Bookmark				"Bookmark"
 	NP2STYLE_CallTip				"CallTip"
-	NP2STYLE_CurrentBlock			"Current Block"
-	NP2STYLE_FoldMargin				"Fold Margin"
+	NP2STYLE_CodeFolding			"Code Folding"
 
 	NP2STYLE_Default				"Default"
 END

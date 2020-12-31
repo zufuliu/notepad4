@@ -2158,8 +2158,7 @@ BEGIN
 	NP2STYLE_IMEIndicator			"IME 표시기"
 	NP2STYLE_Bookmark				"책갈피"
 	NP2STYLE_CallTip				"호출팁"
-	NP2STYLE_CurrentBlock			"현재 블록"
-	NP2STYLE_FoldMargin				"접기 여백"
+	NP2STYLE_CodeFolding			"Code Folding"
 
 	NP2STYLE_Default				"기본값"
 END
