@@ -24,17 +24,20 @@
 #include <intrin.h>
 
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
+	#define NP2_TARGET_ARM		1
 	#define NP2_TARGET_ARM64	1
 	#define NP2_TARGET_ARM32	0
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
 	// TODO: use ARM Neon
 #elif defined(__arm__) || defined(_ARM_) || defined(_M_ARM)
+	#define NP2_TARGET_ARM		1
 	#define NP2_TARGET_ARM64	0
 	#define NP2_TARGET_ARM32	1
 	#define NP2_USE_SSE2		0
 	#define NP2_USE_AVX2		0
 #else
+	#define NP2_TARGET_ARM		0
 	#define NP2_TARGET_ARM64	0
 	#define NP2_TARGET_ARM32	0
 	// SSE2 enabled by default
@@ -58,30 +61,55 @@
 #endif
 
 // for C++20, use functions from <bit> header.
-#if !(NP2_TARGET_ARM64 || NP2_TARGET_ARM32)
-
 // count trailing zero bits
 //!NOTE: TZCNT is compatible with BSF for non-zero value;
 //! but LZCNT is not compatible with BSR, LZCNT = 31 - BSR.
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_ctz(x)		__builtin_ctz(x)
 	#define np2_ctz64(x)	__builtin_ctzll(x)
-#elif defined(_MSC_VER) || defined(__INTEL_COMPILER_BUILD_DATE)
+#elif !NP2_TARGET_ARM && (defined(_MSC_VER) || defined(__INTEL_COMPILER_BUILD_DATE))
 	#define np2_ctz(x)		_tzcnt_u32(x)
 	#define np2_ctz64(x)	_tzcnt_u64(x)
 #else
 	// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=bsf
-	static __forceinline uint32_t np2_ctz(uint32_t value) NP2_noexcept {
+	static inline uint32_t np2_ctz(uint32_t value) NP2_noexcept {
 		unsigned long trailing;
 		_BitScanForward(&trailing, value);
 		return trailing;
 	}
 
 #if defined(_WIN64)
-	static __forceinline uint32_t np2_ctz64(uint64_t value) NP2_noexcept {
+	static inline uint32_t np2_ctz64(uint64_t value) NP2_noexcept {
 		unsigned long trailing;
 		_BitScanForward64(&trailing, value);
 		return trailing;
+	}
+#endif
+#endif
+
+// count leading zero bits
+#if defined(__clang__) || defined(__GNUC__)
+	#define np2_clz(x)		__builtin_clz(x)
+	#define np2_clz64(x)	__builtin_clzll(x)
+#elif NP2_TARGET_ARM
+	#define np2_clz(x)		_CountLeadingZeros(x)
+	#define np2_clz64(x)	_CountLeadingZeros64(x)
+//#elif NP2_USE_AVX2
+//	#define np2_clz(x)		_lzcnt_u32(x)
+//	#define np2_clz64(x)	_lzcnt_u64(x)
+#else
+	// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=bsr
+	static inline uint32_t np2_clz(uint32_t value) NP2_noexcept {
+		unsigned long trailing;
+		_BitScanReverse(&trailing, value);
+		return 31 - trailing;
+	}
+
+#if defined(_WIN64)
+	static inline uint32_t np2_clz64(uint64_t value) NP2_noexcept {
+		unsigned long trailing;
+		_BitScanReverse64(&trailing, value);
+		return 63 - trailing;
 	}
 #endif
 #endif
@@ -118,8 +146,6 @@
 #endif
 #endif
 
-#endif
-
 // fix MSVC 2017 bad code for zero memory
 #if NP2_USE_AVX2
 #define ZeroMemory_32x1(buffer) do { \
@@ -148,4 +174,17 @@
 	_mm_store_ps((float *)((buffer) + 2*sizeof(__m128)), zero);	\
 	_mm_store_ps((float *)((buffer) + 3*sizeof(__m128)), zero);	\
 } while (0)
+#endif
+
+#if defined(__cplusplus)
+namespace np2 {
+inline auto ctz(uint32_t x) noexcept { return np2_ctz(x); }
+inline auto clz(uint32_t x) noexcept { return np2_clz(x); }
+inline auto popcount(uint32_t x) noexcept { return np2_popcount(x); }
+#if defined(_WIN64)
+inline auto ctz(uint64_t x) noexcept { return np2_ctz64(x); }
+inline auto clz(uint64_t x) noexcept { return np2_clz64(x); }
+inline auto popcount(uint64_t x) noexcept { return np2_popcount64(x); }
+#endif
+}
 #endif

@@ -54,7 +54,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Configuration / Properties File
 		* Apache Configuration File
 	* D
-	* [Dart]((../master/tools/lang/Dart.dart), up to Dart 2.12.
+	* [Dart](../master/tools/lang/Dart.dart), up to Dart 2.12.
 	* Diff/Patch File
 	* Doxygen
 	* F#
@@ -120,6 +120,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [PostgreSQL](../master/tools/lang/PostgreSQL.sql), PostgreSQL 13.
 		* [Transact-SQL](../master/tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](../master/tools/lang/Oracle.sql), Oracle 20, incomplete.
+	* [Swift](../master/tools/lang/Swift.swift), Swift 5.3.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File

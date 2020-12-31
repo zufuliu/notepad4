@@ -35,6 +35,8 @@
 #include <shlwapi.h>
 
 #include "Platform.h"
+#include "VectorISA.h"
+
 #include "Scintilla.h"
 #include "XPM.h"
 #include "CharClassify.h"
@@ -111,7 +113,7 @@ void Scintilla_LoadDpiForWindow(void) {
 	}
 }
 
-UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
+UINT GetWindowDPI(HWND hwnd) NP2F_noexcept {
 	if (fnGetDpiForWindow) {
 		return fnGetDpiForWindow(hwnd);
 	}
@@ -126,7 +128,7 @@ UINT GetWindowDPI(HWND hwnd) NP2_noexcept {
 	return g_uSystemDPI;
 }
 
-int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept {
+int SystemMetricsForDpi(int nIndex, UINT dpi) NP2F_noexcept {
 	if (fnGetSystemMetricsForDpi) {
 		return fnGetSystemMetricsForDpi(nIndex, dpi);
 	}
@@ -136,7 +138,7 @@ int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept {
 	return value;
 }
 
-BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept {
+BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2F_noexcept {
 	if (fnAdjustWindowRectExForDpi) {
 		return fnAdjustWindowRectExForDpi(lpRect, dwStyle, FALSE, dwExStyle, dpi);
 	}
@@ -755,14 +757,14 @@ void SurfaceGDI::Polygon(const Point *pts, size_t npts, ColourDesired fore, Colo
 void SurfaceGDI::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
 	BrushColour(back);
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::Rectangle(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
 
 void SurfaceGDI::FillRectangle(PRectangle rc, ColourDesired back) noexcept {
 	// Using ExtTextOut rather than a FillRect ensures that no dithering occurs.
 	// There is no need to allocate a brush either.
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::SetBkColor(hdc, back.AsInteger());
 	::ExtTextOut(hdc, rcw.left, rcw.top, ETO_OPAQUE, &rcw, L"", 0, nullptr);
 }
@@ -774,7 +776,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept 
 	} else {	// Something is wrong so display in red
 		br = ::CreateSolidBrush(RGB(0xff, 0, 0));
 	}
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::FillRect(hdc, &rcw, br);
 	::DeleteObject(br);
 }
@@ -782,7 +784,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept 
 void SurfaceGDI::RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
 	BrushColour(back);
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::RoundRect(hdc,
 		rcw.left + 1, rcw.top,
 		rcw.right - 1, rcw.bottom,
@@ -1024,7 +1026,7 @@ void SurfaceGDI::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 void SurfaceGDI::Ellipse(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept {
 	PenColour(fore);
 	BrushColour(back);
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::Ellipse(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
 }
 
@@ -1044,8 +1046,8 @@ using TextPositionsI = VarBuffer<int, stackBufferLength>;
 
 void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font &font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
-	const RECT rcw = RectFromPRectangle(rc);
-	const int x = static_cast<int>(rc.left);
+	const RECT rcw = RectFromPRectangleEx(rc);
+	const int x = static_cast<int>(rcw.left);
 	const int yBaseInt = static_cast<int>(ybase);
 
 	if (unicodeMode) {
@@ -1527,9 +1529,7 @@ void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
 		hr = pRenderTarget->CreateBitmapBrush(pBitmap, brushProperties, &pBitmapBrush);
 		ReleaseUnknown(pBitmap);
 		if (SUCCEEDED(hr) && pBitmapBrush) {
-			pRenderTarget->FillRectangle(
-				D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom),
-				pBitmapBrush);
+			pRenderTarget->FillRectangle(RectangleFromPRectangle(rc), pBitmapBrush);
 			ReleaseUnknown(pBitmapBrush);
 		}
 	}
@@ -2333,7 +2333,7 @@ void Window::Destroy() noexcept {
 PRectangle Window::GetPosition() const noexcept {
 	RECT rc;
 	::GetWindowRect(HwndFromWindowID(wid), &rc);
-	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
+	return PRectangleFromRectEx(rc);
 }
 
 void Window::SetPosition(PRectangle rc) noexcept {
@@ -2369,7 +2369,7 @@ void Window::SetPositionRelative(PRectangle rc, const Window *relativeTo) noexce
 		::ClientToScreen(HwndFromWindow(*relativeTo), &ptOther);
 		rc.Move(static_cast<XYPOSITION>(ptOther.x), static_cast<XYPOSITION>(ptOther.y));
 
-		const RECT rcMonitor = RectFromPRectangle(rc);
+		const RECT rcMonitor = RectFromPRectangleEx(rc);
 
 		HMONITOR hMonitor = MonitorFromRect(&rcMonitor, MONITOR_DEFAULTTONEAREST);
 		// If hMonitor is NULL, that's just the main screen anyways.
@@ -2397,7 +2397,7 @@ PRectangle Window::GetClientPosition() const noexcept {
 	RECT rc {};
 	if (wid)
 		::GetClientRect(HwndFromWindowID(wid), &rc);
-	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
+	return PRectangleFromRectEx(rc);
 }
 
 void Window::Show(bool show) const noexcept {
@@ -2412,7 +2412,7 @@ void Window::InvalidateAll() noexcept {
 }
 
 void Window::InvalidateRectangle(PRectangle rc) noexcept {
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::InvalidateRect(HwndFromWindowID(wid), &rcw, FALSE);
 }
 
@@ -2986,7 +2986,7 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 }
 
 void ListBoxX::AdjustWindowRect(PRectangle *rc, UINT dpi) noexcept {
-	RECT rcw = RectFromPRectangle(*rc);
+	RECT rcw = RectFromPRectangleEx(*rc);
 #if LISTBOXX_USE_THICKFRAME
 	AdjustWindowRectForDpi(&rcw, WS_THICKFRAME, WS_EX_WINDOWEDGE, dpi);
 #elif LISTBOXX_USE_BORDER
@@ -2994,7 +2994,7 @@ void ListBoxX::AdjustWindowRect(PRectangle *rc, UINT dpi) noexcept {
 #else
 	AdjustWindowRectForDpi(&rcw, 0, WS_EX_WINDOWEDGE, dpi);
 #endif
-	*rc = PRectangle::FromInts(rcw.left, rcw.top, rcw.right, rcw.bottom);
+	*rc = PRectangleFromRectEx(rcw);
 #if LISTBOXX_USE_FAKE_FRAME
 	*rc = rc->Inflate(ListBoxXFakeFrameSize, ListBoxXFakeFrameSize);
 #endif

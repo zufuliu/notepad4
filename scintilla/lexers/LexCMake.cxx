@@ -32,13 +32,13 @@ constexpr bool IsCmakeChar(int ch) noexcept {
 
 bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
 	int offset = 0;
+	char ch;
 	++pos; // bracket
-	while (styler.SafeGetCharAt(pos) == '=') {
+	while ((ch = styler.SafeGetCharAt(pos)) == '=') {
 		++offset;
 		++pos;
 	}
 
-	const char ch = styler.SafeGetCharAt(pos);
 	if (start) {
 		if (ch == '[') {
 			bracketNumber = offset;

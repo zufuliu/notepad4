@@ -99,6 +99,10 @@ constexpr bool IsNumberStart(int ch, int chNext) noexcept {
 	return IsADigit(ch) || (ch == '.' && IsADigit(chNext));
 }
 
+constexpr bool IsNumberStartEx(int chPrev, int ch, int chNext) noexcept {
+	return IsADigit(ch) || (chPrev != '.' && ch == '.' && IsADigit(chNext));
+}
+
 constexpr bool IsNumberContinue(int chPrev, int ch, int chNext) noexcept {
 	return ((ch == '+' || ch == '-') && (chPrev == 'e' || chPrev == 'E'))
 		|| (ch == '.' && chNext != '.');

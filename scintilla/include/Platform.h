@@ -141,7 +141,7 @@ typedef void *IdlerID;
  * A geometric point class.
  * Point is similar to the Win32 POINT and GTK GdkPoint types.
  */
-class Point {
+class Point final {
 public:
 	XYPOSITION x;
 	XYPOSITION y;
@@ -172,7 +172,7 @@ public:
  * PRectangle is similar to Win32 RECT.
  * PRectangles contain their top and left sides, but not their right and bottom sides.
  */
-class PRectangle {
+class PRectangle final {
 public:
 	XYPOSITION left;
 	XYPOSITION top;

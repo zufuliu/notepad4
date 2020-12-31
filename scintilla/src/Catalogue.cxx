@@ -176,6 +176,7 @@ void Scintilla_LinkLexers() {
 	//extern LexerModule lmSrec;
 	//extern LexerModule lmStata;
 	//extern LexerModule lmSTTXT;
+	extern LexerModule lmSwift;
 	//extern LexerModule lmTACL;
 	//extern LexerModule lmTADS3;
 	//extern LexerModule lmTAL;
@@ -323,6 +324,7 @@ void Scintilla_LinkLexers() {
 		//&lmSrec,
 		//&lmStata,
 		//&lmSTTXT,
+		&lmSwift,
 		//&lmTACL,
 		//&lmTADS3,
 		//&lmTAL,

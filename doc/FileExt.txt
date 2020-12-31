@@ -450,6 +450,9 @@ Shell Script
 	.profile
 	mozconfig		Firefox Build Configuration
 
+Swift Source
+	swift
+
 
 Tcl Script
 	tcl

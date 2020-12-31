@@ -45,6 +45,12 @@ enum {
 	DartLineStateMaskImport = (1 << 1),	// import
 };
 
+constexpr bool IsDeclarableOperator(int ch) noexcept {
+	// https://github.com/dart-lang/sdk/blob/master/sdk/lib/core/symbol.dart
+	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
+					 '^', '<', '>', '=', '[', ']');
+}
+
 constexpr int PackState(int state) noexcept {
 	switch (state) {
 	case SCE_DART_STRING_SQ:
@@ -84,8 +90,7 @@ void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) 
 }
 
 void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	int lineStateLineComment = 0;
-	int lineStateImport = 0;
+	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
 
 	int kwType = SCE_DART_DEFAULT;
@@ -102,8 +107,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
-		1: lineStateLineComment
-		1: lineStateImport
+		2: lineStateLineType
 		6: commentLevel
 		8: curlyBrace
 		3*4: nestedState
@@ -111,13 +115,13 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		commentLevel = (lineState >> 2) & 0x3f;
 		curlyBrace = (lineState >> 8) & 0xff;
 		if (curlyBrace) {
-			UnpackNestedState((lineState >> 16) & 0xff, curlyBrace, nestedState);
+			UnpackNestedState(lineState >> 16, curlyBrace, nestedState);
 		}
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_DART_COMMENTLINE);
-		lineStateLineComment = DartLineStateMaskLineComment;
+		lineStateLineType = DartLineStateMaskLineComment;
 	}
 
 	while (sc.More()) {
@@ -141,12 +145,20 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ChangeState(SCE_DART_WORD);
 					if (EqualsAny(s, "import", "part")) {
 						if (visibleChars == sc.LengthCurrent()) {
-							lineStateImport = DartLineStateMaskImport;
+							lineStateLineType = DartLineStateMaskImport;
 						}
 					} else if (EqualsAny(s, "as", "class", "extends", "implements", "is", "new", "throw")) {
 						kwType = SCE_DART_CLASS;
 					} else if (strcmp(s, "enum") == 0) {
 						kwType = SCE_DART_ENUM;
+					} else if (EqualsAny(s, "break", "continue")) {
+						kwType = SCE_DART_LABEL;
+					}
+					if (kwType != SCE_DART_DEFAULT) {
+						const int chNext = sc.GetLineNextChar();
+						if (!IsIdentifierStartEx(chNext)) {
+							kwType = SCE_DART_DEFAULT;
+						}
 					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_DART_WORD2);
@@ -191,7 +203,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_DART_SYMBOL_OPERATOR:
-			if (!isoperator(sc.ch)) {
+			if (!IsDeclarableOperator(sc.ch)) {
 				sc.SetState(SCE_DART_DEFAULT);
 			}
 			break;
@@ -255,12 +267,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_DART_OPERATOR2);
 				sc.Forward();
-			} else if (curlyBrace && sc.ch == '}') {
-				const int outerState = TryPopBack(nestedState);
-				--curlyBrace;
-				sc.SetState(SCE_DART_OPERATOR2);
-				sc.ForwardSetState(outerState);
-				continue;
 			} else if (sc.ch == '\'' && (sc.state == SCE_DART_STRING_SQ
 				|| (sc.state == SCE_DART_TRIPLE_STRING_SQ && sc.Match('\'', '\'', '\'')))) {
 				if (sc.state == SCE_DART_TRIPLE_STRING_SQ) {
@@ -277,6 +283,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.ForwardSetState(SCE_DART_DEFAULT);
 			}
 			break;
+
 		case SCE_DART_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
 				const int outerState = escSeq.outerState;
@@ -288,6 +295,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			}
 			break;
+
 		case SCE_DART_VARIABLE:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(variableOuter);
@@ -301,7 +309,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '/') ? SCE_DART_COMMENTLINEDOC : SCE_DART_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineComment = DartLineStateMaskLineComment;
+					lineStateLineType = DartLineStateMaskLineComment;
 				}
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
@@ -341,7 +349,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '#') {
 				if (IsIdentifierStartEx(sc.chNext)) {
 					sc.SetState(SCE_DART_SYMBOL_IDENTIFIER);
-				} else if (isoperator(sc.ch)) {
+				} else if (IsDeclarableOperator(sc.chNext)) {
 					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
@@ -367,13 +375,12 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineComment | lineStateImport;
+			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineType;
 			if (curlyBrace) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);
-			lineStateLineComment = 0;
-			lineStateImport = 0;
+			lineStateLineType = 0;
 			visibleChars = 0;
 			kwType = SCE_DART_DEFAULT;
 		}

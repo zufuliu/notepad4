@@ -134,6 +134,7 @@
 #define NP2STYLE_Object					63434
 #define NP2STYLE_Type					63435
 #define NP2STYLE_FunctionDefine			63436
+#define NP2STYLE_Protocol				63437
 
 #define NP2STYLE_Label					63440
 #define NP2STYLE_Command				63441

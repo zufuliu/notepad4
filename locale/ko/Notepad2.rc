@@ -1,9 +1,9 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
-#include "config.h"
-//#include "EditLexer.h"
-//#include "EditLexers/EditStyle.h"
+#include "../../src/resource.h"
+#include "../../src/config.h"
+#include "../../src/EditLexer.h"
+#include "../../src/EditLexers/EditStyle.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -20,10 +20,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 한국어 (대한민국) resources
+// Korean (Korea) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
-LANGUAGE LANG_KOREAN, SUBLANG_KOREAN
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -603,12 +603,12 @@ BEGIN
 			BEGIN
 				MENUITEM "시스템 언어(&S)",		IDM_LANG_USER_DEFAULT
 				MENUITEM "Deutsch",					IDM_LANG_GERMAN
-				MENUITEM "English,					IDM_LANG_ENGLISH_US
+				MENUITEM "English",					IDM_LANG_ENGLISH_US
 				MENUITEM "Italiano",				IDM_LANG_ITALIAN
-				MENUITEM "한국어",					IDM_LANG_KOREAN
 				MENUITEM "日本語",					IDM_LANG_JAPANESE
-				MENUITEM "中文(TRADITIONAL)",				IDM_LANG_CHINESE_TRADITIONAL
-				MENUITEM "中文(SIMPLIFIED)",				IDM_LANG_CHINESE_SIMPLIFIED
+				MENUITEM "한국어",					IDM_LANG_KOREAN
+				MENUITEM "中文(繁體)",				IDM_LANG_CHINESE_TRADITIONAL
+				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
 		END
@@ -2189,7 +2189,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+#endif    // Korean (Korea) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -2199,7 +2199,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "Notepad2.ver"
+#include "../../src/Notepad2.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
