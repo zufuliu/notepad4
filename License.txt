@@ -5,8 +5,8 @@ Notepad2, metapath and Notepad2-mod are licensed under the BSD 3-Clause License
 http://www.flos-freeware.ch
 https://xhmikosr.github.io/notepad2-mod/
 
-metapath Copyright © 1996-2012 Florian Balmer, 2011-2020 Zufu Liu and All contributors.
-Notepad2 Copyright © 2004-2012 Florian Balmer, 2011-2020 Zufu Liu and All contributors.
+metapath Copyright © 1996-2012 Florian Balmer, 2011-2021 Zufu Liu and All contributors.
+Notepad2 Copyright © 2004-2012 Florian Balmer, 2011-2021 Zufu Liu and All contributors.
 Notepad2-mod Copyright © 2010-2017 XhmikosR and All contributors.
 All rights reserved.
 
