@@ -132,7 +132,7 @@ BEGIN
 			MENUITEM "Unix/Mac OS(&U) (LF)",              IDM_LINEENDINGS_LF
 			MENUITEM "클래식 Mac OS(&M) (CR)",               IDM_LINEENDINGS_CR
 			MENUITEM SEPARATOR
-			MENUITEM "기본값 설정(&D)...",					IDM_LINEENDINGS_SETDEFAULT
+			MENUITEM "기본값(&D)...",					IDM_LINEENDINGS_SETDEFAULT
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "페이지 설정(&T)...",					IDM_FILE_PAGESETUP
@@ -324,11 +324,11 @@ BEGIN
 		END
 		POPUP "특수 기능(&I)"
 		BEGIN
-			MENUITEM "문자를 Hex값으로 변환(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
-			MENUITEM "Hex값을 문자로 변환(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "문자를 Hex 값으로 변환(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
+			MENUITEM "Hex 값을 문자로 변환(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "C 이스케이프(&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "C 이스케이프 해제(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Hex값 보여주기(&S)",							IDM_EDIT_SHOW_HEX
+			MENUITEM "Hex 값 보여주기(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "URL 인코드(&E)\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "URL 디코드(&D)\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
@@ -2122,7 +2122,7 @@ BEGIN
 
 END
 
-#if 0//NP2_ENABLE_LOCALIZE_LEXER_NAME
+#if NP2_ENABLE_LOCALIZE_LEXER_NAME
 // string table for lexers, see EditLexer.h
 STRINGTABLE
 BEGIN
@@ -2134,7 +2134,7 @@ BEGIN
 END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
-#if 0//NP2_ENABLE_LOCALIZE_STYLE_NAME
+#if NP2_ENABLE_LOCALIZE_STYLE_NAME
 // string table for styles, see EditLexers/EditStyleX.h
 STRINGTABLE
 BEGIN
@@ -2197,6 +2197,6 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "Notepad2.ver"
+#include "../../src/Notepad2.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
