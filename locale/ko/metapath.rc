@@ -18,10 +18,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 한국어 (대한민국) resources
+// Korean (Korea) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
-LANGUAGE LANG_KOREAN, SUBLANG_KOREAN
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -681,13 +681,13 @@ END
 STRINGTABLE
 BEGIN
 	IDS_LANG_USER_DEFAULT		"시스템 언어"
-	IDS_LANG_ENGLISH_US		"English"
-	IDS_LANG_KOREAN_KO		"한국어"
-	IDS_LANG_CHINESE_SIMPLIFIED	"SIMPLIFIED 中文"
-	IDS_LANG_CHINESE_TRADITIONAL	"TRADITIONAL 中文"
-	IDS_LANG_JAPANESE		"日本語"
-	IDS_LANG_GERMAN			"Deutsch"
-	IDS_LANG_ITALIAN		"Italiano"
+	IDS_LANG_ENGLISH_US				"English"
+	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
+	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
+	IDS_LANG_JAPANESE				"日本語"
+	IDS_LANG_KOREAN					"한국어"
+	IDS_LANG_GERMAN					"Deutsch"
+	IDS_LANG_ITALIAN				"Italiano"
 END
 #endif
 
@@ -715,7 +715,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // (United States) resources
+#endif    // Korean (Korea) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -728,3 +728,4 @@ END
 #include "metapath.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

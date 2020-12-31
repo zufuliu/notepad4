@@ -249,13 +249,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_JULIA_OPERATOR2);
 				sc.Forward();
-			} else if (parenCount && sc.ch == ')') {
-				const int outerState = TryPopBack(nestedState);
-				--braceCount;
-				--parenCount;
-				sc.SetState(SCE_JULIA_OPERATOR2);
-				sc.ForwardSetState(outerState);
-				continue;
 			} else if ((sc.state == SCE_JULIA_STRING && sc.ch == '\"')
 				|| (sc.state == SCE_JULIA_TRIPLE_STRING && sc.Match('"', '"', '"'))
 				|| (sc.state == SCE_JULIA_BACKTICKS && sc.ch == '`')

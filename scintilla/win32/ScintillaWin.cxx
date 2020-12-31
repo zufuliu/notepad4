@@ -52,6 +52,7 @@ Used by VSCode, Atom etc.
 #define Enable_ChromiumWebCustomMIMEDataFormat	0
 
 #include "Platform.h"
+#include "VectorISA.h"
 
 #include "ILoader.h"
 #include "ILexer.h"
@@ -910,7 +911,7 @@ bool BoundsContains(PRectangle rcBounds, HRGN hRgnBounds, PRectangle rcCheck) no
 			contains = false;
 		} else if (hRgnBounds) {
 			// In bounding rectangle so check more accurately using region
-			const RECT rcw = RectFromPRectangle(rcCheck);
+			const RECT rcw = RectFromPRectangleEx(rcCheck);
 			HRGN hRgnCheck = ::CreateRectRgnIndirect(&rcw);
 			if (hRgnCheck) {
 				HRGN hRgnDifference = ::CreateRectRgn(0, 0, 0, 0);
@@ -1067,7 +1068,7 @@ sptr_t ScintillaWin::WndPaint() {
 	hRgnUpdate = ::CreateRectRgn(0, 0, 0, 0);
 	::GetUpdateRgn(MainHWND(), hRgnUpdate, FALSE);
 	::BeginPaint(MainHWND(), &ps);
-	rcPaint = PRectangle::FromInts(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom);
+	rcPaint = PRectangleFromRectEx(ps.rcPaint);
 	const PRectangle rcClient = GetClientRectangle();
 	paintingAllText = BoundsContains(rcPaint, hRgnUpdate, rcClient);
 	if (!PaintDC(ps.hdc)) {

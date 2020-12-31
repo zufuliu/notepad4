@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "Platform.h"
+#include "VectorISA.h"
 
 #include "ILoader.h"
 #include "ILexer.h"
@@ -362,6 +363,7 @@ namespace {
 
 // https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
 // Bit Twiddling Hacks Copyright 1997-2005 Sean Eron Anderson
+#if 0
 constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 	x--;
 	x |= x >> 1;
@@ -375,6 +377,15 @@ constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 	x++;
 	return x;
 }
+#else
+inline size_t NextPowerOfTwo(size_t x) noexcept {
+#if SIZE_MAX > UINT_MAX
+	return UINT64_C(1) << (64 - np2::clz(x - 1));
+#else
+	return 1U << (32 - np2::clz(x - 1));
+#endif
+}
+#endif
 
 constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 	return (value + alignment - 1) & (~(alignment - 1));

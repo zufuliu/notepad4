@@ -113,6 +113,7 @@ extern EDITLEXER lexRust;
 
 extern EDITLEXER lexScala;
 extern EDITLEXER lexBash;
+extern EDITLEXER lexSwift;
 
 extern EDITLEXER lexTcl;
 extern EDITLEXER lexTexinfo;
@@ -208,6 +209,7 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexScala,
 	&lexBash,
+	&lexSwift,
 
 	&lexTcl,
 	&lexTexinfo,
@@ -1294,6 +1296,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[4] = KeywordAttr_NoLexer;		// upper case data types
 		attr[5] = KeywordAttr_NoLexer;		// upper case functions
 		break;
+	case NP2LEX_SWIFT:
+		attr[7] = KeywordAttr_NoLexer;		// function
+		break;
 	case NP2LEX_WASM:
 		attr[3] = KeywordAttr_NoLexer;		// full instruction
 		break;
@@ -1676,13 +1681,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		}
 #endif
 
-		uint64_t iMarkerIDs = SC_MARKNUM_FOLDEROPEN
-			| ((uint64_t)SC_MARKNUM_FOLDER << 8)
-			| ((uint64_t)SC_MARKNUM_FOLDERSUB << 16)
-			| ((uint64_t)SC_MARKNUM_FOLDERTAIL << 24)
-			| ((uint64_t)SC_MARKNUM_FOLDEREND << 32)
-			| ((uint64_t)SC_MARKNUM_FOLDEROPENMID << 40)
-			| ((uint64_t)SC_MARKNUM_FOLDERMIDTAIL << 48);
+		uint64_t iMarkerIDs = MULTI_STYLE8(SC_MARKNUM_FOLDEROPEN, SC_MARKNUM_FOLDER,
+			SC_MARKNUM_FOLDERSUB, SC_MARKNUM_FOLDERTAIL,
+			SC_MARKNUM_FOLDEREND, SC_MARKNUM_FOLDEROPENMID,
+			SC_MARKNUM_FOLDERMIDTAIL, 0);
 		do {
 			const int marker = (int)(iMarkerIDs & 0xff);
 			SciCall_MarkerSetBack(marker, foreColor);
