@@ -1,4 +1,4 @@
-Notepad2 Copyright © 2004-2012 Florian Balmer, 2011-2020 Zufu Liu and All contributors.
+Notepad2 Copyright © 2004-2012 Florian Balmer, 2011-2021 Zufu Liu and All contributors.
 Notepad2-mod Copyright © 2010-2017 XhmikosR and All contributors.
 All rights reserved.
 
