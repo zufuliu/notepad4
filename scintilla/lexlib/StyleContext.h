@@ -16,14 +16,14 @@ class StyleContext {
 public:
 	LexAccessor &styler;
 private:
-	IDocument *multiByteAccess;
+	IDocument *multiByteAccess = nullptr;
 	Sci_PositionU endPos;
 	Sci_PositionU lengthDocument;
 
 	// Used for optimizing GetRelativeCharacter
-	Sci_PositionU posRelative;
-	Sci_PositionU currentPosLastRelative;
-	Sci_Position offsetRelative;
+	Sci_PositionU posRelative = 0;
+	Sci_PositionU currentPosLastRelative = SIZE_MAX;
+	Sci_Position offsetRelative = 0;
 
 	void GetNextChar() noexcept {
 		if (multiByteAccess) {
@@ -56,29 +56,17 @@ public:
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-		int initStyle, LexAccessor &styler_, bool useUnicode = false, unsigned char chMask = '\377') noexcept :
+		int initStyle, LexAccessor &styler_, bool useUnicode = false) noexcept :
 	styler(styler_),
-	multiByteAccess(nullptr),
 	endPos(startPos + length),
-	posRelative(0),
-	currentPosLastRelative(LexAccessor::extremePosition),
-	offsetRelative(0),
 	currentPos(startPos),
-	currentLine(-1),
-	lineStartNext(-1),
-	atLineEnd(false),
-	state(initStyle & chMask), // Mask off all bits which aren't in the chMask.
-	chPrev(0),
-	ch(0),
-	chNext(0),
-	width(0),
-	widthNext(1) {
+	state(initStyle) {
 		// lexer need enable useUnicode if it wants to detect Unicode identifier (https://www.unicode.org/reports/tr31/)
 		// or operator. e.g. using functions from CharacterCategory.
 		if ((useUnicode && styler.Encoding() == EncodingType::encUnicode) || styler.Encoding() == EncodingType::encDBCS) {
 			multiByteAccess = styler.MultiByteAccess();
 		}
-		styler.StartAt(startPos/*, chMask*/);
+		styler.StartAt(startPos);
 		styler.StartSegment(startPos);
 		currentLine = styler.GetLine(startPos);
 		lineStartNext = styler.LineStart(currentLine + 1);
@@ -89,8 +77,10 @@ public:
 		lineDocEnd = styler.GetLine(lengthDocument);
 		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
 
+		chPrev = 0;
 		// Variable width is now 0 so GetNextChar gets the char at currentPos into chNext/widthNext
 		width = 0;
+		widthNext = 1;
 		GetNextChar();
 		ch = chNext;
 		width = widthNext;
@@ -123,10 +113,10 @@ public:
 			GetNextChar();
 		} else {
 			atLineStart = false;
-			chPrev = ' ';
-			ch = ' ';
-			chNext = ' ';
 			atLineEnd = true;
+			chPrev = 0;
+			ch = 0;
+			chNext = 0;
 		}
 	}
 	void Forward(Sci_Position nb) noexcept {
