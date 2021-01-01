@@ -5,9 +5,9 @@
 // Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstdint>
 #include <cassert>
 
-#include <algorithm>
 #include <vector>
 
 #include "ILexer.h"
@@ -29,7 +29,7 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 }
 
 void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	endPos_ = std::min(endPos_, startPos_ + len - 1);
+	endPos_ = sci::min(endPos_, startPos_ + len - 1);
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
 		const char *p = buf + (startPos_ - startPos);
 		const char * const t = buf + (endPos_ - startPos);
@@ -45,7 +45,7 @@ void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char 
 }
 
 void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	endPos_ = std::min(endPos_, startPos_ + len - 1);
+	endPos_ = sci::min(endPos_, startPos_ + len - 1);
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
 		const char *p = buf + (startPos_ - startPos);
 		const char * const t = buf + (endPos_ - startPos);
