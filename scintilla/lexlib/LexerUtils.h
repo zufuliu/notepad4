@@ -39,6 +39,16 @@ inline int TakeAndPop(std::vector<int>& states) {
 	return value;
 }
 
+inline int TryPopAndPeek(std::vector<int>& states, int value = 0) {
+	if (!states.empty()) {
+		states.pop_back();
+		if (!states.empty()) {
+			value = states.back();
+		}
+	}
+	return value;
+}
+
 #if 0
 
 // nested state stack on each line
