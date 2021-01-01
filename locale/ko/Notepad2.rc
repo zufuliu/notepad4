@@ -2112,9 +2112,9 @@ BEGIN
 	IDS_CUSTOMIZE_SCHEMES_HELP		"확장자는 세미콜론(;) 으로 구분되어야 합니다.\r\n\
 \r\n\
 스타일 형식:\r\n\
-\t글꼴:이름; 크기:[+|-]nn.mm; 너비:nnn; 굵게; 기울임; 밑줄; 스트라이크;\r\n\
-\t문자셋:dd; 지역:이름; 예:[대문자|소문자|Camel];\r\n\
-\t전경색:#ffffff; 배경색:#bbbbbb; 알파:aa; 외곽선:aa; 줄 끝 채우기;\r\n\
+\tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
+\tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\r\n\
+\tfore:#ffffff; back:#bbbbbb; alpha:aa; outline:aa; eolfilled;\r\n\
 \r\n\
 스타일 속성은 복사/붙여넣기, 또는 끌어서 놓기로 복사할 수 있습니다.\r\n\
 \r\n\
