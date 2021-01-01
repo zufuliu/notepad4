@@ -40,56 +40,19 @@ struct EscapeSequence {
 };
 
 enum {
-	NestedStateValueBit = 3,
-	MaxNestedStateCount = 4,
-	NestedStateCountBit = 3,
-
 	DartLineStateMaskLineComment = 1,	// line comment
 	DartLineStateMaskImport = (1 << 1),	// import
 };
+
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_DART_STRING_SQ);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_DART_STRING_DQ);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_DART_TRIPLE_STRING_SQ);
+static_assert(DefaultNestedStateBaseStyle + 4 == SCE_DART_TRIPLE_STRING_DQ);
 
 constexpr bool IsDeclarableOperator(int ch) noexcept {
 	// https://github.com/dart-lang/sdk/blob/master/sdk/lib/core/symbol.dart
 	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
 					 '^', '<', '>', '=', '[', ']');
-}
-
-constexpr int PackState(int state) noexcept {
-	switch (state) {
-	case SCE_DART_STRING_SQ:
-		return 1;
-	case SCE_DART_STRING_DQ:
-		return 2;
-	case SCE_DART_TRIPLE_STRING_SQ:
-		return 3;
-	case SCE_DART_TRIPLE_STRING_DQ:
-		return 4;
-	default:
-		return 0;
-	}
-}
-
-constexpr int UnpackState(int state) noexcept  {
-	switch (state) {
-	case 1:
-		return SCE_DART_STRING_SQ;
-	case 2:
-		return SCE_DART_STRING_DQ;
-	case 3:
-		return SCE_DART_TRIPLE_STRING_SQ;
-	case 4:
-		return SCE_DART_TRIPLE_STRING_DQ;
-	default:
-		return SCE_DART_DEFAULT;
-	}
-}
-
-int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 8;
-}
-
-void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
-	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
 }
 
 void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -117,7 +80,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		commentLevel = (lineState >> 2) & 0x3f;
 		lineState >>= 8;
 		if (lineState) {
-			UnpackNestedState(lineState, nestedState);
+			UnpackLineState(lineState, nestedState);
 		}
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
@@ -377,7 +340,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (sc.atLineEnd) {
 			int lineState = (commentLevel << 2) | lineStateLineType;
 			if (!nestedState.empty()) {
-				lineState |= PackNestedState(nestedState);
+				lineState |= PackLineState(nestedState) << 8;
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;

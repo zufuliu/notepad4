@@ -8,10 +8,12 @@
 #include <cassert>
 
 #include <algorithm>
+#include <vector>
 
 #include "ILexer.h"
 #include "LexAccessor.h"
 #include "CharacterSet.h"
+#include "LexerUtils.h"
 
 using namespace Scintilla;
 
@@ -197,6 +199,14 @@ Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, con
 	}
 	s[i] = '\0';
 	return i;
+}
+
+int PackLineState(const std::vector<int>& states) noexcept {
+	return PackLineState<DefaultNestedStateValueBit, DefaultMaxNestedStateCount, DefaultNestedStateCountBit, DefaultNestedStateBaseStyle>(states);
+}
+
+void UnpackLineState(int lineState, std::vector<int>& states) {
+	UnpackLineState<DefaultNestedStateValueBit, DefaultMaxNestedStateCount, DefaultNestedStateCountBit, DefaultNestedStateBaseStyle>(lineState, states);
 }
 
 }
