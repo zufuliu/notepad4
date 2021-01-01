@@ -379,7 +379,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ChangeState(SCE_JULIA_TRIPLE_REGEX);
 					sc.Forward(2);
 				}
-			} else if (sc.Match("raw\"")) {
+			} else if (sc.Match('r', 'a', 'w', '"')) {
 				sc.SetState(SCE_JULIA_RAWSTRING);
 				sc.Forward(3);
 				if (sc.Match('"', '"', '"')) {
