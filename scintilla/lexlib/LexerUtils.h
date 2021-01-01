@@ -4,8 +4,8 @@ namespace Scintilla {
 
 // TODO: change packed line state to NestedStateStack (convert lexer to class).
 
-template<int valueBit, int maxStateCount, int countBit, int PackState(int state) noexcept>
-inline int PackLineState(const std::vector<int>& states) noexcept {
+template<int valueBit, int maxStateCount, int countBit, int baseStyle>
+int PackLineState(const std::vector<int>& states) noexcept {
 	constexpr uint32_t countMask = (1 << countBit) - 1;
 	size_t index = states.size();
 	int count = static_cast<int>((index > countMask) ? countMask : index);
@@ -14,24 +14,42 @@ inline int PackLineState(const std::vector<int>& states) noexcept {
 	while (count < maxStateCount && index != 0) {
 		++count;
 		--index;
-		lineState = (lineState << valueBit) | PackState(states[index]);
+		int state = states[index];
+		if (state) {
+			state -= baseStyle;
+		}
+		lineState = (lineState << valueBit) | state;
 	}
 	return lineState;
 }
 
-template<int valueBit, int maxStateCount, int countBit, int UnpackState(int state) noexcept>
-inline void UnpackLineState(int lineState, std::vector<int>& states) {
+template<int valueBit, int maxStateCount, int countBit, int baseStyle>
+void UnpackLineState(int lineState, std::vector<int>& states) {
 	constexpr int mask = (1 << valueBit) - 1;
 	constexpr int countMask = (1 << countBit) - 1;
 	int count = lineState & countMask;
 	lineState >>= countBit;
 	count = (count > maxStateCount)? maxStateCount : count;
 	while (count != 0) {
-		states.push_back(UnpackState(lineState & mask));
+		int state = lineState & mask;
+		if (state) {
+			state += baseStyle;
+		}
+		states.push_back(state);
 		lineState >>= valueBit;
 		--count;
 	}
 }
+
+enum {
+	DefaultNestedStateValueBit = 3,
+	DefaultMaxNestedStateCount = 4,
+	DefaultNestedStateCountBit = 3,
+	DefaultNestedStateBaseStyle = 9,
+};
+
+int PackLineState(const std::vector<int>& states) noexcept;
+void UnpackLineState(int lineState, std::vector<int>& states);
 
 inline int TakeAndPop(std::vector<int>& states) {
 	const int value = states.back();

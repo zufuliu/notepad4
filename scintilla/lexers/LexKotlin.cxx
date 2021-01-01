@@ -43,43 +43,12 @@ struct EscapeSequence {
 };
 
 enum {
-	NestedStateValueBit = 2,
-	MaxNestedStateCount = 4,
-	NestedStateCountBit = 3,
-
 	KotlinLineStateMaskLineComment = 1, // line comment
 	KotlinLineStateMaskImport = 1 << 1, // import
 };
 
-constexpr int PackState(int state) noexcept {
-	switch (state) {
-	case SCE_KOTLIN_STRING:
-		return 1;
-	case SCE_KOTLIN_RAWSTRING:
-		return 2;
-	default:
-		return 0;
-	}
-}
-
-constexpr int UnpackState(int state) noexcept  {
-	switch (state) {
-	case 1:
-		return SCE_KOTLIN_STRING;
-	case 2:
-		return SCE_KOTLIN_RAWSTRING;
-	default:
-		return SCE_KOTLIN_DEFAULT;
-	}
-}
-
-int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 8;
-}
-
-void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
-	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
-}
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_KOTLIN_STRING);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_KOTLIN_RAWSTRING);
 
 void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
@@ -101,12 +70,12 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		2: lineStateLineType
 		6: commentLevel
 		3: nestedState count
-		2*4: nestedState
+		3*4: nestedState
 		*/
 		commentLevel = (lineState >> 2) & 0x3f;
 		lineState >>= 8;
 		if (lineState) {
-			UnpackNestedState(lineState, nestedState);
+			UnpackLineState(lineState, nestedState);
 		}
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
@@ -353,7 +322,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		if (sc.atLineEnd) {
 			int lineState = (commentLevel << 2) | lineStateLineType;
 			if (!nestedState.empty()) {
-				lineState |= PackNestedState(nestedState);
+				lineState |= PackLineState(nestedState) << 8;
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;

@@ -24,13 +24,14 @@ using namespace Scintilla;
 namespace {
 
 enum {
-	NestedStateValueBit = 3,
-	MaxNestedStateCount = 4,
-	NestedStateCountBit = 3,
-
 	SwiftLineStateMaskLineComment = 1,		// line comment
 	SwiftLineStateMaskImport = (1 << 1),	// import
 };
+
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_SWIFT_STRING);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_SWIFT_TRIPLE_STRING);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_SWIFT_STRING_ED);
+static_assert(DefaultNestedStateBaseStyle + 4 == SCE_SWIFT_TRIPLE_STRING_ED);
 
 constexpr bool IsEscapeSequence(int ch) noexcept {
 	return AnyOf(ch, '0', '\\', 't', 'n', 'r', '"', '\'', 'u');
@@ -67,44 +68,6 @@ bool CheckSwiftStringDelimiter(LexAccessor &styler, Sci_PositionU pos, Delimiter
 	return false;
 }
 
-constexpr int PackState(int state) noexcept {
-	switch (state) {
-	case SCE_SWIFT_STRING:
-		return 1;
-	case SCE_SWIFT_TRIPLE_STRING:
-		return 2;
-	case SCE_SWIFT_STRING_ED:
-		return 3;
-	case SCE_SWIFT_TRIPLE_STRING_ED:
-		return 4;
-	default:
-		return 0;
-	}
-}
-
-constexpr int UnpackState(int state) noexcept  {
-	switch (state) {
-	case 1:
-		return SCE_SWIFT_STRING;
-	case 2:
-		return SCE_SWIFT_TRIPLE_STRING;
-	case 3:
-		return SCE_SWIFT_STRING_ED;
-	case 4:
-		return SCE_SWIFT_TRIPLE_STRING_ED;
-	default:
-		return SCE_SWIFT_DEFAULT;
-	}
-}
-
-int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 16;
-}
-
-void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
-	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
-}
-
 void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
@@ -132,7 +95,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		delimiterCount = (lineState >> 8) & 0xff;
 		lineState >>= 16;
 		if (lineState) {
-			UnpackNestedState(lineState, nestedState);
+			UnpackLineState(lineState, nestedState);
 		}
 		if (delimiterCount) {
 			// TODO: backtrack to the line without string interpolation.
@@ -393,7 +356,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		if (sc.atLineEnd) {
 			int lineState = (commentLevel << 2) | (delimiterCount << 8) | lineStateLineType;
 			if (!nestedState.empty()) {
-				lineState |= PackNestedState(nestedState);
+				lineState |= PackLineState(nestedState) << 16;
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;

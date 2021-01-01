@@ -66,49 +66,10 @@ constexpr bool IsJuliaRegexFlag(int ch) noexcept {
 	return ch == 'i' || ch == 'm' || ch == 's' || ch == 'x' || ch == 'a';
 }
 
-enum {
-	NestedStateValueBit = 3,
-	MaxNestedStateCount = 4,
-	NestedStateCountBit = 3,
-};
-
-constexpr int PackState(int state) noexcept {
-	switch (state) {
-	case SCE_JULIA_STRING:
-		return 1;
-	case SCE_JULIA_TRIPLE_STRING:
-		return 2;
-	case SCE_JULIA_BACKTICKS:
-		return 3;
-	case SCE_JULIA_TRIPLE_BACKTICKS:
-		return 4;
-	default:
-		return 0;
-	}
-}
-
-constexpr int UnpackState(int state) noexcept  {
-	switch (state) {
-	case 1:
-		return SCE_JULIA_STRING;
-	case 2:
-		return SCE_JULIA_TRIPLE_STRING;
-	case 3:
-		return SCE_JULIA_BACKTICKS;
-	case 4:
-		return SCE_JULIA_TRIPLE_BACKTICKS;
-	default:
-		return SCE_JULIA_DEFAULT;
-	}
-}
-
-int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 14;
-}
-
-void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
-	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
-}
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JULIA_STRING);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JULIA_TRIPLE_STRING);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JULIA_BACKTICKS);
+static_assert(DefaultNestedStateBaseStyle + 4 == SCE_JULIA_TRIPLE_BACKTICKS);
 
 void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineComment = 0;
@@ -142,7 +103,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		braceCount = (lineState >> 6) & 0xff;
 		lineState >>= 14;
 		if (lineState) {
-			UnpackNestedState(lineState, nestedState);
+			UnpackLineState(lineState, nestedState);
 		}
 	}
 
@@ -457,7 +418,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		if (sc.atLineEnd) {
 			int lineState = (braceCount << 6) | (commentLevel << 1) | lineStateLineComment;
 			if (!nestedState.empty()) {
-				lineState |= PackNestedState(nestedState);
+				lineState |= PackLineState(nestedState) << 14;
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineComment = 0;
