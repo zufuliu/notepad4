@@ -50,7 +50,7 @@ private:
 
 public:
 	explicit LexAccessor(IDocument * pAccess_) noexcept :
-		pAccess(pAccess_), startPos(extremePosition), endPos(0),
+		pAccess(pAccess_), startPos(0), endPos(0),
 		codePage(pAccess->CodePage()),
 		encodingType((codePage == 65001) ? EncodingType::encUnicode : (codePage ? EncodingType::encDBCS : EncodingType::enc8bit)),
 		lenDoc(pAccess->Length()),
