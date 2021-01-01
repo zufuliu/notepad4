@@ -6,13 +6,14 @@ namespace Scintilla {
 
 template<int valueBit, int maxStateCount, int countBit, int baseStyle>
 int PackLineState(const std::vector<int>& states) noexcept {
-	constexpr uint32_t countMask = (1 << countBit) - 1;
+	constexpr size_t countMask = (1 << countBit) - 1;
 	size_t index = states.size();
-	int count = static_cast<int>((index > countMask) ? countMask : index);
+	int count = static_cast<int>(sci::min(index, countMask));
 	int lineState = count;
 	lineState <<= countBit;
-	while (count < maxStateCount && index != 0) {
-		++count;
+	count = sci::min(count, maxStateCount);
+	while (count != 0) {
+		--count;
 		--index;
 		int state = states[index];
 		if (state) {
@@ -29,7 +30,7 @@ void UnpackLineState(int lineState, std::vector<int>& states) {
 	constexpr int countMask = (1 << countBit) - 1;
 	int count = lineState & countMask;
 	lineState >>= countBit;
-	count = (count > maxStateCount)? maxStateCount : count;
+	count = sci::min(count, maxStateCount);
 	while (count != 0) {
 		int state = lineState & mask;
 		if (state) {

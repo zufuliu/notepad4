@@ -8,6 +8,20 @@
 
 namespace Scintilla {
 
+namespace sci {
+
+template <typename T>
+constexpr T min(T x, T y) noexcept {
+	return (x < y) ? x : y;
+}
+
+template <typename T>
+constexpr T max(T x, T y) noexcept {
+	return (x > y) ? x : y;
+}
+
+}
+
 enum class EncodingType { enc8bit, encUnicode, encDBCS };
 
 class LexAccessor {
@@ -39,10 +53,10 @@ private:
 	void Fill(Sci_Position position) noexcept {
 		const Sci_Position m = lenDoc - bufferSize;
 		startPos = position - slopSize;
-		startPos = (startPos > m)? m : startPos;
-		startPos = (startPos < 0)? 0 : startPos;
+		startPos = sci::min(startPos, m);
+		startPos = sci::max<Sci_Position>(startPos, 0);
 		endPos = startPos + bufferSize;
-		endPos = (endPos > lenDoc)? lenDoc : endPos;
+		endPos = sci::min(endPos, lenDoc);
 
 		pAccess->GetCharRange(buf, startPos, endPos - startPos);
 		buf[endPos - startPos] = '\0';
