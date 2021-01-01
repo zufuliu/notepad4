@@ -67,7 +67,9 @@ constexpr bool IsJuliaRegexFlag(int ch) noexcept {
 }
 
 enum {
-	MaxJuliaNestedStateCount = 3,
+	NestedStateValueBit = 3,
+	MaxNestedStateCount = 4,
+	NestedStateCountBit = 3,
 };
 
 constexpr int PackState(int state) noexcept {
@@ -101,11 +103,11 @@ constexpr int UnpackState(int state) noexcept  {
 }
 
 int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<3, MaxJuliaNestedStateCount, PackState>(nestedState) << 22;
+	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 14;
 }
 
-void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) {
-	UnpackLineState<3, MaxJuliaNestedStateCount, UnpackState>(lineState, count, nestedState);
+void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
+	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
 }
 
 void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -117,9 +119,8 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	bool maybeType = false;
 
 	int braceCount = 0;
-	int parenCount = 0; // $()
 	int variableOuter = SCE_JULIA_DEFAULT;	// variable inside string
-	std::vector<int> nestedState;
+	std::vector<int> nestedState; // string interpolation "$()"
 
 	int chBeforeIdentifier = 0;
 	bool isTransposeOperator = false; // "'"
@@ -129,19 +130,19 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
-		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		1: lineStateLineComment
 		5: commentLevel
 		8: braceCount
-		8: parenCount
-		3*3: nestedState
+		3: nestedState count
+		3*4: nestedState
 		*/
 		commentLevel = (lineState >> 1) & 0x1f;
 		braceCount = (lineState >> 6) & 0xff;
-		parenCount = (lineState >> 14) & 0xff;
-		if (parenCount != 0) {
-			UnpackNestedState(lineState >> 22, parenCount, nestedState);
+		lineState >>= 14;
+		if (lineState) {
+			UnpackNestedState(lineState, nestedState);
 		}
 	}
 
@@ -245,7 +246,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_JULIA_VARIABLE);
 			} else if (sc.Match('$', '(')) {
 				++braceCount;
-				++parenCount;
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_JULIA_OPERATOR2);
 				sc.Forward();
@@ -431,14 +431,13 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					isTransposeOperator = true;
 				}
 
-				sc.SetState(parenCount ? SCE_JULIA_OPERATOR2 : SCE_JULIA_OPERATOR);
-				if (parenCount) {
+				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_JULIA_OPERATOR2 : SCE_JULIA_OPERATOR);
+				if (interpolating) {
 					if (sc.ch == '(') {
-						++parenCount;
 						nestedState.push_back(SCE_JULIA_DEFAULT);
 					} else if (sc.ch == ')') {
-						--parenCount;
-						const int outerState = TryPopBack(nestedState);
+						const int outerState = TakeAndPop(nestedState);
 						sc.ForwardSetState(outerState);
 						continue;
 					}
@@ -456,8 +455,8 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (braceCount << 6) | (parenCount << 14) | (commentLevel << 1) | lineStateLineComment;
-			if (parenCount) {
+			int lineState = (braceCount << 6) | (commentLevel << 1) | lineStateLineComment;
+			if (!nestedState.empty()) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);

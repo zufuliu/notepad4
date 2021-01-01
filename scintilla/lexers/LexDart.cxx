@@ -40,7 +40,10 @@ struct EscapeSequence {
 };
 
 enum {
-	MaxDartNestedStateCount = 4,
+	NestedStateValueBit = 3,
+	MaxNestedStateCount = 4,
+	NestedStateCountBit = 3,
+
 	DartLineStateMaskLineComment = 1,	// line comment
 	DartLineStateMaskImport = (1 << 1),	// import
 };
@@ -82,11 +85,11 @@ constexpr int UnpackState(int state) noexcept  {
 }
 
 int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<3, MaxDartNestedStateCount, PackState>(nestedState) << 16;
+	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 8;
 }
 
-void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) {
-	UnpackLineState<3, MaxDartNestedStateCount, UnpackState>(lineState, count, nestedState);
+void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
+	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
 }
 
 void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -96,26 +99,25 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int kwType = SCE_DART_DEFAULT;
 	int chBeforeIdentifier = 0;
 
-	int curlyBrace = 0; // "${}"
 	int variableOuter = SCE_DART_DEFAULT;	// variable inside string
-	std::vector<int> nestedState;
+	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
-		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		2: lineStateLineType
 		6: commentLevel
-		8: curlyBrace
+		3: nestedState count
 		3*4: nestedState
 		*/
 		commentLevel = (lineState >> 2) & 0x3f;
-		curlyBrace = (lineState >> 8) & 0xff;
-		if (curlyBrace) {
-			UnpackNestedState(lineState >> 16, curlyBrace, nestedState);
+		lineState >>= 8;
+		if (lineState) {
+			UnpackNestedState(lineState, nestedState);
 		}
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
@@ -252,7 +254,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_DART_STRING_DQ:
 		case SCE_DART_TRIPLE_STRING_SQ:
 		case SCE_DART_TRIPLE_STRING_DQ:
-			if (curlyBrace == 0 && (sc.state == SCE_DART_STRING_SQ || sc.state == SCE_DART_STRING_DQ) && sc.atLineStart) {
+			if ((sc.state == SCE_DART_STRING_SQ || sc.state == SCE_DART_STRING_DQ) && sc.atLineStart) {
 				sc.SetState(SCE_DART_DEFAULT);
 			} else if (sc.ch == '\\') {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
@@ -263,7 +265,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				variableOuter = sc.state;
 				sc.SetState(SCE_DART_VARIABLE);
 			} else if (sc.Match('$', '{')) {
-				++curlyBrace;
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_DART_OPERATOR2);
 				sc.Forward();
@@ -356,14 +357,13 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				chBeforeIdentifier = sc.chPrev;
 				sc.SetState(SCE_DART_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				sc.SetState(curlyBrace ? SCE_DART_OPERATOR2 : SCE_DART_OPERATOR);
-				if (curlyBrace) {
+				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_DART_OPERATOR2 : SCE_DART_OPERATOR);
+				if (interpolating) {
 					if (sc.ch == '{') {
-						++curlyBrace;
 						nestedState.push_back(SCE_DART_DEFAULT);
 					} else if (sc.ch == '}') {
-						--curlyBrace;
-						const int outerState = TryPopBack(nestedState);
+						const int outerState = TakeAndPop(nestedState);
 						sc.ForwardSetState(outerState);
 						continue;
 					}
@@ -375,8 +375,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (curlyBrace << 8) | (commentLevel << 2) | lineStateLineType;
-			if (curlyBrace) {
+			int lineState = (commentLevel << 2) | lineStateLineType;
+			if (!nestedState.empty()) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);

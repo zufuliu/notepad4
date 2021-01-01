@@ -4,35 +4,38 @@ namespace Scintilla {
 
 // TODO: change packed line state to NestedStateStack (convert lexer to class).
 
-template<int bitCount, int maxStateCount, int PackState(int state) noexcept>
+template<int valueBit, int maxStateCount, int countBit, int PackState(int state) noexcept>
 inline int PackLineState(const std::vector<int>& states) noexcept {
-	int lineState = 0;
-	int count = 0;
+	constexpr uint32_t countMask = (1 << countBit) - 1;
 	size_t index = states.size();
+	int count = static_cast<int>((index > countMask) ? countMask : index);
+	int lineState = count;
+	lineState <<= countBit;
 	while (count < maxStateCount && index != 0) {
 		++count;
 		--index;
-		lineState = (lineState << bitCount) | PackState(states[index]);
+		lineState = (lineState << valueBit) | PackState(states[index]);
 	}
 	return lineState;
 }
 
-template<int bitCount, int maxStateCount, int UnpackState(int state) noexcept>
-inline void UnpackLineState(int lineState, int count, std::vector<int>& states) {
-	constexpr int mask = (1 << bitCount) - 1;
+template<int valueBit, int maxStateCount, int countBit, int UnpackState(int state) noexcept>
+inline void UnpackLineState(int lineState, std::vector<int>& states) {
+	constexpr int mask = (1 << valueBit) - 1;
+	constexpr int countMask = (1 << countBit) - 1;
+	int count = lineState & countMask;
+	lineState >>= countBit;
 	count = (count > maxStateCount)? maxStateCount : count;
-	while (count > 0) {
+	while (count != 0) {
 		states.push_back(UnpackState(lineState & mask));
-		lineState >>= bitCount;
+		lineState >>= valueBit;
 		--count;
 	}
 }
 
-inline int TryPopBack(std::vector<int>& states, int value = 0) {
-	if (!states.empty()) {
-		value = states.back();
-		states.pop_back();
-	}
+inline int TakeAndPop(std::vector<int>& states) {
+	const int value = states.back();
+	states.pop_back();
 	return value;
 }
 

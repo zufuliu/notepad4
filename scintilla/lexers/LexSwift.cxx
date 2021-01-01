@@ -24,7 +24,10 @@ using namespace Scintilla;
 namespace {
 
 enum {
-	MaxSwiftNestedStateCount = 4,
+	NestedStateValueBit = 2,
+	MaxNestedStateCount = 4,
+	NestedStateCountBit = 3,
+
 	SwiftLineStateMaskLineComment = 1,		// line comment
 	SwiftLineStateMaskImport = (1 << 1),	// import
 };
@@ -91,11 +94,11 @@ constexpr int UnpackState(int state) noexcept  {
 }
 
 int PackNestedState(const std::vector<int>& nestedState) noexcept {
-	return PackLineState<2, MaxSwiftNestedStateCount, PackState>(nestedState) << 24;
+	return PackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, PackState>(nestedState) << 16;
 }
 
-void UnpackNestedState(int lineState, int count, std::vector<int>& nestedState) {
-	UnpackLineState<2, MaxSwiftNestedStateCount, UnpackState>(lineState, count, nestedState);
+void UnpackNestedState(int lineState, std::vector<int>& nestedState) {
+	UnpackLineState<NestedStateValueBit, MaxNestedStateCount, NestedStateCountBit, UnpackState>(lineState, nestedState);
 }
 
 void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -105,27 +108,26 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int kwType = SCE_SWIFT_DEFAULT;
 	int chBeforeIdentifier = 0;
 
-	int parenCount = 0; 	// "\()" interpolation
 	int delimiterCount = 0;	// count of '#'
-	std::vector<int> nestedState;
+	std::vector<int> nestedState; // string interpolation "\()"
 
 	int visibleChars = 0;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
-		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		2: lineStateLineType
 		6: commentLevel
-		8: parenCount
 		8: delimiterCount
+		3: nestedState count
 		2*4: nestedState
 		*/
 		commentLevel = (lineState >> 2) & 0x3f;
-		parenCount = (lineState >> 8) & 0xff;
-		delimiterCount = (lineState >> 16) & 0xff;
-		if (parenCount) {
-			UnpackNestedState(lineState >> 24, parenCount, nestedState);
+		delimiterCount = (lineState >> 8) & 0xff;
+		lineState >>= 16;
+		if (lineState) {
+			UnpackNestedState(lineState, nestedState);
 		}
 	}
 
@@ -254,11 +256,10 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SWIFT_STRING:
 		case SCE_SWIFT_TRIPLE_STRING:
-			if (parenCount == 0 && sc.state == SCE_SWIFT_STRING && sc.atLineStart) {
+			if (sc.state == SCE_SWIFT_STRING && sc.atLineStart) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			} else if (sc.ch == '\\') {
 				if (sc.chNext == '(') {
-					++parenCount;
 					nestedState.push_back(sc.state);
 					sc.SetState(SCE_SWIFT_OPERATOR2);
 					sc.Forward();
@@ -286,7 +287,6 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Escape, delimiterCount)) {
 					sc.Forward(delimiterCount);
 					if (sc.ch == '(') {
-						++parenCount;
 						nestedState.push_back(SCE_SWIFT_EXTENDED_STRING);
 						sc.SetState(SCE_SWIFT_OPERATOR2);
 					}
@@ -348,14 +348,13 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				chBeforeIdentifier = sc.chPrev;
 				sc.SetState(SCE_SWIFT_IDENTIFIER);
 			} else if (isoperator(sc.ch) || sc.ch == '\\') {
-				sc.SetState(parenCount ? SCE_SWIFT_OPERATOR2 : SCE_SWIFT_OPERATOR);
-				if (parenCount) {
+				const bool interpolating = !nestedState.empty();
+				sc.SetState(interpolating ? SCE_SWIFT_OPERATOR2 : SCE_SWIFT_OPERATOR);
+				if (interpolating) {
 					if (sc.ch == '(') {
-						++parenCount;
 						nestedState.push_back(SCE_SWIFT_DEFAULT);
 					} else if (sc.ch == ')') {
-						--parenCount;
-						const int outerState = TryPopBack(nestedState);
+						const int outerState = TakeAndPop(nestedState);
 						sc.ForwardSetState(outerState);
 						continue;
 					}
@@ -367,8 +366,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			int lineState = (parenCount << 8) | (commentLevel << 2) | (delimiterCount << 16) | lineStateLineType;
-			if (parenCount) {
+			int lineState = (commentLevel << 2) | (delimiterCount << 8) | lineStateLineType;
+			if (!nestedState.empty()) {
 				lineState |= PackNestedState(nestedState);
 			}
 			styler.SetLineState(sc.currentLine, lineState);
