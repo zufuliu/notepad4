@@ -107,7 +107,7 @@ bool IsYAMLTextBlockEnd(int state, int &indentCount, int textIndentCount,
 		if (state != SCE_YAML_BLOCK_SCALAR && ch == '#') {
 			return true;
 		}
-		if (indentation != textIndentCount) {
+		if (indentation != 0 && indentation != textIndentCount) {
 			return indentation < textIndentCount;
 		}
 		if (state == SCE_YAML_TEXT) {
