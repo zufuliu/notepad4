@@ -81,7 +81,7 @@ BEGIN
 		POPUP "파일 모드(&M)"
 		BEGIN
 			MENUITEM "읽기 전용(&R)",					IDM_FILE_READONLY
-			MENUITEM "파일 잠금(&c)",			IDM_FILE_LOCK_EDITING
+			MENUITEM "파일 잠금(&C)",			IDM_FILE_LOCK_EDITING
 #if defined(_WIN64)
 			MENUITEM "큰 파일 모드(&L)",			IDM_FILE_LARGE_FILE_MODE
 #endif
@@ -103,7 +103,7 @@ BEGIN
 		END
 		POPUP "실행(&L)"
 		BEGIN
-			MENUITEM "내용이 있는 폴더 열기(&F)",		IDM_FILE_OPEN_CONTAINING_FOLDER
+			MENUITEM "파일 위치 열기(&F)",		IDM_FILE_OPEN_CONTAINING_FOLDER
 			MENUITEM "관리자 권한으로 열기(&A)",		IDM_FILE_RELAUNCH_ELEVATED
 			MENUITEM SEPARATOR
 			MENUITEM "새 창에 열기(&N)\tAlt+N",			IDM_FILE_NEWWINDOW
@@ -253,8 +253,8 @@ BEGIN
 				MENUITEM SEPARATOR
 				MENUITEM "벵골 문자를 라틴 문자로(&B)",					IDM_EDIT_MAP_BENGALI_LATIN
 				MENUITEM "키릴 문자를 라틴 문자로(&Y)",					IDM_EDIT_MAP_CYRILLIC_LATIN
-				MENUITEM "데바나가리 문자를 문자로(&D)",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-				MENUITEM "말라얄람 문지를 문자로(&M)",					IDM_EDIT_MAP_MALAYALAM_LATIN
+				MENUITEM "데바나가리 문자를 라틴 문자로(&D)",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+				MENUITEM "말라얄람 문자를 라틴 문자로(&M)",					IDM_EDIT_MAP_MALAYALAM_LATIN
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "선택 영역의 공백을 탭으로(&T)\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
@@ -275,9 +275,9 @@ BEGIN
 			MENUITEM "GUID 새로 만들기(&G)",							IDM_EDIT_INSERT_GUID
 			POPUP "유니코드 제어 문자(&C)"
 			BEGIN
-				MENUITEM "WJ\t&단어 결합자(&n)",						IDM_INSERT_UNICODE_WJ
-				MENUITEM "ZWJ\t0 너비 결합자(&n)",					IDM_INSERT_UNICODE_ZWJ
-				MENUITEM "ZWNJ\t0 너비 비결합자(&n)",			IDM_INSERT_UNICODE_ZWNJ
+				MENUITEM "WJ\t&단어 결합자(&N)",						IDM_INSERT_UNICODE_WJ
+				MENUITEM "ZWJ\t0 너비 결합자(&N)",					IDM_INSERT_UNICODE_ZWJ
+				MENUITEM "ZWNJ\t0 너비 비결합자(&N)",			IDM_INSERT_UNICODE_ZWNJ
 				MENUITEM "LRM\t왼쪽에서 오른쪽으로 표시(&L)",				IDM_INSERT_UNICODE_LRM
 				MENUITEM "RLM\t오른쪽에서 왼쪽으로 표시(&R)",				IDM_INSERT_UNICODE_RLM
 				MENUITEM "LRE\t왼쪽에서 오른쪽으로 삽입 시작(&E)",	IDM_INSERT_UNICODE_LRE
@@ -295,11 +295,11 @@ BEGIN
 				MENUITEM "ISS\t대칭 스와핑 금지(&Y)",		IDM_INSERT_UNICODE_ISS
 				MENUITEM "AAFS\t아랍어 양식 형성 활성화(&F)",		IDM_INSERT_UNICODE_AAFS
 				MENUITEM "IAFS\t아랍어 양식 형성 금지(&H)",		IDM_INSERT_UNICODE_IAFS
-				MENUITEM "RS\t기록 구분 (블록 구분)((&B)", IDM_INSERT_UNICODE_RS
-				MENUITEM "US\t단위 구분 (세그먼트 구분)((&S)", IDM_INSERT_UNICODE_US
+				MENUITEM "RS\t기록 구분 (블록 구분)(&B)", IDM_INSERT_UNICODE_RS
+				MENUITEM "US\t단위 구분 (세그먼트 구분)(&S)", IDM_INSERT_UNICODE_US
 				MENUITEM "LS\t줄 구분(&I)",						IDM_INSERT_UNICODE_LS
 				MENUITEM "PS\t단락 구분(&G)",				IDM_INSERT_UNICODE_PS
-				MENUITEM "ZWSP\t&0 너비 공간",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "ZWSP\t&0 너비 공간(&Z)",					IDM_INSERT_UNICODE_ZWSP
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "파일 이름(&F)",								CMD_INSERTFILENAME_NOEXT
@@ -324,11 +324,11 @@ BEGIN
 		END
 		POPUP "특수 기능(&I)"
 		BEGIN
-			MENUITEM "문자를 Hex 값으로 변환(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
-			MENUITEM "Hex 값을 문자로 변환(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "문자를 Hex값으로 변환(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
+			MENUITEM "Hex값을 문자로 변환(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "C 이스케이프(&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "C 이스케이프 해제(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Hex 값 보여주기(&S)",							IDM_EDIT_SHOW_HEX
+			MENUITEM "Hex값 보여주기(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "URL 인코드(&E)\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "URL 디코드(&D)\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
@@ -358,7 +358,7 @@ BEGIN
 		POPUP "찾기 및 바꾸기(&F)"
 		BEGIN
 			MENUITEM "찾기(&F)...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "찾기 텍스트 저장((&V)\tAlt+F3",			IDM_EDIT_SAVEFIND
+			MENUITEM "찾기 텍스트 저장(&V)\tAlt+F3",			IDM_EDIT_SAVEFIND
 			MENUITEM "다음 찾기(&N)\tF3",					IDM_EDIT_FINDNEXT
 			MENUITEM "이전 찾기(&P)\tShift+F3",		IDM_EDIT_FINDPREV
 			MENUITEM "바꾸기(&E)...\tCtrl+H",				IDM_EDIT_REPLACE
@@ -390,7 +390,7 @@ BEGIN
 			MENUITEM "줄 이동(&G)...\tCtrl+G",			IDM_EDIT_GOTOLINE
 			//MENUITEM SEPARATOR
 			//MENUITEM "뒤로 탐색(&B)\tAlt+Left",	IDM_EDIT_NAVIGATE_BACKWARD
-			//MENUITEM "앞으로 탐색&F)\tAlt+Right",	IDM_EDIT_NAVIGATE_FORWARD
+			//MENUITEM "앞으로 탐색(&F)\tAlt+Right",	IDM_EDIT_NAVIGATE_FORWARD
 			MENUITEM SEPARATOR
 			MENUITEM "블록의 시작으로 이동(&C)\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
 			MENUITEM "블록의 끝으로 이동(&K)\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
@@ -1059,7 +1059,7 @@ BEGIN
     CONTROL         "<a>기록 지우기</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>기록 지우기</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
     AUTOCHECKBOX    "포커스를 잃으면 투명 모드로 전환",IDC_TRANSPARENT,7,126,125,10,WS_TABSTOP
-    AUTOCHECKBOX    "일치하는 줄 북마크((&K)",IDC_FINDALLBOOKMARK,140,102,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "일치하는 줄 북마크(&K)",IDC_FINDALLBOOKMARK,140,102,90,10,WS_TABSTOP
     AUTOCHECKBOX    "고정폭 글꼴 사용(&M)",IDC_USEMONOSPACEDFONT,140,114,75,10,WS_TABSTOP
     CONTROL         "<a>찾기로 이동(Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,127,105,10
     CONTROL         "<a>위치 저장</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,250,114,60,10
@@ -1135,7 +1135,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "기본 줄 끝 모드(&D):",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "로드시 일관성 없는 줄 끝 경고 표시",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "불러올 때 일관성 없는 줄 끝 경고 표시",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
     AUTOCHECKBOX    "저장시 줄 끝이 일치하는지 확인(&E).",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
     AUTOCHECKBOX    "저장시 줄 끝의 공백 제거(&S)",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,139,7,50,14
@@ -1194,9 +1194,9 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTORADIOBUTTON "알리지 않음(&N)",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "메시지 표시(&S)",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
-    AUTORADIOBUTTON "자동 새로 고침 (수정되지 않음)&A)",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "알림 대신 폴링하여 파일 변경 감지&P)",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
-    AUTOCHECKBOX    "다시불러온 후 문서 끝에 유지(&K)",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
+    AUTORADIOBUTTON "자동 새로 고침 (수정되지 않음)(&A)",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
+    AUTOCHECKBOX    "알림 대신 조사하여 파일 변경 감지(&P)",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "다시 불러온 후 문서 끝에 유지(&K)",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "새 파일이 열리면 재설정(&R)",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,139,7,50,14
     PUSHBUTTON      "취소",IDCANCEL,139,24,50,14
@@ -1255,8 +1255,8 @@ BEGIN
     LTEXT           "들여쓰기 간격(&I):",IDC_STATIC,7,30,69,8
     EDITTEXT        IDC_INDENT_WIDTH,78,27,30,14,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "공백으로 탭 삽입(&S)",IDC_TAB_AS_SPACE,7,47,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "탭 키로  들여쓰기 다시 포맷&K)",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
-    AUTOCHECKBOX    "백스페이스 키로  들여쓰기 다시 포맷&B)",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "탭 키로 들여쓰기 다시 포맷(&K)",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
+    AUTOCHECKBOX    "백스페이스 키로 들여쓰기 다시 포맷(&B)",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,117,7,50,14
     PUSHBUTTON      "취소",IDCANCEL,117,27,50,14
 END
@@ -1379,7 +1379,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "줄에 텍스트 접두사(&P):",IDC_STATIC,7,6,96,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "줄에 텍스트 추가&A):",IDC_MODIFY_LINE_TIP2,7,41,97,8
+    LTEXT           "줄에 텍스트 추가(&A):",IDC_MODIFY_LINE_TIP2,7,41,97,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "확인",IDOK,147,108,50,14
     PUSHBUTTON      "취소",IDCANCEL,203,108,50,14
@@ -1926,7 +1926,7 @@ BEGIN
 /e 인코딩\t파일 소스 인코딩.\n\
 /g 줄[,열]\t지정된 위치로 이동합니다 (/g -1 파일 끝).\n\
 /m 텍스트\t지정된 텍스트와 일치합니다 (/m- 마지막, /mr 정규식, /mb 백슬래시).\n\
-/l[o|p]\t수정된 파일을 자동으로 다시 로드합니다.\n\
+/l[o|p]\t수정된 파일을 자동으로 다시 불러옵니다.\n\
 /q\t프롬프트없이 새 파일을 강제로 생성합니다.\n\
 /s 이름\t지정된 구문 체계를 선택합니다.\n\
 /d\t텍스트 파일 구성표를 선택합니다.\n\
@@ -1952,10 +1952,10 @@ BEGIN
     //IDS_ERR_DROP            "한 번에 하나의 파일만 삭제할 수 있습니다!"
     IDS_ASK_SAVE            """%s""에 대한 변경 사항을 저장하시겠습니까?"
     IDS_ASK_REVERT          "파일을 마지막으로 저장된 상태로 되돌리시겠습니까? 변경 사항이 손실됩니다!"
-    IDS_ASK_RECODE          "기록하려면 디스크에서 파일을 다시불러와야 합니다. 저장하지 않은 변경 사항은 손실됩니다!"
+    IDS_ASK_RECODE          "기록하려면 디스크에서 파일을 다시 불러와야 합니다. 저장하지 않은 변경 사항은 손실됩니다!"
     IDS_ASK_CREATE          """%s"" 파일을 찾을 수 없습니다.\n이 파일을 만드시겠습니까?"
-    IDS_PRINT_HEADER        "파일이름, 현재 날짜와 시간|파일이름, 현재 날짜|파일이름|비워둠"
-    IDS_PRINT_FOOTER        "페이지 번호|비워둠"
+    IDS_PRINT_HEADER        "파일이름, 현재 날짜와 시간|파일이름, 현재 날짜|파일이름|비워두기"
+    IDS_PRINT_FOOTER        "페이지 번호|비워두기"
     IDS_PRINT_COLOR         "일반|색상 반전 (어두운 배경)|흰색 바탕에 검은색|흰색 바탕에 컬러|흰색 바탕에 컬러 (줄 번호 제외)|현재 화면 색상 (WYSIWYG)"
     IDS_PRINT_PAGENUM       "%s 페이지"
     IDS_PRINT_ERROR         """%s"" 인쇄 중 오류가 발생했습니다!"
@@ -2150,7 +2150,7 @@ BEGIN
 	NP2STYLE_LongLineMarker			"긴 줄 표시기"
 	NP2STYLE_ExtraLineSpacing		"추가 줄 간격"
 	NP2STYLE_FoldingMarker			"접기 표시기"
-	NP2STYLE_MarkOccurrences		"표시 발생"
+	NP2STYLE_MarkOccurrences		"선택 강조"
 	NP2STYLE_DefaultCodeStyle		"기본 코드 스타일"
 	NP2STYLE_DefaultTextStyle		"기본 텍스트 스타일"
 	NP2STYLE_FoldEllipsis			"접기 줄임표"
