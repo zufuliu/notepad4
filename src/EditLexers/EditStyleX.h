@@ -227,6 +227,8 @@
 #define NP2StyleX_Key					EDITSTYLE_HOLE(Key, L"Key")
 #define NP2StyleX_ParameterExpansion	EDITSTYLE_HOLE(ParameterExpansion, L"Parameter Expansion")
 #define NP2StyleX_Table					EDITSTYLE_HOLE(Table, L"Table")
+#define NP2StyleX_Pair					EDITSTYLE_HOLE(Pair, L"Pair")
+#define NP2StyleX_Tuple					EDITSTYLE_HOLE(Tuple, L"Tuple")
 
 #define NP2StyleX_SourceDestination		EDITSTYLE_HOLE(SourceDestination, L"Source and Destination")
 #define NP2StyleX_PositionSetting		EDITSTYLE_HOLE(PositionSetting, L"Position Setting")
@@ -240,7 +242,10 @@
 #define NP2StyleX_DirectiveOperand		EDITSTYLE_HOLE(DirectiveOperand, L"Directive Operand")
 #define NP2StyleX_InternalFilter		EDITSTYLE_HOLE(InternalFilter, L"Internal Filter")
 #define NP2StyleX_ExternalFilter		EDITSTYLE_HOLE(ExternalFilter, L"External Filter")
-
+#define NP2StyleX_File					EDITSTYLE_HOLE(File, L"File")
+#define NP2StyleX_Link					EDITSTYLE_HOLE(Link, L"Link")
+#define NP2StyleX_Money					EDITSTYLE_HOLE(Money, L"Money")
+#define NP2StyleX_Issue					EDITSTYLE_HOLE(Issue, L"Issue")
 #define NP2StyleX_MagicMethod			EDITSTYLE_HOLE(MagicMethod, L"Magic Method")
 #define NP2StyleX_MagicConstant			EDITSTYLE_HOLE(MagicConstant, L"Magic Constant")
 #define NP2StyleX_TemplateLiteral		EDITSTYLE_HOLE(TemplateLiteral, L"Template Literal")

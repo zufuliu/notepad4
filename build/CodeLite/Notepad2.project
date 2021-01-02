@@ -49,6 +49,7 @@
       <File Name="../../scintilla/lexers/LexProps.cxx"/>
       <File Name="../../scintilla/lexers/LexPython.cxx"/>
       <File Name="../../scintilla/lexers/LexR.cxx"/>
+      <File Name="../../scintilla/lexers/LexRebol.cxx"/>
       <File Name="../../scintilla/lexers/LexRuby.cxx"/>
       <File Name="../../scintilla/lexers/LexRust.cxx"/>
       <File Name="../../scintilla/lexers/LexSmali.cxx"/>
@@ -214,6 +215,7 @@
       <File Name="../../src/EditLexers/stlPowerShell.c"/>
       <File Name="../../src/EditLexers/stlPython.c"/>
       <File Name="../../src/EditLexers/stlR.c"/>
+      <File Name="../../src/EditLexers/stlRebol.c"/>
       <File Name="../../src/EditLexers/stlResource.c"/>
       <File Name="../../src/EditLexers/stlRuby.c"/>
       <File Name="../../src/EditLexers/stlRust.c"/>

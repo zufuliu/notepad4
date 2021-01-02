@@ -220,6 +220,8 @@
 #define NP2STYLE_Key					63634
 #define NP2STYLE_ParameterExpansion		63635
 #define NP2STYLE_Table					63636
+#define NP2STYLE_Pair					63637
+#define NP2STYLE_Tuple					63638
 
 #define NP2STYLE_SourceDestination		63641
 #define NP2STYLE_PositionSetting		63642
@@ -233,7 +235,10 @@
 #define NP2STYLE_DirectiveOperand		63654
 #define NP2STYLE_InternalFilter			63655
 #define NP2STYLE_ExternalFilter			63656
-
+#define NP2STYLE_File					63657
+#define NP2STYLE_Link					63658
+#define NP2STYLE_Money					63659
+#define NP2STYLE_Issue					63660
 #define NP2STYLE_MagicMethod			63661
 #define NP2STYLE_MagicConstant			63662
 #define NP2STYLE_TemplateLiteral		63663

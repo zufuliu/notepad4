@@ -108,6 +108,7 @@ extern EDITLEXER lexPerl;
 extern EDITLEXER lexPS1;
 
 extern EDITLEXER lexR;
+extern EDITLEXER lexRebol;
 extern EDITLEXER lexRC;
 extern EDITLEXER lexRust;
 
@@ -204,6 +205,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexPS1,
 
 	&lexR,
+	&lexRebol,
 	&lexRC,
 	&lexRust,
 
@@ -1278,6 +1280,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		break;
 	case NP2LEX_R:
 		attr[1] = KeywordAttr_NoLexer;		// package
+		break;
+	case NP2LEX_REBOL:
+		attr[2] = KeywordAttr_NoLexer;		// datatype
+		attr[3] = KeywordAttr_NoLexer;		// function
 		break;
 	case NP2LEX_RUBY:
 		attr[1] = KeywordAttr_NoAutoComp;	// code fold
@@ -2458,10 +2464,21 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 //
 PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 	if (!bCheckNames) {
-		if (bAutoSelect && StrCaseEqual(L"m", lpszMatch)) {
-			PEDITLEXER lex = Style_DetectObjCAndMatlab();
-			if (lex != NULL) {
-				return lex;
+		if (bAutoSelect && lpszMatch[1] == L'\0') {
+			const WCHAR suffix = *lpszMatch | 0x20;
+			if (suffix == L'm') {
+				PEDITLEXER lex = Style_DetectObjCAndMatlab();
+				if (lex != NULL) {
+					return lex;
+				}
+			} else if (suffix == L'r') {
+				// check preface `REBOL []` at file beginning
+				char tchText[9] = "";
+				SciCall_GetText(COUNTOF(tchText), tchText);
+				const char after = tchText[CSTRLEN("rebol")];
+				if ((after == ' ' || after == '\t' || after == '[') && StrStartsWithCase(tchText, "rebol")) {
+					return &lexRebol;
+				}
 			}
 		}
 
