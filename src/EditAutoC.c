@@ -515,6 +515,7 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_DOT:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
+	case NP2LEX_REBOL:
 		return (ch == '-');
 
 	case NP2LEX_ASM:
@@ -1069,6 +1070,10 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	}
 	else if (pLexCurrent->iLexer == SCLEX_SWIFT && (ch == '@' || ch == '#') && iCurrentStyle == SCE_SWIFT_DEFAULT) {
 		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(ch == '#') ? 1 : 2]); // directive, attribute
+		return AutoC_AddSpecWord_Keyword;
+	}
+	else if (pLexCurrent->iLexer == SCLEX_REBOL && ch == '#' && iCurrentStyle == SCE_REBOL_DEFAULT) {
+		WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]); // directive
 		return AutoC_AddSpecWord_Keyword;
 	}
 	return 0;
@@ -2034,6 +2039,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
 	case SCLEX_PROPERTIES:
+	case SCLEX_REBOL:
 		EditToggleLineComments(L";", FALSE);
 		break;
 
@@ -2287,6 +2293,10 @@ void EditToggleCommentBlock(void) {
 
 	case SCLEX_R:
 		EditEncloseSelectionNewLine(L"if (FALSE) {", L"}");
+		break;
+
+	case SCLEX_REBOL:
+		EditEncloseSelectionNewLine(L"comment {", L"}");
 		break;
 
 	case SCLEX_TCL:

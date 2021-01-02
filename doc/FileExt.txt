@@ -421,6 +421,13 @@ R Code
 	Rprofile.site
 	Renviron.site
 
+Rebol Script
+	r
+	reb
+
+	red			Red
+	reds		Red/System
+
 Resource Script
 	rc
 	rc2

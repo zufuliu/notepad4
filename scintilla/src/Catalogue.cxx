@@ -160,7 +160,7 @@ void Scintilla_LinkLexers() {
 	extern LexerModule lmPython;
 	extern LexerModule lmR;
 	//extern LexerModule lmRaku;
-	//extern LexerModule lmREBOL;
+	extern LexerModule lmREBOL;
 	//extern LexerModule lmRegistry;
 	extern LexerModule lmRuby;
 	extern LexerModule lmRust;
@@ -308,7 +308,7 @@ void Scintilla_LinkLexers() {
 		&lmPython,
 		&lmR,
 		//&lmRaku,
-		//&lmREBOL,
+		&lmREBOL,
 		//&lmRegistry,
 		&lmRuby,
 		&lmRust,
