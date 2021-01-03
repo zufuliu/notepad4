@@ -384,6 +384,7 @@ MATLAB Code
 Nsis Setup Script
 	nsi				NSIS Script
 	nsh				NSIS Header File
+	nlf				NSIS Language File
 
 
 Pascal Source

@@ -716,6 +716,40 @@ def parse_llvm_api_file(path):
 	]
 	return keywordList
 
+def parse_nsis_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, ';')
+	for key, doc in sections:
+		items = doc.split()
+		if key == 'preprocessor':
+			items = [item.strip('!') for item in items]
+		elif key == 'functions':
+			functions = []
+			for item in items:
+				item = item.strip('.')
+				if item.startswith('un.'):
+					item = item[3:]
+				functions.append(item)
+			items = functions
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'instructions',
+		'attributes',
+		'functions',
+		'predefined variables',
+	])
+	keywordList = [
+		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer),
+		('instruction', keywordMap['instructions'], KeywordAttr.NoLexer),
+		('attribute', keywordMap['attributes'], KeywordAttr.NoLexer),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
+		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer),
+	]
+	return keywordList
+
 def parse_r_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}

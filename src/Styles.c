@@ -1201,9 +1201,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_JAVA:
 		attr[10] = KeywordAttr_NoLexer;		// Package
 		break;
-	case NP2LEX_NSIS:
-		attr[0] = KeywordAttr_MakeLower;
-		break;
 	case NP2LEX_RC:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
 		break;
@@ -1277,6 +1274,14 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		break;
 	case NP2LEX_LUA:
 		attr[3] = KeywordAttr_NoLexer;		// standard library
+		break;
+	case NP2LEX_NSIS:
+		attr[0] = KeywordAttr_MakeLower;	// keywords
+		attr[1] = KeywordAttr_NoLexer;		// preprocessor
+		attr[2] = KeywordAttr_NoLexer;		// instruction
+		attr[3] = KeywordAttr_NoLexer;		// attribute
+		attr[4] = KeywordAttr_NoLexer;		// function
+		attr[5] = KeywordAttr_NoLexer;		// predefined variables
 		break;
 	case NP2LEX_R:
 		attr[1] = KeywordAttr_NoLexer;		// package
