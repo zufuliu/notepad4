@@ -822,7 +822,7 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 	int styleNext = styler.StyleAt(startPos);
 
 	constexpr int MaxFoldWordLength = 7 + 1; // foreach
-	char word[MaxFoldWordLength + 1] = "";
+	char word[MaxFoldWordLength + 1];
 	int wordlen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -844,15 +844,15 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 				word[wordlen] = '\0';
 				wordlen = 0;
 				if (isCShell) {
-					if (strcmp(word, "if") == 0 || strcmp(word, "foreach") == 0 || strcmp(word, "switch") == 0 || strcmp(word, "while") == 0) {
+					if (EqualsAny(word, "if", "foreach", "switch", "while")) {
 						levelCurrent++;
-					} else if (strcmp(word, "end") == 0 || strcmp(word, "endif") == 0 || strcmp(word, "endsw") == 0) {
+					} else if (EqualsAny(word, "end", "endif", "endsw")) {
 						levelCurrent--;
 					}
 				} else {
-					if (strcmp(word, "if") == 0 || strcmp(word, "case") == 0 || strcmp(word, "do") == 0) {
+					if (EqualsAny(word, "if", "case", "do")) {
 						levelCurrent++;
-					} else if (strcmp(word, "fi") == 0 || strcmp(word, "esac") == 0 || strcmp(word, "done") == 0) {
+					} else if (EqualsAny(word, "fi", "esac", "done")) {
 						levelCurrent--;
 					}
 				}
