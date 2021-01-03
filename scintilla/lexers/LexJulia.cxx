@@ -462,7 +462,7 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
 	constexpr int MaxFoldWordLength = 10 + 1; // baremodule
-	char buf[MaxFoldWordLength + 1] = "";
+	char buf[MaxFoldWordLength + 1];
 	int wordLen = 0;
 
 	char chNext = styler[startPos];

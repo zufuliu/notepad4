@@ -340,7 +340,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	int style = initStyle;
 
 	constexpr int MaxFoldWordLength = 8 + 1; // function
-	char buf[MaxFoldWordLength + 1] = "";
+	char buf[MaxFoldWordLength + 1];
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -370,8 +370,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				wordLen = 0;
 				if (StrStartsWith(buf, "end")) {
 					levelNext--;
-				} else if (strcmp(buf, "if") == 0 || strcmp(buf, "function") == 0 || strcmp(buf, "macro") == 0
-					|| strcmp(buf, "foreach") == 0 || strcmp(buf, "while") == 0) {
+				} else if (EqualsAny(buf, "if",  "function", "macro", "foreach", "while")) {
 					levelNext++;
 				}
 			}
