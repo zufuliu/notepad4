@@ -22,17 +22,12 @@ namespace {
 
 enum {
 	RebolLineTypeComment = 1,		// line comment
-	RebolLineTypeInclude = 1 << 1,	// #include, #import
+	RebolLineTypeInclude = 1 << 1,	// #include
 	RebolLineTypeDefine = 2 << 1,	// #define
 
 	RebolLineStateHtmlTag = 1 << 4,
 	RebolLineTypeDefaultMask = (1 << 3) - 2,
 };
-
-constexpr bool IsEscapeChar(int ch) noexcept {
-	// escaped-char
-	return AnyOf(ch, '/', '-', '~', '^', '{', '}', '\"');
-}
 
 struct EscapeSequence {
 	int digitsLeft = 0;
@@ -40,16 +35,13 @@ struct EscapeSequence {
 	bool quoted = false;
 
 	bool resetEscapeState(int state, int chNext) noexcept {
-		outerState = state;
-		digitsLeft = 0;
-		quoted = false;
-		if (IsEscapeChar(chNext)) {
-			digitsLeft = 1;
-		} else if (chNext == '(') {
-			digitsLeft = 8;
-			quoted = true;
+		if (!IsGraphic(chNext)) {
+			return false;
 		}
-		return digitsLeft != 0;
+		outerState = state;
+		digitsLeft = (chNext == '(') ? 8 : 1;
+		quoted = chNext == '(';
+		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -71,6 +63,12 @@ constexpr bool IsRebolIdentifierChar(int ch) noexcept {
 
 constexpr bool IsRebolNumberStart(int ch, int chNext) noexcept {
 	return IsADigit(ch) || ((ch == '+' || ch == '-') && IsADigit(chNext));
+}
+
+constexpr bool IsRebolDateTimeStart(int chPrev, int ch, int chNext) noexcept {
+	// http://www.rebol.com/r3/docs/datatypes/date.html
+	return (ch == ':' || ch == '/' || ch == '=' || (ch == '-' && !(chPrev == 'e' || chPrev == 'E')))
+	&& (ch == chNext || IsAlphaNumeric(chNext));
 }
 
 constexpr bool IsRebolOperator(int ch, int chNext) noexcept {
@@ -145,10 +143,10 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_REBOL_OPERATOR);
 				sc.ForwardSetState(state);
 				continue;
-			} else if (sc.state == SCE_REBOL_NUMBER && (sc.ch == '-' || sc.ch == ':') && IsAlphaNumeric(sc.chNext)) {
-				sc.ChangeState((sc.ch == '-') ? SCE_REBOL_DATE : SCE_REBOL_TIME);
+			} else if (sc.state == SCE_REBOL_NUMBER && IsRebolDateTimeStart(sc.chPrev, sc.ch, sc.chNext)) {
+				sc.ChangeState((sc.ch == ':') ? SCE_REBOL_TIME : SCE_REBOL_DATE);
 			} else if ((sc.state != SCE_REBOL_NUMBER && (sc.ch == '+' || sc.ch == '-'))
-				|| ((sc.state == SCE_REBOL_DATE || sc.state == SCE_REBOL_TIME) && (sc.ch == ':' || sc.ch == '/'))) {
+				|| ((sc.state == SCE_REBOL_DATE || sc.state == SCE_REBOL_TIME) && (sc.ch == ':' || sc.ch == '/' || sc.ch == '='))) {
 				sc.Forward();
 			}
 			else if (!(sc.ch == '\'' || IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext))) {
@@ -189,8 +187,8 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else {
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
+					const int chNext = sc.GetLineNextChar();
 					if (keywordLists[0]->InList(s)) {
-						const int chNext = sc.GetLineNextChar();
 						if (chNext == '{' && strcmp(s, "comment") == 0) {
 							sc.ChangeState(SCE_REBOL_COMMENTBLOCK);
 							if (sc.ch == '{') {
@@ -199,6 +197,8 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						} else {
 							sc.ChangeState(SCE_REBOL_WORD);
 						}
+					} else if (chNext == '(') {
+						sc.ChangeState(SCE_REBOL_MACRO);
 					}
 				}
 				if (sc.state != SCE_REBOL_COMMENTBLOCK) {
@@ -213,14 +213,14 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_REBOL_SYMBOL:
 		case SCE_REBOL_ISSUE:
-			if (!IsRebolIdentifierChar(sc.ch)) {
+			if (!(sc.ch == '/' || IsRebolIdentifierChar(sc.ch))) {
 				if (sc.state == SCE_REBOL_ISSUE) {
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
 					const char *p = s + 1;
 					if (keywordLists[1]->InList(p)) {
 						sc.ChangeState(SCE_REBOL_DIRECTIVE);
-						if (EqualsAny(p, "include", "import")) {
+						if (strcmp(p, "include") == 0) {
 							lineStateLineType = RebolLineTypeInclude;
 						} else if (strcmp(p, "define") == 0) {
 							lineStateLineType = RebolLineTypeDefine;
@@ -290,8 +290,16 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_REBOL_BINARY:
-			if (sc.ch == '}') {
+			if (sc.ch == ';') {
+				sc.SetState(SCE_REBOL_BINARYCOMMENT);
+			} else if (sc.ch == '}') {
 				sc.ForwardSetState(SCE_REBOL_DEFAULT);
+			}
+			break;
+		case SCE_REBOL_BINARYCOMMENT:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_REBOL_BINARY);
+				continue;
 			}
 			break;
 
@@ -385,7 +393,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	sc.Complete();
 }
 
-void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
+void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
 	const int lineTypeMask = RebolLineTypeDefaultMask | foldComment;
 
@@ -403,25 +411,20 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) - 1;
 
-	int styleNext = styler.StyleAt(startPos);
-	int style = initStyle;
-
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int stylePrev = style;
-		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		const int style = styler.StyleAt(i);
+		const char ch = styler[i];
 
 		if (style == SCE_REBOL_OPERATOR) {
-			const char ch = styler[i];
 			if (ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == ']' || ch == ')') {
 				levelNext--;
 			}
 		} else if (style == SCE_REBOL_BRACEDSTRING || style == SCE_REBOL_BINARY || (style == SCE_REBOL_COMMENTBLOCK && foldComment)) {
-			if (style != stylePrev && stylePrev != SCE_REBOL_ESCAPECHAR) {
+			if (ch == '{') {
 				levelNext++;
-			} else if (style != styleNext && styleNext != SCE_REBOL_ESCAPECHAR) {
+			} else if (ch == '}') {
 				levelNext--;
 			}
 		}
