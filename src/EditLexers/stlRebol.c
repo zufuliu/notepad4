@@ -8,8 +8,8 @@ static KEYWORDLIST Keywords_Rebol = {{
 "reduce remove-each repeat return routine set size? switch throw true try unless until use variadic while with xor yes "
 
 , // 1 directive
-"call case default define do either enum export get get-definition if import include inline pop-path register-intrinsics "
-"script switch syscall system system-global u16 user-code verbose "
+"call case default define do either enum export get get-definition if import in include inline pop-path "
+"register-intrinsics script switch syscall system system-global typecheck u16 user-code verbose "
 
 , // 2 datatype
 "action! binary! bitset! block! byte! byte-ptr! c-string! char! closure! command! datatype! date! decimal! "
@@ -69,7 +69,8 @@ static EDITSTYLE Styles_Rebol[] = {
 	{ SCE_REBOL_TYPE, NP2StyleX_Type, L"fore:#0080FF" },
 	{ SCE_REBOL_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_REBOL_PROPERTY, NP2StyleX_Property, L"fore:#A46000" },
-	{ MULTI_STYLE(SCE_REBOL_COMMENTLINE, SCE_REBOL_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_REBOL_MACRO, NP2StyleX_Macro, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_REBOL_COMMENTLINE, SCE_REBOL_COMMENTBLOCK, SCE_REBOL_BINARYCOMMENT, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_REBOL_QUOTEDSTRING, SCE_REBOL_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_REBOL_BRACEDSTRING, NP2StyleX_RawString, L"fore:#F08000" },
 	{ SCE_REBOL_BINARY, NP2StyleX_Bytes, L"fore:#C08000" },

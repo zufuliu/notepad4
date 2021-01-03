@@ -58,6 +58,7 @@ variadic
 #get-definition
 #if
 #import
+#in
 #include
 #inline
 #pop-path
@@ -67,6 +68,7 @@ variadic
 #syscall
 #system
 #system-global
+#typecheck
 #u16
 #user-code
 #verbose
