@@ -1393,8 +1393,8 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		}
 		return FALSE;
 	}
-	if (iLexer == SCLEX_RUST) {
-		// lifetime
+	if (iLexer == SCLEX_RUST || iLexer == SCLEX_REBOL) {
+		// Rust lifetime, REBOL symbol
 		return FALSE;
 	}
 
