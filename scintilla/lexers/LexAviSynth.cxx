@@ -150,7 +150,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.Match('*', ']')) {
 				sc.Forward();
 				--nestedLevel;
-				if (nestedLevel <= 0) {
+				if (nestedLevel == 0) {
 					sc.ForwardSetState(SCE_AVS_DEFAULT);
 				}
 			}
