@@ -515,7 +515,6 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_DOT:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
-	case NP2LEX_REBOL:
 		return (ch == '-');
 
 	case NP2LEX_ASM:
@@ -569,6 +568,10 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_MAKE:
 	case NP2LEX_NSIS:
 		return (ch == '-' || ch == '$' || ch == '!');
+
+	case NP2LEX_REBOL:
+		// http://www.rebol.com/r3/docs/guide/code-syntax.html#section-4
+		return (ch == '-' || ch == '!' || ch == '?' || ch == '~' || ch == '+' || ch == '&' || ch == '*' || ch == '=');
 
 	case NP2LEX_XML:
 		return (ch == '-' || ch == ':');
@@ -1639,7 +1642,7 @@ BOOL IsIndentKeywordStyle(int style) {
 	case SCLEX_MATLAB:
 		return style == SCE_MAT_KEYWORD;
 	//case SCLEX_NSIS:
-	//	return style == SCE_C_WORD || style == SCE_C_PREPROCESSOR;
+	//	return style == SCE_NSIS_WORD || style == SCE_NSIS_PREPROCESSOR;
 
 	//case SCLEX_PASCAL:
 	case SCLEX_RUBY:
