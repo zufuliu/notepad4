@@ -18,7 +18,7 @@ class PropSetSimple;
 
 typedef bool (*PFNIsCommentLeader)(Accessor &styler, Sci_Position pos, Sci_Position len);
 
-class Accessor : public LexAccessor {
+class Accessor final : public LexAccessor {
 	const PropSetSimple * const pprops;
 public:
 	Accessor(IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;

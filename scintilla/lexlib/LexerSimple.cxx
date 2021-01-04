@@ -24,20 +24,7 @@
 
 using namespace Scintilla;
 
-LexerSimple::LexerSimple(const LexerModule *module_) :
-	LexerBase(module_->LexClasses(), module_->NamedStyles()),
-	module(module_) {
-#if 0
-	for (int wl = 0; wl < module->GetNumWordLists(); wl++) {
-		if (!wordLists.empty())
-			wordLists += "\n";
-		wordLists += module->GetWordListDescription(wl);
-	}
-#endif
-}
-
-const char * SCI_METHOD LexerSimple::DescribeWordListSets() const noexcept {
-	return wordLists.c_str();
+LexerSimple::LexerSimple(const LexerModule *module_) : module(module_) {
 }
 
 void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) {
