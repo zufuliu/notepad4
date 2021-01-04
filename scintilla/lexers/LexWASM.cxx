@@ -137,7 +137,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 				}
 			} else if (sc.Match('(', ';')) {
-				sc.Forward(2);
+				sc.Forward();
 				++commentLevel;
 			}
 			break;

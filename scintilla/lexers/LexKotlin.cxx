@@ -184,7 +184,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 				}
 			} else if (sc.Match('/', '*')) {
-				sc.Forward(2);
+				sc.Forward();
 				++commentLevel;
 			}
 			break;

@@ -208,7 +208,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				//} else {
 				//	sc.SetState(SCE_RUST_COMMENTBLOCK);
 				//}
-				sc.Forward(2);
+				sc.Forward();
 				++commentLevel;
 			}
 			break;
