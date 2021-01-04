@@ -22,10 +22,7 @@
 
 using namespace Scintilla;
 
-static const char styleSubable[] = { 0 };
-
-LexerBase::LexerBase(const LexicalClass *lexClasses_, size_t nClasses_) :
-	lexClasses(lexClasses_), nClasses(nClasses_) {
+LexerBase::LexerBase() {
 	for (int wl = 0; wl < numWordLists; wl++) {
 		keywordLists[wl] = new WordList;
 	}
@@ -125,23 +122,23 @@ int SCI_METHOD LexerBase::DistanceToSecondaryStyles() const noexcept {
 }
 
 const char * SCI_METHOD LexerBase::GetSubStyleBases() const noexcept {
-	return styleSubable;
+	return "";
 }
 
 int SCI_METHOD LexerBase::NamedStyles() const noexcept {
-	return static_cast<int>(nClasses);
+	return 0;
 }
 
-const char * SCI_METHOD LexerBase::NameOfStyle(int style) const noexcept {
-	return (style < NamedStyles()) ? lexClasses[style].name : "";
+const char * SCI_METHOD LexerBase::NameOfStyle([[maybe_unused]] int style) const noexcept {
+	return "";
 }
 
-const char * SCI_METHOD LexerBase::TagsOfStyle(int style) const noexcept {
-	return (style < NamedStyles()) ? lexClasses[style].tags : "";
+const char * SCI_METHOD LexerBase::TagsOfStyle([[maybe_unused]] int style) const noexcept {
+	return "";
 }
 
-const char * SCI_METHOD LexerBase::DescriptionOfStyle(int style) const noexcept {
-	return (style < NamedStyles()) ? lexClasses[style].description : "";
+const char * SCI_METHOD LexerBase::DescriptionOfStyle([[maybe_unused]] int style) const noexcept {
+	return "";
 }
 
 // ILexer5 methods

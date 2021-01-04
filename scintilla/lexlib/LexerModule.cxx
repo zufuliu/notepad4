@@ -29,31 +29,19 @@ int LexerModule::GetLanguage() const noexcept {
 }
 
 int LexerModule::GetNumWordLists() const noexcept {
-	if (!wordListDescriptions) {
-		return -1;
-	}
-
-	int numWordLists = 0;
-	while (wordListDescriptions[numWordLists]) {
-		++numWordLists;
-	}
-	return numWordLists;
+	return -1;
 }
 
-const char *LexerModule::GetWordListDescription(int index) const noexcept {
-	assert(index < GetNumWordLists());
-	if (!wordListDescriptions || (index >= GetNumWordLists())) {
-		return "";
-	}
-	return wordListDescriptions[index];
+const char *LexerModule::GetWordListDescription([[maybe_unused]] int index) const noexcept {
+	return "";
 }
 
 const LexicalClass *LexerModule::LexClasses() const noexcept {
-	return lexClasses;
+	return nullptr;
 }
 
 size_t LexerModule::NamedStyles() const noexcept {
-	return nClasses;
+	return 0;
 }
 
 ILexer5 *LexerModule::Create() const {

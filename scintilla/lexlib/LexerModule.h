@@ -25,13 +25,10 @@ typedef ILexer5 *(*LexerFactoryFunction)();
  * The ExternalLexerModule subclass holds lexers loaded from DLLs or shared libraries.
  */
 class LexerModule {
-	int language;
-	LexerFunction fnLexer;
-	LexerFunction fnFolder;
-	LexerFactoryFunction fnFactory;
-	const char *const *wordListDescriptions;
-	const LexicalClass *lexClasses;
-	size_t nClasses;
+	const int language;
+	LexerFunction const fnLexer;
+	LexerFunction const fnFolder;
+	LexerFactoryFunction const fnFactory;
 
 public:
 	const char *const languageName;
@@ -39,32 +36,22 @@ public:
 		int language_,
 		LexerFunction fnLexer_,
 		const char *languageName_ = nullptr,
-		LexerFunction fnFolder_ = nullptr,
-		const char *const wordListDescriptions_[] = nullptr,
-		const LexicalClass *lexClasses_ = nullptr,
-		size_t nClasses_ = 0) noexcept:
+		LexerFunction fnFolder_ = nullptr) noexcept:
 		language(language_),
 		fnLexer(fnLexer_),
 		fnFolder(fnFolder_),
 		fnFactory(nullptr),
-		wordListDescriptions(wordListDescriptions_),
-		lexClasses(lexClasses_),
-		nClasses(nClasses_),
 		languageName(languageName_) {
 	}
 
 	constexpr LexerModule(
 		int language_,
 		LexerFactoryFunction fnFactory_,
-		const char *languageName_ = nullptr,
-		const char *const wordListDescriptions_[] = nullptr) noexcept:
+		const char *languageName_ = nullptr) noexcept:
 		language(language_),
 		fnLexer(nullptr),
 		fnFolder(nullptr),
 		fnFactory(fnFactory_),
-		wordListDescriptions(wordListDescriptions_),
-		lexClasses(nullptr),
-		nClasses(0),
 		languageName(languageName_) {
 	}
 
