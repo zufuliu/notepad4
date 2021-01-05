@@ -20,6 +20,9 @@
 *
 ******************************************************************************/
 
+#if !defined(NOMINMAX)
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
@@ -165,10 +168,10 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		}
 
 		// Dont reduce margins below the minimum printable area
-		rectMargins.left	= max_l(rectPhysMargins.left, rectSetup.left);
-		rectMargins.top		= max_l(rectPhysMargins.top, rectSetup.top);
-		rectMargins.right	= max_l(rectPhysMargins.right, rectSetup.right);
-		rectMargins.bottom	= max_l(rectPhysMargins.bottom, rectSetup.bottom);
+		rectMargins.left	= sci::max(rectPhysMargins.left, rectSetup.left);
+		rectMargins.top		= sci::max(rectPhysMargins.top, rectSetup.top);
+		rectMargins.right	= sci::max(rectPhysMargins.right, rectSetup.right);
+		rectMargins.bottom	= sci::max(rectPhysMargins.bottom, rectSetup.bottom);
 	} else {
 		rectMargins.left	= rectPhysMargins.left;
 		rectMargins.top		= rectPhysMargins.top;
@@ -273,8 +276,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			lengthDoc = endPos;
 		}
 
-		lengthPrinted = max_pos(lengthPrinted, 0);
-		lengthDoc = min_pos(lengthDoc, lengthDocMax);
+		lengthPrinted = sci::max<Sci_Position>(lengthPrinted, 0);
+		lengthDoc = sci::min(lengthDoc, lengthDocMax);
 	}
 
 	// We must substract the physical margins from the printable area

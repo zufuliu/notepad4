@@ -40,7 +40,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	const bool allowInitialSpaces = styler.GetPropertyInt("lexer.props.allow.initial.spaces", 1) != 0;
 
 	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Position maxLines = (endPos == styler.Length()) ? styler.GetLine(endPos) : styler.GetLine(endPos - 1);	// Requested last line
+	const Sci_Position maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
@@ -136,7 +136,7 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Position maxLines = (endPos == styler.Length()) ? styler.GetLine(endPos) : styler.GetLine(endPos - 1);	// Requested last line
+	const Sci_Position maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 

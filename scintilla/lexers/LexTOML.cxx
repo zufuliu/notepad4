@@ -341,7 +341,7 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Position maxLines = (endPos == styler.Length()) ? styler.GetLine(endPos) : styler.GetLine(endPos - 1);
+	const Sci_Position maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 
 	Sci_Position lineCurrent = styler.GetLine(startPos);
 
