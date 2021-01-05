@@ -8,20 +8,6 @@
 
 namespace Scintilla {
 
-namespace sci {
-
-template <typename T>
-constexpr T min(T x, T y) noexcept {
-	return (x < y) ? x : y;
-}
-
-template <typename T>
-constexpr T max(T x, T y) noexcept {
-	return (x > y) ? x : y;
-}
-
-}
-
 enum class EncodingType { enc8bit, encUnicode, encDBCS };
 
 class LexAccessor {

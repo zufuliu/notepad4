@@ -15,6 +15,7 @@
 
 // Basic signed type used throughout interface
 typedef ptrdiff_t Sci_Position;
+typedef ptrdiff_t Sci_Line;
 
 // Unsigned variant used for ILexer::Lex and ILexer::Fold
 typedef size_t Sci_PositionU;
@@ -30,4 +31,20 @@ typedef Sci_Position Sci_PositionCR;
 	#define SCI_METHOD __stdcall
 #else
 	#define SCI_METHOD
+#endif
+
+#if defined(__cplusplus)
+namespace sci {
+
+template <typename T>
+constexpr T min(T x, T y) noexcept {
+	return (x < y) ? x : y;
+}
+
+template <typename T>
+constexpr T max(T x, T y) noexcept {
+	return (x > y) ? x : y;
+}
+
+}
 #endif

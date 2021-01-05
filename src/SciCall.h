@@ -35,7 +35,6 @@ extern "C"
 LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wParam, LPARAM lParam);
 #define SciCall(m, w, l)	Scintilla_DirectFunction(g_hScintilla, (m), (w), (l))
 
-typedef Sci_Position Sci_Line;
 typedef unsigned int Sci_MarkerMask;
 
 NP2_inline Sci_Position min_pos(Sci_Position x, Sci_Position y) {

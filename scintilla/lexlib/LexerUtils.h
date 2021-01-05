@@ -26,13 +26,13 @@ int PackLineState(const std::vector<int>& states) noexcept {
 
 template<int valueBit, int maxStateCount, int countBit, int baseStyle>
 void UnpackLineState(int lineState, std::vector<int>& states) {
-	constexpr int mask = (1 << valueBit) - 1;
+	constexpr int valueMask = (1 << valueBit) - 1;
 	constexpr int countMask = (1 << countBit) - 1;
 	int count = lineState & countMask;
 	lineState >>= countBit;
 	count = sci::min(count, maxStateCount);
 	while (count != 0) {
-		int state = lineState & mask;
+		int state = lineState & valueMask;
 		if (state) {
 			state += baseStyle;
 		}
