@@ -317,7 +317,7 @@ static constexpr int opposite(int ch) noexcept {
 	return ch;
 }
 
-static bool IsPackageLine(Sci_Position line, LexAccessor &styler) noexcept {
+static bool IsPackageLine(Sci_Line line, LexAccessor &styler) noexcept {
 	const Sci_Position pos = styler.LineStart(line);
 	const int style = styler.StyleAt(pos);
 	if (style == SCE_PL_WORD && styler.Match(pos, "package")) {
@@ -592,7 +592,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		|| initStyle == SCE_PL_POD_VERB
 		) {
 		// POD backtracking finds preceding blank lines and goes back past them
-		Sci_Position ln = styler.GetLine(startPos);
+		Sci_Line ln = styler.GetLine(startPos);
 		if (ln > 0) {
 			initStyle = styler.StyleAt(styler.LineStart(--ln));
 			if (initStyle == SCE_PL_POD || initStyle == SCE_PL_POD_VERB) {
@@ -887,7 +887,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_POD:
 		case SCE_PL_POD_VERB: {
 			Sci_PositionU fw = sc.currentPos;
-			const Sci_Position ln = styler.GetLine(fw);
+			const Sci_Line ln = styler.GetLine(fw);
 			if (sc.atLineStart && sc.Match("=cut")) {	// end of POD
 				sc.SetState(SCE_PL_POD);
 				sc.Forward(4);
@@ -1534,7 +1534,7 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	const bool foldAtElse = styler.GetPropertyInt("fold.perl.at.else", 0) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 
 	// Backtrack to previous line in case need to fix its fold status
 	if (startPos > 0) {

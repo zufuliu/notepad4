@@ -133,16 +133,16 @@ public:
 		return pAccess->StyleAt(position);
 	}
 
-	Sci_Position GetLine(Sci_Position position) const noexcept {
+	Sci_Line GetLine(Sci_Position position) const noexcept {
 		return pAccess->LineFromPosition(position);
 	}
-	Sci_Position LineStart(Sci_Position line) const noexcept {
+	Sci_Position LineStart(Sci_Line line) const noexcept {
 		return pAccess->LineStart(line);
 	}
-	Sci_Position LineEnd(Sci_Position line) const noexcept {
+	Sci_Position LineEnd(Sci_Line line) const noexcept {
 		return pAccess->LineEnd(line);
 	}
-	int LevelAt(Sci_Position line) const noexcept {
+	int LevelAt(Sci_Line line) const noexcept {
 		return pAccess->GetLevel(line);
 	}
 	constexpr Sci_Position Length() const noexcept {
@@ -155,10 +155,10 @@ public:
 			validLen = 0;
 		}
 	}
-	int GetLineState(Sci_Position line) const noexcept {
+	int GetLineState(Sci_Line line) const noexcept {
 		return pAccess->GetLineState(line);
 	}
-	int SetLineState(Sci_Position line, int state) {
+	int SetLineState(Sci_Line line, int state) {
 		return pAccess->SetLineState(line, state);
 	}
 	// Style setting
@@ -196,7 +196,7 @@ public:
 		}
 		startSeg = pos + 1;
 	}
-	void SetLevel(Sci_Position line, int level) {
+	void SetLevel(Sci_Line line, int level) {
 		pAccess->SetLevel(line, level);
 	}
 	void IndicatorFill(Sci_Position start, Sci_Position end, int indicator, int value) {
@@ -230,9 +230,9 @@ constexpr bool IsWhiteSpace(int ch) noexcept {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
 
-bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcept;
+bool IsLexCommentLine(Sci_Line line, LexAccessor &styler, int style) noexcept;
 
-inline bool IsBackslashLine(Sci_Position line, LexAccessor &styler) noexcept {
+inline bool IsBackslashLine(Sci_Line line, LexAccessor &styler) noexcept {
 #if 1
 	const Sci_Position pos = styler.LineStart(line + 1) - 1;
 	return (pos >= 2) && (styler[pos] == '\n')
@@ -243,9 +243,9 @@ inline bool IsBackslashLine(Sci_Position line, LexAccessor &styler) noexcept {
 #endif
 }
 
-bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char *word, bool matchCase, int style) noexcept;
+bool IsLexLineStartsWith(Sci_Line line, LexAccessor &styler, const char *word, bool matchCase, int style) noexcept;
 
-Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcept;
+Sci_Position LexLineSkipSpaceTab(Sci_Line line, LexAccessor &styler) noexcept;
 
 inline Sci_Position LexSkipSpaceTab(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
 	for (Sci_Position i = startPos; i < endPos; i++) {

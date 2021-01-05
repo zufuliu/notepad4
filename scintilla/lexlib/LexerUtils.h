@@ -71,16 +71,16 @@ inline int TryPopAndPeek(std::vector<int>& states, int value = 0) {
 #if 0
 
 // nested state stack on each line
-using NestedStateStack = std::map<Sci_Position, std::vector<int>>;
+using NestedStateStack = std::map<Sci_Line, std::vector<int>>;
 
-inline void GetNestedState(const NestedStateStack& stateStack, Sci_Position line, std::vector<int>& states) {
+inline void GetNestedState(const NestedStateStack& stateStack, Sci_Line line, std::vector<int>& states) {
 	const auto it = stateStack.find(line);
 	if (it != stateStack.end()) {
 		states = it->second;
 	}
 }
 
-inline void SaveNestedState(NestedStateStack& stateStack, Sci_Position line, const std::vector<int>& states) {
+inline void SaveNestedState(NestedStateStack& stateStack, Sci_Line line, const std::vector<int>& states) {
 	if (states.empty()) {
 		auto it = stateStack.find(line);
 		if (it != stateStack.end()) {

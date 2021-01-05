@@ -569,7 +569,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 	}
 
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int lineState;
 	if (lineCurrent > 0) {
 		lineState = styler.GetLineState(lineCurrent-1);

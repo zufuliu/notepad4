@@ -26,7 +26,7 @@ int Accessor::GetPropertyInt(const char *key, int defaultValue) const {
 	return pprops->GetInt(key, defaultValue);
 }
 
-int Accessor::IndentAmount(Sci_Position line) noexcept {
+int Accessor::IndentAmount(Sci_Line line) noexcept {
 	const Sci_Position end = Length();
 	Sci_Position pos = LineStart(line);
 

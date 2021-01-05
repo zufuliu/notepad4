@@ -398,7 +398,7 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	const int lineTypeMask = RebolLineTypeDefaultMask | foldComment;
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	int lineTypePrev = 0;
 	if (lineCurrent > 0) {

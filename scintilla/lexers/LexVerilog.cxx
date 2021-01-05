@@ -159,7 +159,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

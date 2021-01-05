@@ -18,7 +18,7 @@ public:
 private:
 	IDocument *multiByteAccess = nullptr;
 	Sci_PositionU endPos;
-	Sci_PositionU lengthDocument;
+	const Sci_PositionU lengthDocument;
 
 	// Used for optimizing GetRelativeCharacter
 	Sci_PositionU posRelative = 0;
@@ -30,21 +30,16 @@ private:
 			chNext = multiByteAccess->GetCharacterAndWidth(currentPos + width, &widthNext);
 		} else {
 			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + width));
-			widthNext = 1;
 		}
 		// End of line determined from line end position, allowing CR, LF,
 		// CRLF and Unicode line ends as set by document.
-		if (currentLine < lineDocEnd) {
-			atLineEnd = static_cast<Sci_Position>(currentPos) >= (lineStartNext - 1);
-		} else { // Last line
-			atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext;
-		}
+		atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext - (currentLine < lineDocEnd);
 	}
 
 public:
 	Sci_PositionU currentPos;
-	Sci_Position currentLine;
-	Sci_Position lineDocEnd;
+	Sci_Line currentLine;
+	Sci_Line lineDocEnd;
 	Sci_Position lineStartNext;
 	bool atLineStart;
 	bool atLineEnd;
@@ -59,6 +54,7 @@ public:
 		int initStyle, LexAccessor &styler_, bool useUnicode = false) noexcept :
 	styler(styler_),
 	endPos(startPos + length),
+	lengthDocument(styler.Length()),
 	currentPos(startPos),
 	state(initStyle) {
 		// lexer need enable useUnicode if it wants to detect Unicode identifier (https://www.unicode.org/reports/tr31/)
@@ -70,7 +66,6 @@ public:
 		styler.StartSegment(startPos);
 		currentLine = styler.GetLine(startPos);
 		lineStartNext = styler.LineStart(currentLine + 1);
-		lengthDocument = static_cast<Sci_PositionU>(styler.Length());
 		if (endPos == lengthDocument) {
 			endPos++;
 		}
@@ -139,13 +134,12 @@ public:
 		state = state_;
 	}
 	void SetState(int state_) {
-		styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
+		styler.ColourTo(currentPos - ((currentPos > lengthDocument) + 1), state);
 		state = state_;
 	}
 	void ForwardSetState(int state_) {
 		Forward();
-		styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
-		state = state_;
+		SetState(state_);
 	}
 	Sci_Position LengthCurrent() const noexcept {
 		return currentPos - styler.GetStartSegment();

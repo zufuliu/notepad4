@@ -157,7 +157,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	// backtrack to previous line for better coloring for indented text on typing.
 	if (initStyle == SCE_YAML_INDENTED_TEXT || initStyle == SCE_YAML_TEXT) {
 		const Sci_Position endPos = startPos + lengthDoc;
-		const Sci_Position currentLine = styler.GetLine(startPos);
+		const Sci_Line currentLine = styler.GetLine(startPos);
 		startPos = (currentLine == 0)? 0 : styler.LineStart(currentLine - 1);
 		lengthDoc = endPos - startPos;
 		initStyle = (startPos == 0)? SCE_YAML_DEFAULT : styler.StyleAt(startPos - 1);
@@ -466,10 +466,10 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_Position maxPos = startPos + lengthDoc;
-	const Sci_Position docLines = styler.GetLine(styler.Length());
-	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
+	const Sci_Line docLines = styler.GetLine(styler.Length());
+	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
 
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState stateCurrent(styler.GetLineState(lineCurrent));
 	while (lineCurrent > 0) {
 		lineCurrent--;

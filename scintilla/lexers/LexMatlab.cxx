@@ -293,7 +293,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	int numBrace = 0;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

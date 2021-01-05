@@ -61,7 +61,7 @@ void LexerModule::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 void LexerModule::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	LexerWordList keywordLists, Accessor &styler) const {
 	if (fnFolder) {
-		Sci_Position lineCurrent = styler.GetLine(startPos);
+		Sci_Line lineCurrent = styler.GetLine(startPos);
 		// Move back one line in case deletion wrecked current line fold state
 		if (lineCurrent > 0) {
 			lineCurrent--;

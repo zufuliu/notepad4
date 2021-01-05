@@ -55,7 +55,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 	bool expected = false;
 	bool subParen = false;
 
-	Sci_Position currentLine = styler.GetLine(startPos);
+	Sci_Line currentLine = styler.GetLine(startPos);
 	if (currentLine > 0)
 		currentLine--;
 	length += startPos - styler.LineStart(currentLine);

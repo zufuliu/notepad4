@@ -49,8 +49,8 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 	bool isBOLWS = false;
 	bool isCStyleComment = false;
 
-	Sci_Position curLine = styler.GetLine(startPos);
-	const Sci_Position curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
+	Sci_Line curLine = styler.GetLine(startPos);
+	const int curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
 	bool isCode = (curLineState == 1);
 
 	// Go through all provided text segment
@@ -246,7 +246,7 @@ static constexpr  bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_INNO_COMMENT_PASCAL;
 }
 static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) noexcept {
-	const Sci_Position curLine = styler.GetLine(curPos);
+	const Sci_Line curLine = styler.GetLine(curPos);
 	const Sci_Position pos = LexSkipSpaceTab(styler.LineStart(curLine + 1), styler.LineStart(curLine + 2) - 1, styler);
 	const char ch = styler.SafeGetCharAt(pos);
 	if (ch == '[' && styler.StyleAt(pos) == SCE_INNO_SECTION)
@@ -260,7 +260,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 
 	const Sci_PositionU endPos = startPos + length;
 	static Sci_Position sectionFound = -1;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
@@ -290,7 +290,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		}
 
 		if (ch == '[' && style == SCE_INNO_SECTION) {
-			const Sci_Position curLine = styler.GetLine(i);
+			const Sci_Line curLine = styler.GetLine(i);
 			if (sectionFound == -1 || sectionFound > curLine)
 				sectionFound = curLine;
 			levelNext++;

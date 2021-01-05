@@ -282,7 +282,7 @@ static void exitInnerExpression(const int *p_inner_string_types,
 }
 
 static bool isEmptyLine(Sci_Position pos, Accessor &styler) noexcept {
-	const Sci_Position lineCurrent = styler.GetLine(pos);
+	const Sci_Line lineCurrent = styler.GetLine(pos);
 	const int indentCurrent = styler.IndentAmount(lineCurrent);
 	return (indentCurrent & SC_FOLDLEVELWHITEFLAG) != 0;
 }
@@ -297,7 +297,7 @@ static bool sureThisIsHeredoc(Sci_Position iPrev, Accessor &styler, char *prevWo
 	// Not so fast, since Ruby's so dynamic.  Check the context
 	// to make sure we're OK.
 	int prevStyle;
-	const Sci_Position lineStart = styler.GetLine(iPrev);
+	const Sci_Line lineStart = styler.GetLine(iPrev);
 	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
 
@@ -397,7 +397,7 @@ static bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	int prevStyle;
 	// Use full document, not just part we're styling
 	const Sci_Position lengthDoc = styler.Length();
-	const Sci_Position lineStart = styler.GetLine(lt2StartPos);
+	const Sci_Line lineStart = styler.GetLine(lt2StartPos);
 	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
 	constexpr bool definitely_not_a_here_doc = true;
@@ -540,12 +540,12 @@ static bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	}
 
 	// Just look at the start of each line
-	Sci_Position last_line = styler.GetLine(lengthDoc - 1);
+	Sci_Line last_line = styler.GetLine(lengthDoc - 1);
 	// But don't go too far
 	if (last_line > lineStart + 50) {
 		last_line = lineStart + 50;
 	}
-	for (Sci_Position line_num = lineStart + 1; line_num <= last_line; line_num++) {
+	for (Sci_Line line_num = lineStart + 1; line_num <= last_line; line_num++) {
 		if (allow_indent) {
 			j = LexSkipSpaceTab(styler.LineStart(line_num), lengthDoc, styler);
 		} else {
@@ -579,7 +579,7 @@ static void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, 
 
 	Sci_Position pos = startPos;
 	// Quick way to characterize each line
-	Sci_Position lineStart;
+	Sci_Line lineStart;
 	for (lineStart = styler.GetLine(pos); lineStart > 0; lineStart--) {
 		// Now look at the style before the previous line's EOL
 		pos = styler.LineStart(lineStart) - 1;
@@ -1446,7 +1446,7 @@ static bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styl
 	char chPrev;
 	char chPrev2;
 	int style = SCE_RB_DEFAULT;
-	Sci_Position lineStart = styler.GetLine(pos);
+	Sci_Line lineStart = styler.GetLine(pos);
 	Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	// We want to step backwards until we don't care about the current
 	// position. But first move lineStartPosn back behind any
@@ -1550,7 +1550,7 @@ static bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styl
 // on the current line
 
 static bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
-	const Sci_Position lineStart = styler.GetLine(pos);
+	const Sci_Line lineStart = styler.GetLine(pos);
 	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
 	while (--pos >= lineStartPosn) {
@@ -1662,7 +1662,7 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
 		false);
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = startPos == 0 ? 0 : (styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK & ~SC_FOLDLEVELBASE);
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
