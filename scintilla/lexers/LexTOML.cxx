@@ -340,10 +340,10 @@ constexpr int GetTableLevel(int lineState) noexcept {
 void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
-	const Sci_Position endPos = startPos + lengthDoc;
-	const Sci_Position maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
+	const Sci_Line endPos = startPos + lengthDoc;
+	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 
 	int prevLevel = SC_FOLDLEVELBASE;
 	bool prevComment = false;

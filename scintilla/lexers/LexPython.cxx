@@ -322,7 +322,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, MultiStyle(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK))
 
-static inline bool IsQuoteLine(Sci_Position line, const Accessor &styler) noexcept {
+static inline bool IsQuoteLine(Sci_Line line, const Accessor &styler) noexcept {
 	const int style = styler.StyleAt(styler.LineStart(line));
 	return IsPyTripleStyle(style);
 }
@@ -330,8 +330,8 @@ static inline bool IsQuoteLine(Sci_Position line, const Accessor &styler) noexce
 // based on original folding code
 static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + length;
-	const Sci_Position docLines = styler.GetLine(styler.Length());
-	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
+	const Sci_Line docLines = styler.GetLine(styler.Length());
+	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
 
 	// property fold.quotes.python
 	//	This option enables folding multi-line quoted strings when using the Python lexer.
@@ -341,7 +341,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 	// for any white space lines (needed esp. within triple quoted strings)
 	// and so we can fix any preceding fold level (which is why we go back
 	// at least one line in all cases)
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int indentCurrent = styler.IndentAmount(lineCurrent);
 	while (lineCurrent > 0) {
 		lineCurrent--;
@@ -368,7 +368,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 
 		// Gather info
 		int lev = indentCurrent;
-		Sci_Position lineNext = lineCurrent + 1;
+		Sci_Line lineNext = lineCurrent + 1;
 		int indentNext = indentCurrent;
 		int quote = false;
 		if (lineNext <= docLines) {
@@ -425,7 +425,7 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 		// which is indented more than the line after the end of
 		// the comment-block, use the level of the block before
 
-		Sci_Position skipLine = lineNext;
+		Sci_Line skipLine = lineNext;
 		int skipLevel = levelAfterComments;
 
 		while (--skipLine > lineCurrent) {

@@ -232,7 +232,7 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 	sc.Complete();
 }
 
-static bool IsLBegin(Sci_Position line, Accessor &styler, const char* word, int wlen) noexcept {
+static bool IsLBegin(Sci_Line line, Accessor &styler, const char* word, int wlen) noexcept {
 	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	const Sci_Position chp = pos + 1 + wlen;
 	if (styler[pos] == '\\' && styler.StyleAt(pos) == SCE_L_COMMAND
@@ -241,7 +241,7 @@ static bool IsLBegin(Sci_Position line, Accessor &styler, const char* word, int 
 		return true;
 	return false;
 }
-static bool IsLEnd(Sci_Position line, Accessor &styler) noexcept {
+static bool IsLEnd(Sci_Line line, Accessor &styler) noexcept {
 	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	if (styler[pos] == '\\' && styler.StyleAt(pos) == SCE_L_COMMAND && styler.Match(pos + 1, "end")) {
 		if (styler.Match(pos + 4, "{document}") || styler.Match(pos + 4, "input"))
@@ -260,7 +260,7 @@ static void FoldLatexDoc(Sci_PositionU startPos, Sci_Position length, int /*init
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

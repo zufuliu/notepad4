@@ -38,14 +38,14 @@ void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, Lexer
 // code folding based on Python
 void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyle */, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
-	const Sci_Position docLines = styler.GetLine(styler.Length());	// Available last line
-	const Sci_Position maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
+	const Sci_Line docLines = styler.GetLine(styler.Length());	// Available last line
+	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
 
 	// Backtrack to previous non-blank line so we can determine indent level
 	// for any white space lines
 	// and so we can fix any preceding fold level (which is why we go back
 	// at least one line in all cases)
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int indentCurrent = styler.IndentAmount(lineCurrent);
 	while (lineCurrent > 0) {
 		lineCurrent--;
@@ -60,7 +60,7 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 	// to end of document (in case of unclosed quote at end).
 	while (lineCurrent <= maxLines) {
 		// Gather info
-		Sci_Position lineNext = lineCurrent + 1;
+		Sci_Line lineNext = lineCurrent + 1;
 		int indentNext = indentCurrent;
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document

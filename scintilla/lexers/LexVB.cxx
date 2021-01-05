@@ -226,7 +226,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 	sc.Complete();
 }
 
-static bool VBLineStartsWith(Sci_Position line, Accessor &styler, const char* word) noexcept {
+static bool VBLineStartsWith(Sci_Line line, Accessor &styler, const char* word) noexcept {
 	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
 	return (styler.StyleAt(pos) == SCE_B_KEYWORD) && (styler.MatchIgnoreCase(pos, word));
 }
@@ -235,7 +235,7 @@ static bool VBMatchNextWord(Sci_Position startPos, Sci_Position endPos, Accessor
 	return isspacechar(LexCharAt(pos + static_cast<int>(strlen(word))))
 		&& styler.MatchIgnoreCase(pos, word);
 }
-static bool IsVBProperty(Sci_Position line, Sci_Position startPos, Accessor &styler) noexcept {
+static bool IsVBProperty(Sci_Line line, Sci_Position startPos, Accessor &styler) noexcept {
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		if (styler.StyleAt(i) == SCE_B_OPERATOR && LexCharAt(i) == '(')
@@ -243,7 +243,7 @@ static bool IsVBProperty(Sci_Position line, Sci_Position startPos, Accessor &sty
 	}
 	return false;
 }
-static bool IsVBSome(Sci_Position line, int kind, Accessor &styler) noexcept {
+static bool IsVBSome(Sci_Line line, int kind, Accessor &styler) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
@@ -281,7 +281,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
@@ -300,8 +300,8 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	bool isExit = false;	// Exit {Function Sub Property}
 	bool isDeclare = false;	// Declare, Delegate {Function Sub}
 	bool isIf = false;		// If ... Then \r\n ... \r\n End If
-	static Sci_Position lineIf = 0;
-	static Sci_Position lineThen = 0;
+	static Sci_Line lineIf = 0;
+	static Sci_Line lineThen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char chPrev = ch;

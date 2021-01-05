@@ -324,7 +324,7 @@ public:
 
 	void SCI_METHOD SetErrorStatus(int status) noexcept override;
 
-	Sci_Position SCI_METHOD LineFromPosition(Sci_Position pos) const noexcept override;
+	Sci_Line SCI_METHOD LineFromPosition(Sci_Position pos) const noexcept override;
 	Sci::Line SciLineFromPosition(Sci::Position pos) const noexcept;	// Avoids casting LineFromPosition
 	Sci::Position ClampPositionIntoDocument(Sci::Position pos) const noexcept;
 	bool ContainsLineEnd(const char *s, Sci::Position length) const noexcept {
@@ -413,7 +413,7 @@ public:
 		return cb.GapPosition();
 	}
 
-	int SCI_METHOD GetLineIndentation(Sci_Position line) const noexcept override;
+	int SCI_METHOD GetLineIndentation(Sci_Line line) const noexcept override;
 	Sci::Position SetLineIndentation(Sci::Line line, Sci::Position indent);
 	Sci::Position GetLineIndentPosition(Sci::Line line) const noexcept;
 	Sci::Position GetColumn(Sci::Position pos) noexcept;
@@ -466,9 +466,9 @@ public:
 	Sci::Line LineFromHandle(int markerHandle) const noexcept;
 	int MarkerNumberFromLine(Sci::Line line, int which) const noexcept;
 	int MarkerHandleFromLine(Sci::Line line, int which) const noexcept;
-	Sci_Position SCI_METHOD LineStart(Sci_Position line) const noexcept override;
+	Sci_Position SCI_METHOD LineStart(Sci_Line line) const noexcept override;
 	bool IsLineStartPosition(Sci::Position position) const noexcept;
-	Sci_Position SCI_METHOD LineEnd(Sci_Position line) const noexcept override;
+	Sci_Position SCI_METHOD LineEnd(Sci_Line line) const noexcept override;
 	Sci::Position LineEndPosition(Sci::Position position) const noexcept;
 	bool IsLineEndPosition(Sci::Position position) const noexcept;
 	bool IsPositionInLineEnd(Sci::Position position) const noexcept;
@@ -479,8 +479,8 @@ public:
 	Sci::Line LineFromPositionAfter(Sci::Line line, Sci::Position length) const noexcept;
 #endif
 
-	int SCI_METHOD SetLevel(Sci_Position line, int level) override;
-	int SCI_METHOD GetLevel(Sci_Position line) const noexcept override;
+	int SCI_METHOD SetLevel(Sci_Line line, int level) override;
+	int SCI_METHOD GetLevel(Sci_Line line) const noexcept override;
 	void ClearLevels();
 	Sci::Line GetLastChild(Sci::Line lineParent, int level = -1, Sci::Line lastLine = -1);
 	Sci::Line GetFoldParent(Sci::Line line) const noexcept;
@@ -539,8 +539,8 @@ public:
 	LexInterface *GetLexInterface() const noexcept;
 	void SetLexInterface(std::unique_ptr<LexInterface> pLexInterface) noexcept;
 
-	int SCI_METHOD SetLineState(Sci_Position line, int state) override;
-	int SCI_METHOD GetLineState(Sci_Position line) const noexcept override;
+	int SCI_METHOD SetLineState(Sci_Line line, int state) override;
+	int SCI_METHOD GetLineState(Sci_Line line) const noexcept override;
 	Sci::Line GetMaxLineState() const noexcept;
 	void SCI_METHOD ChangeLexerState(Sci_Position start, Sci_Position end) override;
 

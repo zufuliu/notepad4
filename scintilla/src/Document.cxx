@@ -418,7 +418,7 @@ int Document::MarkerHandleFromLine(Sci::Line line, int which) const noexcept {
 	return Markers()->HandleFromLine(line, which);
 }
 
-Sci_Position SCI_METHOD Document::LineStart(Sci_Position line) const noexcept {
+Sci_Position SCI_METHOD Document::LineStart(Sci_Line line) const noexcept {
 	return cb.LineStart(line);
 }
 
@@ -426,7 +426,7 @@ bool Document::IsLineStartPosition(Sci::Position position) const noexcept {
 	return LineStart(LineFromPosition(position)) == position;
 }
 
-Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const noexcept {
+Sci_Position SCI_METHOD Document::LineEnd(Sci_Line line) const noexcept {
 	Sci::Position position = LineStart(line + 1);
 	if (line < LinesTotal() - 1) {
 		if (cb.GetLineEndTypes()) {
@@ -458,7 +458,7 @@ void SCI_METHOD Document::SetErrorStatus(int status) noexcept {
 	}
 }
 
-Sci_Position SCI_METHOD Document::LineFromPosition(Sci_Position pos) const noexcept {
+Sci_Line SCI_METHOD Document::LineFromPosition(Sci_Position pos) const noexcept {
 	return cb.LineFromPosition(pos);
 }
 
@@ -512,7 +512,7 @@ Sci::Line Document::LineFromPositionAfter(Sci::Line line, Sci::Position length) 
 }
 #endif
 
-int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
+int SCI_METHOD Document::SetLevel(Sci_Line line, int level) {
 	const int prev = Levels()->SetLevel(line, level, LinesTotal());
 	if (prev != level) {
 		DocModification mh(SC_MOD_CHANGEFOLD | SC_MOD_CHANGEMARKER,
@@ -524,7 +524,7 @@ int SCI_METHOD Document::SetLevel(Sci_Position line, int level) {
 	return prev;
 }
 
-int SCI_METHOD Document::GetLevel(Sci_Position line) const noexcept {
+int SCI_METHOD Document::GetLevel(Sci_Line line) const noexcept {
 	return Levels()->GetLevel(line);
 }
 
@@ -1477,7 +1477,7 @@ static std::string CreateIndentation(Sci::Position indent, int tabSize, bool ins
 	return indentation;
 }
 
-int SCI_METHOD Document::GetLineIndentation(Sci_Position line) const noexcept {
+int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
 	int indent = 0;
 	if ((line >= 0) && (line < LinesTotal())) {
 		const Sci::Position lineStart = LineStart(line);
@@ -2389,7 +2389,7 @@ void Document::SetLexInterface(std::unique_ptr<LexInterface> pLexInterface) noex
 	pli = std::move(pLexInterface);
 }
 
-int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
+int SCI_METHOD Document::SetLineState(Sci_Line line, int state) {
 	const int statePrevious = States()->SetLineState(line, state, LinesTotal());
 	if (state != statePrevious) {
 		const DocModification mh(SC_MOD_CHANGELINESTATE, LineStart(line), 0, 0, nullptr, line);
@@ -2398,7 +2398,7 @@ int SCI_METHOD Document::SetLineState(Sci_Position line, int state) {
 	return statePrevious;
 }
 
-int SCI_METHOD Document::GetLineState(Sci_Position line) const noexcept {
+int SCI_METHOD Document::GetLineState(Sci_Line line) const noexcept {
 	return States()->GetLineState(line);
 }
 

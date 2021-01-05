@@ -136,7 +136,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		initStyle = SCE_C_XML_DEFAULT;
 	}
 
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	const int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
 	int lineState = (curLineState >> 24);
 	int numCBrace = (curLineState >> 18) & 0x3F;
@@ -1103,7 +1103,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	sc.Complete();
 }
 
-static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position &DefinePos) noexcept {
+static bool IsCppDefineLine(Sci_Line line, LexAccessor &styler, Sci_Position &DefinePos) noexcept {
 	Sci_Position pos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(pos, endPos, styler);
@@ -1119,7 +1119,7 @@ static bool IsCppDefineLine(Sci_Position line, LexAccessor &styler, Sci_Position
 }
 // also used in LexAsm.cxx
 bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept {
-	Sci_Position line = styler.GetLine(currentPos);
+	Sci_Line line = styler.GetLine(currentPos);
 	Sci_Position pos;
 	if (IsCppDefineLine(line, styler, pos)) {
 		if (pos < currentPos)
@@ -1133,7 +1133,7 @@ bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept {
 	}
 	return false;
 }
-static bool IsCppFoldingLine(Sci_Position line, LexAccessor &styler, int kind) noexcept {
+static bool IsCppFoldingLine(Sci_Line line, LexAccessor &styler, int kind) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
@@ -1179,7 +1179,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 static constexpr bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
 }
-static bool IsOpenBraceLine(Sci_Position line, LexAccessor &styler) noexcept {
+static bool IsOpenBraceLine(Sci_Line line, LexAccessor &styler) noexcept {
 	// above line
 	Sci_Position startPos = styler.LineStart(line - 1);
 	Sci_Position endPos = styler.LineStart(line) - 1;
@@ -1224,7 +1224,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

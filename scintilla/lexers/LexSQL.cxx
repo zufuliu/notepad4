@@ -289,7 +289,7 @@ class SQLStates {
 public:
 	SQLStates() = default;
 
-	void Set(Sci_Position lineNumber, sql_state_t sqlStatesLine) {
+	void Set(Sci_Line lineNumber, sql_state_t sqlStatesLine) {
 		if (sqlStatesLine) {
 			sqlStatement.resize(lineNumber + 1, 0);
 			sqlStatement[lineNumber] = sqlStatesLine;
@@ -444,7 +444,7 @@ public:
 		return (sqlStatesLine & MASK_INTO_CREATE_VIEW_AS_STATEMENT) != 0;
 	}
 
-	sql_state_t ForLine(Sci_Position lineNumber) const noexcept {
+	sql_state_t ForLine(Sci_Line lineNumber) const noexcept {
 		if ((lineNumber > 0) && (sqlStatement.size() > static_cast<size_t>(lineNumber))) {
 			return sqlStatement[lineNumber];
 		}
@@ -472,7 +472,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 	SQLStates sqlStates;
 	Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0) {
 		// Backtrack to previous line in case need to fix its fold status for folding block of single-line comments (i.e. '--').

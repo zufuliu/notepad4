@@ -60,7 +60,7 @@ void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_
 	*s = '\0';
 }
 
-Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcept {
+Sci_Position LexLineSkipSpaceTab(Sci_Line line, LexAccessor &styler) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
@@ -72,7 +72,7 @@ Sci_Position LexLineSkipSpaceTab(Sci_Position line, LexAccessor &styler) noexcep
 }
 
 bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) noexcept {
-	const Sci_Position line = styler.GetLine(startPos);
+	const Sci_Line line = styler.GetLine(startPos);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		if (!IsSpaceOrTab(styler.SafeGetCharAt(i))) {
@@ -82,7 +82,7 @@ bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) noexcept {
 	return true;
 }
 
-bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) noexcept {
+bool IsLexEmptyLine(LexAccessor &styler, Sci_Line line) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
@@ -93,7 +93,7 @@ bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) noexcept {
 	return true;
 }
 
-bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char *word, bool matchCase, int style) noexcept {
+bool IsLexLineStartsWith(Sci_Line line, LexAccessor &styler, const char *word, bool matchCase, int style) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position pos = startPos; pos < endPos; pos++) {
@@ -105,7 +105,7 @@ bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char *wor
 	return false;
 }
 
-bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcept {
+bool IsLexCommentLine(Sci_Line line, LexAccessor &styler, int style) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position pos = startPos; pos < endPos; pos++) {

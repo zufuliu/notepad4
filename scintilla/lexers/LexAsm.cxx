@@ -71,10 +71,10 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		initStyle = SCE_ASM_DEFAULT;
 	const Sci_PositionU endPos = startPos + length;
 	StyleContext sc(startPos, length, initStyle, styler);
-	const Sci_Position lineCurrent = styler.GetLine(startPos);
+	const Sci_Line lineCurrent = styler.GetLine(startPos);
 	bool isIncludePreprocessor = false;
 	static bool isGnuAsmSource = false;
-	Sci_Position lastGnuAsmDefLine = -1;
+	Sci_Line lastGnuAsmDefLine = -1;
 
 	for (; sc.More(); sc.Forward()) {
 		// Prevent SCE_ASM_STRINGEOL from leaking back to previous line
@@ -322,7 +322,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 static constexpr bool IsAsmDefaultStyle(int style) noexcept {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
-static bool IsEquLine(Sci_Position line, LexAccessor &styler) noexcept {
+static bool IsEquLine(Sci_Line line, LexAccessor &styler) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipWhiteSpace(startPos, endPos, styler, IsAsmDefaultStyle);
@@ -333,7 +333,7 @@ static bool IsEquLine(Sci_Position line, LexAccessor &styler) noexcept {
 	}
 	return false;
 }
-static bool IsAsmDefineLine(Sci_Position line, LexAccessor &styler) noexcept {
+static bool IsAsmDefineLine(Sci_Line line, LexAccessor &styler) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
@@ -363,7 +363,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	const WordList &directives4foldend = *keywordLists[7];
 
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

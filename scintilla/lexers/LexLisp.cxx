@@ -39,7 +39,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.StartSegment(startPos);
 	const Sci_PositionU endPos = startPos + length;
 
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
 
@@ -153,7 +153,7 @@ static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

@@ -80,7 +80,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 	styler.StartSegment(startPos);
 	const Sci_PositionU endPos = startPos + length;
 
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int curLineState = (lineCurrent > 0) ? styler.GetLineState(lineCurrent - 1) : 0;
 	char buf[MAX_WORD_LENGTH + 1] = "";
 	int wordLen = 0;
@@ -318,8 +318,8 @@ static inline bool IsFoldWord(const char *word) noexcept {
 		|| strcmp(word, "attribute") == 0;
 }
 // field/parameter with annotation?
-static bool IsAnnotationLine(Sci_Position line, Accessor &styler) noexcept {
-	Sci_Position scan_line = 10;
+static bool IsAnnotationLine(Sci_Line line, Accessor &styler) noexcept {
+	Sci_Line scan_line = 10;
 	while (scan_line-- > 0) {
 		const Sci_Position startPos = styler.LineStart(line);
 		const Sci_Position endPos = styler.LineStart(line + 1) - 1;
@@ -336,7 +336,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;

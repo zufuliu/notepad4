@@ -114,7 +114,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 	const CharacterSet setHexNumber(CharacterSet::setDigits, "abcdefABCDEF");
 	const CharacterSet setOperator(CharacterSet::setNone, "#$&'()*+,-./:;<=>@[]^{}");
 
-	Sci_Position curLine = styler.GetLine(startPos);
+	Sci_Line curLine = styler.GetLine(startPos);
 	int curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
 
 	StyleContext sc(startPos, length, initStyle, styler);
@@ -401,7 +401,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	const Sci_PositionU endPos = startPos + length;
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	int lineFoldStateCurrent = lineCurrent > 0 ? styler.GetLineState(lineCurrent - 1) & stateFoldMaskAll : 0;

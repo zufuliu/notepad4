@@ -104,7 +104,7 @@ static int GetSendKey(const char *szLine, char *szKey) noexcept {
 //
 // Routine to check the last "none comment" character on a line to see if its a continuation
 //
-static bool IsContinuationLine(Sci_PositionU szLine, Accessor &styler) noexcept {
+static bool IsContinuationLine(Sci_Line szLine, Accessor &styler) noexcept {
 	const Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
 	//int stylech = styler.StyleAt(nsPos);
@@ -145,7 +145,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 	const WordList &keywords7 = *keywordLists[6];
 	const WordList &keywords8 = *keywordLists[7];
 	// find the first previous line without continuation character at the end
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	const Sci_Position s_startPos = startPos;
 	// When not inside a Block comment: find First line without _
 	if (!(initStyle == SCE_AU3_COMMENTBLOCK)) {
@@ -554,7 +554,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 //
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
-static int GetStyleFirstWord(Sci_PositionU szLine, Accessor &styler) noexcept {
+static int GetStyleFirstWord(Sci_Line szLine, Accessor &styler) noexcept {
 	Sci_Position nsPos = styler.LineStart(szLine);
 	const Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
 	while (isspacechar(styler.SafeGetCharAt(nsPos)) && nsPos < nePos) {
@@ -574,7 +574,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 	const bool foldInComment = foldComment == 2;
 	const bool foldpreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
 	// Backtrack to previous line in case need to fix its fold status
-	Sci_Position lineCurrent = styler.GetLine(startPos);
+	Sci_Line lineCurrent = styler.GetLine(startPos);
 	if (startPos > 0) {
 		if (lineCurrent > 0) {
 			lineCurrent--;
