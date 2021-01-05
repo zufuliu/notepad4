@@ -223,6 +223,11 @@ public:
 		styler.GetRangeLowered(styler.GetStartSegment(), currentPos, s, len);
 	}
 
+	bool LineEndsWith(char ch0) const noexcept {
+		return chPrev == static_cast<unsigned char>(ch0)
+			|| (chPrev == '\r' && ch == '\n' && currentPos >= 2 && ch0 == styler[currentPos - 2]);
+	}
+
 	int GetNextNSChar() const noexcept {
 		if (!IsWhiteSpace(ch)) {
 			return ch;

@@ -427,10 +427,8 @@ bool Document::IsLineStartPosition(Sci::Position position) const noexcept {
 }
 
 Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const noexcept {
-	if (line >= LinesTotal() - 1) {
-		return LineStart(line + 1);
-	} else {
-		Sci::Position position = LineStart(line + 1);
+	Sci::Position position = LineStart(line + 1);
+	if (line < LinesTotal() - 1) {
 		if (cb.GetLineEndTypes()) {
 			const unsigned char bytes[] = {
 				cb.UCharAt(position - 3),
@@ -449,8 +447,8 @@ Sci_Position SCI_METHOD Document::LineEnd(Sci_Position line) const noexcept {
 		if ((position > LineStart(line)) && (cb.CharAt(position - 1) == '\r')) {
 			position--;
 		}
-		return position;
 	}
+	return position;
 }
 
 void SCI_METHOD Document::SetErrorStatus(int status) noexcept {

@@ -247,9 +247,14 @@ constexpr bool IsWhiteSpace(int ch) noexcept {
 bool IsLexCommentLine(Sci_Position line, LexAccessor &styler, int style) noexcept;
 
 inline bool IsBackslashLine(Sci_Position line, LexAccessor &styler) noexcept {
+#if 1
 	const Sci_Position pos = styler.LineStart(line + 1) - 1;
 	return (pos >= 2) && (styler[pos] == '\n')
 		&& (styler[pos - 1] == '\\' || (styler[pos - 1] == '\r' && styler[pos - 2] == '\\'));
+#else
+	const Sci_Position pos = styler.LineEnd(line);
+	return pos > 0 && styler[pos - 1] == '\\';
+#endif
 }
 
 bool IsLexLineStartsWith(Sci_Position line, LexAccessor &styler, const char *word, bool matchCase, int style) noexcept;

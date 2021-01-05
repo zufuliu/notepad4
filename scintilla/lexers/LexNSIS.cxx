@@ -26,7 +26,7 @@ enum {
 	NsisLineTypeInclude = 1 << 1,	// !include
 	NsisLineTypeDefine = 2 << 1,	// !define
 
-	NsisLineStateLineContinue = 1 << 4,
+	NsisLineStateLineContinuation = 1 << 4,
 	NsisLineTypeDefaultMask = (1 << 3) - 2,
 	NsisLineTypeFullMask = (1 << 3) - 1,
 };
@@ -37,15 +37,15 @@ constexpr bool IsEscapeChar(int ch) noexcept {
 
 void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int visibleChars = 0;
-	int lineContinue = 0;
+	int lineContinuation = 0;
 	int lineStateLineType = 0;
 	int variableOuter = SCE_NSIS_DEFAULT;	// variable inside string
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
-		lineContinue = lineState & NsisLineStateLineContinue;
-		if (lineContinue) {
+		lineContinuation = lineState & NsisLineStateLineContinuation;
+		if (lineContinuation) {
 			++visibleChars;
 			lineStateLineType = lineState & NsisLineTypeFullMask;
 		}
@@ -109,8 +109,10 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					variableOuter = sc.state;
 					sc.SetState(SCE_NSIS_VARIABLE);
 				}
-			} else if (!lineContinue && sc.atLineStart) {
-				sc.SetState(SCE_NSIS_DEFAULT);
+			} else if (sc.atLineStart) {
+				if (!lineContinuation) {
+					sc.SetState(SCE_NSIS_DEFAULT);
+				}
 			} else if ((sc.state == SCE_NSIS_STRINGSQ && sc.ch == '\'')
 				|| (sc.state == SCE_NSIS_STRINGDQ && sc.ch == '"')
 				|| (sc.state == SCE_NSIS_STRINGBT && sc.ch == '`')) {
@@ -135,8 +137,10 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_NSIS_COMMENTLINE:
-			if (!lineContinue && sc.atLineStart) {
-				sc.SetState(SCE_NSIS_DEFAULT);
+			if (sc.atLineStart) {
+				if (!lineContinuation) {
+					sc.SetState(SCE_NSIS_DEFAULT);
+				}
 			}
 			break;
 
@@ -178,18 +182,14 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 		}
 
-		if (lineContinue && sc.atLineStart) {
-			lineContinue = 0;
-		} else if (sc.ch == '\\' && IsEOLChar(sc.chNext)) {
-			lineContinue = NsisLineStateLineContinue;
-		}
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			const int lineState = lineContinue | lineStateLineType;
+			lineContinuation = sc.LineEndsWith('\\') ? NsisLineStateLineContinuation : 0;
+			const int lineState = lineContinuation | lineStateLineType;
 			styler.SetLineState(sc.currentLine, lineState);
-			if (!lineContinue) {
+			if (!lineContinuation) {
 				visibleChars = 0;
 				lineStateLineType = 0;
 			}
