@@ -22,9 +22,11 @@ using namespace Scintilla;
 
 namespace {
 
+#define ENABLE_FOLD_NULL_DOCUMENT	1
+#if !ENABLE_FOLD_NULL_DOCUMENT
 void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.
-#if 0
+#if 1
 	styler.StartAt(startPos + lengthDoc);
 #else
 	if (lengthDoc > 0) {
@@ -34,10 +36,15 @@ void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, Lexer
 	}
 #endif
 }
-
+#else
 // code folding based on Python
 void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyle */, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
+	styler.StartAt(maxPos);
+	if (!styler.GetPropertyInt("fold")) {
+		return;
+	}
+
 	const Sci_Line docLines = styler.GetLine(styler.Length());	// Available last line
 	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);	// Requested last line
 
@@ -108,7 +115,11 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 	// header flag set; the loop above is crafted to take care of this case!
 	//styler.SetLevel(lineCurrent, indentCurrent);
 }
-
+#endif
 }
 
-LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null", FoldNullDoc);
+#if !ENABLE_FOLD_NULL_DOCUMENT
+LexerModule lmNull(SCLEX_NULL, ColouriseNullDoc, "null");
+#else
+LexerModule lmNull(SCLEX_NULL, FoldNullDoc, "null");
+#endif
