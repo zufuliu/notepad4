@@ -60,7 +60,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	bool lineContinue = false;
 	bool atLineStart = startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) -1;
 
 	// scripts/GenerateCharTable.py
 	static const unsigned char kJsonCharClass[256] = {
@@ -268,7 +268,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = ((lineStartNext < endPos) ? lineStartNext : endPos) -1;
+			lineEndPos = sci::min(lineStartNext, endPos) -1;
 		}
 	}
 

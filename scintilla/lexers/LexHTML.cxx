@@ -2136,7 +2136,7 @@ void ColouriseXMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 }
 
 void ColouriseHTMLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	// Passing in false because we're notlexing XML
+	// Passing in false because we're not lexing XML
 	ColouriseHyperTextDoc(startPos, length, initStyle, keywordLists, styler, false);
 }
 

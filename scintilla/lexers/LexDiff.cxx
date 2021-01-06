@@ -111,7 +111,7 @@ int ColouriseDiffLine(const char *lineBuffer) noexcept {
 }
 
 void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
+	const int fold = styler.GetPropertyInt("fold", 1);
 
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);

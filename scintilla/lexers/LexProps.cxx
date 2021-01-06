@@ -50,7 +50,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 
 #if !ENABLE_FOLD_PROPS_COMMENT
-	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
+	const int fold = styler.GetPropertyInt("fold", 1);
 	int prevLevel = (lineCurrent > 0) ? styler.LevelAt(lineCurrent - 1) : SC_FOLDLEVELBASE;
 #endif
 
