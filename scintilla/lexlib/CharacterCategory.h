@@ -32,7 +32,7 @@ bool IsIdContinue(int character) noexcept;
 bool IsXidStart(int character) noexcept;
 bool IsXidContinue(int character) noexcept;
 
-class CharacterCategoryMap {
+class CharacterCategoryMap final {
 private:
 	std::vector<unsigned char> dense;
 public:

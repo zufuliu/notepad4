@@ -12,7 +12,7 @@ namespace Scintilla {
 // which just continues the current token or starts an identifier if in default.
 // DBCS treated specially as the second character can be < 0x80 and hence
 // syntactically significant. UTF-8 avoids this as all trail bytes are >= 0x80
-class StyleContext {
+class StyleContext final {
 public:
 	LexAccessor &styler;
 private:
@@ -88,7 +88,7 @@ public:
 	StyleContext &operator=(const StyleContext &) = delete;
 	StyleContext &operator=(StyleContext &&) = delete;
 	void Complete() {
-		styler.ColourTo(currentPos - ((currentPos > lengthDocument) ? 2 : 1), state);
+		styler.ColourTo(currentPos - ((currentPos > lengthDocument) + 1), state);
 		styler.Flush();
 	}
 	bool More() const noexcept {

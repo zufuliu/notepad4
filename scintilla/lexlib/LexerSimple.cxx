@@ -29,14 +29,26 @@ LexerSimple::LexerSimple(const LexerModule *module_) : module(module_) {
 
 void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) {
 	Accessor astyler(pAccess, &props);
-	module->Lex(startPos, lengthDoc, initStyle, keywordLists, astyler);
+	module->fnLexer(startPos, lengthDoc, initStyle, keywordLists, astyler);
 	astyler.Flush();
 }
 
 void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) {
-	if (props.GetInt("fold")) {
+	if (module->fnFolder && props.GetInt("fold")) {
 		Accessor astyler(pAccess, &props);
-		module->Fold(startPos, lengthDoc, initStyle, keywordLists, astyler);
+		Sci_Line lineCurrent = astyler.GetLine(startPos);
+		// Move back one line in case deletion wrecked current line fold state
+		if (lineCurrent > 0) {
+			lineCurrent--;
+			const Sci_Position newStartPos = astyler.LineStart(lineCurrent);
+			lengthDoc += startPos - newStartPos;
+			startPos = newStartPos;
+			initStyle = 0;
+			if (startPos > 0) {
+				initStyle = astyler.StyleAt(startPos - 1);
+			}
+		}
+		module->fnFolder(startPos, lengthDoc, initStyle, keywordLists, astyler);
 		astyler.Flush();
 	}
 }

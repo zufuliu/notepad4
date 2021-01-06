@@ -12,7 +12,7 @@
 
 namespace Scintilla {
 
-class CatalogueModules {
+class CatalogueModules final {
 	std::vector<LexerModule *> lexerCatalogue;
 public:
 	const LexerModule *Find(int language) const noexcept {

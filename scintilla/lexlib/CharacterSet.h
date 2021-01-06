@@ -8,7 +8,7 @@
 
 namespace Scintilla {
 
-class CharacterSet {
+class CharacterSet final {
 	bool valueAfter;
 	// ASCII character only, not useful for UTF-8 or DBCS multi byte character
 	bool bset[128]{};
