@@ -50,29 +50,3 @@ ILexer5 *LexerModule::Create() const {
 	}
 	return new LexerSimple(this);
 }
-
-void LexerModule::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-	LexerWordList keywordLists, Accessor &styler) const {
-	if (fnLexer) {
-		fnLexer(startPos, lengthDoc, initStyle, keywordLists, styler);
-	}
-}
-
-void LexerModule::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-	LexerWordList keywordLists, Accessor &styler) const {
-	if (fnFolder) {
-		Sci_Line lineCurrent = styler.GetLine(startPos);
-		// Move back one line in case deletion wrecked current line fold state
-		if (lineCurrent > 0) {
-			lineCurrent--;
-			const Sci_Position newStartPos = styler.LineStart(lineCurrent);
-			lengthDoc += startPos - newStartPos;
-			startPos = newStartPos;
-			initStyle = 0;
-			if (startPos > 0) {
-				initStyle = styler.StyleAt(startPos - 1);
-			}
-		}
-		fnFolder(startPos, lengthDoc, initStyle, keywordLists, styler);
-	}
-}

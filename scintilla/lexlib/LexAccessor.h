@@ -261,7 +261,7 @@ Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAc
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler,
 	bool IsStreamCommentStyle(int), const CharacterSet &charSet) noexcept;
 bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) noexcept;
-bool IsLexEmptyLine(LexAccessor &styler, Sci_Position line) noexcept;
+bool IsLexEmptyLine(LexAccessor &styler, Sci_Line line) noexcept;
 
 Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int) noexcept, char *s, Sci_PositionU len) noexcept;
 Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, bool IsWordChar(int) noexcept, char *s, Sci_PositionU len) noexcept;

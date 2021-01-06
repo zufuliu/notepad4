@@ -24,7 +24,7 @@ typedef ILexer5 *(*LexerFactoryFunction)();
  * module appropriate to a particular language.
  * The ExternalLexerModule subclass holds lexers loaded from DLLs or shared libraries.
  */
-class LexerModule {
+class LexerModule final {
 	const int language;
 	LexerFunction const fnLexer;
 	LexerFunction const fnFolder;
@@ -65,11 +65,7 @@ public:
 
 	ILexer5 *Create() const;
 
-	void Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-		LexerWordList keywordLists, Accessor &styler) const;
-	void Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-		LexerWordList keywordLists, Accessor &styler) const;
-
+	friend class LexerSimple;
 	friend class CatalogueModules;
 };
 

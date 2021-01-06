@@ -8,7 +8,7 @@
 
 namespace Scintilla {
 
-class PropSetSimple {
+class PropSetSimple final {
 	void *impl;
 	void Set(const char *keyVal);
 public:

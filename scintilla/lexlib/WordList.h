@@ -10,7 +10,7 @@ namespace Scintilla {
 
 /**
  */
-class WordList {
+class WordList final {
 	// Each word contains at least one character - a empty word acts as sentinel at the end.
 	char **words;
 	char *list;

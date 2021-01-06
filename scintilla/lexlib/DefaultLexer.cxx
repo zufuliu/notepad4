@@ -53,6 +53,10 @@ Sci_Position SCI_METHOD DefaultLexer::PropertySet(const char *, const char *) {
 	return -1;
 }
 
+const char *SCI_METHOD DefaultLexer::PropertyGet([[maybe_unused]] const char *key) const {
+	return "";
+}
+
 const char * SCI_METHOD DefaultLexer::DescribeWordListSets() const noexcept {
 	return "";
 }
