@@ -1319,8 +1319,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	}
 }
 
-static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle);
-static void Style_SetParsed(const struct DetailStyle *style, int iStyle);
 static inline void Style_SetDefaultStyle(int index) {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
 }
@@ -3756,7 +3754,8 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 	}
 }
 
-static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
+#if 0
+void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	UINT mask = 0;
 	int iValue;
 	COLORREF rgb;
@@ -3815,7 +3814,7 @@ static void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	style->mask = mask;
 }
 
-static void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
+void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
 	const UINT mask = style->mask;
 
 	// Font
@@ -3870,6 +3869,7 @@ static void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
 		SciCall_StyleSetCharacterSet(iStyle, style->charset);
 	}
 }
+#endif
 
 //=============================================================================
 //
