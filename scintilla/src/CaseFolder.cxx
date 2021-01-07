@@ -14,11 +14,16 @@
 
 using namespace Scintilla;
 
+template <typename T>
+static constexpr T MakeLowerCase(T ch) noexcept {
+	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
+}
+
 CaseFolder::~CaseFolder() = default;
 
-CaseFolderTable::CaseFolderTable() noexcept : mapping{} {
+CaseFolderTable::CaseFolderTable() noexcept {
 	for (size_t iChar = 0; iChar < sizeof(mapping); iChar++) {
-		mapping[iChar] = static_cast<char>(iChar);
+		mapping[iChar] = static_cast<char>(MakeLowerCase(iChar));
 	}
 }
 
@@ -39,18 +44,7 @@ void CaseFolderTable::SetTranslation(char ch, char chTranslation) noexcept {
 	mapping[static_cast<unsigned char>(ch)] = chTranslation;
 }
 
-void CaseFolderTable::StandardASCII() noexcept {
-	for (size_t iChar = 0; iChar < sizeof(mapping); iChar++) {
-		if (iChar >= 'A' && iChar <= 'Z') {
-			mapping[iChar] = static_cast<char>(iChar - 'A' + 'a');
-		} else {
-			mapping[iChar] = static_cast<char>(iChar);
-		}
-	}
-}
-
 CaseFolderUnicode::CaseFolderUnicode() {
-	StandardASCII();
 	converter = ConverterFor(CaseConversionFold);
 }
 

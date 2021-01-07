@@ -221,12 +221,12 @@ constexpr bool IsPunctuation(int ch) noexcept {
 
 template <typename T>
 constexpr T MakeUpperCase(T ch) noexcept {
-	return (ch < 'a' || ch > 'z') ? ch : (ch - 'a' + 'A');
+	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }
 
 template <typename T>
 constexpr T MakeLowerCase(T ch) noexcept {
-	return (ch < 'A' || ch > 'Z') ? ch : (ch - 'A' + 'a');
+	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
 #if 0

@@ -2625,9 +2625,7 @@ class CaseFolderDBCS final : public CaseFolderTable {
 	std::vector<wchar_t> utf16Folded;
 	UINT cp;
 public:
-	explicit CaseFolderDBCS(UINT cp_) noexcept : cp(cp_) {
-		StandardASCII();
-	}
+	explicit CaseFolderDBCS(UINT cp_) noexcept : cp(cp_) { }
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override {
 		if ((lenMixed == 1) && (sizeFolded > 0)) {
 			folded[0] = mapping[static_cast<unsigned char>(mixed[0])];
@@ -2685,7 +2683,6 @@ CaseFolder *ScintillaWin::CaseFolderForEncoding() {
 	} else {
 		if (pdoc->dbcsCodePage == 0) {
 			CaseFolderTable *pcf = new CaseFolderTable();
-			pcf->StandardASCII();
 			// Only for single byte encodings
 			for (int i = 0x80; i < 0x100; i++) {
 				char sCharacter[2] = "A";
