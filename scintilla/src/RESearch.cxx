@@ -541,20 +541,22 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 
 			if (*p == '-') {	/* real dash */
 				i++;
-				prevChar = *p;
-				ChSet(*p++);
+				prevChar = '-';
+				ChSet('-');
+				p++;
 			}
 			if (*p == ']') {	/* real brace */
 				i++;
-				prevChar = *p;
-				ChSet(*p++);
+				prevChar = ']';
+				ChSet(']');
+				p++;
 			}
 			while (*p && *p != ']') {
 				if (*p == '-') {
 					if (prevChar < 0) {
 						// Previous def. was a char class like \d, take dash literally
-						prevChar = *p;
-						ChSet(*p);
+						prevChar = '-';
+						ChSet('-');
 					} else if (*(p + 1)) {
 						if (*(p + 1) != ']') {
 							c1 = prevChar + 1;
@@ -592,8 +594,8 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 							}
 						} else {
 							// Dash before the ], take it literally
-							prevChar = *p;
-							ChSet(*p);
+							prevChar = '-';
+							ChSet('-');
 						}
 					} else {
 						return badpat("Missing ]");
@@ -912,9 +914,8 @@ static inline int isinset(const char *ap, unsigned char c) noexcept {
 #define CCLSKIP 34	/* [CLO] CCL 32 bytes END */
 
 Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap, int moveDir, Sci::Position *offset) {
-	int op;
-	int c;
-	int n;
+	uint8_t op;
+	uint8_t n;
 	Sci::Position e;		/* extra pointer for CLO  */
 	Sci::Position bp;		/* beginning of subpat... */
 	Sci::Position ep;		/* ending of subpat...    */
@@ -948,10 +949,10 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 				return NOTFOUND;
 			break;
 		case BOT:
-			bopat[static_cast<int>(*ap++)] = lp;
+			bopat[static_cast<unsigned char>(*ap++)] = lp;
 			break;
 		case EOT:
-			eopat[static_cast<int>(*ap++)] = lp;
+			eopat[static_cast<unsigned char>(*ap++)] = lp;
 			break;
 		case BOW:
 			if ((lp != bol && iswordc(ci.CharAt(lp - 1))) || !iswordc(ci.CharAt(lp)))
@@ -1017,11 +1018,10 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 				} else if (lp < endp) {
 					lp++;
 				}
-
 				n = ANYSKIP;
 				break;
-			case CHR:
-				c = *(ap + 1);
+			case CHR: {
+				const char c = *(ap + 1);
 				if (op == CLO || op == LCLO) {
 					while ((lp < endp) && (c == ci.CharAt(lp))) {
 						lp++;
@@ -1030,7 +1030,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 					lp++;
 				}
 				n = CHRSKIP;
-				break;
+			} break;
 			case CCL:
 				while ((lp < endp) && isinset(ap + 1, ci.CharAt(lp))) {
 					lp++;

@@ -522,9 +522,7 @@ static unsigned int KeyFromString(const char *charBytes, size_t len) noexcept {
 	return k;
 }
 
-SpecialRepresentations::SpecialRepresentations() noexcept {
-	constexpr unsigned char none = 0;
-	std::fill(startByteHasReprs, std::end(startByteHasReprs), none);
+SpecialRepresentations::SpecialRepresentations() noexcept : startByteHasReprs{} {
 }
 
 void SpecialRepresentations::SetRepresentation(const char *charBytes, const char *value) {

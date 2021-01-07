@@ -17,7 +17,7 @@
 
 using namespace Scintilla;
 
-CharClassify::CharClassify() noexcept : charClass{} {
+CharClassify::CharClassify() noexcept {
 	SetDefaultCharClasses(true);
 }
 
