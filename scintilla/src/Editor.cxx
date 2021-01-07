@@ -4138,17 +4138,9 @@ void Editor::Indent(bool forwards) {
 	ContainerNeedsUpdate(SC_UPDATE_SELECTION);
 }
 
-class CaseFolderASCII : public CaseFolderTable {
-public:
-	CaseFolderASCII() noexcept {
-		StandardASCII();
-	}
-};
-
-
 CaseFolder *Editor::CaseFolderForEncoding() {
 	// Simple default that only maps ASCII upper case to lower case.
-	return new CaseFolderASCII();
+	return new CaseFolderTable();
 }
 
 /**

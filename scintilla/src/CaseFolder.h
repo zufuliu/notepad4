@@ -22,12 +22,11 @@ public:
 	~CaseFolderTable() override;
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override;
 	void SetTranslation(char ch, char chTranslation) noexcept;
-	void StandardASCII() noexcept;
 };
 
 class ICaseConverter;
 
-class CaseFolderUnicode : public CaseFolderTable {
+class CaseFolderUnicode final : public CaseFolderTable {
 	ICaseConverter *converter;
 public:
 	CaseFolderUnicode();
