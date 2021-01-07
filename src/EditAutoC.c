@@ -1062,7 +1062,8 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		if (iCurrentStyle == SCE_KOTLIN_DEFAULT) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // annotation
 			return AutoC_AddSpecWord_Keyword;
-		} else if (iCurrentStyle >= SCE_KOTLIN_COMMENTLINE && iCurrentStyle <= SCE_KOTLIN_COMMENTDOCWORD) {
+		}
+		if (iCurrentStyle >= SCE_KOTLIN_COMMENTLINE && iCurrentStyle <= SCE_KOTLIN_COMMENTDOCWORD) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[6]); // KDoc
 			return AutoC_AddSpecWord_Finish;
 		}
@@ -1878,9 +1879,9 @@ void EditAutoIndent(void) {
 		SciCall_GetLine(iCurLine - 1, pLineBuf);
 		pLineBuf[iPrevLineLength] = '\0';
 
-		int ch = pLineBuf[iPrevLineLength - 2];
+		int ch = (uint8_t)pLineBuf[iPrevLineLength - 2];
 		if (ch == '\r') {
-			ch = pLineBuf[iPrevLineLength - 3];
+			ch = (uint8_t)pLineBuf[iPrevLineLength - 3];
 			iIndentLen = 1;
 		}
 		if (ch == '{' || ch == '[' || ch == '(') {
