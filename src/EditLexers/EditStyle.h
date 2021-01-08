@@ -77,34 +77,18 @@
 #define NP2STYLE_JSDefault				63301
 #define NP2STYLE_JSComment				63302
 #define NP2STYLE_JSKeyword				63303
-
+#define NP2STYLE_JSDocComment			63304
 #define NP2STYLE_JSString				63305
 #define NP2STYLE_JSRegex				63306
 #define NP2STYLE_JSNumber				63307
-#define NP2STYLE_JSSymbol				63308
-
-#define NP2STYLE_ASPJSDefault			63311
-#define NP2STYLE_ASPJSComment			63312
-#define NP2STYLE_ASPJSKeyword			63313
-
-#define NP2STYLE_ASPJSString			63315
-#define NP2STYLE_ASPJSRegex				63316
-#define NP2STYLE_ASPJSNumber			63317
-#define NP2STYLE_ASPJSSymbol			63318
+#define NP2STYLE_JSOperator				63308
 
 #define NP2STYLE_VBSDefault				63321
 #define NP2STYLE_VBSComment				63322
 #define NP2STYLE_VBSKeyword				63323
-
+#define NP2STYLE_VBSOperator			63324
 #define NP2STYLE_VBSString				63325
 #define NP2STYLE_VBSNumber				63326
-
-#define NP2STYLE_ASPVBSDefault			63331
-#define NP2STYLE_ASPVBSComment			63332
-#define NP2STYLE_ASPVBSKeyword			63333
-
-#define NP2STYLE_ASPVBSString			63335
-#define NP2STYLE_ASPVBSNumber			63336
 
 #define NP2STYLE_TagClass				63401
 #define NP2STYLE_TagId					63402

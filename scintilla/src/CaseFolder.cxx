@@ -22,7 +22,7 @@ static constexpr T MakeLowerCase(T ch) noexcept {
 CaseFolder::~CaseFolder() = default;
 
 CaseFolderTable::CaseFolderTable() noexcept {
-	for (size_t iChar = 0; iChar < sizeof(mapping); iChar++) {
+	for (int iChar = 0; iChar < 256; iChar++) {
 		mapping[iChar] = static_cast<char>(MakeLowerCase(iChar));
 	}
 }
