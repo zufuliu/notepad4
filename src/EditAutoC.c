@@ -709,8 +709,8 @@ static int GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
 	if (iCurrentStyle == SCE_H_CDATA) {
 		return HTML_TEXT_BLOCK_CDATA;
 	}
-	if ((iCurrentStyle >= SCE_HJ_START && iCurrentStyle <= SCE_HJ_REGEX)
-		|| (iCurrentStyle >= SCE_HJA_START && iCurrentStyle <= SCE_HJA_REGEX)) {
+	if ((iCurrentStyle >= SCE_HJ_START && iCurrentStyle <= SCE_HJ_TEMPLATELITERAL)
+		|| (iCurrentStyle >= SCE_HJA_START && iCurrentStyle <= SCE_HJA_TEMPLATELITERAL)) {
 		return HTML_TEXT_BLOCK_JS;
 	}
 	if ((iCurrentStyle >= SCE_HB_START && iCurrentStyle <= SCE_HB_OPERATOR)

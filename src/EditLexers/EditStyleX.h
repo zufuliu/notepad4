@@ -89,6 +89,7 @@
 #define NP2StyleX_JSRegex				EDITSTYLE_HOLE(JSRegex, L"JS Regex")
 #define NP2StyleX_JSNumber				EDITSTYLE_HOLE(JSNumber, L"JS Number")
 #define NP2StyleX_JSOperator			EDITSTYLE_HOLE(JSOperator, L"JS Operator")
+#define NP2StyleX_JSTemplateLiteral		EDITSTYLE_HOLE(JSTemplateLiteral, L"JS Template Literal")
 
 #define NP2StyleX_VBSDefault			EDITSTYLE_HOLE(VBSDefault, L"VBS Default")
 #define NP2StyleX_VBSComment			EDITSTYLE_HOLE(VBSComment, L"VBS Comment")
