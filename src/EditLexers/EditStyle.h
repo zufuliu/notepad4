@@ -82,6 +82,7 @@
 #define NP2STYLE_JSRegex				63306
 #define NP2STYLE_JSNumber				63307
 #define NP2STYLE_JSOperator				63308
+#define NP2STYLE_JSTemplateLiteral		63309
 
 #define NP2STYLE_VBSDefault				63321
 #define NP2STYLE_VBSComment				63322
