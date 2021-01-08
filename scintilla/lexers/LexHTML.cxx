@@ -125,7 +125,7 @@ constexpr int statePrintForState(int state, script_mode inScriptType) noexcept {
 		if ((state >= SCE_HP_START) && (state <= SCE_HP_IDENTIFIER)) {
 			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_PYTHON);
 		}
-		if ((state >= SCE_HB_START) && (state <= SCE_HB_STRINGEOL)) {
+		if ((state >= SCE_HB_START) && (state <= SCE_HB_OPERATOR)) {
 			return state + ((inScriptType == eNonHtmlScript) ? 0 : SCE_HA_VBS);
 		}
 		if ((state >= SCE_HJ_START) && (state <= SCE_HJ_REGEX)) {
@@ -140,7 +140,7 @@ constexpr int stateForPrintState(int StateToPrint) noexcept {
 	if ((StateToPrint >= SCE_HPA_START) && (StateToPrint <= SCE_HPA_IDENTIFIER)) {
 		return StateToPrint - SCE_HA_PYTHON;
 	}
-	if ((StateToPrint >= SCE_HBA_START) && (StateToPrint <= SCE_HBA_STRINGEOL)) {
+	if ((StateToPrint >= SCE_HBA_START) && (StateToPrint <= SCE_HBA_OPERATOR)) {
 		return StateToPrint - SCE_HA_VBS;
 	}
 	if ((StateToPrint >= SCE_HJA_START) && (StateToPrint <= SCE_HJA_REGEX)) {
@@ -1695,6 +1695,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			break;
 		case SCE_HB_DEFAULT:
 		case SCE_HB_START:
+		case SCE_HB_OPERATOR:
 			if (IsNumberStart(ch, chNext)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HB_NUMBER;
@@ -1713,7 +1714,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_HB_COMMENTLINE;
 			} else if (isoperator(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
-				styler.ColourTo(i, statePrintForState(SCE_HB_DEFAULT, inScriptType));
+				styler.ColourTo(i, statePrintForState(SCE_HB_OPERATOR, inScriptType));
 				state = SCE_HB_DEFAULT;
 			} else if ((ch == ' ') || (ch == '\t')) {
 				if (state == SCE_HB_START) {
@@ -1737,7 +1738,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					} else if (ch == '\'') {
 						state = SCE_HB_COMMENTLINE;
 					} else if (isoperator(ch)) {
-						styler.ColourTo(i, statePrintForState(SCE_HB_DEFAULT, inScriptType));
+						styler.ColourTo(i, statePrintForState(SCE_HB_OPERATOR, inScriptType));
 						state = (ch == '.')? SCE_HB_WORD : SCE_HB_DEFAULT;
 					}
 				}
@@ -2071,7 +2072,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (iswordstart(ch)) {
 				state = SCE_HB_WORD;
 			} else if (isoperator(ch)) {
-				styler.ColourTo(i, SCE_HB_DEFAULT);
+				styler.ColourTo(i, SCE_HB_OPERATOR);
 			}
 		} else if (state == SCE_HBA_DEFAULT) {    // One of the above succeeded
 			if ((ch == '\"') && (nonEmptySegment)) {
@@ -2081,7 +2082,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (iswordstart(ch)) {
 				state = SCE_HBA_WORD;
 			} else if (isoperator(ch)) {
-				styler.ColourTo(i, SCE_HBA_DEFAULT);
+				styler.ColourTo(i, SCE_HBA_OPERATOR);
 			}
 		} else if (state == SCE_HJ_DEFAULT) {    // One of the above succeeded
 			if (ch == '/' && chNext == '*') {

@@ -84,34 +84,18 @@
 #define NP2StyleX_JSDefault				EDITSTYLE_HOLE(JSDefault, L"JS Default")
 #define NP2StyleX_JSComment				EDITSTYLE_HOLE(JSComment, L"JS Comment")
 #define NP2StyleX_JSKeyword				EDITSTYLE_HOLE(JSKeyword, L"JS Keyword")
-
+#define NP2StyleX_JSDocComment			EDITSTYLE_HOLE(JSDocComment, L"JS Doc Comment")
 #define NP2StyleX_JSString				EDITSTYLE_HOLE(JSString, L"JS String")
 #define NP2StyleX_JSRegex				EDITSTYLE_HOLE(JSRegex, L"JS Regex")
 #define NP2StyleX_JSNumber				EDITSTYLE_HOLE(JSNumber, L"JS Number")
-#define NP2StyleX_JSSymbol				EDITSTYLE_HOLE(JSSymbol, L"JS Symbol")
-
-#define NP2StyleX_ASPJSDefault			EDITSTYLE_HOLE(ASPJSDefault, L"ASP JS Default")
-#define NP2StyleX_ASPJSComment			EDITSTYLE_HOLE(ASPJSComment, L"ASP JS Comment")
-#define NP2StyleX_ASPJSKeyword			EDITSTYLE_HOLE(ASPJSKeyword, L"ASP JS Keyword")
-
-#define NP2StyleX_ASPJSString			EDITSTYLE_HOLE(ASPJSString, L"ASP JS String")
-#define NP2StyleX_ASPJSRegex			EDITSTYLE_HOLE(ASPJSRegex, L"ASP JS Regex")
-#define NP2StyleX_ASPJSNumber			EDITSTYLE_HOLE(ASPJSNumber, L"ASP JS Number")
-#define NP2StyleX_ASPJSSymbol			EDITSTYLE_HOLE(ASPJSSymbol, L"ASP JS Symbol")
+#define NP2StyleX_JSOperator			EDITSTYLE_HOLE(JSOperator, L"JS Operator")
 
 #define NP2StyleX_VBSDefault			EDITSTYLE_HOLE(VBSDefault, L"VBS Default")
 #define NP2StyleX_VBSComment			EDITSTYLE_HOLE(VBSComment, L"VBS Comment")
 #define NP2StyleX_VBSKeyword			EDITSTYLE_HOLE(VBSKeyword, L"VBS Keyword")
-
+#define NP2StyleX_VBSOperator			EDITSTYLE_HOLE(VBSOperator, L"VBS Operator")
 #define NP2StyleX_VBSString				EDITSTYLE_HOLE(VBSString, L"VBS String")
 #define NP2StyleX_VBSNumber				EDITSTYLE_HOLE(VBSNumber, L"VBS Number")
-
-#define NP2StyleX_ASPVBSDefault			EDITSTYLE_HOLE(ASPVBSDefault, L"ASP VBS Default")
-#define NP2StyleX_ASPVBSComment			EDITSTYLE_HOLE(ASPVBSComment, L"ASP VBS Comment")
-#define NP2StyleX_ASPVBSKeyword			EDITSTYLE_HOLE(ASPVBSKeyword, L"ASP VBS Keyword")
-
-#define NP2StyleX_ASPVBSString			EDITSTYLE_HOLE(ASPVBSString, L"ASP VBS String")
-#define NP2StyleX_ASPVBSNumber			EDITSTYLE_HOLE(ASPVBSNumber, L"ASP VBS Number")
 
 #define NP2StyleX_TagClass				EDITSTYLE_HOLE(TagClass, L"Tag Class")
 #define NP2StyleX_TagId					EDITSTYLE_HOLE(TagId, L"Tag Id")
