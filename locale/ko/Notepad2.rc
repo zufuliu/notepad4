@@ -275,8 +275,8 @@ BEGIN
 			MENUITEM "GUID 새로 만들기(&G)",							IDM_EDIT_INSERT_GUID
 			POPUP "유니코드 제어 문자(&C)"
 			BEGIN
-				MENUITEM "WJ\t&단어 결합자(&N)",						IDM_INSERT_UNICODE_WJ
-				MENUITEM "ZWJ\t0 너비 결합자(&N)",					IDM_INSERT_UNICODE_ZWJ
+				MENUITEM "WJ\t&단어 결합자(&W)",						IDM_INSERT_UNICODE_WJ
+				MENUITEM "ZWJ\t0 너비 결합자(&J)",					IDM_INSERT_UNICODE_ZWJ
 				MENUITEM "ZWNJ\t0 너비 비결합자(&N)",			IDM_INSERT_UNICODE_ZWNJ
 				MENUITEM "LRM\t왼쪽에서 오른쪽으로 표시(&L)",				IDM_INSERT_UNICODE_LRM
 				MENUITEM "RLM\t오른쪽에서 왼쪽으로 표시(&R)",				IDM_INSERT_UNICODE_RLM
