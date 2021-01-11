@@ -144,63 +144,75 @@ def GenerateJsonCharClass():
 	wordStart = [item[0] for item in keywords]
 	operator = "{}[]:,+-"
 
+	SCE_JSON_DEFAULT = 0
+	SCE_JSON_OPERATOR = 1
+	SCE_JSON_NUMBER = 2
+	SCE_JSON_MAYBE_KEYWORD = 3
+	SCE_JSON_IDENTIFIER = 4
+	SCE_JSON_STRING = 5
+	SCE_JSON_CHARACTER = 6
+
 	JsonChar_None = 0
-	JsonChar_Operator = 1
-	JsonChar_OperatorOpen = 2
-	JsonChar_OperatorClose = 3
-	JsonChar_String = 4
-	JsonChar_Digit = 5
-	JsonChar_WordStart = 6
-	JsonChar_Dot = 7
-	JsonChar_Slash = 8
-	JsonChar_Char = 9
-	JsonChar_IDStart = 10
+	JsonChar_BraceOpen = 1
+	JsonChar_BraceClose = 2
+	JsonChar_WordStart = 3
+	JsonChar_Dot = 4
+	JsonChar_Slash = 5
+	JsonChar_Ignore = 6
 
-	JsonChar_Number = 0x10
-	JsonChar_ID = 0x20
+	JsonMask_Number = 1 << 3
+	JsonMask_Identifier = 1 << 4
 
-	table = [JsonChar_None] * 128
+	table = [0] * 128
 	# https://www.ecma-international.org/ecma-262/#sec-ecmascript-language-lexical-grammar
 	for i in range(0x21, 0x80):
 		ch = chr(i)
-		value = JsonChar_None
+		state = SCE_JSON_DEFAULT
+		mask = 0
+		charClass = JsonChar_Ignore
 		if ch in operator:
+			state = SCE_JSON_OPERATOR
 			if ch in '{[':
-				value = JsonChar_OperatorOpen
+				charClass = JsonChar_BraceOpen
 			elif ch in '}]':
-				value = JsonChar_OperatorClose
+				charClass = JsonChar_BraceClose
 			else:
 				if ch in '+-':
 					# SignedInteger in ExponentPart
-					value = JsonChar_Operator | JsonChar_Number
-				else:
-					value = JsonChar_Operator
+					mask = JsonMask_Number
 		elif ch == '\"':
-			value = JsonChar_String
+			state = SCE_JSON_STRING
 		elif ch == '\'':
-			value = JsonChar_Char
+			state = SCE_JSON_CHARACTER
 		elif ch == '/':
-			value = JsonChar_Slash
+			charClass = JsonChar_Slash
 		elif ch == '.':
-			value = JsonChar_Dot | JsonChar_Number
+			state = SCE_JSON_OPERATOR
+			mask = JsonMask_Number
+			charClass = JsonChar_Dot
 		elif ch.isdigit():
-			value = JsonChar_Digit | JsonChar_Number | JsonChar_ID
+			state = SCE_JSON_NUMBER
+			mask = JsonMask_Number | JsonMask_Identifier
 		elif ch in wordStart:
-			value = JsonChar_WordStart | JsonChar_Number | JsonChar_ID
+			state = SCE_JSON_MAYBE_KEYWORD
+			mask = JsonMask_Number | JsonMask_Identifier
+			charClass = JsonChar_WordStart
 		elif ch.isalpha() or ch == '_':
-			value = JsonChar_IDStart | JsonChar_Number | JsonChar_ID
-		elif ch == '$':
-			value = JsonChar_IDStart | JsonChar_ID
-		elif ch == '@':
-			# JSON-LD
-			value = JsonChar_IDStart | JsonChar_ID
-		elif ch == '\\':
-			# UnicodeEscapeSequence
-			value = JsonChar_ID
+			state = SCE_JSON_IDENTIFIER
+			mask = JsonMask_Number | JsonMask_Identifier
+		elif ch in '$@\\':
+			# '@': JSON-LD
+			# '\\': UnicodeEscapeSequence
+			state = SCE_JSON_IDENTIFIER
+			mask = JsonMask_Identifier
+		else:
+			charClass = JsonChar_None
 
+		value = charClass | mask | (state << 5)
 		table[i] = value
 
-	table.extend([JsonChar_IDStart | JsonChar_ID]*128)
+	nonAscii = (SCE_JSON_IDENTIFIER << 5) | JsonMask_Identifier | JsonChar_Ignore
+	table.extend([nonAscii]*128)
 	lines = dumpArray(table, 16)
 	Regenerate("../lexers/LexJSON.cxx", "//", lines)
 
