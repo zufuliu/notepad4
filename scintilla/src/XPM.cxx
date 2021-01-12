@@ -47,21 +47,26 @@ size_t MeasureLength(const char *s) noexcept {
 	return i;
 }
 
-unsigned int ValueOfHex(const char ch) noexcept {
-	if (ch >= '0' && ch <= '9')
-		return ch - '0';
-	else if (ch >= 'A' && ch <= 'F')
-		return ch - 'A' + 10;
-	else if (ch >= 'a' && ch <= 'f')
-		return ch - 'a' + 10;
-	else
-		return 0;
+constexpr unsigned int GetHexDigit(unsigned char ch) noexcept {
+	unsigned int diff = ch - '0';
+	if (diff < 10) {
+		return diff;
+	}
+	diff = (ch | 0x20) - 'a';
+	if (diff < 6) {
+		return diff + 10;
+	}
+	return 0;
 }
 
-ColourDesired ColourFromHex(const char *val) noexcept {
-	const unsigned int r = ValueOfHex(val[0]) * 16 + ValueOfHex(val[1]);
-	const unsigned int g = ValueOfHex(val[2]) * 16 + ValueOfHex(val[3]);
-	const unsigned int b = ValueOfHex(val[4]) * 16 + ValueOfHex(val[5]);
+constexpr unsigned int GetHexValue(unsigned char ch1, unsigned char ch2) noexcept {
+	return (GetHexDigit(ch1) << 4) | GetHexDigit(ch2);
+}
+
+constexpr ColourDesired ColourFromHex(const char *val) noexcept {
+	const unsigned int r = GetHexValue(val[0], val[1]);
+	const unsigned int g = GetHexValue(val[2], val[3]);
+	const unsigned int b = GetHexValue(val[4], val[5]);
 	return ColourDesired(r, g, b);
 }
 

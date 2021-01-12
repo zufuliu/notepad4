@@ -57,16 +57,20 @@ using namespace Scintilla;
 
 namespace {
 
-inline int translateBashDigit(int ch) noexcept {
+constexpr int translateBashDigit(int ch) noexcept {
 	if (ch >= '0' && ch <= '9') {
 		return ch - '0';
-	} else if (ch >= 'a' && ch <= 'z') {
+	}
+	if (ch >= 'a' && ch <= 'z') {
 		return ch - 'a' + 10;
-	} else if (ch >= 'A' && ch <= 'Z') {
+	}
+	if (ch >= 'A' && ch <= 'Z') {
 		return ch - 'A' + 36;
-	} else if (ch == '@') {
+	}
+	if (ch == '@') {
 		return 62;
-	} else if (ch == '_') {
+	}
+	if (ch == '_') {
 		return 63;
 	}
 	return BASH_BASE_ERROR;

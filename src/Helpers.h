@@ -163,6 +163,18 @@ NP2_inline int ToLowerA(int ch) {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
+NP2_inline int GetHexDigit(unsigned char ch) {
+	unsigned int diff = ch - '0';
+	if (diff < 10) {
+		return diff;
+	}
+	diff = (ch | 0x20) - 'a';
+	if (diff < 6) {
+		return diff + 10;
+	}
+	return -1;
+}
+
 NP2_inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
 	return wcscmp(s1, s2) == 0;
 }
