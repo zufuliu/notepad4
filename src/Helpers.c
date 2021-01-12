@@ -2647,102 +2647,85 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 */
 
 /**
- * If the character is an hexa digit, get its value.
- */
-static inline int GetHexDigit(char ch) {
-	if (ch >= '0' && ch <= '9') {
-		return ch - '0';
-	}
-	if (ch >= 'A' && ch <= 'F') {
-		return ch - 'A' + 10;
-	}
-	if (ch >= 'a' && ch <= 'f') {
-		return ch - 'a' + 10;
-	}
-	return -1;
-}
-
-/**
  * Convert C style \a, \b, \f, \n, \r, \t, \v, \xhh and \uhhhh into their indicated characters.
  */
 unsigned int UnSlash(char *s, UINT cpEdit) {
-	const char *sStart = s;
+	const char * const start = s;
 	char *o = s;
 
 	while (*s) {
-		if (*s == '\\') {
-			s++;
-			if (*s == 'a') {
-				*o = '\a';
-			} else if (*s == 'b') {
-				*o = '\b';
-			} else if (*s == 'e') {
-				*o = '\x1B';
-			} else if (*s == 'f') {
-				*o = '\f';
-			} else if (*s == 'n') {
-				*o = '\n';
-			} else if (*s == 'r') {
-				*o = '\r';
-			} else if (*s == 't') {
-				*o = '\t';
-			} else if (*s == 'v') {
-				*o = '\v';
-			} else if (*s == 'x' || *s == 'u') {
-				const BOOL bShort = (*s == 'x');
-				char ch[8];
-				const char *pch = ch;
-				WCHAR val[2] = L"";
-				int hex;
-				val[0] = 0;
-				hex = GetHexDigit(*(s + 1));
-				if (hex >= 0) {
-					int value = hex;
-					s++;
-					hex = GetHexDigit(*(s + 1));
-					if (hex >= 0) {
-						s++;
-						value = (value << 4) | hex;
-						if (!bShort) {
-							hex = GetHexDigit(*(s + 1));
-							if (hex >= 0) {
-								s++;
-								value = (value << 4) | hex;
-								hex = GetHexDigit(*(s + 1));
-								if (hex >= 0) {
-									s++;
-									value = (value << 4) | hex;
-								}
-							}
-						}
-					}
-					if (value) {
-						val[0] = (WCHAR)value;
-						val[1] = 0;
-						WideCharToMultiByte(cpEdit, 0, val, -1, ch, COUNTOF(ch), NULL, NULL);
-						*o = *pch++;
-						while (*pch) {
-							*++o = *pch++;
-						}
-					} else {
-						o--;
-					}
-				} else {
-					o--;
+		if (*s != '\\') {
+			*o++ = *s++;
+			continue;
+		}
+		s++;
+		switch (*s) {
+		case 'a':
+			*o = '\a';
+			break;
+		case 'b':
+			*o = '\b';
+			break;
+		case 'e':
+			*o = '\x1B';
+			break;
+		case 'f':
+			*o = '\f';
+			break;
+		case 'n':
+			*o = '\n';
+			break;
+		case 'r':
+			*o = '\r';
+			break;
+		case 't':
+			*o = '\t';
+			break;
+		case 'v':
+			*o = '\v';
+			break;
+		case 'x':
+		case 'u': {
+			const int digitCount = (*s == 'x') ? 2 : 4;
+			int value = 0;
+			int count = 0;
+			for (; count < digitCount; count++) {
+				const int hex = GetHexDigit(s[1]);
+				if (hex < 0) {
+					break;
 				}
-			} else {
-				*o = *s;
+				value = (value << 4) | hex;
+				s++;
 			}
-		} else {
+			if (value) {
+				WCHAR val[2] =  { (WCHAR)value, 0 };
+				char ch[8];
+				WideCharToMultiByte(cpEdit, 0, val, -1, ch, sizeof(ch), NULL, NULL);
+				const char *pch = ch;
+				*o = *pch++;
+				while (*pch) {
+					*++o = *pch++;
+				}
+			} else if (count == 0) {
+				*o++ = '\\';
+				*o = *s;
+			} else {
+				o--; // to balance o++; at end of switch
+			}
+		} break;
+		default:
+			*o++ = '\\';
 			*o = *s;
+			break;
 		}
 		o++;
 		if (*s) {
 			s++;
 		}
 	}
+
 	*o = '\0';
-	return (unsigned int)(o - sStart);
+	return (unsigned int)(o - start);
 }
 
 /**
@@ -2750,8 +2733,9 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
  * This is used to get control characters into the regular expresion engine.
  */
 unsigned int UnSlashLowOctal(char *s) {
-	const char *sStart = s;
+	const char * const start = s;
 	char *o = s;
+
 	while (*s) {
 		if ((s[0] == '\\') && (s[1] == '0') && IsOctalDigit(s[2]) && IsOctalDigit(s[3])) {
 			*o = (char)(8 * (s[2] - '0') + (s[3] - '0'));
@@ -2764,8 +2748,9 @@ unsigned int UnSlashLowOctal(char *s) {
 			s++;
 		}
 	}
+
 	*o = '\0';
-	return (unsigned int)(o - sStart);
+	return (unsigned int)(o - start);
 }
 
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit) {
