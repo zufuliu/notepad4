@@ -267,12 +267,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (kwType != SCE_GO_DEFAULT && kwPrev == kwType && sc.ch != '.') {
 					kwType = SCE_GO_DEFAULT;
 				}
-				if (sc.ch == '.' && IsIdentifierStartEx(sc.chNext)) {
-					sc.SetState(SCE_GO_OPERATOR);
-					sc.ForwardSetState(SCE_GO_IDENTIFIER);
-				} else {
-					sc.SetState(SCE_GO_DEFAULT);
-				}
+				sc.SetState(SCE_GO_DEFAULT);
 			}
 			break;
 
@@ -379,8 +374,10 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_GO_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				if (sc.chPrev != '.') {
+					identifierStart = sc.currentPos;
+				}
 				sc.SetState(SCE_GO_IDENTIFIER);
-				identifierStart = sc.currentPos;
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_GO_OPERATOR);
 				if (funcState != GoFunction_None) {
