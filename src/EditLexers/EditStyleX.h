@@ -123,7 +123,7 @@
 #define NP2StyleX_Property				EDITSTYLE_HOLE(Property, L"Property")
 #define NP2StyleX_Macro					EDITSTYLE_HOLE(Macro, L"Macro")
 #define NP2StyleX_Annotation			EDITSTYLE_HOLE(Annotation, L"Annotation")
-#define NP2StyleX_Object				EDITSTYLE_HOLE(Object, L"Object")
+
 #define NP2StyleX_Type					EDITSTYLE_HOLE(Type, L"Type")
 #define NP2StyleX_FunctionDefine		EDITSTYLE_HOLE(FunctionDefine, L"Function Define")
 #define NP2StyleX_Protocol				EDITSTYLE_HOLE(Protocol, L"Protocol")
@@ -238,7 +238,7 @@
 #define NP2StyleX_NowdocString			EDITSTYLE_HOLE(NowdocString, L"Nowdoc String")
 #define NP2StyleX_DateTime				EDITSTYLE_HOLE(DateTime, L"DateTime")
 #define NP2StyleX_Action				EDITSTYLE_HOLE(Action, L"Action")
-#define NP2StyleX_ModuleDirective		EDITSTYLE_HOLE(ModuleDirective, L"Module Directive")
+
 #define NP2StyleX_Anchor				EDITSTYLE_HOLE(Anchor, L"Anchor")
 #define NP2StyleX_TextBlock				EDITSTYLE_HOLE(TextBlock, L"Text Block")
 #define NP2StyleX_Math					EDITSTYLE_HOLE(Math, L"Math")

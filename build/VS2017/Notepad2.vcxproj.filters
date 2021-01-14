@@ -93,6 +93,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexJavaScript.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexJSON.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -505,6 +508,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlTOML.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlTypeScript.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlVB.c">

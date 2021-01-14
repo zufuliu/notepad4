@@ -217,6 +217,24 @@ constexpr bool IsPunctuation(int ch) noexcept {
 		|| (ch > 'z' && ch < 127);
 }
 
+constexpr bool IsCommentTagPrev(int chPrev) noexcept {
+	return AnyOf(chPrev, ' ', '\t', '\n', '\r', '*', '!', '/');
+}
+
+constexpr bool IsTaskMarkerPrev(int chPrev) noexcept {
+	return AnyOf(chPrev, ' ', '\t', '*', '!', '/', '\n', '\r');
+}
+
+constexpr bool IsTaskMarkerEnd(int ch) noexcept {
+	return AnyOf(ch, ':', '(', ' ', '\t', '\n', '\r');
+}
+
+constexpr bool IsTaskMarkerStart(int visibleChars, int visibleCharsBefore, int chPrev, int ch, int chNext) noexcept {
+	return (visibleChars == 0 || (visibleChars <= visibleCharsBefore + 3 && IsTaskMarkerPrev(chPrev)))
+		&& IsUpperCase(ch)
+		&& IsUpperCase(chNext);
+}
+
 // Simple case functions for ASCII supersets.
 
 template <typename T>

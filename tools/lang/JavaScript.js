@@ -38,7 +38,7 @@ enum implements interface package private protected public
 // new.target // 2020
 // import.meta // 2020
 
-//! module
+//! directive		===========================================================
 // https://www.ecma-international.org/ecma-262/11.0/index.html#sec-imports
 // https://www.ecma-international.org/ecma-262/11.0/index.html#sec-exports
 import as from
@@ -53,7 +53,84 @@ exports
 module
 require(path)
 
-//! API
+//! decorators
+// https://github.com/tc39/proposal-decorators
+
+//! JSDoc			===========================================================
+// https://jsdoc.app/
+/**
+ * @abstract @virtual
+ * @access
+ * @alias
+ * @async
+ * @augments @extends
+ * @author
+ * @borrows
+ * @callback
+ * @class @constructor
+ * @classdesc
+ * @constant @const
+ * @constructs
+ * @copyright
+ * @default @defaultvalue
+ * @deprecated
+ * @description @desc
+ * @enum
+ * @event
+ * @example
+ * @exports
+ * @external @host
+ * @file @fileoverview @overview
+ * @fires @emits
+ * @function @func @method
+ * @generator
+ * @global
+ * @hideconstructor
+ * @ignore
+ * @implements
+ * @inheritdoc
+ * @inner
+ * @instance
+ * @interface
+ * @kind
+ * @lends
+ * @license
+ * @listens
+ * @member @var
+ * @memberof
+ * @mixes
+ * @mixin
+ * @module
+ * @name
+ * @namespace
+ * @override
+ * @package
+ * @param @arg @argument
+ * @private
+ * @property @prop
+ * @protected
+ * @public
+ * @readonly
+ * @requires
+ * @returns @return
+ * @see
+ * @since
+ * @static
+ * @summary
+ * @this
+ * @throws @exception
+ * @todo
+ * @tutorial
+ * @type
+ * @typedef
+ * @variation
+ * @version
+ * @yields @yield
+ * {@link } {@linkcode } {@linkplain }
+ * {@tutorial }
+ */
+
+//! API				===========================================================
 eval(x)
 isFinite(number)
 isNaN(number)
@@ -584,7 +661,7 @@ VBArray {
 // Windows Script Host
 // https://msdn.microsoft.com/en-us/library/9bbdkx3k(v=msdn.10)
 WScript {
-	//CreateObject(strProgID[,strPrefix]) 
+	//CreateObject(strProgID[,strPrefix])
 	//Echo()
 	//Exec(strCommand)
 	//GetObject(strPathname [,strProgID], [strPrefix])

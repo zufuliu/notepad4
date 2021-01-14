@@ -32,6 +32,7 @@
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
+      <File Name="../../scintilla/lexers/LexJavaScript.cxx"/>
       <File Name="../../scintilla/lexers/LexJSON.cxx"/>
       <File Name="../../scintilla/lexers/LexJulia.cxx"/>
       <File Name="../../scintilla/lexers/LexKotlin.cxx"/>
@@ -225,6 +226,7 @@
       <File Name="../../src/EditLexers/stlSwift.c"/>
       <File Name="../../src/EditLexers/stlTcl.c"/>
       <File Name="../../src/EditLexers/stlTOML.c"/>
+      <File Name="../../src/EditLexers/stlTypeScript.c"/>
       <File Name="../../src/EditLexers/stlVB.c"/>
       <File Name="../../src/EditLexers/stlVBS.c"/>
       <File Name="../../src/EditLexers/stlVerilog.c"/>

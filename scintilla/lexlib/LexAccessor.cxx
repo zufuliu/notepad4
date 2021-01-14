@@ -209,4 +209,23 @@ void UnpackLineState(int lineState, std::vector<int>& states) {
 	UnpackLineState<DefaultNestedStateValueBit, DefaultMaxNestedStateCount, DefaultNestedStateCountBit, DefaultNestedStateBaseStyle>(lineState, states);
 }
 
+void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &startPos, Sci_Position &lengthDoc, int &initStyle) noexcept {
+	const Sci_Line currentLine = styler.GetLine(startPos);
+	if (currentLine != 0) {
+		Sci_Line line = currentLine - 1;
+		int lineState = styler.GetLineState(line);
+		while ((lineState & stateMask) != 0 && line != 0) {
+			--line;
+			lineState = styler.GetLineState(line);
+		}
+		++line;
+		if (line != currentLine) {
+			const Sci_Position endPos = startPos + lengthDoc;
+			startPos = (line == 0)? 0 : styler.LineStart(line);
+			lengthDoc = endPos - startPos;
+			initStyle = (startPos == 0)? 0 : styler.StyleAt(startPos - 1);
+		}
+	}
+}
+
 }

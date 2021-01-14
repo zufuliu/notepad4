@@ -115,6 +115,7 @@ void Scintilla_LinkLexers() {
 	//extern LexerModule lmIHex;
 	//extern LexerModule lmIndent;
 	extern LexerModule lmInno;
+	extern LexerModule lmJavaScript;
 	extern LexerModule lmJSON;
 	extern LexerModule lmJulia;
 	//extern LexerModule lmKix;
@@ -263,6 +264,7 @@ void Scintilla_LinkLexers() {
 		//&lmIHex,
 		//&lmIndent,
 		&lmInno,
+		&lmJavaScript,
 		&lmJSON,
 		&lmJulia,
 		//&lmKix,

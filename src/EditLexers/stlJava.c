@@ -116,7 +116,7 @@ static EDITSTYLE Styles_Java[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
 	{ SCE_C_WORD2, NP2StyleX_TypeKeyword, L"fore:#0000FF" },
-	{ SCE_C_ATTRIBUTE, NP2StyleX_ModuleDirective, L"fore:#FF8000" },
+	{ SCE_C_ATTRIBUTE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_C_DIRECTIVE, NP2StyleX_Annotation, L"fore:#FF8000" },
 	{ SCE_C_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
 	{ SCE_C_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },

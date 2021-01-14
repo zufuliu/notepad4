@@ -26,7 +26,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
 * Syntax highlighting, code folding and API list for (see built-in [file extension list](../master/doc/FileExt.txt)):
 	* Plain Text
-	* ActionScript
+	* [ActionScript](../master/tools/lang/ActionScript.as) for ActionScript 3 and 4
 	* Android Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
 		* javap
 		* Jasmin
@@ -76,7 +76,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Inno Setup
 	* Boost Jam
 	* Java, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
-	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2020 (11th edition) with [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
+	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2020 (11th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* JSON and JSON5 Document
 	* [Julia Script](../master/tools/lang/Julia.jl), up to Julia 1.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
 	* [Kotlin](../master/tools/lang/Kotlin.kt), up to Kotlin 1.3
@@ -125,6 +125,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File
+	* [TypeScript](../master/tools/lang/TypeScript.ts) TypeScript 4.2
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* VHDL
