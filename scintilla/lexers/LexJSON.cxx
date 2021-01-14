@@ -52,8 +52,8 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	char buf[MaxLexWordLength + 1] = "";
 	int wordLen = 0;
 
-	// JSON5 line continue
-	bool lineContinue = false;
+	// JSON5 line continuation
+	bool lineContinuation = false;
 	bool atLineStart = startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
@@ -125,8 +125,8 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_JSON_STRING:
 		case SCE_JSON_CHARACTER:
 			if (i == lineEndPos) { // atLineEnd
-				if (lineContinue) {
-					lineContinue = false;
+				if (lineContinuation) {
+					lineContinuation = false;
 				} else {
 					styler.ColourTo(i - 1, state);
 					state = SCE_JSON_DEFAULT;
@@ -135,7 +135,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				styler.ColourTo(i - 1, state);
 				if (IsEOLChar(chNext)) {
 					styler.ColourTo(i, SCE_JSON_DEFAULT);
-					lineContinue = true;
+					lineContinuation = true;
 				} else {
 					// highlight any character as escape sequence
 					++i;

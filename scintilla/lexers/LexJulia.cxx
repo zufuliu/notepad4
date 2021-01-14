@@ -80,7 +80,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	bool maybeType = false;
 
 	int braceCount = 0;
-	int variableOuter = SCE_JULIA_DEFAULT;	// variable inside string
 	std::vector<int> nestedState; // string interpolation "$()"
 
 	int chBeforeIdentifier = 0;
@@ -185,8 +184,8 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_JULIA_MACRO:
 		case SCE_JULIA_SYMBOL:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				if (sc.state == SCE_JULIA_VARIABLE && variableOuter != SCE_JULIA_DEFAULT) {
-					sc.SetState(variableOuter);
+				if (sc.state == SCE_JULIA_VARIABLE && escSeq.outerState != SCE_JULIA_DEFAULT) {
+					sc.SetState(escSeq.outerState);
 					continue;
 				}
 				sc.SetState(SCE_JULIA_DEFAULT);
@@ -203,7 +202,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Forward();
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				variableOuter = sc.state;
+				escSeq.outerState = sc.state;
 				sc.SetState(SCE_JULIA_VARIABLE);
 			} else if (sc.Match('$', '(')) {
 				++braceCount;
@@ -359,7 +358,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (symbol && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_JULIA_SYMBOL);
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				variableOuter = SCE_JULIA_DEFAULT;
+				escSeq.outerState = SCE_JULIA_DEFAULT;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_VARIABLE);
 			} else if (sc.ch == '0') {

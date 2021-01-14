@@ -62,7 +62,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int kwType = SCE_DART_DEFAULT;
 	int chBeforeIdentifier = 0;
 
-	int variableOuter = SCE_DART_DEFAULT;	// variable inside string
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
@@ -225,7 +224,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				variableOuter = sc.state;
+				escSeq.outerState = sc.state;
 				sc.SetState(SCE_DART_VARIABLE);
 			} else if (sc.Match('$', '{')) {
 				nestedState.push_back(sc.state);
@@ -262,7 +261,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_DART_VARIABLE:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				sc.SetState(variableOuter);
+				sc.SetState(escSeq.outerState);
 				continue;
 			}
 			break;
@@ -308,7 +307,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_DART_NUMBER);
 			} else if ((sc.ch == '@' || sc.ch == '$') && IsIdentifierStartEx(sc.chNext)) {
-				variableOuter = SCE_DART_DEFAULT;
+				escSeq.outerState = SCE_DART_DEFAULT;
 				sc.SetState((sc.ch == '@') ? SCE_DART_METADATA : SCE_DART_VARIABLE);
 			} else if (sc.ch == '#') {
 				if (IsIdentifierStartEx(sc.chNext)) {
@@ -317,7 +316,9 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				chBeforeIdentifier = sc.chPrev;
+				if (sc.chPrev != '.') {
+					chBeforeIdentifier = sc.chPrev;
+				}
 				sc.SetState(SCE_DART_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
 				const bool interpolating = !nestedState.empty();

@@ -57,7 +57,6 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	int kwType = SCE_KOTLIN_DEFAULT;
 	int chBeforeIdentifier = 0;
 
-	int variableOuter = SCE_KOTLIN_DEFAULT;	// variable inside string
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
@@ -205,7 +204,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.Forward();
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				variableOuter = sc.state;
+				escSeq.outerState = sc.state;
 				sc.SetState(SCE_KOTLIN_VARIABLE);
 			} else if (sc.Match('$', '{')) {
 				nestedState.push_back(sc.state);
@@ -256,7 +255,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_KOTLIN_VARIABLE:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				sc.SetState(variableOuter);
+				sc.SetState(escSeq.outerState);
 				continue;
 			}
 			break;
