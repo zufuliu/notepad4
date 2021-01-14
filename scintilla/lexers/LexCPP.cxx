@@ -1,7 +1,7 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for C, C++, C#, Java, Rescouce Script, Asymptote, D, Objective C/C++, PHP
-//! JavaScript, JScript, ActionScript, haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL/AIDL
+//! haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL/AIDL
 
 #include <cassert>
 #include <cstring>
@@ -28,13 +28,11 @@ using namespace Scintilla;
 #define		LEX_CPP		1	// C/C++
 #define		LEX_JAVA	2	// Java
 #define		LEX_CS		3	// C#
-#define		LEX_JS		4	// JavaScript
 #define		LEX_RC		5	// Resouce Script
 #define		LEX_IDL		6	// Interface Definition Language
 #define		LEX_D		7	// D
 #define		LEX_ASY		8	// Asymptote
 #define		LEX_OBJC	10	// Objective C/C++
-#define		LEX_AS		11	// ActionScript
 #define		LEX_HX		12	// haXe
 #define		LEX_GROOVY	13	// Groovy Script
 #define		LEX_SCALA	14	// Scala Script
@@ -50,7 +48,7 @@ static constexpr bool HasAnotation(int lex) noexcept { // @anotation
 	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool HasRegex(int lex) noexcept { // Javascript /regex/
-	return lex == LEX_JS || lex == LEX_GROOVY || lex == LEX_AS || lex == LEX_HX || lex == LEX_AWK;
+	return lex == LEX_GROOVY || lex == LEX_HX || lex == LEX_AWK;
 }
 static constexpr bool HasTripleVerbatim(int lex) noexcept {
 	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
@@ -59,10 +57,10 @@ static constexpr bool SharpComment(int lex) noexcept {
 	return lex == LEX_AWK || lex == LEX_JAM;
 }
 static constexpr bool HasXML(int lex) noexcept {
-	return lex == LEX_JS || lex == LEX_AS || lex == LEX_SCALA;
+	return lex == LEX_SCALA;
 }
 static constexpr bool SquareBraceAfterType(int lex) noexcept {
-	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_JS || lex == LEX_AS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool IsDStrFix(int ch) noexcept {
 	return ch == 'c' || ch == 'w' || ch == 'd';
@@ -486,8 +484,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				outerStyle = sc.state;
 				sc.SetState(SCE_C_COMMENTDOC_TAG);
 				sc.Forward();
-			} else if ((sc.ch == '@' || sc.ch == '\\') && IsAlpha(sc.chNext) && (IsASpace(sc.chPrev)
-				|| sc.chPrev == '*' || sc.chPrev == '/' || sc.chPrev == '!')) {
+			} else if ((sc.ch == '@' || sc.ch == '\\') && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
 				docTagType = DOC_TAG_AT;
 				outerStyle = sc.state;
 				sc.SetState(SCE_C_COMMENTDOC_TAG);
@@ -645,7 +642,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 		case SCE_C_DSTRINGB: // D
-			if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D)) {
+			if (sc.ch == '`' && (lexType == LEX_D)) {
 				if (lexType == LEX_D && IsDStrFix(sc.chNext))
 					sc.Forward();
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -871,7 +868,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						++numDTSBrace;
 						sc.SetState(SCE_C_DSTRINGT);
 						sc.Forward();
-					} else if (sc.ch == '`' && (lexType == LEX_JS || lexType == LEX_D)) {
+					} else if (sc.ch == '`' && (lexType == LEX_D)) {
 						sc.SetState(SCE_C_DSTRINGB);
 					} else if (!SharpComment(lexType) && sc.Match('/', '*')) {
 						if (visibleChars == 0 && styler.MatchAny(sc.currentPos + 2, '*', '!')) {
@@ -1015,7 +1012,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						} else {
 							sc.SetState(SCE_C_OPERATOR);
 						}
-					} else if (isoperator(sc.ch) || ((lexType == LEX_CS || lexType == LEX_D || lexType == LEX_JS) && sc.ch == '$') || sc.ch == '@'
+					} else if (isoperator(sc.ch) || ((lexType == LEX_CS || lexType == LEX_D) && sc.ch == '$') || sc.ch == '@'
 						|| (lexType == LEX_PHP && sc.ch == '\\')) {
 						sc.SetState(SCE_C_OPERATOR);
 						isPragmaPreprocessor = false;
@@ -1356,15 +1353,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			if (isObjCProtocol && ch == ';') {
 				isObjCProtocol = false;
 				levelNext--;
-			}
-		}
-
-		if (lexType == LEX_JS && style == SCE_C_DSTRINGB) {
-			if (ch == '`') {
-				if (styleNext == SCE_C_DSTRINGB)
-					levelNext++;
-				else if (stylePrev == SCE_C_DSTRINGB)
-					levelNext--;
 			}
 		}
 

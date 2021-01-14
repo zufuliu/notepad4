@@ -47,7 +47,6 @@ extern BOOL		bNoEncodingTags;
 extern BOOL		bWarnLineEndings;
 extern BOOL		bFixLineEndings;
 extern BOOL		bAutoStripBlanks;
-extern WCHAR	szCurFile[MAX_PATH + 40];
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 extern LANGID uiLanguage;
 #endif

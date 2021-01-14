@@ -294,7 +294,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			break;
 
 		case SCE_GO_TASK_MARKER:
-			if (sc.ch == ':' || sc.ch == '(') {
+			if (IsTaskMarkerEnd(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 			} else if (!IsUpperCase(sc.ch)) {
 				sc.ChangeState(escSeq.outerState);

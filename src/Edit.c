@@ -68,7 +68,6 @@ extern int g_DOSEncoding;
 
 extern LPMRULIST mruFind;
 extern LPMRULIST mruReplace;
-extern WCHAR szCurFile[MAX_PATH + 40];
 
 static DStringW wchPrefixSelection;
 static DStringW wchAppendSelection;

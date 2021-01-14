@@ -299,4 +299,6 @@ inline char LexGetNextChar(Sci_Position startPos, Sci_Position endPos, LexAccess
 	return '\0';
 }
 
+void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &startPos, Sci_Position &lengthDoc, int &initStyle) noexcept;
+
 }

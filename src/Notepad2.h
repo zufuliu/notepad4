@@ -120,6 +120,8 @@ NP2SettingsVersion_Current = NP2SettingsVersion_V1,
 #define MAX_INI_SECTION_SIZE_FLAGS				(4 * 1024)
 #define MAX_INI_SECTION_SIZE_TOOLBAR_LABELS		(2 * 1024)
 
+extern WCHAR szCurFile[MAX_PATH + 40];
+
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
 void InitInstance(HINSTANCE hInstance, int nCmdShow);

@@ -61,6 +61,7 @@ JavaScript
 	js
 	jse				JScript Encoded File
 	jsm				JavaScript Module
+	jsx				JavaScript with JSX
 	mjs				ECMAScript Module
 	qs				Qt Installer Framework Script
 
@@ -94,6 +95,7 @@ Python Script
 	pxd				Cython Definition File
 	pxi				Cython Include File
 	pyi				Stub File (PEP 484), https://www.python.org/dev/peps/pep-0484/#stub-files
+	py3				used by some people for Python 3 code
 	pth				Path Configuration File, https://docs.python.org/3.9/library/site.html
 	boo				Boo
 	empy			EmPy
@@ -476,6 +478,10 @@ TOML File
 	toml			https://github.com/toml-lang/toml
 
 	Cargo.lock		Rust Cargo
+
+TypeScript
+	ts
+	tsx		TypeScript with JSX
 
 
 VBScript

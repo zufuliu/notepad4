@@ -52,6 +52,14 @@ enum {
 int PackLineState(const std::vector<int>& states) noexcept;
 void UnpackLineState(int lineState, std::vector<int>& states);
 
+inline int TryTakeAndPop(std::vector<int>& states, int value = 0) {
+	if (!states.empty()) {
+		value = states.back();
+		states.pop_back();
+	}
+	return value;
+}
+
 inline int TakeAndPop(std::vector<int>& states) {
 	const int value = states.back();
 	states.pop_back();
