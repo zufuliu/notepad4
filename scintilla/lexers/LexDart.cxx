@@ -132,22 +132,25 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else if (keywordLists[3]->InList(s)) {
 					sc.ChangeState(SCE_DART_ENUM);
 				} else if (kwType != SCE_DART_DEFAULT) {
-					sc.ChangeState(kwType);
-				} else {
-					const int offset = sc.ch == '?';
-					const int chNext = sc.GetLineNextChar(offset);
-					if (chNext == '(') {
-						sc.ChangeState(SCE_DART_FUNCTION);
-					} else if ((chBeforeIdentifier == '<' && chNext == '>')
-						|| IsIdentifierStartEx(chNext)) {
-						// type<type>
-						// type<type?>
-						// type identifier
-						// type? identifier
-						sc.ChangeState(SCE_DART_CLASS);
+				} else if (sc.ch != '.') {
+					if (kwType != SCE_DART_DEFAULT) {
+						sc.ChangeState(kwType);
+					} else {
+						const int offset = sc.ch == '?';
+						const int chNext = sc.GetLineNextChar(offset);
+						if (chNext == '(') {
+							sc.ChangeState(SCE_DART_FUNCTION);
+						} else if ((chBeforeIdentifier == '<' && chNext == '>')
+							|| IsIdentifierStartEx(chNext)) {
+							// type<type>
+							// type<type?>
+							// type identifier
+							// type? identifier
+							sc.ChangeState(SCE_DART_CLASS);
+						}
 					}
 				}
-				if (sc.state != SCE_DART_WORD) {
+				if (sc.state != SCE_DART_WORD && sc.ch != '.') {
 					kwType = SCE_DART_DEFAULT;
 				}
 				sc.SetState(SCE_DART_DEFAULT);

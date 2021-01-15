@@ -161,7 +161,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						sc.ChangeState(SCE_SWIFT_ENUM);
 					}
 				}
-				if (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_IDENTIFIER_BT) {
+				if (sc.ch != '.' && (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_IDENTIFIER_BT)) {
 					if (kwType != SCE_SWIFT_DEFAULT) {
 						sc.ChangeState(kwType);
 					} else {
@@ -176,7 +176,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						}
 					}
 				}
-				if (sc.state != SCE_SWIFT_WORD) {
+				if (sc.state != SCE_SWIFT_WORD && sc.ch != '.') {
 					kwType = SCE_SWIFT_DEFAULT;
 				}
 				sc.SetState(SCE_SWIFT_DEFAULT);
