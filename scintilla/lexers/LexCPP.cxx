@@ -213,6 +213,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			// Reset states to begining of colourise so no surprises
 			// if different sets of lines lexed.
 			visibleChars = 0;
+			docTagType = 0;
 			lastWordWasUUID = false;
 			lastWordWasGoto = false;
 			lastPPDefineWord = 0;
