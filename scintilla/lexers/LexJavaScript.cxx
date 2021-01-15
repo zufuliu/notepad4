@@ -116,7 +116,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	EscapeSequence escSeq;
 
 	if (enableJsx && startPos != 0) {
-		// backtrack to the line starts JSX for better coloring for JSX on typing.
+		// backtrack to the line starts JSX for better coloring on typing.
 		BacktrackToStart(styler, JsLineStateInsideJsxExpression, startPos, lengthDoc, initStyle);
 	}
 
@@ -140,6 +140,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		if (sc.Match('#', '!')) {
 			// Shell Shebang at beginning of file
 			sc.SetState(SCE_JS_COMMENTLINE);
+			sc.Forward();
 			lineStateLineType = JsLineStateMaskLineComment;
 		}
 	} else if (IsSpaceEquiv(initStyle)) {

@@ -92,6 +92,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_RUST_COMMENTLINE);
+		sc.Forward();
 		lineStateLineType = RustLineStateMaskLineComment;
 	}
 

@@ -200,6 +200,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_C_COMMENTLINE);
+		sc.Forward();
 	}
 
 	for (; sc.More(); sc.Forward()) {
