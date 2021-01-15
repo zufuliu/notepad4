@@ -86,6 +86,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_VIM_COMMENTLINE);
+		sc.Forward();
 	}
 
 	while (sc.More()) {
