@@ -221,22 +221,24 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_JS_ENUM);
 					} else if (keywordLists[6]->InList(s)) {
 						sc.ChangeState(SCE_JS_CONSTANT);
-					} else if (kwType != SCE_JS_DEFAULT) {
-						sc.ChangeState(kwType);
-					} else {
-						const int offset = sc.ch == '?';
-						const int chNext = sc.GetLineNextChar(offset);
-						if (chNext == '(') {
-							sc.ChangeState(SCE_JS_FUNCTION);
-						} else if ((chBeforeIdentifier == '<' && chNext == '>') || sc.Match('[', ']')) {
-							// type<type>
-							// type<type?>
-							// type[]
-							sc.ChangeState(SCE_JS_CLASS);
+					} else if (sc.ch != '.') {
+						if (kwType != SCE_JS_DEFAULT) {
+							sc.ChangeState(kwType);
+						} else {
+							const int offset = sc.ch == '?';
+							const int chNext = sc.GetLineNextChar(offset);
+							if (chNext == '(') {
+								sc.ChangeState(SCE_JS_FUNCTION);
+							} else if ((chBeforeIdentifier == '<' && chNext == '>') || sc.Match('[', ']')) {
+								// type<type>
+								// type<type?>
+								// type[]
+								sc.ChangeState(SCE_JS_CLASS);
+							}
 						}
 					}
 					stylePrevNonWhite = sc.state;
-					if (sc.state != SCE_JS_WORD) {
+					if (sc.state != SCE_JS_WORD && sc.ch != '.') {
 						kwType = SCE_JS_DEFAULT;
 					}
 				} else if (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE) {
