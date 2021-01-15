@@ -174,7 +174,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_KOTLIN_COMMENTBLOCK:
 		case SCE_KOTLIN_COMMENTBLOCKDOC:
-			if (sc.state == SCE_KOTLIN_COMMENTBLOCKDOC && sc.ch == '@' && IsLowerCase(sc.chNext) && isspacechar(sc.chPrev)) {
+			if (sc.state == SCE_KOTLIN_COMMENTBLOCKDOC && sc.ch == '@' && IsLowerCase(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
 				sc.SetState(SCE_KOTLIN_COMMENTDOCWORD);
 			} else if (sc.Match('*', '/')) {
 				sc.Forward();

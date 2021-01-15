@@ -323,16 +323,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_JS_COMMENTLINEDOC:
 		case SCE_JS_COMMENTBLOCK:
 		case SCE_JS_COMMENTBLOCKDOC:
-			if (sc.state == SCE_JS_COMMENTLINE || sc.state == SCE_JS_COMMENTLINEDOC) {
-				if (sc.atLineStart) {
-					sc.SetState(SCE_JS_DEFAULT);
-					break;
-				}
-			} else if (sc.Match('*', '/')) {
-				sc.Forward();
-				sc.ForwardSetState(SCE_JS_DEFAULT);
-				break;
-			}
 			switch (docTagState) {
 			case DocTagState::At:
 				docTagState = DocTagState::None;
@@ -342,7 +332,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					docTagState = DocTagState::None;
 					sc.SetState(SCE_JS_COMMENTTAGAT);
 					sc.ForwardSetState(SCE_JS_COMMENTBLOCKDOC);
-					continue;
+					break;
 				}
 				break;
 			case DocTagState::XmlOpen:
@@ -352,8 +342,20 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_JS_COMMENTTAGXML);
 					sc.Forward((sc.ch == '/') ? 2 : 1);
 					sc.SetState(SCE_JS_COMMENTLINEDOC);
-					continue;
+					break;
 				}
+				break;
+			default:
+				break;
+			}
+			if (sc.state == SCE_JS_COMMENTLINE || sc.state == SCE_JS_COMMENTLINEDOC) {
+				if (sc.atLineStart) {
+					sc.SetState(SCE_JS_DEFAULT);
+					break;
+				}
+			} else if (sc.Match('*', '/')) {
+				sc.Forward();
+				sc.ForwardSetState(SCE_JS_DEFAULT);
 				break;
 			}
 			if (docTagState == DocTagState::None) {
@@ -548,6 +550,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			kwType = SCE_JS_DEFAULT;
+			docTagState = DocTagState::None;
 		}
 		sc.Forward();
 	}
