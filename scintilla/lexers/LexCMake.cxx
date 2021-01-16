@@ -84,6 +84,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_CMAKE_OPERATOR:
 			sc.SetState(SCE_CMAKE_DEFAULT);
 			break;
+
 		case SCE_CMAKE_NUMBER:
 			if (!IsNumberStart(sc.ch, sc.chNext)) {
 				if (IsCmakeChar(sc.ch) || IsCmakeChar(chBeforeNumber)) {
@@ -92,6 +93,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}
 			break;
+
 		case SCE_CMAKE_IDENTIFIER:
 			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-')) {
 				const int chNext = sc.GetNextNSChar();
@@ -133,11 +135,13 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}
 			break;
+
 		case SCE_CMAKE_COMMENT:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_CMAKE_DEFAULT);
 			}
 			break;
+
 		case SCE_CMAKE_BLOCK_COMMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
 				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
@@ -147,6 +151,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			break;
+
 		case SCE_CMAKE_STRING:
 			if (sc.ch == '\\') {
 				if (IsEOLChar(sc.chNext)) {
@@ -176,6 +181,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				outerStyle = SCE_CMAKE_DEFAULT;
 			}
 			break;
+
 		case SCE_CMAKE_ESCAPE_SEQUENCE:
 			if (sc.ch == '\\') {
 				if (IsEOLChar(sc.chNext)) {
@@ -191,6 +197,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			break;
+
 		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
 				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
@@ -200,6 +207,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			break;
+
 		case SCE_CMAKE_VARIABLE:
 			if (sc.ch == '}') {
 				--varNestedLevel;
@@ -213,6 +221,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				++varNestedLevel;
 			}
 			break;
+
 		case SCE_CMAKE_VARIABLE_DOLLAR:
 			if (!IsIdentifierChar(sc.ch)) {
 				bool done = false;
@@ -233,6 +242,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			}
 			break;
+
 		case SCE_CMAKE_VARIABLE_AT:
 			if (!IsIdentifierChar(sc.ch)) {
 				if (sc.ch == '@') {

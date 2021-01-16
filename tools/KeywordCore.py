@@ -233,7 +233,7 @@ def parse_avisynth_api_file(path):
 		'properties',
 		'options',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('internal functions', keywordMap['functions'], KeywordAttr.MakeLower),
 		('internal filters', keywordMap['filters'], KeywordAttr.MakeLower),
@@ -241,7 +241,6 @@ def parse_avisynth_api_file(path):
 		('properties', keywordMap['properties'], KeywordAttr.MakeLower),
 		('options', keywordMap['options'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
@@ -344,7 +343,7 @@ def parse_cmake_api_file(path):
 	#counter = Counter(item.split('_')[0] for item in keywordMap['long variables'])
 	#print('CMake long variables prefix:', counter)
 
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('commands', keywordMap['commands'], KeywordAttr.Default),
 		('parameters', keywordMap['parameters'], KeywordAttr.Default),
@@ -356,14 +355,13 @@ def parse_cmake_api_file(path):
 		('long properties', [], KeywordAttr.NoLexer),
 		('long variables', [], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_dart_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
 		if key in ('keywords', 'types'):
-			items = set(doc.split())
+			items = doc.split()
 			keywordMap[key] = items
 		elif key == 'libraries':
 			items = re.findall(r'(class|typedef)\s+(\w+)', doc)
@@ -386,7 +384,7 @@ def parse_dart_api_file(path):
 		'metadata',
 		'function',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
@@ -394,7 +392,6 @@ def parse_dart_api_file(path):
 		('metadata', keywordMap['metadata'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_gn_api_file(path):
 	sections = read_api_file(path, '#')
@@ -403,7 +400,7 @@ def parse_gn_api_file(path):
 		if key == 'function':
 			items = re.findall(r'^(\w+\()', doc, re.MULTILINE)
 		else:
-			items = set(doc.split())
+			items = doc.split()
 		keywordMap[key] = items
 
 	RemoveDuplicateKeyword(keywordMap, [
@@ -412,21 +409,20 @@ def parse_gn_api_file(path):
 		'target variables',
 		'placeholders',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.Default),
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.Default),
 		('target variables', keywordMap['target variables'], KeywordAttr.NoLexer),
 		('placeholders', keywordMap['placeholders'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_go_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
 		if key in ('keywords', 'types'):
-			items = set(doc.split())
+			items = doc.split()
 			if key == 'types':
 				keywordMap['primitive types'] = items
 			else:
@@ -487,7 +483,7 @@ def parse_go_api_file(path):
 		'constant',
 		'variables',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('primitive types', keywordMap['primitive types'], KeywordAttr.Default),
 		('builtin functions', keywordMap['builtin functions'], KeywordAttr.Default),
@@ -499,7 +495,6 @@ def parse_go_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('package', keywordMap['package'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_javascript_api_file(path):
 	sections = read_api_file(path, '//')
@@ -571,7 +566,6 @@ def parse_javascript_api_file(path):
 		('properties', keywordMap['properties'], KeywordAttr.NoLexer),
 		('JSDoc', keywordMap['jsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
-	return keywordList
 
 def parse_julia_api_file(path):
 	sections = read_api_file(path, '#')
@@ -613,7 +607,7 @@ def parse_julia_api_file(path):
 		'module',
 		'function',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('code fold', codeFold, KeywordAttr.NoAutoComp),
 		('type', keywordMap['type'], KeywordAttr.Default),
@@ -623,7 +617,6 @@ def parse_julia_api_file(path):
 		('macro', keywordMap['macro'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_kotlin_api_file(path):
 	sections = read_api_file(path, '//')
@@ -646,8 +639,7 @@ def parse_kotlin_api_file(path):
 			items = re.findall(r'object\s+(\w+)', doc)
 			classes.update(items)
 
-			items = re.findall(r'interface\s+(\w+)', doc)
-			interfaces = set(items)
+			interfaces = re.findall(r'interface\s+(\w+)', doc)
 
 			keywordMap['class'] = classes
 			keywordMap['interface'] = interfaces
@@ -667,7 +659,7 @@ def parse_kotlin_api_file(path):
 		'enum',
 		'annotation',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('interface', keywordMap['interface'], KeywordAttr.Default),
@@ -676,7 +668,6 @@ def parse_kotlin_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
-	return keywordList
 
 def parse_lua_api_file(path):
 	sections = read_api_file(path, '--')
@@ -719,13 +710,12 @@ def parse_lua_api_file(path):
 		'metamethod',
 		'library',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('basic function', keywordMap['basic function'], KeywordAttr.Default),
 		('metamethod', keywordMap['metamethod'], KeywordAttr.Default),
 		('standard library', keywordMap['library'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_llvm_api_file(path):
 	sections = read_api_file(path, ';')
@@ -746,13 +736,12 @@ def parse_llvm_api_file(path):
 		'attribute',
 		'instruction',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('attribute', keywordMap['attribute'], KeywordAttr.Default),
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
 	]
-	return keywordList
 
 def parse_nsis_api_file(path):
 	keywordMap = {}
@@ -778,7 +767,7 @@ def parse_nsis_api_file(path):
 		'functions',
 		'predefined variables',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
 		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer),
 		('instruction', keywordMap['instructions'], KeywordAttr.NoLexer),
@@ -786,14 +775,13 @@ def parse_nsis_api_file(path):
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_r_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
 	for key, doc in sections:
 		if key == 'keywords':
-			items = set(doc.split())
+			items = doc.split()
 		else:
 			result = re.findall(r'^[\w\.]+\(?', doc, re.MULTILINE)
 			items = []
@@ -807,11 +795,10 @@ def parse_r_api_file(path):
 		'keywords',
 		'package',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('package', keywordMap['package'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_rebol_api_file(pathList):
 	keywordMap = {}
@@ -829,13 +816,12 @@ def parse_rebol_api_file(pathList):
 		'keywords',
 		'functions',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('directive', keywordMap['directive'], KeywordAttr.Default),
 		('datatype', keywordMap['datatypes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_ruby_api_file(path):
 	sections = read_api_file(path, '#')
@@ -848,13 +834,12 @@ def parse_ruby_api_file(path):
 	keywordMap['keywords'] |= codeFold
 	codeFold.remove('end')
 
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('code fold', codeFold, KeywordAttr.NoAutoComp),
 		('re', keywordMap['re'], KeywordAttr.NoAutoComp),
 		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_rust_api_file(path):
 	sections = read_api_file(path, '//')
@@ -862,9 +847,9 @@ def parse_rust_api_file(path):
 	used = set()
 	for key, doc in sections:
 		if key in ('keywords', 'reserved keywords', 'primitive types', 'macros'):
-			items = set(doc.split())
+			items = doc.split()
 			keywordMap[key] = items
-			used |= items
+			used.update(items)
 		elif key == 'attribute':
 			items = re.findall(r"(\w+\(?)", doc)
 			attributes = set()
@@ -875,7 +860,7 @@ def parse_rust_api_file(path):
 					attributes.add(item + ')')
 				else:
 					attributes.add(item)
-			keywordMap[key] = list(attributes)
+			keywordMap[key] = attributes
 		elif key == 'modules':
 			items = re.findall(r'mod\s+([\w:]+)', doc)
 			modules = set()
@@ -912,7 +897,7 @@ def parse_rust_api_file(path):
 				elif name in unions:
 					unions.add(alias)
 				elif name in types:
-					types.add(alias)
+					types.append(alias)
 
 			keywordMap['struct'] = structs
 			keywordMap['trait'] = traits
@@ -937,7 +922,7 @@ def parse_rust_api_file(path):
 		'union',
 		'constant',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('reserved keywords', keywordMap['reserved keywords'], KeywordAttr.NoAutoComp),
 		('primitive types', keywordMap['primitive types'], KeywordAttr.Default),
@@ -951,7 +936,6 @@ def parse_rust_api_file(path):
 		('module', keywordMap['modules'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_sql_api_files(pathList):
 	keywordMap = {}
@@ -987,7 +971,7 @@ def parse_sql_api_files(pathList):
 	functions -= ignores
 	upper_functions |= ignores
 
-	keywordList = [
+	return [
 		('keywords', keywords, KeywordAttr.Default),
 		('data types', types, KeywordAttr.Default),
 		('functions', functions, KeywordAttr.Default),
@@ -996,7 +980,6 @@ def parse_sql_api_files(pathList):
 		('upper case data types', upper_types, KeywordAttr.NoLexer),
 		('upper case functions', upper_functions, KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_swift_api_file(path):
 	sections = read_api_file(path, '//')
@@ -1039,7 +1022,7 @@ def parse_swift_api_file(path):
 		'protocol',
 		'enumeration',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('directive', keywordMap['directive'], KeywordAttr.Default),
 		('attribute', keywordMap['attribute'], KeywordAttr.Default),
@@ -1049,7 +1032,6 @@ def parse_swift_api_file(path):
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 def parse_typescript_api_file(path):
 	sections = read_api_file(path, '//')
@@ -1096,11 +1078,10 @@ def parse_vim_api_file(path):
 		'keywords',
 		'commands',
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('commands', keywordMap['commands'], KeywordAttr.Default),
 	]
-	return keywordList
 
 def parse_wasm_lexer_keywords(path):
 	if not os.path.isfile(path):
@@ -1154,7 +1135,7 @@ def parse_wasm_lexer_keywords(path):
 		'type',
 		'instruction'
 	])
-	keywordList = [
+	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
