@@ -20,9 +20,6 @@
 *
 ******************************************************************************/
 
-#if !defined(NOMINMAX)
-#define NOMINMAX
-#endif
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
