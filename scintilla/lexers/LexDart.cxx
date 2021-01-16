@@ -131,7 +131,6 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ChangeState(SCE_DART_CLASS);
 				} else if (keywordLists[3]->InList(s)) {
 					sc.ChangeState(SCE_DART_ENUM);
-				} else if (kwType != SCE_DART_DEFAULT) {
 				} else if (sc.ch != '.') {
 					if (kwType != SCE_DART_DEFAULT) {
 						sc.ChangeState(kwType);
