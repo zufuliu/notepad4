@@ -16,20 +16,20 @@ class StyleContext final {
 public:
 	LexAccessor &styler;
 private:
-	IDocument *multiByteAccess = nullptr;
 	Sci_PositionU endPos;
 	const Sci_PositionU lengthDocument;
-
+#if 0
 	// Used for optimizing GetRelativeCharacter
 	Sci_PositionU posRelative = 0;
 	Sci_PositionU currentPosLastRelative = SIZE_MAX;
 	Sci_Position offsetRelative = 0;
+#endif
 
 	void GetNextChar() noexcept {
-		if (multiByteAccess) {
-			chNext = multiByteAccess->GetCharacterAndWidth(currentPos + width, &widthNext);
+		if (!multiByteAccess) {
+			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + 1));
 		} else {
-			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + width));
+			chNext = styler.GetCharacterAndWidth(currentPos + width, &widthNext);
 		}
 		// End of line determined from line end position, allowing CR, LF,
 		// CRLF and Unicode line ends as set by document.
@@ -41,6 +41,7 @@ public:
 	Sci_Line currentLine;
 	Sci_Line lineDocEnd;
 	Sci_Position lineStartNext;
+	const bool multiByteAccess;
 	bool atLineStart;
 	bool atLineEnd;
 	int state;
@@ -51,17 +52,13 @@ public:
 	Sci_Position widthNext;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-		int initStyle, LexAccessor &styler_, bool useUnicode = false) noexcept :
+		int initStyle, LexAccessor &styler_) noexcept :
 	styler(styler_),
 	endPos(startPos + length),
 	lengthDocument(styler.Length()),
 	currentPos(startPos),
+	multiByteAccess(styler.Encoding() == EncodingType::encDBCS),
 	state(initStyle) {
-		// lexer need enable useUnicode if it wants to detect Unicode identifier (https://www.unicode.org/reports/tr31/)
-		// or operator. e.g. using functions from CharacterCategory.
-		if ((useUnicode && styler.Encoding() == EncodingType::encUnicode) || styler.Encoding() == EncodingType::encDBCS) {
-			multiByteAccess = styler.MultiByteAccess();
-		}
 		styler.StartAt(startPos);
 		styler.StartSegment(startPos);
 		currentLine = styler.GetLine(startPos);
@@ -73,12 +70,14 @@ public:
 		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
 
 		chPrev = 0;
-		// Variable width is now 0 so GetNextChar gets the char at currentPos into chNext/widthNext
-		width = 0;
+		width = 1;
 		widthNext = 1;
-		GetNextChar();
-		ch = chNext;
-		width = widthNext;
+		if (!multiByteAccess) {
+			ch = static_cast<unsigned char>(styler[startPos]);
+		} else {
+			ch =  styler.GetCharacterAndWidth(startPos, &widthNext);
+			width = widthNext;
+		}
 
 		GetNextChar();
 	}
@@ -157,6 +156,7 @@ public:
 		if (n == 0) {
 			return ch;
 		}
+#if 0
 		if (multiByteAccess) {
 			if ((currentPosLastRelative != currentPos) ||
 				((n > 0) && ((offsetRelative < 0) || (n < offsetRelative))) ||
@@ -165,13 +165,14 @@ public:
 				offsetRelative = 0;
 			}
 			const Sci_Position diffRelative = n - offsetRelative;
-			const Sci_Position posNew = multiByteAccess->GetRelativePosition(posRelative, diffRelative);
-			const int chReturn = multiByteAccess->GetCharacterAndWidth(posNew, nullptr);
+			const Sci_Position posNew = styler.GetRelativePosition(posRelative, diffRelative);
+			const int chReturn = styler.GetCharacterAndWidth(posNew, nullptr);
 			posRelative = posNew;
 			currentPosLastRelative = currentPos;
 			offsetRelative = n;
 			return chReturn;
 		}
+#endif
 		// fast version for single byte encodings
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}

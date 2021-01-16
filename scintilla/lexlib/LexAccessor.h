@@ -70,6 +70,10 @@ public:
 	constexpr IDocument *MultiByteAccess() const noexcept {
 		return pAccess;
 	}
+	int GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {
+		return pAccess->GetCharacterAndWidth(position, pWidth);
+	}
+
 	/** Safe version of operator[], returning a defined value for invalid position. */
 	char SafeGetCharAt(Sci_Position position) noexcept {
 		if (position < startPos || position >= endPos) {

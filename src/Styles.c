@@ -1831,7 +1831,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 #if 0
 		// profile lexer performance
+		StopWatch watch;
+		StopWatch_Start(watch);
 		SciCall_ColouriseAll();
+		StopWatch_Stop(watch);
+		const double duration = StopWatch_Get(&watch);
+		printf("%s ColouriseAll duration=%.6f\n", __func__, duration);
 #else
 		// idle styling
 		SciCall_StartStyling(0);
