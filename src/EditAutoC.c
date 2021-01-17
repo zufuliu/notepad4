@@ -1568,7 +1568,7 @@ void EditAutoCloseXMLTag(void) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const Sci_Position iStartPos = max_pos(0, iCurPos - (COUNTOF(tchBuf) - 1));
 	const Sci_Position iSize = iCurPos - iStartPos;
-	BOOL shouldAutoClose = iSize >= 3;
+	BOOL shouldAutoClose = iSize >= 3 && autoCompletionConfig.bCloseTags;
 	BOOL autoClosed = FALSE;
 
 	if (shouldAutoClose && pLexCurrent->iLexer == SCLEX_CPP) {
