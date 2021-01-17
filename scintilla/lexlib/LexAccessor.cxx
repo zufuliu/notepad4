@@ -75,8 +75,9 @@ bool IsLexSpaceToEOL(LexAccessor &styler, Sci_Position startPos) noexcept {
 	const Sci_Line line = styler.GetLine(startPos);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (!IsSpaceOrTab(styler.SafeGetCharAt(i))) {
-			return false;
+		const char ch = styler.SafeGetCharAt(i);
+		if (!IsSpaceOrTab(ch)) {
+			return IsEOLChar(ch);
 		}
 	}
 	return true;
@@ -86,8 +87,9 @@ bool IsLexEmptyLine(LexAccessor &styler, Sci_Line line) noexcept {
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (!IsSpaceOrTab(styler.SafeGetCharAt(i))) {
-			return false;
+		const char ch = styler.SafeGetCharAt(i);
+		if (!IsSpaceOrTab(ch)) {
+			return IsEOLChar(ch);
 		}
 	}
 	return true;
@@ -218,7 +220,9 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 			--line;
 			lineState = styler.GetLineState(line);
 		}
-		++line;
+		if ((lineState & stateMask) == 0) {
+			++line;
+		}
 		if (line != currentLine) {
 			const Sci_Position endPos = startPos + lengthDoc;
 			startPos = (line == 0)? 0 : styler.LineStart(line);
