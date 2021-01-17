@@ -26,7 +26,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
 * Syntax highlighting, code folding and API list for (see built-in [file extension list](../master/doc/FileExt.txt)):
 	* Plain Text
-	* [ActionScript](../master/tools/lang/ActionScript.as) for ActionScript 3 and 4
+	* [ActionScript](../master/tools/lang/ActionScript.as) for ActionScript 3 and 4.
 	* Android Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
 		* javap
 		* Jasmin
@@ -37,7 +37,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* NASM
 	* Asymptote Vector Graphics Language
 	* AutoIt Script
-	* [AviSynth Script](../master/tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1
+	* [AviSynth Script](../master/tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
 	* AWK, GNU AWK
 	* Batch Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
 	* C#, Vala, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
@@ -79,7 +79,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2020 (11th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* JSON and JSON5 Document
 	* [Julia Script](../master/tools/lang/Julia.jl), up to Julia 1.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
-	* [Kotlin](../master/tools/lang/Kotlin.kt), up to Kotlin 1.3
+	* [Kotlin](../master/tools/lang/Kotlin.kt), up to Kotlin 1.3.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](../master/tools/lang/LLVM.ll), up to LLVM 10.
@@ -125,13 +125,13 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File
-	* [TypeScript](../master/tools/lang/TypeScript.ts) TypeScript 4.2
+	* [TypeScript](../master/tools/lang/TypeScript.ts), TypeScript 4.2.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* VHDL
 	* Verilog HDL
 	* [Vim Script](../master/tools/lang/Vim.vim)
-	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt), up to wabt 1.0.19
+	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt), up to wabt 1.0.19.
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet
@@ -195,11 +195,11 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
-	* [日本語](https://github.com/maboroshin/notepad2) by @maboroshin
+	* [日本語](https://github.com/maboroshin/notepad2) by [@maboroshin](https://github.com/maboroshin)
 	* [中文 (繁體)](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hant)
 	* [中文 (简体)](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans)
-	* [한국어](https://github.com/VenusGirl/notepad2) by @VenusGirl
-	* [한국어](https://teus.me/category/IT/Notepad2) by @bluenlive
+	* [한국어](https://github.com/VenusGirl/notepad2) by [@VenusGirl](https://github.com/VenusGirl)
+	* [한국어](https://teus.me/category/IT/Notepad2) by [@bluenlive](https://github.com/bluenlive)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
 * Other projects based on (original) Notepad2 or Notepad2-mod:
 	* [Notepad3](https://github.com/rizonesoft/Notepad3)
