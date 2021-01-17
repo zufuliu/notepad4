@@ -184,7 +184,7 @@ def parse_actionscript_api_file(path):
 		('enumeration', [], KeywordAttr.Default),
 		('constant', [], KeywordAttr.Default),
 		('metadata', [], KeywordAttr.Default),
-		('function', [], KeywordAttr.NoLexer),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('properties', [], KeywordAttr.Default),
 		('doc tag', [], KeywordAttr.Default),
 	]

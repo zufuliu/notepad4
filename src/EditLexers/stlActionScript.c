@@ -32,7 +32,8 @@ NULL
 NULL
 
 , // 8 function
-NULL
+"decodeURI( decodeURIComponent( encodeURI( encodeURIComponent( escape( isFinite( isNaN( isXMLName( parseFloat( parseInt( "
+"trace( unescape( "
 
 , // 9 properties
 NULL
