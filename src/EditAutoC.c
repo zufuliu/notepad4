@@ -1085,7 +1085,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		return AutoC_AddSpecWord_Keyword;
 	}
 	else if (pLexCurrent->iLexer == SCLEX_JAVASCRIPT && (ch == '@' || (ch == '<' && pLexCurrent->rid == NP2LEX_TYPESCRIPT))) {
-		if (iCurrentStyle >= SCE_JS_COMMENTLINE && iCurrentStyle <= SCE_JS_TASK_MARKER) {
+		if (iCurrentStyle >= SCE_JS_COMMENTLINE && iCurrentStyle <= SCE_JS_TASKMARKER) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[9]); // JSDoc, TSDoc
 			return AutoC_AddSpecWord_Finish;
 		}
