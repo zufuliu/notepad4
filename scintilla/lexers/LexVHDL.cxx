@@ -140,21 +140,13 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 // Folding the code
 static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &kwFold = *keywordLists[8];
-
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 1) != 0;
 	const bool foldAtBegin = styler.GetPropertyInt("fold.at.Begin", 1) != 0;
-	const bool foldAtParenthese = styler.GetPropertyInt("fold.at.Parenthese", 1) != 0;
-	//const bool foldAtWhen = styler.GetPropertyInt("fold.at.When", 1) != 0; //< fold at when in case statements
-
 	const Sci_PositionU endPos = startPos + length;
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	//int levelMinCurrent = levelCurrent;
-	int levelMinCurrentElse = levelCurrent; //< Used for folding at 'else'
 	int levelMinCurrentBegin = levelCurrent; //< Used for folding at 'begin'
 	int levelNext = levelCurrent;
 
@@ -226,10 +218,10 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
+		if (IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
@@ -237,7 +229,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			}
 		}
 
-		if ((style == SCE_VHDL_OPERATOR) && foldAtParenthese) {
+		if (style == SCE_VHDL_OPERATOR) {
 			if (ch == '(') {
 				levelNext++;
 			} else if (ch == ')') {
@@ -270,9 +262,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 						strcmp(s, "record") == 0 || strcmp(s, "then") == 0 ||
 						strcmp(s, "units") == 0) {
 						if (strcmp(prevWord, "end") != 0) {
-							if (levelMinCurrentElse > levelNext) {
-								levelMinCurrentElse = levelNext;
-							}
 							levelNext++;
 						}
 					} else if (
@@ -297,9 +286,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 
 							// check for a colon (':') before the instantiated units "entity", "component" or "configuration". Don't fold thereafter.
 							if (chAtPos != ':') {
-								if (levelMinCurrentElse > levelNext) {
-									levelMinCurrentElse = levelNext;
-								}
 								levelNext++;
 							}
 						}
@@ -321,9 +307,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 									!iswordchar(styler.SafeGetCharAt(pos - 1)) &&
 									(chAtPos == 'i' || chAtPos == 'I') && styler.MatchAny(pos + 1, 's', 'S') &&
 									!iswordchar(styler.SafeGetCharAt(pos + 2))) {
-									if (levelMinCurrentElse > levelNext) {
-										levelMinCurrentElse = levelNext;
-									}
 									levelNext++;
 									break;
 								}
@@ -337,10 +320,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 						levelNext--;
 					} else if (strcmp(s, "elsif") == 0) { // elsif is followed by then so folding occurs correctly
 						levelNext--;
-					} else if (strcmp(s, "else") == 0) {
-						if (strcmp(prevWord, "when") != 0) {	 // ignore a <= x when y else z;
-							levelMinCurrentElse = levelNext - 1;	// VHDL else is all on its own so just dec. the min level
-						}
 					} else if (
 						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "architecture") == 0)) ||
 						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "function") == 0)) ||
@@ -354,9 +333,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 
 		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
-			if (foldAtElse && (levelMinCurrentElse < levelUse)) {
-				levelUse = levelMinCurrentElse;
-			}
 			if (foldAtBegin && (levelMinCurrentBegin < levelUse)) {
 				levelUse = levelMinCurrentBegin;
 			}
@@ -369,8 +345,6 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 
 			lineCurrent++;
 			levelCurrent = levelNext;
-			//levelMinCurrent = levelCurrent;
-			levelMinCurrentElse = levelCurrent;
 			levelMinCurrentBegin = levelCurrent;
 		}
 	}

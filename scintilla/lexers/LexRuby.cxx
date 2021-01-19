@@ -1655,8 +1655,6 @@ static bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_RB_COMMENTLINE)
 
 static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const WordList &kwFold = *keywordLists[1];
 
 	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
@@ -1678,11 +1676,11 @@ static void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		/*Mutiline comment patch*/
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (style == SCE_RB_COMMENTLINE) {
-			if (foldComment && stylePrev != SCE_RB_COMMENTLINE) {
+			if (stylePrev != SCE_RB_COMMENTLINE) {
 				if (chNext == '{') {
 					levelCurrent++;
 				} else if (chNext == '}' && levelCurrent > 0) {

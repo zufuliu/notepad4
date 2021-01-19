@@ -133,8 +133,6 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 #if ENABLE_FOLD_PROPS_COMMENT
 void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_Position endPos = startPos + lengthDoc;
 	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 
@@ -145,8 +143,8 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	bool prev2Comment = false;
 	if (lineCurrent > 0) {
 		prevLevel = styler.LevelAt(lineCurrent - 1);
-		prevComment = foldComment && styler.GetLineState(lineCurrent - 1) == SCE_PROPS_COMMENT;
-		prev2Comment = foldComment && lineCurrent > 1 && styler.GetLineState(lineCurrent - 2) == SCE_PROPS_COMMENT;
+		prevComment = styler.GetLineState(lineCurrent - 1) == SCE_PROPS_COMMENT;
+		prev2Comment = lineCurrent > 1 && styler.GetLineState(lineCurrent - 2) == SCE_PROPS_COMMENT;
 	}
 
 	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
@@ -154,7 +152,7 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 		int nextLevel;
 		const int initStyle = styler.GetLineState(lineCurrent);
 
-		const bool currentComment = foldComment && initStyle == SCE_PROPS_COMMENT;
+		const bool currentComment = initStyle == SCE_PROPS_COMMENT;
 		if (currentComment) {
 			commentHead = !prevComment;
 			if (prevLevel & SC_FOLDLEVELHEADERFLAG) {

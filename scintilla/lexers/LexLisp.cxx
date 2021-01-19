@@ -150,8 +150,6 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsStreamStyle(style)		((style) == SCE_C_STRING)
 #define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
 static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -171,17 +169,16 @@ static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldComment && IsStreamCommantStyle(style)) {
+		if (IsStreamCommantStyle(style)) {
 			if (!IsStreamCommantStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommantStyle(styleNext) && !atEOL) {
 				levelNext--;
 			}
-		}
-		if (foldComment && IsStreamStyle(style)) {
+		} else if (IsStreamStyle(style)) {
 			if (!IsStreamStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamStyle(styleNext) && !atEOL) {

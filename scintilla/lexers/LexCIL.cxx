@@ -162,8 +162,6 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
 #define IsStreamCommentStyle(style)	((style) == SCE_C_COMMENT)
 static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -183,10 +181,10 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldComment && IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
+		if (IsStreamCommentStyle(style) && !IsCommentLine(lineCurrent)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {

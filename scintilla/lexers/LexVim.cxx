@@ -259,8 +259,6 @@ struct FoldLineState {
 };
 
 void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -302,7 +300,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 
 		if (i == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
-			if (foldComment & foldCurrent.lineComment) {
+			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else {
 				levelNext += foldNext.lineContinue - foldCurrent.lineContinue;

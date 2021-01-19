@@ -255,9 +255,6 @@ static bool IsSectionEnd(Sci_Position curPos, Accessor &styler) noexcept {
 }
 
 static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	static Sci_Position sectionFound = -1;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -278,14 +275,14 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && IsStreamCommentStyle(style)) {
+		if (IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
 				levelNext--;
 			}
 		}
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 
@@ -299,7 +296,7 @@ static void FoldInnoDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			levelNext--;
 		}
 
-		if (foldPreprocessor && ch == '#' && style == SCE_INNO_PREPROC) {
+		if (ch == '#' && style == SCE_INNO_PREPROC) {
 			const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (LexMatchIC(pos, "if")) {
 				levelNext++;

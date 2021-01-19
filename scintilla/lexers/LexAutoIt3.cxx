@@ -569,10 +569,7 @@ static int GetStyleFirstWord(Sci_Line szLine, Accessor &styler) noexcept {
 //
 static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const Sci_Position endPos = startPos + length;
-	// get settings from the config files for folding comments and preprocessor lines
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-	const bool foldInComment = foldComment == 2;
-	const bool foldpreprocessor = styler.GetPropertyInt("fold.preprocessor") != 0;
+	constexpr bool foldInComment = false;
 	// Backtrack to previous line in case need to fix its fold status
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	if (startPos > 0) {
@@ -714,7 +711,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			// Folding logic for preprocessor blocks
 			// *************************************
 			// process preprosessor line
-			if (foldpreprocessor && style == SCE_AU3_PREPROCESSOR) {
+			if (style == SCE_AU3_PREPROCESSOR) {
 				if (!(stylePrev == SCE_AU3_PREPROCESSOR) && (styleNext == SCE_AU3_PREPROCESSOR)) {
 					levelNext++;
 				}
@@ -726,7 +723,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			// *********************************
 			// Folding logic for Comment blocks
 			// *********************************
-			if (foldComment && IsStreamCommentStyle(style)) {
+			if (IsStreamCommentStyle(style)) {
 				// Start of a comment block
 				if (!(stylePrev == style) && IsStreamCommentStyle(styleNext) && styleNext == style) {
 					levelNext++;

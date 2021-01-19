@@ -333,8 +333,6 @@ static bool IsAnnotationLine(Sci_Line line, Accessor &styler) noexcept {
 }
 
 static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -354,7 +352,7 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 

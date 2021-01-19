@@ -84,7 +84,6 @@ extern EDITLEXER lexGroovy;
 
 extern EDITLEXER lexHaXe;
 
-//extern EDITLEXER lexIDL;
 extern EDITLEXER lexINI;
 extern EDITLEXER lexINNO;
 
@@ -182,7 +181,6 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexHaXe,
 
-	//&lexIDL,
 	&lexINI,
 	&lexINNO,
 
@@ -1491,13 +1489,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case NP2LEX_CSS:
-			SciCall_SetProperty("lexer.css.scss.language", ((np2LexLangIndex == IDM_LEXER_SCSS)? "1" : "0"));
-			SciCall_SetProperty("lexer.css.less.language", ((np2LexLangIndex == IDM_LEXER_LESS)? "1" : "0"));
-			SciCall_SetProperty("lexer.css.hss.language", ((np2LexLangIndex == IDM_LEXER_HSS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.scss", ((np2LexLangIndex == IDM_LEXER_SCSS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.less", ((np2LexLangIndex == IDM_LEXER_LESS)? "1" : "0"));
+			SciCall_SetProperty("lexer.css.hss", ((np2LexLangIndex == IDM_LEXER_HSS)? "1" : "0"));
 			break;
 
 		case NP2LEX_BASH:
-			SciCall_SetProperty("lexer.bash.csh.language", ((np2LexLangIndex == IDM_LEXER_CSHELL)? "1" : "0"));
+			SciCall_SetProperty("lexer.bash.csh", ((np2LexLangIndex == IDM_LEXER_CSHELL)? "1" : "0"));
 			break;
 
 		case NP2LEX_JAVASCRIPT:

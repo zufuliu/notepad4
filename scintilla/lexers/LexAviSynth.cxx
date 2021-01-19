@@ -223,8 +223,6 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 }
 
 void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -251,16 +249,14 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		styleNext = styler.StyleAt(i + 1);
 
 		if (style == SCE_AVS_COMMENTBLOCKN) {
-			if (foldComment) {
-				const int level = (ch == '[' && chNext == '*') ? 1 : ((ch == '*' && chNext == ']') ? -1 : 0);
-				if (level != 0) {
-					levelNext += level;
-					i++;
-					chNext = styler.SafeGetCharAt(i + 1);
-					styleNext = styler.StyleAt(i + 1);
-				}
+			const int level = (ch == '[' && chNext == '*') ? 1 : ((ch == '*' && chNext == ']') ? -1 : 0);
+			if (level != 0) {
+				levelNext += level;
+				i++;
+				chNext = styler.SafeGetCharAt(i + 1);
+				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_AVS_TRIPLESTRING || (foldComment && style == SCE_AVS_COMMENTBLOCK)) {
+		} else if (style == SCE_AVS_TRIPLESTRING || style == SCE_AVS_COMMENTBLOCK) {
 			if (style != stylePrev) {
 				levelNext++;
 			} else if (style != styleNext) {
@@ -276,7 +272,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 		if (i == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
-			if (foldComment & lineCommentCurrent) {
+			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
 			}
 

@@ -349,8 +349,6 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 }
 
 void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -377,14 +375,12 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		styleNext = styler.StyleAt(i + 1);
 
 		if (IsStreamCommentStyle(style)) {
-			if (foldComment) {
-				const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
-				if (level != 0) {
-					levelNext += level;
-					i++;
-					chNext = styler.SafeGetCharAt(i + 1);
-					styleNext = styler.StyleAt(i + 1);
-				}
+			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
+			if (level != 0) {
+				levelNext += level;
+				i++;
+				chNext = styler.SafeGetCharAt(i + 1);
+				styleNext = styler.StyleAt(i + 1);
 			}
 		} else if (style == SCE_KOTLIN_RAWSTRINGSTART) {
 			if (style != stylePrev) {
@@ -404,7 +400,7 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		if (i == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
-			if (foldComment & foldCurrent.lineComment) {
+			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.packageImport) {
 				levelNext += foldNext.packageImport - foldPrev.packageImport;

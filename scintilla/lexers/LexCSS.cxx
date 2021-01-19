@@ -93,15 +93,15 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 	// property lexer.css.scss.language
 	//	Set to 1 for Sassy CSS (.scss)
-	const bool isScssDocument = styler.GetPropertyInt("lexer.css.scss.language") != 0;
+	const bool isScssDocument = styler.GetPropertyInt("lexer.css.scss") != 0;
 
 	// property lexer.css.less.language
 	// Set to 1 for Less CSS (.less)
-	const bool isLessDocument = styler.GetPropertyInt("lexer.css.less.language") != 0;
+	const bool isLessDocument = styler.GetPropertyInt("lexer.css.less") != 0;
 
 	// property lexer.css.hss.language
 	// Set to 1 for HSS (.hss)
-	const bool isHssDocument = styler.GetPropertyInt("lexer.css.hss.language") != 0;
+	const bool isHssDocument = styler.GetPropertyInt("lexer.css.hss") != 0;
 
 	// SCSS/LESS/HSS have the concept of variable
 	const bool hasVariables = isScssDocument || isLessDocument || isHssDocument;
@@ -503,7 +503,6 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -515,7 +514,7 @@ static void FoldCSSDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 		chNext = styler.SafeGetCharAt(i + 1);
 		const int style = styler.StyleAt(i);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		if (foldComment) {
+		{
 			if (!inComment && (style == SCE_CSS_COMMENT))
 				levelCurrent++;
 			else if (inComment && (style != SCE_CSS_COMMENT))

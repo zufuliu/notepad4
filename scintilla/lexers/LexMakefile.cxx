@@ -227,8 +227,6 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_MAKE_COMMENT)
 
 static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -250,7 +248,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
 		if (atEOL) {
-		 	if (foldComment && IsCommentLine(lineCurrent)) {
+		 	if (IsCommentLine(lineCurrent)) {
 				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			} else {
 				levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);

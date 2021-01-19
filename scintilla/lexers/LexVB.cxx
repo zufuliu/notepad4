@@ -276,9 +276,6 @@ static bool IsVBSome(Sci_Line line, int kind, Accessor &styler) noexcept {
 #define IsVB6Type(line)			IsVBSome(line, 1, styler)
 
 static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -314,7 +311,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		const bool atLineBegin = (visibleChars == 0) && !atEOL;
 
 		if (atEOL) {
-			if (foldComment && IsCommentLine(lineCurrent)) {
+			if (IsCommentLine(lineCurrent)) {
 				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			}
 			else if (IsDimLine(lineCurrent)) {
@@ -433,7 +430,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 		}
 
-		if (foldPreprocessor && style == SCE_B_PREPROCESSOR) {
+		if (style == SCE_B_PREPROCESSOR) {
 			if (VBMatch("#if") || VBMatch("#region") || VBMatch("#externalsource"))
 				levelNext++;
 			else if (VBMatch("#end"))

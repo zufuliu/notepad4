@@ -466,9 +466,8 @@ static constexpr bool IsCommentStyle (int style) noexcept {
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
 
 static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldOnlyBegin = styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldAtElse = styler.GetPropertyInt("fold.sql.at.else", 0) != 0;
+	constexpr bool foldOnlyBegin = false;
+	constexpr bool foldAtElse = false;
 
 	SQLStates sqlStates;
 	Sci_PositionU endPos = startPos + length;
@@ -520,12 +519,12 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 	bool endFound = false;
-	bool isUnfoldingIgnored = false;
+	constexpr bool isUnfoldingIgnored = false;
 	// this statementFound flag avoids to fold when the statement is on only one line by ignoring ELSE or ELSIF
 	// eg. "IF condition1 THEN ... ELSIF condition2 THEN ... ELSE ... END IF;"
 	bool statementFound = false;
 	sql_state_t sqlStatesCurrentLine = 0;
-	if (foldOnlyBegin) {
+	if constexpr (foldOnlyBegin) {
 		sqlStatesCurrentLine = sqlStates.ForLine(lineCurrent);
 	}
 
@@ -544,7 +543,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 			// set endFound and isUnfoldingIgnored to false if EOL is reached or ';' is found
 			endFound = false;
-			isUnfoldingIgnored = false;
+			//isUnfoldingIgnored = false;
 		}
 		if ((!IsCommentStyle(style) && ch == ';')) {
 			if (SQLStates::IsIntoMergeStatement(sqlStatesCurrentLine)) {
@@ -571,7 +570,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (ch == ':' && chNext == '=' && !IsCommentStyle(style))
 			sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
 
-		if (foldComment && IsStreamCommentStyle(style)) {
+		if (IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
@@ -581,7 +580,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 		// Disable explicit folding; it can often cause problems with non-aware code
 		// MySQL needs -- comments to be followed by space or control char
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (style == SCE_SQL_OPERATOR) {
@@ -591,7 +590,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext++;
 			} else if (ch == ')') {
 				levelNext--;
-			} else if ((foldOnlyBegin) && ch == ';') {
+			} else if constexpr ((foldOnlyBegin) && ch == ';') {
 				sqlStatesCurrentLine = SQLStates::IgnoreWhen(sqlStatesCurrentLine, false);
 			}
 		}
@@ -618,13 +617,13 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if (strcmp(s, "if") == 0) {
 				if (endFound) {
 					endFound = false;
-					if (foldOnlyBegin && !isUnfoldingIgnored) {
+					if constexpr (foldOnlyBegin && !isUnfoldingIgnored) {
 						// this end isn't for begin block, but for if block ("end if;")
 						// so ignore previous "end" by increment levelNext.
 						levelNext++;
 					}
 				} else {
-					if (!foldOnlyBegin)
+					if constexpr (!foldOnlyBegin)
 						sqlStatesCurrentLine = SQLStates::IntoCondition(sqlStatesCurrentLine, true);
 					if (levelCurrent > levelNext) {
 						// doesn't include this line into the folding block
@@ -635,7 +634,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if (!foldOnlyBegin && strcmp(s, "then") == 0 &&
 				SQLStates::IsIntoCondition(sqlStatesCurrentLine)) {
 				sqlStatesCurrentLine = SQLStates::IntoCondition(sqlStatesCurrentLine, false);
-				if (!foldOnlyBegin) {
+				if constexpr (!foldOnlyBegin) {
 					if (levelCurrent > levelNext) {
 						levelCurrent = levelNext;
 					}
@@ -650,7 +649,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if (strcmp(s, "loop") == 0 || strcmp(s, "case") == 0 || strcmp(s, "while") == 0 || strcmp(s, "repeat") == 0) {
 				if (endFound) {
 					endFound = false;
-					if (foldOnlyBegin && !isUnfoldingIgnored) {
+					if constexpr (foldOnlyBegin && !isUnfoldingIgnored) {
 						// this end isn't for begin block, but for loop block ("end loop;") or case block ("end case;")
 						// so ignore previous "end" by increment levelNext.
 						levelNext++;
@@ -660,7 +659,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 						if (!SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
 							levelNext--; //again for the "end case;" and block when
 					}
-				} else if (!foldOnlyBegin) {
+				} else if constexpr (!foldOnlyBegin) {
 					if (strcmp(s, "case") == 0) {
 						sqlStatesCurrentLine = SQLStates::BeginCaseBlock(sqlStatesCurrentLine);
 						sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
@@ -678,13 +677,13 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					// because doesn't hide LOOP or CASE (eg "END; LOOP" or "END; CASE")
 					levelCurrent = levelNext;
 				}
-			} else if ((!foldOnlyBegin) && (foldAtElse && !statementFound) && strcmp(s, "elsif") == 0) {
+			} else if constexpr ((!foldOnlyBegin) && (foldAtElse && !statementFound) && strcmp(s, "elsif") == 0) {
 				// folding for ELSE and ELSIF block only if foldAtElse is set
 				// and IF or CASE aren't on only one line with ELSE or ELSIF (with flag statementFound)
 				sqlStatesCurrentLine = SQLStates::IntoCondition(sqlStatesCurrentLine, true);
 				levelCurrent--;
 				levelNext--;
-			} else if ((!foldOnlyBegin) && (foldAtElse && !statementFound) && strcmp(s, "else") == 0) {
+			} else if constexpr ((!foldOnlyBegin) && (foldAtElse && !statementFound) && strcmp(s, "else") == 0) {
 				// folding for ELSE and ELSIF block only if foldAtElse is set
 				// and IF or CASE aren't on only one line with ELSE or ELSIF (with flag statementFound)
 				// prevent also ELSE is on the same line (eg. "ELSE ... END IF;")
@@ -709,7 +708,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					levelNext--;
 				if (levelNext < SC_FOLDLEVELBASE) {
 					levelNext = SC_FOLDLEVELBASE;
-					isUnfoldingIgnored = true;
+					//isUnfoldingIgnored = true;
 				}
 			} else if ((!foldOnlyBegin) && strcmp(s, "when") == 0 &&
 				!SQLStates::IsIgnoreWhen(sqlStatesCurrentLine) &&
@@ -767,7 +766,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			lineCurrent++;
 			levelCurrent = levelNext;
 			statementFound = false;
-			if (!foldOnlyBegin)
+			if constexpr (!foldOnlyBegin)
 				sqlStates.Set(lineCurrent, sqlStatesCurrentLine);
 		}
 	}

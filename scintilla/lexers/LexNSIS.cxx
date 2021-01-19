@@ -27,8 +27,7 @@ enum {
 	NsisLineTypeDefine = 2 << 1,	// !define
 
 	NsisLineStateLineContinuation = 1 << 4,
-	NsisLineTypeDefaultMask = (1 << 3) - 2,
-	NsisLineTypeFullMask = (1 << 3) - 1,
+	NsisLineTypeMask = (1 << 3) - 1,
 };
 
 constexpr bool IsEscapeChar(int ch) noexcept {
@@ -47,7 +46,7 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		lineContinuation = lineState & NsisLineStateLineContinuation;
 		if (lineContinuation) {
 			++visibleChars;
-			lineStateLineType = lineState & NsisLineTypeFullMask;
+			lineStateLineType = lineState & NsisLineTypeMask;
 		}
 	}
 
@@ -201,20 +200,17 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 }
 
 void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-	const int lineTypeMask = NsisLineTypeDefaultMask | foldComment;
-
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	int lineTypePrev = 0;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-		lineTypePrev = styler.GetLineState(lineCurrent - 1) & lineTypeMask;
+		lineTypePrev = styler.GetLineState(lineCurrent - 1) & NsisLineTypeMask;
 	}
 
 	int levelNext = levelCurrent;
-	int lineTypeCurrent = styler.GetLineState(lineCurrent) & lineTypeMask;
+	int lineTypeCurrent = styler.GetLineState(lineCurrent) & NsisLineTypeMask;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
 
@@ -251,7 +247,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 					}
 				}
 			}
-		} else if (style == SCE_NSIS_COMMENT && foldComment) {
+		} else if (style == SCE_NSIS_COMMENT) {
 			if (stylePrev != style) {
 				levelNext++;
 			} else if (styleNext != style) {
@@ -260,7 +256,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		}
 
 		if (i == lineEndPos) {
-			const int lineTypeNext = styler.GetLineState(lineCurrent + 1) & lineTypeMask;
+			const int lineTypeNext = styler.GetLineState(lineCurrent + 1) & NsisLineTypeMask;
 			if (lineTypeCurrent) {
 				levelNext += (lineTypeNext == lineTypeCurrent) - (lineTypePrev == lineTypeCurrent);
 			}

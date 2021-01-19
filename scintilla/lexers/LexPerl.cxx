@@ -1527,11 +1527,8 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PL_COMMENTLINE)
 
 static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	const bool foldPOD = styler.GetPropertyInt("fold.perl.pod", 1) != 0;
 	const bool foldPackage = styler.GetPropertyInt("fold.perl.package", 1) != 0;
-	const bool foldCommentExplicit = styler.GetPropertyInt("fold.perl.comment.explicit", 0) != 0;
-	const bool foldAtElse = styler.GetPropertyInt("fold.perl.at.else", 0) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -1563,28 +1560,22 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
 		// Comment folding
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		// {} [] block folding
 		if (style == SCE_PL_OPERATOR) {
 			if (ch == '{') {
-				if (foldAtElse && levelCurrent < levelPrev)
-					--levelPrev;
 				levelCurrent++;
 			} else if (ch == '}') {
 				levelCurrent--;
 			}
 			if (ch == '[') {
-				if (foldAtElse && levelCurrent < levelPrev)
-					--levelPrev;
 				levelCurrent++;
 			} else if (ch == ']') {
 				levelCurrent--;
 			}
 			if (ch == '(') {
-				if (foldAtElse && levelCurrent < levelPrev)
-					--levelPrev;
 				levelCurrent++;
 			} else if (ch == ')') {
 				levelCurrent--;
@@ -1654,15 +1645,6 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				break;
 			}
 			break;
-		}
-
-		//explicit folding
-		if (foldCommentExplicit && style == SCE_PL_COMMENTLINE && ch == '#') {
-			if (chNext == '{') {
-				levelCurrent++;
-			} else if (levelCurrent > SC_FOLDLEVELBASE && chNext == '}') {
-				levelCurrent--;
-			}
 		}
 
 		if (atEOL) {

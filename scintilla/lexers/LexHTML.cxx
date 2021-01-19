@@ -611,11 +611,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	//	The default is on.
 	const bool foldHTMLPreprocessor = foldHTML && styler.GetPropertyInt("fold.html.preprocessor", 1);
 
-	// property fold.hypertext.comment
-	//	Allow folding for comments in scripts embedded in HTML.
-	//	The default is off.
-	const bool foldComment = fold && styler.GetPropertyInt("fold.hypertext.comment", 0) != 0;
-
 	// property fold.hypertext.heredoc
 	//	Allow folding for heredocs in scripts embedded in HTML.
 	//	The default is off.
@@ -719,10 +714,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 						} else if (styler.Match(j, "end")) {
 							levelCurrent--;
 						}
-					} else if ((ch == '{') || (ch == '}') || (foldComment && (ch == '/') && (chNext == '*'))) {
+					} else if ((ch == '{') || (ch == '}') || (ch == '/' && chNext == '*')) {
 						levelCurrent += (((ch == '{') || (ch == '/')) ? 1 : -1);
 					}
-				} else if (((state == SCE_HPHP_COMMENT) || (state == SCE_HJ_COMMENT) || (state == SCE_HJ_COMMENTDOC)) && foldComment && (ch == '*') && (chNext == '/')) {
+				} else if ((state == SCE_HPHP_COMMENT || state == SCE_HJ_COMMENT || state == SCE_HJ_COMMENTDOC) && (ch == '*' && chNext == '/')) {
 					levelCurrent--;
 				}
 				break;
