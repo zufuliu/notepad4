@@ -26,7 +26,7 @@ enum {
 	RebolLineTypeDefine = 2 << 1,	// #define
 
 	RebolLineStateHtmlTag = 1 << 4,
-	RebolLineTypeDefaultMask = (1 << 3) - 2,
+	RebolLineTypeMask = (1 << 3) - 1,
 };
 
 struct EscapeSequence {
@@ -394,20 +394,17 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 }
 
 void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-	const int lineTypeMask = RebolLineTypeDefaultMask | foldComment;
-
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	int lineTypePrev = 0;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-		lineTypePrev = styler.GetLineState(lineCurrent - 1) & lineTypeMask;
+		lineTypePrev = styler.GetLineState(lineCurrent - 1) & RebolLineTypeMask;
 	}
 
 	int levelNext = levelCurrent;
-	int lineTypeCurrent = styler.GetLineState(lineCurrent) & lineTypeMask;
+	int lineTypeCurrent = styler.GetLineState(lineCurrent) & RebolLineTypeMask;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
 
@@ -421,7 +418,7 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 			} else if (ch == ']' || ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_REBOL_BRACEDSTRING || style == SCE_REBOL_BINARY || (style == SCE_REBOL_COMMENTBLOCK && foldComment)) {
+		} else if (style == SCE_REBOL_BRACEDSTRING || style == SCE_REBOL_BINARY || style == SCE_REBOL_COMMENTBLOCK) {
 			if (ch == '{') {
 				levelNext++;
 			} else if (ch == '}') {
@@ -430,7 +427,7 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 		}
 
 		if (i == lineEndPos) {
-			const int lineTypeNext = styler.GetLineState(lineCurrent + 1) & lineTypeMask;
+			const int lineTypeNext = styler.GetLineState(lineCurrent + 1) & RebolLineTypeMask;
 			if (lineTypeCurrent) {
 				levelNext += (lineTypeNext == lineTypeCurrent) - (lineTypePrev == lineTypeCurrent);
 			}

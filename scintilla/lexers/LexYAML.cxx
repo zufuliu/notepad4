@@ -463,8 +463,6 @@ struct FoldLineState {
 
 // code folding based on LexNull
 void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Line docLines = styler.GetLine(styler.Length());
 	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
@@ -506,7 +504,7 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		const int levelAfterBlank = stateNext.indentCount;
 		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
 
-		if (foldComment && lineCurrent < lineNext) {
+		if (lineCurrent < lineNext) {
 			int prevLineType = stateCurrent.lineType;
 			int nextLineType = GetLineType(styler.GetLineState(lineCurrent));
 			int prevLevel = skipLevel;
@@ -533,10 +531,6 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 				styler.SetLevel(lineCurrent, level);
 				prevLineType = currentLineType;
 				prevLevel = level;
-			}
-		} else {
-			for (; lineCurrent < lineNext; lineCurrent++) {
-				styler.SetLevel(lineCurrent, skipLevel);
 			}
 		}
 

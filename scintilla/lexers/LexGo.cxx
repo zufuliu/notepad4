@@ -440,8 +440,6 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 }
 
 void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
-	const int foldComment = styler.GetPropertyInt("fold.comment", 1);
-
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -464,7 +462,7 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_GO_RAW_STRING || (foldComment & (style == SCE_GO_COMMENTBLOCK))) {
+		if (style == SCE_GO_RAW_STRING || style == SCE_GO_COMMENTBLOCK) {
 			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
 				levelNext++;
 			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
@@ -481,7 +479,7 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 		if (i == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
-			if (foldComment & lineCommentCurrent) {
+			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
 			}
 

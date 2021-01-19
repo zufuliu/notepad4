@@ -398,8 +398,6 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PAS_COMMENTLINE)
 
 static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -420,7 +418,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && IsStreamCommentStyle(style)) {
+		if (IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelCurrent++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
@@ -428,14 +426,13 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				levelCurrent--;
 			}
 		}
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldPreprocessor) {
-			if (style == SCE_PAS_PREPROCESSOR && ch == '{' && chNext == '$') {
+		if (style == SCE_PAS_PREPROCESSOR) {
+			if (ch == '{' && chNext == '$') {
 				ClassifyPascalPreprocessorFoldPoint(levelCurrent, lineFoldStateCurrent, i + 2, styler);
-			} else if (style == SCE_PAS_PREPROCESSOR2 && ch == '(' && chNext == '*'
-				&& styler.SafeGetCharAt(i + 2) == '$') {
+			} else if (ch == '(' && chNext == '*' && styler.SafeGetCharAt(i + 2) == '$') {
 				ClassifyPascalPreprocessorFoldPoint(levelCurrent, lineFoldStateCurrent, i + 3, styler);
 			}
 		}

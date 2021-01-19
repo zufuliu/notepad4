@@ -320,7 +320,6 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 
@@ -332,7 +331,7 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 

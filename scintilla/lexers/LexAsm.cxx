@@ -356,9 +356,6 @@ static bool IsAsmDefineLine(Sci_Line line, LexAccessor &styler) noexcept {
 
 #define MAX_ASM_WORD_LEN	15
 static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
-
 	const WordList &directives4foldstart = *keywordLists[6];
 	const WordList &directives4foldend = *keywordLists[7];
 
@@ -383,17 +380,17 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && IsStreamCommentStyle(style)) {
+		if (IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
 				levelNext--;
 			}
 		}
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldPreprocessor && atEOL && IsAsmDefineLine(lineCurrent, styler)) {
+		if (atEOL && IsAsmDefineLine(lineCurrent, styler)) {
 			levelNext += IsAsmDefineLine(lineCurrent + 1, styler) - IsAsmDefineLine(lineCurrent - 1, styler);
 		}
 		if (atEOL) {

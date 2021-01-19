@@ -338,8 +338,6 @@ constexpr int GetTableLevel(int lineState) noexcept {
 
 // code folding based on LexProps
 void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-
 	const Sci_Line endPos = startPos + lengthDoc;
 	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 
@@ -350,8 +348,8 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	bool prev2Comment = false;
 	if (lineCurrent > 0) {
 		prevLevel = styler.LevelAt(lineCurrent - 1);
-		prevComment = foldComment && GetLineType(styler.GetLineState(lineCurrent - 1)) == TOMLLineType_CommentLine;
-		prev2Comment = foldComment && lineCurrent > 1 && GetLineType(styler.GetLineState(lineCurrent - 2)) == TOMLLineType_CommentLine;
+		prevComment = GetLineType(styler.GetLineState(lineCurrent - 1)) == TOMLLineType_CommentLine;
+		prev2Comment = lineCurrent > 1 && GetLineType(styler.GetLineState(lineCurrent - 2)) == TOMLLineType_CommentLine;
 	}
 
 	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
@@ -360,7 +358,7 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		const int lineState = styler.GetLineState(lineCurrent);
 		const int lineType = GetLineType(lineState);
 
-		const bool currentComment = foldComment && lineType == TOMLLineType_CommentLine;
+		const bool currentComment = lineType == TOMLLineType_CommentLine;
 		if (currentComment) {
 			commentHead = !prevComment;
 			if (prevLevel & SC_FOLDLEVELHEADERFLAG) {

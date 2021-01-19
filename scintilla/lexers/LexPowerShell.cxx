@@ -130,14 +130,11 @@ static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, 
 // level store to make it easy to pick up with each increment
 // and to make it possible to fiddle the current level for "} else {".
 static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	int levelMinCurrent = levelCurrent;
 	int levelNext = levelCurrent;
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
@@ -151,16 +148,11 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		if (style == SCE_POWERSHELL_OPERATOR) {
 			if (ch == '{') {
-				// Measure the minimum before a '{' to allow
-				// folding on "} else {"
-				if (levelMinCurrent > levelNext) {
-					levelMinCurrent = levelNext;
-				}
 				levelNext++;
 			} else if (ch == '}') {
 				levelNext--;
 			}
-		} else if (foldComment && style == SCE_POWERSHELL_COMMENTSTREAM) {
+		} else if (style == SCE_POWERSHELL_COMMENTSTREAM) {
 			if (stylePrev != SCE_POWERSHELL_COMMENTSTREAM) {
 				levelNext++;
 			} else if (styleNext != SCE_POWERSHELL_COMMENTSTREAM) {
@@ -169,9 +161,6 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 		}
 		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
-			if (foldAtElse) {
-				levelUse = levelMinCurrent;
-			}
 			int lev = levelUse | levelNext << 16;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
@@ -180,7 +169,6 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 			}
 			lineCurrent++;
 			levelCurrent = levelNext;
-			levelMinCurrent = levelCurrent;
 		}
 	}
 }

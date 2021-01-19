@@ -23,6 +23,7 @@ using namespace Scintilla;
 namespace {
 
 #define ENABLE_FOLD_NULL_DOCUMENT	1
+
 #if !ENABLE_FOLD_NULL_DOCUMENT
 void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, LexerWordList, Accessor &styler) {
 	// Null language means all style bytes are 0 so just mark the end - no need to fill in.

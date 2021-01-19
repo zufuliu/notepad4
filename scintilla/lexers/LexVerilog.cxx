@@ -154,16 +154,11 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 #define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
 
 static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const bool foldComment = styler.GetPropertyInt("fold.comment", 1) != 0;
-	const bool foldPreprocessor = styler.GetPropertyInt("fold.preprocessor", 1) != 0;
-	const bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
-
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	int levelMinCurrent = levelCurrent;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -178,17 +173,17 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 		styleNext = styler.StyleAt(i + 1);
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 
-		if (foldComment && IsStreamCommentStyle(style)) {
+		if (IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
 				levelNext--;
 			}
 		}
-		if (foldComment && atEOL && IsCommentLine(lineCurrent)) {
+		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (foldPreprocessor && ch == '`' && (style == SCE_V_PREPROCESSOR)) {
+		if (ch == '`' && (style == SCE_V_PREPROCESSOR)) {
 			const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (styler.Match(pos, "if")) {
 				levelNext++;
@@ -218,9 +213,6 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 		if (atEOL || (i == endPos - 1)) {
 			int levelUse = levelCurrent;
-			if (foldAtElse) {
-				levelUse = levelMinCurrent;
-			}
 			int lev = levelUse | levelNext << 16;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
@@ -229,7 +221,6 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			lineCurrent++;
 			levelCurrent = levelNext;
-			levelMinCurrent = levelCurrent;
 		}
 	}
 }
