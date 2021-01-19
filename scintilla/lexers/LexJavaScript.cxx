@@ -71,7 +71,7 @@ inline bool IsJsIdentifierStartNext(const StyleContext &sc) noexcept {
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
-	return state <= SCE_JS_TASK_MARKER;
+	return state <= SCE_JS_TASKMARKER;
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
@@ -384,7 +384,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					}
 				} else if (IsTaskMarkerStart(visibleChars, visibleCharsBefore, sc.chPrev, sc.ch, sc.chNext)) {
 					escSeq.outerState = sc.state;
-					sc.SetState(SCE_JS_TASK_MARKER);
+					sc.SetState(SCE_JS_TASKMARKER);
 				}
 			}
 			break;
@@ -397,7 +397,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			break;
 
-		case SCE_JS_TASK_MARKER:
+		case SCE_JS_TASKMARKER:
 			if (IsTaskMarkerEnd(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 			} else if (!IsUpperCase(sc.ch)) {
@@ -575,7 +575,7 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 }
 
 constexpr bool IsInnerCommentStyle(int style) noexcept {
-	return style == SCE_JS_COMMENTTAGAT || style == SCE_JS_COMMENTTAGXML || style == SCE_JS_TASK_MARKER;
+	return style == SCE_JS_COMMENTTAGAT || style == SCE_JS_COMMENTTAGXML || style == SCE_JS_TASKMARKER;
 }
 
 void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {

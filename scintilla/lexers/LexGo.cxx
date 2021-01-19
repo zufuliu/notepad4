@@ -278,22 +278,22 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (IsUpperCase(sc.ch)) {
 					if (IsUpperCase(sc.chNext)) {
 						escSeq.outerState = sc.state;
-						sc.SetState(SCE_GO_TASK_MARKER);
+						sc.SetState(SCE_GO_TASKMARKER);
 						sc.Forward();
 					}
 				} else if ((sc.ch == '+' && sc.Match("+build")) || sc.Match('g', 'o', ':')) {
-					sc.SetState(SCE_GO_TASK_MARKER_LINE);
+					sc.SetState(SCE_GO_TASKMARKERLINE);
 				}
 			}
 			break;
 
-		case SCE_GO_TASK_MARKER_LINE:
+		case SCE_GO_TASKMARKERLINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_GO_DEFAULT);
 			}
 			break;
 
-		case SCE_GO_TASK_MARKER:
+		case SCE_GO_TASKMARKER:
 			if (IsTaskMarkerEnd(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 			} else if (!IsUpperCase(sc.ch)) {
@@ -308,7 +308,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.ForwardSetState(SCE_GO_DEFAULT);
 			} else if (visibleChars == 0 && IsUpperCase(sc.ch) && IsUpperCase(sc.chNext)) {
 				escSeq.outerState = sc.state;
-				sc.SetState(SCE_GO_TASK_MARKER);
+				sc.SetState(SCE_GO_TASKMARKER);
 				sc.Forward();
 			}
 			break;
@@ -432,7 +432,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 }
 
 constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_GO_TASK_MARKER || style == SCE_GO_FORMAT_SPECIFIER;
+	return style == SCE_GO_TASKMARKER || style == SCE_GO_FORMAT_SPECIFIER;
 }
 
 constexpr int GetLineCommentState(int lineState) noexcept {

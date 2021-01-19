@@ -46,7 +46,7 @@ enum {
 	DefaultNestedStateValueBit = 3,
 	DefaultMaxNestedStateCount = 4,
 	DefaultNestedStateCountBit = 3,
-	DefaultNestedStateBaseStyle = 9,
+	DefaultNestedStateBaseStyle = 10,
 };
 
 int PackLineState(const std::vector<int>& states) noexcept;
