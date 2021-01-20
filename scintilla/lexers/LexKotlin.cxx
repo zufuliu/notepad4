@@ -344,10 +344,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_KOTLIN_COMMENTBLOCK || style == SCE_KOTLIN_COMMENTBLOCKDOC;
-}
-
 void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -374,7 +370,9 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (IsStreamCommentStyle(style)) {
+		switch (style) {
+		case SCE_KOTLIN_COMMENTBLOCK:
+		case SCE_KOTLIN_COMMENTBLOCKDOC: {
 			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -382,20 +380,27 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_KOTLIN_RAWSTRINGSTART) {
+		} break;
+
+		case SCE_KOTLIN_RAWSTRINGSTART:
 			if (style != stylePrev) {
 				levelNext++;
 			}
-		} else if (style == SCE_KOTLIN_RAWSTRINGEND) {
+			break;
+
+		case SCE_KOTLIN_RAWSTRINGEND:
 			if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_KOTLIN_OPERATOR) {
+			break;
+
+		case SCE_KOTLIN_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

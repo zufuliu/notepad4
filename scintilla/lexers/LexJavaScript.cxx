@@ -570,10 +570,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_JS_COMMENTBLOCK || style == SCE_JS_COMMENTBLOCKDOC;
-}
-
 constexpr bool IsInnerCommentStyle(int style) noexcept {
 	return style == SCE_JS_COMMENTTAGAT || style == SCE_JS_COMMENTTAGXML || style == SCE_JS_TASKMARKER;
 }
@@ -604,27 +600,37 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (IsStreamCommentStyle(style)) {
+		switch (style) {
+		case SCE_JS_COMMENTBLOCK:
+		case SCE_JS_COMMENTBLOCKDOC:
 			if (style != stylePrev && !IsInnerCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (style != styleNext && !IsInnerCommentStyle(styleNext)) {
 				levelNext--;
 			}
-		} else if (style == SCE_JS_STRING_BTSTART) {
+			break;
+
+		case SCE_JS_STRING_BTSTART:
 			if (style != stylePrev) {
 				levelNext++;
 			}
-		} else if (style == SCE_JS_STRING_BTEND) {
+			break;
+
+		case SCE_JS_STRING_BTEND:
 			if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_JS_OPERATOR) {
+			break;
+
+		case SCE_JS_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_JSX_TAG) {
+			break;
+
+		case SCE_JSX_TAG:
 			if (ch == '<') {
 				if (chNext == '/') {
 					levelNext--;
@@ -637,6 +643,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 			} else if (ch == '/' && chNext == '>') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

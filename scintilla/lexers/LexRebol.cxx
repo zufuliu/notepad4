@@ -412,18 +412,24 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 		const int style = styler.StyleAt(i);
 		const char ch = styler[i];
 
-		if (style == SCE_REBOL_OPERATOR) {
+		switch (style) {
+		case SCE_REBOL_OPERATOR:
 			if (ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == ']' || ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_REBOL_BRACEDSTRING || style == SCE_REBOL_BINARY || style == SCE_REBOL_COMMENTBLOCK) {
+			break;
+
+		case SCE_REBOL_BRACEDSTRING:
+		case SCE_REBOL_BINARY:
+		case SCE_REBOL_COMMENTBLOCK:
 			if (ch == '{') {
 				levelNext++;
 			} else if (ch == '}') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

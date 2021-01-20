@@ -248,7 +248,8 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_AVS_COMMENTBLOCKN) {
+		switch (style) {
+		case SCE_AVS_COMMENTBLOCKN: {
 			const int level = (ch == '[' && chNext == '*') ? 1 : ((ch == '*' && chNext == ']') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -256,18 +257,24 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_AVS_TRIPLESTRING || style == SCE_AVS_COMMENTBLOCK) {
+		} break;
+
+		case SCE_AVS_TRIPLESTRING:
+		case SCE_AVS_COMMENTBLOCK:
 			if (style != stylePrev) {
 				levelNext++;
 			} else if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_AVS_OPERATOR) {
+			break;
+
+		case SCE_AVS_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

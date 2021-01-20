@@ -210,7 +210,8 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_WASM_COMMENTBLOCK) {
+		switch (style) {
+		case SCE_WASM_COMMENTBLOCK: {
 			const int level = (ch == '(' && chNext == ';') ? 1 : ((ch == ';' && chNext == ')') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -218,12 +219,15 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_WASM_OPERATOR) {
+		} break;
+
+		case SCE_WASM_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

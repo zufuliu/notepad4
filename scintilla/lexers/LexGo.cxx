@@ -462,19 +462,24 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_GO_RAW_STRING || style == SCE_GO_COMMENTBLOCK) {
+		switch (style) {
+		case SCE_GO_RAW_STRING:
+		case SCE_GO_COMMENTBLOCK:
 			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
 				levelNext++;
 			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
 				levelNext--;
 			}
-		} else if (style == SCE_GO_OPERATOR) {
+			break;
+
+		case SCE_GO_OPERATOR: {
 			const char ch = styler[i];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
+		} break;
 		}
 
 		if (i == lineEndPos) {

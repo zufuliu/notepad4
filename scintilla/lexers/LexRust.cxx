@@ -395,15 +395,6 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	sc.Complete();
 }
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_RUST_COMMENTBLOCK || style == SCE_RUST_COMMENTBLOCKDOC;
-}
-
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_RUST_STRING || style == SCE_RUST_BYTESTRING
-		|| style == SCE_RUST_RAW_STRING || style == SCE_RUST_RAW_BYTESTRING;
-}
-
 constexpr bool IsStringInnerStyle(int style) noexcept {
 	return style == SCE_RUST_ESCAPECHAR || style == SCE_RUST_LINE_CONTINUE;
 }
@@ -443,7 +434,9 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (IsStreamCommentStyle(style)) {
+		switch (style) {
+		case SCE_RUST_COMMENTBLOCK:
+		case SCE_RUST_COMMENTBLOCKDOC:  {
 			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -452,18 +445,26 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (IsMultilineStringStyle(style)) {
+		} break;
+
+		case SCE_RUST_STRING:
+		case SCE_RUST_BYTESTRING:
+		case SCE_RUST_RAW_STRING:
+		case SCE_RUST_RAW_BYTESTRING:
 			if (style != stylePrev && !IsStringInnerStyle(stylePrev)) {
 				levelNext++;
 			} else if (style != styleNext && !IsStringInnerStyle(styleNext)) {
 				levelNext--;
 			}
-		} else if (style == SCE_RUST_OPERATOR) {
+			break;
+
+		case SCE_RUST_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

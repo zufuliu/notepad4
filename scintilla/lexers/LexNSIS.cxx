@@ -226,7 +226,9 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_NSIS_WORD || style == SCE_NSIS_PREPROCESSOR) {
+		switch (style) {
+		case SCE_NSIS_WORD:
+		case SCE_NSIS_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
 				buf[wordLen++] = MakeLowerCase(styler[i]);
 			}
@@ -247,12 +249,15 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 					}
 				}
 			}
-		} else if (style == SCE_NSIS_COMMENT) {
+			break;
+
+		case SCE_NSIS_COMMENT:
 			if (stylePrev != style) {
 				levelNext++;
 			} else if (styleNext != style) {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

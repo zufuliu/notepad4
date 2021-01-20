@@ -380,10 +380,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_SWIFT_COMMENTBLOCK || style == SCE_SWIFT_COMMENTBLOCKDOC;
-}
-
 void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -410,7 +406,9 @@ void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (IsStreamCommentStyle(style)) {
+		switch (style) {
+		case SCE_SWIFT_COMMENTBLOCK:
+		case SCE_SWIFT_COMMENTBLOCKDOC: {
 			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -418,26 +416,39 @@ void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_SWIFT_TRIPLE_STRINGSTART || style == SCE_SWIFT_TRIPLE_STRING_EDSTART) {
+		} break;
+
+		case SCE_SWIFT_TRIPLE_STRINGSTART:
+		case SCE_SWIFT_TRIPLE_STRING_EDSTART:
 			if (style != stylePrev) {
 				levelNext++;
 			}
-		} else if (style == SCE_SWIFT_TRIPLE_STRINGEND || style == SCE_SWIFT_TRIPLE_STRING_EDEND) {
+			break;
+
+		case SCE_SWIFT_TRIPLE_STRINGEND:
+		case SCE_SWIFT_TRIPLE_STRING_EDEND:
 			if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_SWIFT_OPERATOR) {
+			break;
+
+		case SCE_SWIFT_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_SWIFT_DIRECTIVE && ch == '#') {
-			if (chNext == 'i' && styler.SafeGetCharAt(i + 2) == 'f') {
-				levelNext++;
-			} else if (chNext == 'e' && styler.Match(i + 1, "endif")) {
-				levelNext--;
+			break;
+
+		case SCE_SWIFT_DIRECTIVE:
+			if (ch == '#') {
+				if (chNext == 'i' && styler.SafeGetCharAt(i + 2) == 'f') {
+					levelNext++;
+				} else if (chNext == 'e' && styler.Match(i + 1, "endif")) {
+					levelNext--;
+				}
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

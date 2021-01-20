@@ -366,10 +366,6 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_DART_COMMENTBLOCK || style == SCE_DART_COMMENTBLOCKDOC;
-}
-
 void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -396,7 +392,9 @@ void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (IsStreamCommentStyle(style)) {
+		switch (style) {
+		case SCE_DART_COMMENTBLOCKDOC:
+		case SCE_DART_COMMENTBLOCK:  {
 			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -404,26 +402,38 @@ void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_DART_TRIPLE_RAWSTRING_SQ || style == SCE_DART_TRIPLE_RAWSTRING_DQ) {
+		} break;
+
+		case SCE_DART_TRIPLE_RAWSTRING_SQ:
+		case SCE_DART_TRIPLE_RAWSTRING_DQ:
 			if (style != stylePrev) {
 				levelNext++;
 			} else if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_DART_TRIPLE_STRING_SQSTART || style == SCE_DART_TRIPLE_STRING_DQSTART) {
+			break;
+
+		case SCE_DART_TRIPLE_STRING_SQSTART:
+		case SCE_DART_TRIPLE_STRING_DQSTART:
 			if (style != stylePrev) {
 				levelNext++;
 			}
-		} else if (style == SCE_DART_TRIPLE_STRING_SQEND || style == SCE_DART_TRIPLE_STRING_DQEND) {
+			break;
+
+		case SCE_DART_TRIPLE_STRING_SQEND:
+		case SCE_DART_TRIPLE_STRING_DQEND:
 			if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_DART_OPERATOR) {
+			break;
+
+		case SCE_DART_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {
