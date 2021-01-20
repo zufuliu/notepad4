@@ -139,10 +139,11 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						const int chNext = sc.GetLineNextChar(offset);
 						if (chNext == '(') {
 							sc.ChangeState(SCE_DART_FUNCTION);
-						} else if ((chBeforeIdentifier == '<' && chNext == '>')
+						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
 							|| IsIdentifierStartEx(chNext)) {
 							// type<type>
 							// type<type?>
+							// type<type<type>>
 							// type identifier
 							// type? identifier
 							sc.ChangeState(SCE_DART_CLASS);

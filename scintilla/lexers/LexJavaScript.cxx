@@ -229,9 +229,10 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							const int chNext = sc.GetLineNextChar(offset);
 							if (chNext == '(') {
 								sc.ChangeState(SCE_JS_FUNCTION);
-							} else if ((chBeforeIdentifier == '<' && chNext == '>') || sc.Match('[', ']')) {
+							} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<')) || sc.Match('[', ']')) {
 								// type<type>
 								// type<type?>
+								// type<type<type>>
 								// type[]
 								sc.ChangeState(SCE_JS_CLASS);
 							}
