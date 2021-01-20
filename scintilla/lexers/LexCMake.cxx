@@ -356,20 +356,26 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_CMAKE_BLOCK_COMMENT || style == SCE_CMAKE_BRACKET_ARGUMENT) {
+		switch (style) {
+		case SCE_CMAKE_BLOCK_COMMENT:
+		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (style != stylePrev) {
 				levelNext++;
 			} else if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (style == SCE_CMAKE_OPERATOR) {
+			break;
+
+		case SCE_CMAKE_OPERATOR: {
 			const char ch = styler[i];
 			if (ch == '(') {
 				levelNext++;
 			} else if (ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_CMAKE_WORD) {
+		} break;
+
+		case SCE_CMAKE_WORD:
 			if (wordLen < MaxFoldWordLength) {
 				buf[wordLen++] = MakeLowerCase(styler[i]);
 			}
@@ -382,6 +388,7 @@ void FoldCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 					levelNext++;
 				}
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

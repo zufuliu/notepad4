@@ -429,12 +429,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	sc.Complete();
 }
 
-constexpr bool IsMultilineStringStyle(int style) noexcept {
-	return style == SCE_JULIA_RAWSTRING || style == SCE_JULIA_TRIPLE_RAWSTRING
-		|| style == SCE_JULIA_BYTESTRING || style == SCE_JULIA_TRIPLE_BYTESTRING
-		|| style == SCE_JULIA_REGEX || style == SCE_JULIA_TRIPLE_REGEX;
-}
-
 constexpr bool IsStringInnerStyle(int style) noexcept {
 	return style == SCE_JULIA_ESCAPECHAR;
 }
@@ -473,7 +467,8 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 
-		if (style == SCE_JULIA_COMMENTBLOCK) {
+		switch (style) {
+		case SCE_JULIA_COMMENTBLOCK: {
 			const int level = (ch == '#' && chNext == '=') ? 1 : ((ch == '=' && chNext == '#') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
@@ -482,7 +477,9 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				chNext = styler.SafeGetCharAt(i + 1);
 				styleNext = styler.StyleAt(i + 1);
 			}
-		} else if (style == SCE_JULIA_WORD) {
+		} break;
+
+		case SCE_JULIA_WORD:
 			if (wordLen < MaxFoldWordLength) {
 				buf[wordLen++] = ch;
 			}
@@ -495,26 +492,42 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 					levelNext++;
 				}
 			}
-		} else if (style == SCE_JULIA_OPERATOR) {
+			break;
+
+		case SCE_JULIA_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
-		} else if (style == SCE_JULIA_TRIPLE_STRINGSTART || style == SCE_JULIA_TRIPLE_BACKTICKSSTART) {
+			break;
+
+		case SCE_JULIA_TRIPLE_STRINGSTART:
+		case SCE_JULIA_TRIPLE_BACKTICKSSTART:
 			if (style != stylePrev) {
 				levelNext++;
 			}
-		} else if (style == SCE_JULIA_TRIPLE_STRINGEND || style == SCE_JULIA_TRIPLE_BACKTICKSEND) {
+			break;
+
+		case SCE_JULIA_TRIPLE_STRINGEND:
+		case SCE_JULIA_TRIPLE_BACKTICKSEND:
 			if (style != styleNext) {
 				levelNext--;
 			}
-		} else if (IsMultilineStringStyle(style)) {
+			break;
+
+		case SCE_JULIA_RAWSTRING:
+		case SCE_JULIA_TRIPLE_RAWSTRING:
+		case SCE_JULIA_BYTESTRING:
+		case SCE_JULIA_TRIPLE_BYTESTRING:
+		case SCE_JULIA_REGEX:
+		case SCE_JULIA_TRIPLE_REGEX:
 			if (style != stylePrev && !IsStringInnerStyle(stylePrev)) {
 				levelNext++;
 			} else if (style != styleNext && !IsStringInnerStyle(styleNext)) {
 				levelNext--;
 			}
+			break;
 		}
 
 		if (i == lineEndPos) {

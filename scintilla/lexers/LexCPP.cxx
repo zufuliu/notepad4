@@ -1223,7 +1223,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	//int levelMinCurrent = levelCurrent;
 	int levelNext = levelCurrent;
 
 	char chNext = styler[startPos];
@@ -1338,9 +1337,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			// maybe failed in multi-line define section, MFC's afx.h is a example
 			if (ch == '{' && !(lineCurrent > 0 && visibleChars == 0 && IsOpenBraceLine(lineCurrent, styler))) {
 				levelNext++;
-				//if (levelMinCurrent > levelNext) {
-				//	levelMinCurrent = levelNext;
-				//}
 			} else if (ch == '}') {
 				levelNext--;
 			} else if (ch == '[' || ch == '(') {
@@ -1384,7 +1380,6 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 			lineCurrent++;
 			levelCurrent = levelNext;
-			//levelMinCurrent = levelCurrent;
 			visibleChars = 0;
 			isObjCProtocol = false;
 			lineCommentCurrent = IsCommentLine(lineCurrent);
