@@ -169,9 +169,10 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						const int chNext = sc.GetLineNextChar(offset);
 						if (chNext == '(') {
 							sc.ChangeState(SCE_SWIFT_FUNCTION);
-						} else if ((chBeforeIdentifier == '<' && chNext == '>')) {
+						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
 							// type<type>
 							// type<type?>
+							// type<type<type>>
 							sc.ChangeState(SCE_SWIFT_CLASS);
 						}
 					}
@@ -335,7 +336,9 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				chBeforeIdentifier = sc.chPrev;
+				if (sc.chPrev != '.') {
+					chBeforeIdentifier = sc.chPrev;
+				}
 				sc.SetState(SCE_SWIFT_IDENTIFIER);
 			} else if (isoperator(sc.ch) || sc.ch == '\\') {
 				const bool interpolating = !nestedState.empty();

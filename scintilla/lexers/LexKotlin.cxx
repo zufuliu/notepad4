@@ -56,6 +56,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 	int kwType = SCE_KOTLIN_DEFAULT;
 	int chBeforeIdentifier = 0;
+	int chBefore = 0;
 
 	std::vector<int> nestedState; // string interpolation "${}"
 
@@ -110,7 +111,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					} else if (EqualsAny(s, "break", "continue", "return", "this", "super")) {
 						kwType = SCE_KOTLIN_LABEL;
 					} else if (((kwType != SCE_KOTLIN_ANNOTATION && kwType != SCE_KOTLIN_ENUM)
-							&& (chBeforeIdentifier != ':' && strcmp(s, "class") == 0))
+							&& (chBefore != ':' && strcmp(s, "class") == 0))
 						|| strcmp(s, "typealias") == 0) {
 						kwType = SCE_KOTLIN_CLASS;
 					} else if (strcmp(s, "enum") == 0) {
@@ -135,14 +136,23 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.ChangeState(SCE_KOTLIN_INTERFACE);
 				} else if (keywordLists[3]->InList(s)) {
 					sc.ChangeState(SCE_KOTLIN_ENUM);
-				} else {
+				} else if (sc.ch != '.') {
 					if (kwType != SCE_KOTLIN_DEFAULT && kwType != SCE_KOTLIN_LABEL) {
 						sc.ChangeState(kwType);
-					} else if (sc.GetNextNSChar() == '(') {
-						sc.ChangeState(SCE_KOTLIN_FUNCTION);
+					} else {
+						const int offset = sc.ch == '?';
+						const int chNext = sc.GetLineNextChar(offset);
+						if (chNext == '(') {
+							sc.ChangeState(SCE_KOTLIN_FUNCTION);
+						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+							// type<type>
+							// type<type?>
+							// type<type<type>>
+							sc.ChangeState(SCE_KOTLIN_CLASS);
+						}
 					}
 				}
-				if (sc.state != SCE_KOTLIN_WORD) {
+				if (sc.state != SCE_KOTLIN_WORD && sc.ch != '.') {
 					kwType = SCE_KOTLIN_DEFAULT;
 				}
 				sc.SetState(SCE_KOTLIN_DEFAULT);
@@ -299,7 +309,10 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				chBeforeIdentifier = sc.chPrev;
+				chBefore = sc.chPrev;
+				if (chBefore != '.') {
+					chBeforeIdentifier = chBefore;
+				}
 				sc.SetState(SCE_KOTLIN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
