@@ -33,14 +33,14 @@ private:
 		}
 		// End of line determined from line end position, allowing CR, LF,
 		// CRLF and Unicode line ends as set by document.
-		atLineEnd = static_cast<Sci_Position>(currentPos) >= lineStartNext - (currentLine < lineDocEnd);
+		atLineEnd = currentPos >= lineStartNext - (currentLine < lineDocEnd);
 	}
 
 public:
 	Sci_PositionU currentPos;
 	Sci_Line currentLine;
 	Sci_Line lineDocEnd;
-	Sci_Position lineStartNext;
+	Sci_PositionU lineStartNext;
 	const bool multiByteAccess;
 	bool atLineStart;
 	bool atLineEnd;
@@ -223,8 +223,8 @@ public:
 			|| (chPrev == '\r' && ch == '\n' && currentPos >= 2 && ch0 == styler[currentPos - 2]);
 	}
 
-	int GetNextNSChar() const noexcept {
-		if (!IsWhiteSpace(ch)) {
+	int GetDocNextChar(bool ignoreCurrent = false) const noexcept {
+		if (!ignoreCurrent && !IsWhiteSpace(ch)) {
 			return ch;
 		}
 		if (!IsWhiteSpace(chNext)) {
@@ -233,11 +233,11 @@ public:
 		return LexGetNextChar(currentPos + 2, styler);
 	}
 
-	int GetLineNextChar(Sci_Position offset = 0) const noexcept {
-		if (offset == 0 && !IsWhiteSpace(ch)) {
+	int GetLineNextChar(bool ignoreCurrent = false) const noexcept {
+		if (!ignoreCurrent && !IsWhiteSpace(ch)) {
 			return ch;
 		}
-		if (currentPos + 1 == static_cast<Sci_PositionU>(lineStartNext)) {
+		if (currentPos + 1 == lineStartNext) {
 			return '\0';
 		}
 		if (!IsWhiteSpace(chNext)) {

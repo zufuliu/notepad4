@@ -60,7 +60,7 @@ int CheckLLVMVarType(StyleContext &sc, int kwType) noexcept {
 	if (kwType == SCE_LLVM_LABEL || sc.ch == ':') {
 		state = SCE_LLVM_LABEL;
 	} else {
-		const int chNext = sc.GetNextNSChar();
+		const int chNext = sc.GetDocNextChar();
 		if (chNext == '(') {
 			char s[8];
 			sc.GetCurrent(s, sizeof(s));

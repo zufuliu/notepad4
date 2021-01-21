@@ -273,7 +273,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				const bool hasAttr = (lexType == LEX_CPP || lexType == LEX_OBJC || isObjCSource || lexType == LEX_CS);
 				const bool mayAttr = lastWordWasAttr && (numRBrace > 0 || (lineState & LEX_BLOCK_MASK_DEFINE));
 				const bool mayCSAttr = (lexType == LEX_CS) && numSBrace == 1 && numRBrace == 0;
-				const int nextChar = sc.GetNextNSChar();
+				const int nextChar = sc.GetDocNextChar();
 
 				if (lastPPDefineWord) {
 					if (lastPPDefineWord == 2 && strcmp(s, "defined") == 0)

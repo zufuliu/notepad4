@@ -162,7 +162,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						sc.Forward();
 					}
 				} else {
-					const int chNext = sc.GetNextNSChar();
+					const int chNext = sc.GetDocNextChar();
 					if (sc.ch == '!' || chNext == '(') {
 						sc.ChangeState(SCE_JULIA_FUNCTION);
 						if (sc.ch == '!') {

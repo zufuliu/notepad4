@@ -71,7 +71,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_GN_KEYWORD);
-				} else if (sc.GetNextNSChar() == '(') {
+				} else if (sc.GetDocNextChar() == '(') {
 					const bool builtin = keywordLists[1]->InListPrefixed(s, '(');
 					sc.ChangeState(builtin ? SCE_GN_BUILTIN_FUNCTION : SCE_GN_FUNCTION);
 				} else if (keywordLists[2]->InList(s)) {

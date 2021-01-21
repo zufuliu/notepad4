@@ -86,7 +86,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexce
 		return 0;
 	}
 
-	Sci_Position pos = sc.currentPos + 1;
+	Sci_PositionU pos = sc.currentPos + 1;
 	if (sc.chNext == '+' || sc.chNext == '-' || sc.chNext == '#' || sc.chNext == ' ') {
 		++pos;
 	}
@@ -418,7 +418,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						}
 						break;
 					}
-				} else if (sc.ch == ')' && IsASpaceOrTab(sc.chNext) && sc.GetLineNextChar(1) == '(') {
+				} else if (sc.ch == ')' && IsASpaceOrTab(sc.chNext) && sc.GetLineNextChar(true) == '(') {
 					funcState = GoFunction_Return;
 				}
 			}

@@ -122,7 +122,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						kwType = SCE_KOTLIN_INTERFACE;
 					}
 					if (kwType != SCE_KOTLIN_DEFAULT) {
-						const int chNext = sc.GetNextNSChar();
+						const int chNext = sc.GetDocNextChar();
 						if (!((kwType == SCE_KOTLIN_LABEL && chNext == '@') || (kwType != SCE_KOTLIN_LABEL && IsIdentifierStart(chNext)))) {
 							kwType = SCE_KOTLIN_DEFAULT;
 						}
@@ -140,8 +140,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					if (kwType != SCE_KOTLIN_DEFAULT && kwType != SCE_KOTLIN_LABEL) {
 						sc.ChangeState(kwType);
 					} else {
-						const int offset = sc.ch == '?';
-						const int chNext = sc.GetLineNextChar(offset);
+						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							sc.ChangeState(SCE_KOTLIN_FUNCTION);
 						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {

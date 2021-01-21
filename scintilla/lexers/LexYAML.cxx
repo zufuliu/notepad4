@@ -64,7 +64,7 @@ constexpr bool IsYAMLDateTime(int ch, int chNext) noexcept {
 bool IsYAMLText(StyleContext& sc, int braceCount, const WordList *kwList) {
 	const int state = sc.state;
 	const Sci_Position endPos = braceCount? sc.styler.Length() : sc.lineStartNext;
-	const char chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
+	const unsigned char chNext = LexGetNextChar(sc.currentPos, endPos, sc.styler);
 	if (chNext == ':') {
 		// possible key
 		sc.ChangeState(SCE_YAML_TEXT);
@@ -282,7 +282,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 
 				sc.Forward();
-				if (sc.GetNextNSChar() == ':') {
+				if (sc.GetDocNextChar() == ':') {
 					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 				}
@@ -297,7 +297,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.Forward();
 			} else if (sc.ch == '\"') {
 				sc.Forward();
-				if (sc.GetNextNSChar() == ':') {
+				if (sc.GetDocNextChar() == ':') {
 					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 				}
