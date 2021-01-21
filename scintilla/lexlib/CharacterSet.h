@@ -235,6 +235,11 @@ constexpr bool IsTaskMarkerStart(int visibleChars, int visibleCharsBefore, int c
 		&& IsUpperCase(chNext);
 }
 
+constexpr bool IsInvalidUrlChar(int ch) noexcept {
+	return ch <= 32 || ch >= 127
+		|| AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}');
+}
+
 // Simple case functions for ASCII supersets.
 
 template <typename T>
