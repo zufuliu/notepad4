@@ -140,9 +140,6 @@ constexpr int GetLineType(int lineState) noexcept {
 }
 
 void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	// ns-uri-char
-	const CharacterSet setUriChar(CharacterSet::setAlphaNum, "%-#;/?:@&=+$,_.!~*'()[]");
-
 	int visibleChars = 0;
 	bool indentEnded = true;
 	bool hasKey = false;
@@ -270,7 +267,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_YAML_VERBATIM_TAG:
 			if (sc.state == SCE_YAML_VERBATIM_TAG && sc.ch == '>') {
 				sc.ForwardSetState(SCE_YAML_DEFAULT);
-			} else if (!setUriChar.Contains(sc.ch)) {
+			} else if (IsInvalidUrlChar(sc.ch)) {
 				sc.SetState(SCE_YAML_DEFAULT);
 			}
 			break;

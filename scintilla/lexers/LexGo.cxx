@@ -73,9 +73,13 @@ constexpr bool IsFormatSpecifier(uint8_t ch) noexcept {
 		|| ch == 'U';
 }
 
-Sci_Position CheckFormatSpecifier(const StyleContext &sc) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
+	}
+	if (insideUrl && IsHexDigit(sc.chNext)) {
+		// percent encoded URL string
+		return 0;
 	}
 	if (IsASpaceOrTab(sc.chNext) && IsADigit(sc.chPrev)) {
 		// ignore word after percent: "5% x"
@@ -89,7 +93,6 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc) noexcept {
 	while (pos < sc.lineStartNext) {
 		const uint8_t ch = sc.styler[pos];
 		if (IsFormatSpecifier(ch)) {
-			// TODO: fix percent encoded URL string
 			return pos - sc.currentPos + 1;
 		}
 		if (!(IsADigit(ch) || ch == '*' || ch == '.' || ch == '[' || ch == ']')) {
@@ -173,6 +176,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	bool insideUrl = false;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -320,7 +324,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(sc);
+				const Sci_Position length = CheckFormatSpecifier(sc, insideUrl);
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_GO_FORMAT_SPECIFIER);
@@ -332,6 +336,10 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.ForwardSetState(SCE_GO_DEFAULT);
 			} else if (sc.state == SCE_GO_STRING && sc.atLineStart) {
 				sc.SetState(SCE_GO_DEFAULT);
+			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+				insideUrl = true;
+			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+				insideUrl = false;
 			}
 			break;
 
@@ -366,10 +374,12 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_COMMENTBLOCK);
 				sc.Forward();
 			} else if (sc.ch == '\"') {
+				insideUrl = false;
 				sc.SetState(SCE_GO_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_GO_CHARACTER);
 			} else if (sc.ch == '`') {
+				insideUrl = false;
 				sc.SetState(SCE_GO_RAW_STRING);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_GO_NUMBER);
