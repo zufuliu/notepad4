@@ -69,7 +69,7 @@ public:
 	friend class CatalogueModules;
 };
 
-constexpr int SCE_SIMPLE_OPERATOR = 4;
+constexpr int SCE_SIMPLE_OPERATOR = 5;
 constexpr int SimpleLineStateMaskLineComment = 1;
 
 // code folding for braces, brackets, parentheses and consecutive line comments.

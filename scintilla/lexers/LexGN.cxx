@@ -56,6 +56,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	while (sc.More()) {
 		switch (sc.state) {
 		case SCE_GN_OPERATOR:
+		case SCE_GN_OPERATOR2:
 			sc.SetState(SCE_GN_DEFAULT);
 			break;
 
@@ -86,12 +87,12 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GN_ESCAPECHAR);
 				sc.Forward((escSeq.digitsLeft == 1)? 1 : 2);
 			} else if (sc.ch == ':' || sc.ch == '*') {
-				sc.SetState(SCE_GN_OPERATOR);
+				sc.SetState(SCE_GN_OPERATOR2);
 				sc.ForwardSetState(SCE_GN_STRING);
 				continue;
 			} else if (sc.ch == '$') {
 				if (sc.chNext == '{') {
-					sc.SetState(SCE_GN_OPERATOR);
+					sc.SetState(SCE_GN_OPERATOR2);
 					sc.Forward();
 					++braceCount;
 					expansionLevel = braceCount;
@@ -157,7 +158,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_GN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				sc.SetState(SCE_GN_OPERATOR);
+				sc.SetState(expansionLevel ? SCE_GN_OPERATOR2 : SCE_GN_OPERATOR);
 				if (sc.ch == '{') {
 					++braceCount;
 				} else if (sc.ch == '}') {
