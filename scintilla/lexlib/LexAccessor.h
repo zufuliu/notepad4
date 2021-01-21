@@ -272,19 +272,19 @@ Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, boo
 Sci_PositionU LexGetRange(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) noexcept;
 Sci_PositionU LexGetRangeLowered(Sci_Position startPos, LexAccessor &styler, const CharacterSet &charSet, char *s, Sci_PositionU len) noexcept;
 
-inline char LexGetPrevChar(Sci_Position endPos, LexAccessor &styler) noexcept {
+inline unsigned char LexGetPrevChar(Sci_Position endPos, LexAccessor &styler) noexcept {
 	do {
 		--endPos;
-		const char ch = styler.SafeGetCharAt(endPos);
+		const unsigned char ch = styler.SafeGetCharAt(endPos);
 		if (!IsWhiteSpace(ch)) {
 			return ch;
 		}
 	} while (true);
 }
 
-inline char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept {
+inline unsigned char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept {
 	do {
-		const char ch = styler.SafeGetCharAt(startPos);
+		const unsigned char ch = styler.SafeGetCharAt(startPos);
 		if (!IsWhiteSpace(ch)) {
 			return ch;
 		}
@@ -292,9 +292,9 @@ inline char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) noexcept 
 	} while (true);
 }
 
-inline char LexGetNextChar(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
+inline unsigned char LexGetNextChar(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
 	while (startPos < endPos) {
-		const char ch = styler[startPos];
+		const unsigned char ch = styler[startPos];
 		if (!IsWhiteSpace(ch)) {
 			return ch;
 		}

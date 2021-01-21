@@ -137,7 +137,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							kwType = SCE_RUST_UNION;
 						}
 						if (kwType != SCE_RUST_DEFAULT) {
-							const int chNext = sc.GetNextNSChar();
+							const int chNext = sc.GetDocNextChar();
 							if (!IsIdentifierStart(chNext)) {
 								kwType = SCE_RUST_DEFAULT;
 							}
@@ -160,7 +160,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (keywordLists[7]->InList(s)) {
 						sc.ChangeState(SCE_RUST_CONSTANT);
 					} else {
-						const int chNext = sc.GetNextNSChar();
+						const int chNext = sc.GetDocNextChar();
 						if (chNext == '(') {
 							sc.ChangeState((kwType == SCE_RUST_FUNCTION_DEFINE)? kwType : SCE_RUST_FUNCTION);
 						} else if (chNext == '!') {

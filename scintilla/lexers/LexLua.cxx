@@ -213,7 +213,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.ChangeState(SCE_LUA_WORD7);
 				} else if (keywords8.InList(s)) {
 					sc.ChangeState(SCE_LUA_WORD8);
-				} else if (sc.GetNextNSChar() == '(') {
+				} else if (sc.GetDocNextChar() == '(') {
 					sc.ChangeState(SCE_LUA_FUNCTION);
 				}
 				sc.SetState(SCE_LUA_DEFAULT);

@@ -133,7 +133,7 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 				} else if (function2.InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_MAT_FUNCTION2);
 				} else {
-					const int chNext = sc.GetNextNSChar();
+					const int chNext = sc.GetDocNextChar();
 					if (chNext == '(') {
 						sc.ChangeState(SCE_MAT_FUNCTION);
 					}

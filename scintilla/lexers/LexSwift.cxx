@@ -165,8 +165,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					if (kwType != SCE_SWIFT_DEFAULT) {
 						sc.ChangeState(kwType);
 					} else {
-						const int offset = sc.ch == '?';
-						const int chNext = sc.GetLineNextChar(offset);
+						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							sc.ChangeState(SCE_SWIFT_FUNCTION);
 						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {

@@ -59,7 +59,7 @@ constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 
 bool IsTOMLKey(StyleContext& sc, int braceCount, const WordList *kwList) {
 	if (braceCount) {
-		const char chNext = LexGetNextChar(sc.currentPos, sc.styler.Length(), sc.styler);
+		const int chNext = sc.GetDocNextChar();
 		if (chNext == '=' || chNext == '.' || chNext == '-') {
 			sc.ChangeState(SCE_TOML_KEY);
 			return true;

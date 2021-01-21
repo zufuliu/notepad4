@@ -96,7 +96,7 @@ void ColouriseCmakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_CMAKE_IDENTIFIER:
 			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-')) {
-				const int chNext = sc.GetNextNSChar();
+				const int chNext = sc.GetDocNextChar();
 				if (chNext == '(') {
 					// command, function and macro are case insensitive
 					// see Command Invocations: space* identifier space* '(' arguments ')'

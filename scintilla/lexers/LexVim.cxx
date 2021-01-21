@@ -117,7 +117,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_VIM_COMMANDS);
-				} else if (sc.GetNextNSChar() == '(') {
+				} else if (sc.GetDocNextChar() == '(') {
 					sc.ChangeState(SCE_VIM_FUNCTION);
 				}
 				sc.SetState(SCE_VIM_DEFAULT);

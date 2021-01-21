@@ -110,7 +110,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (skipType) {
 					s[len - 1] = '\0';
 				}
-				if (visibleChars == len && sc.GetNextNSChar() == ':') {
+				if (visibleChars == len && sc.GetLineNextChar() == ':') {
 					sc.ChangeState(SCE_B_LABEL);
 					sc.SetState(SCE_B_DEFAULT);
 				} else

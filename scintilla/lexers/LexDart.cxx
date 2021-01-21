@@ -135,8 +135,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (kwType != SCE_DART_DEFAULT) {
 						sc.ChangeState(kwType);
 					} else {
-						const int offset = sc.ch == '?';
-						const int chNext = sc.GetLineNextChar(offset);
+						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							sc.ChangeState(SCE_DART_FUNCTION);
 						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
