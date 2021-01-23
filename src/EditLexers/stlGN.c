@@ -53,7 +53,7 @@ static EDITSTYLE Styles_GN[] = {
 	{ SCE_GN_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
 	{ SCE_GN_PLACEHOLDER, NP2StyleX_Placeholder, L"fore:#648000" },
 	{ SCE_GN_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_GN_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_GN_OPERATOR, SCE_GN_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexGN = {

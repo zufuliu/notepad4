@@ -1476,16 +1476,16 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		// Code folding
 		SciCall_SetProperty("fold", "1");
-		SciCall_SetProperty("fold.comment", "1");
-		SciCall_SetProperty("fold.preprocessor", "1");
-		SciCall_SetProperty("fold.compact", "0");
+		//SciCall_SetProperty("fold.comment", "1");
+		//SciCall_SetProperty("fold.preprocessor", "1");
+		//SciCall_SetProperty("fold.compact", "0");
 
 		switch (rid) {
 		case NP2LEX_HTML:
 		case NP2LEX_XML:
 			SciCall_SetProperty("fold.html", "1");
-			SciCall_SetProperty("fold.hypertext.comment", "1");
-			SciCall_SetProperty("fold.hypertext.heredoc", "1");
+			//SciCall_SetProperty("fold.hypertext.comment", "1");
+			//SciCall_SetProperty("fold.hypertext.heredoc", "1");
 			break;
 
 		case NP2LEX_CSS:
