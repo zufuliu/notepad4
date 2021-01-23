@@ -131,7 +131,7 @@
 #define NP2STYLE_TripleQuotedString		63447
 #define NP2STYLE_BasicFunction			63448
 #define NP2STYLE_PredefinedVariable		63449
-#define NP2STYLE_DocCommentTagHTML		63450
+
 #define NP2STYLE_ReservedWord			63451
 #define NP2STYLE_EscapeSequence			63452
 #define NP2STYLE_Placeholder			63453

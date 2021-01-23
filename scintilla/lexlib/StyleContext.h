@@ -247,4 +247,6 @@ public:
 	}
 };
 
+bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle);
+
 }

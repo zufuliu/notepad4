@@ -80,6 +80,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	std::vector<int> nestedState;	// string interpolation "\()"
 
 	int visibleChars = 0;
+	int visibleCharsBefore = 0;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
@@ -209,6 +210,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_SWIFT_COMMENTLINEDOC:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_SWIFT_TASKMARKER);
 			}
 			break;
 
@@ -223,6 +226,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.Match('/', '*')) {
 				sc.Forward();
 				++commentLevel;
+			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_SWIFT_TASKMARKER)) {
+				continue;
 			}
 			break;
 
@@ -295,11 +300,13 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (visibleChars == 0) {
 					lineStateLineType = SwiftLineStateMaskLineComment;
 				}
+				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '*' || chNext == ':'  || chNext == '!') ? SCE_SWIFT_COMMENTBLOCKDOC : SCE_SWIFT_COMMENTBLOCK);
 				sc.Forward();
 				commentLevel = 1;
+				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
 				sc.Forward(2);
@@ -365,6 +372,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;
 			visibleChars = 0;
+			visibleCharsBefore = 0;
 			kwType = SCE_SWIFT_DEFAULT;
 		}
 		sc.Forward();

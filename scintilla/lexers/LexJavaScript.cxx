@@ -181,7 +181,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.ForwardSetState(state);
 				continue;
-			} else if (sc.Match('\\', 'u') || (sc.ch == '-' && (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE))) {
+			}
+			if (sc.Match('\\', 'u') || (sc.ch == '-' && (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE))) {
 				sc.Forward();
 			} else if (!IsJsIdentifierChar(sc.ch)) {
 				if (sc.state == SCE_JS_IDENTIFIER) {
@@ -382,9 +383,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.SetState(SCE_JS_COMMENTTAGXML);
 						sc.Forward();
 					}
-				} else if (IsTaskMarkerStart(visibleChars, visibleCharsBefore, sc.chPrev, sc.ch, sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_JS_TASKMARKER);
+				} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JS_TASKMARKER)) {
+					continue;
 				}
 			}
 			break;
@@ -393,15 +393,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_JS_COMMENTTAGXML:
 			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-')) {
 				sc.SetState(escSeq.outerState);
-				continue;
-			}
-			break;
-
-		case SCE_JS_TASKMARKER:
-			if (IsTaskMarkerEnd(sc.ch)) {
-				sc.SetState(escSeq.outerState);
-			} else if (!IsUpperCase(sc.ch)) {
-				sc.ChangeState(escSeq.outerState);
 				continue;
 			}
 			break;
