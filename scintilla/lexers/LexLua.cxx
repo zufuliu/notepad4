@@ -23,10 +23,12 @@
 
 using namespace Scintilla;
 
+namespace {
+
 // Test for [=[ ... ]=] delimiters, returns 0 if it's only a [ or ],
 // return 1 for [[ or ]], returns >=2 for [=[ or ]=] and so on.
 // The maximum number of '=' characters allowed is 254.
-static int LongDelimCheck(const StyleContext &sc) noexcept {
+int LongDelimCheck(const StyleContext &sc) noexcept {
 	int sep = 1;
 	while (sc.GetRelative(sep) == '=' && sep < 0xFF) {
 		sep++;
@@ -36,7 +38,7 @@ static int LongDelimCheck(const StyleContext &sc) noexcept {
 	return 0;
 }
 
-/*static const char * const luaWordListDesc[] = {
+/*const char * const luaWordListDesc[] = {
 	"Keywords",
 	"Basic functions",
 	"String, (table) & math functions",
@@ -48,7 +50,11 @@ static int LongDelimCheck(const StyleContext &sc) noexcept {
 	0
 };*/
 
-static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+constexpr bool IsEscapeSkip(int ch) noexcept {
+	return ch == '"' || ch == '\'' || ch == '\\';
+}
+
+void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -57,16 +63,6 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	const WordList &keywords6 = *keywordLists[5];
 	const WordList &keywords7 = *keywordLists[6];
 	const WordList &keywords8 = *keywordLists[7];
-
-	// Accepts accented characters
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", true);
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", true);
-	// Not exactly following number definition (several dots are seen as OK, etc.)
-	// but probably enough in most cases. [pP] is for hex floats.
-	const CharacterSet setNumber(CharacterSet::setDigits, ".-+abcdefpABCDEFP");
-	const CharacterSet setExponent(CharacterSet::setNone, "eEpP");
-	const CharacterSet setLuaOperator(CharacterSet::setNone, "*/-+()={}~[];<>,.^%:#&|");
-	const CharacterSet setEscapeSkip(CharacterSet::setNone, "\"'\\");
 
 	Sci_Line currentLine = styler.GetLine(startPos);
 	// Initialize long string [[ ... ]] or block comment --[[ ... ]],
@@ -135,11 +131,11 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
 					ln++;
 				const Sci_Position ws1 = ln;
-				if (setWordStart.Contains(sc.GetRelative(ln))) {
+				if (IsIdentifierStartEx(sc.GetRelative(ln))) {
 					int c;
 					int i = 0;
 					char s[128];
-					while (setWord.Contains(c = sc.GetRelative(ln))) {	// get potential label
+					while (IsIdentifierCharEx(c = sc.GetRelative(ln))) {	// get potential label
 						if (i < 127)
 							s[i++] = static_cast<char>(c);
 						ln++;
@@ -171,15 +167,11 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			sc.SetState(SCE_LUA_DEFAULT);
 		} else if (sc.state == SCE_LUA_NUMBER) {
-			// We stop the number definition on non-numerical non-dot non-eEpP non-sign non-hexdigit char
-			if (!setNumber.Contains(sc.ch)) {
+			if (!IsDecimalNumberEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_LUA_DEFAULT);
-			} else if (sc.ch == '-' || sc.ch == '+') {
-				if (!setExponent.Contains(sc.chPrev))
-					sc.SetState(SCE_LUA_DEFAULT);
 			}
 		} else if (sc.state == SCE_LUA_IDENTIFIER) {
-			if (!setWord.Contains(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
@@ -188,10 +180,10 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						sc.SetState(SCE_LUA_DEFAULT);
 						while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
 							sc.Forward();
-						if (setWordStart.Contains(sc.ch)) {
+						if (IsIdentifierStartEx(sc.ch)) {
 							sc.SetState(SCE_LUA_LABEL);
 							sc.Forward();
-							while (setWord.Contains(sc.ch))
+							while (IsIdentifierCharEx(sc.ch))
 								sc.Forward();
 							sc.GetCurrent(s, sizeof(s));
 							if (keywords.InList(s))
@@ -228,7 +220,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					stringWs = 0;
 			}
 			if (sc.ch == '\\') {
-				if (setEscapeSkip.Contains(sc.chNext)) {
+				if (IsEscapeSkip(sc.chNext)) {
 					sc.Forward();
 				} else if (sc.chNext == 'z') {
 					sc.Forward();
@@ -246,7 +238,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					stringWs = 0;
 			}
 			if (sc.ch == '\\') {
-				if (setEscapeSkip.Contains(sc.chNext)) {
+				if (IsEscapeSkip(sc.chNext)) {
 					sc.Forward();
 				} else if (sc.chNext == 'z') {
 					sc.Forward();
@@ -273,7 +265,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
 					sc.Forward();
 				}
-			} else if (setWordStart.Contains(sc.ch)) {
+			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_LUA_IDENTIFIER);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_LUA_STRING);
@@ -303,7 +295,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 			} else if (sc.atLineStart && sc.ch == '$') {
 				sc.SetState(SCE_LUA_PREPROCESSOR);	// Obsolete since Lua 4.0, but still in old code
-			} else if (setLuaOperator.Contains(sc.ch)) {
+			} else if (isoperator(sc.ch) || sc.ch == '#') {
 				sc.SetState(SCE_LUA_OPERATOR);
 			}
 		}
@@ -314,7 +306,7 @@ static void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
 
-static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU lengthDoc = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -383,6 +375,8 @@ static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
+}
+
 }
 
 LexerModule lmLua(SCLEX_LUA, ColouriseLuaDoc, "lua", FoldLuaDoc);

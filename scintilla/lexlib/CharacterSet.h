@@ -21,6 +21,7 @@ public:
 		setAlpha = setLower | setUpper,
 		setAlphaNum = setAlpha | setDigits
 	};
+	//[[deprecated]]
 	CharacterSet(setBase base = setNone, const char *initialSet = "", bool valueAfter_ = false) noexcept;
 	CharacterSet(const CharacterSet &other) = delete;
 	CharacterSet(CharacterSet &&other) = delete;
@@ -205,12 +206,22 @@ constexpr bool isoperator(int ch) noexcept {
 		|| ch == '?' || ch == '!' || ch == '.' || ch == '~';
 }
 
+// isoperator() excludes following eight punctuation: '"', '#', '$', "'", '@', '\\', '_', '`'
+// in most lexers, isoperator(ch) is equivalent to following code:
+// IsAGraphic(ch) && !AnyOf(ch, '#', '$', '@', '\\', '`');
+
+constexpr bool IsAGraphic(int ch) noexcept {
+	// excludes C0 control characters and whitespace
+	return ch > 32 && ch < 127;
+}
+
 constexpr bool IsGraphic(int ch) noexcept {
 	// excludes C0 control characters and whitespace
 	return ch > 32 && ch != 127;
 }
 
 constexpr bool IsPunctuation(int ch) noexcept {
+	//return IsAGraphic(ch) && !IsAlphaNumeric(ch);
 	return (ch > 32 && ch < '0')
 		|| (ch > '9' && ch < 'A')
 		|| (ch > 'Z' && ch < 'a')

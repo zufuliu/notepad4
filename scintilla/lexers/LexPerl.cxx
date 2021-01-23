@@ -26,6 +26,8 @@
 
 using namespace Scintilla;
 
+namespace {
+
 // Info for HERE document handling from perldata.pod (reformatted):
 // ----------------------------------------------------------------
 // A line-oriented form of quoting is based on the shell ``here-doc'' syntax.
@@ -83,7 +85,7 @@ using namespace Scintilla;
 // we also assume SCE_PL_STRING_VAR is the interpolated style with the smallest value
 #define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING)
 
-static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
+bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
 	char s[128];
@@ -91,7 +93,7 @@ static bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList
 	return keywords.InList(s);
 }
 
-static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw,
+int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw,
 	int backFlag, Sci_PositionU backPos, Sci_PositionU endPos) noexcept {
 	// identifiers are recognized by Perl as barewords under some
 	// conditions, the following attempts to do the disambiguation
@@ -141,7 +143,7 @@ static int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_Posit
 	return result;
 }
 
-static void skipWhitespaceComment(const LexAccessor &styler, Sci_PositionU &p) noexcept {
+void skipWhitespaceComment(const LexAccessor &styler, Sci_PositionU &p) noexcept {
 	// when backtracking, we need to skip whitespace and comments
 	while (p > 0) {
 		const int style = styler.StyleAt(p);
@@ -151,7 +153,7 @@ static void skipWhitespaceComment(const LexAccessor &styler, Sci_PositionU &p) n
 	}
 }
 
-static int findPrevLexeme(const LexAccessor &styler, Sci_PositionU &bk, int &style) noexcept {
+int findPrevLexeme(const LexAccessor &styler, Sci_PositionU &bk, int &style) noexcept {
 	// scan backward past whitespace and comments to find a lexeme
 	skipWhitespaceComment(styler, bk);
 	if (bk == 0)
@@ -167,7 +169,7 @@ static int findPrevLexeme(const LexAccessor &styler, Sci_PositionU &bk, int &sty
 	return sz;
 }
 
-static int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept {
+int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	// backtrack to find open '{' corresponding to a '}', balanced
 	// return significant style to be tested for '/' disambiguation
 	int braceCount = 1;
@@ -194,7 +196,7 @@ static int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept 
 	return SCE_PL_DEFAULT;
 }
 
-static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
+int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	// backtrack to classify sub-styles of identifier under test
 	// return sub-style to be tested for '/' disambiguation
 	if (styler.SafeGetCharAt(bk) == '>')	// inputsymbol, like <foo>
@@ -219,7 +221,7 @@ static int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept 
 	return 0;
 }
 
-static int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) noexcept {
+int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) noexcept {
 	// forward scan the current line to classify line for POD style
 	int state = -1;
 	while (pos < endPos) {
@@ -243,7 +245,7 @@ static int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU en
 	return state;
 }
 
-static bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
+bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 	// backtrack to identify if we're starting a subroutine prototype
 	// we also need to ignore whitespace/comments, format is like:
 	//     sub abc::pqr :const :prototype(...)
@@ -300,7 +302,7 @@ static bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 	return (state == SUB_HAS_SUB);
 }
 
-static int actualNumStyle(int numberStyle) noexcept {
+int actualNumStyle(int numberStyle) noexcept {
 	if (numberStyle == PERLNUM_VECTOR || numberStyle == PERLNUM_V_VECTOR) {
 		return SCE_PL_STRING;
 	} else if (numberStyle == PERLNUM_BAD) {
@@ -309,7 +311,7 @@ static int actualNumStyle(int numberStyle) noexcept {
 	return SCE_PL_NUMBER;
 }
 
-static constexpr int opposite(int ch) noexcept {
+constexpr int opposite(int ch) noexcept {
 	if (ch == '(') return ')';
 	if (ch == '[') return ']';
 	if (ch == '{') return '}';
@@ -317,7 +319,7 @@ static constexpr int opposite(int ch) noexcept {
 	return ch;
 }
 
-static bool IsPackageLine(Sci_Line line, LexAccessor &styler) noexcept {
+bool IsPackageLine(Sci_Line line, LexAccessor &styler) noexcept {
 	const Sci_Position pos = styler.LineStart(line);
 	const int style = styler.StyleAt(pos);
 	if (style == SCE_PL_WORD && styler.Match(pos, "package")) {
@@ -326,7 +328,7 @@ static bool IsPackageLine(Sci_Line line, LexAccessor &styler) noexcept {
 	return false;
 }
 
-static int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) noexcept {
+int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) noexcept {
 	const int lvl = static_cast<unsigned char>(styler.SafeGetCharAt(pos + 5));
 	if (lvl >= '1' && lvl <= '4') {
 		return lvl - '0';
@@ -334,7 +336,7 @@ static int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) noexcept {
 	return 0;
 }
 
-static int InputSymbolScan(StyleContext &sc) noexcept {
+int InputSymbolScan(StyleContext &sc) noexcept {
 	// forward scan for matching > on same line; file handles
 	int c;
 	int sLen = 0;
@@ -350,14 +352,18 @@ static int InputSymbolScan(StyleContext &sc) noexcept {
 	return 0;
 }
 
-static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = false) {
+constexpr bool IsPerlSpecialVar(int ch) noexcept {
+	return AnyOf(ch, '"', '$', ';', '<', '>', '&', '`', '\'', '+', ',', '.', '/', '\\', '%', ':', '=', '~', '!', '?', '@', '[', ']');
+}
+
+constexpr bool IsPerlControlVar(int ch) noexcept {
+	return AnyOf(ch, 'A', 'C', 'D', 'E', 'F', 'H', 'I', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'V', 'W', 'X');
+}
+
+void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = false) {
 	// interpolate a segment (with no active backslashes or delimiters within)
 	// switch in or out of an interpolation style or continue current style
 	// commit variable patterns if found, trim segment, repeat until done
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", true);
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", true);
-	const CharacterSet setSpecialVar(CharacterSet::setNone, "\"$;<>&`'+,./\\%:=~!?@[]");
-	const CharacterSet setControlVar(CharacterSet::setNone, "ACDEFHILMNOPRSTVWX");
 
 	while (maxSeg > 0) {
 		bool isVar = false;
@@ -377,11 +383,11 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 			}
 			if (maxSeg > sLen) {
 				const int c = sc.GetRelativeCharacter(sLen);
-				if (setWordStart.Contains(c)) {	// word (various)
+				if (IsIdentifierStartEx(c)) {	// word (various)
 					sLen++;
 					isVar = true;
 					while (maxSeg > sLen) {
-						if (!setWord.Contains(sc.GetRelativeCharacter(sLen)))
+						if (!IsIdentifierCharEx(sc.GetRelativeCharacter(sLen)))
 							break;
 						sLen++;
 					}
@@ -406,7 +412,7 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 					isVar = true;
 					while ((maxSeg > sLen) && IsADigit(sc.GetRelativeCharacter(sLen)))
 						sLen++;
-				} else if (setSpecialVar.Contains(c)) {	// $ special variables
+				} else if (IsPerlSpecialVar(c)) {	// $ special variables
 					sLen++;
 					isVar = true;
 				} else if (!isPattern && ((c == '(') || (c == ')') || (c == '|'))) {	// $ additional
@@ -414,7 +420,7 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 					isVar = true;
 				} else if (c == '^') {	// $^A control-char style
 					sLen++;
-					if ((maxSeg > sLen) && setControlVar.Contains(sc.GetRelativeCharacter(sLen))) {
+					if ((maxSeg > sLen) && IsPerlControlVar(sc.GetRelativeCharacter(sLen))) {
 						sLen++;
 						isVar = true;
 					}
@@ -443,35 +449,74 @@ static void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = fa
 		sc.SetState(sc.state - INTERPOLATE_SHIFT);
 }
 
+constexpr bool IsPerlSingleCharOperator(int ch) noexcept {
+	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B',  'M', 'A', 'C');
+}
 
-static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+constexpr bool IsPerlOperator(int ch) noexcept {
+	// lexing of "%*</" operators is non-trivial; these are missing in the set below
+	return AnyOf(ch, '^', '&', '\\', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>',  ',', '?', '!', '.', '~');
+}
+
+constexpr bool IsPerlQDelimiter(int ch) noexcept {
+	return ch == 'q' || ch == 'r' || ch == 'w' || ch == 'x';
+}
+
+constexpr bool IsPerlModifiers(int ch) noexcept {
+	return IsAlpha(ch);
+}
+
+constexpr bool IsPerlPreferRE(int ch) noexcept {
+	return ch == '*' || ch == '/' || ch == '<' || ch == '%';
+}
+
+// IsPerlArrayChar() and IsPerlHashChar() also accepts chars for special vars like $_,
+// which are then truncated when the next char does not match IsPerlVarChar()
+
+constexpr bool IsPerlVarChar(int ch) noexcept {
+	return IsIdentifierCharEx(ch) || ch == '#' || ch == '$' || ch == '\'';
+}
+
+constexpr bool IsPerlArrayChar(int ch) noexcept {
+	return IsAlpha(ch) || AnyOf(ch, '#', '$', '_', '+', '-') || ch >= 0x80;
+}
+
+constexpr bool IsPerlHashChar(int ch) noexcept {
+	return IsAlpha(ch) || AnyOf(ch, '#', '$', '_', '!', '^', '+', '-') || ch >= 0x80;
+}
+
+constexpr bool IsPerlPodChar(int ch) noexcept {
+	return IsPerlModifiers(ch);
+}
+
+constexpr bool IsPerlNonHereDoc(int ch) noexcept {
+	return IsADigit(ch) || ch == '=' || ch == '$' || ch == '@';
+}
+
+constexpr bool IsPerlHereDocDelimiter(int ch) noexcept {
+	return IsIdentifierChar(ch);
+}
+
+constexpr bool IsPerlSubPrototype(int ch) noexcept {
+	return AnyOf(ch, '\\', '[', '$', '@', '%', '&', '*', '+', ']', ';', '_', ' ', '\t');
+}
+
+constexpr bool IsPerlRepetition(int ch) noexcept {
+	return IsADigit(ch) || ch == ')' || ch == '"' || ch == '\'';
+}
+
+constexpr bool IsPerlFormatStart(int ch) noexcept {
+	return IsIdentifierStart(ch) || ch == '=';
+}
+
+constexpr bool IsPerlFormatChar(int ch) noexcept {
+	return IsPerlHereDocDelimiter(ch);
+}
+
+void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	// keywords that forces /PATTERN/ at all times; should track vim's behaviour
 	const WordList &reWords = *keywordLists[1];
-
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", true);
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", true);
-
-	// charset classes
-	const CharacterSet setSingleCharOp(CharacterSet::setNone, "rwxoRWXOezsfdlpSbctugkTBMAC");
-	// lexing of "%*</" operators is non-trivial; these are missing in the set below
-	const CharacterSet setPerlOperator(CharacterSet::setNone, "^&\\()-+=|{}[]:;>,?!.~");
-	const CharacterSet setQDelim(CharacterSet::setNone, "qrwx");
-	const CharacterSet setModifiers(CharacterSet::setAlpha);
-	const CharacterSet setPreferRE(CharacterSet::setNone, "*/<%");
-	// setArray and setHash also accepts chars for special vars like $_,
-	// which are then truncated when the next char does not match setVar
-	const CharacterSet setVar(CharacterSet::setAlphaNum, "#$_'", true);
-	const CharacterSet setArray(CharacterSet::setAlpha, "#$_+-", true);
-	const CharacterSet setHash(CharacterSet::setAlpha, "#$_!^+-", true);
-	const CharacterSet &setPOD = setModifiers;
-	const CharacterSet setNonHereDoc(CharacterSet::setDigits, "=$@");
-	const CharacterSet setHereDocDelim(CharacterSet::setAlphaNum, "_");
-	const CharacterSet setSubPrototype(CharacterSet::setNone, "\\[$@%&*+];_ \t");
-	const CharacterSet setRepetition(CharacterSet::setDigits, ")\"'");
-	// for format identifiers
-	const CharacterSet setFormatStart(CharacterSet::setAlpha, "_=");
-	const CharacterSet &setFormat = setHereDocDelim;
 
 	// Lexer for perl often has to backtrack to start of current style to determine
 	// which characters are being used as quotes, how deeply nested is the
@@ -634,14 +679,14 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			backPos = sc.currentPos;
 			break;
 		case SCE_PL_IDENTIFIER:		// identifier, bareword, inputsymbol
-			if ((!setWord.Contains(sc.ch) && sc.ch != '\'')
+			if ((!IsIdentifierCharEx(sc.ch) && sc.ch != '\'')
 				|| sc.Match('.', '.')
 				|| sc.chPrev == '>') {	// end of inputsymbol
 				sc.SetState(SCE_PL_DEFAULT);
 			}
 			break;
 		case SCE_PL_WORD:		// keyword, plus special cases
-			if (!setWord.Contains(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[100];
 				sc.GetCurrent(s, sizeof(s));
 				if ((strcmp(s, "__DATA__") == 0) || (strcmp(s, "__END__") == 0)) {
@@ -664,7 +709,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_SYMBOLTABLE:
 			if (sc.Match(':', ':')) {	// skip ::
 				sc.Forward();
-			} else if (!setVar.Contains(sc.ch)) {
+			} else if (!IsPerlVarChar(sc.ch)) {
 				if (sc.LengthCurrent() == 1) {
 					// Special variable: $(, $_ etc.
 					sc.Forward();
@@ -729,7 +774,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (numState == PERLNUM_VECTOR || numState == PERLNUM_V_VECTOR) {
 				if (IsADigit(sc.ch))	// vector
 					break;
-				if (setWord.Contains(sc.ch) && dotCount == 0) {	// change to word
+				if (IsIdentifierCharEx(sc.ch) && dotCount == 0) {	// change to word
 					sc.ChangeState(SCE_PL_IDENTIFIER);
 					break;
 				}
@@ -784,7 +829,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.Forward(ws_skip + 1);
 					HereDoc.Quote = delim_ch;
 					HereDoc.Quoted = true;
-				} else if ((ws_skip == 0 && setNonHereDoc.Contains(sc.chNext))
+				} else if ((ws_skip == 0 && IsPerlNonHereDoc(sc.chNext))
 					|| ws_skip > 0) {
 					// left shift << or <<= operator cases
 					// restore position if operator
@@ -819,7 +864,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 						}
 					}
 				} else { // an unquoted here-doc delimiter, no extended charsets
-					if (setHereDocDelim.Contains(sc.ch)) {
+					if (IsPerlHereDocDelimiter(sc.ch)) {
 						HereDoc.Append(sc.ch);
 					} else {
 						sc.SetState(SCE_PL_DEFAULT);
@@ -928,7 +973,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_REGEX:
 		case SCE_PL_STRING_QR:
 			if (Quote.Rep <= 0) {
-				if (!setModifiers.Contains(sc.ch))
+				if (!IsPerlModifiers(sc.ch))
 					sc.SetState(SCE_PL_DEFAULT);
 			} else if (!Quote.Up && !IsASpace(sc.ch)) {
 				Quote.Open(sc.ch);
@@ -965,7 +1010,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_REGSUBST:
 		case SCE_PL_XLAT:
 			if (Quote.Rep <= 0) {
-				if (!setModifiers.Contains(sc.ch))
+				if (!IsPerlModifiers(sc.ch))
 					sc.SetState(SCE_PL_DEFAULT);
 			} else if (!Quote.Up && !IsASpace(sc.ch)) {
 				Quote.Open(sc.ch);
@@ -1075,7 +1120,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_PL_SUB_PROTOTYPE: {
 			int i = 0;
 			// forward scan; must all be valid proto characters
-			while (setSubPrototype.Contains(sc.GetRelative(i)))
+			while (IsPerlSubPrototype(sc.GetRelative(i)))
 				i++;
 			if (sc.GetRelative(i) == ')') {	// valid sub prototype
 				sc.ForwardBytes(i);
@@ -1112,11 +1157,11 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.Forward();
 				sc.SetState(SCE_PL_FORMAT_IDENT);
 			}
-			if (setFormatStart.Contains(sc.ch)) {	// identifier or '='
+			if (IsPerlFormatStart(sc.ch)) {	// identifier or '='
 				if (sc.ch != '=') {
 					do {
 						sc.Forward();
-					} while (setFormat.Contains(sc.ch));
+					} while (IsPerlFormatChar(sc.ch));
 				}
 				while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
 					sc.Forward();
@@ -1193,7 +1238,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else if (sc.ch == 'v') {		// vector
 					numState = PERLNUM_V_VECTOR;
 				}
-			} else if (setWord.Contains(sc.ch)) {
+			} else if (IsIdentifierCharEx(sc.ch)) {
 				// if immediately prefixed by '::', always a bareword
 				sc.SetState(SCE_PL_WORD);
 				if (sc.chPrev == ':' && sc.GetRelative(-2) == ':') {
@@ -1202,25 +1247,25 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				const Sci_PositionU bk = sc.currentPos;
 				Sci_PositionU fw = sc.currentPos + 1;
 				// first check for possible quote-like delimiter
-				if (sc.ch == 's' && !setWord.Contains(sc.chNext)) {
+				if (sc.ch == 's' && !IsIdentifierCharEx(sc.chNext)) {
 					sc.ChangeState(SCE_PL_REGSUBST);
 					Quote.New(2);
-				} else if (sc.ch == 'm' && !setWord.Contains(sc.chNext)) {
+				} else if (sc.ch == 'm' && !IsIdentifierCharEx(sc.chNext)) {
 					sc.ChangeState(SCE_PL_REGEX);
 					Quote.New();
-				} else if (sc.ch == 'q' && !setWord.Contains(sc.chNext)) {
+				} else if (sc.ch == 'q' && !IsIdentifierCharEx(sc.chNext)) {
 					sc.ChangeState(SCE_PL_STRING_Q);
 					Quote.New();
-				} else if (sc.ch == 'y' && !setWord.Contains(sc.chNext)) {
+				} else if (sc.ch == 'y' && !IsIdentifierCharEx(sc.chNext)) {
 					sc.ChangeState(SCE_PL_XLAT);
 					Quote.New(2);
-				} else if (sc.Match('t', 'r') && !setWord.Contains(sc.GetRelative(2))) {
+				} else if (sc.Match('t', 'r') && !IsIdentifierCharEx(sc.GetRelative(2))) {
 					sc.ChangeState(SCE_PL_XLAT);
 					Quote.New(2);
 					sc.Forward();
 					fw++;
-				} else if (sc.ch == 'q' && setQDelim.Contains(sc.chNext)
-					&& !setWord.Contains(sc.GetRelative(2))) {
+				} else if (sc.ch == 'q' && IsPerlQDelimiter(sc.chNext)
+					&& !IsIdentifierCharEx(sc.GetRelative(2))) {
 					if (sc.chNext == 'q') sc.ChangeState(SCE_PL_STRING_QQ);
 					else if (sc.chNext == 'x') sc.ChangeState(SCE_PL_STRING_QX);
 					else if (sc.chNext == 'r') sc.ChangeState(SCE_PL_STRING_QR);
@@ -1229,15 +1274,15 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.Forward();
 					fw++;
 				} else if (sc.ch == 'x' && (sc.chNext == '=' ||	// repetition
-					!setWord.Contains(sc.chNext) ||
-					(setRepetition.Contains(sc.chPrev) && IsADigit(sc.chNext)))) {
+					!IsIdentifierCharEx(sc.chNext) ||
+					(IsPerlRepetition(sc.chPrev) && IsADigit(sc.chNext)))) {
 					sc.ChangeState(SCE_PL_OPERATOR);
 				}
 				// if potentially a keyword, scan forward and grab word, then check
 				// if it's really one; if yes, disambiguation test is performed
 				// otherwise it is always a bareword and we skip a lot of scanning
 				if (sc.state == SCE_PL_WORD) {
-					while (setWord.Contains(static_cast<unsigned char>(styler.SafeGetCharAt(fw))))
+					while (IsIdentifierCharEx(static_cast<unsigned char>(styler.SafeGetCharAt(fw))))
 						fw++;
 					if (!isPerlKeyword(styler.GetStartSegment(), fw, keywords, styler)) {
 						sc.ChangeState(SCE_PL_IDENTIFIER);
@@ -1259,7 +1304,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				Quote.Open(sc.ch);
 				backFlag = BACK_NONE;
 			} else if (sc.ch == '\'') {
-				if (sc.chPrev == '&' && setWordStart.Contains(sc.chNext)) {
+				if (sc.chPrev == '&' && IsIdentifierStartEx(sc.chNext)) {
 					// Archaic call
 					sc.SetState(SCE_PL_IDENTIFIER);
 				} else {
@@ -1288,7 +1333,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				backFlag = BACK_NONE;
 			} else if (sc.ch == '@') {
 				sc.SetState(SCE_PL_ARRAY);
-				if (setArray.Contains(sc.chNext)) {
+				if (IsPerlArrayChar(sc.chNext)) {
 					// no special treatment
 				} else if (sc.chNext == ':' && sc.GetRelative(2) == ':') {
 					sc.ForwardBytes(2);
@@ -1298,7 +1343,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.ChangeState(SCE_PL_OPERATOR);
 				}
 				backFlag = BACK_NONE;
-			} else if (setPreferRE.Contains(sc.ch)) {
+			} else if (IsPerlPreferRE(sc.ch)) {
 				// Explicit backward peeking to set a consistent preferRE for
 				// any slash found, so no longer need to track preferRE state.
 				// Find first previous significant lexed element and interpret.
@@ -1430,7 +1475,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else if (sc.ch == '%') {	// handle '%', hash
 					if (preferRE) {
 						sc.SetState(SCE_PL_HASH);
-						if (setHash.Contains(sc.chNext)) {
+						if (IsPerlHashChar(sc.chNext)) {
 							sc.Forward();
 						} else if (sc.chNext == ':' && sc.GetRelative(2) == ':') {
 							sc.ForwardBytes(2);
@@ -1468,19 +1513,19 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 					}
 				}
 			} else if (sc.ch == '='		// POD
-				&& setPOD.Contains(sc.chNext)
+				&& IsPerlPodChar(sc.chNext)
 				&& sc.atLineStart) {
 				sc.SetState(SCE_PL_POD);
 				backFlag = BACK_NONE;
-			} else if (sc.ch == '-' && setWordStart.Contains(sc.chNext)) {	// extended '-' cases
+			} else if (sc.ch == '-' && IsIdentifierStartEx(sc.chNext)) {	// extended '-' cases
 				const Sci_PositionU bk = sc.currentPos;
 				Sci_PositionU fw = 2;
-				if (setSingleCharOp.Contains(sc.chNext) &&	// file test operators
-					!setWord.Contains(sc.GetRelative(2))) {
+				if (IsPerlSingleCharOperator(sc.chNext) &&	// file test operators
+					!IsIdentifierCharEx(sc.GetRelative(2))) {
 					sc.SetState(SCE_PL_WORD);
 				} else {
 					// nominally a minus and bareword; find extent of bareword
-					while (setWord.Contains(sc.GetRelative(fw)))
+					while (IsIdentifierCharEx(sc.GetRelative(fw)))
 						fw++;
 					sc.SetState(SCE_PL_OPERATOR);
 				}
@@ -1497,7 +1542,7 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 				} else {
 					sc.SetState(SCE_PL_OPERATOR);
 				}
-			} else if (setPerlOperator.Contains(sc.ch)) {	// operators
+			} else if (IsPerlOperator(sc.ch)) {	// operators
 				sc.SetState(SCE_PL_OPERATOR);
 				if (sc.Match('.', '.')) {	// .. and ...
 					sc.Forward();
@@ -1526,9 +1571,9 @@ static void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PL_COMMENTLINE)
 
-static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	const bool foldPOD = styler.GetPropertyInt("fold.perl.pod", 1) != 0;
-	const bool foldPackage = styler.GetPropertyInt("fold.perl.package", 1) != 0;
+void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
+	constexpr bool foldPOD = true;//styler.GetPropertyInt("fold.perl.pod", 1) != 0;
+	constexpr bool foldPackage = true;//styler.GetPropertyInt("fold.perl.package", 1) != 0;
 
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -1678,6 +1723,8 @@ static void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
 	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
+}
+
 }
 
 LexerModule lmPerl(SCLEX_PERL, ColourisePerlDoc, "perl", FoldPerlDoc);

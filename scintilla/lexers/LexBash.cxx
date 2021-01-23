@@ -124,28 +124,54 @@ int GlobScan(StyleContext &sc) noexcept {
 	return 0;
 }
 
+constexpr bool IsBashWordChar(int ch) noexcept {
+	// note that [+-] are often parts of identifiers in shell scripts
+	return IsIdentifierChar(ch) || ch == '.' || ch == '+' || ch == '-';
 }
 
-static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	WordList cmdDelimiter;
-	WordList bashStruct;
-	WordList bashStruct_in;
-	cmdDelimiter.Set("| || |& & && ; ;; ( ) { }", false);
-	bashStruct.Set("if elif fi while until else then do done esac eval", false);
-	bashStruct_in.Set("for case select", false);
+constexpr bool IsBashMetaCharacter(int ch) noexcept {
+	return ch <= 32 || AnyOf(ch, '|', '&', ';', '(', ')', '<', '>');
+}
 
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
-	// note that [+-] are often parts of identifiers in shell scripts
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "._+-");
-	CharacterSet setMetaCharacter(CharacterSet::setNone, "|&;()<> \t\r\n");
-	setMetaCharacter.Add(0);
-	const CharacterSet setBashOperator(CharacterSet::setNone, "^&%()-+=|{}[]:;>,*<?!.~@");
-	const CharacterSet setSingleCharOp(CharacterSet::setNone, "rwxoRWXOezsfdlpSbctugkTBMACahGLNn");
-	const CharacterSet setParam(CharacterSet::setAlphaNum, "$_");
-	const CharacterSet setHereDoc(CharacterSet::setAlpha, "_\\-+!%*,./:?@[]^`{}~");
-	const CharacterSet setHereDoc2(CharacterSet::setAlphaNum, "_-+!%*,./:=?@[]^`{}~");
-	const CharacterSet setLeftShift(CharacterSet::setDigits, "$");
+constexpr bool IsBashOperator(int ch) noexcept {
+	return AnyOf(ch, '^', '&', '%', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>', ',', '*', '<', '?', '!', '.', '~', '@');
+}
+
+constexpr bool IsBashOperatorLast(int ch) noexcept {
+	return IsAGraphic(ch) && !(ch == '/'); // remaining graphic characters
+}
+
+constexpr bool IsBashSingleCharOperator(int ch) noexcept {
+	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B', 'M', 'A', 'C', 'a', 'h', 'G', 'L', 'N', 'n');
+}
+
+constexpr bool IsBashParamChar(int ch) noexcept {
+	return IsIdentifierChar(ch) || ch == '$';
+}
+
+constexpr bool IsBashHereDoc(int ch) noexcept {
+	return IsAlpha(ch) || AnyOf(ch, '_', '\\', '-', '+', '!', '%', '*', ',', '.', '/', ':', '?', '@', '[', ']', '^', '`', '{', '}', '~');
+}
+
+constexpr bool IsBashHereDoc2(int ch) noexcept {
+	return IsAlphaNumeric(ch) || AnyOf(ch, '_', '-', '+', '!', '%', '*', ',', '.', '/', ':', '=', '?', '@', '[', ']', '^', '`', '{', '}', '~');
+}
+
+constexpr bool IsBashLeftShift(int ch) noexcept {
+	return IsADigit(ch) || ch == '$';
+}
+
+constexpr bool IsBashCmdDelimiter(int ch, int chNext) noexcept {
+	if (chNext == 0) {
+		return AnyOf(ch, '|', '&', ';', '(', ')', '{', '}');
+	}
+	return (ch == chNext && (ch == '|' || ch == '&' || ch == ';'))
+		|| (ch == '|' && chNext == '&');
+}
+
+void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const WordList &keywords = *keywordLists[0];
+	const WordList &bashStruct = *keywordLists[1];
 
 	class HereDocCls {	// Class to manage HERE document elements
 	public:
@@ -302,14 +328,11 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_SH_WORD:
 			// "." never used in Bash variable names but used in file names
-			if (!setWord.Contains(sc.ch) || sc.Match('+', '=')) {
-				char s[512];
-				char s2[10];
+			if (!IsBashWordChar(sc.ch) || sc.Match('+', '=')) {
+				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				// allow keywords ending in a whitespace or command delimiter
-				s2[0] = static_cast<char>(sc.ch);
-				s2[1] = '\0';
-				const bool keywordEnds = IsASpace(sc.ch) || cmdDelimiter.InList(s2);
+				const bool keywordEnds = IsASpace(sc.ch) || IsBashCmdDelimiter(sc.ch, 0);
 				// 'in' or 'do' may be construct keywords
 				if (cmdState == BASH_CMD_WORD) {
 					if (strcmp(s, "in") == 0 && keywordEnds)
@@ -337,7 +360,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 				}
 				// 'for'|'case'|'select' needs 'in'|'do' to be highlighted later
-				else if (bashStruct_in.InList(s)) {
+				else if (EqualsAny(s, "for", "case", "select")) {
 					if (cmdState == BASH_CMD_START && keywordEnds)
 						cmdStateNew = BASH_CMD_WORD;
 					else
@@ -369,9 +392,9 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_SH_IDENTIFIER:
 			if (sc.chPrev == '\\') {	// for escaped chars
 				sc.ForwardSetState(SCE_SH_DEFAULT);
-			} else if (!setWord.Contains(sc.ch)) {
+			} else if (!IsBashWordChar(sc.ch)) {
 				sc.SetState(SCE_SH_DEFAULT);
-			} else if (cmdState == BASH_CMD_ARITH && !setWordStart.Contains(sc.ch)) {
+			} else if (cmdState == BASH_CMD_ARITH && !IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
@@ -447,7 +470,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.Forward();
 					HereDoc.Quoted = true;
 					HereDoc.State = 1;
-				} else if (setHereDoc.Contains(sc.chNext) ||
+				} else if (IsBashHereDoc(sc.chNext) ||
 					(sc.chNext == '=' && cmdState != BASH_CMD_ARITH)) {
 					// an unquoted here-doc delimiter, no special handling
 					HereDoc.State = 1;
@@ -456,7 +479,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					sc.ForwardSetState(SCE_SH_DEFAULT);
 				} else if (IsASpace(sc.chNext)) {
 					// eat whitespace
-				} else if (setLeftShift.Contains(sc.chNext) ||
+				} else if (IsBashLeftShift(sc.chNext) ||
 					(sc.chNext == '=' && cmdState == BASH_CMD_ARITH)) {
 					// left shift <<$var or <<= cases
 					sc.ChangeState(SCE_SH_OPERATOR);
@@ -471,7 +494,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 				if ((HereDoc.Quote == '\'' && sc.ch != HereDoc.Quote) ||
 					(HereDoc.Quoted && sc.ch != HereDoc.Quote && sc.ch != '\\') ||
 					(HereDoc.Quote != '\'' && sc.chPrev == '\\') ||
-					(setHereDoc2.Contains(sc.ch))) {
+					(IsBashHereDoc2(sc.ch))) {
 					HereDoc.Append(sc.ch);
 				} else if (HereDoc.Quoted && sc.ch == HereDoc.Quote) {	// closing quote => end of delimiter
 					sc.ForwardSetState(SCE_SH_DEFAULT);
@@ -525,7 +548,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 			}
 			break;
 		case SCE_SH_SCALAR:	// variable names
-			if (!setParam.Contains(sc.ch)) {
+			if (!IsBashParamChar(sc.ch)) {
 				if (sc.LengthCurrent() == 1) {
 					// Special variable: $(, $_ etc.
 					sc.ForwardSetState(SCE_SH_DEFAULT);
@@ -658,12 +681,12 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 #endif
 					}
 				}
-			} else if (setWordStart.Contains(sc.ch)) {
+			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_SH_WORD);
 			//} else if (sc.ch == '#' || (sc.ch == '/' && sc.chNext == '/')) {
 			} else if (sc.ch == '#') {
 				if (stylePrev != SCE_SH_WORD && stylePrev != SCE_SH_IDENTIFIER &&
-					(sc.currentPos == 0 || setMetaCharacter.Contains(sc.chPrev))) {
+					IsBashMetaCharacter(sc.chPrev)) {
 					sc.SetState(SCE_SH_COMMENTLINE);
 				} else {
 					sc.SetState(SCE_SH_WORD);
@@ -681,7 +704,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					} else if (sc.chNext == '#' && !IsASpace(sc.GetRelative(2))) {	// ##a
 						sc.SetState(SCE_SH_IDENTIFIER);
 						sc.Forward(2);
-					} else if (setWordStart.Contains(sc.chNext)) {	// #name
+					} else if (IsIdentifierStart(sc.chNext)) {	// #name
 						sc.SetState(SCE_SH_IDENTIFIER);
 					}
 				}
@@ -729,12 +752,12 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					HereDoc.Indent = false;
 				}
 			} else if (sc.ch == '-'	&&	// one-char file test operators
-				setSingleCharOp.Contains(sc.chNext) &&
-				!setWord.Contains(sc.GetRelative(2)) &&
+				IsBashSingleCharOperator(sc.chNext) &&
+				!IsBashWordChar(sc.GetRelative(2)) &&
 				IsASpace(sc.chPrev)) {
 				sc.SetState(SCE_SH_WORD);
 				sc.Forward();
-			} else if (setBashOperator.Contains(sc.ch)) {
+			} else if (IsBashOperatorLast(sc.ch)) {
 				sc.SetState(SCE_SH_OPERATOR);
 				// globs have no whitespace, do not appear in arithmetic expressions
 				if (cmdState != BASH_CMD_ARITH && sc.ch == '(' && sc.chNext != '(') {
@@ -770,19 +793,14 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 					|| cmdState == BASH_CMD_BODY
 					|| cmdState == BASH_CMD_WORD
 					|| (cmdState == BASH_CMD_TEST && testExprType == 0)) {
-					char s[10];
 					bool isCmdDelim = false;
-					s[0] = static_cast<char>(sc.ch);
-					if (setBashOperator.Contains(sc.chNext)) {
-						s[1] = static_cast<char>(sc.chNext);
-						s[2] = '\0';
-						isCmdDelim = cmdDelimiter.InList(s);
+					if (IsBashOperator(sc.chNext)) {
+						isCmdDelim = IsBashCmdDelimiter(sc.ch, sc.chNext);
 						if (isCmdDelim)
 							sc.Forward();
 					}
 					if (!isCmdDelim) {
-						s[1] = '\0';
-						isCmdDelim = cmdDelimiter.InList(s);
+						isCmdDelim = IsBashCmdDelimiter(sc.ch, 0);
 					}
 					if (isCmdDelim) {
 						cmdState = BASH_CMD_DELIM;
@@ -813,7 +831,7 @@ static void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
-static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
+void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const bool isCShell = styler.GetPropertyInt("lexer.bash.csh") != 0;
 
 	const Sci_PositionU endPos = startPos + length;
@@ -899,6 +917,8 @@ static void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerW
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
 	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
 	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
+}
+
 }
 
 LexerModule lmBash(SCLEX_BASH, ColouriseBashDoc, "bash", FoldBashDoc);

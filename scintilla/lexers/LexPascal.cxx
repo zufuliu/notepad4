@@ -27,6 +27,8 @@
 
 using namespace Scintilla;
 
+namespace {
+
 enum {
 	stateInAsm = 0x1000,
 	stateInProperty = 0x2000,
@@ -37,7 +39,7 @@ enum {
 	stateFoldMaskAll = 0x0FFF
 };
 
-/*static const char * const pascalWordListDesc[] = {
+/*const char * const pascalWordListDesc[] = {
 	"Keywords",
 	"Type",
 	"Function",
@@ -45,7 +47,7 @@ enum {
 	0
 };*/
 
-static void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLineState, bool bSmartHighlighting) {
+void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLineState, bool bSmartHighlighting) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &typewords = *keywordLists[1];
 	const WordList &funwords = *keywordLists[2];
@@ -105,14 +107,12 @@ static void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int
 	sc.SetState(SCE_PAS_DEFAULT);
 }
 
-static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool bSmartHighlighting = styler.GetPropertyInt("lexer.pascal.smart.highlighting", 1) != 0;
+constexpr bool IsPascalOperator(int ch) noexcept {
+	return AnyOf(ch, '#', '$', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '@', '[', ']', '^', '{', '}');
+}
 
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_", true);
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_", true);
-	const CharacterSet setNumber(CharacterSet::setDigits, ".-+eE");
-	const CharacterSet setHexNumber(CharacterSet::setDigits, "abcdefABCDEF");
-	const CharacterSet setOperator(CharacterSet::setNone, "#$&'()*+,-./:;<=>@[]^{}");
+void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	constexpr bool bSmartHighlighting = true; //styler.GetPropertyInt("lexer.pascal.smart.highlighting", 1) != 0;
 
 	Sci_Line curLine = styler.GetLine(startPos);
 	int curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
@@ -129,21 +129,17 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 		// Determine if the current state should terminate.
 		switch (sc.state) {
 		case SCE_PAS_NUMBER:
-			if (!setNumber.Contains(sc.ch) || (sc.ch == '.' && sc.chNext == '.')) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_PAS_DEFAULT);
-			} else if (sc.ch == '-' || sc.ch == '+') {
-				if (sc.chPrev != 'E' && sc.chPrev != 'e') {
-					sc.SetState(SCE_PAS_DEFAULT);
-				}
 			}
 			break;
 		case SCE_PAS_IDENTIFIER:
-			if (!setWord.Contains(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				ClassifyPascalWord(keywordLists, sc, curLineState, bSmartHighlighting);
 			}
 			break;
 		case SCE_PAS_HEXNUMBER:
-			if (!setHexNumber.Contains(sc.ch)) {
+			if (!IsHexDigit(sc.ch)) {
 				sc.SetState(SCE_PAS_DEFAULT);
 			}
 			break;
@@ -180,7 +176,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 			}
 			break;
 		case SCE_PAS_CHARACTER:
-			if (!setHexNumber.Contains(sc.ch) && sc.ch != '$') {
+			if (!IsHexDigit(sc.ch) && sc.ch != '$') {
 				sc.SetState(SCE_PAS_DEFAULT);
 			}
 			break;
@@ -206,7 +202,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 					while (IsHexDigit(sc.ch))
 						sc.Forward();
 				}
-			} else if (setWordStart.Contains(sc.ch)) {
+			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_PAS_IDENTIFIER);
 				//			} else if (sc.ch == '$' && !(curLineState & stateInAsm)) {
 			} else if (sc.ch == '$') {
@@ -235,7 +231,7 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 						sc.Forward(2);
 				} else
 					sc.SetState(SCE_PAS_CHARACTER);
-			} else if (setOperator.Contains(sc.ch) && !(curLineState & stateInAsm)) {
+			} else if (IsPascalOperator(sc.ch) && !(curLineState & stateInAsm)) {
 				sc.SetState(SCE_PAS_OPERATOR);
 			} else if (curLineState & stateInAsm) {
 				sc.SetState(SCE_PAS_ASM);
@@ -243,27 +239,27 @@ static void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int 
 		}
 	}
 
-	if (sc.state == SCE_PAS_IDENTIFIER && setWord.Contains(sc.chPrev)) {
+	if (sc.state == SCE_PAS_IDENTIFIER && IsIdentifierCharEx(sc.chPrev)) {
 		ClassifyPascalWord(keywordLists, sc, curLineState, bSmartHighlighting);
 	}
 
 	sc.Complete();
 }
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_PAS_COMMENT || style == SCE_PAS_COMMENT2;
 }
 
-static constexpr unsigned int GetFoldInPreprocessorLevelFlag(int lineFoldStateCurrent) noexcept {
+constexpr unsigned int GetFoldInPreprocessorLevelFlag(int lineFoldStateCurrent) noexcept {
 	return lineFoldStateCurrent & stateFoldInPreprocessorLevelMask;
 }
 
-static void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned int nestLevel) noexcept {
+void SetFoldInPreprocessorLevelFlag(int &lineFoldStateCurrent, unsigned int nestLevel) noexcept {
 	lineFoldStateCurrent &= ~stateFoldInPreprocessorLevelMask;
 	lineFoldStateCurrent |= nestLevel & stateFoldInPreprocessorLevelMask;
 }
 
-static void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
+void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
 	Sci_PositionU startPos, Accessor &styler) noexcept {
 	const CharacterSet setWord(CharacterSet::setAlpha);
 
@@ -296,12 +292,10 @@ static void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFold
 	}
 }
 
-static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCurrent,
+void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent, int &lineFoldStateCurrent,
 	Sci_Position startPos, Sci_PositionU endPos,
 	Sci_PositionU lastStart, Sci_PositionU currentPos, Accessor &styler) noexcept {
 	char s[128];
-	const CharacterSet setWordStart(CharacterSet::setAlpha, "_");
-	const CharacterSet setWord(CharacterSet::setAlphaNum, "_");
 
 	styler.GetRangeLowered(lastStart, currentPos + 1, s, sizeof(s));
 
@@ -334,7 +328,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 							ignoreKeyword = true;
 						}
 					}
-				} else if (setWordStart.Contains(styler.SafeGetCharAt(j))) {
+				} else if (IsAlpha(styler.SafeGetCharAt(j))) {
 					char s2[16];	// Size of the longest possible keyword + one additional character + null
 					LexGetRangeLowered(j, styler, setWord, s2, sizeof(s2));
 
@@ -397,7 +391,7 @@ static void ClassifyPascalWordFoldPoint(int &levelCurrent, int &lineFoldStateCur
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PAS_COMMENTLINE)
 
-static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
@@ -443,7 +437,7 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		}
 		if (stylePrev == SCE_PAS_WORD && !(lineFoldStateCurrent & stateFoldInPreprocessor)) {
 			if (setWord.Contains(ch) && !setWord.Contains(chNext)) {
-				ClassifyPascalWordFoldPoint(levelCurrent, lineFoldStateCurrent, startPos, endPos, lastStart, i, styler);
+				ClassifyPascalWordFoldPoint(setWord, levelCurrent, lineFoldStateCurrent, startPos, endPos, lastStart, i, styler);
 			}
 		}
 
@@ -464,6 +458,8 @@ static void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initS
 	// If we didn't reach the EOL in previous loop, store line level and whitespace information.
 	// The rest will be filled in later...
 	styler.SetLevel(lineCurrent, levelPrev);
+}
+
 }
 
 LexerModule lmPascal(SCLEX_PASCAL, ColourisePascalDoc, "pascal", FoldPascalDoc);

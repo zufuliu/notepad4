@@ -33,11 +33,14 @@ static KEYWORDLIST Keywords_Bash = {{
 // M4
 "dnl "
 
-, // 1
+, // 1 bashStruct 
+"if elif fi while until else then do done esac eval"
+
+, // 2
 "$PATH $MANPATH $INFOPATH $USER $TMP $TEMP $PRINTER $HOSTNAME $PS1 $SHELL "
 "$JAVA_HOME $JAVA_OPTS $CATALINA_HOME $CATALINA_BASE $CATALINA_OPTS "
 
-, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, NULL, NULL, NULL, NULL, NULL, NULL
 
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
