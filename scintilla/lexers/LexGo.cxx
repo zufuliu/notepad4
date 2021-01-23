@@ -278,16 +278,11 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_GO_COMMENTLINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_GO_DEFAULT);
-			} else if (visibleChars - visibleCharsBefore == 2) {
-				if (IsUpperCase(sc.ch)) {
-					if (IsUpperCase(sc.chNext)) {
-						escSeq.outerState = sc.state;
-						sc.SetState(SCE_GO_TASKMARKER);
-						sc.Forward();
-					}
-				} else if ((sc.ch == '+' && sc.Match("+build")) || sc.Match('g', 'o', ':')) {
-					sc.SetState(SCE_GO_TASKMARKERLINE);
-				}
+			} else if (visibleChars - visibleCharsBefore == 2
+				&& ((sc.ch == '+' && sc.Match("+build")) || sc.Match('g', 'o', ':'))) {
+				sc.SetState(SCE_GO_TASKMARKERLINE);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_GO_TASKMARKER);
 			}
 			break;
 
@@ -297,23 +292,12 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			break;
 
-		case SCE_GO_TASKMARKER:
-			if (IsTaskMarkerEnd(sc.ch)) {
-				sc.SetState(escSeq.outerState);
-			} else if (!IsUpperCase(sc.ch)) {
-				sc.ChangeState(escSeq.outerState);
-				continue;
-			}
-			break;
-
 		case SCE_GO_COMMENTBLOCK:
 			if (sc.Match('*', '/')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_GO_DEFAULT);
-			} else if (visibleChars == 0 && IsUpperCase(sc.ch) && IsUpperCase(sc.chNext)) {
-				escSeq.outerState = sc.state;
-				sc.SetState(SCE_GO_TASKMARKER);
-				sc.Forward();
+			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_GO_TASKMARKER)) {
+				continue;
 			}
 			break;
 
@@ -371,6 +355,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
+				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_GO_COMMENTBLOCK);
 				sc.Forward();
 			} else if (sc.ch == '\"') {
@@ -431,6 +416,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			styler.SetLineState(sc.currentLine, lineStateLineComment);
 			lineStateLineComment = 0;
 			visibleChars = 0;
+			visibleCharsBefore = 0;
 			funcState = GoFunction_None;
 			lineStartCurrent = sc.lineStartNext;
 			identifierStart = 0;

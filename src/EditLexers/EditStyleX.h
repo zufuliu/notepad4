@@ -138,7 +138,7 @@
 #define NP2StyleX_TripleQuotedString	EDITSTYLE_HOLE(TripleQuotedString, L"Triple Quoted String")
 #define NP2StyleX_BasicFunction			EDITSTYLE_HOLE(BasicFunction, L"Basic Function")
 #define NP2StyleX_PredefinedVariable	EDITSTYLE_HOLE(PredefinedVariable, L"Predefined Variable")
-#define NP2StyleX_DocCommentTagHTML		EDITSTYLE_HOLE(DocCommentTagHTML, L"Doc Comment HTML Tag")
+
 #define NP2StyleX_ReservedWord			EDITSTYLE_HOLE(ReservedWord, L"Reserved Word")
 #define NP2StyleX_EscapeSequence		EDITSTYLE_HOLE(EscapeSequence, L"Escape Sequence")
 #define NP2StyleX_Placeholder			EDITSTYLE_HOLE(Placeholder, L"Placeholder")

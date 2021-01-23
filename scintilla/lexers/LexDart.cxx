@@ -65,6 +65,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
+	int visibleCharsBefore = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -179,6 +180,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_DART_COMMENTLINEDOC:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_DART_DEFAULT);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_DART_TASKMARKER);
 			}
 			break;
 
@@ -193,6 +196,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.Match('/', '*')) {
 				sc.Forward();
 				++commentLevel;
+			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_DART_TASKMARKER)) {
+				continue;
 			}
 			break;
 
@@ -277,11 +282,13 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (visibleChars == 0) {
 					lineStateLineType = DartLineStateMaskLineComment;
 				}
+				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '*') ? SCE_DART_COMMENTBLOCKDOC : SCE_DART_COMMENTBLOCK);
 				sc.Forward();
 				commentLevel = 1;
+				visibleCharsBefore = visibleChars;
 			} else if (sc.ch == 'r' && (sc.chNext == '\'' || sc.chNext == '"')) {
 				sc.SetState((sc.chNext == '\'') ? SCE_DART_RAWSTRING_SQ : SCE_DART_RAWSTRING_DQ);
 				sc.Forward(2);
@@ -349,6 +356,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;
 			visibleChars = 0;
+			visibleCharsBefore = 0;
 			kwType = SCE_DART_DEFAULT;
 		}
 		sc.Forward();

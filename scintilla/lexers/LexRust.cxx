@@ -71,6 +71,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int kwType = SCE_RUST_DEFAULT;
 
 	int visibleChars = 0;
+	int visibleCharsBefore = 0;
 	Sci_PositionU charStartPos = 0;
 	EscapeSequence escSeq;
 
@@ -190,6 +191,8 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_RUST_COMMENTLINEDOC:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_RUST_DEFAULT);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_RUST_TASKMARKER);
 			}
 			break;
 
@@ -211,6 +214,8 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				//}
 				sc.Forward();
 				++commentLevel;
+			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_RUST_TASKMARKER)) {
+				continue;
 			}
 			break;
 
@@ -309,6 +314,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (visibleChars == 0) {
 					lineStateLineType = RustLineStateMaskLineComment;
 				}
+				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
 				if (chNext == '!' || (chNext == '*' && sc.GetRelative(3) != '*')) {
@@ -318,6 +324,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 				sc.Forward();
 				commentLevel = 1;
+				visibleCharsBefore = visibleChars;
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_RUST_STRING);
 			} else if (sc.ch == '\'') {
@@ -388,6 +395,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;
 			visibleChars = 0;
+			visibleCharsBefore = 0;
 		}
 		sc.Forward();
 	}

@@ -86,6 +86,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	bool isTransposeOperator = false; // "'"
 
 	int visibleChars = 0;
+	int visibleCharsBefore = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -283,8 +284,11 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_JULIA_COMMENTLINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_JULIA_DEFAULT);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JULIA_TASKMARKER);
 			}
 			break;
+
 		case SCE_JULIA_COMMENTBLOCK:
 			if (sc.Match('=', '#')) {
 				sc.Forward();
@@ -295,6 +299,8 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.Match('#', '=')) {
 				sc.Forward();
 				++commentLevel;
+			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_JULIA_TASKMARKER)) {
+				continue;
 			}
 			break;
 		}
@@ -306,6 +312,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			if (transposeOperator) {
 				sc.SetState(SCE_JULIA_OPERATOR);
 			} else if (sc.ch == '#') {
+				visibleCharsBefore = visibleChars;
 				if (sc.chNext == '=') {
 					commentLevel = 1;
 					sc.SetState(SCE_JULIA_COMMENTBLOCK);
@@ -411,7 +418,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 		}
 
-		if (visibleChars == 0 && !isspacechar(sc.ch)) {
+		if (!isspacechar(sc.ch)) {
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
@@ -422,6 +429,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineComment = 0;
 			visibleChars = 0;
+			visibleCharsBefore = 0;
 		}
 		sc.Forward();
 	}

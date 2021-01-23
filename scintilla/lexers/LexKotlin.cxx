@@ -61,6 +61,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
+	int visibleCharsBefore = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -179,6 +180,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_KOTLIN_COMMENTLINEDOC:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_KOTLIN_DEFAULT);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_KOTLIN_TASKMARKER);
 			}
 			break;
 
@@ -195,8 +198,11 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.Match('/', '*')) {
 				sc.Forward();
 				++commentLevel;
+			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_KOTLIN_TASKMARKER)) {
+				continue;
 			}
 			break;
+
 		case SCE_KOTLIN_COMMENTDOCWORD:
 			if (!IsLowerCase(sc.ch)) {
 				sc.SetState(SCE_KOTLIN_COMMENTBLOCKDOC);
@@ -286,10 +292,12 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				if (visibleChars == 0) {
 					lineStateLineType = KotlinLineStateMaskLineComment;
 				}
+				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
 				sc.SetState((chNext == '*' || chNext == '!') ? SCE_KOTLIN_COMMENTBLOCKDOC : SCE_KOTLIN_COMMENTBLOCK);
 				sc.Forward();
+				visibleCharsBefore = visibleChars;
 				commentLevel = 1;
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
@@ -339,6 +347,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;
 			visibleChars = 0;
+			visibleCharsBefore = 0;
 			kwType = SCE_KOTLIN_DEFAULT;
 		}
 		sc.Forward();
