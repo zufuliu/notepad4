@@ -23,7 +23,7 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_R_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 16;
+	int numBase = 0;
 
 	// highlight any character as escape sequence, no highlight for hex in '\u{hex}' or '\U{hex}'.
 	void resetEscapeState(int state, int chNext) noexcept {
