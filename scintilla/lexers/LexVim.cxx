@@ -34,7 +34,7 @@ constexpr bool IsVimEscapeChar(int ch) noexcept {
 
 struct EscapeSequence {
 	int digitsLeft = 0;
-	int numBase = 16;
+	int numBase = 0;
 
 	bool resetEscapeState(int chNext) noexcept {
 		// https://vimhelp.org/eval.txt.html#string

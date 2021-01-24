@@ -23,7 +23,7 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_GO_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 16;
+	int numBase = 0;
 
 	// highlight any character as escape sequence.
 	void resetEscapeState(int state, int chNext) noexcept {

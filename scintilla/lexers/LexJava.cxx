@@ -23,7 +23,7 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_JAVA_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 16;
+	int numBase = 0;
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
@@ -32,6 +32,7 @@ struct EscapeSequence {
 		}
 		outerState = state;
 		digitsLeft = 1;
+		numBase = 16;
 		if (chNext == 'u') {
 			digitsLeft = 5;
 		} else if (IsOctalDigit(chNext)) {
