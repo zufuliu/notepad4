@@ -567,10 +567,12 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
+	bool detachedBrace = false;
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 		foldPrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
+		detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent - 1, SCE_JS_OPERATOR, SCE_JS_TASKMARKER);
 	}
 
 	int levelNext = levelCurrent;
@@ -581,6 +583,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
+	int visibleChars = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -613,7 +616,9 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 		case SCE_JS_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
-				levelNext++;
+				if (!(ch == '{' && visibleChars == 0 && detachedBrace)) {
+					levelNext++;
+				}
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
@@ -635,12 +640,21 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 			break;
 		}
 
+		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
+			++visibleChars;
+		}
 		if (i == lineEndPos) {
+			detachedBrace = false;
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.packageImport) {
 				levelNext += foldNext.packageImport - foldPrev.packageImport;
+			} else if (visibleChars) {
+				detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent, SCE_JS_OPERATOR, SCE_JS_TASKMARKER);
+				if (detachedBrace) {
+					levelNext++;
+				}
 			}
 
 			const int levelUse = levelCurrent;
@@ -658,6 +672,7 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;
+			visibleChars = 0;
 		}
 	}
 }

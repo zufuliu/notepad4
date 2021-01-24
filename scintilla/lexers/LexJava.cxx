@@ -60,6 +60,10 @@ enum class DocTagState {
 	TagClose,		// </tag>
 };
 
+constexpr bool IsSpaceEquiv(int state) noexcept {
+	return state <= SCE_JAVA_TASKMARKER;
+}
+
 void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 
@@ -370,9 +374,11 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
 	int levelCurrent = SC_FOLDLEVELBASE;
+	bool detachedBrace = false;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 		foldPrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
+		detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent - 1, SCE_JAVA_OPERATOR, SCE_JAVA_TASKMARKER);
 	}
 
 	int levelNext = levelCurrent;
@@ -382,6 +388,7 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
+	int visibleChars = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const int stylePrev = style;
@@ -402,19 +409,30 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		case SCE_JAVA_OPERATOR: {
 			const char ch = styler[i];
 			if (ch == '{' || ch == '[' || ch == '(') {
-				levelNext++;
+				if (!(ch == '{' && visibleChars == 0 && detachedBrace)) {
+					levelNext++;
+				}
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
 		} break;
 		}
 
+		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
+			++visibleChars;
+		}
 		if (i == lineEndPos) {
+			detachedBrace = false;
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.packageImport) {
 				levelNext += foldNext.packageImport - foldPrev.packageImport;
+			} else if (visibleChars) {
+				detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent, SCE_JAVA_OPERATOR, SCE_JAVA_TASKMARKER);
+				if (detachedBrace) {
+					levelNext++;
+				}
 			}
 
 			const int levelUse = levelCurrent;
@@ -432,6 +450,7 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;
+			visibleChars = 0;
 		}
 	}
 }

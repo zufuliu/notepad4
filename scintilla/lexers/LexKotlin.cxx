@@ -50,6 +50,10 @@ enum {
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_KOTLIN_STRING);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_KOTLIN_RAWSTRING);
 
+constexpr bool IsSpaceEquiv(int state) noexcept {
+	return state <= SCE_KOTLIN_TASKMARKER;
+}
+
 void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
@@ -370,9 +374,11 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
 	int levelCurrent = SC_FOLDLEVELBASE;
+	bool detachedBrace = false;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 		foldPrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
+		detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent - 1, SCE_KOTLIN_OPERATOR, SCE_KOTLIN_TASKMARKER);
 	}
 
 	int levelNext = levelCurrent;
@@ -383,6 +389,7 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
+	int visibleChars = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -417,19 +424,30 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_KOTLIN_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
-				levelNext++;
+				if (!(ch == '{' && visibleChars == 0 && detachedBrace)) {
+					levelNext++;
+				}
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
 			break;
 		}
 
+		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
+			++visibleChars;
+		}
 		if (i == lineEndPos) {
+			detachedBrace = false;
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.packageImport) {
 				levelNext += foldNext.packageImport - foldPrev.packageImport;
+			} else if (visibleChars) {
+				detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent, SCE_KOTLIN_OPERATOR, SCE_KOTLIN_TASKMARKER);
+				if (detachedBrace) {
+					levelNext++;
+				}
 			}
 
 			const int levelUse = levelCurrent;
@@ -447,6 +465,7 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;
+			visibleChars = 0;
 		}
 	}
 }
