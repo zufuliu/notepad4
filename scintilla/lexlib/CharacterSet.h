@@ -209,7 +209,7 @@ constexpr bool isoperator(int ch) noexcept {
 		|| ch == '?' || ch == '!' || ch == '.' || ch == '~';
 }
 
-// isoperator() excludes following eight punctuation: '"', '#', '$', "'", '@', '\\', '_', '`'
+// isoperator() excludes following eight punctuation: '"', '#', '$', '\'', '@', '\\', '_', '`'
 // in most lexers, isoperator(ch) is equivalent to following code:
 // IsAGraphic(ch) && !AnyOf(ch, '#', '$', '@', '\\', '`');
 
