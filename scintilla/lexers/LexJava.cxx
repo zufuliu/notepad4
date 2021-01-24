@@ -158,8 +158,8 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							}
 						} else if (sc.Match('[', ']') || sc.Match(':', ':')
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
-							|| IsIdentifierStartEx(sc.chNext)
-							|| (chBeforeIdentifier == '(' && sc.ch == ')' && IsIdentifierCharEx(chNext))) {
+							|| IsIdentifierStartEx(chNext)
+							|| (chBeforeIdentifier == '(' && sc.ch == ')' && IsADigit(chNext))) {
 							// type[]
 							// type::method
 							// type identifier

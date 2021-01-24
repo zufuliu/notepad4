@@ -74,6 +74,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int hashCount = 0;		// count of '#' for raw (byte) string
 	int kwType = SCE_RUST_DEFAULT;
 
+	int chBeforeIdentifier = 0;
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
 	Sci_PositionU charStartPos = 0;
@@ -164,7 +165,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(SCE_RUST_UNION);
 					} else if (keywordLists[7]->InList(s)) {
 						sc.ChangeState(SCE_RUST_CONSTANT);
-					} else {
+					} else if (sc.ch != '.') {
 						const int chNext = sc.GetDocNextChar();
 						if (chNext == '(') {
 							sc.ChangeState((kwType == SCE_RUST_FUNCTION_DEFINE)? kwType : SCE_RUST_FUNCTION);
@@ -173,11 +174,14 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						} else if (kwType != SCE_RUST_DEFAULT) {
 							if (kwType != SCE_RUST_CONSTANT || chNext == ':') {
 								sc.ChangeState(kwType);
+							} else if (chBeforeIdentifier == '[' && sc.ch == ';') {
+								// array: [T; N]
+								sc.ChangeState(SCE_RUST_TYPE);
 							}
 						}
 					}
 				}
-				if (sc.state != SCE_RUST_WORD) {
+				if (sc.state != SCE_RUST_WORD && sc.ch != '.') {
 					kwType = SCE_RUST_DEFAULT;
 				}
 				sc.SetState(SCE_RUST_DEFAULT);
@@ -323,6 +327,9 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_RUST_RAW_STRING);
 					sc.Forward(hashCount + 1);
 				} else {
+					if (sc.chPrev != '.') {
+						chBeforeIdentifier = sc.chPrev;
+					}
 					sc.SetState(SCE_RUST_IDENTIFIER);
 					const int chNext = sc.GetRelative(2);
 					if (IsIdentifierStart(chNext)) {
@@ -346,6 +353,9 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_RUST_RAW_BYTESTRING);
 					sc.Forward(hashCount + 2);
 				} else {
+					if (sc.chPrev != '.') {
+						chBeforeIdentifier = sc.chPrev;
+					}
 					sc.SetState(SCE_RUST_IDENTIFIER);
 				}
 			} else if (sc.ch == '$' && IsIdentifierStart(sc.chNext)) {
@@ -353,6 +363,9 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_RUST_NUMBER);
 			} else if (IsIdentifierStart(sc.ch)) {
+				if (sc.chPrev != '.') {
+					chBeforeIdentifier = sc.chPrev;
+				}
 				sc.SetState(SCE_RUST_IDENTIFIER);
 			} else if (isoperator(sc.ch) || sc.ch == '$' || sc.ch == '@') {
 				sc.SetState(SCE_RUST_OPERATOR);
