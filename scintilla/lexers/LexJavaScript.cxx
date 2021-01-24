@@ -336,7 +336,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					docTagState = DocTagState::None;
 					sc.SetState(SCE_JS_COMMENTTAGAT);
 					sc.ForwardSetState(SCE_JS_COMMENTBLOCKDOC);
-					break;
 				}
 				break;
 			case DocTagState::XmlOpen:
@@ -346,7 +345,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_JS_COMMENTTAGXML);
 					sc.Forward((sc.ch == '/') ? 2 : 1);
 					sc.SetState(SCE_JS_COMMENTLINEDOC);
-					break;
 				}
 				break;
 			default:

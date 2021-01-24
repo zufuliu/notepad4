@@ -63,7 +63,8 @@ bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBe
 		} else if (ch <= 32 && len >= 3 && len < 16 && AnyOf(sc.ch, 'T', 'F', 'N', 'X')) {
 			char s[16];
 			sc.styler.GetRange(sc.currentPos, pos, s, sizeof(s));
-			marker = EqualsAny(s, "TODO", "FIXME", "NOTE", "XXX", "TBD") || StrStartsWith(s, "NOLINT");
+			marker = EqualsAny(s, "TODO", "FIXME", "NOTE", "XXX", "TBD")
+				|| StrStartsWith(s, "NOLINT"); // clang-tidy: NOLINT, NOLINTNEXTLINE
 		}
 
 		visibleChars += len;

@@ -32,6 +32,7 @@
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
+      <File Name="../../scintilla/lexers/LexJava.cxx"/>
       <File Name="../../scintilla/lexers/LexJavaScript.cxx"/>
       <File Name="../../scintilla/lexers/LexJSON.cxx"/>
       <File Name="../../scintilla/lexers/LexJulia.cxx"/>

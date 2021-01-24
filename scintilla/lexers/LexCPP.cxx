@@ -1,15 +1,10 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for C, C++, C#, Java, Rescouce Script, Asymptote, D, Objective C/C++, PHP
-//! haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL/AIDL
+//! Lexer for C, C++, C#, Rescouce Script, Asymptote, D, Objective C/C++, PHP
+//! haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL
 
 #include <cassert>
 #include <cstring>
-
-#include <string>
-#include <vector>
-#include <map>
-#include <algorithm>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -21,22 +16,18 @@
 #include "StyleContext.h"
 #include "CharacterSet.h"
 #include "LexerModule.h"
-//#include "SparseState.h"
 
 using namespace Scintilla;
 
 #define		LEX_CPP		1	// C/C++
-#define		LEX_JAVA	2	// Java
 #define		LEX_CS		3	// C#
 #define		LEX_RC		5	// Resouce Script
-#define		LEX_IDL		6	// Interface Definition Language
 #define		LEX_D		7	// D
 #define		LEX_ASY		8	// Asymptote
 #define		LEX_OBJC	10	// Objective C/C++
 #define		LEX_HX		12	// haXe
 #define		LEX_GROOVY	13	// Groovy Script
 #define		LEX_SCALA	14	// Scala Script
-//#define		LEX_AIDL	27	// Android Interface Definition Language
 #define		LEX_PHP		29
 #define		LEX_AWK		51	// Awk
 #define		LEX_JAM		52	// Jamfile
@@ -45,13 +36,13 @@ static constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocesso
 	return lex == LEX_CPP || lex == LEX_CS || lex == LEX_RC || lex == LEX_OBJC;
 }
 static constexpr bool HasAnotation(int lex) noexcept { // @anotation
-	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool HasRegex(int lex) noexcept { // Javascript /regex/
 	return lex == LEX_GROOVY || lex == LEX_HX || lex == LEX_AWK;
 }
 static constexpr bool HasTripleVerbatim(int lex) noexcept {
-	return lex == LEX_JAVA || lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool SharpComment(int lex) noexcept {
 	return lex == LEX_AWK || lex == LEX_JAM;
@@ -60,7 +51,7 @@ static constexpr bool HasXML(int lex) noexcept {
 	return lex == LEX_SCALA;
 }
 static constexpr bool SquareBraceAfterType(int lex) noexcept {
-	return lex == LEX_JAVA || lex == LEX_CS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_CS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool IsDStrFix(int ch) noexcept {
 	return ch == 'c' || ch == 'w' || ch == 'd';

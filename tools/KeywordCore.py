@@ -8,6 +8,7 @@ from enum import IntFlag
 from FileGenerator import Regenerate
 
 AllKeywordAttrList = {}
+JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
 
 # see EditLexer.h
@@ -368,7 +369,7 @@ def parse_dart_api_file(path):
 			keywordMap['class'] = [item[1] for item in items]
 
 			items = re.findall(r'(enum)\s+(\w+)', doc)
-			keywordMap['enum'] = [item[1] for item in items]
+			keywordMap['enumeration'] = [item[1] for item in items]
 
 			items = re.findall(r'@(\w+\(?)', doc)
 			keywordMap['metadata'] = items
@@ -380,7 +381,7 @@ def parse_dart_api_file(path):
 		'keywords',
 		'types',
 		'class',
-		'enum',
+		'enumeration',
 		'metadata',
 		'function',
 	])
@@ -388,7 +389,7 @@ def parse_dart_api_file(path):
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
-		('enum', keywordMap['enum'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('metadata', keywordMap['metadata'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
@@ -494,6 +495,49 @@ def parse_go_api_file(path):
 		('variables', keywordMap['variables'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('package', keywordMap['package'], KeywordAttr.NoLexer),
+	]
+
+def parse_java_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'types', 'directive'):
+			keywordMap[key] = doc.split()
+		elif key == 'api':
+			classes = re.findall(r'class\s+(\w+)', doc)
+			interfaces = re.findall(r'interface\s+(\w+)', doc)
+			enumeration = re.findall(r'enum\s+(\w+)', doc)
+			annotations = re.findall(r'@(\w+)', doc)
+
+			keywordMap['class'] = classes
+			keywordMap['interface'] = interfaces
+			keywordMap['enumeration'] = enumeration
+			keywordMap['annotation'] = annotations
+		elif key == 'javadoc':
+			items = re.findall(r'@(\w+)', doc)
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'directive',
+		'class',
+		'interface',
+		'enumeration',
+	])
+
+	JavaKeywordMap.update(keywordMap)
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('directive', keywordMap['directive'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('function', [], KeywordAttr.Default),
+		('Javadoc', keywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 
 def parse_javascript_api_file(path):
@@ -643,7 +687,7 @@ def parse_kotlin_api_file(path):
 
 			keywordMap['class'] = classes
 			keywordMap['interface'] = interfaces
-			keywordMap['enum'] = enums
+			keywordMap['enumeration'] = enums
 			keywordMap['annotation'] = annotations
 
 			items = re.findall(r'fun\s+.*?(\w+\()', doc, re.DOTALL)
@@ -652,18 +696,25 @@ def parse_kotlin_api_file(path):
 			items = doc.split()
 		keywordMap[key] = items
 
+	if True:
+		# for JVM target
+		keywordMap['class'].update(JavaKeywordMap['class'])
+		keywordMap['interface'].extend(JavaKeywordMap['interface'])
+		keywordMap['enumeration'].update(JavaKeywordMap['enumeration'])
+		keywordMap['annotation'].update(JavaKeywordMap['annotation'])
+
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
 		'class',
 		'interface',
-		'enum',
+		'enumeration',
 		'annotation',
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('interface', keywordMap['interface'], KeywordAttr.Default),
-		('enum', keywordMap['enum'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
