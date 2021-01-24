@@ -289,11 +289,18 @@ bool HasDetachedBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operator
 		C++:
 			[lambda-capture]
 				{ body }
+		C#:
+			=> { lambda }
+		Objective-C:
+			^{ block }
 		Rust:
 			fn name() -> optional?
 				{ body }
+		Scala:
+			class name[T]
+				{ body }
 		*/
-		return AnyOf(ch, ')', '>', '=', ':', ']', '?');
+		return AnyOf(ch, ')', '>', '=', ':', ']', '^', '?');
 	}
 	if (ignoreStyle) {
 		while (startPos < pos) {

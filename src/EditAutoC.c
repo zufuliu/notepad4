@@ -1498,6 +1498,8 @@ static inline int GetCharacterStyle(int iLexer) {
 		return SCE_JAVA_CHARACTER;
 	case SCLEX_GO:
 		return SCE_GO_CHARACTER;
+	case SCLEX_KOTLIN:
+		return SCE_KOTLIN_CHARACTER;
 	case SCLEX_RUST:
 		return SCE_RUST_CHARACTER;
 	default:
