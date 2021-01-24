@@ -261,13 +261,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_DART_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				const int outerState = escSeq.outerState;
-				if (sc.ch == '\\' && escSeq.resetEscapeState(outerState, sc.chNext)) {
-					sc.Forward();
-				} else {
-					sc.SetState(outerState);
-					continue;
-				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 

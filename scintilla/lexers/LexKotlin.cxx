@@ -254,22 +254,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_KOTLIN_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				const int outerState = escSeq.outerState;
-				if (outerState == SCE_KOTLIN_STRING) {
-					if (sc.ch == '\\' && escSeq.resetEscapeState(outerState, sc.chNext)) {
-						sc.Forward();
-					} else {
-						sc.SetState(outerState);
-						if (sc.ch == '\"') {
-							sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
-						}
-					}
-				} else {
-					sc.SetState(outerState);
-					if (sc.ch == '\'') {
-						sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
-					}
-				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 
