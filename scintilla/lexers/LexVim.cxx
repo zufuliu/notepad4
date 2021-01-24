@@ -139,17 +139,8 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_VIM_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				if (sc.ch == '\\') {
-					if (!escSeq.resetEscapeState(sc.chNext)) {
-						sc.SetState(SCE_VIM_STRING);
-					}
-					sc.Forward();
-				} else {
-					sc.SetState(SCE_VIM_STRING);
-					if (sc.ch == '\"') {
-						sc.ForwardSetState(SCE_VIM_DEFAULT);
-					}
-				}
+				sc.SetState(SCE_VIM_STRING);
+				continue;
 			}
 			break;
 

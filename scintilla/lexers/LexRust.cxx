@@ -260,29 +260,8 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_RUST_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				const int outerState = escSeq.outerState;
-				if (outerState == SCE_RUST_STRING || outerState == SCE_RUST_BYTESTRING) {
-					if (sc.ch == '\\') {
-						if (IsEOLChar(sc.chNext)) {
-							sc.SetState(SCE_RUST_LINE_CONTINUE);
-							sc.ForwardSetState(outerState);
-						} else {
-							escSeq.resetEscapeState(outerState, sc.chNext);
-							sc.Forward();
-						}
-					} else {
-						sc.SetState(outerState);
-						if (sc.ch == '\"') {
-							sc.ForwardSetState(SCE_RUST_DEFAULT);
-						}
-					}
-				} else {
-					sc.SetState(outerState);
-					if (sc.ch == '\'') {
-						sc.ForwardSetState(SCE_RUST_DEFAULT);
-					}
-					continue;
-				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 

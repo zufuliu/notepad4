@@ -199,6 +199,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_TOML_DEFAULT);
 			}
 			break;
+
 		case SCE_TOML_STRING_DQ:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_TOML_DEFAULT);
@@ -221,6 +222,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
 			break;
+
 		case SCE_TOML_TRIPLE_STRING_DQ:
 			if (sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
@@ -234,14 +236,8 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				const int outerState = escSeq.outerState;
-				if (sc.ch == '\\') {
-					escSeq.resetEscapeState(outerState, sc.chNext);
-					sc.Forward();
-				} else {
-					sc.SetState(outerState);
-					continue;
-				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 

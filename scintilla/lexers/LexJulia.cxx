@@ -235,15 +235,11 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.ForwardSetState(SCE_JULIA_DEFAULT);
 			}
 			break;
+
 		case SCE_JULIA_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				const int outerState = escSeq.outerState;
-				if (outerState != SCE_JULIA_CHARACTER && sc.ch == '\\' && escSeq.resetEscapeState(outerState, sc.chNext)) {
-					sc.Forward();
-				} else {
-					sc.SetState(outerState);
-					continue;
-				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 

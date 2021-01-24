@@ -178,15 +178,8 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_LLVM_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				const int outerState = escSeq.outerState;
-				if (sc.ch == '\\' && escSeq.resetEscapeState(outerState, sc.chNext)) {
-					sc.Forward();
-				} else {
-					sc.SetState(outerState);
-					if (sc.ch == '\"') {
-						sc.ForwardSetState(SCE_LLVM_DEFAULT);
-					}
-				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 

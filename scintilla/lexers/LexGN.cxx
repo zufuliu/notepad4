@@ -129,12 +129,8 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_GN_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				if (escSeq.resetEscapeState(sc)) {
-					sc.Forward((escSeq.digitsLeft == 1)? 1 : 2);
-				} else {
-					sc.SetState(SCE_GN_STRING);
-					continue;
-				}
+				sc.SetState(SCE_GN_STRING);
+				continue;
 			}
 			break;
 
