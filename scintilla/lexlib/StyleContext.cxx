@@ -51,7 +51,7 @@ bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBe
 		Sci_PositionU pos = sc.currentPos + 2;
 		int len = 2;
 		unsigned char ch;
-		while (IsUpperCase(ch = sc.styler.SafeGetCharAt(pos))) {
+		while (IsUpperCase(ch = sc.styler[pos])) {
 			++pos;
 			++len;
 		}

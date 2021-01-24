@@ -159,6 +159,7 @@ static EDITSTYLE Styles_AVS[] = {
 	{ SCE_AVS_CLIPPROP, NP2StyleX_Property, L"fore:#007F7F" },
 	{ SCE_AVS_USERDFN, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_AVS_COMMENTLINE, SCE_AVS_COMMENTBLOCK, SCE_AVS_COMMENTBLOCKN, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_AVS_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
 	{ MULTI_STYLE(SCE_AVS_STRING, SCE_AVS_ESCAPESTRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_AVS_TRIPLESTRING, NP2StyleX_TripleQuotedString, L"fore:#F08000" },
 	{ SCE_AVS_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },

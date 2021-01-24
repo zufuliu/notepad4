@@ -232,4 +232,90 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 	}
 }
 
+bool HasDetachedBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operatorStyle, int maxSpaceStyle, int ignoreStyle) noexcept {
+	// check brace on next line
+	Sci_Position startPos = styler.LineStart(line + 1);
+	Sci_Position pos = startPos;
+	char ch;
+	while (IsASpaceOrTab(ch = styler[pos])) {
+		++pos;
+	}
+	if (ch != '{') {
+		return false;
+	}
+
+	int style = styler.StyleAt(pos);
+	if (style != operatorStyle) {
+		return false;
+	}
+
+	// check current line
+	pos = startPos - 1;
+	startPos = styler.LineStart(line);
+	while (pos >= startPos) {
+		style = styler.StyleAt(pos);
+		if (style > maxSpaceStyle) {
+			break;
+		}
+		--pos;
+	}
+	if (pos < startPos) {
+		// current line is empty or comment
+		return false;
+	}
+	if (style == operatorStyle) {
+		ch = styler[pos];
+		/*
+		function(param)
+			{ body }
+
+		if (expr)
+			{ body }
+		else
+			{ body }
+
+		switch (expr)
+			{ body }
+
+		class name<T>
+			{ body }
+
+		var name =
+			{ body }
+
+		case constant:
+			{ body }
+
+		C++:
+			[lambda-capture]
+				{ body }
+		Rust:
+			fn name() -> optional?
+				{ body }
+		*/
+		return AnyOf(ch, ')', '>', '=', ':', ']', '?');
+	}
+	if (ignoreStyle) {
+		while (startPos < pos) {
+			style = styler.StyleAt(startPos);
+			if (style > maxSpaceStyle) {
+				break;
+			}
+			++startPos;
+		}
+		return style != ignoreStyle;
+	}
+
+	/*
+		class name
+			{ body }
+
+		try
+			{ body }
+		catch (exception)
+			{ body }
+	*/
+	return true;
+}
+
 }
