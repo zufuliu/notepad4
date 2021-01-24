@@ -1049,6 +1049,19 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		}
 		break;
 
+	case SCLEX_JAVA:
+		if (ch == '@') {
+			if (iCurrentStyle == SCE_JAVA_DEFAULT) {
+				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[7]); // annotation
+				return AutoC_AddSpecWord_Keyword;
+			}
+			if (iCurrentStyle >= SCE_JAVA_COMMENTBLOCKDOC && iCurrentStyle <= SCE_JAVA_TASKMARKER) {
+				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[9]); // Javadoc
+				return AutoC_AddSpecWord_Finish;
+			}
+		}
+		break;
+
 	case SCLEX_JAVASCRIPT:
 		if (ch == '@' || (ch == '<' && pLexCurrent->rid == NP2LEX_TYPESCRIPT)) {
 			if (iCurrentStyle >= SCE_JS_COMMENTLINE && iCurrentStyle <= SCE_JS_TASKMARKER) {
@@ -1481,6 +1494,8 @@ static inline int GetCharacterStyle(int iLexer) {
 	switch (iLexer) {
 	case SCLEX_CPP:
 		return SCE_C_CHARACTER;
+	case SCLEX_JAVA:
+		return SCE_JAVA_CHARACTER;
 	case SCLEX_GO:
 		return SCE_GO_CHARACTER;
 	case SCLEX_RUST:
@@ -2118,6 +2133,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_JAVA:
 	case SCLEX_JAVASCRIPT:
 	case SCLEX_JSON:
 	case SCLEX_KOTLIN:
@@ -2257,6 +2273,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_DART:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_JAVA:
 	case SCLEX_JAVASCRIPT:
 	case SCLEX_JSON:
 	case SCLEX_KOTLIN:

@@ -1165,8 +1165,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	attr[KEYWORDSET_MAX] = KeywordAttr_NoLexer;
 
 	switch (pLexNew->rid) {
-	case NP2LEX_AU3:
-		break;
 	case NP2LEX_BATCH:
 		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
 		break;
@@ -1195,11 +1193,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[3] = KeywordAttr_NoAutoComp;	// Python
 		attr[4] = KeywordAttr_NoAutoComp;	// PHP
 		attr[7] = KeywordAttr_NoLexer;		// Value
-		break;
-	case NP2LEX_INNO:
-		break;
-	case NP2LEX_JAVA:
-		attr[10] = KeywordAttr_NoLexer;		// Package
 		break;
 	case NP2LEX_RC:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
@@ -1259,6 +1252,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[7] = KeywordAttr_NoLexer;		// variables
 		attr[8] = KeywordAttr_NoLexer;		// function
 		attr[9] = KeywordAttr_NoLexer;		// package
+		break;
+	case NP2LEX_JAVA:
+		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation
+		attr[9] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// Javadoc
 		break;
 	case NP2LEX_JAVASCRIPT:
 		attr[8] = KeywordAttr_NoLexer;		// function

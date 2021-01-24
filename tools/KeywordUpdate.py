@@ -9,6 +9,7 @@ def update_all_keyword():
 		('NP2LEX_DART', 'stlDart.c', 'Dart.dart', 0, parse_dart_api_file),
 		('NP2LEX_GN', 'stlGN.c', 'GN.gn', 0, parse_gn_api_file),
 		('NP2LEX_GO', 'stlGO.c', 'Go.go', 0, parse_go_api_file),
+		('NP2LEX_JAVA', 'stlJava.c', 'Java.java', 1, parse_java_api_file),
 		('NP2LEX_JAVASCRIPT', 'stlJavaScript.c', 'JavaScript.js', 1, parse_javascript_api_file),
 		('NP2LEX_JULIA', 'stlJulia.c', 'Julia.jl', 0, parse_julia_api_file),
 		('NP2LEX_KOTLIN', 'stlKotlin.c', 'Kotlin.kt', 0, parse_kotlin_api_file),

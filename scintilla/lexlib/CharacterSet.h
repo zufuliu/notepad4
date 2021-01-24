@@ -59,6 +59,10 @@ inline bool EqualsAny(const char *s, Args... args) noexcept {
 }
 #endif
 
+constexpr bool Between(int value, int lower, int high) noexcept {
+	return value >= lower && value <=  high;
+}
+
 // Functions for classifying characters
 
 constexpr bool IsEOLChar(int ch) noexcept {
@@ -92,8 +96,7 @@ constexpr bool IsADigit(int ch, int base) noexcept {
 		return (ch >= '0' && ch < '0' + base);
 	}
 	return (ch >= '0' && ch <= '9')
-		|| (ch >= 'A' && ch < 'A' + base - 10)
-		|| (ch >= 'a' && ch < 'a' + base - 10);
+		|| Between(ch | 0x20, 'a', 'a' + base - 10);
 }
 
 constexpr bool IsNumberStart(int ch, int chNext) noexcept {

@@ -23,7 +23,7 @@ static KEYWORDLIST Keywords_Dart = {{
 "StackTrace Stopwatch Stream String StringBuffer StringSink Symbol SystemHash "
 "Timer Type Uri UriData "
 
-, // 3 enum
+, // 3 enumeration
 NULL
 
 , // 4 metadata
