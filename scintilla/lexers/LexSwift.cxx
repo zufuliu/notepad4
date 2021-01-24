@@ -173,10 +173,13 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							sc.ChangeState(SCE_SWIFT_FUNCTION);
-						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
+							|| (chBeforeIdentifier == '[' && (sc.ch == ']' && AnyOf(sc.chNext, '(', ']')))) {
 							// type<type>
 							// type<type?>
 							// type<type<type>>
+							// [type]()
+							// [[type]]()
 							sc.ChangeState(SCE_SWIFT_CLASS);
 						}
 					}

@@ -229,11 +229,12 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
 							if (chNext == '(') {
 								sc.ChangeState(SCE_JS_FUNCTION);
-							} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<')) || sc.Match('[', ']')) {
+							} else if (sc.Match('[', ']')
+								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+								// type[]
 								// type<type>
 								// type<type?>
 								// type<type<type>>
-								// type[]
 								sc.ChangeState(SCE_JS_CLASS);
 							}
 						}
