@@ -27,7 +27,8 @@ static KEYWORDLIST Keywords_Kotlin = {{
 "EOFException EditText Enum EnumMap EnumSet Environment Error EventObject Exception "
 "Field File FileDescriptor FileInputStream FileOutputStream FilePermission FileReader FileSystem FileWriter "
 "FilterInputStream FilterOutputStream FilterReader FilterWriter Float FloatArray FloatBuffer Format Formatter "
-"GZIPInputStream GZIPOutputStream GregorianCalendar GridView Handler HashMap HashSet Hashtable HttpClient HttpRequest "
+"GZIPInputStream GZIPOutputStream GregorianCalendar GridView "
+"Handler HashMap HashSet Hashtable HttpClient HttpCookie HttpRequest HttpURLConnection "
 "IOError IOException Image ImageButton ImageView IndexedValue Inet4Address Inet6Address InetAddress InetSocketAddress "
 "InflaterInputStream InputStream InputStreamReader Int IntArray IntBuffer Integer Intent IntentFilter "
 "JarEntry JarException JarFile JarInputStream JarOutputStream KeyEvent "
@@ -47,7 +48,8 @@ static KEYWORDLIST Keywords_Kotlin = {{
 "Stack StackView String StringBuffer StringBuilder StringJoiner StringReader StringTokenizer StringWriter System "
 "TableLayout TextView Thread ThreadGroup ThreadLocal ThreadPoolExecutor Throwable TimeZone Timer TimerTask "
 "Toast ToggleButton TreeMap TreeSet Triple "
-"UByte UByteArray UInt UIntArray ULong ULongArray URI URL URLDecoder URLEncoder UShort UShortArray UUID Unit "
+"UByte UByteArray UInt UIntArray ULong ULongArray URI URL URLConnection URLDecoder URLEncoder UShort UShortArray UUID "
+"Unit "
 "Vector View ViewGroup Void WeakHashMap WeakReference Window Writer "
 "ZipEntry ZipException ZipFile ZipInputStream ZipOutputStream "
 
@@ -63,6 +65,7 @@ static KEYWORDLIST Keywords_Kotlin = {{
 
 , // 3 enumeration
 "AnnotationRetention AnnotationTarget DeprecationLevel ElementType LazyThreadSafetyMode RegexOption RetentionPolicy "
+"TimeUnit "
 
 , // 4 annotation
 "Basic Column Deprecated Documented Entity FunctionalInterface Generated Id Inherited "

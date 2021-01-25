@@ -22,7 +22,6 @@ volatile
 while
 
 // others
-@interface
 false true null
 
 // Blocks and Statements
@@ -110,6 +109,7 @@ package java.lang {
 	public class Error extends Throwable
 
 	// Annotation
+	@interface // for auto-completion
 	@Deprecated
 	@FunctionalInterface
 	@Override
@@ -216,6 +216,8 @@ package java.net {
 	public class DatagramSocket implements Closeable
 		public class MulticastSocket
 	public final class DatagramPacket
+	public final class HttpCookie implements Cloneable
+	public abstract class HttpURLConnection extends URLConnection
 	public class InetAddress implements Serializable
 		public final class Inet4Address
 		public final class Inet6Address
@@ -225,6 +227,7 @@ package java.net {
 		public class InetSocketAddress
 	public final class URI implements Comparable<URI>, Serializable
 	public final class URL implements Serializable
+	public abstract class URLConnection
 	public class URLDecoder
 	public class URLEncoder
 }
@@ -351,6 +354,7 @@ package java.util.concurrent {
 	public class CountDownLatch
 	public class Semaphore implements Serializable
 	public class ThreadPoolExecutor extends AbstractExecutorService
+	public enum TimeUnit extends Enum<TimeUnit>
 }
 
 package java.util.concurrent.atomic {

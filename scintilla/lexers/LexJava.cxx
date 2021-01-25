@@ -109,13 +109,13 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						continue;
 					}
 				} else if (keywordLists[0]->InList(s)) {
-					const bool demoted = (chBefore == '.' || chBefore == ':');
-					sc.ChangeState(demoted ? SCE_JAVA_WORD_DEMOTED : SCE_JAVA_WORD);
+					sc.ChangeState(SCE_JAVA_WORD);
 					if (strcmp(s, "import") == 0) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = JavaLineStateMaskImport;
 						}
-					} else if ((!demoted && strcmp(s, "class") == 0) || EqualsAny(s, "extends", "instanceof")) {
+					} else if ((!(chBefore == '.' || chBefore == ':') && strcmp(s, "class") == 0)
+						|| EqualsAny(s, "new", "extends", "instanceof", "throws")) {
 						kwType = SCE_JAVA_CLASS;
 					} else if (strcmp(s, "enum") == 0) {
 						kwType = SCE_JAVA_ENUM;
@@ -147,25 +147,25 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(kwType);
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == ')');
-						if (chNext == '(') {
-							if (sc.ch == ')') {
-								if (chBeforeIdentifier == '(') {
-									// (type)(expression)
-									sc.ChangeState(SCE_JAVA_CLASS);
-								}
-							} else {
-								sc.ChangeState(SCE_JAVA_FUNCTION);
+						if (sc.ch == ')') {
+							if (chBeforeIdentifier == '(' && (chNext == '(' || IsIdentifierCharEx(chNext))) {
+								// (type)(expression)
+								// (type)expression, (type)++identifier, (type)--identifier
+								sc.ChangeState(SCE_JAVA_CLASS);
 							}
+						} else if (chNext == '(') {
+							sc.ChangeState(SCE_JAVA_FUNCTION);
 						} else if (sc.Match('[', ']') || sc.Match(':', ':')
+							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
-							|| IsIdentifierStartEx(chNext)
-							|| (chBeforeIdentifier == '(' && sc.ch == ')' && IsADigit(chNext))) {
-							// type[]
+							|| IsIdentifierStartEx(chNext)) {
+							// type[] identifier
+							// TODO: fix type identifier[]
 							// type::method
-							// type identifier
+							// type<>, type<?>, type<? super T>
 							// type<type>
 							// type<type<type>>
-							// (type)expression, (type)++identifier, (type)--identifier
+							// type identifier
 							sc.ChangeState(SCE_JAVA_CLASS);
 						}
 					}

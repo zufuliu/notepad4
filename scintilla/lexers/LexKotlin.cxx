@@ -148,7 +148,9 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							sc.ChangeState(SCE_KOTLIN_FUNCTION);
-						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+						} else if (sc.Match(':', ':')
+							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+							// type::class
 							// type<type>
 							// type<type?>
 							// type<type<type>>
@@ -170,7 +172,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_KOTLIN_ANNOTATION:
-			if (sc.ch == '.') {
+			if (sc.ch == '.' || sc.ch == ':') {
 				sc.SetState(SCE_KOTLIN_OPERATOR);
 				sc.ForwardSetState(SCE_KOTLIN_ANNOTATION);
 				continue;
