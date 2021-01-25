@@ -242,11 +242,13 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	int lineCommentPrev = 0;
-	bool detachedBrace = false;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 		lineCommentPrev = GetLineCommentState(styler.GetLineState(lineCurrent - 1));
-		detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent - 1, SCE_AVS_OPERATOR, SCE_AVS_TASKMARKER);
+		const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent - 1, SCE_AVS_OPERATOR, SCE_AVS_TASKMARKER);
+		if (bracePos) {
+			startPos = bracePos + 1; // skip the brace
+		}
 	}
 
 	int levelNext = levelCurrent;
@@ -288,9 +290,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 		case SCE_AVS_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
-				if (!(ch == '{' && visibleChars == 0 && detachedBrace)) {
-					levelNext++;
-				}
+				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
@@ -301,14 +301,15 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 			++visibleChars;
 		}
 		if (i == lineEndPos) {
-			detachedBrace = false;
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
 			} else if (visibleChars) {
-				detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent, SCE_AVS_OPERATOR, SCE_AVS_TASKMARKER);
-				if (detachedBrace) {
+				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_AVS_OPERATOR, SCE_AVS_TASKMARKER);
+				if (bracePos) {
 					levelNext++;
+					i = bracePos; // skip the brace
+					chNext = '\0';
 				}
 			}
 
