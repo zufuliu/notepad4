@@ -55,7 +55,7 @@ bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBe
 		}
 
 		bool marker = false;
-		const int len = static_cast<int>(sc.currentPos - pos);
+		const int len = static_cast<int>(pos - sc.currentPos);
 		if (ch == ':' || ch == '(') {
 			// highlight first uppercase word after comment characters as task marker.
 			marker = true;

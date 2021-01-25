@@ -432,7 +432,8 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 }
 
 constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_GO_TASKMARKER || style == SCE_GO_FORMAT_SPECIFIER;
+	return style == SCE_GO_ESCAPECHAR || style == SCE_GO_FORMAT_SPECIFIER
+		|| style == SCE_GO_TASKMARKER;
 }
 
 constexpr int GetLineCommentState(int lineState) noexcept {

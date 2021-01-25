@@ -365,8 +365,8 @@ struct FoldLineState {
 };
 
 constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_JAVA_ESCAPECHAR
-		|| style == SCE_JAVA_COMMENTTAGAT || style == SCE_JAVA_COMMENTTAGHTML;
+	return style == SCE_JAVA_ESCAPECHAR// || style == SCE_JAVA_FORMAT_SPECIFIER || style == SCE_JAVA_PLACEHOLDER
+		|| style == SCE_JAVA_COMMENTTAGAT || style == SCE_JAVA_COMMENTTAGHTML || style == SCE_JAVA_TASKMARKER;
 }
 
 void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
