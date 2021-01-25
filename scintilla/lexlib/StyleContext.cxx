@@ -49,14 +49,13 @@ static constexpr bool IsTaskMarkerStart(int visibleChars, int visibleCharsBefore
 bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle) {
 	if (IsTaskMarkerStart(visibleChars, visibleCharsBefore, sc.chPrev, sc.ch, sc.chNext)) {
 		Sci_PositionU pos = sc.currentPos + 2;
-		int len = 2;
 		unsigned char ch;
 		while (IsUpperCase(ch = sc.styler[pos])) {
 			++pos;
-			++len;
 		}
 
 		bool marker = false;
+		const int len = static_cast<int>(sc.currentPos - pos);
 		if (ch == ':' || ch == '(') {
 			// highlight first uppercase word after comment characters as task marker.
 			marker = true;
