@@ -52,6 +52,12 @@ constexpr bool AnyOf(T t, Args... args) noexcept {
 	return ((t == args) || ...);
 }
 
+// prevent pointer without <type_traits>
+template <typename T, typename... Args>
+constexpr void AnyOf([[maybe_unused]] T *t, [[maybe_unused]] Args... args) noexcept {}
+template <typename T, typename... Args>
+constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args) noexcept {}
+
 #if defined(_INC_STRING)
 template <typename... Args>
 inline bool EqualsAny(const char *s, Args... args) noexcept {
