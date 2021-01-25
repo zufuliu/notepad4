@@ -66,7 +66,7 @@ inline bool EqualsAny(const char *s, Args... args) noexcept {
 #endif
 
 constexpr bool Between(int value, int lower, int high) noexcept {
-	return value >= lower && value <=  high;
+	return value >= lower && value <= high;
 }
 
 // Functions for classifying characters

@@ -417,11 +417,13 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
 	int levelCurrent = SC_FOLDLEVELBASE;
-	bool detachedBrace = false;
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 		foldPrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
-		detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent - 1, SCE_RUST_OPERATOR, SCE_RUST_TASKMARKER);
+		const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent - 1, SCE_RUST_OPERATOR, SCE_RUST_TASKMARKER);
+		if (bracePos) {
+			startPos = bracePos + 1; // skip the brace
+		}
 	}
 
 	int levelNext = levelCurrent;
@@ -467,9 +469,7 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		case SCE_RUST_OPERATOR:
 			if (ch == '{' || ch == '[' || ch == '(') {
-				if (!(ch == '{' && visibleChars == 0 && detachedBrace)) {
-					levelNext++;
-				}
+				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
@@ -480,16 +480,17 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			++visibleChars;
 		}
 		if (i == lineEndPos) {
-			detachedBrace = false;
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.pubUse) {
 				levelNext += foldNext.pubUse - foldPrev.pubUse;
 			} else if (visibleChars) {
-				detachedBrace = HasDetachedBraceOnNextLine(styler, lineCurrent, SCE_JAVA_OPERATOR, SCE_JAVA_TASKMARKER);
-				if (detachedBrace) {
+				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_RUST_OPERATOR, SCE_RUST_TASKMARKER);
+				if (bracePos) {
 					levelNext++;
+					i = bracePos; // skip the brace
+					chNext = '\0';
 				}
 			}
 

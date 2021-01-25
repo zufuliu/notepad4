@@ -232,39 +232,54 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 	}
 }
 
-bool HasDetachedBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operatorStyle, int maxSpaceStyle, int ignoreStyle) noexcept {
+Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operatorStyle, int maxSpaceStyle, int ignoreStyle) noexcept {
 	// check brace on next line
 	Sci_Position startPos = styler.LineStart(line + 1);
-	Sci_Position pos = startPos;
+	Sci_Position bracePos = startPos;
 	char ch;
-	while (IsASpaceOrTab(ch = styler[pos])) {
-		++pos;
+	while (IsASpaceOrTab(ch = styler[bracePos])) {
+		++bracePos;
 	}
 	if (ch != '{') {
-		return false;
+		return 0;
 	}
 
-	int style = styler.StyleAt(pos);
+	int style = styler.StyleAt(bracePos);
 	if (style != operatorStyle) {
-		return false;
+		return 0;
 	}
 
 	// check current line
-	pos = startPos - 1;
+	Sci_Position endPos = startPos - 1;
 	startPos = styler.LineStart(line);
-	while (pos >= startPos) {
-		style = styler.StyleAt(pos);
+
+	// ignore current line, e.g. current line is preprocessor.
+	if (ignoreStyle) {
+		while (startPos < endPos) {
+			style = styler.StyleAt(startPos);
+			if (style > maxSpaceStyle) {
+				break;
+			}
+			++startPos;
+		}
+		if (style == ignoreStyle) {
+			return 0;
+		}
+	}
+
+	while (endPos >= startPos) {
+		style = styler.StyleAt(endPos);
 		if (style > maxSpaceStyle) {
 			break;
 		}
-		--pos;
+		--endPos;
 	}
-	if (pos < startPos) {
+	if (endPos < startPos) {
 		// current line is empty or comment
-		return false;
+		return 0;
 	}
 	if (style == operatorStyle) {
-		ch = styler[pos];
+		ch = styler[endPos];
 		/*
 		function(param)
 			{ body }
@@ -291,6 +306,8 @@ bool HasDetachedBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operator
 				{ body }
 		C#:
 			=> { lambda }
+		Java:
+			-> { lambda }
 		Objective-C:
 			^{ block }
 		Rust:
@@ -300,17 +317,9 @@ bool HasDetachedBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operator
 			class name[T]
 				{ body }
 		*/
-		return AnyOf(ch, ')', '>', '=', ':', ']', '^', '?');
-	}
-	if (ignoreStyle) {
-		while (startPos < pos) {
-			style = styler.StyleAt(startPos);
-			if (style > maxSpaceStyle) {
-				break;
-			}
-			++startPos;
+		if (!AnyOf(ch, ')', '>', '=', ':', ']', '^', '?')) {
+			return 0;
 		}
-		return style != ignoreStyle;
 	}
 
 	/*
@@ -322,7 +331,7 @@ bool HasDetachedBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operator
 		catch (exception)
 			{ body }
 	*/
-	return true;
+	return bracePos;
 }
 
 }
