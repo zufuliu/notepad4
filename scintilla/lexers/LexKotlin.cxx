@@ -128,7 +128,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 					if (kwType != SCE_KOTLIN_DEFAULT) {
 						const int chNext = sc.GetDocNextChar();
-						if (!((kwType == SCE_KOTLIN_LABEL && chNext == '@') || (kwType != SCE_KOTLIN_LABEL && IsIdentifierStart(chNext)))) {
+						if (!((kwType == SCE_KOTLIN_LABEL && chNext == '@') || (kwType != SCE_KOTLIN_LABEL && IsIdentifierStartEx(chNext)))) {
 							kwType = SCE_KOTLIN_DEFAULT;
 						}
 					}

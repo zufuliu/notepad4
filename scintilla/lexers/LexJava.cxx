@@ -126,7 +126,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 					if (kwType != SCE_JAVA_DEFAULT) {
 						const int chNext = sc.GetDocNextChar();
-						if (!IsIdentifierStart(chNext)) {
+						if (!IsIdentifierStartEx(chNext)) {
 							kwType = SCE_JAVA_DEFAULT;
 						}
 					}
@@ -189,7 +189,6 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_JAVA_COMMENTLINE:
-		case SCE_JAVA_COMMENTLINEDOC:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_JAVA_DEFAULT);
 			} else {
@@ -305,14 +304,14 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (sc.state == SCE_JAVA_DEFAULT) {
 			if (sc.Match('/', '/')) {
 				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '!' || chNext == '/') ? SCE_JAVA_COMMENTLINEDOC : SCE_JAVA_COMMENTLINE);
+				sc.SetState(SCE_JAVA_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineType = JavaLineStateMaskLineComment;
 				}
 				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '*' || chNext == '!') ? SCE_JAVA_COMMENTBLOCKDOC : SCE_JAVA_COMMENTBLOCK);
+				sc.SetState((chNext == '*') ? SCE_JAVA_COMMENTBLOCKDOC : SCE_JAVA_COMMENTBLOCK);
 				sc.Forward();
 				visibleCharsBefore = visibleChars;
 				docTagState = DocTagState::None;

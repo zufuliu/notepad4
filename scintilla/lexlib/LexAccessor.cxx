@@ -297,6 +297,8 @@ Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int opera
 
 		var name =
 			{ body }
+		var name = new type[]
+			{ body }
 
 		case constant:
 			{ body }

@@ -75,7 +75,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int lineStateLineComment = 0;
 	int commentLevel = 0;
 
-	int numBase = 10;
 	int kwType = SCE_JULIA_DEFAULT;
 	bool maybeType = false;
 
@@ -116,10 +115,10 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_JULIA_NUMBER:
 			// strict to avoid color multiply expression as number
-			if (!(IsADigit(sc.ch, numBase) || sc.ch == '_')) {
-				if (IsJuliaExponent(numBase, sc.ch, sc.chNext)) {
+			if (!(IsADigit(sc.ch, escSeq.numBase) || sc.ch == '_')) {
+				if (IsJuliaExponent(escSeq.numBase, sc.ch, sc.chNext)) {
 					sc.Forward();
-				} else if (!(numBase == 10 && sc.ch == '.' && sc.chPrev != '.')) {
+				} else if (!(escSeq.numBase == 10 && sc.ch == '.' && sc.chPrev != '.')) {
 					sc.SetState(SCE_JULIA_DEFAULT);
 				}
 			}
@@ -365,21 +364,21 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_VARIABLE);
 			} else if (sc.ch == '0') {
-				numBase = 10;
+				escSeq.numBase = 10;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_NUMBER);
 				if (sc.chNext == 'x' || sc.chNext == 'X') {
-					numBase = 16;
+					escSeq.numBase = 16;
 				} else if (sc.chNext == 'b' || sc.chNext == 'B') {
-					numBase = 2;
+					escSeq.numBase = 2;
 				} else if (sc.chNext == 'o' || sc.chNext == 'O') {
-					numBase = 8;
+					escSeq.numBase = 8;
 				}
-				if (numBase != 10) {
+				if (escSeq.numBase != 10) {
 					sc.Forward();
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
-				numBase = 10;
+				escSeq.numBase = 10;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {

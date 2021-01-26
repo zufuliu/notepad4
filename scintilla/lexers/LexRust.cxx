@@ -116,7 +116,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_RUST_IDENTIFIER:
-			if (!IsIdentifierChar(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				if (lineStateAttribute) {
 					sc.ChangeState(SCE_RUST_ATTRIBUTE);
 				} else if (sc.ch == '!') {
@@ -144,7 +144,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						}
 						if (kwType != SCE_RUST_DEFAULT) {
 							const int chNext = sc.GetDocNextChar();
-							if (!IsIdentifierStart(chNext)) {
+							if (!IsIdentifierStartEx(chNext)) {
 								kwType = SCE_RUST_DEFAULT;
 							}
 						}
@@ -190,7 +190,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_RUST_VARIABLE:
 		case SCE_RUST_LIFETIME:
-			if (!IsIdentifierChar(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(SCE_RUST_DEFAULT);
 			}
 			break;
@@ -247,9 +247,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_RUST_CHARACTER:
 		case SCE_RUST_BYTE_CHARACTER:
 			if (sc.ch == '\\') {
-				if (IsEOLChar(sc.chNext)) {
-					sc.ForwardSetState(SCE_RUST_DEFAULT);
-				} else {
+				if (!IsEOLChar(sc.chNext)) {
 					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_RUST_ESCAPECHAR);
 					sc.Forward();
@@ -315,7 +313,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_RUST_STRING);
 			} else if (sc.ch == '\'') {
-				if (IsIdentifierStart(sc.chNext) && sc.GetRelative(2) != '\'') {
+				if (IsIdentifierStartEx(sc.chNext) && sc.GetRelative(2) != '\'') {
 					sc.SetState(SCE_RUST_LIFETIME);
 				} else {
 					charStartPos = sc.currentPos;
@@ -358,11 +356,11 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 					sc.SetState(SCE_RUST_IDENTIFIER);
 				}
-			} else if (sc.ch == '$' && IsIdentifierStart(sc.chNext)) {
+			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_RUST_VARIABLE);
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_RUST_NUMBER);
-			} else if (IsIdentifierStart(sc.ch)) {
+			} else if (IsIdentifierStartEx(sc.ch)) {
 				if (sc.chPrev != '.') {
 					chBeforeIdentifier = sc.chPrev;
 				}
