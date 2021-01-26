@@ -232,7 +232,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.ch == '\\') {
 				const int state = sc.state;
 				if (IsEOLChar(sc.chNext)) {
-					sc.SetState(SCE_RUST_LINE_CONTINUE);
+					sc.SetState(SCE_RUST_LINE_CONTINUATION);
 					sc.ForwardSetState(state);
 				} else {
 					escSeq.resetEscapeState(state, sc.chNext);
@@ -400,7 +400,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 }
 
 constexpr bool IsStringInnerStyle(int style) noexcept {
-	return style == SCE_RUST_ESCAPECHAR || style == SCE_RUST_LINE_CONTINUE;
+	return style == SCE_RUST_ESCAPECHAR || style == SCE_RUST_LINE_CONTINUATION;
 }
 
 struct FoldLineState {
