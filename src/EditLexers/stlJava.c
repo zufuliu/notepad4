@@ -92,6 +92,7 @@ static EDITSTYLE Styles_Java[] = {
 	{ SCE_JAVA_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_JAVA_ANNOTATION, NP2StyleX_Annotation, L"fore:#FF8000" },
 	{ SCE_JAVA_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
+	{ SCE_JAVA_RECORD, NP2StyleX_Record, L"fore:#0080FF" },
 	{ SCE_JAVA_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_JAVA_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
 	{ SCE_JAVA_FUNCTION, NP2StyleX_Method, L"fore:#A46000" },

@@ -116,7 +116,7 @@
 #define NP2STYLE_Property				63431
 #define NP2STYLE_Macro					63432
 #define NP2STYLE_Annotation				63433
-
+#define NP2STYLE_Record					63434
 #define NP2STYLE_Type					63435
 #define NP2STYLE_FunctionDefine			63436
 #define NP2STYLE_Protocol				63437

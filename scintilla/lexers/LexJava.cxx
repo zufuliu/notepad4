@@ -117,10 +117,12 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if ((!(chBefore == '.' || chBefore == ':') && strcmp(s, "class") == 0)
 						|| EqualsAny(s, "new", "extends", "instanceof", "throws")) {
 						kwType = SCE_JAVA_CLASS;
-					} else if (strcmp(s, "enum") == 0) {
-						kwType = SCE_JAVA_ENUM;
 					} else if (EqualsAny(s, "interface", "implements")) {
 						kwType = SCE_JAVA_INTERFACE;
+					} else if (strcmp(s, "enum") == 0) {
+						kwType = SCE_JAVA_ENUM;
+					} else if (strcmp(s, "record") == 0) {
+						kwType = SCE_JAVA_RECORD;
 					} else if (EqualsAny(s, "break", "continue")) {
 						kwType = SCE_JAVA_LABEL;
 					}
