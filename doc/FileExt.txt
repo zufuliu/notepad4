@@ -101,6 +101,7 @@ Python Script
 	empy			EmPy
 	cobra			Cobra
 	gs				GNOME Genie
+	bzl				Bazel BUILD file, https://docs.bazel.build/versions/master/build-ref.html
 
 Ruby Script
 	rb
