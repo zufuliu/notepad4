@@ -165,7 +165,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_VIM_BLOB_HEX:
-			if (!iswordchar(sc.ch)) {
+			if (!(IsIdentifierChar(sc.ch) || sc.ch == '.')) {
 				sc.SetState(SCE_VIM_DEFAULT);
 			}
 			break;

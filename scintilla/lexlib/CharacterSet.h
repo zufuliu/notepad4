@@ -194,6 +194,10 @@ constexpr bool IsDecimalNumberEx(int chPrev, int ch, int chNext) noexcept {
 	return IsIdentifierChar(ch) || IsNumberContinueEx(chPrev, ch, chNext);
 }
 
+// simply treat every character/byte larger than 127 as Unicode identifier,
+// i.e. we don't support Unicode operators. proper implementation will need
+// enable multiByteAccess in StyleContext and use functions from CharacterCategory.
+
 constexpr bool IsIdentifierCharEx(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch >= 0x80;
 }

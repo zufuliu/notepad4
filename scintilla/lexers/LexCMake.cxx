@@ -27,7 +27,7 @@ constexpr bool IsCmakeOperator(int ch) noexcept {
 }
 
 constexpr bool IsCmakeChar(int ch) noexcept {
-	return iswordchar(ch) || ch == '-' || ch == '+';
+	return IsIdentifierChar(ch) || ch == '.' || ch == '-' || ch == '+';
 }
 
 bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {

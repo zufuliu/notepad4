@@ -200,8 +200,7 @@ def GenerateJsonCharClass():
 		elif ch.isalpha() or ch == '_':
 			state = SCE_JSON_IDENTIFIER
 			mask = JsonMask_Number | JsonMask_Identifier
-		elif ch in '$@\\':
-			# '@': JSON-LD
+		elif ch in '$\\':
 			# '\\': UnicodeEscapeSequence
 			state = SCE_JSON_IDENTIFIER
 			mask = JsonMask_Identifier
