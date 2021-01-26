@@ -65,15 +65,15 @@ constexpr bool IsVimOp(int ch) noexcept {
 }
 
 enum {
-	VimLineStateMaskLineComment = 1 << 0,	// line comment
-	VimLineStateMaskLineContinue = 1 << 1,	// line continue
-	VimLineStateMaskAutoCommand = 1 << 2,	// autocmd
+	VimLineStateMaskLineComment = 1 << 0,		// line comment
+	VimLineStateMaskLineContinuation = 1 << 1,	// line continuation
+	VimLineStateMaskAutoCommand = 1 << 2,		// autocmd
 };
 
 void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineAutoCommand = 0;
 	int lineStateLineComment = 0;
-	int lineStateLineContinue = 0;
+	int lineStateLineContinuation = 0;
 	int actuallyVisibleChars = 0;
 	int visibleChars = 0;
 	EscapeSequence escSeq;
@@ -218,7 +218,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		if (!isspacechar(sc.ch) && !(actuallyVisibleChars == 0 && sc.ch == ':')) {
 			if (actuallyVisibleChars == 0) {
 				if (sc.ch == '\\') {
-					lineStateLineContinue = VimLineStateMaskLineContinue;
+					lineStateLineContinuation = VimLineStateMaskLineContinuation;
 				} else {
 					lineStateLineAutoCommand = 0;
 				}
@@ -228,9 +228,9 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		}
 
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, lineStateLineAutoCommand | lineStateLineComment | lineStateLineContinue);
+			styler.SetLineState(sc.currentLine, lineStateLineAutoCommand | lineStateLineComment | lineStateLineContinuation);
 			lineStateLineComment = 0;
-			lineStateLineContinue = 0;
+			lineStateLineContinuation = 0;
 			actuallyVisibleChars = 0;
 			visibleChars = 0;
 		}
@@ -242,10 +242,10 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 struct FoldLineState {
 	int lineComment;
-	int lineContinue;
+	int lineContinuation;
 	constexpr explicit FoldLineState(int lineState) noexcept:
 		lineComment(lineState & VimLineStateMaskLineComment),
-		lineContinue((lineState >> 1) & 1) {
+		lineContinuation((lineState >> 1) & 1) {
 	}
 };
 
@@ -294,7 +294,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else {
-				levelNext += foldNext.lineContinue - foldCurrent.lineContinue;
+				levelNext += foldNext.lineContinuation - foldCurrent.lineContinuation;
 			}
 
 			const int levelUse = levelCurrent;
