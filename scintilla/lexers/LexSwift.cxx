@@ -166,21 +166,30 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						sc.ChangeState(SCE_SWIFT_ENUM);
 					}
 				}
-				if (sc.ch != '.' && (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_IDENTIFIER_BT)) {
-					if (kwType != SCE_SWIFT_DEFAULT) {
-						sc.ChangeState(kwType);
-					} else {
-						const int chNext = sc.GetDocNextChar(sc.ch == '?');
-						if (chNext == '(') {
-							sc.ChangeState(SCE_SWIFT_FUNCTION);
-						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
-							|| (chBeforeIdentifier == '[' && (sc.ch == ']' && AnyOf(sc.chNext, '(', ']')))) {
-							// type<type>
-							// type<type?>
-							// type<type<type>>
-							// [type]()
-							// [[type]]()
-							sc.ChangeState(SCE_SWIFT_CLASS);
+				if (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_IDENTIFIER_BT) {
+					if (sc.ch == ':') {
+						if (visibleChars == sc.LengthCurrent()) {
+							const int chNext = sc.GetLineNextChar(true);
+							if (IsJumpLabelNextChar(chNext)) {
+								sc.ChangeState(SCE_SWIFT_LABEL);
+							}
+						}
+					} else if (sc.ch != '.') {
+						if (kwType != SCE_SWIFT_DEFAULT) {
+							sc.ChangeState(kwType);
+						} else {
+							const int chNext = sc.GetDocNextChar(sc.ch == '?');
+							if (chNext == '(') {
+								sc.ChangeState(SCE_SWIFT_FUNCTION);
+							} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
+								|| (chBeforeIdentifier == '[' && (sc.ch == ']' && AnyOf(sc.chNext, '(', ']')))) {
+								// type<type>
+								// type<type?>
+								// type<type<type>>
+								// [type]()
+								// [[type]]()
+								sc.ChangeState(SCE_SWIFT_CLASS);
+							}
 						}
 					}
 				}

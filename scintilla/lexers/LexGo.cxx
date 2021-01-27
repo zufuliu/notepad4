@@ -213,8 +213,10 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						kwType = SCE_GO_TYPE;
 					} else if (strcmp(s, "const") == 0) {
 						kwType = SCE_GO_CONSTANT;
-					} else if (strcmp(s, "map") == 0 || strcmp(s, "chan") == 0) {
+					} else if (EqualsAny(s, "map", "chan")) {
 						kwType = SCE_GO_IDENTIFIER;
+					} else if (EqualsAny(s, "goto", "break", "continue")) {
+						kwType = SCE_GO_LABEL;
 					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD2);
@@ -232,8 +234,13 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				} else if (keywordLists[6]->InList(s)) {
 					sc.ChangeState(SCE_GO_CONSTANT);
 				} else {
-					const int chNext = sc.GetLineNextChar();
-					if (chNext == '(') {
+					const bool ignoreCurrent = sc.ch == ':' && visibleChars == sc.LengthCurrent();
+					const int chNext = sc.GetLineNextChar(ignoreCurrent);
+					if (ignoreCurrent) {
+						if (IsJumpLabelNextChar(chNext)) {
+							sc.ChangeState(SCE_JS_LABEL);
+						}
+					} else if (chNext == '(') {
 						if (funcState != GoFunction_None) {
 							funcState = GoFunction_Name;
 							sc.ChangeState(SCE_GO_FUNCTION_DEFINE);

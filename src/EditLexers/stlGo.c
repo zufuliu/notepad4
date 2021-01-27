@@ -107,7 +107,7 @@ static EDITSTYLE Styles_Go[] = {
 	{ SCE_GO_RAW_STRING, NP2StyleX_RawString, L"fore:#F08000" },
 	{ SCE_GO_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_GO_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
-	{ SCE_GO_LABEL, NP2StyleX_Label, L"fore:#7C5AF3" },
+	{ SCE_GO_LABEL, NP2StyleX_Label, L"back:#FFC040" },
 	{ SCE_GO_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_GO_OPERATOR, SCE_GO_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
