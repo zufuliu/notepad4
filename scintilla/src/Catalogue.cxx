@@ -77,7 +77,7 @@ void Scintilla_LinkLexers() {
 	extern LexerModule lmCIL;
 	//extern LexerModule lmClw;
 	//extern LexerModule lmClwNoCase;
-	extern LexerModule lmCmake;
+	extern LexerModule lmCMake;
 	//extern LexerModule lmCOBOL;
 	//extern LexerModule lmCoffeeScript;
 	extern LexerModule lmConf;
@@ -227,7 +227,7 @@ void Scintilla_LinkLexers() {
 		&lmCIL,
 		//&lmClw,
 		//&lmClwNoCase,
-		&lmCmake,
+		&lmCMake,
 		//&lmCOBOL,
 		//&lmCoffeeScript,
 		&lmConf,
