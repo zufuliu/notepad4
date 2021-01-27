@@ -144,6 +144,13 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ChangeState(SCE_JAVA_ENUM);
 				} else if (keywordLists[6]->InList(s)) {
 					sc.ChangeState(SCE_JAVA_CONSTANT);
+				} else if (sc.ch == ':') {
+					if (sc.chNext == ':') {
+						// type::method
+						sc.ChangeState(SCE_JAVA_CLASS);
+					} else if (visibleChars == sc.LengthCurrent()) {
+						sc.ChangeState(SCE_JAVA_LABEL);
+					}
 				} else if (sc.ch != '.') {
 					if (kwType != SCE_JAVA_DEFAULT) {
 						sc.ChangeState(kwType);
@@ -157,13 +164,12 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							}
 						} else if (chNext == '(') {
 							sc.ChangeState(SCE_JAVA_FUNCTION);
-						} else if (sc.Match('[', ']') || sc.Match(':', ':')
+						} else if (sc.Match('[', ']')
 							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
 							|| IsIdentifierStartEx(chNext)) {
 							// type[] identifier
-							// TODO: fix type identifier[]
-							// type::method
+							// TODO: fix C/C++ style: type identifier[]
 							// type<>, type<?>, type<? super T>
 							// type<type>
 							// type<type<type>>
@@ -305,7 +311,6 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (sc.state == SCE_JAVA_DEFAULT) {
 			if (sc.Match('/', '/')) {
-				const int chNext = sc.GetRelative(2);
 				sc.SetState(SCE_JAVA_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineType = JavaLineStateMaskLineComment;

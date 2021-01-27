@@ -362,7 +362,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					lastWordWasGoto = false;
 				} else if (sc.ch == ':' && sc.chNext != ':' && !(isAssignStmt)
 					&& (numCBrace > 0 && numSBrace == 0 && numRBrace == 0)
-					&& visibleChars == static_cast<int>(strlen(s))) {
+					&& visibleChars == sc.LengthCurrent()) {
 					sc.ChangeState(SCE_C_LABEL);
 				} else if (iswordchar(s[0]) && (IsASpace(sc.ch) || sc.ch == '[' || sc.ch == ')' || sc.ch == '>'
 					|| sc.ch == '*' || sc.ch == '&' || sc.ch == ':')) {
@@ -385,7 +385,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						const bool next_is_word = iswordstart(ch);
 						if (next_char == ')' || next_char == '>') {
 							if (next_is_word || (ch == '(')) {
-								pos = sc.currentPos - strlen(s) - 1;
+								pos = styler.GetStartSegment() - 1;
 								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
 								ch = styler.SafeGetCharAt(pos);
 								if (next_char == '>' && (ch == '<' || ch == ',')) {
@@ -398,7 +398,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 										is_class = true;
 									}
 								}
-
 							}
 						} else if (next_is_word) {
 							pos++;
@@ -408,7 +407,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							if (ch == '=') {
 								is_class = true;
 							} else if (ch == ',' || ch == ';') {
-								pos = sc.currentPos - strlen(s) - 1;
+								pos = styler.GetStartSegment() - 1;
 								while (IsASpace(styler.SafeGetCharAt(pos))) pos--;
 								ch = styler.SafeGetCharAt(pos);
 								if (iswordchar(ch) || ch == ';' || ch == '{') {

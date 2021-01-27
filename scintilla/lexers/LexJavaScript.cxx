@@ -222,6 +222,13 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_JS_ENUM);
 					} else if (keywordLists[6]->InList(s)) {
 						sc.ChangeState(SCE_JS_CONSTANT);
+					} else if (sc.ch == ':') {
+						if (visibleChars == sc.LengthCurrent()) {
+							const int chNext = sc.GetLineNextChar(true);
+							if (IsJumpLabelNextChar(chNext)) {
+								sc.ChangeState(SCE_JS_LABEL);
+							}
+						}
 					} else if (sc.ch != '.') {
 						if (kwType != SCE_JS_DEFAULT) {
 							sc.ChangeState(kwType);

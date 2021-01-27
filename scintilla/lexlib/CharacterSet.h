@@ -170,10 +170,12 @@ constexpr bool isspacechar(int ch) noexcept {
 	return ch == ' ' || (ch >= 0x09 && ch <= 0x0d);
 }
 
+//[[deprecated]]
 constexpr bool iswordchar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_';
 }
 
+//[[deprecated]]
 constexpr bool iswordstart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
@@ -204,10 +206,6 @@ constexpr bool IsIdentifierCharEx(int ch) noexcept {
 
 constexpr bool IsIdentifierStartEx(int ch) noexcept {
 	return IsIdentifierStart(ch) || ch >= 0x80;
-}
-
-constexpr bool IsWordCharEx(int ch) noexcept {
-	return iswordchar(ch) || ch >= 0x80;
 }
 
 constexpr bool isoperator(int ch) noexcept {
@@ -248,6 +246,14 @@ constexpr bool IsCommentTagPrev(int chPrev) noexcept {
 constexpr bool IsInvalidUrlChar(int ch) noexcept {
 	return ch <= 32 || ch >= 127
 		|| AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}');
+}
+
+// characters can follow jump `label:`, based on Swift's document Labeled Statement at
+// https://docs.swift.org/swift-book/ReferenceManual/Statements.html#grammar_labeled-statement
+// good coding style should place left aligned label on it's own line.
+constexpr bool IsJumpLabelNextChar(int chNext) noexcept {
+	// own line, comment, for, foreach, while, repeat, if, switch, do
+	return AnyOf(chNext, 0, '/', 'f', 'w', 'r', 'i', 's', 'd');
 }
 
 // Simple case functions for ASCII supersets.
