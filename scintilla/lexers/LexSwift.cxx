@@ -151,7 +151,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							kwType = SCE_SWIFT_LABEL;
 						}
 						if (kwType != SCE_SWIFT_DEFAULT) {
-							const int chNext = sc.GetDocNextChar();
+							const int chNext = sc.GetLineNextChar();
 							if (!IsIdentifierStartEx(chNext)) {
 								kwType = SCE_SWIFT_DEFAULT;
 							}
