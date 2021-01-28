@@ -37,13 +37,17 @@ bool StyleContext::MatchIgnoreCase(const char *s) const noexcept {
 	return true;
 }
 
-static constexpr bool IsTaskMarkerPrev(int chPrev) noexcept {
+namespace {
+
+constexpr bool IsTaskMarkerPrev(int chPrev) noexcept {
 	return chPrev <= 32 || AnyOf(chPrev, '/', '*', '!', '#');
 }
 
-static constexpr bool IsTaskMarkerStart(int visibleChars, int visibleCharsBefore, int chPrev, int ch, int chNext) noexcept {
+constexpr bool IsTaskMarkerStart(int visibleChars, int visibleCharsBefore, int chPrev, int ch, int chNext) noexcept {
 	return (visibleChars == 0 || (visibleChars <= visibleCharsBefore + 3 && IsTaskMarkerPrev(chPrev)))
 		&& IsUpperCase(ch) && IsUpperCase(chNext);
+}
+
 }
 
 bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle) {
@@ -60,10 +64,14 @@ bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBe
 			// highlight first uppercase word after comment characters as task marker.
 			marker = true;
 		} else if (ch <= 32 && len >= 3 && len < 16 && AnyOf(sc.ch, 'T', 'F', 'N', 'X')) {
-			char s[16];
+			char s[8]{};
 			sc.styler.GetRange(sc.currentPos, pos, s, sizeof(s));
-			marker = EqualsAny(s, "TODO", "FIXME", "NOTE", "XXX", "TBD")
-				|| StrStartsWith(s, "NOLINT"); // clang-tidy: NOLINT, NOLINTNEXTLINE
+			marker = memcmp(s, "TODO", COUNTOF("TODO")) == 0
+				|| memcmp(s, "FIXME", COUNTOF("FIXME")) == 0
+				|| memcmp(s, "NOTE", COUNTOF("NOTE")) == 0
+				|| memcmp(s, "XXX", COUNTOF("XXX")) == 0
+				|| memcmp(s, "TBD", COUNTOF("TBD")) == 0
+				|| memcmp(s, "NOLINT", CSTRLEN("NOLINT")) == 0; // clang-tidy: NOLINT, NOLINTNEXTLINE
 		}
 
 		visibleChars += len;
