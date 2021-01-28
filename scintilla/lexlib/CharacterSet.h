@@ -8,6 +8,7 @@
 
 namespace Scintilla {
 
+//[[deprecated]]
 class CharacterSet final {
 	bool valueAfter;
 	// ASCII character only, not useful for UTF-8 or DBCS multi byte character
@@ -252,8 +253,9 @@ constexpr bool IsInvalidUrlChar(int ch) noexcept {
 // https://docs.swift.org/swift-book/ReferenceManual/Statements.html#grammar_labeled-statement
 // good coding style should place left aligned label on it's own line.
 constexpr bool IsJumpLabelNextChar(int chNext) noexcept {
-	// own line, comment, for, foreach, while, repeat, if, switch, do
-	return AnyOf(chNext, 0, '/', 'f', 'w', 'r', 'i', 's', 'd');
+	// own line, comment, for, foreach, while, do, if, switch, repeat
+	// TODO: match each word exactly like HighlightTaskMarker().
+	return AnyOf(chNext, '\0', '/', 'f', 'w', 'd', 'i', 's', 'r');
 }
 
 // Simple case functions for ASCII supersets.

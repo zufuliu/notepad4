@@ -185,7 +185,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 
-	Sci_Position identifierStart = 0;
+	Sci_Position identifierStartPos = 0;
 	Sci_Position lineStartCurrent = styler.LineStart(sc.currentLine);
 
 	while (sc.More()) {
@@ -218,6 +218,12 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					} else if (EqualsAny(s, "goto", "break", "continue")) {
 						kwType = SCE_GO_LABEL;
 					}
+					if (kwType == SCE_GO_TYPE || kwType == SCE_GO_LABEL) {
+						const int chNext = sc.GetLineNextChar();
+						if (!IsIdentifierStartEx(chNext)) {
+							kwType = SCE_GO_DEFAULT;
+						}
+					}
 				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD2);
 				} else if (keywordLists[2]->InListPrefixed(s, '(')) {
@@ -238,7 +244,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					const int chNext = sc.GetLineNextChar(ignoreCurrent);
 					if (ignoreCurrent) {
 						if (IsJumpLabelNextChar(chNext)) {
-							sc.ChangeState(SCE_JS_LABEL);
+							sc.ChangeState(SCE_GO_LABEL);
 						}
 					} else if (chNext == '(') {
 						if (funcState != GoFunction_None) {
@@ -269,7 +275,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = SCE_GO_DEFAULT;
 						}
 					} else if (!(chNext == '.' || chNext == '*')) {
-						const int state = DetectIdentifierType(styler, funcState, chNext, identifierStart, lineStartCurrent);
+						const int state = DetectIdentifierType(styler, funcState, chNext, identifierStartPos, lineStartCurrent);
 						if (state != SCE_GO_DEFAULT) {
 							sc.ChangeState(state);
 						}
@@ -277,7 +283,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 
 				if (sc.state == SCE_GO_WORD || sc.state == SCE_GO_WORD2) {
-					identifierStart = lineStartCurrent = sc.currentPos;
+					identifierStartPos = lineStartCurrent = sc.currentPos;
 				}
 				if (kwType != SCE_GO_DEFAULT && kwPrev == kwType && sc.ch != '.') {
 					kwType = SCE_GO_DEFAULT;
@@ -381,7 +387,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				if (sc.chPrev != '.') {
-					identifierStart = sc.currentPos;
+					identifierStartPos = sc.currentPos;
 				}
 				sc.SetState(SCE_GO_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
@@ -430,7 +436,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			visibleCharsBefore = 0;
 			funcState = GoFunction_None;
 			lineStartCurrent = sc.lineStartNext;
-			identifierStart = 0;
+			identifierStartPos = 0;
 		}
 		sc.Forward();
 	}
