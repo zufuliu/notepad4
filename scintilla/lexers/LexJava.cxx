@@ -125,8 +125,12 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						kwType = SCE_JAVA_RECORD;
 					} else if (EqualsAny(s, "break", "continue")) {
 						kwType = SCE_JAVA_LABEL;
+					} else if (EqualsAny(s, "if", "while")) {
+						// to avoid treating following code as type cast:
+						// if (identifier) expression, while (identifier) expression
+						kwType = SCE_JAVA_WORD;
 					}
-					if (kwType != SCE_JAVA_DEFAULT) {
+					if (kwType != SCE_JAVA_DEFAULT && kwType != SCE_JAVA_WORD) {
 						const int chNext = sc.GetDocNextChar();
 						if (!IsIdentifierStartEx(chNext)) {
 							kwType = SCE_JAVA_DEFAULT;
@@ -152,12 +156,12 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(SCE_JAVA_LABEL);
 					}
 				} else if (sc.ch != '.') {
-					if (kwType != SCE_JAVA_DEFAULT) {
+					if (kwType != SCE_JAVA_DEFAULT && kwType != SCE_JAVA_WORD) {
 						sc.ChangeState(kwType);
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == ')');
 						if (sc.ch == ')') {
-							if (chBeforeIdentifier == '(' && (chNext == '(' || IsIdentifierCharEx(chNext))) {
+							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != SCE_JAVA_WORD && IsIdentifierCharEx(chNext)))) {
 								// (type)(expression)
 								// (type)expression, (type)++identifier, (type)--identifier
 								sc.ChangeState(SCE_JAVA_CLASS);
