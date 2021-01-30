@@ -75,7 +75,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* INI Configuration File
 	* Inno Setup
 	* Boost Jam
-	* [Java](../master/tools/lang/Java.java), up to Java SE 15. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
+	* [Java](../master/tools/lang/Java.java), up to Java 16. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2020 (11th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* JSON and JSON5 Document

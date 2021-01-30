@@ -43,8 +43,8 @@ static KEYWORDLIST Keywords_Swift = {{
 static EDITSTYLE Styles_Swift[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SWIFT_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
-	{ MULTI_STYLE(SCE_SWIFT_DIRECTIVE, SCE_SWIFT_OTHER_DIRECTIVE, 0, 0), NP2StyleX_Directive, L"fore:#FF8000" },
-	{ MULTI_STYLE(SCE_SWIFT_ATTRIBUTE, SCE_SWIFT_OTHER_ATTRIBUTE, 0, 0), NP2StyleX_Attribute, L"fore:#FF8000" },
+	{ SCE_SWIFT_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
+	{ SCE_SWIFT_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
 	{ SCE_SWIFT_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
 	{ SCE_SWIFT_STRUCT, NP2StyleX_Structure, L"fore:#0080FF" },
 	{ SCE_SWIFT_PROTOCOL, NP2StyleX_Protocol, L"bold; fore:#1E90FF" },
