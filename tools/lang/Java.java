@@ -1,4 +1,5 @@
 // Java SE 15 https://docs.oracle.com/en/java/javase/index.html
+// JDK 16 http://openjdk.java.net/projects/jdk/16/
 // https://docs.oracle.com/javase/specs/index.html
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
 

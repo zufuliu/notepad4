@@ -123,15 +123,23 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SWIFT_IDENTIFIER:
 		case SCE_SWIFT_IDENTIFIER_BT:
+		case SCE_SWIFT_ATTRIBUTE:
+		case SCE_SWIFT_DIRECTIVE:
+		case SCE_SWIFT_VARIABLE:
 			if (!IsIdentifierCharEx(sc.ch)) {
 				if (sc.state == SCE_SWIFT_IDENTIFIER_BT) {
 					if (sc.ch == '`') {
 						sc.Forward();
 					}
-				} else {
+				} else if (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_DIRECTIVE) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[0]->InList(s)) {
+					if (sc.state == SCE_SWIFT_DIRECTIVE) {
+						if (!keywordLists[1]->InListPrefixed(s + 1, '(')) {
+							// required for code folding
+							sc.ChangeState(SCE_SWIFT_DEFAULT);
+						}
+					} else if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_SWIFT_WORD);
 						if (strcmp(s, "import") == 0) {
 							if (visibleChars == sc.LengthCurrent()) {
@@ -195,28 +203,6 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 				if (sc.state != SCE_SWIFT_WORD && sc.ch != '.') {
 					kwType = SCE_SWIFT_DEFAULT;
-				}
-				sc.SetState(SCE_SWIFT_DEFAULT);
-			}
-			break;
-
-		case SCE_SWIFT_ATTRIBUTE:
-		case SCE_SWIFT_DIRECTIVE:
-		case SCE_SWIFT_VARIABLE:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				if (sc.state != SCE_SWIFT_VARIABLE) {
-					char s[128];
-					sc.GetCurrent(s, sizeof(s));
-					const char *p = s + 1;
-					if (sc.state == SCE_SWIFT_DIRECTIVE) {
-						if (!keywordLists[1]->InListPrefixed(p, '(')) {
-							sc.ChangeState(SCE_SWIFT_OTHER_DIRECTIVE);
-						}
-					} else {
-						if (!keywordLists[2]->InListPrefixed(p, '(')) {
-							sc.ChangeState(SCE_SWIFT_OTHER_ATTRIBUTE);
-						}
-					}
 				}
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			}
