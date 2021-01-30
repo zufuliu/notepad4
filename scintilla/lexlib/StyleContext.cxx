@@ -64,14 +64,11 @@ bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBe
 			// highlight first uppercase word after comment characters as task marker.
 			marker = true;
 		} else if (ch <= 32 && len >= 3 && len < 16 && AnyOf(sc.ch, 'T', 'F', 'N', 'X')) {
-			char s[8]{};
+			char s[8];
 			sc.styler.GetRange(sc.currentPos, pos, s, sizeof(s));
-			marker = memcmp(s, "TODO", COUNTOF("TODO")) == 0
-				|| memcmp(s, "FIXME", COUNTOF("FIXME")) == 0
-				|| memcmp(s, "NOTE", COUNTOF("NOTE")) == 0
-				|| memcmp(s, "XXX", COUNTOF("XXX")) == 0
-				|| memcmp(s, "TBD", COUNTOF("TBD")) == 0
-				|| memcmp(s, "NOLINT", CSTRLEN("NOLINT")) == 0; // clang-tidy: NOLINT, NOLINTNEXTLINE
+			marker = CStrEqual(s, "TODO") || CStrEqual(s, "FIXME")
+				|| CStrEqual(s, "NOTE") || CStrEqual(s, "XXX") || CStrEqual(s, "TBD")
+				|| CStrStartsWith(s, "NOLINT"); // clang-tidy: NOLINT, NOLINTNEXTLINE
 		}
 
 		visibleChars += len;

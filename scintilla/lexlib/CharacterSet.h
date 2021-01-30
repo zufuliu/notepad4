@@ -281,9 +281,78 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 #define COUNTOF(ar)	_countof(ar)
 #define CSTRLEN(s)	(_countof(s) - 1)
 
-#define StrStartsWith(s, prefix)			(strncmp((s), (prefix), CSTRLEN(prefix)) == 0)
-#define StrStartsWithEx(s, prefix, len)		(strncmp((s), (prefix), (len)) == 0)
-#define StrStartsWithCase(s, prefix)		(_strnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
-#define StrStartsWithCaseEx(s, prefix, len)	(_strnicmp((s), (prefix), (len)) == 0)
+#define StrEqual(s, q)						(::strcmp((s), (q)) == 0)
+#define StrStartsWith(s, prefix)			(::strncmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrStartsWithEx(s, prefix, len)		(::strncmp((s), (prefix), (len)) == 0)
+#define StrStartsWithCase(s, prefix)		(::_strnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrStartsWithCaseEx(s, prefix, len)	(::_strnicmp((s), (prefix), (len)) == 0)
+#define StrEndsWith(s, len, suffix)			(::strcmp((s) + ((len) - CSTRLEN(suffix)), (suffix)) == 0)
+
+#if defined(_MSC_BUILD) && (_MSC_VER < 1920)
+// Visual C++ 2017 failed to optimize out string literal in memcmp().
+namespace Private {
+
+constexpr int as_i4(const char *s) noexcept {
+	return *(const int *)s;
+}
+
+constexpr int as_i2(const char *s) noexcept {
+	return *(const short *)s;
+}
+
+template <size_t N>
+constexpr bool ConstStringCmp(const char *s, const char *q) noexcept {
+	if constexpr (N == 2) {
+		return as_i2(s) == as_i2(q);
+	}
+	if constexpr (N == 3) {
+		return as_i2(s) == as_i2(q) && s[2] == q[2];
+	}
+	if constexpr (N == 4) {
+		return as_i4(s) == as_i4(q);
+	}
+	if constexpr (N == 5) {
+		return as_i4(s) == as_i4(q) && s[4] == q[4];
+	}
+	if constexpr (N == 6) {
+		return as_i4(s) == as_i4(q) && as_i2(s + 4) == as_i2(q + 4);
+	}
+	if constexpr (N == 7) {
+		return as_i4(s) == as_i4(q) && as_i2(s + 4) == as_i2(q + 4) && s[6] == q[6];
+	}
+	if constexpr (N == 8) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4);
+	}
+	if constexpr (N == 9) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && s[8] == q[8];
+	}
+	if constexpr (N == 10) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i2(s + 8) == as_i2(q + 8);
+	}
+	if constexpr (N == 11) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i2(s + 8) == as_i2(q + 8) && s[10] == q[10];
+	}
+	if constexpr (N == 12) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i4(s + 8) == as_i4(q + 8);
+	}
+	if constexpr (N == 13) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i4(s + 8) == as_i4(q + 8) && s[12] == q[12];
+	}
+	if constexpr (N == 14) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i4(s + 8) == as_i4(q + 8) && as_i2(s + 12) == as_i2(q + 12);
+	}
+}
+
+}
+
+#define CStrEqual(s, q)					Private::ConstStringCmp<COUNTOF(q)>((s), (q))
+#define CStrStartsWith(s, prefix)		Private::ConstStringCmp<CSTRLEN(prefix)>((s), (prefix))
+#else
+#define CStrEqual(s, q)					(::memcmp((s), (q), COUNTOF(q)) == 0)
+#define CStrStartsWith(s, prefix)		(::memcmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#endif
+#define CStrEqualEx(s, q)				(::memcmp((s), (q), COUNTOF(q)) == 0)
+#define CStrStartsWithEx(s, prefix)		(::memcmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define CStrEndsWith(s, len, suffix)	(::memcmp((s) + ((len) - CSTRLEN(suffix)), suffix, COUNTOF(suffix)) == 0)
 
 }

@@ -120,7 +120,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						state = SCE_LLVM_WORD;
 					} else if (keywordLists[1]->InList(s)) {
 						state = SCE_LLVM_WORD2;
-						if (strcmp(s, "label") == 0) {
+						if (CStrEqual(s, "label")) {
 							kwType = SCE_LLVM_LABEL;
 						}
 					} else if (keywordLists[2]->InListPrefixed(s, '(')) {

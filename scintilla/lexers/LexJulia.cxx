@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Julia
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -129,7 +130,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
-					if (strcmp(s, "type") == 0 ) {
+					if (CStrEqual(s, "type")) {
 						// only in `abstract type` or `primitive type`
 						if (kwType == SCE_JULIA_WORD) {
 							sc.ChangeState(SCE_JULIA_WORD);
@@ -140,13 +141,13 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					} else {
 						isTransposeOperator = false;
 						sc.ChangeState(SCE_JULIA_WORD);
-						if (strcmp(s, "struct") == 0) {
+						if (CStrEqual(s, "struct")) {
 							kwType = SCE_JULIA_TYPE;
-						} else if (strcmp(s, "macro") == 0) {
+						} else if (CStrEqual(s, "macro")) {
 							kwType = SCE_JULIA_MACRO;
-						} else if (strcmp(s, "function") == 0) {
+						} else if (CStrEqual(s, "function")) {
 							kwType = SCE_JULIA_FUNCTION_DEFINE;
-						} else if (strcmp(s, "abstract") == 0 || strcmp(s, "primitive") == 0) {
+						} else if (CStrEqual(s, "abstract") || CStrEqual(s, "primitive")) {
 							kwType = SCE_JULIA_WORD;
 						}
 					}
@@ -455,8 +456,8 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
 
-	constexpr int MaxFoldWordLength = 10 + 1; // baremodule
-	char buf[MaxFoldWordLength + 1];
+	char buf[12]; // baremodule
+	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
 	char chNext = styler[startPos];
@@ -489,7 +490,7 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			if (styleNext != SCE_JULIA_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (strcmp(buf, "end") == 0) {
+				if (CStrEqual(buf, "end")) {
 					levelNext--;
 				} else if (keywordLists[1]->InList(buf)) {
 					levelNext++;

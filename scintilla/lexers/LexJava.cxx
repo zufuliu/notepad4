@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Java, Android IDL, BeanShell.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -101,7 +102,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				if (s[0] == '@') {
-					if (strcmp(s + 1, "interface") == 0) {
+					if (CStrEqual(s, "@interface")) {
 						sc.ChangeState(SCE_JAVA_WORD);
 						kwType = SCE_JAVA_ANNOTATION;
 					} else {
@@ -110,22 +111,22 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				} else if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_JAVA_WORD);
-					if (strcmp(s, "import") == 0) {
+					if (CStrEqual(s, "import")) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = JavaLineStateMaskImport;
 						}
-					} else if ((!(chBefore == '.' || chBefore == ':') && strcmp(s, "class") == 0)
-						|| EqualsAny(s, "new", "extends", "instanceof", "throws")) {
+					} else if ((!(chBefore == '.' || chBefore == ':') && CStrEqual(s, "class"))
+						|| CStrEqual(s, "new") || CStrEqual(s, "extends") || CStrEqual(s, "instanceof") || CStrEqual(s, "throws")) {
 						kwType = SCE_JAVA_CLASS;
-					} else if (EqualsAny(s, "interface", "implements")) {
+					} else if (CStrEqual(s, "interface") || CStrEqual(s, "implements")) {
 						kwType = SCE_JAVA_INTERFACE;
-					} else if (strcmp(s, "enum") == 0) {
+					} else if (CStrEqual(s, "enum")) {
 						kwType = SCE_JAVA_ENUM;
-					} else if (strcmp(s, "record") == 0) {
+					} else if (CStrEqual(s, "record")) {
 						kwType = SCE_JAVA_RECORD;
-					} else if (EqualsAny(s, "break", "continue")) {
+					} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")) {
 						kwType = SCE_JAVA_LABEL;
-					} else if (EqualsAny(s, "if", "while")) {
+					} else if (CStrEqual(s, "if") || CStrEqual(s, "while")) {
 						// to avoid treating following code as type cast:
 						// if (identifier) expression, while (identifier) expression
 						kwType = SCE_JAVA_WORD;

@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Kotlin.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -109,21 +110,22 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_KOTLIN_WORD);
-					if (strcmp(s, "import") == 0) {
+					if (CStrEqual(s, "import")) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = KotlinLineStateMaskImport;
 						}
-					} else if (EqualsAny(s, "break", "continue", "return", "this", "super")) {
+					} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")
+						|| CStrEqual(s, "return") || CStrEqual(s, "this") || CStrEqual(s, "super")) {
 						kwType = SCE_KOTLIN_LABEL;
 					} else if (((kwType != SCE_KOTLIN_ANNOTATION && kwType != SCE_KOTLIN_ENUM)
-							&& (chBefore != ':' && strcmp(s, "class") == 0))
-						|| strcmp(s, "typealias") == 0) {
+							&& (chBefore != ':' && CStrEqual(s, "class")))
+						|| CStrEqual(s, "typealias")) {
 						kwType = SCE_KOTLIN_CLASS;
-					} else if (strcmp(s, "enum") == 0) {
+					} else if (CStrEqual(s, "enum")) {
 						kwType = SCE_KOTLIN_ENUM;
-					} else if (strcmp(s, "annotation") == 0) {
+					} else if (CStrEqual(s, "annotation")) {
 						kwType = SCE_KOTLIN_ANNOTATION;
-					} else if (strcmp(s, "interface") == 0) {
+					} else if (CStrEqual(s, "interface")) {
 						kwType = SCE_KOTLIN_INTERFACE;
 					}
 					if (kwType != SCE_KOTLIN_DEFAULT) {

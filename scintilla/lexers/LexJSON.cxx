@@ -49,7 +49,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int levelNext = levelCurrent;
 
 	constexpr int MaxLexWordLength = 8; // Infinity
-	char buf[MaxLexWordLength + 1] = "";
+	char buf[MaxLexWordLength + 1];
 	int wordLen = 0;
 
 	// JSON5 line continuation

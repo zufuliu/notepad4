@@ -155,7 +155,6 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_F_COMMENT)
-#define StrEqu(str1, str2)		(strcmp(str1, str2) == 0)
 
 static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;

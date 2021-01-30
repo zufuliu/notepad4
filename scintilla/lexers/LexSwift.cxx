@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Swift.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -141,21 +142,22 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						}
 					} else if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_SWIFT_WORD);
-						if (strcmp(s, "import") == 0) {
+						if (CStrEqual(s, "import")) {
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = SwiftLineStateMaskImport;
 							}
-						} else if (EqualsAny(s, "class", "as", "extension", "is", "typealias")) {
+						} else if (CStrEqual(s, "class") || CStrEqual(s, "as") || CStrEqual(s, "extension")
+							|| CStrEqual(s, "is") || CStrEqual(s, "typealias")) {
 							kwType = SCE_SWIFT_CLASS;
-						} else if (strcmp(s, "struct") == 0) {
+						} else if (CStrEqual(s, "struct")) {
 							kwType = SCE_SWIFT_STRUCT;
-						} else if (strcmp(s, "protocol") == 0) {
+						} else if (CStrEqual(s, "protocol")) {
 							kwType = SCE_SWIFT_PROTOCOL;
-						} else if (strcmp(s, "enum") == 0) {
+						} else if (CStrEqual(s, "enum")) {
 							kwType = SCE_SWIFT_ENUM;
-						} else if (strcmp(s, "func") == 0) {
+						} else if (CStrEqual(s, "func")) {
 							kwType = SCE_SWIFT_FUNCTION_DEFINE;
-						} else if (EqualsAny(s, "break", "continue")) {
+						} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")) {
 							kwType = SCE_SWIFT_LABEL;
 						}
 						if (kwType != SCE_SWIFT_DEFAULT) {

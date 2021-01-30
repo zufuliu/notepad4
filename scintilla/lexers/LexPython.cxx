@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Python.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -144,11 +145,11 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
 					sc.ChangeState(SCE_PY_WORD);
-					if (strcmp(s, "def") == 0)
+					if (CStrEqual(s, "def"))
 						defType = PY_DEF_FUNC;
-					else if (strcmp(s, "class") == 0 || strcmp(s, "raise") == 0 || strcmp(s, "except") == 0)
+					else if (CStrEqual(s, "class") || CStrEqual(s, "raise") || CStrEqual(s, "except"))
 						defType = PY_DEF_CLASS;
-					//else if (strcmp(s, "enum") == 0)
+					//else if (CStrEqual(s, "enum"))
 					//	defType = PY_DEF_ENUM;
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_PY_WORD2);

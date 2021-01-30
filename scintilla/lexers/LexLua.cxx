@@ -7,6 +7,7 @@
  ** Modified by Marcos E. Wurzius & Philippe Lhoste
  **/
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -176,7 +177,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
 					sc.ChangeState(SCE_LUA_WORD);
-					if (strcmp(s, "goto") == 0) {	// goto <label> forward scan
+					if (CStrEqual(s, "goto")) {	// goto <label> forward scan
 						sc.SetState(SCE_LUA_DEFAULT);
 						while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
 							sc.Forward();
@@ -331,17 +332,16 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			if (ch == 'i' || ch == 'd' || ch == 'f' || ch == 'e' || ch == 'r' || ch == 'u') {
 				char s[10] = "";
 				for (Sci_PositionU j = 0; j < 8; j++) {
-					if (!iswordchar(styler[i + j])) {
+					const char c = styler[i + j];
+					if (!IsLowerCase(c)) {
 						break;
 					}
-					s[j] = styler[i + j];
-					s[j + 1] = '\0';
+					s[j] = c;
 				}
 
-				if ((strcmp(s, "if") == 0) || (strcmp(s, "do") == 0) || (strcmp(s, "function") == 0) || (strcmp(s, "repeat") == 0)) {
+				if (CStrEqual(s, "if") || CStrEqual(s, "do") || CStrEqual(s, "function") || CStrEqual(s, "repeat")) {
 					levelCurrent++;
-				}
-				if ((strcmp(s, "end") == 0) || (strcmp(s, "elseif") == 0) || (strcmp(s, "until") == 0)) {
+				} else if (CStrEqual(s, "end") || CStrEqual(s, "elseif") || CStrEqual(s, "until")) {
 					levelCurrent--;
 				}
 			}

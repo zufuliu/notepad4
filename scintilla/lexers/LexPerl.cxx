@@ -7,6 +7,7 @@
 // Lexical analysis fixes by Kein-Hong Man <mkh@pl.jaring.my>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -689,10 +690,10 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[100];
 				sc.GetCurrent(s, sizeof(s));
-				if ((strcmp(s, "__DATA__") == 0) || (strcmp(s, "__END__") == 0)) {
+				if (CStrEqual(s, "__DATA__") || CStrEqual(s, "__END__")) {
 					sc.ChangeState(SCE_PL_DATASECTION);
 				} else {
-					if ((strcmp(s, "format") == 0)) {
+					if (CStrEqual(s, "format")) {
 						sc.SetState(SCE_PL_FORMAT_IDENT);
 						HereDoc.State = 0;
 					} else {

@@ -9,6 +9,7 @@
 // Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -114,11 +115,11 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 					sc.ChangeState(SCE_B_LABEL);
 					sc.SetState(SCE_B_DEFAULT);
 				} else
-					if (strcmp(s, "rem") == 0) {
+					if (CStrEqual(s, "rem")) {
 						sc.ChangeState(SCE_B_COMMENT);
 					} else {
-						if ((isIfThenPreprocessor && strcmp(s, "then") == 0) || (isEndPreprocessor
-							&& (strcmp(s, "if") == 0 || strcmp(s, "region") == 0 || strcmp(s, "externalsource") == 0))) {
+						if ((isIfThenPreprocessor && CStrEqual(s, "then")) || (isEndPreprocessor
+							&& (CStrEqual(s, "if") || CStrEqual(s, "region") || CStrEqualEx(s, "externalsource") == 0))) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
 						} else if (keywords.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD);
@@ -128,8 +129,8 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 							sc.ChangeState(SCE_B_KEYWORD3);
 						} else if (!vbScriptSyntax && s[0] == '#' && keywords4.InList(s + 1)) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
-							isIfThenPreprocessor = strcmp(s, "#if") == 0 || strcmp(s, "#elseif") == 0;
-							isEndPreprocessor = strcmp(s, "#end") == 0;
+							isIfThenPreprocessor = CStrEqual(s, "#if") || CStrEqual(s, "#elseif");
+							isEndPreprocessor = CStrEqual(s, "#end");
 						} else if (keywords5.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD4);
 						} else if (keywords6.InList(s)) {
