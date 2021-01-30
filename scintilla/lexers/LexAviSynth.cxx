@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for AviSynth, AviSynth+, GScript.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -87,7 +88,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					int state = SCE_AVS_USERDFN;
 					if (keywordLists[1]->InListPrefixed(s, '(')) {
 						state = SCE_AVS_FUNCTION;
-						if (!insideScript && EqualsAny(s, "eval", "gscript", "geval")) {
+						if (!insideScript && (CStrEqual(s, "eval") || CStrEqual(s, "gscript") || CStrEqual(s, "geval"))) {
 							scriptEval = ScriptEvalState_Name;
 						}
 					} else if (keywordLists[2]->InListPrefixed(s, '(')) {

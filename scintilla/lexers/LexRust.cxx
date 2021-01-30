@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Rust.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -127,19 +128,19 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_RUST_WORD);
-						if (strcmp(s, "struct") == 0) {
+						if (CStrEqual(s, "struct")) {
 							kwType = SCE_RUST_STRUCT;
-						} else if (strcmp(s, "fn") == 0) {
+						} else if (CStrEqual(s, "fn")) {
 							kwType = SCE_RUST_FUNCTION_DEFINE;
-						} else if (strcmp(s, "trait") == 0) {
+						} else if (CStrEqual(s, "trait")) {
 							kwType = SCE_RUST_TRAIT;
-						} else if (strcmp(s, "enum") == 0) {
+						} else if (CStrEqual(s, "enum")) {
 							kwType = SCE_RUST_ENUMERATION;
-						} else if (strcmp(s, "type") == 0) {
+						} else if (CStrEqual(s, "type")) {
 							kwType = SCE_RUST_TYPE; // type alias
-						} else if (strcmp(s, "const") == 0) {
+						} else if (CStrEqual(s, "const")) {
 							kwType = SCE_RUST_CONSTANT;
-						} else if (strcmp(s, "union") == 0) {
+						} else if (CStrEqual(s, "union")) {
 							kwType = SCE_RUST_UNION;
 						}
 						if (kwType != SCE_RUST_DEFAULT) {
@@ -148,7 +149,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								kwType = SCE_RUST_DEFAULT;
 							}
 						}
-						if ((visibleChars == 3 || visibleChars == 6) && strcmp(s, "use") == 0) {
+						if ((visibleChars == 3 || visibleChars == 6) && CStrEqual(s, "use")) {
 							lineStateLineType = RustLineStateMaskPubUse;
 						}
 					} else if (keywordLists[1]->InList(s)) {

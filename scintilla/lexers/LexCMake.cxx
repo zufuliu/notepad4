@@ -105,9 +105,9 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					userDefType = SCE_CMAKE_DEFAULT;
 					if (keywordLists[0]->InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_WORD);
-						if (strcmp(s, "function") == 0) {
+						if (CStrEqual(s, "function")) {
 							userDefType = SCE_CMAKE_FUNCATION;
-						} else if (strcmp(s, "macro") == 0) {
+						} else if (CStrEqual(s, "macro")) {
 							userDefType = SCE_CMAKE_MACRO;
 						}
 					} else if (keywordLists[1]->InListPrefixed(s, '(')) {
@@ -228,7 +228,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.ch == '{') {
 					char s[8];
 					sc.GetCurrent(s, sizeof(s));
-					if (strcmp(s, "$ENV") == 0 || strcmp(s, "$CACHE") == 0) {
+					if (CStrEqual(s, "$ENV") || CStrEqual(s, "$CACHE")) {
 						sc.SetState(SCE_CMAKE_VARIABLE);
 						varNestedLevel = 1;
 						done = true;
@@ -347,8 +347,8 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	constexpr int MaxFoldWordLength = 8 + 1; // function
-	char buf[MaxFoldWordLength + 1];
+	char buf[16]; // function
+	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -382,9 +382,10 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			if (styleNext != SCE_CMAKE_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (StrStartsWith(buf, "end")) {
+				if (CStrStartsWith(buf, "end")) {
 					levelNext--;
-				} else if (EqualsAny(buf, "if",  "function", "macro", "foreach", "while")) {
+				} else if (CStrEqual(buf, "if") || CStrEqual(buf, "function") || CStrEqual(buf, "macro")
+					|| CStrEqual(buf, "foreach") || CStrEqual(buf, "while")) {
 					levelNext++;
 				}
 			}

@@ -159,18 +159,18 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (!IsWordChar(sc.ch)) {
 				char s[256];
 				sc.GetCurrentLowered(s, sizeof(s));
-				if (strcmp(s, "rem") == 0) {
+				if (CStrEqual(s, "rem")) {
 					sc.ChangeState(SCE_BAT_COMMENT);
 				} else {
 					if (!inEcho && keywords.InList(s)) { // not in echo ?
 						sc.ChangeState(SCE_BAT_WORD);
-						inEcho = strcmp(s, "echo") == 0 || strcmp(s, "echo.") == 0 || strcmp(s, "title") == 0 || strcmp(s, "prompt") == 0;
-						isGoto = strcmp(s, "goto") == 0;
-						isCall = strcmp(s, "call") == 0;
+						inEcho = CStrEqual(s, "echo") || CStrEqual(s, "echo.") || CStrEqual(s, "title") || CStrEqual(s, "prompt");
+						isGoto = CStrEqual(s, "goto");
+						isCall = CStrEqual(s, "call");
 						if (inEcho) {
 							parenCount = levelNext;
 						}
-					} else if (!inEcho && visibleChars == static_cast<int>(strlen(s))) {
+					} else if (!inEcho && visibleChars == sc.LengthCurrent()) {
 						if (visibleChars == 1 && sc.ch == ':' && sc.chNext == '\\') {
 							sc.Forward(2);
 							while (IsWordChar(sc.ch) || sc.ch == '\\') {

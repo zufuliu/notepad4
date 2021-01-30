@@ -6,6 +6,7 @@
 // Adapted from LexPerl by Kein-Hong Man 2004
 // The License.txt file describes the conditions under which this software may be distributed.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -335,9 +336,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				const bool keywordEnds = IsASpace(sc.ch) || IsBashCmdDelimiter(sc.ch, 0);
 				// 'in' or 'do' may be construct keywords
 				if (cmdState == BASH_CMD_WORD) {
-					if (strcmp(s, "in") == 0 && keywordEnds)
+					if (CStrEqual(s, "in") && keywordEnds)
 						cmdStateNew = BASH_CMD_BODY;
-					else if (strcmp(s, "do") == 0 && keywordEnds)
+					else if (CStrEqual(s, "do") && keywordEnds)
 						cmdStateNew = BASH_CMD_START;
 					else
 						sc.ChangeState(SCE_SH_IDENTIFIER);
@@ -345,7 +346,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					break;
 				}
 				// a 'test' keyword starts a test expression
-				if (strcmp(s, "test") == 0) {
+				if (CStrEqual(s, "test")) {
 					if (cmdState == BASH_CMD_START && keywordEnds) {
 						cmdStateNew = BASH_CMD_TEST;
 						testExprType = 0;
@@ -360,7 +361,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 				}
 				// 'for'|'case'|'select' needs 'in'|'do' to be highlighted later
-				else if (EqualsAny(s, "for", "case", "select")) {
+				else if (CStrEqual(s, "for") || CStrEqual(s, "case") || CStrEqual(s, "select")) {
 					if (cmdState == BASH_CMD_START && keywordEnds)
 						cmdStateNew = BASH_CMD_WORD;
 					else
@@ -378,7 +379,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 
 				// m4
-				if (strcmp(s, "dnl") == 0) {
+				if (CStrEqual(s, "dnl")) {
 					sc.ChangeState(SCE_SH_COMMENTLINE);
 					if (sc.atLineEnd) {
 						sc.SetState(SCE_SH_DEFAULT);
@@ -842,8 +843,8 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 
-	constexpr int MaxFoldWordLength = 7 + 1; // foreach
-	char word[MaxFoldWordLength + 1];
+	char word[8]; // foreach
+	constexpr int MaxFoldWordLength = sizeof(word) - 1;
 	int wordlen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -865,15 +866,15 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 				word[wordlen] = '\0';
 				wordlen = 0;
 				if (isCShell) {
-					if (EqualsAny(word, "if", "foreach", "switch", "while")) {
+					if (CStrEqual(word, "if") || CStrEqual(word, "foreach") || CStrEqual(word, "switch") || CStrEqual(word, "while")) {
 						levelCurrent++;
-					} else if (EqualsAny(word, "end", "endif", "endsw")) {
+					} else if (CStrEqual(word, "end") || CStrEqual(word, "endif") || CStrEqual(word, "endsw")) {
 						levelCurrent--;
 					}
 				} else {
-					if (EqualsAny(word, "if", "case", "do")) {
+					if (CStrEqual(word, "if") || CStrEqual(word, "case") || CStrEqual(word, "do")) {
 						levelCurrent++;
-					} else if (EqualsAny(word, "fi", "esac", "done")) {
+					} else if (CStrEqual(word, "fi") || CStrEqual(word, "esac") || CStrEqual(word, "done")) {
 						levelCurrent--;
 					}
 				}

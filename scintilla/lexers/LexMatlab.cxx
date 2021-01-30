@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Matlab, Octave, Scilab and Gnuplot (treated as same as Octave).
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -284,7 +285,6 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_MAT_COMMENT)
-#define StrEqu(str1, str2)		(strcmp(str1, str2) == 0)
 
 static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
@@ -332,22 +332,21 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		}
 
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
-			constexpr int MaxFoldWordLength = 14 + 1; // unwind_protect
-			char word[MaxFoldWordLength + 1];
+			char word[16]; // unwind_protect
 			const Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
-			if ((StrEqu(word, "function") && LexGetNextChar(i + len, styler) != '(')
-				|| StrEqu(word, "if")
-				|| StrEqu(word, "for")
-				|| StrEqu(word, "while")
-				|| StrEqu(word, "try")
-				|| (IsMatlabOctave(lexType) && (StrEqu(word, "switch") || StrEqu(word, "classdef") || StrEqu(word, "parfor")))
-				|| ((lexType == LEX_OCTAVE) && (StrEqu(word, "do") || StrEqu(word, "unwind_protect")))
-				|| ((lexType == LEX_SCILAB) && StrEqu(word, "select"))
+			if ((CStrEqual(word, "function") && LexGetNextChar(i + len, styler) != '(')
+				|| CStrEqual(word, "if")
+				|| CStrEqual(word, "for")
+				|| CStrEqual(word, "while")
+				|| CStrEqual(word, "try")
+				|| (IsMatlabOctave(lexType) && (CStrEqual(word, "switch") || CStrEqual(word, "classdef") || CStrEqual(word, "parfor")))
+				|| ((lexType == LEX_OCTAVE) && (CStrEqual(word, "do") || StrEqual(word, "unwind_protect")))
+				|| ((lexType == LEX_SCILAB) && CStrEqual(word, "select"))
 				) {
 				levelNext++;
-			} else if ((lexType == LEX_OCTAVE) && StrEqu(word, "until")) {
+			} else if ((lexType == LEX_OCTAVE) && CStrEqual(word, "until")) {
 				levelNext--;
-			} else if (styler.Match(i, "end")) {
+			} else if (CStrStartsWith(word, "end")) {
 				levelNext--;
 				//if (len == 3) {	// just "end"
 				//	Sci_Position pos = LexSkipSpaceTab(i+3, endPos, styler);
@@ -356,8 +355,8 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				//		levelNext++;
 				//	}
 				//}
-			} else if (IsMatlabOctave(lexType) && chPrev != '@' && (StrEqu(word, "methods")
-				|| StrEqu(word, "properties") || StrEqu(word, "events") || StrEqu(word, "enumeration"))) {
+			} else if (IsMatlabOctave(lexType) && chPrev != '@' && (CStrEqual(word, "methods")
+				|| CStrEqual(word, "properties") || CStrEqual(word, "events") || CStrEqual(word, "enumeration"))) {
 				// Matlab classdef
 				Sci_Position pos = LexSkipSpaceTab(i + len, endPos, styler);
 				const char chEnd = styler.SafeGetCharAt(pos);

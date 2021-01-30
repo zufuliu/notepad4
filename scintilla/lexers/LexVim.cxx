@@ -109,7 +109,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (keywordLists[0]->InList(s)) {
 					if (!lineStateLineAutoCommand && visibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_VIM_WORD);
-						if (strcmp(s, "au") == 0 || strcmp(s, "autocmd") == 0) {
+						if (CStrEqual(s, "au") || CStrEqual(s, "autocmd")) {
 							lineStateLineAutoCommand = VimLineStateMaskAutoCommand;
 						}
 					} else {
@@ -266,8 +266,8 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 
 	int styleNext = styler.StyleAt(startPos);
 
-	constexpr int MaxFoldWordLength = 5 + 1; // while
-	char buf[MaxFoldWordLength + 1];
+	char buf[8]; // while
+	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
@@ -281,9 +281,9 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			if (styleNext != SCE_VIM_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (EqualsAny(buf, "if", "while", "for", "try") || StrStartsWith(buf, "fun")) {
+				if (CStrEqual(buf, "if") || CStrEqual(buf, "while") || CStrEqual(buf, "for") || CStrEqual(buf, "try") || CStrStartsWith(buf, "fun")) {
 					levelNext++;
-				} else if (StrStartsWith(buf, "end")) {
+				} else if (CStrStartsWith(buf, "end")) {
 					levelNext--;
 				}
 			}

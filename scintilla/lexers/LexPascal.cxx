@@ -7,6 +7,7 @@
  ** Completely rewritten by Marko Njezic <sf@maxempire.com> October 2008
  **/
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -59,7 +60,7 @@ void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLi
 	}
 	if (keywords.InList(s)) {
 		if (curLineState & stateInAsm) {
-			if (strcmp(s, "end") == 0 && sc.GetRelative(-4) != '@') {
+			if (CStrEqual(s, "end") && sc.GetRelative(-4) != '@') {
 				curLineState &= ~stateInAsm;
 				sc.ChangeState(SCE_PAS_WORD);
 			} else {
@@ -67,23 +68,23 @@ void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLi
 			}
 		} else {
 			bool ignoreKeyword = false;
-			if (strcmp(s, "asm") == 0) {
+			if (CStrEqual(s, "asm")) {
 				curLineState |= stateInAsm;
 			} else if (bSmartHighlighting) {
-				if (strcmp(s, "property") == 0) {
+				if (CStrEqual(s, "property")) {
 					curLineState |= stateInProperty;
-				} else if (strcmp(s, "exports") == 0) {
+				} else if (CStrEqual(s, "exports")) {
 					curLineState |= stateInExport;
-				} else if (!(curLineState & (stateInProperty | stateInExport)) && strcmp(s, "index") == 0) {
+				} else if (!(curLineState & (stateInProperty | stateInExport)) && CStrEqual(s, "index")) {
 					ignoreKeyword = true;
-				} else if (!(curLineState & stateInExport) && strcmp(s, "name") == 0) {
+				} else if (!(curLineState & stateInExport) && CStrEqual(s, "name")) {
 					ignoreKeyword = true;
 				} else if (!(curLineState & stateInProperty) &&
-					(strcmp(s, "read") == 0 || strcmp(s, "write") == 0 ||
-						//					 strcmp(s, "default") == 0 || strcmp(s, "nodefault") == 0 ||
-						strcmp(s, "stored") == 0 || strcmp(s, "implements") == 0 ||
-						strcmp(s, "readonly") == 0 || strcmp(s, "writeonly") == 0 ||
-						strcmp(s, "add") == 0 || strcmp(s, "remove") == 0)) {
+					(CStrEqual(s, "read") || CStrEqual(s, "write") ||
+						//CStrEqual(s, "default") || CStrEqual(s, "nodefault") ||
+						CStrEqual(s, "stored") || CStrEqual(s, "implements") ||
+						CStrEqual(s, "readonly") || CStrEqual(s, "writeonly") ||
+						CStrEqual(s, "add") || CStrEqual(s, "remove"))) {
 					ignoreKeyword = true;
 				}
 			}
@@ -268,18 +269,18 @@ void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCu
 
 	unsigned int nestLevel = GetFoldInPreprocessorLevelFlag(lineFoldStateCurrent);
 
-	if (strcmp(s, "if") == 0 ||
-		strcmp(s, "ifdef") == 0 ||
-		strcmp(s, "ifndef") == 0 ||
-		strcmp(s, "ifopt") == 0 ||
-		strcmp(s, "region") == 0) {
+	if (CStrEqual(s, "if") ||
+		CStrEqual(s, "ifdef") ||
+		CStrEqual(s, "ifndef") ||
+		CStrEqual(s, "ifopt") ||
+		CStrEqual(s, "region")) {
 		nestLevel++;
 		SetFoldInPreprocessorLevelFlag(lineFoldStateCurrent, nestLevel);
 		lineFoldStateCurrent |= stateFoldInPreprocessor;
 		levelCurrent++;
-	} else if (strcmp(s, "endif") == 0 ||
-		strcmp(s, "ifend") == 0 ||
-		strcmp(s, "endregion") == 0) {
+	} else if (CStrEqual(s, "endif") ||
+		CStrEqual(s, "ifend") ||
+		CStrEqual(s, "endregion")) {
 		nestLevel--;
 		SetFoldInPreprocessorLevelFlag(lineFoldStateCurrent, nestLevel);
 		if (nestLevel == 0) {
@@ -299,15 +300,15 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 
 	styler.GetRangeLowered(lastStart, currentPos + 1, s, sizeof(s));
 
-	if (strcmp(s, "record") == 0) {
+	if (CStrEqual(s, "record")) {
 		lineFoldStateCurrent |= stateFoldInRecord;
 		levelCurrent++;
-	} else if (strcmp(s, "begin") == 0 ||
-		strcmp(s, "asm") == 0 ||
-		strcmp(s, "try") == 0 ||
-		(strcmp(s, "case") == 0 && !(lineFoldStateCurrent & stateFoldInRecord))) {
+	} else if (CStrEqual(s, "begin") ||
+		CStrEqual(s, "asm") ||
+		CStrEqual(s, "try") ||
+		(CStrEqual(s, "case") && !(lineFoldStateCurrent & stateFoldInRecord))) {
 		levelCurrent++;
-	} else if (strcmp(s, "class") == 0 || strcmp(s, "object") == 0) {
+	} else if (CStrEqual(s, "class") || CStrEqual(s, "object")) {
 		// "class" & "object" keywords require special handling...
 		bool ignoreKeyword = false;
 		Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler, IsStreamCommentStyle);
@@ -317,7 +318,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 				// Handle forward class declarations ("type TMyClass = class;")
 				// and object method declarations ("TNotifyEvent = procedure(Sender: TObject) of object;")
 				ignoreKeyword = true;
-			} else if (strcmp(s, "class") == 0) {
+			} else if (CStrEqual(s, "class")) {
 				// "class" keyword has a few more special cases...
 				if (styler.SafeGetCharAt(j) == '(') {
 					// Handle simplified complete class declarations ("type TMyClass = class(TObject);")
@@ -332,12 +333,12 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 					char s2[16];	// Size of the longest possible keyword + one additional character + null
 					LexGetRangeLowered(j, styler, setWord, s2, sizeof(s2));
 
-					if (strcmp(s2, "procedure") == 0 ||
-						strcmp(s2, "function") == 0 ||
-						strcmp(s2, "of") == 0 ||
-						strcmp(s2, "var") == 0 ||
-						strcmp(s2, "property") == 0 ||
-						strcmp(s2, "operator") == 0) {
+					if (CStrEqual(s2, "procedure") ||
+						CStrEqual(s2, "function") ||
+						CStrEqual(s2, "of") ||
+						CStrEqual(s2, "var") ||
+						CStrEqual(s2, "property") ||
+						CStrEqual(s2, "operator")) {
 						ignoreKeyword = true;
 					}
 				}
@@ -346,7 +347,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		if (!ignoreKeyword) {
 			levelCurrent++;
 		}
-	} else if (strcmp(s, "interface") == 0) {
+	} else if (CStrEqual(s, "interface")) {
 		// "interface" keyword requires special handling...
 		bool ignoreKeyword = true;
 		Sci_Position j = lastStart - 1;
@@ -369,7 +370,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		if (!ignoreKeyword) {
 			levelCurrent++;
 		}
-	} else if (strcmp(s, "dispinterface") == 0) {
+	} else if (CStrEqual(s, "dispinterface")) {
 		// "dispinterface" keyword requires special handling...
 		bool ignoreKeyword = false;
 		const Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler);
@@ -380,7 +381,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		if (!ignoreKeyword) {
 			levelCurrent++;
 		}
-	} else if (strcmp(s, "end") == 0) {
+	} else if (CStrEqual(s, "end")) {
 		lineFoldStateCurrent &= ~stateFoldInRecord;
 		levelCurrent--;
 		if (levelCurrent < SC_FOLDLEVELBASE) {

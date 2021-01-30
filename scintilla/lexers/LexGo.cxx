@@ -2,6 +2,7 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Go.
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -207,15 +208,15 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				const int kwPrev = kwType;
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD);
-					if (strcmp(s, "func") == 0) {
+					if (CStrEqual(s, "func")) {
 						funcState = (visibleChars == 4)? GoFunction_Define : GoFunction_Param;
-					} else if (strcmp(s, "type") == 0) {
+					} else if (CStrEqual(s, "type")) {
 						kwType = SCE_GO_TYPE;
-					} else if (strcmp(s, "const") == 0) {
+					} else if (CStrEqual(s, "const")) {
 						kwType = SCE_GO_CONSTANT;
-					} else if (EqualsAny(s, "map", "chan")) {
+					} else if (CStrEqual(s, "map") || CStrEqual(s, "chan")) {
 						kwType = SCE_GO_IDENTIFIER;
-					} else if (EqualsAny(s, "goto", "break", "continue")) {
+					} else if (CStrEqual(s, "goto") || CStrEqual(s, "break") || CStrEqual(s, "continue")) {
 						kwType = SCE_GO_LABEL;
 					}
 					if (kwType == SCE_GO_TYPE || kwType == SCE_GO_LABEL) {
@@ -228,7 +229,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.ChangeState(SCE_GO_WORD2);
 				} else if (keywordLists[2]->InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_GO_BUILTIN_FUNC);
-					if (sc.ch == '(' && strcmp(s, "new") == 0) {
+					if (sc.ch == '(' && CStrEqual(s, "new")) {
 						kwType = SCE_GO_IDENTIFIER;
 					}
 				} else if (keywordLists[3]->InList(s)) {

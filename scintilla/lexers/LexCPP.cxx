@@ -3,6 +3,7 @@
 //! Lexer for C, C++, C#, Rescouce Script, Asymptote, D, Objective C/C++, PHP
 //! haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL
 
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -62,7 +63,6 @@ static constexpr bool Use2ndKeyword(int lex) noexcept {
 static constexpr bool Use2ndKeyword2(int lex) noexcept {
 	return lex == LEX_CPP || lex == LEX_OBJC;
 }
-#define	strequ(str1, str2)	(!strcmp(str1, str2))
 static constexpr bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_C_DEFAULT, SCE_C_COMMENT, SCE_C_COMMENTLINE
 	// SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG, SCE_C_COMMENTDOC_TAG_XML
@@ -267,7 +267,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				const int nextChar = sc.GetDocNextChar();
 
 				if (lastPPDefineWord) {
-					if (lastPPDefineWord == 2 && strcmp(s, "defined") == 0)
+					if (lastPPDefineWord == 2 && StrEqual(s, "defined"))
 						sc.ChangeState(SCE_C_WORD);
 					else if (sc.ch == '(')
 						sc.ChangeState(SCE_C_MACRO2);
@@ -293,39 +293,39 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						char *ppw = s;
 						if (s[0] == '#')
 							ppw = s + 1;
-						isPragmaPreprocessor = strequ(ppw, "pragma") || strequ(ppw, "line");
-						isIncludePreprocessor = strcmp(ppw, "include") >= 0 || strequ(ppw, "import") || strequ(ppw, "using");
-						isMessagePreprocessor = strequ(ppw, "error") || strequ(ppw, "warning") || strequ(ppw, "message") ||
-							strequ(ppw, "region") || strequ(ppw, "endregion");
-						if (strequ(ppw, "define")) {
+						isPragmaPreprocessor = StrEqual(ppw, "pragma") || StrEqual(ppw, "line");
+						isIncludePreprocessor = strcmp(ppw, "include") >= 0 || StrEqual(ppw, "import") || StrEqual(ppw, "using");
+						isMessagePreprocessor = StrEqual(ppw, "error") || StrEqual(ppw, "warning") || StrEqual(ppw, "message") ||
+							StrEqual(ppw, "region") || StrEqual(ppw, "endregion");
+						if (StrEqual(ppw, "define")) {
 							lineState |= LEX_BLOCK_MASK_DEFINE;
 							lastPPDefineWord = 1;
 						} else if (strstr(ppw, "if")) {
 							lastPPDefineWord = 2;
-						} else if (strequ(ppw, "undef")) {
+						} else if (StrEqual(ppw, "undef")) {
 							lastPPDefineWord = 3;
 						}
 					}
 				} else if (isPragmaPreprocessor) {
 					isPragmaPreprocessor = false;
 					sc.ChangeState(SCE_C_PREPROCESSOR);
-					isMessagePreprocessor = strequ(s, "region") || strequ(s, "endregion") || strequ(s, "mark");
+					isMessagePreprocessor = CStrEqual(s, "region") || CStrEqual(s, "endregion") || CStrEqual(s, "mark");
 				} else if ((!hasAttr || mayAttr || mayCSAttr) && kwAttribute.InList(s)) {
 					sc.ChangeState(SCE_C_ATTRIBUTE);
 				} else if (keywords.InList(s)) {
 					sc.ChangeState(SCE_C_WORD);
-					if (isAssignStmt && chPrevNonWhite == '=' && (strequ(s, "function") || strequ(s, "new"))) {
+					if (isAssignStmt && chPrevNonWhite == '=' && (CStrEqual(s, "function") || CStrEqual(s, "new"))) {
 						isAssignStmt = false;
 					}
 					// asm __asm _asm
-					lastWordWasAsm = strequ(s, "asm") || strequ(s, "__asm");
-					lastWordWasUUID = strequ(s, "uuid");
-					lastWordWasGoto = strequ(s, "goto") || strequ(s, "__label__") || strequ(s, "break") || strequ(s, "continue");
-					followsReturn = strequ(s, "return");
+					lastWordWasAsm = CStrEqual(s, "asm") || CStrEqual(s, "__asm");
+					lastWordWasUUID = CStrEqual(s, "uuid");
+					lastWordWasGoto = CStrEqual(s, "goto") || CStrEqual(s, "__label__") || CStrEqual(s, "break") || CStrEqual(s, "continue");
+					followsReturn = CStrEqual(s, "return");
 					if (!isTypeDefine)
-						isTypeDefine = strequ(s, "typedef");
+						isTypeDefine = CStrEqual(s, "typedef");
 					if (!lastWordWasAttr)
-						lastWordWasAttr = strequ(s, "__declspec") || strequ(s, "__attribute__");
+						lastWordWasAttr = CStrEqual(s, "__declspec") || CStrEqual(s, "__attribute__");
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_C_WORD2);
 				} else if (s[0] == '@' && HasAnotation(lexType)) {
@@ -338,7 +338,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						if (!isObjCSource)
 							isObjCSource = true;
 						if (!lastWordWasAttr)
-							lastWordWasAttr = strequ(s + 1, "property");
+							lastWordWasAttr = StrEqual(s + 1, "property");
 					}
 				} else if (kwClass.InList(s)) {
 					sc.ChangeState(SCE_C_CLASS);
