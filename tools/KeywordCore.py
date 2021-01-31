@@ -127,13 +127,26 @@ def UpdateKeywordFile(rid, path, keywordList, keywordCount=16):
 	output = BuildKeywordContent(rid, keywordList, keywordCount=keywordCount)
 	Regenerate(path, '//', output)
 
-def read_api_file(path, comment):
+def read_api_file(path, comment, commentKind=0):
 	doc = open(path, encoding='utf-8').read()
-	doc = re.sub(comment + r'[^!].+', '', doc) # normal comment
+	if commentKind == 0:
+		doc = re.sub(comment + r'[^!].+', '', doc) # normal comment
 	sections = []
 	items = doc.split(comment + "!") #! section name
 	for section in items:
 		lines = section.strip().splitlines()
+		if commentKind == 1:
+			result = []
+			for line in lines:
+				index = line.find(comment)
+				if index < 0:
+					result.append(line)
+					continue
+				if index > 0:
+					line = line[:index].strip()
+					if line:
+						result.append(line)
+			lines = result
 		if not lines:
 			continue
 
@@ -188,6 +201,31 @@ def parse_actionscript_api_file(path):
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('properties', [], KeywordAttr.Default),
 		('doc tag', [], KeywordAttr.Default),
+	]
+
+def parse_apdl_api_file(path):
+	ext = os.path.splitext(path)[1].lower()
+	comment = '!' if ext == '.apdl' else '**'
+	sections = read_api_file(path, comment, 1)
+	keywordMap = {}
+	for key, doc in sections:
+		key = key.strip('*! ')
+		if key == 'function':
+			items = re.findall('(\w+\()', doc)
+		else:
+			items = doc.split()
+			if key in ('code folding', 'slash command', 'star command'):
+				items = [item.lstrip('*/') for item in items]
+		keywordMap[key] = items
+
+	keywordMap['star command'].extend(keywordMap['code folding']) # for auto-completion
+	return [
+		('keywords', keywordMap['code folding'], KeywordAttr.Default),
+		('command', keywordMap['command'], KeywordAttr.Default),
+		('slash command', keywordMap['slash command'], KeywordAttr.Default),
+		('star command', keywordMap['star command'], KeywordAttr.Default),
+		('argument', keywordMap['argument'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.Default),
 	]
 
 def parse_avisynth_api_file(path):

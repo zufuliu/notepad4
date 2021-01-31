@@ -988,6 +988,13 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 #define AutoC_AddSpecWord_Keyword	2
 INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int chPrev) {
 	switch (pLexCurrent->iLexer) {
+	case SCLEX_APDL:
+		if (iCurrentStyle == 0 && (ch == '*' || ch == '/')) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(ch == '/') ? 2 : 3]);// slash, star command
+			return AutoC_AddSpecWord_Keyword;
+		}
+		break;
+
 	case SCLEX_CPP:
 		if (IsCppCommentStyle(iCurrentStyle) && np2_LexKeyword) {
 			if ((ch == '@' && (np2_LexKeyword == &kwJavaDoc || np2_LexKeyword == &kwPHPDoc || np2_LexKeyword == &kwDoxyDoc))
@@ -2091,6 +2098,10 @@ void EditAutoIndent(void) {
 
 void EditToggleCommentLine(void) {
 	switch (pLexCurrent->iLexer) {
+	case SCLEX_APDL:
+		EditToggleLineComments((pLexCurrent->rid == NP2LEX_APDL) ? L"!" : L"**", FALSE);
+		break;
+
 	case SCLEX_ASM: {
 		LPCWSTR ch;
 		switch (autoCompletionConfig.iAsmLineCommentChar) {

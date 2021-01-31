@@ -59,7 +59,7 @@ void Scintilla_LinkLexers() {
 	//extern LexerModule lmAbaqus;
 	//extern LexerModule lmAda;
 	//extern LexerModule lmAHK;
-	//extern LexerModule lmAPDL;
+	extern LexerModule lmAPDL;
 	//extern LexerModule lmAs;
 	extern LexerModule lmAsm;
 	//extern LexerModule lmAsn1;
@@ -209,7 +209,7 @@ void Scintilla_LinkLexers() {
 		//&lmAbaqus,
 		//&lmAda,
 		//&lmAHK,
-		//&lmAPDL,
+		&lmAPDL,
 		//&lmAs,
 		&lmAsm,
 		//&lmAsn1,
