@@ -161,12 +161,17 @@ XML Document
 	web.config		ASP.NET Web Configuration
 
 
+ABAQUS
+	inp
+
 ActionScript
 	as
 
 ANSI Art
 	nfo				System Information File
 	diz				Description in Zip File
+
+ANSYS APDL
 
 Assembler Source
 	asm

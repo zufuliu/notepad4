@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexAsm.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexAutoIt3.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -348,7 +351,13 @@
     <ClCompile Include="..\..\src\Styles.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlABAQUS.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlActionScript.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlAPDL.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlAsm.c">

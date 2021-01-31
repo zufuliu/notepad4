@@ -54,9 +54,11 @@ extern EDITLEXER lexSQL;
 extern EDITLEXER lexHTML;
 extern EDITLEXER lexXML;
 
+extern EDITLEXER lexABAQUS;
 extern EDITLEXER lexActionScript;
 extern EDITLEXER lexSmali;
 extern EDITLEXER lexANSI;
+extern EDITLEXER lexAPDL;
 extern EDITLEXER lexASM;
 extern EDITLEXER lexASY;
 extern EDITLEXER lexAU3;
@@ -151,9 +153,11 @@ static PEDITLEXER pLexArray[] = {
 	&lexHTML,
 	&lexXML,
 
+	&lexABAQUS,
 	&lexActionScript,
 	&lexSmali,
 	&lexANSI,
+	&lexAPDL,
 	&lexASM,
 	&lexASY,
 	&lexAU3,
@@ -1501,6 +1505,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			const char *jsx = (StrNotEmpty(lpszExt) && (StrCaseEqual(lpszExt, L".jsx") || StrCaseEqual(lpszExt, L".tsx")))? "1" : "0";
 			SciCall_SetProperty("lexer.jsx", jsx);
 		} break;
+
+		case NP2LEX_APDL:
+		case NP2LEX_ABAQUS:
+			SciCall_SetProperty("lexer.apdl", (rid == NP2LEX_APDL) ? "1" : "0");
+			break;
 		}
 
 		Style_UpdateLexerKeywords(pLexNew);

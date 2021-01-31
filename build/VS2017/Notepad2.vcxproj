@@ -961,6 +961,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\scintilla\lexers\LexAsm.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAutoIt3.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAviSynth.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexBash.cxx" />
@@ -1064,7 +1065,9 @@
     <ClCompile Include="..\..\src\Helpers.c" />
     <ClCompile Include="..\..\src\Notepad2.c" />
     <ClCompile Include="..\..\src\Styles.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlABAQUS.c" />
     <ClCompile Include="..\..\src\EditLexers\stlActionScript.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlAPDL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlAsm.c" />
     <ClCompile Include="..\..\src\EditLexers\stlAsymptote.c" />
     <ClCompile Include="..\..\src\EditLexers\stlAutoIt3.c" />

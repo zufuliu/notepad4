@@ -288,7 +288,11 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 #define StrStartsWithCaseEx(s, prefix, len)	(::_strnicmp((s), (prefix), (len)) == 0)
 #define StrEndsWith(s, len, suffix)			(::strcmp((s) + ((len) - CSTRLEN(suffix)), (suffix)) == 0)
 
-#if defined(_MSC_BUILD) && (_MSC_VER < 1920)
+#if defined(__clang__) || defined(__GNUC__)
+#define CStrEqual(s, q)					(::memcmp((s), (q), COUNTOF(q)) == 0)
+#define CStrStartsWith(s, prefix)		(::memcmp((s), (prefix), CSTRLEN(prefix)) == 0)
+
+#elif defined(_MSC_BUILD) && (_MSC_VER < 1920)
 // Visual C++ 2017 failed to optimize out string literal in memcmp().
 namespace Private {
 
