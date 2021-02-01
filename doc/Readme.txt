@@ -32,7 +32,7 @@ Rebuilding from the Source Code
   of the Notepad2 source code directory.
 
   Many of the Scintilla lexing modules are not used by Notepad2. Run
-  LinkLex.js to adapt the list (in "scintilla/src/Catalogue.cxx") and
+  LinkLex.js to adapt the list (in "scintilla/lexlib/LexerModule.cxx") and
   make linking work properly.
 
 
@@ -57,7 +57,7 @@ How to add or modify Syntax Schemes
   then adjust NUMLEXERS (Styles.h) to the new total number of syntax
   schemes. Include the "scintilla/lexers/Lex*.cxx" file required for
   your language into your project. Ensure the new module is initialized
-  (in "scintilla/src/Catalogue.cxx"), either by manually uncommenting
+  (in "scintilla/lexlib/LexerModule.cxx"), either by manually uncommenting
   the corresponding LINK_LEXER() macro call, or by updating and
   re-running LinkLex.js.
 

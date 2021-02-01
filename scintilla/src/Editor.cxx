@@ -6650,16 +6650,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 	case SCI_GETBUFFEREDDRAW:
 		return view.bufferedDraw;
 
-#ifdef INCLUDE_DEPRECATED_FEATURES
-	case SCI_GETTWOPHASEDRAW:
-		return view.phasesDraw == EditView::phasesTwo;
-
-	case SCI_SETTWOPHASEDRAW:
-		if (view.SetTwoPhaseDraw(wParam != 0))
-			InvalidateStyleRedraw();
-		break;
-#endif
-
 	case SCI_GETPHASESDRAW:
 		return view.phasesDraw;
 
@@ -7260,15 +7250,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETFONTLOCALE:
 		return StringResult(lParam, vs.localeName.c_str());
-
-#ifdef INCLUDE_DEPRECATED_FEATURES
-	case SCI_SETSTYLEBITS:
-		vs.EnsureStyle(0xff);
-		break;
-
-	case SCI_GETSTYLEBITS:
-		return 8;
-#endif
 
 	case SCI_SETLINESTATE:
 		return pdoc->SetLineState(wParam, static_cast<int>(lParam));

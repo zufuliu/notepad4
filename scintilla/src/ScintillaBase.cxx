@@ -27,11 +27,9 @@
 
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 //#include "CharacterCategory.h"
 
 #include "LexerModule.h"
-#include "Catalogue.h"
 
 #include "Position.h"
 #include "UniqueString.h"
@@ -68,9 +66,6 @@ ScintillaBase::ScintillaBase() noexcept {
 	listType = 0;
 	maxListWidth = 0;
 	multiAutoCMode = SC_MULTIAUTOC_ONCE;
-#ifdef SCI_LEXER
-	Scintilla_LinkLexers();
-#endif
 }
 
 ScintillaBase::~ScintillaBase() = default;
@@ -575,10 +570,7 @@ void ScintillaBase::RightButtonDownWithModifiers(Point pt, unsigned int curTime,
 namespace Scintilla {
 
 class LexState : public LexInterface {
-	const LexerModule *lexCurrent;
-	void SetLexerModule(const LexerModule *lex);
-	PropSetSimple props;
-	int interfaceVersion;
+	const LexerModule *lexCurrent; //! removed in Scintilla 5
 public:
 	int lexLanguage;
 
@@ -590,8 +582,7 @@ public:
 	LexState &operator=(const LexState &) = delete;
 	LexState &operator=(LexState &&) = delete;
 	~LexState() noexcept override;
-	void SetLexer(uptr_t wParam);
-	void SetLexerLanguage(const char *languageName);
+	void SetLexer(uptr_t wParam); //! removed in Scintilla 5
 
 	const char *DescribeWordListSets() const noexcept;
 	void SetWordList(int n, bool toLower, const char *wl);
@@ -627,8 +618,6 @@ public:
 
 LexState::LexState(Document *pdoc_) noexcept : LexInterface(pdoc_) {
 	lexCurrent = nullptr;
-	performingStyle = false;
-	interfaceVersion = lvRelease4;
 	lexLanguage = SCLEX_CONTAINER;
 }
 
@@ -655,41 +644,20 @@ LexState *ScintillaBase::DocumentLexState() {
 	return down_cast<LexState *>(pdoc->GetLexInterface());
 }
 
-void LexState::SetLexerModule(const LexerModule *lex) {
+void LexState::SetLexer(uptr_t wParam) { //! removed in Scintilla 5
+	lexLanguage = static_cast<int>(wParam);
+	const LexerModule *lex = (lexLanguage == SCLEX_CONTAINER) ? nullptr : LexerModule::Find(lexLanguage);
 	if (lex != lexCurrent) {
 		if (instance) {
 			instance->Release();
 			instance = nullptr;
 		}
-		interfaceVersion = lvRelease4;
 		lexCurrent = lex;
-		if (lexCurrent) {
-			instance = lexCurrent->Create();
-			interfaceVersion = instance->Version();
+		if (lex) {
+			instance = lex->Create();
 		}
 		pdoc->LexerChanged(GetIdentifier() != SCLEX_NULL);
 	}
-}
-
-void LexState::SetLexer(uptr_t wParam) {
-	lexLanguage = static_cast<int>(wParam);
-	if (lexLanguage == SCLEX_CONTAINER) {
-		SetLexerModule(nullptr);
-	} else {
-		const LexerModule *lex = Catalogue::Find(lexLanguage);
-		if (!lex)
-			lex = Catalogue::Find(SCLEX_NULL);
-		SetLexerModule(lex);
-	}
-}
-
-void LexState::SetLexerLanguage(const char *languageName) {
-	const LexerModule *lex = Catalogue::Find(languageName);
-	if (!lex)
-		lex = Catalogue::Find(SCLEX_NULL);
-	if (lex)
-		lexLanguage = lex->GetLanguage();
-	SetLexerModule(lex);
 }
 
 const char *LexState::DescribeWordListSets() const noexcept {
@@ -766,7 +734,6 @@ const char *LexState::DescribeProperty(const char *name) const {
 }
 
 void LexState::PropSet(const char *key, const char *val) {
-	props.Set(key, val, strlen(key), strlen(val));
 	if (instance) {
 		const Sci_Position firstModification = instance->PropertySet(key, val);
 		if (firstModification >= 0) {
@@ -776,15 +743,34 @@ void LexState::PropSet(const char *key, const char *val) {
 }
 
 const char *LexState::PropGet(const char *key) const {
-	return props.Get(key);
+	if (instance) {
+		return instance->PropertyGet(key);
+	} else {
+		return nullptr;
+	}
 }
 
 int LexState::PropGetInt(const char *key, int defaultValue) const {
-	return props.GetInt(key, defaultValue);
+	if (instance) {
+		const char *value = instance->PropertyGet(key);
+		if (value && *value) {
+			return atoi(value);
+		}
+	}
+	return defaultValue;
 }
 
 size_t LexState::PropGetExpanded(const char *key, char *result) const {
-	return props.GetExpanded(key, result);
+	if (instance) {
+		const char *value = instance->PropertyGet(key);
+		if (value) {
+			if (result) {
+				strcpy(result, value);
+			}
+			return strlen(value);
+		}
+	}
+	return 0;
 }
 
 int LexState::LineEndTypesSupported() const noexcept {
@@ -1107,12 +1093,12 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 #endif
 
 	case SCI_SETLEXER:
-		DocumentLexState()->SetLexer(static_cast<int>(wParam));
+		DocumentLexState()->SetLexer(wParam);
 		break;
 
 	case SCI_SETILEXER:
 		DocumentLexState()->SetInstance(reinterpret_cast<ILexer5 *>(lParam));
-		return 0;
+		break;
 
 	case SCI_GETLEXER:
 		return DocumentLexState()->GetIdentifier();
@@ -1150,27 +1136,12 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		DocumentLexState()->SetWordList(static_cast<int>(wParam & KEYWORDSET_INDEXMASK), (wParam & KEYWORDSET_TOLOWER) != 0, ConstCharPtrFromSPtr(lParam));
 		break;
 
-	case SCI_SETLEXERLANGUAGE:
-		DocumentLexState()->SetLexerLanguage(ConstCharPtrFromSPtr(lParam));
-		break;
-
 	case SCI_GETLEXERLANGUAGE:
 		return StringResult(lParam, DocumentLexState()->GetName());
-
-#if 0//def SCI_LEXER
-	case SCI_LOADLEXERLIBRARY:
-		ExternalLexerLoad(ConstCharPtrFromSPtr(lParam));
-		break;
-#endif
 
 	case SCI_PRIVATELEXERCALL:
 		return reinterpret_cast<sptr_t>(
 			DocumentLexState()->PrivateCall(static_cast<int>(wParam), reinterpret_cast<void *>(lParam)));
-
-#ifdef INCLUDE_DEPRECATED_FEATURES
-	case SCI_GETSTYLEBITSNEEDED:
-		return 8;
-#endif
 
 	case SCI_PROPERTYNAMES:
 		return StringResult(lParam, DocumentLexState()->PropertyNames());

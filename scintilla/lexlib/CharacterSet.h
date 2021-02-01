@@ -296,12 +296,12 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 // Visual C++ 2017 failed to optimize out string literal in memcmp().
 namespace Private {
 
-constexpr int as_i4(const char *s) noexcept {
-	return *(const int *)s;
+constexpr unsigned int as_i4(const char *s) noexcept {
+	return *(const unsigned int *)s;
 }
 
-constexpr int as_i2(const char *s) noexcept {
-	return *(const short *)s;
+constexpr unsigned short as_i2(const char *s) noexcept {
+	return *(const unsigned short *)s;
 }
 
 template <size_t N>

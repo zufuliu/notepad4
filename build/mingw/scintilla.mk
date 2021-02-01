@@ -4,7 +4,7 @@ PROJ = scintilla
 NAME = lib$(PROJ).a
 OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 
-CPPFLAGS += -DSCI_LEXER -DNO_CXX11_REGEX
+CPPFLAGS += -DNO_CXX11_REGEX
 
 scintilla_dir = ../../scintilla
 lexers_dir = $(scintilla_dir)/lexers
