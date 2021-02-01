@@ -28,8 +28,6 @@ enum {
 };
 
 void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	/// temporary workaround before official document is available:
-	/// treat APDL and ABAQUS as same, except for comment.
 	const bool apdl = styler.GetPropertyInt("lexer.apdl") & true;
 
 	int visibleChars = 0;
@@ -78,6 +76,7 @@ void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							}
 						} else if (CStrEqual(s, "*com")) {
 							sc.ChangeState(SCE_APDL_COMMENT);
+							lineStateLineType = APDLLineStateLineComment;
 						}
 					} else if (commandValue == 2) {
 						sc.ChangeState(SCE_APDL_WORD);
