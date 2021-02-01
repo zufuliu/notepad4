@@ -8,8 +8,6 @@
 #include <cstdlib>
 #include <cassert>
 
-#include <string>
-
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"

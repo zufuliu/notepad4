@@ -71,7 +71,6 @@
     <VirtualDirectory Name="lexlib">
       <File Name="../../scintilla/lexlib/Accessor.cxx"/>
       <File Name="../../scintilla/lexlib/Accessor.h"/>
-      <File Name="../../scintilla/lexlib/CatalogueModules.h"/>
       <File Name="../../scintilla/lexlib/CharacterCategory.cxx"/>
       <File Name="../../scintilla/lexlib/CharacterCategory.h"/>
       <File Name="../../scintilla/lexlib/CharacterSet.cxx"/>
@@ -107,8 +106,6 @@
       <File Name="../../scintilla/src/CaseConvert.h"/>
       <File Name="../../scintilla/src/CaseFolder.cxx"/>
       <File Name="../../scintilla/src/CaseFolder.h"/>
-      <File Name="../../scintilla/src/Catalogue.cxx"/>
-      <File Name="../../scintilla/src/Catalogue.h"/>
       <File Name="../../scintilla/src/CellBuffer.cxx"/>
       <File Name="../../scintilla/src/CellBuffer.h"/>
       <File Name="../../scintilla/src/CharClassify.cxx"/>
@@ -292,7 +289,6 @@
         <Preprocessor Value="NOMINMAX"/>
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
-        <Preprocessor Value="SCI_LEXER"/>
         <Preprocessor Value="NO_CXX11_REGEX"/>
       </Compiler>
       <Linker Options="-mwindows;-municode">

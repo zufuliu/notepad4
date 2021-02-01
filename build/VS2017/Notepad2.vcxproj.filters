@@ -243,9 +243,6 @@
     <ClCompile Include="..\..\scintilla\src\CaseFolder.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\src\Catalogue.cxx">
-      <Filter>Scintilla\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\scintilla\src\CellBuffer.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
@@ -575,9 +572,6 @@
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\scintilla\lexlib\CatalogueModules.h">
-      <Filter>Scintilla\lexlib</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
@@ -633,9 +627,6 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\CaseFolder.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\Catalogue.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\CellBuffer.h">

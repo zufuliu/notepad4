@@ -2086,14 +2086,6 @@ sptr_t ScintillaWin::SciMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 		::SetFocus(MainHWND());
 		break;
 
-#ifdef INCLUDE_DEPRECATED_FEATURES
-	case SCI_SETKEYSUNICODE:
-		break;
-
-	case SCI_GETKEYSUNICODE:
-		return true;
-#endif
-
 	case SCI_SETTECHNOLOGY:
 		if ((wParam == SC_TECHNOLOGY_DEFAULT) ||
 			(wParam == SC_TECHNOLOGY_DIRECTWRITERETAIN) ||
@@ -2329,10 +2321,6 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case SCI_GETDIRECTFUNCTION:
 		case SCI_GETDIRECTPOINTER:
 		case SCI_GRABFOCUS:
-#ifdef INCLUDE_DEPRECATED_FEATURES
-		case SCI_SETKEYSUNICODE:
-		case SCI_GETKEYSUNICODE:
-#endif
 		case SCI_SETTECHNOLOGY:
 		case SCI_SETBIDIRECTIONAL:
 		case SCI_TARGETASUTF8:

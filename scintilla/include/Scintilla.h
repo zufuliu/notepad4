@@ -19,7 +19,6 @@ void Scintilla_LoadDpiForWindow(void);
 int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
 #endif
-void Scintilla_LinkLexers(void);
 
 #ifdef __cplusplus
 }
@@ -1288,23 +1287,3 @@ struct SCNotification {
 	int characterSource;	/* SCN_CHARADDED */
 	int oldCodePage;		/* SCN_CODEPAGECHANGED */
 };
-
-#ifdef INCLUDE_DEPRECATED_FEATURES
-
-#define SCI_SETKEYSUNICODE 2521
-#define SCI_GETKEYSUNICODE 2522
-
-#define SCI_GETTWOPHASEDRAW 2283
-#define SCI_SETTWOPHASEDRAW 2284
-
-#define CharacterRange Sci_CharacterRange
-#define TextRange Sci_TextRange
-#define TextToFind Sci_TextToFind
-#define RangeToFormat Sci_RangeToFormat
-#define NotifyHeader Sci_NotifyHeader
-
-#define SCI_SETSTYLEBITS 2090
-#define SCI_GETSTYLEBITS 2091
-#define SCI_GETSTYLEBITSNEEDED 4011
-
-#endif
