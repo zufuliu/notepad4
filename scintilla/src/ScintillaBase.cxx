@@ -570,10 +570,7 @@ void ScintillaBase::RightButtonDownWithModifiers(Point pt, unsigned int curTime,
 namespace Scintilla {
 
 class LexState : public LexInterface {
-	const LexerModule *lexCurrent; //! removed in Scintilla 5
 public:
-	int lexLanguage;
-
 	explicit LexState(Document *pdoc_) noexcept;
 	void SetInstance(ILexer5 *instance_);
 	// Deleted so LexState objects can not be copied.
@@ -582,7 +579,7 @@ public:
 	LexState &operator=(const LexState &) = delete;
 	LexState &operator=(LexState &&) = delete;
 	~LexState() noexcept override;
-	void SetLexer(uptr_t wParam); //! removed in Scintilla 5
+	void SetLexer(int language); //! removed in Scintilla 5
 
 	const char *DescribeWordListSets() const noexcept;
 	void SetWordList(int n, bool toLower, const char *wl);
@@ -617,8 +614,6 @@ public:
 }
 
 LexState::LexState(Document *pdoc_) noexcept : LexInterface(pdoc_) {
-	lexCurrent = nullptr;
-	lexLanguage = SCLEX_CONTAINER;
 }
 
 LexState::~LexState() noexcept {
@@ -644,20 +639,17 @@ LexState *ScintillaBase::DocumentLexState() {
 	return down_cast<LexState *>(pdoc->GetLexInterface());
 }
 
-void LexState::SetLexer(uptr_t wParam) { //! removed in Scintilla 5
-	lexLanguage = static_cast<int>(wParam);
-	const LexerModule *lex = (lexLanguage == SCLEX_CONTAINER) ? nullptr : LexerModule::Find(lexLanguage);
-	if (lex != lexCurrent) {
-		if (instance) {
-			instance->Release();
-			instance = nullptr;
-		}
-		lexCurrent = lex;
-		if (lex) {
-			instance = lex->Create();
-		}
-		pdoc->LexerChanged(GetIdentifier() != SCLEX_NULL);
+void LexState::SetLexer(int language) { //! removed in Scintilla 5
+	if (instance) {
+		instance->Release();
+		instance = nullptr;
 	}
+	if (language != SCLEX_CONTAINER) {
+		const LexerModule *lex = LexerModule::Find(language);
+		language = lex->GetLanguage();
+		instance = lex->Create();
+	}
+	pdoc->LexerChanged(language != SCLEX_NULL);
 }
 
 const char *LexState::DescribeWordListSets() const noexcept {
@@ -678,31 +670,21 @@ void LexState::SetWordList(int n, bool toLower, const char *wl) {
 }
 
 int LexState::GetIdentifier() const noexcept {
-	if (lexCurrent) {
-		return lexCurrent->GetLanguage();
-	}
 	if (instance) {
-		if (instance->Version() >= lvRelease5) {
-			return instance->GetIdentifier();
-		}
+		return instance->GetIdentifier();
 	}
 	return SCLEX_CONTAINER;
 }
 
 const char *LexState::GetName() const noexcept {
-	if (lexCurrent) {
-		return lexCurrent->languageName;
-	}
 	if (instance) {
-		if (instance->Version() >= lvRelease5) {
-			return instance->GetName();
-		}
+		return instance->GetName();
 	}
 	return "";
 }
 
 void *LexState::PrivateCall(int operation, void *pointer) {
-	if (pdoc && instance) {
+	if (instance) {
 		return instance->PrivateCall(operation, pointer);
 	} else {
 		return nullptr;
@@ -875,7 +857,7 @@ const char *LexState::DescriptionOfStyle(int style) const noexcept {
 }
 
 void ScintillaBase::NotifyStyleToNeeded(Sci::Position endStyleNeeded) {
-	if (DocumentLexState()->GetIdentifier() != SCLEX_CONTAINER) {
+	if (!DocumentLexState()->UseContainerLexing()) {
 		const Sci::Line lineEndStyled =
 			pdoc->SciLineFromPosition(pdoc->GetEndStyled());
 		const Sci::Position endStyled =
@@ -1093,7 +1075,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 #endif
 
 	case SCI_SETLEXER:
-		DocumentLexState()->SetLexer(wParam);
+		DocumentLexState()->SetLexer(static_cast<int>(wParam));
 		break;
 
 	case SCI_SETILEXER:
@@ -1107,7 +1089,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		// from Editor::FoldAll()
 		pdoc->EnsureStyledTo((lParam == -1) ? pdoc->Length() : lParam);
 #if 0
-		if (DocumentLexState()->lexLanguage == SCLEX_CONTAINER) {
+		if (DocumentLexState()->UseContainerLexing()) {
 			pdoc->ModifiedAt(wParam);
 			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
 		} else {

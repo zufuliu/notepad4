@@ -10,7 +10,6 @@ namespace Scintilla {
 
 class Accessor;
 class WordList;
-struct LexicalClass;
 
 typedef const WordList * const LexerWordList[];
 

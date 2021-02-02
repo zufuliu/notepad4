@@ -27,7 +27,7 @@ namespace {
 // Note that ColouriseDiffLine analyzes only the first DIFF_BUFFER_START_SIZE
 // characters of each line to classify the line.
 
-int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noexcept {
+inline int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noexcept {
 	// It is needed to remember the current state to recognize starting
 	// comment lines before the first "diff " or "--- ". If a real
 	// difference starts then each line starting with ' ' is a whitespace
