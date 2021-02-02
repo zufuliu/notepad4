@@ -43,11 +43,10 @@ public:
 };
 
 enum {
-	lvRelease4 = 2,
 	lvRelease5 = 3,
 };
 
-class ILexer4 {
+class ILexer5 {
 public:
 	virtual int SCI_METHOD Version() const noexcept = 0;
 	virtual void SCI_METHOD Release() noexcept = 0;
@@ -74,10 +73,7 @@ public:
 	virtual const char * SCI_METHOD NameOfStyle(int style) const noexcept = 0;
 	virtual const char * SCI_METHOD TagsOfStyle(int style) const noexcept = 0;
 	virtual const char * SCI_METHOD DescriptionOfStyle(int style) const noexcept = 0;
-};
-
-class ILexer5 : public ILexer4 {
-public:
+	// ILexer5 methods
 	virtual const char * SCI_METHOD GetName() const noexcept = 0;
 	virtual int SCI_METHOD GetIdentifier() const noexcept = 0;
 	virtual const char * SCI_METHOD PropertyGet(const char *key) const = 0;
