@@ -51,7 +51,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexBash.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexers\lexBatch.cxx">
+    <ClCompile Include="..\..\scintilla\lexers\LexBatch.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexCIL.cxx">
