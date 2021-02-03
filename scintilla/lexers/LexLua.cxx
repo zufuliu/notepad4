@@ -7,7 +7,6 @@
  ** Modified by Marcos E. Wurzius & Philippe Lhoste
  **/
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -339,9 +338,9 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 					s[j] = c;
 				}
 
-				if (CStrEqual(s, "if") || CStrEqual(s, "do") || CStrEqual(s, "function") || CStrEqual(s, "repeat")) {
+				if (CStrEqualsAny(s, "if", "do", "function", "repeat")) {
 					levelCurrent++;
-				} else if (CStrEqual(s, "end") || CStrEqual(s, "elseif") || CStrEqual(s, "until")) {
+				} else if (CStrEqualsAny(s, "end", "elseif", "until")) {
 					levelCurrent--;
 				}
 			}

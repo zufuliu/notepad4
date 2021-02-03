@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Go.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -214,9 +213,9 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						kwType = SCE_GO_TYPE;
 					} else if (CStrEqual(s, "const")) {
 						kwType = SCE_GO_CONSTANT;
-					} else if (CStrEqual(s, "map") || CStrEqual(s, "chan")) {
+					} else if (CStrEqualsAny(s, "map", "chan")) {
 						kwType = SCE_GO_IDENTIFIER;
-					} else if (CStrEqual(s, "goto") || CStrEqual(s, "break") || CStrEqual(s, "continue")) {
+					} else if (CStrEqualsAny(s, "goto", "break", "continue")) {
 						kwType = SCE_GO_LABEL;
 					}
 					if (kwType == SCE_GO_TYPE || kwType == SCE_GO_LABEL) {

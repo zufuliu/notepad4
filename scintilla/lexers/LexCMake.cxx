@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for CMake.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -22,8 +21,8 @@ using namespace Scintilla;
 namespace {
 
 constexpr bool IsCMakeOperator(int ch) noexcept {
-	return ch == '(' || ch == ')' || ch == '=' || ch == ':' || ch == ';'
-		|| ch == '$' || ch == '<' || ch == '>' || ch == ','; // Generator expressions
+	return AnyOf(ch, '(', ')', '=', ':', ';',
+					 '$', '<', '>', ','); // Generator expressions
 }
 
 constexpr bool IsCMakeChar(int ch) noexcept {
@@ -228,7 +227,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.ch == '{') {
 					char s[8];
 					sc.GetCurrent(s, sizeof(s));
-					if (CStrEqual(s, "$ENV") || CStrEqual(s, "$CACHE")) {
+					if (CStrEqualsAny(s, "$ENV", "$CACHE")) {
 						sc.SetState(SCE_CMAKE_VARIABLE);
 						varNestedLevel = 1;
 						done = true;
@@ -384,8 +383,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				wordLen = 0;
 				if (CStrStartsWith(buf, "end")) {
 					levelNext--;
-				} else if (CStrEqual(buf, "if") || CStrEqual(buf, "function") || CStrEqual(buf, "macro")
-					|| CStrEqual(buf, "foreach") || CStrEqual(buf, "while")) {
+				} else if (CStrEqualsAny(buf, "if", "function", "macro", "foreach", "while")) {
 					levelNext++;
 				}
 			}

@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Makefile of gmake, nmake, bmake, qmake
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -263,9 +262,9 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			if (ch == '!' || ch == '.')
 				j++;
 			LexGetRangeLowered(j, styler, iswordchar, buf, MAX_WORD_LENGTH);
-			if (CStrStartsWith(buf, "if") || CStrEqual(buf, "define") || CStrEqual(buf, "for"))
+			if (CStrStartsWith(buf, "if") || CStrEqualsAny(buf, "define", "for"))
 				levelNext++;
-			else if (CStrEqual(buf, "endif") || CStrEqual(buf, "endef") || CStrEqual(buf, "endfor"))
+			else if (CStrEqualsAny(buf, "endif", "endef", "endfor"))
 				levelNext--;
 		}
 

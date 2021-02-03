@@ -381,4 +381,3 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 }
 
 LexerModule lmSmali(SCLEX_SMALI, ColouriseSmaliDoc, "smali", FoldSmaliDoc);
-

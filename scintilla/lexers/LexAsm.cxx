@@ -6,7 +6,6 @@
 #include <cstring>
 
 #include <string>
-#include <map>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -459,4 +458,3 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 }
 
 LexerModule lmAsm(SCLEX_ASM, ColouriseAsmDoc, "asm", FoldAsmDoc);
-

@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Dart.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -114,16 +113,15 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_DART_WORD);
-					if (CStrEqual(s, "import") || CStrEqual(s, "part")) {
+					if (CStrEqualsAny(s, "import", "part")) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = DartLineStateMaskImport;
 						}
-					} else if (CStrEqual(s, "as") || CStrEqual(s, "class") || CStrEqual(s, "extends")
-						|| CStrEqual(s, "implements") || CStrEqual(s, "is") || CStrEqual(s, "new") || CStrEqual(s, "throw")) {
+					} else if (CStrEqualsAny(s, "as", "class", "extends", "implements", "is", "new", "throw")) {
 						kwType = SCE_DART_CLASS;
 					} else if (CStrEqual(s, "enum")) {
 						kwType = SCE_DART_ENUM;
-					} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")) {
+					} else if (CStrEqualsAny(s, "break", "continue")) {
 						kwType = SCE_DART_LABEL;
 					}
 					if (kwType != SCE_DART_DEFAULT) {

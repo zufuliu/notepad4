@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for NSIS.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -236,7 +235,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 				if (style == SCE_NSIS_WORD) {
 					if (wordLen >= 9 && CStrEndsWith(buf, wordLen, "end")) {
 						levelNext--;
-					} else if (CStrStartsWith(buf, "section") || CStrEqual(buf, "function") || CStrEqual(buf, "pageex")) {
+					} else if (CStrStartsWith(buf, "section") || CStrEqualsAny(buf, "function", "pageex")) {
 						levelNext++;
 					}
 				} else {

@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Rebol, Red, Red/System.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -221,9 +220,9 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					const char *p = s + 1;
 					if (keywordLists[1]->InList(p)) {
 						sc.ChangeState(SCE_REBOL_DIRECTIVE);
-						if (StrEqual(p, "include")) {
+						if (CStrEqual(p, "include")) {
 							lineStateLineType = RebolLineTypeInclude;
-						} else if (StrEqual(p, "define")) {
+						} else if (CStrEqual(p, "define")) {
 							lineStateLineType = RebolLineTypeDefine;
 						}
 					}
