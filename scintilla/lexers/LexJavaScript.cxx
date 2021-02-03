@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for JavaScript, JScript, TypeScript, ActionScript.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -191,16 +190,15 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_JS_WORD);
-						if (CStrEqual(s, "as") || CStrEqual(s, "class") || CStrEqual(s, "extends")
-							|| CStrEqual(s, "is") || CStrEqual(s, "new") || CStrEqual(s, "type")) {
+						if (CStrEqualsAny(s, "as", "class", "extends", "is", "new", "type")) {
 							kwType = SCE_JS_CLASS;
 						} else if (CStrEqual(s, "function")) {
 							kwType = SCE_JS_FUNCTION_DEFINE;
-						} else if (CStrEqual(s, "interface") || CStrEqual(s, "implements")) {
+						} else if (CStrEqualsAny(s, "interface", "implements")) {
 							kwType = SCE_JS_INTERFACE;
 						} else if (CStrEqual(s, "enum")) {
 							kwType = SCE_JS_ENUM;
-						} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")) {
+						} else if (CStrEqualsAny(s, "break", "continue")) {
 							kwType = SCE_JS_LABEL;
 						}
 						if (kwType != SCE_JS_DEFAULT) {
@@ -213,7 +211,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_JS_WORD2);
 					} else if (keywordLists[2]->InList(s)) {
 						sc.ChangeState(SCE_JS_DIRECTIVE);
-						if (CStrEqual(s, "import") || CStrEqual(s, "require")) {
+						if (CStrEqualsAny(s, "import", "require")) {
 							lineStateLineType = JsLineStateMaskImport;
 						}
 					} else if (keywordLists[3]->InList(s)) {

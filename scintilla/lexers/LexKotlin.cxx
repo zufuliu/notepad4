@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Kotlin.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -114,8 +113,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = KotlinLineStateMaskImport;
 						}
-					} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")
-						|| CStrEqual(s, "return") || CStrEqual(s, "this") || CStrEqual(s, "super")) {
+					} else if (CStrEqualsAny(s, "break", "continue", "return", "this", "super")) {
 						kwType = SCE_KOTLIN_LABEL;
 					} else if (((kwType != SCE_KOTLIN_ANNOTATION && kwType != SCE_KOTLIN_ENUM)
 							&& (chBefore != ':' && CStrEqual(s, "class")))

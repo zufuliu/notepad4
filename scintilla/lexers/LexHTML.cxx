@@ -5,13 +5,8 @@
 // Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
-
-#include <string>
-#include <map>
-#include <set>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -93,8 +88,8 @@ int PrintScriptingIndicatorOffset(Accessor &styler, Sci_PositionU start, Sci_Pos
 	int iResult = 0;
 	char s[8];
 	GetTextSegment(styler, start, end, s, sizeof(s));
-	if (StrStartsWith(s, "php")) {
-		iResult = CSTRLEN("php");
+	if (CStrStartsWith(s, "php")) {
+		iResult = CStrLen("php");
 	}
 
 	return iResult;
@@ -292,7 +287,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 		styler.ColourTo(end, chAttr);
 	}
 	if (chAttr == SCE_H_TAG && !customElement) {
-		if (allowScripts && StrEqual(tag, "script")) {
+		if (allowScripts && CStrEqual(tag, "script")) {
 			// check to see if this is a self-closing tag by sniffing ahead
 			bool isSelfClose = false;
 			for (Sci_PositionU cPos = end; cPos <= end + 200; cPos++) {
@@ -308,7 +303,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 			// do not enter a script state if the tag self-closed
 			if (!isSelfClose)
 				chAttr = SCE_H_SCRIPT;
-		} else if (!isXml && StrEqual(tag, "comment")) {
+		} else if (!isXml && CStrEqual(tag, "comment")) {
 			chAttr = SCE_H_COMMENT;
 		}
 	}

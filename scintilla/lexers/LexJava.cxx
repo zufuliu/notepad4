@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Java, Android IDL, BeanShell.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -116,17 +115,17 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							lineStateLineType = JavaLineStateMaskImport;
 						}
 					} else if ((!(chBefore == '.' || chBefore == ':') && CStrEqual(s, "class"))
-						|| CStrEqual(s, "new") || CStrEqual(s, "extends") || CStrEqual(s, "instanceof") || CStrEqual(s, "throws")) {
+						|| CStrEqualsAny(s, "new", "extends", "instanceof", "throws")) {
 						kwType = SCE_JAVA_CLASS;
-					} else if (CStrEqual(s, "interface") || CStrEqual(s, "implements")) {
+					} else if (CStrEqualsAny(s, "interface", "implements")) {
 						kwType = SCE_JAVA_INTERFACE;
 					} else if (CStrEqual(s, "enum")) {
 						kwType = SCE_JAVA_ENUM;
 					} else if (CStrEqual(s, "record")) {
 						kwType = SCE_JAVA_RECORD;
-					} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")) {
+					} else if (CStrEqualsAny(s, "break", "continue")) {
 						kwType = SCE_JAVA_LABEL;
-					} else if (CStrEqual(s, "if") || CStrEqual(s, "while")) {
+					} else if (CStrEqualsAny(s, "if", "while")) {
 						// to avoid treating following code as type cast:
 						// if (identifier) expression, while (identifier) expression
 						kwType = SCE_JAVA_WORD;

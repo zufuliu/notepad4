@@ -6,7 +6,6 @@
 // Adapted from LexPerl by Kein-Hong Man 2004
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -361,7 +360,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 				}
 				// 'for'|'case'|'select' needs 'in'|'do' to be highlighted later
-				else if (CStrEqual(s, "for") || CStrEqual(s, "case") || CStrEqual(s, "select")) {
+				else if (CStrEqualsAny(s, "for", "case", "select")) {
 					if (cmdState == BASH_CMD_START && keywordEnds)
 						cmdStateNew = BASH_CMD_WORD;
 					else
@@ -866,15 +865,15 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 				word[wordlen] = '\0';
 				wordlen = 0;
 				if (isCShell) {
-					if (CStrEqual(word, "if") || CStrEqual(word, "foreach") || CStrEqual(word, "switch") || CStrEqual(word, "while")) {
+					if (CStrEqualsAny(word, "if", "foreach", "switch", "while")) {
 						levelCurrent++;
-					} else if (CStrEqual(word, "end") || CStrEqual(word, "endif") || CStrEqual(word, "endsw")) {
+					} else if (CStrEqualsAny(word, "end", "endif", "endsw")) {
 						levelCurrent--;
 					}
 				} else {
-					if (CStrEqual(word, "if") || CStrEqual(word, "case") || CStrEqual(word, "do")) {
+					if (CStrEqualsAny(word, "if", "case", "do")) {
 						levelCurrent++;
-					} else if (CStrEqual(word, "fi") || CStrEqual(word, "esac") || CStrEqual(word, "done")) {
+					} else if (CStrEqualsAny(word, "fi", "esac", "done")) {
 						levelCurrent--;
 					}
 				}

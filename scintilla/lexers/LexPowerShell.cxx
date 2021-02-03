@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for PowerShell.
 
-#include <cstdlib>
 #include <cassert>
 
 #include "ILexer.h"
@@ -174,4 +173,3 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 }
 
 LexerModule lmPowerShell(SCLEX_POWERSHELL, ColourisePowerShellDoc, "powershell", FoldPowerShellDoc);
-

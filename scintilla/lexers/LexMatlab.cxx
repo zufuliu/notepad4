@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Matlab, Octave, Scilab and Gnuplot (treated as same as Octave).
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -335,12 +334,9 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			char word[16]; // unwind_protect
 			const Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
 			if ((CStrEqual(word, "function") && LexGetNextChar(i + len, styler) != '(')
-				|| CStrEqual(word, "if")
-				|| CStrEqual(word, "for")
-				|| CStrEqual(word, "while")
-				|| CStrEqual(word, "try")
-				|| (IsMatlabOctave(lexType) && (CStrEqual(word, "switch") || CStrEqual(word, "classdef") || CStrEqual(word, "parfor")))
-				|| ((lexType == LEX_OCTAVE) && (CStrEqual(word, "do") || StrEqual(word, "unwind_protect")))
+				|| CStrEqualsAny(word, "if", "for", "while", "try")
+				|| (IsMatlabOctave(lexType) && CStrEqualsAny(word, "switch", "classdef", "parfor"))
+				|| ((lexType == LEX_OCTAVE) && CStrEqualsAny(word, "do", "unwind_protect"))
 				|| ((lexType == LEX_SCILAB) && CStrEqual(word, "select"))
 				) {
 				levelNext++;
@@ -355,8 +351,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				//		levelNext++;
 				//	}
 				//}
-			} else if (IsMatlabOctave(lexType) && chPrev != '@' && (CStrEqual(word, "methods")
-				|| CStrEqual(word, "properties") || CStrEqual(word, "events") || CStrEqual(word, "enumeration"))) {
+			} else if (IsMatlabOctave(lexType) && chPrev != '@' && CStrEqualsAny(word, "methods", "properties", "events", "enumeration")) {
 				// Matlab classdef
 				Sci_Position pos = LexSkipSpaceTab(i + len, endPos, styler);
 				const char chEnd = styler.SafeGetCharAt(pos);

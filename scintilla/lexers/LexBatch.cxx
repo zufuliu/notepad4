@@ -164,7 +164,7 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				} else {
 					if (!inEcho && keywords.InList(s)) { // not in echo ?
 						sc.ChangeState(SCE_BAT_WORD);
-						inEcho = CStrEqual(s, "echo") || CStrEqual(s, "echo.") || CStrEqual(s, "title") || CStrEqual(s, "prompt");
+						inEcho = CStrEqualsAny(s, "echo", "echo.", "title", "prompt");
 						isGoto = CStrEqual(s, "goto");
 						isCall = CStrEqual(s, "call");
 						if (inEcho) {

@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Julia
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -147,7 +146,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							kwType = SCE_JULIA_MACRO;
 						} else if (CStrEqual(s, "function")) {
 							kwType = SCE_JULIA_FUNCTION_DEFINE;
-						} else if (CStrEqual(s, "abstract") || CStrEqual(s, "primitive")) {
+						} else if (CStrEqualsAny(s, "abstract", "primitive")) {
 							kwType = SCE_JULIA_WORD;
 						}
 					}

@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for F#
 
-#include <cstdlib>
 #include <cassert>
 
 #include "ILexer.h"

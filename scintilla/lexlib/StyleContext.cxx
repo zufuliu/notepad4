@@ -5,7 +5,6 @@
 // Copyright 1998-2004 by Neil Hodgson <neilh@scintilla.org>
 // This file is in the public domain.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -66,8 +65,7 @@ bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBe
 		} else if (ch <= 32 && len >= 3 && len < 16 && AnyOf(sc.ch, 'T', 'F', 'N', 'X')) {
 			char s[8];
 			sc.styler.GetRange(sc.currentPos, pos, s, sizeof(s));
-			marker = CStrEqual(s, "TODO") || CStrEqual(s, "FIXME")
-				|| CStrEqual(s, "NOTE") || CStrEqual(s, "XXX") || CStrEqual(s, "TBD")
+			marker = CStrEqualsAny(s, "TODO", "FIXME", "NOTE", "XXX", "TBD")
 				|| CStrStartsWith(s, "NOLINT"); // clang-tidy: NOLINT, NOLINTNEXTLINE
 		}
 

@@ -59,13 +59,6 @@ constexpr void AnyOf([[maybe_unused]] T *t, [[maybe_unused]] Args... args) noexc
 template <typename T, typename... Args>
 constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args) noexcept {}
 
-#if defined(_INC_STRING)
-template <typename... Args>
-inline bool EqualsAny(const char *s, Args... args) noexcept {
-	return ((::strcmp(s, args) == 0) || ...);
-}
-#endif
-
 constexpr bool Between(int value, int lower, int high) noexcept {
 	return value >= lower && value <= high;
 }
@@ -278,21 +271,42 @@ int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
 #define CompareNCaseInsensitive		_strnicmp
 #endif
 
-#define COUNTOF(ar)	_countof(ar)
-#define CSTRLEN(s)	(_countof(s) - 1)
+template <int N>
+constexpr int CStrLen([[maybe_unused]] const char (&s)[N]) {
+	return N - 1;
+}
 
-#define StrEqual(s, q)						(::strcmp((s), (q)) == 0)
-#define StrStartsWith(s, prefix)			(::strncmp((s), (prefix), CSTRLEN(prefix)) == 0)
-#define StrStartsWithEx(s, prefix, len)		(::strncmp((s), (prefix), (len)) == 0)
-#define StrStartsWithCase(s, prefix)		(::_strnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
-#define StrStartsWithCaseEx(s, prefix, len)	(::_strnicmp((s), (prefix), (len)) == 0)
-#define StrEndsWith(s, len, suffix)			(::strcmp((s) + ((len) - CSTRLEN(suffix)), (suffix)) == 0)
+#if defined(_INC_STRING)
+template <typename... Args>
+inline bool EqualsAny(const char *s, Args... args) noexcept {
+	return ((::strcmp(s, args) == 0) || ...);
+}
 
-#if defined(__clang__) || defined(__GNUC__)
-#define CStrEqual(s, q)					(::memcmp((s), (q), COUNTOF(q)) == 0)
-#define CStrStartsWith(s, prefix)		(::memcmp((s), (prefix), CSTRLEN(prefix)) == 0)
+inline bool StrEqual(const char *s, const char *q) noexcept {
+	return ::strcmp(s, q) == 0;
+}
 
-#elif defined(_MSC_BUILD) && (_MSC_VER < 1920)
+template <size_t N>
+inline bool StrStartsWith(const char *s, const char (&prefix)[N]) noexcept {
+	return ::strncmp(s, prefix, N - 1) == 0;
+}
+
+template <size_t N>
+inline bool StrEndsWith(const char *s, size_t len, const char (&suffix)[N]) noexcept {
+	return ::strcmp(s + (len + 1 - N), suffix) == 0;
+}
+
+#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD) || (_MSC_VER >= 1920)
+template <size_t N>
+inline bool CStrEqual(const char *s, const char (&q)[N]) noexcept {
+	return ::memcmp(s, q, N) == 0;
+}
+
+template <size_t N>
+inline bool CStrStartsWith(const char *s, const char (&prefix)[N]) noexcept {
+	return ::memcmp(s, prefix, N - 1) == 0;
+}
+#else
 // Visual C++ 2017 failed to optimize out string literal in memcmp().
 namespace Private {
 
@@ -345,18 +359,103 @@ constexpr bool ConstStringCmp(const char *s, const char *q) noexcept {
 	if constexpr (N == 14) {
 		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i4(s + 8) == as_i4(q + 8) && as_i2(s + 12) == as_i2(q + 12);
 	}
+	if constexpr (N == 15) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i4(s + 8) == as_i4(q + 8) && as_i2(s + 12) == as_i2(q + 12) && s[14] == q[14];
+	}
+	if constexpr (N == 16) {
+		return as_i4(s) == as_i4(q) && as_i4(s + 4) == as_i4(q + 4) && as_i4(s + 8) == as_i4(q + 8) && as_i4(s + 12) == as_i4(q + 12);
+	}
 }
 
 }
+template <size_t N>
+constexpr bool CStrEqual(const char *s, const char (&q)[N]) noexcept {
+	return Private::ConstStringCmp<N>(s, q);
+}
 
-#define CStrEqual(s, q)					Private::ConstStringCmp<COUNTOF(q)>((s), (q))
-#define CStrStartsWith(s, prefix)		Private::ConstStringCmp<CSTRLEN(prefix)>((s), (prefix))
-#else
-#define CStrEqual(s, q)					(::memcmp((s), (q), COUNTOF(q)) == 0)
-#define CStrStartsWith(s, prefix)		(::memcmp((s), (prefix), CSTRLEN(prefix)) == 0)
+template <size_t N>
+constexpr bool CStrStartsWith(const char *s, const char (&prefix)[N]) noexcept {
+	return Private::ConstStringCmp<N - 1>(s, prefix);
+}
 #endif
-#define CStrEqualEx(s, q)				(::memcmp((s), (q), COUNTOF(q)) == 0)
-#define CStrStartsWithEx(s, prefix)		(::memcmp((s), (prefix), CSTRLEN(prefix)) == 0)
-#define CStrEndsWith(s, len, suffix)	(::memcmp((s) + ((len) - CSTRLEN(suffix)), suffix, COUNTOF(suffix)) == 0)
+
+template <size_t N>
+inline bool CStrEndsWith(const char *s, size_t len, const char (&suffix)[N]) noexcept {
+	return CStrEqual(s + (len + 1 - N), suffix);
+}
+
+template <size_t N>
+inline bool CStrEqualEx(const char *s, const char (&q)[N]) noexcept {
+	return ::memcmp(s, q, N) == 0;
+}
+
+template <size_t N>
+inline bool CStrStartsWithEx(const char *s, const char (&prefix)[N]) noexcept {
+	return ::memcmp(s, prefix, N - 1) == 0;
+}
+
+template <size_t N>
+inline bool CStrEndsWithEx(const char *s, size_t len, const char (&suffix)[N]) noexcept {
+	return ::memcmp(s + (len + 1 - N), suffix, N) == 0;
+}
+
+template <size_t N1>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1]) noexcept {
+	return CStrEqual(s, s1);
+}
+
+template <size_t N1, size_t N2>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2);
+}
+
+template <size_t N1, size_t N2, size_t N3>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3);
+}
+
+template <size_t N1, size_t N2, size_t N3, size_t N4>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3],
+	const char (&s4)[N4]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3) || CStrEqual(s, s4);
+}
+
+template <size_t N1, size_t N2, size_t N3, size_t N4, size_t N5>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3],
+	const char (&s4)[N4], const char (&s5)[N5]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3) || CStrEqual(s, s4) || CStrEqual(s, s5);
+}
+
+template <size_t N1, size_t N2, size_t N3, size_t N4, size_t N5, size_t N6>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3],
+	const char (&s4)[N4], const char (&s5)[N5], const char (&s6)[N6]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3) || CStrEqual(s, s4)
+		|| CStrEqual(s, s5) || CStrEqual(s, s6);
+}
+
+template <size_t N1, size_t N2, size_t N3, size_t N4, size_t N5, size_t N6, size_t N7>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3],
+	const char (&s4)[N4], const char (&s5)[N5], const char (&s6)[N6], const char (&s7)[N7]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3) || CStrEqual(s, s4)
+		|| CStrEqual(s, s5) || CStrEqual(s, s6) || CStrEqual(s, s7);
+}
+
+template <size_t N1, size_t N2, size_t N3, size_t N4, size_t N5, size_t N6, size_t N7, size_t N8>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3],
+	const char (&s4)[N4], const char (&s5)[N5], const char (&s6)[N6], const char (&s7)[N7], const char (&s8)[N8]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3) || CStrEqual(s, s4)
+		|| CStrEqual(s, s5) || CStrEqual(s, s6) || CStrEqual(s, s7) || CStrEqual(s, s8);
+}
+
+template <size_t N1, size_t N2, size_t N3, size_t N4, size_t N5, size_t N6, size_t N7, size_t N8, size_t N9>
+inline bool CStrEqualsAny(const char *s, const char (&s1)[N1], const char (&s2)[N2], const char (&s3)[N3],
+	const char (&s4)[N4], const char (&s5)[N5], const char (&s6)[N6], const char (&s7)[N7], const char (&s8)[N8],
+	const char (&s9)[N9]) noexcept {
+	return CStrEqual(s, s1) || CStrEqual(s, s2) || CStrEqual(s, s3) || CStrEqual(s, s4)
+		|| CStrEqual(s, s5) || CStrEqual(s, s6) || CStrEqual(s, s7) || CStrEqual(s, s8)
+		|| CStrEqual(s, s9);
+}
+
+#endif // _INC_STRING
 
 }

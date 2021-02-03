@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Swift.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -146,8 +145,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = SwiftLineStateMaskImport;
 							}
-						} else if (CStrEqual(s, "class") || CStrEqual(s, "as") || CStrEqual(s, "extension")
-							|| CStrEqual(s, "is") || CStrEqual(s, "typealias")) {
+						} else if (CStrEqualsAny(s, "class", "as", "extension", "is", "typealias")) {
 							kwType = SCE_SWIFT_CLASS;
 						} else if (CStrEqual(s, "struct")) {
 							kwType = SCE_SWIFT_STRUCT;
@@ -157,7 +155,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							kwType = SCE_SWIFT_ENUM;
 						} else if (CStrEqual(s, "func")) {
 							kwType = SCE_SWIFT_FUNCTION_DEFINE;
-						} else if (CStrEqual(s, "break") || CStrEqual(s, "continue")) {
+						} else if (CStrEqualsAny(s, "break", "continue")) {
 							kwType = SCE_SWIFT_LABEL;
 						}
 						if (kwType != SCE_SWIFT_DEFAULT) {

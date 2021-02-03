@@ -7,13 +7,10 @@
 // Copyright 1998-2012 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
-#include <string>
 #include <vector>
-#include <map>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -124,9 +121,9 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 				//} else if (kw_sqlplus.InListAbbreviated(s, '~')) {
 				//	sc.ChangeState(SCE_SQL_SQLPLUS);
-				//	if (StrStartsWith(s, "rem")) {
+				//	if (CStrStartsWith(s, "rem")) {
 				//		nextState = SCE_SQL_SQLPLUS_COMMENT;
-				//	} else if (StrStartsWith(s, "pro")) {
+				//	} else if (CStrStartsWith(s, "pro")) {
 				//		nextState = SCE_SQL_SQLPLUS_PROMPT;
 				//	}
 				//} else if (kw_user2.InList(s)) {

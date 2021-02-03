@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Vim.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -22,14 +21,7 @@ using namespace Scintilla;
 namespace {
 
 constexpr bool IsVimEscapeChar(int ch) noexcept {
-	return ch == '\\'
-		|| ch == '\"'
-		|| ch == 'b'
-		|| ch == 'e'
-		|| ch == 'f'
-		|| ch == 'n'
-		|| ch == 'r'
-		|| ch == 't';
+	return AnyOf(ch, '\\', '\"', 'b', 'e', 'f', 'n', 'r', 't');
 }
 
 struct EscapeSequence {
@@ -109,7 +101,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (keywordLists[0]->InList(s)) {
 					if (!lineStateLineAutoCommand && visibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_VIM_WORD);
-						if (CStrEqual(s, "au") || CStrEqual(s, "autocmd")) {
+						if (CStrEqualsAny(s, "au", "autocmd")) {
 							lineStateLineAutoCommand = VimLineStateMaskAutoCommand;
 						}
 					} else {
@@ -281,7 +273,7 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			if (styleNext != SCE_VIM_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (CStrEqual(buf, "if") || CStrEqual(buf, "while") || CStrEqual(buf, "for") || CStrEqual(buf, "try") || CStrStartsWith(buf, "fun")) {
+				if (CStrEqualsAny(buf, "if", "while", "for", "try") || CStrStartsWith(buf, "fun")) {
 					levelNext++;
 				} else if (CStrStartsWith(buf, "end")) {
 					levelNext--;

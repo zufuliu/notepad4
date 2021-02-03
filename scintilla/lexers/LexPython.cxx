@@ -2,7 +2,6 @@
 // See License.txt for details about distribution and modification.
 //! Lexer for Python.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
@@ -147,7 +146,7 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 					sc.ChangeState(SCE_PY_WORD);
 					if (CStrEqual(s, "def"))
 						defType = PY_DEF_FUNC;
-					else if (CStrEqual(s, "class") || CStrEqual(s, "raise") || CStrEqual(s, "except"))
+					else if (CStrEqualsAny(s, "class", "raise", "except"))
 						defType = PY_DEF_CLASS;
 					//else if (CStrEqual(s, "enum"))
 					//	defType = PY_DEF_ENUM;
@@ -458,4 +457,3 @@ static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWor
 }
 
 LexerModule lmPython(SCLEX_PYTHON, ColourisePyDoc, "python", FoldPyDoc);
-
