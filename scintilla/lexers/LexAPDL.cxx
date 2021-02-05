@@ -15,6 +15,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -69,11 +70,11 @@ void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (keywordLists[0]->InList(s + 1)) {
 							// for code folding
 							sc.ChangeState(SCE_APDL_WORD);
-							if (CStrEqual(s, "*end")) {
+							if (StrEqual(s, "*end")) {
 								// highlight next word as keyword
 								commandValue = 2;
 							}
-						} else if (CStrEqual(s, "*com")) {
+						} else if (StrEqual(s, "*com")) {
 							sc.ChangeState(SCE_APDL_COMMENT);
 							lineStateLineType = APDLLineStateLineComment;
 						}
@@ -206,10 +207,10 @@ void FoldAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			if (styleNext != SCE_APDL_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (CStrStartsWith(buf, "*end")) {
+				if (StrStartsWith(buf, "*end")) {
 					levelNext--;
 				} else if (buf[0] == '*') {
-					if ((apdl && (CStrEqual(buf, "*if") || CStrStartsWith(buf, "*do")))
+					if ((apdl && (StrEqual(buf, "*if") || StrStartsWith(buf, "*do")))
 						|| (!apdl && keywordLists[0]->InList(buf + 1))) {
 						levelNext++;
 					}

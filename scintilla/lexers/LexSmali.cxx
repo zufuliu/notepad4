@@ -13,6 +13,7 @@
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -125,18 +126,19 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			if (!IsSmaliWordChar(ch)) {
 				buf[wordLen] = '\0';
 				if (buf[0] == '.') {
-					if (strcmp(buf + 1,"end") == 0 || strcmp(buf + 1,"restart") == 0 || strcmp(buf + 1,"limit") == 0) {
+					const char *p = buf + 1;
+					if (StrEqualsAny(p, "end", "restart", "limit")) {
 						nextWordType = kWordType_Directive;
-					} else if (strcmp(buf + 1,"field") == 0) {
+					} else if (StrEqual(p, "field")) {
 						nextWordType = kWrodType_Field;
-					} else if (strcmp(buf + 1,"method") == 0) {
+					} else if (StrEqual(p, "method")) {
 						nextWordType = kWordType_Method;
 					}
-					if (strcmp(buf + 1,"annotation") == 0 || strcmp(buf + 1,"subannotation") == 0) {
+					if (StrEqualsAny(p, "annotation", "subannotation")) {
 						curLineState = 1;
-					} else if (strcmp(buf + 1,"packed-switch") == 0 || strcmp(buf + 1,"sparse-switch") == 0) {
+					} else if (StrEqualsAny(p, "packed-switch", "sparse-switch")) {
 						curLineState = 2;
-					} else if (strcmp(buf + 1,"end") == 0) {
+					} else if (StrEqual(p, "end")) {
 						curLineState = 0;
 					}
 				}
@@ -305,17 +307,9 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_SMALI_COMMENTLINE)
 static inline bool IsFoldWord(const char *word) noexcept {
-	return strcmp(word, "method") == 0
-		|| strcmp(word, "annotation") == 0
-		|| strcmp(word, "subannotation") == 0
-		|| strcmp(word, "packed-switch") == 0
-		|| strcmp(word, "sparse-switch") == 0
-		|| strcmp(word, "array-data") == 0
+	return StrEqualsAny(word, "method", "annotation", "subannotation", "packed-switch", "sparse-switch", "array-data")
 		// not used in Smali and Jasmin or javap
-		|| strcmp(word, "tableswitch") == 0
-		|| strcmp(word, "lookupswitch") == 0
-		|| strcmp(word, "constant-pool") == 0
-		|| strcmp(word, "attribute") == 0;
+		|| StrEqualsAny(word, "tableswitch", "lookupswitch", "constant-pool", "attribute");
 }
 // field/parameter with annotation?
 static bool IsAnnotationLine(Sci_Line line, Accessor &styler) noexcept {
@@ -359,9 +353,9 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 		if (iswordchar(ch) && style == SCE_SMALI_DIRECTIVE && stylePrev != SCE_SMALI_DIRECTIVE) {
 			char buf[MAX_WORD_LENGTH + 1];
 			LexGetRange(i, styler, IsSmaliWordCharX, buf, sizeof(buf));
-			if (buf[0] == '.' && (IsFoldWord(buf + 1) || (strcmp(buf + 1,"field") == 0 && IsAnnotationLine(lineCurrent + 1, styler)))) {
+			if (buf[0] == '.' && (IsFoldWord(buf + 1) || (StrEqual(buf + 1,"field") && IsAnnotationLine(lineCurrent + 1, styler)))) {
 				levelNext++;
-			} else if (buf[0] != '.' && (IsFoldWord(buf) || strcmp(buf, "field") == 0)) {
+			} else if (buf[0] != '.' && (IsFoldWord(buf) || StrEqual(buf, "field"))) {
 				levelNext--;
 			}
 		}

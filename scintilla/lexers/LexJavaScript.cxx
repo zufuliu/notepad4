@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
 
@@ -190,15 +191,15 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_JS_WORD);
-						if (CStrEqualsAny(s, "as", "class", "extends", "is", "new", "type")) {
+						if (StrEqualsAny(s, "class", "extends","new", "type", "as", "is")) {
 							kwType = SCE_JS_CLASS;
-						} else if (CStrEqual(s, "function")) {
+						} else if (StrEqual(s, "function")) {
 							kwType = SCE_JS_FUNCTION_DEFINE;
-						} else if (CStrEqualsAny(s, "interface", "implements")) {
+						} else if (StrEqualsAny(s, "interface", "implements")) {
 							kwType = SCE_JS_INTERFACE;
-						} else if (CStrEqual(s, "enum")) {
+						} else if (StrEqual(s, "enum")) {
 							kwType = SCE_JS_ENUM;
-						} else if (CStrEqualsAny(s, "break", "continue")) {
+						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = SCE_JS_LABEL;
 						}
 						if (kwType != SCE_JS_DEFAULT) {
@@ -211,7 +212,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_JS_WORD2);
 					} else if (keywordLists[2]->InList(s)) {
 						sc.ChangeState(SCE_JS_DIRECTIVE);
-						if (CStrEqualsAny(s, "import", "require")) {
+						if (StrEqualsAny(s, "import", "require")) {
 							lineStateLineType = JsLineStateMaskImport;
 						}
 					} else if (keywordLists[3]->InList(s)) {

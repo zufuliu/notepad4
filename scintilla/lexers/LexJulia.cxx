@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
 
@@ -129,7 +130,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
-					if (CStrEqual(s, "type")) {
+					if (StrEqual(s, "type")) {
 						// only in `abstract type` or `primitive type`
 						if (kwType == SCE_JULIA_WORD) {
 							sc.ChangeState(SCE_JULIA_WORD);
@@ -140,13 +141,13 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					} else {
 						isTransposeOperator = false;
 						sc.ChangeState(SCE_JULIA_WORD);
-						if (CStrEqual(s, "struct")) {
+						if (StrEqual(s, "struct")) {
 							kwType = SCE_JULIA_TYPE;
-						} else if (CStrEqual(s, "macro")) {
+						} else if (StrEqual(s, "macro")) {
 							kwType = SCE_JULIA_MACRO;
-						} else if (CStrEqual(s, "function")) {
+						} else if (StrEqual(s, "function")) {
 							kwType = SCE_JULIA_FUNCTION_DEFINE;
-						} else if (CStrEqualsAny(s, "abstract", "primitive")) {
+						} else if (StrEqualsAny(s, "abstract", "primitive")) {
 							kwType = SCE_JULIA_WORD;
 						}
 					}
@@ -489,7 +490,7 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			if (styleNext != SCE_JULIA_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (CStrEqual(buf, "end")) {
+				if (StrEqual(buf, "end")) {
 					levelNext--;
 				} else if (keywordLists[1]->InList(buf)) {
 					levelNext++;

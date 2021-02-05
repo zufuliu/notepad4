@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -127,19 +128,19 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.GetCurrent(s, sizeof(s));
 					if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_RUST_WORD);
-						if (CStrEqual(s, "struct")) {
+						if (StrEqual(s, "struct")) {
 							kwType = SCE_RUST_STRUCT;
-						} else if (CStrEqual(s, "fn")) {
+						} else if (StrEqual(s, "fn")) {
 							kwType = SCE_RUST_FUNCTION_DEFINE;
-						} else if (CStrEqual(s, "trait")) {
+						} else if (StrEqual(s, "trait")) {
 							kwType = SCE_RUST_TRAIT;
-						} else if (CStrEqual(s, "enum")) {
+						} else if (StrEqual(s, "enum")) {
 							kwType = SCE_RUST_ENUMERATION;
-						} else if (CStrEqual(s, "type")) {
+						} else if (StrEqual(s, "type")) {
 							kwType = SCE_RUST_TYPE; // type alias
-						} else if (CStrEqual(s, "const")) {
+						} else if (StrEqual(s, "const")) {
 							kwType = SCE_RUST_CONSTANT;
-						} else if (CStrEqual(s, "union")) {
+						} else if (StrEqual(s, "union")) {
 							kwType = SCE_RUST_UNION;
 						}
 						if (kwType != SCE_RUST_DEFAULT) {
@@ -148,7 +149,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								kwType = SCE_RUST_DEFAULT;
 							}
 						}
-						if ((visibleChars == 3 || visibleChars == 6) && CStrEqual(s, "use")) {
+						if ((visibleChars == 3 || visibleChars == 6) && StrEqual(s, "use")) {
 							lineStateLineType = RustLineStateMaskPubUse;
 						}
 					} else if (keywordLists[1]->InList(s)) {

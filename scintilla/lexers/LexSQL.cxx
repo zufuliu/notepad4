@@ -21,6 +21,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -109,7 +110,7 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				const int chNext = sc.GetDocNextChar();
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (keywords1.InList(s)) {
-					if (chNext == '(' && strcmp(s, "repeat") == 0) {
+					if (chNext == '(' && StrEqual(s, "repeat")) {
 						sc.ChangeState(SCE_SQL_USER1);
 					} else {
 						sc.ChangeState(SCE_SQL_WORD);
@@ -121,9 +122,9 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 				//} else if (kw_sqlplus.InListAbbreviated(s, '~')) {
 				//	sc.ChangeState(SCE_SQL_SQLPLUS);
-				//	if (CStrStartsWith(s, "rem")) {
+				//	if (StrStartsWith(s, "rem")) {
 				//		nextState = SCE_SQL_SQLPLUS_COMMENT;
-				//	} else if (CStrStartsWith(s, "pro")) {
+				//	} else if (StrStartsWith(s, "pro")) {
 				//		nextState = SCE_SQL_SQLPLUS_PROMPT;
 				//	}
 				//} else if (kw_user2.InList(s)) {
@@ -609,9 +610,9 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				s[j] = '\0';
 			}
 
-			if (!foldOnlyBegin && strcmp(s, "select") == 0) {
+			if (!foldOnlyBegin && StrEqual(s, "select")) {
 				sqlStatesCurrentLine = SQLStates::IntoSelectStatementOrAssignment(sqlStatesCurrentLine, true);
-			} else if (strcmp(s, "if") == 0) {
+			} else if (StrEqual(s, "if")) {
 				if (endFound) {
 					endFound = false;
 					if constexpr (foldOnlyBegin && !isUnfoldingIgnored) {
@@ -628,7 +629,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 						levelCurrent = levelNext;
 					}
 				}
-			} else if (!foldOnlyBegin && strcmp(s, "then") == 0 &&
+			} else if (!foldOnlyBegin && StrEqual(s, "then") &&
 				SQLStates::IsIntoCondition(sqlStatesCurrentLine)) {
 				sqlStatesCurrentLine = SQLStates::IntoCondition(sqlStatesCurrentLine, false);
 				if constexpr (!foldOnlyBegin) {
@@ -643,7 +644,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					// because doesn't hide LOOP or CASE (eg "END; LOOP" or "END; CASE")
 					levelCurrent = levelNext;
 				}
-			} else if (strcmp(s, "loop") == 0 || strcmp(s, "case") == 0 || strcmp(s, "while") == 0 || strcmp(s, "repeat") == 0) {
+			} else if (StrEqualsAny(s, "loop", "case", "while", "repeat")) {
 				if (endFound) {
 					endFound = false;
 					if constexpr (foldOnlyBegin && !isUnfoldingIgnored) {
@@ -651,13 +652,13 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 						// so ignore previous "end" by increment levelNext.
 						levelNext++;
 					}
-					if ((!foldOnlyBegin) && strcmp(s, "case") == 0) {
+					if ((!foldOnlyBegin) && StrEqual(s, "case")) {
 						sqlStatesCurrentLine = SQLStates::EndCaseBlock(sqlStatesCurrentLine);
 						if (!SQLStates::IsCaseMergeWithoutWhenFound(sqlStatesCurrentLine))
 							levelNext--; //again for the "end case;" and block when
 					}
 				} else if constexpr (!foldOnlyBegin) {
-					if (strcmp(s, "case") == 0) {
+					if (StrEqual(s, "case")) {
 						sqlStatesCurrentLine = SQLStates::BeginCaseBlock(sqlStatesCurrentLine);
 						sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
 					}
@@ -674,13 +675,13 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					// because doesn't hide LOOP or CASE (eg "END; LOOP" or "END; CASE")
 					levelCurrent = levelNext;
 				}
-			} else if constexpr ((!foldOnlyBegin) && (foldAtElse && !statementFound) && strcmp(s, "elsif") == 0) {
+			} else if constexpr ((!foldOnlyBegin) && (foldAtElse && !statementFound) && StrEqual(s, "elsif")) {
 				// folding for ELSE and ELSIF block only if foldAtElse is set
 				// and IF or CASE aren't on only one line with ELSE or ELSIF (with flag statementFound)
 				sqlStatesCurrentLine = SQLStates::IntoCondition(sqlStatesCurrentLine, true);
 				levelCurrent--;
 				levelNext--;
-			} else if constexpr ((!foldOnlyBegin) && (foldAtElse && !statementFound) && strcmp(s, "else") == 0) {
+			} else if constexpr ((!foldOnlyBegin) && (foldAtElse && !statementFound) && StrEqual(s, "else")) {
 				// folding for ELSE and ELSIF block only if foldAtElse is set
 				// and IF or CASE aren't on only one line with ELSE or ELSIF (with flag statementFound)
 				// prevent also ELSE is on the same line (eg. "ELSE ... END IF;")
@@ -692,10 +693,10 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					// we are in same case "} ELSE {" in C language
 					levelCurrent--;
 				}
-			} else if (strcmp(s, "begin") == 0 || strcmp(s, "start") == 0) {
+			} else if (StrEqualsAny(s, "begin", "start")) {
 				levelNext++;
 				sqlStatesCurrentLine = SQLStates::IntoDeclareBlock(sqlStatesCurrentLine, false);
-			} else if ((strcmp(s, "end") == 0) || (strcmp(s, "endif") == 0)) {
+			} else if (StrEqualsAny(s, "end", "endif")) {
 				// SQL Anywhere permits IF ... ELSE ... ENDIF
 				// will only be active if "endif" appears in the
 				// keyword list.
@@ -707,7 +708,7 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					levelNext = SC_FOLDLEVELBASE;
 					//isUnfoldingIgnored = true;
 				}
-			} else if ((!foldOnlyBegin) && strcmp(s, "when") == 0 &&
+			} else if ((!foldOnlyBegin) && StrEqual(s, "when") &&
 				!SQLStates::IsIgnoreWhen(sqlStatesCurrentLine) &&
 				!SQLStates::IsIntoExceptionBlock(sqlStatesCurrentLine) && (
 					SQLStates::IsIntoCaseBlock(sqlStatesCurrentLine) ||
@@ -724,28 +725,23 @@ static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					}
 					sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, false);
 				}
-			} else if ((!foldOnlyBegin) && strcmp(s, "exit") == 0) {
+			} else if ((!foldOnlyBegin) && StrEqual(s, "exit")) {
 				sqlStatesCurrentLine = SQLStates::IgnoreWhen(sqlStatesCurrentLine, true);
-			} else if ((!foldOnlyBegin) && !SQLStates::IsIntoDeclareBlock(sqlStatesCurrentLine) && strcmp(s, "exception") == 0) {
+			} else if ((!foldOnlyBegin) && !SQLStates::IsIntoDeclareBlock(sqlStatesCurrentLine) && StrEqual(s, "exception")) {
 				sqlStatesCurrentLine = SQLStates::IntoExceptionBlock(sqlStatesCurrentLine, true);
-			} else if ((!foldOnlyBegin) &&
-				(strcmp(s, "declare") == 0 || strcmp(s, "function") == 0 ||
-					strcmp(s, "procedure") == 0 || strcmp(s, "package") == 0)) {
+			} else if ((!foldOnlyBegin) && StrEqualsAny(s, "declare", "function", "procedure", "package")) {
 				sqlStatesCurrentLine = SQLStates::IntoDeclareBlock(sqlStatesCurrentLine, true);
-			} else if ((!foldOnlyBegin) && strcmp(s, "merge") == 0) {
+			} else if ((!foldOnlyBegin) && StrEqual(s, "merge")) {
 				sqlStatesCurrentLine = SQLStates::IntoMergeStatement(sqlStatesCurrentLine, true);
 				sqlStatesCurrentLine = SQLStates::CaseMergeWithoutWhenFound(sqlStatesCurrentLine, true);
 				levelNext++;
 				statementFound = true;
-			} else if ((!foldOnlyBegin) &&
-				strcmp(s, "create") == 0) {
+			} else if ((!foldOnlyBegin) && StrEqual(s, "create")) {
 				sqlStatesCurrentLine = SQLStates::IntoCreateStatement(sqlStatesCurrentLine, true);
-			} else if ((!foldOnlyBegin) &&
-				strcmp(s, "view") == 0 &&
+			} else if ((!foldOnlyBegin) && StrEqual(s, "view") &&
 				SQLStates::IsIntoCreateStatement(sqlStatesCurrentLine)) {
 				sqlStatesCurrentLine = SQLStates::IntoCreateViewStatement(sqlStatesCurrentLine, true);
-			} else if ((!foldOnlyBegin) &&
-				strcmp(s, "as") == 0 &&
+			} else if ((!foldOnlyBegin) && StrEqual(s, "as") &&
 				SQLStates::IsIntoCreateViewStatement(sqlStatesCurrentLine) &&
 				!SQLStates::IsIntoCreateViewAsStatement(sqlStatesCurrentLine)) {
 				sqlStatesCurrentLine = SQLStates::IntoCreateViewAsStatement(sqlStatesCurrentLine, true);

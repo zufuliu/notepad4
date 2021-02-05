@@ -91,6 +91,7 @@
       <File Name="../../scintilla/lexlib/PropSetSimple.h"/>
       <File Name="../../scintilla/lexlib/SparseState.h"/>
       <File Name="../../scintilla/lexlib/StringCopy.h"/>
+      <File Name="../../scintilla/lexlib/StringUtils.h"/>
       <File Name="../../scintilla/lexlib/StyleContext.cxx"/>
       <File Name="../../scintilla/lexlib/StyleContext.h"/>
       <File Name="../../scintilla/lexlib/SubStyles.h"/>

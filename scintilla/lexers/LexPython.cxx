@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -144,11 +145,11 @@ static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int init
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
 					sc.ChangeState(SCE_PY_WORD);
-					if (CStrEqual(s, "def"))
+					if (StrEqual(s, "def"))
 						defType = PY_DEF_FUNC;
-					else if (CStrEqualsAny(s, "class", "raise", "except"))
+					else if (StrEqualsAny(s, "class", "raise", "except"))
 						defType = PY_DEF_CLASS;
-					//else if (CStrEqual(s, "enum"))
+					//else if (StrEqual(s, "enum"))
 					//	defType = PY_DEF_ENUM;
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_PY_WORD2);

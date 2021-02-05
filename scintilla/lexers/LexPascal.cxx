@@ -23,6 +23,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -59,7 +60,7 @@ void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLi
 	}
 	if (keywords.InList(s)) {
 		if (curLineState & stateInAsm) {
-			if (CStrEqual(s, "end") && sc.GetRelative(-4) != '@') {
+			if (StrEqual(s, "end") && sc.GetRelative(-4) != '@') {
 				curLineState &= ~stateInAsm;
 				sc.ChangeState(SCE_PAS_WORD);
 			} else {
@@ -67,19 +68,19 @@ void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLi
 			}
 		} else {
 			bool ignoreKeyword = false;
-			if (CStrEqual(s, "asm")) {
+			if (StrEqual(s, "asm")) {
 				curLineState |= stateInAsm;
 			} else if (bSmartHighlighting) {
-				if (CStrEqual(s, "property")) {
+				if (StrEqual(s, "property")) {
 					curLineState |= stateInProperty;
-				} else if (CStrEqual(s, "exports")) {
+				} else if (StrEqual(s, "exports")) {
 					curLineState |= stateInExport;
-				} else if (!(curLineState & (stateInProperty | stateInExport)) && CStrEqual(s, "index")) {
+				} else if (!(curLineState & (stateInProperty | stateInExport)) && StrEqual(s, "index")) {
 					ignoreKeyword = true;
-				} else if (!(curLineState & stateInExport) && CStrEqual(s, "name")) {
+				} else if (!(curLineState & stateInExport) && StrEqual(s, "name")) {
 					ignoreKeyword = true;
 				} else if (!(curLineState & stateInProperty) &&
-					(CStrEqualsAny(s, "read", "write", /*"default", "nodefault",*/ "stored", "implements", "readonly", "writeonly", "add", "remove"))) {
+					(StrEqualsAny(s, "read", "write", /*"default", "nodefault",*/ "stored", "implements", "readonly", "writeonly", "add", "remove"))) {
 					ignoreKeyword = true;
 				}
 			}
@@ -264,12 +265,12 @@ void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCu
 
 	unsigned int nestLevel = GetFoldInPreprocessorLevelFlag(lineFoldStateCurrent);
 
-	if (CStrEqualsAny(s, "if", "ifdef", "ifndef", "ifopt", "region")) {
+	if (StrEqualsAny(s, "if", "ifdef", "ifndef", "ifopt", "region")) {
 		nestLevel++;
 		SetFoldInPreprocessorLevelFlag(lineFoldStateCurrent, nestLevel);
 		lineFoldStateCurrent |= stateFoldInPreprocessor;
 		levelCurrent++;
-	} else if (CStrEqualsAny(s, "endif", "ifend", "endregion")) {
+	} else if (StrEqualsAny(s, "endif", "ifend", "endregion")) {
 		nestLevel--;
 		SetFoldInPreprocessorLevelFlag(lineFoldStateCurrent, nestLevel);
 		if (nestLevel == 0) {
@@ -289,13 +290,13 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 
 	styler.GetRangeLowered(lastStart, currentPos + 1, s, sizeof(s));
 
-	if (CStrEqual(s, "record")) {
+	if (StrEqual(s, "record")) {
 		lineFoldStateCurrent |= stateFoldInRecord;
 		levelCurrent++;
-	} else if (CStrEqualsAny(s, "begin", "asm", "try") ||
-		(CStrEqual(s, "case") && !(lineFoldStateCurrent & stateFoldInRecord))) {
+	} else if (StrEqualsAny(s, "begin", "asm", "try") ||
+		(StrEqual(s, "case") && !(lineFoldStateCurrent & stateFoldInRecord))) {
 		levelCurrent++;
-	} else if (CStrEqualsAny(s, "class", "object")) {
+	} else if (StrEqualsAny(s, "class", "object")) {
 		// "class" & "object" keywords require special handling...
 		bool ignoreKeyword = false;
 		Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler, IsStreamCommentStyle);
@@ -305,7 +306,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 				// Handle forward class declarations ("type TMyClass = class;")
 				// and object method declarations ("TNotifyEvent = procedure(Sender: TObject) of object;")
 				ignoreKeyword = true;
-			} else if (CStrEqual(s, "class")) {
+			} else if (StrEqual(s, "class")) {
 				// "class" keyword has a few more special cases...
 				if (styler.SafeGetCharAt(j) == '(') {
 					// Handle simplified complete class declarations ("type TMyClass = class(TObject);")
@@ -320,7 +321,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 					char s2[16];	// Size of the longest possible keyword + one additional character + null
 					LexGetRangeLowered(j, styler, setWord, s2, sizeof(s2));
 
-					if (CStrEqualsAny(s2, "procedure", "function", "of", "var", "property", "operator")) {
+					if (StrEqualsAny(s2, "procedure", "function", "of", "var", "property", "operator")) {
 						ignoreKeyword = true;
 					}
 				}
@@ -329,7 +330,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		if (!ignoreKeyword) {
 			levelCurrent++;
 		}
-	} else if (CStrEqual(s, "interface")) {
+	} else if (StrEqual(s, "interface")) {
 		// "interface" keyword requires special handling...
 		bool ignoreKeyword = true;
 		Sci_Position j = lastStart - 1;
@@ -352,7 +353,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		if (!ignoreKeyword) {
 			levelCurrent++;
 		}
-	} else if (CStrEqual(s, "dispinterface")) {
+	} else if (StrEqual(s, "dispinterface")) {
 		// "dispinterface" keyword requires special handling...
 		bool ignoreKeyword = false;
 		const Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler);
@@ -363,7 +364,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 		if (!ignoreKeyword) {
 			levelCurrent++;
 		}
-	} else if (CStrEqual(s, "end")) {
+	} else if (StrEqual(s, "end")) {
 		lineFoldStateCurrent &= ~stateFoldInRecord;
 		levelCurrent--;
 		if (levelCurrent < SC_FOLDLEVELBASE) {

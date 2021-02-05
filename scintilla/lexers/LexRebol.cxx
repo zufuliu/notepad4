@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -189,7 +190,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.GetCurrentLowered(s, sizeof(s));
 					const int chNext = sc.GetLineNextChar();
 					if (keywordLists[0]->InList(s)) {
-						if (chNext == '{' && CStrEqual(s, "comment")) {
+						if (chNext == '{' && StrEqual(s, "comment")) {
 							sc.ChangeState(SCE_REBOL_COMMENTBLOCK);
 							if (sc.ch == '{') {
 								++nestedLevel;
@@ -220,9 +221,9 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					const char *p = s + 1;
 					if (keywordLists[1]->InList(p)) {
 						sc.ChangeState(SCE_REBOL_DIRECTIVE);
-						if (CStrEqual(p, "include")) {
+						if (StrEqual(p, "include")) {
 							lineStateLineType = RebolLineTypeInclude;
-						} else if (CStrEqual(p, "define")) {
+						} else if (StrEqual(p, "define")) {
 							lineStateLineType = RebolLineTypeDefine;
 						}
 					}

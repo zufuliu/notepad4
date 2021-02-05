@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -64,7 +65,7 @@ int CheckLLVMVarType(StyleContext &sc, int kwType) noexcept {
 			char s[8];
 			sc.GetCurrent(s, sizeof(s));
 			const bool quoted = state == SCE_LLVM_QUOTED_VARIABLE || state == SCE_LLVM_QUOTED_GLOBAL_VARIABLE;
-			if (CStrStartsWith(s + (quoted? 2 : 1), "llvm.")) {
+			if (StrStartsWith(s + (quoted? 2 : 1), "llvm.")) {
 				state = SCE_LLVM_INTRINSIC;
 			} else {
 				state = SCE_LLVM_FUNCTION;
@@ -119,7 +120,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						state = SCE_LLVM_WORD;
 					} else if (keywordLists[1]->InList(s)) {
 						state = SCE_LLVM_WORD2;
-						if (CStrEqual(s, "label")) {
+						if (StrEqual(s, "label")) {
 							kwType = SCE_LLVM_LABEL;
 						}
 					} else if (keywordLists[2]->InListPrefixed(s, '(')) {

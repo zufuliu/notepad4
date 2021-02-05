@@ -249,7 +249,7 @@ using namespace Scintilla;
 #define BLKIND  0370
 #define BITIND  07
 
-static const unsigned char bitarr[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+static constexpr const unsigned char bitarr[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
 
 #define badpat(x)	(*nfa = END, x)
 

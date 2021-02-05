@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -70,9 +71,9 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (s[0] == '!') {
 					sc.ChangeState(SCE_NSIS_PREPROCESSOR);
-					if (CStrEqual(s, "!include")) {
+					if (StrEqual(s, "!include")) {
 						lineStateLineType = NsisLineTypeInclude;
-					} else if (CStrEqual(s, "!define")) {
+					} else if (StrEqual(s, "!define")) {
 						lineStateLineType = NsisLineTypeDefine;
 					}
 				} else if (visibleChars == sc.LengthCurrent()) {
@@ -233,15 +234,15 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			if (styleNext != style) {
 				buf[wordLen] = '\0';
 				if (style == SCE_NSIS_WORD) {
-					if (wordLen >= 9 && CStrEndsWith(buf, wordLen, "end")) {
+					if (wordLen >= 9 && StrEndsWith(buf, wordLen, "end")) {
 						levelNext--;
-					} else if (CStrStartsWith(buf, "section") || CStrEqualsAny(buf, "function", "pageex")) {
+					} else if (StrStartsWith(buf, "section") || StrEqualsAny(buf, "function", "pageex")) {
 						levelNext++;
 					}
 				} else {
-					if (CStrStartsWith(buf, "!if") || CStrEqual(buf, "!macro")) {
+					if (StrStartsWith(buf, "!if") || StrEqual(buf, "!macro")) {
 						levelNext++;
-					} else if (CStrStartsWith(buf, "!end") || CStrEqual(buf, "!macroend")) {
+					} else if (StrStartsWith(buf, "!end") || StrEqual(buf, "!macroend")) {
 						levelNext--;
 					}
 				}

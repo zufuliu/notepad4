@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -69,24 +70,24 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_L_COMMAND:
 			if (!IsAlpha(ch)) {
 				buf[wordLen] = '\0';
-				if (strcmp(buf, "@c") == 0 || strcmp(buf, "@comment") == 0) {
+				if (StrEqualsAny(buf, "@c", "@comment")) {
 					state = SCE_L_COMMENT;
-				} else if (strcmp(buf, "@end") == 0) {
+				} else if (StrEqual(buf, "@end")) {
 					levelNext--;
 					isCommand = true;
 				} else {
 					if (buf[0] == '@' && keywords2.InList(buf + 1)) {
 						levelNext++;
 					}
-					if (strcmp(buf, "@settitle") == 0) {
+					if (StrEqual(buf, "@settitle")) {
 						state = SCE_L_TITLE;
-					} else if (strcmp(buf, "@chapter") == 0) {
+					} else if (StrEqual(buf, "@chapter")) {
 						state = SCE_L_CHAPTER;
-					} else if (strcmp(buf, "@section") == 0) {
+					} else if (StrEqual(buf, "@section")) {
 						state = SCE_L_SECTION;
-					} else if (strcmp(buf, "@subsection") == 0) {
+					} else if (StrEqual(buf, "@subsection")) {
 						state = SCE_L_SECTION1;
-					} else if (strcmp(buf, "@subsubsection") == 0) {
+					} else if (StrEqual(buf, "@subsubsection")) {
 						state = SCE_L_SECTION2;
 					}
 				}

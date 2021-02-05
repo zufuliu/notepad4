@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -207,15 +208,15 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				const int kwPrev = kwType;
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD);
-					if (CStrEqual(s, "func")) {
+					if (StrEqual(s, "func")) {
 						funcState = (visibleChars == 4)? GoFunction_Define : GoFunction_Param;
-					} else if (CStrEqual(s, "type")) {
+					} else if (StrEqual(s, "type")) {
 						kwType = SCE_GO_TYPE;
-					} else if (CStrEqual(s, "const")) {
+					} else if (StrEqual(s, "const")) {
 						kwType = SCE_GO_CONSTANT;
-					} else if (CStrEqualsAny(s, "map", "chan")) {
+					} else if (StrEqualsAny(s, "map", "chan")) {
 						kwType = SCE_GO_IDENTIFIER;
-					} else if (CStrEqualsAny(s, "goto", "break", "continue")) {
+					} else if (StrEqualsAny(s, "goto", "break", "continue")) {
 						kwType = SCE_GO_LABEL;
 					}
 					if (kwType == SCE_GO_TYPE || kwType == SCE_GO_LABEL) {
@@ -228,7 +229,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.ChangeState(SCE_GO_WORD2);
 				} else if (keywordLists[2]->InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_GO_BUILTIN_FUNC);
-					if (sc.ch == '(' && CStrEqual(s, "new")) {
+					if (sc.ch == '(' && StrEqual(s, "new")) {
 						kwType = SCE_GO_IDENTIFIER;
 					}
 				} else if (keywordLists[3]->InList(s)) {

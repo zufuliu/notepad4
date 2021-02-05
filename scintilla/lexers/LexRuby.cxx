@@ -17,6 +17,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -92,11 +93,11 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, const WordList &keywo
 	char s[MAX_KEYWORD_LENGTH + 1];
 	styler.GetRange(start, end + 1, s, sizeof(s));
 	int chAttr;
-	if (0 == strcmp(prevWord, "class"))
+	if (StrEqual(prevWord, "class"))
 		chAttr = SCE_RB_CLASSNAME;
-	else if (0 == strcmp(prevWord, "module"))
+	else if (StrEqual(prevWord, "module"))
 		chAttr = SCE_RB_MODULE_NAME;
-	else if (0 == strcmp(prevWord, "def"))
+	else if (StrEqual(prevWord, "def"))
 		chAttr = SCE_RB_DEFNAME;
 	else if (keywords.InList(s) && ((start == 0) || !followsDot(start - 1, styler))) {
 		if (keywordIsAmbiguous(s)
@@ -332,9 +333,7 @@ bool sureThisIsHeredoc(Sci_Position iPrev, Accessor &styler, char *prevWord) {
 		firstWordEndPosn += 1;
 	}
 	//XXX Write a style-aware thing to regex scintilla buffer objects
-	if (!strcmp(prevWord, "undef")
-		|| !strcmp(prevWord, "def")
-		|| !strcmp(prevWord, "alias")) {
+	if (StrEqualsAny(prevWord, "undef", "def", "alias")) {
 		// These keywords are what we were looking for
 		return false;
 	}
@@ -678,7 +677,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							 | ((uint64_t)SCE_RB_STRING_QW << 24)
 							 | ((uint64_t)SCE_RB_STRING_QW << 32)
 							 | ((uint64_t)SCE_RB_STRING_QX << 48);
-	static const char* q_chars = "qQrwWx";
+	constexpr const char* q_chars = "qQrwWx";
 
 	// In most cases a value of 2 should be ample for the code in the
 	// Ruby library, and the code the user is likely to enter.
@@ -956,9 +955,9 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (ch == '%') {
 				styler.ColourTo(i - 1, state);
 				bool have_string = false;
-				if (strchr(q_chars, chNext) && !isSafeWordcharOrHigh(chNext2)) {
+				const char *hit = strchr(q_chars, chNext);
+				if (hit && !isSafeWordcharOrHigh(chNext2)) {
 					Quote.New();
-					const char *hit = strchr(q_chars, chNext);
 					if (hit != nullptr) {
 						state = (int)((q_states >> ((hit - q_chars)*8)) & 0xff);
 						Quote.Open(chNext2);
@@ -1045,8 +1044,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				if (ch == '='
 					&& isSafeWordcharOrHigh(chPrev)
 					&& (chNext == '(' || IsASpace(chNext))
-					&& (!strcmp(prevWord, "def")
-						|| followsDot(styler.GetStartSegment(), styler))) {
+					&& (StrEqual(prevWord, "def") || followsDot(styler.GetStartSegment(), styler))) {
 					// <name>= is a name only when being def'd -- Get it the next time
 					// This means that <name>=<name> is always lexed as
 					// <name>, (op, =), <name>
@@ -1432,11 +1430,7 @@ void getPrevWord(Sci_Position pos, char *prevWord, Accessor &styler, int word_st
 bool keywordIsAmbiguous(const char *prevWord) noexcept {
 	// Order from most likely used to least likely
 	// Lots of ways to do a loop in Ruby besides 'while/until'
-	return !strcmp(prevWord, "if")
-		|| !strcmp(prevWord, "do")
-		|| !strcmp(prevWord, "while")
-		|| !strcmp(prevWord, "unless")
-		|| !strcmp(prevWord, "until");
+	return StrEqualsAny(prevWord, "if", "do", "while", "unless", "until");
 }
 
 // Demote keywords in the following conditions:
@@ -1444,7 +1438,7 @@ bool keywordIsAmbiguous(const char *prevWord) noexcept {
 // do after a while or until, as a noise word (like then after if)
 
 bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
-	if (word[0] == 'd' && word[1] == 'o' && !word[2]) {
+	if (StrEqual(word, "do")) {
 		return keywordDoStartsLoop(pos, styler);
 	}
 
@@ -1524,10 +1518,10 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 		//XXX: Make a list of other keywords where 'if' isn't a modifier
 		//	   and can appear legitimately
 		// Formulate this to avoid warnings from most compilers
-		if (strcmp(word, "if") == 0) {
+		if (StrEqual(word, "if")) {
 			char prevWord[MAX_KEYWORD_LENGTH + 1];
 			getPrevWord(pos, prevWord, styler, SCE_RB_WORD);
-			return strcmp(prevWord, "else") != 0;
+			return !StrEqual(prevWord, "else");
 		}
 		return true;
 	default:
@@ -1584,9 +1578,7 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 			}
 			*dst = 0;
 			// Did we see our keyword?
-			if (!strcmp(prevWord, WHILE_BACKWARDS)
-				|| !strcmp(prevWord, UNTIL_BACKWARDS)
-				|| !strcmp(prevWord, FOR_BACKWARDS)) {
+			if (StrEqualsAny(prevWord, WHILE_BACKWARDS, UNTIL_BACKWARDS, FOR_BACKWARDS)) {
 				return true;
 			}
 			// We can move pos to the beginning of the keyword, and then
@@ -1713,7 +1705,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			char prevWord[MAX_KEYWORD_LENGTH + 1]; // 1 byte for zero
 			prevWord[0] = 0;
 			getPrevWord(i, prevWord, styler, SCE_RB_WORD);
-			if (!strcmp(prevWord, "end")) {
+			if (StrEqual(prevWord, "end")) {
 				// Don't decrement below 0
 				if (levelCurrent > 0)
 					levelCurrent--;

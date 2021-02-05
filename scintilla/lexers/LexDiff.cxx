@@ -17,6 +17,7 @@
 #include "LexAccessor.h"
 #include "Accessor.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -27,20 +28,20 @@ namespace {
 // Note that ColouriseDiffLine analyzes only the first DIFF_BUFFER_START_SIZE
 // characters of each line to classify the line.
 
-inline int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noexcept {
+inline int ColouriseDiffLine(const char (&lineBuffer)[DIFF_BUFFER_START_SIZE]) noexcept {
 	// It is needed to remember the current state to recognize starting
 	// comment lines before the first "diff " or "--- ". If a real
 	// difference starts then each line starting with ' ' is a whitespace
 	// otherwise it is considered a comment (Only in..., Binary file...)
-	if (CStrStartsWith(lineBuffer, "diff ")) {
+	if (StrStartsWith(lineBuffer, "diff ")) {
 		return SCE_DIFF_COMMAND;
 	}
-	if (CStrStartsWith(lineBuffer, "Index: ")) {  // For subversion's diff
+	if (StrStartsWith(lineBuffer, "Index: ")) {  // For subversion's diff
 		return SCE_DIFF_COMMAND;
 	}
-	if (CStrStartsWith(lineBuffer, "---") && lineBuffer[CStrLen("---")] != '-') {
+	if (StrStartsWith(lineBuffer, "---") && lineBuffer[CStrLen("---")] != '-') {
 		// In a context diff, --- appears in both the header and the position markers
-		if (lineBuffer[CStrLen("---")] == ' ' && atoi(lineBuffer + CStrLen("---") + 1) && !strchr(lineBuffer, '/')) {
+		if (lineBuffer[CStrLen("---")] == ' ' && atoi(lineBuffer + CStrLen("--- ")) && !strchr(lineBuffer, '/')) {
 			return SCE_DIFF_POSITION;
 		}
 		if (IsEOLChar(lineBuffer[CStrLen("---")])) {
@@ -51,7 +52,7 @@ inline int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noex
 		}
 		return SCE_DIFF_DELETED;
 	}
-	if (CStrStartsWith(lineBuffer, "+++ ")) {
+	if (StrStartsWith(lineBuffer, "+++ ")) {
 		// I don't know of any diff where "+++ " is a position marker, but for
 		// consistency, do the same as with "--- " and "*** ".
 		if (atoi(lineBuffer + CStrLen("+++ ")) && !strchr(lineBuffer, '/')) {
@@ -59,14 +60,14 @@ inline int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noex
 		}
 		return SCE_DIFF_HEADER;
 	}
-	if (CStrStartsWith(lineBuffer, "====")) {  // For p4's diff
+	if (StrStartsWith(lineBuffer, "====")) {  // For p4's diff
 		return SCE_DIFF_HEADER;
 	}
-	if (CStrStartsWith(lineBuffer, "***")) {
+	if (StrStartsWith(lineBuffer, "***")) {
 		// In a context diff, *** appears in both the header and the position markers.
 		// Also ******** is a chunk header, but here it's treated as part of the
 		// position marker since there is no separate style for a chunk header.
-		if (lineBuffer[CStrLen("***")] == ' ' && atoi(lineBuffer + CStrLen("***") + 1) && !strchr(lineBuffer, '/')) {
+		if (lineBuffer[CStrLen("***")] == ' ' && atoi(lineBuffer + CStrLen("*** ")) && !strchr(lineBuffer, '/')) {
 			return SCE_DIFF_POSITION;
 		}
 		if (lineBuffer[CStrLen("***")] == '*') {
@@ -74,7 +75,7 @@ inline int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noex
 		}
 		return SCE_DIFF_HEADER;
 	}
-	if (CStrStartsWith(lineBuffer, "? ")) {    // For difflib
+	if (StrStartsWith(lineBuffer, "? ")) {    // For difflib
 		return SCE_DIFF_HEADER;
 	}
 	if (lineBuffer[0] == '@') {
@@ -83,16 +84,16 @@ inline int ColouriseDiffLine(const char lineBuffer[DIFF_BUFFER_START_SIZE]) noex
 	if (IsADigit(lineBuffer[0])) {
 		return SCE_DIFF_POSITION;
 	}
-	if (CStrStartsWith(lineBuffer, "++")) {
+	if (StrStartsWith(lineBuffer, "++")) {
 		return SCE_DIFF_PATCH_ADD;
 	}
-	if (CStrStartsWith(lineBuffer, "+-")) {
+	if (StrStartsWith(lineBuffer, "+-")) {
 		return SCE_DIFF_PATCH_DELETE;
 	}
-	if (CStrStartsWith(lineBuffer, "-+")) {
+	if (StrStartsWith(lineBuffer, "-+")) {
 		return SCE_DIFF_REMOVED_PATCH_ADD;
 	}
-	if (CStrStartsWith(lineBuffer, "--")) {
+	if (StrStartsWith(lineBuffer, "--")) {
 		return SCE_DIFF_REMOVED_PATCH_DELETE;
 	}
 	if (lineBuffer[0] == '-' || lineBuffer[0] == '<') {

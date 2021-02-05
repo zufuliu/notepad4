@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -69,7 +70,6 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	int kwType = SCE_JAVA_DEFAULT;
 	int chBeforeIdentifier = 0;
-	int chBefore = 0;
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
@@ -101,7 +101,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				if (s[0] == '@') {
-					if (CStrEqual(s, "@interface")) {
+					if (StrEqual(s, "@interface")) {
 						sc.ChangeState(SCE_JAVA_WORD);
 						kwType = SCE_JAVA_ANNOTATION;
 					} else {
@@ -110,22 +110,21 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				} else if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_JAVA_WORD);
-					if (CStrEqual(s, "import")) {
+					if (StrEqual(s, "import")) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = JavaLineStateMaskImport;
 						}
-					} else if ((!(chBefore == '.' || chBefore == ':') && CStrEqual(s, "class"))
-						|| CStrEqualsAny(s, "new", "extends", "instanceof", "throws")) {
+					} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws")) {
 						kwType = SCE_JAVA_CLASS;
-					} else if (CStrEqualsAny(s, "interface", "implements")) {
+					} else if (StrEqualsAny(s, "interface", "implements")) {
 						kwType = SCE_JAVA_INTERFACE;
-					} else if (CStrEqual(s, "enum")) {
+					} else if (StrEqual(s, "enum")) {
 						kwType = SCE_JAVA_ENUM;
-					} else if (CStrEqual(s, "record")) {
+					} else if (StrEqual(s, "record")) {
 						kwType = SCE_JAVA_RECORD;
-					} else if (CStrEqualsAny(s, "break", "continue")) {
+					} else if (StrEqualsAny(s, "break", "continue")) {
 						kwType = SCE_JAVA_LABEL;
-					} else if (CStrEqualsAny(s, "if", "while")) {
+					} else if (StrEqualsAny(s, "if", "while")) {
 						// to avoid treating following code as type cast:
 						// if (identifier) expression, while (identifier) expression
 						kwType = SCE_JAVA_WORD;
@@ -336,9 +335,8 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_JAVA_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch) || sc.Match('@', 'i')) {
-				chBefore = sc.chPrev;
-				if (chBefore != '.') {
-					chBeforeIdentifier = chBefore;
+				if (sc.chPrev != '.') {
+					chBeforeIdentifier = sc.chPrev;
 				}
 				sc.SetState(SCE_JAVA_IDENTIFIER);
 			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {

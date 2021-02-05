@@ -1079,7 +1079,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		break;
 
 	case SCI_SETILEXER:
-		DocumentLexState()->SetInstance(reinterpret_cast<ILexer5 *>(lParam));
+		DocumentLexState()->SetInstance(static_cast<ILexer5 *>(PtrFromSPtr(lParam)));
 		break;
 
 	case SCI_GETLEXER:
@@ -1115,7 +1115,8 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		return DocumentLexState()->PropGetInt(ConstCharPtrFromUPtr(wParam), static_cast<int>(lParam));
 
 	case SCI_SETKEYWORDS:
-		DocumentLexState()->SetWordList(static_cast<int>(wParam & KEYWORDSET_INDEXMASK), (wParam & KEYWORDSET_TOLOWER) != 0, ConstCharPtrFromSPtr(lParam));
+		DocumentLexState()->SetWordList(static_cast<int>(wParam & KEYWORDSET_INDEXMASK),
+			(wParam & KEYWORDSET_TOLOWER) != 0, ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case SCI_GETLEXERLANGUAGE:
@@ -1123,7 +1124,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 
 	case SCI_PRIVATELEXERCALL:
 		return reinterpret_cast<sptr_t>(
-			DocumentLexState()->PrivateCall(static_cast<int>(wParam), reinterpret_cast<void *>(lParam)));
+			DocumentLexState()->PrivateCall(static_cast<int>(wParam), PtrFromSPtr(lParam)));
 
 	case SCI_PROPERTYNAMES:
 		return StringResult(lParam, DocumentLexState()->PropertyNames());

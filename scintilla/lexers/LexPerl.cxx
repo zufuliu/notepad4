@@ -19,6 +19,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -686,10 +687,10 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[100];
 				sc.GetCurrent(s, sizeof(s));
-				if (CStrEqualsAny(s, "__DATA__", "__END__")) {
+				if (StrEqualsAny(s, "__DATA__", "__END__")) {
 					sc.ChangeState(SCE_PL_DATASECTION);
 				} else {
-					if (CStrEqual(s, "format")) {
+					if (StrEqual(s, "format")) {
 						sc.SetState(SCE_PL_FORMAT_IDENT);
 						HereDoc.State = 0;
 					} else {
