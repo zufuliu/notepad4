@@ -21,6 +21,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -451,11 +452,11 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.ChangeState(SCE_CSS_UNKNOWN_PSEUDOCLASS);
 				break;
 			case SCE_CSS_IMPORTANT:
-				if (strcmp(s2, "important") != 0)
+				if (!StrEqual(s2, "important"))
 					sc.ChangeState(SCE_CSS_VALUE);
 				break;
 			case SCE_CSS_DIRECTIVE:
-				if (op == '@' && strcmp(s2, "media") == 0)
+				if (op == '@' && StrEqual(s2, "media"))
 					sc.ChangeState(SCE_CSS_MEDIA);
 				break;
 			}

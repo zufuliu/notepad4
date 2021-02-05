@@ -112,6 +112,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "CharacterCategory.h"
 #include "LexerModule.h"
 #include "OptionSet.h"

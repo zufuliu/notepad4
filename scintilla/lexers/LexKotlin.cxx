@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
 
@@ -60,7 +61,6 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 	int kwType = SCE_KOTLIN_DEFAULT;
 	int chBeforeIdentifier = 0;
-	int chBefore = 0;
 
 	std::vector<int> nestedState; // string interpolation "${}"
 
@@ -109,21 +109,21 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_KOTLIN_WORD);
-					if (CStrEqual(s, "import")) {
+					if (StrEqual(s, "import")) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = KotlinLineStateMaskImport;
 						}
-					} else if (CStrEqualsAny(s, "break", "continue", "return", "this", "super")) {
+					} else if (StrEqualsAny(s, "break", "continue", "return", "this", "super")) {
 						kwType = SCE_KOTLIN_LABEL;
-					} else if (((kwType != SCE_KOTLIN_ANNOTATION && kwType != SCE_KOTLIN_ENUM)
-							&& (chBefore != ':' && CStrEqual(s, "class")))
-						|| CStrEqual(s, "typealias")) {
-						kwType = SCE_KOTLIN_CLASS;
-					} else if (CStrEqual(s, "enum")) {
+					} else if (StrEqualsAny(s, "class", "typealias")) {
+						if (!(kwType == SCE_KOTLIN_ANNOTATION || kwType == SCE_KOTLIN_ENUM)) {
+							kwType = SCE_KOTLIN_CLASS;
+						}
+					} else if (StrEqual(s, "enum")) {
 						kwType = SCE_KOTLIN_ENUM;
-					} else if (CStrEqual(s, "annotation")) {
+					} else if (StrEqual(s, "annotation")) {
 						kwType = SCE_KOTLIN_ANNOTATION;
-					} else if (CStrEqual(s, "interface")) {
+					} else if (StrEqual(s, "interface")) {
 						kwType = SCE_KOTLIN_INTERFACE;
 					}
 					if (kwType != SCE_KOTLIN_DEFAULT) {
@@ -308,9 +308,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				chBefore = sc.chPrev;
-				if (chBefore != '.') {
-					chBeforeIdentifier = chBefore;
+				if (sc.chPrev != '.') {
+					chBeforeIdentifier = sc.chPrev;
 				}
 				sc.SetState(SCE_KOTLIN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {

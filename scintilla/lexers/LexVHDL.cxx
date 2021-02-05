@@ -22,6 +22,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -190,7 +191,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		const char ch = styler.SafeGetCharAt(j);
 		const int style = styler.StyleAt(j);
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
-			if ((ch == ';') && (strcmp(prevWord, "end") == 0)) {
+			if (ch == ';' && StrEqual(prevWord, "end")) {
 				strcpy(prevWord, ";");
 			}
 		}
@@ -238,7 +239,7 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 		}
 
 		if ((!IsCommentStyle(style)) && (style != SCE_VHDL_STRING)) {
-			if ((ch == ';') && (strcmp(prevWord, "end") == 0)) {
+			if (ch == ';' && StrEqual(prevWord, "end")) {
 				strcpy(prevWord, ";");
 			}
 
@@ -255,20 +256,12 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 				s[k] = '\0';
 
 				if (kwFold.InList(s)) {
-					if (
-						strcmp(s, "architecture") == 0 || strcmp(s, "case") == 0 ||
-						strcmp(s, "generate") == 0 || strcmp(s, "loop") == 0 || strcmp(s, "block") == 0 ||
-						strcmp(s, "package") == 0 || strcmp(s, "process") == 0 ||
-						strcmp(s, "record") == 0 || strcmp(s, "then") == 0 ||
-						strcmp(s, "units") == 0) {
-						if (strcmp(prevWord, "end") != 0) {
+					if (StrEqualsAny(s, "architecture", "case", "generate", "loop", "block", "package", "process", "record", "then", "units")) {
+						if (!StrEqual(prevWord, "end")) {
 							levelNext++;
 						}
-					} else if (
-						strcmp(s, "component") == 0 ||
-						strcmp(s, "entity") == 0 ||
-						strcmp(s, "configuration") == 0) {
-						if (strcmp(prevWord, "end") != 0) {
+					} else if (StrEqualsAny(s, "component", "entity", "configuration")) {
+						if (!StrEqual(prevWord, "end")) {
 							// check for instantiated unit by backward searching for the colon.
 							Sci_PositionU pos = lastStart;
 							char chAtPos = 0;
@@ -289,8 +282,8 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 								levelNext++;
 							}
 						}
-					} else if (strcmp(s, "procedure") == 0 || strcmp(s, "function") == 0) {
-						if (strcmp(prevWord, "end") != 0) {
+					} else if (StrEqualsAny(s, "procedure", "function")) {
+						if (!StrEqual(prevWord, "end")) {
 							// check for "end procedure" etc.
 							// This code checks to see if the procedure / function is a definition within a "package"
 								// rather than the actual code in the body.
@@ -316,14 +309,11 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 							}
 						}
 
-					} else if (strcmp(s, "end") == 0) {
+					} else if (StrEqual(s, "end")) {
 						levelNext--;
-					} else if (strcmp(s, "elsif") == 0) { // elsif is followed by then so folding occurs correctly
+					} else if (StrEqual(s, "elsif")) { // elsif is followed by then so folding occurs correctly
 						levelNext--;
-					} else if (
-						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "architecture") == 0)) ||
-						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "function") == 0)) ||
-						((strcmp(s, "begin") == 0) && (strcmp(prevWord, "procedure") == 0))) {
+					} else if (StrEqual(s, "begin") && StrEqualsAny(prevWord, "architecture", "function", "procedure")) {
 						levelMinCurrentBegin = levelNext - 1;
 					}
 					strcpy(prevWord, s);

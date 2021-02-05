@@ -19,6 +19,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -176,7 +177,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
 					sc.ChangeState(SCE_LUA_WORD);
-					if (CStrEqual(s, "goto")) {	// goto <label> forward scan
+					if (StrEqual(s, "goto")) {	// goto <label> forward scan
 						sc.SetState(SCE_LUA_DEFAULT);
 						while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
 							sc.Forward();
@@ -338,9 +339,9 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 					s[j] = c;
 				}
 
-				if (CStrEqualsAny(s, "if", "do", "function", "repeat")) {
+				if (StrEqualsAny(s, "if", "do", "function", "repeat")) {
 					levelCurrent++;
-				} else if (CStrEqualsAny(s, "end", "elseif", "until")) {
+				} else if (StrEqualsAny(s, "end", "elseif", "until")) {
 					levelCurrent--;
 				}
 			}

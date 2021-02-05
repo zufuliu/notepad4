@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
 
@@ -141,21 +142,21 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						}
 					} else if (keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_SWIFT_WORD);
-						if (CStrEqual(s, "import")) {
+						if (StrEqual(s, "import")) {
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = SwiftLineStateMaskImport;
 							}
-						} else if (CStrEqualsAny(s, "class", "as", "extension", "is", "typealias")) {
+						} else if (StrEqualsAny(s, "class", "extension", "typealias", "as", "is")) {
 							kwType = SCE_SWIFT_CLASS;
-						} else if (CStrEqual(s, "struct")) {
+						} else if (StrEqual(s, "struct")) {
 							kwType = SCE_SWIFT_STRUCT;
-						} else if (CStrEqual(s, "protocol")) {
+						} else if (StrEqual(s, "protocol")) {
 							kwType = SCE_SWIFT_PROTOCOL;
-						} else if (CStrEqual(s, "enum")) {
+						} else if (StrEqual(s, "enum")) {
 							kwType = SCE_SWIFT_ENUM;
-						} else if (CStrEqual(s, "func")) {
+						} else if (StrEqual(s, "func")) {
 							kwType = SCE_SWIFT_FUNCTION_DEFINE;
-						} else if (CStrEqualsAny(s, "break", "continue")) {
+						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = SCE_SWIFT_LABEL;
 						}
 						if (kwType != SCE_SWIFT_DEFAULT) {

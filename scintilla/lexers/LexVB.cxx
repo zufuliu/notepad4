@@ -21,6 +21,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -114,11 +115,11 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 					sc.ChangeState(SCE_B_LABEL);
 					sc.SetState(SCE_B_DEFAULT);
 				} else
-					if (CStrEqual(s, "rem")) {
+					if (StrEqual(s, "rem")) {
 						sc.ChangeState(SCE_B_COMMENT);
 					} else {
-						if ((isIfThenPreprocessor && CStrEqual(s, "then")) || (isEndPreprocessor
-							&& CStrEqualsAny(s, "if", "region", "externalsource"))) {
+						if ((isIfThenPreprocessor && StrEqual(s, "then")) || (isEndPreprocessor
+							&& StrEqualsAny(s, "if", "region", "externalsource"))) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
 						} else if (keywords.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD);
@@ -128,8 +129,8 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 							sc.ChangeState(SCE_B_KEYWORD3);
 						} else if (!vbScriptSyntax && s[0] == '#' && keywords4.InList(s + 1)) {
 							sc.ChangeState(SCE_B_PREPROCESSOR);
-							isIfThenPreprocessor = CStrEqualsAny(s, "#if", "#elseif");
-							isEndPreprocessor = CStrEqual(s, "#end");
+							isIfThenPreprocessor = StrEqualsAny(s, "#if", "#elseif");
+							isEndPreprocessor = StrEqual(s, "#end");
 						} else if (keywords5.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD4);
 						} else if (keywords6.InList(s)) {

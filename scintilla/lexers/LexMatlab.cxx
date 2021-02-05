@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -333,16 +334,16 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[16]; // unwind_protect
 			const Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
-			if ((CStrEqual(word, "function") && LexGetNextChar(i + len, styler) != '(')
-				|| CStrEqualsAny(word, "if", "for", "while", "try")
-				|| (IsMatlabOctave(lexType) && CStrEqualsAny(word, "switch", "classdef", "parfor"))
-				|| ((lexType == LEX_OCTAVE) && CStrEqualsAny(word, "do", "unwind_protect"))
-				|| ((lexType == LEX_SCILAB) && CStrEqual(word, "select"))
+			if ((StrEqual(word, "function") && LexGetNextChar(i + len, styler) != '(')
+				|| StrEqualsAny(word, "if", "for", "while", "try")
+				|| (IsMatlabOctave(lexType) && StrEqualsAny(word, "switch", "classdef", "parfor"))
+				|| ((lexType == LEX_OCTAVE) && StrEqualsAny(word, "do", "unwind_protect"))
+				|| ((lexType == LEX_SCILAB) && StrEqual(word, "select"))
 				) {
 				levelNext++;
-			} else if ((lexType == LEX_OCTAVE) && CStrEqual(word, "until")) {
+			} else if ((lexType == LEX_OCTAVE) && StrEqual(word, "until")) {
 				levelNext--;
-			} else if (CStrStartsWith(word, "end")) {
+			} else if (StrStartsWith(word, "end")) {
 				levelNext--;
 				//if (len == 3) {	// just "end"
 				//	Sci_Position pos = LexSkipSpaceTab(i+3, endPos, styler);
@@ -351,7 +352,7 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				//		levelNext++;
 				//	}
 				//}
-			} else if (IsMatlabOctave(lexType) && chPrev != '@' && CStrEqualsAny(word, "methods", "properties", "events", "enumeration")) {
+			} else if (IsMatlabOctave(lexType) && chPrev != '@' && StrEqualsAny(word, "methods", "properties", "events", "enumeration")) {
 				// Matlab classdef
 				Sci_Position pos = LexSkipSpaceTab(i + len, endPos, styler);
 				const char chEnd = styler.SafeGetCharAt(pos);

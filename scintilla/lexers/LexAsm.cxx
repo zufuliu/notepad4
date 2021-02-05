@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -122,7 +123,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				} else if (s[0] == '.' && GNUdirective.InList(s + 1)) {
 					isGnuAsmSource = true;
 					sc.ChangeState(SCE_ASM_DIRECTIVE);
-					if (strcmp(s, ".def") == 0)
+					if (StrEqual(s, ".def"))
 						lastGnuAsmDefLine = lineCurrent;
 				} else if (directiveOperand.InList(s)) {
 					sc.ChangeState(SCE_ASM_DIRECTIVEOPERAND);
@@ -143,19 +144,17 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					}
 				}
 				sc.SetState(SCE_ASM_DEFAULT);
-				if (IsDirective && s[0] == '#' && (strcmp(s, "#error") == 0 || strcmp(s, "%error") == 0 ||
-					strcmp(s, "#warning") == 0 || strcmp(s, "#message") == 0)) {
+				if (IsDirective && (s[0] == '#' || s[0] == '%') && StrEqualsAny(s, "#error", "%error", "#warning", "#message")) {
 					while (!IsASpaceOrTab(sc.ch) && !IsEOLChar(sc.chNext))
 						sc.Forward();
 					if (!sc.atLineEnd)
 						sc.ForwardSetState(SCE_ASM_STRING);
 				}
-				if (IsDirective && (strcmp(s, "#include") == 0 || strcmp(s, "include") == 0 ||
-					strcmp(s, "includelib") == 0 || strcmp(s, "%include") == 0)) {
+				if (IsDirective && StrEqualsAny(s, "#include", "include", "includelib", "%include")) {
 					isIncludePreprocessor = true;
 					sc.ForwardSetState(SCE_ASM_STRING);
 				}
-				if (IsDirective && strcmp(s, "comment") == 0) { // MASM32 block comment
+				if (IsDirective && StrEqual(s, "comment")) { // MASM32 block comment
 					while (sc.ch == ' ' || sc.ch == '\t')
 						sc.Forward();
 					if (sc.ch == '*')
@@ -164,7 +163,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				if (sc.atLineEnd) {
 					sc.SetState(SCE_ASM_DEFAULT);
 				}
-				if (IsDirective && !strcmp(s, "comment")) {
+				if (IsDirective && StrEqual(s, "comment")) {
 					const char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
 					while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd) {
 						sc.ForwardSetState(SCE_ASM_DEFAULT);
@@ -271,12 +270,11 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					if (kwProprocessor.InList(pp)) {
 						sc.SetState(SCE_ASM_PREPROCESSOR);
 						sc.Forward(pos - sc.currentPos + len);
-						if (strcmp(pp, "include") == 0) {
+						if (StrEqual(pp, "include")) {
 							isIncludePreprocessor = true;
 							if (!sc.atLineEnd)
 								sc.SetState(SCE_ASM_STRING);
-						} else if (strcmp(pp, "error") == 0 || strcmp(pp, "warning") == 0
-							|| strcmp(pp, "message") == 0) {
+						} else if (StrEqualsAny(pp, "error", "warning", "message")) {
 							if (!sc.atLineEnd)
 								sc.SetState(SCE_ASM_STRING);
 						} else {
@@ -420,22 +418,22 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				wordlen = 0;
 				if (directives4foldstart.InList(word)) {
 					levelNext++;
-					if (strcmp(word, "dialog") == 0) {
+					if (StrEqual(word, "dialog")) {
 						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 						if (styler[pos] == '\"')
 							levelNext--;
 					}
-					if (strcmp(word, "if") == 0 && IsEndLine(lineCurrent)) { // FASM: end if
+					if (StrEqual(word, "if") && IsEndLine(lineCurrent)) { // FASM: end if
 						levelNext -= 2;
 					}
 				} else if (directives4foldend.InList(word)) {
 					levelNext--;
-					if (strcmp(word, "enddialog") == 0) {
+					if (StrEqual(word, "enddialog")) {
 						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 						if (styler[pos] == ',')
 							levelNext++;
 					}
-					if (strcmp(word, "endproc") == 0) {
+					if (StrEqual(word, "endproc")) {
 						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 						if (styler[pos] == '(')
 							levelNext++;

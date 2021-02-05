@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -104,9 +105,9 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					userDefType = SCE_CMAKE_DEFAULT;
 					if (keywordLists[0]->InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_WORD);
-						if (CStrEqual(s, "function")) {
+						if (StrEqual(s, "function")) {
 							userDefType = SCE_CMAKE_FUNCATION;
-						} else if (CStrEqual(s, "macro")) {
+						} else if (StrEqual(s, "macro")) {
 							userDefType = SCE_CMAKE_MACRO;
 						}
 					} else if (keywordLists[1]->InListPrefixed(s, '(')) {
@@ -227,7 +228,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.ch == '{') {
 					char s[8];
 					sc.GetCurrent(s, sizeof(s));
-					if (CStrEqualsAny(s, "$ENV", "$CACHE")) {
+					if (StrEqualsAny(s, "$ENV", "$CACHE")) {
 						sc.SetState(SCE_CMAKE_VARIABLE);
 						varNestedLevel = 1;
 						done = true;
@@ -381,9 +382,9 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			if (styleNext != SCE_CMAKE_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (CStrStartsWith(buf, "end")) {
+				if (StrStartsWith(buf, "end")) {
 					levelNext--;
-				} else if (CStrEqualsAny(buf, "if", "function", "macro", "foreach", "while")) {
+				} else if (StrEqualsAny(buf, "if", "function", "macro", "foreach", "while")) {
 					levelNext++;
 				}
 			}

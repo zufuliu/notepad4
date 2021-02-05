@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -87,7 +88,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					int state = SCE_AVS_USERDFN;
 					if (keywordLists[1]->InListPrefixed(s, '(')) {
 						state = SCE_AVS_FUNCTION;
-						if (!insideScript && (CStrEqualsAny(s, "eval", "gscript", "geval"))) {
+						if (!insideScript && StrEqualsAny(s, "eval", "gscript", "geval")) {
 							scriptEval = ScriptEvalState_Name;
 						}
 					} else if (keywordLists[2]->InListPrefixed(s, '(')) {

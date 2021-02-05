@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
 
@@ -113,15 +114,15 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_DART_WORD);
-					if (CStrEqualsAny(s, "import", "part")) {
+					if (StrEqualsAny(s, "import", "part")) {
 						if (visibleChars == sc.LengthCurrent()) {
 							lineStateLineType = DartLineStateMaskImport;
 						}
-					} else if (CStrEqualsAny(s, "as", "class", "extends", "implements", "is", "new", "throw")) {
+					} else if (StrEqualsAny(s, "class", "extends", "implements", "new", "throw", "as", "is")) {
 						kwType = SCE_DART_CLASS;
-					} else if (CStrEqual(s, "enum")) {
+					} else if (StrEqual(s, "enum")) {
 						kwType = SCE_DART_ENUM;
-					} else if (CStrEqualsAny(s, "break", "continue")) {
+					} else if (StrEqualsAny(s, "break", "continue")) {
 						kwType = SCE_DART_LABEL;
 					}
 					if (kwType != SCE_DART_DEFAULT) {

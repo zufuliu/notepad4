@@ -15,6 +15,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -266,7 +267,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				const int nextChar = sc.GetDocNextChar();
 
 				if (lastPPDefineWord) {
-					if (lastPPDefineWord == 2 && CStrEqual(s, "defined"))
+					if (lastPPDefineWord == 2 && StrEqual(s, "defined"))
 						sc.ChangeState(SCE_C_WORD);
 					else if (sc.ch == '(')
 						sc.ChangeState(SCE_C_MACRO2);
@@ -292,38 +293,38 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						char *ppw = s;
 						if (s[0] == '#')
 							ppw = s + 1;
-						isPragmaPreprocessor = CStrEqualsAny(ppw, "pragma", "line");
-						isIncludePreprocessor = CStrStartsWith(ppw, "include") || CStrEqualsAny(ppw, "import", "using");
-						isMessagePreprocessor = CStrEqualsAny(ppw, "error", "warning", "message", "region", "endregion");
-						if (CStrEqual(ppw, "define")) {
+						isPragmaPreprocessor = StrEqualsAny(ppw, "pragma", "line");
+						isIncludePreprocessor = StrStartsWith(ppw, "include") || StrEqualsAny(ppw, "import", "using");
+						isMessagePreprocessor = StrEqualsAny(ppw, "error", "warning", "message", "region", "endregion");
+						if (StrEqual(ppw, "define")) {
 							lineState |= LEX_BLOCK_MASK_DEFINE;
 							lastPPDefineWord = 1;
 						} else if (strstr(ppw, "if")) {
 							lastPPDefineWord = 2;
-						} else if (CStrEqual(ppw, "undef")) {
+						} else if (StrEqual(ppw, "undef")) {
 							lastPPDefineWord = 3;
 						}
 					}
 				} else if (isPragmaPreprocessor) {
 					isPragmaPreprocessor = false;
 					sc.ChangeState(SCE_C_PREPROCESSOR);
-					isMessagePreprocessor = CStrEqualsAny(s, "region", "endregion", "mark");
+					isMessagePreprocessor = StrEqualsAny(s, "region", "endregion", "mark");
 				} else if ((!hasAttr || mayAttr || mayCSAttr) && kwAttribute.InList(s)) {
 					sc.ChangeState(SCE_C_ATTRIBUTE);
 				} else if (keywords.InList(s)) {
 					sc.ChangeState(SCE_C_WORD);
-					if (isAssignStmt && chPrevNonWhite == '=' && CStrEqualsAny(s, "function", "new")) {
+					if (isAssignStmt && chPrevNonWhite == '=' && StrEqualsAny(s, "function", "new")) {
 						isAssignStmt = false;
 					}
 					// asm __asm _asm
-					lastWordWasAsm = CStrEqualsAny(s, "asm", "__asm");
-					lastWordWasUUID = CStrEqual(s, "uuid");
-					lastWordWasGoto = CStrEqualsAny(s, "goto", "__label__", "break", "continue");
-					followsReturn = CStrEqual(s, "return");
+					lastWordWasAsm = StrEqualsAny(s, "asm", "__asm");
+					lastWordWasUUID = StrEqual(s, "uuid");
+					lastWordWasGoto = StrEqualsAny(s, "goto", "__label__", "break", "continue");
+					followsReturn = StrEqual(s, "return");
 					if (!isTypeDefine)
-						isTypeDefine = CStrEqual(s, "typedef");
+						isTypeDefine = StrEqual(s, "typedef");
 					if (!lastWordWasAttr)
-						lastWordWasAttr = CStrEqualsAny(s, "__declspec", "__attribute__");
+						lastWordWasAttr = StrEqualsAny(s, "__declspec", "__attribute__");
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_C_WORD2);
 				} else if (s[0] == '@' && HasAnotation(lexType)) {
@@ -336,7 +337,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						if (!isObjCSource)
 							isObjCSource = true;
 						if (!lastWordWasAttr)
-							lastWordWasAttr = CStrEqual(s + 1, "property");
+							lastWordWasAttr = StrEqual(s + 1, "property");
 					}
 				} else if (kwClass.InList(s)) {
 					sc.ChangeState(SCE_C_CLASS);

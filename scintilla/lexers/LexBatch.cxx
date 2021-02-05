@@ -16,6 +16,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -159,14 +160,14 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 			} else if (!IsWordChar(sc.ch)) {
 				char s[256];
 				sc.GetCurrentLowered(s, sizeof(s));
-				if (CStrEqual(s, "rem")) {
+				if (StrEqual(s, "rem")) {
 					sc.ChangeState(SCE_BAT_COMMENT);
 				} else {
 					if (!inEcho && keywords.InList(s)) { // not in echo ?
 						sc.ChangeState(SCE_BAT_WORD);
-						inEcho = CStrEqualsAny(s, "echo", "echo.", "title", "prompt");
-						isGoto = CStrEqual(s, "goto");
-						isCall = CStrEqual(s, "call");
+						inEcho = StrEqualsAny(s, "echo", "echo.", "title", "prompt");
+						isGoto = StrEqual(s, "goto");
+						isCall = StrEqual(s, "call");
 						if (inEcho) {
 							parenCount = levelNext;
 						}

@@ -608,6 +608,9 @@
     <ClInclude Include="..\..\scintilla\lexlib\StringCopy.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\lexlib\StringUtils.h">
+      <Filter>Scintilla\lexlib</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\StyleContext.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>

@@ -14,6 +14,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "StringUtils.h"
 #include "LexerModule.h"
 
 using namespace Scintilla;
@@ -101,7 +102,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (keywordLists[0]->InList(s)) {
 					if (!lineStateLineAutoCommand && visibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_VIM_WORD);
-						if (CStrEqualsAny(s, "au", "autocmd")) {
+						if (StrEqualsAny(s, "au", "autocmd")) {
 							lineStateLineAutoCommand = VimLineStateMaskAutoCommand;
 						}
 					} else {
@@ -273,9 +274,9 @@ void FoldVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*
 			if (styleNext != SCE_VIM_WORD) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (CStrEqualsAny(buf, "if", "while", "for", "try") || CStrStartsWith(buf, "fun")) {
+				if (StrEqualsAny(buf, "if", "while", "for", "try") || StrStartsWith(buf, "fun")) {
 					levelNext++;
-				} else if (CStrStartsWith(buf, "end")) {
+				} else if (StrStartsWith(buf, "end")) {
 					levelNext--;
 				}
 			}

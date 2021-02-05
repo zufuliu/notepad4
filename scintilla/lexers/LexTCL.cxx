@@ -148,12 +148,17 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 		} else if (!IsAWordChar(sc.ch)) {
 			if ((sc.state == SCE_TCL_IDENTIFIER && expected) || sc.state == SCE_TCL_MODIFIER) {
 				char w[100];
-				char *s = w;
 				sc.GetCurrent(w, sizeof(w));
-				if (w[strlen(w) - 1] == '\r')
-					w[strlen(w) - 1] = 0;
-				while (*s == ':') // ignore leading : like in ::set a 10
+				size_t len = strlen(w);
+				char *s = w + len - 1;
+				if (*s == '\r') {
+					*s = '\0';
+				}
+				s = w;
+				while (*s == ':') { // ignore leading : like in ::set a 10
 					++s;
+					--len;
+				}
 				const bool quote = sc.state == SCE_TCL_IN_QUOTE;
 				if (commentLevel || expected) {
 					if (keywords.InList(s)) {
@@ -164,7 +169,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 						sc.ChangeState(quote ? SCE_TCL_WORD_IN_QUOTE : SCE_TCL_WORD3);
 					} else if (keywords4.InList(s)) {
 						sc.ChangeState(quote ? SCE_TCL_WORD_IN_QUOTE : SCE_TCL_WORD4);
-					} else if (sc.GetRelative(-static_cast<int>(strlen(s)) - 1) == '{' &&
+					} else if (sc.GetRelative(-static_cast<Sci_Position>(len) - 1) == '{' &&
 						keywords5.InList(s) && sc.ch == '}') { // {keyword} exactly no spaces
 						sc.ChangeState(SCE_TCL_EXPAND);
 					}
