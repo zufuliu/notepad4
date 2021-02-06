@@ -290,27 +290,21 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 					lineStateAttribute = RustLineStateMaskAttribute;
 				}
-			} else if (sc.Match('/', '/')) {
-				const int chNext = sc.GetRelative(2);
-				if (chNext == '!' || (chNext == '/' && sc.GetRelative(3) != '/')) {
-					sc.SetState(SCE_RUST_COMMENTLINEDOC);
-				} else {
-					sc.SetState(SCE_RUST_COMMENTLINE);
-				}
-				if (visibleChars == 0) {
-					lineStateLineType = RustLineStateMaskLineComment;
-				}
+			} else if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 				visibleCharsBefore = visibleChars;
-			} else if (sc.Match('/', '*')) {
-				const int chNext = sc.GetRelative(2);
-				if (chNext == '!' || (chNext == '*' && sc.GetRelative(3) != '*')) {
-					sc.SetState(SCE_RUST_COMMENTBLOCKDOC);
-				} else {
-					sc.SetState(SCE_RUST_COMMENTBLOCK);
-				}
+				const int chNext = sc.chNext;
+				sc.SetState((chNext == '/') ? SCE_RUST_COMMENTLINE : SCE_RUST_COMMENTBLOCK);
 				sc.Forward();
-				commentLevel = 1;
-				visibleCharsBefore = visibleChars;
+				if (sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+					sc.ChangeState((chNext == '/') ? SCE_RUST_COMMENTLINEDOC : SCE_RUST_COMMENTBLOCKDOC);
+				}
+				if (chNext == '/') {
+					if (visibleChars == 0) {
+						lineStateLineType = RustLineStateMaskLineComment;
+					}
+				} else {
+					commentLevel = 1;
+				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_RUST_STRING);
 			} else if (sc.ch == '\'') {

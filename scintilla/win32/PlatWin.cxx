@@ -2557,7 +2557,7 @@ public:
 	}
 };
 
-static const TCHAR *ListBoxX_ClassName = L"ListBoxX";
+static constexpr const TCHAR *ListBoxX_ClassName = L"ListBoxX";
 #define LISTBOXX_USE_THICKFRAME		0
 #define LISTBOXX_USE_BORDER			1
 #define LISTBOXX_USE_FAKE_FRAME		0

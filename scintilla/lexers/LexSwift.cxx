@@ -297,19 +297,21 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		}
 
 		if (sc.state == SCE_SWIFT_DEFAULT) {
-			if (sc.Match('/', '/')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '/' || chNext == ':' || chNext == '!') ? SCE_SWIFT_COMMENTLINEDOC : SCE_SWIFT_COMMENTLINE);
-				if (visibleChars == 0) {
-					lineStateLineType = SwiftLineStateMaskLineComment;
-				}
+			if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 				visibleCharsBefore = visibleChars;
-			} else if (sc.Match('/', '*')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '*' || chNext == ':'  || chNext == '!') ? SCE_SWIFT_COMMENTBLOCKDOC : SCE_SWIFT_COMMENTBLOCK);
+				const int chNext = sc.chNext;
+				sc.SetState((chNext == '/') ? SCE_SWIFT_COMMENTLINE : SCE_SWIFT_COMMENTBLOCK);
 				sc.Forward();
-				commentLevel = 1;
-				visibleCharsBefore = visibleChars;
+				if (sc.chNext == ':' || sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+					sc.ChangeState((chNext == '/') ? SCE_SWIFT_COMMENTLINEDOC : SCE_SWIFT_COMMENTBLOCKDOC);
+				}
+				if (chNext == '/') {
+					if (visibleChars == 0) {
+						lineStateLineType = SwiftLineStateMaskLineComment;
+					}
+				} else {
+					commentLevel = 1;
+				}
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
 				sc.Forward(2);

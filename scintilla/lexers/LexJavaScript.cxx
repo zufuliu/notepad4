@@ -95,7 +95,7 @@ inline bool IsJsxTagStart(const StyleContext &sc, int chPrevNonWhite, int styleP
 void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 	int lineContinuation = 0;
-	bool insideReRange = false; // inside regex character range []
+	bool insideRegexRange = false; // inside regex character range []
 
 	int kwType = SCE_JS_DEFAULT;
 	int chBeforeIdentifier = 0;
@@ -319,8 +319,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
-				insideReRange = sc.ch == '[';
-			} else if (sc.ch == '/' && !insideReRange) {
+				insideRegexRange = sc.ch == '[';
+			} else if (sc.ch == '/' && !insideRegexRange) {
 				sc.Forward();
 				// regex flags
 				while (IsLowerCase(sc.ch)) {
@@ -448,22 +448,22 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		if (sc.state == SCE_JS_DEFAULT) {
 			if (sc.ch == '/') {
-				if (sc.chNext == '/') {
+				if (sc.chNext == '/' || sc.chNext == '*') {
 					docTagState = DocTagState::None;
 					visibleCharsBefore = visibleChars;
-					const int chNext = sc.GetRelative(2);
-					sc.SetState((chNext == '/' || chNext == '!') ? SCE_JS_COMMENTLINEDOC : SCE_JS_COMMENTLINE);
-					if (visibleChars == 0) {
-						lineStateLineType = JsLineStateMaskLineComment;
-					}
-				} else if (sc.chNext == '*') {
-					docTagState = DocTagState::None;
-					visibleCharsBefore = visibleChars;
-					const int chNext = sc.GetRelative(2);
-					sc.SetState((chNext == '*' || chNext == '!') ? SCE_JS_COMMENTBLOCKDOC : SCE_JS_COMMENTBLOCK);
+					const int chNext = sc.chNext;
+					sc.SetState((chNext == '/') ? SCE_JS_COMMENTLINE : SCE_JS_COMMENTBLOCK);
 					sc.Forward();
+					if (sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+						sc.ChangeState((chNext == '/') ? SCE_JS_COMMENTLINEDOC : SCE_JS_COMMENTBLOCKDOC);
+					}
+					if (chNext == '/') {
+						if (visibleChars == 0) {
+							lineStateLineType = JsLineStateMaskLineComment;
+						}
+					}
 				} else if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
-					insideReRange = false;
+					insideRegexRange = false;
 					sc.SetState(SCE_JS_REGEX);
 				} else {
 					sc.SetState(SCE_JS_OPERATOR);

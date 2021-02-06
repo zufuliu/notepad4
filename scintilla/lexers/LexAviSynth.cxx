@@ -171,20 +171,20 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		if (sc.state == SCE_AVS_DEFAULT) {
 			if (sc.ch == '#') {
+				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_AVS_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineComment = AviSynthLineStateMaskLineComment;
 				}
-				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
+				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_AVS_COMMENTBLOCK);
 				sc.Forward();
-				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('[', '*')) {
-				sc.SetState(SCE_AVS_COMMENTBLOCKN);
-				sc.Forward();
 				commentLevel = 1;
 				visibleCharsBefore = visibleChars;
+				sc.SetState(SCE_AVS_COMMENTBLOCKN);
+				sc.Forward();
 			} else if (sc.Match('\"', '\"', '\"')) {
 				sc.SetState(SCE_AVS_TRIPLESTRING);
 				sc.Forward(2);

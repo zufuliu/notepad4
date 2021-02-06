@@ -283,19 +283,21 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_DART_DEFAULT) {
-			if (sc.Match('/', '/')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '/') ? SCE_DART_COMMENTLINEDOC : SCE_DART_COMMENTLINE);
-				if (visibleChars == 0) {
-					lineStateLineType = DartLineStateMaskLineComment;
-				}
+			if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 				visibleCharsBefore = visibleChars;
-			} else if (sc.Match('/', '*')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '*') ? SCE_DART_COMMENTBLOCKDOC : SCE_DART_COMMENTBLOCK);
+				const int chNext = sc.chNext;
+				sc.SetState((chNext == '/') ? SCE_DART_COMMENTLINE : SCE_DART_COMMENTBLOCK);
 				sc.Forward();
-				commentLevel = 1;
-				visibleCharsBefore = visibleChars;
+				if (chNext == sc.chNext && sc.GetRelative(2) != chNext) {
+					sc.ChangeState((chNext == '/') ? SCE_DART_COMMENTLINEDOC : SCE_DART_COMMENTBLOCKDOC);
+				}
+				if (chNext == '/') {
+					if (visibleChars == 0) {
+						lineStateLineType = DartLineStateMaskLineComment;
+					}
+				 } else {
+					commentLevel = 1;
+				 }
 			} else if (sc.ch == 'r' && (sc.chNext == '\'' || sc.chNext == '"')) {
 				sc.SetState((sc.chNext == '\'') ? SCE_DART_RAWSTRING_SQ : SCE_DART_RAWSTRING_DQ);
 				sc.Forward(2);
