@@ -278,19 +278,21 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		}
 
 		if (sc.state == SCE_KOTLIN_DEFAULT) {
-			if (sc.Match('/', '/')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '!' || chNext == '/') ? SCE_KOTLIN_COMMENTLINEDOC : SCE_KOTLIN_COMMENTLINE);
-				if (visibleChars == 0) {
-					lineStateLineType = KotlinLineStateMaskLineComment;
-				}
+			if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 				visibleCharsBefore = visibleChars;
-			} else if (sc.Match('/', '*')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '*' || chNext == '!') ? SCE_KOTLIN_COMMENTBLOCKDOC : SCE_KOTLIN_COMMENTBLOCK);
+				const int chNext = sc.chNext;
+				sc.SetState((chNext == '/') ? SCE_KOTLIN_COMMENTLINE : SCE_KOTLIN_COMMENTBLOCK);
 				sc.Forward();
-				visibleCharsBefore = visibleChars;
-				commentLevel = 1;
+				if (sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+					sc.ChangeState((chNext == '/') ? SCE_KOTLIN_COMMENTLINEDOC : SCE_KOTLIN_COMMENTBLOCKDOC);
+				}
+				if (chNext == '/') {
+					if (visibleChars == 0) {
+						lineStateLineType = KotlinLineStateMaskLineComment;
+					}
+				} else {
+					commentLevel = 1;
+				}
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
 				sc.Forward(2);

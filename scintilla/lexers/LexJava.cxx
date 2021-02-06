@@ -314,17 +314,19 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (sc.state == SCE_JAVA_DEFAULT) {
 			if (sc.Match('/', '/')) {
+				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_JAVA_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineType = JavaLineStateMaskLineComment;
 				}
-				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
-				const int chNext = sc.GetRelative(2);
-				sc.SetState((chNext == '*') ? SCE_JAVA_COMMENTBLOCKDOC : SCE_JAVA_COMMENTBLOCK);
-				sc.Forward();
 				visibleCharsBefore = visibleChars;
 				docTagState = DocTagState::None;
+				sc.SetState(SCE_JAVA_COMMENTBLOCK);
+				sc.Forward();
+				if (sc.chNext == '*' && sc.GetRelative(2) != '*') {
+					sc.ChangeState(SCE_JAVA_COMMENTBLOCKDOC);
+				}
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_JAVA_TRIPLE_STRING);
 				sc.Forward(2);

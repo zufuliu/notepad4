@@ -367,11 +367,11 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		if (sc.state == SCE_GO_DEFAULT) {
 			if (sc.Match('/', '/')) {
+				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_GO_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineComment = SimpleLineStateMaskLineComment;
 				}
-				visibleCharsBefore = visibleChars;
 			} else if (sc.Match('/', '*')) {
 				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_GO_COMMENTBLOCK);

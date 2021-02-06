@@ -3178,10 +3178,6 @@ val SC_CHARACTERSOURCE_TENTATIVE_INPUT=1
 # IME (either inline or windowed mode) full composited string.
 val SC_CHARACTERSOURCE_IME_RESULT=2
 
-################################################
-# For SciLexer.h
-# moved to SciLexer.iface
-
 # Events
 
 evt void StyleNeeded=2000(int position)
