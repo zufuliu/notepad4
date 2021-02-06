@@ -249,8 +249,6 @@ using namespace Scintilla;
 #define BLKIND  0370
 #define BITIND  07
 
-static constexpr const unsigned char bitarr[] = { 1, 2, 4, 8, 16, 32, 64, 128 };
-
 #define badpat(x)	(*nfa = END, x)
 
 /*
@@ -307,7 +305,7 @@ void RESearch::GrabMatches(const CharacterIndexer &ci) {
 }
 
 void RESearch::ChSet(unsigned char c) noexcept {
-	bittab[(c & BLKIND) >> 3] |= bitarr[c & BITIND];
+	bittab[(c & BLKIND) >> 3] |= 1 << (c & BITIND);
 }
 
 void RESearch::ChSetWithCase(unsigned char c, bool caseSensitive) noexcept {
@@ -353,8 +351,8 @@ constexpr int GetHexValue(unsigned char ch1, unsigned char ch2) noexcept {
 	return (GetHexDigit(ch1) << 4) | GetHexDigit(ch2);
 }
 
-inline int isinset(const char *ap, unsigned char c) noexcept {
-	return ap[(c & BLKIND) >> 3] & bitarr[c & BITIND];
+constexpr int isinset(const char *ap, unsigned char c) noexcept {
+	return (ap[(c & BLKIND) >> 3] >> (c & BITIND)) & 1;
 }
 
 }
