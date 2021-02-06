@@ -1033,7 +1033,7 @@ static inline BOOL IsFileStartsWithDotLog(void) {
 	char tch[5] = "";
 	const Sci_Position len = SciCall_GetText(COUNTOF(tch), tch);
 	// upper case
-	return len >= 4 && strcmp(tch, ".LOG") == 0;
+	return len >= 4 && StrEqualA(tch, ".LOG");
 }
 #endif
 

@@ -691,6 +691,7 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 
 extern EDITLEXER lexCSS;
 extern EDITLEXER lexJavaScript;
+extern EDITLEXER lexJulia;
 extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
 extern EDITLEXER lexVBS;
@@ -1761,24 +1762,24 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_AU3:
 	case SCLEX_BASH:
 		if (np2LexLangIndex == IDM_LEXER_CSHELL) {
-			if (!strcmp(word, "if")) {
+			if (StrEqualA(word, "if")) {
 				*indent = 2;
 				endPart = "endif";
-			} else if (!strcmp(word, "switch")) {
+			} else if (StrEqualA(word, "switch")) {
 				*indent = 2;
 				endPart = "endsw";
-			} else if (!strcmp(word, "foreach") || !strcmp(word, "while")) {
+			} else if (StrEqualA(word, "foreach") || StrEqualA(word, "while")) {
 				*indent = 2;
 				endPart = "end";
 			}
 		} else {
-			if (!strcmp(word, "if")) {
+			if (StrEqualA(word, "if")) {
 				*indent = 2;
 				endPart = "fi";
-			} else if (!strcmp(word, "case")) {
+			} else if (StrEqualA(word, "case")) {
 				*indent = 2;
 				endPart = "esac";
-			} else if (!strcmp(word, "do")) {
+			} else if (StrEqualA(word, "do")) {
 				*indent = 2;
 				endPart = "done";
 			}
@@ -1786,19 +1787,19 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 		break;
 
 	case SCLEX_CMAKE:
-		if (!strcmp(word, "function")) {
+		if (StrEqualA(word, "function")) {
 			*indent = 2;
 			endPart = "endfunction()";
-		} else if (!strcmp(word, "macro")) {
+		} else if (StrEqualA(word, "macro")) {
 			*indent = 2;
 			endPart = "endmacro()";
-		} else if (!strcmp(word, "if")) {
+		} else if (StrEqualA(word, "if")) {
 			*indent = 2;
 			endPart = "endif()";
-		} else if (!strcmp(word, "foreach")) {
+		} else if (StrEqualA(word, "foreach")) {
 			*indent = 2;
 			endPart = "endforeach()";
-		} else if (!strcmp(word, "while")) {
+		} else if (StrEqualA(word, "while")) {
 			*indent = 2;
 			endPart = "endwhile()";
 		}
@@ -1807,61 +1808,50 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 
 	//case SCLEX_INNOSETUP:
 
-	case SCLEX_JULIA:
-		if (!strcmp(word, "function")
-			|| !strcmp(word, "begin")
-			|| !strcmp(word, "do")
-			|| !strcmp(word, "for")
-			|| !strcmp(word, "if")
-			|| !strcmp(word, "let")
-			|| !strcmp(word, "macro")
-			|| !strcmp(word, "module")
-			|| !strcmp(word, "quote")
-			|| !strcmp(word, "struct")
-			|| !strcmp(word, "try")
-			|| !strcmp(word, "type")
-			|| !strcmp(word, "while")
-			|| !strcmp(word, "baremodule")) {
+	case SCLEX_JULIA: {
+		LPCSTR pKeywords = lexJulia.pKeyWords->pszKeyWords[1];
+		LPCSTR p = strstr(pKeywords, word);
+		if (p == pKeywords || (p != NULL &&  p[-1] == ' ')) {
 			*indent = 2;
 			endPart = "end";
 		}
-		break;
+	} break;
 
 	case SCLEX_LUA:
-		if (!strcmp(word, "function") || !strcmp(word, "if") || !strcmp(word, "do")) {
+		if (StrEqualA(word, "function") || StrEqualA(word, "if") || StrEqualA(word, "do")) {
 			*indent = 2;
 			endPart = "end";
 		}
 		break;
 
 	case SCLEX_MAKEFILE:
-		if (!strcmp(word, "if")) {
+		if (StrEqualA(word, "if")) {
 			*indent = 2;
 			endPart = "endif";
-		} else if (!strcmp(word, "define")) {
+		} else if (StrEqualA(word, "define")) {
 			*indent = 2;
 			endPart = "endef";
-		} else if (!strcmp(word, "for")) {
+		} else if (StrEqualA(word, "for")) {
 			*indent = 2;
 			endPart = "endfor";
 		}
 		break;
 	case SCLEX_MATLAB:
-		if (!strcmp(word, "function")) {
+		if (StrEqualA(word, "function")) {
 			*indent = 1;
 			// 'end' is optional
-		} else if (!strcmp(word, "if") || !strcmp(word, "for") || !strcmp(word, "while") || !strcmp(word, "switch") || !strcmp(word, "try")) {
+		} else if (StrEqualA(word, "if") || StrEqualA(word, "for") || StrEqualA(word, "while") || StrEqualA(word, "switch") || StrEqualA(word, "try")) {
 			*indent = 2;
 			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LEXER_OCTAVE) {
-				if (strcmp(word, "if") == 0) {
+				if (StrEqualA(word, "if")) {
 					endPart = "endif";
-				} else if (strcmp(word, "for") == 0) {
+				} else if (StrEqualA(word, "for")) {
 					endPart = "endfor";
-				} else if (strcmp(word, "while") == 0) {
+				} else if (StrEqualA(word, "while")) {
 					endPart = "endwhile";
-				} else if (strcmp(word, "switch") == 0) {
+				} else if (StrEqualA(word, "switch")) {
 					endPart = "endswitch";
-				} else if (strcmp(word, "try") == 0) {
+				} else if (StrEqualA(word, "try")) {
 					endPart = "end_try_catch";
 				}
 			}
@@ -1874,36 +1864,36 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_NSIS:
 	//case SCLEX_PASCAL:
 	case SCLEX_RUBY:
-		if (!strcmp(word, "if") || !strcmp(word, "do") || !strcmp(word, "while") || !strcmp(word, "for")) {
+		if (StrEqualA(word, "if") || StrEqualA(word, "do") || StrEqualA(word, "while") || StrEqualA(word, "for")) {
 			*indent = 2;
 			endPart = "end";
 		}
 		break;
 
 	case SCLEX_SQL:
-		if (!strcmp(word_low, "if")) {
+		if (StrEqualA(word_low, "if")) {
 			*indent = 2;
 			endPart = "END IF;";
-		} else if (!strcmp(word_low, "while")) {
+		} else if (StrEqualA(word_low, "while")) {
 			*indent = 2;
 			endPart = "END WHILE;";
-		} else if (!strcmp(word_low, "repeat")) {
+		} else if (StrEqualA(word_low, "repeat")) {
 			*indent = 2;
 			endPart = "END REPEAT;";
-		} else if (!strcmp(word_low, "loop") || !strcmp(word_low, "for")) {
+		} else if (StrEqualA(word_low, "loop") || StrEqualA(word_low, "for")) {
 			*indent = 2;
 			endPart = "END LOOP;";
-		} else if (!strcmp(word_low, "case")) {
+		} else if (StrEqualA(word_low, "case")) {
 			*indent = 2;
 			endPart = "END CASE;";
-		} else if (!strcmp(word_low, "begin")) {
+		} else if (StrEqualA(word_low, "begin")) {
 			*indent = 2;
 			if (StrStrIA(head, "transaction") != NULL) {
 				endPart = "COMMIT;";
 			} else {
 				endPart = "END";
 			}
-		} else if (!strcmp(word_low, "start")) {
+		} else if (StrEqualA(word_low, "start")) {
 			if (StrStrIA(head, "transaction") != NULL) {
 				*indent = 2;
 				endPart = "COMMIT;";
