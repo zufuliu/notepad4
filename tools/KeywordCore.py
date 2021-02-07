@@ -535,6 +535,45 @@ def parse_go_api_file(path):
 		('package', keywordMap['package'], KeywordAttr.NoLexer),
 	]
 
+def parse_haxe_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'preprocessor'):
+			items = [item.strip('#') for item in doc.split()]
+			keywordMap[key] = items
+		elif key == 'library':
+			items = re.findall(r'(abstract|class|typedef)\s+(\w+)', doc)
+			classes = [item[1] for item in items]
+			interfaces = re.findall(r'interface\s+(\w+)', doc)
+			items = re.findall(r'enum\s+(abstract\s+)?(\w+)', doc)
+			enums = [item[1] for item in items]
+
+			keywordMap['class'] = classes
+			keywordMap['interface'] = interfaces
+			keywordMap['enumeration'] = enums
+		elif key == 'comment':
+			items = re.findall(r'@(\w+)', doc)
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'enumeration',
+		'class',
+		'interface',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoAutoComp),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('metadata', [], KeywordAttr.Default),
+		('function', [], KeywordAttr.Default),
+		('comment', keywordMap['comment'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+	]
+
 def parse_java_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}

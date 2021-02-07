@@ -68,7 +68,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 		* blockdiag, seqdiag, actdiag and nwdiag
 	* Groovy
-	* Haxe
+	* [Haxe](../master/tools/lang/Haxe.hx), up to Haxe 4.1
 	* [HTML](../master/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2020-02-12. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET

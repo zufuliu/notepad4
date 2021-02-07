@@ -1,7 +1,7 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for C, C++, C#, Rescouce Script, Asymptote, D, Objective C/C++, PHP
-//! haXe, Groovy, Scala, Jamfile, AWK, IDL/ODL
+//! Groovy, Scala, Jamfile, AWK, IDL/ODL
 
 #include <cassert>
 #include <cstring>
@@ -26,7 +26,6 @@ using namespace Scintilla;
 #define		LEX_D		7	// D
 #define		LEX_ASY		8	// Asymptote
 #define		LEX_OBJC	10	// Objective C/C++
-#define		LEX_HX		12	// haXe
 #define		LEX_GROOVY	13	// Groovy Script
 #define		LEX_SCALA	14	// Scala Script
 #define		LEX_PHP		29
@@ -40,7 +39,7 @@ static constexpr bool HasAnotation(int lex) noexcept { // @anotation
 	return lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool HasRegex(int lex) noexcept { // Javascript /regex/
-	return lex == LEX_GROOVY || lex == LEX_HX || lex == LEX_AWK;
+	return lex == LEX_GROOVY || lex == LEX_AWK;
 }
 static constexpr bool HasTripleVerbatim(int lex) noexcept {
 	return lex == LEX_GROOVY || lex == LEX_SCALA;
@@ -52,7 +51,7 @@ static constexpr bool HasXML(int lex) noexcept {
 	return lex == LEX_SCALA;
 }
 static constexpr bool SquareBraceAfterType(int lex) noexcept {
-	return lex == LEX_CS || lex == LEX_HX || lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_CS || lex == LEX_GROOVY || lex == LEX_SCALA;
 }
 static constexpr bool IsDStrFix(int ch) noexcept {
 	return ch == 'c' || ch == 'w' || ch == 'd';
@@ -569,7 +568,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 		case SCE_C_STRING:
 			if (sc.atLineEnd) {
-				if (lexType == LEX_HX || lexType == LEX_ASY || lexType == LEX_JAM || lexType == LEX_PHP) {
+				if (lexType == LEX_ASY || lexType == LEX_JAM || lexType == LEX_PHP) {
 					continue;
 				}
 				sc.ChangeState(SCE_C_STRINGEOL);
@@ -958,13 +957,13 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 								sc.SetState(SCE_C_IDENTIFIER);
 							}
 						}
-					} else if (sc.ch == '$' && (lexType == LEX_HX || lexType == LEX_AWK || lexType == LEX_PHP)) {
+					} else if (sc.ch == '$' && (lexType == LEX_AWK || lexType == LEX_PHP)) {
 						if (lexType == LEX_PHP && !iswordstart(sc.chNext))
 							sc.SetState(SCE_C_OPERATOR);
 						else
 							sc.SetState(SCE_C_VARIABLE);
 					} else if (iswordstart(sc.ch) || (iswordstart(sc.chNext) && (lexType != LEX_PHP) && (sc.ch == '@' ||
-						(sc.ch == '#' && (lexType == LEX_D || lexType == LEX_HX || lexType == LEX_JAM))))) {
+						(sc.ch == '#' && (lexType == LEX_D || lexType == LEX_JAM))))) {
 						sc.SetState(SCE_C_IDENTIFIER);
 					} else if (sc.ch == '.') {
 						sc.SetState(SCE_C_OPERATOR);
@@ -1279,7 +1278,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			levelNext++;
 		}
 
-		if ((hasPreprocessor || lexType == LEX_HX) && (ch == '#') && style == SCE_C_PREPROCESSOR) {
+		if (hasPreprocessor && ch == '#' && style == SCE_C_PREPROCESSOR) {
 			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
 			if (styler.Match(pos, "if") || styler.Match(pos, "region")) {
 				levelNext++;

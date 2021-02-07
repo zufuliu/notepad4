@@ -1057,6 +1057,17 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		}
 		break;
 
+	case SCLEX_HAXE:
+		if (ch == '#' && iCurrentStyle == SCE_HAXE_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]); // preprocessor
+			return AutoC_AddSpecWord_Finish;
+		}
+		if (ch == '@' && iCurrentStyle == SCE_HAXE_COMMENTBLOCKDOC) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[8]); // comment
+			return AutoC_AddSpecWord_Keyword;
+		}
+		break;
+
 	case SCLEX_JAVA:
 		if (ch == '@') {
 			if (iCurrentStyle == SCE_JAVA_DEFAULT) {
@@ -2136,6 +2147,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_HAXE:
 	case SCLEX_JAVA:
 	case SCLEX_JAVASCRIPT:
 	case SCLEX_JSON:
@@ -2276,6 +2288,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_DART:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_HAXE:
 	case SCLEX_JAVA:
 	case SCLEX_JAVASCRIPT:
 	case SCLEX_JSON:

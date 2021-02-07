@@ -133,6 +133,7 @@ static inline BOOL DidLexerHasLineComment(int iLexer) {
 
 static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 	return !(iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_APDL
 		|| iLexer == SCLEX_BASH
 		|| iLexer == SCLEX_BATCH
 		|| iLexer == SCLEX_CONF
