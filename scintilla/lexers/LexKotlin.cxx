@@ -282,8 +282,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				visibleCharsBefore = visibleChars;
 				const int chNext = sc.chNext;
 				sc.SetState((chNext == '/') ? SCE_KOTLIN_COMMENTLINE : SCE_KOTLIN_COMMENTBLOCK);
-				sc.Forward();
-				if (sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+				sc.Forward(2);
+				if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
 					sc.ChangeState((chNext == '/') ? SCE_KOTLIN_COMMENTLINEDOC : SCE_KOTLIN_COMMENTBLOCKDOC);
 				}
 				if (chNext == '/') {
@@ -293,6 +293,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				} else {
 					commentLevel = 1;
 				}
+				continue;
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
 				sc.Forward(2);

@@ -861,21 +861,16 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						sc.Forward();
 					} else if (sc.ch == '`' && (lexType == LEX_D)) {
 						sc.SetState(SCE_C_DSTRINGB);
-					} else if (!SharpComment(lexType) && sc.Match('/', '*')) {
-						if (visibleChars == 0 && styler.MatchAny(sc.currentPos + 2, '*', '!')) {
-							sc.SetState(SCE_C_COMMENTDOC);
-						} else {
-							sc.SetState(SCE_C_COMMENT);
+					} else if (!SharpComment(lexType) && sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
+						const int chNext = sc.chNext;
+						sc.SetState((chNext == '/') ? SCE_C_COMMENTLINE : SCE_C_COMMENT);
+						sc.Forward(2);
+						if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
+							sc.ChangeState((chNext == '/') ? SCE_C_COMMENTLINEDOC : SCE_C_COMMENTDOC);
 						}
-						sc.Forward();
+						continue;
 					} else if ((SharpComment(lexType) || lexType == LEX_PHP) && sc.ch == '#') {
 						sc.SetState(SCE_C_COMMENTLINE);
-					} else if (!SharpComment(lexType) && sc.Match('/', '/')) {
-						const char chNext = (visibleChars == 0) ? styler.SafeGetCharAt(sc.currentPos + 2) : '\0';
-						if (chNext == '!' || (chNext == '/' && styler.SafeGetCharAt(sc.currentPos + 3) != '/'))
-							sc.SetState(SCE_C_COMMENTLINEDOC);
-						else
-							sc.SetState(SCE_C_COMMENTLINE);
 					} else if (sc.ch == '$' && (lexType == LEX_JAM && sc.chNext == '(')) {
 						++numDTSBrace;
 						if (sc.chNext == '(')
@@ -1161,8 +1156,10 @@ static bool IsCppFoldingLine(Sci_Line line, LexAccessor &styler, int kind) noexc
 #define IsUnDefLine(line)		IsCppFoldingLine(line, styler, 5)
 
 static constexpr bool IsStreamCommentStyle(int style) noexcept {
-	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC
-		|| style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;
+	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC;
+}
+static constexpr bool IsInnerCommentStyle(int style) noexcept {
+	return style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;	
 }
 static constexpr bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
@@ -1235,9 +1232,9 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			}
 			else if (IsStreamCommentStyle(style)) {
-				if (!IsStreamCommentStyle(stylePrev)) {
+				if (style != stylePrev && !IsInnerCommentStyle(stylePrev)) {
 					levelNext++;
-				} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
+				} else if (style != styleNext && !IsInnerCommentStyle(styleNext)) {
 					levelNext--;
 				}
 			}
@@ -1249,17 +1246,10 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			}
 		}
-		if (lexType == LEX_PHP && IsHear_NowDocStyle(style)) {
-			if (!IsHear_NowDocStyle(stylePrev)) {
-				levelNext++;
-			} else if (!IsHear_NowDocStyle(styleNext) && !atEOL) {
-				levelNext--;
-			}
-		}
-		if (style == SCE_C_TRIPLEVERBATIM || style == SCE_C_VERBATIM) {
+		if (style == SCE_C_TRIPLEVERBATIM || style == SCE_C_VERBATIM || (lexType == LEX_PHP && IsHear_NowDocStyle(style))) {
 			if (stylePrev != style) {
 				levelNext++;
-			} else if (styleNext != style && !atEOL) {
+			} else if (styleNext != style) {
 				levelNext--;
 			}
 		}

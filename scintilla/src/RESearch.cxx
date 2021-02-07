@@ -305,7 +305,7 @@ void RESearch::GrabMatches(const CharacterIndexer &ci) {
 }
 
 void RESearch::ChSet(unsigned char c) noexcept {
-	bittab[(c & BLKIND) >> 3] |= 1 << (c & BITIND);
+	bittab[c >> 3] |= 1 << (c & BITIND);
 }
 
 void RESearch::ChSetWithCase(unsigned char c, bool caseSensitive) noexcept {
@@ -352,7 +352,7 @@ constexpr int GetHexValue(unsigned char ch1, unsigned char ch2) noexcept {
 }
 
 constexpr int isinset(const char *ap, unsigned char c) noexcept {
-	return (ap[(c & BLKIND) >> 3] >> (c & BITIND)) & 1;
+	return ap[c >> 3] & (1 << (c & BITIND));
 }
 
 }

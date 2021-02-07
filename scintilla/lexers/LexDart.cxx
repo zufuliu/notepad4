@@ -287,8 +287,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleCharsBefore = visibleChars;
 				const int chNext = sc.chNext;
 				sc.SetState((chNext == '/') ? SCE_DART_COMMENTLINE : SCE_DART_COMMENTBLOCK);
-				sc.Forward();
-				if (chNext == sc.chNext && sc.GetRelative(2) != chNext) {
+				sc.Forward(2);
+				if (sc.ch == chNext && sc.chNext != chNext) {
 					sc.ChangeState((chNext == '/') ? SCE_DART_COMMENTLINEDOC : SCE_DART_COMMENTBLOCKDOC);
 				}
 				if (chNext == '/') {
@@ -298,6 +298,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				 } else {
 					commentLevel = 1;
 				 }
+				 continue;
 			} else if (sc.ch == 'r' && (sc.chNext == '\'' || sc.chNext == '"')) {
 				sc.SetState((sc.chNext == '\'') ? SCE_DART_RAWSTRING_SQ : SCE_DART_RAWSTRING_DQ);
 				sc.Forward(2);

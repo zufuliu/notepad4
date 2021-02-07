@@ -323,10 +323,11 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleCharsBefore = visibleChars;
 				docTagState = DocTagState::None;
 				sc.SetState(SCE_JAVA_COMMENTBLOCK);
-				sc.Forward();
-				if (sc.chNext == '*' && sc.GetRelative(2) != '*') {
+				sc.Forward(2);
+				if (sc.ch == '*' && sc.chNext != '*') {
 					sc.ChangeState(SCE_JAVA_COMMENTBLOCKDOC);
 				}
+				continue;
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_JAVA_TRIPLE_STRING);
 				sc.Forward(2);
