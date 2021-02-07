@@ -175,7 +175,7 @@ def parse_actionscript_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
 	for key, doc in sections:
-		if key in ('keywords', 'types'):
+		if key in ('keywords', 'types', 'directive'):
 			keywordMap[key] = doc.split()
 		if key == 'class':
 			items = re.findall(r'class\s+(\w+)', doc)
@@ -185,6 +185,7 @@ def parse_actionscript_api_file(path):
 			keywordMap[key] = items
 
 	RemoveDuplicateKeyword(keywordMap, [
+		'directive',
 		'keywords',
 		'types',
 		'class',
@@ -192,7 +193,7 @@ def parse_actionscript_api_file(path):
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
-		('directive', [], KeywordAttr.Default),
+		('directive', keywordMap['directive'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('interface', [], KeywordAttr.Default),
 		('enumeration', [], KeywordAttr.Default),
