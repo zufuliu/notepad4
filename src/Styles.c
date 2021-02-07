@@ -1188,9 +1188,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[11] = KeywordAttr_NoAutoComp;	// Assembler Intruction
 		attr[12] = KeywordAttr_NoAutoComp;	// Assembler Register
 		break;
-	case NP2LEX_HAXE:
-		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
-		break;
 	case NP2LEX_HTML:
 		attr[1] = KeywordAttr_NoAutoComp;	// JavaScript
 		attr[2] = KeywordAttr_MakeLower | KeywordAttr_NoAutoComp;	// VBScript
@@ -1256,6 +1253,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[7] = KeywordAttr_NoLexer;		// variables
 		attr[8] = KeywordAttr_NoLexer;		// function
 		attr[9] = KeywordAttr_NoLexer;		// package
+		break;
+	case NP2LEX_HAXE:
+		attr[1] = KeywordAttr_NoAutoComp;	// preprocessor
+		attr[8] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// comment
 		break;
 	case NP2LEX_JAVA:
 		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation
