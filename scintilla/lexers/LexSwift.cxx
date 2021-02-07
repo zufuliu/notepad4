@@ -301,8 +301,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				visibleCharsBefore = visibleChars;
 				const int chNext = sc.chNext;
 				sc.SetState((chNext == '/') ? SCE_SWIFT_COMMENTLINE : SCE_SWIFT_COMMENTBLOCK);
-				sc.Forward();
-				if (sc.chNext == ':' || sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+				sc.Forward(2);
+				if (sc.ch == ':' || sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
 					sc.ChangeState((chNext == '/') ? SCE_SWIFT_COMMENTLINEDOC : SCE_SWIFT_COMMENTBLOCKDOC);
 				}
 				if (chNext == '/') {
@@ -312,6 +312,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else {
 					commentLevel = 1;
 				}
+				continue;
 			} else if (sc.Match('"', '"', '"')) {
 				sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
 				sc.Forward(2);

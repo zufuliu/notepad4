@@ -8,15 +8,6 @@ import Face
 
 from FileGenerator import Regenerate
 
-def printLexHFile(f):
-	out = []
-	for name in f.order:
-		v = f.features[name]
-		if v["FeatureType"] in ["val"]:
-			if "SCE_" in name or "SCLEX_" in name:
-				out.append("#define " + name + " " + v["Value"])
-	return out
-
 def printHFile(f):
 	out = []
 	previousCategory = ""
@@ -35,8 +26,7 @@ def printHFile(f):
 				featureDefineName = "SCN_" + name.upper()
 				out.append("#define " + featureDefineName + " " + v["Value"])
 			elif v["FeatureType"] in ["val"]:
-				if not ("SCE_" in name or "SCLEX_" in name):
-					out.append("#define " + name + " " + v["Value"])
+				out.append("#define " + name + " " + v["Value"])
 	if anyProvisional:
 		out.append("#endif")
 	return out

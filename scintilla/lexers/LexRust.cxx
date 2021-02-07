@@ -294,8 +294,8 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleCharsBefore = visibleChars;
 				const int chNext = sc.chNext;
 				sc.SetState((chNext == '/') ? SCE_RUST_COMMENTLINE : SCE_RUST_COMMENTBLOCK);
-				sc.Forward();
-				if (sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+				sc.Forward(2);
+				if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
 					sc.ChangeState((chNext == '/') ? SCE_RUST_COMMENTLINEDOC : SCE_RUST_COMMENTBLOCKDOC);
 				}
 				if (chNext == '/') {
@@ -305,6 +305,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else {
 					commentLevel = 1;
 				}
+				continue;
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_RUST_STRING);
 			} else if (sc.ch == '\'') {

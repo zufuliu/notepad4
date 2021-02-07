@@ -453,8 +453,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					visibleCharsBefore = visibleChars;
 					const int chNext = sc.chNext;
 					sc.SetState((chNext == '/') ? SCE_JS_COMMENTLINE : SCE_JS_COMMENTBLOCK);
-					sc.Forward();
-					if (sc.chNext == '!' || (chNext == sc.chNext && sc.GetRelative(2) != chNext)) {
+					sc.Forward(2);
+					if (sc.ch == '!' || (sc.ch == chNext && sc.chNext != chNext)) {
 						sc.ChangeState((chNext == '/') ? SCE_JS_COMMENTLINEDOC : SCE_JS_COMMENTBLOCKDOC);
 					}
 					if (chNext == '/') {
@@ -462,6 +462,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							lineStateLineType = JsLineStateMaskLineComment;
 						}
 					}
+					continue;
 				} else if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
 					insideRegexRange = false;
 					sc.SetState(SCE_JS_REGEX);

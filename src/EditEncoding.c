@@ -1957,11 +1957,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {
 	uint32_t block = ch >> 7;
 	uint32_t index = UnicodeCaseSensitivityIndex[block & 0x7f];
 	block = index ^ (block >> 2);
-#if 0//defined(__AVX2__)
-	index &= _bextr_u32(block - 0x20, 8, 5);
-#else
 	index &= ((block - 0x20) >> 8) & 0x1f;
-#endif
 	if (index) {
 		ch = ch & 0x7f;
 		index = 124 + (index << 2);
@@ -2021,16 +2017,10 @@ BOOL IsStringCaseSensitiveA(LPCSTR pszText) {
 		}
 
 		// ASCII
-#if 1
 		ch |= 0x20; // convert to lower case
 		if (ch >= 'a' && ch <= 'z') {
 			return TRUE;
 		}
-#else
-		if ((UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1) {
-			return TRUE;
-		}
-#endif
 		++ptr;
 	}
 	return FALSE;

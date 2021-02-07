@@ -526,11 +526,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	uint32_t block = ch >> {blockSizeBit + 5};
 	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];
 	block = index ^ (block >> {blockIndexValueBit - indexBitCount});
-#if 0//defined(__AVX2__)
-	index &= _bextr_u32(block - {hex(indexMask + 1)}, 8, {indexBitCount});
-#else
 	index &= ((block - {hex(indexMask + 1)}) >> 8) & {hex(indexMask)};
-#endif
 	if (index) {{
 		ch = ch & {hex(blockSize*32 - 1)};
 		index = {indexOffset} + (index << {blockSizeBit});
