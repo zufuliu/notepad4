@@ -10,7 +10,7 @@ namespace Scintilla {
 
 //[[deprecated]]
 class CharacterSet final {
-	bool valueAfter;
+	const bool valueAfter;
 	// ASCII character only, not useful for UTF-8 or DBCS multi byte character
 	bool bset[128]{};
 public:
@@ -22,29 +22,81 @@ public:
 		setAlpha = setLower | setUpper,
 		setAlphaNum = setAlpha | setDigits
 	};
+
 	//[[deprecated]]
-	CharacterSet(setBase base = setNone, const char *initialSet = "", bool valueAfter_ = false) noexcept;
+	CharacterSet(setBase base = setNone, bool valueAfter_ = false) noexcept : valueAfter(valueAfter_) {
+		if (base & setLower) {
+			for (int ch = 'a'; ch <= 'z'; ch++) {
+				bset[ch] = true;
+			}
+		}
+		if (base & setUpper) {
+			for (int ch = 'A'; ch <= 'Z'; ch++) {
+				bset[ch] = true;
+			}
+		}
+		if (base & setDigits) {
+			for (int ch = '0'; ch <= '9'; ch++) {
+				bset[ch] = true;
+			}
+		}
+	}
+
+	//[[deprecated]]
+	template <size_t N>
+	CharacterSet(setBase base, const char (&initialSet)[N], bool valueAfter_ = false) noexcept : valueAfter(valueAfter_) {
+		AddString(initialSet);
+		if (base & setLower) {
+			for (int ch = 'a'; ch <= 'z'; ch++) {
+				bset[ch] = true;
+			}
+		}
+		if (base & setUpper) {
+			for (int ch = 'A'; ch <= 'Z'; ch++) {
+				bset[ch] = true;
+			}
+		}
+		if (base & setDigits) {
+			for (int ch = '0'; ch <= '9'; ch++) {
+				bset[ch] = true;
+			}
+		}
+	}
+
 	CharacterSet(const CharacterSet &other) = delete;
 	CharacterSet(CharacterSet &&other) = delete;
+#if 1
 	CharacterSet &operator=(const CharacterSet &other) = delete;
-	CharacterSet &operator=(CharacterSet &&other) = delete;
-	void Add(int val) noexcept {
-		assert(val >= 0);
-		assert(val < 128);
-		bset[val] = true;
-	}
-	void AddString(const char *setToAdd) noexcept;
-	bool Contains(int val) const noexcept {
-		assert(val >= 0);
-		if (val < 0) {
-			return false;
+#else
+	CharacterSet &operator=(const CharacterSet &other) noexcept {
+		valueAfter = other.other;
+		for (size_t i = 0; i < sizeof(bset); i++) {
+			bset[i] = other.bset[i];
 		}
-		return (val < 128) ? bset[val] : valueAfter;
 	}
+#endif
+	CharacterSet &operator=(CharacterSet &&other) = delete;
+
+	void Add(unsigned char ch) noexcept {
+		bset[ch] = true;
+	}
+
+	template <size_t N>
+	void AddString(const char (&setToAdd)[N]) noexcept {
+		for (size_t i = 0; i < N - 1; i++) {
+			const unsigned char ch = setToAdd[i];
+			bset[ch] = true;
+		}
+	}
+
+	bool Contains(int ch) const noexcept {
+		const unsigned int uch = ch;
+		return (uch < sizeof(bset)) ? bset[uch] : valueAfter;
+	}
+
 	bool Contains(char ch) const noexcept {
-		// Overload char as char may be signed
 		const unsigned char uch = ch;
-		return Contains(uch);
+		return (uch < sizeof(bset)) ? bset[uch] : valueAfter;
 	}
 };
 
@@ -54,8 +106,6 @@ constexpr bool AnyOf(T t, Args... args) noexcept {
 }
 
 // prevent pointer without <type_traits>
-template <typename T, typename... Args>
-constexpr void AnyOf([[maybe_unused]] T *t, [[maybe_unused]] Args... args) noexcept {}
 template <typename T, typename... Args>
 constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args) noexcept {}
 
@@ -263,9 +313,9 @@ constexpr T MakeLowerCase(T ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
-#if 0
-int CompareCaseInsensitive(const char *a, const char *b) noexcept;
-int CompareNCaseInsensitive(const char *a, const char *b, size_t len) noexcept;
+#ifndef _WIN32
+#define CompareCaseInsensitive		strcasecmp
+#define CompareNCaseInsensitive		strncasecmp
 #else
 #define CompareCaseInsensitive		_stricmp
 #define CompareNCaseInsensitive		_strnicmp

@@ -1017,7 +1017,6 @@
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx" />
-    <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\DefaultLexer.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexAccessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexerBase.cxx" />

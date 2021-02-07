@@ -207,9 +207,6 @@
     <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx">
       <Filter>Scintilla\lexlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexlib\CharacterSet.cxx">
-      <Filter>Scintilla\lexlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexlib\DefaultLexer.cxx">
       <Filter>Scintilla\lexlib</Filter>
     </ClCompile>
