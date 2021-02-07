@@ -26,6 +26,9 @@ defer let
 //! types			===========================================================
 int uint void
 
+//! directive		===========================================================
+import // for code folding
+
 //! class			===========================================================
 public dynamic class ArgumentError
 public class arguments

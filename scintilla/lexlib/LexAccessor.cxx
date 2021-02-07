@@ -303,6 +303,9 @@ Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int opera
 		case constant:
 			{ body }
 
+		ActionScript:
+			function name(param:*):*
+				{ body }
 		C++:
 			[lambda-capture]
 				{ body }
@@ -319,7 +322,7 @@ Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int opera
 			class name[T]
 				{ body }
 		*/
-		if (!AnyOf(ch, ')', '>', '=', ':', ']', '^', '?')) {
+		if (!AnyOf(ch, ')', '>', '=', ':', ']', '^', '?', '*')) {
 			return 0;
 		}
 	}

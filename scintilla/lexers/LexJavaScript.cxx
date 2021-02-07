@@ -563,9 +563,11 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 struct FoldLineState {
 	int lineComment;
 	int packageImport;
+	int lineContinuation;
 	constexpr explicit FoldLineState(int lineState) noexcept:
 		lineComment(lineState & JsLineStateMaskLineComment),
-		packageImport((lineState >> 1) & 1) {
+		packageImport((lineState >> 1) & 1),
+		lineContinuation((lineState >> 4) & 1) {
 	}
 };
 
@@ -659,6 +661,8 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
 			} else if (foldCurrent.packageImport) {
 				levelNext += foldNext.packageImport - foldPrev.packageImport;
+			} else if (foldCurrent.lineContinuation | foldPrev.lineContinuation) {
+				levelNext += foldCurrent.lineContinuation - foldPrev.lineContinuation;
 			} else if (visibleChars) {
 				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_JS_OPERATOR, SCE_JS_TASKMARKER);
 				if (bracePos) {
