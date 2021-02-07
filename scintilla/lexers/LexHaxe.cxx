@@ -1,6 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for HaXe.
+//! Lexer for Haxe.
 
 #include <cassert>
 #include <cstring>
@@ -51,8 +51,8 @@ struct EscapeSequence {
 };
 
 enum {
-	HaXeLineStateMaskLineComment = 1, // line comment
-	HaXeLineStateMaskImport = 1 << 1, // import
+	HaxeLineStateMaskLineComment = 1, // line comment
+	HaxeLineStateMaskImport = 1 << 1, // import
 };
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_HAXE_STRINGSQ);
@@ -61,7 +61,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_HAXE_TASKMARKER;
 }
 
-void ColouriseHaXeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 	bool insideRegexRange = false; // inside regex character range []
 
@@ -112,7 +112,7 @@ void ColouriseHaXeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ChangeState(SCE_HAXE_WORD);
 					if (StrEqual(s, "import")) {
 						if (visibleChars == sc.LengthCurrent()) {
-							lineStateLineType = HaXeLineStateMaskImport;
+							lineStateLineType = HaxeLineStateMaskImport;
 						}
 					} else if (StrEqualsAny(s, "class", "new", "extends", "abstract", "typedef")) {
 						if (kwType != SCE_HAXE_ENUM) {
@@ -258,7 +258,7 @@ void ColouriseHaXeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_HAXE_COMMENTLINE);
 				if (visibleChars == 0) {
-					lineStateLineType = HaXeLineStateMaskLineComment;
+					lineStateLineType = HaxeLineStateMaskLineComment;
 				}
 			} else if (sc.Match('/', '*')) {
 				visibleCharsBefore = visibleChars;
@@ -331,7 +331,7 @@ struct FoldLineState {
 	int lineComment;
 	int packageImport;
 	constexpr explicit FoldLineState(int lineState) noexcept:
-		lineComment(lineState & HaXeLineStateMaskLineComment),
+		lineComment(lineState & HaxeLineStateMaskLineComment),
 		packageImport((lineState >> 1) & 1) {
 	}
 };
@@ -340,7 +340,7 @@ constexpr bool IsInnerStyle(int style) noexcept {
 	return style == SCE_HAXE_COMMENTTAGAT || style == SCE_HAXE_TASKMARKER;
 }
 
-void FoldHaXeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);
@@ -448,4 +448,4 @@ void FoldHaXeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 }
 
-LexerModule lmHaXe(SCLEX_HAXE, ColouriseHaXeDoc, "haxe", FoldHaXeDoc);
+LexerModule lmHaxe(SCLEX_HAXE, ColouriseHaxeDoc, "haxe", FoldHaxeDoc);

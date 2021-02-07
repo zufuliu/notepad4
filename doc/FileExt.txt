@@ -297,7 +297,7 @@ Groovy Script
 	grunit			GrUnit
 
 
-HaXe Script
+Haxe Script
 	hx
 
 

@@ -90,7 +90,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexers\LexHaXe.cxx">
+    <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx">
@@ -426,7 +426,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlGroovy.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\EditLexers\stlHaXe.c">
+    <ClCompile Include="..\..\src\EditLexers\stlHaxe.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlHTML.c">

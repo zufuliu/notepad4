@@ -84,7 +84,7 @@ extern EDITLEXER lexGradle;
 extern EDITLEXER lexDOT;
 extern EDITLEXER lexGroovy;
 
-extern EDITLEXER lexHaXe;
+extern EDITLEXER lexHaxe;
 
 extern EDITLEXER lexINI;
 extern EDITLEXER lexINNO;
@@ -183,7 +183,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexDOT,
 	&lexGroovy,
 
-	&lexHaXe,
+	&lexHaxe,
 
 	&lexINI,
 	&lexINNO,
