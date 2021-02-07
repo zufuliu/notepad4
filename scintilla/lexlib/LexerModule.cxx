@@ -42,7 +42,7 @@ extern LexerModule lmFSharp;
 extern LexerModule lmGN;
 extern LexerModule lmGo;
 extern LexerModule lmGraphViz;
-extern LexerModule lmHaXe;
+extern LexerModule lmHaxe;
 extern LexerModule lmHTML;
 extern LexerModule lmInno;
 extern LexerModule lmJava;
@@ -107,7 +107,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmGN,
 	&lmGo,
 	&lmGraphViz,
-	&lmHaXe,
+	&lmHaxe,
 	&lmHTML,
 	&lmInno,
 	&lmJava,

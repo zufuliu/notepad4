@@ -978,7 +978,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGN.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx" />
-    <ClCompile Include="..\..\scintilla\lexers\LexHaXe.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJava.cxx" />
@@ -1090,7 +1090,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlGradle.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGraphViz.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGroovy.c" />
-    <ClCompile Include="..\..\src\EditLexers\stlHaXe.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlHaxe.c" />
     <ClCompile Include="..\..\src\EditLexers\stlHTML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlInno.c" />
     <ClCompile Include="..\..\src\EditLexers\stlJamfile.c" />
