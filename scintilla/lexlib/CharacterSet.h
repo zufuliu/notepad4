@@ -10,9 +10,9 @@ namespace Scintilla {
 
 //[[deprecated]]
 class CharacterSet final {
-	const bool valueAfter;
 	// ASCII character only, not useful for UTF-8 or DBCS multi byte character
 	bool bset[128]{};
+	const bool valueAfter;
 public:
 	enum setBase {
 		setNone = 0,
@@ -69,10 +69,10 @@ public:
 	CharacterSet &operator=(const CharacterSet &other) = delete;
 #else
 	CharacterSet &operator=(const CharacterSet &other) noexcept {
-		valueAfter = other.other;
 		for (size_t i = 0; i < sizeof(bset); i++) {
 			bset[i] = other.bset[i];
 		}
+		valueAfter = other.valueAfter;
 	}
 #endif
 	CharacterSet &operator=(CharacterSet &&other) = delete;

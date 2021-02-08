@@ -10,10 +10,6 @@
 #include <cassert>
 #include <cstring>
 
-#include <string>
-#include <vector>
-#include <map>
-
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
