@@ -11,9 +11,6 @@ def GenerateBraceMatchTable():
 	line = ', '.join(hex(c) for c in table)
 	print('BraceMatch:', line)
 
-	line = ', '.join(hex(c) for c in table)
-	print('BraceMatch:', line)
-
 def GenerateC0ControlCharacterMask(excludeSeparator):
 	# used in Style_MaybeBinaryFile()
 	bits = ['1'] * 32

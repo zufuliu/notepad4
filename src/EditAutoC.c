@@ -1756,15 +1756,19 @@ BOOL IsIndentKeywordStyle(int style) {
 }
 
 const char *EditKeywordIndent(const char *head, int *indent) {
-	char word[64] = "";
-	char word_low[64] = "";
+	char word[16] = "";
+	char word_low[16] = "";
 	int length = 0;
 	const char *endPart = NULL;
 	*indent = 0;
 
-	while (*head && length < 63 && IsAlpha(*head)) {
+	while (*head && length < 15) {
+		const char lower = *head | 0x20;
+		if (lower < 'a' || lower > 'z') {
+			break;
+		}
 		word[length] = *head;
-		word_low[length] = (char)((*head) | 0x20);
+		word_low[length] = lower;
 		++length;
 		++head;
 	}
