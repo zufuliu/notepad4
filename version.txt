@@ -15,7 +15,7 @@ hg clone http://hg.code.sf.net/p/scintilla/lexilla lexilla
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 4.4.6
-2021-02-06 5543:2b838f4130bd
+2021-02-09 5546:52f0d68a3556
 
 Notepad3 (3-clause BSD)
 https://github.com/rizonesoft/Notepad3
