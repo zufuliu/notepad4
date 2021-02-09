@@ -122,7 +122,7 @@ using namespace Scintilla;
 
 namespace {
 
-const TCHAR *callClassName = L"CallTip";
+constexpr const TCHAR *callClassName = L"CallTip";
 
 inline void SetWindowID(HWND hWnd, int identifier) noexcept {
 	::SetWindowLongPtr(hWnd, GWLP_ID, identifier);

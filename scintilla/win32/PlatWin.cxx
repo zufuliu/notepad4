@@ -1116,8 +1116,9 @@ void SurfaceGDI::MeasureWidths(const Font &font_, std::string_view text, XYPOSIT
 			if (byteCount == 4) {	// Non-BMP
 				ui++;
 			}
+			const XYPOSITION pos = static_cast<XYPOSITION>(poses.buffer[ui]);
 			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < len); bytePos++) {
-				positions[i++] = static_cast<XYPOSITION>(poses.buffer[ui]);
+				positions[i++] = pos;
 			}
 		}
 	} else {
@@ -2270,8 +2271,9 @@ XYPOSITION SurfaceD2D::AverageCharWidth(const Font &font_) {
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
-		const WCHAR wszAllAlpha[] = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		static const WCHAR wszAllAlpha[] = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		constexpr size_t lenAllAlpha = (sizeof(wszAllAlpha) / sizeof(WCHAR)) - 1;
+		static_assert(lenAllAlpha == 52);
 		const HRESULT hr = pIDWriteFactory->CreateTextLayout(wszAllAlpha, static_cast<UINT32>(lenAllAlpha),
 			pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr) && pTextLayout) {

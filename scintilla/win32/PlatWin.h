@@ -102,7 +102,7 @@ inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	PRectangle prc;
 	__m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
 	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
-	_mm_store_ps((float *)(&prc), f32x4);
+	_mm_storeu_ps((float *)(&prc), f32x4);
 	return prc;
 }
 
@@ -110,7 +110,7 @@ inline RECT RectFromPRectangleEx(const PRectangle *prc) noexcept {
 	RECT rc;
 	__m128 f32x4 = _mm_load_ps((float *)(prc));
 	__m128i i32x4 = _mm_cvtps_epi32(f32x4);
-	_mm_store_si128((__m128i *)(&rc), i32x4);
+	_mm_storeu_si128((__m128i *)(&rc), i32x4);
 	return rc;
 }
 
