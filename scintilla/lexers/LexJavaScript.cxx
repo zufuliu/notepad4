@@ -60,7 +60,8 @@ static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JS_STRING_BT);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JSX_TEXT);
 
 constexpr bool IsJsIdentifierStart(int ch) noexcept {
-	return IsIdentifierStartEx(ch) || ch == '$';
+	return IsIdentifierStartEx(ch) || ch == '$'
+		|| ch == '#'; // ECMAScript 2021 private field and method
 }
 
 constexpr bool IsJsIdentifierChar(int ch) noexcept {
