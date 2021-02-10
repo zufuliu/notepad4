@@ -1,5 +1,6 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
 // 2020 11.0 https://www.ecma-international.org/publications/standards/Ecma-262.htm
+// 2021 https://tc39.es/ecma262/
 
 //! keywords
 async await
@@ -375,6 +376,7 @@ String(value) {
 		padStart(maxLength [, fillString])
 		repeat(count)
 		replace(searchValue, replaceValue)
+		replaceAll(searchValue, replaceValue) // 2021
 		search(regexp)
 		slice(start, end)
 		split(separator, limit)

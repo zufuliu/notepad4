@@ -521,7 +521,6 @@ BOOL IsDocWordChar(int ch) {
 		return (ch == '-' || ch == '$');
 
 	case NP2LEX_CIL:
-	case NP2LEX_JAVASCRIPT:
 	case NP2LEX_TYPESCRIPT:
 	case NP2LEX_VERILOG:
 		return (ch == '$');
@@ -543,6 +542,9 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_KOTLIN:
 	case NP2LEX_RUST:
 		return (ch == '$' || ch == '@' || ch == ':');
+
+	case NP2LEX_JAVASCRIPT:
+		return ch == '$' || ch == '#';
 
 	case NP2LEX_GROOVY:
 	case NP2LEX_SCALA:
