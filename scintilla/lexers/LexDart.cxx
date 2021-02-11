@@ -252,17 +252,10 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_DART_VARIABLE);
 				}
-			} else if (sc.ch == '\'' && (sc.state == SCE_DART_STRING_SQ
-				|| (sc.state == SCE_DART_TRIPLE_STRING_SQ && sc.MatchNext('\'', '\'')))) {
-				if (sc.state == SCE_DART_TRIPLE_STRING_SQ) {
-					sc.SetState(SCE_DART_TRIPLE_STRING_SQEND);
-					sc.Forward(2);
-				}
-				sc.ForwardSetState(SCE_DART_DEFAULT);
-			} else if (sc.ch == '"' && (sc.state == SCE_DART_STRING_DQ
-				|| (sc.state == SCE_DART_TRIPLE_STRING_DQ && sc.MatchNext('"', '"')))) {
-				if (sc.state == SCE_DART_TRIPLE_STRING_DQ) {
-					sc.SetState(SCE_DART_TRIPLE_STRING_DQEND);
+			} else if ((sc.ch == '\'' && (sc.state == SCE_DART_STRING_SQ || (sc.state == SCE_DART_TRIPLE_STRING_SQ && sc.MatchNext('\'', '\''))))
+					|| (sc.ch == '"' && (sc.state == SCE_DART_STRING_DQ || (sc.state == SCE_DART_TRIPLE_STRING_DQ && sc.MatchNext('"', '"'))))) {
+				if (sc.state == SCE_DART_TRIPLE_STRING_SQ || sc.state == SCE_DART_TRIPLE_STRING_DQ) {
+					sc.SetState(SCE_DART_TRIPLE_STRINGEND);
 					sc.Forward(2);
 				}
 				sc.ForwardSetState(SCE_DART_DEFAULT);
@@ -316,7 +309,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			if (sc.ch == '"') {
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_DART_TRIPLE_STRING_DQSTART);
+					sc.SetState(SCE_DART_TRIPLE_STRINGSTART);
 					sc.Forward(2);
 					sc.ForwardSetState(SCE_DART_TRIPLE_STRING_DQ);
 					continue;
@@ -324,7 +317,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_DART_STRING_DQ);
 			} else if (sc.ch == '\'') {
 				if (sc.MatchNext('\'', '\'')) {
-					sc.SetState(SCE_DART_TRIPLE_STRING_SQSTART);
+					sc.SetState(SCE_DART_TRIPLE_STRINGSTART);
 					sc.Forward(2);
 					sc.ForwardSetState(SCE_DART_TRIPLE_STRING_SQ);
 					continue;
@@ -442,15 +435,13 @@ void FoldDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			}
 			break;
 
-		case SCE_DART_TRIPLE_STRING_SQSTART:
-		case SCE_DART_TRIPLE_STRING_DQSTART:
+		case SCE_DART_TRIPLE_STRINGSTART:
 			if (style != stylePrev) {
 				levelNext++;
 			}
 			break;
 
-		case SCE_DART_TRIPLE_STRING_SQEND:
-		case SCE_DART_TRIPLE_STRING_DQEND:
+		case SCE_DART_TRIPLE_STRINGEND:
 			if (style != styleNext) {
 				levelNext--;
 			}
