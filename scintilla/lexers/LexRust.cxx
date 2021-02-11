@@ -281,16 +281,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_RUST_DEFAULT) {
-			if (sc.ch == '#') {
-				if (sc.chNext == '[' || ((sc.chNext == '!' || isspacechar(sc.chNext)) && LexGetNextChar(sc.currentPos + 2, styler) == '[')) {
-					// only support `#...[attr]` or `#!...[attr]`, not `#...!...[attr]`
-					sc.SetState(SCE_RUST_ATTRIBUTE);
-					if (sc.chNext == '!') {
-						sc.Forward();
-					}
-					lineStateAttribute = RustLineStateMaskAttribute;
-				}
-			} else if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
+			if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 				visibleCharsBefore = visibleChars;
 				const int chNext = sc.chNext;
 				sc.SetState((chNext == '/') ? SCE_RUST_COMMENTLINE : SCE_RUST_COMMENTBLOCK);
@@ -306,6 +297,16 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					commentLevel = 1;
 				}
 				continue;
+			}
+			if (sc.ch == '#') {
+				if (sc.chNext == '[' || ((sc.chNext == '!' || isspacechar(sc.chNext)) && LexGetNextChar(sc.currentPos + 2, styler) == '[')) {
+					// only support `#...[attr]` or `#!...[attr]`, not `#...!...[attr]`
+					sc.SetState(SCE_RUST_ATTRIBUTE);
+					if (sc.chNext == '!') {
+						sc.Forward();
+					}
+					lineStateAttribute = RustLineStateMaskAttribute;
+				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_RUST_STRING);
 			} else if (sc.ch == '\'') {

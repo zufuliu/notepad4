@@ -191,6 +191,14 @@ public:
 	bool Match(char ch0, char ch1, char ch2, char ch3) const noexcept {
 		return Match(ch0, ch1, ch2) && ch3 == styler.SafeGetCharAt(currentPos + 3);
 	}
+
+	bool MatchNext(char ch0, char ch1) const noexcept {
+		return chNext == static_cast<unsigned char>(ch0) && ch1 == styler.SafeGetCharAt(currentPos + 2);
+	}
+	bool MatchNext(char ch0, char ch1, char ch2) const noexcept {
+		return MatchNext(ch0, ch1) && ch2 == styler.SafeGetCharAt(currentPos + 3);
+	}
+
 	bool Match(const char *s) const noexcept {
 		if (ch != static_cast<unsigned char>(*s)) {
 			return false;
@@ -211,6 +219,7 @@ public:
 		return true;
 	}
 	bool MatchIgnoreCase(const char *s) const noexcept;
+
 	void GetCurrent(char *s, Sci_PositionU len) const noexcept {
 		styler.GetRange(styler.GetStartSegment(), currentPos, s, len);
 	}

@@ -225,14 +225,16 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_KOTLIN_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				escSeq.outerState = sc.state;
-				sc.SetState(SCE_KOTLIN_VARIABLE);
-			} else if (sc.Match('$', '{')) {
-				nestedState.push_back(sc.state);
-				sc.SetState(SCE_KOTLIN_OPERATOR2);
-				sc.Forward();
-			} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.Match('"', '"', '"'))) {
+			} else if (sc.ch == '$') {
+				if (sc.chNext == '{') {
+					nestedState.push_back(sc.state);
+					sc.SetState(SCE_KOTLIN_OPERATOR2);
+					sc.Forward();
+				} else if (IsIdentifierStartEx(sc.chNext)) {
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_KOTLIN_VARIABLE);
+				}
+			} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_KOTLIN_RAWSTRING) {
 					sc.SetState(SCE_KOTLIN_RAWSTRINGEND);
 					sc.Forward(2);
@@ -294,12 +296,14 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					commentLevel = 1;
 				}
 				continue;
-			} else if (sc.Match('"', '"', '"')) {
-				sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_KOTLIN_RAWSTRING);
-				continue;
-			} else if (sc.ch == '\"') {
+			}
+			if (sc.ch == '\"') {
+				if (sc.MatchNext('"', '"')) {
+					sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
+					sc.Forward(2);
+					sc.ForwardSetState(SCE_KOTLIN_RAWSTRING);
+					continue;
+				}
 				sc.SetState(SCE_KOTLIN_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_KOTLIN_CHARACTER);

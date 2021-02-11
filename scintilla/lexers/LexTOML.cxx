@@ -278,16 +278,20 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					if (visibleChars == 0) {
 						lineType = TOMLLineType_CommentLine;
 					}
-				} else if (sc.Match('\'', '\'', '\'')) {
-					sc.SetState(SCE_TOML_TRIPLE_STRING_SQ);
-					sc.Forward(2);
-				} else if (sc.Match('"', '"', '"')) {
-					sc.SetState(SCE_TOML_TRIPLE_STRING_DQ);
-					sc.Forward(2);
 				} else if (sc.ch == '\'') {
-					sc.SetState(SCE_TOML_STRING_SQ);
-				} else if (sc.ch == '\"') {
-					sc.SetState(SCE_TOML_STRING_DQ);
+					if (sc.MatchNext('\'', '\'')) {
+						sc.SetState(SCE_TOML_TRIPLE_STRING_SQ);
+						sc.Forward(2);
+					} else {
+						sc.SetState(SCE_TOML_STRING_SQ);
+					}
+				} else if (sc.ch == '"') {
+					if (sc.MatchNext('"', '"')) {
+						sc.SetState(SCE_TOML_TRIPLE_STRING_DQ);
+						sc.Forward(2);
+					} else {
+						sc.SetState(SCE_TOML_STRING_DQ);
+					}
 				} else if (IsADigit(sc.ch)) {
 					sc.SetState(SCE_TOML_NUMBER);
 				} else if (IsLowerCase(sc.ch)) {

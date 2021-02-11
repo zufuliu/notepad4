@@ -464,7 +464,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						}
 					}
 					continue;
-				} else if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
+				}
+				if (!IsEOLChar(sc.chNext) && IsRegexStart(chPrevNonWhite, stylePrevNonWhite)) {
 					insideRegexRange = false;
 					sc.SetState(SCE_JS_REGEX);
 				} else {
