@@ -296,7 +296,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			//} else if (sc.ch == '%') {
 			//} else if (sc.ch == '{' && IsADigit(sc.chNext)) {
-			} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.Match('"', '"', '"'))) {
+			} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_JAVA_TRIPLE_STRING) {
 					sc.Forward(2);
 				}
@@ -328,11 +328,13 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ChangeState(SCE_JAVA_COMMENTBLOCKDOC);
 				}
 				continue;
-			} else if (sc.Match('"', '"', '"')) {
-				sc.SetState(SCE_JAVA_TRIPLE_STRING);
-				sc.Forward(2);
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_JAVA_STRING);
+				if (sc.MatchNext('"', '"')) {
+					sc.SetState(SCE_JAVA_TRIPLE_STRING);
+					sc.Forward(2);
+				} else {
+					sc.SetState(SCE_JAVA_STRING);
+				}
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_JAVA_CHARACTER);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {

@@ -251,7 +251,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					continue;
 				}
 			} else if (sc.ch == '"' && (sc.state == SCE_SWIFT_STRING
-				|| (sc.state == SCE_SWIFT_TRIPLE_STRING && sc.Match('"', '"', '"')))) {
+				|| (sc.state == SCE_SWIFT_TRIPLE_STRING && sc.MatchNext('"', '"')))) {
 				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
 					sc.SetState(SCE_SWIFT_TRIPLE_STRINGEND);
 					sc.Forward(2);
@@ -279,8 +279,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ForwardSetState(state);
 					continue;
 				}
-			} else if ((sc.state == SCE_SWIFT_STRING_ED && sc.Match('"', '#'))
-				|| (sc.state == SCE_SWIFT_TRIPLE_STRING_ED && sc.Match('"', '"', '"', '#'))) {
+			} else if (sc.ch == '"' && ((sc.state == SCE_SWIFT_STRING_ED && sc.chNext == '#')
+				|| (sc.state == SCE_SWIFT_TRIPLE_STRING_ED && sc.MatchNext('"', '"', '#')))) {
 				const int offset = (sc.state == SCE_SWIFT_STRING_ED) ? 1 : 3;
 				if (CheckSwiftStringDelimiter(styler, sc.currentPos + offset, DelimiterCheck::End, delimiterCount)) {
 					if (sc.state == SCE_SWIFT_TRIPLE_STRING_ED) {
@@ -313,12 +313,14 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					commentLevel = 1;
 				}
 				continue;
-			} else if (sc.Match('"', '"', '"')) {
-				sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_SWIFT_TRIPLE_STRING);
-				continue;
-			} else if (sc.ch == '"') {
+			}
+			if (sc.ch == '"') {
+				if (sc.MatchNext('"', '"')) {
+					sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
+					sc.Forward(2);
+					sc.ForwardSetState(SCE_SWIFT_TRIPLE_STRING);
+					continue;
+				}
 				sc.SetState(SCE_SWIFT_STRING);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);

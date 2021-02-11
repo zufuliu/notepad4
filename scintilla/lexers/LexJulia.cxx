@@ -202,18 +202,18 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.SetState(SCE_JULIA_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				escSeq.outerState = sc.state;
-				sc.SetState(SCE_JULIA_VARIABLE);
-			} else if (sc.Match('$', '(')) {
-				++braceCount;
-				nestedState.push_back(sc.state);
-				sc.SetState(SCE_JULIA_OPERATOR2);
-				sc.Forward();
-			} else if ((sc.state == SCE_JULIA_STRING && sc.ch == '\"')
-				|| (sc.state == SCE_JULIA_TRIPLE_STRING && sc.Match('"', '"', '"'))
-				|| (sc.state == SCE_JULIA_BACKTICKS && sc.ch == '`')
-				|| (sc.state == SCE_JULIA_TRIPLE_BACKTICKS && sc.Match('`', '`', '`'))) {
+			} else if (sc.ch == '$') {
+				if (sc.chNext == '(') {
+					++braceCount;
+					nestedState.push_back(sc.state);
+					sc.SetState(SCE_JULIA_OPERATOR2);
+					sc.Forward();
+				} else if (IsIdentifierStartEx(sc.chNext)) {
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_JULIA_VARIABLE);
+				}
+			} else if ((sc.ch == '"' && (sc.state == SCE_JULIA_STRING || (sc.state == SCE_JULIA_TRIPLE_STRING && sc.MatchNext('"', '"'))))
+				|| (sc.ch == '`' && (sc.state == SCE_JULIA_BACKTICKS || (sc.state == SCE_JULIA_TRIPLE_BACKTICKS && sc.MatchNext('`', '`'))))) {
 				if (sc.state == SCE_JULIA_TRIPLE_STRING || sc.state == SCE_JULIA_TRIPLE_BACKTICKS) {
 					sc.SetState((sc.state == SCE_JULIA_TRIPLE_STRING) ? SCE_JULIA_TRIPLE_STRINGEND : SCE_JULIA_TRIPLE_BACKTICKSEND);
 					sc.Forward(2);
@@ -248,7 +248,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			if (sc.ch == '\\') {
 				sc.Forward();
 			//} else if (sc.ch == '#') { // regex comment
-			} else if (sc.ch == '\"' && (sc.state == SCE_JULIA_REGEX || sc.Match('"', '"', '"'))) {
+			} else if (sc.ch == '\"' && (sc.state == SCE_JULIA_REGEX || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_JULIA_TRIPLE_REGEX) {
 					sc.Forward(2);
 				}
@@ -269,7 +269,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.SetState(SCE_JULIA_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '\"' && (sc.state == SCE_JULIA_RAWSTRING || sc.state == SCE_JULIA_BYTESTRING || sc.Match('"', '"', '"'))) {
+			} else if (sc.ch == '\"' && (sc.state == SCE_JULIA_RAWSTRING || sc.state == SCE_JULIA_BYTESTRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_JULIA_TRIPLE_RAWSTRING || sc.state == SCE_JULIA_TRIPLE_BYTESTRING) {
 					sc.Forward(2);
 				}
@@ -319,40 +319,42 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						lineStateLineComment = SimpleLineStateMaskLineComment;
 					}
 				}
-			} else if (sc.Match('"', '"', '"')) {
-				sc.SetState(SCE_JULIA_TRIPLE_STRINGSTART);
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_JULIA_TRIPLE_STRING);
-				continue;
 			} else if (sc.ch == '\"') {
+				if (sc.MatchNext('"', '"')) {
+					sc.SetState(SCE_JULIA_TRIPLE_STRINGSTART);
+					sc.Forward(2);
+					sc.ForwardSetState(SCE_JULIA_TRIPLE_STRING);
+					continue;
+				}
 				sc.SetState(SCE_JULIA_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_JULIA_CHARACTER);
-			} else if (sc.Match('`', '`', '`')) {
-				sc.SetState(SCE_JULIA_TRIPLE_BACKTICKSSTART);
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_JULIA_TRIPLE_BACKTICKS);
-				continue;
 			} else if (sc.ch == '`') {
+				if (sc.MatchNext('`', '`')) {
+					sc.SetState(SCE_JULIA_TRIPLE_BACKTICKSSTART);
+					sc.Forward(2);
+					sc.ForwardSetState(SCE_JULIA_TRIPLE_BACKTICKS);
+					continue;
+				}
 				sc.SetState(SCE_JULIA_BACKTICKS);
 			} else if (sc.Match('r', '\"')) {
 				sc.SetState(SCE_JULIA_REGEX);
 				sc.Forward();
-				if (sc.Match('"', '"', '"')) {
+				if (sc.MatchNext('"', '"')) {
 					sc.ChangeState(SCE_JULIA_TRIPLE_REGEX);
 					sc.Forward(2);
 				}
 			} else if (sc.Match('r', 'a', 'w', '"')) {
 				sc.SetState(SCE_JULIA_RAWSTRING);
 				sc.Forward(3);
-				if (sc.Match('"', '"', '"')) {
+				if (sc.MatchNext('"', '"')) {
 					sc.ChangeState(SCE_JULIA_TRIPLE_RAWSTRING);
 					sc.Forward(2);
 				}
 			} else if (sc.Match('b', '\"')) {
 				sc.SetState(SCE_JULIA_BYTESTRING);
 				sc.Forward();
-				if (sc.Match('"', '"', '"')) {
+				if (sc.MatchNext('"', '"')) {
 					sc.ChangeState(SCE_JULIA_TRIPLE_BYTESTRING);
 					sc.Forward(2);
 				}

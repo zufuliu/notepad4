@@ -188,13 +188,13 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				}
 			} else if (sc.state == SCE_HAXE_STRINGSQ && sc.ch == '$') {
-				if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_HAXE_VARIABLE);
-				} else if (sc.ch == '{') {
+				if (sc.chNext == '{') {
 					nestedState.push_back(sc.state);
 					sc.SetState(SCE_HAXE_OPERATOR2);
 					sc.Forward();
+				} else if (IsIdentifierStartEx(sc.chNext)) {
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_HAXE_VARIABLE);
 				}
 			} else if ((sc.state == SCE_HAXE_STRINGDQ && sc.ch == '"')
 				|| (sc.state == SCE_HAXE_STRINGSQ && sc.ch == '\'')) {
@@ -238,7 +238,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.Match('*', '/')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_HAXE_DEFAULT);
-			} else if (sc.ch == '@' && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
+			} else if (sc.state == SCE_HAXE_COMMENTBLOCKDOC && sc.ch == '@' && IsAlpha(sc.chNext) && IsCommentTagPrev(sc.chPrev)) {
 				sc.SetState(SCE_HAXE_COMMENTTAGAT);
 			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_HAXE_TASKMARKER)) {
 				continue;

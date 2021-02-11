@@ -118,13 +118,13 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_AVS_STRING);
 				continue;
 			}
-			if (sc.ch == '\"') {
+			if (sc.ch == '"') {
 				sc.ForwardSetState(SCE_AVS_DEFAULT);
 			}
 			break;
 
 		case SCE_AVS_TRIPLESTRING:
-			if (sc.Match('\"', '\"', '\"')) {
+			if (sc.Match('"', '"', '"')) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_AVS_DEFAULT);
 			}
@@ -185,20 +185,22 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				visibleCharsBefore = visibleChars;
 				sc.SetState(SCE_AVS_COMMENTBLOCKN);
 				sc.Forward();
-			} else if (sc.Match('\"', '\"', '\"')) {
-				sc.SetState(SCE_AVS_TRIPLESTRING);
-				sc.Forward(2);
-				if (scriptEval == ScriptEvalState_Paren) {
-					// first argument
-					insideScript = AviSynthLineStateMaskInsideScript;
+			} else if (sc.ch == '"') {
+				if (sc.MatchNext('"', '"')) {
+					sc.SetState(SCE_AVS_TRIPLESTRING);
+					sc.Forward(2);
+					if (scriptEval == ScriptEvalState_Paren) {
+						// first argument
+						insideScript = AviSynthLineStateMaskInsideScript;
+					}
+					if (insideScript) {
+						sc.ForwardSetState(SCE_AVS_DEFAULT);
+						continue;
+					}
+					insideScript = 0;
+				} else {
+					sc.SetState(SCE_AVS_STRING);
 				}
-				if (insideScript) {
-					sc.ForwardSetState(SCE_AVS_DEFAULT);
-					continue;
-				}
-				insideScript = 0;
-			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_AVS_STRING);
 			} else if (sc.Match('e', '\"')) {
 				// Avisynth+ 3.6 escaped string
 				sc.SetState(SCE_AVS_ESCAPESTRING);
