@@ -90,6 +90,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexGroovy.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>

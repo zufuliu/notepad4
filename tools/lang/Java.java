@@ -563,6 +563,32 @@ package android.widget {
 
 }
 
+// https://www.groovy-lang.org/api.html
+module groovy {
+
+package groovy.lang {
+	@Delegate
+	@DelegatesTo
+}
+
+package groovy.transform {
+}
+
+}
+
+// https://docs.gradle.org/current/dsl/index.html
+module gradle {
+	// see Gradle.gradle
+	class Project
+	class Task
+	class Gradle
+	class Settings
+	class Script
+	class SourceSet
+	class Copy
+	class JavaCompile
+}
+
 //! Javadoc			===========================================================
 // https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#CHDJGIJB
 /**

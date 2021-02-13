@@ -527,12 +527,14 @@ BOOL IsDocWordChar(int ch) {
 
 	case NP2LEX_CPP:
 		return (ch == '#' || ch == '@' || ch == ':');
+
 	case NP2LEX_CSHARP:
+	case NP2LEX_HAXE:
+	case NP2LEX_SWIFT:
 		return (ch == '#' || ch == '@');
 
 	case NP2LEX_D:
 	case NP2LEX_FSHARP:
-	case NP2LEX_HAXE:
 	case NP2LEX_INNO:
 	case NP2LEX_VB:
 		return (ch == '#');
@@ -544,8 +546,10 @@ BOOL IsDocWordChar(int ch) {
 		return (ch == '$' || ch == '@' || ch == ':');
 
 	case NP2LEX_JAVASCRIPT:
-		return ch == '$' || ch == '#';
+		return ch == '$' || ch == '#' || ch == '@';
 
+	case NP2LEX_DART:
+	case NP2LEX_GRADLE:
 	case NP2LEX_GROOVY:
 	case NP2LEX_SCALA:
 	case NP2LEX_PYTHON:
@@ -1070,6 +1074,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		}
 		break;
 
+	case SCLEX_GROOVY:
 	case SCLEX_JAVA:
 		if (ch == '@') {
 			if (iCurrentStyle == SCE_JAVA_DEFAULT) {
@@ -2153,6 +2158,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_GROOVY:
 	case SCLEX_HAXE:
 	case SCLEX_JAVA:
 	case SCLEX_JAVASCRIPT:
@@ -2294,6 +2300,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_DART:
 	case SCLEX_GO:
 	case SCLEX_GRAPHVIZ:
+	case SCLEX_GROOVY:
 	case SCLEX_HAXE:
 	case SCLEX_JAVA:
 	case SCLEX_JAVASCRIPT:

@@ -978,6 +978,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGN.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexGroovy.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />

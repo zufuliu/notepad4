@@ -9,6 +9,7 @@ from FileGenerator import Regenerate
 
 AllKeywordAttrList = {}
 JavaKeywordMap = {}
+GroovyKeyword = []
 JavaScriptKeywordMap = {}
 
 # see EditLexer.h
@@ -534,6 +535,56 @@ def parse_go_api_file(path):
 		('variables', keywordMap['variables'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('package', keywordMap['package'], KeywordAttr.NoLexer),
+	]
+
+def parse_gradle_api_file(path):
+	sections = read_api_file(path, '//')
+	functions = []
+	for key, doc in sections:
+		if key == 'api':
+			# properties
+			items = re.findall(r'([a-z]\w+)$', doc, re.MULTILINE)
+			functions.extend(items)
+			# methods
+			items = re.findall(r'([a-z]\w+)\s*\(', doc)
+			functions.extend(items)
+			# script block
+			items = re.findall(r'^\s*([a-z]\w+)\s*\{', doc, re.MULTILINE)
+			functions.extend([item + '^{}' for item in items])
+
+	return [
+		('keywords', GroovyKeyword, KeywordAttr.Default),
+		('types', JavaKeywordMap['types'], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('class', JavaKeywordMap['class'], KeywordAttr.Default),
+		('interface', JavaKeywordMap['interface'], KeywordAttr.Default),
+		('enumeration', JavaKeywordMap['enumeration'], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('annotation', JavaKeywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('function', functions, KeywordAttr.NoLexer),
+		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+	]
+
+def parse_groovy_api_file(path):
+	sections = read_api_file(path, '//')
+	keywords = []
+	for key, doc in sections:
+		if key == 'keywords':
+			keywords = doc.split()
+
+	keywords.extend(JavaKeywordMap['keywords'])
+	GroovyKeyword.extend(keywords)
+	return [
+		('keywords', keywords, KeywordAttr.Default),
+		('types', JavaKeywordMap['types'], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('class', JavaKeywordMap['class'], KeywordAttr.Default),
+		('interface', JavaKeywordMap['interface'], KeywordAttr.Default),
+		('enumeration', JavaKeywordMap['enumeration'], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('annotation', JavaKeywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('function', [], KeywordAttr.Default),
+		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 
 def parse_haxe_api_file(path):

@@ -25,7 +25,7 @@ while
 from to
 
 // http://old.haxe.org/ref/keywords
-callback never trace
+callback here never super trace
 
 //! preprocessor
 // Conditional Compilation

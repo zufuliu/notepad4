@@ -1,9 +1,5 @@
-// Scintilla source code edit control
-/** @file LexAccessor.cxx
- ** Interfaces between Scintilla and lexers.
- **/
-// Copyright 1998-2010 by Neil Hodgson <neilh@scintilla.org>
-// The License.txt file describes the conditions under which this software may be distributed.
+// This file is part of Notepad2.
+// See License.txt for details about distribution and modification.
 
 #include <cstdint>
 #include <cassert>
@@ -229,6 +225,19 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 			lengthDoc = endPos - startPos;
 			initStyle = (startPos == 0)? 0 : styler.StyleAt(startPos - 1);
 		}
+	}
+}
+
+void LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, int maxSpaceStyle, int &chPrevNonWhite, int &stylePrevNonWhite) {
+	Sci_PositionU back = startPos - 1;
+	while (back) {
+		const int style = styler.StyleAt(back);
+		if (style > maxSpaceStyle) {
+			chPrevNonWhite = static_cast<unsigned char>(styler.SafeGetCharAt(back));
+			stylePrevNonWhite = style;
+			break;
+		}
+		--back;
 	}
 }
 
