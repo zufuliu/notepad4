@@ -31,6 +31,7 @@
       <File Name="../../scintilla/lexers/LexGN.cxx"/>
       <File Name="../../scintilla/lexers/LexGo.cxx"/>
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
+      <File Name="../../scintilla/lexers/LexGroovy.cxx"/>
       <File Name="../../scintilla/lexers/LexHaxe.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>

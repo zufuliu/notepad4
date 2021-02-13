@@ -1254,6 +1254,15 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[8] = KeywordAttr_NoLexer;		// function
 		attr[9] = KeywordAttr_NoLexer;		// package
 		break;
+	case NP2LEX_GRADLE:
+		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation
+		attr[8] = KeywordAttr_NoLexer;		// function
+		attr[9] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// GroovyDoc
+		break;
+	case NP2LEX_GROOVY:
+		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation
+		attr[9] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// GroovyDoc
+		break;
 	case NP2LEX_HAXE:
 		attr[1] = KeywordAttr_NoAutoComp;	// preprocessor
 		attr[8] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// comment

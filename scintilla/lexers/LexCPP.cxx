@@ -1,7 +1,7 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
 //! Lexer for C, C++, C#, Rescouce Script, Asymptote, D, Objective C/C++, PHP
-//! Groovy, Scala, Jamfile, AWK, IDL/ODL
+//! Scala, Jamfile, AWK, IDL/ODL
 
 #include <cassert>
 #include <cstring>
@@ -26,7 +26,6 @@ using namespace Scintilla;
 #define		LEX_D		7	// D
 #define		LEX_ASY		8	// Asymptote
 #define		LEX_OBJC	10	// Objective C/C++
-#define		LEX_GROOVY	13	// Groovy Script
 #define		LEX_SCALA	14	// Scala Script
 #define		LEX_PHP		29
 #define		LEX_AWK		51	// Awk
@@ -36,13 +35,13 @@ static constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocesso
 	return lex == LEX_CPP || lex == LEX_CS || lex == LEX_RC || lex == LEX_OBJC;
 }
 static constexpr bool HasAnotation(int lex) noexcept { // @anotation
-	return lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_SCALA;
 }
 static constexpr bool HasRegex(int lex) noexcept { // Javascript /regex/
-	return lex == LEX_GROOVY || lex == LEX_AWK;
+	return lex == LEX_AWK;
 }
 static constexpr bool HasTripleVerbatim(int lex) noexcept {
-	return lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_SCALA;
 }
 static constexpr bool SharpComment(int lex) noexcept {
 	return lex == LEX_AWK || lex == LEX_JAM;
@@ -51,7 +50,7 @@ static constexpr bool HasXML(int lex) noexcept {
 	return lex == LEX_SCALA;
 }
 static constexpr bool SquareBraceAfterType(int lex) noexcept {
-	return lex == LEX_CS || lex == LEX_GROOVY || lex == LEX_SCALA;
+	return lex == LEX_CS || lex == LEX_SCALA;
 }
 static constexpr bool IsDStrFix(int ch) noexcept {
 	return ch == 'c' || ch == 'w' || ch == 'd';
@@ -157,7 +156,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	bool isMessagePreprocessor = false;
 	bool followsReturn = false;
 	bool followsPostfixOperator = false;
-	bool isTripleSingle = false;
 	bool isAssignStmt = false;
 	bool inRERange = false;
 
@@ -739,10 +737,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		case SCE_C_TRIPLEVERBATIM:
 			if (sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
 				sc.Forward();
-			} else if (isTripleSingle && sc.Match('\'', '\'', '\'')) {
-				isTripleSingle = false;
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_C_DEFAULT);
 			} else if (sc.Match('"', '"', '"')) {
 				sc.Forward(2);
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -844,10 +838,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					} else if (HasTripleVerbatim(lexType) && sc.Match('"', '"', '"')) {
 						sc.SetState(SCE_C_TRIPLEVERBATIM);
 						sc.Forward(2);
-					} else if (lexType == LEX_GROOVY && sc.Match('\'', '\'', '\'')) {
-						sc.SetState(SCE_C_TRIPLEVERBATIM);
-						sc.Forward(2);
-						isTripleSingle = true;
 					} else if ((lexType == LEX_D) && sc.Match('x', '\"')) {
 						sc.SetState(SCE_C_DSTRINGX);
 						sc.Forward();

@@ -107,6 +107,8 @@ constexpr bool AnyOf(T t, Args... args) noexcept {
 
 // prevent pointer without <type_traits>
 template <typename T, typename... Args>
+constexpr void AnyOf([[maybe_unused]] T *t, [[maybe_unused]] Args... args) noexcept {}
+template <typename T, typename... Args>
 constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args) noexcept {}
 
 constexpr bool Between(int value, int lower, int high) noexcept {

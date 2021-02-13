@@ -64,10 +64,10 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [GN Build](../master/tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](../master/tools/lang/Go.go), up to Go 1.14.
 		* Go+ (GoPlus) and the Q language
-	* Gradle, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
+	* [Gradle](../master/tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 		* blockdiag, seqdiag, actdiag and nwdiag
-	* Groovy
+	* [Groovy](../master/tools/lang/Groovy.groovy), up to Groovy 4.0.
 	* [Haxe](../master/tools/lang/Haxe.hx), up to Haxe 4.1
 	* [HTML](../master/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2020-02-12. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP

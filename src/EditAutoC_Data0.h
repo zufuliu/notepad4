@@ -463,7 +463,6 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 	np2_LexKeyword = NULL;
 	// additional keywords
 	switch (pLexNew->rid) {
-	case NP2LEX_GROOVY:
 	case NP2LEX_SCALA:
 		np2_LexKeyword = &kwJavaDoc;
 		return;

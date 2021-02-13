@@ -1,0 +1,379 @@
+// 6.8.2 https://gradle.org/
+
+//! api
+// https://docs.gradle.org/current/dsl/index.html
+
+// Core types
+// https://docs.gradle.org/current/dsl/org.gradle.api.Project.html
+class Project {
+	// Properties
+	Set<Project> allprojects
+	AntBuilder ant
+	ArtifactHandler artifacts
+	File buildDir
+	File buildFile
+	ScriptHandler buildscript
+	Map<String, Project> childProjects
+	ConfigurationContainer configurations
+	Convention convention
+	List<String> defaultTasks
+	DependencyHandler dependencies
+	DependencyLockingHandler dependencyLocking
+	String description
+	ExtensionContainer extensions
+	Gradle gradle
+	Object group
+	Logger logger
+	LoggingManager logging
+	String name
+	InputNormalizationHandler normalization
+	Project parent
+	String path
+	PluginManager pluginManager
+	PluginContainer plugins
+	Project project
+	File projectDir
+	Map<String, ?> properties
+	RepositoryHandler repositories
+	ResourceHandler resources
+	File rootDir
+	Project rootProject
+	ProjectState state
+	Object status
+	Set<Project> subprojects
+	TaskContainer tasks
+	Object version
+
+	// Methods
+	String absoluteProjectPath(String path)
+	void afterEvaluate(Closure closure)
+	void afterEvaluate(Action<? super Project> action)
+	void allprojects(Action<? super Project> action)
+	AntBuilder ant(Action<? super AntBuilder> configureAction)
+	void apply(Closure closure)
+	void apply(Map<String, ?> options)
+	void apply(Action<? super ObjectConfigurationAction> action)
+	void artifacts(Action<? super ArtifactHandler> configureAction)
+	void beforeEvaluate(Closure closure)
+	void beforeEvaluate(Action<? super Project> action)
+	Iterable<?> configure(Iterable<?> objects, Closure configureClosure)
+	Iterable<T> configure(Iterable<T> objects, Action<? super T> configureAction)
+	Object configure(Object object, Closure configureClosure)
+	NamedDomainObjectContainer<T> container(Class<T> type)
+	NamedDomainObjectContainer<T> container(Class<T> type, Closure factoryClosure)
+	NamedDomainObjectContainer<T> container(Class<T> type, NamedDomainObjectFactory<T> factory)
+	WorkResult copy(Closure closure)
+	WorkResult copy(Action<? super CopySpec> action)
+	CopySpec copySpec()
+	CopySpec copySpec(Closure closure)
+	CopySpec copySpec(Action<? super CopySpec> action)
+	void defaultTasks(String... defaultTasks)
+	boolean delete(Object... paths)
+	WorkResult delete(Action<? super DeleteSpec> action)
+	void dependencyLocking(Action<? super DependencyLockingHandler> configuration)
+	Project evaluationDependsOn(String path)
+	ExecResult exec(Closure closure)
+	ExecResult exec(Action<? super ExecSpec> action)
+	File file(Object path)
+	File file(Object path, PathValidation validation)
+	ConfigurableFileTree fileTree(Object baseDir)
+	ConfigurableFileTree fileTree(Object baseDir, Closure configureClosure)
+	ConfigurableFileTree fileTree(Object baseDir, Action<? super ConfigurableFileTree> configureAction)
+	ConfigurableFileTree fileTree(Map<String, ?> args)
+	ConfigurableFileCollection files(Object paths, Closure configureClosure)
+	ConfigurableFileCollection files(Object paths, Action<? super ConfigurableFileCollection> configureAction)
+	ConfigurableFileCollection files(Object... paths)
+	Project findProject(String path)
+	Object findProperty(String propertyName)
+	Map<Project, Set<Task>> getAllTasks(boolean recursive)
+	Set<Task> getTasksByName(String name, boolean recursive)
+	boolean hasProperty(String propertyName)
+	ExecResult javaexec(Closure closure)
+	ExecResult javaexec(Action<? super JavaExecSpec> action)
+	File mkdir(Object path)
+	void normalization(Action<? super InputNormalizationHandler> configuration)
+	Project project(String path)
+	Project project(String path, Closure configureClosure)
+	Project project(String path, Action<? super Project> configureAction)
+	Object property(String propertyName)
+	String relativePath(Object path)
+	String relativeProjectPath(String path)
+	void setProperty(String name, Object value)
+	void subprojects(Action<? super Project> action)
+	WorkResult sync(Action<? super CopySpec> action)
+	FileTree tarTree(Object tarPath)
+	Task task(String name)
+	Task task(String name, Closure configureClosure)
+	Task task(String name, Action<? super Task> configureAction)
+	Task task(Map<String, ?> args, String name)
+	Task task(Map<String, ?> args, String name, Closure configureClosure)
+	URI uri(Object path)
+	FileTree zipTree(Object zipPath)
+	// Methods added by the java plugin
+	void disableAutoTargetJvm()
+	Manifest manifest()
+	Manifest manifest(Closure closure)
+	Manifest manifest(Action<? super Manifest> action)
+
+	// Script blocks
+	allprojects { }
+	ant { }
+	artifacts { }
+	buildscript { }
+	configurations { }
+	dependencies { }
+	repositories { }
+	subprojects { }
+	application { }
+	distributions { }
+	reporting { }
+	sourceSets { }
+	publishing { }
+	signing { }
+}
+
+// https://docs.gradle.org/current/dsl/org.gradle.api.Task.html
+class Task {
+	// Properties
+	List<Action<? super Task>> actions
+	AntBuilder ant
+	Convention convention
+	Set<Object> dependsOn
+	String description
+	TaskDestroyables destroyables
+	boolean didWork
+	boolean enabled
+	ExtensionContainer extensions
+	TaskDependency finalizedBy
+	String group
+	TaskInputs inputs
+	TaskLocalState localState
+	Logger logger
+	LoggingManager logging
+	TaskDependency mustRunAfter
+	String name
+	TaskOutputs outputs
+	String path
+	Project project
+	TaskDependency shouldRunAfter
+	TaskState state
+	TaskDependency taskDependencies
+	File temporaryDir
+
+	// Methods
+	Task dependsOn(Object... paths)
+	Task doFirst(Closure action)
+	Task doFirst(String actionName, Action<? super Task> action)
+	Task doFirst(Action<? super Task> action)
+	Task doLast(Closure action)
+	Task doLast(String actionName, Action<? super Task> action)
+	Task doLast(Action<? super Task> action)
+	Task finalizedBy(Object... paths)
+	boolean hasProperty(String propertyName)
+	Task mustRunAfter(Object... paths)
+	void onlyIf(Closure onlyIfClosure)
+	void onlyIf(Spec<? super Task> onlyIfSpec)
+	Object property(String propertyName)
+	void setProperty(String name, Object value)
+	TaskDependency shouldRunAfter(Object... paths)
+}
+
+// https://docs.gradle.org/current/dsl/org.gradle.api.invocation.Gradle.html
+class Gradle {
+	// Properties
+	Gradle gradle
+	File gradleHomeDir
+	File gradleUserHomeDir
+	String gradleVersion
+	Collection<IncludedBuild> includedBuilds
+	Gradle parent
+	PluginManager pluginManager
+	PluginContainer plugins
+	Project rootProject
+	StartParameter startParameter
+	TaskExecutionGraph taskGraph
+
+	// Methods
+	void addBuildListener(BuildListener buildListener)
+	void addListener(Object listener)
+	ProjectEvaluationListener addProjectEvaluationListener(ProjectEvaluationListener listener)
+	void afterProject(Closure closure)
+	void afterProject(Action<? super Project> action)
+	void allprojects(Action<? super Project> action)
+	void apply(Closure closure)
+	void apply(Map<String, ?> options)
+	void apply(Action<? super ObjectConfigurationAction> action)
+	void beforeProject(Closure closure)
+	void beforeProject(Action<? super Project> action)
+	void buildFinished(Closure closure)
+	void buildFinished(Action<? super BuildResult> action)
+	IncludedBuild includedBuild(String name)
+	void projectsEvaluated(Action<? super Gradle> action)
+	void projectsLoaded(Closure closure)
+	void projectsLoaded(Action<? super Gradle> action)
+	void removeListener(Object listener)
+	void removeProjectEvaluationListener(ProjectEvaluationListener listener)
+	void rootProject(Action<? super Project> action)
+	void settingsEvaluated(Closure closure)
+	void settingsEvaluated(Action<? super Settings> action)
+	void useLogger(Object logger)
+}
+
+// https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html
+class Settings {
+	// Properties
+	BuildCacheConfiguration buildCache
+	ExtensionContainer extensions
+	Gradle gradle
+	PluginManager pluginManager
+	PluginContainer plugins
+	File rootDir
+	ProjectDescriptor rootProject
+	Settings settings
+	File settingsDir
+	StartParameter startParameter
+
+	// Methods
+	void apply(Closure closure)
+	void apply(Map<String, ?> options)
+	void apply(Action<? super ObjectConfigurationAction> action)
+	void buildCache(Action<? super BuildCacheConfiguration> action)
+	ProjectDescriptor findProject(File projectDir)
+	ProjectDescriptor findProject(String path)
+	void include(String... projectPaths)
+	void includeBuild(Object rootProject)
+	void includeBuild(Object rootProject, Action<ConfigurableIncludedBuild> configuration)
+	void includeFlat(String... projectNames)
+	ProjectDescriptor project(File projectDir)
+	ProjectDescriptor project(String path)
+}
+
+// https://docs.gradle.org/current/dsl/org.gradle.api.Script.html
+class Script {
+	// Properties
+	ScriptHandler buildscript
+	Logger logger
+	LoggingManager logging
+	ResourceHandler resources
+
+	// Methods
+	void apply(Closure closure)
+	void apply(Map<String, ?> options)
+	WorkResult copy(Closure closure)
+	CopySpec copySpec(Closure closure)
+	boolean delete(Object... paths)
+	ExecResult exec(Closure closure)
+	ExecResult exec(Action<? super ExecSpec> action)
+	File file(Object path)
+	File file(Object path, PathValidation validation)
+	ConfigurableFileTree fileTree(Object baseDir)
+	ConfigurableFileTree fileTree(Object baseDir, Closure configureClosure)
+	ConfigurableFileTree fileTree(Map<String, ?> args)
+	ConfigurableFileCollection files(Object paths, Closure configureClosure)
+	ConfigurableFileCollection files(Object... paths)
+	ExecResult javaexec(Closure closure)
+	ExecResult javaexec(Action<? super JavaExecSpec> action)
+	File mkdir(Object path)
+	String relativePath(Object path)
+	FileTree tarTree(Object tarPath)
+	URI uri(Object path)
+	FileTree zipTree(Object zipPath)
+
+	// Script blocks
+	buildscript { }
+}
+
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceSet.html
+class SourceSet {
+	// Properties
+	SourceDirectorySet allJava
+	SourceDirectorySet allSource
+	FileCollection compileClasspath
+	ExtensionContainer extensions
+	SourceDirectorySet java
+	String name
+	SourceSetOutput output
+	SourceDirectorySet resources
+	FileCollection runtimeClasspath
+
+	// Methods
+	SourceSet compiledBy(Object... taskPaths)
+	String getCompileTaskName(String language)
+	String getTaskName(String verb, String target)
+	SourceSet java(Action<? super SourceDirectorySet> configureAction)
+	SourceSet resources(Action<? super SourceDirectorySet> configureAction)
+
+	// Script blocks
+	java {}
+	resources {}
+}
+
+
+// Task types
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Copy.html
+class Copy {
+	// Properties
+	boolean caseSensitive
+	File destinationDir
+	Integer dirMode
+	DuplicatesStrategy duplicatesStrategy
+	Set<String> excludes
+	Integer fileMode
+	boolean includeEmptyDirs
+	Set<String> includes
+	FileCollection source
+
+	// Methods
+	AbstractCopyTask eachFile(Closure closure)
+	AbstractCopyTask eachFile(Action<? super FileCopyDetails> action)
+	AbstractCopyTask exclude(Closure excludeSpec)
+	AbstractCopyTask exclude(Iterable<String> excludes)
+	AbstractCopyTask exclude(String... excludes)
+	AbstractCopyTask exclude(Spec<FileTreeElement> excludeSpec)
+	AbstractCopyTask expand(Map<String, ?> properties)
+	AbstractCopyTask filesMatching(Iterable<String> patterns, Action<? super FileCopyDetails> action)
+	AbstractCopyTask filesMatching(String pattern, Action<? super FileCopyDetails> action)
+	AbstractCopyTask filesNotMatching(Iterable<String> patterns, Action<? super FileCopyDetails> action)
+	AbstractCopyTask filesNotMatching(String pattern, Action<? super FileCopyDetails> action)
+	AbstractCopyTask filter(Closure closure)
+	AbstractCopyTask filter(Class<? extends FilterReader> filterType)
+	AbstractCopyTask filter(Map<String, ?> properties, Class<? extends FilterReader> filterType)
+	AbstractCopyTask filter(Transformer<String, String> transformer)
+	AbstractCopyTask from(Object sourcePath, Closure c)
+	AbstractCopyTask from(Object sourcePath, Action<? super CopySpec> configureAction)
+	AbstractCopyTask from(Object... sourcePaths)
+	AbstractCopyTask include(Closure includeSpec)
+	AbstractCopyTask include(Iterable<String> includes)
+	AbstractCopyTask include(String... includes)
+	AbstractCopyTask include(Spec<FileTreeElement> includeSpec)
+	AbstractCopyTask into(Object destDir)
+	AbstractCopyTask into(Object destPath, Closure configureClosure)
+	CopySpec into(Object destPath, Action<? super CopySpec> copySpec)
+	AbstractCopyTask rename(Closure closure)
+	AbstractCopyTask rename(String sourceRegEx, String replaceWith)
+	AbstractCopyTask rename(Pattern sourceRegEx, String replaceWith)
+	AbstractCopyTask rename(Transformer<String, String> renamer)
+	CopySpec with(CopySpec... sourceSpecs)
+}
+
+// https://docs.gradle.org/current/dsl/org.gradle.api.tasks.compile.JavaCompile.html
+class JavaCompile {
+	// Properties
+	FileCollection classpath
+	Set<String> excludes
+	Set<String> includes
+	CompileOptions options
+	String sourceCompatibility
+	String targetCompatibility
+
+	// Methods
+	SourceTask exclude(Closure excludeSpec)
+	SourceTask exclude(Iterable<String> excludes)
+	SourceTask exclude(String... excludes)
+	SourceTask exclude(Spec<FileTreeElement> excludeSpec)
+	SourceTask include(Closure includeSpec)
+	SourceTask include(Iterable<String> includes)
+	SourceTask include(String... includes)
+	SourceTask include(Spec<FileTreeElement> includeSpec)
+	SourceTask source(Object... sources)
+}
