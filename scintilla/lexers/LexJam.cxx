@@ -18,15 +18,11 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
+#include "LexerUtils.h"
 
 using namespace Scintilla;
 
 namespace {
-
-struct Expansion {
-	int parenCount;
-	int outerState;
-};
 
 enum {
 	JamLineStateMaskLineComment = 1, // line comment
@@ -56,7 +52,7 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	int kwType = SCE_JAM_DEFAULT;
 	int visibleChars = 0;
 
-	std::vector<Expansion> expansion; // for $()
+	std::vector<int> nestedState; // for $()
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 
 	while (sc.More()) {
@@ -146,7 +142,7 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				continue;
 			}
 			if (sc.Match('$', '(')) {
-				expansion.push_back({1, SCE_JAM_STRING});
+				nestedState.push_back(SCE_JAM_STRING);
 				sc.SetState(SCE_JAM_OPERATOR);
 				sc.Forward();
 			} else if (sc.ch == '"') {
@@ -180,25 +176,20 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_JAM_IDENTIFIER);
 			} else if (sc.Match('$', '(')) {
-				expansion.push_back({1, SCE_JAM_DEFAULT});
+				nestedState.push_back(SCE_JAM_DEFAULT);
 				sc.SetState(SCE_JAM_OPERATOR);
 				sc.Forward();
 			} else if (sc.ch == '<' && (sc.chNext == '.' || IsIdentifierStart(sc.chNext))) {
 				sc.SetState(SCE_JAM_FEATURE);
 			} else if (IsJamOperator(sc.ch)) {
 				sc.SetState(SCE_JAM_OPERATOR);
-				if (!expansion.empty() && (sc.ch == '(' || sc.ch == ')')) {
-					auto& back = expansion.back();
+				if (!nestedState.empty()) {
 					if (sc.ch == '(') {
-						++back.parenCount;
-					} else {
-						--back.parenCount;
-						if (back.parenCount == 0) {
-							const int outerState = back.outerState;
-							expansion.pop_back();
-							sc.ForwardSetState(outerState);
-							continue;
-						}
+						nestedState.push_back(SCE_JAM_DEFAULT);
+					} else if (sc.ch == ')') {
+						const int outerState = TakeAndPop(nestedState);
+						sc.ForwardSetState(outerState);
+						continue;
 					}
 				}
 			}
