@@ -238,7 +238,7 @@
 #define NP2StyleX_NowdocString			EDITSTYLE_HOLE(NowdocString, L"Nowdoc String")
 #define NP2StyleX_DateTime				EDITSTYLE_HOLE(DateTime, L"DateTime")
 #define NP2StyleX_Action				EDITSTYLE_HOLE(Action, L"Action")
-
+#define NP2StyleX_Feature				EDITSTYLE_HOLE(Feature, L"Feature")
 #define NP2StyleX_Anchor				EDITSTYLE_HOLE(Anchor, L"Anchor")
 #define NP2StyleX_TextBlock				EDITSTYLE_HOLE(TextBlock, L"Text Block")
 #define NP2StyleX_Math					EDITSTYLE_HOLE(Math, L"Math")
@@ -267,7 +267,7 @@
 #define NP2StyleX_InlineAsm				EDITSTYLE_HOLE(InlineAsm, L"Inline Asm")
 #define NP2StyleX_Callback				EDITSTYLE_HOLE(Callback, L"Callback")
 #define NP2StyleX_Target				EDITSTYLE_HOLE(Target, L"Target")
-#define NP2StyleX_BuiltInRule			EDITSTYLE_HOLE(BuiltInRule, L"Built-in Rule")
+#define NP2StyleX_Rule					EDITSTYLE_HOLE(Rule, L"Rule")
 #define NP2StyleX_BlobHex				EDITSTYLE_HOLE(BlobHex, L"Blob Hex")
 #define NP2StyleX_BitField				EDITSTYLE_HOLE(BitField, L"Bit Field")
 

@@ -46,6 +46,7 @@ extern LexerModule lmGroovy;
 extern LexerModule lmHaxe;
 extern LexerModule lmHTML;
 extern LexerModule lmInno;
+extern LexerModule lmJam;
 extern LexerModule lmJava;
 extern LexerModule lmJavaScript;
 extern LexerModule lmJSON;
@@ -112,6 +113,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmHaxe,
 	&lmHTML,
 	&lmInno,
+	&lmJam,
 	&lmJava,
 	&lmJavaScript,
 	&lmJSON,

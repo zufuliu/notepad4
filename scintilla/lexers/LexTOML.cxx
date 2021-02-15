@@ -43,9 +43,7 @@ struct EscapeSequence {
 };
 
 constexpr bool IsTOMLOperator(int ch) noexcept {
-	return ch == '[' || ch == ']' || ch == '{' || ch == '}' || ch == ','
-		|| ch == '=' || ch == '.'
-		|| ch == '+' || ch == '-';
+	return AnyOf(ch, '[', ']', '{', '}', ',', '=', '.', '+', '-');
 }
 
 constexpr bool IsTOMLDateTime(int ch, int chNext) noexcept {

@@ -626,6 +626,43 @@ def parse_haxe_api_file(path):
 		('comment', keywordMap['comment'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 
+def parse_jam_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'constants', 'features'):
+			keywordMap[key] = doc.split()
+		elif key in ('rules', 'modules', 'classes'):
+			rules = re.findall(r'rule\s+([\w\-]+)', doc)
+			if key == 'rules':
+				keywordMap['builtin rules'] = rules
+			else:
+				keywordMap.setdefault('rules', []).extend(rules)
+				modules = re.findall(r'module\s+([\w\-]+)', doc)
+				if modules:
+					keywordMap['modules'] = modules
+				classes = re.findall(r'class\s+([\w-]+)', doc)
+				if classes:
+					keywordMap['classes'] = classes
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'modules',
+		'classes',
+		'builtin rules',
+		'rules',
+		'features',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('module', keywordMap['modules'], KeywordAttr.Default),
+		('class', keywordMap['classes'], KeywordAttr.Default),
+		('builtin rule', keywordMap['builtin rules'], KeywordAttr.Default),
+		('constant', keywordMap['constants'], KeywordAttr.Default),
+		('rule', keywordMap['rules'], KeywordAttr.NoLexer),
+		('feature', keywordMap['features'], KeywordAttr.NoLexer),
+	]
+
 def parse_java_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}

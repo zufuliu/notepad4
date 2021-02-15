@@ -76,7 +76,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* PHP
 	* INI Configuration File
 	* Inno Setup
-	* Boost Jam
+	* [Boost Jam](../master/tools/lang/Jamfile.jam), up to Jam 4.4.1.
 	* [Java](../master/tools/lang/Java.java), up to Java 16. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2021 (12th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).

@@ -89,7 +89,7 @@ extern EDITLEXER lexHaxe;
 extern EDITLEXER lexINI;
 extern EDITLEXER lexINNO;
 
-extern EDITLEXER lexJAM;
+extern EDITLEXER lexJam;
 extern EDITLEXER lexJulia;
 
 extern EDITLEXER lexKotlin;
@@ -188,7 +188,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexINI,
 	&lexINNO,
 
-	&lexJAM,
+	&lexJam,
 	&lexJulia,
 
 	&lexKotlin,
@@ -1266,6 +1266,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_HAXE:
 		attr[1] = KeywordAttr_NoAutoComp;	// preprocessor
 		attr[8] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// comment
+		break;
+	case NP2LEX_JAM:
+		attr[5] = KeywordAttr_NoLexer;		// rule
+		attr[6] = KeywordAttr_NoLexer;		// feature
 		break;
 	case NP2LEX_JAVA:
 		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation
@@ -2643,7 +2647,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 		}
 		// Boost build
 		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrHasPrefixCase(lpszName, L"Jamfile"))) {
-			pLexNew = &lexJAM;
+			pLexNew = &lexJam;
 			bFound = TRUE;
 		}
 		if (!bFound && (StrHasPrefixCase(lpszName, L"Kconfig") || StrHasPrefixCase(lpszName, L"Doxyfile"))) {

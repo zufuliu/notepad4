@@ -44,14 +44,10 @@ struct EscapeSequence {
 void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int visibleChars = 0;
 	int lineStateLineComment = 0;
-	int braceCount = 0;
-	int expansionLevel = -1;	// for BracketExpansion
+	int expansionLevel = 0;	// for BracketExpansion
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
-	if (sc.currentLine > 0) {
-		braceCount = styler.GetLineState(sc.currentLine - 1) >> 1;
-	}
 
 	while (sc.More()) {
 		switch (sc.state) {
@@ -92,10 +88,9 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				continue;
 			} else if (sc.ch == '$') {
 				if (sc.chNext == '{') {
+					expansionLevel = 1;
 					sc.SetState(SCE_GN_OPERATOR2);
 					sc.Forward();
-					++braceCount;
-					expansionLevel = braceCount;
 				} else if (IsIdentifierStart(sc.chNext)) {
 					sc.SetState(SCE_GN_VARIABLE);
 				}
@@ -155,14 +150,15 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(expansionLevel ? SCE_GN_OPERATOR2 : SCE_GN_OPERATOR);
-				if (sc.ch == '{') {
-					++braceCount;
-				} else if (sc.ch == '}') {
-					--braceCount;
-					if (expansionLevel && expansionLevel == braceCount + 1) {
-						expansionLevel = 0;
-						sc.ForwardSetState(SCE_GN_STRING);
-						continue;
+				if (expansionLevel) {
+					if (sc.ch == '{') {
+						++expansionLevel;
+					} else if (sc.ch == '}') {
+						--expansionLevel;
+						if (expansionLevel == 0) {
+							sc.ForwardSetState(SCE_GN_STRING);
+							continue;
+						}
 					}
 				}
 			}
@@ -172,7 +168,7 @@ void ColouriseGNDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			++visibleChars;
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, lineStateLineComment | (braceCount << 1));
+			styler.SetLineState(sc.currentLine, lineStateLineComment);
 			visibleChars = 0;
 			lineStateLineComment = 0;
 			expansionLevel = 0;
