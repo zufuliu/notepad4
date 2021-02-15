@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexJam.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexJava.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>

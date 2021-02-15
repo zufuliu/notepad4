@@ -12,6 +12,7 @@ def update_all_keyword():
 		('NP2LEX_GN', 'stlGN.c', 'GN.gn', 0, parse_gn_api_file),
 		('NP2LEX_GO', 'stlGO.c', 'Go.go', 0, parse_go_api_file),
 		('NP2LEX_HAXE', 'stlHaxe.c', 'Haxe.hx', 1, parse_haxe_api_file),
+		('NP2LEX_JAM', 'stlJamfile.c', 'Jamfile.jam', 0, parse_jam_api_file),
 		('NP2LEX_JAVA', 'stlJava.c', 'Java.java', 1, parse_java_api_file),
 			('NP2LEX_GROOVY', 'stlGroovy.c', 'Groovy.groovy', 1, parse_groovy_api_file),
 				('NP2LEX_GRADLE', 'stlGradle.c', 'Gradle.gradle', 1, parse_gradle_api_file),

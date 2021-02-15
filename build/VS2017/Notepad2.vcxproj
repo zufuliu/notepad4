@@ -983,6 +983,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJava.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexJam.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJavaScript.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJSON.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexJulia.cxx" />

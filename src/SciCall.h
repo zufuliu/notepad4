@@ -1356,7 +1356,7 @@ NP2_inline void SciCall_SetEdgeColour(COLORREF edgeColour) {
 
 // Lexer
 
-NP2_inline void SciCall_SetLexer(int lexer) {
+NP2_inline void SciCall_SetLexer(int lexer) { //! removed in Scintilla 5
 	SciCall(SCI_SETLEXER, lexer, 0);
 }
 

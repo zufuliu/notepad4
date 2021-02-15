@@ -231,7 +231,7 @@
 #define NP2STYLE_NowdocString			63665
 #define NP2STYLE_DateTime				63666
 #define NP2STYLE_Action					63667
-
+#define NP2STYLE_Feature				63668
 #define NP2STYLE_Anchor					63669
 #define NP2STYLE_TextBlock				63670
 #define NP2STYLE_Math					63671
@@ -260,6 +260,6 @@
 #define NP2STYLE_InlineAsm				63694
 #define NP2STYLE_Callback				63695
 #define NP2STYLE_Target					63696
-#define NP2STYLE_BuiltInRule			63697
+#define NP2STYLE_Rule					63697
 #define NP2STYLE_BlobHex				63698
 #define NP2STYLE_BitField				63699

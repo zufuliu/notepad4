@@ -1,0 +1,374 @@
+# v2 4.4.1 https://boostorg.github.io/build/
+# https://boostorg.github.io/build/manual/develop/index.html
+
+#! keywords			===========================================================
+# https://github.com/boostorg/build/blob/develop/src/engine/jamgramtab.h
+actions
+bind
+break
+case
+class
+continue
+default
+else
+existing
+for
+if
+ignore
+in
+include
+local
+module
+on
+piecemeal
+quietly
+return
+rule
+switch
+together
+updated
+while
+
+import using
+catch try
+false true
+
+
+#! rules			===========================================================
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.rules
+rule exe
+rule lib
+rule install
+rule alias
+rule unit-test
+rule compile
+rule compile-fail
+rule link
+rule link-fail
+rule run
+rule run-fail
+rule check-target-builds ( target message ? : true-properties * : false-properties * )
+rule obj
+rule preprocessed
+rule glob
+rule glob-tree
+rule project
+rule use-project
+rule explicit
+rule always
+rule constant
+rule path-constant
+rule build-project
+rule test-suite
+
+
+# https://boostorg.github.io/build/manual/develop/index.html#jam.language.rules.builtins
+# Dependency Building
+rule DEPENDS ( targets1 * : targets2 * )
+rule INCLUDES ( targets1 * : targets2 * )
+# Modifying Binding
+rule ALWAYS ( targets * )
+rule LEAVES ( targets * )
+rule NOCARE ( targets * )
+rule NOTFILE ( targets * )
+rule NOUPDATE ( targets * )
+rule TEMPORARY ( targets * )
+rule FAIL_EXPECTED ( targets * )
+rule RMOLD ( targets * )
+rule ISFILE ( targets * )
+# Utility
+rule ECHO ( args * )
+rule EXIT ( message * : result-value ? )
+rule GLOB ( directories * : patterns * : downcase-opt ? )
+rule GLOB_ARCHIVE ( archives * : member-patterns * : downcase-opt ? : symbol-patterns ? )
+rule MATCH ( regexps + : list * )
+rule BACKTRACE ( )
+rule UPDATE ( targets * )
+rule W32_GETREG ( path : data ? )
+rule W32_GETREGNAMES ( path : result-type )
+rule SHELL ( command : * )
+rule MD5 ( string )
+rule SPLIT_BY_CHARACTERS ( string : delimiters )
+rule PRECIOUS ( targets * )
+rule PAD ( string : width )
+rule FILE_OPEN ( filename : mode )
+rule UPDATE_NOW ( targets * : log ? : ignore-minus-n ? )
+# Modules https://boostorg.github.io/build/manual/develop/index.html#jam.language.modules
+rule RULENAMES ( module ? )
+rule VARNAMES ( module ? )
+rule IMPORT ( source_module ? : source_rules * : target_module ? : target_rules * )
+rule EXPORT ( module ? : rules * )
+rule CALLER_MODULE ( levels ? )
+rule DELETE_MODULE ( module ? )
+
+
+#! constants		===========================================================
+# https://boostorg.github.io/build/manual/develop/index.html#jam.language.variables.builtins
+# https://github.com/boostorg/build/blob/develop/src/engine/constants.h
+__name__
+__bases__
+__class__
+HCACHEFILE
+HCACHEMAXAGE
+HDRSCAN
+HDRRULE
+BINDRULE
+LOCATE
+SEARCH
+JAM_SEMAPHORE
+__TIMING_RULE__
+__ACTION_RULE__
+JAMSHELL
+TMPDIR
+TMPNAME
+TMPFILE
+STDOUT
+STDERR
+JAMDATE
+JAM_TIMESTAMP_RESOLUTION
+JAM_VERSION
+JAMUNAME
+ENVIRON
+ARGV
+PARALLELISM
+KEEP_GOING
+OTHER
+TOTAL
+FILE_DIRSCAN
+MAIN
+MAIN_MAKE
+MAKE_MAKE0
+MAKE_MAKE1
+MAKE_MAKE0SORT
+BINDMODULE
+IMPORT_MODULE
+BUILTIN_GLOB_BACK
+timestamp
+__python__
+python_interface
+EXTRA_PYTHONPATH
+MAIN_PYTHON
+FILE_ARCHIVESCAN
+BUILTIN_GLOB_ARCHIVE_BACK
+
+#! features			===========================================================
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.overview.builtins.features
+address-model
+address-sanitizer
+allow
+architecture
+archiveflags
+asmflags
+asynch-exceptions
+build
+cflags
+cxxflags
+linkflags
+conditional
+coverage
+cxxflags
+cxxstd
+cxxstd-dialect
+c++abi
+c++-template-depth
+debug-symbols
+define
+def-file
+dependency
+dll-path
+embed-manifest
+embed-manifest-file
+embed-manifest-via
+exception-handling
+extern-c-nothrow
+fflags
+file
+find-shared-library
+find-static-library
+flags
+hardcode-dll-paths
+implicit-dependency
+force-include
+include
+inlining
+install-package
+instruction-set
+library
+library-path
+leak-sanitizer
+link
+linkflags
+local-visibility
+location
+location-prefix
+mflags
+mmflags
+name
+optimization
+profiling
+relevant
+rtti
+runtime-debugging
+runtime-link
+search
+source
+staging-prefix
+stdlib
+strip
+suppress-import-lib
+tag
+target-os
+threading
+thread-sanitizer
+toolset
+undef
+undefined-sanitizer
+use
+user-interface
+variant
+vectorize
+version
+visibility
+warnings
+warnings-as-errors
+translate-path
+lto
+lto-mode
+response-file
+
+
+#! modules			===========================================================
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules.modules
+module modules {
+	rule binding ( module-name )
+	rule poke ( module-name ? : variables + : value * )
+	rule peek ( module-name ? : variables + )
+	rule call-in ( module-name ? : rule-name args * : * )
+	rule load ( module-name : filename ? : search * )
+	rule import ( module-names + : rules-opt * : rename-opt * )
+	rule clone-rules ( source-module target-module )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules.path
+module path {
+	rule make ( native )
+	rule native ( path )
+	rule is-rooted ( path )
+	rule has-parent ( path )
+	rule basename ( path )
+	rule parent ( path )
+	rule reverse ( path )
+	rule join ( elements + )
+	rule root ( path root )
+	rule pwd ( )
+	rule glob ( dirs * : patterns + : exclude-patterns * )
+	rule glob-tree ( roots * : patterns + : exclude-patterns * )
+	rule exists ( file )
+	rule all-parents ( path : upper_limit ? : cwd ? )
+	rule glob-in-parents ( dir : patterns + : upper-limit ? )
+	rule relative ( child parent : no-error ? )
+	rule relative-to ( path1 path2 )
+	rule programs-path ( )
+	rule makedirs ( path )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules.regex
+module regex {
+	rule split ( string separator )
+	rule split-list ( list * : separator )
+	rule match ( pattern : string : indices * )
+	rule transform ( list * : pattern : indices * )
+	rule escape ( string : symbols : escape-symbol )
+	rule replace ( string match replacement )
+	rule replace-list ( list * : match : replacement )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules.sequence
+module sequence {
+	rule filter ( predicate + : sequence * )
+	rule transform ( function + : sequence * )
+	rule reverse ( s * )
+	rule insertion-sort ( s * : ordered * )
+	rule merge ( s1 * : s2 * : ordered * )
+	rule join ( s * : joint ? )
+	rule length ( s * )
+	rule unique ( list * : stable ? )
+	rule max-element ( elements + : ordered ? )
+	rule select-highest-ranked ( elements * : ranks * )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules.stage
+module stage {
+	rule add-install-dir ( name : suffix ? : parent ? : options * )
+	rule install-dir-names ( )
+	rule get-dir ( name : property-set : package-name : flags * )
+	rule get-package-name ( property-set : project-module ? )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.modules.type
+module type {
+	rule register ( type : suffixes * : base-type ? )
+	rule register-suffixes ( suffixes + : type )
+	rule registered ( type )
+	rule validate ( type )
+	rule set-scanner ( type : scanner )
+	rule get-scanner ( type : property-set )
+	rule base ( type )
+	rule all-bases ( type )
+	rule all-derived ( type )
+	rule is-derived ( type base )
+	rule set-generated-target-suffix ( type : properties * : suffix )
+	rule change-generated-target-suffix ( type : properties * : suffix )
+	rule generated-target-suffix ( type : property-set )
+	rule set-generated-target-prefix ( type : properties * : prefix )
+	rule change-generated-target-prefix ( type : properties * : prefix )
+	rule generated-target-prefix ( type : property-set )
+	rule type ( filename )
+}
+
+
+#! classes			===========================================================
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class.abstract-target
+class abstract-target {
+	rule __init__ ( name : project )
+	rule name ( )
+	rule project ( )
+	rule location ( )
+	rule full-name ( )
+	rule generate ( property-set )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class.project-target
+class project-target : abstract-target {
+	rule build-dir ( )
+	rule main-target ( name )
+	rule has-main-target ( name )
+	rule find ( id : no-error ? )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class.main-target
+class main-target : abstract-target {}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class.basic-target
+class basic-target : abstract-target {
+	rule __init__ ( name : project : sources * : requirements * : default-build * : usage-requirements * )
+	rule construct ( name : source-targets * : property-set )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class.typed-target
+class typed-target : basic-target {
+	rule type ( )
+}
+
+# https://boostorg.github.io/build/manual/develop/index.html#bbv2.reference.class.property-set
+class property-set {
+	rule raw ( )
+	rule str ( )
+	rule propagated ( )
+	rule add ( ps )
+	rule add-raw ( properties * )
+	rule refine ( ps )
+	rule get ( feature )
+}

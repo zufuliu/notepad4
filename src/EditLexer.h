@@ -125,7 +125,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_CONF			63049	// SCLEX_CONF		Config File
 #define NP2LEX_DIFF			63050	// SCLEX_DIFF		Diff/Patch
 #define NP2LEX_AWK			63051	// SCLEX_CPP		Awk Script
-#define NP2LEX_JAM			63052	// SCLEX_CPP		Jamfile
+#define NP2LEX_JAM			63052	// SCLEX_JAM		Jamfile
 #define NP2LEX_DOT			63053	// SCLEX_GRAPHVIZ	GraphViz Dot
 #define NP2LEX_JSON			63054	// SCLEX_JSON		JSON Document
 #define NP2LEX_SMALI		63055	// SCLEX_SMALI		Android Smali

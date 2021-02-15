@@ -153,6 +153,5 @@ static inline BOOL DidLexerHasBlockComment(int iLexer, int rid) {
 		|| iLexer == SCLEX_VIM
 		|| iLexer == SCLEX_YAML
 		|| rid == NP2LEX_AWK
-		|| rid == NP2LEX_JAM
 	);
 }

@@ -2175,6 +2175,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_CMAKE:
 	case SCLEX_CONF:
 	case SCLEX_GN:
+	case SCLEX_JAM:
 	case SCLEX_JULIA:
 	case SCLEX_MAKEFILE:
 	case SCLEX_NSIS:
@@ -2193,7 +2194,6 @@ void EditToggleCommentLine(void) {
 	case SCLEX_CPP:
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
-		case NP2LEX_JAM:
 			EditToggleLineComments(L"#", FALSE);
 			break;
 		default:
@@ -2326,7 +2326,6 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_CPP:
 		switch (pLexCurrent->rid) {
 		case NP2LEX_AWK:
-		case NP2LEX_JAM:
 			break;
 
 		default:
@@ -2372,16 +2371,17 @@ void EditToggleCommentBlock(void) {
 		EditEncloseSelection(L"{", L"}");
 		break;
 
+	case SCLEX_JAM:
+	case SCLEX_LISP:
+		EditEncloseSelection(L"#|", L"|#");
+		break;
+
 	case SCLEX_JULIA:
 		EditEncloseSelection(L"#=", L"=#");
 		break;
 
 	case SCLEX_LATEX:
 		EditEncloseSelectionNewLine(L"\\begin{comment}", L"\\end{comment}");
-		break;
-
-	case SCLEX_LISP:
-		EditEncloseSelection(L"#|", L"|#");
 		break;
 
 	case SCLEX_LUA:
