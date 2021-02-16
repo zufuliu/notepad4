@@ -61,21 +61,27 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_GO_TASKMARKER;
 }
 
-constexpr bool IsFormatSpecifier(uint8_t ch) noexcept {
-	return ch == 'v'
-		|| ch == 'b'
-		|| ch == 'c'
-		|| ch == 'd'
-		|| ch == 'e' || ch == 'E'
-		|| ch == 'f' || ch == 'F'
-		|| ch == 'g' || ch == 'G'
-		|| ch == 'o' || ch == 'O'
-		|| ch == 'p'
-		|| ch == 'q'
-		|| ch == 's'
-		|| ch == 't' || ch == 'T'
-		|| ch == 'x' || ch == 'X'
-		|| ch == 'U';
+// https://pkg.go.dev/fmt
+
+constexpr bool IsFormatFlags(int ch) noexcept {
+	return AnyOf(ch, ' ', '+', '-', '#', '.', '0');
+}
+
+constexpr bool IsFormatSpecifier(int ch) noexcept {
+	return AnyOf(ch, 'v',
+					'b',
+					'c',
+					'd',
+					'e', 'E',
+					'f', 'F',
+					'g', 'G',
+					'o', 'O',
+					'p',
+					'q',
+					's',
+					't', 'T',
+					'U',
+					'x', 'X');
 }
 
 inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
@@ -92,7 +98,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (AnyOf(sc.chNext, ' ', '+', '-', '#', '.', '0')) {
+	if (IsFormatFlags(sc.chNext)) {
 		++pos;
 	}
 	while (pos < sc.lineStartNext) {

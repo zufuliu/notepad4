@@ -104,6 +104,7 @@ static EDITSTYLE Styles_Java[] = {
 	{ MULTI_STYLE(SCE_JAVA_CHARACTER, SCE_JAVA_STRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_JAVA_TRIPLE_STRING, NP2StyleX_TextBlock, L"fore:#F08000" },
 	{ SCE_JAVA_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_JAVA_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_JAVA_LABEL, NP2StyleX_Label, L"back:#FFC040" },
 	{ SCE_JAVA_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_JAVA_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },

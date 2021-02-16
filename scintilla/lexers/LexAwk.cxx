@@ -53,6 +53,10 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_AWK_TASKMARKER;
 }
 
+constexpr bool IsFormatModifier(int ch) noexcept {
+	return AnyOf(ch, ' ', '+', '-', '#', '.', '0', '\'');
+}
+
 constexpr bool IsFormatSpecifier(int ch) noexcept {
 	// https://www.gnu.org/software/gawk/manual/html_node/Control-Letters.html
 	return AnyOf(ch, 'a', 'A',
@@ -122,7 +126,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (AnyOf(sc.chNext, ' ', '+', '-', '#', '\'', '.', '0')) {
+	if (IsFormatModifier(sc.chNext)) {
 		++pos;
 	} else if (sc.chNext == 'E' || sc.chNext == 'O') {
 		const uint8_t ch = sc.styler.SafeGetCharAt(pos + 2);
@@ -135,7 +139,12 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 		if (IsFormatSpecifier(ch)) {
 			return pos - sc.currentPos + 1;
 		}
-		if (!(IsADigit(ch) || ch == '*' || ch == '.' || ch == '$')) {
+		if (ch == '$') {
+			const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
+			if (IsFormatModifier(chNext)) {
+				++pos;
+			}
+		} else if (!(IsADigit(ch) || ch == '*' || ch == '.')) {
 			break;
 		}
 		++pos;
@@ -245,10 +254,9 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.ch == '%') {
 				const Sci_Position length = CheckFormatSpecifier(sc, insideUrl);
 				if (length != 0) {
-					const int state = sc.state;
 					sc.SetState(SCE_AWK_FORMAT_SPECIFIER);
 					sc.Forward(length);
-					sc.SetState(state);
+					sc.SetState(SCE_AWK_STRING);
 					continue;
 				}
 			} else if (sc.ch == '"') {
@@ -340,7 +348,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 		}
 		if (sc.atLineEnd) {
-			int lineState = lineStateLineType | lineContinuation;
+			const int lineState = lineStateLineType | lineContinuation;
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;
 			visibleChars = 0;
