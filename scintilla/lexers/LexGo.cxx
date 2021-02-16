@@ -63,7 +63,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 
 // https://pkg.go.dev/fmt
 
-constexpr bool IsFormatFlags(int ch) noexcept {
+constexpr bool IsFormatFlag(int ch) noexcept {
 	return AnyOf(ch, ' ', '+', '-', '#', '.', '0');
 }
 
@@ -98,7 +98,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (IsFormatFlags(sc.chNext)) {
+	if (IsFormatFlag(sc.chNext)) {
 		++pos;
 	}
 	while (pos < sc.lineStartNext) {
