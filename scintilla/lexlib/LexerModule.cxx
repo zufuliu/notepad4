@@ -28,6 +28,7 @@ extern LexerModule lmAPDL;
 extern LexerModule lmAsm;
 extern LexerModule lmAU3;
 extern LexerModule lmAVS;
+extern LexerModule lmAwk;
 extern LexerModule lmBash;
 extern LexerModule lmBatch;
 extern LexerModule lmCIL;
@@ -95,6 +96,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmAsm,
 	&lmAU3,
 	&lmAVS,
+	&lmAwk,
 	&lmBash,
 	&lmBatch,
 	&lmCIL,

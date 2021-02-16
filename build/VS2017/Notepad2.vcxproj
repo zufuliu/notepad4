@@ -964,6 +964,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAutoIt3.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexAviSynth.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexAwk.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexBash.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexBatch.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCIL.cxx" />

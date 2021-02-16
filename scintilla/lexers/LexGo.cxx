@@ -78,7 +78,7 @@ constexpr bool IsFormatSpecifier(uint8_t ch) noexcept {
 		|| ch == 'U';
 }
 
-Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -92,7 +92,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexce
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (sc.chNext == '+' || sc.chNext == '-' || sc.chNext == '#' || sc.chNext == ' ') {
+	if (AnyOf(sc.chNext, ' ', '+', '-', '#', '.', '0')) {
 		++pos;
 	}
 	while (pos < sc.lineStartNext) {
@@ -108,7 +108,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexce
 	return 0;
 }
 
-int DetectIdentifierType(LexAccessor &styler, int funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
+inline int DetectIdentifierType(LexAccessor &styler, int funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
 	if (((funcState == GoFunction_Caller || funcState == GoFunction_Return) && (chNext == ')' || chNext == ','))
 		|| (funcState > GoFunction_Name && chNext == '{')) {
 		// func (identifier *Type) (Type, error)

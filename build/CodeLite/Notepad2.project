@@ -17,6 +17,7 @@
       <File Name="../../scintilla/lexers/LexAsm.cxx"/>
       <File Name="../../scintilla/lexers/LexAutoIt3.cxx"/>
       <File Name="../../scintilla/lexers/LexAviSynth.cxx"/>
+      <File Name="../../scintilla/lexers/LexAwk.cxx"/>
       <File Name="../../scintilla/lexers/LexBash.cxx"/>
       <File Name="../../scintilla/lexers/LexBatch.cxx"/>
       <File Name="../../scintilla/lexers/LexCIL.cxx"/>
