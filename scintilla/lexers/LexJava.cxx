@@ -68,7 +68,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 // for java.util.Formatter
 // https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/util/Formatter.html
 
-constexpr bool IsFormatFlags(int ch) noexcept {
+constexpr bool IsFormatFlag(int ch) noexcept {
 	return AnyOf(ch, ' ', '+', '-', '#', '.', '0', '<', '(', ',');
 }
 
@@ -107,7 +107,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (IsFormatFlags(sc.chNext)) {
+	if (IsFormatFlag(sc.chNext)) {
 		++pos;
 	}
 	while (pos < sc.lineStartNext) {
@@ -124,13 +124,32 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 		}
 		if (ch == '$') {
 			const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
-			if (IsFormatFlags(chNext)) {
+			if (IsFormatFlag(chNext)) {
 				++pos;
 			}
 		} else if (!(IsADigit(ch) || ch == '*' || ch == '.' || ch == ',')) {
 			break;
 		}
 		++pos;
+	}
+	return 0;
+}
+
+inline Sci_Position CheckPlaceholder(const StyleContext &sc) noexcept {
+	if (IsADigit(sc.chNext)) {
+		// for java.text.MessageFormat, only simplest form: {num}
+		// https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/text/MessageFormat.html
+		Sci_PositionU pos = sc.currentPos + 2;
+		while (pos < sc.lineStartNext) {
+			const uint8_t ch = sc.styler[pos];
+			if (ch == '}') {
+				return pos - sc.currentPos + 1;
+			}
+			if (!IsADigit(ch)) {
+				break;
+			}
+			++pos;
+		}
 	}
 	return 0;
 }
@@ -374,7 +393,15 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(state);
 					continue;
 				}
-			//} else if (sc.ch == '{') {
+			} else if (sc.ch == '{') {
+				const Sci_Position length = CheckPlaceholder(sc);
+				if (length != 0) {
+					const int state = sc.state;
+					sc.SetState(SCE_JAVA_PLACEHOLDER);
+					sc.Forward(length);
+					sc.SetState(state);
+					continue;
+				}
 			} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_JAVA_TRIPLE_STRING) {
 					sc.Forward(2);
@@ -462,8 +489,8 @@ struct FoldLineState {
 };
 
 constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_JAVA_ESCAPECHAR || style == SCE_JAVA_FORMAT_SPECIFIER || style == SCE_JAVA_PLACEHOLDER
-		|| style == SCE_JAVA_COMMENTTAGAT || style == SCE_JAVA_COMMENTTAGHTML || style == SCE_JAVA_TASKMARKER;
+	return AnyOf(style, SCE_JAVA_ESCAPECHAR, SCE_JAVA_FORMAT_SPECIFIER, SCE_JAVA_PLACEHOLDER,
+				SCE_JAVA_COMMENTTAGAT, SCE_JAVA_COMMENTTAGHTML, SCE_JAVA_TASKMARKER);
 }
 
 void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
