@@ -1,7 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for C, C++, C#, Rescouce Script, Asymptote, D, Objective C/C++, PHP
-//! Scala, AWK, IDL/ODL
+//! Lexer for C, C++, C#, Rescouce Script, Asymptote, D, Objective C/C++, PHP, Scala, IDL/ODL
 
 #include <cassert>
 #include <cstring>
@@ -28,7 +27,6 @@ using namespace Scintilla;
 #define		LEX_OBJC	10	// Objective C/C++
 #define		LEX_SCALA	14	// Scala Script
 #define		LEX_PHP		29
-#define		LEX_AWK		51	// Awk
 
 static constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocessor
 	return lex == LEX_CPP || lex == LEX_CS || lex == LEX_RC || lex == LEX_OBJC;
@@ -36,14 +34,8 @@ static constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocesso
 static constexpr bool HasAnotation(int lex) noexcept { // @anotation
 	return lex == LEX_SCALA;
 }
-static constexpr bool HasRegex(int lex) noexcept { // Javascript /regex/
-	return lex == LEX_AWK;
-}
 static constexpr bool HasTripleVerbatim(int lex) noexcept {
 	return lex == LEX_SCALA;
-}
-static constexpr bool SharpComment(int lex) noexcept {
-	return lex == LEX_AWK;
 }
 static constexpr bool HasXML(int lex) noexcept {
 	return lex == LEX_SCALA;
@@ -153,10 +145,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	bool isPreprocessorWord = false;
 	bool isIncludePreprocessor = false;
 	bool isMessagePreprocessor = false;
-	bool followsReturn = false;
-	bool followsPostfixOperator = false;
 	bool isAssignStmt = false;
-	bool inRERange = false;
 
 	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
 		// Set continuationLine if last character of previous line is '\'
@@ -170,16 +159,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				lineEndChar = chBack2;
 			}
 			continuationLine = lineEndChar == '\\';
-		}
-	}
-
-	// look back to set chPrevNonWhite properly for better regex colouring
-	if (startPos > 0) {
-		Sci_Position back = startPos;
-		while (--back && IsSpaceEquiv(styler.StyleAt(back)));
-
-		if (styler.StyleAt(back) == SCE_C_OPERATOR) {
-			chPrevNonWhite = styler.SafeGetCharAt(back);
 		}
 	}
 
@@ -205,16 +184,11 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			lastWordWasUUID = false;
 			lastWordWasGoto = false;
 			lastPPDefineWord = 0;
-			followsReturn = false;
-			followsPostfixOperator = false;
 
 			isPreprocessorWord = false;
 			isPragmaPreprocessor = false;
 			isIncludePreprocessor = false;
 			isMessagePreprocessor = false;
-			if (!(lexType & LEX_AWK)) {
-				inRERange = false;
-			}
 
 			if (!continuationLine) {
 				lineState &= LEX_BLOCK_UMASK_ALL;
@@ -250,7 +224,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				else
 					sc.GetCurrent(s, sizeof(s));
 
-				followsReturn = false;
 				//int len = static_cast<int>(strlen(s));
 				//bool pps = (len > 4 && s[0] == '_' && s[1] == '_' && s[len - 1] == '_' && s[len - 2] == '_');
 				//char tu[256]{};
@@ -316,7 +289,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					lastWordWasAsm = StrEqualsAny(s, "asm", "__asm");
 					lastWordWasUUID = StrEqual(s, "uuid");
 					lastWordWasGoto = StrEqualsAny(s, "goto", "__label__", "break", "continue");
-					followsReturn = StrEqual(s, "return");
 					if (!isTypeDefine)
 						isTypeDefine = StrEqual(s, "typedef");
 					if (!lastWordWasAttr)
@@ -702,24 +674,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 			break;
 
-		case SCE_C_REGEX:
-			if (sc.atLineStart && !(lexType & LEX_AWK)) {
-				sc.SetState(SCE_C_DEFAULT);
-			} else if (!inRERange && sc.ch == '/') {
-				sc.Forward();
-				while (IsLowerCase(sc.ch)) {
-					sc.Forward();	 // gobble regex flags
-				}
-				sc.SetState(SCE_C_DEFAULT);
-			} else if (sc.ch == '\\') {
-				// Gobble up the escaped character
-				sc.Forward();
-			} else if (sc.ch == '[') {
-				inRERange = true;
-			} else if (sc.ch == ']') {
-				inRERange = false;
-			}
-			break;
 		case SCE_C_VERBATIM:
 			if (isObjCSource && sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
 				sc.Forward();
@@ -849,7 +803,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						sc.Forward();
 					} else if (sc.ch == '`' && (lexType == LEX_D)) {
 						sc.SetState(SCE_C_DSTRINGB);
-					} else if (!SharpComment(lexType) && sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
+					} else if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
 						const int chNext = sc.chNext;
 						sc.SetState((chNext == '/') ? SCE_C_COMMENTLINE : SCE_C_COMMENT);
 						sc.Forward(2);
@@ -857,23 +811,12 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							sc.ChangeState((chNext == '/') ? SCE_C_COMMENTLINEDOC : SCE_C_COMMENTDOC);
 						}
 						continue;
-					} else if ((SharpComment(lexType) || lexType == LEX_PHP) && sc.ch == '#') {
+					} else if (lexType == LEX_PHP && sc.ch == '#') {
 						sc.SetState(SCE_C_COMMENTLINE);
 					} else if (IsNumberStart(sc.ch, sc.chNext)) {
 						sc.SetState(SCE_C_NUMBER);
-					} else if (sc.ch == '/') { // bug
-						// RegExp only appears in assignment or function argument
-						//if (HasRegex(lexType) && (isAssignStmt || numRBrace > 0) && (strchr("([{=,:;!%^&*|?~+-", chPrevNonWhite) || followsReturn)
-						const bool isJsRegex = (isAssignStmt && (chPrevNonWhite == '=' || chPrevNonWhite == ':')) 	// assignment
-							|| (numRBrace > 0 && AnyOf(chPrevNonWhite, '(', ',', '!', '&', '|'))	// argument
-							|| (chPrevNonWhite == '}' || chPrevNonWhite == ';')
-							|| followsReturn;
-						if (HasRegex(lexType) && isJsRegex
-							&& !(chPrevNonWhite == '+' || chPrevNonWhite == '-' || followsPostfixOperator)) {
-							sc.SetState(SCE_C_REGEX);	// JavaScript's RegEx
-							followsReturn = false;
-							inRERange = false;
-						} else if ((lexType == LEX_D) && sc.chNext == '+') {
+					} else if (sc.ch == '/') {
+						if (lexType == LEX_D && sc.chNext == '+') {
 							++curNcLevel;
 							sc.SetState(SCE_C_DNESTEDCOMMENT);
 							sc.Forward();
@@ -936,8 +879,8 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 								sc.SetState(SCE_C_IDENTIFIER);
 							}
 						}
-					} else if (sc.ch == '$' && (lexType == LEX_AWK || lexType == LEX_PHP)) {
-						if (lexType == LEX_PHP && !iswordstart(sc.chNext))
+					} else if (sc.ch == '$' && lexType == LEX_PHP) {
+						if (!iswordstart(sc.chNext))
 							sc.SetState(SCE_C_OPERATOR);
 						else
 							sc.SetState(SCE_C_VARIABLE);
@@ -980,10 +923,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						|| (lexType == LEX_PHP && sc.ch == '\\')) {
 						sc.SetState(SCE_C_OPERATOR);
 						isPragmaPreprocessor = false;
-						if ((sc.ch == '+' && sc.chPrev == '+') || (sc.ch == '-' && sc.chPrev == '-'))
-							followsPostfixOperator = true;
-						else
-							followsPostfixOperator = false;
 
 						if (lastWordWasUUID && sc.ch == '(') {
 							sc.ForwardSetState(SCE_C_UUID);
@@ -996,7 +935,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						if (sc.ch == ';') {
 							isAssignStmt = false;
 							lastWordWasGoto = false;
-							followsReturn = false;
 							//if (numCBrace == 0)
 							isTypeDefine = false;
 						}
@@ -1011,7 +949,6 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							//}
 						} else if (sc.ch == '}') {
 							lastWordWasGoto = false;
-							followsReturn = false;
 							lastWordWasAsm = false;
 							if (lineState & LEX_BLOCK_MASK_ASM) {
 								lineState &= LEX_BLOCK_UMASK_ASM;

@@ -1237,6 +1237,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[4] = KeywordAttr_MakeLower;	// properties
 		attr[5] = KeywordAttr_NoLexer;		// options
 		break;
+	case NP2LEX_AWK:
+		attr[3] = KeywordAttr_NoLexer;		// library function
+		attr[4] = KeywordAttr_NoLexer;		// misc
+		break;
 	case NP2LEX_CMAKE:
 		attr[6] = KeywordAttr_NoLexer;		// long properties
 		attr[7] = KeywordAttr_NoLexer;		// long variables
@@ -1859,7 +1863,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		// Save current lexer
 		pLexCurrent = pLexNew;
 		bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
-		bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer, rid);
+		bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer);
 		UpdateStatusBarCache(STATUS_LEXER);
 		UpdateStatusbar();
 	}

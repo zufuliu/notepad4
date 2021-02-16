@@ -539,6 +539,7 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_VB:
 		return (ch == '#');
 
+	case NP2LEX_AWK:
 	case NP2LEX_JAVA:
 	case NP2LEX_JULIA:
 	case NP2LEX_KOTLIN:
@@ -2153,6 +2154,7 @@ void EditToggleCommentLine(void) {
 		break;
 
 	case SCLEX_CIL:
+	case SCLEX_CPP:
 	case SCLEX_CSS: // for SCSS, LESS, HSS
 	case SCLEX_DART:
 	case SCLEX_FSHARP:
@@ -2172,6 +2174,7 @@ void EditToggleCommentLine(void) {
 		break;
 
 	case SCLEX_AVS:
+	case SCLEX_AWK:
 	case SCLEX_CMAKE:
 	case SCLEX_CONF:
 	case SCLEX_GN:
@@ -2189,17 +2192,6 @@ void EditToggleCommentLine(void) {
 	case SCLEX_TOML:
 	case SCLEX_YAML:
 		EditToggleLineComments(L"#", FALSE);
-		break;
-
-	case SCLEX_CPP:
-		switch (pLexCurrent->rid) {
-		case NP2LEX_AWK:
-			EditToggleLineComments(L"#", FALSE);
-			break;
-		default:
-			EditToggleLineComments(L"//", FALSE);
-			break;
-		}
 		break;
 
 	case SCLEX_FORTRAN:
@@ -2296,6 +2288,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_ASM:
 	case SCLEX_AVS:
 	case SCLEX_CIL:
+	case SCLEX_CPP:
 	case SCLEX_CSS:
 	case SCLEX_DART:
 	case SCLEX_GO:
@@ -2321,17 +2314,6 @@ void EditToggleCommentBlock(void) {
 
 	case SCLEX_CMAKE:
 		EditEncloseSelection(L"#[[", L"]]");
-		break;
-
-	case SCLEX_CPP:
-		switch (pLexCurrent->rid) {
-		case NP2LEX_AWK:
-			break;
-
-		default:
-			EditEncloseSelection(L"/*", L"*/");
-			break;
-		}
 		break;
 
 	case SCLEX_FORTRAN:

@@ -283,6 +283,31 @@ def parse_avisynth_api_file(path):
 		('options', keywordMap['options'], KeywordAttr.NoLexer),
 	]
 
+def parse_awk_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'predefined variables', 'misc'):
+			keywordMap[key] = doc.split()
+		elif key in ('built-in functions', 'library functions'):
+			items = re.findall(r'(\w+)\s*\(', doc)
+			keywordMap[key] = [item + '(' for item in items]
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'predefined variables',
+		'built-in functions',
+		'library functions',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('predefined variable', keywordMap['predefined variables'], KeywordAttr.Default),
+		('built-in function', keywordMap['built-in functions'], KeywordAttr.Default),
+		('library function', keywordMap['library functions'], KeywordAttr.NoLexer),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
 	cmakeLang = "ASM C CSharp CUDA CXX Fortran Java RC Swift".split()

@@ -48,6 +48,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexAviSynth.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexAwk.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexBash.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
