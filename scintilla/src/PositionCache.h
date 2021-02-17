@@ -210,14 +210,14 @@ typedef std::map<unsigned int, Representation> MapRepresentation;
 
 class SpecialRepresentations {
 	MapRepresentation mapReprs;
-	unsigned char startByteHasReprs[0x100];
+	unsigned char startByteHasReprs[0x100]{};
 public:
-	SpecialRepresentations() noexcept;
+	SpecialRepresentations() noexcept {}
 	void SetRepresentation(const char *charBytes, const char *value);
 	void ClearRepresentation(const char *charBytes);
 	const Representation *RepresentationFromCharacter(const char *charBytes, size_t len) const;
 	bool Contains(const char *charBytes, size_t len) const;
-	void Clear();
+	void Clear() noexcept;
 };
 
 struct TextSegment {
