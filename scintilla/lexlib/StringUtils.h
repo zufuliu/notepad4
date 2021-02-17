@@ -33,7 +33,7 @@ inline bool StrHasSuffix(const char *s, size_t length, const char (&suffix)[N]) 
 }
 
 
-#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD) || (_MSC_VER >= 1920)
+#if defined(__clang__) || defined(__GNUC__) || !defined(_MSC_BUILD)// || (_MSC_VER >= 1920)
 template <size_t N>
 constexpr bool StrEqual(const char *s, const char (&t)[N]) noexcept {
 	return __builtin_memcmp(s, t, N) == 0;
