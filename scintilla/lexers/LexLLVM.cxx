@@ -82,7 +82,6 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int lineStateLineComment = 0;
 	int kwType = SCE_LLVM_DEFAULT;
 	int visibleChars = 0;
-	bool noCharacterBefore = false;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -127,7 +126,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						state = SCE_LLVM_ATTRIBUTE;
 					} else if (keywordLists[3]->InList(s)) {
 						state = SCE_LLVM_INSTRUCTION;
-					} else if (sc.ch == ':' && noCharacterBefore) {
+					} else if (sc.ch == ':' && visibleChars == sc.LengthCurrent()) {
 						state = SCE_LLVM_LABEL;
 					}
 				}
@@ -225,18 +224,16 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == 'i' && IsADigit(sc.chNext)) {
 				// iN
 				sc.SetState(SCE_LLVM_WORD2);
-			} else if (sc.ch == 'x' && isspacechar(sc.chNext)) {
-				sc.SetState(SCE_LLVM_OPERATOR);
 			} else if (IsIdentifierStart(sc.ch)) {
-				noCharacterBefore = visibleChars == 0;
+				sc.SetState((sc.ch == 'x' && isspacechar(sc.chNext)) ? SCE_LLVM_OPERATOR : SCE_LLVM_IDENTIFIER);
 				sc.SetState(SCE_LLVM_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_LLVM_OPERATOR);
 			}
 		}
 
-		if (visibleChars == 0 && !isspacechar(sc.ch)) {
-			visibleChars = 1;
+		if (!isspacechar(sc.ch)) {
+			++visibleChars;
 		}
 		if (sc.atLineEnd) {
 			styler.SetLineState(sc.currentLine, lineStateLineComment);

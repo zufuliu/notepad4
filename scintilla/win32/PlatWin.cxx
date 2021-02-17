@@ -3506,7 +3506,7 @@ bool ListBoxX_Register() noexcept {
 	// truncated items in the list and the appearance/disappearance of the vertical scroll bar.
 	// The list repaint is double-buffered to avoid the flicker this would otherwise cause.
 	wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
-	wndclassc.cbWndExtra = sizeof(ListBoxX *);
+	wndclassc.cbWndExtra = sizeof(LONG_PTR);
 	wndclassc.hInstance = hinstPlatformRes;
 	wndclassc.lpfnWndProc = ListBoxX::StaticWndProc;
 	wndclassc.hCursor = ::LoadCursor({}, IDC_ARROW);

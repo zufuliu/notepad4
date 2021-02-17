@@ -3769,7 +3769,7 @@ void ScintillaWin::PrepareOnce() noexcept
 	WNDCLASSEX wndclassc {};
 	wndclassc.cbSize = sizeof(wndclassc);
 	wndclassc.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
-	wndclassc.cbWndExtra = sizeof(ScintillaWin *);
+	wndclassc.cbWndExtra = sizeof(LONG_PTR);
 	wndclassc.hInstance = hInstance;
 	wndclassc.lpfnWndProc = ScintillaWin::CTWndProc;
 	wndclassc.hCursor = ::LoadCursor({}, IDC_ARROW);
@@ -3790,7 +3790,7 @@ bool ScintillaWin::Register(HINSTANCE hInstance_) noexcept {
 	wndclass.cbSize = sizeof(wndclass);
 	wndclass.style = CS_GLOBALCLASS | CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc = ScintillaWin::SWndProc;
-	wndclass.cbWndExtra = sizeof(ScintillaWin *);
+	wndclass.cbWndExtra = sizeof(LONG_PTR);
 	wndclass.hInstance = hInstance;
 	wndclass.lpszClassName = L"Scintilla";
 	scintillaClassAtom = ::RegisterClassExW(&wndclass);
