@@ -1008,7 +1008,7 @@ static void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, PRectangle r
 	if (fillBackground) {
 		surface->FillRectangle(rcSegment, textBack);
 	}
-	FontAlias ctrlCharsFont = vsDraw.styles[STYLE_CONTROLCHAR].font;
+	const FontAlias ctrlCharsFont = vsDraw.styles[STYLE_CONTROLCHAR].font;
 	const XYPOSITION normalCharHeight = std::ceil(vsDraw.styles[STYLE_CONTROLCHAR].capitalHeight);
 	PRectangle rcCChar = rcSegment;
 	rcCChar.left = rcCChar.left + 1;
@@ -2013,7 +2013,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 		if (rcSegment.Intersects(rcLine)) {
 			const int styleMain = ll->styles[i];
 			ColourDesired textFore = vsDraw.styles[styleMain].fore;
-			FontAlias textFont = vsDraw.styles[styleMain].font;
+			const FontAlias textFont = vsDraw.styles[styleMain].font;
 			//hotspot foreground
 			const bool inHotspot = (ll->hotspot.Valid()) && ll->hotspot.ContainsCharacter(iDoc);
 			if (inHotspot) {
@@ -2091,7 +2091,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						// Using one font for all control characters so it can be controlled independently to ensure
 						// the box goes around the characters tightly. Seems to be no way to work out what height
 						// is taken by an individual character - internal leading gives varying results.
-						FontAlias ctrlCharsFont = vsDraw.styles[STYLE_CONTROLCHAR].font;
+						const FontAlias ctrlCharsFont = vsDraw.styles[STYLE_CONTROLCHAR].font;
 						const char cc[2] = { static_cast<char>(vsDraw.controlCharSymbol), '\0' };
 						surface->DrawTextNoClip(rcSegment, ctrlCharsFont,
 							rcSegment.top + vsDraw.maxAscent,

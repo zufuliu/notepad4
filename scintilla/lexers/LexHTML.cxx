@@ -396,7 +396,7 @@ constexpr int defaultStateForSGML(script_type scriptLanguage) noexcept {
 	return (scriptLanguage == eScriptSGMLblock)? SCE_H_SGML_BLOCK_DEFAULT : SCE_H_SGML_DEFAULT;
 }
 
-bool issgmlwordchar(int ch) noexcept {
+constexpr bool issgmlwordchar(int ch) noexcept {
 	return !IsASCII(ch) ||
 		(IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == ':' || ch == '!' || ch == '#' || ch == '[');
 }

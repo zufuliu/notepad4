@@ -211,7 +211,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 		}
 		if (atEOL || (i == endPos - 1)) {
-			int levelUse = levelCurrent;
+			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
