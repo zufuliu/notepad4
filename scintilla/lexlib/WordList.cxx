@@ -17,11 +17,13 @@
 using namespace Scintilla;
 using range_t = WordList::range_t;
 
+namespace {
+
 /**
  * Creates an array that points into each word in the string and puts \0 terminators
  * after each word.
  */
-static char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
+inline char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
 	int prev = 1;
 	range_t words = 0;
 	// treat space and C0 control characters as word separators.
@@ -62,6 +64,28 @@ static char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
 	keywords[wordsStore] = end;
 	*len = wordsStore;
 	return keywords;
+}
+
+/** Threshold for linear search.
+ * Because of cache locality and other metrics, linear search is faster than binary search
+ * when word list contains few words.
+ */
+constexpr range_t WordListLinearSearchThreshold = 5;
+
+// words in [start, end) starts with same character, maximum word count limited to 0xffff.
+struct Range {
+	range_t start;
+	const range_t end;
+	explicit constexpr Range(range_t range) noexcept : start(range & 0xffff), end(range >> 16) {}
+	constexpr range_t Length() const noexcept {
+		return end - start;
+	}
+	bool Next() noexcept {
+		++start;
+		return start < end;
+	}
+};
+
 }
 
 WordList::WordList() noexcept :
@@ -139,12 +163,6 @@ bool WordList::Set(const char *s, bool toLower) {
 	}
 	return true;
 }
-
-/** Threshold for linear search.
- * Because of cache locality and other metrics, linear search is faster than binary search
- * when word list contains few words.
- */
-static constexpr range_t WordListLinearSearchThreshold = 5;
 
 /** Check whether a string is in the list.
  * List elements are either exact matches or prefixes.

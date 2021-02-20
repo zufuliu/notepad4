@@ -426,7 +426,7 @@ class ScintillaWin final :
 	bool renderTargetValid;
 #endif
 
-	explicit ScintillaWin(HWND hwnd);
+	explicit ScintillaWin(HWND hwnd) noexcept;
 	// ~ScintillaWin() in public section
 
 	void Init() noexcept;
@@ -616,7 +616,7 @@ HINSTANCE ScintillaWin::hInstance {};
 ATOM ScintillaWin::scintillaClassAtom = 0;
 ATOM ScintillaWin::callClassAtom = 0;
 
-ScintillaWin::ScintillaWin(HWND hwnd) {
+ScintillaWin::ScintillaWin(HWND hwnd) noexcept {
 
 	lastKeyDownConsumed = false;
 	lastHighSurrogateChar = 0;

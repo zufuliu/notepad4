@@ -18,19 +18,6 @@ private:
 	char **words;
 	char *list;
 	range_t len;
-	// words in [start, end) starts with same character, maximum word count limited to 0xffff.
-	struct Range {
-		range_t start;
-		const range_t end;
-		explicit constexpr Range(range_t range) noexcept : start(range & 0xffff), end(range >> 16) {}
-		constexpr range_t Length() const noexcept {
-			return end - start;
-		}
-		bool Next() noexcept {
-			++start;
-			return start < end;
-		}
-	};
 	range_t ranges[128];	// only ASCII, most word starts with character in '_a-zA-Z'
 public:
 	explicit WordList() noexcept;
