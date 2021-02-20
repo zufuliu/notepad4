@@ -10,11 +10,7 @@ namespace Scintilla {
 
 // Simplified access to high precision timing.
 class ElapsedPeriod {
-#ifndef _LIBCPP_HAS_NO_MONOTONIC_CLOCK
 	using ElapsedClock = std::chrono::steady_clock;
-#else
-	using ElapsedClock = std::chrono::high_resolution_clock;
-#endif
 	ElapsedClock::time_point tp;
 public:
 	/// Capture the moment
