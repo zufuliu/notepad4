@@ -1043,8 +1043,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define KEYWORDSET_INDEXMASK 31
 #define KEYWORDSET_TOLOWER 32
 #define SCI_SETKEYWORDS 4005
-#define SCI_SETLEXERLANGUAGE 4006
-#define SCI_LOADLEXERLIBRARY 4007
 #define SCI_GETPROPERTY 4008
 #define SCI_GETPROPERTYEXPANDED 4009
 #define SCI_GETPROPERTYINT 4010

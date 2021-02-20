@@ -2938,7 +2938,7 @@ fun void StartRecord=3001(,)
 # Stop notifying the container of all key presses and commands.
 fun void StopRecord=3002(,)
 
-# Set the lexing language of the document.
+# Set the lexing language of the document, removed in Scintilla 5.
 set void SetLexer=4001(int lexer,)
 
 # Retrieve the lexing language of the document.
@@ -2958,11 +2958,11 @@ val KEYWORDSET_TOLOWER=32
 # Set up the key words used by the lexer.
 set void SetKeyWords=4005(int keyWordSet, string keyWords)
 
-# Set the lexing language of the document based on string name.
-set void SetLexerLanguage=4006(, string language)
+# Set the lexing language of the document based on string name, removed in Scintilla 5.
+#set void SetLexerLanguage=4006(, string language)
 
-# Load a lexer library (dll / so).
-fun void LoadLexerLibrary=4007(, string path)
+# Load a lexer library (dll / so), removed in Scintilla 5.
+#fun void LoadLexerLibrary=4007(, string path)
 
 # Retrieve a "property" value previously set with SetProperty.
 # Result is NUL-terminated.
