@@ -12,10 +12,7 @@ namespace Scintilla {
 class LexerBase : public ILexer5 {
 protected:
 	PropSetSimple props;
-	enum {
-		numWordLists = KEYWORDSET_MAX
-	};
-	WordList *keywordLists[numWordLists + 1];
+	WordList *keywordLists[KEYWORDSET_MAX];
 public:
 	LexerBase();
 	virtual ~LexerBase();
