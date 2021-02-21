@@ -35,7 +35,7 @@ constexpr bool IsASpaceCharacter(char ch) noexcept {
 
 PropSetSimple::PropSetSimple() {
 	mapss *props = new mapss;
-	impl = PropsFromPointer(props);
+	impl = static_cast<void *>(props);
 }
 
 PropSetSimple::~PropSetSimple() {
@@ -44,12 +44,17 @@ PropSetSimple::~PropSetSimple() {
 	impl = nullptr;
 }
 
-void PropSetSimple::Set(const char *key, const char *val, size_t lenKey, size_t lenVal) {
-	mapss *props = PropsFromPointer(impl);
+bool PropSetSimple::Set(const char *key, const char *val) {
 	if (!*key) {	// Empty keys are not supported
-		return;
+		return false;
 	}
-	(*props)[std::string(key, lenKey)] = std::string(val, lenVal);
+
+	mapss *props = PropsFromPointer(impl);
+	const auto [it, success] = props->emplace(key, val);
+	if (!success) {
+		it->second = val;
+	}
+	return true;
 }
 
 #if 0
@@ -81,10 +86,10 @@ void PropSetSimple::SetMultiple(const char *s) {
 #endif
 
 const char *PropSetSimple::Get(const char *key) const {
-	mapss *props = PropsFromPointer(impl);
-	const auto keyPos = props->find(std::string(key));
-	if (keyPos != props->end()) {
-		return keyPos->second.c_str();
+	const mapss *props = PropsFromPointer(impl);
+	const auto it = props->find(key);
+	if (it != props->end()) {
+		return it->second.c_str();
 	}
 	return "";
 }
@@ -146,23 +151,22 @@ int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, int maxE
 }
 
 }
-#endif
 
 size_t PropSetSimple::GetExpanded(const char *key, char *result) const {
-	const std::string val = Get(key);
-	//ExpandAllInPlace(*this, val, 100, VarChain(key));
-	const size_t n = val.size();
+	const char *val = Get(key);
+	const size_t n = strlen(val);
 	if (result) {
-		memcpy(result, val.c_str(), n + 1);
+		memcpy(result, val, n + 1);
 	}
 	return n;	// Not including NUL
 }
+#endif
 
-int PropSetSimple::GetInt(const char *key, int defaultValue) const {
-	const std::string val = Get(key);
-	//ExpandAllInPlace(*this, val, 100, VarChain(key));
-	if (!val.empty()) {
-		return atoi(val.c_str());
+int PropSetSimple::GetInt(const char *key, size_t lenKey, int defaultValue) const {
+	const mapss *props = PropsFromPointer(impl);
+	const auto it = props->find(std::string(key, lenKey));
+	if (it != props->end() && !it->second.empty()) {
+		defaultValue = atoi(it->second.c_str());
 	}
 	return defaultValue;
 }

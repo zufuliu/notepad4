@@ -736,7 +736,7 @@ int LexState::PropGetInt(const char *key, int defaultValue) const {
 	if (instance) {
 		const char *value = instance->PropertyGet(key);
 		if (value && *value) {
-			return atoi(value);
+			defaultValue = atoi(value);
 		}
 	}
 	return defaultValue;

@@ -524,7 +524,7 @@ static unsigned int KeyFromString(const char *charBytes, size_t len) noexcept {
 
 void SpecialRepresentations::SetRepresentation(const char *charBytes, const char *value) {
 	const unsigned int key = KeyFromString(charBytes, UTF8MaxBytes);
-	auto it = mapReprs.find(key);
+	const auto it = mapReprs.find(key);
 	if (it == mapReprs.end()) {
 		// New entry so increment for first byte
 		const unsigned char ucStart = charBytes[0];

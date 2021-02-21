@@ -300,10 +300,8 @@ void RGBAImageSet::Clear() noexcept {
 
 /// Add an image.
 void RGBAImageSet::Add(int ident, RGBAImage *image) {
-	const auto it = images.find(ident);
-	if (it == images.end()) {
-		images.emplace(ident, image);
-	} else {
+	const auto [it, success] = images.emplace(ident, image);
+	if (!success) {
 		it->second.reset(image);
 	}
 	height = -1;
