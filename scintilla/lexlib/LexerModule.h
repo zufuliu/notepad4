@@ -11,7 +11,7 @@ namespace Scintilla {
 class Accessor;
 class WordList;
 
-typedef const WordList * const LexerWordList[];
+typedef const WordList * const LexerWordList[KEYWORDSET_MAX];
 
 typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	LexerWordList keywordLists, Accessor &styler);

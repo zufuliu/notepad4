@@ -23,18 +23,17 @@
 using namespace Scintilla;
 
 LexerBase::LexerBase() {
-	for (int wl = 0; wl < numWordLists; wl++) {
-		keywordLists[wl] = new WordList;
+	auto *iter = keywordLists;
+	for (int wl = KEYWORDSET_MAX; wl; wl--) {
+		*iter++ = new WordList;
 	}
-	keywordLists[numWordLists] = nullptr;
 }
 
 LexerBase::~LexerBase() {
-	for (int wl = 0; wl < numWordLists; wl++) {
-		delete keywordLists[wl];
-		keywordLists[wl] = nullptr;
+	auto *iter = keywordLists;
+	for (int wl = KEYWORDSET_MAX; wl; wl--) {
+		delete *iter++;
 	}
-	keywordLists[numWordLists] = nullptr;
 }
 
 void SCI_METHOD LexerBase::Release() noexcept {
@@ -75,7 +74,7 @@ const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
 }
 
 Sci_Position SCI_METHOD LexerBase::WordListSet(int n, bool toLower, const char *wl) {
-	if (n < numWordLists) {
+	if (n < KEYWORDSET_MAX) {
 		if (keywordLists[n]->Set(wl, toLower)) {
 			return 0;
 		}
