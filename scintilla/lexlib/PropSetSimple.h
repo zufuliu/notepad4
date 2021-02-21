@@ -14,12 +14,17 @@ class PropSetSimple final {
 public:
 	PropSetSimple();
 	~PropSetSimple();
-	void Set(const char *key, const char *val, size_t lenKey = -1, size_t lenVal = -1);
+	bool Set(const char *key, const char *val);
 	//void Set(const char *keyVal);
 	//void SetMultiple(const char *s);
 	const char *Get(const char *key) const;
-	size_t GetExpanded(const char *key, char *result) const;
-	int GetInt(const char *key, int defaultValue = 0) const;
+	//size_t GetExpanded(const char *key, char *result) const;
+	int GetInt(const char *key, size_t lenKey, int defaultValue = 0) const;
+
+	template <size_t N>
+	int GetInt(const char (&key)[N], int defaultValue = 0) const {
+		return GetInt(key, N - 1, defaultValue);
+	}
 };
 
 }

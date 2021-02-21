@@ -7,7 +7,6 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <cstring>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -57,9 +56,7 @@ const char * SCI_METHOD LexerBase::DescribeProperty(const char *) const noexcept
 }
 
 Sci_Position SCI_METHOD LexerBase::PropertySet(const char *key, const char *val) {
-	const char *valOld = props.Get(key);
-	if (strcmp(val, valOld) != 0) {
-		props.Set(key, val, strlen(key), strlen(val));
+	if (props.Set(key, val)) {
 		return 0;
 	}
 	return -1;

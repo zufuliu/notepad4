@@ -38,7 +38,10 @@ void KeyMap::Clear() noexcept {
 }
 
 void KeyMap::AssignCmdKey(int key, int modifiers, unsigned int msg) {
-	kmap[KeyModifiers(key, modifiers)] = msg;
+	const auto [it, success] = kmap.emplace(KeyModifiers(key, modifiers), msg);
+	if (!success) {
+		it->second = msg;
+	}
 }
 
 unsigned int KeyMap::Find(int key, int modifiers) const {

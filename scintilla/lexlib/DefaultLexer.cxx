@@ -7,7 +7,6 @@
 
 #include <cstdlib>
 #include <cassert>
-#include <cstring>
 
 #include "ILexer.h"
 #include "Scintilla.h"
