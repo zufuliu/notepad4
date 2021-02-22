@@ -157,6 +157,9 @@ D2D1_DRAW_TEXT_OPTIONS d2dDrawTextOptions = D2D1_DRAW_TEXT_OPTIONS_NONE;
 static HMODULE hDLLD2D {};
 static HMODULE hDLLDWrite {};
 
+extern "C" const GUID __declspec(selectany) IID_IDWriteFactory2 = // 0439fc60-ca44-4994-8dee-3a9af7b732ec
+{ 0x0439fc60, 0xca44, 0x4994, { 0x8d, 0xee, 0x3a, 0x9a, 0xf7, 0xb7, 0x32, 0xec } };
+
 #if USE_WIN32_INIT_ONCE
 static BOOL CALLBACK LoadD2DOnce(PINIT_ONCE initOnce, PVOID parameter, PVOID *lpContext) noexcept
 #else
@@ -203,9 +206,6 @@ static void LoadD2DOnce() noexcept
 	if (hDLLDWrite) {
 		DWriteCreateFactorySig fnDWCF = DLLFunction<DWriteCreateFactorySig>(hDLLDWrite, "DWriteCreateFactory");
 		if (fnDWCF) {
-			const GUID IID_IDWriteFactory2 = // 0439fc60-ca44-4994-8dee-3a9af7b732ec
-			{ 0x0439fc60, 0xca44, 0x4994, { 0x8d, 0xee, 0x3a, 0x9a, 0xf7, 0xb7, 0x32, 0xec } };
-
 			const HRESULT hr = fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
 				IID_IDWriteFactory2,
 				reinterpret_cast<IUnknown**>(&pIDWriteFactory));
