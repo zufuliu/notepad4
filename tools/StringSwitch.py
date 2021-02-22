@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import operator
 
 # return true if equal
 SwitchType_Equal = 0
@@ -129,7 +128,7 @@ def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, sw
 			sorted_list.append((len(buf), buf))
 
 	cond_map = {}
-	sorted_list.sort(key=operator.itemgetter(0)) # sorted by string length
+	sorted_list.sort(key=lambda m: m[0]) # sorted by string length
 	for item in sorted_list:
 		length = item[0]
 		buf = item[1]
@@ -167,7 +166,7 @@ def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, sw
 		stmt = IndentLevel1 + 'case %s:' % key
 		stmt_list.append(stmt);
 		expr_list = []
-		items.sort(key=operator.itemgetter(1)) # sorted by string value
+		items.sort(key=lambda m: m[1]) # sorted by string value
 		for item in items:
 			length = item[0]
 			buf = item[1]
