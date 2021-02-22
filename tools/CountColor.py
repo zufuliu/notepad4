@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import os.path
-import operator
 import re
 
 kReColorHex = re.compile(r'#[0-9A-Fa-f]{6}')
@@ -63,13 +62,13 @@ def count_color(path):
 	color_map = {}
 	find_color_in_file(path, color_map)
 
-	colors = sorted(color_map.items(), key=operator.itemgetter(0))
+	colors = sorted(color_map.items(), key=lambda m: m[0])
 	colors = sorted(colors, key=lambda m: m[1]['total_count'], reverse=True)
 	color_map = dict(colors)
 	for color_stat in color_map.values():
 		usage = color_stat['usage']
-		usage = sorted(usage.items(), key=operator.itemgetter(0))
-		usage = sorted(usage, key=operator.itemgetter(1), reverse=True)
+		usage = sorted(usage.items(), key=lambda m: m[0])
+		usage = sorted(usage, key=lambda m: m[1], reverse=True)
 		color_stat['usage'] = dict(usage)
 
 	print_color_count(color_map)
