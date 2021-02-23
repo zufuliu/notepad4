@@ -169,7 +169,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		sc.Forward();
 	}
 
-	for (; sc.More(); sc.Forward()) {
+	while (sc.More()) {
 
 		if (sc.atLineStart) {
 			if (sc.state == SCE_C_STRING || sc.state == SCE_C_CHARACTER) {
@@ -537,10 +537,9 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 		case SCE_C_STRING:
 			if (sc.atLineEnd) {
-				if (lexType == LEX_ASY || lexType == LEX_PHP) {
-					continue;
+				if (!(lexType == LEX_ASY || lexType == LEX_PHP)) {
+					sc.ChangeState(SCE_C_STRINGEOL);
 				}
-				sc.ChangeState(SCE_C_STRINGEOL);
 			} else if (isIncludePreprocessor && sc.ch == '>') {
 				outerStyle = SCE_C_DEFAULT;
 				sc.ForwardSetState(SCE_C_DEFAULT);
@@ -777,7 +776,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.Forward(5);
 				sc.SetState(SCE_C_DEFAULT);
 			}
-		} else
+		} else {
 			if (sc.state == SCE_C_DEFAULT) {
 				if (lexType == LEX_PHP && sc.Match("<?php")) {
 					sc.SetState(SCE_C_XML_TAG);
@@ -977,6 +976,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						}
 					}
 			}
+		}
 
 		// Handle line continuation generically.
 		if (sc.ch == '\\') {
@@ -986,6 +986,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				if (sc.ch == '\r' && sc.chNext == '\n') {
 					sc.Forward();
 				}
+				sc.Forward();
 				continuationLine = true;
 				continue;
 			}
@@ -996,6 +997,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			visibleChars++;
 		}
 		continuationLine = false;
+		sc.Forward();
 	}
 
 	sc.Complete();
