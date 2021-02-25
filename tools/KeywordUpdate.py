@@ -5,7 +5,7 @@ def update_all_keyword():
 	items = [
 		('NP2LEX_ABAQUS', 'stlABAQUS.c', 'ABAQUS.inp', 0, parse_apdl_api_file),
 		('NP2LEX_ACTIONSCRIPT', 'stlActionScript.c', 'ActionScript.as', 1, parse_actionscript_api_file),
-		('NP2LEX_APDL', 'stlAPDL.c', 'APDL.apdl', 0, parse_apdl_api_file),
+		('NP2LEX_APDL', 'stlAPDL.c', 'APDL.cdb', 0, parse_apdl_api_file),
 		('NP2LEX_AVS', 'stlAviSynth.c', 'AviSynth.avs', 0, parse_avisynth_api_file),
 		('NP2LEX_AWK', 'stlAwk.c', 'Awk.awk', 1, parse_awk_api_file),
 		('NP2LEX_CMAKE', 'stlCMake.c', 'CMake.cmake', 0, parse_cmake_api_file),
