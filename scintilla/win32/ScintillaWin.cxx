@@ -3751,17 +3751,11 @@ STDMETHODIMP ScintillaWin::GetData(const FORMATETC *pFEIn, STGMEDIUM *pSTM) {
 }
 
 #if USE_WIN32_INIT_ONCE
-BOOL CALLBACK ScintillaWin::PrepareOnce(PINIT_ONCE initOnce, PVOID parameter, PVOID *lpContext) noexcept
+BOOL CALLBACK ScintillaWin::PrepareOnce([[maybe_unused]] PINIT_ONCE initOnce, [[maybe_unused]] PVOID parameter, [[maybe_unused]] PVOID *lpContext) noexcept
 #else
 void ScintillaWin::PrepareOnce() noexcept
 #endif
 {
-#if USE_WIN32_INIT_ONCE
-	UNREFERENCED_PARAMETER(initOnce);
-	UNREFERENCED_PARAMETER(parameter);
-	UNREFERENCED_PARAMETER(lpContext);
-#endif
-
 	Platform_Initialise(hInstance);
 	CharClassify::InitUnicodeData();
 

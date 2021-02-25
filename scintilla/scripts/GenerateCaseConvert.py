@@ -208,7 +208,7 @@ def addCaseSensitivityTest(fd, caseTable, charCount):
 #include <chrono>
 #include "../src/ElapsedPeriod.h"
 
-int main(void) {
+int main() {
 	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
 	Scintilla::ElapsedPeriod period;
 	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
