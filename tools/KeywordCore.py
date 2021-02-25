@@ -207,7 +207,7 @@ def parse_actionscript_api_file(path):
 
 def parse_apdl_api_file(path):
 	ext = os.path.splitext(path)[1].lower()
-	comment = '!' if ext == '.apdl' else '**'
+	comment = '!' if ext == '.cdb' else '**'
 	sections = read_api_file(path, comment, 1)
 	keywordMap = {}
 	for key, doc in sections:

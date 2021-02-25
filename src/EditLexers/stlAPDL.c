@@ -39,7 +39,7 @@ static EDITSTYLE Styles_APDL[] = {
 EDITLEXER lexAPDL = {
 	SCLEX_APDL, NP2LEX_APDL,
 	EDITLEXER_HOLE(L"ANSYS APDL", Styles_APDL),
-	L"apdl",
+	L"cdb",
 	&Keywords_APDL,
 	Styles_APDL
 };
