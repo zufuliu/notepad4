@@ -55,6 +55,7 @@ Caret::Caret() noexcept :
 
 EditModel::EditModel() : braces{} {
 	inOverstrike = false;
+	enableLaTeXInputMethod = false;
 	xOffset = 0;
 	trackLineWidth = false;
 	posDrag = SelectionPosition(Sci::invalidPosition);

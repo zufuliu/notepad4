@@ -87,6 +87,7 @@ Used by VSCode, Atom etc.
 
 #include "PlatWin.h"
 #include "HanjaDic.h"
+#include "LaTeXInput.h"
 
 #ifndef WM_DPICHANGED
 #define WM_DPICHANGED				0x02E0
@@ -485,6 +486,7 @@ class ScintillaWin final :
 	void EscapeHanja();
 	void ToggleHanja();
 	void AddWString(std::wstring_view wsv, CharacterSource charSource);
+	bool HandleLaTeXInputMethod();
 
 	UINT CodePageOfDocument() const noexcept;
 	bool ValidCodePage(int codePage) const noexcept override;
@@ -1321,6 +1323,52 @@ void ScintillaWin::AddWString(std::wstring_view wsv, CharacterSource charSource)
 	}
 }
 
+bool ScintillaWin::HandleLaTeXInputMethod() {
+	if (sel.Count() > 1 || !sel.Empty() || pdoc->IsReadOnly()) {
+		return false;
+	}
+
+	char buffer[MaxLaTeXInputBufferLength];
+	const Sci::Position main = sel.MainCaret();
+	Sci::Position pos = main - 1;
+	char *ptr = buffer + sizeof(buffer) - 1;
+	*ptr = '\0';
+	char ch;
+	do {
+		ch = pdoc->CharAt(pos);
+		if (!IsLaTeXInputSequenceChar(ch)) {
+			break;
+		}
+		--pos;
+		--ptr;
+		*ptr = ch;
+	} while (pos >= 0 && ptr != buffer);
+	if (ch != '\\') {
+		return false;
+	}
+
+	ptrdiff_t wclen = buffer + sizeof(buffer) - 1 - ptr;
+	const uint32_t wch = GetLaTeXInputUnicodeCharacter(ptr, wclen);
+	if (wch == 0) {
+		return false;
+	}
+
+	wchar_t wcs[3] = { 0 };
+	wclen = UTF16FromLaTeXInputCharacter(wch, wcs);
+
+	const UINT codePage = CodePageOfDocument();
+	const int len = MultiByteFromWideChar(codePage, std::wstring_view(wcs, wclen), buffer, sizeof(buffer) - 1);
+
+	targetRange.start.SetPosition(pos);
+	targetRange.end.SetPosition(main);
+	ReplaceTarget(false, buffer, len);
+	// move caret after character
+	pos += len;
+	sel.RangeMain().anchor.SetPosition(pos);
+	sel.RangeMain().caret.SetPosition(pos);
+	return true;
+}
+
 sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// Copy & paste by johnsonj with a lot of helps of Neil.
 	// Great thanks for my foreruners, jiniya and BLUEnLIVE.
@@ -1759,9 +1807,14 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 			// Don't interpret these as they may be characters entered by number.
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
-		const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)),
-							ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown),
-							&lastKeyDownConsumed);
+		const int modifiers = ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown);
+		if (wParam == VK_TAB && modifiers == 0) {
+			if (enableLaTeXInputMethod && HandleLaTeXInputMethod()) {
+				lastKeyDownConsumed = true;
+				break;
+			}
+		}
+		const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)), modifiers, &lastKeyDownConsumed);
 		if (!ret && !lastKeyDownConsumed) {
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
@@ -1774,14 +1827,16 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 
 	case WM_CHAR:
 		if (!lastKeyDownConsumed) {
-			wchar_t wcs[3] = { static_cast<wchar_t>(wParam), 0 };
+			const wchar_t ch = static_cast<wchar_t>(wParam);
+			wchar_t wcs[3] = { ch, 0 };
 			unsigned int wclen = 1;
-			if (IS_HIGH_SURROGATE(wcs[0])) {
+			if (IS_HIGH_SURROGATE(ch)) {
 				// If this is a high surrogate character, we need a second one
-				lastHighSurrogateChar = wcs[0];
+				lastHighSurrogateChar = ch;
 				return 0;
-			} else if (IS_LOW_SURROGATE(wcs[0])) {
-				wcs[1] = wcs[0];
+			}
+			if (IS_LOW_SURROGATE(ch)) {
+				wcs[1] = ch;
 				wcs[0] = lastHighSurrogateChar;
 				lastHighSurrogateChar = 0;
 				wclen = 2;

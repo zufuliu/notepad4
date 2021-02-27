@@ -1056,6 +1056,7 @@
     <ClCompile Include="..\..\scintilla\src\ViewStyle.cxx" />
     <ClCompile Include="..\..\scintilla\src\XPM.cxx" />
     <ClCompile Include="..\..\scintilla\win32\HanjaDic.cxx" />
+    <ClCompile Include="..\..\scintilla\win32\LaTeXInput.cxx" />
     <ClCompile Include="..\..\scintilla\win32\PlatWin.cxx" />
     <ClCompile Include="..\..\scintilla\win32\ScintillaWin.cxx" />
     <ClCompile Include="..\..\src\Bridge.cpp" />
@@ -1137,6 +1138,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\scintilla\include\ILexer.h" />
     <ClInclude Include="..\..\scintilla\include\ILoader.h" />
+    <ClInclude Include="..\..\scintilla\include\LaTeXInput.h" />
     <ClInclude Include="..\..\scintilla\include\Platform.h" />
     <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\..\scintilla\include\SciLexer.h" />

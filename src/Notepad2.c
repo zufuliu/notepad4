@@ -1694,6 +1694,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetBackSpaceUnIndents(bBackspaceUnindents);
 	SciCall_SetTabWidth(iTabWidth);
 	SciCall_SetIndent(iIndentWidth);
+	SciCall_SetLaTeXInputMethod(autoCompletionConfig.bLaTeXInputMethod);
 
 	// Indent Guides
 	Style_SetIndentGuides(bShowIndentGuides);
@@ -2577,6 +2578,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
+	CheckCmd(hmenu, IDM_SET_LATEX_INPUT_METHOD, autoCompletionConfig.bLaTeXInputMethod);
 	CheckCmd(hmenu, IDM_SET_LINE_SELECTION_MODE, bEnableLineSelectionMode);
 
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, !bMarkOccurrences);
@@ -4073,6 +4075,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_AutoCCancel();
 		break;
 
+	case IDM_SET_LATEX_INPUT_METHOD:
+		autoCompletionConfig.bLaTeXInputMethod = !autoCompletionConfig.bLaTeXInputMethod;
+		SciCall_SetLaTeXInputMethod(autoCompletionConfig.bLaTeXInputMethod);
+		break;
+
 	case IDM_SET_LINE_SELECTION_MODE:
 		bEnableLineSelectionMode = !bEnableLineSelectionMode;
 		if (!bEnableLineSelectionMode) {
@@ -5436,6 +5443,7 @@ void LoadSettings(void) {
 	autoCompletionConfig.dwScanWordsTimeout = max_i(iValue, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
 	autoCompletionConfig.bEnglistIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", 0);
 	autoCompletionConfig.bIgnoreCase = IniSectionGetBool(pIniSection, L"AutoCIgnoreCase", 0);
+	autoCompletionConfig.bLaTeXInputMethod = IniSectionGetBool(pIniSection, L"LaTeXInputMethod", 0);
 	iValue = IniSectionGetInt(pIniSection, L"AutoCVisibleItemCount", 16);
 	autoCompletionConfig.iVisibleItemCount = max_i(iValue, MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT);
 	iValue = IniSectionGetInt(pIniSection, L"AutoCMinWordLength", 1);
@@ -5808,6 +5816,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoCScanWordsTimeout", autoCompletionConfig.dwScanWordsTimeout, AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
 	IniSectionSetBoolEx(pIniSection, L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglistIMEModeOnly, 0);
 	IniSectionSetBoolEx(pIniSection, L"AutoCIgnoreCase", autoCompletionConfig.bIgnoreCase, 0);
+	IniSectionSetBoolEx(pIniSection, L"LaTeXInputMethod", autoCompletionConfig.bLaTeXInputMethod, 0);
 	IniSectionSetIntEx(pIniSection, L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
 	IniSectionSetIntEx(pIniSection, L"AutoCMinWordLength", autoCompletionConfig.iMinWordLength, 1);
 	IniSectionSetIntEx(pIniSection, L"AutoCMinNumberLength", autoCompletionConfig.iMinNumberLength, 3);

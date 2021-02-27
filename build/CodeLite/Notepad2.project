@@ -6,6 +6,7 @@
     <VirtualDirectory Name="include">
       <File Name="../../scintilla/include/ILexer.h"/>
       <File Name="../../scintilla/include/ILoader.h"/>
+      <File Name="../../scintilla/include/LaTeXInput.h"/>
       <File Name="../../scintilla/include/Platform.h"/>
       <File Name="../../scintilla/include/Sci_Position.h"/>
       <File Name="../../scintilla/include/SciLexer.h"/>
@@ -167,6 +168,7 @@
     <VirtualDirectory Name="win32">
       <File Name="../../scintilla/win32/HanjaDic.cxx"/>
       <File Name="../../scintilla/win32/HanjaDic.h"/>
+      <File Name="../../scintilla/win32/LaTeXInput.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.h"/>
       <File Name="../../scintilla/win32/ScintillaWin.cxx"/>

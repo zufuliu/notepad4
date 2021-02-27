@@ -2418,15 +2418,6 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 	ShowCaretAtCurrentPosition();
 }
 
-int Editor::ModifierFlags(bool shift, bool ctrl, bool alt, bool meta, bool super) noexcept {
-	return
-		(shift ? SCI_SHIFT : 0) |
-		(ctrl ? SCI_CTRL : 0) |
-		(alt ? SCI_ALT : 0) |
-		(meta ? SCI_META : 0) |
-		(super ? SCI_SUPER : 0);
-}
-
 void Editor::NotifyFocus(bool focus) {
 	SCNotification scn = {};
 	scn.nmhdr.code = focus ? SCN_FOCUSIN : SCN_FOCUSOUT;
@@ -6969,6 +6960,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETIMEINTERACTION:
 		imeInteraction = static_cast<EditModel::IMEInteraction>(wParam);
+		break;
+
+	case SCI_SETLATEXINPUTMETHOD:
+		enableLaTeXInputMethod = wParam != 0;
 		break;
 
 	case SCI_GETIMEINTERACTION:

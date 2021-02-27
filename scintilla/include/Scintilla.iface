@@ -303,6 +303,9 @@ get IMEInteraction GetIMEInteraction=2678(,)
 # Choose to display the IME in a window or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
+# Enable LaTeX input method.
+set void SetLaTeXInputMethod=2659(bool enable,)
+
 enu Alpha=SC_ALPHA_
 val SC_ALPHA_TRANSPARENT=0
 val SC_ALPHA_OPAQUE=255
