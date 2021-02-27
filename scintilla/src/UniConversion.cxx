@@ -253,17 +253,6 @@ std::wstring WStringFromUTF8(std::string_view svu8) {
 	}
 }
 
-unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf) noexcept {
-	if (val < SUPPLEMENTAL_PLANE_FIRST) {
-		tbuf[0] = static_cast<wchar_t>(val);
-		return 1;
-	} else {
-		tbuf[0] = static_cast<wchar_t>(((val - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
-		tbuf[1] = static_cast<wchar_t>((val & 0x3ff) + SURROGATE_TRAIL_FIRST);
-		return 2;
-	}
-}
-
 // https://en.wikipedia.org/wiki/UTF-8
 // https://tools.ietf.org/html/rfc3629
 // UTF-8, a transformation format of ISO 10646

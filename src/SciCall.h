@@ -635,7 +635,7 @@ NP2_inline void SciCall_StyleClearAll(void) {
 }
 
 NP2_inline void SciCall_CopyStyles(size_t sourceIndex, LPARAM destStyles) {
-	SciCall(SCI_COPYSTYLES, sourceIndex, destStyles);	
+	SciCall(SCI_COPYSTYLES, sourceIndex, destStyles);
 }
 
 NP2_inline void SciCall_StyleSetFont(int style, const char *fontName) {
@@ -840,6 +840,10 @@ NP2_inline void SciCall_SetFontLocale(const char *localeName) {
 
 NP2_inline void SciCall_SetIMEInteraction(int imeInteraction) {
 	SciCall(SCI_SETIMEINTERACTION, imeInteraction, 0);
+}
+
+NP2_inline void SciCall_SetLaTeXInputMethod(BOOL enable) {
+	SciCall(SCI_SETLATEXINPUTMETHOD, enable, 0);
 }
 
 // Brace highlighting

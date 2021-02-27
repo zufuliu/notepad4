@@ -324,6 +324,9 @@
     <ClCompile Include="..\..\scintilla\win32\HanjaDic.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\win32\LaTeXInput.cxx">
+      <Filter>Scintilla\win32</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\win32\PlatWin.cxx">
       <Filter>Scintilla\win32</Filter>
     </ClCompile>
@@ -561,6 +564,9 @@
       <Filter>Scintilla\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\include\ILoader.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\LaTeXInput.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\include\Platform.h">

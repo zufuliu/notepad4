@@ -289,6 +289,7 @@ typedef struct EditAutoCompletionConfig {
 	UINT dwScanWordsTimeout;
 	BOOL bEnglistIMEModeOnly;
 	BOOL bIgnoreCase;
+	BOOL bLaTeXInputMethod;
 	UINT iVisibleItemCount;
 	int iMinWordLength;
 	int iMinNumberLength;

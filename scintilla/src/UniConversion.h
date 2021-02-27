@@ -23,7 +23,6 @@ size_t UTF32FromUTF8(std::string_view svu8, unsigned int *tbuf, size_t tlen);
 // WStringFromUTF8 does the right thing when wchar_t is 2 or 4 bytes so
 // works on both Windows and Unix.
 std::wstring WStringFromUTF8(std::string_view svu8);
-unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf) noexcept;
 bool UTF8IsValid(std::string_view svu8) noexcept;
 std::string FixInvalidUTF8(const std::string &text);
 
@@ -109,6 +108,7 @@ enum {
 	SURROGATE_TRAIL_FIRST = 0xDC00,
 	SURROGATE_TRAIL_LAST = 0xDFFF,
 	SUPPLEMENTAL_PLANE_FIRST = 0x10000,
+	MAX_UNICODE = 0x10ffff,
 };
 
 constexpr unsigned int UTF16CharLength(wchar_t uch) noexcept {
@@ -117,6 +117,31 @@ constexpr unsigned int UTF16CharLength(wchar_t uch) noexcept {
 
 constexpr unsigned int UTF16LengthFromUTF8ByteCount(unsigned int byteCount) noexcept {
 	return (byteCount < 4) ? 1 : 2;
+}
+
+inline unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf) noexcept {
+	if (val < SUPPLEMENTAL_PLANE_FIRST) {
+		tbuf[0] = static_cast<wchar_t>(val);
+		return 1;
+	}
+	tbuf[0] = static_cast<wchar_t>(((val - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
+	tbuf[1] = static_cast<wchar_t>((val & 0x3ff) + SURROGATE_TRAIL_FIRST);
+	return 2;
+}
+
+inline unsigned int UTF16FromLaTeXInputCharacter(unsigned int val, wchar_t *tbuf) noexcept {
+	if (val < SUPPLEMENTAL_PLANE_FIRST) {
+		tbuf[0] = static_cast<wchar_t>(val);
+		return 1;
+	}
+	if (val <= MAX_UNICODE) {
+		tbuf[0] = static_cast<wchar_t>(((val - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
+		tbuf[1] = static_cast<wchar_t>((val & 0x3ff) + SURROGATE_TRAIL_FIRST);
+	} else {
+		tbuf[0] = val & 0xffff;
+		tbuf[1] = val >> 16;
+	}
+	return 2;
 }
 
 }

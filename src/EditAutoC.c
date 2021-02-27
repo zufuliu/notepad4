@@ -6,6 +6,7 @@
 #include <commdlg.h>
 #include <limits.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include "SciCall.h"
 #include "Helpers.h"
@@ -13,6 +14,7 @@
 #include "Styles.h"
 #include "resource.h"
 #include "EditAutoC_Data0.h"
+#include "LaTeXInput.h"
 
 #define NP2_AUTOC_USE_STRING_ORDER	1
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
@@ -344,6 +346,8 @@ static inline BOOL WordList_StartsWith(const struct WordList *pWList, LPCSTR pWo
 }
 
 void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
+	//StopWatch watch;
+	//StopWatch_Start(watch);
 	char *word = pWList->wordBuf;
 	const int iStartLen = pWList->iStartLen;
 	int len = 0;
@@ -393,6 +397,10 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 			break;
 		}
 	} while (*pList);
+
+	//StopWatch_Stop(watch);
+	//const double duration = StopWatch_Get(&watch);
+	//printf("%s duration=%.6f\n", __func__, duration);
 }
 
 static inline void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
@@ -474,6 +482,8 @@ static inline BOOL IsSpecialStartChar(int ch, int chPrev) {
 		// ObjC Keyword, Java Annotation, Python Decorator, Cobra Directive
 		|| (ch == '<') // HTML/XML Tag, C# Doc Tag
 		|| (ch == '\\')// Doxygen Doc Tag, LaTeX Command
+		|| (chPrev == '\\' && (ch == '^' || ch == ':'))// LaTeX input, Emoji input
+		// TODO: show emoji list after typing ':'.
 		|| (chPrev == '<' && ch == '/')	// HTML/XML Close Tag
 		|| (chPrev == '-' && ch == '>')	// member(C/C++/PHP)
 		|| (chPrev == ':' && ch == ':');// namespace(C++), static member(C++/Java8/PHP)
@@ -995,6 +1005,20 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 #define AutoC_AddSpecWord_Finish	1
 #define AutoC_AddSpecWord_Keyword	2
 INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int chPrev) {
+#if EnableLaTeXLikeEmojiInput
+	if ((ch == '\\' || (chPrev == '\\' && (ch == '^' || ch == ':'))) && autoCompletionConfig.bLaTeXInputMethod) {
+		if (ch != ':') {
+			WordList_AddListEx(pWList, kAllLaTeXInputSequences);
+		} else {
+			WordList_AddListEx(pWList, kAllEmojiInputSequences);
+		}
+	}
+#else
+	if ((ch == '\\' || (chPrev == '\\' && ch == '^')) && autoCompletionConfig.bLaTeXInputMethod) {
+		WordList_AddListEx(pWList, kAllLaTeXInputSequences);
+	}
+#endif
+
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_APDL:
 		if (iCurrentStyle == 0 && (ch == '*' || ch == '/')) {
@@ -1121,6 +1145,14 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[6]); // KDoc
 				return AutoC_AddSpecWord_Finish;
 			}
+		}
+		break;
+
+	case SCLEX_LATEX:
+	case SCLEX_TEXINFO:
+		if ((ch == '\\' || (chPrev == '\\' && ch == '^')) && !autoCompletionConfig.bLaTeXInputMethod) {
+			WordList_AddListEx(pWList, kAllLaTeXInputSequences);
+			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 

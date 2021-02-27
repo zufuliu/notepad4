@@ -22,6 +22,7 @@ public:
 class EditModel {
 public:
 	bool inOverstrike;
+	bool enableLaTeXInputMethod;
 	int xOffset;		///< Horizontal scrolled amount in pixels
 	bool trackLineWidth;
 

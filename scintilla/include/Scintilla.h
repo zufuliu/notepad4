@@ -114,6 +114,7 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_IME_INLINE 1
 #define SCI_GETIMEINTERACTION 2678
 #define SCI_SETIMEINTERACTION 2679
+#define SCI_SETLATEXINPUTMETHOD 2659
 #define SC_ALPHA_TRANSPARENT 0
 #define SC_ALPHA_OPAQUE 255
 #define SC_ALPHA_NOALPHA 256
