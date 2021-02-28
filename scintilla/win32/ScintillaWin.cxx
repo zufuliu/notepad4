@@ -1353,7 +1353,7 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 		return false;
 	}
 
-	const wchar_t wcs[3] = { wch & 0xffff, wch >> 16, 0 };
+	const wchar_t wcs[3] = { static_cast<wchar_t>(wch & 0xffff), static_cast<wchar_t>(wch >> 16), 0 };
 	wclen = 1 + (wcs[1] != 0);
 
 	const UINT codePage = CodePageOfDocument();

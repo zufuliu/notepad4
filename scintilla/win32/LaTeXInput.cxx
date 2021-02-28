@@ -2,11 +2,11 @@
 // See License.txt for details about distribution and modification.
 
 #include <cstdint>
-#include <cstdio>
+//#include <cstdio>
 
-#include <chrono>
+//#include <chrono>
 
-#include "ElapsedPeriod.h"
+//#include "ElapsedPeriod.h"
 #include "LaTeXInput.h"
 
 namespace {
