@@ -453,63 +453,63 @@ static const uint16_t LaTeXHashTable[] = {
 
 static const InputSequence LaTeXSequenceList[] = {
 {0x6304, 0x0001, 0x2245}, // ≅, \cong, Approximately Equal To
-{0x6605, 0x0006, 0x1D536}, // 𝔶, \fraky, Mathematical Fraktur Small Y
+{0x6605, 0x0006, 0xDD36'D835}, // U+1D536, 𝔶, \fraky, Mathematical Fraktur Small Y
 {0x7304, 0x000c, 0x211B}, // ℛ, \scrR, Script Capital R / Script R
 {0x6208, 0x0011, 0x2A09}, // ⨉, \bigtimes, N-Ary Times Operator
-{0x6208, 0x001a, 0x1D75C}, // 𝝜, \bsansEta, Mathematical Sans-Serif Bold Capital Eta
+{0x6208, 0x001a, 0xDF5C'D835}, // U+1D75C, 𝝜, \bsansEta, Mathematical Sans-Serif Bold Capital Eta
 {0x6503, 0x0023, 0x00F0}, // ð, \eth, Latin Small Letter Eth
-{0x6605, 0x0027, 0x1D537}, // 𝔷, \frakz, Mathematical Fraktur Small Z
-{0x7304, 0x002d, 0x1D4AE}, // 𝒮, \scrS, Mathematical Script Capital S
+{0x6605, 0x0027, 0xDD37'D835}, // U+1D537, 𝔷, \frakz, Mathematical Fraktur Small Z
+{0x7304, 0x002d, 0xDCAE'D835}, // U+1D4AE, 𝒮, \scrS, Mathematical Script Capital S
 {0x7509, 0x0032, 0x03BF}, // ο, \upomicron, Greek Small Letter Omicron
 {0x7705, 0x003c, 0x2227}, // ∧, \wedge, Logical And
 {0x6e10, 0x0042, 0x2904}, // ⤄, \nvLeftrightarrow, Left Right Double Arrow With Vertical Stroke
-{0x7304, 0x0053, 0x1D4AF}, // 𝒯, \scrT, Mathematical Script Capital T
+{0x7304, 0x0053, 0xDCAF'D835}, // U+1D4AF, 𝒯, \scrT, Mathematical Script Capital T
 {0x750a, 0x0058, 0x03D8}, // Ϙ, \upoldKoppa, Greek Letter Archaic Koppa
 {0x760c, 0x0063, 0xFE00'228B}, // ⊋︀, \varsupsetneq, Superset Of With Not Equal To / Superset Of Or Not Equal To + Variation Selector-1
-{0x7304, 0x0070, 0x1D4B0}, // 𝒰, \scrU, Mathematical Script Capital U
+{0x7304, 0x0070, 0xDCB0'D835}, // U+1D4B0, 𝒰, \scrU, Mathematical Script Capital U
 {0x7309, 0x0075, 0x225B}, // ≛, \starequal, Star Equals
 {0x730e, 0x007f, 0x2B12}, // ⬒, \squaretopblack, Square With Top Half Black
 {0x5604, 0x008e, 0x2016}, // ‖, \Vert, Double Vertical Line / Double Vertical Bar
 {0x6207, 0x0093, 0x2605}, // ★, \bigstar, Black Star
-{0x7304, 0x009b, 0x1D4B1}, // 𝒱, \scrV, Mathematical Script Capital V
+{0x7304, 0x009b, 0xDCB1'D835}, // U+1D4B1, 𝒱, \scrV, Mathematical Script Capital V
 {0x7409, 0x00a0, 0x29A2}, // ⦢, \turnangle, Turned Angle
-{0x6207, 0x00aa, 0x1D7DB}, // 𝟛, \bbthree, Mathematical Double-Struck Digit Three
-{0x620e, 0x00b2, 0x1D7A1}, // 𝞡, \bisansvarTheta, Mathematical Sans-Serif Bold Italic Capital Theta Symbol
+{0x6207, 0x00aa, 0xDFDB'D835}, // U+1D7DB, 𝟛, \bbthree, Mathematical Double-Struck Digit Three
+{0x620e, 0x00b2, 0xDFA1'D835}, // U+1D7A1, 𝞡, \bisansvarTheta, Mathematical Sans-Serif Bold Italic Capital Theta Symbol
 {0x6c09, 0x00c1, 0x2190}, // ←, \leftarrow, Leftwards Arrow / Left Arrow
 {0x6c10, 0x00cb, 0x2B32}, // ⬲, \leftarrowonoplus, Left Arrow With Circled Plus
 {0x6e04, 0x00dc, 0x22FA}, // ⋺, \nisd, Contains With Long Horizontal Stroke
 {0x6e05, 0x00e1, 0x2247}, // ≇, \ncong, Neither Approximately Nor Actually Equal To
 {0x7206, 0x00e7, 0x27E9}, // ⟩, \rangle, Mathematical Right Angle Bracket
 {0x7206, 0x00ee, 0x25D8}, // ◘, \rvbull, Inverse Bullet
-{0x7304, 0x00f5, 0x1D4B2}, // 𝒲, \scrW, Mathematical Script Capital W
+{0x7304, 0x00f5, 0xDCB2'D835}, // U+1D4B2, 𝒲, \scrW, Mathematical Script Capital W
 {0x4f02, 0x00fa, 0x0152}, // Œ, \OE, Latin Capital Ligature Oe / Latin Capital Letter O E
-{0x6906, 0x00fd, 0x1D6FD}, // 𝛽, \itbeta, Mathematical Italic Small Beta
+{0x6906, 0x00fd, 0xDEFD'D835}, // U+1D6FD, 𝛽, \itbeta, Mathematical Italic Small Beta
 {0x6c15, 0x0104, 0x2967}, // ⥧, \leftrightharpoonsdown, Leftwards Harpoon With Barb Down Above Rightwards Harpoon With Barb Down
-{0x7304, 0x011a, 0x1D4B3}, // 𝒳, \scrX, Mathematical Script Capital X
+{0x7304, 0x011a, 0xDCB3'D835}, // U+1D4B3, 𝒳, \scrX, Mathematical Script Capital X
 {0x770e, 0x011f, 0x2A60}, // ⩠, \wedgedoublebar, Logical And With Double Underbar
 {0x4105, 0x012e, 0x299C}, // ⦜, \Angle, Right Angle Variant With Square
 {0x6305, 0x0134, 0x2AD1}, // ⫑, \csube, Closed Subset Or Equal To
-{0x7304, 0x013a, 0x1D4B4}, // 𝒴, \scrY, Mathematical Script Capital Y
+{0x7304, 0x013a, 0xDCB4'D835}, // U+1D4B4, 𝒴, \scrY, Mathematical Script Capital Y
 {0x6209, 0x013f, 0x29C5}, // ⧅, \boxbslash, Squared Falling Diagonal Slash
 {0x6e07, 0x0149, 0x2249}, // ≉, \napprox, Not Almost Equal To
 {0x720f, 0x0151, 0x22CC}, // ⋌, \rightthreetimes, Right Semidirect Product
-{0x7304, 0x0161, 0x1D4B5}, // 𝒵, \scrZ, Mathematical Script Capital Z
+{0x7304, 0x0161, 0xDCB5'D835}, // U+1D4B5, 𝒵, \scrZ, Mathematical Script Capital Z
 {0x7308, 0x0166, 0x228F}, // ⊏, \sqsubset, Square Image Of
 {0x5403, 0x016f, 0x03A4}, // Τ, \Tau, Greek Capital Letter Tau
 {0x6206, 0x0173, 0x22A1}, // ⊡, \boxdot, Squared Dot Operator
 {0x7305, 0x017a, 0x2AA0}, // ⪠, \simgE, Similar Above Greater-Than Above Equals Sign
-{0x6908, 0x0180, 0x1D706}, // 𝜆, \itlambda, Mathematical Italic Small Lamda
+{0x6908, 0x0180, 0xDF06'D835}, // U+1D706, 𝜆, \itlambda, Mathematical Italic Small Lamda
 {0x6d0f, 0x0189, 0x29AB}, // ⦫, \measangleldtosw, Measured Angle With Open Arm Ending In Arrow Pointing Down And Left
 {0x730e, 0x0199, 0x25A7}, // ▧, \squarenwsefill, Square With Upper Left To Lower Right Fill
 {0x5e06, 0x01a8, 0x1DB2}, // ᶲ, \^ltphi, Modifier Letter Small Phi
 {0x7210, 0x01af, 0x21F6}, // ⇶, \rightthreearrows, Three Rightwards Arrows
 {0x7307, 0x01c0, 0x220D}, // ∍, \smallni, Small Contains As Member
 {0x5305, 0x01c8, 0x2A4F}, // ⩏, \Sqcup, Double Square Union
-{0x620d, 0x01ce, 0x1D79E}, // 𝞞, \bisansOmicron, Mathematical Sans-Serif Bold Italic Capital Omicron
+{0x620d, 0x01ce, 0xDF9E'D835}, // U+1D79E, 𝞞, \bisansOmicron, Mathematical Sans-Serif Bold Italic Capital Omicron
 {0x6409, 0x01dc, 0x2193}, // ↓, \downarrow, Downwards Arrow / Down Arrow
 {0x6909, 0x01e6, 0x27F8}, // ⟸, \impliedby, Long Leftwards Double Arrow
 {0x6c06, 0x01f0, 0x22C9}, // ⋉, \ltimes, Left Normal Factor Semidirect Product
-{0x7307, 0x01f7, 0x1D7E4}, // 𝟤, \sanstwo, Mathematical Sans-Serif Digit Two
+{0x7307, 0x01f7, 0xDFE4'D835}, // U+1D7E4, 𝟤, \sanstwo, Mathematical Sans-Serif Digit Two
 {0x740f, 0x01ff, 0x2B36}, // ⬶, \twoheadmapsfrom, Leftwards Two-Headed Arrow From Bar
 {0x550d, 0x020f, 0x296E}, // ⥮, \UpEquilibrium, Upwards Harpoon With Barb Left Beside Downwards Harpoon With Barb Right
 {0x6208, 0x021d, 0x2A04}, // ⨄, \biguplus, N-Ary Union Operator With Plus
@@ -518,25 +518,25 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7003, 0x022e, 0x03D5}, // ϕ, \phi, Greek Phi Symbol / Greek Small Letter Script Phi
 {0x7008, 0x0232, 0x22E8}, // ⋨, \precnsim, Precedes But Not Equivalent To
 {0x700b, 0x023b, 0x227C}, // ≼, \preccurlyeq, Precedes Or Equal To
-{0x7304, 0x0247, 0x1D4B6}, // 𝒶, \scra, Mathematical Script Small A
+{0x7304, 0x0247, 0xDCB6'D835}, // U+1D4B6, 𝒶, \scra, Mathematical Script Small A
 {0x4c04, 0x024c, 0x21B2}, // ↲, \Ldsh, Downwards Arrow With Tip Leftwards / Down Arrow With Tip Left
 {0x640e, 0x0251, 0x21C5}, // ⇅, \dblarrowupdown, Upwards Arrow Leftwards Of Downwards Arrow / Up Arrow Left Of Down Arrow
 {0x6c03, 0x0260, 0x264C}, // ♌, \leo, Leo
-{0x7304, 0x0264, 0x1D4B7}, // 𝒷, \scrb, Mathematical Script Small B
+{0x7304, 0x0264, 0xDCB7'D835}, // U+1D4B7, 𝒷, \scrb, Mathematical Script Small B
 {0x6208, 0x0269, 0x22C0}, // ⋀, \bigwedge, N-Ary Logical And
 {0x6306, 0x0272, 0x2257}, // ≗, \circeq, Ring Equal To
 {0x6f0b, 0x0279, 0x00AA}, // ª, \ordfeminine, Feminine Ordinal Indicator
-{0x7304, 0x0285, 0x1D4B8}, // 𝒸, \scrc, Mathematical Script Small C
+{0x7304, 0x0285, 0xDCB8'D835}, // U+1D4B8, 𝒸, \scrc, Mathematical Script Small C
 {0x4c0f, 0x028a, 0x2960}, // ⥠, \LeftUpTeeVector, Upwards Harpoon With Barb Left From Bar
-{0x6205, 0x029a, 0x1D6AE}, // 𝚮, \bfEta, Mathematical Bold Capital Eta
+{0x6205, 0x029a, 0xDEAE'D835}, // U+1D6AE, 𝚮, \bfEta, Mathematical Bold Capital Eta
 {0x6505, 0x02a0, 0x2261}, // ≡, \equiv, Identical To
-{0x6907, 0x02a6, 0x1D705}, // 𝜅, \itkappa, Mathematical Italic Small Kappa
+{0x6907, 0x02a6, 0xDF05'D835}, // U+1D705, 𝜅, \itkappa, Mathematical Italic Small Kappa
 {0x6c03, 0x02ae, 0x2264}, // ≤, \leq, Less-Than Or Equal To / Less Than Or Equal To
 {0x6c09, 0x02b2, 0x27E6}, // ⟦, \llbracket, Mathematical Left White Square Bracket
 {0x6c0a, 0x02bc, 0x25FA}, // ◺, \lltriangle, Lower Left Triangle
 {0x6e0b, 0x02c7, 0x292E}, // ⤮, \neovsearrow, North East Arrow Crossing South East Arrow
-{0x7304, 0x02d3, 0x1D4B9}, // 𝒹, \scrd, Mathematical Script Small D
-{0x6207, 0x02d8, 0x1D735}, // 𝜵, \binabla, Mathematical Bold Italic Nabla
+{0x7304, 0x02d3, 0xDCB9'D835}, // U+1D4B9, 𝒹, \scrd, Mathematical Script Small D
+{0x6207, 0x02d8, 0xDF35'D835}, // U+1D735, 𝜵, \binabla, Mathematical Bold Italic Nabla
 {0x6405, 0x02e0, 0x20DB}, // ⃛, \dddot, Combining Three Dots Above / Non-Spacing Three Dots Above
 {0x6c05, 0x02e6, 0x264E}, // ♎, \libra, Libra
 {0x6d09, 0x02ec, 0x2A5D}, // ⩝, \midbarvee, Logical Or With Horizontal Dash
@@ -547,47 +547,47 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x640c, 0x0312, 0x273D}, // ✽, \dingasterisk, Heavy Teardrop-Spoked Asterisk
 {0x6806, 0x031f, 0x210F}, // ℏ, \hslash, Planck Constant Over Two Pi / Planck Constant Over 2 Pi
 {0x6e06, 0x0326, 0x22AD}, // ⊭, \nvDash, Not True
-{0x7304, 0x032d, 0x1D4BB}, // 𝒻, \scrf, Mathematical Script Small F
+{0x7304, 0x032d, 0xDCBB'D835}, // U+1D4BB, 𝒻, \scrf, Mathematical Script Small F
 {0x4c0f, 0x0332, 0x29CF}, // ⧏, \LeftTriangleBar, Left Triangle Beside Vertical Bar
 {0x7304, 0x0342, 0x210A}, // ℊ, \scrg, Script Small G
 {0x5e06, 0x0347, 0x1D45}, // ᵅ, \^alpha, Modifier Letter Small Alpha
-{0x6208, 0x034e, 0x1D76B}, // 𝝫, \bsansPhi, Mathematical Sans-Serif Bold Capital Phi
-{0x6209, 0x0357, 0x1D7A7}, // 𝞧, \bisansPsi, Mathematical Sans-Serif Bold Italic Capital Psi
+{0x6208, 0x034e, 0xDF6B'D835}, // U+1D76B, 𝝫, \bsansPhi, Mathematical Sans-Serif Bold Capital Phi
+{0x6209, 0x0357, 0xDFA7'D835}, // U+1D7A7, 𝞧, \bisansPsi, Mathematical Sans-Serif Bold Italic Capital Psi
 {0x6707, 0x0361, 0x2A82}, // ⪂, \gesdoto, Greater-Than Or Slanted Equal To With Dot Above
-{0x7304, 0x0369, 0x1D4BD}, // 𝒽, \scrh, Mathematical Script Small H
+{0x7304, 0x0369, 0xDCBD'D835}, // U+1D4BD, 𝒽, \scrh, Mathematical Script Small H
 {0x6204, 0x036e, 0x2146}, // ⅆ, \bbid, Double-Struck Italic Small D
-{0x6208, 0x0373, 0x1D6CC}, // 𝛌, \bflambda, Mathematical Bold Small Lamda
+{0x6208, 0x0373, 0xDECC'D835}, // U+1D6CC, 𝛌, \bflambda, Mathematical Bold Small Lamda
 {0x6d0c, 0x037c, 0x2B51}, // ⭑, \medblackstar, Black Small Star
 {0x6f05, 0x0389, 0x2295}, // ⊕, \oplus, Circled Plus
 {0x720f, 0x038f, 0x21C4}, // ⇄, \rightleftarrows, Rightwards Arrow Over Leftwards Arrow / Right Arrow Over Left Arrow
 {0x720f, 0x039f, 0x21E8}, // ⇨, \rightwhitearrow, Rightwards White Arrow / White Right Arrow
-{0x7304, 0x03af, 0x1D4BE}, // 𝒾, \scri, Mathematical Script Small I
+{0x7304, 0x03af, 0xDCBE'D835}, // U+1D4BE, 𝒾, \scri, Mathematical Script Small I
 {0x750e, 0x03b4, 0x21BE}, // ↾, \upharpoonright, Upwards Harpoon With Barb Rightwards / Up Harpoon With Barb Right
 {0x6204, 0x03c3, 0x2147}, // ⅇ, \bbie, Double-Struck Italic Small E
-{0x6207, 0x03c8, 0x1D7D6}, // 𝟖, \bfeight, Mathematical Bold Digit Eight
+{0x6207, 0x03c8, 0xDFD6'D835}, // U+1D7D6, 𝟖, \bfeight, Mathematical Bold Digit Eight
 {0x6305, 0x03d0, 0x2AD2}, // ⫒, \csupe, Closed Superset Or Equal To
 {0x630c, 0x03d6, 0x229C}, // ⊜, \circledequal, Circled Equals
 {0x6c06, 0x03e3, 0x2A93}, // ⪓, \lesges, Less-Than Above Slanted Equal Above Greater-Than Above Slanted Equal
 {0x6e0a, 0x03ea, 0x219A}, // ↚, \nleftarrow, Leftwards Arrow With Stroke / Left Arrow With Stroke
-{0x7304, 0x03f5, 0x1D4BF}, // 𝒿, \scrj, Mathematical Script Small J
+{0x7304, 0x03f5, 0xDCBF'D835}, // U+1D4BF, 𝒿, \scrj, Mathematical Script Small J
 {0x6406, 0x03fa, 0x2506}, // ┆, \dshfnc, Box Drawings Light Triple Dash Vertical / Forms Light Triple Dash Vertical
 {0x6508, 0x0401, 0x2205}, // ∅, \emptyset, Empty Set
 {0x6707, 0x040a, 0x2A7C}, // ⩼, \gtquest, Greater-Than With Question Mark Above
-{0x7304, 0x0412, 0x1D4C0}, // 𝓀, \scrk, Mathematical Script Small K
+{0x7304, 0x0412, 0xDCC0'D835}, // U+1D4C0, 𝓀, \scrk, Mathematical Script Small K
 {0x7506, 0x0417, 0x2A41}, // ⩁, \uminus, Union With Minus Sign
 {0x6506, 0x041e, 0x2A73}, // ⩳, \eqqsim, Equals Sign Above Tilde Operator
 {0x650f, 0x0425, 0x20E4}, // ⃤, \enclosetriangle, Combining Enclosing Upward Pointing Triangle
 {0x6e04, 0x0435, 0x2224}, // ∤, \nmid, Does Not Divide
-{0x7304, 0x043a, 0x1D4C1}, // 𝓁, \scrl, Mathematical Script Small L
+{0x7304, 0x043a, 0xDCC1'D835}, // U+1D4C1, 𝓁, \scrl, Mathematical Script Small L
 {0x7309, 0x043f, 0x2ABE}, // ⪾, \supsetdot, Superset With Dot
 {0x5e02, 0x0449, 0x207D}, // ⁽, \^(, Superscript Left Parenthesis / Superscript Opening Parenthesis
-{0x620d, 0x044c, 0x1D781}, // 𝞁, \bsansvarsigma, Mathematical Sans-Serif Bold Small Final Sigma
+{0x620d, 0x044c, 0xDF81'D835}, // U+1D781, 𝞁, \bsansvarsigma, Mathematical Sans-Serif Bold Small Final Sigma
 {0x6c06, 0x045a, 0x230A}, // ⌊, \lfloor, Left Floor
 {0x6e17, 0x0461, 0x2917}, // ⤗, \nvtwoheadrightarrowtail, Rightwards Two-Headed Arrow With Tail With Vertical Stroke
-{0x7304, 0x0479, 0x1D4C2}, // 𝓂, \scrm, Mathematical Script Small M
+{0x7304, 0x0479, 0xDCC2'D835}, // U+1D4C2, 𝓂, \scrm, Mathematical Script Small M
 {0x5e02, 0x047e, 0x207E}, // ⁾, \^), Superscript Right Parenthesis / Superscript Closing Parenthesis
 {0x6204, 0x0481, 0x2148}, // ⅈ, \bbii, Double-Struck Italic Small I
-{0x7304, 0x0486, 0x1D4C3}, // 𝓃, \scrn, Mathematical Script Small N
+{0x7304, 0x0486, 0xDCC3'D835}, // U+1D4C3, 𝓃, \scrn, Mathematical Script Small N
 {0x3003, 0x048b, 0x2189}, // ↉, \0/3, Vulgar Fraction Zero Thirds
 {0x6204, 0x048f, 0x2149}, // ⅉ, \bbij, Double-Struck Italic Small J
 {0x6e09, 0x0494, 0x2289}, // ⊉, \nsupseteq, Neither A Superset Of Nor Equal To
@@ -598,164 +598,164 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x5e02, 0x04c4, 0x207A}, // ⁺, \^+, Superscript Plus Sign
 {0x6705, 0x04c7, 0x2137}, // ℷ, \gimel, Gimel Symbol / Third Transfinite Cardinal
 {0x680c, 0x04cd, 0x2B23}, // ⬣, \hexagonblack, Horizontal Black Hexagon
-{0x6907, 0x04da, 0x1D6F4}, // 𝛴, \itSigma, Mathematical Italic Capital Sigma
+{0x6907, 0x04da, 0xDEF4'D835}, // U+1D6F4, 𝛴, \itSigma, Mathematical Italic Capital Sigma
 {0x6d06, 0x04e2, 0x21A5}, // ↥, \mapsup, Upwards Arrow From Bar / Up Arrow From Bar
 {0x6f06, 0x04e9, 0x2298}, // ⊘, \oslash, Circled Division Slash
 {0x7008, 0x04f0, 0x2057}, // ⁗, \pppprime, Quadruple Prime
-{0x7304, 0x04f9, 0x1D4C5}, // 𝓅, \scrp, Mathematical Script Small P
-{0x7308, 0x04fe, 0x1D7E6}, // 𝟦, \sansfour, Mathematical Sans-Serif Digit Four
+{0x7304, 0x04f9, 0xDCC5'D835}, // U+1D4C5, 𝓅, \scrp, Mathematical Script Small P
+{0x7308, 0x04fe, 0xDFE6'D835}, // U+1D7E6, 𝟦, \sansfour, Mathematical Sans-Serif Digit Four
 {0x620d, 0x0507, 0x25B4}, // ▴, \blacktriangle, Black Up-Pointing Small Triangle / Black Up Pointing Small Triangle
 {0x7007, 0x0515, 0x2AB3}, // ⪳, \preceqq, Precedes Above Equals Sign
-{0x7304, 0x051d, 0x1D4C6}, // 𝓆, \scrq, Mathematical Script Small Q
+{0x7304, 0x051d, 0xDCC6'D835}, // U+1D4C6, 𝓆, \scrq, Mathematical Script Small Q
 {0x4e12, 0x0522, 0x0338'29CF}, // ⧏̸, \NotLeftTriangleBar, Left Triangle Beside Vertical Bar + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x5e02, 0x0535, 0x207B}, // ⁻, \^-, Superscript Minus / Superscript Hyphen-Minus
 {0x650d, 0x0538, 0x22D5}, // ⋕, \equalparallel, Equal And Parallel To
-{0x7304, 0x0546, 0x1D4C7}, // 𝓇, \scrr, Mathematical Script Small R
+{0x7304, 0x0546, 0xDCC7'D835}, // U+1D4C7, 𝓇, \scrr, Mathematical Script Small R
 {0x6c14, 0x054b, 0x2948}, // ⥈, \leftrightarrowcircle, Left Right Arrow Through Small Circle
 {0x6d0a, 0x0560, 0x2A2B}, // ⨫, \minusfdots, Minus Sign With Falling Dots
 {0x7005, 0x056b, 0x028B}, // ʋ, \pscrv, Latin Small Letter V With Hook / Latin Small Letter Script V
-{0x7304, 0x0571, 0x1D4C8}, // 𝓈, \scrs, Mathematical Script Small S
-{0x6909, 0x0576, 0x1D6F0}, // 𝛰, \itOmicron, Mathematical Italic Capital Omicron
-{0x7304, 0x0580, 0x1D4C9}, // 𝓉, \scrt, Mathematical Script Small T
+{0x7304, 0x0571, 0xDCC8'D835}, // U+1D4C8, 𝓈, \scrs, Mathematical Script Small S
+{0x6909, 0x0576, 0xDEF0'D835}, // U+1D6F0, 𝛰, \itOmicron, Mathematical Italic Capital Omicron
+{0x7304, 0x0580, 0xDCC9'D835}, // U+1D4C9, 𝓉, \scrt, Mathematical Script Small T
 {0x7306, 0x0585, 0x2AD4}, // ⫔, \supsub, Superset Above Subset
 {0x7702, 0x058c, 0x2118}, // ℘, \wp, Script Capital P / Script P
 {0x5e02, 0x058f, 0x2070}, // ⁰, \^0, Superscript Zero / Superscript Digit Zero
 {0x6405, 0x0592, 0x22F2}, // ⋲, \disin, Element Of With Long Horizontal Stroke
-{0x7304, 0x0598, 0x1D4CA}, // 𝓊, \scru, Mathematical Script Small U
+{0x7304, 0x0598, 0xDCCA'D835}, // U+1D4CA, 𝓊, \scru, Mathematical Script Small U
 {0x750e, 0x059d, 0x21A8}, // ↨, \updownarrowbar, Up Down Arrow With Base
 {0x5e02, 0x05ac, 0x00B9}, // ¹, \^1, Superscript One / Superscript Digit One
-{0x6205, 0x05af, 0x1D4D0}, // 𝓐, \bscrA, Mathematical Bold Script Capital A
+{0x6205, 0x05af, 0xDCD0'D835}, // U+1D4D0, 𝓐, \bscrA, Mathematical Bold Script Capital A
 {0x6f10, 0x05b5, 0x2233}, // ∳, \ointctrclockwise, Anticlockwise Contour Integral
-{0x7304, 0x05c6, 0x1D4CB}, // 𝓋, \scrv, Mathematical Script Small V
+{0x7304, 0x05c6, 0xDCCB'D835}, // U+1D4CB, 𝓋, \scrv, Mathematical Script Small V
 {0x740d, 0x05cb, 0x25E0}, // ◠, \topsemicircle, Upper Half Circle
 {0x7702, 0x05d9, 0x2240}, // ≀, \wr, Wreath Product
 {0x5e02, 0x05dc, 0x00B2}, // ², \^2, Superscript Two / Superscript Digit Two
-{0x6205, 0x05df, 0x1D4D1}, // 𝓑, \bscrB, Mathematical Bold Script Capital B
+{0x6205, 0x05df, 0xDCD1'D835}, // U+1D4D1, 𝓑, \bscrB, Mathematical Bold Script Capital B
 {0x6206, 0x05e5, 0x25EB}, // ◫, \boxbar, White Square With Vertical Bisecting Line
 {0x6306, 0x05ec, 0x264B}, // ♋, \cancer, Cancer
-{0x7304, 0x05f3, 0x1D4CC}, // 𝓌, \scrw, Mathematical Script Small W
+{0x7304, 0x05f3, 0xDCCC'D835}, // U+1D4CC, 𝓌, \scrw, Mathematical Script Small W
 {0x7409, 0x05f8, 0x23E2}, // ⏢, \trapezium, White Trapezium
 {0x7608, 0x0602, 0x03F0}, // ϰ, \varkappa, Greek Kappa Symbol / Greek Small Letter Script Kappa
 {0x5e02, 0x060b, 0x00B3}, // ³, \^3, Superscript Three / Superscript Digit Three
-{0x6205, 0x060e, 0x1D4D2}, // 𝓒, \bscrC, Mathematical Bold Script Capital C
-{0x6209, 0x0614, 0x1D6DC}, // 𝛜, \bfepsilon, Mathematical Bold Epsilon Symbol
+{0x6205, 0x060e, 0xDCD2'D835}, // U+1D4D2, 𝓒, \bscrC, Mathematical Bold Script Capital C
+{0x6209, 0x0614, 0xDEDC'D835}, // U+1D6DC, 𝛜, \bfepsilon, Mathematical Bold Epsilon Symbol
 {0x6709, 0x061e, 0x2A86}, // ⪆, \gtrapprox, Greater-Than Or Approximate
-{0x7304, 0x0628, 0x1D4CD}, // 𝓍, \scrx, Mathematical Script Small X
+{0x7304, 0x0628, 0xDCCD'D835}, // U+1D4CD, 𝓍, \scrx, Mathematical Script Small X
 {0x730c, 0x062d, 0x2B29}, // ⬩, \smblkdiamond, Black Small Diamond
 {0x730c, 0x063a, 0x25F3}, // ◳, \squareurquad, White Square With Upper Right Quadrant
 {0x730f, 0x0647, 0x25A9}, // ▩, \squarecrossfill, Square With Diagonal Crosshatch Fill
 {0x5e02, 0x0657, 0x2074}, // ⁴, \^4, Superscript Four / Superscript Digit Four
-{0x6205, 0x065a, 0x1D6BD}, // 𝚽, \bfPhi, Mathematical Bold Capital Phi
-{0x6205, 0x0660, 0x1D4D3}, // 𝓓, \bscrD, Mathematical Bold Script Capital D
+{0x6205, 0x065a, 0xDEBD'D835}, // U+1D6BD, 𝚽, \bfPhi, Mathematical Bold Capital Phi
+{0x6205, 0x0660, 0xDCD3'D835}, // U+1D4D3, 𝓓, \bscrD, Mathematical Bold Script Capital D
 {0x6208, 0x0666, 0x2A01}, // ⨁, \bigoplus, N-Ary Circled Plus Operator
-{0x6208, 0x066f, 0x1D754}, // 𝝔, \bivarrho, Mathematical Bold Italic Rho Symbol
+{0x6208, 0x066f, 0xDF54'D835}, // U+1D754, 𝝔, \bivarrho, Mathematical Bold Italic Rho Symbol
 {0x6213, 0x0678, 0x2593}, // ▓, \blockthreeqtrshaded, Dark Shade
 {0x630b, 0x068c, 0x2651}, // ♑, \capricornus, Capricorn
 {0x6704, 0x0698, 0x0294}, // ʔ, \glst, Latin Letter Glottal Stop
 {0x6d06, 0x069d, 0x2A5F}, // ⩟, \minhat, Logical And With Underbar
-{0x7304, 0x06a4, 0x1D4CE}, // 𝓎, \scry, Mathematical Script Small Y
+{0x7304, 0x06a4, 0xDCCE'D835}, // U+1D4CE, 𝓎, \scry, Mathematical Script Small Y
 {0x4c0e, 0x06a9, 0x21D4}, // ⇔, \Leftrightarrow, Left Right Double Arrow
 {0x5e02, 0x06b8, 0x2075}, // ⁵, \^5, Superscript Five / Superscript Digit Five
-{0x6205, 0x06bb, 0x1D4D4}, // 𝓔, \bscrE, Mathematical Bold Script Capital E
-{0x6209, 0x06c1, 0x1D730}, // 𝜰, \biUpsilon, Mathematical Bold Italic Capital Upsilon
-{0x620a, 0x06cb, 0x1D75F}, // 𝝟, \bsansKappa, Mathematical Sans-Serif Bold Capital Kappa
+{0x6205, 0x06bb, 0xDCD4'D835}, // U+1D4D4, 𝓔, \bscrE, Mathematical Bold Script Capital E
+{0x6209, 0x06c1, 0xDF30'D835}, // U+1D730, 𝜰, \biUpsilon, Mathematical Bold Italic Capital Upsilon
+{0x620a, 0x06cb, 0xDF5F'D835}, // U+1D75F, 𝝟, \bsansKappa, Mathematical Sans-Serif Bold Capital Kappa
 {0x6c03, 0x06d6, 0x2A91}, // ⪑, \lgE, Less-Than Above Greater-Than Above Double-Line Equal
-{0x7304, 0x06da, 0x1D4CF}, // 𝓏, \scrz, Mathematical Script Small Z
+{0x7304, 0x06da, 0xDCCF'D835}, // U+1D4CF, 𝓏, \scrz, Mathematical Script Small Z
 {0x7304, 0x06df, 0x221A}, // √, \surd, Square Root
 {0x5e02, 0x06e4, 0x2076}, // ⁶, \^6, Superscript Six / Superscript Digit Six
-{0x6205, 0x06e7, 0x1D4D5}, // 𝓕, \bscrF, Mathematical Bold Script Capital F
-{0x6207, 0x06ed, 0x1D74E}, // 𝝎, \biomega, Mathematical Bold Italic Small Omega
+{0x6205, 0x06e7, 0xDCD5'D835}, // U+1D4D5, 𝓕, \bscrF, Mathematical Bold Script Capital F
+{0x6207, 0x06ed, 0xDF4E'D835}, // U+1D74E, 𝝎, \biomega, Mathematical Bold Italic Small Omega
 {0x630a, 0x06f5, 0x22CF}, // ⋏, \curlywedge, Curly Logical And
 {0x640d, 0x0700, 0x223A}, // ∺, \dotsminusdots, Geometric Proportion
 {0x6709, 0x070e, 0x2AFA}, // ⫺, \geqqslant, Double-Line Slanted Greater-Than Or Equal To
 {0x6807, 0x0718, 0x2394}, // ⎔, \hexagon, Software-Function Symbol
 {0x6c07, 0x0720, 0x2276}, // ≶, \lessgtr, Less-Than Or Greater-Than / Less Than Or Greater Than
 {0x5e02, 0x0728, 0x2077}, // ⁷, \^7, Superscript Seven / Superscript Digit Seven
-{0x6205, 0x072b, 0x1D4D6}, // 𝓖, \bscrG, Mathematical Bold Script Capital G
+{0x6205, 0x072b, 0xDCD6'D835}, // U+1D4D6, 𝓖, \bscrG, Mathematical Bold Script Capital G
 {0x6309, 0x0731, 0x2A07}, // ⨇, \conjquant, Two Logical And Operator
 {0x6e0b, 0x073b, 0x21F7}, // ⇷, \nvleftarrow, Leftwards Arrow With Vertical Stroke
 {0x7307, 0x0747, 0x2AD8}, // ⫘, \supdsub, Superset Beside And Joined By Dash With Subset
 {0x5605, 0x074f, 0x22A9}, // ⊩, \Vdash, Forces
 {0x5e02, 0x0755, 0x2078}, // ⁸, \^8, Superscript Eight / Superscript Digit Eight
-{0x6205, 0x0758, 0x1D4D7}, // 𝓗, \bscrH, Mathematical Bold Script Capital H
-{0x6209, 0x075e, 0x1D775}, // 𝝵, \bsanszeta, Mathematical Sans-Serif Bold Small Zeta
+{0x6205, 0x0758, 0xDCD7'D835}, // U+1D4D7, 𝓗, \bscrH, Mathematical Bold Script Capital H
+{0x6209, 0x075e, 0xDF75'D835}, // U+1D775, 𝝵, \bsanszeta, Mathematical Sans-Serif Bold Small Zeta
 {0x6c09, 0x0768, 0x22DA}, // ⋚, \lesseqgtr, Less-Than Equal To Or Greater-Than / Less Than Equal To Or Greater Than
 {0x5e02, 0x0772, 0x2079}, // ⁹, \^9, Superscript Nine / Superscript Digit Nine
-{0x6205, 0x0775, 0x1D4D8}, // 𝓘, \bscrI, Mathematical Bold Script Capital I
-{0x6207, 0x077b, 0x1D738}, // 𝜸, \bigamma, Mathematical Bold Italic Small Gamma
+{0x6205, 0x0775, 0xDCD8'D835}, // U+1D4D8, 𝓘, \bscrI, Mathematical Bold Script Capital I
+{0x6207, 0x077b, 0xDF38'D835}, // U+1D738, 𝜸, \bigamma, Mathematical Bold Italic Small Gamma
 {0x7006, 0x0783, 0x028A}, // ʊ, \pupsil, Latin Small Letter Upsilon
 {0x760c, 0x078a, 0x22D8}, // ⋘, \verymuchless, Very Much Less-Than / Very Much Less Than
-{0x6205, 0x0797, 0x1D4D9}, // 𝓙, \bscrJ, Mathematical Bold Script Capital J
+{0x6205, 0x0797, 0xDCD9'D835}, // U+1D4D9, 𝓙, \bscrJ, Mathematical Bold Script Capital J
 {0x7607, 0x079d, 0x2736}, // ✶, \varstar, Six Pointed Black Star
-{0x6205, 0x07a5, 0x1D4DA}, // 𝓚, \bscrK, Mathematical Bold Script Capital K
-{0x7307, 0x07ab, 0x1D7E3}, // 𝟣, \sansone, Mathematical Sans-Serif Digit One
-{0x6205, 0x07b3, 0x1D4DB}, // 𝓛, \bscrL, Mathematical Bold Script Capital L
+{0x6205, 0x07a5, 0xDCDA'D835}, // U+1D4DA, 𝓚, \bscrK, Mathematical Bold Script Capital K
+{0x7307, 0x07ab, 0xDFE3'D835}, // U+1D7E3, 𝟣, \sansone, Mathematical Sans-Serif Digit One
+{0x6205, 0x07b3, 0xDCDB'D835}, // U+1D4DB, 𝓛, \bscrL, Mathematical Bold Script Capital L
 {0x6505, 0x07b9, 0x225D}, // ≝, \eqdef, Equal To By Definition
 {0x6b05, 0x07bf, 0x03BA}, // κ, \kappa, Greek Small Letter Kappa
 {0x730a, 0x07c5, 0x2AC0}, // ⫀, \supsetplus, Superset With Plus Sign Below
 {0x740f, 0x07d0, 0x22B5}, // ⊵, \trianglerighteq, Contains As Normal Subgroup Or Equal To
 {0x5e02, 0x07e0, 0x207C}, // ⁼, \^=, Superscript Equals Sign
-{0x6205, 0x07e3, 0x1D4DC}, // 𝓜, \bscrM, Mathematical Bold Script Capital M
+{0x6205, 0x07e3, 0xDCDC'D835}, // U+1D4DC, 𝓜, \bscrM, Mathematical Bold Script Capital M
 {0x6206, 0x07e9, 0x2A43}, // ⩃, \barcap, Intersection With Overbar
-{0x620b, 0x07f0, 0x1D7B3}, // 𝞳, \bisanskappa, Mathematical Sans-Serif Bold Italic Small Kappa
+{0x620b, 0x07f0, 0xDFB3'D835}, // U+1D7B3, 𝞳, \bisanskappa, Mathematical Sans-Serif Bold Italic Small Kappa
 {0x6e04, 0x07fc, 0x2271}, // ≱, \ngeq, Neither Greater-Than Nor Equal To / Neither Greater Than Nor Equal To
 {0x6e0c, 0x0801, 0x21F8}, // ⇸, \nvrightarrow, Rightwards Arrow With Vertical Stroke
 {0x700a, 0x080e, 0x2AB7}, // ⪷, \precapprox, Precedes Above Almost Equal To
 {0x7306, 0x0819, 0x2AD6}, // ⫖, \supsup, Superset Above Superset
-{0x6205, 0x0820, 0x1D4DD}, // 𝓝, \bscrN, Mathematical Bold Script Capital N
-{0x6209, 0x0826, 0x1D6DB}, // 𝛛, \bfpartial, Mathematical Bold Partial Differential
-{0x620a, 0x0830, 0x1D7EF}, // 𝟯, \bsansthree, Mathematical Sans-Serif Bold Digit Three
+{0x6205, 0x0820, 0xDCDD'D835}, // U+1D4DD, 𝓝, \bscrN, Mathematical Bold Script Capital N
+{0x6209, 0x0826, 0xDEDB'D835}, // U+1D6DB, 𝛛, \bfpartial, Mathematical Bold Partial Differential
+{0x620a, 0x0830, 0xDFEF'D835}, // U+1D7EF, 𝟯, \bsansthree, Mathematical Sans-Serif Bold Digit Three
 {0x7408, 0x083b, 0x02DC}, // ˜, \tildelow, Small Tilde / Spacing Tilde
 {0x7414, 0x0844, 0x2B3B}, // ⬻, \twoheadleftarrowtail, Leftwards Two-Headed Arrow With Tail
 {0x4410, 0x0859, 0x21F5}, // ⇵, \DownArrowUpArrow, Downwards Arrow Leftwards Of Upwards Arrow
-{0x6205, 0x086a, 0x1D4DE}, // 𝓞, \bscrO, Mathematical Bold Script Capital O
+{0x6205, 0x086a, 0xDCDE'D835}, // U+1D4DE, 𝓞, \bscrO, Mathematical Bold Script Capital O
 {0x7214, 0x0870, 0x2B48}, // ⭈, \rightarrowbackapprox, Rightwards Arrow Above Reverse Almost Equal To
 {0x7308, 0x0885, 0x2216}, // ∖, \setminus, Set Minus
 {0x4f02, 0x088e, 0x2A54}, // ⩔, \Or, Double Logical Or
 {0x6108, 0x0891, 0x2609}, // ☉, \astrosun, Sun
-{0x6205, 0x089a, 0x1D4DF}, // 𝓟, \bscrP, Mathematical Bold Script Capital P
-{0x6207, 0x08a0, 0x1D6C9}, // 𝛉, \bftheta, Mathematical Bold Small Theta
+{0x6205, 0x089a, 0xDCDF'D835}, // U+1D4DF, 𝓟, \bscrP, Mathematical Bold Script Capital P
+{0x6207, 0x08a0, 0xDEC9'D835}, // U+1D6C9, 𝛉, \bftheta, Mathematical Bold Small Theta
 {0x7409, 0x08a8, 0x225C}, // ≜, \triangleq, Delta Equal To
 {0x5e02, 0x08b2, 0x1D2C}, // ᴬ, \^A, Modifier Letter Capital A
-{0x6205, 0x08b5, 0x1D4E0}, // 𝓠, \bscrQ, Mathematical Bold Script Capital Q
-{0x6207, 0x08bb, 0x1D6C5}, // 𝛅, \bfdelta, Mathematical Bold Small Delta
+{0x6205, 0x08b5, 0xDCE0'D835}, // U+1D4E0, 𝓠, \bscrQ, Mathematical Bold Script Capital Q
+{0x6207, 0x08bb, 0xDEC5'D835}, // U+1D6C5, 𝛅, \bfdelta, Mathematical Bold Small Delta
 {0x4c0d, 0x08c3, 0x295A}, // ⥚, \LeftTeeVector, Leftwards Harpoon With Barb Up From Bar
 {0x5e02, 0x08d1, 0x1D2E}, // ᴮ, \^B, Modifier Letter Capital B
-{0x6205, 0x08d4, 0x1D4E1}, // 𝓡, \bscrR, Mathematical Bold Script Capital R
+{0x6205, 0x08d4, 0xDCE1'D835}, // U+1D4E1, 𝓡, \bscrR, Mathematical Bold Script Capital R
 {0x6f06, 0x08da, 0x2230}, // ∰, \oiiint, Volume Integral
-{0x6205, 0x08e1, 0x1D4E2}, // 𝓢, \bscrS, Mathematical Bold Script Capital S
+{0x6205, 0x08e1, 0xDCE2'D835}, // U+1D4E2, 𝓢, \bscrS, Mathematical Bold Script Capital S
 {0x6208, 0x08e7, 0x229F}, // ⊟, \boxminus, Squared Minus
 {0x6f0c, 0x08f0, 0x0312}, // ̒, \oturnedcomma, Combining Turned Comma Above / Non-Spacing Turned Comma Above
 {0x7508, 0x08fd, 0x03DB}, // ϛ, \upstigma, Greek Small Letter Stigma
 {0x750b, 0x0906, 0x21E1}, // ⇡, \updasharrow, Upwards Dashed Arrow / Up Dashed Arrow
 {0x5e02, 0x0912, 0x1D30}, // ᴰ, \^D, Modifier Letter Capital D
-{0x6205, 0x0915, 0x1D4E3}, // 𝓣, \bscrT, Mathematical Bold Script Capital T
-{0x620d, 0x091b, 0x1D7BE}, // 𝞾, \bisansupsilon, Mathematical Sans-Serif Bold Italic Small Upsilon
-{0x6905, 0x0929, 0x1D712}, // 𝜒, \itchi, Mathematical Italic Small Chi
+{0x6205, 0x0915, 0xDCE3'D835}, // U+1D4E3, 𝓣, \bscrT, Mathematical Bold Script Capital T
+{0x620d, 0x091b, 0xDFBE'D835}, // U+1D7BE, 𝞾, \bisansupsilon, Mathematical Sans-Serif Bold Italic Small Upsilon
+{0x6905, 0x0929, 0xDF12'D835}, // U+1D712, 𝜒, \itchi, Mathematical Italic Small Chi
 {0x6e0f, 0x092f, 0x21CE}, // ⇎, \nLeftrightarrow, Left Right Double Arrow With Stroke
 {0x7307, 0x093f, 0x2AD7}, // ⫗, \suphsub, Superset Beside Subset
 {0x4c0a, 0x0947, 0x21DA}, // ⇚, \Lleftarrow, Leftwards Triple Arrow / Left Triple Arrow
 {0x5e02, 0x0952, 0x1D31}, // ᴱ, \^E, Modifier Letter Capital E
-{0x6205, 0x0955, 0x1D4E4}, // 𝓤, \bscrU, Mathematical Bold Script Capital U
-{0x620e, 0x095b, 0x1D7C6}, // 𝟆, \bisansvarkappa, Mathematical Sans-Serif Bold Italic Kappa Symbol
+{0x6205, 0x0955, 0xDCE4'D835}, // U+1D4E4, 𝓤, \bscrU, Mathematical Bold Script Capital U
+{0x620e, 0x095b, 0xDFC6'D835}, // U+1D7C6, 𝟆, \bisansvarkappa, Mathematical Sans-Serif Bold Italic Kappa Symbol
 {0x6410, 0x096a, 0x2B16}, // ⬖, \diamondleftblack, Diamond With Left Half Black
 {0x6505, 0x097b, 0x2242}, // ≂, \eqsim, Minus Tilde
 {0x6605, 0x0981, 0x2322}, // ⌢, \frown, Frown
 {0x680f, 0x0987, 0x25AC}, // ▬, \hrectangleblack, Black Rectangle
-{0x6205, 0x0997, 0x1D4E5}, // 𝓥, \bscrV, Mathematical Bold Script Capital V
+{0x6205, 0x0997, 0xDCE5'D835}, // U+1D4E5, 𝓥, \bscrV, Mathematical Bold Script Capital V
 {0x6406, 0x099d, 0x00B0}, // °, \degree, Degree Sign
 {0x640f, 0x09a4, 0x21AF}, // ↯, \downzigzagarrow, Downwards Zigzag Arrow / Down Zigzag Arrow
 {0x740d, 0x09b4, 0x2A3A}, // ⨺, \triangleminus, Minus Sign In Triangle
 {0x5e02, 0x09c2, 0x1D33}, // ᴳ, \^G, Modifier Letter Capital G
 {0x5e05, 0x09c5, 0x1DA5}, // ᶥ, \^iota, Modifier Letter Small Iota
-{0x6205, 0x09cb, 0x1D4E6}, // 𝓦, \bscrW, Mathematical Bold Script Capital W
-{0x6206, 0x09d1, 0x1D721}, // 𝜡, \biZeta, Mathematical Bold Italic Capital Zeta
+{0x6205, 0x09cb, 0xDCE6'D835}, // U+1D4E6, 𝓦, \bscrW, Mathematical Bold Script Capital W
+{0x6206, 0x09d1, 0xDF21'D835}, // U+1D721, 𝜡, \biZeta, Mathematical Bold Italic Capital Zeta
 {0x6312, 0x09d8, 0x25D3}, // ◓, \circletophalfblack, Circle With Upper Half Black
 {0x7305, 0x09eb, 0x02D2}, // ˒, \sbrhr, Modifier Letter Centred Right Half Ring / Modifier Letter Centered Right Half Ring
 {0x520a, 0x09f1, 0x21D2}, // ⇒, \Rightarrow, Rightwards Double Arrow / Right Double Arrow
 {0x5305, 0x09fc, 0x03A3}, // Σ, \Sigma, Greek Capital Letter Sigma
 {0x5e02, 0x0a02, 0x1D34}, // ᴴ, \^H, Modifier Letter Capital H
-{0x6205, 0x0a05, 0x1D4E7}, // 𝓧, \bscrX, Mathematical Bold Script Capital X
+{0x6205, 0x0a05, 0xDCE7'D835}, // U+1D4E7, 𝓧, \bscrX, Mathematical Bold Script Capital X
 {0x6c05, 0x0a0b, 0x2268}, // ≨, \lneqq, Less-Than But Not Equal To / Less Than But Not Equal To
 {0x6c09, 0x0a11, 0x2AF9}, // ⫹, \leqqslant, Double-Line Slanted Less-Than Or Equal To
 {0x6e06, 0x0a1b, 0x226D}, // ≭, \nasymp, Not Equivalent To
@@ -763,12 +763,12 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x770b, 0x0a30, 0x2B2F}, // ⬯, \whtvertoval, White Vertical Ellipse
 {0x5e02, 0x0a3c, 0x1D35}, // ᴵ, \^I, Modifier Letter Capital I
 {0x5f02, 0x0a3f, 0x208D}, // ₍, \_(, Subscript Left Parenthesis / Subscript Opening Parenthesis
-{0x6205, 0x0a42, 0x1D4E8}, // 𝓨, \bscrY, Mathematical Bold Script Capital Y
-{0x620b, 0x0a48, 0x1D7A2}, // 𝞢, \bisansSigma, Mathematical Sans-Serif Bold Italic Capital Sigma
+{0x6205, 0x0a42, 0xDCE8'D835}, // U+1D4E8, 𝓨, \bscrY, Mathematical Bold Script Capital Y
+{0x620b, 0x0a48, 0xDFA2'D835}, // U+1D7A2, 𝞢, \bisansSigma, Mathematical Sans-Serif Bold Italic Capital Sigma
 {0x7802, 0x0a54, 0x03BE}, // ξ, \xi, Greek Small Letter Xi
 {0x5e02, 0x0a57, 0x1D36}, // ᴶ, \^J, Modifier Letter Capital J
 {0x5f02, 0x0a5a, 0x208E}, // ₎, \_), Subscript Right Parenthesis / Subscript Closing Parenthesis
-{0x6205, 0x0a5d, 0x1D4E9}, // 𝓩, \bscrZ, Mathematical Bold Script Capital Z
+{0x6205, 0x0a5d, 0xDCE9'D835}, // U+1D4E9, 𝓩, \bscrZ, Mathematical Bold Script Capital Z
 {0x680e, 0x0a63, 0x21AA}, // ↪, \hookrightarrow, Rightwards Arrow With Hook / Right Arrow With Hook
 {0x6917, 0x0a72, 0x25DB}, // ◛, \invwhitelowerhalfcircle, Lower Half Inverse White Circle
 {0x7006, 0x0a8a, 0x210E}, // ℎ, \planck, Planck Constant
@@ -781,56 +781,56 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7505, 0x0abb, 0x2A1B}, // ⨛, \upint, Integral With Overbar
 {0x5e02, 0x0ac1, 0x1D38}, // ᴸ, \^L, Modifier Letter Capital L
 {0x5f02, 0x0ac4, 0x208A}, // ₊, \_+, Subscript Plus Sign
-{0x6209, 0x0ac7, 0x1D7A0}, // 𝞠, \bisansRho, Mathematical Sans-Serif Bold Italic Capital Rho
-{0x620a, 0x0ad1, 0x1D795}, // 𝞕, \bisansZeta, Mathematical Sans-Serif Bold Italic Capital Zeta
+{0x6209, 0x0ac7, 0xDFA0'D835}, // U+1D7A0, 𝞠, \bisansRho, Mathematical Sans-Serif Bold Italic Capital Rho
+{0x620a, 0x0ad1, 0xDF95'D835}, // U+1D795, 𝞕, \bisansZeta, Mathematical Sans-Serif Bold Italic Capital Zeta
 {0x650b, 0x0adc, 0x2A9C}, // ⪜, \eqqslantgtr, Double-Line Slanted Equal To Or Greater-Than
 {0x750d, 0x0ae8, 0x2909}, // ⤉, \uparrowbarred, Upwards Arrow With Horizontal Stroke
 {0x5a04, 0x0af6, 0x0396}, // Ζ, \Zeta, Greek Capital Letter Zeta
 {0x5e02, 0x0afb, 0x1D39}, // ᴹ, \^M, Modifier Letter Capital M
-{0x6204, 0x0afe, 0x1D727}, // 𝜧, \biMu, Mathematical Bold Italic Capital Mu
-{0x6906, 0x0b03, 0x1D608}, // 𝘈, \isansA, Mathematical Sans-Serif Italic Capital A
+{0x6204, 0x0afe, 0xDF27'D835}, // U+1D727, 𝜧, \biMu, Mathematical Bold Italic Capital Mu
+{0x6906, 0x0b03, 0xDE08'D835}, // U+1D608, 𝘈, \isansA, Mathematical Sans-Serif Italic Capital A
 {0x7205, 0x0b0a, 0x2309}, // ⌉, \rceil, Right Ceiling
 {0x7904, 0x0b10, 0x0292}, // ʒ, \yogh, Latin Small Letter Ezh / Latin Small Letter Yogh
 {0x5e02, 0x0b15, 0x1D3A}, // ᴺ, \^N, Modifier Letter Capital N
 {0x5f02, 0x0b18, 0x208B}, // ₋, \_-, Subscript Minus / Subscript Hyphen-Minus
-{0x6906, 0x0b1b, 0x1D609}, // 𝘉, \isansB, Mathematical Sans-Serif Italic Capital B
+{0x6906, 0x0b1b, 0xDE09'D835}, // U+1D609, 𝘉, \isansB, Mathematical Sans-Serif Italic Capital B
 {0x5e02, 0x0b22, 0x1D3C}, // ᴼ, \^O, Modifier Letter Capital O
 {0x6212, 0x0b25, 0x25B6}, // ▶, \blacktriangleright, Black Right-Pointing Triangle / Black Right Pointing Triangle
-{0x6906, 0x0b38, 0x1D60A}, // 𝘊, \isansC, Mathematical Sans-Serif Italic Capital C
+{0x6906, 0x0b38, 0xDE0A'D835}, // U+1D60A, 𝘊, \isansC, Mathematical Sans-Serif Italic Capital C
 {0x5e02, 0x0b3f, 0x1D3E}, // ᴾ, \^P, Modifier Letter Capital P
 {0x6411, 0x0b42, 0x2B17}, // ⬗, \diamondrightblack, Diamond With Right Half Black
-{0x6906, 0x0b54, 0x1D60B}, // 𝘋, \isansD, Mathematical Sans-Serif Italic Capital D
+{0x6906, 0x0b54, 0xDE0B'D835}, // U+1D60B, 𝘋, \isansD, Mathematical Sans-Serif Italic Capital D
 {0x7803, 0x0b5b, 0x22BB}, // ⊻, \xor, Xor
 {0x5f02, 0x0b5f, 0x2080}, // ₀, \_0, Subscript Zero / Subscript Digit Zero
-{0x6205, 0x0b62, 0x1D4EA}, // 𝓪, \bscra, Mathematical Bold Script Small A
+{0x6205, 0x0b62, 0xDCEA'D835}, // U+1D4EA, 𝓪, \bscra, Mathematical Bold Script Small A
 {0x6308, 0x0b68, 0x2663}, // ♣, \clubsuit, Black Club Suit
-{0x6904, 0x0b71, 0x1D6EF}, // 𝛯, \itXi, Mathematical Italic Capital Xi
-{0x6906, 0x0b76, 0x1D60C}, // 𝘌, \isansE, Mathematical Sans-Serif Italic Capital E
+{0x6904, 0x0b71, 0xDEEF'D835}, // U+1D6EF, 𝛯, \itXi, Mathematical Italic Capital Xi
+{0x6906, 0x0b76, 0xDE0C'D835}, // U+1D60C, 𝘌, \isansE, Mathematical Sans-Serif Italic Capital E
 {0x770b, 0x0b7d, 0x2B2D}, // ⬭, \whthorzoval, White Horizontal Ellipse
 {0x5e02, 0x0b89, 0x1D3F}, // ᴿ, \^R, Modifier Letter Capital R
 {0x5f02, 0x0b8c, 0x2081}, // ₁, \_1, Subscript One / Subscript Digit One
-{0x6205, 0x0b8f, 0x1D4EB}, // 𝓫, \bscrb, Mathematical Bold Script Small B
+{0x6205, 0x0b8f, 0xDCEB'D835}, // U+1D4EB, 𝓫, \bscrb, Mathematical Bold Script Small B
 {0x6809, 0x0b95, 0x2661}, // ♡, \heartsuit, White Heart Suit
-{0x6906, 0x0b9f, 0x1D60D}, // 𝘍, \isansF, Mathematical Sans-Serif Italic Capital F
-{0x6907, 0x0ba6, 0x1D6E2}, // 𝛢, \itAlpha, Mathematical Italic Capital Alpha
+{0x6906, 0x0b9f, 0xDE0D'D835}, // U+1D60D, 𝘍, \isansF, Mathematical Sans-Serif Italic Capital F
+{0x6907, 0x0ba6, 0xDEE2'D835}, // U+1D6E2, 𝛢, \itAlpha, Mathematical Italic Capital Alpha
 {0x5f02, 0x0bae, 0x2082}, // ₂, \_2, Subscript Two / Subscript Digit Two
-{0x6205, 0x0bb1, 0x1D4EC}, // 𝓬, \bscrc, Mathematical Bold Script Small C
-{0x6206, 0x0bb7, 0x1D6AD}, // 𝚭, \bfZeta, Mathematical Bold Capital Zeta
-{0x6906, 0x0bbe, 0x1D60E}, // 𝘎, \isansG, Mathematical Sans-Serif Italic Capital G
+{0x6205, 0x0bb1, 0xDCEC'D835}, // U+1D4EC, 𝓬, \bscrc, Mathematical Bold Script Small C
+{0x6206, 0x0bb7, 0xDEAD'D835}, // U+1D6AD, 𝚭, \bfZeta, Mathematical Bold Capital Zeta
+{0x6906, 0x0bbe, 0xDE0E'D835}, // U+1D60E, 𝘎, \isansG, Mathematical Sans-Serif Italic Capital G
 {0x5e02, 0x0bc5, 0x1D40}, // ᵀ, \^T, Modifier Letter Capital T
 {0x5f02, 0x0bc8, 0x2083}, // ₃, \_3, Subscript Three / Subscript Digit Three
 {0x6108, 0x0bcb, 0x267E}, // ♾, \acidfree, Permanent Paper Sign
-{0x6205, 0x0bd4, 0x1D4ED}, // 𝓭, \bscrd, Mathematical Bold Script Small D
+{0x6205, 0x0bd4, 0xDCED'D835}, // U+1D4ED, 𝓭, \bscrd, Mathematical Bold Script Small D
 {0x6708, 0x0bda, 0x2A8A}, // ⪊, \gnapprox, Greater-Than And Not Approximate
-{0x6906, 0x0be3, 0x1D60F}, // 𝘏, \isansH, Mathematical Sans-Serif Italic Capital H
+{0x6906, 0x0be3, 0xDE0F'D835}, // U+1D60F, 𝘏, \isansH, Mathematical Sans-Serif Italic Capital H
 {0x6d04, 0x0bea, 0x2642}, // ♂, \male, Male Sign
 {0x730a, 0x0bef, 0x2ACC}, // ⫌, \supsetneqq, Superset Of Above Not Equal To
 {0x4801, 0x0bfa, 0x030B}, // ̋, \H, Combining Double Acute Accent / Non-Spacing Double Acute
 {0x5e02, 0x0bfc, 0x1D41}, // ᵁ, \^U, Modifier Letter Capital U
 {0x5f02, 0x0bff, 0x2084}, // ₄, \_4, Subscript Four / Subscript Digit Four
-{0x6205, 0x0c02, 0x1D4EE}, // 𝓮, \bscre, Mathematical Bold Script Small E
+{0x6205, 0x0c02, 0xDCEE'D835}, // U+1D4EE, 𝓮, \bscre, Mathematical Bold Script Small E
 {0x6605, 0x0c08, 0x23E5}, // ⏥, \fltns, Flatness
-{0x6906, 0x0c0e, 0x1D610}, // 𝘐, \isansI, Mathematical Sans-Serif Italic Capital I
+{0x6906, 0x0c0e, 0xDE10'D835}, // U+1D610, 𝘐, \isansI, Mathematical Sans-Serif Italic Capital I
 {0x6c0c, 0x0c15, 0x27FB}, // ⟻, \longmapsfrom, Long Leftwards Arrow From Bar
 {0x6d0e, 0x0c22, 0x25C6}, // ◆, \mdlgblkdiamond, Black Diamond
 {0x760c, 0x0c31, 0x2423}, // ␣, \visiblespace, Open Box
@@ -838,364 +838,364 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x5f02, 0x0c41, 0x2085}, // ₅, \_5, Subscript Five / Subscript Digit Five
 {0x5f04, 0x0c44, 0x1D6A}, // ᵪ, \_chi, Greek Subscript Small Letter Chi
 {0x6105, 0x0c49, 0x2648}, // ♈, \aries, Aries
-{0x6205, 0x0c4f, 0x1D4EF}, // 𝓯, \bscrf, Mathematical Bold Script Small F
-{0x6906, 0x0c55, 0x1D611}, // 𝘑, \isansJ, Mathematical Sans-Serif Italic Capital J
+{0x6205, 0x0c4f, 0xDCEF'D835}, // U+1D4EF, 𝓯, \bscrf, Mathematical Bold Script Small F
+{0x6906, 0x0c55, 0xDE11'D835}, // U+1D611, 𝘑, \isansJ, Mathematical Sans-Serif Italic Capital J
 {0x6d0c, 0x0c5c, 0x2B28}, // ⬨, \mdwhtlozenge, White Medium Lozenge
 {0x7411, 0x0c69, 0x25ED}, // ◭, \triangleleftblack, Up-Pointing Triangle With Left Half Black / Up Pointing Triangle With Left Half Black
 {0x5e02, 0x0c7b, 0x1D42}, // ᵂ, \^W, Modifier Letter Capital W
 {0x5f02, 0x0c7e, 0x2086}, // ₆, \_6, Subscript Six / Subscript Digit Six
 {0x6103, 0x0c81, 0x2217}, // ∗, \ast, Asterisk Operator
-{0x6205, 0x0c85, 0x1D4F0}, // 𝓰, \bscrg, Mathematical Bold Script Small G
-{0x6906, 0x0c8b, 0x1D612}, // 𝘒, \isansK, Mathematical Sans-Serif Italic Capital K
+{0x6205, 0x0c85, 0xDCF0'D835}, // U+1D4F0, 𝓰, \bscrg, Mathematical Bold Script Small G
+{0x6906, 0x0c8b, 0xDE12'D835}, // U+1D612, 𝘒, \isansK, Mathematical Sans-Serif Italic Capital K
 {0x7008, 0x0c92, 0x2225}, // ∥, \parallel, Parallel To
 {0x5002, 0x0c9b, 0x03A0}, // Π, \Pi, Greek Capital Letter Pi
 {0x5f02, 0x0c9e, 0x2087}, // ₇, \_7, Subscript Seven / Subscript Digit Seven
-{0x6205, 0x0ca1, 0x1D4F1}, // 𝓱, \bscrh, Mathematical Bold Script Small H
-{0x620b, 0x0ca7, 0x1D78E}, // 𝞎, \bsansvarrho, Mathematical Sans-Serif Bold Rho Symbol
+{0x6205, 0x0ca1, 0xDCF1'D835}, // U+1D4F1, 𝓱, \bscrh, Mathematical Bold Script Small H
+{0x620b, 0x0ca7, 0xDF8E'D835}, // U+1D78E, 𝞎, \bsansvarrho, Mathematical Sans-Serif Bold Rho Symbol
 {0x650f, 0x0cb3, 0x2107}, // ℇ, \eulermascheroni, Euler Constant / Eulers
-{0x6906, 0x0cc3, 0x1D613}, // 𝘓, \isansL, Mathematical Sans-Serif Italic Capital L
+{0x6906, 0x0cc3, 0xDE13'D835}, // U+1D613, 𝘓, \isansL, Mathematical Sans-Serif Italic Capital L
 {0x7006, 0x0cca, 0x22B0}, // ⊰, \prurel, Precedes Under Relation
 {0x7605, 0x0cd1, 0x22EE}, // ⋮, \vdots, Vertical Ellipsis
 {0x4c01, 0x0cd7, 0x0141}, // Ł, \L, Latin Capital Letter L With Stroke / Latin Capital Letter L Slash
 {0x5f02, 0x0cd9, 0x2088}, // ₈, \_8, Subscript Eight / Subscript Digit Eight
-{0x6205, 0x0cdc, 0x1D4F2}, // 𝓲, \bscri, Mathematical Bold Script Small I
-{0x6209, 0x0ce2, 0x1D7CB}, // 𝟋, \bfdigamma, Mathematical Bold Small Digamma
+{0x6205, 0x0cdc, 0xDCF2'D835}, // U+1D4F2, 𝓲, \bscri, Mathematical Bold Script Small I
+{0x6209, 0x0ce2, 0xDFCB'D835}, // U+1D7CB, 𝟋, \bfdigamma, Mathematical Bold Small Digamma
 {0x650c, 0x0cec, 0x2A9B}, // ⪛, \eqqslantless, Double-Line Slanted Equal To Or Less-Than
 {0x660d, 0x0cf9, 0x27D7}, // ⟗, \fullouterjoin, Full Outer Join
-{0x6906, 0x0d07, 0x1D614}, // 𝘔, \isansM, Mathematical Sans-Serif Italic Capital M
-{0x6909, 0x0d0e, 0x1D710}, // 𝜐, \itupsilon, Mathematical Italic Small Upsilon
+{0x6906, 0x0d07, 0xDE14'D835}, // U+1D614, 𝘔, \isansM, Mathematical Sans-Serif Italic Capital M
+{0x6909, 0x0d0e, 0xDF10'D835}, // U+1D710, 𝜐, \itupsilon, Mathematical Italic Small Upsilon
 {0x6f09, 0x0d18, 0x23DE}, // ⏞, \overbrace, Top Curly Bracket
 {0x5f02, 0x0d22, 0x2089}, // ₉, \_9, Subscript Nine / Subscript Digit Nine
-{0x6205, 0x0d25, 0x1D4F3}, // 𝓳, \bscrj, Mathematical Bold Script Small J
+{0x6205, 0x0d25, 0xDCF3'D835}, // U+1D4F3, 𝓳, \bscrj, Mathematical Bold Script Small J
 {0x630b, 0x0d2b, 0x229A}, // ⊚, \circledcirc, Circled Ring Operator
-{0x6906, 0x0d37, 0x1D615}, // 𝘕, \isansN, Mathematical Sans-Serif Italic Capital N
-{0x6204, 0x0d3e, 0x1D6CD}, // 𝛍, \bfmu, Mathematical Bold Small Mu
-{0x6205, 0x0d43, 0x1D733}, // 𝜳, \biPsi, Mathematical Bold Italic Capital Psi
-{0x6205, 0x0d49, 0x1D4F4}, // 𝓴, \bscrk, Mathematical Bold Script Small K
+{0x6906, 0x0d37, 0xDE15'D835}, // U+1D615, 𝘕, \isansN, Mathematical Sans-Serif Italic Capital N
+{0x6204, 0x0d3e, 0xDECD'D835}, // U+1D6CD, 𝛍, \bfmu, Mathematical Bold Small Mu
+{0x6205, 0x0d43, 0xDF33'D835}, // U+1D733, 𝜳, \biPsi, Mathematical Bold Italic Capital Psi
+{0x6205, 0x0d49, 0xDCF4'D835}, // U+1D4F4, 𝓴, \bscrk, Mathematical Bold Script Small K
 {0x6207, 0x0d4f, 0x213D}, // ℽ, \bbgamma, Double-Struck Small Gamma
-{0x6207, 0x0d57, 0x1D763}, // 𝝣, \bsansXi, Mathematical Sans-Serif Bold Capital Xi
-{0x6208, 0x0d5f, 0x1D787}, // 𝞇, \bsanspsi, Mathematical Sans-Serif Bold Small Psi
-{0x6906, 0x0d68, 0x1D616}, // 𝘖, \isansO, Mathematical Sans-Serif Italic Capital O
+{0x6207, 0x0d57, 0xDF63'D835}, // U+1D763, 𝝣, \bsansXi, Mathematical Sans-Serif Bold Capital Xi
+{0x6208, 0x0d5f, 0xDF87'D835}, // U+1D787, 𝞇, \bsanspsi, Mathematical Sans-Serif Bold Small Psi
+{0x6906, 0x0d68, 0xDE16'D835}, // U+1D616, 𝘖, \isansO, Mathematical Sans-Serif Italic Capital O
 {0x4f01, 0x0d6f, 0x00D8}, // Ø, \O, Latin Capital Letter O With Stroke / Latin Capital Letter O Slash
-{0x6205, 0x0d71, 0x1D4F5}, // 𝓵, \bscrl, Mathematical Bold Script Small L
-{0x6208, 0x0d77, 0x1D726}, // 𝜦, \biLambda, Mathematical Bold Italic Capital Lamda
+{0x6205, 0x0d71, 0xDCF5'D835}, // U+1D4F5, 𝓵, \bscrl, Mathematical Bold Script Small L
+{0x6208, 0x0d77, 0xDF26'D835}, // U+1D726, 𝜦, \biLambda, Mathematical Bold Italic Capital Lamda
 {0x6307, 0x0d80, 0x2A6D}, // ⩭, \congdot, Congruent With Dot Above
 {0x6705, 0x0d88, 0x2269}, // ≩, \gneqq, Greater-Than But Not Equal To / Greater Than But Not Equal To
-{0x6906, 0x0d8e, 0x1D617}, // 𝘗, \isansP, Mathematical Sans-Serif Italic Capital P
+{0x6906, 0x0d8e, 0xDE17'D835}, // U+1D617, 𝘗, \isansP, Mathematical Sans-Serif Italic Capital P
 {0x6c0a, 0x0d95, 0x27FC}, // ⟼, \longmapsto, Long Rightwards Arrow From Bar
 {0x7307, 0x0da0, 0x2AC2}, // ⫂, \supmult, Superset With Multiplication Sign Below
 {0x7405, 0x0da8, 0x027A}, // ɺ, \trnrl, Latin Small Letter Turned R With Long Leg
 {0x5001, 0x0dae, 0x00B6}, // ¶, \P, Pilcrow Sign / Paragraph Sign
-{0x6205, 0x0db0, 0x1D4F6}, // 𝓶, \bscrm, Mathematical Bold Script Small M
-{0x6208, 0x0db6, 0x1D74B}, // 𝝋, \bivarphi, Mathematical Bold Italic Small Phi
-{0x6906, 0x0dbf, 0x1D618}, // 𝘘, \isansQ, Mathematical Sans-Serif Italic Capital Q
+{0x6205, 0x0db0, 0xDCF6'D835}, // U+1D4F6, 𝓶, \bscrm, Mathematical Bold Script Small M
+{0x6208, 0x0db6, 0xDF4B'D835}, // U+1D74B, 𝝋, \bivarphi, Mathematical Bold Italic Small Phi
+{0x6906, 0x0dbf, 0xDE18'D835}, // U+1D618, 𝘘, \isansQ, Mathematical Sans-Serif Italic Capital Q
 {0x730b, 0x0dc6, 0x227D}, // ≽, \succcurlyeq, Succeeds Or Equal To
 {0x5f02, 0x0dd2, 0x208C}, // ₌, \_=, Subscript Equals Sign
-{0x6205, 0x0dd5, 0x1D4F7}, // 𝓷, \bscrn, Mathematical Bold Script Small N
-{0x620c, 0x0ddb, 0x1D75A}, // 𝝚, \bsansEpsilon, Mathematical Sans-Serif Bold Capital Epsilon
-{0x6906, 0x0de8, 0x1D619}, // 𝘙, \isansR, Mathematical Sans-Serif Italic Capital R
+{0x6205, 0x0dd5, 0xDCF7'D835}, // U+1D4F7, 𝓷, \bscrn, Mathematical Bold Script Small N
+{0x620c, 0x0ddb, 0xDF5A'D835}, // U+1D75A, 𝝚, \bsansEpsilon, Mathematical Sans-Serif Bold Capital Epsilon
+{0x6906, 0x0de8, 0xDE19'D835}, // U+1D619, 𝘙, \isansR, Mathematical Sans-Serif Italic Capital R
 {0x6c11, 0x0def, 0x20D0}, // ⃐, \leftharpoonaccent, Combining Left Harpoon Above / Non-Spacing Left Harpoon Above
-{0x6205, 0x0e01, 0x1D4F8}, // 𝓸, \bscro, Mathematical Bold Script Small O
+{0x6205, 0x0e01, 0xDCF8'D835}, // U+1D4F8, 𝓸, \bscro, Mathematical Bold Script Small O
 {0x6304, 0x0e07, 0x22C5}, // ⋅, \cdot, Dot Operator
-{0x6906, 0x0e0c, 0x1D61A}, // 𝘚, \isansS, Mathematical Sans-Serif Italic Capital S
+{0x6906, 0x0e0c, 0xDE1A'D835}, // U+1D61A, 𝘚, \isansS, Mathematical Sans-Serif Italic Capital S
 {0x6e07, 0x0e13, 0x2646}, // ♆, \neptune, Neptune
 {0x5301, 0x0e1b, 0x00A7}, // §, \S, Section Sign
-{0x6205, 0x0e1d, 0x1D4F9}, // 𝓹, \bscrp, Mathematical Bold Script Small P
-{0x6209, 0x0e23, 0x1D796}, // 𝞖, \bisansEta, Mathematical Sans-Serif Bold Italic Capital Eta
+{0x6205, 0x0e1d, 0xDCF9'D835}, // U+1D4F9, 𝓹, \bscrp, Mathematical Bold Script Small P
+{0x6209, 0x0e23, 0xDF96'D835}, // U+1D796, 𝞖, \bisansEta, Mathematical Sans-Serif Bold Italic Capital Eta
 {0x640d, 0x0e2d, 0x279B}, // ➛, \draftingarrow, Drafting Point Rightwards Arrow / Drafting Point Right Arrow
-{0x6906, 0x0e3b, 0x1D61B}, // 𝘛, \isansT, Mathematical Sans-Serif Italic Capital T
+{0x6906, 0x0e3b, 0xDE1B'D835}, // U+1D61B, 𝘛, \isansT, Mathematical Sans-Serif Italic Capital T
 {0x760c, 0x0e42, 0x2A63}, // ⩣, \veedoublebar, Logical Or With Double Underbar
 {0x5e02, 0x0e4f, 0x1D43}, // ᵃ, \^a, Modifier Letter Small A
-{0x6205, 0x0e52, 0x1D4FA}, // 𝓺, \bscrq, Mathematical Bold Script Small Q
-{0x6206, 0x0e58, 0x1D737}, // 𝜷, \bibeta, Mathematical Bold Italic Small Beta
+{0x6205, 0x0e52, 0xDCFA'D835}, // U+1D4FA, 𝓺, \bscrq, Mathematical Bold Script Small Q
+{0x6206, 0x0e58, 0xDF37'D835}, // U+1D737, 𝜷, \bibeta, Mathematical Bold Italic Small Beta
 {0x6206, 0x0e5f, 0x22C3}, // ⋃, \bigcup, N-Ary Union
 {0x6306, 0x0e66, 0x0277}, // ɷ, \clomeg, Latin Small Letter Closed Omega
-{0x6906, 0x0e6d, 0x1D61C}, // 𝘜, \isansU, Mathematical Sans-Serif Italic Capital U
-{0x6906, 0x0e74, 0x1D701}, // 𝜁, \itzeta, Mathematical Italic Small Zeta
+{0x6906, 0x0e6d, 0xDE1C'D835}, // U+1D61C, 𝘜, \isansU, Mathematical Sans-Serif Italic Capital U
+{0x6906, 0x0e74, 0xDF01'D835}, // U+1D701, 𝜁, \itzeta, Mathematical Italic Small Zeta
 {0x6c08, 0x0e7b, 0x231F}, // ⌟, \lrcorner, Bottom Right Corner
 {0x730b, 0x0e84, 0x25A5}, // ▥, \squarevfill, Square With Vertical Fill
 {0x4108, 0x0e90, 0x212B}, // Å, \Angstrom, Angstrom Sign / Angstrom Unit
 {0x5e02, 0x0e99, 0x1D47}, // ᵇ, \^b, Modifier Letter Small B
-{0x6205, 0x0e9c, 0x1D4FB}, // 𝓻, \bscrr, Mathematical Bold Script Small R
-{0x6206, 0x0ea2, 0x1D7D3}, // 𝟓, \bffive, Mathematical Bold Digit Five
-{0x6906, 0x0ea9, 0x1D61D}, // 𝘝, \isansV, Mathematical Sans-Serif Italic Capital V
+{0x6205, 0x0e9c, 0xDCFB'D835}, // U+1D4FB, 𝓻, \bscrr, Mathematical Bold Script Small R
+{0x6206, 0x0ea2, 0xDFD3'D835}, // U+1D7D3, 𝟓, \bffive, Mathematical Bold Digit Five
+{0x6906, 0x0ea9, 0xDE1D'D835}, // U+1D61D, 𝘝, \isansV, Mathematical Sans-Serif Italic Capital V
 {0x6c05, 0x0eb0, 0x2A79}, // ⩹, \ltcir, Less-Than With Circle Inside
 {0x4c11, 0x0eb6, 0x2959}, // ⥙, \LeftDownVectorBar, Downwards Harpoon With Barb Left To Bar
 {0x4d08, 0x0ec8, 0x2906}, // ⤆, \Mapsfrom, Leftwards Double Arrow From Bar
 {0x5e02, 0x0ed1, 0x1D9C}, // ᶜ, \^c, Modifier Letter Small C
-{0x6205, 0x0ed4, 0x1D4FC}, // 𝓼, \bscrs, Mathematical Bold Script Small S
-{0x6906, 0x0eda, 0x1D61E}, // 𝘞, \isansW, Mathematical Sans-Serif Italic Capital W
+{0x6205, 0x0ed4, 0xDCFC'D835}, // U+1D4FC, 𝓼, \bscrs, Mathematical Bold Script Small S
+{0x6906, 0x0eda, 0xDE1E'D835}, // U+1D61E, 𝘞, \isansW, Mathematical Sans-Serif Italic Capital W
 {0x6e0f, 0x0ee1, 0x2B3A}, // ⬺, \nVleftarrowtail, Leftwards Arrow With Tail With Double Vertical Stroke
 {0x7404, 0x0ef1, 0x2928}, // ⤨, \toea, North East Arrow And South East Arrow
 {0x5e02, 0x0ef6, 0x1D48}, // ᵈ, \^d, Modifier Letter Small D
-{0x6205, 0x0ef9, 0x1D4FD}, // 𝓽, \bscrt, Mathematical Bold Script Small T
-{0x6208, 0x0eff, 0x1D79D}, // 𝞝, \bisansXi, Mathematical Sans-Serif Bold Italic Capital Xi
+{0x6205, 0x0ef9, 0xDCFD'D835}, // U+1D4FD, 𝓽, \bscrt, Mathematical Bold Script Small T
+{0x6208, 0x0eff, 0xDF9D'D835}, // U+1D79D, 𝞝, \bisansXi, Mathematical Sans-Serif Bold Italic Capital Xi
 {0x6706, 0x0f08, 0x2273}, // ≳, \gtrsim, Greater-Than Or Equivalent To / Greater Than Or Equivalent To
-{0x6906, 0x0f0f, 0x1D61F}, // 𝘟, \isansX, Mathematical Sans-Serif Italic Capital X
+{0x6906, 0x0f0f, 0xDE1F'D835}, // U+1D61F, 𝘟, \isansX, Mathematical Sans-Serif Italic Capital X
 {0x6c06, 0x0f16, 0x03BB}, // λ, \lambda, Greek Small Letter Lamda / Greek Small Letter Lambda
 {0x720e, 0x0f1d, 0x21C0}, // ⇀, \rightharpoonup, Rightwards Harpoon With Barb Upwards / Right Harpoon With Barb Up
 {0x7309, 0x0f2c, 0x2AC5}, // ⫅, \subseteqq, Subset Of Above Equals Sign
 {0x5e02, 0x0f36, 0x1D49}, // ᵉ, \^e, Modifier Letter Small E
-{0x6205, 0x0f39, 0x1D4FE}, // 𝓾, \bscru, Mathematical Bold Script Small U
+{0x6205, 0x0f39, 0xDCFE'D835}, // U+1D4FE, 𝓾, \bscru, Mathematical Bold Script Small U
 {0x6410, 0x0f3f, 0x291D}, // ⤝, \diamondleftarrow, Leftwards Arrow To Black Diamond
-{0x6906, 0x0f50, 0x1D620}, // 𝘠, \isansY, Mathematical Sans-Serif Italic Capital Y
+{0x6906, 0x0f50, 0xDE20'D835}, // U+1D620, 𝘠, \isansY, Mathematical Sans-Serif Italic Capital Y
 {0x6c05, 0x0f57, 0x2308}, // ⌈, \lceil, Left Ceiling
-{0x7407, 0x0f5d, 0x1D7FE}, // 𝟾, \tteight, Mathematical Monospace Digit Eight
+{0x7407, 0x0f5d, 0xDFFE'D835}, // U+1D7FE, 𝟾, \tteight, Mathematical Monospace Digit Eight
 {0x5212, 0x0f65, 0x295D}, // ⥝, \RightDownTeeVector, Downwards Harpoon With Barb Right From Bar
 {0x5e02, 0x0f78, 0x1DA0}, // ᶠ, \^f, Modifier Letter Small F
-{0x6205, 0x0f7b, 0x1D4FF}, // 𝓿, \bscrv, Mathematical Bold Script Small V
+{0x6205, 0x0f7b, 0xDCFF'D835}, // U+1D4FF, 𝓿, \bscrv, Mathematical Bold Script Small V
 {0x6207, 0x0f81, 0x25CB}, // ○, \bigcirc, White Circle
-{0x620a, 0x0f89, 0x1D7AB}, // 𝞫, \bisansbeta, Mathematical Sans-Serif Bold Italic Small Beta
+{0x620a, 0x0f89, 0xDFAB'D835}, // U+1D7AB, 𝞫, \bisansbeta, Mathematical Sans-Serif Bold Italic Small Beta
 {0x6303, 0x0f94, 0x222A}, // ∪, \cup, Union
-{0x6906, 0x0f98, 0x1D621}, // 𝘡, \isansZ, Mathematical Sans-Serif Italic Capital Z
+{0x6906, 0x0f98, 0xDE21'D835}, // U+1D621, 𝘡, \isansZ, Mathematical Sans-Serif Italic Capital Z
 {0x5e02, 0x0f9f, 0x1D4D}, // ᵍ, \^g, Modifier Letter Small G
 {0x6204, 0x0fa2, 0x03B2}, // β, \beta, Greek Small Letter Beta
-{0x6205, 0x0fa7, 0x1D500}, // 𝔀, \bscrw, Mathematical Bold Script Small W
+{0x6205, 0x0fa7, 0xDD00'D835}, // U+1D500, 𝔀, \bscrw, Mathematical Bold Script Small W
 {0x620f, 0x0fad, 0x2592}, // ▒, \blockhalfshaded, Medium Shade
 {0x6805, 0x0fbd, 0x2302}, // ⌂, \house, House
 {0x6d0f, 0x0fc3, 0x29AA}, // ⦪, \measanglerdtose, Measured Angle With Open Arm Ending In Arrow Pointing Down And Right
 {0x7404, 0x0fd3, 0x0250}, // ɐ, \trna, Latin Small Letter Turned A
 {0x4402, 0x0fd8, 0x00D0}, // Ð, \DH, Latin Capital Letter Eth
 {0x5e02, 0x0fdb, 0x02B0}, // ʰ, \^h, Modifier Letter Small H
-{0x6205, 0x0fde, 0x1D501}, // 𝔁, \bscrx, Mathematical Bold Script Small X
+{0x6205, 0x0fde, 0xDD01'D835}, // U+1D501, 𝔁, \bscrx, Mathematical Bold Script Small X
 {0x7007, 0x0fe4, 0x2AB1}, // ⪱, \precneq, Precedes Above Single-Line Not Equal To
 {0x3703, 0x0fec, 0x215E}, // ⅞, \7/8, Vulgar Fraction Seven Eighths / Fraction Seven Eighths
 {0x5e02, 0x0ff0, 0x2071}, // ⁱ, \^i, Superscript Latin Small Letter I
-{0x6205, 0x0ff3, 0x1D502}, // 𝔂, \bscry, Mathematical Bold Script Small Y
-{0x620d, 0x0ff9, 0x1D767}, // 𝝧, \bsansvarTheta, Mathematical Sans-Serif Bold Capital Theta Symbol
+{0x6205, 0x0ff3, 0xDD02'D835}, // U+1D502, 𝔂, \bscry, Mathematical Bold Script Small Y
+{0x620d, 0x0ff9, 0xDF67'D835}, // U+1D767, 𝝧, \bsansvarTheta, Mathematical Sans-Serif Bold Capital Theta Symbol
 {0x7209, 0x1007, 0x27E7}, // ⟧, \rrbracket, Mathematical Right White Square Bracket
 {0x4402, 0x1011, 0x0110}, // Đ, \DJ, Latin Capital Letter D With Stroke / Latin Capital Letter D Bar
 {0x5e02, 0x1014, 0x02B2}, // ʲ, \^j, Modifier Letter Small J
 {0x6204, 0x1017, 0x213F}, // ℿ, \bbPi, Double-Struck Capital Pi
-{0x6205, 0x101c, 0x1D503}, // 𝔃, \bscrz, Mathematical Bold Script Small Z
+{0x6205, 0x101c, 0xDD03'D835}, // U+1D503, 𝔃, \bscrz, Mathematical Bold Script Small Z
 {0x640f, 0x1022, 0x2B19}, // ⬙, \diamondbotblack, Diamond With Bottom Half Black
 {0x700a, 0x1032, 0x2A27}, // ⨧, \plussubtwo, Plus Sign With Subscript Two
 {0x7305, 0x103d, 0x23E4}, // ⏤, \strns, Straightness
 {0x5508, 0x1043, 0x27F0}, // ⟰, \UUparrow, Upwards Quadruple Arrow
 {0x5e02, 0x104c, 0x1D4F}, // ᵏ, \^k, Modifier Letter Small K
-{0x6209, 0x104f, 0x1D6BC}, // 𝚼, \bfUpsilon, Mathematical Bold Capital Upsilon
+{0x6209, 0x104f, 0xDEBC'D835}, // U+1D6BC, 𝚼, \bfUpsilon, Mathematical Bold Capital Upsilon
 {0x6403, 0x1059, 0x0307}, // ̇, \dot, Combining Dot Above / Non-Spacing Dot Above
 {0x6c07, 0x105d, 0x2A7B}, // ⩻, \ltquest, Less-Than With Question Mark Above
 {0x7306, 0x1065, 0x2AC8}, // ⫈, \supsim, Superset Of Above Tilde Operator
 {0x5e02, 0x106c, 0x02E1}, // ˡ, \^l, Modifier Letter Small L
-{0x6205, 0x106f, 0x1D6D9}, // 𝛙, \bfpsi, Mathematical Bold Small Psi
+{0x6205, 0x106f, 0xDED9'D835}, // U+1D6D9, 𝛙, \bfpsi, Mathematical Bold Small Psi
 {0x5306, 0x1075, 0x03DA}, // Ϛ, \Stigma, Greek Letter Stigma / Greek Capital Letter Stigma
 {0x5e02, 0x107c, 0x1D50}, // ᵐ, \^m, Modifier Letter Small M
-{0x6206, 0x107f, 0x1D6C3}, // 𝛃, \bfbeta, Mathematical Bold Small Beta
-{0x6209, 0x1086, 0x1D720}, // 𝜠, \biEpsilon, Mathematical Bold Italic Capital Epsilon
-{0x6906, 0x1090, 0x1D622}, // 𝘢, \isansa, Mathematical Sans-Serif Italic Small A
+{0x6206, 0x107f, 0xDEC3'D835}, // U+1D6C3, 𝛃, \bfbeta, Mathematical Bold Small Beta
+{0x6209, 0x1086, 0xDF20'D835}, // U+1D720, 𝜠, \biEpsilon, Mathematical Bold Italic Capital Epsilon
+{0x6906, 0x1090, 0xDE22'D835}, // U+1D622, 𝘢, \isansa, Mathematical Sans-Serif Italic Small A
 {0x5e02, 0x1097, 0x207F}, // ⁿ, \^n, Superscript Latin Small Letter N
 {0x6204, 0x109a, 0x2136}, // ℶ, \beth, Bet Symbol / Second Transfinite Cardinal
-{0x6204, 0x109f, 0x1D728}, // 𝜨, \biNu, Mathematical Bold Italic Capital Nu
-{0x620a, 0x10a4, 0x1D76F}, // 𝝯, \bsansnabla, Mathematical Sans-Serif Bold Nabla
-{0x6906, 0x10af, 0x1D623}, // 𝘣, \isansb, Mathematical Sans-Serif Italic Small B
+{0x6204, 0x109f, 0xDF28'D835}, // U+1D728, 𝜨, \biNu, Mathematical Bold Italic Capital Nu
+{0x620a, 0x10a4, 0xDF6F'D835}, // U+1D76F, 𝝯, \bsansnabla, Mathematical Sans-Serif Bold Nabla
+{0x6906, 0x10af, 0xDE23'D835}, // U+1D623, 𝘣, \isansb, Mathematical Sans-Serif Italic Small B
 {0x6e09, 0x10b6, 0x2288}, // ⊈, \nsubseteq, Neither A Subset Of Nor Equal To
 {0x7404, 0x10c0, 0x0265}, // ɥ, \trnh, Latin Small Letter Turned H
 {0x4105, 0x10c5, 0x0391}, // Α, \Alpha, Greek Capital Letter Alpha
 {0x5e02, 0x10cb, 0x1D52}, // ᵒ, \^o, Modifier Letter Small O
 {0x5e04, 0x10ce, 0x1D60}, // ᵠ, \^phi, Modifier Letter Small Greek Phi
-{0x6206, 0x10d3, 0x1D5D4}, // 𝗔, \bsansA, Mathematical Sans-Serif Bold Capital A
+{0x6206, 0x10d3, 0xDDD4'D835}, // U+1D5D4, 𝗔, \bsansA, Mathematical Sans-Serif Bold Capital A
 {0x6303, 0x10da, 0x03C7}, // χ, \chi, Greek Small Letter Chi
 {0x650d, 0x10de, 0x29B4}, // ⦴, \emptysetoarrl, Empty Set With Left Arrow Above
-{0x6906, 0x10ec, 0x1D624}, // 𝘤, \isansc, Mathematical Sans-Serif Italic Small C
+{0x6906, 0x10ec, 0xDE24'D835}, // U+1D624, 𝘤, \isansc, Mathematical Sans-Serif Italic Small C
 {0x5e02, 0x10f3, 0x1D56}, // ᵖ, \^p, Modifier Letter Small P
-{0x6206, 0x10f6, 0x1D5D5}, // 𝗕, \bsansB, Mathematical Sans-Serif Bold Capital B
-{0x620a, 0x10fd, 0x1D6DD}, // 𝛝, \bfvartheta, Mathematical Bold Theta Symbol
-{0x620b, 0x1108, 0x1D790}, // 𝞐, \bisansAlpha, Mathematical Sans-Serif Bold Italic Capital Alpha
+{0x6206, 0x10f6, 0xDDD5'D835}, // U+1D5D5, 𝗕, \bsansB, Mathematical Sans-Serif Bold Capital B
+{0x620a, 0x10fd, 0xDEDD'D835}, // U+1D6DD, 𝛝, \bfvartheta, Mathematical Bold Theta Symbol
+{0x620b, 0x1108, 0xDF90'D835}, // U+1D790, 𝞐, \bisansAlpha, Mathematical Sans-Serif Bold Italic Capital Alpha
 {0x6301, 0x1114, 0x0327}, // ̧, \c, Combining Cedilla / Non-Spacing Cedilla
 {0x660e, 0x1116, 0x292F}, // ⤯, \fdiagovnearrow, Falling Diagonal Crossing North East Arrow
-{0x6906, 0x1125, 0x1D625}, // 𝘥, \isansd, Mathematical Sans-Serif Italic Small D
+{0x6906, 0x1125, 0xDE25'D835}, // U+1D625, 𝘥, \isansd, Mathematical Sans-Serif Italic Small D
 {0x6e04, 0x112c, 0x226F}, // ≯, \ngtr, Not Greater-Than / Not Greater Than
-{0x6206, 0x1131, 0x1D5D6}, // 𝗖, \bsansC, Mathematical Sans-Serif Bold Capital C
-{0x6207, 0x1138, 0x1D73D}, // 𝜽, \bitheta, Mathematical Bold Italic Small Theta
+{0x6206, 0x1131, 0xDDD6'D835}, // U+1D5D6, 𝗖, \bsansC, Mathematical Sans-Serif Bold Capital C
+{0x6207, 0x1138, 0xDF3D'D835}, // U+1D73D, 𝜽, \bitheta, Mathematical Bold Italic Small Theta
 {0x6703, 0x1140, 0x2A92}, // ⪒, \glE, Greater-Than Above Less-Than Above Double-Line Equal
-{0x6906, 0x1144, 0x1D626}, // 𝘦, \isanse, Mathematical Sans-Serif Italic Small E
+{0x6906, 0x1144, 0xDE26'D835}, // U+1D626, 𝘦, \isanse, Mathematical Sans-Serif Italic Small E
 {0x5e02, 0x114b, 0x02B3}, // ʳ, \^r, Modifier Letter Small R
-{0x6206, 0x114e, 0x1D7DD}, // 𝟝, \bbfive, Mathematical Double-Struck Digit Five
-{0x6206, 0x1155, 0x1D5D7}, // 𝗗, \bsansD, Mathematical Sans-Serif Bold Capital D
-{0x6207, 0x115c, 0x1D739}, // 𝜹, \bidelta, Mathematical Bold Italic Small Delta
+{0x6206, 0x114e, 0xDFDD'D835}, // U+1D7DD, 𝟝, \bbfive, Mathematical Double-Struck Digit Five
+{0x6206, 0x1155, 0xDDD7'D835}, // U+1D5D7, 𝗗, \bsansD, Mathematical Sans-Serif Bold Capital D
+{0x6207, 0x115c, 0xDF39'D835}, // U+1D739, 𝜹, \bidelta, Mathematical Bold Italic Small Delta
 {0x620b, 0x1164, 0x2580}, // ▀, \blockuphalf, Upper Half Block
 {0x6408, 0x1170, 0x2238}, // ∸, \dotminus, Dot Minus
-{0x6906, 0x1179, 0x1D627}, // 𝘧, \isansf, Mathematical Sans-Serif Italic Small F
+{0x6906, 0x1179, 0xDE27'D835}, // U+1D627, 𝘧, \isansf, Mathematical Sans-Serif Italic Small F
 {0x6c04, 0x1180, 0x02D0}, // ː, \lmrk, Modifier Letter Triangular Colon
 {0x6c04, 0x1185, 0x2AA6}, // ⪦, \ltcc, Less-Than Closed By Curve
 {0x7405, 0x118a, 0x0252}, // ɒ, \trnsa, Latin Small Letter Turned Alpha / Latin Small Letter Turned Script A
 {0x5e02, 0x1190, 0x02E2}, // ˢ, \^s, Modifier Letter Small S
-{0x6206, 0x1193, 0x1D5D8}, // 𝗘, \bsansE, Mathematical Sans-Serif Bold Capital E
+{0x6206, 0x1193, 0xDDD8'D835}, // U+1D5D8, 𝗘, \bsansE, Mathematical Sans-Serif Bold Capital E
 {0x6211, 0x119a, 0x25BE}, // ▾, \blacktriangledown, Black Down-Pointing Small Triangle / Black Down Pointing Small Triangle
 {0x6404, 0x11ac, 0x2026}, // …, \dots, Horizontal Ellipsis
 {0x6707, 0x11b1, 0x2277}, // ≷, \gtrless, Greater-Than Or Less-Than / Greater Than Or Less Than
-{0x6906, 0x11b9, 0x1D628}, // 𝘨, \isansg, Mathematical Sans-Serif Italic Small G
+{0x6906, 0x11b9, 0xDE28'D835}, // U+1D628, 𝘨, \isansg, Mathematical Sans-Serif Italic Small G
 {0x6d0f, 0x11c0, 0x29AE}, // ⦮, \measangledrtose, Measured Angle With Open Arm Ending In Arrow Pointing Right And Down
 {0x6e10, 0x11d0, 0x21F9}, // ⇹, \nvleftrightarrow, Left Right Arrow With Vertical Stroke
 {0x7404, 0x11e1, 0x026F}, // ɯ, \trnm, Latin Small Letter Turned M
 {0x5e02, 0x11e6, 0x1D57}, // ᵗ, \^t, Modifier Letter Small T
-{0x6206, 0x11e9, 0x1D5D9}, // 𝗙, \bsansF, Mathematical Sans-Serif Bold Capital F
-{0x6906, 0x11f0, 0x1D629}, // 𝘩, \isansh, Mathematical Sans-Serif Italic Small H
+{0x6206, 0x11e9, 0xDDD9'D835}, // U+1D5D9, 𝗙, \bsansF, Mathematical Sans-Serif Bold Capital F
+{0x6906, 0x11f0, 0xDE29'D835}, // U+1D629, 𝘩, \isansh, Mathematical Sans-Serif Italic Small H
 {0x6e12, 0x11f7, 0x2B34}, // ⬴, \nvtwoheadleftarrow, Leftwards Two-Headed Arrow With Vertical Stroke
 {0x7404, 0x120a, 0x2929}, // ⤩, \tosa, South East Arrow And South West Arrow
 {0x4305, 0x120f, 0x2237}, // ∷, \Colon, Proportion
 {0x5e02, 0x1215, 0x1D58}, // ᵘ, \^u, Modifier Letter Small U
-{0x6206, 0x1218, 0x1D5DA}, // 𝗚, \bsansG, Mathematical Sans-Serif Bold Capital G
-{0x6209, 0x121f, 0x1D7A5}, // 𝞥, \bisansPhi, Mathematical Sans-Serif Bold Italic Capital Phi
-{0x6905, 0x1229, 0x1D70F}, // 𝜏, \ittau, Mathematical Italic Small Tau
-{0x6906, 0x122f, 0x1D62A}, // 𝘪, \isansi, Mathematical Sans-Serif Italic Small I
+{0x6206, 0x1218, 0xDDDA'D835}, // U+1D5DA, 𝗚, \bsansG, Mathematical Sans-Serif Bold Capital G
+{0x6209, 0x121f, 0xDFA5'D835}, // U+1D7A5, 𝞥, \bisansPhi, Mathematical Sans-Serif Bold Italic Capital Phi
+{0x6905, 0x1229, 0xDF0F'D835}, // U+1D70F, 𝜏, \ittau, Mathematical Italic Small Tau
+{0x6906, 0x122f, 0xDE2A'D835}, // U+1D62A, 𝘪, \isansi, Mathematical Sans-Serif Italic Small I
 {0x6c0d, 0x1236, 0x2946}, // ⥆, \leftarrowplus, Leftwards Arrow With Plus Below
 {0x6f08, 0x1244, 0x22B6}, // ⊶, \original, Original Of
 {0x7007, 0x124d, 0x2A25}, // ⨥, \plusdot, Plus Sign With Dot Below
 {0x720b, 0x1255, 0x29B0}, // ⦰, \revemptyset, Reversed Empty Set
 {0x7409, 0x1261, 0x2234}, // ∴, \therefore, Therefore
 {0x5e02, 0x126b, 0x1D5B}, // ᵛ, \^v, Modifier Letter Small V
-{0x6206, 0x126e, 0x1D5DB}, // 𝗛, \bsansH, Mathematical Sans-Serif Bold Capital H
-{0x6208, 0x1275, 0x1D76C}, // 𝝬, \bsansChi, Mathematical Sans-Serif Bold Capital Chi
+{0x6206, 0x126e, 0xDDDB'D835}, // U+1D5DB, 𝗛, \bsansH, Mathematical Sans-Serif Bold Capital H
+{0x6208, 0x1275, 0xDF6C'D835}, // U+1D76C, 𝝬, \bsansChi, Mathematical Sans-Serif Bold Capital Chi
 {0x6705, 0x127e, 0x2A7A}, // ⩺, \gtcir, Greater-Than With Circle Inside
-{0x6906, 0x1284, 0x1D62B}, // 𝘫, \isansj, Mathematical Sans-Serif Italic Small J
+{0x6906, 0x1284, 0xDE2B'D835}, // U+1D62B, 𝘫, \isansj, Mathematical Sans-Serif Italic Small J
 {0x6c02, 0x128b, 0x2264}, // ≤, \le, Less-Than Or Equal To / Less Than Or Equal To
 {0x6e03, 0x128e, 0x22FC}, // ⋼, \nis, Small Contains With Vertical Bar At End Of Horizontal Stroke
 {0x5e02, 0x1292, 0x02B7}, // ʷ, \^w, Modifier Letter Small W
-{0x6203, 0x1295, 0x1D538}, // 𝔸, \bbA, Mathematical Double-Struck Capital A
-{0x6206, 0x1299, 0x1D5DC}, // 𝗜, \bsansI, Mathematical Sans-Serif Bold Capital I
-{0x6906, 0x12a0, 0x1D62C}, // 𝘬, \isansk, Mathematical Sans-Serif Italic Small K
+{0x6203, 0x1295, 0xDD38'D835}, // U+1D538, 𝔸, \bbA, Mathematical Double-Struck Capital A
+{0x6206, 0x1299, 0xDDDC'D835}, // U+1D5DC, 𝗜, \bsansI, Mathematical Sans-Serif Bold Capital I
+{0x6906, 0x12a0, 0xDE2C'D835}, // U+1D62C, 𝘬, \isansk, Mathematical Sans-Serif Italic Small K
 {0x6e07, 0x12a7, 0x2196}, // ↖, \nwarrow, North West Arrow / Upper Left Arrow
 {0x7308, 0x12af, 0x22E9}, // ⋩, \succnsim, Succeeds But Not Equivalent To
 {0x7516, 0x12b8, 0x294C}, // ⥌, \updownharpoonrightleft, Up Barb Right Down Barb Left Harpoon
 {0x520b, 0x12cf, 0x21DB}, // ⇛, \Rrightarrow, Rightwards Triple Arrow / Right Triple Arrow
 {0x5e02, 0x12db, 0x02E3}, // ˣ, \^x, Modifier Letter Small X
-{0x6203, 0x12de, 0x1D539}, // 𝔹, \bbB, Mathematical Double-Struck Capital B
-{0x6206, 0x12e2, 0x1D5DD}, // 𝗝, \bsansJ, Mathematical Sans-Serif Bold Capital J
-{0x6207, 0x12e9, 0x1D7E0}, // 𝟠, \bbeight, Mathematical Double-Struck Digit Eight
+{0x6203, 0x12de, 0xDD39'D835}, // U+1D539, 𝔹, \bbB, Mathematical Double-Struck Capital B
+{0x6206, 0x12e2, 0xDDDD'D835}, // U+1D5DD, 𝗝, \bsansJ, Mathematical Sans-Serif Bold Capital J
+{0x6207, 0x12e9, 0xDFE0'D835}, // U+1D7E0, 𝟠, \bbeight, Mathematical Double-Struck Digit Eight
 {0x630c, 0x12f1, 0x2A4D}, // ⩍, \closedvarcap, Closed Intersection With Serifs
-{0x6906, 0x12fe, 0x1D62D}, // 𝘭, \isansl, Mathematical Sans-Serif Italic Small L
+{0x6906, 0x12fe, 0xDE2D'D835}, // U+1D62D, 𝘭, \isansl, Mathematical Sans-Serif Italic Small L
 {0x6b01, 0x1305, 0x0328}, // ̨, \k, Combining Ogonek / Non-Spacing Ogonek
 {0x7404, 0x1307, 0x0279}, // ɹ, \trnr, Latin Small Letter Turned R
 {0x760f, 0x130c, 0x22B2}, // ⊲, \vartriangleleft, Normal Subgroup Of
 {0x5507, 0x131c, 0x21D1}, // ⇑, \Uparrow, Upwards Double Arrow / Up Double Arrow
 {0x5e02, 0x1324, 0x02B8}, // ʸ, \^y, Modifier Letter Small Y
 {0x6203, 0x1327, 0x2102}, // ℂ, \bbC, Double-Struck Capital C / Double-Struck C
-{0x6206, 0x132b, 0x1D5DE}, // 𝗞, \bsansK, Mathematical Sans-Serif Bold Capital K
+{0x6206, 0x132b, 0xDDDE'D835}, // U+1D5DE, 𝗞, \bsansK, Mathematical Sans-Serif Bold Capital K
 {0x620b, 0x1332, 0x2370}, // ⍰, \boxquestion, Apl Functional Symbol Quad Question
 {0x6506, 0x133e, 0x29E3}, // ⧣, \eparsl, Equals Sign And Slanted Parallel
-{0x6906, 0x1345, 0x1D62E}, // 𝘮, \isansm, Mathematical Sans-Serif Italic Small M
+{0x6906, 0x1345, 0xDE2E'D835}, // U+1D62E, 𝘮, \isansm, Mathematical Sans-Serif Italic Small M
 {0x6c01, 0x134c, 0x0142}, // ł, \l, Latin Small Letter L With Stroke / Latin Small Letter L Slash
 {0x760b, 0x134e, 0x2305}, // ⌅, \varbarwedge, Projective
 {0x5e02, 0x135a, 0x1DBB}, // ᶻ, \^z, Modifier Letter Small Z
-{0x6203, 0x135d, 0x1D53B}, // 𝔻, \bbD, Mathematical Double-Struck Capital D
-{0x6206, 0x1361, 0x1D5DF}, // 𝗟, \bsansL, Mathematical Sans-Serif Bold Capital L
+{0x6203, 0x135d, 0xDD3B'D835}, // U+1D53B, 𝔻, \bbD, Mathematical Double-Struck Capital D
+{0x6206, 0x1361, 0xDDDF'D835}, // U+1D5DF, 𝗟, \bsansL, Mathematical Sans-Serif Bold Capital L
 {0x6405, 0x1368, 0x02A4}, // ʤ, \dyogh, Latin Small Letter Dezh Digraph / Latin Small Letter D Yogh
-{0x6906, 0x136e, 0x1D62F}, // 𝘯, \isansn, Mathematical Sans-Serif Italic Small N
+{0x6906, 0x136e, 0xDE2F'D835}, // U+1D62F, 𝘯, \isansn, Mathematical Sans-Serif Italic Small N
 {0x6e07, 0x1375, 0x0338'224E}, // ≎̸, \nBumpeq, Geometrically Equivalent To + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x720a, 0x137d, 0x23B1}, // ⎱, \rmoustache, Upper Right Or Lower Left Curly Bracket Section
 {0x7404, 0x1388, 0x0287}, // ʇ, \trnt, Latin Small Letter Turned T
 {0x7605, 0x138d, 0x02CC}, // ˌ, \verti, Modifier Letter Low Vertical Line
 {0x440c, 0x1393, 0x2913}, // ⤓, \DownArrowBar, Downwards Arrow To Bar
-{0x6203, 0x13a0, 0x1D53C}, // 𝔼, \bbE, Mathematical Double-Struck Capital E
-{0x6206, 0x13a4, 0x1D5E0}, // 𝗠, \bsansM, Mathematical Sans-Serif Bold Capital M
-{0x6906, 0x13ab, 0x1D630}, // 𝘰, \isanso, Mathematical Sans-Serif Italic Small O
-{0x6203, 0x13b2, 0x1D53D}, // 𝔽, \bbF, Mathematical Double-Struck Capital F
-{0x6204, 0x13b6, 0x1D6CE}, // 𝛎, \bfnu, Mathematical Bold Small Nu
-{0x6206, 0x13bb, 0x1D5E1}, // 𝗡, \bsansN, Mathematical Sans-Serif Bold Capital N
-{0x620d, 0x13c2, 0x1D7C4}, // 𝟄, \bisansepsilon, Mathematical Sans-Serif Bold Italic Epsilon Symbol
+{0x6203, 0x13a0, 0xDD3C'D835}, // U+1D53C, 𝔼, \bbE, Mathematical Double-Struck Capital E
+{0x6206, 0x13a4, 0xDDE0'D835}, // U+1D5E0, 𝗠, \bsansM, Mathematical Sans-Serif Bold Capital M
+{0x6906, 0x13ab, 0xDE30'D835}, // U+1D630, 𝘰, \isanso, Mathematical Sans-Serif Italic Small O
+{0x6203, 0x13b2, 0xDD3D'D835}, // U+1D53D, 𝔽, \bbF, Mathematical Double-Struck Capital F
+{0x6204, 0x13b6, 0xDECE'D835}, // U+1D6CE, 𝛎, \bfnu, Mathematical Bold Small Nu
+{0x6206, 0x13bb, 0xDDE1'D835}, // U+1D5E1, 𝗡, \bsansN, Mathematical Sans-Serif Bold Capital N
+{0x620d, 0x13c2, 0xDFC4'D835}, // U+1D7C4, 𝟄, \bisansepsilon, Mathematical Sans-Serif Bold Italic Epsilon Symbol
 {0x6408, 0x13d0, 0x2572}, // ╲, \diagdown, Box Drawings Light Diagonal Upper Left To Lower Right / Forms Light Diagonal Upper Left To Lower Right
-{0x6906, 0x13d9, 0x1D631}, // 𝘱, \isansp, Mathematical Sans-Serif Italic Small P
+{0x6906, 0x13d9, 0xDE31'D835}, // U+1D631, 𝘱, \isansp, Mathematical Sans-Serif Italic Small P
 {0x6f01, 0x13e0, 0x00F8}, // ø, \o, Latin Small Letter O With Stroke / Latin Small Letter O Slash
 {0x7206, 0x13e2, 0x22CA}, // ⋊, \rtimes, Right Normal Factor Semidirect Product
 {0x740c, 0x13e9, 0x25BF}, // ▿, \triangledown, White Down-Pointing Small Triangle / White Down Pointing Small Triangle
 {0x4405, 0x13f6, 0x2AE4}, // ⫤, \Dashv, Vertical Bar Double Left Turnstile
 {0x6105, 0x13fc, 0x0301}, // ́, \acute, Combining Acute Accent / Non-Spacing Acute
-{0x6203, 0x1402, 0x1D53E}, // 𝔾, \bbG, Mathematical Double-Struck Capital G
-{0x6206, 0x1406, 0x1D5E2}, // 𝗢, \bsansO, Mathematical Sans-Serif Bold Capital O
-{0x6906, 0x140d, 0x1D632}, // 𝘲, \isansq, Mathematical Sans-Serif Italic Small Q
+{0x6203, 0x1402, 0xDD3E'D835}, // U+1D53E, 𝔾, \bbG, Mathematical Double-Struck Capital G
+{0x6206, 0x1406, 0xDDE2'D835}, // U+1D5E2, 𝗢, \bsansO, Mathematical Sans-Serif Bold Capital O
+{0x6906, 0x140d, 0xDE32'D835}, // U+1D632, 𝘲, \isansq, Mathematical Sans-Serif Italic Small Q
 {0x6c02, 0x1414, 0x226A}, // ≪, \ll, Much Less-Than / Much Less Than
 {0x5405, 0x1417, 0x2A2F}, // ⨯, \Times, Vector Or Cross Product
 {0x6203, 0x141d, 0x210D}, // ℍ, \bbH, Double-Struck Capital H / Double-Struck H
-{0x6206, 0x1421, 0x1D5E3}, // 𝗣, \bsansP, Mathematical Sans-Serif Bold Capital P
+{0x6206, 0x1421, 0xDDE3'D835}, // U+1D5E3, 𝗣, \bsansP, Mathematical Sans-Serif Bold Capital P
 {0x6206, 0x1428, 0x224F}, // ≏, \bumpeq, Difference Between
-{0x6906, 0x142f, 0x1D633}, // 𝘳, \isansr, Mathematical Sans-Serif Italic Small R
+{0x6906, 0x142f, 0xDE33'D835}, // U+1D633, 𝘳, \isansr, Mathematical Sans-Serif Italic Small R
 {0x7004, 0x1436, 0x220F}, // ∏, \prod, N-Ary Product
 {0x740a, 0x143b, 0x29FB}, // ⧻, \tripleplus, Triple Plus
 {0x7509, 0x1446, 0x039F}, // Ο, \upOmicron, Greek Capital Letter Omicron
-{0x6203, 0x1450, 0x1D540}, // 𝕀, \bbI, Mathematical Double-Struck Capital I
-{0x6206, 0x1454, 0x1D5E4}, // 𝗤, \bsansQ, Mathematical Sans-Serif Bold Capital Q
-{0x6207, 0x145b, 0x1D6D4}, // 𝛔, \bfsigma, Mathematical Bold Small Sigma
+{0x6203, 0x1450, 0xDD40'D835}, // U+1D540, 𝕀, \bbI, Mathematical Double-Struck Capital I
+{0x6206, 0x1454, 0xDDE4'D835}, // U+1D5E4, 𝗤, \bsansQ, Mathematical Sans-Serif Bold Capital Q
+{0x6207, 0x145b, 0xDED4'D835}, // U+1D6D4, 𝛔, \bfsigma, Mathematical Bold Small Sigma
 {0x620c, 0x1463, 0x2A57}, // ⩗, \bigslopedvee, Sloping Large Or
 {0x6406, 0x1470, 0x2138}, // ℸ, \daleth, Dalet Symbol / Fourth Transfinite Cardinal
-{0x6906, 0x1477, 0x1D634}, // 𝘴, \isanss, Mathematical Sans-Serif Italic Small S
+{0x6906, 0x1477, 0xDE34'D835}, // U+1D634, 𝘴, \isanss, Mathematical Sans-Serif Italic Small S
 {0x7404, 0x147e, 0x028E}, // ʎ, \trny, Latin Small Letter Turned Y
 {0x4e17, 0x1483, 0x0338'2AA2}, // ⪢̸, \NotNestedGreaterGreater, Double Nested Greater-Than + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
-{0x6203, 0x149b, 0x1D541}, // 𝕁, \bbJ, Mathematical Double-Struck Capital J
-{0x6206, 0x149f, 0x1D5E5}, // 𝗥, \bsansR, Mathematical Sans-Serif Bold Capital R
-{0x620b, 0x14a6, 0x1D760}, // 𝝠, \bsansLambda, Mathematical Sans-Serif Bold Capital Lamda
-{0x6906, 0x14b2, 0x1D635}, // 𝘵, \isanst, Mathematical Sans-Serif Italic Small T
+{0x6203, 0x149b, 0xDD41'D835}, // U+1D541, 𝕁, \bbJ, Mathematical Double-Struck Capital J
+{0x6206, 0x149f, 0xDDE5'D835}, // U+1D5E5, 𝗥, \bsansR, Mathematical Sans-Serif Bold Capital R
+{0x620b, 0x14a6, 0xDF60'D835}, // U+1D760, 𝝠, \bsansLambda, Mathematical Sans-Serif Bold Capital Lamda
+{0x6906, 0x14b2, 0xDE35'D835}, // U+1D635, 𝘵, \isanst, Mathematical Sans-Serif Italic Small T
 {0x6c05, 0x14b9, 0x2026}, // …, \ldots, Horizontal Ellipsis
 {0x7305, 0x14bf, 0x2293}, // ⊓, \sqcap, Square Cap
 {0x7414, 0x14c5, 0x2949}, // ⥉, \twoheaduparrowcircle, Upwards Two-Headed Arrow From Small Circle
 {0x6108, 0x14da, 0x2652}, // ♒, \aquarius, Aquarius
-{0x6203, 0x14e3, 0x1D542}, // 𝕂, \bbK, Mathematical Double-Struck Capital K
-{0x6206, 0x14e7, 0x1D5E6}, // 𝗦, \bsansS, Mathematical Sans-Serif Bold Capital S
-{0x620b, 0x14ee, 0x1D785}, // 𝞅, \bsansvarphi, Mathematical Sans-Serif Bold Small Phi
+{0x6203, 0x14e3, 0xDD42'D835}, // U+1D542, 𝕂, \bbK, Mathematical Double-Struck Capital K
+{0x6206, 0x14e7, 0xDDE6'D835}, // U+1D5E6, 𝗦, \bsansS, Mathematical Sans-Serif Bold Capital S
+{0x620b, 0x14ee, 0xDF85'D835}, // U+1D785, 𝞅, \bsansvarphi, Mathematical Sans-Serif Bold Small Phi
 {0x640c, 0x14fa, 0x25CC}, // ◌, \dottedcircle, Dotted Circle
-{0x6906, 0x1507, 0x1D636}, // 𝘶, \isansu, Mathematical Sans-Serif Italic Small U
+{0x6906, 0x1507, 0xDE36'D835}, // U+1D636, 𝘶, \isansu, Mathematical Sans-Serif Italic Small U
 {0x700b, 0x150e, 0x2AB9}, // ⪹, \precnapprox, Precedes Above Not Almost Equal To
 {0x5f02, 0x151a, 0x2090}, // ₐ, \_a, Latin Subscript Small Letter A
-{0x6203, 0x151d, 0x1D543}, // 𝕃, \bbL, Mathematical Double-Struck Capital L
-{0x6206, 0x1521, 0x1D5E7}, // 𝗧, \bsansT, Mathematical Sans-Serif Bold Capital T
-{0x6906, 0x1528, 0x1D637}, // 𝘷, \isansv, Mathematical Sans-Serif Italic Small V
+{0x6203, 0x151d, 0xDD43'D835}, // U+1D543, 𝕃, \bbL, Mathematical Double-Struck Capital L
+{0x6206, 0x1521, 0xDDE7'D835}, // U+1D5E7, 𝗧, \bsansT, Mathematical Sans-Serif Bold Capital T
+{0x6906, 0x1528, 0xDE37'D835}, // U+1D637, 𝘷, \isansv, Mathematical Sans-Serif Italic Small V
 {0x6c02, 0x152f, 0x2018}, // ‘, \lq, Left Single Quotation Mark / Single Turned Comma Quotation Mark
 {0x6c13, 0x1532, 0x21AD}, // ↭, \leftrightsquigarrow, Left Right Wave Arrow
 {0x7501, 0x1546, 0x02D8}, // ˘, \u, Breve / Spacing Breve
 {0x520e, 0x1548, 0x295B}, // ⥛, \RightTeeVector, Rightwards Harpoon With Barb Up From Bar
-{0x6203, 0x1557, 0x1D544}, // 𝕄, \bbM, Mathematical Double-Struck Capital M
-{0x6206, 0x155b, 0x1D5E8}, // 𝗨, \bsansU, Mathematical Sans-Serif Bold Capital U
+{0x6203, 0x1557, 0xDD44'D835}, // U+1D544, 𝕄, \bbM, Mathematical Double-Struck Capital M
+{0x6206, 0x155b, 0xDDE8'D835}, // U+1D5E8, 𝗨, \bsansU, Mathematical Sans-Serif Bold Capital U
 {0x640c, 0x1562, 0x2B1A}, // ⬚, \dottedsquare, Dotted Square
 {0x640e, 0x156f, 0x21CA}, // ⇊, \downdownarrows, Downwards Paired Arrows / Down Paired Arrows
-{0x6906, 0x157e, 0x1D638}, // 𝘸, \isansw, Mathematical Sans-Serif Italic Small W
+{0x6906, 0x157e, 0xDE38'D835}, // U+1D638, 𝘸, \isansw, Mathematical Sans-Serif Italic Small W
 {0x6203, 0x1585, 0x2115}, // ℕ, \bbN, Double-Struck Capital N / Double-Struck N
-{0x6205, 0x1589, 0x1D72C}, // 𝜬, \biRho, Mathematical Bold Italic Capital Rho
-{0x6206, 0x158f, 0x1D5E9}, // 𝗩, \bsansV, Mathematical Sans-Serif Bold Capital V
-{0x6208, 0x1596, 0x1D780}, // 𝞀, \bsansrho, Mathematical Sans-Serif Bold Small Rho
-{0x620a, 0x159f, 0x1D788}, // 𝞈, \bsansomega, Mathematical Sans-Serif Bold Small Omega
-{0x6906, 0x15aa, 0x1D639}, // 𝘹, \isansx, Mathematical Sans-Serif Italic Small X
+{0x6205, 0x1589, 0xDF2C'D835}, // U+1D72C, 𝜬, \biRho, Mathematical Bold Italic Capital Rho
+{0x6206, 0x158f, 0xDDE9'D835}, // U+1D5E9, 𝗩, \bsansV, Mathematical Sans-Serif Bold Capital V
+{0x6208, 0x1596, 0xDF80'D835}, // U+1D780, 𝞀, \bsansrho, Mathematical Sans-Serif Bold Small Rho
+{0x620a, 0x159f, 0xDF88'D835}, // U+1D788, 𝞈, \bsansomega, Mathematical Sans-Serif Bold Small Omega
+{0x6906, 0x15aa, 0xDE39'D835}, // U+1D639, 𝘹, \isansx, Mathematical Sans-Serif Italic Small X
 {0x7212, 0x15b1, 0x21FE}, // ⇾, \rightarrowtriangle, Rightwards Open-Headed Arrow
 {0x7605, 0x15c4, 0x02C8}, // ˈ, \verts, Modifier Letter Vertical Line
-{0x6203, 0x15ca, 0x1D546}, // 𝕆, \bbO, Mathematical Double-Struck Capital O
-{0x6206, 0x15ce, 0x1D5EA}, // 𝗪, \bsansW, Mathematical Sans-Serif Bold Capital W
-{0x6207, 0x15d5, 0x1D6C0}, // 𝛀, \bfOmega, Mathematical Bold Capital Omega
+{0x6203, 0x15ca, 0xDD46'D835}, // U+1D546, 𝕆, \bbO, Mathematical Double-Struck Capital O
+{0x6206, 0x15ce, 0xDDEA'D835}, // U+1D5EA, 𝗪, \bsansW, Mathematical Sans-Serif Bold Capital W
+{0x6207, 0x15d5, 0xDEC0'D835}, // U+1D6C0, 𝛀, \bfOmega, Mathematical Bold Capital Omega
 {0x6407, 0x15dd, 0x2214}, // ∔, \dotplus, Dot Plus
-{0x6906, 0x15e5, 0x1D63A}, // 𝘺, \isansy, Mathematical Sans-Serif Italic Small Y
+{0x6906, 0x15e5, 0xDE3A'D835}, // U+1D63A, 𝘺, \isansy, Mathematical Sans-Serif Italic Small Y
 {0x760b, 0x15ec, 0x22F6}, // ⋶, \varisinobar, Element Of With Overbar
 {0x5f02, 0x15f8, 0x2091}, // ₑ, \_e, Latin Subscript Small Letter E
 {0x6107, 0x15fb, 0x20E7}, // ⃧, \annuity, Combining Annuity Symbol
 {0x6203, 0x1603, 0x2119}, // ℙ, \bbP, Double-Struck Capital P / Double-Struck P
-{0x6206, 0x1607, 0x1D5EB}, // 𝗫, \bsansX, Mathematical Sans-Serif Bold Capital X
-{0x6906, 0x160e, 0x1D63B}, // 𝘻, \isansz, Mathematical Sans-Serif Italic Small Z
+{0x6206, 0x1607, 0xDDEB'D835}, // U+1D5EB, 𝗫, \bsansX, Mathematical Sans-Serif Bold Capital X
+{0x6906, 0x160e, 0xDE3B'D835}, // U+1D63B, 𝘻, \isansz, Mathematical Sans-Serif Italic Small Z
 {0x6c08, 0x1615, 0x2A7D}, // ⩽, \leqslant, Less-Than Or Slanted Equal To
 {0x6f04, 0x161e, 0x2299}, // ⊙, \odot, Circled Dot Operator
 {0x6203, 0x1623, 0x0304}, // ̄, \bar, Combining Macron / Non-Spacing Macron
 {0x6203, 0x1627, 0x211A}, // ℚ, \bbQ, Double-Struck Capital Q / Double-Struck Q
-{0x6205, 0x162b, 0x1D6BE}, // 𝚾, \bfChi, Mathematical Bold Capital Chi
-{0x6206, 0x1631, 0x1D7CE}, // 𝟎, \bfzero, Mathematical Bold Digit Zero
-{0x6206, 0x1638, 0x1D5EC}, // 𝗬, \bsansY, Mathematical Sans-Serif Bold Capital Y
-{0x6208, 0x163f, 0x1D7EE}, // 𝟮, \bsanstwo, Mathematical Sans-Serif Bold Digit Two
-{0x620a, 0x1648, 0x1D772}, // 𝝲, \bsansgamma, Mathematical Sans-Serif Bold Small Gamma
-{0x620d, 0x1653, 0x1D7C3}, // 𝟃, \bisanspartial, Mathematical Sans-Serif Bold Italic Partial Differential
+{0x6205, 0x162b, 0xDEBE'D835}, // U+1D6BE, 𝚾, \bfChi, Mathematical Bold Capital Chi
+{0x6206, 0x1631, 0xDFCE'D835}, // U+1D7CE, 𝟎, \bfzero, Mathematical Bold Digit Zero
+{0x6206, 0x1638, 0xDDEC'D835}, // U+1D5EC, 𝗬, \bsansY, Mathematical Sans-Serif Bold Capital Y
+{0x6208, 0x163f, 0xDFEE'D835}, // U+1D7EE, 𝟮, \bsanstwo, Mathematical Sans-Serif Bold Digit Two
+{0x620a, 0x1648, 0xDF72'D835}, // U+1D772, 𝝲, \bsansgamma, Mathematical Sans-Serif Bold Small Gamma
+{0x620d, 0x1653, 0xDFC3'D835}, // U+1D7C3, 𝟃, \bisanspartial, Mathematical Sans-Serif Bold Italic Partial Differential
 {0x6406, 0x1661, 0x2020}, // †, \dagger, Dagger
 {0x690a, 0x1668, 0x2AF4}, // ⫴, \interleave, Triple Vertical Bar Binary Relation
 {0x5004, 0x1673, 0x2ABB}, // ⪻, \Prec, Double Precedes
 {0x6203, 0x1678, 0x211D}, // ℝ, \bbR, Double-Struck Capital R / Double-Struck R
-{0x6206, 0x167c, 0x1D5ED}, // 𝗭, \bsansZ, Mathematical Sans-Serif Bold Capital Z
-{0x6207, 0x1683, 0x1D6AA}, // 𝚪, \bfGamma, Mathematical Bold Capital Gamma
+{0x6206, 0x167c, 0xDDED'D835}, // U+1D5ED, 𝗭, \bsansZ, Mathematical Sans-Serif Bold Capital Z
+{0x6207, 0x1683, 0xDEAA'D835}, // U+1D6AA, 𝚪, \bfGamma, Mathematical Bold Capital Gamma
 {0x710c, 0x168b, 0x00BF}, // ¿, \questiondown, Inverted Question Mark
 {0x5f02, 0x1698, 0x2095}, // ₕ, \_h, Latin Subscript Small Letter H
-{0x6203, 0x169b, 0x1D54A}, // 𝕊, \bbS, Mathematical Double-Struck Capital S
+{0x6203, 0x169b, 0xDD4A'D835}, // U+1D54A, 𝕊, \bbS, Mathematical Double-Struck Capital S
 {0x6e06, 0x169f, 0x22AC}, // ⊬, \nvdash, Does Not Prove
 {0x7308, 0x16a6, 0x2A13}, // ⨓, \scpolint, Line Integration With Semicircular Path Around Pole
 {0x5f02, 0x16af, 0x1D62}, // ᵢ, \_i, Latin Subscript Small Letter I
-{0x6203, 0x16b2, 0x1D54B}, // 𝕋, \bbT, Mathematical Double-Struck Capital T
+{0x6203, 0x16b2, 0xDD4B'D835}, // U+1D54B, 𝕋, \bbT, Mathematical Double-Struck Capital T
 {0x640d, 0x16b6, 0x21E3}, // ⇣, \downdasharrow, Downwards Dashed Arrow / Down Dashed Arrow
 {0x7206, 0x16c4, 0x230B}, // ⌋, \rfloor, Right Floor
 {0x5f02, 0x16cb, 0x2C7C}, // ⱼ, \_j, Latin Subscript Small Letter J
-{0x6203, 0x16ce, 0x1D54C}, // 𝕌, \bbU, Mathematical Double-Struck Capital U
-{0x6205, 0x16d2, 0x1D7DA}, // 𝟚, \bbtwo, Mathematical Double-Struck Digit Two
+{0x6203, 0x16ce, 0xDD4C'D835}, // U+1D54C, 𝕌, \bbU, Mathematical Double-Struck Capital U
+{0x6205, 0x16d2, 0xDFDA'D835}, // U+1D7DA, 𝟚, \bbtwo, Mathematical Double-Struck Digit Two
 {0x6208, 0x16d8, 0x27C8}, // ⟈, \bsolhsub, Reverse Solidus Preceding Subset
 {0x650a, 0x16e1, 0x266A}, // ♪, \eighthnote, Eighth Note
 {0x6908, 0x16ec, 0x22BA}, // ⊺, \intercal, Intercalate
@@ -1204,366 +1204,366 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7209, 0x1710, 0x23B9}, // ⎹, \rvboxline, Right Vertical Box Line
 {0x5f02, 0x171a, 0x2096}, // ₖ, \_k, Latin Subscript Small Letter K
 {0x6106, 0x171d, 0x299E}, // ⦞, \angles, Angle With S Inside
-{0x6203, 0x1724, 0x1D54D}, // 𝕍, \bbV, Mathematical Double-Struck Capital V
+{0x6203, 0x1724, 0xDD4D'D835}, // U+1D54D, 𝕍, \bbV, Mathematical Double-Struck Capital V
 {0x630e, 0x1728, 0x2687}, // ⚇, \circledtwodots, White Circle With Two Dots
 {0x750a, 0x1737, 0x23DF}, // ⏟, \underbrace, Bottom Curly Bracket
 {0x5f02, 0x1742, 0x2097}, // ₗ, \_l, Latin Subscript Small Letter L
-{0x6203, 0x1745, 0x1D54E}, // 𝕎, \bbW, Mathematical Double-Struck Capital W
+{0x6203, 0x1745, 0xDD4E'D835}, // U+1D54E, 𝕎, \bbW, Mathematical Double-Struck Capital W
 {0x6703, 0x1749, 0x2AA5}, // ⪥, \gla, Greater-Than Beside Less-Than
 {0x6e16, 0x174d, 0x2B3C}, // ⬼, \nvtwoheadleftarrowtail, Leftwards Two-Headed Arrow With Tail With Vertical Stroke
 {0x6f0b, 0x1764, 0x23B4}, // ⎴, \overbracket, Top Square Bracket
-{0x7405, 0x1770, 0x1D7FC}, // 𝟼, \ttsix, Mathematical Monospace Digit Six
+{0x7405, 0x1770, 0xDFFC'D835}, // U+1D7FC, 𝟼, \ttsix, Mathematical Monospace Digit Six
 {0x5f02, 0x1776, 0x2098}, // ₘ, \_m, Latin Subscript Small Letter M
-{0x6203, 0x1779, 0x1D54F}, // 𝕏, \bbX, Mathematical Double-Struck Capital X
+{0x6203, 0x1779, 0xDD4F'D835}, // U+1D54F, 𝕏, \bbX, Mathematical Double-Struck Capital X
 {0x6213, 0x177d, 0x2689}, // ⚉, \blackcircledtwodots, Black Circle With Two White Dots
-{0x7305, 0x1791, 0x1D5A0}, // 𝖠, \sansA, Mathematical Sans-Serif Capital A
-{0x7406, 0x1797, 0x1D7FF}, // 𝟿, \ttnine, Mathematical Monospace Digit Nine
+{0x7305, 0x1791, 0xDDA0'D835}, // U+1D5A0, 𝖠, \sansA, Mathematical Sans-Serif Capital A
+{0x7406, 0x1797, 0xDFFF'D835}, // U+1D7FF, 𝟿, \ttnine, Mathematical Monospace Digit Nine
 {0x5f02, 0x179e, 0x2099}, // ₙ, \_n, Latin Subscript Small Letter N
 {0x6105, 0x17a1, 0x2A3F}, // ⨿, \amalg, Amalgamation Or Coproduct
-{0x6203, 0x17a7, 0x1D550}, // 𝕐, \bbY, Mathematical Double-Struck Capital Y
-{0x6206, 0x17ab, 0x1D5EE}, // 𝗮, \bsansa, Mathematical Sans-Serif Bold Small A
+{0x6203, 0x17a7, 0xDD50'D835}, // U+1D550, 𝕐, \bbY, Mathematical Double-Struck Capital Y
+{0x6206, 0x17ab, 0xDDEE'D835}, // U+1D5EE, 𝗮, \bsansa, Mathematical Sans-Serif Bold Small A
 {0x6805, 0x17b2, 0x02D1}, // ˑ, \hlmrk, Modifier Letter Half Triangular Colon
 {0x6e08, 0x17b8, 0x2274}, // ≴, \nlesssim, Neither Less-Than Nor Equivalent To / Neither Less Than Nor Equivalent To
-{0x7305, 0x17c1, 0x1D5A1}, // 𝖡, \sansB, Mathematical Sans-Serif Capital B
+{0x7305, 0x17c1, 0xDDA1'D835}, // U+1D5A1, 𝖡, \sansB, Mathematical Sans-Serif Capital B
 {0x5f02, 0x17c7, 0x2092}, // ₒ, \_o, Latin Subscript Small Letter O
 {0x6203, 0x17ca, 0x2124}, // ℤ, \bbZ, Double-Struck Capital Z / Double-Struck Z
-{0x6206, 0x17ce, 0x1D5EF}, // 𝗯, \bsansb, Mathematical Sans-Serif Bold Small B
+{0x6206, 0x17ce, 0xDDEF'D835}, // U+1D5EF, 𝗯, \bsansb, Mathematical Sans-Serif Bold Small B
 {0x6208, 0x17d5, 0x2A05}, // ⨅, \bigsqcap, N-Ary Square Intersection Operator
 {0x620b, 0x17de, 0x263B}, // ☻, \blacksmiley, Black Smiling Face
 {0x680d, 0x17ea, 0x26A5}, // ⚥, \hermaphrodite, Male And Female Sign
 {0x6c0d, 0x17f8, 0x27D5}, // ⟕, \leftouterjoin, Left Outer Join
-{0x7305, 0x1806, 0x1D5A2}, // 𝖢, \sansC, Mathematical Sans-Serif Capital C
+{0x7305, 0x1806, 0xDDA2'D835}, // U+1D5A2, 𝖢, \sansC, Mathematical Sans-Serif Capital C
 {0x5f02, 0x180c, 0x209A}, // ₚ, \_p, Latin Subscript Small Letter P
-{0x6206, 0x180f, 0x1D5F0}, // 𝗰, \bsansc, Mathematical Sans-Serif Bold Small C
+{0x6206, 0x180f, 0xDDF0'D835}, // U+1D5F0, 𝗰, \bsansc, Mathematical Sans-Serif Bold Small C
 {0x6304, 0x1816, 0x2ACF}, // ⫏, \csub, Closed Subset
-{0x6909, 0x181b, 0x1D716}, // 𝜖, \itepsilon, Mathematical Italic Epsilon Symbol
-{0x7305, 0x1825, 0x1D5A3}, // 𝖣, \sansD, Mathematical Sans-Serif Capital D
+{0x6909, 0x181b, 0xDF16'D835}, // U+1D716, 𝜖, \itepsilon, Mathematical Italic Epsilon Symbol
+{0x7305, 0x1825, 0xDDA3'D835}, // U+1D5A3, 𝖣, \sansD, Mathematical Sans-Serif Capital D
 {0x5606, 0x182b, 0x22AA}, // ⊪, \Vvdash, Triple Vertical Bar Right Turnstile
-{0x6206, 0x1832, 0x1D5F1}, // 𝗱, \bsansd, Mathematical Sans-Serif Bold Small D
-{0x7305, 0x1839, 0x1D5A4}, // 𝖤, \sansE, Mathematical Sans-Serif Capital E
+{0x6206, 0x1832, 0xDDF1'D835}, // U+1D5F1, 𝗱, \bsansd, Mathematical Sans-Serif Bold Small D
+{0x7305, 0x1839, 0xDDA4'D835}, // U+1D5A4, 𝖤, \sansE, Mathematical Sans-Serif Capital E
 {0x730b, 0x183f, 0x2142}, // ⅂, \sansLturned, Turned Sans-Serif Capital L
 {0x5f02, 0x184b, 0x1D63}, // ᵣ, \_r, Latin Subscript Small Letter R
-{0x6206, 0x184e, 0x1D5F2}, // 𝗲, \bsanse, Mathematical Sans-Serif Bold Small E
-{0x7305, 0x1855, 0x1D5A5}, // 𝖥, \sansF, Mathematical Sans-Serif Capital F
+{0x6206, 0x184e, 0xDDF2'D835}, // U+1D5F2, 𝗲, \bsanse, Mathematical Sans-Serif Bold Small E
+{0x7305, 0x1855, 0xDDA5'D835}, // U+1D5A5, 𝖥, \sansF, Mathematical Sans-Serif Capital F
 {0x5f02, 0x185b, 0x209B}, // ₛ, \_s, Latin Subscript Small Letter S
-{0x6206, 0x185e, 0x1D5F3}, // 𝗳, \bsansf, Mathematical Sans-Serif Bold Small F
+{0x6206, 0x185e, 0xDDF3'D835}, // U+1D5F3, 𝗳, \bsansf, Mathematical Sans-Serif Bold Small F
 {0x630f, 0x1865, 0x29B7}, // ⦷, \circledparallel, Circled Parallel
 {0x6c07, 0x1875, 0x2A81}, // ⪁, \lesdoto, Less-Than Or Slanted Equal To With Dot Above
 {0x6d0c, 0x187d, 0x2B26}, // ⬦, \mdwhtdiamond, White Medium Diamond
-{0x7305, 0x188a, 0x1D5A6}, // 𝖦, \sansG, Mathematical Sans-Serif Capital G
+{0x7305, 0x188a, 0xDDA6'D835}, // U+1D5A6, 𝖦, \sansG, Mathematical Sans-Serif Capital G
 {0x7307, 0x1890, 0x2AC1}, // ⫁, \submult, Subset With Multiplication Sign Below
 {0x5f02, 0x1898, 0x209C}, // ₜ, \_t, Latin Subscript Small Letter T
-{0x6204, 0x189b, 0x1D743}, // 𝝃, \bixi, Mathematical Bold Italic Small Xi
-{0x6205, 0x18a0, 0x1D6D2}, // 𝛒, \bfrho, Mathematical Bold Small Rho
+{0x6204, 0x189b, 0xDF43'D835}, // U+1D743, 𝝃, \bixi, Mathematical Bold Italic Small Xi
+{0x6205, 0x18a0, 0xDED2'D835}, // U+1D6D2, 𝛒, \bfrho, Mathematical Bold Small Rho
 {0x6206, 0x18a6, 0x27D8}, // ⟘, \bigbot, Large Up Tack
-{0x6206, 0x18ad, 0x1D5F4}, // 𝗴, \bsansg, Mathematical Sans-Serif Bold Small G
+{0x6206, 0x18ad, 0xDDF4'D835}, // U+1D5F4, 𝗴, \bsansg, Mathematical Sans-Serif Bold Small G
 {0x7008, 0x18b4, 0x2B20}, // ⬠, \pentagon, White Pentagon
-{0x7305, 0x18bd, 0x1D5A7}, // 𝖧, \sansH, Mathematical Sans-Serif Capital H
+{0x7305, 0x18bd, 0xDDA7'D835}, // U+1D5A7, 𝖧, \sansH, Mathematical Sans-Serif Capital H
 {0x3503, 0x18c3, 0x215A}, // ⅚, \5/6, Vulgar Fraction Five Sixths / Fraction Five Sixths
 {0x5202, 0x18c7, 0x211C}, // ℜ, \Re, Black-Letter Capital R / Black-Letter R
 {0x5f02, 0x18ca, 0x1D64}, // ᵤ, \_u, Latin Subscript Small Letter U
-{0x6206, 0x18cd, 0x1D5F5}, // 𝗵, \bsansh, Mathematical Sans-Serif Bold Small H
+{0x6206, 0x18cd, 0xDDF5'D835}, // U+1D5F5, 𝗵, \bsansh, Mathematical Sans-Serif Bold Small H
 {0x6309, 0x18d4, 0x00A9}, // ©, \copyright, Copyright Sign
 {0x6703, 0x18de, 0x2AA4}, // ⪤, \glj, Greater-Than Overlapping Less-Than
-{0x7305, 0x18e2, 0x1D5A8}, // 𝖨, \sansI, Mathematical Sans-Serif Capital I
+{0x7305, 0x18e2, 0xDDA8'D835}, // U+1D5A8, 𝖨, \sansI, Mathematical Sans-Serif Capital I
 {0x750d, 0x18e8, 0x21BF}, // ↿, \upharpoonleft, Upwards Harpoon With Barb Leftwards / Up Harpoon With Barb Left
 {0x5f02, 0x18f6, 0x1D65}, // ᵥ, \_v, Latin Subscript Small Letter V
 {0x5f06, 0x18f9, 0x2094}, // ₔ, \_schwa, Latin Subscript Small Letter Schwa
-{0x6203, 0x1900, 0x1D552}, // 𝕒, \bba, Mathematical Double-Struck Small A
-{0x6206, 0x1904, 0x1D7D8}, // 𝟘, \bbzero, Mathematical Double-Struck Digit Zero
-{0x6206, 0x190b, 0x1D5F6}, // 𝗶, \bsansi, Mathematical Sans-Serif Bold Small I
+{0x6203, 0x1900, 0xDD52'D835}, // U+1D552, 𝕒, \bba, Mathematical Double-Struck Small A
+{0x6206, 0x1904, 0xDFD8'D835}, // U+1D7D8, 𝟘, \bbzero, Mathematical Double-Struck Digit Zero
+{0x6206, 0x190b, 0xDDF6'D835}, // U+1D5F6, 𝗶, \bsansi, Mathematical Sans-Serif Bold Small I
 {0x6507, 0x1912, 0x2A78}, // ⩸, \equivDD, Equivalent With Four Dots Above
-{0x7305, 0x191a, 0x1D5A9}, // 𝖩, \sansJ, Mathematical Sans-Serif Capital J
+{0x7305, 0x191a, 0xDDA9'D835}, // U+1D5A9, 𝖩, \sansJ, Mathematical Sans-Serif Capital J
 {0x7507, 0x1920, 0x03C5}, // υ, \upsilon, Greek Small Letter Upsilon
 {0x7804, 0x1928, 0x211E}, // ℞, \xrat, Prescription Take
 {0x3503, 0x192d, 0x215D}, // ⅝, \5/8, Vulgar Fraction Five Eighths / Fraction Five Eighths
-{0x6203, 0x1931, 0x1D553}, // 𝕓, \bbb, Mathematical Double-Struck Small B
-{0x6205, 0x1935, 0x1D7D0}, // 𝟐, \bftwo, Mathematical Bold Digit Two
-{0x6205, 0x193b, 0x1D722}, // 𝜢, \biEta, Mathematical Bold Italic Capital Eta
-{0x6206, 0x1941, 0x1D5F7}, // 𝗷, \bsansj, Mathematical Sans-Serif Bold Small J
-{0x6208, 0x1948, 0x1D776}, // 𝝶, \bsanseta, Mathematical Sans-Serif Bold Small Eta
+{0x6203, 0x1931, 0xDD53'D835}, // U+1D553, 𝕓, \bbb, Mathematical Double-Struck Small B
+{0x6205, 0x1935, 0xDFD0'D835}, // U+1D7D0, 𝟐, \bftwo, Mathematical Bold Digit Two
+{0x6205, 0x193b, 0xDF22'D835}, // U+1D722, 𝜢, \biEta, Mathematical Bold Italic Capital Eta
+{0x6206, 0x1941, 0xDDF7'D835}, // U+1D5F7, 𝗷, \bsansj, Mathematical Sans-Serif Bold Small J
+{0x6208, 0x1948, 0xDF76'D835}, // U+1D776, 𝝶, \bsanseta, Mathematical Sans-Serif Bold Small Eta
 {0x650c, 0x1951, 0x29B3}, // ⦳, \emptysetoarr, Empty Set With Right Arrow Above
 {0x6d07, 0x195e, 0x2720}, // ✠, \maltese, Maltese Cross
-{0x7305, 0x1966, 0x1D5AA}, // 𝖪, \sansK, Mathematical Sans-Serif Capital K
+{0x7305, 0x1966, 0xDDAA'D835}, // U+1D5AA, 𝖪, \sansK, Mathematical Sans-Serif Capital K
 {0x7412, 0x196c, 0x25EE}, // ◮, \trianglerightblack, Up-Pointing Triangle With Right Half Black / Up Pointing Triangle With Right Half Black
 {0x5f02, 0x197f, 0x2093}, // ₓ, \_x, Latin Subscript Small Letter X
-{0x6203, 0x1982, 0x1D554}, // 𝕔, \bbc, Mathematical Double-Struck Small C
-{0x6206, 0x1986, 0x1D5F8}, // 𝗸, \bsansk, Mathematical Sans-Serif Bold Small K
+{0x6203, 0x1982, 0xDD54'D835}, // U+1D554, 𝕔, \bbc, Mathematical Double-Struck Small C
+{0x6206, 0x1986, 0xDDF8'D835}, // U+1D5F8, 𝗸, \bsansk, Mathematical Sans-Serif Bold Small K
 {0x7104, 0x198d, 0x2003}, //  , \quad, Em Space
-{0x7305, 0x1992, 0x1D5AB}, // 𝖫, \sansL, Mathematical Sans-Serif Capital L
+{0x7305, 0x1992, 0xDDAB'D835}, // U+1D5AB, 𝖫, \sansL, Mathematical Sans-Serif Capital L
 {0x730b, 0x1998, 0x25A4}, // ▤, \squarehfill, Square With Horizontal Fill
 {0x7514, 0x19a4, 0x20ED}, // ⃭, \underleftharpoondown, Combining Leftwards Harpoon With Barb Downwards
-{0x6203, 0x19b9, 0x1D555}, // 𝕕, \bbd, Mathematical Double-Struck Small D
+{0x6203, 0x19b9, 0xDD55'D835}, // U+1D555, 𝕕, \bbd, Mathematical Double-Struck Small D
 {0x6203, 0x19bd, 0x22A5}, // ⊥, \bot, Up Tack
-{0x6206, 0x19c1, 0x1D5F9}, // 𝗹, \bsansl, Mathematical Sans-Serif Bold Small L
+{0x6206, 0x19c1, 0xDDF9'D835}, // U+1D5F9, 𝗹, \bsansl, Mathematical Sans-Serif Bold Small L
 {0x6605, 0x19c8, 0x2ADC}, // ⫝̸, \forks, Forking
 {0x7211, 0x19ce, 0x291E}, // ⤞, \rightarrowdiamond, Rightwards Arrow To Black Diamond
-{0x7305, 0x19e0, 0x1D5AC}, // 𝖬, \sansM, Mathematical Sans-Serif Capital M
-{0x6203, 0x19e6, 0x1D556}, // 𝕖, \bbe, Mathematical Double-Struck Small E
-{0x6206, 0x19ea, 0x1D5FA}, // 𝗺, \bsansm, Mathematical Sans-Serif Bold Small M
-{0x7305, 0x19f1, 0x1D5AD}, // 𝖭, \sansN, Mathematical Sans-Serif Capital N
+{0x7305, 0x19e0, 0xDDAC'D835}, // U+1D5AC, 𝖬, \sansM, Mathematical Sans-Serif Capital M
+{0x6203, 0x19e6, 0xDD56'D835}, // U+1D556, 𝕖, \bbe, Mathematical Double-Struck Small E
+{0x6206, 0x19ea, 0xDDFA'D835}, // U+1D5FA, 𝗺, \bsansm, Mathematical Sans-Serif Bold Small M
+{0x7305, 0x19f1, 0xDDAD'D835}, // U+1D5AD, 𝖭, \sansN, Mathematical Sans-Serif Capital N
 {0x7709, 0x19f7, 0x2A51}, // ⩑, \wedgeodot, Logical And With Dot Above
-{0x6203, 0x1a01, 0x1D557}, // 𝕗, \bbf, Mathematical Double-Struck Small F
-{0x6206, 0x1a05, 0x1D5FB}, // 𝗻, \bsansn, Mathematical Sans-Serif Bold Small N
-{0x620d, 0x1a0c, 0x1D78C}, // 𝞌, \bsansvarkappa, Mathematical Sans-Serif Bold Kappa Symbol
-{0x6909, 0x1a1a, 0x1D715}, // 𝜕, \itpartial, Mathematical Italic Partial Differential
+{0x6203, 0x1a01, 0xDD57'D835}, // U+1D557, 𝕗, \bbf, Mathematical Double-Struck Small F
+{0x6206, 0x1a05, 0xDDFB'D835}, // U+1D5FB, 𝗻, \bsansn, Mathematical Sans-Serif Bold Small N
+{0x620d, 0x1a0c, 0xDF8C'D835}, // U+1D78C, 𝞌, \bsansvarkappa, Mathematical Sans-Serif Bold Kappa Symbol
+{0x6909, 0x1a1a, 0xDF15'D835}, // U+1D715, 𝜕, \itpartial, Mathematical Italic Partial Differential
 {0x700e, 0x1a24, 0x2031}, // ‱, \pertenthousand, Per Ten Thousand Sign
-{0x7305, 0x1a33, 0x1D5AE}, // 𝖮, \sansO, Mathematical Sans-Serif Capital O
+{0x7305, 0x1a33, 0xDDAE'D835}, // U+1D5AE, 𝖮, \sansO, Mathematical Sans-Serif Capital O
 {0x7410, 0x1a39, 0x219E}, // ↞, \twoheadleftarrow, Leftwards Two Headed Arrow / Left Two Headed Arrow
 {0x5306, 0x1a4a, 0x22D1}, // ⋑, \Supset, Double Superset
-{0x6203, 0x1a51, 0x1D558}, // 𝕘, \bbg, Mathematical Double-Struck Small G
-{0x6206, 0x1a55, 0x1D5FC}, // 𝗼, \bsanso, Mathematical Sans-Serif Bold Small O
+{0x6203, 0x1a51, 0xDD58'D835}, // U+1D558, 𝕘, \bbg, Mathematical Double-Struck Small G
+{0x6206, 0x1a55, 0xDDFC'D835}, // U+1D5FC, 𝗼, \bsanso, Mathematical Sans-Serif Bold Small O
 {0x6605, 0x1a5c, 0x2AD9}, // ⫙, \forkv, Element Of Opening Downwards
 {0x6d07, 0x1a62, 0x263F}, // ☿, \mercury, Mercury
 {0x6d0f, 0x1a6a, 0x29AF}, // ⦯, \measangledltosw, Measured Angle With Open Arm Ending In Arrow Pointing Left And Down
-{0x7305, 0x1a7a, 0x1D5AF}, // 𝖯, \sansP, Mathematical Sans-Serif Capital P
+{0x7305, 0x1a7a, 0xDDAF'D835}, // U+1D5AF, 𝖯, \sansP, Mathematical Sans-Serif Capital P
 {0x7605, 0x1a80, 0x264D}, // ♍, \virgo, Virgo
 {0x610b, 0x1a86, 0x20F0}, // ⃰, \asteraccent, Combining Asterisk Above
-{0x6203, 0x1a92, 0x1D559}, // 𝕙, \bbh, Mathematical Double-Struck Small H
-{0x6206, 0x1a96, 0x1D5FD}, // 𝗽, \bsansp, Mathematical Sans-Serif Bold Small P
-{0x6210, 0x1a9d, 0x1D7AE}, // 𝞮, \bisansvarepsilon, Mathematical Sans-Serif Bold Italic Small Epsilon
+{0x6203, 0x1a92, 0xDD59'D835}, // U+1D559, 𝕙, \bbh, Mathematical Double-Struck Small H
+{0x6206, 0x1a96, 0xDDFD'D835}, // U+1D5FD, 𝗽, \bsansp, Mathematical Sans-Serif Bold Small P
+{0x6210, 0x1a9d, 0xDFAE'D835}, // U+1D7AE, 𝞮, \bisansvarepsilon, Mathematical Sans-Serif Bold Italic Small Epsilon
 {0x6214, 0x1aae, 0x25BC}, // ▼, \bigblacktriangledown, Black Down-Pointing Triangle / Black Down Pointing Triangle
-{0x6908, 0x1ac3, 0x1D71A}, // 𝜚, \itvarrho, Mathematical Italic Rho Symbol
+{0x6908, 0x1ac3, 0xDF1A'D835}, // U+1D71A, 𝜚, \itvarrho, Mathematical Italic Rho Symbol
 {0x720d, 0x1acc, 0x22BE}, // ⊾, \rightanglearc, Right Angle With Arc
-{0x7305, 0x1ada, 0x1D5B0}, // 𝖰, \sansQ, Mathematical Sans-Serif Capital Q
+{0x7305, 0x1ada, 0xDDB0'D835}, // U+1D5B0, 𝖰, \sansQ, Mathematical Sans-Serif Capital Q
 {0x4307, 0x1ae0, 0x2A74}, // ⩴, \Coloneq, Double Colon Equal
 {0x4505, 0x1ae8, 0x2263}, // ≣, \Equiv, Strictly Equivalent To
 {0x4c0f, 0x1aee, 0x2958}, // ⥘, \LeftUpVectorBar, Upwards Harpoon With Barb Left To Bar
-{0x6203, 0x1afe, 0x1D55A}, // 𝕚, \bbi, Mathematical Double-Struck Small I
-{0x6206, 0x1b02, 0x1D5FE}, // 𝗾, \bsansq, Mathematical Sans-Serif Bold Small Q
+{0x6203, 0x1afe, 0xDD5A'D835}, // U+1D55A, 𝕚, \bbi, Mathematical Double-Struck Small I
+{0x6206, 0x1b02, 0xDDFE'D835}, // U+1D5FE, 𝗾, \bsansq, Mathematical Sans-Serif Bold Small Q
 {0x6304, 0x1b09, 0x2AD0}, // ⫐, \csup, Closed Superset
-{0x6907, 0x1b0e, 0x1D6EB}, // 𝛫, \itKappa, Mathematical Italic Capital Kappa
+{0x6907, 0x1b0e, 0xDEEB'D835}, // U+1D6EB, 𝛫, \itKappa, Mathematical Italic Capital Kappa
 {0x6c07, 0x1b16, 0x2AF7}, // ⫷, \lllnest, Triple Nested Less-Than
-{0x7305, 0x1b1e, 0x1D5B1}, // 𝖱, \sansR, Mathematical Sans-Serif Capital R
+{0x7305, 0x1b1e, 0xDDB1'D835}, // U+1D5B1, 𝖱, \sansR, Mathematical Sans-Serif Capital R
 {0x7306, 0x1b24, 0x2282}, // ⊂, \subset, Subset Of
-{0x6203, 0x1b2b, 0x1D55B}, // 𝕛, \bbj, Mathematical Double-Struck Small J
-{0x6206, 0x1b2f, 0x1D5FF}, // 𝗿, \bsansr, Mathematical Sans-Serif Bold Small R
-{0x6207, 0x1b36, 0x1D6E1}, // 𝛡, \bfvarpi, Mathematical Bold Pi Symbol
+{0x6203, 0x1b2b, 0xDD5B'D835}, // U+1D55B, 𝕛, \bbj, Mathematical Double-Struck Small J
+{0x6206, 0x1b2f, 0xDDFF'D835}, // U+1D5FF, 𝗿, \bsansr, Mathematical Sans-Serif Bold Small R
+{0x6207, 0x1b36, 0xDEE1'D835}, // U+1D6E1, 𝛡, \bfvarpi, Mathematical Bold Pi Symbol
 {0x6405, 0x1b3e, 0x22F1}, // ⋱, \ddots, Down Right Diagonal Ellipsis
 {0x7215, 0x1b44, 0x2969}, // ⥩, \rightleftharpoonsdown, Rightwards Harpoon With Barb Down Above Leftwards Harpoon With Barb Down
-{0x7305, 0x1b5a, 0x1D5B2}, // 𝖲, \sansS, Mathematical Sans-Serif Capital S
+{0x7305, 0x1b5a, 0xDDB2'D835}, // U+1D5B2, 𝖲, \sansS, Mathematical Sans-Serif Capital S
 {0x7309, 0x1b60, 0x228A}, // ⊊, \subsetneq, Subset Of With Not Equal To / Subset Of Or Not Equal To
 {0x7403, 0x1b6a, 0x03C4}, // τ, \tau, Greek Small Letter Tau
-{0x6203, 0x1b6e, 0x1D55C}, // 𝕜, \bbk, Mathematical Double-Struck Small K
-{0x6206, 0x1b72, 0x1D600}, // 𝘀, \bsanss, Mathematical Sans-Serif Bold Small S
+{0x6203, 0x1b6e, 0xDD5C'D835}, // U+1D55C, 𝕜, \bbk, Mathematical Double-Struck Small K
+{0x6206, 0x1b72, 0xDE00'D835}, // U+1D600, 𝘀, \bsanss, Mathematical Sans-Serif Bold Small S
 {0x6305, 0x1b79, 0x00B7}, // ·, \cdotp, Middle Dot
 {0x6709, 0x1b7f, 0x22DB}, // ⋛, \gtreqless, Greater-Than Equal To Or Less-Than / Greater Than Equal To Or Less Than
 {0x6e06, 0x1b89, 0x22AF}, // ⊯, \nVDash, Negated Double Vertical Bar Double Right Turnstile
 {0x7208, 0x1b90, 0x2315}, // ⌕, \recorder, Telephone Recorder
-{0x7305, 0x1b99, 0x1D5B3}, // 𝖳, \sansT, Mathematical Sans-Serif Capital T
-{0x6203, 0x1b9f, 0x1D55D}, // 𝕝, \bbl, Mathematical Double-Struck Small L
-{0x6206, 0x1ba3, 0x1D601}, // 𝘁, \bsanst, Mathematical Sans-Serif Bold Small T
+{0x7305, 0x1b99, 0xDDB3'D835}, // U+1D5B3, 𝖳, \sansT, Mathematical Sans-Serif Capital T
+{0x6203, 0x1b9f, 0xDD5D'D835}, // U+1D55D, 𝕝, \bbl, Mathematical Double-Struck Small L
+{0x6206, 0x1ba3, 0xDE01'D835}, // U+1D601, 𝘁, \bsanst, Mathematical Sans-Serif Bold Small T
 {0x6d02, 0x1baa, 0x2213}, // ∓, \mp, Minus-Or-Plus Sign
 {0x6f04, 0x1bad, 0x233D}, // ⌽, \obar, Apl Functional Symbol Circle Stile
-{0x7305, 0x1bb2, 0x1D5B4}, // 𝖴, \sansU, Mathematical Sans-Serif Capital U
+{0x7305, 0x1bb2, 0xDDB4'D835}, // U+1D5B4, 𝖴, \sansU, Mathematical Sans-Serif Capital U
 {0x7505, 0x1bb8, 0x25DD}, // ◝, \urarc, Upper Right Quadrant Circular Arc
 {0x760a, 0x1bbe, 0x03B5}, // ε, \varepsilon, Greek Small Letter Epsilon
 {0x7611, 0x1bc9, 0x232C}, // ⌬, \varhexagonlrbonds, Benzene Ring
-{0x6203, 0x1bdb, 0x1D55E}, // 𝕞, \bbm, Mathematical Double-Struck Small M
-{0x6206, 0x1bdf, 0x1D602}, // 𝘂, \bsansu, Mathematical Sans-Serif Bold Small U
-{0x6209, 0x1be6, 0x1D6AC}, // 𝚬, \bfEpsilon, Mathematical Bold Capital Epsilon
+{0x6203, 0x1bdb, 0xDD5E'D835}, // U+1D55E, 𝕞, \bbm, Mathematical Double-Struck Small M
+{0x6206, 0x1bdf, 0xDE02'D835}, // U+1D602, 𝘂, \bsansu, Mathematical Sans-Serif Bold Small U
+{0x6209, 0x1be6, 0xDEAC'D835}, // U+1D6AC, 𝚬, \bfEpsilon, Mathematical Bold Capital Epsilon
 {0x6e0a, 0x1bf0, 0x0338'2AC5}, // ⫅̸, \nsubseteqq, Subset Of Above Equals Sign + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x7208, 0x1bfb, 0x2A22}, // ⨢, \ringplus, Plus Sign With Small Circle Above
 {0x7304, 0x1c04, 0x221A}, // √, \sqrt, Square Root
-{0x7305, 0x1c09, 0x1D5B5}, // 𝖵, \sansV, Mathematical Sans-Serif Capital V
+{0x7305, 0x1c09, 0xDDB5'D835}, // U+1D5B5, 𝖵, \sansV, Mathematical Sans-Serif Capital V
 {0x7406, 0x1c0f, 0x2649}, // ♉, \taurus, Taurus
 {0x7605, 0x1c16, 0x225A}, // ≚, \veeeq, Equiangular To
-{0x6203, 0x1c1c, 0x1D55F}, // 𝕟, \bbn, Mathematical Double-Struck Small N
-{0x6204, 0x1c20, 0x1D72B}, // 𝜫, \biPi, Mathematical Bold Italic Capital Pi
-{0x6206, 0x1c25, 0x1D603}, // 𝘃, \bsansv, Mathematical Sans-Serif Bold Small V
-{0x620a, 0x1c2c, 0x1D7F4}, // 𝟴, \bsanseight, Mathematical Sans-Serif Bold Digit Eight
+{0x6203, 0x1c1c, 0xDD5F'D835}, // U+1D55F, 𝕟, \bbn, Mathematical Double-Struck Small N
+{0x6204, 0x1c20, 0xDF2B'D835}, // U+1D72B, 𝜫, \biPi, Mathematical Bold Italic Capital Pi
+{0x6206, 0x1c25, 0xDE03'D835}, // U+1D603, 𝘃, \bsansv, Mathematical Sans-Serif Bold Small V
+{0x620a, 0x1c2c, 0xDFF4'D835}, // U+1D7F4, 𝟴, \bsanseight, Mathematical Sans-Serif Bold Digit Eight
 {0x6305, 0x1c37, 0x22EF}, // ⋯, \cdots, Midline Horizontal Ellipsis
-{0x7305, 0x1c3d, 0x1D5B6}, // 𝖶, \sansW, Mathematical Sans-Serif Capital W
-{0x6203, 0x1c43, 0x1D560}, // 𝕠, \bbo, Mathematical Double-Struck Small O
-{0x6206, 0x1c47, 0x1D604}, // 𝘄, \bsansw, Mathematical Sans-Serif Bold Small W
+{0x7305, 0x1c3d, 0xDDB6'D835}, // U+1D5B6, 𝖶, \sansW, Mathematical Sans-Serif Capital W
+{0x6203, 0x1c43, 0xDD60'D835}, // U+1D560, 𝕠, \bbo, Mathematical Double-Struck Small O
+{0x6206, 0x1c47, 0xDE04'D835}, // U+1D604, 𝘄, \bsansw, Mathematical Sans-Serif Bold Small W
 {0x6d08, 0x1c4e, 0x21A7}, // ↧, \mapsdown, Downwards Arrow From Bar / Down Arrow From Bar
-{0x7305, 0x1c57, 0x1D5B7}, // 𝖷, \sansX, Mathematical Sans-Serif Capital X
-{0x6203, 0x1c5d, 0x1D561}, // 𝕡, \bbp, Mathematical Double-Struck Small P
-{0x6206, 0x1c61, 0x1D605}, // 𝘅, \bsansx, Mathematical Sans-Serif Bold Small X
-{0x6207, 0x1c68, 0x1D6C2}, // 𝛂, \bfalpha, Mathematical Bold Small Alpha
+{0x7305, 0x1c57, 0xDDB7'D835}, // U+1D5B7, 𝖷, \sansX, Mathematical Sans-Serif Capital X
+{0x6203, 0x1c5d, 0xDD61'D835}, // U+1D561, 𝕡, \bbp, Mathematical Double-Struck Small P
+{0x6206, 0x1c61, 0xDE05'D835}, // U+1D605, 𝘅, \bsansx, Mathematical Sans-Serif Bold Small X
+{0x6207, 0x1c68, 0xDEC2'D835}, // U+1D6C2, 𝛂, \bfalpha, Mathematical Bold Small Alpha
 {0x6e04, 0x1c70, 0x2270}, // ≰, \nleq, Neither Less-Than Nor Equal To / Neither Less Than Nor Equal To
-{0x7305, 0x1c75, 0x1D5B8}, // 𝖸, \sansY, Mathematical Sans-Serif Capital Y
-{0x6203, 0x1c7b, 0x1D562}, // 𝕢, \bbq, Mathematical Double-Struck Small Q
+{0x7305, 0x1c75, 0xDDB8'D835}, // U+1D5B8, 𝖸, \sansY, Mathematical Sans-Serif Capital Y
+{0x6203, 0x1c7b, 0xDD62'D835}, // U+1D562, 𝕢, \bbq, Mathematical Double-Struck Small Q
 {0x6206, 0x1c7f, 0x27D9}, // ⟙, \bigtop, Large Down Tack
-{0x6206, 0x1c86, 0x1D606}, // 𝘆, \bsansy, Mathematical Sans-Serif Bold Small Y
-{0x6208, 0x1c8d, 0x1D769}, // 𝝩, \bsansTau, Mathematical Sans-Serif Bold Capital Tau
+{0x6206, 0x1c86, 0xDE06'D835}, // U+1D606, 𝘆, \bsansy, Mathematical Sans-Serif Bold Small Y
+{0x6208, 0x1c8d, 0xDF69'D835}, // U+1D769, 𝝩, \bsansTau, Mathematical Sans-Serif Bold Capital Tau
 {0x620b, 0x1c96, 0x25A0}, // ■, \blacksquare, Black Square
 {0x6d02, 0x1ca2, 0x03BC}, // μ, \mu, Greek Small Letter Mu
-{0x7305, 0x1ca5, 0x1D5B9}, // 𝖹, \sansZ, Mathematical Sans-Serif Capital Z
+{0x7305, 0x1ca5, 0xDDB9'D835}, // U+1D5B9, 𝖹, \sansZ, Mathematical Sans-Serif Capital Z
 {0x760b, 0x1cab, 0x20D2}, // ⃒, \vertoverlay, Combining Long Vertical Line Overlay / Non-Spacing Long Vertical Bar Overlay
 {0x5f05, 0x1cb7, 0x1D66}, // ᵦ, \_beta, Greek Subscript Small Letter Beta
-{0x6203, 0x1cbd, 0x1D563}, // 𝕣, \bbr, Mathematical Double-Struck Small R
-{0x6206, 0x1cc1, 0x1D607}, // 𝘇, \bsansz, Mathematical Sans-Serif Bold Small Z
-{0x6208, 0x1cc8, 0x1D7ED}, // 𝟭, \bsansone, Mathematical Sans-Serif Bold Digit One
+{0x6203, 0x1cbd, 0xDD63'D835}, // U+1D563, 𝕣, \bbr, Mathematical Double-Struck Small R
+{0x6206, 0x1cc1, 0xDE07'D835}, // U+1D607, 𝘇, \bsansz, Mathematical Sans-Serif Bold Small Z
+{0x6208, 0x1cc8, 0xDFED'D835}, // U+1D7ED, 𝟭, \bsansone, Mathematical Sans-Serif Bold Digit One
 {0x6e08, 0x1cd1, 0x0338'227F}, // ≿̸, \nsuccsim, Succeeds Or Equivalent To + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x7303, 0x1cda, 0x2211}, // ∑, \sum, N-Ary Summation
-{0x6203, 0x1cde, 0x1D564}, // 𝕤, \bbs, Mathematical Double-Struck Small S
-{0x6205, 0x1ce2, 0x1D6C8}, // 𝛈, \bfeta, Mathematical Bold Small Eta
+{0x6203, 0x1cde, 0xDD64'D835}, // U+1D564, 𝕤, \bbs, Mathematical Double-Struck Small S
+{0x6205, 0x1ce2, 0xDEC8'D835}, // U+1D6C8, 𝛈, \bfeta, Mathematical Bold Small Eta
 {0x670e, 0x1ce8, 0x203A}, // ›, \guilsinglright, Single Right-Pointing Angle Quotation Mark / Right Pointing Single Guillemet
 {0x6c0f, 0x1cf7, 0x21BD}, // ↽, \leftharpoondown, Leftwards Harpoon With Barb Downwards / Left Harpoon With Barb Down
 {0x6f0e, 0x1d07, 0x0315}, // ̕, \ocommatopright, Combining Comma Above Right / Non-Spacing Comma Above Right
 {0x7303, 0x1d16, 0x263C}, // ☼, \sun, White Sun With Rays
-{0x6203, 0x1d1a, 0x1D565}, // 𝕥, \bbt, Mathematical Double-Struck Small T
+{0x6203, 0x1d1a, 0xDD65'D835}, // U+1D565, 𝕥, \bbt, Mathematical Double-Struck Small T
 {0x6207, 0x1d1e, 0x2235}, // ∵, \because, Because
 {0x6c0a, 0x1d26, 0x2A85}, // ⪅, \lessapprox, Less-Than Or Approximate
 {0x6c0a, 0x1d31, 0x2A8B}, // ⪋, \lesseqqgtr, Less-Than Above Double-Line Equal Above Greater-Than
 {0x6f0b, 0x1d3c, 0x2A35}, // ⨵, \otimesrhrim, Multiplication Sign In Right Half Circle
-{0x7309, 0x1d48, 0x1D7E9}, // 𝟩, \sansseven, Mathematical Sans-Serif Digit Seven
+{0x7309, 0x1d48, 0xDFE9'D835}, // U+1D7E9, 𝟩, \sansseven, Mathematical Sans-Serif Digit Seven
 {0x750a, 0x1d52, 0x25F9}, // ◹, \urtriangle, Upper Right Triangle
-{0x6203, 0x1d5d, 0x1D566}, // 𝕦, \bbu, Mathematical Double-Struck Small U
-{0x6208, 0x1d61, 0x1D6E0}, // 𝛠, \bfvarrho, Mathematical Bold Rho Symbol
+{0x6203, 0x1d5d, 0xDD66'D835}, // U+1D566, 𝕦, \bbu, Mathematical Double-Struck Small U
+{0x6208, 0x1d61, 0xDEE0'D835}, // U+1D6E0, 𝛠, \bfvarrho, Mathematical Bold Rho Symbol
 {0x7006, 0x1d6a, 0x2AAF}, // ⪯, \preceq, Precedes Above Single-Line Equals Sign
 {0x7213, 0x1d71, 0x2968}, // ⥨, \rightleftharpoonsup, Rightwards Harpoon With Barb Up Above Leftwards Harpoon With Barb Up
 {0x5e05, 0x1d85, 0x1D5D}, // ᵝ, \^beta, Modifier Letter Small Beta
 {0x6105, 0x1d8b, 0x22F0}, // ⋰, \adots, Up Right Diagonal Ellipsis
-{0x6203, 0x1d91, 0x1D567}, // 𝕧, \bbv, Mathematical Double-Struck Small V
-{0x6205, 0x1d95, 0x1D7D9}, // 𝟙, \bbone, Mathematical Double-Struck Digit One
+{0x6203, 0x1d91, 0xDD67'D835}, // U+1D567, 𝕧, \bbv, Mathematical Double-Struck Small V
+{0x6205, 0x1d95, 0xDFD9'D835}, // U+1D7D9, 𝟙, \bbone, Mathematical Double-Struck Digit One
 {0x6e0b, 0x1d9b, 0x21FA}, // ⇺, \nVleftarrow, Leftwards Arrow With Double Vertical Stroke
 {0x7403, 0x1da7, 0x22A4}, // ⊤, \top, Down Tack
-{0x6203, 0x1dab, 0x1D568}, // 𝕨, \bbw, Mathematical Double-Struck Small W
-{0x6205, 0x1daf, 0x1D731}, // 𝜱, \biPhi, Mathematical Bold Italic Capital Phi
-{0x6208, 0x1db5, 0x1D78D}, // 𝞍, \bsansphi, Mathematical Sans-Serif Bold Phi Symbol
-{0x6209, 0x1dbe, 0x1D7C1}, // 𝟁, \bisanspsi, Mathematical Sans-Serif Bold Italic Small Psi
-{0x620c, 0x1dc8, 0x1D77E}, // 𝝾, \bsansomicron, Mathematical Sans-Serif Bold Small Omicron
+{0x6203, 0x1dab, 0xDD68'D835}, // U+1D568, 𝕨, \bbw, Mathematical Double-Struck Small W
+{0x6205, 0x1daf, 0xDF31'D835}, // U+1D731, 𝜱, \biPhi, Mathematical Bold Italic Capital Phi
+{0x6208, 0x1db5, 0xDF8D'D835}, // U+1D78D, 𝞍, \bsansphi, Mathematical Sans-Serif Bold Phi Symbol
+{0x6209, 0x1dbe, 0xDFC1'D835}, // U+1D7C1, 𝟁, \bisanspsi, Mathematical Sans-Serif Bold Italic Small Psi
+{0x620c, 0x1dc8, 0xDF7E'D835}, // U+1D77E, 𝝾, \bsansomicron, Mathematical Sans-Serif Bold Small Omicron
 {0x7508, 0x1dd5, 0x231C}, // ⌜, \ulcorner, Top Left Corner
-{0x6203, 0x1dde, 0x1D569}, // 𝕩, \bbx, Mathematical Double-Struck Small X
-{0x6209, 0x1de2, 0x1D7F5}, // 𝟵, \bsansnine, Mathematical Sans-Serif Bold Digit Nine
+{0x6203, 0x1dde, 0xDD69'D835}, // U+1D569, 𝕩, \bbx, Mathematical Double-Struck Small X
+{0x6209, 0x1de2, 0xDFF5'D835}, // U+1D7F5, 𝟵, \bsansnine, Mathematical Sans-Serif Bold Digit Nine
 {0x650e, 0x1dec, 0x20DF}, // ⃟, \enclosediamond, Combining Enclosing Diamond / Enclosing Diamond
 {0x6e05, 0x1dfb, 0x019E}, // ƞ, \nrleg, Latin Small Letter N With Long Right Leg
 {0x700b, 0x1e01, 0x2030}, // ‰, \perthousand, Per Mille Sign
-{0x7305, 0x1e0d, 0x1D5BA}, // 𝖺, \sansa, Mathematical Sans-Serif Small A
-{0x6203, 0x1e13, 0x1D56A}, // 𝕪, \bby, Mathematical Double-Struck Small Y
-{0x6206, 0x1e17, 0x1D73B}, // 𝜻, \bizeta, Mathematical Bold Italic Small Zeta
-{0x620a, 0x1e1e, 0x1D6D3}, // 𝛓, \bfvarsigma, Mathematical Bold Small Final Sigma
-{0x6904, 0x1e29, 0x1D6ED}, // 𝛭, \itMu, Mathematical Italic Capital Mu
+{0x7305, 0x1e0d, 0xDDBA'D835}, // U+1D5BA, 𝖺, \sansa, Mathematical Sans-Serif Small A
+{0x6203, 0x1e13, 0xDD6A'D835}, // U+1D56A, 𝕪, \bby, Mathematical Double-Struck Small Y
+{0x6206, 0x1e17, 0xDF3B'D835}, // U+1D73B, 𝜻, \bizeta, Mathematical Bold Italic Small Zeta
+{0x620a, 0x1e1e, 0xDED3'D835}, // U+1D6D3, 𝛓, \bfvarsigma, Mathematical Bold Small Final Sigma
+{0x6904, 0x1e29, 0xDEED'D835}, // U+1D6ED, 𝛭, \itMu, Mathematical Italic Capital Mu
 {0x6e07, 0x1e2e, 0x2204}, // ∄, \nexists, There Does Not Exist
-{0x7305, 0x1e36, 0x1D5BB}, // 𝖻, \sansb, Mathematical Sans-Serif Small B
+{0x7305, 0x1e36, 0xDDBB'D835}, // U+1D5BB, 𝖻, \sansb, Mathematical Sans-Serif Small B
 {0x750c, 0x1e3c, 0x23B5}, // ⎵, \underbracket, Bottom Square Bracket
 {0x750f, 0x1e49, 0x25E4}, // ◤, \ulblacktriangle, Black Upper Left Triangle
-{0x6203, 0x1e59, 0x1D56B}, // 𝕫, \bbz, Mathematical Double-Struck Small Z
-{0x6207, 0x1e5d, 0x1D748}, // 𝝈, \bisigma, Mathematical Bold Italic Small Sigma
+{0x6203, 0x1e59, 0xDD6B'D835}, // U+1D56B, 𝕫, \bbz, Mathematical Double-Struck Small Z
+{0x6207, 0x1e5d, 0xDF48'D835}, // U+1D748, 𝝈, \bisigma, Mathematical Bold Italic Small Sigma
 {0x6213, 0x1e65, 0x25C8}, // ◈, \blackinwhitediamond, White Diamond Containing Black Small Diamond
 {0x6c12, 0x1e79, 0x27F7}, // ⟷, \longleftrightarrow, Long Left Right Arrow
 {0x6e05, 0x1e8c, 0x2244}, // ≄, \nsime, Not Asymptotically Equal To
 {0x6e0c, 0x1e92, 0x21FB}, // ⇻, \nVrightarrow, Rightwards Arrow With Double Vertical Stroke
-{0x7305, 0x1e9f, 0x1D5BC}, // 𝖼, \sansc, Mathematical Sans-Serif Small C
-{0x7305, 0x1ea5, 0x1D5BD}, // 𝖽, \sansd, Mathematical Sans-Serif Small D
+{0x7305, 0x1e9f, 0xDDBC'D835}, // U+1D5BC, 𝖼, \sansc, Mathematical Sans-Serif Small C
+{0x7305, 0x1ea5, 0xDDBD'D835}, // U+1D5BD, 𝖽, \sansd, Mathematical Sans-Serif Small D
 {0x7307, 0x1eab, 0x2A9D}, // ⪝, \simless, Similar Or Less-Than
-{0x6204, 0x1eb3, 0x1D6D1}, // 𝛑, \bfpi, Mathematical Bold Small Pi
-{0x6207, 0x1eb8, 0x1D7D5}, // 𝟕, \bfseven, Mathematical Bold Digit Seven
+{0x6204, 0x1eb3, 0xDED1'D835}, // U+1D6D1, 𝛑, \bfpi, Mathematical Bold Small Pi
+{0x6207, 0x1eb8, 0xDFD5'D835}, // U+1D7D5, 𝟕, \bfseven, Mathematical Bold Digit Seven
 {0x6506, 0x1ec0, 0x2A97}, // ⪗, \elsdot, Slanted Equal To Or Less-Than With Dot Inside
 {0x6e0c, 0x1ec7, 0x2903}, // ⤃, \nvRightarrow, Rightwards Double Arrow With Vertical Stroke
-{0x7305, 0x1ed4, 0x1D5BE}, // 𝖾, \sanse, Mathematical Sans-Serif Small E
+{0x7305, 0x1ed4, 0xDDBE'D835}, // U+1D5BE, 𝖾, \sanse, Mathematical Sans-Serif Small E
 {0x6106, 0x1eda, 0x299F}, // ⦟, \angdnr, Acute Angle
 {0x6903, 0x1ee1, 0x222B}, // ∫, \int, Integral
 {0x7008, 0x1ee5, 0x2313}, // ⌓, \profsurf, Segment
-{0x7305, 0x1eee, 0x1D5BF}, // 𝖿, \sansf, Mathematical Sans-Serif Small F
-{0x620a, 0x1ef4, 0x1D7AF}, // 𝞯, \bisanszeta, Mathematical Sans-Serif Bold Italic Small Zeta
-{0x620d, 0x1eff, 0x1D7A4}, // 𝞤, \bisansUpsilon, Mathematical Sans-Serif Bold Italic Capital Upsilon
+{0x7305, 0x1eee, 0xDDBF'D835}, // U+1D5BF, 𝖿, \sansf, Mathematical Sans-Serif Small F
+{0x620a, 0x1ef4, 0xDFAF'D835}, // U+1D7AF, 𝞯, \bisanszeta, Mathematical Sans-Serif Bold Italic Small Zeta
+{0x620d, 0x1eff, 0xDFA4'D835}, // U+1D7A4, 𝞤, \bisansUpsilon, Mathematical Sans-Serif Bold Italic Capital Upsilon
 {0x6c0a, 0x1f0d, 0x23B0}, // ⎰, \lmoustache, Upper Left Or Lower Right Curly Bracket Section
 {0x7008, 0x1f18, 0x2AB5}, // ⪵, \precneqq, Precedes Above Not Equal To
-{0x7305, 0x1f21, 0x1D5C0}, // 𝗀, \sansg, Mathematical Sans-Serif Small G
-{0x7305, 0x1f27, 0x1D5C1}, // 𝗁, \sansh, Mathematical Sans-Serif Small H
+{0x7305, 0x1f21, 0xDDC0'D835}, // U+1D5C0, 𝗀, \sansg, Mathematical Sans-Serif Small G
+{0x7305, 0x1f27, 0xDDC1'D835}, // U+1D5C1, 𝗁, \sansh, Mathematical Sans-Serif Small H
 {0x7a04, 0x1f2d, 0x03B6}, // ζ, \zeta, Greek Small Letter Zeta
-{0x6207, 0x1f32, 0x1D734}, // 𝜴, \biOmega, Mathematical Bold Italic Capital Omega
+{0x6207, 0x1f32, 0xDF34'D835}, // U+1D734, 𝜴, \biOmega, Mathematical Bold Italic Capital Omega
 {0x6406, 0x1f3a, 0x20DC}, // ⃜, \ddddot, Combining Four Dots Above / Non-Spacing Four Dots Above
 {0x720e, 0x1f41, 0x219D}, // ↝, \rightwavearrow, Rightwards Wave Arrow / Right Wave Arrow
-{0x7305, 0x1f50, 0x1D5C2}, // 𝗂, \sansi, Mathematical Sans-Serif Small I
-{0x7305, 0x1f56, 0x1D5C3}, // 𝗃, \sansj, Mathematical Sans-Serif Small J
+{0x7305, 0x1f50, 0xDDC2'D835}, // U+1D5C2, 𝗂, \sansi, Mathematical Sans-Serif Small I
+{0x7305, 0x1f56, 0xDDC3'D835}, // U+1D5C3, 𝗃, \sansj, Mathematical Sans-Serif Small J
 {0x7515, 0x1f5c, 0x20EC}, // ⃬, \underrightharpoondown, Combining Rightwards Harpoon With Barb Downwards
 {0x4d06, 0x1f72, 0x2907}, // ⤇, \Mapsto, Rightwards Double Arrow From Bar
-{0x6205, 0x1f79, 0x1D6BB}, // 𝚻, \bfTau, Mathematical Bold Capital Tau
+{0x6205, 0x1f79, 0xDEBB'D835}, // U+1D6BB, 𝚻, \bfTau, Mathematical Bold Capital Tau
 {0x6315, 0x1f7f, 0x2A50}, // ⩐, \closedvarcupsmashprod, Closed Union With Serifs And Smash Product
 {0x6c05, 0x1f95, 0x2A8D}, // ⪍, \lsime, Less-Than Above Similar Or Equal
 {0x6c07, 0x1f9b, 0x22D6}, // ⋖, \lessdot, Less-Than With Dot / Less Than With Dot
 {0x6e02, 0x1fa3, 0x2260}, // ≠, \ne, Not Equal To
 {0x700f, 0x1fa6, 0x2A5E}, // ⩞, \perspcorrespond, Logical And With Double Overbar
-{0x7305, 0x1fb6, 0x1D5C4}, // 𝗄, \sansk, Mathematical Sans-Serif Small K
-{0x6205, 0x1fbc, 0x1D7CF}, // 𝟏, \bfone, Mathematical Bold Digit One
-{0x6207, 0x1fc2, 0x1D71E}, // 𝜞, \biGamma, Mathematical Bold Italic Capital Gamma
-{0x6207, 0x1fca, 0x1D761}, // 𝝡, \bsansMu, Mathematical Sans-Serif Bold Capital Mu
+{0x7305, 0x1fb6, 0xDDC4'D835}, // U+1D5C4, 𝗄, \sansk, Mathematical Sans-Serif Small K
+{0x6205, 0x1fbc, 0xDFCF'D835}, // U+1D7CF, 𝟏, \bfone, Mathematical Bold Digit One
+{0x6207, 0x1fc2, 0xDF1E'D835}, // U+1D71E, 𝜞, \biGamma, Mathematical Bold Italic Capital Gamma
+{0x6207, 0x1fca, 0xDF61'D835}, // U+1D761, 𝝡, \bsansMu, Mathematical Sans-Serif Bold Capital Mu
 {0x720f, 0x1fd2, 0x21DD}, // ⇝, \rightsquigarrow, Rightwards Squiggle Arrow / Right Squiggle Arrow
-{0x7305, 0x1fe2, 0x1D5C5}, // 𝗅, \sansl, Mathematical Sans-Serif Small L
+{0x7305, 0x1fe2, 0xDDC5'D835}, // U+1D5C5, 𝗅, \sansl, Mathematical Sans-Serif Small L
 {0x4604, 0x1fe8, 0x2132}, // Ⅎ, \Finv, Turned Capital F / Turned F
 {0x6c05, 0x1fed, 0x2A8F}, // ⪏, \lsimg, Less-Than Above Similar Above Greater-Than
 {0x6c08, 0x1ff3, 0x223E}, // ∾, \lazysinv, Inverted Lazy S
 {0x6e02, 0x1ffc, 0x014B}, // ŋ, \ng, Latin Small Letter Eng
 {0x7007, 0x1fff, 0x2034}, // ‴, \ppprime, Triple Prime
-{0x7305, 0x2007, 0x1D5C6}, // 𝗆, \sansm, Mathematical Sans-Serif Small M
+{0x7305, 0x2007, 0xDDC6'D835}, // U+1D5C6, 𝗆, \sansm, Mathematical Sans-Serif Small M
 {0x7415, 0x200d, 0x2916}, // ⤖, \twoheadrightarrowtail, Rightwards Two-Headed Arrow With Tail
 {0x5402, 0x2023, 0x00DE}, // Þ, \TH, Latin Capital Letter Thorn
-{0x6206, 0x2026, 0x1D6C7}, // 𝛇, \bfzeta, Mathematical Bold Small Zeta
+{0x6206, 0x2026, 0xDEC7'D835}, // U+1D6C7, 𝛇, \bfzeta, Mathematical Bold Small Zeta
 {0x6209, 0x202d, 0x2A02}, // ⨂, \bigotimes, N-Ary Circled Times Operator
 {0x6305, 0x2037, 0x25D2}, // ◒, \cirfb, Circle With Lower Half Black
 {0x6c16, 0x203d, 0x294B}, // ⥋, \leftrightharpoondownup, Left Barb Down Right Barb Up Harpoon
-{0x7305, 0x2054, 0x1D5C7}, // 𝗇, \sansn, Mathematical Sans-Serif Small N
+{0x7305, 0x2054, 0xDDC7'D835}, // U+1D5C7, 𝗇, \sansn, Mathematical Sans-Serif Small N
 {0x7305, 0x205a, 0x2A9F}, // ⪟, \simlE, Similar Above Less-Than Above Equals Sign
 {0x4b05, 0x2060, 0x039A}, // Κ, \Kappa, Greek Capital Letter Kappa
-{0x6209, 0x2066, 0x1D744}, // 𝝄, \biomicron, Mathematical Bold Italic Small Omicron
+{0x6209, 0x2066, 0xDF44'D835}, // U+1D744, 𝝄, \biomicron, Mathematical Bold Italic Small Omicron
 {0x6c06, 0x2070, 0x29A0}, // ⦠, \lpargt, Spherical Angle Opening Left
 {0x6c16, 0x2077, 0x21FF}, // ⇿, \leftrightarrowtriangle, Left Right Open-Headed Arrow
 {0x6e02, 0x208e, 0x220B}, // ∋, \ni, Contains As Member
 {0x6f05, 0x2091, 0x0254}, // ɔ, \openo, Latin Small Letter Open O
-{0x7305, 0x2097, 0x1D5C8}, // 𝗈, \sanso, Mathematical Sans-Serif Small O
+{0x7305, 0x2097, 0xDDC8'D835}, // U+1D5C8, 𝗈, \sanso, Mathematical Sans-Serif Small O
 {0x7306, 0x209d, 0x0336}, // ̶, \strike, Combining Long Stroke Overlay / Non-Spacing Long Bar Overlay
 {0x7307, 0x20a4, 0x2199}, // ↙, \swarrow, South West Arrow / Lower Left Arrow
-{0x620b, 0x20ac, 0x1D799}, // 𝞙, \bisansKappa, Mathematical Sans-Serif Bold Italic Capital Kappa
-{0x7305, 0x20b8, 0x1D5C9}, // 𝗉, \sansp, Mathematical Sans-Serif Small P
+{0x620b, 0x20ac, 0xDF99'D835}, // U+1D799, 𝞙, \bisansKappa, Mathematical Sans-Serif Bold Italic Capital Kappa
+{0x7305, 0x20b8, 0xDDC9'D835}, // U+1D5C9, 𝗉, \sansp, Mathematical Sans-Serif Small P
 {0x5e08, 0x20be, 0xA71B}, // ꜛ, \^uparrow, Modifier Letter Raised Up Arrow
 {0x5f06, 0x20c7, 0x1D67}, // ᵧ, \_gamma, Greek Subscript Small Letter Gamma
-{0x6205, 0x20ce, 0x1D6DF}, // 𝛟, \bfphi, Mathematical Bold Phi Symbol
-{0x7305, 0x20d4, 0x1D5CA}, // 𝗊, \sansq, Mathematical Sans-Serif Small Q
-{0x620a, 0x20da, 0x1D777}, // 𝝷, \bsanstheta, Mathematical Sans-Serif Bold Small Theta
-{0x7305, 0x20e5, 0x1D5CB}, // 𝗋, \sansr, Mathematical Sans-Serif Small R
-{0x6207, 0x20eb, 0x1D6AF}, // 𝚯, \bfTheta, Mathematical Bold Capital Theta
-{0x620a, 0x20f3, 0x1D773}, // 𝝳, \bsansdelta, Mathematical Sans-Serif Bold Small Delta
-{0x7305, 0x20fe, 0x1D5CC}, // 𝗌, \sanss, Mathematical Sans-Serif Small S
-{0x6207, 0x2104, 0x1D6AB}, // 𝚫, \bfDelta, Mathematical Bold Capital Delta
+{0x6205, 0x20ce, 0xDEDF'D835}, // U+1D6DF, 𝛟, \bfphi, Mathematical Bold Phi Symbol
+{0x7305, 0x20d4, 0xDDCA'D835}, // U+1D5CA, 𝗊, \sansq, Mathematical Sans-Serif Small Q
+{0x620a, 0x20da, 0xDF77'D835}, // U+1D777, 𝝷, \bsanstheta, Mathematical Sans-Serif Bold Small Theta
+{0x7305, 0x20e5, 0xDDCB'D835}, // U+1D5CB, 𝗋, \sansr, Mathematical Sans-Serif Small R
+{0x6207, 0x20eb, 0xDEAF'D835}, // U+1D6AF, 𝚯, \bfTheta, Mathematical Bold Capital Theta
+{0x620a, 0x20f3, 0xDF73'D835}, // U+1D773, 𝝳, \bsansdelta, Mathematical Sans-Serif Bold Small Delta
+{0x7305, 0x20fe, 0xDDCC'D835}, // U+1D5CC, 𝗌, \sanss, Mathematical Sans-Serif Small S
+{0x6207, 0x2104, 0xDEAB'D835}, // U+1D6AB, 𝚫, \bfDelta, Mathematical Bold Capital Delta
 {0x6f0f, 0x210c, 0x27E6}, // ⟦, \openbracketleft, Mathematical Left White Square Bracket
-{0x7305, 0x211c, 0x1D5CD}, // 𝗍, \sanst, Mathematical Sans-Serif Small T
+{0x7305, 0x211c, 0xDDCD'D835}, // U+1D5CD, 𝗍, \sanst, Mathematical Sans-Serif Small T
 {0x4303, 0x2122, 0x22D2}, // ⋒, \Cap, Double Intersection
 {0x5e04, 0x2126, 0x1D61}, // ᵡ, \^chi, Modifier Letter Small Chi
-{0x6208, 0x212b, 0x1D79B}, // 𝞛, \bisansMu, Mathematical Sans-Serif Bold Italic Capital Mu
+{0x6208, 0x212b, 0xDF9B'D835}, // U+1D79B, 𝞛, \bisansMu, Mathematical Sans-Serif Bold Italic Capital Mu
 {0x6f0b, 0x2134, 0x2A34}, // ⨴, \otimeslhrim, Multiplication Sign In Left Half Circle
 {0x7008, 0x2140, 0x2312}, // ⌒, \profline, Arc
-{0x7305, 0x2149, 0x1D5CE}, // 𝗎, \sansu, Mathematical Sans-Serif Small U
+{0x7305, 0x2149, 0xDDCE'D835}, // U+1D5CE, 𝗎, \sansu, Mathematical Sans-Serif Small U
 {0x730b, 0x214f, 0x2ABA}, // ⪺, \succnapprox, Succeeds Above Not Almost Equal To
 {0x3303, 0x215b, 0x00BE}, // ¾, \3/4, Vulgar Fraction Three Quarters / Fraction Three Quarters
 {0x660d, 0x215f, 0x2252}, // ≒, \fallingdotseq, Approximately Equal To Or The Image Of
 {0x7206, 0x216d, 0x201B}, // ‛, \reapos, Single High-Reversed-9 Quotation Mark / Single Reversed Comma Quotation Mark
-{0x7305, 0x2174, 0x1D5CF}, // 𝗏, \sansv, Mathematical Sans-Serif Small V
+{0x7305, 0x2174, 0xDDCF'D835}, // U+1D5CF, 𝗏, \sansv, Mathematical Sans-Serif Small V
 {0x3303, 0x217a, 0x2157}, // ⅗, \3/5, Vulgar Fraction Three Fifths / Fraction Three Fifths
 {0x6102, 0x217e, 0x00E5}, // å, \aa, Latin Small Letter A With Ring Above / Latin Small Letter A Ring
-{0x7305, 0x2181, 0x1D5D0}, // 𝗐, \sansw, Mathematical Sans-Serif Small W
+{0x7305, 0x2181, 0xDDD0'D835}, // U+1D5D0, 𝗐, \sansw, Mathematical Sans-Serif Small W
 {0x4412, 0x2187, 0x295F}, // ⥟, \DownRightTeeVector, Rightwards Harpoon With Barb Down From Bar
 {0x6305, 0x219a, 0x25D0}, // ◐, \cirfl, Circle With Left Half Black
 {0x650e, 0x21a0, 0x2B40}, // ⭀, \equalleftarrow, Equals Sign Above Leftwards Arrow
 {0x6905, 0x21af, 0x22F9}, // ⋹, \isinE, Element Of With Two Horizontal Strokes
 {0x6c0e, 0x21b5, 0x2194}, // ↔, \leftrightarrow, Left Right Arrow
 {0x7304, 0x21c4, 0x22C6}, // ⋆, \star, Star Operator
-{0x7305, 0x21c9, 0x1D5D1}, // 𝗑, \sansx, Mathematical Sans-Serif Small X
+{0x7305, 0x21c9, 0xDDD1'D835}, // U+1D5D1, 𝗑, \sansx, Mathematical Sans-Serif Small X
 {0x7306, 0x21cf, 0x22B1}, // ⊱, \scurel, Succeeds Under Relation
 {0x7405, 0x21d6, 0x0303}, // ̃, \tilde, Combining Tilde / Non-Spacing Tilde
 {0x6506, 0x21dc, 0x2A98}, // ⪘, \egsdot, Slanted Equal To Or Greater-Than With Dot Inside
 {0x6c05, 0x21e3, 0x25DE}, // ◞, \lrarc, Lower Right Quadrant Circular Arc
-{0x7305, 0x21e9, 0x1D5D2}, // 𝗒, \sansy, Mathematical Sans-Serif Small Y
+{0x7305, 0x21e9, 0xDDD2'D835}, // U+1D5D2, 𝗒, \sansy, Mathematical Sans-Serif Small Y
 {0x7609, 0x21ef, 0x22FD}, // ⋽, \varniobar, Contains With Overbar
 {0x3303, 0x21f9, 0x215C}, // ⅜, \3/8, Vulgar Fraction Three Eighths / Fraction Three Eighths
 {0x4507, 0x21fd, 0x2986}, // ⦆, \Elroang, Right White Parenthesis
 {0x6503, 0x2205, 0x2113}, // ℓ, \ell, Script Small L
-{0x6908, 0x2209, 0x1D711}, // 𝜑, \itvarphi, Mathematical Italic Small Phi
+{0x6908, 0x2209, 0xDF11'D835}, // U+1D711, 𝜑, \itvarphi, Mathematical Italic Small Phi
 {0x6e0b, 0x2212, 0x22E3}, // ⋣, \nsqsupseteq, Not Square Original Of Or Equal To
 {0x6e0f, 0x221e, 0x2B39}, // ⬹, \nvleftarrowtail, Leftwards Arrow With Tail With Vertical Stroke
-{0x7305, 0x222e, 0x1D5D3}, // 𝗓, \sansz, Mathematical Sans-Serif Small Z
+{0x7305, 0x222e, 0xDDD3'D835}, // U+1D5D3, 𝗓, \sansz, Mathematical Sans-Serif Small Z
 {0x6102, 0x2234, 0x00E6}, // æ, \ae, Latin Small Letter Ae / Latin Small Letter A E
-{0x6209, 0x2237, 0x1D7A6}, // 𝞦, \bisansChi, Mathematical Sans-Serif Bold Italic Capital Chi
+{0x6209, 0x2237, 0xDFA6'D835}, // U+1D7A6, 𝞦, \bisansChi, Mathematical Sans-Serif Bold Italic Capital Chi
 {0x6e02, 0x2241, 0x03BD}, // ν, \nu, Greek Small Letter Nu
-{0x6909, 0x2244, 0x1D6F6}, // 𝛶, \itUpsilon, Mathematical Italic Capital Upsilon
+{0x6909, 0x2244, 0xDEF6'D835}, // U+1D6F6, 𝛶, \itUpsilon, Mathematical Italic Capital Upsilon
 {0x6e07, 0x224e, 0x0338'2AB0}, // ⪰̸, \nsucceq, Succeeds Above Single-Line Equals Sign + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x6f0d, 0x2256, 0x20D6}, // ⃖, \overleftarrow, Combining Left Arrow Above / Non-Spacing Left Arrow Above
 {0x6208, 0x2264, 0x22A0}, // ⊠, \boxtimes, Squared Times
 {0x7107, 0x226d, 0x225F}, // ≟, \questeq, Questioned Equal To
-{0x620a, 0x2275, 0x1D751}, // 𝝑, \bivartheta, Mathematical Bold Italic Theta Symbol
+{0x620a, 0x2275, 0xDF51'D835}, // U+1D751, 𝝑, \bivartheta, Mathematical Bold Italic Theta Symbol
 {0x6305, 0x2280, 0x25D1}, // ◑, \cirfr, Circle With Right Half Black
 {0x730a, 0x2286, 0x2AB8}, // ⪸, \succapprox, Succeeds Above Almost Equal To
 {0x7706, 0x2291, 0x2259}, // ≙, \wedgeq, Estimates
@@ -1571,7 +1571,7 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x6906, 0x229e, 0x2A19}, // ⨙, \intcap, Integral With Intersection
 {0x6e07, 0x22a5, 0x2285}, // ⊅, \nsupset, Not A Superset Of
 {0x7304, 0x22ad, 0x25E7}, // ◧, \sqfl, Square With Left Half Black
-{0x7308, 0x22b2, 0x1D7E7}, // 𝟧, \sansfive, Mathematical Sans-Serif Digit Five
+{0x7308, 0x22b2, 0xDFE7'D835}, // U+1D7E7, 𝟧, \sansfive, Mathematical Sans-Serif Digit Five
 {0x4c03, 0x22bb, 0x29CA}, // ⧊, \Lap, Triangle With Dot Above
 {0x5203, 0x22bf, 0x21B1}, // ↱, \Rsh, Upwards Arrow With Tip Rightwards / Up Arrow With Tip Right
 {0x5a04, 0x22c3, 0x01B5}, // Ƶ, \Zbar, Latin Capital Letter Z With Stroke / Latin Capital Letter Z Bar
@@ -1588,28 +1588,28 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x6d04, 0x233f, 0x2ADB}, // ⫛, \mlcp, Transversal Intersection
 {0x630b, 0x2344, 0x229D}, // ⊝, \circleddash, Circled Dash
 {0x650d, 0x2350, 0x20DE}, // ⃞, \enclosesquare, Combining Enclosing Square / Enclosing Square
-{0x6904, 0x235e, 0x1D6EE}, // 𝛮, \itNu, Mathematical Italic Capital Nu
+{0x6904, 0x235e, 0xDEEE'D835}, // U+1D6EE, 𝛮, \itNu, Mathematical Italic Capital Nu
 {0x6c0d, 0x2363, 0x21A2}, // ↢, \leftarrowtail, Leftwards Arrow With Tail / Left Arrow With Tail
 {0x7004, 0x2371, 0x0321}, // ̡, \palh, Combining Palatalized Hook Below / Non-Spacing Palatalized Hook Below
 {0x730b, 0x2376, 0x2A6C}, // ⩬, \simminussim, Similar Minus Similar
 {0x7409, 0x2382, 0x2009}, //  , \thinspace, Thin Space
 {0x7410, 0x238c, 0x21A1}, // ↡, \twoheaddownarrow, Downwards Two Headed Arrow / Down Two Headed Arrow
-{0x6207, 0x239d, 0x1D755}, // 𝝕, \bivarpi, Mathematical Bold Italic Pi Symbol
+{0x6207, 0x239d, 0xDF55'D835}, // U+1D755, 𝝕, \bivarpi, Mathematical Bold Italic Pi Symbol
 {0x6308, 0x23a5, 0x2A44}, // ⩄, \capwedge, Intersection With Logical And
 {0x6704, 0x23ae, 0x2AA7}, // ⪧, \gtcc, Greater-Than Closed By Curve
 {0x6c0b, 0x23b3, 0x2B1C}, // ⬜, \lgwhtsquare, White Large Square
 {0x7204, 0x23bf, 0x0256}, // ɖ, \rtld, Latin Small Letter D With Tail / Latin Small Letter D Retroflex Hook
 {0x750c, 0x23c4, 0x21E7}, // ⇧, \upwhitearrow, Upwards White Arrow / White Up Arrow
 {0x620c, 0x23d1, 0x21E4}, // ⇤, \barleftarrow, Leftwards Arrow To Bar / Left Arrow To Bar
-{0x6905, 0x23de, 0x1D6F9}, // 𝛹, \itPsi, Mathematical Italic Capital Psi
+{0x6905, 0x23de, 0xDEF9'D835}, // U+1D6F9, 𝛹, \itPsi, Mathematical Italic Capital Psi
 {0x7304, 0x23e4, 0x25E8}, // ◨, \sqfr, Square With Right Half Black
-{0x6208, 0x23e9, 0x1D6B2}, // 𝚲, \bfLambda, Mathematical Bold Capital Lamda
-{0x620c, 0x23f2, 0x1D7B4}, // 𝞴, \bisanslambda, Mathematical Sans-Serif Bold Italic Small Lamda
+{0x6208, 0x23e9, 0xDEB2'D835}, // U+1D6B2, 𝚲, \bfLambda, Mathematical Bold Capital Lamda
+{0x620c, 0x23f2, 0xDFB4'D835}, // U+1D7B4, 𝞴, \bisanslambda, Mathematical Sans-Serif Bold Italic Small Lamda
 {0x6705, 0x23ff, 0x2A90}, // ⪐, \gsiml, Greater-Than Above Similar Above Less-Than
 {0x6c11, 0x2405, 0x296A}, // ⥪, \leftharpoonupdash, Leftwards Harpoon With Barb Up Above Long Dash
 {0x6e0b, 0x2417, 0x21DF}, // ⇟, \nHdownarrow, Downwards Arrow With Double Stroke / Down Arrow With Double Stroke
 {0x5211, 0x2423, 0x294F}, // ⥏, \RightUpDownVector, Up Barb Right Down Barb Right Harpoon
-{0x6208, 0x2435, 0x1D6D7}, // 𝛗, \bfvarphi, Mathematical Bold Small Phi
+{0x6208, 0x2435, 0xDED7'D835}, // U+1D6D7, 𝛗, \bfvarphi, Mathematical Bold Small Phi
 {0x6c0b, 0x243e, 0x2B24}, // ⬤, \lgblkcircle, Black Large Circle
 {0x6e0f, 0x244a, 0x21AE}, // ↮, \nleftrightarrow, Left Right Arrow With Stroke
 {0x7305, 0x245a, 0x02D3}, // ˓, \sblhr, Modifier Letter Centred Left Half Ring / Modifier Letter Centered Left Half Ring
@@ -1618,10 +1618,10 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x730d, 0x2472, 0x2143}, // ⅃, \sansLmirrored, Reversed Sans-Serif Capital L
 {0x4103, 0x2480, 0x2A53}, // ⩓, \And, Double Logical And
 {0x6c0a, 0x2484, 0x25FF}, // ◿, \lrtriangle, Lower Right Triangle
-{0x6209, 0x248f, 0x1D7BA}, // 𝞺, \bisansrho, Mathematical Sans-Serif Bold Italic Small Rho
+{0x6209, 0x248f, 0xDFBA'D835}, // U+1D7BA, 𝞺, \bisansrho, Mathematical Sans-Serif Bold Italic Small Rho
 {0x6403, 0x2499, 0x2207}, // ∇, \del, Nabla
 {0x6c0b, 0x249d, 0x2B1B}, // ⬛, \lgblksquare, Black Large Square
-{0x6207, 0x24a9, 0x1D736}, // 𝜶, \bialpha, Mathematical Bold Italic Small Alpha
+{0x6207, 0x24a9, 0xDF36'D835}, // U+1D736, 𝜶, \bialpha, Mathematical Bold Italic Small Alpha
 {0x630f, 0x24b1, 0x21B7}, // ↷, \curvearrowright, Clockwise Top Semicircle Arrow
 {0x7006, 0x24c1, 0x0263}, // ɣ, \pgamma, Latin Small Letter Gamma
 {0x730c, 0x24c8, 0x2B2B}, // ⬫, \smwhtlozenge, White Small Lozenge
@@ -1629,13 +1629,13 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x620d, 0x24da, 0x25E1}, // ◡, \botsemicircle, Lower Half Circle
 {0x6306, 0x24e8, 0x0310}, // ̐, \candra, Combining Candrabindu / Non-Spacing Candrabindu
 {0x630e, 0x24ef, 0x25CD}, // ◍, \circlevertfill, Circle With Vertical Fill
-{0x6907, 0x24fe, 0x1D6FB}, // 𝛻, \itnabla, Mathematical Italic Nabla
+{0x6907, 0x24fe, 0xDEFB'D835}, // U+1D6FB, 𝛻, \itnabla, Mathematical Italic Nabla
 {0x6c06, 0x2506, 0x2A7F}, // ⩿, \lesdot, Less-Than Or Slanted Equal To With Dot Inside
 {0x6f02, 0x250d, 0x0153}, // œ, \oe, Latin Small Ligature Oe / Latin Small Letter O E
 {0x7204, 0x2510, 0x026D}, // ɭ, \rtll, Latin Small Letter L With Retroflex Hook / Latin Small Letter L Retroflex Hook
 {0x7303, 0x2515, 0x223C}, // ∼, \sim, Tilde Operator
-{0x6207, 0x2519, 0x1D762}, // 𝝢, \bsansNu, Mathematical Sans-Serif Bold Capital Nu
-{0x6209, 0x2521, 0x1D75E}, // 𝝞, \bsansIota, Mathematical Sans-Serif Bold Capital Iota
+{0x6207, 0x2519, 0xDF62'D835}, // U+1D762, 𝝢, \bsansNu, Mathematical Sans-Serif Bold Capital Nu
+{0x6209, 0x2521, 0xDF5E'D835}, // U+1D75E, 𝝞, \bsansIota, Mathematical Sans-Serif Bold Capital Iota
 {0x7007, 0x252b, 0x2202}, // ∂, \partial, Partial Differential
 {0x7208, 0x2533, 0x2A12}, // ⨒, \rppolint, Line Integration With Rectangular Path Around Pole
 {0x6207, 0x253c, 0x213E}, // ℾ, \bbGamma, Double-Struck Capital Gamma
@@ -1643,7 +1643,7 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7204, 0x254c, 0x0273}, // ɳ, \rtln, Latin Small Letter N With Retroflex Hook / Latin Small Letter N Retroflex Hook
 {0x7206, 0x2551, 0x0295}, // ʕ, \reglst, Latin Letter Pharyngeal Voiced Fricative / Latin Letter Reversed Glottal Stop
 {0x730e, 0x2558, 0x2222}, // ∢, \sphericalangle, Spherical Angle
-{0x7406, 0x2567, 0x1D7FA}, // 𝟺, \ttfour, Mathematical Monospace Digit Four
+{0x7406, 0x2567, 0xDFFA'D835}, // U+1D7FA, 𝟺, \ttfour, Mathematical Monospace Digit Four
 {0x6109, 0x256e, 0x23E6}, // ⏦, \accurrent, Ac Current
 {0x6c0e, 0x2578, 0x21AC}, // ↬, \looparrowright, Rightwards Arrow With Loop / Right Arrow With Loop
 {0x7006, 0x2587, 0x2033}, // ″, \pprime, Double Prime
@@ -1652,7 +1652,7 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x6c0e, 0x25a3, 0x21E6}, // ⇦, \leftwhitearrow, Leftwards White Arrow / White Left Arrow
 {0x7204, 0x25b2, 0x027D}, // ɽ, \rtlr, Latin Small Letter R With Tail / Latin Small Letter R Hook
 {0x6206, 0x25b7, 0x22C1}, // ⋁, \bigvee, N-Ary Logical Or
-{0x620f, 0x25be, 0x1D774}, // 𝝴, \bsansvarepsilon, Mathematical Sans-Serif Bold Small Epsilon
+{0x620f, 0x25be, 0xDF74'D835}, // U+1D774, 𝝴, \bsansvarepsilon, Mathematical Sans-Serif Bold Small Epsilon
 {0x6708, 0x25ce, 0x2A7E}, // ⩾, \geqslant, Greater-Than Or Slanted Equal To
 {0x7008, 0x25d7, 0x2A15}, // ⨕, \pointint, Integral Around A Point Operator
 {0x7204, 0x25e0, 0x0282}, // ʂ, \rtls, Latin Small Letter S With Hook / Latin Small Letter S Hook
@@ -1667,11 +1667,11 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x630b, 0x2639, 0x22DE}, // ⋞, \curlyeqprec, Equal To Or Precedes
 {0x6c0f, 0x2645, 0x25E3}, // ◣, \llblacktriangle, Black Lower Left Triangle
 {0x6e0e, 0x2655, 0x2278}, // ≸, \notlessgreater, Neither Less-Than Nor Greater-Than / Neither Less Than Nor Greater Than
-{0x6208, 0x2664, 0x1D79C}, // 𝞜, \bisansNu, Mathematical Sans-Serif Bold Italic Capital Nu
+{0x6208, 0x2664, 0xDF9C'D835}, // U+1D79C, 𝞜, \bisansNu, Mathematical Sans-Serif Bold Italic Capital Nu
 {0x7007, 0x266d, 0x2A26}, // ⨦, \plussim, Plus Sign With Tilde Below
 {0x7206, 0x2675, 0x027B}, // ɻ, \rttrnr, Latin Small Letter Turned R With Hook / Latin Small Letter Turned R Hook
 {0x7603, 0x267c, 0x20D7}, // ⃗, \vec, Combining Right Arrow Above / Non-Spacing Right Arrow Above
-{0x6205, 0x2680, 0x1D74D}, // 𝝍, \bipsi, Mathematical Bold Italic Small Psi
+{0x6205, 0x2680, 0xDF4D'D835}, // U+1D74D, 𝝍, \bipsi, Mathematical Bold Italic Small Psi
 {0x7603, 0x2686, 0x2228}, // ∨, \vee, Logical Or
 {0x5212, 0x268a, 0x2955}, // ⥕, \RightDownVectorBar, Downwards Harpoon With Barb Right To Bar
 {0x6909, 0x269d, 0x2206}, // ∆, \increment, Increment
@@ -1682,7 +1682,7 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x4411, 0x26d1, 0x295E}, // ⥞, \DownLeftTeeVector, Leftwards Harpoon With Barb Down From Bar
 {0x4e07, 0x26e3, 0x21D6}, // ⇖, \Nwarrow, North West Double Arrow / Upper Left Double Arrow
 {0x620c, 0x26eb, 0x29EB}, // ⧫, \blacklozenge, Black Lozenge
-{0x690a, 0x26f8, 0x1D717}, // 𝜗, \itvartheta, Mathematical Italic Theta Symbol
+{0x690a, 0x26f8, 0xDF17'D835}, // U+1D717, 𝜗, \itvartheta, Mathematical Italic Theta Symbol
 {0x6c0c, 0x2703, 0x290E}, // ⤎, \leftdbkarrow, Leftwards Triple Dash Arrow
 {0x6c0f, 0x2710, 0x25E2}, // ◢, \lrblacktriangle, Black Lower Right Triangle
 {0x7204, 0x2720, 0x02BC}, // ʼ, \rasp, Modifier Letter Apostrophe
@@ -1694,7 +1694,7 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x6e0b, 0x274e, 0x2932}, // ⤲, \nwovnearrow, North West Arrow Crossing North East Arrow
 {0x7207, 0x275a, 0x29F7}, // ⧷, \rsolbar, Reverse Solidus With Horizontal Stroke
 {0x7608, 0x2762, 0x22F3}, // ⋳, \varisins, Element Of With Vertical Bar At End Of Horizontal Stroke
-{0x6209, 0x276b, 0x1D7B0}, // 𝞰, \bisanseta, Mathematical Sans-Serif Bold Italic Small Eta
+{0x6209, 0x276b, 0xDFB0'D835}, // U+1D7B0, 𝞰, \bisanseta, Mathematical Sans-Serif Bold Italic Small Eta
 {0x6308, 0x2775, 0x00AE}, // ®, \circledR, Registered Sign / Registered Trade Mark Sign
 {0x640e, 0x277e, 0x21E9}, // ⇩, \downwhitearrow, Downwards White Arrow / White Down Arrow
 {0x6907, 0x278d, 0x27F9}, // ⟹, \implies, Long Rightwards Double Arrow
@@ -1707,12 +1707,12 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x730b, 0x27e0, 0x292D}, // ⤭, \seovnearrow, South East Arrow Crossing North East Arrow
 {0x7606, 0x27ec, 0x03F1}, // ϱ, \varrho, Greek Rho Symbol / Greek Small Letter Tailed Rho
 {0x6208, 0x27f3, 0x23B6}, // ⎶, \bbrktbrk, Bottom Square Bracket Over Top Square Bracket
-{0x620d, 0x27fc, 0x1D794}, // 𝞔, \bisansEpsilon, Mathematical Sans-Serif Bold Italic Capital Epsilon
+{0x620d, 0x27fc, 0xDF94'D835}, // U+1D794, 𝞔, \bisansEpsilon, Mathematical Sans-Serif Bold Italic Capital Epsilon
 {0x620d, 0x280a, 0x258C}, // ▌, \blocklefthalf, Left Half Block
 {0x6507, 0x2818, 0x2002}, //  , \enspace, En Space
 {0x740e, 0x2820, 0x219F}, // ↟, \twoheaduparrow, Upwards Two Headed Arrow / Up Two Headed Arrow
 {0x4c0d, 0x282f, 0x2952}, // ⥒, \LeftVectorBar, Leftwards Harpoon With Barb Up To Bar
-{0x6907, 0x283d, 0x1D714}, // 𝜔, \itomega, Mathematical Italic Small Omega
+{0x6907, 0x283d, 0xDF14'D835}, // U+1D714, 𝜔, \itomega, Mathematical Italic Small Omega
 {0x6f07, 0x2845, 0x0305}, // ̅, \overbar, Combining Overline / Non-Spacing Overscore
 {0x7306, 0x284d, 0x2AD3}, // ⫓, \subsup, Subset Above Superset
 {0x7609, 0x2854, 0x2A61}, // ⩡, \varveebar, Small Vee With Underbar
@@ -1721,164 +1721,164 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7306, 0x2871, 0x2A9E}, // ⪞, \simgtr, Similar Or Greater-Than
 {0x760b, 0x2878, 0x2667}, // ♧, \varclubsuit, White Club Suit
 {0x3103, 0x2884, 0x00BD}, // ½, \1/2, Vulgar Fraction One Half / Fraction One Half
-{0x620a, 0x2888, 0x1D6B9}, // 𝚹, \bfvarTheta, Mathematical Bold Capital Theta Symbol
+{0x620a, 0x2888, 0xDEB9'D835}, // U+1D6B9, 𝚹, \bfvarTheta, Mathematical Bold Capital Theta Symbol
 {0x6e06, 0x2893, 0x2262}, // ≢, \nequiv, Not Identical To
 {0x7004, 0x289a, 0x227A}, // ≺, \prec, Precedes
 {0x3103, 0x289f, 0x2153}, // ⅓, \1/3, Vulgar Fraction One Third / Fraction One Third
 {0x4e11, 0x28a3, 0x0338'2290}, // ⊐̸, \NotSquareSuperset, Square Original Of + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
-{0x6207, 0x28b5, 0x1D723}, // 𝜣, \biTheta, Mathematical Bold Italic Capital Theta
+{0x6207, 0x28b5, 0xDF23'D835}, // U+1D723, 𝜣, \biTheta, Mathematical Bold Italic Capital Theta
 {0x6304, 0x28bd, 0x221B}, // ∛, \cbrt, Cube Root
 {0x6504, 0x28c2, 0x20AC}, // €, \euro, Euro Sign
-{0x6907, 0x28c7, 0x1D6FE}, // 𝛾, \itgamma, Mathematical Italic Small Gamma
+{0x6907, 0x28c7, 0xDEFE'D835}, // U+1D6FE, 𝛾, \itgamma, Mathematical Italic Small Gamma
 {0x6c05, 0x28cf, 0x0271}, // ɱ, \ltlmr, Latin Small Letter M With Hook / Latin Small Letter M Hook
-{0x7308, 0x28d5, 0x1D7E2}, // 𝟢, \sanszero, Mathematical Sans-Serif Digit Zero
+{0x7308, 0x28d5, 0xDFE2'D835}, // U+1D7E2, 𝟢, \sanszero, Mathematical Sans-Serif Digit Zero
 {0x3103, 0x28de, 0x00BC}, // ¼, \1/4, Vulgar Fraction One Quarter / Fraction One Quarter
-{0x6207, 0x28e2, 0x1D71F}, // 𝜟, \biDelta, Mathematical Bold Italic Capital Delta
-{0x6908, 0x28ea, 0x1D6EC}, // 𝛬, \itLambda, Mathematical Italic Capital Lamda
+{0x6207, 0x28e2, 0xDF1F'D835}, // U+1D71F, 𝜟, \biDelta, Mathematical Bold Italic Capital Delta
+{0x6908, 0x28ea, 0xDEEC'D835}, // U+1D6EC, 𝛬, \itLambda, Mathematical Italic Capital Lamda
 {0x6d0d, 0x28f3, 0x2221}, // ∡, \measuredangle, Measured Angle
-{0x7407, 0x2901, 0x1D7FD}, // 𝟽, \ttseven, Mathematical Monospace Digit Seven
+{0x7407, 0x2901, 0xDFFD'D835}, // U+1D7FD, 𝟽, \ttseven, Mathematical Monospace Digit Seven
 {0x3103, 0x2909, 0x2155}, // ⅕, \1/5, Vulgar Fraction One Fifth / Fraction One Fifth
 {0x610e, 0x290d, 0x2246}, // ≆, \approxnotequal, Approximately But Not Actually Equal To
-{0x6204, 0x291c, 0x1D741}, // 𝝁, \bimu, Mathematical Bold Italic Small Mu
-{0x6207, 0x2921, 0x1D6CB}, // 𝛋, \bfkappa, Mathematical Bold Small Kappa
+{0x6204, 0x291c, 0xDF41'D835}, // U+1D741, 𝝁, \bimu, Mathematical Bold Italic Small Mu
+{0x6207, 0x2921, 0xDECB'D835}, // U+1D6CB, 𝛋, \bfkappa, Mathematical Bold Small Kappa
 {0x6905, 0x2929, 0x22F4}, // ⋴, \isins, Small Element Of With Vertical Bar At End Of Horizontal Stroke
 {0x3103, 0x292f, 0x2159}, // ⅙, \1/6, Vulgar Fraction One Sixth / Fraction One Sixth
 {0x6106, 0x2933, 0x2248}, // ≈, \approx, Almost Equal To
 {0x6406, 0x293a, 0x2685}, // ⚅, \dicevi, Die Face-6
 {0x6506, 0x2941, 0x2A9A}, // ⪚, \eqqgtr, Double-Line Equal To Or Greater-Than
 {0x3103, 0x2948, 0x2150}, // ⅐, \1/7, Vulgar Fraction One Seventh
-{0x6209, 0x294c, 0x1D7CA}, // 𝟊, \bfDigamma, Mathematical Bold Capital Digamma
+{0x6209, 0x294c, 0xDFCA'D835}, // U+1D7CA, 𝟊, \bfDigamma, Mathematical Bold Capital Digamma
 {0x6e05, 0x2956, 0x2207}, // ∇, \nabla, Nabla
 {0x6e05, 0x295c, 0x2280}, // ⊀, \nprec, Does Not Precede
 {0x7009, 0x2962, 0x22D4}, // ⋔, \pitchfork, Pitchfork
 {0x3103, 0x296c, 0x215B}, // ⅛, \1/8, Vulgar Fraction One Eighth / Fraction One Eighth
 {0x4e0f, 0x2970, 0x0338'228F}, // ⊏̸, \NotSquareSubset, Square Image Of + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
-{0x620b, 0x2980, 0x1D7A9}, // 𝞩, \bisansnabla, Mathematical Sans-Serif Bold Italic Nabla
+{0x620b, 0x2980, 0xDFA9'D835}, // U+1D7A9, 𝞩, \bisansnabla, Mathematical Sans-Serif Bold Italic Nabla
 {0x6f09, 0x298c, 0x2A36}, // ⨶, \otimeshat, Circled Multiplication Sign With Circumflex Accent
 {0x3103, 0x2996, 0x2151}, // ⅑, \1/9, Vulgar Fraction One Ninth
 {0x5210, 0x299a, 0x295C}, // ⥜, \RightUpTeeVector, Upwards Harpoon With Barb Right From Bar
-{0x6904, 0x29ab, 0x1D709}, // 𝜉, \itxi, Mathematical Italic Small Xi
+{0x6904, 0x29ab, 0xDF09'D835}, // U+1D709, 𝜉, \itxi, Mathematical Italic Small Xi
 {0x7407, 0x29b0, 0x2A4A}, // ⩊, \twocups, Union Beside And Joined With Union
 {0x7505, 0x29b8, 0x214B}, // ⅋, \upand, Turned Ampersand
 {0x6e10, 0x29be, 0x21FC}, // ⇼, \nVleftrightarrow, Left Right Arrow With Double Vertical Stroke
 {0x7404, 0x29cf, 0x292A}, // ⤪, \towa, South West Arrow And North West Arrow
-{0x6209, 0x29d4, 0x1D7A3}, // 𝞣, \bisansTau, Mathematical Sans-Serif Bold Italic Capital Tau
+{0x6209, 0x29d4, 0xDFA3'D835}, // U+1D7A3, 𝞣, \bisansTau, Mathematical Sans-Serif Bold Italic Capital Tau
 {0x6408, 0x29de, 0x2A30}, // ⨰, \dottimes, Multiplication Sign With Dot Above
 {0x7211, 0x29e7, 0x21CC}, // ⇌, \rightleftharpoons, Rightwards Harpoon Over Leftwards Harpoon / Right Harpoon Over Left Harpoon
 {0x7306, 0x29f9, 0x22E5}, // ⋥, \sqspne, Square Original Of Or Not Equal To
 {0x4e14, 0x2a00, 0x2AA2}, // ⪢, \NestedGreaterGreater, Double Nested Greater-Than
 {0x4f06, 0x2a15, 0x2A37}, // ⨷, \Otimes, Multiplication Sign In Double Circle
-{0x6203, 0x2a1c, 0x1D400}, // 𝐀, \bfA, Mathematical Bold Capital A
-{0x6209, 0x2a20, 0x1D7F0}, // 𝟰, \bsansfour, Mathematical Sans-Serif Bold Digit Four
-{0x6905, 0x2a2a, 0x1D6F2}, // 𝛲, \itRho, Mathematical Italic Capital Rho
-{0x6203, 0x2a30, 0x1D401}, // 𝐁, \bfB, Mathematical Bold Capital B
+{0x6203, 0x2a1c, 0xDC00'D835}, // U+1D400, 𝐀, \bfA, Mathematical Bold Capital A
+{0x6209, 0x2a20, 0xDFF0'D835}, // U+1D7F0, 𝟰, \bsansfour, Mathematical Sans-Serif Bold Digit Four
+{0x6905, 0x2a2a, 0xDEF2'D835}, // U+1D6F2, 𝛲, \itRho, Mathematical Italic Capital Rho
+{0x6203, 0x2a30, 0xDC01'D835}, // U+1D401, 𝐁, \bfB, Mathematical Bold Capital B
 {0x4c0a, 0x2a34, 0x27FE}, // ⟾, \Longmapsto, Long Rightwards Double Arrow From Bar
 {0x5003, 0x2a3f, 0x03A8}, // Ψ, \Psi, Greek Capital Letter Psi
-{0x6203, 0x2a43, 0x1D402}, // 𝐂, \bfC, Mathematical Bold Capital C
+{0x6203, 0x2a43, 0xDC02'D835}, // U+1D402, 𝐂, \bfC, Mathematical Bold Capital C
 {0x6e07, 0x2a47, 0x2A14}, // ⨔, \npolint, Line Integration Not Including The Pole
-{0x6203, 0x2a4f, 0x1D403}, // 𝐃, \bfD, Mathematical Bold Capital D
-{0x620a, 0x2a53, 0x1D782}, // 𝞂, \bsanssigma, Mathematical Sans-Serif Bold Small Sigma
+{0x6203, 0x2a4f, 0xDC03'D835}, // U+1D403, 𝐃, \bfD, Mathematical Bold Capital D
+{0x620a, 0x2a53, 0xDF82'D835}, // U+1D782, 𝞂, \bsanssigma, Mathematical Sans-Serif Bold Small Sigma
 {0x6c16, 0x2a5e, 0x294A}, // ⥊, \leftrightharpoonupdown, Left Barb Up Right Barb Down Harpoon
 {0x7002, 0x2a75, 0x03C0}, // π, \pi, Greek Small Letter Pi
-{0x6203, 0x2a78, 0x1D404}, // 𝐄, \bfE, Mathematical Bold Capital E
-{0x6207, 0x2a7c, 0x1D6BA}, // 𝚺, \bfSigma, Mathematical Bold Capital Sigma
-{0x6209, 0x2a84, 0x1D7C7}, // 𝟇, \bisansphi, Mathematical Sans-Serif Bold Italic Phi Symbol
+{0x6203, 0x2a78, 0xDC04'D835}, // U+1D404, 𝐄, \bfE, Mathematical Bold Capital E
+{0x6207, 0x2a7c, 0xDEBA'D835}, // U+1D6BA, 𝚺, \bfSigma, Mathematical Bold Capital Sigma
+{0x6209, 0x2a84, 0xDFC7'D835}, // U+1D7C7, 𝟇, \bisansphi, Mathematical Sans-Serif Bold Italic Phi Symbol
 {0x6311, 0x2a8e, 0x2B30}, // ⬰, \circleonleftarrow, Left Arrow With Small Circle
 {0x5305, 0x2aa0, 0x2A4E}, // ⩎, \Sqcap, Double Square Intersection
-{0x6203, 0x2aa6, 0x1D405}, // 𝐅, \bfF, Mathematical Bold Capital F
-{0x6205, 0x2aaa, 0x1D732}, // 𝜲, \biChi, Mathematical Bold Italic Capital Chi
-{0x6208, 0x2ab0, 0x1D786}, // 𝞆, \bsanschi, Mathematical Sans-Serif Bold Small Chi
+{0x6203, 0x2aa6, 0xDC05'D835}, // U+1D405, 𝐅, \bfF, Mathematical Bold Capital F
+{0x6205, 0x2aaa, 0xDF32'D835}, // U+1D732, 𝜲, \biChi, Mathematical Bold Italic Capital Chi
+{0x6208, 0x2ab0, 0xDF86'D835}, // U+1D786, 𝞆, \bsanschi, Mathematical Sans-Serif Bold Small Chi
 {0x630c, 0x2ab9, 0x25F6}, // ◶, \circlelrquad, White Circle With Lower Right Quadrant
 {0x6407, 0x2ac6, 0x2A77}, // ⩷, \ddotseq, Equals Sign With Two Dots Above And Two Dots Below
 {0x6413, 0x2ace, 0x296B}, // ⥫, \dashleftharpoondown, Leftwards Harpoon With Barb Down Below Long Dash
 {0x6917, 0x2ae2, 0x25DA}, // ◚, \invwhiteupperhalfcircle, Upper Half Inverse White Circle
 {0x6e0b, 0x2afa, 0x2931}, // ⤱, \neovnwarrow, North East Arrow Crossing North West Arrow
-{0x6203, 0x2b06, 0x1D406}, // 𝐆, \bfG, Mathematical Bold Capital G
-{0x6207, 0x2b0a, 0x1D77D}, // 𝝽, \bsansxi, Mathematical Sans-Serif Bold Small Xi
-{0x6909, 0x2b12, 0x1D6E6}, // 𝛦, \itEpsilon, Mathematical Italic Capital Epsilon
-{0x6203, 0x2b1c, 0x1D407}, // 𝐇, \bfH, Mathematical Bold Capital H
+{0x6203, 0x2b06, 0xDC06'D835}, // U+1D406, 𝐆, \bfG, Mathematical Bold Capital G
+{0x6207, 0x2b0a, 0xDF7D'D835}, // U+1D77D, 𝝽, \bsansxi, Mathematical Sans-Serif Bold Small Xi
+{0x6909, 0x2b12, 0xDEE6'D835}, // U+1D6E6, 𝛦, \itEpsilon, Mathematical Italic Capital Epsilon
+{0x6203, 0x2b1c, 0xDC07'D835}, // U+1D407, 𝐇, \bfH, Mathematical Bold Capital H
 {0x630f, 0x2b20, 0x2686}, // ⚆, \circledrightdot, White Circle With Dot Right
 {0x7002, 0x2b30, 0x00B1}, // ±, \pm, Plus-Minus Sign / Plus-Or-Minus Sign
-{0x6203, 0x2b33, 0x1D408}, // 𝐈, \bfI, Mathematical Bold Capital I
+{0x6203, 0x2b33, 0xDC08'D835}, // U+1D408, 𝐈, \bfI, Mathematical Bold Capital I
 {0x6410, 0x2b37, 0x21C2}, // ⇂, \downharpoonright, Downwards Harpoon With Barb Rightwards / Down Harpoon With Barb Right
 {0x6705, 0x2b48, 0x2AA9}, // ⪩, \gescc, Greater-Than Closed By Curve Above Slanted Equal
-{0x6906, 0x2b4e, 0x1D6EA}, // 𝛪, \itIota, Mathematical Italic Capital Iota
+{0x6906, 0x2b4e, 0xDEEA'D835}, // U+1D6EA, 𝛪, \itIota, Mathematical Italic Capital Iota
 {0x7605, 0x2b55, 0x2640}, // ♀, \venus, Female Sign
-{0x6203, 0x2b5b, 0x1D409}, // 𝐉, \bfJ, Mathematical Bold Capital J
-{0x620a, 0x2b5f, 0x1D76E}, // 𝝮, \bsansOmega, Mathematical Sans-Serif Bold Capital Omega
+{0x6203, 0x2b5b, 0xDC09'D835}, // U+1D409, 𝐉, \bfJ, Mathematical Bold Capital J
+{0x620a, 0x2b5f, 0xDF6E'D835}, // U+1D76E, 𝝮, \bsansOmega, Mathematical Sans-Serif Bold Capital Omega
 {0x6406, 0x2b6a, 0x2681}, // ⚁, \diceii, Die Face-2
 {0x4e13, 0x2b71, 0x0338'29D0}, // ⧐̸, \NotRightTriangleBar, Vertical Bar Beside Right Triangle + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
-{0x6203, 0x2b85, 0x1D40A}, // 𝐊, \bfK, Mathematical Bold Capital K
-{0x6207, 0x2b89, 0x1D7DF}, // 𝟟, \bbseven, Mathematical Double-Struck Digit Seven
+{0x6203, 0x2b85, 0xDC0A'D835}, // U+1D40A, 𝐊, \bfK, Mathematical Bold Capital K
+{0x6207, 0x2b89, 0xDFDF'D835}, // U+1D7DF, 𝟟, \bbseven, Mathematical Double-Struck Digit Seven
 {0x6607, 0x2b91, 0x25C9}, // ◉, \fisheye, Fisheye
 {0x6c06, 0x2b99, 0x2A1C}, // ⨜, \lowint, Integral With Underbar
 {0x7016, 0x2ba0, 0x2AA3}, // ⪣, \partialmeetcontraction, Double Nested Less-Than With Underbar
-{0x6203, 0x2bb7, 0x1D40B}, // 𝐋, \bfL, Mathematical Bold Capital L
-{0x6904, 0x2bbb, 0x1D6F1}, // 𝛱, \itPi, Mathematical Italic Capital Pi
+{0x6203, 0x2bb7, 0xDC0B'D835}, // U+1D40B, 𝐋, \bfL, Mathematical Bold Capital L
+{0x6904, 0x2bbb, 0xDEF1'D835}, // U+1D6F1, 𝛱, \itPi, Mathematical Italic Capital Pi
 {0x6c11, 0x2bc0, 0x2B4B}, // ⭋, \leftarrowbsimilar, Leftwards Arrow Above Reverse Tilde Operator
 {0x720a, 0x2bd2, 0x221F}, // ∟, \rightangle, Right Angle
 {0x770c, 0x2bdd, 0x2A55}, // ⩕, \wedgeonwedge, Two Intersecting Logical And
 {0x5507, 0x2bea, 0x03A5}, // Υ, \Upsilon, Greek Capital Letter Upsilon
-{0x6203, 0x2bf2, 0x1D40C}, // 𝐌, \bfM, Mathematical Bold Capital M
-{0x620a, 0x2bf6, 0x1D758}, // 𝝘, \bsansGamma, Mathematical Sans-Serif Bold Capital Gamma
-{0x6203, 0x2c01, 0x1D40D}, // 𝐍, \bfN, Mathematical Bold Capital N
+{0x6203, 0x2bf2, 0xDC0C'D835}, // U+1D40C, 𝐌, \bfM, Mathematical Bold Capital M
+{0x620a, 0x2bf6, 0xDF58'D835}, // U+1D758, 𝝘, \bsansGamma, Mathematical Sans-Serif Bold Capital Gamma
+{0x6203, 0x2c01, 0xDC0D'D835}, // U+1D40D, 𝐍, \bfN, Mathematical Bold Capital N
 {0x650a, 0x2c05, 0x2A96}, // ⪖, \eqslantgtr, Slanted Equal To Or Greater-Than
-{0x7307, 0x2c10, 0x1D7E8}, // 𝟨, \sanssix, Mathematical Sans-Serif Digit Six
+{0x7307, 0x2c10, 0xDFE8'D835}, // U+1D7E8, 𝟨, \sanssix, Mathematical Sans-Serif Digit Six
 {0x730e, 0x2c18, 0x25A8}, // ▨, \squareneswfill, Square With Upper Right To Lower Left Fill
-{0x6203, 0x2c27, 0x1D40E}, // 𝐎, \bfO, Mathematical Bold Capital O
+{0x6203, 0x2c27, 0xDC0E'D835}, // U+1D40E, 𝐎, \bfO, Mathematical Bold Capital O
 {0x6e06, 0x2c2b, 0x22AE}, // ⊮, \nVdash, Does Not Force
 {0x730d, 0x2c32, 0x2B15}, // ⬕, \squarellblack, Square With Lower Left Diagonal Half Black
-{0x6203, 0x2c40, 0x1D40F}, // 𝐏, \bfP, Mathematical Bold Capital P
-{0x6208, 0x2c44, 0x1D7B7}, // 𝞷, \bisansxi, Mathematical Sans-Serif Bold Italic Small Xi
-{0x620a, 0x2c4d, 0x1D747}, // 𝝇, \bivarsigma, Mathematical Bold Italic Small Final Sigma
+{0x6203, 0x2c40, 0xDC0F'D835}, // U+1D40F, 𝐏, \bfP, Mathematical Bold Capital P
+{0x6208, 0x2c44, 0xDFB7'D835}, // U+1D7B7, 𝞷, \bisansxi, Mathematical Sans-Serif Bold Italic Small Xi
+{0x620a, 0x2c4d, 0xDF47'D835}, // U+1D747, 𝝇, \bivarsigma, Mathematical Bold Italic Small Final Sigma
 {0x6211, 0x2c58, 0x25C0}, // ◀, \blacktriangleleft, Black Left-Pointing Triangle / Black Left Pointing Triangle
 {0x640d, 0x2c6a, 0x22C7}, // ⋇, \divideontimes, Division Times
 {0x640f, 0x2c78, 0x2B18}, // ⬘, \diamondtopblack, Diamond With Top Half Black
 {0x7312, 0x2c88, 0x25B9}, // ▹, \smalltriangleright, White Right-Pointing Small Triangle / White Right Pointing Small Triangle
-{0x6203, 0x2c9b, 0x1D410}, // 𝐐, \bfQ, Mathematical Bold Capital Q
+{0x6203, 0x2c9b, 0xDC10'D835}, // U+1D410, 𝐐, \bfQ, Mathematical Bold Capital Q
 {0x6c0d, 0x2c9f, 0x21E0}, // ⇠, \leftdasharrow, Leftwards Dashed Arrow / Left Dashed Arrow
 {0x6d0e, 0x2cad, 0x25C7}, // ◇, \mdlgwhtdiamond, White Diamond
 {0x6e0b, 0x2cbc, 0x22E2}, // ⋢, \nsqsubseteq, Not Square Image Of Or Equal To
 {0x6f05, 0x2cc8, 0x03C9}, // ω, \omega, Greek Small Letter Omega
 {0x7308, 0x2cce, 0x00A3}, // £, \sterling, Pound Sign
-{0x6203, 0x2cd7, 0x1D411}, // 𝐑, \bfR, Mathematical Bold Capital R
-{0x620b, 0x2cdb, 0x1D7C2}, // 𝟂, \bisansomega, Mathematical Sans-Serif Bold Italic Small Omega
-{0x6203, 0x2ce7, 0x1D412}, // 𝐒, \bfS, Mathematical Bold Capital S
+{0x6203, 0x2cd7, 0xDC11'D835}, // U+1D411, 𝐑, \bfR, Mathematical Bold Capital R
+{0x620b, 0x2cdb, 0xDFC2'D835}, // U+1D7C2, 𝟂, \bisansomega, Mathematical Sans-Serif Bold Italic Small Omega
+{0x6203, 0x2ce7, 0xDC12'D835}, // U+1D412, 𝐒, \bfS, Mathematical Bold Capital S
 {0x6310, 0x2ceb, 0x21BB}, // ↻, \circlearrowright, Clockwise Open Circle Arrow
 {0x6406, 0x2cfc, 0x2621}, // ☡, \danger, Caution Sign
 {0x7210, 0x2d03, 0x2B44}, // ⭄, \rightarrowsupset, Rightwards Arrow Through Superset
 {0x7605, 0x2d14, 0x22A8}, // ⊨, \vDash, True
-{0x6203, 0x2d1a, 0x1D413}, // 𝐓, \bfT, Mathematical Bold Capital T
-{0x6205, 0x2d1e, 0x1D746}, // 𝝆, \birho, Mathematical Bold Italic Small Rho
+{0x6203, 0x2d1a, 0xDC13'D835}, // U+1D413, 𝐓, \bfT, Mathematical Bold Capital T
+{0x6205, 0x2d1e, 0xDF46'D835}, // U+1D746, 𝝆, \birho, Mathematical Bold Italic Small Rho
 {0x6212, 0x2d24, 0x2B47}, // ⭇, \bsimilarrightarrow, Reverse Tilde Operator Above Rightwards Arrow
 {0x6705, 0x2d37, 0x03B3}, // γ, \gamma, Greek Small Letter Gamma
 {0x6e07, 0x2d3d, 0x2197}, // ↗, \nearrow, North East Arrow / Upper Right Arrow
 {0x5204, 0x2d45, 0x21B3}, // ↳, \Rdsh, Downwards Arrow With Tip Rightwards / Down Arrow With Tip Right
-{0x6203, 0x2d4a, 0x1D414}, // 𝐔, \bfU, Mathematical Bold Capital U
-{0x620b, 0x2d4e, 0x1D7AC}, // 𝞬, \bisansgamma, Mathematical Sans-Serif Bold Italic Small Gamma
+{0x6203, 0x2d4a, 0xDC14'D835}, // U+1D414, 𝐔, \bfU, Mathematical Bold Capital U
+{0x620b, 0x2d4e, 0xDFAC'D835}, // U+1D7AC, 𝞬, \bisansgamma, Mathematical Sans-Serif Bold Italic Small Gamma
 {0x6904, 0x2d5a, 0x2A18}, // ⨘, \intx, Integral With Times Sign
-{0x6905, 0x2d5f, 0x1D6E8}, // 𝛨, \itEta, Mathematical Italic Capital Eta
+{0x6905, 0x2d5f, 0xDEE8'D835}, // U+1D6E8, 𝛨, \itEta, Mathematical Italic Capital Eta
 {0x7305, 0x2d65, 0x2519}, // ┙, \sqfnw, Box Drawings Up Light And Left Heavy / Forms Up Light And Left Heavy
 {0x7308, 0x2d6b, 0x2AB6}, // ⪶, \succneqq, Succeeds Above Not Equal To
 {0x7608, 0x2d74, 0x2317}, // ⌗, \viewdata, Viewdata Square
-{0x6203, 0x2d7d, 0x1D415}, // 𝐕, \bfV, Mathematical Bold Capital V
+{0x6203, 0x2d7d, 0xDC15'D835}, // U+1D415, 𝐕, \bfV, Mathematical Bold Capital V
 {0x6204, 0x2d81, 0x213C}, // ℼ, \bbpi, Double-Struck Small Pi
-{0x6207, 0x2d86, 0x1D765}, // 𝝥, \bsansPi, Mathematical Sans-Serif Bold Capital Pi
+{0x6207, 0x2d86, 0xDF65'D835}, // U+1D765, 𝝥, \bsansPi, Mathematical Sans-Serif Bold Capital Pi
 {0x6209, 0x2d8e, 0x2035}, // ‵, \backprime, Reversed Prime
 {0x6603, 0x2d98, 0x027E}, // ɾ, \fhr, Latin Small Letter R With Fishhook / Latin Small Letter Fishhook R
 {0x7212, 0x2d9c, 0x20D1}, // ⃑, \rightharpoonaccent, Combining Right Harpoon Above / Non-Spacing Right Harpoon Above
 {0x7308, 0x2daf, 0x2287}, // ⊇, \supseteq, Superset Of Or Equal To
 {0x7407, 0x2db8, 0x2A4B}, // ⩋, \twocaps, Intersection Beside And Joined With Intersection
-{0x6203, 0x2dc0, 0x1D416}, // 𝐖, \bfW, Mathematical Bold Capital W
-{0x6205, 0x2dc4, 0x1D6D8}, // 𝛘, \bfchi, Mathematical Bold Small Chi
+{0x6203, 0x2dc0, 0xDC16'D835}, // U+1D416, 𝐖, \bfW, Mathematical Bold Capital W
+{0x6205, 0x2dc4, 0xDED8'D835}, // U+1D6D8, 𝛘, \bfchi, Mathematical Bold Small Chi
 {0x6406, 0x2dca, 0x2683}, // ⚃, \diceiv, Die Face-4
 {0x6e03, 0x2dd1, 0x220C}, // ∌, \nni, Does Not Contain As Member
 {0x740a, 0x2dd5, 0x2129}, // ℩, \turnediota, Turned Greek Small Letter Iota
-{0x6203, 0x2de0, 0x1D417}, // 𝐗, \bfX, Mathematical Bold Capital X
+{0x6203, 0x2de0, 0xDC17'D835}, // U+1D417, 𝐗, \bfX, Mathematical Bold Capital X
 {0x6505, 0x2de4, 0x22DD}, // ⋝, \eqgtr, Equal To Or Greater-Than / Equal To Or Greater Than
 {0x7710, 0x2dea, 0x25C5}, // ◅, \whitepointerleft, White Left-Pointing Pointer / White Left Pointing Pointer
 {0x4c06, 0x2dfb, 0x039B}, // Λ, \Lambda, Greek Capital Letter Lamda / Greek Capital Letter Lambda
-{0x6203, 0x2e02, 0x1D418}, // 𝐘, \bfY, Mathematical Bold Capital Y
+{0x6203, 0x2e02, 0xDC18'D835}, // U+1D418, 𝐘, \bfY, Mathematical Bold Capital Y
 {0x6407, 0x2e06, 0x29DF}, // ⧟, \dualmap, Double-Ended Multimap
 {0x6709, 0x2e0e, 0xFE00'2269}, // ≩︀, \gvertneqq, Greater-Than But Not Equal To / Greater Than But Not Equal To + Variation Selector-1
 {0x6c04, 0x2e18, 0x2266}, // ≦, \leqq, Less-Than Over Equal To / Less Than Over Equal To
@@ -1887,9 +1887,9 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7307, 0x2e3a, 0x227F}, // ≿, \succsim, Succeeds Or Equivalent To
 {0x740c, 0x2e42, 0x25C1}, // ◁, \triangleleft, White Left-Pointing Triangle / White Left Pointing Triangle
 {0x760e, 0x2e4f, 0x2666}, // ♦, \vardiamondsuit, Black Diamond Suit
-{0x6203, 0x2e5e, 0x1D419}, // 𝐙, \bfZ, Mathematical Bold Capital Z
-{0x6204, 0x2e62, 0x1D6B5}, // 𝚵, \bfXi, Mathematical Bold Capital Xi
-{0x6204, 0x2e67, 0x1D742}, // 𝝂, \binu, Mathematical Bold Italic Small Nu
+{0x6203, 0x2e5e, 0xDC19'D835}, // U+1D419, 𝐙, \bfZ, Mathematical Bold Capital Z
+{0x6204, 0x2e62, 0xDEB5'D835}, // U+1D6B5, 𝚵, \bfXi, Mathematical Bold Capital Xi
+{0x6204, 0x2e67, 0xDF42'D835}, // U+1D742, 𝝂, \binu, Mathematical Bold Italic Small Nu
 {0x6206, 0x2e6c, 0x2A42}, // ⩂, \barcup, Union With Overbar
 {0x6308, 0x2e73, 0x2A10}, // ⨐, \cirfnint, Circulation Function
 {0x7005, 0x2e7c, 0x2032}, // ′, \prime, Prime
@@ -1904,174 +1904,174 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x630c, 0x2ec8, 0x25F5}, // ◵, \circlellquad, White Circle With Lower Left Quadrant
 {0x640f, 0x2ed5, 0x2908}, // ⤈, \downarrowbarred, Downwards Arrow With Horizontal Stroke
 {0x520b, 0x2ee5, 0x2B46}, // ⭆, \RRightarrow, Rightwards Quadruple Arrow
-{0x6208, 0x2ef1, 0x1D79F}, // 𝞟, \bisansPi, Mathematical Sans-Serif Bold Italic Capital Pi
+{0x6208, 0x2ef1, 0xDF9F'D835}, // U+1D79F, 𝞟, \bisansPi, Mathematical Sans-Serif Bold Italic Capital Pi
 {0x6707, 0x2efa, 0x2AF8}, // ⫸, \gggnest, Triple Nested Greater-Than
 {0x6d08, 0x2f02, 0x21A4}, // ↤, \mapsfrom, Leftwards Arrow From Bar / Left Arrow From Bar
 {0x6d08, 0x2f0b, 0x22B8}, // ⊸, \multimap, Multimap
 {0x6304, 0x2f14, 0x2218}, // ∘, \circ, Ring Operator
 {0x6408, 0x2f19, 0x2A67}, // ⩧, \dotequiv, Identical With Dot Above
 {0x6c08, 0x2f22, 0x263E}, // ☾, \leftmoon, Last Quarter Moon
-{0x6203, 0x2f2b, 0x1D41A}, // 𝐚, \bfa, Mathematical Bold Small A
+{0x6203, 0x2f2b, 0xDC1A'D835}, // U+1D41A, 𝐚, \bfa, Mathematical Bold Small A
 {0x6209, 0x2f2f, 0x2588}, // █, \blockfull, Full Block
 {0x6507, 0x2f39, 0x2A99}, // ⪙, \eqqless, Double-Line Equal To Or Less-Than
 {0x6d0b, 0x2f41, 0x2A5C}, // ⩜, \midbarwedge, Logical And With Horizontal Dash
 {0x6f05, 0x2f4d, 0x030A}, // ̊, \ocirc, Combining Ring Above / Non-Spacing Ring Above
 {0x7309, 0x2f53, 0x2ABD}, // ⪽, \subsetdot, Subset With Dot
-{0x6203, 0x2f5d, 0x1D41B}, // 𝐛, \bfb, Mathematical Bold Small B
+{0x6203, 0x2f5d, 0xDC1B'D835}, // U+1D41B, 𝐛, \bfb, Mathematical Bold Small B
 {0x6212, 0x2f61, 0x25B2}, // ▲, \bigblacktriangleup, Black Up-Pointing Triangle / Black Up Pointing Triangle
 {0x6e12, 0x2f74, 0x2B35}, // ⬵, \nVtwoheadleftarrow, Leftwards Two-Headed Arrow With Double Vertical Stroke
 {0x6e13, 0x2f87, 0x2900}, // ⤀, \nvtwoheadrightarrow, Rightwards Two-Headed Arrow With Vertical Stroke
 {0x7306, 0x2f9b, 0x2AC7}, // ⫇, \subsim, Subset Of Above Tilde Operator
-{0x6203, 0x2fa2, 0x1D41C}, // 𝐜, \bfc, Mathematical Bold Small C
+{0x6203, 0x2fa2, 0xDC1C'D835}, // U+1D41C, 𝐜, \bfc, Mathematical Bold Small C
 {0x6306, 0x2fa6, 0x228D}, // ⊍, \cupdot, Multiset Multiplication
-{0x6203, 0x2fad, 0x1D41D}, // 𝐝, \bfd, Mathematical Bold Small D
-{0x6209, 0x2fb1, 0x1D6D0}, // 𝛐, \bfomicron, Mathematical Bold Small Omicron
+{0x6203, 0x2fad, 0xDC1D'D835}, // U+1D41D, 𝐝, \bfd, Mathematical Bold Small D
+{0x6209, 0x2fb1, 0xDED0'D835}, // U+1D6D0, 𝛐, \bfomicron, Mathematical Bold Small Omicron
 {0x6109, 0x2fbb, 0x29A4}, // ⦤, \angleubar, Angle With Underbar
-{0x6203, 0x2fc5, 0x1D41E}, // 𝐞, \bfe, Mathematical Bold Small E
-{0x620a, 0x2fc9, 0x1D78F}, // 𝞏, \bsansvarpi, Mathematical Sans-Serif Bold Pi Symbol
+{0x6203, 0x2fc5, 0xDC1E'D835}, // U+1D41E, 𝐞, \bfe, Mathematical Bold Small E
+{0x620a, 0x2fc9, 0xDF8F'D835}, // U+1D78F, 𝞏, \bsansvarpi, Mathematical Sans-Serif Bold Pi Symbol
 {0x6405, 0x2fd4, 0x2680}, // ⚀, \dicei, Die Face-1
-{0x6203, 0x2fda, 0x1D41F}, // 𝐟, \bff, Mathematical Bold Small F
+{0x6203, 0x2fda, 0xDC1F'D835}, // U+1D41F, 𝐟, \bff, Mathematical Bold Small F
 {0x6305, 0x2fde, 0x030C}, // ̌, \check, Combining Caron / Non-Spacing Hacek
 {0x6407, 0x2fe4, 0x2682}, // ⚂, \diceiii, Die Face-3
 {0x670d, 0x2fec, 0x2039}, // ‹, \guilsinglleft, Single Left-Pointing Angle Quotation Mark / Left Pointing Single Guillemet
 {0x7205, 0x2ffa, 0x2944}, // ⥄, \rLarr, Short Rightwards Arrow Above Leftwards Arrow
 {0x6105, 0x3000, 0x2A11}, // ⨑, \awint, Anticlockwise Integration
-{0x6203, 0x3006, 0x1D420}, // 𝐠, \bfg, Mathematical Bold Small G
+{0x6203, 0x3006, 0xDC20'D835}, // U+1D420, 𝐠, \bfg, Mathematical Bold Small G
 {0x6407, 0x300a, 0x03DD}, // ϝ, \digamma, Greek Small Letter Digamma
 {0x7308, 0x3012, 0x2290}, // ⊐, \sqsupset, Square Original Of
 {0x740d, 0x301b, 0x20E8}, // ⃨, \threeunderdot, Combining Triple Underdot
 {0x750b, 0x3029, 0x2195}, // ↕, \updownarrow, Up Down Arrow
 {0x6105, 0x3035, 0x2135}, // ℵ, \aleph, Alef Symbol / First Transfinite Cardinal
-{0x6203, 0x303b, 0x1D421}, // 𝐡, \bfh, Mathematical Bold Small H
-{0x6205, 0x303f, 0x1D73C}, // 𝜼, \bieta, Mathematical Bold Italic Small Eta
+{0x6203, 0x303b, 0xDC21'D835}, // U+1D421, 𝐡, \bfh, Mathematical Bold Small H
+{0x6205, 0x303f, 0xDF3C'D835}, // U+1D73C, 𝜼, \bieta, Mathematical Bold Italic Small Eta
 {0x6808, 0x3045, 0x2926}, // ⤦, \hkswarow, South West Arrow With Hook
-{0x7403, 0x304e, 0x1D670}, // 𝙰, \ttA, Mathematical Monospace Capital A
+{0x7403, 0x304e, 0xDE70'D835}, // U+1D670, 𝙰, \ttA, Mathematical Monospace Capital A
 {0x6108, 0x3052, 0x224A}, // ≊, \approxeq, Almost Equal Or Equal To
-{0x6203, 0x305b, 0x1D422}, // 𝐢, \bfi, Mathematical Bold Small I
+{0x6203, 0x305b, 0xDC22'D835}, // U+1D422, 𝐢, \bfi, Mathematical Bold Small I
 {0x6206, 0x305f, 0x2A1F}, // ⨟, \bbsemi, Z Notation Schema Composition
-{0x620a, 0x3066, 0x1D6DE}, // 𝛞, \bfvarkappa, Mathematical Bold Kappa Symbol
+{0x620a, 0x3066, 0xDEDE'D835}, // U+1D6DE, 𝛞, \bfvarkappa, Mathematical Bold Kappa Symbol
 {0x700d, 0x3071, 0x2B1F}, // ⬟, \pentagonblack, Black Pentagon
 {0x7208, 0x307f, 0x29A3}, // ⦣, \revangle, Reversed Angle
-{0x7403, 0x3088, 0x1D671}, // 𝙱, \ttB, Mathematical Monospace Capital B
-{0x6203, 0x308c, 0x1D423}, // 𝐣, \bfj, Mathematical Bold Small J
-{0x6207, 0x3090, 0x1D73F}, // 𝜿, \bikappa, Mathematical Bold Italic Small Kappa
+{0x7403, 0x3088, 0xDE71'D835}, // U+1D671, 𝙱, \ttB, Mathematical Monospace Capital B
+{0x6203, 0x308c, 0xDC23'D835}, // U+1D423, 𝐣, \bfj, Mathematical Bold Small J
+{0x6207, 0x3090, 0xDF3F'D835}, // U+1D73F, 𝜿, \bikappa, Mathematical Bold Italic Small Kappa
 {0x6309, 0x3098, 0x2713}, // ✓, \checkmark, Check Mark
-{0x6905, 0x30a2, 0x1D6F7}, // 𝛷, \itPhi, Mathematical Italic Capital Phi
+{0x6905, 0x30a2, 0xDEF7'D835}, // U+1D6F7, 𝛷, \itPhi, Mathematical Italic Capital Phi
 {0x720e, 0x30a8, 0x2945}, // ⥅, \rightarrowplus, Rightwards Arrow With Plus Below
-{0x7403, 0x30b7, 0x1D672}, // 𝙲, \ttC, Mathematical Monospace Capital C
-{0x6203, 0x30bb, 0x1D424}, // 𝐤, \bfk, Mathematical Bold Small K
-{0x620a, 0x30bf, 0x1D770}, // 𝝰, \bsansalpha, Mathematical Sans-Serif Bold Small Alpha
+{0x7403, 0x30b7, 0xDE72'D835}, // U+1D672, 𝙲, \ttC, Mathematical Monospace Capital C
+{0x6203, 0x30bb, 0xDC24'D835}, // U+1D424, 𝐤, \bfk, Mathematical Bold Small K
+{0x620a, 0x30bf, 0xDF70'D835}, // U+1D770, 𝝰, \bsansalpha, Mathematical Sans-Serif Bold Small Alpha
 {0x6506, 0x30ca, 0x2256}, // ≖, \eqcirc, Ring In Equal To
 {0x6c09, 0x30d1, 0xFE00'2268}, // ≨︀, \lvertneqq, Less-Than But Not Equal To / Less Than But Not Equal To + Variation Selector-1
 {0x730b, 0x30db, 0x2B52}, // ⭒, \smwhitestar, White Small Star
-{0x7403, 0x30e7, 0x1D673}, // 𝙳, \ttD, Mathematical Monospace Capital D
+{0x7403, 0x30e7, 0xDE73'D835}, // U+1D673, 𝙳, \ttD, Mathematical Monospace Capital D
 {0x750a, 0x30eb, 0x21C8}, // ⇈, \upuparrows, Upwards Paired Arrows / Up Paired Arrows
 {0x5203, 0x30f6, 0x03A1}, // Ρ, \Rho, Greek Capital Letter Rho
 {0x5210, 0x30fa, 0x29D0}, // ⧐, \RightTriangleBar, Vertical Bar Beside Right Triangle
-{0x6203, 0x310b, 0x1D425}, // 𝐥, \bfl, Mathematical Bold Small L
-{0x6207, 0x310f, 0x1D6A8}, // 𝚨, \bfAlpha, Mathematical Bold Capital Alpha
+{0x6203, 0x310b, 0xDC25'D835}, // U+1D425, 𝐥, \bfl, Mathematical Bold Small L
+{0x6207, 0x310f, 0xDEA8'D835}, // U+1D6A8, 𝚨, \bfAlpha, Mathematical Bold Capital Alpha
 {0x6210, 0x3117, 0x25C4}, // ◄, \blackpointerleft, Black Left-Pointing Pointer / Black Left Pointing Pointer
 {0x6404, 0x3128, 0x29F6}, // ⧶, \dsol, Solidus With Overbar
-{0x690a, 0x312d, 0x1D70D}, // 𝜍, \itvarsigma, Mathematical Italic Small Final Sigma
+{0x690a, 0x312d, 0xDF0D'D835}, // U+1D70D, 𝜍, \itvarsigma, Mathematical Italic Small Final Sigma
 {0x6c07, 0x3138, 0x2272}, // ≲, \lesssim, Less-Than Or Equivalent To / Less Than Or Equivalent To
-{0x7403, 0x3140, 0x1D674}, // 𝙴, \ttE, Mathematical Monospace Capital E
+{0x7403, 0x3140, 0xDE74'D835}, // U+1D674, 𝙴, \ttE, Mathematical Monospace Capital E
 {0x760a, 0x3144, 0x2205}, // ∅, \varnothing, Empty Set
-{0x6203, 0x314f, 0x1D426}, // 𝐦, \bfm, Mathematical Bold Small M
+{0x6203, 0x314f, 0xDC26'D835}, // U+1D426, 𝐦, \bfm, Mathematical Bold Small M
 {0x6f07, 0x3153, 0x29B8}, // ⦸, \obslash, Circled Reverse Solidus
 {0x7306, 0x315b, 0x25A1}, // □, \square, White Square
-{0x7403, 0x3162, 0x1D675}, // 𝙵, \ttF, Mathematical Monospace Capital F
+{0x7403, 0x3162, 0xDE75'D835}, // U+1D675, 𝙵, \ttF, Mathematical Monospace Capital F
 {0x750e, 0x3166, 0x20EE}, // ⃮, \underleftarrow, Combining Left Arrow Below
-{0x6203, 0x3175, 0x1D427}, // 𝐧, \bfn, Mathematical Bold Small N
+{0x6203, 0x3175, 0xDC27'D835}, // U+1D427, 𝐧, \bfn, Mathematical Bold Small N
 {0x620c, 0x3179, 0x2606}, // ☆, \bigwhitestar, White Star
 {0x6c0f, 0x3186, 0x2B3F}, // ⬿, \leftcurvedarrow, Wave Arrow Pointing Directly Left
 {0x6d04, 0x3196, 0x2642}, // ♂, \mars, Male Sign
 {0x730a, 0x319b, 0x2A33}, // ⨳, \smashtimes, Smash Product
 {0x730a, 0x31a6, 0x2292}, // ⊒, \sqsupseteq, Square Original Of Or Equal To
-{0x7403, 0x31b1, 0x1D676}, // 𝙶, \ttG, Mathematical Monospace Capital G
+{0x7403, 0x31b1, 0xDE76'D835}, // U+1D676, 𝙶, \ttG, Mathematical Monospace Capital G
 {0x4c12, 0x31b5, 0x27FA}, // ⟺, \Longleftrightarrow, Long Left Right Double Arrow
-{0x6203, 0x31c8, 0x1D428}, // 𝐨, \bfo, Mathematical Bold Small O
-{0x6907, 0x31cc, 0x1D703}, // 𝜃, \ittheta, Mathematical Italic Small Theta
-{0x7403, 0x31d4, 0x1D677}, // 𝙷, \ttH, Mathematical Monospace Capital H
+{0x6203, 0x31c8, 0xDC28'D835}, // U+1D428, 𝐨, \bfo, Mathematical Bold Small O
+{0x6907, 0x31cc, 0xDF03'D835}, // U+1D703, 𝜃, \ittheta, Mathematical Italic Small Theta
+{0x7403, 0x31d4, 0xDE77'D835}, // U+1D677, 𝙷, \ttH, Mathematical Monospace Capital H
 {0x4e11, 0x31d8, 0x0338'2AA1}, // ⪡̸, \NotNestedLessLess, Double Nested Less-Than + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
-{0x6203, 0x31ea, 0x1D429}, // 𝐩, \bfp, Mathematical Bold Small P
-{0x6907, 0x31ee, 0x1D6FF}, // 𝛿, \itdelta, Mathematical Italic Small Delta
-{0x7403, 0x31f6, 0x1D678}, // 𝙸, \ttI, Mathematical Monospace Capital I
+{0x6203, 0x31ea, 0xDC29'D835}, // U+1D429, 𝐩, \bfp, Mathematical Bold Small P
+{0x6907, 0x31ee, 0xDEFF'D835}, // U+1D6FF, 𝛿, \itdelta, Mathematical Italic Small Delta
+{0x7403, 0x31f6, 0xDE78'D835}, // U+1D678, 𝙸, \ttI, Mathematical Monospace Capital I
 {0x4e0e, 0x31fa, 0x2AA1}, // ⪡, \NestedLessLess, Double Nested Less-Than
-{0x6203, 0x3209, 0x1D42A}, // 𝐪, \bfq, Mathematical Bold Small Q
-{0x7403, 0x320d, 0x1D679}, // 𝙹, \ttJ, Mathematical Monospace Capital J
-{0x6203, 0x3211, 0x1D42B}, // 𝐫, \bfr, Mathematical Bold Small R
+{0x6203, 0x3209, 0xDC2A'D835}, // U+1D42A, 𝐪, \bfq, Mathematical Bold Small Q
+{0x7403, 0x320d, 0xDE79'D835}, // U+1D679, 𝙹, \ttJ, Mathematical Monospace Capital J
+{0x6203, 0x3211, 0xDC2B'D835}, // U+1D42B, 𝐫, \bfr, Mathematical Bold Small R
 {0x6405, 0x3215, 0x2684}, // ⚄, \dicev, Die Face-5
 {0x6406, 0x321b, 0x2A6A}, // ⩪, \dotsim, Tilde Operator With Dot Above
-{0x7403, 0x3222, 0x1D67A}, // 𝙺, \ttK, Mathematical Monospace Capital K
-{0x6203, 0x3226, 0x1D42C}, // 𝐬, \bfs, Mathematical Bold Small S
+{0x7403, 0x3222, 0xDE7A'D835}, // U+1D67A, 𝙺, \ttK, Mathematical Monospace Capital K
+{0x6203, 0x3226, 0xDC2C'D835}, // U+1D42C, 𝐬, \bfs, Mathematical Bold Small S
 {0x6e10, 0x322a, 0x2914}, // ⤔, \nvrightarrowtail, Rightwards Arrow With Tail With Vertical Stroke
 {0x7309, 0x323b, 0x2AC6}, // ⫆, \supseteqq, Superset Of Above Equals Sign
-{0x7403, 0x3245, 0x1D67B}, // 𝙻, \ttL, Mathematical Monospace Capital L
-{0x6203, 0x3249, 0x1D42D}, // 𝐭, \bft, Mathematical Bold Small T
+{0x7403, 0x3245, 0xDE7B'D835}, // U+1D67B, 𝙻, \ttL, Mathematical Monospace Capital L
+{0x6203, 0x3249, 0xDC2D'D835}, // U+1D42D, 𝐭, \bft, Mathematical Bold Small T
 {0x6209, 0x324d, 0x22FF}, // ⋿, \bagmember, Z Notation Bag Membership
 {0x6402, 0x3257, 0x00F0}, // ð, \dh, Latin Small Letter Eth
 {0x6e09, 0x325a, 0x2226}, // ∦, \nparallel, Not Parallel To
 {0x6e17, 0x3264, 0x2918}, // ⤘, \nVtwoheadrightarrowtail, Rightwards Two-Headed Arrow With Tail With Double Vertical Stroke
 {0x7203, 0x327c, 0x201D}, // ”, \rdq, Right Double Quotation Mark / Double Comma Quotation Mark
 {0x720c, 0x3280, 0x29A5}, // ⦥, \revangleubar, Reversed Angle With Underbar
-{0x7403, 0x328d, 0x1D67C}, // 𝙼, \ttM, Mathematical Monospace Capital M
+{0x7403, 0x328d, 0xDE7C'D835}, // U+1D67C, 𝙼, \ttM, Mathematical Monospace Capital M
 {0x520e, 0x3291, 0x2953}, // ⥓, \RightVectorBar, Rightwards Harpoon With Barb Up To Bar
-{0x6203, 0x32a0, 0x1D42E}, // 𝐮, \bfu, Mathematical Bold Small U
+{0x6203, 0x32a0, 0xDC2E'D835}, // U+1D42E, 𝐮, \bfu, Mathematical Bold Small U
 {0x6c08, 0x32a4, 0x2A83}, // ⪃, \lesdotor, Less-Than Or Slanted Equal To With Dot Above Right
 {0x6d11, 0x32ad, 0x299B}, // ⦛, \measuredangleleft, Measured Angle Opening Left
 {0x6e0b, 0x32bf, 0x219B}, // ↛, \nrightarrow, Rightwards Arrow With Stroke / Right Arrow With Stroke
-{0x7403, 0x32cb, 0x1D67D}, // 𝙽, \ttN, Mathematical Monospace Capital N
-{0x6203, 0x32cf, 0x1D42F}, // 𝐯, \bfv, Mathematical Bold Small V
-{0x6207, 0x32d3, 0x1D72E}, // 𝜮, \biSigma, Mathematical Bold Italic Capital Sigma
+{0x7403, 0x32cb, 0xDE7D'D835}, // U+1D67D, 𝙽, \ttN, Mathematical Monospace Capital N
+{0x6203, 0x32cf, 0xDC2F'D835}, // U+1D42F, 𝐯, \bfv, Mathematical Bold Small V
+{0x6207, 0x32d3, 0xDF2E'D835}, // U+1D72E, 𝜮, \biSigma, Mathematical Bold Italic Capital Sigma
 {0x6402, 0x32db, 0x0111}, // đ, \dj, Latin Small Letter D With Stroke / Latin Small Letter D Bar
 {0x6405, 0x32de, 0x29CB}, // ⧋, \defas, Triangle With Underbar
 {0x6508, 0x32e4, 0x29E5}, // ⧥, \eqvparsl, Identical To And Slanted Parallel
-{0x7403, 0x32ed, 0x1D67E}, // 𝙾, \ttO, Mathematical Monospace Capital O
-{0x6203, 0x32f1, 0x1D430}, // 𝐰, \bfw, Mathematical Bold Small W
-{0x6205, 0x32f5, 0x1D72F}, // 𝜯, \biTau, Mathematical Bold Italic Capital Tau
-{0x6206, 0x32fb, 0x1D7D7}, // 𝟗, \bfnine, Mathematical Bold Digit Nine
-{0x6208, 0x3302, 0x1D783}, // 𝞃, \bsanstau, Mathematical Sans-Serif Bold Small Tau
-{0x620a, 0x330b, 0x1D7F3}, // 𝟳, \bsansseven, Mathematical Sans-Serif Bold Digit Seven
+{0x7403, 0x32ed, 0xDE7E'D835}, // U+1D67E, 𝙾, \ttO, Mathematical Monospace Capital O
+{0x6203, 0x32f1, 0xDC30'D835}, // U+1D430, 𝐰, \bfw, Mathematical Bold Small W
+{0x6205, 0x32f5, 0xDF2F'D835}, // U+1D72F, 𝜯, \biTau, Mathematical Bold Italic Capital Tau
+{0x6206, 0x32fb, 0xDFD7'D835}, // U+1D7D7, 𝟗, \bfnine, Mathematical Bold Digit Nine
+{0x6208, 0x3302, 0xDF83'D835}, // U+1D783, 𝞃, \bsanstau, Mathematical Sans-Serif Bold Small Tau
+{0x620a, 0x330b, 0xDFF3'D835}, // U+1D7F3, 𝟳, \bsansseven, Mathematical Sans-Serif Bold Digit Seven
 {0x6d0c, 0x3316, 0x2B27}, // ⬧, \mdblklozenge, Black Medium Lozenge
 {0x7210, 0x3323, 0x21C1}, // ⇁, \rightharpoondown, Rightwards Harpoon With Barb Downwards / Right Harpoon With Barb Down
-{0x7403, 0x3334, 0x1D67F}, // 𝙿, \ttP, Mathematical Monospace Capital P
+{0x7403, 0x3334, 0xDE7F'D835}, // U+1D67F, 𝙿, \ttP, Mathematical Monospace Capital P
 {0x4902, 0x3338, 0x2111}, // ℑ, \Im, Black-Letter Capital I / Black-Letter I
-{0x6203, 0x333b, 0x1D431}, // 𝐱, \bfx, Mathematical Bold Small X
-{0x7403, 0x333f, 0x1D680}, // 𝚀, \ttQ, Mathematical Monospace Capital Q
+{0x6203, 0x333b, 0xDC31'D835}, // U+1D431, 𝐱, \bfx, Mathematical Bold Small X
+{0x7403, 0x333f, 0xDE80'D835}, // U+1D680, 𝚀, \ttQ, Mathematical Monospace Capital Q
 {0x6109, 0x3343, 0x2A70}, // ⩰, \approxeqq, Approximately Equal Or Equal To
-{0x6203, 0x334d, 0x1D432}, // 𝐲, \bfy, Mathematical Bold Small Y
-{0x7403, 0x3351, 0x1D681}, // 𝚁, \ttR, Mathematical Monospace Capital R
+{0x6203, 0x334d, 0xDC32'D835}, // U+1D432, 𝐲, \bfy, Mathematical Bold Small Y
+{0x7403, 0x3351, 0xDE81'D835}, // U+1D681, 𝚁, \ttR, Mathematical Monospace Capital R
 {0x770a, 0x3355, 0x0330}, // ̰, \wideutilde, Combining Tilde Below / Non-Spacing Tilde Below
 {0x6105, 0x3360, 0x224D}, // ≍, \asymp, Equivalent To
-{0x6203, 0x3366, 0x1D433}, // 𝐳, \bfz, Mathematical Bold Small Z
+{0x6203, 0x3366, 0xDC33'D835}, // U+1D433, 𝐳, \bfz, Mathematical Bold Small Z
 {0x6d05, 0x336a, 0x2212}, // −, \minus, Minus Sign
 {0x7304, 0x3370, 0x2AAC}, // ⪬, \smte, Smaller Than Or Equal To
-{0x7403, 0x3375, 0x1D682}, // 𝚂, \ttS, Mathematical Monospace Capital S
+{0x7403, 0x3375, 0xDE82'D835}, // U+1D682, 𝚂, \ttS, Mathematical Monospace Capital S
 {0x7504, 0x3379, 0x039C}, // Μ, \upMu, Greek Capital Letter Mu
 {0x4504, 0x337e, 0x2A56}, // ⩖, \ElOr, Two Intersecting Logical Or
 {0x7304, 0x3383, 0x0336}, // ̶, \sout, Combining Long Stroke Overlay / Non-Spacing Long Bar Overlay
-{0x7403, 0x3388, 0x1D683}, // 𝚃, \ttT, Mathematical Monospace Capital T
+{0x7403, 0x3388, 0xDE83'D835}, // U+1D683, 𝚃, \ttT, Mathematical Monospace Capital T
 {0x7307, 0x338c, 0x220A}, // ∊, \smallin, Small Element Of
-{0x7403, 0x3394, 0x1D684}, // 𝚄, \ttU, Mathematical Monospace Capital U
-{0x6205, 0x3398, 0x1D753}, // 𝝓, \biphi, Mathematical Bold Italic Phi Symbol
-{0x7403, 0x339e, 0x1D685}, // 𝚅, \ttV, Mathematical Monospace Capital V
+{0x7403, 0x3394, 0xDE84'D835}, // U+1D684, 𝚄, \ttU, Mathematical Monospace Capital U
+{0x6205, 0x3398, 0xDF53'D835}, // U+1D753, 𝝓, \biphi, Mathematical Bold Italic Phi Symbol
+{0x7403, 0x339e, 0xDE85'D835}, // U+1D685, 𝚅, \ttV, Mathematical Monospace Capital V
 {0x6809, 0x33a2, 0x00AF}, // ¯, \highminus, Macron / Spacing Macron
-{0x7403, 0x33ac, 0x1D686}, // 𝚆, \ttW, Mathematical Monospace Capital W
+{0x7403, 0x33ac, 0xDE86'D835}, // U+1D686, 𝚆, \ttW, Mathematical Monospace Capital W
 {0x6706, 0x33b0, 0x2A94}, // ⪔, \gesles, Greater-Than Above Slanted Equal Above Less-Than Above Slanted Equal
 {0x6c0d, 0x33b7, 0x27F5}, // ⟵, \longleftarrow, Long Leftwards Arrow
 {0x7308, 0x33c5, 0x2A6B}, // ⩫, \simrdots, Tilde Operator With Rising Dots
-{0x7403, 0x33ce, 0x1D687}, // 𝚇, \ttX, Mathematical Monospace Capital X
+{0x7403, 0x33ce, 0xDE87'D835}, // U+1D687, 𝚇, \ttX, Mathematical Monospace Capital X
 {0x7411, 0x33d2, 0x21A0}, // ↠, \twoheadrightarrow, Rightwards Two Headed Arrow / Right Two Headed Arrow
 {0x4503, 0x33e4, 0x0397}, // Η, \Eta, Greek Capital Letter Eta
 {0x630e, 0x33e8, 0x21B5}, // ↵, \carriagereturn, Downwards Arrow With Corner Leftwards / Down Arrow With Corner Left
 {0x6906, 0x33f7, 0x2A0E}, // ⨎, \intBar, Integral With Double Stroke
 {0x7306, 0x33fe, 0x2A16}, // ⨖, \sqrint, Quaternion Integral Operator
 {0x7307, 0x3405, 0x2A24}, // ⨤, \simplus, Plus Sign With Tilde Above
-{0x7403, 0x340d, 0x1D688}, // 𝚈, \ttY, Mathematical Monospace Capital Y
+{0x7403, 0x340d, 0xDE88'D835}, // U+1D688, 𝚈, \ttY, Mathematical Monospace Capital Y
 {0x6406, 0x3411, 0x23A3}, // ⎣, \dlcorn, Left Square Bracket Lower Corner
 {0x6d0f, 0x3418, 0x29A8}, // ⦨, \measanglerutone, Measured Angle With Open Arm Ending In Arrow Pointing Up And Right
 {0x700a, 0x3428, 0x3012}, // 〒, \postalmark, Postal Mark
-{0x7403, 0x3433, 0x1D689}, // 𝚉, \ttZ, Mathematical Monospace Capital Z
+{0x7403, 0x3433, 0xDE89'D835}, // U+1D689, 𝚉, \ttZ, Mathematical Monospace Capital Z
 {0x7608, 0x3437, 0x03D1}, // ϑ, \vartheta, Greek Theta Symbol / Greek Small Letter Script Theta
 {0x760a, 0x3440, 0x2A5B}, // ⩛, \veemidvert, Logical Or With Middle Stem
 {0x6205, 0x344b, 0x2140}, // ⅀, \bbsum, Double-Struck N-Ary Summation
@@ -2081,624 +2081,624 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x750f, 0x3468, 0x20EF}, // ⃯, \underrightarrow, Combining Right Arrow Below
 {0x4507, 0x3478, 0x0395}, // Ε, \Epsilon, Greek Capital Letter Epsilon
 {0x6207, 0x3480, 0x226C}, // ≬, \between, Between
-{0x6209, 0x3488, 0x1D757}, // 𝝗, \bsansBeta, Mathematical Sans-Serif Bold Capital Beta
-{0x620a, 0x3492, 0x1D75D}, // 𝝝, \bsansTheta, Mathematical Sans-Serif Bold Capital Theta
+{0x6209, 0x3488, 0xDF57'D835}, // U+1D757, 𝝗, \bsansBeta, Mathematical Sans-Serif Bold Capital Beta
+{0x620a, 0x3492, 0xDF5D'D835}, // U+1D75D, 𝝝, \bsansTheta, Mathematical Sans-Serif Bold Capital Theta
 {0x7202, 0x349d, 0x0322}, // ̢, \rh, Combining Retroflex Hook Below / Non-Spacing Retroflex Hook Below
 {0x730b, 0x34a0, 0x25AB}, // ▫, \smwhtsquare, White Small Square
 {0x520b, 0x34ac, 0x29F4}, // ⧴, \RuleDelayed, Rule-Delayed
 {0x6207, 0x34b8, 0x23E3}, // ⏣, \benzenr, Benzene Ring With Circle
-{0x620a, 0x34c0, 0x1D759}, // 𝝙, \bsansDelta, Mathematical Sans-Serif Bold Capital Delta
+{0x620a, 0x34c0, 0xDF59'D835}, // U+1D759, 𝝙, \bsansDelta, Mathematical Sans-Serif Bold Capital Delta
 {0x6309, 0x34cb, 0x2A0F}, // ⨏, \clockoint, Integral Average With Slash
 {0x650d, 0x34d5, 0x29B2}, // ⦲, \emptysetocirc, Empty Set With Small Circle Above
 {0x6e0a, 0x34e3, 0x0338'2AC6}, // ⫆̸, \nsupseteqq, Superset Of Above Equals Sign + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x7004, 0x34ee, 0x27C2}, // ⟂, \perp, Perpendicular
-{0x6206, 0x34f3, 0x1D7E1}, // 𝟡, \bbnine, Mathematical Double-Struck Digit Nine
+{0x6206, 0x34f3, 0xDFE1'D835}, // U+1D7E1, 𝟡, \bbnine, Mathematical Double-Struck Digit Nine
 {0x7305, 0x34fa, 0x032A}, // ̪, \sbbrg, Combining Bridge Below / Non-Spacing Bridge Below
 {0x740d, 0x3500, 0x2905}, // ⤅, \twoheadmapsto, Rightwards Two-Headed Arrow From Bar
 {0x5e06, 0x350e, 0x1D5E}, // ᵞ, \^gamma, Modifier Letter Small Greek Gamma
-{0x6205, 0x3515, 0x1D6D5}, // 𝛕, \bftau, Mathematical Bold Small Tau
-{0x6209, 0x351b, 0x1D778}, // 𝝸, \bsansiota, Mathematical Sans-Serif Bold Small Iota
+{0x6205, 0x3515, 0xDED5'D835}, // U+1D6D5, 𝛕, \bftau, Mathematical Bold Small Tau
+{0x6209, 0x351b, 0xDF78'D835}, // U+1D778, 𝝸, \bsansiota, Mathematical Sans-Serif Bold Small Iota
 {0x640a, 0x3525, 0x29FA}, // ⧺, \doubleplus, Double Plus
-{0x7403, 0x3530, 0x1D68A}, // 𝚊, \tta, Mathematical Monospace Small A
+{0x7403, 0x3530, 0xDE8A'D835}, // U+1D68A, 𝚊, \tta, Mathematical Monospace Small A
 {0x7610, 0x3534, 0x22B3}, // ⊳, \vartriangleright, Contains As Normal Subgroup
 {0x7202, 0x3545, 0x027C}, // ɼ, \rl, Latin Small Letter R With Long Leg
-{0x7403, 0x3548, 0x1D68B}, // 𝚋, \ttb, Mathematical Monospace Small B
+{0x7403, 0x3548, 0xDE8B'D835}, // U+1D68B, 𝚋, \ttb, Mathematical Monospace Small B
 {0x620f, 0x354c, 0x25BD}, // ▽, \bigtriangledown, White Down-Pointing Triangle / White Down Pointing Triangle
 {0x730b, 0x355c, 0x25AA}, // ▪, \smblksquare, Black Small Square
-{0x7403, 0x3568, 0x1D68C}, // 𝚌, \ttc, Mathematical Monospace Small C
+{0x7403, 0x3568, 0xDE8C'D835}, // U+1D68C, 𝚌, \ttc, Mathematical Monospace Small C
 {0x620b, 0x356c, 0x03F6}, // ϶, \backepsilon, Greek Reversed Lunate Epsilon Symbol
 {0x7307, 0x3578, 0x27C9}, // ⟉, \suphsol, Superset Preceding Solidus
-{0x7403, 0x3580, 0x1D68D}, // 𝚍, \ttd, Mathematical Monospace Small D
-{0x6903, 0x3584, 0x1D434}, // 𝐴, \itA, Mathematical Italic Capital A
+{0x7403, 0x3580, 0xDE8D'D835}, // U+1D68D, 𝚍, \ttd, Mathematical Monospace Small D
+{0x6903, 0x3584, 0xDC34'D835}, // U+1D434, 𝐴, \itA, Mathematical Italic Capital A
 {0x6e07, 0x3588, 0x266E}, // ♮, \natural, Music Natural Sign / Natural
 {0x7305, 0x3590, 0x2323}, // ⌣, \smile, Smile
-{0x7403, 0x3596, 0x1D68E}, // 𝚎, \tte, Mathematical Monospace Small E
+{0x7403, 0x3596, 0xDE8E'D835}, // U+1D68E, 𝚎, \tte, Mathematical Monospace Small E
 {0x7405, 0x359a, 0x03B8}, // θ, \theta, Greek Small Letter Theta
 {0x6206, 0x35a0, 0x22C2}, // ⋂, \bigcap, N-Ary Intersection
-{0x620b, 0x35a7, 0x1D7B1}, // 𝞱, \bisanstheta, Mathematical Sans-Serif Bold Italic Small Theta
-{0x620c, 0x35b3, 0x1D784}, // 𝞄, \bsansupsilon, Mathematical Sans-Serif Bold Small Upsilon
+{0x620b, 0x35a7, 0xDFB1'D835}, // U+1D7B1, 𝞱, \bisanstheta, Mathematical Sans-Serif Bold Italic Small Theta
+{0x620c, 0x35b3, 0xDF84'D835}, // U+1D784, 𝞄, \bsansupsilon, Mathematical Sans-Serif Bold Small Upsilon
 {0x6405, 0x35c0, 0x03B4}, // δ, \delta, Greek Small Letter Delta
 {0x650b, 0x35c6, 0x2A95}, // ⪕, \eqslantless, Slanted Equal To Or Less-Than
-{0x6903, 0x35d2, 0x1D435}, // 𝐵, \itB, Mathematical Italic Capital B
+{0x6903, 0x35d2, 0xDC35'D835}, // U+1D435, 𝐵, \itB, Mathematical Italic Capital B
 {0x6c0e, 0x35d6, 0x21DC}, // ⇜, \leftsquigarrow, Leftwards Squiggle Arrow / Left Squiggle Arrow
 {0x6d03, 0x35e5, 0x2127}, // ℧, \mho, Inverted Ohm Sign / Mho
-{0x7403, 0x35e9, 0x1D68F}, // 𝚏, \ttf, Mathematical Monospace Small F
-{0x620b, 0x35ed, 0x1D7AD}, // 𝞭, \bisansdelta, Mathematical Sans-Serif Bold Italic Small Delta
+{0x7403, 0x35e9, 0xDE8F'D835}, // U+1D68F, 𝚏, \ttf, Mathematical Monospace Small F
+{0x620b, 0x35ed, 0xDFAD'D835}, // U+1D7AD, 𝞭, \bisansdelta, Mathematical Sans-Serif Bold Italic Small Delta
 {0x6606, 0x35f9, 0x2200}, // ∀, \forall, For All
-{0x6903, 0x3600, 0x1D436}, // 𝐶, \itC, Mathematical Italic Capital C
+{0x6903, 0x3600, 0xDC36'D835}, // U+1D436, 𝐶, \itC, Mathematical Italic Capital C
 {0x7005, 0x3604, 0x0264}, // ɤ, \pbgam, Latin Small Letter Rams Horn / Latin Small Letter Baby Gamma
 {0x7202, 0x360a, 0x2019}, // ’, \rq, Right Single Quotation Mark / Single Comma Quotation Mark
-{0x7403, 0x360d, 0x1D690}, // 𝚐, \ttg, Mathematical Monospace Small G
-{0x620c, 0x3611, 0x1D764}, // 𝝤, \bsansOmicron, Mathematical Sans-Serif Bold Capital Omicron
-{0x6903, 0x361e, 0x1D437}, // 𝐷, \itD, Mathematical Italic Capital D
+{0x7403, 0x360d, 0xDE90'D835}, // U+1D690, 𝚐, \ttg, Mathematical Monospace Small G
+{0x620c, 0x3611, 0xDF64'D835}, // U+1D764, 𝝤, \bsansOmicron, Mathematical Sans-Serif Bold Capital Omicron
+{0x6903, 0x361e, 0xDC37'D835}, // U+1D437, 𝐷, \itD, Mathematical Italic Capital D
 {0x7209, 0x3622, 0x263D}, // ☽, \rightmoon, First Quarter Moon
 {0x730c, 0x362c, 0x2AC9}, // ⫉, \subsetapprox, Subset Of Above Almost Equal To
-{0x7403, 0x3639, 0x1D691}, // 𝚑, \tth, Mathematical Monospace Small H
+{0x7403, 0x3639, 0xDE91'D835}, // U+1D691, 𝚑, \tth, Mathematical Monospace Small H
 {0x4505, 0x363d, 0x2A75}, // ⩵, \Equal, Two Consecutive Equals Signs
-{0x6204, 0x3643, 0x1D745}, // 𝝅, \bipi, Mathematical Bold Italic Small Pi
+{0x6204, 0x3643, 0xDF45'D835}, // U+1D745, 𝝅, \bipi, Mathematical Bold Italic Small Pi
 {0x6207, 0x3648, 0x229E}, // ⊞, \boxplus, Squared Plus
-{0x6903, 0x3650, 0x1D438}, // 𝐸, \itE, Mathematical Italic Capital E
+{0x6903, 0x3650, 0xDC38'D835}, // U+1D438, 𝐸, \itE, Mathematical Italic Capital E
 {0x6c13, 0x3654, 0x2B42}, // ⭂, \leftarrowbackapprox, Leftwards Arrow Above Reverse Almost Equal To
 {0x6e10, 0x3668, 0x22ED}, // ⋭, \ntrianglerighteq, Does Not Contain As Normal Subgroup Or Equal
-{0x7403, 0x3679, 0x1D692}, // 𝚒, \tti, Mathematical Monospace Small I
+{0x7403, 0x3679, 0xDE92'D835}, // U+1D692, 𝚒, \tti, Mathematical Monospace Small I
 {0x6206, 0x367d, 0x2022}, // •, \bullet, Bullet
-{0x620a, 0x3684, 0x1D72D}, // 𝜭, \bivarTheta, Mathematical Bold Italic Capital Theta Symbol
-{0x6903, 0x368f, 0x1D439}, // 𝐹, \itF, Mathematical Italic Capital F
-{0x7403, 0x3693, 0x1D693}, // 𝚓, \ttj, Mathematical Monospace Small J
+{0x620a, 0x3684, 0xDF2D'D835}, // U+1D72D, 𝜭, \bivarTheta, Mathematical Bold Italic Capital Theta Symbol
+{0x6903, 0x368f, 0xDC39'D835}, // U+1D439, 𝐹, \itF, Mathematical Italic Capital F
+{0x7403, 0x3693, 0xDE93'D835}, // U+1D693, 𝚓, \ttj, Mathematical Monospace Small J
 {0x6303, 0x3697, 0x2229}, // ∩, \cap, Intersection
-{0x6903, 0x369b, 0x1D43A}, // 𝐺, \itG, Mathematical Italic Capital G
-{0x7403, 0x369f, 0x1D694}, // 𝚔, \ttk, Mathematical Monospace Small K
+{0x6903, 0x369b, 0xDC3A'D835}, // U+1D43A, 𝐺, \itG, Mathematical Italic Capital G
+{0x7403, 0x369f, 0xDE94'D835}, // U+1D694, 𝚔, \ttk, Mathematical Monospace Small K
 {0x750a, 0x36a3, 0x03D9}, // ϙ, \upoldkoppa, Greek Small Letter Archaic Koppa
-{0x6903, 0x36ae, 0x1D43B}, // 𝐻, \itH, Mathematical Italic Capital H
-{0x7403, 0x36b2, 0x1D695}, // 𝚕, \ttl, Mathematical Monospace Small L
+{0x6903, 0x36ae, 0xDC3B'D835}, // U+1D43B, 𝐻, \itH, Mathematical Italic Capital H
+{0x7403, 0x36b2, 0xDE95'D835}, // U+1D695, 𝚕, \ttl, Mathematical Monospace Small L
 {0x7711, 0x36b6, 0x25BB}, // ▻, \whitepointerright, White Right-Pointing Pointer / White Right Pointing Pointer
 {0x5306, 0x36c8, 0x22D0}, // ⋐, \Subset, Double Subset
-{0x6903, 0x36cf, 0x1D43C}, // 𝐼, \itI, Mathematical Italic Capital I
+{0x6903, 0x36cf, 0xDC3C'D835}, // U+1D43C, 𝐼, \itI, Mathematical Italic Capital I
 {0x6c0f, 0x36d3, 0x2B31}, // ⬱, \leftthreearrows, Three Leftwards Arrows
-{0x7403, 0x36e3, 0x1D696}, // 𝚖, \ttm, Mathematical Monospace Small M
+{0x7403, 0x36e3, 0xDE96'D835}, // U+1D696, 𝚖, \ttm, Mathematical Monospace Small M
 {0x5003, 0x36e7, 0x03A6}, // Φ, \Phi, Greek Capital Letter Phi
 {0x6209, 0x36eb, 0x29C7}, // ⧇, \boxcircle, Squared Small Circle
-{0x620e, 0x36f5, 0x1D7C5}, // 𝟅, \bisansvartheta, Mathematical Sans-Serif Bold Italic Theta Symbol
+{0x620e, 0x36f5, 0xDFC5'D835}, // U+1D7C5, 𝟅, \bisansvartheta, Mathematical Sans-Serif Bold Italic Theta Symbol
 {0x630c, 0x3704, 0x2A4C}, // ⩌, \closedvarcup, Closed Union With Serifs
 {0x670a, 0x3711, 0x2A8C}, // ⪌, \gtreqqless, Greater-Than Above Double-Line Equal Above Less-Than
-{0x6903, 0x371c, 0x1D43D}, // 𝐽, \itJ, Mathematical Italic Capital J
+{0x6903, 0x371c, 0xDC3D'D835}, // U+1D43D, 𝐽, \itJ, Mathematical Italic Capital J
 {0x6904, 0x3720, 0x028C}, // ʌ, \invv, Latin Small Letter Turned V
 {0x6c04, 0x3725, 0x2A87}, // ⪇, \lneq, Less-Than And Single-Line Not Equal To
 {0x7212, 0x372a, 0x2B53}, // ⭓, \rightpentagonblack, Black Right-Pointing Pentagon
-{0x7403, 0x373d, 0x1D697}, // 𝚗, \ttn, Mathematical Monospace Small N
+{0x7403, 0x373d, 0xDE97'D835}, // U+1D697, 𝚗, \ttn, Mathematical Monospace Small N
 {0x7504, 0x3741, 0x27D2}, // ⟒, \upin, Element Of Opening Upwards
-{0x6903, 0x3746, 0x1D43E}, // 𝐾, \itK, Mathematical Italic Capital K
+{0x6903, 0x3746, 0xDC3E'D835}, // U+1D43E, 𝐾, \itK, Mathematical Italic Capital K
 {0x6904, 0x374a, 0x028D}, // ʍ, \invw, Latin Small Letter Turned W
 {0x6c13, 0x374f, 0x2966}, // ⥦, \leftrightharpoonsup, Leftwards Harpoon With Barb Up Above Rightwards Harpoon With Barb Up
 {0x730b, 0x3763, 0x2650}, // ♐, \sagittarius, Sagittarius
-{0x7403, 0x376f, 0x1D698}, // 𝚘, \tto, Mathematical Monospace Small O
+{0x7403, 0x376f, 0xDE98'D835}, // U+1D698, 𝚘, \tto, Mathematical Monospace Small O
 {0x5903, 0x3773, 0x2144}, // ⅄, \Yup, Turned Sans-Serif Capital Y
 {0x6105, 0x3777, 0x2220}, // ∠, \angle, Angle
-{0x6206, 0x377d, 0x1D724}, // 𝜤, \biIota, Mathematical Bold Italic Capital Iota
-{0x6903, 0x3784, 0x1D43F}, // 𝐿, \itL, Mathematical Italic Capital L
+{0x6206, 0x377d, 0xDF24'D835}, // U+1D724, 𝜤, \biIota, Mathematical Bold Italic Capital Iota
+{0x6903, 0x3784, 0xDC3F'D835}, // U+1D43F, 𝐿, \itL, Mathematical Italic Capital L
 {0x7007, 0x3788, 0x227E}, // ≾, \precsim, Precedes Or Equivalent To
-{0x7403, 0x3790, 0x1D699}, // 𝚙, \ttp, Mathematical Monospace Small P
-{0x6209, 0x3794, 0x1D7C0}, // 𝟀, \bisanschi, Mathematical Sans-Serif Bold Italic Small Chi
-{0x6903, 0x379e, 0x1D440}, // 𝑀, \itM, Mathematical Italic Capital M
+{0x7403, 0x3790, 0xDE99'D835}, // U+1D699, 𝚙, \ttp, Mathematical Monospace Small P
+{0x6209, 0x3794, 0xDFC0'D835}, // U+1D7C0, 𝟀, \bisanschi, Mathematical Sans-Serif Bold Italic Small Chi
+{0x6903, 0x379e, 0xDC40'D835}, // U+1D440, 𝑀, \itM, Mathematical Italic Capital M
 {0x720d, 0x37a2, 0x2B54}, // ⭔, \rightpentagon, White Right-Pointing Pentagon
-{0x7403, 0x37b0, 0x1D69A}, // 𝚚, \ttq, Mathematical Monospace Small Q
-{0x6903, 0x37b4, 0x1D441}, // 𝑁, \itN, Mathematical Italic Capital N
+{0x7403, 0x37b0, 0xDE9A'D835}, // U+1D69A, 𝚚, \ttq, Mathematical Monospace Small Q
+{0x6903, 0x37b4, 0xDC41'D835}, // U+1D441, 𝑁, \itN, Mathematical Italic Capital N
 {0x7307, 0x37b8, 0x2198}, // ↘, \searrow, South East Arrow / Lower Right Arrow
-{0x7403, 0x37c0, 0x1D69B}, // 𝚛, \ttr, Mathematical Monospace Small R
+{0x7403, 0x37c0, 0xDE9B'D835}, // U+1D69B, 𝚛, \ttr, Mathematical Monospace Small R
 {0x4c09, 0x37c4, 0x21D0}, // ⇐, \Leftarrow, Leftwards Double Arrow / Left Double Arrow
-{0x6903, 0x37ce, 0x1D442}, // 𝑂, \itO, Mathematical Italic Capital O
+{0x6903, 0x37ce, 0xDC42'D835}, // U+1D442, 𝑂, \itO, Mathematical Italic Capital O
 {0x7308, 0x37d2, 0x2286}, // ⊆, \subseteq, Subset Of Or Equal To
-{0x7403, 0x37db, 0x1D69C}, // 𝚜, \tts, Mathematical Monospace Small S
+{0x7403, 0x37db, 0xDE9C'D835}, // U+1D69C, 𝚜, \tts, Mathematical Monospace Small S
 {0x6407, 0x37df, 0x22C4}, // ⋄, \diamond, Diamond Operator
-{0x6903, 0x37e7, 0x1D443}, // 𝑃, \itP, Mathematical Italic Capital P
-{0x6904, 0x37eb, 0x1D707}, // 𝜇, \itmu, Mathematical Italic Small Mu
-{0x7403, 0x37f0, 0x1D69D}, // 𝚝, \ttt, Mathematical Monospace Small T
+{0x6903, 0x37e7, 0xDC43'D835}, // U+1D443, 𝑃, \itP, Mathematical Italic Capital P
+{0x6904, 0x37eb, 0xDF07'D835}, // U+1D707, 𝜇, \itmu, Mathematical Italic Small Mu
+{0x7403, 0x37f0, 0xDE9D'D835}, // U+1D69D, 𝚝, \ttt, Mathematical Monospace Small T
 {0x7504, 0x37f4, 0x039D}, // Ν, \upNu, Greek Capital Letter Nu
 {0x770f, 0x37f9, 0x20E9}, // ⃩, \widebridgeabove, Combining Wide Bridge Above
 {0x3102, 0x3809, 0x215F}, // ⅟, \1/, Fraction Numerator One
-{0x6209, 0x380c, 0x1D74A}, // 𝝊, \biupsilon, Mathematical Bold Italic Small Upsilon
-{0x620a, 0x3816, 0x1D798}, // 𝞘, \bisansIota, Mathematical Sans-Serif Bold Italic Capital Iota
+{0x6209, 0x380c, 0xDF4A'D835}, // U+1D74A, 𝝊, \biupsilon, Mathematical Bold Italic Small Upsilon
+{0x620a, 0x3816, 0xDF98'D835}, // U+1D798, 𝞘, \bisansIota, Mathematical Sans-Serif Bold Italic Capital Iota
 {0x6413, 0x3821, 0x291F}, // ⤟, \diamondleftarrowbar, Leftwards Arrow From Bar To Black Diamond
 {0x6505, 0x3835, 0x212F}, // ℯ, \euler, Script Small E
-{0x6903, 0x383b, 0x1D444}, // 𝑄, \itQ, Mathematical Italic Capital Q
+{0x6903, 0x383b, 0xDC44'D835}, // U+1D444, 𝑄, \itQ, Mathematical Italic Capital Q
 {0x6d0d, 0x383f, 0x25CF}, // ●, \mdlgblkcircle, Black Circle
 {0x7307, 0x384d, 0x2AC4}, // ⫄, \supedot, Superset Of Or Equal To With Dot Above
 {0x7308, 0x3855, 0x223F}, // ∿, \sinewave, Sine Wave
-{0x7403, 0x385e, 0x1D69E}, // 𝚞, \ttu, Mathematical Monospace Small U
+{0x7403, 0x385e, 0xDE9E'D835}, // U+1D69E, 𝚞, \ttu, Mathematical Monospace Small U
 {0x4904, 0x3862, 0x0399}, // Ι, \Iota, Greek Capital Letter Iota
 {0x500c, 0x3867, 0x214A}, // ⅊, \PropertyLine, Property Line
 {0x5304, 0x3874, 0x2ABC}, // ⪼, \Succ, Double Succeeds
-{0x6207, 0x3879, 0x1D71C}, // 𝜜, \biAlpha, Mathematical Bold Italic Capital Alpha
+{0x6207, 0x3879, 0xDF1C'D835}, // U+1D71C, 𝜜, \biAlpha, Mathematical Bold Italic Capital Alpha
 {0x6805, 0x3881, 0x0195}, // ƕ, \hvlig, Latin Small Letter Hv / Latin Small Letter H V
-{0x6903, 0x3887, 0x1D445}, // 𝑅, \itR, Mathematical Italic Capital R
-{0x6907, 0x388b, 0x1D6A5}, // 𝚥, \itjmath, Mathematical Italic Small Dotless J
+{0x6903, 0x3887, 0xDC45'D835}, // U+1D445, 𝑅, \itR, Mathematical Italic Capital R
+{0x6907, 0x388b, 0xDEA5'D835}, // U+1D6A5, 𝚥, \itjmath, Mathematical Italic Small Dotless J
 {0x6f09, 0x3893, 0x29C0}, // ⧀, \olessthan, Circled Less-Than
 {0x7305, 0x389d, 0x2294}, // ⊔, \sqcup, Square Cup
-{0x7403, 0x38a3, 0x1D69F}, // 𝚟, \ttv, Mathematical Monospace Small V
+{0x7403, 0x38a3, 0xDE9F'D835}, // U+1D69F, 𝚟, \ttv, Mathematical Monospace Small V
 {0x5307, 0x38a7, 0x21D9}, // ⇙, \Swarrow, South West Double Arrow / Lower Left Double Arrow
-{0x6209, 0x38af, 0x1D72A}, // 𝜪, \biOmicron, Mathematical Bold Italic Capital Omicron
-{0x6903, 0x38b9, 0x1D446}, // 𝑆, \itS, Mathematical Italic Capital S
-{0x7403, 0x38bd, 0x1D6A0}, // 𝚠, \ttw, Mathematical Monospace Small W
+{0x6209, 0x38af, 0xDF2A'D835}, // U+1D72A, 𝜪, \biOmicron, Mathematical Bold Italic Capital Omicron
+{0x6903, 0x38b9, 0xDC46'D835}, // U+1D446, 𝑆, \itS, Mathematical Italic Capital S
+{0x7403, 0x38bd, 0xDEA0'D835}, // U+1D6A0, 𝚠, \ttw, Mathematical Monospace Small W
 {0x4206, 0x38c1, 0x224E}, // ≎, \Bumpeq, Geometrically Equivalent To
-{0x6903, 0x38c8, 0x1D447}, // 𝑇, \itT, Mathematical Italic Capital T
+{0x6903, 0x38c8, 0xDC47'D835}, // U+1D447, 𝑇, \itT, Mathematical Italic Capital T
 {0x730a, 0x38cc, 0x23B7}, // ⎷, \sqrtbottom, Radical Symbol Bottom
 {0x730e, 0x38d7, 0x2B13}, // ⬓, \squarebotblack, Square With Bottom Half Black
-{0x7403, 0x38e6, 0x1D6A1}, // 𝚡, \ttx, Mathematical Monospace Small X
+{0x7403, 0x38e6, 0xDEA1'D835}, // U+1D6A1, 𝚡, \ttx, Mathematical Monospace Small X
 {0x7714, 0x38ea, 0x27C1}, // ⟁, \whiteinwhitetriangle, White Triangle Containing Small White Triangle
 {0x4c03, 0x38ff, 0x21B0}, // ↰, \Lsh, Upwards Arrow With Tip Leftwards / Up Arrow With Tip Left
 {0x6204, 0x3903, 0x026C}, // ɬ, \btdl, Latin Small Letter L With Belt / Latin Small Letter L Belt
-{0x620c, 0x3908, 0x1D7C8}, // 𝟈, \bisansvarrho, Mathematical Sans-Serif Bold Italic Rho Symbol
+{0x620c, 0x3908, 0xDFC8'D835}, // U+1D7C8, 𝟈, \bisansvarrho, Mathematical Sans-Serif Bold Italic Rho Symbol
 {0x6211, 0x3915, 0x2B41}, // ⭁, \bsimilarleftarrow, Reverse Tilde Operator Above Leftwards Arrow
 {0x6214, 0x3927, 0x2920}, // ⤠, \barrightarrowdiamond, Rightwards Arrow From Bar To Black Diamond
 {0x680a, 0x393c, 0x25AD}, // ▭, \hrectangle, White Rectangle
 {0x6903, 0x3947, 0x27FA}, // ⟺, \iff, Long Left Right Double Arrow
-{0x6903, 0x394b, 0x1D448}, // 𝑈, \itU, Mathematical Italic Capital U
-{0x7403, 0x394f, 0x1D6A2}, // 𝚢, \tty, Mathematical Monospace Small Y
-{0x6903, 0x3953, 0x1D449}, // 𝑉, \itV, Mathematical Italic Capital V
-{0x6907, 0x3957, 0x1D6A4}, // 𝚤, \itimath, Mathematical Italic Small Dotless I
+{0x6903, 0x394b, 0xDC48'D835}, // U+1D448, 𝑈, \itU, Mathematical Italic Capital U
+{0x7403, 0x394f, 0xDEA2'D835}, // U+1D6A2, 𝚢, \tty, Mathematical Monospace Small Y
+{0x6903, 0x3953, 0xDC49'D835}, // U+1D449, 𝑉, \itV, Mathematical Italic Capital V
+{0x6907, 0x3957, 0xDEA4'D835}, // U+1D6A4, 𝚤, \itimath, Mathematical Italic Small Dotless I
 {0x6c03, 0x395f, 0x2AAB}, // ⪫, \lat, Larger Than
-{0x7403, 0x3963, 0x1D6A3}, // 𝚣, \ttz, Mathematical Monospace Small Z
+{0x7403, 0x3963, 0xDEA3'D835}, // U+1D6A3, 𝚣, \ttz, Mathematical Monospace Small Z
 {0x620b, 0x3967, 0x2037}, // ‷, \backppprime, Reversed Triple Prime
-{0x6903, 0x3973, 0x1D44A}, // 𝑊, \itW, Mathematical Italic Capital W
-{0x6905, 0x3977, 0x1D713}, // 𝜓, \itpsi, Mathematical Italic Small Psi
+{0x6903, 0x3973, 0xDC4A'D835}, // U+1D44A, 𝑊, \itW, Mathematical Italic Capital W
+{0x6905, 0x3977, 0xDF13'D835}, // U+1D713, 𝜓, \itpsi, Mathematical Italic Small Psi
 {0x6e05, 0x397d, 0x226E}, // ≮, \nless, Not Less-Than / Not Less Than
 {0x6f0c, 0x3983, 0x29BC}, // ⦼, \odotslashdot, Circled Anticlockwise-Rotated Division Sign
-{0x7405, 0x3990, 0x1D7F8}, // 𝟸, \tttwo, Mathematical Monospace Digit Two
-{0x6206, 0x3996, 0x1D6B0}, // 𝚰, \bfIota, Mathematical Bold Capital Iota
+{0x7405, 0x3990, 0xDFF8'D835}, // U+1D7F8, 𝟸, \tttwo, Mathematical Monospace Digit Two
+{0x6206, 0x3996, 0xDEB0'D835}, // U+1D6B0, 𝚰, \bfIota, Mathematical Bold Capital Iota
 {0x640c, 0x399d, 0x2A62}, // ⩢, \doublebarvee, Logical Or With Double Overbar
-{0x6903, 0x39aa, 0x1D44B}, // 𝑋, \itX, Mathematical Italic Capital X
+{0x6903, 0x39aa, 0xDC4B'D835}, // U+1D44B, 𝑋, \itX, Mathematical Italic Capital X
 {0x6d03, 0x39ae, 0x2223}, // ∣, \mid, Divides
 {0x6e09, 0x39b2, 0x0338'2A7D}, // ⩽̸, \nleqslant, Less-Than Or Slanted Equal To + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x6f0a, 0x39bc, 0x2A2E}, // ⨮, \oplusrhrim, Plus Sign In Right Half Circle
 {0x7204, 0x39c7, 0x02D4}, // ˔, \rais, Modifier Letter Up Tack
 {0x730c, 0x39cc, 0x25F2}, // ◲, \squarelrquad, White Square With Lower Right Quadrant
-{0x6203, 0x39d9, 0x1D468}, // 𝑨, \biA, Mathematical Bold Italic Capital A
-{0x620c, 0x39dd, 0x1D6C6}, // 𝛆, \bfvarepsilon, Mathematical Bold Small Epsilon
+{0x6203, 0x39d9, 0xDC68'D835}, // U+1D468, 𝑨, \biA, Mathematical Bold Italic Capital A
+{0x620c, 0x39dd, 0xDEC6'D835}, // U+1D6C6, 𝛆, \bfvarepsilon, Mathematical Bold Small Epsilon
 {0x630f, 0x39ea, 0x21BA}, // ↺, \circlearrowleft, Anticlockwise Open Circle Arrow
-{0x6903, 0x39fa, 0x1D44C}, // 𝑌, \itY, Mathematical Italic Capital Y
+{0x6903, 0x39fa, 0xDC4C'D835}, // U+1D44C, 𝑌, \itY, Mathematical Italic Capital Y
 {0x6c12, 0x39fe, 0x2B33}, // ⬳, \longleftsquigarrow, Long Leftwards Squiggle Arrow
 {0x760d, 0x3a11, 0x22BF}, // ⊿, \varlrtriangle, Right Triangle
-{0x6203, 0x3a1f, 0x1D469}, // 𝑩, \biB, Mathematical Bold Italic Capital B
-{0x6207, 0x3a23, 0x1D77B}, // 𝝻, \bsansmu, Mathematical Sans-Serif Bold Small Mu
-{0x6903, 0x3a2b, 0x1D44D}, // 𝑍, \itZ, Mathematical Italic Capital Z
+{0x6203, 0x3a1f, 0xDC69'D835}, // U+1D469, 𝑩, \biB, Mathematical Bold Italic Capital B
+{0x6207, 0x3a23, 0xDF7B'D835}, // U+1D77B, 𝝻, \bsansmu, Mathematical Sans-Serif Bold Small Mu
+{0x6903, 0x3a2b, 0xDC4D'D835}, // U+1D44D, 𝑍, \itZ, Mathematical Italic Capital Z
 {0x7008, 0x3a2f, 0x2A28}, // ⨨, \plustrif, Plus Sign With Black Triangle
 {0x7309, 0x3a38, 0x2311}, // ⌑, \sqlozenge, Square Lozenge
 {0x7408, 0x3a42, 0x205D}, // ⁝, \tricolon, Tricolon
 {0x7507, 0x3a4b, 0x03DF}, // ϟ, \upkoppa, Greek Small Letter Koppa
 {0x5802, 0x3a53, 0x039E}, // Ξ, \Xi, Greek Capital Letter Xi
-{0x6203, 0x3a56, 0x1D46A}, // 𝑪, \biC, Mathematical Bold Italic Capital C
+{0x6203, 0x3a56, 0xDC6A'D835}, // U+1D46A, 𝑪, \biC, Mathematical Bold Italic Capital C
 {0x6705, 0x3a5a, 0x0300}, // ̀, \grave, Combining Grave Accent / Non-Spacing Grave
 {0x6e04, 0x3a60, 0x2241}, // ≁, \nsim, Not Tilde
 {0x7316, 0x3a65, 0x25C2}, // ◂, \smallblacktriangleleft, Black Left-Pointing Small Triangle / Black Left Pointing Small Triangle
 {0x7507, 0x3a7c, 0x03E1}, // ϡ, \upsampi, Greek Small Letter Sampi
-{0x6203, 0x3a84, 0x1D46B}, // 𝑫, \biD, Mathematical Bold Italic Capital D
+{0x6203, 0x3a84, 0xDC6B'D835}, // U+1D46B, 𝑫, \biD, Mathematical Bold Italic Capital D
 {0x6d08, 0x3a88, 0x2A2A}, // ⨪, \minusdot, Minus Sign With Dot Below
 {0x730d, 0x3a91, 0x25E9}, // ◩, \squareulblack, Square With Upper Left Diagonal Half Black
-{0x6203, 0x3a9f, 0x1D46C}, // 𝑬, \biE, Mathematical Bold Italic Capital E
+{0x6203, 0x3a9f, 0xDC6C'D835}, // U+1D46C, 𝑬, \biE, Mathematical Bold Italic Capital E
 {0x640f, 0x3aa3, 0x21C3}, // ⇃, \downharpoonleft, Downwards Harpoon With Barb Leftwards / Down Harpoon With Barb Left
 {0x6506, 0x3ab3, 0x22DC}, // ⋜, \eqless, Equal To Or Less-Than / Equal To Or Less Than
 {0x6506, 0x3aba, 0x2203}, // ∃, \exists, There Exists
 {0x5214, 0x3ac1, 0x296F}, // ⥯, \ReverseUpEquilibrium, Downwards Harpoon With Barb Left Beside Upwards Harpoon With Barb Right
-{0x6203, 0x3ad6, 0x1D46D}, // 𝑭, \biF, Mathematical Bold Italic Capital F
+{0x6203, 0x3ad6, 0xDC6D'D835}, // U+1D46D, 𝑭, \biF, Mathematical Bold Italic Capital F
 {0x6409, 0x3ada, 0x2910}, // ⤐, \drbkarrow, Rightwards Two-Headed Triple Dash Arrow
 {0x6e0e, 0x3ae4, 0x2279}, // ≹, \notgreaterless, Neither Greater-Than Nor Less-Than / Neither Greater Than Nor Less Than
 {0x760c, 0x3af3, 0x2664}, // ♤, \varspadesuit, White Spade Suit
-{0x6203, 0x3b00, 0x1D46E}, // 𝑮, \biG, Mathematical Bold Italic Capital G
+{0x6203, 0x3b00, 0xDC6E'D835}, // U+1D46E, 𝑮, \biG, Mathematical Bold Italic Capital G
 {0x6403, 0x3b04, 0x00F7}, // ÷, \div, Division Sign
 {0x720a, 0x3b08, 0x2192}, // →, \rightarrow, Rightwards Arrow / Right Arrow
 {0x7303, 0x3b13, 0x2AAA}, // ⪪, \smt, Smaller Than
-{0x6203, 0x3b17, 0x1D46F}, // 𝑯, \biH, Mathematical Bold Italic Capital H
+{0x6203, 0x3b17, 0xDC6F'D835}, // U+1D46F, 𝑯, \biH, Mathematical Bold Italic Capital H
 {0x6207, 0x3b1b, 0x29C4}, // ⧄, \boxdiag, Squared Rising Diagonal Slash
 {0x6c08, 0x3b23, 0x21B4}, // ↴, \linefeed, Rightwards Arrow With Corner Downwards / Right Arrow With Corner Down
 {0x6c0d, 0x3b2c, 0x21AB}, // ↫, \looparrowleft, Leftwards Arrow With Loop / Left Arrow With Loop
 {0x7513, 0x3b3a, 0x034D}, // ͍, \underleftrightarrow, Combining Left Right Arrow Below
-{0x6203, 0x3b4e, 0x1D470}, // 𝑰, \biI, Mathematical Bold Italic Capital I
-{0x6903, 0x3b52, 0x1D44E}, // 𝑎, \ita, Mathematical Italic Small A
+{0x6203, 0x3b4e, 0xDC70'D835}, // U+1D470, 𝑰, \biI, Mathematical Bold Italic Capital I
+{0x6903, 0x3b52, 0xDC4E'D835}, // U+1D44E, 𝑎, \ita, Mathematical Italic Small A
 {0x6c09, 0x3b56, 0x23B8}, // ⎸, \lvboxline, Left Vertical Box Line
 {0x6c11, 0x3b60, 0x21CB}, // ⇋, \leftrightharpoons, Leftwards Harpoon Over Rightwards Harpoon / Left Harpoon Over Right Harpoon
 {0x7404, 0x3b72, 0x02A7}, // ʧ, \tesh, Latin Small Letter Tesh Digraph / Latin Small Letter T Esh
 {0x4411, 0x3b77, 0x2956}, // ⥖, \DownLeftVectorBar, Leftwards Harpoon With Barb Down To Bar
 {0x4c0c, 0x3b89, 0x27FD}, // ⟽, \Longmapsfrom, Long Leftwards Double Arrow From Bar
-{0x6203, 0x3b96, 0x1D471}, // 𝑱, \biJ, Mathematical Bold Italic Capital J
+{0x6203, 0x3b96, 0xDC71'D835}, // U+1D471, 𝑱, \biJ, Mathematical Bold Italic Capital J
 {0x6208, 0x3b9a, 0x2A06}, // ⨆, \bigsqcup, N-Ary Square Union Operator
-{0x620d, 0x3ba3, 0x1D7B8}, // 𝞸, \bisansomicron, Mathematical Sans-Serif Bold Italic Small Omicron
-{0x6903, 0x3bb1, 0x1D44F}, // 𝑏, \itb, Mathematical Italic Small B
-{0x690a, 0x3bb5, 0x1D6F3}, // 𝛳, \itvarTheta, Mathematical Italic Capital Theta Symbol
-{0x6203, 0x3bc0, 0x1D472}, // 𝑲, \biK, Mathematical Bold Italic Capital K
-{0x6208, 0x3bc4, 0x1D7B5}, // 𝞵, \bisansmu, Mathematical Sans-Serif Bold Italic Small Mu
+{0x620d, 0x3ba3, 0xDFB8'D835}, // U+1D7B8, 𝞸, \bisansomicron, Mathematical Sans-Serif Bold Italic Small Omicron
+{0x6903, 0x3bb1, 0xDC4F'D835}, // U+1D44F, 𝑏, \itb, Mathematical Italic Small B
+{0x690a, 0x3bb5, 0xDEF3'D835}, // U+1D6F3, 𝛳, \itvarTheta, Mathematical Italic Capital Theta Symbol
+{0x6203, 0x3bc0, 0xDC72'D835}, // U+1D472, 𝑲, \biK, Mathematical Bold Italic Capital K
+{0x6208, 0x3bc4, 0xDFB5'D835}, // U+1D7B5, 𝞵, \bisansmu, Mathematical Sans-Serif Bold Italic Small Mu
 {0x6405, 0x3bcd, 0x2250}, // ≐, \doteq, Approaches The Limit
-{0x6903, 0x3bd3, 0x1D450}, // 𝑐, \itc, Mathematical Italic Small C
-{0x6906, 0x3bd7, 0x1D6E3}, // 𝛣, \itBeta, Mathematical Italic Capital Beta
-{0x6907, 0x3bde, 0x1D70E}, // 𝜎, \itsigma, Mathematical Italic Small Sigma
+{0x6903, 0x3bd3, 0xDC50'D835}, // U+1D450, 𝑐, \itc, Mathematical Italic Small C
+{0x6906, 0x3bd7, 0xDEE3'D835}, // U+1D6E3, 𝛣, \itBeta, Mathematical Italic Capital Beta
+{0x6907, 0x3bde, 0xDF0E'D835}, // U+1D70E, 𝜎, \itsigma, Mathematical Italic Small Sigma
 {0x760d, 0x3be6, 0x2219}, // ∙, \vysmblkcircle, Bullet Operator
-{0x6203, 0x3bf4, 0x1D473}, // 𝑳, \biL, Mathematical Bold Italic Capital L
+{0x6203, 0x3bf4, 0xDC73'D835}, // U+1D473, 𝑳, \biL, Mathematical Bold Italic Capital L
 {0x630b, 0x3bf8, 0x2231}, // ∱, \clwintegral, Clockwise Integral
-{0x6903, 0x3c04, 0x1D451}, // 𝑑, \itd, Mathematical Italic Small D
+{0x6903, 0x3c04, 0xDC51'D835}, // U+1D451, 𝑑, \itd, Mathematical Italic Small D
 {0x7309, 0x3c08, 0x228B}, // ⊋, \supsetneq, Superset Of With Not Equal To / Superset Of Or Not Equal To
-{0x6203, 0x3c12, 0x1D474}, // 𝑴, \biM, Mathematical Bold Italic Capital M
-{0x6208, 0x3c16, 0x1D740}, // 𝝀, \bilambda, Mathematical Bold Italic Small Lamda
+{0x6203, 0x3c12, 0xDC74'D835}, // U+1D474, 𝑴, \biM, Mathematical Bold Italic Capital M
+{0x6208, 0x3c16, 0xDF40'D835}, // U+1D740, 𝝀, \bilambda, Mathematical Bold Italic Small Lamda
 {0x6808, 0x3c1f, 0x2925}, // ⤥, \hksearow, South East Arrow With Hook
 {0x6810, 0x3c28, 0x22B9}, // ⊹, \hermitconjmatrix, Hermitian Conjugate Matrix
-{0x6903, 0x3c39, 0x1D452}, // 𝑒, \ite, Mathematical Italic Small E
-{0x690c, 0x3c3d, 0x1D700}, // 𝜀, \itvarepsilon, Mathematical Italic Small Epsilon
+{0x6903, 0x3c39, 0xDC52'D835}, // U+1D452, 𝑒, \ite, Mathematical Italic Small E
+{0x690c, 0x3c3d, 0xDF00'D835}, // U+1D700, 𝜀, \itvarepsilon, Mathematical Italic Small Epsilon
 {0x760d, 0x3c4a, 0x2B1D}, // ⬝, \vysmblksquare, Black Very Small Square
-{0x6203, 0x3c58, 0x1D475}, // 𝑵, \biN, Mathematical Bold Italic Capital N
-{0x6903, 0x3c5c, 0x1D453}, // 𝑓, \itf, Mathematical Italic Small F
-{0x6906, 0x3c60, 0x1D704}, // 𝜄, \itiota, Mathematical Italic Small Iota
+{0x6203, 0x3c58, 0xDC75'D835}, // U+1D475, 𝑵, \biN, Mathematical Bold Italic Capital N
+{0x6903, 0x3c5c, 0xDC53'D835}, // U+1D453, 𝑓, \itf, Mathematical Italic Small F
+{0x6906, 0x3c60, 0xDF04'D835}, // U+1D704, 𝜄, \itiota, Mathematical Italic Small Iota
 {0x6908, 0x3c67, 0x2A3D}, // ⨽, \intprodr, Righthand Interior Product
 {0x6c12, 0x3c70, 0x2962}, // ⥢, \leftharpoonsupdown, Leftwards Harpoon With Barb Up Above Leftwards Harpoon With Barb Down
 {0x6e06, 0x3c83, 0x26B2}, // ⚲, \neuter, Neuter
 {0x7302, 0x3c8a, 0x00DF}, // ß, \ss, Latin Small Letter Sharp S
 {0x7409, 0x3c8d, 0x2319}, // ⌙, \turnednot, Turned Not Sign
-{0x6203, 0x3c97, 0x1D476}, // 𝑶, \biO, Mathematical Bold Italic Capital O
+{0x6203, 0x3c97, 0xDC76'D835}, // U+1D476, 𝑶, \biO, Mathematical Bold Italic Capital O
 {0x6506, 0x3c9b, 0x2A76}, // ⩶, \eqeqeq, Three Consecutive Equals Signs
-{0x6903, 0x3ca2, 0x1D454}, // 𝑔, \itg, Mathematical Italic Small G
+{0x6903, 0x3ca2, 0xDC54'D835}, // U+1D454, 𝑔, \itg, Mathematical Italic Small G
 {0x730a, 0x3ca6, 0x2291}, // ⊑, \sqsubseteq, Square Image Of Or Equal To
-{0x6203, 0x3cb1, 0x1D477}, // 𝑷, \biP, Mathematical Bold Italic Capital P
+{0x6203, 0x3cb1, 0xDC77'D835}, // U+1D477, 𝑷, \biP, Mathematical Bold Italic Capital P
 {0x6306, 0x3cb5, 0x2A40}, // ⩀, \capdot, Intersection With Dot
 {0x6508, 0x3cbc, 0x23E7}, // ⏧, \elinters, Electrical Intersection
 {0x6903, 0x3cc5, 0x210E}, // ℎ, \ith, Planck Constant
 {0x6c05, 0x3cc9, 0x22E6}, // ⋦, \lnsim, Less-Than But Not Equivalent To / Less Than But Not Equivalent To
 {0x6c06, 0x3ccf, 0x27E8}, // ⟨, \langle, Mathematical Left Angle Bracket
 {0x7505, 0x3cd6, 0x25DC}, // ◜, \ularc, Upper Left Quadrant Circular Arc
-{0x6203, 0x3cdc, 0x1D478}, // 𝑸, \biQ, Mathematical Bold Italic Capital Q
-{0x6903, 0x3ce0, 0x1D456}, // 𝑖, \iti, Mathematical Italic Small I
-{0x6907, 0x3ce4, 0x1D6FA}, // 𝛺, \itOmega, Mathematical Italic Capital Omega
+{0x6203, 0x3cdc, 0xDC78'D835}, // U+1D478, 𝑸, \biQ, Mathematical Bold Italic Capital Q
+{0x6903, 0x3ce0, 0xDC56'D835}, // U+1D456, 𝑖, \iti, Mathematical Italic Small I
+{0x6907, 0x3ce4, 0xDEFA'D835}, // U+1D6FA, 𝛺, \itOmega, Mathematical Italic Capital Omega
 {0x6e07, 0x3cec, 0x2275}, // ≵, \ngtrsim, Neither Greater-Than Nor Equivalent To / Neither Greater Than Nor Equivalent To
 {0x740b, 0x3cf4, 0x27C0}, // ⟀, \threedangle, Three Dimensional Angle
 {0x7606, 0x3d00, 0x22FB}, // ⋻, \varnis, Contains With Vertical Bar At End Of Horizontal Stroke
-{0x6203, 0x3d07, 0x1D479}, // 𝑹, \biR, Mathematical Bold Italic Capital R
-{0x6903, 0x3d0b, 0x1D457}, // 𝑗, \itj, Mathematical Italic Small J
+{0x6203, 0x3d07, 0xDC79'D835}, // U+1D479, 𝑹, \biR, Mathematical Bold Italic Capital R
+{0x6903, 0x3d0b, 0xDC57'D835}, // U+1D457, 𝑗, \itj, Mathematical Italic Small J
 {0x6c03, 0x3d0f, 0x02D5}, // ˕, \low, Modifier Letter Down Tack
 {0x6d0b, 0x3d13, 0x26AB}, // ⚫, \mdblkcircle, Medium Black Circle
 {0x6d0c, 0x3d1f, 0x2B25}, // ⬥, \mdblkdiamond, Black Medium Diamond
-{0x6203, 0x3d2c, 0x1D47A}, // 𝑺, \biS, Mathematical Bold Italic Capital S
-{0x6903, 0x3d30, 0x1D458}, // 𝑘, \itk, Mathematical Italic Small K
+{0x6203, 0x3d2c, 0xDC7A'D835}, // U+1D47A, 𝑺, \biS, Mathematical Bold Italic Capital S
+{0x6903, 0x3d30, 0xDC58'D835}, // U+1D458, 𝑘, \itk, Mathematical Italic Small K
 {0x4412, 0x3d34, 0x2957}, // ⥗, \DownRightVectorBar, Rightwards Harpoon With Barb Down To Bar
-{0x6203, 0x3d47, 0x1D47B}, // 𝑻, \biT, Mathematical Bold Italic Capital T
+{0x6203, 0x3d47, 0xDC7B'D835}, // U+1D47B, 𝑻, \biT, Mathematical Bold Italic Capital T
 {0x6414, 0x3d4b, 0x296D}, // ⥭, \dashrightharpoondown, Rightwards Harpoon With Barb Down Below Long Dash
-{0x6903, 0x3d60, 0x1D459}, // 𝑙, \itl, Mathematical Italic Small L
+{0x6903, 0x3d60, 0xDC59'D835}, // U+1D459, 𝑙, \itl, Mathematical Italic Small L
 {0x6906, 0x3d64, 0x2A0C}, // ⨌, \iiiint, Quadruple Integral Operator
-{0x6907, 0x3d6b, 0x1D6E4}, // 𝛤, \itGamma, Mathematical Italic Capital Gamma
+{0x6907, 0x3d6b, 0xDEE4'D835}, // U+1D6E4, 𝛤, \itGamma, Mathematical Italic Capital Gamma
 {0x6d0b, 0x3d73, 0x25FC}, // ◼, \mdblksquare, Black Medium Square
-{0x6203, 0x3d7f, 0x1D47C}, // 𝑼, \biU, Mathematical Bold Italic Capital U
-{0x6204, 0x3d83, 0x1D6B3}, // 𝚳, \bfMu, Mathematical Bold Capital Mu
-{0x620a, 0x3d88, 0x1D779}, // 𝝹, \bsanskappa, Mathematical Sans-Serif Bold Small Kappa
+{0x6203, 0x3d7f, 0xDC7C'D835}, // U+1D47C, 𝑼, \biU, Mathematical Bold Italic Capital U
+{0x6204, 0x3d83, 0xDEB3'D835}, // U+1D6B3, 𝚳, \bfMu, Mathematical Bold Capital Mu
+{0x620a, 0x3d88, 0xDF79'D835}, // U+1D779, 𝝹, \bsanskappa, Mathematical Sans-Serif Bold Small Kappa
 {0x6704, 0x3d93, 0x2267}, // ≧, \geqq, Greater-Than Over Equal To / Greater Than Over Equal To
-{0x6903, 0x3d98, 0x1D45A}, // 𝑚, \itm, Mathematical Italic Small M
+{0x6903, 0x3d98, 0xDC5A'D835}, // U+1D45A, 𝑚, \itm, Mathematical Italic Small M
 {0x6907, 0x3d9c, 0x22F5}, // ⋵, \isindot, Element Of With Dot Above
 {0x6c0d, 0x3da4, 0x21BC}, // ↼, \leftharpoonup, Leftwards Harpoon With Barb Upwards / Left Harpoon With Barb Up
-{0x6203, 0x3db2, 0x1D47D}, // 𝑽, \biV, Mathematical Bold Italic Capital V
-{0x6206, 0x3db6, 0x1D56C}, // 𝕬, \bfrakA, Mathematical Bold Fraktur Capital A
-{0x6207, 0x3dbd, 0x1D6B1}, // 𝚱, \bfKappa, Mathematical Bold Capital Kappa
+{0x6203, 0x3db2, 0xDC7D'D835}, // U+1D47D, 𝑽, \biV, Mathematical Bold Italic Capital V
+{0x6206, 0x3db6, 0xDD6C'D835}, // U+1D56C, 𝕬, \bfrakA, Mathematical Bold Fraktur Capital A
+{0x6207, 0x3dbd, 0xDEB1'D835}, // U+1D6B1, 𝚱, \bfKappa, Mathematical Bold Capital Kappa
 {0x6209, 0x3dc5, 0x00A6}, // ¦, \brokenbar, Broken Bar / Broken Vertical Bar
-{0x620c, 0x3dcf, 0x1D73A}, // 𝜺, \bivarepsilon, Mathematical Bold Italic Small Epsilon
+{0x620c, 0x3dcf, 0xDF3A'D835}, // U+1D73A, 𝜺, \bivarepsilon, Mathematical Bold Italic Small Epsilon
 {0x6703, 0x3ddc, 0x2265}, // ≥, \geq, Greater-Than Or Equal To / Greater Than Or Equal To
-{0x6903, 0x3de0, 0x1D45B}, // 𝑛, \itn, Mathematical Italic Small N
+{0x6903, 0x3de0, 0xDC5B'D835}, // U+1D45B, 𝑛, \itn, Mathematical Italic Small N
 {0x440a, 0x3de4, 0x27F1}, // ⟱, \DDownarrow, Downwards Quadruple Arrow
 {0x4c11, 0x3def, 0x2961}, // ⥡, \LeftDownTeeVector, Downwards Harpoon With Barb Left From Bar
-{0x6203, 0x3e01, 0x1D47E}, // 𝑾, \biW, Mathematical Bold Italic Capital W
-{0x6206, 0x3e05, 0x1D56D}, // 𝕭, \bfrakB, Mathematical Bold Fraktur Capital B
+{0x6203, 0x3e01, 0xDC7E'D835}, // U+1D47E, 𝑾, \biW, Mathematical Bold Italic Capital W
+{0x6206, 0x3e05, 0xDD6D'D835}, // U+1D56D, 𝕭, \bfrakB, Mathematical Bold Fraktur Capital B
 {0x660c, 0x3e0c, 0x292C}, // ⤬, \fdiagovrdiag, Falling Diagonal Crossing Rising Diagonal
-{0x6903, 0x3e19, 0x1D45C}, // 𝑜, \ito, Mathematical Italic Small O
+{0x6903, 0x3e19, 0xDC5C'D835}, // U+1D45C, 𝑜, \ito, Mathematical Italic Small O
 {0x6a05, 0x3e1d, 0x0237}, // ȷ, \jmath, Latin Small Letter Dotless J
-{0x7309, 0x3e23, 0x1D7E5}, // 𝟥, \sansthree, Mathematical Sans-Serif Digit Three
+{0x7309, 0x3e23, 0xDFE5'D835}, // U+1D7E5, 𝟥, \sansthree, Mathematical Sans-Serif Digit Three
 {0x7708, 0x3e2d, 0x27D1}, // ⟑, \wedgedot, And With Dot
-{0x6203, 0x3e36, 0x1D47F}, // 𝑿, \biX, Mathematical Bold Italic Capital X
-{0x6206, 0x3e3a, 0x1D56E}, // 𝕮, \bfrakC, Mathematical Bold Fraktur Capital C
-{0x6208, 0x3e41, 0x1D7F2}, // 𝟲, \bsanssix, Mathematical Sans-Serif Bold Digit Six
-{0x6903, 0x3e4a, 0x1D45D}, // 𝑝, \itp, Mathematical Italic Small P
+{0x6203, 0x3e36, 0xDC7F'D835}, // U+1D47F, 𝑿, \biX, Mathematical Bold Italic Capital X
+{0x6206, 0x3e3a, 0xDD6E'D835}, // U+1D56E, 𝕮, \bfrakC, Mathematical Bold Fraktur Capital C
+{0x6208, 0x3e41, 0xDFF2'D835}, // U+1D7F2, 𝟲, \bsanssix, Mathematical Sans-Serif Bold Digit Six
+{0x6903, 0x3e4a, 0xDC5D'D835}, // U+1D45D, 𝑝, \itp, Mathematical Italic Small P
 {0x6f0a, 0x3e4e, 0x2A2D}, // ⨭, \opluslhrim, Plus Sign In Left Half Circle
 {0x7305, 0x3e59, 0x266F}, // ♯, \sharp, Music Sharp Sign / Sharp
 {0x730c, 0x3e5f, 0x25F1}, // ◱, \squarellquad, White Square With Lower Left Quadrant
 {0x7605, 0x3e6c, 0x22A2}, // ⊢, \vdash, Right Tack
-{0x6203, 0x3e72, 0x1D480}, // 𝒀, \biY, Mathematical Bold Italic Capital Y
-{0x6206, 0x3e76, 0x1D56F}, // 𝕯, \bfrakD, Mathematical Bold Fraktur Capital D
-{0x6207, 0x3e7d, 0x1D63C}, // 𝘼, \bisansA, Mathematical Sans-Serif Bold Italic Capital A
+{0x6203, 0x3e72, 0xDC80'D835}, // U+1D480, 𝒀, \biY, Mathematical Bold Italic Capital Y
+{0x6206, 0x3e76, 0xDD6F'D835}, // U+1D56F, 𝕯, \bfrakD, Mathematical Bold Fraktur Capital D
+{0x6207, 0x3e7d, 0xDE3C'D835}, // U+1D63C, 𝘼, \bisansA, Mathematical Sans-Serif Bold Italic Capital A
 {0x6308, 0x3e85, 0x22CE}, // ⋎, \curlyvee, Curly Logical Or
-{0x6903, 0x3e8e, 0x1D45E}, // 𝑞, \itq, Mathematical Italic Small Q
-{0x6904, 0x3e92, 0x1D708}, // 𝜈, \itnu, Mathematical Italic Small Nu
+{0x6903, 0x3e8e, 0xDC5E'D835}, // U+1D45E, 𝑞, \itq, Mathematical Italic Small Q
+{0x6904, 0x3e92, 0xDF08'D835}, // U+1D708, 𝜈, \itnu, Mathematical Italic Small Nu
 {0x720c, 0x3e97, 0x2253}, // ≓, \risingdotseq, Image Of Or Approximately Equal To
 {0x4c0f, 0x3ea4, 0x294E}, // ⥎, \LeftRightVector, Left Barb Up Right Barb Up Harpoon
-{0x6203, 0x3eb4, 0x1D481}, // 𝒁, \biZ, Mathematical Bold Italic Capital Z
-{0x6206, 0x3eb8, 0x1D570}, // 𝕰, \bfrakE, Mathematical Bold Fraktur Capital E
-{0x6207, 0x3ebf, 0x1D63D}, // 𝘽, \bisansB, Mathematical Sans-Serif Bold Italic Capital B
-{0x6903, 0x3ec7, 0x1D45F}, // 𝑟, \itr, Mathematical Italic Small R
-{0x6905, 0x3ecb, 0x1D6F8}, // 𝛸, \itChi, Mathematical Italic Capital Chi
-{0x6206, 0x3ed1, 0x1D571}, // 𝕱, \bfrakF, Mathematical Bold Fraktur Capital F
-{0x6207, 0x3ed8, 0x1D63E}, // 𝘾, \bisansC, Mathematical Sans-Serif Bold Italic Capital C
-{0x6903, 0x3ee0, 0x1D460}, // 𝑠, \its, Mathematical Italic Small S
+{0x6203, 0x3eb4, 0xDC81'D835}, // U+1D481, 𝒁, \biZ, Mathematical Bold Italic Capital Z
+{0x6206, 0x3eb8, 0xDD70'D835}, // U+1D570, 𝕰, \bfrakE, Mathematical Bold Fraktur Capital E
+{0x6207, 0x3ebf, 0xDE3D'D835}, // U+1D63D, 𝘽, \bisansB, Mathematical Sans-Serif Bold Italic Capital B
+{0x6903, 0x3ec7, 0xDC5F'D835}, // U+1D45F, 𝑟, \itr, Mathematical Italic Small R
+{0x6905, 0x3ecb, 0xDEF8'D835}, // U+1D6F8, 𝛸, \itChi, Mathematical Italic Capital Chi
+{0x6206, 0x3ed1, 0xDD71'D835}, // U+1D571, 𝕱, \bfrakF, Mathematical Bold Fraktur Capital F
+{0x6207, 0x3ed8, 0xDE3E'D835}, // U+1D63E, 𝘾, \bisansC, Mathematical Sans-Serif Bold Italic Capital C
+{0x6903, 0x3ee0, 0xDC60'D835}, // U+1D460, 𝑠, \its, Mathematical Italic Small S
 {0x6905, 0x3ee4, 0x0131}, // ı, \imath, Latin Small Letter Dotless I
 {0x6d0f, 0x3eea, 0x29AC}, // ⦬, \measangleurtone, Measured Angle With Open Arm Ending In Arrow Pointing Right And Up
 {0x7513, 0x3efa, 0x2963}, // ⥣, \upharpoonsleftright, Upwards Harpoon With Barb Left Beside Upwards Harpoon With Barb Right
-{0x6205, 0x3f0e, 0x1D7DE}, // 𝟞, \bbsix, Mathematical Double-Struck Digit Six
-{0x6206, 0x3f14, 0x1D572}, // 𝕲, \bfrakG, Mathematical Bold Fraktur Capital G
-{0x6207, 0x3f1b, 0x1D63F}, // 𝘿, \bisansD, Mathematical Sans-Serif Bold Italic Capital D
+{0x6205, 0x3f0e, 0xDFDE'D835}, // U+1D7DE, 𝟞, \bbsix, Mathematical Double-Struck Digit Six
+{0x6206, 0x3f14, 0xDD72'D835}, // U+1D572, 𝕲, \bfrakG, Mathematical Bold Fraktur Capital G
+{0x6207, 0x3f1b, 0xDE3F'D835}, // U+1D63F, 𝘿, \bisansD, Mathematical Sans-Serif Bold Italic Capital D
 {0x6211, 0x3f23, 0x25BA}, // ►, \blackpointerright, Black Right-Pointing Pointer / Black Right Pointing Pointer
-{0x6903, 0x3f35, 0x1D461}, // 𝑡, \itt, Mathematical Italic Small T
+{0x6903, 0x3f35, 0xDC61'D835}, // U+1D461, 𝑡, \itt, Mathematical Italic Small T
 {0x6c07, 0x3f39, 0x2ACD}, // ⫍, \lsqhook, Square Left Open Box Operator
 {0x6e0b, 0x3f41, 0x2902}, // ⤂, \nvLeftarrow, Leftwards Double Arrow With Vertical Stroke
 {0x7310, 0x3f4d, 0x2B49}, // ⭉, \similarleftarrow, Tilde Operator Above Leftwards Arrow
 {0x740a, 0x3f5e, 0x2005}, //  , \thickspace, Four-Per-Em Space
 {0x760f, 0x3f69, 0x2B22}, // ⬢, \varhexagonblack, Black Hexagon
 {0x5e06, 0x3f79, 0x1DBF}, // ᶿ, \^theta, Modifier Letter Small Theta
-{0x6206, 0x3f80, 0x1D573}, // 𝕳, \bfrakH, Mathematical Bold Fraktur Capital H
-{0x6207, 0x3f87, 0x1D640}, // 𝙀, \bisansE, Mathematical Sans-Serif Bold Italic Capital E
+{0x6206, 0x3f80, 0xDD73'D835}, // U+1D573, 𝕳, \bfrakH, Mathematical Bold Fraktur Capital H
+{0x6207, 0x3f87, 0xDE40'D835}, // U+1D640, 𝙀, \bisansE, Mathematical Sans-Serif Bold Italic Capital E
 {0x630a, 0x3f8f, 0x229B}, // ⊛, \circledast, Circled Asterisk Operator
-{0x6903, 0x3f9a, 0x1D462}, // 𝑢, \itu, Mathematical Italic Small U
+{0x6903, 0x3f9a, 0xDC62'D835}, // U+1D462, 𝑢, \itu, Mathematical Italic Small U
 {0x5e06, 0x3f9e, 0x1D5F}, // ᵟ, \^delta, Modifier Letter Small Delta
-{0x6206, 0x3fa5, 0x1D574}, // 𝕴, \bfrakI, Mathematical Bold Fraktur Capital I
-{0x6207, 0x3fac, 0x1D641}, // 𝙁, \bisansF, Mathematical Sans-Serif Bold Italic Capital F
-{0x6903, 0x3fb4, 0x1D463}, // 𝑣, \itv, Mathematical Italic Small V
+{0x6206, 0x3fa5, 0xDD74'D835}, // U+1D574, 𝕴, \bfrakI, Mathematical Bold Fraktur Capital I
+{0x6207, 0x3fac, 0xDE41'D835}, // U+1D641, 𝙁, \bisansF, Mathematical Sans-Serif Bold Italic Capital F
+{0x6903, 0x3fb4, 0xDC63'D835}, // U+1D463, 𝑣, \itv, Mathematical Italic Small V
 {0x6c08, 0x3fb8, 0x231E}, // ⌞, \llcorner, Bottom Left Corner
 {0x6c0e, 0x3fc1, 0x27F6}, // ⟶, \longrightarrow, Long Rightwards Arrow
 {0x7007, 0x3fd0, 0x2A72}, // ⩲, \pluseqq, Plus Sign Above Equals Sign
 {0x7608, 0x3fd8, 0x03C2}, // ς, \varsigma, Greek Small Letter Final Sigma
 {0x520c, 0x3fe1, 0x2970}, // ⥰, \RoundImplies, Right Double Arrow With Rounded Head
-{0x6206, 0x3fee, 0x1D575}, // 𝕵, \bfrakJ, Mathematical Bold Fraktur Capital J
-{0x6207, 0x3ff5, 0x1D7D1}, // 𝟑, \bfthree, Mathematical Bold Digit Three
-{0x6207, 0x3ffd, 0x1D642}, // 𝙂, \bisansG, Mathematical Sans-Serif Bold Italic Capital G
+{0x6206, 0x3fee, 0xDD75'D835}, // U+1D575, 𝕵, \bfrakJ, Mathematical Bold Fraktur Capital J
+{0x6207, 0x3ff5, 0xDFD1'D835}, // U+1D7D1, 𝟑, \bfthree, Mathematical Bold Digit Three
+{0x6207, 0x3ffd, 0xDE42'D835}, // U+1D642, 𝙂, \bisansG, Mathematical Sans-Serif Bold Italic Capital G
 {0x6405, 0x4005, 0x2999}, // ⦙, \ddfnc, Dotted Fence
-{0x6903, 0x400b, 0x1D464}, // 𝑤, \itw, Mathematical Italic Small W
-{0x6909, 0x400f, 0x1D70A}, // 𝜊, \itomicron, Mathematical Italic Small Omicron
-{0x7406, 0x4019, 0x1D7FB}, // 𝟻, \ttfive, Mathematical Monospace Digit Five
+{0x6903, 0x400b, 0xDC64'D835}, // U+1D464, 𝑤, \itw, Mathematical Italic Small W
+{0x6909, 0x400f, 0xDF0A'D835}, // U+1D70A, 𝜊, \itomicron, Mathematical Italic Small Omicron
+{0x7406, 0x4019, 0xDFFB'D835}, // U+1D7FB, 𝟻, \ttfive, Mathematical Monospace Digit Five
 {0x7508, 0x4020, 0x231D}, // ⌝, \urcorner, Top Right Corner
-{0x6206, 0x4029, 0x1D576}, // 𝕶, \bfrakK, Mathematical Bold Fraktur Capital K
-{0x6207, 0x4030, 0x1D643}, // 𝙃, \bisansH, Mathematical Sans-Serif Bold Italic Capital H
+{0x6206, 0x4029, 0xDD76'D835}, // U+1D576, 𝕶, \bfrakK, Mathematical Bold Fraktur Capital K
+{0x6207, 0x4030, 0xDE43'D835}, // U+1D643, 𝙃, \bisansH, Mathematical Sans-Serif Bold Italic Capital H
 {0x6507, 0x4038, 0x2255}, // ≕, \eqcolon, Equals Colon / Equal Colon
-{0x6903, 0x4040, 0x1D465}, // 𝑥, \itx, Mathematical Italic Small X
+{0x6903, 0x4040, 0xDC65'D835}, // U+1D465, 𝑥, \itx, Mathematical Italic Small X
 {0x6e07, 0x4044, 0x2284}, // ⊄, \nsubset, Not A Subset Of
-{0x7405, 0x404c, 0x1D7F7}, // 𝟷, \ttone, Mathematical Monospace Digit One
+{0x7405, 0x404c, 0xDFF7'D835}, // U+1D7F7, 𝟷, \ttone, Mathematical Monospace Digit One
 {0x7406, 0x4052, 0x2336}, // ⌶, \topbot, Apl Functional Symbol I-Beam
 {0x4e07, 0x4059, 0x21D7}, // ⇗, \Nearrow, North East Double Arrow / Upper Right Double Arrow
-{0x6203, 0x4061, 0x1D482}, // 𝒂, \bia, Mathematical Bold Italic Small A
-{0x6206, 0x4065, 0x1D7D2}, // 𝟒, \bffour, Mathematical Bold Digit Four
-{0x6206, 0x406c, 0x1D577}, // 𝕷, \bfrakL, Mathematical Bold Fraktur Capital L
-{0x6207, 0x4073, 0x1D644}, // 𝙄, \bisansI, Mathematical Sans-Serif Bold Italic Capital I
-{0x620a, 0x407b, 0x1D752}, // 𝝒, \bivarkappa, Mathematical Bold Italic Kappa Symbol
-{0x620a, 0x4086, 0x1D768}, // 𝝨, \bsansSigma, Mathematical Sans-Serif Bold Capital Sigma
-{0x6903, 0x4091, 0x1D466}, // 𝑦, \ity, Mathematical Italic Small Y
+{0x6203, 0x4061, 0xDC82'D835}, // U+1D482, 𝒂, \bia, Mathematical Bold Italic Small A
+{0x6206, 0x4065, 0xDFD2'D835}, // U+1D7D2, 𝟒, \bffour, Mathematical Bold Digit Four
+{0x6206, 0x406c, 0xDD77'D835}, // U+1D577, 𝕷, \bfrakL, Mathematical Bold Fraktur Capital L
+{0x6207, 0x4073, 0xDE44'D835}, // U+1D644, 𝙄, \bisansI, Mathematical Sans-Serif Bold Italic Capital I
+{0x620a, 0x407b, 0xDF52'D835}, // U+1D752, 𝝒, \bivarkappa, Mathematical Bold Italic Kappa Symbol
+{0x620a, 0x4086, 0xDF68'D835}, // U+1D768, 𝝨, \bsansSigma, Mathematical Sans-Serif Bold Capital Sigma
+{0x6903, 0x4091, 0xDC66'D835}, // U+1D466, 𝑦, \ity, Mathematical Italic Small Y
 {0x6e0c, 0x4095, 0x22E0}, // ⋠, \npreccurlyeq, Does Not Precede Or Equal
 {0x7509, 0x40a2, 0x03D0}, // ϐ, \upvarbeta, Greek Beta Symbol / Greek Small Letter Curled Beta
-{0x6203, 0x40ac, 0x1D483}, // 𝒃, \bib, Mathematical Bold Italic Small B
-{0x6206, 0x40b0, 0x1D578}, // 𝕸, \bfrakM, Mathematical Bold Fraktur Capital M
-{0x6207, 0x40b7, 0x1D645}, // 𝙅, \bisansJ, Mathematical Sans-Serif Bold Italic Capital J
-{0x620c, 0x40bf, 0x1D78A}, // 𝞊, \bsansepsilon, Mathematical Sans-Serif Bold Epsilon Symbol
-{0x6903, 0x40cc, 0x1D467}, // 𝑧, \itz, Mathematical Italic Small Z
+{0x6203, 0x40ac, 0xDC83'D835}, // U+1D483, 𝒃, \bib, Mathematical Bold Italic Small B
+{0x6206, 0x40b0, 0xDD78'D835}, // U+1D578, 𝕸, \bfrakM, Mathematical Bold Fraktur Capital M
+{0x6207, 0x40b7, 0xDE45'D835}, // U+1D645, 𝙅, \bisansJ, Mathematical Sans-Serif Bold Italic Capital J
+{0x620c, 0x40bf, 0xDF8A'D835}, // U+1D78A, 𝞊, \bsansepsilon, Mathematical Sans-Serif Bold Epsilon Symbol
+{0x6903, 0x40cc, 0xDC67'D835}, // U+1D467, 𝑧, \itz, Mathematical Italic Small Z
 {0x6f04, 0x40d0, 0x2A38}, // ⨸, \odiv, Circled Division Sign
 {0x720d, 0x40d5, 0x21E5}, // ⇥, \rightarrowbar, Rightwards Arrow To Bar / Right Arrow To Bar
 {0x720e, 0x40e3, 0x21A3}, // ↣, \rightarrowtail, Rightwards Arrow With Tail / Right Arrow With Tail
-{0x6203, 0x40f2, 0x1D484}, // 𝒄, \bic, Mathematical Bold Italic Small C
-{0x6206, 0x40f6, 0x1D579}, // 𝕹, \bfrakN, Mathematical Bold Fraktur Capital N
-{0x6207, 0x40fd, 0x1D646}, // 𝙆, \bisansK, Mathematical Sans-Serif Bold Italic Capital K
-{0x6207, 0x4105, 0x1D77C}, // 𝝼, \bsansnu, Mathematical Sans-Serif Bold Small Nu
+{0x6203, 0x40f2, 0xDC84'D835}, // U+1D484, 𝒄, \bic, Mathematical Bold Italic Small C
+{0x6206, 0x40f6, 0xDD79'D835}, // U+1D579, 𝕹, \bfrakN, Mathematical Bold Fraktur Capital N
+{0x6207, 0x40fd, 0xDE46'D835}, // U+1D646, 𝙆, \bisansK, Mathematical Sans-Serif Bold Italic Capital K
+{0x6207, 0x4105, 0xDF7C'D835}, // U+1D77C, 𝝼, \bsansnu, Mathematical Sans-Serif Bold Small Nu
 {0x6e06, 0x410d, 0x2116}, // №, \numero, Numero Sign / Numero
 {0x7003, 0x4114, 0x20A7}, // ₧, \pes, Peseta Sign
 {0x710b, 0x4118, 0x2669}, // ♩, \quarternote, Quarter Note
 {0x7409, 0x4124, 0x224B}, // ≋, \tildetrpl, Triple Tilde
 {0x6105, 0x412e, 0x2A6E}, // ⩮, \asteq, Equals With Asterisk
-{0x6203, 0x4134, 0x1D485}, // 𝒅, \bid, Mathematical Bold Italic Small D
-{0x6206, 0x4138, 0x1D57A}, // 𝕺, \bfrakO, Mathematical Bold Fraktur Capital O
-{0x6207, 0x413f, 0x1D647}, // 𝙇, \bisansL, Mathematical Sans-Serif Bold Italic Capital L
+{0x6203, 0x4134, 0xDC85'D835}, // U+1D485, 𝒅, \bid, Mathematical Bold Italic Small D
+{0x6206, 0x4138, 0xDD7A'D835}, // U+1D57A, 𝕺, \bfrakO, Mathematical Bold Fraktur Capital O
+{0x6207, 0x413f, 0xDE47'D835}, // U+1D647, 𝙇, \bisansL, Mathematical Sans-Serif Bold Italic Capital L
 {0x6214, 0x4147, 0x25D7}, // ◗, \blackrighthalfcircle, Right Half Black Circle
 {0x6705, 0x415c, 0x22E7}, // ⋧, \gnsim, Greater-Than But Not Equivalent To / Greater Than But Not Equivalent To
 {0x6f06, 0x4162, 0x2296}, // ⊖, \ominus, Circled Minus
 {0x7402, 0x4169, 0x00FE}, // þ, \th, Latin Small Letter Thorn
-{0x6203, 0x416c, 0x1D486}, // 𝒆, \bie, Mathematical Bold Italic Small E
-{0x6206, 0x4170, 0x1D57B}, // 𝕻, \bfrakP, Mathematical Bold Fraktur Capital P
-{0x6207, 0x4177, 0x1D648}, // 𝙈, \bisansM, Mathematical Sans-Serif Bold Italic Capital M
+{0x6203, 0x416c, 0xDC86'D835}, // U+1D486, 𝒆, \bie, Mathematical Bold Italic Small E
+{0x6206, 0x4170, 0xDD7B'D835}, // U+1D57B, 𝕻, \bfrakP, Mathematical Bold Fraktur Capital P
+{0x6207, 0x4177, 0xDE48'D835}, // U+1D648, 𝙈, \bisansM, Mathematical Sans-Serif Bold Italic Capital M
 {0x730c, 0x417f, 0x2ACA}, // ⫊, \supsetapprox, Superset Of Above Almost Equal To
-{0x6203, 0x418c, 0x1D487}, // 𝒇, \bif, Mathematical Bold Italic Small F
-{0x6206, 0x4190, 0x1D57C}, // 𝕼, \bfrakQ, Mathematical Bold Fraktur Capital Q
-{0x6207, 0x4197, 0x1D649}, // 𝙉, \bisansN, Mathematical Sans-Serif Bold Italic Capital N
-{0x6209, 0x419f, 0x1D7BD}, // 𝞽, \bisanstau, Mathematical Sans-Serif Bold Italic Small Tau
-{0x620c, 0x41a9, 0x1D7BF}, // 𝞿, \bisansvarphi, Mathematical Sans-Serif Bold Italic Small Phi
+{0x6203, 0x418c, 0xDC87'D835}, // U+1D487, 𝒇, \bif, Mathematical Bold Italic Small F
+{0x6206, 0x4190, 0xDD7C'D835}, // U+1D57C, 𝕼, \bfrakQ, Mathematical Bold Fraktur Capital Q
+{0x6207, 0x4197, 0xDE49'D835}, // U+1D649, 𝙉, \bisansN, Mathematical Sans-Serif Bold Italic Capital N
+{0x6209, 0x419f, 0xDFBD'D835}, // U+1D7BD, 𝞽, \bisanstau, Mathematical Sans-Serif Bold Italic Small Tau
+{0x620c, 0x41a9, 0xDFBF'D835}, // U+1D7BF, 𝞿, \bisansvarphi, Mathematical Sans-Serif Bold Italic Small Phi
 {0x6406, 0x41b6, 0x2571}, // ╱, \diagup, Box Drawings Light Diagonal Upper Right To Lower Left / Forms Light Diagonal Upper Right To Lower Left
 {0x6706, 0x41bd, 0x2A80}, // ⪀, \gesdot, Greater-Than Or Slanted Equal To With Dot Inside
 {0x6708, 0x41c4, 0x2A84}, // ⪄, \gesdotol, Greater-Than Or Slanted Equal To With Dot Above Left
 {0x6d0c, 0x41cd, 0x2B50}, // ⭐, \medwhitestar, White Medium Star
-{0x6203, 0x41da, 0x1D488}, // 𝒈, \big, Mathematical Bold Italic Small G
-{0x6206, 0x41de, 0x1D57D}, // 𝕽, \bfrakR, Mathematical Bold Fraktur Capital R
-{0x6207, 0x41e5, 0x1D64A}, // 𝙊, \bisansO, Mathematical Sans-Serif Bold Italic Capital O
+{0x6203, 0x41da, 0xDC88'D835}, // U+1D488, 𝒈, \big, Mathematical Bold Italic Small G
+{0x6206, 0x41de, 0xDD7D'D835}, // U+1D57D, 𝕽, \bfrakR, Mathematical Bold Fraktur Capital R
+{0x6207, 0x41e5, 0xDE4A'D835}, // U+1D64A, 𝙊, \bisansO, Mathematical Sans-Serif Bold Italic Capital O
 {0x6809, 0x41ed, 0x2A6F}, // ⩯, \hatapprox, Almost Equal To With Circumflex Accent
 {0x7307, 0x41f7, 0x264F}, // ♏, \scorpio, Scorpius
-{0x6203, 0x41ff, 0x1D489}, // 𝒉, \bih, Mathematical Bold Italic Small H
-{0x6206, 0x4203, 0x1D57E}, // 𝕾, \bfrakS, Mathematical Bold Fraktur Capital S
-{0x6207, 0x420a, 0x1D64B}, // 𝙋, \bisansP, Mathematical Sans-Serif Bold Italic Capital P
+{0x6203, 0x41ff, 0xDC89'D835}, // U+1D489, 𝒉, \bih, Mathematical Bold Italic Small H
+{0x6206, 0x4203, 0xDD7E'D835}, // U+1D57E, 𝕾, \bfrakS, Mathematical Bold Fraktur Capital S
+{0x6207, 0x420a, 0xDE4B'D835}, // U+1D64B, 𝙋, \bisansP, Mathematical Sans-Serif Bold Italic Capital P
 {0x6905, 0x4212, 0x22B7}, // ⊷, \image, Image Of
-{0x6905, 0x4218, 0x1D70C}, // 𝜌, \itrho, Mathematical Italic Small Rho
+{0x6905, 0x4218, 0xDF0C'D835}, // U+1D70C, 𝜌, \itrho, Mathematical Italic Small Rho
 {0x7212, 0x421e, 0x296C}, // ⥬, \rightharpoonupdash, Rightwards Harpoon With Barb Up Above Long Dash
 {0x7305, 0x4231, 0x03C3}, // σ, \sigma, Greek Small Letter Sigma
 {0x750a, 0x4237, 0x25F8}, // ◸, \ultriangle, Upper Left Triangle
 {0x4c10, 0x4242, 0x2951}, // ⥑, \LeftUpDownVector, Up Barb Left Down Barb Left Harpoon
-{0x6203, 0x4253, 0x1D48A}, // 𝒊, \bii, Mathematical Bold Italic Small I
-{0x6205, 0x4257, 0x1D7D4}, // 𝟔, \bfsix, Mathematical Bold Digit Six
-{0x6206, 0x425d, 0x1D57F}, // 𝕿, \bfrakT, Mathematical Bold Fraktur Capital T
-{0x6207, 0x4264, 0x1D64C}, // 𝙌, \bisansQ, Mathematical Sans-Serif Bold Italic Capital Q
-{0x620b, 0x426c, 0x1D7BC}, // 𝞼, \bisanssigma, Mathematical Sans-Serif Bold Italic Small Sigma
+{0x6203, 0x4253, 0xDC8A'D835}, // U+1D48A, 𝒊, \bii, Mathematical Bold Italic Small I
+{0x6205, 0x4257, 0xDFD4'D835}, // U+1D7D4, 𝟔, \bfsix, Mathematical Bold Digit Six
+{0x6206, 0x425d, 0xDD7F'D835}, // U+1D57F, 𝕿, \bfrakT, Mathematical Bold Fraktur Capital T
+{0x6207, 0x4264, 0xDE4C'D835}, // U+1D64C, 𝙌, \bisansQ, Mathematical Sans-Serif Bold Italic Capital Q
+{0x620b, 0x426c, 0xDFBC'D835}, // U+1D7BC, 𝞼, \bisanssigma, Mathematical Sans-Serif Bold Italic Small Sigma
 {0x6905, 0x4278, 0x221E}, // ∞, \infty, Infinity
 {0x7903, 0x427e, 0x00A5}, // ¥, \yen, Yen Sign
 {0x4c0a, 0x4282, 0x2B45}, // ⭅, \LLeftarrow, Leftwards Quadruple Arrow
 {0x6108, 0x428d, 0x224C}, // ≌, \allequal, All Equal To
-{0x6203, 0x4296, 0x1D48B}, // 𝒋, \bij, Mathematical Bold Italic Small J
-{0x6206, 0x429a, 0x1D580}, // 𝖀, \bfrakU, Mathematical Bold Fraktur Capital U
-{0x6207, 0x42a1, 0x1D64D}, // 𝙍, \bisansR, Mathematical Sans-Serif Bold Italic Capital R
+{0x6203, 0x4296, 0xDC8B'D835}, // U+1D48B, 𝒋, \bij, Mathematical Bold Italic Small J
+{0x6206, 0x429a, 0xDD80'D835}, // U+1D580, 𝖀, \bfrakU, Mathematical Bold Fraktur Capital U
+{0x6207, 0x42a1, 0xDE4D'D835}, // U+1D64D, 𝙍, \bisansR, Mathematical Sans-Serif Bold Italic Capital R
 {0x7003, 0x42a9, 0x03C8}, // ψ, \psi, Greek Small Letter Psi
 {0x7006, 0x42ad, 0x221D}, // ∝, \propto, Proportional To
 {0x4409, 0x42b4, 0x21D3}, // ⇓, \Downarrow, Downwards Double Arrow / Down Double Arrow
 {0x5e0a, 0x42be, 0xA71C}, // ꜜ, \^downarrow, Modifier Letter Raised Down Arrow
-{0x6203, 0x42c9, 0x1D48C}, // 𝒌, \bik, Mathematical Bold Italic Small K
-{0x6206, 0x42cd, 0x1D581}, // 𝖁, \bfrakV, Mathematical Bold Fraktur Capital V
-{0x6207, 0x42d4, 0x1D64E}, // 𝙎, \bisansS, Mathematical Sans-Serif Bold Italic Capital S
+{0x6203, 0x42c9, 0xDC8C'D835}, // U+1D48C, 𝒌, \bik, Mathematical Bold Italic Small K
+{0x6206, 0x42cd, 0xDD81'D835}, // U+1D581, 𝖁, \bfrakV, Mathematical Bold Fraktur Capital V
+{0x6207, 0x42d4, 0xDE4E'D835}, // U+1D64E, 𝙎, \bisansS, Mathematical Sans-Serif Bold Italic Capital S
 {0x6e07, 0x42dc, 0x0338'224F}, // ≏̸, \nbumpeq, Difference Between + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x7402, 0x42e4, 0x2192}, // →, \to, Rightwards Arrow / Right Arrow
-{0x6203, 0x42e7, 0x1D48D}, // 𝒍, \bil, Mathematical Bold Italic Small L
-{0x6206, 0x42eb, 0x1D582}, // 𝖂, \bfrakW, Mathematical Bold Fraktur Capital W
-{0x6207, 0x42f2, 0x1D64F}, // 𝙏, \bisansT, Mathematical Sans-Serif Bold Italic Capital T
-{0x6208, 0x42fa, 0x1D7B6}, // 𝞶, \bisansnu, Mathematical Sans-Serif Bold Italic Small Nu
-{0x6907, 0x4303, 0x1D71B}, // 𝜛, \itvarpi, Mathematical Italic Pi Symbol
+{0x6203, 0x42e7, 0xDC8D'D835}, // U+1D48D, 𝒍, \bil, Mathematical Bold Italic Small L
+{0x6206, 0x42eb, 0xDD82'D835}, // U+1D582, 𝖂, \bfrakW, Mathematical Bold Fraktur Capital W
+{0x6207, 0x42f2, 0xDE4F'D835}, // U+1D64F, 𝙏, \bisansT, Mathematical Sans-Serif Bold Italic Capital T
+{0x6208, 0x42fa, 0xDFB6'D835}, // U+1D7B6, 𝞶, \bisansnu, Mathematical Sans-Serif Bold Italic Small Nu
+{0x6907, 0x4303, 0xDF1B'D835}, // U+1D71B, 𝜛, \itvarpi, Mathematical Italic Pi Symbol
 {0x6d09, 0x430b, 0x2A0A}, // ⨊, \modtwosum, Modulo Two Sum
 {0x6e07, 0x4315, 0x0338'2AAF}, // ⪯̸, \npreceq, Precedes Above Single-Line Equals Sign + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x7306, 0x431d, 0x2A0B}, // ⨋, \sumint, Summation With Integral
-{0x6203, 0x4324, 0x1D48E}, // 𝒎, \bim, Mathematical Bold Italic Small M
-{0x6205, 0x4328, 0x1D74C}, // 𝝌, \bichi, Mathematical Bold Italic Small Chi
-{0x6206, 0x432e, 0x1D583}, // 𝖃, \bfrakX, Mathematical Bold Fraktur Capital X
-{0x6207, 0x4335, 0x1D650}, // 𝙐, \bisansU, Mathematical Sans-Serif Bold Italic Capital U
-{0x620c, 0x433d, 0x1D789}, // 𝞉, \bsanspartial, Mathematical Sans-Serif Bold Partial Differential
+{0x6203, 0x4324, 0xDC8E'D835}, // U+1D48E, 𝒎, \bim, Mathematical Bold Italic Small M
+{0x6205, 0x4328, 0xDF4C'D835}, // U+1D74C, 𝝌, \bichi, Mathematical Bold Italic Small Chi
+{0x6206, 0x432e, 0xDD83'D835}, // U+1D583, 𝖃, \bfrakX, Mathematical Bold Fraktur Capital X
+{0x6207, 0x4335, 0xDE50'D835}, // U+1D650, 𝙐, \bisansU, Mathematical Sans-Serif Bold Italic Capital U
+{0x620c, 0x433d, 0xDF89'D835}, // U+1D789, 𝞉, \bsanspartial, Mathematical Sans-Serif Bold Partial Differential
 {0x6e0c, 0x434a, 0x2340}, // ⍀, \notbackslash, Apl Functional Symbol Backslash Bar
 {0x6e0e, 0x4357, 0x22EB}, // ⋫, \ntriangleright, Does Not Contain As Normal Subgroup
 {0x7611, 0x4366, 0x2306}, // ⌆, \vardoublebarwedge, Perspective
 {0x3403, 0x4378, 0x2158}, // ⅘, \4/5, Vulgar Fraction Four Fifths / Fraction Four Fifths
 {0x4f05, 0x437c, 0x03A9}, // Ω, \Omega, Greek Capital Letter Omega
-{0x6203, 0x4382, 0x1D48F}, // 𝒏, \bin, Mathematical Bold Italic Small N
-{0x6206, 0x4386, 0x1D584}, // 𝖄, \bfrakY, Mathematical Bold Fraktur Capital Y
-{0x6207, 0x438d, 0x1D651}, // 𝙑, \bisansV, Mathematical Sans-Serif Bold Italic Capital V
+{0x6203, 0x4382, 0xDC8F'D835}, // U+1D48F, 𝒏, \bin, Mathematical Bold Italic Small N
+{0x6206, 0x4386, 0xDD84'D835}, // U+1D584, 𝖄, \bfrakY, Mathematical Bold Fraktur Capital Y
+{0x6207, 0x438d, 0xDE51'D835}, // U+1D651, 𝙑, \bisansV, Mathematical Sans-Serif Bold Italic Capital V
 {0x6c08, 0x4395, 0x2A89}, // ⪉, \lnapprox, Less-Than And Not Approximate
 {0x740c, 0x439e, 0x2A39}, // ⨹, \triangleplus, Plus Sign In Triangle
 {0x5508, 0x43ab, 0x290A}, // ⤊, \Uuparrow, Upwards Triple Arrow
-{0x6203, 0x43b4, 0x1D490}, // 𝒐, \bio, Mathematical Bold Italic Small O
-{0x6206, 0x43b8, 0x1D585}, // 𝖅, \bfrakZ, Mathematical Bold Fraktur Capital Z
-{0x6207, 0x43bf, 0x1D652}, // 𝙒, \bisansW, Mathematical Sans-Serif Bold Italic Capital W
-{0x6209, 0x43c7, 0x1D6D6}, // 𝛖, \bfupsilon, Mathematical Bold Small Upsilon
+{0x6203, 0x43b4, 0xDC90'D835}, // U+1D490, 𝒐, \bio, Mathematical Bold Italic Small O
+{0x6206, 0x43b8, 0xDD85'D835}, // U+1D585, 𝖅, \bfrakZ, Mathematical Bold Fraktur Capital Z
+{0x6207, 0x43bf, 0xDE52'D835}, // U+1D652, 𝙒, \bisansW, Mathematical Sans-Serif Bold Italic Capital W
+{0x6209, 0x43c7, 0xDED6'D835}, // U+1D6D6, 𝛖, \bfupsilon, Mathematical Bold Small Upsilon
 {0x620a, 0x43d1, 0x2353}, // ⍓, \boxupcaret, Apl Functional Symbol Quad Up Caret
-{0x620b, 0x43dc, 0x1D7A8}, // 𝞨, \bisansOmega, Mathematical Sans-Serif Bold Italic Capital Omega
+{0x620b, 0x43dc, 0xDFA8'D835}, // U+1D7A8, 𝞨, \bisansOmega, Mathematical Sans-Serif Bold Italic Capital Omega
 {0x6e06, 0x43e8, 0x22FE}, // ⋾, \niobar, Small Contains With Overbar
 {0x7404, 0x43ef, 0x2927}, // ⤧, \tona, North West Arrow And North East Arrow
 {0x5605, 0x43f4, 0x22AB}, // ⊫, \VDash, Double Vertical Bar Double Right Turnstile
-{0x6203, 0x43fa, 0x1D491}, // 𝒑, \bip, Mathematical Bold Italic Small P
-{0x6207, 0x43fe, 0x1D653}, // 𝙓, \bisansX, Mathematical Sans-Serif Bold Italic Capital X
-{0x6209, 0x4406, 0x1D75B}, // 𝝛, \bsansZeta, Mathematical Sans-Serif Bold Capital Zeta
+{0x6203, 0x43fa, 0xDC91'D835}, // U+1D491, 𝒑, \bip, Mathematical Bold Italic Small P
+{0x6207, 0x43fe, 0xDE53'D835}, // U+1D653, 𝙓, \bisansX, Mathematical Sans-Serif Bold Italic Capital X
+{0x6209, 0x4406, 0xDF5B'D835}, // U+1D75B, 𝝛, \bsansZeta, Mathematical Sans-Serif Bold Capital Zeta
 {0x6408, 0x4410, 0x2300}, // ⌀, \diameter, Diameter Sign
 {0x6e16, 0x4419, 0x2B3D}, // ⬽, \nVtwoheadleftarrowtail, Leftwards Two-Headed Arrow With Tail With Double Vertical Stroke
 {0x770c, 0x4430, 0x2A5A}, // ⩚, \wedgemidvert, Logical And With Middle Stem
 {0x4705, 0x443d, 0x0393}, // Γ, \Gamma, Greek Capital Letter Gamma
-{0x6203, 0x4443, 0x1D492}, // 𝒒, \biq, Mathematical Bold Italic Small Q
-{0x6206, 0x4447, 0x1D7DC}, // 𝟜, \bbfour, Mathematical Double-Struck Digit Four
-{0x6207, 0x444e, 0x1D654}, // 𝙔, \bisansY, Mathematical Sans-Serif Bold Italic Capital Y
-{0x6208, 0x4456, 0x1D76D}, // 𝝭, \bsansPsi, Mathematical Sans-Serif Bold Capital Psi
-{0x6209, 0x445f, 0x1D6B6}, // 𝚶, \bfOmicron, Mathematical Bold Capital Omicron
-{0x6209, 0x4469, 0x1D750}, // 𝝐, \biepsilon, Mathematical Bold Italic Epsilon Symbol
-{0x620b, 0x4473, 0x1D77A}, // 𝝺, \bsanslambda, Mathematical Sans-Serif Bold Small Lamda
-{0x620e, 0x447f, 0x1D7BB}, // 𝞻, \bisansvarsigma, Mathematical Sans-Serif Bold Italic Small Final Sigma
+{0x6203, 0x4443, 0xDC92'D835}, // U+1D492, 𝒒, \biq, Mathematical Bold Italic Small Q
+{0x6206, 0x4447, 0xDFDC'D835}, // U+1D7DC, 𝟜, \bbfour, Mathematical Double-Struck Digit Four
+{0x6207, 0x444e, 0xDE54'D835}, // U+1D654, 𝙔, \bisansY, Mathematical Sans-Serif Bold Italic Capital Y
+{0x6208, 0x4456, 0xDF6D'D835}, // U+1D76D, 𝝭, \bsansPsi, Mathematical Sans-Serif Bold Capital Psi
+{0x6209, 0x445f, 0xDEB6'D835}, // U+1D6B6, 𝚶, \bfOmicron, Mathematical Bold Capital Omicron
+{0x6209, 0x4469, 0xDF50'D835}, // U+1D750, 𝝐, \biepsilon, Mathematical Bold Italic Epsilon Symbol
+{0x620b, 0x4473, 0xDF7A'D835}, // U+1D77A, 𝝺, \bsanslambda, Mathematical Sans-Serif Bold Small Lamda
+{0x620e, 0x447f, 0xDFBB'D835}, // U+1D7BB, 𝞻, \bisansvarsigma, Mathematical Sans-Serif Bold Italic Small Final Sigma
 {0x6702, 0x448e, 0x2265}, // ≥, \ge, Greater-Than Or Equal To / Greater Than Or Equal To
 {0x7307, 0x4491, 0x2AC3}, // ⫃, \subedot, Subset Of Or Equal To With Dot Above
 {0x3104, 0x4499, 0x2152}, // ⅒, \1/10, Vulgar Fraction One Tenth
-{0x6203, 0x449e, 0x1D493}, // 𝒓, \bir, Mathematical Bold Italic Small R
+{0x6203, 0x449e, 0xDC93'D835}, // U+1D493, 𝒓, \bir, Mathematical Bold Italic Small R
 {0x6207, 0x44a2, 0x2A00}, // ⨀, \bigodot, N-Ary Circled Dot Operator
-{0x6207, 0x44aa, 0x1D655}, // 𝙕, \bisansZ, Mathematical Sans-Serif Bold Italic Capital Z
-{0x620b, 0x44b2, 0x1D792}, // 𝞒, \bisansGamma, Mathematical Sans-Serif Bold Italic Capital Gamma
+{0x6207, 0x44aa, 0xDE55'D835}, // U+1D655, 𝙕, \bisansZ, Mathematical Sans-Serif Bold Italic Capital Z
+{0x620b, 0x44b2, 0xDF92'D835}, // U+1D792, 𝞒, \bisansGamma, Mathematical Sans-Serif Bold Italic Capital Gamma
 {0x6312, 0x44be, 0x29BE}, // ⦾, \circledwhitebullet, Circled White Bullet
-{0x6907, 0x44d1, 0x1D6FC}, // 𝛼, \italpha, Mathematical Italic Small Alpha
+{0x6907, 0x44d1, 0xDEFC'D835}, // U+1D6FC, 𝛼, \italpha, Mathematical Italic Small Alpha
 {0x6e0b, 0x44d9, 0x2060}, // ⁠, \nolinebreak, Word Joiner
-{0x6203, 0x44e5, 0x1D494}, // 𝒔, \bis, Mathematical Bold Italic Small S
+{0x6203, 0x44e5, 0xDC94'D835}, // U+1D494, 𝒔, \bis, Mathematical Bold Italic Small S
 {0x6415, 0x44e9, 0x2965}, // ⥥, \downharpoonsleftright, Downwards Harpoon With Barb Left Beside Downwards Harpoon With Barb Right
 {0x650a, 0x44ff, 0x00A1}, // ¡, \exclamdown, Inverted Exclamation Mark
 {0x6702, 0x450a, 0x226B}, // ≫, \gg, Much Greater-Than / Much Greater Than
 {0x730a, 0x450d, 0x2ABF}, // ⪿, \subsetplus, Subset With Plus Sign Below
 {0x7310, 0x4518, 0x29A1}, // ⦡, \sphericalangleup, Spherical Angle Opening Up
 {0x4407, 0x4529, 0x03DC}, // Ϝ, \Digamma, Greek Letter Digamma / Greek Capital Letter Digamma
-{0x6203, 0x4531, 0x1D495}, // 𝒕, \bit, Mathematical Bold Italic Small T
+{0x6203, 0x4531, 0xDC95'D835}, // U+1D495, 𝒕, \bit, Mathematical Bold Italic Small T
 {0x660a, 0x4535, 0x221C}, // ∜, \fourthroot, Fourth Root
 {0x6c05, 0x4540, 0x25DF}, // ◟, \llarc, Lower Left Quadrant Circular Arc
 {0x760d, 0x4546, 0x2B1E}, // ⬞, \vysmwhtsquare, White Very Small Square
 {0x770d, 0x4554, 0x29A6}, // ⦦, \wideangledown, Oblique Angle Opening Up
-{0x6203, 0x4562, 0x1D496}, // 𝒖, \biu, Mathematical Bold Italic Small U
-{0x6605, 0x4566, 0x1D504}, // 𝔄, \frakA, Mathematical Fraktur Capital A
-{0x6203, 0x456c, 0x1D497}, // 𝒗, \biv, Mathematical Bold Italic Small V
-{0x6204, 0x4570, 0x1D6B4}, // 𝚴, \bfNu, Mathematical Bold Capital Nu
+{0x6203, 0x4562, 0xDC96'D835}, // U+1D496, 𝒖, \biu, Mathematical Bold Italic Small U
+{0x6605, 0x4566, 0xDD04'D835}, // U+1D504, 𝔄, \frakA, Mathematical Fraktur Capital A
+{0x6203, 0x456c, 0xDC97'D835}, // U+1D497, 𝒗, \biv, Mathematical Bold Italic Small V
+{0x6204, 0x4570, 0xDEB4'D835}, // U+1D6B4, 𝚴, \bfNu, Mathematical Bold Capital Nu
 {0x6206, 0x4575, 0x22BD}, // ⊽, \barvee, Nor
-{0x6206, 0x457c, 0x1D586}, // 𝖆, \bfraka, Mathematical Bold Fraktur Small A
+{0x6206, 0x457c, 0xDD86'D835}, // U+1D586, 𝖆, \bfraka, Mathematical Bold Fraktur Small A
 {0x630a, 0x4583, 0x2A29}, // ⨩, \commaminus, Minus Sign With Comma Above
 {0x630c, 0x458e, 0x25F7}, // ◷, \circleurquad, White Circle With Upper Right Quadrant
-{0x6605, 0x459b, 0x1D505}, // 𝔅, \frakB, Mathematical Fraktur Capital B
+{0x6605, 0x459b, 0xDD05'D835}, // U+1D505, 𝔅, \frakB, Mathematical Fraktur Capital B
 {0x6e0a, 0x45a1, 0x21CD}, // ⇍, \nLeftarrow, Leftwards Double Arrow With Stroke / Left Double Arrow With Stroke
 {0x6f0c, 0x45ac, 0x29C1}, // ⧁, \ogreaterthan, Circled Greater-Than
 {0x550b, 0x45b9, 0x21D5}, // ⇕, \Updownarrow, Up Down Double Arrow
-{0x6203, 0x45c5, 0x1D498}, // 𝒘, \biw, Mathematical Bold Italic Small W
-{0x6206, 0x45c9, 0x1D587}, // 𝖇, \bfrakb, Mathematical Bold Fraktur Small B
+{0x6203, 0x45c5, 0xDC98'D835}, // U+1D498, 𝒘, \biw, Mathematical Bold Italic Small W
+{0x6206, 0x45c9, 0xDD87'D835}, // U+1D587, 𝖇, \bfrakb, Mathematical Bold Fraktur Small B
 {0x6505, 0x45d0, 0x2A66}, // ⩦, \eqdot, Equals Sign With Dot Below
 {0x6605, 0x45d6, 0x212D}, // ℭ, \frakC, Black-Letter Capital C / Black-Letter C
 {0x6c0b, 0x45dc, 0x290C}, // ⤌, \leftbkarrow, Leftwards Double Dash Arrow
-{0x6203, 0x45e8, 0x1D499}, // 𝒙, \bix, Mathematical Bold Italic Small X
-{0x6206, 0x45ec, 0x1D588}, // 𝖈, \bfrakc, Mathematical Bold Fraktur Small C
-{0x6605, 0x45f3, 0x1D507}, // 𝔇, \frakD, Mathematical Fraktur Capital D
+{0x6203, 0x45e8, 0xDC99'D835}, // U+1D499, 𝒙, \bix, Mathematical Bold Italic Small X
+{0x6206, 0x45ec, 0xDD88'D835}, // U+1D588, 𝖈, \bfrakc, Mathematical Bold Fraktur Small C
+{0x6605, 0x45f3, 0xDD07'D835}, // U+1D507, 𝔇, \frakD, Mathematical Fraktur Capital D
 {0x6806, 0x45f9, 0x200A}, //  , \hspace, Hair Space
-{0x6203, 0x4600, 0x1D49A}, // 𝒚, \biy, Mathematical Bold Italic Small Y
-{0x6206, 0x4604, 0x1D589}, // 𝖉, \bfrakd, Mathematical Bold Fraktur Small D
-{0x6207, 0x460b, 0x1D656}, // 𝙖, \bisansa, Mathematical Sans-Serif Bold Italic Small A
+{0x6203, 0x4600, 0xDC9A'D835}, // U+1D49A, 𝒚, \biy, Mathematical Bold Italic Small Y
+{0x6206, 0x4604, 0xDD89'D835}, // U+1D589, 𝖉, \bfrakd, Mathematical Bold Fraktur Small D
+{0x6207, 0x460b, 0xDE56'D835}, // U+1D656, 𝙖, \bisansa, Mathematical Sans-Serif Bold Italic Small A
 {0x630a, 0x4613, 0x2332}, // ⌲, \conictaper, Conical Taper
-{0x6605, 0x461e, 0x1D508}, // 𝔈, \frakE, Mathematical Fraktur Capital E
+{0x6605, 0x461e, 0xDD08'D835}, // U+1D508, 𝔈, \frakE, Mathematical Fraktur Capital E
 {0x6d0b, 0x4624, 0x26AA}, // ⚪, \mdwhtcircle, Medium White Circle
 {0x7408, 0x4630, 0x266B}, // ♫, \twonotes, Beamed Eighth Notes / Barred Eighth Notes
 {0x5f04, 0x4639, 0x1D68}, // ᵨ, \_rho, Greek Subscript Small Letter Rho
-{0x6203, 0x463e, 0x1D49B}, // 𝒛, \biz, Mathematical Bold Italic Small Z
-{0x6206, 0x4642, 0x1D58A}, // 𝖊, \bfrake, Mathematical Bold Fraktur Small E
-{0x6207, 0x4649, 0x1D657}, // 𝙗, \bisansb, Mathematical Sans-Serif Bold Italic Small B
+{0x6203, 0x463e, 0xDC9B'D835}, // U+1D49B, 𝒛, \biz, Mathematical Bold Italic Small Z
+{0x6206, 0x4642, 0xDD8A'D835}, // U+1D58A, 𝖊, \bfrake, Mathematical Bold Fraktur Small E
+{0x6207, 0x4649, 0xDE57'D835}, // U+1D657, 𝙗, \bisansb, Mathematical Sans-Serif Bold Italic Small B
 {0x6306, 0x4651, 0x2A45}, // ⩅, \cupvee, Union With Logical Or
-{0x6605, 0x4658, 0x1D509}, // 𝔉, \frakF, Mathematical Fraktur Capital F
+{0x6605, 0x4658, 0xDD09'D835}, // U+1D509, 𝔉, \frakF, Mathematical Fraktur Capital F
 {0x7408, 0x465e, 0x2A31}, // ⨱, \timesbar, Multiplication Sign With Underbar
-{0x6206, 0x4667, 0x1D58B}, // 𝖋, \bfrakf, Mathematical Bold Fraktur Small F
-{0x6207, 0x466e, 0x1D658}, // 𝙘, \bisansc, Mathematical Sans-Serif Bold Italic Small C
+{0x6206, 0x4667, 0xDD8B'D835}, // U+1D58B, 𝖋, \bfrakf, Mathematical Bold Fraktur Small F
+{0x6207, 0x466e, 0xDE58'D835}, // U+1D658, 𝙘, \bisansc, Mathematical Sans-Serif Bold Italic Small C
 {0x6208, 0x4676, 0x22BC}, // ⊼, \barwedge, Nand
-{0x6605, 0x467f, 0x1D50A}, // 𝔊, \frakG, Mathematical Fraktur Capital G
+{0x6605, 0x467f, 0xDD0A'D835}, // U+1D50A, 𝔊, \frakG, Mathematical Fraktur Capital G
 {0x6608, 0x4685, 0x2ADD}, // ⫝, \forksnot, Nonforking
 {0x6d0b, 0x468e, 0x25FB}, // ◻, \mdwhtsquare, White Medium Square
 {0x4303, 0x469a, 0x22D3}, // ⋓, \Cup, Double Union
-{0x6206, 0x469e, 0x1D58C}, // 𝖌, \bfrakg, Mathematical Bold Fraktur Small G
-{0x6207, 0x46a5, 0x1D659}, // 𝙙, \bisansd, Mathematical Sans-Serif Bold Italic Small D
+{0x6206, 0x469e, 0xDD8C'D835}, // U+1D58C, 𝖌, \bfrakg, Mathematical Bold Fraktur Small G
+{0x6207, 0x46a5, 0xDE59'D835}, // U+1D659, 𝙙, \bisansd, Mathematical Sans-Serif Bold Italic Small D
 {0x6306, 0x46ad, 0x2210}, // ∐, \coprod, N-Ary Coproduct
 {0x6605, 0x46b4, 0x210C}, // ℌ, \frakH, Black-Letter Capital H / Black-Letter H
 {0x6904, 0x46ba, 0x222C}, // ∬, \iint, Double Integral
-{0x6905, 0x46bf, 0x1D702}, // 𝜂, \iteta, Mathematical Italic Small Eta
+{0x6905, 0x46bf, 0xDF02'D835}, // U+1D702, 𝜂, \iteta, Mathematical Italic Small Eta
 {0x7607, 0x46c5, 0x2A52}, // ⩒, \veeodot, Logical Or With Dot Above
-{0x6206, 0x46cd, 0x1D58D}, // 𝖍, \bfrakh, Mathematical Bold Fraktur Small H
-{0x6207, 0x46d4, 0x1D65A}, // 𝙚, \bisanse, Mathematical Sans-Serif Bold Italic Small E
+{0x6206, 0x46cd, 0xDD8D'D835}, // U+1D58D, 𝖍, \bfrakh, Mathematical Bold Fraktur Small H
+{0x6207, 0x46d4, 0xDE5A'D835}, // U+1D65A, 𝙚, \bisanse, Mathematical Sans-Serif Bold Italic Small E
 {0x6405, 0x46dc, 0x2AE3}, // ⫣, \dashV, Double Vertical Bar Left Turnstile
 {0x6605, 0x46e2, 0x2111}, // ℑ, \frakI, Black-Letter Capital I / Black-Letter I
-{0x690a, 0x46e8, 0x1D718}, // 𝜘, \itvarkappa, Mathematical Italic Kappa Symbol
+{0x690a, 0x46e8, 0xDF18'D835}, // U+1D718, 𝜘, \itvarkappa, Mathematical Italic Kappa Symbol
 {0x6f05, 0x46f3, 0x222F}, // ∯, \oiint, Surface Integral
 {0x7713, 0x46f9, 0x21EA}, // ⇪, \whitearrowupfrombar, Upwards White Arrow From Bar / White Up Arrow From Bar
-{0x6206, 0x470d, 0x1D58E}, // 𝖎, \bfraki, Mathematical Bold Fraktur Small I
-{0x6207, 0x4714, 0x1D65B}, // 𝙛, \bisansf, Mathematical Sans-Serif Bold Italic Small F
-{0x6605, 0x471c, 0x1D50D}, // 𝔍, \frakJ, Mathematical Fraktur Capital J
-{0x7308, 0x4722, 0x1D7EB}, // 𝟫, \sansnine, Mathematical Sans-Serif Digit Nine
-{0x6206, 0x472b, 0x1D58F}, // 𝖏, \bfrakj, Mathematical Bold Fraktur Small J
+{0x6206, 0x470d, 0xDD8E'D835}, // U+1D58E, 𝖎, \bfraki, Mathematical Bold Fraktur Small I
+{0x6207, 0x4714, 0xDE5B'D835}, // U+1D65B, 𝙛, \bisansf, Mathematical Sans-Serif Bold Italic Small F
+{0x6605, 0x471c, 0xDD0D'D835}, // U+1D50D, 𝔍, \frakJ, Mathematical Fraktur Capital J
+{0x7308, 0x4722, 0xDFEB'D835}, // U+1D7EB, 𝟫, \sansnine, Mathematical Sans-Serif Digit Nine
+{0x6206, 0x472b, 0xDD8F'D835}, // U+1D58F, 𝖏, \bfrakj, Mathematical Bold Fraktur Small J
 {0x6206, 0x4732, 0x2A32}, // ⨲, \btimes, Semidirect Product With Bottom Closed
-{0x6207, 0x4739, 0x1D65C}, // 𝙜, \bisansg, Mathematical Sans-Serif Bold Italic Small G
-{0x6209, 0x4741, 0x1D7F1}, // 𝟱, \bsansfive, Mathematical Sans-Serif Bold Digit Five
-{0x6605, 0x474b, 0x1D50E}, // 𝔎, \frakK, Mathematical Fraktur Capital K
+{0x6207, 0x4739, 0xDE5C'D835}, // U+1D65C, 𝙜, \bisansg, Mathematical Sans-Serif Bold Italic Small G
+{0x6209, 0x4741, 0xDFF1'D835}, // U+1D7F1, 𝟱, \bsansfive, Mathematical Sans-Serif Bold Digit Five
+{0x6605, 0x474b, 0xDD0E'D835}, // U+1D50E, 𝔎, \frakK, Mathematical Fraktur Capital K
 {0x7311, 0x4751, 0x25C3}, // ◃, \smalltriangleleft, White Left-Pointing Small Triangle / White Left Pointing Small Triangle
 {0x760b, 0x4763, 0x25B5}, // ▵, \vartriangle, White Up-Pointing Small Triangle / White Up Pointing Small Triangle
-{0x6206, 0x476f, 0x1D590}, // 𝖐, \bfrakk, Mathematical Bold Fraktur Small K
-{0x6207, 0x4776, 0x1D65D}, // 𝙝, \bisansh, Mathematical Sans-Serif Bold Italic Small H
+{0x6206, 0x476f, 0xDD90'D835}, // U+1D590, 𝖐, \bfrakk, Mathematical Bold Fraktur Small K
+{0x6207, 0x4776, 0xDE5D'D835}, // U+1D65D, 𝙝, \bisansh, Mathematical Sans-Serif Bold Italic Small H
 {0x620e, 0x477e, 0x2590}, // ▐, \blockrighthalf, Right Half Block
-{0x6605, 0x478d, 0x1D50F}, // 𝔏, \frakL, Mathematical Fraktur Capital L
-{0x6206, 0x4793, 0x1D591}, // 𝖑, \bfrakl, Mathematical Bold Fraktur Small L
-{0x6207, 0x479a, 0x1D65E}, // 𝙞, \bisansi, Mathematical Sans-Serif Bold Italic Small I
+{0x6605, 0x478d, 0xDD0F'D835}, // U+1D50F, 𝔏, \frakL, Mathematical Fraktur Capital L
+{0x6206, 0x4793, 0xDD91'D835}, // U+1D591, 𝖑, \bfrakl, Mathematical Bold Fraktur Small L
+{0x6207, 0x479a, 0xDE5E'D835}, // U+1D65E, 𝙞, \bisansi, Mathematical Sans-Serif Bold Italic Small I
 {0x6213, 0x47a2, 0x25D6}, // ◖, \blacklefthalfcircle, Left Half Black Circle
-{0x6605, 0x47b6, 0x1D510}, // 𝔐, \frakM, Mathematical Fraktur Capital M
+{0x6605, 0x47b6, 0xDD10'D835}, // U+1D510, 𝔐, \frakM, Mathematical Fraktur Capital M
 {0x680d, 0x47bc, 0x21A9}, // ↩, \hookleftarrow, Leftwards Arrow With Hook / Left Arrow With Hook
 {0x7210, 0x47ca, 0x21C9}, // ⇉, \rightrightarrows, Rightwards Paired Arrows / Right Paired Arrows
 {0x730b, 0x47db, 0x22E4}, // ⋤, \sqsubsetneq, Square Image Of Or Not Equal To
-{0x6205, 0x47e7, 0x1D6BF}, // 𝚿, \bfPsi, Mathematical Bold Capital Psi
-{0x6206, 0x47ed, 0x1D592}, // 𝖒, \bfrakm, Mathematical Bold Fraktur Small M
-{0x6207, 0x47f4, 0x1D65F}, // 𝙟, \bisansj, Mathematical Sans-Serif Bold Italic Small J
-{0x6605, 0x47fc, 0x1D511}, // 𝔑, \frakN, Mathematical Fraktur Capital N
-{0x6206, 0x4802, 0x1D593}, // 𝖓, \bfrakn, Mathematical Bold Fraktur Small N
+{0x6205, 0x47e7, 0xDEBF'D835}, // U+1D6BF, 𝚿, \bfPsi, Mathematical Bold Capital Psi
+{0x6206, 0x47ed, 0xDD92'D835}, // U+1D592, 𝖒, \bfrakm, Mathematical Bold Fraktur Small M
+{0x6207, 0x47f4, 0xDE5F'D835}, // U+1D65F, 𝙟, \bisansj, Mathematical Sans-Serif Bold Italic Small J
+{0x6605, 0x47fc, 0xDD11'D835}, // U+1D511, 𝔑, \frakN, Mathematical Fraktur Capital N
+{0x6206, 0x4802, 0xDD93'D835}, // U+1D593, 𝖓, \bfrakn, Mathematical Bold Fraktur Small N
 {0x6206, 0x4809, 0x290D}, // ⤍, \bkarow, Rightwards Double Dash Arrow
-{0x6207, 0x4810, 0x1D660}, // 𝙠, \bisansk, Mathematical Sans-Serif Bold Italic Small K
+{0x6207, 0x4810, 0xDE60'D835}, // U+1D660, 𝙠, \bisansk, Mathematical Sans-Serif Bold Italic Small K
 {0x630a, 0x4818, 0x2201}, // ∁, \complement, Complement
-{0x6605, 0x4823, 0x1D512}, // 𝔒, \frakO, Mathematical Fraktur Capital O
-{0x6206, 0x4829, 0x1D594}, // 𝖔, \bfrako, Mathematical Bold Fraktur Small O
-{0x6207, 0x4830, 0x1D661}, // 𝙡, \bisansl, Mathematical Sans-Serif Bold Italic Small L
+{0x6605, 0x4823, 0xDD12'D835}, // U+1D512, 𝔒, \frakO, Mathematical Fraktur Capital O
+{0x6206, 0x4829, 0xDD94'D835}, // U+1D594, 𝖔, \bfrako, Mathematical Bold Fraktur Small O
+{0x6207, 0x4830, 0xDE61'D835}, // U+1D661, 𝙡, \bisansl, Mathematical Sans-Serif Bold Italic Small L
 {0x6214, 0x4838, 0x2688}, // ⚈, \blackcircledrightdot, Black Circle With White Dot Right
-{0x6605, 0x484d, 0x1D513}, // 𝔓, \frakP, Mathematical Fraktur Capital P
+{0x6605, 0x484d, 0xDD13'D835}, // U+1D513, 𝔓, \frakP, Mathematical Fraktur Capital P
 {0x7012, 0x4853, 0x25B0}, // ▰, \parallelogramblack, Black Parallelogram
-{0x7406, 0x4866, 0x1D7F6}, // 𝟶, \ttzero, Mathematical Monospace Digit Zero
+{0x7406, 0x4866, 0xDFF6'D835}, // U+1D7F6, 𝟶, \ttzero, Mathematical Monospace Digit Zero
 {0x4303, 0x486d, 0x03A7}, // Χ, \Chi, Greek Capital Letter Chi
-{0x6206, 0x4871, 0x1D595}, // 𝖕, \bfrakp, Mathematical Bold Fraktur Small P
-{0x6207, 0x4878, 0x1D662}, // 𝙢, \bisansm, Mathematical Sans-Serif Bold Italic Small M
-{0x6605, 0x4880, 0x1D514}, // 𝔔, \frakQ, Mathematical Fraktur Capital Q
+{0x6206, 0x4871, 0xDD95'D835}, // U+1D595, 𝖕, \bfrakp, Mathematical Bold Fraktur Small P
+{0x6207, 0x4878, 0xDE62'D835}, // U+1D662, 𝙢, \bisansm, Mathematical Sans-Serif Bold Italic Small M
+{0x6605, 0x4880, 0xDD14'D835}, // U+1D514, 𝔔, \frakQ, Mathematical Fraktur Capital Q
 {0x6906, 0x4886, 0x2310}, // ⌐, \invnot, Reversed Not Sign
 {0x6b11, 0x488d, 0x223B}, // ∻, \kernelcontraction, Homothetic
 {0x6c05, 0x489f, 0x0278}, // ɸ, \ltphi, Latin Small Letter Phi
@@ -2708,65 +2708,65 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7516, 0x48d3, 0x294D}, // ⥍, \updownharpoonleftright, Up Barb Left Down Barb Right Harpoon
 {0x4e0b, 0x48ea, 0x0338'226A}, // ≪̸, \NotLessLess, Much Less-Than / Much Less Than + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x5210, 0x48f6, 0x2954}, // ⥔, \RightUpVectorBar, Upwards Harpoon With Barb Right To Bar
-{0x6206, 0x4907, 0x1D596}, // 𝖖, \bfrakq, Mathematical Bold Fraktur Small Q
-{0x6207, 0x490e, 0x1D663}, // 𝙣, \bisansn, Mathematical Sans-Serif Bold Italic Small N
+{0x6206, 0x4907, 0xDD96'D835}, // U+1D596, 𝖖, \bfrakq, Mathematical Bold Fraktur Small Q
+{0x6207, 0x490e, 0xDE63'D835}, // U+1D663, 𝙣, \bisansn, Mathematical Sans-Serif Bold Italic Small N
 {0x620b, 0x4916, 0x2422}, // ␢, \blanksymbol, Blank Symbol / Blank
 {0x640b, 0x4922, 0x2662}, // ♢, \diamondsuit, White Diamond Suit
 {0x6605, 0x492e, 0x211C}, // ℜ, \frakR, Black-Letter Capital R / Black-Letter R
 {0x6906, 0x4934, 0x2A1A}, // ⨚, \intcup, Integral With Union
 {0x6e03, 0x493b, 0x00AC}, // ¬, \neg, Not Sign
 {0x7508, 0x493f, 0x0332}, // ̲, \underbar, Combining Low Line / Non-Spacing Underscore
-{0x6206, 0x4948, 0x1D597}, // 𝖗, \bfrakr, Mathematical Bold Fraktur Small R
-{0x6207, 0x494f, 0x1D725}, // 𝜥, \biKappa, Mathematical Bold Italic Capital Kappa
-{0x6207, 0x4957, 0x1D664}, // 𝙤, \bisanso, Mathematical Sans-Serif Bold Italic Small O
+{0x6206, 0x4948, 0xDD97'D835}, // U+1D597, 𝖗, \bfrakr, Mathematical Bold Fraktur Small R
+{0x6207, 0x494f, 0xDF25'D835}, // U+1D725, 𝜥, \biKappa, Mathematical Bold Italic Capital Kappa
+{0x6207, 0x4957, 0xDE64'D835}, // U+1D664, 𝙤, \bisanso, Mathematical Sans-Serif Bold Italic Small O
 {0x6507, 0x495f, 0x2A71}, // ⩱, \eqqplus, Equals Sign Above Plus Sign
-{0x6605, 0x4967, 0x1D516}, // 𝔖, \frakS, Mathematical Fraktur Capital S
+{0x6605, 0x4967, 0xDD16'D835}, // U+1D516, 𝔖, \frakS, Mathematical Fraktur Capital S
 {0x6908, 0x496d, 0x22F7}, // ⋷, \isinobar, Small Element Of With Overbar
 {0x6e0b, 0x4976, 0x21CF}, // ⇏, \nRightarrow, Rightwards Double Arrow With Stroke / Right Double Arrow With Stroke
 {0x7610, 0x4982, 0x2232}, // ∲, \varointclockwise, Clockwise Contour Integral
 {0x4413, 0x4993, 0x2950}, // ⥐, \DownLeftRightVector, Left Barb Down Right Barb Down Harpoon
-{0x6206, 0x49a7, 0x1D598}, // 𝖘, \bfraks, Mathematical Bold Fraktur Small S
-{0x6207, 0x49ae, 0x1D665}, // 𝙥, \bisansp, Mathematical Sans-Serif Bold Italic Small P
-{0x620a, 0x49b6, 0x1D756}, // 𝝖, \bsansAlpha, Mathematical Sans-Serif Bold Capital Alpha
+{0x6206, 0x49a7, 0xDD98'D835}, // U+1D598, 𝖘, \bfraks, Mathematical Bold Fraktur Small S
+{0x6207, 0x49ae, 0xDE65'D835}, // U+1D665, 𝙥, \bisansp, Mathematical Sans-Serif Bold Italic Small P
+{0x620a, 0x49b6, 0xDF56'D835}, // U+1D756, 𝝖, \bsansAlpha, Mathematical Sans-Serif Bold Capital Alpha
 {0x6312, 0x49c1, 0x21F4}, // ⇴, \circleonrightarrow, Right Arrow With Small Circle
-{0x6605, 0x49d4, 0x1D517}, // 𝔗, \frakT, Mathematical Fraktur Capital T
+{0x6605, 0x49d4, 0xDD17'D835}, // U+1D517, 𝔗, \frakT, Mathematical Fraktur Capital T
 {0x4e11, 0x49da, 0x0338'226B}, // ≫̸, \NotGreaterGreater, Much Greater-Than / Much Greater Than + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
-{0x6206, 0x49ec, 0x1D599}, // 𝖙, \bfrakt, Mathematical Bold Fraktur Small T
-{0x6207, 0x49f3, 0x1D666}, // 𝙦, \bisansq, Mathematical Sans-Serif Bold Italic Small Q
-{0x620d, 0x49fb, 0x1D78B}, // 𝞋, \bsansvartheta, Mathematical Sans-Serif Bold Theta Symbol
-{0x6605, 0x4a09, 0x1D518}, // 𝔘, \frakU, Mathematical Fraktur Capital U
+{0x6206, 0x49ec, 0xDD99'D835}, // U+1D599, 𝖙, \bfrakt, Mathematical Bold Fraktur Small T
+{0x6207, 0x49f3, 0xDE66'D835}, // U+1D666, 𝙦, \bisansq, Mathematical Sans-Serif Bold Italic Small Q
+{0x620d, 0x49fb, 0xDF8B'D835}, // U+1D78B, 𝞋, \bsansvartheta, Mathematical Sans-Serif Bold Theta Symbol
+{0x6605, 0x4a09, 0xDD18'D835}, // U+1D518, 𝔘, \frakU, Mathematical Fraktur Capital U
 {0x6c04, 0x4a0f, 0x0272}, // ɲ, \ltln, Latin Small Letter N With Left Hook / Latin Small Letter N Hook
 {0x7409, 0x4a14, 0x2040}, // ⁀, \tieconcat, Character Tie
 {0x7605, 0x4a1e, 0x03D6}, // ϖ, \varpi, Greek Pi Symbol / Greek Small Letter Omega Pi
-{0x6206, 0x4a24, 0x1D59A}, // 𝖚, \bfraku, Mathematical Bold Fraktur Small U
-{0x6207, 0x4a2b, 0x1D667}, // 𝙧, \bisansr, Mathematical Sans-Serif Bold Italic Small R
-{0x6209, 0x4a33, 0x1D771}, // 𝝱, \bsansbeta, Mathematical Sans-Serif Bold Small Beta
-{0x620b, 0x4a3d, 0x1D7C9}, // 𝟉, \bisansvarpi, Mathematical Sans-Serif Bold Italic Pi Symbol
+{0x6206, 0x4a24, 0xDD9A'D835}, // U+1D59A, 𝖚, \bfraku, Mathematical Bold Fraktur Small U
+{0x6207, 0x4a2b, 0xDE67'D835}, // U+1D667, 𝙧, \bisansr, Mathematical Sans-Serif Bold Italic Small R
+{0x6209, 0x4a33, 0xDF71'D835}, // U+1D771, 𝝱, \bsansbeta, Mathematical Sans-Serif Bold Small Beta
+{0x620b, 0x4a3d, 0xDFC9'D835}, // U+1D7C9, 𝟉, \bisansvarpi, Mathematical Sans-Serif Bold Italic Pi Symbol
 {0x6506, 0x4a49, 0x2013}, // –, \endash, En Dash
-{0x6605, 0x4a50, 0x1D519}, // 𝔙, \frakV, Mathematical Fraktur Capital V
+{0x6605, 0x4a50, 0xDD19'D835}, // U+1D519, 𝔙, \frakV, Mathematical Fraktur Capital V
 {0x6f10, 0x4a56, 0x27E7}, // ⟧, \openbracketright, Mathematical Right White Square Bracket
-{0x6206, 0x4a67, 0x1D59B}, // 𝖛, \bfrakv, Mathematical Bold Fraktur Small V
-{0x6207, 0x4a6e, 0x1D668}, // 𝙨, \bisanss, Mathematical Sans-Serif Bold Italic Small S
-{0x6605, 0x4a76, 0x1D51A}, // 𝔚, \frakW, Mathematical Fraktur Capital W
-{0x6905, 0x4a7c, 0x1D6F5}, // 𝛵, \itTau, Mathematical Italic Capital Tau
+{0x6206, 0x4a67, 0xDD9B'D835}, // U+1D59B, 𝖛, \bfrakv, Mathematical Bold Fraktur Small V
+{0x6207, 0x4a6e, 0xDE68'D835}, // U+1D668, 𝙨, \bisanss, Mathematical Sans-Serif Bold Italic Small S
+{0x6605, 0x4a76, 0xDD1A'D835}, // U+1D51A, 𝔚, \frakW, Mathematical Fraktur Capital W
+{0x6905, 0x4a7c, 0xDEF5'D835}, // U+1D6F5, 𝛵, \itTau, Mathematical Italic Capital Tau
 {0x7306, 0x4a82, 0x2AB0}, // ⪰, \succeq, Succeeds Above Single-Line Equals Sign
 {0x730a, 0x4a89, 0x2ACB}, // ⫋, \subsetneqq, Subset Of Above Not Equal To
 {0x550a, 0x4a94, 0x2912}, // ⤒, \UpArrowBar, Upwards Arrow To Bar
-{0x6206, 0x4a9f, 0x1D59C}, // 𝖜, \bfrakw, Mathematical Bold Fraktur Small W
-{0x6207, 0x4aa6, 0x1D669}, // 𝙩, \bisanst, Mathematical Sans-Serif Bold Italic Small T
-{0x6605, 0x4aae, 0x1D51B}, // 𝔛, \frakX, Mathematical Fraktur Capital X
+{0x6206, 0x4a9f, 0xDD9C'D835}, // U+1D59C, 𝖜, \bfrakw, Mathematical Bold Fraktur Small W
+{0x6207, 0x4aa6, 0xDE69'D835}, // U+1D669, 𝙩, \bisanst, Mathematical Sans-Serif Bold Italic Small T
+{0x6605, 0x4aae, 0xDD1B'D835}, // U+1D51B, 𝔛, \frakX, Mathematical Fraktur Capital X
 {0x6907, 0x4ab4, 0x2A3C}, // ⨼, \intprod, Interior Product
-{0x6907, 0x4abc, 0x1D6E9}, // 𝛩, \itTheta, Mathematical Italic Capital Theta
-{0x6206, 0x4ac4, 0x1D59D}, // 𝖝, \bfrakx, Mathematical Bold Fraktur Small X
-{0x6207, 0x4acb, 0x1D66A}, // 𝙪, \bisansu, Mathematical Sans-Serif Bold Italic Small U
+{0x6907, 0x4abc, 0xDEE9'D835}, // U+1D6E9, 𝛩, \itTheta, Mathematical Italic Capital Theta
+{0x6206, 0x4ac4, 0xDD9D'D835}, // U+1D59D, 𝖝, \bfrakx, Mathematical Bold Fraktur Small X
+{0x6207, 0x4acb, 0xDE6A'D835}, // U+1D66A, 𝙪, \bisansu, Mathematical Sans-Serif Bold Italic Small U
 {0x6503, 0x4ad3, 0x0283}, // ʃ, \esh, Latin Small Letter Esh
-{0x6605, 0x4ad7, 0x1D51C}, // 𝔜, \frakY, Mathematical Fraktur Capital Y
-{0x6907, 0x4add, 0x1D6E5}, // 𝛥, \itDelta, Mathematical Italic Capital Delta
+{0x6605, 0x4ad7, 0xDD1C'D835}, // U+1D51C, 𝔜, \frakY, Mathematical Fraktur Capital Y
+{0x6907, 0x4add, 0xDEE5'D835}, // U+1D6E5, 𝛥, \itDelta, Mathematical Italic Capital Delta
 {0x6c13, 0x4ae5, 0x27FF}, // ⟿, \longrightsquigarrow, Long Rightwards Squiggle Arrow
 {0x720d, 0x4af9, 0x2911}, // ⤑, \rightdotarrow, Rightwards Arrow With Dotted Stem
 {0x720e, 0x4b07, 0x299D}, // ⦝, \rightanglemdot, Measured Right Angle With Dot
-{0x6206, 0x4b16, 0x1D59E}, // 𝖞, \bfraky, Mathematical Bold Fraktur Small Y
-{0x6207, 0x4b1d, 0x1D66B}, // 𝙫, \bisansv, Mathematical Sans-Serif Bold Italic Small V
+{0x6206, 0x4b16, 0xDD9E'D835}, // U+1D59E, 𝖞, \bfraky, Mathematical Bold Fraktur Small Y
+{0x6207, 0x4b1d, 0xDE6B'D835}, // U+1D66B, 𝙫, \bisansv, Mathematical Sans-Serif Bold Italic Small V
 {0x630c, 0x4b25, 0x25F4}, // ◴, \circleulquad, White Circle With Upper Left Quadrant
 {0x6506, 0x4b32, 0x2014}, // —, \emdash, Em Dash
 {0x6605, 0x4b39, 0x2128}, // ℨ, \frakZ, Black-Letter Capital Z / Black-Letter Z
@@ -2774,25 +2774,25 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7306, 0x4b43, 0x2283}, // ⊃, \supset, Superset Of
 {0x7307, 0x4b4a, 0x2AB4}, // ⪴, \succeqq, Succeeds Above Equals Sign
 {0x6105, 0x4b52, 0x03B1}, // α, \alpha, Greek Small Letter Alpha
-{0x6204, 0x4b58, 0x1D729}, // 𝜩, \biXi, Mathematical Bold Italic Capital Xi
-{0x6206, 0x4b5d, 0x1D59F}, // 𝖟, \bfrakz, Mathematical Bold Fraktur Small Z
-{0x6207, 0x4b64, 0x1D6C1}, // 𝛁, \bfnabla, Mathematical Bold Nabla
-{0x6207, 0x4b6c, 0x1D66C}, // 𝙬, \bisansw, Mathematical Sans-Serif Bold Italic Small W
+{0x6204, 0x4b58, 0xDF29'D835}, // U+1D729, 𝜩, \biXi, Mathematical Bold Italic Capital Xi
+{0x6206, 0x4b5d, 0xDD9F'D835}, // U+1D59F, 𝖟, \bfrakz, Mathematical Bold Fraktur Small Z
+{0x6207, 0x4b64, 0xDEC1'D835}, // U+1D6C1, 𝛁, \bfnabla, Mathematical Bold Nabla
+{0x6207, 0x4b6c, 0xDE6C'D835}, // U+1D66C, 𝙬, \bisansw, Mathematical Sans-Serif Bold Italic Small W
 {0x6311, 0x4b74, 0x25D4}, // ◔, \circleurquadblack, Circle With Upper Right Quadrant Black
-{0x6904, 0x4b86, 0x1D70B}, // 𝜋, \itpi, Mathematical Italic Small Pi
+{0x6904, 0x4b86, 0xDF0B'D835}, // U+1D70B, 𝜋, \itpi, Mathematical Italic Small Pi
 {0x6d06, 0x4b8b, 0x22A7}, // ⊧, \models, Models
-{0x6207, 0x4b92, 0x1D66D}, // 𝙭, \bisansx, Mathematical Sans-Serif Bold Italic Small X
-{0x620b, 0x4b9a, 0x1D7AA}, // 𝞪, \bisansalpha, Mathematical Sans-Serif Bold Italic Small Alpha
+{0x6207, 0x4b92, 0xDE6D'D835}, // U+1D66D, 𝙭, \bisansx, Mathematical Sans-Serif Bold Italic Small X
+{0x620b, 0x4b9a, 0xDFAA'D835}, // U+1D7AA, 𝞪, \bisansalpha, Mathematical Sans-Serif Bold Italic Small Alpha
 {0x7413, 0x4ba6, 0x2B37}, // ⬷, \twoheadleftdbkarrow, Leftwards Two-Headed Triple Dash Arrow
-{0x6207, 0x4bba, 0x1D66E}, // 𝙮, \bisansy, Mathematical Sans-Serif Bold Italic Small Y
-{0x620c, 0x4bc2, 0x1D79A}, // 𝞚, \bisansLambda, Mathematical Sans-Serif Bold Italic Capital Lamda
+{0x6207, 0x4bba, 0xDE6E'D835}, // U+1D66E, 𝙮, \bisansy, Mathematical Sans-Serif Bold Italic Small Y
+{0x620c, 0x4bc2, 0xDF9A'D835}, // U+1D79A, 𝞚, \bisansLambda, Mathematical Sans-Serif Bold Italic Capital Lamda
 {0x620d, 0x4bcf, 0x25B3}, // △, \bigtriangleup, White Up-Pointing Triangle / White Up Pointing Triangle
 {0x6704, 0x4bdd, 0x2A88}, // ⪈, \gneq, Greater-Than And Single-Line Not Equal To
-{0x6905, 0x4be2, 0x1D719}, // 𝜙, \itphi, Mathematical Italic Phi Symbol
+{0x6905, 0x4be2, 0xDF19'D835}, // U+1D719, 𝜙, \itphi, Mathematical Italic Phi Symbol
 {0x6c0a, 0x4be8, 0x2B3E}, // ⬾, \leftarrowx, Leftwards Arrow Through X
-{0x7309, 0x4bf3, 0x1D7EA}, // 𝟪, \sanseight, Mathematical Sans-Serif Digit Eight
+{0x7309, 0x4bf3, 0xDFEA'D835}, // U+1D7EA, 𝟪, \sanseight, Mathematical Sans-Serif Digit Eight
 {0x6206, 0x4bfd, 0x22C8}, // ⋈, \bowtie, Bowtie
-{0x6207, 0x4c04, 0x1D66F}, // 𝙯, \bisansz, Mathematical Sans-Serif Bold Italic Small Z
+{0x6207, 0x4c04, 0xDE6F'D835}, // U+1D66F, 𝙯, \bisansz, Mathematical Sans-Serif Bold Italic Small Z
 {0x620a, 0x4c0c, 0x2036}, // ‶, \backpprime, Reversed Double Prime
 {0x6e0d, 0x4c17, 0x22EA}, // ⋪, \ntriangleleft, Not Normal Subgroup Of
 {0x7405, 0x4c25, 0x029E}, // ʞ, \turnk, Latin Small Letter Turned K
@@ -2801,157 +2801,157 @@ static const InputSequence LaTeXSequenceList[] = {
 {0x7203, 0x4c39, 0x03C1}, // ρ, \rho, Greek Small Letter Rho
 {0x4e02, 0x4c3d, 0x014A}, // Ŋ, \NG, Latin Capital Letter Eng
 {0x630b, 0x4c40, 0x22DF}, // ⋟, \curlyeqsucc, Equal To Or Succeeds
-{0x6605, 0x4c4c, 0x1D51E}, // 𝔞, \fraka, Mathematical Fraktur Small A
+{0x6605, 0x4c4c, 0xDD1E'D835}, // U+1D51E, 𝔞, \fraka, Mathematical Fraktur Small A
 {0x6905, 0x4c52, 0x222D}, // ∭, \iiint, Triple Integral
 {0x6a04, 0x4c58, 0x2A1D}, // ⨝, \join, Join
 {0x6e10, 0x4c5d, 0x2915}, // ⤕, \nVrightarrowtail, Rightwards Arrow With Tail With Double Vertical Stroke
 {0x7307, 0x4c6e, 0x29E2}, // ⧢, \shuffle, Shuffle Product
 {0x730c, 0x4c76, 0x2B2A}, // ⬪, \smblklozenge, Black Small Lozenge
-{0x6605, 0x4c83, 0x1D51F}, // 𝔟, \frakb, Mathematical Fraktur Small B
+{0x6605, 0x4c83, 0xDD1F'D835}, // U+1D51F, 𝔟, \frakb, Mathematical Fraktur Small B
 {0x6706, 0x4c89, 0x22D7}, // ⋗, \gtrdot, Greater-Than With Dot / Greater Than With Dot
 {0x6215, 0x4c90, 0x21B8}, // ↸, \barovernorthwestarrow, North West Arrow To Long Bar / Upper Left Arrow To Long Bar
 {0x640a, 0x4ca6, 0x01C2}, // ǂ, \doublepipe, Latin Letter Alveolar Click / Latin Letter Pipe Double Bar
-{0x6605, 0x4cb1, 0x1D520}, // 𝔠, \frakc, Mathematical Fraktur Small C
+{0x6605, 0x4cb1, 0xDD20'D835}, // U+1D520, 𝔠, \frakc, Mathematical Fraktur Small C
 {0x740e, 0x4cb7, 0x22B4}, // ⊴, \trianglelefteq, Normal Subgroup Of Or Equal To
 {0x7606, 0x4cc6, 0x22BB}, // ⊻, \veebar, Xor
 {0x6212, 0x4ccd, 0x25A3}, // ▣, \blackinwhitesquare, White Square Containing Black Small Square
-{0x6605, 0x4ce0, 0x1D521}, // 𝔡, \frakd, Mathematical Fraktur Small D
+{0x6605, 0x4ce0, 0xDD21'D835}, // U+1D521, 𝔡, \frakd, Mathematical Fraktur Small D
 {0x6906, 0x4ce6, 0x0296}, // ʖ, \inglst, Latin Letter Inverted Glottal Stop
 {0x7506, 0x4ced, 0x2645}, // ♅, \uranus, Uranus
 {0x770b, 0x4cf4, 0x29A7}, // ⦧, \wideangleup, Oblique Angle Opening Down
-{0x6206, 0x4d00, 0x1D71D}, // 𝜝, \biBeta, Mathematical Bold Italic Capital Beta
-{0x6207, 0x4d07, 0x1D77F}, // 𝝿, \bsanspi, Mathematical Sans-Serif Bold Small Pi
-{0x6605, 0x4d0f, 0x1D522}, // 𝔢, \frake, Mathematical Fraktur Small E
-{0x6906, 0x4d15, 0x1D6E7}, // 𝛧, \itZeta, Mathematical Italic Capital Zeta
+{0x6206, 0x4d00, 0xDF1D'D835}, // U+1D71D, 𝜝, \biBeta, Mathematical Bold Italic Capital Beta
+{0x6207, 0x4d07, 0xDF7F'D835}, // U+1D77F, 𝝿, \bsanspi, Mathematical Sans-Serif Bold Small Pi
+{0x6605, 0x4d0f, 0xDD22'D835}, // U+1D522, 𝔢, \frake, Mathematical Fraktur Small E
+{0x6906, 0x4d15, 0xDEE7'D835}, // U+1D6E7, 𝛧, \itZeta, Mathematical Italic Capital Zeta
 {0x6e08, 0x4d1c, 0x233F}, // ⌿, \notslash, Apl Functional Symbol Slash Bar
 {0x7005, 0x4d25, 0x2647}, // ♇, \pluto, Pluto
-{0x6208, 0x4d2b, 0x1D766}, // 𝝦, \bsansRho, Mathematical Sans-Serif Bold Capital Rho
-{0x620c, 0x4d34, 0x1D76A}, // 𝝪, \bsansUpsilon, Mathematical Sans-Serif Bold Capital Upsilon
-{0x6605, 0x4d41, 0x1D523}, // 𝔣, \frakf, Mathematical Fraktur Small F
+{0x6208, 0x4d2b, 0xDF66'D835}, // U+1D766, 𝝦, \bsansRho, Mathematical Sans-Serif Bold Capital Rho
+{0x620c, 0x4d34, 0xDF6A'D835}, // U+1D76A, 𝝪, \bsansUpsilon, Mathematical Sans-Serif Bold Capital Upsilon
+{0x6605, 0x4d41, 0xDD23'D835}, // U+1D523, 𝔣, \frakf, Mathematical Fraktur Small F
 {0x6c0f, 0x4d47, 0x2B4A}, // ⭊, \leftarrowapprox, Leftwards Arrow Above Almost Equal To
 {0x6e09, 0x4d57, 0x0338'2A7E}, // ⩾̸, \ngeqslant, Greater-Than Or Slanted Equal To + Combining Long Solidus Overlay / Non-Spacing Long Slash Overlay
 {0x760f, 0x4d61, 0x25AE}, // ▮, \vrectangleblack, Black Vertical Rectangle
 {0x3203, 0x4d71, 0x2154}, // ⅔, \2/3, Vulgar Fraction Two Thirds / Fraction Two Thirds
 {0x6409, 0x4d75, 0x2A08}, // ⨈, \disjquant, Two Logical Or Operator
-{0x6605, 0x4d7f, 0x1D524}, // 𝔤, \frakg, Mathematical Fraktur Small G
+{0x6605, 0x4d7f, 0xDD24'D835}, // U+1D524, 𝔤, \frakg, Mathematical Fraktur Small G
 {0x7212, 0x4d85, 0x2B4C}, // ⭌, \rightarrowbsimilar, Rightwards Arrow Above Reverse Tilde Operator
-{0x6206, 0x4d98, 0x1D73E}, // 𝜾, \biiota, Mathematical Bold Italic Small Iota
+{0x6206, 0x4d98, 0xDF3E'D835}, // U+1D73E, 𝜾, \biiota, Mathematical Bold Italic Small Iota
 {0x6209, 0x4d9f, 0x22CD}, // ⋍, \backsimeq, Reversed Tilde Equals
 {0x6209, 0x4da9, 0x2A03}, // ⨃, \bigcupdot, N-Ary Union Operator With Dot
 {0x630d, 0x4db3, 0x29BF}, // ⦿, \circledbullet, Circled Bullet
-{0x6605, 0x4dc1, 0x1D525}, // 𝔥, \frakh, Mathematical Fraktur Small H
+{0x6605, 0x4dc1, 0xDD25'D835}, // U+1D525, 𝔥, \frakh, Mathematical Fraktur Small H
 {0x6803, 0x4dc7, 0x0302}, // ̂, \hat, Combining Circumflex Accent / Non-Spacing Circumflex
 {0x6c0c, 0x4dcb, 0x2B38}, // ⬸, \leftdotarrow, Leftwards Arrow With Dotted Stem
-{0x7304, 0x4dd8, 0x1D49C}, // 𝒜, \scrA, Mathematical Script Capital A
+{0x7304, 0x4dd8, 0xDC9C'D835}, // U+1D49C, 𝒜, \scrA, Mathematical Script Capital A
 {0x3203, 0x4ddd, 0x2156}, // ⅖, \2/5, Vulgar Fraction Two Fifths / Fraction Two Fifths
-{0x6204, 0x4de1, 0x1D6CF}, // 𝛏, \bfxi, Mathematical Bold Small Xi
+{0x6204, 0x4de1, 0xDECF'D835}, // U+1D6CF, 𝛏, \bfxi, Mathematical Bold Small Xi
 {0x6405, 0x4de6, 0x22A3}, // ⊣, \dashv, Left Tack
-{0x6605, 0x4dec, 0x1D526}, // 𝔦, \fraki, Mathematical Fraktur Small I
+{0x6605, 0x4dec, 0xDD26'D835}, // U+1D526, 𝔦, \fraki, Mathematical Fraktur Small I
 {0x720e, 0x4df2, 0x21E2}, // ⇢, \rightdasharrow, Rightwards Dashed Arrow / Right Dashed Arrow
 {0x7304, 0x4e01, 0x212C}, // ℬ, \scrB, Script Capital B / Script B
 {0x4102, 0x4e06, 0x00C5}, // Å, \AA, Latin Capital Letter A With Ring Above / Latin Capital Letter A Ring
-{0x6205, 0x4e09, 0x1D749}, // 𝝉, \bitau, Mathematical Bold Italic Small Tau
-{0x620a, 0x4e0f, 0x1D791}, // 𝞑, \bisansBeta, Mathematical Sans-Serif Bold Italic Capital Beta
+{0x6205, 0x4e09, 0xDF49'D835}, // U+1D749, 𝝉, \bitau, Mathematical Bold Italic Small Tau
+{0x620a, 0x4e0f, 0xDF91'D835}, // U+1D791, 𝞑, \bisansBeta, Mathematical Sans-Serif Bold Italic Capital Beta
 {0x620b, 0x4e1a, 0x2B2E}, // ⬮, \blkvertoval, Black Vertical Ellipse
-{0x6605, 0x4e26, 0x1D527}, // 𝔧, \frakj, Mathematical Fraktur Small J
+{0x6605, 0x4e26, 0xDD27'D835}, // U+1D527, 𝔧, \frakj, Mathematical Fraktur Small J
 {0x6c03, 0x4e2c, 0x201C}, // “, \ldq, Left Double Quotation Mark / Double Turned Comma Quotation Mark
 {0x6c11, 0x4e30, 0x21FD}, // ⇽, \leftarrowtriangle, Leftwards Open-Headed Arrow
 {0x6d0a, 0x4e42, 0x2A2C}, // ⨬, \minusrdots, Minus Sign With Rising Dots
-{0x7304, 0x4e4d, 0x1D49E}, // 𝒞, \scrC, Mathematical Script Capital C
+{0x7304, 0x4e4d, 0xDC9E'D835}, // U+1D49E, 𝒞, \scrC, Mathematical Script Capital C
 {0x7405, 0x4e52, 0x00D7}, // ×, \times, Multiplication Sign
 {0x4204, 0x4e58, 0x0392}, // Β, \Beta, Greek Capital Letter Beta
 {0x6208, 0x4e5d, 0x25CE}, // ◎, \bullseye, Bullseye
 {0x620e, 0x4e66, 0x2591}, // ░, \blockqtrshaded, Light Shade
-{0x6605, 0x4e75, 0x1D528}, // 𝔨, \frakk, Mathematical Fraktur Small K
+{0x6605, 0x4e75, 0xDD28'D835}, // U+1D528, 𝔨, \frakk, Mathematical Fraktur Small K
 {0x6e09, 0x4e7b, 0x21DE}, // ⇞, \nHuparrow, Upwards Arrow With Double Stroke / Up Arrow With Double Stroke
-{0x7304, 0x4e85, 0x1D49F}, // 𝒟, \scrD, Mathematical Script Capital D
-{0x7407, 0x4e8a, 0x1D7F9}, // 𝟹, \ttthree, Mathematical Monospace Digit Three
+{0x7304, 0x4e85, 0xDC9F'D835}, // U+1D49F, 𝒟, \scrD, Mathematical Script Capital D
+{0x7407, 0x4e8a, 0xDFF9'D835}, // U+1D7F9, 𝟹, \ttthree, Mathematical Monospace Digit Three
 {0x7608, 0x4e92, 0x03F4}, // ϴ, \varTheta, Greek Capital Theta Symbol
-{0x6605, 0x4e9b, 0x1D529}, // 𝔩, \frakl, Mathematical Fraktur Small L
+{0x6605, 0x4e9b, 0xDD29'D835}, // U+1D529, 𝔩, \frakl, Mathematical Fraktur Small L
 {0x7304, 0x4ea1, 0x2130}, // ℰ, \scrE, Script Capital E / Script E
 {0x7305, 0x4ea6, 0x2243}, // ≃, \simeq, Asymptotically Equal To
-{0x620a, 0x4eac, 0x1D7B2}, // 𝞲, \bisansiota, Mathematical Sans-Serif Bold Italic Small Iota
-{0x6605, 0x4eb7, 0x1D52A}, // 𝔪, \frakm, Mathematical Fraktur Small M
+{0x620a, 0x4eac, 0xDFB2'D835}, // U+1D7B2, 𝞲, \bisansiota, Mathematical Sans-Serif Bold Italic Small Iota
+{0x6605, 0x4eb7, 0xDD2A'D835}, // U+1D52A, 𝔪, \frakm, Mathematical Fraktur Small M
 {0x7304, 0x4ebd, 0x2131}, // ℱ, \scrF, Script Capital F / Script F
 {0x4102, 0x4ec2, 0x00C6}, // Æ, \AE, Latin Capital Letter Ae / Latin Capital Letter A E
 {0x6206, 0x4ec5, 0x29C6}, // ⧆, \boxast, Squared Asterisk
-{0x6208, 0x4ecc, 0x1D7B9}, // 𝞹, \bisanspi, Mathematical Sans-Serif Bold Italic Small Pi
-{0x6605, 0x4ed5, 0x1D52B}, // 𝔫, \frakn, Mathematical Fraktur Small N
+{0x6208, 0x4ecc, 0xDFB9'D835}, // U+1D7B9, 𝞹, \bisanspi, Mathematical Sans-Serif Bold Italic Small Pi
+{0x6605, 0x4ed5, 0xDD2B'D835}, // U+1D52B, 𝔫, \frakn, Mathematical Fraktur Small N
 {0x6904, 0x4edb, 0x03B9}, // ι, \iota, Greek Small Letter Iota
 {0x6d0d, 0x4ee0, 0x26AC}, // ⚬, \mdsmwhtcircle, Medium Small White Circle
 {0x6e0c, 0x4eee, 0x22E1}, // ⋡, \nsucccurlyeq, Does Not Succeed Or Equal
-{0x7304, 0x4efb, 0x1D4A2}, // 𝒢, \scrG, Mathematical Script Capital G
+{0x7304, 0x4efb, 0xDCA2'D835}, // U+1D4A2, 𝒢, \scrG, Mathematical Script Capital G
 {0x7304, 0x4f00, 0x227B}, // ≻, \succ, Succeeds
 {0x5f04, 0x4f05, 0x1D69}, // ᵩ, \_phi, Greek Subscript Small Letter Phi
 {0x6307, 0x4f0a, 0x2254}, // ≔, \coloneq, Colon Equals / Colon Equal
-{0x6605, 0x4f12, 0x1D52C}, // 𝔬, \frako, Mathematical Fraktur Small O
+{0x6605, 0x4f12, 0xDD2C'D835}, // U+1D52C, 𝔬, \frako, Mathematical Fraktur Small O
 {0x7304, 0x4f18, 0x210B}, // ℋ, \scrH, Script Capital H / Script H
 {0x7406, 0x4f1d, 0x0270}, // ɰ, \trnmlr, Latin Small Letter Turned M With Long Leg
 {0x6204, 0x4f24, 0x2145}, // ⅅ, \bbiD, Double-Struck Italic Capital D
-{0x6209, 0x4f29, 0x1D7EC}, // 𝟬, \bsanszero, Mathematical Sans-Serif Bold Digit Zero
-{0x6605, 0x4f33, 0x1D52D}, // 𝔭, \frakp, Mathematical Fraktur Small P
+{0x6209, 0x4f29, 0xDFEC'D835}, // U+1D7EC, 𝟬, \bsanszero, Mathematical Sans-Serif Bold Digit Zero
+{0x6605, 0x4f33, 0xDD2D'D835}, // U+1D52D, 𝔭, \frakp, Mathematical Fraktur Small P
 {0x6a07, 0x4f39, 0x2643}, // ♃, \jupiter, Jupiter
 {0x6d0d, 0x4f41, 0x25FD}, // ◽, \mdsmwhtsquare, White Medium Small Square
 {0x6e05, 0x4f4f, 0x2209}, // ∉, \notin, Not An Element Of
 {0x6e13, 0x4f55, 0x2901}, // ⤁, \nVtwoheadrightarrow, Rightwards Two-Headed Arrow With Double Vertical Stroke
 {0x7304, 0x4f69, 0x2110}, // ℐ, \scrI, Script Capital I / Script I
-{0x6206, 0x4f6e, 0x1D6A9}, // 𝚩, \bfBeta, Mathematical Bold Capital Beta
-{0x6207, 0x4f75, 0x1D6DA}, // 𝛚, \bfomega, Mathematical Bold Small Omega
+{0x6206, 0x4f6e, 0xDEA9'D835}, // U+1D6A9, 𝚩, \bfBeta, Mathematical Bold Capital Beta
+{0x6207, 0x4f75, 0xDEDA'D835}, // U+1D6DA, 𝛚, \bfomega, Mathematical Bold Small Omega
 {0x630b, 0x4f7d, 0x272A}, // ✪, \circledstar, Circled White Star
-{0x6605, 0x4f89, 0x1D52E}, // 𝔮, \frakq, Mathematical Fraktur Small Q
+{0x6605, 0x4f89, 0xDD2E'D835}, // U+1D52E, 𝔮, \frakq, Mathematical Fraktur Small Q
 {0x6f06, 0x4f8f, 0x0309}, // ̉, \ovhook, Combining Hook Above / Non-Spacing Hook Above
-{0x7304, 0x4f96, 0x1D4A5}, // 𝒥, \scrJ, Mathematical Script Capital J
+{0x7304, 0x4f96, 0xDCA5'D835}, // U+1D4A5, 𝒥, \scrJ, Mathematical Script Capital J
 {0x440a, 0x4f9b, 0x290B}, // ⤋, \Ddownarrow, Downwards Triple Arrow
 {0x5307, 0x4fa6, 0x21D8}, // ⇘, \Searrow, South East Double Arrow / Lower Right Double Arrow
-{0x6605, 0x4fae, 0x1D52F}, // 𝔯, \frakr, Mathematical Fraktur Small R
+{0x6605, 0x4fae, 0xDD2F'D835}, // U+1D52F, 𝔯, \frakr, Mathematical Fraktur Small R
 {0x6e0f, 0x4fb4, 0x22EC}, // ⋬, \ntrianglelefteq, Not Normal Subgroup Of Or Equal To
 {0x7007, 0x4fc4, 0x2A23}, // ⨣, \plushat, Plus Sign With Circumflex Accent Above
-{0x7304, 0x4fcc, 0x1D4A6}, // 𝒦, \scrK, Mathematical Script Capital K
+{0x7304, 0x4fcc, 0xDCA6'D835}, // U+1D4A6, 𝒦, \scrK, Mathematical Script Capital K
 {0x7306, 0x4fd1, 0x2644}, // ♄, \saturn, Saturn
 {0x730d, 0x4fd8, 0x2B14}, // ⬔, \squareurblack, Square With Upper Right Diagonal Half Black
 {0x620b, 0x4fe6, 0x2B2C}, // ⬬, \blkhorzoval, Black Horizontal Ellipse
 {0x6503, 0x4ff2, 0x03B7}, // η, \eta, Greek Small Letter Eta
-{0x6605, 0x4ff6, 0x1D530}, // 𝔰, \fraks, Mathematical Fraktur Small S
+{0x6605, 0x4ff6, 0xDD30'D835}, // U+1D530, 𝔰, \fraks, Mathematical Fraktur Small S
 {0x6906, 0x4ffc, 0x2A0D}, // ⨍, \intbar, Finite Part Integral
 {0x6c0d, 0x5003, 0x219C}, // ↜, \leftwavearrow, Leftwards Wave Arrow / Left Wave Arrow
 {0x6e05, 0x5011, 0x2281}, // ⊁, \nsucc, Does Not Succeed
 {0x7304, 0x5017, 0x2112}, // ℒ, \scrL, Script Capital L / Script L
-{0x6206, 0x501c, 0x1D6CA}, // 𝛊, \bfiota, Mathematical Bold Small Iota
-{0x6207, 0x5023, 0x1D6C4}, // 𝛄, \bfgamma, Mathematical Bold Small Gamma
-{0x6209, 0x502b, 0x1D74F}, // 𝝏, \bipartial, Mathematical Bold Italic Partial Differential
+{0x6206, 0x501c, 0xDECA'D835}, // U+1D6CA, 𝛊, \bfiota, Mathematical Bold Small Iota
+{0x6207, 0x5023, 0xDEC4'D835}, // U+1D6C4, 𝛄, \bfgamma, Mathematical Bold Small Gamma
+{0x6209, 0x502b, 0xDF4F'D835}, // U+1D74F, 𝝏, \bipartial, Mathematical Bold Italic Partial Differential
 {0x6219, 0x5035, 0x21B9}, // ↹, \barleftarrowrightarrowbar, Leftwards Arrow To Bar Over Rightwards Arrow To Bar / Left Arrow To Bar Over Right Arrow To Bar
-{0x6605, 0x504f, 0x1D531}, // 𝔱, \frakt, Mathematical Fraktur Small T
+{0x6605, 0x504f, 0xDD31'D835}, // U+1D531, 𝔱, \frakt, Mathematical Fraktur Small T
 {0x7304, 0x5055, 0x2133}, // ℳ, \scrM, Script Capital M / Script M
 {0x7308, 0x505a, 0x29E4}, // ⧤, \smeparsl, Equals Sign And Slanted Parallel With Tilde Above
 {0x5405, 0x5063, 0x0398}, // Θ, \Theta, Greek Capital Letter Theta
 {0x620e, 0x5069, 0x2A58}, // ⩘, \bigslopedwedge, Sloping Large And
-{0x6605, 0x5078, 0x1D532}, // 𝔲, \fraku, Mathematical Fraktur Small U
+{0x6605, 0x5078, 0xDD32'D835}, // U+1D532, 𝔲, \fraku, Mathematical Fraktur Small U
 {0x6d06, 0x507e, 0x21A6}, // ↦, \mapsto, Rightwards Arrow From Bar / Right Arrow From Bar
 {0x6d0d, 0x5085, 0x25FE}, // ◾, \mdsmblksquare, Black Medium Small Square
-{0x7304, 0x5093, 0x1D4A9}, // 𝒩, \scrN, Mathematical Script Capital N
+{0x7304, 0x5093, 0xDCA9'D835}, // U+1D4A9, 𝒩, \scrN, Mathematical Script Capital N
 {0x740d, 0x5098, 0x25B7}, // ▷, \triangleright, White Right-Pointing Triangle / White Right Pointing Triangle
 {0x7507, 0x50a6, 0x2191}, // ↑, \uparrow, Upwards Arrow / Up Arrow
 {0x760a, 0x50ae, 0x2B21}, // ⬡, \varhexagon, White Hexagon
 {0x4405, 0x50b9, 0x0394}, // Δ, \Delta, Greek Capital Letter Delta
-{0x620b, 0x50bf, 0x1D797}, // 𝞗, \bisansTheta, Mathematical Sans-Serif Bold Italic Capital Theta
-{0x6605, 0x50cb, 0x1D533}, // 𝔳, \frakv, Mathematical Fraktur Small V
-{0x7304, 0x50d1, 0x1D4AA}, // 𝒪, \scrO, Mathematical Script Capital O
+{0x620b, 0x50bf, 0xDF97'D835}, // U+1D797, 𝞗, \bisansTheta, Mathematical Sans-Serif Bold Italic Capital Theta
+{0x6605, 0x50cb, 0xDD33'D835}, // U+1D533, 𝔳, \frakv, Mathematical Fraktur Small V
+{0x7304, 0x50d1, 0xDCAA'D835}, // U+1D4AA, 𝒪, \scrO, Mathematical Script Capital O
 {0x7409, 0x50d6, 0x2122}, // ™, \trademark, Trade Mark Sign / Trademark
 {0x740c, 0x50e0, 0x25EC}, // ◬, \trianglecdot, White Up-Pointing Triangle With Dot / White Up Pointing Triangle With Dot
 {0x4b05, 0x50ed, 0x03DE}, // Ϟ, \Koppa, Greek Letter Koppa / Greek Capital Letter Koppa
-{0x6205, 0x50f3, 0x1D6B8}, // 𝚸, \bfRho, Mathematical Bold Capital Rho
-{0x620b, 0x50f9, 0x1D793}, // 𝞓, \bisansDelta, Mathematical Sans-Serif Bold Italic Capital Delta
+{0x6205, 0x50f3, 0xDEB8'D835}, // U+1D6B8, 𝚸, \bfRho, Mathematical Bold Capital Rho
+{0x620b, 0x50f9, 0xDF93'D835}, // U+1D793, 𝞓, \bisansDelta, Mathematical Sans-Serif Bold Italic Capital Delta
 {0x6407, 0x5105, 0x290F}, // ⤏, \dbkarow, Rightwards Triple Dash Arrow
 {0x6604, 0x510d, 0x266D}, // ♭, \flat, Music Flat Sign / Flat
-{0x6605, 0x5112, 0x1D534}, // 𝔴, \frakw, Mathematical Fraktur Small W
+{0x6605, 0x5112, 0xDD34'D835}, // U+1D534, 𝔴, \frakw, Mathematical Fraktur Small W
 {0x6606, 0x5118, 0x2640}, // ♀, \female, Female Sign
 {0x6c04, 0x511f, 0x2AAD}, // ⪭, \late, Larger Than Or Equal To
-{0x7304, 0x5124, 0x1D4AB}, // 𝒫, \scrP, Mathematical Script Capital P
+{0x7304, 0x5124, 0xDCAB'D835}, // U+1D4AB, 𝒫, \scrP, Mathematical Script Capital P
 {0x5305, 0x5129, 0x03E0}, // Ϡ, \Sampi, Greek Letter Sampi / Greek Capital Letter Sampi
-{0x6204, 0x512f, 0x1D6B7}, // 𝚷, \bfPi, Mathematical Bold Capital Pi
-{0x6605, 0x5134, 0x1D535}, // 𝔵, \frakx, Mathematical Fraktur Small X
+{0x6204, 0x512f, 0xDEB7'D835}, // U+1D6B7, 𝚷, \bfPi, Mathematical Bold Capital Pi
+{0x6605, 0x5134, 0xDD35'D835}, // U+1D535, 𝔵, \frakx, Mathematical Fraktur Small X
 {0x7213, 0x513a, 0x2964}, // ⥤, \rightharpoonsupdown, Rightwards Harpoon With Barb Up Above Rightwards Harpoon With Barb Down
-{0x7304, 0x514e, 0x1D4AC}, // 𝒬, \scrQ, Mathematical Script Capital Q
+{0x7304, 0x514e, 0xDCAC'D835}, // U+1D4AC, 𝒬, \scrQ, Mathematical Script Capital Q
 {0x7505, 0x5153, 0x228E}, // ⊎, \uplus, Multiset Union
 };
 //LaTeX hash--Autogenerated -- end of section automatically generated
@@ -3084,835 +3084,835 @@ static const uint16_t EmojiHashTable[] = {
 };
 
 static const InputSequence EmojiSequenceList[] = {
-{0x610d, 0x0001, 0x1F45F}, // 👟, \:athletic_shoe:, Athletic Shoe
-{0x630b, 0x000f, 0x1F306}, // 🌆, \:city_sunset:, Cityscape At Dusk
+{0x610d, 0x0001, 0xDC5F'D83D}, // U+1F45F, 👟, \:athletic_shoe:, Athletic Shoe
+{0x630b, 0x000f, 0xDF06'D83C}, // U+1F306, 🌆, \:city_sunset:, Cityscape At Dusk
 {0x6604, 0x001b, 0x270A}, // ✊, \:fist:, Raised Fist
-{0x6d0a, 0x0020, 0x1F52C}, // 🔬, \:microscope:, Microscope
-{0x6d12, 0x002b, 0x1F6B5}, // 🚵, \:mountain_bicyclist:, Mountain Bicyclist
-{0x7311, 0x003e, 0x1F5FD}, // 🗽, \:statue_of_liberty:, Statue Of Liberty
-{0x7702, 0x0050, 0x1F6BE}, // 🚾, \:wc:, Water Closet
-{0x7a03, 0x0053, 0x1F4A4}, // 💤, \:zzz:, Sleeping Symbol
-{0x6308, 0x0057, 0x1F55D}, // 🕝, \:clock230:, Clock Face Two-Thirty
-{0x6308, 0x0060, 0x1F615}, // 😕, \:confused:, Confused Face
-{0x6309, 0x0069, 0x1F566}, // 🕦, \:clock1130:, Clock Face Eleven-Thirty
-{0x6804, 0x0073, 0x1F33F}, // 🌿, \:herb:, Herb
-{0x6f02, 0x0078, 0x1F402}, // 🐂, \:ox:, Ox
-{0x7204, 0x007b, 0x1F621}, // 😡, \:rage:, Pouting Face
-{0x6808, 0x0080, 0x1F3E5}, // 🏥, \:hospital:, Hospital
-{0x680d, 0x0089, 0x1F425}, // 🐥, \:hatched_chick:, Front-Facing Baby Chick
+{0x6d0a, 0x0020, 0xDD2C'D83D}, // U+1F52C, 🔬, \:microscope:, Microscope
+{0x6d12, 0x002b, 0xDEB5'D83D}, // U+1F6B5, 🚵, \:mountain_bicyclist:, Mountain Bicyclist
+{0x7311, 0x003e, 0xDDFD'D83D}, // U+1F5FD, 🗽, \:statue_of_liberty:, Statue Of Liberty
+{0x7702, 0x0050, 0xDEBE'D83D}, // U+1F6BE, 🚾, \:wc:, Water Closet
+{0x7a03, 0x0053, 0xDCA4'D83D}, // U+1F4A4, 💤, \:zzz:, Sleeping Symbol
+{0x6308, 0x0057, 0xDD5D'D83D}, // U+1F55D, 🕝, \:clock230:, Clock Face Two-Thirty
+{0x6308, 0x0060, 0xDE15'D83D}, // U+1F615, 😕, \:confused:, Confused Face
+{0x6309, 0x0069, 0xDD66'D83D}, // U+1F566, 🕦, \:clock1130:, Clock Face Eleven-Thirty
+{0x6804, 0x0073, 0xDF3F'D83C}, // U+1F33F, 🌿, \:herb:, Herb
+{0x6f02, 0x0078, 0xDC02'D83D}, // U+1F402, 🐂, \:ox:, Ox
+{0x7204, 0x007b, 0xDE21'D83D}, // U+1F621, 😡, \:rage:, Pouting Face
+{0x6808, 0x0080, 0xDFE5'D83C}, // U+1F3E5, 🏥, \:hospital:, Hospital
+{0x680d, 0x0089, 0xDC25'D83D}, // U+1F425, 🐥, \:hatched_chick:, Front-Facing Baby Chick
 {0x6912, 0x0097, 0x2139}, // ℹ, \:information_source:, Information Source
 {0x7308, 0x00aa, 0x264F}, // ♏, \:scorpius:, Scorpius
-{0x610e, 0x00b3, 0x1F53C}, // 🔼, \:arrow_up_small:, Up-Pointing Small Red Triangle
+{0x610e, 0x00b3, 0xDD3C'D83D}, // U+1F53C, 🔼, \:arrow_up_small:, Up-Pointing Small Red Triangle
 {0x6111, 0x00c2, 0x2197}, // ↗, \:arrow_upper_right:, North East Arrow / Upper Right Arrow
-{0x620b, 0x00d4, 0x1F6BC}, // 🚼, \:baby_symbol:, Baby Symbol
-{0x630c, 0x00e0, 0x1F307}, // 🌇, \:city_sunrise:, Sunset Over Buildings
-{0x6e0c, 0x00ed, 0x1F529}, // 🔩, \:nut_and_bolt:, Nut And Bolt
-{0x6e12, 0x00fa, 0x1F31A}, // 🌚, \:new_moon_with_face:, New Moon With Face
-{0x7306, 0x010d, 0x1F461}, // 👡, \:sandal:, Womans Sandal
-{0x2b02, 0x0114, 0x1F44D}, // 👍, \:+1:, Thumbs Up Sign
-{0x6208, 0x0117, 0x1F421}, // 🐡, \:blowfish:, Blowfish
-{0x6309, 0x0120, 0x1F40A}, // 🐊, \:crocodile:, Crocodile
+{0x620b, 0x00d4, 0xDEBC'D83D}, // U+1F6BC, 🚼, \:baby_symbol:, Baby Symbol
+{0x630c, 0x00e0, 0xDF07'D83C}, // U+1F307, 🌇, \:city_sunrise:, Sunset Over Buildings
+{0x6e0c, 0x00ed, 0xDD29'D83D}, // U+1F529, 🔩, \:nut_and_bolt:, Nut And Bolt
+{0x6e12, 0x00fa, 0xDF1A'D83C}, // U+1F31A, 🌚, \:new_moon_with_face:, New Moon With Face
+{0x7306, 0x010d, 0xDC61'D83D}, // U+1F461, 👡, \:sandal:, Womans Sandal
+{0x2b02, 0x0114, 0xDC4D'D83D}, // U+1F44D, 👍, \:+1:, Thumbs Up Sign
+{0x6208, 0x0117, 0xDC21'D83D}, // U+1F421, 🐡, \:blowfish:, Blowfish
+{0x6309, 0x0120, 0xDC0A'D83D}, // U+1F40A, 🐊, \:crocodile:, Crocodile
 {0x6608, 0x012a, 0x26F2}, // ⛲, \:fountain:, Fountain
-{0x7305, 0x0133, 0x1F363}, // 🍣, \:sushi:, Sushi
-{0x6102, 0x0139, 0x1F18E}, // 🆎, \:ab:, Negative Squared Ab
-{0x650a, 0x013c, 0x1F30F}, // 🌏, \:earth_asia:, Earth Globe Asia-Australia
-{0x650e, 0x0147, 0x1F611}, // 😑, \:expressionless:, Expressionless Face
-{0x6a05, 0x0156, 0x1F456}, // 👖, \:jeans:, Jeans
-{0x6d03, 0x015c, 0x1F50D}, // 🔍, \:mag:, Left-Pointing Magnifying Glass
-{0x6e1e, 0x0160, 0x1F4D4}, // 📔, \:notebook_with_decorative_cover:, Notebook With Decorative Cover
-{0x6f07, 0x017f, 0x1F419}, // 🐙, \:octopus:, Octopus
-{0x730e, 0x0187, 0x1F392}, // 🎒, \:school_satchel:, School Satchel
-{0x6407, 0x0196, 0x1F46F}, // 👯, \:dancers:, Woman With Bunny Ears
-{0x6704, 0x019e, 0x1F381}, // 🎁, \:gift:, Wrapped Present
-{0x6d0f, 0x01a3, 0x1F473}, // 👳, \:man_with_turban:, Man With Turban
-{0x7305, 0x01b3, 0x1F31F}, // 🌟, \:star2:, Glowing Star
-{0x7406, 0x01b9, 0x1F345}, // 🍅, \:tomato:, Tomato
-{0x7417, 0x01c0, 0x1F46D}, // 👭, \:two_women_holding_hands:, Two Women Holding Hands
-{0x6610, 0x01d8, 0x1F340}, // 🍀, \:four_leaf_clover:, Four Leaf Clover
-{0x6e08, 0x01e9, 0x1F636}, // 😶, \:no_mouth:, Face Without Mouth
-{0x7005, 0x01f2, 0x1F45B}, // 👛, \:purse:, Purse
-{0x700c, 0x01f8, 0x1F49C}, // 💜, \:purple_heart:, Purple Heart
-{0x7405, 0x0205, 0x1F42F}, // 🐯, \:tiger:, Tiger Face
-{0x7407, 0x020b, 0x1F3BA}, // 🎺, \:trumpet:, Trumpet
+{0x7305, 0x0133, 0xDF63'D83C}, // U+1F363, 🍣, \:sushi:, Sushi
+{0x6102, 0x0139, 0xDD8E'D83C}, // U+1F18E, 🆎, \:ab:, Negative Squared Ab
+{0x650a, 0x013c, 0xDF0F'D83C}, // U+1F30F, 🌏, \:earth_asia:, Earth Globe Asia-Australia
+{0x650e, 0x0147, 0xDE11'D83D}, // U+1F611, 😑, \:expressionless:, Expressionless Face
+{0x6a05, 0x0156, 0xDC56'D83D}, // U+1F456, 👖, \:jeans:, Jeans
+{0x6d03, 0x015c, 0xDD0D'D83D}, // U+1F50D, 🔍, \:mag:, Left-Pointing Magnifying Glass
+{0x6e1e, 0x0160, 0xDCD4'D83D}, // U+1F4D4, 📔, \:notebook_with_decorative_cover:, Notebook With Decorative Cover
+{0x6f07, 0x017f, 0xDC19'D83D}, // U+1F419, 🐙, \:octopus:, Octopus
+{0x730e, 0x0187, 0xDF92'D83C}, // U+1F392, 🎒, \:school_satchel:, School Satchel
+{0x6407, 0x0196, 0xDC6F'D83D}, // U+1F46F, 👯, \:dancers:, Woman With Bunny Ears
+{0x6704, 0x019e, 0xDF81'D83C}, // U+1F381, 🎁, \:gift:, Wrapped Present
+{0x6d0f, 0x01a3, 0xDC73'D83D}, // U+1F473, 👳, \:man_with_turban:, Man With Turban
+{0x7305, 0x01b3, 0xDF1F'D83C}, // U+1F31F, 🌟, \:star2:, Glowing Star
+{0x7406, 0x01b9, 0xDF45'D83C}, // U+1F345, 🍅, \:tomato:, Tomato
+{0x7417, 0x01c0, 0xDC6D'D83D}, // U+1F46D, 👭, \:two_women_holding_hands:, Two Women Holding Hands
+{0x6610, 0x01d8, 0xDF40'D83C}, // U+1F340, 🍀, \:four_leaf_clover:, Four Leaf Clover
+{0x6e08, 0x01e9, 0xDE36'D83D}, // U+1F636, 😶, \:no_mouth:, Face Without Mouth
+{0x7005, 0x01f2, 0xDC5B'D83D}, // U+1F45B, 👛, \:purse:, Purse
+{0x700c, 0x01f8, 0xDC9C'D83D}, // U+1F49C, 💜, \:purple_heart:, Purple Heart
+{0x7405, 0x0205, 0xDC2F'D83D}, // U+1F42F, 🐯, \:tiger:, Tiger Face
+{0x7407, 0x020b, 0xDFBA'D83C}, // U+1F3BA, 🎺, \:trumpet:, Trumpet
 {0x610d, 0x0213, 0x2195}, // ↕, \:arrow_up_down:, Up Down Arrow
-{0x6206, 0x0221, 0x1F488}, // 💈, \:barber:, Barber Pole
-{0x6307, 0x0228, 0x1F6C3}, // 🛃, \:customs:, Customs
-{0x6808, 0x0230, 0x1F33A}, // 🌺, \:hibiscus:, Hibiscus
-{0x6b13, 0x0239, 0x1F61A}, // 😚, \:kissing_closed_eyes:, Kissing Face With Closed Eyes
-{0x7004, 0x024d, 0x1F350}, // 🍐, \:pear:, Pear
-{0x700a, 0x0252, 0x1F43C}, // 🐼, \:panda_face:, Panda Face
-{0x730f, 0x025d, 0x1F496}, // 💖, \:sparkling_heart:, Sparkling Heart
-{0x7506, 0x026d, 0x1F513}, // 🔓, \:unlock:, Open Lock
-{0x6204, 0x0274, 0x1F514}, // 🔔, \:bell:, Bell
-{0x6307, 0x0279, 0x1F414}, // 🐔, \:chicken:, Chicken
-{0x6705, 0x0281, 0x1F47B}, // 👻, \:ghost:, Ghost
-{0x6d07, 0x0287, 0x1F690}, // 🚐, \:minibus:, Minibus
-{0x7006, 0x028f, 0x1F429}, // 🐩, \:poodle:, Poodle
-{0x7009, 0x0296, 0x1F623}, // 😣, \:persevere:, Persevering Face
-{0x7305, 0x02a0, 0x1F509}, // 🔉, \:sound:, Speaker With One Sound Wave
-{0x730e, 0x02a6, 0x1F4CF}, // 📏, \:straight_ruler:, Straight Ruler
-{0x7406, 0x02b5, 0x1F3BE}, // 🎾, \:tennis:, Tennis Racquet And Ball
-{0x6209, 0x02bc, 0x1F4BC}, // 💼, \:briefcase:, Briefcase
+{0x6206, 0x0221, 0xDC88'D83D}, // U+1F488, 💈, \:barber:, Barber Pole
+{0x6307, 0x0228, 0xDEC3'D83D}, // U+1F6C3, 🛃, \:customs:, Customs
+{0x6808, 0x0230, 0xDF3A'D83C}, // U+1F33A, 🌺, \:hibiscus:, Hibiscus
+{0x6b13, 0x0239, 0xDE1A'D83D}, // U+1F61A, 😚, \:kissing_closed_eyes:, Kissing Face With Closed Eyes
+{0x7004, 0x024d, 0xDF50'D83C}, // U+1F350, 🍐, \:pear:, Pear
+{0x700a, 0x0252, 0xDC3C'D83D}, // U+1F43C, 🐼, \:panda_face:, Panda Face
+{0x730f, 0x025d, 0xDC96'D83D}, // U+1F496, 💖, \:sparkling_heart:, Sparkling Heart
+{0x7506, 0x026d, 0xDD13'D83D}, // U+1F513, 🔓, \:unlock:, Open Lock
+{0x6204, 0x0274, 0xDD14'D83D}, // U+1F514, 🔔, \:bell:, Bell
+{0x6307, 0x0279, 0xDC14'D83D}, // U+1F414, 🐔, \:chicken:, Chicken
+{0x6705, 0x0281, 0xDC7B'D83D}, // U+1F47B, 👻, \:ghost:, Ghost
+{0x6d07, 0x0287, 0xDE90'D83D}, // U+1F690, 🚐, \:minibus:, Minibus
+{0x7006, 0x028f, 0xDC29'D83D}, // U+1F429, 🐩, \:poodle:, Poodle
+{0x7009, 0x0296, 0xDE23'D83D}, // U+1F623, 😣, \:persevere:, Persevering Face
+{0x7305, 0x02a0, 0xDD09'D83D}, // U+1F509, 🔉, \:sound:, Speaker With One Sound Wave
+{0x730e, 0x02a6, 0xDCCF'D83D}, // U+1F4CF, 📏, \:straight_ruler:, Straight Ruler
+{0x7406, 0x02b5, 0xDFBE'D83C}, // U+1F3BE, 🎾, \:tennis:, Tennis Racquet And Ball
+{0x6209, 0x02bc, 0xDCBC'D83D}, // U+1F4BC, 💼, \:briefcase:, Briefcase
 {0x6306, 0x02c6, 0x2615}, // ☕, \:coffee:, Hot Beverage
-{0x6308, 0x02cd, 0x1F55C}, // 🕜, \:clock130:, Clock Face One-Thirty
-{0x6309, 0x02d6, 0x1F565}, // 🕥, \:clock1030:, Clock Face Ten-Thirty
-{0x6d08, 0x02e0, 0x1F4BD}, // 💽, \:minidisc:, Minidisc
-{0x6d09, 0x02e9, 0x1F30C}, // 🌌, \:milky_way:, Milky Way
-{0x7005, 0x02f3, 0x1F4B7}, // 💷, \:pound:, Banknote With Pound Sign
-{0x700f, 0x02f9, 0x1F64D}, // 🙍, \:person_frowning:, Person Frowning
+{0x6308, 0x02cd, 0xDD5C'D83D}, // U+1F55C, 🕜, \:clock130:, Clock Face One-Thirty
+{0x6309, 0x02d6, 0xDD65'D83D}, // U+1F565, 🕥, \:clock1030:, Clock Face Ten-Thirty
+{0x6d08, 0x02e0, 0xDCBD'D83D}, // U+1F4BD, 💽, \:minidisc:, Minidisc
+{0x6d09, 0x02e9, 0xDF0C'D83C}, // U+1F30C, 🌌, \:milky_way:, Milky Way
+{0x7005, 0x02f3, 0xDCB7'D83D}, // U+1F4B7, 💷, \:pound:, Banknote With Pound Sign
+{0x700f, 0x02f9, 0xDE4D'D83D}, // U+1F64D, 🙍, \:person_frowning:, Person Frowning
 {0x6305, 0x0309, 0x2601}, // ☁, \:cloud:, Cloud
-{0x7505, 0x030f, 0x1F238}, // 🈸, \:u7533:, Squared Cjk Unified Ideograph-7533
+{0x7505, 0x030f, 0xDE38'D83C}, // U+1F238, 🈸, \:u7533:, Squared Cjk Unified Ideograph-7533
 {0x7605, 0x0315, 0x264D}, // ♍, \:virgo:, Virgo
 {0x6208, 0x031b, 0x203C}, // ‼, \:bangbang:, Double Exclamation Mark
-{0x6508, 0x0324, 0x1F346}, // 🍆, \:eggplant:, Aubergine
-{0x6615, 0x032d, 0x1F3A3}, // 🎣, \:fishing_pole_and_fish:, Fishing Pole And Fish
-{0x6d03, 0x0343, 0x1F468}, // 👨, \:man:, Man
-{0x6d10, 0x0347, 0x1F3B9}, // 🎹, \:musical_keyboard:, Musical Keyboard
-{0x720a, 0x0358, 0x1F534}, // 🔴, \:red_circle:, Large Red Circle
-{0x7505, 0x0363, 0x1F21A}, // 🈚, \:u7121:, Squared Cjk Unified Ideograph-7121
-{0x6305, 0x0369, 0x1F451}, // 👑, \:crown:, Crown
+{0x6508, 0x0324, 0xDF46'D83C}, // U+1F346, 🍆, \:eggplant:, Aubergine
+{0x6615, 0x032d, 0xDFA3'D83C}, // U+1F3A3, 🎣, \:fishing_pole_and_fish:, Fishing Pole And Fish
+{0x6d03, 0x0343, 0xDC68'D83D}, // U+1F468, 👨, \:man:, Man
+{0x6d10, 0x0347, 0xDFB9'D83C}, // U+1F3B9, 🎹, \:musical_keyboard:, Musical Keyboard
+{0x720a, 0x0358, 0xDD34'D83D}, // U+1F534, 🔴, \:red_circle:, Large Red Circle
+{0x7505, 0x0363, 0xDE1A'D83C}, // U+1F21A, 🈚, \:u7121:, Squared Cjk Unified Ideograph-7121
+{0x6305, 0x0369, 0xDC51'D83D}, // U+1F451, 👑, \:crown:, Crown
 {0x6309, 0x036f, 0x2651}, // ♑, \:capricorn:, Capricorn
-{0x6906, 0x0379, 0x1F4F1}, // 📱, \:iphone:, Mobile Phone
-{0x700a, 0x0380, 0x1F446}, // 👆, \:point_up_2:, White Up Pointing Backhand Index
-{0x6103, 0x038b, 0x1F3E7}, // 🏧, \:atm:, Automated Teller Machine
-{0x630e, 0x038f, 0x1F3A0}, // 🎠, \:carousel_horse:, Carousel Horse
-{0x660c, 0x039e, 0x1F364}, // 🍤, \:fried_shrimp:, Fried Shrimp
+{0x6906, 0x0379, 0xDCF1'D83D}, // U+1F4F1, 📱, \:iphone:, Mobile Phone
+{0x700a, 0x0380, 0xDC46'D83D}, // U+1F446, 👆, \:point_up_2:, White Up Pointing Backhand Index
+{0x6103, 0x038b, 0xDFE7'D83C}, // U+1F3E7, 🏧, \:atm:, Automated Teller Machine
+{0x630e, 0x038f, 0xDFA0'D83C}, // U+1F3A0, 🎠, \:carousel_horse:, Carousel Horse
+{0x660c, 0x039e, 0xDF64'D83C}, // U+1F364, 🍤, \:fried_shrimp:, Fried Shrimp
 {0x6704, 0x03ab, 0x26F3}, // ⛳, \:golf:, Flag In Hole
-{0x6a05, 0x03b0, 0x1F5FE}, // 🗾, \:japan:, Silhouette Of Japan
+{0x6a05, 0x03b0, 0xDDFE'D83D}, // U+1F5FE, 🗾, \:japan:, Silhouette Of Japan
 {0x7707, 0x03b6, 0x26A0}, // ⚠, \:warning:, Warning Sign
-{0x6307, 0x03be, 0x1F559}, // 🕙, \:clock10:, Clock Face Ten Oclock
-{0x6503, 0x03c6, 0x1F51A}, // 🔚, \:end:, End With Leftwards Arrow Above
-{0x7307, 0x03ca, 0x1F305}, // 🌅, \:sunrise:, Sunrise
+{0x6307, 0x03be, 0xDD59'D83D}, // U+1F559, 🕙, \:clock10:, Clock Face Ten Oclock
+{0x6503, 0x03c6, 0xDD1A'D83D}, // U+1F51A, 🔚, \:end:, End With Leftwards Arrow Above
+{0x7307, 0x03ca, 0xDF05'D83C}, // U+1F305, 🌅, \:sunrise:, Sunrise
 {0x7719, 0x03d2, 0x25FD}, // ◽, \:white_medium_small_square:, White Medium Small Square
 {0x6110, 0x03ec, 0x21AA}, // ↪, \:arrow_right_hook:, Rightwards Arrow With Hook / Right Arrow With Hook
-{0x6307, 0x03fd, 0x1F55A}, // 🕚, \:clock11:, Clock Face Eleven Oclock
-{0x6805, 0x0405, 0x1F3E0}, // 🏠, \:house:, House Building
-{0x7406, 0x040b, 0x1F3A9}, // 🎩, \:tophat:, Top Hat
-{0x7505, 0x0412, 0x1F232}, // 🈲, \:u7981:, Squared Cjk Unified Ideograph-7981
-{0x6204, 0x0418, 0x1F4D6}, // 📖, \:book:, Open Book
-{0x6307, 0x041d, 0x1F55B}, // 🕛, \:clock12:, Clock Face Twelve Oclock
-{0x630c, 0x0425, 0x1F6A7}, // 🚧, \:construction:, Construction Sign
-{0x660b, 0x0432, 0x1F342}, // 🍂, \:fallen_leaf:, Fallen Leaf
+{0x6307, 0x03fd, 0xDD5A'D83D}, // U+1F55A, 🕚, \:clock11:, Clock Face Eleven Oclock
+{0x6805, 0x0405, 0xDFE0'D83C}, // U+1F3E0, 🏠, \:house:, House Building
+{0x7406, 0x040b, 0xDFA9'D83C}, // U+1F3A9, 🎩, \:tophat:, Top Hat
+{0x7505, 0x0412, 0xDE32'D83C}, // U+1F232, 🈲, \:u7981:, Squared Cjk Unified Ideograph-7981
+{0x6204, 0x0418, 0xDCD6'D83D}, // U+1F4D6, 📖, \:book:, Open Book
+{0x6307, 0x041d, 0xDD5B'D83D}, // U+1F55B, 🕛, \:clock12:, Clock Face Twelve Oclock
+{0x630c, 0x0425, 0xDEA7'D83D}, // U+1F6A7, 🚧, \:construction:, Construction Sign
+{0x660b, 0x0432, 0xDF42'D83C}, // U+1F342, 🍂, \:fallen_leaf:, Fallen Leaf
 {0x6813, 0x043e, 0x2797}, // ➗, \:heavy_division_sign:, Heavy Division Sign
-{0x6c0a, 0x0452, 0x1F688}, // 🚈, \:light_rail:, Light Rail
-{0x6d09, 0x045d, 0x1F45E}, // 👞, \:mans_shoe:, Mans Shoe
-{0x7005, 0x0467, 0x1F45D}, // 👝, \:pouch:, Pouch
-{0x7309, 0x046d, 0x1F63C}, // 😼, \:smirk_cat:, Cat Face With Wry Smile
-{0x6204, 0x0477, 0x1F43B}, // 🐻, \:bear:, Bear Face
-{0x6205, 0x047c, 0x1F35E}, // 🍞, \:bread:, Bread
-{0x6407, 0x0482, 0x1F42C}, // 🐬, \:dolphin:, Dolphin
-{0x650e, 0x048a, 0x1F332}, // 🌲, \:evergreen_tree:, Evergreen Tree
-{0x6604, 0x0499, 0x1F438}, // 🐸, \:frog:, Frog Face
-{0x6704, 0x049e, 0x1F601}, // 😁, \:grin:, Grinning Face With Smiling Eyes
-{0x6d10, 0x04a3, 0x1F4B8}, // 💸, \:money_with_wings:, Money With Wings
-{0x720a, 0x04b4, 0x1F391}, // 🎑, \:rice_scene:, Moon Viewing Ceremony
+{0x6c0a, 0x0452, 0xDE88'D83D}, // U+1F688, 🚈, \:light_rail:, Light Rail
+{0x6d09, 0x045d, 0xDC5E'D83D}, // U+1F45E, 👞, \:mans_shoe:, Mans Shoe
+{0x7005, 0x0467, 0xDC5D'D83D}, // U+1F45D, 👝, \:pouch:, Pouch
+{0x7309, 0x046d, 0xDE3C'D83D}, // U+1F63C, 😼, \:smirk_cat:, Cat Face With Wry Smile
+{0x6204, 0x0477, 0xDC3B'D83D}, // U+1F43B, 🐻, \:bear:, Bear Face
+{0x6205, 0x047c, 0xDF5E'D83C}, // U+1F35E, 🍞, \:bread:, Bread
+{0x6407, 0x0482, 0xDC2C'D83D}, // U+1F42C, 🐬, \:dolphin:, Dolphin
+{0x650e, 0x048a, 0xDF32'D83C}, // U+1F332, 🌲, \:evergreen_tree:, Evergreen Tree
+{0x6604, 0x0499, 0xDC38'D83D}, // U+1F438, 🐸, \:frog:, Frog Face
+{0x6704, 0x049e, 0xDE01'D83D}, // U+1F601, 😁, \:grin:, Grinning Face With Smiling Eyes
+{0x6d10, 0x04a3, 0xDCB8'D83D}, // U+1F4B8, 💸, \:money_with_wings:, Money With Wings
+{0x720a, 0x04b4, 0xDF91'D83C}, // U+1F391, 🎑, \:rice_scene:, Moon Viewing Ceremony
 {0x6110, 0x04bf, 0x2199}, // ↙, \:arrow_lower_left:, South West Arrow / Lower Left Arrow
-{0x6204, 0x04d0, 0x1F4A5}, // 💥, \:boom:, Collision Symbol
-{0x6609, 0x04d5, 0x1F44A}, // 👊, \:facepunch:, Fisted Hand Sign
-{0x6609, 0x04df, 0x1F365}, // 🍥, \:fish_cake:, Fish Cake With Swirl Design
-{0x6b0a, 0x04e9, 0x1F51F}, // 🔟, \:keycap_ten:, Keycap Ten
-{0x6d08, 0x04f4, 0x1F69D}, // 🚝, \:monorail:, Monorail
+{0x6204, 0x04d0, 0xDCA5'D83D}, // U+1F4A5, 💥, \:boom:, Collision Symbol
+{0x6609, 0x04d5, 0xDC4A'D83D}, // U+1F44A, 👊, \:facepunch:, Fisted Hand Sign
+{0x6609, 0x04df, 0xDF65'D83C}, // U+1F365, 🍥, \:fish_cake:, Fish Cake With Swirl Design
+{0x6b0a, 0x04e9, 0xDD1F'D83D}, // U+1F51F, 🔟, \:keycap_ten:, Keycap Ten
+{0x6d08, 0x04f4, 0xDE9D'D83D}, // U+1F69D, 🚝, \:monorail:, Monorail
 {0x7305, 0x04fd, 0x2600}, // ☀, \:sunny:, Black Sun With Rays
 {0x7307, 0x0503, 0x26C4}, // ⛄, \:snowman:, Snowman Without Snow
-{0x7307, 0x050b, 0x1F508}, // 🔈, \:speaker:, Speaker
-{0x740f, 0x0513, 0x1F4AD}, // 💭, \:thought_balloon:, Thought Balloon
+{0x7307, 0x050b, 0xDD08'D83D}, // U+1F508, 🔈, \:speaker:, Speaker
+{0x740f, 0x0513, 0xDCAD'D83D}, // U+1F4AD, 💭, \:thought_balloon:, Thought Balloon
 {0x7a03, 0x0523, 0x26A1}, // ⚡, \:zap:, High Voltage Sign
-{0x6103, 0x0527, 0x1F524}, // 🔤, \:abc:, Input Symbol For Latin Letters
-{0x641f, 0x052b, 0x1F4A0}, // 💠, \:diamond_shape_with_a_dot_inside:, Diamond Shape With A Dot Inside
+{0x6103, 0x0527, 0xDD24'D83D}, // U+1F524, 🔤, \:abc:, Input Symbol For Latin Letters
+{0x641f, 0x052b, 0xDCA0'D83D}, // U+1F4A0, 💠, \:diamond_shape_with_a_dot_inside:, Diamond Shape With A Dot Inside
 {0x670d, 0x054b, 0x2754}, // ❔, \:grey_question:, White Question Mark Ornament
-{0x7004, 0x0559, 0x1F64F}, // 🙏, \:pray:, Person With Folded Hands
-{0x7415, 0x055e, 0x1F46C}, // 👬, \:two_men_holding_hands:, Two Men Holding Hands
-{0x7704, 0x0574, 0x1F43A}, // 🐺, \:wolf:, Wolf Face
+{0x7004, 0x0559, 0xDE4F'D83D}, // U+1F64F, 🙏, \:pray:, Person With Folded Hands
+{0x7415, 0x055e, 0xDC6C'D83D}, // U+1F46C, 👬, \:two_men_holding_hands:, Two Men Holding Hands
+{0x7704, 0x0574, 0xDC3A'D83D}, // U+1F43A, 🐺, \:wolf:, Wolf Face
 {0x7709, 0x0579, 0x3030}, // 〰, \:wavy_dash:, Wavy Dash
-{0x6206, 0x0583, 0x1F34C}, // 🍌, \:banana:, Banana
-{0x6207, 0x058a, 0x1F388}, // 🎈, \:balloon:, Balloon
-{0x6508, 0x0592, 0x1F418}, // 🐘, \:elephant:, Elephant
-{0x6608, 0x059b, 0x1F3C8}, // 🏈, \:football:, American Football
-{0x660b, 0x05a4, 0x1F692}, // 🚒, \:fire_engine:, Fire Engine
-{0x6c07, 0x05b0, 0x1F406}, // 🐆, \:leopard:, Leopard
-{0x6e0a, 0x05b8, 0x1F4DB}, // 📛, \:name_badge:, Name Badge
-{0x6304, 0x05c3, 0x1F44F}, // 👏, \:clap:, Clapping Hands Sign
-{0x6305, 0x05c8, 0x1F4B9}, // 💹, \:chart:, Chart With Upwards Trend And Yen Sign
-{0x6b04, 0x05ce, 0x1F201}, // 🈁, \:koko:, Squared Katakana Koko
-{0x6d0c, 0x05d3, 0x1F393}, // 🎓, \:mortar_board:, Graduation Cap
-{0x6e03, 0x05e0, 0x1F195}, // 🆕, \:new:, Squared New
-{0x7007, 0x05e4, 0x1F17F}, // 🅿, \:parking:, Negative Squared Latin Capital Letter P
-{0x7305, 0x05ec, 0x1F40D}, // 🐍, \:snake:, Snake
-{0x730a, 0x05f2, 0x1F63A}, // 😺, \:smiley_cat:, Smiling Cat Face With Open Mouth
-{0x770e, 0x05fd, 0x1F45A}, // 👚, \:womans_clothes:, Womans Clothes
+{0x6206, 0x0583, 0xDF4C'D83C}, // U+1F34C, 🍌, \:banana:, Banana
+{0x6207, 0x058a, 0xDF88'D83C}, // U+1F388, 🎈, \:balloon:, Balloon
+{0x6508, 0x0592, 0xDC18'D83D}, // U+1F418, 🐘, \:elephant:, Elephant
+{0x6608, 0x059b, 0xDFC8'D83C}, // U+1F3C8, 🏈, \:football:, American Football
+{0x660b, 0x05a4, 0xDE92'D83D}, // U+1F692, 🚒, \:fire_engine:, Fire Engine
+{0x6c07, 0x05b0, 0xDC06'D83D}, // U+1F406, 🐆, \:leopard:, Leopard
+{0x6e0a, 0x05b8, 0xDCDB'D83D}, // U+1F4DB, 📛, \:name_badge:, Name Badge
+{0x6304, 0x05c3, 0xDC4F'D83D}, // U+1F44F, 👏, \:clap:, Clapping Hands Sign
+{0x6305, 0x05c8, 0xDCB9'D83D}, // U+1F4B9, 💹, \:chart:, Chart With Upwards Trend And Yen Sign
+{0x6b04, 0x05ce, 0xDE01'D83C}, // U+1F201, 🈁, \:koko:, Squared Katakana Koko
+{0x6d0c, 0x05d3, 0xDF93'D83C}, // U+1F393, 🎓, \:mortar_board:, Graduation Cap
+{0x6e03, 0x05e0, 0xDD95'D83C}, // U+1F195, 🆕, \:new:, Squared New
+{0x7007, 0x05e4, 0xDD7F'D83C}, // U+1F17F, 🅿, \:parking:, Negative Squared Latin Capital Letter P
+{0x7305, 0x05ec, 0xDC0D'D83D}, // U+1F40D, 🐍, \:snake:, Snake
+{0x730a, 0x05f2, 0xDE3A'D83D}, // U+1F63A, 😺, \:smiley_cat:, Smiling Cat Face With Open Mouth
+{0x770e, 0x05fd, 0xDC5A'D83D}, // U+1F45A, 👚, \:womans_clothes:, Womans Clothes
 {0x610f, 0x060c, 0x23EB}, // ⏫, \:arrow_double_up:, Black Up-Pointing Double Triangle
-{0x6404, 0x061c, 0x1F3AF}, // 🎯, \:dart:, Direct Hit
-{0x6c08, 0x0621, 0x1F484}, // 💄, \:lipstick:, Lipstick
-{0x6d11, 0x062a, 0x1F4EC}, // 📬, \:mailbox_with_mail:, Open Mailbox With Raised Flag
-{0x7017, 0x063c, 0x1F6AE}, // 🚮, \:put_litter_in_its_place:, Put Litter In Its Place Symbol
-{0x7309, 0x0654, 0x1F3B7}, // 🎷, \:saxophone:, Saxophone
-{0x7704, 0x065e, 0x1F609}, // 😉, \:wink:, Winking Face
-{0x6a03, 0x0663, 0x1F602}, // 😂, \:joy:, Face With Tears Of Joy
-{0x6d08, 0x0667, 0x1F4B0}, // 💰, \:moneybag:, Money Bag
-{0x7410, 0x0670, 0x1F4D0}, // 📐, \:triangular_ruler:, Triangular Ruler
-{0x631a, 0x0681, 0x1F4C9}, // 📉, \:chart_with_downwards_trend:, Chart With Downwards Trend
-{0x6809, 0x069c, 0x1F36F}, // 🍯, \:honey_pot:, Honey Pot
-{0x6f08, 0x06a6, 0x1F646}, // 🙆, \:ok_woman:, Face With Ok Gesture
-{0x720c, 0x06af, 0x1F358}, // 🍘, \:rice_cracker:, Rice Cracker
-{0x770a, 0x06bc, 0x1F452}, // 👒, \:womans_hat:, Womans Hat
+{0x6404, 0x061c, 0xDFAF'D83C}, // U+1F3AF, 🎯, \:dart:, Direct Hit
+{0x6c08, 0x0621, 0xDC84'D83D}, // U+1F484, 💄, \:lipstick:, Lipstick
+{0x6d11, 0x062a, 0xDCEC'D83D}, // U+1F4EC, 📬, \:mailbox_with_mail:, Open Mailbox With Raised Flag
+{0x7017, 0x063c, 0xDEAE'D83D}, // U+1F6AE, 🚮, \:put_litter_in_its_place:, Put Litter In Its Place Symbol
+{0x7309, 0x0654, 0xDFB7'D83C}, // U+1F3B7, 🎷, \:saxophone:, Saxophone
+{0x7704, 0x065e, 0xDE09'D83D}, // U+1F609, 😉, \:wink:, Winking Face
+{0x6a03, 0x0663, 0xDE02'D83D}, // U+1F602, 😂, \:joy:, Face With Tears Of Joy
+{0x6d08, 0x0667, 0xDCB0'D83D}, // U+1F4B0, 💰, \:moneybag:, Money Bag
+{0x7410, 0x0670, 0xDCD0'D83D}, // U+1F4D0, 📐, \:triangular_ruler:, Triangular Ruler
+{0x631a, 0x0681, 0xDCC9'D83D}, // U+1F4C9, 📉, \:chart_with_downwards_trend:, Chart With Downwards Trend
+{0x6809, 0x069c, 0xDF6F'D83C}, // U+1F36F, 🍯, \:honey_pot:, Honey Pot
+{0x6f08, 0x06a6, 0xDE46'D83D}, // U+1F646, 🙆, \:ok_woman:, Face With Ok Gesture
+{0x720c, 0x06af, 0xDF58'D83C}, // U+1F358, 🍘, \:rice_cracker:, Rice Cracker
+{0x770a, 0x06bc, 0xDC52'D83D}, // U+1F452, 👒, \:womans_hat:, Womans Hat
 {0x610a, 0x06c7, 0x2B07}, // ⬇, \:arrow_down:, Downwards Black Arrow
-{0x6204, 0x06d2, 0x1F462}, // 👢, \:boot:, Womans Boots
-{0x6908, 0x06d7, 0x1F607}, // 😇, \:innocent:, Smiling Face With Halo
+{0x6204, 0x06d2, 0xDC62'D83D}, // U+1F462, 👢, \:boot:, Womans Boots
+{0x6908, 0x06d7, 0xDE07'D83D}, // U+1F607, 😇, \:innocent:, Smiling Face With Halo
 {0x6f09, 0x06e0, 0x26CE}, // ⛎, \:ophiuchus:, Ophiuchus
 {0x700c, 0x06ea, 0x26C5}, // ⛅, \:partly_sunny:, Sun Behind Cloud
-{0x7305, 0x06f7, 0x1F455}, // 👕, \:shirt:, T-Shirt
-{0x7307, 0x06fd, 0x1F6AC}, // 🚬, \:smoking:, Smoking Symbol
-{0x7310, 0x0705, 0x1F61B}, // 😛, \:stuck_out_tongue:, Face With Stuck-Out Tongue
-{0x7406, 0x0716, 0x1F422}, // 🐢, \:turtle:, Turtle
-{0x6105, 0x071d, 0x1F47C}, // 👼, \:angel:, Baby Angel
-{0x680c, 0x0723, 0x1F649}, // 🙉, \:hear_no_evil:, Hear-No-Evil Monkey
-{0x6902, 0x0730, 0x1F194}, // 🆔, \:id:, Squared Id
-{0x6b06, 0x0733, 0x1F458}, // 👘, \:kimono:, Kimono
-{0x6d04, 0x073a, 0x1F507}, // 🔇, \:mute:, Speaker With Cancellation Stroke
-{0x7204, 0x073f, 0x1F339}, // 🌹, \:rose:, Rose
-{0x7606, 0x0744, 0x1F3BB}, // 🎻, \:violin:, Violin
-{0x770a, 0x074b, 0x1F390}, // 🎐, \:wind_chime:, Wind Chime
-{0x6104, 0x0756, 0x1F521}, // 🔡, \:abcd:, Input Symbol For Latin Small Letters
-{0x6109, 0x075b, 0x1F627}, // 😧, \:anguished:, Anguished Face
-{0x6204, 0x0765, 0x1F37A}, // 🍺, \:beer:, Beer Mug
-{0x6308, 0x076a, 0x1F4C6}, // 📆, \:calendar:, Tear-Off Calendar
-{0x6308, 0x0773, 0x1F378}, // 🍸, \:cocktail:, Cocktail Glass
-{0x6311, 0x077c, 0x1F6B8}, // 🚸, \:children_crossing:, Children Crossing
-{0x6704, 0x078e, 0x1F467}, // 👧, \:girl:, Girl
-{0x730c, 0x0793, 0x1F3B0}, // 🎰, \:slot_machine:, Slot Machine
-{0x630d, 0x07a0, 0x1F319}, // 🌙, \:crescent_moon:, Crescent Moon
-{0x6504, 0x07ae, 0x1F4B6}, // 💶, \:euro:, Banknote With Euro Sign
-{0x6514, 0x07b3, 0x1F3E4}, // 🏤, \:european_post_office:, European Post Office
+{0x7305, 0x06f7, 0xDC55'D83D}, // U+1F455, 👕, \:shirt:, T-Shirt
+{0x7307, 0x06fd, 0xDEAC'D83D}, // U+1F6AC, 🚬, \:smoking:, Smoking Symbol
+{0x7310, 0x0705, 0xDE1B'D83D}, // U+1F61B, 😛, \:stuck_out_tongue:, Face With Stuck-Out Tongue
+{0x7406, 0x0716, 0xDC22'D83D}, // U+1F422, 🐢, \:turtle:, Turtle
+{0x6105, 0x071d, 0xDC7C'D83D}, // U+1F47C, 👼, \:angel:, Baby Angel
+{0x680c, 0x0723, 0xDE49'D83D}, // U+1F649, 🙉, \:hear_no_evil:, Hear-No-Evil Monkey
+{0x6902, 0x0730, 0xDD94'D83C}, // U+1F194, 🆔, \:id:, Squared Id
+{0x6b06, 0x0733, 0xDC58'D83D}, // U+1F458, 👘, \:kimono:, Kimono
+{0x6d04, 0x073a, 0xDD07'D83D}, // U+1F507, 🔇, \:mute:, Speaker With Cancellation Stroke
+{0x7204, 0x073f, 0xDF39'D83C}, // U+1F339, 🌹, \:rose:, Rose
+{0x7606, 0x0744, 0xDFBB'D83C}, // U+1F3BB, 🎻, \:violin:, Violin
+{0x770a, 0x074b, 0xDF90'D83C}, // U+1F390, 🎐, \:wind_chime:, Wind Chime
+{0x6104, 0x0756, 0xDD21'D83D}, // U+1F521, 🔡, \:abcd:, Input Symbol For Latin Small Letters
+{0x6109, 0x075b, 0xDE27'D83D}, // U+1F627, 😧, \:anguished:, Anguished Face
+{0x6204, 0x0765, 0xDF7A'D83C}, // U+1F37A, 🍺, \:beer:, Beer Mug
+{0x6308, 0x076a, 0xDCC6'D83D}, // U+1F4C6, 📆, \:calendar:, Tear-Off Calendar
+{0x6308, 0x0773, 0xDF78'D83C}, // U+1F378, 🍸, \:cocktail:, Cocktail Glass
+{0x6311, 0x077c, 0xDEB8'D83D}, // U+1F6B8, 🚸, \:children_crossing:, Children Crossing
+{0x6704, 0x078e, 0xDC67'D83D}, // U+1F467, 👧, \:girl:, Girl
+{0x730c, 0x0793, 0xDFB0'D83C}, // U+1F3B0, 🎰, \:slot_machine:, Slot Machine
+{0x630d, 0x07a0, 0xDF19'D83C}, // U+1F319, 🌙, \:crescent_moon:, Crescent Moon
+{0x6504, 0x07ae, 0xDCB6'D83D}, // U+1F4B6, 💶, \:euro:, Banknote With Euro Sign
+{0x6514, 0x07b3, 0xDFE4'D83C}, // U+1F3E4, 🏤, \:european_post_office:, European Post Office
 {0x6804, 0x07c8, 0x270B}, // ✋, \:hand:, Raised Hand
-{0x700d, 0x07cd, 0x1F6B0}, // 🚰, \:potable_water:, Potable Water Symbol
-{0x3104, 0x07db, 0x1F522}, // 🔢, \:1234:, Input Symbol For Numbers
+{0x700d, 0x07cd, 0xDEB0'D83D}, // U+1F6B0, 🚰, \:potable_water:, Potable Water Symbol
+{0x3104, 0x07db, 0xDD22'D83D}, // U+1F522, 🔢, \:1234:, Input Symbol For Numbers
 {0x620c, 0x07e0, 0x26AB}, // ⚫, \:black_circle:, Medium Black Circle
 {0x6810, 0x07ed, 0x2796}, // ➖, \:heavy_minus_sign:, Heavy Minus Sign
-{0x7009, 0x07fe, 0x1F34D}, // 🍍, \:pineapple:, Pineapple
-{0x7407, 0x0808, 0x1F531}, // 🔱, \:trident:, Trident Emblem
-{0x7508, 0x0810, 0x1F612}, // 😒, \:unamused:, Unamused Face
-{0x760e, 0x0819, 0x1F4F3}, // 📳, \:vibration_mode:, Vibration Mode
-{0x620d, 0x0828, 0x1F6C4}, // 🛄, \:baggage_claim:, Baggage Claim
-{0x6503, 0x0836, 0x1F373}, // 🍳, \:egg:, Cooking
-{0x6704, 0x083a, 0x1F410}, // 🐐, \:goat:, Goat
-{0x6911, 0x083f, 0x1F4E8}, // 📨, \:incoming_envelope:, Incoming Envelope
-{0x6d0e, 0x0851, 0x1F4EA}, // 📪, \:mailbox_closed:, Closed Mailbox With Lowered Flag
-{0x7009, 0x0860, 0x1F334}, // 🌴, \:palm_tree:, Palm Tree
-{0x7505, 0x086a, 0x1F239}, // 🈹, \:u5272:, Squared Cjk Unified Ideograph-5272
-{0x6203, 0x0870, 0x1F41B}, // 🐛, \:bug:, Bug
-{0x6206, 0x0874, 0x1F459}, // 👙, \:bikini:, Bikini
-{0x660a, 0x087b, 0x1F526}, // 🔦, \:flashlight:, Electric Torch
-{0x6706, 0x0886, 0x1F347}, // 🍇, \:grapes:, Grapes
+{0x7009, 0x07fe, 0xDF4D'D83C}, // U+1F34D, 🍍, \:pineapple:, Pineapple
+{0x7407, 0x0808, 0xDD31'D83D}, // U+1F531, 🔱, \:trident:, Trident Emblem
+{0x7508, 0x0810, 0xDE12'D83D}, // U+1F612, 😒, \:unamused:, Unamused Face
+{0x760e, 0x0819, 0xDCF3'D83D}, // U+1F4F3, 📳, \:vibration_mode:, Vibration Mode
+{0x620d, 0x0828, 0xDEC4'D83D}, // U+1F6C4, 🛄, \:baggage_claim:, Baggage Claim
+{0x6503, 0x0836, 0xDF73'D83C}, // U+1F373, 🍳, \:egg:, Cooking
+{0x6704, 0x083a, 0xDC10'D83D}, // U+1F410, 🐐, \:goat:, Goat
+{0x6911, 0x083f, 0xDCE8'D83D}, // U+1F4E8, 📨, \:incoming_envelope:, Incoming Envelope
+{0x6d0e, 0x0851, 0xDCEA'D83D}, // U+1F4EA, 📪, \:mailbox_closed:, Closed Mailbox With Lowered Flag
+{0x7009, 0x0860, 0xDF34'D83C}, // U+1F334, 🌴, \:palm_tree:, Palm Tree
+{0x7505, 0x086a, 0xDE39'D83C}, // U+1F239, 🈹, \:u5272:, Squared Cjk Unified Ideograph-5272
+{0x6203, 0x0870, 0xDC1B'D83D}, // U+1F41B, 🐛, \:bug:, Bug
+{0x6206, 0x0874, 0xDC59'D83D}, // U+1F459, 👙, \:bikini:, Bikini
+{0x660a, 0x087b, 0xDD26'D83D}, // U+1F526, 🔦, \:flashlight:, Electric Torch
+{0x6706, 0x0886, 0xDF47'D83C}, // U+1F347, 🍇, \:grapes:, Grapes
 {0x6c03, 0x088d, 0x264C}, // ♌, \:leo:, Leo
-{0x6e08, 0x0891, 0x1F311}, // 🌑, \:new_moon:, New Moon Symbol
-{0x700a, 0x089a, 0x1F448}, // 👈, \:point_left:, White Left Pointing Backhand Index
-{0x720d, 0x08a5, 0x1F4CD}, // 📍, \:round_pushpin:, Round Pushpin
-{0x7505, 0x08b3, 0x1F234}, // 🈴, \:u5408:, Squared Cjk Unified Ideograph-5408
-{0x6105, 0x08b9, 0x1F4A2}, // 💢, \:anger:, Anger Symbol
-{0x6208, 0x08bf, 0x1F699}, // 🚙, \:blue_car:, Recreational Vehicle
+{0x6e08, 0x0891, 0xDF11'D83C}, // U+1F311, 🌑, \:new_moon:, New Moon Symbol
+{0x700a, 0x089a, 0xDC48'D83D}, // U+1F448, 👈, \:point_left:, White Left Pointing Backhand Index
+{0x720d, 0x08a5, 0xDCCD'D83D}, // U+1F4CD, 📍, \:round_pushpin:, Round Pushpin
+{0x7505, 0x08b3, 0xDE34'D83C}, // U+1F234, 🈴, \:u5408:, Squared Cjk Unified Ideograph-5408
+{0x6105, 0x08b9, 0xDCA2'D83D}, // U+1F4A2, 💢, \:anger:, Anger Symbol
+{0x6208, 0x08bf, 0xDE99'D83D}, // U+1F699, 🚙, \:blue_car:, Recreational Vehicle
 {0x6212, 0x08c8, 0x2B1B}, // ⬛, \:black_large_square:, Black Large Square
-{0x6708, 0x08db, 0x1F3B2}, // 🎲, \:game_die:, Game Die
-{0x680e, 0x08e4, 0x1F423}, // 🐣, \:hatching_chick:, Hatching Chick
-{0x6c0b, 0x08f3, 0x1F48C}, // 💌, \:love_letter:, Love Letter
-{0x6c11, 0x08ff, 0x1F50F}, // 🔏, \:lock_with_ink_pen:, Lock With Ink Pen
-{0x7305, 0x0911, 0x1F385}, // 🎅, \:santa:, Father Christmas
+{0x6708, 0x08db, 0xDFB2'D83C}, // U+1F3B2, 🎲, \:game_die:, Game Die
+{0x680e, 0x08e4, 0xDC23'D83D}, // U+1F423, 🐣, \:hatching_chick:, Hatching Chick
+{0x6c0b, 0x08f3, 0xDC8C'D83D}, // U+1F48C, 💌, \:love_letter:, Love Letter
+{0x6c11, 0x08ff, 0xDD0F'D83D}, // U+1F50F, 🔏, \:lock_with_ink_pen:, Lock With Ink Pen
+{0x7305, 0x0911, 0xDF85'D83C}, // U+1F385, 🎅, \:santa:, Father Christmas
 {0x7402, 0x0917, 0x2122}, // ™, \:tm:, Trade Mark Sign / Trademark
-{0x6613, 0x091a, 0x1F31D}, // 🌝, \:full_moon_with_face:, Full Moon With Face
-{0x6a0e, 0x092e, 0x1F383}, // 🎃, \:jack_o_lantern:, Jack-O-Lantern
-{0x7607, 0x093d, 0x1F30B}, // 🌋, \:volcano:, Volcano
+{0x6613, 0x091a, 0xDF1D'D83C}, // U+1F31D, 🌝, \:full_moon_with_face:, Full Moon With Face
+{0x6a0e, 0x092e, 0xDF83'D83C}, // U+1F383, 🎃, \:jack_o_lantern:, Jack-O-Lantern
+{0x7607, 0x093d, 0xDF0B'D83C}, // U+1F30B, 🌋, \:volcano:, Volcano
 {0x6706, 0x0945, 0x264A}, // ♊, \:gemini:, Gemini
-{0x6209, 0x094c, 0x1F4CA}, // 📊, \:bar_chart:, Bar Chart
-{0x6313, 0x0956, 0x1F477}, // 👷, \:construction_worker:, Construction Worker
-{0x6d0a, 0x096a, 0x1F3A4}, // 🎤, \:microphone:, Microphone
-{0x6f06, 0x0975, 0x1F3E2}, // 🏢, \:office:, Office Building
-{0x7305, 0x097c, 0x1F604}, // 😄, \:smile:, Smiling Face With Open Mouth And Smiling Eyes
-{0x7404, 0x0982, 0x1F389}, // 🎉, \:tada:, Party Popper
-{0x740a, 0x0987, 0x1F495}, // 💕, \:two_hearts:, Two Hearts
-{0x7903, 0x0992, 0x1F4B4}, // 💴, \:yen:, Banknote With Yen Sign
-{0x6306, 0x0996, 0x1F4F7}, // 📷, \:camera:, Camera
-{0x6607, 0x099d, 0x1F628}, // 😨, \:fearful:, Fearful Face
-{0x6807, 0x09a5, 0x1F45C}, // 👜, \:handbag:, Handbag
+{0x6209, 0x094c, 0xDCCA'D83D}, // U+1F4CA, 📊, \:bar_chart:, Bar Chart
+{0x6313, 0x0956, 0xDC77'D83D}, // U+1F477, 👷, \:construction_worker:, Construction Worker
+{0x6d0a, 0x096a, 0xDFA4'D83C}, // U+1F3A4, 🎤, \:microphone:, Microphone
+{0x6f06, 0x0975, 0xDFE2'D83C}, // U+1F3E2, 🏢, \:office:, Office Building
+{0x7305, 0x097c, 0xDE04'D83D}, // U+1F604, 😄, \:smile:, Smiling Face With Open Mouth And Smiling Eyes
+{0x7404, 0x0982, 0xDF89'D83C}, // U+1F389, 🎉, \:tada:, Party Popper
+{0x740a, 0x0987, 0xDC95'D83D}, // U+1F495, 💕, \:two_hearts:, Two Hearts
+{0x7903, 0x0992, 0xDCB4'D83D}, // U+1F4B4, 💴, \:yen:, Banknote With Yen Sign
+{0x6306, 0x0996, 0xDCF7'D83D}, // U+1F4F7, 📷, \:camera:, Camera
+{0x6607, 0x099d, 0xDE28'D83D}, // U+1F628, 😨, \:fearful:, Fearful Face
+{0x6807, 0x09a5, 0xDC5C'D83D}, // U+1F45C, 👜, \:handbag:, Handbag
 {0x7306, 0x09ad, 0x26BD}, // ⚽, \:soccer:, Soccer Ball
-{0x730b, 0x09b4, 0x1F3FB}, // 🏻, \:skin-tone-2:, Emoji Modifier Fitzpatrick Type-1-2
-{0x7505, 0x09c0, 0x1F233}, // 🈳, \:u7a7a:, Squared Cjk Unified Ideograph-7A7A
-{0x770c, 0x09c6, 0x1F4AE}, // 💮, \:white_flower:, White Flower
-{0x6307, 0x09d3, 0x1F4F2}, // 📲, \:calling:, Mobile Phone With Rightwards Arrow At Left
-{0x6606, 0x09db, 0x1F46A}, // 👪, \:family:, Family
+{0x730b, 0x09b4, 0xDFFB'D83C}, // U+1F3FB, 🏻, \:skin-tone-2:, Emoji Modifier Fitzpatrick Type-1-2
+{0x7505, 0x09c0, 0xDE33'D83C}, // U+1F233, 🈳, \:u7a7a:, Squared Cjk Unified Ideograph-7A7A
+{0x770c, 0x09c6, 0xDCAE'D83D}, // U+1F4AE, 💮, \:white_flower:, White Flower
+{0x6307, 0x09d3, 0xDCF2'D83D}, // U+1F4F2, 📲, \:calling:, Mobile Phone With Rightwards Arrow At Left
+{0x6606, 0x09db, 0xDC6A'D83D}, // U+1F46A, 👪, \:family:, Family
 {0x660c, 0x09e2, 0x23E9}, // ⏩, \:fast_forward:, Black Right-Pointing Double Triangle
-{0x6c0a, 0x09ef, 0x1F50A}, // 🔊, \:loud_sound:, Speaker With Three Sound Waves
-{0x730b, 0x09fa, 0x1F3FC}, // 🏼, \:skin-tone-3:, Emoji Modifier Fitzpatrick Type-3
-{0x7505, 0x0a06, 0x1F235}, // 🈵, \:u6e80:, Squared Cjk Unified Ideograph-6E80
-{0x6305, 0x0a0c, 0x1F35B}, // 🍛, \:curry:, Curry And Rice
+{0x6c0a, 0x09ef, 0xDD0A'D83D}, // U+1F50A, 🔊, \:loud_sound:, Speaker With Three Sound Waves
+{0x730b, 0x09fa, 0xDFFC'D83C}, // U+1F3FC, 🏼, \:skin-tone-3:, Emoji Modifier Fitzpatrick Type-3
+{0x7505, 0x0a06, 0xDE35'D83C}, // U+1F235, 🈵, \:u6e80:, Squared Cjk Unified Ideograph-6E80
+{0x6305, 0x0a0c, 0xDF5B'D83C}, // U+1F35B, 🍛, \:curry:, Curry And Rice
 {0x690b, 0x0a12, 0x2049}, // ⁉, \:interrobang:, Exclamation Question Mark
-{0x6d05, 0x0a1e, 0x1F5FF}, // 🗿, \:moyai:, Moyai
-{0x6d06, 0x0a24, 0x1F401}, // 🐁, \:mouse2:, Mouse
-{0x7217, 0x0a2b, 0x1F3BD}, // 🎽, \:running_shirt_with_sash:, Running Shirt With Sash
-{0x7303, 0x0a43, 0x1F3BF}, // 🎿, \:ski:, Ski And Ski Boot
-{0x730b, 0x0a47, 0x1F3FD}, // 🏽, \:skin-tone-4:, Emoji Modifier Fitzpatrick Type-4
-{0x6207, 0x0a53, 0x1F3B3}, // 🎳, \:bowling:, Bowling
-{0x6307, 0x0a5b, 0x1F36E}, // 🍮, \:custard:, Custard
-{0x6404, 0x0a63, 0x1F6AA}, // 🚪, \:door:, Door
-{0x6614, 0x0a68, 0x1F3B4}, // 🎴, \:flower_playing_cards:, Flower Playing Cards
-{0x6811, 0x0a7d, 0x1F4B2}, // 💲, \:heavy_dollar_sign:, Heavy Dollar Sign
-{0x6d11, 0x0a8f, 0x1F6A0}, // 🚠, \:mountain_cableway:, Mountain Cableway
-{0x7204, 0x0aa1, 0x1F48D}, // 💍, \:ring:, Ring
-{0x7306, 0x0aa6, 0x1F62A}, // 😪, \:sleepy:, Sleepy Face
-{0x730b, 0x0aad, 0x1F3FE}, // 🏾, \:skin-tone-5:, Emoji Modifier Fitzpatrick Type-5
-{0x7404, 0x0ab9, 0x1F68A}, // 🚊, \:tram:, Tram
+{0x6d05, 0x0a1e, 0xDDFF'D83D}, // U+1F5FF, 🗿, \:moyai:, Moyai
+{0x6d06, 0x0a24, 0xDC01'D83D}, // U+1F401, 🐁, \:mouse2:, Mouse
+{0x7217, 0x0a2b, 0xDFBD'D83C}, // U+1F3BD, 🎽, \:running_shirt_with_sash:, Running Shirt With Sash
+{0x7303, 0x0a43, 0xDFBF'D83C}, // U+1F3BF, 🎿, \:ski:, Ski And Ski Boot
+{0x730b, 0x0a47, 0xDFFD'D83C}, // U+1F3FD, 🏽, \:skin-tone-4:, Emoji Modifier Fitzpatrick Type-4
+{0x6207, 0x0a53, 0xDFB3'D83C}, // U+1F3B3, 🎳, \:bowling:, Bowling
+{0x6307, 0x0a5b, 0xDF6E'D83C}, // U+1F36E, 🍮, \:custard:, Custard
+{0x6404, 0x0a63, 0xDEAA'D83D}, // U+1F6AA, 🚪, \:door:, Door
+{0x6614, 0x0a68, 0xDFB4'D83C}, // U+1F3B4, 🎴, \:flower_playing_cards:, Flower Playing Cards
+{0x6811, 0x0a7d, 0xDCB2'D83D}, // U+1F4B2, 💲, \:heavy_dollar_sign:, Heavy Dollar Sign
+{0x6d11, 0x0a8f, 0xDEA0'D83D}, // U+1F6A0, 🚠, \:mountain_cableway:, Mountain Cableway
+{0x7204, 0x0aa1, 0xDC8D'D83D}, // U+1F48D, 💍, \:ring:, Ring
+{0x7306, 0x0aa6, 0xDE2A'D83D}, // U+1F62A, 😪, \:sleepy:, Sleepy Face
+{0x730b, 0x0aad, 0xDFFE'D83C}, // U+1F3FE, 🏾, \:skin-tone-5:, Emoji Modifier Fitzpatrick Type-5
+{0x7404, 0x0ab9, 0xDE8A'D83D}, // U+1F68A, 🚊, \:tram:, Tram
 {0x7406, 0x0abe, 0x2649}, // ♉, \:taurus:, Taurus
-{0x6204, 0x0ac5, 0x1F426}, // 🐦, \:bird:, Bird
+{0x6204, 0x0ac5, 0xDC26'D83D}, // U+1F426, 🐦, \:bird:, Bird
 {0x6219, 0x0aca, 0x25FE}, // ◾, \:black_medium_small_square:, Black Medium Small Square
 {0x6710, 0x0ae4, 0x2755}, // ❕, \:grey_exclamation:, White Exclamation Mark Ornament
-{0x7204, 0x0af5, 0x1F35A}, // 🍚, \:rice:, Cooked Rice
-{0x7305, 0x0afa, 0x1F480}, // 💀, \:skull:, Skull
-{0x730b, 0x0b00, 0x1F3FF}, // 🏿, \:skin-tone-6:, Emoji Modifier Fitzpatrick Type-6
-{0x7310, 0x0b0c, 0x1F52F}, // 🔯, \:six_pointed_star:, Six Pointed Star With Middle Dot
-{0x7406, 0x0b1d, 0x1F405}, // 🐅, \:tiger2:, Tiger
-{0x6807, 0x0b24, 0x1F487}, // 💇, \:haircut:, Haircut
-{0x6d0a, 0x0b2c, 0x1F5FB}, // 🗻, \:mount_fuji:, Mount Fuji
-{0x720a, 0x0b37, 0x1F502}, // 🔂, \:repeat_one:, Clockwise Rightwards And Leftwards Open Circle Arrows With Circled One Overlay
-{0x7303, 0x0b42, 0x1F62D}, // 😭, \:sob:, Loudly Crying Face
-{0x7308, 0x0b46, 0x1F387}, // 🎇, \:sparkler:, Firework Sparkler
-{0x730b, 0x0b4f, 0x1F608}, // 😈, \:smiling_imp:, Smiling Face With Horns
-{0x7402, 0x0b5b, 0x1F4FA}, // 📺, \:tv:, Television
+{0x7204, 0x0af5, 0xDF5A'D83C}, // U+1F35A, 🍚, \:rice:, Cooked Rice
+{0x7305, 0x0afa, 0xDC80'D83D}, // U+1F480, 💀, \:skull:, Skull
+{0x730b, 0x0b00, 0xDFFF'D83C}, // U+1F3FF, 🏿, \:skin-tone-6:, Emoji Modifier Fitzpatrick Type-6
+{0x7310, 0x0b0c, 0xDD2F'D83D}, // U+1F52F, 🔯, \:six_pointed_star:, Six Pointed Star With Middle Dot
+{0x7406, 0x0b1d, 0xDC05'D83D}, // U+1F405, 🐅, \:tiger2:, Tiger
+{0x6807, 0x0b24, 0xDC87'D83D}, // U+1F487, 💇, \:haircut:, Haircut
+{0x6d0a, 0x0b2c, 0xDDFB'D83D}, // U+1F5FB, 🗻, \:mount_fuji:, Mount Fuji
+{0x720a, 0x0b37, 0xDD02'D83D}, // U+1F502, 🔂, \:repeat_one:, Clockwise Rightwards And Leftwards Open Circle Arrows With Circled One Overlay
+{0x7303, 0x0b42, 0xDE2D'D83D}, // U+1F62D, 😭, \:sob:, Loudly Crying Face
+{0x7308, 0x0b46, 0xDF87'D83C}, // U+1F387, 🎇, \:sparkler:, Firework Sparkler
+{0x730b, 0x0b4f, 0xDE08'D83D}, // U+1F608, 😈, \:smiling_imp:, Smiling Face With Horns
+{0x7402, 0x0b5b, 0xDCFA'D83D}, // U+1F4FA, 📺, \:tv:, Television
 {0x6108, 0x0b5e, 0x2652}, // ♒, \:aquarius:, Aquarius
 {0x6212, 0x0b67, 0x25AA}, // ▪, \:black_small_square:, Black Small Square
-{0x6805, 0x0b7a, 0x1F434}, // 🐴, \:horse:, Horse Face
+{0x6805, 0x0b7a, 0xDC34'D83D}, // U+1F434, 🐴, \:horse:, Horse Face
 {0x7308, 0x0b80, 0x2728}, // ✨, \:sparkles:, Sparkles
 {0x7713, 0x0b89, 0x25FB}, // ◻, \:white_medium_square:, White Medium Square
-{0x6203, 0x0b9d, 0x1F68C}, // 🚌, \:bus:, Bus
-{0x6205, 0x0ba1, 0x1F371}, // 🍱, \:bento:, Bento Box
-{0x6403, 0x0ba7, 0x1F4C0}, // 📀, \:dvd:, Dvd
-{0x6404, 0x0bab, 0x1F4A8}, // 💨, \:dash:, Dash Symbol
-{0x6405, 0x0bb0, 0x1F38E}, // 🎎, \:dolls:, Japanese Dolls
+{0x6203, 0x0b9d, 0xDE8C'D83D}, // U+1F68C, 🚌, \:bus:, Bus
+{0x6205, 0x0ba1, 0xDF71'D83C}, // U+1F371, 🍱, \:bento:, Bento Box
+{0x6403, 0x0ba7, 0xDCC0'D83D}, // U+1F4C0, 📀, \:dvd:, Dvd
+{0x6404, 0x0bab, 0xDCA8'D83D}, // U+1F4A8, 💨, \:dash:, Dash Symbol
+{0x6405, 0x0bb0, 0xDF8E'D83C}, // U+1F38E, 🎎, \:dolls:, Japanese Dolls
 {0x720a, 0x0bb6, 0x00AE}, // ®, \:registered:, Registered Sign / Registered Trade Mark Sign
-{0x7406, 0x0bc1, 0x1F445}, // 👅, \:tongue:, Tongue
-{0x7714, 0x0bc8, 0x1F318}, // 🌘, \:waning_crescent_moon:, Waning Crescent Moon Symbol
-{0x6810, 0x0bdd, 0x1F49F}, // 💟, \:heart_decoration:, Heart Decoration
-{0x6f0c, 0x0bee, 0x1F68D}, // 🚍, \:oncoming_bus:, Oncoming Bus
-{0x7603, 0x0bfb, 0x1F4FC}, // 📼, \:vhs:, Videocassette
-{0x6207, 0x0bff, 0x1F6C1}, // 🛁, \:bathtub:, Bathtub
-{0x6f05, 0x0c07, 0x1F30A}, // 🌊, \:ocean:, Water Wave
-{0x7207, 0x0c0d, 0x1F413}, // 🐓, \:rooster:, Rooster
-{0x7207, 0x0c15, 0x1F6A3}, // 🚣, \:rowboat:, Rowboat
-{0x6314, 0x0c1d, 0x1F510}, // 🔐, \:closed_lock_with_key:, Closed Lock With Key
-{0x650a, 0x0c32, 0x1F453}, // 👓, \:eyeglasses:, Eyeglasses
-{0x6c11, 0x0c3d, 0x1F535}, // 🔵, \:large_blue_circle:, Large Blue Circle
-{0x6d04, 0x0c4f, 0x1F314}, // 🌔, \:moon:, Waxing Gibbous Moon Symbol
-{0x7403, 0x0c54, 0x1F51D}, // 🔝, \:top:, Top With Upwards Arrow Above
+{0x7406, 0x0bc1, 0xDC45'D83D}, // U+1F445, 👅, \:tongue:, Tongue
+{0x7714, 0x0bc8, 0xDF18'D83C}, // U+1F318, 🌘, \:waning_crescent_moon:, Waning Crescent Moon Symbol
+{0x6810, 0x0bdd, 0xDC9F'D83D}, // U+1F49F, 💟, \:heart_decoration:, Heart Decoration
+{0x6f0c, 0x0bee, 0xDE8D'D83D}, // U+1F68D, 🚍, \:oncoming_bus:, Oncoming Bus
+{0x7603, 0x0bfb, 0xDCFC'D83D}, // U+1F4FC, 📼, \:vhs:, Videocassette
+{0x6207, 0x0bff, 0xDEC1'D83D}, // U+1F6C1, 🛁, \:bathtub:, Bathtub
+{0x6f05, 0x0c07, 0xDF0A'D83C}, // U+1F30A, 🌊, \:ocean:, Water Wave
+{0x7207, 0x0c0d, 0xDC13'D83D}, // U+1F413, 🐓, \:rooster:, Rooster
+{0x7207, 0x0c15, 0xDEA3'D83D}, // U+1F6A3, 🚣, \:rowboat:, Rowboat
+{0x6314, 0x0c1d, 0xDD10'D83D}, // U+1F510, 🔐, \:closed_lock_with_key:, Closed Lock With Key
+{0x650a, 0x0c32, 0xDC53'D83D}, // U+1F453, 👓, \:eyeglasses:, Eyeglasses
+{0x6c11, 0x0c3d, 0xDD35'D83D}, // U+1F535, 🔵, \:large_blue_circle:, Large Blue Circle
+{0x6d04, 0x0c4f, 0xDF14'D83C}, // U+1F314, 🌔, \:moon:, Waxing Gibbous Moon Symbol
+{0x7403, 0x0c54, 0xDD1D'D83D}, // U+1F51D, 🔝, \:top:, Top With Upwards Arrow Above
 {0x6105, 0x0c58, 0x2648}, // ♈, \:aries:, Aries
-{0x6209, 0x0c5e, 0x1F4D8}, // 📘, \:blue_book:, Blue Book
-{0x630d, 0x0c68, 0x1F38A}, // 🎊, \:confetti_ball:, Confetti Ball
-{0x6706, 0x0c76, 0x1F3B8}, // 🎸, \:guitar:, Guitar
-{0x6e09, 0x0c7d, 0x1F485}, // 💅, \:nail_care:, Nail Polish
-{0x6e0d, 0x0c87, 0x1F6AB}, // 🚫, \:no_entry_sign:, No Entry Sign
-{0x7305, 0x0c95, 0x1F613}, // 😓, \:sweat:, Face With Cold Sweat
-{0x7310, 0x0c9b, 0x1F682}, // 🚂, \:steam_locomotive:, Steam Locomotive
-{0x6304, 0x0cac, 0x1F404}, // 🐄, \:cow2:, Cow
-{0x630e, 0x0cb1, 0x1F384}, // 🎄, \:christmas_tree:, Christmas Tree
-{0x630f, 0x0cc0, 0x1F302}, // 🌂, \:closed_umbrella:, Closed Umbrella
-{0x7018, 0x0cd0, 0x1F64E}, // 🙎, \:person_with_pouting_face:, Person With Pouting Face
+{0x6209, 0x0c5e, 0xDCD8'D83D}, // U+1F4D8, 📘, \:blue_book:, Blue Book
+{0x630d, 0x0c68, 0xDF8A'D83C}, // U+1F38A, 🎊, \:confetti_ball:, Confetti Ball
+{0x6706, 0x0c76, 0xDFB8'D83C}, // U+1F3B8, 🎸, \:guitar:, Guitar
+{0x6e09, 0x0c7d, 0xDC85'D83D}, // U+1F485, 💅, \:nail_care:, Nail Polish
+{0x6e0d, 0x0c87, 0xDEAB'D83D}, // U+1F6AB, 🚫, \:no_entry_sign:, No Entry Sign
+{0x7305, 0x0c95, 0xDE13'D83D}, // U+1F613, 😓, \:sweat:, Face With Cold Sweat
+{0x7310, 0x0c9b, 0xDE82'D83D}, // U+1F682, 🚂, \:steam_locomotive:, Steam Locomotive
+{0x6304, 0x0cac, 0xDC04'D83D}, // U+1F404, 🐄, \:cow2:, Cow
+{0x630e, 0x0cb1, 0xDF84'D83C}, // U+1F384, 🎄, \:christmas_tree:, Christmas Tree
+{0x630f, 0x0cc0, 0xDF02'D83C}, // U+1F302, 🌂, \:closed_umbrella:, Closed Umbrella
+{0x7018, 0x0cd0, 0xDE4E'D83D}, // U+1F64E, 🙎, \:person_with_pouting_face:, Person With Pouting Face
 {0x6110, 0x0ce9, 0x2934}, // ⤴, \:arrow_heading_up:, Arrow Pointing Rightwards Then Curving Upwards
-{0x6204, 0x0cfa, 0x1F417}, // 🐗, \:boar:, Boar
-{0x630a, 0x0cff, 0x1F48F}, // 💏, \:couplekiss:, Kiss
-{0x630d, 0x0d0a, 0x1F36B}, // 🍫, \:chocolate_bar:, Chocolate Bar
-{0x6318, 0x0d18, 0x1F4C8}, // 📈, \:chart_with_upwards_trend:, Chart With Upwards Trend
-{0x6f13, 0x0d31, 0x1F694}, // 🚔, \:oncoming_police_car:, Oncoming Police Car
-{0x6307, 0x0d45, 0x1F3AC}, // 🎬, \:clapper:, Clapper Board
-{0x680a, 0x0d4d, 0x1F681}, // 🚁, \:helicopter:, Helicopter
-{0x6b03, 0x0d58, 0x1F511}, // 🔑, \:key:, Key
-{0x7008, 0x0d5c, 0x1F478}, // 👸, \:princess:, Princess
-{0x700b, 0x0d65, 0x1F3E3}, // 🏣, \:post_office:, Japanese Post Office
-{0x7417, 0x0d71, 0x1F6A9}, // 🚩, \:triangular_flag_on_post:, Triangular Flag On Post
+{0x6204, 0x0cfa, 0xDC17'D83D}, // U+1F417, 🐗, \:boar:, Boar
+{0x630a, 0x0cff, 0xDC8F'D83D}, // U+1F48F, 💏, \:couplekiss:, Kiss
+{0x630d, 0x0d0a, 0xDF6B'D83C}, // U+1F36B, 🍫, \:chocolate_bar:, Chocolate Bar
+{0x6318, 0x0d18, 0xDCC8'D83D}, // U+1F4C8, 📈, \:chart_with_upwards_trend:, Chart With Upwards Trend
+{0x6f13, 0x0d31, 0xDE94'D83D}, // U+1F694, 🚔, \:oncoming_police_car:, Oncoming Police Car
+{0x6307, 0x0d45, 0xDFAC'D83C}, // U+1F3AC, 🎬, \:clapper:, Clapper Board
+{0x680a, 0x0d4d, 0xDE81'D83D}, // U+1F681, 🚁, \:helicopter:, Helicopter
+{0x6b03, 0x0d58, 0xDD11'D83D}, // U+1F511, 🔑, \:key:, Key
+{0x7008, 0x0d5c, 0xDC78'D83D}, // U+1F478, 👸, \:princess:, Princess
+{0x700b, 0x0d65, 0xDFE3'D83C}, // U+1F3E3, 🏣, \:post_office:, Japanese Post Office
+{0x7417, 0x0d71, 0xDEA9'D83D}, // U+1F6A9, 🚩, \:triangular_flag_on_post:, Triangular Flag On Post
 {0x6204, 0x0d89, 0x26F5}, // ⛵, \:boat:, Sailboat
-{0x630c, 0x0d8e, 0x1F52E}, // 🔮, \:crystal_ball:, Crystal Ball
-{0x650b, 0x0d9b, 0x1F33E}, // 🌾, \:ear_of_rice:, Ear Of Rice
-{0x6604, 0x0da7, 0x1F193}, // 🆓, \:free:, Squared Free
-{0x6909, 0x0dac, 0x1F368}, // 🍨, \:ice_cream:, Ice Cream
-{0x6d07, 0x0db6, 0x1F004}, // 🀄, \:mahjong:, Mahjong Tile Red Dragon
-{0x730a, 0x0dbe, 0x1F640}, // 🙀, \:scream_cat:, Weary Cat Face
+{0x630c, 0x0d8e, 0xDD2E'D83D}, // U+1F52E, 🔮, \:crystal_ball:, Crystal Ball
+{0x650b, 0x0d9b, 0xDF3E'D83C}, // U+1F33E, 🌾, \:ear_of_rice:, Ear Of Rice
+{0x6604, 0x0da7, 0xDD93'D83C}, // U+1F193, 🆓, \:free:, Squared Free
+{0x6909, 0x0dac, 0xDF68'D83C}, // U+1F368, 🍨, \:ice_cream:, Ice Cream
+{0x6d07, 0x0db6, 0xDC04'D83C}, // U+1F004, 🀄, \:mahjong:, Mahjong Tile Red Dragon
+{0x730a, 0x0dbe, 0xDE40'D83D}, // U+1F640, 🙀, \:scream_cat:, Weary Cat Face
 {0x6213, 0x0dc9, 0x25FC}, // ◼, \:black_medium_square:, Black Medium Square
-{0x650c, 0x0ddd, 0x1F30D}, // 🌍, \:earth_africa:, Earth Globe Europe-Africa
-{0x6e09, 0x0dea, 0x1F4F0}, // 📰, \:newspaper:, Newspaper
-{0x6e10, 0x0df4, 0x1F303}, // 🌃, \:night_with_stars:, Night With Stars
-{0x6f02, 0x0e05, 0x1F17E}, // 🅾, \:o2:, Negative Squared Latin Capital Letter O
-{0x700a, 0x0e08, 0x1F693}, // 🚓, \:police_car:, Police Car
-{0x7419, 0x0e13, 0x1F500}, // 🔀, \:twisted_rightwards_arrows:, Twisted Rightwards Arrows
-{0x7707, 0x0e2d, 0x1F6B6}, // 🚶, \:walking:, Pedestrian
+{0x650c, 0x0ddd, 0xDF0D'D83C}, // U+1F30D, 🌍, \:earth_africa:, Earth Globe Europe-Africa
+{0x6e09, 0x0dea, 0xDCF0'D83D}, // U+1F4F0, 📰, \:newspaper:, Newspaper
+{0x6e10, 0x0df4, 0xDF03'D83C}, // U+1F303, 🌃, \:night_with_stars:, Night With Stars
+{0x6f02, 0x0e05, 0xDD7E'D83C}, // U+1F17E, 🅾, \:o2:, Negative Squared Latin Capital Letter O
+{0x700a, 0x0e08, 0xDE93'D83D}, // U+1F693, 🚓, \:police_car:, Police Car
+{0x7419, 0x0e13, 0xDD00'D83D}, // U+1F500, 🔀, \:twisted_rightwards_arrows:, Twisted Rightwards Arrows
+{0x7707, 0x0e2d, 0xDEB6'D83D}, // U+1F6B6, 🚶, \:walking:, Pedestrian
 {0x610e, 0x0e35, 0x25C0}, // ◀, \:arrow_backward:, Black Left-Pointing Triangle / Black Left Pointing Triangle
-{0x6204, 0x0e44, 0x1F6B2}, // 🚲, \:bike:, Bicycle
-{0x630a, 0x0e49, 0x1F630}, // 😰, \:cold_sweat:, Face With Open Mouth And Cold Sweat
-{0x6311, 0x0e54, 0x1F3EA}, // 🏪, \:convenience_store:, Convenience Store
-{0x6605, 0x0e66, 0x1F38F}, // 🎏, \:flags:, Carp Streamer
+{0x6204, 0x0e44, 0xDEB2'D83D}, // U+1F6B2, 🚲, \:bike:, Bicycle
+{0x630a, 0x0e49, 0xDE30'D83D}, // U+1F630, 😰, \:cold_sweat:, Face With Open Mouth And Cold Sweat
+{0x6311, 0x0e54, 0xDFEA'D83C}, // U+1F3EA, 🏪, \:convenience_store:, Convenience Store
+{0x6605, 0x0e66, 0xDF8F'D83C}, // U+1F38F, 🎏, \:flags:, Carp Streamer
 {0x6806, 0x0e6c, 0x2665}, // ♥, \:hearts:, Black Heart Suit
-{0x6913, 0x0e73, 0x1F250}, // 🉐, \:ideograph_advantage:, Circled Ideograph Advantage
-{0x6d05, 0x0e87, 0x1F348}, // 🍈, \:melon:, Melon
-{0x6d05, 0x0e8d, 0x1F42D}, // 🐭, \:mouse:, Mouse Face
-{0x7308, 0x0e93, 0x1F331}, // 🌱, \:seedling:, Seedling
-{0x7309, 0x0e9c, 0x1F35D}, // 🍝, \:spaghetti:, Spaghetti
-{0x730d, 0x0ea6, 0x1F31E}, // 🌞, \:sun_with_face:, Sun With Face
-{0x640e, 0x0eb4, 0x1F333}, // 🌳, \:deciduous_tree:, Deciduous Tree
-{0x6504, 0x0ec3, 0x1F440}, // 👀, \:eyes:, Eyes
-{0x730a, 0x0ec8, 0x1F60E}, // 😎, \:sunglasses:, Smiling Face With Sunglasses
-{0x731c, 0x0ed3, 0x1F61D}, // 😝, \:stuck_out_tongue_closed_eyes:, Face With Stuck-Out Tongue And Tightly-Closed Eyes
-{0x7409, 0x0ef0, 0x1F52D}, // 🔭, \:telescope:, Telescope
-{0x6208, 0x0efa, 0x1F382}, // 🎂, \:birthday:, Birthday Cake
-{0x630d, 0x0f03, 0x1F38C}, // 🎌, \:crossed_flags:, Crossed Flags
-{0x6405, 0x0f11, 0x1F457}, // 👗, \:dress:, Dress
-{0x680a, 0x0f17, 0x1F497}, // 💗, \:heartpulse:, Growing Heart
-{0x6c12, 0x0f22, 0x1F537}, // 🔷, \:large_blue_diamond:, Large Blue Diamond
-{0x6d0c, 0x0f35, 0x1F3B5}, // 🎵, \:musical_note:, Musical Note
-{0x6205, 0x0f42, 0x1F60A}, // 😊, \:blush:, Smiling Face With Smiling Eyes
-{0x6208, 0x0f48, 0x1F516}, // 🔖, \:bookmark:, Bookmark
-{0x6209, 0x0f51, 0x1F6B4}, // 🚴, \:bicyclist:, Bicyclist
-{0x6308, 0x0f5b, 0x1F330}, // 🌰, \:chestnut:, Chestnut
-{0x630b, 0x0f64, 0x1F4B3}, // 💳, \:credit_card:, Credit Card
-{0x650e, 0x0f70, 0x1F30E}, // 🌎, \:earth_americas:, Earth Globe Americas
-{0x660e, 0x0f7f, 0x1F374}, // 🍴, \:fork_and_knife:, Fork And Knife
-{0x6805, 0x0f8e, 0x1F3E8}, // 🏨, \:hotel:, Hotel
-{0x6d04, 0x0f94, 0x1F637}, // 😷, \:mask:, Face With Medical Mask
-{0x740a, 0x0f99, 0x1F62B}, // 😫, \:tired_face:, Tired Face
+{0x6913, 0x0e73, 0xDE50'D83C}, // U+1F250, 🉐, \:ideograph_advantage:, Circled Ideograph Advantage
+{0x6d05, 0x0e87, 0xDF48'D83C}, // U+1F348, 🍈, \:melon:, Melon
+{0x6d05, 0x0e8d, 0xDC2D'D83D}, // U+1F42D, 🐭, \:mouse:, Mouse Face
+{0x7308, 0x0e93, 0xDF31'D83C}, // U+1F331, 🌱, \:seedling:, Seedling
+{0x7309, 0x0e9c, 0xDF5D'D83C}, // U+1F35D, 🍝, \:spaghetti:, Spaghetti
+{0x730d, 0x0ea6, 0xDF1E'D83C}, // U+1F31E, 🌞, \:sun_with_face:, Sun With Face
+{0x640e, 0x0eb4, 0xDF33'D83C}, // U+1F333, 🌳, \:deciduous_tree:, Deciduous Tree
+{0x6504, 0x0ec3, 0xDC40'D83D}, // U+1F440, 👀, \:eyes:, Eyes
+{0x730a, 0x0ec8, 0xDE0E'D83D}, // U+1F60E, 😎, \:sunglasses:, Smiling Face With Sunglasses
+{0x731c, 0x0ed3, 0xDE1D'D83D}, // U+1F61D, 😝, \:stuck_out_tongue_closed_eyes:, Face With Stuck-Out Tongue And Tightly-Closed Eyes
+{0x7409, 0x0ef0, 0xDD2D'D83D}, // U+1F52D, 🔭, \:telescope:, Telescope
+{0x6208, 0x0efa, 0xDF82'D83C}, // U+1F382, 🎂, \:birthday:, Birthday Cake
+{0x630d, 0x0f03, 0xDF8C'D83C}, // U+1F38C, 🎌, \:crossed_flags:, Crossed Flags
+{0x6405, 0x0f11, 0xDC57'D83D}, // U+1F457, 👗, \:dress:, Dress
+{0x680a, 0x0f17, 0xDC97'D83D}, // U+1F497, 💗, \:heartpulse:, Growing Heart
+{0x6c12, 0x0f22, 0xDD37'D83D}, // U+1F537, 🔷, \:large_blue_diamond:, Large Blue Diamond
+{0x6d0c, 0x0f35, 0xDFB5'D83C}, // U+1F3B5, 🎵, \:musical_note:, Musical Note
+{0x6205, 0x0f42, 0xDE0A'D83D}, // U+1F60A, 😊, \:blush:, Smiling Face With Smiling Eyes
+{0x6208, 0x0f48, 0xDD16'D83D}, // U+1F516, 🔖, \:bookmark:, Bookmark
+{0x6209, 0x0f51, 0xDEB4'D83D}, // U+1F6B4, 🚴, \:bicyclist:, Bicyclist
+{0x6308, 0x0f5b, 0xDF30'D83C}, // U+1F330, 🌰, \:chestnut:, Chestnut
+{0x630b, 0x0f64, 0xDCB3'D83D}, // U+1F4B3, 💳, \:credit_card:, Credit Card
+{0x650e, 0x0f70, 0xDF0E'D83C}, // U+1F30E, 🌎, \:earth_americas:, Earth Globe Americas
+{0x660e, 0x0f7f, 0xDF74'D83C}, // U+1F374, 🍴, \:fork_and_knife:, Fork And Knife
+{0x6805, 0x0f8e, 0xDFE8'D83C}, // U+1F3E8, 🏨, \:hotel:, Hotel
+{0x6d04, 0x0f94, 0xDE37'D83D}, // U+1F637, 😷, \:mask:, Face With Medical Mask
+{0x740a, 0x0f99, 0xDE2B'D83D}, // U+1F62B, 😫, \:tired_face:, Tired Face
 {0x6108, 0x0fa4, 0x2B06}, // ⬆, \:arrow_up:, Upwards Black Arrow
-{0x620b, 0x0fad, 0x1F0CF}, // 🃏, \:black_joker:, Playing Card Black Joker
-{0x670a, 0x0fb9, 0x1F49D}, // 💝, \:gift_heart:, Heart With Ribbon
+{0x620b, 0x0fad, 0xDCCF'D83C}, // U+1F0CF, 🃏, \:black_joker:, Playing Card Black Joker
+{0x670a, 0x0fb9, 0xDC9D'D83D}, // U+1F49D, 💝, \:gift_heart:, Heart With Ribbon
 {0x6c19, 0x0fc4, 0x21A9}, // ↩, \:leftwards_arrow_with_hook:, Leftwards Arrow With Hook / Left Arrow With Hook
-{0x6d13, 0x0fde, 0x1F472}, // 👲, \:man_with_gua_pi_mao:, Man With Gua Pi Mao
-{0x7205, 0x0ff2, 0x1F4FB}, // 📻, \:radio:, Radio
-{0x7303, 0x0ff8, 0x1F198}, // 🆘, \:sos:, Squared Sos
-{0x610a, 0x0ffc, 0x1F632}, // 😲, \:astonished:, Astonished Face
-{0x6308, 0x1007, 0x1F564}, // 🕤, \:clock930:, Clock Face Nine-Thirty
-{0x6403, 0x1010, 0x1F436}, // 🐶, \:dog:, Dog Face
-{0x6b07, 0x1014, 0x1F617}, // 😗, \:kissing:, Kissing Face
+{0x6d13, 0x0fde, 0xDC72'D83D}, // U+1F472, 👲, \:man_with_gua_pi_mao:, Man With Gua Pi Mao
+{0x7205, 0x0ff2, 0xDCFB'D83D}, // U+1F4FB, 📻, \:radio:, Radio
+{0x7303, 0x0ff8, 0xDD98'D83C}, // U+1F198, 🆘, \:sos:, Squared Sos
+{0x610a, 0x0ffc, 0xDE32'D83D}, // U+1F632, 😲, \:astonished:, Astonished Face
+{0x6308, 0x1007, 0xDD64'D83D}, // U+1F564, 🕤, \:clock930:, Clock Face Nine-Thirty
+{0x6403, 0x1010, 0xDC36'D83D}, // U+1F436, 🐶, \:dog:, Dog Face
+{0x6b07, 0x1014, 0xDE17'D83D}, // U+1F617, 😗, \:kissing:, Kissing Face
 {0x6c05, 0x101c, 0x264E}, // ♎, \:libra:, Libra
-{0x770a, 0x1022, 0x1F377}, // 🍷, \:wine_glass:, Wine Glass
-{0x6110, 0x102d, 0x1F503}, // 🔃, \:arrows_clockwise:, Clockwise Downwards And Upwards Open Circle Arrows
-{0x6111, 0x103e, 0x1F69B}, // 🚛, \:articulated_lorry:, Articulated Lorry
-{0x6204, 0x1050, 0x1F6C0}, // 🛀, \:bath:, Bath
-{0x6306, 0x1055, 0x1F335}, // 🌵, \:cactus:, Cactus
-{0x680a, 0x105c, 0x1F60D}, // 😍, \:heart_eyes:, Smiling Face With Heart-Shaped Eyes
+{0x770a, 0x1022, 0xDF77'D83C}, // U+1F377, 🍷, \:wine_glass:, Wine Glass
+{0x6110, 0x102d, 0xDD03'D83D}, // U+1F503, 🔃, \:arrows_clockwise:, Clockwise Downwards And Upwards Open Circle Arrows
+{0x6111, 0x103e, 0xDE9B'D83D}, // U+1F69B, 🚛, \:articulated_lorry:, Articulated Lorry
+{0x6204, 0x1050, 0xDEC0'D83D}, // U+1F6C0, 🛀, \:bath:, Bath
+{0x6306, 0x1055, 0xDF35'D83C}, // U+1F335, 🌵, \:cactus:, Cactus
+{0x680a, 0x105c, 0xDE0D'D83D}, // U+1F60D, 😍, \:heart_eyes:, Smiling Face With Heart-Shaped Eyes
 {0x6108, 0x1067, 0x2708}, // ✈, \:airplane:, Airplane
-{0x640a, 0x1070, 0x1F635}, // 😵, \:dizzy_face:, Dizzy Face
-{0x6604, 0x107b, 0x1F43E}, // 🐾, \:feet:, Paw Prints
-{0x6917, 0x1080, 0x1F481}, // 💁, \:information_desk_person:, Information Desk Person
-{0x6f07, 0x1098, 0x1F44C}, // 👌, \:ok_hand:, Ok Hand Sign
-{0x7412, 0x10a0, 0x1F4DE}, // 📞, \:telephone_receiver:, Telephone Receiver
-{0x6205, 0x10b3, 0x1F37B}, // 🍻, \:beers:, Clinking Beer Mugs
-{0x6305, 0x10b9, 0x1F36C}, // 🍬, \:candy:, Candy
+{0x640a, 0x1070, 0xDE35'D83D}, // U+1F635, 😵, \:dizzy_face:, Dizzy Face
+{0x6604, 0x107b, 0xDC3E'D83D}, // U+1F43E, 🐾, \:feet:, Paw Prints
+{0x6917, 0x1080, 0xDC81'D83D}, // U+1F481, 💁, \:information_desk_person:, Information Desk Person
+{0x6f07, 0x1098, 0xDC4C'D83D}, // U+1F44C, 👌, \:ok_hand:, Ok Hand Sign
+{0x7412, 0x10a0, 0xDCDE'D83D}, // U+1F4DE, 📞, \:telephone_receiver:, Telephone Receiver
+{0x6205, 0x10b3, 0xDF7B'D83C}, // U+1F37B, 🍻, \:beers:, Clinking Beer Mugs
+{0x6305, 0x10b9, 0xDF6C'D83C}, // U+1F36C, 🍬, \:candy:, Candy
 {0x6306, 0x10bf, 0x26EA}, // ⛪, \:church:, Church
-{0x630a, 0x10c6, 0x1F4C7}, // 📇, \:card_index:, Card Index
-{0x660b, 0x10d1, 0x1F4C1}, // 📁, \:file_folder:, File Folder
-{0x6e05, 0x10dd, 0x1F3B6}, // 🎶, \:notes:, Multiple Musical Notes
-{0x7405, 0x10e3, 0x1F69A}, // 🚚, \:truck:, Delivery Truck
-{0x7407, 0x10e9, 0x1F69C}, // 🚜, \:tractor:, Tractor
-{0x6105, 0x10f1, 0x1F34E}, // 🍎, \:apple:, Red Apple
-{0x6204, 0x10f7, 0x1F4A3}, // 💣, \:bomb:, Bomb
-{0x6303, 0x10fc, 0x1F622}, // 😢, \:cry:, Crying Face
-{0x640f, 0x1100, 0x1F42A}, // 🐪, \:dromedary_camel:, Dromedary Camel
-{0x6e0a, 0x1110, 0x1F6AD}, // 🚭, \:no_smoking:, No Smoking Symbol
-{0x720b, 0x111b, 0x1F683}, // 🚃, \:railway_car:, Railway Car
+{0x630a, 0x10c6, 0xDCC7'D83D}, // U+1F4C7, 📇, \:card_index:, Card Index
+{0x660b, 0x10d1, 0xDCC1'D83D}, // U+1F4C1, 📁, \:file_folder:, File Folder
+{0x6e05, 0x10dd, 0xDFB6'D83C}, // U+1F3B6, 🎶, \:notes:, Multiple Musical Notes
+{0x7405, 0x10e3, 0xDE9A'D83D}, // U+1F69A, 🚚, \:truck:, Delivery Truck
+{0x7407, 0x10e9, 0xDE9C'D83D}, // U+1F69C, 🚜, \:tractor:, Tractor
+{0x6105, 0x10f1, 0xDF4E'D83C}, // U+1F34E, 🍎, \:apple:, Red Apple
+{0x6204, 0x10f7, 0xDCA3'D83D}, // U+1F4A3, 💣, \:bomb:, Bomb
+{0x6303, 0x10fc, 0xDE22'D83D}, // U+1F622, 😢, \:cry:, Crying Face
+{0x640f, 0x1100, 0xDC2A'D83D}, // U+1F42A, 🐪, \:dromedary_camel:, Dromedary Camel
+{0x6e0a, 0x1110, 0xDEAD'D83D}, // U+1F6AD, 🚭, \:no_smoking:, No Smoking Symbol
+{0x720b, 0x111b, 0xDE83'D83D}, // U+1F683, 🚃, \:railway_car:, Railway Car
 {0x6209, 0x1127, 0x2712}, // ✒, \:black_nib:, Black Nib
-{0x630c, 0x1131, 0x1F520}, // 🔠, \:capital_abcd:, Input Symbol For Latin Capital Letters
-{0x670a, 0x113e, 0x1F4D7}, // 📗, \:green_book:, Green Book
-{0x6714, 0x1149, 0x1F310}, // 🌐, \:globe_with_meridians:, Globe With Meridians
-{0x6d06, 0x115e, 0x1F412}, // 🐒, \:monkey:, Monkey
-{0x7007, 0x1165, 0x1F4CC}, // 📌, \:pushpin:, Pushpin
-{0x7316, 0x116d, 0x1F304}, // 🌄, \:sunrise_over_mountains:, Sunrise Over Mountains
+{0x630c, 0x1131, 0xDD20'D83D}, // U+1F520, 🔠, \:capital_abcd:, Input Symbol For Latin Capital Letters
+{0x670a, 0x113e, 0xDCD7'D83D}, // U+1F4D7, 📗, \:green_book:, Green Book
+{0x6714, 0x1149, 0xDF10'D83C}, // U+1F310, 🌐, \:globe_with_meridians:, Globe With Meridians
+{0x6d06, 0x115e, 0xDC12'D83D}, // U+1F412, 🐒, \:monkey:, Monkey
+{0x7007, 0x1165, 0xDCCC'D83D}, // U+1F4CC, 📌, \:pushpin:, Pushpin
+{0x7316, 0x116d, 0xDF04'D83C}, // U+1F304, 🌄, \:sunrise_over_mountains:, Sunrise Over Mountains
 {0x610b, 0x1184, 0x27A1}, // ➡, \:arrow_right:, Black Rightwards Arrow / Black Right Arrow
-{0x6205, 0x1190, 0x1F4DA}, // 📚, \:books:, Books
-{0x6304, 0x1196, 0x1F33D}, // 🌽, \:corn:, Ear Of Maize
-{0x6407, 0x119b, 0x1F4A7}, // 💧, \:droplet:, Droplet
-{0x6c0c, 0x11a3, 0x1F6C5}, // 🛅, \:left_luggage:, Left Luggage
-{0x7005, 0x11b0, 0x1F355}, // 🍕, \:pizza:, Slice Of Pizza
+{0x6205, 0x1190, 0xDCDA'D83D}, // U+1F4DA, 📚, \:books:, Books
+{0x6304, 0x1196, 0xDF3D'D83C}, // U+1F33D, 🌽, \:corn:, Ear Of Maize
+{0x6407, 0x119b, 0xDCA7'D83D}, // U+1F4A7, 💧, \:droplet:, Droplet
+{0x6c0c, 0x11a3, 0xDEC5'D83D}, // U+1F6C5, 🛅, \:left_luggage:, Left Luggage
+{0x7005, 0x11b0, 0xDF55'D83C}, // U+1F355, 🍕, \:pizza:, Slice Of Pizza
 {0x7108, 0x11b6, 0x2753}, // ❓, \:question:, Black Question Mark Ornament
-{0x730e, 0x11bf, 0x1F4AC}, // 💬, \:speech_balloon:, Speech Balloon
-{0x7405, 0x11ce, 0x1F337}, // 🌷, \:tulip:, Tulip
-{0x7406, 0x11d4, 0x1F686}, // 🚆, \:train2:, Train
+{0x730e, 0x11bf, 0xDCAC'D83D}, // U+1F4AC, 💬, \:speech_balloon:, Speech Balloon
+{0x7405, 0x11ce, 0xDF37'D83C}, // U+1F337, 🌷, \:tulip:, Tulip
+{0x7406, 0x11d4, 0xDE86'D83D}, // U+1F686, 🚆, \:train2:, Train
 {0x770c, 0x11db, 0x26AA}, // ⚪, \:white_circle:, Medium White Circle
-{0x3805, 0x11e8, 0x1F3B1}, // 🎱, \:8ball:, Billiards
-{0x6103, 0x11ee, 0x1F41C}, // 🐜, \:ant:, Ant
-{0x6212, 0x11f2, 0x1F464}, // 👤, \:bust_in_silhouette:, Bust In Silhouette
-{0x6406, 0x1205, 0x1F483}, // 💃, \:dancer:, Dancer
-{0x6415, 0x120c, 0x1F625}, // 😥, \:disappointed_relieved:, Disappointed But Relieved Face
-{0x6506, 0x1222, 0x1F4E7}, // 📧, \:e-mail:, E-Mail Symbol
-{0x6b0d, 0x1229, 0x1F618}, // 😘, \:kissing_heart:, Face Throwing A Kiss
-{0x6c04, 0x1237, 0x1F512}, // 🔒, \:lock:, Lock
-{0x700a, 0x123c, 0x1F447}, // 👇, \:point_down:, White Down Pointing Backhand Index
-{0x7306, 0x1247, 0x1F631}, // 😱, \:scream:, Face Screaming In Fear
-{0x7306, 0x124e, 0x1F3C4}, // 🏄, \:surfer:, Surfer
-{0x7317, 0x1255, 0x1F53B}, // 🔻, \:small_red_triangle_down:, Down-Pointing Red Triangle
+{0x3805, 0x11e8, 0xDFB1'D83C}, // U+1F3B1, 🎱, \:8ball:, Billiards
+{0x6103, 0x11ee, 0xDC1C'D83D}, // U+1F41C, 🐜, \:ant:, Ant
+{0x6212, 0x11f2, 0xDC64'D83D}, // U+1F464, 👤, \:bust_in_silhouette:, Bust In Silhouette
+{0x6406, 0x1205, 0xDC83'D83D}, // U+1F483, 💃, \:dancer:, Dancer
+{0x6415, 0x120c, 0xDE25'D83D}, // U+1F625, 😥, \:disappointed_relieved:, Disappointed But Relieved Face
+{0x6506, 0x1222, 0xDCE7'D83D}, // U+1F4E7, 📧, \:e-mail:, E-Mail Symbol
+{0x6b0d, 0x1229, 0xDE18'D83D}, // U+1F618, 😘, \:kissing_heart:, Face Throwing A Kiss
+{0x6c04, 0x1237, 0xDD12'D83D}, // U+1F512, 🔒, \:lock:, Lock
+{0x700a, 0x123c, 0xDC47'D83D}, // U+1F447, 👇, \:point_down:, White Down Pointing Backhand Index
+{0x7306, 0x1247, 0xDE31'D83D}, // U+1F631, 😱, \:scream:, Face Screaming In Fear
+{0x7306, 0x124e, 0xDFC4'D83C}, // U+1F3C4, 🏄, \:surfer:, Surfer
+{0x7317, 0x1255, 0xDD3B'D83D}, // U+1F53B, 🔻, \:small_red_triangle_down:, Down-Pointing Red Triangle
 {0x680f, 0x126d, 0x2795}, // ➕, \:heavy_plus_sign:, Heavy Plus Sign
-{0x720e, 0x127d, 0x1F3A2}, // 🎢, \:roller_coaster:, Roller Coaster
-{0x7403, 0x128c, 0x1F375}, // 🍵, \:tea:, Teacup Without Handle
+{0x720e, 0x127d, 0xDFA2'D83C}, // U+1F3A2, 🎢, \:roller_coaster:, Roller Coaster
+{0x7403, 0x128c, 0xDF75'D83C}, // U+1F375, 🍵, \:tea:, Teacup Without Handle
 {0x6106, 0x1290, 0x2693}, // ⚓, \:anchor:, Anchor
-{0x6308, 0x1297, 0x1F563}, // 🕣, \:clock830:, Clock Face Eight-Thirty
-{0x6805, 0x12a0, 0x1F52A}, // 🔪, \:hocho:, Hocho
-{0x6809, 0x12a6, 0x1F354}, // 🍔, \:hamburger:, Hamburger
-{0x6811, 0x12b0, 0x1F3E1}, // 🏡, \:house_with_garden:, House With Garden
-{0x6908, 0x12c2, 0x1F366}, // 🍦, \:icecream:, Soft Ice Cream
-{0x6c06, 0x12cb, 0x1F4D2}, // 📒, \:ledger:, Ledger
-{0x6c11, 0x12d2, 0x1F317}, // 🌗, \:last_quarter_moon:, Last Quarter Moon Symbol
-{0x7502, 0x12e4, 0x1F199}, // 🆙, \:up:, Squared Up With Exclamation Mark
-{0x2d02, 0x12e7, 0x1F44E}, // 👎, \:-1:, Thumbs Down Sign
-{0x680c, 0x12ea, 0x1F3C7}, // 🏇, \:horse_racing:, Horse Racing
-{0x6c04, 0x12f7, 0x1F444}, // 👄, \:lips:, Mouth
+{0x6308, 0x1297, 0xDD63'D83D}, // U+1F563, 🕣, \:clock830:, Clock Face Eight-Thirty
+{0x6805, 0x12a0, 0xDD2A'D83D}, // U+1F52A, 🔪, \:hocho:, Hocho
+{0x6809, 0x12a6, 0xDF54'D83C}, // U+1F354, 🍔, \:hamburger:, Hamburger
+{0x6811, 0x12b0, 0xDFE1'D83C}, // U+1F3E1, 🏡, \:house_with_garden:, House With Garden
+{0x6908, 0x12c2, 0xDF66'D83C}, // U+1F366, 🍦, \:icecream:, Soft Ice Cream
+{0x6c06, 0x12cb, 0xDCD2'D83D}, // U+1F4D2, 📒, \:ledger:, Ledger
+{0x6c11, 0x12d2, 0xDF17'D83C}, // U+1F317, 🌗, \:last_quarter_moon:, Last Quarter Moon Symbol
+{0x7502, 0x12e4, 0xDD99'D83C}, // U+1F199, 🆙, \:up:, Squared Up With Exclamation Mark
+{0x2d02, 0x12e7, 0xDC4E'D83D}, // U+1F44E, 👎, \:-1:, Thumbs Down Sign
+{0x680c, 0x12ea, 0xDFC7'D83C}, // U+1F3C7, 🏇, \:horse_racing:, Horse Racing
+{0x6c04, 0x12f7, 0xDC44'D83D}, // U+1F444, 👄, \:lips:, Mouth
 {0x7005, 0x12fc, 0x260E}, // ☎, \:phone:, Black Telephone
 {0x7306, 0x1302, 0x3299}, // ㊙, \:secret:, Circled Ideograph Secret
-{0x770a, 0x1309, 0x1F349}, // 🍉, \:watermelon:, Watermelon
+{0x770a, 0x1309, 0xDF49'D83C}, // U+1F349, 🍉, \:watermelon:, Watermelon
 {0x610d, 0x1314, 0x25B6}, // ▶, \:arrow_forward:, Black Right-Pointing Triangle / Black Right Pointing Triangle
-{0x620a, 0x1322, 0x1F499}, // 💙, \:blue_heart:, Blue Heart
-{0x6311, 0x132d, 0x1F4B1}, // 💱, \:currency_exchange:, Currency Exchange
+{0x620a, 0x1322, 0xDC99'D83D}, // U+1F499, 💙, \:blue_heart:, Blue Heart
+{0x6311, 0x132d, 0xDCB1'D83D}, // U+1F4B1, 💱, \:currency_exchange:, Currency Exchange
 {0x6408, 0x133f, 0x2666}, // ♦, \:diamonds:, Black Diamond Suit
-{0x700b, 0x1348, 0x1F63E}, // 😾, \:pouting_cat:, Pouting Cat Face
-{0x700e, 0x1354, 0x1F4C3}, // 📃, \:page_with_curl:, Page With Curl
-{0x7305, 0x1363, 0x1F320}, // 🌠, \:stars:, Shooting Star
-{0x6d04, 0x1369, 0x1F4DD}, // 📝, \:memo:, Memo
-{0x6d07, 0x136e, 0x1F4EB}, // 📫, \:mailbox:, Closed Mailbox With Raised Flag
-{0x7206, 0x1376, 0x1F380}, // 🎀, \:ribbon:, Ribbon
-{0x730b, 0x137d, 0x1F3C2}, // 🏂, \:snowboarder:, Snowboarder
-{0x6302, 0x1389, 0x1F4BF}, // 💿, \:cd:, Optical Disc
-{0x6306, 0x138c, 0x1F550}, // 🕐, \:clock1:, Clock Face One Oclock
-{0x630e, 0x1393, 0x1F3C1}, // 🏁, \:checkered_flag:, Chequered Flag
-{0x6a07, 0x13a2, 0x1F639}, // 😹, \:joy_cat:, Cat Face With Tears Of Joy
-{0x6d0b, 0x13aa, 0x1F435}, // 🐵, \:monkey_face:, Monkey Face
-{0x6e02, 0x13b6, 0x1F196}, // 🆖, \:ng:, Squared Ng
-{0x7007, 0x13b9, 0x1F4EE}, // 📮, \:postbox:, Postbox
-{0x730b, 0x13c1, 0x1F4A6}, // 💦, \:sweat_drops:, Splashing Sweat Symbol
-{0x6304, 0x13cd, 0x1F370}, // 🍰, \:cake:, Shortcake
-{0x6306, 0x13d2, 0x1F551}, // 🕑, \:clock2:, Clock Face Two Oclock
-{0x6404, 0x13d9, 0x1F4C5}, // 📅, \:date:, Calendar
-{0x6604, 0x13de, 0x1F525}, // 🔥, \:fire:, Fire
-{0x670b, 0x13e3, 0x1F34F}, // 🍏, \:green_apple:, Green Apple
-{0x680e, 0x13ef, 0x1F63B}, // 😻, \:heart_eyes_cat:, Smiling Cat Face With Heart-Shaped Eyes
-{0x6f0a, 0x13fe, 0x1F62E}, // 😮, \:open_mouth:, Face With Open Mouth
-{0x7505, 0x1409, 0x1F237}, // 🈷, \:u6708:, Squared Cjk Unified Ideograph-6708
-{0x6207, 0x140f, 0x1F490}, // 💐, \:bouquet:, Bouquet
-{0x6306, 0x1417, 0x1F552}, // 🕒, \:clock3:, Clock Face Three Oclock
-{0x660c, 0x141e, 0x1F3A1}, // 🎡, \:ferris_wheel:, Ferris Wheel
-{0x6703, 0x142b, 0x1F48E}, // 💎, \:gem:, Gem Stone
-{0x6e08, 0x142f, 0x1F4D3}, // 📓, \:notebook:, Notebook
-{0x6f0b, 0x1438, 0x1F475}, // 👵, \:older_woman:, Older Woman
-{0x7308, 0x1444, 0x1F634}, // 😴, \:sleeping:, Sleeping Face
-{0x7505, 0x144d, 0x1F236}, // 🈶, \:u6709:, Squared Cjk Unified Ideograph-6709
-{0x760c, 0x1453, 0x1F4F9}, // 📹, \:video_camera:, Video Camera
-{0x7903, 0x1460, 0x1F60B}, // 😋, \:yum:, Face Savouring Delicious Food
+{0x700b, 0x1348, 0xDE3E'D83D}, // U+1F63E, 😾, \:pouting_cat:, Pouting Cat Face
+{0x700e, 0x1354, 0xDCC3'D83D}, // U+1F4C3, 📃, \:page_with_curl:, Page With Curl
+{0x7305, 0x1363, 0xDF20'D83C}, // U+1F320, 🌠, \:stars:, Shooting Star
+{0x6d04, 0x1369, 0xDCDD'D83D}, // U+1F4DD, 📝, \:memo:, Memo
+{0x6d07, 0x136e, 0xDCEB'D83D}, // U+1F4EB, 📫, \:mailbox:, Closed Mailbox With Raised Flag
+{0x7206, 0x1376, 0xDF80'D83C}, // U+1F380, 🎀, \:ribbon:, Ribbon
+{0x730b, 0x137d, 0xDFC2'D83C}, // U+1F3C2, 🏂, \:snowboarder:, Snowboarder
+{0x6302, 0x1389, 0xDCBF'D83D}, // U+1F4BF, 💿, \:cd:, Optical Disc
+{0x6306, 0x138c, 0xDD50'D83D}, // U+1F550, 🕐, \:clock1:, Clock Face One Oclock
+{0x630e, 0x1393, 0xDFC1'D83C}, // U+1F3C1, 🏁, \:checkered_flag:, Chequered Flag
+{0x6a07, 0x13a2, 0xDE39'D83D}, // U+1F639, 😹, \:joy_cat:, Cat Face With Tears Of Joy
+{0x6d0b, 0x13aa, 0xDC35'D83D}, // U+1F435, 🐵, \:monkey_face:, Monkey Face
+{0x6e02, 0x13b6, 0xDD96'D83C}, // U+1F196, 🆖, \:ng:, Squared Ng
+{0x7007, 0x13b9, 0xDCEE'D83D}, // U+1F4EE, 📮, \:postbox:, Postbox
+{0x730b, 0x13c1, 0xDCA6'D83D}, // U+1F4A6, 💦, \:sweat_drops:, Splashing Sweat Symbol
+{0x6304, 0x13cd, 0xDF70'D83C}, // U+1F370, 🍰, \:cake:, Shortcake
+{0x6306, 0x13d2, 0xDD51'D83D}, // U+1F551, 🕑, \:clock2:, Clock Face Two Oclock
+{0x6404, 0x13d9, 0xDCC5'D83D}, // U+1F4C5, 📅, \:date:, Calendar
+{0x6604, 0x13de, 0xDD25'D83D}, // U+1F525, 🔥, \:fire:, Fire
+{0x670b, 0x13e3, 0xDF4F'D83C}, // U+1F34F, 🍏, \:green_apple:, Green Apple
+{0x680e, 0x13ef, 0xDE3B'D83D}, // U+1F63B, 😻, \:heart_eyes_cat:, Smiling Cat Face With Heart-Shaped Eyes
+{0x6f0a, 0x13fe, 0xDE2E'D83D}, // U+1F62E, 😮, \:open_mouth:, Face With Open Mouth
+{0x7505, 0x1409, 0xDE37'D83C}, // U+1F237, 🈷, \:u6708:, Squared Cjk Unified Ideograph-6708
+{0x6207, 0x140f, 0xDC90'D83D}, // U+1F490, 💐, \:bouquet:, Bouquet
+{0x6306, 0x1417, 0xDD52'D83D}, // U+1F552, 🕒, \:clock3:, Clock Face Three Oclock
+{0x660c, 0x141e, 0xDFA1'D83C}, // U+1F3A1, 🎡, \:ferris_wheel:, Ferris Wheel
+{0x6703, 0x142b, 0xDC8E'D83D}, // U+1F48E, 💎, \:gem:, Gem Stone
+{0x6e08, 0x142f, 0xDCD3'D83D}, // U+1F4D3, 📓, \:notebook:, Notebook
+{0x6f0b, 0x1438, 0xDC75'D83D}, // U+1F475, 👵, \:older_woman:, Older Woman
+{0x7308, 0x1444, 0xDE34'D83D}, // U+1F634, 😴, \:sleeping:, Sleeping Face
+{0x7505, 0x144d, 0xDE36'D83C}, // U+1F236, 🈶, \:u6709:, Squared Cjk Unified Ideograph-6709
+{0x760c, 0x1453, 0xDCF9'D83D}, // U+1F4F9, 📹, \:video_camera:, Video Camera
+{0x7903, 0x1460, 0xDE0B'D83D}, // U+1F60B, 😋, \:yum:, Face Savouring Delicious Food
 {0x610b, 0x1464, 0x23F0}, // ⏰, \:alarm_clock:, Alarm Clock
-{0x6207, 0x1470, 0x1F68F}, // 🚏, \:busstop:, Bus Stop
-{0x6304, 0x1478, 0x1F408}, // 🐈, \:cat2:, Cat
-{0x6306, 0x147d, 0x1F553}, // 🕓, \:clock4:, Clock Face Four Oclock
-{0x6809, 0x1484, 0x1F493}, // 💓, \:heartbeat:, Beating Heart
-{0x6a0f, 0x148e, 0x1F3EF}, // 🏯, \:japanese_castle:, Japanese Castle
-{0x6f04, 0x149e, 0x1F362}, // 🍢, \:oden:, Oden
-{0x7208, 0x14a3, 0x1F60C}, // 😌, \:relieved:, Relieved Face
-{0x730f, 0x14ac, 0x1F4F6}, // 📶, \:signal_strength:, Antenna With Bars
-{0x6103, 0x14bc, 0x1F3A8}, // 🎨, \:art:, Artist Palette
+{0x6207, 0x1470, 0xDE8F'D83D}, // U+1F68F, 🚏, \:busstop:, Bus Stop
+{0x6304, 0x1478, 0xDC08'D83D}, // U+1F408, 🐈, \:cat2:, Cat
+{0x6306, 0x147d, 0xDD53'D83D}, // U+1F553, 🕓, \:clock4:, Clock Face Four Oclock
+{0x6809, 0x1484, 0xDC93'D83D}, // U+1F493, 💓, \:heartbeat:, Beating Heart
+{0x6a0f, 0x148e, 0xDFEF'D83C}, // U+1F3EF, 🏯, \:japanese_castle:, Japanese Castle
+{0x6f04, 0x149e, 0xDF62'D83C}, // U+1F362, 🍢, \:oden:, Oden
+{0x7208, 0x14a3, 0xDE0C'D83D}, // U+1F60C, 😌, \:relieved:, Relieved Face
+{0x730f, 0x14ac, 0xDCF6'D83D}, // U+1F4F6, 📶, \:signal_strength:, Antenna With Bars
+{0x6103, 0x14bc, 0xDFA8'D83C}, // U+1F3A8, 🎨, \:art:, Artist Palette
 {0x6305, 0x14c0, 0x2663}, // ♣, \:clubs:, Black Club Suit
-{0x6306, 0x14c6, 0x1F554}, // 🕔, \:clock5:, Clock Face Five Oclock
-{0x630a, 0x14cd, 0x1F616}, // 😖, \:confounded:, Confounded Face
-{0x6c08, 0x14d8, 0x1F606}, // 😆, \:laughing:, Smiling Face With Open Mouth And Tightly-Closed Eyes
-{0x6e07, 0x14e1, 0x1F454}, // 👔, \:necktie:, Necktie
-{0x7309, 0x14e9, 0x1F4E1}, // 📡, \:satellite:, Satellite Antenna
-{0x7706, 0x14f3, 0x1F527}, // 🔧, \:wrench:, Wrench
+{0x6306, 0x14c6, 0xDD54'D83D}, // U+1F554, 🕔, \:clock5:, Clock Face Five Oclock
+{0x630a, 0x14cd, 0xDE16'D83D}, // U+1F616, 😖, \:confounded:, Confounded Face
+{0x6c08, 0x14d8, 0xDE06'D83D}, // U+1F606, 😆, \:laughing:, Smiling Face With Open Mouth And Tightly-Closed Eyes
+{0x6e07, 0x14e1, 0xDC54'D83D}, // U+1F454, 👔, \:necktie:, Necktie
+{0x7309, 0x14e9, 0xDCE1'D83D}, // U+1F4E1, 📡, \:satellite:, Satellite Antenna
+{0x7706, 0x14f3, 0xDD27'D83D}, // U+1F527, 🔧, \:wrench:, Wrench
 {0x6110, 0x14fa, 0x2196}, // ↖, \:arrow_upper_left:, North West Arrow / Upper Left Arrow
-{0x6303, 0x150b, 0x1F46E}, // 👮, \:cop:, Police Officer
+{0x6303, 0x150b, 0xDC6E'D83D}, // U+1F46E, 👮, \:cop:, Police Officer
 {0x6306, 0x150f, 0x264B}, // ♋, \:cancer:, Cancer
-{0x6306, 0x1516, 0x1F555}, // 🕕, \:clock6:, Clock Face Six Oclock
-{0x6308, 0x151d, 0x1F562}, // 🕢, \:clock730:, Clock Face Seven-Thirty
-{0x6309, 0x1526, 0x1F4CB}, // 📋, \:clipboard:, Clipboard
-{0x6311, 0x1530, 0x1F491}, // 💑, \:couple_with_heart:, Couple With Heart
-{0x6404, 0x1542, 0x1F415}, // 🐕, \:dog2:, Dog
-{0x660b, 0x1547, 0x1F4BE}, // 💾, \:floppy_disk:, Floppy Disk
-{0x6f0b, 0x1553, 0x1F4E4}, // 📤, \:outbox_tray:, Outbox Tray
-{0x7405, 0x155f, 0x1F68B}, // 🚋, \:train:, Tram Car
-{0x740d, 0x1565, 0x1F6A5}, // 🚥, \:traffic_light:, Horizontal Traffic Light
-{0x6207, 0x1573, 0x1F50B}, // 🔋, \:battery:, Battery
-{0x6306, 0x157b, 0x1F556}, // 🕖, \:clock7:, Clock Face Seven Oclock
-{0x6a0d, 0x1582, 0x1F479}, // 👹, \:japanese_ogre:, Japanese Ogre
-{0x6d0d, 0x1590, 0x1F3BC}, // 🎼, \:musical_score:, Musical Score
-{0x6f0a, 0x159e, 0x1F450}, // 👐, \:open_hands:, Open Hands Sign
+{0x6306, 0x1516, 0xDD55'D83D}, // U+1F555, 🕕, \:clock6:, Clock Face Six Oclock
+{0x6308, 0x151d, 0xDD62'D83D}, // U+1F562, 🕢, \:clock730:, Clock Face Seven-Thirty
+{0x6309, 0x1526, 0xDCCB'D83D}, // U+1F4CB, 📋, \:clipboard:, Clipboard
+{0x6311, 0x1530, 0xDC91'D83D}, // U+1F491, 💑, \:couple_with_heart:, Couple With Heart
+{0x6404, 0x1542, 0xDC15'D83D}, // U+1F415, 🐕, \:dog2:, Dog
+{0x660b, 0x1547, 0xDCBE'D83D}, // U+1F4BE, 💾, \:floppy_disk:, Floppy Disk
+{0x6f0b, 0x1553, 0xDCE4'D83D}, // U+1F4E4, 📤, \:outbox_tray:, Outbox Tray
+{0x7405, 0x155f, 0xDE8B'D83D}, // U+1F68B, 🚋, \:train:, Tram Car
+{0x740d, 0x1565, 0xDEA5'D83D}, // U+1F6A5, 🚥, \:traffic_light:, Horizontal Traffic Light
+{0x6207, 0x1573, 0xDD0B'D83D}, // U+1F50B, 🔋, \:battery:, Battery
+{0x6306, 0x157b, 0xDD56'D83D}, // U+1F556, 🕖, \:clock7:, Clock Face Seven Oclock
+{0x6a0d, 0x1582, 0xDC79'D83D}, // U+1F479, 👹, \:japanese_ogre:, Japanese Ogre
+{0x6d0d, 0x1590, 0xDFBC'D83C}, // U+1F3BC, 🎼, \:musical_score:, Musical Score
+{0x6f0a, 0x159e, 0xDC50'D83D}, // U+1F450, 👐, \:open_hands:, Open Hands Sign
 {0x7006, 0x15a9, 0x2653}, // ♓, \:pisces:, Pisces
-{0x7016, 0x15b0, 0x1F471}, // 👱, \:person_with_blond_hair:, Person With Blond Hair
+{0x7016, 0x15b0, 0xDC71'D83D}, // U+1F471, 👱, \:person_with_blond_hair:, Person With Blond Hair
 {0x6215, 0x15c7, 0x2611}, // ☑, \:ballot_box_with_check:, Ballot Box With Check
-{0x6306, 0x15dd, 0x1F557}, // 🕗, \:clock8:, Clock Face Eight Oclock
-{0x6408, 0x15e4, 0x1F369}, // 🍩, \:doughnut:, Doughnut
-{0x6806, 0x15ed, 0x1F4A9}, // 💩, \:hankey:, Pile Of Poo
-{0x6903, 0x15f4, 0x1F47F}, // 👿, \:imp:, Imp
-{0x7209, 0x15f8, 0x1F40E}, // 🐎, \:racehorse:, Horse
-{0x7210, 0x1602, 0x1F49E}, // 💞, \:revolving_hearts:, Revolving Hearts
-{0x7304, 0x1613, 0x1F376}, // 🍶, \:sake:, Sake Bottle And Cup
+{0x6306, 0x15dd, 0xDD57'D83D}, // U+1F557, 🕗, \:clock8:, Clock Face Eight Oclock
+{0x6408, 0x15e4, 0xDF69'D83C}, // U+1F369, 🍩, \:doughnut:, Doughnut
+{0x6806, 0x15ed, 0xDCA9'D83D}, // U+1F4A9, 💩, \:hankey:, Pile Of Poo
+{0x6903, 0x15f4, 0xDC7F'D83D}, // U+1F47F, 👿, \:imp:, Imp
+{0x7209, 0x15f8, 0xDC0E'D83D}, // U+1F40E, 🐎, \:racehorse:, Horse
+{0x7210, 0x1602, 0xDC9E'D83D}, // U+1F49E, 💞, \:revolving_hearts:, Revolving Hearts
+{0x7304, 0x1613, 0xDF76'D83C}, // U+1F376, 🍶, \:sake:, Sake Bottle And Cup
 {0x7304, 0x1618, 0x2B50}, // ⭐, \:star:, White Medium Star
-{0x7406, 0x161d, 0x1F3AB}, // 🎫, \:ticket:, Ticket
-{0x7707, 0x1624, 0x1F61F}, // 😟, \:worried:, Worried Face
-{0x6302, 0x162c, 0x1F191}, // 🆑, \:cl:, Squared Cl
-{0x6306, 0x162f, 0x1F558}, // 🕘, \:clock9:, Clock Face Nine Oclock
-{0x6c08, 0x1636, 0x1F36D}, // 🍭, \:lollipop:, Lollipop
-{0x6d06, 0x163f, 0x1F4AA}, // 💪, \:muscle:, Flexed Biceps
+{0x7406, 0x161d, 0xDFAB'D83C}, // U+1F3AB, 🎫, \:ticket:, Ticket
+{0x7707, 0x1624, 0xDE1F'D83D}, // U+1F61F, 😟, \:worried:, Worried Face
+{0x6302, 0x162c, 0xDD91'D83C}, // U+1F191, 🆑, \:cl:, Squared Cl
+{0x6306, 0x162f, 0xDD58'D83D}, // U+1F558, 🕘, \:clock9:, Clock Face Nine Oclock
+{0x6c08, 0x1636, 0xDF6D'D83C}, // U+1F36D, 🍭, \:lollipop:, Lollipop
+{0x6d06, 0x163f, 0xDCAA'D83D}, // U+1F4AA, 💪, \:muscle:, Flexed Biceps
 {0x7007, 0x1646, 0x270F}, // ✏, \:pencil2:, Pencil
 {0x7308, 0x164e, 0x2702}, // ✂, \:scissors:, Black Scissors
-{0x740d, 0x1657, 0x1F38B}, // 🎋, \:tanabata_tree:, Tanabata Tree
-{0x6208, 0x1665, 0x1F530}, // 🔰, \:beginner:, Japanese Symbol For Beginner
-{0x620c, 0x166e, 0x1F494}, // 💔, \:broken_heart:, Broken Heart
-{0x630b, 0x167b, 0x1F4D5}, // 📕, \:closed_book:, Closed Book
-{0x6708, 0x1687, 0x1F600}, // 😀, \:grinning:, Grinning Face
-{0x6709, 0x1690, 0x1F482}, // 💂, \:guardsman:, Guardsman
-{0x6b05, 0x169a, 0x1F428}, // 🐨, \:koala:, Koala
-{0x6d0c, 0x16a0, 0x1F356}, // 🍖, \:meat_on_bone:, Meat On Bone
-{0x6f0b, 0x16ad, 0x1F4D9}, // 📙, \:orange_book:, Orange Book
-{0x720c, 0x16b9, 0x1F518}, // 🔘, \:radio_button:, Radio Button
-{0x730b, 0x16c6, 0x1F648}, // 🙈, \:see_no_evil:, See-No-Evil Monkey
-{0x7714, 0x16d2, 0x1F312}, // 🌒, \:waxing_crescent_moon:, Waxing Crescent Moon Symbol
-{0x620a, 0x16e7, 0x1F424}, // 🐤, \:baby_chick:, Baby Chick
-{0x620b, 0x16f2, 0x1F37C}, // 🍼, \:baby_bottle:, Baby Bottle
-{0x6709, 0x16fe, 0x1F62C}, // 😬, \:grimacing:, Grimacing Face
-{0x6d05, 0x1708, 0x1F687}, // 🚇, \:metro:, Metro
-{0x7616, 0x170e, 0x1F6A6}, // 🚦, \:vertical_traffic_light:, Vertical Traffic Light
-{0x6211, 0x1725, 0x1F685}, // 🚅, \:bullettrain_front:, High-Speed Train With Bullet Nose
-{0x7008, 0x1737, 0x1F43D}, // 🐽, \:pig_nose:, Pig Nose
-{0x7304, 0x1740, 0x1F6A2}, // 🚢, \:ship:, Ship
+{0x740d, 0x1657, 0xDF8B'D83C}, // U+1F38B, 🎋, \:tanabata_tree:, Tanabata Tree
+{0x6208, 0x1665, 0xDD30'D83D}, // U+1F530, 🔰, \:beginner:, Japanese Symbol For Beginner
+{0x620c, 0x166e, 0xDC94'D83D}, // U+1F494, 💔, \:broken_heart:, Broken Heart
+{0x630b, 0x167b, 0xDCD5'D83D}, // U+1F4D5, 📕, \:closed_book:, Closed Book
+{0x6708, 0x1687, 0xDE00'D83D}, // U+1F600, 😀, \:grinning:, Grinning Face
+{0x6709, 0x1690, 0xDC82'D83D}, // U+1F482, 💂, \:guardsman:, Guardsman
+{0x6b05, 0x169a, 0xDC28'D83D}, // U+1F428, 🐨, \:koala:, Koala
+{0x6d0c, 0x16a0, 0xDF56'D83C}, // U+1F356, 🍖, \:meat_on_bone:, Meat On Bone
+{0x6f0b, 0x16ad, 0xDCD9'D83D}, // U+1F4D9, 📙, \:orange_book:, Orange Book
+{0x720c, 0x16b9, 0xDD18'D83D}, // U+1F518, 🔘, \:radio_button:, Radio Button
+{0x730b, 0x16c6, 0xDE48'D83D}, // U+1F648, 🙈, \:see_no_evil:, See-No-Evil Monkey
+{0x7714, 0x16d2, 0xDF12'D83C}, // U+1F312, 🌒, \:waxing_crescent_moon:, Waxing Crescent Moon Symbol
+{0x620a, 0x16e7, 0xDC24'D83D}, // U+1F424, 🐤, \:baby_chick:, Baby Chick
+{0x620b, 0x16f2, 0xDF7C'D83C}, // U+1F37C, 🍼, \:baby_bottle:, Baby Bottle
+{0x6709, 0x16fe, 0xDE2C'D83D}, // U+1F62C, 😬, \:grimacing:, Grimacing Face
+{0x6d05, 0x1708, 0xDE87'D83D}, // U+1F687, 🚇, \:metro:, Metro
+{0x7616, 0x170e, 0xDEA6'D83D}, // U+1F6A6, 🚦, \:vertical_traffic_light:, Vertical Traffic Light
+{0x6211, 0x1725, 0xDE85'D83D}, // U+1F685, 🚅, \:bullettrain_front:, High-Speed Train With Bullet Nose
+{0x7008, 0x1737, 0xDC3D'D83D}, // U+1F43D, 🐽, \:pig_nose:, Pig Nose
+{0x7304, 0x1740, 0xDEA2'D83D}, // U+1F6A2, 🚢, \:ship:, Ship
 {0x6112, 0x1745, 0x2935}, // ⤵, \:arrow_heading_down:, Arrow Pointing Rightwards Then Curving Downwards
-{0x6303, 0x1758, 0x1F42E}, // 🐮, \:cow:, Cow Face
+{0x6303, 0x1758, 0xDC2E'D83D}, // U+1F42E, 🐮, \:cow:, Cow Face
 {0x6309, 0x175c, 0x00A9}, // ©, \:copyright:, Copyright Sign
-{0x6603, 0x1766, 0x1F4E0}, // 📠, \:fax:, Fax Machine
-{0x6d10, 0x176a, 0x1F4F4}, // 📴, \:mobile_phone_off:, Mobile Phone Off
-{0x7004, 0x177b, 0x1F48A}, // 💊, \:pill:, Pill
+{0x6603, 0x1766, 0xDCE0'D83D}, // U+1F4E0, 📠, \:fax:, Fax Machine
+{0x6d10, 0x176a, 0xDCF4'D83D}, // U+1F4F4, 📴, \:mobile_phone_off:, Mobile Phone Off
+{0x7004, 0x177b, 0xDC8A'D83D}, // U+1F48A, 💊, \:pill:, Pill
 {0x7207, 0x1780, 0x263A}, // ☺, \:relaxed:, White Smiling Face
-{0x720c, 0x1788, 0x1F64B}, // 🙋, \:raising_hand:, Happy Person Raising One Hand
-{0x7305, 0x1795, 0x1F40C}, // 🐌, \:snail:, Snail
-{0x7309, 0x179b, 0x1F638}, // 😸, \:smile_cat:, Grinning Cat Face With Smiling Eyes
-{0x730a, 0x17a5, 0x1F353}, // 🍓, \:strawberry:, Strawberry
-{0x7505, 0x17b0, 0x1F23A}, // 🈺, \:u55b6:, Squared Cjk Unified Ideograph-55B6
-{0x7206, 0x17b6, 0x1F430}, // 🐰, \:rabbit:, Rabbit Face
-{0x7307, 0x17bd, 0x1F689}, // 🚉, \:station:, Station
-{0x6304, 0x17c5, 0x1F192}, // 🆒, \:cool:, Squared Cool
-{0x6307, 0x17ca, 0x1F300}, // 🌀, \:cyclone:, Cyclone
-{0x6308, 0x17d2, 0x1F352}, // 🍒, \:cherries:, Cherries
-{0x6308, 0x17db, 0x1F561}, // 🕡, \:clock630:, Clock Face Six-Thirty
-{0x6605, 0x17e4, 0x1F35F}, // 🍟, \:fries:, French Fries
-{0x6c05, 0x17ea, 0x1F34B}, // 🍋, \:lemon:, Lemon
-{0x7307, 0x17f0, 0x1F489}, // 💉, \:syringe:, Syringe
-{0x730d, 0x17f8, 0x1F64A}, // 🙊, \:speak_no_evil:, Speak-No-Evil Monkey
-{0x7407, 0x1806, 0x1F624}, // 😤, \:triumph:, Face With Look Of Triumph
-{0x7705, 0x180e, 0x1F433}, // 🐳, \:whale:, Spouting Whale
-{0x770d, 0x1814, 0x1F403}, // 🐃, \:water_buffalo:, Water Buffalo
-{0x6306, 0x1822, 0x1F46B}, // 👫, \:couple:, Man And Woman Holding Hands
-{0x6503, 0x1829, 0x1F442}, // 👂, \:ear:, Ear
+{0x720c, 0x1788, 0xDE4B'D83D}, // U+1F64B, 🙋, \:raising_hand:, Happy Person Raising One Hand
+{0x7305, 0x1795, 0xDC0C'D83D}, // U+1F40C, 🐌, \:snail:, Snail
+{0x7309, 0x179b, 0xDE38'D83D}, // U+1F638, 😸, \:smile_cat:, Grinning Cat Face With Smiling Eyes
+{0x730a, 0x17a5, 0xDF53'D83C}, // U+1F353, 🍓, \:strawberry:, Strawberry
+{0x7505, 0x17b0, 0xDE3A'D83C}, // U+1F23A, 🈺, \:u55b6:, Squared Cjk Unified Ideograph-55B6
+{0x7206, 0x17b6, 0xDC30'D83D}, // U+1F430, 🐰, \:rabbit:, Rabbit Face
+{0x7307, 0x17bd, 0xDE89'D83D}, // U+1F689, 🚉, \:station:, Station
+{0x6304, 0x17c5, 0xDD92'D83C}, // U+1F192, 🆒, \:cool:, Squared Cool
+{0x6307, 0x17ca, 0xDF00'D83C}, // U+1F300, 🌀, \:cyclone:, Cyclone
+{0x6308, 0x17d2, 0xDF52'D83C}, // U+1F352, 🍒, \:cherries:, Cherries
+{0x6308, 0x17db, 0xDD61'D83D}, // U+1F561, 🕡, \:clock630:, Clock Face Six-Thirty
+{0x6605, 0x17e4, 0xDF5F'D83C}, // U+1F35F, 🍟, \:fries:, French Fries
+{0x6c05, 0x17ea, 0xDF4B'D83C}, // U+1F34B, 🍋, \:lemon:, Lemon
+{0x7307, 0x17f0, 0xDC89'D83D}, // U+1F489, 💉, \:syringe:, Syringe
+{0x730d, 0x17f8, 0xDE4A'D83D}, // U+1F64A, 🙊, \:speak_no_evil:, Speak-No-Evil Monkey
+{0x7407, 0x1806, 0xDE24'D83D}, // U+1F624, 😤, \:triumph:, Face With Look Of Triumph
+{0x7705, 0x180e, 0xDC33'D83D}, // U+1F433, 🐳, \:whale:, Spouting Whale
+{0x770d, 0x1814, 0xDC03'D83D}, // U+1F403, 🐃, \:water_buffalo:, Water Buffalo
+{0x6306, 0x1822, 0xDC6B'D83D}, // U+1F46B, 👫, \:couple:, Man And Woman Holding Hands
+{0x6503, 0x1829, 0xDC42'D83D}, // U+1F442, 👂, \:ear:, Ear
 {0x6608, 0x182d, 0x26FD}, // ⛽, \:fuelpump:, Fuel Pump
-{0x661c, 0x1836, 0x1F31B}, // 🌛, \:first_quarter_moon_with_face:, First Quarter Moon With Face
-{0x7007, 0x1853, 0x1F427}, // 🐧, \:penguin:, Penguin
-{0x700f, 0x185b, 0x1F3AD}, // 🎭, \:performing_arts:, Performing Arts
-{0x7203, 0x186b, 0x1F40F}, // 🐏, \:ram:, Ram
-{0x6e11, 0x186f, 0x1F6B1}, // 🚱, \:non-potable_water:, Non-Potable Water Symbol
+{0x661c, 0x1836, 0xDF1B'D83C}, // U+1F31B, 🌛, \:first_quarter_moon_with_face:, First Quarter Moon With Face
+{0x7007, 0x1853, 0xDC27'D83D}, // U+1F427, 🐧, \:penguin:, Penguin
+{0x700f, 0x185b, 0xDFAD'D83C}, // U+1F3AD, 🎭, \:performing_arts:, Performing Arts
+{0x7203, 0x186b, 0xDC0F'D83D}, // U+1F40F, 🐏, \:ram:, Ram
+{0x6e11, 0x186f, 0xDEB1'D83D}, // U+1F6B1, 🚱, \:non-potable_water:, Non-Potable Water Symbol
 {0x7015, 0x1881, 0x303D}, // 〽, \:part_alternation_mark:, Part Alternation Mark
-{0x7205, 0x1897, 0x1F35C}, // 🍜, \:ramen:, Steaming Bowl
+{0x7205, 0x1897, 0xDF5C'D83C}, // U+1F35C, 🍜, \:ramen:, Steaming Bowl
 {0x6111, 0x189d, 0x23EC}, // ⏬, \:arrow_double_down:, Black Down-Pointing Double Triangle
-{0x6213, 0x18af, 0x1F465}, // 👥, \:busts_in_silhouette:, Busts In Silhouette
-{0x6e10, 0x18c3, 0x1F4F5}, // 📵, \:no_mobile_phones:, No Mobile Phones
-{0x7207, 0x18d4, 0x1F407}, // 🐇, \:rabbit2:, Rabbit
-{0x731c, 0x18dc, 0x1F61C}, // 😜, \:stuck_out_tongue_winking_eye:, Face With Stuck-Out Tongue And Winking Eye
-{0x6b0b, 0x18f9, 0x1F63D}, // 😽, \:kissing_cat:, Kissing Cat Face With Closed Eyes
+{0x6213, 0x18af, 0xDC65'D83D}, // U+1F465, 👥, \:busts_in_silhouette:, Busts In Silhouette
+{0x6e10, 0x18c3, 0xDCF5'D83D}, // U+1F4F5, 📵, \:no_mobile_phones:, No Mobile Phones
+{0x7207, 0x18d4, 0xDC07'D83D}, // U+1F407, 🐇, \:rabbit2:, Rabbit
+{0x731c, 0x18dc, 0xDE1C'D83D}, // U+1F61C, 😜, \:stuck_out_tongue_winking_eye:, Face With Stuck-Out Tongue And Winking Eye
+{0x6b0b, 0x18f9, 0xDE3D'D83D}, // U+1F63D, 😽, \:kissing_cat:, Kissing Cat Face With Closed Eyes
 {0x7207, 0x1905, 0x267B}, // ♻, \:recycle:, Black Universal Recycling Symbol
-{0x740e, 0x190d, 0x1F379}, // 🍹, \:tropical_drink:, Tropical Drink
-{0x6305, 0x191c, 0x1F42B}, // 🐫, \:camel:, Bactrian Camel
-{0x6605, 0x1922, 0x1F301}, // 🌁, \:foggy:, Foggy
-{0x6607, 0x1928, 0x1F3ED}, // 🏭, \:factory:, Factory
-{0x660a, 0x1930, 0x1F463}, // 👣, \:footprints:, Footprints
+{0x740e, 0x190d, 0xDF79'D83C}, // U+1F379, 🍹, \:tropical_drink:, Tropical Drink
+{0x6305, 0x191c, 0xDC2B'D83D}, // U+1F42B, 🐫, \:camel:, Bactrian Camel
+{0x6605, 0x1922, 0xDF01'D83C}, // U+1F301, 🌁, \:foggy:, Foggy
+{0x6607, 0x1928, 0xDFED'D83C}, // U+1F3ED, 🏭, \:factory:, Factory
+{0x660a, 0x1930, 0xDC63'D83D}, // U+1F463, 👣, \:footprints:, Footprints
 {0x6e1b, 0x193b, 0x274E}, // ❎, \:negative_squared_cross_mark:, Negative Squared Cross Mark
-{0x7009, 0x1957, 0x1F4CE}, // 📎, \:paperclip:, Paperclip
-{0x700e, 0x1961, 0x1F4C4}, // 📄, \:page_facing_up:, Page Facing Up
-{0x3103, 0x1970, 0x1F4AF}, // 💯, \:100:, Hundred Points Symbol
-{0x6809, 0x1974, 0x1F460}, // 👠, \:high_heel:, High-Heeled Shoe
-{0x690a, 0x197e, 0x1F4E5}, // 📥, \:inbox_tray:, Inbox Tray
-{0x720e, 0x1989, 0x1F6A8}, // 🚨, \:rotating_light:, Police Cars Revolving Light
-{0x7306, 0x1998, 0x1F603}, // 😃, \:smiley:, Smiling Face With Open Mouth
-{0x7309, 0x199f, 0x1F6A4}, // 🚤, \:speedboat:, Speedboat
-{0x7312, 0x19a9, 0x1F69F}, // 🚟, \:suspension_railway:, Suspension Railway
-{0x6106, 0x19bc, 0x1F251}, // 🉑, \:accept:, Circled Ideograph Accept
-{0x6109, 0x19c3, 0x1F691}, // 🚑, \:ambulance:, Ambulance
-{0x6203, 0x19cd, 0x1F647}, // 🙇, \:bow:, Person Bowing Deeply
-{0x6204, 0x19d1, 0x1F476}, // 👶, \:baby:, Baby
-{0x6405, 0x19d6, 0x1F4AB}, // 💫, \:dizzy:, Dizzy Symbol
-{0x650f, 0x19dc, 0x1F3F0}, // 🏰, \:european_castle:, European Castle
-{0x6c06, 0x19ec, 0x1F343}, // 🍃, \:leaves:, Leaf Fluttering In Wind
-{0x6c1b, 0x19f3, 0x1F31C}, // 🌜, \:last_quarter_moon_with_face:, Last Quarter Moon With Face
-{0x700b, 0x1a0f, 0x1F357}, // 🍗, \:poultry_leg:, Poultry Leg
+{0x7009, 0x1957, 0xDCCE'D83D}, // U+1F4CE, 📎, \:paperclip:, Paperclip
+{0x700e, 0x1961, 0xDCC4'D83D}, // U+1F4C4, 📄, \:page_facing_up:, Page Facing Up
+{0x3103, 0x1970, 0xDCAF'D83D}, // U+1F4AF, 💯, \:100:, Hundred Points Symbol
+{0x6809, 0x1974, 0xDC60'D83D}, // U+1F460, 👠, \:high_heel:, High-Heeled Shoe
+{0x690a, 0x197e, 0xDCE5'D83D}, // U+1F4E5, 📥, \:inbox_tray:, Inbox Tray
+{0x720e, 0x1989, 0xDEA8'D83D}, // U+1F6A8, 🚨, \:rotating_light:, Police Cars Revolving Light
+{0x7306, 0x1998, 0xDE03'D83D}, // U+1F603, 😃, \:smiley:, Smiling Face With Open Mouth
+{0x7309, 0x199f, 0xDEA4'D83D}, // U+1F6A4, 🚤, \:speedboat:, Speedboat
+{0x7312, 0x19a9, 0xDE9F'D83D}, // U+1F69F, 🚟, \:suspension_railway:, Suspension Railway
+{0x6106, 0x19bc, 0xDE51'D83C}, // U+1F251, 🉑, \:accept:, Circled Ideograph Accept
+{0x6109, 0x19c3, 0xDE91'D83D}, // U+1F691, 🚑, \:ambulance:, Ambulance
+{0x6203, 0x19cd, 0xDE47'D83D}, // U+1F647, 🙇, \:bow:, Person Bowing Deeply
+{0x6204, 0x19d1, 0xDC76'D83D}, // U+1F476, 👶, \:baby:, Baby
+{0x6405, 0x19d6, 0xDCAB'D83D}, // U+1F4AB, 💫, \:dizzy:, Dizzy Symbol
+{0x650f, 0x19dc, 0xDFF0'D83C}, // U+1F3F0, 🏰, \:european_castle:, European Castle
+{0x6c06, 0x19ec, 0xDF43'D83C}, // U+1F343, 🍃, \:leaves:, Leaf Fluttering In Wind
+{0x6c1b, 0x19f3, 0xDF1C'D83C}, // U+1F31C, 🌜, \:last_quarter_moon_with_face:, Last Quarter Moon With Face
+{0x700b, 0x1a0f, 0xDF57'D83C}, // U+1F357, 🍗, \:poultry_leg:, Poultry Leg
 {0x7306, 0x1a1b, 0x2660}, // ♠, \:spades:, Black Spade Suit
-{0x7404, 0x1a22, 0x1F695}, // 🚕, \:taxi:, Taxi
-{0x6308, 0x1a27, 0x1F4BB}, // 💻, \:computer:, Personal Computer
-{0x6e0c, 0x1a30, 0x1F610}, // 😐, \:neutral_face:, Neutral Face
-{0x7203, 0x1a3d, 0x1F400}, // 🐀, \:rat:, Rat
-{0x7304, 0x1a41, 0x1F4BA}, // 💺, \:seat:, Seat
-{0x7304, 0x1a46, 0x1F51C}, // 🔜, \:soon:, Soon With Rightwards Arrow Above
-{0x7304, 0x1a4b, 0x1F372}, // 🍲, \:stew:, Pot Of Food
-{0x7306, 0x1a50, 0x1F4DC}, // 📜, \:scroll:, Scroll
-{0x7314, 0x1a57, 0x1F538}, // 🔸, \:small_orange_diamond:, Small Orange Diamond
-{0x6203, 0x1a6c, 0x1F466}, // 👦, \:boy:, Boy
-{0x6308, 0x1a70, 0x1F560}, // 🕠, \:clock530:, Clock Face Five-Thirty
+{0x7404, 0x1a22, 0xDE95'D83D}, // U+1F695, 🚕, \:taxi:, Taxi
+{0x6308, 0x1a27, 0xDCBB'D83D}, // U+1F4BB, 💻, \:computer:, Personal Computer
+{0x6e0c, 0x1a30, 0xDE10'D83D}, // U+1F610, 😐, \:neutral_face:, Neutral Face
+{0x7203, 0x1a3d, 0xDC00'D83D}, // U+1F400, 🐀, \:rat:, Rat
+{0x7304, 0x1a41, 0xDCBA'D83D}, // U+1F4BA, 💺, \:seat:, Seat
+{0x7304, 0x1a46, 0xDD1C'D83D}, // U+1F51C, 🔜, \:soon:, Soon With Rightwards Arrow Above
+{0x7304, 0x1a4b, 0xDF72'D83C}, // U+1F372, 🍲, \:stew:, Pot Of Food
+{0x7306, 0x1a50, 0xDCDC'D83D}, // U+1F4DC, 📜, \:scroll:, Scroll
+{0x7314, 0x1a57, 0xDD38'D83D}, // U+1F538, 🔸, \:small_orange_diamond:, Small Orange Diamond
+{0x6203, 0x1a6c, 0xDC66'D83D}, // U+1F466, 👦, \:boy:, Boy
+{0x6308, 0x1a70, 0xDD60'D83D}, // U+1F560, 🕠, \:clock530:, Clock Face Five-Thirty
 {0x6518, 0x1a79, 0x2734}, // ✴, \:eight_pointed_black_star:, Eight Pointed Black Star
-{0x6f13, 0x1a92, 0x1F698}, // 🚘, \:oncoming_automobile:, Oncoming Automobile
-{0x7206, 0x1aa6, 0x1F3C3}, // 🏃, \:runner:, Runner
+{0x6f13, 0x1a92, 0xDE98'D83D}, // U+1F698, 🚘, \:oncoming_automobile:, Oncoming Automobile
+{0x7206, 0x1aa6, 0xDFC3'D83C}, // U+1F3C3, 🏃, \:runner:, Runner
 {0x7508, 0x1aad, 0x2614}, // ☔, \:umbrella:, Umbrella With Rain Drops
-{0x6101, 0x1ab6, 0x1F170}, // 🅰, \:a:, Negative Squared Latin Capital Letter A
+{0x6101, 0x1ab6, 0xDD70'D83C}, // U+1F170, 🅰, \:a:, Negative Squared Latin Capital Letter A
 {0x6515, 0x1ab8, 0x2733}, // ✳, \:eight_spoked_asterisk:, Eight Spoked Asterisk
-{0x6a0f, 0x1ace, 0x1F47A}, // 👺, \:japanese_goblin:, Japanese Goblin
-{0x6e07, 0x1ade, 0x1F645}, // 🙅, \:no_good:, Face With No Good Gesture
-{0x7309, 0x1ae6, 0x1F33B}, // 🌻, \:sunflower:, Sunflower
-{0x6201, 0x1af0, 0x1F171}, // 🅱, \:b:, Negative Squared Latin Capital Letter B
+{0x6a0f, 0x1ace, 0xDC7A'D83D}, // U+1F47A, 👺, \:japanese_goblin:, Japanese Goblin
+{0x6e07, 0x1ade, 0xDE45'D83D}, // U+1F645, 🙅, \:no_good:, Face With No Good Gesture
+{0x7309, 0x1ae6, 0xDF3B'D83C}, // U+1F33B, 🌻, \:sunflower:, Sunflower
+{0x6201, 0x1af0, 0xDD71'D83C}, // U+1F171, 🅱, \:b:, Negative Squared Latin Capital Letter B
 {0x6805, 0x1af2, 0x2764}, // ❤, \:heart:, Heavy Black Heart
 {0x6810, 0x1af8, 0x2714}, // ✔, \:heavy_check_mark:, Heavy Check Mark
 {0x7309, 0x1b09, 0x2744}, // ❄, \:snowflake:, Snowflake
 {0x730b, 0x1b13, 0x2650}, // ♐, \:sagittarius:, Sagittarius
-{0x7705, 0x1b1f, 0x1F629}, // 😩, \:weary:, Weary Face
-{0x7707, 0x1b25, 0x1F492}, // 💒, \:wedding:, Wedding
-{0x7713, 0x1b2d, 0x1F533}, // 🔳, \:white_square_button:, White Square Button
-{0x6204, 0x1b41, 0x1F4A1}, // 💡, \:bulb:, Electric Light Bulb
+{0x7705, 0x1b1f, 0xDE29'D83D}, // U+1F629, 😩, \:weary:, Weary Face
+{0x7707, 0x1b25, 0xDC92'D83D}, // U+1F492, 💒, \:wedding:, Wedding
+{0x7713, 0x1b2d, 0xDD33'D83D}, // U+1F533, 🔳, \:white_square_button:, White Square Button
+{0x6204, 0x1b41, 0xDCA1'D83D}, // U+1F4A1, 💡, \:bulb:, Electric Light Bulb
 {0x630f, 0x1b46, 0x3297}, // ㊗, \:congratulations:, Circled Ideograph Congratulation
-{0x630f, 0x1b56, 0x1F63F}, // 😿, \:crying_cat_face:, Crying Cat Face
-{0x6806, 0x1b66, 0x1F62F}, // 😯, \:hushed:, Hushed Face
-{0x6f09, 0x1b6d, 0x1F474}, // 👴, \:older_man:, Older Man
-{0x720e, 0x1b77, 0x1F3C9}, // 🏉, \:rugby_football:, Rugby Football
+{0x630f, 0x1b56, 0xDE3F'D83D}, // U+1F63F, 😿, \:crying_cat_face:, Crying Cat Face
+{0x6806, 0x1b66, 0xDE2F'D83D}, // U+1F62F, 😯, \:hushed:, Hushed Face
+{0x6f09, 0x1b6d, 0xDC74'D83D}, // U+1F474, 👴, \:older_man:, Older Man
+{0x720e, 0x1b77, 0xDFC9'D83C}, // U+1F3C9, 🏉, \:rugby_football:, Rugby Football
 {0x7712, 0x1b86, 0x2B1C}, // ⬜, \:white_large_square:, White Large Square
 {0x6208, 0x1b99, 0x26BE}, // ⚾, \:baseball:, Baseball
 {0x630a, 0x1ba2, 0x27B0}, // ➰, \:curly_loop:, Curly Loop
-{0x6b04, 0x1bad, 0x1F48B}, // 💋, \:kiss:, Kiss Mark
-{0x6c0e, 0x1bb2, 0x1F505}, // 🔅, \:low_brightness:, Low Brightness Symbol
+{0x6b04, 0x1bad, 0xDC8B'D83D}, // U+1F48B, 💋, \:kiss:, Kiss Mark
+{0x6c0e, 0x1bb2, 0xDD05'D83D}, // U+1F505, 🔅, \:low_brightness:, Low Brightness Symbol
 {0x6c10, 0x1bc1, 0x2194}, // ↔, \:left_right_arrow:, Left Right Arrow
-{0x7206, 0x1bd2, 0x1F680}, // 🚀, \:rocket:, Rocket
-{0x7305, 0x1bd9, 0x1F41A}, // 🐚, \:shell:, Spiral Shell
-{0x7307, 0x1bdf, 0x1F3CA}, // 🏊, \:swimmer:, Swimmer
-{0x7312, 0x1be7, 0x1F53A}, // 🔺, \:small_red_triangle:, Up-Pointing Red Triangle
-{0x760a, 0x1bfa, 0x1F3AE}, // 🎮, \:video_game:, Video Game
-{0x6206, 0x1c05, 0x1F41E}, // 🐞, \:beetle:, Lady Beetle
-{0x6207, 0x1c0c, 0x1F33C}, // 🌼, \:blossom:, Blossom
-{0x6306, 0x1c14, 0x1F3A6}, // 🎦, \:cinema:, Cinema
-{0x6513, 0x1c1b, 0x1F4E9}, // 📩, \:envelope_with_arrow:, Envelope With Downwards Arrow Above
-{0x680a, 0x1c2f, 0x1F3A7}, // 🎧, \:headphones:, Headphone
-{0x7209, 0x1c3a, 0x1F359}, // 🍙, \:rice_ball:, Rice Ball
-{0x7307, 0x1c44, 0x1F523}, // 🔣, \:symbols:, Input Symbol For Symbols
-{0x7312, 0x1c4c, 0x1F539}, // 🔹, \:small_blue_diamond:, Small Blue Diamond
+{0x7206, 0x1bd2, 0xDE80'D83D}, // U+1F680, 🚀, \:rocket:, Rocket
+{0x7305, 0x1bd9, 0xDC1A'D83D}, // U+1F41A, 🐚, \:shell:, Spiral Shell
+{0x7307, 0x1bdf, 0xDFCA'D83C}, // U+1F3CA, 🏊, \:swimmer:, Swimmer
+{0x7312, 0x1be7, 0xDD3A'D83D}, // U+1F53A, 🔺, \:small_red_triangle:, Up-Pointing Red Triangle
+{0x760a, 0x1bfa, 0xDFAE'D83C}, // U+1F3AE, 🎮, \:video_game:, Video Game
+{0x6206, 0x1c05, 0xDC1E'D83D}, // U+1F41E, 🐞, \:beetle:, Lady Beetle
+{0x6207, 0x1c0c, 0xDF3C'D83C}, // U+1F33C, 🌼, \:blossom:, Blossom
+{0x6306, 0x1c14, 0xDFA6'D83C}, // U+1F3A6, 🎦, \:cinema:, Cinema
+{0x6513, 0x1c1b, 0xDCE9'D83D}, // U+1F4E9, 📩, \:envelope_with_arrow:, Envelope With Downwards Arrow Above
+{0x680a, 0x1c2f, 0xDFA7'D83C}, // U+1F3A7, 🎧, \:headphones:, Headphone
+{0x7209, 0x1c3a, 0xDF59'D83C}, // U+1F359, 🍙, \:rice_ball:, Rice Ball
+{0x7307, 0x1c44, 0xDD23'D83D}, // U+1F523, 🔣, \:symbols:, Input Symbol For Symbols
+{0x7312, 0x1c4c, 0xDD39'D83D}, // U+1F539, 🔹, \:small_blue_diamond:, Small Blue Diamond
 {0x6505, 0x1c5f, 0x2709}, // ✉, \:email:, Envelope
-{0x680f, 0x1c65, 0x1F506}, // 🔆, \:high_brightness:, High Brightness Symbol
+{0x680f, 0x1c65, 0xDD06'D83D}, // U+1F506, 🔆, \:high_brightness:, High Brightness Symbol
 {0x6c04, 0x1c75, 0x27BF}, // ➿, \:loop:, Double Curly Loop
-{0x6d08, 0x1c7a, 0x1F344}, // 🍄, \:mushroom:, Mushroom
-{0x6d0a, 0x1c83, 0x1F341}, // 🍁, \:maple_leaf:, Maple Leaf
-{0x7007, 0x1c8e, 0x1F614}, // 😔, \:pensive:, Pensive Face
-{0x6105, 0x1c96, 0x1F620}, // 😠, \:angry:, Angry Face
-{0x740a, 0x1c9c, 0x1F68E}, // 🚎, \:trolleybus:, Trolleybus
-{0x7508, 0x1ca7, 0x1F51E}, // 🔞, \:underage:, No One Under Eighteen Symbol
-{0x790c, 0x1cb0, 0x1F49B}, // 💛, \:yellow_heart:, Yellow Heart
-{0x6d04, 0x1cbd, 0x1F4E3}, // 📣, \:mega:, Cheering Megaphone
+{0x6d08, 0x1c7a, 0xDF44'D83C}, // U+1F344, 🍄, \:mushroom:, Mushroom
+{0x6d0a, 0x1c83, 0xDF41'D83C}, // U+1F341, 🍁, \:maple_leaf:, Maple Leaf
+{0x7007, 0x1c8e, 0xDE14'D83D}, // U+1F614, 😔, \:pensive:, Pensive Face
+{0x6105, 0x1c96, 0xDE20'D83D}, // U+1F620, 😠, \:angry:, Angry Face
+{0x740a, 0x1c9c, 0xDE8E'D83D}, // U+1F68E, 🚎, \:trolleybus:, Trolleybus
+{0x7508, 0x1ca7, 0xDD1E'D83D}, // U+1F51E, 🔞, \:underage:, No One Under Eighteen Symbol
+{0x790c, 0x1cb0, 0xDC9B'D83D}, // U+1F49B, 💛, \:yellow_heart:, Yellow Heart
+{0x6d04, 0x1cbd, 0xDCE3'D83D}, // U+1F4E3, 📣, \:mega:, Cheering Megaphone
 {0x6e08, 0x1cc2, 0x26D4}, // ⛔, \:no_entry:, No Entry
-{0x730d, 0x1ccb, 0x1F47E}, // 👾, \:space_invader:, Alien Monster
+{0x730d, 0x1ccb, 0xDC7E'D83D}, // U+1F47E, 👾, \:space_invader:, Alien Monster
 {0x7710, 0x1cd9, 0x2705}, // ✅, \:white_check_mark:, White Heavy Check Mark
-{0x7713, 0x1cea, 0x1F316}, // 🌖, \:waning_gibbous_moon:, Waning Gibbous Moon Symbol
-{0x6305, 0x1cfe, 0x1F498}, // 💘, \:cupid:, Heart With Arrow
-{0x6308, 0x1d04, 0x1F55F}, // 🕟, \:clock430:, Clock Face Four-Thirty
-{0x6406, 0x1d0d, 0x1F409}, // 🐉, \:dragon:, Dragon
+{0x7713, 0x1cea, 0xDF16'D83C}, // U+1F316, 🌖, \:waning_gibbous_moon:, Waning Gibbous Moon Symbol
+{0x6305, 0x1cfe, 0xDC98'D83D}, // U+1F498, 💘, \:cupid:, Heart With Arrow
+{0x6308, 0x1d04, 0xDD5F'D83D}, // U+1F55F, 🕟, \:clock430:, Clock Face Four-Thirty
+{0x6406, 0x1d0d, 0xDC09'D83D}, // U+1F409, 🐉, \:dragon:, Dragon
 {0x680a, 0x1d14, 0x2668}, // ♨, \:hotsprings:, Hot Springs
 {0x7404, 0x1d1f, 0x26FA}, // ⛺, \:tent:, Tent
-{0x7602, 0x1d24, 0x1F19A}, // 🆚, \:vs:, Squared Vs
-{0x6303, 0x1d27, 0x1F697}, // 🚗, \:car:, Automobile
+{0x7602, 0x1d24, 0xDD9A'D83C}, // U+1F19A, 🆚, \:vs:, Squared Vs
+{0x6303, 0x1d27, 0xDE97'D83D}, // U+1F697, 🚗, \:car:, Automobile
 {0x6816, 0x1d2b, 0x23F3}, // ⏳, \:hourglass_flowing_sand:, Hourglass With Flowing Sand
-{0x6e0e, 0x1d42, 0x1F6B7}, // 🚷, \:no_pedestrians:, No Pedestrians
-{0x7004, 0x1d51, 0x1F416}, // 🐖, \:pig2:, Pig
-{0x620d, 0x1d56, 0x1F4D1}, // 📑, \:bookmark_tabs:, Bookmark Tabs
+{0x6e0e, 0x1d42, 0xDEB7'D83D}, // U+1F6B7, 🚷, \:no_pedestrians:, No Pedestrians
+{0x7004, 0x1d51, 0xDC16'D83D}, // U+1F416, 🐖, \:pig2:, Pig
+{0x620d, 0x1d56, 0xDCD1'D83D}, // U+1F4D1, 📑, \:bookmark_tabs:, Bookmark Tabs
 {0x6816, 0x1d64, 0x2716}, // ✖, \:heavy_multiplication_x:, Heavy Multiplication X
-{0x6c0a, 0x1d7b, 0x1F3E9}, // 🏩, \:love_hotel:, Love Hotel
-{0x6c0b, 0x1d86, 0x1F4E2}, // 📢, \:loudspeaker:, Public Address Loudspeaker
-{0x7005, 0x1d92, 0x1F4DF}, // 📟, \:pager:, Pager
-{0x6213, 0x1d98, 0x1F532}, // 🔲, \:black_square_button:, Black Square Button
-{0x6303, 0x1dac, 0x1F431}, // 🐱, \:cat:, Cat Face
-{0x6306, 0x1db0, 0x1F36A}, // 🍪, \:cookie:, Cookie
-{0x640c, 0x1db7, 0x1F61E}, // 😞, \:disappointed:, Disappointed Face
-{0x670b, 0x1dc4, 0x1F49A}, // 💚, \:green_heart:, Green Heart
-{0x6806, 0x1dd0, 0x1F528}, // 🔨, \:hammer:, Hammer
+{0x6c0a, 0x1d7b, 0xDFE9'D83C}, // U+1F3E9, 🏩, \:love_hotel:, Love Hotel
+{0x6c0b, 0x1d86, 0xDCE2'D83D}, // U+1F4E2, 📢, \:loudspeaker:, Public Address Loudspeaker
+{0x7005, 0x1d92, 0xDCDF'D83D}, // U+1F4DF, 📟, \:pager:, Pager
+{0x6213, 0x1d98, 0xDD32'D83D}, // U+1F532, 🔲, \:black_square_button:, Black Square Button
+{0x6303, 0x1dac, 0xDC31'D83D}, // U+1F431, 🐱, \:cat:, Cat Face
+{0x6306, 0x1db0, 0xDF6A'D83C}, // U+1F36A, 🍪, \:cookie:, Cookie
+{0x640c, 0x1db7, 0xDE1E'D83D}, // U+1F61E, 😞, \:disappointed:, Disappointed Face
+{0x670b, 0x1dc4, 0xDC9A'D83D}, // U+1F49A, 💚, \:green_heart:, Green Heart
+{0x6806, 0x1dd0, 0xDD28'D83D}, // U+1F528, 🔨, \:hammer:, Hammer
 {0x6809, 0x1dd7, 0x231B}, // ⌛, \:hourglass:, Hourglass
 {0x7008, 0x1de1, 0x261D}, // ☝, \:point_up:, White Up Pointing Index
-{0x730c, 0x1dea, 0x1F360}, // 🍠, \:sweet_potato:, Roasted Sweet Potato
-{0x7705, 0x1df7, 0x1F469}, // 👩, \:woman:, Woman
-{0x620a, 0x1dfd, 0x1F3C0}, // 🏀, \:basketball:, Basketball And Hoop
-{0x630e, 0x1e08, 0x1F338}, // 🌸, \:cherry_blossom:, Cherry Blossom
+{0x730c, 0x1dea, 0xDF60'D83C}, // U+1F360, 🍠, \:sweet_potato:, Roasted Sweet Potato
+{0x7705, 0x1df7, 0xDC69'D83D}, // U+1F469, 👩, \:woman:, Woman
+{0x620a, 0x1dfd, 0xDFC0'D83C}, // U+1F3C0, 🏀, \:basketball:, Basketball And Hoop
+{0x630e, 0x1e08, 0xDF38'D83C}, // U+1F338, 🌸, \:cherry_blossom:, Cherry Blossom
 {0x6d01, 0x1e17, 0x24C2}, // Ⓜ, \:m:, Circled Latin Capital Letter M
-{0x6d04, 0x1e19, 0x1F6B9}, // 🚹, \:mens:, Mens Symbol
-{0x6f0d, 0x1e1e, 0x1F696}, // 🚖, \:oncoming_taxi:, Oncoming Taxi
-{0x700b, 0x1e2c, 0x1F449}, // 👉, \:point_right:, White Right Pointing Backhand Index
-{0x7206, 0x1e38, 0x1F501}, // 🔁, \:repeat:, Clockwise Rightwards And Leftwards Open Circle Arrows
-{0x7409, 0x1e3f, 0x1F34A}, // 🍊, \:tangerine:, Tangerine
-{0x7505, 0x1e49, 0x1F22F}, // 🈯, \:u6307:, Squared Cjk Unified Ideograph-6307
-{0x7704, 0x1e4f, 0x1F44B}, // 👋, \:wave:, Waving Hand Sign
-{0x7706, 0x1e54, 0x1F6BA}, // 🚺, \:womens:, Womens Symbol
+{0x6d04, 0x1e19, 0xDEB9'D83D}, // U+1F6B9, 🚹, \:mens:, Mens Symbol
+{0x6f0d, 0x1e1e, 0xDE96'D83D}, // U+1F696, 🚖, \:oncoming_taxi:, Oncoming Taxi
+{0x700b, 0x1e2c, 0xDC49'D83D}, // U+1F449, 👉, \:point_right:, White Right Pointing Backhand Index
+{0x7206, 0x1e38, 0xDD01'D83D}, // U+1F501, 🔁, \:repeat:, Clockwise Rightwards And Leftwards Open Circle Arrows
+{0x7409, 0x1e3f, 0xDF4A'D83C}, // U+1F34A, 🍊, \:tangerine:, Tangerine
+{0x7505, 0x1e49, 0xDE2F'D83C}, // U+1F22F, 🈯, \:u6307:, Squared Cjk Unified Ideograph-6307
+{0x7704, 0x1e4f, 0xDC4B'D83D}, // U+1F44B, 👋, \:wave:, Waving Hand Sign
+{0x7706, 0x1e54, 0xDEBA'D83D}, // U+1F6BA, 🚺, \:womens:, Womens Symbol
 {0x7712, 0x1e5b, 0x25AB}, // ▫, \:white_small_square:, White Small Square
-{0x6204, 0x1e6e, 0x1F3E6}, // 🏦, \:bank:, Bank
-{0x640d, 0x1e73, 0x1F6AF}, // 🚯, \:do_not_litter:, Do Not Litter Symbol
-{0x6410, 0x1e81, 0x1F3EC}, // 🏬, \:department_store:, Department Store
-{0x6604, 0x1e92, 0x1F41F}, // 🐟, \:fish:, Fish
-{0x6f02, 0x1e97, 0x1F197}, // 🆗, \:ok:, Squared Ok
-{0x6f10, 0x1e9a, 0x1F4C2}, // 📂, \:open_file_folder:, Open File Folder
-{0x7007, 0x1eab, 0x1F4E6}, // 📦, \:package:, Package
-{0x7207, 0x1eb3, 0x1F308}, // 🌈, \:rainbow:, Rainbow
-{0x7302, 0x1ebb, 0x1F202}, // 🈂, \:sa:, Squared Katakana Sa
+{0x6204, 0x1e6e, 0xDFE6'D83C}, // U+1F3E6, 🏦, \:bank:, Bank
+{0x640d, 0x1e73, 0xDEAF'D83D}, // U+1F6AF, 🚯, \:do_not_litter:, Do Not Litter Symbol
+{0x6410, 0x1e81, 0xDFEC'D83C}, // U+1F3EC, 🏬, \:department_store:, Department Store
+{0x6604, 0x1e92, 0xDC1F'D83D}, // U+1F41F, 🐟, \:fish:, Fish
+{0x6f02, 0x1e97, 0xDD97'D83C}, // U+1F197, 🆗, \:ok:, Squared Ok
+{0x6f10, 0x1e9a, 0xDCC2'D83D}, // U+1F4C2, 📂, \:open_file_folder:, Open File Folder
+{0x7007, 0x1eab, 0xDCE6'D83D}, // U+1F4E6, 📦, \:package:, Package
+{0x7207, 0x1eb3, 0xDF08'D83C}, // U+1F308, 🌈, \:rainbow:, Rainbow
+{0x7302, 0x1ebb, 0xDE02'D83C}, // U+1F202, 🈂, \:sa:, Squared Katakana Sa
 {0x7307, 0x1ebe, 0x2747}, // ❇, \:sparkle:, Sparkle
-{0x7406, 0x1ec6, 0x1F3C6}, // 🏆, \:trophy:, Trophy
-{0x6405, 0x1ecd, 0x1F361}, // 🍡, \:dango:, Dango
-{0x6612, 0x1ed3, 0x1F313}, // 🌓, \:first_quarter_moon:, First Quarter Moon Symbol
+{0x7406, 0x1ec6, 0xDFC6'D83C}, // U+1F3C6, 🏆, \:trophy:, Trophy
+{0x6405, 0x1ecd, 0xDF61'D83C}, // U+1F361, 🍡, \:dango:, Dango
+{0x6612, 0x1ed3, 0xDF13'D83C}, // U+1F313, 🌓, \:first_quarter_moon:, First Quarter Moon Symbol
 {0x6f01, 0x1ee6, 0x2B55}, // ⭕, \:o:, Heavy Large Circle
-{0x700b, 0x1ee8, 0x1F4EF}, // 📯, \:postal_horn:, Postal Horn
-{0x730a, 0x1ef4, 0x1F367}, // 🍧, \:shaved_ice:, Shaved Ice
-{0x740d, 0x1eff, 0x1F420}, // 🐠, \:tropical_fish:, Tropical Fish
-{0x610e, 0x1f0d, 0x1F6A1}, // 🚡, \:aerial_tramway:, Aerial Tramway
-{0x6203, 0x1f1c, 0x1F41D}, // 🐝, \:bee:, Honeybee
-{0x6206, 0x1f20, 0x1F38D}, // 🎍, \:bamboo:, Pine Decoration
-{0x620f, 0x1f27, 0x1F470}, // 👰, \:bride_with_veil:, Bride With Veil
-{0x6210, 0x1f37, 0x1F684}, // 🚄, \:bullettrain_side:, High-Speed Train
+{0x700b, 0x1ee8, 0xDCEF'D83D}, // U+1F4EF, 📯, \:postal_horn:, Postal Horn
+{0x730a, 0x1ef4, 0xDF67'D83C}, // U+1F367, 🍧, \:shaved_ice:, Shaved Ice
+{0x740d, 0x1eff, 0xDC20'D83D}, // U+1F420, 🐠, \:tropical_fish:, Tropical Fish
+{0x610e, 0x1f0d, 0xDEA1'D83D}, // U+1F6A1, 🚡, \:aerial_tramway:, Aerial Tramway
+{0x6203, 0x1f1c, 0xDC1D'D83D}, // U+1F41D, 🐝, \:bee:, Honeybee
+{0x6206, 0x1f20, 0xDF8D'D83C}, // U+1F38D, 🎍, \:bamboo:, Pine Decoration
+{0x620f, 0x1f27, 0xDC70'D83D}, // U+1F470, 👰, \:bride_with_veil:, Bride With Veil
+{0x6210, 0x1f37, 0xDE84'D83D}, // U+1F684, 🚄, \:bullettrain_side:, High-Speed Train
 {0x610a, 0x1f48, 0x2B05}, // ⬅, \:arrow_left:, Leftwards Black Arrow
-{0x6204, 0x1f53, 0x1F519}, // 🔙, \:back:, Back With Leftwards Arrow Above
-{0x6b14, 0x1f58, 0x1F619}, // 😙, \:kissing_smiling_eyes:, Kissing Face With Smiling Eyes
-{0x6d10, 0x1f6d, 0x1F69E}, // 🚞, \:mountain_railway:, Mountain Railway
-{0x6f02, 0x1f7e, 0x1F51B}, // 🔛, \:on:, On With Exclamation Mark With Left Right Arrow Above
+{0x6204, 0x1f53, 0xDD19'D83D}, // U+1F519, 🔙, \:back:, Back With Leftwards Arrow Above
+{0x6b14, 0x1f58, 0xDE19'D83D}, // U+1F619, 😙, \:kissing_smiling_eyes:, Kissing Face With Smiling Eyes
+{0x6d10, 0x1f6d, 0xDE9E'D83D}, // U+1F69E, 🚞, \:mountain_railway:, Mountain Railway
+{0x6f02, 0x1f7e, 0xDD1B'D83D}, // U+1F51B, 🔛, \:on:, On With Exclamation Mark With Left Right Arrow Above
 {0x6111, 0x1f81, 0x2198}, // ↘, \:arrow_lower_right:, South East Arrow / Lower Right Arrow
-{0x6308, 0x1f93, 0x1F55E}, // 🕞, \:clock330:, Clock Face Three-Thirty
-{0x6309, 0x1f9c, 0x1F567}, // 🕧, \:clock1230:, Clock Face Twelve-Thirty
-{0x6d09, 0x1fa6, 0x1F50E}, // 🔎, \:mag_right:, Right-Pointing Magnifying Glass
-{0x6d0c, 0x1fb0, 0x1F3A5}, // 🎥, \:movie_camera:, Movie Camera
-{0x6e0b, 0x1fbd, 0x1F6B3}, // 🚳, \:no_bicycles:, No Bicycles
-{0x7306, 0x1fc9, 0x1F3EB}, // 🏫, \:school:, School
-{0x740b, 0x1fd0, 0x1F5FC}, // 🗼, \:tokyo_tower:, Tokyo Tower
+{0x6308, 0x1f93, 0xDD5E'D83D}, // U+1F55E, 🕞, \:clock330:, Clock Face Three-Thirty
+{0x6309, 0x1f9c, 0xDD67'D83D}, // U+1F567, 🕧, \:clock1230:, Clock Face Twelve-Thirty
+{0x6d09, 0x1fa6, 0xDD0E'D83D}, // U+1F50E, 🔎, \:mag_right:, Right-Pointing Magnifying Glass
+{0x6d0c, 0x1fb0, 0xDFA5'D83C}, // U+1F3A5, 🎥, \:movie_camera:, Movie Camera
+{0x6e0b, 0x1fbd, 0xDEB3'D83D}, // U+1F6B3, 🚳, \:no_bicycles:, No Bicycles
+{0x7306, 0x1fc9, 0xDFEB'D83C}, // U+1F3EB, 🏫, \:school:, School
+{0x740b, 0x1fd0, 0xDDFC'D83D}, // U+1F5FC, 🗼, \:tokyo_tower:, Tokyo Tower
 {0x770a, 0x1fdc, 0x267F}, // ♿, \:wheelchair:, Wheelchair Symbol
-{0x6d07, 0x1fe7, 0x1F486}, // 💆, \:massage:, Face Massage
-{0x6d14, 0x1fef, 0x1F4ED}, // 📭, \:mailbox_with_no_mail:, Open Mailbox With Lowered Flag
+{0x6d07, 0x1fe7, 0xDC86'D83D}, // U+1F486, 💆, \:massage:, Face Massage
+{0x6d14, 0x1fef, 0xDCED'D83D}, // U+1F4ED, 📭, \:mailbox_with_no_mail:, Open Mailbox With Lowered Flag
 {0x7206, 0x2004, 0x23EA}, // ⏪, \:rewind:, Black Left-Pointing Double Triangle
-{0x7208, 0x200b, 0x1F6BB}, // 🚻, \:restroom:, Restroom
+{0x7208, 0x200b, 0xDEBB'D83D}, // U+1F6BB, 🚻, \:restroom:, Restroom
 {0x7705, 0x2014, 0x231A}, // ⌚, \:watch:, Watch
-{0x6110, 0x201a, 0x1F53D}, // 🔽, \:arrow_down_small:, Down-Pointing Small Red Triangle
-{0x6703, 0x202b, 0x1F52B}, // 🔫, \:gun:, Pistol
-{0x6105, 0x202f, 0x1F47D}, // 👽, \:alien:, Extraterrestrial Alien
-{0x6117, 0x2035, 0x1F504}, // 🔄, \:arrows_counterclockwise:, Anticlockwise Downwards And Upwards Open Circle Arrows
-{0x630b, 0x204d, 0x1F3AA}, // 🎪, \:circus_tent:, Circus Tent
-{0x640b, 0x2059, 0x1F432}, // 🐲, \:dragon_face:, Dragon Face
+{0x6110, 0x201a, 0xDD3D'D83D}, // U+1F53D, 🔽, \:arrow_down_small:, Down-Pointing Small Red Triangle
+{0x6703, 0x202b, 0xDD2B'D83D}, // U+1F52B, 🔫, \:gun:, Pistol
+{0x6105, 0x202f, 0xDC7D'D83D}, // U+1F47D, 👽, \:alien:, Extraterrestrial Alien
+{0x6117, 0x2035, 0xDD04'D83D}, // U+1F504, 🔄, \:arrows_counterclockwise:, Anticlockwise Downwards And Upwards Open Circle Arrows
+{0x630b, 0x204d, 0xDFAA'D83C}, // U+1F3AA, 🎪, \:circus_tent:, Circus Tent
+{0x640b, 0x2059, 0xDC32'D83D}, // U+1F432, 🐲, \:dragon_face:, Dragon Face
 {0x650b, 0x2065, 0x2757}, // ❗, \:exclamation:, Heavy Exclamation Mark Symbol
-{0x6e04, 0x2071, 0x1F443}, // 👃, \:nose:, Nose
-{0x6e07, 0x2076, 0x1F515}, // 🔕, \:no_bell:, Bell With Cancellation Stroke
-{0x7005, 0x207e, 0x1F351}, // 🍑, \:peach:, Peach
-{0x7305, 0x2084, 0x1F411}, // 🐑, \:sheep:, Sheep
-{0x7406, 0x208a, 0x1F6BD}, // 🚽, \:toilet:, Toilet
-{0x6406, 0x2091, 0x1F4B5}, // 💵, \:dollar:, Banknote With Dollar Sign
-{0x650d, 0x2098, 0x1F50C}, // 🔌, \:electric_plug:, Electric Plug
-{0x6608, 0x20a6, 0x1F626}, // 😦, \:frowning:, Frowning Face With Open Mouth
-{0x6807, 0x20af, 0x1F439}, // 🐹, \:hamster:, Hamster Face
-{0x6c04, 0x20b7, 0x1F517}, // 🔗, \:link:, Link Symbol
-{0x7305, 0x20bc, 0x1F60F}, // 😏, \:smirk:, Smirking Face
-{0x7306, 0x20c2, 0x1F6BF}, // 🚿, \:shower:, Shower
+{0x6e04, 0x2071, 0xDC43'D83D}, // U+1F443, 👃, \:nose:, Nose
+{0x6e07, 0x2076, 0xDD15'D83D}, // U+1F515, 🔕, \:no_bell:, Bell With Cancellation Stroke
+{0x7005, 0x207e, 0xDF51'D83C}, // U+1F351, 🍑, \:peach:, Peach
+{0x7305, 0x2084, 0xDC11'D83D}, // U+1F411, 🐑, \:sheep:, Sheep
+{0x7406, 0x208a, 0xDEBD'D83D}, // U+1F6BD, 🚽, \:toilet:, Toilet
+{0x6406, 0x2091, 0xDCB5'D83D}, // U+1F4B5, 💵, \:dollar:, Banknote With Dollar Sign
+{0x650d, 0x2098, 0xDD0C'D83D}, // U+1F50C, 🔌, \:electric_plug:, Electric Plug
+{0x6608, 0x20a6, 0xDE26'D83D}, // U+1F626, 😦, \:frowning:, Frowning Face With Open Mouth
+{0x6807, 0x20af, 0xDC39'D83D}, // U+1F439, 🐹, \:hamster:, Hamster Face
+{0x6c04, 0x20b7, 0xDD17'D83D}, // U+1F517, 🔗, \:link:, Link Symbol
+{0x7305, 0x20bc, 0xDE0F'D83D}, // U+1F60F, 😏, \:smirk:, Smirking Face
+{0x7306, 0x20c2, 0xDEBF'D83D}, // U+1F6BF, 🚿, \:shower:, Shower
 {0x7601, 0x20c9, 0x270C}, // ✌, \:v:, Victory Hand
-{0x6607, 0x20cb, 0x1F633}, // 😳, \:flushed:, Flushed Face
-{0x6609, 0x20d3, 0x1F315}, // 🌕, \:full_moon:, Full Moon Symbol
-{0x690f, 0x20dd, 0x1F3EE}, // 🏮, \:izakaya_lantern:, Izakaya Lantern
-{0x730b, 0x20ed, 0x1F605}, // 😅, \:sweat_smile:, Smiling Face With Open Mouth And Cold Sweat
-{0x7706, 0x20f9, 0x1F40B}, // 🐋, \:whale2:, Whale
-{0x620f, 0x2100, 0x1F309}, // 🌉, \:bridge_at_night:, Bridge At Night
-{0x6609, 0x2110, 0x1F386}, // 🎆, \:fireworks:, Fireworks
-{0x7003, 0x211a, 0x1F437}, // 🐷, \:pig:, Pig Face
-{0x7010, 0x211e, 0x1F6C2}, // 🛂, \:passport_control:, Passport Control
+{0x6607, 0x20cb, 0xDE33'D83D}, // U+1F633, 😳, \:flushed:, Flushed Face
+{0x6609, 0x20d3, 0xDF15'D83C}, // U+1F315, 🌕, \:full_moon:, Full Moon Symbol
+{0x690f, 0x20dd, 0xDFEE'D83C}, // U+1F3EE, 🏮, \:izakaya_lantern:, Izakaya Lantern
+{0x730b, 0x20ed, 0xDE05'D83D}, // U+1F605, 😅, \:sweat_smile:, Smiling Face With Open Mouth And Cold Sweat
+{0x7706, 0x20f9, 0xDC0B'D83D}, // U+1F40B, 🐋, \:whale2:, Whale
+{0x620f, 0x2100, 0xDF09'D83C}, // U+1F309, 🌉, \:bridge_at_night:, Bridge At Night
+{0x6609, 0x2110, 0xDF86'D83C}, // U+1F386, 🎆, \:fireworks:, Fireworks
+{0x7003, 0x211a, 0xDC37'D83D}, // U+1F437, 🐷, \:pig:, Pig Face
+{0x7010, 0x211e, 0xDEC2'D83D}, // U+1F6C2, 🛂, \:passport_control:, Passport Control
 {0x7801, 0x212f, 0x274C}, // ❌, \:x:, Cross Mark
-{0x6c14, 0x2131, 0x1F536}, // 🔶, \:large_orange_diamond:, Large Orange Diamond
-{0x720c, 0x2146, 0x1F64C}, // 🙌, \:raised_hands:, Person Raising Both Hands In Celebration
+{0x6c14, 0x2131, 0xDD36'D83D}, // U+1F536, 🔶, \:large_orange_diamond:, Large Orange Diamond
+{0x720c, 0x2146, 0xDE4C'D83D}, // U+1F64C, 🙌, \:raised_hands:, Person Raising Both Hands In Celebration
 };
 //Emoji hash--Autogenerated -- end of section automatically generated
 #endif // EnableLaTeXLikeEmojiInput

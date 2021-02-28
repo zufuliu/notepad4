@@ -42,7 +42,6 @@ def find_word_contains_punctuation(items):
 	result.sort()
 	return result
 
-
 def json_dump(obj):
 	return json.dumps(obj, ensure_ascii=False, indent='\t')
 
@@ -163,6 +162,8 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 	if input_name == 'Emoji':
 		prefix = '\\:'
 		suffix = ':'
+	# see https://www.unicode.org/faq/utf_bom.html
+	LEAD_OFFSET = 0xD800 - (0x10000 >> 10)
 	for info in input_list:
 		character = info['character']
 		if len(character) == 1:
@@ -170,7 +171,11 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 			if ch <= 0xffff:
 				code = '0x%04X' % ch
 			else:
-				code = '0x%X' % ch
+				character = ('U+%X, ' % ch) + character
+				# convert to UTF-16
+				lead = LEAD_OFFSET + (ch >> 10)
+				trail = 0xDC00 + (ch & 0x3FF)
+				code = "0x%04X'%04X" % (trail, lead)
 		else:
 			code = "0x%04X'%04X" % (ord(character[1]), ord(character[0]))
 		magic = info['magic']

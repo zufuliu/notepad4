@@ -1353,8 +1353,8 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 		return false;
 	}
 
-	wchar_t wcs[3] = { 0 };
-	wclen = UTF16FromLaTeXInputCharacter(wch, wcs);
+	const wchar_t wcs[3] = { wch & 0xffff, wch >> 16, 0 };
+	wclen = 1 + (wcs[1] != 0);
 
 	const UINT codePage = CodePageOfDocument();
 	const int len = MultiByteFromWideChar(codePage, std::wstring_view(wcs, wclen), buffer, sizeof(buffer) - 1);
