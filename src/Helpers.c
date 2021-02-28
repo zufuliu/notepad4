@@ -2698,7 +2698,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
 				s++;
 			}
 			if (value) {
-				WCHAR val[2] =  { (WCHAR)value, 0 };
+				WCHAR val[2] = { (WCHAR)value, 0 };
 				char ch[8];
 				WideCharToMultiByte(cpEdit, 0, val, -1, ch, sizeof(ch), NULL, NULL);
 				const char *pch = ch;

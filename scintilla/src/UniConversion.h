@@ -42,11 +42,11 @@ inline int UnicodeFromUTF8(const unsigned char *us) noexcept {
 	case 1:
 		return us[0];
 	case 2:
-		return ((us[0] & 0x1F) << 6) + (us[1] & 0x3F);
+		return ((us[0] & 0x1F) << 6) | (us[1] & 0x3F);
 	case 3:
-		return ((us[0] & 0xF) << 12) + ((us[1] & 0x3F) << 6) + (us[2] & 0x3F);
+		return ((us[0] & 0xF) << 12) | ((us[1] & 0x3F) << 6) | (us[2] & 0x3F);
 	default:
-		return ((us[0] & 0x7) << 18) + ((us[1] & 0x3F) << 12) + ((us[2] & 0x3F) << 6) + (us[3] & 0x3F);
+		return ((us[0] & 0x7) << 18) | ((us[1] & 0x3F) << 12) | ((us[2] & 0x3F) << 6) | (us[3] & 0x3F);
 	}
 }
 
