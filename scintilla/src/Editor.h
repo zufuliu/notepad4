@@ -334,7 +334,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetSelection(SelectionPosition currentPos_, SelectionPosition anchor_);
 	void SetSelection(Sci::Position currentPos_, Sci::Position anchor_);
 	void SetSelection(SelectionPosition currentPos_);
-	void SetSelection(int currentPos_);
+	void SetSelection(Sci::Position currentPos_);
 	void SetEmptySelection(SelectionPosition currentPos_);
 	void SetEmptySelection(Sci::Position currentPos_);
 	enum class AddNumber {
