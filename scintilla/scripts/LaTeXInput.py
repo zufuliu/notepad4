@@ -266,9 +266,8 @@ def update_latex_input_header(latex_map, emoji_map, version, link):
 	output.append('#if EnableLaTeXLikeEmojiInput')
 	output.append('\tEmojiInputSequencePrefixLength = %d,' % len(prefix))
 	output.append('\tEmojiInputSequenceSuffixLength = %d,' % len(suffix))
-	output.append('\tEmojiInputSequencePrefixSuffixLength = EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,')
-	output.append('\tMinEmojiInputSequenceLength = %d + EmojiInputSequencePrefixSuffixLength,' % min_emoji_len)
-	output.append('\tMaxEmojiInputSequenceLength = %d + EmojiInputSequencePrefixSuffixLength,' % max_emoji_len)
+	output.append('\tMinEmojiInputSequenceLength = %d + EmojiInputSequencePrefixLength, // suffix is optional' % min_emoji_len)
+	output.append('\tMaxEmojiInputSequenceLength = %d + EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,' % max_emoji_len)
 
 	output.append('')
 	if max_latex_len >= max_emoji_len + len(prefix) + len(suffix):

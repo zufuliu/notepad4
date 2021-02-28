@@ -37,10 +37,11 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 		if (length < MinEmojiInputSequenceLength || length > MaxEmojiInputSequenceLength) {
 			return 0;
 		}
-		length -= EmojiInputSequencePrefixSuffixLength;
+		length -= EmojiInputSequencePrefixLength;
 		sequence += EmojiInputSequencePrefixLength;
-		if (sequence[length] != ':') {
-			return 0;
+		const char ch = sequence[length - EmojiInputSequenceSuffixLength];
+		if (ch == ':') {
+			length -= EmojiInputSequenceSuffixLength;
 		}
 	}
 #else
