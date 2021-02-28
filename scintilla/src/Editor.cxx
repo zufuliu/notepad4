@@ -714,7 +714,7 @@ void Editor::SetSelection(SelectionPosition currentPos_) {
 	QueueIdleWork(WorkNeeded::workUpdateUI);
 }
 
-void Editor::SetSelection(int currentPos_) {
+void Editor::SetSelection(Sci::Position currentPos_) {
 	SetSelection(SelectionPosition(currentPos_));
 }
 

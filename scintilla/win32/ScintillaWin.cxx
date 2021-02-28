@@ -1363,9 +1363,7 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 	targetRange.end.SetPosition(main);
 	ReplaceTarget(false, buffer, len);
 	// move caret after character
-	pos += len;
-	sel.RangeMain().anchor.SetPosition(pos);
-	sel.RangeMain().caret.SetPosition(pos);
+	SetEmptySelection(pos + len);
 	if (ac.Active()) {
 		ac.Cancel();
 	}
