@@ -1346,6 +1346,12 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 	if (ch != '\\') {
 		return false;
 	}
+	if (pdoc->dbcsCodePage && pdoc->dbcsCodePage != SC_CP_UTF8) {
+		ch = pdoc->CharAt(pos - 1);
+		if (pdoc->IsDBCSLeadByteNoExcept(ch)) {
+			return false;
+		}
+	}
 
 	ptrdiff_t wclen = buffer + sizeof(buffer) - 1 - ptr;
 	const uint32_t wch = GetLaTeXInputUnicodeCharacter(ptr, wclen);
