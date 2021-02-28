@@ -1364,6 +1364,7 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 
 	const UINT codePage = CodePageOfDocument();
 	const int len = MultiByteFromWideChar(codePage, std::wstring_view(wcs, wclen), buffer, sizeof(buffer) - 1);
+	buffer[len] = '\0';
 
 	targetRange.start.SetPosition(pos);
 	targetRange.end.SetPosition(main);
