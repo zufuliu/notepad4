@@ -19,7 +19,7 @@ struct InputSequence {
 
 template <typename T, uint32_t N>
 constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
-	return N ;
+	return N;
 }
 
 }
