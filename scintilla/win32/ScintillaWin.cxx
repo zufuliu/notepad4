@@ -1366,6 +1366,9 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 	pos += len;
 	sel.RangeMain().anchor.SetPosition(pos);
 	sel.RangeMain().caret.SetPosition(pos);
+	if (ac.Active()) {
+		ac.Cancel();
+	}
 	return true;
 }
 
