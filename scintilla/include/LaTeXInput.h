@@ -20,9 +20,8 @@ enum {
 #if EnableLaTeXLikeEmojiInput
 	EmojiInputSequencePrefixLength = 1,
 	EmojiInputSequenceSuffixLength = 1,
-	EmojiInputSequencePrefixSuffixLength = EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,
-	MinEmojiInputSequenceLength = 1 + EmojiInputSequencePrefixSuffixLength,
-	MaxEmojiInputSequenceLength = 31 + EmojiInputSequencePrefixSuffixLength,
+	MinEmojiInputSequenceLength = 1 + EmojiInputSequencePrefixLength, // suffix is optional
+	MaxEmojiInputSequenceLength = 31 + EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,
 
 	MaxLaTeXInputBufferLength = 1 + MaxEmojiInputSequenceLength + 1,
 #else
@@ -54,8 +53,9 @@ extern const char * const kAllEmojiInputSequences;
 
 /*!
  * @brief Get Unicode UTF-16 characters for LaTeX or Emoji input sequence.
- * example: \sum to U+2211 ∑, \:laughing: to U+1F606 😆 and \gvertneqq to U+2269 + U+FE00 ≩︀.
- * @param sequence The input sequence withou the prefix '\', sequence[0] == ':' indicates Emoji.
+ * example: \sum to U+2211 ∑, \:smile: to U+1F604 😄 and \gvertneqq to U+2269 + U+FE00 ≩︀.
+ * @param sequence The input sequence withou the prefix '\'.
+ * sequence[0] == ':' indicates Emoji, the suffix ':' is optional (but must be counted into length when included).
  * @param length Length for the input sequence withou the prefix '\'.
  * @return Returns the corresponding Unicode characters or zero when the input sequence is not found.
  */
