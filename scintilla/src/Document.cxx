@@ -1744,7 +1744,7 @@ Sci::Position Document::ParaDown(Sci::Position pos) const noexcept {
 }
 
 CharClassify::cc Document::WordCharacterClass(unsigned int ch) const noexcept {
-	if (dbcsCodePage && (!UTF8IsAscii(ch))) {
+	if (dbcsCodePage && !IsASCIICharacter(ch)) {
 		if (SC_CP_UTF8 == dbcsCodePage) {
 			return CharClassify::ClassifyCharacter(ch);
 		} else {
@@ -2605,11 +2605,11 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 		if (pos > 0) {
 			ceStart = CharacterAfter(pos);
 			pos -= CharacterBefore(pos).widthBytes;
-			if (!IsASCII(ceStart.character)) {
-				while (pos > 0 && !IsASCII(CharacterAfter(pos).character)) {
+			if (!IsASCIICharacter(ceStart.character)) {
+				while (pos > 0 && !IsASCIICharacter(CharacterAfter(pos).character)) {
 					pos -= CharacterBefore(pos).widthBytes;
 				}
-				if (IsASCII(CharacterAfter(pos).character))
+				if (IsASCIICharacter(CharacterAfter(pos).character))
 					pos += CharacterAfter(pos).widthBytes;
 			} else if (IsLowerCase(ceStart.character)) {
 				while (pos > 0 && IsLowerCase(CharacterAfter(pos).character)) {
@@ -2657,8 +2657,8 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 			pos += CharacterAfter(pos).widthBytes;
 		ceStart = CharacterAfter(pos);
 	}
-	if (!IsASCII(ceStart.character)) {
-		while (pos < length && !IsASCII(CharacterAfter(pos).character))
+	if (!IsASCIICharacter(ceStart.character)) {
+		while (pos < length && !IsASCIICharacter(CharacterAfter(pos).character))
 			pos += CharacterAfter(pos).widthBytes;
 	} else if (IsLowerCase(ceStart.character)) {
 		while (pos < length && IsLowerCase(CharacterAfter(pos).character))
