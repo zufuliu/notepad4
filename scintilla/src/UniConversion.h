@@ -54,8 +54,20 @@ constexpr bool UTF8IsTrailByte(unsigned char ch) noexcept {
 	return (ch >= 0x80) && (ch < 0xc0);
 }
 
+constexpr bool IsASCIICharacter(unsigned int ch) noexcept {
+	return ch < 0x80;
+}
+
 constexpr bool UTF8IsAscii(unsigned int ch) noexcept {
 	return ch < 0x80;
+}
+
+constexpr bool UTF8IsAscii(unsigned char ch) noexcept {
+	return ch < 0x80;
+}
+
+constexpr bool UTF8IsAscii(char ch) noexcept {
+	return static_cast<unsigned char>(ch) < 0x80;
 }
 
 enum {

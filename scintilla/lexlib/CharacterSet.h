@@ -180,9 +180,10 @@ constexpr bool IsFloatExponent(int base, int ch, int chNext) noexcept {
 		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
 }
 
-constexpr bool IsASCII(int ch) noexcept {
-	return ch >= 0 && ch < 0x80;
-}
+//[[deprecated]]
+//constexpr bool IsASCII(int ch) noexcept {
+//	return ch >= 0 && ch < 0x80;
+//}
 
 constexpr bool IsLowerCase(int ch) noexcept {
 	return ch >= 'a' && ch <= 'z';

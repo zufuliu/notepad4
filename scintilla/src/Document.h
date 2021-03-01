@@ -268,7 +268,7 @@ public:
 	struct CharacterExtracted {
 		int character;
 		int widthBytes;
-		CharacterExtracted(int character_, int widthBytes_) noexcept :
+		constexpr CharacterExtracted(int character_, int widthBytes_) noexcept :
 			character(character_), widthBytes(widthBytes_) {}
 		// For DBCS characters turn 2 bytes into an int
 		static CharacterExtracted DBCS(unsigned char lead, unsigned char trail) noexcept {

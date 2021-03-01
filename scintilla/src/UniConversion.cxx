@@ -164,7 +164,7 @@ size_t UTF16FromUTF8(std::string_view svu8, wchar_t *tbuf, size_t tlen) {
 			value |= (ch & 0x3F) << 6;
 			ch = svu8[i++];
 			value |= ch & 0x3F;
-			tbuf[ui] = static_cast<wchar_t>(((value - 0x10000) >> 10) + SURROGATE_LEAD_FIRST);
+			tbuf[ui] = static_cast<wchar_t>(((value - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
 			ui++;
 			tbuf[ui] = static_cast<wchar_t>((value & 0x3ff) + SURROGATE_TRAIL_FIRST);
 			break;
