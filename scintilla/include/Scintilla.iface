@@ -303,9 +303,6 @@ get IMEInteraction GetIMEInteraction=2678(,)
 # Choose to display the IME in a window or inline.
 set void SetIMEInteraction=2679(IMEInteraction imeInteraction,)
 
-# Enable LaTeX input method.
-set void SetLaTeXInputMethod=2659(bool enable,)
-
 enu Alpha=SC_ALPHA_
 val SC_ALPHA_TRANSPARENT=0
 val SC_ALPHA_OPAQUE=255
@@ -1791,9 +1788,14 @@ fun void Cancel=2325(,)
 # Delete the selection or if no selection, the character before the caret.
 fun void DeleteBack=2326(,)
 
+enu TabCompletion=TAB_COMPLETION_
+val TAB_COMPLETION_DEFAULT=0
+val TAB_COMPLETION_LATEX=1
+val TAB_COMPLETION_FALLBACK=2
+
 # If selection is empty or all on one line replace the selection with a tab character.
 # If more than one line selected, indent the lines.
-fun void Tab=2327(,)
+fun void Tab=2327(int what,)
 
 # Dedent the selected lines.
 fun void BackTab=2328(,)

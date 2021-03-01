@@ -842,9 +842,6 @@ NP2_inline void SciCall_SetIMEInteraction(int imeInteraction) {
 	SciCall(SCI_SETIMEINTERACTION, imeInteraction, 0);
 }
 
-NP2_inline void SciCall_SetLaTeXInputMethod(BOOL enable) {
-	SciCall(SCI_SETLATEXINPUTMETHOD, enable, 0);
-}
 
 // Brace highlighting
 
@@ -1173,7 +1170,11 @@ NP2_inline void SciCall_NewLine(void) {
 }
 
 NP2_inline void SciCall_Tab(void) {
-	SciCall(SCI_TAB, 0, 0);
+	SciCall(SCI_TAB, TAB_COMPLETION_DEFAULT, 0);
+}
+
+NP2_inline void SciCall_TabCompletion(int what) {
+	SciCall(SCI_TAB, what, 0);
 }
 
 NP2_inline void SciCall_BackTab(void) {

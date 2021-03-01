@@ -486,7 +486,7 @@ class ScintillaWin final :
 	void EscapeHanja();
 	void ToggleHanja();
 	void AddWString(std::wstring_view wsv, CharacterSource charSource);
-	bool HandleLaTeXInputMethod();
+	bool HandleLaTeXTabCompletion();
 
 	UINT CodePageOfDocument() const noexcept;
 	bool ValidCodePage(int codePage) const noexcept override;
@@ -1323,7 +1323,7 @@ void ScintillaWin::AddWString(std::wstring_view wsv, CharacterSource charSource)
 	}
 }
 
-bool ScintillaWin::HandleLaTeXInputMethod() {
+bool ScintillaWin::HandleLaTeXTabCompletion() {
 	if (sel.Count() > 1 || !sel.Empty() || pdoc->IsReadOnly()) {
 		return false;
 	}
@@ -1348,7 +1348,7 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 	}
 	if (pdoc->dbcsCodePage && pdoc->dbcsCodePage != SC_CP_UTF8) {
 		ch = pdoc->CharAt(pos - 1);
-		if (pdoc->IsDBCSLeadByteNoExcept(ch)) {
+		if (!UTF8IsAscii(ch) && pdoc->IsDBCSLeadByteNoExcept(ch)) {
 			return false;
 		}
 	}
@@ -1371,9 +1371,6 @@ bool ScintillaWin::HandleLaTeXInputMethod() {
 	ReplaceTarget(false, buffer, len);
 	// move caret after character
 	SetEmptySelection(pos + len);
-	if (ac.Active()) {
-		ac.Cancel();
-	}
 	return true;
 }
 
@@ -1816,12 +1813,6 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
 		const int modifiers = ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown);
-		if (wParam == VK_TAB && modifiers == 0) {
-			if (enableLaTeXInputMethod && HandleLaTeXInputMethod()) {
-				lastKeyDownConsumed = true;
-				break;
-			}
-		}
 		const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)), modifiers, &lastKeyDownConsumed);
 		if (!ret && !lastKeyDownConsumed) {
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
@@ -2389,6 +2380,17 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		case SCI_TARGETASUTF8:
 		case SCI_ENCODEDFROMUTF8:
 			return SciMessage(iMessage, wParam, lParam);
+
+		case SCI_TAB:
+			if (wParam & TAB_COMPLETION_LATEX) {
+				if (HandleLaTeXTabCompletion()) {
+					break;
+				}
+				if (!(wParam & TAB_COMPLETION_FALLBACK)) {
+					break;
+				}
+			}
+			[[fallthrough]];
 
 		default:
 			return ScintillaBase::WndProc(iMessage, wParam, lParam);
