@@ -350,6 +350,7 @@
 #define CMD_ENCLOSE_TRIPLE_SQ			20021	// Ctrl+3
 #define CMD_ENCLOSE_TRIPLE_DQ			20022	// Ctrl+6
 #define CMD_ENCLOSE_TRIPLE_BT			20023	// Ctrl+9
+#define CMD_TAB_COMPLETION				20024	// Tab
 
 #define CMD_INCREASENUM					20031	// Ctrl+Alt++
 #define CMD_DECREASENUM					20032	// Ctrl+Alt+-

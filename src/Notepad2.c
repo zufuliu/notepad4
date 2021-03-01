@@ -1694,7 +1694,6 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetBackSpaceUnIndents(bBackspaceUnindents);
 	SciCall_SetTabWidth(iTabWidth);
 	SciCall_SetIndent(iIndentWidth);
-	SciCall_SetLaTeXInputMethod(autoCompletionConfig.bLaTeXInputMethod);
 
 	// Indent Guides
 	Style_SetIndentGuides(bShowIndentGuides);
@@ -4077,7 +4076,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_SET_LATEX_INPUT_METHOD:
 		autoCompletionConfig.bLaTeXInputMethod = !autoCompletionConfig.bLaTeXInputMethod;
-		SciCall_SetLaTeXInputMethod(autoCompletionConfig.bLaTeXInputMethod);
 		break;
 
 	case IDM_SET_LINE_SELECTION_MODE:
@@ -4536,6 +4534,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	break;
+
+	case CMD_TAB_COMPLETION:
+		SciCall_TabCompletion(autoCompletionConfig.bLaTeXInputMethod | TAB_COMPLETION_FALLBACK);
+		break;
 
 	case CMD_CTRLTAB:
 		SciCall_SetTabIndents(FALSE);
@@ -5120,6 +5122,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			SciCall_EndUndoAction();
 			SciCall_AutoCCancel();
+			if (scn->listCompletionMethod == SC_AC_TAB && autoCompletionConfig.bLaTeXInputMethod) {
+				SciCall_TabCompletion(TAB_COMPLETION_LATEX);
+			}
 		}
 		break;
 

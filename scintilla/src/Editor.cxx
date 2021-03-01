@@ -6962,10 +6962,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		imeInteraction = static_cast<EditModel::IMEInteraction>(wParam);
 		break;
 
-	case SCI_SETLATEXINPUTMETHOD:
-		enableLaTeXInputMethod = wParam != 0;
-		break;
-
 	case SCI_GETIMEINTERACTION:
 		return imeInteraction;
 

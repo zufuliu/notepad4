@@ -114,7 +114,6 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SC_IME_INLINE 1
 #define SCI_GETIMEINTERACTION 2678
 #define SCI_SETIMEINTERACTION 2679
-#define SCI_SETLATEXINPUTMETHOD 2659
 #define SC_ALPHA_TRANSPARENT 0
 #define SC_ALPHA_OPAQUE 255
 #define SC_ALPHA_NOALPHA 256
@@ -659,6 +658,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_EDITTOGGLEOVERTYPE 2324
 #define SCI_CANCEL 2325
 #define SCI_DELETEBACK 2326
+#define TAB_COMPLETION_DEFAULT 0
+#define TAB_COMPLETION_LATEX 1
+#define TAB_COMPLETION_FALLBACK 2
 #define SCI_TAB 2327
 #define SCI_BACKTAB 2328
 #define SCI_NEWLINE 2329
