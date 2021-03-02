@@ -67,13 +67,13 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	if (latex) {
 		value %= array_size(LaTeXHashTable);
 		value = LaTeXHashTable[value];
-		sequenceString = kAllLaTeXInputSequences;
-		sequenceList = LaTeXSequenceList;
+		sequenceString = AllLaTeXInputSequenceString;
+		sequenceList = LaTeXInputSequenceList;
 	} else {
 		value %= array_size(EmojiHashTable);
 		value = EmojiHashTable[value];
-		sequenceString = kAllEmojiInputSequences;
-		sequenceList = EmojiSequenceList;
+		sequenceString = AllEmojiInputSequenceString;
+		sequenceList = EmojiInputSequenceList;
 	}
 #else
 	value %= array_size(LaTeXHashTable);
@@ -81,8 +81,8 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 #endif
 	if (value) {
 #if !EnableLaTeXLikeEmojiInput
-		const char * const sequenceString = kAllLaTeXInputSequences;
-		const InputSequence * const sequenceList = LaTeXSequenceList;
+		const char * const sequenceString = AllLaTeXInputSequenceString;
+		const InputSequence * const sequenceList = LaTeXInputSequenceList;
 #endif
 
 		// magic field in InputSequence.
