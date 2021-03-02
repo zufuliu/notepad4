@@ -1371,6 +1371,7 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 	ReplaceTarget(false, buffer, len);
 	// move caret after character
 	SetEmptySelection(pos + len);
+	AutoCompleteCancel();
 	return true;
 }
 
