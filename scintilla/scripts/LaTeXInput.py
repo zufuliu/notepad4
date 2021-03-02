@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 import sys
+import os.path
 import re
 import string
 import json
 from statistics import variance
+import unicodedata
 import time
 
 from FileGenerator import Regenerate
 
 header_path = '../include/LaTeXInput.h'
 data_path = '../win32/LaTeXInputData.h'
+
+source_info = {
+	'latex_link': 'https://docs.julialang.org/en/v1.7-dev/manual/unicode-input/',
+	'emoji_link': 'https://github.com/iamcal/emoji-data/blob/master/emoji_pretty.json',
+}
 
 # strip out unused bytes (sequence[0] and the separator ' ') from input sequences,
 # sequence[0] is already stored in `magic` field.
@@ -41,6 +48,12 @@ def find_word_contains_punctuation(items):
 			result.append(item)
 	result.sort()
 	return result
+
+def get_character_name(ch):
+	try:
+		return unicodedata.name(ch).title()
+	except ValueError:
+		return ''
 
 def json_dump(obj):
 	return json.dumps(obj, ensure_ascii=False, indent='\t')
@@ -154,9 +167,8 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 	output = [f'static const uint16_t {input_name}HashTable[] = {{']
 	output.extend('0x%04x,' % value for value in hash_table)
 	output.append('};')
-	output.append('')
+	Regenerate(data_path, f'//{input_name} hash', output)
 
-	output.append(f'static const InputSequence {input_name}SequenceList[] = {{')
 	prefix = '\\'
 	suffix = ''
 	if input_name == 'Emoji':
@@ -164,6 +176,7 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 		suffix = ':'
 	# see https://www.unicode.org/faq/utf_bom.html
 	LEAD_OFFSET = 0xD800 - (0x10000 >> 10)
+	output= []
 	for info in input_list:
 		character = info['character']
 		if len(character) == 1:
@@ -184,11 +197,10 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 		name = info['name']
 		line = '{0x%04x, 0x%04x, %s}, // %s, %s, %s' % (magic, offset, code, character, sequence, name)
 		output.append(line)
-	output.append('};')
-	Regenerate(data_path, f'//{input_name} hash', output)
+	Regenerate(data_path, f'//{input_name} list', output)
 
 	content[-1] += ';'
-	Regenerate(data_path, f'//{input_name} sequences', content)
+	Regenerate(data_path, f'//{input_name} string', content)
 
 	max_collision += 1 # maximum string comparison
 	size = offset + 2*hash_size + 8*len(input_map)
@@ -202,7 +214,7 @@ def update_all_latex_input_data(latex_map=None, emoji_map=None):
 		emoji_map = json_load('emoji_map.json')
 
 	update_latex_input_data('LaTeX', latex_map, 512)
-	update_latex_input_data('Emoji', emoji_map, 128)
+	update_latex_input_data('Emoji', emoji_map, 256)
 
 
 def get_input_map_size_info(input_name, input_map):
@@ -249,9 +261,11 @@ static inline bool IsLaTeXInputSequenceChar(char ch) {{
 }}
 """.splitlines())
 
-def update_latex_input_header(latex_map, emoji_map, version, link):
-	output = ['// input sequences based on ' + version]
-	output.append('// documented at ' + link)
+def update_latex_input_header(latex_map, emoji_map):
+	output = ['// LaTeX input sequences based on ' + source_info['latex_version']]
+	output.append('// documented at ' + source_info['latex_link'] + '.')
+	output.append('// Emoji input sequences based on ' + source_info['emoji_link'] + ',')
+	output.append('// downloaded on ' + source_info['emoji_version'] + '.')
 	output.append('')
 
 	output.append('enum {')
@@ -299,7 +313,7 @@ def fix_character_and_code(character, code):
 		return character in ch, ch, code
 	return character == ch, ch, code
 
-def parse_julia_unicode_input_html(path, update_data=True):
+def parse_julia_unicode_input_html(path):
 	from bs4 import BeautifulSoup
 
 	doc = open(path, encoding='utf-8', newline='\n').read()
@@ -318,12 +332,11 @@ def parse_julia_unicode_input_html(path, update_data=True):
 	version_date = colophon.get_text().strip()
 	version = f"{version.rstrip('.')} ({version_date}),"
 	print(version)
-
-	latex_map = {}
-	emoji_map = {}
+	source_info['latex_version'] = version
 
 	table = page.find('table').find('tbody')
 	high = sys.maxunicode >> 16
+	latex_map = {}
 	for row in table.find_all('tr'):
 		items = []
 		for column in row.find_all('td'):
@@ -347,17 +360,7 @@ def parse_julia_unicode_input_html(path, update_data=True):
 		for sequence in items:
 			assert len(sequence) > 1 and sequence.startswith('\\'), (sequence, row_text)
 			sequence = sequence[1:]
-
-			if sequence[0] == ':':
-				assert len(sequence) > 2 and sequence[-1] == ':', (sequence, row_text)
-				sequence = sequence[1:-1]
-				emoji_map[sequence] = {
-					'code': code,
-					'character': character,
-					'sequence': sequence,
-					'name': name
-				}
-			else:
+			if sequence[0] != ':':
 				latex_map[sequence] = {
 					'code': code,
 					'character': character,
@@ -365,17 +368,48 @@ def parse_julia_unicode_input_html(path, update_data=True):
 					'name': name
 				}
 
-			assert ':' not in sequence, (sequence, row_text)
+	return latex_map
 
+def parse_iamcal_emoji_data_json(path):
+	modification = time.gmtime(os.path.getmtime(path))
+	emoji_version = time.strftime('%A %d %B %Y', modification)
+	print(emoji_version, modification)
+	source_info['emoji_version'] = emoji_version
+
+	input_list = json_load(path)
+	emoji_map = {}
+	for info in input_list:
+		code = info['unified']
+		if '-' in code:
+			continue
+
+		character = chr(int(code, 16))
+		code = 'U+' + code
+		sequence = info['short_name']
+		name = info['name'].title().strip()
+		if not name:
+			name = get_character_name(character)
+		emoji_map[sequence] = {
+			'code': code,
+			'character': character,
+			'sequence': sequence,
+			'name': name
+		}
+
+	return emoji_map
+
+def parse_all_source_data(update_data=False):
+	latex_map = parse_julia_unicode_input_html('Unicode Input.html')
 	with open('latex_map.json', 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(json_dump(latex_map))
+
+	emoji_map = parse_iamcal_emoji_data_json('emoji_pretty.json')
 	with open('emoji_map.json', 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(json_dump(emoji_map))
 
-	update_latex_input_header(latex_map, emoji_map, version, link)
+	update_latex_input_header(latex_map, emoji_map)
 	if update_data:
 		update_all_latex_input_data(latex_map, emoji_map)
 
-# https://docs.julialang.org/en/v1.7-dev/manual/unicode-input/
-parse_julia_unicode_input_html('Unicode Input.html')
+parse_all_source_data()
 #update_all_latex_input_data()
