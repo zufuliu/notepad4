@@ -28,6 +28,7 @@ constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
 
 uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 #if EnableLaTeXLikeEmojiInput
+	static_assert(LaTeXHashMultiplier == EmojiHashMultiplier);
 	const bool latex = *sequence != ':';
 	if (latex) {
 		if (length < MinLaTeXInputSequenceLength || length > MaxLaTeXInputSequenceLength) {
@@ -61,18 +62,18 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	uint32_t value = 0;
 	const char *ptr = sequence;
 	do {
-		value = value*33 + static_cast<uint8_t>(*ptr++);
+		value = value*LaTeXHashMultiplier + static_cast<uint8_t>(*ptr++);
 	} while (ptr < end);
 #if EnableLaTeXLikeEmojiInput
 	if (latex) {
 		value %= array_size(LaTeXHashTable);
 		value = LaTeXHashTable[value];
-		sequenceString = AllLaTeXInputSequenceString;
+		sequenceString = LaTeXInputSequenceString;
 		sequenceList = LaTeXInputSequenceList;
 	} else {
 		value %= array_size(EmojiHashTable);
 		value = EmojiHashTable[value];
-		sequenceString = AllEmojiInputSequenceString;
+		sequenceString = EmojiInputSequenceString;
 		sequenceList = EmojiInputSequenceList;
 	}
 #else
@@ -81,7 +82,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 #endif
 	if (value) {
 #if !EnableLaTeXLikeEmojiInput
-		const char * const sequenceString = AllLaTeXInputSequenceString;
+		const char * const sequenceString = LaTeXInputSequenceString;
 		const InputSequence * const sequenceList = LaTeXInputSequenceList;
 #endif
 

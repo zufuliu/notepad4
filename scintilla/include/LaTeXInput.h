@@ -23,7 +23,7 @@ enum {
 	EmojiInputSequencePrefixLength = 1,
 	EmojiInputSequenceSuffixLength = 1,
 	MinEmojiInputSequenceLength = 1 + EmojiInputSequencePrefixLength, // suffix is optional
-	MaxEmojiInputSequenceLength = 33 + EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,
+	MaxEmojiInputSequenceLength = 54 + EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,
 
 	MaxLaTeXInputBufferLength = 1 + MaxEmojiInputSequenceLength + 1,
 #else
@@ -46,11 +46,11 @@ static inline bool IsLaTeXInputSequenceChar(char ch) {
 
 
 /// all LaTeX input sequences excludes the prefix '\', separated by space (U+0020).
-extern const char * const AllLaTeXInputSequenceString;
+extern const char * const LaTeXInputSequenceString;
 
 #if EnableLaTeXLikeEmojiInput
 /// all Emoji input sequences excludes the prefix '\:' and suffix ':', separated by space (U+0020).
-extern const char * const AllEmojiInputSequenceString;
+extern const char * const EmojiInputSequenceString;
 #endif
 
 /*!
