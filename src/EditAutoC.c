@@ -1008,14 +1008,14 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 #if EnableLaTeXLikeEmojiInput
 	if ((ch == '\\' || (chPrev == '\\' && (ch == '^' || ch == ':'))) && autoCompletionConfig.bLaTeXInputMethod) {
 		if (ch != ':') {
-			WordList_AddListEx(pWList, AllLaTeXInputSequenceString);
+			WordList_AddListEx(pWList, LaTeXInputSequenceString);
 		} else {
-			WordList_AddListEx(pWList, AllEmojiInputSequenceString);
+			WordList_AddListEx(pWList, EmojiInputSequenceString);
 		}
 	}
 #else
 	if ((ch == '\\' || (chPrev == '\\' && ch == '^')) && autoCompletionConfig.bLaTeXInputMethod) {
-		WordList_AddListEx(pWList, AllLaTeXInputSequenceString);
+		WordList_AddListEx(pWList, LaTeXInputSequenceString);
 	}
 #endif
 
@@ -1151,7 +1151,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_LATEX:
 	case SCLEX_TEXINFO:
 		if ((ch == '\\' || (chPrev == '\\' && ch == '^')) && !autoCompletionConfig.bLaTeXInputMethod) {
-			WordList_AddListEx(pWList, AllLaTeXInputSequenceString);
+			WordList_AddListEx(pWList, LaTeXInputSequenceString);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;

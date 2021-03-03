@@ -14,6 +14,7 @@ header_path = '../include/LaTeXInput.h'
 data_path = '../win32/LaTeXInputData.h'
 
 source_info = {
+	# data source at https://github.com/JuliaLang/julia/tree/master/stdlib/REPL/src
 	'latex_link': 'https://docs.julialang.org/en/v1.7-dev/manual/unicode-input/',
 	'emoji_link': 'https://github.com/iamcal/emoji-data/blob/master/emoji_pretty.json',
 }
@@ -61,56 +62,55 @@ def json_dump(obj):
 def json_load(path):
 	return json.loads(open(path, encoding='utf-8', newline='\n').read())
 
-def djb2_hash(buf):
+def djb2_hash(buf, multiplier):
 	value = 0
 	for ch in buf:
 		# masked to match C/C++ unsigned integer overflow wrap around
-		value = (value*33 + ch) & (2**32 - 1)
+		value = (value * multiplier + ch) & (2**32 - 1)
 	return value
 
 
-def find_hash_table_size(input_name, input_map, min_hash_size, max_hash_size):
-	hash_size = min_hash_size
-	hash_distribution = None
-	min_collision = sys.maxsize
-	key_list = []
+def prepare_input_data(input_map, path):
+	if not input_map:
+		input_map = json_load(path)
 	for key, info in input_map.items():
 		buf = key.encode('utf-8')
 		info['hash_key'] = buf
-		key_list.append(buf)
+		info['magic'] = len(buf) | (buf[0] << 8)
+	return input_map
 
-	for size in range(min_hash_size, max_hash_size + 1):
-		distribution = [0] * size
-		for key in key_list:
-			hash_key = djb2_hash(key) % size
-			distribution[hash_key] += 1
+def find_hash_param(input_map, multiplier_list, max_hash_size):
+	key_list = [(info['hash_key'], info['magic']) for info in input_map.values()]
+	hash_size = len(input_map) // 15
+	hash_param = {}
+	for multiplier in multiplier_list:
+		for size in range(hash_size, max_hash_size + 1):
+			distribution = [0] * size
+			hash_map = {}
+			for key, magic in key_list:
+				hash_key = djb2_hash(key, multiplier) % size
+				distribution[hash_key] += 1
+				if hash_key in hash_map:
+					hash_map[hash_key].append(magic)
+				else:
+					hash_map[hash_key] = [magic]
 
-		max_collision = max(distribution)
-		#max_collision = variance(distribution)
-		if max_collision < min_collision:
-			min_collision = max_collision
-			hash_size = size
-			hash_distribution = distribution
+			collision = max(distribution)
+			if collision < 16:
+				comparison = 1 + max(len(items) - len(set(items)) for items in hash_map.values())
+				if comparison <= 3: # maximum string comparison
+					var = round(variance(distribution), 2)
+					item = (size, collision, comparison, var)
+					if multiplier in hash_param:
+						hash_param[multiplier].append(item)
+					else:
+						hash_param[multiplier] = [item]
+	return hash_param
 
-	min_collision = min(hash_distribution)
-	max_collision = max(hash_distribution)
-	used = sum(item != 0 for item in hash_distribution)
-
-	print(input_name, 'Hash table size:', (hash_size, used),
-		'collision:', (min_collision, max_collision), 'variance:', variance(hash_distribution))
-	assert max_collision < 16
-	return hash_size
-
-def update_latex_input_data(input_name, input_map, max_hash_size):
-	min_hash_size = ord('z') - ord(' ')
-	hash_size = max(min_hash_size, round(len(input_map)/16))
-	hash_size = find_hash_table_size(input_name, input_map, hash_size, max_hash_size)
-
+def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 	hash_map = {}
 	for info in input_map.values():
-		hash_key = info['hash_key']
-		info['magic'] = len(hash_key) | (hash_key[0] << 8)
-		hash_key = djb2_hash(hash_key) % hash_size
+		hash_key = djb2_hash(info['hash_key'], multiplier) % hash_size
 		info['hash'] = hash_key
 		if hash_key in hash_map:
 			hash_map[hash_key].append(info)
@@ -122,25 +122,18 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 	content = []
 	offset = 0
 	max_collision = 0
-	#start_time = time.perf_counter_ns()
+	max_comparison = 0 # maximum string comparison
 	for hash_key in range(hash_size):
 		if hash_key in hash_map:
 			items = hash_map[hash_key]
 			items.sort(key=lambda m: (m['magic'], m['hash_key']))
-
-			prev = 0
-			collision = 0
-			for item in items:
-				magic = item['magic']
-				if magic == prev:
-					collision += 1
-				else:
-					if collision > max_collision:
-						max_collision = collision
-					collision = 0
-				prev = magic
+			key_list = [item['magic'] for item in items]
+			collision = len(key_list)
 			if collision > max_collision:
 				max_collision = collision
+			collision -= len(set(key_list))
+			if collision > max_comparison:
+				max_comparison = collision
 
 			if BuildDataForLookupOnly:
 				key_list = [info['sequence'][1:] for info in items]
@@ -161,10 +154,10 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 			hash_table[hash_key] = value
 			input_list.extend(items)
 
-	#end_time = time.perf_counter_ns()
-	#print(input_name, 'loop time:', (end_time - start_time)/1e3)
-
-	output = [f'static const uint16_t {input_name}HashTable[] = {{']
+	output = []
+	output.append(f'static constexpr uint32_t {input_name}HashMultiplier = {multiplier};')
+	output.append('')
+	output.append(f'static const uint16_t {input_name}HashTable[] = {{')
 	output.extend('0x%04x,' % value for value in hash_table)
 	output.append('};')
 	Regenerate(data_path, f'//{input_name} hash', output)
@@ -202,19 +195,44 @@ def update_latex_input_data(input_name, input_map, max_hash_size):
 	content[-1] += ';'
 	Regenerate(data_path, f'//{input_name} string', content)
 
-	max_collision += 1 # maximum string comparison
 	size = offset + 2*hash_size + 8*len(input_map)
 	print(input_name, 'count:', len(input_map), 'content:', offset,
-		'map:', (2*hash_size, 8*len(input_map), max_collision), 'total:', (size, size/1024))
+		'map:', (2*hash_size, 8*len(input_map), max_collision, max_comparison + 1), 'total:', (size, size/1024))
 
 def update_all_latex_input_data(latex_map=None, emoji_map=None):
-	if not latex_map:
-		latex_map = json_load('latex_map.json')
-	if not emoji_map:
-		emoji_map = json_load('emoji_map.json')
+	latex_map = prepare_input_data(latex_map, 'latex_map.json')
+	emoji_map = prepare_input_data(emoji_map, 'emoji_map.json')
 
-	update_latex_input_data('LaTeX', latex_map, 512)
-	update_latex_input_data('Emoji', emoji_map, 256)
+	if True:
+		multiplier_list = [33]
+		if False:
+			for value in range(1, 8):
+				multiplier_list.append((1 << value) - 1)
+				multiplier_list.append((1 << value))
+				multiplier_list.append((1 << value) + 1)
+			multiplier_list = list(set(multiplier_list))
+			multiplier_list.sort()
+
+		latex_hash = find_hash_param(latex_map, multiplier_list, 512)
+		emoji_hash = find_hash_param(emoji_map, multiplier_list, 256)
+		multiplier_list = list(set(latex_hash.keys()) & set(emoji_hash.keys()))
+		multiplier_list.sort()
+		print('hash multiplier:', multiplier_list)
+		with open('latex_hash.log', 'w', encoding='utf-8', newline='\n') as fd:
+			for multiplier, items in latex_hash.items():
+				if multiplier in multiplier_list:
+					fd.write(f'{multiplier}\n')
+					line = '\n'.join('\t' + str(item) for item in items)
+					fd.write(line)
+		with open('emoji_hash.log', 'w', encoding='utf-8', newline='\n') as fd:
+			for multiplier, items in emoji_hash.items():
+				if multiplier in multiplier_list:
+					fd.write(f'{multiplier}\n')
+					line = '\n'.join('\t' + str(item) for item in items)
+					fd.write(line)
+
+	update_latex_input_data('LaTeX', latex_map, 33, 290)
+	update_latex_input_data('Emoji', emoji_map, 33, 164)
 
 
 def get_input_map_size_info(input_name, input_map):
@@ -337,6 +355,7 @@ def parse_julia_unicode_input_html(path):
 	table = page.find('table').find('tbody')
 	high = sys.maxunicode >> 16
 	latex_map = {}
+	emoji_map = {}
 	for row in table.find_all('tr'):
 		items = []
 		for column in row.find_all('td'):
@@ -355,12 +374,23 @@ def parse_julia_unicode_input_html(path):
 		assert ok and 1 <= len(character) <= 2, (character, row_text)
 		if len(character) == 2:
 			assert ord(character[0]) <= 0xffff and high < ord(character[1]) <= 0xffff, (character, row_text)
+		else:
+			assert ord(character) > 0x80, (character, row_text)
 
 		items = [item.strip() for item in sequence.split(',')]
 		for sequence in items:
 			assert len(sequence) > 1 and sequence.startswith('\\'), (sequence, row_text)
 			sequence = sequence[1:]
-			if sequence[0] != ':':
+			if sequence[0] == ':':
+				sequence = sequence[1:-1]
+				assert len(sequence) >= 1, (sequence, row_text)
+				emoji_map[sequence] = {
+					'code': code,
+					'character': character,
+					'sequence': sequence,
+					'name': name
+				}
+			else:
 				latex_map[sequence] = {
 					'code': code,
 					'character': character,
@@ -368,7 +398,7 @@ def parse_julia_unicode_input_html(path):
 					'name': name
 				}
 
-	return latex_map
+	return latex_map, emoji_map
 
 def parse_iamcal_emoji_data_json(path):
 	modification = time.gmtime(os.path.getmtime(path))
@@ -378,32 +408,60 @@ def parse_iamcal_emoji_data_json(path):
 
 	input_list = json_load(path)
 	emoji_map = {}
+	non_qualified = {}
+	input_map = {}
 	for info in input_list:
 		code = info['unified']
+		unified = True
 		if '-' in code:
-			continue
+			code = info['non_qualified']
+			if not code or '-' in code:
+				continue
+			unified = False
 
-		character = chr(int(code, 16))
+		ch = int(code, 16)
+		assert ch > 0x80, info
+		character = chr(ch)
 		code = 'U+' + code
-		sequence = info['short_name']
 		name = info['name'].title().strip()
 		if not name:
 			name = get_character_name(character)
-		emoji_map[sequence] = {
-			'code': code,
-			'character': character,
-			'sequence': sequence,
-			'name': name
-		}
+		short_name = info['short_name']
+		short_names = info['short_names']
+		assert short_name in short_names
+		for sequence in short_names:
+			if sequence in input_map:
+				assert character == input_map[sequence], (sequence, info)
+			else:
+				input_map[sequence] = character
+			if unified:
+				emoji_map[sequence] = {
+					'code': code,
+					'character': character,
+					'sequence': sequence,
+					'name': name
+				}
+			else:
+				non_qualified[sequence] = {
+					'code': code,
+					'character': character,
+					'sequence': sequence,
+					'name': name
+				}
 
-	return emoji_map
+	return emoji_map, non_qualified
 
-def parse_all_source_data(update_data=False):
-	latex_map = parse_julia_unicode_input_html('Unicode Input.html')
+def parse_all_source_data(update_data=True):
+	latex_map, emoji_map = parse_julia_unicode_input_html('Unicode Input.html')
 	with open('latex_map.json', 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(json_dump(latex_map))
 
-	emoji_map = parse_iamcal_emoji_data_json('emoji_pretty.json')
+	unified, non_qualified = parse_iamcal_emoji_data_json('emoji_pretty.json')
+	diff = set(emoji_map.keys()) - set(unified.keys()) - set(non_qualified.keys())
+	if diff:
+		print('missing emoji:', list(sorted(diff)))
+	emoji_map.update(non_qualified)
+	emoji_map.update(unified)
 	with open('emoji_map.json', 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(json_dump(emoji_map))
 
