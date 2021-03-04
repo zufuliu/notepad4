@@ -271,7 +271,7 @@ public:
 		constexpr CharacterExtracted(int character_, int widthBytes_) noexcept :
 			character(character_), widthBytes(widthBytes_) {}
 		// For DBCS characters turn 2 bytes into an int
-		static CharacterExtracted DBCS(unsigned char lead, unsigned char trail) noexcept {
+		static constexpr CharacterExtracted DBCS(unsigned char lead, unsigned char trail) noexcept {
 			return CharacterExtracted((lead << 8) | trail, 2);
 		}
 	};

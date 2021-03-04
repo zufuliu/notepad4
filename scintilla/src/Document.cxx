@@ -2615,7 +2615,8 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 				while (pos > 0 && IsLowerCase(CharacterAfter(pos).character)) {
 					pos -= CharacterBefore(pos).widthBytes;
 				}
-				if (!IsUpperCase(CharacterAfter(pos).character) && !IsLowerCase(CharacterAfter(pos).character))
+				ceStart = CharacterAfter(pos);
+				if (!IsUpperCase(ceStart.character) && !IsLowerCase(ceStart.character))
 					pos += CharacterAfter(pos).widthBytes;
 			} else if (IsUpperCase(ceStart.character)) {
 				while (pos > 0 && IsUpperCase(CharacterAfter(pos).character)) {
@@ -2652,39 +2653,58 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 	CharacterExtracted ceStart = CharacterAfter(pos);
 	const Sci::Position length = Length();
-	if (IsWordPartSeparator(ceStart.character)) {
-		while (pos < length && IsWordPartSeparator(CharacterAfter(pos).character))
-			pos += CharacterAfter(pos).widthBytes;
+	while (pos < length && IsWordPartSeparator(ceStart.character)) {
+		pos += ceStart.widthBytes;
 		ceStart = CharacterAfter(pos);
 	}
 	if (!IsASCIICharacter(ceStart.character)) {
-		while (pos < length && !IsASCIICharacter(CharacterAfter(pos).character))
-			pos += CharacterAfter(pos).widthBytes;
-	} else if (IsLowerCase(ceStart.character)) {
-		while (pos < length && IsLowerCase(CharacterAfter(pos).character))
-			pos += CharacterAfter(pos).widthBytes;
-	} else if (IsUpperCase(ceStart.character)) {
-		if (IsLowerCase(CharacterAfter(pos + ceStart.widthBytes).character)) {
-			pos += CharacterAfter(pos).widthBytes;
-			while (pos < length && IsLowerCase(CharacterAfter(pos).character))
-				pos += CharacterAfter(pos).widthBytes;
-		} else {
-			while (pos < length && IsUpperCase(CharacterAfter(pos).character))
-				pos += CharacterAfter(pos).widthBytes;
+		while (pos < length && !IsASCIICharacter(ceStart.character)) {
+			pos += ceStart.widthBytes;
+			ceStart = CharacterAfter(pos);
 		}
-		if (IsLowerCase(CharacterAfter(pos).character) && IsUpperCase(CharacterBefore(pos).character))
-			pos -= CharacterBefore(pos).widthBytes;
+	} else if (IsLowerCase(ceStart.character)) {
+		while (pos < length && IsLowerCase(ceStart.character)) {
+			pos += ceStart.widthBytes;
+			ceStart = CharacterAfter(pos);
+		}
+	} else if (IsUpperCase(ceStart.character)) {
+		CharacterExtracted cePos = CharacterAfter(pos + ceStart.widthBytes);
+		if (IsLowerCase(cePos.character)) {
+			pos += ceStart.widthBytes;
+			ceStart = cePos;
+			while (pos < length && IsLowerCase(ceStart.character)) {
+				pos += ceStart.widthBytes;
+				ceStart = CharacterAfter(pos);
+			}
+		} else {
+			while (pos < length && IsUpperCase(ceStart.character)) {
+				pos += ceStart.widthBytes;
+				ceStart = CharacterAfter(pos);
+			}
+		}
+		if (IsLowerCase(ceStart.character)) {
+			cePos = CharacterBefore(pos);
+			if (IsUpperCase(cePos.character)) {
+				pos -= cePos.widthBytes;
+			}
+		}
 	} else if (IsADigit(ceStart.character)) {
-		while (pos < length && IsADigit(CharacterAfter(pos).character))
-			pos += CharacterAfter(pos).widthBytes;
+		while (pos < length && IsADigit(ceStart.character)) {
+			pos += ceStart.widthBytes;
+			ceStart = CharacterAfter(pos);
+		}
 	} else if (IsGraphic(ceStart.character)) {
-		while (pos < length && IsASCIIPunctuationCharacter(CharacterAfter(pos).character))
-			pos += CharacterAfter(pos).widthBytes;
+		while (pos < length && IsASCIIPunctuationCharacter(ceStart.character)) {
+			pos += ceStart.widthBytes;
+			ceStart = CharacterAfter(pos);
+		}
 	} else if (isspacechar(ceStart.character)) {
-		while (pos < length && isspacechar(CharacterAfter(pos).character))
-			pos += CharacterAfter(pos).widthBytes;
+		while (pos < length && isspacechar(ceStart.character)) {
+			pos += ceStart.widthBytes;
+			ceStart = CharacterAfter(pos);
+		}
 	} else {
-		pos += CharacterAfter(pos).widthBytes;
+		pos += ceStart.widthBytes;
 	}
 	return pos;
 }
