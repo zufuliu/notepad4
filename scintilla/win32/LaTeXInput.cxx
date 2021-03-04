@@ -29,8 +29,8 @@ constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
 uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 #if EnableLaTeXLikeEmojiInput
 	static_assert(LaTeXHashMultiplier == EmojiHashMultiplier);
-	const bool latex = *sequence != ':';
-	if (latex) {
+	const char firstChar = *sequence;
+	if (firstChar != ':') {
 		if (length < MinLaTeXInputSequenceLength || length > MaxLaTeXInputSequenceLength) {
 			return 0;
 		}
@@ -65,7 +65,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 		value = value*LaTeXHashMultiplier + static_cast<uint8_t>(*ptr++);
 	} while (ptr < end);
 #if EnableLaTeXLikeEmojiInput
-	if (latex) {
+	if (firstChar != ':') {
 		value %= array_size(LaTeXHashTable);
 		value = LaTeXHashTable[value];
 		sequenceString = LaTeXInputSequenceString;

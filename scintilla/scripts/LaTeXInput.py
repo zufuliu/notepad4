@@ -65,9 +65,9 @@ def json_load(path):
 def djb2_hash(buf, multiplier):
 	value = 0
 	for ch in buf:
-		# masked to match C/C++ unsigned integer overflow wrap around
-		value = (value * multiplier + ch) & (2**32 - 1)
-	return value
+		value = value * multiplier + ch
+	# masked to match C/C++ unsigned integer overflow wrap around
+	return value & (2**32 - 1)
 
 
 def prepare_input_data(input_map, path):
@@ -79,28 +79,51 @@ def prepare_input_data(input_map, path):
 		info['magic'] = len(buf) | (buf[0] << 8)
 	return input_map
 
+def dump_hash_param(hash_param, multiplier_list, path):
+	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
+		for multiplier, items in hash_param.items():
+			if multiplier in multiplier_list:
+				output = [str(multiplier) + '\n']
+				items.sort()
+				previous = items[0][0]
+				for item in items:
+					current = item[0]
+					if current != previous:
+						previous = current
+						output.append('\n')
+					output.append('\t' + str(item) + '\n')
+				fd.write(''.join(output))
+
 def find_hash_param(input_map, multiplier_list, max_hash_size):
-	key_list = [(info['hash_key'], info['magic']) for info in input_map.values()]
+	key_list = [info['hash_key'] for info in input_map.values()]
+	magic_list = [info['magic'] for info in input_map.values()]
+
 	hash_size = len(input_map) // 15
 	hash_param = {}
 	for multiplier in multiplier_list:
+		raw_hash = [djb2_hash(key, multiplier) for key in key_list]
 		for size in range(hash_size, max_hash_size + 1):
+			hash_list = [hash_key % size for hash_key in raw_hash]
 			distribution = [0] * size
-			hash_map = {}
-			for key, magic in key_list:
-				hash_key = djb2_hash(key, multiplier) % size
+			for hash_key in hash_list:
 				distribution[hash_key] += 1
-				if hash_key in hash_map:
-					hash_map[hash_key].append(magic)
-				else:
-					hash_map[hash_key] = [magic]
 
 			collision = max(distribution)
 			if collision < 16:
-				comparison = 1 + max(len(items) - len(set(items)) for items in hash_map.values())
-				if comparison <= 3: # maximum string comparison
+				hash_map = {}
+				for index, magic in enumerate(magic_list):
+					hash_key = hash_list[index]
+					if hash_key in hash_map:
+						hash_map[hash_key].append(magic)
+					else:
+						hash_map[hash_key] = [magic]
+
+				comparison = [len(items) - len(set(items)) for items in hash_map.values()]
+				max_comparison = max(comparison)
+				if max_comparison < 3: # maximum string comparison
+					used = sum(item != 0 for item in distribution)
 					var = round(variance(distribution), 2)
-					item = (size, collision, comparison, var)
+					item = (max_comparison + 1, size, used, collision, sum(comparison), var)
 					if multiplier in hash_param:
 						hash_param[multiplier].append(item)
 					else:
@@ -213,23 +236,18 @@ def update_all_latex_input_data(latex_map=None, emoji_map=None):
 			multiplier_list = list(set(multiplier_list))
 			multiplier_list.sort()
 
+		start_time = time.perf_counter_ns()
 		latex_hash = find_hash_param(latex_map, multiplier_list, 512)
 		emoji_hash = find_hash_param(emoji_map, multiplier_list, 256)
+		end_time = time.perf_counter_ns()
+		duration = (end_time - start_time)/1e6
+		print('hash param time:', duration)
+
 		multiplier_list = list(set(latex_hash.keys()) & set(emoji_hash.keys()))
 		multiplier_list.sort()
 		print('hash multiplier:', multiplier_list)
-		with open('latex_hash.log', 'w', encoding='utf-8', newline='\n') as fd:
-			for multiplier, items in latex_hash.items():
-				if multiplier in multiplier_list:
-					fd.write(f'{multiplier}\n')
-					line = '\n'.join('\t' + str(item) for item in items)
-					fd.write(line)
-		with open('emoji_hash.log', 'w', encoding='utf-8', newline='\n') as fd:
-			for multiplier, items in emoji_hash.items():
-				if multiplier in multiplier_list:
-					fd.write(f'{multiplier}\n')
-					line = '\n'.join('\t' + str(item) for item in items)
-					fd.write(line)
+		dump_hash_param(latex_hash, multiplier_list, 'latex_hash.log')
+		dump_hash_param(emoji_hash, multiplier_list, 'emoji_hash.log')
 
 	update_latex_input_data('LaTeX', latex_map, 33, 290)
 	update_latex_input_data('Emoji', emoji_map, 33, 164)
