@@ -1789,9 +1789,9 @@ fun void Cancel=2325(,)
 fun void DeleteBack=2326(,)
 
 enu TabCompletion=TAB_COMPLETION_
-val TAB_COMPLETION_DEFAULT=0
-val TAB_COMPLETION_LATEX=1
-val TAB_COMPLETION_FALLBACK=2
+val TAB_COMPLETION_NONE=2
+val TAB_COMPLETION_DEFAULT=1
+val TAB_COMPLETION_LATEX=2
 
 # If selection is empty or all on one line replace the selection with a tab character.
 # If more than one line selected, indent the lines.

@@ -109,7 +109,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 		} while (start < stop);
 	}
 
-	//const double duration = elapsed.Duration()*1e3;
-	//printf("LaTeXInput(%s) => %04X, %.6f\n", sequence, value, duration);
+	//const double duration = elapsed.Duration()*1e6;
+	//printf("LaTeXInput(%s) => %04X, %.3f\n", sequence, value, duration);
 	return value;
 }

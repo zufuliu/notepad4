@@ -658,9 +658,9 @@ typedef sptr_t (*SciFnDirect)(sptr_t ptr, unsigned int iMessage, uptr_t wParam, 
 #define SCI_EDITTOGGLEOVERTYPE 2324
 #define SCI_CANCEL 2325
 #define SCI_DELETEBACK 2326
-#define TAB_COMPLETION_DEFAULT 0
-#define TAB_COMPLETION_LATEX 1
-#define TAB_COMPLETION_FALLBACK 2
+#define TAB_COMPLETION_NONE 2
+#define TAB_COMPLETION_DEFAULT 1
+#define TAB_COMPLETION_LATEX 2
 #define SCI_TAB 2327
 #define SCI_BACKTAB 2328
 #define SCI_NEWLINE 2329
