@@ -4536,7 +4536,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case CMD_TAB_COMPLETION:
-		SciCall_TabCompletion(autoCompletionConfig.bLaTeXInputMethod | TAB_COMPLETION_FALLBACK);
+		SciCall_TabCompletion((autoCompletionConfig.bLaTeXInputMethod * TAB_COMPLETION_LATEX) | TAB_COMPLETION_DEFAULT);
 		break;
 
 	case CMD_CTRLTAB:

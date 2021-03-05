@@ -1324,7 +1324,7 @@ void ScintillaWin::AddWString(std::wstring_view wsv, CharacterSource charSource)
 }
 
 bool ScintillaWin::HandleLaTeXTabCompletion() {
-	if (sel.Count() > 1 || !sel.Empty() || pdoc->IsReadOnly()) {
+	if (ac.Active() || sel.Count() > 1 || !sel.Empty() || pdoc->IsReadOnly()) {
 		return false;
 	}
 
@@ -1371,7 +1371,6 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 	ReplaceTarget(false, buffer, len);
 	// move caret after character
 	SetEmptySelection(pos + len);
-	AutoCompleteCancel();
 	return true;
 }
 
@@ -2388,7 +2387,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				if (HandleLaTeXTabCompletion()) {
 					break;
 				}
-				if (!(wParam & TAB_COMPLETION_FALLBACK)) {
+				if (!(wParam & TAB_COMPLETION_DEFAULT)) {
 					break;
 				}
 			}
