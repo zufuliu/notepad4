@@ -89,7 +89,7 @@ def find_free_access_key(menu, path):
 					fd.write('\t' + line + '\n')
 	else:
 		print('No free access key:', lines)
-		print('required access key:', list(sorted(required)))
+		print('required access key:', sorted(required))
 
 # line starts with '//' is line comment
 # line ends with '//#' is frozen, access key should not changed

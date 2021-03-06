@@ -29,8 +29,7 @@ def FindModules(lexersPath, projectPath):
 def RegenerateAll():
 	lexers = FindModules('../lexers', '../../build/VS2017/Notepad2.vcxproj')
 
-	modules = list(lexers.values())
-	modules.sort(key=lambda m: m.lower())
+	modules = sorted(lexers.values(), key=lambda m: m.lower())
 	Regenerate('../lexlib/LexerModule.cxx', '//', modules)
 
 RegenerateAll()

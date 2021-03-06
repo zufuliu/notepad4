@@ -233,8 +233,7 @@ def update_all_latex_input_data(latex_map=None, emoji_map=None):
 				multiplier_list.append((1 << value) - 1)
 				multiplier_list.append((1 << value))
 				multiplier_list.append((1 << value) + 1)
-			multiplier_list = list(set(multiplier_list))
-			multiplier_list.sort()
+			multiplier_list = sorted(set(multiplier_list))
 
 		start_time = time.perf_counter_ns()
 		latex_hash = find_hash_param(latex_map, multiplier_list, 512)
@@ -243,8 +242,7 @@ def update_all_latex_input_data(latex_map=None, emoji_map=None):
 		duration = (end_time - start_time)/1e6
 		print('hash param time:', duration)
 
-		multiplier_list = list(set(latex_hash.keys()) & set(emoji_hash.keys()))
-		multiplier_list.sort()
+		multiplier_list = sorted(set(latex_hash.keys()) & set(emoji_hash.keys()))
 		print('hash multiplier:', multiplier_list)
 		dump_hash_param(latex_hash, multiplier_list, 'latex_hash.log')
 		dump_hash_param(emoji_hash, multiplier_list, 'emoji_hash.log')
@@ -268,11 +266,11 @@ def build_charset_function(latex_charset, emoji_charset, output):
 
 	diff = latex_charset - punctuation
 	if diff:
-		diff = list(sorted(diff))
+		diff = sorted(diff)
 		print('Invalid LaTeX character:', diff, [ord(ch) for ch in diff])
 	diff = emoji_charset - punctuation
 	if diff:
-		diff = list(sorted(diff))
+		diff = sorted(diff)
 		print('Invalid Emoji character:', diff, [ord(ch) for ch in diff])
 
 	print('LaTeX punctuation:', latex_charset)
@@ -280,8 +278,8 @@ def build_charset_function(latex_charset, emoji_charset, output):
 	print('Emoji punctuation:', emoji_charset)
 	print('Emoji punctuation:', [ord(ch) for ch in emoji_charset])
 
-	latex_punctuation = list(sorted(latex_charset))
-	emoji_punctuation = list(sorted(emoji_charset - latex_charset))
+	latex_punctuation = sorted(latex_charset)
+	emoji_punctuation = sorted(emoji_charset - latex_charset)
 	latex_charset = make_char_equals(latex_punctuation)
 	emoji_charset = make_char_equals(emoji_punctuation)
 	output.extend(f"""
@@ -477,7 +475,7 @@ def parse_all_source_data(update_data=True):
 	unified, non_qualified = parse_iamcal_emoji_data_json('emoji_pretty.json')
 	diff = set(emoji_map.keys()) - set(unified.keys()) - set(non_qualified.keys())
 	if diff:
-		print('missing emoji:', list(sorted(diff)))
+		print('missing emoji:', sorted(diff))
 	emoji_map.update(non_qualified)
 	emoji_map.update(unified)
 	with open('emoji_map.json', 'w', encoding='utf-8', newline='\n') as fd:
