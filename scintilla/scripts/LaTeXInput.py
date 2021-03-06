@@ -69,6 +69,16 @@ def djb2_hash(buf, multiplier):
 	# masked to match C/C++ unsigned integer overflow wrap around
 	return value & (2**32 - 1)
 
+def fast_counter(items):
+	# faster than defaultdict and Counter
+	counter = {}
+	for item in items:
+		if item in counter:
+			counter[item] += 1
+		else:
+			counter[item] = 1
+	return counter
+
 
 def prepare_input_data(input_map, path):
 	if not input_map:
@@ -112,18 +122,23 @@ def find_hash_param(input_map, multiplier_list, max_hash_size):
 			if collision < 16:
 				hash_map = {}
 				for index, magic in enumerate(magic_list):
-					hash_key = hash_list[index]
+					hash_key = (hash_list[index] << 16) | magic
 					if hash_key in hash_map:
-						hash_map[hash_key].append(magic)
+						hash_map[hash_key] += 1
 					else:
-						hash_map[hash_key] = [magic]
+						hash_map[hash_key] = 1
 
-				comparison = [len(items) - len(set(items)) for items in hash_map.values()]
-				max_comparison = max(comparison)
-				if max_comparison < 3: # maximum string comparison
+				comparison = sorted(hash_map.values(), reverse=True)
+				max_comparison = comparison[0]
+				if max_comparison < 4:
+					extra_comparison = 0
+					for value in comparison:
+						if value == 1:
+							break
+						extra_comparison += value - 1
 					used = sum(item != 0 for item in distribution)
 					var = round(variance(distribution), 2)
-					item = (max_comparison + 1, size, used, collision, sum(comparison), var)
+					item = (max_comparison, size, used, collision, extra_comparison, var)
 					if multiplier in hash_param:
 						hash_param[multiplier].append(item)
 					else:
@@ -143,32 +158,32 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 	hash_table = [0] * hash_size
 	input_list = []
 	content = []
-	offset = 0
+	string_offset = 0
 	max_collision = 0
-	max_comparison = 0 # maximum string comparison
+	max_comparison = 0
 	for hash_key in range(hash_size):
 		if hash_key in hash_map:
 			items = hash_map[hash_key]
 			items.sort(key=lambda m: (m['magic'], m['hash_key']))
-			key_list = [item['magic'] for item in items]
-			collision = len(key_list)
+			collision = len(items)
 			if collision > max_collision:
 				max_collision = collision
-			collision -= len(set(key_list))
-			if collision > max_comparison:
-				max_comparison = collision
+			counter = fast_counter(item['magic'] for item in items)
+			comparison = max(counter.values())
+			if comparison > max_comparison:
+				max_comparison = comparison
 
 			if BuildDataForLookupOnly:
 				key_list = [info['sequence'][1:] for info in items]
 				for index, sequence in enumerate(key_list):
-					items[index]['offset'] = offset
-					offset += len(sequence)
+					items[index]['offset'] = string_offset
+					string_offset += len(sequence)
 				content.append('"' + ''.join(key_list) + '"')
 			else:
 				key_list = [info['sequence'] for info in items]
 				for index, sequence in enumerate(key_list):
-					items[index]['offset'] = offset + 1
-					offset += len(sequence) + 1
+					items[index]['offset'] = string_offset + 1
+					string_offset += len(sequence) + 1
 				content.append('"' + ' '.join(key_list) + ' "')
 
 			value = (len(input_list) << 4) | len(items)
@@ -218,9 +233,10 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 	content[-1] += ';'
 	Regenerate(data_path, f'//{input_name} string', content)
 
-	size = offset + 2*hash_size + 8*len(input_map)
-	print(input_name, 'count:', len(input_map), 'content:', offset,
-		'map:', (2*hash_size, 8*len(input_map), max_collision, max_comparison + 1), 'total:', (size, size/1024))
+	string_size, hash_size, list_size = string_offset + 1, hash_size*2, len(input_map)*8
+	size = string_size + hash_size + list_size
+	print(input_name, 'count:', len(input_map), 'content:', string_size,
+		'map:', (hash_size, list_size, max_collision, max_comparison), 'total:', (size, size/1024))
 
 def update_all_latex_input_data(latex_map=None, emoji_map=None):
 	latex_map = prepare_input_data(latex_map, 'latex_map.json')
