@@ -120,11 +120,11 @@ def build_switch_stmt(switch_type, func_name, var_name, word_list, int_arg=0, sw
 		groups = word_list['groups']
 		for key, items in groups.items():
 			for item in items:
-				buf = bytearray(item.encode(CStringEncoding))
+				buf = item.encode(CStringEncoding)
 				sorted_list.append((len(buf), buf, key))
 	else:
 		for item in word_list:
-			buf = bytearray(item.encode(CStringEncoding))
+			buf = item.encode(CStringEncoding)
 			sorted_list.append((len(buf), buf))
 
 	cond_map = {}

@@ -31,7 +31,7 @@ class KeywordAttr(IntFlag):
 		return ' | '.join(comb)
 
 def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
-	items = list(sorted(items))
+	items = sorted(items)
 	groups = {}
 	for item in items:
 		if item.endswith('()'):
