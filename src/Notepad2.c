@@ -5074,7 +5074,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (scn->listCompletionMethod == SC_AC_NEWLINE) {
 					SciCall_NewLine();
 				} else {
-					SciCall_Tab();
+					SciCall_TabCompletion((autoCompletionConfig.bLaTeXInputMethod * TAB_COMPLETION_LATEX) | TAB_COMPLETION_DEFAULT);
 				}
 				return 0;
 			}
