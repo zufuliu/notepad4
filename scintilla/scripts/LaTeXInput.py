@@ -149,7 +149,6 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 	hash_map = {}
 	for info in input_map.values():
 		hash_key = djb2_hash(info['hash_key'], multiplier) % hash_size
-		info['hash'] = hash_key
 		if hash_key in hash_map:
 			hash_map[hash_key].append(info)
 		else:
@@ -168,7 +167,7 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 			collision = len(items)
 			if collision > max_collision:
 				max_collision = collision
-			counter = fast_counter(item['magic'] for item in items)
+			counter = fast_counter(info['magic'] for info in items)
 			comparison = max(counter.values())
 			if comparison > max_comparison:
 				max_comparison = comparison
@@ -483,7 +482,7 @@ def parse_iamcal_emoji_data_json(path):
 
 	return emoji_map, non_qualified
 
-def parse_all_source_data(update_data=True):
+def parse_all_data_source(update_data=True):
 	latex_map, emoji_map = parse_julia_unicode_input_html('Unicode Input.html')
 	with open('latex_map.json', 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(json_dump(latex_map))
@@ -501,5 +500,5 @@ def parse_all_source_data(update_data=True):
 	if update_data:
 		update_all_latex_input_data(latex_map, emoji_map)
 
-parse_all_source_data()
+parse_all_data_source()
 #update_all_latex_input_data()
