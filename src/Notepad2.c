@@ -2707,6 +2707,10 @@ static inline BOOL IsBraceMatchChar(int ch) {
 #endif
 }
 
+static inline void HandleTabCompletion(void) {
+	SciCall_TabCompletion((autoCompletionConfig.bLaTeXInputMethod * TAB_COMPLETION_LATEX) | TAB_COMPLETION_DEFAULT);
+}
+
 //=============================================================================
 //
 // MsgCommand() - Handles WM_COMMAND
@@ -4536,7 +4540,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case CMD_TAB_COMPLETION:
-		SciCall_TabCompletion((autoCompletionConfig.bLaTeXInputMethod * TAB_COMPLETION_LATEX) | TAB_COMPLETION_DEFAULT);
+		HandleTabCompletion();
 		break;
 
 	case CMD_CTRLTAB:
@@ -5074,7 +5078,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (scn->listCompletionMethod == SC_AC_NEWLINE) {
 					SciCall_NewLine();
 				} else {
-					SciCall_TabCompletion((autoCompletionConfig.bLaTeXInputMethod * TAB_COMPLETION_LATEX) | TAB_COMPLETION_DEFAULT);
+					HandleTabCompletion();
 				}
 				return 0;
 			}
