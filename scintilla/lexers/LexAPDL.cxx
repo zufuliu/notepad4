@@ -22,7 +22,7 @@ using namespace Scintilla;
 
 namespace {
 
-#define FOLD_APDL_BY_INDENTATION	1
+#define FOLD_APDL_BY_INDENTATION	0
 
 enum {
 	APDLLineStateLineNone = 0,
