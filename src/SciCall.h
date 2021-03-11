@@ -549,6 +549,10 @@ NP2_inline void SciCall_SetWhitespaceBack(BOOL useSetting, COLORREF back) {
 	SciCall(SCI_SETWHITESPACEBACK, useSetting, back);
 }
 
+NP2_inline void SciCall_SetWhitespaceForeAlpha(int alpha) {
+	SciCall(SCI_SETWHITESPACEFOREALPHA, alpha, 0);
+}
+
 NP2_inline void SciCall_SetWhitespaceSize(int size) {
 	SciCall(SCI_SETWHITESPACESIZE, size, 0);
 }
