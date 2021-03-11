@@ -1653,6 +1653,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	} else {
 		SciCall_SetWhitespaceBack(FALSE, 0);
 	}
+	if (!Style_StrGetAlpha(szValue, &iValue)) {
+		iValue = SC_ALPHA_NOALPHA;
+	}
+	SciCall_SetWhitespaceForeAlpha(iValue);
 	//! end Whitespace
 
 	//! begin Caret
