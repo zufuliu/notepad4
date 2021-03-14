@@ -2963,12 +2963,6 @@ val KEYWORDSET_TOLOWER=32
 # Set up the key words used by the lexer.
 set void SetKeyWords=4005(int keyWordSet, string keyWords)
 
-# Set the lexing language of the document based on string name, removed in Scintilla 5.
-#set void SetLexerLanguage=4006(, string language)
-
-# Load a lexer library (dll / so), removed in Scintilla 5.
-#fun void LoadLexerLibrary=4007(, string path)
-
 # Retrieve a "property" value previously set with SetProperty.
 # Result is NUL-terminated.
 get int GetProperty=4008(string key, stringresult value)
