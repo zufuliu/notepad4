@@ -236,5 +236,5 @@ def FindSectionInList(lines, markers):
 def ReplaceREInFile(path, match, replace):
     with open(path, "r", encoding="utf-8") as f:
         contents = f.read()
-    contents = re.sub(match, replace, contents)
+    contents = re.sub(match, replace, contents, 1)
     UpdateFile(path, contents)
