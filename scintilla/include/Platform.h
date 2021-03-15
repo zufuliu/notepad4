@@ -280,6 +280,14 @@ public:
 	constexpr float GetBlueComponent() const noexcept {
 		return GetBlue() / componentMaximum;
 	}
+
+	// Manual alpha blending
+	constexpr ColourDesired AlphaScaled(unsigned int alpha) noexcept {
+		return ColourDesired(GetRed() * alpha / 255, GetGreen() * alpha / 255, GetBlue() * alpha / 255);
+	}
+	constexpr ColourDesired AlphaBlendOn(unsigned int alpha, ColourDesired back) noexcept {
+		return ColourDesired(AlphaScaled(alpha).AsInteger() + back.AlphaScaled(255 - alpha).AsInteger());
+	}
 };
 
 /**
