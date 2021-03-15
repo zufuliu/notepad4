@@ -223,6 +223,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 
 	whitespaceColours.fore = ColourOptional();
 	whitespaceColours.back = ColourOptional(ColourDesired(0xff, 0xff, 0xff));
+	whitespaceForeAlpha = SC_ALPHA_NOALPHA;
 	controlCharSymbol = 0;	/* Draw the control characters */
 	controlCharWidth = 0;
 	selbar = Platform::Chrome();

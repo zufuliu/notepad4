@@ -7473,6 +7473,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
+	case SCI_SETWHITESPACEFOREALPHA:
+		vs.whitespaceForeAlpha = static_cast<int>(wParam);
+		InvalidateStyleRedraw();
+		break;
+
+	case SCI_GETWHITESPACEFOREALPHA:
+		return vs.whitespaceForeAlpha;
+
 	case SCI_SETCARETFORE:
 		vs.caretcolour = ColourDesired(static_cast<int>(wParam));
 		vs.additionalCaretColour = ColourDesired(static_cast<int>(wParam));

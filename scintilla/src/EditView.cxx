@@ -2055,9 +2055,9 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 			if (ts.representation) {
 				if (ll->chars[i] == '\t') {
 					// Tab display
+					if (drawWhitespaceBackground && vsDraw.WhiteSpaceVisible(inIndentation))
+						textBack = vsDraw.whitespaceColours.back;
 					if (phasesDraw == phasesOne) {
-						if (drawWhitespaceBackground && vsDraw.WhiteSpaceVisible(inIndentation))
-							textBack = vsDraw.whitespaceColours.back;
 						surface->FillRectangle(rcSegment, textBack);
 					}
 					if (inIndentation && vsDraw.viewIndentationGuides == ivReal) {
@@ -2075,6 +2075,8 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						if (vsDraw.WhiteSpaceVisible(inIndentation)) {
 							if (vsDraw.whitespaceColours.fore.isSet)
 								textFore = vsDraw.whitespaceColours.fore;
+							if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
+								textFore = textFore.AlphaBlendOn(vsDraw.whitespaceForeAlpha, textBack);
 							surface->PenColour(textFore);
 							const PRectangle rcTab(rcSegment.left + 1, rcSegment.top + tabArrowHeight,
 								rcSegment.right - 1, rcSegment.bottom - vsDraw.maxDescent);
@@ -2123,20 +2125,22 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 								if (vsDraw.WhiteSpaceVisible(inIndentation)) {
 									const XYPOSITION xmid = (ll->positions[cpos + ts.start] + ll->positions[cpos + ts.start + 1]) / 2;
 									if ((phasesDraw == phasesOne) && drawWhitespaceBackground) {
-										textBack = vsDraw.whitespaceColours.back;
 										const PRectangle rcSpace(
 											ll->positions[cpos + ts.start] + xStart - static_cast<XYPOSITION>(subLineStart),
 											rcSegment.top,
 											ll->positions[cpos + ts.start + 1] + xStart - static_cast<XYPOSITION>(subLineStart),
 											rcSegment.bottom);
-										surface->FillRectangle(rcSpace, textBack);
+										surface->FillRectangle(rcSpace, vsDraw.whitespaceColours.back);
 									}
 									const int halfDotWidth = vsDraw.whitespaceSize / 2;
 									PRectangle rcDot(xmid + xStart - halfDotWidth - static_cast<XYPOSITION>(subLineStart),
 										rcSegment.top + vsDraw.lineHeight / 2, 0.0f, 0.0f);
 									rcDot.right = rcDot.left + vsDraw.whitespaceSize;
 									rcDot.bottom = rcDot.top + vsDraw.whitespaceSize;
-									surface->FillRectangle(rcDot, textFore);
+									if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
+										SimpleAlphaRectangle(surface, rcDot, textFore, vsDraw.whitespaceForeAlpha);
+									else
+										surface->FillRectangle(rcDot, textFore);
 								}
 							}
 							if (inIndentation && vsDraw.viewIndentationGuides == ivReal) {
@@ -2632,6 +2636,7 @@ Sci::Position EditView::FormatRange(bool draw, const Sci_RangeToFormat *pfr, Sur
 	vsPrint.selAdditionalAlpha = SC_ALPHA_NOALPHA;
 	vsPrint.whitespaceColours.back.isSet = false;
 	vsPrint.whitespaceColours.fore.isSet = false;
+	vsPrint.whitespaceForeAlpha = SC_ALPHA_NOALPHA;
 	vsPrint.showCaretLineBackground = false;
 	vsPrint.alwaysShowCaretLineBackground = false;
 	// Don't highlight matching braces using indicators
