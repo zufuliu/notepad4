@@ -848,6 +848,14 @@ set void SetWhitespaceSize=2086(int size,)
 # Get the size of the dots used to mark space characters.
 get int GetWhitespaceSize=2087(,)
 
+
+# Set the foreground alpha of all whitespace.
+set void SetWhitespaceForeAlpha=2750(Alpha alpha,)
+
+# Get the foreground alpha of all whitespace.
+get Alpha GetWhitespaceForeAlpha=2751(,)
+
+
 # Used to hold extra styling information for each line.
 set void SetLineState=2092(line line, int state)
 
