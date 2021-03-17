@@ -19,24 +19,18 @@ enum {
 	StyleTheme_Max = StyleTheme_Dark,
 };
 
-#ifndef _INC_WINDOWS
-typedef wchar_t * LPWSTR;
-typedef const wchar_t * LPCWSTR;
-typedef int BOOL;
-#endif
-
 typedef struct EDITSTYLE {
 	const int iStyle;
 	struct {
 		const int rid;
 		const int iNameLen;
-		LPCWSTR const pszName;
-		LPWSTR szValue;
+		const wchar_t * const pszName;
+		wchar_t *szValue;
 	};
-	LPCWSTR const pszDefault;
+	const wchar_t * const pszDefault;
 } EDITSTYLE, *PEDITSTYLE;
 
-#define EDITSTYLE_BufferSize(iStyleCount)	((iStyleCount) * MAX_EDITSTYLE_VALUE_SIZE * sizeof(WCHAR))
+#define EDITSTYLE_BufferSize(iStyleCount)	((iStyleCount) * MAX_EDITSTYLE_VALUE_SIZE * sizeof(wchar_t))
 #define	MULTI_STYLE(a, b, c, d)			((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #define	MULTI_STYLE8(a, b, c, d, e, f, g, h) \
 	(MULTI_STYLE(a, b, c, d) | ((int64_t)MULTI_STYLE(e, f, g, h) << 32))
@@ -57,16 +51,16 @@ typedef struct EDITLEXER {
 	const int rid;
 	struct {
 		int iStyleTheme;
-		BOOL bStyleChanged;
-		BOOL bUseDefaultCodeStyle;
+		int bStyleChanged;
+		int bUseDefaultCodeStyle;
 		int iFavoriteOrder;
 		const unsigned int iStyleCount;
 		const int iNameLen;
-		LPCWSTR const pszName;
-		LPWSTR szExtensions;
-		LPWSTR szStyleBuf;
+		const wchar_t * const pszName;
+		wchar_t *szExtensions;
+		wchar_t *szStyleBuf;
 	};
-	LPCWSTR const pszDefExt;
+	const wchar_t * const pszDefExt;
 	const KEYWORDLIST * const pKeyWords;
 	EDITSTYLE * const Styles;
 } EDITLEXER, *PEDITLEXER;
