@@ -456,6 +456,7 @@ public:
 	virtual void SCICALL LineTo(int x_, int y_) noexcept = 0;
 	virtual void SCICALL Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) = 0;
 	virtual void SCICALL RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) = 0;
+	virtual void SCICALL RectangleFrame(PRectangle rc, ColourDesired fore) = 0;
 	virtual void SCICALL FillRectangle(PRectangle rc, ColourDesired back) = 0;
 	virtual void SCICALL FillRectangle(PRectangle rc, Surface &surfacePattern) = 0;
 	virtual void SCICALL RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) = 0;

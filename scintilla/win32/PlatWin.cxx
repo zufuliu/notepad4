@@ -581,6 +581,7 @@ public:
 	void SCICALL LineTo(int x_, int y_) noexcept override;
 	void SCICALL Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
 	void SCICALL RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
+	void SCICALL RectangleFrame(PRectangle rc, ColourDesired fore) noexcept override;
 	void SCICALL FillRectangle(PRectangle rc, ColourDesired back) noexcept override;
 	void SCICALL FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept override;
 	void SCICALL RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) noexcept override;
@@ -749,6 +750,12 @@ void SurfaceGDI::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired 
 	BrushColour(back);
 	const RECT rcw = RectFromPRectangleEx(rc);
 	::Rectangle(hdc, rcw.left, rcw.top, rcw.right, rcw.bottom);
+}
+
+void SurfaceGDI::RectangleFrame(PRectangle rc, ColourDesired fore) noexcept {
+	BrushColour(fore);
+	const RECT rcw = RectFromPRectangleEx(rc);
+	::FrameRect(hdc, &rcw, brush);
 }
 
 void SurfaceGDI::FillRectangle(PRectangle rc, ColourDesired back) noexcept {
@@ -957,7 +964,7 @@ void SurfaceGDI::AlphaRectangle(PRectangle rc, int cornerSize, ColourDesired fil
 		}
 	} else {
 		BrushColour(outline);
-		FrameRect(hdc, &rcw, brush);
+		::FrameRect(hdc, &rcw, brush);
 	}
 }
 
@@ -1253,6 +1260,7 @@ public:
 	void SCICALL LineTo(int x_, int y_) noexcept override;
 	void SCICALL Polygon(const Point *pts, size_t npts, ColourDesired fore, ColourDesired back) override;
 	void SCICALL RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired back) override;
+	void SCICALL RectangleFrame(PRectangle rc, ColourDesired fore) override;
 	void SCICALL FillRectangle(PRectangle rc, ColourDesired back) override;
 	void SCICALL FillRectangle(PRectangle rc, Surface &surfacePattern) override;
 	void SCICALL RoundedRectangle(PRectangle rc, ColourDesired fore, ColourDesired back) override;
@@ -1492,6 +1500,14 @@ void SurfaceD2D::RectangleDraw(PRectangle rc, ColourDesired fore, ColourDesired 
 		const D2D1_RECT_F rectangle1 = D2D1::RectF(std::round(rc.left) + 0.5f, rc.top + 0.5f, std::round(rc.right) - 0.5f, rc.bottom - 0.5f);
 		D2DPenColour(back);
 		pRenderTarget->FillRectangle(&rectangle1, pBrush);
+		D2DPenColour(fore);
+		pRenderTarget->DrawRectangle(&rectangle1, pBrush);
+	}
+}
+
+void SurfaceD2D::RectangleFrame(PRectangle rc, ColourDesired fore) {
+	if (pRenderTarget) {
+		const D2D1_RECT_F rectangle1 = D2D1::RectF(std::round(rc.left) + 0.5f, rc.top + 0.5f, std::round(rc.right) - 0.5f, rc.bottom - 0.5f);
 		D2DPenColour(fore);
 		pRenderTarget->DrawRectangle(&rectangle1, pBrush);
 	}
