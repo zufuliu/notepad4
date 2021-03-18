@@ -2124,13 +2124,16 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 									textFore = vsDraw.whitespaceColours.fore;
 								if (vsDraw.WhiteSpaceVisible(inIndentation)) {
 									const XYPOSITION xmid = (ll->positions[cpos + ts.start] + ll->positions[cpos + ts.start + 1]) / 2;
-									if ((phasesDraw == phasesOne) && drawWhitespaceBackground) {
-										const PRectangle rcSpace(
-											ll->positions[cpos + ts.start] + xStart - static_cast<XYPOSITION>(subLineStart),
-											rcSegment.top,
-											ll->positions[cpos + ts.start + 1] + xStart - static_cast<XYPOSITION>(subLineStart),
-											rcSegment.bottom);
-										surface->FillRectangle(rcSpace, vsDraw.whitespaceColours.back);
+									if (drawWhitespaceBackground) {
+										textBack = vsDraw.whitespaceColours.back;
+										if (phasesDraw == phasesOne) {
+											const PRectangle rcSpace(
+												ll->positions[cpos + ts.start] + xStart - static_cast<XYPOSITION>(subLineStart),
+												rcSegment.top,
+												ll->positions[cpos + ts.start + 1] + xStart - static_cast<XYPOSITION>(subLineStart),
+												rcSegment.bottom);
+											surface->FillRectangle(rcSpace, textBack);
+										}
 									}
 									const int halfDotWidth = vsDraw.whitespaceSize / 2;
 									PRectangle rcDot(xmid + xStart - halfDotWidth - static_cast<XYPOSITION>(subLineStart),
@@ -2138,9 +2141,8 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 									rcDot.right = rcDot.left + vsDraw.whitespaceSize;
 									rcDot.bottom = rcDot.top + vsDraw.whitespaceSize;
 									if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
-										SimpleAlphaRectangle(surface, rcDot, textFore, vsDraw.whitespaceForeAlpha);
-									else
-										surface->FillRectangle(rcDot, textFore);
+										textFore = textFore.AlphaBlendOn(vsDraw.whitespaceForeAlpha, textBack);
+									surface->FillRectangle(rcDot, textFore);
 								}
 							}
 							if (inIndentation && vsDraw.viewIndentationGuides == ivReal) {
