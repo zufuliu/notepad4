@@ -136,8 +136,9 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 	break;
 
 	case INDIC_STRIKE: {
-		surface->MoveTo(irc.left, irc.top - 4);
-		surface->LineTo(irc.right, irc.top - 4);
+		const int mid = static_cast<int>(rcLine.top + rcLine.bottom)/2 + 1;
+		surface->MoveTo(irc.left, mid);
+		surface->LineTo(irc.right, mid);
 	}
 	break;
 
@@ -146,16 +147,7 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 		// Draw nothing
 		break;
 
-	case INDIC_BOX: {
-		surface->MoveTo(irc.left, ymid + 1);
-		surface->LineTo(irc.right, ymid + 1);
-		const int lineTop = static_cast<int>(rcLine.top) + 1;
-		surface->LineTo(irc.right, lineTop);
-		surface->LineTo(irc.left, lineTop);
-		surface->LineTo(irc.left, ymid + 1);
-	}
-	break;
-
+	case INDIC_BOX:
 	case INDIC_ROUNDBOX:
 	case INDIC_STRAIGHTBOX:
 	case INDIC_FULLBOX: {
@@ -164,8 +156,12 @@ void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectan
 			rcBox.top = rcLine.top + 1;
 		rcBox.left = rc.left;
 		rcBox.right = rc.right;
-		surface->AlphaRectangle(rcBox, (sacDraw.style == INDIC_ROUNDBOX) ? 1 : 0,
-			sacDraw.fore, fillAlpha, sacDraw.fore, outlineAlpha, 0);
+		if (sacDraw.style == INDIC_BOX) {
+			surface->RectangleFrame(rcBox, sacDraw.fore);
+		} else {
+			surface->AlphaRectangle(rcBox, (sacDraw.style == INDIC_ROUNDBOX) ? 1 : 0,
+				sacDraw.fore, fillAlpha, sacDraw.fore, outlineAlpha, 0);
+		}
 	}
 	break;
 

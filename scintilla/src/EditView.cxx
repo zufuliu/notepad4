@@ -1397,13 +1397,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 
 	if (phase & drawIndicatorsFore) {
 		if (model.foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_BOXED) {
-			surface->PenColour(textFore);
-			const IntegerRectangle ircBox(rcBox);
-			surface->MoveTo(ircBox.left, ircBox.top);
-			surface->LineTo(ircBox.left, ircBox.bottom - 1);
-			surface->LineTo(ircBox.right - 1, ircBox.bottom - 1);
-			surface->LineTo(ircBox.right - 1, ircBox.top);
-			surface->LineTo(ircBox.left, ircBox.top);
+			surface->RectangleFrame(rcBox, textFore);
 		}
 	}
 
@@ -1483,19 +1477,12 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 
 	if (phase & drawIndicatorsFore) {
 		if (vsDraw.eolAnnotationVisible == EOLANNOTATION_BOXED ) {
-			surface->PenColour(textFore);
 			PRectangle rcBox = rcSegment;
-			rcBox.left = std::round(rcSegment.left);
-			rcBox.right = std::round(rcSegment.right);
-			const IntegerRectangle ircBox(rcBox);
-			surface->MoveTo(ircBox.left, ircBox.top);
-			surface->LineTo(ircBox.left, ircBox.bottom);
-			surface->MoveTo(ircBox.right, ircBox.top);
-			surface->LineTo(ircBox.right, ircBox.bottom);
-			surface->MoveTo(ircBox.left, ircBox.top);
-			surface->LineTo(ircBox.right, ircBox.top);
-			surface->MoveTo(ircBox.left, ircBox.bottom - 1);
-			surface->LineTo(ircBox.right, ircBox.bottom - 1);
+			rcBox.left = std::round(rcBox.left);
+			rcBox.right = std::round(rcBox.right);
+			rcBox.top = std::floor(rcBox.top);
+			rcBox.bottom = std::floor(rcBox.bottom);
+			surface->RectangleFrame(rcBox, textFore);
 		}
 	}
 }
