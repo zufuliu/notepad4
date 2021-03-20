@@ -82,6 +82,7 @@ static EDITSTYLE Styles_TS[] = {
 
 EDITLEXER lexTypeScript = {
 	SCLEX_JAVASCRIPT, NP2LEX_TYPESCRIPT,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"TypeScript", Styles_TS),
 	L"ts; tsx",
 	&Keywords_TS,

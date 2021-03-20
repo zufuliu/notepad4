@@ -36,6 +36,7 @@ static EDITSTYLE Styles_Verilog[] = {
 
 EDITLEXER lexVerilog = {
 	SCLEX_VERILOG, NP2LEX_VERILOG,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Verilog HDL Source", Styles_Verilog),
 	L"v; vl",
 	&Keywords_Verilog,

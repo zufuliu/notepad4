@@ -264,6 +264,7 @@ static EDITSTYLE Styles_PHP[] = {
 
 EDITLEXER lexPHP = {
 	SCLEX_CPP, NP2LEX_PHP,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"PHP Script", Styles_PHP),
 	L"php; phpt; phtml; php_cs; eyecode",
 	&Keywords_PHP,

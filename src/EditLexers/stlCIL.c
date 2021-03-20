@@ -96,6 +96,7 @@ static EDITSTYLE Styles_CIL[] = {
 
 EDITLEXER lexCIL = {
 	SCLEX_CIL, NP2LEX_CIL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"CIL Assembly", Styles_CIL),
 	L"il",
 	&Keywords_CIL,

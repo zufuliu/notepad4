@@ -113,6 +113,7 @@ static EDITSTYLE Styles_Java[] = {
 
 EDITLEXER lexJava = {
 	SCLEX_JAVA, NP2LEX_JAVA,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Java Source", Styles_Java),
 	L"java; jad; aidl; bsh",
 	&Keywords_Java,

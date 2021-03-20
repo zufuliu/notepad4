@@ -50,6 +50,7 @@ static EDITSTYLE Styles_ASY[] = {
 
 EDITLEXER lexASY = {
 	SCLEX_CPP, NP2LEX_ASY,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Asymptote Code", Styles_ASY),
 	L"asy",
 	&Keywords_ASY,

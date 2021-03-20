@@ -29,6 +29,7 @@ static EDITSTYLE Styles_TEX[] = {
 
 EDITLEXER lexLaTeX = {
 	SCLEX_LATEX, NP2LEX_LATEX,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"LaTeX File", Styles_TEX),
 	L"tex; latex; sty; cls; tpx; bbl; bib; ltx; dtx; ins; toc; info",
 	&Keywords_TEX,
@@ -79,6 +80,7 @@ static EDITSTYLE Styles_TEXI[] = {
 
 EDITLEXER lexTexinfo = {
 	SCLEX_TEXINFO, NP2LEX_TEXINFO,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Texinfo File", Styles_TEXI),
 	L"texi; texinfo; txi",
 	&Keywords_TEXI,

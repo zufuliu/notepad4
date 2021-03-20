@@ -51,6 +51,7 @@ static EDITSTYLE Styles_Ruby[] = {
 
 EDITLEXER lexRuby = {
 	SCLEX_RUBY, NP2LEX_RUBY,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Ruby Script", Styles_Ruby),
 	L"rb; ruby; rbw; rake; rjs; gemspec; podspec; cr",
 	&Keywords_Ruby,

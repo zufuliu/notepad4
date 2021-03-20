@@ -54,6 +54,7 @@ static EDITSTYLE Styles_RC[] = {
 
 EDITLEXER lexRC = {
 	SCLEX_CPP, NP2LEX_RC,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Resource Script", Styles_RC),
 	L"rc; rc2; rct; rh; dlg",
 	&Keywords_RC,

@@ -60,6 +60,7 @@ static EDITSTYLE Styles_MAK[] = {
 
 EDITLEXER lexMake = {
 	SCLEX_MAKEFILE, NP2LEX_MAKE,
+	SCHEME_SETTINGS_TAB_4,
 	EDITLEXER_HOLE(L"Makefile", Styles_MAK),
 	L"mak; make; mk; dsp; dsw; am; pro; pri; gmk; ninja",
 	&Keywords_MAK,

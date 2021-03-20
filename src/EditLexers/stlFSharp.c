@@ -45,6 +45,7 @@ static EDITSTYLE Styles_FSharp[] = {
 
 EDITLEXER lexFSharp = {
 	SCLEX_FSHARP, NP2LEX_FSHARP,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"F# Source", Styles_FSharp),
 	L"fs; fsi; fsx; fsscript; fsl; fsy; ml; mli; sml; nb",
 	&Keywords_FSharp,

@@ -209,6 +209,7 @@ static EDITSTYLE Styles_HTML[] = {
 
 EDITLEXER lexHTML = {
 	SCLEX_HTML, NP2LEX_HTML,
+	SCHEME_SETTINGS_SPACE_2,
 	EDITLEXER_HOLE(L"Web Source Code", Styles_HTML),
 	L"html; htm; shtml; xhtml; asp; aspx; jsp; mht; htd; htt; hta; htc; cfm; tpl; jd",
 	&Keywords_HTML,

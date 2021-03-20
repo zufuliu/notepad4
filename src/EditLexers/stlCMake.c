@@ -142,6 +142,7 @@ static EDITSTYLE Styles_CMake[] = {
 
 EDITLEXER lexCMake = {
 	SCLEX_CMAKE, NP2LEX_CMAKE,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"CMake Script", Styles_CMake),
 	L"cmake; ctest",
 	&Keywords_CMake,

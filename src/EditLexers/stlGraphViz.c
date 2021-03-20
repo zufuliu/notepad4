@@ -55,6 +55,7 @@ static EDITSTYLE Styles_DOT[] = {
 
 EDITLEXER lexDOT = {
 	SCLEX_GRAPHVIZ, NP2LEX_DOT,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"GraphViz Dot", Styles_DOT),
 	L"dot; gv; diag",
 	&Keywords_DOT,

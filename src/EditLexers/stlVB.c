@@ -86,6 +86,7 @@ static EDITSTYLE Styles_VB[] = {
 
 EDITLEXER lexVB = {
 	SCLEX_VB, NP2LEX_VB,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Visual Basic", Styles_VB),
 	L"vb; bas; frm; cls; ctl; pag; dsr; dob",
 	&Keywords_VB,

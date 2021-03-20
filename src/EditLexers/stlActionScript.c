@@ -73,6 +73,7 @@ static EDITSTYLE Styles_AS[] = {
 
 EDITLEXER lexActionScript = {
 	SCLEX_JAVASCRIPT, NP2LEX_ACTIONSCRIPT,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"ActionScript", Styles_AS),
 	L"as",
 	&Keywords_AS,

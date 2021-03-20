@@ -98,6 +98,7 @@ static EDITSTYLE Styles_WASM[] = {
 
 EDITLEXER lexWASM = {
 	SCLEX_WASM, NP2LEX_WASM,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"WebAssembly", Styles_WASM),
 	L"wat; wast",
 	&Keywords_WASM,

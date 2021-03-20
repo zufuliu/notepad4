@@ -53,6 +53,7 @@ static EDITSTYLE Styles_Matlab[] = {
 
 EDITLEXER lexMatlab = {
 	SCLEX_MATLAB, NP2LEX_MATLAB,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"MATLAB Code", Styles_Matlab),
 	L"m; sce; sci",
 	&Keywords_Matlab,

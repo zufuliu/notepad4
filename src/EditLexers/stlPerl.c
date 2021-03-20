@@ -73,6 +73,7 @@ static EDITSTYLE Styles_Perl[] = {
 
 EDITLEXER lexPerl = {
 	SCLEX_PERL, NP2LEX_PERL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Perl Script", Styles_Perl),
 	L"pl; pm; cgi; pod; plx; stp",
 	&Keywords_Perl,

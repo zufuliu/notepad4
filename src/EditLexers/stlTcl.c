@@ -46,6 +46,7 @@ static EDITSTYLE Styles_Tcl[] = {
 
 EDITLEXER lexTcl = {
 	SCLEX_TCL, NP2LEX_TCL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Tcl Script", Styles_Tcl),
 	L"tcl; itcl; tm",
 	&Keywords_Tcl,

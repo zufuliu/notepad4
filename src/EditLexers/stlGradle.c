@@ -133,6 +133,7 @@ static EDITSTYLE Styles_Gradle[] = {
 
 EDITLEXER lexGradle = {
 	SCLEX_GROOVY, NP2LEX_GRADLE,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Gradle Build Script", Styles_Gradle),
 	L"gradle",
 	&Keywords_Gradle,
