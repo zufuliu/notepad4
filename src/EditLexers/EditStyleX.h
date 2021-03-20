@@ -4,6 +4,11 @@
 #define EDITSTYLE_HOLE(style, name)		{ NP2STYLE_ ## style, CSTRLEN(name), (name), NULL }
 #define EDITSTYLE_HOLEX(style, name)	{ style, CSTRLEN(name), (name), NULL }
 
+#define SCHEME_SETTINGS_DEFAULT			{ TAB_WIDTH_4, INDENT_WIDTH_4, TAB_AS_TAB, 1 }
+#define SCHEME_SETTINGS_TAB_4			{ TAB_WIDTH_4, INDENT_WIDTH_4, TAB_AS_TAB, 0 }
+#define SCHEME_SETTINGS_SPACE_4			{ TAB_WIDTH_4, INDENT_WIDTH_4, TAB_AS_SPACES, 0 }
+#define SCHEME_SETTINGS_SPACE_2			{ TAB_WIDTH_2, INDENT_WIDTH_2, TAB_AS_SPACES, 0 }
+
 #define EDITLEXER_HOLE(name, styles)	{ StyleTheme_Default, 0, 1, 0, COUNTOF(styles), CSTRLEN(name), (name), NULL, NULL }
 #define EDITLEXER_TEXT(name, styles)	{ StyleTheme_Default, 0, 0, 0, COUNTOF(styles), CSTRLEN(name), (name), NULL, NULL }
 

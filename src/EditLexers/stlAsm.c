@@ -175,6 +175,7 @@ static EDITSTYLE Styles_ASM[] = {
 
 EDITLEXER lexASM = {
 	SCLEX_ASM, NP2LEX_ASM,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Assembler Source", Styles_ASM),
 	L"asm; s; sx; inc; cod; a51",
 	&Keywords_ASM,

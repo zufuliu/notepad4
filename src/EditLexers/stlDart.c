@@ -60,6 +60,7 @@ static EDITSTYLE Styles_Dart[] = {
 
 EDITLEXER lexDart = {
 	SCLEX_DART, NP2LEX_DART,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Dart Source", Styles_Dart),
 	L"dart",
 	&Keywords_Dart,

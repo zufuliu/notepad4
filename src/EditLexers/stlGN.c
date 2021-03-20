@@ -58,6 +58,7 @@ static EDITSTYLE Styles_GN[] = {
 
 EDITLEXER lexGN = {
 	SCLEX_GN, NP2LEX_GN,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"GN Build Script", Styles_GN),
 	L"gn; gni",
 	&Keywords_GN,

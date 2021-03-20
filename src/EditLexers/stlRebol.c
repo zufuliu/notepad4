@@ -92,6 +92,7 @@ static EDITSTYLE Styles_Rebol[] = {
 
 EDITLEXER lexRebol = {
 	SCLEX_REBOL, NP2LEX_REBOL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Rebol Script", Styles_Rebol),
 	L"r; reb; red; reds",
 	&Keywords_Rebol,

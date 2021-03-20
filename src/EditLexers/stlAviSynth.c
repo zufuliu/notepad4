@@ -169,6 +169,7 @@ static EDITSTYLE Styles_AVS[] = {
 
 EDITLEXER lexAVS = {
 	SCLEX_AVS, NP2LEX_AVS,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"AviSynth Script", Styles_AVS),
 	L"avs; avsi",
 	&Keywords_AVS,

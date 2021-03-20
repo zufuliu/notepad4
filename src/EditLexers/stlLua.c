@@ -65,6 +65,7 @@ static EDITSTYLE Styles_Lua[] = {
 
 EDITLEXER lexLua = {
 	SCLEX_LUA, NP2LEX_LUA,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Lua Script", Styles_Lua),
 	L"lua; wlua; nse; luadoc; luax",
 	&Keywords_Lua,

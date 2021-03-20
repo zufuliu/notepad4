@@ -41,6 +41,7 @@ static EDITSTYLE Styles_Pascal[] = {
 
 EDITLEXER lexPascal = {
 	SCLEX_PASCAL, NP2LEX_PASCAL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Pascal Source", Styles_Pascal),
 	L"pas; inc; dpr; dpk; dfm; pp; lfm; lpr; fpd",
 	&Keywords_Pascal,

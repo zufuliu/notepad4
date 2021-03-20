@@ -78,6 +78,7 @@ static EDITSTYLE Styles_PS1[] = {
 
 EDITLEXER lexPS1 = {
 	SCLEX_POWERSHELL, NP2LEX_PS1,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"PowerShell Script", Styles_PS1),
 	L"ps1; psc1; psd1; psm1",
 	&Keywords_PS1,

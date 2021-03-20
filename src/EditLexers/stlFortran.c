@@ -29,6 +29,7 @@ static EDITSTYLE Styles_Fortran[] = {
 
 EDITLEXER lexFortran = {
 	SCLEX_FORTRAN, NP2LEX_FORTRAN,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Fortran Source", Styles_Fortran),
 	L"f; for; ftn; fpp; f90; f95; f03; f08; f2k; hf",
 	&Keywords_Fortran,

@@ -55,6 +55,7 @@ static EDITSTYLE Styles_Awk[] = {
 
 EDITLEXER lexAwk = {
 	SCLEX_AWK, NP2LEX_AWK,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Awk Script", Styles_Awk),
 	L"awk",
 	&Keywords_Awk,

@@ -64,6 +64,7 @@ static EDITSTYLE Styles_Batch[] = {
 
 EDITLEXER lexBatch = {
 	SCLEX_BATCH, NP2LEX_BATCH,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Batch File", Styles_Batch),
 	L"bat; cmd",
 	&Keywords_Batch,

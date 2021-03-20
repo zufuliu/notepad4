@@ -72,6 +72,7 @@ static EDITSTYLE Styles_Jam[] = {
 
 EDITLEXER lexJam = {
 	SCLEX_JAM, NP2LEX_JAM,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Jamfile", Styles_Jam),
 	L"jam",
 	&Keywords_Jam,

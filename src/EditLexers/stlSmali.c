@@ -136,6 +136,7 @@ static EDITSTYLE Styles_Smail[] = {
 
 EDITLEXER lexSmali = {
 	SCLEX_SMALI, NP2LEX_SMALI,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Android Smali", Styles_Smail),
 	L"smali; ddx",
 	&Keywords_Smail,

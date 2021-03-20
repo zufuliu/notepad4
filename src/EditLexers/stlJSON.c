@@ -26,6 +26,7 @@ static EDITSTYLE Styles_JSON[] = {
 
 EDITLEXER lexJSON = {
 	SCLEX_JSON, NP2LEX_JSON,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"JSON Document", Styles_JSON),
 	L"json; har; ipynb; wxcp; jshintrc; eslintrc; babelrc; prettierrc; stylelintrc; jsonld; jsonc; arcconfig; arclint; jscop",
 	&Keywords_JSON,

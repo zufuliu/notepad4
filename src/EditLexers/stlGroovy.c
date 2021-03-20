@@ -114,6 +114,7 @@ static EDITSTYLE Styles_Groovy[] = {
 
 EDITLEXER lexGroovy = {
 	SCLEX_GROOVY, NP2LEX_GROOVY,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Groovy Script", Styles_Groovy),
 	L"groovy; gvy; gy; gsh; gpp; grunit",
 	&Keywords_Groovy,

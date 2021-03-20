@@ -83,6 +83,7 @@ static EDITSTYLE Styles_NSIS[] = {
 
 EDITLEXER lexNsis = {
 	SCLEX_NSIS, NP2LEX_NSIS,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Nsis Setup Script", Styles_NSIS),
 	L"nsi; nsh; nlf",
 	&Keywords_NSIS,

@@ -24,6 +24,7 @@ static EDITSTYLE Styles_LISP[] = {
 
 EDITLEXER lexLisp = {
 	SCLEX_LISP, NP2LEX_LISP,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Lisp Script", Styles_LISP),
 	L"lisp; el; lsp; clj; cljs; scm",
 	&Keywords_LISP,

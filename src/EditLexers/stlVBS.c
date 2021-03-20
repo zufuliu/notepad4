@@ -69,6 +69,7 @@ static EDITSTYLE Styles_VBS[] = {
 
 EDITLEXER lexVBS = {
 	SCLEX_VBSCRIPT, NP2LEX_VBS,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"VBScript", Styles_VBS),
 	L"vbs; dsm",
 	&Keywords_VBS,

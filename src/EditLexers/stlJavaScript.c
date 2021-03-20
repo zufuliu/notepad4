@@ -156,6 +156,7 @@ static EDITSTYLE Styles_JS[] = {
 
 EDITLEXER lexJavaScript = {
 	SCLEX_JAVASCRIPT, NP2LEX_JAVASCRIPT,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"JavaScript", Styles_JS),
 	L"js; jse; jsm; jsx; mjs; qs",
 	&Keywords_JS,

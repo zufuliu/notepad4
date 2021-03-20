@@ -99,6 +99,7 @@ static EDITSTYLE Styles_D[] = {
 
 EDITLEXER lexD = {
 	SCLEX_CPP, NP2LEX_D,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"D Source", Styles_D),
 	L"d; di; dd",
 	&Keywords_D,

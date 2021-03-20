@@ -207,6 +207,7 @@ static EDITSTYLE Styles_Julia[] = {
 
 EDITLEXER lexJulia = {
 	SCLEX_JULIA, NP2LEX_JULIA,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Julia Script", Styles_Julia),
 	L"jl",
 	&Keywords_Julia,

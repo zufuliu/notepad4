@@ -130,6 +130,7 @@ static EDITSTYLE Styles_AU3[] = {
 
 EDITLEXER lexAU3 = {
 	SCLEX_AU3, NP2LEX_AU3,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"AutoIt3 Script", Styles_AU3),
 	L"au3",
 	&Keywords_AU3,

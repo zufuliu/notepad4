@@ -63,6 +63,7 @@ static EDITSTYLE Styles_Bash[] = {
 
 EDITLEXER lexBash = {
 	SCLEX_BASH, NP2LEX_BASH,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Shell Script", Styles_Bash),
 	L"sh; csh; zsh; bash; tcsh; m4; in; ac",
 	&Keywords_Bash,

@@ -244,6 +244,7 @@ static EDITSTYLE Styles_Rust[] = {
 
 EDITLEXER lexRust = {
 	SCLEX_RUST, NP2LEX_RUST,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Rust Source", Styles_Rust),
 	L"rs",
 	&Keywords_Rust,

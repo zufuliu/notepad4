@@ -27,6 +27,7 @@ static EDITSTYLE Styles_TOML[] = {
 
 EDITLEXER lexTOML = {
 	SCLEX_TOML, NP2LEX_TOML,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"TOML File", Styles_TOML),
 	L"toml",
 	&Keywords_TOML,

@@ -7,6 +7,17 @@
 
 #define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
 
+#define TAB_WIDTH_4		4
+#define TAB_WIDTH_2		2
+#define TAB_WIDTH_MIN	0
+#define TAB_WIDTH_MAX	256
+#define INDENT_WIDTH_4		4
+#define INDENT_WIDTH_2		2
+#define INDENT_WIDTH_MIN	0
+#define INDENT_WIDTH_MAX	256
+#define TAB_AS_TAB			0
+#define TAB_AS_SPACES		1
+
 #define MAX_EDITSTYLE_VALUE_SIZE	256
 #define MAX_EDITLEXER_EXT_SIZE		512
 #define MAX_LEXER_STYLE_EDIT_SIZE	512
@@ -49,6 +60,13 @@ typedef struct KEYWORDLIST {
 typedef struct EDITLEXER {
 	const int iLexer;
 	const int rid;
+	// default Tab settings for this scheme.
+	struct {
+		const unsigned char tabWidth;
+		const unsigned char indentWidth;
+		const unsigned char tabsAsSpaces;
+		const unsigned char useGlobalTabSettings;
+	};
 	struct {
 		int iStyleTheme;
 		int bStyleChanged;

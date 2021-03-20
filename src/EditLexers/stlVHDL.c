@@ -60,6 +60,7 @@ static EDITSTYLE Styles_VHDL[] = {
 
 EDITLEXER lexVHDL = {
 	SCLEX_VHDL, NP2LEX_VHDL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"VHDL Source", Styles_VHDL),
 	L"vhd; vhdl",
 	&Keywords_VHDL,

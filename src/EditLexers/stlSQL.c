@@ -513,6 +513,7 @@ static EDITSTYLE Styles_SQL[] = {
 
 EDITLEXER lexSQL = {
 	SCLEX_SQL, NP2LEX_SQL,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"SQL Query", Styles_SQL),
 	L"sql; mysql; hsql",
 	&Keywords_SQL,

@@ -103,6 +103,7 @@ static EDITSTYLE Styles_CSS[] = {
 
 EDITLEXER lexCSS = {
 	SCLEX_CSS, NP2LEX_CSS,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"CSS Style Sheet", Styles_CSS),
 	L"css; scss; less; hss",
 	&Keywords_CSS,

@@ -67,6 +67,7 @@ static EDITSTYLE Styles_INNO[] = {
 
 EDITLEXER lexINNO = {
 	SCLEX_INNOSETUP, NP2LEX_INNO,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Inno Setup Script", Styles_INNO),
 	L"iss; isl; islu",
 	&Keywords_INNO,

@@ -67,6 +67,7 @@ static EDITSTYLE Styles_Haxe[] = {
 
 EDITLEXER lexHaxe = {
 	SCLEX_HAXE, NP2LEX_HAXE,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Haxe Script", Styles_Haxe),
 	L"hx",
 	&Keywords_Haxe,

@@ -36,6 +36,7 @@ static EDITSTYLE Styles_VIM[] = {
 
 EDITLEXER lexVim = {
 	SCLEX_VIM, NP2LEX_VIM,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Vim Script", Styles_VIM),
 	L"vim",
 	&Keywords_VIM,

@@ -123,6 +123,7 @@ static EDITSTYLE Styles_R[] = {
 
 EDITLEXER lexR = {
 	SCLEX_R, NP2LEX_R,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"R Code", Styles_R),
 	L"r; rsource",
 	&Keywords_R,

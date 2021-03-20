@@ -60,6 +60,7 @@ static EDITSTYLE Styles_Scala[] = {
 
 EDITLEXER lexScala = {
 	SCLEX_CPP, NP2LEX_SCALA,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Scala Script", Styles_Scala),
 	L"scala",
 	&Keywords_Scala,

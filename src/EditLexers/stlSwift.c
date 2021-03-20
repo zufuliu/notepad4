@@ -66,6 +66,7 @@ static EDITSTYLE Styles_Swift[] = {
 
 EDITLEXER lexSwift = {
 	SCLEX_SWIFT, NP2LEX_SWIFT,
+	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"Swift Source", Styles_Swift),
 	L"swift",
 	&Keywords_Swift,
