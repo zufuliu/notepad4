@@ -109,7 +109,6 @@ static LPWSTR tchToolbarBitmap = NULL;
 static LPWSTR tchToolbarBitmapHot = NULL;
 static LPWSTR tchToolbarBitmapDisabled = NULL;
 static int iPathNameFormat;
-BOOL	fWordWrap;
 BOOL	fWordWrapG;
 int		iWordWrapMode;
 int		iWordWrapIndent;
@@ -122,28 +121,19 @@ static BOOL bShowIndentGuides;
 static BOOL bHighlightCurrentBlock;
 BOOL	bHighlightCurrentSubLine;
 INT		iHighlightCurrentLine;
-BOOL	bTabsAsSpaces;
-BOOL	bTabsAsSpacesG;
-BOOL	bTabIndents;
-BOOL	bTabIndentsG;
-BOOL	bBackspaceUnindents;
-int		iZoomLevel = 100;
-int		iTabWidth;
-int		iTabWidthG;
-int		iIndentWidth;
-int		iIndentWidthG;
+EditTabSettings tabSettings;
 static BOOL bMarkLongLines;
-int		iLongLinesLimit;
 int		iLongLinesLimitG;
 int		iLongLineMode;
-int		iWrapCol = 0;
+int		iWrapColumn = 0;
+int		iZoomLevel = 100;
 BOOL	bShowBookmarkMargin;
 static BOOL bShowLineNumbers;
 static BOOL bMarkOccurrences;
 static BOOL bMarkOccurrencesMatchCase;
 static BOOL bMarkOccurrencesMatchWords;
 static BOOL bMarkOccurrencesBookmark;
-struct EditAutoCompletionConfig autoCompletionConfig;
+EditAutoCompletionConfig autoCompletionConfig;
 static BOOL bEnableLineSelectionMode;
 static BOOL bShowCodeFolding;
 #if NP2_ENABLE_SHOW_CALLTIPS
@@ -1525,45 +1515,6 @@ void UpdateFoldMarginWidth(void) {
 	SciCall_SetMarginWidth(MarginNumber_CodeFolding, width);
 }
 
-void SetWrapStartIndent(void) {
-	int indent = 0;
-	switch (iWordWrapIndent) {
-	case EditWrapIndentOneCharacter:
-		indent = 1;
-		break;
-	case EditWrapIndentTwoCharacter:
-		indent = 2;
-		break;
-	case EditWrapIndentOneLevel:
-		indent = (iIndentWidth) ? iIndentWidth : iTabWidth;
-		break;
-	case EditWrapIndentTwoLevel:
-		indent = (iIndentWidth) ? 2 * iIndentWidth : 2 * iTabWidth;
-		break;
-	}
-	SciCall_SetWrapStartIndent(indent);
-}
-
-void SetWrapIndentMode(void) {
-	int indentMode;
-	switch (iWordWrapIndent) {
-	case EditWrapIndentSameAsSubline:
-		indentMode = SC_WRAPINDENT_SAME;
-		break;
-	case EditWrapIndentOneLevelThanSubline:
-		indentMode = SC_WRAPINDENT_INDENT;
-		break;
-	case EditWrapIndentTwoLevelThanSubline:
-		indentMode = SC_WRAPINDENT_DEEPINDENT;
-		break;
-	default:
-		indentMode = SC_WRAPINDENT_FIXED;
-		SetWrapStartIndent();
-		break;
-	}
-	SciCall_SetWrapIndentMode(indentMode);
-}
-
 void SetWrapVisualFlags(void) {
 	if (bShowWordWrapSymbols) {
 		int wrapVisualFlags = 0;
@@ -1689,18 +1640,18 @@ HWND EditCreate(HWND hwndParent) {
 
 	SciCall_SetZoom(iZoomLevel);
 	// Tabs
-	SciCall_SetUseTabs(!bTabsAsSpaces);
-	SciCall_SetTabIndents(bTabIndents);
-	SciCall_SetBackSpaceUnIndents(bBackspaceUnindents);
-	SciCall_SetTabWidth(iTabWidth);
-	SciCall_SetIndent(iIndentWidth);
+	SciCall_SetTabWidth(tabSettings.globalTabWidth);
+	SciCall_SetIndent(tabSettings.globalIndentWidth);
+	SciCall_SetUseTabs(!tabSettings.globalTabsAsSpaces);
+	SciCall_SetTabIndents(tabSettings.bTabIndents);
+	SciCall_SetBackSpaceUnIndents(tabSettings.bBackspaceUnindents);
 
 	// Indent Guides
 	Style_SetIndentGuides(bShowIndentGuides);
 
 	// Word wrap
-	SciCall_SetWrapMode(fWordWrap? iWordWrapMode : SC_WRAP_NONE);
-	SetWrapIndentMode();
+	SciCall_SetWrapMode(fWordWrapG ? iWordWrapMode : SC_WRAP_NONE);
+	EditSetWrapIndentMode(tabSettings.globalTabWidth, tabSettings.globalIndentWidth);
 	SetWrapVisualFlags();
 
 	if (bShowUnicodeControlCharacter) {
@@ -1717,7 +1668,7 @@ HWND EditCreate(HWND hwndParent) {
 	} else {
 		SciCall_SetEdgeMode(EDGE_NONE);
 	}
-	SciCall_SetEdgeColumn(iLongLinesLimit);
+	SciCall_SetEdgeColumn(iLongLinesLimitG);
 
 	// Margins
 	SciCall_SetMarginSensitive(MarginNumber_Bookmark, TRUE);
@@ -1769,12 +1720,6 @@ void EditReplaceDocument(HANDLE pdoc) {
 	SciCall_ReleaseDocument(pdoc);
 	SciCall_SetCodePage(cpEdit);
 	SciCall_SetEOLMode(iEOLMode);
-
-	SciCall_SetUseTabs(!bTabsAsSpaces);
-	SciCall_SetTabIndents(bTabIndents);
-	SciCall_SetBackSpaceUnIndents(bBackspaceUnindents);
-	SciCall_SetTabWidth(iTabWidth);
-	SciCall_SetIndent(iIndentWidth);
 }
 
 //=============================================================================
@@ -2562,7 +2507,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_VIEW_STYLE_THEME_DEFAULT + np2StyleTheme;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_STYLE_THEME_DEFAULT, IDM_VIEW_STYLE_THEME_DARK, i, MF_BYCOMMAND);
 
-	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fWordWrap);
+	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_FONTQUALITY_DEFAULT, IDM_VIEW_FONTQUALITY_CLEARTYPE, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_BLOCK_OVR, iOvrCaretStyle);
@@ -2571,7 +2516,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_NOBLINK, iCaretBlinkPeriod == 0);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_SELECTION, !bBlockCaretOutSelection);
 	CheckCmd(hmenu, IDM_VIEW_LONGLINEMARKER, bMarkLongLines);
-	CheckCmd(hmenu, IDM_VIEW_TABSASSPACES, bTabsAsSpaces);
+	CheckCmd(hmenu, IDM_VIEW_TABSASSPACES, fvCurFile.bTabsAsSpaces);
 	CheckCmd(hmenu, IDM_VIEW_SHOWINDENTGUIDES, bShowIndentGuides);
 	CheckCmd(hmenu, IDM_VIEW_LINENUMBERS, bShowLineNumbers);
 	CheckCmd(hmenu, IDM_VIEW_MARGIN, bShowBookmarkMargin);
@@ -3275,7 +3220,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_VCHome();
 		}
 		SciCall_Tab();
-		SciCall_SetTabIndents(bTabIndents);
+		SciCall_SetTabIndents(fvCurFile.bTabIndents);
 	}
 	break;
 
@@ -3288,7 +3233,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_VCHome();
 		}
 		SciCall_BackTab();
-		SciCall_SetTabIndents(bTabIndents);
+		SciCall_SetTabIndents(fvCurFile.bTabIndents);
 	}
 	break;
 
@@ -3375,19 +3320,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
-	case IDM_EDIT_COLUMNWRAP: {
-		if (iWrapCol == 0) {
-			iWrapCol = iLongLinesLimit;
-		}
-
-		if (ColumnWrapDlg(hwnd, &iWrapCol)) {
-			iWrapCol = clamp_i(iWrapCol, 1, 512);
+	case IDM_EDIT_COLUMNWRAP:
+		if (ColumnWrapDlg(hwnd)) {
 			BeginWaitCursor();
-			EditWrapToColumn(iWrapCol);
+			EditWrapToColumn(iWrapColumn);
 			EndWaitCursor();
 		}
-	}
-	break;
+		break;
 
 	case IDM_EDIT_SPLITLINES:
 		BeginWaitCursor();
@@ -3453,25 +3392,25 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_CONVERTTABS:
 		BeginWaitCursor();
-		EditTabsToSpaces(iTabWidth, FALSE);
+		EditTabsToSpaces(fvCurFile.iTabWidth, FALSE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTSPACES:
 		BeginWaitCursor();
-		EditSpacesToTabs(iTabWidth, FALSE);
+		EditSpacesToTabs(fvCurFile.iTabWidth, FALSE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTTABS2:
 		BeginWaitCursor();
-		EditTabsToSpaces(iTabWidth, TRUE);
+		EditTabsToSpaces(fvCurFile.iTabWidth, TRUE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CONVERTSPACES2:
 		BeginWaitCursor();
-		EditSpacesToTabs(iTabWidth, TRUE);
+		EditSpacesToTabs(fvCurFile.iTabWidth, TRUE);
 		EndWaitCursor();
 		break;
 
@@ -3984,19 +3923,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_WORDWRAP:
-		fWordWrap = !fWordWrap;
-		SciCall_SetWrapMode(fWordWrap? iWordWrapMode : SC_WRAP_NONE);
-		fWordWrapG = fWordWrap;
+		fWordWrapG = fvCurFile.fWordWrap = !fvCurFile.fWordWrap;
+		SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
 		EditEnsureSelectionVisible();
 		UpdateToolbar();
 		break;
 
 	case IDM_VIEW_WORDWRAPSETTINGS:
-		if (WordWrapSettingsDlg(hwnd, &iWordWrapIndent)) {
-			SciCall_SetWrapMode(fWordWrap? iWordWrapMode : SC_WRAP_NONE);
+		if (WordWrapSettingsDlg(hwnd)) {
+			SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
 			SciCall_SetMarginOptions(bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE);
-			fWordWrapG = fWordWrap;
-			SetWrapIndentMode();
+			EditSetWrapIndentMode(fvCurFile.iTabWidth, fvCurFile.iIndentWidth);
 			SetWrapVisualFlags();
 			EditEnsureSelectionVisible();
 			UpdateToolbar();
@@ -4014,38 +3951,24 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_LONGLINESETTINGS:
-		if (LongLineSettingsDlg(hwnd, &iLongLinesLimit)) {
+		if (LongLineSettingsDlg(hwnd)) {
 			bMarkLongLines = TRUE;
 			SciCall_SetEdgeMode((iLongLineMode == EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND);
 			Style_SetLongLineColors();
-			iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
-			SciCall_SetEdgeColumn(iLongLinesLimit);
-			iLongLinesLimitG = iLongLinesLimit;
+			SciCall_SetEdgeColumn(fvCurFile.iLongLinesLimit);
 		}
 		break;
 
 	case IDM_VIEW_TABSASSPACES:
-		bTabsAsSpaces = !bTabsAsSpaces;
-		SciCall_SetUseTabs(!bTabsAsSpaces);
-		bTabsAsSpacesG = bTabsAsSpaces;
+		SciCall_SetUseTabs(fvCurFile.bTabsAsSpaces);
+		fvCurFile.mask |= FV_TABSASSPACES;
+		fvCurFile.bTabsAsSpaces = !fvCurFile.bTabsAsSpaces;
+		tabSettings.globalTabsAsSpaces = fvCurFile.bTabsAsSpaces;
 		break;
 
 	case IDM_VIEW_TABSETTINGS:
 		if (TabSettingsDlg(hwnd)) {
-			SciCall_SetUseTabs(!bTabsAsSpaces);
-			SciCall_SetTabIndents(bTabIndents);
-			SciCall_SetBackSpaceUnIndents(bBackspaceUnindents);
-			iTabWidth = clamp_i(iTabWidth, 1, 256);
-			iIndentWidth = clamp_i(iIndentWidth, 0, 256);
-			SciCall_SetTabWidth(iTabWidth);
-			SciCall_SetIndent(iIndentWidth);
-			bTabsAsSpacesG = bTabsAsSpaces;
-			bTabIndentsG = bTabIndents;
-			iTabWidthG = iTabWidth;
-			iIndentWidthG = iIndentWidth;
-			if (SciCall_GetWrapIndentMode() == SC_WRAPINDENT_FIXED) {
-				SetWrapStartIndent();
-			}
+			FileVars_Apply(&fvCurFile);
 		}
 		break;
 
@@ -4547,8 +4470,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetTabIndents(FALSE);
 		SciCall_SetUseTabs(TRUE);
 		SciCall_Tab();
-		SciCall_SetUseTabs(!bTabsAsSpaces);
-		SciCall_SetTabIndents(bTabIndents);
+		SciCall_SetUseTabs(!fvCurFile.bTabsAsSpaces);
+		SciCall_SetTabIndents(fvCurFile.bTabIndents);
 		break;
 
 	case CMD_RECODEDEFAULT:
@@ -4750,14 +4673,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SendWMCommand(hwnd, IDM_VIEW_LONGLINEMARKER);
 		} else {
 			if (LOWORD(wParam) == CMD_INCLINELIMIT) {
-				iLongLinesLimit++;
+				iLongLinesLimitG++;
 			} else {
-				iLongLinesLimit--;
+				iLongLinesLimitG--;
 			}
-			iLongLinesLimit = clamp_i(iLongLinesLimit, 0, NP2_LONG_LINE_LIMIT);
-			SciCall_SetEdgeColumn(iLongLinesLimit);
+			fvCurFile.iLongLinesLimit = iLongLinesLimitG = clamp_i(iLongLinesLimitG, 0, NP2_LONG_LINE_LIMIT);
+			SciCall_SetEdgeColumn(fvCurFile.iLongLinesLimit);
 			UpdateStatusbar();
-			iLongLinesLimitG = iLongLinesLimit;
 		}
 		break;
 
@@ -5419,8 +5341,7 @@ void LoadSettings(void) {
 	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
 	iPathNameFormat = clamp_i(iValue, 0, 2);
 
-	fWordWrap = IniSectionGetBool(pIniSection, L"WordWrap", 1);
-	fWordWrapG = fWordWrap;
+	fWordWrapG = IniSectionGetBool(pIniSection, L"WordWrap", 1);
 
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_AUTO);
 	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_AUTO);
@@ -5478,37 +5399,27 @@ void LoadSettings(void) {
 	iCallTipsWaitTime = max_i(iValue, 100);
 #endif
 
-	bTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
-	bTabsAsSpacesG = bTabsAsSpaces;
-	bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", 1);
-	bTabIndentsG = bTabIndents;
+	iValue = IniSectionGetInt(pIniSection, L"TabWidth", TAB_WIDTH_4);
+	tabSettings.globalTabWidth = clamp_i(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+	iValue = IniSectionGetInt(pIniSection, L"IndentWidth", INDENT_WIDTH_4);
+	tabSettings.globalIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+	tabSettings.globalTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
+	tabSettings.bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", 1);
+	tabSettings.bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
 
-	bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
+	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
+	fvCurFile.fWordWrap = fWordWrapG;
+
+	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 0);
+	iValue = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
+	iLongLinesLimitG = clamp_i(iValue, 0, NP2_LONG_LINE_LIMIT);
+	iValue = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
+	iLongLineMode = clamp_i(iValue, EDGE_LINE, EDGE_BACKGROUND);
 
 	iValue = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
 	// Added in v4.2.25.1172, stored as a relative font size in point, in range [-10, 20].
 	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
 	iZoomLevel = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
-
-	iValue = IniSectionGetInt(pIniSection, L"TabWidth", 4);
-	iValue = clamp_i(iValue, 1, 256);
-	iTabWidth = iValue;
-	iTabWidthG = iValue;
-
-	iValue = IniSectionGetInt(pIniSection, L"IndentWidth", 4);
-	iValue = clamp_i(iValue, 0, 256);
-	iIndentWidth = iValue;
-	iIndentWidthG = iValue;
-
-	bMarkLongLines = IniSectionGetBool(pIniSection, L"MarkLongLines", 0);
-
-	iValue = IniSectionGetInt(pIniSection, L"LongLinesLimit", 80);
-	iValue = clamp_i(iValue, 0, NP2_LONG_LINE_LIMIT);
-	iLongLinesLimit = iValue;
-	iLongLinesLimitG = iValue;
-
-	iValue = IniSectionGetInt(pIniSection, L"LongLineMode", EDGE_LINE);
-	iLongLineMode = clamp_i(iValue, EDGE_LINE, EDGE_BACKGROUND);
 
 	bShowBookmarkMargin = IniSectionGetBool(pIniSection, L"ShowBookmarkMargin", 0);
 	bShowLineNumbers = IniSectionGetBool(pIniSection, L"ShowLineNumbers", 1);
@@ -5838,15 +5749,15 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, TRUE);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);
 #endif
-	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", bTabsAsSpacesG, 0);
-	IniSectionSetBoolEx(pIniSection, L"TabIndents", bTabIndentsG, 1);
-	IniSectionSetBoolEx(pIniSection, L"BackspaceUnindents", bBackspaceUnindents, 0);
-	IniSectionSetIntEx(pIniSection, L"ZoomLevel", iZoomLevel, 100);
-	IniSectionSetIntEx(pIniSection, L"TabWidth", iTabWidthG, 4);
-	IniSectionSetIntEx(pIniSection, L"IndentWidth", iIndentWidthG, 4);
+	IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.globalTabWidth, TAB_WIDTH_4);
+	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.globalIndentWidth, INDENT_WIDTH_4);
+	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, 0);
+	IniSectionSetBoolEx(pIniSection, L"TabIndents", tabSettings.bTabIndents, 1);
+	IniSectionSetBoolEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 0);
 	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, 0);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);
 	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);
+	IniSectionSetIntEx(pIniSection, L"ZoomLevel", iZoomLevel, 100);
 	IniSectionSetBoolEx(pIniSection, L"ShowBookmarkMargin", bShowBookmarkMargin, 0);
 	IniSectionSetBoolEx(pIniSection, L"ShowLineNumbers", bShowLineNumbers, 1);
 	IniSectionSetBoolEx(pIniSection, L"ShowCodeFolding", bShowCodeFolding, 1);
@@ -6981,7 +6892,7 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_VIEW_TOGGLEFOLDS, i && bShowCodeFolding);
 	EnableTool(IDT_FILE_LAUNCH, i);
 
-	CheckTool(IDT_VIEW_WORDWRAP, fWordWrap);
+	CheckTool(IDT_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 }
 
 //=============================================================================

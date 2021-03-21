@@ -120,10 +120,14 @@ extern BOOL bLockedForEditing;
 extern BOOL bLargeFileMode;
 #endif
 extern FILEVARS fvCurFile;
+extern EditTabSettings tabSettings;
+extern int iWrapColumn;
+extern int iWordWrapIndent;
 
 void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	bFreezeAppTitle = TRUE;
 	bLockedForEditing = FALSE;
+	iWrapColumn = 0;
 
 	SciCall_SetReadOnly(FALSE);
 	SciCall_Cancel();
@@ -132,8 +136,6 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	SciCall_ClearAll();
 	SciCall_ClearMarker();
 	SciCall_SetXOffset(0);
-
-	FileVars_Apply(&fvCurFile);
 
 #if defined(_WIN64)
 	// enable conversion between line endings
@@ -147,6 +149,8 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		}
 	}
 #endif
+
+	FileVars_Apply(&fvCurFile);
 
 	if (cbText > 0) {
 		SciCall_SetModEventMask(SC_MOD_NONE);
@@ -248,6 +252,8 @@ void EditConvertToLargeMode(void) {
 	SciCall_ClearMarker();
 
 	EditReplaceDocument(pdoc);
+	FileVars_Apply(&fvCurFile);
+
 	if (length > 0) {
 		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AppendText(length, pchText);
@@ -2360,15 +2366,6 @@ void EditModifyNumber(BOOL bIncrease) {
 	}
 }
 
-extern int iTabWidth;
-extern int iTabWidthG;
-extern int iIndentWidth;
-extern int iIndentWidthG;
-extern BOOL bTabsAsSpaces;
-extern BOOL bTabsAsSpacesG;
-extern BOOL bTabIndents;
-extern BOOL bTabIndentsG;
-
 //=============================================================================
 //
 // EditTabsToSpaces()
@@ -3478,10 +3475,11 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 					char tchComment[1024] = "";
 					Sci_Position tab = 0;
 					Sci_Position count = iCommentCol;
-					if (!bTabsAsSpaces && iTabWidth > 0) {
-						tab = iCommentCol / iTabWidth;
+					const int tabWidth = fvCurFile.iTabWidth;
+					if (!fvCurFile.bTabsAsSpaces && tabWidth > 0) {
+						tab = iCommentCol / tabWidth;
 						FillMemory(tchComment, tab, '\t');
-						count -= tab * iTabWidth;
+						count -= tab * tabWidth;
 					}
 					FillMemory(tchComment + tab, count, ' ');
 					strcat(tchComment, mszComment);
@@ -4325,13 +4323,14 @@ void EditSortLines(int iSortFlags) {
 			pLines[i].pwszLine = pwszLine;
 
 			if (iSortFlags & SORT_COLUMN) {
+				const int tabWidth = fvCurFile.iTabWidth;
 				Sci_Position col = 0;
-				Sci_Position tabs = iTabWidth;
+				Sci_Position tabs = tabWidth;
 				while (*pwszLine) {
 					if (*pwszLine == L'\t') {
 						if (col + tabs <= iSortColumn) {
 							col += tabs;
-							tabs = iTabWidth;
+							tabs = tabWidth;
 							pwszLine = CharNext(pwszLine);
 						} else {
 							break;
@@ -4339,7 +4338,7 @@ void EditSortLines(int iSortFlags) {
 					} else if (col < iSortColumn) {
 						col++;
 						if (--tabs == 0) {
-							tabs = iTabWidth;
+							tabs = tabWidth;
 						}
 						pwszLine = CharNext(pwszLine);
 					} else {
@@ -7321,9 +7320,17 @@ void EditOpenSelection(int type) {
 
 extern BOOL bNoEncodingTags;
 extern int fNoFileVariables;
+extern BOOL fWordWrapG;
+extern int iWordWrapMode;
+extern int iLongLinesLimitG;
 
 void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	ZeroMemory(lpfv, sizeof(FILEVARS));
+	// see FileVars_Apply() for other Tab settings.
+	lpfv->bTabIndents = tabSettings.bTabIndents;
+	lpfv->fWordWrap = fWordWrapG;
+	lpfv->iLongLinesLimit = iLongLinesLimitG;
+
 	if ((fNoFileVariables && bNoEncodingTags) || !lpData || !cbData) {
 		return;
 	}
@@ -7346,12 +7353,12 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 			if (!bDisableFileVariables) {
 				if (FileVars_ParseInt(tch, "tab-width", &i)) {
-					lpfv->iTabWidth = clamp_i(i, 1, 256);
+					lpfv->iTabWidth = clamp_i(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
 					lpfv->mask |= FV_TABWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "*basic-indent", &i)) {
-					lpfv->iIndentWidth = clamp_i(i, 0, 256);
+					lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 					lpfv->mask |= FV_INDENTWIDTH;
 				}
 
@@ -7408,65 +7415,73 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 }
 
+void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
+	int indent = 0;
+	switch (iWordWrapIndent) {
+	case EditWrapIndentOneCharacter:
+		indent = 1;
+		break;
+	case EditWrapIndentTwoCharacter:
+		indent = 2;
+		break;
+	case EditWrapIndentOneLevel:
+		indent = indentWidth ? indentWidth : tabWidth;
+		break;
+	case EditWrapIndentTwoLevel:
+		indent = indentWidth ? 2 * indentWidth : 2 * tabWidth;
+		break;
+	}
+	SciCall_SetWrapStartIndent(indent);
+}
+
+void EditSetWrapIndentMode(int tabWidth, int indentWidth) {
+	int indentMode;
+	switch (iWordWrapIndent) {
+	case EditWrapIndentSameAsSubline:
+		indentMode = SC_WRAPINDENT_SAME;
+		break;
+	case EditWrapIndentOneLevelThanSubline:
+		indentMode = SC_WRAPINDENT_INDENT;
+		break;
+	case EditWrapIndentTwoLevelThanSubline:
+		indentMode = SC_WRAPINDENT_DEEPINDENT;
+		break;
+	default:
+		indentMode = SC_WRAPINDENT_FIXED;
+		EditSetWrapStartIndent(tabWidth, indentWidth);
+		break;
+	}
+	SciCall_SetWrapIndentMode(indentMode);
+}
+
 //=============================================================================
 //
 // FileVars_Apply()
 //
-
-extern BOOL fWordWrap;
-extern BOOL fWordWrapG;
-extern int iWordWrapMode;
-extern int iLongLinesLimit;
-extern int iLongLinesLimitG;
-extern int iWrapCol;
-
-void FileVars_Apply(LPCFILEVARS lpfv) {
-	if (lpfv->mask & FV_TABWIDTH) {
-		iTabWidth = lpfv->iTabWidth;
-	} else {
-		iTabWidth = iTabWidthG;
-	}
-	SciCall_SetTabWidth(iTabWidth);
-
-	if (lpfv->mask & FV_INDENTWIDTH) {
-		iIndentWidth = lpfv->iIndentWidth;
-	} else if (lpfv->mask & FV_TABWIDTH) {
-		iIndentWidth = 0;
-	} else {
-		iIndentWidth = iIndentWidthG;
-	}
-	SciCall_SetIndent(iIndentWidth);
-
-	if (lpfv->mask & FV_TABSASSPACES) {
-		bTabsAsSpaces = lpfv->bTabsAsSpaces;
-	} else {
-		bTabsAsSpaces = bTabsAsSpacesG;
-	}
-	SciCall_SetUseTabs(!bTabsAsSpaces);
-
-	if (lpfv->mask & FV_TABINDENTS) {
-		bTabIndents = lpfv->bTabIndents;
-	} else {
-		bTabIndents = bTabIndentsG;
-	}
-	SciCall_SetTabIndents(bTabIndents);
-
-	if (lpfv->mask & FV_WORDWRAP) {
-		fWordWrap = lpfv->fWordWrap;
-	} else {
-		fWordWrap = fWordWrapG;
+void FileVars_Apply(LPFILEVARS lpfv) {
+	const int mask = lpfv->mask;
+	{
+		if (!(mask & FV_TABWIDTH)) {
+			lpfv->iTabWidth = tabSettings.globalTabWidth;
+		}
+		if (!(mask & FV_INDENTWIDTH)) {
+			lpfv->iIndentWidth = tabSettings.globalIndentWidth;
+		}
+		if (!(mask & FV_TABSASSPACES)) {
+			lpfv->bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
+		}
 	}
 
-	SciCall_SetWrapMode(fWordWrap? iWordWrapMode : SC_WRAP_NONE);
+	SciCall_SetTabWidth(lpfv->iTabWidth);
+	SciCall_SetIndent(lpfv->iIndentWidth);
+	SciCall_SetUseTabs(!lpfv->bTabsAsSpaces);
+	SciCall_SetTabIndents(lpfv->bTabIndents);
+	SciCall_SetBackSpaceUnIndents(tabSettings.bBackspaceUnindents);
 
-	if (lpfv->mask & FV_LONGLINESLIMIT) {
-		iLongLinesLimit = lpfv->iLongLinesLimit;
-	} else {
-		iLongLinesLimit = iLongLinesLimitG;
-	}
-	SciCall_SetEdgeColumn(iLongLinesLimit);
+	SciCall_SetWrapMode(lpfv->fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
+	EditSetWrapIndentMode(lpfv->iTabWidth, lpfv->iIndentWidth);
 
-	iWrapCol = 0;
+	SciCall_SetEdgeColumn(lpfv->iLongLinesLimit);
 }
 
 static LPCSTR FileVars_Find(LPCSTR pszData, LPCSTR pszName) {

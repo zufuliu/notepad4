@@ -9,7 +9,7 @@
 
 #define TAB_WIDTH_4		4
 #define TAB_WIDTH_2		2
-#define TAB_WIDTH_MIN	0
+#define TAB_WIDTH_MIN	1
 #define TAB_WIDTH_MAX	256
 #define INDENT_WIDTH_4		4
 #define INDENT_WIDTH_2		2
@@ -87,7 +87,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 
 #endif  // !RC_INVOKED
 
-// NP2LEX_, rid for EDITLEXER
+// NP2LEX_, resource id for EDITLEXER.
 #define NP2LEX_TEXTFILE		63000	// SCLEX_NULL		Text File
 #define NP2LEX_CPP			63001	// SCLEX_CPP		C/C++ Source
 #define NP2LEX_JAVA			63002	// SCLEX_JAVA		Java Source

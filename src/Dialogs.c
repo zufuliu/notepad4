@@ -31,6 +31,7 @@
 #include "Helpers.h"
 #include "Notepad2.h"
 #include "Edit.h"
+#include "Styles.h"
 #include "Dlapi.h"
 #include "Dialogs.h"
 #include "resource.h"
@@ -50,6 +51,9 @@ extern BOOL		bAutoStripBlanks;
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 extern LANGID uiLanguage;
 #endif
+extern FILEVARS fvCurFile;
+extern EditTabSettings tabSettings;
+extern int iWrapColumn;
 
 //=============================================================================
 //
@@ -1326,12 +1330,14 @@ BOOL ChangeNotifyDlg(HWND hwnd) {
 //
 //
 static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const int iNumber = *((int *)lParam);
+		const int column = iWrapColumn ? iWrapColumn : fvCurFile.iLongLinesLimit;
 
-		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, iNumber, FALSE);
+		SetDlgItemInt(hwnd, IDC_COLUMNWRAP, column, FALSE);
 		SendDlgItemMessage(hwnd, IDC_COLUMNWRAP, EM_LIMITTEXT, 15, 0);
 
 		CenterDlgInParent(hwnd);
@@ -1342,11 +1348,10 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			BOOL fTranslated;
-			const int iNewNumber = GetDlgItemInt(hwnd, IDC_COLUMNWRAP, &fTranslated, FALSE);
+			const int column = GetDlgItemInt(hwnd, IDC_COLUMNWRAP, &fTranslated, FALSE);
 
 			if (fTranslated) {
-				int *piNumber = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
-				*piNumber = iNewNumber;
+				iWrapColumn = clamp_i(column, 1, 512);
 
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -1370,8 +1375,8 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 //
 // ColumnWrapDlg()
 //
-BOOL ColumnWrapDlg(HWND hwnd, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COLUMNWRAP), hwnd, ColumnWrapDlgProc, (LPARAM)iNumber);
+BOOL ColumnWrapDlg(HWND hwnd) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COLUMNWRAP), hwnd, ColumnWrapDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -1380,7 +1385,7 @@ BOOL ColumnWrapDlg(HWND hwnd, int *iNumber) {
 // WordWrapSettingsDlgProc()
 //
 //
-extern BOOL fWordWrap;
+extern BOOL fWordWrapG;
 extern int iWordWrapMode;
 extern int iWordWrapIndent;
 extern int iWordWrapSymbols;
@@ -1440,13 +1445,11 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			}
 
 			iSel = (int)SendDlgItemMessage(hwnd, IDC_WRAP_MODE, CB_GETCURSEL, 0, 0);
-			if (iSel == SC_WRAP_NONE) {
-				fWordWrap = FALSE;
-			} else {
-				fWordWrap = TRUE;
+			if (iSel != SC_WRAP_NONE) {
 				iWordWrapMode = iSel;
 			}
 
+			fWordWrapG = fvCurFile.fWordWrap = iSel != SC_WRAP_NONE;
 			bWordWrapSelectSubLine = IsButtonChecked(hwnd, IDC_WRAP_SELECT_SUBLINE);
 			bHighlightCurrentSubLine = IsButtonChecked(hwnd, IDC_WRAP_HIGHLIGHT_SUBLINE);
 			EndDialog(hwnd, IDOK);
@@ -1468,8 +1471,8 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // WordWrapSettingsDlg()
 //
-BOOL WordWrapSettingsDlg(HWND hwnd, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WORDWRAP), hwnd, WordWrapSettingsDlgProc, (LPARAM)iNumber);
+BOOL WordWrapSettingsDlg(HWND hwnd) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WORDWRAP), hwnd, WordWrapSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -1479,14 +1482,14 @@ BOOL WordWrapSettingsDlg(HWND hwnd, int *iNumber) {
 //
 //
 extern int iLongLineMode;
+extern int iLongLinesLimitG;
 
 static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
-		const int iNumber = *((int *)lParam);
-
-		SetDlgItemInt(hwnd, IDC_LONGLINE_LIMIT, iNumber, FALSE);
+		SetDlgItemInt(hwnd, IDC_LONGLINE_LIMIT, fvCurFile.iLongLinesLimit, FALSE);
 		SendDlgItemMessage(hwnd, IDC_LONGLINE_LIMIT, EM_LIMITTEXT, 15, 0);
 
 		if (iLongLineMode == EDGE_LINE) {
@@ -1503,11 +1506,12 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			BOOL fTranslated;
-			const int iNewNumber = GetDlgItemInt(hwnd, IDC_LONGLINE_LIMIT, &fTranslated, FALSE);
+			int longLinesLimit = GetDlgItemInt(hwnd, IDC_LONGLINE_LIMIT, &fTranslated, FALSE);
 
 			if (fTranslated) {
-				int *piNumber = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
-				*piNumber = iNewNumber;
+				longLinesLimit = clamp_i(longLinesLimit, 0, NP2_LONG_LINE_LIMIT);
+				fvCurFile.iLongLinesLimit = longLinesLimit;
+				iLongLinesLimitG = longLinesLimit;
 				iLongLineMode = IsButtonChecked(hwnd, IDC_LONGLINE_EDGE_LINE) ? EDGE_LINE : EDGE_BACKGROUND;
 
 				EndDialog(hwnd, IDOK);
@@ -1532,8 +1536,8 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // LongLineSettingsDlg()
 //
-BOOL LongLineSettingsDlg(HWND hwnd, int *iNumber) {
-	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LONGLINES), hwnd, LongLineSettingsDlgProc, (LPARAM)iNumber);
+BOOL LongLineSettingsDlg(HWND hwnd) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LONGLINES), hwnd, LongLineSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
 
@@ -1542,32 +1546,24 @@ BOOL LongLineSettingsDlg(HWND hwnd, int *iNumber) {
 // TabSettingsDlgProc()
 //
 //
-extern int iTabWidth;
-extern int iIndentWidth;
-extern BOOL bTabsAsSpaces;
-extern BOOL bTabIndents;
-extern BOOL bBackspaceUnindents;
-
 static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetDlgItemInt(hwnd, IDC_TAB_WIDTH, iTabWidth, FALSE);
+		SetDlgItemInt(hwnd, IDC_TAB_WIDTH, fvCurFile.iTabWidth, FALSE);
 		SendDlgItemMessage(hwnd, IDC_TAB_WIDTH, EM_LIMITTEXT, 15, 0);
 
-		SetDlgItemInt(hwnd, IDC_INDENT_WIDTH, iIndentWidth, FALSE);
+		SetDlgItemInt(hwnd, IDC_INDENT_WIDTH, fvCurFile.iIndentWidth, FALSE);
 		SendDlgItemMessage(hwnd, IDC_INDENT_WIDTH, EM_LIMITTEXT, 15, 0);
 
-		if (bTabsAsSpaces) {
+		if (fvCurFile.bTabsAsSpaces) {
 			CheckDlgButton(hwnd, IDC_TAB_AS_SPACE, BST_CHECKED);
 		}
-
-		if (bTabIndents) {
+		if (fvCurFile.bTabIndents) {
 			CheckDlgButton(hwnd, IDC_TAB_INDENT, BST_CHECKED);
 		}
-
-		if (bBackspaceUnindents) {
+		if (tabSettings.bBackspaceUnindents) {
 			CheckDlgButton(hwnd, IDC_BACKSPACE_UNINDENT, BST_CHECKED);
 		}
 
@@ -1581,16 +1577,24 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			BOOL fTranslated1;
 			BOOL fTranslated2;
 
-			const int iNewTabWidth = GetDlgItemInt(hwnd, IDC_TAB_WIDTH, &fTranslated1, FALSE);
-			const int iNewIndentWidth = GetDlgItemInt(hwnd, IDC_INDENT_WIDTH, &fTranslated2, FALSE);
+			int iNewTabWidth = GetDlgItemInt(hwnd, IDC_TAB_WIDTH, &fTranslated1, FALSE);
+			int iNewIndentWidth = GetDlgItemInt(hwnd, IDC_INDENT_WIDTH, &fTranslated2, FALSE);
 
 			if (fTranslated1 && fTranslated2) {
-				iTabWidth = iNewTabWidth;
-				iIndentWidth = iNewIndentWidth;
+				iNewTabWidth = clamp_i(iNewTabWidth, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+				iNewIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 
-				bTabsAsSpaces = IsButtonChecked(hwnd, IDC_TAB_AS_SPACE);
-				bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
-				bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
+				fvCurFile.mask |= FV_TABWIDTH | FV_INDENTWIDTH | FV_TABSASSPACES | FV_TABINDENTS;
+				fvCurFile.iTabWidth = iNewTabWidth;
+				fvCurFile.iIndentWidth = iNewTabWidth;
+				fvCurFile.bTabsAsSpaces = IsButtonChecked(hwnd, IDC_TAB_AS_SPACE);
+				fvCurFile.bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
+
+				tabSettings.globalTabWidth = iNewTabWidth;
+				tabSettings.globalIndentWidth = iNewIndentWidth;
+				tabSettings.globalTabsAsSpaces = fvCurFile.bTabsAsSpaces;
+				tabSettings.bTabIndents = fvCurFile.bTabIndents;
+				tabSettings.bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
 
 				EndDialog(hwnd, IDOK);
 			} else {
@@ -2068,7 +2072,7 @@ void ZoomLevelDlg(HWND hwnd, BOOL bBottom) {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, bBottom);
 }
 
-extern struct EditAutoCompletionConfig autoCompletionConfig;
+extern EditAutoCompletionConfig autoCompletionConfig;
 
 static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
