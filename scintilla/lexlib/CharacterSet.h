@@ -102,6 +102,9 @@ public:
 
 template <typename T, typename... Args>
 constexpr bool AnyOf(T t, Args... args) noexcept {
+#if defined(__clang__)
+	static_assert(__is_integral(T));
+#endif
 	return ((t == args) || ...);
 }
 
