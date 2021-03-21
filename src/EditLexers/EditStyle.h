@@ -1,5 +1,5 @@
 #pragma once
-// NP2STYLE_
+// NP2STYLE_, resource id for EDITSTYLE.
 #define NP2STYLE_MarginLineNumber		63201
 #define NP2STYLE_MatchingBrace			63202
 #define NP2STYLE_MatchingBraceError		63203

@@ -494,7 +494,7 @@ static inline BOOL IsSpecialStartChar(int ch, int chPrev) {
 // EditCompleteWord()
 // Auto-complete words
 //
-extern struct EditAutoCompletionConfig autoCompletionConfig;
+extern EditAutoCompletionConfig autoCompletionConfig;
 
 // CharClassify::SetDefaultCharClasses()
 static inline BOOL IsDefaultWordChar(int ch) {
@@ -1964,10 +1964,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	return endPart;
 }
 
-extern BOOL	bTabsAsSpaces;
-extern BOOL	bTabIndents;
-extern int	iTabWidth;
-extern int	iIndentWidth;
+extern FILEVARS fvCurFile;
 
 void EditAutoIndent(void) {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
@@ -1993,7 +1990,7 @@ void EditAutoIndent(void) {
 		if (iPrevLineLength < 2) {
 			return;
 		}
-		char *pLineBuf = (char *)NP2HeapAlloc(2 * iPrevLineLength + 1 + iIndentWidth * 2 + 2 + 64);
+		char *pLineBuf = (char *)NP2HeapAlloc(2 * iPrevLineLength + 1 + fvCurFile.iIndentWidth * 2 + 2 + 64);
 		if (pLineBuf == NULL) {
 			return;
 		}
@@ -2066,12 +2063,12 @@ void EditAutoIndent(void) {
 
 		Sci_Position iIndentPos = iCurPos;
 		if (indent) {
-			int pad = iIndentWidth;
+			int pad = fvCurFile.iIndentWidth;
 			iIndentPos += iIndentLen;
 			ch = ' ';
-			if (bTabIndents) {
-				if (bTabsAsSpaces) {
-					pad = iTabWidth;
+			if (fvCurFile.bTabIndents) {
+				if (fvCurFile.bTabsAsSpaces) {
+					pad = fvCurFile.iTabWidth;
 					ch = ' ';
 				} else {
 					pad = 1;
@@ -2534,7 +2531,7 @@ void EditShowCallTips(Sci_Position position) {
 #else
 	sprintf(text, "ShowCallTips(%d, %d, %d)\n\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
 #endif
-	SciCall_CallTipUseStyle(iTabWidth);
+	SciCall_CallTipUseStyle(fvCurFile.iTabWidth);
 	SciCall_CallTipShow(position, text);
 	NP2HeapFree(pLine);
 	NP2HeapFree(text);

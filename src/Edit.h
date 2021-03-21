@@ -423,6 +423,14 @@ BOOL IsStringCaseSensitiveA(LPCSTR pszText);
 #define FV_ENCODING				64
 #define FV_MODE					128
 
+typedef struct EditTabSettings {
+	int 	globalTabWidth;
+	int 	globalIndentWidth;
+	BOOL	globalTabsAsSpaces;
+	BOOL	bTabIndents;
+	BOOL	bBackspaceUnindents;
+} EditTabSettings;
+
 typedef struct FILEVARS {
 	int 	mask;
 	int 	iTabWidth;
@@ -438,8 +446,10 @@ typedef struct FILEVARS {
 
 typedef const FILEVARS * LPCFILEVARS;
 
+void	EditSetWrapStartIndent(int tabWidth, int indentWidth);
+void	EditSetWrapIndentMode(int tabWidth, int indentWidth);
 void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
-void	FileVars_Apply(LPCFILEVARS lpfv);
+void	FileVars_Apply(LPFILEVARS lpfv);
 BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
 // in EditEncoding.c
