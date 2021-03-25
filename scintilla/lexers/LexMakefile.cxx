@@ -162,10 +162,10 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 				state = SCE_MAKE_COMMENT;
 			} else if ((ch == '$' && chNext == '(') || (ch == '$' && chNext == '$' && styler.SafeGetCharAt(i + 2) == '(')) {
 				styler.ColourTo(i - 1, state);
-				Sci_Position pos = i + 1;
+				Sci_PositionU pos = i + 1;
 				if (chNext == '$') ++pos;
 				ch = chNext;
-				while (ch != ')') {
+				while (pos < endPos && ch != ')') {
 					chNext = styler.SafeGetCharAt(pos + 1);
 					if (ch == '$' && chNext == '(')
 						break;
