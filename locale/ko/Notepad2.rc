@@ -673,7 +673,7 @@ BEGIN
 				MENUITEM "편집 창(&E)",			IDM_SET_RTL_LAYOUT_EDIT
 				MENUITEM "기타 창(&O)",			IDM_SET_RTL_LAYOUT_OTHER
 			END
-			POPUP "양방향(&B) (Direct2D)"
+			POPUP "양방향 (Direct2D)(&B)"
 			BEGIN
 				MENUITEM "없음(&N)",					IDM_SET_BIDIRECTIONAL_NONE
 				MENUITEM "왼쪽에서 오른쪽(&L)",			IDM_SET_BIDIRECTIONAL_L2R
