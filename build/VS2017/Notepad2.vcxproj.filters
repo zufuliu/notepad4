@@ -276,6 +276,9 @@
     <ClCompile Include="..\..\scintilla\src\EditView.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\src\Geometry.cxx">
+      <Filter>Scintilla\src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\src\Indicator.cxx">
       <Filter>Scintilla\src</Filter>
     </ClCompile>
@@ -569,9 +572,6 @@
     <ClInclude Include="..\..\scintilla\include\LaTeXInput.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\scintilla\include\Platform.h">
-      <Filter>Scintilla\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\scintilla\include\Sci_Position.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
@@ -677,10 +677,10 @@
     <ClInclude Include="..\..\scintilla\src\FontQuality.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\Indicator.h">
+    <ClInclude Include="..\..\scintilla\src\Geometry.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\IntegerRectangle.h">
+    <ClInclude Include="..\..\scintilla\src\Indicator.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\KeyMap.h">
@@ -696,6 +696,9 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\PerLine.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\src\Platform.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\Position.h">

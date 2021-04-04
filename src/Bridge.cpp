@@ -254,7 +254,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	}
 
 	// Set print color mode
-	SciCall_SetPrintColourMode(iPrintColor);
+	SciCall_SetPrintColorMode(iPrintColor);
 
 	// Set print zoom...
 	SciCall_SetPrintMagnification(iPrintZoom);

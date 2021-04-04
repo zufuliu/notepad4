@@ -12,10 +12,13 @@
 #include <string_view>
 #include <vector>
 #include <map>
+#include <optional>
 #include <algorithm>
 #include <iterator>
 #include <memory>
 
+#include "Debugging.h"
+#include "Geometry.h"
 #include "Platform.h"
 
 #include "XPM.h"
@@ -299,11 +302,8 @@ void RGBAImageSet::Clear() noexcept {
 }
 
 /// Add an image.
-void RGBAImageSet::Add(int ident, RGBAImage *image) {
-	const auto [it, success] = images.emplace(ident, image);
-	if (!success) {
-		it->second.reset(image);
-	}
+void RGBAImageSet::AddImage(int ident, std::unique_ptr<RGBAImage> image) {
+	images[ident] = std::move(image);
 	height = -1;
 	width = -1;
 }

@@ -97,7 +97,10 @@ constexpr PRectangle PRectangleFromRect(RECT rc) noexcept {
 	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
 }
 
-#if NP2_USE_SSE2
+#if 0//NP2_USE_SSE2
+static_assert(sizeof(PRectangle) == sizeof(__m128));
+static_assert(sizeof(RECT) == sizeof(__m128i));
+
 inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	PRectangle prc;
 	__m128i i32x4 = _mm_load_si128((__m128i *)(&rc));

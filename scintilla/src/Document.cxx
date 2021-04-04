@@ -18,6 +18,7 @@
 #include <string_view>
 #include <vector>
 #include <forward_list>
+#include <optional>
 #include <algorithm>
 #include <memory>
 #include <chrono>
@@ -26,6 +27,8 @@
 #include <regex>
 #endif
 
+#include "Debugging.h"
+#include "Geometry.h"
 #include "Platform.h"
 
 #include "ILoader.h"
@@ -254,7 +257,7 @@ int Document::LineEndTypesSupported() const noexcept {
 bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 	if (dbcsCodePage != dbcsCodePage_) {
 		dbcsCodePage = dbcsCodePage_;
-		SetCaseFolder(nullptr);
+		pcf.reset();
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(SC_CP_UTF8 == dbcsCodePage);
 		dbcsCharClass = DBCSCharClassify::Get(dbcsCodePage_);
@@ -1136,11 +1139,11 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 
 EncodingFamily Document::CodePageFamily() const noexcept {
 	if (SC_CP_UTF8 == dbcsCodePage)
-		return EncodingFamily::efUnicode;
+		return EncodingFamily::unicode;
 	else if (dbcsCodePage)
-		return EncodingFamily::efDBCS;
+		return EncodingFamily::dbcs;
 	else
-		return EncodingFamily::efEightBit;
+		return EncodingFamily::eightBit;
 }
 
 void Document::ModifiedAt(Sci::Position pos) noexcept {
@@ -1946,8 +1949,8 @@ bool Document::HasCaseFolder() const noexcept {
 	return pcf != nullptr;
 }
 
-void Document::SetCaseFolder(CaseFolder *pcf_) noexcept {
-	pcf.reset(pcf_);
+void Document::SetCaseFolder(std::unique_ptr<CaseFolder> pcf_) noexcept {
+	pcf = std::move(pcf_);
 }
 
 Document::CharacterExtracted Document::ExtractCharacter(Sci::Position position) const noexcept {
