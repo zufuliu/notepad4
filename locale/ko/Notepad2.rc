@@ -420,13 +420,13 @@ BEGIN
 			MENUITEM "선택영역에서 블록 탈자기호 그리기(&S)",		IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "줄 바꿈(&R)\tCtrl+W",						IDM_VIEW_WORDWRAP
+		MENUITEM "줄바꿈(&R)\tCtrl+W",						IDM_VIEW_WORDWRAP
 		MENUITEM "긴 줄 표시(&L)\tCtrl+Shift+L",			IDM_VIEW_LONGLINEMARKER
 		MENUITEM "들여쓰기 안내선(&G)\tCtrl+Shift+G",		IDM_VIEW_SHOWINDENTGUIDES
 		MENUITEM SEPARATOR
 		MENUITEM "공백 표시(&W)\tCtrl+Shift+8",			IDM_VIEW_SHOWWHITESPACE
 		MENUITEM "줄 끝 표시(&E)\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
-		MENUITEM "줄 바꿈 기호 표시(&Y)\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
+		MENUITEM "줄바꿈 기호 표시(&Y)\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
 		MENUITEM "유니코드 제어 문자(&I)",				IDM_VIEW_UNICODE_CONTROL_CHAR
 		//MENUITEM "팁 불러오기 표시(&H)",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
@@ -575,7 +575,7 @@ BEGIN
 	BEGIN
 		MENUITEM "탭을 공백으로 삽입(&S)",			IDM_VIEW_TABSASSPACES
 		MENUITEM "탭 설정(&T)...\tCtrl+T",		IDM_VIEW_TABSETTINGS
-		MENUITEM "줄 바꿈 설정(&W)...",			IDM_VIEW_WORDWRAPSETTINGS
+		MENUITEM "줄바꿈 설정(&W)...",			IDM_VIEW_WORDWRAPSETTINGS
 		MENUITEM "긴 줄 표시 설정(&L)...",			IDM_VIEW_LONGLINESETTINGS
 		MENUITEM "자동 완성 설정(&A)...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
 		MENUITEM "대소문자 무시 자동 완성(&G)",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
@@ -1257,8 +1257,8 @@ BEGIN
     LTEXT           "들여쓰기 간격(&I):",IDC_STATIC,7,30,69,8
     EDITTEXT        IDC_INDENT_WIDTH,78,27,30,14,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "공백으로 탭 삽입(&S)",IDC_TAB_AS_SPACE,7,47,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "탭 키로 들여쓰기 다시 포맷(&K)",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
-    AUTOCHECKBOX    "백스페이스 키로 들여쓰기 다시 포맷(&B)",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "탭 키 들여쓰기 재구성(&K)",IDC_TAB_INDENT,7,59,139,10,WS_TABSTOP
+    AUTOCHECKBOX    "백스페이스 키 들여쓰기 재구성(&B)",IDC_BACKSPACE_UNINDENT,7,71,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,117,7,50,14
     PUSHBUTTON      "취소",IDCANCEL,117,27,50,14
 END
@@ -1278,7 +1278,7 @@ END
 
 IDD_WORDWRAP DIALOGEX 0, 0, 250, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "줄 바꿈 설정"
+CAPTION "줄바꿈 설정"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_WRAP_INDENT,7,7,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1287,11 +1287,11 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,137,118,50,14
     PUSHBUTTON      "취소",IDCANCEL,193,118,50,14
-    LTEXT           "들여쓰기 안함|한 글자씩 들여쓰기|두 글자씩 들여쓰기|1단계 들여쓰기|2단계 들여쓰기|첫 번째 하위 줄과 동일하게 들여쓰기|첫 번째 하위 줄보다 1단계 더 들여쓰기|첫 번째 하위 줄보다 2단계 더 들여쓰기",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "줄 바꿈 전 시각적 표시기 없음|줄 바꿈 전 시각적 표시기 표시 (텍스트 근처)|줄 바꿈 전 시각적 표시기 표시 (테두리 근처)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "줄 바꿈 후 시각적 표시기 없음|줄 바꿈 후 시각적 표시기 표시 (텍스트 근처)|줄 바꿈 후 시각적 표시기 표시 (테두리 근처)|줄 바꿈 후 시각적 표시기 표시 (줄 번호 여백)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "줄 바꿈 없음|단어 사이에 텍스트 줄 바꿈|문자 사이에 텍스트 줄 바꿈|공백에 텍스트 줄 바꿈|자동 줄 바꿈|",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
-    GROUPBOX        "줄 바꿈의 경우",IDC_STATIC,7,74,235,38
+    LTEXT           "들여쓰기 줄바꾸기 안함|한 글자 들여쓰기 줄바꾸기|두 글자 들여쓰기 줄바꾸기|1단계 들여쓰기 줄바꾸기|2단계 들여쓰기 줄바꾸기|첫 번째 하위 줄과 동일하게 들여쓰기 줄바꾸기|첫 번째 하위 줄보다 1단계 더 들여쓰기 줄바꾸기|첫 번째 하위 줄보다 2단계 더 들여쓰기 줄바꾸기",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "줄바꾸기 전 시각적 표시기 안함|줄바꾸기 전 시각적 표시기 표시 (텍스트 근처)|줄바꾸기 전 시각적 표시기 표시 (테두리 근처)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "줄바꾸기 후 시각적 표시기 안함|줄바꾸기 후 시각적 표시기 표시 (텍스트 근처)|줄바꾸기 후 시각적 표시기 표시 (테두리 근처)|줄바꿈 후 시각적 표시기 표시 (줄 번호 여백)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
+    LTEXT           "줄바꾸기 안함|단어 사이에 텍스트 줄바꾸기|문자 사이에 텍스트 줄바꾸기|공백에 텍스트 줄바꿈|자동 줄바꿈|",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
+    GROUPBOX        "줄바꾸기된 줄의 경우",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "왼쪽 여백에서 줄 선택 시 하위 줄만 선택",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
     AUTOCHECKBOX    "현재 줄을 강조 표시할 때 하위 줄만 강조 표시",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
 END
@@ -1416,9 +1416,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "선택 에워싸기"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "선택 전 삽입(&B):",IDC_STATIC,7,7,114,8
+    LTEXT           "선택 앞에 삽입(&B):",IDC_STATIC,7,7,114,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "선택 후 삽입(&A):",IDC_MODIFY_LINE_TIP2,7,41,116,8
+    LTEXT           "선택 뒤에 삽입(&A):",IDC_MODIFY_LINE_TIP2,7,41,116,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "확인",IDOK,135,77,50,14
     PUSHBUTTON      "취소",IDCANCEL,191,77,50,14
@@ -1535,7 +1535,7 @@ BEGIN
     AUTOCHECKBOX    "현재 문서의 단어를 검색",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
     AUTOCHECKBOX    "영어 IME 모드에서만 자동 완성 작동",IDC_AUTOC_ENGLISH_IME_ONLY,14,80,180,10,WS_TABSTOP
-    AUTOCHECKBOX    "자동 완성은 대소 문자를 구분하지 않음",IDC_AUTOC_CASE_INSENSITIVE,14,92,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "자동 완성은 대소문자를 구분하지 않음",IDC_AUTOC_CASE_INSENSITIVE,14,92,180,10,WS_TABSTOP
     GROUPBOX        "자동 완성을 완료하는데 사용되는 키 (취소하려면 Esc 키 사용)",IDC_STATIC,7,111,218,44
     AUTOCHECKBOX    "엔터 키",IDC_AUTOC_FILLUP_ENTER,14,123,35,10,WS_TABSTOP
     AUTOCHECKBOX    "탭 키",IDC_AUTOC_FILLUP_TAB,66,123,35,10,WS_TABSTOP
@@ -1859,8 +1859,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_INI          "구성 파일 (*.ini)|*.ini|모든 파일 (*.*)|*.*|"
-    IDS_OPENWITH            "즐겨 찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 선택하십시오."
-    IDS_FAVORITES           "즐겨 찾는 파일에 대한 링크가 있는 디렉토리를 선택하십시오."
+    IDS_OPENWITH            "즐겨찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 선택하십시오."
+    IDS_FAVORITES           "즐겨찾는 파일에 대한 링크가 있는 디렉토리를 선택하십시오."
 END
 
 STRINGTABLE
@@ -1876,7 +1876,7 @@ BEGIN
     IDT_EDIT_PASTE          "붙여넣기"
     IDT_EDIT_FIND           "찾기"
     IDT_EDIT_REPLACE        "바꾸기"
-    IDT_VIEW_WORDWRAP       "줄 바꿈"
+    IDT_VIEW_WORDWRAP       "줄바꿈"
     IDT_VIEW_ZOOMIN         "확대"
     IDT_VIEW_ZOOMOUT        "축소"
     IDT_VIEW_SCHEME         "구성표 선택"
@@ -1896,11 +1896,11 @@ STRINGTABLE
 BEGIN
     IDS_ERR_LOADFILE        """%s"" 파일을 불러오는 도중 오류가 발생했습니다."
     IDS_ERR_SAVEFILE        """%s"" 파일을 저장하는 도중 오류가 발생했습니다."
-    IDS_ERR_BROWSE          "파일 탐색 플러그인이 없습니다.\nMetapath 파일 탐색 플러그인은\nttps://github.com/zufuliu/notepad2/releases에서 다운로드할 수 있습니다.\n다운로드 페이지를여시겠습니까?"
+    IDS_ERR_BROWSE          "파일 탐색 플러그인이 없습니다.\nMetapath 파일 탐색 플러그인은\nttps://github.com/zufuliu/notepad2/releases에서 다운로드할 수 있습니다.\n다운로드 페이지를 여시겠습니까?"
     IDS_ERR_MRUDLG          "선택한 파일에 액세스할 수 없습니다!\n목록에서 제거하시겠습니까?"
     IDS_ERR_CREATELINK      "바탕화면 링크를 만드는 동안 오류가 발생했습니다."
     IDS_ERR_PREVWINDISABLED "기존 Notepad2 창이 사용 중이거나 활성 대화 상자가 있습니다.\n다른 Notepad2 창을 여시겠습니까?"
-    IDS_SELRECT             "이 작업은 직사각형 선택 내에서 수행 할 수 없습니다."
+    IDS_SELRECT             "이 작업은 직사각형 선택 내에서 수행할 수 없습니다."
     IDS_BUFFERTOOSMALL      "이 작업을 수행할 수 없습니다 (줄이 너무 깁니다)"
     IDS_FIND_WRAPFW         "문서의 끝에 도달하여 처음부터 검색을 다시 시작했습니다."
     IDS_FIND_WRAPRE         "문서의 시작 부분에 도달하여 끝에서 검색을 다시 시작했습니다."
@@ -1909,8 +1909,8 @@ BEGIN
     IDS_ASK_ENCODING        "파일 인코딩을 ANSI에서 비 ANSI로 (또는 그 반대로) 전환하면 지원되지 않는 텍스트가 기본 문자로 대체될 수 있으며 실행 취소 기록이 지워집니다. 계속하시겠습니까?"
     IDS_ASK_ENCODING2       "빈 파일의 인코딩을 ANSI에서 비 ANSI로 변경하려고합니다. 새 인코딩과 동기화할 수 없으므로 실행 취소 기록이 지워집니다. 계속하시셌습니까?"
     IDS_ERR_ENCODINGNA      "선택한 인코딩에 대한 코드 페이지 변환표는 시스템에서 사용할 수 없습니다."
-    IDS_ERR_UNICODE         "이 유니 코드 파일을 변환하는 동안 오류가 발생했습니다.\n파일을 저장하면 데이터가 손실됩니다!"
-	IDS_BINARY_FILE_LOCKED	"이 파일은 텍스트 파일이 아닐 가능성이 높으므로 실수로 편집되어 파일이 손상되는 것을 방지하기 위해 편집용으로 잠깁니다."
+    IDS_ERR_UNICODE         "이 유니코드 파일을 변환하는 동안 오류가 발생했습니다.\n파일을 저장하면 데이터가 손실됩니다!"
+	IDS_BINARY_FILE_LOCKED	"이 파일은 텍스트 파일이 아닐 가능성이 높으므로 실수로 편집되어 파일이 손상되는 것을 방지하기 위해 편집이 잠깁니다."
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	IDS_CHANGE_LANG_RESTART	"UI 언어를 변경하려면 Notepad2를 다시 시작해야 합니다. 지금 다시 시작하시겠습니까?"
 #endif
@@ -2111,7 +2111,7 @@ BEGIN
 	IDS_CONFIG_THEME_TITLE_DEFAULT	"구성표 사용자 정의 - 기본 테마"
 	IDS_CONFIG_THEME_TITLE_DARK		"구성표 사용자 정의 - 다크 테마"
 	IDS_FAVORITE_SCHEMES_TITLE		"즐겨찾기"
-	IDS_CUSTOMIZE_SCHEMES_HELP		"확장자는 세미콜론(;) 으로 구분되어야 합니다.\r\n\
+	IDS_CUSTOMIZE_SCHEMES_HELP		"확장자는 세미콜론(;)으로 구분되어야 합니다.\r\n\
 \r\n\
 스타일 형식:\r\n\
 \tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
