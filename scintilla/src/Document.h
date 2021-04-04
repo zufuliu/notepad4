@@ -17,7 +17,7 @@ class LineState;
 class LineAnnotation;
 
 enum class EncodingFamily {
-	efEightBit, efUnicode, efDBCS
+	eightBit, unicode, dbcs
 };
 
 /**
@@ -504,7 +504,7 @@ public:
 
 	bool MatchesWordOptions(bool word, bool wordStart, Sci::Position pos, Sci::Position length) const noexcept;
 	bool HasCaseFolder() const noexcept;
-	void SetCaseFolder(CaseFolder *pcf_) noexcept;
+	void SetCaseFolder(std::unique_ptr<CaseFolder> pcf_) noexcept;
 	Sci::Position FindText(Sci::Position minPos, Sci::Position maxPos, const char *search, int flags, Sci::Position *length);
 	const char *SubstituteByPosition(const char *text, Sci::Position *length);
 	int LineCharacterIndex() const noexcept;

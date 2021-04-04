@@ -16,7 +16,7 @@ constexpr bool IsSpaceOrTab(int ch) noexcept {
 * A point in document space.
 * Uses double for sufficient resolution in large (>20,000,000 line) documents.
 */
-class PointDocument {
+class PointDocument final {
 public:
 	double x;
 	double y;
@@ -30,15 +30,16 @@ public:
 // There are two points for some positions and this enumeration
 // can choose between the end of the first line or subline
 // and the start of the next line or subline.
-enum PointEnd {
-	peDefault = 0x0,
-	peLineEnd = 0x1,
-	peSubLineEnd = 0x2
+enum class PointEnd {
+	start = 0x0,
+	lineEnd = 0x1,
+	subLineEnd = 0x2,
+	endEither = lineEnd | subLineEnd,
 };
 
-class BidiData {
+class BidiData final {
 public:
-	std::vector<FontAlias> stylesFonts;
+	std::vector<std::shared_ptr<Font>> stylesFonts;
 	std::vector<XYPOSITION> widthReprs;
 	void Resize(size_t maxLineLength_);
 };
@@ -256,7 +257,7 @@ public:
 		lengthEachSubdivision = 100
 	};
 	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
-		int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
+		XYPOSITION xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;
 	BreakFinder(BreakFinder &&) = delete;

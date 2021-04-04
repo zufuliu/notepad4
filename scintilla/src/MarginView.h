@@ -32,9 +32,8 @@ public:
 
 	MarginView() noexcept;
 
-	void DropGraphics(bool freeObjects) noexcept;
-	void AllocateGraphics(const ViewStyle &vsDraw);
-	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) const;
+	void DropGraphics() noexcept;
+	void RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw);
 	void SCICALL PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc, PRectangle rcMargin,
 		const EditModel &model, const ViewStyle &vs);
 };

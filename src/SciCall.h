@@ -700,6 +700,10 @@ NP2_inline void SciCall_StyleSetCase(int style, int caseVisible) {
 
 // Caret, selection, and hotspot styles
 
+NP2_inline void SciCall_SetElementColor(int element, COLORREF color) {
+	SciCall(SCI_SETELEMENTCOLOUR, element, color);
+}
+
 NP2_inline void SciCall_SetSelFore(BOOL useSetting, COLORREF fore) {
 	SciCall(SCI_SETSELFORE, useSetting, fore);
 }
@@ -796,11 +800,11 @@ NP2_inline void SciCall_SetMarginCursor(int margin, int cursor) {
 	SciCall(SCI_SETMARGINCURSORN, margin, cursor);
 }
 
-NP2_inline void SciCall_SetFoldMarginColour(BOOL useSetting, COLORREF back) {
+NP2_inline void SciCall_SetFoldMarginColor(BOOL useSetting, COLORREF back) {
 	SciCall(SCI_SETFOLDMARGINCOLOUR, useSetting, back);
 }
 
-NP2_inline void SciCall_SetFoldMarginHiColour(BOOL useSetting, COLORREF fore) {
+NP2_inline void SciCall_SetFoldMarginHiColor(BOOL useSetting, COLORREF fore) {
 	SciCall(SCI_SETFOLDMARGINHICOLOUR, useSetting, fore);
 }
 
@@ -957,6 +961,10 @@ NP2_inline void SciCall_MarkerSetAlpha(int markerNumber, int alpha) {
 	SciCall(SCI_MARKERSETALPHA, markerNumber, alpha);
 }
 
+NP2_inline void SciCall_MarkerSetStrokeWidth(int markerNumber, int hundredths) {
+	SciCall(SCI_MARKERSETSTROKEWIDTH, markerNumber, hundredths);
+}
+
 NP2_inline void SciCall_MarkerEnableHighlight(BOOL enabled) {
 	SciCall(SCI_MARKERENABLEHIGHLIGHT, enabled, 0);
 }
@@ -1005,6 +1013,10 @@ NP2_inline void SciCall_IndicSetAlpha(int indicator, int alpha) {
 
 NP2_inline void SciCall_IndicSetOutlineAlpha(int indicator, int alpha) {
 	SciCall(SCI_INDICSETOUTLINEALPHA, indicator, alpha);
+}
+
+NP2_inline void SciCall_IndicSetStrokeWidth(int indicator, int hundredths) {
+	SciCall(SCI_INDICSETSTROKEWIDTH, indicator, hundredths);
 }
 
 NP2_inline void SciCall_SetIndicatorCurrent(int indicator) {
@@ -1211,7 +1223,7 @@ NP2_inline void SciCall_SetPrintMagnification(int magnification) {
 	SciCall(SCI_SETPRINTMAGNIFICATION, magnification, 0);
 }
 
-NP2_inline void SciCall_SetPrintColourMode(int mode) {
+NP2_inline void SciCall_SetPrintColorMode(int mode) {
 	SciCall(SCI_SETPRINTCOLOURMODE, mode, 0);
 }
 
@@ -1359,8 +1371,8 @@ NP2_inline void SciCall_SetEdgeColumn(int column) {
 	SciCall(SCI_SETEDGECOLUMN, column, 0);
 }
 
-NP2_inline void SciCall_SetEdgeColour(COLORREF edgeColour) {
-	SciCall(SCI_SETEDGECOLOUR, edgeColour, 0);
+NP2_inline void SciCall_SetEdgeColor(COLORREF edgeColor) {
+	SciCall(SCI_SETEDGECOLOUR, edgeColor, 0);
 }
 
 // Lexer

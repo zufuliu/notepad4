@@ -1040,6 +1040,7 @@
     <ClCompile Include="..\..\scintilla\src\EditModel.cxx" />
     <ClCompile Include="..\..\scintilla\src\Editor.cxx" />
     <ClCompile Include="..\..\scintilla\src\EditView.cxx" />
+    <ClCompile Include="..\..\scintilla\src\Geometry.cxx" />
     <ClCompile Include="..\..\scintilla\src\Indicator.cxx" />
     <ClCompile Include="..\..\scintilla\src\KeyMap.cxx" />
     <ClCompile Include="..\..\scintilla\src\LineMarker.cxx" />
@@ -1139,7 +1140,6 @@
     <ClInclude Include="..\..\scintilla\include\ILexer.h" />
     <ClInclude Include="..\..\scintilla\include\ILoader.h" />
     <ClInclude Include="..\..\scintilla\include\LaTeXInput.h" />
-    <ClInclude Include="..\..\scintilla\include\Platform.h" />
     <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\..\scintilla\include\SciLexer.h" />
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />
@@ -1175,13 +1175,14 @@
     <ClInclude Include="..\..\scintilla\src\EditView.h" />
     <ClInclude Include="..\..\scintilla\src\ElapsedPeriod.h" />
     <ClInclude Include="..\..\scintilla\src\FontQuality.h" />
+    <ClInclude Include="..\..\scintilla\src\Geometry.h" />
     <ClInclude Include="..\..\scintilla\src\Indicator.h" />
-    <ClInclude Include="..\..\scintilla\src\IntegerRectangle.h" />
     <ClInclude Include="..\..\scintilla\src\KeyMap.h" />
     <ClInclude Include="..\..\scintilla\src\LineMarker.h" />
     <ClInclude Include="..\..\scintilla\src\MarginView.h" />
     <ClInclude Include="..\..\scintilla\src\Partitioning.h" />
     <ClInclude Include="..\..\scintilla\src\PerLine.h" />
+    <ClInclude Include="..\..\scintilla\src\Platform.h" />
     <ClInclude Include="..\..\scintilla\src\Position.h" />
     <ClInclude Include="..\..\scintilla\src\PositionCache.h" />
     <ClInclude Include="..\..\scintilla\src\RESearch.h" />

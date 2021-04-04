@@ -20,22 +20,6 @@ struct FontSpecification {
 	bool operator<(const FontSpecification &other) const noexcept;
 };
 
-// Just like Font but only has a copy of the FontID so should not delete it
-class FontAlias final : public Font {
-public:
-	FontAlias() noexcept = default;
-	// FontAlias objects can be copy or move constructed but not be assigned
-	FontAlias(const FontAlias &) noexcept;
-	FontAlias(FontAlias &&) noexcept;
-	FontAlias &operator=(const FontAlias &) = delete;
-	FontAlias &operator=(FontAlias &&) = delete;
-#ifndef PLAT_WIN
-	~FontAlias() override;
-#endif
-	void MakeAlias(const Font &fontOrigin) noexcept;
-	void ClearFont() noexcept;
-};
-
 struct FontMeasurements {
 	unsigned int ascent;
 	unsigned int descent;
@@ -54,10 +38,10 @@ struct StylePod {
 	bool eolFilled;
 	bool underline;
 	bool strike;
-	enum ecaseForced : uint8_t {
-		caseMixed, caseUpper, caseLower, caseCamel
+	enum class CaseForce : uint8_t {
+		mixed, upper, lower, camel
 	};
-	ecaseForced caseForce;
+	CaseForce caseForce;
 	bool visible;
 	bool changeable;
 	bool hotspot;
@@ -67,7 +51,7 @@ struct StylePod {
  */
 class Style : public FontSpecification, public FontMeasurements, public StylePod {
 public:
-	FontAlias font;
+	std::shared_ptr<Font> font;
 
 	Style() noexcept;
 	Style(const Style &source) noexcept;
@@ -77,7 +61,7 @@ public:
 	Style &operator=(Style &&) = delete;
 	void ResetDefault(const char *fontName_) noexcept;
 	void ClearTo(const Style &source) noexcept;
-	void Copy(const Font &font_, const FontMeasurements &fm_) noexcept;
+	void Copy(std::shared_ptr<Font> font_, const FontMeasurements &fm_) noexcept;
 	bool IsProtected() const noexcept {
 		return !(changeable && visible);
 	}

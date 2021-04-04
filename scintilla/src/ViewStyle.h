@@ -25,14 +25,14 @@ public:
  */
 class FontRealised : public FontMeasurements {
 public:
-	Font font;
-	FontRealised() noexcept;
+	std::shared_ptr<Font> font;
+	FontRealised() noexcept = default;
 	// FontRealised objects can not be copied.
 	FontRealised(const FontRealised &) = delete;
 	FontRealised(FontRealised &&) = delete;
 	FontRealised &operator=(const FontRealised &) = delete;
 	FontRealised &operator=(FontRealised &&) = delete;
-	virtual ~FontRealised();
+	virtual ~FontRealised() noexcept = default;
 	void Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs, const char *localeName);
 };
 
@@ -160,6 +160,9 @@ public:
 	int ctrlCharPadding; // the padding around control character text blobs
 	int lastSegItalicsOffset; // the offset so as not to clip italic characters at EOLs
 
+	std::map<int, std::optional<ColourAlpha>> elementColours;
+	std::set<int> elementAllowsTranslucent;
+
 	// Wrapping support
 	WrapMode wrapState;
 	int wrapVisualFlags;
@@ -200,6 +203,9 @@ public:
 	ColourDesired WrapColour() const noexcept;
 
 	void AddMultiEdge(uptr_t wParam, sptr_t lParam);
+
+	std::optional<ColourAlpha> ElementColour(int index) const noexcept;
+	bool ElementAllowsTranslucent(int index) const noexcept;
 
 	bool SetWrapState(int wrapState_) noexcept;
 	bool SetWrapVisualFlags(int wrapVisualFlags_) noexcept;

@@ -1081,6 +1081,12 @@ static inline int ScaleStylePixel(int value, int scale, int minValue) {
 	return max_i(value, minValue);
 }
 
+#define CodeFoldingMarker_BoxTree MULTI_STYLE8(			\
+		SC_MARKNUM_FOLDEROPEN, SC_MARKNUM_FOLDER,		\
+		SC_MARKNUM_FOLDERSUB, SC_MARKNUM_FOLDERTAIL,	\
+		SC_MARKNUM_FOLDEREND, SC_MARKNUM_FOLDEROPENMID,	\
+		SC_MARKNUM_FOLDERMIDTAIL, 0)
+
 // styles depend on current DPI or zoom level.
 void Style_OnDPIChanged(PEDITLEXER pLex) {
 	const int scale = g_uCurrentDPI*iZoomLevel;
@@ -1121,6 +1127,15 @@ void Style_OnDPIChanged(PEDITLEXER pLex) {
 		SciCall_SetExtraAscent(0);
 		SciCall_SetExtraDescent(0);
 	}
+
+	// code folding
+	uint64_t iMarkerIDs = CodeFoldingMarker_BoxTree;
+	iValue = ScaleStylePixel(100, scale, 100);
+	do {
+		const int marker = (int)(iMarkerIDs & 0xff);
+		SciCall_MarkerSetStrokeWidth(marker, iValue);
+		iMarkerIDs >>= 8;
+	} while (iMarkerIDs);
 }
 
 void Style_OnStyleThemeChanged(int theme) {
@@ -1408,8 +1423,8 @@ void Style_InitDefaultColor(void) {
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		rgb = backColor;
 	}
-	SciCall_SetFoldMarginColour(TRUE, rgb);
-	SciCall_SetFoldMarginHiColour(TRUE, rgb);
+	SciCall_SetFoldMarginColor(TRUE, rgb);
+	SciCall_SetFoldMarginHiColor(TRUE, rgb);
 
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_LineNumber].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
@@ -1596,10 +1611,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	COLORREF rgb;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
-		SciCall_StyleSetFore(STYLE_DEFAULT, GetSysColor(COLOR_WINDOWTEXT));
+		rgb = GetSysColor(COLOR_WINDOWTEXT);
+		SciCall_StyleSetFore(STYLE_DEFAULT, rgb);
 	}
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
-		SciCall_StyleSetBack(STYLE_DEFAULT, GetSysColor(COLOR_WINDOW));
+		rgb = GetSysColor(COLOR_WINDOW);
+		SciCall_StyleSetBack(STYLE_DEFAULT, rgb);
 	}
 	// lexer default (base style), i.e.: EDITSTYLE_DEFAULT
 	Style_SetStyles(STYLE_DEFAULT, pLexNew->Styles[0].szValue);
@@ -1622,6 +1639,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
 	SciCall_SetSelBack(TRUE, rgb);
+	SciCall_SetElementColor(SC_ELEMENT_LIST_SELECTED_BACK, rgb);
 	if (Style_StrGetForeColor(szValue, &rgb)) {
 		SciCall_SetAdditionalSelBack(rgb);
 	}
@@ -1661,13 +1679,16 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	//! begin Caret
 	const COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
+	COLORREF foreColor = SciCall_StyleGetFore(STYLE_DEFAULT);
+	SciCall_SetElementColor(SC_ELEMENT_LIST, foreColor);
+	SciCall_SetElementColor(SC_ELEMENT_LIST_BACK, backColor);
 	// caret fore
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Caret].szValue;
 	if (!Style_StrGetForeColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_WINDOWTEXT);
 	}
 	if (!VerifyContrast(rgb, backColor)) {
-		rgb = SciCall_StyleGetFore(STYLE_DEFAULT);
+		rgb = foreColor;
 	}
 	SciCall_SetCaretFore(rgb);
 	// additional caret fore
@@ -1691,9 +1712,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// update styles that use pixel
 	Style_OnDPIChanged(pLexNew);
 
-	// set folding style; braces are for scoping only
+	// set code folding style; braces are for scoping only
 	{
-		COLORREF foreColor;
 		COLORREF fillColor;
 		COLORREF highlightColor;
 
@@ -1716,10 +1736,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		if (!Style_StrGetBackColor(szValue, &rgb)) {
 			rgb = backColor;
 		}
-		SciCall_SetFoldMarginColour(TRUE, rgb);
-		SciCall_SetFoldMarginHiColour(TRUE, rgb);
+		SciCall_SetFoldMarginColor(TRUE, rgb);
+		SciCall_SetFoldMarginHiColor(TRUE, rgb);
 #if 0	// use gray fold color
-		COLORREF foreColor = SciCall_StyleGetFore(STYLE_DEFAULT);
 		// Marker fore/back colors
 		// Set marker color to the average of foreColor and backColor
 		foreColor =	(((foreColor & 0xFF0000) + (backColor & 0xFF0000)) >> 1 & 0xFF0000) |
@@ -1732,10 +1751,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		}
 #endif
 
-		uint64_t iMarkerIDs = MULTI_STYLE8(SC_MARKNUM_FOLDEROPEN, SC_MARKNUM_FOLDER,
-			SC_MARKNUM_FOLDERSUB, SC_MARKNUM_FOLDERTAIL,
-			SC_MARKNUM_FOLDEREND, SC_MARKNUM_FOLDEROPENMID,
-			SC_MARKNUM_FOLDERMIDTAIL, 0);
+		uint64_t iMarkerIDs = CodeFoldingMarker_BoxTree;
 		do {
 			const int marker = (int)(iMarkerIDs & 0xff);
 			SciCall_MarkerSetBack(marker, foreColor);
@@ -3085,7 +3101,7 @@ void Style_SetLongLineColors(void) {
 		rgb = GetSysColor(COLOR_3DLIGHT);
 	}
 
-	SciCall_SetEdgeColour(rgb);
+	SciCall_SetEdgeColor(rgb);
 }
 
 //=============================================================================
