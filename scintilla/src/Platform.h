@@ -74,54 +74,7 @@
 
 #endif
 
-// use __vectorcall to pass float/double arguments such as Point and PRectangle.
-#if defined(_WIN64) && defined(NDEBUG)
-	#if defined(_MSC_BUILD)
-		#define SCICALL __vectorcall
-	#elif defined(__INTEL_COMPILER_BUILD_DATE)
-		//#define SCICALL __regcall
-		#define SCICALL
-	#else
-		#define SCICALL
-	#endif
-#else
-	#define SCICALL
-#endif
-
-#if defined(__GNUC__) || defined(__clang__)
-#define NP2_unreachable()	__builtin_unreachable()
-#else
-#define NP2_unreachable()	__assume(0)
-#endif
-
 namespace Scintilla {
-
-// official Scintilla use dynamic_cast, which requires RTTI.
-// When RTTI is enabled, MSVC defines _CPPRTTI,
-// GCC/Clang defines __cpp_rtti (similar to C++20 feature testing macros).
-#if defined(NDEBUG) && !((defined(_MSC_VER) && defined(_CPPRTTI)) || (!defined(_MSC_VER) && defined(__cpp_rtti)))
-#define USE_RTTI	0
-#else
-#define USE_RTTI	1
-#endif
-
-template<typename DerivedPointer, class Base>
-inline DerivedPointer down_cast(Base *ptr) noexcept {
-#if USE_RTTI
-	return dynamic_cast<DerivedPointer>(ptr);
-#else
-	return static_cast<DerivedPointer>(ptr);
-#endif
-}
-
-template<typename DerivedReference, class Base>
-inline DerivedReference down_cast(Base &ref) noexcept {
-#if USE_RTTI
-	return dynamic_cast<DerivedReference>(ref);
-#else
-	return static_cast<DerivedReference>(ref);
-#endif
-}
 
 // Underlying the implementation of the platform classes are platform specific types.
 // Sometimes these need to be passed around by client code so they are defined here
@@ -199,7 +152,7 @@ public:
 
 class IScreenLineLayout {
 public:
-	virtual ~IScreenLineLayout() = default;
+	virtual ~IScreenLineLayout() noexcept = default;
 	virtual size_t PositionFromX(XYPOSITION xDistance, bool charPosition) = 0;
 	virtual XYPOSITION XFromPosition(size_t caretPosition) noexcept = 0;
 	virtual std::vector<Interval> FindRangeIntervals(size_t start, size_t end) = 0;
@@ -312,7 +265,7 @@ public:
 	}
 	Window &operator=(const Window &) = delete;
 	Window &operator=(Window &&) = delete;
-	virtual ~Window() = default;
+	virtual ~Window() noexcept = default;
 	WindowID GetID() const noexcept {
 		return wid;
 	}
@@ -364,8 +317,8 @@ struct ListOptions final {
 
 class ListBox : public Window {
 public:
-	ListBox() noexcept;
-	~ListBox() override;
+	ListBox() noexcept = default;
+	~ListBox() noexcept override = default;
 	static std::unique_ptr<ListBox> Allocate();
 
 	virtual void SetFont(const Font *font) noexcept = 0;

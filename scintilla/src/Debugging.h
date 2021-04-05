@@ -7,7 +7,40 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
+#if defined(__GNUC__) || defined(__clang__)
+#define NP2_unreachable()	__builtin_unreachable()
+#else
+#define NP2_unreachable()	__assume(0)
+#endif
+
 namespace Scintilla {
+
+// official Scintilla use dynamic_cast, which requires RTTI.
+// When RTTI is enabled, MSVC defines _CPPRTTI,
+// GCC/Clang defines __cpp_rtti (similar to C++20 feature testing macros).
+#if defined(NDEBUG) && !((defined(_MSC_VER) && defined(_CPPRTTI)) || (!defined(_MSC_VER) && defined(__cpp_rtti)))
+#define USE_RTTI	0
+#else
+#define USE_RTTI	1
+#endif
+
+template<typename DerivedPointer, class Base>
+inline DerivedPointer down_cast(Base *ptr) noexcept {
+#if USE_RTTI
+	return dynamic_cast<DerivedPointer>(ptr);
+#else
+	return static_cast<DerivedPointer>(ptr);
+#endif
+}
+
+template<typename DerivedReference, class Base>
+inline DerivedReference down_cast(Base &ref) noexcept {
+#if USE_RTTI
+	return dynamic_cast<DerivedReference>(ref);
+#else
+	return static_cast<DerivedReference>(ref);
+#endif
+}
 
 #if defined(__clang__)
 	#if __has_feature(attribute_analyzer_noreturn)

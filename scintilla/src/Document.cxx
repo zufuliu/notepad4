@@ -28,8 +28,6 @@
 #endif
 
 #include "Debugging.h"
-#include "Geometry.h"
-#include "Platform.h"
 
 #include "ILoader.h"
 #include "ILexer.h"

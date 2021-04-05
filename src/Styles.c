@@ -1081,11 +1081,11 @@ static inline int ScaleStylePixel(int value, int scale, int minValue) {
 	return max_i(value, minValue);
 }
 
-#define CodeFoldingMarker_BoxTree MULTI_STYLE8(			\
-		SC_MARKNUM_FOLDEROPEN, SC_MARKNUM_FOLDER,		\
-		SC_MARKNUM_FOLDERSUB, SC_MARKNUM_FOLDERTAIL,	\
-		SC_MARKNUM_FOLDEREND, SC_MARKNUM_FOLDEROPENMID,	\
-		SC_MARKNUM_FOLDERMIDTAIL, 0)
+#define CodeFoldingMarkerList	MULTI_STYLE8(	\
+	SC_MARKNUM_FOLDEROPEN, SC_MARKNUM_FOLDER,		\
+	SC_MARKNUM_FOLDERSUB, SC_MARKNUM_FOLDERTAIL,	\
+	SC_MARKNUM_FOLDEREND, SC_MARKNUM_FOLDEROPENMID,	\
+	SC_MARKNUM_FOLDERMIDTAIL, 0)
 
 // styles depend on current DPI or zoom level.
 void Style_OnDPIChanged(PEDITLEXER pLex) {
@@ -1129,8 +1129,8 @@ void Style_OnDPIChanged(PEDITLEXER pLex) {
 	}
 
 	// code folding
-	uint64_t iMarkerIDs = CodeFoldingMarker_BoxTree;
 	iValue = ScaleStylePixel(100, scale, 100);
+	uint64_t iMarkerIDs = CodeFoldingMarkerList;
 	do {
 		const int marker = (int)(iMarkerIDs & 0xff);
 		SciCall_MarkerSetStrokeWidth(marker, iValue);
@@ -1751,7 +1751,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		}
 #endif
 
-		uint64_t iMarkerIDs = CodeFoldingMarker_BoxTree;
+		uint64_t iMarkerIDs = CodeFoldingMarkerList;
 		do {
 			const int marker = (int)(iMarkerIDs & 0xff);
 			SciCall_MarkerSetBack(marker, foreColor);
