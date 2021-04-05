@@ -1518,47 +1518,8 @@ unsigned int SciMessageFromEM(unsigned int iMessage) noexcept {
 
 }
 
-namespace Scintilla {
-
-UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept {
-	// UTF-8 and DBCS ANSI code pages
-	if (documentCodePage) {
-		return documentCodePage;
-	}
-	// SBCS code pages: zero / CP_ACP
-	switch (characterSet) {
-	case SC_CHARSET_ANSI: return 1252;
-	//case SC_CHARSET_DEFAULT: return documentCodePage ? documentCodePage : 1252;
-	case SC_CHARSET_DEFAULT: return documentCodePage;
-	case SC_CHARSET_BALTIC: return 1257;
-	case SC_CHARSET_CHINESEBIG5: return 950;
-	case SC_CHARSET_EASTEUROPE: return 1250;
-	case SC_CHARSET_GB2312: return 936;
-	case SC_CHARSET_GREEK: return 1253;
-	case SC_CHARSET_HANGUL: return 949;
-	case SC_CHARSET_MAC: return 10000;
-	case SC_CHARSET_OEM: return 437;
-	case SC_CHARSET_RUSSIAN: return 1251;
-	case SC_CHARSET_SHIFTJIS: return 932;
-	case SC_CHARSET_TURKISH: return 1254;
-	case SC_CHARSET_JOHAB: return 1361;
-	case SC_CHARSET_HEBREW: return 1255;
-	case SC_CHARSET_ARABIC: return 1256;
-	case SC_CHARSET_VIETNAMESE: return 1258;
-	case SC_CHARSET_THAI: return 874;
-	case SC_CHARSET_8859_15: return 28605;
-		// Not supported
-	case SC_CHARSET_CYRILLIC: return documentCodePage;
-	case SC_CHARSET_SYMBOL: return documentCodePage;
-	}
-	return documentCodePage;
-}
-
-}
-
 UINT ScintillaWin::CodePageOfDocument() const noexcept {
 	return pdoc->dbcsCodePage; // see SCI_GETCODEPAGE in Editor.cxx
-	//return CodePageFromCharSet(vs.styles[STYLE_DEFAULT].characterSet, pdoc->dbcsCodePage);
 }
 
 std::string ScintillaWin::EncodeWString(std::wstring_view wsv) {
@@ -3327,7 +3288,7 @@ void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &se
 		} else {
 			// Not Unicode mode
 			// Convert to Unicode using the current Scintilla code page
-			const UINT cpSrc = CodePageFromCharSet(selectedText.characterSet, selectedText.codePage);
+			const UINT cpSrc = selectedText.codePage;
 			const size_t uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
 			gmUnicode.Allocate(2 * uLen);
 			if (gmUnicode) {

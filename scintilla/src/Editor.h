@@ -67,24 +67,21 @@ public:
 class SelectionText {
 	std::string s;
 public:
-	bool rectangular;
-	bool lineCopy;
+	bool rectangular = false;
+	bool lineCopy = false;
 	bool asBinary = false;
-	int codePage;
-	int characterSet;
-	SelectionText() noexcept : rectangular(false), lineCopy(false), codePage(0), characterSet(0) {}
+	int codePage = 0;
+	SelectionText() noexcept = default;
 	void Clear() noexcept {
 		s.clear();
 		rectangular = false;
 		lineCopy = false;
 		asBinary = false;
 		codePage = 0;
-		characterSet = 0;
 	}
-	void Copy(const std::string &s_, int codePage_, int characterSet_, bool rectangular_, bool lineCopy_) {
+	void Copy(const std::string &s_, int codePage_, bool rectangular_, bool lineCopy_) {
 		s = s_;
 		codePage = codePage_;
-		characterSet = characterSet_;
 		rectangular = rectangular_;
 		lineCopy = lineCopy_;
 		if (!asBinary) {
