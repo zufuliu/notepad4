@@ -4303,8 +4303,7 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 			const Sci::Position end = pdoc->LineStart(currentLine + 1);
 
 			std::string text = RangeText(start, end);
-			ss->Copy(text, pdoc->dbcsCodePage,
-				vs.styles[STYLE_DEFAULT].characterSet, false, true);
+			ss->Copy(text, pdoc->dbcsCodePage, false, true);
 		}
 	} else {
 		std::string text;
@@ -4320,8 +4319,7 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 					text.push_back('\n');
 			}
 		}
-		ss->Copy(text, pdoc->dbcsCodePage,
-			vs.styles[STYLE_DEFAULT].characterSet, sel.IsRectangular(), sel.selType == Selection::SelTypes::lines);
+		ss->Copy(text, pdoc->dbcsCodePage, sel.IsRectangular(), sel.selType == Selection::SelTypes::lines);
 	}
 }
 
@@ -4330,15 +4328,13 @@ void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool l
 	end = pdoc->ClampPositionIntoDocument(end);
 	SelectionText selectedText;
 	std::string text = RangeText(start, end);
-	selectedText.Copy(text,
-		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false, lineCopy);
+	selectedText.Copy(text, pdoc->dbcsCodePage, false, lineCopy);
 	CopyToClipboard(selectedText);
 }
 
 void Editor::CopyText(size_t length, const char *text) {
 	SelectionText selectedText;
-	selectedText.Copy(std::string(text, length),
-		pdoc->dbcsCodePage, vs.styles[STYLE_DEFAULT].characterSet, false, false);
+	selectedText.Copy(std::string(text, length), pdoc->dbcsCodePage, false, false);
 	CopyToClipboard(selectedText);
 }
 

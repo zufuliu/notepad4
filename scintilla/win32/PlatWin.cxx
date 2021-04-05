@@ -146,8 +146,6 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 
 namespace Scintilla {
 
-UINT CodePageFromCharSet(DWORD characterSet, UINT documentCodePage) noexcept;
-
 #if defined(USE_D2D)
 IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
@@ -271,24 +269,21 @@ struct FontWin final : public Font {
 	IDWriteTextFormat *pTextFormat = nullptr;
 #endif
 	int extraFontFlag;
-	int characterSet;
 	FLOAT yAscent = 2.0f;
 	FLOAT yDescent = 1.0f;
 	FLOAT yInternalLeading = 0.0f;
-	FontWin(const LOGFONTW &lf_, HFONT hfont_, int extraFontFlag_, int characterSet_) noexcept :
+	FontWin(const LOGFONTW &lf_, HFONT hfont_, int extraFontFlag_) noexcept :
 		lf(lf_), hfont(hfont_),
-		extraFontFlag(extraFontFlag_), characterSet(characterSet_) {}
+		extraFontFlag(extraFontFlag_) {}
 #if defined(USE_D2D)
 	FontWin(const LOGFONTW &lf_, IDWriteTextFormat *pTextFormat_,
 		int extraFontFlag_,
-		int characterSet_,
 		FLOAT yAscent_,
 		FLOAT yDescent_,
 		FLOAT yInternalLeading_) noexcept :
 		lf(lf_),
 		pTextFormat(pTextFormat_),
 		extraFontFlag(extraFontFlag_),
-		characterSet(characterSet_),
 		yAscent(yAscent_),
 		yDescent(yDescent_),
 		yInternalLeading(yInternalLeading_) {}
@@ -422,7 +417,7 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 	SetLogFont(lf, fp.faceName, fp.characterSet, fp.size, fp.weight, fp.italic, fp.extraFontFlag);
 	if (fp.technology == SCWIN_TECH_GDI) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
-		return std::make_shared<FontGDI>(lf, hfont, fp.extraFontFlag, fp.characterSet);
+		return std::make_shared<FontGDI>(lf, hfont, fp.extraFontFlag);
 	} else {
 #if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
@@ -465,7 +460,7 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 				ReleaseUnknown(pTextLayout);
 				pTextFormat->SetLineSpacing(DWRITE_LINE_SPACING_METHOD_UNIFORM, lineMetrics[0].height, lineMetrics[0].baseline);
 			}
-			return std::make_shared<FontDirectWrite>(lf, pTextFormat, fp.extraFontFlag, fp.characterSet, yAscent, yDescent, yInternalLeading);
+			return std::make_shared<FontDirectWrite>(lf, pTextFormat, fp.extraFontFlag, yAscent, yDescent, yInternalLeading);
 		}
 #endif
 	}
@@ -1552,9 +1547,6 @@ void SurfaceD2D::SetFont(const Font *font_) noexcept {
 	yDescent = pfm->yDescent;
 	yInternalLeading = pfm->yInternalLeading;
 	codePageText = mode.codePage;
-	if (mode.codePage != SC_CP_UTF8 && pfm->characterSet) {
-		codePageText = Scintilla::CodePageFromCharSet(pfm->characterSet, mode.codePage);
-	}
 	if (pRenderTarget) {
 		const D2D1_TEXT_ANTIALIAS_MODE aaMode = DWriteMapFontQuality(pfm->extraFontFlag);
 
