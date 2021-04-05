@@ -97,22 +97,22 @@ constexpr PRectangle PRectangleFromRect(RECT rc) noexcept {
 	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
 }
 
-#if 0//NP2_USE_SSE2
-static_assert(sizeof(PRectangle) == sizeof(__m128));
+#if NP2_USE_AVX2
+static_assert(sizeof(PRectangle) == sizeof(__m256d));
 static_assert(sizeof(RECT) == sizeof(__m128i));
 
 inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	PRectangle prc;
 	__m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
-	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
-	_mm_storeu_ps((float *)(&prc), f32x4);
+	__m256d f64x4 = _mm256_cvtepi32_pd(i32x4);
+	_mm256_storeu_pd((double *)(&prc), f64x4);
 	return prc;
 }
 
 inline RECT RectFromPRectangleEx(const PRectangle *prc) noexcept {
 	RECT rc;
-	__m128 f32x4 = _mm_load_ps((float *)(prc));
-	__m128i i32x4 = _mm_cvtps_epi32(f32x4);
+	__m256d f64x4 = _mm256_load_pd((double *)(prc));
+	__m128i i32x4 = _mm256_cvttpd_epi32(f64x4);
 	_mm_storeu_si128((__m128i *)(&rc), i32x4);
 	return rc;
 }
@@ -142,6 +142,36 @@ constexpr POINT POINTFromPoint(Point pt) noexcept {
 constexpr Point PointFromPOINT(POINT pt) noexcept {
 	return Point::FromInts(pt.x, pt.y);
 }
+
+#if NP2_USE_SSE2
+static_assert(sizeof(Point) == sizeof(__m128d));
+static_assert(sizeof(POINT) == sizeof(__int64));
+
+inline POINT POINTFromPointEx(Point point) noexcept {
+	POINT pt;
+	__m128d f64x2 = _mm_load_pd((double *)(&point));
+	__m128i i32x2 = _mm_cvtpd_epi32(f64x2);
+	_mm_storeu_si64(&pt, i32x2);
+	return pt;
+}
+
+inline Point PointFromPOINTEx(POINT point) noexcept {
+	Point pt;
+	__m128i i32x2 = _mm_loadu_si64(&point);
+	__m128d f64x2 = _mm_cvtepi32_pd(i32x2);
+	_mm_storeu_pd((double *)(&pt), f64x2);
+	return pt;
+}
+
+#else
+constexpr POINT POINTFromPointEx(Point point) noexcept {
+	return POINTFromPoint(point);
+}
+
+constexpr Point PointFromPOINTEx(POINT point) noexcept {
+	return PointFromPOINT(point);
+}
+#endif
 
 constexpr HWND HwndFromWindowID(WindowID wid) noexcept {
 	return static_cast<HWND>(wid);

@@ -2232,7 +2232,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 				POINT pt;
 				if (::GetCursorPos(&pt)) {
 					::ScreenToClient(MainHWND(), &pt);
-					DisplayCursor(ContextCursor(PointFromPOINT(pt)));
+					DisplayCursor(ContextCursor(PointFromPOINTEx(pt)));
 				}
 				return TRUE;
 			}
@@ -3148,7 +3148,7 @@ void ScintillaWin::ImeStartComposition() {
 		const Point pos = PointMainCaret();
 		COMPOSITIONFORM CompForm;
 		CompForm.dwStyle = CFS_POINT;
-		CompForm.ptCurrentPos = POINTFromPoint(pos);
+		CompForm.ptCurrentPos = POINTFromPointEx(pos);
 
 		::ImmSetCompositionWindow(imc.hIMC, &CompForm);
 
@@ -3984,7 +3984,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 			} else if ((iMessage == WM_NCLBUTTONDOWN) || (iMessage == WM_NCLBUTTONDBLCLK)) {
 				POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 				ScreenToClient(hWnd, &pt);
-				sciThis->ct.MouseClick(PointFromPOINT(pt));
+				sciThis->ct.MouseClick(PointFromPOINTEx(pt));
 				sciThis->CallTipClick();
 				return 0;
 			} else if (iMessage == WM_LBUTTONDOWN) {

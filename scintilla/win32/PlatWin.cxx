@@ -758,7 +758,7 @@ void SurfaceGDI::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 	}
 	PenColour(stroke.colour, stroke.width);
 	std::vector<POINT> outline;
-	std::transform(pts, pts + npts, std::back_inserter(outline), POINTFromPoint);
+	std::transform(pts, pts + npts, std::back_inserter(outline), POINTFromPointEx);
 	::Polyline(hdc, outline.data(), static_cast<int>(npts));
 }
 
@@ -766,7 +766,7 @@ void SurfaceGDI::Polygon(const Point *pts, size_t npts, FillStroke fillStroke) {
 	PenColour(fillStroke.stroke.colour.GetColour(), fillStroke.stroke.width);
 	BrushColour(fillStroke.fill.colour.GetColour());
 	std::vector<POINT> outline;
-	std::transform(pts, pts + npts, std::back_inserter(outline), POINTFromPoint);
+	std::transform(pts, pts + npts, std::back_inserter(outline), POINTFromPointEx);
 	::Polygon(hdc, outline.data(), static_cast<int>(npts));
 }
 
@@ -785,7 +785,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, Fill fill) noexcept {
 	if (fill.colour.IsOpaque()) {
 		// Using ExtTextOut rather than a FillRect ensures that no dithering occurs.
 		// There is no need to allocate a brush either.
-		const RECT rcw = RectFromPRectangle(rc);
+		const RECT rcw = RectFromPRectangleEx(rc);
 		::SetBkColor(hdc, fill.colour.GetColour().AsInteger());
 		::ExtTextOut(hdc, rcw.left, rcw.top, ETO_OPAQUE, &rcw, TEXT(""), 0, nullptr);
 	} else {
@@ -804,7 +804,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, Surface &surfacePattern) noexcept 
 	} else {	// Something is wrong so display in red
 		br = ::CreateSolidBrush(RGB(0xff, 0, 0));
 	}
-	const RECT rcw = RectFromPRectangle(rc);
+	const RECT rcw = RectFromPRectangleEx(rc);
 	::FillRect(hdc, &rcw, br);
 	::DeleteObject(br);
 }
@@ -1177,8 +1177,8 @@ XYPOSITION SurfaceGDI::WidthText(const Font *font_, std::string_view text) {
 
 void SurfaceGDI::DrawTextCommonUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
-	const RECT rcw = RectFromPRectangle(rc);
-	const int x = static_cast<int>(rc.left);
+	const RECT rcw = RectFromPRectangleEx(rc);
+	const int x = static_cast<int>(rcw.left);
 	const int yBaseInt = static_cast<int>(ybase);
 
 	const TextWide tbuf(text, SC_CP_UTF8);
@@ -1317,9 +1317,45 @@ constexpr D2D1_RECT_F RectangleFromPRectangle(PRectangle rc) noexcept {
 	};
 }
 
+#if NP2_USE_AVX2
+static_assert(sizeof(PRectangle) == sizeof(__m256d));
+static_assert(sizeof(D2D1_RECT_F) == sizeof(__m128));
+
+inline D2D1_RECT_F RectangleFromPRectangleEx(PRectangle prc) noexcept {
+	D2D1_RECT_F rc;
+	__m256d f64x4 = _mm256_load_pd((double *)(&prc));
+	__m128 f32x4 = _mm256_cvtpd_ps(f64x4);
+	_mm_storeu_ps((float *)(&rc), f32x4);
+	return rc;
+}
+
+#else
+constexpr D2D1_RECT_F RectangleFromPRectangleEx(PRectangle prc) noexcept {
+	return RectangleFromPRectangle(prc);
+}
+#endif
+
 constexpr D2D1_POINT_2F DPointFromPoint(Point point) noexcept {
 	return { static_cast<FLOAT>(point.x), static_cast<FLOAT>(point.y) };
 }
+
+#if NP2_USE_SSE2
+static_assert(sizeof(Point) == sizeof(__m128d));
+static_assert(sizeof(D2D1_POINT_2F) == sizeof(__m64));
+
+inline D2D1_POINT_2F DPointFromPointEx(Point point) noexcept {
+	D2D1_POINT_2F pt;
+	__m128d f64x2 = _mm_load_pd((double *)(&point));
+	__m128 f32x2 = _mm_cvtpd_ps(f64x2);
+	_mm_storel_pi((__m64 *)(&pt), f32x2);
+	return pt;
+}
+
+#else
+constexpr D2D1_POINT_2F DPointFromPointEx(Point point) noexcept {
+	return DPointFromPoint(point);
+}
+#endif
 
 constexpr const int SupportsD2D[] = {
 	SC_SUPPORTS_LINE_DRAWS_FINAL,
@@ -1590,8 +1626,8 @@ void SurfaceD2D::LineDraw(Point start, Point end, Stroke stroke) {
 		strokeProps, nullptr, 0, &pStrokeStyle);
 	if (SUCCEEDED(hr)) {
 		pRenderTarget->DrawLine(
-			DPointFromPoint(start),
-			DPointFromPoint(end), pBrush, stroke.WidthF(), pStrokeStyle);
+			DPointFromPointEx(start),
+			DPointFromPointEx(end), pBrush, stroke.WidthF(), pStrokeStyle);
 	}
 
 	ReleaseUnknown(pStrokeStyle);
@@ -1604,9 +1640,9 @@ ID2D1PathGeometry *SurfaceD2D::Geometry(const Point *pts, size_t npts, D2D1_FIGU
 		ID2D1GeometrySink *sink = nullptr;
 		hr = geometry->Open(&sink);
 		if (SUCCEEDED(hr) && sink) {
-			sink->BeginFigure(DPointFromPoint(pts[0]), figureBegin);
+			sink->BeginFigure(DPointFromPointEx(pts[0]), figureBegin);
 			for (size_t i = 1; i < npts; i++) {
-				sink->AddLine(DPointFromPoint(pts[i]));
+				sink->AddLine(DPointFromPointEx(pts[i]));
 			}
 			sink->EndFigure((figureBegin == D2D1_FIGURE_BEGIN_FILLED) ?
 				D2D1_FIGURE_END_CLOSED : D2D1_FIGURE_END_OPEN);
@@ -1691,7 +1727,7 @@ void SurfaceD2D::RectangleFrame(PRectangle rc, Stroke stroke) {
 void SurfaceD2D::FillRectangle(PRectangle rc, Fill fill) {
 	if (pRenderTarget) {
 		D2DPenColourAlpha(fill.colour);
-		const D2D1_RECT_F rectangle = RectangleFromPRectangle(rc);
+		const D2D1_RECT_F rectangle = RectangleFromPRectangleEx(rc);
 		pRenderTarget->FillRectangle(&rectangle, pBrush);
 	}
 }
@@ -1714,7 +1750,7 @@ void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
 		hr = pRenderTarget->CreateBitmapBrush(pBitmap, brushProperties, &pBitmapBrush);
 		ReleaseUnknown(pBitmap);
 		if (SUCCEEDED(hr) && pBitmapBrush) {
-			pRenderTarget->FillRectangle(RectangleFromPRectangle(rc), pBitmapBrush);
+			pRenderTarget->FillRectangle(RectangleFromPRectangleEx(rc), pBitmapBrush);
 			ReleaseUnknown(pBitmapBrush);
 		}
 	}
@@ -1821,7 +1857,7 @@ void SurfaceD2D::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 		const HRESULT hr = pRenderTarget->CreateBitmap(size, image.data(),
 			width * 4, &props, &bitmap);
 		if (SUCCEEDED(hr)) {
-			const D2D1_RECT_F rcDestination = RectangleFromPRectangle(rc);
+			const D2D1_RECT_F rcDestination = RectangleFromPRectangleEx(rc);
 			pRenderTarget->DrawBitmap(bitmap, rcDestination);
 			ReleaseUnknown(bitmap);
 		}
@@ -3056,9 +3092,9 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 		this);
 
 	dpi = GetWindowDPI(hwndParent);
-	POINT locationw = POINTFromPoint(location);
+	POINT locationw = POINTFromPointEx(location);
 	::MapWindowPoints(hwndParent, {}, &locationw, 1);
-	location = PointFromPOINT(locationw);
+	location = PointFromPOINTEx(locationw);
 }
 
 void ListBoxX::SetFont(const Font *font) noexcept {
