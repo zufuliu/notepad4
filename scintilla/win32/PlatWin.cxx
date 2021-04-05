@@ -950,7 +950,7 @@ constexpr SIZE SizeOfRect(RECT rc) noexcept {
 	return { rc.right - rc.left, rc.bottom - rc.top };
 }
 
-constexpr BLENDFUNCTION mergeAlpha = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+constexpr const BLENDFUNCTION mergeAlpha = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
 
 }
 
@@ -2079,7 +2079,7 @@ public:
 	ScreenLineLayout(ScreenLineLayout &&) = delete;
 	ScreenLineLayout &operator=(const ScreenLineLayout &) = delete;
 	ScreenLineLayout &operator=(ScreenLineLayout &&) = delete;
-	~ScreenLineLayout() override;
+	~ScreenLineLayout() noexcept override;
 	size_t PositionFromX(XYPOSITION xDistance, bool charPosition) noexcept override;
 	XYPOSITION XFromPosition(size_t caretPosition) noexcept override;
 	std::vector<Interval> FindRangeIntervals(size_t start, size_t end) override;
@@ -2207,7 +2207,7 @@ ScreenLineLayout::ScreenLineLayout(const IScreenLine *screenLine) {
 	FillTextLayoutFormats(screenLine, textLayout, blobs);
 }
 
-ScreenLineLayout::~ScreenLineLayout() {
+ScreenLineLayout::~ScreenLineLayout() noexcept {
 	ReleaseUnknown(textLayout);
 }
 
@@ -2940,10 +2940,6 @@ static constexpr const WCHAR *ListBoxX_ClassName = L"ListBoxX";
 #define LISTBOXX_USE_BORDER			1
 #define LISTBOXX_USE_FAKE_FRAME		0
 
-ListBox::ListBox() noexcept = default;
-
-ListBox::~ListBox() = default;
-
 class ListBoxX final : public ListBox {
 	int lineHeight = 10;
 	HFONT fontCopy{};
@@ -2996,7 +2992,7 @@ class ListBoxX final : public ListBox {
 
 public:
 	ListBoxX() noexcept = default;
-	~ListBoxX() override {
+	~ListBoxX() noexcept override {
 		if (fontCopy) {
 			::DeleteObject(fontCopy);
 			fontCopy = nullptr;

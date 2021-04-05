@@ -6,6 +6,20 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
+// use __vectorcall to pass float/double arguments such as Point and PRectangle.
+#if defined(_WIN64) && defined(NDEBUG)
+	#if defined(_MSC_BUILD)
+		#define SCICALL __vectorcall
+	#elif defined(__INTEL_COMPILER_BUILD_DATE)
+		//#define SCICALL __regcall
+		#define SCICALL
+	#else
+		#define SCICALL
+	#endif
+#else
+	#define SCICALL
+#endif
+
 namespace Scintilla {
 
 typedef double XYPOSITION;
