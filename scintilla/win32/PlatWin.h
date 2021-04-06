@@ -109,16 +109,12 @@ inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	return prc;
 }
 
-inline RECT RectFromPRectangleEx(const PRectangle *prc) noexcept {
+inline RECT RectFromPRectangleEx(PRectangle prc) noexcept {
 	RECT rc;
-	__m256d f64x4 = _mm256_load_pd((double *)(prc));
+	__m256d f64x4 = _mm256_load_pd((double *)(&prc));
 	__m128i i32x4 = _mm256_cvttpd_epi32(f64x4);
 	_mm_storeu_si128((__m128i *)(&rc), i32x4);
 	return rc;
-}
-
-inline RECT RectFromPRectangleEx(PRectangle prc) noexcept {
-	return RectFromPRectangleEx(&prc);
 }
 
 #else
@@ -150,7 +146,7 @@ static_assert(sizeof(POINT) == sizeof(__int64));
 inline POINT POINTFromPointEx(Point point) noexcept {
 	POINT pt;
 	__m128d f64x2 = _mm_load_pd((double *)(&point));
-	__m128i i32x2 = _mm_cvtpd_epi32(f64x2);
+	__m128i i32x2 = _mm_cvttpd_epi32(f64x2);
 	_mm_storeu_si64(&pt, i32x2);
 	return pt;
 }

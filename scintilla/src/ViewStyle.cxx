@@ -255,10 +255,10 @@ void ViewStyle::Init(size_t stylesSize_) {
 	CalculateMarginWidthAndMask();
 	textStart = marginInside ? fixedColumnWidth : leftMarginWidth;
 	zoomLevel = 100;
-	viewWhitespace = wsInvisible;
-	tabDrawMode = tdLongArrow;
+	viewWhitespace = WhiteSpace::invisible;
+	tabDrawMode = TabDrawMode::longArrow;
 	whitespaceSize = 1;
-	viewIndentationGuides = ivNone;
+	viewIndentationGuides = IndentView::none;
 	viewEOL = false;
 	extraFontFlag = 0;
 	extraAscent = 0;
@@ -503,13 +503,13 @@ bool ViewStyle::SelectionBackgroundDrawn() const noexcept {
 }
 
 bool ViewStyle::WhitespaceBackgroundDrawn() const noexcept {
-	return (viewWhitespace != wsInvisible) && (whitespaceColours.back.isSet);
+	return (viewWhitespace != WhiteSpace::invisible) && (whitespaceColours.back.isSet);
 }
 
 bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
-	return (!inIndent && viewWhitespace == wsVisibleAfterIndent) ||
-		(inIndent && viewWhitespace == wsVisibleOnlyInIndent) ||
-		viewWhitespace == wsVisibleAlways;
+	return (!inIndent && viewWhitespace == WhiteSpace::visibleAfterIndent) ||
+		(inIndent && viewWhitespace == WhiteSpace::visibleOnlyInIndent) ||
+		viewWhitespace == WhiteSpace::visibleAlways;
 }
 
 ColourDesired ViewStyle::WrapColour() const noexcept {

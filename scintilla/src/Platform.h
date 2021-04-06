@@ -138,6 +138,7 @@ public:
 
 class IScreenLine {
 public:
+	virtual ~IScreenLine() noexcept = default;
 	virtual std::string_view Text() const noexcept = 0;
 	virtual size_t Length() const noexcept = 0;
 	virtual size_t RepresentationCount() const = 0;
@@ -196,7 +197,7 @@ public:
 	};
 
 	virtual void Release() noexcept = 0;
-	virtual int Supports(int feature) const noexcept = 0;
+	virtual bool Supports(int feature) const noexcept = 0;
 	virtual bool Initialised() const noexcept = 0;
 	virtual int LogPixelsY() const noexcept = 0;
 	virtual int PixelDivisions() const noexcept = 0;

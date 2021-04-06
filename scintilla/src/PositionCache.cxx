@@ -308,7 +308,7 @@ ScreenLine::ScreenLine(
 	tabWidth(vs.tabWidth),
 	tabWidthMinimumPixels(tabWidthMinimumPixels_) {}
 
-ScreenLine::~ScreenLine() = default;
+ScreenLine::~ScreenLine() noexcept = default;
 
 std::string_view ScreenLine::Text() const noexcept {
 	return std::string_view(&ll->chars[start], len);
@@ -354,7 +354,7 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 
 LineLayoutCache::LineLayoutCache() :
 	lastCaretSlot(SIZE_MAX),
-	level(0),
+	level(Cache::none),
 	allInvalidated(false), styleClock(-1) {
 	Allocate(0);
 }
@@ -408,12 +408,12 @@ void LineLayoutCache::Allocate(size_t length_) {
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	// round up cache size to avoid rapidly resizing when linesOnScreen or linesInDoc changed.
 	size_t lengthForLevel = 0;
-	if (level == llcCaret) {
+	if (level == Cache::caret) {
 		lengthForLevel = 1;
-	} else if (level == llcPage) {
+	} else if (level == Cache::page) {
 		// see comment in Retrieve() method.
 		lengthForLevel = 1 + AlignUp(4*linesOnScreen, 64);
-	} else if (level == llcDocument) {
+	} else if (level == Cache::document) {
 		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
 	if (lengthForLevel != cache.size()) {
@@ -440,9 +440,9 @@ void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
 	}
 }
 
-void LineLayoutCache::SetLevel(int level_) noexcept {
+void LineLayoutCache::SetLevel(Cache level_) noexcept {
 	allInvalidated = false;
-	if ((level_ != -1) && (level != level_)) {
+	if ((static_cast<int>(level_) != -1) && (level != level_)) {
 		level = level_;
 		Deallocate();
 	}
@@ -458,7 +458,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	allInvalidated = false;
 
 	size_t pos = 0;
-	if (level == llcPage) {
+	if (level == Cache::page) {
 		// two arenas, each with two pages to ensure cache efficiency on scrolling.
 		// first arena for lines near top visible line.
 		// second arena for other lines, e.g. folded lines near top visible line.
@@ -478,7 +478,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 			lastCaretSlot = 0;
 			std::swap(cache[0], cache[pos]);
 		}
-	} else if (level == llcDocument) {
+	} else if (level == Cache::document) {
 		pos = lineNumber;
 	}
 

@@ -314,9 +314,8 @@ using FontDirectWrite = FontWin;
 
 HINSTANCE hinstPlatformRes {};
 
-constexpr const int SupportsGDI[] = {
-	SC_SUPPORTS_PIXEL_MODIFICATION,
-};
+constexpr int SupportsGDI =
+	SC_SUPPORTS_PIXEL_MODIFICATION;
 
 constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
@@ -353,17 +352,6 @@ constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexc
 	}
 }
 #endif
-
-void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, XYPOSITION size, int weight, bool italic, int extraFontFlag) {
-	lf = LOGFONTW();
-	// The negative is to allow for leading
-	lf.lfHeight = -std::abs(std::lround(size));
-	lf.lfWeight = weight;
-	lf.lfItalic = italic ? 1 : 0;
-	lf.lfCharSet = static_cast<BYTE>(characterSet);
-	lf.lfQuality = Win32MapFontQuality(extraFontFlag);
-	UTF16FromUTF8(faceName, lf.lfFaceName, LF_FACESIZE);
-}
 
 #if defined(USE_D2D)
 bool GetDWriteFontProperties(const LOGFONTW &lf, std::wstring &wsFamily,
@@ -413,8 +401,14 @@ bool GetDWriteFontProperties(const LOGFONTW &lf, std::wstring &wsFamily,
 }
 
 std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
-	LOGFONTW lf;
-	SetLogFont(lf, fp.faceName, fp.characterSet, fp.size, fp.weight, fp.italic, fp.extraFontFlag);
+	LOGFONTW lf {};
+	// The negative is to allow for leading
+	lf.lfHeight = -std::abs(std::lround(fp.size));
+	lf.lfWeight = fp.weight;
+	lf.lfItalic = fp.italic ? 1 : 0;
+	lf.lfCharSet = static_cast<BYTE>(fp.characterSet);
+	lf.lfQuality = Win32MapFontQuality(fp.extraFontFlag);
+	UTF16FromUTF8(fp.faceName, lf.lfFaceName, LF_FACESIZE);
 	if (fp.technology == SCWIN_TECH_GDI) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
 		return std::make_shared<FontGDI>(lf, hfont, fp.extraFontFlag);
@@ -488,7 +482,7 @@ public:
 	VarBuffer &operator=(const VarBuffer &) = delete;
 	VarBuffer &operator=(VarBuffer &&) = delete;
 
-	~VarBuffer() {
+	~VarBuffer() noexcept {
 		if (buffer != bufferStandard) {
 			delete[]buffer;
 			buffer = nullptr;
@@ -496,7 +490,9 @@ public:
 	}
 };
 
-constexpr int stackBufferLength = 1000;
+// limited to BreakFinder::lengthStartSubdivision for drawing document text in editor window.
+// no limit for drawing other text, e.g. auto-completion list, calltip, annotation, etc.
+constexpr int stackBufferLength = 300;
 class TextWide : public VarBuffer<wchar_t, stackBufferLength> {
 public:
 	int tlen;	// Using int instead of size_t as most Win32 APIs take int.
@@ -554,7 +550,7 @@ public:
 	void SetMode(SurfaceMode mode_) noexcept override;
 
 	void Release() noexcept override;
-	int Supports(int feature) const noexcept override;
+	bool Supports(int feature) const noexcept override;
 	bool Initialised() const noexcept override;
 	int LogPixelsY() const noexcept override;
 	int PixelDivisions() const noexcept override;
@@ -652,12 +648,8 @@ void SurfaceGDI::Release() noexcept {
 	Clear();
 }
 
-int SurfaceGDI::Supports(int feature) const noexcept {
-	for (const int f : SupportsGDI) {
-		if (f == feature)
-			return 1;
-	}
-	return 0;
+bool SurfaceGDI::Supports(int feature) const noexcept {
+	return SupportsGDI == feature;
 }
 
 bool SurfaceGDI::Initialised() const noexcept {
@@ -747,8 +739,8 @@ int SurfaceGDI::DeviceHeightFont(int points) const noexcept {
 
 void SurfaceGDI::LineDraw(Point start, Point end, Stroke stroke) noexcept {
 	PenColour(stroke.colour, stroke.width);
-	::MoveToEx(hdc, std::lround(std::floor(start.x)), std::lround(std::floor(start.y)), nullptr);
-	::LineTo(hdc, std::lround(std::floor(end.x)), std::lround(std::floor(end.y)));
+	::MoveToEx(hdc, static_cast<int>(start.x), static_cast<int>(start.y), nullptr);
+	::LineTo(hdc, static_cast<int>(end.x), static_cast<int>(end.y));
 }
 
 void SurfaceGDI::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
@@ -1357,12 +1349,11 @@ constexpr D2D1_POINT_2F DPointFromPointEx(Point point) noexcept {
 }
 #endif
 
-constexpr const int SupportsD2D[] = {
-	SC_SUPPORTS_LINE_DRAWS_FINAL,
-	SC_SUPPORTS_FRACTIONAL_STROKE_WIDTH,
-	SC_SUPPORTS_TRANSLUCENT_STROKE,
-	SC_SUPPORTS_PIXEL_MODIFICATION,
-};
+constexpr unsigned int SupportsD2D =
+	(1 << SC_SUPPORTS_LINE_DRAWS_FINAL) |
+	(1 << SC_SUPPORTS_FRACTIONAL_STROKE_WIDTH) |
+	(1 << SC_SUPPORTS_TRANSLUCENT_STROKE) |
+	(1 << SC_SUPPORTS_PIXEL_MODIFICATION);
 
 constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 	return D2D_COLOR_F {
@@ -1426,7 +1417,7 @@ public:
 	void SetMode(SurfaceMode mode_) noexcept override;
 
 	void Release() noexcept override;
-	int Supports(int feature) const noexcept override;
+	bool Supports(int feature) const noexcept override;
 	bool Initialised() const noexcept override;
 
 	void D2DPenColourAlpha(ColourAlpha fore) noexcept;
@@ -1524,12 +1515,8 @@ void SurfaceD2D::Release() noexcept {
 	Clear();
 }
 
-int SurfaceD2D::Supports(int feature) const noexcept {
-	for (const int f : SupportsD2D) {
-		if (f == feature)
-			return 1;
-	}
-	return 0;
+bool SurfaceD2D::Supports(int feature) const noexcept {
+	return (SupportsD2D >> feature) & true;
 }
 
 bool SurfaceD2D::Initialised() const noexcept {
@@ -2017,7 +2004,7 @@ class BlobInline final : public IDWriteInlineObject {
 		DWRITE_BREAK_CONDITION *breakConditionAfter) override;
 public:
 	explicit BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
-	virtual ~BlobInline() = default;
+	virtual ~BlobInline() noexcept = default;
 };
 
 /// Implement IUnknown
@@ -3028,6 +3015,10 @@ class ListBoxX final : public ListBox {
 
 public:
 	ListBoxX() noexcept = default;
+	ListBoxX(const ListBoxX &) = delete;
+	ListBoxX(ListBoxX &&) = delete;
+	ListBoxX &operator=(const ListBoxX &) = delete;
+	ListBoxX &operator=(ListBoxX &&) = delete;
 	~ListBoxX() noexcept override {
 		if (fontCopy) {
 			::DeleteObject(fontCopy);
@@ -3140,7 +3131,7 @@ PRectangle ListBoxX::GetDesiredRect() {
 	if (widestItem) {
 		len = static_cast<int>(strlen(widestItem));
 		if (unicodeMode) {
-			const TextWide tbuf(widestItem, unicodeMode);
+			const TextWide tbuf(widestItem, SC_CP_UTF8);
 			::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &textSize);
 		} else {
 			::GetTextExtentPoint32A(hdc, widestItem, len, &textSize);
@@ -3276,7 +3267,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 		::InsetRect(&rcText, static_cast<int>(TextInset.x), static_cast<int>(TextInset.y));
 
 		if (unicodeMode) {
-			const TextWide tbuf(text, unicodeMode);
+			const TextWide tbuf(text, SC_CP_UTF8);
 			::DrawTextW(pDrawItem->hDC, tbuf.buffer, tbuf.tlen, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
 		} else {
 			::DrawTextA(pDrawItem->hDC, text, len, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
