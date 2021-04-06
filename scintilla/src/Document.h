@@ -514,9 +514,9 @@ public:
 	void AllocateLines(Sci::Line lines);
 
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
-	void SetCharClasses(const unsigned char *chars, CharClassify::cc newCharClass) noexcept;
+	void SetCharClasses(const unsigned char *chars, CharacterClass characterClass) noexcept;
 	void SetCharClassesEx(const unsigned char *chars, int length) noexcept;
-	int GetCharsOfClass(CharClassify::cc characterClass, unsigned char *buffer) const noexcept;
+	int GetCharsOfClass(CharacterClass characterClass, unsigned char *buffer) const noexcept;
 #if 0
 	void SetCharacterCategoryOptimization(int countCharacters);
 	int CharacterCategoryOptimization() const noexcept;
@@ -565,7 +565,7 @@ public:
 	bool AddWatcher(DocWatcher *watcher, void *userData);
 	bool RemoveWatcher(DocWatcher *watcher, void *userData);
 
-	CharClassify::cc WordCharacterClass(unsigned int ch) const noexcept;
+	CharacterClass WordCharacterClass(unsigned int ch) const noexcept;
 	bool IsWordPartSeparator(unsigned int ch) const noexcept;
 	Sci::Position WordPartLeft(Sci::Position pos) const noexcept;
 	Sci::Position WordPartRight(Sci::Position pos) const noexcept;
@@ -579,7 +579,7 @@ public:
 	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle, Sci::Position startPos, bool useStartPos) const noexcept;
 
 	bool IsAutoCompletionWordCharacter(unsigned int ch) const noexcept {
-		return WordCharacterClass(ch) == CharClassify::ccWord;
+		return WordCharacterClass(ch) == CharacterClass::word;
 	}
 
 private:

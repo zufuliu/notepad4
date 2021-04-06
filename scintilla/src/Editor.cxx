@@ -6366,13 +6366,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWORDCHARS:
-		return pdoc->GetCharsOfClass(CharClassify::ccWord, UCharPtrFromSPtr(lParam));
+		return pdoc->GetCharsOfClass(CharacterClass::word, UCharPtrFromSPtr(lParam));
 
 	case SCI_SETWORDCHARS: {
 			pdoc->SetDefaultCharClasses(false);
 			if (lParam == 0)
 				return 0;
-			pdoc->SetCharClasses(ConstUCharPtrFromSPtr(lParam), CharClassify::ccWord);
+			pdoc->SetCharClasses(ConstUCharPtrFromSPtr(lParam), CharacterClass::word);
 		}
 		break;
 
@@ -6381,22 +6381,22 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWHITESPACECHARS:
-		return pdoc->GetCharsOfClass(CharClassify::ccSpace, UCharPtrFromSPtr(lParam));
+		return pdoc->GetCharsOfClass(CharacterClass::space, UCharPtrFromSPtr(lParam));
 
 	case SCI_SETWHITESPACECHARS: {
 			if (lParam == 0)
 				return 0;
-			pdoc->SetCharClasses(ConstUCharPtrFromSPtr(lParam), CharClassify::ccSpace);
+			pdoc->SetCharClasses(ConstUCharPtrFromSPtr(lParam), CharacterClass::space);
 		}
 		break;
 
 	case SCI_GETPUNCTUATIONCHARS:
-		return pdoc->GetCharsOfClass(CharClassify::ccPunctuation, UCharPtrFromSPtr(lParam));
+		return pdoc->GetCharsOfClass(CharacterClass::punctuation, UCharPtrFromSPtr(lParam));
 
 	case SCI_SETPUNCTUATIONCHARS: {
 			if (lParam == 0)
 				return 0;
-			pdoc->SetCharClasses(ConstUCharPtrFromSPtr(lParam), CharClassify::ccPunctuation);
+			pdoc->SetCharClasses(ConstUCharPtrFromSPtr(lParam), CharacterClass::punctuation);
 		}
 		break;
 
@@ -6543,15 +6543,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->MarkerNumberFromLine(wParam, static_cast<int>(lParam));
 
 	case SCI_GETVIEWWS:
-		return vs.viewWhitespace;
+		return static_cast<sptr_t>(vs.viewWhitespace);
 
 	case SCI_SETVIEWWS:
-		vs.viewWhitespace = static_cast<WhiteSpaceVisibility>(wParam);
+		vs.viewWhitespace = static_cast<WhiteSpace>(wParam);
 		Redraw();
 		break;
 
 	case SCI_GETTABDRAWMODE:
-		return vs.tabDrawMode;
+		return static_cast<sptr_t>(vs.tabDrawMode);
 
 	case SCI_SETTABDRAWMODE:
 		vs.tabDrawMode = static_cast<TabDrawMode>(wParam);
@@ -6829,11 +6829,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.wrapIndentMode;
 
 	case SCI_SETLAYOUTCACHE:
-		view.llc.SetLevel(static_cast<int>(wParam));
+		view.llc.SetLevel(static_cast<LineLayoutCache::Cache>(wParam));
 		break;
 
 	case SCI_GETLAYOUTCACHE:
-		return view.llc.GetLevel();
+		return static_cast<sptr_t>(view.llc.GetLevel());
 
 	case SCI_SETPOSITIONCACHE:
 		view.posCache.SetSize(wParam);
@@ -6940,7 +6940,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETINDENTATIONGUIDES:
-		return vs.viewIndentationGuides;
+		return static_cast<sptr_t>(vs.viewIndentationGuides);
 
 	case SCI_SETHIGHLIGHTGUIDE:
 		if ((highlightGuideColumn != static_cast<int>(wParam)) || (wParam > 0)) {

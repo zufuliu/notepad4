@@ -2690,7 +2690,7 @@ public:
 			for (size_t mixIndex = 0; mixIndex < nUtf16Mixed; mixIndex++) {
 				if ((lenFlat + 20) > utf16Folded.size())
 					utf16Folded.resize(lenFlat + 60);
-				const char *foldedUTF8 = CaseConvert(utf16Mixed[mixIndex], CaseConversionFold);
+				const char *foldedUTF8 = CaseConvert(utf16Mixed[mixIndex], CaseConversion::fold);
 				if (foldedUTF8) {
 					// Maximum length of a case conversion is 6 bytes, 3 characters
 					wchar_t wFolded[20];
@@ -2732,7 +2732,7 @@ std::unique_ptr<CaseFolder> ScintillaWin::CaseFolderForEncoding() {
 				const unsigned int lengthUTF16 = WideCharFromMultiByte(cpDest, sCharacter,
 					wCharacter, std::size(wCharacter));
 				if (lengthUTF16 == 1) {
-					const char *caseFolded = CaseConvert(wCharacter[0], CaseConversionFold);
+					const char *caseFolded = CaseConvert(wCharacter[0], CaseConversion::fold);
 					if (caseFolded) {
 						wchar_t wLower[20];
 						const size_t charsConverted = UTF16FromUTF8(std::string_view(caseFolded),
@@ -2762,7 +2762,7 @@ std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMa
 
 	const UINT cpDoc = CodePageOfDocument();
 	if (cpDoc == SC_CP_UTF8) {
-		return CaseConvertString(s, (caseMapping == CaseMapping::upper) ? CaseConversionUpper : CaseConversionLower);
+		return CaseConvertString(s, (caseMapping == CaseMapping::upper) ? CaseConversion::upper : CaseConversion::lower);
 	}
 
 	// Change text to UTF-16

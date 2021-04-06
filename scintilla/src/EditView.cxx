@@ -180,7 +180,7 @@ EditView::EditView() {
 	additionalCaretsBlink = true;
 	additionalCaretsVisible = true;
 	imeCaretBlockOverride = false;
-	llc.SetLevel(LineLayoutCache::llcCaret);
+	llc.SetLevel(LineLayoutCache::Cache::caret);
 	tabArrowHeight = 4;
 	customDrawTabArrow = nullptr;
 	customDrawWrapMarker = nullptr;
@@ -285,7 +285,7 @@ static void DrawTabArrow(Surface *surface, PRectangle rcTab, int ymid,
 	}
 
 	// Draw the arrow head if needed
-	if (vsDraw.tabDrawMode == tdLongArrow) {
+	if (vsDraw.tabDrawMode == TabDrawMode::longArrow) {
 		XYPOSITION ydiff = std::floor(rcTab.Height() / 2.0f);
 		XYPOSITION xhead = rightStroke - ydiff;
 		if (xhead <= rcTab.left) {
@@ -640,7 +640,7 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 					}
 					if (wrapState != WrapMode::character) {
 						Sci::Position pos = lastGoodBreak;
-						CharClassify::cc ccPrev = CharClassify::ccSpace;
+						CharacterClass ccPrev = CharacterClass::space;
 						WrapBreak wbPrev = WrapBreak::None;
 						if (wrapState == WrapMode::automatic) {
 							const int character = model.pdoc->CharacterAfter(pos + posLineStart).character;
@@ -663,12 +663,12 @@ void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surfa
 								// word boundary
 								// TODO: Unicode Line Breaking Algorithm https://www.unicode.org/reports/tr14/
 								const WrapBreak wbPos = wbPrev;
-								const CharClassify::cc ccPos = ccPrev;
+								const CharacterClass ccPos = ccPrev;
 								const int chPrevious = model.pdoc->CharacterAfter(posBefore + posLineStart).character;
 								ccPrev = model.pdoc->WordCharacterClass(chPrevious);
 								wbPrev = GetWrapBreakEx(chPrevious, isUtf8);
 								if (wbPrev != WrapBreak::Before && wbPos != WrapBreak::After) {
-									if ((ccPrev == CharClassify::ccCJKWord || ccPos == CharClassify::ccCJKWord) ||
+									if ((ccPrev == CharacterClass::cjkWord || ccPos == CharacterClass::cjkWord) ||
 										//(wbPrev == WrapBreak::Both || wbPos == WrapBreak::Both) ||
 										(wbPrev != wbPos && (wbPrev == WrapBreak::After || wbPos == WrapBreak::Before)) ||
 										(ccPrev != ccPos && (wbPrev == WrapBreak::Undefined || wbPos == WrapBreak::Undefined))
@@ -1856,7 +1856,7 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 			} else {
 				// Normal text display
 				surface->FillRectangleAligned(rcSegment, Fill(textBack));
-				if (vsDraw.viewWhitespace != wsInvisible) {
+				if (vsDraw.viewWhitespace != WhiteSpace::invisible) {
 					for (int cpos = 0; cpos <= i - ts.start; cpos++) {
 						if (ll->chars[cpos + ts.start] == ' ') {
 							if (drawWhitespaceBackground && vsDraw.WhiteSpaceVisible(inIndentation)) {
@@ -2097,7 +2097,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 					if (phasesDraw == PhasesDraw::one) {
 						surface->FillRectangleAligned(rcSegment, Fill(textBack));
 					}
-					if (inIndentation && vsDraw.viewIndentationGuides == ivReal) {
+					if (inIndentation && vsDraw.viewIndentationGuides == IndentView::real) {
 						for (int indentCount = static_cast<int>((ll->positions[i] + epsilon) / indentWidth);
 							indentCount <= (ll->positions[i + 1] - epsilon) / indentWidth;
 							indentCount++) {
@@ -2108,7 +2108,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 							}
 						}
 					}
-					if (vsDraw.viewWhitespace != wsInvisible) {
+					if (vsDraw.viewWhitespace != WhiteSpace::invisible) {
 						if (vsDraw.WhiteSpaceVisible(inIndentation)) {
 							if (vsDraw.whitespaceColours.fore.isSet)
 								textFore = vsDraw.whitespaceColours.fore;
@@ -2151,11 +2151,11 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 							rcSegment.top + vsDraw.maxAscent, text, textFore, textBack);
 					}
 				}
-				if (vsDraw.viewWhitespace != wsInvisible ||
-					(inIndentation && vsDraw.viewIndentationGuides != ivNone)) {
+				if (vsDraw.viewWhitespace != WhiteSpace::invisible ||
+					(inIndentation && vsDraw.viewIndentationGuides != IndentView::none)) {
 					for (int cpos = 0; cpos <= i - ts.start; cpos++) {
 						if (ll->chars[cpos + ts.start] == ' ') {
-							if (vsDraw.viewWhitespace != wsInvisible) {
+							if (vsDraw.viewWhitespace != WhiteSpace::invisible) {
 								if (vsDraw.whitespaceColours.fore.isSet)
 									textFore = vsDraw.whitespaceColours.fore;
 								if (vsDraw.WhiteSpaceVisible(inIndentation)) {
@@ -2181,7 +2181,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 									surface->FillRectangleAligned(rcDot, Fill(textFore));
 								}
 							}
-							if (inIndentation && vsDraw.viewIndentationGuides == ivReal) {
+							if (inIndentation && vsDraw.viewIndentationGuides == IndentView::real) {
 								for (int indentCount = static_cast<int>((ll->positions[cpos + ts.start] + epsilon) / indentWidth);
 									indentCount <= (ll->positions[cpos + ts.start + 1] - epsilon) / indentWidth;
 									indentCount++) {
@@ -2226,7 +2226,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 
 void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine) const {
-	if ((vsDraw.viewIndentationGuides == ivLookForward || vsDraw.viewIndentationGuides == ivLookBoth)
+	if ((vsDraw.viewIndentationGuides == IndentView::lookForward || vsDraw.viewIndentationGuides == IndentView::lookBoth)
 		&& (subLine == 0)) {
 		const Sci::Position posLineStart = model.pdoc->LineStart(line);
 		int indentSpace = model.pdoc->GetLineIndentation(line);
@@ -2247,7 +2247,7 @@ void EditView::DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &mode
 				// Level is one more level than parent
 				indentLastWithText += model.pdoc->IndentSize();
 			}
-			if (vsDraw.viewIndentationGuides == ivLookForward) {
+			if (vsDraw.viewIndentationGuides == IndentView::lookForward) {
 				// In viLookForward mode, previous line only used if it is a fold header
 				if (isFoldHeader) {
 					indentSpace = std::max(indentSpace, indentLastWithText);
@@ -2672,7 +2672,7 @@ Sci::Position EditView::FormatRange(bool draw, const Sci_RangeToFormat *pfr, Sur
 	vsPrint.zoomLevel = printParameters.magnification;
 	// Don't show indentation guides
 	// If this ever gets changed, cached pixmap would need to be recreated if technology != SC_TECHNOLOGY_DEFAULT
-	vsPrint.viewIndentationGuides = ivNone;
+	vsPrint.viewIndentationGuides = IndentView::none;
 	// Don't show the selection when printing
 	vsPrint.selColours.back.isSet = false;
 	vsPrint.selColours.fore.isSet = false;
