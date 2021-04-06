@@ -457,12 +457,15 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 		if (bmp.bmBitsPixel == 32) {
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
+			const BYTE red = GetRValue(crDest);
+			const BYTE green = GetGValue(crDest);
+			const BYTE blue = GetBValue(crDest);
 			for (int y = 0; y < bmp.bmHeight; y++) {
 				for (int x = 0; x < bmp.bmWidth; x++) {
 					const BYTE alpha = prgba[x].rgbReserved;
-					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (GetRValue(crDest) * (255 - alpha))) >> 8;
-					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (GetGValue(crDest) * (255 - alpha))) >> 8;
-					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (GetBValue(crDest) * (255 - alpha))) >> 8;
+					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (red * (255 - alpha))) >> 8;
+					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (green * (255 - alpha))) >> 8;
+					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (blue * (255 - alpha))) >> 8;
 					prgba[x].rgbReserved = 0xFF;
 				}
 				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
@@ -484,11 +487,14 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 		if (bmp.bmBitsPixel == 32) {
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
+			const WORD red = GetRValue(crDest) * (255 - alpha);
+			const WORD green = GetGValue(crDest) * (255 - alpha);
+			const WORD blue = GetBValue(crDest) * (255 - alpha);
 			for (int y = 0; y < bmp.bmHeight; y++) {
 				for (int x = 0; x < bmp.bmWidth; x++) {
-					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (GetRValue(crDest) * (255 - alpha))) >> 8;
-					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (GetGValue(crDest) * (255 - alpha))) >> 8;
-					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (GetBValue(crDest) * (255 - alpha))) >> 8;
+					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + red) >> 8;
+					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + green) >> 8;
+					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
 				}
 				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
 			}
