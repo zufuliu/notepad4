@@ -229,11 +229,11 @@ public:
 	}
 
 	// Manual alpha blending
-	constexpr ColourDesired AlphaScaled(unsigned int alpha) noexcept {
-		return ColourDesired(GetRed() * alpha / 255, GetGreen() * alpha / 255, GetBlue() * alpha / 255);
-	}
-	constexpr ColourDesired AlphaBlendOn(unsigned int alpha, ColourDesired back) noexcept {
-		return ColourDesired(AlphaScaled(alpha).AsInteger() + back.AlphaScaled(255 - alpha).AsInteger());
+	constexpr ColourDesired AlphaBlendOn(unsigned int alpha, ColourDesired back) const noexcept {
+		const unsigned int red = (GetRed()*255 + back.GetRed()*(255 - alpha)) >> 8;
+		const unsigned int green = (GetGreen()*255 + back.GetGreen()*(255 - alpha)) >> 8;
+		const unsigned int blue = (GetBlue()*255 + back.GetBlue()*(255 - alpha)) >> 8;
+		return ColourDesired(red, green, blue);
 	}
 };
 
