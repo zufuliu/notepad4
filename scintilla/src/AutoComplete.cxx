@@ -153,19 +153,17 @@ struct Sorter {
 void AutoComplete::SetList(const char *list) {
 	if (autoSort == SC_ORDER_PRESORTED) {
 		lb->SetList(list, separator, typesep);
-		sortMatrix.clear();
-		sortMatrix.reserve(lb->Length());
-		for (int i = 0; i < lb->Length(); ++i) {
-			sortMatrix.push_back(i);
+		sortMatrix.resize(lb->Length());
+		for (int i = 0; i < static_cast<int>(sortMatrix.size()); ++i) {
+			sortMatrix[i] = i;
 		}
 		return;
 	}
 
 	Sorter IndexSort(this, list);
-	sortMatrix.clear();
-	sortMatrix.reserve(IndexSort.indices.size() / 2);
-	for (int i = 0; i < static_cast<int>(IndexSort.indices.size()) / 2; ++i) {
-		sortMatrix.push_back(i);
+	sortMatrix.resize(IndexSort.indices.size() / 2);
+	for (int i = 0; i < static_cast<int>(sortMatrix.size()); ++i) {
+		sortMatrix[i] = i;
 	}
 	std::sort(sortMatrix.begin(), sortMatrix.end(), IndexSort);
 	if (autoSort == SC_ORDER_CUSTOM || sortMatrix.size() < 2) {
@@ -241,7 +239,7 @@ void AutoComplete::Select(const char *word) {
 	int end = lb->Length() - 1; // upper bound of the api array block to search
 	while ((start <= end) && (location == -1)) { // Binary searching loop
 		int pivot = (start + end) / 2;
-		std::string item = GetValue(sortMatrix[pivot]);
+		std::string item = lb->GetValue(sortMatrix[pivot]);
 		int cond;
 		if (ignoreCase)
 			cond = CompareNCaseInsensitive(word, item.c_str(), lenWord);
