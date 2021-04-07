@@ -1967,7 +1967,6 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 
 		// Vector elements point into selection in order to change selection.
 		std::vector<SelectionRange *> selPtrs;
-		selPtrs.reserve(sel.Count());
 		for (size_t r = 0; r < sel.Count(); r++) {
 			selPtrs.push_back(&sel.Range(r));
 		}

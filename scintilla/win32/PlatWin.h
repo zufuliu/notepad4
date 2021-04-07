@@ -125,10 +125,6 @@ constexpr PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 constexpr RECT RectFromPRectangleEx(PRectangle prc) noexcept {
 	return RectFromPRectangle(prc);
 }
-
-constexpr RECT RectFromPRectangleEx(const PRectangle *prc) noexcept {
-	return RectFromPRectangle(*prc);
-}
 #endif
 
 constexpr POINT POINTFromPoint(Point pt) noexcept {

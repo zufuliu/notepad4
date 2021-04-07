@@ -351,9 +351,7 @@ constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexc
 		return D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
 	}
 }
-#endif
 
-#if defined(USE_D2D)
 bool GetDWriteFontProperties(const LOGFONTW &lf, std::wstring &wsFamily,
 	DWRITE_FONT_WEIGHT &weight, DWRITE_FONT_STYLE &style, DWRITE_FONT_STRETCH &stretch) {
 	bool success = false;
@@ -1802,7 +1800,6 @@ void SurfaceD2D::GradientRectangle(PRectangle rc, const std::vector<ColourStop> 
 		}
 
 		std::vector<D2D1_GRADIENT_STOP> gradientStops;
-		gradientStops.reserve(stops.size());
 		for (const ColourStop &stop : stops) {
 			gradientStops.push_back({ static_cast<FLOAT>(stop.position), ColorFromColourAlpha(stop.colour) });
 		}
@@ -2361,7 +2358,6 @@ std::vector<Interval> ScreenLineLayout::FindRangeIntervals(size_t start, size_t 
 	}
 
 	// Get the selection ranges behind the text.
-	ret.reserve(actualHitTestCount);
 	for (size_t i = 0; i < actualHitTestCount; ++i) {
 		// Store selection rectangle
 		const DWRITE_HIT_TEST_METRICS &htm = hitTestMetrics[i];
