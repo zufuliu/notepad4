@@ -332,6 +332,9 @@ extern INT	iHighlightCurrentLine;
 extern BOOL	bShowBookmarkMargin;
 extern int	iZoomLevel;
 
+extern FILEVARS fvCurFile;
+extern EditTabSettings tabSettings;
+
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
 #define STYLE_MASK_FORE_COLOR	(1 << 2)
@@ -605,6 +608,16 @@ static inline LPCWSTR GetStyleThemeFilePath(void) {
 
 static inline void FindDarkThemeFile(void) {
 	FindExtraIniFile(darkStyleThemeFilePath, L"Notepad2 DarkTheme.ini", L"DarkTheme.ini");
+}
+
+static inline void Style_LoadTabSettings(PEDITLEXER pLex) {
+	LPCWSTR lpSection = pLex->pszName;
+	int iValue = IniGetInt(lpSection, L"TabWidth", pLex->defaultTabWidth);
+	tabSettings.schemeTabWidth = clamp_i(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+	iValue = IniGetInt(lpSection, L"IndentWidth", pLex->defaultIndentWidth);
+	tabSettings.schemeIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+	tabSettings.schemeTabsAsSpaces = IniGetInt(lpSection, L"TabsAsSpaces", pLex->defaultTabsAsSpaces);
+	tabSettings.schemeUseGlobalTabSettings = IniGetInt(lpSection, L"UseGlobalTabSettings", pLex->defaultUseGlobalTabSettings);
 }
 
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
@@ -909,6 +922,12 @@ void Style_Save(void) {
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
 				IniSectionSetStringEx(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
+			}
+			if (pLex == pLexCurrent && pLex->iStyleTheme == StyleTheme_Default) {
+				IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
+				IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
+				IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLex->defaultTabsAsSpaces);
+				IniSectionSetBoolEx(pIniSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLex->defaultUseGlobalTabSettings);
 			}
 			// delete this section if nothing changed
 			WritePrivateProfileSection(pLex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf, themePath);
@@ -1492,6 +1511,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	int rid = pLexNew->rid;
 
 	if (bLexerChanged) {
+		Style_LoadTabSettings(pLexNew);
+		FileVars_Apply(&fvCurFile);
 		SciCall_SetLexer(iLexer);
 
 		if (iLexer == SCLEX_CPP || iLexer == SCLEX_MATLAB) {
@@ -2583,7 +2604,6 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 extern BOOL fNoHTMLGuess;
 extern BOOL fNoCGIGuess;
 extern BOOL fNoAutoDetection;
-extern FILEVARS fvCurFile;
 
 static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWSTR *pszExt, BOOL *pDotFile) {
 	LPCWSTR lpszExt = PathFindExtension(lpszFile);

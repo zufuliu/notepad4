@@ -422,6 +422,7 @@ BOOL IsStringCaseSensitiveA(LPCSTR pszText);
 #define FV_LONGLINESLIMIT		32
 #define FV_ENCODING				64
 #define FV_MODE					128
+#define FV_MaskHasFileTabSettings	(FV_TABWIDTH | FV_INDENTWIDTH | FV_TABSASSPACES)
 
 typedef struct EditTabSettings {
 	int 	globalTabWidth;
@@ -429,6 +430,11 @@ typedef struct EditTabSettings {
 	BOOL	globalTabsAsSpaces;
 	BOOL	bTabIndents;
 	BOOL	bBackspaceUnindents;
+
+	int		schemeTabWidth;
+	int		schemeIndentWidth;
+	BOOL	schemeTabsAsSpaces;
+	BOOL	schemeUseGlobalTabSettings;
 } EditTabSettings;
 
 typedef struct FILEVARS {
