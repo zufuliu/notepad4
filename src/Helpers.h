@@ -440,6 +440,22 @@ NP2_inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
 	IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
 }
 
+NP2_inline void IniSetIntEx(LPCWSTR lpSection, LPCWSTR lpName, int i, int iDefault) {
+	if (i != iDefault) {
+		IniSetInt(lpSection, lpName, i);
+	} else {
+		IniSetString(lpSection, lpName, NULL);
+	}
+}
+
+NP2_inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, BOOL b, BOOL bDefault) {
+	if (b != bDefault) {
+		IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
+	} else {
+		IniSetString(lpSection, lpName, NULL);
+	}
+}
+
 #define LoadIniSection(lpSection, lpBuf, cchBuf) \
 	GetPrivateProfileSection(lpSection, lpBuf, cchBuf, szIniFile);
 #define SaveIniSection(lpSection, lpBuf) \

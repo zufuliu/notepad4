@@ -1546,20 +1546,101 @@ BOOL LongLineSettingsDlg(HWND hwnd) {
 // TabSettingsDlgProc()
 //
 //
+static void SyncGlobalTabSettings(HWND hwnd) {
+	const BOOL useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
+	if (useGlobal) {
+		WCHAR wch[16];
+		GetDlgItemText(hwnd, IDC_GLOBAL_TAB_WIDTH, wch, COUNTOF(wch));
+		SetDlgItemText(hwnd, IDC_SCHEME_TAB_WIDTH, wch);
+		GetDlgItemText(hwnd, IDC_GLOBAL_INDENT_WIDTH, wch, COUNTOF(wch));
+		SetDlgItemText(hwnd, IDC_SCHEME_INDENT_WIDTH, wch);
+		CheckDlgButton(hwnd, IDC_SCHEME_TAB_AS_SPACE, IsDlgButtonChecked(hwnd, IDC_GLOBAL_TAB_AS_SPACE));
+	} else {
+		SetDlgItemInt(hwnd, IDC_SCHEME_TAB_WIDTH, tabSettings.schemeTabWidth, FALSE);
+		SetDlgItemInt(hwnd, IDC_SCHEME_INDENT_WIDTH, tabSettings.schemeIndentWidth, FALSE);
+		CheckDlgButton(hwnd, IDC_SCHEME_TAB_AS_SPACE, tabSettings.schemeTabsAsSpaces ? BST_CHECKED : BST_UNCHECKED);
+	}
+	EnableWindow(GetDlgItem(hwnd, IDC_SCHEME_TAB_WIDTH), !useGlobal);
+	EnableWindow(GetDlgItem(hwnd, IDC_SCHEME_INDENT_WIDTH), !useGlobal);
+	EnableWindow(GetDlgItem(hwnd, IDC_SCHEME_TAB_AS_SPACE), !useGlobal);
+}
+
+static void SyncSchemeTabSettings(HWND hwnd) {
+	const BOOL useScheme = IsButtonChecked(hwnd, IDC_FILE_USE_SCHEME_TAB);
+	if (useScheme) {
+		WCHAR wch[16];
+		GetDlgItemText(hwnd, IDC_SCHEME_TAB_WIDTH, wch, COUNTOF(wch));
+		SetDlgItemText(hwnd, IDC_FILE_TAB_WIDTH, wch);
+		GetDlgItemText(hwnd, IDC_SCHEME_INDENT_WIDTH, wch, COUNTOF(wch));
+		SetDlgItemText(hwnd, IDC_FILE_INDENT_WIDTH, wch);
+		CheckDlgButton(hwnd, IDC_FILE_TAB_AS_SPACE, IsDlgButtonChecked(hwnd, IDC_SCHEME_TAB_AS_SPACE));
+	} else {
+		SetDlgItemInt(hwnd, IDC_FILE_TAB_WIDTH, fvCurFile.iTabWidth, FALSE);
+		SetDlgItemInt(hwnd, IDC_FILE_INDENT_WIDTH, fvCurFile.iIndentWidth, FALSE);
+		CheckDlgButton(hwnd, IDC_FILE_TAB_AS_SPACE, fvCurFile.bTabsAsSpaces ? BST_CHECKED : BST_UNCHECKED);
+	}
+	EnableWindow(GetDlgItem(hwnd, IDC_FILE_TAB_WIDTH), !useScheme);
+	EnableWindow(GetDlgItem(hwnd, IDC_FILE_INDENT_WIDTH), !useScheme);
+	EnableWindow(GetDlgItem(hwnd, IDC_FILE_TAB_AS_SPACE), !useScheme);
+}
+
 static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		SetDlgItemInt(hwnd, IDC_TAB_WIDTH, fvCurFile.iTabWidth, FALSE);
-		SendDlgItemMessage(hwnd, IDC_TAB_WIDTH, EM_LIMITTEXT, 15, 0);
-
-		SetDlgItemInt(hwnd, IDC_INDENT_WIDTH, fvCurFile.iIndentWidth, FALSE);
-		SendDlgItemMessage(hwnd, IDC_INDENT_WIDTH, EM_LIMITTEXT, 15, 0);
-
-		if (fvCurFile.bTabsAsSpaces) {
-			CheckDlgButton(hwnd, IDC_TAB_AS_SPACE, BST_CHECKED);
+		WCHAR wch[MAX_EDITLEXER_NAME_SIZE];
+		LPCWSTR pszName;
+#if NP2_ENABLE_LOCALIZE_LEXER_NAME
+		if (GetString(pLexCurrent->rid, wch, COUNTOF(wch))) {
+			pszName = wch;
+		} else {
+			pszName = pLexCurrent->pszName;
 		}
+#else
+		pszName = pLexCurrent->pszName;
+#endif
+		SetDlgItemText(hwnd, IDC_SCHEME_TAB_GROUPBOX, pszName);
+		if (StrIsEmpty(szCurFile)) {
+			GetString(IDS_UNTITLED, wch, COUNTOF(wch));
+			pszName = wch;
+		} else {
+			pszName = PathFindFileName(szCurFile);
+		}
+		SetDlgItemText(hwnd, IDC_FILE_TAB_GROUPBOX, pszName);
+
+		SetDlgItemInt(hwnd, IDC_GLOBAL_TAB_WIDTH, tabSettings.globalTabWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_GLOBAL_TAB_WIDTH, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_GLOBAL_INDENT_WIDTH, tabSettings.globalIndentWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_GLOBAL_INDENT_WIDTH, EM_LIMITTEXT, 15, 0);
+		if (tabSettings.globalTabsAsSpaces) {
+			CheckDlgButton(hwnd, IDC_GLOBAL_TAB_AS_SPACE, BST_CHECKED);
+		}
+
+		SetDlgItemInt(hwnd, IDC_SCHEME_TAB_WIDTH, tabSettings.schemeTabWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_SCHEME_TAB_WIDTH, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_SCHEME_INDENT_WIDTH, tabSettings.schemeIndentWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_SCHEME_INDENT_WIDTH, EM_LIMITTEXT, 15, 0);
+		if (tabSettings.schemeTabsAsSpaces) {
+			CheckDlgButton(hwnd, IDC_SCHEME_TAB_AS_SPACE, BST_CHECKED);
+		}
+		if (tabSettings.schemeUseGlobalTabSettings) {
+			CheckDlgButton(hwnd, IDC_SCHEME_USE_GLOBAL_TAB, BST_CHECKED);
+			SyncGlobalTabSettings(hwnd);
+		}
+
+		SetDlgItemInt(hwnd, IDC_FILE_TAB_WIDTH, fvCurFile.iTabWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_FILE_TAB_WIDTH, EM_LIMITTEXT, 15, 0);
+		SetDlgItemInt(hwnd, IDC_FILE_INDENT_WIDTH, fvCurFile.iIndentWidth, FALSE);
+		SendDlgItemMessage(hwnd, IDC_FILE_INDENT_WIDTH, EM_LIMITTEXT, 15, 0);
+		if (fvCurFile.bTabsAsSpaces) {
+			CheckDlgButton(hwnd, IDC_FILE_TAB_AS_SPACE, BST_CHECKED);
+		}
+		if ((fvCurFile.mask & FV_MaskHasFileTabSettings) == 0) {
+			CheckDlgButton(hwnd, IDC_FILE_USE_SCHEME_TAB, BST_CHECKED);
+			SyncSchemeTabSettings(hwnd);
+		}
+
 		if (fvCurFile.bTabIndents) {
 			CheckDlgButton(hwnd, IDC_TAB_INDENT, BST_CHECKED);
 		}
@@ -1577,31 +1658,93 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			BOOL fTranslated1;
 			BOOL fTranslated2;
 
-			int iNewTabWidth = GetDlgItemInt(hwnd, IDC_TAB_WIDTH, &fTranslated1, FALSE);
-			int iNewIndentWidth = GetDlgItemInt(hwnd, IDC_INDENT_WIDTH, &fTranslated2, FALSE);
-
+			int iNewTabWidth = GetDlgItemInt(hwnd, IDC_GLOBAL_TAB_WIDTH, &fTranslated1, FALSE);
+			int iNewIndentWidth = GetDlgItemInt(hwnd, IDC_GLOBAL_INDENT_WIDTH, &fTranslated2, FALSE);
 			if (fTranslated1 && fTranslated2) {
-				iNewTabWidth = clamp_i(iNewTabWidth, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
-				iNewIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
-
-				fvCurFile.mask |= FV_TABWIDTH | FV_INDENTWIDTH | FV_TABSASSPACES | FV_TABINDENTS;
-				fvCurFile.iTabWidth = iNewTabWidth;
-				fvCurFile.iIndentWidth = iNewTabWidth;
-				fvCurFile.bTabsAsSpaces = IsButtonChecked(hwnd, IDC_TAB_AS_SPACE);
-				fvCurFile.bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
-
-				tabSettings.globalTabWidth = iNewTabWidth;
-				tabSettings.globalIndentWidth = iNewIndentWidth;
-				tabSettings.globalTabsAsSpaces = fvCurFile.bTabsAsSpaces;
-				tabSettings.bTabIndents = fvCurFile.bTabIndents;
-				tabSettings.bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
-
-				EndDialog(hwnd, IDOK);
+				tabSettings.globalTabWidth = clamp_i(iNewTabWidth, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+				tabSettings.globalIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+				tabSettings.globalTabsAsSpaces = IsButtonChecked(hwnd, IDC_GLOBAL_TAB_AS_SPACE);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_INDENT_WIDTH : IDC_TAB_WIDTH)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_GLOBAL_INDENT_WIDTH : IDC_GLOBAL_TAB_WIDTH)), 1);
+				break;
 			}
+
+			const BOOL useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
+			tabSettings.schemeUseGlobalTabSettings = useGlobal;
+			if (useGlobal) {
+				tabSettings.schemeTabWidth = tabSettings.globalTabWidth;
+				tabSettings.schemeIndentWidth = tabSettings.globalIndentWidth;
+				tabSettings.schemeTabsAsSpaces = tabSettings.globalTabsAsSpaces;
+			} else {
+				iNewTabWidth = GetDlgItemInt(hwnd, IDC_SCHEME_TAB_WIDTH, &fTranslated1, FALSE);
+				iNewIndentWidth = GetDlgItemInt(hwnd, IDC_SCHEME_INDENT_WIDTH, &fTranslated2, FALSE);
+				if (fTranslated1 && fTranslated2) {
+					tabSettings.schemeTabWidth = clamp_i(iNewTabWidth, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+					tabSettings.schemeIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+					tabSettings.schemeTabsAsSpaces = IsButtonChecked(hwnd, IDC_SCHEME_TAB_AS_SPACE);
+				} else {
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_SCHEME_INDENT_WIDTH : IDC_SCHEME_TAB_WIDTH)), 1);
+					break;
+				}
+			}
+
+			if (IsButtonChecked(hwnd, IDC_FILE_USE_SCHEME_TAB)) {
+				fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
+				fvCurFile.iTabWidth = tabSettings.schemeTabWidth;
+				fvCurFile.iIndentWidth = tabSettings.schemeIndentWidth;
+				fvCurFile.bTabsAsSpaces = tabSettings.schemeTabsAsSpaces;
+			} else {
+				iNewTabWidth = GetDlgItemInt(hwnd, IDC_FILE_TAB_WIDTH, &fTranslated1, FALSE);
+				iNewIndentWidth = GetDlgItemInt(hwnd, IDC_FILE_INDENT_WIDTH, &fTranslated2, FALSE);
+				if (fTranslated1 && fTranslated2) {
+					fvCurFile.mask |= FV_MaskHasFileTabSettings;
+					fvCurFile.iTabWidth = clamp_i(iNewTabWidth, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+					fvCurFile.iIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+					fvCurFile.bTabsAsSpaces = IsButtonChecked(hwnd, IDC_FILE_TAB_AS_SPACE);
+				} else {
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_FILE_INDENT_WIDTH : IDC_FILE_TAB_WIDTH)), 1);
+					break;
+				}
+			}
+
+			fvCurFile.bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
+			tabSettings.bTabIndents = fvCurFile.bTabIndents;
+			tabSettings.bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
+
+			LPCWSTR lpSection = pLexCurrent->pszName;
+			IniSetIntEx(lpSection, L"TabWidth", tabSettings.schemeTabWidth, pLexCurrent->defaultTabWidth);
+			IniSetIntEx(lpSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLexCurrent->defaultIndentWidth);
+			IniSetBoolEx(lpSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLexCurrent->defaultTabsAsSpaces);
+			IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLexCurrent->defaultUseGlobalTabSettings);
+			EndDialog(hwnd, IDOK);
 		}
 		break;
+
+		case IDC_GLOBAL_TAB_WIDTH:
+		case IDC_GLOBAL_INDENT_WIDTH:
+			if (HIWORD(wParam) == EN_CHANGE) {
+				SyncGlobalTabSettings(hwnd);
+				SyncSchemeTabSettings(hwnd);
+			}
+			break;
+
+		case IDC_GLOBAL_TAB_AS_SPACE:
+		case IDC_SCHEME_USE_GLOBAL_TAB:
+			SyncGlobalTabSettings(hwnd);
+			SyncSchemeTabSettings(hwnd);
+			break;
+
+		case IDC_SCHEME_TAB_WIDTH:
+		case IDC_SCHEME_INDENT_WIDTH:
+			if (HIWORD(wParam) == EN_CHANGE) {
+				SyncSchemeTabSettings(hwnd);
+			}
+			break;
+
+		case IDC_SCHEME_TAB_AS_SPACE:
+		case IDC_FILE_USE_SCHEME_TAB:
+			SyncSchemeTabSettings(hwnd);
+			break;
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
