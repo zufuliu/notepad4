@@ -2112,16 +2112,15 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						if (vsDraw.WhiteSpaceVisible(inIndentation)) {
 							if (vsDraw.whitespaceColours.fore.isSet)
 								textFore = vsDraw.whitespaceColours.fore;
+							if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
+								textFore = textFore.AlphaBlendOn(vsDraw.whitespaceForeAlpha, textBack);
 							const PRectangle rcTab(rcSegment.left + 1, rcSegment.top + tabArrowHeight,
 								rcSegment.right - 1, rcSegment.bottom - vsDraw.maxDescent);
 							const int segmentTop = static_cast<int>(rcSegment.top + vsDraw.lineHeight / 2);
-							ColourAlpha whiteSpaceFore = vsDraw.ElementColour(SC_ELEMENT_WHITE_SPACE).value_or(textFore);
-							if (!whiteSpaceFore.IsOpaque())	// Just for GDI which is low efficiency.
-								whiteSpaceFore = ColourAlpha(whiteSpaceFore.AlphaBlendOn(whiteSpaceFore.GetAlpha(), textBack));
 							if (!customDrawTabArrow)
-								DrawTabArrow(surface, rcTab, segmentTop, vsDraw, Stroke(whiteSpaceFore, 1.0f));
+								DrawTabArrow(surface, rcTab, segmentTop, vsDraw, Stroke(textFore, 1.0f));
 							else
-								customDrawTabArrow(surface, rcTab, segmentTop, vsDraw, Stroke(whiteSpaceFore, 1.0f));
+								customDrawTabArrow(surface, rcTab, segmentTop, vsDraw, Stroke(textFore, 1.0f));
 						}
 					}
 				} else {
@@ -2177,10 +2176,9 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 										rcSegment.top + vsDraw.lineHeight / 2, 0.0f, 0.0f);
 									rcDot.right = rcDot.left + vsDraw.whitespaceSize;
 									rcDot.bottom = rcDot.top + vsDraw.whitespaceSize;
-									ColourAlpha whiteSpaceFore = vsDraw.ElementColour(SC_ELEMENT_WHITE_SPACE).value_or(textFore);
-									if (!whiteSpaceFore.IsOpaque())	// Just for GDI which is low efficiency.
-										whiteSpaceFore = ColourAlpha(whiteSpaceFore.AlphaBlendOn(whiteSpaceFore.GetAlpha(), textBack));
-									surface->FillRectangleAligned(rcDot, Fill(whiteSpaceFore));
+									if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
+										textFore = textFore.AlphaBlendOn(vsDraw.whitespaceForeAlpha, textBack);
+									surface->FillRectangleAligned(rcDot, Fill(textFore));
 								}
 							}
 							if (inIndentation && vsDraw.viewIndentationGuides == IndentView::real) {
@@ -2682,6 +2680,7 @@ Sci::Position EditView::FormatRange(bool draw, const Sci_RangeToFormat *pfr, Sur
 	vsPrint.selAdditionalAlpha = SC_ALPHA_NOALPHA;
 	vsPrint.whitespaceColours.back.isSet = false;
 	vsPrint.whitespaceColours.fore.isSet = false;
+	vsPrint.whitespaceForeAlpha = SC_ALPHA_NOALPHA;
 	vsPrint.showCaretLineBackground = false;
 	vsPrint.alwaysShowCaretLineBackground = false;
 	// Don't highlight matching braces using indicators

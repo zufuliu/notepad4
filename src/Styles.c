@@ -1683,19 +1683,19 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//! begin Whitespace
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
-		// form rgba
-		if (Style_StrGetAlpha(szValue, &iValue)) {
-			rgb |= iValue << 24;
-		} else {
-			rgb |= SC_ALPHA_OPAQUE << 24;
-		}
-		SciCall_SetElementColor(SC_ELEMENT_WHITE_SPACE, rgb);
+		SciCall_SetWhitespaceFore(TRUE, rgb);
+	} else {
+		SciCall_SetWhitespaceFore(FALSE, 0);
 	}
 	if (Style_StrGetBackColor(szValue, &rgb)) {
 		SciCall_SetWhitespaceBack(TRUE, rgb);
 	} else {
 		SciCall_SetWhitespaceBack(FALSE, 0);
 	}
+	if (!Style_StrGetAlpha(szValue, &iValue)) {
+		iValue = SC_ALPHA_NOALPHA;
+	}
+	SciCall_SetWhitespaceForeAlpha(iValue);
 	//! end Whitespace
 
 	//! begin Caret

@@ -109,6 +109,7 @@ public:
 	bool selEOLFilled;
 	int eolSelectedWidth;
 	ForeBackColours whitespaceColours;
+	int whitespaceForeAlpha;
 	int controlCharSymbol;
 	XYPOSITION controlCharWidth;
 	ColourDesired selbar;

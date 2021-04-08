@@ -688,7 +688,6 @@ val SC_ELEMENT_LIST=0
 val SC_ELEMENT_LIST_BACK=1
 val SC_ELEMENT_LIST_SELECTED=2
 val SC_ELEMENT_LIST_SELECTED_BACK=3
-val SC_ELEMENT_WHITE_SPACE=40
 
 # Set the colour of an element. Translucency (alpha) may or may not be significant
 # and this may depend on the platform. The alpha byte should commonly be 0xff for opaque.
@@ -890,6 +889,14 @@ set void SetWhitespaceSize=2086(int size,)
 
 # Get the size of the dots used to mark space characters.
 get int GetWhitespaceSize=2087(,)
+
+
+# Set the foreground alpha of all whitespace.
+set void SetWhitespaceForeAlpha=2091(Alpha alpha,)
+
+# Get the foreground alpha of all whitespace.
+get Alpha GetWhitespaceForeAlpha=2109(,)
+
 
 # Used to hold extra styling information for each line.
 set void SetLineState=2092(line line, int state)
