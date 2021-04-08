@@ -5802,7 +5802,6 @@ void Editor::StyleSetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	case SCI_STYLESETCHARACTERSET:
 		vs.fontsValid = false;
 		vs.styles[wParam].characterSet = static_cast<int>(lParam);
-		pdoc->SetCaseFolder(nullptr);
 		break;
 	case SCI_STYLESETVISIBLE:
 		vs.styles[wParam].visible = lParam != 0;
