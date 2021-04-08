@@ -307,7 +307,7 @@ struct FontWin final : public Font {
 
 /* dummy types to minimize differences between official Scintilla.
 FontDirectWrite::HFont() will create wild font when font family name
-is different from type face name, e.g. Source Code Pro Semibold.
+is different from typeface name, e.g. Source Code Pro Semibold.
 */
 using FontGDI = FontWin;
 using FontDirectWrite = FontWin;

@@ -109,7 +109,7 @@ struct FontParameters {
 		bool italic_ = false,
 		int extraFontFlag_ = 0,
 		int technology_ = 0,
-		int characterSet_=0,
+		int characterSet_ = 0,
 		const char *localeName_ = localeNameDefault) noexcept :
 
 		faceName(faceName_),
