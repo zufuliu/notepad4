@@ -117,12 +117,14 @@ size_t UTF16Length(std::string_view svu8) noexcept {
 
 size_t UTF16FromUTF8(std::string_view svu8, wchar_t *tbuf, size_t tlen) {
 	size_t ui = 0;
-	for (size_t i = 0; i < svu8.length();) {
-		unsigned char ch = svu8[i];
+	const unsigned char *ptr = reinterpret_cast<const unsigned char *>(svu8.data());
+	const unsigned char * const end = ptr + svu8.length();
+	while (ptr < end) {
+		unsigned char ch = *ptr;
 		const unsigned int byteCount = UTF8BytesOfLead(ch);
 		unsigned int value;
 
-		if (i + byteCount > svu8.length()) {
+		if (ptr + byteCount > end) {
 			// Trying to read past end but still have space to write
 			if (ui < tlen) {
 				tbuf[ui] = ch;
@@ -136,33 +138,33 @@ size_t UTF16FromUTF8(std::string_view svu8, wchar_t *tbuf, size_t tlen) {
 			throw std::runtime_error("UTF16FromUTF8: attempted write beyond end");
 		}
 
-		i++;
+		ptr++;
 		switch (byteCount) {
 		case 1:
 			tbuf[ui] = ch;
 			break;
 		case 2:
 			value = (ch & 0x1F) << 6;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= ch & 0x3F;
 			tbuf[ui] = static_cast<wchar_t>(value);
 			break;
 		case 3:
 			value = (ch & 0xF) << 12;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= (ch & 0x3F) << 6;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= ch & 0x3F;
 			tbuf[ui] = static_cast<wchar_t>(value);
 			break;
 		default:
 			// Outside the BMP so need two surrogates
 			value = (ch & 0x7) << 18;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= (ch & 0x3F) << 12;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= (ch & 0x3F) << 6;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= ch & 0x3F;
 			tbuf[ui] = static_cast<wchar_t>(((value - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
 			ui++;
@@ -187,12 +189,14 @@ size_t UTF32Length(std::string_view svu8) noexcept {
 
 size_t UTF32FromUTF8(std::string_view svu8, unsigned int *tbuf, size_t tlen) {
 	size_t ui = 0;
-	for (size_t i = 0; i < svu8.length();) {
-		unsigned char ch = svu8[i];
+	const unsigned char *ptr = reinterpret_cast<const unsigned char *>(svu8.data());
+	const unsigned char * const end = ptr + svu8.length();
+	while (ptr < end) {
+		unsigned char ch = *ptr;
 		const unsigned int byteCount = UTF8BytesOfLead(ch);
 		unsigned int value;
 
-		if (i + byteCount > svu8.length()) {
+		if (ptr + byteCount > end) {
 			// Trying to read past end but still have space to write
 			if (ui < tlen) {
 				tbuf[ui] = ch;
@@ -205,30 +209,30 @@ size_t UTF32FromUTF8(std::string_view svu8, unsigned int *tbuf, size_t tlen) {
 			throw std::runtime_error("UTF32FromUTF8: attempted write beyond end");
 		}
 
-		i++;
+		ptr++;
 		switch (byteCount) {
 		case 1:
 			value = ch;
 			break;
 		case 2:
 			value = (ch & 0x1F) << 6;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= ch & 0x3F;
 			break;
 		case 3:
 			value = (ch & 0xF) << 12;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= (ch & 0x3F) << 6;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= ch & 0x3F;
 			break;
 		default:
 			value = (ch & 0x7) << 18;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= (ch & 0x3F) << 12;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= (ch & 0x3F) << 6;
-			ch = svu8[i++];
+			ch = *ptr++;
 			value |= ch & 0x3F;
 			break;
 		}

@@ -34,8 +34,8 @@ public:
 	Selection sel;
 	bool primarySelection;
 
-	enum IMEInteraction {
-		imeWindowed, imeInline
+	enum class IMEInteraction {
+		windowed, internal
 	} imeInteraction;
 	enum class CharacterSource {
 		directInput, tentativeInput, imeResult,

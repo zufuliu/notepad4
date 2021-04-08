@@ -19,20 +19,21 @@ struct PrintParameters {
 /**
 * The view may be drawn in separate phases.
 */
-enum DrawPhase {
-	drawBack = 0x1,
-	drawIndicatorsBack = 0x2,
-	drawText = 0x4,
-	drawIndentationGuides = 0x8,
-	drawIndicatorsFore = 0x10,
-	drawSelectionTranslucent = 0x20,
-	drawLineTranslucent = 0x40,
-	drawFoldLines = 0x80,
-	drawCarets = 0x100,
-	drawAll = 0x1FF
+enum class DrawPhase {
+	none = 0x0,
+	back = 0x1,
+	indicatorsBack = 0x2,
+	text = 0x4,
+	indentationGuides = 0x8,
+	indicatorsFore = 0x10,
+	selectionTranslucent = 0x20,
+	lineTranslucent = 0x40,
+	foldLines = 0x80,
+	carets = 0x100,
+	all = 0x1FF
 };
 
-// from drawBack to drawCarets
+// from DrawPhase::back to DrawPhase::carets
 constexpr int MaxDrawPhaseCount = 9;
 
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept;
@@ -42,7 +43,8 @@ void DrawTextNoClipPhase(Surface *surface, PRectangle rc, const Style &style, XY
 void DrawStyledText(Surface *surface, const ViewStyle &vs, int styleOffset, PRectangle rcText,
 	const StyledText &st, size_t start, size_t length, DrawPhase phase);
 
-typedef void (*DrawTabArrowFn)(Surface *surface, PRectangle rcTab, int ymid);
+typedef void (*DrawTabArrowFn)(Surface *surface, PRectangle rcTab, int ymid,
+	const ViewStyle &vsDraw, Stroke stroke);
 
 class LineTabstops;
 
@@ -66,8 +68,8 @@ public:
 	* In multiPhaseDraw mode, drawing is performed in multiple phases with each phase drawing
 	* one feature over the whole drawing area, instead of within one line. This allows text to
 	* overlap from one line to the next. */
-	enum PhasesDraw {
-		phasesOne, phasesTwo, phasesMultiple
+	enum class PhasesDraw {
+		one, two, multiple
 	};
 	PhasesDraw phasesDraw;
 
@@ -112,9 +114,8 @@ public:
 	int GetNextTabstop(Sci::Line line, int x) const noexcept;
 	void LinesAddedOrRemoved(Sci::Line lineOfPos, Sci::Line linesAdded) const;
 
-	void DropGraphics(bool freeObjects) noexcept;
-	void AllocateGraphics(const ViewStyle &vsDraw);
-	void RefreshPixMaps(Surface *surfaceWindow, WindowID wid, const ViewStyle &vsDraw) const;
+	void DropGraphics() noexcept;
+	void RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw);
 
 	LineLayout *RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model);
 	void LayoutLine(const EditModel &model, Sci::Line line, Surface *surface, const ViewStyle &vstyle,

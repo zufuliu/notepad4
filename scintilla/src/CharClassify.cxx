@@ -25,25 +25,24 @@ void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	// Initialize all char classes to default values
 	for (int ch = 0; ch < 128; ch++) {
 		if (IsEOLChar(ch))
-			charClass[ch] = ccNewLine;
+			charClass[ch] = CharacterClass::newLine;
 		else if (ch < 0x20 || ch == ' ')
-			charClass[ch] = ccSpace;
+			charClass[ch] = CharacterClass::space;
 		else if (includeWordClass && (IsAlphaNumeric(ch) || ch == '_'))
-			charClass[ch] = ccWord;
+			charClass[ch] = CharacterClass::word;
 		else
-			charClass[ch] = ccPunctuation;
+			charClass[ch] = CharacterClass::punctuation;
 	}
 
-	const int w = includeWordClass ? ccWord : ccPunctuation;
-	memset(charClass + 128, w, 128);
+	const CharacterClass w = includeWordClass ? CharacterClass::word : CharacterClass::punctuation;
+	memset(charClass + 128, static_cast<int>(w), 128);
 }
 
-void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) noexcept {
+void CharClassify::SetCharClasses(const unsigned char *chars, CharacterClass newCharClass) noexcept {
 	// Apply the newCharClass to the specified chars
 	if (chars) {
-		const unsigned char w = static_cast<unsigned char>(newCharClass);
 		while (*chars) {
-			charClass[*chars] = w;
+			charClass[*chars] = newCharClass;
 			chars++;
 		}
 	}
@@ -51,17 +50,17 @@ void CharClassify::SetCharClasses(const unsigned char *chars, cc newCharClass) n
 
 void CharClassify::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
 	if (chars == nullptr || length == 0) {
-		memset(charClass + 128, ccWord, 128);
+		memset(charClass + 128, static_cast<int>(CharacterClass::word), 128);
 	} else {
 		assert(length == 32);
 		for (int i = 0; i < 128; i++) {
 			const unsigned char w = (chars[i >> 2] >> (2 * (i & 3))) & 3;
-			charClass[i + 128] = w;
+			charClass[i + 128] = static_cast<CharacterClass>(w);
 		}
 	}
 }
 
-int CharClassify::GetCharsOfClass(cc characterClass, unsigned char *buffer) const noexcept {
+int CharClassify::GetCharsOfClass(CharacterClass characterClass, unsigned char *buffer) const noexcept {
 	// Get characters belonging to the given char class; return the number
 	// of characters (if the buffer is NULL, don't write to it).
 	int count = 0;

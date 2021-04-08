@@ -11,14 +11,15 @@ namespace Scintilla {
 class XPM;
 class RGBAImage;
 
-typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, int part, int marginStyle, const void *lineMarker);
+typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, int part, int marginStyle, const void *lineMarker);
 
 struct LineMarkerBase {
 	int markType = SC_MARK_CIRCLE;
-	ColourDesired fore = ColourDesired(0, 0, 0);
-	ColourDesired back = ColourDesired(0xff, 0xff, 0xff);
-	ColourDesired backSelected = ColourDesired(0xff, 0x00, 0x00);
+	ColourAlpha fore = ColourAlpha(0, 0, 0);
+	ColourAlpha back = ColourAlpha(0xff, 0xff, 0xff);
+	ColourAlpha backSelected = ColourAlpha(0xff, 0x00, 0x00);
 	int alpha = SC_ALPHA_NOALPHA;
+	XYPOSITION strokeWidth = 1.0f;
 	/** Some platforms, notably PLAT_CURSES, do not support Scintilla's native
 	 * Draw function for drawing line markers. Allow those platforms to override
 	 * it instead of creating a new method(s) in the Surface class that existing
@@ -48,7 +49,9 @@ public:
 	void SetXPM(const char *textForm);
 	void SetXPM(const char *const *linesForm);
 	void SCICALL SetRGBAImage(Point sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage);
-	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font &fontForCharacter, FoldPart part, int marginStyle) const;
+	void AlignedPolygon(Surface *surface, const Point *pts, size_t npts) const;
+	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, FoldPart part, int marginStyle) const;
+	void SCICALL DrawFoldingMark(Surface *surface, PRectangle rcWhole, FoldPart part) const;
 
 private:
 	void CopyImage(const LineMarker &other);

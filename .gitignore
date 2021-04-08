@@ -18,6 +18,7 @@ locale/en
 *.aps
 *.obj
 *.exe
+*.cod
 *.pyc
 *.pyo
 *.plist

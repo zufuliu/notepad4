@@ -8,36 +8,17 @@
 #include <stdexcept>
 #include <string_view>
 #include <vector>
+#include <optional>
 #include <memory>
 
+#include "Debugging.h"
+#include "Geometry.h"
 #include "Platform.h"
 
 #include "Scintilla.h"
 #include "Style.h"
 
 using namespace Scintilla;
-
-FontAlias::FontAlias(const FontAlias &other) noexcept {
-	SetID(other.fid);
-}
-
-FontAlias::FontAlias(FontAlias &&other) noexcept {
-	SetID(other.fid);
-	other.ClearFont();
-}
-#ifndef PLAT_WIN
-FontAlias::~FontAlias() {
-	SetID(FontID{});
-	// ~Font will not release the actual font resource since it is now 0
-}
-#endif
-void FontAlias::MakeAlias(const Font &fontOrigin) noexcept {
-	SetID(fontOrigin.GetID());
-}
-
-void FontAlias::ClearFont() noexcept {
-	SetID(FontID{});
-}
 
 bool FontSpecification::operator==(const FontSpecification &other) const noexcept {
 	return fontName == other.fontName &&
@@ -83,7 +64,7 @@ Style::Style() noexcept {
 	eolFilled = false;
 	underline = false;
 	strike = false;
-	caseForce = caseMixed;
+	caseForce = CaseForce::mixed;
 	visible = true;
 	changeable = true;
 	hotspot = false;
@@ -103,7 +84,7 @@ Style &Style::operator=(const Style &source) noexcept {
 	(FontSpecification &)(*this) = source;
 	(FontMeasurements &)(*this) = source;
 	(StylePod &)(*this) = source;
-	font.ClearFont();
+	font.reset();
 	return *this;
 }
 
@@ -119,18 +100,18 @@ void Style::ResetDefault(const char *fontName_) noexcept {
 	eolFilled = false;
 	underline = false;
 	strike = false;
-	caseForce = caseMixed;
+	caseForce = CaseForce::mixed;
 	visible = true;
 	changeable = true;
 	hotspot = false;
-	font.ClearFont();
+	font.reset();
 }
 
 void Style::ClearTo(const Style &source) noexcept {
 	*this = source;
 }
 
-void Style::Copy(const Font &font_, const FontMeasurements &fm_) noexcept {
-	font.MakeAlias(font_);
+void Style::Copy(std::shared_ptr<Font> font_, const FontMeasurements &fm_) noexcept {
+	font = std::move(font_);
 	(FontMeasurements &)(*this) = fm_;
 }

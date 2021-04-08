@@ -57,7 +57,7 @@ public:
 	endPos(startPos + length),
 	lengthDocument(styler.Length()),
 	currentPos(startPos),
-	multiByteAccess(styler.Encoding() == EncodingType::encDBCS),
+	multiByteAccess(styler.Encoding() == EncodingType::dbcs),
 	state(initStyle) {
 		styler.StartAt(startPos);
 		styler.StartSegment(startPos);

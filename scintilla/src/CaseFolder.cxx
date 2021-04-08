@@ -44,7 +44,7 @@ void CaseFolderTable::SetTranslation(char ch, char chTranslation) noexcept {
 }
 
 CaseFolderUnicode::CaseFolderUnicode() {
-	converter = ConverterFor(CaseConversionFold);
+	converter = ConverterFor(CaseConversion::fold);
 }
 
 size_t CaseFolderUnicode::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {

@@ -7,7 +7,6 @@
       <File Name="../../scintilla/include/ILexer.h"/>
       <File Name="../../scintilla/include/ILoader.h"/>
       <File Name="../../scintilla/include/LaTeXInput.h"/>
-      <File Name="../../scintilla/include/Platform.h"/>
       <File Name="../../scintilla/include/Sci_Position.h"/>
       <File Name="../../scintilla/include/SciLexer.h"/>
       <File Name="../../scintilla/include/Scintilla.h"/>
@@ -129,9 +128,10 @@
       <File Name="../../scintilla/src/EditView.h"/>
       <File Name="../../scintilla/src/ElapsedPeriod.h"/>
       <File Name="../../scintilla/src/FontQuality.h"/>
+      <File Name="../../scintilla/src/Geometry.cxx"/>
+      <File Name="../../scintilla/src/Geometry.h"/>
       <File Name="../../scintilla/src/Indicator.cxx"/>
       <File Name="../../scintilla/src/Indicator.h"/>
-      <File Name="../../scintilla/src/IntegerRectangle.h"/>
       <File Name="../../scintilla/src/KeyMap.cxx"/>
       <File Name="../../scintilla/src/KeyMap.h"/>
       <File Name="../../scintilla/src/LineMarker.cxx"/>
@@ -141,6 +141,7 @@
       <File Name="../../scintilla/src/Partitioning.h"/>
       <File Name="../../scintilla/src/PerLine.cxx"/>
       <File Name="../../scintilla/src/PerLine.h"/>
+      <File Name="../../scintilla/src/Platform.h"/>
       <File Name="../../scintilla/src/Position.h"/>
       <File Name="../../scintilla/src/PositionCache.cxx"/>
       <File Name="../../scintilla/src/PositionCache.h"/>

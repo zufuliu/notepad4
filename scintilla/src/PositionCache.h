@@ -16,7 +16,7 @@ constexpr bool IsSpaceOrTab(int ch) noexcept {
 * A point in document space.
 * Uses double for sufficient resolution in large (>20,000,000 line) documents.
 */
-class PointDocument {
+class PointDocument final {
 public:
 	double x;
 	double y;
@@ -30,15 +30,16 @@ public:
 // There are two points for some positions and this enumeration
 // can choose between the end of the first line or subline
 // and the start of the next line or subline.
-enum PointEnd {
-	peDefault = 0x0,
-	peLineEnd = 0x1,
-	peSubLineEnd = 0x2
+enum class PointEnd {
+	start = 0x0,
+	lineEnd = 0x1,
+	subLineEnd = 0x2,
+	endEither = lineEnd | subLineEnd,
 };
 
-class BidiData {
+class BidiData final {
 public:
-	std::vector<FontAlias> stylesFonts;
+	std::vector<std::shared_ptr<Font>> stylesFonts;
 	std::vector<XYPOSITION> widthReprs;
 	void Resize(size_t maxLineLength_);
 };
@@ -129,7 +130,7 @@ struct ScreenLine : public IScreenLine {
 	ScreenLine(ScreenLine &&) = delete;
 	void operator=(const ScreenLine &) = delete;
 	void operator=(ScreenLine &&) = delete;
-	virtual ~ScreenLine();
+	virtual ~ScreenLine() noexcept;
 
 	std::string_view Text() const noexcept override;
 	size_t Length() const noexcept override;
@@ -146,9 +147,17 @@ struct ScreenLine : public IScreenLine {
 /**
  */
 class LineLayoutCache final {
+public:
+	enum class Cache {
+		none = SC_CACHE_NONE,
+		caret = SC_CACHE_CARET,
+		page = SC_CACHE_PAGE,
+		document = SC_CACHE_DOCUMENT
+	};
+private:
 	std::vector<std::unique_ptr<LineLayout>> cache;
 	size_t lastCaretSlot;
-	int level;
+	Cache level;
 	bool allInvalidated;
 	int styleClock;
 	void Allocate(size_t length_);
@@ -162,15 +171,9 @@ public:
 	void operator=(LineLayoutCache &&) = delete;
 	~LineLayoutCache();
 	void Deallocate() noexcept;
-	enum {
-		llcNone = SC_CACHE_NONE,
-		llcCaret = SC_CACHE_CARET,
-		llcPage = SC_CACHE_PAGE,
-		llcDocument = SC_CACHE_DOCUMENT
-	};
 	void Invalidate(LineLayout::ValidLevel validity_) noexcept;
-	void SetLevel(int level_) noexcept;
-	int GetLevel() const noexcept {
+	void SetLevel(Cache level_) noexcept;
+	Cache GetLevel() const noexcept {
 		return level;
 	}
 	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
@@ -256,7 +259,7 @@ public:
 		lengthEachSubdivision = 100
 	};
 	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
-		int xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
+		XYPOSITION xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;
 	BreakFinder(BreakFinder &&) = delete;

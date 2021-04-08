@@ -7327,6 +7327,7 @@ extern int iLongLinesLimitG;
 void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	ZeroMemory(lpfv, sizeof(FILEVARS));
 	// see FileVars_Apply() for other Tab settings.
+	tabSettings.schemeUseGlobalTabSettings = TRUE;
 	lpfv->bTabIndents = tabSettings.bTabIndents;
 	lpfv->fWordWrap = fWordWrapG;
 	lpfv->iLongLinesLimit = iLongLinesLimitG;
@@ -7460,7 +7461,7 @@ void EditSetWrapIndentMode(int tabWidth, int indentWidth) {
 //
 void FileVars_Apply(LPFILEVARS lpfv) {
 	const int mask = lpfv->mask;
-	{
+	if (tabSettings.schemeUseGlobalTabSettings) {
 		if (!(mask & FV_TABWIDTH)) {
 			lpfv->iTabWidth = tabSettings.globalTabWidth;
 		}
@@ -7469,6 +7470,16 @@ void FileVars_Apply(LPFILEVARS lpfv) {
 		}
 		if (!(mask & FV_TABSASSPACES)) {
 			lpfv->bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
+		}
+	} else {
+		if (!(mask & FV_TABWIDTH)) {
+			lpfv->iTabWidth = tabSettings.schemeTabWidth;
+		}
+		if (!(mask & FV_INDENTWIDTH)) {
+			lpfv->iIndentWidth = tabSettings.schemeIndentWidth;
+		}
+		if (!(mask & FV_TABSASSPACES)) {
+			lpfv->bTabsAsSpaces = tabSettings.schemeTabsAsSpaces;
 		}
 	}
 

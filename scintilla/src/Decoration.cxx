@@ -13,10 +13,11 @@
 #include <stdexcept>
 #include <string_view>
 #include <vector>
+#include <optional>
 #include <algorithm>
 #include <memory>
 
-#include "Platform.h"
+#include "Debugging.h"
 
 #include "Scintilla.h"
 #include "Position.h"
@@ -250,10 +251,10 @@ void DecorationList<POS>::DeleteAnyEmpty() {
 
 template <typename POS>
 void DecorationList<POS>::SetView() {
-	decorationView.clear();
-	decorationView.reserve(decorationList.size());
+	decorationView.resize(decorationList.size());
+	auto iter = decorationView.begin();
 	for (const auto &deco : decorationList) {
-		decorationView.push_back(deco.get());
+		*iter++ = deco.get();
 	}
 }
 

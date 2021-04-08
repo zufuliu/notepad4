@@ -62,10 +62,10 @@ typedef struct EDITLEXER {
 	const int rid;
 	// default Tab settings for this scheme.
 	struct {
-		const unsigned char tabWidth;
-		const unsigned char indentWidth;
-		const unsigned char tabsAsSpaces;
-		const unsigned char useGlobalTabSettings;
+		const unsigned char defaultTabWidth;
+		const unsigned char defaultIndentWidth;
+		const unsigned char defaultTabsAsSpaces;
+		const unsigned char defaultUseGlobalTabSettings;
 	};
 	struct {
 		int iStyleTheme;
