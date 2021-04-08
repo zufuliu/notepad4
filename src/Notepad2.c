@@ -3963,7 +3963,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetUseTabs(fvCurFile.bTabsAsSpaces);
 		fvCurFile.mask |= FV_TABSASSPACES;
 		fvCurFile.bTabsAsSpaces = !fvCurFile.bTabsAsSpaces;
-		tabSettings.globalTabsAsSpaces = fvCurFile.bTabsAsSpaces;
 		break;
 
 	case IDM_VIEW_TABSETTINGS:
@@ -5406,7 +5405,7 @@ void LoadSettings(void) {
 	tabSettings.globalTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
 	tabSettings.bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", 1);
 	tabSettings.bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
-
+	// for toolbar state
 	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
 	fvCurFile.fWordWrap = fWordWrapG;
 
