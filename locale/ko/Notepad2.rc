@@ -417,7 +417,7 @@ BEGIN
 			MENUITEM "줄 너비&3",				IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
 			MENUITEM "깜박임 없음(&N)",					IDM_VIEW_CARET_STYLE_NOBLINK
-			MENUITEM "선택영역에서 블록 탈자기호 그리기(&S)",		IDM_VIEW_CARET_STYLE_SELECTION
+			MENUITEM "선택영역에서 블록 탈자기호 표시(&S)",		IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "줄바꿈(&R)\tCtrl+W",						IDM_VIEW_WORDWRAP
@@ -1060,7 +1060,7 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,215,90,12,10
     CONTROL         "<a>기록 지우기</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
     CONTROL         "<a>기록 지우기</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
-    AUTOCHECKBOX    "포커스를 잃으면 투명 모드로 전환",IDC_TRANSPARENT,7,126,125,10,WS_TABSTOP
+    AUTOCHECKBOX    "초점을 잃으면 투명 모드로 전환",IDC_TRANSPARENT,7,126,125,10,WS_TABSTOP
     AUTOCHECKBOX    "일치하는 줄 북마크(&K)",IDC_FINDALLBOOKMARK,140,102,90,10,WS_TABSTOP
     AUTOCHECKBOX    "고정폭 글꼴 사용(&M)",IDC_USEMONOSPACEDFONT,140,114,75,10,WS_TABSTOP
     CONTROL         "<a>찾기로 이동(Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,127,105,10
@@ -1090,7 +1090,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,214,149
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,162,13,13
-    LTEXT           "즐겨 찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 지정하려면 여기를 클릭하십시오.",IDC_OPENWITHDESCR,26,162,195,20
+    LTEXT           "즐겨찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 지정하려면 여기를 클릭하십시오.",IDC_OPENWITHDESCR,26,162,195,20
     DEFPUSHBUTTON   "확인",IDOK,115,185,50,14
     PUSHBUTTON      "취소",IDCANCEL,171,185,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
@@ -1121,7 +1121,7 @@ BEGIN
     LTEXT           "기본 인코딩(&D):",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
     CONTROL         "<a>기본 인코딩을 선택하려면 여기를 클릭하세요(&S).</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
-    AUTOCHECKBOX    "통계적 유니 코드 (UTF-16) 감지 건너뛰기(&U).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "통계적 유니코드 (UTF-16) 감지 건너뛰기(&U).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "UTF-8 모드에서 7비트 ASCII 파일 열기(&A).",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "UTF-8 모드에서 ANSI (알 수 없는 인코딩) 파일 열기(&8).",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
     AUTOCHECKBOX    "DOS-437 모드에서 ANSI 아트 (*.nfo, *.diz) 파일 열기(&N).",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
@@ -1154,7 +1154,7 @@ BEGIN
     LTEXT           "LF:",IDC_STATIC,10,28,34,8,SS_RIGHT
     LTEXT           "CR:",IDC_STATIC,10,38,34,8,SS_RIGHT
     LTEXT           "%s 줄",IDC_EOL_SUM_CRLF,48,18,136,8
-    LTEXT           "%s 중",IDC_EOL_SUM_LF,48,28,136,8
+    LTEXT           "%s 줄",IDC_EOL_SUM_LF,48,28,136,8
     LTEXT           "%s 줄",IDC_EOL_SUM_CR,48,38,136,8
     LTEXT           "줄 끝을 정규화 하시겠습니까?(&D)",IDC_STATIC,7,52,180,8
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1252,7 +1252,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "탭 설정"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-	GROUPBOX		"Global",IDC_STATIC,7,7,218,38
+	GROUPBOX		"전역",IDC_STATIC,7,7,218,38
     LTEXT           "탭 너비(&T):",IDC_STATIC,14,17,67,8
     EDITTEXT        IDC_GLOBAL_TAB_WIDTH,78,15,30,12,ES_NUMBER | ES_AUTOHSCROLL
     LTEXT           "들여쓰기 간격(&I):",IDC_STATIC,14,32,69,8
@@ -1264,14 +1264,14 @@ BEGIN
     LTEXT           "들여쓰기 간격(&N):",IDC_STATIC,14,73,69,8
     EDITTEXT        IDC_SCHEME_INDENT_WIDTH,78,71,30,12,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "공백으로 탭 삽입(&P)",IDC_SCHEME_TAB_AS_SPACE,118,58,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use &global settings.",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "전역 설정 사용(&G).",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
 	GROUPBOX		"",IDC_FILE_TAB_GROUPBOX,7,91,218,38
     LTEXT           "탭 너비(&W):",IDC_STATIC,14,101,67,8
     EDITTEXT        IDC_FILE_TAB_WIDTH,78,99,30,12,ES_NUMBER | ES_AUTOHSCROLL
     LTEXT           "들여쓰기 간격(&D):",IDC_STATIC,14,115,69,8
     EDITTEXT        IDC_FILE_INDENT_WIDTH,78,113,30,12,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "공백으로 탭 삽입(&A)",IDC_FILE_TAB_AS_SPACE,118,100,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use sche&me settings.",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "구성표 설정 사용(&M).",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
     AUTOCHECKBOX    "탭 키 들여쓰기 재구성(&K)",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
     AUTOCHECKBOX    "백스페이스 키 들여쓰기 재구성(&B)",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,119,164,50,14
@@ -1285,7 +1285,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "긴 줄의 제한(&L):",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    AUTORADIOBUTTON "모서리선 표시(&E)",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "가장 자리 선 표시(&E)",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "배경색 변경(&B)",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,127,7,50,14
     PUSHBUTTON      "취소",IDCANCEL,127,24,50,14
@@ -1302,11 +1302,11 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,137,118,50,14
     PUSHBUTTON      "취소",IDCANCEL,193,118,50,14
-    LTEXT           "들여쓰기 줄바꾸기 안함|한 글자 들여쓰기 줄바꾸기|두 글자 들여쓰기 줄바꾸기|1단계 들여쓰기 줄바꾸기|2단계 들여쓰기 줄바꾸기|첫 번째 하위 줄과 동일하게 들여쓰기 줄바꾸기|첫 번째 하위 줄보다 1단계 더 들여쓰기 줄바꾸기|첫 번째 하위 줄보다 2단계 더 들여쓰기 줄바꾸기",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "줄바꾸기 전 시각적 표시기 안함|줄바꾸기 전 시각적 표시기 표시 (텍스트 근처)|줄바꾸기 전 시각적 표시기 표시 (테두리 근처)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "줄바꾸기 후 시각적 표시기 안함|줄바꾸기 후 시각적 표시기 표시 (텍스트 근처)|줄바꾸기 후 시각적 표시기 표시 (테두리 근처)|줄바꿈 후 시각적 표시기 표시 (줄 번호 여백)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "줄바꾸기 안함|단어 사이에 텍스트 줄바꾸기|문자 사이에 텍스트 줄바꾸기|공백에 텍스트 줄바꿈|자동 줄바꿈|",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
-    GROUPBOX        "줄바꾸기된 줄의 경우",IDC_STATIC,7,74,235,38
+    LTEXT           "들여쓰기 줄바꿈 안함|한 글자 들여쓰기 줄바꿈|두 글자 들여쓰기 줄바꿈|한 단계 들여쓰기 줄바꿈|두 단계 들여쓰기 줄바꿈|첫 번째 하위 줄과 동일하게 들여쓰기 줄바꿈|첫 번째 하위 줄보다 한 단계 더 들여쓰기 줄바꿈|첫 번째 하위 줄보다 두 단계 더 들여쓰기 줄바꿈",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "줄바꿈 전에 시각적 표시기 안함|줄바꿈 전에 시각적 표시기 표시 (텍스트 근처)|줄바꿈 전에 시각적 표시기 표시 (테두리 근처)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "줄바꿈 후에 시각적 표시기 안함|줄바꿈 후에 시각적 표시기 표시 (텍스트 근처)|줄바꿈 후에 시각적 표시기 표시 (테두리 근처)|줄바꿈 후에 시각적 표시기 표시 (줄 번호 여백)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
+    LTEXT           "줄바꿈 안함|단어 사이에 텍스트 줄바꿈|문자 사이에 텍스트 줄바꿈|공백에 텍스트 줄바꿈|자동 줄바꿈|",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
+    GROUPBOX        "줄바꿈된 줄의 경우",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "왼쪽 여백에서 줄 선택 시 하위 줄만 선택",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
     AUTOCHECKBOX    "현재 줄을 강조 표시할 때 하위 줄만 강조 표시",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
 END
