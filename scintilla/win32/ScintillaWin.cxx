@@ -3169,7 +3169,7 @@ void ScintillaWin::ImeStartComposition() {
 			// TODO: change to GetLocaleDefaultUIFont(inputLang, lf.lfFaceName, &dummy) for Vista+.
 			memcpy(lf.lfFaceName, defaultTextFontName, sizeof(lf.lfFaceName));
 #else
-			const char* fontName = vs.styles[styleHere].fontName;
+			const char *fontName = vs.styles[styleHere].fontName;
 			if (fontName) {
 				UTF16FromUTF8(std::string_view(fontName), lf.lfFaceName, LF_FACESIZE);
 			}
