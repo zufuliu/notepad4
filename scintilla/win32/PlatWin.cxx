@@ -317,23 +317,6 @@ HINSTANCE hinstPlatformRes {};
 constexpr int SupportsGDI =
 	SC_SUPPORTS_PIXEL_MODIFICATION;
 
-constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
-	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
-
-	case SC_EFF_QUALITY_NON_ANTIALIASED:
-		return NONANTIALIASED_QUALITY;
-
-	case SC_EFF_QUALITY_ANTIALIASED:
-		return ANTIALIASED_QUALITY;
-
-	case SC_EFF_QUALITY_LCD_OPTIMIZED:
-		return CLEARTYPE_QUALITY;
-
-	default:
-		return DEFAULT_QUALITY;
-	}
-}
-
 #if defined(USE_D2D)
 constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
