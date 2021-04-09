@@ -1605,9 +1605,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 	Style_SetStyles(STYLE_DEFAULT, szValue);
 
-	// Auto-select codepage according to charset
-	//Style_SetACPfromCharSet(hwnd);
-
 	// used in Direct2D for language dependent glyphs
 	if (IsVistaAndAbove()) {
 		// current user default locale (empty) to override "en-US" in Scintilla.
@@ -2730,7 +2727,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 			++p;
 		}
 		const BOOL bPHP = StrStartsWith(p, "<?php");
-		if ((pLexNew->rid == NP2LEX_PHP) ^ bPHP) {
+		if ((pLexNew->rid == NP2LEX_PHP) != bPHP) {
 			pLexNew = &lexHTML;
 			np2LexLangIndex = IDM_LEXER_PHP;
 			bFound = TRUE;

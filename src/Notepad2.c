@@ -3785,7 +3785,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (!IsWindow(hDlgFindReplace)) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 		} else {
-			if (bReplace ^ (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != NULL)) {
+			if (bReplace != (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != NULL)) {
 				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
 				DestroyWindow(hDlgFindReplace);
 				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
