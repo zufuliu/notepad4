@@ -31,6 +31,17 @@ constexpr bool FlagSet(T value, T test) noexcept {
 	return (static_cast<int>(value) & static_cast<int>(test)) == static_cast<int>(test);
 }
 
+// https://bugs.llvm.org/show_bug.cgi?id=49377
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96733
+template <typename T>
+constexpr T Clamp(T x, T lower, T upper) noexcept {
+#if defined(__GNUC__) || defined(__clang__)
+	return std::min(std::max(x, lower), upper);
+#else
+	return (x < lower) ? lower : (x > upper) ? upper : x;
+#endif
+}
+
 /**
  * A geometric point class.
  * Point is similar to the Win32 POINT and GTK+ GdkPoint types.
