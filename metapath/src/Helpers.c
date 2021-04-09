@@ -971,22 +971,24 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 	switch (PRIMARYLANGID(lang)) {
 	default:
 	case LANG_ENGLISH:
+		// https://docs.microsoft.com/en-us/typography/font-list/segoe-ui
 		font = L"Segoe UI";
-		*wSize = 9;
 		break;
 	case LANG_CHINESE:
+		// https://docs.microsoft.com/en-us/typography/font-list/microsoft-yahei
+		// https://docs.microsoft.com/en-us/typography/font-list/microsoft-jhenghei
 		font = IsChineseTraditionalSubLang(subLang) ? L"Microsoft JhengHei UI" : L"Microsoft YaHei UI";
-		*wSize = 9;
 		break;
 	case LANG_JAPANESE:
+		// https://docs.microsoft.com/en-us/typography/font-list/meiryo
 		font = L"Meiryo UI";
-		*wSize = 9;
 		break;
 	case LANG_KOREAN:
+		// https://docs.microsoft.com/en-us/typography/font-list/malgun-gothic
 		font = L"Malgun Gothic";
-		*wSize = 9;
 		break;
 	}
+	*wSize = 9;
 	lstrcpy(lpFaceName, font);
 }
 #endif

@@ -3164,12 +3164,16 @@ void ScintillaWin::ImeStartComposition() {
 			lf.lfWeight = vs.styles[styleHere].weight;
 			lf.lfItalic = vs.styles[styleHere].italic ? TRUE : FALSE;
 			lf.lfCharSet = DEFAULT_CHARSET;
-			lf.lfFaceName[0] = L'\0';
-			if (vs.styles[styleHere].fontName) {
-				const char* fontName = vs.styles[styleHere].fontName;
+			lf.lfQuality = Win32MapFontQuality(vs.extraFontFlag);
+#if 1
+			// TODO: change to GetLocaleDefaultUIFont(inputLang, lf.lfFaceName, &dummy) for Vista+.
+			memcpy(lf.lfFaceName, defaultTextFontName, sizeof(lf.lfFaceName));
+#else
+			const char* fontName = vs.styles[styleHere].fontName;
+			if (fontName) {
 				UTF16FromUTF8(std::string_view(fontName), lf.lfFaceName, LF_FACESIZE);
 			}
-
+#endif
 			::ImmSetCompositionFontW(imc.hIMC, &lf);
 		}
 		// Caret is displayed in IME window. So, caret in Scintilla is useless.
