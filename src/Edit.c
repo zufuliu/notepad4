@@ -7344,6 +7344,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 	// parse file variables at the beginning or end of the file.
 	BOOL beginning = TRUE;
+	int mask = 0;
 	while (TRUE) {
 		if (!fNoFileVariables) {
 			// Emacs file variables
@@ -7355,32 +7356,32 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			if (!bDisableFileVariables) {
 				if (FileVars_ParseInt(tch, "tab-width", &i)) {
 					lpfv->iTabWidth = clamp_i(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
-					lpfv->mask |= FV_TABWIDTH;
+					mask |= FV_TABWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "*basic-indent", &i)) {
 					lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
-					lpfv->mask |= FV_INDENTWIDTH;
+					mask |= FV_INDENTWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
 					lpfv->bTabsAsSpaces = i == 0;
-					lpfv->mask |= FV_TABSASSPACES;
+					mask |= FV_TABSASSPACES;
 				}
 
 				if (FileVars_ParseInt(tch, "*tab-always-indent", &i)) {
 					lpfv->bTabIndents = i != 0;
-					lpfv->mask |= FV_TABINDENTS;
+					mask |= FV_TABINDENTS;
 				}
 
 				if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
 					lpfv->fWordWrap = i == 0;
-					lpfv->mask |= FV_WORDWRAP;
+					mask |= FV_WORDWRAP;
 				}
 
 				if (FileVars_ParseInt(tch, "fill-column", &i)) {
 					lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
-					lpfv->mask |= FV_LONGLINESLIMIT;
+					mask |= FV_LONGLINESLIMIT;
 				}
 			}
 		}
@@ -7393,17 +7394,17 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 				FileVars_ParseStr(tch, "/*!40101 SET NAMES ", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
 				// MySQL dump: /*!40101 SET NAMES utf8mb4 */;
 				// CSS @charset "UTF-8"; is not supported.
-				lpfv->mask |= FV_ENCODING;
+				mask |= FV_ENCODING;
 			}
 		}
 
 		if (!fNoFileVariables && !bDisableFileVariables) {
 			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) { // Emacs
-				lpfv->mask |= FV_MODE;
+				mask |= FV_MODE;
 			}
 		}
 
-		if (beginning && lpfv->mask == 0 && cbData > COUNTOF(tch)) {
+		if (beginning && mask == 0 && cbData > COUNTOF(tch)) {
 			strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch) - 1);
 			beginning = FALSE;
 		} else {
@@ -7411,9 +7412,19 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 		}
 	}
 
-	if (lpfv->mask & FV_ENCODING) {
+	beginning = mask & FV_MaskHasTabIndentWidth;
+	if (beginning == FV_TABWIDTH || beginning == FV_INDENTWIDTH) {
+		if (beginning == FV_TABWIDTH) {
+			lpfv->iIndentWidth = lpfv->iTabWidth;
+		} else {
+			lpfv->iTabWidth = lpfv->iIndentWidth;
+		}
+		mask |= FV_MaskHasTabIndentWidth;
+	}
+	if (mask & FV_ENCODING) {
 		lpfv->iEncoding = Encoding_MatchA(lpfv->tchEncoding);
 	}
+	lpfv->mask = mask;
 }
 
 void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
