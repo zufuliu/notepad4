@@ -1591,6 +1591,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 	case WM_INITDIALOG: {
 		WCHAR wch[MAX_EDITLEXER_NAME_SIZE];
 		LPCWSTR pszName;
+		Style_LoadTabSettings(pLexCurrent);
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 		if (GetString(pLexCurrent->rid, wch, COUNTOF(wch))) {
 			pszName = wch;
@@ -1710,12 +1711,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			fvCurFile.bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
 			tabSettings.bTabIndents = fvCurFile.bTabIndents;
 			tabSettings.bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
-
-			LPCWSTR lpSection = pLexCurrent->pszName;
-			IniSetIntEx(lpSection, L"TabWidth", tabSettings.schemeTabWidth, pLexCurrent->defaultTabWidth);
-			IniSetIntEx(lpSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLexCurrent->defaultIndentWidth);
-			IniSetBoolEx(lpSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLexCurrent->defaultTabsAsSpaces);
-			IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLexCurrent->defaultUseGlobalTabSettings);
+			Style_SaveTabSettings(pLexCurrent);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
