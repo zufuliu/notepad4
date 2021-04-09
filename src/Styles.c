@@ -610,7 +610,7 @@ static inline void FindDarkThemeFile(void) {
 	FindExtraIniFile(darkStyleThemeFilePath, L"Notepad2 DarkTheme.ini", L"DarkTheme.ini");
 }
 
-static inline void Style_LoadTabSettings(PEDITLEXER pLex) {
+void Style_LoadTabSettings(PEDITLEXER pLex) {
 	LPCWSTR lpSection = pLex->pszName;
 	int iValue = IniGetInt(lpSection, L"TabWidth", pLex->defaultTabWidth);
 	tabSettings.schemeTabWidth = clamp_i(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
@@ -618,6 +618,21 @@ static inline void Style_LoadTabSettings(PEDITLEXER pLex) {
 	tabSettings.schemeIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 	tabSettings.schemeTabsAsSpaces = IniGetInt(lpSection, L"TabsAsSpaces", pLex->defaultTabsAsSpaces);
 	tabSettings.schemeUseGlobalTabSettings = IniGetInt(lpSection, L"UseGlobalTabSettings", pLex->defaultUseGlobalTabSettings);
+}
+
+void Style_SaveTabSettings(PEDITLEXER pLex) {
+	LPCWSTR lpSection = pLex->pszName;
+	IniSetIntEx(lpSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
+	IniSetIntEx(lpSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
+	IniSetBoolEx(lpSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLex->defaultTabsAsSpaces);
+	IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLex->defaultUseGlobalTabSettings);
+}
+
+static inline void SaveLexTabSettings(IniSectionOnSave *pIniSection, PEDITLEXER pLex) {
+	IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
+	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
+	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLex->defaultTabsAsSpaces);
+	IniSectionSetBoolEx(pIniSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLex->defaultUseGlobalTabSettings);
 }
 
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
@@ -924,10 +939,7 @@ void Style_Save(void) {
 				IniSectionSetStringEx(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].szValue, pLex->Styles[i].pszDefault);
 			}
 			if (pLex == pLexCurrent && pLex->iStyleTheme == StyleTheme_Default) {
-				IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
-				IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
-				IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLex->defaultTabsAsSpaces);
-				IniSectionSetBoolEx(pIniSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLex->defaultUseGlobalTabSettings);
+				SaveLexTabSettings(pIniSection, pLex);
 			}
 			// delete this section if nothing changed
 			WritePrivateProfileSection(pLex->pszName, StrIsEmpty(pIniSectionBuf) ? NULL : pIniSectionBuf, themePath);
@@ -1511,8 +1523,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	int rid = pLexNew->rid;
 
 	if (bLexerChanged) {
-		Style_LoadTabSettings(pLexNew);
-		FileVars_Apply(&fvCurFile);
+		if ((fvCurFile.mask & FV_MaskHasFileTabSettings) != FV_MaskHasFileTabSettings) {
+			// otherwise, the same tab settings already applied in EditSetNewText().
+			Style_LoadTabSettings(pLexNew);
+			FileVars_Apply(&fvCurFile);
+		}
 		SciCall_SetLexer(iLexer);
 
 		if (iLexer == SCLEX_CPP || iLexer == SCLEX_MATLAB) {
