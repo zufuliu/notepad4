@@ -943,9 +943,11 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 				return NOTFOUND;
 			break;
 		case BOT:
+			lp = ci.MovePositionOutsideChar(lp, -1);
 			bopat[static_cast<unsigned char>(*ap++)] = lp;
 			break;
 		case EOT:
+			lp = ci.MovePositionOutsideChar(lp, 1);
 			eopat[static_cast<unsigned char>(*ap++)] = lp;
 			break;
 		case BOW:
