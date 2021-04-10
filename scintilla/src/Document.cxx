@@ -108,7 +108,7 @@ void ActionDuration::AddSample(Sci::Line numberActions, double durationOfActions
 	const double durationOne = durationOfActions / numberActions;
 #endif
 	const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
-	//duration = std::clamp(duration_, minDuration, maxDuration);
+	//duration = Clamp(duration_, minDuration, maxDuration);
 	duration = std::max(duration_, minDuration);
 	//printf("%s actions=%.9f / %zd, one=%.9f, value=%.9f, [%.9f, %f, %f]\n", __func__,
 	//	durationOfActions, numberActions, durationOne, duration_, duration, minDuration, maxDuration);

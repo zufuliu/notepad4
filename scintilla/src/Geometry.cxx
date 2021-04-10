@@ -11,34 +11,46 @@
 
 #include "Geometry.h"
 
+#include <intrin.h>
+
 namespace Scintilla {
 
 PRectangle Clamp(PRectangle rc, Edge edge, XYPOSITION position) noexcept {
 	switch (edge) {
 	case Edge::left:
-		return PRectangle(Clamp(position, rc.left, rc.right), rc.top, rc.right, rc.bottom);
+		rc.left = Clamp(position, rc.left, rc.right);
+		break;
 	case Edge::top:
-		return PRectangle(rc.left, Clamp(position, rc.top, rc.bottom), rc.right, rc.bottom);
+		rc.top = Clamp(position, rc.top, rc.bottom);
+		break;
 	case Edge::right:
-		return PRectangle(rc.left, rc.top, Clamp(position, rc.left, rc.right), rc.bottom);
+		rc.right = Clamp(position, rc.left, rc.right);
+		break;
 	case Edge::bottom:
 	default:
-		return PRectangle(rc.left, rc.top, rc.right, Clamp(position, rc.top, rc.bottom));
+		rc.bottom =Clamp(position, rc.top, rc.bottom);
+		break;
 	}
+	return rc;
 }
 
 PRectangle Side(PRectangle rc, Edge edge, XYPOSITION size) noexcept {
 	switch (edge) {
 	case Edge::left:
-		return PRectangle(rc.left, rc.top, std::min(rc.left + size, rc.right), rc.bottom);
+		rc.right = std::min(rc.left + size, rc.right);
+		break;
 	case Edge::top:
-		return PRectangle(rc.left, rc.top, rc.right, std::min(rc.top + size, rc.bottom));
+		rc.bottom = std::min(rc.top + size, rc.bottom);
+		break;
 	case Edge::right:
-		return PRectangle(std::max(rc.left, rc.right - size), rc.top, rc.right, rc.bottom);
+		rc.left = std::max(rc.left, rc.right - size);
+		break;
 	case Edge::bottom:
 	default:
-		return PRectangle(rc.left, std::max(rc.top, rc.bottom - size), rc.right, rc.bottom);
+		rc.top = std::max(rc.top, rc.bottom - size);
+		break;
 	}
+	return rc;
 }
 
 Interval Intersection(Interval a, Interval b) noexcept {
