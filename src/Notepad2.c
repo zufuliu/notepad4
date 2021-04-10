@@ -320,7 +320,7 @@ struct CachedStatusItem {
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 DWORD		g_uWinVer;
 #endif
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
@@ -489,7 +489,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS

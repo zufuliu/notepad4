@@ -1775,8 +1775,25 @@ void EditURLDecode(void) {
 	LPWSTR pszUnescapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
 
 	DWORD cchUnescapedW = (DWORD)(NP2HeapSize(pszUnescapedW) / sizeof(WCHAR));
+	int cchUnescaped = cchUnescapedW;
 	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, URL_UNESCAPE_AS_UTF8);
-	const int cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, (int)NP2HeapSize(pszUnescaped), NULL, NULL);
+	if (!IsWin8AndAbove()) {
+		char *ptr = pszUnescaped;
+		WCHAR *t = pszUnescapedW;
+		WCHAR ch;
+		while ((ch = *t++) != 0) {
+			if (ch > 0xff) {
+				break;
+			}
+			*ptr++ = (char)ch;
+		}
+		*ptr = '\0';
+		if (ptr == pszUnescaped + cchUnescapedW && IsUTF8(pszUnescaped, cchUnescapedW)) {
+			cchUnescapedW = MultiByteToWideChar(CP_UTF8, 0, pszUnescaped, cchUnescapedW, pszUnescapedW, cchUnescaped);
+		}
+	}
+
+	cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, (int)NP2HeapSize(pszUnescaped), NULL, NULL);
 	EditReplaceMainSelection(cchUnescaped, pszUnescaped);
 
 	NP2HeapFree(pszText);
