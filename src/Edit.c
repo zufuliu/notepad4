@@ -1680,6 +1680,13 @@ void EditSentenceCase(void) {
 	NP2HeapFree(pszTextW);
 }
 
+#ifndef URL_ESCAPE_AS_UTF8		// (NTDDI_VERSION >= NTDDI_WIN7)
+#define URL_ESCAPE_AS_UTF8		0x00040000
+#endif
+#ifndef URL_UNESCAPE_AS_UTF8	// (NTDDI_VERSION >= NTDDI_WIN8)
+#define URL_UNESCAPE_AS_UTF8	URL_ESCAPE_AS_UTF8
+#endif
+
 //=============================================================================
 //
 // EditURLEncode()
@@ -1707,10 +1714,10 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
-	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3); // '&', H1, H0
+	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3); // '&', H1, H0
 
 	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_SEGMENT_ONLY);
+	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_BROWSER_MODE | URL_ESCAPE_AS_UTF8);
 
 	NP2HeapFree(pszText);
 	NP2HeapFree(pszTextW);
@@ -1768,7 +1775,7 @@ void EditURLDecode(void) {
 	LPWSTR pszUnescapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
 
 	DWORD cchUnescapedW = (DWORD)(NP2HeapSize(pszUnescapedW) / sizeof(WCHAR));
-	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, 0);
+	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, URL_UNESCAPE_AS_UTF8);
 	const int cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, (int)NP2HeapSize(pszUnescaped), NULL, NULL);
 	EditReplaceMainSelection(cchUnescaped, pszUnescaped);
 
