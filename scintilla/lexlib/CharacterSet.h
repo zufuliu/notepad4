@@ -83,6 +83,7 @@ public:
 
 	template <size_t N>
 	void AddString(const char (&setToAdd)[N]) noexcept {
+		static_assert(N != 0);
 		for (size_t i = 0; i < N - 1; i++) {
 			const unsigned char ch = setToAdd[i];
 			bset[ch] = true;
