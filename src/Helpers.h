@@ -283,7 +283,7 @@ void DebugPrintf(const char *fmt, ...);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 extern DWORD g_uWinVer;
 #endif
 extern WCHAR szIniFile[MAX_PATH];
