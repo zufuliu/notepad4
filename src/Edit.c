@@ -1717,7 +1717,11 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
 	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3); // '&', H1, H0
 
 	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_BROWSER_MODE | URL_ESCAPE_AS_UTF8);
+	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_AS_UTF8);
+	if (!IsWin7AndAbove()) {
+		// TODO: encode some URL parts as UTF-8 then percent-escape these UTF-8 bytes.
+		//ParseURL(pszEscapedW, &ppu);
+	}
 
 	NP2HeapFree(pszText);
 	NP2HeapFree(pszTextW);
