@@ -133,6 +133,14 @@ NP2_inline BOOL IsOctalDigit(int ch) {
 	return ch >= '0' && ch <= '7';
 }
 
+NP2_inline BOOL IsLowerCase(int ch) {
+	return ch >= 'a' && ch <= 'z';
+}
+
+NP2_inline BOOL IsUpperCase(int ch) {
+	return ch >= 'A' && ch <= 'Z';
+}
+
 NP2_inline BOOL IsAlpha(int ch) {
 	return (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z');
