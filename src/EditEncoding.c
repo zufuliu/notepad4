@@ -15,6 +15,7 @@
 
 extern BOOL bSkipUnicodeDetection;
 extern int iDefaultCodePage;
+extern int iDefaultCharSet;
 
 int g_DOSEncoding;
 
@@ -514,13 +515,28 @@ void EditOnCodePageChanged(UINT oldCodePage) {
 // Encoding Helper Functions
 //
 void Encoding_InitDefaults(void) {
+	const UINT acp = GetACP();
+	if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
+		// TODO: fix issue #39 "Use Unicode UTF-8 for worldwide language support"
+		iDefaultCodePage = acp;
+	} else {
+		iDefaultCodePage = CP_ACP;
+	}
+
+	CHARSETINFO ci;
+	if (TranslateCharsetInfo((DWORD *)(UINT_PTR)iDefaultCodePage, &ci, TCI_SRCCODEPAGE)) {
+		iDefaultCharSet = ci.ciCharset;
+	} else {
+		iDefaultCharSet = ANSI_CHARSET;
+	}
+
 	const UINT oemcp = GetOEMCP();
-	wsprintf(wchANSI, L" (%u)", GetACP());
 	mEncoding[CPI_OEM].uCodePage = oemcp;
+
+	wsprintf(wchANSI, L" (%u)", acp);
 	wsprintf(wchOEM, L" (%u)", oemcp);
 
 	g_DOSEncoding = CPI_OEM;
-
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
 	if (oemcp != 437 && IsValidCodePage(437)) {
 		for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); ++i) {
