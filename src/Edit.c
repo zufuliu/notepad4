@@ -2354,7 +2354,7 @@ void EditModifyNumber(BOOL bIncrease) {
 			return;
 		}
 
-		const int radix = StrChrIA(chNumber, 'x') ? 16 : 10;
+		const int radix = strpbrk(chNumber, "xX") ? 16 : 10;
 		char *end;
 		int iNumber = (int)strtol(chNumber, &end, radix);
 		if (end == chNumber || iNumber < 0) {
@@ -2373,10 +2373,10 @@ void EditModifyNumber(BOOL bIncrease) {
 			const int len = iWidth + 1;
 			BOOL bUppercase = FALSE;
 			for (int i = len; i >= 0; i--) {
-				if (IsCharLowerA(chNumber[i])) {
+				if (IsLowerCase(chNumber[i])) {
 					break;
 				}
-				if (IsCharUpperA(chNumber[i])) {
+				if (IsUpperCase(chNumber[i])) {
 					bUppercase = TRUE;
 					break;
 				}
