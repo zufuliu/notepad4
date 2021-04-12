@@ -57,7 +57,6 @@ extern BOOL bAutoStripBlanks;
 
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
-//extern int iDefaultCharSet;
 extern BOOL bLoadANSIasUTF8;
 extern BOOL bLoadASCIIasUTF8;
 extern BOOL bLoadNFOasOEM;

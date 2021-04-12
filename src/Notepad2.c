@@ -5600,23 +5600,6 @@ void LoadSettings(void) {
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
 
-	iDefaultCodePage = 0;
-	{
-		const UINT acp = GetACP();
-		if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
-			iDefaultCodePage = acp;
-		}
-	}
-
-	{
-		CHARSETINFO ci;
-		if (TranslateCharsetInfo((DWORD *)(UINT_PTR)iDefaultCodePage, &ci, TCI_SRCCODEPAGE)) {
-			iDefaultCharSet = ci.ciCharset;
-		} else {
-			iDefaultCharSet = ANSI_CHARSET;
-		}
-	}
-
 	// Scintilla Styles
 	Style_Load();
 }
