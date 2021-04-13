@@ -7413,7 +7413,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		} else if (cchText < 2048) {
 			char tchText[2048] = "";
 			SciCall_GetText(COUNTOF(tchText), tchText);
-			StrTrimA(tchText, " \t\n\r");
+			StrTrimA(tchText, " \t\n\r"); // failure means not empty.
 			if (StrIsEmptyA(tchText)) {
 				bIsEmptyNewFile = TRUE;
 			}
