@@ -1690,7 +1690,7 @@ void EditSentenceCase(void) {
 //
 // EditURLEncode()
 //
-LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
+LPWSTR EditURLEncodeSelection(int *pcchEscaped) {
 	*pcchEscaped = 0;
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount <= 1) {
@@ -1700,17 +1700,16 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount);
 	SciCall_GetSelText(pszText);
 
-	if (bTrim) {
-		StrTrimA(pszText, " \t\r\n");
-	}
-	if (StrIsEmptyA(pszText)) {
-		NP2HeapFree(pszText);
-		return NULL;
-	}
-
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc(iSelCount * sizeof(WCHAR));
 	const UINT cpEdit = SciCall_GetCodePage();
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	NP2HeapFree(pszText);
+	// TODO: trim all C0 and C1 control characters.
+	StrTrim(pszTextW, L" \a\b\f\n\r\t\v");
+	if (StrIsEmpty(pszTextW)) {
+		NP2HeapFree(pszTextW);
+		return NULL;
+	}
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
 	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3); // '&', H1, H0
@@ -1722,7 +1721,6 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
 		//ParseURL(pszEscapedW, &ppu);
 	}
 
-	NP2HeapFree(pszText);
 	NP2HeapFree(pszTextW);
 	*pcchEscaped = cchEscapedW;
 	return pszEscapedW;
@@ -1739,7 +1737,7 @@ void EditURLEncode(void) {
 	}
 
 	int cchEscapedW;
-	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, FALSE);
+	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW);
 	if (pszEscapedW == NULL) {
 		return;
 	}
@@ -6973,7 +6971,7 @@ void EditSelectionAction(int action) {
 	}
 
 	int cchEscapedW;
-	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, TRUE);
+	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW);
 	if (pszEscapedW == NULL) {
 		return;
 	}
@@ -7605,7 +7603,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 			pvEnd++;
 		}
 		*pvEnd = '\0';
-		StrTrimA(tch, ":=\"\' \t");
+		StrTrimA(tch, ":=\"\' \t"); // ASCII, should not fail.
 
 		*pszValue = '\0';
 		strncpy(pszValue, tch, cchValue);
