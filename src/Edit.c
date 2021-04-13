@@ -2354,7 +2354,8 @@ void EditModifyNumber(BOOL bIncrease) {
 			return;
 		}
 
-		const int radix = strpbrk(chNumber, "xX") ? 16 : 10;
+		const char *ptr = strpbrk(chNumber, "xX");
+		const int radix = (ptr != NULL) ? 16 : 10;
 		char *end;
 		int iNumber = (int)strtol(chNumber, &end, radix);
 		if (end == chNumber || iNumber < 0) {
@@ -2368,20 +2369,9 @@ void EditModifyNumber(BOOL bIncrease) {
 			iNumber--;
 		}
 
-		const int iWidth = (int)strlen(chNumber) - ((radix == 16) ? 2 : 0);
-		if (radix == 16) {
-			const int len = iWidth + 1;
-			BOOL bUppercase = FALSE;
-			for (int i = len; i >= 0; i--) {
-				if (IsLowerCase(chNumber[i])) {
-					break;
-				}
-				if (IsUpperCase(chNumber[i])) {
-					bUppercase = TRUE;
-					break;
-				}
-			}
-			if (bUppercase) {
+		const int iWidth = (int)strlen(chNumber) - ((ptr != NULL) ? 2 : 0);
+		if (ptr != NULL) {
+			if (*ptr == 'X') {
 				sprintf(chNumber, "%#0*X", iWidth, iNumber);
 			} else {
 				sprintf(chNumber, "%#0*x", iWidth, iNumber);
