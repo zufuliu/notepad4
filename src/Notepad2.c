@@ -353,7 +353,6 @@ static int	flagPortableMyDocs		= 0;
 int			flagNoFadeHidden		= 0;
 static int	iOpacityLevel			= 75;
 int			iFindReplaceOpacityLevel= 75;
-static int	flagToolbarLook			= 0;
 int			flagSimpleIndentGuides	= 0;
 BOOL 		fNoHTMLGuess			= 0;
 BOOL 		fNoCGIGuess				= 0;
@@ -1877,12 +1876,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	if (!bExternalBitmap) {
-		BOOL fProcessed = FALSE;
-		if (flagToolbarLook == 1) {
-			fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
-		} else if (flagToolbarLook == 2) {
-			fProcessed = BitmapGrayScale(hbmpCopy);
-		}
+		const BOOL fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
@@ -6589,9 +6583,6 @@ void LoadFlags(void) {
 
 	iValue = IniSectionGetInt(pIniSection, L"FindReplaceOpacityLevel", 75);
 	iFindReplaceOpacityLevel = validate_i(iValue, 0, 100, 75);
-
-	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", 1);
-	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);
 	fNoHTMLGuess = IniSectionGetBool(pIniSection, L"NoHTMLGuess", 0);
