@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include "config.h"
 #include "Helpers.h"
+#include "../../scintilla/include/VectorISA.h"
+#include "../../scintilla/include/GraphicUtils.h"
 #include "Dlapi.h"
 #include "resource.h"
 
@@ -448,36 +450,6 @@ BOOL Is32bitExe(LPCWSTR lpszExeName) {
 
 //=============================================================================
 //
-//  BitmapMergeAlpha()
-//  Merge alpha channel into color channel
-//
-BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
-	BITMAP bmp;
-	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
-		if (bmp.bmBitsPixel == 32) {
-			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
-
-			const BYTE red = GetRValue(crDest);
-			const BYTE green = GetGValue(crDest);
-			const BYTE blue = GetBValue(crDest);
-			for (int y = 0; y < bmp.bmHeight; y++) {
-				for (int x = 0; x < bmp.bmWidth; x++) {
-					const BYTE alpha = prgba[x].rgbReserved;
-					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (red * (255 - alpha))) >> 8;
-					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (green * (255 - alpha))) >> 8;
-					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (blue * (255 - alpha))) >> 8;
-					prgba[x].rgbReserved = 0xFF;
-				}
-				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
-			}
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-//=============================================================================
-//
 //  BitmapAlphaBlend()
 //  Perform alpha blending to color channel only
 //
@@ -485,43 +457,115 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
+			//StopWatch watch;
+			//StopWatch_Start(watch);
+#if NP2_USE_AVX2
+#if 0
+			#define BitmapAlphaBlend_Tag	"avx2 2x2"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth / 2;
+			uint64_t *prgba = (uint64_t *)bmp.bmBits;
+
+			const __m256i i32x8Alpha = _mm256_set1_epi32(alpha);
+			__m256i i32x8Back = mm256_rgba_to_bgra_si32(crDest);
+			i32x8Back = _mm256_mullo_epi16(i32x8Back, mm256_xor_alpha_epi32(i32x8Alpha));
+			for (ULONG x = 0; x + 2 <= count; x += 2, prgba += 2) {
+				__m256i origin = mm256_unpack_color_ptr64(prgba);
+				__m256i i32x8Fore = _mm256_mullo_epi16(origin, i32x8Alpha);
+				i32x8Fore = _mm256_add_epi32(i32x8Fore, i32x8Back);
+				i32x8Fore = mm256_divlo_epu16_by_255(i32x8Fore);
+				i32x8Fore = _mm256_blend_epi32(origin, i32x8Fore, 0x77);
+				__m128i i32x4Fore = mm256_pack_color_si128(i32x8Fore);
+
+				origin = mm256_unpack_color_ptr64(prgba + 1);
+				i32x8Fore = _mm256_mullo_epi16(origin, i32x8Alpha);
+				i32x8Fore = _mm256_add_epi32(i32x8Fore, i32x8Back);
+				i32x8Fore = mm256_divlo_epu16_by_255(i32x8Fore);
+				i32x8Fore = _mm256_blend_epi32(origin, i32x8Fore, 0x77);
+
+				i32x4Fore = _mm_unpacklo_epi64(i32x4Fore, mm256_pack_color_si128(i32x8Fore));
+				_mm_storeu_si128((__m128i *)prgba, i32x4Fore);
+			}
+			if (count & 1) {
+				const __m256i origin = mm256_unpack_color_ptr64(prgba);
+				__m256i i32x8Fore = _mm256_mullo_epi16(origin, i32x8Alpha);
+				i32x8Fore = _mm256_add_epi32(i32x8Fore, i32x8Back);
+				i32x8Fore = mm256_divlo_epu16_by_255(i32x8Fore);
+				i32x8Fore = _mm256_blend_epi32(origin, i32x8Fore, 0x77);
+				__m128i i32x4Fore = mm256_pack_color_si128(i32x8Fore);
+				_mm_storel_epi64((__m128i *)prgba, i32x4Fore);
+			}
+
+#elif 0
+			#define BitmapAlphaBlend_Tag	"avx2 2x1"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth / 2;
+			uint64_t *prgba = (uint64_t *)bmp.bmBits;
+
+			const __m256i i32x8Alpha = _mm256_set1_epi32(alpha);
+			__m256i i32x8Back = mm256_rgba_to_bgra_si32(crDest);
+			i32x8Back = _mm256_mullo_epi16(i32x8Back, mm256_xor_alpha_epi32(i32x8Alpha));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m256i origin = mm256_unpack_color_ptr64(prgba);
+				__m256i i32x8Fore = _mm256_mullo_epi16(origin, i32x8Alpha);
+				i32x8Fore = _mm256_add_epi32(i32x8Fore, i32x8Back);
+				i32x8Fore = mm256_divlo_epu16_by_255(i32x8Fore);
+				i32x8Fore = _mm256_blend_epi32(origin, i32x8Fore, 0x77);
+				__m128i i32x4Fore = mm256_pack_color_si128(i32x8Fore);
+				_mm_storel_epi64((__m128i *)prgba, i32x4Fore);
+			}
+
+#else
+			#define BitmapAlphaBlend_Tag	"avx2 1x1"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
+			uint32_t *prgba = (uint32_t *)bmp.bmBits;
+
+			const __m128i i32x4Alpha = _mm_set1_epi32(alpha);
+			__m128i i32x4Back = rgba_to_bgra_avx2_si32(crDest);
+			i32x4Back = _mm_mullo_epi16(i32x4Back, mm_xor_alpha_epi32(i32x4Alpha));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m128i origin = mm_unpack_color_avx2_ptr32(prgba);
+				__m128i i32x4Fore = _mm_mullo_epi16(origin, i32x4Alpha);
+				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
+				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
+				i32x4Fore = _mm_blend_epi32(origin, i32x4Fore, 7);
+				i32x4Fore = mm_pack_color_si128(i32x4Fore);
+				_mm_storeu_si32(prgba, i32x4Fore);
+			}
+#endif // NP2_USE_AVX2
+#elif NP2_USE_SSE2
+			#define BitmapAlphaBlend_Tag	"sse2"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
+			uint32_t *prgba = (uint32_t *)bmp.bmBits;
+
+			const __m128i i32x4Alpha = _mm_set1_epi32(alpha);
+			__m128i i32x4Back = rgba_to_bgra_sse2_si32(crDest);
+			i32x4Back = _mm_mullo_epi16(i32x4Back, mm_xor_alpha_epi32(i32x4Alpha));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const uint32_t origin = *prgba;
+				__m128i i32x4Fore = mm_unpack_color_sse2_si32(origin);
+				i32x4Fore = _mm_mullo_epi16(i32x4Fore, i32x4Alpha);
+				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
+				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
+				const uint32_t color = bgr_from_bgra_s132(i32x4Fore);
+				*prgba = color | (origin & 0xff000000U);
+			}
+
+#else
+			#define BitmapAlphaBlend_Tag	"scale"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
-			const WORD red = GetRValue(crDest) * (255 - alpha);
-			const WORD green = GetGValue(crDest) * (255 - alpha);
-			const WORD blue = GetBValue(crDest) * (255 - alpha);
-			for (int y = 0; y < bmp.bmHeight; y++) {
-				for (int x = 0; x < bmp.bmWidth; x++) {
-					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + red) >> 8;
-					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + green) >> 8;
-					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
-				}
-				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
+			const WORD red = GetRValue(crDest) * (255 ^ alpha);
+			const WORD green = GetGValue(crDest) * (255 ^ alpha);
+			const WORD blue = GetBValue(crDest) * (255 ^ alpha);
+			for (ULONG x = 0; x < count; x++) {
+				prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + red) >> 8;
+				prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + green) >> 8;
+				prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
 			}
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-//=============================================================================
-//
-//  BitmapGrayScale()
-//  Gray scale color channel only
-//
-BOOL BitmapGrayScale(HBITMAP hbmp) {
-	BITMAP bmp;
-	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
-		if (bmp.bmBitsPixel == 32) {
-			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
-
-			for (int y = 0; y < bmp.bmHeight; y++) {
-				for (int x = 0; x < bmp.bmWidth; x++) {
-					prgba[x].rgbRed = prgba[x].rgbGreen = prgba[x].rgbBlue =
-							(((BYTE)((prgba[x].rgbRed * 38 + prgba[x].rgbGreen * 75 + prgba[x].rgbBlue * 15) >> 7) * 0x80) + (0xD0 * (255 - 0x80))) >> 8;
-				}
-				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
-			}
+#endif
+			//StopWatch_Stop(watch);
+			//StopWatch_ShowLog(&watch, "BitmapAlphaBlend " BitmapAlphaBlend_Tag);
+			#undef BitmapAlphaBlend_Tag
 			return TRUE;
 		}
 	}

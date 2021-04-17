@@ -4,6 +4,7 @@
   <Dependencies/>
   <VirtualDirectory Name="Scintilla">
     <VirtualDirectory Name="include">
+      <File Name="../../scintilla/include/GraphicUtils.h"/>
       <File Name="../../scintilla/include/ILexer.h"/>
       <File Name="../../scintilla/include/ILoader.h"/>
       <File Name="../../scintilla/include/LaTeXInput.h"/>

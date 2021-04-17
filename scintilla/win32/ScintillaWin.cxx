@@ -703,7 +703,12 @@ ScintillaWin::ScintillaWin(HWND hwnd) noexcept {
 	Init();
 }
 
-ScintillaWin::~ScintillaWin() = default;
+ScintillaWin::~ScintillaWin() {
+	if (sysCaretBitmap) {
+		::DeleteObject(sysCaretBitmap);
+		sysCaretBitmap = {};
+	}
+}
 
 void ScintillaWin::Init() noexcept {
 	// Initialize COM.  If the app has already done this it will have

@@ -19,6 +19,7 @@
 ******************************************************************************/
 #pragma once
 
+#include <stdint.h>
 #include "compiler.h"
 
 NP2_inline int min_i(int x, int y) {

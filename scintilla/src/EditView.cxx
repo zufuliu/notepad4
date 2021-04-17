@@ -28,6 +28,8 @@
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
+#include "VectorISA.h"
+#include "GraphicUtils.h"
 
 #include "ILoader.h"
 #include "ILexer.h"
@@ -69,6 +71,32 @@ PrintParameters::PrintParameters() noexcept {
 }
 
 namespace Scintilla {
+
+#if NP2_USE_AVX2
+inline ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
+	__m128i i32x4Fore = mm_unpack_color_avx2_si32(fore.AsInteger());
+	__m128i i32x4Back = mm_unpack_color_avx2_si32(back.AsInteger());
+	__m128i i32x4Alpha = _mm_set1_epi32(alpha);
+	i32x4Fore = mm_alpha_blend_epi32(i32x4Fore, i32x4Back, i32x4Alpha);
+	const uint32_t color = mm_pack_color_si32(i32x4Fore);
+	return ColourDesired(color);
+}
+
+#elif NP2_USE_SSE2
+inline ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
+	__m128i i32x4Fore = mm_unpack_color_sse2_si32(fore.AsInteger());
+	__m128i i32x4Back = mm_unpack_color_sse2_si32(back.AsInteger());
+	__m128i i32x4Alpha = _mm_set1_epi32(alpha);
+	i32x4Fore = mm_alpha_blend_epi32(i32x4Fore, i32x4Back, i32x4Alpha);
+	const uint32_t color = mm_pack_color_si32(i32x4Fore);
+	return ColourDesired(color);
+}
+
+#else
+constexpr ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
+	return ColourDesired::AlphaBlend(fore, back, alpha);
+}
+#endif
 
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept {
 	if (st.multipleStyles) {
@@ -2113,7 +2141,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 							if (vsDraw.whitespaceColours.fore.isSet)
 								textFore = vsDraw.whitespaceColours.fore;
 							if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
-								textFore = textFore.AlphaBlendOn(vsDraw.whitespaceForeAlpha, textBack);
+								textFore = AlphaBlend(textFore, textBack, vsDraw.whitespaceForeAlpha);
 							const PRectangle rcTab(rcSegment.left + 1, rcSegment.top + tabArrowHeight,
 								rcSegment.right - 1, rcSegment.bottom - vsDraw.maxDescent);
 							const int segmentTop = static_cast<int>(rcSegment.top + vsDraw.lineHeight / 2);
@@ -2177,7 +2205,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 									rcDot.right = rcDot.left + vsDraw.whitespaceSize;
 									rcDot.bottom = rcDot.top + vsDraw.whitespaceSize;
 									if (vsDraw.whitespaceForeAlpha != SC_ALPHA_NOALPHA)
-										textFore = textFore.AlphaBlendOn(vsDraw.whitespaceForeAlpha, textBack);
+										textFore = AlphaBlend(textFore, textBack, vsDraw.whitespaceForeAlpha);
 									surface->FillRectangleAligned(rcDot, Fill(textFore));
 								}
 							}

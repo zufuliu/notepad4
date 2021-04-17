@@ -1137,6 +1137,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlYAML.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\scintilla\include\GraphicUtils.h" />
     <ClInclude Include="..\..\scintilla\include\ILexer.h" />
     <ClInclude Include="..\..\scintilla\include\ILoader.h" />
     <ClInclude Include="..\..\scintilla\include\LaTeXInput.h" />

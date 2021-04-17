@@ -35,6 +35,8 @@
 #include "Geometry.h"
 #include "Platform.h"
 #include "VectorISA.h"
+#include "GraphicUtils.h"
+
 #include "Scintilla.h"
 #include "XPM.h"
 #include "CharClassify.h"
@@ -794,22 +796,52 @@ void SurfaceGDI::RoundedRectangle(PRectangle rc, FillStroke fillStroke) noexcept
 
 namespace {
 
-constexpr DWORD dwordFromBGRA(byte b, byte g, byte r, byte a) noexcept {
-	return (a << 24) | (r << 16) | (g << 8) | b;
+#if NP2_USE_AVX2
+inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+	__m128i i32x4Color = rgba_to_abgr_avx2_si32(colour.AsInteger());
+	__m128i i32x4Alpha = _mm_broadcastd_epi32(i32x4Color);
+	i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
+	i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
+	i32x4Color = _mm_alignr_epi8(i32x4Alpha, i32x4Color, 4);
+	return mm_pack_color_si32(i32x4Color);
 }
 
-constexpr byte AlphaScaled(unsigned char component, unsigned int alpha) noexcept {
-	return static_cast<byte>(component * alpha / 255);
+#elif NP2_USE_SSE2
+inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+	const uint32_t rgba = bswap32(colour.AsInteger());
+	__m128i i32x4Color = mm_unpack_color_sse2_si32(rgba);
+	__m128i i32x4Alpha = _mm_shuffle_epi32(i32x4Color, 0);
+	i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
+	i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
+
+	const uint32_t color = bgr_from_abgr_s132(i32x4Color);
+	return color | (rgba << 24);
 }
 
-constexpr DWORD dwordMultiplied(ColourAlpha colour) noexcept {
-	const unsigned int alpha = colour.GetAlpha();
-	return dwordFromBGRA(
-		AlphaScaled(colour.GetBlue(), alpha),
-		AlphaScaled(colour.GetGreen(), alpha),
-		AlphaScaled(colour.GetRed(), alpha),
-		static_cast<byte>(alpha));
+#else
+// make a GDI RGBQUAD as DWORD.
+template <typename T>
+constexpr DWORD RGBQuad(T alpha, T red, T green, T blue) noexcept {
+	return (alpha << 24) | (red << 16) | (green << 8) | blue;
 }
+
+template <typename T>
+constexpr T AlphaScaled(T component, T alpha) noexcept {
+	return static_cast<T>(component * alpha / 255);
+}
+
+template <typename T>
+constexpr DWORD RGBQuadMultiplied(T alpha, T red, T green, T blue) noexcept {
+	red = AlphaScaled(red, alpha);
+	green = AlphaScaled(green, alpha);
+	blue = AlphaScaled(blue, alpha);
+	return RGBQuad(alpha, red, green, blue);
+}
+
+constexpr DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+	return RGBQuadMultiplied(colour.GetAlpha(), colour.GetRed(), colour.GetGreen(), colour.GetBlue());
+}
+#endif
 
 class DIBSection {
 	HDC hMemDC{};
@@ -892,31 +924,69 @@ void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
 	SetPixel(xSymmetric, ySymmetric, value);
 }
 
-constexpr unsigned int Proportional(unsigned char a, unsigned char b, XYPOSITION t) noexcept {
-	return static_cast<unsigned int>(a + t * (b - a));
+#if NP2_USE_AVX2
+inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+	__m128i i32x4Fore = rgba_to_abgr_avx2_si32(a.AsInteger());
+	__m128i i32x4Back = rgba_to_abgr_avx2_si32(b.AsInteger());
+	// a + t * (b - a)
+	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
+	// component * alpha / 255
+	__m128 f32x4Alpha = _mm_broadcastss_ps(f32x4Fore);
+	f32x4Fore = _mm_mul_ps(f32x4Fore, f32x4Alpha);
+	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
+	f32x4Fore = mm_alignr_ps(f32x4Alpha, f32x4Fore, 1);
+
+	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
+	return mm_pack_color_si32(i32x4Fore);
 }
 
-ColourAlpha Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
-	return ColourAlpha(
-		Proportional(a.GetRed(), b.GetRed(), t),
-		Proportional(a.GetGreen(), b.GetGreen(), t),
-		Proportional(a.GetBlue(), b.GetBlue(), t),
-		Proportional(a.GetAlpha(), b.GetAlpha(), t));
+#elif NP2_USE_SSE2
+inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+	__m128i i32x4Fore = rgba_to_abgr_sse2_si32(a.AsInteger());
+	__m128i i32x4Back = rgba_to_abgr_sse2_si32(b.AsInteger());
+	// a + t * (b - a)
+	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
+	// component * alpha / 255
+	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
+	__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0);
+	f32x4Fore = _mm_mul_ps(f32x4Fore, f32x4Alpha);
+	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
+
+	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
+	const uint32_t color = bgr_from_abgr_s132(i32x4Fore);
+	return color | (alpha << 24);
 }
 
-ColourAlpha GradientValue(const std::vector<ColourStop> &stops, XYPOSITION proportion) noexcept {
+#else
+constexpr uint32_t Proportional(uint8_t a, uint8_t b, XYPOSITION t) noexcept {
+	return static_cast<uint32_t>(a + t * (b - a));
+}
+
+constexpr DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+	const uint32_t red = Proportional(a.GetRed(), b.GetRed(), t);
+	const uint32_t green = Proportional(a.GetGreen(), b.GetGreen(), t);
+	const uint32_t blue = Proportional(a.GetBlue(), b.GetBlue(), t);
+	const uint32_t alpha = Proportional(a.GetAlpha(), b.GetAlpha(), t);
+	return RGBQuadMultiplied(alpha, red, green, blue);
+}
+#endif
+
+DWORD GradientValue(const std::vector<ColourStop> &stops, XYPOSITION proportion) noexcept {
 	for (size_t stop = 0; stop < stops.size() - 1; stop++) {
 		// Loop through each pair of stops
 		const XYPOSITION positionStart = stops[stop].position;
 		const XYPOSITION positionEnd = stops[stop + 1].position;
 		if ((proportion >= positionStart) && (proportion <= positionEnd)) {
-			const XYPOSITION proportionInPair = (proportion - positionStart) /
-				(positionEnd - positionStart);
+			const XYPOSITION proportionInPair = (proportion - positionStart) / (positionEnd - positionStart);
 			return Proportional(stops[stop].colour, stops[stop + 1].colour, proportionInPair);
 		}
 	}
 	// Loop should always find a value
-	return ColourAlpha();
+	return 0;
 }
 
 constexpr SIZE SizeOfRect(RECT rc) noexcept {
@@ -938,9 +1008,9 @@ void SurfaceGDI::AlphaRectangle(PRectangle rc, XYPOSITION cornerSize, FillStroke
 			// Ensure not distorted too much by corners when small
 			const LONG corner = std::min(static_cast<LONG>(cornerSize), (std::min(size.cx, size.cy) / 2) - 2);
 
-			constexpr DWORD valEmpty = dwordFromBGRA(0, 0, 0, 0);
-			const DWORD valFill = dwordMultiplied(fillStroke.fill.colour);
-			const DWORD valOutline = dwordMultiplied(fillStroke.stroke.colour);
+			constexpr DWORD valEmpty = 0;
+			const DWORD valFill = RGBQuadMultiplied(fillStroke.fill.colour);
+			const DWORD valOutline = RGBQuadMultiplied(fillStroke.stroke.colour);
 
 			// Draw a framed rectangle
 			for (int y = 0; y < size.cy; y++) {
@@ -983,8 +1053,7 @@ void SurfaceGDI::GradientRectangle(PRectangle rc, const std::vector<ColourStop> 
 			for (LONG y = 0; y < size.cy; y++) {
 				// Find y/height proportional colour
 				const XYPOSITION proportion = y / (rc.Height() - 1.0f);
-				const ColourAlpha mixed = GradientValue(stops, proportion);
-				const DWORD valFill = dwordMultiplied(mixed);
+				const DWORD valFill = GradientValue(stops, proportion);
 				for (LONG x = 0; x < size.cx; x++) {
 					section.SetPixel(x, y, valFill);
 				}
@@ -993,8 +1062,7 @@ void SurfaceGDI::GradientRectangle(PRectangle rc, const std::vector<ColourStop> 
 			for (LONG x = 0; x < size.cx; x++) {
 				// Find x/width proportional colour
 				const XYPOSITION proportion = x / (rc.Width() - 1.0f);
-				const ColourAlpha mixed = GradientValue(stops, proportion);
-				const DWORD valFill = dwordMultiplied(mixed);
+				const DWORD valFill = GradientValue(stops, proportion);
 				for (LONG y = 0; y < size.cy; y++) {
 					section.SetPixel(x, y, valFill);
 				}
@@ -1336,6 +1404,23 @@ constexpr unsigned int SupportsD2D =
 	(1 << SC_SUPPORTS_TRANSLUCENT_STROKE) |
 	(1 << SC_SUPPORTS_PIXEL_MODIFICATION);
 
+#if NP2_USE_SSE2
+static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
+
+inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
+#if NP2_USE_AVX2
+	__m128i i32x4 = mm_unpack_color_avx2_si32(colour.AsInteger());
+#else
+	__m128i i32x4 = mm_unpack_color_sse2_si32(colour.AsInteger());
+#endif
+	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
+	f32x4 = _mm_div_ps(f32x4, _mm_set1_ps(255.0f));
+	D2D_COLOR_F color;
+	_mm_storeu_ps((float *)&color, f32x4);
+	return color;
+}
+
+#else
 constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 	return D2D_COLOR_F {
 		colour.GetRedComponent(),
@@ -1344,6 +1429,7 @@ constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 		colour.GetAlphaComponent()
 	};
 }
+#endif
 
 constexpr D2D1_RECT_F RectangleInset(D2D1_RECT_F rect, FLOAT inset) noexcept {
 	return D2D1_RECT_F {
