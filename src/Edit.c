@@ -7784,7 +7784,7 @@ static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) 
 		action = fExpanded ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 	}
 
-	if (action != fExpanded) {
+	if ((BOOL)action != fExpanded) {
 		SciCall_ToggleFold(line);
 		if (*fToggled == FALSE || *pAction == FOLD_ACTION_SNIFF) {
 			// empty INI section not changed after toggle (issue #48).
