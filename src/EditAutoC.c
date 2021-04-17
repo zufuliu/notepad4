@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "SciCall.h"
+#include "VectorISA.h"
 #include "Helpers.h"
 #include "Edit.h"
 #include "Styles.h"
