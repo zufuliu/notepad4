@@ -33,11 +33,19 @@ static inline __m128i mm_setlo_epi32(uint32_t value) NP2_noexcept {
 #endif
 }
 
-static inline __m128i mm_loadl_si32(const uint32_t *value) NP2_noexcept {
+static inline __m128i mm_loadu_si32(const uint32_t *value) NP2_noexcept {
 #if defined(__GNUC__)
 	return _mm_setr_epi32(*value, 0, 0, 0);
 #else
 	return _mm_loadu_si32(value);
+#endif
+}
+
+static inline void mm_storeu_si32(void *mem_addr, __m128i a) NP2_noexcept {
+#if defined(__GNUC__)
+	*((uint32_t *)mem_addr) = _mm_cvtsi128_si32(a);
+#else
+	_mm_storeu_si32(mem_addr, a);
 #endif
 }
 
@@ -81,7 +89,7 @@ static inline __m128i mm_unpack_color_sse2_si32(uint32_t color) NP2_noexcept {
 }
 
 static inline __m128i mm_unpack_color_sse2_ptr32(const uint32_t *color) NP2_noexcept {
-	__m128i i32x4 = mm_loadl_si32(color);
+	__m128i i32x4 = mm_loadu_si32(color);
 	i32x4 = _mm_unpacklo_epi8(i32x4, _mm_setzero_si128());
 	i32x4 = _mm_unpacklo_epi8(i32x4, _mm_setzero_si128());
 	return i32x4;

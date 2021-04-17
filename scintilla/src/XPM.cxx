@@ -289,7 +289,7 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 		i32x4Color = _mm_alignr_epi8(i32x4Alpha, i32x4Color, 4);
 
 		i32x4Color = mm_pack_color_si128(i32x4Color);
-		_mm_storeu_si32(pbgra, i32x4Color);
+		mm_storeu_si32(pbgra, i32x4Color);
 	}
 
 #elif NP2_USE_SSE2
