@@ -712,10 +712,6 @@ void Editor::SetSelection(SelectionPosition currentPos_) {
 	QueueIdleWork(WorkItems::updateUI);
 }
 
-void Editor::SetSelection(Sci::Position currentPos_) {
-	SetSelection(SelectionPosition(currentPos_));
-}
-
 void Editor::SetEmptySelection(SelectionPosition currentPos_) {
 	const Sci::Line currentLine = pdoc->SciLineFromPosition(currentPos_.Position());
 	SelectionRange rangeNew(ClampPositionIntoDocument(currentPos_));

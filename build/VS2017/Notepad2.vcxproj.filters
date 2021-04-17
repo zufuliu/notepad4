@@ -563,6 +563,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\scintilla\include\GraphicUtils.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\include\ILexer.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>

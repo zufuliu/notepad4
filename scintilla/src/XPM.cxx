@@ -20,6 +20,8 @@
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
+#include "VectorISA.h"
+#include "GraphicUtils.h"
 
 #include "XPM.h"
 
@@ -275,16 +277,48 @@ void RGBAImage::SetPixel(int x, int y, ColourDesired colour, int alpha) noexcept
 // Transform a block of pixels from RGBA to BGRA with premultiplied alpha.
 // Used for DrawRGBAImage on some platforms.
 void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept {
+#if NP2_USE_AVX2
+	count /= bytesPerPixel;
+	uint32_t *pbgra = reinterpret_cast<uint32_t *>(pixelsBGRA);
+	const uint32_t *prgba = reinterpret_cast<const uint32_t *>(pixelsRGBA);
+	for (size_t i = 0; i < count; i++, pbgra++) {
+		__m128i i32x4Color = mm_unpack_color_avx2_si32(loadbe_u32(prgba++));
+		__m128i i32x4Alpha = _mm_broadcastd_epi32(i32x4Color);
+		i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
+		i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
+		i32x4Color = _mm_alignr_epi8(i32x4Alpha, i32x4Color, 4);
+
+		i32x4Color = mm_pack_color_si128(i32x4Color);
+		_mm_storeu_si32(pbgra, i32x4Color);
+	}
+
+#elif NP2_USE_SSE2
+	count /= bytesPerPixel;
+	uint32_t *pbgra = reinterpret_cast<uint32_t *>(pixelsBGRA);
+	const uint32_t *prgba = reinterpret_cast<const uint32_t *>(pixelsRGBA);
+	for (size_t i = 0; i < count; i++, pbgra++) {
+		const uint32_t rgba = bswap32(*prgba++);
+		__m128i i32x4Color = mm_unpack_color_sse2_si32(rgba);
+		__m128i i32x4Alpha = _mm_shuffle_epi32(i32x4Color, 0);
+		i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
+		i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
+
+		const uint32_t color = bgr_from_abgr_s132(i32x4Color);
+		*pbgra = (color | (rgba << 24));
+	}
+
+#else
 	for (size_t i = 0; i < count; i++) {
 		const unsigned char alpha = pixelsRGBA[3];
 		// Input is RGBA, output is BGRA with premultiplied alpha
-		pixelsBGRA[2] = (pixelsRGBA[0] * alpha + 127) / 255;
-		pixelsBGRA[1] = (pixelsRGBA[1] * alpha + 127) / 255;
-		pixelsBGRA[0] = (pixelsRGBA[2] * alpha + 127) / 255;
+		pixelsBGRA[2] = pixelsRGBA[0] * alpha / 255;
+		pixelsBGRA[1] = pixelsRGBA[1] * alpha / 255;
+		pixelsBGRA[0] = pixelsRGBA[2] * alpha / 255;
 		pixelsBGRA[3] = alpha;
 		pixelsRGBA += bytesPerPixel;
 		pixelsBGRA += bytesPerPixel;
 	}
+#endif
 }
 
 RGBAImageSet::RGBAImageSet() noexcept : height(-1), width(-1) {
