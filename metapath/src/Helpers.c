@@ -528,7 +528,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
 				i32x4Fore = _mm_blend_epi32(origin, i32x4Fore, 7);
 				i32x4Fore = mm_pack_color_si128(i32x4Fore);
-				_mm_storeu_si32(prgba, i32x4Fore);
+				mm_storeu_si32(prgba, i32x4Fore);
 			}
 #endif // NP2_USE_AVX2
 #elif NP2_USE_SSE2
