@@ -2630,7 +2630,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 
 			if (flagUseSystemMRU != 2) {
 				flagUseSystemMRU = 2;
-				IniSetInt(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1);
+				IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1, 1);
 			}
 		}
 	} else {

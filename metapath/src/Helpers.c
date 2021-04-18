@@ -481,7 +481,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 				_mm_storel_epi64((__m128i *)prgba, i32x4Fore);
 			}
 
-#elif 0
+#else
 			#define BitmapAlphaBlend_Tag	"avx2 1x1"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			uint32_t *prgba = (uint32_t *)bmp.bmBits;

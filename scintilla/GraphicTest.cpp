@@ -43,10 +43,8 @@ struct ColourAlpha {
 };
 using ColourDesired = ColourAlpha;
 
-static inline uint32_t ColorFromRGBQuad(RGBQUAD quad) noexcept {
-	uint32_t dummy;
-	memcpy(&dummy, &quad, sizeof(quad));
-	return dummy;
+static inline uint32_t RGBQuadToUInt32(RGBQUAD quad) noexcept {
+	return *(uint32_t *)((void *)(&quad));
 }
 
 union DualPixel {
@@ -401,6 +399,7 @@ uint32_t BitmapAlphaBlend_sse2(uint32_t fore, COLORREF back, unsigned int alpha)
 	return color | (fore & 0xff000000);
 }
 
+#if 0 // TestBitmapAlphaBlend
 void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE alpha) {
 	printf("BitmapAlphaBlend(%s, %08x, %02x)\n", path, crDest, alpha);
 	std::vector<uint32_t> data;
@@ -423,7 +422,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			quad.rgbRed = (BYTE)(((quad.rgbRed * alpha) + red) / 255);
 			quad.rgbGreen = (BYTE)(((quad.rgbGreen * alpha) + green) / 255);
 			quad.rgbBlue = (BYTE)(((quad.rgbBlue * alpha) + blue) / 255);
-			scale[x] = ColorFromRGBQuad(quad);
+			scale[x] = RGBQuadToUInt32(quad);
 		}
 	}
 
@@ -552,8 +551,9 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			}
 		}
 	}
-#endif
+#endif // NP2_USE_AVX2
 }
+#endif // TestBitmapAlphaBlend
 #endif // BitmapAlphaBlend
 
 #if 0 // BitmapGrayScale
