@@ -814,7 +814,7 @@ inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
 	i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
 	i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
 
-	const uint32_t color = bgr_from_abgr_s132(i32x4Color);
+	const uint32_t color = bgr_from_abgr_si32(i32x4Color);
 	return color | (rgba << 24);
 }
 
@@ -957,7 +957,7 @@ inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
 	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
 
 	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
-	const uint32_t color = bgr_from_abgr_s132(i32x4Fore);
+	const uint32_t color = bgr_from_abgr_si32(i32x4Fore);
 	return color | (alpha << 24);
 }
 
