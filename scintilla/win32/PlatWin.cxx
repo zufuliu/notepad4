@@ -1447,8 +1447,6 @@ class BlobInline;
 class SurfaceD2D final : public Surface {
 	SurfaceMode mode;
 
-	int codePageText =0;
-
 	ID2D1RenderTarget *pRenderTarget = nullptr;
 	ID2D1BitmapRenderTarget *pBitmapRenderTarget = nullptr;
 	bool ownRenderTarget = false;
@@ -1636,7 +1634,6 @@ void SurfaceD2D::SetFont(const Font *font_) noexcept {
 	yAscent = pfm->yAscent;
 	yDescent = pfm->yDescent;
 	yInternalLeading = pfm->yInternalLeading;
-	codePageText = mode.codePage;
 	if (pRenderTarget) {
 		const D2D1_TEXT_ANTIALIAS_MODE aaMode = DWriteMapFontQuality(pfm->extraFontFlag);
 
@@ -2460,7 +2457,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 			static_cast<FLOAT>(rc.Height()),
 			&pTextLayout);
 		if (SUCCEEDED(hr)) {
-			D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase-yAscent));
+			D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase - yAscent));
 			pRenderTarget->DrawTextLayout(origin, pTextLayout, pBrush, d2dDrawTextOptions);
 			ReleaseUnknown(pTextLayout);
 		}
@@ -2476,7 +2473,7 @@ void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION yba
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, codePageText, ETO_OPAQUE);
+		DrawTextCommon(rc, font_, ybase, text, mode.codePage, ETO_OPAQUE);
 	}
 }
 
@@ -2485,7 +2482,7 @@ void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION yb
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, codePageText, ETO_OPAQUE | ETO_CLIPPED);
+		DrawTextCommon(rc, font_, ybase, text, mode.codePage, ETO_OPAQUE | ETO_CLIPPED);
 	}
 }
 
@@ -2496,7 +2493,7 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 		if (ch != ' ') {
 			if (pRenderTarget) {
 				D2DPenColourAlpha(fore);
-				DrawTextCommon(rc, font_, ybase, text, codePageText, 0);
+				DrawTextCommon(rc, font_, ybase, text, mode.codePage, 0);
 			}
 			return;
 		}
@@ -2509,7 +2506,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		// SetFont failed or no access to DirectWrite so give up.
 		return;
 	}
-	const TextWide tbuf(text, codePageText);
+	const TextWide tbuf(text, mode.codePage);
 	TextPositions poses(tbuf.tlen);
 	// Initialize poses for safety.
 	std::fill(poses.buffer, poses.buffer + tbuf.tlen, 0.0f);
@@ -2561,7 +2558,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			positions[i++] = lastPos;
 		}
 	} else {
-		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(codePageText);
+		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(mode.codePage);
 		if (dbcs) {
 			// May be one or two bytes per position
 			int ui = 0;
@@ -2589,7 +2586,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 XYPOSITION SurfaceD2D::WidthText(const Font *font_, std::string_view text) {
 	FLOAT width = 1.0;
 	SetFont(font_);
-	const TextWide tbuf(text, codePageText);
+	const TextWide tbuf(text, mode.codePage);
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
