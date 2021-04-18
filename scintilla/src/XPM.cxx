@@ -303,7 +303,7 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 		i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
 		i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
 
-		const uint32_t color = bgr_from_abgr_s132(i32x4Color);
+		const uint32_t color = bgr_from_abgr_si32(i32x4Color);
 		*pbgra = (color | (rgba << 24));
 	}
 
