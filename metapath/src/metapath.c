@@ -2673,7 +2673,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		if (iStartupDir == 1) {
 			IniSetString(INI_SECTION_NAME_SETTINGS, L"MRUDirectory", szCurDir);
 		}
-		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
+		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, 1);
 		return;
 	}
 

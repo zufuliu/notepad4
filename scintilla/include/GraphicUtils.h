@@ -143,7 +143,7 @@ static inline uint32_t bgr_from_abgr_si32(__m128i i32x4) NP2_noexcept {
 #endif // NP2_USE_SSE2
 
 #if NP2_USE_AVX2
-#define pshufb(n)	(0x80808000 | (n))
+#define pshufb_1to4(n)	(0x80808000 | (n))
 
 #define mm_alignr_ps(a, b, imm8) \
 	_mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(a), _mm_castps_si128(b), (imm8)*4))
@@ -166,7 +166,7 @@ static inline __m128i rgba_to_bgra_avx2_si32(uint32_t color) NP2_noexcept {
 	return _mm_shuffle_epi32(i32x4, 0xc6); // 0b11_00_01_10
 #else
 	__m128i i32x4 = mm_setlo_epi32(color);
-	return _mm_shuffle_epi8(i32x4, _mm_setr_epi32(pshufb(2), pshufb(1), pshufb(0), pshufb(3)));
+	return _mm_shuffle_epi8(i32x4, _mm_setr_epi32(pshufb_1to4(2), pshufb_1to4(1), pshufb_1to4(0), pshufb_1to4(3)));
 #endif
 }
 

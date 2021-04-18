@@ -4192,12 +4192,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_REUSEWINDOW:
 		bReuseWindow = !bReuseWindow;
-		IniSetBool(INI_SECTION_NAME_FLAGS, L"ReuseWindow", bReuseWindow);
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ReuseWindow", bReuseWindow, 0);
 		break;
 
 	case IDM_VIEW_SINGLEFILEINSTANCE:
 		bSingleFileInstance = !bSingleFileInstance;
-		IniSetBool(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance);
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance, 1);
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
@@ -5271,7 +5271,7 @@ void LoadSettings(void) {
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
+	//const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", 0);
 	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", 0);
@@ -5353,7 +5353,6 @@ void LoadSettings(void) {
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
 	bHighlightCurrentBlock = IniSectionGetBool(pIniSection, L"HighlightCurrentBlock", 1);
 	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
-	iValue = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iValue;
 	bHighlightCurrentSubLine = iValue > 10;
 	iHighlightCurrentLine = clamp_i(iValue % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
@@ -5410,8 +5409,6 @@ void LoadSettings(void) {
 	iLongLineMode = clamp_i(iValue, EDGE_LINE, EDGE_BACKGROUND);
 
 	iValue = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
-	// Added in v4.2.25.1172, stored as a relative font size in point, in range [-10, 20].
-	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
 	iZoomLevel = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	bShowBookmarkMargin = IniSectionGetBool(pIniSection, L"ShowBookmarkMargin", 0);
@@ -5457,8 +5454,6 @@ void LoadSettings(void) {
 	iPrintColor = clamp_i(iValue, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintZoom", 100);
-	// previously stored as a relative font size in point plus 10, in range [-10, 20] + 10.
-	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
 	iPrintZoom = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
@@ -5657,7 +5652,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
-		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
+		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, 1);
 		return;
 	}
 
@@ -5667,7 +5662,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
-	IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
+	//IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, 1);
 	IniSectionSetBoolEx(pIniSection, L"SaveRecentFiles", bSaveRecentFiles, 0);
 	IniSectionSetBoolEx(pIniSection, L"SaveFindReplace", bSaveFindReplace, 0);
