@@ -107,9 +107,11 @@ static inline __m128i mm_pack_color_si128(__m128i i32x4) NP2_noexcept {
 	return i32x4;
 }
 
+#if defined(_WIN64)
 static inline uint64_t mm_pack_color_si64(__m128i i32x4) NP2_noexcept {
 	return _mm_cvtsi128_si64(mm_pack_color_si128(i32x4));
 }
+#endif
 
 static inline uint32_t mm_pack_color_si32(__m128i i32x4) NP2_noexcept {
 	return _mm_cvtsi128_si32(mm_pack_color_si128(i32x4));
