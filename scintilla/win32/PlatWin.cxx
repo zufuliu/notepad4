@@ -410,11 +410,6 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 		const std::wstring wsLocale = WStringFromUTF8(fp.localeName);
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wsFamily.c_str(), nullptr,
 			weight, style, stretch, fHeight, wsLocale.c_str(), &pTextFormat);
-		if (hr == E_INVALIDARG) {
-			// Possibly a bad locale name like "/" so try "en-us".
-			hr = pIDWriteFactory->CreateTextFormat(wsFamily.c_str(), nullptr,
-					weight, style, stretch, fHeight, L"en-us", &pTextFormat);
-		}
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
@@ -803,23 +798,23 @@ namespace {
 
 #if NP2_USE_AVX2
 inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
-	__m128i i32x4Color = rgba_to_abgr_avx2_si32(colour.AsInteger());
-	__m128i i32x4Alpha = _mm_broadcastd_epi32(i32x4Color);
-	i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
-	i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
-	i32x4Color = _mm_alignr_epi8(i32x4Alpha, i32x4Color, 4);
-	return mm_pack_color_si32(i32x4Color);
+	__m128i i16x4Color = rgba_to_bgra_epi16_sse4_si32(colour.AsInteger());
+	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0xff);
+	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
+	i16x4Color = mm_div_epu16_by_255(i16x4Color);
+	i16x4Color = _mm_blend_epi16(i16x4Alpha, i16x4Color, 7);
+	return pack_color_epi16_sse2_si32(i16x4Color);
 }
 
 #elif NP2_USE_SSE2
 inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
 	const uint32_t rgba = bswap32(colour.AsInteger());
-	__m128i i32x4Color = mm_unpack_color_sse2_si32(rgba);
-	__m128i i32x4Alpha = _mm_shuffle_epi32(i32x4Color, 0);
-	i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
-	i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
+	__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
+	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
+	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
+	i16x4Color = mm_div_epu16_by_255(i16x4Color);
 
-	const uint32_t color = bgr_from_abgr_si32(i32x4Color);
+	const uint32_t color = bgr_from_abgr_epi16_sse2_si32(i16x4Color);
 	return color | (rgba << 24);
 }
 
@@ -931,8 +926,8 @@ void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
 
 #if NP2_USE_AVX2
 inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
-	__m128i i32x4Fore = rgba_to_abgr_avx2_si32(a.AsInteger());
-	__m128i i32x4Back = rgba_to_abgr_avx2_si32(b.AsInteger());
+	__m128i i32x4Fore = rgba_to_abgr_epi32_sse4_si32(a.AsInteger());
+	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
 	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
@@ -944,13 +939,13 @@ inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
 	f32x4Fore = mm_alignr_ps(f32x4Alpha, f32x4Fore, 1);
 
 	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
-	return mm_pack_color_si32(i32x4Fore);
+	return pack_color_epi32_sse2_si32(i32x4Fore);
 }
 
 #elif NP2_USE_SSE2
 inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
-	__m128i i32x4Fore = rgba_to_abgr_sse2_si32(a.AsInteger());
-	__m128i i32x4Back = rgba_to_abgr_sse2_si32(b.AsInteger());
+	__m128i i32x4Fore = rgba_to_abgr_epi32_sse2_si32(a.AsInteger());
+	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
 	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
@@ -962,7 +957,7 @@ inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
 	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
 
 	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
-	const uint32_t color = bgr_from_abgr_si32(i32x4Fore);
+	const uint32_t color = bgr_from_abgr_epi32_sse2_si32(i32x4Fore);
 	return color | (alpha << 24);
 }
 
@@ -1414,9 +1409,9 @@ static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
 
 inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 #if NP2_USE_AVX2
-	__m128i i32x4 = mm_unpack_color_avx2_si32(colour.AsInteger());
+	__m128i i32x4 = unpack_color_epi32_sse4_si32(colour.AsInteger());
 #else
-	__m128i i32x4 = mm_unpack_color_sse2_si32(colour.AsInteger());
+	__m128i i32x4 = unpack_color_epi32_sse2_si32(colour.AsInteger());
 #endif
 	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
 	f32x4 = _mm_div_ps(f32x4, _mm_set1_ps(255.0f));
@@ -1513,7 +1508,7 @@ public:
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void SCICALL DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions);
+	void SCICALL DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageDraw, UINT fuOptions);
 
 	void SCICALL DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
 	void SCICALL DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
@@ -2443,11 +2438,10 @@ std::unique_ptr<IScreenLineLayout> SurfaceD2D::Layout(const IScreenLine *screenL
 	return std::make_unique<ScreenLineLayout>(screenLine);
 }
 
-void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions) {
+void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageDraw, UINT fuOptions) {
 	SetFont(font_);
 
 	// Use Unicode calls
-	const int codePageDraw = codePageOverride ? codePageOverride : mode.codePage;
 	const TextWide tbuf(text, codePageDraw);
 	if (pRenderTarget && pTextFormat && pBrush) {
 		if (fuOptions & ETO_CLIPPED) {
@@ -2479,7 +2473,7 @@ void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION yba
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, 0, ETO_OPAQUE);
+		DrawTextCommon(rc, font_, ybase, text, mode.codePage, ETO_OPAQUE);
 	}
 }
 
@@ -2488,7 +2482,7 @@ void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION yb
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, 0, ETO_OPAQUE | ETO_CLIPPED);
+		DrawTextCommon(rc, font_, ybase, text, mode.codePage, ETO_OPAQUE | ETO_CLIPPED);
 	}
 }
 
@@ -2499,7 +2493,7 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 		if (ch != ' ') {
 			if (pRenderTarget) {
 				D2DPenColourAlpha(fore);
-				DrawTextCommon(rc, font_, ybase, text, 0, 0);
+				DrawTextCommon(rc, font_, ybase, text, mode.codePage, 0);
 			}
 			return;
 		}
@@ -2531,7 +2525,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	XYPOSITION position = 0.0;
+	FLOAT position = 0.0f;
 	int ti = 0;
 	for (unsigned int ci = 0; ci < count; ci++) {
 		const FLOAT width = clusterMetrics[ci].width;
@@ -2544,8 +2538,9 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	PLATFORM_ASSERT(ti == tbuf.tlen);
 	if (mode.codePage == SC_CP_UTF8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
+		int ui = 0;
 		size_t i = 0;
-		for (int ui = 0; ui < tbuf.tlen; ui++) {
+		while (ui < tbuf.tlen) {
 			const unsigned char uch = text[i];
 			const unsigned int byteCount = UTF8BytesOfLead(uch);
 			if (byteCount == 4) {	// Non-BMP
@@ -2554,8 +2549,11 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.tlen); bytePos++) {
 				positions[i++] = poses.buffer[ui];
 			}
+			ui++;
 		}
-		const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
+		XYPOSITION lastPos = 0.0f;
+		if (i > 0)
+			lastPos = positions[i - 1];
 		while (i < text.length()) {
 			positions[i++] = lastPos;
 		}
@@ -2660,7 +2658,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	XYPOSITION position = 0.0f;
+	FLOAT position = 0.0f;
 	int ti = 0;
 	for (unsigned int ci = 0; ci < count; ci++) {
 		const FLOAT width = clusterMetrics[ci].width;
@@ -2672,20 +2670,22 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	}
 	PLATFORM_ASSERT(ti == tbuf.tlen);
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
+	int ui = 0;
 	size_t i = 0;
-	for (int ui = 0; ui < tbuf.tlen; ui++) {
+	while (ui < tbuf.tlen) {
 		const unsigned char uch = text[i];
 		const unsigned int byteCount = UTF8BytesOfLead(uch);
 		if (byteCount == 4) {	// Non-BMP
 			ui++;
-			PLATFORM_ASSERT(ui < ti);
 		}
 		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()); bytePos++) {
 			positions[i++] = poses.buffer[ui];
 		}
-
+		ui++;
 	}
-	const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
+	XYPOSITION lastPos = 0.0f;
+	if (i > 0)
+		lastPos = positions[i - 1];
 	while (i < text.length()) {
 		positions[i++] = lastPos;
 	}

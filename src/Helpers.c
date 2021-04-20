@@ -546,44 +546,30 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 			//StopWatch watch;
 			//StopWatch_Start(watch);
 #if NP2_USE_AVX2
-#if 1
-			#define BitmapMergeAlpha_Tag	"avx2 2x1"
+			#define BitmapMergeAlpha_Tag	"sse4 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
 			uint64_t *prgba = (uint64_t *)bmp.bmBits;
 
-			const __m256i i32x8Back = mm256_rgba_to_bgra_si32(crDest);
+			const __m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
-				__m256i i32x8Fore = mm256_unpack_color_ptr64(prgba);
-				__m256i i32x8Alpha = _mm256_shuffle_epi32(i32x8Fore, 0xff);
-				i32x8Fore = mm256_alpha_blend_epi32(i32x8Fore, i32x8Back, i32x8Alpha);
-				const uint64_t color = mm256_pack_color_si64(i32x8Fore);
+				__m128i i16x8Fore = unpack_color_epi16_sse4_ptr64(prgba);
+				__m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Fore, 0xff), 0xff);
+				i16x8Fore = mm_alpha_blend_epi16(i16x8Fore, i16x8Back, i16x8Alpha);
+				const uint64_t color = pack_color_epi16_sse2_si64(i16x8Fore);
 				*prgba = color | UINT64_C(0xff000000ff000000);
 			}
-#else
-			#define BitmapMergeAlpha_Tag	"avx2 1x1"
-			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			uint32_t *prgba = (uint32_t *)bmp.bmBits;
 
-			const __m128i i32x4Back = rgba_to_bgra_avx2_si32(crDest);
-			for (ULONG x = 0; x < count; x++, prgba++) {
-				__m128i i32x4Fore = mm_unpack_color_avx2_ptr32(prgba);
-				__m128i i32x4Alpha = _mm_shuffle_epi32(i32x4Fore, 0xff);
-				i32x4Fore = mm_alpha_blend_epi32(i32x4Fore, i32x4Back, i32x4Alpha);
-				const uint32_t color = mm_pack_color_si32(i32x4Fore);
-				*prgba = color | 0xff000000U;
-			}
-#endif // NP2_USE_AVX2
 #elif NP2_USE_SSE2
-			#define BitmapMergeAlpha_Tag	"sse2"
+			#define BitmapMergeAlpha_Tag	"sse2 1x1"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			uint32_t *prgba = (uint32_t *)bmp.bmBits;
 
-			const __m128i i32x4Back = rgba_to_bgra_sse2_si32(crDest);
+			const __m128i i16x4Back = rgba_to_bgra_epi16_sse2_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
-				__m128i i32x4Fore = mm_unpack_color_sse2_ptr32(prgba);
-				__m128i i32x4Alpha = _mm_shuffle_epi32(i32x4Fore, 0xff);
-				i32x4Fore = mm_alpha_blend_epi32(i32x4Fore, i32x4Back, i32x4Alpha);
-				const uint32_t color = mm_pack_color_si32(i32x4Fore);
+				__m128i i16x4Fore = unpack_color_epi16_sse2_ptr32(prgba);
+				__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, 0xff);
+				i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
+				const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 				*prgba = color | 0xff000000U;
 			}
 
@@ -627,103 +613,56 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 			//fwrite(bmp.bmBits, 1, bmp.bmHeight*bmp.bmWidth*4, fp);
 			//fclose(fp);
 #if NP2_USE_AVX2
-#if 1
-			#define BitmapAlphaBlend_Tag	"avx2 2x1"
+			#define BitmapAlphaBlend_Tag	"sse4 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
 			uint64_t *prgba = (uint64_t *)bmp.bmBits;
 
-			const __m256i i32x8Alpha = _mm256_set1_epi32(alpha);
-			__m256i i32x8Back = mm256_rgba_to_bgra_si32(crDest);
-			i32x8Back = _mm256_mullo_epi16(i32x8Back, mm256_xor_alpha_epi32(i32x8Alpha));
+			const __m128i i16x8Alpha = _mm_broadcastw_epi16(mm_setlo_epi32(alpha));
+			__m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
+			i16x8Back = _mm_mullo_epi16(i16x8Back, mm_xor_alpha_epi16(i16x8Alpha));
 			for (ULONG x = 0; x < count; x++, prgba++) {
-				const __m256i origin = mm256_unpack_color_ptr64(prgba);
-				__m256i i32x8Fore = _mm256_mullo_epi16(origin, i32x8Alpha);
-				i32x8Fore = _mm256_add_epi32(i32x8Fore, i32x8Back);
-				i32x8Fore = mm256_divlo_epu16_by_255(i32x8Fore);
-				i32x8Fore = _mm256_blend_epi32(origin, i32x8Fore, 0x77);
-				__m128i i32x4Fore = mm256_pack_color_si128(i32x8Fore);
-				_mm_storel_epi64((__m128i *)prgba, i32x4Fore);
+				const __m128i origin = unpack_color_epi16_sse4_ptr64(prgba);
+				__m128i i16x8Fore = _mm_mullo_epi16(origin, i16x8Alpha);
+				i16x8Fore = _mm_add_epi16(i16x8Fore, i16x8Back);
+				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
+				i16x8Fore = _mm_blend_epi16(origin, i16x8Fore, 0x77);
+				i16x8Fore = pack_color_epi16_sse2_si128(i16x8Fore);
+				_mm_storel_epi64((__m128i *)prgba, i16x8Fore);
 			}
 
-#else
-			#define BitmapAlphaBlend_Tag	"avx2 1x1"
-			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			uint32_t *prgba = (uint32_t *)bmp.bmBits;
-
-			const __m128i i32x4Alpha = _mm_set1_epi32(alpha);
-			__m128i i32x4Back = rgba_to_bgra_avx2_si32(crDest);
-			i32x4Back = _mm_mullo_epi16(i32x4Back, mm_xor_alpha_epi32(i32x4Alpha));
-			for (ULONG x = 0; x < count; x++, prgba++) {
-				const __m128i origin = mm_unpack_color_avx2_ptr32(prgba);
-				__m128i i32x4Fore = _mm_mullo_epi16(origin, i32x4Alpha);
-				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
-				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
-				i32x4Fore = _mm_blend_epi32(origin, i32x4Fore, 7);
-				i32x4Fore = mm_pack_color_si128(i32x4Fore);
-				mm_storeu_si32(prgba, i32x4Fore);
-			}
-#endif // NP2_USE_AVX2
 #elif NP2_USE_SSE2
-#if 1
 			#define BitmapAlphaBlend_Tag	"sse2 1x4"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
 			__m128i *prgba = (__m128i *)bmp.bmBits;
 
-			const __m128i i32x4Alpha = _mm_set1_epi32(alpha);
-			__m128i i32x4Back = rgba_to_bgra_sse2_si32(crDest);
-			i32x4Back = _mm_mullo_epi16(i32x4Back, mm_xor_alpha_epi32(i32x4Alpha));
+			const __m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
+			__m128i i16x8Back = _mm_shuffle_epi32(rgba_to_bgra_epi16_sse2_si32(crDest), 0x44);
+			i16x8Back = _mm_mullo_epi16(i16x8Back, mm_xor_alpha_epi16(i16x8Alpha));
 			for (ULONG x = 0; x < count; x++, prgba++) {
 				__m128i origin = _mm_loadu_si128(prgba);
-				__m128i i32x4Fore = mm_unpacklo_color_sse2_si128(origin);
-				i32x4Fore = _mm_mullo_epi16(i32x4Fore, i32x4Alpha);
-				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
-				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
-				__m128i i32x4_12 = mm_pack_color_si128(i32x4Fore);
-
 				__m128i color42 = _mm_shuffle_epi32(origin, 0x31);
-				i32x4Fore = mm_unpacklo_color_sse2_si128(color42);
-				i32x4Fore = _mm_mullo_epi16(i32x4Fore, i32x4Alpha);
-				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
-				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
-				i32x4_12 = _mm_unpacklo_epi32(i32x4_12, mm_pack_color_si128(i32x4Fore));
 
-				i32x4Fore = mm_unpackhi_color_sse2_si128(origin);
-				i32x4Fore = _mm_mullo_epi16(i32x4Fore, i32x4Alpha);
-				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
-				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
-				__m128i i32x4_34 = mm_pack_color_si128(i32x4Fore);
+				__m128i i16x8Fore = unpacklo_color_epi16_sse2_si32(origin);
+				i16x8Fore = _mm_unpacklo_epi64(i16x8Fore, unpacklo_color_epi16_sse2_si32(color42));
+				i16x8Fore = _mm_mullo_epi16(i16x8Fore, i16x8Alpha);
+				i16x8Fore = _mm_add_epi16(i16x8Fore, i16x8Back);
+				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
+				__m128i i32x4Fore = pack_color_epi16_sse2_si128(i16x8Fore);
 
-				i32x4Fore = mm_unpackhi_color_sse2_si128(color42);
-				i32x4Fore = _mm_mullo_epi16(i32x4Fore, i32x4Alpha);
-				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
-				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
-				i32x4_34 = _mm_unpacklo_epi32(i32x4_34, mm_pack_color_si128(i32x4Fore));
+				i16x8Fore = unpackhi_color_epi16_sse2_si128(origin);
+				i16x8Fore = _mm_unpacklo_epi64(i16x8Fore, unpackhi_color_epi16_sse2_si128(color42));
+				i16x8Fore = _mm_mullo_epi16(i16x8Fore, i16x8Alpha);
+				i16x8Fore = _mm_add_epi16(i16x8Fore, i16x8Back);
+				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
+				color42 = pack_color_epi16_sse2_si128(i16x8Fore);
 
-				i32x4_34 = _mm_unpacklo_epi64(i32x4_12, i32x4_34);
-				i32x4_34 = _mm_and_si128(_mm_set1_epi32(0x00ffffff), i32x4_34);
-				i32x4_12 = _mm_andnot_si128(_mm_set1_epi32(0x00ffffff), origin);
-				i32x4_34 = _mm_or_si128(i32x4_12, i32x4_34);
-				_mm_storeu_si128(prgba, i32x4_34);
+				i32x4Fore = _mm_unpacklo_epi64(i32x4Fore, color42);
+				i32x4Fore = _mm_and_si128(_mm_set1_epi32(0x00ffffff), i32x4Fore);
+				origin = _mm_andnot_si128(_mm_set1_epi32(0x00ffffff), origin);
+				i32x4Fore = _mm_or_si128(origin, i32x4Fore);
+				_mm_storeu_si128(prgba, i32x4Fore);
 			}
 
-#else
-			#define BitmapAlphaBlend_Tag	"sse2 1x1"
-			const ULONG count = bmp.bmHeight * bmp.bmWidth;
-			uint32_t *prgba = (uint32_t *)bmp.bmBits;
-
-			const __m128i i32x4Alpha = _mm_set1_epi32(alpha);
-			__m128i i32x4Back = rgba_to_bgra_sse2_si32(crDest);
-			i32x4Back = _mm_mullo_epi16(i32x4Back, mm_xor_alpha_epi32(i32x4Alpha));
-			for (ULONG x = 0; x < count; x++, prgba++) {
-				const uint32_t origin = *prgba;
-				__m128i i32x4Fore = mm_unpack_color_sse2_si32(origin);
-				i32x4Fore = _mm_mullo_epi16(i32x4Fore, i32x4Alpha);
-				i32x4Fore = _mm_add_epi32(i32x4Fore, i32x4Back);
-				i32x4Fore = mm_divlo_epu16_by_255(i32x4Fore);
-				const uint32_t color = bgr_from_bgra_si32(i32x4Fore);
-				*prgba = color | (origin & 0xff000000U);
-			}
-#endif // NP2_USE_AVX2
 #else
 			#define BitmapAlphaBlend_Tag	"scale"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
@@ -778,8 +717,8 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
 //
 BOOL VerifyContrast(COLORREF cr1, COLORREF cr2) {
 #if NP2_USE_AVX2
-	__m128i i32x4Fore = mm_unpack_color_avx2_si32(cr1);
-	__m128i i32x4Back = mm_unpack_color_avx2_si32(cr2);
+	__m128i i32x4Fore = unpack_color_epi32_sse4_si32(cr1);
+	__m128i i32x4Back = unpack_color_epi32_sse4_si32(cr2);
 
 	__m128i diff = _mm_sad_epu8(i32x4Fore, i32x4Back);
 	int value = mm_hadd_epi32_si32(diff);
