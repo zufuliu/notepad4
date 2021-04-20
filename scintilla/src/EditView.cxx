@@ -74,21 +74,21 @@ namespace Scintilla {
 
 #if NP2_USE_AVX2
 inline ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
-	__m128i i32x4Fore = mm_unpack_color_avx2_si32(fore.AsInteger());
-	__m128i i32x4Back = mm_unpack_color_avx2_si32(back.AsInteger());
-	__m128i i32x4Alpha = _mm_set1_epi32(alpha);
-	i32x4Fore = mm_alpha_blend_epi32(i32x4Fore, i32x4Back, i32x4Alpha);
-	const uint32_t color = mm_pack_color_si32(i32x4Fore);
+	__m128i i16x4Fore = unpack_color_epi16_sse4_si32(fore.AsInteger());
+	__m128i i16x4Back = unpack_color_epi16_sse4_si32(back.AsInteger());
+	__m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
+	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
+	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 	return ColourDesired(color);
 }
 
 #elif NP2_USE_SSE2
 inline ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
-	__m128i i32x4Fore = mm_unpack_color_sse2_si32(fore.AsInteger());
-	__m128i i32x4Back = mm_unpack_color_sse2_si32(back.AsInteger());
-	__m128i i32x4Alpha = _mm_set1_epi32(alpha);
-	i32x4Fore = mm_alpha_blend_epi32(i32x4Fore, i32x4Back, i32x4Alpha);
-	const uint32_t color = mm_pack_color_si32(i32x4Fore);
+	__m128i i16x4Fore = unpack_color_epi16_sse2_si32(fore.AsInteger());
+	__m128i i16x4Back = unpack_color_epi16_sse2_si32(back.AsInteger());
+	__m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
+	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
+	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 	return ColourDesired(color);
 }
 

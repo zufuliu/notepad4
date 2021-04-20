@@ -269,18 +269,20 @@ void RGBAImage::SetPixel(int x, int y, ColourAlpha colour) noexcept {
 // Used for DrawRGBAImage on some platforms.
 void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept {
 #if NP2_USE_AVX2
-	count /= bytesPerPixel;
-	uint32_t *pbgra = reinterpret_cast<uint32_t *>(pixelsBGRA);
-	const uint32_t *prgba = reinterpret_cast<const uint32_t *>(pixelsRGBA);
+	count /= (bytesPerPixel * 2);
+	uint64_t *pbgra = reinterpret_cast<uint64_t *>(pixelsBGRA);
+	const uint64_t *prgba = reinterpret_cast<const uint64_t *>(pixelsRGBA);
 	for (size_t i = 0; i < count; i++, pbgra++) {
-		__m128i i32x4Color = mm_unpack_color_avx2_si32(loadbe_u32(prgba++));
-		__m128i i32x4Alpha = _mm_broadcastd_epi32(i32x4Color);
-		i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
-		i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
-		i32x4Color = _mm_alignr_epi8(i32x4Alpha, i32x4Color, 4);
+		__m128i i16x8Color = unpack_color_epi16_sse4_ptr64(prgba++);
+		i16x8Color = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, 0xc6), 0xc6);
+		__m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, 0xff), 0xff);
 
-		i32x4Color = mm_pack_color_si128(i32x4Color);
-		mm_storeu_si32(pbgra, i32x4Color);
+		i16x8Color = _mm_mullo_epi16(i16x8Color, i16x8Alpha);
+		i16x8Color = mm_div_epu16_by_255(i16x8Color);
+		i16x8Color = _mm_blend_epi16(i16x8Alpha, i16x8Color, 0x77);
+
+		i16x8Color = pack_color_epi16_sse2_si128(i16x8Color);
+		_mm_storel_epi64((__m128i *)pbgra, i16x8Color);
 	}
 
 #elif NP2_USE_SSE2
@@ -289,12 +291,12 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 	const uint32_t *prgba = reinterpret_cast<const uint32_t *>(pixelsRGBA);
 	for (size_t i = 0; i < count; i++, pbgra++) {
 		const uint32_t rgba = bswap32(*prgba++);
-		__m128i i32x4Color = mm_unpack_color_sse2_si32(rgba);
-		__m128i i32x4Alpha = _mm_shuffle_epi32(i32x4Color, 0);
-		i32x4Color = _mm_mullo_epi16(i32x4Color, i32x4Alpha);
-		i32x4Color = mm_divlo_epu16_by_255(i32x4Color);
+		__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
+		__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
+		i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
+		i16x4Color = mm_div_epu16_by_255(i16x4Color);
 
-		const uint32_t color = bgr_from_abgr_si32(i32x4Color);
+		const uint32_t color = bgr_from_abgr_epi16_sse2_si32(i16x4Color);
 		*pbgra = (color | (rgba << 24));
 	}
 
