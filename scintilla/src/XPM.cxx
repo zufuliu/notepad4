@@ -68,17 +68,17 @@ constexpr unsigned int GetHexValue(unsigned char ch1, unsigned char ch2) noexcep
 	return (GetHexDigit(ch1) << 4) | GetHexDigit(ch2);
 }
 
-constexpr ColourDesired ColourFromHex(const char *val) noexcept {
+constexpr ColourAlpha ColourFromHex(const char *val) noexcept {
 	const unsigned int r = GetHexValue(val[0], val[1]);
 	const unsigned int g = GetHexValue(val[2], val[3]);
 	const unsigned int b = GetHexValue(val[4], val[5]);
-	return ColourDesired(r, g, b);
+	return ColourAlpha(r, g, b);
 }
 
 }
 
 
-ColourDesired XPM::ColourFromCode(int ch) const noexcept {
+ColourAlpha XPM::ColourFromCode(int ch) const noexcept {
 	return colourCodeTable[ch];
 }
 
@@ -123,7 +123,7 @@ void XPM::Init(const char *const *linesForm) {
 	if (!linesForm)
 		return;
 
-	std::fill(colourCodeTable, std::end(colourCodeTable), ColourDesired(0));
+	std::fill(colourCodeTable, std::end(colourCodeTable), ColourAlpha(0, 0, 0, 0));
 	const char *line0 = linesForm[0];
 	width = atoi(line0);
 	line0 = NextField(line0);
@@ -141,7 +141,7 @@ void XPM::Init(const char *const *linesForm) {
 		const char *colourDef = linesForm[c + 1];
 		const char code = colourDef[0];
 		colourDef += 4;
-		ColourDesired colour(0xff, 0xff, 0xff);
+		ColourAlpha colour(0, 0, 0);
 		if (*colourDef == '#') {
 			colour = ColourFromHex(colourDef + 1);
 		} else {
@@ -181,19 +181,13 @@ void XPM::Draw(Surface *surface, PRectangle rc) {
 	}
 }
 
-void XPM::PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const noexcept {
+ColourAlpha XPM::PixelAt(int x, int y) const noexcept {
 	if (pixels.empty() || (x < 0) || (x >= width) || (y < 0) || (y >= height)) {
-		colour = ColourDesired(0);
-		transparent = true;
-		return;
+		// Out of bounds -> transparent black
+		return ColourAlpha(0, 0, 0, 0);
 	}
 	const int code = pixels[y * width + x];
-	transparent = code == codeTransparent;
-	if (transparent) {
-		colour = ColourDesired(0);
-	} else {
-		colour = ColourFromCode(code);
-	}
+	return ColourFromCode(code);
 }
 
 std::vector<const char *> XPM::LinesFormFromTextForm(const char *textForm) {
@@ -247,10 +241,7 @@ RGBAImage::RGBAImage(const XPM &xpm) {
 	pixelBytes.resize(CountBytes());
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			ColourDesired colour;
-			bool transparent = false;
-			xpm.PixelAt(x, y, colour, transparent);
-			SetPixel(x, y, colour, transparent ? 0 : 255);
+			SetPixel(x, y, xpm.PixelAt(x, y));
 		}
 	}
 }
@@ -265,13 +256,13 @@ const unsigned char *RGBAImage::Pixels() const noexcept {
 	return pixelBytes.data();
 }
 
-void RGBAImage::SetPixel(int x, int y, ColourDesired colour, int alpha) noexcept {
+void RGBAImage::SetPixel(int x, int y, ColourAlpha colour) noexcept {
 	unsigned char *pixel = pixelBytes.data() + (y*width + x) * 4;
 	// RGBA
 	pixel[0] = colour.GetRed();
 	pixel[1] = colour.GetGreen();
 	pixel[2] = colour.GetBlue();
-	pixel[3] = static_cast<unsigned char>(alpha);
+	pixel[3] = colour.GetAlpha();
 }
 
 // Transform a block of pixels from RGBA to BGRA with premultiplied alpha.
