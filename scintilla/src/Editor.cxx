@@ -7265,15 +7265,6 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
-	case SCI_SETFONTLOCALE:
-		if (lParam != 0) {
-			vs.SetFontLocaleName(CharPtrFromSPtr(lParam));
-		}
-		break;
-
-	case SCI_GETFONTLOCALE:
-		return StringResult(lParam, vs.localeName.c_str());
-
 	case SCI_SETELEMENTCOLOUR:
 		vs.elementColours[static_cast<int>(wParam)] = ColourAlpha(static_cast<int>(lParam));
 		break;
@@ -7290,6 +7281,15 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_GETELEMENTALLOWSTRANSLUCENT:
 		return vs.ElementAllowsTranslucent(static_cast<int>(wParam));
+
+	case SCI_SETFONTLOCALE:
+		if (lParam != 0) {
+			vs.SetFontLocaleName(CharPtrFromSPtr(lParam));
+		}
+		break;
+
+	case SCI_GETFONTLOCALE:
+		return StringResult(lParam, vs.localeName.c_str());
 
 	case SCI_SETLINESTATE:
 		return pdoc->SetLineState(wParam, static_cast<int>(lParam));
