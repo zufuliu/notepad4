@@ -463,13 +463,31 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 			//fwrite(bmp.bmBits, 1, bmp.bmHeight*bmp.bmWidth*4, fp);
 			//fclose(fp);
 #if NP2_USE_AVX2
+#if 1
+			#define BitmapAlphaBlend_Tag	"avx2 4x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
+			__m128i *prgba = (__m128i *)bmp.bmBits;
+
+			const __m256i i16x16Alpha = _mm256_broadcastw_epi16(mm_setlo_epi32(alpha));
+			const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
+			const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
+				__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
+				i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
+				i16x16Fore = _mm256_srli_epi16(_mm256_mulhi_epu16(i16x16Fore, i16x16_0x8081), 7);
+				i16x16Fore = _mm256_blend_epi16(origin, i16x16Fore, 0x77);
+				i16x16Fore = _mm256_packus_epi16(i16x16Fore, i16x16Fore);
+				i16x16Fore = _mm256_permute4x64_epi64(i16x16Fore, 8);
+				_mm_storeu_si128(prgba, _mm256_castsi256_si128(i16x16Fore));
+			}
+#else
 			#define BitmapAlphaBlend_Tag	"sse4 2x1"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
 			uint64_t *prgba = (uint64_t *)bmp.bmBits;
 
 			const __m128i i16x8Alpha = _mm_broadcastw_epi16(mm_setlo_epi32(alpha));
-			__m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
-			i16x8Back = _mm_mullo_epi16(i16x8Back, mm_xor_alpha_epi16(i16x8Alpha));
+			const __m128i i16x8Back = _mm_mullo_epi16(rgba_to_bgra_epi16x8_sse4_si32(crDest), mm_xor_alpha_epi16(i16x8Alpha));
 			for (ULONG x = 0; x < count; x++, prgba++) {
 				const __m128i origin = unpack_color_epi16_sse4_ptr64(prgba);
 				__m128i i16x8Fore = _mm_mullo_epi16(origin, i16x8Alpha);
@@ -479,7 +497,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 				i16x8Fore = pack_color_epi16_sse2_si128(i16x8Fore);
 				_mm_storel_epi64((__m128i *)prgba, i16x8Fore);
 			}
-
+#endif // NP2_USE_AVX2
 #elif NP2_USE_SSE2
 			#define BitmapAlphaBlend_Tag	"sse2 1x4"
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
