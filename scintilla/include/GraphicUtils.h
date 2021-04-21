@@ -179,11 +179,11 @@ static inline __m128i rgba_to_bgra_epi32_sse2_si32(uint32_t color) NP2_noexcept 
 	return _mm_shuffle_epi32(i32x4, 0xc6); // 0b11_00_01_10
 }
 
-static inline uint32_t bgr_from_bgra_epi16_si32(__m128i i16x4) NP2_noexcept {
+static inline uint32_t bgr_from_bgra_epi16_sse2_si32(__m128i i16x4) NP2_noexcept {
 	return pack_color_epi16_sse2_si32(i16x4) & 0x00ffffff;
 }
 
-static inline uint32_t bgr_from_bgra_epi32_si32(__m128i i32x4) NP2_noexcept {
+static inline uint32_t bgr_from_bgra_epi32_sse2_si32(__m128i i32x4) NP2_noexcept {
 	return pack_color_epi32_sse2_si32(i32x4) & 0x00ffffff;
 }
 #endif // NP2_USE_SSE2

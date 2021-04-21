@@ -453,7 +453,7 @@ uint32_t BitmapAlphaBlend_sse2(uint32_t fore, COLORREF back, BYTE alpha) noexcep
 	__m128i i16x4Back = rgba_to_bgra_epi16_sse2_si32(back);
 	__m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
 	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
-	const uint32_t color = bgr_from_bgra_epi16_si32(i16x4Fore);
+	const uint32_t color = bgr_from_bgra_epi16_sse2_si32(i16x4Fore);
 	return color | (fore & 0xff000000);
 }
 
@@ -498,7 +498,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			i16x4Fore = _mm_mullo_epi16(i16x4Fore, i16x4Alpha);
 			i16x4Fore = _mm_add_epi32(i16x4Fore, i16x4Back);
 			i16x4Fore = mm_div_epu16_by_255(i16x4Fore);
-			uint32_t color = bgr_from_bgra_epi16_si32(i16x4Fore);
+			uint32_t color = bgr_from_bgra_epi16_sse2_si32(i16x4Fore);
 			xmm[x] = color | (origin & 0xff000000U);
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
@@ -597,6 +597,32 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		for (size_t x = 0; x < pixelCount; x++) {
 			if (scale[x] != xmm[x]) {
 				printf("sse4 2x1 fail %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
+				break;
+			}
+		}
+	}
+	{ // avx2 4x1
+		std::vector<uint32_t> xmm;
+		xmm.resize(pixelCount);
+		const __m128i *prgba = (__m128i *)data.data();
+		__m128i *dest = (__m128i *)xmm.data();
+
+		const __m256i i16x16Alpha = _mm256_broadcastw_epi16(mm_setlo_epi32(alpha));
+		const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
+		const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
+		for (size_t x = 0; x < pixelCount; x += 4, prgba++, dest++) {
+			const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
+			__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
+			i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
+			i16x16Fore = _mm256_srli_epi16(_mm256_mulhi_epu16(i16x16Fore, i16x16_0x8081), 7);
+			i16x16Fore = _mm256_blend_epi16(origin, i16x16Fore, 0x77);
+			i16x16Fore = _mm256_packus_epi16(i16x16Fore, i16x16Fore);
+			i16x16Fore = _mm256_permute4x64_epi64(i16x16Fore, 8);
+			_mm_storeu_si128(dest, _mm256_castsi256_si128(i16x16Fore));
+		}
+		for (size_t x = 0; x < pixelCount; x++) {
+			if (scale[x] != xmm[x]) {
+				printf("avx2 4x1 fail %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
 				break;
 			}
 		}
