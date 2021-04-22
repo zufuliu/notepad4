@@ -5398,6 +5398,7 @@ void LoadSettings(void) {
 	tabSettings.globalTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
 	tabSettings.bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", 1);
 	tabSettings.bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
+	tabSettings.bDetectIndentation = IniSectionGetBool(pIniSection, L"DetectIndentation", 1);
 	// for toolbar state
 	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
 	fvCurFile.fWordWrap = fWordWrapG;
@@ -5725,6 +5726,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, 0);
 	IniSectionSetBoolEx(pIniSection, L"TabIndents", tabSettings.bTabIndents, 1);
 	IniSectionSetBoolEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 0);
+	IniSectionSetBoolEx(pIniSection, L"DetectIndentation", tabSettings.bDetectIndentation, 1);
 	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, 0);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);
 	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);

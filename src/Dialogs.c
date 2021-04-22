@@ -1648,6 +1648,9 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		if (tabSettings.bBackspaceUnindents) {
 			CheckDlgButton(hwnd, IDC_BACKSPACE_UNINDENT, BST_CHECKED);
 		}
+		if (tabSettings.bDetectIndentation) {
+			CheckDlgButton(hwnd, IDC_DETECT_INDENTATION, BST_CHECKED);
+		}
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1711,6 +1714,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			fvCurFile.bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
 			tabSettings.bTabIndents = fvCurFile.bTabIndents;
 			tabSettings.bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
+			tabSettings.bDetectIndentation = IsButtonChecked(hwnd, IDC_DETECT_INDENTATION);
 			Style_SaveTabSettings(pLexCurrent);
 			EndDialog(hwnd, IDOK);
 		}
