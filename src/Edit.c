@@ -445,10 +445,6 @@ BOOL EditCopyAppend(HWND hwnd) {
 // EditDetectEOLMode()
 //
 void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
-	if (cbData == 0) {
-		return;
-	}
-
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
@@ -797,6 +793,127 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	status->linesCount[2] = lineCountCR;
 }
 
+void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
+	if ((lpfv->mask & FV_MaskHasFileTabSettings) == FV_MaskHasFileTabSettings) {
+		return;
+	}
+	if (!tabSettings.bDetectIndentation) {
+		return;
+	}
+
+	//StopWatch watch;
+	//StopWatch_Start(watch);
+
+	// code based on SciTEBase::DiscoverIndentSetting().
+	cbData = min_u(cbData, 1*1024*1024);
+	const uint8_t *ptr = (const uint8_t *)lpData;
+	const uint8_t * const end = ptr + cbData;
+	int indentLineCount[9] = { 0 }; // line count for tab, space 1 to 8
+	int prevIndentCount = 0;
+	int prevTabWidth = -1;
+
+#if NP2_USE_AVX2
+	const __m256i vectCR = _mm256_set1_epi8('\r');
+	const __m256i vectLF = _mm256_set1_epi8('\n');
+labelStart:
+#elif NP2_USE_SSE2
+	const __m128i vectCR = _mm_set1_epi8('\r');
+	const __m128i vectLF = _mm_set1_epi8('\n');
+labelStart:
+#endif
+	while (ptr < end) {
+		switch (*ptr++) {
+		case '\t':
+			++indentLineCount[0];
+			break;
+
+		case ' ': {
+			int indentCount = 1;
+			while (ptr < end && *ptr == ' ') {
+				++ptr;
+				++indentCount;
+			}
+			if ((indentCount & 1) != 0 && *ptr == '*') {
+				// fix alignment space before star in Javadoc style comment: ` * comment content`
+				// TODO: fix other (e.g. function argument) alignment spaces.
+				--indentCount;
+			}
+
+			if (indentCount == prevIndentCount) {
+				if (prevTabWidth >= 0) {
+					++indentLineCount[prevTabWidth];
+				}
+			} else {
+				const int delta = abs(indentCount - prevIndentCount);
+				prevIndentCount = indentCount;
+				if (delta <= 8) {
+					prevTabWidth = delta;
+					++indentLineCount[delta];
+				} else {
+					prevTabWidth = -1;
+				}
+			}
+		} break;
+
+		case '\r':
+		case '\n':
+			continue;
+		}
+
+		// skip to line end
+#if NP2_USE_AVX2
+		while (ptr + sizeof(__m256i) <= end) {
+			const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
+			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk, vectCR), _mm256_cmpeq_epi8(chunk, vectLF)));
+			if (mask != 0) {
+				const uint32_t trailing = np2_ctz(mask);
+				ptr += trailing + 1;
+				goto labelStart;
+			}
+			ptr += sizeof(__m256i);
+		}
+#elif NP2_USE_SSE2
+		while (ptr + sizeof(__m128i) <= end) {
+			const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk, vectCR), _mm_cmpeq_epi8(chunk, vectLF)));
+			if (mask != 0) {
+				const uint32_t trailing = np2_ctz(mask);
+				ptr += trailing + 1;
+				goto labelStart;
+			}
+			ptr += sizeof(__m128i);
+		}
+#endif
+		const uint32_t mask = (1 << '\r') | (1 << '\n');
+		uint8_t ch = 0;
+		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
+			// nop
+		}
+	}
+
+	prevTabWidth = 0;
+	for (int i = 1; i < 9; i++) {
+		if (indentLineCount[i] > indentLineCount[prevTabWidth]) {
+			prevTabWidth = i;
+		}
+	}
+	if (prevTabWidth != 0) {
+		lpfv->mask |= FV_MaskHasFileTabSettings;
+		lpfv->iIndentWidth = lpfv->iTabWidth = prevTabWidth;
+		lpfv->bTabsAsSpaces = TRUE;
+	} else if (indentLineCount[0] != 0) {
+		lpfv->mask |= FV_TABSASSPACES;
+		lpfv->bTabsAsSpaces = FALSE;
+	}
+
+	//StopWatch_Stop(watch);
+	//const double duration = StopWatch_Get(&watch);
+	//printf("indentation %u, duration=%.06f, tab width=%d\n", (UINT)cbData, duration, prevTabWidth);
+	//for (int i = 0; i < 9; i++) {
+	//	printf("\tindentLineCount[%d] = %d\n", i, indentLineCount[i]);
+	//}
+}
+
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, LPBOOL lpbBOM) {
 	BOOL bPreferOEM = FALSE;
 	if (bLoadNFOasOEM) {
@@ -1084,7 +1201,10 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		lpDataUTF8 = lpData;
 	}
 
-	EditDetectEOLMode(lpDataUTF8, cbData, status);
+	if (cbData) {
+		EditDetectEOLMode(lpDataUTF8, cbData, status);
+		EditDetectIndentation(lpDataUTF8, cbData, &fvCurFile);
+	}
 	SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 	EditSetNewText(lpDataUTF8, cbData, status->totalLineCount);
 

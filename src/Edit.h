@@ -431,6 +431,7 @@ typedef struct EditTabSettings {
 	BOOL	globalTabsAsSpaces;
 	BOOL	bTabIndents;
 	BOOL	bBackspaceUnindents;
+	BOOL	bDetectIndentation;
 
 	int		schemeTabWidth;
 	int		schemeIndentWidth;
