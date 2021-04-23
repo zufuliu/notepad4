@@ -1637,7 +1637,8 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		if (fvCurFile.bTabsAsSpaces) {
 			CheckDlgButton(hwnd, IDC_FILE_TAB_AS_SPACE, BST_CHECKED);
 		}
-		if ((fvCurFile.mask & FV_MaskHasFileTabSettings) == 0) {
+		const BOOL hasFileTabSettings = fvCurFile.mask & FV_MaskHasFileTabSettings;
+		if (!hasFileTabSettings) {
 			CheckDlgButton(hwnd, IDC_FILE_USE_SCHEME_TAB, BST_CHECKED);
 			SyncSchemeTabSettings(hwnd);
 		}
@@ -1653,6 +1654,12 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		}
 
 		CenterDlgInParent(hwnd);
+		if (hasFileTabSettings || !tabSettings.schemeUseGlobalTabSettings) {
+			HWND hwndCtl = GetDlgItem(hwnd, hasFileTabSettings ? IDC_FILE_TAB_WIDTH : IDC_SCHEME_TAB_WIDTH);
+			SetFocus(hwndCtl);
+			PostMessage(hwndCtl, EM_SETSEL, 0, -1);
+			return FALSE;
+		}
 	}
 	return TRUE;
 

@@ -6671,8 +6671,9 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"</tag>");
 
-		SetFocus(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX));
-		PostMessage(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX), EM_SETSEL, 1, 4);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX);
+		SetFocus(hwndCtl);
+		PostMessage(hwndCtl, EM_SETSEL, 1, 4);
 		CenterDlgInParent(hwnd);
 	}
 	return FALSE;
