@@ -808,9 +808,11 @@ void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	cbData = min_u(cbData, 1*1024*1024);
 	const uint8_t *ptr = (const uint8_t *)lpData;
 	const uint8_t * const end = ptr + cbData;
-	int indentLineCount[9] = { 0 }; // line count for tab, space 1 to 8
+	#define MAX_DETECTED_TAB_WIDTH	8
+	// line count for ambiguous lines, line indented by 1 to 8 spaces, line starts with tab.
+	int indentLineCount[1 + MAX_DETECTED_TAB_WIDTH + 1] = { 0 };
 	int prevIndentCount = 0;
-	int prevTabWidth = -1;
+	int prevTabWidth = 0;
 
 #if NP2_USE_AVX2
 	const __m256i vectCR = _mm256_set1_epi8('\r');
@@ -824,7 +826,7 @@ labelStart:
 	while (ptr < end) {
 		switch (*ptr++) {
 		case '\t':
-			++indentLineCount[0];
+			++indentLineCount[MAX_DETECTED_TAB_WIDTH + 1];
 			break;
 
 		case ' ': {
@@ -835,29 +837,31 @@ labelStart:
 			}
 			if ((indentCount & 1) != 0 && *ptr == '*') {
 				// fix alignment space before star in Javadoc style comment: ` * comment content`
-				// TODO: fix other (e.g. function argument) alignment spaces.
 				--indentCount;
-			}
-
-			if (indentCount == prevIndentCount) {
-				if (prevTabWidth >= 0) {
-					++indentLineCount[prevTabWidth];
+				if (indentCount == 0) {
+					break;
 				}
-			} else {
+			}
+			if (indentCount != prevIndentCount) {
 				const int delta = abs(indentCount - prevIndentCount);
 				prevIndentCount = indentCount;
-				if (delta <= 8) {
-					prevTabWidth = delta;
-					++indentLineCount[delta];
+				// TODO: fix other (e.g. function argument) alignment spaces.
+				if (delta <= MAX_DETECTED_TAB_WIDTH) {
+					prevTabWidth = min_i(delta, indentCount);
 				} else {
-					prevTabWidth = -1;
+					prevTabWidth = 0;
 				}
 			}
+			++indentLineCount[prevTabWidth];
 		} break;
 
 		case '\r':
 		case '\n':
 			continue;
+
+		default:
+			prevIndentCount = 0;
+			break;
 		}
 
 		// skip to line end
@@ -885,31 +889,33 @@ labelStart:
 		}
 #endif
 		const uint32_t mask = (1 << '\r') | (1 << '\n');
-		uint8_t ch = 0;
+		uint8_t ch;
 		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
 			// nop
 		}
 	}
 
 	prevTabWidth = 0;
-	for (int i = 1; i < 9; i++) {
+	for (int i = 1; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
 		if (indentLineCount[i] > indentLineCount[prevTabWidth]) {
 			prevTabWidth = i;
 		}
 	}
 	if (prevTabWidth != 0) {
-		lpfv->mask |= FV_MaskHasFileTabSettings;
-		lpfv->iIndentWidth = lpfv->iTabWidth = prevTabWidth;
-		lpfv->bTabsAsSpaces = TRUE;
-	} else if (indentLineCount[0] != 0) {
+		const BOOL bTabsAsSpaces = prevTabWidth <= MAX_DETECTED_TAB_WIDTH;
 		lpfv->mask |= FV_TABSASSPACES;
-		lpfv->bTabsAsSpaces = FALSE;
+		lpfv->bTabsAsSpaces = bTabsAsSpaces;
+		if (bTabsAsSpaces) {
+			lpfv->mask |= FV_MaskHasTabIndentWidth;
+			lpfv->iTabWidth = prevTabWidth;
+			lpfv->iIndentWidth = prevTabWidth;
+		}
 	}
 
 	//StopWatch_Stop(watch);
 	//const double duration = StopWatch_Get(&watch);
 	//printf("indentation %u, duration=%.06f, tab width=%d\n", (UINT)cbData, duration, prevTabWidth);
-	//for (int i = 0; i < 9; i++) {
+	//for (int i = 0; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
 	//	printf("\tindentLineCount[%d] = %d\n", i, indentLineCount[i]);
 	//}
 }
