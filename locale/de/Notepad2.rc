@@ -1906,6 +1906,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "Add to Favorites"
     IDT_VIEW_TOGGLEFOLDS    "Toggle Folds"
     IDT_FILE_LAUNCH         "Execute Document"
+    IDT_VIEW_ALWAYSONTOP    "Always On Top"
 END
 
 STRINGTABLE

@@ -93,6 +93,7 @@ static TBBUTTON tbbMainWnd[] = {
 	{22, 	IDT_FILE_ADDTOFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{23, 	IDT_VIEW_TOGGLEFOLDS, 	TBSTATE_ENABLED, BTNS_WHOLEDROPDOWN, {0}, 0, 0},
 	{24, 	IDT_FILE_LAUNCH, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{25, 	IDT_VIEW_ALWAYSONTOP, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 };
 
 WCHAR	szIniFile[MAX_PATH] = L"";
@@ -4210,6 +4211,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			flagAlwaysOnTop = 0;
 			SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}
+		UpdateToolbar();
 		break;
 
 	case IDM_VIEW_MINTOTRAY:
@@ -4854,6 +4856,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendWMCommandOrBeep(hwnd, IDM_FILE_LAUNCH);
 		break;
 
+	case IDT_VIEW_ALWAYSONTOP:
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_ALWAYSONTOP);
+		break;
 	}
 
 	return 0;
@@ -6863,6 +6868,7 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_FILE_LAUNCH, i);
 
 	CheckTool(IDT_VIEW_WORDWRAP, fvCurFile.fWordWrap);
+	CheckTool(IDT_VIEW_ALWAYSONTOP, IsTopMost());
 }
 
 //=============================================================================

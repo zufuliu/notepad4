@@ -1906,6 +1906,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "添加到收藏夹"
     IDT_VIEW_TOGGLEFOLDS    "切换折叠"
     IDT_FILE_LAUNCH         "运行文件"
+    IDT_VIEW_ALWAYSONTOP    "始终置顶"
 END
 
 STRINGTABLE

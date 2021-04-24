@@ -1906,6 +1906,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "즐겨찾기에 추가"
     IDT_VIEW_TOGGLEFOLDS    "접기 전환"
     IDT_FILE_LAUNCH         "문서 실행"
+    IDT_VIEW_ALWAYSONTOP    "항상 맨 위"
 END
 
 STRINGTABLE
