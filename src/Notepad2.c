@@ -345,6 +345,7 @@ static int	flagNoReuseWindow		= 0;
 static int	flagReuseWindow			= 0;
 static BOOL bSingleFileInstance		= TRUE;
 static BOOL bReuseWindow			= FALSE;
+static BOOL bStickyWindowPosition	= FALSE;
 static int	flagMultiFileArg		= 0;
 static int	flagSingleFileInstance	= 1;
 static int	flagStartAsTrayIcon		= 0;
@@ -2553,6 +2554,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentSubLine);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
+	CheckCmd(hmenu, IDM_VIEW_STICKY_WINDOW_POSITION, bStickyWindowPosition);
+	EnableCmd(hmenu, IDM_VIEW_CLEARWINPOS, !bStickyWindowPosition);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
@@ -2613,6 +2616,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_OPENINIFILE, i);
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
+	EnableCmd(hmenu, IDM_VIEW_STICKY_WINDOW_POSITION, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
@@ -4190,6 +4194,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_CLEARWINPOS:
 		ClearWindowPositionHistory();
+		break;
+
+	case IDM_VIEW_STICKY_WINDOW_POSITION:
+		if (!bStickyWindowPosition) {
+			SaveSettingsNow(FALSE, TRUE);
+		}
+		bStickyWindowPosition = !bStickyWindowPosition;
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"StickyWindowPosition", bStickyWindowPosition, 0);
 		break;
 
 	case IDM_VIEW_REUSEWINDOW:
@@ -5792,8 +5804,9 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-
-	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+	if (!bStickyWindowPosition) {
+		SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+	}
 	// Scintilla Styles
 	Style_Save();
 }
@@ -6559,6 +6572,7 @@ void LoadFlags(void) {
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
+	bStickyWindowPosition = IniSectionGetBool(pIniSection, L"StickyWindowPosition", 0);
 
 	if (!flagReuseWindow && !flagNoReuseWindow) {
 		flagNoReuseWindow = !bReuseWindow;

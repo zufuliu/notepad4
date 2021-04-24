@@ -226,6 +226,7 @@ def make_notepad2_toolbar_bitmap():
 		'images/.png',			# IDT_FILE_ADDTOFAV
 		'images/.png',			# IDT_VIEW_TOGGLEFOLDS
 		'images/.png',			# IDT_FILE_LAUNCH
+		'images/pin-angle-16x.png',				# IDT_VIEW_ALWAYSONTOP
 	], 'Toolbar.bmp')
 
 #make_matapath_toolbar_bitmap()

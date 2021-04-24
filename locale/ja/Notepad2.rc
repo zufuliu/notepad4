@@ -626,6 +626,7 @@ BEGIN
 			MENUITEM "システムトレイに最小化(&Z)",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
 			MENUITEM "新しいウィンドウを開かない(&R)",				IDM_VIEW_REUSEWINDOW
+			MENUITEM "&Sticky Window Position",		IDM_VIEW_STICKY_WINDOW_POSITION
 			MENUITEM "ウィンドウ位置の履歴を消去(&H)",		IDM_VIEW_CLEARWINPOS
 		END
 		POPUP "タイトルバーの表示名(&Y)"
