@@ -626,6 +626,7 @@ BEGIN
 			MENUITEM "Minimi&ze to Tray",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
 			MENUITEM "&Reuse Window",				IDM_VIEW_REUSEWINDOW
+			MENUITEM "&Sticky Window Position",		IDM_VIEW_STICKY_WINDOW_POSITION
 			MENUITEM "Clear Position &History",		IDM_VIEW_CLEARWINPOS
 		END
 		POPUP "Window Title Displa&y"
