@@ -1906,6 +1906,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "新增到我的最愛"
     IDT_VIEW_TOGGLEFOLDS    "切換折疊"
     IDT_FILE_LAUNCH         "執行檔案"
+    IDT_VIEW_ALWAYSONTOP    "始終置頂"
 END
 
 STRINGTABLE

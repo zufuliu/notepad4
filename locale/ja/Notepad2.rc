@@ -1906,6 +1906,7 @@ BEGIN
     IDT_FILE_ADDTOFAV       "お気に入りに追加"
     IDT_VIEW_TOGGLEFOLDS    "折りたたみの切り替え"
     IDT_FILE_LAUNCH         "開いている文書を実行"
+    IDT_VIEW_ALWAYSONTOP    "常に手前に表示"
 END
 
 STRINGTABLE
