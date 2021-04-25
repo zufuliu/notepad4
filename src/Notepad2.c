@@ -91,8 +91,9 @@ static TBBUTTON tbbMainWnd[] = {
 	{20, 	IDT_FILE_PRINT, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{21, 	IDT_FILE_OPENFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{22, 	IDT_FILE_ADDTOFAV, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{23, 	IDT_VIEW_TOGGLEFOLDS, 	TBSTATE_ENABLED, BTNS_WHOLEDROPDOWN, {0}, 0, 0},
+	{23, 	IDT_VIEW_TOGGLEFOLDS, 	TBSTATE_ENABLED, BTNS_DROPDOWN, {0}, 0, 0},
 	{24, 	IDT_FILE_LAUNCH, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{25, 	IDT_VIEW_ALWAYSONTOP, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 };
 
 WCHAR	szIniFile[MAX_PATH] = L"";
@@ -320,7 +321,7 @@ struct CachedStatusItem {
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 DWORD		g_uWinVer;
 #endif
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
@@ -344,6 +345,7 @@ static int	flagNoReuseWindow		= 0;
 static int	flagReuseWindow			= 0;
 static BOOL bSingleFileInstance		= TRUE;
 static BOOL bReuseWindow			= FALSE;
+static BOOL bStickyWindowPosition	= FALSE;
 static int	flagMultiFileArg		= 0;
 static int	flagSingleFileInstance	= 1;
 static int	flagStartAsTrayIcon		= 0;
@@ -353,7 +355,6 @@ static int	flagPortableMyDocs		= 0;
 int			flagNoFadeHidden		= 0;
 static int	iOpacityLevel			= 75;
 int			iFindReplaceOpacityLevel= 75;
-static int	flagToolbarLook			= 0;
 int			flagSimpleIndentGuides	= 0;
 BOOL 		fNoHTMLGuess			= 0;
 BOOL 		fNoCGIGuess				= 0;
@@ -489,7 +490,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH
 	NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
@@ -1877,12 +1878,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	if (!bExternalBitmap) {
-		BOOL fProcessed = FALSE;
-		if (flagToolbarLook == 1) {
-			fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
-		} else if (flagToolbarLook == 2) {
-			fProcessed = BitmapGrayScale(hbmpCopy);
-		}
+		const BOOL fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
@@ -1926,7 +1922,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 #endif // NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS
 
 	SendMessage(hwndToolbar, TB_SETEXTENDEDSTYLE, 0,
-				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS);
+				SendMessage(hwndToolbar, TB_GETEXTENDEDSTYLE, 0, 0) | TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS);
 
 	if (Toolbar_SetButtons(hwndToolbar, tchToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd)) == 0) {
 		Toolbar_SetButtons(hwndToolbar, DefaultToolbarButtons, tbbMainWnd, COUNTOF(tbbMainWnd));
@@ -2558,6 +2554,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentSubLine);
 
 	CheckCmd(hmenu, IDM_VIEW_REUSEWINDOW, bReuseWindow);
+	CheckCmd(hmenu, IDM_VIEW_STICKY_WINDOW_POSITION, bStickyWindowPosition);
+	EnableCmd(hmenu, IDM_VIEW_CLEARWINPOS, !bStickyWindowPosition);
 	CheckCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, bSingleFileInstance);
 	CheckCmd(hmenu, IDM_VIEW_ALWAYSONTOP, IsTopMost());
 	CheckCmd(hmenu, IDM_VIEW_MINTOTRAY, bMinimizeToTray);
@@ -2618,6 +2616,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, CMD_OPENINIFILE, i);
 
 	EnableCmd(hmenu, IDM_VIEW_REUSEWINDOW, i);
+	EnableCmd(hmenu, IDM_VIEW_STICKY_WINDOW_POSITION, i);
 	EnableCmd(hmenu, IDM_VIEW_SINGLEFILEINSTANCE, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVERECENT, i);
 	EnableCmd(hmenu, IDM_VIEW_NOSAVEFINDREPL, i);
@@ -3785,7 +3784,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (!IsWindow(hDlgFindReplace)) {
 			hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 		} else {
-			if (bReplace ^ (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != NULL)) {
+			if (bReplace != (GetDlgItem(hDlgFindReplace, IDC_REPLACETEXT) != NULL)) {
 				SendWMCommand(hDlgFindReplace, IDC_TOGGLEFINDREPLACE);
 				DestroyWindow(hDlgFindReplace);
 				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
@@ -4046,6 +4045,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDT_VIEW_TOGGLEFOLDS:
 	case IDM_VIEW_FOLD_DEFAULT:
 		if (bShowCodeFolding) {
 			FoldToggleDefault(FOLD_ACTION_SNIFF);
@@ -4196,14 +4196,22 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ClearWindowPositionHistory();
 		break;
 
+	case IDM_VIEW_STICKY_WINDOW_POSITION:
+		if (!bStickyWindowPosition) {
+			SaveSettingsNow(FALSE, TRUE);
+		}
+		bStickyWindowPosition = !bStickyWindowPosition;
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"StickyWindowPosition", bStickyWindowPosition, 0);
+		break;
+
 	case IDM_VIEW_REUSEWINDOW:
 		bReuseWindow = !bReuseWindow;
-		IniSetBool(INI_SECTION_NAME_FLAGS, L"ReuseWindow", bReuseWindow);
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ReuseWindow", bReuseWindow, 0);
 		break;
 
 	case IDM_VIEW_SINGLEFILEINSTANCE:
 		bSingleFileInstance = !bSingleFileInstance;
-		IniSetBool(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance);
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance, 1);
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
@@ -4216,6 +4224,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			flagAlwaysOnTop = 0;
 			SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}
+		UpdateToolbar();
 		break;
 
 	case IDM_VIEW_MINTOTRAY:
@@ -4860,6 +4869,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SendWMCommandOrBeep(hwnd, IDM_FILE_LAUNCH);
 		break;
 
+	case IDT_VIEW_ALWAYSONTOP:
+		SendWMCommandOrBeep(hwnd, IDM_VIEW_ALWAYSONTOP);
+		break;
 	}
 
 	return 0;
@@ -5277,7 +5289,7 @@ void LoadSettings(void) {
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
+	//const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
 	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", 0);
 	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", 0);
@@ -5359,7 +5371,6 @@ void LoadSettings(void) {
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", 1);
 	bHighlightCurrentBlock = IniSectionGetBool(pIniSection, L"HighlightCurrentBlock", 1);
 	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
-	iValue = (iSettingsVersion < NP2SettingsVersion_V1) ? 12 : iValue;
 	bHighlightCurrentSubLine = iValue > 10;
 	iHighlightCurrentLine = clamp_i(iValue % 10, 0, 2);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", 0);
@@ -5405,6 +5416,7 @@ void LoadSettings(void) {
 	tabSettings.globalTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", 0);
 	tabSettings.bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", 1);
 	tabSettings.bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", 0);
+	tabSettings.bDetectIndentation = IniSectionGetBool(pIniSection, L"DetectIndentation", 1);
 	// for toolbar state
 	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
 	fvCurFile.fWordWrap = fWordWrapG;
@@ -5416,8 +5428,6 @@ void LoadSettings(void) {
 	iLongLineMode = clamp_i(iValue, EDGE_LINE, EDGE_BACKGROUND);
 
 	iValue = IniSectionGetInt(pIniSection, L"ZoomLevel", 100);
-	// Added in v4.2.25.1172, stored as a relative font size in point, in range [-10, 20].
-	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
 	iZoomLevel = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	bShowBookmarkMargin = IniSectionGetBool(pIniSection, L"ShowBookmarkMargin", 0);
@@ -5463,8 +5473,6 @@ void LoadSettings(void) {
 	iPrintColor = clamp_i(iValue, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintZoom", 100);
-	// previously stored as a relative font size in point plus 10, in range [-10, 20] + 10.
-	iValue = (iSettingsVersion < NP2SettingsVersion_V1)? 100 : iValue;
 	iPrintZoom = clamp_i(iValue, SC_MIN_ZOOM_LEVEL, SC_MAX_ZOOM_LEVEL);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintMarginLeft", -1);
@@ -5600,23 +5608,6 @@ void LoadSettings(void) {
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
 
-	iDefaultCodePage = 0;
-	{
-		const UINT acp = GetACP();
-		if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
-			iDefaultCodePage = acp;
-		}
-	}
-
-	{
-		CHARSETINFO ci;
-		if (TranslateCharsetInfo((DWORD *)(UINT_PTR)iDefaultCodePage, &ci, TCI_SRCCODEPAGE)) {
-			iDefaultCharSet = ci.ciCharset;
-		} else {
-			iDefaultCharSet = ANSI_CHARSET;
-		}
-	}
-
 	// Scintilla Styles
 	Style_Load();
 }
@@ -5680,7 +5671,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	}
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
-		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
+		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, 1);
 		return;
 	}
 
@@ -5690,7 +5681,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
-	IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
+	//IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, 1);
 	IniSectionSetBoolEx(pIniSection, L"SaveRecentFiles", bSaveRecentFiles, 0);
 	IniSectionSetBoolEx(pIniSection, L"SaveFindReplace", bSaveFindReplace, 0);
@@ -5753,6 +5744,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, 0);
 	IniSectionSetBoolEx(pIniSection, L"TabIndents", tabSettings.bTabIndents, 1);
 	IniSectionSetBoolEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 0);
+	IniSectionSetBoolEx(pIniSection, L"DetectIndentation", tabSettings.bDetectIndentation, 1);
 	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, 0);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);
 	IniSectionSetIntEx(pIniSection, L"LongLineMode", iLongLineMode, EDGE_LINE);
@@ -5812,8 +5804,9 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-
-	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+	if (!bStickyWindowPosition) {
+		SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+	}
 	// Scintilla Styles
 	Style_Save();
 }
@@ -6579,6 +6572,7 @@ void LoadFlags(void) {
 
 	bSingleFileInstance = IniSectionGetBool(pIniSection, L"SingleFileInstance", 1);
 	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
+	bStickyWindowPosition = IniSectionGetBool(pIniSection, L"StickyWindowPosition", 0);
 
 	if (!flagReuseWindow && !flagNoReuseWindow) {
 		flagNoReuseWindow = !bReuseWindow;
@@ -6606,9 +6600,6 @@ void LoadFlags(void) {
 
 	iValue = IniSectionGetInt(pIniSection, L"FindReplaceOpacityLevel", 75);
 	iFindReplaceOpacityLevel = validate_i(iValue, 0, 100, 75);
-
-	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", 1);
-	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	flagSimpleIndentGuides = IniSectionGetBool(pIniSection, L"SimpleIndentGuides", 0);
 	fNoHTMLGuess = IniSectionGetBool(pIniSection, L"NoHTMLGuess", 0);
@@ -6892,6 +6883,7 @@ void UpdateToolbar(void) {
 	EnableTool(IDT_FILE_LAUNCH, i);
 
 	CheckTool(IDT_VIEW_WORDWRAP, fvCurFile.fWordWrap);
+	CheckTool(IDT_VIEW_ALWAYSONTOP, IsTopMost());
 }
 
 //=============================================================================
@@ -7430,7 +7422,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		} else if (cchText < 2048) {
 			char tchText[2048] = "";
 			SciCall_GetText(COUNTOF(tchText), tchText);
-			StrTrimA(tchText, " \t\n\r");
+			StrTrimA(tchText, " \t\n\r"); // failure means not empty.
 			if (StrIsEmptyA(tchText)) {
 				bIsEmptyNewFile = TRUE;
 			}

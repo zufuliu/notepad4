@@ -1591,6 +1591,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 	case WM_INITDIALOG: {
 		WCHAR wch[MAX_EDITLEXER_NAME_SIZE];
 		LPCWSTR pszName;
+		Style_LoadTabSettings(pLexCurrent);
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 		if (GetString(pLexCurrent->rid, wch, COUNTOF(wch))) {
 			pszName = wch;
@@ -1636,7 +1637,8 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		if (fvCurFile.bTabsAsSpaces) {
 			CheckDlgButton(hwnd, IDC_FILE_TAB_AS_SPACE, BST_CHECKED);
 		}
-		if ((fvCurFile.mask & FV_MaskHasFileTabSettings) == 0) {
+		const BOOL hasFileTabSettings = fvCurFile.mask & FV_MaskHasFileTabSettings;
+		if (!hasFileTabSettings) {
 			CheckDlgButton(hwnd, IDC_FILE_USE_SCHEME_TAB, BST_CHECKED);
 			SyncSchemeTabSettings(hwnd);
 		}
@@ -1647,8 +1649,17 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		if (tabSettings.bBackspaceUnindents) {
 			CheckDlgButton(hwnd, IDC_BACKSPACE_UNINDENT, BST_CHECKED);
 		}
+		if (tabSettings.bDetectIndentation) {
+			CheckDlgButton(hwnd, IDC_DETECT_INDENTATION, BST_CHECKED);
+		}
 
 		CenterDlgInParent(hwnd);
+		if (hasFileTabSettings || !tabSettings.schemeUseGlobalTabSettings) {
+			HWND hwndCtl = GetDlgItem(hwnd, hasFileTabSettings ? IDC_FILE_TAB_WIDTH : IDC_SCHEME_TAB_WIDTH);
+			SetFocus(hwndCtl);
+			PostMessage(hwndCtl, EM_SETSEL, 0, -1);
+			return FALSE;
+		}
 	}
 	return TRUE;
 
@@ -1710,12 +1721,8 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			fvCurFile.bTabIndents = IsButtonChecked(hwnd, IDC_TAB_INDENT);
 			tabSettings.bTabIndents = fvCurFile.bTabIndents;
 			tabSettings.bBackspaceUnindents = IsButtonChecked(hwnd, IDC_BACKSPACE_UNINDENT);
-
-			LPCWSTR lpSection = pLexCurrent->pszName;
-			IniSetIntEx(lpSection, L"TabWidth", tabSettings.schemeTabWidth, pLexCurrent->defaultTabWidth);
-			IniSetIntEx(lpSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLexCurrent->defaultIndentWidth);
-			IniSetBoolEx(lpSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLexCurrent->defaultTabsAsSpaces);
-			IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLexCurrent->defaultUseGlobalTabSettings);
+			tabSettings.bDetectIndentation = IsButtonChecked(hwnd, IDC_DETECT_INDENTATION);
+			Style_SaveTabSettings(pLexCurrent);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
@@ -2634,7 +2641,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 
 			if (flagUseSystemMRU != 2) {
 				flagUseSystemMRU = 2;
-				IniSetInt(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1);
+				IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1, 1);
 			}
 		}
 	} else {

@@ -21,6 +21,7 @@
 #endif
 
 // https://docs.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics
+// https://software.intel.com/sites/landingpage/IntrinsicsGuide/
 #include <intrin.h>
 
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
@@ -43,7 +44,8 @@
 	// SSE2 enabled by default
 	#define NP2_USE_SSE2		1
 
-	// Clang and GCC use -mavx2 -mpopcnt -mbmi (to enable tzcnt) or -march=x86-64-v3.
+	// Clang and GCC use -march=x86-64-v3, https://clang.llvm.org/docs/UsersManual.html#x86
+	// or -mavx2 -mpopcnt -mbmi -mbmi2 -mlzcnt -mmovbe
 	// MSVC use /arch:AVX2
 	#if defined(_WIN64) && defined(__AVX2__)
 		#define NP2_USE_AVX2	1
@@ -71,7 +73,6 @@
 	#define np2_ctz(x)		_tzcnt_u32(x)
 	#define np2_ctz64(x)	_tzcnt_u64(x)
 #else
-	// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=bsf
 	static inline uint32_t np2_ctz(uint32_t value) NP2_noexcept {
 		unsigned long trailing;
 		_BitScanForward(&trailing, value);
@@ -98,7 +99,6 @@
 //	#define np2_clz(x)		_lzcnt_u32(x)
 //	#define np2_clz64(x)	_lzcnt_u64(x)
 #else
-	// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=bsr
 	static inline uint32_t np2_clz(uint32_t value) NP2_noexcept {
 		unsigned long trailing;
 		_BitScanReverse(&trailing, value);
@@ -175,6 +175,43 @@
 	_mm_store_ps((float *)((buffer) + 3*sizeof(__m128)), zero);	\
 } while (0)
 #endif
+
+
+#if defined(__GNUC__) || defined(__clang__)
+#define bswap32(x)				__builtin_bswap32(x)
+#else
+#define bswap32(x)				_byteswap_ulong(x)
+#endif
+
+#if defined(_MSC_VER)
+#define rotr8(x)				_rotr((x), 8)
+#define rotl8(x)				_rotl((x), 8)
+#else
+static inline uint32_t rotr8(uint32_t x) NP2_noexcept {
+	return ((x & 0xff) << 24) | (x >> 8);
+}
+static inline uint32_t rotl8(uint32_t x) NP2_noexcept {
+	return (x >> 24) | (x << 8);
+}
+#endif
+
+#if NP2_USE_AVX2
+static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
+#if defined(__GNUC__)
+	return __builtin_bswap32(*((const uint32_t *)ptr));
+#else
+	return _loadbe_i32(ptr);
+#endif
+}
+
+#define bit_zero_high_u32(x, index)	_bzhi_u32((x), (index))			// BMI2
+//#define bit_zero_high_u32(x, index)	_bextr_u32((x), 0, (index))		// BMI1
+#else
+static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcept {
+	return x & ((1U << index) - 1);
+}
+#endif
+
 
 #if defined(__cplusplus)
 namespace np2 {

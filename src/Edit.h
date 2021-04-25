@@ -422,6 +422,7 @@ BOOL IsStringCaseSensitiveA(LPCSTR pszText);
 #define FV_LONGLINESLIMIT		32
 #define FV_ENCODING				64
 #define FV_MODE					128
+#define FV_MaskHasTabIndentWidth	(FV_TABWIDTH | FV_INDENTWIDTH)
 #define FV_MaskHasFileTabSettings	(FV_TABWIDTH | FV_INDENTWIDTH | FV_TABSASSPACES)
 
 typedef struct EditTabSettings {
@@ -430,6 +431,7 @@ typedef struct EditTabSettings {
 	BOOL	globalTabsAsSpaces;
 	BOOL	bTabIndents;
 	BOOL	bBackspaceUnindents;
+	BOOL	bDetectIndentation;
 
 	int		schemeTabWidth;
 	int		schemeIndentWidth;

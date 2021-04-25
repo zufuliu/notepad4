@@ -57,7 +57,6 @@ extern BOOL bAutoStripBlanks;
 
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
-//extern int iDefaultCharSet;
 extern BOOL bLoadANSIasUTF8;
 extern BOOL bLoadASCIIasUTF8;
 extern BOOL bLoadNFOasOEM;
@@ -446,10 +445,6 @@ BOOL EditCopyAppend(HWND hwnd) {
 // EditDetectEOLMode()
 //
 void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
-	if (cbData == 0) {
-		return;
-	}
-
 	/* '\r' and '\n' is not reused (e.g. as trailing byte in DBCS) by any known encoding,
 	it's safe to check whole data byte by byte.*/
 
@@ -798,6 +793,133 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	status->linesCount[2] = lineCountCR;
 }
 
+void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
+	if ((lpfv->mask & FV_MaskHasFileTabSettings) == FV_MaskHasFileTabSettings) {
+		return;
+	}
+	if (!tabSettings.bDetectIndentation) {
+		return;
+	}
+
+	//StopWatch watch;
+	//StopWatch_Start(watch);
+
+	// code based on SciTEBase::DiscoverIndentSetting().
+	cbData = min_u(cbData, 1*1024*1024);
+	const uint8_t *ptr = (const uint8_t *)lpData;
+	const uint8_t * const end = ptr + cbData;
+	#define MAX_DETECTED_TAB_WIDTH	8
+	// line count for ambiguous lines, line indented by 1 to 8 spaces, line starts with tab.
+	int indentLineCount[1 + MAX_DETECTED_TAB_WIDTH + 1] = { 0 };
+	int prevIndentCount = 0;
+	int prevTabWidth = 0;
+
+#if NP2_USE_AVX2
+	const __m256i vectCR = _mm256_set1_epi8('\r');
+	const __m256i vectLF = _mm256_set1_epi8('\n');
+labelStart:
+#elif NP2_USE_SSE2
+	const __m128i vectCR = _mm_set1_epi8('\r');
+	const __m128i vectLF = _mm_set1_epi8('\n');
+labelStart:
+#endif
+	while (ptr < end) {
+		switch (*ptr++) {
+		case '\t':
+			++indentLineCount[MAX_DETECTED_TAB_WIDTH + 1];
+			break;
+
+		case ' ': {
+			int indentCount = 1;
+			while (ptr < end && *ptr == ' ') {
+				++ptr;
+				++indentCount;
+			}
+			if ((indentCount & 1) != 0 && *ptr == '*') {
+				// fix alignment space before star in Javadoc style comment: ` * comment content`
+				--indentCount;
+				if (indentCount == 0) {
+					break;
+				}
+			}
+			if (indentCount != prevIndentCount) {
+				const int delta = abs(indentCount - prevIndentCount);
+				prevIndentCount = indentCount;
+				// TODO: fix other (e.g. function argument) alignment spaces.
+				if (delta <= MAX_DETECTED_TAB_WIDTH) {
+					prevTabWidth = min_i(delta, indentCount);
+				} else {
+					prevTabWidth = 0;
+				}
+			}
+			++indentLineCount[prevTabWidth];
+		} break;
+
+		case '\r':
+		case '\n':
+			continue;
+
+		default:
+			prevIndentCount = 0;
+			break;
+		}
+
+		// skip to line end
+#if NP2_USE_AVX2
+		while (ptr + sizeof(__m256i) <= end) {
+			const __m256i chunk = _mm256_loadu_si256((__m256i *)ptr);
+			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(_mm256_cmpeq_epi8(chunk, vectCR), _mm256_cmpeq_epi8(chunk, vectLF)));
+			if (mask != 0) {
+				const uint32_t trailing = np2_ctz(mask);
+				ptr += trailing + 1;
+				goto labelStart;
+			}
+			ptr += sizeof(__m256i);
+		}
+#elif NP2_USE_SSE2
+		while (ptr + sizeof(__m128i) <= end) {
+			const __m128i chunk = _mm_loadu_si128((__m128i *)ptr);
+			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_cmpeq_epi8(chunk, vectCR), _mm_cmpeq_epi8(chunk, vectLF)));
+			if (mask != 0) {
+				const uint32_t trailing = np2_ctz(mask);
+				ptr += trailing + 1;
+				goto labelStart;
+			}
+			ptr += sizeof(__m128i);
+		}
+#endif
+		const uint32_t mask = (1 << '\r') | (1 << '\n');
+		uint8_t ch;
+		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
+			// nop
+		}
+	}
+
+	prevTabWidth = 0;
+	for (int i = 1; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
+		if (indentLineCount[i] > indentLineCount[prevTabWidth]) {
+			prevTabWidth = i;
+		}
+	}
+	if (prevTabWidth != 0) {
+		const BOOL bTabsAsSpaces = prevTabWidth <= MAX_DETECTED_TAB_WIDTH;
+		lpfv->mask |= FV_TABSASSPACES;
+		lpfv->bTabsAsSpaces = bTabsAsSpaces;
+		if (bTabsAsSpaces) {
+			lpfv->mask |= FV_MaskHasTabIndentWidth;
+			lpfv->iTabWidth = prevTabWidth;
+			lpfv->iIndentWidth = prevTabWidth;
+		}
+	}
+
+	//StopWatch_Stop(watch);
+	//const double duration = StopWatch_Get(&watch);
+	//printf("indentation %u, duration=%.06f, tab width=%d\n", (UINT)cbData, duration, prevTabWidth);
+	//for (int i = 0; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
+	//	printf("\tindentLineCount[%d] = %d\n", i, indentLineCount[i]);
+	//}
+}
+
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, LPBOOL lpbBOM) {
 	BOOL bPreferOEM = FALSE;
 	if (bLoadNFOasOEM) {
@@ -1085,7 +1207,10 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		lpDataUTF8 = lpData;
 	}
 
-	EditDetectEOLMode(lpDataUTF8, cbData, status);
+	if (cbData) {
+		EditDetectEOLMode(lpDataUTF8, cbData, status);
+		EditDetectIndentation(lpDataUTF8, cbData, &fvCurFile);
+	}
 	SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 	EditSetNewText(lpDataUTF8, cbData, status->totalLineCount);
 
@@ -1680,11 +1805,18 @@ void EditSentenceCase(void) {
 	NP2HeapFree(pszTextW);
 }
 
+#ifndef URL_ESCAPE_AS_UTF8		// (NTDDI_VERSION >= NTDDI_WIN7)
+#define URL_ESCAPE_AS_UTF8		0x00040000
+#endif
+#ifndef URL_UNESCAPE_AS_UTF8	// (NTDDI_VERSION >= NTDDI_WIN8)
+#define URL_UNESCAPE_AS_UTF8	URL_ESCAPE_AS_UTF8
+#endif
+
 //=============================================================================
 //
 // EditURLEncode()
 //
-LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
+LPWSTR EditURLEncodeSelection(int *pcchEscaped) {
 	*pcchEscaped = 0;
 	const Sci_Position iSelCount = SciCall_GetSelTextLength();
 	if (iSelCount <= 1) {
@@ -1694,25 +1826,27 @@ LPWSTR EditURLEncodeSelection(int *pcchEscaped, BOOL bTrim) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount);
 	SciCall_GetSelText(pszText);
 
-	if (bTrim) {
-		StrTrimA(pszText, " \t\r\n");
-	}
-	if (StrIsEmptyA(pszText)) {
-		NP2HeapFree(pszText);
-		return NULL;
-	}
-
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc(iSelCount * sizeof(WCHAR));
 	const UINT cpEdit = SciCall_GetCodePage();
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));
+	NP2HeapFree(pszText);
+	// TODO: trim all C0 and C1 control characters.
+	StrTrim(pszTextW, L" \a\b\f\n\r\t\v");
+	if (StrIsEmpty(pszTextW)) {
+		NP2HeapFree(pszTextW);
+		return NULL;
+	}
 
 	// https://docs.microsoft.com/en-us/windows/desktop/api/shlwapi/nf-shlwapi-urlescapew
-	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3); // '&', H1, H0
+	LPWSTR pszEscapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * kMaxMultiByteCount * 3); // '&', H1, H0
 
 	DWORD cchEscapedW = (int)NP2HeapSize(pszEscapedW) / sizeof(WCHAR);
-	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_SEGMENT_ONLY);
+	UrlEscape(pszTextW, pszEscapedW, &cchEscapedW, URL_ESCAPE_AS_UTF8);
+	if (!IsWin7AndAbove()) {
+		// TODO: encode some URL parts as UTF-8 then percent-escape these UTF-8 bytes.
+		//ParseURL(pszEscapedW, &ppu);
+	}
 
-	NP2HeapFree(pszText);
 	NP2HeapFree(pszTextW);
 	*pcchEscaped = cchEscapedW;
 	return pszEscapedW;
@@ -1729,7 +1863,7 @@ void EditURLEncode(void) {
 	}
 
 	int cchEscapedW;
-	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, FALSE);
+	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW);
 	if (pszEscapedW == NULL) {
 		return;
 	}
@@ -1768,8 +1902,25 @@ void EditURLDecode(void) {
 	LPWSTR pszUnescapedW = (LPWSTR)NP2HeapAlloc(NP2HeapSize(pszTextW) * 3);
 
 	DWORD cchUnescapedW = (DWORD)(NP2HeapSize(pszUnescapedW) / sizeof(WCHAR));
-	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, 0);
-	const int cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, (int)NP2HeapSize(pszUnescaped), NULL, NULL);
+	int cchUnescaped = cchUnescapedW;
+	UrlUnescape(pszTextW, pszUnescapedW, &cchUnescapedW, URL_UNESCAPE_AS_UTF8);
+	if (!IsWin8AndAbove()) {
+		char *ptr = pszUnescaped;
+		WCHAR *t = pszUnescapedW;
+		WCHAR ch;
+		while ((ch = *t++) != 0) {
+			if (ch > 0xff) {
+				break;
+			}
+			*ptr++ = (char)ch;
+		}
+		*ptr = '\0';
+		if (ptr == pszUnescaped + cchUnescapedW && IsUTF8(pszUnescaped, cchUnescapedW)) {
+			cchUnescapedW = MultiByteToWideChar(CP_UTF8, 0, pszUnescaped, cchUnescapedW, pszUnescapedW, cchUnescaped);
+		}
+	}
+
+	cchUnescaped = WideCharToMultiByte(cpEdit, 0, pszUnescapedW, cchUnescapedW, pszUnescaped, (int)NP2HeapSize(pszUnescaped), NULL, NULL);
 	EditReplaceMainSelection(cchUnescaped, pszUnescaped);
 
 	NP2HeapFree(pszText);
@@ -2327,7 +2478,8 @@ void EditModifyNumber(BOOL bIncrease) {
 			return;
 		}
 
-		const int radix = StrChrIA(chNumber, 'x') ? 16 : 10;
+		const char *ptr = strpbrk(chNumber, "xX");
+		const int radix = (ptr != NULL) ? 16 : 10;
 		char *end;
 		int iNumber = (int)strtol(chNumber, &end, radix);
 		if (end == chNumber || iNumber < 0) {
@@ -2341,20 +2493,9 @@ void EditModifyNumber(BOOL bIncrease) {
 			iNumber--;
 		}
 
-		const int iWidth = (int)strlen(chNumber) - ((radix == 16) ? 2 : 0);
-		if (radix == 16) {
-			const int len = iWidth + 1;
-			BOOL bUppercase = FALSE;
-			for (int i = len; i >= 0; i--) {
-				if (IsCharLowerA(chNumber[i])) {
-					break;
-				}
-				if (IsCharUpperA(chNumber[i])) {
-					bUppercase = TRUE;
-					break;
-				}
-			}
-			if (bUppercase) {
+		const int iWidth = (int)strlen(chNumber) - ((ptr != NULL) ? 2 : 0);
+		if (ptr != NULL) {
+			if (*ptr == 'X') {
 				sprintf(chNumber, "%#0*X", iWidth, iNumber);
 			} else {
 				sprintf(chNumber, "%#0*x", iWidth, iNumber);
@@ -6536,8 +6677,9 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, L"</tag>");
 
-		SetFocus(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX));
-		PostMessage(GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX), EM_SETSEL, 1, 4);
+		HWND hwndCtl = GetDlgItem(hwnd, IDC_MODIFY_LINE_PREFIX);
+		SetFocus(hwndCtl);
+		PostMessage(hwndCtl, EM_SETSEL, 1, 4);
 		CenterDlgInParent(hwnd);
 	}
 	return FALSE;
@@ -6956,7 +7098,7 @@ void EditSelectionAction(int action) {
 	}
 
 	int cchEscapedW;
-	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW, TRUE);
+	LPWSTR pszEscapedW = EditURLEncodeSelection(&cchEscapedW);
 	if (pszEscapedW == NULL) {
 		return;
 	}
@@ -7344,6 +7486,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 
 	// parse file variables at the beginning or end of the file.
 	BOOL beginning = TRUE;
+	int mask = 0;
 	while (TRUE) {
 		if (!fNoFileVariables) {
 			// Emacs file variables
@@ -7355,32 +7498,32 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			if (!bDisableFileVariables) {
 				if (FileVars_ParseInt(tch, "tab-width", &i)) {
 					lpfv->iTabWidth = clamp_i(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
-					lpfv->mask |= FV_TABWIDTH;
+					mask |= FV_TABWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "*basic-indent", &i)) {
 					lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
-					lpfv->mask |= FV_INDENTWIDTH;
+					mask |= FV_INDENTWIDTH;
 				}
 
 				if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
 					lpfv->bTabsAsSpaces = i == 0;
-					lpfv->mask |= FV_TABSASSPACES;
+					mask |= FV_TABSASSPACES;
 				}
 
 				if (FileVars_ParseInt(tch, "*tab-always-indent", &i)) {
 					lpfv->bTabIndents = i != 0;
-					lpfv->mask |= FV_TABINDENTS;
+					mask |= FV_TABINDENTS;
 				}
 
 				if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
 					lpfv->fWordWrap = i == 0;
-					lpfv->mask |= FV_WORDWRAP;
+					mask |= FV_WORDWRAP;
 				}
 
 				if (FileVars_ParseInt(tch, "fill-column", &i)) {
 					lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
-					lpfv->mask |= FV_LONGLINESLIMIT;
+					mask |= FV_LONGLINESLIMIT;
 				}
 			}
 		}
@@ -7393,17 +7536,17 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 				FileVars_ParseStr(tch, "/*!40101 SET NAMES ", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding))) {
 				// MySQL dump: /*!40101 SET NAMES utf8mb4 */;
 				// CSS @charset "UTF-8"; is not supported.
-				lpfv->mask |= FV_ENCODING;
+				mask |= FV_ENCODING;
 			}
 		}
 
 		if (!fNoFileVariables && !bDisableFileVariables) {
 			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) { // Emacs
-				lpfv->mask |= FV_MODE;
+				mask |= FV_MODE;
 			}
 		}
 
-		if (beginning && lpfv->mask == 0 && cbData > COUNTOF(tch)) {
+		if (beginning && mask == 0 && cbData > COUNTOF(tch)) {
 			strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch) - 1);
 			beginning = FALSE;
 		} else {
@@ -7411,9 +7554,19 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 		}
 	}
 
-	if (lpfv->mask & FV_ENCODING) {
+	beginning = mask & FV_MaskHasTabIndentWidth;
+	if (beginning == FV_TABWIDTH || beginning == FV_INDENTWIDTH) {
+		if (beginning == FV_TABWIDTH) {
+			lpfv->iIndentWidth = lpfv->iTabWidth;
+		} else {
+			lpfv->iTabWidth = lpfv->iIndentWidth;
+		}
+		mask |= FV_MaskHasTabIndentWidth;
+	}
+	if (mask & FV_ENCODING) {
 		lpfv->iEncoding = Encoding_MatchA(lpfv->tchEncoding);
 	}
+	lpfv->mask = mask;
 }
 
 void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
@@ -7577,7 +7730,7 @@ BOOL FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchVa
 			pvEnd++;
 		}
 		*pvEnd = '\0';
-		StrTrimA(tch, ":=\"\' \t");
+		StrTrimA(tch, ":=\"\' \t"); // ASCII, should not fail.
 
 		*pszValue = '\0';
 		strncpy(pszValue, tch, cchValue);
@@ -7758,7 +7911,7 @@ static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) 
 		action = fExpanded ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 	}
 
-	if (action ^ fExpanded) {
+	if ((BOOL)action != fExpanded) {
 		SciCall_ToggleFold(line);
 		if (*fToggled == FALSE || *pAction == FOLD_ACTION_SNIFF) {
 			// empty INI section not changed after toggle (issue #48).

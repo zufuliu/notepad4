@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include "config.h"
 #include "Helpers.h"
+#include "VectorISA.h"
+#include "GraphicUtils.h"
 #include "resource.h"
 
 LPCSTR GetCurrentLogTime(void) {
@@ -541,21 +543,55 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
+			//StopWatch watch;
+			//StopWatch_Start(watch);
+#if NP2_USE_AVX2
+			#define BitmapMergeAlpha_Tag	"sse4 2x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
+			uint64_t *prgba = (uint64_t *)bmp.bmBits;
+
+			const __m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				__m128i i16x8Fore = unpack_color_epi16_sse4_ptr64(prgba);
+				__m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Fore, 0xff), 0xff);
+				i16x8Fore = mm_alpha_blend_epi16(i16x8Fore, i16x8Back, i16x8Alpha);
+				const uint64_t color = pack_color_epi16_sse2_si64(i16x8Fore);
+				*prgba = color | UINT64_C(0xff000000ff000000);
+			}
+
+#elif NP2_USE_SSE2
+			#define BitmapMergeAlpha_Tag	"sse2 1x1"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
+			uint32_t *prgba = (uint32_t *)bmp.bmBits;
+
+			const __m128i i16x4Back = rgba_to_bgra_epi16_sse2_si32(crDest);
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				__m128i i16x4Fore = unpack_color_epi16_sse2_ptr32(prgba);
+				__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, 0xff);
+				i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
+				const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
+				*prgba = color | 0xff000000U;
+			}
+
+#else
+			#define BitmapMergeAlpha_Tag	"scale"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
 			const BYTE red = GetRValue(crDest);
 			const BYTE green = GetGValue(crDest);
 			const BYTE blue = GetBValue(crDest);
-			for (int y = 0; y < bmp.bmHeight; y++) {
-				for (int x = 0; x < bmp.bmWidth; x++) {
-					const BYTE alpha = prgba[x].rgbReserved;
-					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (red * (255 - alpha))) >> 8;
-					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (green * (255 - alpha))) >> 8;
-					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (blue * (255 - alpha))) >> 8;
-					prgba[x].rgbReserved = 0xFF;
-				}
-				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
+			for (ULONG x = 0; x < count; x++) {
+				const BYTE alpha = prgba[x].rgbReserved;
+				prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + (red * (255 ^ alpha))) >> 8;
+				prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + (green * (255 ^ alpha))) >> 8;
+				prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + (blue * (255 ^ alpha))) >> 8;
+				prgba[x].rgbReserved = 0xFF;
 			}
+#endif
+			//StopWatch_Stop(watch);
+			//StopWatch_ShowLog(&watch, "BitmapMergeAlpha " BitmapMergeAlpha_Tag);
+			#undef BitmapMergeAlpha_Tag
 			return TRUE;
 		}
 	}
@@ -571,19 +607,97 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
+			//StopWatch watch;
+			//StopWatch_Start(watch);
+			//FILE *fp = fopen("bitmap.dat", "wb");
+			//fwrite(bmp.bmBits, 1, bmp.bmHeight*bmp.bmWidth*4, fp);
+			//fclose(fp);
+#if NP2_USE_AVX2
+#if 1
+			#define BitmapAlphaBlend_Tag	"avx2 4x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
+			__m128i *prgba = (__m128i *)bmp.bmBits;
+
+			const __m256i i16x16Alpha = _mm256_broadcastw_epi16(mm_setlo_epi32(alpha));
+			const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
+			const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m256i origin = _mm256_cvtepu8_epi16(*prgba);
+				__m256i i16x16Fore = _mm256_mullo_epi16(origin, i16x16Alpha);
+				i16x16Fore = _mm256_add_epi16(i16x16Fore, i16x16Back);
+				i16x16Fore = _mm256_srli_epi16(_mm256_mulhi_epu16(i16x16Fore, i16x16_0x8081), 7);
+				i16x16Fore = _mm256_blend_epi16(origin, i16x16Fore, 0x77);
+				i16x16Fore = _mm256_packus_epi16(i16x16Fore, i16x16Fore);
+				i16x16Fore = _mm256_permute4x64_epi64(i16x16Fore, 8);
+				_mm_storeu_si128(prgba, _mm256_castsi256_si128(i16x16Fore));
+			}
+#else
+			#define BitmapAlphaBlend_Tag	"sse4 2x1"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
+			uint64_t *prgba = (uint64_t *)bmp.bmBits;
+
+			const __m128i i16x8Alpha = _mm_broadcastw_epi16(mm_setlo_epi32(alpha));
+			const __m128i i16x8Back = _mm_mullo_epi16(rgba_to_bgra_epi16x8_sse4_si32(crDest), mm_xor_alpha_epi16(i16x8Alpha));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				const __m128i origin = unpack_color_epi16_sse4_ptr64(prgba);
+				__m128i i16x8Fore = _mm_mullo_epi16(origin, i16x8Alpha);
+				i16x8Fore = _mm_add_epi16(i16x8Fore, i16x8Back);
+				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
+				i16x8Fore = _mm_blend_epi16(origin, i16x8Fore, 0x77);
+				i16x8Fore = pack_color_epi16_sse2_si128(i16x8Fore);
+				_mm_storel_epi64((__m128i *)prgba, i16x8Fore);
+			}
+#endif // NP2_USE_AVX2
+#elif NP2_USE_SSE2
+			#define BitmapAlphaBlend_Tag	"sse2 1x4"
+			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
+			__m128i *prgba = (__m128i *)bmp.bmBits;
+
+			const __m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
+			__m128i i16x8Back = _mm_shuffle_epi32(rgba_to_bgra_epi16_sse2_si32(crDest), 0x44);
+			i16x8Back = _mm_mullo_epi16(i16x8Back, mm_xor_alpha_epi16(i16x8Alpha));
+			for (ULONG x = 0; x < count; x++, prgba++) {
+				__m128i origin = _mm_loadu_si128(prgba);
+				__m128i color42 = _mm_shuffle_epi32(origin, 0x31);
+
+				__m128i i16x8Fore = unpacklo_color_epi16_sse2_si32(origin);
+				i16x8Fore = _mm_unpacklo_epi64(i16x8Fore, unpacklo_color_epi16_sse2_si32(color42));
+				i16x8Fore = _mm_mullo_epi16(i16x8Fore, i16x8Alpha);
+				i16x8Fore = _mm_add_epi16(i16x8Fore, i16x8Back);
+				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
+				__m128i i32x4Fore = pack_color_epi16_sse2_si128(i16x8Fore);
+
+				i16x8Fore = unpackhi_color_epi16_sse2_si128(origin);
+				i16x8Fore = _mm_unpacklo_epi64(i16x8Fore, unpackhi_color_epi16_sse2_si128(color42));
+				i16x8Fore = _mm_mullo_epi16(i16x8Fore, i16x8Alpha);
+				i16x8Fore = _mm_add_epi16(i16x8Fore, i16x8Back);
+				i16x8Fore = mm_div_epu16_by_255(i16x8Fore);
+				color42 = pack_color_epi16_sse2_si128(i16x8Fore);
+
+				i32x4Fore = _mm_unpacklo_epi64(i32x4Fore, color42);
+				i32x4Fore = _mm_and_si128(_mm_set1_epi32(0x00ffffff), i32x4Fore);
+				origin = _mm_andnot_si128(_mm_set1_epi32(0x00ffffff), origin);
+				i32x4Fore = _mm_or_si128(origin, i32x4Fore);
+				_mm_storeu_si128(prgba, i32x4Fore);
+			}
+
+#else
+			#define BitmapAlphaBlend_Tag	"scale"
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
-			const WORD red = GetRValue(crDest) * (255 - alpha);
-			const WORD green = GetGValue(crDest) * (255 - alpha);
-			const WORD blue = GetBValue(crDest) * (255 - alpha);
-			for (int y = 0; y < bmp.bmHeight; y++) {
-				for (int x = 0; x < bmp.bmWidth; x++) {
-					prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + red) >> 8;
-					prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + green) >> 8;
-					prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
-				}
-				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
+			const WORD red = GetRValue(crDest) * (255 ^ alpha);
+			const WORD green = GetGValue(crDest) * (255 ^ alpha);
+			const WORD blue = GetBValue(crDest) * (255 ^ alpha);
+			for (ULONG x = 0; x < count; x++) {
+				prgba[x].rgbRed = ((prgba[x].rgbRed * alpha) + red) >> 8;
+				prgba[x].rgbGreen = ((prgba[x].rgbGreen * alpha) + green) >> 8;
+				prgba[x].rgbBlue = ((prgba[x].rgbBlue * alpha) + blue) >> 8;
 			}
+#endif
+			//StopWatch_Stop(watch);
+			//StopWatch_ShowLog(&watch, "BitmapAlphaBlend " BitmapAlphaBlend_Tag);
+			#undef BitmapAlphaBlend_Tag
 			return TRUE;
 		}
 	}
@@ -599,14 +713,14 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		if (bmp.bmBitsPixel == 32) {
+			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
-			for (int y = 0; y < bmp.bmHeight; y++) {
-				for (int x = 0; x < bmp.bmWidth; x++) {
-					prgba[x].rgbRed = prgba[x].rgbGreen = prgba[x].rgbBlue =
-							(((BYTE)((prgba[x].rgbRed * 38 + prgba[x].rgbGreen * 75 + prgba[x].rgbBlue * 15) >> 7) * 0x80) + (0xD0 * (255 - 0x80))) >> 8;
-				}
-				prgba = (RGBQUAD *)((LPBYTE)prgba + bmp.bmWidthBytes);
+			for (ULONG x = 0; x < count; x++) {
+				// gray = 0.299*red + 0.587*green + 0.114*blue
+				BYTE gray = (prgba[x].rgbRed * 38 + prgba[x].rgbGreen * 75 + prgba[x].rgbBlue * 15) >> 7;
+				gray = ((gray * 0x80) + (0xD0 * (255 ^ 0x80))) >> 8;
+				prgba[x].rgbRed = prgba[x].rgbGreen = prgba[x].rgbBlue = gray;
 			}
 			return TRUE;
 		}
@@ -620,6 +734,23 @@ BOOL BitmapGrayScale(HBITMAP hbmp) {
 // Check if two colors can be distinguished
 //
 BOOL VerifyContrast(COLORREF cr1, COLORREF cr2) {
+#if NP2_USE_AVX2
+	__m128i i32x4Fore = unpack_color_epi32_sse4_si32(cr1);
+	__m128i i32x4Back = unpack_color_epi32_sse4_si32(cr2);
+
+	__m128i diff = _mm_sad_epu8(i32x4Fore, i32x4Back);
+	int value = mm_hadd_epi32_si32(diff);
+	if (value >= 400) {
+		return TRUE;
+	}
+
+	i32x4Fore = _mm_mullo_epi16(i32x4Fore, _mm_setr_epi32(3, 5, 1, 0));
+	i32x4Back = _mm_mullo_epi16(i32x4Back, _mm_setr_epi32(3, 6, 1, 0));
+	diff = _mm_sub_epi32(i32x4Fore, i32x4Back);
+	value = mm_hadd_epi32_si32(diff);
+	return abs(value) >= 400;
+
+#else
 	const BYTE r1 = GetRValue(cr1);
 	const BYTE g1 = GetGValue(cr1);
 	const BYTE b1 = GetBValue(cr1);
@@ -629,6 +760,7 @@ BOOL VerifyContrast(COLORREF cr1, COLORREF cr2) {
 
 	return	((abs((3 * r1 + 5 * g1 + 1 * b1) - (3 * r2 + 6 * g2 + 1 * b2))) >= 400) ||
 			((abs(r1 - r2) + abs(b1 - b2) + abs(g1 - g2)) >= 400);
+#endif
 }
 
 //=============================================================================
@@ -1445,22 +1577,24 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 	switch (PRIMARYLANGID(lang)) {
 	default:
 	case LANG_ENGLISH:
+		// https://docs.microsoft.com/en-us/typography/font-list/segoe-ui
 		font = L"Segoe UI";
-		*wSize = 9;
 		break;
 	case LANG_CHINESE:
+		// https://docs.microsoft.com/en-us/typography/font-list/microsoft-yahei
+		// https://docs.microsoft.com/en-us/typography/font-list/microsoft-jhenghei
 		font = IsChineseTraditionalSubLang(subLang) ? L"Microsoft JhengHei UI" : L"Microsoft YaHei UI";
-		*wSize = 9;
 		break;
 	case LANG_JAPANESE:
+		// https://docs.microsoft.com/en-us/typography/font-list/meiryo
 		font = L"Meiryo UI";
-		*wSize = 9;
 		break;
 	case LANG_KOREAN:
+		// https://docs.microsoft.com/en-us/typography/font-list/malgun-gothic
 		font = L"Malgun Gothic";
-		*wSize = 9;
 		break;
 	}
+	*wSize = 9;
 	lstrcpy(lpFaceName, font);
 }
 #endif

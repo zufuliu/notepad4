@@ -187,7 +187,6 @@ int			flagGotoFavorites	= 0;
 static int	iAutoRefreshRate	= 0; // unit: 1/10 sec
 int			flagNoFadeHidden	= 0;
 static int	iOpacityLevel		= 75;
-static int	flagToolbarLook		= 0;
 static int	flagPosParam		= 0;
 
 static inline BOOL HasFilter(void) {
@@ -927,12 +926,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	}
 
 	if (!bExternalBitmap) {
-		BOOL fProcessed = FALSE;
-		if (flagToolbarLook == 1) {
-			fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
-		} else if (flagToolbarLook == 2) {
-			fProcessed = BitmapGrayScale(hbmpCopy);
-		}
+		const BOOL fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
@@ -2679,7 +2673,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		if (iStartupDir == 1) {
 			IniSetString(INI_SECTION_NAME_SETTINGS, L"MRUDirectory", szCurDir);
 		}
-		IniSetBool(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings);
+		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, 1);
 		return;
 	}
 
@@ -2999,9 +2993,6 @@ void LoadFlags(void) {
 
 	iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
 	iOpacityLevel = validate_i(iValue, 0, 100, 75);
-
-	iValue = IniSectionGetInt(pIniSection, L"ToolbarLook", 1);
-	flagToolbarLook = clamp_i(iValue, 0, 2);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
 		LPCWSTR strValue = IniSectionGetValue(pIniSection, L"ShellAppUserModelID");

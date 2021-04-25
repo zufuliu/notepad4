@@ -15,6 +15,7 @@
 
 extern BOOL bSkipUnicodeDetection;
 extern int iDefaultCodePage;
+extern int iDefaultCharSet;
 
 int g_DOSEncoding;
 
@@ -514,13 +515,28 @@ void EditOnCodePageChanged(UINT oldCodePage) {
 // Encoding Helper Functions
 //
 void Encoding_InitDefaults(void) {
+	const UINT acp = GetACP();
+	if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
+		// TODO: fix issue #39 "Use Unicode UTF-8 for worldwide language support"
+		iDefaultCodePage = acp;
+	} else {
+		iDefaultCodePage = CP_ACP;
+	}
+
+	CHARSETINFO ci;
+	if (TranslateCharsetInfo((DWORD *)(UINT_PTR)iDefaultCodePage, &ci, TCI_SRCCODEPAGE)) {
+		iDefaultCharSet = ci.ciCharset;
+	} else {
+		iDefaultCharSet = ANSI_CHARSET;
+	}
+
 	const UINT oemcp = GetOEMCP();
-	wsprintf(wchANSI, L" (%u)", GetACP());
 	mEncoding[CPI_OEM].uCodePage = oemcp;
+
+	wsprintf(wchANSI, L" (%u)", acp);
 	wsprintf(wchOEM, L" (%u)", oemcp);
 
 	g_DOSEncoding = CPI_OEM;
-
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
 	if (oemcp != 437 && IsValidCodePage(437)) {
 		for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); ++i) {
@@ -1311,8 +1327,9 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 		// (which might not even be mapped), for the first chunk of input just
 		// use vector instructions.
 		__m256i shifted_bytes = _mm256_loadu_si256((__m256i *)data);
-		__m256i shl_16 = _mm256_permute2x128_si256(shifted_bytes, _mm256_set1_epi8(0), 0x03);
-		shifted_bytes = _mm256_alignr_epi8(shifted_bytes, shl_16, 15);
+		//__m256i shl_16 = _mm256_permute2x128_si256(shifted_bytes, _mm256_setzero_si256(), 0x03);
+		//shifted_bytes = _mm256_alignr_epi8(shifted_bytes, shl_16, 15);
+		shifted_bytes = _mm256_slli_si256(shifted_bytes, 1);
 
 		// Loop over input in sizeof(__m256i)-byte chunks, as long as we can safely read
 		// that far into memory
@@ -1438,19 +1455,10 @@ int z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_con
 	}
 #else
 	e_3 = _mm_and_si128(_mm_and_si128(e_1, e_2), e_3);
-#if 0
-	uint64_t dummy[2];
-	_mm_store_si128((__m128i *)dummy, e_3);
-	dummy[0] |= dummy[1];
-	if (dummy[0]) {
-		return 0;
-	}
-#else
 	const int mask = _mm_movemask_epi8(_mm_cmpeq_epi8(e_3, _mm_setzero_si128()));
 	if (mask != 0xFFFF) {
 		return 0;
 	}
-#endif
 #endif
 
 	// Save continuation bits and input bytes for the next round
@@ -1474,7 +1482,8 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 		// (which might not even be mapped), for the first chunk of input just
 		// use vector instructions.
 		__m128i shifted_bytes = _mm_loadu_si128((__m128i *)data);
-		shifted_bytes = _mm_alignr_epi8(shifted_bytes, _mm_setzero_si128(), 15);
+		//shifted_bytes = _mm_alignr_epi8(shifted_bytes, _mm_setzero_si128(), 15);
+		shifted_bytes = _mm_slli_si128(shifted_bytes, 1);
 
 		// Loop over input in sizeof(__m128i)-byte chunks, as long as we can safely read
 		// that far into memory
@@ -1510,13 +1519,9 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 }
 
 static inline int did_cpu_supports_ssse3(void) {
-#if 0//defined(__GNUC__)
-	return __builtin_cpu_supports("ssse3");
-#else
 	int info[4] = {0};
 	__cpuid(info, 0x00000001);
 	return info[2] & 0x0000200;
-#endif
 }
 // end NP2_USE_SSE2
 #endif

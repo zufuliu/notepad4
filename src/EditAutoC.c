@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "SciCall.h"
+#include "VectorISA.h"
 #include "Helpers.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -39,7 +40,7 @@ struct WordList {
 	int (__cdecl *WL_strcmp)(LPCSTR, LPCSTR);
 	int (__cdecl *WL_strncmp)(LPCSTR, LPCSTR, size_t);
 #if NP2_AUTOC_USE_STRING_ORDER
-	UINT (*WL_OrderFunc)(const void *, unsigned int);
+	uint32_t (*WL_OrderFunc)(const void *, uint32_t);
 #endif
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
@@ -69,40 +70,54 @@ struct WordList {
 
 #if NP2_AUTOC_USE_STRING_ORDER
 #define NP2_AUTOC_ORDER_LENGTH	4
-#define NP2_AUTOC_MAX_ORDER_LENGTH	4
 
-UINT WordList_Order(const void *pWord, unsigned int len) {
+uint32_t WordList_Order(const void *pWord, uint32_t len) {
 #if 0
-	unsigned int high = 0;
-	const unsigned char *ptr = (const unsigned char *)pWord;
-	len = min_u(len, 4);
-	while (len) {
+	uint32_t high = 0;
+	const uint8_t *ptr = (const uint8_t *)pWord;
+	len = min_u(len, NP2_AUTOC_ORDER_LENGTH);
+	for (uint32_t i = 0; i < len; i++) {
 		high = (high << 8) | *ptr++;
-		--len;
 	}
-#else
-	unsigned int high = *((const unsigned int *)pWord);
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
-		high &= ((1U << len * 8) - 1);
+		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
+	}
+
+#else
+	uint32_t high = *((const uint32_t *)pWord);
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high = bit_zero_high_u32(high, len*8);
 	}
 	high = bswap32(high);
 #endif
 	return high;
 }
 
-UINT WordList_OrderCase(const void *pWord, unsigned int len) {
-	unsigned int high = 0;
-	const unsigned char *ptr = (const unsigned char *)pWord;
-	len = min_u(len, 4);
-	while (len) {
-		unsigned char ch = *ptr++;
+uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
+#if 1
+	uint32_t high = 0;
+	const uint8_t *ptr = (const uint8_t *)pWord;
+	len = min_u(len, NP2_AUTOC_ORDER_LENGTH);
+	for (uint32_t i = 0; i < len; i++) {
+		uint8_t ch = *ptr++;
 		// convert to lower case to match _stricmp() / strcasecmp().
 		if (ch >= 'A' && ch <= 'Z') {
 			ch = ch + 'a' - 'A';
 		}
 		high = (high << 8) | ch;
-		--len;
 	}
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
+	}
+
+#else
+	uint32_t high = *((const uint32_t *)pWord);
+	high |= 0x20202020U; // only works for ASCII letters
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high = bit_zero_high_u32(high, len*8);
+	}
+	high = bswap32(high);
+#endif
 	return high;
 }
 #endif
@@ -148,11 +163,10 @@ struct WordNode {
 
 static inline void WordList_AddBuffer(struct WordList *pWList) {
 	char *buffer = (char *)NP2HeapAlloc(pWList->capacity);
-	char *align = (char *)align_ptr(buffer);
 	pWList->bufferList[pWList->bufferCount] = buffer;
 	pWList->buffer = buffer;
 	pWList->bufferCount++;
-	pWList->offset = (UINT)(align - buffer);
+	pWList->offset = 0;
 }
 
 static inline void WordList_AddCache(struct WordList *pWList) {
@@ -167,7 +181,7 @@ static inline void WordList_AddCache(struct WordList *pWList) {
 void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	struct WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_USE_STRING_ORDER
-	const UINT order = (pWList->iStartLen > NP2_AUTOC_MAX_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
+	const UINT order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
 #endif
 	if (root == NULL) {
 		struct WordNode *node;
@@ -787,11 +801,11 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 		strcat(pFind, "[A-Za-z0-9_]");
 		strcat(pFind, "\\i?");
 	} else {
-		if (IsDefaultWordChar((unsigned char)pRoot[0])) {
+		if (IsDefaultWordChar((uint8_t)pRoot[0])) {
 			strcat(pFind, "\\h");
 		}
 		EscapeRegex(pFind + strlen(pFind), pRoot);
-		if (IsDefaultWordChar((unsigned char)pRoot[iRootLen - 1])) {
+		if (IsDefaultWordChar((uint8_t)pRoot[iRootLen - 1])) {
 			strcat(pFind, "\\i?");
 		} else {
 			strcat(pFind, "\\i");

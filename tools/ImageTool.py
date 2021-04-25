@@ -226,11 +226,13 @@ def make_notepad2_toolbar_bitmap():
 		'images/.png',			# IDT_FILE_ADDTOFAV
 		'images/.png',			# IDT_VIEW_TOGGLEFOLDS
 		'images/.png',			# IDT_FILE_LAUNCH
+		'images/pin-angle-16x.png',				# IDT_VIEW_ALWAYSONTOP
 	], 'Toolbar.bmp')
 
-make_matapath_toolbar_bitmap()
+#make_matapath_toolbar_bitmap()
 #make_notepad2_toolbar_bitmap()
-convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')
+#convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')
+#concat_horizontal(['../res/Toolbar.bmp', 'images/pin-angle-16x.png'], 'Toolbar.bmp')
 
 #split_horizontal('Toolbar.bmp', '16x40')
 

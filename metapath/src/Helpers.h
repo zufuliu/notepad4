@@ -19,6 +19,7 @@
 ******************************************************************************/
 #pragma once
 
+#include <stdint.h>
 #include "compiler.h"
 
 NP2_inline int min_i(int x, int y) {
@@ -197,11 +198,7 @@ NP2_inline void IniSetIntEx(LPCWSTR lpSection, LPCWSTR lpName, int i, int iDefau
 }
 
 NP2_inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, BOOL b, BOOL bDefault) {
-	if (b != bDefault) {
-		IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
-	} else {
-		IniSetString(lpSection, lpName, NULL);
-	}
+	IniSetString(lpSection, lpName, (b == bDefault) ? NULL : (b ? L"1" : L"0"));
 }
 
 #define LoadIniSection(lpSection, lpBuf, cchBuf) \

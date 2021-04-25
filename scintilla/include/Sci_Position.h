@@ -39,5 +39,10 @@ constexpr T max(T x, T y) noexcept {
 	return (x > y) ? x : y;
 }
 
+template <typename T>
+constexpr T clamp(T x, T lower, T upper) noexcept {
+	return (x < lower) ? lower : (x > upper) ? upper : x;
+}
+
 }
 #endif

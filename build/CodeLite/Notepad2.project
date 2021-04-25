@@ -4,6 +4,7 @@
   <Dependencies/>
   <VirtualDirectory Name="Scintilla">
     <VirtualDirectory Name="include">
+      <File Name="../../scintilla/include/GraphicUtils.h"/>
       <File Name="../../scintilla/include/ILexer.h"/>
       <File Name="../../scintilla/include/ILoader.h"/>
       <File Name="../../scintilla/include/LaTeXInput.h"/>
@@ -316,13 +317,13 @@
       <ResourceCompiler Options="-DRC_INVOKED;-DUNICODE;-D_UNICODE;"/>
     </GlobalSettings>
     <Configuration Name="Debug_AVX2" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-mavx2;-mpopcnt;-mbmi" C_Options="-g;-O0;-mavx2;-mpopcnt;-mbmi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O0;-mavx2;-mpopcnt;-mbmi;-mbmi2;-mlzcnt;-mmovbe" C_Options="-g;-O0;-mavx2;-mpopcnt;-mbmi;-mbmi2;-mlzcnt;-mmovbe" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="_DEBUG"/>
         <Preprocessor Value="_WIN64"/>
         <Preprocessor Value="_WIN32_WINNT=0x0601"/>
         <Preprocessor Value="WINVER=0x0601"/>
       </Compiler>
-      <Linker Options="-O0;-mavx2;-mpopcnt;-mbmi;-Wl,--major-os-version,6;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.01" Required="yes"/>
+      <Linker Options="-O0;-mavx2;-mpopcnt;-mbmi;-mbmi2;-mlzcnt;-mmovbe;-Wl,--major-os-version,6;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.01" Required="yes"/>
       <ResourceCompiler Options="-D_DEBUG;-D_WIN64;" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
@@ -442,13 +443,13 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release_AVX2" CompilerType="MinGW ( gcc )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-mavx2;-mpopcnt;-mbmi;-fno-rtti;-ffast-math;-fomit-frame-pointer" C_Options="-O2;-mavx2;-mpopcnt;-mbmi;-ffast-math;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-mavx2;-mpopcnt;-mbmi;-mbmi2;-mlzcnt;-mmovbe;-fno-rtti;-ffast-math;-fomit-frame-pointer" C_Options="-O2;-mavx2;-mpopcnt;-mbmi;-mbmi2;-mlzcnt;-mmovbe;-ffast-math;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="_WIN64"/>
         <Preprocessor Value="_WIN32_WINNT=0x0601"/>
         <Preprocessor Value="WINVER=0x0601"/>
       </Compiler>
-      <Linker Options="-s;-O2;-mavx2;-mpopcnt;-mbmi;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,6;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.01" Required="yes"/>
+      <Linker Options="-s;-O2;-mavx2;-mpopcnt;-mbmi;-mbmi2;-mlzcnt;-mmovbe;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,6;-Wl,--minor-os-version,1;-Wl,--subsystem,windows:6.01" Required="yes"/>
       <ResourceCompiler Options="-D_WIN64" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>

@@ -31,6 +31,16 @@ constexpr bool FlagSet(T value, T test) noexcept {
 	return (static_cast<int>(value) & static_cast<int>(test)) == static_cast<int>(test);
 }
 
+// https://secret.club/2021/04/09/std-clamp.html
+// https://bugs.llvm.org/show_bug.cgi?id=49909
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96733
+template <typename T>
+constexpr T Clamp(T x, T lower, T upper) noexcept {
+	x = (x < lower) ? lower : x;
+	x = (x > upper) ? upper : x;
+	return x;
+}
+
 /**
  * A geometric point class.
  * Point is similar to the Win32 POINT and GTK+ GdkPoint types.
@@ -229,10 +239,10 @@ public:
 	}
 
 	// Manual alpha blending
-	constexpr ColourDesired AlphaBlendOn(unsigned int alpha, ColourDesired back) const noexcept {
-		const unsigned int red = (GetRed()*alpha + back.GetRed()*(255 - alpha)) >> 8;
-		const unsigned int green = (GetGreen()*alpha + back.GetGreen()*(255 - alpha)) >> 8;
-		const unsigned int blue = (GetBlue()*alpha + back.GetBlue()*(255 - alpha)) >> 8;
+	static constexpr ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
+		const unsigned int red = (fore.GetRed()*alpha + back.GetRed()*(255 ^ alpha)) >> 8;
+		const unsigned int green = (fore.GetGreen()*alpha + back.GetGreen()*(255 ^ alpha)) >> 8;
+		const unsigned int blue = (fore.GetBlue()*alpha + back.GetBlue()*(255 ^ alpha)) >> 8;
 		return ColourDesired(red, green, blue);
 	}
 };

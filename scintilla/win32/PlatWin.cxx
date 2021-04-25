@@ -35,6 +35,8 @@
 #include "Geometry.h"
 #include "Platform.h"
 #include "VectorISA.h"
+#include "GraphicUtils.h"
+
 #include "Scintilla.h"
 #include "XPM.h"
 #include "CharClassify.h"
@@ -317,23 +319,6 @@ HINSTANCE hinstPlatformRes {};
 constexpr int SupportsGDI =
 	SC_SUPPORTS_PIXEL_MODIFICATION;
 
-constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
-	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
-
-	case SC_EFF_QUALITY_NON_ANTIALIASED:
-		return NONANTIALIASED_QUALITY;
-
-	case SC_EFF_QUALITY_ANTIALIASED:
-		return ANTIALIASED_QUALITY;
-
-	case SC_EFF_QUALITY_LCD_OPTIMIZED:
-		return CLEARTYPE_QUALITY;
-
-	default:
-		return DEFAULT_QUALITY;
-	}
-}
-
 #if defined(USE_D2D)
 constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
 	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
@@ -425,6 +410,11 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 		const std::wstring wsLocale = WStringFromUTF8(fp.localeName);
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wsFamily.c_str(), nullptr,
 			weight, style, stretch, fHeight, wsLocale.c_str(), &pTextFormat);
+		if (hr == E_INVALIDARG) {
+			// Possibly a bad locale name like "/" so try "en-us".
+			hr = pIDWriteFactory->CreateTextFormat(wsFamily.c_str(), nullptr,
+					weight, style, stretch, fHeight, L"en-us", &pTextFormat);
+		}
 		if (SUCCEEDED(hr)) {
 			pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
@@ -811,22 +801,52 @@ void SurfaceGDI::RoundedRectangle(PRectangle rc, FillStroke fillStroke) noexcept
 
 namespace {
 
-constexpr DWORD dwordFromBGRA(byte b, byte g, byte r, byte a) noexcept {
-	return (a << 24) | (r << 16) | (g << 8) | b;
+#if NP2_USE_AVX2
+inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+	__m128i i16x4Color = rgba_to_bgra_epi16_sse4_si32(colour.AsInteger());
+	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0xff);
+	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
+	i16x4Color = mm_div_epu16_by_255(i16x4Color);
+	i16x4Color = _mm_blend_epi16(i16x4Alpha, i16x4Color, 7);
+	return pack_color_epi16_sse2_si32(i16x4Color);
 }
 
-constexpr byte AlphaScaled(unsigned char component, unsigned int alpha) noexcept {
-	return static_cast<byte>(component * alpha / 255);
+#elif NP2_USE_SSE2
+inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+	const uint32_t rgba = bswap32(colour.AsInteger());
+	__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
+	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
+	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
+	i16x4Color = mm_div_epu16_by_255(i16x4Color);
+
+	const uint32_t color = bgr_from_abgr_epi16_sse2_si32(i16x4Color);
+	return color | (rgba << 24);
 }
 
-constexpr DWORD dwordMultiplied(ColourAlpha colour) noexcept {
-	const unsigned int alpha = colour.GetAlpha();
-	return dwordFromBGRA(
-		AlphaScaled(colour.GetBlue(), alpha),
-		AlphaScaled(colour.GetGreen(), alpha),
-		AlphaScaled(colour.GetRed(), alpha),
-		static_cast<byte>(alpha));
+#else
+// make a GDI RGBQUAD as DWORD.
+template <typename T>
+constexpr DWORD RGBQuad(T alpha, T red, T green, T blue) noexcept {
+	return (alpha << 24) | (red << 16) | (green << 8) | blue;
 }
+
+template <typename T>
+constexpr T AlphaScaled(T component, T alpha) noexcept {
+	return static_cast<T>(component * alpha / 255);
+}
+
+template <typename T>
+constexpr DWORD RGBQuadMultiplied(T alpha, T red, T green, T blue) noexcept {
+	red = AlphaScaled(red, alpha);
+	green = AlphaScaled(green, alpha);
+	blue = AlphaScaled(blue, alpha);
+	return RGBQuad(alpha, red, green, blue);
+}
+
+constexpr DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+	return RGBQuadMultiplied(colour.GetAlpha(), colour.GetRed(), colour.GetGreen(), colour.GetBlue());
+}
+#endif
 
 class DIBSection {
 	HDC hMemDC{};
@@ -909,31 +929,69 @@ void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
 	SetPixel(xSymmetric, ySymmetric, value);
 }
 
-constexpr unsigned int Proportional(unsigned char a, unsigned char b, XYPOSITION t) noexcept {
-	return static_cast<unsigned int>(a + t * (b - a));
+#if NP2_USE_AVX2
+inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+	__m128i i32x4Fore = rgba_to_abgr_epi32_sse4_si32(a.AsInteger());
+	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
+	// a + t * (b - a)
+	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
+	// component * alpha / 255
+	__m128 f32x4Alpha = _mm_broadcastss_ps(f32x4Fore);
+	f32x4Fore = _mm_mul_ps(f32x4Fore, f32x4Alpha);
+	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
+	f32x4Fore = mm_alignr_ps(f32x4Alpha, f32x4Fore, 1);
+
+	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
+	return pack_color_epi32_sse2_si32(i32x4Fore);
 }
 
-ColourAlpha Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
-	return ColourAlpha(
-		Proportional(a.GetRed(), b.GetRed(), t),
-		Proportional(a.GetGreen(), b.GetGreen(), t),
-		Proportional(a.GetBlue(), b.GetBlue(), t),
-		Proportional(a.GetAlpha(), b.GetAlpha(), t));
+#elif NP2_USE_SSE2
+inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+	__m128i i32x4Fore = rgba_to_abgr_epi32_sse2_si32(a.AsInteger());
+	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
+	// a + t * (b - a)
+	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
+	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
+	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
+	// component * alpha / 255
+	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
+	__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0);
+	f32x4Fore = _mm_mul_ps(f32x4Fore, f32x4Alpha);
+	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
+
+	i32x4Fore = _mm_cvttps_epi32(f32x4Fore);
+	const uint32_t color = bgr_from_abgr_epi32_sse2_si32(i32x4Fore);
+	return color | (alpha << 24);
 }
 
-ColourAlpha GradientValue(const std::vector<ColourStop> &stops, XYPOSITION proportion) noexcept {
+#else
+constexpr uint32_t Proportional(uint8_t a, uint8_t b, XYPOSITION t) noexcept {
+	return static_cast<uint32_t>(a + t * (b - a));
+}
+
+constexpr DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+	const uint32_t red = Proportional(a.GetRed(), b.GetRed(), t);
+	const uint32_t green = Proportional(a.GetGreen(), b.GetGreen(), t);
+	const uint32_t blue = Proportional(a.GetBlue(), b.GetBlue(), t);
+	const uint32_t alpha = Proportional(a.GetAlpha(), b.GetAlpha(), t);
+	return RGBQuadMultiplied(alpha, red, green, blue);
+}
+#endif
+
+DWORD GradientValue(const std::vector<ColourStop> &stops, XYPOSITION proportion) noexcept {
 	for (size_t stop = 0; stop < stops.size() - 1; stop++) {
 		// Loop through each pair of stops
 		const XYPOSITION positionStart = stops[stop].position;
 		const XYPOSITION positionEnd = stops[stop + 1].position;
 		if ((proportion >= positionStart) && (proportion <= positionEnd)) {
-			const XYPOSITION proportionInPair = (proportion - positionStart) /
-				(positionEnd - positionStart);
+			const XYPOSITION proportionInPair = (proportion - positionStart) / (positionEnd - positionStart);
 			return Proportional(stops[stop].colour, stops[stop + 1].colour, proportionInPair);
 		}
 	}
 	// Loop should always find a value
-	return ColourAlpha();
+	return 0;
 }
 
 constexpr SIZE SizeOfRect(RECT rc) noexcept {
@@ -955,9 +1013,9 @@ void SurfaceGDI::AlphaRectangle(PRectangle rc, XYPOSITION cornerSize, FillStroke
 			// Ensure not distorted too much by corners when small
 			const LONG corner = std::min(static_cast<LONG>(cornerSize), (std::min(size.cx, size.cy) / 2) - 2);
 
-			constexpr DWORD valEmpty = dwordFromBGRA(0, 0, 0, 0);
-			const DWORD valFill = dwordMultiplied(fillStroke.fill.colour);
-			const DWORD valOutline = dwordMultiplied(fillStroke.stroke.colour);
+			constexpr DWORD valEmpty = 0;
+			const DWORD valFill = RGBQuadMultiplied(fillStroke.fill.colour);
+			const DWORD valOutline = RGBQuadMultiplied(fillStroke.stroke.colour);
 
 			// Draw a framed rectangle
 			for (int y = 0; y < size.cy; y++) {
@@ -1000,8 +1058,7 @@ void SurfaceGDI::GradientRectangle(PRectangle rc, const std::vector<ColourStop> 
 			for (LONG y = 0; y < size.cy; y++) {
 				// Find y/height proportional colour
 				const XYPOSITION proportion = y / (rc.Height() - 1.0f);
-				const ColourAlpha mixed = GradientValue(stops, proportion);
-				const DWORD valFill = dwordMultiplied(mixed);
+				const DWORD valFill = GradientValue(stops, proportion);
 				for (LONG x = 0; x < size.cx; x++) {
 					section.SetPixel(x, y, valFill);
 				}
@@ -1010,8 +1067,7 @@ void SurfaceGDI::GradientRectangle(PRectangle rc, const std::vector<ColourStop> 
 			for (LONG x = 0; x < size.cx; x++) {
 				// Find x/width proportional colour
 				const XYPOSITION proportion = x / (rc.Width() - 1.0f);
-				const ColourAlpha mixed = GradientValue(stops, proportion);
-				const DWORD valFill = dwordMultiplied(mixed);
+				const DWORD valFill = GradientValue(stops, proportion);
 				for (LONG y = 0; y < size.cy; y++) {
 					section.SetPixel(x, y, valFill);
 				}
@@ -1353,6 +1409,23 @@ constexpr unsigned int SupportsD2D =
 	(1 << SC_SUPPORTS_TRANSLUCENT_STROKE) |
 	(1 << SC_SUPPORTS_PIXEL_MODIFICATION);
 
+#if NP2_USE_SSE2
+static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
+
+inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
+#if NP2_USE_AVX2
+	__m128i i32x4 = unpack_color_epi32_sse4_si32(colour.AsInteger());
+#else
+	__m128i i32x4 = unpack_color_epi32_sse2_si32(colour.AsInteger());
+#endif
+	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
+	f32x4 = _mm_div_ps(f32x4, _mm_set1_ps(255.0f));
+	D2D_COLOR_F color;
+	_mm_storeu_ps((float *)&color, f32x4);
+	return color;
+}
+
+#else
 constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 	return D2D_COLOR_F {
 		colour.GetRedComponent(),
@@ -1361,6 +1434,7 @@ constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 		colour.GetAlphaComponent()
 	};
 }
+#endif
 
 constexpr D2D1_RECT_F RectangleInset(D2D1_RECT_F rect, FLOAT inset) noexcept {
 	return D2D1_RECT_F {
@@ -1377,8 +1451,6 @@ class BlobInline;
 
 class SurfaceD2D final : public Surface {
 	SurfaceMode mode;
-
-	int codePageText =0;
 
 	ID2D1RenderTarget *pRenderTarget = nullptr;
 	ID2D1BitmapRenderTarget *pBitmapRenderTarget = nullptr;
@@ -1441,7 +1513,7 @@ public:
 
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) override;
 
-	void SCICALL DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageDraw, UINT fuOptions);
+	void SCICALL DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions);
 
 	void SCICALL DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
 	void SCICALL DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
@@ -1567,7 +1639,6 @@ void SurfaceD2D::SetFont(const Font *font_) noexcept {
 	yAscent = pfm->yAscent;
 	yDescent = pfm->yDescent;
 	yInternalLeading = pfm->yInternalLeading;
-	codePageText = mode.codePage;
 	if (pRenderTarget) {
 		const D2D1_TEXT_ANTIALIAS_MODE aaMode = DWriteMapFontQuality(pfm->extraFontFlag);
 
@@ -2372,10 +2443,11 @@ std::unique_ptr<IScreenLineLayout> SurfaceD2D::Layout(const IScreenLine *screenL
 	return std::make_unique<ScreenLineLayout>(screenLine);
 }
 
-void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageDraw, UINT fuOptions) {
+void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions) {
 	SetFont(font_);
 
 	// Use Unicode calls
+	const int codePageDraw = codePageOverride ? codePageOverride : mode.codePage;
 	const TextWide tbuf(text, codePageDraw);
 	if (pRenderTarget && pTextFormat && pBrush) {
 		if (fuOptions & ETO_CLIPPED) {
@@ -2391,7 +2463,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 			static_cast<FLOAT>(rc.Height()),
 			&pTextLayout);
 		if (SUCCEEDED(hr)) {
-			D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase-yAscent));
+			D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase - yAscent));
 			pRenderTarget->DrawTextLayout(origin, pTextLayout, pBrush, d2dDrawTextOptions);
 			ReleaseUnknown(pTextLayout);
 		}
@@ -2407,7 +2479,7 @@ void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION yba
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, codePageText, ETO_OPAQUE);
+		DrawTextCommon(rc, font_, ybase, text, 0, ETO_OPAQUE);
 	}
 }
 
@@ -2416,7 +2488,7 @@ void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION yb
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, codePageText, ETO_OPAQUE | ETO_CLIPPED);
+		DrawTextCommon(rc, font_, ybase, text, 0, ETO_OPAQUE | ETO_CLIPPED);
 	}
 }
 
@@ -2427,7 +2499,7 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 		if (ch != ' ') {
 			if (pRenderTarget) {
 				D2DPenColourAlpha(fore);
-				DrawTextCommon(rc, font_, ybase, text, codePageText, 0);
+				DrawTextCommon(rc, font_, ybase, text, 0, 0);
 			}
 			return;
 		}
@@ -2440,7 +2512,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		// SetFont failed or no access to DirectWrite so give up.
 		return;
 	}
-	const TextWide tbuf(text, codePageText);
+	const TextWide tbuf(text, mode.codePage);
 	TextPositions poses(tbuf.tlen);
 	// Initialize poses for safety.
 	std::fill(poses.buffer, poses.buffer + tbuf.tlen, 0.0f);
@@ -2459,7 +2531,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	FLOAT position = 0.0f;
+	XYPOSITION position = 0.0;
 	int ti = 0;
 	for (unsigned int ci = 0; ci < count; ci++) {
 		const FLOAT width = clusterMetrics[ci].width;
@@ -2472,9 +2544,8 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	PLATFORM_ASSERT(ti == tbuf.tlen);
 	if (mode.codePage == SC_CP_UTF8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
-		int ui = 0;
 		size_t i = 0;
-		while (ui < tbuf.tlen) {
+		for (int ui = 0; ui < tbuf.tlen; ui++) {
 			const unsigned char uch = text[i];
 			const unsigned int byteCount = UTF8BytesOfLead(uch);
 			if (byteCount == 4) {	// Non-BMP
@@ -2483,16 +2554,13 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.tlen); bytePos++) {
 				positions[i++] = poses.buffer[ui];
 			}
-			ui++;
 		}
-		XYPOSITION lastPos = 0.0f;
-		if (i > 0)
-			lastPos = positions[i - 1];
+		const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
 		while (i < text.length()) {
 			positions[i++] = lastPos;
 		}
 	} else {
-		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(codePageText);
+		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(mode.codePage);
 		if (dbcs) {
 			// May be one or two bytes per position
 			int ui = 0;
@@ -2520,7 +2588,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 XYPOSITION SurfaceD2D::WidthText(const Font *font_, std::string_view text) {
 	FLOAT width = 1.0;
 	SetFont(font_);
-	const TextWide tbuf(text, codePageText);
+	const TextWide tbuf(text, mode.codePage);
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
@@ -2592,7 +2660,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	FLOAT position = 0.0f;
+	XYPOSITION position = 0.0f;
 	int ti = 0;
 	for (unsigned int ci = 0; ci < count; ci++) {
 		const FLOAT width = clusterMetrics[ci].width;
@@ -2604,22 +2672,20 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	}
 	PLATFORM_ASSERT(ti == tbuf.tlen);
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
-	int ui = 0;
 	size_t i = 0;
-	while (ui < tbuf.tlen) {
+	for (int ui = 0; ui < tbuf.tlen; ui++) {
 		const unsigned char uch = text[i];
 		const unsigned int byteCount = UTF8BytesOfLead(uch);
 		if (byteCount == 4) {	// Non-BMP
 			ui++;
+			PLATFORM_ASSERT(ui < ti);
 		}
 		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()); bytePos++) {
 			positions[i++] = poses.buffer[ui];
 		}
-		ui++;
+
 	}
-	XYPOSITION lastPos = 0.0f;
-	if (i > 0)
-		lastPos = positions[i - 1];
+	const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
 	while (i < text.length()) {
 		positions[i++] = lastPos;
 	}

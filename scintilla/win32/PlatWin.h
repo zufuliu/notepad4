@@ -82,6 +82,12 @@ extern "C" BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExS
 #endif
 #endif
 
+#if NP2_FORCE_COMPILE_C_AS_CPP
+extern WCHAR defaultTextFontName[LF_FACESIZE];
+#else
+extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
+#endif
+
 namespace Scintilla {
 
 extern void Platform_Initialise(void *hInstance) noexcept;
@@ -233,6 +239,23 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 }
 
 HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept;
+
+constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
+	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
+
+	case SC_EFF_QUALITY_NON_ANTIALIASED:
+		return NONANTIALIASED_QUALITY;
+
+	case SC_EFF_QUALITY_ANTIALIASED:
+		return ANTIALIASED_QUALITY;
+
+	case SC_EFF_QUALITY_LCD_OPTIMIZED:
+		return CLEARTYPE_QUALITY;
+
+	default:
+		return DEFAULT_QUALITY;
+	}
+}
 
 #if defined(USE_D2D)
 extern bool LoadD2D() noexcept;

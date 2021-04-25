@@ -95,10 +95,6 @@ NP2_inline void* align_ptr(const void *ptr) {
 
 #define unaligned_ptr(ptr, size)	(((uintptr_t)(ptr)) & ((size) - 1))
 
-NP2_inline unsigned int bswap32(unsigned int x) {
-	return (x << 24) | ((x << 8) & 0xff0000) | ((x >> 8) & 0xff00) | (x >> 24);
-}
-
 NP2_inline BOOL StrIsEmptyA(LPCSTR s) {
 	return s == NULL || *s == '\0';
 }
@@ -131,6 +127,14 @@ NP2_inline BOOL IsASpaceOrTab(int ch) {
 
 NP2_inline BOOL IsOctalDigit(int ch) {
 	return ch >= '0' && ch <= '7';
+}
+
+NP2_inline BOOL IsLowerCase(int ch) {
+	return ch >= 'a' && ch <= 'z';
+}
+
+NP2_inline BOOL IsUpperCase(int ch) {
+	return ch >= 'A' && ch <= 'Z';
 }
 
 NP2_inline BOOL IsAlpha(int ch) {
@@ -283,7 +287,7 @@ void DebugPrintf(const char *fmt, ...);
 
 extern HINSTANCE g_hInstance;
 extern HANDLE g_hDefaultHeap;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN7
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
 extern DWORD g_uWinVer;
 #endif
 extern WCHAR szIniFile[MAX_PATH];
@@ -449,11 +453,7 @@ NP2_inline void IniSetIntEx(LPCWSTR lpSection, LPCWSTR lpName, int i, int iDefau
 }
 
 NP2_inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, BOOL b, BOOL bDefault) {
-	if (b != bDefault) {
-		IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
-	} else {
-		IniSetString(lpSection, lpName, NULL);
-	}
+	IniSetString(lpSection, lpName, (b == bDefault) ? NULL : (b ? L"1" : L"0"));
 }
 
 #define LoadIniSection(lpSection, lpBuf, cchBuf) \
@@ -755,8 +755,8 @@ BOOL StatusSetTextID(HWND hwnd, UINT nPart, UINT uID);
 int  StatusCalcPaneWidth(HWND hwnd, LPCWSTR lpsz);
 
 /**
- * we only have 25 commands in toolbar
- * max size = 25*(3 + 2) + 1 (each command with a separator)
+ * we only have 26 commands in toolbar
+ * max size = 26*(3 + 2) + 1 (each command with a separator)
  */
 #define MAX_TOOLBAR_ITEM_COUNT_WITH_SEPARATOR	50
 #define MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE	160

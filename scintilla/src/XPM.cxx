@@ -20,6 +20,8 @@
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
+#include "VectorISA.h"
+#include "GraphicUtils.h"
 
 #include "XPM.h"
 
@@ -66,17 +68,17 @@ constexpr unsigned int GetHexValue(unsigned char ch1, unsigned char ch2) noexcep
 	return (GetHexDigit(ch1) << 4) | GetHexDigit(ch2);
 }
 
-constexpr ColourDesired ColourFromHex(const char *val) noexcept {
+constexpr ColourAlpha ColourFromHex(const char *val) noexcept {
 	const unsigned int r = GetHexValue(val[0], val[1]);
 	const unsigned int g = GetHexValue(val[2], val[3]);
 	const unsigned int b = GetHexValue(val[4], val[5]);
-	return ColourDesired(r, g, b);
+	return ColourAlpha(r, g, b);
 }
 
 }
 
 
-ColourDesired XPM::ColourFromCode(int ch) const noexcept {
+ColourAlpha XPM::ColourFromCode(int ch) const noexcept {
 	return colourCodeTable[ch];
 }
 
@@ -121,7 +123,7 @@ void XPM::Init(const char *const *linesForm) {
 	if (!linesForm)
 		return;
 
-	std::fill(colourCodeTable, std::end(colourCodeTable), ColourDesired(0));
+	std::fill(colourCodeTable, std::end(colourCodeTable), ColourAlpha(0, 0, 0, 0));
 	const char *line0 = linesForm[0];
 	width = atoi(line0);
 	line0 = NextField(line0);
@@ -139,7 +141,7 @@ void XPM::Init(const char *const *linesForm) {
 		const char *colourDef = linesForm[c + 1];
 		const char code = colourDef[0];
 		colourDef += 4;
-		ColourDesired colour(0xff, 0xff, 0xff);
+		ColourAlpha colour(0, 0, 0);
 		if (*colourDef == '#') {
 			colour = ColourFromHex(colourDef + 1);
 		} else {
@@ -179,19 +181,13 @@ void XPM::Draw(Surface *surface, PRectangle rc) {
 	}
 }
 
-void XPM::PixelAt(int x, int y, ColourDesired &colour, bool &transparent) const noexcept {
+ColourAlpha XPM::PixelAt(int x, int y) const noexcept {
 	if (pixels.empty() || (x < 0) || (x >= width) || (y < 0) || (y >= height)) {
-		colour = ColourDesired(0);
-		transparent = true;
-		return;
+		// Out of bounds -> transparent black
+		return ColourAlpha(0, 0, 0, 0);
 	}
 	const int code = pixels[y * width + x];
-	transparent = code == codeTransparent;
-	if (transparent) {
-		colour = ColourDesired(0);
-	} else {
-		colour = ColourFromCode(code);
-	}
+	return ColourFromCode(code);
 }
 
 std::vector<const char *> XPM::LinesFormFromTextForm(const char *textForm) {
@@ -245,10 +241,7 @@ RGBAImage::RGBAImage(const XPM &xpm) {
 	pixelBytes.resize(CountBytes());
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			ColourDesired colour;
-			bool transparent = false;
-			xpm.PixelAt(x, y, colour, transparent);
-			SetPixel(x, y, colour, transparent ? 0 : 255);
+			SetPixel(x, y, xpm.PixelAt(x, y));
 		}
 	}
 }
@@ -263,28 +256,62 @@ const unsigned char *RGBAImage::Pixels() const noexcept {
 	return pixelBytes.data();
 }
 
-void RGBAImage::SetPixel(int x, int y, ColourDesired colour, int alpha) noexcept {
+void RGBAImage::SetPixel(int x, int y, ColourAlpha colour) noexcept {
 	unsigned char *pixel = pixelBytes.data() + (y*width + x) * 4;
 	// RGBA
 	pixel[0] = colour.GetRed();
 	pixel[1] = colour.GetGreen();
 	pixel[2] = colour.GetBlue();
-	pixel[3] = static_cast<unsigned char>(alpha);
+	pixel[3] = colour.GetAlpha();
 }
 
 // Transform a block of pixels from RGBA to BGRA with premultiplied alpha.
 // Used for DrawRGBAImage on some platforms.
 void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept {
+#if NP2_USE_AVX2
+	count /= (bytesPerPixel * 2);
+	uint64_t *pbgra = reinterpret_cast<uint64_t *>(pixelsBGRA);
+	const uint64_t *prgba = reinterpret_cast<const uint64_t *>(pixelsRGBA);
+	for (size_t i = 0; i < count; i++, pbgra++) {
+		__m128i i16x8Color = unpack_color_epi16_sse4_ptr64(prgba++);
+		i16x8Color = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, 0xc6), 0xc6);
+		__m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, 0xff), 0xff);
+
+		i16x8Color = _mm_mullo_epi16(i16x8Color, i16x8Alpha);
+		i16x8Color = mm_div_epu16_by_255(i16x8Color);
+		i16x8Color = _mm_blend_epi16(i16x8Alpha, i16x8Color, 0x77);
+
+		i16x8Color = pack_color_epi16_sse2_si128(i16x8Color);
+		_mm_storel_epi64((__m128i *)pbgra, i16x8Color);
+	}
+
+#elif NP2_USE_SSE2
+	count /= bytesPerPixel;
+	uint32_t *pbgra = reinterpret_cast<uint32_t *>(pixelsBGRA);
+	const uint32_t *prgba = reinterpret_cast<const uint32_t *>(pixelsRGBA);
+	for (size_t i = 0; i < count; i++, pbgra++) {
+		const uint32_t rgba = bswap32(*prgba++);
+		__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
+		__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
+		i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
+		i16x4Color = mm_div_epu16_by_255(i16x4Color);
+
+		const uint32_t color = bgr_from_abgr_epi16_sse2_si32(i16x4Color);
+		*pbgra = (color | (rgba << 24));
+	}
+
+#else
 	for (size_t i = 0; i < count; i++) {
 		const unsigned char alpha = pixelsRGBA[3];
 		// Input is RGBA, output is BGRA with premultiplied alpha
-		pixelsBGRA[2] = (pixelsRGBA[0] * alpha + 127) / 255;
-		pixelsBGRA[1] = (pixelsRGBA[1] * alpha + 127) / 255;
-		pixelsBGRA[0] = (pixelsRGBA[2] * alpha + 127) / 255;
+		pixelsBGRA[2] = pixelsRGBA[0] * alpha / 255;
+		pixelsBGRA[1] = pixelsRGBA[1] * alpha / 255;
+		pixelsBGRA[0] = pixelsRGBA[2] * alpha / 255;
 		pixelsBGRA[3] = alpha;
 		pixelsRGBA += bytesPerPixel;
 		pixelsBGRA += bytesPerPixel;
 	}
+#endif
 }
 
 RGBAImageSet::RGBAImageSet() noexcept : height(-1), width(-1) {
