@@ -7326,6 +7326,16 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			UpdateLineNumberWidth();
 		}
 
+		// reset EditDetectIndentation result by scheme which is hard to detect
+		switch (pLexCurrent->rid) {
+		case NP2LEX_DIFF:
+			fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
+			fvCurFile.iIndentWidth = tabSettings.schemeIndentWidth;
+			fvCurFile.bTabsAsSpaces = tabSettings.schemeTabsAsSpaces;
+			FileVars_Apply(&fvCurFile);
+			break;
+		}
+
 		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
 		if (flagUseSystemMRU == 2) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
