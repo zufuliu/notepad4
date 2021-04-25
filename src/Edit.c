@@ -152,7 +152,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	FileVars_Apply(&fvCurFile);
 
 	if (cbText > 0) {
-		SciCall_SetModEventMask(SC_MOD_NONE);
+		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 #if 0
 		StopWatch watch;
 		StopWatch_Start(watch);
@@ -163,7 +163,6 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		StopWatch_Stop(watch);
 		StopWatch_ShowLog(&watch, "AddText time");
 #endif
-		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	}
 
 	SciCall_SetUndoCollection(TRUE);
@@ -210,9 +209,8 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	SciCall_SetCodePage(cpDest);
 
 	if (cbText > 0) {
-		SciCall_SetModEventMask(SC_MOD_NONE);
-		SciCall_AppendText(cbText, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+		SciCall_AppendText(cbText, pchText);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -254,9 +252,8 @@ void EditConvertToLargeMode(void) {
 	FileVars_Apply(&fvCurFile);
 
 	if (length > 0) {
-		SciCall_SetModEventMask(SC_MOD_NONE);
-		SciCall_AppendText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+		SciCall_AppendText(length, pchText);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
