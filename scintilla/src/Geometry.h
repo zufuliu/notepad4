@@ -259,7 +259,7 @@ public:
 	}
 
 	constexpr ColourAlpha(ColourDesired cd, unsigned int alpha) noexcept :
-		ColourDesired(cd.AsInteger() | (alpha << 24)) {
+		ColourDesired((cd.AsInteger() & 0xffffff) | (alpha << 24)) {
 	}
 
 	constexpr ColourAlpha(ColourDesired cd) noexcept :
@@ -279,7 +279,7 @@ public:
 	}
 
 	constexpr bool IsOpaque() const noexcept {
-		return GetAlpha() == 0xff;
+		return AsInteger() >= 0xff000000U;
 	}
 
 	constexpr ColourAlpha MixedWith(ColourAlpha other) const noexcept {
