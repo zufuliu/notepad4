@@ -7339,10 +7339,14 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 
 		// check for binary file (file with unknown encoding: ANSI)
 		const BOOL binary = (iEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
-		// lock binary file for editing
+		// lock binary file for editing, and reset auto detected indentation results
 		if (binary) {
 			bLockedForEditing = TRUE;
 			SciCall_SetReadOnly(TRUE);
+			fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
+			fvCurFile.iIndentWidth = tabSettings.schemeIndentWidth;
+			fvCurFile.bTabsAsSpaces = tabSettings.schemeTabsAsSpaces;
+			FileVars_Apply(&fvCurFile);
 		} else {
 #if NP2_ENABLE_DOT_LOG_FEATURE
 			if (IsFileStartsWithDotLog()) {
