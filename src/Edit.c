@@ -223,6 +223,7 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	if (length == 0 && bSetSavePoint) {
 		SciCall_SetSavePoint();
 	}
+	UpdateLineNumberWidth();
 	return TRUE;
 }
 
