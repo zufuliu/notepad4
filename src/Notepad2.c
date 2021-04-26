@@ -7339,6 +7339,15 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 
 		// check for binary file (file with unknown encoding: ANSI)
 		const BOOL binary = (iEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
+		if (fvCurFile.detectedTabSettings) {
+			// ignore auto "detected" Tab settings for binary file and diff file.
+			if (binary || pLexCurrent->iLexer == SCLEX_DIFF) {
+				fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
+				fvCurFile.detectedTabSettings = FALSE;
+				Style_LoadTabSettings(pLexCurrent);
+				FileVars_Apply(&fvCurFile);
+			}
+		}
 		// lock binary file for editing
 		if (binary) {
 			bLockedForEditing = TRUE;

@@ -905,6 +905,7 @@ labelStart:
 	if (prevTabWidth != 0) {
 		const BOOL bTabsAsSpaces = prevTabWidth <= MAX_DETECTED_TAB_WIDTH;
 		lpfv->mask |= FV_TABSASSPACES;
+		lpfv->detectedTabSettings = TRUE;
 		lpfv->bTabsAsSpaces = bTabsAsSpaces;
 		if (bTabsAsSpaces) {
 			lpfv->mask |= FV_MaskHasTabIndentWidth;
@@ -7568,6 +7569,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 		lpfv->iEncoding = Encoding_MatchA(lpfv->tchEncoding);
 	}
 	lpfv->mask = mask;
+	lpfv->detectedTabSettings = mask & FV_MaskHasFileTabSettings;
 }
 
 void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
