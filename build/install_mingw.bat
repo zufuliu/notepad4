@@ -21,5 +21,5 @@ IF /I "%~1" == "llvm" (
   @rem for CI purpose only, the result binary is dynamic linked against api-ms-win-crt*.dll instead of msvcrt.dll
   curl -fsSL -o "llvm-mingw-20210423-ucrt-x86_64.zip" "https://github.com/mstorsjo/llvm-mingw/releases/download/20210423/llvm-mingw-20210423-ucrt-x86_64.zip"
   7z x -y -o"C:\" "llvm-mingw-20210423-ucrt-x86_64.zip" >NUL
-  move /Y "C:\llvm-mingw-20210423-ucrt-x86_64" "C\llvm-mingw"
+  move /Y "C:\llvm-mingw-20210423-ucrt-x86_64" "C:\llvm-mingw"
 )
