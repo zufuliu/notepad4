@@ -441,7 +441,6 @@ typedef struct EditTabSettings {
 
 typedef struct FILEVARS {
 	int 	mask;
-	BOOL	detectedTabSettings;
 	int 	iTabWidth;
 	int 	iIndentWidth;
 	BOOL	bTabsAsSpaces;

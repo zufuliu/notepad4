@@ -7163,7 +7163,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	Sci_Line iDocTopLine = 0;
 	int iXOffset = 0;
 	int keepTitleExcerpt = fKeepTitleExcerpt;
-	int lexerSpecified = flagLexerSpecified;
+	BOOL keepCurrentLexer = FALSE;
 
 	if (!bNew && StrNotEmpty(lpszFile)) {
 		lstrcpy(tch, lpszFile);
@@ -7177,7 +7177,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			iXOffset = SciCall_GetXOffset();
 			bRestoreView = iLine > 1 || iCol > 1;
 			keepTitleExcerpt = 1;
-			lexerSpecified = 1;
+			keepCurrentLexer = TRUE;
 		}
 		fSuccess = TRUE;
 	}
@@ -7306,7 +7306,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		UpdateStatusBarCacheLineColumn();
 
 		BOOL bUnknownFile = FALSE;
-		if (!lexerSpecified) {
+		if (!keepCurrentLexer) {
 			if (flagLexerSpecified) {
 				if (pLexCurrent->rid == iInitialLexer) {
 					UpdateLineNumberWidth();
@@ -7339,11 +7339,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 
 		// check for binary file (file with unknown encoding: ANSI)
 		const BOOL binary = (iEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
-		if (fvCurFile.detectedTabSettings) {
+		if (binary || pLexCurrent->iLexer == SCLEX_DIFF) {
 			// ignore auto "detected" Tab settings for binary file and diff file.
-			if (binary || pLexCurrent->iLexer == SCLEX_DIFF) {
+			if (fvCurFile.mask & FV_MaskHasFileTabSettings) {
 				fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
-				fvCurFile.detectedTabSettings = FALSE;
 				Style_LoadTabSettings(pLexCurrent);
 				FileVars_Apply(&fvCurFile);
 			}
