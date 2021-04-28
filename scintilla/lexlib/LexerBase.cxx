@@ -19,7 +19,7 @@
 #include "LexerModule.h"
 #include "LexerBase.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 LexerBase::LexerBase() {
 	auto *iter = keywordLists;
@@ -40,7 +40,7 @@ void SCI_METHOD LexerBase::Release() noexcept {
 }
 
 int SCI_METHOD LexerBase::Version() const noexcept {
-	return lvRelease5;
+	return Scintilla::lvRelease5;
 }
 
 const char * SCI_METHOD LexerBase::PropertyNames() const noexcept {

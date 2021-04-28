@@ -19,7 +19,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsVWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$';

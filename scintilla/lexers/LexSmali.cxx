@@ -16,7 +16,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsSmaliOp(int ch) noexcept {
 	return ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == '='

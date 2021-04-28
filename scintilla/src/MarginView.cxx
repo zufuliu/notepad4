@@ -59,7 +59,7 @@ using namespace Scintilla;
 namespace Scintilla {
 
 void DrawWrapMarker(Surface *surface, PRectangle rcPlace,
-	bool isEndMarker, ColourDesired wrapColour) {
+	bool isEndMarker, ColourAlpha wrapColour) {
 
 	const XYPOSITION extraFinalPixel = surface->Supports(SC_SUPPORTS_LINE_DRAWS_FINAL) ? 0.0f : 1.0f;
 
@@ -132,22 +132,22 @@ void MarginView::RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw)
 		const PRectangle rcPattern = PRectangle::FromInts(0, 0, patternSize, patternSize);
 
 		// Initialize default colours based on the chrome colour scheme.  Typically the highlight is white.
-		ColourDesired colourFMFill = vsDraw.selbar;
-		ColourDesired colourFMStripes = vsDraw.selbarlight;
+		ColourAlpha colourFMFill = vsDraw.selbar;
+		ColourAlpha colourFMStripes = vsDraw.selbarlight;
 
-		if (!(vsDraw.selbarlight == ColourDesired(0xff, 0xff, 0xff))) {
+		if (!(vsDraw.selbarlight == ColourAlpha(0xff, 0xff, 0xff))) {
 			// User has chosen an unusual chrome colour scheme so just use the highlight edge colour.
 			// (Typically, the highlight colour is white.)
 			colourFMFill = vsDraw.selbarlight;
 		}
 
-		if (vsDraw.foldmarginColour.isSet) {
+		if (vsDraw.foldmarginColour) {
 			// override default fold margin colour
-			colourFMFill = vsDraw.foldmarginColour;
+			colourFMFill = *vsDraw.foldmarginColour;
 		}
-		if (vsDraw.foldmarginHighlightColour.isSet) {
+		if (vsDraw.foldmarginHighlightColour) {
 			// override default fold margin highlight colour
-			colourFMStripes = vsDraw.foldmarginHighlightColour;
+			colourFMStripes = *vsDraw.foldmarginHighlightColour;
 		}
 
 		pixmapSelPattern->FillRectangle(rcPattern, colourFMFill);
@@ -195,7 +195,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 					surface->FillRectangle(rcSelMargin,
 						invertPhase ? *pixmapSelPattern : *pixmapSelPatternOffset1);
 				} else {
-					ColourDesired colour;
+					ColourAlpha colour;
 					switch (vs.ms[margin].style) {
 					case SC_MARGIN_BACK:
 						colour = vs.styles[STYLE_DEFAULT].back;
@@ -216,7 +216,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 				surface->FillRectangle(rcSelMargin, vs.styles[STYLE_LINENUMBER].back);
 			}
 
-			const int lineStartPaint = static_cast<int>(rcMargin.top + ptOrigin.y) / vs.lineHeight;
+			const Sci::Line lineStartPaint = static_cast<Sci::Line>(rcMargin.top + ptOrigin.y) / vs.lineHeight;
 			Sci::Line visibleLine = model.TopLineOfMain() + lineStartPaint;
 			Sci::Position yposScreen = lineStartPaint * vs.lineHeight - static_cast<Sci::Position>(ptOrigin.y);
 			// Work out whether the top line is whitespace located after a
@@ -391,7 +391,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 						rcNumber.left = xpos;
 						DrawTextNoClipPhase(surface, rcNumber, vs.styles[STYLE_LINENUMBER],
 							rcNumber.top + vs.maxAscent, sNumber, DrawPhase::all);
-					} else if (vs.wrapVisualFlags & SC_WRAPVISUALFLAG_MARGIN) {
+					} else if (vs.wrap.visualFlags & SC_WRAPVISUALFLAG_MARGIN) {
 						PRectangle rcWrapMarker = rcMarker;
 						rcWrapMarker.right -= wrapMarkerPaddingRight;
 						rcWrapMarker.left = rcWrapMarker.right - vs.styles[STYLE_LINENUMBER].aveCharWidth;

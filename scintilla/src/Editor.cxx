@@ -62,6 +62,7 @@
 #include "ElapsedPeriod.h"
 
 using namespace Scintilla;
+using namespace Lexilla;
 
 namespace {
 
@@ -1483,7 +1484,7 @@ void Editor::UpdateSystemCaret() {
 }
 
 bool Editor::Wrapping() const noexcept {
-	return vs.wrapState != WrapMode::none;
+	return vs.wrap.state != WrapMode::none;
 }
 
 void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd) noexcept {
@@ -4043,7 +4044,7 @@ int Editor::KeyDefault(int, int) noexcept {
 
 int Editor::KeyDownWithModifiers(int key, int modifiers, bool *consumed) {
 	DwellEnd(false);
-	const int msg = kmap.Find(key, modifiers);
+	const unsigned int msg = kmap.Find(key, modifiers);
 	if (msg) {
 		if (consumed)
 			*consumed = true;
@@ -4823,8 +4824,8 @@ void Editor::SetHotSpotRange(const Point *pt) {
 		// range can encompass more than the run range and then
 		// the underline will not be drawn properly.
 		Range hsNew;
-		hsNew.start = pdoc->ExtendStyleRange(pos, -1, vs.hotspotSingleLine);
-		hsNew.end = pdoc->ExtendStyleRange(pos, 1, vs.hotspotSingleLine);
+		hsNew.start = pdoc->ExtendStyleRange(pos, -1, hotspotSingleLine);
+		hsNew.end = pdoc->ExtendStyleRange(pos, 1, hotspotSingleLine);
 
 		// Only invalidate the range if the hotspot range has changed...
 		if (!(hsNew == hotspot)) {
@@ -5752,10 +5753,10 @@ void Editor::StyleSetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 	vs.EnsureStyle(wParam);
 	switch (iMessage) {
 	case SCI_STYLESETFORE:
-		vs.styles[wParam].fore = ColourDesired(static_cast<int>(lParam));
+		vs.styles[wParam].fore = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		break;
 	case SCI_STYLESETBACK:
-		vs.styles[wParam].back = ColourDesired(static_cast<int>(lParam));
+		vs.styles[wParam].back = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		break;
 	case SCI_STYLESETBOLD:
 		vs.fontsValid = false;
@@ -5816,9 +5817,9 @@ sptr_t Editor::StyleGetMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPar
 	vs.EnsureStyle(wParam);
 	switch (iMessage) {
 	case SCI_STYLEGETFORE:
-		return vs.styles[wParam].fore.AsInteger();
+		return vs.styles[wParam].fore.OpaqueRGB();
 	case SCI_STYLEGETBACK:
-		return vs.styles[wParam].back.AsInteger();
+		return vs.styles[wParam].back.OpaqueRGB();
 	case SCI_STYLEGETBOLD:
 		return vs.styles[wParam].weight > SC_WEIGHT_NORMAL;
 	case SCI_STYLEGETWEIGHT:
@@ -6781,7 +6782,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWRAPMODE:
-		return static_cast<sptr_t>(vs.wrapState);
+		return static_cast<sptr_t>(vs.wrap.state);
 
 	case SCI_SETWRAPVISUALFLAGS:
 		if (vs.SetWrapVisualFlags(static_cast<int>(wParam))) {
@@ -6791,7 +6792,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWRAPVISUALFLAGS:
-		return vs.wrapVisualFlags;
+		return vs.wrap.visualFlags;
 
 	case SCI_SETWRAPVISUALFLAGSLOCATION:
 		if (vs.SetWrapVisualFlagsLocation(static_cast<int>(wParam))) {
@@ -6800,7 +6801,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWRAPVISUALFLAGSLOCATION:
-		return vs.wrapVisualFlagsLocation;
+		return vs.wrap.visualFlagsLocation;
 
 	case SCI_SETWRAPSTARTINDENT:
 		if (vs.SetWrapVisualStartIndent(static_cast<int>(wParam))) {
@@ -6810,7 +6811,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWRAPSTARTINDENT:
-		return vs.wrapVisualStartIndent;
+		return vs.wrap.visualStartIndent;
 
 	case SCI_SETWRAPINDENTMODE:
 		if (vs.SetWrapIndentMode(static_cast<int>(wParam))) {
@@ -6820,7 +6821,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETWRAPINDENTMODE:
-		return vs.wrapIndentMode;
+		return vs.wrap.indentMode;
 
 	case SCI_SETLAYOUTCACHE:
 		view.llc.SetLevel(static_cast<LineLayoutCache::Cache>(wParam));
@@ -7015,37 +7016,37 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_MARKERSETFORE:
 		if (wParam <= MARKER_MAX)
-			vs.markers[wParam].fore = ColourDesired(static_cast<int>(lParam));
+			vs.markers[wParam].fore = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		InvalidateStyleData();
 		RedrawSelMargin();
 		break;
 	case SCI_MARKERSETBACK:
 		if (wParam <= MARKER_MAX)
-			vs.markers[wParam].back = ColourDesired(static_cast<int>(lParam));
+			vs.markers[wParam].back = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		InvalidateStyleData();
 		RedrawSelMargin();
 		break;
 	case SCI_MARKERSETBACKSELECTED:
 		if (wParam <= MARKER_MAX)
-			vs.markers[wParam].backSelected = ColourDesired(static_cast<int>(lParam));
+			vs.markers[wParam].backSelected = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		InvalidateStyleData();
 		RedrawSelMargin();
 		break;
 	case SCI_MARKERSETFORETRANSLUCENT:
 		if (wParam <= MARKER_MAX)
-			vs.markers[wParam].fore = ColourAlpha(static_cast<int>(lParam));
+			vs.markers[wParam].fore = ColourAlpha(static_cast<unsigned int>(lParam));
 		InvalidateStyleData();
 		RedrawSelMargin();
 		break;
 	case SCI_MARKERSETBACKTRANSLUCENT:
 		if (wParam <= MARKER_MAX)
-			vs.markers[wParam].back = ColourAlpha(static_cast<int>(lParam));
+			vs.markers[wParam].back = ColourAlpha(static_cast<unsigned int>(lParam));
 		InvalidateStyleData();
 		RedrawSelMargin();
 		break;
 	case SCI_MARKERSETBACKSELECTEDTRANSLUCENT:
 		if (wParam <= MARKER_MAX)
-			vs.markers[wParam].backSelected = ColourAlpha(static_cast<int>(lParam));
+			vs.markers[wParam].backSelected = ColourAlpha(static_cast<unsigned int>(lParam));
 		InvalidateStyleData();
 		RedrawSelMargin();
 		break;
@@ -7195,14 +7196,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_SETMARGINBACKN:
 		if (ValidMargin(wParam)) {
-			vs.ms[wParam].back = ColourDesired(static_cast<int>(lParam));
+			vs.ms[wParam].back = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_GETMARGINBACKN:
 		if (ValidMargin(wParam))
-			return vs.ms[wParam].back.AsInteger();
+			return vs.ms[wParam].back.OpaqueRGB();
 		else
 			return 0;
 
@@ -7266,11 +7267,11 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETELEMENTCOLOUR:
-		vs.elementColours[static_cast<int>(wParam)] = ColourAlpha(static_cast<int>(lParam));
+		vs.elementColours[static_cast<int>(wParam)] = ColourAlpha(static_cast<unsigned int>(lParam));
 		break;
 
 	case SCI_GETELEMENTCOLOUR:
-		return vs.ElementColour(static_cast<int>(wParam)).value_or(ColourAlpha()).AsInteger();
+		return vs.ElementColour(static_cast<int>(wParam)).value_or(ColourAlpha()).OpaqueRGB();
 
 	case SCI_RESETELEMENTCOLOUR:
 		vs.elementColours[static_cast<int>(wParam)].reset();
@@ -7301,34 +7302,34 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->GetMaxLineState();
 
 	case SCI_GETCARETLINEVISIBLE:
-		return vs.showCaretLineBackground;
+		return vs.caretLine.show;
 	case SCI_SETCARETLINEVISIBLE:
-		vs.showCaretLineBackground = wParam != 0;
+		vs.caretLine.show = wParam != 0;
 		InvalidateStyleRedraw();
 		break;
 	case SCI_GETCARETLINEVISIBLEALWAYS:
-		return vs.alwaysShowCaretLineBackground;
+		return vs.caretLine.alwaysShow;
 	case SCI_SETCARETLINEVISIBLEALWAYS:
-		vs.alwaysShowCaretLineBackground = wParam != 0;
+		vs.caretLine.alwaysShow = wParam != 0;
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETCARETLINEFRAME:
-		return vs.caretLineFrame;
+		return vs.caretLine.frame;
 	case SCI_SETCARETLINEFRAME:
-		vs.caretLineFrame = static_cast<int>(wParam);
+		vs.caretLine.frame = static_cast<int>(wParam);
 		InvalidateStyleRedraw();
 		break;
 	case SCI_GETCARETLINEBACK:
-		return vs.caretLineBackground.AsInteger();
+		return vs.caretLine.background.OpaqueRGB();
 	case SCI_SETCARETLINEBACK:
-		vs.caretLineBackground = ColourDesired(static_cast<int>(wParam));
+		vs.caretLine.background = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 	case SCI_GETCARETLINEBACKALPHA:
-		return vs.caretLineAlpha;
+		return vs.caretLine.alpha;
 	case SCI_SETCARETLINEBACKALPHA:
-		vs.caretLineAlpha = static_cast<int>(wParam);
+		vs.caretLine.alpha = static_cast<int>(wParam);
 		InvalidateStyleRedraw();
 		break;
 
@@ -7479,46 +7480,46 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return LinesOnScreen();
 
 	case SCI_SETSELFORE:
-		vs.selColours.fore = ColourOptional(wParam, lParam);
-		vs.selAdditionalForeground = ColourDesired(static_cast<int>(lParam));
+		vs.selection.colours.fore = OptionalColour(wParam, lParam);
+		vs.selection.additionalForeground = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETSELBACK:
-		vs.selColours.back = ColourOptional(wParam, lParam);
-		vs.selAdditionalBackground = ColourDesired(static_cast<int>(lParam));
+		vs.selection.colours.back = OptionalColour(wParam, lParam);
+		vs.selection.additionalBackground = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETSELALPHA:
-		vs.selAlpha = static_cast<int>(wParam);
-		vs.selAdditionalAlpha = static_cast<int>(wParam);
+		vs.selection.alpha = static_cast<int>(wParam);
+		vs.selection.additionalAlpha = static_cast<int>(wParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETSELALPHA:
-		return vs.selAlpha;
+		return vs.selection.alpha;
 
 	case SCI_GETSELEOLFILLED:
-		return vs.selEOLFilled;
+		return vs.selection.eolFilled;
 
 	case SCI_SETSELEOLFILLED:
-		vs.selEOLFilled = wParam != 0;
+		vs.selection.eolFilled = wParam != 0;
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETEOLSELECTEDWIDTH:
-		vs.eolSelectedWidth = std::clamp(static_cast<int>(wParam), 0, 100);
+		vs.selection.eolSelectedWidth = std::clamp(static_cast<int>(wParam), 0, 100);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETWHITESPACEFORE:
-		vs.whitespaceColours.fore = ColourOptional(wParam, lParam);
+		vs.whitespaceColours.fore = OptionalColour(wParam, lParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETWHITESPACEBACK:
-		vs.whitespaceColours.back = ColourOptional(wParam, lParam);
+		vs.whitespaceColours.back = OptionalColour(wParam, lParam);
 		InvalidateStyleRedraw();
 		break;
 
@@ -7531,34 +7532,34 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.whitespaceForeAlpha;
 
 	case SCI_SETCARETFORE:
-		vs.caretcolour = ColourDesired(static_cast<int>(wParam));
-		vs.additionalCaretColour = ColourDesired(static_cast<int>(wParam));
+		vs.caret.colour = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
+		vs.caret.additionalColour = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETCARETFORE:
-		return vs.caretcolour.AsInteger();
+		return vs.caret.colour.OpaqueRGB();
 
 	case SCI_SETCARETSTYLE:
 		if (wParam <= (CARETSTYLE_BLOCK | CARETSTYLE_OVERSTRIKE_BLOCK | CARETSTYLE_BLOCK_AFTER))
-			vs.caretStyle = static_cast<int>(wParam);
+			vs.caret.style = static_cast<int>(wParam);
 		else
 			/* Default to the line caret */
-			vs.caretStyle = CARETSTYLE_LINE;
+			vs.caret.style = CARETSTYLE_LINE;
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETCARETSTYLE:
-		return vs.caretStyle;
+		return vs.caret.style;
 
 	case SCI_SETCARETWIDTH:
 		// Windows accessibility allows 20 pixels caret width.
-		vs.caretWidth = std::clamp(static_cast<int>(wParam), 0, 20);
+		vs.caret.width = std::clamp(static_cast<int>(wParam), 0, 20);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETCARETWIDTH:
-		return vs.caretWidth;
+		return vs.caret.width;
 
 	case SCI_ASSIGNCMDKEY:
 		kmap.AssignCmdKey(LowShortFromWParam(wParam),
@@ -7587,14 +7588,14 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_INDICSETFORE:
 		if (wParam <= INDICATOR_MAX) {
-			vs.indicators[wParam].sacNormal.fore = ColourDesired(static_cast<int>(lParam));
-			vs.indicators[wParam].sacHover.fore = ColourDesired(static_cast<int>(lParam));
+			vs.indicators[wParam].sacNormal.fore = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
+			vs.indicators[wParam].sacHover.fore = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETFORE:
-		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacNormal.fore.AsInteger() : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacNormal.fore.OpaqueRGB() : 0;
 
 	case SCI_INDICSETHOVERSTYLE:
 		if (wParam <= INDICATOR_MAX) {
@@ -7608,13 +7609,13 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case SCI_INDICSETHOVERFORE:
 		if (wParam <= INDICATOR_MAX) {
-			vs.indicators[wParam].sacHover.fore = ColourDesired(static_cast<int>(lParam));
+			vs.indicators[wParam].sacHover.fore = ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
 			InvalidateStyleRedraw();
 		}
 		break;
 
 	case SCI_INDICGETHOVERFORE:
-		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacHover.fore.AsInteger() : 0;
+		return (wParam <= INDICATOR_MAX) ? vs.indicators[wParam].sacHover.fore.OpaqueRGB() : 0;
 
 	case SCI_INDICSETFLAGS:
 		if (wParam <= INDICATOR_MAX) {
@@ -7880,10 +7881,10 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETEDGECOLOUR:
-		return vs.theEdge.colour.AsInteger();
+		return vs.theEdge.colour.OpaqueRGB();
 
 	case SCI_SETEDGECOLOUR:
-		vs.theEdge.colour = ColourDesired(static_cast<int>(wParam));
+		vs.theEdge.colour = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 
@@ -8117,30 +8118,30 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_SETFOLDMARGINCOLOUR:
-		vs.foldmarginColour = ColourOptional(wParam, lParam);
+		vs.foldmarginColour = OptionalColour(wParam, lParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETFOLDMARGINHICOLOUR:
-		vs.foldmarginHighlightColour = ColourOptional(wParam, lParam);
+		vs.foldmarginHighlightColour = OptionalColour(wParam, lParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETHOTSPOTACTIVEFORE:
-		vs.hotspotColours.fore = ColourOptional(wParam, lParam);
+		vs.hotspotColours.fore = OptionalColour(wParam, lParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETHOTSPOTACTIVEFORE:
-		return vs.hotspotColours.fore.AsInteger();
+		return vs.hotspotColours.fore.value_or(ColourAlpha()).OpaqueRGB();
 
 	case SCI_SETHOTSPOTACTIVEBACK:
-		vs.hotspotColours.back = ColourOptional(wParam, lParam);
+		vs.hotspotColours.back = OptionalColour(wParam, lParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETHOTSPOTACTIVEBACK:
-		return vs.hotspotColours.back.AsInteger();
+		return vs.hotspotColours.back.value_or(ColourAlpha()).OpaqueRGB();
 
 	case SCI_SETHOTSPOTACTIVEUNDERLINE:
 		vs.hotspotUnderline = wParam != 0;
@@ -8151,12 +8152,12 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.hotspotUnderline ? 1 : 0;
 
 	case SCI_SETHOTSPOTSINGLELINE:
-		vs.hotspotSingleLine = wParam != 0;
+		hotspotSingleLine = wParam != 0;
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETHOTSPOTSINGLELINE:
-		return vs.hotspotSingleLine ? 1 : 0;
+		return hotspotSingleLine ? 1 : 0;
 
 	case SCI_SETPASTECONVERTENDINGS:
 		convertPastes = wParam != 0;
@@ -8509,30 +8510,30 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		return virtualSpaceOptions;
 
 	case SCI_SETADDITIONALSELFORE:
-		vs.selAdditionalForeground = ColourDesired(static_cast<int>(wParam));
+		vs.selection.additionalForeground = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETADDITIONALSELBACK:
-		vs.selAdditionalBackground = ColourDesired(static_cast<int>(wParam));
+		vs.selection.additionalBackground = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_SETADDITIONALSELALPHA:
-		vs.selAdditionalAlpha = static_cast<int>(wParam);
+		vs.selection.additionalAlpha = static_cast<int>(wParam);
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETADDITIONALSELALPHA:
-		return vs.selAdditionalAlpha;
+		return vs.selection.additionalAlpha;
 
 	case SCI_SETADDITIONALCARETFORE:
-		vs.additionalCaretColour = ColourDesired(static_cast<int>(wParam));
+		vs.caret.additionalColour = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_GETADDITIONALCARETFORE:
-		return vs.additionalCaretColour.AsInteger();
+		return vs.caret.additionalColour.OpaqueRGB();
 
 	case SCI_ROTATESELECTION:
 		sel.RotateMain();

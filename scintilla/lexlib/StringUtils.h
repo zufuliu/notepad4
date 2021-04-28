@@ -2,7 +2,7 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
-namespace Scintilla {
+namespace Lexilla {
 
 template <size_t N>
 constexpr size_t CStrLen([[maybe_unused]] const char (&s)[N]) noexcept {

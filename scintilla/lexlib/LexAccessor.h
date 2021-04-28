@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Lexilla {
 
 enum class EncodingType { eightBit, unicode, dbcs };
 
@@ -16,7 +16,7 @@ public:
 		extremePosition = 0x7FFFFFFF
 	};
 private:
-	IDocument * const pAccess;
+	Scintilla::IDocument * const pAccess;
 	/** @a bufferSize is a trade off between time taken to copy the characters
 	 * and retrieval overhead.
 	 * @a slopSize positions the buffer before the desired position
@@ -49,7 +49,7 @@ private:
 	}
 
 public:
-	explicit LexAccessor(IDocument * pAccess_) noexcept :
+	explicit LexAccessor(Scintilla::IDocument *pAccess_) noexcept :
 		pAccess(pAccess_), startPos(0), endPos(0),
 		codePage(pAccess->CodePage()),
 		encodingType((codePage == 65001) ? EncodingType::unicode : (codePage ? EncodingType::dbcs : EncodingType::eightBit)),
@@ -67,7 +67,7 @@ public:
 		}
 		return buf[position - startPos];
 	}
-	constexpr IDocument *MultiByteAccess() const noexcept {
+	constexpr Scintilla::IDocument *MultiByteAccess() const noexcept {
 		return pAccess;
 	}
 	int GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {

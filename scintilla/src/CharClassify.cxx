@@ -16,6 +16,7 @@
 #include "CharClassify.h"
 
 using namespace Scintilla;
+using namespace Lexilla;
 
 CharClassify::CharClassify() noexcept {
 	SetDefaultCharClasses(true);

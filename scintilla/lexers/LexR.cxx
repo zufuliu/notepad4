@@ -16,7 +16,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 namespace {
 
@@ -181,7 +181,7 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 static_assert(SCE_R_OPERATOR == SCE_SIMPLE_OPERATOR);
 }
 
-namespace Scintilla {
+namespace Lexilla {
 
 void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;

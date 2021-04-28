@@ -24,7 +24,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsSqlWordChar(int ch, bool sqlAllowDottedWord) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_' || (sqlAllowDottedWord && ch == '.');

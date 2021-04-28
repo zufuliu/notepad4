@@ -33,8 +33,8 @@ struct FontMeasurements {
 
 // used to optimize style copy.
 struct StylePod {
-	ColourDesired fore;
-	ColourDesired back;
+	ColourAlpha fore;
+	ColourAlpha back;
 	bool eolFilled;
 	bool underline;
 	bool strike;

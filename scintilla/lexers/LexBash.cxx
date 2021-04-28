@@ -21,7 +21,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 #define HERE_DELIM_MAX			256
 

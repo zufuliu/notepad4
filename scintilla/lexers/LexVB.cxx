@@ -24,7 +24,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 // Internal state, highlighted as number
 #define SCE_B_FILENUMBER	(SCE_B_DEFAULT + 100)

@@ -62,6 +62,7 @@
 #include "ScintillaBase.h"
 
 using namespace Scintilla;
+using namespace Lexilla;
 
 ScintillaBase::ScintillaBase() noexcept {
 #if SCI_EnablePopupMenu
@@ -1053,19 +1054,19 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		break;
 
 	case SCI_CALLTIPSETBACK:
-		ct.colourBG = ColourDesired(static_cast<int>(wParam));
+		ct.colourBG = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		vs.styles[STYLE_CALLTIP].back = ct.colourBG;
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_CALLTIPSETFORE:
-		ct.colourUnSel = ColourDesired(static_cast<int>(wParam));
+		ct.colourUnSel = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		vs.styles[STYLE_CALLTIP].fore = ct.colourUnSel;
 		InvalidateStyleRedraw();
 		break;
 
 	case SCI_CALLTIPSETFOREHLT:
-		ct.colourSel = ColourDesired(static_cast<int>(wParam));
+		ct.colourSel = ColourAlpha::FromRGB(static_cast<unsigned int>(wParam));
 		InvalidateStyleRedraw();
 		break;
 

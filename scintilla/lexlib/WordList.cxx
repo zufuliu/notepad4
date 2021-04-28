@@ -14,7 +14,7 @@
 
 #include "WordList.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 using range_t = WordList::range_t;
 
 namespace {

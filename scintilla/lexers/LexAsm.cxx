@@ -19,7 +19,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsAsmWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == '?' || ch == '@' || ch == '$';

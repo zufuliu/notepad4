@@ -20,7 +20,7 @@
 #include "LexerModule.h"
 #include "LexerUtils.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 namespace {
 

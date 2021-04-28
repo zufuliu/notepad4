@@ -20,7 +20,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 namespace {
 
@@ -1647,10 +1647,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (ch == '\"') {
 				styler.ColourTo(i, statePrintForState(SCE_HJ_DOUBLESTRING, inScriptType));
 				state = SCE_HJ_DEFAULT;
-			} else if ((inScriptType == eNonHtmlScript) && (ch == '-') && (chNext == '-') && (chNext2 == '>')) {
-				styler.ColourTo(i - 1, StateToPrint);
-				state = SCE_HJ_COMMENTLINE;
-				i += 2;
 			} else if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				state = SCE_HJ_STRINGEOL;
@@ -1664,10 +1660,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			} else if (ch == '\'') {
 				styler.ColourTo(i, statePrintForState(SCE_HJ_SINGLESTRING, inScriptType));
 				state = SCE_HJ_DEFAULT;
-			} else if ((inScriptType == eNonHtmlScript) && (ch == '-') && (chNext == '-') && (chNext2 == '>')) {
-				styler.ColourTo(i - 1, StateToPrint);
-				state = SCE_HJ_COMMENTLINE;
-				i += 2;
 			} else if (IsEOLChar(ch)) {
 				styler.ColourTo(i - 1, StateToPrint);
 				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {

@@ -17,7 +17,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 #define MAKE_TYPE_GMAKE 0
 #define MAKE_TYPE_NMAKE 1

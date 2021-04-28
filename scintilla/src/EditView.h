@@ -135,7 +135,7 @@ public:
 	void SCICALL DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight) const;
 	void SCICALL DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
 		Sci::Line line, Sci::Position lineEnd, int xStart, int subLine, XYACCUMULATOR subLineStart,
-		ColourOptional background) const;
+		std::optional<ColourAlpha> background) const;
 	void SCICALL DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase);
 	void SCICALL DrawEOLAnnotationText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
@@ -146,10 +146,10 @@ public:
 		int xStart, PRectangle rcLine, int subLine) const;
 	void SCICALL DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
 		Range lineRange, Sci::Position posLineStart, int xStart,
-		int subLine, ColourOptional background) const;
+		int subLine, std::optional<ColourAlpha> background) const;
 	void SCICALL DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line lineVisible,
 		PRectangle rcLine, Range lineRange, Sci::Position posLineStart, int xStart,
-		int subLine, ColourOptional background) const;
+		int subLine, std::optional<ColourAlpha> background) const;
 	void SCICALL DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine) const;
 	void SCICALL DrawLine(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line line,

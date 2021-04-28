@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Lexilla {
 
 class Accessor;
 class WordList;
@@ -15,7 +15,7 @@ typedef const WordList * const LexerWordList[KEYWORDSET_MAX];
 
 typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	LexerWordList keywordLists, Accessor &styler);
-typedef ILexer5 *(*LexerFactoryFunction)();
+typedef Scintilla::ILexer5 *(*LexerFactoryFunction)();
 
 /**
  * A LexerModule is responsible for lexing and folding a particular language.
@@ -55,7 +55,7 @@ public:
 		return language;
 	}
 
-	ILexer5 *Create() const;
+	Scintilla::ILexer5 *Create() const;
 
 	static const LexerModule *Find(int language_) noexcept;
 

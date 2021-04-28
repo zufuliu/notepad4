@@ -16,7 +16,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 // TODO: https://www.gnu.org/software/emacs/manual/html_node/elisp/Character-Type.html
 

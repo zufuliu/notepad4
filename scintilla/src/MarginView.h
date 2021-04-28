@@ -8,9 +8,9 @@
 
 namespace Scintilla {
 
-void DrawWrapMarker(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourDesired wrapColour);
+void DrawWrapMarker(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourAlpha wrapColour);
 
-typedef void (*DrawWrapMarkerFn)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourDesired wrapColour);
+typedef void (*DrawWrapMarkerFn)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourAlpha wrapColour);
 
 /**
 * MarginView draws the margins.

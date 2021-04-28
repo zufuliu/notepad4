@@ -13,7 +13,7 @@
 
 #include "CharacterCategory.h"
 
-namespace Scintilla {
+namespace Lexilla {
 
 namespace {
 	// Use an unnamed namespace to protect the declarations from name conflicts

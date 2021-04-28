@@ -17,7 +17,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 #define		LEX_CPP		1	// C/C++
 #define		LEX_CS		3	// C#

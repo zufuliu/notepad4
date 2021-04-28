@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Lexilla {
 
 enum {
 	wsSpace = 1, wsTab = 2, wsSpaceTab = 4, wsInconsistent = 8
@@ -21,7 +21,7 @@ typedef bool (*PFNIsCommentLeader)(Accessor &styler, Sci_Position pos, Sci_Posit
 class Accessor final : public LexAccessor {
 	const PropSetSimple * const pprops;
 public:
-	Accessor(IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;
+	Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;
 	int GetPropertyInt(const char *key, size_t lenKey, int defaultValue = 0) const;
 
 	template <size_t N>

@@ -60,8 +60,8 @@ void FontMeasurements::ClearMeasurements() noexcept {
 }
 
 Style::Style() noexcept {
-	fore = ColourDesired(0, 0, 0);
-	back = ColourDesired(0xff, 0xff, 0xff);
+	fore = ColourAlpha(0, 0, 0);
+	back = ColourAlpha(0xff, 0xff, 0xff);
 	eolFilled = false;
 	underline = false;
 	strike = false;
@@ -96,8 +96,8 @@ void Style::ResetDefault(const char *fontName_) noexcept {
 	size = Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER;
 	characterSet = SC_CHARSET_DEFAULT;
 	FontMeasurements::ClearMeasurements();
-	fore = ColourDesired(0, 0, 0);
-	back = ColourDesired(0xff, 0xff, 0xff);
+	fore = ColourAlpha(0, 0, 0);
+	back = ColourAlpha(0xff, 0xff, 0xff);
 	eolFilled = false;
 	underline = false;
 	strike = false;

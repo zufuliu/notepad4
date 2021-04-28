@@ -15,7 +15,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsFSOperator(int ch) noexcept {
 	return isoperator(ch) || (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`');

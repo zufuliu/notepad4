@@ -17,7 +17,7 @@
 #include "LexerModule.h"
 
 #if 0
-using namespace Scintilla;
+using namespace Lexilla;
 
 static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int state = initStyle;

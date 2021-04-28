@@ -50,6 +50,7 @@
 #include "ElapsedPeriod.h"
 
 using namespace Scintilla;
+using namespace Lexilla;
 
 void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 	if (pdoc && instance && !performingStyle) {

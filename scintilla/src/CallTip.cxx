@@ -57,15 +57,15 @@ CallTip::CallTip() noexcept {
 
 #ifdef __APPLE__
 	// proper apple colours for the default
-	colourBG = ColourDesired(0xff, 0xff, 0xc6);
-	colourUnSel = ColourDesired(0, 0, 0);
+	colourBG = ColourAlpha(0xff, 0xff, 0xc6);
+	colourUnSel = ColourAlpha(0, 0, 0);
 #else
-	colourBG = ColourDesired(0xff, 0xff, 0xff);
-	colourUnSel = ColourDesired(0x80, 0x80, 0x80);
+	colourBG = ColourAlpha(0xff, 0xff, 0xff);
+	colourUnSel = ColourAlpha(0x80, 0x80, 0x80);
 #endif
-	colourSel = ColourDesired(0, 0, 0x80);
-	colourShade = ColourDesired(0, 0, 0);
-	colourLight = ColourDesired(0xc0, 0xc0, 0xc0);
+	colourSel = ColourAlpha(0, 0, 0x80);
+	colourShade = ColourAlpha(0, 0, 0);
+	colourLight = ColourAlpha(0xc0, 0xc0, 0xc0);
 	codePage = 0;
 	clickPlace = 0;
 }
@@ -96,7 +96,7 @@ constexpr bool IsArrowCharacter(char ch) noexcept {
 	return (ch == 0) || (ch == '\001') || (ch == '\002');
 }
 
-void DrawArrow(Scintilla::Surface *surface, const PRectangle &rc, bool upArrow, ColourDesired colourBG, ColourDesired colourUnSel) {
+void DrawArrow(Scintilla::Surface *surface, const PRectangle &rc, bool upArrow, ColourAlpha colourBG, ColourAlpha colourUnSel) {
 	surface->FillRectangle(rc, colourBG);
 	const PRectangle rcClientInner = Clamp(rc.Inset(1), Edge::right, rc.right - 2);
 	surface->FillRectangle(rcClientInner, colourUnSel);
@@ -356,7 +356,7 @@ bool CallTip::UseStyleCallTip() const noexcept {
 
 // It might be better to have two access functions for this and to use
 // them for all settings of colours.
-void CallTip::SetForeBack(ColourDesired fore, ColourDesired back) noexcept {
+void CallTip::SetForeBack(ColourAlpha fore, ColourAlpha back) noexcept {
 	colourBG = back;
 	colourUnSel = fore;
 }

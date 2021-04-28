@@ -365,8 +365,8 @@ public:
  */
 namespace Platform {
 
-ColourDesired Chrome() noexcept;
-ColourDesired ChromeHighlight() noexcept;
+ColourAlpha Chrome() noexcept;
+ColourAlpha ChromeHighlight() noexcept;
 const char *DefaultFont() noexcept;
 int DefaultFontSize() noexcept;
 unsigned int DoubleClickTime() noexcept;

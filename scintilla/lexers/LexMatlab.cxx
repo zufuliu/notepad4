@@ -17,7 +17,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 #define	LEX_MATLAB		40
 #define	LEX_OCTAVE		61

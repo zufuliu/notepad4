@@ -13,7 +13,7 @@ namespace Scintilla {
 class MarginStyle {
 public:
 	int style;
-	ColourDesired back;
+	ColourAlpha back;
 	int width;
 	MarkerMask mask;
 	bool sensitive;
@@ -57,25 +57,80 @@ constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	return std::max(size, 2 * SC_FONT_SIZE_MULTIPLIER);
 }
 
-class ColourOptional : public ColourDesired {
-public:
-	bool isSet;
-	ColourOptional(ColourDesired colour_ = ColourDesired(0, 0, 0), bool isSet_ = false) noexcept : ColourDesired(colour_), isSet(isSet_) {}
-	ColourOptional(uptr_t wParam, sptr_t lParam) noexcept : ColourDesired(static_cast<int>(lParam)), isSet(wParam != 0) {}
-};
+constexpr std::optional<ColourAlpha> OptionalColour(uptr_t wParam, sptr_t lParam) noexcept {
+	if (wParam) {
+		return ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
+	} else {
+		return {};
+	}
+}
 
 struct ForeBackColours {
-	ColourOptional fore;
-	ColourOptional back;
+	std::optional<ColourAlpha> fore;
+	std::optional<ColourAlpha> back;
+};
+
+struct SelectionAppearance {
+	// Colours of main selection
+	ForeBackColours colours;
+	// Colours of additional (non-main) selections
+	ColourAlpha additionalForeground;
+	ColourAlpha additionalBackground;
+	// Background colour on X when not primary selection
+	ColourAlpha background2;
+	// Translucency. SC_ALPHA_NOALPHA: draw selection background beneath text
+	int alpha;
+	// Translucency of additional selections
+	int additionalAlpha;
+	// Draw selection past line end characters up to right border
+	bool eolFilled;
+	int eolSelectedWidth;
+};
+
+struct CaretLineAppearance {
+	// Colour of caret line
+	ColourAlpha background;
+	// Whether to show the caret line
+	bool show;
+	// Also show when non-focused
+	bool alwaysShow;
+	// Translucency.  SC_ALPHA_NOALPHA: draw selection background beneath text
+	int alpha;
+	// Non-0: draw a rectangle around line instead of filling line. Value is pixel width of frame
+	int frame;
+};
+
+struct CaretAppearance {
+	// Colour of caret
+	ColourAlpha colour;
+	// Colour of additional (non-main) carets
+	ColourAlpha additionalColour;
+	// Line, block, over-strike bar ...
+	int style;
+	// Width in pixels
+	int width;
+};
+
+struct WrapAppearance {
+	// No wrapping, word, character, whitespace appearance
+	WrapMode state;
+	// Show indication of wrap at line end, line start, or in margin
+	int visualFlags;
+	// Show indication near margin or near text
+	int visualFlagsLocation;
+	// How much indentation to show wrapping
+	int visualStartIndent;
+	// SC_WRAPINDENT_FIXED, _SAME, _INDENT, _DEEPINDENT
+	int indentMode;
 };
 
 struct EdgeProperties {
 	int column;
-	ColourDesired colour;
-	EdgeProperties(int column_ = 0, ColourDesired colour_ = ColourDesired(0)) noexcept :
+	ColourAlpha colour;
+	EdgeProperties(int column_ = 0, ColourAlpha colour_ = ColourAlpha(0)) noexcept :
 		column(column_), colour(colour_) {}
 	EdgeProperties(uptr_t wParam, sptr_t lParam) noexcept :
-		column(static_cast<int>(wParam)), colour(static_cast<int>(lParam)) {}
+		column(static_cast<int>(wParam)), colour(ColourAlpha::FromRGB(static_cast<unsigned int>(lParam))) {}
 };
 
 /**
@@ -100,25 +155,19 @@ public:
 	XYPOSITION aveCharWidth;
 	XYPOSITION spaceWidth;
 	XYPOSITION tabWidth;
-	ForeBackColours selColours;
-	ColourDesired selAdditionalForeground;
-	ColourDesired selAdditionalBackground;
-	ColourDesired selBackground2;
-	int selAlpha;
-	int selAdditionalAlpha;
-	bool selEOLFilled;
-	int eolSelectedWidth;
+
+	SelectionAppearance selection;
+
 	ForeBackColours whitespaceColours;
 	int whitespaceForeAlpha;
 	int controlCharSymbol;
 	XYPOSITION controlCharWidth;
-	ColourDesired selbar;
-	ColourDesired selbarlight;
-	ColourOptional foldmarginColour;
-	ColourOptional foldmarginHighlightColour;
+	ColourAlpha selbar;
+	ColourAlpha selbarlight;
+	std::optional<ColourAlpha> foldmarginColour;
+	std::optional<ColourAlpha> foldmarginHighlightColour;
 	ForeBackColours hotspotColours;
 	bool hotspotUnderline;
-	bool hotspotSingleLine;
 	/// Margins are ordered: Line Numbers, Selection Margin, Spacing Margin
 	int leftMarginWidth;	///< Spacing margin on left of text
 	int rightMarginWidth;	///< Spacing margin on right of text
@@ -135,15 +184,11 @@ public:
 	int whitespaceSize;
 	IndentView viewIndentationGuides;
 	bool viewEOL;
-	ColourDesired caretcolour;
-	ColourDesired additionalCaretColour;
-	int caretLineFrame;
-	bool showCaretLineBackground;
-	bool alwaysShowCaretLineBackground;
-	ColourDesired caretLineBackground;
-	int caretLineAlpha;
-	int caretStyle;
-	int caretWidth;
+
+	CaretAppearance caret;
+
+	CaretLineAppearance caretLine;
+
 	bool someStylesProtected;
 	bool someStylesForceCase;
 	int extraFontFlag;
@@ -168,12 +213,7 @@ public:
 	std::map<int, std::optional<ColourAlpha>> elementColours;
 	std::set<int> elementAllowsTranslucent;
 
-	// Wrapping support
-	WrapMode wrapState;
-	int wrapVisualFlags;
-	int wrapVisualFlagsLocation;
-	int wrapVisualStartIndent;
-	int wrapIndentMode; // SC_WRAPINDENT_FIXED, _SAME, _INDENT
+	WrapAppearance wrap;
 
 	std::string localeName;
 
@@ -202,15 +242,15 @@ public:
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;
 	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept;
-	ColourOptional Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept;
+	std::optional<ColourAlpha> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept;
 	bool SelectionBackgroundDrawn() const noexcept;
 	bool WhitespaceBackgroundDrawn() const noexcept;
-	ColourDesired WrapColour() const noexcept;
+	ColourAlpha WrapColour() const noexcept;
 
 	void AddMultiEdge(uptr_t wParam, sptr_t lParam);
 
-	std::optional<ColourAlpha> ElementColour(int index) const noexcept;
-	bool ElementAllowsTranslucent(int index) const noexcept;
+	std::optional<ColourAlpha> ElementColour(int index) const;
+	bool ElementAllowsTranslucent(int index) const;
 
 	bool SetWrapState(int wrapState_) noexcept;
 	bool SetWrapVisualFlags(int wrapVisualFlags_) noexcept;

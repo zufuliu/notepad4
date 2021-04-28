@@ -19,7 +19,7 @@
 #include "LexerModule.h"
 #include "DefaultLexer.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 DefaultLexer::DefaultLexer(const char *languageName_, int language_) noexcept :
 	languageName(languageName_),
@@ -33,7 +33,7 @@ void SCI_METHOD DefaultLexer::Release() noexcept {
 }
 
 int SCI_METHOD DefaultLexer::Version() const noexcept {
-	return lvRelease5;
+	return Scintilla::lvRelease5;
 }
 
 const char * SCI_METHOD DefaultLexer::PropertyNames() const noexcept {
@@ -64,7 +64,7 @@ Sci_Position SCI_METHOD DefaultLexer::WordListSet(int, bool, const char *) {
 	return -1;
 }
 
-void SCI_METHOD DefaultLexer::Fold(Sci_PositionU, Sci_Position, int, IDocument *) {
+void SCI_METHOD DefaultLexer::Fold(Sci_PositionU, Sci_Position, int, Scintilla::IDocument *) {
 }
 
 void * SCI_METHOD DefaultLexer::PrivateCall(int, void *) {

@@ -22,7 +22,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsAu3TypeCharacter(int ch) noexcept {
 	return ch == '$';

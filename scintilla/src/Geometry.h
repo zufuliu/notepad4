@@ -197,26 +197,39 @@ PRectangle PixelAlign(PRectangle rc, int pixelDivisions) noexcept;
 PRectangle PixelAlignOutside(PRectangle rc, int pixelDivisions) noexcept;
 
 /**
- * Holds an RGB colour with 8 bits for each component.
- */
+* Holds an RGBA colour with 8 bits for each component.
+*/
 constexpr const float componentMaximum = 255.0f;
-class ColourDesired {
+class ColourAlpha final {
 	unsigned int co;
 public:
-	constexpr explicit ColourDesired(unsigned int co_ = 0) noexcept : co(co_) {}
+	constexpr explicit ColourAlpha(unsigned int co_ = 0) noexcept : co(co_) {}
 
-	constexpr ColourDesired(unsigned int red, unsigned int green, unsigned int blue) noexcept :
-		co(red | (green << 8) | (blue << 16)) {}
-
-	constexpr bool operator==(const ColourDesired &other) const noexcept {
-		return co == other.co;
+	constexpr ColourAlpha(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha = 0xff) noexcept :
+		ColourAlpha(red | (green << 8) | (blue << 16) | (alpha << 24)) {
 	}
 
-	constexpr unsigned int AsInteger() const noexcept {
+	constexpr ColourAlpha(ColourAlpha cd, unsigned int alpha) noexcept :
+		ColourAlpha(cd.OpaqueRGB() | (alpha << 24)) {
+	}
+
+	static constexpr ColourAlpha FromRGB(unsigned int co_) noexcept {
+		return ColourAlpha(co_ | (0xffu << 24));
+	}
+
+	constexpr ColourAlpha Opaque() const noexcept {
+		return ColourAlpha(co & 0xffffff);
+	}
+
+	constexpr unsigned int OpaqueRGB() const noexcept {
+		return co & 0xffffff;
+	}
+
+	constexpr unsigned int RGBAValue() const noexcept {
 		return co;
 	}
 
-	// Red, green and blue values as bytes 0..255
+	// Red, green, blue and alpha values as bytes 0..255
 	constexpr unsigned char GetRed() const noexcept {
 		return co & 0xff;
 	}
@@ -226,8 +239,11 @@ public:
 	constexpr unsigned char GetBlue() const noexcept {
 		return (co >> 16) & 0xff;
 	}
+	constexpr unsigned char GetAlpha() const noexcept {
+		return co >> 24;
+	}
 
-	// Red, green and blue values as float 0..1.0
+	// Red, green, blue, and alpha values as float 0..1.0
 	constexpr float GetRedComponent() const noexcept {
 		return GetRed() / componentMaximum;
 	}
@@ -237,49 +253,16 @@ public:
 	constexpr float GetBlueComponent() const noexcept {
 		return GetBlue() / componentMaximum;
 	}
-
-	// Manual alpha blending
-	static constexpr ColourDesired AlphaBlend(ColourDesired fore, ColourDesired back, unsigned int alpha) noexcept {
-		const unsigned int red = (fore.GetRed()*alpha + back.GetRed()*(255 ^ alpha)) >> 8;
-		const unsigned int green = (fore.GetGreen()*alpha + back.GetGreen()*(255 ^ alpha)) >> 8;
-		const unsigned int blue = (fore.GetBlue()*alpha + back.GetBlue()*(255 ^ alpha)) >> 8;
-		return ColourDesired(red, green, blue);
-	}
-};
-
-/**
-* Holds an RGBA colour.
-*/
-class ColourAlpha final : public ColourDesired {
-public:
-	constexpr explicit ColourAlpha(unsigned co_ = 0) noexcept : ColourDesired(co_) {}
-
-	constexpr ColourAlpha(unsigned int red, unsigned int green, unsigned int blue, unsigned int alpha = 0xff) noexcept :
-		ColourDesired(red | (green << 8) | (blue << 16) | (alpha << 24)) {
-	}
-
-	constexpr ColourAlpha(ColourDesired cd, unsigned int alpha) noexcept :
-		ColourDesired((cd.AsInteger() & 0xffffff) | (alpha << 24)) {
-	}
-
-	constexpr ColourAlpha(ColourDesired cd) noexcept :
-		ColourDesired(cd.AsInteger() | (0xffu << 24)) {
-	}
-
-	constexpr ColourDesired GetColour() const noexcept {
-		return ColourDesired(AsInteger() & 0xffffff);
-	}
-
-	constexpr unsigned char GetAlpha() const noexcept {
-		return (AsInteger() >> 24) & 0xff;
-	}
-
 	constexpr float GetAlphaComponent() const noexcept {
 		return GetAlpha() / componentMaximum;
 	}
 
+	constexpr bool operator==(const ColourAlpha &other) const noexcept {
+		return co == other.co;
+	}
+
 	constexpr bool IsOpaque() const noexcept {
-		return AsInteger() >= 0xff000000U;
+		return co >= 0xff000000U;
 	}
 
 	constexpr ColourAlpha MixedWith(ColourAlpha other) const noexcept {
@@ -288,6 +271,14 @@ public:
 		const unsigned int blue = (GetBlue() + other.GetBlue()) / 2;
 		const unsigned int alpha = (GetAlpha() + other.GetAlpha()) / 2;
 		return ColourAlpha(red, green, blue, alpha);
+	}
+
+	// Manual alpha blending
+	static constexpr ColourAlpha AlphaBlend(ColourAlpha fore, ColourAlpha back, unsigned int alpha) noexcept {
+		const unsigned int red = (fore.GetRed()*alpha + back.GetRed()*(255 ^ alpha)) >> 8;
+		const unsigned int green = (fore.GetGreen()*alpha + back.GetGreen()*(255 ^ alpha)) >> 8;
+		const unsigned int blue = (fore.GetBlue()*alpha + back.GetBlue()*(255 ^ alpha)) >> 8;
+		return ColourAlpha(red, green, blue);
 	}
 };
 
@@ -312,8 +303,6 @@ class Fill final {
 public:
 	ColourAlpha colour;
 	constexpr Fill(ColourAlpha colour_) noexcept :
-		colour(colour_) {}
-	constexpr Fill(ColourDesired colour_) noexcept :
 		colour(colour_) {}
 };
 

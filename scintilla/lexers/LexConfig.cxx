@@ -15,7 +15,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsConfOp(int ch) noexcept {
 	return ch == '=' || ch == ':' || ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' ||

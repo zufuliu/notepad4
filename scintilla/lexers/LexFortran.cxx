@@ -15,7 +15,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsFWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_' || ch == '%';

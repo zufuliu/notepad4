@@ -25,7 +25,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 /*static const char * const VHDLWordLists[] = {
 	"Keywords",

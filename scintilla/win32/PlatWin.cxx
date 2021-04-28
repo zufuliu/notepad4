@@ -677,7 +677,7 @@ void SurfaceGDI::PenColour(ColourAlpha fore, XYPOSITION widthStroke) noexcept {
 		penOld = {};
 	}
 	const DWORD penWidth = std::lround(widthStroke);
-	const COLORREF penColour = fore.GetColour().AsInteger();
+	const COLORREF penColour = fore.OpaqueRGB();
 	if (widthStroke > 1) {
 		const LOGBRUSH brushParameters { BS_SOLID, penColour, 0 };
 		pen = ::ExtCreatePen(PS_GEOMETRIC | PS_ENDCAP_ROUND | PS_JOIN_MITER,
@@ -698,7 +698,7 @@ void SurfaceGDI::BrushColour(ColourAlpha back) noexcept {
 		brush = {};
 		brushOld = {};
 	}
-	brush = ::CreateSolidBrush(back.GetColour().AsInteger());
+	brush = ::CreateSolidBrush(back.OpaqueRGB());
 	brushOld = SelectBrush(hdc, brush);
 }
 
@@ -743,8 +743,8 @@ void SurfaceGDI::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 }
 
 void SurfaceGDI::Polygon(const Point *pts, size_t npts, FillStroke fillStroke) {
-	PenColour(fillStroke.stroke.colour.GetColour(), fillStroke.stroke.width);
-	BrushColour(fillStroke.fill.colour.GetColour());
+	PenColour(fillStroke.stroke.colour.Opaque(), fillStroke.stroke.width);
+	BrushColour(fillStroke.fill.colour.Opaque());
 	std::vector<POINT> outline;
 	std::transform(pts, pts + npts, std::back_inserter(outline), POINTFromPointEx);
 	::Polygon(hdc, outline.data(), static_cast<int>(npts));
@@ -766,7 +766,7 @@ void SurfaceGDI::FillRectangle(PRectangle rc, Fill fill) noexcept {
 		// Using ExtTextOut rather than a FillRect ensures that no dithering occurs.
 		// There is no need to allocate a brush either.
 		const RECT rcw = RectFromPRectangleEx(rc);
-		::SetBkColor(hdc, fill.colour.GetColour().AsInteger());
+		::SetBkColor(hdc, fill.colour.OpaqueRGB());
 		::ExtTextOut(hdc, rcw.left, rcw.top, ETO_OPAQUE, &rcw, TEXT(""), 0, nullptr);
 	} else {
 		AlphaRectangle(rc, 0, FillStroke(fill.colour));
@@ -803,7 +803,7 @@ namespace {
 
 #if NP2_USE_AVX2
 inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
-	__m128i i16x4Color = rgba_to_bgra_epi16_sse4_si32(colour.AsInteger());
+	__m128i i16x4Color = rgba_to_bgra_epi16_sse4_si32(colour.RGBAValue());
 	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0xff);
 	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
 	i16x4Color = mm_div_epu16_by_255(i16x4Color);
@@ -813,7 +813,7 @@ inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
 
 #elif NP2_USE_SSE2
 inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
-	const uint32_t rgba = bswap32(colour.AsInteger());
+	const uint32_t rgba = bswap32(colour.RGBAValue());
 	__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
 	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
 	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
@@ -931,8 +931,8 @@ void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
 
 #if NP2_USE_AVX2
 inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
-	__m128i i32x4Fore = rgba_to_abgr_epi32_sse4_si32(a.AsInteger());
-	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
+	__m128i i32x4Fore = rgba_to_abgr_epi32_sse4_si32(a.RGBAValue());
+	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.RGBAValue());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
 	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
@@ -949,8 +949,8 @@ inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
 
 #elif NP2_USE_SSE2
 inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
-	__m128i i32x4Fore = rgba_to_abgr_epi32_sse2_si32(a.AsInteger());
-	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
+	__m128i i32x4Fore = rgba_to_abgr_epi32_sse2_si32(a.RGBAValue());
+	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.RGBAValue());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
 	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
@@ -1140,15 +1140,15 @@ void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 
 void SurfaceGDI::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
 	ColourAlpha fore, ColourAlpha back) {
-	::SetTextColor(hdc, fore.GetColour().AsInteger());
-	::SetBkColor(hdc, back.GetColour().AsInteger());
+	::SetTextColor(hdc, fore.OpaqueRGB());
+	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE);
 }
 
 void SurfaceGDI::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
 	ColourAlpha fore, ColourAlpha back) {
-	::SetTextColor(hdc, fore.GetColour().AsInteger());
-	::SetBkColor(hdc, back.GetColour().AsInteger());
+	::SetTextColor(hdc, fore.OpaqueRGB());
+	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE | ETO_CLIPPED);
 }
 
@@ -1157,7 +1157,7 @@ void SurfaceGDI::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 	// Avoid drawing spaces in transparent mode
 	for (const char ch : text) {
 		if (ch != ' ') {
-			::SetTextColor(hdc, fore.GetColour().AsInteger());
+			::SetTextColor(hdc, fore.OpaqueRGB());
 			::SetBkMode(hdc, TRANSPARENT);
 			DrawTextCommon(rc, font_, ybase, text, 0);
 			::SetBkMode(hdc, OPAQUE);
@@ -1233,15 +1233,15 @@ void SurfaceGDI::DrawTextCommonUTF8(PRectangle rc, const Font *font_, XYPOSITION
 
 void SurfaceGDI::DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
 	ColourAlpha fore, ColourAlpha back) {
-	::SetTextColor(hdc, fore.GetColour().AsInteger());
-	::SetBkColor(hdc, back.GetColour().AsInteger());
+	::SetTextColor(hdc, fore.OpaqueRGB());
+	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommonUTF8(rc, font_, ybase, text, ETO_OPAQUE);
 }
 
 void SurfaceGDI::DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
 	ColourAlpha fore, ColourAlpha back) {
-	::SetTextColor(hdc, fore.GetColour().AsInteger());
-	::SetBkColor(hdc, back.GetColour().AsInteger());
+	::SetTextColor(hdc, fore.OpaqueRGB());
+	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommonUTF8(rc, font_, ybase, text, ETO_OPAQUE | ETO_CLIPPED);
 }
 
@@ -1250,7 +1250,7 @@ void SurfaceGDI::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOS
 	// Avoid drawing spaces in transparent mode
 	for (const char ch : text) {
 		if (ch != ' ') {
-			::SetTextColor(hdc, fore.GetColour().AsInteger());
+			::SetTextColor(hdc, fore.OpaqueRGB());
 			::SetBkMode(hdc, TRANSPARENT);
 			DrawTextCommonUTF8(rc, font_, ybase, text, 0);
 			::SetBkMode(hdc, OPAQUE);
@@ -1414,9 +1414,9 @@ static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
 
 inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 #if NP2_USE_AVX2
-	__m128i i32x4 = unpack_color_epi32_sse4_si32(colour.AsInteger());
+	__m128i i32x4 = unpack_color_epi32_sse4_si32(colour.RGBAValue());
 #else
-	__m128i i32x4 = unpack_color_epi32_sse2_si32(colour.AsInteger());
+	__m128i i32x4 = unpack_color_epi32_sse2_si32(colour.RGBAValue());
 #endif
 	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
 	f32x4 = _mm_div_ps(f32x4, _mm_set1_ps(255.0f));
@@ -3288,7 +3288,7 @@ namespace {
 
 inline COLORREF ColourOfElement(std::optional<ColourAlpha> colour, UINT nIndex) noexcept {
 	if (colour.has_value()) {
-		return colour.value().GetColour().AsInteger();
+		return colour.value().OpaqueRGB();
 	} else {
 		return ::GetSysColor(nIndex);
 	}
@@ -4006,12 +4006,12 @@ void Menu::Show(Point pt, const Window &w) noexcept {
 	Destroy();
 }
 
-ColourDesired Platform::Chrome() noexcept {
-	return ColourDesired(::GetSysColor(COLOR_3DFACE));
+ColourAlpha Platform::Chrome() noexcept {
+	return ColourAlpha::FromRGB(::GetSysColor(COLOR_3DFACE));
 }
 
-ColourDesired Platform::ChromeHighlight() noexcept {
-	return ColourDesired(::GetSysColor(COLOR_3DHIGHLIGHT));
+ColourAlpha Platform::ChromeHighlight() noexcept {
+	return ColourAlpha::FromRGB(::GetSysColor(COLOR_3DHIGHLIGHT));
 }
 
 const char *Platform::DefaultFont() noexcept {

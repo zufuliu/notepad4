@@ -20,18 +20,18 @@
 #include "LexerBase.h"
 #include "LexerSimple.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 LexerSimple::LexerSimple(const LexerModule *module_) : module(module_) {
 }
 
-void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) {
+void SCI_METHOD LexerSimple::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) {
 	Accessor astyler(pAccess, &props);
 	module->fnLexer(startPos, lengthDoc, initStyle, keywordLists, astyler);
 	astyler.Flush();
 }
 
-void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, IDocument *pAccess) {
+void SCI_METHOD LexerSimple::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) {
 	if (module->fnFolder && props.GetInt("fold")) {
 		Accessor astyler(pAccess, &props);
 		Sci_Line lineCurrent = astyler.GetLine(startPos);

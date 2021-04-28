@@ -17,7 +17,7 @@
 #include "StringUtils.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 #define PY_DEF_CLASS 1
 #define PY_DEF_FUNC	2

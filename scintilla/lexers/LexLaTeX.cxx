@@ -16,7 +16,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
 static constexpr bool IsLSpecial(int ch) noexcept {
 	return ch == '#' || ch == '$' || ch == '%' || ch == '&'

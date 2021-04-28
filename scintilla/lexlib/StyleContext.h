@@ -6,7 +6,7 @@
 // This file is in the public domain.
 #pragma once
 
-namespace Scintilla {
+namespace Lexilla {
 
 // All languages handled so far can treat all characters >= 0x80 as one class
 // which just continues the current token or starts an identifier if in default.

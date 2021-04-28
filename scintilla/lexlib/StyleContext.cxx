@@ -17,9 +17,9 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
-namespace Scintilla {
+namespace Lexilla {
 
 bool StyleContext::MatchIgnoreCase(const char *s) const noexcept {
 	if (MakeLowerCase(ch) != static_cast<unsigned char>(*s)) {

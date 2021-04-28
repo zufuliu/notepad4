@@ -28,7 +28,7 @@ using namespace Scintilla;
 void Indicator::Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State state, int value) const {
 	StyleAndColour sacDraw = sacNormal;
 	if (Flags() & SC_INDICFLAG_VALUEFORE) {
-		sacDraw.fore = ColourDesired(value & SC_INDICVALUEMASK);
+		sacDraw.fore = ColourAlpha::FromRGB(value & SC_INDICVALUEMASK);
 	}
 	if (state == State::hover) {
 		sacDraw = sacHover;

@@ -11,9 +11,9 @@
 #include "CharacterSet.h"
 #include "LexerUtils.h"
 
-using namespace Scintilla;
+using namespace Lexilla;
 
-namespace Scintilla {
+namespace Lexilla {
 
 bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 	for (; *s; s++, pos++) {
