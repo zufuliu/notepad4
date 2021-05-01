@@ -36,6 +36,9 @@ matrix:
 # before_build:
 #  - cmd: CALL update_rev.bat
 
+cache:
+  - build\tools -> build\install_llvm.bat
+
 for:
   - # MSVC x64 Debug
     matrix:

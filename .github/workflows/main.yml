@@ -75,7 +75,7 @@ jobs:
 
     - name: Install LLVM
       run: |
-        CALL "build\install_llvm.bat" latest 1
+        CALL "build\install_llvm.bat" 1
 
     - name: Clang x64 Release
       run: |
