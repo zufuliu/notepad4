@@ -6,6 +6,11 @@ SET "PATH=C:\msys64\usr\bin;%PATH%"
 
 @rem we don't need gdb or lldb, which saved the time to install Python and it's dependencies.
 
+IF /I "%~1" == "ucrt" (
+  SHIFT
+  pacman -S --needed --noconfirm --noprogressbar mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-tools-git mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld
+)
+
 IF /I "%~1" == "x86_64" (
   SHIFT
   pacman -S --needed --noconfirm --noprogressbar mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-tools-git mingw-w64-x86_64-clang mingw-w64-x86_64-lld
