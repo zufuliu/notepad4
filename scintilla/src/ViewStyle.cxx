@@ -489,6 +489,10 @@ bool ViewStyle::SelectionBackgroundDrawn() const noexcept {
 		((selection.alpha == SC_ALPHA_NOALPHA) || (selection.additionalAlpha == SC_ALPHA_NOALPHA));
 }
 
+bool ViewStyle::SelectionTextDrawn() const noexcept {
+	return selection.colours.fore.has_value();
+}
+
 bool ViewStyle::WhitespaceBackgroundDrawn() const noexcept {
 	return (viewWhitespace != WhiteSpace::invisible) && (whitespaceColours.back);
 }
@@ -514,8 +518,8 @@ void ViewStyle::AddMultiEdge(uptr_t wParam, sptr_t lParam) {
 		EdgeProperties(column, lParam));
 }
 
-std::optional<ColourAlpha> ViewStyle::ElementColour(int index) const {
-	const auto search = elementColours.find(index);
+std::optional<ColourAlpha> ViewStyle::ElementColour(int element) const {
+	const auto search = elementColours.find(element);
 	if (search != elementColours.end()) {
 		if (search->second.has_value()) {
 			return search->second;
@@ -524,8 +528,8 @@ std::optional<ColourAlpha> ViewStyle::ElementColour(int index) const {
 	return {};
 }
 
-bool ViewStyle::ElementAllowsTranslucent(int index) const {
-	return elementAllowsTranslucent.count(index) > 0;
+bool ViewStyle::ElementAllowsTranslucent(int element) const {
+	return elementAllowsTranslucent.count(element) > 0;
 }
 
 bool ViewStyle::SetWrapState(int wrapState_) noexcept {

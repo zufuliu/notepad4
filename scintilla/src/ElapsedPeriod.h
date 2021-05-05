@@ -18,12 +18,12 @@ public:
 	/// Return duration as floating point seconds
 	double Duration(bool reset=false) noexcept {
 		const auto tpNow = ElapsedClock::now();
-		const auto stylingDuration =
+		const auto duration =
 			std::chrono::duration_cast<std::chrono::duration<double>>(tpNow - tp);
 		if (reset) {
 			tp = tpNow;
 		}
-		return stylingDuration.count();
+		return duration.count();
 	}
 };
 

@@ -931,9 +931,9 @@ void CellBuffer::ResetLineEnds() {
 
 	constexpr Sci::Position position = 0;
 	const Sci::Position length = Length();
+	plv->InsertText(0, length);
 	Sci::Line lineInsert = 1;
 	constexpr bool atLineStart = true;
-	plv->InsertText(lineInsert - 1, length);
 	unsigned char chBeforePrev = 0;
 	unsigned char chPrev = 0;
 	for (Sci::Position i = 0; i < length; i++) {

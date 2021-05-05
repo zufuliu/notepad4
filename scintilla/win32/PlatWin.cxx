@@ -743,8 +743,8 @@ void SurfaceGDI::PolyLine(const Point *pts, size_t npts, Stroke stroke) {
 }
 
 void SurfaceGDI::Polygon(const Point *pts, size_t npts, FillStroke fillStroke) {
-	PenColour(fillStroke.stroke.colour.Opaque(), fillStroke.stroke.width);
-	BrushColour(fillStroke.fill.colour.Opaque());
+	PenColour(fillStroke.stroke.colour.WithoutAlpha(), fillStroke.stroke.width);
+	BrushColour(fillStroke.fill.colour.WithoutAlpha());
 	std::vector<POINT> outline;
 	std::transform(pts, pts + npts, std::back_inserter(outline), POINTFromPointEx);
 	::Polygon(hdc, outline.data(), static_cast<int>(npts));

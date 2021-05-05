@@ -130,7 +130,7 @@ struct ScreenLine : public IScreenLine {
 	ScreenLine(ScreenLine &&) = delete;
 	void operator=(const ScreenLine &) = delete;
 	void operator=(ScreenLine &&) = delete;
-	virtual ~ScreenLine() noexcept;
+	~ScreenLine() noexcept override;
 
 	std::string_view Text() const noexcept override;
 	size_t Length() const noexcept override;

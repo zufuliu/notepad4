@@ -3006,6 +3006,26 @@ val SC_SUPPORTS_PIXEL_MODIFICATION=4
 # Get whether a feature is supported
 get bool SupportsFeature=2750(Supports feature,)
 
+enu LineCharacterIndexType=SC_LINECHARACTERINDEX_
+val SC_LINECHARACTERINDEX_NONE=0
+val SC_LINECHARACTERINDEX_UTF32=1
+val SC_LINECHARACTERINDEX_UTF16=2
+
+# Retrieve line character index state.
+get LineCharacterIndexType GetLineCharacterIndex=2710(,)
+
+# Request line character index be created or its use count increased.
+fun void AllocateLineCharacterIndex=2711(LineCharacterIndexType lineCharacterIndex,)
+
+# Decrease use count of line character index and remove if 0.
+fun void ReleaseLineCharacterIndex=2712(LineCharacterIndexType lineCharacterIndex,)
+
+# Retrieve the document line containing a position measured in index units.
+fun line LineFromIndexPosition=2713(position pos, LineCharacterIndexType lineCharacterIndex)
+
+# Retrieve the position measured in index units at the start of a document line.
+fun position IndexPositionFromLine=2714(line line, LineCharacterIndexType lineCharacterIndex)
+
 # Start notifying the container of all key presses and commands.
 fun void StartRecord=3001(,)
 
@@ -3295,26 +3315,6 @@ get Bidirectional GetBidirectional=2708(,)
 
 # Set bidirectional text display state.
 set void SetBidirectional=2709(Bidirectional bidirectional,)
-
-enu LineCharacterIndexType=SC_LINECHARACTERINDEX_
-val SC_LINECHARACTERINDEX_NONE=0
-val SC_LINECHARACTERINDEX_UTF32=1
-val SC_LINECHARACTERINDEX_UTF16=2
-
-# Retrieve line character index state.
-get LineCharacterIndexType GetLineCharacterIndex=2710(,)
-
-# Request line character index be created or its use count increased.
-fun void AllocateLineCharacterIndex=2711(LineCharacterIndexType lineCharacterIndex,)
-
-# Decrease use count of line character index and remove if 0.
-fun void ReleaseLineCharacterIndex=2712(LineCharacterIndexType lineCharacterIndex,)
-
-# Retrieve the document line containing a position measured in index units.
-fun line LineFromIndexPosition=2713(position pos, LineCharacterIndexType lineCharacterIndex)
-
-# Retrieve the position measured in index units at the start of a document line.
-fun position IndexPositionFromLine=2714(line line, LineCharacterIndexType lineCharacterIndex)
 
 cat Deprecated
 

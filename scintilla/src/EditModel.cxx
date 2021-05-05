@@ -66,6 +66,7 @@ EditModel::EditModel() : braces{} {
 	braces[1] = Sci::invalidPosition;
 	bracesMatchStyle = STYLE_BRACEBAD;
 	highlightGuideColumn = 0;
+	hasFocus = false;
 	primarySelection = true;
 	imeInteraction = IMEInteraction::windowed;
 	bidirectional = Bidirectional::bidiDisabled;
@@ -114,4 +115,9 @@ const char *EditModel::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
 #else
 	return defaultFoldDisplayText.get();
 #endif
+}
+
+InSelection EditModel::LineEndInSelection(Sci::Line lineDoc) const noexcept {
+	const Sci::Position posAfterLineEnd = pdoc->LineStart(lineDoc + 1);
+	return sel.InSelectionForEOL(posAfterLineEnd);
 }

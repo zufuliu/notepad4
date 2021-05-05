@@ -210,7 +210,8 @@ public:
 	int ctrlCharPadding; // the padding around control character text blobs
 	int lastSegItalicsOffset; // the offset so as not to clip italic characters at EOLs
 
-	std::map<int, std::optional<ColourAlpha>> elementColours;
+	using ElementMap = std::map<int, std::optional<ColourAlpha>>;
+	ElementMap elementColours;
 	std::set<int> elementAllowsTranslucent;
 
 	WrapAppearance wrap;
@@ -243,14 +244,15 @@ public:
 	int GetFrameWidth() const noexcept;
 	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept;
 	std::optional<ColourAlpha> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept;
+	bool SelectionTextDrawn() const noexcept;
 	bool SelectionBackgroundDrawn() const noexcept;
 	bool WhitespaceBackgroundDrawn() const noexcept;
 	ColourAlpha WrapColour() const noexcept;
 
 	void AddMultiEdge(uptr_t wParam, sptr_t lParam);
 
-	std::optional<ColourAlpha> ElementColour(int index) const;
-	bool ElementAllowsTranslucent(int index) const;
+	std::optional<ColourAlpha> ElementColour(int element) const;
+	bool ElementAllowsTranslucent(int element) const;
 
 	bool SetWrapState(int wrapState_) noexcept;
 	bool SetWrapVisualFlags(int wrapVisualFlags_) noexcept;

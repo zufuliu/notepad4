@@ -31,6 +31,7 @@ public:
 	Sci::Position braces[2];
 	int bracesMatchStyle;
 	int highlightGuideColumn;
+	bool hasFocus;
 	Selection sel;
 	bool primarySelection;
 
@@ -74,6 +75,7 @@ public:
 	void SetDefaultFoldDisplayText(const char *text);
 	const char *GetDefaultFoldDisplayText() const noexcept;
 	const char *GetFoldDisplayText(Sci::Line lineDoc) const noexcept;
+	InSelection LineEndInSelection(Sci::Line lineDoc) const noexcept;
 };
 
 }

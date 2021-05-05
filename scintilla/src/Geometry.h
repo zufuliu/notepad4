@@ -217,8 +217,12 @@ public:
 		return ColourAlpha(co_ | (0xffu << 24));
 	}
 
-	constexpr ColourAlpha Opaque() const noexcept {
+	constexpr ColourAlpha WithoutAlpha() const noexcept {
 		return ColourAlpha(co & 0xffffff);
+	}
+
+	constexpr ColourAlpha Opaque() const noexcept {
+		return ColourAlpha(co | (0xffu << 24));
 	}
 
 	constexpr unsigned int OpaqueRGB() const noexcept {
@@ -289,7 +293,7 @@ class Stroke final {
 public:
 	ColourAlpha colour;
 	XYPOSITION width;
-	constexpr explicit Stroke(ColourAlpha colour_, XYPOSITION width_ = 1.0f) noexcept :
+	constexpr explicit Stroke(ColourAlpha colour_, XYPOSITION width_ = 1.0) noexcept :
 		colour(colour_), width(width_) {}
 	constexpr float WidthF() const noexcept {
 		return static_cast<float>(width);
@@ -313,9 +317,9 @@ class FillStroke final {
 public:
 	Fill fill;
 	Stroke stroke;
-	constexpr FillStroke(ColourAlpha colourFill_, ColourAlpha colourStroke_, XYPOSITION widthStroke_ = 1.0f) noexcept :
+	constexpr FillStroke(ColourAlpha colourFill_, ColourAlpha colourStroke_, XYPOSITION widthStroke_ = 1.0) noexcept :
 		fill(colourFill_), stroke(colourStroke_, widthStroke_) {}
-	constexpr explicit FillStroke(ColourAlpha colourBoth, XYPOSITION widthStroke_ = 1.0f) noexcept :
+	constexpr explicit FillStroke(ColourAlpha colourBoth, XYPOSITION widthStroke_ = 1.0) noexcept :
 		fill(colourBoth), stroke(colourBoth, widthStroke_) {}
 };
 
