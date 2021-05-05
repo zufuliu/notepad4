@@ -876,7 +876,6 @@
       <AdditionalOptions>/source-charset:utf-8 /GA -march=x86-64-v3 -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wcomma %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalDependencies>comctl32.lib;shlwapi.lib;imm32.lib;uxtheme.lib;%(AdditionalDependencies)</AdditionalDependencies>
