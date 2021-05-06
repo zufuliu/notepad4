@@ -243,11 +243,9 @@ int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefa
 BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault) {
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
 	if (value) {
-		switch (*value) {
-		case L'1':
-			return TRUE;
-		case L'0':
-			return FALSE;
+		const UINT t = *value - L'0';
+		if (t <= 1U) {
+			return t;
 		}
 	}
 	return bDefault;

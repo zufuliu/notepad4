@@ -7693,14 +7693,14 @@ BOOL FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue) {
 		}
 
 		switch (*pvStart) {
-		case 't':
-		case 'y':
+		case 't': // true
+		case 'y': // yes
 			*piValue = 1;
 			return TRUE;
-		case 'f':
-		case 'n':
+		case 'f': // false
+		case 'n': // no
 			*piValue = 0;
-			return FALSE;
+			return TRUE;
 		}
 	}
 
