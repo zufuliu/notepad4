@@ -7502,7 +7502,8 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 					mask |= FV_TABWIDTH;
 				}
 
-				if (FileVars_ParseInt(tch, "*basic-indent", &i)) {
+				if (FileVars_ParseInt(tch, "*basic-indent", &i) ||
+					FileVars_ParseInt(tch, "*basic-offset", &i)) {
 					lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 					mask |= FV_INDENTWIDTH;
 				}
