@@ -7482,8 +7482,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	char tch[512];
 	strncpy(tch, lpData, min_u(cbData, sizeof(tch)));
 	tch[sizeof(tch) - 1] = '\0';
-	const BOOL utf8Sig = IsUTF8Signature(lpData);
-	BOOL bDisableFileVariables = FALSE;
+	const BOOL utf8Sig = IsUTF8Signature(tch);
 
 	// parse file variables at the beginning or end of the file.
 	BOOL beginning = TRUE;
@@ -7493,44 +7492,46 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			// Emacs file variables
 			int i;
 			if (FileVars_ParseInt(tch, "enable-local-variables", &i) && (!i)) {
-				bDisableFileVariables = TRUE;
+				break;
 			}
 
-			if (!bDisableFileVariables) {
-				if (FileVars_ParseInt(tch, "tab-width", &i)) {
-					lpfv->iTabWidth = clamp_i(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
-					mask |= FV_TABWIDTH;
-				}
+			if (FileVars_ParseInt(tch, "tab-width", &i)) {
+				lpfv->iTabWidth = clamp_i(i, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
+				mask |= FV_TABWIDTH;
+			}
 
-				if (FileVars_ParseInt(tch, "*basic-indent", &i) ||
-					FileVars_ParseInt(tch, "*basic-offset", &i)) {
-					lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
-					mask |= FV_INDENTWIDTH;
-				}
+			if (FileVars_ParseInt(tch, "*basic-indent", &i) ||
+				FileVars_ParseInt(tch, "*basic-offset", &i)) {
+				lpfv->iIndentWidth = clamp_i(i, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
+				mask |= FV_INDENTWIDTH;
+			}
 
-				if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
-					lpfv->bTabsAsSpaces = i == 0;
-					mask |= FV_TABSASSPACES;
-				}
+			if (FileVars_ParseInt(tch, "indent-tabs-mode", &i)) {
+				lpfv->bTabsAsSpaces = i == 0;
+				mask |= FV_TABSASSPACES;
+			}
 
-				if (FileVars_ParseInt(tch, "*tab-always-indent", &i)) {
-					lpfv->bTabIndents = i != 0;
-					mask |= FV_TABINDENTS;
-				}
+			if (FileVars_ParseInt(tch, "*tab-always-indent", &i)) {
+				lpfv->bTabIndents = i != 0;
+				mask |= FV_TABINDENTS;
+			}
 
-				if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
-					lpfv->fWordWrap = i == 0;
-					mask |= FV_WORDWRAP;
-				}
+			if (FileVars_ParseInt(tch, "truncate-lines", &i)) {
+				lpfv->fWordWrap = i == 0;
+				mask |= FV_WORDWRAP;
+			}
 
-				if (FileVars_ParseInt(tch, "fill-column", &i)) {
-					lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
-					mask |= FV_LONGLINESLIMIT;
-				}
+			if (FileVars_ParseInt(tch, "fill-column", &i)) {
+				lpfv->iLongLinesLimit = clamp_i(i, 0, NP2_LONG_LINE_LIMIT);
+				mask |= FV_LONGLINESLIMIT;
+			}
+
+			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) {
+				mask |= FV_MODE;
 			}
 		}
 
-		if (!utf8Sig && !bNoEncodingTags && !bDisableFileVariables) {
+		if (!utf8Sig && !bNoEncodingTags) {
 			if (FileVars_ParseStr(tch, "encoding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // XML
 				FileVars_ParseStr(tch, "charset", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // HTML
 				FileVars_ParseStr(tch, "coding", lpfv->tchEncoding, COUNTOF(lpfv->tchEncoding)) || // Emacs
@@ -7539,12 +7540,6 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 				// MySQL dump: /*!40101 SET NAMES utf8mb4 */;
 				// CSS @charset "UTF-8"; is not supported.
 				mask |= FV_ENCODING;
-			}
-		}
-
-		if (!fNoFileVariables && !bDisableFileVariables) {
-			if (FileVars_ParseStr(tch, "mode", lpfv->tchMode, COUNTOF(lpfv->tchMode))) { // Emacs
-				mask |= FV_MODE;
 			}
 		}
 
