@@ -1011,8 +1011,10 @@ BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) 
 
 	int i = 0xFFFF;
 	const BOOL bIsTextUnicode = bSkipUnicodeDetection ? FALSE : IsTextUnicode(pBuffer, cb, &i);
-	const BOOL bHasBOM = (pBuffer[0] == '\xFF' && pBuffer[1] == '\xFE');
-	const BOOL bHasRBOM = (pBuffer[0] == '\xFE' && pBuffer[1] == '\xFF');
+	//const BOOL bHasBOM = (pBuffer[0] == '\xFF' && pBuffer[1] == '\xFE');
+	//const BOOL bHasRBOM = (pBuffer[0] == '\xFE' && pBuffer[1] == '\xFF');
+	const BOOL bHasBOM = (*(const WORD *)pBuffer) == 0xFEFF;
+	const BOOL bHasRBOM = (*(const WORD *)pBuffer) == 0xFFFE;
 
 	if (i == 0xFFFF) { // i doesn't seem to have been modified ...
 		i = 0;

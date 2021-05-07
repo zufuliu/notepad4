@@ -406,7 +406,8 @@ BOOL	IsUTF7(const char *pTest, DWORD nLength);
 //INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
 static inline BOOL IsUTF8Signature(const char *p) {
-	return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
+	//return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
+	return (*((const UINT *)p) & 0xFFFFFF) == 0xBFBBEF;
 }
 
 BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW);
