@@ -118,7 +118,7 @@ public:
 	void RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw);
 
 	LineLayout *RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model);
-	void LayoutLine(const EditModel &model, Sci::Line line, Surface *surface, const ViewStyle &vstyle,
+	void LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle,
 		LineLayout *ll, int width = LineLayout::wrapWidthInfinite);
 
 	static void UpdateBidiData(const EditModel &model, const ViewStyle &vstyle, LineLayout *ll);
@@ -160,37 +160,6 @@ public:
 		Sci::Line line, PRectangle rcArea, int subLine) const;
 	Sci::Position FormatRange(bool draw, const Sci_RangeToFormat *pfr, Surface *surface, Surface *surfaceMeasure,
 		const EditModel &model, const ViewStyle &vs);
-};
-
-/**
-* Convenience class to ensure LineLayout objects are always disposed.
-*/
-class AutoLineLayout {
-	LineLayoutCache &llc;
-	LineLayout *ll;
-public:
-	AutoLineLayout(LineLayoutCache &llc_, LineLayout *ll_) noexcept : llc(llc_), ll(ll_) {}
-	AutoLineLayout(const AutoLineLayout &) = delete;
-	AutoLineLayout(AutoLineLayout &&) = delete;
-	AutoLineLayout &operator=(const AutoLineLayout &) = delete;
-	AutoLineLayout &operator=(AutoLineLayout &&) = delete;
-	~AutoLineLayout() noexcept {
-		llc.Dispose(ll);
-		ll = nullptr;
-	}
-	LineLayout *operator->() const noexcept {
-		return ll;
-	}
-	operator LineLayout *() const noexcept {
-		return ll;
-	}
-	operator bool() const noexcept {
-		return ll != nullptr;
-	}
-	void Set(LineLayout *ll_) noexcept {
-		llc.Dispose(ll);
-		ll = ll_;
-	}
 };
 
 }

@@ -178,7 +178,7 @@ IF EXIST "%VS_PATH%" (
 )
 @rem Visual Studio Build Tools
 FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [15.0^,17.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
-SET "VSINSTALLDIR=%VS_PATH%\"
+IF EXIST "%VS_PATH%" SET "VSINSTALLDIR=%VS_PATH%\"
 EXIT /B
 
 

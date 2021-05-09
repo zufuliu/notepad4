@@ -53,7 +53,6 @@ private:
 	int lenLineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	Sci::Line lineNumber;
-	bool inCache;
 public:
 	enum {
 		wrapWidthInfinite = 0x7ffffff
@@ -84,7 +83,7 @@ public:
 	int lines;
 	XYPOSITION wrapIndent; // In pixels
 
-	explicit LineLayout(int maxLineLength_);
+	LineLayout(Sci::Line lineNumber_, int maxLineLength_);
 	// Deleted so LineLayout objects can not be copied.
 	LineLayout(const LineLayout &) = delete;
 	LineLayout(LineLayout &&) = delete;
@@ -95,6 +94,8 @@ public:
 	void EnsureBidiData();
 	void Free() noexcept;
 	void Invalidate(ValidLevel validity_) noexcept;
+	Sci::Line LineNumber() const noexcept;
+	bool CanHold(Sci::Line lineDoc, int lineLength_) const noexcept;
 	int LineStart(int line) const noexcept;
 	int LineLength(int line) const noexcept;
 	enum class Scope {
@@ -160,7 +161,6 @@ private:
 	Cache level;
 	bool allInvalidated;
 	int styleClock;
-	void Allocate(size_t length_);
 	void AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc);
 public:
 	LineLayoutCache();
@@ -178,7 +178,6 @@ public:
 	}
 	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine);
-	void Dispose(LineLayout *ll) noexcept;
 };
 
 class PositionCacheEntry {

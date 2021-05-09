@@ -1498,10 +1498,10 @@ void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd) noexcept
 }
 
 bool Editor::WrapOneLine(Surface *surface, Sci::Line lineToWrap) {
-	AutoLineLayout ll(view.llc, view.RetrieveLineLayout(lineToWrap, *this));
+	LineLayout *ll = view.RetrieveLineLayout(lineToWrap, *this);
 	int linesWrapped = 1;
 	if (ll) {
-		view.LayoutLine(*this, lineToWrap, surface, vs, ll, wrapWidth);
+		view.LayoutLine(*this, surface, vs, ll, wrapWidth);
 		linesWrapped = ll->lines;
 	}
 	return pcs->SetHeight(lineToWrap, linesWrapped +
@@ -1514,6 +1514,7 @@ bool Editor::WrapOneLine(Surface *surface, Sci::Line lineToWrap) {
 // wsIdle: wrap one page + 100 lines
 // Return true if wrapping occurred.
 bool Editor::WrapLines(WrapScope ws) {
+	//static double totalWrapTime = 0;
 	Sci::Line goodTopLine = topLine;
 	bool wrapOccurred = false;
 	if (!Wrapping()) {
@@ -1587,7 +1588,9 @@ bool Editor::WrapLines(WrapScope ws) {
 					wrapPending.Wrapped(lineToWrap);
 					lineToWrap++;
 				}
-				durationWrapOneUnit.AddSample(bytesBeingWrapped, epWrapping.Duration());
+				const double duration = epWrapping.Duration();
+				//totalWrapTime += duration;
+				durationWrapOneUnit.AddSample(bytesBeingWrapped, duration);
 
 				goodTopLine = pcs->DisplayFromDoc(lineDocTop) + std::min(
 					subLineTop, static_cast<Sci::Line>(pcs->GetHeight(lineDocTop) - 1));
@@ -1597,6 +1600,8 @@ bool Editor::WrapLines(WrapScope ws) {
 		// If wrapping is done, bring it to resting position
 		if (wrapPending.start >= lineEndNeedWrap) {
 			wrapPending.Reset();
+			//printf("%s total wrap time=%.6f\n", __func__, totalWrapTime);
+			//totalWrapTime = 0;
 		}
 	}
 
@@ -1651,10 +1656,10 @@ void Editor::LinesSplit(int pixelWidth) {
 		UndoGroup ug(pdoc);
 		for (Sci::Line line = lineStart; line <= lineEnd; line++) {
 			AutoSurface surface(this);
-			AutoLineLayout ll(view.llc, view.RetrieveLineLayout(line, *this));
+			LineLayout *ll = view.RetrieveLineLayout(line, *this);
 			if (surface && ll) {
 				const Sci::Position posLineStart = pdoc->LineStart(line);
-				view.LayoutLine(*this, line, surface, vs, ll, pixelWidth);
+				view.LayoutLine(*this, surface, vs, ll, pixelWidth);
 				Sci::Position lengthInsertedTotal = 0;
 				for (int subLine = 1; subLine < ll->lines; subLine++) {
 					const Sci::Position lengthInserted = pdoc->InsertString(
@@ -5305,9 +5310,9 @@ void Editor::SetAnnotationHeights(Sci::Line start, Sci::Line end) {
 			int linesWrapped = 1;
 			if (Wrapping()) {
 				AutoSurface surface(this);
-				AutoLineLayout ll(view.llc, view.RetrieveLineLayout(line, *this));
+				LineLayout *ll = view.RetrieveLineLayout(line, *this);
 				if (surface && ll) {
-					view.LayoutLine(*this, line, surface, vs, ll, wrapWidth);
+					view.LayoutLine(*this, surface, vs, ll, wrapWidth);
 					linesWrapped = ll->lines;
 				}
 			}
@@ -5706,10 +5711,10 @@ int Editor::CodePage() const noexcept {
 
 Sci::Line Editor::WrapCount(Sci::Line line) {
 	AutoSurface surface(this);
-	AutoLineLayout ll(view.llc, view.RetrieveLineLayout(line, *this));
+	LineLayout *ll = view.RetrieveLineLayout(line, *this);
 
 	if (surface && ll) {
-		view.LayoutLine(*this, line, surface, vs, ll, wrapWidth);
+		view.LayoutLine(*this, surface, vs, ll, wrapWidth);
 		return ll->lines;
 	} else {
 		return 1;

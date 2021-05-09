@@ -59,10 +59,9 @@ void BidiData::Resize(size_t maxLineLength_) {
 	widthReprs.resize(maxLineLength_ + 1);
 }
 
-LineLayout::LineLayout(int maxLineLength_) :
+LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 	lenLineStarts(0),
-	lineNumber(-1),
-	inCache(false),
+	lineNumber(lineNumber_),
 	maxLineLength(-1),
 	numCharsInLine(0),
 	numCharsBeforeEOL(0),
@@ -117,6 +116,14 @@ void LineLayout::Free() noexcept {
 void LineLayout::Invalidate(ValidLevel validity_) noexcept {
 	if (validity > validity_)
 		validity = validity_;
+}
+
+Sci::Line LineLayout::LineNumber() const noexcept {
+	return lineNumber;
+}
+
+bool LineLayout::CanHold(Sci::Line lineDoc, int lineLength_) const noexcept {
+	return (lineNumber == lineDoc) && (lineLength_ <= maxLineLength);
 }
 
 int LineLayout::LineStart(int line) const noexcept {
@@ -356,12 +363,9 @@ LineLayoutCache::LineLayoutCache() :
 	lastCaretSlot(SIZE_MAX),
 	level(Cache::none),
 	allInvalidated(false), styleClock(-1) {
-	Allocate(0);
 }
 
-LineLayoutCache::~LineLayoutCache() {
-	Deallocate();
-}
+LineLayoutCache::~LineLayoutCache() = default;
 
 namespace {
 
@@ -397,14 +401,6 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 
 }
 
-void LineLayoutCache::Allocate(size_t length_) {
-	allInvalidated = false;
-	cache.resize(length_);
-	//printf("%s level=%d, size=%zu/%zu, LineLayout=%zu/%zu, BidiData=%zu, XYPOSITION=%zu\n",
-	//	__func__, level, cache.size(), cache.capacity(), sizeof(LineLayout),
-	//	sizeof(std::unique_ptr<LineLayout>), sizeof(BidiData), sizeof(XYPOSITION));
-}
-
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	// round up cache size to avoid rapidly resizing when linesOnScreen or linesInDoc changed.
 	size_t lengthForLevel = 0;
@@ -417,7 +413,11 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
 	if (lengthForLevel != cache.size()) {
-		Allocate(lengthForLevel);
+		allInvalidated = false;
+		cache.resize(lengthForLevel);
+		//printf("%s level=%d, size=%zu/%zu, LineLayout=%zu/%zu, BidiData=%zu, XYPOSITION=%zu\n",
+		//	__func__, level, cache.size(), cache.capacity(), sizeof(LineLayout),
+		//	sizeof(std::unique_ptr<LineLayout>), sizeof(BidiData), sizeof(XYPOSITION));
 	}
 	PLATFORM_ASSERT(cache.size() >= lengthForLevel);
 }
@@ -444,7 +444,8 @@ void LineLayoutCache::SetLevel(Cache level_) noexcept {
 	allInvalidated = false;
 	if ((static_cast<int>(level_) != -1) && (level != level_)) {
 		level = level_;
-		Deallocate();
+		cache.clear();
+		lastCaretSlot = SIZE_MAX;
 	}
 }
 
@@ -484,11 +485,11 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 
 	LineLayout *ret = cache[pos].get();
 	if (ret) {
-		if ((ret->lineNumber != lineNumber) || (ret->maxLineLength < maxChars)) {
+		if (!ret->CanHold(lineNumber, maxChars)) {
 			//printf("USE line=%zd/%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
 			//	lineNumber, ret->lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
 			ret->~LineLayout();
-			ret = new (ret) LineLayout(maxChars);
+			ret = new (ret) LineLayout(lineNumber, maxChars);
 		} else {
 			//printf("HIT line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d, validity=%d\n",
 			//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_, ret->validity);
@@ -496,22 +497,12 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	} else {
 		//printf("NEW line=%zd, caret=%zd/%zd top=%zd, pos=%zu, clock=%d\n",
 		//	lineNumber, lineCaret, lastCaretSlot, topLine, pos, styleClock_);
-		cache[pos] = std::make_unique<LineLayout>(maxChars);
+		cache[pos] = std::make_unique<LineLayout>(lineNumber, maxChars);
 		ret = cache[pos].get();
 	}
-	ret->lineNumber = lineNumber;
-	ret->inCache = true;
 
+	// Cache::none is not supported, we only use Cache::page.
 	return ret;
-}
-
-void LineLayoutCache::Dispose(LineLayout *ll) noexcept {
-	allInvalidated = false;
-	if (ll) {
-		if (!ll->inCache) {
-			delete ll;
-		}
-	}
 }
 
 // Simply pack the (maximum 4) character bytes into an int

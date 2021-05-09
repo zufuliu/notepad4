@@ -440,10 +440,11 @@ constexpr bool IsControlCharacter(unsigned char ch) noexcept {
 * Copy the given @a line and its styles from the document into local arrays.
 * Also determine the x position at which each character starts.
 */
-void EditView::LayoutLine(const EditModel &model, Sci::Line line, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width) {
+void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width) {
 	if (!ll)
 		return;
 
+	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
@@ -796,9 +797,9 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 		posLineStart = model.pdoc->LineStart(lineDoc);
 	}
 	const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
-	AutoLineLayout ll(llc, RetrieveLineLayout(lineDoc, model));
+	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
 	if (surface && ll) {
-		LayoutLine(model, lineDoc, surface, vs, ll, model.wrapWidth);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const int posInLine = static_cast<int>(pos.Position() - posLineStart);
 		pt = ll->PointFromPosition(posInLine, vs.lineHeight, pe);
 		pt.x += vs.textStart - model.xOffset;
@@ -837,9 +838,9 @@ Range EditView::RangeDisplayLine(Surface *surface, const EditModel &model, Sci::
 	}
 	const Sci::Line lineDoc = model.pcs->DocFromDisplay(lineVisible);
 	const Sci::Position positionLineStart = model.pdoc->LineStart(lineDoc);
-	AutoLineLayout ll(llc, RetrieveLineLayout(lineDoc, model));
+	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
 	if (surface && ll) {
-		LayoutLine(model, lineDoc, surface, vs, ll, model.wrapWidth);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
 		const int subLine = static_cast<int>(lineVisible - lineStartSet);
 		if (subLine < ll->lines) {
@@ -868,9 +869,9 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 		return SelectionPosition(canReturnInvalid ? INVALID_POSITION :
 			model.pdoc->Length());
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
-	AutoLineLayout ll(llc, RetrieveLineLayout(lineDoc, model));
+	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
 	if (surface && ll) {
-		LayoutLine(model, lineDoc, surface, vs, ll, model.wrapWidth);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
 		const int subLine = static_cast<int>(visibleLine - lineStartSet);
 		if (subLine < ll->lines) {
@@ -919,10 +920,10 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 * This method is used for rectangular selections and does not work on wrapped lines.
 */
 SelectionPosition EditView::SPositionFromLineX(Surface *surface, const EditModel &model, Sci::Line lineDoc, int x, const ViewStyle &vs) {
-	AutoLineLayout ll(llc, RetrieveLineLayout(lineDoc, model));
+	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
 	if (surface && ll) {
 		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
-		LayoutLine(model, lineDoc, surface, vs, ll, model.wrapWidth);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Range rangeSubLine = ll->SubLineRange(0, LineLayout::Scope::visibleOnly);
 		const XYPOSITION subLineStart = ll->positions[rangeSubLine.start];
 		const Sci::Position positionInLine = ll->FindPositionFromX(x + subLineStart, rangeSubLine, false);
@@ -940,9 +941,9 @@ SelectionPosition EditView::SPositionFromLineX(Surface *surface, const EditModel
 Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model, Sci::Position pos, const ViewStyle &vs) {
 	const Sci::Line lineDoc = model.pdoc->SciLineFromPosition(pos);
 	Sci::Line lineDisplay = model.pcs->DisplayFromDoc(lineDoc);
-	AutoLineLayout ll(llc, RetrieveLineLayout(lineDoc, model));
+	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
 	if (surface && ll) {
-		LayoutLine(model, lineDoc, surface, vs, ll, model.wrapWidth);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 		const Sci::Position posInLine = pos - posLineStart;
 		lineDisplay--; // To make up for first increment ahead.
@@ -957,11 +958,11 @@ Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model
 
 Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &model, Sci::Position pos, bool start, const ViewStyle &vs) {
 	const Sci::Line line = model.pdoc->SciLineFromPosition(pos);
-	AutoLineLayout ll(llc, RetrieveLineLayout(line, model));
+	LineLayout *ll = RetrieveLineLayout(line, model);
 	Sci::Position posRet = INVALID_POSITION;
 	if (surface && ll) {
 		const Sci::Position posLineStart = model.pdoc->LineStart(line);
-		LayoutLine(model, line, surface, vs, ll, model.wrapWidth);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Position posInLine = pos - posLineStart;
 		if (posInLine <= ll->maxLineLength) {
 			for (int subLine = 0; subLine < ll->lines; subLine++) {
@@ -2495,7 +2496,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 			| SC_FOLDFLAG_LINEAFTER_EXPANDED | SC_FOLDFLAG_LINEAFTER_CONTRACTED)) != 0;
 
 		Sci::Line lineDocPrevious = -1;	// Used to avoid laying out one document line multiple times
-		AutoLineLayout ll(llc, nullptr);
+		LineLayout *ll = nullptr;
 		int phaseCount;
 		DrawPhase phases[MaxDrawPhaseCount];
 		if ((phasesDraw == PhasesDraw::multiple) && !bufferedDraw) {
@@ -2541,9 +2542,8 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 				ElapsedPeriod ep;
 #endif
 				if (lineDoc != lineDocPrevious) {
-					ll.Set(nullptr);
-					ll.Set(RetrieveLineLayout(lineDoc, model));
-					LayoutLine(model, lineDoc, surface, vsDraw, ll, model.wrapWidth);
+					ll = RetrieveLineLayout(lineDoc, model);
+					LayoutLine(model, surface, vsDraw, ll, model.wrapWidth);
 					lineDocPrevious = lineDoc;
 				}
 #if defined(TIME_PAINTING)
@@ -2616,7 +2616,6 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 				visibleLine++;
 			}
 		}
-		ll.Set(nullptr);
 #if defined(TIME_PAINTING)
 		if (durPaint < 0.00000001)
 			durPaint = 0.00000001;
@@ -2805,8 +2804,8 @@ Sci::Position EditView::FormatRange(bool draw, const Sci_RangeToFormat *pfr, Sur
 
 		// Copy this line and its styles from the document into local arrays
 		// and determine the x position at which each character starts.
-		LineLayout ll(static_cast<int>(model.pdoc->LineStart(lineDoc + 1) - model.pdoc->LineStart(lineDoc) + 1));
-		LayoutLine(model, lineDoc, surfaceMeasure, vsPrint, &ll, widthPrint);
+		LineLayout ll(lineDoc, static_cast<int>(model.pdoc->LineStart(lineDoc + 1) - model.pdoc->LineStart(lineDoc) + 1));
+		LayoutLine(model, surfaceMeasure, vsPrint, &ll, widthPrint);
 
 		ll.containsCaret = false;
 
