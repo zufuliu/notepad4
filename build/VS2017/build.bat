@@ -172,7 +172,13 @@ SET "VS_COMPONENT=Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.V
 IF "%NEED_ARM64%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM64"
 IF "%NEED_ARM%" == 1 SET "VS_COMPONENT=%VS_COMPONENT% Microsoft.VisualStudio.Component.VC.Tools.ARM"
 FOR /f "delims=" %%A IN ('"%VSWHERE%" -property installationPath -prerelease -version [15.0^,17.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
-IF EXIST "%VS_PATH%" SET "VSINSTALLDIR=%VS_PATH%\"
+IF EXIST "%VS_PATH%" (
+	SET "VSINSTALLDIR=%VS_PATH%\"
+	EXIT /B
+)
+@rem Visual Studio Build Tools
+FOR /f "delims=" %%A IN ('"%VSWHERE%" -products Microsoft.VisualStudio.Product.BuildTools -property installationPath -prerelease -version [15.0^,17.0^) -requires %VS_COMPONENT%') DO SET "VS_PATH=%%A"
+SET "VSINSTALLDIR=%VS_PATH%\"
 EXIT /B
 
 
