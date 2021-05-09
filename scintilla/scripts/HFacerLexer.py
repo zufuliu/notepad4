@@ -6,7 +6,7 @@
 import pathlib
 import Face
 
-from FileGenerator import Regenerate
+import FileGenerator
 
 def printLexHFile(f):
 	# StylesCommon in Scintilla.iface
@@ -34,7 +34,7 @@ def printLexHFile(f):
 def RegenerateAll(root):
 	f = Face.Face()
 	f.ReadFromFile(root / "include/SciLexer.iface")
-	Regenerate(root / "include/SciLexer.h", "/* ", printLexHFile(f))
+	FileGenerator.Regenerate(root / "include/SciLexer.h", "/* ", printLexHFile(f))
 
 if __name__ == "__main__":
 	RegenerateAll(pathlib.Path(__file__).resolve().parent.parent)

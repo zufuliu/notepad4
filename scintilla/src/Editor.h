@@ -278,7 +278,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	// Wrapping support
 	WrapPending wrapPending;
-	ActionDuration durationWrapOneLine;
+	ActionDuration durationWrapOneUnit;
 
 	bool convertPastes;
 

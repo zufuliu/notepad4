@@ -87,27 +87,17 @@ int LexInterface::LineEndTypesSupported() const noexcept {
 	return 0;
 }
 
-void ActionDuration::AddSample(Sci::Line numberActions, double durationOfActions) noexcept {
+void ActionDuration::AddSample(Sci::Position numberActions, double durationOfActions) noexcept {
 	// Only adjust for multiple actions to avoid instability
-#if ActionDuration_MeasureTimeByBytes
-	if (numberActions < ActionDuration_MeasureTimeByBytes) {
+	if (numberActions < unitBytes) {
 		return;
 	}
-#else
-	if (numberActions < 8) {
-		return;
-	}
-#endif
 
 	// Alpha value for exponential smoothing.
 	// Most recent value contributes 25% to smoothed value.
 	constexpr double alpha = 0.25;
 
-#if ActionDuration_MeasureTimeByBytes
-	const double durationOne = (ActionDuration_MeasureTimeByBytes * durationOfActions) / numberActions;
-#else
-	const double durationOne = durationOfActions / numberActions;
-#endif
+	const double durationOne = (unitBytes * durationOfActions) / numberActions;
 	const double duration_ = alpha * durationOne + (1.0 - alpha) * duration;
 	//duration = Clamp(duration_, minDuration, maxDuration);
 	duration = std::max(duration_, minDuration);
@@ -119,13 +109,9 @@ double ActionDuration::Duration() const noexcept {
 	return duration;
 }
 
-Sci::Line ActionDuration::ActionsInAllowedTime(double secondsAllowed) const noexcept {
-	const Sci::Line actions = std::clamp<Sci::Line>(static_cast<Sci::Line>(secondsAllowed / duration), 8, 0x10000);
-#if ActionDuration_MeasureTimeByBytes
-	return actions * ActionDuration_MeasureTimeByBytes;
-#else
-	return actions;
-#endif
+Sci::Position ActionDuration::ActionsInAllowedTime(double secondsAllowed) const noexcept {
+	const Sci::Position actions = std::clamp<Sci::Position>(static_cast<Sci::Position>(secondsAllowed / duration), 8, 0x10000);
+	return actions * unitBytes;
 }
 
 Document::Document(int options) :
@@ -503,16 +489,15 @@ Sci::Line Document::LineFromPositionIndex(Sci::Position pos, int lineCharacterIn
 	return cb.LineFromPositionIndex(pos, lineCharacterIndex);
 }
 
-#if ActionDuration_MeasureTimeByBytes
 Sci::Line Document::LineFromPositionAfter(Sci::Line line, Sci::Position length) const noexcept {
-	const Sci::Position pos = LineStart(line) + length;
-	if (pos >= Length()) {
+	const Sci::Position posAfter = cb.LineStart(line) + length;
+	if (posAfter >= Length()) {
 		return LinesTotal();
 	}
-	const Sci::Line lineLast = SciLineFromPosition(pos);
-	return lineLast + (!!(line == lineLast));
+	const Sci::Line lineAfter = SciLineFromPosition(posAfter);
+	// Want to make some progress so return next line
+	return lineAfter + (line == lineAfter);
 }
-#endif
 
 int SCI_METHOD Document::SetLevel(Sci_Line line, int level) {
 	const int prev = Levels()->SetLevel(line, level, LinesTotal());
@@ -2361,16 +2346,11 @@ void Document::EnsureStyledTo(Sci::Position pos) {
 }
 
 void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
-	const Sci::Line lineFirst = SciLineFromPosition(GetEndStyled());
+	const Sci::Position stylingStart = GetEndStyled();
 	ElapsedPeriod epStyling;
 	EnsureStyledTo(pos);
-	const Sci::Line lineLast = SciLineFromPosition(GetEndStyled());
-#if ActionDuration_MeasureTimeByBytes
-	const Sci::Line actions = LineStart(lineLast) - LineStart(lineFirst);
-#else
-	const Sci::Line actions = lineLast - lineFirst;
-#endif
-	durationStyleOneLine.AddSample(actions, epStyling.Duration());
+	const Sci::Position bytesBeingStyled = GetEndStyled() - stylingStart;
+	durationStyleOneUnit.AddSample(bytesBeingStyled, epStyling.Duration());
 }
 
 void Document::LexerChanged(bool hasStyles_) {

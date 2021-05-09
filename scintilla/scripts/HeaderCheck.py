@@ -53,7 +53,6 @@ def CheckFiles(headerOrderTxt):
     for f in orderedPaths:
         #~ print("   File ", f.relative_to(root))
         incs = ExtractHeaders(f)
-        news = set(incs) - set(headerOrder)
         allIncs = allIncs.union(set(incs))
 
         m = 0

@@ -1544,12 +1544,8 @@ bool Editor::WrapLines(WrapScope ws) {
 			// as taking only one display line.
 			lineToWrapEnd = lineDocTop;
 			Sci::Line lines = LinesOnScreen() + 1;
-#if ActionDuration_MeasureTimeByBytes
-			const Sci::Line lineLast = pdoc->LineFromPositionAfter(lineToWrap, ActionDuration_InitializedMaxBytes);
+			const Sci::Line lineLast = pdoc->LineFromPositionAfter(lineToWrap, ActionDuration::InitializedMaxBytes);
 			const Sci::Line maxLine = std::min(lineLast, pcs->LinesInDoc());
-#else
-			const Sci::Line maxLine = pcs->LinesInDoc();
-#endif
 			while ((lineToWrapEnd < maxLine) && (lines > 0)) {
 				if (pcs->GetVisible(lineToWrapEnd))
 					lines--;
@@ -1563,12 +1559,8 @@ bool Editor::WrapLines(WrapScope ws) {
 		} else if (ws == WrapScope::wsIdle) {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
 			constexpr double secondsAllowed = 0.01;
-			const Sci::Line actions = durationWrapOneLine.ActionsInAllowedTime(secondsAllowed);
-#if ActionDuration_MeasureTimeByBytes
-			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actions);
-#else
-			lineToWrapEnd = lineToWrap + actions;
-#endif
+			const Sci::Position actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
+			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actionsInAllowedTime);
 		}
 		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, pdoc->LinesTotal());
 		lineToWrapEnd = std::min(lineToWrapEnd, lineEndNeedWrap);
@@ -1586,11 +1578,7 @@ bool Editor::WrapLines(WrapScope ws) {
 			AutoSurface surface(this);
 			if (surface) {
 				//Platform::DebugPrintf("Wraplines: scope=%0d need=%0d..%0d perform=%0d..%0d\n", ws, wrapPending.start, wrapPending.end, lineToWrap, lineToWrapEnd);
-#if ActionDuration_MeasureTimeByBytes
-				const Sci::Line actions = pdoc->LineStart(lineToWrapEnd) - pdoc->LineStart(lineToWrap);
-#else
-				const Sci::Line actions = lineToWrapEnd - lineToWrap;
-#endif
+				const Sci::Position bytesBeingWrapped = pdoc->LineStart(lineToWrapEnd) - pdoc->LineStart(lineToWrap);
 				ElapsedPeriod epWrapping;
 				while (lineToWrap < lineToWrapEnd) {
 					if (WrapOneLine(surface, lineToWrap)) {
@@ -1599,7 +1587,7 @@ bool Editor::WrapLines(WrapScope ws) {
 					wrapPending.Wrapped(lineToWrap);
 					lineToWrap++;
 				}
-				durationWrapOneLine.AddSample(actions, epWrapping.Duration());
+				durationWrapOneUnit.AddSample(bytesBeingWrapped, epWrapping.Duration());
 
 				goodTopLine = pcs->DisplayFromDoc(lineDocTop) + std::min(
 					subLineTop, static_cast<Sci::Line>(pcs->GetHeight(lineDocTop) - 1));
@@ -5184,15 +5172,12 @@ Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolli
 	// Try to keep time taken by styling reasonable so interaction remains smooth.
 	// When scrolling, allow less time to ensure responsive
 	const double secondsAllowed = scrolling ? 0.005 : 0.02;
-	Sci::Line lineStart = pdoc->SciLineFromPosition(pdoc->GetEndStyled());
-	const Sci::Line actions = pdoc->durationStyleOneLine.ActionsInAllowedTime(secondsAllowed);
-#if ActionDuration_MeasureTimeByBytes
-	lineStart = pdoc->LineFromPositionAfter(lineStart, actions);
-#else
-	lineStart += actions;
-#endif
 
-	const Sci::Line stylingMaxLine = std::min(lineStart, pdoc->LinesTotal());
+	Sci::Line lineLast = pdoc->SciLineFromPosition(pdoc->GetEndStyled());
+	const Sci::Position actionsInAllowedTime = pdoc->durationStyleOneUnit.ActionsInAllowedTime(secondsAllowed);
+	lineLast = pdoc->LineFromPositionAfter(lineLast, actionsInAllowedTime);
+
+	const Sci::Line stylingMaxLine = std::min(lineLast, pdoc->LinesTotal());
 	return std::min(pdoc->LineStart(stylingMaxLine), posMax);
 }
 

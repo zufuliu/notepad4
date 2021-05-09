@@ -3,7 +3,7 @@ import os.path
 import glob
 import re
 
-from FileGenerator import Regenerate
+import FileGenerator
 
 def FindModules(lexersPath, projectPath):
 	doc = open(projectPath, encoding='utf-8').read()
@@ -30,6 +30,6 @@ def RegenerateAll():
 	lexers = FindModules('../lexers', '../../build/VS2017/Notepad2.vcxproj')
 
 	modules = sorted(lexers.values(), key=lambda m: m.lower())
-	Regenerate('../lexlib/LexerModule.cxx', '//', modules)
+	FileGenerator.Regenerate('../lexlib/LexerModule.cxx', '//', modules)
 
 RegenerateAll()

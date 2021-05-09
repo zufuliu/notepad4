@@ -115,7 +115,7 @@ def groupRanges(symmetrics):
 
 	rangeCoverage = list(flatten([range(r[0], r[0]+r[2]*r[3], r[3]) for r in rangeGroups]))
 
-	nonRanges = [(l, u) for l, u, d in symmetrics if l not in rangeCoverage]
+	nonRanges = [(l, u) for l, u, _d in symmetrics if l not in rangeCoverage]
 
 	return rangeGroups, nonRanges
 
