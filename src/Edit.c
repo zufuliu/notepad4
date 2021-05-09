@@ -7480,8 +7480,9 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 
 	char tch[512];
-	strncpy(tch, lpData, min_u(cbData, sizeof(tch)));
-	tch[sizeof(tch) - 1] = '\0';
+	const DWORD len = min_u(cbData, sizeof(tch) - 1);
+	memcpy(tch, lpData, len);
+	tch[len] = '\0';
 	const BOOL utf8Sig = IsUTF8Signature(tch);
 
 	// parse file variables at the beginning or end of the file.
@@ -7543,8 +7544,9 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 		}
 
-		if (beginning && mask == 0 && cbData > COUNTOF(tch)) {
-			strncpy(tch, lpData + cbData - COUNTOF(tch) + 1, COUNTOF(tch) - 1);
+		if (beginning && mask == 0 && cbData > sizeof(tch)) {
+			memcpy(tch, lpData + cbData - sizeof(tch) + 1, sizeof(tch) - 1);
+			tch[sizeof(tch) - 1] = '\0';
 			beginning = FALSE;
 		} else {
 			break;
