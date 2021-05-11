@@ -225,12 +225,12 @@ public:
 		return ColourAlpha(co | (0xffu << 24));
 	}
 
-	constexpr unsigned int OpaqueRGB() const noexcept {
-		return co & 0xffffff;
+	constexpr unsigned int AsInteger() const noexcept {
+		return co;
 	}
 
-	constexpr unsigned int RGBAValue() const noexcept {
-		return co;
+	constexpr unsigned int OpaqueRGB() const noexcept {
+		return co & 0xffffff;
 	}
 
 	// Red, green, blue and alpha values as bytes 0..255

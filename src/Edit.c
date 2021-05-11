@@ -7479,7 +7479,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 		return;
 	}
 
-	char tch[512];
+	char tch[512 + 1];
 	const DWORD len = min_u(cbData, sizeof(tch) - 1);
 	memcpy(tch, lpData, len);
 	tch[len] = '\0';
@@ -7544,7 +7544,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 			}
 		}
 
-		if (beginning && mask == 0 && cbData > sizeof(tch)) {
+		if (beginning && mask == 0 && cbData > sizeof(tch) - 1) {
 			memcpy(tch, lpData + cbData - sizeof(tch) + 1, sizeof(tch) - 1);
 			tch[sizeof(tch) - 1] = '\0';
 			beginning = FALSE;

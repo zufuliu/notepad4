@@ -441,9 +441,9 @@ void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
 }
 
 void LineLayoutCache::SetLevel(Cache level_) noexcept {
-	allInvalidated = false;
-	if ((static_cast<int>(level_) != -1) && (level != level_)) {
+	if (level != level_) {
 		level = level_;
+		allInvalidated = false;
 		cache.clear();
 		lastCaretSlot = SIZE_MAX;
 	}

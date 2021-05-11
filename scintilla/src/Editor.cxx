@@ -1545,7 +1545,7 @@ bool Editor::WrapLines(WrapScope ws) {
 			// as taking only one display line.
 			lineToWrapEnd = lineDocTop;
 			Sci::Line lines = LinesOnScreen() + 1;
-			const Sci::Line lineLast = pdoc->LineFromPositionAfter(lineToWrap, ActionDuration::InitializedMaxBytes);
+			const Sci::Line lineLast = pdoc->LineFromPositionAfter(lineToWrap, ActionDuration::InitialBytes);
 			const Sci::Line maxLine = std::min(lineLast, pcs->LinesInDoc());
 			while ((lineToWrapEnd < maxLine) && (lines > 0)) {
 				if (pcs->GetVisible(lineToWrapEnd))
@@ -7264,7 +7264,7 @@ sptr_t Editor::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case SCI_GETELEMENTCOLOUR:
-		return vs.ElementColour(static_cast<int>(wParam)).value_or(ColourAlpha()).OpaqueRGB();
+		return vs.ElementColour(static_cast<int>(wParam)).value_or(ColourAlpha()).AsInteger();
 
 	case SCI_RESETELEMENTCOLOUR:
 		vs.elementColours[static_cast<int>(wParam)].reset();

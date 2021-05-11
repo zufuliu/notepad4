@@ -204,7 +204,7 @@ class ActionDuration {
 	// measure time in KiB instead of byte.
 	static constexpr int unitBytes = 1024;
 public:
-	static constexpr int InitializedMaxBytes = 1024*1024;
+	static constexpr int InitialBytes = 1024*1024;
 	void AddSample(Sci::Position numberActions, double durationOfActions) noexcept;
 	double Duration() const noexcept;
 	Sci::Position ActionsInAllowedTime(double secondsAllowed) const noexcept;
