@@ -210,7 +210,7 @@ def addCaseSensitivityTest(fd, caseTable, charCount):
 
 int main() {
 	assert(sizeof(UnicodeCaseSensitivityTable) > kUnicodeCaseSensitiveMax);
-	Scintilla::ElapsedPeriod period;
+	const Scintilla::ElapsedPeriod period;
 	for (uint32_t ch = 0; ch < sizeof(UnicodeCaseSensitivityTable); ch++) {
 		const int result = IsCharacterCaseSensitive(ch);
 		const int expect = UnicodeCaseSensitivityTable[ch];

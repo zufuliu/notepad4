@@ -51,7 +51,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	}
 #endif
 
-	//Scintilla::ElapsedPeriod elapsed;
+	//const Scintilla::ElapsedPeriod elapsed;
 #if EnableLaTeXLikeEmojiInput
 	const char *sequenceString;
 	const InputSequence *sequenceList;

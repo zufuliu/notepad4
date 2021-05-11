@@ -458,7 +458,7 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 		const Sci::Position lineLength = (vstyle.viewEOL ? posLineEnd : model.pdoc->LineEnd(line)) - posLineStart;
 		validity = LineLayout::ValidLevel::invalid;
 		if (lineLength == ll->numCharsInLine) {
-			//ElapsedPeriod period;
+			//const ElapsedPeriod period;
 			// See if chars, styles, indicators, are all the same
 			int allSame = 0;
 			// Check base line layout
@@ -520,7 +520,7 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 		}
 	}
 	if (validity == LineLayout::ValidLevel::invalid) {
-		//ElapsedPeriod period;
+		//const ElapsedPeriod period;
 		ll->widthLine = LineLayout::wrapWidthInfinite;
 		ll->lines = 1;
 		if (vstyle.edgeState == EDGE_BACKGROUND) {
@@ -618,7 +618,7 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 			// Simple common case where line does not need wrapping.
 			ll->lines = 1;
 		} else {
-			//ElapsedPeriod period;
+			//const ElapsedPeriod period;
 			const XYPOSITION aveCharWidth = vstyle.aveCharWidth;
 			if (vstyle.wrap.visualFlags & SC_WRAPVISUALFLAG_END) {
 				width -= static_cast<int>(aveCharWidth); // take into account the space for end wrap mark
@@ -2488,7 +2488,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 		double durLayout = 0.0;
 		double durPaint = 0.0;
 		double durCopy = 0.0;
-		ElapsedPeriod epWhole;
+		const ElapsedPeriod epWhole;
 #endif
 		const bool bracesIgnoreStyle = ((vsDraw.braceHighlightIndicatorSet && (model.bracesMatchStyle == STYLE_BRACELIGHT)) ||
 			(vsDraw.braceBadLightIndicatorSet && (model.bracesMatchStyle == STYLE_BRACEBAD)));
@@ -2604,7 +2604,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 					lineWidthMaxSeen = std::max(
 						lineWidthMaxSeen, static_cast<int>(ll->positions[ll->numCharsInLine]));
 #if defined(TIME_PAINTING)
-					durCopy += ep.Duration(true);
+					durCopy += ep.Duration();
 #endif
 				}
 

@@ -1067,7 +1067,7 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 }
 
 sptr_t ScintillaWin::WndPaint() {
-	//ElapsedPeriod ep;
+	//const ElapsedPeriod ep;
 
 	// Redirect assertions to debug output and save current state
 	//const bool assertsPopup = Platform::ShowAssertionPopUps(false);

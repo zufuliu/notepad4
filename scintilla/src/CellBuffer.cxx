@@ -1048,7 +1048,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	constexpr size_t PositionBlockSize = 128;
 #endif
 
-	//ElapsedPeriod period;
+	//const ElapsedPeriod period;
 	Sci::Position positions[PositionBlockSize];
 	size_t nPositions = 0;
 	const Sci::Line lineStart = lineInsert;

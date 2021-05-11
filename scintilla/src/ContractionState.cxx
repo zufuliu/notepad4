@@ -245,7 +245,7 @@ void ContractionState<LINE>::InsertLines(Sci::Line lineDoc, Sci::Line lineCount)
 	if (OneToOne()) {
 		linesInDocument += static_cast<LINE>(lineCount);
 	} else {
-		//ElapsedPeriod period;
+		//const ElapsedPeriod period;
 #if ContractionState_InsertLines_OneByOne
 		for (Sci::Line l = 0; l < lineCount; l++) {
 			InsertLine(lineDoc + l);
@@ -286,7 +286,7 @@ void ContractionState<LINE>::DeleteLines(Sci::Line lineDoc, Sci::Line lineCount)
 	if (OneToOne()) {
 		linesInDocument -= static_cast<LINE>(lineCount);
 	} else {
-		//ElapsedPeriod period;
+		//const ElapsedPeriod period;
 #if ContractionState_DeleteLines_OneByOne
 		for (Sci::Line l = 0; l < lineCount; l++) {
 			DeleteLine(lineDoc);

@@ -2347,7 +2347,7 @@ void Document::EnsureStyledTo(Sci::Position pos) {
 
 void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
 	const Sci::Position stylingStart = GetEndStyled();
-	ElapsedPeriod epStyling;
+	const ElapsedPeriod epStyling;
 	EnsureStyledTo(pos);
 	const Sci::Position bytesBeingStyled = GetEndStyled() - stylingStart;
 	durationStyleOneUnit.AddSample(bytesBeingStyled, epStyling.Duration());
@@ -3199,7 +3199,7 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 	bool caseSensitive, Sci::Position *length, RESearch &search) {
 	const RESearchRange resr(doc, minPos, maxPos);
 	try {
-		//ElapsedPeriod ep;
+		//const ElapsedPeriod ep;
 		std::regex::flag_type flagsRe = std::regex::ECMAScript;
 		// Flags that appear to have no effect:
 		// | std::regex::collate | std::regex::extended;
@@ -3229,7 +3229,7 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 		// Example - search in doc/ScintillaHistory.html for
 		// [[:upper:]]eta[[:space:]]
 		// On MacBook, normally around 1 second but with locale imbued -> 14 seconds.
-		//const double durSearch = ep.Duration(true);
+		//const double durSearch = ep.Duration();
 		//Platform::DebugPrintf("Search:%9.6g \n", durSearch);
 		return posMatch;
 	} catch (const std::regex_error &) {
