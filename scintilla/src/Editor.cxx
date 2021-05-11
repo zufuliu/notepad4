@@ -1514,7 +1514,31 @@ bool Editor::WrapOneLine(Surface *surface, Sci::Line lineToWrap) {
 // wsIdle: wrap one page + 100 lines
 // Return true if wrapping occurred.
 bool Editor::WrapLines(WrapScope ws) {
-	//static double totalWrapTime = 0;
+//#define WRAP_LINES_TIMING
+#ifdef WRAP_LINES_TIMING
+	struct WrapTiming {
+		size_t totalBytes;
+		double totalDuration;
+		using Clock = std::chrono::steady_clock;
+		Clock::time_point startTime;
+
+		void Reset() noexcept {
+			totalBytes = 0;
+			totalDuration = 0;
+		}
+		void Add(size_t bytes, double duration) noexcept {
+			totalBytes += bytes;
+			totalDuration += duration;
+		}
+		double TotalTime() const noexcept {
+			const auto tpNow = Clock::now();
+			const auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(tpNow - startTime);
+			return duration.count();
+		}
+	};
+
+	static WrapTiming wrapTiming;
+#endif
 	Sci::Line goodTopLine = topLine;
 	bool wrapOccurred = false;
 	if (!Wrapping()) {
@@ -1535,6 +1559,13 @@ bool Editor::WrapLines(WrapScope ws) {
 		}
 		// Decide where to start wrapping
 		Sci::Line lineToWrap = wrapPending.start;
+#ifdef WRAP_LINES_TIMING
+		if (lineToWrap == 0) {
+			printf("%s wrap start ws=%d, modEventMask=%x\n", __func__, ws, modEventMask);
+			wrapTiming.Reset();
+			wrapTiming.startTime = WrapTiming::Clock::now();
+		}
+#endif
 		Sci::Line lineToWrapEnd = std::min(wrapPending.end, pdoc->LinesTotal());
 		const Sci::Line lineDocTop = pcs->DocFromDisplay(topLine);
 		const Sci::Line subLineTop = topLine - pcs->DisplayFromDoc(lineDocTop);
@@ -1589,7 +1620,9 @@ bool Editor::WrapLines(WrapScope ws) {
 					lineToWrap++;
 				}
 				const double duration = epWrapping.Duration();
-				//totalWrapTime += duration;
+#ifdef WRAP_LINES_TIMING
+				wrapTiming.Add(bytesBeingWrapped, duration);
+#endif
 				durationWrapOneUnit.AddSample(bytesBeingWrapped, duration);
 
 				goodTopLine = pcs->DisplayFromDoc(lineDocTop) + std::min(
@@ -1600,8 +1633,14 @@ bool Editor::WrapLines(WrapScope ws) {
 		// If wrapping is done, bring it to resting position
 		if (wrapPending.start >= lineEndNeedWrap) {
 			wrapPending.Reset();
-			//printf("%s total wrap time=%.6f\n", __func__, totalWrapTime);
-			//totalWrapTime = 0;
+#ifdef WRAP_LINES_TIMING
+			const double totalTime = wrapTiming.TotalTime();
+			printf("%s bytes=%zu, time=%.6f / %.6f, level=%d,\n"
+				"\tLinesOnScreen=%zd, idleStyling=%d, modEventMask=%x, technology=%d, dbcsCodePage=%d\n",
+				__func__, wrapTiming.totalBytes, wrapTiming.totalDuration, totalTime,
+				view.llc.GetLevel(), LinesOnScreen(), idleStyling, modEventMask, technology, pdoc->dbcsCodePage);
+			wrapTiming.Reset();
+#endif
 		}
 	}
 
