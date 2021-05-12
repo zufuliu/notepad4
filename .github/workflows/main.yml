@@ -13,6 +13,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+
     - name: MSVC x64 Release
       run: |
         CALL "build\VS2017\build.bat" Build x64 Release 1
@@ -72,6 +76,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
 
     - name: Install LLVM
       run: |
@@ -133,6 +141,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+
     - name: Install llvm-mingw
       run: |
         CALL "build\install_mingw.bat" llvm
@@ -193,6 +205,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+
     - name: Install GCC and Clang
       run: |
         CALL "build\install_mingw.bat" ucrt
@@ -243,6 +259,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+
     - name: Install GCC and Clang
       run: |
         CALL "build\install_mingw.bat" x86_64
@@ -292,6 +312,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
 
     - name: Install GCC and Clang
       run: |
