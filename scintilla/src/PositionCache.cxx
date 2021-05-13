@@ -404,11 +404,11 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	// round up cache size to avoid rapidly resizing when linesOnScreen or linesInDoc changed.
 	size_t lengthForLevel = 0;
-	if (level == Cache::caret) {
-		lengthForLevel = 1;
-	} else if (level == Cache::page) {
+	if (level == Cache::page) {
 		// see comment in Retrieve() method.
 		lengthForLevel = 1 + AlignUp(4*linesOnScreen, 64);
+	} else if (level == Cache::caret) {
+		lengthForLevel = 2;
 	} else if (level == Cache::document) {
 		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
@@ -479,6 +479,8 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 			lastCaretSlot = 0;
 			std::swap(cache[0], cache[pos]);
 		}
+	} else if (level == Cache::caret) {
+		pos = lineNumber != lineCaret;
 	} else if (level == Cache::document) {
 		pos = lineNumber;
 	}

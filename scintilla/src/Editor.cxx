@@ -1518,16 +1518,19 @@ bool Editor::WrapLines(WrapScope ws) {
 #ifdef WRAP_LINES_TIMING
 	struct WrapTiming {
 		size_t totalBytes;
+		size_t totalRuns;
 		double totalDuration;
 		using Clock = std::chrono::steady_clock;
 		Clock::time_point startTime;
 
 		void Reset() noexcept {
 			totalBytes = 0;
+			totalRuns = 0;
 			totalDuration = 0;
 		}
 		void Add(size_t bytes, double duration) noexcept {
 			totalBytes += bytes;
+			++totalRuns;
 			totalDuration += duration;
 		}
 		double TotalTime() const noexcept {
@@ -1635,9 +1638,9 @@ bool Editor::WrapLines(WrapScope ws) {
 			wrapPending.Reset();
 #ifdef WRAP_LINES_TIMING
 			const double totalTime = wrapTiming.TotalTime();
-			printf("%s bytes=%zu, time=%.6f / %.6f, level=%d,\n"
+			printf("%s bytes=%zu / %zu, time=%.6f / %.6f, level=%d,\n"
 				"\tLinesOnScreen=%zd, idleStyling=%d, modEventMask=%x, technology=%d, dbcsCodePage=%d\n",
-				__func__, wrapTiming.totalBytes, wrapTiming.totalDuration, totalTime,
+				__func__, wrapTiming.totalBytes, wrapTiming.totalRuns, wrapTiming.totalDuration, totalTime,
 				view.llc.GetLevel(), LinesOnScreen(), idleStyling, modEventMask, technology, pdoc->dbcsCodePage);
 			wrapTiming.Reset();
 #endif

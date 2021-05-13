@@ -24,7 +24,7 @@ namespace {
  * after each word.
  */
 inline char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
-	int prev = 1;
+	unsigned char prev = 1;
 	range_t words = 0;
 	// treat space and C0 control characters as word separators.
 
@@ -32,7 +32,7 @@ inline char **ArrayFromWordList(char *wordlist, size_t slen, range_t *len) {
 	char *s = wordlist;
 	while (s < end) {
 		const unsigned char ch = *s++;
-		const int curr = ch <= ' ';
+		const bool curr = ch <= ' ';
 		if (!curr && prev) {
 			words++;
 		}
