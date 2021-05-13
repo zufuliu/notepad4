@@ -5752,8 +5752,12 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
+	}
+	if (editMarkAllStatus.bookmarkLine >= 0 || editMarkAllStatus.bookmarkForFindAll) {
 		if ((findFlag | editMarkAllStatus.findFlag) & NP2_MarkAllBookmark) {
-			SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
+			if ((findFlag & (NP2_MarkAllBookmark | NP2_FromFindAll)) != 0 || !editMarkAllStatus.bookmarkForFindAll) {
+				SciCall_MarkerDeleteAll(MarkerNumber_Bookmark);
+			}
 		}
 	}
 	if (editMarkAllStatus.pszText) {
@@ -5796,6 +5800,7 @@ BOOL EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 
 	//EditMarkAll_Runs = 0;
 	if (findFlag & NP2_MarkAllBookmark) {
+		editMarkAllStatus.bookmarkForFindAll = findFlag & NP2_FromFindAll;
 		Style_SetBookmark();
 	}
 	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
@@ -5995,7 +6000,8 @@ void EditFindAll(LPCEDITFINDREPLACE lpefr, BOOL selectAll) {
 	}
 
 	searchFlags |= (bFindReplaceFindAllBookmark * NP2_MarkAllBookmark)
-		| (selectAll * NP2_MarkAllSelectAll);
+		| (selectAll * NP2_MarkAllSelectAll)
+		| NP2_FromFindAll;
 	// rewind start position when transform backslash is checked,
 	// all other searching doesn't across lines.
 	// NOTE: complex fix is needed when multiline regex is supported.

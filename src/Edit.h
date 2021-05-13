@@ -29,6 +29,7 @@
 #define NP2_MarkAllMultiline	0x00001000
 #define NP2_MarkAllBookmark		0x00002000
 #define NP2_MarkAllSelectAll	0x00004000
+#define NP2_FromFindAll			0x00008000
 
 typedef struct EDITFINDREPLACE {
 	char	szFind[512];
@@ -218,6 +219,7 @@ enum {
 typedef struct EditMarkAllStatus {
 	BOOL pending;
 	BOOL ignoreSelectionUpdate;
+	BOOL bookmarkForFindAll;
 	int findFlag;
 	int incrementSize;			// increment search size
 	Sci_Position iSelCount;		// length for pszText
