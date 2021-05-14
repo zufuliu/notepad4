@@ -33,8 +33,11 @@ matrix:
       compiler: Clang
 
 # No reversion when shallow clone is enabled.
-# before_build:
+before_build:
 #  - cmd: CALL update_rev.bat
+  - cmd: |
+      ECHO Update Version Hash
+      "c:/Program Files/Git/usr/bin/sed" -i "s/\(.\+\)[0-9a-f]\{8\}\(.\+\)/\1%APPVEYOR_REPO_COMMIT:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
 
 for:
   - # MSVC x64 Debug
