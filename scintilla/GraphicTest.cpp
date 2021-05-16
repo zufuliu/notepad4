@@ -244,7 +244,7 @@ void BGRAFromRGBA_sse4_2x1(void *pixelsBGRA, const void *pixelsRGBA, size_t coun
 	const uint64_t *prgba = static_cast<const uint64_t *>(pixelsRGBA);
 	for (size_t i = 0; i < count; i++, pbgra++) {
 		__m128i i16x8Color = unpack_color_epi16_sse4_ptr64(prgba++);
-		i16x8Color = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, 0xc6), 0xc6);
+		i16x8Color = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, _MM_SHUFFLE(3, 0, 1, 2)), _MM_SHUFFLE(3, 0, 1, 2));
 		__m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Color, 0xff), 0xff);
 
 		i16x8Color = _mm_mullo_epi16(i16x8Color, i16x8Alpha);
