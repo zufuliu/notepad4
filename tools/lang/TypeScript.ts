@@ -1,4 +1,4 @@
-// 4.2 https://www.typescriptlang.org/docs/
+// 4.3 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/tree/master/doc/TypeScript Language Specification
 
 //! keywords		===========================================================
@@ -14,7 +14,7 @@ if implements in infer instanceof interface intrinsic is
 keyof
 let
 new null
-of
+of override
 package private protected public
 readonly return
 set static super switch
@@ -65,7 +65,7 @@ any bigint boolean never number object string symbol unknown void
  * @packageDocumentation
  * @param
  * @privateRemarks
- * @privateRemarks
+ * @public
  * @readonly
  * @remarks
  * @returns
