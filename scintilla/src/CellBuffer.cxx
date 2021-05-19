@@ -1067,7 +1067,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 
 	if (!utf8LineEnds) {
 #if NP2_USE_AVX2
-		constexpr uint32_t LAST_CR_MASK = (1U << (sizeof(__m256i) - 1));
 		const __m256i vectCR = _mm256_set1_epi8('\r');
 		const __m256i vectLF = _mm256_set1_epi8('\n');
 		while (ptr + sizeof(__m256i) <= end) {
@@ -1078,8 +1077,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			const char *next = ptr + sizeof(__m256i);
 			bool lastCR = false;
 			if (maskCR) {
-				if (maskCR & LAST_CR_MASK) {
-					maskCR &= LAST_CR_MASK - 1;
+				if ((int32_t)maskCR < 0) {
 					lastCR = true;
 					if (*next == '\n') {
 						// CR+LF across boundary
@@ -1127,7 +1125,6 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 		}
 		// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-		constexpr uint32_t LAST_CR_MASK = (1U << (2*sizeof(__m128i) - 1));
 		const __m128i vectCR = _mm_set1_epi8('\r');
 		const __m128i vectLF = _mm_set1_epi8('\n');
 		while (ptr + 2*sizeof(__m128i) <= end) {
@@ -1142,8 +1139,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			const char *next = ptr + 2*sizeof(__m128i);
 			bool lastCR = false;
 			if (maskCR) {
-				if (maskCR & LAST_CR_MASK) {
-					maskCR &= LAST_CR_MASK - 1;
+				if ((int32_t)maskCR < 0) {
 					lastCR = true;
 					if (*next == '\n') {
 						// CR+LF across boundary

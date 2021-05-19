@@ -459,13 +459,16 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 	const uint8_t *ptr = (const uint8_t *)lpData;
 	// No NULL-terminated requirement for *ptr == '\n'
+#if NP2_USE_SSE2 || NP2_USE_AVX2
+	const uint8_t * const end = ptr + cbData;
+#else
 	const uint8_t * const end = ptr + cbData - 1;
+#endif
 
 #if NP2_USE_AVX2
-	const uint64_t LAST_CR_MASK = (UINT64_C(1) << (2*sizeof(__m256i) - 1));
 	const __m256i vectCR = _mm256_set1_epi8('\r');
 	const __m256i vectLF = _mm256_set1_epi8('\n');
-	while (ptr + 2*sizeof(__m256i) <= end) {
+	while (ptr + 2*sizeof(__m256i) < end) {
 		// unaligned loading: line starts at random position.
 		const __m256i chunk1 = _mm256_loadu_si256((__m256i *)ptr);
 		const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(ptr + sizeof(__m256i)));
@@ -476,15 +479,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 		ptr += 2*sizeof(__m256i);
 		if (maskCR) {
-			if (maskCR & LAST_CR_MASK) {
-				maskCR &= LAST_CR_MASK - 1;
+			if ((int64_t)maskCR < 0) {
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
 					++lineCountCRLF;
 				} else {
-					// clear highest bit (last CR) to avoid using following code:
-					// maskCR = (maskCR_LF ^ maskLF) | (maskCR & LAST_CR_MASK);
 					++lineCountCR;
 				}
 			}
@@ -511,8 +511,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	if (ptr < end) {
 		NP2_alignas(32) uint8_t buffer[2*sizeof(__m256i)];
 		ZeroMemory_32x2(buffer);
-		__movsb(buffer, ptr, end - ptr + 1);
-		ptr = end + 1;
+		__movsb(buffer, ptr, end - ptr);
 
 		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
 		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
@@ -522,8 +521,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		maskLF |= ((uint64_t)(uint32_t)_mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m256i);
 
 		if (maskCR) {
-			if (maskCR & LAST_CR_MASK) {
-				maskCR &= LAST_CR_MASK - 1;
+			if ((int64_t)maskCR < 0) {
 				++lineCountCR;
 			}
 
@@ -548,10 +546,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
 #if defined(_WIN64)
-	const uint64_t LAST_CR_MASK = (UINT64_C(1) << (4*sizeof(__m128i) - 1));
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
-	while (ptr + 4*sizeof(__m128i) <= end) {
+	while (ptr + 4*sizeof(__m128i) < end) {
 		// unaligned loading: line starts at random position.
 		const __m128i chunk1 = _mm_loadu_si128((__m128i *)ptr);
 		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
@@ -568,15 +565,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 		ptr += 4*sizeof(__m128i);
 		if (maskCR) {
-			if (maskCR & LAST_CR_MASK) {
-				maskCR &= LAST_CR_MASK - 1;
+			if ((int64_t)maskCR < 0) {
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
 					++lineCountCRLF;
 				} else {
-					// clear highest bit (last CR) to avoid using following code:
-					// maskCR = (maskCR_LF ^ maskLF) | (maskCR & LAST_CR_MASK);
 					++lineCountCR;
 				}
 			}
@@ -603,8 +597,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	if (ptr < end) {
 		NP2_alignas(16) uint8_t buffer[4*sizeof(__m128i)];
 		ZeroMemory_16x4(buffer);
-		__movsb(buffer, ptr, end - ptr + 1);
-		ptr = end + 1;
+		__movsb(buffer, ptr, end - ptr);
 
 		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
 		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
@@ -620,8 +613,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		maskLF |= ((uint64_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk4, vectLF))) << 3*sizeof(__m128i);
 
 		if (maskCR) {
-			if (maskCR & LAST_CR_MASK) {
-				maskCR &= LAST_CR_MASK - 1;
+			if ((int64_t)maskCR < 0) {
 				++lineCountCR;
 			}
 
@@ -645,10 +637,9 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	}
 	// end _WIN64 NP2_USE_SSE2
 #else
-	const uint32_t LAST_CR_MASK = (1U << (2*sizeof(__m128i) - 1));
 	const __m128i vectCR = _mm_set1_epi8('\r');
 	const __m128i vectLF = _mm_set1_epi8('\n');
-	while (ptr + 2*sizeof(__m128i) <= end) {
+	while (ptr + 2*sizeof(__m128i) < end) {
 		// unaligned loading: line starts at random position.
 		const __m128i chunk1 = _mm_loadu_si128((__m128i *)ptr);
 		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(ptr + sizeof(__m128i)));
@@ -659,15 +650,12 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 
 		ptr += 2*sizeof(__m128i);
 		if (maskCR) {
-			if (maskCR & LAST_CR_MASK) {
-				maskCR &= LAST_CR_MASK - 1;
+			if ((int32_t)maskCR < 0) {
 				if (*ptr == '\n') {
 					// CR+LF across boundary
 					++ptr;
 					++lineCountCRLF;
 				} else {
-					// clear highest bit (last CR) to avoid using following code:
-					// maskCR = (maskCR_LF ^ maskLF) | (maskCR & LAST_CR_MASK);
 					++lineCountCR;
 				}
 			}
@@ -694,8 +682,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	if (ptr < end) {
 		NP2_alignas(16) uint8_t buffer[2*sizeof(__m128i)];
 		ZeroMemory_16x2(buffer);
-		__movsb(buffer, ptr, end - ptr + 1);
-		ptr = end + 1;
+		__movsb(buffer, ptr, end - ptr);
 
 		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
 		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
@@ -705,8 +692,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 		maskLF |= ((uint32_t)_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, vectLF))) << sizeof(__m128i);
 
 		if (maskCR) {
-			if (maskCR & LAST_CR_MASK) {
-				maskCR &= LAST_CR_MASK - 1;
+			if ((int32_t)maskCR < 0) {
 				++lineCountCR;
 			}
 
@@ -753,7 +739,6 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			break;
 		}
 	} while (ptr < end);
-#endif
 
 	if (ptr == end) {
 		switch (*ptr) {
@@ -765,6 +750,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			break;
 		}
 	}
+#endif
 
 	const size_t linesMax = max_z(max_z(lineCountCRLF, lineCountCR), lineCountLF);
 	// values must kept in same order as SC_EOL_CRLF, SC_EOL_CR, SC_EOL_LF
