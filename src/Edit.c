@@ -773,8 +773,10 @@ void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 		return;
 	}
 
-	//StopWatch watch;
-	//StopWatch_Start(watch);
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
 
 	// code based on SciTEBase::DiscoverIndentSetting().
 	cbData = min_u(cbData, 1*1024*1024);
@@ -782,7 +784,7 @@ void EditDetectIndentation(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	const uint8_t * const end = ptr + cbData;
 	#define MAX_DETECTED_TAB_WIDTH	8
 	// line count for ambiguous lines, line indented by 1 to 8 spaces, line starts with tab.
-	int indentLineCount[1 + MAX_DETECTED_TAB_WIDTH + 1] = { 0 };
+	uint32_t indentLineCount[1 + MAX_DETECTED_TAB_WIDTH + 1] = { 0 };
 	int prevIndentCount = 0;
 	int prevTabWidth = 0;
 
@@ -867,12 +869,26 @@ labelStart:
 		}
 	}
 
+#if NP2_USE_AVX2
+	const __m128i chunk1 = _mm_loadu_si128((__m128i *)indentLineCount);
+	const __m128i chunk2 = _mm_loadu_si128((__m128i *)(indentLineCount + 4));
+	const __m128i chunk3 = _mm_loadl_epi64((__m128i *)(indentLineCount + 8));
+	__m128i maxAll = _mm_max_epu32(_mm_max_epu32(chunk1, chunk2), chunk3);
+	maxAll = _mm_max_epu32(maxAll, _mm_shuffle_epi32(maxAll, _MM_SHUFFLE(0, 1, 2, 3)));
+	maxAll = _mm_max_epu32(maxAll, _mm_shuffle_epi32(maxAll, _MM_SHUFFLE(1, 0, 3, 2)));
+	uint32_t mask = _mm_movemask_ps(_mm_castsi128_ps(_mm_cmpeq_epi32(maxAll, chunk1)));
+	mask |= ((uint32_t)_mm_movemask_ps(_mm_castsi128_ps(_mm_cmpeq_epi32(maxAll, chunk2)))) << 4;
+	mask |= ((uint32_t)_mm_movemask_ps(_mm_castsi128_ps(_mm_cmpeq_epi32(maxAll, chunk3)))) << 8;
+	prevTabWidth = np2_ctz(mask);
+
+#else
 	prevTabWidth = 0;
 	for (int i = 1; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
 		if (indentLineCount[i] > indentLineCount[prevTabWidth]) {
 			prevTabWidth = i;
 		}
 	}
+#endif
 	if (prevTabWidth != 0) {
 		const BOOL bTabsAsSpaces = prevTabWidth <= MAX_DETECTED_TAB_WIDTH;
 		lpfv->mask |= FV_TABSASSPACES;
@@ -884,12 +900,14 @@ labelStart:
 		}
 	}
 
-	//StopWatch_Stop(watch);
-	//const double duration = StopWatch_Get(&watch);
-	//printf("indentation %u, duration=%.06f, tab width=%d\n", (UINT)cbData, duration, prevTabWidth);
-	//for (int i = 0; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
-	//	printf("\tindentLineCount[%d] = %d\n", i, indentLineCount[i]);
-	//}
+#if 0
+	StopWatch_Stop(watch);
+	const double duration = StopWatch_Get(&watch);
+	printf("indentation %u, duration=%.06f, tab width=%d\n", (UINT)cbData, duration, prevTabWidth);
+	for (int i = 0; i < MAX_DETECTED_TAB_WIDTH + 2; i++) {
+		printf("\tindentLineCount[%d] = %u\n", i, indentLineCount[i]);
+	}
+#endif
 }
 
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, LPBOOL lpbBOM) {
