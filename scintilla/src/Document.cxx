@@ -555,12 +555,12 @@ Sci::Line Document::GetFoldParent(Sci::Line line) const noexcept {
 	const int level = LevelNumber(GetLevel(line));
 	Sci::Line lineLook = line - 1;
 	while ((lineLook > 0) && (
-		(!LevelIsWhitespace(GetLevel(lineLook))) ||
+		(!LevelIsHeader(GetLevel(lineLook))) ||
 		(LevelNumber(GetLevel(lineLook)) >= level))
 		) {
 		lineLook--;
 	}
-	if (LevelIsWhitespace(GetLevel(lineLook)) &&
+	if (LevelIsHeader(GetLevel(lineLook)) &&
 		(LevelNumber(GetLevel(lineLook)) < level)) {
 		return lineLook;
 	} else {
