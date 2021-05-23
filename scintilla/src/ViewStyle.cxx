@@ -80,10 +80,8 @@ ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicat
 	foldmarginColour = source.foldmarginColour;
 	foldmarginHighlightColour = source.foldmarginHighlightColour;
 
-	hotspotColours = source.hotspotColours;
 	hotspotUnderline = source.hotspotUnderline;
 
-	whitespaceColours = source.whitespaceColours;
 	controlCharSymbol = source.controlCharSymbol;
 	controlCharWidth = source.controlCharWidth;
 	selbar = source.selbar;
@@ -189,21 +187,34 @@ void ViewStyle::Init(size_t stylesSize_) {
 	spaceWidth = 8;
 	tabWidth = spaceWidth * 8;
 
-	selection.colours.fore.reset();
-	selection.colours.back = ColourAlpha(0xc0, 0xc0, 0xc0);
-	selection.additionalForeground = ColourAlpha(0xff, 0, 0);
-	selection.additionalBackground = ColourAlpha(0xd7, 0xd7, 0xd7);
-	selection.background2 = ColourAlpha(0xb0, 0xb0, 0xb0);
-	selection.alpha = SC_ALPHA_NOALPHA;
-	selection.additionalAlpha = SC_ALPHA_NOALPHA;
+	// Default is for no selection foregrounds
+	elementColours.erase(SC_ELEMENT_SELECTION_TEXT);
+	elementColours.erase(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT);
+	elementColours.erase(SC_ELEMENT_SELECTION_SECONDARY_TEXT);
+	elementColours.erase(SC_ELEMENT_SELECTION_NO_FOCUS_TEXT);
+	// Shades of grey for selection backgrounds
+	elementBaseColours[SC_ELEMENT_SELECTION_BACK] = ColourAlpha(0xc0, 0xc0, 0xc0, 0xff);
+	elementBaseColours[SC_ELEMENT_SELECTION_ADDITIONAL_BACK] = ColourAlpha(0xd7, 0xd7, 0xd7, 0xff);
+	elementBaseColours[SC_ELEMENT_SELECTION_SECONDARY_BACK] = ColourAlpha(0xb0, 0xb0, 0xb0, 0xff);
+	elementBaseColours[SC_ELEMENT_SELECTION_NO_FOCUS_BACK] = ColourAlpha(0x80, 0x80, 0x80, 0x3f);
+	elementAllowsTranslucent.insert({
+		SC_ELEMENT_SELECTION_TEXT,
+		SC_ELEMENT_SELECTION_BACK,
+		SC_ELEMENT_SELECTION_ADDITIONAL_TEXT,
+		SC_ELEMENT_SELECTION_ADDITIONAL_BACK,
+		SC_ELEMENT_SELECTION_SECONDARY_TEXT,
+		SC_ELEMENT_SELECTION_SECONDARY_BACK,
+		SC_ELEMENT_SELECTION_NO_FOCUS_TEXT,
+		SC_ELEMENT_SELECTION_BACK,
+		SC_ELEMENT_SELECTION_NO_FOCUS_BACK,
+	});
+	selection.layer = Layer::base;
 	selection.eolFilled = false;
 	selection.eolSelectedWidth = 100;
 
 	foldmarginColour.reset();
 	foldmarginHighlightColour.reset();
 
-	whitespaceColours.fore.reset();
-	whitespaceColours.back.reset();
 	whitespaceForeAlpha = SC_ALPHA_NOALPHA;
 	controlCharSymbol = 0;	/* Draw the control characters */
 	controlCharWidth = 0;
@@ -212,23 +223,27 @@ void ViewStyle::Init(size_t stylesSize_) {
 	styles[STYLE_LINENUMBER].fore = ColourAlpha(0, 0, 0);
 	styles[STYLE_LINENUMBER].back = Platform::Chrome();
 
-	caret.colour = ColourAlpha(0, 0, 0);
-	caret.additionalColour = ColourAlpha(0x7f, 0x7f, 0x7f);
+	elementBaseColours[SC_ELEMENT_CARET] = ColourAlpha(0, 0, 0);
+	elementBaseColours[SC_ELEMENT_CARET_ADDITIONAL] = ColourAlpha(0x7f, 0x7f, 0x7f);
+	elementAllowsTranslucent.insert({
+		SC_ELEMENT_CARET,
+		SC_ELEMENT_CARET_ADDITIONAL,
+	});
 	caret.style = CARETSTYLE_LINE;
 	caret.width = 1;
 
-	caretLine.background = ColourAlpha(0xff, 0xff, 0);
-	caretLine.show = false;
+	elementColours.erase(SC_ELEMENT_CARET_LINE_BACK);
+	elementAllowsTranslucent.insert(SC_ELEMENT_CARET_LINE_BACK);
 	caretLine.alwaysShow = false;
-	caretLine.alpha = SC_ALPHA_NOALPHA;
+	caretLine.layer = Layer::base;
 	caretLine.frame = 0;
 
 	someStylesProtected = false;
 	someStylesForceCase = false;
 
-	hotspotColours.fore.reset();
-	hotspotColours.back.reset();
 	hotspotUnderline = true;
+	elementColours.erase(SC_ELEMENT_HOT_SPOT_ACTIVE);
+	elementAllowsTranslucent.insert(SC_ELEMENT_HOT_SPOT_ACTIVE);
 
 	leftMarginWidth = 1;
 	rightMarginWidth = 1;
@@ -243,6 +258,9 @@ void ViewStyle::Init(size_t stylesSize_) {
 	viewWhitespace = WhiteSpace::invisible;
 	tabDrawMode = TabDrawMode::longArrow;
 	whitespaceSize = 1;
+	elementColours.erase(SC_ELEMENT_WHITE_SPACE);
+	elementAllowsTranslucent.insert(SC_ELEMENT_WHITE_SPACE);
+
 	viewIndentationGuides = IndentView::none;
 	viewEOL = false;
 	extraFontFlag = 0;
@@ -442,9 +460,10 @@ int ViewStyle::GetFrameWidth() const noexcept {
 	return std::clamp(caretLine.frame, 1, lineHeight / 3);
 }
 
-bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept {
-	return caretLine.frame && (caretActive || caretLine.alwaysShow) && caretLine.show &&
-		(caretLine.alpha == SC_ALPHA_NOALPHA) && lineContainsCaret;
+bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const {
+	return caretLine.frame && (caretActive || caretLine.alwaysShow) &&
+		ElementColour(SC_ELEMENT_CARET_LINE_BACK) &&
+		(caretLine.layer == Layer::base) && lineContainsCaret;
 }
 
 // See if something overrides the line background colour:  Either if caret is on the line
@@ -453,17 +472,17 @@ bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) cons
 // display itself (as long as it's not an SC_MARK_EMPTY marker).  These are checked in order
 // with the earlier taking precedence.  When multiple markers cause background override,
 // the colour for the highest numbered one is used.
-std::optional<ColourAlpha> ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept {
+std::optional<ColourAlpha> ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
 	std::optional<ColourAlpha> background;
-	if (!caretLine.frame && (caretActive || caretLine.alwaysShow) && caretLine.show &&
-		(caretLine.alpha == SC_ALPHA_NOALPHA) && lineContainsCaret) {
-		background = caretLine.background;
+	if (!caretLine.frame && (caretActive || caretLine.alwaysShow) &&
+		(caretLine.layer == Layer::base) && lineContainsCaret) {
+		background = ElementColour(SC_ELEMENT_CARET_LINE_BACK);
 	}
 	if (!background && marksOfLine) {
 		MarkerMask marks = marksOfLine;
 		for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
 			if ((marks & 1) && (markers[markBit].markType == SC_MARK_BACKGROUND) &&
-				(markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
+				(markers[markBit].layer == Layer::base)) {
 				background = markers[markBit].back;
 			}
 			marks >>= 1;
@@ -474,27 +493,34 @@ std::optional<ColourAlpha> ViewStyle::Background(MarkerMask marksOfLine, bool ca
 		if (marksMasked) {
 			for (int markBit = 0; (markBit < MarkerBitCount) && marksMasked; markBit++) {
 				if ((marksMasked & 1) &&
-					(markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
+					(markers[markBit].layer == Layer::base)) {
 					background = markers[markBit].back;
 				}
 				marksMasked >>= 1;
 			}
 		}
 	}
-	return background;
+	if (background) {
+		return background->Opaque();
+	} else {
+		return {};
+	}
 }
 
 bool ViewStyle::SelectionBackgroundDrawn() const noexcept {
-	return selection.colours.back &&
-		((selection.alpha == SC_ALPHA_NOALPHA) || (selection.additionalAlpha == SC_ALPHA_NOALPHA));
+	return selection.layer == Layer::base;
 }
 
-bool ViewStyle::SelectionTextDrawn() const noexcept {
-	return selection.colours.fore.has_value();
+bool ViewStyle::SelectionTextDrawn() const {
+	return
+		ElementIsSet(SC_ELEMENT_SELECTION_TEXT) ||
+		ElementIsSet(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT) ||
+		ElementIsSet(SC_ELEMENT_SELECTION_SECONDARY_TEXT) ||
+		ElementIsSet(SC_ELEMENT_SELECTION_NO_FOCUS_TEXT);
 }
 
-bool ViewStyle::WhitespaceBackgroundDrawn() const noexcept {
-	return (viewWhitespace != WhiteSpace::invisible) && (whitespaceColours.back);
+bool ViewStyle::WhitespaceBackgroundDrawn() const {
+	return (viewWhitespace != WhiteSpace::invisible) && (ElementIsSet(SC_ELEMENT_WHITE_SPACE_BACK));
 }
 
 bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
@@ -503,8 +529,8 @@ bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
 		viewWhitespace == WhiteSpace::visibleAlways;
 }
 
-ColourAlpha ViewStyle::WrapColour() const noexcept {
-	return whitespaceColours.fore.value_or(styles[STYLE_DEFAULT].fore);
+ColourAlpha ViewStyle::WrapColour() const {
+	return ElementColour(SC_ELEMENT_WHITE_SPACE).value_or(styles[STYLE_DEFAULT].fore);
 }
 
 // Insert new edge in sorted order.
@@ -525,11 +551,50 @@ std::optional<ColourAlpha> ViewStyle::ElementColour(int element) const {
 			return search->second;
 		}
 	}
+	const auto searchBase = elementBaseColours.find(element);
+	if (searchBase != elementBaseColours.end()) {
+		if (searchBase->second.has_value()) {
+			return searchBase->second;
+		}
+	}
 	return {};
 }
 
 bool ViewStyle::ElementAllowsTranslucent(int element) const {
-	return elementAllowsTranslucent.count(element) > 0;
+	return elementAllowsTranslucent.count(element) != 0;
+}
+
+bool ViewStyle::ResetElement(int element) {
+	const auto search = elementColours.find(element);
+	const bool changed = (search != elementColours.end()) && (search->second.has_value());
+	elementColours.erase(element);
+	return changed;
+}
+
+bool ViewStyle::SetElementColour(int element, ColourAlpha colour) {
+	const auto search = elementColours.find(element);
+	const bool changed =
+		(search == elementColours.end()) ||
+		(search->second.has_value() && !(*search->second == colour));
+	elementColours[element] = colour;
+	return changed;
+}
+
+bool ViewStyle::ElementIsSet(int element) const {
+	const auto search = elementColours.find(element);
+	if (search != elementColours.end()) {
+		return search->second.has_value();
+	}
+	return false;
+}
+
+bool ViewStyle::SetElementBase(int element, ColourAlpha colour) {
+	const auto search = elementBaseColours.find(element);
+	const bool changed =
+		(search == elementBaseColours.end()) ||
+		(search->second.has_value() && !(*search->second == colour));
+	elementBaseColours[element] = colour;
+	return changed;
 }
 
 bool ViewStyle::SetWrapState(int wrapState_) noexcept {
@@ -689,7 +754,7 @@ FontRealised *ViewStyle::Find(const FontSpecification &fs) const {
 	return nullptr;
 }
 
-void ViewStyle::FindMaxAscentDescent() {
+void ViewStyle::FindMaxAscentDescent() noexcept {
 	auto ascent = maxAscent;
 	auto descent = maxDescent;
 	for (const auto &font : fonts) {

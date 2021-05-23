@@ -1549,7 +1549,7 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 #endif
 	// find next close brace
 	const Sci_Position iPos = SciCall_BraceMatchNext(pos, startPos);
-	if (iPos != -1) {
+	if (iPos >= 0) {
 		// style may not matched when iPos > SciCall_GetEndStyled() (e.g. iPos on next line), see Document::BraceMatch()
 #if 0
 		SciCall_EnsureStyledTo(iPos + 1);
@@ -1557,7 +1557,7 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 		// TODO: retry when style not matched
 		if (SciCall_GetStyleAt(pos) == SciCall_GetStyleAt(iPos)) {
 			// check whether next close brace already matched
-			return pos == 0 || SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(pos)) == -1;
+			return pos == 0 || SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(pos)) < 0;
 		}
 	}
 	return FALSE;

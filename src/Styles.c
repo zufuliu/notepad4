@@ -417,6 +417,8 @@ enum ANSIArtStyleIndex {
 
 #define IMEIndicatorDefaultColor	RGB(0x10, 0x80, 0x10)
 #define MarkOccurrencesDefaultAlpha	100
+#define SelectionDefaultAlpha		95
+#define CaretLineDefaultAlpha		90
 
 #define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
 #define	BookmarkLineDefaultColor	RGB(0, 0xff, 0)
@@ -1665,25 +1667,27 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//! begin Selection
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Selection].szValue;
 	// never change text color on selecting.
-	SciCall_SetSelFore(FALSE, 0);
-
+	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_TEXT);
+	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT);
+	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_SECONDARY_TEXT);
+	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_NO_FOCUS_TEXT);
 	// always set background color
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
 	}
-	SciCall_SetSelBack(TRUE, rgb);
-	SciCall_SetElementColor(SC_ELEMENT_LIST_SELECTED_BACK, rgb);
-	if (Style_StrGetForeColor(szValue, &rgb)) {
-		SciCall_SetAdditionalSelBack(rgb);
-	}
-
 	if (!Style_StrGetAlpha(szValue, &iValue)) {
-		iValue = SC_ALPHA_NOALPHA;
+		iValue = SelectionDefaultAlpha;
 	}
-	SciCall_SetSelAlpha(iValue);
-	if (Style_StrGetOutlineAlpha(szValue, &iValue)) {
-		SciCall_SetAdditionalSelAlpha(iValue);
-	}
+	SciCall_SetSelectionLayer(SC_LAYER_OVER_TEXT);
+	SciCall_SetElementColor(SC_ELEMENT_LIST_SELECTED_BACK, rgb);
+	SciCall_SetElementColor(SC_ELEMENT_SELECTION_BACK, ColorAlpha(rgb, iValue));
+	// additional selection
+	Style_StrGetForeColor(szValue, &rgb);
+	Style_StrGetOutlineAlpha(szValue, &iValue);
+	rgb = ColorAlpha(rgb, iValue);
+	SciCall_SetElementColor(SC_ELEMENT_SELECTION_ADDITIONAL_BACK, rgb);
+	SciCall_SetElementColor(SC_ELEMENT_SELECTION_SECONDARY_BACK, rgb);
+	//SciCall_SetElementColor(SC_ELEMENT_SELECTION_NO_FOCUS_BACK, rgb);
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
 	if (!Style_StrGetSize(szValue, &iValue)) {
@@ -1695,23 +1699,22 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//! begin Whitespace
 	szValue = pLexGlobal->Styles[GlobalStyleIndex_Whitespace].szValue;
 	if (Style_StrGetForeColor(szValue, &rgb)) {
-		SciCall_SetWhitespaceFore(TRUE, rgb);
+		if (!Style_StrGetAlpha(szValue, &iValue)) {
+			iValue = SC_ALPHA_OPAQUE;
+		}
+		SciCall_SetElementColor(SC_ELEMENT_WHITE_SPACE, ColorAlpha(rgb, iValue));
 	} else {
-		SciCall_SetWhitespaceFore(FALSE, 0);
+		SciCall_ResetElementColor(SC_ELEMENT_WHITE_SPACE);
 	}
 	if (Style_StrGetBackColor(szValue, &rgb)) {
-		SciCall_SetWhitespaceBack(TRUE, rgb);
+		SciCall_SetElementColor(SC_ELEMENT_WHITE_SPACE_BACK, ColorAlpha(rgb, SC_ALPHA_OPAQUE));
 	} else {
-		SciCall_SetWhitespaceBack(FALSE, 0);
+		SciCall_ResetElementColor(SC_ELEMENT_WHITE_SPACE_BACK);
 	}
-	if (!Style_StrGetAlpha(szValue, &iValue)) {
-		iValue = SC_ALPHA_NOALPHA;
-	}
-	SciCall_SetWhitespaceForeAlpha(iValue);
 	//! end Whitespace
 
 	//! begin Caret
-	const COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
+	COLORREF backColor = SciCall_StyleGetBack(STYLE_DEFAULT);
 	COLORREF foreColor = SciCall_StyleGetFore(STYLE_DEFAULT);
 	SciCall_SetElementColor(SC_ELEMENT_LIST, foreColor);
 	SciCall_SetElementColor(SC_ELEMENT_LIST_BACK, backColor);
@@ -1723,11 +1726,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (!VerifyContrast(rgb, backColor)) {
 		rgb = foreColor;
 	}
-	SciCall_SetCaretFore(rgb);
+	rgb = ColorAlpha(rgb, SC_ALPHA_OPAQUE);
+	SciCall_SetElementColor(SC_ELEMENT_CARET, rgb);
 	// additional caret fore
 	if (Style_StrGetBackColor(szValue, &rgb) && VerifyContrast(rgb, backColor)) {
-		SciCall_SetAdditionalCaretFore(rgb);
+		rgb = ColorAlpha(rgb, SC_ALPHA_OPAQUE);
 	}
+	SciCall_SetElementColor(SC_ELEMENT_CARET_ADDITIONAL, rgb);
 	//! end Caret
 
 	// IME indicator
@@ -1785,16 +1790,20 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 #endif
 
 		uint64_t iMarkerIDs = CodeFoldingMarkerList;
+		highlightColor = ColorAlpha(highlightColor, SC_ALPHA_OPAQUE);
+		foreColor = ColorAlpha(foreColor, SC_ALPHA_OPAQUE);
+		backColor = ColorAlpha(backColor, SC_ALPHA_OPAQUE);
 		do {
 			const int marker = (int)(iMarkerIDs & 0xff);
-			SciCall_MarkerSetBack(marker, foreColor);
-			SciCall_MarkerSetFore(marker, backColor);
-			SciCall_MarkerSetBackSelected(marker, highlightColor);
+			SciCall_MarkerSetBackTranslucent(marker, foreColor);
+			SciCall_MarkerSetForeTranslucent(marker, backColor);
+			SciCall_MarkerSetBackSelectedTranslucent(marker, highlightColor);
 			iMarkerIDs >>= 8;
 		} while (iMarkerIDs);
 
-		SciCall_MarkerSetFore(SC_MARKNUM_FOLDER, fillColor);
-		SciCall_MarkerSetFore(SC_MARKNUM_FOLDEREND, fillColor);
+		fillColor = ColorAlpha(fillColor, SC_ALPHA_OPAQUE);
+		SciCall_MarkerSetForeTranslucent(SC_MARKNUM_FOLDER, fillColor);
+		SciCall_MarkerSetForeTranslucent(SC_MARKNUM_FOLDEREND, fillColor);
 
 		Style_SetDefaultStyle(GlobalStyleIndex_FoldDispalyText);
 	} // end set folding style
@@ -3110,7 +3119,6 @@ void Style_SetLongLineColors(void) {
 // Style_HighlightCurrentLine()
 //
 void Style_HighlightCurrentLine(void) {
-	SciCall_SetCaretLineVisible(FALSE);
 	if (iHighlightCurrentLine != 0) {
 		LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentLine].szValue;
 		// 1: background color, 2: outline frame
@@ -3124,14 +3132,13 @@ void Style_HighlightCurrentLine(void) {
 			}
 
 			SciCall_SetCaretLineFrame(size);
-			SciCall_SetCaretLineBack(rgb);
+			SciCall_SetCaretLineLayer(SC_LAYER_OVER_TEXT);
 
 			int alpha;
 			if (!Style_StrGetAlphaEx(outline, szValue, &alpha)) {
-				alpha = SC_ALPHA_NOALPHA;
+				alpha = CaretLineDefaultAlpha;
 			}
-			SciCall_SetCaretLineBackAlpha(alpha);
-			SciCall_SetCaretLineVisible(TRUE);
+			SciCall_SetElementColor(SC_ELEMENT_CARET_LINE_BACK, ColorAlpha(rgb, alpha));
 		}
 	}
 }
@@ -3181,9 +3188,10 @@ void Style_SetBookmark(void) {
 		sprintf(bookmark_pixmap_color, bookmark_pixmap_color_fmt, iBookmarkImageColor);
 		SciCall_MarkerDefinePixmap(MarkerNumber_Bookmark, bookmark_pixmap);
 #else
-		SciCall_MarkerSetBack(MarkerNumber_Bookmark, iBookmarkImageColor);
+		iBookmarkImageColor = ColorAlpha(iBookmarkImageColor, SC_ALPHA_OPAQUE);
+		SciCall_MarkerSetBackTranslucent(MarkerNumber_Bookmark, iBookmarkImageColor);
 		// set same color to avoid showing edge.
-		SciCall_MarkerSetFore(MarkerNumber_Bookmark, iBookmarkImageColor);
+		SciCall_MarkerSetForeTranslucent(MarkerNumber_Bookmark, iBookmarkImageColor);
 		SciCall_MarkerDefine(MarkerNumber_Bookmark, SC_MARK_VERTICALBOOKMARK);
 #endif
 	} else {
@@ -3195,8 +3203,9 @@ void Style_SetBookmark(void) {
 		if (!Style_StrGetAlpha(szValue, &iBookmarkLineAlpha)) {
 			iBookmarkLineAlpha = BookmarkLineDefaultAlpha;
 		}
-		SciCall_MarkerSetBack(MarkerNumber_Bookmark, iBookmarkLineColor);
-		SciCall_MarkerSetAlpha(MarkerNumber_Bookmark, iBookmarkLineAlpha);
+		iBookmarkLineColor = ColorAlpha(iBookmarkLineColor, iBookmarkLineAlpha);
+		SciCall_MarkerSetBackTranslucent(MarkerNumber_Bookmark, iBookmarkLineColor);
+		SciCall_MarkerSetLayer(MarkerNumber_Bookmark, SC_LAYER_OVER_TEXT);
 		SciCall_MarkerDefine(MarkerNumber_Bookmark, SC_MARK_BACKGROUND);
 	}
 	bBookmarkColorUpdated = FALSE;
@@ -3558,8 +3567,9 @@ BOOL Style_StrGetAlphaEx(BOOL outline, LPCWSTR lpszStyle, int *alpha) {
 
 	if (p != NULL) {
 		p += outline ? CSTRLEN(L"outline:") : CSTRLEN(L"alpha:");
-		if (CRTStrToInt(p, alpha)) {
-			*alpha = clamp_i(*alpha, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
+		int iValue;
+		if (CRTStrToInt(p, &iValue)) {
+			*alpha = clamp_i(iValue, SC_ALPHA_TRANSPARENT, SC_ALPHA_OPAQUE);
 			return TRUE;
 		}
 	}

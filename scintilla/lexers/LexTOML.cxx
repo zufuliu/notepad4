@@ -156,6 +156,8 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						keyState = TOMLKeyState_Unquoted;
 					}
 					break;
+				default:
+					break;
 				}
 				if (keyState == TOMLKeyState_Unquoted) {
 					if (sc.ch == '\'') {

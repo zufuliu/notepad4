@@ -164,6 +164,10 @@ public:
 		return PRectangle(left + delta, top + delta, right - delta, bottom - delta);
 	}
 
+	constexpr PRectangle Inset(Point delta) const noexcept {
+		return PRectangle(left + delta.x, top + delta.y, right - delta.x, bottom - delta.y);
+	}
+
 	constexpr Point Centre() const noexcept {
 		return Point((left + right) / 2, (top + bottom) / 2);
 	}
@@ -274,6 +278,28 @@ public:
 		const unsigned int green = (GetGreen() + other.GetGreen()) / 2;
 		const unsigned int blue = (GetBlue() + other.GetBlue()) / 2;
 		const unsigned int alpha = (GetAlpha() + other.GetAlpha()) / 2;
+		return ColourAlpha(red, green, blue, alpha);
+	}
+
+#if 0
+	constexpr static unsigned int Mixed(unsigned char a, unsigned char b, double proportion) noexcept {
+		return static_cast<unsigned int>(a + proportion * (b - a));
+	}
+
+	constexpr ColourAlpha MixedWith(ColourAlpha other, double proportion) const noexcept {
+		return ColourAlpha(
+			Mixed(GetRed(), other.GetRed(), proportion),
+			Mixed(GetGreen(), other.GetGreen(), proportion),
+			Mixed(GetBlue(), other.GetBlue(), proportion),
+			Mixed(GetAlpha(), other.GetAlpha(), proportion));
+	}
+#endif
+	static constexpr ColourAlpha MixAlpha(ColourAlpha colour, ColourAlpha other) noexcept {
+		unsigned int alpha = other.GetAlpha();
+		const unsigned int red = (other.GetRed()*alpha + colour.GetRed()*(255 ^ alpha)) >> 8;
+		const unsigned int green = (other.GetGreen()*alpha + colour.GetGreen()*(255 ^ alpha)) >> 8;
+		const unsigned int blue = (other.GetBlue()*alpha + colour.GetBlue()*(255 ^ alpha)) >> 8;
+		alpha = (alpha*alpha + colour.GetAlpha()*(255 ^ alpha)) >> 8;
 		return ColourAlpha(red, green, blue, alpha);
 	}
 

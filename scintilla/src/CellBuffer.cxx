@@ -1396,7 +1396,7 @@ void CellBuffer::BasicDeleteChars(const Sci::Position position, const Sci::Posit
 	if (deleteLength == 0)
 		return;
 
-	Sci::Line lineRecalculateStart = INVALID_POSITION;
+	Sci::Line lineRecalculateStart = Sci::invalidPosition;
 
 	if ((position == 0) && (deleteLength == substance.Length())) {
 		// If whole buffer is being deleted, faster to reinitialise lines data

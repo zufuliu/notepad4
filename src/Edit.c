@@ -3698,7 +3698,7 @@ void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iPos = SciCall_GetLineSelEndPosition(iLine);
-			if (iPos != INVALID_POSITION) {
+			if (iPos >= 0) {
 				iMaxColumn = max_pos(iMaxColumn, SciCall_GetColumn(iPos));
 			}
 		}
@@ -3714,7 +3714,7 @@ void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iLineSelEndPos = SciCall_GetLineSelEndPosition(iLine);
-			if (bIsRectangular && INVALID_POSITION == iLineSelEndPos) {
+			if (bIsRectangular && iLineSelEndPos < 0) {
 				continue;
 			}
 
@@ -4609,7 +4609,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 	iNewCol = min_pos(iNewCol, iLineEndPos);
 	const Sci_Position iNewPos = SciCall_FindColumn(iNewLine - 1, iNewCol - 1);
 	// SciCall_GotoPos(pos) is equivalent to SciCall_SetSel(-1, pos)
-	EditSelectEx(-1, iNewPos);
+	EditSelectEx(INVALID_POSITION, iNewPos);
 	SciCall_ChooseCaretX();
 }
 
@@ -5577,7 +5577,7 @@ void EditFindNext(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	Sci_Position iPos = SciCall_FindText(searchFlags, &ttf);
 	BOOL bSuppressNotFound = FALSE;
 
-	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap && !fExtendSelection) {
+	if (iPos < 0 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(searchFlags, &ttf);
@@ -5586,7 +5586,7 @@ void EditFindNext(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 		}
 	}
 
-	if (iPos == -1) {
+	if (iPos < 0) {
 		// not found
 		if (!bSuppressNotFound) {
 			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
@@ -5620,7 +5620,7 @@ void EditFindPrev(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 	const Sci_Position iLength = SciCall_GetLength();
 	BOOL bSuppressNotFound = FALSE;
 
-	if (iPos == -1 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
+	if (iPos < 0 && ttf.chrg.cpMin < iLength && !lpefr->bNoFindWrap && !fExtendSelection) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap2", IDS_FIND_WRAPRE)) {
 			ttf.chrg.cpMin = iLength;
 			iPos = SciCall_FindText(searchFlags, &ttf);
@@ -5629,7 +5629,7 @@ void EditFindPrev(LPCEDITFINDREPLACE lpefr, BOOL fExtendSelection) {
 		}
 	}
 
-	if (iPos == -1) {
+	if (iPos < 0) {
 		// not found
 		if (!bSuppressNotFound) {
 			InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
@@ -5663,7 +5663,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 	Sci_Position iPos = SciCall_FindText(searchFlags, &ttf);
 	BOOL bSuppressNotFound = FALSE;
 
-	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
+	if (iPos < 0 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(searchFlags, &ttf);
@@ -5672,7 +5672,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 		}
 	}
 
-	if (iPos == -1) {
+	if (iPos < 0) {
 		// not found
 		LocalFree(pszReplace2);
 		if (!bSuppressNotFound) {
@@ -5696,7 +5696,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 	iPos = SciCall_FindText(searchFlags, &ttf);
 	bSuppressNotFound = FALSE;
 
-	if (iPos == -1 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
+	if (iPos < 0 && ttf.chrg.cpMin > 0 && !lpefr->bNoFindWrap) {
 		if (IDOK == InfoBoxInfo(MB_OKCANCEL, L"MsgFindWrap1", IDS_FIND_WRAPFW)) {
 			ttf.chrg.cpMin = 0;
 			iPos = SciCall_FindText(searchFlags, &ttf);
@@ -5705,7 +5705,7 @@ BOOL EditReplace(HWND hwnd, LPCEDITFINDREPLACE lpefr) {
 		}
 	}
 
-	if (iPos != -1) {
+	if (iPos >= 0) {
 		EditSelectEx(ttf.chrgText.cpMin, ttf.chrgText.cpMax);
 	} else {
 		iPos = SciCall_GetTargetEnd();
@@ -6068,7 +6068,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
-	while (SciCall_FindText(searchFlags, &ttf) != -1) {
+	while (SciCall_FindText(searchFlags, &ttf) >= 0) {
 		if (++iCount == 1) {
 			SciCall_BeginUndoAction();
 		}
@@ -6141,7 +6141,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
 	BOOL fCancel = FALSE;
-	while (!fCancel && SciCall_FindText(searchFlags, &ttf) != -1) {
+	while (!fCancel && SciCall_FindText(searchFlags, &ttf) >= 0) {
 		if (ttf.chrgText.cpMin >= SciCall_GetSelectionStart() && ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
 			if (++iCount == 1) {
 				SciCall_BeginUndoAction();
@@ -7233,13 +7233,13 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	while (iStartPos < iEndPos) {
 		ft.chrg.cpMin = iStartPos;
 		Sci_Position iPos = SciCall_FindText(findFlag, &ft);
-		if (iPos == -1) {
+		if (iPos < 0) {
 			break;
 		}
 
 		iStartPos = iPos + 1;
 		iPos = SciCall_BraceMatchNext(iPos, ft.chrgText.cpMax);
-		iEndPos = (iPos == -1) ? iLineEnd : iPos;
+		iEndPos = (iPos < 0) ? iLineEnd : iPos;
 		if (iCurrentPos >= iStartPos && iCurrentPos <= iEndPos) {
 			iLineStart = iStartPos;
 			iLineEnd = iEndPos;

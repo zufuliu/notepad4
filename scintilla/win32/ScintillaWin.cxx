@@ -438,8 +438,8 @@ class ScintillaWin final :
 	void Finalise() noexcept override;
 #if defined(USE_D2D)
 	void EnsureRenderTarget(HDC hdc) noexcept;
-	void DropRenderTarget() noexcept;
 #endif
+	void DropRenderTarget() noexcept;
 	HWND MainHWND() const noexcept;
 #if DebugDragAndDropDataFormat
 	void EnumDataSourceFormat(const char *tag, LPDATAOBJECT pIDataSource);
@@ -509,6 +509,7 @@ class ScintillaWin final :
 	void SetMouseCapture(bool on) noexcept override;
 	bool HaveMouseCapture() noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
+	void UpdateBaseElements() override;
 	bool SCICALL PaintContains(PRectangle rc) const noexcept override;
 	void ScrollText(Sci::Line linesToMove) override;
 	void NotifyCaretMove() noexcept override;
@@ -734,9 +735,7 @@ void ScintillaWin::Finalise() noexcept {
 		FineTickerCancel(tr);
 	}
 	SetIdle(false);
-#if defined(USE_D2D)
 	DropRenderTarget();
-#endif
 	::RevokeDragDrop(MainHWND());
 	//if (SUCCEEDED(hrOle)) {
 	//	::OleUninitialize();
@@ -759,7 +758,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 
 		// Create a Direct2D render target.
 #if 1
-		D2D1_RENDER_TARGET_PROPERTIES drtp;
+		D2D1_RENDER_TARGET_PROPERTIES drtp {};
 		drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
 		drtp.pixelFormat.format = DXGI_FORMAT_UNKNOWN;
 		drtp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_UNKNOWN;
@@ -783,7 +782,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 			}
 
 		} else {
-			D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp;
+			D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp {};
 			dhrtp.hwnd = hw;
 			dhrtp.pixelSize = size;
 			dhrtp.presentOptions = (technology == SC_TECHNOLOGY_DIRECTWRITERETAIN) ?
@@ -822,12 +821,13 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 		}
 	}
 }
+#endif
 
 void ScintillaWin::DropRenderTarget() noexcept {
+#if defined(USE_D2D)
 	ReleaseUnknown(pRenderTarget);
-}
-
 #endif
+}
 
 HWND ScintillaWin::MainHWND() const noexcept {
 	return HwndFromWindow(wMain);
@@ -1113,7 +1113,7 @@ sptr_t ScintillaWin::HandleCompositionWindowed(uptr_t wParam, sptr_t lParam) {
 
 			// Set new position after converted
 			const Point pos = PointMainCaret();
-			COMPOSITIONFORM CompForm;
+			COMPOSITIONFORM CompForm {};
 			CompForm.dwStyle = CFS_POINT;
 			CompForm.ptCurrentPos = POINTFromPoint(pos);
 			::ImmSetCompositionWindow(imc.hIMC, &CompForm);
@@ -2133,10 +2133,8 @@ sptr_t ScintillaWin::SciMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 				} else {
 					bidirectional = EditModel::Bidirectional::bidiDisabled;
 				}
-#if defined(USE_D2D)
 				DropRenderTarget();
 				view.bufferedDraw = technologyNew == SC_TECHNOLOGY_DEFAULT;
-#endif
 				technology = technologyNew;
 				// Invalidate all cached information including layout.
 				vs.fontsValid = false;
@@ -2176,6 +2174,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_CREATE:
 			ctrlID = ::GetDlgCtrlID(MainHWND());
+			UpdateBaseElements();
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
 			::RegisterDragDrop(MainHWND(), &dt);
@@ -2252,6 +2251,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_SETTINGCHANGE:
 			//Platform::DebugPrintf("Setting Changed\n");
+			UpdateBaseElements();
 			InvalidateStyleData();
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
@@ -2266,6 +2266,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 
 		case WM_SYSCOLORCHANGE:
 			//Platform::DebugPrintf("Setting Changed\n");
+			UpdateBaseElements();
 			InvalidateStyleData();
 			break;
 
@@ -2497,6 +2498,23 @@ void ScintillaWin::SetTrackMouseLeaveEvent(bool on) noexcept {
 		TrackMouseEvent(&tme);
 	}
 	trackedMouseLeave = on;
+}
+
+void ScintillaWin::UpdateBaseElements() {
+	struct ElementToIndex { int element; int nIndex; };
+	const ElementToIndex eti[] = {
+		{ SC_ELEMENT_LIST, COLOR_WINDOWTEXT },
+		{ SC_ELEMENT_LIST_BACK, COLOR_WINDOW },
+		{ SC_ELEMENT_LIST_SELECTED, COLOR_HIGHLIGHTTEXT },
+		{ SC_ELEMENT_LIST_SELECTED_BACK, COLOR_HIGHLIGHT },
+	};
+	bool changed = false;
+	for (const ElementToIndex &ei : eti) {
+		changed = vs.SetElementBase(ei.element, ColourAlpha::FromRGB(::GetSysColor(ei.nIndex))) || changed;
+	}
+	if (changed) {
+		Redraw();
+	}
 }
 
 bool ScintillaWin::PaintContains(PRectangle rc) const noexcept {
@@ -3393,11 +3411,23 @@ void ScintillaWin::ScrollMessage(WPARAM wParam) {
 		break;
 	case SB_PAGEUP:
 		topLineNew -= LinesToScroll(); break;
-	case SB_PAGEDOWN: topLineNew += LinesToScroll(); break;
-	case SB_TOP: topLineNew = 0; break;
-	case SB_BOTTOM: topLineNew = MaxScrollPos(); break;
-	case SB_THUMBPOSITION: topLineNew = sci.nTrackPos; break;
-	case SB_THUMBTRACK: topLineNew = sci.nTrackPos; break;
+	case SB_PAGEDOWN:
+		topLineNew += LinesToScroll();
+		break;
+	case SB_TOP:
+		topLineNew = 0;
+		break;
+	case SB_BOTTOM:
+		topLineNew = MaxScrollPos();
+		break;
+	case SB_THUMBPOSITION:
+		topLineNew = sci.nTrackPos;
+		break;
+	case SB_THUMBTRACK:
+		topLineNew = sci.nTrackPos;
+		break;
+	default:
+		break;
 	}
 	ScrollTo(topLineNew);
 }
@@ -3439,6 +3469,8 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 		}
 	}
 	break;
+	default:
+		break;
 	}
 	HorizontalScrollTo(xPos);
 }

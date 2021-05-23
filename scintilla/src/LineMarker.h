@@ -13,12 +13,14 @@ class RGBAImage;
 
 typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, int part, int marginStyle, const void *lineMarker);
 
+enum class Layer { base = 0, under = 1, over = 2 };
+
 struct LineMarkerBase {
 	int markType = SC_MARK_CIRCLE;
 	ColourAlpha fore = ColourAlpha(0, 0, 0);
 	ColourAlpha back = ColourAlpha(0xff, 0xff, 0xff);
 	ColourAlpha backSelected = ColourAlpha(0xff, 0x00, 0x00);
-	int alpha = SC_ALPHA_NOALPHA;
+	Layer layer = Layer::base;
 	XYPOSITION strokeWidth = 1.0f;
 	/** Some platforms, notably PLAT_CURSES, do not support Scintilla's native
 	 * Draw function for drawing line markers. Allow those platforms to override

@@ -408,7 +408,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 				}
 
-				if (sc.chNext == ':' && ( sc.ch == ':' || sc.ch == '<' || sc.ch == '>')) {
+				if (sc.chNext == ':' && (sc.ch == ':' || sc.ch == '<' || sc.ch == '>')) {
 					// type after ::, <:, >:
 					maybeType = true;
 					sc.Forward();

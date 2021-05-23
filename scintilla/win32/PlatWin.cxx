@@ -2463,7 +2463,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 			static_cast<FLOAT>(rc.Height()),
 			&pTextLayout);
 		if (SUCCEEDED(hr)) {
-			D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase - yAscent));
+			const D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase - yAscent));
 			pRenderTarget->DrawTextLayout(origin, pTextLayout, pBrush, d2dDrawTextOptions);
 			ReleaseUnknown(pTextLayout);
 		}
@@ -3038,8 +3038,8 @@ class ListBoxX final : public ListBox {
 	unsigned int aveCharWidth = 8;
 	COLORREF colorText = 0;
 	COLORREF colorBackground = 0;
-	COLORREF colorHighlight = 0;
 	COLORREF colorHighlightText = 0;
+	COLORREF colorHighlightBack = 0;
 	Window *parent = nullptr;
 	int ctrlID = 0;
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
@@ -3311,8 +3311,8 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 			rcImage.right = rcBox.left;
 			// The image is not highlighted
 			FillRectColour(pDrawItem->hDC, &rcImage, colorBackground);
-			FillRectColour(pDrawItem->hDC, &rcBox, colorHighlight);
-			::SetBkColor(pDrawItem->hDC, colorHighlight);
+			FillRectColour(pDrawItem->hDC, &rcBox, colorHighlightBack);
+			::SetBkColor(pDrawItem->hDC, colorHighlightBack);
 			::SetTextColor(pDrawItem->hDC, colorHighlightText);
 		} else {
 			FillRectColour(pDrawItem->hDC, &pDrawItem->rcItem, colorBackground);
@@ -3444,8 +3444,8 @@ void ListBoxX::SetList(const char *list, const char separator, const char typese
 void ListBoxX::SetOptions(ListOptions options_) noexcept {
 	colorText = ColourOfElement(options_.fore, COLOR_WINDOWTEXT);
 	colorBackground = ColourOfElement(options_.back, COLOR_WINDOW);
-	colorHighlight = ColourOfElement(options_.backSelected, COLOR_HIGHLIGHT);
 	colorHighlightText = ColourOfElement(options_.foreSelected, COLOR_HIGHLIGHTTEXT);
+	colorHighlightBack = ColourOfElement(options_.backSelected, COLOR_HIGHLIGHT);
 }
 
 void ListBoxX::AdjustWindowRect(PRectangle *rc, UINT dpi) noexcept {
@@ -3534,6 +3534,8 @@ void ListBoxX::ResizeToCursor() {
 	case HTBOTTOMRIGHT:
 		rc.bottom = pt.y;
 		rc.right = pt.x;
+		break;
+	default:
 		break;
 	}
 
@@ -3655,6 +3657,9 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 			hit = HTERROR;
 	}
 	break;
+
+	default:
+		break;
 	}
 
 	return hit;

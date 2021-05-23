@@ -413,6 +413,8 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						case GoFunction_Param:
 							funcState = GoFunction_Return;
 							break;
+						default:
+							break;
 						}
 						break;
 					case ')':

@@ -104,9 +104,9 @@ public:
 	/// Get image by id.
 	RGBAImage *Get(int ident) const;
 	/// Give the largest height of the set.
-	int GetHeight() const;
+	int GetHeight() const noexcept;
 	/// Give the largest width of the set.
-	int GetWidth() const;
+	int GetWidth() const noexcept;
 };
 
 }

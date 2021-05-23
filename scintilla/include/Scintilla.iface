@@ -408,13 +408,13 @@ val SC_MASK_FOLDERS=0xFE000000
 fun void MarkerDefine=2040(int markerNumber, MarkerSymbol markerSymbol)
 
 # Set the foreground colour used for a particular marker number.
-set void MarkerSetFore=2041(int markerNumber, colour fore)
+#set void MarkerSetFore=2041(int markerNumber, colour fore)
 
 # Set the background colour used for a particular marker number.
-set void MarkerSetBack=2042(int markerNumber, colour back)
+#set void MarkerSetBack=2042(int markerNumber, colour back)
 
 # Set the background colour used for a particular marker number when its folding block is selected.
-set void MarkerSetBackSelected=2292(int markerNumber, colour back)
+#set void MarkerSetBackSelected=2292(int markerNumber, colour back)
 
 # Set the foreground colour used for a particular marker number.
 set void MarkerSetForeTranslucent=2294(int markerNumber, colouralpha fore)
@@ -457,7 +457,13 @@ fun void MarkerDefinePixmap=2049(int markerNumber, string pixmap)
 fun void MarkerAddSet=2466(line line, int markerSet)
 
 # Set the alpha used for a marker that is drawn in the text area, not the margin.
-set void MarkerSetAlpha=2476(int markerNumber, Alpha alpha)
+#set void MarkerSetAlpha=2476(int markerNumber, Alpha alpha)
+
+# Get the layer used for a marker that is drawn in the text area, not the margin.
+get Layer MarkerGetLayer=2734(int markerNumber,)
+
+# Set the layer used for a marker that is drawn in the text area, not the margin.
+set void MarkerSetLayer=2735(int markerNumber, Layer layer)
 
 val SC_MAX_MARGIN=4
 
@@ -688,6 +694,21 @@ val SC_ELEMENT_LIST=0
 val SC_ELEMENT_LIST_BACK=1
 val SC_ELEMENT_LIST_SELECTED=2
 val SC_ELEMENT_LIST_SELECTED_BACK=3
+val SC_ELEMENT_SELECTION_TEXT=10
+val SC_ELEMENT_SELECTION_BACK=11
+val SC_ELEMENT_SELECTION_ADDITIONAL_TEXT=12
+val SC_ELEMENT_SELECTION_ADDITIONAL_BACK=13
+val SC_ELEMENT_SELECTION_SECONDARY_TEXT=14
+val SC_ELEMENT_SELECTION_SECONDARY_BACK=15
+val SC_ELEMENT_SELECTION_NO_FOCUS_TEXT=16
+val SC_ELEMENT_SELECTION_NO_FOCUS_BACK=17
+val SC_ELEMENT_CARET=40
+val SC_ELEMENT_CARET_ADDITIONAL=41
+val SC_ELEMENT_CARET_LINE_BACK=50
+val SC_ELEMENT_WHITE_SPACE=60
+val SC_ELEMENT_WHITE_SPACE_BACK=61
+val SC_ELEMENT_HOT_SPOT_ACTIVE=70
+val SC_ELEMENT_HOT_SPOT_ACTIVE_BACK=71
 
 # Set the colour of an element. Translucency (alpha) may or may not be significant
 # and this may depend on the platform. The alpha byte should commonly be 0xff for opaque.
@@ -706,17 +727,20 @@ get bool GetElementIsSet=2756(Element element,)
 # Get whether an element supports translucency.
 get bool GetElementAllowsTranslucent=2757(Element element,)
 
+# Get the colour of an element.
+get colouralpha GetElementBaseColour=2758(Element element,)
+
 # Set the foreground colour of the main and additional selections and whether to use this setting.
-fun void SetSelFore=2067(bool useSetting, colour fore)
+#fun void SetSelFore=2067(bool useSetting, colour fore)
 
 # Set the background colour of the main and additional selections and whether to use this setting.
-fun void SetSelBack=2068(bool useSetting, colour back)
+#fun void SetSelBack=2068(bool useSetting, colour back)
 
 # Get the alpha of the selection.
-get Alpha GetSelAlpha=2477(,)
+#get Alpha GetSelAlpha=2477(,)
 
 # Set the alpha of the selection.
-set void SetSelAlpha=2478(Alpha alpha,)
+#set void SetSelAlpha=2478(Alpha alpha,)
 
 # Is the selection end of line filled?
 get bool GetSelEOLFilled=2479(,)
@@ -727,8 +751,25 @@ set void SetSelEOLFilled=2480(bool filled,)
 # Set the eol-is-selected rectangle width.
 set void SetEOLSelectedWidth=2475(int percent,)
 
+enu Layer=SC_LAYER_
+val SC_LAYER_BASE=0
+val SC_LAYER_UNDER_TEXT=1
+val SC_LAYER_OVER_TEXT=2
+
+# Get the layer for drawing selections
+get Layer GetSelectionLayer=2762(,)
+
+# Set the layer for drawing selections: either opaquely on base layer or translucently over text
+set void SetSelectionLayer=2763(Layer layer,)
+
+# Get the layer of the background of the line containing the caret.
+get Layer GetCaretLineLayer=2764(,)
+
+# Set the layer of the background of the line containing the caret.
+set void SetCaretLineLayer=2765(Layer layer,)
+
 # Set the foreground colour of the caret.
-set void SetCaretFore=2069(colour fore,)
+#set void SetCaretFore=2069(colour fore,)
 
 # When key+modifier combination keyDefinition is pressed perform sciCommand.
 fun void AssignCmdKey=2070(keymod keyDefinition, int sciCommand)
@@ -879,24 +920,16 @@ set void IndicSetStrokeWidth=2751(int indicator, int hundredths)
 get int IndicGetStrokeWidth=2752(int indicator,)
 
 # Set the foreground colour of all whitespace and whether to use this setting.
-fun void SetWhitespaceFore=2084(bool useSetting, colour fore)
+#fun void SetWhitespaceFore=2084(bool useSetting, colour fore)
 
 # Set the background colour of all whitespace and whether to use this setting.
-fun void SetWhitespaceBack=2085(bool useSetting, colour back)
+#fun void SetWhitespaceBack=2085(bool useSetting, colour back)
 
 # Set the size of the dots used to mark space characters.
 set void SetWhitespaceSize=2086(int size,)
 
 # Get the size of the dots used to mark space characters.
 get int GetWhitespaceSize=2087(,)
-
-
-# Set the foreground alpha of all whitespace.
-set void SetWhitespaceForeAlpha=2091(Alpha alpha,)
-
-# Get the foreground alpha of all whitespace.
-get Alpha GetWhitespaceForeAlpha=2109(,)
-
 
 # Used to hold extra styling information for each line.
 set void SetLineState=2092(line line, int state)
@@ -908,16 +941,16 @@ get int GetLineState=2093(line line,)
 get int GetMaxLineState=2094(,)
 
 # Is the background of the line containing the caret in a different colour?
-get bool GetCaretLineVisible=2095(,)
+#get bool GetCaretLineVisible=2095(,)
 
 # Display the background of the line containing the caret in a different colour.
-set void SetCaretLineVisible=2096(bool show,)
+#set void SetCaretLineVisible=2096(bool show,)
 
 # Get the colour of the background of the line containing the caret.
-get colour GetCaretLineBack=2097(,)
+#get colour GetCaretLineBack=2097(,)
 
 # Set the colour of the background of the line containing the caret.
-set void SetCaretLineBack=2098(colour back,)
+#set void SetCaretLineBack=2098(colour back,)
 
 # Retrieve the caret line frame width.
 # Width = 0 means this option is disabled.
@@ -1097,7 +1130,7 @@ get position GetLineEndPosition=2136(line line,)
 get int GetCodePage=2137(,)
 
 # Get the foreground colour of the caret.
-get colour GetCaretFore=2138(,)
+#get colour GetCaretFore=2138(,)
 
 # In read-only mode?
 get bool GetReadOnly=2140(,)
@@ -2218,16 +2251,16 @@ set void SetPrintWrapMode=2406(Wrap wrapMode,)
 get Wrap GetPrintWrapMode=2407(,)
 
 # Set a fore colour for active hotspots.
-set void SetHotspotActiveFore=2410(bool useSetting, colour fore)
+#set void SetHotspotActiveFore=2410(bool useSetting, colour fore)
 
 # Get the fore colour for active hotspots.
-get colour GetHotspotActiveFore=2494(,)
+#get colour GetHotspotActiveFore=2494(,)
 
 # Set a back colour for active hotspots.
-set void SetHotspotActiveBack=2411(bool useSetting, colour back)
+#set void SetHotspotActiveBack=2411(bool useSetting, colour back)
 
 # Get the back colour for active hotspots.
-get colour GetHotspotActiveBack=2495(,)
+#get colour GetHotspotActiveBack=2495(,)
 
 # Enable / Disable underlining active hotspots.
 set void SetHotspotActiveUnderline=2412(bool underline,)
@@ -2462,10 +2495,10 @@ get bool GetPasteConvertEndings=2468(,)
 fun void SelectionDuplicate=2469(,)
 
 # Set background alpha of the caret line.
-set void SetCaretLineBackAlpha=2470(Alpha alpha,)
+#set void SetCaretLineBackAlpha=2470(Alpha alpha,)
 
 # Get the background alpha of the caret line.
-get Alpha GetCaretLineBackAlpha=2471(,)
+#get Alpha GetCaretLineBackAlpha=2471(,)
 
 enu CaretStyle=CARETSTYLE_
 val CARETSTYLE_INVISIBLE=0
@@ -2810,23 +2843,23 @@ get int GetRectangularSelectionModifier=2599(,)
 
 # Set the foreground colour of additional selections.
 # Must have previously called SetSelFore with non-zero first argument for this to have an effect.
-set void SetAdditionalSelFore=2600(colour fore,)
+#set void SetAdditionalSelFore=2600(colour fore,)
 
 # Set the background colour of additional selections.
 # Must have previously called SetSelBack with non-zero first argument for this to have an effect.
-set void SetAdditionalSelBack=2601(colour back,)
+#set void SetAdditionalSelBack=2601(colour back,)
 
 # Set the alpha of the selection.
-set void SetAdditionalSelAlpha=2602(Alpha alpha,)
+#set void SetAdditionalSelAlpha=2602(Alpha alpha,)
 
 # Get the alpha of the selection.
-get Alpha GetAdditionalSelAlpha=2603(,)
+#get Alpha GetAdditionalSelAlpha=2603(,)
 
 # Set the foreground colour of additional carets.
-set void SetAdditionalCaretFore=2604(colour fore,)
+#set void SetAdditionalCaretFore=2604(colour fore,)
 
 # Get the foreground colour of additional carets.
-get colour GetAdditionalCaretFore=2605(,)
+#get colour GetAdditionalCaretFore=2605(,)
 
 # Set the main selection to the next selection.
 fun void RotateSelection=2606(,)

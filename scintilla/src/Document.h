@@ -168,6 +168,14 @@ constexpr int LevelNumber(int level) noexcept {
 	return level & SC_FOLDLEVELNUMBERMASK;
 }
 
+constexpr bool LevelIsHeader(int level) noexcept {
+	return (level & SC_FOLDLEVELHEADERFLAG) == SC_FOLDLEVELHEADERFLAG;
+}
+
+constexpr bool LevelIsWhitespace(int level) noexcept {
+	return (level & SC_FOLDLEVELWHITEFLAG) == SC_FOLDLEVELWHITEFLAG;
+}
+
 class LexInterface {
 protected:
 	Document *pdoc;

@@ -37,6 +37,10 @@ LRESULT SCI_METHOD Scintilla_DirectFunction(HANDLE handle, UINT msg, WPARAM wPar
 
 typedef unsigned int Sci_MarkerMask;
 
+NP2_inline COLORREF ColorAlpha(COLORREF rgb, UINT alpha) {
+	return rgb | (alpha << 24);
+}
+
 NP2_inline Sci_Position min_pos(Sci_Position x, Sci_Position y) {
 	return (x < y) ? x : y;
 }
@@ -473,22 +477,6 @@ NP2_inline void SciCall_SetRectangularSelectionAnchor(Sci_Position anchor) {
 	SciCall(SCI_SETRECTANGULARSELECTIONANCHOR, anchor, 0);
 }
 
-NP2_inline void SciCall_SetAdditionalSelAlpha(int alpha) {
-	SciCall(SCI_SETADDITIONALSELALPHA, alpha, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalSelFore(COLORREF fore) {
-	SciCall(SCI_SETADDITIONALSELFORE, fore, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalSelBack(COLORREF back) {
-	SciCall(SCI_SETADDITIONALSELBACK, back, 0);
-}
-
-NP2_inline void SciCall_SetAdditionalCaretFore(COLORREF fore) {
-	SciCall(SCI_SETADDITIONALCARETFORE, fore, 0);
-}
-
 NP2_inline void SciCall_SetAdditionalCaretsBlink(BOOL additionalCaretsBlink) {
 	SciCall(SCI_SETADDITIONALCARETSBLINK, additionalCaretsBlink, 0);
 }
@@ -539,18 +527,6 @@ NP2_inline void SciCall_SetEndAtLastLine(int endAtLastLine) {
 
 NP2_inline void SciCall_SetViewWS(int viewWS) {
 	SciCall(SCI_SETVIEWWS, viewWS, 0);
-}
-
-NP2_inline void SciCall_SetWhitespaceFore(BOOL useSetting, COLORREF fore) {
-	SciCall(SCI_SETWHITESPACEFORE, useSetting, fore);
-}
-
-NP2_inline void SciCall_SetWhitespaceBack(BOOL useSetting, COLORREF back) {
-	SciCall(SCI_SETWHITESPACEBACK, useSetting, back);
-}
-
-NP2_inline void SciCall_SetWhitespaceForeAlpha(int alpha) {
-	SciCall(SCI_SETWHITESPACEFOREALPHA, alpha, 0);
 }
 
 NP2_inline void SciCall_SetWhitespaceSize(int size) {
@@ -704,16 +680,16 @@ NP2_inline void SciCall_SetElementColor(int element, COLORREF color) {
 	SciCall(SCI_SETELEMENTCOLOUR, element, color);
 }
 
-NP2_inline void SciCall_SetSelFore(BOOL useSetting, COLORREF fore) {
-	SciCall(SCI_SETSELFORE, useSetting, fore);
+NP2_inline COLORREF SciCall_GetElementColour(int element) {
+	return (COLORREF)SciCall(SCI_GETELEMENTCOLOUR, element, 0);
 }
 
-NP2_inline void SciCall_SetSelBack(BOOL useSetting, COLORREF back) {
-	SciCall(SCI_SETSELBACK, useSetting, back);
+NP2_inline void SciCall_ResetElementColor(int element) {
+	SciCall(SCI_RESETELEMENTCOLOUR, element, 0);
 }
 
-NP2_inline void SciCall_SetSelAlpha(int alpha) {
-	SciCall(SCI_SETSELALPHA, alpha, 0);
+NP2_inline void SciCall_SetSelectionLayer(int layer) {
+	SciCall(SCI_SETSELECTIONLAYER, layer, 0);
 }
 
 NP2_inline void SciCall_SetSelEOLFilled(BOOL filled) {
@@ -724,20 +700,8 @@ NP2_inline void SciCall_SetEOLSelectedWidth(int percent) {
 	SciCall(SCI_SETEOLSELECTEDWIDTH, percent, 0);
 }
 
-NP2_inline void SciCall_SetCaretFore(COLORREF fore) {
-	SciCall(SCI_SETCARETFORE, fore, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineVisible(BOOL show) {
-	SciCall(SCI_SETCARETLINEVISIBLE, show, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineBack(COLORREF back) {
-	SciCall(SCI_SETCARETLINEBACK, back, 0);
-}
-
-NP2_inline void SciCall_SetCaretLineBackAlpha(int alpha) {
-	SciCall(SCI_SETCARETLINEBACKALPHA, alpha, 0);
+NP2_inline void SciCall_SetCaretLineLayer(int layer) {
+	SciCall(SCI_SETCARETLINELAYER, layer, 0);
 }
 
 NP2_inline void SciCall_SetCaretLineFrame(int width) {
@@ -945,20 +909,20 @@ NP2_inline int SciCall_MarkerSymbolDefined(int markerNumber) {
 	return (int)SciCall(SCI_MARKERSYMBOLDEFINED, markerNumber, 0);
 }
 
-NP2_inline void SciCall_MarkerSetFore(int markerNumber, COLORREF fore) {
-	SciCall(SCI_MARKERSETFORE, markerNumber, fore);
+NP2_inline void SciCall_MarkerSetForeTranslucent(int markerNumber, COLORREF fore) {
+	SciCall(SCI_MARKERSETFORETRANSLUCENT, markerNumber, fore);
 }
 
-NP2_inline void SciCall_MarkerSetBack(int markerNumber, COLORREF back) {
-	SciCall(SCI_MARKERSETBACK, markerNumber, back);
+NP2_inline void SciCall_MarkerSetBackTranslucent(int markerNumber, COLORREF back) {
+	SciCall(SCI_MARKERSETBACKTRANSLUCENT, markerNumber, back);
 }
 
-NP2_inline void SciCall_MarkerSetBackSelected(int markerNumber, COLORREF back) {
-	SciCall(SCI_MARKERSETBACKSELECTED, markerNumber, back);
+NP2_inline void SciCall_MarkerSetBackSelectedTranslucent(int markerNumber, COLORREF back) {
+	SciCall(SCI_MARKERSETBACKSELECTEDTRANSLUCENT, markerNumber, back);
 }
 
-NP2_inline void SciCall_MarkerSetAlpha(int markerNumber, int alpha) {
-	SciCall(SCI_MARKERSETALPHA, markerNumber, alpha);
+NP2_inline void SciCall_MarkerSetLayer(int markerNumber, int layer) {
+	SciCall(SCI_MARKERSETLAYER, markerNumber, layer);
 }
 
 NP2_inline void SciCall_MarkerSetStrokeWidth(int markerNumber, int hundredths) {

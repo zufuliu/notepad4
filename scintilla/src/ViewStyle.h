@@ -65,46 +65,24 @@ constexpr std::optional<ColourAlpha> OptionalColour(uptr_t wParam, sptr_t lParam
 	}
 }
 
-struct ForeBackColours {
-	std::optional<ColourAlpha> fore;
-	std::optional<ColourAlpha> back;
-};
-
 struct SelectionAppearance {
-	// Colours of main selection
-	ForeBackColours colours;
-	// Colours of additional (non-main) selections
-	ColourAlpha additionalForeground;
-	ColourAlpha additionalBackground;
-	// Background colour on X when not primary selection
-	ColourAlpha background2;
-	// Translucency. SC_ALPHA_NOALPHA: draw selection background beneath text
-	int alpha;
-	// Translucency of additional selections
-	int additionalAlpha;
+	// Whether to draw on base layer or over text
+	Layer layer;
 	// Draw selection past line end characters up to right border
 	bool eolFilled;
 	int eolSelectedWidth;
 };
 
 struct CaretLineAppearance {
-	// Colour of caret line
-	ColourAlpha background;
-	// Whether to show the caret line
-	bool show;
+	// Whether to draw on base layer or over text
+	Layer layer;
 	// Also show when non-focused
 	bool alwaysShow;
-	// Translucency.  SC_ALPHA_NOALPHA: draw selection background beneath text
-	int alpha;
 	// Non-0: draw a rectangle around line instead of filling line. Value is pixel width of frame
 	int frame;
 };
 
 struct CaretAppearance {
-	// Colour of caret
-	ColourAlpha colour;
-	// Colour of additional (non-main) carets
-	ColourAlpha additionalColour;
 	// Line, block, over-strike bar ...
 	int style;
 	// Width in pixels
@@ -158,7 +136,6 @@ public:
 
 	SelectionAppearance selection;
 
-	ForeBackColours whitespaceColours;
 	int whitespaceForeAlpha;
 	int controlCharSymbol;
 	XYPOSITION controlCharWidth;
@@ -166,7 +143,6 @@ public:
 	ColourAlpha selbarlight;
 	std::optional<ColourAlpha> foldmarginColour;
 	std::optional<ColourAlpha> foldmarginHighlightColour;
-	ForeBackColours hotspotColours;
 	bool hotspotUnderline;
 	/// Margins are ordered: Line Numbers, Selection Margin, Spacing Margin
 	int leftMarginWidth;	///< Spacing margin on left of text
@@ -212,6 +188,7 @@ public:
 
 	using ElementMap = std::map<int, std::optional<ColourAlpha>>;
 	ElementMap elementColours;
+	ElementMap elementBaseColours;
 	std::set<int> elementAllowsTranslucent;
 
 	WrapAppearance wrap;
@@ -242,17 +219,21 @@ public:
 	bool ValidStyle(size_t styleIndex) const noexcept;
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;
-	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const noexcept;
-	std::optional<ColourAlpha> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const noexcept;
-	bool SelectionTextDrawn() const noexcept;
+	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const;
+	std::optional<ColourAlpha> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
+	bool SelectionTextDrawn() const;
 	bool SelectionBackgroundDrawn() const noexcept;
-	bool WhitespaceBackgroundDrawn() const noexcept;
-	ColourAlpha WrapColour() const noexcept;
+	bool WhitespaceBackgroundDrawn() const;
+	ColourAlpha WrapColour() const;
 
 	void AddMultiEdge(uptr_t wParam, sptr_t lParam);
 
 	std::optional<ColourAlpha> ElementColour(int element) const;
 	bool ElementAllowsTranslucent(int element) const;
+	bool ResetElement(int element);
+	bool SetElementColour(int element, ColourAlpha colour);
+	bool ElementIsSet(int element) const;
+	bool SetElementBase(int element, ColourAlpha colour);
 
 	bool SetWrapState(int wrapState_) noexcept;
 	bool SetWrapVisualFlags(int wrapVisualFlags_) noexcept;
@@ -275,7 +256,7 @@ private:
 	void AllocStyles(size_t sizeNew);
 	void CreateAndAddFont(const FontSpecification &fs);
 	FontRealised *Find(const FontSpecification &fs) const;
-	void FindMaxAscentDescent();
+	void FindMaxAscentDescent() noexcept;
 };
 
 }

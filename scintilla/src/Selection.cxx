@@ -357,7 +357,7 @@ void Selection::AddSelectionWithoutTrim(SelectionRange range) {
 	mainRange = ranges.size() - 1;
 }
 
-void Selection::DropSelection(size_t r) {
+void Selection::DropSelection(size_t r) noexcept {
 	if ((ranges.size() > 1) && (r < ranges.size())) {
 		size_t mainNew = mainRange;
 		if (mainNew >= r) {
@@ -439,7 +439,7 @@ void Selection::Reset() noexcept {
 	}
 }
 
-void Selection::RemoveDuplicates() {
+void Selection::RemoveDuplicates() noexcept {
 	for (size_t i = 0; i < ranges.size() - 1; i++) {
 		if (ranges[i].Empty()) {
 			size_t j = i + 1;

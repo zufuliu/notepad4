@@ -331,8 +331,8 @@ constexpr unsigned char escapeValue(unsigned char ch) noexcept {
 	case 't':	return '\t';
 	case 'v':	return '\v';
 	case 'e':	return '\x1B';
+	default:	return 0;
 	}
-	return 0;
 }
 
 constexpr int GetHexDigit(unsigned char ch) noexcept {

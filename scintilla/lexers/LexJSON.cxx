@@ -217,6 +217,8 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						chNext = styler.SafeGetCharAt(i + 1);
 					}
 					break;
+				default:
+					break;
 				}
 			}
 		}

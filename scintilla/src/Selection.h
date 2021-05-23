@@ -12,7 +12,7 @@ class SelectionPosition {
 	Sci::Position position;
 	Sci::Position virtualSpace;
 public:
-	explicit SelectionPosition(Sci::Position position_ = INVALID_POSITION, Sci::Position virtualSpace_ = 0) noexcept : position(position_), virtualSpace(virtualSpace_) {
+	explicit SelectionPosition(Sci::Position position_ = Sci::invalidPosition, Sci::Position virtualSpace_ = 0) noexcept : position(position_), virtualSpace(virtualSpace_) {
 		PLATFORM_ASSERT(virtualSpace < 800000);
 		if (virtualSpace < 0)
 			virtualSpace = 0;
@@ -171,7 +171,7 @@ public:
 	void SetSelection(SelectionRange range);
 	void AddSelection(SelectionRange range);
 	void AddSelectionWithoutTrim(SelectionRange range);
-	void DropSelection(size_t r);
+	void DropSelection(size_t r) noexcept;
 	void DropAdditionalRanges();
 	void TentativeSelection(SelectionRange range);
 	void CommitTentative() noexcept;
@@ -181,7 +181,7 @@ public:
 	Sci::Position VirtualSpaceFor(Sci::Position pos) const noexcept;
 	void Clear();
 	void Reset() noexcept;
-	void RemoveDuplicates();
+	void RemoveDuplicates() noexcept;
 	void RotateMain() noexcept;
 	bool Tentative() const noexcept {
 		return tentativeMain;

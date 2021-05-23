@@ -130,6 +130,50 @@ ColourAlpha MixedWith_sse2(ColourAlpha colour, ColourAlpha other) noexcept {
 }
 #endif // MixedWith
 
+#if 0 // MixAlpha
+constexpr unsigned int Mixed(unsigned char a, unsigned char b, double proportion) noexcept {
+	return static_cast<unsigned int>(a + proportion * (b - a));
+}
+
+ColourAlpha MixedWithProportion(ColourAlpha colour, ColourAlpha other) noexcept {
+	const double proportion = other.GetAlpha() / 255.0f;
+	return ColourAlpha(
+		Mixed(colour.GetRed(), other.GetRed(), proportion),
+		Mixed(colour.GetGreen(), other.GetGreen(), proportion),
+		Mixed(colour.GetBlue(), other.GetBlue(), proportion),
+		Mixed(colour.GetAlpha(), other.GetAlpha(), proportion));
+}
+
+ColourAlpha MixAlpha(ColourAlpha colour, ColourAlpha other) noexcept {
+	unsigned int alpha = other.GetAlpha();
+	const unsigned int red = (other.GetRed()*alpha + colour.GetRed()*(255 ^ alpha)) / 255;
+	const unsigned int green = (other.GetGreen()*alpha + colour.GetGreen()*(255 ^ alpha)) / 255;
+	const unsigned int blue = (other.GetBlue()*alpha + colour.GetBlue()*(255 ^ alpha)) / 255;
+	alpha = (alpha*alpha + colour.GetAlpha()*(255 ^ alpha)) / 255;
+	return ColourAlpha(red, green, blue, alpha);
+}
+
+#if NP2_USE_AVX2
+ColourAlpha MixAlpha_sse4(ColourAlpha colour, ColourAlpha other) noexcept {
+	__m128i i16x4Fore = unpack_color_epi16_sse4_si32(other.AsInteger());
+	__m128i i16x4Back = unpack_color_epi16_sse4_si32(colour.AsInteger());
+	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, _MM_SHUFFLE(3, 3, 3, 3));
+	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
+	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
+	return ColourAlpha(color);
+}
+#endif
+
+ColourAlpha MixAlpha_sse2(ColourAlpha colour, ColourAlpha other) noexcept {
+	__m128i i16x4Fore = unpack_color_epi16_sse2_si32(other.AsInteger());
+	__m128i i16x4Back = unpack_color_epi16_sse2_si32(colour.AsInteger());
+	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, _MM_SHUFFLE(3, 3, 3, 3));
+	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
+	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
+	return ColourAlpha(color);
+}
+#endif // MixAlpha
+
 #if 0 // AlphaBlend
 ColourAlpha AlphaBlend(ColourAlpha fore, ColourAlpha back, unsigned int alpha) noexcept {
 	const unsigned int red = (fore.GetRed()*alpha + back.GetRed()*(255 ^ alpha)) / 255;
@@ -701,6 +745,17 @@ int __cdecl main() {
 #endif
 	printf("     sse2 %08x\n", MixedWith_sse2(fore, back).AsInteger());
 #endif // MixedWith
+
+#if 0 // MixAlpha
+	const ColourAlpha other = fore;
+	printf("MixAlpha(%08x, %08x, %02x):\n", back, other.AsInteger(), other.GetAlpha());
+	printf("    float %08x\n", MixedWithProportion(back, other).AsInteger());
+	printf("    scale %08x\n", MixAlpha(back, other).AsInteger());
+#if NP2_USE_AVX2
+	printf("     sse4 %08x\n", MixAlpha_sse4(back, other).AsInteger());
+#endif
+	printf("     sse2 %08x\n", MixAlpha_sse2(back, other).AsInteger());
+#endif // MixAlpha
 
 #if 0 // AlphaBlend
 	printf("AlphaBlend(%08x, %08x, %02x):\n", fore, back, alpha);

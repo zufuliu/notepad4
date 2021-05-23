@@ -520,7 +520,7 @@ void Document::ClearLevels() {
 }
 
 static bool IsSubordinate(int levelStart, int levelTry) noexcept {
-	if (levelTry & SC_FOLDLEVELWHITEFLAG)
+	if (LevelIsWhitespace(levelTry))
 		return true;
 	else
 		return LevelNumber(levelStart) < LevelNumber(levelTry);
@@ -536,14 +536,14 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, int level, Sci::Line last
 		EnsureStyledTo(LineStart(lineMaxSubord + 2));
 		if (!IsSubordinate(level, GetLevel(lineMaxSubord + 1)))
 			break;
-		if ((lookLastLine != -1) && (lineMaxSubord >= lookLastLine) && !(GetLevel(lineMaxSubord) & SC_FOLDLEVELWHITEFLAG))
+		if ((lookLastLine != -1) && (lineMaxSubord >= lookLastLine) && !LevelIsWhitespace(GetLevel(lineMaxSubord)))
 			break;
 		lineMaxSubord++;
 	}
 	if (lineMaxSubord > lineParent) {
 		if (level > LevelNumber(GetLevel(lineMaxSubord + 1))) {
 			// Have chewed up some whitespace that belongs to a parent so seek back
-			if (GetLevel(lineMaxSubord) & SC_FOLDLEVELWHITEFLAG) {
+			if (LevelIsWhitespace(GetLevel(lineMaxSubord))) {
 				lineMaxSubord--;
 			}
 		}
@@ -555,12 +555,12 @@ Sci::Line Document::GetFoldParent(Sci::Line line) const noexcept {
 	const int level = LevelNumber(GetLevel(line));
 	Sci::Line lineLook = line - 1;
 	while ((lineLook > 0) && (
-		(!(GetLevel(lineLook) & SC_FOLDLEVELHEADERFLAG)) ||
+		(!LevelIsWhitespace(GetLevel(lineLook))) ||
 		(LevelNumber(GetLevel(lineLook)) >= level))
 		) {
 		lineLook--;
 	}
-	if ((GetLevel(lineLook) & SC_FOLDLEVELHEADERFLAG) &&
+	if (LevelIsWhitespace(GetLevel(lineLook)) &&
 		(LevelNumber(GetLevel(lineLook)) < level)) {
 		return lineLook;
 	} else {
@@ -575,13 +575,13 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 	Sci::Line lookLine = line;
 	int lookLineLevel = level;
 	int lookLineLevelNum = LevelNumber(lookLineLevel);
-	while ((lookLine > 0) && ((lookLineLevel & SC_FOLDLEVELWHITEFLAG) ||
-		((lookLineLevel & SC_FOLDLEVELHEADERFLAG) && (lookLineLevelNum >= LevelNumber(GetLevel(lookLine + 1)))))) {
+	while ((lookLine > 0) && (LevelIsWhitespace(lookLineLevel) ||
+		(LevelIsHeader(lookLineLevel) && (lookLineLevelNum >= LevelNumber(GetLevel(lookLine + 1)))))) {
 		lookLineLevel = GetLevel(--lookLine);
 		lookLineLevelNum = LevelNumber(lookLineLevel);
 	}
 
-	Sci::Line beginFoldBlock = (lookLineLevel & SC_FOLDLEVELHEADERFLAG) ? lookLine : GetFoldParent(lookLine);
+	Sci::Line beginFoldBlock = LevelIsHeader(lookLineLevel) ? lookLine : GetFoldParent(lookLine);
 	if (beginFoldBlock == -1) {
 		highlightDelimiter.Clear();
 		return;
@@ -594,7 +594,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 		lookLineLevel = GetLevel(lookLine);
 		lookLineLevelNum = LevelNumber(lookLineLevel);
 		while ((lookLine >= 0) && (lookLineLevelNum >= SC_FOLDLEVELBASE)) {
-			if (lookLineLevel & SC_FOLDLEVELHEADERFLAG) {
+			if (LevelIsHeader(lookLineLevel)) {
 				if (GetLastChild(lookLine, -1, lookLastLine) == line) {
 					beginFoldBlock = lookLine;
 					endFoldBlock = line;
@@ -611,7 +611,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 		for (lookLine = line - 1, lookLineLevel = GetLevel(lookLine), lookLineLevelNum = LevelNumber(lookLineLevel);
 			lookLine >= beginFoldBlock;
 			lookLineLevel = GetLevel(--lookLine), lookLineLevelNum = LevelNumber(lookLineLevel)) {
-			if ((lookLineLevel & SC_FOLDLEVELWHITEFLAG) || (lookLineLevelNum > LevelNumber(level))) {
+			if (LevelIsWhitespace(lookLineLevel) || (lookLineLevelNum > LevelNumber(level))) {
 				firstChangeableLineBefore = lookLine;
 				break;
 			}
@@ -624,7 +624,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 	for (lookLine = line + 1, lookLineLevel = GetLevel(lookLine), lookLineLevelNum = LevelNumber(lookLineLevel);
 		lookLine <= endFoldBlock;
 		lookLineLevel = GetLevel(++lookLine), lookLineLevelNum = LevelNumber(lookLineLevel)) {
-		if ((lookLineLevel & SC_FOLDLEVELHEADERFLAG) && (lookLineLevelNum < LevelNumber(GetLevel(lookLine + 1)))) {
+		if (LevelIsHeader(lookLineLevel) && (lookLineLevelNum < LevelNumber(GetLevel(lookLine + 1)))) {
 			firstChangeableLineAfter = lookLine;
 			break;
 		}
@@ -966,14 +966,14 @@ Sci_Position SCI_METHOD Document::GetRelativePosition(Sci_Position positionStart
 		while (characterOffset != 0) {
 			const Sci::Position posNext = NextPosition(pos, increment);
 			if (posNext == pos)
-				return INVALID_POSITION;
+				return Sci::invalidPosition;
 			pos = posNext;
 			characterOffset -= increment;
 		}
 	} else {
 		pos = positionStart + characterOffset;
 		if ((pos < 0) || (pos > Length()))
-			return INVALID_POSITION;
+			return Sci::invalidPosition;
 	}
 	return pos;
 }
@@ -985,7 +985,7 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 		while (characterOffset != 0) {
 			const Sci::Position posNext = NextPosition(pos, increment);
 			if (posNext == pos)
-				return INVALID_POSITION;
+				return Sci::invalidPosition;
 			if (std::abs(pos - posNext) > 3)	// 4 byte character = 2*UTF16.
 				characterOffset -= increment;
 			pos = posNext;
@@ -994,7 +994,7 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 	} else {
 		pos = positionStart + characterOffset;
 		if ((pos < 0) || (pos > Length()))
-			return INVALID_POSITION;
+			return Sci::invalidPosition;
 	}
 	return pos;
 }

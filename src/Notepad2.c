@@ -1151,14 +1151,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_SETTINGCHANGE:
 		// TODO: detect system theme and high contrast mode changes
-		Style_UpdateCaret();
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
+		Style_SetLexer(pLexCurrent, FALSE);
 		break;
 
 	case WM_SYSCOLORCHANGE:
 		// update Scintilla colors
-		Style_SetLexer(pLexCurrent, FALSE);
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
+		Style_SetLexer(pLexCurrent, FALSE);
 		break;
 
 	//case WM_TIMER:
@@ -3683,7 +3683,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_FINDMATCHINGBRACE: {
-		Sci_Position iBrace2 = -1;
+		Sci_Position iBrace2 = INVALID_POSITION;
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
@@ -3695,14 +3695,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				iBrace2 = SciCall_BraceMatch(iPos);
 			}
 		}
-		if (iBrace2 != -1) {
+		if (iBrace2 >= 0) {
 			SciCall_GotoPos(iBrace2);
 		}
 	}
 	break;
 
 	case IDM_EDIT_SELTOMATCHINGBRACE: {
-		Sci_Position iBrace2 = -1;
+		Sci_Position iBrace2 = INVALID_POSITION;
 		Sci_Position iPos = SciCall_GetCurrentPos();
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
@@ -3714,7 +3714,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				iBrace2 = SciCall_BraceMatch(iPos);
 			}
 		}
-		if (iBrace2 != -1) {
+		if (iBrace2 >= 0) {
 			if (iBrace2 > iPos) {
 				SciCall_SetSel(iPos, iBrace2 + 1);
 			} else {
@@ -3730,11 +3730,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
 		Sci_Line iNextLine = SciCall_MarkerNext(iLine + 1, MarkerBitmask_Bookmark);
-		if (iNextLine == -1) {
+		if (iNextLine < 0) {
 			iNextLine = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
 		}
 
-		if (iNextLine != -1) {
+		if (iNextLine >= 0) {
 			editMarkAllStatus.ignoreSelectionUpdate = TRUE;
 			SciCall_EnsureVisible(iNextLine);
 			SciCall_GotoLine(iNextLine);
@@ -3750,12 +3750,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const Sci_Line iLine = SciCall_LineFromPosition(iPos);
 
 		Sci_Line iNextLine = SciCall_MarkerPrevious(iLine - 1, MarkerBitmask_Bookmark);
-		if (iNextLine == -1) {
+		if (iNextLine < 0) {
 			const Sci_Line nLines = SciCall_GetLineCount();
 			iNextLine = SciCall_MarkerPrevious(nLines, MarkerBitmask_Bookmark);
 		}
 
-		if (iNextLine != -1) {
+		if (iNextLine >= 0) {
 			editMarkAllStatus.ignoreSelectionUpdate = TRUE;
 			SciCall_EnsureVisible(iNextLine);
 			SciCall_GotoLine(iNextLine);
@@ -4123,7 +4123,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			scn.updated = NP2_CUSTOM_UPDATE;
 			SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, (LPARAM)&scn);
 		} else {
-			SciCall_BraceHighlight(-1, -1);
+			SciCall_BraceHighlight(INVALID_POSITION, INVALID_POSITION);
 		}
 		break;
 
@@ -4925,7 +4925,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					int ch = SciCall_GetCharAt(iPos);
 					if (IsBraceMatchChar(ch)) {
 						const Sci_Position iBrace2 = SciCall_BraceMatch(iPos);
-						if (iBrace2 != -1) {
+						if (iBrace2 >= 0) {
 							const Sci_Position col1 = SciCall_GetColumn(iPos);
 							const Sci_Position col2 = SciCall_GetColumn(iBrace2);
 							SciCall_BraceHighlight(iPos, iBrace2);
@@ -4939,7 +4939,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						ch = SciCall_GetCharAt(iPos);
 						if (IsBraceMatchChar(ch)) {
 							const Sci_Position iBrace2 = SciCall_BraceMatch(iPos);
-							if (iBrace2 != -1) {
+							if (iBrace2 >= 0) {
 								const Sci_Position col1 = SciCall_GetColumn(iPos);
 								const Sci_Position col2 = SciCall_GetColumn(iBrace2);
 								SciCall_BraceHighlight(iPos, iBrace2);
@@ -4949,7 +4949,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 								SciCall_SetHighlightGuide(0);
 							}
 						} else {
-							SciCall_BraceHighlight(-1, -1);
+							SciCall_BraceHighlight(INVALID_POSITION, INVALID_POSITION);
 							SciCall_SetHighlightGuide(0);
 						}
 					}
@@ -5038,7 +5038,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				} else {
 					const int chNext = (brace == '(') ? ')' : brace + 2;
 					if (ch == chNext) {
-						if (SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(iCurPos)) == -1) {
+						if (SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(iCurPos)) < 0) {
 							*(braces + 1) = L'\0'; // delete close brace
 						}
 					} else {

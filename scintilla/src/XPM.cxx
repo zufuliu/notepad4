@@ -345,7 +345,7 @@ RGBAImage *RGBAImageSet::Get(int ident) const {
 }
 
 /// Give the largest height of the set.
-int RGBAImageSet::GetHeight() const {
+int RGBAImageSet::GetHeight() const noexcept {
 	int h = height;
 	if (h < 0) {
 		for (const auto &image : images) {
@@ -357,7 +357,7 @@ int RGBAImageSet::GetHeight() const {
 }
 
 /// Give the largest width of the set.
-int RGBAImageSet::GetWidth() const {
+int RGBAImageSet::GetWidth() const noexcept {
 	int w = width;
 	if (w < 0) {
 		for (const auto &image : images) {

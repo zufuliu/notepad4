@@ -225,14 +225,14 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 			bool needWhiteClosure = false;
 			if (vs.ms[margin].mask & SC_MASK_FOLDERS) {
 				const int level = model.pdoc->GetLevel(model.pcs->DocFromDisplay(visibleLine));
-				if (level & SC_FOLDLEVELWHITEFLAG) {
+				if (LevelIsWhitespace(level)) {
 					Sci::Line lineBack = model.pcs->DocFromDisplay(visibleLine);
 					int levelPrev = level;
-					while ((lineBack > 0) && (levelPrev & SC_FOLDLEVELWHITEFLAG)) {
+					while ((lineBack > 0) && LevelIsWhitespace(levelPrev)) {
 						lineBack--;
 						levelPrev = model.pdoc->GetLevel(lineBack);
 					}
-					if (!(levelPrev & SC_FOLDLEVELHEADERFLAG)) {
+					if (!LevelIsHeader(levelPrev)) {
 						if (LevelNumber(level) < LevelNumber(levelPrev))
 							needWhiteClosure = true;
 					}
@@ -272,7 +272,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 					const int levelNext = model.pdoc->GetLevel(lineDoc + 1);
 					const int levelNum = LevelNumber(level);
 					const int levelNextNum = LevelNumber(levelNext);
-					if (level & SC_FOLDLEVELHEADERFLAG) {
+					if (LevelIsHeader(level)) {
 						if (firstSubLine) {
 							if (levelNum < levelNextNum) {
 								if (model.pcs->GetExpanded(lineDoc)) {
@@ -305,16 +305,16 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 						const int firstFollowupLineLevel = model.pdoc->GetLevel(firstFollowupLine);
 						const int secondFollowupLineLevelNum = LevelNumber(model.pdoc->GetLevel(firstFollowupLine + 1));
 						if (!model.pcs->GetExpanded(lineDoc)) {
-							if ((firstFollowupLineLevel & SC_FOLDLEVELWHITEFLAG) &&
+							if (LevelIsWhitespace(firstFollowupLineLevel) &&
 								(levelNum > secondFollowupLineLevelNum))
 								needWhiteClosure = true;
 
 							if (highlightDelimiter.IsFoldBlockHighlighted(firstFollowupLine))
 								headWithTail = true;
 						}
-					} else if (level & SC_FOLDLEVELWHITEFLAG) {
+					} else if (LevelIsWhitespace(level)) {
 						if (needWhiteClosure) {
-							if (levelNext & SC_FOLDLEVELWHITEFLAG) {
+							if (LevelIsWhitespace(levelNext)) {
 								marks |= 1 << SC_MARKNUM_FOLDERSUB;
 							} else if (levelNextNum > SC_FOLDLEVELBASE) {
 								marks |= 1 << SC_MARKNUM_FOLDERMIDTAIL;
@@ -337,7 +337,7 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 					} else if (levelNum > SC_FOLDLEVELBASE) {
 						if (levelNextNum < levelNum) {
 							needWhiteClosure = false;
-							if (levelNext & SC_FOLDLEVELWHITEFLAG) {
+							if (LevelIsWhitespace(levelNext)) {
 								marks |= 1 << SC_MARKNUM_FOLDERSUB;
 								needWhiteClosure = true;
 							} else if (lastSubLine) {
@@ -373,8 +373,8 @@ void MarginView::PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc,
 							if (model.foldFlags & SC_FOLDFLAG_LEVELNUMBERS) {
 								const int lev = model.pdoc->GetLevel(lineDoc);
 								sprintf(number, "%c%c %03X %03X",
-									(lev & SC_FOLDLEVELHEADERFLAG) ? 'H' : '_',
-									(lev & SC_FOLDLEVELWHITEFLAG) ? 'W' : '_',
+									LevelIsHeader(lev) ? 'H' : '_',
+									LevelIsWhitespace(lev) ? 'W' : '_',
 									LevelNumber(lev),
 									lev >> 16
 								);
