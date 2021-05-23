@@ -2822,6 +2822,9 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
 		case 'v':
 			*o = '\v';
 			break;
+		case '\\':
+			*o = '\\';
+			break;
 		case 'x':
 		case 'u': {
 			const int digitCount = (*s == 'x') ? 2 : 4;
@@ -2852,6 +2855,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
 			}
 		} break;
 		default:
+			// unknown escape sequence
 			*o++ = '\\';
 			*o = *s;
 			break;
