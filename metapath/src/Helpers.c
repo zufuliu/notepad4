@@ -846,23 +846,25 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 //  SetWindowTransparentMode()
 //
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
-	const DWORD exStyle = GetWindowExStyle(hwnd);
+	// https://docs.microsoft.com/en-us/windows/win32/winmsg/using-windows#using-layered-windows
+	DWORD exStyle = GetWindowExStyle(hwnd);
+	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
+	SetWindowExStyle(hwnd, exStyle);
 	if (bTransparentMode) {
-		SetWindowExStyle(hwnd, exStyle | WS_EX_LAYERED);
 		const BYTE bAlpha = (BYTE)(iOpacityLevel * 255 / 100);
 		SetLayeredWindowAttributes(hwnd, 0, bAlpha, LWA_ALPHA);
-	} else {
-		SetWindowExStyle(hwnd, exStyle & ~WS_EX_LAYERED);
 	}
+	// Ask the window and its children to repaint
+	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
-	const DWORD exStyle = GetWindowExStyle(hwnd);
-	if (bRTL) {
-		SetWindowExStyle(hwnd, exStyle | WS_EX_LAYOUTRTL);
-	} else {
-		SetWindowExStyle(hwnd, exStyle & ~WS_EX_LAYOUTRTL);
-	}
+	// https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#window-layout-and-mirroring
+	DWORD exStyle = GetWindowExStyle(hwnd);
+	exStyle = bRTL ? (exStyle | WS_EX_LAYOUTRTL) : (exStyle & ~WS_EX_LAYOUTRTL);
+	SetWindowExStyle(hwnd, exStyle);
+	// update layout in the client area
+	InvalidateRect(hwnd, NULL, TRUE);
 }
 
 //=============================================================================
