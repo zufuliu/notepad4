@@ -1450,13 +1450,18 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	rcBox.right = std::round(rcBox.right) + 1;
 
 	if (FlagSet(phase, DrawPhase::back)) {
-		surface->FillRectangleAligned(rcSegment, Fill(textBack));
-
 		// Fill Remainder of the line
 		PRectangle rcRemainder = rcSegment;
 		rcRemainder.left = std::max(rcRemainder.left, rcLine.left);
 		rcRemainder.right = rcLine.right;
 		FillLineRemainder(surface, model, vsDraw, ll, line, rcRemainder, subLine);
+
+		ColourAlpha backgroundFill = textBack;
+		if (vsDraw.styles[ll->styles[ll->numCharsInLine]].eolFilled) {
+			const ColourAlpha eolFilled = vsDraw.styles[ll->styles[ll->numCharsInLine]].back;
+			backgroundFill = AlphaBlend(backgroundFill, eolFilled, vsDraw.ElementColour(SC_ELEMENT_SELECTION_BACK)->GetAlpha());
+		}
+		surface->FillRectangleAligned(rcBox, Fill(backgroundFill));
 	}
 
 	if (FlagSet(phase, DrawPhase::text)) {
