@@ -2134,7 +2134,7 @@ BEGIN
 스타일 형식:\r\n\
 \tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
 \tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\r\n\
-\tfore:#ffffff; back:#bbbbbb; alpha:aa; outline:aa; eolfilled;\r\n\
+\tfore:#RRGGBB; back:#RRGGBB; alpha:aa; outline:aa; eolfilled;\r\n\
 \r\n\
 스타일 속성은 복사/붙여넣기, 또는 끌어서 놓기로 복사할 수 있습니다.\r\n\
 \r\n\

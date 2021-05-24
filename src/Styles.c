@@ -30,6 +30,7 @@
 #include "SciCall.h"
 #include "config.h"
 #include "Helpers.h"
+#include "VectorISA.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -345,6 +346,16 @@ extern EditTabSettings tabSettings;
 
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
 #define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
+
+// color hex: #RRGGBB => 0x00RRGGBB
+// see GraphicUtils.h for the conversions.
+static inline COLORREF ColorFromRGBHex(uint32_t value) {
+	return bswap32(value) >> 8;
+}
+
+static inline uint32_t ColorToRGBHex(COLORREF color) {
+	return bswap32(color) >> 8;
+}
 
 struct DetailStyle {
 	UINT mask;
@@ -840,7 +851,7 @@ static void Style_LoadAll(BOOL bReload) {
 			if (n < MAX_CUSTOM_COLOR_COUNT && *wch == L'#') {
 				int irgb;
 				if (HexStrToInt(wch + 1, &irgb)) {
-					customColor[n] = RGB((irgb & 0xFF0000) >> 16, (irgb & 0xFF00) >> 8, irgb & 0xFF);
+					customColor[n] = ColorFromRGBHex(irgb);
 				}
 			}
 		}
@@ -919,7 +930,7 @@ void Style_Save(void) {
 				WCHAR tch[4];
 				WCHAR wch[16];
 				wsprintf(tch, L"%02u", i + 1);
-				wsprintf(wch, L"#%02X%02X%02X", GetRValue(color), GetGValue(color), GetBValue(color));
+				wsprintf(wch, L"#%06X", ColorToRGBHex(color));
 				IniSectionSetString(pIniSection, tch, wch);
 			}
 		}
@@ -3518,7 +3529,7 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
 		if (*p == L'#') {
 			int iValue;
 			if (HexStrToInt(p + 1, &iValue)) {
-				*rgb = RGB((iValue & 0xFF0000) >> 16, (iValue & 0xFF00) >> 8, iValue & 0xFF);
+				*rgb = ColorFromRGBHex(iValue);
 				return TRUE;
 			}
 		}
@@ -3742,7 +3753,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"fore:#%02X%02X%02X", GetRValue(iRGBResult), GetGValue(iRGBResult), GetBValue(iRGBResult));
+		wsprintf(tch, L"fore:#%06X", ColorToRGBHex(iRGBResult));
 		lstrcat(szNewStyle, tch);
 		Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	} else {
@@ -3750,7 +3761,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"back:#%02X%02X%02X", GetRValue(iRGBResult), GetGValue(iRGBResult), GetBValue(iRGBResult));
+		wsprintf(tch, L"back:#%06X", ColorToRGBHex(iRGBResult));
 		lstrcat(szNewStyle, tch);
 	}
 
