@@ -4,7 +4,6 @@ image:
   - Visual Studio 2017
 
 configuration:
-  - Debug
   - Release
 
 platform:
@@ -28,123 +27,16 @@ deploy: off
 matrix:
   fast_finish: true
   exclude:
-    - configuration: Debug
     - platform: ARM
       compiler: Clang
 
 # No reversion when shallow clone is enabled.
 before_build:
-#  - cmd: CALL update_rev.bat
   - cmd: |
       ECHO Update Version Hash
       "c:/Program Files/Git/usr/bin/sed" -i "s/\(.\+\)[0-9a-f]\{8\}\(.\+\)/\1%APPVEYOR_REPO_COMMIT:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
 
 for:
-  - # MSVC x64 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: x64
-          compiler: MSVC
-
-    build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build x64 Debug 1
-
-  - # Clang x64 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: x64
-          compiler: Clang
-
-    build_script:
-      - cmd: CALL "build\install_llvm.bat" 1
-      - cmd: CALL "build\VS2017\build.bat" Build x64 LLVMDebug 1
-
-  - # MSVC Win32 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: Win32
-          compiler: MSVC
-
-    build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build Win32 Debug 1
-
-  - # Clang Win32 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: Win32
-          compiler: Clang
-
-    build_script:
-      - cmd: CALL "build\install_llvm.bat" 1
-      - cmd: CALL "build\VS2017\build.bat" Build Win32 LLVMDebug 1
-
-  - # MSVC ARM64 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: ARM64
-          compiler: MSVC
-
-    build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build ARM64 Debug 1
-
-  - # Clang ARM64 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: ARM64
-          compiler: Clang
-
-    build_script:
-      - cmd: CALL "build\install_llvm.bat" 1
-      - cmd: CALL "build\VS2017\build.bat" Build ARM64 LLVMDebug 1
-
-  - # MSVC AVX2 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: AVX2
-          compiler: MSVC
-
-    build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build AVX2 Debug 1
-
-  - # Clang AVX2 Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: AVX2
-          compiler: Clang
-
-    build_script:
-      - cmd: CALL "build\install_llvm.bat" 1
-      - cmd: CALL "build\VS2017\build.bat" Build AVX2 LLVMDebug 1
-
-  - # MSVC ARM Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: ARM
-          compiler: MSVC
-
-    build_script:
-      - cmd: CALL "build\VS2017\build.bat" Build ARM Debug 1
-
-  - # Clang ARM Debug
-    matrix:
-      only:
-        - configuration: Debug
-          platform: ARM
-          compiler: Clang
-
-    build_script:
-      - cmd: CALL "build\install_llvm.bat" 1
-      - cmd: CALL "build\VS2017\build.bat" Build ARM LLVMDebug 1
-
   - # MSVC x64 Release
     matrix:
       only:
