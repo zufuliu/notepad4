@@ -3139,8 +3139,10 @@ void Style_HighlightCurrentLine(void) {
 				alpha = CaretLineDefaultAlpha;
 			}
 			SciCall_SetElementColor(SC_ELEMENT_CARET_LINE_BACK, ColorAlpha(rgb, alpha));
+			return;
 		}
 	}
+	SciCall_ResetElementColor(SC_ELEMENT_CARET_LINE_BACK);
 }
 
 //=============================================================================
