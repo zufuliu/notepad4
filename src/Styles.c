@@ -375,7 +375,7 @@ struct DetailStyle {
 
 /*
 style in other lexers is inherited from it's lexer default (first) style and global default style.
-	This also means other "Default" styles in lexHTML don't work as expected (bug by b7e7585f869897276e27a3b83b5b91a7196ca4da).
+	This also means other "Default" styles in lexHTML don't work as expected.
 	Maybe it's better to remove them instead of confusing users.
 
 font quality, caret style, caret width, caret blink period are moved to "Settings" section,

@@ -215,7 +215,6 @@ void ViewStyle::Init(size_t stylesSize_) {
 	foldmarginColour.reset();
 	foldmarginHighlightColour.reset();
 
-	whitespaceForeAlpha = SC_ALPHA_NOALPHA;
 	controlCharSymbol = 0;	/* Draw the control characters */
 	controlCharWidth = 0;
 	selbar = Platform::Chrome();
@@ -530,7 +529,7 @@ bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
 }
 
 ColourAlpha ViewStyle::WrapColour() const {
-	return ElementColour(SC_ELEMENT_WHITE_SPACE).value_or(styles[STYLE_DEFAULT].fore);
+	return ElementColour(SC_ELEMENT_WHITE_SPACE).value_or(styles[STYLE_DEFAULT].fore).Opaque();
 }
 
 // Insert new edge in sorted order.

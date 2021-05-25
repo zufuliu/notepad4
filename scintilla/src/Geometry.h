@@ -282,7 +282,7 @@ public:
 	}
 
 #if 0
-	constexpr static unsigned int Mixed(unsigned char a, unsigned char b, double proportion) noexcept {
+	static constexpr unsigned int Mixed(unsigned char a, unsigned char b, double proportion) noexcept {
 		return static_cast<unsigned int>(a + proportion * (b - a));
 	}
 

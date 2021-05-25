@@ -136,7 +136,6 @@ public:
 
 	SelectionAppearance selection;
 
-	int whitespaceForeAlpha;
 	int controlCharSymbol;
 	XYPOSITION controlCharWidth;
 	ColourAlpha selbar;
