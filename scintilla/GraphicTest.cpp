@@ -816,7 +816,7 @@ int __cdecl main() {
 
 #if 0 // BitmapMergeAlpha
 	printf("BitmapMergeAlpha (%08x / %08x), (%08x / %08x), %08x:\n", quad, fore, quad2, fore2, back);
-	printf("    scale %08x %08x\n", RGBQuadFromColor(BitmapMergeAlpha(fore, back)), RGBQuadFromColor(BitmapMergeAlpha(fore2, back)));
+	printf("    scale %08x %08x\n", ColorToRGBQuad(BitmapMergeAlpha(fore, back)), ColorToRGBQuad(BitmapMergeAlpha(fore2, back)));
 #if NP2_USE_AVX2
 	printf("     sse4 %08x %08x\n", BitmapMergeAlpha_sse4(&quad, back), BitmapMergeAlpha_sse4(&quad2, back));
 	{
@@ -830,7 +830,7 @@ int __cdecl main() {
 
 #if 0 // BitmapAlphaBlend
 	printf("BitmapAlphaBlend (%08x / %08x), (%08x, %08x), %08x, %02x:\n", quad, fore, quad2, fore2, back, alpha);
-	printf("    scale %08x %08x\n", RGBQuadFromColor(BitmapAlphaBlend(fore, back, alpha)), RGBQuadFromColor(BitmapAlphaBlend(fore2, back, alpha)));
+	printf("    scale %08x %08x\n", ColorToRGBQuad(BitmapAlphaBlend(fore, back, alpha)), ColorToRGBQuad(BitmapAlphaBlend(fore2, back, alpha)));
 #if NP2_USE_AVX2
 	printf("     sse4 %08x %08x\n", BitmapAlphaBlend_sse4(&quad, back, alpha), BitmapAlphaBlend_sse4(&quad2, back, alpha));
 	{

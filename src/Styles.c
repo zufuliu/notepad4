@@ -31,6 +31,7 @@
 #include "config.h"
 #include "Helpers.h"
 #include "VectorISA.h"
+#include "GraphicUtils.h"
 #include "Notepad2.h"
 #include "Edit.h"
 #include "Styles.h"
@@ -346,16 +347,6 @@ extern EditTabSettings tabSettings;
 
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
 #define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
-
-// color hex: #RRGGBB => 0x00RRGGBB
-// see GraphicUtils.h for the conversions.
-static inline COLORREF ColorFromRGBHex(uint32_t value) {
-	return bswap32(value) >> 8;
-}
-
-static inline uint32_t ColorToRGBHex(COLORREF color) {
-	return bswap32(color) >> 8;
-}
 
 struct DetailStyle {
 	UINT mask;

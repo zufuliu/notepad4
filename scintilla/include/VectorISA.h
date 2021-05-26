@@ -22,6 +22,8 @@
 
 // https://docs.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics
 // https://software.intel.com/sites/landingpage/IntrinsicsGuide/
+// https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+// https://clang.llvm.org/docs/LanguageExtensions.html
 #include <intrin.h>
 
 #if defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)
@@ -92,7 +94,7 @@
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_clz(x)		__builtin_clz(x)
 	#define np2_clz64(x)	__builtin_clzll(x)
-#elif NP2_TARGET_ARM
+#elif NP2_TARGET_ARM64
 	#define np2_clz(x)		_CountLeadingZeros(x)
 	#define np2_clz64(x)	_CountLeadingZeros64(x)
 //#elif NP2_USE_AVX2
@@ -183,7 +185,10 @@
 #define bswap32(x)				_byteswap_ulong(x)
 #endif
 
-#if defined(_MSC_VER)
+#if defined(__clang__)
+#define rotr8(x)				__builtin_rotateright32((x), 8)
+#define rotl8(x)				__builtin_rotateleft32((x), 8)
+#elif defined(_MSC_VER)
 #define rotr8(x)				_rotr((x), 8)
 #define rotl8(x)				_rotl((x), 8)
 #else

@@ -13,16 +13,44 @@
 // bswap:		[b][g][r][a]
 //      rotr8:	[a][b][g][r]
 
-// see https://docs.microsoft.com/en-us/windows/win32/uxguide/vis-icons#size-requirements
-// we can process 4 pixels at a time for all our bitmap (even after DPI scaling).
-
-static inline uint32_t RGBQuadFromColor(uint32_t color) NP2_noexcept {
-	return rotr8(bswap32(color));
-}
+// color RGB hex: #RRGGBB => 0x00RRGGBB
+// RGBA hex: #RRGGBBAA
+// ARGB hex: #AARRGGBB
 
 static inline uint32_t ColorFromRGBQuad(uint32_t quad) NP2_noexcept {
 	return rotr8(bswap32(quad));
 }
+
+static inline uint32_t ColorFromRGBHex(uint32_t hex) NP2_noexcept {
+	return bswap32(hex) >> 8;
+}
+
+static inline uint32_t ColorFromRGBAHex(uint32_t hex) NP2_noexcept {
+	return bswap32(hex);
+}
+
+static inline uint32_t ColorFromARGBHex(uint32_t hex) NP2_noexcept {
+	return rotr8(bswap32(hex));
+}
+
+static inline uint32_t ColorToRGBQuad(uint32_t color) NP2_noexcept {
+	return rotr8(bswap32(color));
+}
+
+static inline uint32_t ColorToRGBHex(uint32_t color) NP2_noexcept {
+	return bswap32(color) >> 8;
+}
+
+static inline uint32_t ColorToRGBAHex(uint32_t color) NP2_noexcept {
+	return bswap32(color);
+}
+
+static inline uint32_t ColorToARGBHex(uint32_t color) NP2_noexcept {
+	return rotr8(bswap32(color));
+}
+
+// see https://docs.microsoft.com/en-us/windows/win32/uxguide/vis-icons#size-requirements
+// we can process 4 pixels at a time for all our bitmap (even after DPI scaling).
 
 #if NP2_USE_SSE2
 static inline __m128i mm_setlo_epi32(uint32_t value) NP2_noexcept {
