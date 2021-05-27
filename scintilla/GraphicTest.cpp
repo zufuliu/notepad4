@@ -510,9 +510,9 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 	}
 
 	const size_t pixelCount = data.size();
-	std::vector<uint32_t> scale;
-	{ // scale
-		scale.resize(pixelCount);
+	std::vector<uint32_t> scalar;
+	{ // scalar
+		scalar.resize(pixelCount);
 		const RGBQUAD *prgba = reinterpret_cast<RGBQUAD *>(data.data());
 
 		const WORD red = GetRValue(crDest) * (255 ^ alpha);
@@ -523,7 +523,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			quad.rgbRed = (BYTE)(((quad.rgbRed * alpha) + red) / 255);
 			quad.rgbGreen = (BYTE)(((quad.rgbGreen * alpha) + green) / 255);
 			quad.rgbBlue = (BYTE)(((quad.rgbBlue * alpha) + blue) / 255);
-			scale[x] = RGBQuadToUInt32(quad);
+			scalar[x] = RGBQuadToUInt32(quad);
 		}
 	}
 
@@ -545,8 +545,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			xmm[x] = color | (origin & 0xff000000U);
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
-			if (scale[x] != xmm[x]) {
-				printf("sse2 1x1 fail %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
+			if (scalar[x] != xmm[x]) {
+				printf("sse2 1x1 fail %4zu %08x, %08x %08x\n", x, data[x], scalar[x], xmm[x]);
 				break;
 			}
 		}
@@ -586,8 +586,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			_mm_storeu_si128(dest, i32x4Fore);
 		}
 		for (size_t x = offset; x < pixelCount; x++) {
-			if (scale[x] != xmm[x]) {
-				printf("sse2 1x4 fail at %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
+			if (scalar[x] != xmm[x]) {
+				printf("sse2 1x4 fail at %4zu %08x, %08x %08x\n", x, data[x], scalar[x], xmm[x]);
 				break;
 			}
 		}
@@ -612,8 +612,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			mm_storeu_si32(dest, i32x4Fore);
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
-			if (scale[x] != xmm[x]) {
-				printf("sse4 1x1 fail %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
+			if (scalar[x] != xmm[x]) {
+				printf("sse4 1x1 fail %4zu %08x, %08x %08x\n", x, data[x], scalar[x], xmm[x]);
 				break;
 			}
 		}
@@ -638,8 +638,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			_mm_storel_epi64((__m128i *)dest, i16x8Fore);
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
-			if (scale[x] != xmm[x]) {
-				printf("sse4 2x1 fail %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
+			if (scalar[x] != xmm[x]) {
+				printf("sse4 2x1 fail %4zu %08x, %08x %08x\n", x, data[x], scalar[x], xmm[x]);
 				break;
 			}
 		}
@@ -664,8 +664,8 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			_mm_storeu_si128(dest, _mm256_castsi256_si128(i16x16Fore));
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
-			if (scale[x] != xmm[x]) {
-				printf("avx2 4x1 fail %4zu %08x, %08x %08x\n", x, data[x], scale[x], xmm[x]);
+			if (scalar[x] != xmm[x]) {
+				printf("avx2 4x1 fail %4zu %08x, %08x %08x\n", x, data[x], scalar[x], xmm[x]);
 				break;
 			}
 		}
@@ -739,7 +739,7 @@ int __cdecl main() {
 
 #if 0 // MixedWith
 	printf("MixedWith(%08x, %08x):\n", fore, back);
-	printf("    scale %08x\n", MixedWith(fore, back).AsInteger());
+	printf("   scalar %08x\n", MixedWith(fore, back).AsInteger());
 #if NP2_USE_AVX2
 	printf("     sse4 %08x\n", MixedWith_sse4(fore, back).AsInteger());
 #endif
@@ -750,7 +750,7 @@ int __cdecl main() {
 	const ColourAlpha other = fore;
 	printf("MixAlpha(%08x, %08x, %02x):\n", back, other.AsInteger(), other.GetAlpha());
 	printf("    float %08x\n", MixedWithProportion(back, other).AsInteger());
-	printf("    scale %08x\n", MixAlpha(back, other).AsInteger());
+	printf("   scalar %08x\n", MixAlpha(back, other).AsInteger());
 #if NP2_USE_AVX2
 	printf("     sse4 %08x\n", MixAlpha_sse4(back, other).AsInteger());
 #endif
@@ -759,7 +759,7 @@ int __cdecl main() {
 
 #if 0 // AlphaBlend
 	printf("AlphaBlend(%08x, %08x, %02x):\n", fore, back, alpha);
-	printf("    scale %08x\n", AlphaBlend(fore, back, alpha).AsInteger());
+	printf("   scalar %08x\n", AlphaBlend(fore, back, alpha).AsInteger());
 #if NP2_USE_AVX2
 	printf("     sse4 %08x\n", AlphaBlend_sse4(fore, back, alpha).AsInteger());
 #endif
@@ -768,7 +768,7 @@ int __cdecl main() {
 
 #if 0 // RGBQuadMultiplied
 	printf("RGBQuadMultiplied(%08x):\n", fore);
-	printf("    scale %08x\n", RGBQuadMultiplied(fore));
+	printf("   scalar %08x\n", RGBQuadMultiplied(fore));
 #if NP2_USE_AVX2
 	printf("sse4 16 b %08x\n", RGBQuadMultiplied_sse4_blend16(fore));
 	printf("sse4 32 a %08x\n", RGBQuadMultiplied_sse4_align32(fore));
@@ -786,7 +786,7 @@ int __cdecl main() {
 	printf("BGRAFromRGBA(%08x, %08x)\n", rgba[0], rgba[1]);
 	BGRAFromRGBA(static_cast<uint8_t *>(pixelsBGRA), static_cast<const uint8_t *>(pixelsRGBA), pixelCount);
 	printf("   single %08x %08x\n", RGBQuadMultiplied(rgba[0]), RGBQuadMultiplied(rgba[1]));
-	printf("    scale %08x %08x\n", bgra[0], bgra[1]);
+	printf("   scalar %08x %08x\n", bgra[0], bgra[1]);
 #if NP2_USE_AVX2
 	memset(bgra, 0, sizeof(bgra));
 	BGRAFromRGBA_sse4_align32(pixelsBGRA, pixelsRGBA, pixelCount);
@@ -806,7 +806,7 @@ int __cdecl main() {
 #if 0 // Proportional
 	constexpr double proportion = alpha/255.0f;
 	printf("Proportional(%08x, %08x, %f):\n", fore, back, proportion);
-	printf("    scale %08x\n", Proportional(ColourAlpha(fore), ColourAlpha(back), proportion));
+	printf("   scalar %08x\n", Proportional(ColourAlpha(fore), ColourAlpha(back), proportion));
 #if NP2_USE_AVX2
 	printf("   sse4 a %08x\n", Proportional_sse4_align(fore, back, proportion));
 	printf("   sse4 b %08x\n", Proportional_sse4_blend(fore, back, proportion));
@@ -816,7 +816,7 @@ int __cdecl main() {
 
 #if 0 // BitmapMergeAlpha
 	printf("BitmapMergeAlpha (%08x / %08x), (%08x / %08x), %08x:\n", quad, fore, quad2, fore2, back);
-	printf("    scale %08x %08x\n", ColorToRGBQuad(BitmapMergeAlpha(fore, back)), ColorToRGBQuad(BitmapMergeAlpha(fore2, back)));
+	printf("   scalar %08x %08x\n", ColorToRGBQuad(BitmapMergeAlpha(fore, back)), ColorToRGBQuad(BitmapMergeAlpha(fore2, back)));
 #if NP2_USE_AVX2
 	printf("     sse4 %08x %08x\n", BitmapMergeAlpha_sse4(&quad, back), BitmapMergeAlpha_sse4(&quad2, back));
 	{
@@ -830,7 +830,7 @@ int __cdecl main() {
 
 #if 0 // BitmapAlphaBlend
 	printf("BitmapAlphaBlend (%08x / %08x), (%08x, %08x), %08x, %02x:\n", quad, fore, quad2, fore2, back, alpha);
-	printf("    scale %08x %08x\n", ColorToRGBQuad(BitmapAlphaBlend(fore, back, alpha)), ColorToRGBQuad(BitmapAlphaBlend(fore2, back, alpha)));
+	printf("   scalar %08x %08x\n", ColorToRGBQuad(BitmapAlphaBlend(fore, back, alpha)), ColorToRGBQuad(BitmapAlphaBlend(fore2, back, alpha)));
 #if NP2_USE_AVX2
 	printf("     sse4 %08x %08x\n", BitmapAlphaBlend_sse4(&quad, back, alpha), BitmapAlphaBlend_sse4(&quad2, back, alpha));
 	{
@@ -845,7 +845,7 @@ int __cdecl main() {
 
 #if 0 // BitmapGrayScale
 	printf("BitmapGrayScale(%08x / %08x):\n", quad, fore);
-	printf("    scale %08x\n", BitmapGrayScale(fore));
+	printf("   scalar %08x\n", BitmapGrayScale(fore));
 #if NP2_USE_AVX2
 	printf("     sse4 %08x\n", BitmapGrayScale_sse4(quad));
 #endif
@@ -854,7 +854,7 @@ int __cdecl main() {
 #if 0 // VerifyContrast
 	const Contrast cr1 = VerifyContrast(fore & 0xffffff, back & 0xffffff);
 	printf("VerifyContrast(%08x, %08x):\n", fore, back);
-	printf("    scale %d, %d\n", cr1.diff, cr1.scale);
+	printf("   scalar %d, %d\n", cr1.diff, cr1.scale);
 #if NP2_USE_AVX2
 	const Contrast cr2 = VerifyContrast_sse4(fore & 0xffffff, back & 0xffffff);
 	printf("     sse4 %d, %d\n", cr2.diff, cr2.scale);

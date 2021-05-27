@@ -572,7 +572,7 @@ BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 			}
 
 #else
-			#define BitmapMergeAlpha_Tag	"scale"
+			#define BitmapMergeAlpha_Tag	"scalar"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 
@@ -680,7 +680,7 @@ BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 			}
 
 #else
-			#define BitmapAlphaBlend_Tag	"scale"
+			#define BitmapAlphaBlend_Tag	"scalar"
 			const ULONG count = bmp.bmHeight * bmp.bmWidth;
 			RGBQUAD *prgba = (RGBQUAD *)bmp.bmBits;
 

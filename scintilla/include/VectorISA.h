@@ -94,7 +94,7 @@
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_clz(x)		__builtin_clz(x)
 	#define np2_clz64(x)	__builtin_clzll(x)
-#elif NP2_TARGET_ARM64
+#elif NP2_TARGET_ARM
 	#define np2_clz(x)		_CountLeadingZeros(x)
 	#define np2_clz64(x)	_CountLeadingZeros64(x)
 //#elif NP2_USE_AVX2
