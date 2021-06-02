@@ -131,7 +131,6 @@
       <File Name="../../scintilla/src/EditView.cxx"/>
       <File Name="../../scintilla/src/EditView.h"/>
       <File Name="../../scintilla/src/ElapsedPeriod.h"/>
-      <File Name="../../scintilla/src/FontQuality.h"/>
       <File Name="../../scintilla/src/Geometry.cxx"/>
       <File Name="../../scintilla/src/Geometry.h"/>
       <File Name="../../scintilla/src/Indicator.cxx"/>
