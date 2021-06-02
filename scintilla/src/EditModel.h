@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 /**
 */
@@ -35,18 +35,11 @@ public:
 	Selection sel;
 	bool primarySelection;
 
-	enum class IMEInteraction {
-		windowed, internal
-	} imeInteraction;
-	enum class CharacterSource {
-		directInput, tentativeInput, imeResult,
-	};
-	enum class Bidirectional {
-		bidiDisabled, bidiL2R, bidiR2L
-	} bidirectional;
+	Scintilla::IMEInteraction imeInteraction;
+	Scintilla::Bidirectional bidirectional;
 
-	int foldFlags;
-	int foldDisplayTextStyle;
+	Scintilla::FoldFlag foldFlags;
+	Scintilla::FoldDisplayTextStyle foldDisplayTextStyle;
 	UniqueString defaultFoldDisplayText;
 	std::unique_ptr<IContractionState> pcs;
 	// Hotspot support

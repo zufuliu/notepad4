@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 /// A split vector of integers with a method for adding a value to all elements
 /// in a range.

@@ -1143,6 +1143,9 @@
     <ClInclude Include="..\..\scintilla\include\Sci_Position.h" />
     <ClInclude Include="..\..\scintilla\include\SciLexer.h" />
     <ClInclude Include="..\..\scintilla\include\Scintilla.h" />
+    <ClInclude Include="..\..\scintilla\include\ScintillaMessages.h" />
+    <ClInclude Include="..\..\scintilla\include\ScintillaStructures.h" />
+    <ClInclude Include="..\..\scintilla\include\ScintillaTypes.h" />
     <ClInclude Include="..\..\scintilla\include\VectorISA.h" />
     <ClInclude Include="..\..\scintilla\lexlib\Accessor.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h" />
@@ -1174,7 +1177,6 @@
     <ClInclude Include="..\..\scintilla\src\Editor.h" />
     <ClInclude Include="..\..\scintilla\src\EditView.h" />
     <ClInclude Include="..\..\scintilla\src\ElapsedPeriod.h" />
-    <ClInclude Include="..\..\scintilla\src\FontQuality.h" />
     <ClInclude Include="..\..\scintilla\src\Geometry.h" />
     <ClInclude Include="..\..\scintilla\src\Indicator.h" />
     <ClInclude Include="..\..\scintilla\src\KeyMap.h" />

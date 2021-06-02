@@ -209,13 +209,14 @@
 #include <algorithm>
 #include <iterator>
 
+#include "ScintillaTypes.h"
+
 #include "Position.h"
 #include "CharClassify.h"
 #include "RESearch.h"
 
 using namespace Scintilla;
-
-#define SCFIND_POSIX 0x00400000
+using namespace Scintilla::Internal;
 
 #define OKP     1
 #define NOP     0
@@ -265,7 +266,7 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	bol = 0;
 	previousPattern = nullptr;
 	previousLength = 0;
-	previousFlags = 0;
+	previousFlags = FindOption::None;
 	constexpr unsigned char nul = 0;
 	std::fill(bittab, std::end(bittab), nul);
 	std::fill(tagstk, std::end(tagstk), 0);
@@ -281,7 +282,7 @@ void RESearch::ClearCache() noexcept {
 	sta = NOP;
 	previousPattern = nullptr;
 	previousLength = 0;
-	previousFlags = 0;
+	previousFlags = FindOption::None;
 }
 
 void RESearch::Clear() noexcept {
@@ -451,7 +452,7 @@ int RESearch::GetBackslashExpression(
 	return result;
 }
 
-const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags) {
+const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, FindOption flags) {
 	if (sta == OKP && (pattern == nullptr || length == 0
 		|| (pattern == previousPattern
 			&& length == previousLength
@@ -461,7 +462,7 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 		return nullptr;
 	}
 
-	const bool posix = (flags & SCFIND_POSIX) != 0;
+	const bool posix = FlagSet(flags, FindOption::Posix);
 	const char * const errmsg = DoCompile(pattern, length, caseSensitive, posix);
 	if (errmsg == nullptr) {
 		previousPattern = pattern;

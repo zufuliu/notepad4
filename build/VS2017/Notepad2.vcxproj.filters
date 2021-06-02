@@ -584,6 +584,15 @@
     <ClInclude Include="..\..\scintilla\include\Scintilla.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\ScintillaMessages.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\ScintillaStructures.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\include\ScintillaTypes.h">
+      <Filter>Scintilla\include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\include\VectorISA.h">
       <Filter>Scintilla\include</Filter>
     </ClInclude>
@@ -675,9 +684,6 @@
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\ElapsedPeriod.h">
-      <Filter>Scintilla\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\scintilla\src\FontQuality.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\src\Geometry.h">

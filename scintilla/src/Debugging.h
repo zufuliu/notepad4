@@ -13,7 +13,7 @@
 #define NP2_unreachable()	__assume(0)
 #endif
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 // official Scintilla use dynamic_cast, which requires RTTI.
 // When RTTI is enabled, MSVC defines _CPPRTTI,
@@ -71,7 +71,7 @@ void Assert(const char *c, const char *file, int line) noexcept CLANG_ANALYZER_N
 #ifdef NDEBUG
 #define PLATFORM_ASSERT(c) ((void)0)
 #else
-#define PLATFORM_ASSERT(c) ((c) ? (void)(0) : Scintilla::Platform::Assert(#c, __FILE__, __LINE__))
+#define PLATFORM_ASSERT(c) ((c) ? (void)(0) : Scintilla::Internal::Platform::Assert(#c, __FILE__, __LINE__))
 #endif
 
 }

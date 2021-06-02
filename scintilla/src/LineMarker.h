@@ -6,33 +6,31 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 class XPM;
 class RGBAImage;
 
-typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, int part, int marginStyle, const void *lineMarker);
+typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, int part, Scintilla::MarginType marginStyle, const void *lineMarker);
 
-enum class Layer { base = 0, under = 1, over = 2 };
-
-struct LineMarkerBase {
-	int markType = SC_MARK_CIRCLE;
-	ColourAlpha fore = ColourAlpha(0, 0, 0);
-	ColourAlpha back = ColourAlpha(0xff, 0xff, 0xff);
-	ColourAlpha backSelected = ColourAlpha(0xff, 0x00, 0x00);
-	Layer layer = Layer::base;
+struct LineMarkerPod {
+	Scintilla::MarkerSymbol markType = Scintilla::MarkerSymbol::Circle;
+	ColourRGBA fore = ColourRGBA(0, 0, 0);
+	ColourRGBA back = ColourRGBA(0xff, 0xff, 0xff);
+	ColourRGBA backSelected = ColourRGBA(0xff, 0x00, 0x00);
+	Scintilla::Layer layer = Scintilla::Layer::Base;
 	XYPOSITION strokeWidth = 1.0f;
 	/** Some platforms, notably PLAT_CURSES, do not support Scintilla's native
 	 * Draw function for drawing line markers. Allow those platforms to override
 	 * it instead of creating a new method(s) in the Surface class that existing
 	 * platforms must implement as empty. */
 	DrawLineMarkerFn customDraw = nullptr;
-	constexpr LineMarkerBase() noexcept = default;
+	constexpr LineMarkerPod() noexcept = default;
 };
 
 /**
  */
-class LineMarker final : public LineMarkerBase {
+class LineMarker final : public LineMarkerPod {
 public:
 	enum class FoldPart {
 		undefined, head, body, tail, headWithTail
@@ -52,7 +50,7 @@ public:
 	void SetXPM(const char *const *linesForm);
 	void SCICALL SetRGBAImage(Point sizeRGBAImage, float scale, const unsigned char *pixelsRGBAImage);
 	void AlignedPolygon(Surface *surface, const Point *pts, size_t npts) const;
-	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, FoldPart part, int marginStyle) const;
+	void SCICALL Draw(Surface *surface, PRectangle rcWhole, const Font *fontForCharacter, FoldPart part, Scintilla::MarginType marginStyle) const;
 	void SCICALL DrawFoldingMark(Surface *surface, PRectangle rcWhole, FoldPart part) const;
 
 private:

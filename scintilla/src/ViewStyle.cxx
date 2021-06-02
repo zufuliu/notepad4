@@ -19,11 +19,12 @@
 #include <algorithm>
 #include <memory>
 
+#include "ScintillaTypes.h"
+
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
 
-#include "Scintilla.h"
 #include "Position.h"
 #include "UniqueString.h"
 #include "Indicator.h"
@@ -33,16 +34,21 @@
 #include "ViewStyle.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 
-MarginStyle::MarginStyle(int style_, int width_, MarkerMask mask_) noexcept :
-	style(style_), width(width_), mask(mask_), sensitive(false), cursor(SC_CURSORREVERSEARROW) {
+MarginStyle::MarginStyle(MarginType style_, int width_, MarkerMask mask_) noexcept :
+	style(style_), width(width_), mask(mask_), sensitive(false), cursor(CursorShape::ReverseArrow) {
 }
 
-void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs, const char *localeName) {
+bool MarginStyle::ShowsFolding() const noexcept {
+	return (mask & MaskFolders) != 0;
+}
+
+void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technology, const FontSpecification &fs, const char *localeName) {
 	PLATFORM_ASSERT(fs.fontName);
 	sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
 	const float deviceHeight = static_cast<float>(surface.DeviceHeightFont(sizeZoomed));
-	const FontParameters fp(fs.fontName, deviceHeight / SC_FONT_SIZE_MULTIPLIER, fs.weight,
+	const FontParameters fp(fs.fontName, deviceHeight / FontSizeMultiplier, fs.weight,
 		fs.italic, fs.extraFontFlag, technology, fs.characterSet, localeName);
 	font = Font::Allocate(fp);
 
@@ -53,13 +59,13 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, int technology, cons
 	spaceWidth = surface.WidthText(font.get(), " ");
 }
 
-ViewStyle::ViewStyle() : markers(MARKER_MAX + 1), indicators(INDICATOR_MAX + 1) {
+ViewStyle::ViewStyle() : markers(MarkerMax + 1), indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
 	Init();
 }
 
 // Copy constructor only called when printing copies the screen ViewStyle so it can be
 // modified for printing styles.
-ViewStyle::ViewStyle(const ViewStyle &source) : markers(MARKER_MAX + 1), indicators(INDICATOR_MAX + 1) {
+ViewStyle::ViewStyle(const ViewStyle &source) : markers(MarkerMax + 1), indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
 	Init(source.styles.size());
 	styles = source.styles;
 	for (size_t sty = 0; sty < source.styles.size(); sty++) {
@@ -149,11 +155,11 @@ void ViewStyle::CalculateMarginWidthAndMask() noexcept {
 	for (int markBit = 0; markBit < MarkerBitCount; markBit++) {
 		const MarkerMask maskBit = 1U << markBit;
 		switch (markers[markBit].markType) {
-		case SC_MARK_EMPTY:
+		case MarkerSymbol::Empty:
 			maskInLine &= ~maskBit;
 			break;
-		case SC_MARK_BACKGROUND:
-		case SC_MARK_UNDERLINE:
+		case MarkerSymbol::Background:
+		case MarkerSymbol::Underline:
 			maskInLine &= ~maskBit;
 			maskDrawInText |= maskDefinedMarkers & maskBit;
 			break;
@@ -172,11 +178,11 @@ void ViewStyle::Init(size_t stylesSize_) {
 	// There are no image markers by default, so no need for calling CalcLargestMarkerHeight()
 	largestMarkerHeight = 0;
 
-	indicators[0] = Indicator(INDIC_SQUIGGLE, ColourAlpha(0, 0x7f, 0));
-	indicators[1] = Indicator(INDIC_TT, ColourAlpha(0, 0, 0xff));
-	indicators[2] = Indicator(INDIC_PLAIN, ColourAlpha(0xff, 0, 0));
+	indicators[0] = Indicator(IndicatorStyle::Squiggle, ColourRGBA(0, 0x7f, 0));
+	indicators[1] = Indicator(IndicatorStyle::TT, ColourRGBA(0, 0, 0xff));
+	indicators[2] = Indicator(IndicatorStyle::Plain, ColourRGBA(0xff, 0, 0));
 
-	technology = SC_TECHNOLOGY_DEFAULT;
+	technology = Technology::Default;
 	indicatorsDynamic = false;
 	indicatorsSetFore = false;
 	lineHeight = 1;
@@ -188,27 +194,27 @@ void ViewStyle::Init(size_t stylesSize_) {
 	tabWidth = spaceWidth * 8;
 
 	// Default is for no selection foregrounds
-	elementColours.erase(SC_ELEMENT_SELECTION_TEXT);
-	elementColours.erase(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT);
-	elementColours.erase(SC_ELEMENT_SELECTION_SECONDARY_TEXT);
-	elementColours.erase(SC_ELEMENT_SELECTION_NO_FOCUS_TEXT);
+	elementColours.erase(Element::SelectionText);
+	elementColours.erase(Element::SelectionAdditionalText);
+	elementColours.erase(Element::SelectionSecondaryText);
+	elementColours.erase(Element::SelectionInactiveText);
 	// Shades of grey for selection backgrounds
-	elementBaseColours[SC_ELEMENT_SELECTION_BACK] = ColourAlpha(0xc0, 0xc0, 0xc0, 0xff);
-	elementBaseColours[SC_ELEMENT_SELECTION_ADDITIONAL_BACK] = ColourAlpha(0xd7, 0xd7, 0xd7, 0xff);
-	elementBaseColours[SC_ELEMENT_SELECTION_SECONDARY_BACK] = ColourAlpha(0xb0, 0xb0, 0xb0, 0xff);
-	elementBaseColours[SC_ELEMENT_SELECTION_NO_FOCUS_BACK] = ColourAlpha(0x80, 0x80, 0x80, 0x3f);
+	elementBaseColours[Element::SelectionBack] = ColourRGBA(0xc0, 0xc0, 0xc0, 0xff);
+	elementBaseColours[Element::SelectionAdditionalBack] = ColourRGBA(0xd7, 0xd7, 0xd7, 0xff);
+	elementBaseColours[Element::SelectionSecondaryBack] = ColourRGBA(0xb0, 0xb0, 0xb0, 0xff);
+	elementBaseColours[Element::SelectionInactiveBack] = ColourRGBA(0x80, 0x80, 0x80, 0x3f);
 	elementAllowsTranslucent.insert({
-		SC_ELEMENT_SELECTION_TEXT,
-		SC_ELEMENT_SELECTION_BACK,
-		SC_ELEMENT_SELECTION_ADDITIONAL_TEXT,
-		SC_ELEMENT_SELECTION_ADDITIONAL_BACK,
-		SC_ELEMENT_SELECTION_SECONDARY_TEXT,
-		SC_ELEMENT_SELECTION_SECONDARY_BACK,
-		SC_ELEMENT_SELECTION_NO_FOCUS_TEXT,
-		SC_ELEMENT_SELECTION_BACK,
-		SC_ELEMENT_SELECTION_NO_FOCUS_BACK,
+		Element::SelectionText,
+		Element::SelectionBack,
+		Element::SelectionAdditionalText,
+		Element::SelectionAdditionalBack,
+		Element::SelectionSecondaryText,
+		Element::SelectionSecondaryBack,
+		Element::SelectionInactiveText,
+		Element::SelectionBack,
+		Element::SelectionInactiveBack,
 	});
-	selection.layer = Layer::base;
+	selection.layer = Layer::Base;
 	selection.eolFilled = false;
 	selection.eolSelectedWidth = 100;
 
@@ -219,74 +225,74 @@ void ViewStyle::Init(size_t stylesSize_) {
 	controlCharWidth = 0;
 	selbar = Platform::Chrome();
 	selbarlight = Platform::ChromeHighlight();
-	styles[STYLE_LINENUMBER].fore = ColourAlpha(0, 0, 0);
-	styles[STYLE_LINENUMBER].back = Platform::Chrome();
+	styles[StyleLineNumber].fore = ColourRGBA(0, 0, 0);
+	styles[StyleLineNumber].back = Platform::Chrome();
 
-	elementBaseColours[SC_ELEMENT_CARET] = ColourAlpha(0, 0, 0);
-	elementBaseColours[SC_ELEMENT_CARET_ADDITIONAL] = ColourAlpha(0x7f, 0x7f, 0x7f);
+	elementBaseColours[Element::Caret] = ColourRGBA(0, 0, 0);
+	elementBaseColours[Element::CaretAdditional] = ColourRGBA(0x7f, 0x7f, 0x7f);
 	elementAllowsTranslucent.insert({
-		SC_ELEMENT_CARET,
-		SC_ELEMENT_CARET_ADDITIONAL,
+		Element::Caret,
+		Element::CaretAdditional,
 	});
-	caret.style = CARETSTYLE_LINE;
+	caret.style = CaretStyle::Line;
 	caret.width = 1;
 
-	elementColours.erase(SC_ELEMENT_CARET_LINE_BACK);
-	elementAllowsTranslucent.insert(SC_ELEMENT_CARET_LINE_BACK);
+	elementColours.erase(Element::CaretLineBack);
+	elementAllowsTranslucent.insert(Element::CaretLineBack);
 	caretLine.alwaysShow = false;
-	caretLine.layer = Layer::base;
+	caretLine.layer = Layer::Base;
 	caretLine.frame = 0;
 
 	someStylesProtected = false;
 	someStylesForceCase = false;
 
 	hotspotUnderline = true;
-	elementColours.erase(SC_ELEMENT_HOT_SPOT_ACTIVE);
-	elementAllowsTranslucent.insert(SC_ELEMENT_HOT_SPOT_ACTIVE);
+	elementColours.erase(Element::HotSpotActive);
+	elementAllowsTranslucent.insert(Element::HotSpotActive);
 
 	leftMarginWidth = 1;
 	rightMarginWidth = 1;
-	ms.resize(SC_MAX_MARGIN + 1);
-	ms[0] = MarginStyle(SC_MARGIN_NUMBER);
-	ms[1] = MarginStyle(SC_MARGIN_SYMBOL, 16, ~SC_MASK_FOLDERS);
-	ms[2] = MarginStyle(SC_MARGIN_SYMBOL);
+	ms.resize(MaxMargin + 1);
+	ms[0] = MarginStyle(MarginType::Number);
+	ms[1] = MarginStyle(MarginType::Symbol, 16, ~MaskFolders);
+	ms[2] = MarginStyle(MarginType::Symbol);
 	marginInside = true;
 	CalculateMarginWidthAndMask();
 	textStart = marginInside ? fixedColumnWidth : leftMarginWidth;
 	zoomLevel = 100;
-	viewWhitespace = WhiteSpace::invisible;
-	tabDrawMode = TabDrawMode::longArrow;
+	viewWhitespace = WhiteSpace::Invisible;
+	tabDrawMode = TabDrawMode::LongArrow;
 	whitespaceSize = 1;
-	elementColours.erase(SC_ELEMENT_WHITE_SPACE);
-	elementAllowsTranslucent.insert(SC_ELEMENT_WHITE_SPACE);
+	elementColours.erase(Element::WhiteSpace);
+	elementAllowsTranslucent.insert(Element::WhiteSpace);
 
-	viewIndentationGuides = IndentView::none;
+	viewIndentationGuides = IndentView::None;
 	viewEOL = false;
-	extraFontFlag = 0;
+	extraFontFlag = FontQuality::QualityDefault;
 	extraAscent = 0;
 	extraDescent = 0;
 	marginStyleOffset = 0;
-	annotationVisible = ANNOTATION_HIDDEN;
+	annotationVisible = AnnotationVisible::Hidden;
 	annotationStyleOffset = 0;
-	eolAnnotationVisible = EOLANNOTATION_HIDDEN;
+	eolAnnotationVisible = EOLAnnotationVisible::Hidden;
 	eolAnnotationStyleOffset = 0;
 	braceHighlightIndicatorSet = false;
 	braceHighlightIndicator = 0;
 	braceBadLightIndicatorSet = false;
 	braceBadLightIndicator = 0;
 
-	edgeState = EDGE_NONE;
-	theEdge = EdgeProperties(0, ColourAlpha(0xc0, 0xc0, 0xc0));
+	edgeState = EdgeVisualStyle::None;
+	theEdge = EdgeProperties(0, ColourRGBA(0xc0, 0xc0, 0xc0));
 
 	marginNumberPadding = 3;
 	ctrlCharPadding = 3; // +3 For a blank on front and rounded edge each side
 	lastSegItalicsOffset = 2;
 
-	wrap.state = WrapMode::none;
-	wrap.visualFlags = 0;
-	wrap.visualFlagsLocation = 0;
+	wrap.state = Wrap::None;
+	wrap.visualFlags = WrapVisualFlag::None;
+	wrap.visualFlagsLocation = WrapVisualLocation::Default;
 	wrap.visualStartIndent = 0;
-	wrap.indentMode = SC_WRAPINDENT_FIXED;
+	wrap.indentMode = WrapIndentMode::Fixed;
 
 	localeName = localeNameDefault;
 }
@@ -302,7 +308,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 		}
 
 		// Create a FontRealised object for each unique font in the styles.
-		CreateAndAddFont(styles[STYLE_DEFAULT]);
+		CreateAndAddFont(styles[StyleDefault]);
 		for (const auto &style : styles) {
 			CreateAndAddFont(style);
 		}
@@ -318,8 +324,8 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 			style.Copy(fr->font, *fr);
 		}
 
-		aveCharWidth = styles[STYLE_DEFAULT].aveCharWidth;
-		spaceWidth = styles[STYLE_DEFAULT].spaceWidth;
+		aveCharWidth = styles[StyleDefault].aveCharWidth;
+		spaceWidth = styles[StyleDefault].spaceWidth;
 	}
 
 	selbar = Platform::Chrome();
@@ -350,7 +356,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	controlCharWidth = 0.0;
 	if (controlCharSymbol >= 32) {
 		const char cc[2] = { static_cast<char>(controlCharSymbol), '\0' };
-		controlCharWidth = surface.WidthText(styles[STYLE_CONTROLCHAR].font.get(), cc);
+		controlCharWidth = surface.WidthText(styles[StyleControlChar].font.get(), cc);
 	}
 
 	CalculateMarginWidthAndMask();
@@ -376,21 +382,21 @@ void ViewStyle::EnsureStyle(size_t index) {
 
 void ViewStyle::ResetDefaultStyle() {
 	fontsValid = false;
-	styles[STYLE_DEFAULT].ResetDefault(fontNames.Save(Platform::DefaultFont()));
+	styles[StyleDefault].ResetDefault(fontNames.Save(Platform::DefaultFont()));
 }
 
 void ViewStyle::ClearStyles() noexcept {
 	fontsValid = false;
 	// Reset all styles to be like the default style
-	const Style &source = styles[STYLE_DEFAULT];
+	const Style &source = styles[StyleDefault];
 	for (auto &style : styles) {
 		style.ClearTo(source);
 	}
 
-	styles[STYLE_LINENUMBER].back = Platform::Chrome();
+	styles[StyleLineNumber].back = Platform::Chrome();
 	// Set call tip fore/back to match the values previously set for call tips
-	styles[STYLE_CALLTIP].back = ColourAlpha(0xff, 0xff, 0xff);
-	styles[STYLE_CALLTIP].fore = ColourAlpha(0x80, 0x80, 0x80);
+	styles[StyleCallTip].back = ColourRGBA(0xff, 0xff, 0xff);
+	styles[StyleCallTip].fore = ColourRGBA(0x80, 0x80, 0x80);
 }
 
 void ViewStyle::CopyStyles(size_t sourceIndex, size_t destStyles) {
@@ -441,11 +447,11 @@ void ViewStyle::CalcLargestMarkerHeight() noexcept {
 	largestMarkerHeight = 0;
 	for (const auto &marker : markers) {
 		switch (marker.markType) {
-		case SC_MARK_PIXMAP:
+		case MarkerSymbol::Pixmap:
 			if (marker.pxpm && marker.pxpm->GetHeight() > largestMarkerHeight)
 				largestMarkerHeight = marker.pxpm->GetHeight();
 			break;
-		case SC_MARK_RGBAIMAGE:
+		case MarkerSymbol::RgbaImage:
 			if (marker.image && marker.image->GetHeight() > largestMarkerHeight)
 				largestMarkerHeight = marker.image->GetHeight();
 			break;
@@ -461,27 +467,27 @@ int ViewStyle::GetFrameWidth() const noexcept {
 
 bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const {
 	return caretLine.frame && (caretActive || caretLine.alwaysShow) &&
-		ElementColour(SC_ELEMENT_CARET_LINE_BACK) &&
-		(caretLine.layer == Layer::base) && lineContainsCaret;
+		ElementColour(Element::CaretLineBack) &&
+		(caretLine.layer == Layer::Base) && lineContainsCaret;
 }
 
 // See if something overrides the line background colour:  Either if caret is on the line
 // and background colour is set for that, or if a marker is defined that forces its background
 // colour onto the line, or if a marker is defined but has no selection margin in which to
-// display itself (as long as it's not an SC_MARK_EMPTY marker).  These are checked in order
+// display itself (as long as it's not an MarkerSymbol::Empty marker).  These are checked in order
 // with the earlier taking precedence.  When multiple markers cause background override,
 // the colour for the highest numbered one is used.
-std::optional<ColourAlpha> ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
-	std::optional<ColourAlpha> background;
+std::optional<ColourRGBA> ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
+	std::optional<ColourRGBA> background;
 	if (!caretLine.frame && (caretActive || caretLine.alwaysShow) &&
-		(caretLine.layer == Layer::base) && lineContainsCaret) {
-		background = ElementColour(SC_ELEMENT_CARET_LINE_BACK);
+		(caretLine.layer == Layer::Base) && lineContainsCaret) {
+		background = ElementColour(Element::CaretLineBack);
 	}
 	if (!background && marksOfLine) {
 		MarkerMask marks = marksOfLine;
 		for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
-			if ((marks & 1) && (markers[markBit].markType == SC_MARK_BACKGROUND) &&
-				(markers[markBit].layer == Layer::base)) {
+			if ((marks & 1) && (markers[markBit].markType == MarkerSymbol::Background) &&
+				(markers[markBit].layer == Layer::Base)) {
 				background = markers[markBit].back;
 			}
 			marks >>= 1;
@@ -492,7 +498,7 @@ std::optional<ColourAlpha> ViewStyle::Background(MarkerMask marksOfLine, bool ca
 		if (marksMasked) {
 			for (int markBit = 0; (markBit < MarkerBitCount) && marksMasked; markBit++) {
 				if ((marksMasked & 1) &&
-					(markers[markBit].layer == Layer::base)) {
+					(markers[markBit].layer == Layer::Base)) {
 					background = markers[markBit].back;
 				}
 				marksMasked >>= 1;
@@ -507,29 +513,29 @@ std::optional<ColourAlpha> ViewStyle::Background(MarkerMask marksOfLine, bool ca
 }
 
 bool ViewStyle::SelectionBackgroundDrawn() const noexcept {
-	return selection.layer == Layer::base;
+	return selection.layer == Layer::Base;
 }
 
 bool ViewStyle::SelectionTextDrawn() const {
 	return
-		ElementIsSet(SC_ELEMENT_SELECTION_TEXT) ||
-		ElementIsSet(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT) ||
-		ElementIsSet(SC_ELEMENT_SELECTION_SECONDARY_TEXT) ||
-		ElementIsSet(SC_ELEMENT_SELECTION_NO_FOCUS_TEXT);
+		ElementIsSet(Element::SelectionText) ||
+		ElementIsSet(Element::SelectionAdditionalText) ||
+		ElementIsSet(Element::SelectionSecondaryText) ||
+		ElementIsSet(Element::SelectionInactiveText);
 }
 
 bool ViewStyle::WhitespaceBackgroundDrawn() const {
-	return (viewWhitespace != WhiteSpace::invisible) && (ElementIsSet(SC_ELEMENT_WHITE_SPACE_BACK));
+	return (viewWhitespace != WhiteSpace::Invisible) && (ElementIsSet(Element::WhiteSpaceBack));
 }
 
 bool ViewStyle::WhiteSpaceVisible(bool inIndent) const noexcept {
-	return (!inIndent && viewWhitespace == WhiteSpace::visibleAfterIndent) ||
-		(inIndent && viewWhitespace == WhiteSpace::visibleOnlyInIndent) ||
-		viewWhitespace == WhiteSpace::visibleAlways;
+	return (!inIndent && viewWhitespace == WhiteSpace::VisibleAfterIndent) ||
+		(inIndent && viewWhitespace == WhiteSpace::VisibleOnlyInIndent) ||
+		viewWhitespace == WhiteSpace::VisibleAlways;
 }
 
-ColourAlpha ViewStyle::WrapColour() const {
-	return ElementColour(SC_ELEMENT_WHITE_SPACE).value_or(styles[STYLE_DEFAULT].fore).Opaque();
+ColourRGBA ViewStyle::WrapColour() const {
+	return ElementColour(Element::WhiteSpace).value_or(styles[StyleDefault].fore).Opaque();
 }
 
 // Insert new edge in sorted order.
@@ -543,7 +549,7 @@ void ViewStyle::AddMultiEdge(uptr_t wParam, sptr_t lParam) {
 		EdgeProperties(column, lParam));
 }
 
-std::optional<ColourAlpha> ViewStyle::ElementColour(int element) const {
+std::optional<ColourRGBA> ViewStyle::ElementColour(Element element) const {
 	const auto search = elementColours.find(element);
 	if (search != elementColours.end()) {
 		if (search->second.has_value()) {
@@ -559,18 +565,18 @@ std::optional<ColourAlpha> ViewStyle::ElementColour(int element) const {
 	return {};
 }
 
-bool ViewStyle::ElementAllowsTranslucent(int element) const {
+bool ViewStyle::ElementAllowsTranslucent(Element element) const {
 	return elementAllowsTranslucent.count(element) != 0;
 }
 
-bool ViewStyle::ResetElement(int element) {
+bool ViewStyle::ResetElement(Element element) {
 	const auto search = elementColours.find(element);
 	const bool changed = (search != elementColours.end()) && (search->second.has_value());
 	elementColours.erase(element);
 	return changed;
 }
 
-bool ViewStyle::SetElementColour(int element, ColourAlpha colour) {
+bool ViewStyle::SetElementColour(Element element, ColourRGBA colour) {
 	const auto search = elementColours.find(element);
 	const bool changed =
 		(search == elementColours.end()) ||
@@ -579,7 +585,7 @@ bool ViewStyle::SetElementColour(int element, ColourAlpha colour) {
 	return changed;
 }
 
-bool ViewStyle::ElementIsSet(int element) const {
+bool ViewStyle::ElementIsSet(Element element) const {
 	const auto search = elementColours.find(element);
 	if (search != elementColours.end()) {
 		return search->second.has_value();
@@ -587,7 +593,7 @@ bool ViewStyle::ElementIsSet(int element) const {
 	return false;
 }
 
-bool ViewStyle::SetElementBase(int element, ColourAlpha colour) {
+bool ViewStyle::SetElementBase(Element element, ColourRGBA colour) {
 	const auto search = elementBaseColours.find(element);
 	const bool changed =
 		(search == elementBaseColours.end()) ||
@@ -596,37 +602,19 @@ bool ViewStyle::SetElementBase(int element, ColourAlpha colour) {
 	return changed;
 }
 
-bool ViewStyle::SetWrapState(int wrapState_) noexcept {
-	WrapMode wrapStateWanted;
-	switch (wrapState_) {
-	case SC_WRAP_WORD:
-		wrapStateWanted = WrapMode::word;
-		break;
-	case SC_WRAP_CHAR:
-		wrapStateWanted = WrapMode::character;
-		break;
-	case SC_WRAP_WHITESPACE:
-		wrapStateWanted = WrapMode::whitespace;
-		break;
-	case SC_WRAP_AUTO:
-		wrapStateWanted = WrapMode::automatic;
-		break;
-	default:
-		wrapStateWanted = WrapMode::none;
-		break;
-	}
-	const bool changed = wrap.state != wrapStateWanted;
-	wrap.state = wrapStateWanted;
+bool ViewStyle::SetWrapState(Wrap wrapState_) noexcept {
+	const bool changed = wrap.state != wrapState_;
+	wrap.state = wrapState_;
 	return changed;
 }
 
-bool ViewStyle::SetWrapVisualFlags(int wrapVisualFlags_) noexcept {
+bool ViewStyle::SetWrapVisualFlags(WrapVisualFlag wrapVisualFlags_) noexcept {
 	const bool changed = wrap.visualFlags != wrapVisualFlags_;
 	wrap.visualFlags = wrapVisualFlags_;
 	return changed;
 }
 
-bool ViewStyle::SetWrapVisualFlagsLocation(int wrapVisualFlagsLocation_) noexcept {
+bool ViewStyle::SetWrapVisualFlagsLocation(WrapVisualLocation wrapVisualFlagsLocation_) noexcept {
 	const bool changed = wrap.visualFlagsLocation != wrapVisualFlagsLocation_;
 	wrap.visualFlagsLocation = wrapVisualFlagsLocation_;
 	return changed;
@@ -638,27 +626,27 @@ bool ViewStyle::SetWrapVisualStartIndent(int wrapVisualStartIndent_) noexcept {
 	return changed;
 }
 
-bool ViewStyle::SetWrapIndentMode(int wrapIndentMode_) noexcept {
+bool ViewStyle::SetWrapIndentMode(WrapIndentMode wrapIndentMode_) noexcept {
 	const bool changed = wrap.indentMode != wrapIndentMode_;
 	wrap.indentMode = wrapIndentMode_;
 	return changed;
 }
 
 bool ViewStyle::IsBlockCaretStyle() const noexcept {
-	return ((caret.style & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) ||
-		(caret.style & CARETSTYLE_OVERSTRIKE_BLOCK) != 0;
+	return ((caret.style & CaretStyle::InsMask) == CaretStyle::Block) ||
+		FlagSet(caret.style, CaretStyle::OverstrikeBlock);
 }
 
 bool ViewStyle::IsCaretVisible() const noexcept {
-	return caret.width > 0 && caret.style != CARETSTYLE_INVISIBLE;
+	return caret.width > 0 && caret.style != CaretStyle::Invisible;
 }
 
 bool ViewStyle::DrawCaretInsideSelection(bool inOverstrike, bool imeCaretBlockOverride) const noexcept {
-	if (caret.style & CARETSTYLE_BLOCK_AFTER) {
+	if (FlagSet(caret.style, CaretStyle::BlockAfter)) {
 		return false;
 	}
-	return ((caret.style & CARETSTYLE_INS_MASK) == CARETSTYLE_BLOCK) ||
-		(inOverstrike && (caret.style & CARETSTYLE_OVERSTRIKE_BLOCK) != 0) ||
+	return ((caret.style & CaretStyle::InsMask) == CaretStyle::Block) ||
+		(inOverstrike && FlagSet(caret.style, CaretStyle::OverstrikeBlock)) ||
 		imeCaretBlockOverride;
 }
 
@@ -668,7 +656,7 @@ ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawD
 		return CaretShape::line;
 	}
 	if (inOverstrike) {
-		if (caret.style & CARETSTYLE_OVERSTRIKE_BLOCK) {
+		if (FlagSet(caret.style, CaretStyle::OverstrikeBlock)) {
 			return CaretShape::block;
 		}
 		if (drawOverstrikeCaret) {
@@ -678,12 +666,12 @@ ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawD
 	if (imeCaretBlockOverride) {
 		return CaretShape::block;
 	}
-	const int style = caret.style & CARETSTYLE_INS_MASK;
-	return (style <= CARETSTYLE_BLOCK) ? static_cast<CaretShape>(style) : CaretShape::line;
+	const CaretStyle style = caret.style & CaretStyle::InsMask;
+	return (style <= CaretStyle::Block) ? static_cast<CaretShape>(style) : CaretShape::line;
 }
 
 bool ViewStyle::ZoomIn() noexcept {
-	if (zoomLevel < SC_MAX_ZOOM_LEVEL) {
+	if (zoomLevel < MaxZoomLevel) {
 		int level = zoomLevel;
 		if (level < 200) {
 			level += 10;
@@ -691,7 +679,7 @@ bool ViewStyle::ZoomIn() noexcept {
 			level += 25;
 		}
 
-		level = std::min(level, SC_MAX_ZOOM_LEVEL);
+		level = std::min(level, MaxZoomLevel);
 		if (level != zoomLevel) {
 			zoomLevel = level;
 			fontsValid = false;
@@ -702,7 +690,7 @@ bool ViewStyle::ZoomIn() noexcept {
 }
 
 bool ViewStyle::ZoomOut() noexcept {
-	if (zoomLevel > SC_MIN_ZOOM_LEVEL) {
+	if (zoomLevel > MinZoomLevel) {
 		int level = zoomLevel;
 		if (level <= 200) {
 			level -= 10;
@@ -710,7 +698,7 @@ bool ViewStyle::ZoomOut() noexcept {
 			level -= 25;
 		}
 
-		level = std::max(level, SC_MIN_ZOOM_LEVEL);
+		level = std::max(level, MinZoomLevel);
 		if (level != zoomLevel) {
 			zoomLevel = level;
 			fontsValid = false;
@@ -725,8 +713,8 @@ void ViewStyle::AllocStyles(size_t sizeNew) {
 	const size_t i = styles.size();
 	styles.resize(sizeNew);
 	sizeNew = styles.size();
-	if (sizeNew > STYLE_DEFAULT) {
-		const Style &source = styles[STYLE_DEFAULT];
+	if (sizeNew > StyleDefault) {
+		const Style &source = styles[StyleDefault];
 		for (auto it = styles.begin() + i; it != styles.end(); ++it) {
 			it->ClearTo(source);
 		}

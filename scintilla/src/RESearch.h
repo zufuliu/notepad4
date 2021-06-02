@@ -7,7 +7,7 @@
 // This file is in the public domain.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 class CharacterIndexer {
 public:
@@ -28,7 +28,7 @@ public:
 	void Clear() noexcept;
 	void ClearCache() noexcept;
 	void GrabMatches(const CharacterIndexer &ci);
-	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, int flags);
+	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, Scintilla::FindOption flags);
 	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
 
 	static constexpr int MAXTAG = 10;
@@ -61,7 +61,7 @@ private:
 	// cache for previous pattern with same address, length and flags
 	const char *previousPattern;
 	Sci::Position previousLength;
-	int previousFlags;
+	Scintilla::FindOption previousFlags;
 	std::string cachedPattern;
 
 	unsigned char bittab[BITBLK]; /* bit table for CCL pre-set bits */

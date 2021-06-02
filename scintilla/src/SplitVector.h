@@ -16,7 +16,7 @@
 #include <cstdio>
 #endif
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 template <typename T>
 class SplitVector {
@@ -33,20 +33,25 @@ protected:
 	/// hence be fast.
 	void GapTo(ptrdiff_t position) noexcept {
 		if (position != part1Length) {
-			if (position < part1Length) {
-				// Moving the gap towards start so moving elements towards end
-				std::move_backward(
-					body.data() + position,
-					body.data() + part1Length,
-					body.data() + gapLength + part1Length);
-			} else {	// position > part1Length
-				// Moving the gap towards end so moving elements towards start
-				std::move(
-					body.data() + part1Length + gapLength,
-					body.data() + gapLength + position,
-					body.data() + part1Length);
+			try {
+				// This can never fail but std::move and std::move_backward are not noexcept.
+				if (position < part1Length) {
+					// Moving the gap towards start so moving elements towards end
+					std::move_backward(
+						body.data() + position,
+						body.data() + part1Length,
+						body.data() + gapLength + part1Length);
+				} else {	// position > part1Length
+					// Moving the gap towards end so moving elements towards start
+					std::move(
+						body.data() + part1Length + gapLength,
+						body.data() + gapLength + position,
+						body.data() + part1Length);
+				}
+				part1Length = position;
+			} catch (...) {
+				// Ignore any exception
 			}
-			part1Length = position;
 		}
 	}
 

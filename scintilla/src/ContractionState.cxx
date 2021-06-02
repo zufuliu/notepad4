@@ -29,7 +29,7 @@
 #include "ContractionState.h"
 //#include "ElapsedPeriod.h"
 
-using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 #define ContractionState_InsertLines_OneByOne	0
 #define ContractionState_DeleteLines_OneByOne	0
@@ -497,7 +497,7 @@ void ContractionState<LINE>::Check() const noexcept {
 
 }
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 std::unique_ptr<IContractionState> ContractionStateCreate(bool largeDocument) {
 	if (largeDocument)

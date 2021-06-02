@@ -21,13 +21,13 @@
 #include <algorithm>
 #include <memory>
 
+#include "ScintillaTypes.h"
+#include "ILoader.h"
+#include "ILexer.h"
+
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
-
-#include "ILoader.h"
-#include "ILexer.h"
-#include "Scintilla.h"
 
 //#include "CharacterCategory.h"
 
@@ -38,7 +38,6 @@
 #include "RunStyles.h"
 #include "ContractionState.h"
 #include "CellBuffer.h"
-#include "KeyMap.h"
 #include "Indicator.h"
 #include "LineMarker.h"
 #include "Style.h"
@@ -53,6 +52,7 @@
 #include "EditModel.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 Caret::Caret() noexcept :
 	active(false), on(false), period(500) {}
@@ -64,20 +64,20 @@ EditModel::EditModel() : braces{} {
 	posDrag = SelectionPosition(Sci::invalidPosition);
 	braces[0] = Sci::invalidPosition;
 	braces[1] = Sci::invalidPosition;
-	bracesMatchStyle = STYLE_BRACEBAD;
+	bracesMatchStyle = StyleBraceBad;
 	highlightGuideColumn = 0;
 	hasFocus = false;
 	primarySelection = true;
-	imeInteraction = IMEInteraction::windowed;
-	bidirectional = Bidirectional::bidiDisabled;
-	foldFlags = 0;
-	foldDisplayTextStyle = SC_FOLDDISPLAYTEXT_HIDDEN;
+	imeInteraction = IMEInteraction::Windowed;
+	bidirectional = Bidirectional::Disabled;
+	foldFlags = FoldFlag::None;
+	foldDisplayTextStyle = FoldDisplayTextStyle::Hidden;
 	hotspot = Range(Sci::invalidPosition);
 	hotspotSingleLine = true;
 	hoverIndicatorPos = Sci::invalidPosition;
 	wrapWidth = LineLayout::wrapWidthInfinite;
 	// before setting a lexer, style buffer is useless.
-	pdoc = new Document(SC_DOCUMENTOPTION_STYLES_NONE);
+	pdoc = new Document(DocumentOption::StylesNone);
 	pdoc->AddRef();
 	pcs = ContractionStateCreate(pdoc->IsLarge());
 }
@@ -88,12 +88,12 @@ EditModel::~EditModel() {
 }
 
 bool EditModel::BidirectionalEnabled() const noexcept {
-	return (bidirectional != Bidirectional::bidiDisabled) &&
-		(SC_CP_UTF8 == pdoc->dbcsCodePage);
+	return (bidirectional != Bidirectional::Disabled) &&
+		(CpUtf8 == pdoc->dbcsCodePage);
 }
 
 bool EditModel::BidirectionalR2L() const noexcept {
-	return bidirectional == Bidirectional::bidiR2L;
+	return bidirectional == Bidirectional::R2L;
 }
 
 void EditModel::SetDefaultFoldDisplayText(const char *text) {
@@ -105,7 +105,7 @@ const char *EditModel::GetDefaultFoldDisplayText() const noexcept {
 }
 
 const char *EditModel::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
-	if (foldDisplayTextStyle == SC_FOLDDISPLAYTEXT_HIDDEN || pcs->GetExpanded(lineDoc)) {
+	if (foldDisplayTextStyle == FoldDisplayTextStyle::Hidden || pcs->GetExpanded(lineDoc)) {
 		return nullptr;
 	}
 

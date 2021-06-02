@@ -88,7 +88,7 @@ extern WCHAR defaultTextFontName[LF_FACESIZE];
 extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
 #endif
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 extern void Platform_Initialise(void *hInstance) noexcept;
 extern void Platform_Finalise(bool fromDllMain) noexcept;
@@ -203,7 +203,7 @@ inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
 #else
 	FARPROC function = ::GetProcAddress(hModule, lpProcName);
 	static_assert(sizeof(T) == sizeof(function));
-	T fp;
+	T fp {};
 	memcpy(&fp, &function, sizeof(T));
 	return fp;
 #endif
@@ -240,16 +240,16 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 
 HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept;
 
-constexpr BYTE Win32MapFontQuality(int extraFontFlag) noexcept {
-	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
+constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
+	switch (extraFontFlag & FontQuality::QualityMask) {
 
-	case SC_EFF_QUALITY_NON_ANTIALIASED:
+	case FontQuality::QualityNonAntialiased:
 		return NONANTIALIASED_QUALITY;
 
-	case SC_EFF_QUALITY_ANTIALIASED:
+	case FontQuality::QualityAntialiased:
 		return ANTIALIASED_QUALITY;
 
-	case SC_EFF_QUALITY_LCD_OPTIMIZED:
+	case FontQuality::QualityLcdOptimized:
 		return CLEARTYPE_QUALITY;
 
 	default:

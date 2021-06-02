@@ -9,7 +9,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 constexpr bool IsNullOrEmpty(const char *text) noexcept {
 	return text == nullptr || *text == '\0';

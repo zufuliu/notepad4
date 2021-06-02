@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 struct Chunk {
 	size_t start;
@@ -29,7 +29,7 @@ class CallTip {
 	int offsetMain;         // The alignment point of the call tip
 	int offsetText;
 	int tabSize;            // Tab size in pixels, <=0 no TAB expand
-	bool useStyleCallTip;   // if true, STYLE_CALLTIP should be used
+	bool useStyleCallTip;   // if true, StyleCallTip should be used
 	bool above;		// if true, display calltip above text
 
 	int SCICALL DrawChunk(Surface *surface, int x, std::string_view sv,
@@ -43,11 +43,11 @@ public:
 	Window wDraw;
 	bool inCallTipMode;
 	Sci::Position posStartCallTip;
-	ColourAlpha colourBG;
-	ColourAlpha colourUnSel;
-	ColourAlpha colourSel;
-	ColourAlpha colourShade;
-	ColourAlpha colourLight;
+	ColourRGBA colourBG;
+	ColourRGBA colourUnSel;
+	ColourRGBA colourSel;
+	ColourRGBA colourShade;
+	ColourRGBA colourLight;
 	int codePage;
 	int clickPlace;
 
@@ -73,7 +73,7 @@ public:
 	/// Setup the calltip and return a rectangle of the area required.
 	PRectangle SCICALL CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
 		const char *faceName, int size, int codePage_,
-		int characterSet, int technology, const char *localeName,
+		Scintilla::CharacterSet characterSet, Scintilla::Technology technology, const char *localeName,
 		const Window &wParent);
 
 	void CallTipCancel() noexcept;
@@ -92,7 +92,7 @@ public:
 	bool UseStyleCallTip() const noexcept;
 
 	// Modify foreground and background colours
-	void SetForeBack(ColourAlpha fore, ColourAlpha back) noexcept;
+	void SetForeBack(ColourRGBA fore, ColourRGBA back) noexcept;
 };
 
 }

@@ -700,8 +700,8 @@ val SC_ELEMENT_SELECTION_ADDITIONAL_TEXT=12
 val SC_ELEMENT_SELECTION_ADDITIONAL_BACK=13
 val SC_ELEMENT_SELECTION_SECONDARY_TEXT=14
 val SC_ELEMENT_SELECTION_SECONDARY_BACK=15
-val SC_ELEMENT_SELECTION_NO_FOCUS_TEXT=16
-val SC_ELEMENT_SELECTION_NO_FOCUS_BACK=17
+val SC_ELEMENT_SELECTION_INACTIVE_TEXT=16
+val SC_ELEMENT_SELECTION_INACTIVE_BACK=17
 val SC_ELEMENT_CARET=40
 val SC_ELEMENT_CARET_ADDITIONAL=41
 val SC_ELEMENT_CARET_LINE_BACK=50
@@ -903,6 +903,7 @@ val SC_INDICVALUEBIT=0x1000000
 val SC_INDICVALUEMASK=0xFFFFFF
 
 enu IndicFlag=SC_INDICFLAG_
+val SC_INDICFLAG_NONE=0
 val SC_INDICFLAG_VALUEFORE=1
 
 ali SC_INDICFLAG_VALUEFORE=VALUE_FORE
@@ -1449,6 +1450,7 @@ fun line DocLineFromVisible=2221(line displayLine,)
 fun line WrapCount=2235(line docLine,)
 
 enu FoldLevel=SC_FOLDLEVEL
+val SC_FOLDLEVELNONE=0x0
 val SC_FOLDLEVELBASE=0x400
 val SC_FOLDLEVELWHITEFLAG=0x1000
 val SC_FOLDLEVELHEADERFLAG=0x2000
@@ -1534,6 +1536,7 @@ fun void FoldAll=2662(FoldAction action,)
 fun void EnsureVisible=2232(line line,)
 
 enu AutomaticFold=SC_AUTOMATICFOLD_
+val SC_AUTOMATICFOLD_NONE=0x0000
 val SC_AUTOMATICFOLD_SHOW=0x0001
 val SC_AUTOMATICFOLD_CLICK=0x0002
 val SC_AUTOMATICFOLD_CHANGE=0x0004
@@ -1545,6 +1548,7 @@ set void SetAutomaticFold=2663(AutomaticFold automaticFold,)
 get AutomaticFold GetAutomaticFold=2664(,)
 
 enu FoldFlag=SC_FOLDFLAG_
+val SC_FOLDFLAG_NONE=0x0000
 val SC_FOLDFLAG_LINEBEFORE_EXPANDED=0x0002
 val SC_FOLDFLAG_LINEBEFORE_CONTRACTED=0x0004
 val SC_FOLDFLAG_LINEAFTER_EXPANDED=0x0008
@@ -1872,7 +1876,7 @@ fun void Cancel=2325(,)
 fun void DeleteBack=2326(,)
 
 enu TabCompletion=TAB_COMPLETION_
-val TAB_COMPLETION_NONE=2
+val TAB_COMPLETION_NONE=0
 val TAB_COMPLETION_DEFAULT=1
 val TAB_COMPLETION_LATEX=2
 
@@ -2981,7 +2985,7 @@ get LineEndType GetLineEndTypesActive=2658(,)
 # Set the way a character is drawn.
 set void SetRepresentation=2665(string encodedCharacter, string representation)
 
-# Set the way a character is drawn.
+# Get the way a character is drawn.
 # Result is NUL-terminated.
 get int GetRepresentation=2666(string encodedCharacter, stringresult representation)
 
@@ -3230,16 +3234,18 @@ ali SC_MOD_CHANGEEOLANNOTATION=CHANGE_E_O_L_ANNOTATION
 ali SC_MODEVENTMASKALL=EVENT_MASK_ALL
 
 enu Update=SC_UPDATE_
+val SC_UPDATE_NONE=0x0
 val SC_UPDATE_CONTENT=0x1
 val SC_UPDATE_SELECTION=0x2
 val SC_UPDATE_V_SCROLL=0x4
 val SC_UPDATE_H_SCROLL=0x8
-val NP2_CUSTOM_UPDATE=0x100
+val SC_UPDATE_APP_CUSTOM=0x100
 
 # For compatibility, these go through the COMMAND notification rather than NOTIFY
 # and should have had exactly the same values as the EN_* constants.
 # Unfortunately the SETFOCUS and KILLFOCUS are flipped over from EN_*
 # As clients depend on these constants, this will not be changed.
+enu FocusChange=SCEN_
 val SCEN_CHANGE=768
 val SCEN_SETFOCUS=512
 val SCEN_KILLFOCUS=256

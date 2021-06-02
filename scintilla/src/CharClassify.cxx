@@ -15,7 +15,7 @@
 #include "CharacterSet.h"
 #include "CharClassify.h"
 
-using namespace Scintilla;
+using namespace Scintilla::Internal;
 using namespace Lexilla;
 
 CharClassify::CharClassify() noexcept {
@@ -49,7 +49,7 @@ void CharClassify::SetCharClasses(const unsigned char *chars, CharacterClass new
 	}
 }
 
-void CharClassify::SetCharClassesEx(const unsigned char *chars, int length) noexcept {
+void CharClassify::SetCharClassesEx(const unsigned char *chars, size_t length) noexcept {
 	if (chars == nullptr || length == 0) {
 		memset(charClass + 128, static_cast<int>(CharacterClass::word), 128);
 	} else {

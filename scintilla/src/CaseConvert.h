@@ -8,7 +8,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 enum class CaseConversion {
 	fold,
@@ -29,7 +29,7 @@ const char *CaseConvert(int character, CaseConversion conversion);
 // When performing CaseConvertString, the converted value may be up to 3 times longer than the input.
 // Ligatures are often decomposed into multiple characters and long cases include:
 // ΐ "\xce\x90" folds to ΐ "\xce\xb9\xcc\x88\xcc\x81"
-constexpr int maxExpansionCaseConversion = 3;
+constexpr size_t maxExpansionCaseConversion = 3;
 
 // Converts a mixed case string using a particular conversion.
 // Result may be a different length to input and the length is the return value.

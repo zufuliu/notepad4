@@ -19,16 +19,19 @@
 #include <algorithm>
 #include <memory>
 
+#include "ScintillaTypes.h"
+#include "ScintillaMessages.h"
+
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
 
-#include "Scintilla.h"
 #include "CharacterSet.h"
 #include "Position.h"
 #include "AutoComplete.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 AutoComplete::AutoComplete() :
 	active(false),
@@ -41,10 +44,10 @@ AutoComplete::AutoComplete() :
 	cancelAtStartPos(true),
 	autoHide(true),
 	dropRestOfWord(false),
-	ignoreCaseBehaviour(SC_CASEINSENSITIVEBEHAVIOUR_RESPECTCASE),
+	ignoreCaseBehaviour(CaseInsensitiveBehaviour::RespectCase),
 	widthLBDefault(100),
 	heightLBDefault(100),
-	autoSort(SC_ORDER_PRESORTED) {
+	autoSort(Ordering::PreSorted) {
 	lb = ListBox::Allocate();
 }
 
@@ -60,7 +63,7 @@ bool AutoComplete::Active() const noexcept {
 
 void AutoComplete::Start(Window &parent, int ctrlID,
 	Sci::Position position, Point location, Sci::Position startLen_,
-	int lineHeight, bool unicodeMode, int technology) noexcept {
+	int lineHeight, bool unicodeMode, Technology technology) noexcept {
 	if (active) {
 		Cancel();
 	}
@@ -151,7 +154,7 @@ struct Sorter {
 };
 
 void AutoComplete::SetList(const char *list) {
-	if (autoSort == SC_ORDER_PRESORTED) {
+	if (autoSort == Ordering::PreSorted) {
 		lb->SetList(list, separator, typesep);
 		sortMatrix.resize(lb->Length());
 		for (int i = 0; i < static_cast<int>(sortMatrix.size()); ++i) {
@@ -166,7 +169,7 @@ void AutoComplete::SetList(const char *list) {
 		sortMatrix[i] = i;
 	}
 	std::sort(sortMatrix.begin(), sortMatrix.end(), IndexSort);
-	if (autoSort == SC_ORDER_CUSTOM || sortMatrix.size() < 2) {
+	if (autoSort == Ordering::Custom || sortMatrix.size() < 2) {
 		lb->SetList(list, separator, typesep);
 		PLATFORM_ASSERT(lb->Length() == static_cast<int>(sortMatrix.size()));
 		return;
@@ -259,7 +262,7 @@ void AutoComplete::Select(const char *word) {
 			}
 			location = pivot;
 			if (ignoreCase
-				&& ignoreCaseBehaviour == SC_CASEINSENSITIVEBEHAVIOUR_RESPECTCASE) {
+				&& ignoreCaseBehaviour == CaseInsensitiveBehaviour::RespectCase) {
 				// Check for exact-case match
 				for (; pivot <= end; pivot++) {
 					item = lb->GetValue(sortMatrix[pivot]);
@@ -283,7 +286,7 @@ void AutoComplete::Select(const char *word) {
 		else
 			lb->Select(-1);
 	} else {
-		if (autoSort == SC_ORDER_CUSTOM) {
+		if (autoSort == Ordering::Custom) {
 			// Check for a logically earlier match
 			for (int i = location + 1; i <= end; ++i) {
 				const std::string item = lb->GetValue(sortMatrix[i]);

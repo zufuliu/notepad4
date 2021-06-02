@@ -21,7 +21,7 @@ constexpr Position invalidPosition = -1;
 
 }
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 // Bit set of marker numbers.
 using MarkerMask = unsigned int;

@@ -93,6 +93,15 @@
 
 // Non-platform-specific headers
 
+// Exported headers
+
+#include "Sci_Position.h"
+#include "ScintillaTypes.h"
+#include "ScintillaMessages.h"
+#include "ScintillaStructures.h"
+#include "ILoader.h"
+#include "ILexer.h"
+
 // src platform interface
 #include "Debugging.h"
 #include "Geometry.h"
@@ -100,9 +109,6 @@
 
 // include
 #include "VectorISA.h"
-#include "Sci_Position.h"
-#include "ILoader.h"
-#include "ILexer.h"
 #include "Scintilla.h"
 #include "ScintillaWidget.h"
 
@@ -153,7 +159,6 @@
 #include "UniConversion.h"
 #include "Selection.h"
 #include "PositionCache.h"
-#include "FontQuality.h"
 #include "EditModel.h"
 #include "MarginView.h"
 #include "EditView.h"

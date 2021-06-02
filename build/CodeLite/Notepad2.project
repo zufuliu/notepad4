@@ -11,6 +11,9 @@
       <File Name="../../scintilla/include/Sci_Position.h"/>
       <File Name="../../scintilla/include/SciLexer.h"/>
       <File Name="../../scintilla/include/Scintilla.h"/>
+      <File Name="../../scintilla/include/ScintillaMessages.h"/>
+      <File Name="../../scintilla/include/ScintillaStructures.h"/>
+      <File Name="../../scintilla/include/ScintillaTypes.h"/>
       <File Name="../../scintilla/include/VectorISA.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="lexers">

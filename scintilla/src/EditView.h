@@ -6,13 +6,13 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 struct PrintParameters {
 	/// 2018-09-04 Changed to a percent value
 	int magnification;
-	int colourMode;
-	WrapMode wrapState;
+	Scintilla::PrintOption colourMode;
+	Scintilla::Wrap wrapState;
 	PrintParameters() noexcept;
 };
 
@@ -68,10 +68,7 @@ public:
 	* In multiPhaseDraw mode, drawing is performed in multiple phases with each phase drawing
 	* one feature over the whole drawing area, instead of within one line. This allows text to
 	* overlap from one line to the next. */
-	enum class PhasesDraw {
-		one, two, multiple
-	};
-	PhasesDraw phasesDraw;
+	Scintilla::PhasesDraw phasesDraw;
 
 	int lineWidthMaxSeen;
 
@@ -135,7 +132,7 @@ public:
 	void SCICALL DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight) const;
 	void SCICALL DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
 		Sci::Line line, Sci::Position lineEnd, int xStart, int subLine, XYACCUMULATOR subLineStart,
-		std::optional<ColourAlpha> background) const;
+		std::optional<ColourRGBA> background) const;
 	void SCICALL DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase);
 	void SCICALL DrawEOLAnnotationText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
@@ -146,10 +143,10 @@ public:
 		int xStart, PRectangle rcLine, int subLine) const;
 	void SCICALL DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
 		Range lineRange, Sci::Position posLineStart, int xStart,
-		int subLine, std::optional<ColourAlpha> background) const;
+		int subLine, std::optional<ColourRGBA> background) const;
 	void SCICALL DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line lineVisible,
 		PRectangle rcLine, Range lineRange, Sci::Position posLineStart, int xStart,
-		int subLine, std::optional<ColourAlpha> background) const;
+		int subLine, std::optional<ColourRGBA> background) const;
 	void SCICALL DrawIndentGuidesOverEmpty(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, Sci::Line lineVisible, PRectangle rcLine, int xStart, int subLine) const;
 	void SCICALL DrawLine(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line line,
@@ -158,7 +155,7 @@ public:
 		const ViewStyle &vsDraw);
 	void SCICALL FillLineRemainder(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, PRectangle rcArea, int subLine) const;
-	Sci::Position FormatRange(bool draw, const Sci_RangeToFormat *pfr, Surface *surface, Surface *surfaceMeasure,
+	Sci::Position FormatRange(bool draw, const Scintilla::RangeToFormat *pfr, Surface *surface, Surface *surfaceMeasure,
 		const EditModel &model, const ViewStyle &vs);
 };
 

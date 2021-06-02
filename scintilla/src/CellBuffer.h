@@ -8,7 +8,7 @@
 
 #define InsertString_WithoutPerLine		1023
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 // Interface to per-line data that wants to see each line insertion and deletion
 class PerLine {
@@ -116,7 +116,7 @@ private:
 	SplitVector<char> style;
 	bool readOnly;
 	bool utf8Substance;
-	int utf8LineEnds;
+	Scintilla::LineEndType utf8LineEnds;
 
 	bool collectingUndo;
 	UndoHistory uh;
@@ -156,21 +156,21 @@ public:
 	void Allocate(Sci::Position newSize);
 	bool EnsureStyleBuffer(bool hasStyles_);
 	void SetUTF8Substance(bool utf8Substance_) noexcept;
-	int GetLineEndTypes() const noexcept {
+	Scintilla::LineEndType GetLineEndTypes() const noexcept {
 		return utf8LineEnds;
 	}
-	void SetLineEndTypes(int utf8LineEnds_);
+	void SetLineEndTypes(Scintilla::LineEndType utf8LineEnds_);
 	bool ContainsLineEnd(const char *s, Sci::Position length) const noexcept;
 	void SetPerLine(PerLine *pl) noexcept;
-	int LineCharacterIndex() const noexcept;
-	void AllocateLineCharacterIndex(int lineCharacterIndex);
-	void ReleaseLineCharacterIndex(int lineCharacterIndex);
+	Scintilla::LineCharacterIndexType LineCharacterIndex() const noexcept;
+	void AllocateLineCharacterIndex(Scintilla::LineCharacterIndexType lineCharacterIndex);
+	void ReleaseLineCharacterIndex(Scintilla::LineCharacterIndexType lineCharacterIndex);
 	Sci::Line Lines() const noexcept;
 	void AllocateLines(Sci::Line lines);
 	Sci::Position LineStart(Sci::Line line) const noexcept;
-	Sci::Position IndexLineStart(Sci::Line line, int lineCharacterIndex) const noexcept;
+	Sci::Position IndexLineStart(Sci::Line line, Scintilla::LineCharacterIndexType lineCharacterIndex) const noexcept;
 	Sci::Line LineFromPosition(Sci::Position pos) const noexcept;
-	Sci::Line LineFromPositionIndex(Sci::Position pos, int lineCharacterIndex) const noexcept;
+	Sci::Line LineFromPositionIndex(Sci::Position pos, Scintilla::LineCharacterIndexType lineCharacterIndex) const noexcept;
 	void InsertLine(Sci::Line line, Sci::Position position, bool lineStart);
 	void RemoveLine(Sci::Line line);
 	const char *InsertString(Sci::Position position, const char *s, Sci::Position insertLength, bool &startSequence);

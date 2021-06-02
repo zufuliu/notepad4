@@ -1672,7 +1672,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_TEXT);
 	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_ADDITIONAL_TEXT);
 	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_SECONDARY_TEXT);
-	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_NO_FOCUS_TEXT);
+	//SciCall_ResetElementColor(SC_ELEMENT_SELECTION_INACTIVE_TEXT);
 	// always set background color
 	if (!Style_StrGetBackColor(szValue, &rgb)) {
 		rgb = GetSysColor(COLOR_HIGHLIGHT);
@@ -1689,7 +1689,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	rgb = ColorAlpha(rgb, iValue);
 	SciCall_SetElementColor(SC_ELEMENT_SELECTION_ADDITIONAL_BACK, rgb);
 	SciCall_SetElementColor(SC_ELEMENT_SELECTION_SECONDARY_BACK, rgb);
-	//SciCall_SetElementColor(SC_ELEMENT_SELECTION_NO_FOCUS_BACK, rgb);
+	SciCall_SetElementColor(SC_ELEMENT_SELECTION_INACTIVE_BACK, rgb);
 
 	SciCall_SetSelEOLFilled(Style_StrGetEOLFilled(szValue));
 	if (!Style_StrGetSize(szValue, &iValue)) {

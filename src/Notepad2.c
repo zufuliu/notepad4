@@ -1691,7 +1691,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
 #else
 	// Don't draw folding line below when collapsed.
-	SciCall_SetFoldFlags(0);
+	SciCall_SetFoldFlags(SC_FOLDFLAG_NONE);
 #endif
 	SciCall_FoldDisplayTextSetStyle(SC_FOLDDISPLAYTEXT_BOXED);
 	const char *text = GetFoldDisplayEllipsis(SC_CP_UTF8, 0); // internal default encoding
@@ -4120,7 +4120,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			scn.nmhdr.hwndFrom = hwndEdit;
 			scn.nmhdr.idFrom = IDC_EDIT;
 			scn.nmhdr.code = SCN_UPDATEUI;
-			scn.updated = NP2_CUSTOM_UPDATE;
+			scn.updated = SC_UPDATE_APP_CUSTOM;
 			SendMessage(hwnd, WM_NOTIFY, IDC_EDIT, (LPARAM)&scn);
 		} else {
 			SciCall_BraceHighlight(INVALID_POSITION, INVALID_POSITION);

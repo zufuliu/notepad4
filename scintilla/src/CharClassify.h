@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 constexpr bool IsDBCSCodePage(int codePage) noexcept {
 	return codePage == 932
@@ -24,7 +24,7 @@ public:
 
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
 	void SetCharClasses(const unsigned char *chars, CharacterClass newCharClass) noexcept;
-	void SetCharClassesEx(const unsigned char *chars, int length) noexcept;
+	void SetCharClassesEx(const unsigned char *chars, size_t length) noexcept;
 	int GetCharsOfClass(CharacterClass characterClass, unsigned char *buffer) const noexcept;
 	CharacterClass GetClass(unsigned char ch) const noexcept {
 		return charClass[ch];

@@ -12,14 +12,16 @@
 #include <algorithm>
 #include <memory>
 
+#include "ScintillaTypes.h"
+
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
 
-#include "Scintilla.h"
 #include "Style.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 bool FontSpecification::operator==(const FontSpecification &other) const noexcept {
 	return fontName == other.fontName &&
@@ -60,8 +62,8 @@ void FontMeasurements::ClearMeasurements() noexcept {
 }
 
 Style::Style() noexcept {
-	fore = ColourAlpha(0, 0, 0);
-	back = ColourAlpha(0xff, 0xff, 0xff);
+	fore = ColourRGBA(0, 0, 0);
+	back = ColourRGBA(0xff, 0xff, 0xff);
 	eolFilled = false;
 	underline = false;
 	strike = false;
@@ -91,13 +93,13 @@ Style &Style::operator=(const Style &source) noexcept {
 
 void Style::ResetDefault(const char *fontName_) noexcept {
 	fontName = fontName_;
-	weight = SC_WEIGHT_NORMAL;
+	weight = FontWeight::Normal;
 	italic = false;
-	size = Platform::DefaultFontSize() * SC_FONT_SIZE_MULTIPLIER;
-	characterSet = SC_CHARSET_DEFAULT;
+	size = Platform::DefaultFontSize() * FontSizeMultiplier;
+	characterSet = CharacterSet::Default;
 	FontMeasurements::ClearMeasurements();
-	fore = ColourAlpha(0, 0, 0);
-	back = ColourAlpha(0xff, 0xff, 0xff);
+	fore = ColourRGBA(0, 0, 0);
+	back = ColourRGBA(0xff, 0xff, 0xff);
 	eolFilled = false;
 	underline = false;
 	strike = false;

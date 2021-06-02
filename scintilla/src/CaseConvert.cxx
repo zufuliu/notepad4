@@ -20,7 +20,7 @@
 #include "CaseConvert.h"
 #include "UniConversion.h"
 
-using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 namespace {
 	// Use an unnamed namespace to protect the declarations from name conflicts
@@ -589,7 +589,13 @@ class CaseConverter final : public ICaseConverter {
 		}
 		CharacterConversion(int character_, std::string_view conversion_) noexcept : character(character_) {
 			assert(conversion_.length() <= maxConversionLength);
-			conversion_.copy(conversion.conversion, conversion_.length());
+			try {
+				// This can never fail as std::string_view::copy should only throw
+				// std::out_of_range if pos > size() and pos == 0 here
+				conversion_.copy(conversion.conversion, conversion_.length());
+			} catch (...) {
+				// Ignore any exception
+			}
 		}
 		bool operator<(const CharacterConversion &other) const noexcept {
 			return character < other.character;
@@ -795,7 +801,7 @@ CaseConverter *ConverterForConversion(CaseConversion conversion) noexcept {
 
 }
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 ICaseConverter *ConverterFor(CaseConversion conversion) {
 	CaseConverter *pCaseConv = ConverterForConversion(conversion);

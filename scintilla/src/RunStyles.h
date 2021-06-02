@@ -8,7 +8,7 @@
 /// Styling buffer using one element for each run rather than using
 /// a filled buffer.
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 // Return for RunStyles::FillRange reports if anything was changed and the
 // range that was changed. This may be trimmed from the requested range

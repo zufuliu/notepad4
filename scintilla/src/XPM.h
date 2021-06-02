@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 /**
  * Hold a pixmap in XPM format.
@@ -16,9 +16,9 @@ class XPM final {
 	int width = 1;
 	int nColours = 1;
 	std::vector<unsigned char> pixels;
-	ColourAlpha colourCodeTable[256];
+	ColourRGBA colourCodeTable[256];
 	char codeTransparent = ' ';
-	ColourAlpha ColourFromCode(int ch) const noexcept;
+	ColourRGBA ColourFromCode(int ch) const noexcept;
 	void FillRun(Surface *surface, int code, int startX, int y, int x) const;
 public:
 	explicit XPM(const char *textForm);
@@ -38,7 +38,7 @@ public:
 	constexpr int GetWidth() const noexcept {
 		return width;
 	}
-	ColourAlpha PixelAt(int x, int y) const noexcept;
+	ColourRGBA PixelAt(int x, int y) const noexcept;
 private:
 	static std::vector<const char *>LinesFormFromTextForm(const char *textForm);
 };
@@ -77,7 +77,7 @@ public:
 	}
 	int CountBytes() const noexcept;
 	const unsigned char *Pixels() const noexcept;
-	void SetPixel(int x, int y, ColourAlpha colour) noexcept;
+	void SetPixel(int x, int y, ColourRGBA colour) noexcept;
 	static void BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pixelsRGBA, size_t count) noexcept;
 };
 

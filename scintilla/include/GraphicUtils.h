@@ -3,7 +3,7 @@
 #pragma once
 
 // color byte order from high to lower:
-// [a][b][g][r]		COLORREF/RGB(), ColourAlpha, D2D_COLOR_F
+// [a][b][g][r]		COLORREF/RGB(), ColourRGBA, D2D_COLOR_F
 // bswap:		[r][g][b][a]
 //      rotr8:	[a][r][g][b]
 // rotl8:		[b][g][r][a]

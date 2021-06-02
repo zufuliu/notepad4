@@ -7,7 +7,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla::HanjaDict {
+namespace Scintilla::Internal {
 
 int GetHangulOfHanja(wchar_t *inout) noexcept;
 

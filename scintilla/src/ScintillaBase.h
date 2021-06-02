@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 #define SCI_EnablePopupMenu	0
 
@@ -21,6 +21,7 @@ protected:
 		idCallTip = 1,
 		idAutoComplete = 2,
 
+#if SCI_EnablePopupMenu
 		idcmdUndo = 10,
 		idcmdRedo = 11,
 		idcmdCut = 12,
@@ -28,6 +29,7 @@ protected:
 		idcmdPaste = 14,
 		idcmdDelete = 15,
 		idcmdSelectAll = 16
+#endif
 	};
 
 	enum class NotificationPosition {
@@ -37,16 +39,16 @@ protected:
 	};
 
 #if SCI_EnablePopupMenu
-	int displayPopupMenu;
+	Scintilla::PopUp displayPopupMenu;
 	Menu popup;
 #endif
-	AutoComplete ac;
+	Scintilla::Internal::AutoComplete ac;
 
 	CallTip ct;
 
 	int listType;			///< 0 is an autocomplete list
 	int maxListWidth;		/// Maximum width of list, in average character widths
-	int multiAutoCMode; /// Mode for autocompleting when multiple selections are present
+	Scintilla::MultiAutoComplete multiAutoCMode; /// Mode for autocompleting when multiple selections are present
 
 	LexState *DocumentLexState();
 
@@ -55,10 +57,12 @@ protected:
 	void Initialise() noexcept override {}
 	void Finalise() noexcept override;
 
-	void InsertCharacter(std::string_view sv, CharacterSource charSource) override;
+	void InsertCharacter(std::string_view sv, Scintilla::CharacterSource charSource) override;
+#if SCI_EnablePopupMenu
 	void Command(int cmdId);
+#endif
 	void CancelModes() noexcept override;
-	int KeyCommand(unsigned int iMessage) override;
+	int KeyCommand(Scintilla::Message iMessage) override;
 
 	void AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, const char *text, Sci::Position textLen);
 	void AutoCompleteStart(Sci::Position lenEntered, const char *list);
@@ -68,7 +72,7 @@ protected:
 	int AutoCompleteGetCurrentText(char *buffer) const;
 	void AutoCompleteCharacterAdded(char ch);
 	void AutoCompleteCharacterDeleted();
-	void AutoCompleteCompleted(char ch, int completionMethod);
+	void AutoCompleteCompleted(char ch, Scintilla::CompletionMethods completionMethod);
 	void AutoCompleteMoveToCurrentWord();
 	void AutoCompleteSelection();
 	void ListNotify(ListBoxEvent *plbe) override;
@@ -83,8 +87,8 @@ protected:
 	void ContextMenu(Point pt) noexcept;
 #endif
 
-	void ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) override;
-	void RightButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) override;
+	void ButtonDownWithModifiers(Point pt, unsigned int curTime, Scintilla::KeyMod modifiers) override;
+	void RightButtonDownWithModifiers(Point pt, unsigned int curTime, Scintilla::KeyMod modifiers) override;
 
 	void NotifyStyleToNeeded(Sci::Position endStyleNeeded) override;
 	void NotifyLexerChanged(Document *doc, void *userData) override;
@@ -98,7 +102,7 @@ public:
 	ScintillaBase &operator=(const ScintillaBase &) = delete;
 	ScintillaBase &operator=(ScintillaBase &&) = delete;
 	// Public so scintilla_send_message can use it
-	sptr_t WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam) override;
+	Scintilla::sptr_t WndProc(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) override;
 };
 
 }

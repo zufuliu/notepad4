@@ -6,11 +6,11 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
-void DrawWrapMarker(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourAlpha wrapColour);
+void DrawWrapMarker(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourRGBA wrapColour);
 
-typedef void (*DrawWrapMarkerFn)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourAlpha wrapColour);
+typedef void (*DrawWrapMarkerFn)(Surface *surface, PRectangle rcPlace, bool isEndMarker, ColourRGBA wrapColour);
 
 /**
 * MarginView draws the margins.

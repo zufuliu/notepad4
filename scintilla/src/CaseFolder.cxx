@@ -11,7 +11,7 @@
 #include "CaseFolder.h"
 #include "CaseConvert.h"
 
-using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 template <typename T>
 static constexpr T MakeLowerCase(T ch) noexcept {

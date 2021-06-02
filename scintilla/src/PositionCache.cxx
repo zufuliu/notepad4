@@ -22,14 +22,15 @@
 #include <iterator>
 #include <memory>
 
+#include "ScintillaTypes.h"
+#include "ScintillaMessages.h"
+#include "ILoader.h"
+#include "ILexer.h"
+
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
 #include "VectorISA.h"
-
-#include "ILoader.h"
-#include "ILexer.h"
-#include "Scintilla.h"
 
 //#include "CharacterCategory.h"
 #include "Position.h"
@@ -53,6 +54,7 @@
 #include "PositionCache.h"
 
 using namespace Scintilla;
+using namespace Scintilla::Internal;
 
 void BidiData::Resize(size_t maxLineLength_) {
 	stylesFonts.resize(maxLineLength_ + 1);
@@ -136,7 +138,7 @@ int LineLayout::LineStart(int line) const noexcept {
 	}
 }
 
-int Scintilla::LineLayout::LineLength(int line) const noexcept {
+int LineLayout::LineLength(int line) const noexcept {
 	if (!lineStarts) {
 		return numCharsInLine;
 	} if (line >= lines - 1) {
@@ -361,7 +363,7 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 
 LineLayoutCache::LineLayoutCache() :
 	lastCaretSlot(SIZE_MAX),
-	level(Cache::none),
+	level(LineCache::None),
 	allInvalidated(false), styleClock(-1) {
 }
 
@@ -404,12 +406,12 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
 	// round up cache size to avoid rapidly resizing when linesOnScreen or linesInDoc changed.
 	size_t lengthForLevel = 0;
-	if (level == Cache::page) {
+	if (level == LineCache::Page) {
 		// see comment in Retrieve() method.
 		lengthForLevel = 1 + AlignUp(4*linesOnScreen, 64);
-	} else if (level == Cache::caret) {
+	} else if (level == LineCache::Caret) {
 		lengthForLevel = 2;
-	} else if (level == Cache::document) {
+	} else if (level == LineCache::Document) {
 		lengthForLevel = AlignUp(linesInDoc, 64);
 	}
 	if (lengthForLevel != cache.size()) {
@@ -440,7 +442,7 @@ void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
 	}
 }
 
-void LineLayoutCache::SetLevel(Cache level_) noexcept {
+void LineLayoutCache::SetLevel(LineCache level_) noexcept {
 	if (level != level_) {
 		level = level_;
 		allInvalidated = false;
@@ -459,7 +461,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 	allInvalidated = false;
 
 	size_t pos = 0;
-	if (level == Cache::page) {
+	if (level == LineCache::Page) {
 		// two arenas, each with two pages to ensure cache efficiency on scrolling.
 		// first arena for lines near top visible line.
 		// second arena for other lines, e.g. folded lines near top visible line.
@@ -479,9 +481,9 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 			lastCaretSlot = 0;
 			std::swap(cache[0], cache[pos]);
 		}
-	} else if (level == Cache::caret) {
+	} else if (level == LineCache::Caret) {
 		pos = lineNumber != lineCaret;
-	} else if (level == Cache::document) {
+	} else if (level == LineCache::Document) {
 		pos = lineNumber;
 	}
 
@@ -503,7 +505,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 		ret = cache[pos].get();
 	}
 
-	// Cache::none is not supported, we only use Cache::page.
+	// LineLineCache::None is not supported, we only use LineCache::Page.
 	return ret;
 }
 
@@ -750,6 +752,7 @@ bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, const char *s_,
 }
 
 // FNV-1 http://www.isthe.com/chongo/tech/comp/fnv/
+// https://www.python.org/dev/peps/pep-0456/
 unsigned int PositionCacheEntry::Hash(unsigned int styleNumber_, const char *s, unsigned int len_) noexcept {
 	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
 	unsigned int ret = us[0] << 7;

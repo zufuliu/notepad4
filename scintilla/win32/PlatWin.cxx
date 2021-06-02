@@ -31,17 +31,16 @@
 #include <windowsx.h>
 #include <shlwapi.h>
 
+#include "ScintillaTypes.h"
+
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
 #include "VectorISA.h"
 #include "GraphicUtils.h"
-
-#include "Scintilla.h"
 #include "XPM.h"
 #include "CharClassify.h"
 #include "UniConversion.h"
-#include "FontQuality.h"
 
 #include "PlatWin.h"
 
@@ -65,6 +64,8 @@ extern UINT g_uSystemDPI;
 extern "C" UINT g_uSystemDPI;
 #endif
 
+using namespace Scintilla;
+
 #if !NP2_HAS_GETDPIFORWINDOW
 namespace {
 
@@ -87,8 +88,8 @@ AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = nullptr;
 
 }
 
-void Scintilla_LoadDpiForWindow(void) {
-	using Scintilla::DLLFunction;
+extern "C" void Scintilla_LoadDpiForWindow(void) {
+	using Scintilla::Internal::DLLFunction;
 
 	HMODULE user32 = ::GetModuleHandleW(L"user32.dll");
 	fnGetDpiForWindow = DLLFunction<GetDpiForWindowSig>(user32, "GetDpiForWindow");
@@ -146,7 +147,7 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 }
 #endif
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 #if defined(USE_D2D)
 IDWriteFactory *pIDWriteFactory = nullptr;
@@ -270,16 +271,16 @@ struct FontWin final : public Font {
 #if defined(USE_D2D)
 	IDWriteTextFormat *pTextFormat = nullptr;
 #endif
-	int extraFontFlag;
+	FontQuality extraFontFlag;
 	FLOAT yAscent = 2.0f;
 	FLOAT yDescent = 1.0f;
 	FLOAT yInternalLeading = 0.0f;
-	FontWin(const LOGFONTW &lf_, HFONT hfont_, int extraFontFlag_) noexcept :
+	FontWin(const LOGFONTW &lf_, HFONT hfont_, FontQuality extraFontFlag_) noexcept :
 		lf(lf_), hfont(hfont_),
 		extraFontFlag(extraFontFlag_) {}
 #if defined(USE_D2D)
 	FontWin(const LOGFONTW &lf_, IDWriteTextFormat *pTextFormat_,
-		int extraFontFlag_,
+		FontQuality extraFontFlag_,
 		FLOAT yAscent_,
 		FLOAT yDescent_,
 		FLOAT yInternalLeading_) noexcept :
@@ -316,20 +317,20 @@ using FontDirectWrite = FontWin;
 
 HINSTANCE hinstPlatformRes {};
 
-constexpr int SupportsGDI =
-	SC_SUPPORTS_PIXEL_MODIFICATION;
+constexpr Supports SupportsGDI =
+	Supports::PixelModification;
 
 #if defined(USE_D2D)
-constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(int extraFontFlag) noexcept {
-	switch (extraFontFlag & SC_EFF_QUALITY_MASK) {
+constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(FontQuality extraFontFlag) noexcept {
+	switch (extraFontFlag & FontQuality::QualityMask) {
 
-	case SC_EFF_QUALITY_NON_ANTIALIASED:
+	case FontQuality::QualityNonAntialiased:
 		return D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
 
-	case SC_EFF_QUALITY_ANTIALIASED:
+	case FontQuality::QualityAntialiased:
 		return D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
 
-	case SC_EFF_QUALITY_LCD_OPTIMIZED:
+	case FontQuality::QualityLcdOptimized:
 		return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
 
 	default:
@@ -387,12 +388,12 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 	LOGFONTW lf {};
 	// The negative is to allow for leading
 	lf.lfHeight = -std::abs(std::lround(fp.size));
-	lf.lfWeight = fp.weight;
+	lf.lfWeight = static_cast<LONG>(fp.weight);
 	lf.lfItalic = fp.italic ? 1 : 0;
 	lf.lfCharSet = static_cast<BYTE>(fp.characterSet);
 	lf.lfQuality = Win32MapFontQuality(fp.extraFontFlag);
 	UTF16FromUTF8(fp.faceName, lf.lfFaceName, LF_FACESIZE);
-	if (fp.technology == SCWIN_TECH_GDI) {
+	if (fp.technology == Technology::Default) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
 		return std::make_shared<FontGDI>(lf, hfont, fp.extraFontFlag);
 	} else {
@@ -486,7 +487,7 @@ public:
 	int tlen;	// Using int instead of size_t as most Win32 APIs take int.
 	TextWide(std::string_view text, int codePage) :
 		VarBuffer<wchar_t, stackBufferLength>(text.length()) {
-		if (codePage == SC_CP_UTF8) {
+		if (codePage == CpUtf8) {
 			tlen = static_cast<int>(UTF16FromUTF8(text, buffer, text.length()));
 		} else {
 			// Support Asian string display in 9x English
@@ -515,8 +516,8 @@ class SurfaceGDI final : public Surface {
 	// There appears to be a 16 bit string length limit in GDI on NT.
 	int maxLenText = 65535;
 
-	void PenColour(ColourAlpha fore, XYPOSITION widthStroke) noexcept;
-	void BrushColour(ColourAlpha back) noexcept;
+	void PenColour(ColourRGBA fore, XYPOSITION widthStroke) noexcept;
+	void BrushColour(ColourRGBA back) noexcept;
 	void SetFont(const Font *font_) noexcept;
 	void Clear() noexcept;
 
@@ -538,7 +539,7 @@ public:
 	void SetMode(SurfaceMode mode_) noexcept override;
 
 	void Release() noexcept override;
-	bool Supports(int feature) const noexcept override;
+	bool SupportsFeature(Supports feature) const noexcept override;
 	bool Initialised() const noexcept override;
 	int LogPixelsY() const noexcept override;
 	int PixelDivisions() const noexcept override;
@@ -562,16 +563,16 @@ public:
 	std::unique_ptr<IScreenLineLayout> Layout(const IScreenLine *screenLine) noexcept override;
 
 	void SCICALL DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void SCICALL DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore) override;
+	void SCICALL DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore) override;
 	void SCICALL MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font *font_, std::string_view text) override;
 
 	void SCICALL DrawTextCommonUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, UINT fuOptions);
-	void SCICALL DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore) override;
+	void SCICALL DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore) override;
 	void SCICALL MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthTextUTF8(const Font *font_, std::string_view text) override;
 
@@ -636,7 +637,7 @@ void SurfaceGDI::Release() noexcept {
 	Clear();
 }
 
-bool SurfaceGDI::Supports(int feature) const noexcept {
+bool SurfaceGDI::SupportsFeature(Supports feature) const noexcept {
 	return SupportsGDI == feature;
 }
 
@@ -669,7 +670,7 @@ void SurfaceGDI::SetMode(SurfaceMode mode_) noexcept {
 	mode = mode_;
 }
 
-void SurfaceGDI::PenColour(ColourAlpha fore, XYPOSITION widthStroke) noexcept {
+void SurfaceGDI::PenColour(ColourRGBA fore, XYPOSITION widthStroke) noexcept {
 	if (pen) {
 		::SelectObject(hdc, penOld);
 		::DeleteObject(pen);
@@ -691,7 +692,7 @@ void SurfaceGDI::PenColour(ColourAlpha fore, XYPOSITION widthStroke) noexcept {
 	penOld = SelectPen(hdc, pen);
 }
 
-void SurfaceGDI::BrushColour(ColourAlpha back) noexcept {
+void SurfaceGDI::BrushColour(ColourRGBA back) noexcept {
 	if (brush) {
 		::SelectObject(hdc, brushOld);
 		::DeleteObject(brush);
@@ -802,7 +803,7 @@ void SurfaceGDI::RoundedRectangle(PRectangle rc, FillStroke fillStroke) noexcept
 namespace {
 
 #if NP2_USE_AVX2
-inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+inline DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 	__m128i i16x4Color = rgba_to_bgra_epi16_sse4_si32(colour.AsInteger());
 	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0xff);
 	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
@@ -812,7 +813,7 @@ inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
 }
 
 #elif NP2_USE_SSE2
-inline DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+inline DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 	const uint32_t rgba = bswap32(colour.AsInteger());
 	__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
 	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
@@ -843,7 +844,7 @@ constexpr DWORD RGBQuadMultiplied(T alpha, T red, T green, T blue) noexcept {
 	return RGBQuad(alpha, red, green, blue);
 }
 
-constexpr DWORD RGBQuadMultiplied(ColourAlpha colour) noexcept {
+constexpr DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 	return RGBQuadMultiplied(colour.GetAlpha(), colour.GetRed(), colour.GetGreen(), colour.GetBlue());
 }
 #endif
@@ -930,7 +931,7 @@ void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
 }
 
 #if NP2_USE_AVX2
-inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	__m128i i32x4Fore = rgba_to_abgr_epi32_sse4_si32(a.AsInteger());
 	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
@@ -948,7 +949,7 @@ inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
 }
 
 #elif NP2_USE_SSE2
-inline DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	__m128i i32x4Fore = rgba_to_abgr_epi32_sse2_si32(a.AsInteger());
 	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
@@ -971,7 +972,7 @@ constexpr uint32_t Proportional(uint8_t a, uint8_t b, XYPOSITION t) noexcept {
 	return static_cast<uint32_t>(a + t * (b - a));
 }
 
-constexpr DWORD Proportional(ColourAlpha a, ColourAlpha b, XYPOSITION t) noexcept {
+constexpr DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	const uint32_t red = Proportional(a.GetRed(), b.GetRed(), t);
 	const uint32_t green = Proportional(a.GetGreen(), b.GetGreen(), t);
 	const uint32_t blue = Proportional(a.GetBlue(), b.GetBlue(), t);
@@ -1130,8 +1131,8 @@ void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 	const int x = static_cast<int>(rcw.left);
 	const int yBaseInt = static_cast<int>(ybase);
 
-	if (mode.codePage == SC_CP_UTF8) {
-		const TextWide tbuf(text, SC_CP_UTF8);
+	if (mode.codePage == CpUtf8) {
+		const TextWide tbuf(text, CpUtf8);
 		::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer, tbuf.tlen, nullptr);
 	} else {
 		::ExtTextOutA(hdc, x, yBaseInt, fuOptions, &rcw, text.data(), static_cast<UINT>(text.length()), nullptr);
@@ -1139,21 +1140,21 @@ void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 }
 
 void SurfaceGDI::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	::SetTextColor(hdc, fore.OpaqueRGB());
 	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE);
 }
 
 void SurfaceGDI::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	::SetTextColor(hdc, fore.OpaqueRGB());
 	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommon(rc, font_, ybase, text, ETO_OPAQUE | ETO_CLIPPED);
 }
 
 void SurfaceGDI::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore) {
+	ColourRGBA fore) {
 	// Avoid drawing spaces in transparent mode
 	for (const char ch : text) {
 		if (ch != ' ') {
@@ -1174,8 +1175,8 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	int fit = 0;
 	int i = 0;
 	const int len = static_cast<int>(text.length());
-	if (mode.codePage == SC_CP_UTF8) {
-		const TextWide tbuf(text, SC_CP_UTF8);
+	if (mode.codePage == CpUtf8) {
+		const TextWide tbuf(text, CpUtf8);
 		TextPositionsI poses(tbuf.tlen);
 		if (!::GetTextExtentExPointW(hdc, tbuf.buffer, tbuf.tlen, maxWidthMeasure, &fit, poses.buffer, &sz)) {
 			// Failure
@@ -1212,10 +1213,10 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 XYPOSITION SurfaceGDI::WidthText(const Font *font_, std::string_view text) {
 	SetFont(font_);
 	SIZE sz {};
-	if (mode.codePage != SC_CP_UTF8) {
+	if (mode.codePage != CpUtf8) {
 		::GetTextExtentPoint32A(hdc, text.data(), std::min(static_cast<int>(text.length()), maxLenText), &sz);
 	} else {
-		const TextWide tbuf(text, SC_CP_UTF8);
+		const TextWide tbuf(text, CpUtf8);
 		::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &sz);
 	}
 	return static_cast<XYPOSITION>(sz.cx);
@@ -1227,26 +1228,26 @@ void SurfaceGDI::DrawTextCommonUTF8(PRectangle rc, const Font *font_, XYPOSITION
 	const int x = static_cast<int>(rcw.left);
 	const int yBaseInt = static_cast<int>(ybase);
 
-	const TextWide tbuf(text, SC_CP_UTF8);
+	const TextWide tbuf(text, CpUtf8);
 	::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer, tbuf.tlen, nullptr);
 }
 
 void SurfaceGDI::DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	::SetTextColor(hdc, fore.OpaqueRGB());
 	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommonUTF8(rc, font_, ybase, text, ETO_OPAQUE);
 }
 
 void SurfaceGDI::DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	::SetTextColor(hdc, fore.OpaqueRGB());
 	::SetBkColor(hdc, back.OpaqueRGB());
 	DrawTextCommonUTF8(rc, font_, ybase, text, ETO_OPAQUE | ETO_CLIPPED);
 }
 
 void SurfaceGDI::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore) {
+	ColourRGBA fore) {
 	// Avoid drawing spaces in transparent mode
 	for (const char ch : text) {
 		if (ch != ' ') {
@@ -1267,7 +1268,7 @@ void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	int fit = 0;
 	int i = 0;
 	const int len = static_cast<int>(text.length());
-	const TextWide tbuf(text, SC_CP_UTF8);
+	const TextWide tbuf(text, CpUtf8);
 	TextPositionsI poses(tbuf.tlen);
 	if (!::GetTextExtentExPointW(hdc, tbuf.buffer, tbuf.tlen, maxWidthMeasure, &fit, poses.buffer, &sz)) {
 		// Failure
@@ -1292,7 +1293,7 @@ void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 XYPOSITION SurfaceGDI::WidthTextUTF8(const Font *font_, std::string_view text) {
 	SetFont(font_);
 	SIZE sz = { 0,0 };
-	const TextWide tbuf(text, SC_CP_UTF8);
+	const TextWide tbuf(text, CpUtf8);
 	::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &sz);
 	return static_cast<XYPOSITION>(sz.cx);
 }
@@ -1404,15 +1405,15 @@ constexpr D2D1_POINT_2F DPointFromPointEx(Point point) noexcept {
 #endif
 
 constexpr unsigned int SupportsD2D =
-	(1 << SC_SUPPORTS_LINE_DRAWS_FINAL) |
-	(1 << SC_SUPPORTS_FRACTIONAL_STROKE_WIDTH) |
-	(1 << SC_SUPPORTS_TRANSLUCENT_STROKE) |
-	(1 << SC_SUPPORTS_PIXEL_MODIFICATION);
+	(1 << static_cast<int>(Supports::LineDrawsFinal)) |
+	(1 << static_cast<int>(Supports::FractionalStrokeWidth)) |
+	(1 << static_cast<int>(Supports::TranslucentStroke)) |
+	(1 << static_cast<int>(Supports::PixelModification));
 
 #if NP2_USE_SSE2
 static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
 
-inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
+inline D2D_COLOR_F ColorFromColourAlpha(ColourRGBA colour) noexcept {
 #if NP2_USE_AVX2
 	__m128i i32x4 = unpack_color_epi32_sse4_si32(colour.AsInteger());
 #else
@@ -1426,7 +1427,7 @@ inline D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
 }
 
 #else
-constexpr D2D_COLOR_F ColorFromColourAlpha(ColourAlpha colour) noexcept {
+constexpr D2D_COLOR_F ColorFromColourAlpha(ColourRGBA colour) noexcept {
 	return D2D_COLOR_F {
 		colour.GetRedComponent(),
 		colour.GetGreenComponent(),
@@ -1487,10 +1488,10 @@ public:
 	void SetMode(SurfaceMode mode_) noexcept override;
 
 	void Release() noexcept override;
-	bool Supports(int feature) const noexcept override;
+	bool SupportsFeature(Supports feature) const noexcept override;
 	bool Initialised() const noexcept override;
 
-	void D2DPenColourAlpha(ColourAlpha fore) noexcept;
+	void D2DPenColourAlpha(ColourRGBA fore) noexcept;
 	int LogPixelsY() const noexcept override;
 	int PixelDivisions() const noexcept override;
 	int DeviceHeightFont(int points) const noexcept override;
@@ -1515,15 +1516,15 @@ public:
 
 	void SCICALL DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions);
 
-	void SCICALL DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore) override;
+	void SCICALL DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore) override;
 	void SCICALL MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthText(const Font *font_, std::string_view text) override;
 
-	void SCICALL DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore, ColourAlpha back) override;
-	void SCICALL DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourAlpha fore) override;
+	void SCICALL DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore, ColourRGBA back) override;
+	void SCICALL DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, ColourRGBA fore) override;
 	void SCICALL MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) override;
 	XYPOSITION WidthTextUTF8(const Font *font_, std::string_view text) override;
 
@@ -1585,8 +1586,8 @@ void SurfaceD2D::Release() noexcept {
 	Clear();
 }
 
-bool SurfaceD2D::Supports(int feature) const noexcept {
-	return (SupportsD2D >> feature) & true;
+bool SurfaceD2D::SupportsFeature(Supports feature) const noexcept {
+	return (SupportsD2D >> static_cast<int>(feature)) & true;
 }
 
 bool SurfaceD2D::Initialised() const noexcept {
@@ -1618,7 +1619,7 @@ HRESULT SurfaceD2D::GetBitmap(ID2D1Bitmap **ppBitmap) {
 	return pBitmapRenderTarget->GetBitmap(ppBitmap);
 }
 
-void SurfaceD2D::D2DPenColourAlpha(ColourAlpha fore) noexcept {
+void SurfaceD2D::D2DPenColourAlpha(ColourRGBA fore) noexcept {
 	if (pRenderTarget) {
 		const D2D_COLOR_F col = ColorFromColourAlpha(fore);
 		if (pBrush) {
@@ -2252,7 +2253,7 @@ void ScreenLineLayout::FillTextLayoutFormats(const IScreenLine *screenLine, IDWr
 /* Convert to a wide character string and replace tabs with X to stop DirectWrite tab expansion */
 
 std::wstring ScreenLineLayout::ReplaceRepresentation(std::string_view text) {
-	const TextWide wideText(text, SC_CP_UTF8);
+	const TextWide wideText(text, CpUtf8);
 	std::wstring ws(wideText.buffer, wideText.tlen);
 	std::replace(ws.begin(), ws.end(), L'\t', L'X');
 	return ws;
@@ -2475,7 +2476,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 }
 
 void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
@@ -2484,7 +2485,7 @@ void SurfaceD2D::DrawTextNoClip(PRectangle rc, const Font *font_, XYPOSITION yba
 }
 
 void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
@@ -2493,7 +2494,7 @@ void SurfaceD2D::DrawTextClipped(PRectangle rc, const Font *font_, XYPOSITION yb
 }
 
 void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore) {
+	ColourRGBA fore) {
 	// Avoid drawing spaces in transparent mode
 	for (const char ch : text) {
 		if (ch != ' ') {
@@ -2542,7 +2543,7 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		position += width;
 	}
 	PLATFORM_ASSERT(ti == tbuf.tlen);
-	if (mode.codePage == SC_CP_UTF8) {
+	if (mode.codePage == CpUtf8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		size_t i = 0;
 		for (int ui = 0; ui < tbuf.tlen; ui++) {
@@ -2604,31 +2605,31 @@ XYPOSITION SurfaceD2D::WidthText(const Font *font_, std::string_view text) {
 }
 
 void SurfaceD2D::DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, SC_CP_UTF8, ETO_OPAQUE);
+		DrawTextCommon(rc, font_, ybase, text, CpUtf8, ETO_OPAQUE);
 	}
 }
 
 void SurfaceD2D::DrawTextClippedUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore, ColourAlpha back) {
+	ColourRGBA fore, ColourRGBA back) {
 	if (pRenderTarget) {
 		FillRectangleAligned(rc, back);
 		D2DPenColourAlpha(fore);
-		DrawTextCommon(rc, font_, ybase, text, SC_CP_UTF8, ETO_OPAQUE | ETO_CLIPPED);
+		DrawTextCommon(rc, font_, ybase, text, CpUtf8, ETO_OPAQUE | ETO_CLIPPED);
 	}
 }
 
 void SurfaceD2D::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
-	ColourAlpha fore) {
+	ColourRGBA fore) {
 	// Avoid drawing spaces in transparent mode
 	for (const char ch : text) {
 		if (ch != ' ') {
 			if (pRenderTarget) {
 				D2DPenColourAlpha(fore);
-				DrawTextCommon(rc, font_, ybase, text, SC_CP_UTF8, 0);
+				DrawTextCommon(rc, font_, ybase, text, CpUtf8, 0);
 			}
 			return;
 		}
@@ -2641,7 +2642,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		// SetFont failed or no access to DirectWrite so give up.
 		return;
 	}
-	const TextWide tbuf(text, SC_CP_UTF8);
+	const TextWide tbuf(text, CpUtf8);
 	TextPositions poses(tbuf.tlen);
 	// Initialize poses for safety.
 	std::fill(poses.buffer, poses.buffer + tbuf.tlen, 0.0f);
@@ -2694,7 +2695,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 XYPOSITION SurfaceD2D::WidthTextUTF8(const Font * font_, std::string_view text) {
 	FLOAT width = 1.0;
 	SetFont(font_);
-	const TextWide tbuf(text, SC_CP_UTF8);
+	const TextWide tbuf(text, CpUtf8);
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
@@ -2776,9 +2777,9 @@ void SurfaceD2D::FlushDrawing() noexcept {
 
 #endif
 
-std::unique_ptr<Surface> Surface::Allocate(int technology) {
+std::unique_ptr<Surface> Surface::Allocate(Technology technology) {
 #if defined(USE_D2D)
-	if (technology == SCWIN_TECH_GDI)
+	if (technology == Technology::Default)
 		return std::make_unique<SurfaceGDI>();
 	else
 		return std::make_unique<SurfaceD2D>();
@@ -3028,7 +3029,7 @@ static constexpr const WCHAR *ListBoxX_ClassName = L"ListBoxX";
 class ListBoxX final : public ListBox {
 	int lineHeight = 10;
 	HFONT fontCopy{};
-	int technology = SCWIN_TECH_GDI;
+	Technology technology = Technology::Default;
 	RGBAImageSet images;
 	LineToItem lti;
 	HWND lb{};
@@ -3088,7 +3089,7 @@ public:
 		}
 	}
 	void SetFont(const Font *font) noexcept override;
-	void SCICALL Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept override;
+	void SCICALL Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, Technology technology_) noexcept override;
 	void SetAverageCharWidth(int width) noexcept override;
 	void SetVisibleRows(int rows) noexcept override;
 	int GetVisibleRows() const noexcept override;
@@ -3120,7 +3121,7 @@ std::unique_ptr<ListBox> ListBox::Allocate() {
 	return std::make_unique<ListBoxX>();
 }
 
-void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, int technology_) noexcept {
+void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHeight_, bool unicodeMode_, Technology technology_) noexcept {
 	parent = &parent_;
 	ctrlID = ctrlID_;
 	location = location_;
@@ -3193,7 +3194,7 @@ PRectangle ListBoxX::GetDesiredRect() {
 	if (widestItem) {
 		len = static_cast<int>(strlen(widestItem));
 		if (unicodeMode) {
-			const TextWide tbuf(widestItem, SC_CP_UTF8);
+			const TextWide tbuf(widestItem, CpUtf8);
 			::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &textSize);
 		} else {
 			::GetTextExtentPoint32A(hdc, widestItem, len, &textSize);
@@ -3286,7 +3287,7 @@ void ListBoxX::ClearRegisteredImages() noexcept {
 
 namespace {
 
-inline COLORREF ColourOfElement(std::optional<ColourAlpha> colour, UINT nIndex) noexcept {
+inline COLORREF ColourOfElement(std::optional<ColourRGBA> colour, UINT nIndex) noexcept {
 	if (colour.has_value()) {
 		return colour.value().OpaqueRGB();
 	} else {
@@ -3329,7 +3330,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 		::InsetRect(&rcText, static_cast<int>(TextInset.x), static_cast<int>(TextInset.y));
 
 		if (unicodeMode) {
-			const TextWide tbuf(text, SC_CP_UTF8);
+			const TextWide tbuf(text, CpUtf8);
 			::DrawTextW(pDrawItem->hDC, tbuf.buffer, tbuf.tlen, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
 		} else {
 			::DrawTextA(pDrawItem->hDC, text, len, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
@@ -3339,7 +3340,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 		const RGBAImage *pimage = images.Get(pixId);
 		if (pimage) {
 			std::unique_ptr<Surface> surfaceItem(Surface::Allocate(technology));
-			if (technology == SCWIN_TECH_GDI) {
+			if (technology == Technology::Default) {
 				surfaceItem->Init(pDrawItem->hDC, pDrawItem->hwndItem);
 				const long left = pDrawItem->rcItem.left + static_cast<int>(ItemInset.x + ImageInset.x);
 				const PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
@@ -4011,12 +4012,12 @@ void Menu::Show(Point pt, const Window &w) noexcept {
 	Destroy();
 }
 
-ColourAlpha Platform::Chrome() noexcept {
-	return ColourAlpha::FromRGB(::GetSysColor(COLOR_3DFACE));
+ColourRGBA Platform::Chrome() noexcept {
+	return ColourRGBA::FromRGB(::GetSysColor(COLOR_3DFACE));
 }
 
-ColourAlpha Platform::ChromeHighlight() noexcept {
-	return ColourAlpha::FromRGB(::GetSysColor(COLOR_3DHIGHLIGHT));
+ColourRGBA Platform::ChromeHighlight() noexcept {
+	return ColourRGBA::FromRGB(::GetSysColor(COLOR_3DHIGHLIGHT));
 }
 
 const char *Platform::DefaultFont() noexcept {

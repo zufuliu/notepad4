@@ -6,7 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 constexpr bool IsSpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
@@ -148,17 +148,10 @@ struct ScreenLine : public IScreenLine {
 /**
  */
 class LineLayoutCache final {
-public:
-	enum class Cache {
-		none = SC_CACHE_NONE,
-		caret = SC_CACHE_CARET,
-		page = SC_CACHE_PAGE,
-		document = SC_CACHE_DOCUMENT
-	};
 private:
 	std::vector<std::unique_ptr<LineLayout>> cache;
 	size_t lastCaretSlot;
-	Cache level;
+	Scintilla::LineCache level;
 	bool allInvalidated;
 	int styleClock;
 	void AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc);
@@ -172,8 +165,8 @@ public:
 	~LineLayoutCache();
 	void Deallocate() noexcept;
 	void Invalidate(LineLayout::ValidLevel validity_) noexcept;
-	void SetLevel(Cache level_) noexcept;
-	Cache GetLevel() const noexcept {
+	void SetLevel(Scintilla::LineCache level_) noexcept;
+	Scintilla::LineCache GetLevel() const noexcept {
 		return level;
 	}
 	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,

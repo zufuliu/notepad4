@@ -6,19 +6,20 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 /**
  */
 class MarginStyle {
 public:
-	int style;
-	ColourAlpha back;
+	Scintilla::MarginType style;
+	ColourRGBA back;
 	int width;
 	MarkerMask mask;
 	bool sensitive;
-	int cursor;
-	MarginStyle(int style_ = SC_MARGIN_SYMBOL, int width_ = 0, MarkerMask mask_ = 0) noexcept;
+	Scintilla::CursorShape cursor;
+	MarginStyle(Scintilla::MarginType style_ = Scintilla::MarginType::Symbol, int width_ = 0, MarkerMask mask_ = 0) noexcept;
+	bool ShowsFolding() const noexcept;
 };
 
 /**
@@ -33,33 +34,20 @@ public:
 	FontRealised &operator=(const FontRealised &) = delete;
 	FontRealised &operator=(FontRealised &&) = delete;
 	virtual ~FontRealised() noexcept = default;
-	void Realise(Surface &surface, int zoomLevel, int technology, const FontSpecification &fs, const char *localeName);
+	void Realise(Surface &surface, int zoomLevel, Scintilla::Technology technology, const FontSpecification &fs, const char *localeName);
 };
 
-enum class IndentView { none, real, lookForward, lookBoth };
-
-enum class WhiteSpace {
-	invisible = 0,
-	visibleAlways = 1,
-	visibleAfterIndent = 2,
-	visibleOnlyInIndent = 3,
-};
-
-enum class TabDrawMode { longArrow = 0, strikeOut = 1 };
-
-typedef std::map<FontSpecification, std::unique_ptr<FontRealised>> FontMap;
-
-enum class WrapMode { none, word, character, whitespace, automatic };
+using FontMap = std::map<FontSpecification, std::unique_ptr<FontRealised>>;
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	size = (size * zoomLevel + 50) / 100;
 	// Hangs if sizeZoomed (in point) <= 1
-	return std::max(size, 2 * SC_FONT_SIZE_MULTIPLIER);
+	return std::max(size, 2 * Scintilla::FontSizeMultiplier);
 }
 
-constexpr std::optional<ColourAlpha> OptionalColour(uptr_t wParam, sptr_t lParam) noexcept {
+constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) noexcept {
 	if (wParam) {
-		return ColourAlpha::FromRGB(static_cast<unsigned int>(lParam));
+		return ColourRGBA::FromRGB(static_cast<unsigned int>(lParam));
 	} else {
 		return {};
 	}
@@ -67,7 +55,7 @@ constexpr std::optional<ColourAlpha> OptionalColour(uptr_t wParam, sptr_t lParam
 
 struct SelectionAppearance {
 	// Whether to draw on base layer or over text
-	Layer layer;
+	Scintilla::Layer layer;
 	// Draw selection past line end characters up to right border
 	bool eolFilled;
 	int eolSelectedWidth;
@@ -75,7 +63,7 @@ struct SelectionAppearance {
 
 struct CaretLineAppearance {
 	// Whether to draw on base layer or over text
-	Layer layer;
+	Scintilla::Layer layer;
 	// Also show when non-focused
 	bool alwaysShow;
 	// Non-0: draw a rectangle around line instead of filling line. Value is pixel width of frame
@@ -84,31 +72,43 @@ struct CaretLineAppearance {
 
 struct CaretAppearance {
 	// Line, block, over-strike bar ...
-	int style;
+	Scintilla::CaretStyle style;
 	// Width in pixels
 	int width;
 };
 
 struct WrapAppearance {
 	// No wrapping, word, character, whitespace appearance
-	WrapMode state;
+	Scintilla::Wrap state;
 	// Show indication of wrap at line end, line start, or in margin
-	int visualFlags;
+	Scintilla::WrapVisualFlag visualFlags;
 	// Show indication near margin or near text
-	int visualFlagsLocation;
+	Scintilla::WrapVisualLocation visualFlagsLocation;
 	// How much indentation to show wrapping
 	int visualStartIndent;
-	// SC_WRAPINDENT_FIXED, _SAME, _INDENT, _DEEPINDENT
-	int indentMode;
+	// WrapIndentMode::Fixed, _SAME, _INDENT, _DEEPINDENT
+	Scintilla::WrapIndentMode indentMode;
 };
 
 struct EdgeProperties {
 	int column;
-	ColourAlpha colour;
-	EdgeProperties(int column_ = 0, ColourAlpha colour_ = ColourAlpha(0)) noexcept :
+	ColourRGBA colour;
+	EdgeProperties(int column_ = 0, ColourRGBA colour_ = ColourRGBA(0)) noexcept :
 		column(column_), colour(colour_) {}
-	EdgeProperties(uptr_t wParam, sptr_t lParam) noexcept :
-		column(static_cast<int>(wParam)), colour(ColourAlpha::FromRGB(static_cast<unsigned int>(lParam))) {}
+	EdgeProperties(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept :
+		column(static_cast<int>(wParam)), colour(ColourRGBA::FromRGB(static_cast<unsigned int>(lParam))) {}
+};
+
+// This is an old style enum so that its members can be used directly as indices without casting
+enum StyleIndices {
+	StyleDefault = static_cast<int>(Scintilla::StylesCommon::Default),
+	StyleLineNumber = static_cast<int>(Scintilla::StylesCommon::LineNumber),
+	StyleBraceLight = static_cast<int>(Scintilla::StylesCommon::BraceLight),
+	StyleBraceBad = static_cast<int>(Scintilla::StylesCommon::BraceBad),
+	StyleControlChar = static_cast<int>(Scintilla::StylesCommon::ControlChar),
+	StyleIndentGuide = static_cast<int>(Scintilla::StylesCommon::IndentGuide),
+	StyleCallTip = static_cast<int>(Scintilla::StylesCommon::CallTip),
+	StyleFoldDisplayText = static_cast<int>(Scintilla::StylesCommon::FoldDisplayText),
 };
 
 /**
@@ -125,7 +125,7 @@ public:
 	bool indicatorsDynamic;
 	bool indicatorsSetFore;
 	bool fontsValid;
-	int technology;
+	Scintilla::Technology technology;
 	int lineHeight;
 	int lineOverlap;
 	unsigned int maxAscent;
@@ -138,10 +138,10 @@ public:
 
 	int controlCharSymbol;
 	XYPOSITION controlCharWidth;
-	ColourAlpha selbar;
-	ColourAlpha selbarlight;
-	std::optional<ColourAlpha> foldmarginColour;
-	std::optional<ColourAlpha> foldmarginHighlightColour;
+	ColourRGBA selbar;
+	ColourRGBA selbarlight;
+	std::optional<ColourRGBA> foldmarginColour;
+	std::optional<ColourRGBA> foldmarginHighlightColour;
 	bool hotspotUnderline;
 	/// Margins are ordered: Line Numbers, Selection Margin, Spacing Margin
 	int leftMarginWidth;	///< Spacing margin on left of text
@@ -154,10 +154,10 @@ public:
 	int textStart;	///< Starting x position of text within the view
 	/// 2018-09-04 Changed to a percent value
 	int zoomLevel;
-	WhiteSpace viewWhitespace;
-	TabDrawMode tabDrawMode;
+	Scintilla::WhiteSpace viewWhitespace;
+	Scintilla::TabDrawMode tabDrawMode;
 	int whitespaceSize;
-	IndentView viewIndentationGuides;
+	Scintilla::IndentView viewIndentationGuides;
 	bool viewEOL;
 
 	CaretAppearance caret;
@@ -166,29 +166,29 @@ public:
 
 	bool someStylesProtected;
 	bool someStylesForceCase;
-	int extraFontFlag;
+	Scintilla::FontQuality extraFontFlag;
 	int extraAscent;
 	int extraDescent;
 	int marginStyleOffset;
-	int annotationVisible;
+	Scintilla::AnnotationVisible annotationVisible;
 	int annotationStyleOffset;
-	int eolAnnotationVisible;
+	Scintilla::EOLAnnotationVisible eolAnnotationVisible;
 	int eolAnnotationStyleOffset;
 	bool braceHighlightIndicatorSet;
 	bool braceBadLightIndicatorSet;
 	int braceHighlightIndicator;
 	int braceBadLightIndicator;
-	int edgeState;
+	Scintilla::EdgeVisualStyle edgeState;
 	EdgeProperties theEdge;
 	std::vector<EdgeProperties> theMultiEdge;
 	int marginNumberPadding; // the right-side padding of the number margin
 	int ctrlCharPadding; // the padding around control character text blobs
 	int lastSegItalicsOffset; // the offset so as not to clip italic characters at EOLs
 
-	using ElementMap = std::map<int, std::optional<ColourAlpha>>;
+	using ElementMap = std::map<Scintilla::Element, std::optional<ColourRGBA>>;
 	ElementMap elementColours;
 	ElementMap elementBaseColours;
-	std::set<int> elementAllowsTranslucent;
+	std::set<Scintilla::Element> elementAllowsTranslucent;
 
 	WrapAppearance wrap;
 
@@ -219,26 +219,26 @@ public:
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;
 	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const;
-	std::optional<ColourAlpha> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
+	std::optional<ColourRGBA> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
 	bool SelectionTextDrawn() const;
 	bool SelectionBackgroundDrawn() const noexcept;
 	bool WhitespaceBackgroundDrawn() const;
-	ColourAlpha WrapColour() const;
+	ColourRGBA WrapColour() const;
 
-	void AddMultiEdge(uptr_t wParam, sptr_t lParam);
+	void AddMultiEdge(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
 
-	std::optional<ColourAlpha> ElementColour(int element) const;
-	bool ElementAllowsTranslucent(int element) const;
-	bool ResetElement(int element);
-	bool SetElementColour(int element, ColourAlpha colour);
-	bool ElementIsSet(int element) const;
-	bool SetElementBase(int element, ColourAlpha colour);
+	std::optional<ColourRGBA> ElementColour(Scintilla::Element element) const;
+	bool ElementAllowsTranslucent(Scintilla::Element element) const;
+	bool ResetElement(Scintilla::Element element);
+	bool SetElementColour(Scintilla::Element element, ColourRGBA colour);
+	bool ElementIsSet(Scintilla::Element element) const;
+	bool SetElementBase(Scintilla::Element element, ColourRGBA colour);
 
-	bool SetWrapState(int wrapState_) noexcept;
-	bool SetWrapVisualFlags(int wrapVisualFlags_) noexcept;
-	bool SetWrapVisualFlagsLocation(int wrapVisualFlagsLocation_) noexcept;
+	bool SetWrapState(Scintilla::Wrap wrapState_) noexcept;
+	bool SetWrapVisualFlags(Scintilla::WrapVisualFlag wrapVisualFlags_) noexcept;
+	bool SetWrapVisualFlagsLocation(Scintilla::WrapVisualLocation wrapVisualFlagsLocation_) noexcept;
 	bool SetWrapVisualStartIndent(int wrapVisualStartIndent_) noexcept;
-	bool SetWrapIndentMode(int wrapIndentMode_) noexcept;
+	bool SetWrapIndentMode(Scintilla::WrapIndentMode wrapIndentMode_) noexcept;
 
 	bool WhiteSpaceVisible(bool inIndent) const noexcept;
 

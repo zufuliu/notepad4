@@ -6,15 +6,15 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
-namespace Scintilla {
+namespace Scintilla::Internal {
 
 struct FontSpecification {
 	const char *fontName = nullptr;
-	int weight = SC_WEIGHT_NORMAL;
+	Scintilla::FontWeight weight = Scintilla::FontWeight::Normal;
 	bool italic = false;
-	int size = 10 * SC_FONT_SIZE_MULTIPLIER;
-	int characterSet = SC_CHARSET_DEFAULT;
-	int extraFontFlag = 0;
+	int size = 10 * Scintilla::FontSizeMultiplier;
+	Scintilla::CharacterSet characterSet = Scintilla::CharacterSet::Default;
+	Scintilla::FontQuality extraFontFlag = Scintilla::FontQuality::QualityDefault;
 	constexpr FontSpecification() noexcept = default;
 	bool operator==(const FontSpecification &other) const noexcept;
 	bool operator<(const FontSpecification &other) const noexcept;
@@ -33,8 +33,8 @@ struct FontMeasurements {
 
 // used to optimize style copy.
 struct StylePod {
-	ColourAlpha fore;
-	ColourAlpha back;
+	ColourRGBA fore;
+	ColourRGBA back;
 	bool eolFilled;
 	bool underline;
 	bool strike;

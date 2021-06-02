@@ -14,7 +14,7 @@
 #include "UniConversion.h"
 #include "HanjaDic.h"
 
-namespace Scintilla::HanjaDict {
+namespace Scintilla::Internal {
 
 interface IRadical;
 interface IHanja;
@@ -78,7 +78,12 @@ public:
 	~HanjaDic() {
 		if (SUCCEEDED(hr)) {
 			hr = HJinterface->CloseMainDic();
-			HJinterface->Release();
+			try {
+				// This can never fail but IUnknown::Release is not marked noexcept.
+				HJinterface->Release();
+			} catch (...) {
+				// Ignore any exception
+			}
 		}
 	}
 
