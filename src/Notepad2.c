@@ -7608,7 +7608,9 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	ofn.nMaxFile = COUNTOF(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
-				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_NOVALIDATE;
+				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ |
+				OFN_NOVALIDATE | OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+	ofn.lpfnHook = OpenSaveFileDlgHookProc;
 
 	const BOOL success = GetOpenFileName(&ofn);
 	if (success) {
@@ -7662,7 +7664,9 @@ BOOL SaveFileDlg(HWND hwnd, BOOL Untitled, LPWSTR lpstrFile, int cchFile, LPCWST
 	ofn.nMaxFile = MAX_PATH;
 	ofn.Flags = OFN_HIDEREADONLY /*| OFN_NOCHANGEDIR*/ |
 				/*OFN_NODEREFERENCELINKS |*/ OFN_OVERWRITEPROMPT |
-				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST;
+				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
+				OFN_NOVALIDATE | OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+	ofn.lpfnHook = OpenSaveFileDlgHookProc;
 
 	const BOOL success = GetSaveFileName(&ofn);
 	if (success) {

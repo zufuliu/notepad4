@@ -2205,6 +2205,57 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 	return ret;
 }
 
+//=============================================================================
+//
+// File Dialog Hook
+// OFNHookProc for GetOpenFileName/GetSaveFileName
+// https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
+//
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg) {
+	case WM_NOTIFY: {
+		LPOFNOTIFY pOFNOTIFY = (LPOFNOTIFY)lParam;
+		switch (pOFNOTIFY->hdr.code) {
+		case CDN_FILEOK: {
+			HWND hFileDlg;
+			LPOPENFILENAME pOFN = pOFNOTIFY->lpOFN;
+			LPTSTR szPath = pOFN->lpstrFile;
+			int n = lstrlen(szPath);
+			BOOL bRawPath = TRUE;
+			// Multi-selected result ends with \0\0.
+			if ((pOFN->Flags & OFN_ALLOWMULTISELECT) && szPath[n + 1] != '\x0') {
+				return FALSE;
+			}
+			if (!PathIsDirectory(szPath)) {
+				return FALSE;
+			}
+			hFileDlg = GetParent(hWnd);
+			for (int i = 0; i < n; i++) {
+				if (szPath[i] == TEXT('/')) {
+					szPath[i] = TEXT('\\');
+					bRawPath &= FALSE;
+				}
+			}
+			if (szPath[n - 1] != TEXT('\\') && szPath[n - 1] != TEXT(' ') && n + 1 < MAX_PATH) {
+				bRawPath &= PathAddBackslash(szPath) == NULL;
+			}
+			if (bRawPath) {
+				return FALSE;
+			}
+			// edt1: dlgs.h
+			SendMessage(hFileDlg, CDM_SETCONTROLTEXT, edt1, (LPARAM)szPath);
+			PostMessage(hFileDlg, WM_COMMAND, IDOK, 0);
+			SetWindowLong(hWnd, 0, 1);
+			return TRUE;
+		}
+		}
+		return FALSE;
+	}
+	default:
+		return FALSE;
+	}
+}
+
 /*
   MinimizeToTray - Copyright 2000 Matthew Ellis <m.t.ellis@bigfoot.com>
 

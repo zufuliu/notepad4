@@ -909,6 +909,9 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 
+//==== File Dialog Hook =========================================================
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);
 BOOL AddBackslashA(char *pszOut, const char *pszInput);
