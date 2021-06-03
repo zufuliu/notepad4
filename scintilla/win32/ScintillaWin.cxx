@@ -49,6 +49,8 @@ Used by VSCode, Atom etc.
 */
 #define Enable_ChromiumWebCustomMIMEDataFormat	0
 
+#undef FindText // Fix GCC LTO ODR violation warning.
+
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
 #include "ScintillaStructures.h"
@@ -187,6 +189,8 @@ namespace Scintilla::Internal {
 class ScintillaWin;
 }
 
+namespace {
+
 /**
  */
 class FormatEnumerator final : public IEnumFORMATETC {
@@ -272,8 +276,6 @@ public:
 	STDMETHODIMP DragLeave() override;
 	STDMETHODIMP Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, POINTL pt, PDWORD pdwEffect) override;
 };
-
-namespace {
 
 // InputLanguage() and SetCandidateWindowPos() are based on Chromium's IMM32Manager and InputMethodWinImm32.
 // https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
@@ -875,7 +877,7 @@ KeyMod ScintillaWin::MouseModifiers(uptr_t wParam) noexcept {
 namespace {
 
 /** Map the key codes to their equivalent Keys:: form. */
-Keys KeyTranslate(int keyIn) noexcept {
+constexpr Keys KeyTranslate(int keyIn) noexcept {
 	//PLATFORM_ASSERT(!keyIn);
 	switch (keyIn) {
 	case VK_DOWN:		return Keys::Down;
@@ -1479,6 +1481,39 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	EnsureCaretVisible();
 	ShowCaretAtCurrentPosition();
 	return 0;
+}
+
+namespace {
+
+// Translate message IDs from WM_* and EM_* to SCI_* so can partly emulate Windows Edit control
+constexpr Message SciMessageFromEM(unsigned int iMessage) noexcept {
+	switch (iMessage) {
+	case EM_CANPASTE: return Message::CanPaste;
+	case EM_CANREDO: return Message::CanRedo;
+	case EM_CANUNDO: return Message::CanUndo;
+	case EM_EMPTYUNDOBUFFER: return Message::EmptyUndoBuffer;
+	case EM_GETFIRSTVISIBLELINE: return Message::GetFirstVisibleLine;
+	case EM_GETLINE: return Message::GetLine;
+	case EM_GETLINECOUNT: return Message::GetLineCount;
+	case EM_GETSELTEXT: return Message::GetSelText;
+	case EM_HIDESELECTION: return Message::HideSelection;
+	case EM_LINEINDEX: return Message::PositionFromLine;
+	case EM_LINESCROLL: return Message::LineScroll;
+	case EM_REDO: return Message::Redo;
+	case EM_REPLACESEL: return Message::ReplaceSel;
+	case EM_SCROLLCARET: return Message::ScrollCaret;
+	case EM_SETREADONLY: return Message::SetReadOnly;
+	case EM_UNDO: return Message::Undo;
+	case WM_CLEAR: return Message::Clear;
+	case WM_COPY: return Message::Copy;
+	case WM_CUT: return Message::Cut;
+	case WM_PASTE: return Message::Paste;
+	case WM_SETTEXT: return Message::SetText;
+	case WM_UNDO: return Message::Undo;
+	default: return static_cast<Message>(iMessage);
+	}
+}
+
 }
 
 UINT ScintillaWin::CodePageOfDocument() const noexcept {
@@ -2159,6 +2194,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 		case WM_VSCROLL:
+		case EM_SCROLL:
 			ScrollMessage(wParam);
 			break;
 
@@ -2311,6 +2347,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			return EditMessage(msg, wParam, lParam);
 		}
 
+		iMessage = SciMessageFromEM(msg);
 		switch (iMessage) {
 		case Message::GetDirectFunction:
 		case Message::GetDirectPointer:
@@ -4068,10 +4105,10 @@ LRESULT CALLBACK ScintillaWin::SWndProc(
 	}
 }
 
-// This function is externally visible so it can be called from container when building statically.
-// Must be called once only.
 extern "C" {
 
+// This function is externally visible so it can be called from container when building statically.
+// Must be called once only.
 int Scintilla_RegisterClasses(void *hInstance) {
 	const bool result = ScintillaWin::Register(static_cast<HINSTANCE>(hInstance));
 	return result;

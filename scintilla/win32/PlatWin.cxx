@@ -88,7 +88,8 @@ AdjustWindowRectExForDpiSig fnAdjustWindowRectExForDpi = nullptr;
 
 }
 
-extern "C" void Scintilla_LoadDpiForWindow(void) {
+extern "C"
+void Scintilla_LoadDpiForWindow(void) {
 	using Scintilla::Internal::DLLFunction;
 
 	HMODULE user32 = ::GetModuleHandleW(L"user32.dll");
