@@ -7392,7 +7392,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->GetLevel(wParam);
 
 	case Message::GetLastChild:
-		return pdoc->GetLastChild(wParam, static_cast<FoldLevel>(lParam));
+		return pdoc->GetLastChild(wParam, OptionalFoldLevel(lParam));
 
 	case Message::GetFoldParent:
 		return pdoc->GetFoldParent(wParam);

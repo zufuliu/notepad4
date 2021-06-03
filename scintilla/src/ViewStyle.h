@@ -45,7 +45,7 @@ constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	return std::max(size, 2 * Scintilla::FontSizeMultiplier);
 }
 
-constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) noexcept {
+constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) {
 	if (wParam) {
 		return ColourRGBA::FromRGB(static_cast<unsigned int>(lParam));
 	} else {
