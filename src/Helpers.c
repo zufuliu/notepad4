@@ -2781,53 +2781,58 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 
 //=============================================================================
 //
-// File Dialog Hook
-// OFNHookProc for GetOpenFileName/GetSaveFileName
+// File Dialog Hook for GetOpenFileName/GetSaveFileName
 // https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
 //
+
+static WNDPROC DefaultFileDlgProc = NULL;
+
+static LRESULT CALLBACK DefaultFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg) {
+	case WM_COMMAND:
+		switch (wParam) {
+		case IDOK: {
+			TCHAR szPath[MAX_PATH];
+			BOOL bPathChanged = FALSE;
+			HWND hCmbPath = GetDlgItem(hWnd, cmb13); // cmb13: dlgs.h
+			int n = GetWindowText(hCmbPath, szPath, MAX_PATH);
+			if (n > 0 && PathFileExists(szPath)) {
+				for (int i = 0; i < n; i++) {
+					if (szPath[i] == TEXT('/')) {
+						szPath[i] = TEXT('\\');
+						bPathChanged |= TRUE;
+					}
+				}
+				if (bPathChanged) {
+					SetWindowText(hCmbPath, szPath);
+				}
+			}
+		}
+		}
+	}
+	return DefaultFileDlgProc(hWnd, uMsg, wParam, lParam);
+}
+
 UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
 	case WM_NOTIFY: {
 		LPOFNOTIFY pOFNOTIFY = (LPOFNOTIFY)lParam;
 		switch (pOFNOTIFY->hdr.code) {
-		case CDN_FILEOK: {
-			HWND hFileDlg;
-			LPOPENFILENAME pOFN = pOFNOTIFY->lpOFN;
-			LPTSTR szPath = pOFN->lpstrFile;
-			int n = lstrlen(szPath);
-			BOOL bRawPath = TRUE;
-			// Multi-selected result ends with \0\0.
-			if ((pOFN->Flags & OFN_ALLOWMULTISELECT) && szPath[n + 1] != '\x0') {
-				return FALSE;
+		case CDN_INITDONE: {
+			HWND hDefaultFileDlg = GetParent(hWnd);
+			WNDPROC DlgProc = (WNDPROC)GetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC);
+			// OFN_OVERWRITEPROMPT is tested before OFNHookProc making "D:\d" like folder path trigger a prompt.
+			// Hook the default (parent) dialog box procedure.
+			if (DlgProc != DefaultFileDlgHookProc) {
+				DefaultFileDlgProc = DlgProc;
 			}
-			if (!PathIsDirectory(szPath)) {
-				return FALSE;
-			}
-			hFileDlg = GetParent(hWnd);
-			for (int i = 0; i < n; i++) {
-				if (szPath[i] == TEXT('/')) {
-					szPath[i] = TEXT('\\');
-					bRawPath &= FALSE;
-				}
-			}
-			if (szPath[n - 1] != TEXT('\\') && szPath[n - 1] != TEXT(' ') && n + 1 < MAX_PATH) {
-				bRawPath &= PathAddBackslash(szPath) == NULL;
-			}
-			if (bRawPath) {
-				return FALSE;
-			}
-			// edt1: dlgs.h
-			SendMessage(hFileDlg, CDM_SETCONTROLTEXT, edt1, (LPARAM)szPath);
-			PostMessage(hFileDlg, WM_COMMAND, IDOK, 0);
-			SetWindowLong(hWnd, 0, 1);
+			SetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC, (LONG_PTR)DefaultFileDlgHookProc);
 			return TRUE;
 		}
 		}
-		return FALSE;
 	}
-	default:
-		return FALSE;
 	}
+	return FALSE;
 }
 
 /******************************************************************************
