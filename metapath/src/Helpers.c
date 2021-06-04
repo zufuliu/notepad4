@@ -2253,7 +2253,6 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 				DefaultFileDlgProc = DlgProc;
 			}
 			SetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC, (LONG_PTR)DefaultFileDlgHookProc);
-			return TRUE;
 		}
 		}
 	}

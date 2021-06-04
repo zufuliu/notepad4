@@ -337,6 +337,8 @@ extern int	iZoomLevel;
 extern FILEVARS fvCurFile;
 extern EditTabSettings tabSettings;
 
+extern BOOL bUseXPFileDialog;
+
 #define STYLE_MASK_FONT_FACE	(1 << 0)
 #define STYLE_MASK_FONT_SIZE	(1 << 1)
 #define STYLE_MASK_FORE_COLOR	(1 << 2)
@@ -975,9 +977,11 @@ BOOL Style_Import(HWND hwnd) {
 	ofn.lpstrDefExt	= L"ini";
 	ofn.nMaxFile	= COUNTOF(szFile);
 	ofn.Flags		= OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/
-					  | OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-	ofn.lpfnHook = OpenSaveFileDlgHookProc;
+					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
+	if (bUseXPFileDialog) {
+		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+		ofn.lpfnHook = OpenSaveFileDlgHookProc;
+	}
 
 	if (GetOpenFileName(&ofn)) {
 		IniSection section;
@@ -1049,9 +1053,11 @@ BOOL Style_Export(HWND hwnd) {
 	ofn.lpstrDefExt = L"ini";
 	ofn.nMaxFile	= COUNTOF(szFile);
 	ofn.Flags		= /*OFN_FILEMUSTEXIST |*/ OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT
-					  | OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-	ofn.lpfnHook = OpenSaveFileDlgHookProc;
+					  | OFN_PATHMUSTEXIST | OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_OVERWRITEPROMPT;
+	if (bUseXPFileDialog) {
+		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+		ofn.lpfnHook = OpenSaveFileDlgHookProc;
+	}
 
 	if (GetSaveFileName(&ofn)) {
 		DWORD dwError = ERROR_SUCCESS;

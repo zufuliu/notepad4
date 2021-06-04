@@ -108,6 +108,7 @@
 #define IDC_COLOR_SAMP2					106
 #define IDC_COLOR_PICK2					107
 #define IDC_LANGUAGE_LIST				108
+#define IDC_USE_XP_FILE_DIALOG			109
 // Locations
 #define IDPP_PROG						113
 #define IDC_QUICKVIEW					100

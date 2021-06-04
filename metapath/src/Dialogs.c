@@ -180,6 +180,7 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 //
 extern HWND hwndDirList;
 extern int cxRunDlg;
+extern BOOL bUseXPFileDialog;
 
 INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
@@ -255,9 +256,11 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.lpstrTitle = szTitle;
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS
-						| OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-			ofn.lpfnHook = OpenSaveFileDlgHookProc;
+						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
+			if (bUseXPFileDialog) {
+				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+				ofn.lpfnHook = OpenSaveFileDlgHookProc;
+			}
 
 			if (GetOpenFileName(&ofn)) {
 				QuotateFilenameStr(szFile);
@@ -832,6 +835,13 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 		ComboBox_SetCurSel(hwndCtl, languageResID - IDS_LANG_USER_DEFAULT);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 #endif
+
+		if (!IsVistaAndAbove()) {
+			CheckDlgButton(hwnd, IDC_USE_XP_FILE_DIALOG, BST_CHECKED);
+			EnableWindow(GetDlgItem(hwnd, IDC_USE_XP_FILE_DIALOG), FALSE);
+		} else if (bUseXPFileDialog) {
+			CheckDlgButton(hwnd, IDC_USE_XP_FILE_DIALOG, BST_CHECKED);
+		}
 	}
 	return TRUE;
 
@@ -906,6 +916,7 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			SetUILanguage((int)SendDlgItemMessage(hwnd, IDC_LANGUAGE_LIST, CB_GETCURSEL, 0, 0) + IDS_LANG_USER_DEFAULT);
 #endif
+			bUseXPFileDialog = IsButtonChecked(hwnd, IDC_USE_XP_FILE_DIALOG);
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
 		}
@@ -1136,9 +1147,11 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			ofn.nMaxFile = COUNTOF(szFile);
 			ofn.lpstrTitle = szTitle;
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT
-						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS
-						| OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-			ofn.lpfnHook = OpenSaveFileDlgHookProc;
+						| OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
+			if (bUseXPFileDialog) {
+				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+				ofn.lpfnHook = OpenSaveFileDlgHookProc;
+			}
 
 			if (GetOpenFileName(&ofn)) {
 				lstrcpyn(tchBuf, szFile, COUNTOF(tchBuf));
@@ -2402,9 +2415,11 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			ofn.nMaxFile    = COUNTOF(szFile);
 			ofn.lpstrTitle  = szTitle;
 			ofn.Flags       = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR |
-							  OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS |
-							  OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
-			ofn.lpfnHook = OpenSaveFileDlgHookProc;
+							  OFN_PATHMUSTEXIST | OFN_SHAREAWARE | OFN_NODEREFERENCELINKS;
+			if (bUseXPFileDialog) {
+				ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+				ofn.lpfnHook = OpenSaveFileDlgHookProc;
+			}
 
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
