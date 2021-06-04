@@ -48,9 +48,8 @@ constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) {
 	if (wParam) {
 		return ColourRGBA::FromRGB(static_cast<unsigned int>(lParam));
-	} else {
-		return {};
 	}
+	return std::nullopt;
 }
 
 struct SelectionAppearance {

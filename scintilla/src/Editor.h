@@ -661,7 +661,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		if (lParam >= 0) {
 			return static_cast<FoldLevel>(lParam);
 		}
-		return {};
+		return std::nullopt;
 	}
 
 	static Scintilla::sptr_t StringResult(Scintilla::sptr_t lParam, const char *val) noexcept;

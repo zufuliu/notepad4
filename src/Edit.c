@@ -7957,7 +7957,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 				FoldLevelStack_Push(&levelStack, level);
 				if (lev == levelStack.levelCount) {
 					FoldToggleNode(line, &action, &fToggled);
-					line = SciCall_GetLastChild(line);
+					line = SciCall_GetLastChildEx(line, level);
 				}
 			}
 			++line;
@@ -7970,7 +7970,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				if (lev == level) {
 					FoldToggleNode(line, &action, &fToggled);
-					line = SciCall_GetLastChild(line);
+					line = SciCall_GetLastChildEx(line, level);
 				}
 			}
 			++line;
@@ -8052,11 +8052,11 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				FoldLevelStack_Push(&levelStack, level);
-				level = levelStack.levelCount;
-				if ((state >> level) & 1) {
+				const int lev = levelStack.levelCount;
+				if ((state >> lev) & 1) {
 					FoldToggleNode(line, &action, &fToggled);
-					if (level == maxLevel) {
-						line = SciCall_GetLastChild(line);
+					if (lev == maxLevel) {
+						line = SciCall_GetLastChildEx(line, level);
 					}
 				}
 			}
@@ -8067,11 +8067,11 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			int level = SciCall_GetFoldLevel(line);
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
-				level -= SC_FOLDLEVELBASE;
-				if ((state >> level) & 1) {
+				const int lev = level - SC_FOLDLEVELBASE;
+				if ((state >> lev) & 1) {
 					FoldToggleNode(line, &action, &fToggled);
-					if (level == maxLevel) {
-						line = SciCall_GetLastChild(line);
+					if (lev == maxLevel) {
+						line = SciCall_GetLastChildEx(line, level);
 					}
 				}
 			}
@@ -8272,7 +8272,7 @@ void EditGotoBlock(int menu) {
 						sibling = FALSE;
 						break;
 					}
-					line = SciCall_GetLastChild(line);
+					line = SciCall_GetLastChildEx(line, lev);
 				} else {
 					iLine = line;
 					break;

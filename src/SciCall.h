@@ -1237,6 +1237,10 @@ NP2_inline Sci_Line SciCall_GetLastChild(Sci_Line line) {
 	return SciCall(SCI_GETLASTCHILD, line, -1);
 }
 
+NP2_inline Sci_Line SciCall_GetLastChildEx(Sci_Line line, int level) {
+	return SciCall(SCI_GETLASTCHILD, line, level);
+}
+
 NP2_inline Sci_Line SciCall_GetFoldParent(Sci_Line line) {
 	return SciCall(SCI_GETFOLDPARENT, line, 0);
 }
