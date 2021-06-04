@@ -35,7 +35,6 @@
 #include "Scintilla.h"
 
 //#include "CharacterCategory.h"
-
 #include "LexerModule.h"
 
 #include "Position.h"
@@ -67,6 +66,14 @@
 using namespace Scintilla;
 using namespace Scintilla::Internal;
 using namespace Lexilla;
+
+static_assert(__is_standard_layout(SCNotification));
+static_assert(__is_standard_layout(NotificationData));
+static_assert(sizeof(SCNotification) == sizeof(NotificationData));
+//#if defined(_MSC_VER) && defined(__cpp_lib_is_layout_compatible)
+//static_assert(__is_layout_compatible(SCNotification, NotificationData));
+//#else
+//#endif
 
 ScintillaBase::ScintillaBase() noexcept {
 #if SCI_EnablePopupMenu
