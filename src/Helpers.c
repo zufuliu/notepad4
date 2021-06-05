@@ -2829,6 +2829,7 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		}
 	}
 	}
+	UNREFERENCED_PARAMETER(wParam);
 	return FALSE;
 }
 
