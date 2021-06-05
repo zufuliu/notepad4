@@ -171,6 +171,7 @@ BOOL	bFileWatchingKeepAtEnd;
 BOOL	bResetFileWatching;
 static DWORD dwFileCheckInterval;
 static DWORD dwAutoReloadTimeout;
+BOOL bUseXPFileDialog;
 static int iEscFunction;
 static BOOL bAlwaysOnTop;
 static BOOL bMinimizeToTray;
@@ -2591,6 +2592,13 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, iFileWatchingMode);
 
+	if (IsVistaAndAbove()) {
+		CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
+	} else {
+		RemoveMenu(hmenu, IDM_SET_USE_XP_FILE_DIALOG, MF_BYCOMMAND);
+		bUseXPFileDialog = TRUE;
+	}
+
 	if (StrNotEmpty(szTitleExcerpt)) {
 		i = IDM_VIEW_SHOWEXCERPT;
 	} else if (iPathNameFormat == 0) {
@@ -4212,6 +4220,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SINGLEFILEINSTANCE:
 		bSingleFileInstance = !bSingleFileInstance;
 		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"SingleFileInstance", bSingleFileInstance, 1);
+		break;
+
+	case IDM_SET_USE_XP_FILE_DIALOG:
+		bUseXPFileDialog = !bUseXPFileDialog;
+		IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"UseXPFileDialog", bUseXPFileDialog, 0);
 		break;
 
 	case IDM_VIEW_ALWAYSONTOP:
@@ -6593,6 +6606,12 @@ void LoadFlags(void) {
 	dwFileCheckInterval = IniSectionGetInt(pIniSection, L"FileCheckInterval", 1000);
 	dwAutoReloadTimeout = IniSectionGetInt(pIniSection, L"AutoReloadTimeout", 1000);
 
+	if (IsVistaAndAbove()) {
+		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", 0);
+	} else {
+		bUseXPFileDialog = TRUE;
+	}
+
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
 
 	int iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
@@ -7608,7 +7627,11 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	ofn.nMaxFile = COUNTOF(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST |
-				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/ | OFN_NOVALIDATE;
+				OFN_SHAREAWARE /*| OFN_NODEREFERENCELINKS*/;
+	if (bUseXPFileDialog) {
+		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+		ofn.lpfnHook = OpenSaveFileDlgHookProc;
+	}
 
 	const BOOL success = GetOpenFileName(&ofn);
 	if (success) {
@@ -7663,6 +7686,10 @@ BOOL SaveFileDlg(HWND hwnd, BOOL Untitled, LPWSTR lpstrFile, int cchFile, LPCWST
 	ofn.Flags = OFN_HIDEREADONLY /*| OFN_NOCHANGEDIR*/ |
 				/*OFN_NODEREFERENCELINKS |*/ OFN_OVERWRITEPROMPT |
 				OFN_DONTADDTORECENT | OFN_PATHMUSTEXIST;
+	if (bUseXPFileDialog) {
+		ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+		ofn.lpfnHook = OpenSaveFileDlgHookProc;
+	}
 
 	const BOOL success = GetSaveFileName(&ofn);
 	if (success) {

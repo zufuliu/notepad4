@@ -1488,15 +1488,18 @@ void StrTab2Space(LPWSTR lpsz) {
 //
 // PathFixBackslashes() - in place conversion
 //
-void PathFixBackslashes(LPWSTR lpsz) {
+BOOL PathFixBackslashes(LPWSTR lpsz) {
 	WCHAR *c = lpsz;
+	BOOL bFixed = FALSE;
 	while ((c = StrChr(c, L'/')) != NULL) {
 		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
 			c += 2;
 		} else {
 			*c++ = L'\\';
+			bFixed |= TRUE;
 		}
 	}
+	return bFixed;
 }
 
 //=============================================================================
@@ -2203,6 +2206,53 @@ INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 	}
 
 	return ret;
+}
+
+//=============================================================================
+//
+// File Dialog Hook for GetOpenFileName/GetSaveFileName
+// https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
+//
+
+static WNDPROC DefaultFileDlgProc = NULL;
+
+static LRESULT CALLBACK DefaultFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg) {
+	case WM_COMMAND:
+		switch (wParam) {
+		case IDOK: {
+			TCHAR szPath[MAX_PATH];
+			HWND hCmbPath = GetDlgItem(hWnd, cmb13); // cmb13: dlgs.h
+			int n = GetWindowText(hCmbPath, szPath, MAX_PATH);
+			if (PathFixBackslashes(szPath)) {
+				SetWindowText(hCmbPath, szPath);
+			}
+		}
+		}
+	}
+	return DefaultFileDlgProc(hWnd, uMsg, wParam, lParam);
+}
+
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	switch (uMsg) {
+	case WM_NOTIFY: {
+		LPOFNOTIFY pOFNOTIFY = (LPOFNOTIFY)lParam;
+		switch (pOFNOTIFY->hdr.code) {
+		case CDN_INITDONE: {
+			HWND hDefaultFileDlg = GetParent(hWnd);
+			WNDPROC DlgProc = (WNDPROC)GetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC);
+			// OFN_OVERWRITEPROMPT is tested before OFNHookProc making "D:\d" like folder path trigger a prompt.
+			// Hook the default (parent) dialog box procedure.
+			if (DlgProc != DefaultFileDlgHookProc) {
+				DefaultFileDlgProc = DlgProc;
+			}
+			SetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC, (LONG_PTR)DefaultFileDlgHookProc);
+		}
+		}
+	}
+	}
+	UNREFERENCED_PARAMETER(wParam);
+	return FALSE;
 }
 
 /*

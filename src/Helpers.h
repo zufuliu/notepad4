@@ -827,7 +827,7 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
 void PrepareFilterStr(LPWSTR lpFilter);
 
 void	StrTab2Space(LPWSTR lpsz);
-void	PathFixBackslashes(LPWSTR lpsz);
+BOOL	PathFixBackslashes(LPWSTR lpsz);
 
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void	PathCanonicalizeEx(LPWSTR lpSrc);
@@ -908,6 +908,9 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
 HWND	CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+
+//==== File Dialog Hook =========================================================
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);

@@ -491,7 +491,7 @@ LPWSTR GetFilenameStr(LPWSTR lpFile);
 
 void PrepareFilterStr(LPWSTR lpFilter);
 void StrTab2Space(LPWSTR lpsz);
-void PathFixBackslashes(LPWSTR lpsz);
+BOOL PathFixBackslashes(LPWSTR lpsz);
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void PathCanonicalizeEx(LPWSTR lpSrc);
 BOOL SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer);
@@ -582,6 +582,9 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc) \
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
 INT_PTR ThemedDialogBoxParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc, LPARAM dwInitParam);
+
+//==== File Dialog Hook =========================================================
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
 BOOL GetDoAnimateMinimize(void);

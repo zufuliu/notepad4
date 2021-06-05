@@ -99,6 +99,7 @@ int		iEscFunction;
 BOOL	bFocusEdit;
 BOOL	bAlwaysOnTop;
 static BOOL bTransparentMode;
+BOOL bUseXPFileDialog;
 BOOL	bWindowLayoutRTL;
 BOOL	bMinimizeToTray;
 BOOL	fUseRecycleBin;
@@ -1357,8 +1358,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ofn.lpstrTitle = szTitle;
 		ofn.lpstrInitialDir = szCurDir;
 		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT |
-					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT |
-					OFN_PATHMUSTEXIST;
+					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
+		if (bUseXPFileDialog) {
+			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+			ofn.lpfnHook = OpenSaveFileDlgHookProc;
+		}
 
 		if (!GetSaveFileName(&ofn)) {
 			break;
@@ -1449,8 +1453,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		ofn.lpstrFile = szNewFile;
 		ofn.nMaxFile = MAX_PATH;
 		ofn.Flags = OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT |
-					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT |
-					OFN_PATHMUSTEXIST;
+					OFN_NODEREFERENCELINKS | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
+		if (bUseXPFileDialog) {
+			ofn.Flags |= OFN_EXPLORER | OFN_ENABLESIZING | OFN_ENABLEHOOK;
+			ofn.lpfnHook = OpenSaveFileDlgHookProc;
+		}
 
 		if (!GetSaveFileName(&ofn)) {
 			break;
@@ -2461,6 +2468,12 @@ void LoadSettings(void) {
 	int iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
 	iEscFunction = clamp_i(iValue, 0, 2);
 
+	if (IsVistaAndAbove()) {
+		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", 0);
+	} else {
+		bUseXPFileDialog = TRUE;
+	}
+
 	iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
 	iStartupDir = clamp_i(iValue, 0, 2);
 
@@ -2698,6 +2711,10 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
 	IniSectionSetBoolEx(pIniSection, L"EscFunction", iEscFunction, 0);
+
+	if (IsVistaAndAbove()) {
+		IniSectionSetBoolEx(pIniSection, L"UseXPFileDialog", bUseXPFileDialog, 0);
+	}
 
 	IniSectionSetIntEx(pIniSection, L"StartupDirectory", iStartupDir, 1);
 	if (iStartupDir == 1) {
