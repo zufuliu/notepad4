@@ -2147,15 +2147,18 @@ void StrTab2Space(LPWSTR lpsz) {
 //
 // PathFixBackslashes() - in place conversion
 //
-void PathFixBackslashes(LPWSTR lpsz) {
+BOOL PathFixBackslashes(LPWSTR lpsz) {
 	WCHAR *c = lpsz;
+	BOOL bFixed = FALSE;
 	while ((c = StrChr(c, L'/')) != NULL) {
 		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
 			c += 2;
 		} else {
 			*c++ = L'\\';
+			bFixed |= TRUE;
 		}
 	}
+	return bFixed;
 }
 
 //=============================================================================
@@ -2793,16 +2796,9 @@ static LRESULT CALLBACK DefaultFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wPar
 		switch (wParam) {
 		case IDOK: {
 			TCHAR szPath[MAX_PATH];
-			BOOL bPathChanged = FALSE;
 			HWND hCmbPath = GetDlgItem(hWnd, cmb13); // cmb13: dlgs.h
 			int n = GetWindowText(hCmbPath, szPath, MAX_PATH);
-			for (int i = 0; i < n; i++) {
-				if (szPath[i] == TEXT('/')) {
-					szPath[i] = TEXT('\\');
-					bPathChanged |= TRUE;
-				}
-			}
-			if (bPathChanged) {
+			if (PathFixBackslashes(szPath)) {
 				SetWindowText(hCmbPath, szPath);
 			}
 		}

@@ -491,7 +491,7 @@ LPWSTR GetFilenameStr(LPWSTR lpFile);
 
 void PrepareFilterStr(LPWSTR lpFilter);
 void StrTab2Space(LPWSTR lpsz);
-void PathFixBackslashes(LPWSTR lpsz);
+BOOL PathFixBackslashes(LPWSTR lpsz);
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void PathCanonicalizeEx(LPWSTR lpSrc);
 BOOL SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer);

@@ -827,7 +827,7 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
 void PrepareFilterStr(LPWSTR lpFilter);
 
 void	StrTab2Space(LPWSTR lpsz);
-void	PathFixBackslashes(LPWSTR lpsz);
+BOOL	PathFixBackslashes(LPWSTR lpsz);
 
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 void	PathCanonicalizeEx(LPWSTR lpSrc);
