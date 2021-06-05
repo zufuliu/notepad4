@@ -2222,16 +2222,14 @@ static LRESULT CALLBACK DefaultFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wPar
 			BOOL bPathChanged = FALSE;
 			HWND hCmbPath = GetDlgItem(hWnd, cmb13); // cmb13: dlgs.h
 			int n = GetWindowText(hCmbPath, szPath, MAX_PATH);
-			if (n > 0 && PathFileExists(szPath)) {
-				for (int i = 0; i < n; i++) {
-					if (szPath[i] == TEXT('/')) {
-						szPath[i] = TEXT('\\');
-						bPathChanged |= TRUE;
-					}
+			for (int i = 0; i < n; i++) {
+				if (szPath[i] == TEXT('/')) {
+					szPath[i] = TEXT('\\');
+					bPathChanged |= TRUE;
 				}
-				if (bPathChanged) {
-					SetWindowText(hCmbPath, szPath);
-				}
+			}
+			if (bPathChanged) {
+				SetWindowText(hCmbPath, szPath);
 			}
 		}
 		}
