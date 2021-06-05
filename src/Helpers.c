@@ -2155,7 +2155,7 @@ BOOL PathFixBackslashes(LPWSTR lpsz) {
 			c += 2;
 		} else {
 			*c++ = L'\\';
-			bFixed |= TRUE;
+			bFixed = TRUE;
 		}
 	}
 	return bFixed;
@@ -2787,45 +2787,45 @@ HWND CreateThemedDialogParam(HINSTANCE hInstance, LPCWSTR lpTemplate, HWND hWndP
 // File Dialog Hook for GetOpenFileName/GetSaveFileName
 // https://docs.microsoft.com/en-us/windows/win32/dlgbox/open-and-save-as-dialog-boxes
 //
+static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+	UNREFERENCED_PARAMETER(dwRefData);
 
-static WNDPROC DefaultFileDlgProc = NULL;
-
-static LRESULT CALLBACK DefaultFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch (uMsg) {
+	switch (umsg) {
 	case WM_COMMAND:
 		switch (wParam) {
 		case IDOK: {
 			TCHAR szPath[MAX_PATH];
-			HWND hCmbPath = GetDlgItem(hWnd, cmb13); // cmb13: dlgs.h
-			int n = GetWindowText(hCmbPath, szPath, MAX_PATH);
+			HWND hCmbPath = GetDlgItem(hwnd, cmb13); // cmb13: dlgs.h
+			GetWindowText(hCmbPath, szPath, MAX_PATH);
 			if (PathFixBackslashes(szPath)) {
 				SetWindowText(hCmbPath, szPath);
 			}
-		}
-		}
+		} break;
+	} break;
+
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd, OpenSaveFileDlgSubProc, uIdSubclass);
+		break;
 	}
-	return DefaultFileDlgProc(hWnd, uMsg, wParam, lParam);
+
+	return DefSubclassProc(hwnd, umsg, wParam, lParam);
 }
 
-UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch (uMsg) {
+UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(wParam);
+
+	switch (umsg) {
 	case WM_NOTIFY: {
 		LPOFNOTIFY pOFNOTIFY = (LPOFNOTIFY)lParam;
 		switch (pOFNOTIFY->hdr.code) {
-		case CDN_INITDONE: {
-			HWND hDefaultFileDlg = GetParent(hWnd);
-			WNDPROC DlgProc = (WNDPROC)GetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC);
+		case CDN_INITDONE:
 			// OFN_OVERWRITEPROMPT is tested before OFNHookProc making "D:\d" like folder path trigger a prompt.
 			// Hook the default (parent) dialog box procedure.
-			if (DlgProc != DefaultFileDlgHookProc) {
-				DefaultFileDlgProc = DlgProc;
-			}
-			SetWindowLongPtr(hDefaultFileDlg, GWLP_WNDPROC, (LONG_PTR)DefaultFileDlgHookProc);
+			SetWindowSubclass(GetParent(hwnd), OpenSaveFileDlgSubProc, 0, 0);
+			break;
 		}
-		}
+	} break;
 	}
-	}
-	UNREFERENCED_PARAMETER(wParam);
 	return FALSE;
 }
 
