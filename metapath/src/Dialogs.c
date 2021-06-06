@@ -836,10 +836,8 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 #endif
 
-		if (!IsVistaAndAbove()) {
-			CheckDlgButton(hwnd, IDC_USE_XP_FILE_DIALOG, BST_CHECKED);
-			EnableWindow(GetDlgItem(hwnd, IDC_USE_XP_FILE_DIALOG), FALSE);
-		} else if (bUseXPFileDialog) {
+		EnableWindow(GetDlgItem(hwnd, IDC_USE_XP_FILE_DIALOG), IsVistaAndAbove());
+		if (bUseXPFileDialog) {
 			CheckDlgButton(hwnd, IDC_USE_XP_FILE_DIALOG, BST_CHECKED);
 		}
 	}

@@ -2592,12 +2592,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, iFileWatchingMode);
 
-	if (IsVistaAndAbove()) {
-		CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
-	} else {
-		RemoveMenu(hmenu, IDM_SET_USE_XP_FILE_DIALOG, MF_BYCOMMAND);
-		bUseXPFileDialog = TRUE;
-	}
+	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, IsVistaAndAbove());
+	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
 
 	if (StrNotEmpty(szTitleExcerpt)) {
 		i = IDM_VIEW_SHOWEXCERPT;
