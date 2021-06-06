@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <shlwapi.h>
+#include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include "SciCall.h"

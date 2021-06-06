@@ -297,6 +297,8 @@
         <IncludePath Value="../../scintilla/src"/>
         <Preprocessor Value="_WINDOWS"/>
         <Preprocessor Value="NOMINMAX"/>
+        <Preprocessor Value="WIN32_LEAN_AND_MEAN"/>
+        <Preprocessor Value="STRICT_TYPED_ITEMIDS"/>
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
         <Preprocessor Value="NO_CXX11_REGEX"/>

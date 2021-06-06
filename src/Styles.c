@@ -22,6 +22,7 @@
 #include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
+#include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include <uxtheme.h>

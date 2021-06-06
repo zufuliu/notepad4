@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include <windows.h>
+#include <ole2.h>
 
 #include "UniConversion.h"
 #include "HanjaDic.h"

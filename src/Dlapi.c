@@ -22,6 +22,7 @@
 #include <windowsx.h>
 #include <shlwapi.h>
 #include <shlobj.h>
+#include <shellapi.h>
 #include <commctrl.h>
 #include "Helpers.h"
 #include "Dlapi.h"
@@ -1254,11 +1255,11 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 
 	// Init new ITEMIDLIST
 	if (pidl1) {
-		CopyMemory((LPBYTE)pidl, (LPCBYTE)pidl1, cb1);
+		CopyMemory((char *)pidl, (const char *)pidl1, cb1);
 	}
 
 	// pidl2 can't be NULL here
-	CopyMemory((LPBYTE)pidl + cb1, (LPCBYTE)pidl2, cb2);
+	CopyMemory((char *)pidl + cb1, (const char *)pidl2, cb2);
 
 	return pidl;
 }

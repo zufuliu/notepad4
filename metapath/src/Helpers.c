@@ -20,9 +20,14 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <dde.h>
+#include <ddeml.h>
+#include <dlgs.h>
 #include <shlwapi.h>
 #include <shlobj.h>
+#include <shellapi.h>
 #include <commctrl.h>
+#include <commdlg.h>
 #include <uxtheme.h>
 #include <vssym32.h>
 #include <psapi.h>

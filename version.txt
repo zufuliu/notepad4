@@ -5,7 +5,7 @@ git clone https://github.com/XhmikosR/notepad2-mod.git
 Scintilla (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 5.0.3
-2021-06-02 8815:3c29e371d843
+2021-06-05 8819:8b463475329e
 
 Lexilla (upstream)
 git clone https://github.com/ScintillaOrg/lexilla.git

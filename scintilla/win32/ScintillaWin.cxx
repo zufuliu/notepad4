@@ -26,6 +26,9 @@
 #include <chrono>
 //#include <mutex>
 
+// WIN32_LEAN_AND_MEAN is defined to avoid including commdlg.h
+// (which defined FindText) to fix GCC LTO ODR violation warning.
+
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
@@ -48,8 +51,6 @@ Chromium Web Custom MIME Data Format
 Used by VSCode, Atom etc.
 */
 #define Enable_ChromiumWebCustomMIMEDataFormat	0
-
-#undef FindText // Fix GCC LTO ODR violation warning.
 
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"

@@ -23,6 +23,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <shlwapi.h>
+#include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
 #include "SciCall.h"
