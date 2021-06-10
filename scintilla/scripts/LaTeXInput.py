@@ -15,7 +15,7 @@ data_path = '../win32/LaTeXInputData.h'
 
 source_info = {
 	# data source at https://github.com/JuliaLang/julia/tree/master/stdlib/REPL/src
-	'latex_link': 'https://docs.julialang.org/en/v1.7-dev/manual/unicode-input/',
+	'latex_link': 'https://docs.julialang.org/en/v1.8-dev/manual/unicode-input/',
 	'emoji_link': 'https://github.com/iamcal/emoji-data/blob/master/emoji_pretty.json',
 }
 
