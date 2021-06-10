@@ -28,7 +28,8 @@ SetEnvironmentVariable(UBSAN_OPTIONS, L"log_path=" WC_METAPATH L"-UBSan.log,prin
 Disabled warnings:
 	C4201: nonstandard extension used: nameless struct/union.
 	C4204: nonstandard extension used: non-constant aggregate initializer.
-	C4221: nonstandard extension used : 'identifier' : cannot be initialized using address of automatic variable.
+	C4214: nonstandard extension used: bit field types other than int.
+	C4221: nonstandard extension used: 'identifier' : cannot be initialized using address of automatic variable.
 
 /wd26429 /wd26446 /wd26472 /wd26481 /wd26482 /wd26485 /wd26486 /wd26489
 Disabled Code Analysis warnings:

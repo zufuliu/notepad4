@@ -1,4 +1,4 @@
-// 5.3 https://docs.swift.org/
+// 5.5 https://docs.swift.org/
 // https://docs.swift.org/swift-book/
 // https://swift.org/documentation/
 // https://github.com/apple/swift
@@ -61,6 +61,8 @@ Type
 unowned
 weak willSet
 precedencegroup
+
+async await
 
 //! directive		===========================================================
 // Compiler Control Statements

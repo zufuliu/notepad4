@@ -7848,7 +7848,7 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
 
-// max level for Toggle Folds for Current Level for indentation based lexers.
+// max level for Toggle Folds -> Current Level for indentation based lexers.
 #define MAX_EDIT_TOGGLE_FOLD_LEVEL		63
 struct FoldLevelStack {
 	int levelCount; // 1-based level number at current header line
