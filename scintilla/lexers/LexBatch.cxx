@@ -106,12 +106,6 @@ void DetectBatVariable(StyleContext &sc, bool &quotedVar, bool &markVar, bool &n
 
 }
 
-/*static const char *const batchWordListDesc[] = {
-	"Internal Commands",
-	"External Commands",
-	0
-};*/
-
 static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	bool quotedVar = false;		// %var%

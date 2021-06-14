@@ -1230,9 +1230,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	attr[KEYWORDSET_MAX] = KeywordAttr_NoLexer;
 
 	switch (pLexNew->rid) {
-	case NP2LEX_BATCH:
-		attr[6] = KeywordAttr_NoLexer;		// Upper Case Keyword
-		break;
 	case NP2LEX_CPP:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
 		attr[3] = KeywordAttr_NoAutoComp;	// Directive
@@ -1301,6 +1298,12 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_AWK:
 		attr[3] = KeywordAttr_NoLexer;		// library function
 		attr[4] = KeywordAttr_NoLexer;		// misc
+		break;
+	case NP2LEX_BATCH:
+		attr[1] = KeywordAttr_NoLexer;		// system commands
+		attr[2] = KeywordAttr_NoLexer;		// upper case keywords / commands
+		attr[3] = KeywordAttr_NoLexer;		// environment variables
+		attr[4] = KeywordAttr_NoLexer;		// command options
 		break;
 	case NP2LEX_CMAKE:
 		attr[6] = KeywordAttr_NoLexer;		// long properties

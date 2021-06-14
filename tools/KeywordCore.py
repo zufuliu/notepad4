@@ -308,6 +308,53 @@ def parse_awk_api_file(path):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
+def parse_batch_api_file(path):
+	sections = read_api_file(path, '::')
+	keywordMap = {
+		'upper case keywords': [],
+		'options': [],
+	}
+	for key, doc in sections:
+		if key == 'keywords':
+			items = doc.split()
+			keywordMap['upper case keywords'].extend(items)
+			keywordMap[key] = [item.lower() for item in items]
+		elif key == 'external command':
+			uppercase = keywordMap['upper case keywords']
+			options = keywordMap['options']
+			commands = []
+			for line in doc.splitlines():
+				items = line.strip().split()
+				if not items:
+					continue
+				command = items[0]
+				if command[0].isupper():
+					uppercase.append(command)
+				elif command[0].islower():
+					commands.append(command)
+				if len(items) > 1:
+					options.extend(item for item in items[1:] if item[0].isalpha())
+			keywordMap['system commands'] = commands
+		elif key == 'environment variables':
+			keywordMap[key] = doc.split()
+		elif key == 'options':
+			keywordMap[key].extend(doc.split())
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'system commands',
+		'upper case keywords',
+		'environment variables',
+		'options',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('system commands', keywordMap['system commands'], KeywordAttr.NoLexer),
+		('upper case keywords / commands', keywordMap['upper case keywords'], KeywordAttr.NoLexer),
+		('environment variables', keywordMap['environment variables'], KeywordAttr.NoLexer),
+		('command options', keywordMap['options'], KeywordAttr.NoLexer),
+	]
+
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
 	cmakeLang = "ASM C CSharp CUDA CXX Fortran Java RC Swift".split()
