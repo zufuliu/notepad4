@@ -8,6 +8,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <string_view>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -231,6 +233,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 				sc.ForwardSetState(SCE_TCL_DEFAULT);
 			prevSlash = false;
 			previousLevel = currentLevel;
+			visibleChars = false;
 			continue;
 		}
 

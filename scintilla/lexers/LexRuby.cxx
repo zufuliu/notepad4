@@ -8,6 +8,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <string_view>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -239,20 +241,6 @@ public:
 		Count++;
 		Up	  = u;
 		Down  = opposite(Up);
-	}
-	QuoteCls(const QuoteCls &q) noexcept {
-		// copy constructor -- use this for copying in
-		Count = q.Count;
-		Up	  = q.Up;
-		Down  = q.Down;
-	}
-	QuoteCls &operator=(const QuoteCls &q) noexcept { // assignment constructor
-		if (this != &q) {
-			Count = q.Count;
-			Up    = q.Up;
-			Down  = q.Down;
-		}
-		return *this;
 	}
 };
 
@@ -626,25 +614,17 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	class HereDocCls {
 	public:
-		int State;
+		int State = 0;
 		// States
 		// 0: '<<' encountered
 		// 1: collect the delimiter
 		// 1b: text between the end of the delimiter and the EOL
 		// 2: here doc text (lines after the delimiter)
-		char Quote;		// the char after '<<'
-		bool Quoted;		// true if Quote in ('\'','"','`')
-		int DelimiterLength;	// strlen(Delimiter)
-		char Delimiter[256];	// the Delimiter, limit of 256: from Perl
-		bool CanBeIndented;
-		HereDocCls() noexcept {
-			State = 0;
-			Quote = '\0';
-			Quoted = false;
-			DelimiterLength = 0;
-			Delimiter[0] = '\0';
-			CanBeIndented = false;
-		}
+		char Quote = '\0';		// the char after '<<'
+		bool Quoted = false;		// true if Quote in ('\'','"','`')
+		int DelimiterLength = 0;	// strlen(Delimiter)
+		char Delimiter[256] {};	// the Delimiter, limit of 256: from Perl
+		bool CanBeIndented = false;
 	};
 	HereDocCls HereDoc;
 
@@ -660,8 +640,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	int state = initStyle;
 	const Sci_Position lengthDoc = startPos + length;
 
-	char prevWord[MAX_KEYWORD_LENGTH + 1]; // 1 byte for zero
-	prevWord[0] = '\0';
+	char prevWord[MAX_KEYWORD_LENGTH + 1] {}; // 1 byte for zero
 	if (length == 0)
 		return;
 
@@ -698,9 +677,9 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 #define INNER_STRINGS_MAX_COUNT 5
 	// These vars track our instances of "...#{,,,%Q<..#{,,,}...>,,,}..."
-	int inner_string_types[INNER_STRINGS_MAX_COUNT];
+	int inner_string_types[INNER_STRINGS_MAX_COUNT] {};
 	// Track # braces when we push a new #{ thing
-	int inner_expn_brace_counts[INNER_STRINGS_MAX_COUNT];
+	int inner_expn_brace_counts[INNER_STRINGS_MAX_COUNT] {};
 	QuoteCls inner_quotes[INNER_STRINGS_MAX_COUNT];
 	int inner_string_count = 0;
 	int brace_counts = 0;	// Number of #{ ... } things within an expression
@@ -1734,7 +1713,6 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
 	if (!buffer_ends_with_eol) {
-		lineCurrent++;
 		int new_lev = levelCurrent;
 		if ((levelCurrent > levelPrev))
 			new_lev |= SC_FOLDLEVELHEADERFLAG;

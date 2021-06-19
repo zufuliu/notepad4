@@ -657,7 +657,20 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		return static_cast<const char *>(PtrFromUPtr(wParam));
 	}
 
-	constexpr std::optional<FoldLevel> OptionalFoldLevel(Scintilla::sptr_t lParam) {
+	static constexpr Scintilla::sptr_t SPtrFromUPtr(Scintilla::uptr_t wParam) noexcept {
+		return static_cast<Scintilla::sptr_t>(wParam);
+	}
+	static constexpr Sci::Position PositionFromUPtr(Scintilla::uptr_t wParam) noexcept {
+		return SPtrFromUPtr(wParam);
+	}
+	static constexpr Sci::Line LineFromUPtr(Scintilla::uptr_t wParam) noexcept {
+		return SPtrFromUPtr(wParam);
+	}
+	Point PointFromParameters(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) const noexcept {
+		return Point(static_cast<XYPOSITION>(wParam) - vs.ExternalMarginWidth(), static_cast<XYPOSITION>(lParam));
+	}
+
+	static constexpr std::optional<FoldLevel> OptionalFoldLevel(Scintilla::sptr_t lParam) {
 		if (lParam >= 0) {
 			return static_cast<FoldLevel>(lParam);
 		}

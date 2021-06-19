@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstring>
 
+#include <string_view>
 #include <vector>
 
 #include "ILexer.h"

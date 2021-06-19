@@ -1321,6 +1321,9 @@ get position GetTextLength=2183(,)
 # Retrieve a pointer to a function that processes messages for this Scintilla.
 get pointer GetDirectFunction=2184(,)
 
+# Retrieve a pointer to a function that processes messages for this Scintilla and returns status.
+get pointer GetDirectStatusFunction=2772(,)
+
 # Retrieve a pointer value to use as the first argument when calling
 # the function returned by GetDirectFunction.
 get pointer GetDirectPointer=2185(,)
@@ -2495,6 +2498,9 @@ set void SetPasteConvertEndings=2467(bool convert,)
 # Get convert-on-paste setting
 get bool GetPasteConvertEndings=2468(,)
 
+# Replace the selection with text like a rectangular paste.
+fun void ReplaceRectangular=2771(position length, string text)
+
 # Duplicate the selection. If selection empty duplicate the line containing the caret.
 fun void SelectionDuplicate=2469(,)
 
@@ -2991,6 +2997,27 @@ get int GetRepresentation=2666(string encodedCharacter, stringresult representat
 
 # Remove a character representation.
 fun void ClearRepresentation=2667(string encodedCharacter,)
+
+# Clear representations to default.
+fun void ClearAllRepresentations=2770(,)
+
+# Can draw representations in various ways
+enu RepresentationAppearance=SC_REPRESENTATION
+val SC_REPRESENTATION_PLAIN=0
+val SC_REPRESENTATION_BLOB=1
+val SC_REPRESENTATION_COLOUR=0x10
+
+# Set the appearance of a representation.
+set void SetRepresentationAppearance=2766(string encodedCharacter, RepresentationAppearance appearance)
+
+# Get the appearance of a representation.
+get RepresentationAppearance GetRepresentationAppearance=2767(string encodedCharacter,)
+
+# Set the colour of a representation.
+set void SetRepresentationColour=2768(string encodedCharacter, colouralpha colour)
+
+# Get the colour of a representation.
+get colouralpha GetRepresentationColour=2769(string encodedCharacter,)
 
 # Set the end of line annotation text for a line
 set void EOLAnnotationSetText=2740(line line, string text)

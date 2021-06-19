@@ -8,6 +8,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <string_view>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -1002,6 +1004,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (chNext2 == '@') {
 				i += 2; // place as if it was the second next char treated
 				state = SCE_H_ASPAT;
+				scriptLanguage = eScriptVBS;
 			} else if ((chNext2 == '-') && (styler.SafeGetCharAt(i + 3) == '-')) {
 				styler.ColourTo(i + 3, SCE_H_ASP);
 				state = SCE_H_XCCOMMENT;
@@ -1015,8 +1018,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				}
 
 				state = StateForScript(aspScript);
+				scriptLanguage = aspScript;
 			}
-			scriptLanguage = eScriptVBS;
 			styler.ColourTo(i, SCE_H_ASP);
 			// fold whole script
 			if (foldHTMLPreprocessor)

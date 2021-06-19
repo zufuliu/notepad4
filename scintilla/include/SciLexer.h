@@ -60,6 +60,7 @@
 #define SCLEX_JSON 120
 #define SCLEX_CIL 127
 #define SCLEX_FSHARP 132
+#define SCLEX_JULIA 133
 #define SCLEX_AHK 200
 #define SCLEX_TEXINFO 202
 #define SCLEX_SRT 204
@@ -70,7 +71,6 @@
 #define SCLEX_LLVM 209
 #define SCLEX_KOTLIN 210
 #define SCLEX_JAVASCRIPT 211
-#define SCLEX_JULIA 212
 #define SCLEX_WASM 213
 #define SCLEX_TOML 214
 #define SCLEX_GN 215

@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <string_view>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -22,8 +24,8 @@ using namespace Lexilla;
 Accessor::Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple *pprops_) noexcept : LexAccessor(pAccess_), pprops(pprops_) {
 }
 
-int Accessor::GetPropertyInt(const char *key, size_t lenKey, int defaultValue) const {
-	return pprops->GetInt(key, lenKey, defaultValue);
+int Accessor::GetPropertyInt(std::string_view key, int defaultValue) const {
+	return pprops->GetInt(key, defaultValue);
 }
 
 int Accessor::IndentAmount(Sci_Line line) noexcept {

@@ -22,12 +22,7 @@ class Accessor final : public LexAccessor {
 	const PropSetSimple * const pprops;
 public:
 	Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;
-	int GetPropertyInt(const char *key, size_t lenKey, int defaultValue = 0) const;
-
-	template <size_t N>
-	int GetPropertyInt(const char (&key)[N], int defaultValue = 0) const {
-		return GetPropertyInt(key, N - 1, defaultValue);
-	}
+	int GetPropertyInt(std::string_view key, int defaultValue = 0) const;
 
 	int IndentAmount(Sci_Line line) noexcept;
 

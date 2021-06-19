@@ -10,7 +10,7 @@
 * The use of these inline wrapper functions with declared types will ensure
 * that we get the benefit of the compiler's type checking.
 *
-* Actual type for `int` based on SciTE's ScintillaCall.h.
+* Actual type for `int` based on ScintillaCall.h.
 *
 *
 ******************************************************************************/

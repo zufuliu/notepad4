@@ -317,7 +317,7 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 	rcac.bottom = static_cast<XYPOSITION>(std::min(static_cast<int>(rcac.top) + heightLB, static_cast<int>(rcPopupBounds.bottom)));
 	ac.lb->SetPositionRelative(rcac, &wMain);
 	ac.lb->SetFont(vs.styles[StyleDefault].font.get());
-	const unsigned int aveCharWidth = static_cast<unsigned int>(vs.styles[StyleDefault].aveCharWidth);
+	const int aveCharWidth = static_cast<int>(vs.styles[StyleDefault].aveCharWidth);
 	ac.lb->SetAverageCharWidth(aveCharWidth);
 	ac.lb->SetDelegate(this);
 
@@ -328,7 +328,7 @@ void ScintillaBase::AutoCompleteStart(Sci::Position lenEntered, const char *list
 	const int heightAlloced = static_cast<int>(rcList.bottom - rcList.top);
 	widthLB = std::max(widthLB, static_cast<int>(rcList.right - rcList.left));
 	if (maxListWidth != 0)
-		widthLB = std::min(widthLB, static_cast<int>(aveCharWidth)*maxListWidth);
+		widthLB = std::min(widthLB, aveCharWidth*maxListWidth);
 	// Make an allowance for large strings in list
 	rcList.left = pt.x - ac.lb->CaretFromEdge();
 	rcList.right = rcList.left + widthLB;
@@ -897,7 +897,7 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	switch (iMessage) {
 	case Message::AutoCShow:
 		listType = 0;
-		AutoCompleteStart(wParam, ConstCharPtrFromSPtr(lParam));
+		AutoCompleteStart(PositionFromUPtr(wParam), ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case Message::AutoCCancel:
@@ -1063,19 +1063,19 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::CallTipSetBack:
-		ct.colourBG = ColourRGBA::FromRGB(static_cast<unsigned int>(wParam));
+		ct.colourBG = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
 		vs.styles[StyleCallTip].back = ct.colourBG;
 		InvalidateStyleRedraw();
 		break;
 
 	case Message::CallTipSetFore:
-		ct.colourUnSel = ColourRGBA::FromRGB(static_cast<unsigned int>(wParam));
+		ct.colourUnSel = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
 		vs.styles[StyleCallTip].fore = ct.colourUnSel;
 		InvalidateStyleRedraw();
 		break;
 
 	case Message::CallTipSetForeHlt:
-		ct.colourSel = ColourRGBA::FromRGB(static_cast<unsigned int>(wParam));
+		ct.colourSel = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
 		InvalidateStyleRedraw();
 		break;
 
@@ -1111,10 +1111,10 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		pdoc->EnsureStyledTo((lParam == -1) ? pdoc->Length() : lParam);
 #if 0
 		if (DocumentLexState()->UseContainerLexing()) {
-			pdoc->ModifiedAt(wParam);
+			pdoc->ModifiedAt(PositionFromUPtr(wParam));
 			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
 		} else {
-			DocumentLexState()->Colourise(wParam, lParam);
+			DocumentLexState()->Colourise(PositionFromUPtr(wParam), lParam);
 		}
 #endif
 		Redraw();

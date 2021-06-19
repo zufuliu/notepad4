@@ -8,6 +8,8 @@
 #include <cassert>
 #include <cstring>
 
+#include <string_view>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"

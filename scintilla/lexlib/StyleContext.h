@@ -40,6 +40,7 @@ public:
 	Sci_PositionU currentPos;
 	Sci_Line currentLine;
 	Sci_Line lineDocEnd;
+	//Sci_Position lineEnd;
 	Sci_PositionU lineStartNext;
 	const bool multiByteAccess;
 	bool atLineStart;
@@ -62,6 +63,7 @@ public:
 		styler.StartAt(startPos);
 		styler.StartSegment(startPos);
 		currentLine = styler.GetLine(startPos);
+		//lineEnd = styler.LineEnd(currentLine);
 		lineStartNext = styler.LineStart(currentLine + 1);
 		if (endPos == lengthDocument) {
 			endPos++;
@@ -98,6 +100,7 @@ public:
 			atLineStart = atLineEnd;
 			if (atLineStart) {
 				currentLine++;
+				//lineEnd = styler.LineEnd(currentLine);
 				lineStartNext = styler.LineStart(currentLine + 1);
 			}
 			chPrev = ch;
@@ -175,6 +178,9 @@ public:
 #endif
 		// fast version for single byte encodings
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
+	}
+	bool MatchLineEnd() const noexcept {
+		return atLineEnd;
 	}
 #if 0
 	[[deprecated]]

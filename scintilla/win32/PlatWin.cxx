@@ -482,7 +482,7 @@ public:
 
 // limited to BreakFinder::lengthStartSubdivision for drawing document text in editor window.
 // no limit for drawing other text, e.g. auto-completion list, calltip, annotation, etc.
-constexpr int stackBufferLength = 300;
+constexpr int stackBufferLength = 320;
 class TextWide : public VarBuffer<wchar_t, stackBufferLength> {
 public:
 	int tlen;	// Using int instead of size_t as most Win32 APIs take int.

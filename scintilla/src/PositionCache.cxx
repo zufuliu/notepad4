@@ -510,57 +510,85 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 }
 
 // Simply pack the (maximum 4) character bytes into an int
-static unsigned int KeyFromString(const char *charBytes, size_t len) noexcept {
-	PLATFORM_ASSERT(len <= 4);
+static constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
+	PLATFORM_ASSERT(charBytes.length() <= 4);
 	unsigned int k = 0;
-	while (len && *charBytes) {
-		const unsigned char uc = *charBytes++;
+	for (const unsigned char uc : charBytes) {
 		k = (k << 8) | uc;
-		--len;
 	}
 	return k;
 }
 
-void SpecialRepresentations::SetRepresentation(const char *charBytes, const char *value) {
-	const unsigned int key = KeyFromString(charBytes, UTF8MaxBytes);
-	const auto it = mapReprs.find(key);
-	if (it == mapReprs.end()) {
-		// New entry so increment for first byte
-		const unsigned char ucStart = charBytes[0];
-		startByteHasReprs[ucStart]++;
-		mapReprs.emplace(key, value);
-	} else {
-		it->second = Representation(value);
+void SpecialRepresentations::SetRepresentation(std::string_view charBytes, std::string_view value) {
+	if ((charBytes.length() <= 4) && (value.length() <= Representation::maxLength)) {
+		const unsigned int key = KeyFromString(charBytes);
+		const auto it = mapReprs.find(key);
+		if (it == mapReprs.end()) {
+			// New entry so increment for first byte
+			const unsigned char ucStart = charBytes[0];
+			startByteHasReprs[ucStart]++;
+			mapReprs.emplace(key, value);
+		} else {
+			it->second = Representation(value);
+		}
 	}
 }
 
-void SpecialRepresentations::ClearRepresentation(const char *charBytes) {
-	const auto it = mapReprs.find(KeyFromString(charBytes, UTF8MaxBytes));
-	if (it != mapReprs.end()) {
-		mapReprs.erase(it);
-		const unsigned char ucStart = charBytes[0];
-		startByteHasReprs[ucStart]--;
+void SpecialRepresentations::SetRepresentationAppearance(std::string_view charBytes, RepresentationAppearance appearance) {
+	if (charBytes.length() <= 4) {
+		const unsigned int key = KeyFromString(charBytes);
+		const auto it = mapReprs.find(key);
+		if (it == mapReprs.end()) {
+			// Not present so fail
+			return;
+		}
+		it->second.appearance = appearance;
 	}
 }
 
-const Representation *SpecialRepresentations::RepresentationFromCharacter(const char *charBytes, size_t len) const {
-	PLATFORM_ASSERT(len <= 4);
-	const unsigned char ucStart = charBytes[0];
-	if (!startByteHasReprs[ucStart])
-		return nullptr;
-	const auto it = mapReprs.find(KeyFromString(charBytes, len));
-	if (it != mapReprs.end()) {
-		return &(it->second);
+void SpecialRepresentations::SetRepresentationColour(std::string_view charBytes, ColourRGBA colour) {
+	if (charBytes.length() <= 4) {
+		const unsigned int key = KeyFromString(charBytes);
+		const auto it = mapReprs.find(key);
+		if (it == mapReprs.end()) {
+			// Not present so fail
+			return;
+		}
+		it->second.appearance = mapReprs[key].appearance | RepresentationAppearance::Colour;
+		it->second.colour = colour;
+	}
+}
+
+void SpecialRepresentations::ClearRepresentation(std::string_view charBytes) {
+	if (charBytes.length() <= 4) {
+		const auto it = mapReprs.find(KeyFromString(charBytes));
+		if (it != mapReprs.end()) {
+			mapReprs.erase(it);
+			const unsigned char ucStart = charBytes[0];
+			startByteHasReprs[ucStart]--;
+		}
+	}
+}
+
+const Representation *SpecialRepresentations::RepresentationFromCharacter(std::string_view charBytes) const {
+	if (charBytes.length() <= 4) {
+		const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
+		if (!startByteHasReprs[ucStart])
+			return nullptr;
+		const auto it = mapReprs.find(KeyFromString(charBytes));
+		if (it != mapReprs.end()) {
+			return &(it->second);
+		}
 	}
 	return nullptr;
 }
 
-bool SpecialRepresentations::Contains(const char *charBytes, size_t len) const {
-	PLATFORM_ASSERT(len <= 4);
-	const unsigned char ucStart = charBytes[0];
+bool SpecialRepresentations::Contains(std::string_view charBytes) const {
+	PLATFORM_ASSERT(charBytes.length() <= 4);
+	const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
 	if (!startByteHasReprs[ucStart])
 		return false;
-	const auto it = mapReprs.find(KeyFromString(charBytes, len));
+	const auto it = mapReprs.find(KeyFromString(charBytes));
 	return it != mapReprs.end();
 }
 
@@ -647,7 +675,10 @@ TextSegment BreakFinder::Next() {
 			else if (encodingFamily == EncodingFamily::dbcs)
 				charWidth = pdoc->DBCSDrawBytes(
 					std::string_view(&ll->chars[nextBreak], lineRange.end - nextBreak));
-			const Representation *repr = preprs->RepresentationFromCharacter(&ll->chars[nextBreak], charWidth);
+			// Special case \r\n line ends if there is a representation
+			if (preprs->Contains("\r\n") && ll->chars[nextBreak] == '\r' && ll->chars[nextBreak + 1] == '\n')
+				charWidth = 2;
+			const Representation *repr = preprs->RepresentationFromCharacter(std::string_view(&ll->chars[nextBreak], charWidth));
 			if (((nextBreak > 0) && (ll->styles[nextBreak] != ll->styles[nextBreak - 1])) ||
 				repr ||
 				(nextBreak == saeNext)) {
@@ -698,12 +729,12 @@ bool BreakFinder::More() const noexcept {
 }
 
 PositionCacheEntry::PositionCacheEntry() noexcept :
-	styleNumber(0), len(0), clock(0), positions(nullptr) {
+	styleNumber(0), len(0), clock(0) {
 }
 
 // Copy constructor not currently used, but needed for being element in std::vector.
 PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
-	styleNumber(other.styleNumber), len(other.styleNumber), clock(other.styleNumber), positions(nullptr) {
+	styleNumber(other.styleNumber), len(other.styleNumber), clock(other.styleNumber) {
 	if (other.positions) {
 		const size_t lenData = len + (len / sizeof(XYPOSITION)) + 1;
 		positions = std::make_unique<XYPOSITION[]>(lenData);
@@ -711,17 +742,17 @@ PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
 	}
 }
 
-void PositionCacheEntry::Set(unsigned int styleNumber_, const char *s_,
-	unsigned int len_, const XYPOSITION *positions_, unsigned int clock_) {
+void PositionCacheEntry::Set(unsigned int styleNumber_, std::string_view sv,
+	const XYPOSITION *positions_, unsigned int clock_) {
 	styleNumber = styleNumber_;
-	len = len_;
+	len = static_cast<unsigned int>(sv.length());
 	clock = clock_;
-	if (s_ && positions_) {
+	if (sv.data() && positions_) {
 		positions = std::make_unique<XYPOSITION[]>(len + (len / sizeof(XYPOSITION)) + 1);
 		for (unsigned int i = 0; i < len; i++) {
 			positions[i] = positions_[i];
 		}
-		memcpy(&positions[len], s_, len);
+		memcpy(&positions[len], sv.data(), sv.length());
 	} else {
 		positions.reset();
 	}
@@ -738,10 +769,9 @@ void PositionCacheEntry::Clear() noexcept {
 	clock = 0;
 }
 
-bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, const char *s_,
-	unsigned int len_, XYPOSITION *positions_) const noexcept {
-	if ((styleNumber == styleNumber_) && (len == len_) &&
-		(memcmp(&positions[len], s_, len) == 0)) {
+bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept {
+	if ((styleNumber == styleNumber_) && (len == sv.length()) &&
+		(memcmp(&positions[len], sv.data(), sv.length()) == 0)) {
 		for (unsigned int i = 0; i < len; i++) {
 			positions_[i] = positions[i];
 		}
@@ -751,20 +781,10 @@ bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, const char *s_,
 	}
 }
 
-// FNV-1 http://www.isthe.com/chongo/tech/comp/fnv/
-// https://www.python.org/dev/peps/pep-0456/
-unsigned int PositionCacheEntry::Hash(unsigned int styleNumber_, const char *s, unsigned int len_) noexcept {
-	const unsigned char *us = reinterpret_cast<const unsigned char *>(s);
-	unsigned int ret = us[0] << 7;
-	for (unsigned int i = 0; i < len_; i++) {
-		ret *= 1000003;
-		ret ^= us[i];
-	}
-	ret *= 1000003;
-	ret ^= len_;
-	ret *= 1000003;
-	ret ^= styleNumber_;
-	return ret;
+size_t PositionCacheEntry::Hash(unsigned int styleNumber_, std::string_view sv) noexcept {
+	const size_t h1 = std::hash<std::string_view>{}(sv);
+	const size_t h2 = std::hash<unsigned int>{}(styleNumber_);
+	return h1 ^ (h2 << 1);
 }
 
 bool PositionCacheEntry::NewerThan(const PositionCacheEntry &other) const noexcept {
@@ -786,10 +806,6 @@ PositionCache::PositionCache() {
 	pces.resize(2039);
 #endif
 	allClear = true;
-}
-
-PositionCache::~PositionCache() {
-	Clear();
 }
 
 void PositionCache::Clear() noexcept {
@@ -814,12 +830,16 @@ void PositionCache::SetSize(size_t size_) {
 	}
 }
 
+size_t PositionCache::GetSize() const noexcept {
+	return pces.size();
+}
+
 void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
-	const char *s, unsigned int len, XYPOSITION *positions, const Document *pdoc) {
+	std::string_view sv, XYPOSITION *positions) {
 
 	allClear = false;
 	size_t probe = pces.size();	// Out of bounds
-	if ((len < 64)) {
+	if ((sv.length() < 64)) {
 		// Only store short strings in the cache so it doesn't churn with
 		// long comments with only a single comment.
 #if PositionCacheHashSizeUsePowerOfTwo
@@ -828,21 +848,21 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 		const size_t modulo = probe;
 #endif
 		// Two way associative: try two probe positions.
-		const unsigned int hashValue = PositionCacheEntry::Hash(styleNumber, s, len);
+		const size_t hashValue = PositionCacheEntry::Hash(styleNumber, sv);
 #if PositionCacheHashSizeUsePowerOfTwo
 		probe = hashValue & mask;
 #else
 		probe = hashValue % modulo;
 #endif
-		if (pces[probe].Retrieve(styleNumber, s, len, positions)) {
+		if (pces[probe].Retrieve(styleNumber, sv, positions)) {
 			return;
 		}
 #if PositionCacheHashSizeUsePowerOfTwo
-		const unsigned int probe2 = (hashValue * 37) & mask;
+		const size_t probe2 = (hashValue * 37) & mask;
 #else
-		const unsigned int probe2 = (hashValue * 37) % modulo;
+		const size_t probe2 = (hashValue * 37) % modulo;
 #endif
-		if (pces[probe2].Retrieve(styleNumber, s, len, positions)) {
+		if (pces[probe2].Retrieve(styleNumber, sv, positions)) {
 			return;
 		}
 		// Not found. Choose the oldest of the two slots to replace
@@ -851,22 +871,7 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 		}
 	}
 	const Font *fontStyle = vstyle.styles[styleNumber].font.get();
-	if (len > BreakFinder::lengthStartSubdivision) {
-		// Break up into segments
-		unsigned int startSegment = 0;
-		XYPOSITION xStartSegment = 0;
-		while (startSegment < len) {
-			const unsigned int lenSegment = pdoc->SafeSegment(s + startSegment, len - startSegment, BreakFinder::lengthEachSubdivision);
-			surface->MeasureWidths(fontStyle, std::string_view(s + startSegment, lenSegment), positions + startSegment);
-			for (unsigned int inSeg = 0; inSeg < lenSegment; inSeg++) {
-				positions[startSegment + inSeg] += xStartSegment;
-			}
-			xStartSegment = positions[startSegment + lenSegment - 1];
-			startSegment += lenSegment;
-		}
-	} else {
-		surface->MeasureWidths(fontStyle, std::string_view(s, len), positions);
-	}
+	surface->MeasureWidths(fontStyle, sv, positions);
 	if (probe < pces.size()) {
 		// Store into cache
 		clock++;
@@ -878,6 +883,6 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 			}
 			clock = 2;
 		}
-		pces[probe].Set(styleNumber, s, len, positions, clock);
+		pces[probe].Set(styleNumber, sv, positions, clock);
 	}
 }

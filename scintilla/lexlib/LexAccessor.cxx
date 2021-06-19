@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cassert>
 
+#include <string_view>
 #include <vector>
 
 #include "ILexer.h"

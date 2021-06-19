@@ -482,6 +482,12 @@ enum class LineEndType {
 	Unicode = 1,
 };
 
+enum class RepresentationAppearance {
+	Plain = 0,
+	Blob = 1,
+	Colour = 0x10,
+};
+
 enum class EOLAnnotationVisible {
 	Hidden = 0x0,
 	Standard = 0x1,
@@ -752,6 +758,12 @@ constexpr CaretStyle operator&(CaretStyle a, CaretStyle b) noexcept {
 
 constexpr LineEndType operator&(LineEndType a, LineEndType b) noexcept {
 	return static_cast<LineEndType>(static_cast<int>(a) & static_cast<int>(b));
+}
+
+// Functions to manipulate fields from a RepresentationAppearance
+
+constexpr RepresentationAppearance operator|(RepresentationAppearance a, RepresentationAppearance b) noexcept {
+	return static_cast<RepresentationAppearance>(static_cast<int>(a) | static_cast<int>(b));
 }
 
 // Functions to manipulate fields from a LineCharacterIndexType

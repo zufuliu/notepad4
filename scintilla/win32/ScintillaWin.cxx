@@ -461,6 +461,8 @@ class ScintillaWin final :
 
 	//static sptr_t DirectFunction(
 	//	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam);
+	//static sptr_t DirectStatusFunction(
+	//	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam, int *pStatus);
 	static LRESULT CALLBACK SWndProc(
 		HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK CTWndProc(
@@ -1963,7 +1965,7 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 		break;
 
 	case EM_LINEFROMCHAR:
-		if (static_cast<Sci::Position>(wParam) < 0) {
+		if (PositionFromUPtr(wParam) < 0) {
 			wParam = SelectionStart().Position();
 		}
 		return pdoc->LineFromPosition(wParam);
@@ -2100,6 +2102,10 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 	switch (iMessage) {
 	case Message::GetDirectFunction:
 		//return reinterpret_cast<sptr_t>(DirectFunction);
+		return 0;
+
+	case Message::GetDirectStatusFunction:
+		//return reinterpret_cast<sptr_t>(DirectStatusFunction);
 		return 0;
 
 	case Message::GetDirectPointer:
@@ -2351,6 +2357,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		iMessage = SciMessageFromEM(msg);
 		switch (iMessage) {
 		case Message::GetDirectFunction:
+		case Message::GetDirectStatusFunction:
 		case Message::GetDirectPointer:
 		case Message::GrabFocus:
 		case Message::SetTechnology:
@@ -4051,8 +4058,18 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(
 
 //sptr_t ScintillaWin::DirectFunction(
 //	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam) {
-//	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(reinterpret_cast<ScintillaWin *>(ptr)->MainHWND(), nullptr));
-//	return reinterpret_cast<ScintillaWin *>(ptr)->WndProc(static_cast<Message>(iMessage), wParam, lParam);
+//	ScintillaWin *sci = reinterpret_cast<ScintillaWin *>(ptr);
+//	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(sci->MainHWND(), nullptr));
+//	return sci->WndProc(static_cast<Message>(iMessage), wParam, lParam);
+//}
+//
+//sptr_t ScintillaWin::DirectStatusFunction(
+//	sptr_t ptr, UINT iMessage, uptr_t wParam, sptr_t lParam, int *pStatus) {
+//	ScintillaWin *sci = reinterpret_cast<ScintillaWin *>(ptr);
+//	PLATFORM_ASSERT(::GetCurrentThreadId() == ::GetWindowThreadProcessId(sci->MainHWND(), nullptr));
+//	const sptr_t returnValue = sci->WndProc(static_cast<Message>(iMessage), wParam, lParam);
+//	*pStatus = static_cast<int>(sci->errorStatus);
+//	return returnValue;
 //}
 
 extern "C"

@@ -47,7 +47,7 @@ constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 
 constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) {
 	if (wParam) {
-		return ColourRGBA::FromRGB(static_cast<unsigned int>(lParam));
+		return ColourRGBA::FromIpRGB(lParam);
 	}
 	return std::nullopt;
 }
@@ -95,7 +95,7 @@ struct EdgeProperties {
 	EdgeProperties(int column_ = 0, ColourRGBA colour_ = ColourRGBA(0)) noexcept :
 		column(column_), colour(colour_) {}
 	EdgeProperties(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept :
-		column(static_cast<int>(wParam)), colour(ColourRGBA::FromRGB(static_cast<unsigned int>(lParam))) {}
+		column(static_cast<int>(wParam)), colour(ColourRGBA::FromIpRGB(lParam)) {}
 };
 
 // This is an old style enum so that its members can be used directly as indices without casting
