@@ -19,14 +19,21 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
+#include "LexerUtils.h"
 
 using namespace Lexilla;
 
 namespace {
 
+enum {
+	BatchLineStateMaskEmptyLine = 1 << 0,
+	BatchLineStateMaskVisibleChars = 1 << 1,
+	BatchLineStateLineContinuation = 1 << 2,
+};
+
 // / \ : * ? < > " |
 constexpr bool IsBatSpec(int ch) noexcept {
-	return ch == ':' || ch == '?' || ch == '%' || ch == '\'' || ch == '\"' || ch == '`';
+	return ch == ':' || ch == '?' || ch == '%' || ch == '!' || ch == '\'' || ch == '\"' || ch == '`';
 }
 constexpr bool IsBatOp(int ch, bool inEcho) noexcept {
 	return ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '(' || ch == ')'
@@ -38,11 +45,20 @@ constexpr bool IsWordStart(int ch) noexcept {
 constexpr bool IsWordChar(int ch) noexcept {
 	return IsGraphic(ch) && !(IsBatOp(ch, false) || IsBatSpec(ch));
 }
-constexpr bool IsBatVariable(int ch) noexcept {
-	return iswordchar(ch) || ch == '-' || ch == ':' || ch == '=' || ch == '$';
+
+constexpr bool IsLabelStart(int ch) noexcept {
+	// ! is not allowed with SetLocal EnableDelayedExpansion
+	//return !AnyOf(ch, '\r', '\n', ' ', '\t', '|', '&', '%', '!', ',', ';', '=', '+', '<', '>');
+	return IsIdentifierChar(ch) || ch == '.';
 }
+
+constexpr bool IsLabelChar(int ch) noexcept {
+	//return !AnyOf(ch, '\r', '\n', ' ', '\t', '|', '&', '%', '!', ',', ';', '=');
+	return IsIdentifierChar(ch) || ch == '.';
+}
+
 constexpr bool IsBatVariableNext(int chNext) noexcept {
-	return chNext == '~' || chNext == '=' || chNext == '*' || iswordstart(chNext);
+	return chNext == '~' || chNext == '=' || chNext == '*' || chNext == '#' || iswordstart(chNext);
 }
 constexpr bool IsMarkVariableNext(int chNext) noexcept {
 	return chNext == '=' || iswordstart(chNext);
@@ -51,189 +67,203 @@ constexpr bool IsMarkVariableNext(int chNext) noexcept {
 constexpr bool IsSingleQuotedString(int ch, int chPrev, int chNext) noexcept {
 	return ch == '\'' && !((chPrev >= 0x80 || IsAlphaNumeric(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
 }
-// Escape Characters https://www.robvanderwoude.com/escapechars.php
-constexpr bool GetBatEscapeLen(int state, int& length, int ch, int chNext, int chNext2) noexcept {
+
+bool GetBatEscapeLen(StyleContext &sc, int& length) noexcept {
+	// Escape Characters https://www.robvanderwoude.com/escapechars.php
 	length = 0;
-	if (ch == '^') {
-		if (chNext == '^') {
-			length = (chNext2 == '!') ? 2 : 1;
-		} else if (IsPunctuation(chNext)) {
+	switch (sc.ch) {
+	case '^':
+		if (IsEOLChar(sc.chNext)) {
+			// line continuation
+			return true;
+		}
+		if (sc.chNext == '^') {
+			length = (sc.GetRelative(2) == '!') ? 2 : 1;
+		} else if (IsPunctuation(sc.chNext)) {
 			length = 1;
 		}
-	} else if (ch == '%') {
-		if (chNext == '%' && !IsBatVariableNext(chNext2)) {
+		break;
+
+	case '%':
+		if (sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
 			length = 1;
 		}
-	} else if (ch == '"') {
+		break;
+
+	case '\"':
 		// Inside the search pattern of FIND
-		if (chNext == '"' && (state == SCE_BAT_STRINGDQ || state == SCE_BAT_STRINGSQ || state == SCE_BAT_STRINGBT)) {
+		if (sc.chNext == '"' && (sc.state == SCE_BAT_STRINGDQ || sc.state == SCE_BAT_STRINGSQ || sc.state == SCE_BAT_STRINGBT)) {
 			length = 1;
 		}
-	} else if (ch == '\\') {
+		break;
+
+	case '\\':
 		// Inside the regex pattern of FINDSTR
+		break;
 	}
 
 	return length != 0;
 }
 
-constexpr int LevelNumber(int level) noexcept {
-	return (level & SC_FOLDLEVELNUMBERMASK) - SC_FOLDLEVELBASE;
+constexpr bool IsTildeExpansion(int ch) noexcept {
+	return AnyOf(ch, 'f', 'd', 'p', 'n', 'x', 's', 'a', 't', 'z');
 }
 
-void DetectBatVariable(StyleContext &sc, bool &quotedVar, bool &markVar, bool &numVar) {
-	quotedVar = false;
-	markVar = false;
-	numVar = false;
+char DetectBatVariable(StyleContext &sc) {
+	char varQuoteChar = '\0';
 	sc.SetState(SCE_BAT_VARIABLE);
-	if (sc.chNext == '*' || sc.chNext == '~' || sc.chNext == '%') {
-		if (sc.chNext == '%') {
+	if (sc.chNext == '*' || IsADigit(sc.chNext)) { // %*, %1 ... %9
+		sc.Forward();
+	} else if (sc.chNext == '~' || sc.chNext == '%') {
+		sc.Forward();
+		if (sc.ch == '%') {
 			sc.Forward();
 		}
-		if (sc.chNext == '~') {
+		if (sc.ch == '~') {
+			// see help for CALL and FOR commands
 			sc.Forward();
-			numVar = sc.chNext != '$';
-			if (numVar) {
-				while (sc.More() && !(IsADigit(sc.ch) || isspacechar(sc.ch))) {
+			while (IsTildeExpansion(sc.ch)) {
+				sc.Forward();
+			}
+			if (sc.ch == '$') {
+				while (sc.More() && !(sc.ch == ':' || isspacechar(sc.chNext))) {
+					sc.Forward();
+				}
+				if (sc.ch == ':') {
 					sc.Forward();
 				}
 			}
 		}
-	} else if (IsADigit(sc.chNext)) {
-		numVar = true;
+		if (sc.ch == '^') {
+			// see https://www.robvanderwoude.com/clevertricks.php
+			sc.Forward();
+		}
 	} else {
-		quotedVar = true;
+		varQuoteChar = '%';
 	}
+	return varQuoteChar;
 }
 
-}
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_BAT_STRINGDQ);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_BAT_STRINGSQ);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_BAT_STRINGBT);
 
-static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	bool quotedVar = false;		// %var%
-	bool markVar = false;		// !var!		SetLocal EnableDelayedExpansion
-	bool numVar = false;		// %1, %~1
-	int visibleChars = 0;
+void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const bool fold = styler.GetPropertyInt("fold", 1) & true;
+	char varQuoteChar = '\0'; // %var% or !var! after SetLocal EnableDelayedExpansion
+	int logicalVisibleChars = 0;
+	int lineVisibleChars = 0;
+	int prevLineState = 0;
 	bool inEcho = false;
-	bool isGoto = false;
-	bool isCall = false;
 	int escapeLen = 0;
+	int parenCount = 0;
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	std::vector<int> nestedState;
-
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (sc.currentLine > 0) {
 		levelCurrent = styler.LevelAt(sc.currentLine - 1) >> 16;
+		prevLineState = styler.GetLineState(sc.currentLine - 1);
+		/*
+		1: empty line
+		1: logicalVisibleChars
+		1: line continuation
+		8: parenCount
+		: nestedState
+		*/
+		parenCount = (prevLineState >> 8) & 0xff;
+		if (prevLineState & BatchLineStateLineContinuation) {
+			logicalVisibleChars = prevLineState & BatchLineStateMaskVisibleChars;
+		}
+		const int lineState = prevLineState >> 16;
+		if (lineState) {
+			UnpackLineState(lineState, nestedState);
+		}
 	}
+
 	int levelNext = levelCurrent;
-	int parenCount = 0;
 
 	while (sc.More()) {
-		if (sc.atLineStart) {
-			quotedVar = false;
-			markVar = false;
-			numVar = false;
-			inEcho = false;
-			isGoto = false;
-			isCall = false;
-			visibleChars = 0;
-		}
-
 		switch (sc.state) {
 		case SCE_BAT_OPERATOR:
 			sc.SetState(SCE_BAT_DEFAULT);
 			break;
+
 		case SCE_BAT_IDENTIFIER:
-			if ((sc.ch == '%' || sc.ch == '^') && GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
-				sc.SetState(SCE_BAT_ESCAPE);
+			if ((sc.ch == '%' || sc.ch == '^') && GetBatEscapeLen(sc, escapeLen)) {
+				sc.SetState(SCE_BAT_ESCAPECHAR);
 				sc.Forward(escapeLen);
-			} else if (sc.ch == '.' && !inEcho && sc.LengthCurrent() == 4 && sc.styler.MatchIgnoreCase(sc.styler.GetStartSegment(), "echo")) {
-				inEcho = true;
-				parenCount = levelNext;
-				sc.ChangeState(SCE_BAT_WORD);
-				sc.ForwardSetState(SCE_BAT_DEFAULT);
 			} else if (!IsWordChar(sc.ch)) {
-				char s[256];
+				char s[64];
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (StrEqual(s, "rem")) {
 					sc.ChangeState(SCE_BAT_COMMENT);
 				} else {
-					if (!inEcho && keywords.InList(s)) { // not in echo ?
+					if (!inEcho && keywordLists[0]->InList(s)) {
 						sc.ChangeState(SCE_BAT_WORD);
-						inEcho = StrEqualsAny(s, "echo", "echo.", "title", "prompt");
-						isGoto = StrEqual(s, "goto");
-						isCall = StrEqual(s, "call");
-						if (inEcho) {
-							parenCount = levelNext;
-						}
-					} else if (!inEcho && visibleChars == sc.LengthCurrent()) {
-						if (visibleChars == 1 && sc.ch == ':' && sc.chNext == '\\') {
-							sc.Forward(2);
-							while (IsWordChar(sc.ch) || sc.ch == '\\') {
-								sc.Forward();
+						inEcho = false;
+						if (StrEqualsAny(s, "echo", "echo.", "title", "cd", "chdir")) {
+							// commands with unquoted string argument
+							inEcho = true;
+						} else if (StrEqualsAny(s, "do", "else")) {
+							logicalVisibleChars = 0;
+						} else {
+							const bool isGoto = StrEqual(s, "goto");
+							if (isGoto || StrEqual(s, "call")) {
+								sc.SetState(SCE_BAT_DEFAULT);
+								while (IsASpaceOrTab(sc.ch)) {
+									sc.Forward();
+								}
+								if (sc.ch == ':' || (isGoto && IsGraphic(sc.ch))) {
+									sc.SetState(SCE_BAT_LABEL);
+								}
 							}
 						}
+					} else if (!inEcho && logicalVisibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_BAT_COMMAND);
-					} else if (isGoto) {
-						sc.ChangeState(SCE_BAT_LABEL);
-						isGoto = false;
 					}
-					sc.SetState(SCE_BAT_DEFAULT);
+					if (sc.state != SCE_BAT_LABEL) {
+						sc.SetState(SCE_BAT_DEFAULT);
+					}
 				}
 			}
 			break;
+
 		case SCE_BAT_COMMENT:
 			if (sc.atLineStart) {
-				visibleChars = 0;
 				sc.SetState(SCE_BAT_DEFAULT);
 			}
 			break;
+
 		case SCE_BAT_LABEL:
-			if (sc.ch == ':') {
-				sc.ForwardSetState(SCE_BAT_DEFAULT);
-			} else if (!(iswordstart(sc.ch) || sc.ch == '-')) {
+			if (!IsLabelChar(sc.ch)) {
+				if (sc.ch == ':') {
+					sc.Forward();
+				}
 				sc.SetState(SCE_BAT_DEFAULT);
 			}
 			break;
+
 		case SCE_BAT_LABEL_LINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_BAT_DEFAULT);
+			} else if (IsGraphic(sc.ch) && !IsLabelChar(sc.ch)) {
+				sc.ChangeState(SCE_BAT_NOT_BATCH);
+				levelNext++;
 			}
 			break;
-		case SCE_BAT_VARIABLE: {
-			bool end_var = false;
-			if (quotedVar) {
-				if (sc.ch == '%') {
-					if (sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
-						sc.Forward();
-					}
-					end_var = true;
+
+		case SCE_BAT_VARIABLE:
+			if (varQuoteChar) {
+				if (sc.ch == varQuoteChar) {
+					varQuoteChar = '\0';
 					sc.Forward();
-				}
-			} else if (markVar) {
-				if (sc.ch == '!') {
-					end_var = true;
-					sc.Forward();
-				}
-			} else {
-				if (sc.ch == '*') {
-					end_var = true;
-					sc.Forward();
-				} else if (numVar) {
-					if (!IsADigit(sc.ch)) {
-						end_var = true;
-					}
-				} else if (!IsBatVariable(sc.ch)) {
-					end_var = true;
-				}
-				if (sc.ch == '%' && sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
-					sc.Forward(2);
+				} else if (sc.ch == '\"' || sc.ch == '\'' || sc.ch == '`' || IsEOLChar(sc.ch)) {
+					// something went wrong
+					varQuoteChar = '\0';
 				}
 			}
-			if (!end_var && isspacechar(sc.ch)) {
-				end_var = true;
-			}
-			if (end_var) {
+			if (varQuoteChar == '\0') {
 				if (nestedState.empty()) {
 					sc.SetState(SCE_BAT_DEFAULT);
 				} else {
@@ -242,45 +272,22 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 					continue;
 				}
 			}
-		}
-		break;
+			break;
+
 		case SCE_BAT_STRINGDQ:
 		case SCE_BAT_STRINGSQ:
 		case SCE_BAT_STRINGBT:
-			if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
+			if (GetBatEscapeLen(sc, escapeLen)) {
 				nestedState.push_back(sc.state);
-				sc.SetState(SCE_BAT_ESCAPE);
+				sc.SetState(SCE_BAT_ESCAPECHAR);
 				sc.Forward(escapeLen);
 			} else if (sc.ch == '%') {
 				nestedState.push_back(sc.state);
-				DetectBatVariable(sc, quotedVar, markVar, numVar);
+				varQuoteChar = DetectBatVariable(sc);
 			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
 				nestedState.push_back(sc.state);
-				quotedVar = false;
-				markVar = true;
-				numVar = false;
+				varQuoteChar = '!';
 				sc.SetState(SCE_BAT_VARIABLE);
-			} else if (sc.atLineEnd) {
-				bool multiline = false;
-				if (sc.state == SCE_BAT_STRINGSQ || sc.state == SCE_BAT_STRINGBT) {
-					const Sci_Position start = styler.LineStart(sc.currentLine);
-					Sci_Position pos = sc.currentPos;
-					Sci_Position offset = 0;
-					while (pos >= start + 2 && IsASpace(styler.SafeGetCharAt(pos))) {
-						--pos;
-						--offset;
-					}
-
-					const int chNext = sc.GetRelative(offset);
-					if ((chNext == '|' || chNext == '&')) {
-						const int ch = sc.GetRelative(offset - 1);
-						multiline = ch == '^';
-					}
-				}
-				if (!multiline) {
-					nestedState.clear();
-					sc.SetState(SCE_BAT_DEFAULT);
-				}
 			} else if ((sc.state == SCE_BAT_STRINGDQ && sc.ch == '\"')
 				|| (sc.state == SCE_BAT_STRINGSQ && sc.ch == '\'')
 				|| (sc.state == SCE_BAT_STRINGBT && sc.ch == '`')) {
@@ -302,8 +309,9 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				sc.SetState(SCE_BAT_STRINGBT);
 			}
 			break;
-		case SCE_BAT_ESCAPE:
-			if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
+
+		case SCE_BAT_ESCAPECHAR:
+			if (GetBatEscapeLen(sc, escapeLen)) {
 				sc.Forward(escapeLen);
 			} else {
 				if (nestedState.empty()) {
@@ -315,55 +323,70 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 				}
 			}
 			break;
+
+		case SCE_BAT_NOT_BATCH:
+			if (lineVisibleChars == 0 && sc.ch == ':') {
+				// resume batch parsing on new label
+				if (IsLabelStart(sc.chNext)) {
+					sc.SetState(SCE_BAT_LABEL_LINE);
+					levelNext--;
+				}
+			}
+			break;
 		}
 
 		if (sc.state == SCE_BAT_DEFAULT) {
 			if (sc.Match(':', ':')) {
 				sc.SetState(SCE_BAT_COMMENT);
-			} else if ((visibleChars == 0 || isGoto || isCall) && sc.ch == ':' && iswordstart(sc.chNext) && sc.chNext != '\\') {
-				sc.SetState((visibleChars == 0) ? SCE_BAT_LABEL_LINE : SCE_BAT_LABEL);
-				if (isGoto) {
-					isGoto = false;
+			} else if (sc.atLineStart && sc.Match('#', '!')) {
+				// shell shebang starts embedded script
+				parenCount = 0;
+				sc.SetState(SCE_BAT_NOT_BATCH);
+				levelNext++;
+			} else if (lineVisibleChars == 0 && sc.ch == ':') {
+				parenCount = 0;
+				if (IsLabelStart(sc.chNext)) {
+					sc.SetState(SCE_BAT_LABEL_LINE);
+				} else {
+					// unreachable label starts skipped block
+					sc.SetState(SCE_BAT_NOT_BATCH);
+					levelNext++;
 				}
-				if (isCall) {
-					isCall = false;
-				}
-			} else if (GetBatEscapeLen(sc.state, escapeLen, sc.ch, sc.chNext, sc.GetRelative(2))) {
-				sc.SetState(SCE_BAT_ESCAPE);
+			} else if (GetBatEscapeLen(sc, escapeLen)) {
+				sc.SetState(SCE_BAT_ESCAPECHAR);
 				sc.Forward(escapeLen);
 			} else if (sc.ch == '\"') {
-				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGDQ);
 			} else if (IsSingleQuotedString(sc.ch, sc.chPrev, sc.chNext)) {
-				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGSQ);
 			} else if (sc.ch == '`') {
-				nestedState.clear();
 				sc.SetState(SCE_BAT_STRINGBT);
 			} else if (sc.ch == '%') {
-				DetectBatVariable(sc, quotedVar, markVar, numVar);
+				varQuoteChar = DetectBatVariable(sc);
 			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
-				quotedVar = false;
-				markVar = true;
-				numVar = false;
+				varQuoteChar = '!';
 				sc.SetState(SCE_BAT_VARIABLE);
-			} else if (sc.MatchIgnoreCase("@rem")) {
-				sc.SetState(SCE_BAT_COMMENT);
-			} else if (IsWordStart(sc.ch)) { // all file name
-				sc.SetState(SCE_BAT_IDENTIFIER);
 			} else if (sc.ch == '(' || sc.ch == ')') {
-				if (!inEcho || LevelNumber(parenCount) > 0) {
-					sc.SetState(SCE_BAT_OPERATOR);
+				sc.SetState(SCE_BAT_OPERATOR);
+				if (!inEcho || parenCount > 0) {
 					if (sc.ch == '(') {
+						parenCount++;
 						levelNext++;
-					} else if (sc.ch == ')') {
+					} else {
+						parenCount--;
 						levelNext--;
 						inEcho = false;
 					}
 				}
 			} else if (IsBatOp(sc.ch, inEcho)) {
 				sc.SetState(SCE_BAT_OPERATOR);
-				if (sc.ch == '|' || sc.ch == '&') { // pipe
+				if (sc.ch == '>') {
+					if (sc.chNext == '&') {
+						// output redirect: 2>&1
+						sc.Forward();
+					}
+					inEcho = false;
+				} else if (sc.ch == '|' || sc.ch == '&') { // pipe
 					if (sc.ch == sc.chNext) {	// cmd1 || cmd2, cmd1 && cmd2
 						sc.Forward();
 					}
@@ -372,36 +395,79 @@ static void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int i
 					} else {
 						sc.ForwardSetState(SCE_BAT_DEFAULT);
 					}
-					visibleChars = 0;
+					logicalVisibleChars = 0;
 					inEcho = false;
 					continue;
 				}
-				if (visibleChars == 0 && sc.ch == '@' && IsWordStart(sc.chNext)) {
-					sc.ForwardSetState(SCE_BAT_IDENTIFIER);
-					visibleChars = 0;
+				if (logicalVisibleChars == 0 && sc.ch == '@' && IsWordStart(sc.chNext)) {
+					sc.Forward();
+					if (sc.MatchIgnoreCase("rem") && !IsGraphic(sc.GetRelative(3))) {
+						sc.ChangeState(SCE_BAT_COMMENT);
+					} else {
+						sc.SetState(SCE_BAT_IDENTIFIER);
+					}
 				}
+			} else if (IsWordStart(sc.ch)) {
+				sc.SetState(SCE_BAT_IDENTIFIER);
 			}
 		}
 
 		if (!isspacechar(sc.ch)) {
-			visibleChars++;
+			logicalVisibleChars++;
+			lineVisibleChars++;
 		}
 		if (sc.atLineEnd) {
-			visibleChars = 0;
-			const int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
-			if (levelUse < levelNext) {
-				lev |= SC_FOLDLEVELHEADERFLAG;
+			const int chPrev = sc.LineLastChar();
+			varQuoteChar = '\0';
+
+			int lineState = lineVisibleChars ? 0 : BatchLineStateMaskEmptyLine;
+			lineVisibleChars = 0;
+			if (chPrev == '^') {
+				lineState = BatchLineStateLineContinuation | (logicalVisibleChars ? BatchLineStateMaskVisibleChars : 0);
+			} else {
+				inEcho = false;
+				logicalVisibleChars = 0;
 			}
-			if (lev != styler.LevelAt(sc.currentLine)) {
-				styler.SetLevel(sc.currentLine, lev);
+			lineState |= parenCount << 8;
+			if (sc.state == SCE_BAT_STRINGDQ || sc.state == SCE_BAT_STRINGSQ || sc.state == SCE_BAT_STRINGBT) {
+				if (sc.state != SCE_BAT_STRINGDQ && (chPrev == '^' || chPrev == '|' || chPrev == '&')) {
+					if (!nestedState.empty()) {
+						lineState |= PackLineState(nestedState) << 16;
+					}
+				} else {
+					nestedState.clear();
+					sc.SetState(SCE_BAT_DEFAULT);
+				}
 			}
-			levelCurrent = levelNext;
+			styler.SetLineState(sc.currentLine, lineState);
+
+			if (fold) {
+				if (sc.state == SCE_BAT_LABEL_LINE) {
+					levelCurrent = SC_FOLDLEVELBASE;
+					levelNext = SC_FOLDLEVELBASE + 1;
+					if (prevLineState & BatchLineStateMaskEmptyLine) {
+						styler.SetLevel(sc.currentLine - 1, SC_FOLDLEVELBASE | (SC_FOLDLEVELBASE << 16));
+					}
+				}
+
+				const int levelUse = levelCurrent;
+				int lev = levelUse | levelNext << 16;
+				if (levelUse < levelNext) {
+					lev |= SC_FOLDLEVELHEADERFLAG;
+				}
+				if (lev != styler.LevelAt(sc.currentLine)) {
+					styler.SetLevel(sc.currentLine, lev);
+				}
+				levelCurrent = levelNext;
+				prevLineState = lineState;
+			}
 		}
 		sc.Forward();
 	}
 
 	sc.Complete();
+}
+
 }
 
 LexerModule lmBatch(SCLEX_BATCH, ColouriseBatchDoc, "batch");

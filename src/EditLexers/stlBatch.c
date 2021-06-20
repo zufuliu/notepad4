@@ -112,7 +112,7 @@ static EDITSTYLE Styles_Batch[] = {
 	{ SCE_BAT_STRINGDQ, NP2StyleX_DoubleQuotedString, L"fore:#008080" },
 	{ SCE_BAT_STRINGSQ, NP2StyleX_SingleQuotedString, L"fore:#C08000" },
 	{ SCE_BAT_STRINGBT, NP2StyleX_Backticks, L"fore:#F08000" },
-	{ SCE_BAT_ESCAPE, NP2StyleX_EscapeSequence, L"fore:#FF0000" },
+	{ SCE_BAT_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#FF0000" },
 	{ SCE_BAT_VARIABLE, NP2StyleX_Variable, L"fore:#003CE6; back:#FFF1A8" },
 	{ SCE_BAT_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_BAT_LABEL, SCE_BAT_LABEL_LINE, 0, 0), NP2StyleX_Label, L"fore:#C80000; back:#F4F4F4; eolfilled" },

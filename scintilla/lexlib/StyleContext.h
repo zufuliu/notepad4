@@ -238,6 +238,13 @@ public:
 			|| (chPrev == '\r' && ch == '\n' && currentPos >= 2 && ch0 == styler[currentPos - 2]);
 	}
 
+	int LineLastChar() const noexcept {
+		if (chPrev == '\r' && ch == '\n' && currentPos >= 2) {
+			return static_cast<unsigned char>(styler[currentPos - 2]);
+		}
+		return chPrev;
+	}
+
 	int GetDocNextChar(bool ignoreCurrent = false) const noexcept {
 		if (!ignoreCurrent && !IsWhiteSpace(ch)) {
 			return ch;
