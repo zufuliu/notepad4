@@ -871,19 +871,20 @@ HOMEDRIVE HomeDrive
 HOMEPATH HomePath
 LOCALAPPDATA LocalAppData
 LOGONSERVER LogonServer
-NUMBER_OF_PROCESSORS
+NUMBER_OF_PROCESSORS Number_Of_Processors
 OS
-PATHEXT
-PROCESSOR_ARCHITECTURE
-PROCESSOR_IDENTIFIER
-PROCESSOR_LEVEL
-PROCESSOR_REVISION
+Path
+PATHEXT PathExt
+PROCESSOR_ARCHITECTURE Processor_Architecture
+PROCESSOR_IDENTIFIER Processor_Identifier
+PROCESSOR_LEVEL Processor_Level
+PROCESSOR_REVISION Processor_Revision
 ProgramData
 ProgramFiles
 ProgramFiles(x86)
 ProgramW6432
 PSModulePath
-PUBLIC
+PUBLIC Public
 SESSIONNAME	SessionName
 SystemDrive
 SystemRoot
@@ -893,7 +894,7 @@ USERDOMAIN UserDomain
 USERDOMAIN_ROAMINGPROFILE UserDomain_RoamingProfile
 USERNAME UserName
 USERPROFILE UserProfile
-windir WINDIR
+windir WINDIR WinDir
 
 ::! options			===========================================================
 :: FOR /?

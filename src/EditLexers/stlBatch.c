@@ -53,12 +53,13 @@ static KEYWORDLIST Keywords_Batch = {{
 "ALLUSERSPROFILE APPDATA AllUsersProfile AppData "
 "CMDCMDLINE COMPUTERNAME CmdCmdLine ComSpec CommonProgramFiles CommonProgramFiles(x86) CommonProgramW6432 ComputerName "
 "DriverData ExitCode ExitCodeAscii HIGHESTNUMANODENUMBER HOMEDRIVE HOMEPATH HighestNumaNodeNumber HomeDrive HomePath "
-"LOCALAPPDATA LOGONSERVER LocalAppData LogonServer NUMBER_OF_PROCESSORS OS "
-"PATHEXT PROCESSOR_ARCHITECTURE PROCESSOR_IDENTIFIER PROCESSOR_LEVEL PROCESSOR_REVISION PSModulePath PUBLIC "
-"ProgramData ProgramFiles ProgramFiles(x86) ProgramW6432 "
+"LOCALAPPDATA LOGONSERVER LocalAppData LogonServer NUMBER_OF_PROCESSORS Number_Of_Processors OS "
+"PATHEXT PROCESSOR_ARCHITECTURE PROCESSOR_IDENTIFIER PROCESSOR_LEVEL PROCESSOR_REVISION PSModulePath PUBLIC Path PathExt "
+"Processor_Architecture Processor_Identifier Processor_Level Processor_Revision "
+"ProgramData ProgramFiles ProgramFiles(x86) ProgramW6432 Public "
 "RANDOM Random SESSIONNAME SessionName SystemDrive SystemRoot TEMP TMP "
 "USERDOMAIN USERDOMAIN_ROAMINGPROFILE USERNAME USERPROFILE UserDomain UserDomain_RoamingProfile UserName UserProfile "
-"WINDIR __APPDIR__ __AppDir__ __CD__ random windir "
+"WINDIR WinDir __APPDIR__ __AppDir__ __CD__ random windir "
 
 , // 4 command options
 "ABOVENORMAL AFFINITY BELOWNORMAL EOF HIGH LOW MAX MIN NODE NORMAL REALTIME SEPARATE SHARED WAIT "
