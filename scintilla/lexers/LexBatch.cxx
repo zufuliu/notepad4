@@ -57,18 +57,20 @@ constexpr bool IsLabelChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.';
 }
 
-constexpr bool IsBatVariableNext(int chNext) noexcept {
-	return chNext == '~' || chNext == '=' || chNext == '*' || chNext == '#' || iswordstart(chNext);
+constexpr bool IsVariableChar(int ch) noexcept {
+	return IsGraphic(ch) && !AnyOf(ch, '%', ',', ';', '=', '"', '&', '<', '>', '|');
 }
-constexpr bool IsMarkVariableNext(int chNext) noexcept {
-	return chNext == '=' || iswordstart(chNext);
+
+constexpr bool IsVariableEscapeChar(int ch) noexcept {
+	return IsGraphic(ch) && !AnyOf(ch, '%', ',', ';', '=');
 }
+
 // someone's, don't
 constexpr bool IsSingleQuotedString(int ch, int chPrev, int chNext) noexcept {
 	return ch == '\'' && !((chPrev >= 0x80 || IsAlphaNumeric(chPrev)) && (chNext == 's' || chNext == 't' || chNext == 'S' || chNext == 'T'));
 }
 
-bool GetBatEscapeLen(StyleContext &sc, int& length) noexcept {
+bool GetBatEscapeLen(StyleContext &sc, int &length) noexcept {
 	// Escape Characters https://www.robvanderwoude.com/escapechars.php
 	length = 0;
 	switch (sc.ch) {
@@ -85,7 +87,7 @@ bool GetBatEscapeLen(StyleContext &sc, int& length) noexcept {
 		break;
 
 	case '%':
-		if (sc.chNext == '%' && !IsBatVariableNext(sc.GetRelative(2))) {
+		if (sc.chNext == '%' && !IsVariableChar(sc.GetRelative(2))) {
 			length = 1;
 		}
 		break;
@@ -109,39 +111,48 @@ constexpr bool IsTildeExpansion(int ch) noexcept {
 	return AnyOf(ch, 'f', 'd', 'p', 'n', 'x', 's', 'a', 't', 'z');
 }
 
-char DetectBatVariable(StyleContext &sc) {
-	char varQuoteChar = '\0';
+char DetectBatVariable(StyleContext &sc, int &varQuoteChar) {
+	const int state = sc.state;
+	varQuoteChar = '\0';
 	sc.SetState(SCE_BAT_VARIABLE);
-	if (sc.chNext == '*' || IsADigit(sc.chNext)) { // %*, %1 ... %9
+	if (sc.chNext == '*' || IsADigit(sc.chNext)) {
+		// %*, %1 ... %9
 		sc.Forward();
 	} else if (sc.chNext == '~' || sc.chNext == '%') {
 		sc.Forward();
 		if (sc.ch == '%') {
 			sc.Forward();
 		}
-		if (sc.ch == '~') {
+		if (sc.ch == '~' && IsVariableChar(sc.chNext)) {
 			// see help for CALL and FOR commands
 			sc.Forward();
-			while (IsTildeExpansion(sc.ch)) {
+			while (IsTildeExpansion(sc.ch) && IsVariableChar(sc.chNext)) {
 				sc.Forward();
 			}
 			if (sc.ch == '$') {
-				while (sc.More() && !(sc.ch == ':' || isspacechar(sc.chNext))) {
+				while (sc.More()) {
+					if (sc.ch == ':' || !IsVariableChar(sc.chNext)) {
+						break;
+					}
 					sc.Forward();
 				}
-				if (sc.ch == ':') {
+				if (sc.ch == ':' && IsVariableChar(sc.chNext)) {
 					sc.Forward();
 				}
 			}
 		}
-		if (sc.ch == '^') {
+		if (sc.ch == '^' && IsVariableEscapeChar(sc.chNext)) {
+			// for %%^" in (1 2 3) do echo %%^"
 			// see https://www.robvanderwoude.com/clevertricks.php
 			sc.Forward();
 		}
+	} else if (IsGraphic(sc.chNext) && !(sc.chNext == '%' || sc.chNext == '!')) {
+		varQuoteChar = sc.ch;
 	} else {
-		varQuoteChar = '%';
+		sc.ChangeState(state);
+		return false;
 	}
-	return varQuoteChar;
+	return true;
 }
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_BAT_STRINGDQ);
@@ -150,7 +161,7 @@ static_assert(DefaultNestedStateBaseStyle + 3 == SCE_BAT_STRINGBT);
 
 void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) & true;
-	char varQuoteChar = '\0'; // %var% or !var! after SetLocal EnableDelayedExpansion
+	int varQuoteChar = '\0'; // %var% or !var! after SetLocal EnableDelayedExpansion
 	int logicalVisibleChars = 0;
 	int lineVisibleChars = 0;
 	int prevLineState = 0;
@@ -190,11 +201,13 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			break;
 
 		case SCE_BAT_IDENTIFIER:
-			if ((sc.ch == '%' || sc.ch == '^') && GetBatEscapeLen(sc, escapeLen)) {
+			if ((sc.ch == '^' || sc.ch == '%') && GetBatEscapeLen(sc, escapeLen)) {
 				sc.SetState(SCE_BAT_ESCAPECHAR);
 				sc.Forward(escapeLen);
+			} else if ((sc.ch == '%' || sc.ch == '!') && DetectBatVariable(sc, varQuoteChar)) {
+				// nop
 			} else if (!IsWordChar(sc.ch)) {
-				char s[64];
+				char s[260];
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (StrEqual(s, "rem")) {
 					sc.ChangeState(SCE_BAT_COMMENT);
@@ -281,13 +294,11 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_BAT_ESCAPECHAR);
 				sc.Forward(escapeLen);
-			} else if (sc.ch == '%') {
+			} else if (sc.ch == '%' || sc.ch == '!') {
 				nestedState.push_back(sc.state);
-				varQuoteChar = DetectBatVariable(sc);
-			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
-				nestedState.push_back(sc.state);
-				varQuoteChar = '!';
-				sc.SetState(SCE_BAT_VARIABLE);
+				if (!DetectBatVariable(sc, varQuoteChar)) {
+					nestedState.pop_back();
+				}
 			} else if ((sc.state == SCE_BAT_STRINGDQ && sc.ch == '\"')
 				|| (sc.state == SCE_BAT_STRINGSQ && sc.ch == '\'')
 				|| (sc.state == SCE_BAT_STRINGBT && sc.ch == '`')) {
@@ -361,11 +372,8 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				sc.SetState(SCE_BAT_STRINGSQ);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_BAT_STRINGBT);
-			} else if (sc.ch == '%') {
-				varQuoteChar = DetectBatVariable(sc);
-			} else if (sc.ch == '!' && IsMarkVariableNext(sc.chNext)) {
-				varQuoteChar = '!';
-				sc.SetState(SCE_BAT_VARIABLE);
+			} else if ((sc.ch == '%' || sc.ch == '!') && DetectBatVariable(sc, varQuoteChar)) {
+				// nop
 			} else if (sc.ch == '(' || sc.ch == ')') {
 				sc.SetState(SCE_BAT_OPERATOR);
 				if (!inEcho || parenCount > 0) {
@@ -422,7 +430,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 			int lineState = lineVisibleChars ? 0 : BatchLineStateMaskEmptyLine;
 			lineVisibleChars = 0;
-			if (chPrev == '^') {
+			if (chPrev == '^' && sc.state != SCE_BAT_COMMENT) {
 				lineState = BatchLineStateLineContinuation | (logicalVisibleChars ? BatchLineStateMaskVisibleChars : 0);
 			} else {
 				inEcho = false;
