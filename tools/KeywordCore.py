@@ -315,7 +315,7 @@ def parse_batch_api_file(path):
 		'options': [],
 	}
 	for key, doc in sections:
-		if key == 'keywords':
+		if key in ('keywords', 'internal command'):
 			items = doc.split()
 			keywordMap['upper case keywords'].extend(items)
 			keywordMap[key] = [item.lower() for item in items]
@@ -342,6 +342,7 @@ def parse_batch_api_file(path):
 
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
+		'internal command',
 		'system commands',
 		'upper case keywords',
 		'environment variables',
@@ -349,6 +350,7 @@ def parse_batch_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('internal commands', keywordMap['internal command'], KeywordAttr.Default),
 		('system commands', keywordMap['system commands'], KeywordAttr.NoLexer),
 		('upper case keywords / commands', keywordMap['upper case keywords'], KeywordAttr.NoLexer),
 		('environment variables', keywordMap['environment variables'], KeywordAttr.NoLexer),

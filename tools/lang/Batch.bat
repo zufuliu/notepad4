@@ -3,26 +3,16 @@
 
 ::! keywords		===========================================================
 :: built-in command, output from help command
-ASSOC
 BREAK
 CALL
-CD
-CHDIR
 CLS
-COLOR
-COPY
-DATE
-DEL
-DIR
 ECHO
 	ECHO.
 ENDLOCAL EndLocal
-ERASE
 EXIT
 FOR
 	IN
 	DO
-FTYPE
 GOTO
 IF
 	ELSE
@@ -34,20 +24,9 @@ IF
 
 	ERRORLEVEL ErrorLevel
 	CMDEXTVERSION CmdExtVersion
-MD
-MKDIR
-MKLINK
-MOVE
-PATH
 PAUSE
 POPD
-PROMPT
-PUSHD
-RD
 REM
-REN
-RENAME
-RMDIR
 SET
 SETLOCAL SetLocal
 	ENABLEEXTENSIONS EnableExtensions
@@ -55,16 +34,40 @@ SETLOCAL SetLocal
 	ENABLEDELAYEDEXPANSION	EnableDelayedExpansion
 	DISABLEDELAYEDEXPANSION	DisableDelayedExpansion
 SHIFT
-START
-TIME
 TITLE
-TYPE
 VER
 VERIFY
-VOL
 
 :: other
 NUL
+
+::! internal command	=======================================================
+:: built-in command with arguments
+ASSOC
+CD
+CHDIR
+COLOR
+COPY
+DATE
+DEL
+DIR
+ERASE
+FTYPE
+MD
+MKDIR
+MKLINK
+MOVE
+PATH
+PROMPT
+PUSHD
+RD
+REN
+RENAME
+RMDIR
+START
+TIME
+TYPE
+VOL
 
 ::! external command	=======================================================
 :: output from help command

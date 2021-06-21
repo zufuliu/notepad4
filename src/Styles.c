@@ -1300,10 +1300,10 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[4] = KeywordAttr_NoLexer;		// misc
 		break;
 	case NP2LEX_BATCH:
-		attr[1] = KeywordAttr_NoLexer;		// system commands
-		attr[2] = KeywordAttr_NoLexer;		// upper case keywords / commands
-		attr[3] = KeywordAttr_NoLexer;		// environment variables
-		attr[4] = KeywordAttr_NoLexer;		// command options
+		attr[2] = KeywordAttr_NoLexer;		// system commands
+		attr[3] = KeywordAttr_NoLexer;		// upper case keywords / commands
+		attr[4] = KeywordAttr_NoLexer;		// environment variables
+		attr[5] = KeywordAttr_NoLexer;		// command options
 		break;
 	case NP2LEX_CMAKE:
 		attr[6] = KeywordAttr_NoLexer;		// long properties

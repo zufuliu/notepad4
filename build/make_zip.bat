@@ -112,7 +112,7 @@ SET "EXIT_ON_ERROR=%~1"
 CALL :SubGetVersion
 CALL :SubDetectSevenzipPath
 
-IF /I "%SEVENZIP%" == "" CALL :SUBMSG "ERROR" "7za wasn't found!"
+IF NOT EXIST "%SEVENZIP%" CALL :SUBMSG "ERROR" "7za wasn't found!"
 
 IF /I "%COMPILER%" == "GCC" (
   SET INPUTDIR_AVX2=bin\%CONFIG%_AVX2
@@ -222,7 +222,7 @@ IF EXIST "%SEVENZIP_PATH%" (SET "SEVENZIP=%SEVENZIP_PATH%" & EXIT /B)
 FOR /F "tokens=2*" %%A IN (
   'REG QUERY "HKLM\SOFTWARE\7-Zip" /v "Path" 2^>NUL ^| FIND "REG_SZ" ^|^|
    REG QUERY "HKLM\SOFTWARE\Wow6432Node\7-Zip" /v "Path" 2^>NUL ^| FIND "REG_SZ"') DO SET "SEVENZIP=%%B\7z.exe"
-EXIT /B
+IF EXIST "%SEVENZIP%" EXIT /B
 
 FOR /F "tokens=2*" %%A IN (
   'REG QUERY "HKLM\SOFTWARE\7-Zip-Zstandard" /v "Path" 2^>NUL ^| FIND "REG_SZ" ^|^|
