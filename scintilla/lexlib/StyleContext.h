@@ -234,6 +234,18 @@ public:
 		styler.GetRangeLowered(styler.GetStartSegment(), currentPos, s, len);
 	}
 
+	void Rewind() noexcept {
+		currentPos = styler.GetStartSegment();
+		chPrev = 0;
+		if (!multiByteAccess) {
+			ch = static_cast<unsigned char>(styler[currentPos]);
+		} else {
+			ch =  styler.GetCharacterAndWidth(currentPos, &widthNext);
+			width = widthNext;
+		}
+		Forward();
+	}
+
 	bool LineEndsWith(char ch0) const noexcept {
 		return chPrev == static_cast<unsigned char>(ch0)
 			|| (chPrev == '\r' && ch == '\n' && currentPos >= 2 && ch0 == styler[currentPos - 2]);

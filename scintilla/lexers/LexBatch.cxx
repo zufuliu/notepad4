@@ -152,7 +152,7 @@ constexpr bool IsTildeExpansion(int ch) noexcept {
 
 bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar) {
 	varQuoteChar = '\0';
-	if (!IsGraphic(sc.chNext) || sc.chNext == '!' || (sc.ch == '!' && sc.chNext == '%')) {
+	if (!IsGraphic(sc.chNext) || (sc.ch == '!' && (sc.chNext == '%' || sc.chNext == '!'))) {
 		return false;
 	}
 
@@ -163,7 +163,7 @@ bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar) {
 		return true;
 	}
 	if (sc.chNext == '*' || IsADigit(sc.chNext)) {
-		// %*, %1 ... %9
+		// %*, %0 ... %9
 		sc.Forward();
 	} else if (sc.chNext == '~' || sc.chNext == '%') {
 		sc.Forward();
@@ -254,7 +254,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			break;
 
 		case SCE_BAT_IDENTIFIER:
-			if (sc.ch == '.' && sc.LengthCurrent() == 4 && sc.styler.MatchIgnoreCase(sc.styler.GetStartSegment(), "echo")) {
+			if (sc.ch == '.' && sc.LengthCurrent() == 4 && styler.MatchIgnoreCase(styler.GetStartSegment(), "echo")) {
 				parenBefore = parenCount;
 				command = Command::Echo;
 				sc.ChangeState(SCE_BAT_WORD);
@@ -334,8 +334,10 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					varQuoteChar = '\0';
 					sc.Forward();
 				} else if (IsEOLChar(sc.ch) || sc.ch == GetStringQuote(outerStyle)) {
-					// something went wrong
+					// something went wrong, e.g. ! without EnableDelayedExpansion.
 					varQuoteChar = '\0';
+					sc.ChangeState(outerStyle);
+					sc.Rewind();
 				}
 			}
 			if (varQuoteChar == '\0') {
