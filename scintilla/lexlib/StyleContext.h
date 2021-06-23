@@ -40,7 +40,7 @@ public:
 	Sci_PositionU currentPos;
 	Sci_Line currentLine;
 	Sci_Line lineDocEnd;
-	//Sci_Position lineEnd;
+	//Sci_PositionU lineEnd;
 	Sci_PositionU lineStartNext;
 	const bool multiByteAccess;
 	bool atLineStart;
@@ -180,6 +180,7 @@ public:
 		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
 	}
 	bool MatchLineEnd() const noexcept {
+		//return currentPos == lineEnd;
 		return atLineEnd;
 	}
 #if 0
@@ -238,7 +239,7 @@ public:
 			|| (chPrev == '\r' && ch == '\n' && currentPos >= 2 && ch0 == styler[currentPos - 2]);
 	}
 
-	int LineLastChar() const noexcept {
+	int GetLineLastChar() const noexcept {
 		if (chPrev == '\r' && ch == '\n' && currentPos >= 2) {
 			return static_cast<unsigned char>(styler[currentPos - 2]);
 		}

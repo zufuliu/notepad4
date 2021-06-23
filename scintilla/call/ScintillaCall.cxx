@@ -51,7 +51,7 @@ intptr_t ScintillaCall::CallString(Message msg, uintptr_t wParam, const char *s)
 }
 
 std::string ScintillaCall::CallReturnString(Message msg, uintptr_t wParam) {
-	size_t len = CallPointer(msg, wParam, nullptr);
+	const size_t len = CallPointer(msg, wParam, nullptr);
 	std::string value;
 	if (len) {
 		value.resize(len);
@@ -100,14 +100,13 @@ int ScintillaCall::UnsignedStyleAt(Position position) {
 }
 
 std::string ScintillaCall::StringOfSpan(Span span) {
-	if (span.Length() == 0) {
-		return std::string();
-	} else {
-		std::string text(span.Length(), '\0');
+	std::string text;
+	if (span.Length() != 0) {
+		text.resize(span.Length());
 		SetTarget(span);
 		TargetText(text.data());
-		return text;
 	}
+	return text;
 }
 
 Position ScintillaCall::ReplaceTarget(std::string_view text) {

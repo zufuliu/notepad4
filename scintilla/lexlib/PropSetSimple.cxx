@@ -20,7 +20,7 @@ using namespace Lexilla;
 
 namespace {
 
-typedef std::map<std::string, std::string> mapss;
+using mapss = std::map<std::string, std::string, std::less<>>;
 
 inline mapss *PropsFromPointer(void *impl) noexcept {
 	return static_cast<mapss *>(impl);
@@ -41,14 +41,19 @@ PropSetSimple::~PropSetSimple() {
 
 bool PropSetSimple::Set(std::string_view key, std::string_view val) {
 	mapss *props = PropsFromPointer(impl);
-	const auto [it, updated] = props->emplace(key, val);
-	if (!updated) {
+	const auto it = props->find(key);
+	if (it != props->end()) {
+		if (it->second == val) {
+			return false;
+		}
 		it->second = val;
+	} else {
+		props->emplace(key, val);
 	}
 	return true;
 }
 
-const char *PropSetSimple::Get(const char *key) const {
+const char *PropSetSimple::Get(std::string_view key) const {
 	const mapss *props = PropsFromPointer(impl);
 	const auto it = props->find(key);
 	if (it != props->end()) {
@@ -59,7 +64,7 @@ const char *PropSetSimple::Get(const char *key) const {
 
 int PropSetSimple::GetInt(std::string_view key, int defaultValue) const {
 	const mapss *props = PropsFromPointer(impl);
-	const auto it = props->find(std::string(key));
+	const auto it = props->find(key);
 	if (it != props->end() && !it->second.empty()) {
 		defaultValue = atoi(it->second.c_str());
 	}

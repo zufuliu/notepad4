@@ -522,12 +522,11 @@ static constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept
 void SpecialRepresentations::SetRepresentation(std::string_view charBytes, std::string_view value) {
 	if ((charBytes.length() <= 4) && (value.length() <= Representation::maxLength)) {
 		const unsigned int key = KeyFromString(charBytes);
-		const auto it = mapReprs.find(key);
-		if (it == mapReprs.end()) {
+		const auto [it, inserted] = mapReprs.try_emplace(key, value);
+		if (inserted) {
 			// New entry so increment for first byte
-			const unsigned char ucStart = charBytes[0];
+			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
 			startByteHasReprs[ucStart]++;
-			mapReprs.emplace(key, value);
 		} else {
 			it->second = Representation(value);
 		}
@@ -564,7 +563,7 @@ void SpecialRepresentations::ClearRepresentation(std::string_view charBytes) {
 		const auto it = mapReprs.find(KeyFromString(charBytes));
 		if (it != mapReprs.end()) {
 			mapReprs.erase(it);
-			const unsigned char ucStart = charBytes[0];
+			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
 			startByteHasReprs[ucStart]--;
 		}
 	}
