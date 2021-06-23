@@ -896,7 +896,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 		return CharacterExtracted(unicodeReplacementChar, 0);
 	}
 	const unsigned char leadByte = cb.UCharAt(position);
-	if (!dbcsCodePage || UTF8IsAscii(leadByte)) {
+	if (UTF8IsAscii(leadByte) || !dbcsCodePage) {
 		// Common case: ASCII character
 		return CharacterExtracted(leadByte, 1);
 	}
@@ -915,10 +915,12 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 		}
 	} else {
 		if (IsDBCSLeadByteNoExcept(leadByte) && ((position + 1) < Length())) {
-			return CharacterExtracted::DBCS(leadByte, cb.UCharAt(position + 1));
-		} else {
-			return CharacterExtracted(leadByte, 1);
+			const unsigned char trailByte = cb.UCharAt(position + 1);
+			if (!IsDBCSTrailByteInvalid(trailByte)) {
+				return CharacterExtracted::DBCS(leadByte, trailByte);
+			}
 		}
+		return CharacterExtracted(leadByte, 1);
 	}
 }
 
@@ -1006,39 +1008,33 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 }
 
 int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {
-	int character;
 	int bytesInCharacter = 1;
 	const unsigned char leadByte = cb.UCharAt(position);
-	if (dbcsCodePage) {
+	int character = leadByte;
+	if (!UTF8IsAscii(leadByte) && dbcsCodePage) {
 		if (CpUtf8 == dbcsCodePage) {
-			if (UTF8IsAscii(leadByte)) {
-				// Single byte character or invalid
-				character = leadByte;
+			const int widthCharBytes = UTF8BytesOfLead(leadByte);
+			unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
+			for (int b = 1; b < widthCharBytes; b++) {
+				charBytes[b] = cb.UCharAt(position + b);
+			}
+			const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
+			if (utf8status & UTF8MaskInvalid) {
+				// Report as singleton surrogate values which are invalid Unicode
+				character = 0xDC80 + character;
 			} else {
-				const int widthCharBytes = UTF8BytesOfLead(leadByte);
-				unsigned char charBytes[UTF8MaxBytes] = { leadByte, 0, 0, 0 };
-				for (int b = 1; b < widthCharBytes; b++) {
-					charBytes[b] = cb.UCharAt(position + b);
-				}
-				const int utf8status = UTF8ClassifyMulti(charBytes, widthCharBytes);
-				if (utf8status & UTF8MaskInvalid) {
-					// Report as singleton surrogate values which are invalid Unicode
-					character = 0xDC80 + leadByte;
-				} else {
-					bytesInCharacter = utf8status & UTF8MaskWidth;
-					character = UnicodeFromUTF8(charBytes);
-				}
+				bytesInCharacter = utf8status & UTF8MaskWidth;
+				character = UnicodeFromUTF8(charBytes);
 			}
 		} else {
 			if (IsDBCSLeadByteNoExcept(leadByte)) {
-				bytesInCharacter = 2;
-				character = (leadByte << 8) | cb.UCharAt(position + 1);
-			} else {
-				character = leadByte;
+				const unsigned char trailByte = cb.UCharAt(position + 1);
+				if (!IsDBCSTrailByteInvalid(trailByte)) {
+					bytesInCharacter = 2;
+					character = (character << 8) | trailByte;
+				}
 			}
 		}
-	} else {
-		character = leadByte;
 	}
 	if (pWidth) {
 		*pWidth = bytesInCharacter;

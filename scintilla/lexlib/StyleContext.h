@@ -49,15 +49,14 @@ public:
 	int chPrev;
 	int ch;
 	int chNext;
-	Sci_Position width;
-	Sci_Position widthNext;
+	Sci_Position width = 1;
+	Sci_Position widthNext = 1;
 
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 		int initStyle, LexAccessor &styler_) noexcept :
 	styler(styler_),
 	endPos(startPos + length),
 	lengthDocument(styler.Length()),
-	currentPos(startPos),
 	multiByteAccess(styler.Encoding() == EncodingType::dbcs),
 	state(initStyle) {
 		styler.StartAt(startPos);
@@ -70,18 +69,7 @@ public:
 		}
 		lineDocEnd = styler.GetLine(lengthDocument);
 		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
-
-		chPrev = 0;
-		width = 1;
-		widthNext = 1;
-		if (!multiByteAccess) {
-			ch = static_cast<unsigned char>(styler[startPos]);
-		} else {
-			ch =  styler.GetCharacterAndWidth(startPos, &widthNext);
-			width = widthNext;
-		}
-
-		GetNextChar();
+		SeekTo(startPos);
 	}
 	// Deleted so StyleContext objects can not be copied.
 	StyleContext(const StyleContext &) = delete;
@@ -234,16 +222,20 @@ public:
 		styler.GetRangeLowered(styler.GetStartSegment(), currentPos, s, len);
 	}
 
-	void Rewind() noexcept {
-		currentPos = styler.GetStartSegment();
+	void SeekTo(Sci_PositionU startPos) noexcept {
+		currentPos = startPos;
 		chPrev = 0;
 		if (!multiByteAccess) {
-			ch = static_cast<unsigned char>(styler[currentPos]);
+			ch = static_cast<unsigned char>(styler[startPos]);
 		} else {
-			ch =  styler.GetCharacterAndWidth(currentPos, &widthNext);
+			ch =  styler.GetCharacterAndWidth(startPos, &widthNext);
 			width = widthNext;
 		}
-		Forward();
+		GetNextChar();
+	}
+
+	void Rewind() noexcept {
+		SeekTo(styler.GetStartSegment());
 	}
 
 	bool LineEndsWith(char ch0) const noexcept {

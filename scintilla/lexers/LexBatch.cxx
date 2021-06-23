@@ -338,6 +338,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					varQuoteChar = '\0';
 					sc.ChangeState(outerStyle);
 					sc.Rewind();
+					sc.Forward();
 				}
 			}
 			if (varQuoteChar == '\0') {
