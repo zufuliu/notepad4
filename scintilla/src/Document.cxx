@@ -914,7 +914,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 			return CharacterExtracted(UnicodeFromUTF8(charBytes), utf8status & UTF8MaskWidth);
 		}
 	} else {
-		if (IsDBCSLeadByteNoExcept(leadByte) && ((position + 1) < Length())) {
+		if (IsDBCSLeadByteNoExcept(leadByte)) {
 			const unsigned char trailByte = cb.UCharAt(position + 1);
 			if (!IsDBCSTrailByteInvalid(trailByte)) {
 				return CharacterExtracted::DBCS(leadByte, trailByte);

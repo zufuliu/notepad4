@@ -99,7 +99,7 @@ public:
 	}
 #endif
 	bool IsLeadByte(unsigned char ch) const noexcept {
-		return ch > 0x80 && encodingType == EncodingType::dbcs && pAccess->IsDBCSLeadByte(ch);
+		return encodingType == EncodingType::dbcs && ch > 0x80 && pAccess->IsDBCSLeadByte(ch);
 	}
 	constexpr EncodingType Encoding() const noexcept {
 		return encodingType;
