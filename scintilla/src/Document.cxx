@@ -1055,10 +1055,6 @@ bool Document::IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
 	return dbcsCharClass->IsLeadByte(ch);
 }
 
-bool Document::IsDBCSLeadByteInvalid(unsigned char ch) const noexcept {
-	return dbcsCharClass->IsLeadByteInvalid(ch);
-}
-
 bool Document::IsDBCSTrailByteInvalid(unsigned char ch) const noexcept {
 	return dbcsCharClass->IsTrailByteInvalid(ch);
 }

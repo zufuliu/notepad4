@@ -16,6 +16,18 @@ constexpr bool IsDBCSCodePage(int codePage) noexcept {
 		|| codePage == 1361;
 }
 
+constexpr bool IsDBCSValidSingleByte(int codePage, int ch) noexcept {
+	switch (codePage) {
+	case 932:
+		return ch == 0x80
+			|| (ch >= 0xA0 && ch <= 0xDF)
+			|| (ch >= 0xFD);
+
+	default:
+		return false;
+	}
+}
+
 enum class CharacterClass : unsigned char { space, newLine, word, punctuation, cjkWord };
 
 class CharClassify {
@@ -69,9 +81,6 @@ public:
 	bool IsLeadByte(unsigned char ch) const noexcept {
 		return leadByte[ch];
 	}
-	bool IsLeadByteInvalid(unsigned char ch) const noexcept {
-		return invalidLeadByte[ch];
-	}
 	bool IsTrailByteInvalid(unsigned char ch) const noexcept {
 		return invalidTrailByte[ch];
 	}
@@ -97,7 +106,6 @@ private:
 	const int codePage;
 	int minTrailByte;
 	bool leadByte[256];
-	bool invalidLeadByte[256];
 	bool invalidTrailByte[256];
 	unsigned char classifyMap[0xffff + 1];
 };

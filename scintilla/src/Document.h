@@ -339,7 +339,6 @@ public:
 	int SCI_METHOD CodePage() const noexcept override;
 	bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept override;
 	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept;
-	bool IsDBCSLeadByteInvalid(unsigned char ch) const noexcept;
 	bool IsDBCSTrailByteInvalid(unsigned char ch) const noexcept;
 	int DBCSDrawBytes(std::string_view text) const noexcept;
 	int SafeSegment(const char *text, int length, int lengthSegment) const noexcept;

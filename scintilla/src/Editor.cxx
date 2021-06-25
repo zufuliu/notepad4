@@ -221,14 +221,15 @@ void Editor::SetRepresentations() {
 		"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US"
 	};
 	for (size_t j = 0; j < std::size(reps); j++) {
-		const char c[2] = { static_cast<char>(j), 0 };
+		const char c[2] = { static_cast<char>(j), '\0' };
 		reprs.SetRepresentation(std::string_view(c, 1), reps[j]);
 	}
 	reprs.SetRepresentation("\x7f", "DEL");
 
+	const int dbcsCodePage = pdoc->dbcsCodePage;
 	// C1 control set
 	// As well as Unicode mode, ISO-8859-1 should use these
-	if (IsUnicodeMode()) {
+	if (CpUtf8 == dbcsCodePage) {
 		static const char * const repsC1[] = {
 			"PAD", "HOP", "BPH", "NBH", "IND", "NEL", "SSA", "ESA",
 			"HTS", "HTJ", "VTS", "PLD", "PLU", "RI", "SS2", "SS3",
@@ -236,27 +237,18 @@ void Editor::SetRepresentations() {
 			"SOS", "SGCI", "SCI", "CSI", "ST", "OSC", "PM", "APC"
 		};
 		for (size_t j = 0; j < std::size(repsC1); j++) {
-			const char c1[3] = { '\xc2',  static_cast<char>(0x80 + j), 0 };
+			const char c1[3] = { '\xc2',  static_cast<char>(0x80 + j), '\0' };
 			reprs.SetRepresentation(c1, repsC1[j]);
 		}
 		reprs.SetRepresentation("\xe2\x80\xa8", "LS");
 		reprs.SetRepresentation("\xe2\x80\xa9", "PS");
-
-		// UTF-8 invalid bytes
+	}
+	if (dbcsCodePage) {
+		// UTF-8 invalid bytes or DBCS invalid single bytes.
 		for (int k = 0x80; k < 0x100; k++) {
-			const char hiByte[2] = { static_cast<char>(k), 0 };
-			char hexits[5];	// Really only needs 4 but that causes warning from gcc 7.1
-			sprintf(hexits, "x%2X", k);
-			reprs.SetRepresentation(hiByte, hexits);
-		}
-	} else if (pdoc->dbcsCodePage) {
-		// DBCS invalid single lead bytes
-		for (int k = 0x80; k < 0x100; k++) {
-			const char ch = static_cast<char>(k);
-			if (pdoc->IsDBCSLeadByteNoExcept(ch) || pdoc->IsDBCSLeadByteInvalid(ch)) {
-				const char hiByte[2] = { ch, 0 };
-				char hexits[5];	// Really only needs 4 but that causes warning from gcc 7.1
-				sprintf(hexits, "x%2X", k);
+			if (!IsDBCSValidSingleByte(dbcsCodePage, k)) {
+				const char hiByte[2] = { static_cast<char>(k), '\0' };
+				const char hexits[4] = { 'x', "0123456789ABCDEF"[k >> 4], "0123456789ABCDEF"[k & 15], '\0' };
 				reprs.SetRepresentation(hiByte, hexits);
 			}
 		}

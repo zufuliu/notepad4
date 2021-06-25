@@ -2,6 +2,37 @@
 import sys
 from enum import IntFlag
 
+DBCSCodePages = [
+	'cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
+	'cp936', 'gbk',
+	'cp949', 'uhc',
+	'cp950', 'big5', 'big5hkscs',
+	'cp1361', 'johab',
+]
+
+def to_byte_ranges(items):
+	ranges = []
+	if items:
+		items = sorted(items)
+		start = prev = items[0]
+		for index in range(1, len(items)):
+			value = items[index]
+			if value - prev != 1:
+				ranges.append((start, prev))
+				start = value
+			prev = value
+		ranges.append((start, prev))
+	return ranges
+
+def format_byte_ranges(ranges):
+	result = []
+	for start, end in ranges:
+		if start == end:
+			result.append('[0x%02X]' % start)
+		else:
+			result.append('[0x%02X, 0x%02X]' % (start, end))
+	return ', '.join(result)
+
 class DBCSTailKind(IntFlag):
 	Digit = 1
 	Punctuation = 2
@@ -32,7 +63,7 @@ class DBCSTailKind(IntFlag):
 				comb.append(value.name)
 		return ' or '.join(comb)
 
-def print_dbcs_char_by_tail(code_page, what):
+def print_dbcs_char_by_tail(codePage, what):
 	"""
 	print DBCS character with specific type of tail byte.
 	used to test whether lexer correctly handles DBCS characters or not.
@@ -47,7 +78,7 @@ def print_dbcs_char_by_tail(code_page, what):
 			if not kind:
 				continue
 			try:
-				ch = bytes([lead, tail]).decode(code_page)
+				ch = bytes([lead, tail]).decode(codePage)
 				if len(ch) != 1:
 					continue
 				count += 1
@@ -61,11 +92,11 @@ def print_dbcs_char_by_tail(code_page, what):
 
 	description = DBCSTailKind.get_desc(what)
 	if count == 0:
-		print(f"no result for {description} in code page {code_page}")
+		print(f"no result for {description} in code page {codePage}")
 		return
 
 	sys.stdout.reconfigure(encoding='utf-8')
-	print(f'{count} result in code page {code_page} for {description}')
+	print(f'{count} result in code page {codePage} for {description}')
 	step = 20
 	for key, items in sorted(result.items()):
 		kind, tail, ch_tail = key
@@ -77,18 +108,38 @@ def print_dbcs_char_by_tail(code_page, what):
 			i += step
 
 def print_dbcs_test_char(what):
-	print_dbcs_char_by_tail('cp932', what)
-	print_dbcs_char_by_tail('shift_jis', what)
-	print_dbcs_char_by_tail('shift_jis_2004', what)
-	print_dbcs_char_by_tail('shift_jisx0213', what)
-	print_dbcs_char_by_tail('cp936', what)
-	print_dbcs_char_by_tail('gbk', what)
-	print_dbcs_char_by_tail('cp949', what)
-	print_dbcs_char_by_tail('uhc', what)
-	print_dbcs_char_by_tail('cp950', what)
-	print_dbcs_char_by_tail('big5', what)
-	print_dbcs_char_by_tail('big5hkscs', what)
-	print_dbcs_char_by_tail('cp1361', what)
-	print_dbcs_char_by_tail('johab', what)
+	for codePage in DBCSCodePages:
+		print_dbcs_char_by_tail(codePage, what)
 
-print_dbcs_test_char(DBCSTailKind.All)
+def print_dbcs_valid_bytes():
+	for codePage in DBCSCodePages:
+		validSingle = []
+		validLead = set()
+		validTail = set()
+
+		for lead in range(0x80, 0x100):
+			try:
+				bytes([lead]).decode(codePage)
+				validSingle.append(lead)
+			except UnicodeDecodeError:
+				pass
+
+			for tail in range(0x21, 0x100):
+				try:
+					ch = bytes([lead, tail]).decode(codePage)
+					if len(ch) == 1:
+						validLead.add(lead)
+						validTail.add(tail)
+				except UnicodeDecodeError:
+					pass
+
+		validSingle = to_byte_ranges(validSingle)
+		validLead = to_byte_ranges(validLead)
+		validTail = to_byte_ranges(validTail)
+		print(codePage)
+		print('  single:', format_byte_ranges(validSingle))
+		print('    lead:', format_byte_ranges(validLead))
+		print('    tail:', format_byte_ranges(validTail))
+
+#print_dbcs_test_char(DBCSTailKind.All)
+print_dbcs_valid_bytes()

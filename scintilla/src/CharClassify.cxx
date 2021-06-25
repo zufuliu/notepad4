@@ -705,7 +705,6 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 	codePage(codePage_),
 	minTrailByte(0x40),
 	leadByte{},
-	invalidLeadByte{},
 	invalidTrailByte{} {
 	// Byte ranges found in Wikipedia articles with relevant search strings in each case
 	switch (codePage_) {
@@ -714,15 +713,6 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		SetRange(leadByte, 0x81, 0x9F);
 		SetRange(leadByte, 0xE0, 0xFC);
 		// Lead bytes F0 to FC may be a Microsoft addition.
-
-		invalidLeadByte[0x85] = true;
-		invalidLeadByte[0x86] = true;
-		invalidLeadByte[0xEB] = true;
-		invalidLeadByte[0xEC] = true;
-		invalidLeadByte[0xEF] = true;
-		invalidLeadByte[0xFA] = true;
-		invalidLeadByte[0xFB] = true;
-		invalidLeadByte[0xFC] = true;
 
 		SetRange(invalidTrailByte, 0x00, 0x3F);
 		invalidTrailByte[0x7F] = true;
@@ -734,9 +724,6 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 	case 936:
 		// GBK
 		SetRange(leadByte, 0x81, 0xFE);
-
-		invalidLeadByte[0x80] = true;
-		invalidLeadByte[0xFF] = true;
 
 		SetRange(invalidTrailByte, 0x00, 0x3F);
 		invalidTrailByte[0x7F] = true;
@@ -750,11 +737,6 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		minTrailByte = 0x41;
 		SetRange(leadByte, 0x81, 0xFE);
 
-		invalidLeadByte[0x80] = true;
-		invalidLeadByte[0xC9] = true;
-		invalidLeadByte[0xFE] = true;
-		invalidLeadByte[0xFF] = true;
-
 		SetRange(invalidTrailByte, 0x00, 0x40);
 		SetRange(invalidTrailByte, 0x5B, 0x60);
 		SetRange(invalidTrailByte, 0x7B, 0x80);
@@ -766,10 +748,6 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 	case 950:
 		// Big5
 		SetRange(leadByte, 0x81, 0xFE);
-
-		SetRange(invalidLeadByte, 0x80, 0xA0);
-		invalidLeadByte[0xC8] = true;
-		SetRange(invalidLeadByte, 0xFA, 0xFF);
 
 		SetRange(invalidTrailByte, 0x00, 0x3F);
 		SetRange(invalidTrailByte, 0x7F, 0xA0);
@@ -785,12 +763,8 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		SetRange(leadByte, 0xD8, 0xDE);
 		SetRange(leadByte, 0xE0, 0xF9);
 
-		SetRange(invalidLeadByte, 0x80, 0x83);
-		SetRange(invalidLeadByte, 0xD4, 0xD8);
-		invalidLeadByte[0xDF] = true;
-		SetRange(invalidLeadByte, 0xFA, 0xFF);
-
 		SetRange(invalidTrailByte, 0x00, 0x30);
+		invalidTrailByte[0x7F] = true;
 		invalidTrailByte[0x80] = true;
 		invalidTrailByte[0xFF] = true;
 
