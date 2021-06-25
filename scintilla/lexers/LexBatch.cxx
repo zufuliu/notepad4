@@ -442,7 +442,9 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			} else if (DetectBatchEscapeChar(sc, outerStyle, command) ||
 				((sc.ch == '%' || sc.ch == '!') && DetectBatchVariable(sc, outerStyle, varQuoteChar))) {
-				// nop
+				if (logicalVisibleChars == 0 && command == Command::None) {
+					command = Command::Argument;
+				}
 			} else if (sc.ch == '\"') {
 				if (logicalVisibleChars == 0 && command == Command::None) {
 					command = Command::Argument;

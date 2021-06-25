@@ -1,6 +1,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
 // 2020 11.0 https://www.ecma-international.org/publications/standards/Ecma-262.htm
-// 2021 https://tc39.es/ecma262/
+// 2021 https://tc39.es/ecma262/2021/
+// 2022 https://tc39.es/ecma262/
 
 //! keywords
 async await
@@ -217,7 +218,7 @@ Error(message) {
 	message
 	name
 
-	AggregateError // MDN
+	AggregateError // 2021
 	// Native Error Types
 	EvalError
 	RangeError
@@ -591,6 +592,17 @@ JSON {
 	stringify(value [, replacer [, space]])
 }
 
+WeakRef(target) { // 2021
+	prototype:
+		deref()
+}
+
+FinalizationRegistry(cleanupCallback) { // 2021
+	prototype:
+		register(target, heldValue [, unregisterToken])
+		unregister(unregisterToken)
+}
+
 GeneratorFunction(p1, p2, … , pn, body) {
 }
 AsyncGeneratorFunction(p1, p2, … , pn, body) {
@@ -608,6 +620,7 @@ Promise(executor) {
 	all(iterable)
 	allSettled(iterable) // 2020
 	race(iterable)
+	any(iterable) // 2021
 	reject(r)
 	resolve(x)
 	prototype:

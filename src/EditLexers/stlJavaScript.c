@@ -16,9 +16,10 @@ static KEYWORDLIST Keywords_JS = {{
 , // 3 class
 "ActiveXObject AggregateError Array ArrayBuffer AsyncFunction AsyncGeneratorFunction Atomics "
 "BigInt BigInt64Array BigUint64Array Boolean DataView Date Debug Document Enumerator Error EvalError EventTarget "
-"Float32Array Float64Array FormData Function GeneratorFunction Int16Array Int32Array Int8Array JSON Map Math Number "
-"Object Promise Proxy RangeError ReferenceError Reflect RegExp Set SharedArrayBuffer String Symbol SyntaxError TypeError "
-"URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray VBArray WScript WeakMap WeakSet XMLHttpRequest jQuery "
+"FinalizationRegistry Float32Array Float64Array FormData Function GeneratorFunction Int16Array Int32Array Int8Array JSON "
+"Map Math Number Object Promise Proxy RangeError ReferenceError Reflect RegExp "
+"Set SharedArrayBuffer String Symbol SyntaxError TypeError URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray "
+"VBArray WScript WeakMap WeakRef WeakSet XMLHttpRequest jQuery "
 
 , // 4 interface
 NULL
@@ -36,7 +37,7 @@ NULL
 
 , // 8 function
 "UTC( __defineGetter__( __defineSetter__( __lookupGetter__( __lookupSetter__( "
-"abort( abs( acos( acosh( add( addEventListener( adoptNode( alert( all( allSettled( anchor( and( "
+"abort( abs( acos( acosh( add( addEventListener( adoptNode( alert( all( allSettled( anchor( and( any( "
 "append( appendChild( apply( asIntN( asUintN( asin( asinh( assert( assign( "
 "atEnd( atan( atan2( atanh( atob( attachShadow( "
 "big( bind( blink( blur( bold( btoa( "
@@ -45,7 +46,7 @@ NULL
 "count( countReset( create( createAttribute( createCDATASection( createComment( createDocumentFragment( "
 "createElement( createElementNS( createExpression( createImageBitmap( createNSResolver( createNodeIterator( "
 "createProcessingInstruction( createRange( createTextNode( createTreeWalker( "
-"debug( decodeURI( decodeURIComponent( defineProperties( defineProperty( delete( deleteProperty( "
+"debug( decodeURI( decodeURIComponent( defineProperties( defineProperty( delete( deleteProperty( deref( "
 "dimensions( dir( dirxml( dispatchEvent( "
 "elementFromPoint( encodeURI( encodeURIComponent( endsWith( entries( error( escape( eval( evaluate( every( "
 "exception( exchange( exec( exp( expm1( "
@@ -72,7 +73,7 @@ NULL
 "padEnd( padStart( parse( parseFloat( parseInt( pop( postMessage( pow( "
 "preventExtensions( print( prompt( propertyIsEnumerable( push( "
 "querySelector( querySelectorAll( queueMicrotask( "
-"race( random( raw( reduce( reduceRight( reject( releasePointerCapture( "
+"race( random( raw( reduce( reduceRight( register( reject( releasePointerCapture( "
 "removeAttribute( removeAttributeNS( removeChild( removeEventListener( removeItem( "
 "repeat( replace( replaceAll( replaceChild( requestAnimationFrame( require( resizeBy( resizeTo( resolve( return( "
 "reverse( revocable( round( "
@@ -87,7 +88,7 @@ NULL
 "toGMTString( toISOString( toJSON( "
 "toLocaleDateString( toLocaleLowerCase( toLocaleString( toLocaleTimeString( toLocaleUpperCase( toLowerCase( toPrecision( "
 "toString( toTimeString( toUTCString( toUpperCase( toggleAttribute( trace( trim( trimEnd( trimStart( trunc( "
-"ubound( unescape( unshift( valueOf( values( wait( wake( warn( write( writeln( xor( "
+"ubound( unescape( unregister( unshift( valueOf( values( wait( wake( warn( write( writeln( xor( "
 
 , // 9 properties
 "URL __proto__ activeElement assignedSlot asyncIterator attributes baseURI body buffer byteLength byteOffset "
