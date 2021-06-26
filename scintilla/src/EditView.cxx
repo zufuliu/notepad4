@@ -1237,7 +1237,9 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 				if (UTF8IsAscii(chEOL)) {
 					ctrlChar = ControlCharacterString(chEOL);
 				} else {
-					sprintf(hexits, "x%2X", chEOL);
+					hexits[0] = 'x';
+					hexits[1] = "0123456789ABCDEF"[chEOL >> 4];
+					hexits[2] = "0123456789ABCDEF"[chEOL & 15];
 					ctrlChar = hexits;
 				}
 			}

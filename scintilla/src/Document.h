@@ -338,8 +338,12 @@ public:
 	int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept override;
 	int SCI_METHOD CodePage() const noexcept override;
 	bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept override;
-	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept;
-	bool IsDBCSTrailByteInvalid(unsigned char ch) const noexcept;
+	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
+		return dbcsCharClass->IsLeadByte(ch);
+	}
+	bool IsDBCSTrailByteNoExcept(unsigned char ch) const noexcept {
+		return dbcsCharClass->IsTrailByte(ch);
+	}
 	int DBCSDrawBytes(std::string_view text) const noexcept;
 	int SafeSegment(const char *text, int length, int lengthSegment) const noexcept;
 	EncodingFamily CodePageFamily() const noexcept;

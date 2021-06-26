@@ -502,10 +502,7 @@ void CharClassify::InitUnicodeData() noexcept {
 namespace {
 
 inline void SetRange(bool bs[256], int low, int high) noexcept {
-	while (low <= high) {
-		bs[low] = true;
-		++low;
-	}
+	memset(bs + low, true, high - low + 1);
 }
 
 std::vector<std::unique_ptr<DBCSCharClassify>> dbcsCharClassifyList;
@@ -705,7 +702,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 	codePage(codePage_),
 	minTrailByte(0x40),
 	leadByte{},
-	invalidTrailByte{} {
+	trailByte{} {
 	// Byte ranges found in Wikipedia articles with relevant search strings in each case
 	switch (codePage_) {
 	case 932:
@@ -714,9 +711,8 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		SetRange(leadByte, 0xE0, 0xFC);
 		// Lead bytes F0 to FC may be a Microsoft addition.
 
-		SetRange(invalidTrailByte, 0x00, 0x3F);
-		invalidTrailByte[0x7F] = true;
-		SetRange(invalidTrailByte, 0xFD, 0xFF);
+		SetRange(trailByte, 0x40, 0x7E);
+		SetRange(trailByte, 0x80, 0xFC);
 
 		ExpandRLE(CharClassifyRLE_CP932, classifyMap);
 		break;
@@ -725,9 +721,8 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		// GBK
 		SetRange(leadByte, 0x81, 0xFE);
 
-		SetRange(invalidTrailByte, 0x00, 0x3F);
-		invalidTrailByte[0x7F] = true;
-		invalidTrailByte[0xFF] = true;
+		SetRange(trailByte, 0x40, 0x7E);
+		SetRange(trailByte, 0x80, 0xFE);
 
 		ExpandRLE(CharClassifyRLE_CP936, classifyMap);
 		break;
@@ -737,10 +732,9 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		minTrailByte = 0x41;
 		SetRange(leadByte, 0x81, 0xFE);
 
-		SetRange(invalidTrailByte, 0x00, 0x40);
-		SetRange(invalidTrailByte, 0x5B, 0x60);
-		SetRange(invalidTrailByte, 0x7B, 0x80);
-		invalidTrailByte[0xFF] = true;
+		SetRange(trailByte, 0x41, 0x5A);
+		SetRange(trailByte, 0x61, 0x7A);
+		SetRange(trailByte, 0x81, 0xFE);
 
 		ExpandRLE(CharClassifyRLE_CP949, classifyMap);
 		break;
@@ -749,9 +743,8 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		// Big5
 		SetRange(leadByte, 0x81, 0xFE);
 
-		SetRange(invalidTrailByte, 0x00, 0x3F);
-		SetRange(invalidTrailByte, 0x7F, 0xA0);
-		invalidTrailByte[0xFF] = true;
+		SetRange(trailByte, 0x40, 0x7E);
+		SetRange(trailByte, 0xA1, 0xFE);
 
 		ExpandRLE(CharClassifyRLE_CP950, classifyMap);
 		break;
@@ -763,10 +756,8 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 		SetRange(leadByte, 0xD8, 0xDE);
 		SetRange(leadByte, 0xE0, 0xF9);
 
-		SetRange(invalidTrailByte, 0x00, 0x30);
-		invalidTrailByte[0x7F] = true;
-		invalidTrailByte[0x80] = true;
-		invalidTrailByte[0xFF] = true;
+		SetRange(trailByte, 0x31, 0x7E);
+		SetRange(trailByte, 0x81, 0xFE);
 
 		ExpandRLE(CharClassifyRLE_CP1361, classifyMap);
 		break;

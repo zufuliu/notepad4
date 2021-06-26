@@ -81,8 +81,8 @@ public:
 	bool IsLeadByte(unsigned char ch) const noexcept {
 		return leadByte[ch];
 	}
-	bool IsTrailByteInvalid(unsigned char ch) const noexcept {
-		return invalidTrailByte[ch];
+	bool IsTrailByte(unsigned char ch) const noexcept {
+		return trailByte[ch];
 	}
 
 	CharacterClass ClassifyCharacter(unsigned int ch) const noexcept {
@@ -106,7 +106,7 @@ private:
 	const int codePage;
 	int minTrailByte;
 	bool leadByte[256];
-	bool invalidTrailByte[256];
+	bool trailByte[256];
 	unsigned char classifyMap[0xffff + 1];
 };
 

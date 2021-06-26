@@ -916,7 +916,7 @@ Document::CharacterExtracted Document::CharacterAfter(Sci::Position position) co
 	} else {
 		if (IsDBCSLeadByteNoExcept(leadByte)) {
 			const unsigned char trailByte = cb.UCharAt(position + 1);
-			if (!IsDBCSTrailByteInvalid(trailByte)) {
+			if (IsDBCSTrailByteNoExcept(trailByte)) {
 				return CharacterExtracted::DBCS(leadByte, trailByte);
 			}
 		}
@@ -1029,7 +1029,7 @@ int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Positio
 		} else {
 			if (IsDBCSLeadByteNoExcept(leadByte)) {
 				const unsigned char trailByte = cb.UCharAt(position + 1);
-				if (!IsDBCSTrailByteInvalid(trailByte)) {
+				if (IsDBCSTrailByteNoExcept(trailByte)) {
 					bytesInCharacter = 2;
 					character = (character << 8) | trailByte;
 				}
@@ -1051,20 +1051,12 @@ bool SCI_METHOD Document::IsDBCSLeadByte(unsigned char ch) const noexcept {
 	return dbcsCharClass && dbcsCharClass->IsLeadByte(ch);
 }
 
-bool Document::IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
-	return dbcsCharClass->IsLeadByte(ch);
-}
-
-bool Document::IsDBCSTrailByteInvalid(unsigned char ch) const noexcept {
-	return dbcsCharClass->IsTrailByteInvalid(ch);
-}
-
 int Document::DBCSDrawBytes(std::string_view text) const noexcept {
 	if (text.length() <= 1) {
 		return static_cast<int>(text.length());
 	}
 	if (IsDBCSLeadByteNoExcept(text[0])) {
-		return IsDBCSTrailByteInvalid(text[1]) ? 1 : 2;
+		return IsDBCSTrailByteNoExcept(text[1]) ? 2 : 1;
 	} else {
 		return 1;
 	}
