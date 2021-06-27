@@ -28,54 +28,52 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 }
 
 void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	endPos_ = sci::min(endPos_, startPos_ + len - 1);
+	assert(startPos_ < endPos_ && len != 0);
+	endPos_ = sci::min(endPos_, startPos_ + len);
+	len = endPos_ - startPos_;
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		const char *p = buf + (startPos_ - startPos);
-		const char * const t = buf + (endPos_ - startPos);
-		while (p < t) {
-			*s++ = *p++;
-		}
+		const char * const p = buf + (startPos_ - startPos);
+		memcpy(s, p, len);
 	} else {
-		for (; startPos_ < endPos_; startPos_++) {
-			*s++ = (*this)[startPos_];
-		}
+		pAccess->GetCharRange(s, startPos_, len);
 	}
-	*s = '\0';
+	s[len] = '\0';
 }
 
 void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	endPos_ = sci::min(endPos_, startPos_ + len - 1);
+	assert(startPos_ < endPos_ && len != 0);
+	endPos_ = sci::min(endPos_, startPos_ + len);
+	len = endPos_ - startPos_;
 	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		const char *p = buf + (startPos_ - startPos);
-		const char * const t = buf + (endPos_ - startPos);
-		while (p < t) {
-			*s++ = MakeLowerCase(*p++);
-		}
+		const char * const p = buf + (startPos_ - startPos);
+		memcpy(s, p, len);
 	} else {
-		for (; startPos_ < endPos_; startPos_++) {
-			*s++ = MakeLowerCase((*this)[startPos_]);
+		pAccess->GetCharRange(s, startPos_, len);
+	}
+
+	const char * const t = s + len;
+	while (s < t) {
+		if (*s >= 'A' && *s <= 'Z') {
+			*s += 'a' - 'A';
 		}
+		++s;
 	}
 	*s = '\0';
 }
 
 std::string LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) {
+	assert(startPos_ < endPos_);
 	const Sci_PositionU len = endPos_ - startPos_;
-	std::string s;
-	if (static_cast<Sci_Position>(len) > 0) {
-		s.resize(len);
-		GetRange(startPos_, endPos_, s.data(), len);
-	}
+	std::string s(len, '\0');
+	GetRange(startPos_, endPos_, s.data(), len);
 	return s;
 }
 
 std::string LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_) {
+	assert(startPos_ < endPos_);
 	const Sci_PositionU len = endPos_ - startPos_;
-	std::string s;
-	if (static_cast<Sci_Position>(len) > 0) {
-		s.resize(len);
-		GetRangeLowered(startPos_, endPos_, s.data(), len);
-	}
+	std::string s(len, '\0');
+	GetRangeLowered(startPos_, endPos_, s.data(), len);
 	return s;
 }
 
