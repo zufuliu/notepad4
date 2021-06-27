@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <string>
 #include <string_view>
 
 #include "ILexer.h"

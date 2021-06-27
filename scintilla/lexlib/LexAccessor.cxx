@@ -4,8 +4,10 @@
 #include <cstdint>
 #include <cassert>
 
+#include <string>
 #include <string_view>
 #include <vector>
+#include <memory>
 
 #include "ILexer.h"
 #include "LexAccessor.h"
@@ -55,6 +57,26 @@ void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_
 		}
 	}
 	*s = '\0';
+}
+
+std::string LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) {
+	const Sci_PositionU len = endPos_ - startPos_;
+	std::string s;
+	if (static_cast<Sci_Position>(len) > 0) {
+		s.resize(len);
+		GetRange(startPos_, endPos_, s.data(), len);
+	}
+	return s;
+}
+
+std::string LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_) {
+	const Sci_PositionU len = endPos_ - startPos_;
+	std::string s;
+	if (static_cast<Sci_Position>(len) > 0) {
+		s.resize(len);
+		GetRangeLowered(startPos_, endPos_, s.data(), len);
+	}
+	return s;
 }
 
 Sci_Position LexLineSkipSpaceTab(Sci_Line line, LexAccessor &styler) noexcept {
