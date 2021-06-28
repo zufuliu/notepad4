@@ -173,12 +173,16 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 			}
 			break;
 		case SCE_MAT_DOUBLEQUOTESTRING:
-			if (sc.ch == '\\') {
+			if (sc.ch == '\\' && lexType != LEX_MATLAB) {
 				if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
 					sc.Forward();
 				}
 			} else if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_MAT_DEFAULT);
+				if (sc.chNext == '\"') {
+					sc.Forward();
+				} else {
+					sc.ForwardSetState(SCE_MAT_DEFAULT);
+				}
 			}
 			break;
 		case SCE_MAT_COMMENTBLOCK:
