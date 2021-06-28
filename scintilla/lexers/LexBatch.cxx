@@ -69,12 +69,12 @@ constexpr bool IsLabelChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.' || ch == '-';
 }
 
-constexpr bool IsVariableChar(int ch) noexcept {
-	return IsGraphic(ch) && !AnyOf(ch, '%', ',', ';', '=', '"', '&', '<', '>', '|');
+constexpr bool IsVariableChar(int ch, char quote, char paren) noexcept {
+	return IsGraphic(ch) && !AnyOf(ch, '%', '&', '<', '>', '|', quote, paren);
 }
 
 constexpr bool IsVariableEscapeChar(int ch) noexcept {
-	return IsGraphic(ch) && !AnyOf(ch, '%', ',', ';', '=');
+	return IsGraphic(ch) && ch != '%';
 }
 
 constexpr bool IsStringStyle(int style) noexcept {
@@ -116,13 +116,6 @@ bool DetectBatchEscapeChar(StyleContext &sc, int &outerStyle, Command command) {
 		}
 		break;
 
-	case '%':
-		// TODO: detect for loop
-		if (sc.chNext == '%' && !IsVariableChar(sc.GetRelative(2))) {
-			length = 1;
-		}
-		break;
-
 	case '\"':
 		// Inside the search pattern of FIND
 		if (sc.chNext == '"' && state == SCE_BAT_STRINGDQ) {
@@ -151,7 +144,7 @@ constexpr bool IsTildeExpansion(int ch) noexcept {
 	return AnyOf(ch, 'f', 'd', 'p', 'n', 'x', 's', 'a', 't', 'z');
 }
 
-bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar) {
+bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar, int parenCount) {
 	varQuoteChar = '\0';
 	if (!IsGraphic(sc.chNext) || (sc.ch == '!' && (sc.chNext == '%' || sc.chNext == '!'))) {
 		return false;
@@ -167,24 +160,31 @@ bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar) {
 		// %*, %0 ... %9
 		sc.Forward();
 	} else if (sc.chNext == '~' || sc.chNext == '%') {
+		// TODO: detect for loop to get valid variables in current scope.
+		const char quote = GetStringQuote(outerStyle);
+		const char paren = parenCount ? ')' : '\0';
 		sc.Forward();
 		if (sc.ch == '%') {
+			if (!IsVariableChar(sc.chNext, quote, paren)) {
+				sc.ChangeState(SCE_BAT_ESCAPECHAR);
+				return true;
+			}
 			sc.Forward();
 		}
-		if (sc.ch == '~' && IsVariableChar(sc.chNext)) {
+		if (sc.ch == '~' && IsVariableChar(sc.chNext, quote, paren)) {
 			// see help for CALL and FOR commands
 			sc.Forward();
-			while (IsTildeExpansion(sc.ch) && IsVariableChar(sc.chNext)) {
+			while (IsTildeExpansion(sc.ch) && IsVariableChar(sc.chNext, quote, paren)) {
 				sc.Forward();
 			}
 			if (sc.ch == '$') {
 				while (sc.More()) {
-					if (sc.ch == ':' || !IsVariableChar(sc.chNext)) {
+					if (sc.ch == ':' || !IsVariableChar(sc.chNext, quote, paren)) {
 						break;
 					}
 					sc.Forward();
 				}
-				if (sc.ch == ':' && IsVariableChar(sc.chNext)) {
+				if (sc.ch == ':' && IsVariableChar(sc.chNext, quote, paren)) {
 					sc.Forward();
 				}
 			}
@@ -264,8 +264,8 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			} else if (sc.ch == '^' || sc.ch == '%' || sc.ch == '!') {
 				const bool begin = logicalVisibleChars == sc.LengthCurrent();
-				const bool handled = (sc.ch != '!' && DetectBatchEscapeChar(sc, outerStyle, command))
-					|| (sc.ch != '^' && DetectBatchVariable(sc, outerStyle, varQuoteChar));
+				const bool handled = (sc.ch == '^') ? DetectBatchEscapeChar(sc, outerStyle, command)
+					: DetectBatchVariable(sc, outerStyle, varQuoteChar, parenCount);
 				if (handled) {
 					if (begin && command == Command::None) {
 						command = Command::Argument;
@@ -363,7 +363,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			if (DetectBatchEscapeChar(sc, outerStyle, command)) {
 				// nop
 			} else if (sc.ch == '%' || sc.ch == '!') {
-				DetectBatchVariable(sc, outerStyle, varQuoteChar);
+				DetectBatchVariable(sc, outerStyle, varQuoteChar, parenCount);
 			} else if (sc.ch == '\"') {
 				int state = sc.state;
 				if (state == SCE_BAT_STRINGDQ) {
@@ -425,7 +425,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		if (sc.state == SCE_BAT_DEFAULT) {
-			if (sc.Match(':', ':')) {
+			if (sc.Match(':', ':') && command != Command::Echo) {
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if (sc.atLineStart && sc.Match('#', '!')) {
 				// shell shebang starts embedded script
@@ -442,7 +442,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					levelNext++;
 				}
 			} else if (DetectBatchEscapeChar(sc, outerStyle, command) ||
-				((sc.ch == '%' || sc.ch == '!') && DetectBatchVariable(sc, outerStyle, varQuoteChar))) {
+				((sc.ch == '%' || sc.ch == '!') && DetectBatchVariable(sc, outerStyle, varQuoteChar, parenCount))) {
 				if (logicalVisibleChars == 0 && command == Command::None) {
 					command = Command::Argument;
 				}
