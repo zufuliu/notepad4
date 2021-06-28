@@ -5065,40 +5065,36 @@ int CharacterCategoryMap::Size() const noexcept {
 
 void CharacterCategoryMap::Optimize(int countCharacters) {
 #if CHARACTERCATEGORY_USE_BINARY_SEARCH
-	const int characters = std::clamp(countCharacters, 256, maxUnicode + 1);
+	int characters = std::clamp(countCharacters, 256, maxUnicode + 1);
 	dense.resize(characters);
 
-	int end = 0;
-	int index = 0;
-	int current = catRanges[index];
-	++index;
+	int index = 1;
+	int current = catRanges[0];
+	unsigned char *p = dense.data();
 	do {
-		const int next = catRanges[index];
+		const int next = catRanges[index++];
 		const unsigned char category = current & maskCategory;
-		current >>= 5;
-		end = std::min(characters, next >> 5);
-		while (current < end) {
-			dense[current++] = category;
-		}
+		const int count = std::min((next >> 5) - (current >> 5), characters);
 		current = next;
-		++index;
-	} while (characters > end);
+		memset(p, category, count);
+		p += count;
+		characters -= count;
+	} while (characters != 0);
 #else
 	// only support BMP, see ExpandRLE() in CharClassify.cxx
-	const int characters = std::clamp(countCharacters, 256, 0xffff + 1);
+	int characters = std::clamp(countCharacters, 256, 0xffff + 1);
 	dense.resize(characters);
 
-	int end = 0;
 	int index = 0;
+	unsigned char *p = dense.data();
 	do {
-		int current = CatTableRLE_BMP[index++];
+		const int current = CatTableRLE_BMP[index++];
 		const unsigned char category = current & maskCategory;
-		current >>= 5;
-		int count = std::min(current, characters - end);
-		while (count--) {
-			dense[end++] = category;
-		}
-	} while (characters > end);
+		const int count = std::min(current >> 5, characters);
+		memset(p, category, count);
+		p += count;
+		characters -= count;
+	} while (characters != 0);
 #endif
 }
 

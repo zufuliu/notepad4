@@ -7,7 +7,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <memory>
 
 #include "ILexer.h"
 #include "LexAccessor.h"

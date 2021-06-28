@@ -84,14 +84,12 @@ void ExpandRLE(const DataType (&data)[DataSize], ValueType (&buffer)[BufferSize]
 	constexpr DataType mask = (1 << ValueBit) - 1;
 	ValueType *p = buffer;
 
-	for (int i = 0; i < DataSize; i++) {
-		DataType ch = data[i];
+	for (DataType ch : data) {
 		const ValueType value = ch & mask;
 		ch >>= ValueBit;
 		assert(p + ch <= buffer + BufferSize);
-		while (ch--) {
-			*p++ = value;
-		}
+		memset(p, value, ch);
+		p += ch;
 	}
 	// ensure full expanded
 	assert(p == buffer + BufferSize);
