@@ -33,6 +33,7 @@ enum {
 
 enum class Command {
 	None,
+	For,
 	Keyword,
 	Echo,
 	Call,
@@ -69,12 +70,15 @@ constexpr bool IsLabelChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.' || ch == '-';
 }
 
-constexpr bool IsVariableChar(int ch, char quote, char paren) noexcept {
-	return IsGraphic(ch) && !AnyOf(ch, '%', '&', '<', '>', '|', quote, paren);
+constexpr bool IsVariableChar(int ch, char quote, Command command, int parenCount) noexcept {
+	return IsGraphic(ch) && !(AnyOf(ch, '%', '&', '<', '>', '|', '"', quote)
+		|| (parenCount != 0 && ch == ')')
+		|| (quote == '\0' && command == Command::For && AnyOf(ch, ',', ';', '=')));
 }
 
-constexpr bool IsVariableEscapeChar(int ch) noexcept {
-	return IsGraphic(ch) && ch != '%';
+constexpr bool IsVariableEscapeChar(int ch, char quote, Command command) noexcept {
+	return IsGraphic(ch) && !(ch == '%' || ch == quote
+		|| (quote == '\0' && command == Command::For && AnyOf(ch, ',', ';', '=')));
 }
 
 constexpr bool IsStringStyle(int style) noexcept {
@@ -144,7 +148,7 @@ constexpr bool IsTildeExpansion(int ch) noexcept {
 	return AnyOf(ch, 'f', 'd', 'p', 'n', 'x', 's', 'a', 't', 'z');
 }
 
-bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar, int parenCount) {
+bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar, Command command, int parenCount) {
 	varQuoteChar = '\0';
 	if (!IsGraphic(sc.chNext) || (sc.ch == '!' && (sc.chNext == '%' || sc.chNext == '!'))) {
 		return false;
@@ -162,34 +166,26 @@ bool DetectBatchVariable(StyleContext &sc, int &outerStyle, int &varQuoteChar, i
 	} else if (sc.chNext == '~' || sc.chNext == '%') {
 		// TODO: detect for loop to get valid variables in current scope.
 		const char quote = GetStringQuote(outerStyle);
-		const char paren = parenCount ? ')' : '\0';
 		sc.Forward();
 		if (sc.ch == '%') {
-			if (!IsVariableChar(sc.chNext, quote, paren)) {
+			if (!IsVariableChar(sc.chNext, quote, command, parenCount)) {
 				sc.ChangeState(SCE_BAT_ESCAPECHAR);
 				return true;
 			}
 			sc.Forward();
 		}
-		if (sc.ch == '~' && IsVariableChar(sc.chNext, quote, paren)) {
+		if (sc.ch == '~' && IsVariableChar(sc.chNext, quote, command, parenCount)) {
 			// see help for CALL and FOR commands
 			sc.Forward();
-			while (IsTildeExpansion(sc.ch) && IsVariableChar(sc.chNext, quote, paren)) {
+			while (IsTildeExpansion(sc.ch) && IsVariableChar(sc.chNext, quote, command, parenCount)) {
 				sc.Forward();
 			}
-			if (sc.ch == '$') {
-				while (sc.More()) {
-					if (sc.ch == ':' || !IsVariableChar(sc.chNext, quote, paren)) {
-						break;
-					}
-					sc.Forward();
-				}
-				if (sc.ch == ':' && IsVariableChar(sc.chNext, quote, paren)) {
-					sc.Forward();
-				}
+			if (sc.ch == '$' && IsGraphic(sc.chNext)) {
+				varQuoteChar = ':';
+				return true;
 			}
 		}
-		if (sc.ch == '^' && IsVariableEscapeChar(sc.chNext)) {
+		if (sc.ch == '^' && IsVariableEscapeChar(sc.chNext, quote, command)) {
 			// for %%^" in (1 2 3) do echo %%^"
 			// see https://www.robvanderwoude.com/clevertricks.php
 			sc.Forward();
@@ -265,7 +261,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if (sc.ch == '^' || sc.ch == '%' || sc.ch == '!') {
 				const bool begin = logicalVisibleChars == sc.LengthCurrent();
 				const bool handled = (sc.ch == '^') ? DetectBatchEscapeChar(sc, outerStyle, command)
-					: DetectBatchVariable(sc, outerStyle, varQuoteChar, parenCount);
+					: DetectBatchVariable(sc, outerStyle, varQuoteChar, command, parenCount);
 				if (handled) {
 					if (begin && command == Command::None) {
 						command = Command::Argument;
@@ -295,6 +291,8 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 							logicalVisibleChars = 0;
 						} else if (StrEqual(s, "set")) {
 							command = Command::Set;
+						} else if (StrEqual(s, "for")) {
+							command = Command::For;
 						}
 					} else if (keywordLists[1]->InList(s)) {
 						command = Command::Argument;
@@ -342,6 +340,14 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				if (sc.ch == varQuoteChar) {
 					varQuoteChar = '\0';
 					sc.Forward();
+					if (sc.chPrev == ':') {
+						const char quote = GetStringQuote(outerStyle);
+						if (sc.ch == '^' && IsVariableEscapeChar(sc.chNext, quote, command)) {
+							sc.Forward(2);
+						} else if (IsVariableChar(sc.ch, quote, command, parenCount)) {
+							sc.Forward();
+						}
+					}
 				} else if (IsEOLChar(sc.ch) || sc.ch == GetStringQuote(outerStyle)) {
 					// something went wrong, e.g. ! without EnableDelayedExpansion.
 					varQuoteChar = '\0';
@@ -363,7 +369,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			if (DetectBatchEscapeChar(sc, outerStyle, command)) {
 				// nop
 			} else if (sc.ch == '%' || sc.ch == '!') {
-				DetectBatchVariable(sc, outerStyle, varQuoteChar, parenCount);
+				DetectBatchVariable(sc, outerStyle, varQuoteChar, command, parenCount);
 			} else if (sc.ch == '\"') {
 				int state = sc.state;
 				if (state == SCE_BAT_STRINGDQ) {
@@ -442,7 +448,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					levelNext++;
 				}
 			} else if (DetectBatchEscapeChar(sc, outerStyle, command) ||
-				((sc.ch == '%' || sc.ch == '!') && DetectBatchVariable(sc, outerStyle, varQuoteChar, parenCount))) {
+				((sc.ch == '%' || sc.ch == '!') && DetectBatchVariable(sc, outerStyle, varQuoteChar, command, parenCount))) {
 				if (logicalVisibleChars == 0 && command == Command::None) {
 					command = Command::Argument;
 				}
@@ -514,7 +520,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			} else if ((command == Command::Call && sc.ch == ':') || (command == Command::Goto && IsGraphic(sc.ch))) {
 				command = Command::Argument;
 				sc.SetState(SCE_BAT_LABEL);
-			} else if ((logicalVisibleChars == 0 || command == Command::None || command == Command::Keyword) && IsFileNameChar(sc.ch)) {
+			} else if ((logicalVisibleChars == 0 || command <= Command::Keyword) && IsFileNameChar(sc.ch)) {
 				sc.SetState(SCE_BAT_IDENTIFIER);
 			}
 		}
