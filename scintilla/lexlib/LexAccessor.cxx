@@ -40,24 +40,13 @@ void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char 
 }
 
 void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
-	assert(startPos_ <= endPos_ && len != 0 && s != nullptr);
-	endPos_ = sci::min(endPos_, startPos_ + len - 1);
-	len = endPos_ - startPos_;
-	if (startPos_ >= static_cast<Sci_PositionU>(startPos) && endPos_ <= static_cast<Sci_PositionU>(endPos)) {
-		const char * const p = buf + (startPos_ - startPos);
-		memcpy(s, p, len);
-	} else {
-		pAccess->GetCharRange(s, startPos_, len);
-	}
-
-	const char * const t = s + len;
-	while (s < t) {
+	GetRange(startPos_, endPos_, s, len);
+	while (*s) {
 		if (*s >= 'A' && *s <= 'Z') {
 			*s += 'a' - 'A';
 		}
 		++s;
 	}
-	*s = '\0';
 }
 
 std::string LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) {

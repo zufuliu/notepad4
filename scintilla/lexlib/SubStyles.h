@@ -12,7 +12,8 @@ class WordClassifier {
 	int baseStyle;
 	int firstStyle;
 	int lenStyles;
-	std::map<std::string, int> wordToStyle;
+	using WordStyleMap = std::map<std::string, int, std::less<>>;
+	WordStyleMap wordToStyle;
 
 public:
 
@@ -47,7 +48,7 @@ public:
 		wordToStyle.clear();
 	}
 
-	int ValueFor(const std::string &s) const {
+	int ValueFor(std::string_view s) const {
 		const auto it = wordToStyle.find(s);
 		if (it != wordToStyle.end())
 			return it->second;
@@ -59,7 +60,7 @@ public:
 		return (style >= firstStyle) && (style < (firstStyle + lenStyles));
 	}
 
-	void RemoveStyle(int style) {
+	void RemoveStyle(int style) noexcept {
 		auto it = wordToStyle.begin();
 		while (it != wordToStyle.end()) {
 			if (it->second == style) {
@@ -72,6 +73,8 @@ public:
 
 	void SetIdentifiers(int style, const char *identifiers) {
 		RemoveStyle(style);
+		if (!identifiers)
+			return;
 		while (*identifiers) {
 			const char *cpSpace = identifiers;
 			while (*cpSpace && !(*cpSpace == ' ' || *cpSpace == '\t' || *cpSpace == '\r' || *cpSpace == '\n'))
@@ -106,8 +109,8 @@ class SubStyles {
 
 	int BlockFromStyle(int style) const noexcept {
 		int b = 0;
-		for (const auto &classifier : classifiers) {
-			if (classifier.IncludesStyle(style))
+		for (const auto &wc : classifiers) {
+			if (wc.IncludesStyle(style))
 				return b;
 			b++;
 		}
@@ -167,18 +170,18 @@ public:
 
 	int FirstAllocated() const noexcept {
 		int start = 257;
-		for (const auto &classifier : classifiers) {
-			if (start > classifier.Start())
-				start = classifier.Start();
+		for (const auto &wc : classifiers) {
+			if ((wc.Length() > 0) && (start > wc.Start()))
+				start = wc.Start();
 		}
 		return (start < 256) ? start : -1;
 	}
 
 	int LastAllocated() const noexcept {
 		int last = -1;
-		for (const auto &classifier : classifiers) {
-			if (last < classifier.Last())
-				last = classifier.Last();
+		for (const auto &wc : classifiers) {
+			if ((wc.Length() > 0) && (last < wc.Last()))
+				last = wc.Last();
 		}
 		return last;
 	}
@@ -191,8 +194,9 @@ public:
 
 	void Free() noexcept {
 		allocated = 0;
-		for (auto &classifier : classifiers)
-			classifier.Clear();
+		for (auto &wc : classifiers) {
+			wc.Clear();
+		}
 	}
 
 	const WordClassifier &Classifier(int baseStyle) const noexcept {

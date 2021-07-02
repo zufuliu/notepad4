@@ -37,11 +37,11 @@ class OptionSet {
 		Option(plcos ps_, const char *description_) noexcept :
 			opType(SC_TYPE_STRING), ps(ps_), description(description_) {
 		}
-		bool Set(T *base, const char *val) {
+		bool Set(T *base, std::string_view val) {
 			value = val;
 			switch (opType) {
 			case SC_TYPE_BOOLEAN: {
-				bool option = atoi(val) != 0;
+				bool option = atoi(val.data()) != 0;
 				if ((*base).*pb != option) {
 					(*base).*pb = option;
 					return true;
@@ -49,7 +49,7 @@ class OptionSet {
 				break;
 			}
 			case SC_TYPE_INTEGER: {
-				int option = atoi(val);
+				int option = atoi(val.data());
 				if ((*base).*pi != option) {
 					(*base).*pi = option;
 					return true;
@@ -70,40 +70,43 @@ class OptionSet {
 			return value.c_str();
 		}
 	};
-	typedef std::map<std::string, Option> OptionMap;
+	using OptionMap = std::map<std::string, Option, std::less<>>;
 	OptionMap nameToDef;
 	std::string names;
 	std::string wordLists;
 
-	void AppendName(const char *name) {
-		if (!names.empty())
-			names += "\n";
-		names += name;
+	void AddProperty(std::string_view name, Option option) {
+		const auto it = nameToDef.find(name);
+		if (it != nameToDef.end()) {
+			it->second = option;
+		} else {
+			nameToDef.emplace(name, option);
+			if (!names.empty())
+				names += "\n";
+			names += name;
+		}
 	}
 public:
-	void DefineProperty(const char *name, plcob pb, const char *description = "") {
-		nameToDef[name] = Option(pb, description);
-		AppendName(name);
+	void DefineProperty(std::string_view name, plcob pb, const char *description = "") {
+		AddProperty(name, Option(pb, description));
 	}
-	void DefineProperty(const char *name, plcoi pi, const char *description = "") {
-		nameToDef[name] = Option(pi, description);
-		AppendName(name);
+	void DefineProperty(std::string_view name, plcoi pi, const char *description = "") {
+		AddProperty(name, Option(pi, description));
 	}
-	void DefineProperty(const char *name, plcos ps, const char *description = "") {
-		nameToDef[name] = Option(ps, description);
-		AppendName(name);
+	void DefineProperty(std::string_view name, plcos ps, const char *description = "") {
+		AddProperty(name, Option(ps, description));
 	}
 	const char *PropertyNames() const noexcept {
 		return names.c_str();
 	}
-	int PropertyType(const char *name) const {
+	int PropertyType(std::string_view name) const {
 		const auto it = nameToDef.find(name);
 		if (it != nameToDef.end()) {
 			return it->second.opType;
 		}
 		return SC_TYPE_BOOLEAN;
 	}
-	const char *DescribeProperty(const char *name) const {
+	const char *DescribeProperty(std::string_view name) const {
 		const auto it = nameToDef.find(name);
 		if (it != nameToDef.end()) {
 			return it->second.description;
@@ -111,7 +114,7 @@ public:
 		return "";
 	}
 
-	bool PropertySet(T *base, const char *name, const char *val) {
+	bool PropertySet(T *base, std::string_view name, std::string_view val) {
 		const auto it = nameToDef.find(name);
 		if (it != nameToDef.end()) {
 			return it->second.Set(base, val);
@@ -119,7 +122,7 @@ public:
 		return false;
 	}
 
-	const char *PropertyGet(const char *name) const {
+	const char *PropertyGet(std::string_view name) const {
 		const auto it = nameToDef.find(name);
 		if (it != nameToDef.end()) {
 			return it->second.Get();
