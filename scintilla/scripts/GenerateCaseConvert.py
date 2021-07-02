@@ -289,6 +289,7 @@ def checkUnicodeCaseSensitivity(filename=None):
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <cstdint>
+#include <intrin.h>
 #define COUNTOF(a)		(sizeof(a) / sizeof(a[0]))
 typedef int BOOL;
 
@@ -303,7 +304,7 @@ typedef struct UnicodeCaseSensitivityRange {
 		fd.write(r"""
 BOOL IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return (UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1;
+		return _bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31);
 	}
 	for (uint32_t index = 0; index < COUNTOF(UnicodeCaseSensitivityRangeList); index++) {
 		const UnicodeCaseSensitivityRange range = UnicodeCaseSensitivityRangeList[index];
@@ -313,7 +314,7 @@ BOOL IsCharacterCaseSensitive(uint32_t ch) {
 			}
 			if (range.offset)  {
 				ch -= range.low;
-				return (UnicodeCaseSensitivityMask[range.offset + (ch >> 5)] >> (ch & 31)) & 1;
+				return _bittest((const long *)(UnicodeCaseSensitivityMask + range.offset + (ch >> 5)), ch & 31);
 			}
 			return 1;
 		}
@@ -379,7 +380,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
 	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	ch = {table}[{offsetD} + ch];
-	return (UnicodeCaseSensitivityMask[ch] >> lower) & 1;
+	return _bittest((const long *)(UnicodeCaseSensitivityMask + ch), lower);
 }}
 """.format(**args)
 	output.extend(function.splitlines())
@@ -390,6 +391,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <cstdint>
+#include <intrin.h>
 typedef int BOOL;
 
 """)
@@ -398,7 +400,7 @@ typedef int BOOL;
 
 BOOL IsCharacterCaseSensitive(uint32_t ch)	{
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return (UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1;
+		return _bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31);
 	}
 	if (ch > kUnicodeCaseSensitiveMax) {
 		return 0;
@@ -531,7 +533,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 		ch = ch & {hex(blockSize*32 - 1)};
 		index = {indexOffset} + (index << {blockSizeBit});
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
-		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
+		return _bittest((const long *)(UnicodeCaseSensitivityMask + index), ch & 31);
 	}}
 	return 0;
 }}
@@ -553,7 +555,7 @@ typedef int BOOL;
 
 BOOL IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return (UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1;
+		return _bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31);
 	}
 	if (ch > kUnicodeCaseSensitiveMax) {
 		return 0;

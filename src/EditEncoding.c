@@ -1970,7 +1970,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {
 		ch = ch & 0x7f;
 		index = 124 + (index << 2);
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
-		return (UnicodeCaseSensitivityMask[index] >> (ch & 31)) & 1;
+		return _bittest((const long *)(UnicodeCaseSensitivityMask + index), ch & 31);
 	}
 	return 0;
 }
@@ -1985,7 +1985,7 @@ BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW) {
 	uint32_t ch;
 	while ((ch = *ptr++) != 0) {
 		if (ch < kUnicodeCaseSensitiveFirst) {
-			if ((UnicodeCaseSensitivityMask[ch >> 5] >> (ch & 31)) & 1) {
+			if (_bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31)) {
 				return TRUE;
 			}
 		} else {

@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <inttypes.h>
+#include <intrin.h>
 #include "SciCall.h"
 #include "config.h"
 #include "Helpers.h"
@@ -2642,7 +2643,7 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	UpdateWindowTitle();
 }
 
-static inline BOOL IsBraceMatchChar(int ch) {
+static inline uint8_t IsBraceMatchChar(uint32_t ch) {
 #if 0
 	return ch == '(' || ch == ')'
 		|| ch == '[' || ch == ']'
@@ -2651,7 +2652,7 @@ static inline BOOL IsBraceMatchChar(int ch) {
 #else
 	// tools/GenerateTable.py
 	static const uint32_t table[8] = { 0, 0x50000300, 0x28000000, 0x28000000 };
-	return (table[ch >> 5] >> (ch & 31)) & 1;
+	return _bittest((const long *)(table + (ch >> 5)), ch & 31);
 #endif
 }
 
