@@ -284,8 +284,15 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							command = Command::Echo;
 						} else if (StrEqualsAny(s, "do", "else")) {
 							logicalVisibleChars = 0;
-						} else if (StrEqual(s, "goto")) {
-							command = Command::Goto;
+						} else if (StrEqualsAny(s, "exit", "goto")) {
+							if (StrEqual(s, "goto")) {
+								command = Command::Goto;
+							}
+							if (levelCurrent == SC_FOLDLEVELBASE + 1 && parenCount == 0 &&
+								(logicalVisibleChars == 4 || (logicalVisibleChars == 5 &&
+								LexGetPrevChar(sc.currentPos - 4, sc.styler) == '@'))) {
+								levelNext--;
+							}
 						} else if (StrEqual(s, "call")) {
 							command = Command::Call;
 							logicalVisibleChars = 0;
@@ -327,8 +334,16 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_BAT_LABEL_LINE:
-			if (sc.atLineStart) {
+			// :[label][<Space|Tab|:>comments]
+			// https://ss64.com/nt/goto.html
+			if (sc.atLineEnd) {
+				levelCurrent = SC_FOLDLEVELBASE;
+				levelNext = SC_FOLDLEVELBASE + 1;
 				sc.SetState(SCE_BAT_DEFAULT);
+			} else if (IsSpaceOrTab(sc.ch) || sc.ch == ':') {
+				levelCurrent = SC_FOLDLEVELBASE;
+				levelNext = SC_FOLDLEVELBASE + 1;
+				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsGraphic(sc.ch) && !IsLabelChar(sc.ch)) {
 				sc.ChangeState(SCE_BAT_NOT_BATCH);
 				levelNext++;
@@ -440,7 +455,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				levelNext++;
 			} else if (lineVisibleChars == 0 && sc.ch == ':') {
 				parenCount = 0;
-				if (IsLabelStart(sc.chNext)) {
+				if (IsLabelStart(sc.chNext) || IsWhiteSpace(sc.chNext)) {
 					sc.SetState(SCE_BAT_LABEL_LINE);
 				} else {
 					// unreachable label starts skipped block
@@ -561,8 +576,6 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 			if (fold) {
 				if (sc.state == SCE_BAT_LABEL_LINE) {
-					levelCurrent = SC_FOLDLEVELBASE;
-					levelNext = SC_FOLDLEVELBASE + 1;
 					if (prevLineState & BatchLineStateMaskEmptyLine) {
 						styler.SetLevel(sc.currentLine - 1, SC_FOLDLEVELBASE | (SC_FOLDLEVELBASE << 16));
 					}
