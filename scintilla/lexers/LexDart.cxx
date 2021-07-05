@@ -229,7 +229,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_DART_TRIPLE_RAWSTRING_DQ:
 			if ((sc.state == SCE_DART_TRIPLE_RAWSTRING_SQ && sc.Match('\'', '\'', '\''))
 				|| (sc.state == SCE_DART_TRIPLE_RAWSTRING_DQ && sc.Match('"', '"', '"'))) {
-				sc.Forward(2);
+				sc.Advance(2);
 				sc.ForwardSetState(SCE_DART_DEFAULT);
 			}
 			break;
@@ -258,7 +258,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					|| (sc.ch == '"' && (sc.state == SCE_DART_STRING_DQ || (sc.state == SCE_DART_TRIPLE_STRING_DQ && sc.MatchNext('"', '"'))))) {
 				if (sc.state == SCE_DART_TRIPLE_STRING_SQ || sc.state == SCE_DART_TRIPLE_STRING_DQ) {
 					sc.SetState(SCE_DART_TRIPLE_STRINGEND);
-					sc.Forward(2);
+					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_DART_DEFAULT);
 			}
@@ -312,7 +312,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.ch == '"') {
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_DART_TRIPLE_STRINGSTART);
-					sc.Forward(2);
+					sc.Advance(2);
 					sc.ForwardSetState(SCE_DART_TRIPLE_STRING_DQ);
 					continue;
 				}
@@ -320,7 +320,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '\'') {
 				if (sc.MatchNext('\'', '\'')) {
 					sc.SetState(SCE_DART_TRIPLE_STRINGSTART);
-					sc.Forward(2);
+					sc.Advance(2);
 					sc.ForwardSetState(SCE_DART_TRIPLE_STRING_SQ);
 					continue;
 				}

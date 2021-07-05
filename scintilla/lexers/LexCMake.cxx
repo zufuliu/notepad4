@@ -148,7 +148,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_CMAKE_BLOCK_COMMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
 				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
-					sc.Forward(1 + bracketNumber);
+					sc.Advance(1 + bracketNumber);
 					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
 					bracketNumber = 0;
 				}
@@ -204,7 +204,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
 				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
-					sc.Forward(1 + bracketNumber);
+					sc.Advance(1 + bracketNumber);
 					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
 					bracketNumber = 0;
 				}
@@ -263,7 +263,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			if (sc.ch == '#') {
 				if (sc.chNext == '[' && IsBracketArgument(styler, sc.currentPos + 1, true, bracketNumber)) {
 					sc.SetState(SCE_CMAKE_BLOCK_COMMENT);
-					sc.Forward(2 + bracketNumber);
+					sc.Advance(2 + bracketNumber);
 				} else {
 					sc.SetState(SCE_CMAKE_COMMENT);
 					if (visibleChars == 0) {
@@ -273,7 +273,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '[' && (sc.chNext == '=' || sc.chNext == '[')) {
 				if (IsBracketArgument(styler, sc.currentPos, true, bracketNumber)) {
 					sc.SetState(SCE_CMAKE_BRACKET_ARGUMENT);
-					sc.Forward(2 + bracketNumber);
+					sc.Advance(2 + bracketNumber);
 				}
 			} else if (sc.Match('/', '/')) { // CMakeCache.txt
 				sc.SetState(SCE_CMAKE_COMMENT);

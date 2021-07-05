@@ -257,7 +257,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		} else if (sc.ch == ']' && (sc.state == SCE_LUA_LITERALSTRING || sc.state == SCE_LUA_COMMENT)) {
 			const int sep = LongDelimCheck(sc);
 			if (sep == sepCount) {   // ]=]-style delim
-				sc.Forward(sep);
+				sc.Advance(sep);
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
 		}
@@ -283,16 +283,16 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 					sc.SetState(SCE_LUA_OPERATOR);
 				} else {
 					sc.SetState(SCE_LUA_LITERALSTRING);
-					sc.Forward(sepCount);
+					sc.Advance(sepCount);
 				}
 			} else if (sc.Match('-', '-')) {
 				sc.SetState(SCE_LUA_COMMENTLINE);
 				if (sc.GetRelative(2) == '[') {
-					sc.Forward(2);
+					sc.Advance(2);
 					sepCount = LongDelimCheck(sc);
 					if (sepCount > 0) {
 						sc.ChangeState(SCE_LUA_COMMENT);
-						sc.Forward(sepCount);
+						sc.Advance(sepCount);
 					}
 				} else {
 					sc.Forward();

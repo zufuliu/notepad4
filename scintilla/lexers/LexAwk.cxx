@@ -258,7 +258,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				const Sci_Position length = CheckFormatSpecifier(sc, insideUrl);
 				if (length != 0) {
 					sc.SetState(SCE_AWK_FORMAT_SPECIFIER);
-					sc.Forward(length);
+					sc.Advance(length);
 					sc.SetState(SCE_AWK_STRING);
 					continue;
 				}

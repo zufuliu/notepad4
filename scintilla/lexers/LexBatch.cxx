@@ -129,7 +129,7 @@ bool DetectBatchEscapeChar(StyleContext &sc, int &outerStyle, Command command) {
 
 	case '\\':
 		// Inside the regex pattern of FINDSTR
-		if (command == Command::Escape && IsPunctuation(sc.chNext)) {
+		if (command == Command::Escape && (sc.chNext == '\\' || sc.chNext == '\"')) {
 			length = 1;
 		}
 		break;
@@ -200,7 +200,7 @@ static_assert(DefaultNestedStateBaseStyle + 1 == SCE_BAT_STRINGDQ);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_BAT_STRINGSQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_BAT_STRINGBT);
 
-void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) & true;
 	int varQuoteChar = '\0'; // %var% or !var! after SetLocal EnableDelayedExpansion
 	int outerStyle = SCE_BAT_DEFAULT;
@@ -212,7 +212,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_BAT_DEFAULT;
 
-	StyleContext sc(startPos, length, initStyle, styler);
+	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	std::vector<int> nestedState;
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (sc.currentLine > 0) {

@@ -392,7 +392,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_JAVA_FORMAT_SPECIFIER);
-					sc.Forward(length);
+					sc.Advance(length);
 					sc.SetState(state);
 					continue;
 				}
@@ -401,13 +401,13 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_JAVA_PLACEHOLDER);
-					sc.Forward(length);
+					sc.Advance(length);
 					sc.SetState(state);
 					continue;
 				}
 			} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_JAVA_TRIPLE_STRING) {
-					sc.Forward(2);
+					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_JAVA_DEFAULT);
 			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
@@ -445,7 +445,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				insideUrl = false;
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_JAVA_TRIPLE_STRING);
-					sc.Forward(2);
+					sc.Advance(2);
 				} else {
 					sc.SetState(SCE_JAVA_STRING);
 				}

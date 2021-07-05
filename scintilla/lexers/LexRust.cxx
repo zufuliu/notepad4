@@ -275,7 +275,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_RUST_RAW_BYTESTRING:
 			if (sc.ch == '\"') {
 				if (hashCount == 0 || (sc.chNext == '#' && IsRustRawString(styler, sc.currentPos + 1, false, hashCount))) {
-					sc.Forward(hashCount);
+					sc.Advance(hashCount);
 					hashCount = 0;
 					sc.ForwardSetState(SCE_RUST_DEFAULT);
 				}
@@ -323,7 +323,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (IsRustRawString(styler, sc.currentPos + 2, true, hashCount)) {
 					hashCount += 1;
 					sc.SetState(SCE_RUST_RAW_STRING);
-					sc.Forward(hashCount + 1);
+					sc.Advance(hashCount + 1);
 				} else {
 					if (sc.chPrev != '.') {
 						chBeforeIdentifier = sc.chPrev;
@@ -349,7 +349,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.Match('b', 'r')) {
 				if (IsRustRawString(styler, sc.currentPos + 2, true, hashCount)) {
 					sc.SetState(SCE_RUST_RAW_BYTESTRING);
-					sc.Forward(hashCount + 2);
+					sc.Advance(hashCount + 2);
 				} else {
 					if (sc.chPrev != '.') {
 						chBeforeIdentifier = sc.chPrev;

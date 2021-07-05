@@ -295,8 +295,7 @@ constexpr bool IsCommentTagPrev(int chPrev) noexcept {
 }
 
 constexpr bool IsInvalidUrlChar(int ch) noexcept {
-	return ch <= 32 || ch >= 127
-		|| AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}');
+	return ch <= 32 || AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}', 127);
 }
 
 // characters can follow jump `label:`, based on Swift's document Labeled Statement at

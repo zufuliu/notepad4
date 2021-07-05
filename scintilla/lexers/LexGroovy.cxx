@@ -340,7 +340,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 			} else if (sc.ch == '\'' && (sc.state == SCE_GROOVY_STRING_SQ || sc.MatchNext('\'', '\''))) {
 				if (sc.state == SCE_GROOVY_TRIPLE_STRING_SQ) {
-					sc.Forward(2);
+					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
 			}
@@ -367,7 +367,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '"' && (sc.state == SCE_GROOVY_STRING_DQ || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_GROOVY_TRIPLE_STRING_DQ) {
 					sc.SetState(SCE_GROOVY_TRIPLE_STRING_DQEND);
-					sc.Forward(2);
+					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
 			}
@@ -459,7 +459,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '\"') {
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_GROOVY_TRIPLE_STRING_DQSTART);
-					sc.Forward(2);
+					sc.Advance(2);
 					sc.ForwardSetState(SCE_GROOVY_TRIPLE_STRING_DQ);
 					continue;
 				}
@@ -467,7 +467,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '\'') {
 				if (sc.MatchNext('\'', '\'')) {
 					sc.SetState(SCE_GROOVY_TRIPLE_STRING_SQ);
-					sc.Forward(2);
+					sc.Advance(2);
 				} else {
 					sc.SetState(SCE_GROOVY_STRING_SQ);
 				}

@@ -117,8 +117,8 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (sc.ch == '\\') {
 				// highlight any character as escape sequence.
 				sc.SetState(SCE_AVS_ESCAPECHAR);
-				sc.Forward(2);
-				sc.SetState(SCE_AVS_STRING);
+				sc.Forward();
+				sc.ForwardSetState(SCE_AVS_STRING);
 				continue;
 			}
 			if (sc.ch == '"') {
@@ -128,7 +128,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_AVS_TRIPLESTRING:
 			if (sc.Match('"', '"', '"')) {
-				sc.Forward(2);
+				sc.Advance(2);
 				sc.ForwardSetState(SCE_AVS_DEFAULT);
 			}
 			break;
@@ -191,7 +191,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.ch == '"') {
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_AVS_TRIPLESTRING);
-					sc.Forward(2);
+					sc.Advance(2);
 					if (scriptEval == ScriptEvalState_Paren) {
 						// first argument
 						insideScript = AviSynthLineStateMaskInsideScript;

@@ -221,7 +221,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_TRIPLE_STRING_SQ:
 			if (sc.Match('\'', '\'', '\'')) {
-				sc.Forward(2);
+				sc.Advance(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
 			break;
@@ -232,7 +232,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_TOML_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.Match('"', '"', '"')) {
-				sc.Forward(2);
+				sc.Advance(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
 			break;
@@ -284,14 +284,14 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else if (sc.ch == '\'') {
 					if (sc.MatchNext('\'', '\'')) {
 						sc.SetState(SCE_TOML_TRIPLE_STRING_SQ);
-						sc.Forward(2);
+						sc.Advance(2);
 					} else {
 						sc.SetState(SCE_TOML_STRING_SQ);
 					}
 				} else if (sc.ch == '"') {
 					if (sc.MatchNext('"', '"')) {
 						sc.SetState(SCE_TOML_TRIPLE_STRING_DQ);
-						sc.Forward(2);
+						sc.Advance(2);
 					} else {
 						sc.SetState(SCE_TOML_STRING_DQ);
 					}

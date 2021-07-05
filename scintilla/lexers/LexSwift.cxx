@@ -256,7 +256,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				|| (sc.state == SCE_SWIFT_TRIPLE_STRING && sc.MatchNext('"', '"')))) {
 				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
 					sc.SetState(SCE_SWIFT_TRIPLE_STRINGEND);
-					sc.Forward(2);
+					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_SWIFT_DEFAULT);
 			}
@@ -271,7 +271,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_SWIFT_ESCAPECHAR);
 				sc.Forward();
 				if (CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Escape, delimiterCount)) {
-					sc.Forward(delimiterCount);
+					sc.Advance(delimiterCount);
 					if (sc.ch == '(') {
 						nestedState.push_back(state);
 						sc.SetState(SCE_SWIFT_OPERATOR2);
@@ -288,7 +288,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					if (sc.state == SCE_SWIFT_TRIPLE_STRING_ED) {
 						sc.SetState(SCE_SWIFT_TRIPLE_STRING_EDEND);
 					}
-					sc.Forward(delimiterCount + offset);
+					sc.Advance(delimiterCount + offset);
 					sc.SetState(SCE_SWIFT_DEFAULT);
 					delimiterCount = TryPopAndPeek(delimiters);
 				} else {
@@ -319,7 +319,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			if (sc.ch == '"') {
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
-					sc.Forward(2);
+					sc.Advance(2);
 					sc.ForwardSetState(SCE_SWIFT_TRIPLE_STRING);
 					continue;
 				}
@@ -342,10 +342,10 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						delimiterCount = delimiter;
 						delimiters.push_back(delimiter);
 						sc.SetState(SCE_SWIFT_STRING_ED);
-						sc.Forward(delimiter);
+						sc.Advance(delimiter);
 						if (sc.Match('"', '"', '"')) {
 							sc.ChangeState(SCE_SWIFT_TRIPLE_STRING_EDSTART);
-							sc.Forward(2);
+							sc.Advance(2);
 							sc.ForwardSetState(SCE_SWIFT_TRIPLE_STRING_ED);
 							continue;
 						}

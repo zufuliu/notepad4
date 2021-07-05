@@ -279,7 +279,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.ch == '\'') {
 				if (sc.chNext == '\'') {
 					sc.SetState(SCE_YAML_ESCAPECHAR);
-					sc.Forward(2);
+					sc.Advance(2);
 					sc.SetState(SCE_YAML_STRING_SQ);
 					continue;
 				}
@@ -338,7 +338,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				braceCount = 0;
 				visibleChars = 1;
 				sc.SetState(SCE_YAML_DOCUMENT);
-				sc.Forward(3);
+				sc.Advance(3);
 				const int chNext = sc.GetLineNextChar();
 				if (chNext != '\0') {
 					sc.SetState(SCE_YAML_DEFAULT);
@@ -355,7 +355,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '!') {
 				if (sc.chNext == '<') {
 					sc.SetState(SCE_YAML_VERBATIM_TAG);
-					sc.Forward(2);
+					sc.Advance(2);
 				} else {
 					sc.SetState(SCE_YAML_TAG);
 				}

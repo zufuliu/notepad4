@@ -339,7 +339,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_GO_FORMAT_SPECIFIER);
-					sc.Forward(length);
+					sc.Advance(length);
 					sc.SetState(state);
 					continue;
 				}

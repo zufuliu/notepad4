@@ -227,15 +227,23 @@ public:
 		chPrev = 0;
 		if (!multiByteAccess) {
 			ch = static_cast<unsigned char>(styler[startPos]);
+			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(startPos + 1));
 		} else {
 			ch =  styler.GetCharacterAndWidth(startPos, &widthNext);
 			width = widthNext;
+			chNext = styler.GetCharacterAndWidth(startPos + width, &widthNext);
 		}
-		GetNextChar();
+		atLineEnd = startPos >= lineStartNext - (currentLine < lineDocEnd);
 	}
 
 	void Rewind() noexcept {
 		SeekTo(styler.GetStartSegment());
+	}
+
+	void Advance(Sci_Position nb) noexcept {
+		if (nb) {
+			SeekTo(currentPos + nb);
+		}
 	}
 
 	bool LineEndsWith(char ch0) const noexcept {

@@ -80,10 +80,10 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 				}
 			} else if (sc.chPrev == '\\') {
 				if (IsCmdEnd(5) && sc.Match("begin{")) {
-					sc.Forward(5);
+					sc.Advance(5);
 					sc.SetState(SCE_L_TAG);
 				} else if (IsCmdEnd(3) && sc.Match("end{")) {
-					sc.Forward(3);
+					sc.Advance(3);
 					sc.SetState(SCE_L_TAG2);
 				} else if ((IsCmdEnd(7) && (sc.Match("chapter") || sc.Match("section") || sc.Match("caption")))
 					|| (IsCmdEnd(5) && sc.Match("title"))) {
@@ -96,7 +96,7 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 				} else if (sc.Match("left[") || sc.Match("Big[")) {
 					isSquareBrace = true;
 				} else if (sc.Match("verb")) {
-					sc.Forward(4);
+					sc.Advance(4);
 					if (!IsAlpha(sc.ch)) {
 						if (sc.ch == '*')
 							sc.Forward();
@@ -140,13 +140,13 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 				sc.ForwardSetState(SCE_L_DEFAULT);
 			} else if (sc.chPrev == '{') {
 				if (sc.Match("verbatim}")) {
-					sc.Forward(8);
+					sc.Advance(8);
 					sc.ForwardSetState(SCE_L_VERBATIM2);
 				} else if (sc.Match("lstlisting}")) {
-					sc.Forward(10);
+					sc.Advance(10);
 					sc.ForwardSetState(SCE_L_LISTCODE);
 				} else if (sc.Match("comment}")) {
-					sc.Forward(7);
+					sc.Advance(7);
 					sc.ForwardSetState(SCE_L_COMMENT2);
 				}
 			}

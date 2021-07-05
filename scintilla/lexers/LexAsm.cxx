@@ -188,13 +188,12 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			}
 		} else if (sc.state == SCE_ASM_COMMENT) {
 			if (sc.Match('*', '/')) {
-				sc.Forward(2);
-				sc.SetState(SCE_ASM_DEFAULT);
+				sc.Forward();
+				sc.ForwardSetState(SCE_ASM_DEFAULT);
 			}
 		} else if (sc.state == SCE_ASM_COMMENT2) {
 			if (sc.ch == '*') {
-				sc.Forward();
-				sc.SetState(SCE_ASM_DEFAULT);
+				sc.ForwardSetState(SCE_ASM_DEFAULT);
 			}
 		} else if (sc.state == SCE_ASM_STRING) {
 			if (sc.ch == '\\') {
@@ -270,7 +269,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					const Sci_PositionU len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
 					if (kwProprocessor.InList(pp)) {
 						sc.SetState(SCE_ASM_PREPROCESSOR);
-						sc.Forward(pos - sc.currentPos + len);
+						sc.Advance(pos - sc.currentPos + len);
 						if (StrEqual(pp, "include")) {
 							isIncludePreprocessor = true;
 							if (!sc.atLineEnd)
