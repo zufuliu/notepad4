@@ -1216,7 +1216,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 			const int styleMain = ll->styles[eolPos];
 			const std::optional<ColourRGBA> selectionFore = SelectionForeground(model, vsDraw, eolInSelection);
 			ColourRGBA textFore = selectionFore.value_or(vsDraw.styles[styleMain].fore);
-			char hexits[4] = "";
+			char hexits[4];
 			std::string_view ctrlChar;
 			Sci::Position widthBytes = 1;
 			RepresentationAppearance appearance = RepresentationAppearance::Blob;
@@ -1240,6 +1240,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 					hexits[0] = 'x';
 					hexits[1] = "0123456789ABCDEF"[chEOL >> 4];
 					hexits[2] = "0123456789ABCDEF"[chEOL & 15];
+					hexits[3] = '\0';
 					ctrlChar = hexits;
 				}
 			}

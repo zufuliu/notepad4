@@ -217,6 +217,15 @@ static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcep
 }
 #endif
 
+#if NP2_TARGET_ARM
+static inline uint8_t bittest(const uint32_t *addr, uint32_t index) {
+	return (*addr >> index) & 1;
+}
+#else
+static inline uint8_t bittest(const uint32_t *addr, uint32_t index) {
+	return _bittest((const long *)addr, index);
+}
+#endif
 
 #if defined(__cplusplus)
 namespace np2 {

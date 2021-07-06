@@ -1961,7 +1961,7 @@ static const uint32_t UnicodeCaseSensitivityMask[] = {
 };
 
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax]
-static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {
+static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {
 	uint32_t block = ch >> 7;
 	uint32_t index = UnicodeCaseSensitivityIndex[block & 0x7f];
 	block = index ^ (block >> 2);
@@ -1970,7 +1970,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {
 		ch = ch & 0x7f;
 		index = 124 + (index << 2);
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
-		return _bittest((const long *)(UnicodeCaseSensitivityMask + index), ch & 31);
+		return bittest(UnicodeCaseSensitivityMask + index, ch & 31);
 	}
 	return 0;
 }
@@ -1985,7 +1985,7 @@ BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW) {
 	uint32_t ch;
 	while ((ch = *ptr++) != 0) {
 		if (ch < kUnicodeCaseSensitiveFirst) {
-			if (_bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31)) {
+			if (bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31)) {
 				return TRUE;
 			}
 		} else {

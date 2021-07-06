@@ -29,8 +29,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <inttypes.h>
-#include <intrin.h>
 #include "SciCall.h"
+#include "VectorISA.h"
 #include "config.h"
 #include "Helpers.h"
 #include "Notepad2.h"
@@ -2652,7 +2652,7 @@ static inline uint8_t IsBraceMatchChar(uint32_t ch) {
 #else
 	// tools/GenerateTable.py
 	static const uint32_t table[8] = { 0, 0x50000300, 0x28000000, 0x28000000 };
-	return _bittest((const long *)(table + (ch >> 5)), ch & 31);
+	return bittest(table + (ch >> 5), ch & 31);
 #endif
 }
 

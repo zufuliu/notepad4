@@ -289,9 +289,8 @@ def checkUnicodeCaseSensitivity(filename=None):
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <cstdint>
-#include <intrin.h>
+#include "../include/VectorISA.h"
 #define COUNTOF(a)		(sizeof(a) / sizeof(a[0]))
-typedef int BOOL;
 
 typedef struct UnicodeCaseSensitivityRange {
 	uint32_t low;
@@ -302,9 +301,9 @@ typedef struct UnicodeCaseSensitivityRange {
 """)
 		fd.write('\n'.join(output))
 		fd.write(r"""
-BOOL IsCharacterCaseSensitive(uint32_t ch) {
+int IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return _bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31);
+		return bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31);
 	}
 	for (uint32_t index = 0; index < COUNTOF(UnicodeCaseSensitivityRangeList); index++) {
 		const UnicodeCaseSensitivityRange range = UnicodeCaseSensitivityRangeList[index];
@@ -314,7 +313,7 @@ BOOL IsCharacterCaseSensitive(uint32_t ch) {
 			}
 			if (range.offset)  {
 				ch -= range.low;
-				return _bittest((const long *)(UnicodeCaseSensitivityMask + range.offset + (ch >> 5)), ch & 31);
+				return bittest(UnicodeCaseSensitivityMask + range.offset + (ch >> 5), ch & 31);
 			}
 			return 1;
 		}
@@ -374,13 +373,13 @@ def updateCaseSensitivity(filename, test=False):
 
 	function = """
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax]
-static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
+static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	const uint32_t lower = ch & 31;
 	ch = (ch - kUnicodeCaseSensitiveFirst) >> 5;
 	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
 	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
 	ch = {table}[{offsetD} + ch];
-	return _bittest((const long *)(UnicodeCaseSensitivityMask + ch), lower);
+	return bittest(UnicodeCaseSensitivityMask + ch, lower);
 }}
 """.format(**args)
 	output.extend(function.splitlines())
@@ -391,16 +390,15 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <cstdint>
-#include <intrin.h>
-typedef int BOOL;
+#include "../include/VectorISA.h"
 
 """)
 		fd.write('\n'.join(output))
 		fd.write(r"""
 
-BOOL IsCharacterCaseSensitive(uint32_t ch)	{
+int IsCharacterCaseSensitive(uint32_t ch)	{
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return _bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31);
+		return bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31);
 	}
 	if (ch > kUnicodeCaseSensitiveMax) {
 		return 0;
@@ -524,7 +522,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 	# when diff < 0, diff >> 8 has 24-bit (or 32-bit using arithmetic shift right) 1s on the right.
 	function = f"""
 // case sensitivity for ch in [kUnicodeCaseSensitiveFirst, kUnicodeCaseSensitiveMax]
-static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
+static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 	uint32_t block = ch >> {blockSizeBit + 5};
 	uint32_t index = UnicodeCaseSensitivityIndex[block & {hex(blockIndexCount - 1)}];
 	block = index ^ (block >> {blockIndexValueBit - indexBitCount});
@@ -533,7 +531,7 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 		ch = ch & {hex(blockSize*32 - 1)};
 		index = {indexOffset} + (index << {blockSizeBit});
 		index = UnicodeCaseSensitivityIndex[index + (ch >> 5)];
-		return _bittest((const long *)(UnicodeCaseSensitivityMask + index), ch & 31);
+		return bittest(UnicodeCaseSensitivityMask + index, ch & 31);
 	}}
 	return 0;
 }}
@@ -546,16 +544,15 @@ static inline BOOL IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 
 	with open(filename, 'w', encoding='utf-8') as fd:
 		fd.write(r"""#include <cstdint>
-#include <intrin.h>
-typedef int BOOL;
+#include "../include/VectorISA.h"
 
 """)
 		fd.write('\n'.join(output))
 		fd.write(r"""
 
-BOOL IsCharacterCaseSensitive(uint32_t ch) {
+int IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return _bittest((const long *)(UnicodeCaseSensitivityMask + (ch >> 5)), ch & 31);
+		return bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31);
 	}
 	if (ch > kUnicodeCaseSensitiveMax) {
 		return 0;
