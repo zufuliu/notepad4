@@ -66,11 +66,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 
 // https://pkg.go.dev/fmt
 
-constexpr bool IsFormatFlag(int ch) noexcept {
-	return AnyOf(ch, ' ', '+', '-', '#', '.', '0');
-}
-
-constexpr bool IsFormatSpecifier(int ch) noexcept {
+constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'v',
 					'b',
 					'c',
@@ -87,7 +83,7 @@ constexpr bool IsFormatSpecifier(int ch) noexcept {
 					'x', 'X');
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -101,18 +97,65 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (IsFormatFlag(sc.chNext)) {
-		++pos;
+	// flags
+	char ch = styler.SafeGetCharAt(pos);
+	while (AnyOf(ch, ' ', '+', '-', '#', '0')) {
+		ch = styler.SafeGetCharAt(++pos);
 	}
-	while (pos < sc.lineStartNext) {
-		const uint8_t ch = sc.styler[pos];
-		if (IsFormatSpecifier(ch)) {
-			return pos - sc.currentPos + 1;
+	// argument index
+	if (ch == '[') {
+		ch = styler.SafeGetCharAt(++pos);
+		while (IsADigit(ch))  {
+			ch = styler.SafeGetCharAt(++pos);
 		}
-		if (!(IsADigit(ch) || ch == '*' || ch == '.' || ch == '[' || ch == ']')) {
-			break;
+		if (ch == ']') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else {
+			return 0;
 		}
-		++pos;
+	}
+	// width
+	if (ch == '*') {
+		ch = styler.SafeGetCharAt(++pos);
+	} else if (ch == '[') {
+		ch = styler.SafeGetCharAt(++pos);
+		while (IsADigit(ch))  {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		if (ch == ']') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else {
+			return 0;
+		}
+	} else {
+		while (IsADigit(ch))  {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+	}
+	// precision
+	if (ch == '.') {
+		ch = styler.SafeGetCharAt(++pos);
+		if (ch == '*') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else if (ch == '[') {
+			ch = styler.SafeGetCharAt(++pos);
+			while (IsADigit(ch))  {
+				ch = styler.SafeGetCharAt(++pos);
+			}
+			if (ch == ']') {
+				ch = styler.SafeGetCharAt(++pos);
+			} else {
+				return 0;
+			}
+		} else {
+			while (IsADigit(ch))  {
+				ch = styler.SafeGetCharAt(++pos);
+			}
+		}
+	}
+	// verb
+	if (IsFormatSpecifier(ch)) {
+		return pos - sc.currentPos + 1;
 	}
 	return 0;
 }
@@ -335,7 +378,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(sc, insideUrl);
+				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_GO_FORMAT_SPECIFIER);

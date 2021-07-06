@@ -56,11 +56,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_AWK_TASKMARKER;
 }
 
-constexpr bool IsFormatModifier(int ch) noexcept {
-	return AnyOf(ch, ' ', '+', '-', '#', '.', '0', '\'');
-}
-
-constexpr bool IsFormatSpecifier(int ch) noexcept {
+constexpr bool IsFormatSpecifier(char ch) noexcept {
 	// https://www.gnu.org/software/gawk/manual/html_node/Control-Letters.html
 	return AnyOf(ch, 'a', 'A',
 					'c',
@@ -106,13 +102,13 @@ constexpr bool IsTimeFormatSpecifier(int ch) noexcept {
 	);
 }
 
-constexpr bool IsTimeFormatSpecifier(int ch, int chNext) noexcept {
+constexpr bool IsTimeFormatSpecifier(int ch, char chNext) noexcept {
 	// Alternative representations
 	return (ch == 'E' && AnyOf(chNext, 'c', 'C', 'x', 'X', 'y', 'Y'))
 		|| (ch == 'O' && AnyOf(chNext, 'd', 'e', 'H', 'I', 'm', 'M', 'S', 'u', 'U', 'V', 'w', 'W', 'y'));
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -129,28 +125,48 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (IsFormatModifier(sc.chNext)) {
-		++pos;
-	} else if (sc.chNext == 'E' || sc.chNext == 'O') {
-		const uint8_t ch = sc.styler.SafeGetCharAt(pos + 2);
+	if (sc.chNext == 'E' || sc.chNext == 'O') {
+		const char ch = styler.SafeGetCharAt(pos + 2);
 		if (IsTimeFormatSpecifier(sc.chNext, ch)) {
 			return 3;
 		}
 	}
-	while (pos < sc.lineStartNext) {
-		const uint8_t ch = sc.styler[pos];
-		if (IsFormatSpecifier(ch)) {
-			return pos - sc.currentPos + 1;
+
+	// https://www.gnu.org/software/gawk/manual/html_node/Format-Modifiers.html
+	char ch = styler.SafeGetCharAt(pos);
+	// positional specifier
+	while (IsADigit(ch)) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	if (ch == '$' && IsADigit(sc.chNext)) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// modifiers
+	while (AnyOf(ch, ' ', '+', '-', '#', '0', '\'')) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// width
+	if (ch == '*') {
+		ch = styler.SafeGetCharAt(++pos);
+	} else {
+		while (IsADigit(ch)) {
+			ch = styler.SafeGetCharAt(++pos);
 		}
-		if (ch == '$') {
-			const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
-			if (IsFormatModifier(chNext)) {
-				++pos;
+	}
+	// .precision
+	if (ch == '.') {
+		ch = styler.SafeGetCharAt(++pos);
+		if (ch == '*') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else {
+			while (IsADigit(ch)) {
+				ch = styler.SafeGetCharAt(++pos);
 			}
-		} else if (!(IsADigit(ch) || ch == '*' || ch == '.')) {
-			break;
 		}
-		++pos;
+	}
+	// format-control letter
+	if (IsFormatSpecifier(ch)) {
+		return pos - sc.currentPos + 1;
 	}
 	return 0;
 }
@@ -255,7 +271,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.SetState(SCE_AWK_DEFAULT);
 				}
 			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(sc, insideUrl);
+				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 				if (length != 0) {
 					sc.SetState(SCE_AWK_FORMAT_SPECIFIER);
 					sc.Advance(length);

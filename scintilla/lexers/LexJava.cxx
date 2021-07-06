@@ -69,13 +69,9 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 // for java.util.Formatter
-// https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/util/Formatter.html
+// https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/util/Formatter.html
 
-constexpr bool IsFormatFlag(int ch) noexcept {
-	return AnyOf(ch, ' ', '+', '-', '#', '.', '0', '<', '(', ',');
-}
-
-constexpr bool IsFormatSpecifier(int ch) noexcept {
+constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'a', 'A',
 					'b', 'B',
 					'c', 'C',
@@ -90,13 +86,13 @@ constexpr bool IsFormatSpecifier(int ch) noexcept {
 					'x', 'X');
 }
 
-constexpr bool IsDateTimeFormatSpecifier(int ch) noexcept {
+constexpr bool IsDateTimeFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'H', 'I', 'k', 'l', 'M', 'S', 'L', 'N', 'p', 'z', 'Z', 's', 'Q', // time
 		'B', 'b', 'h', 'A', 'a', 'C', 'Y', 'y', 'j', 'm', 'd', 'e', // date
 		'R', 'T', 'r', 'D', 'F', 'c'); // date/time
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl) noexcept {
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -110,49 +106,41 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, bool insideUrl)
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	if (IsFormatFlag(sc.chNext)) {
+	// [argument_index$]
+	if (sc.chNext == '<') {
 		++pos;
 	}
-	while (pos < sc.lineStartNext) {
-		const uint8_t ch = sc.styler[pos];
-		if (IsFormatSpecifier(ch)) {
-			return pos - sc.currentPos + 1;
-		}
-		if (ch == 't' || ch == 'T') {
-			const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
-			if (IsDateTimeFormatSpecifier(chNext)) {
-				return pos - sc.currentPos + 2;
-			}
-			break;
-		}
-		if (ch == '$') {
-			const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
-			if (IsFormatFlag(chNext)) {
-				++pos;
-			}
-		} else if (!(IsADigit(ch) || ch == '*' || ch == '.' || ch == ',')) {
-			break;
-		}
-		++pos;
+	char ch = styler.SafeGetCharAt(pos);
+	while (IsADigit(ch)) {
+		ch = styler.SafeGetCharAt(++pos);
 	}
-	return 0;
-}
-
-inline Sci_Position CheckPlaceholder(const StyleContext &sc) noexcept {
-	if (IsADigit(sc.chNext)) {
-		// for java.text.MessageFormat, only simplest form: {num}
-		// https://docs.oracle.com/en/java/javase/15/docs/api/java.base/java/text/MessageFormat.html
-		Sci_PositionU pos = sc.currentPos + 2;
-		while (pos < sc.lineStartNext) {
-			const uint8_t ch = sc.styler[pos];
-			if (ch == '}') {
-				return pos - sc.currentPos + 1;
-			}
-			if (!IsADigit(ch)) {
-				break;
-			}
-			++pos;
+	if (ch == '$' && IsADigit(sc.chNext)) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [flags]
+	while (AnyOf(ch, ' ', '+', '-', '#', '0', '(', ',')) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [width]
+	while (IsADigit(ch)) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [.precision]
+	if (ch == '.') {
+		ch = styler.SafeGetCharAt(++pos);
+		while (IsADigit(ch)) {
+			ch = styler.SafeGetCharAt(++pos);
 		}
+	}
+	// conversion
+	if (ch == 't' || ch == 'T') {
+		const char chNext = sc.styler.SafeGetCharAt(pos + 1);
+		if (IsDateTimeFormatSpecifier(chNext)) {
+			return pos - sc.currentPos + 2;
+		}
+	}
+	if (IsFormatSpecifier(ch)) {
+		return pos - sc.currentPos + 1;
 	}
 	return 0;
 }
@@ -388,7 +376,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				}
 			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(sc, insideUrl);
+				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 				if (length != 0) {
 					const int state = sc.state;
 					sc.SetState(SCE_JAVA_FORMAT_SPECIFIER);
@@ -397,13 +385,9 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					continue;
 				}
 			} else if (sc.ch == '{') {
-				const Sci_Position length = CheckPlaceholder(sc);
-				if (length != 0) {
-					const int state = sc.state;
+				if (IsADigit(sc.chNext)) {
+					escSeq.outerState = sc.state;
 					sc.SetState(SCE_JAVA_PLACEHOLDER);
-					sc.Advance(length);
-					sc.SetState(state);
-					continue;
 				}
 			} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_JAVA_TRIPLE_STRING) {
@@ -419,6 +403,20 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_JAVA_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
+				sc.SetState(escSeq.outerState);
+				continue;
+			}
+			break;
+
+		case SCE_JAVA_PLACEHOLDER:
+			// for java.text.MessageFormat, only simplest form: {num}
+			// https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/text/MessageFormat.html
+			if (!IsADigit(sc.ch)) {
+				if (sc.ch != '}') {
+					sc.Rewind();
+					sc.ChangeState(escSeq.outerState);
+				}
+				sc.Forward();
 				sc.SetState(escSeq.outerState);
 				continue;
 			}

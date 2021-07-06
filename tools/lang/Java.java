@@ -4,7 +4,7 @@
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
 
 //! keywords		===========================================================
-// https://docs.oracle.com/javase/specs/jls/se15/html/jls-3.html#jls-3.9
+// https://docs.oracle.com/javase/specs/jls/se16/html/jls-3.html#jls-3.9
 abstract assert
 break
 case catch
@@ -26,15 +26,15 @@ while
 false true null
 
 // Blocks and Statements
-// https://docs.oracle.com/javase/specs/jls/se15/html/jls-14.html
+// https://docs.oracle.com/javase/specs/jls/se16/html/jls-14.html
 var yield
 
 // Sealed Classes
-// https://docs.oracle.com/javase/specs/jls/se15/preview/specs/sealed-classes-jls.html
+// https://docs.oracle.com/javase/specs/jls/se16/preview/specs/sealed-classes-jls.html
 sealed non-sealed
 
 // Records
-// https://docs.oracle.com/javase/specs/jls/se15/preview/specs/records-jls.html
+// https://docs.oracle.com/javase/specs/jls/se16/preview/specs/records-jls.html
 record
 
 // Android IDL
@@ -45,7 +45,7 @@ boolean byte char double float int long short void
 
 //! directive		===========================================================
 // Packages and Modules
-// https://docs.oracle.com/javase/specs/jls/se15/html/jls-7.html
+// https://docs.oracle.com/javase/specs/jls/se16/html/jls-7.html
 open module
 requires
 exports to
@@ -55,7 +55,7 @@ provides with
 transitive static
 
 //! API				===========================================================
-// https://docs.oracle.com/en/java/javase/15/docs/api/index.html
+// https://docs.oracle.com/en/java/javase/16/docs/api/index.html
 
 module java.base {
 
