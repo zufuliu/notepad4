@@ -300,6 +300,11 @@ LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 	return status;
 }
 
+LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) {
+	LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_DWORD, (const BYTE *)(&value), sizeof(DWORD));
+	return status;
+}
+
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 LSTATUS Registry_DeleteTree(HKEY hKey, LPCWSTR lpSubKey) {
 	typedef LSTATUS (WINAPI *RegDeleteTreeSig)(HKEY hKey, LPCWSTR lpSubKey);

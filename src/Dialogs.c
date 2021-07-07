@@ -2523,6 +2523,7 @@ HKEY_CLASSES_ROOT\Applications\Notepad2.exe
 
 HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe
 	Debugger				REG_SZ		"Notepad2.exe" /z
+	UseFilter				REG_DWORD	0
 */
 extern BOOL fIsElevated;
 extern int flagUseSystemMRU;
@@ -2660,6 +2661,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
+			Registry_SetInt(hKey, L"UseFilter", 0);
 			RegCloseKey(hKey);
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {

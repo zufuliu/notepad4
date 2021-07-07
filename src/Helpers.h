@@ -586,6 +586,7 @@ NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL
 
 LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName);
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText);
+LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value);
 #define Registry_GetDefaultString(hKey)				Registry_GetString((hKey), NULL)
 #define Registry_SetDefaultString(hKey, lpszText)	Registry_SetString((hKey), NULL, (lpszText))
 NP2_inline LSTATUS Registry_CreateKey(HKEY hKey, LPCWSTR lpSubKey, PHKEY phkResult) {
