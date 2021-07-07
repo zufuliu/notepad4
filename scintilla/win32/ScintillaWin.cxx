@@ -1558,22 +1558,15 @@ sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) const {
 		sizeRequestedRange = pdoc->Length();
 	}
 	std::string docBytes(sizeRequestedRange, '\0');
-	pdoc->GetCharRange(&docBytes[0], 0, sizeRequestedRange);
-	if (IsUnicodeMode()) {
-		const size_t uLen = UTF16FromUTF8(docBytes, ptr, lengthWanted);
-		ptr[uLen] = L'\0';
-		return uLen;
-	} else {
-		// Not Unicode mode
-		// Convert to Unicode using the current Scintilla code page
-		const UINT cpSrc = CodePageOfDocument();
-		int lengthUTF16 = WideCharLenFromMultiByte(cpSrc, docBytes);
-		if (lengthUTF16 > lengthWanted)
-			lengthUTF16 = static_cast<int>(lengthWanted);
-		WideCharFromMultiByte(cpSrc, docBytes, ptr, lengthUTF16);
-		ptr[lengthUTF16] = L'\0';
-		return lengthUTF16;
-	}
+	pdoc->GetCharRange(docBytes.data(), 0, sizeRequestedRange);
+	// Convert to Unicode using the current Scintilla code page
+	const UINT cpSrc = CodePageOfDocument();
+	int lengthUTF16 = WideCharLenFromMultiByte(cpSrc, docBytes);
+	if (lengthUTF16 > lengthWanted)
+		lengthUTF16 = static_cast<int>(lengthWanted);
+	WideCharFromMultiByte(cpSrc, docBytes, ptr, lengthUTF16);
+	ptr[lengthUTF16] = L'\0';
+	return lengthUTF16;
 }
 
 Window::Cursor ScintillaWin::ContextCursor(Point pt) {
@@ -3313,24 +3306,16 @@ void ScintillaWin::GetIntelliMouseParameters() noexcept {
 void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) {
 	const std::string_view svSelected(selectedText.Data(), selectedText.LengthWithTerminator());
 	switch (encoding) {
-	case CopyEncoding::Unicode:
-		if (IsUnicodeMode()) {
-			const size_t uchars = UTF16Length(svSelected);
-			gmUnicode.Allocate(2 * uchars);
-			if (gmUnicode) {
-				UTF16FromUTF8(svSelected, static_cast<wchar_t *>(gmUnicode.ptr), uchars);
-			}
-		} else {
-			// Not Unicode mode
-			// Convert to Unicode using the current Scintilla code page
-			const UINT cpSrc = selectedText.codePage;
-			const size_t uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
-			gmUnicode.Allocate(2 * uLen);
-			if (gmUnicode) {
-				WideCharFromMultiByte(cpSrc, svSelected, static_cast<wchar_t *>(gmUnicode.ptr), uLen);
-			}
+	case CopyEncoding::Unicode: {
+		// Convert to Unicode using the current Scintilla code page
+		const UINT cpSrc = selectedText.codePage;
+		const size_t uLen = WideCharLenFromMultiByte(cpSrc, svSelected);
+		gmUnicode.Allocate(2 * uLen);
+		if (gmUnicode) {
+			WideCharFromMultiByte(cpSrc, svSelected, static_cast<wchar_t *>(gmUnicode.ptr), uLen);
 		}
-		break;
+	}
+	break;
 
 	case CopyEncoding::Ansi: {
 		std::string s;

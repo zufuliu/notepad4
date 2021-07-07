@@ -244,12 +244,12 @@ std::wstring WStringFromUTF8(std::string_view svu8) {
 	if constexpr (sizeof(wchar_t) == 2) {
 		const size_t len16 = UTF16Length(svu8);
 		std::wstring ws(len16, 0);
-		UTF16FromUTF8(svu8, &ws[0], len16);
+		UTF16FromUTF8(svu8, ws.data(), len16);
 		return ws;
 	} else {
 		const size_t len32 = UTF32Length(svu8);
 		std::wstring ws(len32, 0);
-		UTF32FromUTF8(svu8, reinterpret_cast<unsigned int *>(&ws[0]), len32);
+		UTF32FromUTF8(svu8, reinterpret_cast<unsigned int *>(ws.data()), len32);
 		return ws;
 	}
 }
