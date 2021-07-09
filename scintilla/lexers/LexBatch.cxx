@@ -28,7 +28,8 @@ namespace {
 
 enum {
 	BatchLineStateMaskEmptyLine = 1 << 0,
-	BatchLineStateLineContinuation = 1 << 1,
+	BatchLineStateMaskCommentLine = 1 << 1,
+	BatchLineStateLineContinuation = 1 << 2,
 };
 
 enum class Command {
@@ -200,6 +201,10 @@ static_assert(DefaultNestedStateBaseStyle + 1 == SCE_BAT_STRINGDQ);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_BAT_STRINGSQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_BAT_STRINGBT);
 
+constexpr bool IsCommentLine(int lineState) noexcept {
+	return (lineState & BatchLineStateMaskCommentLine) != 0;
+}
+
 void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool fold = styler.GetPropertyInt("fold", 1) & true;
 	int varQuoteChar = '\0'; // %var% or !var! after SetLocal EnableDelayedExpansion
@@ -207,6 +212,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int logicalVisibleChars = 0;
 	int lineVisibleChars = 0;
 	int prevLineState = 0;
+	int prev2LineState = 0;
 	Command command = Command::None;
 	int parenCount = 0;
 	int chPrevNonWhite = 0;
@@ -219,10 +225,12 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		levelCurrent = styler.LevelAt(sc.currentLine - 1) >> 16;
 		int lineState = styler.GetLineState(sc.currentLine - 1);
 		prevLineState = lineState;
+		prev2LineState = styler.GetLineState(sc.currentLine - 2);
 		/*
 		1: empty line
+		1: comment line
 		1: line continuation
-		2: unused
+		1: unused
 		4: command
 		8: parenCount
 		3*4: nestedState
@@ -243,6 +251,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 	int levelNext = levelCurrent;
 	int parenBefore = parenCount;
+	bool labelLine = false;
 
 	while (sc.More()) {
 		switch (sc.state) {
@@ -288,9 +297,8 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 							if (StrEqual(s, "goto")) {
 								command = Command::Goto;
 							}
-							if (levelCurrent == SC_FOLDLEVELBASE + 1 && parenCount == 0 &&
-								(logicalVisibleChars == 4 || (logicalVisibleChars == 5 &&
-								LexGetPrevChar(sc.currentPos - 4, sc.styler) == '@'))) {
+							if (levelCurrent == SC_FOLDLEVELBASE + 1 && parenCount == 0 && (lineVisibleChars == 4
+								|| (lineVisibleChars == 5 && LexGetPrevChar(sc.currentPos - 4, styler) == '@'))) {
 								levelNext--;
 							}
 						} else if (StrEqual(s, "call")) {
@@ -336,16 +344,13 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_BAT_LABEL_LINE:
 			// :[label][<Space|Tab|:>comments]
 			// https://ss64.com/nt/goto.html
-			if (sc.atLineEnd) {
-				levelCurrent = SC_FOLDLEVELBASE;
-				levelNext = SC_FOLDLEVELBASE + 1;
+			if (sc.atLineStart) {
 				sc.SetState(SCE_BAT_DEFAULT);
 			} else if (IsSpaceOrTab(sc.ch) || sc.ch == ':') {
-				levelCurrent = SC_FOLDLEVELBASE;
-				levelNext = SC_FOLDLEVELBASE + 1;
 				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsGraphic(sc.ch) && !IsLabelChar(sc.ch)) {
 				sc.ChangeState(SCE_BAT_NOT_BATCH);
+				labelLine = false;
 				levelNext++;
 			}
 			break;
@@ -439,6 +444,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				// resume batch parsing on new label
 				if (IsLabelStart(sc.chNext)) {
 					sc.SetState(SCE_BAT_LABEL_LINE);
+					labelLine = true;
 					levelNext--;
 				}
 			}
@@ -456,6 +462,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (lineVisibleChars == 0 && sc.ch == ':') {
 				parenCount = 0;
 				if (IsLabelStart(sc.chNext) || IsWhiteSpace(sc.chNext)) {
+					labelLine = true;
 					sc.SetState(SCE_BAT_LABEL_LINE);
 				} else {
 					// unreachable label starts skipped block
@@ -555,7 +562,11 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				lineState |= static_cast<int>(command) << 4;
 				sc.SetState(outerStyle);
 			} else {
-				lineState |= (lineVisibleChars == 0 || sc.state == SCE_BAT_COMMENT) ? BatchLineStateMaskEmptyLine : 0;
+				if (sc.state == SCE_BAT_COMMENT && !labelLine) {
+					lineState |= BatchLineStateMaskCommentLine;
+				} else if (lineVisibleChars == 0) {
+					lineState |= BatchLineStateMaskEmptyLine;
+				}
 				command = Command::None;
 				logicalVisibleChars = 0;
 			}
@@ -575,9 +586,20 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			lineVisibleChars = 0;
 
 			if (fold) {
-				if (sc.state == SCE_BAT_LABEL_LINE) {
-					if (prevLineState & BatchLineStateMaskEmptyLine) {
+				if (labelLine) {
+					labelLine = false;
+					levelCurrent = SC_FOLDLEVELBASE;
+					levelNext = SC_FOLDLEVELBASE + 1;
+					if ((prevLineState & BatchLineStateMaskEmptyLine)
+						|| (IsCommentLine(prevLineState) && !IsCommentLine(prev2LineState))) {
 						styler.SetLevel(sc.currentLine - 1, SC_FOLDLEVELBASE | (SC_FOLDLEVELBASE << 16));
+					}
+				} else if (IsCommentLine(lineState | prevLineState)) {
+					if (!IsCommentLine(prevLineState)) {
+						levelNext++;
+					} else if (!IsCommentLine(lineState)) {
+						levelCurrent--;
+						levelNext--;
 					}
 				}
 
@@ -590,6 +612,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					styler.SetLevel(sc.currentLine, lev);
 				}
 				levelCurrent = levelNext;
+				prev2LineState = prevLineState;
 				prevLineState = lineState;
 			}
 		}
