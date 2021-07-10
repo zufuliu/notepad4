@@ -346,12 +346,14 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			// https://ss64.com/nt/goto.html
 			if (sc.atLineStart) {
 				sc.SetState(SCE_BAT_DEFAULT);
-			} else if (IsSpaceOrTab(sc.ch) || sc.ch == ':') {
-				sc.SetState(SCE_BAT_COMMENT);
 			} else if (IsGraphic(sc.ch) && !IsLabelChar(sc.ch)) {
-				sc.ChangeState(SCE_BAT_NOT_BATCH);
-				labelLine = false;
-				levelNext++;
+				if (outerStyle == SCE_BAT_NOT_BATCH) {
+					sc.ChangeState(SCE_BAT_NOT_BATCH);
+					labelLine = false;
+					levelNext++;
+				} else {
+					sc.SetState(SCE_BAT_COMMENT);
+				}
 			}
 			break;
 
@@ -444,6 +446,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				// resume batch parsing on new label
 				if (IsLabelStart(sc.chNext)) {
 					sc.SetState(SCE_BAT_LABEL_LINE);
+					outerStyle = SCE_BAT_NOT_BATCH;
 					labelLine = true;
 					levelNext--;
 				}
@@ -460,15 +463,20 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState(SCE_BAT_NOT_BATCH);
 				levelNext++;
 			} else if (lineVisibleChars == 0 && sc.ch == ':') {
-				parenCount = 0;
-				if (IsLabelStart(sc.chNext) || IsWhiteSpace(sc.chNext)) {
-					labelLine = true;
-					sc.SetState(SCE_BAT_LABEL_LINE);
-				} else {
-					// unreachable label starts skipped block
-					sc.SetState(SCE_BAT_NOT_BATCH);
-					levelNext++;
+				int state = SCE_BAT_COMMENT;
+				if (IsGraphic(sc.chNext)) {
+					parenCount = 0;
+					if (IsLabelStart(sc.chNext)) {
+						state = SCE_BAT_LABEL_LINE;
+						outerStyle = SCE_BAT_DEFAULT;
+						labelLine = true;
+					} else {
+						// unreachable label starts skipped block
+						state = SCE_BAT_NOT_BATCH;
+						levelNext++;
+					}
 				}
+				sc.SetState(state);
 			} else if (DetectBatchEscapeChar(sc, outerStyle, command) ||
 				((sc.ch == '%' || sc.ch == '!') && DetectBatchVariable(sc, outerStyle, varQuoteChar, command, parenCount))) {
 				if (logicalVisibleChars == 0 && command == Command::None) {
