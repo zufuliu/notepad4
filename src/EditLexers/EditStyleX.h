@@ -189,7 +189,7 @@
 #define NP2StyleX_Lifetime				EDITSTYLE_HOLE(Lifetime, L"Lifetime")
 #define NP2StyleX_Decorator				EDITSTYLE_HOLE(Decorator, L"Decorator")
 #define NP2StyleX_BuiltInFunction		EDITSTYLE_HOLE(BuiltInFunction, L"Built-in Function")
-#define NP2StyleX_objectMethod			EDITSTYLE_HOLE(objectMethod, L"object Method")
+
 #define NP2StyleX_BuiltInConstant		EDITSTYLE_HOLE(BuiltInConstant, L"Built-in Constant")
 #define NP2StyleX_FormattedString		EDITSTYLE_HOLE(FormattedString, L"Formatted String")
 #define NP2StyleX_TripleQuotedFString	EDITSTYLE_HOLE(TripleQuotedFString, L"Triple Quoted Formatted String")

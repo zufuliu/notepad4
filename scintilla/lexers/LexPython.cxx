@@ -7,6 +7,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -22,442 +23,917 @@
 
 using namespace Lexilla;
 
-#define PY_DEF_CLASS 1
-#define PY_DEF_FUNC	2
-#define PY_DEF_ENUM	3	// Boo
+namespace {
 
-static constexpr bool IsPyStringPrefix(int ch) noexcept {
-	ch |= 32;
-	return ch == 'r' || ch == 'u' || ch == 'b' || ch == 'f';
-}
-static constexpr bool IsPyTripleStyle(int style) noexcept {
-	return style == SCE_PY_TRIPLE_STRING1 || style == SCE_PY_TRIPLE_STRING2
-		|| style == SCE_PY_TRIPLE_BYTES1 || style == SCE_PY_TRIPLE_BYTES2
-		|| style == SCE_PY_TRIPLE_FMT_STRING1 || style == SCE_PY_TRIPLE_FMT_STRING2;
-}
-static constexpr bool IsPyStringStyle(int style) noexcept {
-	return style == SCE_PY_STRING1 || style == SCE_PY_STRING2
-		|| style == SCE_PY_BYTES1 || style == SCE_PY_BYTES2
-		|| style == SCE_PY_RAW_STRING1 || style == SCE_PY_RAW_STRING2
-		|| style == SCE_PY_RAW_BYTES1 || style == SCE_PY_RAW_BYTES2
-		|| style == SCE_PY_FMT_STRING1 || style == SCE_PY_FMT_STRING2;
-}
-static constexpr bool IsSpaceEquiv(int state) noexcept {
-	// including SCE_PY_DEFAULT, SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK
-	return (state <= SCE_PY_COMMENTLINE) || (state == SCE_PY_COMMENTBLOCK);
+constexpr bool IsPyString(int state) noexcept {
+	return state < SCE_PY_BYTES_SQ;
 }
 
-#define PyStringPrefix_Empty	0
-#define PyStringPrefix_Raw		1		// 'r'
-#define PyStringPrefix_Unicode	2		// 'u'
-#define PyStringPrefix_Bytes	4		// 'b'
-#define PyStringPrefix_Formatted	8	// 'f'
-
-// r, u, b, f
-// ru, rb, rf
-// ur, br, fr
-
-static inline int GetPyStringPrefix(int ch) noexcept {
-	switch ((ch | 32)) {
-	case 'r':
-		return PyStringPrefix_Raw;
-	case 'u':
-		return PyStringPrefix_Unicode;
-	case 'b':
-		return PyStringPrefix_Bytes;
-	case 'f':
-		return PyStringPrefix_Formatted;
-	default:
-		return PyStringPrefix_Empty;
-	}
+constexpr bool IsPyFormattedString(int state) noexcept {
+	return state >= SCE_PY_FMTSTRING_SQ && state <= SCE_PY_TRIPLE_RAWFMTSTRING_DQ;
 }
 
-static inline int GetPyStringStyle(int quote, bool is_raw, bool is_bytes, bool is_fmt) noexcept {
-	switch (quote) {
-	case 1:
-		if (is_bytes)
-			return is_raw ? SCE_PY_RAW_BYTES1 : SCE_PY_BYTES1;
-		if (is_fmt)
-			return SCE_PY_FMT_STRING1;
-		return is_raw ? SCE_PY_RAW_STRING1 : SCE_PY_STRING1;
-
-	case 2:
-		if (is_bytes)
-			return is_raw ? SCE_PY_RAW_BYTES2 : SCE_PY_BYTES2;
-		if (is_fmt)
-			return SCE_PY_FMT_STRING2;
-		return is_raw ? SCE_PY_RAW_STRING2 : SCE_PY_STRING2;
-
-	case 3:
-		if (is_bytes)
-			return SCE_PY_TRIPLE_BYTES1;
-		if (is_fmt)
-			return SCE_PY_TRIPLE_FMT_STRING1;
-		return SCE_PY_TRIPLE_STRING1;
-
-	case 6:
-		if (is_bytes)
-			return SCE_PY_TRIPLE_BYTES2;
-		if (is_fmt)
-			return SCE_PY_TRIPLE_FMT_STRING2;
-		return SCE_PY_TRIPLE_STRING2;
-
-	default:
-		return SCE_PY_DEFAULT;
-	}
+constexpr bool IsPyDoubleQuotedString(int state) noexcept {
+	return state & true;
 }
 
-static void ColourisePyDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-	const WordList &keywords_const = *keywordLists[2];
-	//const WordList &keywords4 = *keywordLists[3];
-	const WordList &keywords_func = *keywordLists[4];
-	const WordList &keywords_attr = *keywordLists[5];
-	const WordList &keywords_objm = *keywordLists[6];
-	const WordList &keywords_class = *keywordLists[7];
+constexpr bool IsPyTripleQuotedString(int state) noexcept {
+	return (state & 3) > 1;
+}
 
-	int defType = 0;
-	int visibleChars = 0;
-	bool continuationLine = false;
+constexpr bool IsPyRawString(int state) noexcept {
+	return (state & 7) > 3;
+}
 
-	StyleContext sc(startPos, length, initStyle, styler);
+constexpr bool IsPyStringStyle(int state) noexcept {
+	return state >= SCE_PY_STRING_SQ;
+}
 
-	for (; sc.More(); sc.Forward()) {
-		if (sc.atLineStart) {
-			if (IsPyTripleStyle(sc.state) || IsPyStringStyle(sc.state)) {
-				sc.SetState(sc.state);
+struct EscapeSequence {
+	int outerState = SCE_PY_DEFAULT;
+	int digitsLeft = 0;
+	int numBase = 16;
+
+	// no highlight for name in '\N{name}'.
+	bool resetEscapeState(int state, int chNext) noexcept {
+		outerState = state;
+		digitsLeft = 0;
+		numBase = 16;
+		if (chNext == 'x') {
+			digitsLeft = 3;
+		} else if (IsADigit(chNext, 8)) {
+			digitsLeft = 3;
+			numBase = 8;
+		} else if (AnyOf(chNext, '\\', '\'', '"', 'a', 'b', 'f', 'n', 'r', 't', 'v')) {
+			digitsLeft = 1;
+		} else if (IsPyString(state)) {
+			if (chNext == 'u') {
+				digitsLeft = 5;
+			} else if (chNext == 'U') {
+				digitsLeft = 9;
+			} else if (chNext == 'N') {
+				digitsLeft = 1;
 			}
-			defType = 0;
-			visibleChars = 0;
 		}
+		return digitsLeft != 0;
+	}
+	bool atEscapeEnd(int ch) noexcept {
+		--digitsLeft;
+		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+	}
+};
 
-		// Determine if the current state should terminate.
+struct FormattedStringState {
+	int state;
+	int braceCount;
+	int parenCount;
+};
+
+constexpr bool IsPyStringPrefix(int ch) noexcept {
+	return AnyOf(ch, 'r', 'b', 'f', 'u', 'R', 'B', 'F', 'U');
+}
+
+inline void EnterPyStringState(StyleContext &sc) {
+	int ch = sc.ch | 0x20;
+	const int next = sc.chNext | 0x20;
+	int chNext = sc.chNext;
+	int state = SCE_PY_IDENTIFIER;
+	int offset = 1;
+	if (ch == 'r') {
+		if (next == 'b' || next == 'f' || next == 'u') {
+			ch = next;
+			offset = 2;
+			chNext = sc.GetRelative(2);
+		}
+	} else if (next == 'r') {
+		offset = 2;
+		chNext = sc.GetRelative(2);
+	}
+	if (chNext == '\'' || chNext == '\"') {
+		switch (ch) {
+		case 'r':
+			state = SCE_PY_RAWSTRING_SQ;
+			break;
+		case 'f':
+			state = SCE_PY_FMTSTRING_SQ;
+			break;
+		case 'b':
+			state = SCE_PY_BYTES_SQ;
+			break;
+		default:
+			state = SCE_PY_STRING_SQ;
+			break;
+		}
+		if (chNext == '\"') {
+			state += SCE_PY_STRING_DQ - SCE_PY_STRING_SQ;
+		}
+		if (offset == 2) {
+			state += SCE_PY_RAWSTRING_SQ - SCE_PY_STRING_SQ;
+		}
+		if (sc.GetRelative(offset + 1) == chNext && sc.GetRelative(offset + 2) == chNext) {
+			offset += 2;
+			state += SCE_PY_TRIPLE_RAWSTRING_SQ - SCE_PY_RAWSTRING_SQ;
+		}
+	} else {
+		--offset;
+	}
+
+	sc.SetState(state);
+	sc.Advance(offset);
+}
+
+// https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
+// https://docs.python.org/3/library/stdtypes.html#printf-style-bytes-formatting
+
+constexpr bool IsDateTimeFormatSpecifier(int ch) noexcept {
+	// https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+	return AnyOf(ch, 'a', 'A',
+					'b', 'B',
+					'c',
+					'd',
+					'f',
+					'H',
+					'I',
+					'j',
+					'm', 'M',
+					'p',
+					'S',
+					'U',
+					'w', 'W',
+					'x', 'X',
+					'y', 'Y',
+					'z', 'Z',
+					// Python 3.6
+					'G',
+					'u',
+					'V');
+}
+
+constexpr bool IsPercentFormatSpecifier(char ch) noexcept {
+	return AnyOf(ch, 'd',
+					'i',
+					'o',
+					'u',
+					'x', 'X',
+					'e', 'E',
+					'f', 'F',
+					'g', 'G',
+					'c',
+					'b',
+					's',
+					'a',
+					'r');
+}
+
+constexpr bool IsInvalidMappingKey(char ch) noexcept {
+	// restrict mapping key: excludes C0 and some special handled characters
+	return (ch >= 0 && ch < 32) || AnyOf(ch, '(', ')', '\'', '\"', '\\', '{', '}', '%', '$', '\x7F');
+}
+
+inline Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &styler, Sci_Position &keyLen, bool insideUrl) noexcept {
+	if (sc.chNext == '%') {
+		return 2;
+	}
+	if (insideUrl && IsHexDigit(sc.chNext)) {
+		// percent encoded URL string
+		return 0;
+	}
+	if (IsASpaceOrTab(sc.chNext) && IsADigit(sc.chPrev)) {
+		// ignore word after percent: "5% x"
+		return 0;
+	}
+	if (IsDateTimeFormatSpecifier(sc.chNext)) {
+		return 2;
+	}
+
+	Sci_PositionU pos = sc.currentPos + 1;
+	char ch = styler.SafeGetCharAt(pos);
+	// 2. (optional) Mapping key
+	if (ch == '(') {
+		ch = styler.SafeGetCharAt(++pos);
+		while (!IsInvalidMappingKey(ch))  {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		if (ch == ')') {
+			ch = styler.SafeGetCharAt(++pos);
+			keyLen = pos - sc.currentPos;
+		} else {
+			return 0;
+		}
+	}
+	// 3. (optional) Conversion flags
+	while (AnyOf(ch, '#', '0', '-', ' ', '+')) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// 4. (optional) Minimum field width
+	if (ch == '*') {
+		ch = styler.SafeGetCharAt(++pos);
+	} else {
+		while (IsADigit(ch)) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+	}
+	// 5. (optional) Precision
+	if (ch == '.') {
+		ch = styler.SafeGetCharAt(++pos);
+		if (ch == '*') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else {
+			while (IsADigit(ch)) {
+				ch = styler.SafeGetCharAt(++pos);
+			}
+		}
+	}
+	// 6. (optional) Length modifier
+	if (ch == 'h' || ch == 'l' || ch == 'L') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// 7. Conversion type
+	if (IsPercentFormatSpecifier(ch)) {
+		return pos - sc.currentPos + 1;
+	}
+	return 0;
+}
+
+// https://docs.python.org/3/library/string.html#formatspec
+
+constexpr bool IsConversionChar(int ch) noexcept {
+	return ch == 's' || ch == 'r' || ch == 'a';
+}
+
+constexpr bool IsBraceFormatSpecifier(char ch) noexcept {
+	return AnyOf(ch, 'b',
+					'c',
+					'd',
+					'e', 'E',
+					'f', 'F',
+					'g', 'G',
+					'n',
+					'o',
+					's',
+					'x', 'X',
+					'%');
+}
+
+inline bool IsPyFormattedStringEnd(const StyleContext &sc) noexcept {
+	return sc.ch == '}'
+		|| (sc.ch == '!' && sc.chNext != '=')
+		|| (sc.ch == '=' && !AnyOf(sc.chPrev, ':', '<', '>', '=', '!'))
+		|| (sc.ch == ':' && (sc.chNext != '=' || AnyOf(sc.GetRelative(2), '<', '>', '=', '^')));
+}
+
+Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+	Sci_PositionU pos = sc.currentPos;
+	// ["!" conversion]
+	if (sc.ch == '!' && IsConversionChar(sc.chNext)) {
+		pos += 2;
+	}
+	// [":" format_spec]
+	char ch = styler.SafeGetCharAt(pos);
+	if (ch != ':') {
+		return pos - sc.currentPos;
+	}
+
+	ch = styler.SafeGetCharAt(++pos);
+	// [[fill] align]
+	if (AnyOf(ch, '<', '>', '=', '^')) {
+		ch = styler.SafeGetCharAt(++pos);
+	} else {
+		const char chNext = styler.SafeGetCharAt(pos + 1);
+		if (!AnyOf(ch, '\r', '\n', '{', '}') && AnyOf(chNext, '<', '>', '=', '^')) {
+			pos += 2;
+			ch = styler.SafeGetCharAt(pos);
+		}
+	}
+	// [sign][#]
+	if (ch == '+' || ch == '-' || ch == ' ') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	if (ch == '#') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [0][width]
+	while (IsADigit(ch)) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [grouping_option]
+	if (ch == '_' || ch == ',') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [.precision]
+	if (ch == '.') {
+		ch = styler.SafeGetCharAt(++pos);
+		while (IsADigit(ch)) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+	}
+	// [type]
+	if (IsBraceFormatSpecifier(ch)) {
+		++pos;
+	}
+	return pos - sc.currentPos;
+}
+
+constexpr bool IsDocCommentTag(int state, int chNext) noexcept {
+	return IsPyDoubleQuotedString(state) && (chNext == 'p' || chNext == 't' || chNext == 'r');
+}
+
+enum {
+	PyLineStateMaskEmptyLine = 1 << 0,
+	PyLineStateMaskCommentLine = 1 << 1,
+	PyLineStateMaskTripleQuote = 1 << 2,
+	PyLineStateMaskCloseBrace = 1 << 3,
+	PyLineStateLineContinuation = 1 << 4,
+	PyLineStateFormattedString = 1 << 5,
+};
+
+void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	int kwType = SCE_PY_DEFAULT;
+	int visibleChars = 0;
+	int visibleCharsBefore = 0;
+	int prevIndentCount = 0;
+	int indentCount = 0;
+	int parenCount = 0;
+	int lineState = 0;
+	bool prevLineContinuation = false;
+	bool lineContinuation = false;
+	bool insideUrl = false;
+	bool insideFStringFormatSpec = false;
+	EscapeSequence escSeq;
+
+	std::vector<FormattedStringState> nestedState;
+
+	if (startPos != 0) {
+		// backtrack to the line starts expression inside formatted string literal.
+		BacktrackToStart(styler, PyLineStateFormattedString, startPos, lengthDoc, initStyle);
+	}
+
+	StyleContext sc(startPos, lengthDoc, initStyle, styler);
+	if (sc.currentLine > 0) {
+		prevLineContinuation = (styler.GetLineState(sc.currentLine - 2) & PyLineStateLineContinuation) != 0;
+		lineState = styler.GetLineState(sc.currentLine - 1);
+		parenCount = (lineState >> 8) & 0xff;
+		prevIndentCount = lineState >> 16;
+		lineContinuation= (lineState & PyLineStateLineContinuation) != 0;
+		lineState = 0;
+	}
+
+	while (sc.More()) {
 		switch (sc.state) {
 		case SCE_PY_OPERATOR:
+		case SCE_PY_OPERATOR2:
 			sc.SetState(SCE_PY_DEFAULT);
 			break;
+
 		case SCE_PY_NUMBER:
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_PY_DEFAULT);
 			}
 			break;
+
 		case SCE_PY_IDENTIFIER:
-			if (!iswordstart(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
-				if (keywords.InList(s)) {
+				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_PY_WORD);
-					if (StrEqual(s, "def"))
-						defType = PY_DEF_FUNC;
-					else if (StrEqualsAny(s, "class", "raise", "except"))
-						defType = PY_DEF_CLASS;
-					//else if (StrEqual(s, "enum"))
-					//	defType = PY_DEF_ENUM;
-				} else if (keywords2.InList(s)) {
+					if (StrEqual(s, "def")) {
+						kwType = SCE_PY_FUNCTION_DEFINE;
+					} else if (StrEqualsAny(s, "class", "raise", "except")) {
+						kwType = SCE_PY_CLASS;
+					}
+				} else if (keywordLists[1]->InList(s)) {
 					sc.ChangeState(SCE_PY_WORD2);
-				} else if (keywords_const.InList(s)) {
-					sc.ChangeState(SCE_PY_BUILTIN_CONST);
-				} else if (keywords_func.InListPrefixed(s, '(')) {
-					sc.ChangeState(SCE_PY_BUILTIN_FUNC);
-				} else if (keywords_attr.InList(s)) {
-					sc.ChangeState(SCE_PY_ATTR);
-				} else if (keywords_objm.InList(s)) {
-					sc.ChangeState(SCE_PY_OBJ_FUNC);
-				} else if (defType == PY_DEF_CLASS) {
-					defType = 0;
-					sc.ChangeState(SCE_PY_CLASSNAME);
-				} else if (defType == PY_DEF_FUNC) {
-					defType = 0;
-					sc.ChangeState(SCE_PY_DEFNAME);
-				} else if (keywords_class.InList(s)) {
-					defType = 0;
-					sc.ChangeState(SCE_PY_CLASSNAME);
+				} else if (keywordLists[2]->InList(s)) {
+					sc.ChangeState(SCE_PY_BUILTIN_CONSTANT);
+				} else if (keywordLists[3]->InListPrefixed(s, '(')) {
+					sc.ChangeState(SCE_PY_BUILTIN_FUNCTION);
+				} else if (keywordLists[4]->InList(s)) {
+					sc.ChangeState(SCE_PY_ATTRIBUTE);
+				} else if (keywordLists[5]->InListPrefixed(s, '(')) {
+					sc.ChangeState(SCE_PY_OBJECT_FUNCTION);
+				} else if (keywordLists[6]->InList(s)) {
+					sc.ChangeState(SCE_PY_CLASS);
+				} else if (kwType != SCE_PY_DEFAULT) {
+					sc.ChangeState(kwType);
 				} else if (sc.GetLineNextChar() == '(') {
 					sc.ChangeState(SCE_PY_FUNCTION);
+				}
+				if (sc.state != SCE_PY_WORD) {
+					kwType = SCE_PY_DEFAULT;
 				}
 				sc.SetState(SCE_PY_DEFAULT);
 			}
 			break;
+
 		case SCE_PY_DECORATOR:
-			if (!iswordchar(sc.ch))
+			if (sc.ch == '.') {
+				sc.SetState(SCE_PY_OPERATOR);
+				sc.ForwardSetState(SCE_PY_DECORATOR);
+			} else if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(SCE_PY_DEFAULT);
+			}
+			break;
+
+		case SCE_PY_STRING_SQ:
+		case SCE_PY_STRING_DQ:
+		case SCE_PY_TRIPLE_STRING_SQ:
+		case SCE_PY_TRIPLE_STRING_DQ:
+		case SCE_PY_RAWSTRING_SQ:
+		case SCE_PY_RAWSTRING_DQ:
+		case SCE_PY_TRIPLE_RAWSTRING_SQ:
+		case SCE_PY_TRIPLE_RAWSTRING_DQ:
+
+		case SCE_PY_FMTSTRING_SQ:
+		case SCE_PY_FMTSTRING_DQ:
+		case SCE_PY_TRIPLE_FMTSTRING_SQ:
+		case SCE_PY_TRIPLE_FMTSTRING_DQ:
+		case SCE_PY_RAWFMTSTRING_SQ:
+		case SCE_PY_RAWFMTSTRING_DQ:
+		case SCE_PY_TRIPLE_RAWFMTSTRING_SQ:
+		case SCE_PY_TRIPLE_RAWFMTSTRING_DQ:
+
+		case SCE_PY_BYTES_SQ:
+		case SCE_PY_BYTES_DQ:
+		case SCE_PY_TRIPLE_BYTES_SQ:
+		case SCE_PY_TRIPLE_BYTES_DQ:
+		case SCE_PY_RAWBYTES_SQ:
+		case SCE_PY_RAWBYTES_DQ:
+		case SCE_PY_TRIPLE_RAWBYTES_SQ:
+		case SCE_PY_TRIPLE_RAWBYTES_DQ:
+			if (sc.atLineStart && !lineContinuation) {
+				if (!IsPyTripleQuotedString(sc.state)) {
+					sc.SetState(SCE_PY_DEFAULT);
+					break;
+				}
+			}
+			if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+				insideUrl = false;
+			}
+			switch (sc.ch) {
+			case '\\':
+				if (IsEOLChar(sc.chNext) || IsPyRawString(sc.state)) {
+					sc.Forward();
+				} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_PY_ESCAPECHAR);
+					sc.Forward();
+				}
+				break;
+
+			case '\'':
+			case '\"':
+				if ((sc.ch == '\'') ^ IsPyDoubleQuotedString(sc.state)) {
+					int offset = 0;
+					if (IsPyTripleQuotedString(sc.state)) {
+						if (sc.chNext == sc.ch && sc.GetRelative(2) == sc.ch) {
+							offset = 3;
+						}
+					} else {
+						offset = 1;
+					}
+					if (offset) {
+						sc.Forward(offset);
+						if (!nestedState.empty() && nestedState.back().state == sc.state) {
+							nestedState.pop_back();
+						}
+						sc.SetState(SCE_PY_DEFAULT);
+						continue;
+					}
+				}
+				break;
+
+			case '{':
+				if (IsPyString(sc.state)) {
+					if (sc.chNext == '{') {
+						escSeq.outerState = sc.state;
+						escSeq.digitsLeft = 1;
+						sc.SetState(SCE_PY_ESCAPECHAR);
+						sc.Forward();
+					} else if (IsPyFormattedString(sc.state)) {
+						if (nestedState.empty()) {
+							nestedState.push_back({sc.state, 1, parenCount});
+						} else {
+							nestedState.back().braceCount += 1;
+						}
+						insideFStringFormatSpec = false;
+						sc.SetState(SCE_PY_OPERATOR2);
+						sc.ForwardSetState(SCE_PY_DEFAULT);
+						continue;
+					} else if (sc.chNext == '}' || sc.chNext == '!' || sc.chNext == ':' || IsIdentifierCharEx(sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_PY_PLACEHOLDER);
+					}
+				}
+				break;
+
+			case '}':
+				if (IsPyString(sc.state)) {
+					if (IsPyFormattedString(sc.state)) {
+						const bool interpolating = !nestedState.empty();
+						if (interpolating) {
+							FormattedStringState &state = nestedState.back();
+							if (state.braceCount > 1) {
+								--state.braceCount;
+							} else {
+								nestedState.pop_back();
+							}
+						}
+						if (interpolating || sc.chNext != '}') {
+							const int state = sc.state;
+							sc.SetState(SCE_PY_OPERATOR2);
+							sc.ForwardSetState(state);
+							insideFStringFormatSpec = false;
+							continue;
+						}
+					}
+					if (sc.chNext == '}') {
+						escSeq.outerState = sc.state;
+						escSeq.digitsLeft = 1;
+						sc.SetState(SCE_PY_ESCAPECHAR);
+						sc.Forward();
+					}
+				}
+				break;
+
+			case '%': {
+				Sci_Position keyLen = 0;
+				Sci_Position length = CheckPercentFormatSpecifier(sc, styler, keyLen, insideUrl);
+				if (length != 0) {
+					const int state = sc.state;
+					sc.SetState(SCE_PY_FORMAT_SPECIFIER);
+					if (keyLen) {
+						length -= keyLen;
+						sc.ForwardSetState(SCE_PY_PLACEHOLDER);
+						sc.Advance(keyLen - 1);
+						sc.SetState(SCE_PY_FORMAT_SPECIFIER);
+					}
+					sc.Advance(length);
+					sc.SetState(state);
+					continue;
+				}
+			} break;
+
+			case '$':
+				// https://docs.python.org/3/library/string.html#template-strings
+				if (IsPyString(sc.state)) {
+					if (sc.chNext == '$') {
+						escSeq.outerState = sc.state;
+						escSeq.digitsLeft = 1;
+						sc.SetState(SCE_PY_ESCAPECHAR);
+						sc.Forward();
+					} else if (sc.chNext == '{') {
+						if (!IsPyFormattedString(sc.state) && IsIdentifierStart(sc.GetRelative(2))) {
+							escSeq.outerState = sc.state;
+							sc.SetState(SCE_PY_DOLLAR_PLACEHOLDER);
+							sc.Advance(2);
+						}
+					} else if (IsIdentifierStart(sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_PY_DOLLAR_PLACEHOLDER);
+					}
+				}
+				break;
+
+			case '!':
+			case ':':
+				if (insideFStringFormatSpec) {
+					const Sci_Position length = CheckBraceFormatSpecifier(sc, styler);
+					if (length != 0) {
+						const int state = sc.state;
+						sc.SetState(SCE_PY_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(state);
+						continue;
+					}
+				}
+				if (sc.ch == ':') {
+					if (sc.MatchNext('/', '/') && IsLowerCase(sc.chPrev)) {
+						insideUrl = true;
+					} else if (visibleChars == 0 && IsDocCommentTag(sc.state, sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_PY_COMMENTTAGAT);
+					}
+				}
+				break;
+
+			case '@':
+				if (visibleChars == 0 && IsDocCommentTag(sc.state, sc.chNext)) {
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_PY_COMMENTTAGAT);
+				}
+				break;
+			}
+			break;
+
+		case SCE_PY_ESCAPECHAR:
+			if (escSeq.atEscapeEnd(sc.ch)) {
+				sc.SetState(escSeq.outerState);
+				continue;
+			}
+			break;
+
+		case SCE_PY_PLACEHOLDER:
+			// https://docs.python.org/3/library/string.html#format-string-syntax
+			if (sc.ch == '.' && IsIdentifierCharEx(sc.chNext)) {
+				sc.Forward();
+			} else if (!IsIdentifierCharEx(sc.ch)) {
+				bool match = true;
+				if (sc.ch == '[') {
+					if (IsADigit(sc.chNext)) {
+						sc.Advance(2);
+						while (IsADigit(sc.ch)) {
+							sc.Forward();
+						}
+						if (sc.ch == ']') {
+							sc.Forward();
+						} else {
+							match = false;
+						}
+					}
+					// TODO: index_string
+				}
+				if (match && (sc.ch == '!' || sc.ch == ':')) {
+					const Sci_Position length = CheckBraceFormatSpecifier(sc, styler);
+					if (length != 0 && styler[sc.currentPos + length] == '}') {
+						sc.SetState(SCE_PY_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(SCE_PY_PLACEHOLDER);
+						sc.ForwardSetState(escSeq.outerState);
+						continue;
+					}
+				}
+				if (sc.ch != '}' || !match) {
+					sc.Rewind();
+					sc.ChangeState(escSeq.outerState);
+				}
+				sc.ForwardSetState(escSeq.outerState);
+				continue;
+			}
+			break;
+
+		case SCE_PY_DOLLAR_PLACEHOLDER:
+			if (!IsIdentifierChar(sc.ch)) {
+				if (sc.ch == '}' && styler[styler.GetStartSegment() + 1] == '{') {
+					sc.Forward();
+				}
+				sc.SetState(escSeq.outerState);
+				continue;
+			}
+			break;
+
+		case SCE_PY_COMMENTTAGAT:
+			if (!IsLowerCase(sc.ch)) {
+				if (sc.ch == ' ' || sc.ch == ':') {
+					sc.SetState(escSeq.outerState);
+				} else {
+					sc.ChangeState(escSeq.outerState);
+					continue;
+				}
+			}
 			break;
 
 		case SCE_PY_COMMENTLINE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_PY_DEFAULT);
-			}
-			break;
-
-		case SCE_PY_STRING1:
-		case SCE_PY_BYTES1:
-		case SCE_PY_RAW_STRING1:
-		case SCE_PY_RAW_BYTES1:
-		case SCE_PY_FMT_STRING1:
-			if (sc.atLineStart && !continuationLine) {
-				sc.SetState(SCE_PY_DEFAULT);
-			} else if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
-				sc.Forward();
-			} else if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_PY_DEFAULT);
-			}
-			break;
-		case SCE_PY_STRING2:
-		case SCE_PY_BYTES2:
-		case SCE_PY_RAW_STRING2:
-		case SCE_PY_RAW_BYTES2:
-		case SCE_PY_FMT_STRING2:
-			if (sc.atLineStart && !continuationLine) {
-				sc.SetState(SCE_PY_DEFAULT);
-			} else if (sc.ch == '\\' && (sc.chNext == '\\' || sc.chNext == '\"' || sc.chNext == '\'')) {
-				sc.Forward();
-			} else if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_PY_DEFAULT);
-			}
-			break;
-		case SCE_PY_TRIPLE_STRING1:
-		case SCE_PY_TRIPLE_BYTES1:
-		case SCE_PY_TRIPLE_FMT_STRING1:
-			if (sc.ch == '\\') {
-				sc.Forward();
-			} else if (sc.Match('\'', '\'', '\'')) {
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_PY_DEFAULT);
-			}
-			break;
-		case SCE_PY_TRIPLE_STRING2:
-		case SCE_PY_TRIPLE_BYTES2:
-		case SCE_PY_TRIPLE_FMT_STRING2:
-			if (sc.ch == '\\') {
-				sc.Forward();
-			} else if (sc.Match('"', '"', '"')) {
-				sc.Forward(2);
-				sc.ForwardSetState(SCE_PY_DEFAULT);
+			} else {
+				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_PY_TASKMARKER);
 			}
 			break;
 		}
 
-		// Determine if a new state should be entered.
 		if (sc.state == SCE_PY_DEFAULT) {
 			if (sc.ch == '#') {
+				visibleCharsBefore = visibleChars;
+				if (visibleChars == 0) {
+					lineState = PyLineStateMaskCommentLine;
+				}
 				sc.SetState(SCE_PY_COMMENTLINE);
-			} else if (sc.Match('\'', '\'', '\'')) {
-				sc.SetState(SCE_PY_TRIPLE_STRING1);
-				sc.Forward(2);
-			} else if (sc.Match('"', '"', '"')) {
-				sc.SetState(SCE_PY_TRIPLE_STRING2);
-				sc.Forward(2);
 			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_PY_STRING1);
+				insideUrl = false;
+				if (sc.MatchNext('\'', '\'')) {
+					sc.SetState(SCE_PY_TRIPLE_STRING_SQ);
+					sc.Advance(2);
+				} else {
+					sc.SetState(SCE_PY_STRING_SQ);
+				}
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_PY_STRING2);
-			} else if (IsNumberStart(sc.ch, sc.chNext)) {
+				insideUrl = false;
+				if (sc.MatchNext('\"', '\"')) {
+					sc.SetState(SCE_PY_TRIPLE_STRING_DQ);
+					sc.Advance(2);
+				} else {
+					sc.SetState(SCE_PY_STRING_DQ);
+				}
+			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_PY_NUMBER);
 			} else if (IsPyStringPrefix(sc.ch)) {
-				int offset = 0;
-				int prefix = GetPyStringPrefix(sc.ch);
-				bool is_bytes = prefix == PyStringPrefix_Bytes;
-				bool is_fmt = prefix == PyStringPrefix_Formatted;
-				bool is_raw = prefix == PyStringPrefix_Raw;
-
-				if (sc.chNext == '\"' || sc.chNext == '\'') {
-					offset = 1;
-				} else if (IsPyStringPrefix(sc.chNext) && (sc.GetRelative(2) == '\"' || sc.GetRelative(2) == '\'')) {
-					prefix = GetPyStringPrefix(sc.chNext);
-					offset = 2;
-					is_bytes = (is_bytes && prefix == PyStringPrefix_Raw) || (is_raw && prefix == PyStringPrefix_Bytes);
-					is_fmt = (is_fmt && prefix == PyStringPrefix_Raw) || (is_raw && prefix == PyStringPrefix_Formatted);
-					is_raw = (is_raw && prefix != PyStringPrefix_Raw) || (!is_raw && prefix == PyStringPrefix_Raw);
-					if (!(is_bytes || is_fmt || is_raw)) {
-						--offset;
-						sc.ForwardSetState(SCE_PY_IDENTIFIER);
-					}
-				}
-				if (!offset) {
-					sc.SetState(SCE_PY_IDENTIFIER);
-				} else {
-					sc.Forward(offset);
-					if (sc.Match('\'', '\'', '\'')) {
-						sc.ChangeState(GetPyStringStyle(3, is_raw, is_bytes, is_fmt));
-						sc.Forward(2);
-					} else if (sc.Match('"', '"', '"')) {
-						sc.ChangeState(GetPyStringStyle(6, is_raw, is_bytes, is_fmt));
-						sc.Forward(2);
-					} else if (sc.ch == '\'') {
-						sc.ChangeState(GetPyStringStyle(1, is_raw, is_bytes, is_fmt));
-					} else if (sc.ch == '\"') {
-						sc.ChangeState(GetPyStringStyle(2, is_raw, is_bytes, is_fmt));
-					}
-				}
-			} else if (iswordstart(sc.ch)) {
+				insideUrl = false;
+				EnterPyStringState(sc);
+			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_PY_IDENTIFIER);
 			} else if (sc.ch == '@') {
-				if (visibleChars == 1 && iswordstart(sc.chNext))
-					sc.SetState(SCE_PY_OPERATOR);
-				else
+				if (!lineContinuation && visibleChars == 0 && parenCount == 0 && IsIdentifierStartEx(sc.chNext)) {
 					sc.SetState(SCE_PY_DECORATOR);
-			} else if (isoperator(sc.ch) || sc.ch == '`') {
-				sc.SetState(SCE_PY_OPERATOR);
-				if (defType > 0 && (sc.ch == '(' || sc.ch == ':'))
-					defType = 0;
+				} else {
+					sc.SetState(SCE_PY_OPERATOR);
+				}
+			} else if (isoperator(sc.ch)) {
+				if (sc.ch == '(') {
+					++parenCount;
+				} else if (sc.ch == ')' && parenCount > 0) {
+					--parenCount;
+				}
+				const bool interpolating = !nestedState.empty();
+				if (interpolating) {
+					const FormattedStringState state = nestedState.back();
+					if (parenCount == state.parenCount && IsPyFormattedStringEnd(sc)) {
+						insideFStringFormatSpec = sc.ch != '}';
+						sc.SetState(state.state);
+						continue;
+					}
+				} else if (visibleChars == 0 && (sc.ch == '}' || sc.ch == ']' || sc.ch == ')')) {
+					lineState |= PyLineStateMaskCloseBrace;
+				}
+				sc.SetState(interpolating ? SCE_PY_OPERATOR2 : SCE_PY_OPERATOR);
+				kwType = SCE_PY_DEFAULT;
 			}
 		}
 
-		// Handle line continuation generically.
-		if (sc.ch == '\\') {
-			if (sc.chNext == '\n' || sc.chNext == '\r') {
-				sc.Forward();
-				if (sc.ch == '\r' && sc.chNext == '\n') {
-					sc.Forward();
-				}
-				continuationLine = true;
-				continue;
+		if (visibleChars == 0 && IsASpaceOrTab(sc.ch)) {
+			if (sc.ch == ' ') {
+				++indentCount;
+			} else {
+				indentCount = (indentCount / 4 + 1) * 4;
 			}
 		}
-		if (!(isspacechar(sc.ch) || IsSpaceEquiv(sc.state))) {
+		if (!isspacechar(sc.ch)) {
 			visibleChars++;
 		}
-		continuationLine = false;
+		if (sc.atLineEnd) {
+			if (lineContinuation) {
+				indentCount = prevIndentCount;
+				if (!prevLineContinuation) {
+					++indentCount;
+				}
+			}
+			lineState |= (indentCount << 16) | (parenCount << 8);
+			prevIndentCount = indentCount;
+			prevLineContinuation = lineContinuation;
+			if (sc.state != SCE_PY_COMMENTLINE && sc.LineEndsWith('\\')) {
+				lineContinuation = true;
+				lineState |= PyLineStateLineContinuation;
+			} else {
+				lineContinuation = false;
+				if (!nestedState.empty()) {
+					const int state = nestedState.back().state;
+					if (!IsPyTripleQuotedString(state)) {
+						nestedState.pop_back();
+						sc.SetState(state);
+					}
+				}
+			}
+			if (!nestedState.empty()) {
+				lineState |= PyLineStateFormattedString | PyLineStateMaskTripleQuote;
+			} else if (IsPyStringStyle(sc.state) && IsPyTripleQuotedString(sc.state)) {
+				lineState |= PyLineStateMaskTripleQuote;
+			} else if (visibleChars == 0) {
+				lineState |= PyLineStateMaskEmptyLine;
+			}
+			styler.SetLineState(sc.currentLine, lineState);
+			lineState = 0;
+			kwType = SCE_PY_DEFAULT;
+			insideFStringFormatSpec = false;
+			visibleChars = 0;
+			visibleCharsBefore = 0;
+			indentCount = 0;
+		}
+		sc.Forward();
 	}
 
 	sc.Complete();
 }
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, MultiStyle(SCE_PY_COMMENTLINE, SCE_PY_COMMENTBLOCK))
-
-static inline bool IsQuoteLine(Sci_Line line, const Accessor &styler) noexcept {
-	const int style = styler.StyleAt(styler.LineStart(line));
-	return IsPyTripleStyle(style);
+constexpr bool IsCommentLine(int lineState) noexcept {
+	return (lineState & PyLineStateMaskCommentLine) != 0;
 }
 
-// based on original folding code
-static void FoldPyDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const Sci_Position maxPos = startPos + length;
+struct FoldLineState {
+	int lineState;
+	int indentCount;
+	constexpr explicit FoldLineState(int lineState_) noexcept : lineState(lineState_), indentCount(lineState_ >> 16) {}
+	constexpr bool Empty() const noexcept {
+		return (lineState & (PyLineStateMaskEmptyLine | PyLineStateMaskCommentLine)) != 0;
+	}
+	constexpr bool TripleQuoted() const noexcept {
+		return (lineState & PyLineStateMaskTripleQuote) != 0;
+	}
+	constexpr bool Backtrack() const noexcept {
+		return (lineState & (PyLineStateMaskEmptyLine | PyLineStateMaskCommentLine | PyLineStateMaskTripleQuote)) != 0;
+	}
+	constexpr bool CloseBrace() const noexcept {
+		return (lineState & PyLineStateMaskCloseBrace) != 0;
+	}
+};
+
+// code folding based on LexYAML
+void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Line docLines = styler.GetLine(styler.Length());
 	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
 
-	// Backtrack to previous non-blank line so we can determine indent level
-	// for any white space lines (needed esp. within triple quoted strings)
-	// and so we can fix any preceding fold level (which is why we go back
-	// at least one line in all cases)
 	Sci_Line lineCurrent = styler.GetLine(startPos);
-	int indentCurrent = styler.IndentAmount(lineCurrent);
+	FoldLineState statePrev(0);
+	FoldLineState stateCurrent(styler.GetLineState(lineCurrent));
 	while (lineCurrent > 0) {
 		lineCurrent--;
-		indentCurrent = styler.IndentAmount(lineCurrent);
-		if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG) && (!IsCommentLine(lineCurrent)) &&
-			(!IsQuoteLine(lineCurrent, styler))) {
+		stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
+		if (!stateCurrent.Backtrack()) {
 			break;
 		}
 	}
-	int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
-
-	// Set up initial loop state
-	startPos = styler.LineStart(lineCurrent);
-	int prev_state = SCE_PY_DEFAULT;
-	if (lineCurrent >= 1) {
-		prev_state = styler.StyleAt(startPos - 1);
+	if (lineCurrent > 0) {
+		statePrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
 	}
-	int prevQuote = IsPyTripleStyle(prev_state);
 
-	// Process all characters to end of requested range or end of any triple quote
-	//that hangs over the end of the range.  Cap processing in all cases
-	// to end of document (in case of unclosed quote at end).
-	while ((lineCurrent <= maxLines) || prevQuote) {
+	while (lineCurrent <= maxLines) {
+		int lev = stateCurrent.indentCount + SC_FOLDLEVELBASE;
+		if (stateCurrent.TripleQuoted()) {
+			statePrev = stateCurrent;
+			styler.SetLevel(lineCurrent, lev | SC_FOLDLEVELHEADERFLAG);
+			do {
+				lineCurrent++;
+				stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
+				styler.SetLevel(lineCurrent, lev + 1);
+			} while (stateCurrent.TripleQuoted());
+			lineCurrent++;
+			stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
+			if (stateCurrent.Empty()) {
+				stateCurrent.indentCount = statePrev.indentCount;
+			}
+			continue;
+		}
 
-		// Gather info
-		int lev = indentCurrent;
 		Sci_Line lineNext = lineCurrent + 1;
-		int indentNext = indentCurrent;
-		int quote = false;
+		FoldLineState stateNext = stateCurrent;
 		if (lineNext <= docLines) {
-			// Information about next line is only available if not at end of document
-			indentNext = styler.IndentAmount(lineNext);
-			const Sci_Position lookAtPos = (styler.LineStart(lineNext) == styler.Length()) ? styler.Length() - 1 : styler.LineStart(lineNext);
-			const int style = styler.StyleAt(lookAtPos);
-			quote = IsPyTripleStyle(style);
+			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
-		const int quote_start = (quote && !prevQuote);
-		const int quote_continue = (quote && prevQuote);
-		if (!quote || !prevQuote) {
-			indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
-		}
-		if (quote) {
-			indentNext = indentCurrentLevel;
-		}
-		if (indentNext & SC_FOLDLEVELWHITEFLAG) {
-			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
-		}
-
-		if (quote_start) {
-			// Place fold point at start of triple quoted string
-			lev |= SC_FOLDLEVELHEADERFLAG;
-		} else if (quote_continue || prevQuote) {
-			// Add level to rest of lines in the string
-			lev = lev + 1;
-		}
-
-		// Skip past any blank lines for next indent level info; we skip also
-		// comments (all comments, not just those starting in column 0)
-		// which effectively folds them into surrounding code rather
-		// than screwing up folding.  If comments end file, use the min
-		// comment indent as the level after
-
-		int minCommentLevel = indentCurrentLevel;
-		while (!quote
-			&& (lineNext < docLines)
-			&& ((indentNext & SC_FOLDLEVELWHITEFLAG) || (lineNext <= docLines && IsCommentLine(lineNext)))) {
-
-			if (IsCommentLine(lineNext) && indentNext < minCommentLevel) {
-				minCommentLevel = indentNext;
-			}
-
+		while ((lineNext < docLines) && stateNext.Empty()) {
 			lineNext++;
-			indentNext = styler.IndentAmount(lineNext);
+			stateNext = FoldLineState(styler.GetLineState(lineNext));
 		}
 
-		const int levelAfterComments = ((lineNext < docLines) ? indentNext & SC_FOLDLEVELNUMBERMASK : minCommentLevel);
-		const int levelBeforeComments = (indentCurrentLevel > levelAfterComments) ? indentCurrentLevel : levelAfterComments;
-
-		// Now set all the indent levels on the lines we skipped
-		// Do this from end to start.  Once we encounter one line
-		// which is indented more than the line after the end of
-		// the comment-block, use the level of the block before
-
-		Sci_Line skipLine = lineNext;
-		int skipLevel = levelAfterComments;
-
-		while (--skipLine > lineCurrent) {
-			const int skipLineIndent = styler.IndentAmount(skipLine);
-			if ((skipLineIndent & SC_FOLDLEVELNUMBERMASK) > levelAfterComments &&
-				!(skipLineIndent & SC_FOLDLEVELWHITEFLAG) &&
-				!IsCommentLine(skipLine)) {
-				skipLevel = levelBeforeComments;
+		int levelAfterBlank = stateNext.indentCount;
+		if (!stateCurrent.Empty()) {
+			if (stateNext.CloseBrace() && levelAfterBlank < stateCurrent.indentCount) {
+				levelAfterBlank = stateCurrent.indentCount;
 			}
-
-			styler.SetLevel(skipLine, skipLevel);
-		}
-
-		// Set fold header on non-quote line
-		if (!quote && !(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
-			if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK)) {
+			if ((stateCurrent.indentCount < levelAfterBlank)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			} else if (stateCurrent.CloseBrace() && stateCurrent.indentCount < statePrev.indentCount) {
+				lev = statePrev.indentCount + SC_FOLDLEVELBASE;
+			}
+		}
+		styler.SetLevel(lineCurrent, lev);
+		lineCurrent++;
+
+		if (lineCurrent < lineNext) {
+			const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
+
+			int prevLineState = stateCurrent.lineState;
+			int nextLineState = styler.GetLineState(lineCurrent);
+			int prevLevel = skipLevel;
+			// comment on first line
+			if (IsCommentLine(prevLineState)) {
+				nextLineState = prevLineState;
+				prevLineState = 0;
+				--lineCurrent;
+			}
+			for (; lineCurrent < lineNext; lineCurrent++) {
+				int level = skipLevel;
+				const int currentLineState = nextLineState;
+				nextLineState = styler.GetLineState(lineCurrent + 1);
+				if (IsCommentLine(currentLineState)) {
+					if (IsCommentLine(nextLineState) && !IsCommentLine(prevLineState)) {
+						level |= SC_FOLDLEVELHEADERFLAG;
+					} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
+						level++;
+					} else {
+						level = prevLevel;
+					}
+				}
+
+				styler.SetLevel(lineCurrent, level);
+				prevLineState = currentLineState;
+				prevLevel = level;
 			}
 		}
 
-		// Keep track of triple quote state of previous line
-		prevQuote = quote;
-
-		// Set fold level for this line and move to next line
-		styler.SetLevel(lineCurrent, lev & ~SC_FOLDLEVELWHITEFLAG);
-		indentCurrent = indentNext;
-		lineCurrent = lineNext;
+		statePrev = stateCurrent;
+		stateCurrent = stateNext;
 	}
+}
 
-	// NOTE: Cannot set level of last line here because indentCurrent doesn't have
-	// header flag set; the loop above is crafted to take care of this case!
-	//styler.SetLevel(lineCurrent, indentCurrent);
 }
 
 LexerModule lmPython(SCLEX_PYTHON, ColourisePyDoc, "python", FoldPyDoc);

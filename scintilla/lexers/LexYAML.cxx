@@ -496,10 +496,10 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		styler.SetLevel(lineCurrent, lev);
 		lineCurrent++;
 
-		const int levelAfterBlank = stateNext.indentCount;
-		const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
-
 		if (lineCurrent < lineNext) {
+			const int levelAfterBlank = stateNext.indentCount;
+			const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
+
 			int prevLineType = stateCurrent.lineType;
 			int nextLineType = GetLineType(styler.GetLineState(lineCurrent));
 			int prevLevel = skipLevel;

@@ -41,7 +41,7 @@ void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, Lexer
 #endif
 }
 #else
-// code folding based on Python
+// indentation based code folding
 void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyle */, LexerWordList, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
 	styler.StartAt(maxPos);
@@ -76,10 +76,6 @@ void FoldNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /* initStyl
 		if (lineNext <= docLines) {
 			// Information about next line is only available if not at end of document
 			indentNext = styler.IndentAmount(lineNext);
-		}
-		const int indentCurrentLevel = indentCurrent & SC_FOLDLEVELNUMBERMASK;
-		if (indentNext & SC_FOLDLEVELWHITEFLAG) {
-			indentNext = SC_FOLDLEVELWHITEFLAG | indentCurrentLevel;
 		}
 
 		// Skip past any blank lines for next indent level info

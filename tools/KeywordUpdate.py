@@ -25,6 +25,7 @@ def update_all_keyword():
 		('NP2LEX_LLVM', 'stlLLVM.c', 'LLVM.ll', 0, parse_llvm_api_file),
 		('NP2LEX_LUA', 'stlLua.c', 'Lua.lua', 0, parse_lua_api_file),
 		('NP2LEX_NSIS', 'stlNsis.c', 'NSIS.nsi', 0, parse_nsis_api_file),
+		('NP2LEX_PYTHON', 'stlPython.c', 'Python.py', 0, parse_python_api_file),
 		('NP2LEX_R', 'stlR.c', 'R.r', 0, parse_r_api_file),
 		('NP2LEX_REBOL', 'stlRebol.c', ['Rebol.r', 'Red.red'], 1, parse_rebol_api_file),
 		('NP2LEX_RUBY', 'stlRuby.c', 'Ruby.rb', 0, parse_ruby_api_file),

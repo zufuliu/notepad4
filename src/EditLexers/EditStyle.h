@@ -177,7 +177,7 @@
 #define NP2STYLE_Lifetime				63564
 #define NP2STYLE_Decorator				63565
 #define NP2STYLE_BuiltInFunction		63566
-#define NP2STYLE_objectMethod			63567
+
 #define NP2STYLE_BuiltInConstant		63568
 #define NP2STYLE_FormattedString		63569
 #define NP2STYLE_TripleQuotedFString	63570

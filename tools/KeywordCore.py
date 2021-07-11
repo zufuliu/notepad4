@@ -1067,6 +1067,106 @@ def parse_nsis_api_file(path):
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer),
 	]
 
+def parse_python_api_file(path):
+	keywordMap = {
+		'modules': [],
+		'attributes': [],
+		'classes': [],
+		'decorators': [],
+		'special method': [],
+		'functions': [],
+		'fields': [],
+		'misc': [],
+	}
+	sections = read_api_file(path, '#')
+	for key, doc in sections:
+		if key in ('keywords', 'built-in constants', 'exceptions'):
+			items = doc.split()
+			if key == 'exceptions':
+				keywordMap['classes'].extend(items)
+			else:
+				keywordMap[key] = items
+		elif key in ('built-in functions', 'api'):
+			items = re.findall(r'@(\w+)', doc)
+			keywordMap['decorators'].extend(items)
+			items = re.findall(r'class\s+(\w+)', doc)
+			if key == 'api':
+				keywordMap['classes'].extend(items)
+			else:
+				keywordMap['types'] =  items
+			items = re.findall(r'exception\s+(\w+)', doc)
+			keywordMap['classes'].extend(items)
+			items = re.findall(r'(\w+)\(', doc)
+			items = set(items) - set(keywordMap['classes'])
+			if key == 'api':
+				for item in items:
+					if item.startswith('__') and item.endswith('__'):
+						keywordMap['special method'].append(item + '()')
+					else:
+						keywordMap['functions'].append(item + '()')
+			else:
+				keywordMap[key] = [item + '()' for item in items]
+			items = re.findall(r'(\w+)=', doc)
+			keywordMap['misc'].extend(item for item in items if len(item) > 2)
+			items = re.findall(r'^([\w\.]+)', doc, re.MULTILINE)
+			keywordMap['modules'].extend(items)
+			items = re.findall(r'^\s+(\w+\(?)', doc, re.MULTILINE)
+			for item in items:
+				if not item.endswith('('):
+					if item.startswith('__') and item.endswith('__'):
+						keywordMap['attributes'].append(item)
+					else:
+						keywordMap['fields'].append(item)
+		elif key == 'attributes':
+			items = set(doc.split())
+			for item in items:
+				if item.endswith(')'):
+					keywordMap['built-in functions'].append(item)
+				else:
+					keywordMap['attributes'].append(item)
+		elif key == 'special method':
+			items = re.findall(r'(__\w+__\(?)', doc)
+			for item in items:
+				if item.endswith('('):
+					keywordMap[key].append(item + ')')
+				else:
+					keywordMap['attributes'].append(item)
+			items = re.findall(r'(\w+)=', doc)
+			keywordMap['misc'].extend(items)
+		elif key == 'comment':
+			items = re.findall(r':(\w+)', doc)
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'built-in constants',
+		'built-in functions',
+		'attributes',
+		'special method',
+		'classes',
+		'modules',
+		'functions',
+		'fields',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('type', keywordMap['types'], KeywordAttr.Default),
+		('built-in constant', keywordMap['built-in constants'], KeywordAttr.Default),
+		('built-in function', keywordMap['built-in functions'], KeywordAttr.Default),
+		('attribute', keywordMap['attributes'], KeywordAttr.Default),
+		('special method', keywordMap['special method'], KeywordAttr.Default),
+		('class', keywordMap['classes'], KeywordAttr.Default),
+		('decorator', keywordMap['decorators'], KeywordAttr.NoAutoComp),
+		('module', keywordMap['modules'], KeywordAttr.NoLexer),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
+		('field', keywordMap['fields'], KeywordAttr.NoLexer),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+		('comment tag', keywordMap['comment'], KeywordAttr.NoLexer),
+	]
+
+
 def parse_r_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}

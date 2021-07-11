@@ -101,11 +101,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Pascal, Delphi
 	* Perl, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* PowerShell
-	* Python, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
-		* IronPython
-		* Cobra
-		* Jython
-		* Boo
+	* [Python](../master/tools/lang/Python.py), up to Python 3.10. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
 	* PHP Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 	* Windows Rescouce Script
 	* [R](../master/tools/lang/R.r), up to R 4.0.3.
