@@ -95,8 +95,8 @@ constexpr bool IsPyStringPrefix(int ch) noexcept {
 
 inline void EnterPyStringState(StyleContext &sc) {
 	int ch = sc.ch | 0x20;
-	const int next = sc.chNext | 0x20;
 	int chNext = sc.chNext;
+	const int next = chNext | 0x20;
 	int state = SCE_PY_IDENTIFIER;
 	int offset = 1;
 	if (ch == 'r') {
@@ -335,7 +335,7 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 }
 
 constexpr bool IsDocCommentTag(int state, int chNext) noexcept {
-	return IsPyDoubleQuotedString(state) && (chNext == 'p' || chNext == 't' || chNext == 'r');
+	return IsPyString(state) && IsPyTripleQuotedString(state) && (chNext == 'p' || chNext == 't' || chNext == 'r');
 }
 
 enum {

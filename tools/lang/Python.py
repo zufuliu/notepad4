@@ -576,7 +576,7 @@ set:
 dict:
 	clear()
 	copy()
-	dict.fromkeys(iterable[, value])
+	fromkeys(iterable[, value])
 	get(key[, default])
 	items()
 	keys()
@@ -2576,15 +2576,15 @@ uuid
 		variant
 		version
 		is_safe
-		getnode()
-		uuid1(node=None, clock_seq=None)
-		uuid3(namespace, name)
-		uuid4()
-		uuid5(namespace, name)
-		NAMESPACE_DNS
-		NAMESPACE_URL
-		NAMESPACE_OID
-		NAMESPACE_X500
+	getnode()
+	uuid1(node=None, clock_seq=None)
+	uuid3(namespace, name)
+	uuid4()
+	uuid5(namespace, name)
+	NAMESPACE_DNS
+	NAMESPACE_URL
+	NAMESPACE_OID
+	NAMESPACE_X500
 
 # Python Runtime Services
 # https://docs.python.org/3.10/library/python.html

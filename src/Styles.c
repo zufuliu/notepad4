@@ -1364,7 +1364,7 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[5] = KeywordAttr_NoLexer;		// predefined variables
 		break;
 	case NP2LEX_PYTHON:
-		attr[7] = KeywordAttr_NoAutoComp;	// decorator
+		attr[7] = KeywordAttr_NoLexer;		// decorator
 		attr[8] = KeywordAttr_NoLexer;		// module
 		attr[9] = KeywordAttr_NoLexer;		// function
 		attr[10] = KeywordAttr_NoLexer;		// field

@@ -1076,7 +1076,7 @@ def parse_python_api_file(path):
 		'special method': [],
 		'functions': [],
 		'fields': [],
-		'misc': [],
+		'misc': ['utf-8'],
 	}
 	sections = read_api_file(path, '#')
 	for key, doc in sections:
@@ -1110,13 +1110,17 @@ def parse_python_api_file(path):
 			keywordMap['misc'].extend(item for item in items if len(item) > 2)
 			items = re.findall(r'^([\w\.]+)', doc, re.MULTILINE)
 			keywordMap['modules'].extend(items)
-			items = re.findall(r'^\s+(\w+\(?)', doc, re.MULTILINE)
+			items = re.findall(r'^[ \t]+(\w+\(?)', doc, re.MULTILINE)
 			for item in items:
 				if not item.endswith('('):
 					if item.startswith('__') and item.endswith('__'):
 						keywordMap['attributes'].append(item)
 					else:
 						keywordMap['fields'].append(item)
+			items = re.findall(r"""['"](.*?)['"]""", doc)
+			items = ' '.join(items).replace('|', ' ').split()
+			items = [item for item in items if len(item) > 2 and all(ch.isalpha() for ch in item)]
+			keywordMap['misc'].extend(items)
 		elif key == 'attributes':
 			items = set(doc.split())
 			for item in items:
@@ -1158,7 +1162,7 @@ def parse_python_api_file(path):
 		('attribute', keywordMap['attributes'], KeywordAttr.Default),
 		('special method', keywordMap['special method'], KeywordAttr.Default),
 		('class', keywordMap['classes'], KeywordAttr.Default),
-		('decorator', keywordMap['decorators'], KeywordAttr.NoAutoComp),
+		('decorator', keywordMap['decorators'], KeywordAttr.NoLexer),
 		('module', keywordMap['modules'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('field', keywordMap['fields'], KeywordAttr.NoLexer),
