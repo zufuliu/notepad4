@@ -63,11 +63,11 @@ constexpr bool UTF8IsAscii(unsigned int ch) noexcept {
 }
 
 constexpr bool UTF8IsAscii(unsigned char ch) noexcept {
-	return ch < 0x80;
+	return static_cast<signed char>(ch) >= 0;
 }
 
 constexpr bool UTF8IsAscii(char ch) noexcept {
-	return static_cast<unsigned char>(ch) < 0x80;
+	return static_cast<signed char>(ch) >= 0;
 }
 
 enum {

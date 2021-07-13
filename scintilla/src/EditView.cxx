@@ -435,11 +435,11 @@ constexpr const unsigned char ASCIIWrapBreakTable[128] = {
 };
 
 constexpr WrapBreak GetWrapBreak(unsigned char ch) noexcept {
-	return (ch < 128)? static_cast<WrapBreak>(ASCIIWrapBreakTable[ch]) : WrapBreak::None;
+	return (ch & 0x80)? WrapBreak::None : static_cast<WrapBreak>(ASCIIWrapBreakTable[ch]);
 }
 
 constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
-	if (ch < 128) {
+	if (ch < 0x80) {
 		return static_cast<WrapBreak>(ASCIIWrapBreakTable[ch]);
 	}
 	if (isUtf8) {
@@ -460,7 +460,7 @@ constexpr bool IsControlCharacter(unsigned char ch) noexcept {
 
 constexpr bool ViewIsASCII(std::string_view text) noexcept {
 	for (unsigned char ch : text) {
-		if (ch > 0x80) {
+		if (ch & 0x80) {
 			return false;
 		}
 	}
