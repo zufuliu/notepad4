@@ -58,10 +58,6 @@ constexpr bool IsASCIICharacter(unsigned int ch) noexcept {
 	return ch < 0x80;
 }
 
-constexpr bool UTF8IsAscii(unsigned int ch) noexcept {
-	return ch < 0x80;
-}
-
 constexpr bool UTF8IsAscii(unsigned char ch) noexcept {
 	return static_cast<signed char>(ch) >= 0;
 }
