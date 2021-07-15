@@ -344,6 +344,7 @@ public:
 	bool IsDBCSTrailByteNoExcept(unsigned char ch) const noexcept {
 		return dbcsCharClass->IsTrailByte(ch);
 	}
+	bool IsDBCSDualByteAt(Sci::Position pos) const noexcept;
 	int DBCSDrawBytes(std::string_view text) const noexcept;
 	int SafeSegment(const char *text, int length, int lengthSegment) const noexcept;
 	EncodingFamily CodePageFamily() const noexcept;

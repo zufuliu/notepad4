@@ -686,7 +686,7 @@ int Document::LenChar(Sci::Position pos, bool *invalid) noexcept {
 		}
 	} else {
 		const bool lead = IsDBCSLeadByteNoExcept(leadByte);
-		if (lead && ((pos + 1) < Length())) {
+		if (lead && IsDBCSTrailByteNoExcept(cb.UCharAt(pos + 1))) {
 			return 2;
 		} else {
 			if (invalid) {
@@ -726,7 +726,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 	}
 }
 
-// Normalise a position so that it is not halfway through a two byte character.
+// Normalise a position so that it is not halfway through a multi-byte character.
 // This can occur in two situations -
 // When lines are terminated with \r\n pairs which should be treated as one character.
 // When displaying DBCS text such as Japanese.
@@ -778,7 +778,7 @@ Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position
 
 			// Check from known start of character.
 			while (posCheck < pos) {
-				const int mbsize = IsDBCSLeadByteNoExcept(cb.CharAt(posCheck)) ? 2 : 1;
+				const int mbsize = IsDBCSDualByteAt(posCheck) ? 2 : 1;
 				if (posCheck + mbsize == pos) {
 					return pos;
 				} else if (posCheck + mbsize > pos) {
@@ -844,7 +844,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 			}
 		} else {
 			if (moveDir > 0) {
-				const int mbsize = IsDBCSLeadByteNoExcept(cb.CharAt(pos)) ? 2 : 1;
+				const int mbsize = IsDBCSDualByteAt(pos) ? 2 : 1;
 				pos += mbsize;
 				if (pos > cb.Length())
 					pos = cb.Length();
@@ -859,8 +859,13 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 				if ((pos - 1) <= posStartLine) {
 					return pos - 1;
 				} else if (IsDBCSLeadByteNoExcept(cb.CharAt(pos - 1))) {
-					// Must actually be trail byte
-					return pos - 2;
+					// Should actually be trail byte
+					if (IsDBCSDualByteAt(pos - 2)) {
+						return pos - 2;
+					} else {
+						// Invalid byte pair so treat as one byte wide
+						return pos - 1;
+					}
 				} else {
 					// Otherwise, step back until a non-lead-byte is found.
 					Sci::Position posTemp = pos - 1;
@@ -869,7 +874,12 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 					// Now posTemp+1 must point to the beginning of a character,
 					// so figure out whether we went back an even or an odd
 					// number of bytes and go back 1 or 2 bytes, respectively.
-					return (pos - 1 - ((pos - posTemp) & 1));
+					const Sci::Position widthLast = ((pos - posTemp) & 1) + 1;
+					if ((widthLast == 2) && (IsDBCSDualByteAt(pos - widthLast))) {
+						return pos - widthLast;
+					}
+					// Byte before pos may be valid character or may be an invalid second byte
+					return pos - 1;
 				}
 			}
 		}
@@ -1060,6 +1070,11 @@ int Document::DBCSDrawBytes(std::string_view text) const noexcept {
 	} else {
 		return 1;
 	}
+}
+
+bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
+	return IsDBCSLeadByteNoExcept(cb.UCharAt(pos))
+		&& IsDBCSTrailByteNoExcept(cb.UCharAt(pos + 1));
 }
 
 static constexpr bool IsSpaceOrTab(int ch) noexcept {
