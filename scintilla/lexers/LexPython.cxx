@@ -298,10 +298,17 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 	// [[fill] align]
 	if (AnyOf(ch, '<', '>', '=', '^')) {
 		ch = styler.SafeGetCharAt(++pos);
+		if (AnyOf(ch, '<', '>', '=', '^')) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
 	} else {
-		const char chNext = styler.SafeGetCharAt(pos + 1);
+		Sci_Position width = 1;
+		if (ch & 0x80) {
+			styler.GetCharacterAndWidth(pos, &width);
+		}
+		const char chNext = styler.SafeGetCharAt(pos + width);
 		if (!AnyOf(ch, '\r', '\n', '{', '}') && AnyOf(chNext, '<', '>', '=', '^')) {
-			pos += 2;
+			pos += 1 + width;
 			ch = styler.SafeGetCharAt(pos);
 		}
 	}
