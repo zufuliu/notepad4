@@ -472,8 +472,12 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			switch (sc.ch) {
 			case '\\':
-				if (IsEOLChar(sc.chNext) || IsPyRawString(sc.state)) {
-					sc.Forward();
+				if (IsEOLChar(sc.chNext)) {
+					// nop
+				} else if (IsPyRawString(sc.state)) {
+					if (sc.chNext == '\\' || sc.chNext == '\'' || sc.chNext == '\"') {
+						sc.Forward();
+					}
 				} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_PY_ESCAPECHAR);
 					sc.Forward();
@@ -842,17 +846,15 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);
 
 	Sci_Line lineCurrent = styler.GetLine(startPos);
-	FoldLineState statePrev(0);
+	FoldLineState statePrev(styler.GetLineState(lineCurrent - 1));
 	FoldLineState stateCurrent(styler.GetLineState(lineCurrent));
 	while (lineCurrent > 0) {
 		lineCurrent--;
-		stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
-		if (!stateCurrent.Backtrack()) {
+		stateCurrent = statePrev;
+		statePrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
+		if (!(stateCurrent.Backtrack() || statePrev.TripleQuoted())) {
 			break;
 		}
-	}
-	if (lineCurrent > 0) {
-		statePrev = FoldLineState(styler.GetLineState(lineCurrent - 1));
 	}
 
 	while (lineCurrent <= maxLines) {
@@ -860,11 +862,12 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 		if (stateCurrent.TripleQuoted()) {
 			statePrev = stateCurrent;
 			styler.SetLevel(lineCurrent, lev | SC_FOLDLEVELHEADERFLAG);
+			int lineState;
 			do {
 				lineCurrent++;
-				stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
+				lineState = styler.GetLineState(lineCurrent);
 				styler.SetLevel(lineCurrent, lev + 1);
-			} while (stateCurrent.TripleQuoted());
+			} while (lineState & PyLineStateMaskTripleQuote);
 			lineCurrent++;
 			stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
 			if (stateCurrent.Empty()) {

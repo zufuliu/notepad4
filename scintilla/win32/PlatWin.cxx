@@ -3617,9 +3617,9 @@ LRESULT ListBoxX::NcHitTest(WPARAM wParam, LPARAM lParam) const noexcept {
 		const int xPos = GET_X_LPARAM(lParam);
 		const int yPos = GET_Y_LPARAM(lParam);
 		/*
-		13 | 12 | 14         4 | 3 | 5
-		10 |    | 11    =>   1 | 0 | 2
-		16 | 15 | 17         7 | 6 | 8
+		HTTOPLEFT    13 | HTTOP    12 | HTTOPRIGHT    14         4 | 3 | 5
+		HTLEFT       10 | HTNOWHERE 0 | HTRIGHT       11  -9 =>  1 | 0 | 2
+		HTBOTTOMLEFT 16 | HTBOTTOM 15 | HTBOTTOMRIGHT 17         7 | 6 | 8
 		*/
 		const int x = (xPos <= rcInner.left) ? 1 : ((xPos >= rcInner.right - cx) ? 2 : 0);
 		int y = (yPos <= rcInner.top) ? 3 : ((yPos >= rcInner.bottom) ? 6 : 0);
