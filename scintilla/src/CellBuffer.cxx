@@ -587,6 +587,17 @@ void UndoHistory::CompletedRedoStep() noexcept {
 	currentAction++;
 }
 
+SplitView::SplitView(const SplitVector<char> &instance) noexcept {
+	length = instance.Length();
+	length1 = instance.GapPosition();
+	if (length1 == 0) {
+		// Assign segment2 to segment1 / length1 to avoid useless test against 0 length1
+		length1 = length;
+	}
+	segment1  = instance.ElementPointer(0);
+	segment2 = instance.ElementPointer(length1) - length1;
+}
+
 CellBuffer::CellBuffer(bool hasStyles_, bool largeDocument_) :
 	hasStyles(hasStyles_), largeDocument(largeDocument_) {
 	readOnly = false;
@@ -661,6 +672,10 @@ const char *CellBuffer::StyleRangePointer(Sci::Position position, Sci::Position 
 
 Sci::Position CellBuffer::GapPosition() const noexcept {
 	return substance.GapPosition();
+}
+
+SplitView CellBuffer::AllView() const noexcept {
+	return SplitView(substance);
 }
 
 // The char* returned is to an allocation owned by the undo history

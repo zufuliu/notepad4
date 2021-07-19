@@ -103,6 +103,34 @@ public:
 	void CompletedRedoStep() noexcept;
 };
 
+struct SplitView {
+	const char *segment1 = nullptr;
+	size_t length1 = 0;
+	const char *segment2 = nullptr;
+	size_t length = 0;
+
+	SplitView() noexcept = default;
+	SplitView(const SplitVector<char> &substance) noexcept;
+
+	bool operator==(const SplitView &other) const noexcept {
+		return segment1 == other.segment1 && length1 == other.length1
+			&& segment2 == other.segment2 && length == other.length;
+	}
+	bool operator!=(const SplitView &other) const noexcept {
+		return !(*this == other);
+	}
+
+	char CharAt(size_t position) const noexcept {
+		if (position < length1) {
+			return segment1[position];
+		}
+		if (position < length) {
+			return segment2[position];
+		}
+		return '\0';
+	}
+};
+
 /**
  * Holder for an expandable array of characters that supports undo and line markers.
  * Based on article "Data Structures in a Bit-Mapped Text Editor"
@@ -151,6 +179,7 @@ public:
 	const char *RangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
 	const char *StyleRangePointer(Sci::Position position, Sci::Position rangeLength) noexcept;
 	Sci::Position GapPosition() const noexcept;
+	SplitView AllView() const noexcept;
 
 	Sci::Position Length() const noexcept;
 	void Allocate(Sci::Position newSize);

@@ -726,7 +726,7 @@ bool Document::InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position
 	}
 }
 
-// Normalise a position so that it is not halfway through a multi-byte character.
+// Normalise a position so that it is not part way through a multi-byte character.
 // This can occur in two situations -
 // When lines are terminated with \r\n pairs which should be treated as one character.
 // When displaying DBCS text such as Japanese.
@@ -1887,6 +1887,15 @@ Sci::Position Document::NextWordEnd(Sci::Position pos, int delta) const noexcept
 	return pos;
 }
 
+namespace {
+
+constexpr bool IsWordEdge(CharacterClass cc, CharacterClass ccNext) noexcept {
+	return (cc != ccNext)
+		&& (cc == CharacterClass::word || cc == CharacterClass::punctuation || cc == CharacterClass::cjkWord);
+}
+
+}
+
 /**
  * Check that the character at the given position is a word or punctuation character and that
  * the previous character is of a different character class.
@@ -1894,31 +1903,27 @@ Sci::Position Document::NextWordEnd(Sci::Position pos, int delta) const noexcept
 bool Document::IsWordStartAt(Sci::Position pos) const noexcept {
 	if (pos >= Length())
 		return false;
-	if (pos > 0) {
-		const CharacterExtracted cePos = CharacterAfter(pos);
-		const CharacterClass ccPos = WordCharacterClass(cePos.character);
-		const CharacterExtracted cePrev = CharacterBefore(pos);
-		const CharacterClass ccPrev = WordCharacterClass(cePrev.character);
-		return (ccPos == CharacterClass::word || ccPos == CharacterClass::punctuation || ccPos == CharacterClass::cjkWord) &&
-			(ccPos != ccPrev/* || StyleAt(pos - 1) != StyleAt(pos)*/);
+	if (pos >= 0) {
+		const CharacterClass ccPos = WordCharacterClass(CharacterAfter(pos).character);
+		// At start of document, treat as if space before so can be word start
+		const CharacterClass ccPrev = (pos > 0) ? WordCharacterClass(CharacterBefore(pos).character) : CharacterClass::space;
+		return IsWordEdge(ccPos, ccPrev);
 	}
 	return true;
 }
 
 /**
- * Check that the character at the given position is a word or punctuation character and that
+ * Check that the character before the given position is a word or punctuation character and that
  * the next character is of a different character class.
  */
 bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 	if (pos <= 0)
 		return false;
-	if (pos < Length()) {
-		const CharacterExtracted cePos = CharacterAfter(pos);
-		const CharacterClass ccPos = WordCharacterClass(cePos.character);
-		const CharacterExtracted cePrev = CharacterBefore(pos);
-		const CharacterClass ccPrev = WordCharacterClass(cePrev.character);
-		return (ccPrev == CharacterClass::word || ccPrev == CharacterClass::punctuation || ccPrev == CharacterClass::cjkWord) &&
-			(ccPrev != ccPos/* || StyleAt(pos - 1) != StyleAt(pos)*/);
+	if (pos <= Length()) {
+		// At end of document, treat as if space after so can be word end
+		const CharacterClass ccPos = (pos < Length()) ? WordCharacterClass(CharacterAfter(pos).character) : CharacterClass::space;
+		const CharacterClass ccPrev = WordCharacterClass(CharacterBefore(pos).character);
+		return IsWordEdge(ccPrev, ccPos);
 	}
 	return true;
 }
@@ -2013,6 +2018,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			// Back all of a character
 			pos = NextPosition(pos, -1);
 		}
+		const SplitView cbView = cb.AllView();
 		if (caseSensitive) {
 			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
@@ -2046,11 +2052,11 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			}
 			//while (forward ? (pos < endSearch) : (pos >= endSearch)) {
 			while ((direction ^ (pos - endSearch)) < 0) {
-				const unsigned char leadByte = UCharAt(pos);
+				const unsigned char leadByte = cbView.CharAt(pos);
 				if (charStartSearch == leadByte) {
 					bool found = (pos + lengthFind) <= limitPos;
 					for (Sci::Position indexSearch = 1; (indexSearch < lengthFind) && found; indexSearch++) {
-						const unsigned char ch = UCharAt(pos + indexSearch);
+						const unsigned char ch = cbView.CharAt(pos + indexSearch);
 						found = ch == searchData[indexSearch];
 					}
 					if (found && MatchesWordOptions(word, wordStart, pos, lengthFind)) {
@@ -2067,7 +2073,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 						}
 					}
 				} else {
-					const unsigned char nextByte = UCharAt(pos + skip);
+					const unsigned char nextByte = cbView.CharAt(pos + skip);
 					pos += shiftTable[nextByte];
 					if (nextByte >= safeChar) {
 						pos = MovePositionOutsideChar(pos, increment, false);
@@ -2086,14 +2092,14 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				size_t indexSearch = 0;
 				bool characterMatches = true;
 				for (;;) {
-					const unsigned char leadByte = cb.UCharAt(posIndexDocument);
+					const unsigned char leadByte = cbView.CharAt(posIndexDocument);
 					char bytes[UTF8MaxBytes + 1];
 					int widthChar = 1;
 					if (!UTF8IsAscii(leadByte)) {
 						const int widthCharBytes = UTF8BytesOfLead(leadByte);
 						bytes[0] = static_cast<char>(leadByte);
 						for (int b = 1; b < widthCharBytes; b++) {
-							bytes[b] = cb.CharAt(posIndexDocument + b);
+							bytes[b] = cbView.CharAt(posIndexDocument + b);
 						}
 						widthChar = UTF8ClassifyMulti(reinterpret_cast<const unsigned char *>(bytes), widthCharBytes) & UTF8MaskWidth;
 					}
@@ -2150,7 +2156,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				size_t indexSearch = 0;
 				bool characterMatches = true;
 				for (;;) {
-					const unsigned char leadByte = cb.UCharAt(pos + indexDocument);
+					const unsigned char leadByte = cbView.CharAt(pos + indexDocument);
 					const int widthChar = IsDBCSLeadByteNoExcept(leadByte) ? 2 : 1;
 					if (!widthFirstCharacter) {
 						widthFirstCharacter = widthChar;
@@ -2164,7 +2170,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 					} else {
 						char bytes[maxBytesCharacter + 1];
 						bytes[0] = static_cast<char>(leadByte);
-						bytes[1] = cb.CharAt(pos + indexDocument + 1);
+						bytes[1] = cbView.CharAt(pos + indexDocument + 1);
 						char folded[maxBytesCharacter * maxFoldingExpansion + 1];
 						lenFlat = pcf->Fold(folded, sizeof(folded), bytes, widthChar);
 						// memcmp may examine lenFlat bytes in both arguments so assert it doesn't read past end of searchThing
@@ -2204,7 +2210,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			while ((direction ^ (pos - endSearch)) < 0) {
 				bool found = (pos + lengthFind) <= limitPos;
 				for (Sci::Position indexSearch = 0; (indexSearch < lengthFind) && found; indexSearch++) {
-					const char ch = CharAt(pos + indexSearch);
+					const char ch = cbView.CharAt(pos + indexSearch);
 					const char chTest = searchData[indexSearch];
 					if (UTF8IsAscii(ch)) {
 						found = chTest == MakeLowerCase(ch);

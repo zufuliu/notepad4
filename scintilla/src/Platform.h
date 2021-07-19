@@ -20,6 +20,7 @@
 #define PLAT_WIN 0
 #define PLAT_WX  0
 #define PLAT_QT 0
+#define PLAT_QT_QML 0
 #define PLAT_FOX 0
 #define PLAT_CURSES 0
 #define PLAT_TK 0
@@ -44,6 +45,10 @@
 #elif defined(SCINTILLA_QT)
 #undef PLAT_QT
 #define PLAT_QT 1
+
+#elif defined(SCINTILLA_QT_QML)
+#undef PLAT_QT_QML
+#define PLAT_QT_QML 1
 
 #elif defined(TK)
 #undef PLAT_TK
