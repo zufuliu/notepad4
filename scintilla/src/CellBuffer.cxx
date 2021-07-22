@@ -1270,14 +1270,42 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 	// end NP2_USE_SSE2
 
 #else
+#if defined(__clang__) || defined(__GNUC__) || defined(__ICL) || !defined(_MSC_VER)
+	if (utf8LineEnds == LineEndType::Default) {
+		while (ptr < end) {
+			// skip to line end
+			const uint8_t ch = *ptr++;
+			constexpr uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
+			if (ch > '\r' || ((mask >> ch) & 1) != 0) {
+				continue;
+			}
+			if (ch == '\r' && *ptr == '\n') {
+				++ptr;
+			}
+			if (nPositions == PositionBlockSize) {
+				plv->InsertLines(lineInsert, positions, nPositions, atLineStart);
+				lineInsert += nPositions;
+				nPositions = 0;
+			}
+			positions[nPositions++] = position + ptr - s;
+		}
+	}
+
+#else
 	if (utf8LineEnds == LineEndType::Default && ptr < end) {
-		constexpr uint32_t mask = (1 << '\r') | (1 << '\n');
 		do {
 			// skip to line end
 			uint8_t ch = 0;
-			while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
+#if 1
+			constexpr uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
+			while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) != 0)) {
 				// nop
 			}
+#else
+			while (ptr < end && ((ch = *ptr++) > '\r' || ch < '\n')) {
+				// nop
+			}
+#endif
 			switch (ch) {
 			case '\r':
 				if (*ptr == '\n') {
@@ -1295,6 +1323,7 @@ void CellBuffer::BasicInsertString(const Sci::Position position, const char * co
 			}
 		} while (ptr < end);
 	}
+#endif
 #endif
 
 	if (ptr < end) {

@@ -704,13 +704,38 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 	// end NP2_USE_SSE2
 #else
 
-	const uint32_t mask = (1 << '\r') | (1 << '\n');
+#if defined(__clang__) || defined(__GNUC__) || defined(__ICL) || !defined(_MSC_VER)
+	while (ptr < end) {
+		const uint8_t ch = *ptr++;
+		const uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
+		if (ch > '\r' || ((mask >> ch) & 1) != 0) {
+			continue;
+		}
+		if (ch == '\n') {
+			++lineCountLF;
+		} else {
+			if (*ptr == '\n') {
+				++ptr;
+				++lineCountCRLF;
+			} else {
+				++lineCountCR;
+			}
+		}
+	}
+#else
 	do {
 		// skip to line end
 		uint8_t ch = 0;
-		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
+#if 1
+		const uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
+		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) != 0)) {
 			// nop
 		}
+#else
+		while (ptr < end && ((ch = *ptr++) > '\r' || ch < '\n')) {
+			// nop
+		}
+#endif
 		switch (ch) {
 		case '\n':
 			++lineCountLF;
@@ -725,7 +750,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 			break;
 		}
 	} while (ptr < end);
-
+#endif
 	if (ptr == end) {
 		switch (*ptr) {
 		case '\n':
@@ -863,9 +888,9 @@ labelStart:
 			ptr += sizeof(__m128i);
 		}
 #endif
-		const uint32_t mask = (1 << '\r') | (1 << '\n');
+		const uint32_t mask = ((1 << '\r') - 1) ^ (1 << '\n');
 		uint8_t ch;
-		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) == 0)) {
+		while (ptr < end && ((ch = *ptr++) > '\r' || ((mask >> ch) & 1) != 0)) {
 			// nop
 		}
 	}
