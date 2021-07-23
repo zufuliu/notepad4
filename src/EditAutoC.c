@@ -84,12 +84,17 @@ uint32_t WordList_Order(const void *pWord, uint32_t len) {
 		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
 	}
 
-#else
-	uint32_t high = *((const uint32_t *)pWord);
+#elif NP2_USE_AVX2
+	uint32_t high = loadle_u32(pWord);
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
 		high = bit_zero_high_u32(high, len*8);
 	}
 	high = bswap32(high);
+#else
+	uint32_t high = loadbe_u32(pWord);
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high >>= (NP2_AUTOC_ORDER_LENGTH - len)*8;
+	}
 #endif
 	return high;
 }
@@ -111,13 +116,19 @@ uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
 		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
 	}
 
-#else
-	uint32_t high = *((const uint32_t *)pWord);
+#elif NP2_USE_AVX2
+	uint32_t high = loadle_u32(pWord);
 	high |= 0x20202020U; // only works for ASCII letters
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
 		high = bit_zero_high_u32(high, len*8);
 	}
 	high = bswap32(high);
+#else
+	uint32_t high = loadbe_u32(pWord);
+	high |= 0x20202020U; // only works for ASCII letters
+	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		high >>= (NP2_AUTOC_ORDER_LENGTH - len)*8;
+	}
 #endif
 	return high;
 }

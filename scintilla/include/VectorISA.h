@@ -200,10 +200,14 @@ static inline uint32_t rotl8(uint32_t x) NP2_noexcept {
 }
 #endif
 
+static inline uint32_t loadle_u32(const void *ptr) NP2_noexcept {
+	return *((const uint32_t *)ptr);
+}
+
 #if NP2_USE_AVX2
 static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
 #if defined(__GNUC__)
-	return __builtin_bswap32(*((const uint32_t *)ptr));
+	return __builtin_bswap32(loadle_u32(ptr));
 #else
 	return _loadbe_i32(ptr);
 #endif
@@ -212,6 +216,11 @@ static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
 #define bit_zero_high_u32(x, index)	_bzhi_u32((x), (index))			// BMI2
 //#define bit_zero_high_u32(x, index)	_bextr_u32((x), 0, (index))		// BMI1
 #else
+
+static inline uint32_t loadbe_u32(const void *ptr) NP2_noexcept {
+	return bswap32(loadle_u32(ptr));
+}
+
 static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcept {
 	return x & ((1U << index) - 1);
 }
