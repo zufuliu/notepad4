@@ -7325,7 +7325,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		if (!keepCurrentLexer) {
 			if (flagLexerSpecified) {
 				if (pLexCurrent->rid == iInitialLexer) {
-					UpdateLineNumberWidth();
+					Style_SetLexer(pLexCurrent, TRUE);
 				} else if (lpSchemeArg) {
 					Style_SetLexerFromName(szCurFile, lpSchemeArg);
 					LocalFree(lpSchemeArg);
