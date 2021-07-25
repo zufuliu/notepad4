@@ -515,6 +515,7 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 static inline void FindSystemDefaultCodeFont(void) {
 	LPCWSTR const commonCodeFontName[] = {
 		L"DejaVu Sans Mono",
+		L"Cascadia Mono",
 		L"Consolas",			// Vista and above
 		//L"Source Code Pro",
 		//L"Liberation Mono",
