@@ -2230,6 +2230,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_AVS:
 	case SCLEX_AWK:
 	case SCLEX_CMAKE:
+	case SCLEX_COFFEESCRIPT:
 	case SCLEX_CONF:
 	case SCLEX_GN:
 	case SCLEX_JAM:
@@ -2368,6 +2369,10 @@ void EditToggleCommentBlock(void) {
 
 	case SCLEX_CMAKE:
 		EditEncloseSelection(L"#[[", L"]]");
+		break;
+
+	case SCLEX_COFFEESCRIPT:
+		EditEncloseSelection(L"###", L"###");
 		break;
 
 	case SCLEX_FORTRAN:

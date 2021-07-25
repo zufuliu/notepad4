@@ -351,7 +351,7 @@ enum {
 	PyLineStateMaskTripleQuote = 1 << 2,
 	PyLineStateMaskCloseBrace = 1 << 3,
 	PyLineStateLineContinuation = 1 << 4,
-	PyLineStateFormattedString = 1 << 5,
+	PyLineStateStringInterpolation = 1 << 5,
 };
 
 void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -372,7 +372,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	if (startPos != 0) {
 		// backtrack to the line starts expression inside formatted string literal.
-		BacktrackToStart(styler, PyLineStateFormattedString, startPos, lengthDoc, initStyle);
+		BacktrackToStart(styler, PyLineStateStringInterpolation, startPos, lengthDoc, initStyle);
 	}
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -804,7 +804,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 			}
 			if (!nestedState.empty()) {
-				lineState |= PyLineStateFormattedString | PyLineStateMaskTripleQuote;
+				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
 			} else if (IsPyStringStyle(sc.state) && IsPyTripleQuotedString(sc.state)) {
 				lineState |= PyLineStateMaskTripleQuote;
 			} else if (visibleChars == 0) {
@@ -846,8 +846,12 @@ struct FoldLineState {
 	}
 };
 
+}
+
+namespace Lexilla {
+
 // code folding based on LexYAML
-void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Position maxPos = startPos + lengthDoc;
 	const Sci_Line docLines = styler.GetLine(styler.Length());
 	const Sci_Line maxLines = (maxPos == styler.Length()) ? docLines : styler.GetLine(maxPos - 1);

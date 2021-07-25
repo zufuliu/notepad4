@@ -984,6 +984,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexBatch.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCIL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCMake.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexCoffeeScript.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexConfig.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCPP.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCSS.cxx" />
@@ -1096,6 +1097,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlBatch.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCIL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCMake.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlCoffeeScript.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCPP.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCSharp.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCSS.c" />

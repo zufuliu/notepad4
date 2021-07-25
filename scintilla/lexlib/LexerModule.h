@@ -67,5 +67,6 @@ constexpr int SimpleLineStateMaskLineComment = 1;
 
 // code folding for braces, brackets, parentheses and consecutive line comments.
 void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler);
+void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler);
 
 }

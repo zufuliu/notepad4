@@ -35,6 +35,7 @@ extern LexerModule lmBash;
 extern LexerModule lmBatch;
 extern LexerModule lmCIL;
 extern LexerModule lmCMake;
+extern LexerModule lmCoffeeScript;
 extern LexerModule lmConf;
 extern LexerModule lmCPP;
 extern LexerModule lmCss;
@@ -103,6 +104,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmBatch,
 	&lmCIL,
 	&lmCMake,
+	&lmCoffeeScript,
 	&lmConf,
 	&lmCPP,
 	&lmCss,

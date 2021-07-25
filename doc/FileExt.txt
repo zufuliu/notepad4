@@ -213,6 +213,13 @@ CMake Script
 	*.cmake.in
 	*.ctest.in
 
+CoffeeScript
+	coffee
+	cjsx			CoffeeScript with JSX
+	cson			https://github.com/bevry/cson
+
+	Cakefile
+
 Config File
 	conf
 	cfg

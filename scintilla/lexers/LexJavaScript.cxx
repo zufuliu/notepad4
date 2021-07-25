@@ -176,7 +176,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				const int state = sc.state;
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.ForwardSetState(state);
-				continue;
 			}
 			if (sc.Match('\\', 'u') || (sc.ch == '-' && (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE))) {
 				sc.Forward();
@@ -246,11 +245,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					if (sc.state != SCE_JS_WORD && sc.ch != '.') {
 						kwType = SCE_JS_DEFAULT;
 					}
-				} else if (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE) {
-					sc.SetState(SCE_JSX_TEXT);
-					continue;
 				}
-				sc.SetState(SCE_JS_DEFAULT);
+				sc.SetState((sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+				continue;
 			}
 			break;
 
@@ -269,20 +266,13 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (lineContinuation) {
 					lineContinuation = 0;
 				} else {
-					if (sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) {
-						sc.SetState(SCE_JSX_TEXT);
-						continue;
-					}
-					sc.SetState(SCE_JS_DEFAULT);
+					sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+					continue;
 				}
 			} else if ((sc.ch == '\'' && (sc.state == SCE_JS_STRING_SQ || sc.state == SCE_JSX_STRING_SQ))
 				|| (sc.ch == '"' && (sc.state == SCE_JS_STRING_DQ || sc.state == SCE_JSX_STRING_DQ))) {
 				sc.Forward();
-				if (sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) {
-					sc.SetState(SCE_JSX_TEXT);
-					continue;
-				}
-				sc.SetState(SCE_JS_DEFAULT);
+				sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
 				continue;
 			}
 			break;

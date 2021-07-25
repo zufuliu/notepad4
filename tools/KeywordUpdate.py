@@ -20,6 +20,7 @@ def update_all_keyword():
 				('NP2LEX_GRADLE', 'stlGradle.c', 'Gradle.gradle', 1, parse_gradle_api_file),
 			('NP2LEX_KOTLIN', 'stlKotlin.c', 'Kotlin.kt', 0, parse_kotlin_api_file),
 		('NP2LEX_JAVASCRIPT', 'stlJavaScript.c', 'JavaScript.js', 1, parse_javascript_api_file),
+			('NP2LEX_COFFEESCRIPT', 'stlCoffeeScript.c', 'CoffeeScript.coffee', 0, parse_coffeescript_api_file),
 			('NP2LEX_TYPESCRIPT', 'stlTypeScript.c', 'TypeScript.ts', 1, parse_typescript_api_file),
 		('NP2LEX_JULIA', 'stlJulia.c', 'Julia.jl', 0, parse_julia_api_file),
 		('NP2LEX_LLVM', 'stlLLVM.c', 'LLVM.ll', 0, parse_llvm_api_file),

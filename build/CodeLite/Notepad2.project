@@ -26,6 +26,7 @@
       <File Name="../../scintilla/lexers/LexBatch.cxx"/>
       <File Name="../../scintilla/lexers/LexCIL.cxx"/>
       <File Name="../../scintilla/lexers/LexCMake.cxx"/>
+      <File Name="../../scintilla/lexers/LexCoffeeScript.cxx"/>
       <File Name="../../scintilla/lexers/LexConfig.cxx"/>
       <File Name="../../scintilla/lexers/LexCPP.cxx"/>
       <File Name="../../scintilla/lexers/LexCSS.cxx"/>
@@ -192,6 +193,7 @@
       <File Name="../../src/EditLexers/stlBatch.c"/>
       <File Name="../../src/EditLexers/stlCIL.c"/>
       <File Name="../../src/EditLexers/stlCMake.c"/>
+      <File Name="../../src/EditLexers/stlCoffeeScript.c"/>
       <File Name="../../src/EditLexers/stlCPP.c"/>
       <File Name="../../src/EditLexers/stlCSharp.c"/>
       <File Name="../../src/EditLexers/stlCSS.c"/>

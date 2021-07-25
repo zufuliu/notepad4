@@ -72,6 +72,7 @@ extern EDITLEXER lexBatch;
 
 extern EDITLEXER lexCIL;
 extern EDITLEXER lexCMake;
+extern EDITLEXER lexCoffeeScript;
 extern EDITLEXER lexCONF;
 
 extern EDITLEXER lexD;
@@ -171,6 +172,7 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexCIL,
 	&lexCMake,
+	&lexCoffeeScript,
 	&lexCONF,
 
 	&lexD,
@@ -2687,6 +2689,10 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 		}
 		if (!bFound && (StrHasPrefixCase(lpszName, L"Makefile") || StrHasPrefixCase(lpszName, L"Kbuild"))) {
 			pLexNew = &lexMake;
+			bFound = TRUE;
+		}
+		if (!bFound && StrCaseEqual(lpszName, L"Cakefile")) {
+			pLexNew = &lexCoffeeScript;
 			bFound = TRUE;
 		}
 		if (!bFound && (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile"))) {

@@ -116,6 +116,7 @@ void	Style_SelectLexerDlg(HWND hwnd, BOOL favorite);
 
 static inline BOOL IsFoldIndentationBased(int iLexer) {
 	return iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_COFFEESCRIPT
 		|| iLexer == SCLEX_PYTHON
 		|| iLexer == SCLEX_YAML;
 }
@@ -123,6 +124,7 @@ static inline BOOL IsFoldIndentationBased(int iLexer) {
 // Python like indentation based code folding that can use SC_IV_LOOKFORWARD
 static inline BOOL IsPythonLikeFolding(int iLexer) {
 	return iLexer == SCLEX_NULL
+		|| iLexer == SCLEX_COFFEESCRIPT
 		|| iLexer == SCLEX_PYTHON
 		|| iLexer == SCLEX_YAML;
 }

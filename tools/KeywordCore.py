@@ -357,6 +357,28 @@ def parse_batch_api_file(path):
 		('command options', keywordMap['options'], KeywordAttr.NoLexer),
 	]
 
+def parse_coffeescript_api_file(path):
+	sections = read_api_file(path, '#')
+	keywordMap = {}
+	for key, doc in sections:
+		keywordMap[key] = doc.split()
+
+	keywordMap['directive'] = JavaScriptKeywordMap['directive']
+	keywordMap['class'] = JavaScriptKeywordMap['class']
+	RemoveDuplicateKeyword(keywordMap, [
+		'directive',
+		'keywords',
+		'reserved words',
+		'class',
+	])
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('reserved words', keywordMap['reserved words'], KeywordAttr.Default),
+		('directive', keywordMap['directive'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+	]
+
 def parse_cmake_api_file(path):
 	# languages from https://gitlab.kitware.com/cmake/cmake/blob/master/Auxiliary/vim/extract-upper-case.pl
 	cmakeLang = "ASM C CSharp CUDA CXX Fortran Java RC Swift".split()

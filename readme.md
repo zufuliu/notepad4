@@ -52,6 +52,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Less CSS
 		* HSS
 	* [CMake](../master/tools/lang/CMake.cmake), up to CMake 3.20. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
+	* [CoffeeScript](../master/tools/lang/CoffeeScript.coffee), CoffeeScript 2.5.
 	* Common Intermediate Language
 	* Configuration / Properties File
 		* Apache Configuration File
