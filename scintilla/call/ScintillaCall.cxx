@@ -898,6 +898,14 @@ bool ScintillaCall::AutoCGetAutoHide() {
 	return Call(Message::AutoCGetAutoHide);
 }
 
+void ScintillaCall::AutoCSetOptions(Scintilla::AutoCompleteOption options) {
+	Call(Message::AutoCSetOptions, static_cast<uintptr_t>(options));
+}
+
+AutoCompleteOption ScintillaCall::AutoCGetOptions() {
+	return static_cast<Scintilla::AutoCompleteOption>(Call(Message::AutoCGetOptions));
+}
+
 void ScintillaCall::AutoCSetDropRestOfWord(bool dropRestOfWord) {
 	Call(Message::AutoCSetDropRestOfWord, dropRestOfWord);
 }

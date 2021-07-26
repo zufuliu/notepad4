@@ -1453,6 +1453,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	if (bShow && bUpdated) {
 		autoCompletionConfig.iPreviousItemCount = pWList->nWordCount;
 		char *pList = WordList_GetList(pWList);
+		SciCall_AutoCSetOptions(SC_AUTOCOMPLETE_FIXED_SIZE);
 		SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted
 		SciCall_AutoCSetIgnoreCase(bIgnoreCase); // case sensitivity
 		//if (bIgnoreCase) {

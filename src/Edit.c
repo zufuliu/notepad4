@@ -42,6 +42,7 @@
 #include "resource.h"
 
 extern HWND hwndMain;
+extern HWND hwndEdit;
 extern DWORD dwLastIOError;
 extern HWND hDlgFindReplace;
 extern UINT cpLastFind;
@@ -153,6 +154,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	FileVars_Apply(&fvCurFile);
 
 	if (cbText > 0) {
+		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 		SciCall_SetModEventMask(SC_MOD_NONE);
 #if 0
 		StopWatch watch;
@@ -165,6 +167,8 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		StopWatch_ShowLog(&watch, "AddText time");
 #endif
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 
 	SciCall_SetUndoCollection(TRUE);
@@ -211,9 +215,12 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	SciCall_SetCodePage(cpDest);
 
 	if (cbText > 0) {
+		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AppendText(cbText, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -256,9 +263,12 @@ void EditConvertToLargeMode(void) {
 	FileVars_Apply(&fvCurFile);
 
 	if (length > 0) {
+		SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 		SciCall_SetModEventMask(SC_MOD_NONE);
 		SciCall_AppendText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
+		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -6090,6 +6100,7 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 
 	// Show wait cursor...
 	BeginWaitCursor();
+	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFind ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
@@ -6127,8 +6138,10 @@ BOOL EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowInfo) {
 		}
 	}
 
+	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		SciCall_EndUndoAction();
+		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 
 	// Remove wait cursor
@@ -6162,6 +6175,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 
 	// Show wait cursor...
 	BeginWaitCursor();
+	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 
 	const BOOL bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFind ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
@@ -6204,6 +6218,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 		}
 	}
 
+	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		const Sci_Position iPos = SciCall_GetTargetEnd();
 		if (SciCall_GetSelectionEnd() <	iPos) {
@@ -6220,6 +6235,7 @@ BOOL EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, BOOL bShowIn
 		}
 
 		SciCall_EndUndoAction();
+		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 
 	// Remove wait cursor
@@ -7951,6 +7967,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
 
+	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	for (Sci_Line line = 0; line < lineCount; ++line) {
 		const int level = SciCall_GetFoldLevel(line);
 		if (level & SC_FOLDLEVELHEADERFLAG) {
@@ -7958,6 +7975,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 		}
 	}
 
+	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
@@ -7973,6 +7991,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
 
+	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
 		struct FoldLevelStack levelStack = { 0, { 0 }};
 		++lev;
@@ -8003,6 +8022,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		}
 	}
 
+	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
@@ -8071,6 +8091,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
 
+	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
 		struct FoldLevelStack levelStack = { 0, { 0 }};
 		while (line < lineCount) {
@@ -8105,6 +8126,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 		}
 	}
 
+	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);

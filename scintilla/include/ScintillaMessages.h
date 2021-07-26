@@ -199,6 +199,8 @@ enum class Message {
 	UserListShow = 2117,
 	AutoCSetAutoHide = 2118,
 	AutoCGetAutoHide = 2119,
+	AutoCSetOptions = 2638,
+	AutoCGetOptions = 2639,
 	AutoCSetDropRestOfWord = 2270,
 	AutoCGetDropRestOfWord = 2271,
 	RegisterImage = 2405,

@@ -1037,6 +1037,10 @@ NP2_inline void SciCall_AutoCSetOrder(int ordere) {
 	SciCall(SCI_AUTOCSETORDER, ordere, 0);
 }
 
+NP2_inline void SciCall_AutoCSetOptions(int options) {
+	SciCall(SCI_AUTOCSETOPTIONS, options, 0);
+}
+
 NP2_inline void SciCall_AutoCSetDropRestOfWord(BOOL dropRestOfWord) {
 	SciCall(SCI_AUTOCSETDROPRESTOFWORD, dropRestOfWord, 0);
 }

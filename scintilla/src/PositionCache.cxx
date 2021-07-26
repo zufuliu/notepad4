@@ -714,7 +714,7 @@ TextSegment BreakFinder::Next() {
 			int charWidth = 1;
 			const char * const chars = &ll->chars[nextBreak];
 			const unsigned char ch = chars[0];
-			if (encodingFamily != EncodingFamily::eightBit && !UTF8IsAscii(ch)) {
+			if (!UTF8IsAscii(ch) && encodingFamily != EncodingFamily::eightBit) {
 				if (encodingFamily == EncodingFamily::unicode) {
 					charWidth = UTF8DrawBytes(reinterpret_cast<const unsigned char *>(chars), static_cast<int>(lineRange.end - nextBreak));
 				} else {
