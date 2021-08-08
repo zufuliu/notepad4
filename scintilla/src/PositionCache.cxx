@@ -526,18 +526,10 @@ constexpr unsigned int KeyFromString(std::string_view charBytes) noexcept {
 inline unsigned int KeyFromString(std::string_view charBytes) noexcept {
 	unsigned int k = 0;
 	if (!charBytes.empty()) {
-#if 0//NP2_USE_AVX2
-		k = loadle_u32(charBytes.data());
-		if (charBytes.length() < 4) {
-			k = bit_zero_high_u32(k, charBytes.length()*8);
-		}
-		k = bswap32(k);
-#else
 		k = loadbe_u32(charBytes.data());
 		if (const size_t diff = 4 - charBytes.length()) {
 			k >>= diff*8;
 		}
-#endif
 	}
 	return k;
 }
