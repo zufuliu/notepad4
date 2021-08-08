@@ -1341,6 +1341,7 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 
 	char buffer[MaxLaTeXInputBufferLength];
 	const Sci::Position main = sel.MainCaret();
+#if 1
 	Sci::Position pos = main - 1;
 	char *ptr = buffer + sizeof(buffer) - 1;
 	*ptr = '\0';
@@ -1365,6 +1366,40 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 	}
 
 	ptrdiff_t wclen = buffer + sizeof(buffer) - 1 - ptr;
+#else
+	Sci::Position pos = std::max<Sci::Position>(0, main - (sizeof(buffer) - 1));
+	Sci::Position wclen = main - pos;
+	if (wclen <= MinLaTeXInputSequenceLength) {
+		return false;
+	}
+	pdoc->GetCharRange(buffer, pos, wclen);
+
+	char ch = '\0';
+	char *ptr = buffer + wclen;
+	*ptr = '\0';
+	pos = main;
+	while (ptr != buffer) {
+		--pos;
+		--ptr;
+		ch = *ptr;
+		if (ch == '\\' || !IsLaTeXInputSequenceChar(ch)) {
+			break;
+		}
+	}
+	if (ch != '\\') {
+		return false;
+	}
+	if (pdoc->dbcsCodePage && pdoc->dbcsCodePage != CpUtf8) {
+		ch = pdoc->CharAt(pos - 1);
+		if (!UTF8IsAscii(ch) && pdoc->IsDBCSLeadByteNoExcept(ch)) {
+			return false;
+		}
+	}
+
+	++ptr;
+	wclen = main - pos - 1;
+#endif
+
 	const uint32_t wch = GetLaTeXInputUnicodeCharacter(ptr, wclen);
 	if (wch == 0) {
 		return false;
