@@ -5842,6 +5842,9 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetHotSpot:
 		vs.styles[wParam].hotspot = lParam != 0;
 		break;
+	case Message::StyleSetCheckMonospaced:
+		vs.styles[wParam].checkMonospaced = lParam != 0;
+		break;
 	default:
 		break;
 	}
@@ -5881,6 +5884,8 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.styles[wParam].changeable ? 1 : 0;
 	case Message::StyleGetHotSpot:
 		return vs.styles[wParam].hotspot ? 1 : 0;
+	case Message::StyleGetCheckMonospaced:
+		return vs.styles[wParam].checkMonospaced ? 1 : 0;
 	default:
 		break;
 	}
@@ -7275,6 +7280,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetVisible:
 	case Message::StyleSetChangeable:
 	case Message::StyleSetHotSpot:
+	case Message::StyleSetCheckMonospaced:
 		StyleSetMessage(iMessage, wParam, lParam);
 		break;
 
@@ -7293,6 +7299,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetVisible:
 	case Message::StyleGetChangeable:
 	case Message::StyleGetHotSpot:
+	case Message::StyleGetCheckMonospaced:
 		return StyleGetMessage(iMessage, wParam, lParam);
 
 	case Message::StyleResetDefault:

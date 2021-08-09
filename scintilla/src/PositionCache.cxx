@@ -401,6 +401,15 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 	return (value + alignment - 1) & (~(alignment - 1));
 }
 
+constexpr bool AllGraphicASCII(std::string_view text) noexcept {
+	for (const unsigned char ch : text) {
+		if (ch < ' ' || ch > '~') {
+			return false;
+		}
+	}
+	return true;
+}
+
 }
 
 void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc) {
@@ -910,6 +919,14 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 		// Not found. Choose the oldest of the two slots to replace
 		if (pces[probe].NewerThan(pces[probe2])) {
 			probe = probe2;
+		}
+	}
+	if (vstyle.styles[styleNumber].monospaceASCII) {
+		if (AllGraphicASCII(sv)) {
+			for (size_t i = 0; i < sv.length(); i++) {
+				positions[i] = vstyle.styles[styleNumber].aveCharWidth * (i + 1);
+			}
+			return;
 		}
 	}
 	const Font *fontStyle = vstyle.styles[styleNumber].font.get();

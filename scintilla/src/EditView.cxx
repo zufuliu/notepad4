@@ -459,7 +459,7 @@ constexpr bool IsControlCharacter(unsigned char ch) noexcept {
 }
 
 constexpr bool ViewIsASCII(std::string_view text) noexcept {
-	for (unsigned char ch : text) {
+	for (const unsigned char ch : text) {
 		if (ch & 0x80) {
 			return false;
 		}
@@ -2489,29 +2489,41 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 	}
 }
 
-static void DrawFoldLines(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, Sci::Line line, PRectangle rcLine) {
+static void DrawFoldLines(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+	Sci::Line line, PRectangle rcLine, int subLine) {
+	const bool lastSubLine = subLine == (ll->lines - 1);
 	const bool expanded = model.pcs->GetExpanded(line);
 	const FoldLevel level = model.pdoc->GetFoldLevel(line);
 	const FoldLevel levelNext = model.pdoc->GetFoldLevel(line + 1);
 	if (LevelIsHeader(level) &&
 		(LevelNumber(level) < LevelNumber(levelNext))) {
+		const ColourRGBA foldLineColour = vsDraw.ElementColour(Element::FoldLine).value_or(
+			vsDraw.markers[static_cast<int>(MarkerOutline::Folder)].fore);
 		// Paint the line above the fold
-		if ((expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeExpanded)))
+		// Paint the line above the fold
+		if ((subLine == 0) &&
+			((expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeExpanded)))
 			||
-			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeContracted)))) {
-			PRectangle rcFoldLine = rcLine;
-			rcFoldLine.bottom = rcFoldLine.top + 1;
-			//surface->FillRectangleAligned(rcFoldLine, Fill(vsDraw.styles[StyleDefault].fore));
-			surface->FillRectangleAligned(rcFoldLine, Fill(vsDraw.markers[static_cast<int>(MarkerOutline::Folder)].fore));
+			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeContracted))))) {
+			surface->FillRectangleAligned(Side(rcLine, Edge::top, 1.0), foldLineColour);
 		}
 		// Paint the line below the fold
-		if ((expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterExpanded)))
+		if (lastSubLine &&
+			((expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterExpanded)))
 			||
-			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterContracted)))) {
-			PRectangle rcFoldLine = rcLine;
-			rcFoldLine.top = rcFoldLine.bottom - 1;
-			//surface->FillRectangleAligned(rcFoldLine, Fill(vsDraw.styles[StyleDefault].fore));
-			surface->FillRectangleAligned(rcFoldLine, Fill(vsDraw.markers[static_cast<int>(MarkerOutline::Folder)].fore));
+			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterContracted))))) {
+			surface->FillRectangleAligned(Side(rcLine, Edge::bottom, 1.0), foldLineColour);
+			// If contracted fold line drawn then don't overwrite with hidden line
+			// as fold lines are more specific then hidden lines.
+			if (!expanded) {
+				return;
+			}
+		}
+	}
+	if (lastSubLine && model.pcs->GetVisible(line) && !model.pcs->GetVisible(line + 1)) {
+		std::optional<ColourRGBA> hiddenLineColour = vsDraw.ElementColour(Element::HiddenLine);
+		if (hiddenLineColour) {
+			surface->FillRectangleAligned(Side(rcLine, Edge::bottom, 1.0), *hiddenLineColour);
 		}
 	}
 }
@@ -2661,7 +2673,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 					ll->RestoreBracesHighlight(rangeLine, model.braces, bracesIgnoreStyle);
 
 					if (FlagSet(phase, DrawPhase::foldLines)) {
-						DrawFoldLines(surface, model, vsDraw, lineDoc, rcLine);
+						DrawFoldLines(surface, model, vsDraw, ll, lineDoc, rcLine, subLine);
 					}
 
 					if (FlagSet(phase, DrawPhase::carets)) {

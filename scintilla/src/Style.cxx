@@ -58,6 +58,7 @@ void FontMeasurements::ClearMeasurements() noexcept {
 	capitalHeight = 1;
 	aveCharWidth = 1;
 	spaceWidth = 1;
+	monospaceASCII = false;
 	sizeZoomed = 2;
 }
 

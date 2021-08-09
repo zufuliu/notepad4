@@ -1626,6 +1626,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// Default Values are always set
 	SciCall_StyleResetDefault();
 	SciCall_StyleSetCharacterSet(STYLE_DEFAULT, DEFAULT_CHARSET);
+	SciCall_StyleSetCheckMonospaced(STYLE_DEFAULT, TRUE);
 
 	//! begin STYLE_DEFAULT
 	LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_DefaultCode].szValue;
@@ -1822,6 +1823,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		} while (iMarkerIDs);
 
 		fillColor = ColorAlpha(fillColor, SC_ALPHA_OPAQUE);
+		//SciCall_SetElementColor(SC_ELEMENT_FOLD_LINE, fillColor);
+		//SciCall_SetElementColor(SC_ELEMENT_HIDDEN_LINE, fillColor);
 		SciCall_MarkerSetForeTranslucent(SC_MARKNUM_FOLDER, fillColor);
 		SciCall_MarkerSetForeTranslucent(SC_MARKNUM_FOLDEREND, fillColor);
 

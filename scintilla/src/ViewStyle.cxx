@@ -18,6 +18,7 @@
 #include <optional>
 #include <algorithm>
 #include <memory>
+#include <numeric>
 
 #include "ScintillaTypes.h"
 
@@ -57,6 +58,24 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
 	aveCharWidth = surface.AverageCharWidth(font.get());
 	spaceWidth = surface.WidthText(font.get(), " ");
+
+	if (fs.checkMonospaced) {
+		// "Ay" is normally strongly kerned and "fi" may be a ligature
+		constexpr std::string_view allASCIIGraphic("Ayfi"
+		// python: ''.join(chr(ch) for ch in range(32, 127))
+		" !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+		std::vector<XYPOSITION> positions(allASCIIGraphic.length());
+		surface.MeasureWidthsUTF8(font.get(), allASCIIGraphic, positions.data());
+		std::adjacent_difference(positions.begin(), positions.end(), positions.begin());
+		const XYPOSITION maxWidth = *std::max_element(positions.begin(), positions.end());
+		const XYPOSITION minWidth = *std::min_element(positions.begin(), positions.end());
+		const XYPOSITION variance = maxWidth - minWidth;
+		const XYPOSITION scaledVariance = variance / aveCharWidth;
+		constexpr XYPOSITION monospaceWidthEpsilon = 0.000001;	// May need tweaking if monospace fonts vary more
+		monospaceASCII = scaledVariance < monospaceWidthEpsilon;
+	} else {
+		monospaceASCII = false;
+	}
 }
 
 ViewStyle::ViewStyle() : markers(MarkerMax + 1), indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {

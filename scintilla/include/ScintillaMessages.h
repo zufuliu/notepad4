@@ -131,6 +131,8 @@ enum class Message {
 	StyleGetWeight = 2064,
 	StyleSetCharacterSet = 2066,
 	StyleSetHotSpot = 2409,
+	StyleSetCheckMonospaced = 2254,
+	StyleGetCheckMonospaced = 2255,
 	SetElementColour = 2753,
 	GetElementColour = 2754,
 	ResetElementColour = 2755,

@@ -1339,8 +1339,12 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 		return false;
 	}
 
-	char buffer[MaxLaTeXInputBufferLength];
 	const Sci::Position main = sel.MainCaret();
+	if (main <= MinLaTeXInputSequenceLength) {
+		return false;
+	}
+
+	char buffer[MaxLaTeXInputBufferLength];
 #if 1
 	Sci::Position pos = main - 1;
 	char *ptr = buffer + sizeof(buffer) - 1;
@@ -1369,23 +1373,20 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 #else
 	Sci::Position pos = std::max<Sci::Position>(0, main - (sizeof(buffer) - 1));
 	Sci::Position wclen = main - pos;
-	if (wclen <= MinLaTeXInputSequenceLength) {
-		return false;
-	}
 	pdoc->GetCharRange(buffer, pos, wclen);
 
-	char ch = '\0';
+	pos = main;
 	char *ptr = buffer + wclen;
 	*ptr = '\0';
-	pos = main;
-	while (ptr != buffer) {
+	char ch;
+	do {
 		--pos;
 		--ptr;
 		ch = *ptr;
-		if (ch == '\\' || !IsLaTeXInputSequenceChar(ch)) {
+		if (!IsLaTeXInputSequenceChar(ch)) {
 			break;
 		}
-	}
+	} while (ptr != buffer);
 	if (ch != '\\') {
 		return false;
 	}

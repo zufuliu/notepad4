@@ -278,7 +278,7 @@ void AutoComplete::Select(const char *word) {
 			}
 		} else if (cond < 0) {
 			end = pivot - 1;
-		} else if (cond > 0) {
+		} else {
 			start = pivot + 1;
 		}
 	}

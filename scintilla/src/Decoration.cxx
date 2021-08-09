@@ -265,7 +265,7 @@ int DecorationList<POS>::AllOnFor(Sci::Position position) const noexcept {
 	for (const auto &deco : decorationList) {
 		if (deco->rs.ValueAt(static_cast<POS>(position))) {
 			if (deco->Indicator() < static_cast<int>(Scintilla::IndicatorNumbers::Ime)) {
-				mask |= 1 << deco->Indicator();
+				mask |= 1u << deco->Indicator();
 			}
 		}
 	}

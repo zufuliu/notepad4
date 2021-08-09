@@ -674,6 +674,10 @@ NP2_inline void SciCall_StyleSetCase(int style, int caseVisible) {
 	SciCall(SCI_STYLESETCASE, style, caseVisible);
 }
 
+NP2_inline void SciCall_StyleSetCheckMonospaced(int style, BOOL checkMonospaced) {
+	SciCall(SCI_STYLESETCHECKMONOSPACED, style, checkMonospaced);
+}
+
 // Caret, selection, and hotspot styles
 
 NP2_inline void SciCall_SetElementColor(int element, COLORREF color) {
