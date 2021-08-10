@@ -2535,10 +2535,10 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	XYPOSITION position = 0.0;
 	int ti = 0;
-	for (unsigned int ci = 0; ci < count; ci++) {
-		const FLOAT width = clusterMetrics[ci].width;
-		const UINT16 length = clusterMetrics[ci].length;
-		for (UINT16 inCluster = 0; inCluster < length; inCluster++) {
+	for (UINT32 ci = 0; ci < count; ci++) {
+		const int length = clusterMetrics[ci].length;
+		const XYPOSITION width = clusterMetrics[ci].width;
+		for (int inCluster = 0; inCluster < length; inCluster++) {
 			poses.buffer[ti++] = position + width * (inCluster + 1) / length;
 		}
 		position += width;
@@ -2664,10 +2664,10 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	XYPOSITION position = 0.0f;
 	int ti = 0;
-	for (unsigned int ci = 0; ci < count; ci++) {
-		const FLOAT width = clusterMetrics[ci].width;
-		const UINT16 length = clusterMetrics[ci].length;
-		for (UINT16 inCluster = 0; inCluster < length; inCluster++) {
+	for (UINT32 ci = 0; ci < count; ci++) {
+		const int length = clusterMetrics[ci].length;
+		const XYPOSITION width = clusterMetrics[ci].width;
+		for (int inCluster = 0; inCluster < length; inCluster++) {
 			poses.buffer[ti++] = position + width * (inCluster + 1) / length;
 		}
 		position += width;

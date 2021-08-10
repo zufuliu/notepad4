@@ -887,8 +887,36 @@ size_t PositionCache::GetSize() const noexcept {
 
 void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
 	std::string_view sv, XYPOSITION *positions) {
+	const Style &style = vstyle.styles[styleNumber];
+	if (style.monospaceASCII && AllGraphicASCII(sv)) {
+		const XYPOSITION aveCharWidth = style.aveCharWidth;
+		const size_t length = sv.length();
+#if NP2_USE_SSE2
+		if (length >= 2) {
+			XYPOSITION *ptr = positions;
+			const XYPOSITION * const end = ptr + length - 1;
+			const __m128d one = _mm_set1_pd(aveCharWidth);
+			const __m128d two = _mm_set1_pd(2);
+			__m128d inc = _mm_setr_pd(1, 2);
+			do {
+				_mm_storeu_pd(ptr, _mm_mul_pd(one, inc));
+				inc = _mm_add_pd(inc, two);
+				ptr += 2;
+			} while (ptr < end);
+			if (ptr == end) {
+				ptr[0] = _mm_cvtsd_f64(_mm_mul_pd(one, inc));
+			}
+		} else {
+			positions[0] = aveCharWidth;
+		}
+#else
+		for (size_t i = 0; i < length; i++) {
+			positions[i] = aveCharWidth * (i + 1);
+		}
+#endif
+		return;
+	}
 
-	allClear = false;
 	size_t probe = pces.size();	// Out of bounds
 	if ((sv.length() < 64)) {
 		// Only store short strings in the cache so it doesn't churn with
@@ -921,16 +949,8 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 			probe = probe2;
 		}
 	}
-	if (vstyle.styles[styleNumber].monospaceASCII) {
-		if (AllGraphicASCII(sv)) {
-			for (size_t i = 0; i < sv.length(); i++) {
-				positions[i] = vstyle.styles[styleNumber].aveCharWidth * (i + 1);
-			}
-			return;
-		}
-	}
-	const Font *fontStyle = vstyle.styles[styleNumber].font.get();
-	surface->MeasureWidths(fontStyle, sv, positions);
+
+	surface->MeasureWidths(style.font.get(), sv, positions);
 	if (probe < pces.size()) {
 		// Store into cache
 		clock++;
@@ -942,6 +962,7 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 			}
 			clock = 2;
 		}
+		allClear = false;
 		pces[probe].Set(styleNumber, sv, positions, clock);
 	}
 }

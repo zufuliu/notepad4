@@ -194,8 +194,8 @@ struct RegexError : public std::runtime_error {
  */
 
 class ActionDuration {
-	double duration = 1e-5;
-	static constexpr double minDuration = 1e-6;
+	double duration = 1e-6;
+	static constexpr double minDuration = 1e-7;
 	static constexpr double maxDuration = 1e-4;
 	// measure time in KiB instead of byte.
 	static constexpr int unitBytes = 1024;
