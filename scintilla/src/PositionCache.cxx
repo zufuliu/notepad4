@@ -401,6 +401,77 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 	return (value + alignment - 1) & (~(alignment - 1));
 }
 
+#if 1
+// test for ASCII only since all C0 control character has special representation.
+#if NP2_USE_SSE2
+inline bool AllGraphicASCII(std::string_view text) noexcept {
+	const char *ptr = text.data();
+	const char * const end = ptr + text.length();
+	if (text.length() >= sizeof(__m128i)) {
+		do {
+			const __m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
+			if (_mm_movemask_epi8(chunk)) {
+				return false;
+			}
+			ptr += sizeof(__m128i);
+		} while (ptr + sizeof(__m128i) <= end);
+	}
+	for (; ptr < end; ptr++) {
+		if (*ptr & 0x80) {
+			return false;
+		}
+	}
+	return true;
+}
+
+#else
+constexpr bool AllGraphicASCII(std::string_view text) noexcept {
+	for (const unsigned char ch : text) {
+		if (ch & 0x80) {
+			return false;
+		}
+	}
+	return true;
+}
+#endif
+
+#else
+#if NP2_USE_SSE2
+inline bool AllGraphicASCII(std::string_view text) noexcept {
+	const char *ptr = text.data();
+	const char * const end = ptr + text.length();
+	if (text.length() >= sizeof(__m128i)) {
+#if NP2_USE_AVX2
+		const __m128i range = _mm_setr_epi8(' ', '~', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		do {
+			if (_mm_cmpistrc(range, *(const __m128i *)ptr, _SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MASKED_NEGATIVE_POLARITY)) {
+				return false;
+			}
+			ptr += sizeof(__m128i);
+		} while (ptr + sizeof(__m128i) <= end);
+#else
+		const __m128i space = _mm_set1_epi8(' ');
+		const __m128i del = _mm_set1_epi8('\x7f');
+		do {
+			__m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
+			chunk = _mm_or_si128(_mm_cmplt_epi8(chunk, space), _mm_cmpeq_epi8(chunk, del));
+			if (_mm_movemask_epi8(chunk)) {
+				return false;
+			}
+			ptr += sizeof(__m128i);
+		} while (ptr + sizeof(__m128i) <= end);
+#endif
+	}
+	for (; ptr < end; ptr++) {
+		const unsigned char ch = *ptr;
+		if (ch < ' ' || ch > '~') {
+			return false;
+		}
+	}
+	return true;
+}
+
+#else
 constexpr bool AllGraphicASCII(std::string_view text) noexcept {
 	for (const unsigned char ch : text) {
 		if (ch < ' ' || ch > '~') {
@@ -409,6 +480,8 @@ constexpr bool AllGraphicASCII(std::string_view text) noexcept {
 	}
 	return true;
 }
+#endif
+#endif
 
 }
 
@@ -904,7 +977,7 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uns
 				ptr += 2;
 			} while (ptr < end);
 			if (ptr == end) {
-				ptr[0] = _mm_cvtsd_f64(_mm_mul_pd(one, inc));
+				_mm_store_sd(ptr, _mm_mul_sd(one, inc));
 			}
 		} else {
 			positions[0] = aveCharWidth;
