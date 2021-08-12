@@ -67,19 +67,19 @@ IF /I "%TARGET%" == "AVX2" (
     IF "%CLANG%" == "1" (
         mingw32-make ARCH=AVX2 CLANG=1 LTO=1 %JOBS% %ACTION%
     ) ELSE (
-        mingw32-make ARCH=AVX2 LTO=1 %JOBS% %ACTION%
+        mingw32-make TRIPLET=x86_64-w64-mingw32 ARCH=AVX2 LTO=1 %JOBS% %ACTION%
     )
 ) ELSE IF "%UCRT%" == "1" (
     IF "%CLANG%" == "1" (
         mingw32-make CLANG=1 LTO=1 WIN7=1 %JOBS% %ACTION%
     ) ELSE (
-        mingw32-make LTO=1 WIN7=1 %JOBS% %ACTION%
+        mingw32-make TRIPLET=x86_64-w64-mingw32 LTO=1 WIN7=1 %JOBS% %ACTION%
     )
 ) ELSE (
     IF "%CLANG%" == "1" (
         mingw32-make CLANG=1 LTO=1 %JOBS% %ACTION%
     ) ELSE (
-        mingw32-make LTO=1 %JOBS% %ACTION%
+        mingw32-make TRIPLET=x86_64-w64-mingw32 LTO=1 %JOBS% %ACTION%
     )
 )
 
@@ -92,7 +92,7 @@ SET "PATH=C:\msys64\mingw32\bin;C:\msys64\usr\bin;%PATH%"
 IF "%CLANG%" == "1" (
     mingw32-make CLANG=1 LTO=1 %JOBS% %ACTION%
 ) ELSE (
-    mingw32-make %JOBS% %ACTION%
+    mingw32-make TRIPLET=i686-w64-mingw32 LTO=1 %JOBS% %ACTION%
 )
 
 ENDLOCAL

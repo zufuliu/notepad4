@@ -406,8 +406,9 @@ constexpr size_t AlignUp(size_t value, size_t alignment) noexcept {
 #if NP2_USE_SSE2
 inline bool AllGraphicASCII(std::string_view text) noexcept {
 	const char *ptr = text.data();
-	const char * const end = ptr + text.length();
-	if (text.length() >= sizeof(__m128i)) {
+	const size_t length = text.length();
+	const char * const end = ptr + length;
+	if (length >= sizeof(__m128i)) {
 		do {
 			const __m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
 			if (_mm_movemask_epi8(chunk)) {
@@ -416,11 +417,20 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 			ptr += sizeof(__m128i);
 		} while (ptr + sizeof(__m128i) <= end);
 	}
+#if 0//NP2_USE_AVX2
+	if (const uint32_t remain = length & (sizeof(__m128i) - 1)) {
+		const __m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
+		if (bit_zero_high_u32(_mm_movemask_epi8(chunk), remain)) {
+			return false;
+		}
+	}
+#else
 	for (; ptr < end; ptr++) {
 		if (*ptr & 0x80) {
 			return false;
 		}
 	}
+#endif
 	return true;
 }
 
