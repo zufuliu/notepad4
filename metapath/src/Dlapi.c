@@ -826,13 +826,12 @@ BOOL DirList_IsFileSelected(HWND hwnd) {
 //
 void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter) {
 	ZeroMemory(pdlf, sizeof(DL_FILTER));
-	lstrcpyn(pdlf->tFilterBuf, lpszFileSpec, (DL_FILTER_BUFSIZE - 1));
-	pdlf->bExcludeFilter = bExcludeFilter;
-
 	if (StrIsEmpty(lpszFileSpec) || StrEqual(lpszFileSpec, L"*.*")) {
 		return;
 	}
 
+	lstrcpyn(pdlf->tFilterBuf, lpszFileSpec, (DL_FILTER_BUFSIZE - 1));
+	pdlf->bExcludeFilter = bExcludeFilter;
 	pdlf->nCount = 1;
 	pdlf->pFilter[0] = pdlf->tFilterBuf;    // Zeile zum Ausprobieren
 

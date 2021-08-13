@@ -342,9 +342,8 @@ void BackgroundWorker_Init(BackgroundWorker *worker, HWND hwnd) {
 
 void BackgroundWorker_Stop(BackgroundWorker *worker) {
 	SetEvent(worker->eventCancel);
-	HANDLE workerThread = worker->workerThread;
+	HANDLE workerThread = InterlockedExchangePointer(&worker->workerThread, NULL);
 	if (workerThread) {
-		worker->workerThread = NULL;
 		while (WaitForSingleObject(workerThread, 0) != WAIT_OBJECT_0) {
 			MSG msg;
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {

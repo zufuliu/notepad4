@@ -409,13 +409,14 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 	const size_t length = text.length();
 	const char * const end = ptr + length;
 	if (length >= sizeof(__m128i)) {
+		const char * const xend = end - sizeof(__m128i);
 		do {
 			const __m128i chunk = _mm_loadu_si128((const __m128i *)ptr);
 			if (_mm_movemask_epi8(chunk)) {
 				return false;
 			}
 			ptr += sizeof(__m128i);
-		} while (ptr + sizeof(__m128i) <= end);
+		} while (ptr <= xend);
 	}
 #if 0//NP2_USE_AVX2
 	if (const uint32_t remain = length & (sizeof(__m128i) - 1)) {
@@ -451,6 +452,7 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 	const char *ptr = text.data();
 	const char * const end = ptr + text.length();
 	if (text.length() >= sizeof(__m128i)) {
+		const char * const xend = end - sizeof(__m128i);
 #if NP2_USE_AVX2
 		const __m128i range = _mm_setr_epi8(' ', '~', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 		do {
@@ -458,7 +460,7 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 				return false;
 			}
 			ptr += sizeof(__m128i);
-		} while (ptr + sizeof(__m128i) <= end);
+		} while (ptr <= xend);
 #else
 		const __m128i space = _mm_set1_epi8(' ');
 		const __m128i del = _mm_set1_epi8('\x7f');
@@ -469,7 +471,7 @@ inline bool AllGraphicASCII(std::string_view text) noexcept {
 				return false;
 			}
 			ptr += sizeof(__m128i);
-		} while (ptr + sizeof(__m128i) <= end);
+		} while (ptr <= xend);
 #endif
 	}
 	for (; ptr < end; ptr++) {
