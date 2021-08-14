@@ -119,14 +119,14 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 				state = SCE_INNO_IDENTIFIER;
 			} else {
 				// Style it the default style
-				styler.ColourTo(i, SCE_INNO_DEFAULT);
+				styler.ColorTo(i + 1, SCE_INNO_DEFAULT);
 			}
 			break;
 
 		case SCE_INNO_COMMENT:
 			if (isEOL) {
 				state = SCE_INNO_DEFAULT;
-				styler.ColourTo(i, SCE_INNO_COMMENT);
+				styler.ColorTo(i + 1, SCE_INNO_COMMENT);
 			}
 			break;
 
@@ -139,15 +139,15 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 				// Check if the buffer contains a keyword
 				if (!isCode && standardKeywords.InList(buffer)) {
-					styler.ColourTo(i - 1, SCE_INNO_KEYWORD);
+					styler.ColorTo(i, SCE_INNO_KEYWORD);
 				} else if (!isCode && parameterKeywords.InList(buffer)) {
-					styler.ColourTo(i - 1, SCE_INNO_PARAMETER);
+					styler.ColorTo(i, SCE_INNO_PARAMETER);
 				} else if (isCode && pascalKeywords.InList(buffer)) {
-					styler.ColourTo(i - 1, SCE_INNO_KEYWORD_PASCAL);
+					styler.ColorTo(i, SCE_INNO_KEYWORD_PASCAL);
 				} else if (isCode && typeKeywords.InList(buffer)) {
-					styler.ColourTo(i - 1, SCE_INNO_PAS_TYPE);
+					styler.ColorTo(i, SCE_INNO_PAS_TYPE);
 				} else {
-					styler.ColourTo(i - 1, SCE_INNO_DEFAULT);
+					styler.ColorTo(i, SCE_INNO_DEFAULT);
 				}
 
 				// Push back the faulty character
@@ -163,16 +163,16 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 				//Check if the buffer contains a section name
 				if (sectionKeywords.InList(buffer)) {
-					styler.ColourTo(styler.LineStart(styler.GetLine(i) + 1) - 1, SCE_INNO_SECTION);
+					styler.ColorTo(styler.LineStart(styler.GetLine(i) + 1), SCE_INNO_SECTION);
 					isCode = !CompareCaseInsensitive(buffer, "code");
 				} else {
-					styler.ColourTo(i, SCE_INNO_DEFAULT);
+					styler.ColorTo(i + 1, SCE_INNO_DEFAULT);
 				}
 			} else if (IsAlphaNumeric(ch) || ch == '_') {
 				buffer[bufferCount++] = MakeLowerCase(ch);
 			} else {
 				state = SCE_INNO_DEFAULT;
-				styler.ColourTo(i, SCE_INNO_DEFAULT);
+				styler.ColorTo(i + 1, SCE_INNO_DEFAULT);
 			}
 			break;
 
@@ -184,9 +184,9 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 
 					// Check if the buffer contains a preprocessor directive
 					if (preprocessorKeywords.InList(buffer)) {
-						styler.ColourTo(i - 1, SCE_INNO_PREPROC);
+						styler.ColorTo(i, SCE_INNO_PREPROC);
 					} else {
-						styler.ColourTo(i - 1, SCE_INNO_DEFAULT);
+						styler.ColorTo(i, SCE_INNO_DEFAULT);
 					}
 
 					// Push back the faulty character
@@ -203,24 +203,24 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 		case SCE_INNO_STRING_DOUBLE:
 			if (ch == '"' || isEOL) {
 				state = SCE_INNO_DEFAULT;
-				styler.ColourTo(i, SCE_INNO_STRING_DOUBLE);
+				styler.ColorTo(i + 1, SCE_INNO_STRING_DOUBLE);
 			}
 			break;
 
 		case SCE_INNO_STRING_SINGLE:
 			if (ch == '\'' || isEOL) {
 				state = SCE_INNO_DEFAULT;
-				styler.ColourTo(i, SCE_INNO_STRING_SINGLE);
+				styler.ColorTo(i + 1, SCE_INNO_STRING_SINGLE);
 			}
 			break;
 
 		case SCE_INNO_INLINE_EXPANSION:
 			if (ch == '}') {
 				state = SCE_INNO_DEFAULT;
-				styler.ColourTo(i, SCE_INNO_INLINE_EXPANSION);
+				styler.ColorTo(i + 1, SCE_INNO_INLINE_EXPANSION);
 			} else if (isEOL) {
 				state = SCE_INNO_DEFAULT;
-				styler.ColourTo(i, SCE_INNO_DEFAULT);
+				styler.ColorTo(i + 1, SCE_INNO_DEFAULT);
 			}
 			break;
 
@@ -228,12 +228,12 @@ static void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position length, int, L
 			if (isCStyleComment) {
 				if (ch == ')' && chPrev == '*') {
 					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_COMMENT_PASCAL);
+					styler.ColorTo(i + 1, SCE_INNO_COMMENT_PASCAL);
 				}
 			} else {
 				if (ch == '}') {
 					state = SCE_INNO_DEFAULT;
-					styler.ColourTo(i, SCE_INNO_COMMENT_PASCAL);
+					styler.ColorTo(i + 1, SCE_INNO_COMMENT_PASCAL);
 				}
 			}
 			break;

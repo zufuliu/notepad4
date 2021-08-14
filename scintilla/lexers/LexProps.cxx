@@ -76,17 +76,17 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		} else if (ch == '[') {
 			initStyle = SCE_PROPS_SECTION;
 		} else if (ch == '@') {
-			styler.ColourTo(i, SCE_PROPS_DEFVAL);
+			styler.ColorTo(i + 1, SCE_PROPS_DEFVAL);
 			const char chNext = styler[++i];
 			if (IsAssignChar(chNext)) {
-				styler.ColourTo(i, SCE_PROPS_ASSIGNMENT);
+				styler.ColorTo(i + 1, SCE_PROPS_ASSIGNMENT);
 			}
 		} else if (allowInitialSpaces || !isspacechar(ch)) {
 			while (i < lineStartNext) {
 				ch = styler[i];
 				if (IsAssignChar(ch)) {
-					styler.ColourTo(i - 1, SCE_PROPS_KEY);
-					styler.ColourTo(i, SCE_PROPS_ASSIGNMENT);
+					styler.ColorTo(i, SCE_PROPS_KEY);
+					styler.ColorTo(i + 1, SCE_PROPS_ASSIGNMENT);
 					++i;
 					break;
 				}
@@ -98,7 +98,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			while (i < lineStartNext) {
 				ch = styler[i];
 				if (IsCommentChar(ch) && IsASpaceOrTab(chPrev))	{
-					styler.ColourTo(i - 1, SCE_PROPS_DEFAULT);
+					styler.ColorTo(i, SCE_PROPS_DEFAULT);
 					initStyle = SCE_PROPS_COMMENT;
 					changed = true;
 					break;
@@ -109,7 +109,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 		}
 
-		styler.ColourTo(lineEndPos, initStyle);
+		styler.ColorTo(lineStartNext, initStyle);
 #if ENABLE_FOLD_PROPS_COMMENT
 		styler.SetLineState(lineCurrent, changed ? SCE_PROPS_DEFAULT : initStyle);
 #else

@@ -64,16 +64,16 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		switch (state) {
 		case SCE_MAKE_OPERATOR:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_MAKE_DEFAULT;
 			break;
 		case SCE_MAKE_IDENTIFIER:
 			if (IsMakeOp(ch, chNext) || IsASpace(ch)) {
 				buf[wordLen] = '\0';
 				if (ch == ':' && chNext == ':') {
-					styler.ColourTo(i - 1, SCE_MAKE_TARGET);
+					styler.ColorTo(i, SCE_MAKE_TARGET);
 				} else if (makeType == MAKE_TYPE_BMAKE && keywordsDP2.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
+					styler.ColorTo(i, SCE_MAKE_PREPROCESSOR);
 				}
 				state = SCE_MAKE_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
@@ -84,23 +84,23 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			if (IsMakeOp(ch, chNext) || IsASpace(ch)) {
 				buf[wordLen] = '\0';
 				if (keywordsGP.InList(buf)) { // gmake
-					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
+					styler.ColorTo(i, SCE_MAKE_PREPROCESSOR);
 					makeType = MAKE_TYPE_GMAKE;
 				} else if (keywordsNinja.InList(buf)) { // ninja
-					styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
+					styler.ColorTo(i, SCE_MAKE_PREPROCESSOR);
 					makeType = MAKE_TYPE_NINJA;
 				} else {
 					Sci_Position pos = i;
 					while (IsASpace(styler.SafeGetCharAt(pos++)));
 					if (styler[pos - 1] == '=' || styler[pos] == '=') {
-						styler.ColourTo(i - 1, SCE_MAKE_VARIABLE);
+						styler.ColorTo(i, SCE_MAKE_VARIABLE);
 					} else if (styler[pos - 1] == ':') {
-						styler.ColourTo(i - 1, SCE_MAKE_TARGET);
+						styler.ColorTo(i, SCE_MAKE_TARGET);
 					} else if (buf[0] == '.' && IsASpace(ch)) { // bmake
-						styler.ColourTo(i - 1, SCE_MAKE_PREPROCESSOR);
+						styler.ColorTo(i, SCE_MAKE_PREPROCESSOR);
 						makeType = MAKE_TYPE_BMAKE;
 					} else {
-						styler.ColourTo(i - 1, SCE_MAKE_DEFAULT);
+						styler.ColorTo(i, SCE_MAKE_DEFAULT);
 					}
 				}
 				state = SCE_MAKE_DEFAULT;
@@ -110,7 +110,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_MAKE_VARIABLE:
 			if (!(ch == '$' || iswordchar(ch))) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_DEFAULT;
 			}
 			break;
@@ -120,7 +120,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			} else if (ch == ')') {
 				varCount--;
 				if (varCount <= 0) {
-					styler.ColourTo(i, state);
+					styler.ColorTo(i + 1, state);
 					state = SCE_MAKE_DEFAULT;
 					continue;
 				}
@@ -128,19 +128,19 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 			break;
 		case SCE_MAKE_VARIABLE3:
 			if (chPrev == '}') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_DEFAULT;
 			}
 			break;
 		case SCE_MAKE_PREPROCESSOR:
 			if (!iswordchar(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_DEFAULT;
 			}
 			break;
 		case SCE_MAKE_COMMENT:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_DEFAULT;
 			}
 			break;
@@ -161,10 +161,10 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		if (state == SCE_MAKE_DEFAULT) {
 			if (ch == '#') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_COMMENT;
 			} else if ((ch == '$' && chNext == '(') || (ch == '$' && chNext == '$' && styler.SafeGetCharAt(i + 2) == '(')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				Sci_PositionU pos = i + 1;
 				if (chNext == '$') ++pos;
 				ch = chNext;
@@ -178,7 +178,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 					ch = chNext;
 				}
 				if (ch == ')' || ch == '$') {
-					styler.ColourTo(pos, SCE_MAKE_VARIABLE2);
+					styler.ColorTo(pos + 1, SCE_MAKE_VARIABLE2);
 					if (ch == '$') {
 						state = SCE_MAKE_VARIABLE2;
 						varCount = 2;
@@ -186,29 +186,29 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 						state = SCE_MAKE_TARGET;
 					}
 				} else {
-					styler.ColourTo(i + 1, SCE_MAKE_OPERATOR);
-					styler.ColourTo(pos - 1, SCE_MAKE_FUNCTION);
+					styler.ColorTo(i + 2, SCE_MAKE_OPERATOR);
+					styler.ColorTo(pos, SCE_MAKE_FUNCTION);
 					if (ch == ',')
-						styler.ColourTo(pos, SCE_MAKE_OPERATOR);
+						styler.ColorTo(pos + 1, SCE_MAKE_OPERATOR);
 				}
 				i = pos;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '$' && chNext == '{') { // bmake
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_VARIABLE3;
 			} else if (ch == '$' && (chNext == '$' || iswordstart(chNext))) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_VARIABLE;
 			} else if (visibleChars == 0 && ch == '!' && iswordstart(chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_PREPROCESSOR;
 				makeType = MAKE_TYPE_NMAKE;
 			} else if (IsMakeOp(ch, chNext) || (visibleChars == 0 && ch == '-')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_MAKE_OPERATOR;
 			} else if (IsGraphic(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 				state = (visibleChars == 0) ? SCE_MAKE_TARGET : SCE_MAKE_IDENTIFIER;
@@ -225,7 +225,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 	}
 
 	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	styler.ColorTo(endPos, state);
 }
 
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_MAKE_COMMENT)

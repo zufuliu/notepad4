@@ -58,19 +58,19 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 		switch (state) {
 		case SCE_C_OPERATOR:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_C_DEFAULT;
 			break;
 		case SCE_C_NUMBER:
 			if (!IsDecimalNumber(chPrev, ch, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
 		case SCE_C_DIRECTIVE:
 		case SCE_C_ASM_INSTRUCTION:
 			if (!IsCILWordChar(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_L_DEFAULT;
 			}
 			break;
@@ -79,13 +79,13 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				buf[wordLen] = '\0';
 				state = SCE_C_DEFAULT;
 				if (keywords.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_WORD);
+					styler.ColorTo(i, SCE_C_WORD);
 				} else if (keywords2.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_WORD2);
+					styler.ColorTo(i, SCE_C_WORD2);
 				} else if (kwInstruction.InList(buf)) {
 					state = SCE_C_ASM_INSTRUCTION;
 				} else if (ch == ':' && chNext != ':') {
-					styler.ColourTo(i - 1, SCE_C_LABEL);
+					styler.ColorTo(i, SCE_C_LABEL);
 				}
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
@@ -94,21 +94,21 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		case SCE_C_STRING:
 		case SCE_C_CHARACTER:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
-				styler.ColourTo(i, state);
+				styler.ColorTo(i + 1, state);
 				state = SCE_C_DEFAULT;
 				continue;
 			}
 			break;
 		case SCE_C_COMMENTLINE:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
@@ -117,7 +117,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
-				styler.ColourTo(i, state);
+				styler.ColorTo(i + 1, state);
 				state = SCE_C_DEFAULT;
 				continue;
 			}
@@ -126,40 +126,40 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 		if (state == SCE_C_DEFAULT) {
 			if (ch == '/' && chNext == '/') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_COMMENTLINE;
 			} else if (ch == '/' && chNext == '*') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_COMMENT;
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_STRING;
 			} else if (ch == '\'') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_CHARACTER;
 			} else if (IsNumberStart(ch, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_NUMBER;
 			} else if (ch == '.' && IsAlpha(chNext) && (IsCILOp(chPrev) || IsASpace(chPrev))) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DIRECTIVE;
 			} else if (iswordstart(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_IDENTIFIER;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 			} else if (IsCILOp(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_OPERATOR;
 			}
 		}
 	}
 
 	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	styler.ColorTo(endPos, state);
 }
 
 #define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)

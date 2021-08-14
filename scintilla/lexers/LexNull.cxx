@@ -36,7 +36,7 @@ void ColouriseNullDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int, Lexer
 	if (lengthDoc > 0) {
 		styler.StartAt(startPos + lengthDoc - 1);
 		styler.StartSegment(startPos + lengthDoc - 1);
-		styler.ColourTo(startPos + lengthDoc - 1, 0);
+		styler.ColorTo(startPos + lengthDoc, 0);
 	}
 #endif
 }

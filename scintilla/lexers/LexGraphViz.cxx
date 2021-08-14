@@ -77,12 +77,12 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 		switch (state) {
 		case SCE_C_OPERATOR:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_C_DEFAULT;
 			break;
 		case SCE_C_NUMBER:
 			if (!IsDecimalNumber(chPrev, ch, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
@@ -92,9 +92,9 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 				Sci_PositionU pos = i;
 				while (IsASpace(styler.SafeGetCharAt(pos++)));
 				if (styler[pos - 1] == '=') {
-					styler.ColourTo(i - 1, SCE_C_WORD2);
+					styler.ColorTo(i, SCE_C_WORD2);
 				} else if (keywords.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_C_WORD);
+					styler.ColorTo(i, SCE_C_WORD);
 				}
 				state = SCE_C_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
@@ -103,33 +103,33 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_C_LABEL:
 			if (!(iswordstart(ch) || ch == '-')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
 		case SCE_C_DIRECTIVE:
 			if (chPrev == '>' || IsASpace(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
 		case SCE_C_STRING:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
-				styler.ColourTo(i, SCE_C_STRING);
+				styler.ColorTo(i + 1, SCE_C_STRING);
 				state = SCE_C_DEFAULT;
 				continue;
 			}
 			break;
 		case SCE_C_COMMENTLINE:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DEFAULT;
 			}
 			break;
@@ -138,7 +138,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
-				styler.ColourTo(i, state);
+				styler.ColorTo(i + 1, state);
 				state = SCE_C_DEFAULT;
 				levelNext--;
 				continue;
@@ -146,7 +146,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_C_COMMENTDOC:
 			if (chPrev == '-' && ch == '>') {
-				styler.ColourTo(i, state);
+				styler.ColorTo(i + 1, state);
 				state = SCE_C_DEFAULT;
 				continue;
 			}
@@ -155,39 +155,39 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 		if (state == SCE_C_DEFAULT) {
 			if ((ch == '/' && chNext == '/') || (visibleChars == 0 && ch == '#')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_COMMENTLINE;
 			} else if (ch == '/' && chNext == '*') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_COMMENT;
 				levelNext++;
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_STRING;
 			} else if (chPrevNonWhite == '=' && IsNumberStart(ch, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_NUMBER;
 			} else if (chPrevNonWhite == '=' && iswordstart(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_LABEL;
 			} else if (ch == '<' && chNext == '!') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_COMMENTDOC;
 			} else if (ch == '<' && (IsAlpha(chNext) || chNext == '/')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_DIRECTIVE;
 			} else if (iswordstart(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_IDENTIFIER;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 			} else if (ch == '>' && !(chPrevNonWhite == '-' || chPrevNonWhite == '>')) {
-				styler.ColourTo(i, SCE_C_DIRECTIVE);
+				styler.ColorTo(i + 1, SCE_C_DIRECTIVE);
 			} else if (IsGraphOp(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_C_OPERATOR;
 				if (ch == '{' || ch == '[') {
 					levelNext++;
@@ -201,7 +201,7 @@ static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int i
 	}
 
 	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	styler.ColorTo(endPos, state);
 }
 
 LexerModule lmGraphViz(SCLEX_GRAPHVIZ, ColouriseGraphDoc, "gv");

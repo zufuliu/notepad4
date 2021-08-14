@@ -101,26 +101,26 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 		switch (state) {
 		case SCE_SMALI_OPERATOR:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_SMALI_DEFAULT;
 			break;
 		case SCE_SMALI_NUMBER:
 			if (!IsDecimalNumber(chPrev, ch, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DEFAULT;
 			}
 			break;
 		case SCE_SMALI_STRING:
 		case SCE_SMALI_CHARACTER:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DEFAULT;
 			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if ((state == SCE_SMALI_STRING && ch == '\"') || (state == SCE_SMALI_CHARACTER && ch == '\'')) {
-				styler.ColourTo(i, state);
+				styler.ColorTo(i + 1, state);
 				state = SCE_SMALI_DEFAULT;
 				continue;
 			}
@@ -145,7 +145,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 						curLineState = 0;
 					}
 				}
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_L_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
@@ -153,25 +153,25 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 			break;
 		case SCE_SMALI_REGISTER:
 			if (!IsADigit(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DEFAULT;
 			}
 			break;
 		case SCE_SMALI_INSTRUCTION:
 			if (!(IsSmaliWordChar(ch) || ch == '/')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DEFAULT;
 			}
 			break;
 		case SCE_SMALI_LABEL:
 			if (!iswordchar(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DEFAULT;
 				visibleChars = 0;
 			}
 			break;
 		case SCE_SMALI_TYPE:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_SMALI_DEFAULT;
 			break;
 		case SCE_SMALI_IDENTIFIER:
@@ -179,28 +179,28 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 				buf[wordLen] = '\0';
 				if (nextWordType == kWordType_Directive) {
 					nextWordType = 0;
-					styler.ColourTo(i - 1, SCE_SMALI_DIRECTIVE);
+					styler.ColorTo(i, SCE_SMALI_DIRECTIVE);
 					state = SCE_SMALI_DEFAULT;
 				} else if (ch == ':' && IsDelimiter(chNext)) {
 					state = SCE_SMALI_LABEL;
 				} else if (keywords.InList(buf)) {
-					styler.ColourTo(i - 1, SCE_SMALI_WORD);
+					styler.ColorTo(i, SCE_SMALI_WORD);
 					state = SCE_SMALI_DEFAULT;
 				} else if (nextWordType == kWrodType_Field) {
 					nextWordType = 0;
-					styler.ColourTo(i - 1, SCE_SMALI_FIELD);
+					styler.ColorTo(i, SCE_SMALI_FIELD);
 					if (ch == '$')
-						styler.ColourTo(i - 1, SCE_SMALI_OPERATOR);
+						styler.ColorTo(i, SCE_SMALI_OPERATOR);
 					state = (ch == ':') ? SCE_SMALI_DEFAULT : SCE_SMALI_FIELD;
 				} else if (nextWordType == kWordType_Method) {
 					nextWordType = 0;
-					styler.ColourTo(i - 1, SCE_SMALI_METHOD);
+					styler.ColorTo(i, SCE_SMALI_METHOD);
 					if (ch == '$')
-						styler.ColourTo(i - 1, SCE_SMALI_OPERATOR);
+						styler.ColorTo(i, SCE_SMALI_OPERATOR);
 					state = (ch == '(' || ch == '>') ? SCE_SMALI_DEFAULT : SCE_SMALI_METHOD;
 				} else if (/*kwInstruction.InList(buf)*/ wordLen == visibleChars && !curLineState && (IsASpace(ch) || ch == '/')) {
 					if (!(IsSmaliWordChar(ch) || ch == '/')) {
-						styler.ColourTo(i - 1, SCE_SMALI_INSTRUCTION);
+						styler.ColorTo(i, SCE_SMALI_INSTRUCTION);
 						state = SCE_SMALI_DEFAULT;
 					} else {
 						state = SCE_SMALI_INSTRUCTION;
@@ -209,7 +209,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 					Sci_PositionU pos = i;
 					while (pos < endPos && IsASpace(styler.SafeGetCharAt(pos))) ++pos;
 					if (styler.SafeGetCharAt(pos) == '(') {
-						styler.ColourTo(i - 1, SCE_SMALI_METHOD);
+						styler.ColorTo(i, SCE_SMALI_METHOD);
 					}
 					state = SCE_SMALI_DEFAULT;
 				}
@@ -220,17 +220,17 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 		case SCE_SMALI_LABEL_EOL:	// packed-switch sparse-switch
 		case SCE_SMALI_COMMENTLINE:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DEFAULT;
 			}
 			break;
 		case SCE_SMALI_FIELD:
 		case SCE_SMALI_METHOD:
 			if (ch == '$') {
-				styler.ColourTo(i - 1, state);
-				styler.ColourTo(i, SCE_SMALI_OPERATOR);
+				styler.ColorTo(i, state);
+				styler.ColorTo(i + 1, SCE_SMALI_OPERATOR);
 			} else if (ch == ':' || ch == '(' || IsASpace(ch)) {
-				styler.ColourTo(i - 1, (ch == ':' ? SCE_SMALI_FIELD : SCE_SMALI_METHOD));
+				styler.ColorTo(i, (ch == ':' ? SCE_SMALI_FIELD : SCE_SMALI_METHOD));
 				state = SCE_SMALI_DEFAULT;
 			}
 			break;
@@ -238,57 +238,57 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 		if (state == SCE_SMALI_DEFAULT) {
 			if (ch == '#') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (IsADigit(chNext)) { // javap
 					state = SCE_SMALI_NUMBER;
 				} else {
 					state = SCE_SMALI_COMMENTLINE;
 				}
 			} else if (ch == '/' && chNext == '/') { // javap
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_COMMENTLINE;
 			} else if (ch == ';' && !(chPrev == '>' || iswordchar(chPrev)) && !IsEOLChar(chNext)) { // jasmin
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_COMMENTLINE;
 			} else if (ch == '\"') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_STRING;
 			} else if (ch == '\'') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_CHARACTER;
 			} else if (IsNumberStart(ch, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_NUMBER;
 			} else if (ch == '.' && visibleChars == 0 && IsAlpha(chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_DIRECTIVE;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 			} else if ((ch == 'v' || ch == 'p') && IsADigit(chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_REGISTER;
 			} else if (!curLineState && visibleChars == 0 && ch == ':' && (chNext == 's' || chNext == 'p')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_LABEL_EOL; // packed-switch sparse-switch
 			} else if (ch == ':' && IsDelimiter(chPrev) && iswordstart(chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_LABEL;
 			} else if ((visibleChars > 0 || (curLineState && visibleChars == 0 && ch == 'L')) && IsJavaType(ch, chPrev, chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_TYPE;
 			} else if (chPrev == '-' && ch == '>') { // field/mathod
-				styler.ColourTo(i, SCE_SMALI_OPERATOR);
+				styler.ColorTo(i + 1, SCE_SMALI_OPERATOR);
 				state = SCE_SMALI_FIELD;
 			} else if ((iswordstart(ch) || ch == '$' || ch == '/')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (ch == '/' || ch == '$') {
-					styler.ColourTo(i, SCE_SMALI_OPERATOR);
+					styler.ColorTo(i + 1, SCE_SMALI_OPERATOR);
 				}
 				state = SCE_SMALI_IDENTIFIER;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 			} else if (IsSmaliOp(ch) || (ch == '[' || ch == ']')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_SMALI_OPERATOR;
 			}
 		}
@@ -305,7 +305,7 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 	}
 
 	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	styler.ColorTo(endPos, state);
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_SMALI_COMMENTLINE)

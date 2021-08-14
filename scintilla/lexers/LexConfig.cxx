@@ -51,58 +51,58 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		switch (state) {
 		case SCE_CONF_OPERATOR:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_CONF_DEFAULT;
 			break;
 		case SCE_CONF_NUMBER:
 			if (!(IsADigit(ch) || ch == '.')) {
 				if (IsUnit(ch) && IsDelimiter(chNext)) {
-					styler.ColourTo(i, state);
+					styler.ColorTo(i + 1, state);
 					state = SCE_CONF_DEFAULT;
 					continue;
 				}
 				if (iswordchar(ch)) {
 					state = SCE_CONF_IDENTIFIER;
 				} else {
-					styler.ColourTo(i - 1, state);
+					styler.ColorTo(i, state);
 					state = SCE_CONF_DEFAULT;
 				}
 			}
 			break;
 		case SCE_CONF_HEXNUM:
 			if (!IsHexDigit(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_DEFAULT;
 			}
 			break;
 		case SCE_CONF_STRING:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_DEFAULT;
 			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
-				styler.ColourTo(i, state);
+				styler.ColorTo(i + 1, state);
 				state = SCE_CONF_DEFAULT;
 				continue;
 			}
 			break;
 		case SCE_CONF_DIRECTIVE:
 			if (insideTag && ch == ':') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (chNext == ':') {
 					i++;
 					ch = chNext;
 					chNext = styler.SafeGetCharAt(i + 1);
 				}
-				styler.ColourTo(i, SCE_CONF_OPERATOR);
+				styler.ColorTo(i + 1, SCE_CONF_OPERATOR);
 				state = SCE_CONF_DIRECTIVE;
 			} else if (IsDelimiter(ch) || (insideTag && ch == '>')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (ch == '.') {
-					styler.ColourTo(i, SCE_CONF_OPERATOR);
+					styler.ColorTo(i + 1, SCE_CONF_OPERATOR);
 				} else {
 					state = SCE_CONF_DEFAULT;
 				}
@@ -111,15 +111,15 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_CONF_SECTION:
 		case SCE_CONF_COMMENT:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_DEFAULT;
 			}
 			break;
 		case SCE_CONF_IDENTIFIER:
 			if (IsDelimiter(ch) || (insideTag && ch == '>') || (ch == '<' && chNext == '/')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (ch == '.') {
-					styler.ColourTo(i, SCE_CONF_OPERATOR);
+					styler.ColorTo(i + 1, SCE_CONF_OPERATOR);
 				} else {
 					state = SCE_CONF_DEFAULT;
 				}
@@ -141,16 +141,16 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		if (state == SCE_CONF_DEFAULT) {
 			if (ch == '#') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_COMMENT;
 			} else if (ch == '\"') {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_STRING;
 			} else if (IsConfOp(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_OPERATOR;
 			} else if ((visibleChars == 0 && !IsASpace(ch)) || (ch == '<' && chNext == '/')) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (ch == '[') {
 					state = SCE_CONF_SECTION;
 				} else {
@@ -163,20 +163,20 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 					}
 				}
 			} else if (insideTag && (ch == '>' || ((ch == '/' || ch == '?') && chNext == '>'))) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (ch == '/' || ch == '?') {
 					i++;
 					ch = chNext;
 					chNext = styler.SafeGetCharAt(i + 1);
 				}
-				styler.ColourTo(i, SCE_CONF_DIRECTIVE);
+				styler.ColorTo(i + 1, SCE_CONF_DIRECTIVE);
 				state = SCE_CONF_DEFAULT;
 				insideTag = false;
 			} else if ((ch == '+' || ch == '-') && IsAlphaNumeric(chNext)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_OPERATOR;
 			} else if (IsADigit(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				if (ch == '0' && (chNext == 'x' || chNext == 'X')) {
 					state = SCE_CONF_HEXNUM;
 					i++;
@@ -186,7 +186,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 					state = SCE_CONF_NUMBER;
 				}
 			} else if (!IsASpace(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_CONF_IDENTIFIER;
 			}
 		}
@@ -201,7 +201,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 	}
 
 	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	styler.ColorTo(endPos, state);
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CONF_COMMENT)

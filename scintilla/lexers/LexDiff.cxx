@@ -133,7 +133,7 @@ void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		styler.GetRange(lineStartCurrent, lineStartNext, lineBuffer, sizeof(lineBuffer));
 		const int lineType = ColouriseDiffLine(lineBuffer);
 		if (initStyle != lineType) {
-			styler.ColourTo(lineStartCurrent - 1, initStyle);
+			styler.ColorTo(lineStartCurrent, initStyle);
 			initStyle = lineType;
 		}
 
@@ -164,7 +164,7 @@ void ColouriseDiffDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		lineStartNext = styler.LineStart(lineCurrent + 1);
 	}
 
-	styler.ColourTo(endPos - 1, initStyle);
+	styler.ColorTo(endPos, initStyle);
 }
 
 }

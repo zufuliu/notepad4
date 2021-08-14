@@ -180,29 +180,30 @@ public:
 	void StartSegment(Sci_PositionU pos) noexcept {
 		startSeg = pos;
 	}
+	[[deprecated]]
 	void ColourTo(Sci_PositionU pos, int chAttr) {
+		ColorTo(pos + 1, chAttr);
+	}
+	void ColorTo(Sci_PositionU endPos_, int chAttr) {
 		// Only perform styling if non empty range
-		if (pos != startSeg - 1) {
-			assert(pos >= startSeg);
-			if (pos < startSeg) {
-				return;
-			}
-
-			if (validLen + (pos - startSeg + 1) >= bufferSize) {
+		assert(endPos_ <= static_cast<Sci_PositionU>(Length()));
+		if (endPos_ > startSeg) {
+			const Sci_PositionU len = endPos_ - startSeg;
+			if (validLen + len >= bufferSize) {
 				Flush();
 			}
 			const unsigned char attr = static_cast<unsigned char>(chAttr);
-			if (validLen + (pos - startSeg + 1) >= bufferSize) {
+			if (validLen + len >= bufferSize) {
 				// Too big for buffer so send directly
-				pAccess->SetStyleFor(pos - startSeg + 1, attr);
+				pAccess->SetStyleFor(len, attr);
 			} else {
-				for (Sci_PositionU i = startSeg; i <= pos; i++) {
+				for (Sci_PositionU i = 0; i < len; i++) {
 					assert((startPosStyling + validLen) < Length());
 					styleBuf[validLen++] = attr;
 				}
 			}
 		}
-		startSeg = pos + 1;
+		startSeg = endPos_;
 	}
 	void SetLevel(Sci_Line line, int level) {
 		pAccess->SetLevel(line, level);

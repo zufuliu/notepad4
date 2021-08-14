@@ -63,11 +63,11 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 		switch (state) {
 		case SCE_L_OPERATOR:
-			styler.ColourTo(i - 1, state);
+			styler.ColorTo(i, state);
 			state = SCE_L_DEFAULT;
 			break;
 		case SCE_L_SPECIAL:
-			styler.ColourTo(i, state);
+			styler.ColorTo(i + 1, state);
 			state = SCE_L_DEFAULT;
 			continue;
 		case SCE_L_COMMAND:
@@ -95,7 +95,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 					}
 				}
 				if (state == SCE_L_COMMAND) {
-					styler.ColourTo(i - 1, state);
+					styler.ColorTo(i, state);
 					state = SCE_L_DEFAULT;
 				}
 			} else if (wordLen < MAX_WORD_LENGTH) {
@@ -105,7 +105,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_L_TAG:
 			if (!IsLowerCase(ch)) {
 				if (isCommand) {
-					styler.ColourTo(i - 1, SCE_L_COMMAND);
+					styler.ColorTo(i, SCE_L_COMMAND);
 				}
 				state = SCE_L_DEFAULT;
 			}
@@ -117,7 +117,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 		case SCE_L_SECTION1:
 		case SCE_L_SECTION2:
 			if (atLineStart) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_L_DEFAULT;
 			}
 			break;
@@ -130,20 +130,20 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 				wordLen = 1;
 			} else if (ch == '@') {
 				if (IsTexiSpec(chNext)) {
-					styler.ColourTo(i - 1, state);
+					styler.ColorTo(i, state);
 					state = SCE_L_SPECIAL;
 				} else if (IsAlpha(chNext)) {
-					styler.ColourTo(i - 1, state);
+					styler.ColorTo(i, state);
 					state = SCE_L_COMMAND;
 					buf[0] = ch;
 					wordLen = 1;
 				}
 			} else if (ch == '@' || ch == '{' || ch == '}' ||
 				(ch == '-' && !IsAlpha(chPrev) && !IsAlpha(chNext))) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_L_OPERATOR;
 			} else if (IsLowerCase(ch)) {
-				styler.ColourTo(i - 1, state);
+				styler.ColorTo(i, state);
 				state = SCE_L_TAG;
 			}
 		}
@@ -166,7 +166,7 @@ static void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int in
 	}
 
 	// Colourise remaining document
-	styler.ColourTo(endPos - 1, state);
+	styler.ColorTo(endPos, state);
 }
 
 LexerModule lmTexinfo(SCLEX_TEXINFO, ColouriseTexiDoc, "texi");
