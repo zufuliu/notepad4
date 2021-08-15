@@ -1732,57 +1732,76 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	const uint8_t *pt = (const uint8_t *)pTest;
-	const uint8_t * const end = pt + nLength;
 
 #if NP2_USE_AVX2
-	while (pt + 2*sizeof(__m256i) <= end) {
-		const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
-		const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
-		const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
-		if (mask) {
-			return FALSE;
-		}
-		pt += 2*sizeof(__m256i);
+	if (nLength >= 2*sizeof(__m256i)) {
+		const uint8_t * const end = pt + nLength - 2*sizeof(__m256i);
+		do {
+			const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
+			const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
+			const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
+			if (mask) {
+				return FALSE;
+			}
+			pt += 2*sizeof(__m256i);
+		} while (pt <= end);
 	}
-	if (pt < end) {
-		NP2_alignas(32) uint8_t buffer[2*sizeof(__m256i)];
-		ZeroMemory_32x2(buffer);
-		__movsb(buffer, pt, end - pt);
 
-		const __m256i chunk1 = _mm256_load_si256((__m256i *)buffer);
-		const __m256i chunk2 = _mm256_load_si256((__m256i *)(buffer + sizeof(__m256i)));
-		const uint32_t mask = _mm256_movemask_epi8(_mm256_or_si256(chunk1, chunk2));
+	nLength &= 2*sizeof(__m256i) - 1;
+	if (nLength != 0) {
+		uint32_t mask = 0;
+		__m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		uint32_t last = _mm256_movemask_epi8(chunk);
+		if (nLength > sizeof(__m256i)) {
+			nLength -= sizeof(__m256i);
+			mask = last;
+			chunk = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
+			last = _mm256_movemask_epi8(chunk);
+		}
+		mask |= bit_zero_high_u32(last, nLength);
 		return mask == 0;
 	}
 	return TRUE;
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
-	while (pt + 4*sizeof(__m128i) <= end) {
-		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
-		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
-		const __m128i chunk3 = _mm_loadu_si128((__m128i *)(pt + 2*sizeof(__m128i)));
-		const __m128i chunk4 = _mm_loadu_si128((__m128i *)(pt + 3*sizeof(__m128i)));
-		const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
-		if (mask) {
-			return FALSE;
-		}
-		pt += 4*sizeof(__m128i);
+	if (nLength >= 4*sizeof(__m128i)) {
+		const uint8_t * const end = pt + nLength - 4*sizeof(__m128i);
+		do {
+			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+			const __m128i chunk3 = _mm_loadu_si128((__m128i *)(pt + 2*sizeof(__m128i)));
+			const __m128i chunk4 = _mm_loadu_si128((__m128i *)(pt + 3*sizeof(__m128i)));
+			const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
+			if (mask) {
+				return FALSE;
+			}
+			pt += 4*sizeof(__m128i);
+		} while (pt <= end);
 	}
-	if (pt < end) {
-		NP2_alignas(16) uint8_t buffer[4*sizeof(__m128i)];
-		ZeroMemory_16x4(buffer);
-		__movsb(buffer, pt, end - pt);
 
-		const __m128i chunk1 = _mm_load_si128((__m128i *)buffer);
-		const __m128i chunk2 = _mm_load_si128((__m128i *)(buffer + sizeof(__m128i)));
-		const __m128i chunk3 = _mm_load_si128((__m128i *)(buffer + 2*sizeof(__m128i)));
-		const __m128i chunk4 = _mm_load_si128((__m128i *)(buffer + 3*sizeof(__m128i)));
-		const uint32_t mask = _mm_movemask_epi8(_mm_or_si128(_mm_or_si128(_mm_or_si128(chunk1, chunk2), chunk3), chunk4));
+	nLength &= 4*sizeof(__m128i) - 1;
+	if (nLength != 0) {
+		__m128i chunk = _mm_setzero_si128();
+#if defined(__clang__)
+		#pragma clang loop unroll(disable)
+#endif
+		for (UINT i = 0; i < nLength / sizeof(__m128i); i++) {
+			chunk = _mm_or_si128(chunk, _mm_load_si128((__m128i *)pt));
+			pt += sizeof(__m128i);
+		}
+
+		uint32_t mask = _mm_movemask_epi8(chunk);
+		nLength &= sizeof(__m128i) - 1;
+		if (nLength != 0) {
+			const uint32_t last = _mm_movemask_epi8(_mm_load_si128((__m128i *)pt));
+			mask |= bit_zero_high_u32(last, nLength);
+		}
 		return mask == 0;
 	}
 	return TRUE;
 	// end NP2_USE_SSE2
 #else
+	const uint8_t * const end = pt + nLength;
 
 #if defined(_WIN64)
 	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
