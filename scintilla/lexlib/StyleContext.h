@@ -238,6 +238,13 @@ public:
 		SeekTo(styler.GetStartSegment());
 	}
 
+	void BackTo(Sci_PositionU startPos) {
+		styler.Flush();
+		styler.StartAt(startPos);
+		styler.StartSegment(startPos);
+		SeekTo(startPos);
+	}
+
 	void Advance(Sci_Position nb) noexcept {
 		if (nb) {
 			SeekTo(currentPos + nb);

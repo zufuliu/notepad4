@@ -1348,15 +1348,16 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		NP2_alignas(32) uint8_t buffer[2*sizeof(__m256i)];
-		ZeroMemory_32x2(buffer);
+		uint8_t buffer[sizeof(__m256i) + 1];
+		_mm256_storeu_si256((__m256i *)buffer, _mm256_setzero_si256());
+		buffer[sizeof(__m256i)] = 0;
 
 		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
 		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
 
-		__m256i shifted_bytes = _mm256_load_si256((__m256i *)buffer);
+		__m256i shifted_bytes = _mm256_loadu_si256((__m256i *)buffer);
 		__m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
 		if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 			return 0;
@@ -1502,15 +1503,16 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 	// Deal with any bytes remaining. Rather than making a separate scalar path,
 	// just fill in a buffer, reading bytes only up to len, and load from that.
 	if (offset < len) {
-		NP2_alignas(16) uint8_t buffer[2*sizeof(__m128i)];
-		ZeroMemory_16x2(buffer);
+		uint8_t buffer[sizeof(__m128i) + 1];
+		_mm_storeu_ps((float *)buffer, _mm_setzero_ps());
+		buffer[sizeof(__m128i)] = 0;
 
 		if (offset != 0) {
 			buffer[0] = data[offset - 1];
 		}
 		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
 
-		__m128i shifted_bytes = _mm_load_si128((__m128i *)(buffer));
+		__m128i shifted_bytes = _mm_loadu_si128((__m128i *)(buffer));
 		__m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
 		if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 			return 0;
@@ -1786,14 +1788,14 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		#pragma clang loop unroll(disable)
 #endif
 		for (UINT i = 0; i < nLength / sizeof(__m128i); i++) {
-			chunk = _mm_or_si128(chunk, _mm_load_si128((__m128i *)pt));
+			chunk = _mm_or_si128(chunk, _mm_loadu_si128((__m128i *)pt));
 			pt += sizeof(__m128i);
 		}
 
 		uint32_t mask = _mm_movemask_epi8(chunk);
 		nLength &= sizeof(__m128i) - 1;
 		if (nLength != 0) {
-			const uint32_t last = _mm_movemask_epi8(_mm_load_si128((__m128i *)pt));
+			const uint32_t last = _mm_movemask_epi8(_mm_loadu_si128((__m128i *)pt));
 			mask |= bit_zero_high_u32(last, nLength);
 		}
 		return mask == 0;

@@ -404,6 +404,7 @@ class ScintillaWin final :
 	UINT dpi;
 	ReverseArrowCursor reverseArrowCursor;
 
+	PRectangle rectangleClient;
 	HRGN hRgnUpdate;
 
 	bool hasOKText;
@@ -573,6 +574,9 @@ class ScintillaWin final :
 #if SCI_EnablePopupMenu
 	sptr_t ShowContextMenu(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 #endif
+	PRectangle GetClientRectangle() const noexcept override {
+		return rectangleClient;
+	}
 	void SizeWindow();
 	sptr_t MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
 	sptr_t KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lParam);
@@ -1657,6 +1661,7 @@ void ScintillaWin::SizeWindow() {
 	}
 #endif
 	//Platform::DebugPrintf("Scintilla WM_SIZE %d %d\n", LOWORD(lParam), HIWORD(lParam));
+	rectangleClient = wMain.GetClientPosition();
 	ChangeSize();
 }
 

@@ -193,6 +193,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Window wMain;	///< The Scintilla parent window
 	Window wMargin;	///< May be separate when using a scroll view for wMain
 
+	// Optimization that avoids superfluous invalidations
+	bool redrawPendingText = false;
+	bool redrawPendingMargin = false;
+
 	/** Style resources may be expensive to allocate so are cached between uses.
 	 * When a style attribute is changed, this cache is flushed. */
 	bool stylesValid;

@@ -180,10 +180,12 @@ public:
 	void StartSegment(Sci_PositionU pos) noexcept {
 		startSeg = pos;
 	}
+#if 0
 	[[deprecated]]
 	void ColourTo(Sci_PositionU pos, int chAttr) {
 		ColorTo(pos + 1, chAttr);
 	}
+#endif
 	void ColorTo(Sci_PositionU endPos_, int chAttr) {
 		// Only perform styling if non empty range
 		assert(endPos_ <= static_cast<Sci_PositionU>(Length()));
