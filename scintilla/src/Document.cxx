@@ -1092,15 +1092,14 @@ static constexpr bool IsSpaceOrTab(int ch) noexcept {
 //   2) Break before punctuation
 //   3) Break after whole character
 
-int Document::SafeSegment(const char *text, int length, int lengthSegment) const noexcept {
-	if (length <= lengthSegment)
-		return length;
+int Document::SafeSegment(const char *text, int lengthSegment) const noexcept {
 	int lastSpaceBreak = -1;
 	int lastPunctuationBreak = -1;
 	int lastEncodingAllowedBreak = 0;
-	for (int j = 0; j < lengthSegment;) {
+	int j = 0;
+	do {
 		const unsigned char ch = text[j];
-		if (j > 0) {
+		if (j != 0) {
 			if (IsSpaceOrTab(text[j - 1]) && !IsSpaceOrTab(text[j])) {
 				lastSpaceBreak = j;
 			}
@@ -1108,7 +1107,7 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 
 		lastEncodingAllowedBreak = j;
 		if (!dbcsCodePage || UTF8IsAscii(ch)) {
-			if (j > 0 && charClass.GetClass(ch) == CharacterClass::punctuation) {
+			if (j != 0 && charClass.GetClass(ch) == CharacterClass::punctuation) {
 				lastPunctuationBreak = j;
 			}
 			j++;
@@ -1117,7 +1116,7 @@ int Document::SafeSegment(const char *text, int length, int lengthSegment) const
 		} else {
 			j += IsDBCSLeadByteNoExcept(ch) ? 2 : 1;
 		}
-	}
+	} while (j < lengthSegment);
 	if (lastSpaceBreak >= 0) {
 		return lastSpaceBreak;
 	} else if (lastPunctuationBreak >= 0) {

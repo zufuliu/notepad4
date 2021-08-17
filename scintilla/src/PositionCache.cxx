@@ -850,7 +850,7 @@ TextSegment BreakFinder::Next() {
 		subBreak = -1;
 		return TextSegment(startSegment, nextBreak - startSegment);
 	} else {
-		subBreak += pdoc->SafeSegment(&ll->chars[subBreak], nextBreak - subBreak, lengthEachSubdivision);
+		subBreak += pdoc->SafeSegment(&ll->chars[subBreak], lengthEachSubdivision);
 		if (subBreak >= nextBreak) {
 			subBreak = -1;
 			return TextSegment(startSegment, nextBreak - startSegment);

@@ -40,7 +40,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	//	For properties files, set to 0 to style all lines that start with whitespace in the default style.
 	//	This is not suitable for SciTE .properties files which use indentation for flow control but
 	//	can be used for RFC2822 text where indentation is used for continuation lines.
-	const bool allowInitialSpaces = styler.GetPropertyInt("lexer.props.allow.initial.spaces", 1) != 0;
+	const bool allowInitialSpaces = styler.GetPropertyInt("lexer.props.allow.initial.spaces", 1) & true;
 
 	const Sci_Position endPos = startPos + lengthDoc;
 	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
@@ -76,8 +76,9 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		} else if (ch == '[') {
 			initStyle = SCE_PROPS_SECTION;
 		} else if (ch == '@') {
-			styler.ColorTo(i + 1, SCE_PROPS_DEFVAL);
-			const char chNext = styler[++i];
+			++i;
+			styler.ColorTo(i, SCE_PROPS_DEFVAL);
+			const char chNext = styler[i];
 			if (IsAssignChar(chNext)) {
 				styler.ColorTo(i + 1, SCE_PROPS_ASSIGNMENT);
 			}
@@ -86,8 +87,8 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				ch = styler[i];
 				if (IsAssignChar(ch)) {
 					styler.ColorTo(i, SCE_PROPS_KEY);
-					styler.ColorTo(i + 1, SCE_PROPS_ASSIGNMENT);
 					++i;
+					styler.ColorTo(i, SCE_PROPS_ASSIGNMENT);
 					break;
 				}
 				// ignore trail byte in DBCS character
@@ -100,7 +101,9 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (IsCommentChar(ch) && IsASpaceOrTab(chPrev))	{
 					styler.ColorTo(i, SCE_PROPS_DEFAULT);
 					initStyle = SCE_PROPS_COMMENT;
+#if ENABLE_FOLD_PROPS_COMMENT
 					changed = true;
+#endif
 					break;
 				}
 				chPrev = ch;
