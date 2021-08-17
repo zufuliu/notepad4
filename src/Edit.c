@@ -7982,6 +7982,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 		SciCall_ScrollCaret();
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 }
 
@@ -8029,6 +8030,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		SciCall_ScrollCaret();
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 }
 
@@ -8133,6 +8135,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 		SciCall_ScrollCaret();
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 }
 
