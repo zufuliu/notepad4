@@ -345,7 +345,7 @@ public:
 		return dbcsCharClass->IsTrailByte(ch);
 	}
 	bool IsDBCSDualByteAt(Sci::Position pos) const noexcept;
-	int DBCSDrawBytes(std::string_view text) const noexcept;
+	int DBCSDrawBytes(const char *text, size_t length) const noexcept;
 	int SafeSegment(const char *text, int lengthSegment) const noexcept;
 	EncodingFamily CodePageFamily() const noexcept;
 

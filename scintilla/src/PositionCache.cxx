@@ -802,9 +802,9 @@ TextSegment BreakFinder::Next() {
 			const unsigned char ch = chars[0];
 			if (!UTF8IsAscii(ch) && encodingFamily != EncodingFamily::eightBit) {
 				if (encodingFamily == EncodingFamily::unicode) {
-					charWidth = UTF8DrawBytes(reinterpret_cast<const unsigned char *>(chars), static_cast<int>(lineRange.end - nextBreak));
+					charWidth = UTF8DrawBytes(chars, lineRange.end - nextBreak);
 				} else {
-					charWidth = pdoc->DBCSDrawBytes(std::string_view(chars, lineRange.end - nextBreak));
+					charWidth = pdoc->DBCSDrawBytes(chars, lineRange.end - nextBreak);
 				}
 			}
 			const Representation *repr = nullptr;

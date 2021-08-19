@@ -807,7 +807,7 @@ void EditView::UpdateBidiData(const EditModel &model, const ViewStyle &vstyle, L
 		ll->bidiData->stylesFonts[ll->numCharsInLine].reset();
 
 		for (int charsInLine = 0; charsInLine < ll->numCharsInLine; charsInLine++) {
-			const int charWidth = UTF8DrawBytes(reinterpret_cast<unsigned char *>(&ll->chars[charsInLine]), ll->numCharsInLine - charsInLine);
+			const int charWidth = UTF8DrawBytes(&ll->chars[charsInLine], ll->numCharsInLine - charsInLine);
 			const Representation *repr = model.reprs.RepresentationFromCharacter(std::string_view(&ll->chars[charsInLine], charWidth));
 
 			ll->bidiData->widthReprs[charsInLine] = 0.0f;

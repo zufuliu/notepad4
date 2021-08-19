@@ -664,7 +664,7 @@ int Document::LenChar(Sci::Position pos, bool *invalid) noexcept {
 	}
 
 	const unsigned char leadByte = cb.UCharAt(pos);
-	if (!dbcsCodePage || UTF8IsAscii(leadByte)) {
+	if (UTF8IsAscii(leadByte) || !dbcsCodePage) {
 		// Common case: ASCII character
 		return 1;
 	}
@@ -1061,12 +1061,12 @@ bool SCI_METHOD Document::IsDBCSLeadByte(unsigned char ch) const noexcept {
 	return dbcsCharClass && dbcsCharClass->IsLeadByte(ch);
 }
 
-int Document::DBCSDrawBytes(std::string_view text) const noexcept {
-	if (text.length() <= 1) {
-		return static_cast<int>(text.length());
+int Document::DBCSDrawBytes(const char *text, size_t length) const noexcept {
+	if (length <= 1) {
+		return static_cast<int>(length);
 	}
 	if (IsDBCSLeadByteNoExcept(text[0])) {
-		return IsDBCSTrailByteNoExcept(text[1]) ? 2 : 1;
+		return 1 + IsDBCSTrailByteNoExcept(text[1]);
 	} else {
 		return 1;
 	}
@@ -1097,29 +1097,29 @@ int Document::SafeSegment(const char *text, int lengthSegment) const noexcept {
 	int lastPunctuationBreak = -1;
 	int lastEncodingAllowedBreak = 0;
 	int j = 0;
+	unsigned char chPrev = 0;
 	do {
 		const unsigned char ch = text[j];
-		if (j != 0) {
-			if (IsSpaceOrTab(text[j - 1]) && !IsSpaceOrTab(text[j])) {
-				lastSpaceBreak = j;
-			}
+		if (IsSpaceOrTab(chPrev) && !IsSpaceOrTab(ch)) {
+			lastSpaceBreak = j;
 		}
 
+		chPrev = ch;
 		lastEncodingAllowedBreak = j;
-		if (!dbcsCodePage || UTF8IsAscii(ch)) {
-			if (j != 0 && charClass.GetClass(ch) == CharacterClass::punctuation) {
+		if (UTF8IsAscii(ch) || !dbcsCodePage) {
+			if (charClass.GetClass(ch) == CharacterClass::punctuation) {
 				lastPunctuationBreak = j;
 			}
 			j++;
 		} else if (dbcsCodePage == CpUtf8) {
 			j += UTF8BytesOfLead(ch);
 		} else {
-			j += IsDBCSLeadByteNoExcept(ch) ? 2 : 1;
+			j += 1 + IsDBCSLeadByteNoExcept(ch);
 		}
 	} while (j < lengthSegment);
 	if (lastSpaceBreak >= 0) {
 		return lastSpaceBreak;
-	} else if (lastPunctuationBreak >= 0) {
+	} else if (lastPunctuationBreak > 0) {
 		return lastPunctuationBreak;
 	}
 	return lastEncodingAllowedBreak;
@@ -2156,7 +2156,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				bool characterMatches = true;
 				for (;;) {
 					const unsigned char leadByte = cbView.CharAt(pos + indexDocument);
-					const int widthChar = IsDBCSLeadByteNoExcept(leadByte) ? 2 : 1;
+					const int widthChar = 1 + IsDBCSLeadByteNoExcept(leadByte);
 					if (!widthFirstCharacter) {
 						widthFirstCharacter = widthChar;
 					}
