@@ -720,6 +720,11 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 #define HTML_TEXT_BLOCK_CSS		6
 #define HTML_TEXT_BLOCK_SGML	7
 
+enum {
+	InnoLineStatePreprocessor = 8,
+	InnoLineStateCodeSection = 16,
+};
+
 extern EDITLEXER lexCSS;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexJulia;
@@ -1112,6 +1117,12 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
+
+	case SCLEX_INNOSETUP:
+		if (ch == '#' && (iCurrentStyle == SCE_INNO_PREPROCESSOR || iCurrentStyle == SCE_INNO_PREPROCESSOR_WORD || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[3]); // preprocessor
+			return AutoC_AddSpecWord_Finish;
+		}
 
 	case SCLEX_GROOVY:
 	case SCLEX_JAVA:
@@ -1780,8 +1791,6 @@ BOOL IsIndentKeywordStyle(int style) {
 	//case SCLEX_CPP:
 	//	return style == SCE_C_PREPROCESSOR;
 
-	//case SCLEX_INNOSETUP:
-	//	return style == SCE_INNO_KEYWORD_PASCAL;
 	case SCLEX_JULIA:
 		return style == SCE_JULIA_WORD;
 	case SCLEX_LUA:
@@ -2181,7 +2190,6 @@ void EditToggleCommentLine(void) {
 	break;
 
 	case SCLEX_AU3:
-	case SCLEX_INNOSETUP:
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
 	case SCLEX_PROPERTIES:
@@ -2260,6 +2268,16 @@ void EditToggleCommentLine(void) {
 		case HTML_TEXT_BLOCK_PHP:
 			EditToggleLineComments(L"//", FALSE);
 			break;
+		}
+	}
+	break;
+
+	case SCLEX_INNOSETUP: {
+		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
+		if (lineState & (InnoLineStatePreprocessor | InnoLineStateCodeSection)) {
+			EditToggleLineComments(L"//", FALSE);
+		} else {
+			EditToggleLineComments(L";", FALSE);
 		}
 	}
 	break;
@@ -2397,7 +2415,16 @@ void EditToggleCommentBlock(void) {
 	}
 	break;
 
-	case SCLEX_INNOSETUP:
+	case SCLEX_INNOSETUP: {
+		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
+		if (lineState &  InnoLineStateCodeSection) {
+			EditEncloseSelection(L"{", L"}");
+		} else if (lineState & InnoLineStatePreprocessor) {
+			EditEncloseSelection(L"/*", L"*/");
+		}
+	}
+	break;
+
 	case SCLEX_PASCAL:
 		EditEncloseSelection(L"{", L"}");
 		break;

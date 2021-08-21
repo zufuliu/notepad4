@@ -128,8 +128,7 @@ def UpdateKeywordFile(rid, path, keywordList, keywordCount=16):
 	output = BuildKeywordContent(rid, keywordList, keywordCount=keywordCount)
 	Regenerate(path, '//', output)
 
-def read_api_file(path, comment, commentKind=0):
-	doc = open(path, encoding='utf-8').read()
+def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
 		doc = re.sub(comment + r'[^!].+', '', doc) # normal comment
 	sections = []
@@ -155,6 +154,10 @@ def read_api_file(path, comment, commentKind=0):
 		doc = '\n'.join(lines[1:])
 		sections.append((key, doc))
 	return sections
+
+def read_api_file(path, comment, commentKind=0):
+	doc = open(path, encoding='utf-8').read()
+	return split_api_section(doc, comment, commentKind=commentKind)
 
 def to_lower(items):
 	return [item.lower() for item in items]
@@ -720,6 +723,126 @@ def parse_haxe_api_file(path):
 		('metadata', [], KeywordAttr.Default),
 		('function', [], KeywordAttr.Default),
 		('comment', keywordMap['comment'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+	]
+
+def parse_inno_setup_api_file(path):
+	section = ''
+	lines = []
+	sections = []
+	doc = open(path, encoding='utf-8').read()
+	for line in doc.splitlines():
+		line = line.strip()
+		if not line:
+			continue
+		if line[0] == '[':
+			if section and lines:
+				doc = '\n'.join(lines)
+				sections.append((section, doc))
+			section = line.strip('[]').strip()
+			lines = []
+		else:
+			lines.append(line)
+	if section and lines:
+		doc = '\n'.join(lines)
+		sections.append((section, doc))
+
+	keywordMap = {
+		'section': [],
+		'parameters': [],
+		'constants': [],
+
+		'directives': [],
+		'types': [],
+		'predefined variables': [],
+		'functions': [],
+
+		'pascal keywords': [],
+		'pascal types': ['IDispatch', 'IUnknown'],
+		'pascal functions': [],
+		'pascal constants': [],
+		'misc': ['Local'],
+	}
+	for section, content in sections:
+		if section == 'ISPP':
+			for key, doc in split_api_section(content, '//'):
+				if key == 'directives':
+					items = re.findall(r'^#(\w+)', doc, re.MULTILINE)
+				elif key == 'types' or key == 'predefined variables':
+					items = doc.split()
+				elif key == 'functions':
+					items = re.findall(r'(\w+)\(', doc)
+					items = [item + '()' for item in items]
+				else:
+					items = []
+				keywordMap[key].extend(items)
+		elif section == 'Constants':
+			items = re.findall(r'^\{?(\w+)', content, re.MULTILINE)
+			keywordMap['constants'].extend(items)
+		elif section == 'Code':
+			keywordMap['section'].append(section)
+			for key, doc in split_api_section(content, '//'):
+				items = []
+				if key == 'keywords':
+					items = doc.split()
+				elif key == 'constants':
+					items = doc.replace(',', ' ').split()
+				elif key in ('event', 'functions', 'classes'):
+					items = re.findall(r'^\s*(function|procedure|constructor|property)\s+(\w+\(?)', doc, re.MULTILINE | re.IGNORECASE)
+					functions = []
+					properties = []
+					for kind, name in items:
+						if key == 'event' or kind.lower() == 'property':
+							properties.append(name)
+						elif not name.endswith('('):
+							functions.append(name)
+						else:
+							functions.append(name + ')')
+
+					types = re.findall(r':\s*(\w+)', doc)
+					if 'array' in types:
+						types.remove('array')
+					if key == 'classes':
+						items = re.findall(r'^(T\w+)\s*=', doc, re.MULTILINE)
+						types.extend(items)
+						items = re.findall(r'^T\w+\s*=\s*\(([\w\s,]+)\)', doc, re.MULTILINE)
+						for item in items:
+							keywordMap['pascal constants'].extend(item.replace(',', ' ').split())
+					keywordMap['misc'].extend(properties)
+					if key == 'functions':
+						items = functions
+					else:
+						key = 'types'
+						items = types
+				keywordMap['pascal ' + key].extend(items)
+		else:
+			keywordMap['section'].append(section)
+			items = re.findall(r'^(\w+)=?:?', content, re.MULTILINE)
+			keywordMap['parameters'].extend(items)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'pascal keywords',
+		'pascal types',
+		'functions',
+		'pascal functions',
+		'predefined variables',
+		'pascal constants',
+		'misc',
+	])
+	return [
+		('section', keywordMap['section'], KeywordAttr.NoLexer),
+		('parameters', keywordMap['parameters'], KeywordAttr.NoLexer),
+		('constants', keywordMap['constants'], KeywordAttr.NoLexer),
+
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer),
+		('types', keywordMap['types'], KeywordAttr.MakeLower),
+		('predefined variables', keywordMap['predefined variables'], KeywordAttr.MakeLower),
+		('functions', keywordMap['functions'], KeywordAttr.NoLexer),
+
+		('pascal keywords', keywordMap['pascal keywords'], KeywordAttr.MakeLower),
+		('pascal types', keywordMap['pascal types'], KeywordAttr.MakeLower),
+		('pascal functions', keywordMap['pascal functions'], KeywordAttr.NoLexer),
+		('pascal constants', keywordMap['pascal constants'], KeywordAttr.MakeLower),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
 def parse_jam_api_file(path):

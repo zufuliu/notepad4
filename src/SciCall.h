@@ -604,6 +604,10 @@ NP2_inline void SciCall_StartStyling(Sci_Position start) {
 	SciCall(SCI_STARTSTYLING, start, 0);
 }
 
+NP2_inline int SciCall_GetLineState(Sci_Line line) {
+	return (int)SciCall(SCI_GETLINESTATE, line, 0);
+}
+
 // Style definition
 
 NP2_inline void SciCall_StyleResetDefault(void) {

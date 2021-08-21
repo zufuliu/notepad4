@@ -1331,6 +1331,20 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[1] = KeywordAttr_NoAutoComp;	// preprocessor
 		attr[8] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// comment
 		break;
+	case NP2LEX_INNO:
+		attr[0] = KeywordAttr_NoLexer;		// section
+		attr[1] = KeywordAttr_NoLexer;		// parameters
+		attr[2] = KeywordAttr_NoLexer;		// constants
+		attr[3] = KeywordAttr_NoLexer;		// directives
+		attr[4] = KeywordAttr_MakeLower;	// types
+		attr[5] = KeywordAttr_MakeLower;	// predefined variables
+		attr[6] = KeywordAttr_NoLexer;		// functions
+		attr[7] = KeywordAttr_MakeLower;	// pascal keywords
+		attr[8] = KeywordAttr_MakeLower;	// pascal types
+		attr[9] = KeywordAttr_NoLexer;		// pascal functions
+		attr[10] = KeywordAttr_MakeLower;	// pascal constants
+		attr[11] = KeywordAttr_NoLexer;		// misc
+		break;
 	case NP2LEX_JAM:
 		attr[5] = KeywordAttr_NoLexer;		// rule
 		attr[6] = KeywordAttr_NoLexer;		// feature

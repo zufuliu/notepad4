@@ -76,7 +76,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* JSP
 		* PHP
 	* INI Configuration File
-	* Inno Setup
+	* [Inno Setup](../master/tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
 	* [Boost Jam](../master/tools/lang/Jamfile.jam), up to Jam 4.4.1.
 	* [Java](../master/tools/lang/Java.java), up to Java 16. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
