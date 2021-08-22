@@ -1,7 +1,7 @@
 #include "EditLexer.h"
 #include "EditStyleX.h"
 
-// TOML 0.5 https://github.com/toml-lang/toml
+// TOML 1.0 https://github.com/toml-lang/toml
 
 static KEYWORDLIST Keywords_TOML = {{
 "false inf nan true "
