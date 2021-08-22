@@ -202,6 +202,8 @@
 
 #define NP2StyleX_SendKey				EDITSTYLE_HOLE(SendKey, L"Send Key")
 #define NP2StyleX_Special				EDITSTYLE_HOLE(Special, L"Special")
+#define NP2StyleX_HotString				EDITSTYLE_HOLE(HotString, L"HotString")
+#define NP2StyleX_HotKey				EDITSTYLE_HOLE(HotKey, L"HotKey")
 
 #define NP2StyleX_PascalKeyword			EDITSTYLE_HOLE(PascalKeyword, L"Pascal Keyword")
 

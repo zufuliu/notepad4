@@ -185,6 +185,12 @@ Assembler Source
 Asymptote Code
 	asy
 
+AutoHotkey Script
+	ahk
+
+	ia
+	scriptlet
+
 AutoIt3 Script
 	au3
 

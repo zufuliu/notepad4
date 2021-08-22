@@ -190,6 +190,8 @@
 
 #define NP2STYLE_SendKey				63591
 #define NP2STYLE_Special				63592
+#define NP2STYLE_HotString				63593
+#define NP2STYLE_HotKey					63594
 
 #define NP2STYLE_PascalKeyword 			63601
 

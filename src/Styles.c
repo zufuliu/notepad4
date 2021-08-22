@@ -64,6 +64,7 @@ extern EDITLEXER lexANSI;
 extern EDITLEXER lexAPDL;
 extern EDITLEXER lexASM;
 extern EDITLEXER lexASY;
+extern EDITLEXER lexAutoHotkey;
 extern EDITLEXER lexAU3;
 extern EDITLEXER lexAVS;
 extern EDITLEXER lexAwk;
@@ -164,6 +165,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexAPDL,
 	&lexASM,
 	&lexASY,
+	&lexAutoHotkey,
 	&lexAU3,
 	&lexAVS,
 	&lexAwk,
@@ -1284,6 +1286,16 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_ACTIONSCRIPT:
 		attr[8] = KeywordAttr_NoLexer;		// function
 		break;
+	case NP2LEX_AHK:
+		attr[0] = KeywordAttr_MakeLower;	// keywords
+		attr[1] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// directives
+		attr[2] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// compiler directives
+		attr[3] = KeywordAttr_MakeLower;	// objects
+		attr[4] = KeywordAttr_MakeLower;	// built-in variables
+		attr[5] = KeywordAttr_MakeLower;	// keys
+		attr[6] = KeywordAttr_MakeLower;	// functions
+		attr[7] = KeywordAttr_NoLexer;		// misc
+		break;
 	case NP2LEX_AVS:
 		attr[1] = KeywordAttr_MakeLower;	// internal functions
 		attr[2] = KeywordAttr_MakeLower;	// internal filters
@@ -1335,7 +1347,7 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[0] = KeywordAttr_NoLexer;		// section
 		attr[1] = KeywordAttr_NoLexer;		// parameters
 		attr[2] = KeywordAttr_NoLexer;		// constants
-		attr[3] = KeywordAttr_NoLexer;		// directives
+		attr[3] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// directives
 		attr[4] = KeywordAttr_MakeLower;	// types
 		attr[5] = KeywordAttr_MakeLower;	// predefined variables
 		attr[6] = KeywordAttr_NoLexer;		// functions

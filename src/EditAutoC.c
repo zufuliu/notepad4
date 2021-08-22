@@ -1039,6 +1039,17 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 #endif
 
 	switch (pLexCurrent->iLexer) {
+	case SCLEX_AHK:
+		if (ch == '#' && iCurrentStyle == SCE_AHK_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]); // #directive
+			return AutoC_AddSpecWord_Finish;
+		}
+		if (ch == '@' && (iCurrentStyle == SCE_AHK_COMMENTLINE || iCurrentStyle == SCE_AHK_COMMENTBLOCK)) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[2]); // @directive
+			return AutoC_AddSpecWord_Finish;
+		}
+		break;
+
 	case SCLEX_APDL:
 		if (iCurrentStyle == 0 && (ch == '*' || ch == '/')) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(ch == '/') ? 2 : 3]);// slash, star command
@@ -1119,10 +1130,11 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		break;
 
 	case SCLEX_INNOSETUP:
-		if (ch == '#' && (iCurrentStyle == SCE_INNO_PREPROCESSOR || iCurrentStyle == SCE_INNO_PREPROCESSOR_WORD || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
+		if (ch == '#' && (iCurrentStyle == SCE_INNO_PREPROCESSOR || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[3]); // preprocessor
 			return AutoC_AddSpecWord_Finish;
 		}
+		break;
 
 	case SCLEX_GROOVY:
 	case SCLEX_JAVA:
@@ -2189,6 +2201,7 @@ void EditToggleCommentLine(void) {
 	}
 	break;
 
+	case SCLEX_AHK:
 	case SCLEX_AU3:
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
@@ -2348,6 +2361,7 @@ void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 
 void EditToggleCommentBlock(void) {
 	switch (pLexCurrent->iLexer) {
+	case SCLEX_AHK:
 	case SCLEX_ASM:
 	case SCLEX_AVS:
 	case SCLEX_CIL:

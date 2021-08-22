@@ -174,6 +174,15 @@ def to_upper_conditional(items):
 			result.append(item.upper())
 	return result
 
+def to_lower_conditional(items):
+	result = []
+	for item in items:
+		if sum(ch.isupper() for ch in item) > 1:
+			result.append(item)
+		else:
+			result.append(item.lower())
+	return result
+
 
 def parse_actionscript_api_file(path):
 	sections = read_api_file(path, '//')
@@ -206,6 +215,52 @@ def parse_actionscript_api_file(path):
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('properties', [], KeywordAttr.Default),
 		('doc tag', [], KeywordAttr.Default),
+	]
+
+def parse_autohotkey_api_file(pathList):
+	keywordMap = {}
+	for path in pathList:
+		sections = read_api_file(path, ';')
+		for key, doc in sections:
+			if key in ('keywords', 'built-in variables', 'keys', 'misc'):
+				items = doc.split()
+			elif key == 'flow of control':
+				key = 'keywords'
+				items = re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
+			elif key == 'directives':
+				items = re.findall(r'#(\w+)', doc)
+			elif key == 'script compiler directives':
+				items = re.findall(r'@([\w\-]+)', doc)
+			elif key == 'functions':
+				items = re.findall(r'^\s*(\w+\(?)', doc, re.MULTILINE)
+				functions = []
+				for item in items:
+					if item.endswith('('):
+						functions.append(item + ')')
+					else:
+						functions.append(item)
+				items = functions
+			elif key == 'objects':
+				items = doc.replace('.', ' ').split()
+			keywordMap.setdefault(key, []).extend(items)
+
+	keywordMap['keywords'].extend(to_lower_conditional(keywordMap['keywords']))
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'objects',
+		'built-in variables',
+		'keys',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('compiler directives', keywordMap['script compiler directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('objects', keywordMap['objects'], KeywordAttr.MakeLower),
+		('built-in variables', keywordMap['built-in variables'], KeywordAttr.MakeLower),
+		('keys', keywordMap['keys'], KeywordAttr.MakeLower),
+		('functions', keywordMap['functions'], KeywordAttr.MakeLower),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
 def parse_apdl_api_file(path):
@@ -833,7 +888,7 @@ def parse_inno_setup_api_file(path):
 		('parameters', keywordMap['parameters'], KeywordAttr.NoLexer),
 		('constants', keywordMap['constants'], KeywordAttr.NoLexer),
 
-		('directives', keywordMap['directives'], KeywordAttr.NoLexer),
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 		('types', keywordMap['types'], KeywordAttr.MakeLower),
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.MakeLower),
 		('functions', keywordMap['functions'], KeywordAttr.NoLexer),
