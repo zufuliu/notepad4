@@ -93,7 +93,7 @@ NULL
 "tarTree targetCompatibility task taskDependencies taskGraph tasks temporaryDir uri useLogger version with zipTree "
 
 , // 9 GroovyDoc
-"author code deprecated docRoot exception hide inheritDoc link linkplain literal param return "
+"author code deprecated docRoot exception exclude hide inheritDoc link linkplain literal param return "
 "see serial serialData serialField since throws value version "
 
 , NULL, NULL, NULL, NULL, NULL

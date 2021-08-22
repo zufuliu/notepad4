@@ -614,4 +614,5 @@ module gradle {
  *
  * used by Android
  * @hide
+ * @exclude
  */
