@@ -1663,6 +1663,7 @@ HWND EditCreate(HWND hwndParent) {
 
 	// current line
 	SciCall_SetCaretLineVisibleAlways(TRUE);
+	SciCall_SetCaretLineHighlightSubLine(bHighlightCurrentSubLine);
 
 	// Long Lines
 	if (bMarkLongLines) {
@@ -4146,6 +4147,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE:
 		bHighlightCurrentSubLine = !bHighlightCurrentSubLine;
+		SciCall_SetCaretLineHighlightSubLine(bHighlightCurrentSubLine);
 		break;
 
 	case IDM_VIEW_ZOOMIN:

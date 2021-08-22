@@ -1141,19 +1141,19 @@ static void DrawCaretLineFramed(Surface *surface, const ViewStyle &vsDraw, const
 	// Avoid double drawing the corners by removing the left and right sides when drawing top and bottom borders
 	const PRectangle rcWithoutLeftRight = rcLine.Inset(Point(width, 0.0));
 
-	if (subLine == 0 || ll->wrapIndent == 0 || vsDraw.caretLine.layer != Layer::Base) {
+	if (subLine == 0 || ll->wrapIndent == 0 || vsDraw.caretLine.layer != Layer::Base || vsDraw.caretLine.subLine) {
 		// Left
 		surface->FillRectangleAligned(Side(rcLine, Edge::left, width), colourFrame);
 	}
-	if (subLine == 0) {
+	if (subLine == 0 || vsDraw.caretLine.subLine) {
 		// Top
 		surface->FillRectangleAligned(Side(rcWithoutLeftRight, Edge::top, width), colourFrame);
 	}
-	if (subLine == ll->lines - 1 || vsDraw.caretLine.layer != Layer::Base) {
+	if (subLine == ll->lines - 1 || vsDraw.caretLine.layer != Layer::Base || vsDraw.caretLine.subLine) {
 		// Right
 		surface->FillRectangleAligned(Side(rcLine, Edge::right, width), colourFrame);
 	}
-	if (subLine == ll->lines - 1) {
+	if (subLine == ll->lines - 1 || vsDraw.caretLine.subLine) {
 		// Bottom
 		surface->FillRectangleAligned(Side(rcWithoutLeftRight, Edge::bottom, width), colourFrame);
 	}
@@ -2109,17 +2109,31 @@ static void DrawTranslucentSelection(Surface *surface, const EditModel &model, c
 	}
 }
 
+static bool CanHighlightCaretLine(const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+	Sci::Line line, int subLine) {
+	if ((model.caret.active || vsDraw.caretLine.alwaysShow) && vsDraw.ElementIsSet(Element::CaretLineBack)) {
+		if (ll->lines == 1 || !vsDraw.caretLine.subLine) {
+			return true;
+		}
+		const SelectionPosition posCaret = model.posDrag.IsValid() ? model.posDrag : model.sel.RangeMain().caret;
+		const Sci::Position posLineStart = model.pdoc->LineStart(line);
+		const int offset = static_cast<int>(posCaret.Position() - posLineStart);
+		return ll->InLine(offset, subLine);
+	}
+	return false;
+}
+
 // Draw any translucent whole line states
 static void DrawTranslucentLineState(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	Sci::Line line, PRectangle rcLine, int subLine, Layer layer) {
-	if ((model.caret.active || vsDraw.caretLine.alwaysShow) && vsDraw.ElementColour(Element::CaretLineBack) && ll->containsCaret &&
-		vsDraw.caretLine.layer == layer) {
+	if (ll->containsCaret && vsDraw.caretLine.layer == layer && CanHighlightCaretLine(model, vsDraw, ll, line, subLine)) {
 		if (vsDraw.caretLine.frame) {
 			DrawCaretLineFramed(surface, vsDraw, ll, rcLine, subLine);
 		} else {
 			surface->FillRectangleAligned(rcLine, *vsDraw.ElementColour(Element::CaretLineBack));
 		}
 	}
+
 	const MarkerMask marksOfLine = model.pdoc->GetMark(line);
 	MarkerMask marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
 	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInText; markBit++) {
@@ -2440,8 +2454,9 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 			phase = static_cast<DrawPhase>(static_cast<int>(phase) & ~static_cast<int>(DrawPhase::back));
 			DrawEOL(surface, model, vsDraw, ll, rcLine, line, lineRange.end,
 				xStart, subLine, subLineStart, background);
-			if (vsDraw.IsLineFrameOpaque(model.caret.active, ll->containsCaret))
+			if (ll->containsCaret && vsDraw.caretLine.OpaqueFrame() && CanHighlightCaretLine(model, vsDraw, ll, line, subLine)) {
 				DrawCaretLineFramed(surface, vsDraw, ll, rcLine, subLine);
+			}
 		}
 
 		if (FlagSet(phase, DrawPhase::indicatorsBack)) {
@@ -2474,8 +2489,9 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 	if (phasesDraw == PhasesDraw::One) {
 		DrawEOL(surface, model, vsDraw, ll, rcLine, line, lineRange.end,
 			xStart, subLine, subLineStart, background);
-		if (vsDraw.IsLineFrameOpaque(model.caret.active, ll->containsCaret))
+		if (ll->containsCaret && vsDraw.caretLine.OpaqueFrame() && CanHighlightCaretLine(model, vsDraw, ll, line, subLine)) {
 			DrawCaretLineFramed(surface, vsDraw, ll, rcLine, subLine);
+		}
 		DrawEdgeLine(surface, vsDraw, ll, rcLine, lineRange, xStart);
 		DrawMarkUnderline(surface, model, vsDraw, line, rcLine);
 	}
@@ -2549,9 +2565,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 		const int screenLinePaintFirst = static_cast<int>(rcArea.top) / vsDraw.lineHeight;
 		const int xStart = vsDraw.textStart - model.xOffset + static_cast<int>(ptOrigin.x);
 
-		SelectionPosition posCaret = model.sel.RangeMain().caret;
-		if (model.posDrag.IsValid())
-			posCaret = model.posDrag;
+		const SelectionPosition posCaret = model.posDrag.IsValid() ? model.posDrag : model.sel.RangeMain().caret;
 		const Sci::Line lineCaret = model.pdoc->SciLineFromPosition(posCaret.Position());
 
 		PRectangle rcTextArea = rcClient;

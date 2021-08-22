@@ -260,6 +260,7 @@ void ViewStyle::Init(size_t stylesSize_) {
 	elementColours.erase(Element::CaretLineBack);
 	elementAllowsTranslucent.insert(Element::CaretLineBack);
 	caretLine.alwaysShow = false;
+	caretLine.subLine = false;
 	caretLine.layer = Layer::Base;
 	caretLine.frame = 0;
 
@@ -486,9 +487,8 @@ int ViewStyle::GetFrameWidth() const noexcept {
 }
 
 bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const {
-	return caretLine.frame && (caretActive || caretLine.alwaysShow) &&
-		ElementColour(Element::CaretLineBack) &&
-		(caretLine.layer == Layer::Base) && lineContainsCaret;
+	return lineContainsCaret && (caretActive || caretLine.alwaysShow)
+		&& caretLine.OpaqueFrame() && ElementIsSet(Element::CaretLineBack);
 }
 
 // See if something overrides the line background colour:  Either if caret is on the line

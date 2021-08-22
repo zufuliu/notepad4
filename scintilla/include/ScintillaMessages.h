@@ -146,6 +146,8 @@ enum class Message {
 	SetSelectionLayer = 2763,
 	GetCaretLineLayer = 2764,
 	SetCaretLineLayer = 2765,
+	GetCaretLineHighlightSubLine = 2773,
+	SetCaretLineHighlightSubLine = 2774,
 	AssignCmdKey = 2070,
 	ClearCmdKey = 2071,
 	ClearAllCmdKeys = 2072,

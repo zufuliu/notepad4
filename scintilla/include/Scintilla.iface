@@ -776,6 +776,12 @@ get Layer GetCaretLineLayer=2764(,)
 # Set the layer of the background of the line containing the caret.
 set void SetCaretLineLayer=2765(Layer layer,)
 
+# Get only highlighting subline instead of whole line.
+get bool GetCaretLineHighlightSubLine=2773(,)
+
+# Set only highlighting subline instead of whole line.
+set void SetCaretLineHighlightSubLine=2774(bool subLine,)
+
 # Set the foreground colour of the caret.
 #set void SetCaretFore=2069(colour fore,)
 

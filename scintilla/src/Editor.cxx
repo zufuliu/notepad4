@@ -7375,6 +7375,13 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
+	case Message::GetCaretLineHighlightSubLine:
+		return vs.caretLine.subLine;
+	case Message::SetCaretLineHighlightSubLine:
+		vs.caretLine.subLine = wParam != 0;
+		InvalidateStyleRedraw();
+		break;
+
 	case Message::GetCaretLineFrame:
 		return vs.caretLine.frame;
 	case Message::SetCaretLineFrame:

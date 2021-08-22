@@ -682,6 +682,14 @@ void ScintillaCall::SetCaretLineLayer(Scintilla::Layer layer) {
 	Call(Message::SetCaretLineLayer, static_cast<uintptr_t>(layer));
 }
 
+bool ScintillaCall::CaretLineHighlightSubLine() {
+	return Call(Message::GetCaretLineHighlightSubLine);
+}
+
+void ScintillaCall::SetCaretLineHighlightSubLine(bool subLine) {
+	Call(Message::SetCaretLineHighlightSubLine, subLine);
+}
+
 void ScintillaCall::AssignCmdKey(int keyDefinition, int sciCommand) {
 	Call(Message::AssignCmdKey, keyDefinition, sciCommand);
 }

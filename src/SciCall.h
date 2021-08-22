@@ -720,6 +720,10 @@ NP2_inline void SciCall_SetCaretLineVisibleAlways(BOOL alwaysVisible) {
 	SciCall(SCI_SETCARETLINEVISIBLEALWAYS, alwaysVisible, 0);
 }
 
+NP2_inline void SciCall_SetCaretLineHighlightSubLine(BOOL subLine) {
+	SciCall(SCI_SETCARETLINEHIGHLIGHTSUBLINE, subLine, 0);
+}
+
 NP2_inline void SciCall_SetCaretPeriod(int periodMilliseconds) {
 	SciCall(SCI_SETCARETPERIOD, periodMilliseconds, 0);
 }
