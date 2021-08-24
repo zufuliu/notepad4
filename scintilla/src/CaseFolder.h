@@ -10,7 +10,7 @@ namespace Scintilla::Internal {
 
 class CaseFolder {
 public:
-	virtual ~CaseFolder();
+	virtual ~CaseFolder() noexcept;
 	virtual size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) = 0;
 };
 
@@ -19,7 +19,6 @@ protected:
 	char mapping[256];
 public:
 	CaseFolderTable() noexcept;
-	~CaseFolderTable() override;
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override;
 	void SetTranslation(char ch, char chTranslation) noexcept;
 };

@@ -55,6 +55,11 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 using namespace Lexilla;
 
+LexInterface::LexInterface(Document *pdoc_) noexcept : pdoc(pdoc_), performingStyle(false) {
+}
+
+LexInterface::~LexInterface() noexcept = default;
+
 void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 	if (pdoc && instance && !performingStyle) {
 		// Protect against reentrance, which may occur, for example, when
@@ -81,6 +86,10 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 
 		performingStyle = false;
 	}
+}
+
+bool LexInterface::UseContainerLexing() const noexcept {
+	return !instance;
 }
 
 LineEndType LexInterface::LineEndTypesSupported() const noexcept {
@@ -2781,11 +2790,6 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 class BuiltinRegex : public RegexSearchBase {
 public:
 	explicit BuiltinRegex(CharClassify *charClassTable) : search(charClassTable) {}
-	BuiltinRegex(const BuiltinRegex &) = delete;
-	BuiltinRegex(BuiltinRegex &&) = delete;
-	BuiltinRegex &operator=(const BuiltinRegex &) = delete;
-	BuiltinRegex &operator=(BuiltinRegex &&) = delete;
-	~BuiltinRegex() override = default;
 
 	Sci::Position FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
 		bool caseSensitive, FindOption flags, Sci::Position *length) override;

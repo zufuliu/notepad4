@@ -595,12 +595,7 @@ class LexState : public LexInterface {
 public:
 	explicit LexState(Document *pdoc_) noexcept;
 	void SetInstance(ILexer5 *instance_);
-	// Deleted so LexState objects can not be copied.
-	LexState(const LexState &) = delete;
-	LexState(LexState &&) = delete;
-	LexState &operator=(const LexState &) = delete;
-	LexState &operator=(LexState &&) = delete;
-	~LexState() noexcept override;
+	// LexInterface deleted the standard operators and defined the virtual destructor so don't need to here.
 	void SetLexer(int language); //! removed in Scintilla 5
 
 	const char *DescribeWordListSets() const noexcept;
@@ -638,19 +633,8 @@ public:
 LexState::LexState(Document *pdoc_) noexcept : LexInterface(pdoc_) {
 }
 
-LexState::~LexState() noexcept {
-	if (instance) {
-		instance->Release();
-		instance = nullptr;
-	}
-}
-
 void LexState::SetInstance(ILexer5 *instance_) {
-	if (instance) {
-		instance->Release();
-		instance = nullptr;
-	}
-	instance = instance_;
+	instance.reset(instance_);
 	pdoc->LexerChanged(GetIdentifier() != SCLEX_NULL);
 }
 
@@ -662,15 +646,13 @@ LexState *ScintillaBase::DocumentLexState() {
 }
 
 void LexState::SetLexer(int language) { //! removed in Scintilla 5
-	if (instance) {
-		instance->Release();
-		instance = nullptr;
-	}
+	ILexer5 *instance_ = nullptr;
 	if (language != SCLEX_CONTAINER) {
 		const LexerModule *lex = LexerModule::Find(language);
 		language = lex->GetLanguage();
-		instance = lex->Create();
+		instance_ = lex->Create();
 	}
+	instance.reset(instance_);
 	pdoc->LexerChanged(language != SCLEX_NULL);
 }
 

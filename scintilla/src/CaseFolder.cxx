@@ -18,15 +18,13 @@ static constexpr T MakeLowerCase(T ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
-CaseFolder::~CaseFolder() = default;
+CaseFolder::~CaseFolder() noexcept = default;
 
 CaseFolderTable::CaseFolderTable() noexcept {
 	for (int iChar = 0; iChar < 256; iChar++) {
 		mapping[iChar] = static_cast<char>(MakeLowerCase(iChar));
 	}
 }
-
-CaseFolderTable::~CaseFolderTable() = default;
 
 size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) {
 	if (lenMixed > sizeFolded) {

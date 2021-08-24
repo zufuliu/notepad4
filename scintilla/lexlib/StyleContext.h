@@ -239,6 +239,7 @@ public:
 	}
 
 	void BackTo(Sci_PositionU startPos) {
+		assert(startPos < styler.GetStartSegment());
 		styler.Flush();
 		styler.StartAt(startPos);
 		styler.StartSegment(startPos);

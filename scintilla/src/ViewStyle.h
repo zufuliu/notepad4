@@ -69,10 +69,6 @@ struct CaretLineAppearance {
 	bool subLine;
 	// Non-0: draw a rectangle around line instead of filling line. Value is pixel width of frame
 	int frame;
-
-	constexpr bool OpaqueFrame() const noexcept {
-		return frame != 0 && layer == Scintilla::Layer::Base;
-	}
 };
 
 struct CaretAppearance {

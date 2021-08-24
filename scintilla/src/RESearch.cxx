@@ -274,10 +274,6 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	Clear();
 }
 
-RESearch::~RESearch() {
-	Clear();
-}
-
 void RESearch::ClearCache() noexcept {
 	sta = NOP;
 	previousPattern = nullptr;

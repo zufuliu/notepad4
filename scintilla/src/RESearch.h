@@ -24,7 +24,6 @@ class RESearch {
 public:
 	explicit RESearch(const CharClassify *charClassTable);
 	// No dynamic allocation so default copy constructor and assignment operator are OK.
-	~RESearch();
 	void Clear() noexcept;
 	void ClearCache() noexcept;
 	void GrabMatches(const CharacterIndexer &ci);

@@ -488,7 +488,8 @@ int ViewStyle::GetFrameWidth() const noexcept {
 
 bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const {
 	return lineContainsCaret && (caretActive || caretLine.alwaysShow)
-		&& caretLine.OpaqueFrame() && ElementIsSet(Element::CaretLineBack);
+		&& caretLine.frame != 0 && caretLine.layer == Layer::Base
+		&& ElementIsSet(Element::CaretLineBack);
 }
 
 // See if something overrides the line background colour:  Either if caret is on the line
@@ -499,8 +500,8 @@ bool ViewStyle::IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) cons
 // the colour for the highest numbered one is used.
 std::optional<ColourRGBA> ViewStyle::Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const {
 	std::optional<ColourRGBA> background;
-	if (!caretLine.frame && (caretActive || caretLine.alwaysShow) &&
-		(caretLine.layer == Layer::Base) && lineContainsCaret) {
+	if (lineContainsCaret && (caretActive || caretLine.alwaysShow)
+		&& caretLine.frame == 0 && caretLine.layer == Layer::Base) {
 		background = ElementColour(Element::CaretLineBack);
 	}
 	if (!background && marksOfLine) {
