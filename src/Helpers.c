@@ -2450,13 +2450,6 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 		pmru->pszItems[0] = StrDup(pszFile);
 	}
 
-	/* notepad2-mod custom code start */
-	// Needed to make Win7 jump lists work when NP2 is not explicitly associated
-	if (IsWin7AndAbove()) {
-		SHAddToRecentDocs(SHARD_PATHW, pszFile);
-	}
-	/* notepad2-mod custom code end */
-
 	return TRUE;
 }
 
