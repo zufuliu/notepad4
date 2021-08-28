@@ -31,8 +31,13 @@
 #pragma
 #error
 
+//! keywords		===========================================================
+private protected public
+// Components and Tasks Parameters
+and or not
+
 //! types			===========================================================
-any int str void
+any int str func void
 
 //! Predefined Variables	===================================================
 __COUNTER__
@@ -227,6 +232,19 @@ IsDirSet(str SetupDirective)
 WarnRenamedVersion(str OldName, str NewName)
 ParseVersion(str FileName, *Major, *Minor, *Rev, *Build)
 GetFileVersion(str FileName)
+
+[Misc]
+; pragma options
+option
+parseroption
+inlinestart
+inlineend
+message
+warning
+error
+verboselevel
+include
+spansymbol
 
 [Constants]
 ; Directory Constants

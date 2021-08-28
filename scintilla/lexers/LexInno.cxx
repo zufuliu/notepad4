@@ -38,6 +38,13 @@ enum class InnoParameterState {
 	Value,
 };
 
+enum class PreprocessorKind {
+	None,
+	Include,
+	Message,
+	Pragma,
+};
+
 constexpr bool IsExpansionStartChar(int ch) noexcept {
 	return IsLowerCase(ch) || ch == '%' || ch == '#' || ch == '\\';
 }
@@ -48,6 +55,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int chBeforeIdentifier = 0;
 	int outerState = SCE_INNO_DEFAULT;
 	InnoParameterState paramState = InnoParameterState::None;
+	PreprocessorKind ppKind = PreprocessorKind::None;
 	int lineState = 0;
 	int lineStatePrev = 0;
 	int expansionLevel = 0;
@@ -80,7 +88,12 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_STRING_DQ:
-			if (sc.ch == '\"' || sc.ch == '{') {
+			if (ppKind == PreprocessorKind::Include) {
+				if (sc.ch == '\"') {
+					ppKind = PreprocessorKind::None;
+					sc.ForwardSetState(SCE_INNO_DEFAULT);
+				}
+			} else if (sc.ch == '\"' || sc.ch == '{') {
 				if (sc.ch == sc.chNext) {
 					sc.Forward();
 				} else if (sc.ch == '\"') {
@@ -157,10 +170,12 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_PREPROCESSOR:
-			if (IsLowerCase(sc.ch)) {
+			if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_INNO_PREPROCESSOR_WORD);
-			} else if (!isspacechar(sc.ch)) {
-				sc.SetState(SCE_INNO_DEFAULT);
+			} else if (!IsASpaceOrTab(sc.ch)) {
+				sc.SetState(outerState);
+				outerState = SCE_INNO_DEFAULT;
+				continue;
 			}
 			break;
 
@@ -168,26 +183,47 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_INNO_NUMBER:
 		case SCE_INNO_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				if (sc.state == SCE_INNO_IDENTIFIER) {
+				if (sc.state != SCE_INNO_NUMBER) {
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
-					if (lineState & InnoLineStateCodeSection) {
-						if (keywordLists[7]->InList(s)) {
+					if (sc.state == SCE_INNO_PREPROCESSOR_WORD) {
+						if (outerState != SCE_INNO_DEFAULT) {
+							sc.ChangeState(SCE_INNO_PREPROCESSOR);
+							sc.SetState(outerState);
+							outerState = SCE_INNO_DEFAULT;
+							continue;
+						}
+						if (StrEqual(s, "include")) {
+							ppKind = PreprocessorKind::Include;
+						} else if (StrEqual(s, "error")) {
+							ppKind = PreprocessorKind::Message;
+						} else if (StrEqual(s, "pragma")) {
+							ppKind = PreprocessorKind::Pragma;
+						} else {
+							ppKind = PreprocessorKind::None;
+						}
+					} else if (lineState & InnoLineStateCodeSection) {
+						if (keywordLists[8]->InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_KEYWORD);
-						} else if (chBeforeIdentifier == ':' || keywordLists[8]->InList(s)) {
+						} else if (chBeforeIdentifier == ':' || keywordLists[9]->InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_TYPE);
-						} else if (keywordLists[10]->InList(s)) {
+						} else if (keywordLists[11]->InList(s)) {
 							sc.ChangeState(SCE_INNO_CONSTANT);
 						}
 					} else {
-						if (keywordLists[4]->InList(s)) {
+						if (ppKind == PreprocessorKind::Pragma) {
+							ppKind = PreprocessorKind::None;
+							sc.ChangeState(SCE_INNO_PREPROCESSOR);
+						} else if (keywordLists[3]->InList(s)) {
+							sc.ChangeState(SCE_INNO_KEYWORD);
+						} else if (keywordLists[5]->InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_TYPE);
 						}
 					}
 					if (sc.state == SCE_INNO_IDENTIFIER) {
 						if (sc.ch == '(') {
 							sc.ChangeState(SCE_INNO_FUNCTION);
-						} else if (keywordLists[5]->InList(s)) {
+						} else if (keywordLists[6]->InList(s)) {
 							sc.ChangeState(SCE_INNO_CONSTANT);
 						}
 					}
@@ -212,7 +248,16 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
+		case SCE_INNO_STRING_ANGLE:
+			if (sc.ch == '>') {
+				sc.ForwardSetState(SCE_INNO_DEFAULT);
+			} else if (sc.atLineStart) {
+				sc.SetState(SCE_INNO_DEFAULT);
+			}
+			break;
+
 		case SCE_INNO_COMMENT:
+		case SCE_INNO_PREPROCESSOR_MESSAGE:
 			if (sc.atLineStart) {
 				if (!(lineStatePrev & InnoLineStateLineContinuation)) {
 					sc.SetState(SCE_INNO_DEFAULT);
@@ -242,7 +287,12 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_INNO_DEFAULT) {
-			if (sc.ch == '[' && visibleChars == 0) {
+			if (ppKind == PreprocessorKind::Message && !isspacechar(sc.ch)) {
+				sc.SetState(SCE_INNO_PREPROCESSOR_MESSAGE);
+			} else if (ppKind == PreprocessorKind::Include && sc.ch == '<') {
+				ppKind = PreprocessorKind::None;
+				sc.SetState(SCE_INNO_STRING_ANGLE);
+			} else if (sc.ch == '[' && visibleChars == 0) {
 				lineState &= ~InnoLineStateCodeSection;
 				sc.SetState(SCE_INNO_SECTION);
 			} else if (sc.ch == ';' && visibleChars == 0) {
@@ -254,6 +304,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '#' && visibleChars == 0) {
 				lineState &= ~InnoLineStateCodeSection;
 				lineState |= InnoLineStatePreprocessor;
+				outerState = SCE_INNO_DEFAULT;
 				sc.SetState(SCE_INNO_PREPROCESSOR);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_INNO_STRING_DQ);
@@ -307,6 +358,10 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						++expansionLevel;
 						outerState = SCE_INNO_DEFAULT;
 						sc.SetState(SCE_INNO_INLINE_EXPANSION);
+						if (sc.chNext == '#') {
+							outerState = SCE_INNO_INLINE_EXPANSION;
+							sc.ForwardSetState(SCE_INNO_PREPROCESSOR);
+						}
 					}
 				} else if (sc.ch == '%') {
 					if (sc.chNext == '%') {
@@ -338,6 +393,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars = 0;
 			chPrevNonWhite = 0;
 			paramState = InnoParameterState::None;
+			ppKind = PreprocessorKind::None;
 			lineStatePrev = lineState;
 			lineState &= InnoLineStateCodeSection;
 			if (lineStatePrev & InnoLineStateLineContinuation) {

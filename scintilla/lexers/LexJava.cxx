@@ -134,7 +134,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	}
 	// conversion
 	if (ch == 't' || ch == 'T') {
-		const char chNext = sc.styler.SafeGetCharAt(pos + 1);
+		const char chNext = styler.SafeGetCharAt(pos + 1);
 		if (IsDateTimeFormatSpecifier(chNext)) {
 			return pos - sc.currentPos + 2;
 		}

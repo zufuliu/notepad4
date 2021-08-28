@@ -2287,7 +2287,7 @@ void EditToggleCommentLine(void) {
 
 	case SCLEX_INNOSETUP: {
 		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
-		if (lineState & (InnoLineStatePreprocessor | InnoLineStateCodeSection)) {
+		if (lineState & InnoLineStateCodeSection) {
 			EditToggleLineComments(L"//", FALSE);
 		} else {
 			EditToggleLineComments(L";", FALSE);

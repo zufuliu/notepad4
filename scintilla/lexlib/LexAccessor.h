@@ -11,11 +11,9 @@ namespace Lexilla {
 enum class EncodingType { eightBit, unicode, dbcs };
 
 class LexAccessor {
-public:
 	enum {
 		extremePosition = 0x7FFFFFFF
 	};
-private:
 	Scintilla::IDocument * const pAccess;
 	/** @a bufferSize is a trade off between time taken to copy the characters
 	 * and retrieval overhead.
@@ -28,8 +26,9 @@ private:
 	char buf[bufferSize + 1];
 	Sci_Position startPos;
 	Sci_Position endPos;
-	const int codePage;
-	const enum EncodingType encodingType;
+	//const int codePage;
+	//const int documentVersion;
+	const EncodingType encodingType;
 	const Sci_Position lenDoc;
 	unsigned char styleBuf[bufferSize];
 	Sci_Position validLen;
@@ -49,11 +48,16 @@ private:
 		buf[m] = '\0';
 	}
 
+	static constexpr EncodingType EncodingTypeForCodePage(int codePage) noexcept {
+		return (codePage == 65001) ? EncodingType::unicode : (codePage ? EncodingType::dbcs : EncodingType::eightBit);
+	}
+
 public:
 	explicit LexAccessor(Scintilla::IDocument *pAccess_) noexcept :
 		pAccess(pAccess_), startPos(0), endPos(0),
-		codePage(pAccess->CodePage()),
-		encodingType((codePage == 65001) ? EncodingType::unicode : (codePage ? EncodingType::dbcs : EncodingType::eightBit)),
+		//codePage(pAccess->CodePage()),
+		//documentVersion(pAccess->Version()),
+		encodingType(EncodingTypeForCodePage(pAccess->CodePage())),
 		lenDoc(pAccess->Length()),
 		validLen(0),
 		startSeg(0),

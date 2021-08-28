@@ -806,6 +806,7 @@ def parse_inno_setup_api_file(path):
 		'parameters': [],
 		'constants': [],
 
+		'keywords': [],
 		'directives': [],
 		'types': [],
 		'predefined variables': [],
@@ -822,7 +823,7 @@ def parse_inno_setup_api_file(path):
 			for key, doc in split_api_section(content, '//'):
 				if key == 'directives':
 					items = re.findall(r'^#(\w+)', doc, re.MULTILINE)
-				elif key == 'types' or key == 'predefined variables':
+				elif key in ('keywords', 'types', 'predefined variables'):
 					items = doc.split()
 				elif key == 'functions':
 					items = re.findall(r'(\w+)\(', doc)
@@ -830,9 +831,9 @@ def parse_inno_setup_api_file(path):
 				else:
 					items = []
 				keywordMap[key].extend(items)
-		elif section == 'Constants':
+		elif section in ('Constants', 'Misc'):
 			items = re.findall(r'^\{?(\w+)', content, re.MULTILINE)
-			keywordMap['constants'].extend(items)
+			keywordMap[section.lower()].extend(items)
 		elif section == 'Code':
 			keywordMap['section'].append(section)
 			for key, doc in split_api_section(content, '//'):
@@ -888,8 +889,9 @@ def parse_inno_setup_api_file(path):
 		('parameters', keywordMap['parameters'], KeywordAttr.NoLexer),
 		('constants', keywordMap['constants'], KeywordAttr.NoLexer),
 
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
-		('types', keywordMap['types'], KeywordAttr.MakeLower),
+		('types', keywordMap['types'], KeywordAttr.Default),
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.MakeLower),
 		('functions', keywordMap['functions'], KeywordAttr.NoLexer),
 
