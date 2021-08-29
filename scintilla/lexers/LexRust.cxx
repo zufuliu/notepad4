@@ -443,7 +443,7 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		switch (style) {
 		case SCE_RUST_COMMENTBLOCK:
-		case SCE_RUST_COMMENTBLOCKDOC:  {
+		case SCE_RUST_COMMENTBLOCKDOC: {
 			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;

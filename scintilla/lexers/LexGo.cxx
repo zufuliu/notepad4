@@ -105,7 +105,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	// argument index
 	if (ch == '[') {
 		ch = styler.SafeGetCharAt(++pos);
-		while (IsADigit(ch))  {
+		while (IsADigit(ch)) {
 			ch = styler.SafeGetCharAt(++pos);
 		}
 		if (ch == ']') {
@@ -119,7 +119,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 		ch = styler.SafeGetCharAt(++pos);
 	} else if (ch == '[') {
 		ch = styler.SafeGetCharAt(++pos);
-		while (IsADigit(ch))  {
+		while (IsADigit(ch)) {
 			ch = styler.SafeGetCharAt(++pos);
 		}
 		if (ch == ']') {
@@ -128,7 +128,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 			return 0;
 		}
 	} else {
-		while (IsADigit(ch))  {
+		while (IsADigit(ch)) {
 			ch = styler.SafeGetCharAt(++pos);
 		}
 	}
@@ -139,7 +139,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 			ch = styler.SafeGetCharAt(++pos);
 		} else if (ch == '[') {
 			ch = styler.SafeGetCharAt(++pos);
-			while (IsADigit(ch))  {
+			while (IsADigit(ch)) {
 				ch = styler.SafeGetCharAt(++pos);
 			}
 			if (ch == ']') {
@@ -148,7 +148,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 				return 0;
 			}
 		} else {
-			while (IsADigit(ch))  {
+			while (IsADigit(ch)) {
 				ch = styler.SafeGetCharAt(++pos);
 			}
 		}

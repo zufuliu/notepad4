@@ -211,7 +211,7 @@ inline Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAcces
 	// 2. (optional) Mapping key
 	if (ch == '(') {
 		ch = styler.SafeGetCharAt(++pos);
-		while (!IsInvalidMappingKey(ch))  {
+		while (!IsInvalidMappingKey(ch)) {
 			ch = styler.SafeGetCharAt(++pos);
 		}
 		if (ch == ')') {

@@ -39,7 +39,7 @@ inline int ColouriseDiffLine(const char (&lineBuffer)[DIFF_BUFFER_START_SIZE]) n
 	if (StrStartsWith(lineBuffer, "diff ")) {
 		return SCE_DIFF_COMMAND;
 	}
-	if (StrStartsWith(lineBuffer, "Index: ")) {  // For subversion's diff
+	if (StrStartsWith(lineBuffer, "Index: ")) { // For subversion's diff
 		return SCE_DIFF_COMMAND;
 	}
 	if (StrStartsWith(lineBuffer, "---") && lineBuffer[CStrLen("---")] != '-') {
@@ -63,7 +63,7 @@ inline int ColouriseDiffLine(const char (&lineBuffer)[DIFF_BUFFER_START_SIZE]) n
 		}
 		return SCE_DIFF_HEADER;
 	}
-	if (StrStartsWith(lineBuffer, "====")) {  // For p4's diff
+	if (StrStartsWith(lineBuffer, "====")) { // For p4's diff
 		return SCE_DIFF_HEADER;
 	}
 	if (StrStartsWith(lineBuffer, "***")) {

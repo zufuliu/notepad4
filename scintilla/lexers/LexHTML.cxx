@@ -970,7 +970,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		}
 
 		// handle the start Django template code
-		else if constexpr (isDjango && scriptLanguage != eScriptPython && scriptLanguage != eScriptComment && (ch == '{' && (chNext == '%' ||  chNext == '{'))) {
+		else if constexpr (isDjango && scriptLanguage != eScriptPython && scriptLanguage != eScriptComment && (ch == '{' && (chNext == '%' || chNext == '{'))) {
 			if (chNext == '%')
 				strcpy(djangoBlockType, "%");
 			else

@@ -206,7 +206,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		public:
 		int Count;
 		int Up, Down;
-		QuoteCls() noexcept  {
+		QuoteCls() noexcept {
 			Count = 0;
 			Up    = '\0';
 			Down  = '\0';

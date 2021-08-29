@@ -1114,7 +1114,7 @@ static bool IsOpenBraceLine(Sci_Line line, LexAccessor &styler) noexcept {
 		//pos = LexSkipSpaceTab(pos, endPos, styler);
 		//ch = styler[pos];
 		//stl = styler.StyleAt(pos);
-		//return  (ch == '\n') || (ch == '\r') || IsSpaceEquiv(stl);
+		//return (ch == '\n') || (ch == '\r') || IsSpaceEquiv(stl);
 	}
 	return false;
 }
