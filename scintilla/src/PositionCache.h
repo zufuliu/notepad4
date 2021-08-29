@@ -67,16 +67,13 @@ public:
 	int xHighlightGuide;
 	bool highlightColumn;
 	bool containsCaret;
+	unsigned char bracePreviousStyles[2];
 	int edgeColumn;
 	std::unique_ptr<char[]> chars;
 	std::unique_ptr<unsigned char[]> styles;
 	std::unique_ptr<XYPOSITION[]> positions;
-	char bracePreviousStyles[2];
 
 	std::unique_ptr<BidiData> bidiData;
-
-	// Hotspot support
-	Range hotspot;
 
 	// Wrapped line support
 	int widthLine;
@@ -107,7 +104,7 @@ public:
 	int SubLineFromPosition(int posInLine, PointEnd pe) const noexcept;
 	void SetLineStart(int line, int start);
 	void SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
-		char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
+		unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept;
 	void RestoreBracesHighlight(Range rangeLine, const Sci::Position braces[], bool ignoreStyle) noexcept;
 	int SCICALL FindBefore(XYPOSITION x, Range range) const noexcept;
 	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const noexcept;

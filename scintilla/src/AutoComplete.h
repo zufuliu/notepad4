@@ -43,6 +43,11 @@ public:
 	Scintilla::Ordering autoSort;
 
 	AutoComplete();
+	// Deleted so AutoComplete objects can not be copied.
+	AutoComplete(const AutoComplete &) = delete;
+	AutoComplete(AutoComplete &&) = delete;
+	AutoComplete &operator=(const AutoComplete &) = delete;
+	AutoComplete &operator=(AutoComplete &&) = delete;
 	~AutoComplete();
 
 	/// Is the auto completion list displayed?

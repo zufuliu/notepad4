@@ -62,7 +62,6 @@ public:
 	virtual Sci::Line TopLineOfMain() const noexcept = 0;
 	virtual Point GetVisibleOriginInMain() const noexcept = 0;
 	virtual Sci::Line LinesOnScreen() const noexcept = 0;
-	virtual Range GetHotSpotRange() const noexcept = 0;
 	bool BidirectionalEnabled() const noexcept;
 	bool BidirectionalR2L() const noexcept;
 	void SetDefaultFoldDisplayText(const char *text);

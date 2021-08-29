@@ -5,17 +5,17 @@ git clone https://github.com/XhmikosR/notepad2-mod.git
 Scintilla (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 5.1.1
-2021-08-24 8909:d723688702ea
+2021-08-28 8915:6557feab7655
 
 Lexilla (upstream)
 git clone https://github.com/ScintillaOrg/lexilla.git
 5.1.1
-2021-08-23 c810183800e0c834f1f28f0cf3e0f12c81c9d73e
+2021-08-29 d0abbaa5f4e504d1ac7107e17ded9d22fd158dd4
 
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite
 5.1.1
-2021-08-23 5805:61b337faad6c
+2021-08-29 5819:62986042084a
 
 Notepad3 (3-clause BSD)
 https://github.com/rizonesoft/Notepad3

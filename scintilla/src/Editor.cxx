@@ -4889,10 +4889,6 @@ void Editor::SetHotSpotRange(const Point *pt) {
 	}
 }
 
-Range Editor::GetHotSpotRange() const noexcept {
-	return hotspot;
-}
-
 void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, KeyMod modifiers) {
 	if (ptMouseLast != pt) {
 		DwellEnd(true);
@@ -7433,8 +7429,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::HideLines:
-		if (wParam > 0)
-			pcs->SetVisible(LineFromUPtr(wParam), lParam, false);
+		pcs->SetVisible(LineFromUPtr(wParam), lParam, false);
 		SetScrollBars();
 		Redraw();
 		break;

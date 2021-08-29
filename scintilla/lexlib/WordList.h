@@ -21,6 +21,11 @@ private:
 	range_t ranges[128];	// only ASCII, most word starts with character in '_a-zA-Z'
 public:
 	explicit WordList() noexcept;
+	// Deleted so WordList objects can not be copied.
+	WordList(const WordList &) = delete;
+	WordList(WordList &&) = delete;
+	WordList &operator=(const WordList &) = delete;
+	WordList &operator=(WordList &&) = delete;
 	~WordList();
 	operator bool() const noexcept;
 	bool operator!=(const WordList &other) const noexcept;

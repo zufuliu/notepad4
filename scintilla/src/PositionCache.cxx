@@ -71,9 +71,8 @@ LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
 	xHighlightGuide(0),
 	highlightColumn(false),
 	containsCaret(false),
-	edgeColumn(0),
 	bracePreviousStyles{},
-	hotspot(0, 0),
+	edgeColumn(0),
 	widthLine(wrapWidthInfinite),
 	lines(1),
 	wrapIndent(0) {
@@ -200,7 +199,7 @@ void LineLayout::SetLineStart(int line, int start) {
 }
 
 void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
-	char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept {
+	unsigned char bracesMatchStyle, int xHighlight, bool ignoreStyle) noexcept {
 	if (!ignoreStyle && rangeLine.ContainsCharacter(braces[0])) {
 		const Sci::Position braceOffset = braces[0] - rangeLine.start;
 		if (braceOffset < numCharsInLine) {

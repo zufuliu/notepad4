@@ -1967,7 +1967,7 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 			rcSegment.right = std::min(rcSegment.right, rcLine.right);
 
 			const InSelection inSelection = hideSelection ? InSelection::inNone : model.sel.CharacterInSelection(iDoc);
-			const bool inHotspot = (ll->hotspot.Valid()) && ll->hotspot.ContainsCharacter(iDoc);
+			const bool inHotspot = model.hotspot.Valid() && model.hotspot.ContainsCharacter(iDoc);
 			ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, inSelection,
 				inHotspot, ll->styles[i], i);
 			if (ts.representation) {
@@ -2178,7 +2178,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 			ColourRGBA textFore = vsDraw.styles[styleMain].fore;
 			const Font *textFont = vsDraw.styles[styleMain].font.get();
 			// Hot-spot foreground
-			const bool inHotspot = (ll->hotspot.Valid()) && ll->hotspot.ContainsCharacter(iDoc);
+			const bool inHotspot = model.hotspot.Valid() && model.hotspot.ContainsCharacter(iDoc);
 			if (inHotspot) {
 				const auto colour = vsDraw.ElementColour(Element::HotSpotActive);
 				if (colour)
@@ -2326,7 +2326,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 					}
 				}
 			}
-			if (ll->hotspot.Valid() && vsDraw.hotspotUnderline && ll->hotspot.ContainsCharacter(iDoc)) {
+			if (inHotspot && vsDraw.hotspotUnderline) {
 				PRectangle rcUL = rcSegment;
 				rcUL.top = rcUL.top + vsDraw.maxAscent + 1;
 				rcUL.bottom = rcUL.top + 1;
@@ -2640,9 +2640,8 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 				durLayout += ep.Duration(true);
 #endif
 				if (ll) {
-					ll->containsCaret = !hideSelection && (lineDoc == lineCaret) &&
-						(ll->lines == 1 || !vsDraw.caretLine.subLine || ll->InLine(caretOffset, subLine));
-					ll->hotspot = model.GetHotSpotRange();
+					ll->containsCaret = !hideSelection && (lineDoc == lineCaret)
+						&& (ll->lines == 1 || !vsDraw.caretLine.subLine || ll->InLine(caretOffset, subLine));
 
 					PRectangle rcLine = rcTextArea;
 					rcLine.top = static_cast<XYPOSITION>(ypos);
@@ -2652,7 +2651,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 						model.pdoc->LineStart(lineDoc + 1));
 
 					// Highlight the current braces if any
-					ll->SetBracesHighlight(rangeLine, model.braces, static_cast<char>(model.bracesMatchStyle),
+					ll->SetBracesHighlight(rangeLine, model.braces, static_cast<unsigned char>(model.bracesMatchStyle),
 						static_cast<int>(model.highlightGuideColumn * vsDraw.aveCharWidth), bracesIgnoreStyle);
 
 					if (leftTextOverlap && (bufferedDraw || ((phasesDraw < PhasesDraw::Multiple) && (FlagSet(phase, DrawPhase::back))))) {

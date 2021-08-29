@@ -142,7 +142,6 @@ public:
 	SelTypes selType;
 
 	Selection() noexcept;
-	~Selection();
 	bool IsRectangular() const noexcept;
 	Sci::Position MainCaret() const noexcept;
 	Sci::Position MainAnchor() const noexcept;
