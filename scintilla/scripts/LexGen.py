@@ -6,7 +6,8 @@ import re
 import FileGenerator
 
 def FindModules(lexersPath, projectPath):
-	doc = open(projectPath, encoding='utf-8').read()
+	with open(projectPath, encoding='utf-8') as fd:
+		doc = fd.read()
 	files = re.findall(r'(Lex\w+\.cxx)', doc)
 
 	lexers = {}
@@ -17,7 +18,8 @@ def FindModules(lexersPath, projectPath):
 			print('Ignore lexer file:', path)
 			continue
 
-		doc = open(path, encoding='utf-8').read()
+		with open(path, encoding='utf-8') as fd:
+			doc = fd.read()
 		items = re.findall(r'^\s*LexerModule\s+(\w+)\s*\(\s*(\w+)', doc, re.MULTILINE)
 		if not items:
 			print('No lexer in file:', path)

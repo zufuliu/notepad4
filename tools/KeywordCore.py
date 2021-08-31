@@ -155,8 +155,12 @@ def split_api_section(doc, comment, commentKind=0):
 		sections.append((key, doc))
 	return sections
 
+def read_file(path):
+	with open(path, encoding='utf-8') as fd:
+		return fd.read()
+
 def read_api_file(path, comment, commentKind=0):
-	doc = open(path, encoding='utf-8').read()
+	doc = read_file(path)
 	return split_api_section(doc, comment, commentKind=commentKind)
 
 def to_lower(items):
@@ -271,7 +275,7 @@ def parse_apdl_api_file(path):
 	for key, doc in sections:
 		key = key.strip('*! ')
 		if key == 'function':
-			items = re.findall('(\w+\()', doc)
+			items = re.findall(r'(\w+\()', doc)
 		else:
 			items = doc.split()
 			if key in ('code folding', 'slash command', 'star command'):
@@ -784,7 +788,7 @@ def parse_inno_setup_api_file(path):
 	section = ''
 	lines = []
 	sections = []
-	doc = open(path, encoding='utf-8').read()
+	doc = read_file(path)
 	for line in doc.splitlines():
 		line = line.strip()
 		if not line:
@@ -1701,7 +1705,7 @@ def parse_wasm_lexer_keywords(path):
 	def has_type_prefix(word):
 		return any(word.startswith(prefix + '.') for prefix in types)
 
-	for line in open(path).readlines():
+	for line in read_file(path).splitlines():
 		if not line or not (line[0].islower() and ',' in line and '::' in line):
 			continue
 

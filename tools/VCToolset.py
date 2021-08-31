@@ -14,7 +14,8 @@ llvm = """
 """.strip('\r\n').splitlines()
 
 def update_project_toolset(projectPath):
-	doc = open(projectPath, encoding='utf-8').read()
+	with open(projectPath, encoding='utf-8') as fd:
+		doc = fd.read()
 	lines = []
 	previous = False
 	for line in doc.splitlines():

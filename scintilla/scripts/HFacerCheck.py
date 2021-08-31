@@ -12,9 +12,10 @@ def findHoles(asc):
 	return holes
 
 def readIFace(path):
-	ifaceDoc = open(path).read()
+	with open(path, encoding='utf-8') as fd:
+		ifaceDoc = fd.read()
 	# remove comment
-	ifaceDoc = re.sub('\s+#.+', '', ifaceDoc)
+	ifaceDoc = re.sub(r'\s+#.+', '', ifaceDoc)
 	# ignore deprecated category
 	index = ifaceDoc.find('cat Deprecated')
 	if index > 0:

@@ -71,7 +71,9 @@ class Face:
 		currentCommentFinished = 0
 		maxInt = (1 << 31) - 1
 		lineno = 0
-		for line in open(name).readlines():
+		with open(path, encoding='utf-8') as fd:
+			lines = fd.readlines()
+		for line in lines:
 			lineno += 1
 			line = sanitiseLine(line)
 			if line:

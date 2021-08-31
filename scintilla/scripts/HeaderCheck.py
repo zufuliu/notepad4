@@ -91,7 +91,7 @@ def CheckFiles(headerOrderTxt):
         if incs != ordered:
             print(f"{f}:1: is out of order")
             fOrdered = pathlib.Path(str(f) + ".ordered")
-            with fOrdered.open("w") as headerOut:
+            with fOrdered.open("w", encoding='utf-8') as headerOut:
                 for header in ordered:
                     headerOut.write("#include " + header + "\n")
             print(f"{fOrdered}:1: is ordered")
@@ -101,7 +101,7 @@ def CheckFiles(headerOrderTxt):
         headerOrderNew = orderDirectory / "NewOrder.txt"
         print(f"{headerOrderFile}:1: changed to {headerOrderNew}")
         print(f"   Added {', '.join(newIncludes)}.")
-        with headerOrderNew.open("w") as headerOut:
+        with headerOrderNew.open("w", encoding='utf-8') as headerOut:
             for header in headerOrder:
                 headerOut.write("#include " + header + "\n")
 

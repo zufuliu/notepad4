@@ -4,7 +4,8 @@ import os.path
 import re
 
 def increase_style_resource_id_value(path, delta=100):
-	doc = open(path, encoding='utf-8', newline='\n').read()
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
 	updated = re.sub(r'\d{5}', lambda m: str(int(m.group(0)) + delta), doc)
 	print('update:', path)
 	with open(path, 'w', encoding='utf-8', newline='\n') as fp:
@@ -14,7 +15,8 @@ def check_encoding_list(path):
 	def is_tag_char(ch):
 		return (ch >= 'a' and ch <= 'z') or (ch >= '0' and ch <= '9')
 
-	doc = open(path, encoding='utf-8', newline='\n').read()
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
 	lines = doc.splitlines()
 	started = False
 	name_map = {}

@@ -60,7 +60,8 @@ def json_dump(obj):
 	return json.dumps(obj, ensure_ascii=False, indent='\t')
 
 def json_load(path):
-	return json.loads(open(path, encoding='utf-8', newline='\n').read())
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		return json.loads(fd.read())
 
 def djb2_hash(buf, multiplier):
 	value = 0
@@ -365,7 +366,8 @@ def fix_character_and_code(character, code):
 def parse_julia_unicode_input_html(path):
 	from bs4 import BeautifulSoup
 
-	doc = open(path, encoding='utf-8', newline='\n').read()
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
 	soup = BeautifulSoup(doc, 'html5lib')
 	documenter = soup.body.find(id='documenter')
 	page = documenter.find(id='documenter-page')
