@@ -232,7 +232,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 							if (StrEqual(s, "@include")) {
 								lineStateLineType = AwkLineStateMaskInclude;
 							} else if (StrEqual(s, "function")) {
-								kwType = SCE_AWK_FUNCTION_DEFINE;
+								kwType = SCE_AWK_FUNCTION_DEFINITION;
 							}
 						}
 					} else if (keywordLists[1]->InList(s)) {
@@ -242,7 +242,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					} else {
 						const int chNext = sc.GetLineNextChar();
 						if (chNext == '(') {
-							sc.ChangeState((kwType == SCE_AWK_FUNCTION_DEFINE) ? SCE_AWK_FUNCTION_DEFINE : SCE_AWK_FUNCTION);
+							sc.ChangeState((kwType == SCE_AWK_FUNCTION_DEFINITION) ? kwType : SCE_AWK_FUNCTION);
 						}
 					}
 

@@ -2794,7 +2794,7 @@ static LRESULT CALLBACK OpenSaveFileDlgSubProc(HWND hwnd, UINT umsg, WPARAM wPar
 	case WM_COMMAND:
 		switch (wParam) {
 		case IDOK: {
-			TCHAR szPath[MAX_PATH];
+			WCHAR szPath[MAX_PATH];
 			HWND hCmbPath = GetDlgItem(hwnd, cmb13); // cmb13: dlgs.h
 			GetWindowText(hCmbPath, szPath, MAX_PATH);
 			if (PathFixBackslashes(szPath)) {

@@ -99,7 +99,7 @@ static EDITSTYLE Styles_Go[] = {
 	{ SCE_GO_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_GO_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_GO_BUILTIN_FUNC, NP2StyleX_BuiltInFunction, L"fore:#FF8000" },
-	{ SCE_GO_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#A46000" },
+	{ SCE_GO_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_GO_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_GO_COMMENTLINE, SCE_GO_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_GO_TASKMARKER, SCE_GO_TASKMARKERLINE, 0, 0), NP2StyleX_TaskMarker, L"bold; fore:#408080" },

@@ -26,7 +26,7 @@ static EDITSTYLE Styles_Ruby[] = {
 	{ MULTI_STYLE(SCE_RB_WORD, SCE_RB_WORD_DEMOTED, 0, 0), NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_RB_MODULE_NAME, NP2StyleX_Module, L"bold; fore:#007F7F" },
 	{ SCE_RB_CLASSNAME, NP2StyleX_Class, L"bold; fore:#007F7F" },
-	{ SCE_RB_DEFNAME, NP2StyleX_FunctionDefine, L"fore:#0080C0" },
+	{ SCE_RB_DEFNAME, NP2StyleX_FunctionDefinition, L"fore:#0080C0" },
 	{ SCE_RB_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_RB_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_RB_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },

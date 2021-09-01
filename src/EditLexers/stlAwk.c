@@ -39,7 +39,7 @@ static KEYWORDLIST Keywords_Awk = {{
 static EDITSTYLE Styles_Awk[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_AWK_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
-	{ SCE_AWK_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#A46000" },
+	{ SCE_AWK_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_AWK_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_AWK_BUILTIN_FUNCTION, NP2StyleX_BuiltInFunction, L"fore:#0080C0" },
 	{ SCE_AWK_BUILTIN_VARIABLE, NP2StyleX_PredefinedVariable, L"fore:#B000B0" },

@@ -43,6 +43,7 @@ static EDITSTYLE Styles_Dart[] = {
 	{ SCE_DART_METADATA, NP2StyleX_Metadata, L"fore:#FF8000" },
 	{ SCE_DART_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
 	{ SCE_DART_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_DART_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_DART_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_DART_COMMENTBLOCK, SCE_DART_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_DART_COMMENTBLOCKDOC, SCE_DART_COMMENTLINEDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },

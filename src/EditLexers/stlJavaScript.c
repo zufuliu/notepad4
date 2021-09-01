@@ -137,7 +137,7 @@ static EDITSTYLE Styles_JS[] = {
 	{ SCE_JS_DIRECTIVE, NP2StyleX_Directive, L"fore:#FF8000" },
 	{ SCE_JS_CLASS, NP2StyleX_Class, L"bold; fore:#0080C0" },
 	{ SCE_JS_DECORATOR, NP2StyleX_Decorator, L"fore:#FF8000" },
-	{ SCE_JS_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#A46000" },
+	{ SCE_JS_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_JS_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_JS_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_JS_COMMENTLINE, SCE_JS_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },

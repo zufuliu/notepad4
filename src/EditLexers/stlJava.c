@@ -95,6 +95,7 @@ static EDITSTYLE Styles_Java[] = {
 	{ SCE_JAVA_RECORD, NP2StyleX_Record, L"fore:#0080FF" },
 	{ SCE_JAVA_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_JAVA_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_JAVA_FUNCTION_DEFINITION, NP2StyleX_MethodDefinition, L"bold; fore:#A46000" },
 	{ SCE_JAVA_FUNCTION, NP2StyleX_Method, L"fore:#A46000" },
 	{ SCE_JAVA_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_JAVA_COMMENTLINE, SCE_JAVA_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },

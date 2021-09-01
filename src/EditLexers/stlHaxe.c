@@ -50,7 +50,7 @@ static EDITSTYLE Styles_Haxe[] = {
 	{ SCE_HAXE_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_HAXE_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
 	{ SCE_HAXE_MATADATA, NP2StyleX_Metadata, L"fore:#FF8000" },
-	{ SCE_HAXE_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#A46000" },
+	{ SCE_HAXE_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_HAXE_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_HAXE_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_HAXE_COMMENTLINE, SCE_HAXE_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },

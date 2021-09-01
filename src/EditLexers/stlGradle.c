@@ -112,6 +112,7 @@ static EDITSTYLE Styles_Gradle[] = {
 	{ SCE_GROOVY_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_GROOVY_TRAIT, NP2StyleX_Trait, L"bold; fore:#1E90FF" },
 	{ SCE_GROOVY_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_GROOVY_FUNCTION_DEFINITION, NP2StyleX_MethodDefinition, L"bold; fore:#A46000" },
 	{ SCE_GROOVY_FUNCTION, NP2StyleX_Method, L"fore:#A46000" },
 	{ SCE_GROOVY_ACTION, NP2StyleX_Action, L"fore:#FF8000" },
 	{ SCE_GROOVY_PROPERTY, NP2StyleX_Property, L"fore:#A46000" },

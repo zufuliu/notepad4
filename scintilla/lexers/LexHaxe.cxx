@@ -125,7 +125,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (StrEqual(s, "enum")) {
 						kwType = SCE_HAXE_ENUM;
 					} else if (StrEqual(s, "function")) {
-						kwType = SCE_HAXE_FUNCTION_DEFINE;
+						kwType = SCE_HAXE_FUNCTION_DEFINITION;
 					}
 					if (kwType != SCE_HAXE_DEFAULT) {
 						const int chNext = sc.GetDocNextChar();

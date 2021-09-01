@@ -188,7 +188,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						if (StrEqualsAny(s, "class", "extends","new", "type", "as", "is")) {
 							kwType = SCE_JS_CLASS;
 						} else if (StrEqual(s, "function")) {
-							kwType = SCE_JS_FUNCTION_DEFINE;
+							kwType = SCE_JS_FUNCTION_DEFINITION;
 						} else if (StrEqualsAny(s, "interface", "implements")) {
 							kwType = SCE_JS_INTERFACE;
 						} else if (StrEqual(s, "enum")) {

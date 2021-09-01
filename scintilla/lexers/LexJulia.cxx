@@ -148,7 +148,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						} else if (StrEqual(s, "macro")) {
 							kwType = SCE_JULIA_MACRO;
 						} else if (StrEqual(s, "function")) {
-							kwType = SCE_JULIA_FUNCTION_DEFINE;
+							kwType = SCE_JULIA_FUNCTION_DEFINITION;
 						} else if (StrEqualsAny(s, "abstract", "primitive")) {
 							kwType = SCE_JULIA_WORD;
 						}
@@ -161,7 +161,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ChangeState(SCE_JULIA_BASIC_FUNCTION);
 				} else if (kwType != SCE_JULIA_DEFAULT && kwType != SCE_JULIA_WORD) {
 					sc.ChangeState(kwType);
-					if (kwType == SCE_JULIA_FUNCTION_DEFINE && sc.ch == '!') {
+					if (kwType == SCE_JULIA_FUNCTION_DEFINITION && sc.ch == '!') {
 						sc.Forward();
 					}
 				} else {

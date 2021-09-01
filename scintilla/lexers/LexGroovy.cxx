@@ -216,7 +216,11 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						} else if (chNext == '(' || IsADigit(chNext) || chNext == '\'' || chNext == '"') {
 							// property value
 							// method parameter
-							sc.ChangeState(SCE_GROOVY_FUNCTION);
+							if (chNext == '(' && IsIdentifierCharEx(chBeforeIdentifier)) {
+								sc.ChangeState(SCE_GROOVY_FUNCTION_DEFINITION);
+							} else {
+								sc.ChangeState(SCE_GROOVY_FUNCTION);
+							}
 						} else if (sc.Match('[', ']') || sc.Match('.', '&')
 							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
@@ -485,7 +489,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_GROOVY_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				chBefore = sc.chPrev;
+				chBefore = chPrevNonWhite;
 				if (chBefore != '.') {
 					chBeforeIdentifier = chBefore;
 				}

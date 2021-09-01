@@ -157,7 +157,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						} else if (StrEqual(s, "enum")) {
 							kwType = SCE_SWIFT_ENUM;
 						} else if (StrEqual(s, "func")) {
-							kwType = SCE_SWIFT_FUNCTION_DEFINE;
+							kwType = SCE_SWIFT_FUNCTION_DEFINITION;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = SCE_SWIFT_LABEL;
 						}

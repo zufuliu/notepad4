@@ -130,8 +130,9 @@
 #define NP2StyleX_Annotation			EDITSTYLE_HOLE(Annotation, L"Annotation")
 #define NP2StyleX_Record				EDITSTYLE_HOLE(Record, L"Record")
 #define NP2StyleX_Type					EDITSTYLE_HOLE(Type, L"Type")
-#define NP2StyleX_FunctionDefine		EDITSTYLE_HOLE(FunctionDefine, L"Function Define")
+#define NP2StyleX_FunctionDefinition	EDITSTYLE_HOLE(FunctionDefinition, L"Function Definition")
 #define NP2StyleX_Protocol				EDITSTYLE_HOLE(Protocol, L"Protocol")
+#define NP2StyleX_MethodDefinition		EDITSTYLE_HOLE(MethodDefinition, L"Method Definition")
 
 #define NP2StyleX_Label					EDITSTYLE_HOLE(Label, L"Label")
 #define NP2StyleX_Command				EDITSTYLE_HOLE(Command, L"Command")

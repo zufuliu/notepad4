@@ -188,7 +188,7 @@ static EDITSTYLE Styles_Julia[] = {
 	{ SCE_JULIA_CONSTANT, NP2StyleX_Constant, L"fore:#307300" },
 	{ SCE_JULIA_MACRO, NP2StyleX_Macro, L"fore:#FF8000" },
 	{ SCE_JULIA_BASIC_FUNCTION, NP2StyleX_BasicFunction, L"fore:#0080C0" },
-	{ SCE_JULIA_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#A46000" },
+	{ SCE_JULIA_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_JULIA_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_JULIA_COMMENTLINE, SCE_JULIA_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_JULIA_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },

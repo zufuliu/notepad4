@@ -154,6 +154,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int chPrevNonWhite = 0;
 	DocTagState docTagState = DocTagState::None;
 	EscapeSequence escSeq;
 
@@ -247,7 +248,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								sc.ChangeState(SCE_JAVA_CLASS);
 							}
 						} else if (chNext == '(') {
-							sc.ChangeState(SCE_JAVA_FUNCTION);
+							sc.ChangeState(IsIdentifierCharEx(chBeforeIdentifier) ? SCE_JAVA_FUNCTION_DEFINITION : SCE_JAVA_FUNCTION);
 						} else if (sc.Match('[', ']')
 							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
@@ -452,8 +453,8 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_JAVA_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch) || sc.Match('@', 'i')) {
-				if (sc.chPrev != '.') {
-					chBeforeIdentifier = sc.chPrev;
+				if (chPrevNonWhite != '.') {
+					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_JAVA_IDENTIFIER);
 			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
@@ -465,6 +466,9 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+			}
 		}
 		if (sc.atLineEnd) {
 			styler.SetLineState(sc.currentLine, lineStateLineType);

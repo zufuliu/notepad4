@@ -90,6 +90,7 @@ static EDITSTYLE Styles_Kotlin[] = {
 	{ SCE_KOTLIN_CLASS, NP2StyleX_Class, L"fore:#0080FF" },
 	{ SCE_KOTLIN_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_KOTLIN_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_KOTLIN_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_KOTLIN_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_KOTLIN_COMMENTBLOCK, SCE_KOTLIN_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_KOTLIN_COMMENTBLOCKDOC, SCE_KOTLIN_COMMENTLINEDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },

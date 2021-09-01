@@ -73,6 +73,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int chPrevNonWhite = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -152,7 +153,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
-							sc.ChangeState(SCE_DART_FUNCTION);
+							sc.ChangeState(IsIdentifierCharEx(chBeforeIdentifier) ? SCE_DART_FUNCTION_DEFINITION : SCE_DART_FUNCTION);
 						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
 							|| IsIdentifierStartEx(chNext)) {
 							// type<type>
@@ -337,8 +338,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				if (sc.chPrev != '.') {
-					chBeforeIdentifier = sc.chPrev;
+				if (chPrevNonWhite != '.') {
+					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_DART_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
@@ -358,6 +359,9 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+			}
 		}
 		if (sc.atLineEnd) {
 			int lineState = (commentLevel << 2) | lineStateLineType;

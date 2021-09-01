@@ -68,6 +68,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int chPrevNonWhite = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -149,7 +150,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
-							sc.ChangeState(SCE_KOTLIN_FUNCTION);
+							sc.ChangeState(IsIdentifierCharEx(chBeforeIdentifier) ? SCE_KOTLIN_FUNCTION_DEFINITION : SCE_KOTLIN_FUNCTION);
 						} else if (sc.Match(':', ':')
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
 							// type::class
@@ -317,8 +318,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				if (sc.chPrev != '.') {
-					chBeforeIdentifier = sc.chPrev;
+				if (chPrevNonWhite != '.') {
+					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_KOTLIN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
@@ -338,6 +339,9 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+			}
 		}
 		if (sc.atLineEnd) {
 			int lineState = (commentLevel << 2) | lineStateLineType;

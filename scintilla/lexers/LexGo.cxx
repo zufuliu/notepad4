@@ -302,7 +302,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					} else if (chNext == '(') {
 						if (funcState != GoFunction_None) {
 							funcState = GoFunction_Name;
-							sc.ChangeState(SCE_GO_FUNCTION_DEFINE);
+							sc.ChangeState(SCE_GO_FUNCTION_DEFINITION);
 						} else {
 							sc.ChangeState(SCE_GO_FUNCTION);
 						}

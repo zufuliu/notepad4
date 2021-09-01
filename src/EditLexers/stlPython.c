@@ -333,7 +333,7 @@ static EDITSTYLE Styles_Python[] = {
 	{ SCE_PY_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ SCE_PY_WORD2, NP2StyleX_Type, L"fore:#0080FF" },
 	{ SCE_PY_CLASS, NP2StyleX_Class, L"bold; fore:#007F7F" },
-	{ SCE_PY_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#0080C0" },
+	{ SCE_PY_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#0080C0" },
 	{ SCE_PY_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_PY_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
 	{ SCE_PY_DECORATOR, NP2StyleX_Decorator, L"fore:#C65D09" },

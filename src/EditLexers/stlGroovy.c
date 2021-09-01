@@ -94,6 +94,7 @@ static EDITSTYLE Styles_Groovy[] = {
 	{ SCE_GROOVY_INTERFACE, NP2StyleX_Interface, L"bold; fore:#1E90FF" },
 	{ SCE_GROOVY_TRAIT, NP2StyleX_Trait, L"bold; fore:#1E90FF" },
 	{ SCE_GROOVY_ENUM, NP2StyleX_Enumeration, L"fore:#FF8000" },
+	{ SCE_GROOVY_FUNCTION_DEFINITION, NP2StyleX_MethodDefinition, L"bold; fore:#A46000" },
 	{ MULTI_STYLE(SCE_GROOVY_FUNCTION, SCE_GROOVY_ACTION, 0, 0), NP2StyleX_Method, L"fore:#A46000" },
 	{ SCE_GROOVY_PROPERTY, NP2StyleX_Property, L"fore:#A46000" },
 	{ SCE_GROOVY_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },

@@ -71,7 +71,7 @@ class Face:
 		currentCommentFinished = 0
 		maxInt = (1 << 31) - 1
 		lineno = 0
-		with open(path, encoding='utf-8') as fd:
+		with open(name, encoding='utf-8') as fd:
 			lines = fd.readlines()
 		for line in lines:
 			lineno += 1

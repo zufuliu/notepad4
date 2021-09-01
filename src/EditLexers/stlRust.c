@@ -226,7 +226,7 @@ static EDITSTYLE Styles_Rust[] = {
 	{ SCE_RUST_ENUMERATION, NP2StyleX_Enumeration, L"fore:#FF8000" },
 	{ SCE_RUST_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ SCE_RUST_MACRO, NP2StyleX_Macro, L"fore:#FF8000" },
-	{ SCE_RUST_FUNCTION_DEFINE, NP2StyleX_FunctionDefine, L"bold; fore:#A46000" },
+	{ SCE_RUST_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_RUST_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_RUST_COMMENTBLOCK, SCE_RUST_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_RUST_COMMENTBLOCKDOC, SCE_RUST_COMMENTLINEDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },

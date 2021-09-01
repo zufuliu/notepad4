@@ -405,7 +405,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_PY_WORD);
 					if (StrEqual(s, "def")) {
-						kwType = SCE_PY_FUNCTION_DEFINE;
+						kwType = SCE_PY_FUNCTION_DEFINITION;
 					} else if (StrEqualsAny(s, "class", "raise", "except")) {
 						kwType = SCE_PY_CLASS;
 					}
