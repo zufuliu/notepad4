@@ -216,7 +216,10 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						} else if (chNext == '(' || IsADigit(chNext) || chNext == '\'' || chNext == '"') {
 							// property value
 							// method parameter
-							if (chNext == '(' && IsIdentifierCharEx(chBeforeIdentifier)) {
+							if (chNext == '(' && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+								// type method()
+								// type[] method()
+								// type<type> method()
 								sc.ChangeState(SCE_GROOVY_FUNCTION_DEFINITION);
 							} else {
 								sc.ChangeState(SCE_GROOVY_FUNCTION);

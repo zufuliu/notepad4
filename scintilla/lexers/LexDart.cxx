@@ -72,6 +72,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
+	int chBefore = 0;
 	int visibleCharsBefore = 0;
 	int chPrevNonWhite = 0;
 	EscapeSequence escSeq;
@@ -153,7 +154,10 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
-							sc.ChangeState(IsIdentifierCharEx(chBeforeIdentifier) ? SCE_DART_FUNCTION_DEFINITION : SCE_DART_FUNCTION);
+							// type method()
+							// type[] method()
+							// type<type> method()
+							sc.ChangeState((IsIdentifierCharEx(chBefore) || chBefore == ']') ? SCE_DART_FUNCTION_DEFINITION : SCE_DART_FUNCTION);
 						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
 							|| IsIdentifierStartEx(chNext)) {
 							// type<type>
@@ -338,6 +342,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_DART_SYMBOL_OPERATOR);
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
 				}

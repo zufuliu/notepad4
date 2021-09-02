@@ -153,6 +153,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int chBeforeIdentifier = 0;
 
 	int visibleChars = 0;
+	int chBefore = 0;
 	int visibleCharsBefore = 0;
 	int chPrevNonWhite = 0;
 	DocTagState docTagState = DocTagState::None;
@@ -248,7 +249,10 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								sc.ChangeState(SCE_JAVA_CLASS);
 							}
 						} else if (chNext == '(') {
-							sc.ChangeState(IsIdentifierCharEx(chBeforeIdentifier) ? SCE_JAVA_FUNCTION_DEFINITION : SCE_JAVA_FUNCTION);
+							// type method()
+							// type[] method()
+							// type<type> method()
+							sc.ChangeState((IsIdentifierCharEx(chBefore) || chBefore == ']') ? SCE_JAVA_FUNCTION_DEFINITION : SCE_JAVA_FUNCTION);
 						} else if (sc.Match('[', ']')
 							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
@@ -453,6 +457,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_JAVA_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch) || sc.Match('@', 'i')) {
+				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
 				}

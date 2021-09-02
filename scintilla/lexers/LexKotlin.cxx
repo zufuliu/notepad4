@@ -67,6 +67,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	std::vector<int> nestedState; // string interpolation "${}"
 
 	int visibleChars = 0;
+	int chBefore = 0;
 	int visibleCharsBefore = 0;
 	int chPrevNonWhite = 0;
 	EscapeSequence escSeq;
@@ -150,7 +151,10 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
-							sc.ChangeState(IsIdentifierCharEx(chBeforeIdentifier) ? SCE_KOTLIN_FUNCTION_DEFINITION : SCE_KOTLIN_FUNCTION);
+							// type function()
+							// type[] function()
+							// type<type> function()
+							sc.ChangeState((IsIdentifierCharEx(chBefore) || chBefore == ']') ? SCE_KOTLIN_FUNCTION_DEFINITION : SCE_KOTLIN_FUNCTION);
 						} else if (sc.Match(':', ':')
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
 							// type::class
@@ -318,6 +322,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				chBefore = chPrevNonWhite;
 				if (chPrevNonWhite != '.') {
 					chBeforeIdentifier = chPrevNonWhite;
 				}
