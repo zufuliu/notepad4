@@ -47,6 +47,15 @@ enum {
 	DartLineStateMaskImport = (1 << 1),	// import
 };
 
+enum class KeywordType {
+	None = SCE_DART_DEFAULT,
+	Class = SCE_DART_CLASS,
+	Enum = SCE_DART_ENUM,
+	Label = SCE_DART_LABEL,
+	Return = 0x40,
+	While,
+};
+
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_DART_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_DART_STRING_DQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_DART_TRIPLE_STRING_SQ);
@@ -66,7 +75,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
 
-	int kwType = SCE_DART_DEFAULT;
+	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
 	std::vector<int> nestedState; // string interpolation "${}"
@@ -123,16 +132,18 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							lineStateLineType = DartLineStateMaskImport;
 						}
 					} else if (StrEqualsAny(s, "class", "extends", "implements", "new", "throw", "as", "is")) {
-						kwType = SCE_DART_CLASS;
+						kwType = KeywordType::Class;
 					} else if (StrEqual(s, "enum")) {
-						kwType = SCE_DART_ENUM;
+						kwType = KeywordType::Enum;
 					} else if (StrEqualsAny(s, "break", "continue")) {
-						kwType = SCE_DART_LABEL;
+						kwType = KeywordType::Label;
+					} else if (StrEqualsAny(s, "return", "await", "yield")) {
+						kwType = KeywordType::Return;
 					}
-					if (kwType != SCE_DART_DEFAULT) {
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 						const int chNext = sc.GetLineNextChar();
 						if (!IsIdentifierStartEx(chNext)) {
-							kwType = SCE_DART_DEFAULT;
+							kwType = KeywordType::None;
 						}
 					}
 				} else if (keywordLists[1]->InList(s)) {
@@ -149,15 +160,19 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						}
 					}
 				} else if (sc.ch != '.') {
-					if (kwType != SCE_DART_DEFAULT) {
-						sc.ChangeState(kwType);
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+						sc.ChangeState(static_cast<int>(kwType));
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							// type method()
 							// type[] method()
 							// type<type> method()
-							sc.ChangeState((IsIdentifierCharEx(chBefore) || chBefore == ']') ? SCE_DART_FUNCTION_DEFINITION : SCE_DART_FUNCTION);
+							if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+								sc.ChangeState(SCE_DART_FUNCTION_DEFINITION );
+							} else {
+								sc.ChangeState(SCE_DART_FUNCTION);
+							}
 						} else if ((chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
 							|| IsIdentifierStartEx(chNext)) {
 							// type<type>
@@ -170,7 +185,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 				if (sc.state != SCE_DART_WORD && sc.ch != '.') {
-					kwType = SCE_DART_DEFAULT;
+					kwType = KeywordType::None;
 				}
 				sc.SetState(SCE_DART_DEFAULT);
 			}
@@ -377,7 +392,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			lineStateLineType = 0;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
-			kwType = SCE_DART_DEFAULT;
+			kwType = KeywordType::None;
 		}
 		sc.Forward();
 	}

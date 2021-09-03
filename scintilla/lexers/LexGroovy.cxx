@@ -61,6 +61,17 @@ enum class DocTagState {
 	TagClose,		// </tag>
 };
 
+enum class KeywordType {
+	None = SCE_GROOVY_DEFAULT,
+	Annotation = SCE_GROOVY_ANNOTATION,
+	Class = SCE_GROOVY_CLASS,
+	Interface = SCE_GROOVY_INTERFACE,
+	Enum = SCE_GROOVY_ENUM,
+	Trait = SCE_GROOVY_TRAIT,
+	Return = 0x40,
+	While,
+};
+
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_GROOVY_STRING_DQ);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_GROOVY_TRIPLE_STRING_DQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_GROOVY_SLASHY_STRING);
@@ -84,7 +95,7 @@ constexpr bool IsSlashyStringStart(int chPrevNonWhite, int stylePrevNonWhite) no
 void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 
-	int kwType = SCE_GROOVY_DEFAULT;
+	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
 	std::vector<int> nestedState; // string interpolation "${}"
@@ -94,7 +105,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	int chBefore = 0;
 	int visibleCharsBefore = 0;
 	int chPrevNonWhite = 0;
-	int stylePrevNonWhite = SCE_JS_DEFAULT;
+	int stylePrevNonWhite = SCE_GROOVY_DEFAULT;
 	DocTagState docTagState = DocTagState::None;
 	EscapeSequence escSeq;
 
@@ -145,7 +156,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				if (s[0] == '@') {
 					if (StrEqual(s, "@interface")) {
 						sc.ChangeState(SCE_GROOVY_WORD);
-						kwType = SCE_GROOVY_ANNOTATION;
+						kwType = KeywordType::Annotation;
 					} else {
 						sc.ChangeState(SCE_GROOVY_ANNOTATION);
 						continue;
@@ -159,22 +170,24 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								lineStateLineType = GroovyLineStateMaskImport;
 							}
 						} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws", "as")) {
-							kwType = SCE_GROOVY_CLASS;
+							kwType = KeywordType::Class;
 						} else if (StrEqualsAny(s, "interface", "implements")) {
-							kwType = SCE_GROOVY_INTERFACE;
+							kwType = KeywordType::Interface;
 						} else if (StrEqual(s, "trait")) {
-							kwType = SCE_GROOVY_TRAIT;
+							kwType = KeywordType::Trait;
 						} else if (StrEqual(s, "enum")) {
-							kwType = SCE_GROOVY_ENUM;
+							kwType = KeywordType::Enum;
+						} else if (StrEqual(s, "return")) {
+							kwType = KeywordType::Return;
 						} else if (StrEqualsAny(s, "if", "while")) {
 							// to avoid treating following code as type cast:
 							// if (identifier) expression, while (identifier) expression
-							kwType = SCE_GROOVY_WORD;
+							kwType = KeywordType::While;
 						}
-						if (kwType != SCE_GROOVY_DEFAULT && kwType != SCE_GROOVY_WORD) {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							const int chNext = sc.GetDocNextChar();
 							if (!IsIdentifierStartEx(chNext)) {
-								kwType = SCE_GROOVY_DEFAULT;
+								kwType = KeywordType::None;
 							}
 						}
 					}
@@ -203,12 +216,12 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						sc.ChangeState(SCE_GROOVY_PROPERTY);
 					}
 				} else if (sc.ch != '.') {
-					if (kwType != SCE_GROOVY_DEFAULT && kwType != SCE_GROOVY_WORD) {
-						sc.ChangeState(kwType);
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+						sc.ChangeState(static_cast<int>(kwType));
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == ')');
 						if (sc.ch == ')') {
-							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != SCE_GROOVY_WORD && IsIdentifierCharEx(chNext)))) {
+							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != KeywordType::While && IsIdentifierCharEx(chNext)))) {
 								// (type)(expression)
 								// (type)expression, (type)++identifier, (type)--identifier
 								sc.ChangeState(SCE_GROOVY_CLASS);
@@ -216,7 +229,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						} else if (chNext == '(' || IsADigit(chNext) || chNext == '\'' || chNext == '"') {
 							// property value
 							// method parameter
-							if (chNext == '(' && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+							if (chNext == '(' && kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
 								// type method()
 								// type[] method()
 								// type<type> method()
@@ -245,7 +258,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 				stylePrevNonWhite = sc.state;
 				if (sc.state != SCE_GROOVY_WORD && sc.ch != '.') {
-					kwType = SCE_GROOVY_DEFAULT;
+					kwType = KeywordType::None;
 				}
 				sc.SetState(SCE_GROOVY_DEFAULT);
 			}
@@ -492,9 +505,9 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_GROOVY_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
-				chBefore = chPrevNonWhite;
-				if (chBefore != '.') {
-					chBeforeIdentifier = chBefore;
+				chBefore = (stylePrevNonWhite == SCE_GROOVY_FUNCTION) ? 0 : chPrevNonWhite;
+				if (chPrevNonWhite != '.') {
+					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_GROOVY_IDENTIFIER);
 			} else if ((sc.ch == '@' || sc.ch == '$') && IsIdentifierStartEx(sc.chNext)) {
@@ -541,7 +554,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			docTagState = DocTagState::None;
-			kwType = SCE_GROOVY_DEFAULT;
+			kwType = KeywordType::None;
 		}
 		sc.Forward();
 	}

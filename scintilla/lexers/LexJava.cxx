@@ -64,6 +64,18 @@ enum class DocTagState {
 	TagClose,		// </tag>
 };
 
+enum class KeywordType {
+	None = SCE_JAVA_DEFAULT,
+	Annotation = SCE_JAVA_ANNOTATION,
+	Class = SCE_JAVA_CLASS,
+	Interface = SCE_JAVA_INTERFACE,
+	Enum = SCE_JAVA_ENUM,
+	Record = SCE_JAVA_RECORD,
+	Label = SCE_JAVA_LABEL,
+	Return = 0x40,
+	While,
+};
+
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_JAVA_TASKMARKER;
 }
@@ -149,7 +161,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int lineStateLineType = 0;
 	bool insideUrl = false;
 
-	int kwType = SCE_JAVA_DEFAULT;
+	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
 	int visibleChars = 0;
@@ -186,7 +198,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (s[0] == '@') {
 					if (StrEqual(s, "@interface")) {
 						sc.ChangeState(SCE_JAVA_WORD);
-						kwType = SCE_JAVA_ANNOTATION;
+						kwType = KeywordType::Annotation;
 					} else {
 						sc.ChangeState(SCE_JAVA_ANNOTATION);
 						continue;
@@ -198,24 +210,26 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							lineStateLineType = JavaLineStateMaskImport;
 						}
 					} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws")) {
-						kwType = SCE_JAVA_CLASS;
+						kwType = KeywordType::Class;
 					} else if (StrEqualsAny(s, "interface", "implements")) {
-						kwType = SCE_JAVA_INTERFACE;
+						kwType = KeywordType::Interface;
 					} else if (StrEqual(s, "enum")) {
-						kwType = SCE_JAVA_ENUM;
+						kwType = KeywordType::Enum;
 					} else if (StrEqual(s, "record")) {
-						kwType = SCE_JAVA_RECORD;
+						kwType = KeywordType::Record;
 					} else if (StrEqualsAny(s, "break", "continue")) {
-						kwType = SCE_JAVA_LABEL;
+						kwType = KeywordType::Label;
+					} else if (StrEqualsAny(s, "return", "yield")) {
+						kwType = KeywordType::Return;
 					} else if (StrEqualsAny(s, "if", "while")) {
 						// to avoid treating following code as type cast:
 						// if (identifier) expression, while (identifier) expression
-						kwType = SCE_JAVA_WORD;
+						kwType = KeywordType::While;
 					}
-					if (kwType != SCE_JAVA_DEFAULT && kwType != SCE_JAVA_WORD) {
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 						const int chNext = sc.GetDocNextChar();
 						if (!IsIdentifierStartEx(chNext)) {
-							kwType = SCE_JAVA_DEFAULT;
+							kwType = KeywordType::None;
 						}
 					}
 				} else if (keywordLists[1]->InList(s)) {
@@ -238,12 +252,12 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.ChangeState(SCE_JAVA_LABEL);
 					}
 				} else if (sc.ch != '.') {
-					if (kwType != SCE_JAVA_DEFAULT && kwType != SCE_JAVA_WORD) {
-						sc.ChangeState(kwType);
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+						sc.ChangeState(static_cast<int>(kwType));
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == ')');
 						if (sc.ch == ')') {
-							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != SCE_JAVA_WORD && IsIdentifierCharEx(chNext)))) {
+							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != KeywordType::While && IsIdentifierCharEx(chNext)))) {
 								// (type)(expression)
 								// (type)expression, (type)++identifier, (type)--identifier
 								sc.ChangeState(SCE_JAVA_CLASS);
@@ -252,7 +266,11 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							// type method()
 							// type[] method()
 							// type<type> method()
-							sc.ChangeState((IsIdentifierCharEx(chBefore) || chBefore == ']') ? SCE_JAVA_FUNCTION_DEFINITION : SCE_JAVA_FUNCTION);
+							if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+								sc.ChangeState(SCE_JAVA_FUNCTION_DEFINITION);
+							} else {
+								sc.ChangeState(SCE_JAVA_FUNCTION);
+							}
 						} else if (sc.Match('[', ']')
 							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
@@ -268,7 +286,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 				if (sc.state != SCE_JAVA_WORD && sc.ch != '.') {
-					kwType = SCE_JAVA_DEFAULT;
+					kwType = KeywordType::None;
 				}
 				sc.SetState(SCE_JAVA_DEFAULT);
 			}
@@ -481,7 +499,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			docTagState = DocTagState::None;
-			kwType = SCE_JAVA_DEFAULT;
+			kwType = KeywordType::None;
 		}
 		sc.Forward();
 	}

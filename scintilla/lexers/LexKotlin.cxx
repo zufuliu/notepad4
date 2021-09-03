@@ -50,6 +50,16 @@ enum {
 	KotlinLineStateMaskImport = 1 << 1, // import
 };
 
+enum class KeywordType {
+	None = SCE_KOTLIN_DEFAULT,
+	Annotation = SCE_KOTLIN_ANNOTATION,
+	Class = SCE_KOTLIN_CLASS,
+	Interface = SCE_KOTLIN_INTERFACE,
+	Enum = SCE_KOTLIN_ENUM,
+	Label = SCE_KOTLIN_LABEL,
+	Return = 0x40,
+};
+
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_KOTLIN_STRING);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_KOTLIN_RAWSTRING);
 
@@ -61,7 +71,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
 
-	int kwType = SCE_KOTLIN_DEFAULT;
+	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
 	std::vector<int> nestedState; // string interpolation "${}"
@@ -118,22 +128,24 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							lineStateLineType = KotlinLineStateMaskImport;
 						}
 					} else if (StrEqualsAny(s, "break", "continue", "return", "this", "super")) {
-						kwType = SCE_KOTLIN_LABEL;
+						kwType = KeywordType::Label;
 					} else if (StrEqualsAny(s, "class", "typealias")) {
-						if (!(kwType == SCE_KOTLIN_ANNOTATION || kwType == SCE_KOTLIN_ENUM)) {
-							kwType = SCE_KOTLIN_CLASS;
+						if (!(kwType == KeywordType::Annotation || kwType == KeywordType::Enum)) {
+							kwType = KeywordType::Class;
 						}
 					} else if (StrEqual(s, "enum")) {
-						kwType = SCE_KOTLIN_ENUM;
+						kwType = KeywordType::Enum;
 					} else if (StrEqual(s, "annotation")) {
-						kwType = SCE_KOTLIN_ANNOTATION;
+						kwType = KeywordType::Annotation;
 					} else if (StrEqual(s, "interface")) {
-						kwType = SCE_KOTLIN_INTERFACE;
+						kwType = KeywordType::Interface;
+					} else if (StrEqual(s, "return")) {
+						kwType = KeywordType::Return;
 					}
-					if (kwType != SCE_KOTLIN_DEFAULT) {
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 						const int chNext = sc.GetDocNextChar();
-						if (!((kwType == SCE_KOTLIN_LABEL && chNext == '@') || (kwType != SCE_KOTLIN_LABEL && IsIdentifierStartEx(chNext)))) {
-							kwType = SCE_KOTLIN_DEFAULT;
+						if (!((kwType == KeywordType::Label) ? (chNext == '@') : IsIdentifierStartEx(chNext))) {
+							kwType = KeywordType::None;
 						}
 					}
 				} else if (sc.ch == '@') {
@@ -146,15 +158,19 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				} else if (keywordLists[3]->InList(s)) {
 					sc.ChangeState(SCE_KOTLIN_ENUM);
 				} else if (sc.ch != '.') {
-					if (kwType != SCE_KOTLIN_DEFAULT && kwType != SCE_KOTLIN_LABEL) {
-						sc.ChangeState(kwType);
+					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+						sc.ChangeState(static_cast<int>(kwType));
 					} else {
 						const int chNext = sc.GetDocNextChar(sc.ch == '?');
 						if (chNext == '(') {
 							// type function()
 							// type[] function()
 							// type<type> function()
-							sc.ChangeState((IsIdentifierCharEx(chBefore) || chBefore == ']') ? SCE_KOTLIN_FUNCTION_DEFINITION : SCE_KOTLIN_FUNCTION);
+							if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+								sc.ChangeState(SCE_KOTLIN_FUNCTION_DEFINITION);
+							} else {
+								sc.ChangeState(SCE_KOTLIN_FUNCTION);
+							}
 						} else if (sc.Match(':', ':')
 							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
 							// type::class
@@ -166,7 +182,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 				}
 				if (sc.state != SCE_KOTLIN_WORD && sc.ch != '.') {
-					kwType = SCE_KOTLIN_DEFAULT;
+					kwType = KeywordType::None;
 				}
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
@@ -317,8 +333,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_KOTLIN_NUMBER);
 			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
-				sc.SetState((kwType == SCE_KOTLIN_LABEL) ? SCE_KOTLIN_LABEL : SCE_KOTLIN_ANNOTATION);
-				kwType = SCE_KOTLIN_DEFAULT;
+				sc.SetState((kwType == KeywordType::Label) ? SCE_KOTLIN_LABEL : SCE_KOTLIN_ANNOTATION);
+				kwType = KeywordType::None;
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_KOTLIN_BACKTICKS);
 			} else if (IsIdentifierStartEx(sc.ch)) {
@@ -357,7 +373,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			lineStateLineType = 0;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
-			kwType = SCE_KOTLIN_DEFAULT;
+			kwType = KeywordType::None;
 		}
 		sc.Forward();
 	}
