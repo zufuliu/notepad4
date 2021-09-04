@@ -26,10 +26,11 @@ namespace {
 
 enum {
 	InnoLineStateLineComment = 1,
-	InnoLineStateEmptyLine = 2,
-	InnoLineStateLineContinuation = 4,
-	InnoLineStatePreprocessor = 8,
-	InnoLineStateCodeSection = 16,
+	InnoLineStateEmptyLine = 1 << 1,
+	InnoLineStateLineContinuation = 1 << 2,
+	InnoLineStateDefineLine = 1 << 3,
+	InnoLineStatePreprocessor = 1 << 4,
+	InnoLineStateCodeSection = 1 << 5,
 };
 
 enum class InnoParameterState {
@@ -40,9 +41,10 @@ enum class InnoParameterState {
 
 enum class PreprocessorKind {
 	None,
+	Init,
+	Pragma,
 	Include,
 	Message,
-	Pragma,
 };
 
 constexpr bool IsExpansionStartChar(int ch) noexcept {
@@ -170,38 +172,50 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_PREPROCESSOR:
-			if (IsIdentifierStart(sc.ch)) {
-				sc.SetState(SCE_INNO_PREPROCESSOR_WORD);
-			} else if (!IsASpaceOrTab(sc.ch)) {
-				sc.SetState(outerState);
-				outerState = SCE_INNO_DEFAULT;
-				continue;
-			}
-			break;
-
-		case SCE_INNO_PREPROCESSOR_WORD:
 		case SCE_INNO_NUMBER:
 		case SCE_INNO_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
 				if (sc.state != SCE_INNO_NUMBER) {
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
-					if (sc.state == SCE_INNO_PREPROCESSOR_WORD) {
-						if (outerState != SCE_INNO_DEFAULT) {
-							sc.ChangeState(SCE_INNO_PREPROCESSOR);
-							sc.SetState(outerState);
-							outerState = SCE_INNO_DEFAULT;
-							continue;
+					if (ppKind == PreprocessorKind::Init) {
+						if (sc.state == SCE_INNO_IDENTIFIER) {
+							sc.ChangeState((outerState == SCE_INNO_DEFAULT) ? SCE_INNO_PREPROCESSOR : SCE_INNO_PREPROCESSOR_WORD);
 						}
-						if (StrEqual(s, "include")) {
-							ppKind = PreprocessorKind::Include;
-						} else if (StrEqual(s, "error")) {
-							ppKind = PreprocessorKind::Message;
-						} else if (StrEqual(s, "pragma")) {
-							ppKind = PreprocessorKind::Pragma;
-						} else {
+						if (sc.LengthCurrent() > 1) {
+							if (outerState != SCE_INNO_DEFAULT) {
+								sc.SetState(outerState);
+								outerState = SCE_INNO_DEFAULT;
+								ppKind = PreprocessorKind::None;
+								continue;
+							}
+							const char *p = s;
+							if (*p == '#')  {
+								++p;
+							}
+							if (StrEqual(p, "include")) {
+								ppKind = PreprocessorKind::Include;
+							} else if (StrEqual(p, "error")) {
+								ppKind = PreprocessorKind::Message;
+							} else if (StrEqual(p, "pragma")) {
+								ppKind = PreprocessorKind::Pragma;
+							} else {
+								ppKind = PreprocessorKind::None;
+								if (StrEqual(p, "define")) {
+									lineState |= InnoLineStateDefineLine;
+								}
+							}
+						} else if (!IsASpaceOrTab(sc.ch)) {
 							ppKind = PreprocessorKind::None;
+							if (outerState != SCE_INNO_DEFAULT) {
+								sc.SetState(outerState);
+								outerState = SCE_INNO_DEFAULT;
+								continue;
+							}
 						}
+					} else if (ppKind == PreprocessorKind::Pragma) {
+						ppKind = PreprocessorKind::None;
+						sc.ChangeState(SCE_INNO_PREPROCESSOR_WORD);
 					} else if (lineState & InnoLineStateCodeSection) {
 						if (keywordLists[8]->InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_KEYWORD);
@@ -211,10 +225,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							sc.ChangeState(SCE_INNO_CONSTANT);
 						}
 					} else {
-						if (ppKind == PreprocessorKind::Pragma) {
-							ppKind = PreprocessorKind::None;
-							sc.ChangeState(SCE_INNO_PREPROCESSOR);
-						} else if (keywordLists[3]->InList(s)) {
+						if (keywordLists[3]->InList(s)) {
 							sc.ChangeState(SCE_INNO_KEYWORD);
 						} else if (keywordLists[5]->InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_TYPE);
@@ -305,6 +316,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				lineState &= ~InnoLineStateCodeSection;
 				lineState |= InnoLineStatePreprocessor;
 				outerState = SCE_INNO_DEFAULT;
+				ppKind = PreprocessorKind::Init;
 				sc.SetState(SCE_INNO_PREPROCESSOR);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_INNO_STRING_DQ);
@@ -360,6 +372,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.SetState(SCE_INNO_INLINE_EXPANSION);
 						if (sc.chNext == '#') {
 							outerState = SCE_INNO_INLINE_EXPANSION;
+							ppKind = PreprocessorKind::Init;
 							sc.ForwardSetState(SCE_INNO_PREPROCESSOR);
 						}
 					}
@@ -384,6 +397,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				lineState |= InnoLineStateEmptyLine;
 			} else if (lineState & InnoLineStatePreprocessor) {
 				if (sc.LineEndsWith('\\')) {
+					lineState &= ~InnoLineStateDefineLine;
 					lineState |= InnoLineStateLineContinuation;
 				}
 			}
@@ -435,17 +449,21 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		switch (style) {
 		case SCE_INNO_PASCAL_KEYWORD:
-		case SCE_INNO_PREPROCESSOR_WORD:
+		case SCE_INNO_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
 				buf[wordLen++] = MakeLowerCase(styler[i]);
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';
 				wordLen = 0;
-				if (style == SCE_INNO_PREPROCESSOR_WORD) {
-					if (StrStartsWith(buf, "if") || StrEqual(buf, "sub")) {
+				if (style == SCE_INNO_PREPROCESSOR) {
+					const char *p = buf;
+					if (*p == '#') {
+						++p;
+					}
+					if (StrStartsWith(p, "if") || StrEqual(p, "sub")) {
 						levelNext++;
-					} else if (StrStartsWith(buf, "end")) {
+					} else if (StrStartsWith(p, "end")) {
 						levelNext--;
 					}
 				} else {
@@ -478,6 +496,8 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 				}
 			} else if (lineState & InnoLineStateLineComment) {
 				levelNext += (lineStateNext & InnoLineStateLineComment) - (lineStatePrev & InnoLineStateLineComment);
+			} else if (lineState & InnoLineStateDefineLine) {
+				levelNext += ((lineStateNext & InnoLineStateDefineLine) >> 3) - ((lineStatePrev & InnoLineStateDefineLine) >> 3);
 			} else if ((lineState | lineStatePrev) & InnoLineStateLineContinuation) {
 				levelNext += ((lineState & InnoLineStateLineContinuation) >> 2) - ((lineStatePrev & InnoLineStateLineContinuation) >> 2);
 			}

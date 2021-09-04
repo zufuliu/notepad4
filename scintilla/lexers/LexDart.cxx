@@ -169,7 +169,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							// type[] method()
 							// type<type> method()
 							if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
-								sc.ChangeState(SCE_DART_FUNCTION_DEFINITION );
+								sc.ChangeState(SCE_DART_FUNCTION_DEFINITION);
 							} else {
 								sc.ChangeState(SCE_DART_FUNCTION);
 							}
