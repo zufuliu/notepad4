@@ -1605,6 +1605,81 @@ static inline int GetCharacterStyle(int iLexer) {
 	}
 }
 
+static inline int GetGenericOperatorStyle(int iLexer) {
+	switch (iLexer) {
+	case SCLEX_CPP:
+		return SCE_C_OPERATOR;
+	case SCLEX_DART:
+		return SCE_DART_OPERATOR;
+	case SCLEX_GROOVY:
+		return SCE_GROOVY_OPERATOR;
+	case SCLEX_HAXE:
+		return SCE_HAXE_OPERATOR;
+	case SCLEX_JAVA:
+		return SCE_JAVA_OPERATOR;
+	case SCLEX_JAVASCRIPT:
+		return SCE_JS_OPERATOR;
+	case SCLEX_KOTLIN:
+		return SCE_KOTLIN_OPERATOR;
+	case SCLEX_RUST:
+		return SCE_RUST_CHARACTER;
+	case SCLEX_SWIFT:
+		return SCE_SWIFT_OPERATOR;
+	default:
+		// '<>' is not generic or template
+		return 0;
+	}
+}
+
+static inline BOOL IsGenericTypeStyle(int iLexer, int style) {
+	switch (iLexer) {
+	case SCLEX_CPP:
+		return style == SCE_C_CLASS
+			|| style == SCE_C_INTERFACE
+			|| style == SCE_C_STRUCT
+			|| style == SCE_C_WORD2;
+	case SCLEX_DART:
+		return style == SCE_DART_CLASS
+			|| style == SCE_DART_ENUM
+			|| style == SCE_DART_WORD2;
+	case SCLEX_GROOVY:
+		return style == SCE_GROOVY_CLASS
+			|| style == SCE_GROOVY_INTERFACE
+			|| style == SCE_GROOVY_TRAIT
+			|| style == SCE_GROOVY_ENUM;
+	case SCLEX_HAXE:
+		return style == SCE_HAXE_CLASS
+			|| style == SCE_HAXE_INTERFACE
+			|| style == SCE_HAXE_ENUM;
+	case SCLEX_JAVA:
+		return style == SCE_JAVA_CLASS
+			|| style == SCE_JAVA_INTERFACE
+			|| style == SCE_JAVA_ENUM;
+	case SCLEX_JAVASCRIPT:
+		return style == SCE_JS_CLASS
+			|| style == SCE_JS_INTERFACE
+			|| style == SCE_JS_ENUM
+			|| style == SCE_JS_WORD2;
+	case SCLEX_KOTLIN:
+		return style == SCE_KOTLIN_CLASS
+			|| style == SCE_KOTLIN_INTERFACE
+			|| style == SCE_KOTLIN_ENUM;
+	case SCLEX_RUST:
+		return style == SCE_RUST_TYPE
+			|| style == SCE_RUST_STRUCT
+			|| style == SCE_RUST_TRAIT
+			|| style == SCE_RUST_ENUMERATION
+			|| style == SCE_RUST_UNION;
+	case SCLEX_SWIFT:
+		return style == SCE_SWIFT_CLASS
+			|| style == SCE_SWIFT_STRUCT
+			|| style == SCE_SWIFT_PROTOCOL
+			|| style == SCE_SWIFT_ENUM;
+	default:
+		return FALSE;
+	}
+}
+
 void EditAutoCloseBraceQuote(int ch) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
@@ -1648,11 +1723,9 @@ void EditAutoCloseBraceQuote(int ch) {
 		}
 		break;
 	case '<':
-		if ((mask & AutoInsertAngleBracket) && (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_CSHARP || pLexCurrent->rid == NP2LEX_JAVA)) {
+		if ((mask & AutoInsertAngleBracket) && IsGenericTypeStyle(pLexCurrent->iLexer, iPrevStyle)) {
 			// geriatric type, template
-			if (iPrevStyle == SCE_C_CLASS || iPrevStyle == SCE_C_INTERFACE || iPrevStyle == SCE_C_STRUCT) {
-				fillChar = '>';
-			}
+			fillChar = '>';
 		}
 		break;
 	case '\"':
@@ -1726,11 +1799,12 @@ void EditAutoCloseXMLTag(void) {
 	BOOL shouldAutoClose = iSize >= 3 && autoCompletionConfig.bCloseTags;
 	BOOL autoClosed = FALSE;
 
-	if (shouldAutoClose && pLexCurrent->iLexer == SCLEX_CPP) {
+	const int ignoreStyle = GetGenericOperatorStyle(pLexCurrent->iLexer);
+	if (shouldAutoClose && ignoreStyle != 0) {
 		int iCurrentStyle = SciCall_GetStyleAt(iCurPos);
-		if (iCurrentStyle == SCE_C_OPERATOR || iCurrentStyle == SCE_C_DEFAULT) {
+		if (iCurrentStyle == 0 || iCurrentStyle == ignoreStyle) {
 			shouldAutoClose = FALSE;
-		} else {
+		} else if (pLexCurrent->iLexer == SCLEX_CPP) {
 			const Sci_Line iLine = SciCall_LineFromPosition(iCurPos);
 			Sci_Position iCurrentLinePos = SciCall_PositionFromLine(iLine);
 			while (iCurrentLinePos < iCurPos && IsASpaceOrTab(SciCall_GetCharAt(iCurrentLinePos))) {
