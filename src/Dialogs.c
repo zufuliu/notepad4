@@ -2522,8 +2522,20 @@ HKEY_CLASSES_ROOT\Applications\Notepad2.exe
 		(Default)			REG_SZ		"Notepad2.exe" "%1"
 
 HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe
-	Debugger				REG_SZ		"Notepad2.exe" /z
-	UseFilter				REG_DWORD	0
+	Debugger								REG_SZ		"Notepad2.exe" /z
+	UseFilter								REG_DWORD	0
+	0
+		AppExecutionAliasRedirect			REG_DWORD	1
+		AppExecutionAliasRedirectPackages	REG_SZ		*
+		FilterFullPath						REG_SZ		"Notepad2.exe"
+	1
+		AppExecutionAliasRedirect			REG_DWORD	1
+		AppExecutionAliasRedirectPackages	REG_SZ		*
+		FilterFullPath						REG_SZ		"Notepad2.exe"
+	2
+		AppExecutionAliasRedirect			REG_DWORD	1
+		AppExecutionAliasRedirectPackages	REG_SZ		*
+		FilterFullPath						REG_SZ		"Notepad2.exe"
 */
 extern BOOL fIsElevated;
 extern int flagUseSystemMRU;
@@ -2657,11 +2669,22 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	// replace Windows Notepad
 	if (mask & SystemIntegration_ReplaceNotepad) {
 		HKEY hKey;
-		const LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
+		LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
 			Registry_SetInt(hKey, L"UseFilter", 0);
+			for (WCHAR ch = 0; ch < 3; ch ++) {
+				const WCHAR num[2] = { ch + '0', L'\0' };
+				HKEY hSubKey;
+				status = Registry_CreateKey(hKey, num, &hSubKey);
+				if (status == ERROR_SUCCESS) {
+					Registry_SetInt(hSubKey, L"AppExecutionAliasRedirect", 1);
+					Registry_SetString(hSubKey, L"AppExecutionAliasRedirectPackages", L"*");
+					Registry_SetString(hSubKey, L"FilterFullPath", tchModule);
+					RegCloseKey(hSubKey);
+				}
+			}
 			RegCloseKey(hKey);
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {
