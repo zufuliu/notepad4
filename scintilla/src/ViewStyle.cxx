@@ -48,17 +48,17 @@ bool MarginStyle::ShowsFolding() const noexcept {
 
 void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technology, const FontSpecification &fs, const char *localeName) {
 	PLATFORM_ASSERT(fs.fontName);
-	sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
-	const float deviceHeight = static_cast<float>(surface.DeviceHeightFont(sizeZoomed));
+	measurements.sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
+	const float deviceHeight = static_cast<float>(surface.DeviceHeightFont(measurements.sizeZoomed));
 	const FontParameters fp(fs.fontName, deviceHeight / FontSizeMultiplier, fs.weight,
 		fs.italic, fs.extraFontFlag, technology, fs.characterSet, localeName);
 	font = Font::Allocate(fp);
 
-	ascent = static_cast<unsigned int>(surface.Ascent(font.get()));
-	descent = static_cast<unsigned int>(surface.Descent(font.get()));
-	capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
-	aveCharWidth = surface.AverageCharWidth(font.get());
-	spaceWidth = surface.WidthText(font.get(), " ");
+	measurements.ascent = static_cast<unsigned int>(surface.Ascent(font.get()));
+	measurements.descent = static_cast<unsigned int>(surface.Descent(font.get()));
+	measurements.capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
+	measurements.aveCharWidth = surface.AverageCharWidth(font.get());
+	measurements.spaceWidth = surface.WidthText(font.get(), " ");
 
 	if (fs.checkMonospaced) {
 		// "Ay" is normally strongly kerned and "fi" may be a ligature
@@ -71,11 +71,11 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		const XYPOSITION maxWidth = *std::max_element(positions.begin(), positions.end());
 		const XYPOSITION minWidth = *std::min_element(positions.begin(), positions.end());
 		const XYPOSITION variance = maxWidth - minWidth;
-		const XYPOSITION scaledVariance = variance / aveCharWidth;
+		const XYPOSITION scaledVariance = variance / measurements.aveCharWidth;
 		constexpr XYPOSITION monospaceWidthEpsilon = 0.000001;	// May need tweaking if monospace fonts vary more
-		monospaceASCII = scaledVariance < monospaceWidthEpsilon;
+		measurements.monospaceASCII = scaledVariance < monospaceWidthEpsilon;
 	} else {
-		monospaceASCII = false;
+		measurements.monospaceASCII = false;
 	}
 }
 
@@ -342,7 +342,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 		// Set the platform font handle and measurements for each style.
 		for (auto &style : styles) {
 			const FontRealised *fr = Find(style);
-			style.Copy(fr->font, *fr);
+			style.Copy(fr->font, fr->measurements);
 		}
 
 		aveCharWidth = styles[StyleDefault].aveCharWidth;
@@ -403,7 +403,7 @@ void ViewStyle::EnsureStyle(size_t index) {
 
 void ViewStyle::ResetDefaultStyle() {
 	fontsValid = false;
-	styles[StyleDefault].ResetDefault(fontNames.Save(Platform::DefaultFont()));
+	styles[StyleDefault] = Style(fontNames.Save(Platform::DefaultFont()));
 }
 
 void ViewStyle::ClearStyles() noexcept {
@@ -411,7 +411,9 @@ void ViewStyle::ClearStyles() noexcept {
 	// Reset all styles to be like the default style
 	const Style &source = styles[StyleDefault];
 	for (auto &style : styles) {
-		style.ClearTo(source);
+		if (&style != &source) {
+			style = source;
+		}
 	}
 
 	styles[StyleLineNumber].back = Platform::Chrome();
@@ -421,12 +423,13 @@ void ViewStyle::ClearStyles() noexcept {
 }
 
 void ViewStyle::CopyStyles(size_t sourceIndex, size_t destStyles) {
-	EnsureStyle(sourceIndex);
 	const Style &source = styles[sourceIndex];
 	do {
 		const size_t index = destStyles & 0xff;
-		EnsureStyle(index);
-		styles[index].ClearTo(source);
+		assert(sourceIndex != index);
+		if (index != sourceIndex) {
+			styles[index] = source;
+		}
 		destStyles >>= 8;
 	} while (destStyles);
 }
@@ -733,11 +736,12 @@ void ViewStyle::AllocStyles(size_t sizeNew) {
 	fontsValid = false;
 	const size_t i = styles.size();
 	styles.resize(sizeNew);
-	sizeNew = styles.size();
-	if (sizeNew > StyleDefault) {
-		const Style &source = styles[StyleDefault];
+	if (i != 0 && sizeNew > StyleDefault) {
+		const auto back = styles.begin() + StyleDefault;
 		for (auto it = styles.begin() + i; it != styles.end(); ++it) {
-			it->ClearTo(source);
+			if (it != back) {
+				*it = *back;
+			}
 		}
 	}
 }
@@ -766,8 +770,8 @@ void ViewStyle::FindMaxAscentDescent() noexcept {
 	auto ascent = maxAscent;
 	auto descent = maxDescent;
 	for (const auto &font : fonts) {
-		ascent = std::max(ascent, font.second->ascent);
-		descent = std::max(descent, font.second->descent);
+		ascent = std::max(ascent, font.second->measurements.ascent);
+		descent = std::max(descent, font.second->measurements.descent);
 	}
 	maxAscent = ascent;
 	maxDescent = descent;

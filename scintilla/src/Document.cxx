@@ -3205,7 +3205,8 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	}
 #endif
 	if (matched) {
-		for (size_t co = 0; co < match.size(); co++) {
+		const size_t maxTag = std::min(<size_t>(match.size(), RESearch::MAXTAG);
+		for (size_t co = 0; co < maxTag; co++) {
 			search.bopat[co] = match[co].first.Pos();
 			search.eopat[co] = match[co].second.PosRoundUp();
 			const Sci::Position lenMatch = search.eopat[co] - search.bopat[co];

@@ -10,7 +10,7 @@ namespace Scintilla::Internal {
 
 /**
  */
-class MarginStyle {
+class MarginStyle final {
 public:
 	Scintilla::MarginType style;
 	ColourRGBA back;
@@ -24,16 +24,10 @@ public:
 
 /**
  */
-class FontRealised : public FontMeasurements {
+class FontRealised final {
 public:
+	FontMeasurements measurements;
 	std::shared_ptr<Font> font;
-	FontRealised() noexcept = default;
-	// FontRealised objects can not be copied.
-	FontRealised(const FontRealised &) = delete;
-	FontRealised(FontRealised &&) = delete;
-	FontRealised &operator=(const FontRealised &) = delete;
-	FontRealised &operator=(FontRealised &&) = delete;
-	virtual ~FontRealised() noexcept = default;
 	void Realise(Surface &surface, int zoomLevel, Scintilla::Technology technology, const FontSpecification &fs, const char *localeName);
 };
 
@@ -114,7 +108,7 @@ enum StyleIndices {
 
 /**
  */
-class ViewStyle {
+class ViewStyle final {
 	UniqueStringSet fontNames;
 	FontMap fonts;
 public:

@@ -867,7 +867,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		/////////////////////////////////////
 		// handle the start of PHP pre-processor = Non-HTML
 		else if ((state != SCE_H_ASPAT) &&
-		         !isStringState(state) &&
+		         !isPHPStringState(state) &&
 		         (state != SCE_HPHP_COMMENT) &&
 		         (state != SCE_HPHP_COMMENTLINE) &&
 		         (ch == '<') &&
@@ -1036,6 +1036,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				 (chPrev == '<') &&
 				 (ch == '!') &&
 				 (StateToPrint != SCE_H_CDATA) &&
+				 (!isStringState(StateToPrint)) &&
 				 (!IsCommentState(StateToPrint)) &&
 				 (!IsScriptCommentState(StateToPrint))) {
 			beforePreProc = state;

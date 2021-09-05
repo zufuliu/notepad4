@@ -2674,8 +2674,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
 			Registry_SetInt(hKey, L"UseFilter", 0);
-			for (WCHAR ch = 0; ch < 3; ch ++) {
-				const WCHAR num[2] = { ch + '0', L'\0' };
+			for (WCHAR ch = 0; ch < 3; ch++) {
+				const WCHAR num[2] = { ch + L'0', L'\0' };
 				HKEY hSubKey;
 				status = Registry_CreateKey(hKey, num, &hSubKey);
 				if (status == ERROR_SUCCESS) {

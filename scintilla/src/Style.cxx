@@ -24,23 +24,26 @@ using namespace Scintilla;
 using namespace Scintilla::Internal;
 
 bool FontSpecification::operator==(const FontSpecification &other) const noexcept {
-	return fontName == other.fontName &&
-		weight == other.weight &&
-		italic == other.italic &&
-		size == other.size &&
-		characterSet == other.characterSet &&
-		extraFontFlag == other.extraFontFlag;
+	return fontName == other.fontName
+		&& size == other.size
+		&& weight == other.weight
+		&& italic == other.italic
+		&& checkMonospaced == other.checkMonospaced
+		&& characterSet == other.characterSet
+		&& extraFontFlag == other.extraFontFlag;
 }
 
 bool FontSpecification::operator<(const FontSpecification &other) const noexcept {
 	if (fontName != other.fontName)
 		return fontName < other.fontName;
+	if (size != other.size)
+		return size < other.size;
 	if (weight != other.weight)
 		return weight < other.weight;
 	if (italic != other.italic)
-		return !italic;
-	if (size != other.size)
-		return size < other.size;
+		return italic < other.italic;
+	if (checkMonospaced != other.checkMonospaced)
+		return checkMonospaced < other.checkMonospaced;
 	if (characterSet != other.characterSet)
 		return characterSet < other.characterSet;
 	if (extraFontFlag != other.extraFontFlag)
@@ -48,71 +51,8 @@ bool FontSpecification::operator<(const FontSpecification &other) const noexcept
 	return false;
 }
 
-FontMeasurements::FontMeasurements() noexcept {
-	ClearMeasurements();
-}
-
-void FontMeasurements::ClearMeasurements() noexcept {
-	ascent = 1;
-	descent = 1;
-	capitalHeight = 1;
-	aveCharWidth = 1;
-	spaceWidth = 1;
-	monospaceASCII = false;
-	sizeZoomed = 2;
-}
-
-Style::Style() noexcept {
-	fore = ColourRGBA(0, 0, 0);
-	back = ColourRGBA(0xff, 0xff, 0xff);
-	eolFilled = false;
-	underline = false;
-	strike = false;
-	caseForce = CaseForce::mixed;
-	visible = true;
-	changeable = true;
-	hotspot = false;
-}
-
-Style::Style(const Style &source) noexcept :
-	FontSpecification(source),
-	FontMeasurements(source),
-	StylePod(source) {
-}
-
-Style &Style::operator=(const Style &source) noexcept {
-	if (this == &source) {
-		return *this;
-	}
-
-	(FontSpecification &)(*this) = source;
-	(FontMeasurements &)(*this) = source;
-	(StylePod &)(*this) = source;
-	font.reset();
-	return *this;
-}
-
-void Style::ResetDefault(const char *fontName_) noexcept {
-	fontName = fontName_;
-	weight = FontWeight::Normal;
-	italic = false;
-	size = Platform::DefaultFontSize() * FontSizeMultiplier;
-	characterSet = CharacterSet::Default;
-	FontMeasurements::ClearMeasurements();
-	fore = ColourRGBA(0, 0, 0);
-	back = ColourRGBA(0xff, 0xff, 0xff);
-	eolFilled = false;
-	underline = false;
-	strike = false;
-	caseForce = CaseForce::mixed;
-	visible = true;
-	changeable = true;
-	hotspot = false;
-	font.reset();
-}
-
-void Style::ClearTo(const Style &source) noexcept {
-	*this = source;
+Style::Style(const char *fontName_) noexcept :
+	FontSpecification(fontName_, Platform::DefaultFontSize() * FontSizeMultiplier) {
 }
 
 void Style::Copy(std::shared_ptr<Font> font_, const FontMeasurements &fm_) noexcept {
