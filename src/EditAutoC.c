@@ -1076,16 +1076,11 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 					return AutoC_AddSpecWord_Finish;
 				}
 			} else if (ch == '@') { // @directive, @annotation, @decorator
-				if (pLexCurrent->rid == NP2LEX_CSHARP) { // verbatim identifier
-					//WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[0]);
-					//WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]);
-				} else {
-					const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3];
-					if (StrNotEmptyA(pKeywords)) {
-						WordList_AddListEx(pWList, pKeywords);
-						// user defined annotation
-						return AutoC_AddSpecWord_Keyword;
-					}
+				const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3];
+				if (StrNotEmptyA(pKeywords)) {
+					WordList_AddListEx(pWList, pKeywords);
+					// user defined annotation
+					return AutoC_AddSpecWord_Keyword;
 				}
 			}
 			//else if (chPrev == ':' && ch == ':') {
@@ -1094,6 +1089,17 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			//else if (chPrev == '-' && ch == '>') {
 			//	WordList_AddList(pWList, "C/C++pointer PHP-variable");
 			//}
+		}
+		break;
+
+	case SCLEX_CSHARP:
+		if (ch == '#' && iCurrentStyle == SCE_CSHARP_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[3]); // preprocessor
+			return AutoC_AddSpecWord_Finish;
+		}
+		if ((ch == '<' || (chPrev == '<' && ch == '/')) && (iCurrentStyle > SCE_CSHARP_DEFAULT && iCurrentStyle < SCE_CSHARP_TASKMARKER)) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[10]); // comment tag
+			return AutoC_AddSpecWord_Finish;
 		}
 		break;
 
@@ -1591,6 +1597,8 @@ static inline int GetCharacterStyle(int iLexer) {
 	switch (iLexer) {
 	case SCLEX_CPP:
 		return SCE_C_CHARACTER;
+	case SCLEX_CSHARP:
+		return SCE_CSHARP_CHARACTER;
 	case SCLEX_JAVA:
 		return SCE_JAVA_CHARACTER;
 	case SCLEX_GO:
@@ -1609,6 +1617,8 @@ static inline int GetGenericOperatorStyle(int iLexer) {
 	switch (iLexer) {
 	case SCLEX_CPP:
 		return SCE_C_OPERATOR;
+	case SCLEX_CSHARP:
+		return SCE_CSHARP_OPERATOR;
 	case SCLEX_DART:
 		return SCE_DART_OPERATOR;
 	case SCLEX_GROOVY:
@@ -1638,6 +1648,12 @@ static inline BOOL IsGenericTypeStyle(int iLexer, int style) {
 			|| style == SCE_C_INTERFACE
 			|| style == SCE_C_STRUCT
 			|| style == SCE_C_WORD2;
+	case SCLEX_CSHARP:
+		return style == SCE_CSHARP_CLASS
+			|| style == SCE_CSHARP_INTERFACE
+			|| style == SCE_CSHARP_STRUCT
+			|| style == SCE_CSHARP_ENUM
+			|| style == SCE_CSHARP_WORD2;
 	case SCLEX_DART:
 		return style == SCE_DART_CLASS
 			|| style == SCE_DART_ENUM
@@ -2294,6 +2310,7 @@ void EditToggleCommentLine(void) {
 
 	case SCLEX_CIL:
 	case SCLEX_CPP:
+	case SCLEX_CSHARP:
 	case SCLEX_CSS: // for SCSS, LESS, HSS
 	case SCLEX_DART:
 	case SCLEX_FSHARP:
@@ -2440,6 +2457,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_AVS:
 	case SCLEX_CIL:
 	case SCLEX_CPP:
+	case SCLEX_CSHARP:
 	case SCLEX_CSS:
 	case SCLEX_DART:
 	case SCLEX_GO:

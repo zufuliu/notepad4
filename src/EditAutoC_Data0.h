@@ -469,8 +469,7 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 	case NP2LEX_PHP:
 		np2_LexKeyword = &kwPHPDoc;
 		return;
-	case NP2LEX_CSHARP:	// .NET Platform
-	case NP2LEX_FSHARP:
+	case NP2LEX_FSHARP: // .NET Platform
 		//case NP2LEX_VB:
 		np2_LexKeyword = &kwNETDoc;
 		return;

@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexCPP.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexCSharp.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexCSS.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>

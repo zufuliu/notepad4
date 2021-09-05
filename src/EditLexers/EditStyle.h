@@ -141,8 +141,6 @@
 
 #define NP2STYLE_BracketArgument		63461
 
-#define NP2STYLE_LINQKeyword			63491
-
 #define NP2STYLE_ScalarVar				63501
 #define NP2STYLE_ArrayVar				63502
 #define NP2STYLE_HashVar				63503

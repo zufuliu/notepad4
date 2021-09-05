@@ -11,6 +11,7 @@ def update_all_keyword():
 		('NP2LEX_AWK', 'stlAwk.c', 'Awk.awk', 1, parse_awk_api_file),
 		('NP2LEX_BATCH', 'stlBatch.c', 'Batch.bat', 0, parse_batch_api_file),
 		('NP2LEX_CMAKE', 'stlCMake.c', 'CMake.cmake', 0, parse_cmake_api_file),
+		('NP2LEX_CSHARP', 'stlCSharp.c', 'CSharp.cs', 1, parse_csharp_api_file),
 		('NP2LEX_DART', 'stlDart.c', 'Dart.dart', 0, parse_dart_api_file),
 		('NP2LEX_GN', 'stlGN.c', 'GN.gn', 0, parse_gn_api_file),
 		('NP2LEX_GO', 'stlGO.c', 'Go.go', 0, parse_go_api_file),

@@ -30,6 +30,7 @@
       <File Name="../../scintilla/lexers/LexCoffeeScript.cxx"/>
       <File Name="../../scintilla/lexers/LexConfig.cxx"/>
       <File Name="../../scintilla/lexers/LexCPP.cxx"/>
+      <File Name="../../scintilla/lexers/LexCSharp.cxx"/>
       <File Name="../../scintilla/lexers/LexCSS.cxx"/>
       <File Name="../../scintilla/lexers/LexDart.cxx"/>
       <File Name="../../scintilla/lexers/LexDiff.cxx"/>

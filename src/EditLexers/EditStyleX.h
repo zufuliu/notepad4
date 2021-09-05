@@ -153,8 +153,6 @@
 
 #define NP2StyleX_BracketArgument		EDITSTYLE_HOLE(BracketArgument, L"Bracket Argument")
 
-#define NP2StyleX_LINQKeyword			EDITSTYLE_HOLE(LINQKeyword, L"LINQ Keyword")
-
 #define NP2StyleX_ScalarVar				EDITSTYLE_HOLE(ScalarVar, L"Scalar $var")
 #define NP2StyleX_ArrayVar				EDITSTYLE_HOLE(ArrayVar, L"Array @var")
 #define NP2StyleX_HashVar				EDITSTYLE_HOLE(HashVar, L"Hash %var")

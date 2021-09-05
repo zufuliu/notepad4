@@ -555,6 +555,60 @@ def parse_cmake_api_file(path):
 		('long variables', [], KeywordAttr.NoLexer),
 	]
 
+def parse_csharp_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'types', 'vala types'):
+			keywordMap[key] = doc.split()
+		elif key == 'preprocessor':
+			items = re.findall(r'#(\w+)', doc)
+			keywordMap[key] = items
+		elif key == 'attributes':
+			items = re.findall(r'\[(\w+)', doc)
+			keywordMap[key] = items
+		elif key == 'api':
+			items = re.findall(r'class\s+(\w+)', doc)
+			keywordMap['class'] = items
+			items = re.findall(r'struct\s+(\w+)', doc)
+			keywordMap['struct'] = items
+			items = re.findall(r'interface\s+(\w+)', doc)
+			keywordMap['interface'] = items
+			items = re.findall(r'enum\s+(\w+)', doc)
+			keywordMap['enumeration'] = items
+			items = re.findall(r'\[(\w+)', doc)
+			keywordMap['attributes'].extend(items)
+			items = re.findall(r'delegate\s+\w+\s+(\w+)', doc)
+			keywordMap['class'].extend(items)
+		elif key == 'comment':
+			items = re.findall(r'<(\w+)', doc)
+			keywordMap['comment tag'] = items
+		else:
+			print('unknown:', key)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'class',
+		'struct',
+		'interface',
+		'enumeration',
+		'vala types',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('vala types', keywordMap['vala types'], KeywordAttr.NoAutoComp),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoAutoComp),
+		('attributes', keywordMap['attributes'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('struct', keywordMap['struct'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('comment tag', keywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+	]
+
 def parse_dart_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}

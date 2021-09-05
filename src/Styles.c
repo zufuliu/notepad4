@@ -1243,9 +1243,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[13] = KeywordAttr_NoLexer;		// C Function
 		attr[14] = KeywordAttr_NoLexer;		// C++ Function
 		break;
-	case NP2LEX_CSHARP:
-		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
-		break;
 	case NP2LEX_D:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
 		attr[11] = KeywordAttr_NoAutoComp;	// Assembler Intruction
@@ -1316,6 +1313,11 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_CMAKE:
 		attr[6] = KeywordAttr_NoLexer;		// long properties
 		attr[7] = KeywordAttr_NoLexer;		// long variables
+		break;
+	case NP2LEX_CSHARP:
+		attr[2] = KeywordAttr_NoAutoComp;	// vala types
+		attr[3] = KeywordAttr_NoAutoComp;	// preprocessor
+		attr[10] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// comment tag
 		break;
 	case NP2LEX_DART:
 		attr[4] = KeywordAttr_NoLexer;		// metadata

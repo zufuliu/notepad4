@@ -39,6 +39,7 @@ extern LexerModule lmCMake;
 extern LexerModule lmCoffeeScript;
 extern LexerModule lmConf;
 extern LexerModule lmCPP;
+extern LexerModule lmCSharp;
 extern LexerModule lmCss;
 extern LexerModule lmDart;
 extern LexerModule lmDiff;
@@ -109,6 +110,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmCoffeeScript,
 	&lmConf,
 	&lmCPP,
+	&lmCSharp,
 	&lmCss,
 	&lmDart,
 	&lmDiff,

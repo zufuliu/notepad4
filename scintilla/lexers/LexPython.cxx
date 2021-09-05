@@ -61,7 +61,7 @@ struct EscapeSequence {
 		numBase = 16;
 		if (chNext == 'x') {
 			digitsLeft = 3;
-		} else if (IsADigit(chNext, 8)) {
+		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
 			numBase = 8;
 		} else if (AnyOf(chNext, '\\', '\'', '"', 'a', 'b', 'f', 'n', 'r', 't', 'v')) {
@@ -508,7 +508,6 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							nestedState.pop_back();
 						}
 						sc.SetState(SCE_PY_DEFAULT);
-						continue;
 					}
 				}
 				break;
@@ -529,7 +528,6 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						insideFStringFormatSpec = false;
 						sc.SetState(SCE_PY_OPERATOR2);
 						sc.ForwardSetState(SCE_PY_DEFAULT);
-						continue;
 					} else if (sc.chNext == '}' || sc.chNext == '!' || sc.chNext == ':' || IsIdentifierCharEx(sc.chNext)) {
 						escSeq.outerState = sc.state;
 						sc.SetState(SCE_PY_PLACEHOLDER);
@@ -695,11 +693,14 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_PY_COMMENTTAGAT:
 			if (!IsLowerCase(sc.ch)) {
 				if (sc.ch == ' ' || sc.ch == ':') {
+					if (sc.ch == ':') {
+						sc.Forward();
+					}
 					sc.SetState(escSeq.outerState);
 				} else {
 					sc.ChangeState(escSeq.outerState);
-					continue;
 				}
+				continue;
 			}
 			break;
 

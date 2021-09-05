@@ -988,6 +988,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexCoffeeScript.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexConfig.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCPP.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexCSharp.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCSS.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexDart.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexDiff.cxx" />
