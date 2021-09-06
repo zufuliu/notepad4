@@ -109,6 +109,10 @@ constexpr bool IsCsIdentifierChar(int ch, int chNext) noexcept {
 	return IsIdentifierCharEx(ch) || IsUnicodeEscape(ch, chNext);
 }
 
+constexpr bool IsInterfaceName(char ch, char chNext) noexcept {
+	return ch == 'I' && IsUpperCase(chNext);
+}
+
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_CSHARP_TASKMARKER;
 }
@@ -323,9 +327,14 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								// type<type?>
 								// type<type<type>>
 								// type identifier
-								sc.ChangeState((s[0] == 'I') ? SCE_CSHARP_INTERFACE : SCE_CSHARP_CLASS);
+								sc.ChangeState(IsInterfaceName(s[0], s[1]) ? SCE_CSHARP_INTERFACE : SCE_CSHARP_CLASS);
 							}
 						}
+#if 0
+						if (sc.state == SCE_CSHARP_IDENTIFIER && IsInterfaceName(s[0], s[1])) {
+							sc.ChangeState(SCE_CSHARP_INTERFACE);
+						}
+#endif
 					}
 				}
 				if (sc.state != SCE_CSHARP_WORD && sc.state != SCE_CSHARP_ATTRIBUTE && sc.ch != '.') {
@@ -462,9 +471,14 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					nestedState.push_back({sc.state,  parenCount});
 					sc.SetState(SCE_CSHARP_OPERATOR2);
 					sc.ForwardSetState(SCE_CSHARP_DEFAULT);
-				} else if (IsADigit(sc.chNext)) {
+				} else if (IsIdentifierCharEx(sc.chNext) || sc.chNext == '@' || sc.chNext == '$') {
+					// standard format: {index,alignment:format}
+					// third party string template library: {@identifier} {$identifier} {identifier}
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_CSHARP_PLACEHOLDER);
+					if (sc.chNext == '@' || sc.chNext == '$') {
+						sc.Forward();
+					}
 				}
 				break;
 
@@ -499,7 +513,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_CSHARP_PLACEHOLDER:
-			if (!IsADigit(sc.ch)) {
+			if (!IsIdentifierCharEx(sc.ch)) {
 				if (sc.ch != '}') {
 					const Sci_Position length = CheckFormatSpecifier(sc, styler);
 					if (length == 0) {
@@ -622,9 +636,9 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					nestedState.pop_back();
 					sc.SetState(state);
 				}
-			}
-			if (!nestedState.empty()) {
-				lineState |= CSharpLineStateMaskInterpolation;
+				if (!nestedState.empty()) {
+					lineState |= CSharpLineStateMaskInterpolation;
+				}
 			}
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineType = 0;

@@ -21,19 +21,19 @@ static KEYWORDLIST Keywords_CSharp = {{
 
 , // 4 attributes
 "AttributeUsage Browsable CLSCompliant ComImport ComVisible Conditional ContextStatic "
-"Debuggable DebuggerHidden DefaultCharSet DllImport Flags Guid MTAThread MarshalAs MethodImpl ModuleInitializer "
-"NonSerialized Obsolete ParamArray STAThread Serializable SkipLocalsInit StructLayout ThreadStatic assembly event field "
-"method module param property return type "
+"Debuggable DebuggerHidden DefaultCharSet DefaultValue DllImport Flags Guid "
+"MTAThread MarshalAs MethodImpl ModuleInitializer NonSerialized Obsolete ParamArray "
+"STAThread Serializable SkipLocalsInit StructLayout ThreadStatic "
 
 , // 5 class
 "Action Activator Activity Application Array ArrayList Assembly Attribute AutoResetEvent "
 "Base64 BinaryReader BinaryWriter BitArray BitConverter Bitmap Blend BlockingCollection Brush Brushes "
 "Buffer BufferedGraphics BufferedStream Button "
-"COMException CheckBox CheckedListBox Clipboard Collection ColorBlend ColorDialog "
+"COMException Calendar CharUnicodeInfo CheckBox CheckedListBox Clipboard Collection ColorBlend ColorDialog "
 "ComboBox CommonDialog Comparer Component ConcurrentBag ConcurrentDictionary ConcurrentQueue ConcurrentStack Console "
-"ContainerControl ContentElement ContextMenuStrip Control Convert CountdownEvent Cursor Cursors "
+"ContainerControl ContentElement ContextMenuStrip Control Convert CountdownEvent CultureInfo Cursor Cursors "
 "DBNull DataColumn DataGridView DataGridViewCell DataGridViewColumn DataGridViewRow DataObject DataRow DataSet DataTable "
-"DataView DateTimePicker Delegate Dictionary Directory DirectoryInfo DriveInfo "
+"DataView DateTimeFormatInfo DateTimePicker Delegate Dictionary Directory DirectoryInfo DriveInfo "
 "Encoding EndPoint Enum Environment EventArgs EventHandler EventInfo EventWaitHandle Exception ExecutionContext "
 "FieldInfo File FileDialog FileInfo FileStream FileSystemInfo FileSystemWatcher FileWebRequest FileWebResponse "
 "FlowLayoutPanel FolderBrowserDialog Font FontDialog FontFamily Form Func "
@@ -46,7 +46,8 @@ static KEYWORDLIST Keywords_CSharp = {{
 "LinearGradientBrush LinkLabel LinkedList LinkedListNode List ListBox ListControl ListView ListViewGroup ListViewItem "
 "ManualResetEvent Marshal MarshalByRefObject MaskedTextBox Math Matrix "
 "MemberInfo MemoryStream MenuStrip MessageBox MethodInfo Module MonthCalendar MouseEventArgs Mutex "
-"NativeWindow NetworkStream NotifyIcon NumericUpDown Object ObservableCollection OpenFileDialog OrderedDictionary "
+"NativeWindow NetworkStream NotifyIcon NumberFormatInfo NumericUpDown "
+"Object ObservableCollection OpenFileDialog OrderedDictionary "
 "PageSetupDialog Panel ParameterInfo Path Pen Pens PictureBox "
 "PrintDialog PrintPreviewDialog Process ProcessStartInfo ProgressBar PropertyGrid PropertyInfo PropertyManager "
 "Queue "
@@ -67,7 +68,7 @@ static KEYWORDLIST Keywords_CSharp = {{
 , // 6 struct
 "ArgIterator ArraySegment BigInteger Boolean Byte CancellationToken Char CharacterRange Color Complex "
 "DateTime DateTimeOffset Decimal Double GCHandle Guid HandleRef Index Int16 Int32 Int64 IntPtr JsonElement JsonProperty "
-"Memory Message ModuleHandle Nullable Point PointF Range Rectangle RectangleF "
+"Memory Message ModuleHandle Nullable Point PointF Range Rectangle RectangleF Rune "
 "SByte Single Size SizeF Span SpinLock SpinWait TimeSpan TypedReference UInt16 UInt32 UInt64 UIntPtr ValueTuple Void "
 
 , // 7 interface
@@ -79,7 +80,7 @@ static KEYWORDLIST Keywords_CSharp = {{
 , // 8 enumeration
 "AttributeTargets CallingConvention CharSet ConsoleColor ConsoleKey DateTimeKind DayOfWeek DialogResult DriveType "
 "FileAccess FileAttributes FileMode FileOptions FileShare FontStyle GraphicsUnit "
-"HttpRequestHeader HttpResponseHeader HttpStatusCode Keys KnownColor LayoutKind RegexOptions "
+"HttpRequestHeader HttpResponseHeader HttpStatusCode Keys KnownColor LayoutKind MethodImplOptions RegexOptions "
 "SearchOption SeekOrigin SocketError SocketFlags SocketType StringComparison StringSplitOptions TaskStatus TypeCode "
 
 , // 9 constant
@@ -94,7 +95,9 @@ NULL
 
 , // 15 Code Snippet
 "for^() if^() switch^() while^() catch^() else^if^() else^{} foreach^() sizeof() typeof() using^() fixed^() lock^() "
-"base() this() checked() default() delegate() nameof()"
+"base() this() checked() default() delegate() nameof() "
+// attribute target
+"assembly field method module param property type "
 }};
 
 static EDITSTYLE Styles_CSharp[] = {
@@ -113,8 +116,8 @@ static EDITSTYLE Styles_CSharp[] = {
 	{ SCE_CSHARP_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_CSHARP_COMMENTLINE, SCE_CSHARP_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_CSHARP_COMMENTLINEDOC, SCE_CSHARP_COMMENTBLOCKDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },
-	{ SCE_CSHARP_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
 	{ SCE_CSHARP_COMMENTTAG_XML, NP2StyleX_DocCommentTag, L"fore:#408080" },
+	{ SCE_CSHARP_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
 	{ MULTI_STYLE(SCE_CSHARP_CHARACTER, SCE_CSHARP_STRING, SCE_CSHARP_INTERPOLATED_STRING, SCE_CSHARP_PREPROCESSOR_MESSAGE), NP2StyleX_String, L"fore:#008000" },
 	{ MULTI_STYLE(SCE_CSHARP_VERBATIM_STRING, SCE_CSHARP_INTERPOLATED_VERBATIM_STRING, SCE_CSHARP_VERBATIM_STRINGSTART, SCE_CSHARP_VERBATIM_STRINGEND), NP2StyleX_VerbatimString, L"fore:#008080" },
 	{ SCE_CSHARP_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },

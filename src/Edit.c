@@ -2183,18 +2183,14 @@ void EditChar2Hex(void) {
 		strcpy(ch, "\\x00");
 	} else {
 		const UINT cpEdit = SciCall_GetCodePage();
-		char uesc = 'u';
-		if (pLexCurrent->rid == NP2LEX_CSHARP) {
-			uesc = 'x';
-		}
 		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)(count + 1)) - 1; // '\0'
 		int j = 0;
 		for (Sci_Position i = 0; i < count; i++) {
 			if (wch[i] <= 0xFF) {
-				sprintf(ch + j, "\\x%02X", wch[i] & 0xFF); // \xhh
+				sprintf(ch + j, "\\x%02X", wch[i]); // \xHH
 				j += 4;
 			} else {
-				sprintf(ch + j, "\\%c%04X", uesc, wch[i]); // \uhhhh \xhhhh
+				sprintf(ch + j, "\\u%04X", wch[i]); // \uHHHH
 				j += 6;
 			}
 		}

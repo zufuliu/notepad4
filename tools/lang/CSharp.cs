@@ -202,6 +202,7 @@ namespace System.ComponentModel {
 	// Classes
 	[Browsable(true)]
 	public class Component : MarshalByRefObject, IDisposable, IComponent
+	[DefaultValue(false)]
 	// Interfaces
 	public interface IComponent : IDisposable
 }
@@ -320,6 +321,15 @@ namespace System.Drawing.Drawing2D {
 	public sealed class GraphicsPath : MarshalByRefObject, ICloneable, IDisposable
 	public sealed class LinearGradientBrush : Brush
 	public sealed class Matrix : MarshalByRefObject, IDisposable
+}
+
+namespace System.Globalization {
+	//  Classes
+	public abstract class Calendar : ICloneable
+	public static class CharUnicodeInfo
+	public class CultureInfo : ICloneable, IFormatProvider
+	public sealed class DateTimeFormatInfo : ICloneable, IFormatProvider
+	public sealed class NumberFormatInfo : ICloneable, IFormatProvider
 }
 
 namespace System.IO {
@@ -445,11 +455,13 @@ namespace System.Runtime.CompilerServices {
 	[MethodImpl(MethodImplOptions.NoInlining)]
 	[ModuleInitializer]
 	[SkipLocalsInit]
+	// Enums
+	public enum MethodImplOptions
 }
 
 namespace System.Runtime.InteropServices {
 	// Classes
-	public class COMException : System.Runtime.InteropServices.ExternalException
+	public class COMException : ExternalException
 	[ComImport]
 	[ComVisible(false)]
 	[DefaultCharSet(CharSet.Auto)]
@@ -457,7 +469,7 @@ namespace System.Runtime.InteropServices {
 	[Guid("")]
 	public static class Marshal
 	[MarshalAs(UnmanagedType.LPWStr)]
-	public abstract class SafeHandle : System.Runtime.ConstrainedExecution.CriticalFinalizerObject, IDisposable
+	public abstract class SafeHandle : CriticalFinalizerObject, IDisposable
 	[StructLayout(LayoutKind.Explicit)]
 	// Structs
 	public struct GCHandle
@@ -473,6 +485,8 @@ namespace System.Text {
 	public abstract class Encoding : ICloneable
 	public sealed class StringBuilder : ISerializable
 	public class UTF8Encoding : Encoding
+	// Structs
+	public struct Rune : IComparable, IComparable<Rune>, IEquatable<Rune>
 }
 
 namespace System.Text.Json {
@@ -536,82 +550,82 @@ namespace System.Windows {
 namespace System.Windows.Forms {
 	// Classes
 	public sealed class Application
-	public class Button : System.Windows.Forms.ButtonBase, System.Windows.Forms.IButtonControl
-	public class CheckBox : System.Windows.Forms.ButtonBase
-	public class CheckedListBox : System.Windows.Forms.ListBox
+	public class Button : ButtonBase, IButtonControl
+	public class CheckBox : ButtonBase
+	public class CheckedListBox : ListBox
 	public static class Clipboard
-	public class ColorDialog : System.Windows.Forms.CommonDialog
-	public class ComboBox : System.Windows.Forms.ListControl
-	public abstract class CommonDialog : System.ComponentModel.Component
-	public class ContainerControl : System.Windows.Forms.ScrollableControl, System.Windows.Forms.IContainerControl
-	public class ContextMenuStrip : System.Windows.Forms.ToolStripDropDownMenu
-	public class Control : System.ComponentModel.Component, IDisposable, System.ComponentModel.ISynchronizeInvoke, System.Windows.Forms.IBindableComponent, System.Windows.Forms.IDropTarget, System.Windows.Forms.IWin32Window
+	public class ColorDialog : CommonDialog
+	public class ComboBox : ListControl
+	public abstract class CommonDialog : Component
+	public class ContainerControl : ScrollableControl, IContainerControl
+	public class ContextMenuStrip : ToolStripDropDownMenu
+	public class Control : Component, IDisposable, ISynchronizeInvoke, IBindableComponent, IDropTarget, IWin32Window
 	public sealed class Cursor : IDisposable, ISerializable
 	public static class Cursors
-	public class DataGridView : System.Windows.Forms.Control, System.ComponentModel.ISupportInitialize
-	public abstract class DataGridViewCell : System.Windows.Forms.DataGridViewElement, ICloneable, IDisposable
-	public class DataGridViewColumn : System.Windows.Forms.DataGridViewBand, IDisposable, System.ComponentModel.IComponent
-	public class DataGridViewRow : System.Windows.Forms.DataGridViewBand
-	public class DataObject : System.Runtime.InteropServices.ComTypes.IDataObject, System.Windows.Forms.IDataObject
-	public class DateTimePicker : System.Windows.Forms.Control
-	public abstract class FileDialog : System.Windows.Forms.CommonDialog
-	public class FlowLayoutPanel : System.Windows.Forms.Panel, System.ComponentModel.IExtenderProvider
-	public sealed class FolderBrowserDialog : System.Windows.Forms.CommonDialog
-	public class FontDialog : System.Windows.Forms.CommonDialog
-	public class Form : System.Windows.Forms.ContainerControl
-	public class GroupBox : System.Windows.Forms.Control
+	public class DataGridView : Control, ISupportInitialize
+	public abstract class DataGridViewCell : DataGridViewElement, ICloneable, IDisposable
+	public class DataGridViewColumn : DataGridViewBand, IDisposable, IComponent
+	public class DataGridViewRow : DataGridViewBand
+	public class DataObject : IDataObject, IDataObject
+	public class DateTimePicker : Control
+	public abstract class FileDialog : CommonDialog
+	public class FlowLayoutPanel : Panel, IExtenderProvider
+	public sealed class FolderBrowserDialog : CommonDialog
+	public class FontDialog : CommonDialog
+	public class Form : ContainerControl
+	public class GroupBox : Control
 	public sealed class HtmlDocument
 	public sealed class HtmlElement
 	public sealed class HtmlWindow
-	public sealed class ImageList : System.ComponentModel.Component
+	public sealed class ImageList : Component
 	public class KeyEventArgs : EventArgs
-	public class Label : System.Windows.Forms.Control, System.Windows.Forms.Automation.IAutomationLiveRegion
-	public class LinkLabel : System.Windows.Forms.Label, System.Windows.Forms.IButtonControl
-	public class ListBox : System.Windows.Forms.ListControl
-	public abstract class ListControl : System.Windows.Forms.Control
-	public class ListView : System.Windows.Forms.Control
+	public class Label : Control, Automation.IAutomationLiveRegion
+	public class LinkLabel : Label, IButtonControl
+	public class ListBox : ListControl
+	public abstract class ListControl : Control
+	public class ListView : Control
 	public sealed class ListViewGroup : ISerializable
 	public class ListViewItem : ICloneable, ISerializable
-	public class MaskedTextBox : System.Windows.Forms.TextBoxBase
-	public class MenuStrip : System.Windows.Forms.ToolStrip
+	public class MaskedTextBox : TextBoxBase
+	public class MenuStrip : ToolStrip
 	public class MessageBox
-	public class MonthCalendar : System.Windows.Forms.Control
+	public class MonthCalendar : Control
 	public class MouseEventArgs : EventArgs
-	public class NativeWindow : MarshalByRefObject, System.Windows.Forms.IWin32Window
-	public sealed class NotifyIcon : System.ComponentModel.Component
-	public class NumericUpDown : System.Windows.Forms.UpDownBase, System.ComponentModel.ISupportInitialize
-	public sealed class OpenFileDialog : System.Windows.Forms.FileDialog
-	public sealed class PageSetupDialog : System.Windows.Forms.CommonDialog
-	public class Panel : System.Windows.Forms.ScrollableControl
-	public class PictureBox : System.Windows.Forms.Control, System.ComponentModel.ISupportInitialize
-	public sealed class PrintDialog : System.Windows.Forms.CommonDialog
-	public class PrintPreviewDialog : System.Windows.Forms.Form
-	public class ProgressBar : System.Windows.Forms.Control
-	public class PropertyGrid : System.Windows.Forms.ContainerControl, System.Windows.Forms.ComponentModel.Com2Interop.IComPropertyBrowser
-	public class PropertyManager : System.Windows.Forms.BindingManagerBase
-	public class RadioButton : System.Windows.Forms.ButtonBase
-	public class RichTextBox : System.Windows.Forms.TextBoxBase
-	public sealed class SaveFileDialog : System.Windows.Forms.FileDialog
+	public class NativeWindow : MarshalByRefObject, IWin32Window
+	public sealed class NotifyIcon : Component
+	public class NumericUpDown : UpDownBase, ISupportInitialize
+	public sealed class OpenFileDialog : FileDialog
+	public sealed class PageSetupDialog : CommonDialog
+	public class Panel : ScrollableControl
+	public class PictureBox : Control, ISupportInitialize
+	public sealed class PrintDialog : CommonDialog
+	public class PrintPreviewDialog : Form
+	public class ProgressBar : Control
+	public class PropertyGrid : ContainerControl, IComPropertyBrowser
+	public class PropertyManager : BindingManagerBase
+	public class RadioButton : ButtonBase
+	public class RichTextBox : TextBoxBase
+	public sealed class SaveFileDialog : FileDialog
 	public class Screen
-	public abstract class ScrollBar : System.Windows.Forms.Control
-	public class SplitContainer : System.Windows.Forms.ContainerControl, System.ComponentModel.ISupportInitialize
-	public class Splitter : System.Windows.Forms.Control
-	public sealed class SplitterPanel : System.Windows.Forms.Panel
-	public class StatusStrip : System.Windows.Forms.ToolStrip
-	public class TabControl : System.Windows.Forms.Control
-	public class TableLayoutPanel : System.Windows.Forms.Panel, System.ComponentModel.IExtenderProvider
-	public class TabPage : System.Windows.Forms.Panel
-	public class TaskDialog : System.Windows.Forms.IWin32Window
-	public class TextBox : System.Windows.Forms.TextBoxBase
-	public class Timer : System.ComponentModel.Component
-	public class ToolStrip : System.Windows.Forms.ScrollableControl, IDisposable
-	public abstract class ToolStripItem : System.ComponentModel.Component, IDisposable, System.Windows.Forms.IDropTarget
-	public class ToolTip : System.ComponentModel.Component, System.ComponentModel.IExtenderProvider
-	public class TrackBar : System.Windows.Forms.Control, System.ComponentModel.ISupportInitialize
+	public abstract class ScrollBar : Control
+	public class SplitContainer : ContainerControl, ISupportInitialize
+	public class Splitter : Control
+	public sealed class SplitterPanel : Panel
+	public class StatusStrip : ToolStrip
+	public class TabControl : Control
+	public class TableLayoutPanel : Panel, IExtenderProvider
+	public class TabPage : Panel
+	public class TaskDialog : IWin32Window
+	public class TextBox : TextBoxBase
+	public class Timer : Component
+	public class ToolStrip : ScrollableControl, IDisposable
+	public abstract class ToolStripItem : Component, IDisposable, IDropTarget
+	public class ToolTip : Component, IExtenderProvider
+	public class TrackBar : Control, ISupportInitialize
 	public class TreeNode : MarshalByRefObject, ICloneable, ISerializable
-	public class TreeView : System.Windows.Forms.Control
-	public class UserControl : System.Windows.Forms.ContainerControl
-	public class WebBrowser : System.Windows.Forms.WebBrowserBase
+	public class TreeView : Control
+	public class UserControl : ContainerControl
+	public class WebBrowser : WebBrowserBase
 	// Structs
 	public struct Message
 	// Interfaces

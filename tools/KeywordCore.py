@@ -564,9 +564,6 @@ def parse_csharp_api_file(path):
 		elif key == 'preprocessor':
 			items = re.findall(r'#(\w+)', doc)
 			keywordMap[key] = items
-		elif key == 'attributes':
-			items = re.findall(r'\[(\w+)', doc)
-			keywordMap[key] = items
 		elif key == 'api':
 			items = re.findall(r'class\s+(\w+)', doc)
 			keywordMap['class'] = items
@@ -577,14 +574,12 @@ def parse_csharp_api_file(path):
 			items = re.findall(r'enum\s+(\w+)', doc)
 			keywordMap['enumeration'] = items
 			items = re.findall(r'\[(\w+)', doc)
-			keywordMap['attributes'].extend(items)
+			keywordMap['attributes'] = items
 			items = re.findall(r'delegate\s+\w+\s+(\w+)', doc)
 			keywordMap['class'].extend(items)
 		elif key == 'comment':
 			items = re.findall(r'<(\w+)', doc)
 			keywordMap['comment tag'] = items
-		else:
-			print('unknown:', key)
 
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
