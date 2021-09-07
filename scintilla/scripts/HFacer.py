@@ -14,18 +14,20 @@ def printHFile(f):
 	anyProvisional = False
 	for name in f.order:
 		v = f.features[name]
-		if v["Category"] != "Deprecated":
-			if v["Category"] == "Provisional" and previousCategory != "Provisional":
+		currentCategory = v["Category"]
+		if currentCategory != "Deprecated":
+			if currentCategory == "Provisional" and previousCategory != "Provisional":
 				out.append("#ifndef SCI_DISABLE_PROVISIONAL")
 				anyProvisional = True
-			previousCategory = v["Category"]
-			if v["FeatureType"] in ["fun", "get", "set"]:
+			previousCategory = currentCategory
+			featureType = v["FeatureType"]
+			if featureType in ["fun", "get", "set"]:
 				featureDefineName = "SCI_" + name.upper()
 				out.append("#define " + featureDefineName + " " + v["Value"])
-			elif v["FeatureType"] in ["evt"]:
+			elif featureType == "evt":
 				featureDefineName = "SCN_" + name.upper()
 				out.append("#define " + featureDefineName + " " + v["Value"])
-			elif v["FeatureType"] in ["val"]:
+			elif featureType == "val":
 				out.append("#define " + name + " " + v["Value"])
 	if anyProvisional:
 		out.append("#endif")

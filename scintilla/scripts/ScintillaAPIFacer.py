@@ -141,7 +141,7 @@ def HEnumerations(f):
 		v = f.features[name]
 		if v["Category"] != "Deprecated":
 			# Only want non-deprecated enumerations and lexers are not part of Scintilla API
-			if v["FeatureType"] in ["enu"] and name != "Lexer":
+			if v["FeatureType"] == "enu" and name != "Lexer":
 				out.append("")
 				prefixes = v["Value"].split()
 				#out.append("enum class " + name + " {" + " // " + ",".join(prefixes))
@@ -171,7 +171,7 @@ def HEnumerations(f):
 	for name in f.order:
 		v = f.features[name]
 		if v["Category"] != "Deprecated":
-			if v["FeatureType"] in ["evt"]:
+			if v["FeatureType"] == "evt":
 				out.append("\t" + name + " = " + v["Value"] + ",")
 	out.append("};")
 
@@ -188,13 +188,13 @@ def HConstants(f):
 	for _n, v in f.features.items():
 		if v["Category"] != "Deprecated":
 			# Only want non-deprecated enumerations and lexers are not part of Scintilla API
-			if v["FeatureType"] in ["enu"]:
+			if v["FeatureType"] == "enu":
 				allEnumPrefixes.extend(v["Value"].split())
 	for name in f.order:
 		v = f.features[name]
 		if v["Category"] != "Deprecated":
 			# Only want non-deprecated enumerations and lexers are not part of Scintilla API
-			if v["FeatureType"] in ["val"]:
+			if v["FeatureType"] == "val":
 				hasPrefix = False
 				for prefix in allEnumPrefixes:
 					if name.startswith(prefix):
@@ -213,8 +213,9 @@ def HMethods(f):
 	for name in f.order:
 		v = f.features[name]
 		if v["Category"] != "Deprecated":
-			if v["FeatureType"] in ["fun", "get", "set"]:
-				if v["FeatureType"] == "get" and name.startswith("Get"):
+			featureType = v["FeatureType"]
+			if featureType in ["fun", "get", "set"]:
+				if featureType == "get" and name.startswith("Get"):
 					name = name[len("Get"):]
 				retType = ActualTypeName(v["ReturnType"])
 				if IsEnumeration(retType):
@@ -234,9 +235,10 @@ def CXXMethods(f):
 	for name in f.order:
 		v = f.features[name]
 		if v["Category"] != "Deprecated":
-			if v["FeatureType"] in ["fun", "get", "set"]:
+			featureType = v["FeatureType"]
+			if featureType in ["fun", "get", "set"]:
 				msgName = "Message::" + name
-				if v["FeatureType"] == "get" and name.startswith("Get"):
+				if featureType == "get" and name.startswith("Get"):
 					name = name[len("Get"):]
 				retType = ActualTypeName(v["ReturnType"])
 				parameters, args, callName = ParametersArgsCallname(v)

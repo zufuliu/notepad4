@@ -17,9 +17,10 @@ def printLexHFile(f):
 	lex = set()
 	for name in f.order:
 		v = f.features[name]
-		if v["FeatureType"] in ["val"]:
+		if v["FeatureType"] == "val":
 			if "SCE_" in name or "SCLEX_" in name:
-				val = int(v["Value"].strip('()'))
+				value = v["Value"]
+				val = int(value)
 				if "SCLEX_" in name:
 					if val in lex:
 						raise Exception("Duplicate Lexer Value: %s = %d" % (name, val))
@@ -28,7 +29,7 @@ def printLexHFile(f):
 				else:
 					if val >= STYLE_DEFAULT and val <= STYLE_LASTPREDEFINED:
 						raise Exception("Invalid Style Value: %s = %d" % (name, val))
-				out.append("#define " + name + " " + v["Value"])
+				out.append("#define " + name + " " + value)
 	return out
 
 def RegenerateAll(root):

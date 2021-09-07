@@ -132,7 +132,7 @@ class Face:
 								value = value + 'U'
 						except ValueError:
 							print("Failure line %d: %s" % (lineno, featureVal))
-							raise Exception()
+							raise
 						self.features[name] = {
 							"FeatureType": featureType,
 							"Category": currentCategory,
