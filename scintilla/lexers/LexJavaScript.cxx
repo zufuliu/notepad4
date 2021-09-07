@@ -557,8 +557,12 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsInnerCommentStyle(int style) noexcept {
-	return style == SCE_JS_COMMENTTAGAT || style == SCE_JS_COMMENTTAGXML || style == SCE_JS_TASKMARKER;
+constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_JS_COMMENTBLOCK
+		|| style == SCE_JS_COMMENTBLOCKDOC
+		|| style == SCE_JS_COMMENTTAGAT
+		|| style == SCE_JS_COMMENTTAGXML
+		|| style == SCE_JS_TASKMARKER;
 }
 
 void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
@@ -595,9 +599,9 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		switch (style) {
 		case SCE_JS_COMMENTBLOCK:
 		case SCE_JS_COMMENTBLOCKDOC:
-			if (style != stylePrev && !IsInnerCommentStyle(stylePrev)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
-			} else if (style != styleNext && !IsInnerCommentStyle(styleNext)) {
+			} else if (!IsStreamCommentStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

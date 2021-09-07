@@ -516,13 +516,19 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_JAVA_ESCAPECHAR
-		|| style == SCE_JAVA_FORMAT_SPECIFIER
-		|| style == SCE_JAVA_PLACEHOLDER
+constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_JAVA_COMMENTBLOCK
+		|| style == SCE_JAVA_COMMENTBLOCKDOC
 		|| style == SCE_JAVA_COMMENTTAGAT
 		|| style == SCE_JAVA_COMMENTTAGHTML
 		|| style == SCE_JAVA_TASKMARKER;
+}
+
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_JAVA_TRIPLE_STRING
+		|| style == SCE_JAVA_ESCAPECHAR
+		|| style == SCE_JAVA_FORMAT_SPECIFIER
+		|| style == SCE_JAVA_PLACEHOLDER;
 }
 
 void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
@@ -556,10 +562,17 @@ void FoldJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		switch (style) {
 		case SCE_JAVA_COMMENTBLOCK:
 		case SCE_JAVA_COMMENTBLOCKDOC:
-		case SCE_JAVA_TRIPLE_STRING:
-			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
-			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
+			} else if (!IsStreamCommentStyle(styleNext)) {
+				levelNext--;
+			}
+			break;
+
+		case SCE_JAVA_TRIPLE_STRING:
+			if (!IsMultilineStringStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

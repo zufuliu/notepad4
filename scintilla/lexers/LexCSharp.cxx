@@ -663,8 +663,10 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_CSHARP_COMMENTTAG_XML
+constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_CSHARP_COMMENTBLOCK
+		|| style == SCE_CSHARP_COMMENTBLOCKDOC
+		|| style == SCE_CSHARP_COMMENTTAG_XML
 		|| style == SCE_CSHARP_TASKMARKER;
 }
 
@@ -703,9 +705,9 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		switch (style) {
 		case SCE_CSHARP_COMMENTBLOCK:
 		case SCE_CSHARP_COMMENTBLOCKDOC:
-			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
-			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
+			} else if (!IsStreamCommentStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

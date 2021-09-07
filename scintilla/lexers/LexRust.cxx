@@ -397,10 +397,6 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	sc.Complete();
 }
 
-constexpr bool IsStringInnerStyle(int style) noexcept {
-	return style == SCE_RUST_ESCAPECHAR || style == SCE_RUST_LINE_CONTINUATION;
-}
-
 struct FoldLineState {
 	int lineComment;
 	int pubUse;
@@ -409,6 +405,15 @@ struct FoldLineState {
 		pubUse((lineState >> 1) & 1) {
 	}
 };
+
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_RUST_STRING
+		|| style == SCE_RUST_BYTESTRING
+		|| style == SCE_RUST_RAW_STRING
+		|| style == SCE_RUST_RAW_BYTESTRING
+		|| style == SCE_RUST_ESCAPECHAR
+		|| style == SCE_RUST_LINE_CONTINUATION;
+}
 
 void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
@@ -458,9 +463,9 @@ void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		case SCE_RUST_BYTESTRING:
 		case SCE_RUST_RAW_STRING:
 		case SCE_RUST_RAW_BYTESTRING:
-			if (style != stylePrev && !IsStringInnerStyle(stylePrev)) {
+			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
-			} else if (style != styleNext && !IsStringInnerStyle(styleNext)) {
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

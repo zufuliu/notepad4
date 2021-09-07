@@ -751,8 +751,17 @@ constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & AHKLineStateMaskLineComment;
 }
 
-constexpr bool IsSectionInnerStyle(int style) noexcept {
-	return style == SCE_AHK_SECTION_COMMENT
+constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_AHK_COMMENTBLOCK
+		|| style == SCE_AHK_DIRECTIVE_AT
+		|| style == SCE_AHK_TASKMARKER;
+}
+
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_AHK_SECTION_SQ
+		|| style == SCE_AHK_SECTION_DQ
+		|| style == SCE_AHK_SECTION_NQ
+		|| style == SCE_AHK_SECTION_COMMENT
 		|| style == SCE_AHK_SECTION_OPTION
 		|| style == SCE_AHK_ESCAPECHAR
 		|| style == SCE_AHK_FORMAT_SPECIFIER
@@ -790,14 +799,20 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 		switch (style) {
 		case SCE_AHK_COMMENTBLOCK:
-			if (style != stylePrev) {
-				if (stylePrev != SCE_AHK_DIRECTIVE_AT) {
-					levelNext++;
-				}
-			} else if (style != styleNext) {
-				if (styleNext != SCE_AHK_DIRECTIVE_AT) {
-					levelNext--;
-				}
+			if (!IsStreamCommentStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsStreamCommentStyle(styleNext)) {
+				levelNext--;
+			}
+			break;
+
+		case SCE_AHK_SECTION_SQ:
+		case SCE_AHK_SECTION_DQ:
+		case SCE_AHK_SECTION_NQ:
+			if (!IsMultilineStringStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsMultilineStringStyle(styleNext)) {
+				levelNext--;
 			}
 			break;
 
@@ -809,20 +824,6 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				levelNext--;
 			}
 		} break;
-
-		case SCE_AHK_SECTION_SQ:
-		case SCE_AHK_SECTION_DQ:
-		case SCE_AHK_SECTION_NQ:
-			if (style != stylePrev) {
-				if (!IsSectionInnerStyle(stylePrev)) {
-					levelNext++;
-				}
-			} else if (style != styleNext) {
-				if (!IsSectionInnerStyle(styleNext)) {
-					levelNext--;
-				}
-			}
-			break;
 		}
 
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {

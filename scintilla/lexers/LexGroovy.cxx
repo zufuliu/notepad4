@@ -571,9 +571,17 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_GROOVY_ESCAPECHAR
-		|| style == SCE_GROOVY_COMMENTTAGAT || style == SCE_GROOVY_TASKMARKER;
+constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_GROOVY_COMMENTBLOCK
+		|| style == SCE_GROOVY_COMMENTBLOCKDOC
+		|| style == SCE_GROOVY_COMMENTTAGAT
+		|| style == SCE_GROOVY_COMMENTTAGHTML
+		|| style == SCE_GROOVY_TASKMARKER;
+}
+
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_GROOVY_TRIPLE_STRING_SQ
+		|| style == SCE_GROOVY_ESCAPECHAR;
 }
 
 void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
@@ -607,10 +615,17 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		switch (style) {
 		case SCE_GROOVY_COMMENTBLOCK:
 		case SCE_GROOVY_COMMENTBLOCKDOC:
-		case SCE_GROOVY_TRIPLE_STRING_SQ:
-			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
-			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
+			} else if (!IsStreamCommentStyle(styleNext)) {
+				levelNext--;
+			}
+			break;
+
+		case SCE_GROOVY_TRIPLE_STRING_SQ:
+			if (!IsMultilineStringStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

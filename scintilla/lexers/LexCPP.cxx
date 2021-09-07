@@ -1074,7 +1074,10 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC;
 }
 static constexpr bool IsInnerCommentStyle(int style) noexcept {
-	return style == SCE_C_COMMENTDOC_TAG || style == SCE_C_COMMENTDOC_TAG_XML;
+	return style == SCE_C_COMMENT
+		|| style == SCE_C_COMMENTDOC
+		|| style == SCE_C_COMMENTDOC_TAG
+		|| style == SCE_C_COMMENTDOC_TAG_XML;
 }
 static constexpr bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
@@ -1147,9 +1150,9 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				}
 			}
 			else if (IsStreamCommentStyle(style)) {
-				if (style != stylePrev && !IsInnerCommentStyle(stylePrev)) {
+				if (!IsInnerCommentStyle(stylePrev)) {
 					levelNext++;
-				} else if (style != styleNext && !IsInnerCommentStyle(styleNext)) {
+				} else if (!IsInnerCommentStyle(styleNext)) {
 					levelNext--;
 				}
 			}

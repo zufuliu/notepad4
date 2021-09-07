@@ -338,8 +338,11 @@ struct FoldLineState {
 	}
 };
 
-constexpr bool IsInnerStyle(int style) noexcept {
-	return style == SCE_HAXE_COMMENTTAGAT || style == SCE_HAXE_TASKMARKER;
+constexpr bool IsStreamCommentStyle(int style) noexcept {
+	return style == SCE_HAXE_COMMENTBLOCK
+		|| style == SCE_HAXE_COMMENTBLOCKDOC
+		|| style == SCE_HAXE_COMMENTTAGAT
+		|| style == SCE_HAXE_TASKMARKER;
 }
 
 void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
@@ -376,10 +379,17 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		switch (style) {
 		case SCE_HAXE_COMMENTBLOCK:
 		case SCE_HAXE_COMMENTBLOCKDOC:
-		case SCE_HAXE_REGEX:
-			if (style != stylePrev && !IsInnerStyle(stylePrev)) {
+			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
-			} else if (style != styleNext && !IsInnerStyle(styleNext)) {
+			} else if (!IsStreamCommentStyle(styleNext)) {
+				levelNext--;
+			}
+			break;
+
+		case SCE_HAXE_REGEX:
+			if (style != stylePrev) {
+				levelNext++;
+			} else if (style != styleNext) {
 				levelNext--;
 			}
 			break;
