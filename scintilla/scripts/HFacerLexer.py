@@ -15,18 +15,34 @@ def printLexHFile(f):
 
 	out = []
 	lex = set()
+	autoValue = 0
+	valueMap = {}
 	for name in f.order:
 		v = f.features[name]
-		if v["FeatureType"] == "val":
+		featureType = v["FeatureType"]
+		if featureType == "lex":
+			autoValue = 0
+			valueMap.clear()
+		elif featureType == "val":
 			if "SCE_" in name or "SCLEX_" in name:
 				value = v["Value"]
-				val = int(value)
 				if "SCLEX_" in name:
+					val = int(value)
 					if val in lex:
 						raise Exception("Duplicate Lexer Value: %s = %d" % (name, val))
 					else:
 						lex.add(val)
 				else:
+					if value == 'auto':
+						val = autoValue
+						value = str(val)
+					else:
+						val = int(value)
+					autoValue = val + 1
+					if autoValue == STYLE_DEFAULT:
+						autoValue = STYLE_LASTPREDEFINED + 1
+					if val in valueMap:
+						raise Exception("Duplicate Style Value: %s = %d, %s" % (name, val, valueMap[val]))
 					if val >= STYLE_DEFAULT and val <= STYLE_LASTPREDEFINED:
 						raise Exception("Invalid Style Value: %s = %d" % (name, val))
 				out.append("#define " + name + " " + value)
