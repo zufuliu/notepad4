@@ -62,9 +62,9 @@ const char *PropSetSimple::Get(std::string_view key) const {
 	return "";
 }
 
-int PropSetSimple::GetInt(std::string_view key, int defaultValue) const {
+int PropSetSimple::GetInt(const char *key, size_t keyLen, int defaultValue) const {
 	const mapss *props = PropsFromPointer(impl);
-	const auto it = props->find(key);
+	const auto it = props->find(std::string_view(key, keyLen));
 	if (it != props->end() && !it->second.empty()) {
 		defaultValue = atoi(it->second.c_str());
 	}

@@ -21,7 +21,12 @@ public:
 
 	bool Set(std::string_view key, std::string_view val);
 	const char *Get(std::string_view key) const;
-	int GetInt(std::string_view key, int defaultValue = 0) const;
+	int GetInt(const char *key, size_t keyLen, int defaultValue = 0) const;
+
+	template <size_t N>
+	int GetInt(const char (&key)[N], int defaultValue = 0) const {
+		return GetInt(key, N - 1, defaultValue);
+	}
 };
 
 }
