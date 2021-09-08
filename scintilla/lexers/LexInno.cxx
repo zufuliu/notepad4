@@ -36,6 +36,7 @@ enum {
 enum class InnoParameterState {
 	None,
 	Key,
+	Assign,
 	Value,
 };
 
@@ -129,7 +130,10 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '=' || sc.ch == ':') {
 				paramState = InnoParameterState::Value;
 				sc.SetState(SCE_INNO_OPERATOR);
-				sc.ForwardSetState( SCE_INNO_DEFAULT);
+				sc.ForwardSetState(SCE_INNO_DEFAULT);
+			} else if (IsASpaceOrTab(sc.ch)) {
+				paramState = InnoParameterState::Assign;
+				sc.SetState(SCE_INNO_DEFAULT);
 			} else if (!IsIdentifierChar(sc.ch)) {
 				paramState = InnoParameterState::Value;
 				sc.ChangeState(SCE_INNO_DEFAULT);
@@ -312,8 +316,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					lineState |= InnoLineStateLineComment;
 				}
 				sc.SetState(SCE_INNO_COMMENT);
-			} else if (sc.ch == '#' && visibleChars == 0) {
-				lineState &= ~InnoLineStateCodeSection;
+			} else if (sc.ch == '#' && visibleChars == 0 && !IsADigit(sc.chNext)) {
 				lineState |= InnoLineStatePreprocessor;
 				outerState = SCE_INNO_DEFAULT;
 				ppKind = PreprocessorKind::Init;
@@ -359,7 +362,16 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if ((visibleChars == 0 || paramState == InnoParameterState::Key) && IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_INNO_PARAMETER);
+			} else if (paramState == InnoParameterState::Assign) {
+				if (sc.ch == '=' || sc.ch == ':') {
+					paramState = InnoParameterState::Value;
+					sc.SetState(SCE_INNO_OPERATOR);
+				} else if (!IsASpaceOrTab(sc.ch)) {
+					paramState = InnoParameterState::Value;
+					goto labelParamValue;
+				}
 			} else if (paramState == InnoParameterState::Value) {
+labelParamValue:
 				if (sc.ch == ';') {
 					paramState = InnoParameterState::Key;
 					sc.SetState(SCE_INNO_OPERATOR);
