@@ -149,129 +149,136 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 			break;
 
+		case SCE_GROOVY_VARIABLE:
 		case SCE_GROOVY_IDENTIFIER:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
-				sc.GetCurrent(s, sizeof(s));
-				if (s[0] == '@') {
-					if (StrEqual(s, "@interface")) {
-						sc.ChangeState(SCE_GROOVY_WORD);
-						kwType = KeywordType::Annotation;
-					} else {
-						sc.ChangeState(SCE_GROOVY_ANNOTATION);
-						continue;
-					}
-				} else if (keywordLists[0]->InList(s)) {
-					const bool demoted = chBefore == '.' || chBefore == '&';
-					sc.ChangeState(demoted ? SCE_GROOVY_WORD_DEMOTED : SCE_GROOVY_WORD);
-					if (!demoted) {
-						if (StrEqual(s, "import")) {
-							if (visibleChars == sc.LengthCurrent()) {
-								lineStateLineType = GroovyLineStateMaskImport;
-							}
-						} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws", "as")) {
-							kwType = KeywordType::Class;
-						} else if (StrEqualsAny(s, "interface", "implements")) {
-							kwType = KeywordType::Interface;
-						} else if (StrEqual(s, "trait")) {
-							kwType = KeywordType::Trait;
-						} else if (StrEqual(s, "enum")) {
-							kwType = KeywordType::Enum;
-						} else if (StrEqual(s, "return")) {
-							kwType = KeywordType::Return;
-						} else if (StrEqualsAny(s, "if", "while")) {
-							// to avoid treating following code as type cast:
-							// if (identifier) expression, while (identifier) expression
-							kwType = KeywordType::While;
-						}
-						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
-							const int chNext = sc.GetDocNextChar();
-							if (!IsIdentifierStartEx(chNext)) {
-								kwType = KeywordType::None;
-							}
-						}
-					}
-				} else if (keywordLists[1]->InList(s)) {
-					sc.ChangeState(SCE_GROOVY_WORD2);
-				} else if (keywordLists[3]->InList(s)) {
-					sc.ChangeState(SCE_GROOVY_CLASS);
-				} else if (keywordLists[4]->InList(s)) {
-					sc.ChangeState(SCE_GROOVY_INTERFACE);
-				} else if (keywordLists[5]->InList(s)) {
-					sc.ChangeState(SCE_GROOVY_ENUM);
-				} else if (keywordLists[6]->InList(s)) {
-					sc.ChangeState(SCE_GROOVY_CONSTANT);
-				} else if (sc.ch == ':') {
-					if (sc.chNext == ':') {
-						// type::method
-						sc.ChangeState(SCE_GROOVY_CLASS);
-					} else if (bracketCount == 0 && nestedState.empty() && visibleChars == sc.LengthCurrent()) {
-						const int chNext = sc.GetDocNextChar(true);
-						if (IsADigit(chNext) || chNext == '\'' || chNext == '\"') {
-							sc.ChangeState(SCE_GROOVY_PROPERTY);
-						} else {
-							sc.ChangeState(SCE_GROOVY_LABEL);
-						}
-					} else {
-						sc.ChangeState(SCE_GROOVY_PROPERTY);
-					}
-				} else if (sc.ch != '.') {
-					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
-						sc.ChangeState(static_cast<int>(kwType));
-					} else {
-						const int chNext = sc.GetDocNextChar(sc.ch == ')');
-						if (sc.ch == ')') {
-							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != KeywordType::While && IsIdentifierCharEx(chNext)))) {
-								// (type)(expression)
-								// (type)expression, (type)++identifier, (type)--identifier
-								sc.ChangeState(SCE_GROOVY_CLASS);
-							}
-						} else if (chNext == '(' || IsADigit(chNext) || chNext == '\'' || chNext == '"') {
-							// property value
-							// method parameter
-							if (chNext == '(' && kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
-								// type method()
-								// type[] method()
-								// type<type> method()
-								sc.ChangeState(SCE_GROOVY_FUNCTION_DEFINITION);
-							} else {
-								sc.ChangeState(SCE_GROOVY_FUNCTION);
-							}
-						} else if (sc.Match('[', ']') || sc.Match('.', '&')
-							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
-							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
-							// type[] identifier
-							// type.&method
-							// type<>, type<?>, type<? super T>
-							// type<type>
-							// type<type<type>>
-							sc.ChangeState(SCE_GROOVY_CLASS);
-						} else if (IsIdentifierStartEx(chNext)) {
-							// type identifier
-							// method parameter
-							sc.ChangeState(IsLowerCase(s[0]) ? SCE_GROOVY_FUNCTION : SCE_GROOVY_CLASS);
-						} else if (chNext == '{' && IsLowerCase(s[0])) {
-							// block {}
-							sc.ChangeState(SCE_GROOVY_ACTION);
-						}
-					}
-				}
-				stylePrevNonWhite = sc.state;
-				if (sc.state != SCE_GROOVY_WORD && sc.ch != '.') {
-					kwType = KeywordType::None;
-				}
-				sc.SetState(SCE_GROOVY_DEFAULT);
-			}
-			break;
-
 		case SCE_GROOVY_ANNOTATION:
 		case SCE_GROOVY_ATTRIBUTE_AT:
-			if (sc.ch == '.' && sc.state == SCE_GROOVY_ANNOTATION) {
-				sc.SetState(SCE_GROOVY_OPERATOR);
-				sc.ForwardSetState(SCE_GROOVY_ANNOTATION);
-				continue;
-			}
 			if (!IsIdentifierCharEx(sc.ch)) {
+				switch (sc.state) {
+				case SCE_GROOVY_VARIABLE:
+					sc.SetState(escSeq.outerState);
+					continue;
+
+				case SCE_GROOVY_ANNOTATION:
+					if (sc.ch == '.') {
+						sc.SetState(SCE_GROOVY_OPERATOR);
+						sc.ForwardSetState(SCE_GROOVY_ANNOTATION);
+						continue;
+					}
+					break;
+
+				case SCE_GROOVY_IDENTIFIER: {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					if (s[0] == '@') {
+						if (StrEqual(s, "@interface")) {
+							sc.ChangeState(SCE_GROOVY_WORD);
+							kwType = KeywordType::Annotation;
+						} else {
+							sc.ChangeState(SCE_GROOVY_ANNOTATION);
+							continue;
+						}
+					} else if (keywordLists[0]->InList(s)) {
+						const bool demoted = chBefore == '.' || chBefore == '&';
+						sc.ChangeState(demoted ? SCE_GROOVY_WORD_DEMOTED : SCE_GROOVY_WORD);
+						if (!demoted) {
+							if (StrEqual(s, "import")) {
+								if (visibleChars == sc.LengthCurrent()) {
+									lineStateLineType = GroovyLineStateMaskImport;
+								}
+							} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws", "as")) {
+								kwType = KeywordType::Class;
+							} else if (StrEqualsAny(s, "interface", "implements")) {
+								kwType = KeywordType::Interface;
+							} else if (StrEqual(s, "trait")) {
+								kwType = KeywordType::Trait;
+							} else if (StrEqual(s, "enum")) {
+								kwType = KeywordType::Enum;
+							} else if (StrEqual(s, "return")) {
+								kwType = KeywordType::Return;
+							} else if (StrEqualsAny(s, "if", "while")) {
+								// to avoid treating following code as type cast:
+								// if (identifier) expression, while (identifier) expression
+								kwType = KeywordType::While;
+							}
+							if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+								const int chNext = sc.GetDocNextChar();
+								if (!IsIdentifierStartEx(chNext)) {
+									kwType = KeywordType::None;
+								}
+							}
+						}
+					} else if (keywordLists[1]->InList(s)) {
+						sc.ChangeState(SCE_GROOVY_WORD2);
+					} else if (keywordLists[3]->InList(s)) {
+						sc.ChangeState(SCE_GROOVY_CLASS);
+					} else if (keywordLists[4]->InList(s)) {
+						sc.ChangeState(SCE_GROOVY_INTERFACE);
+					} else if (keywordLists[5]->InList(s)) {
+						sc.ChangeState(SCE_GROOVY_ENUM);
+					} else if (keywordLists[6]->InList(s)) {
+						sc.ChangeState(SCE_GROOVY_CONSTANT);
+					} else if (sc.ch == ':') {
+						if (sc.chNext == ':') {
+							// type::method
+							sc.ChangeState(SCE_GROOVY_CLASS);
+						} else if (bracketCount == 0 && nestedState.empty() && visibleChars == sc.LengthCurrent()) {
+							const int chNext = sc.GetDocNextChar(true);
+							if (IsADigit(chNext) || chNext == '\'' || chNext == '\"') {
+								sc.ChangeState(SCE_GROOVY_PROPERTY);
+							} else {
+								sc.ChangeState(SCE_GROOVY_LABEL);
+							}
+						} else {
+							sc.ChangeState(SCE_GROOVY_PROPERTY);
+						}
+					} else if (sc.ch != '.') {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+							sc.ChangeState(static_cast<int>(kwType));
+						} else {
+							const int chNext = sc.GetDocNextChar(sc.ch == ')');
+							if (sc.ch == ')') {
+								if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != KeywordType::While && IsIdentifierCharEx(chNext)))) {
+									// (type)(expression)
+									// (type)expression, (type)++identifier, (type)--identifier
+									sc.ChangeState(SCE_GROOVY_CLASS);
+								}
+							} else if (chNext == '(' || IsADigit(chNext) || chNext == '\'' || chNext == '"') {
+								// property value
+								// method parameter
+								if (chNext == '(' && kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+									// type method()
+									// type[] method()
+									// type<type> method()
+									sc.ChangeState(SCE_GROOVY_FUNCTION_DEFINITION);
+								} else {
+									sc.ChangeState(SCE_GROOVY_FUNCTION);
+								}
+							} else if (sc.Match('[', ']') || sc.Match('.', '&')
+								|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
+								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+								// type[] identifier
+								// type.&method
+								// type<>, type<?>, type<? super T>
+								// type<type>
+								// type<type<type>>
+								sc.ChangeState(SCE_GROOVY_CLASS);
+							} else if (IsIdentifierStartEx(chNext)) {
+								// type identifier
+								// method parameter
+								sc.ChangeState(IsLowerCase(s[0]) ? SCE_GROOVY_FUNCTION : SCE_GROOVY_CLASS);
+							} else if (chNext == '{' && IsLowerCase(s[0])) {
+								// block {}
+								sc.ChangeState(SCE_GROOVY_ACTION);
+							}
+						}
+					}
+					stylePrevNonWhite = sc.state;
+					if (sc.state != SCE_GROOVY_WORD && sc.ch != '.') {
+						kwType = KeywordType::None;
+					}
+				} break;
+				}
 				sc.SetState(SCE_GROOVY_DEFAULT);
 			}
 			break;
@@ -386,7 +393,6 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 			} else if (sc.ch == '"' && (sc.state == SCE_GROOVY_STRING_DQ || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_GROOVY_TRIPLE_STRING_DQ) {
-					sc.SetState(SCE_GROOVY_TRIPLE_STRING_DQEND);
 					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
@@ -409,7 +415,6 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_GROOVY_VARIABLE);
 				}
 			} else if (sc.ch == '/') {
-				sc.SetState(SCE_GROOVY_SLASHY_STRINGEND);
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
 			}
 			break;
@@ -430,7 +435,6 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					continue;
 				}
 			} else if (sc.Match('/', '$')) {
-				sc.SetState(SCE_GROOVY_SLASHY_STRINGEND);
 				sc.Forward();
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
 			}
@@ -438,13 +442,6 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_GROOVY_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				sc.SetState(escSeq.outerState);
-				continue;
-			}
-			break;
-
-		case SCE_GROOVY_VARIABLE:
-			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 				continue;
 			}
@@ -470,20 +467,18 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					continue;
 				} else {
 					if (IsSlashyStringStart(chPrevNonWhite, stylePrevNonWhite)) {
-						sc.SetState(SCE_GROOVY_SLASHY_STRINGSTART);
-						sc.ForwardSetState(SCE_GROOVY_SLASHY_STRING);
-						continue;
+						sc.SetState(SCE_GROOVY_SLASHY_STRING);
+					} else {
+						sc.SetState(SCE_GROOVY_OPERATOR);
 					}
-					sc.SetState(SCE_GROOVY_OPERATOR);
 				}
 			} else if (sc.ch == '\"') {
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_GROOVY_TRIPLE_STRING_DQSTART);
+					sc.SetState(SCE_GROOVY_TRIPLE_STRING_DQ);
 					sc.Advance(2);
-					sc.ForwardSetState(SCE_GROOVY_TRIPLE_STRING_DQ);
-					continue;
+				} else {
+					sc.SetState(SCE_GROOVY_STRING_DQ);
 				}
-				sc.SetState(SCE_GROOVY_STRING_DQ);
 			} else if (sc.ch == '\'') {
 				if (sc.MatchNext('\'', '\'')) {
 					sc.SetState(SCE_GROOVY_TRIPLE_STRING_SQ);
@@ -492,9 +487,8 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_GROOVY_STRING_SQ);
 				}
 			} else if (sc.Match('$', '/')) {
-				sc.SetState(SCE_GROOVY_SLASHY_STRINGSTART);
-				sc.Forward();
-				sc.ForwardSetState(SCE_GROOVY_DOLLAR_SLASHY);
+				sc.SetState(SCE_GROOVY_DOLLAR_SLASHY);
+				sc.Advance(2);
 			} else if (sc.ch == '+' || sc.ch == '-') {
 				if (sc.ch == sc.chNext) {
 					sc.SetState(SCE_GROOVY_OPERATOR_PF);
@@ -581,6 +575,11 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 
 constexpr bool IsMultilineStringStyle(int style) noexcept {
 	return style == SCE_GROOVY_TRIPLE_STRING_SQ
+		|| style == SCE_GROOVY_TRIPLE_STRING_DQ
+		|| style == SCE_GROOVY_SLASHY_STRING
+		|| style == SCE_GROOVY_DOLLAR_SLASHY
+		|| style == SCE_GROOVY_OPERATOR2
+		|| style == SCE_GROOVY_VARIABLE
 		|| style == SCE_GROOVY_ESCAPECHAR;
 }
 
@@ -623,23 +622,12 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_GROOVY_TRIPLE_STRING_SQ:
+		case SCE_GROOVY_TRIPLE_STRING_DQ:
+		case SCE_GROOVY_SLASHY_STRING:
+		case SCE_GROOVY_DOLLAR_SLASHY:
 			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsMultilineStringStyle(styleNext)) {
-				levelNext--;
-			}
-			break;
-
-		case SCE_GROOVY_TRIPLE_STRING_DQSTART:
-		case SCE_GROOVY_SLASHY_STRINGSTART:
-			if (style != stylePrev) {
-				levelNext++;
-			}
-			break;
-
-		case SCE_GROOVY_TRIPLE_STRING_DQEND:
-		case SCE_GROOVY_SLASHY_STRINGEND:
-			if (style != styleNext) {
 				levelNext--;
 			}
 			break;

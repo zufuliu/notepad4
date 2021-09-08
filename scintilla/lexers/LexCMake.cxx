@@ -226,9 +226,14 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_CMAKE_VARIABLE_DOLLAR:
+		case SCE_CMAKE_VARIABLE_AT:
 			if (!IsIdentifierChar(sc.ch)) {
 				bool done = false;
-				if (sc.ch == '{') {
+				if (sc.state == SCE_CMAKE_VARIABLE_AT) {
+					if (sc.ch == '@') {
+						sc.Forward();
+					}
+				} else if (sc.ch == '{') {
 					char s[8];
 					sc.GetCurrent(s, sizeof(s));
 					if (StrEqualsAny(s, "$ENV", "$CACHE")) {
@@ -242,18 +247,6 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					if (outerStyle != SCE_CMAKE_DEFAULT) {
 						continue;
 					}
-				}
-			}
-			break;
-
-		case SCE_CMAKE_VARIABLE_AT:
-			if (!IsIdentifierChar(sc.ch)) {
-				if (sc.ch == '@') {
-					sc.Forward();
-				}
-				sc.SetState(outerStyle);
-				if (outerStyle != SCE_CMAKE_DEFAULT) {
-					continue;
 				}
 			}
 			break;

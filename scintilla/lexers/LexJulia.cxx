@@ -70,8 +70,8 @@ constexpr bool IsJuliaRegexFlag(int ch) noexcept {
 }
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JULIA_STRING);
-static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JULIA_TRIPLE_STRING);
-static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JULIA_BACKTICKS);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JULIA_BACKTICKS);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JULIA_TRIPLE_STRING);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_JULIA_TRIPLE_BACKTICKS);
 
 void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -128,68 +128,66 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_JULIA_IDENTIFIER:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
-				sc.GetCurrent(s, sizeof(s));
-				if (keywordLists[0]->InList(s)) {
-					if (StrEqual(s, "type")) {
-						// only in `abstract type` or `primitive type`
-						if (kwType == SCE_JULIA_WORD) {
-							sc.ChangeState(SCE_JULIA_WORD);
-							kwType = SCE_JULIA_TYPE;
-						}
-					} else if (braceCount > 0 || (chBeforeIdentifier == '.' || chBeforeIdentifier == ':' || sc.ch == '.' || sc.ch == ':')) {
-						sc.ChangeState(SCE_JULIA_WORD_DEMOTED);
-					} else {
-						isTransposeOperator = false;
-						sc.ChangeState(SCE_JULIA_WORD);
-						if (StrEqual(s, "struct")) {
-							kwType = SCE_JULIA_TYPE;
-						} else if (StrEqual(s, "macro")) {
-							kwType = SCE_JULIA_MACRO;
-						} else if (StrEqual(s, "function")) {
-							kwType = SCE_JULIA_FUNCTION_DEFINITION;
-						} else if (StrEqualsAny(s, "abstract", "primitive")) {
-							kwType = SCE_JULIA_WORD;
-						}
-					}
-				} else if (keywordLists[2]->InList(s)) {
-					sc.ChangeState(SCE_JULIA_TYPE);
-				} else if (keywordLists[3]->InList(s)) {
-					sc.ChangeState(SCE_JULIA_CONSTANT);
-				} else if (keywordLists[4]->InListPrefixed(s, '(')) {
-					sc.ChangeState(SCE_JULIA_BASIC_FUNCTION);
-				} else if (kwType != SCE_JULIA_DEFAULT && kwType != SCE_JULIA_WORD) {
-					sc.ChangeState(kwType);
-					if (kwType == SCE_JULIA_FUNCTION_DEFINITION && sc.ch == '!') {
-						sc.Forward();
-					}
-				} else {
-					const int chNext = sc.GetDocNextChar();
-					if (sc.ch == '!' || chNext == '(') {
-						sc.ChangeState(SCE_JULIA_FUNCTION);
-						if (sc.ch == '!') {
-							sc.Forward();
-						}
-					} else if (maybeType || chNext == '{') {
-						sc.ChangeState(SCE_JULIA_TYPE);
-					}
-				}
-				if (sc.state != SCE_JULIA_WORD) {
-					kwType = SCE_JULIA_DEFAULT;
-				}
-				maybeType = false;
-				sc.SetState(SCE_JULIA_DEFAULT);
-			}
-			break;
-
+		case SCE_JULIA_VARIABLE2:
 		case SCE_JULIA_VARIABLE:
 		case SCE_JULIA_MACRO:
 		case SCE_JULIA_SYMBOL:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				if (sc.state == SCE_JULIA_VARIABLE && escSeq.outerState != SCE_JULIA_DEFAULT) {
+				if (sc.state == SCE_JULIA_VARIABLE2) {
 					sc.SetState(escSeq.outerState);
 					continue;
+				}
+				if (sc.state == SCE_JULIA_IDENTIFIER) {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					if (keywordLists[0]->InList(s)) {
+						if (StrEqual(s, "type")) {
+							// only in `abstract type` or `primitive type`
+							if (kwType == SCE_JULIA_WORD) {
+								sc.ChangeState(SCE_JULIA_WORD);
+								kwType = SCE_JULIA_TYPE;
+							}
+						} else if (braceCount > 0 || (chBeforeIdentifier == '.' || chBeforeIdentifier == ':' || sc.ch == '.' || sc.ch == ':')) {
+							sc.ChangeState(SCE_JULIA_WORD_DEMOTED);
+						} else {
+							isTransposeOperator = false;
+							sc.ChangeState(SCE_JULIA_WORD);
+							if (StrEqual(s, "struct")) {
+								kwType = SCE_JULIA_TYPE;
+							} else if (StrEqual(s, "macro")) {
+								kwType = SCE_JULIA_MACRO;
+							} else if (StrEqual(s, "function")) {
+								kwType = SCE_JULIA_FUNCTION_DEFINITION;
+							} else if (StrEqualsAny(s, "abstract", "primitive")) {
+								kwType = SCE_JULIA_WORD;
+							}
+						}
+					} else if (keywordLists[2]->InList(s)) {
+						sc.ChangeState(SCE_JULIA_TYPE);
+					} else if (keywordLists[3]->InList(s)) {
+						sc.ChangeState(SCE_JULIA_CONSTANT);
+					} else if (keywordLists[4]->InListPrefixed(s, '(')) {
+						sc.ChangeState(SCE_JULIA_BASIC_FUNCTION);
+					} else if (kwType != SCE_JULIA_DEFAULT && kwType != SCE_JULIA_WORD) {
+						sc.ChangeState(kwType);
+						if (kwType == SCE_JULIA_FUNCTION_DEFINITION && sc.ch == '!') {
+							sc.Forward();
+						}
+					} else {
+						const int chNext = sc.GetDocNextChar();
+						if (sc.ch == '!' || chNext == '(') {
+							sc.ChangeState(SCE_JULIA_FUNCTION);
+							if (sc.ch == '!') {
+								sc.Forward();
+							}
+						} else if (maybeType || chNext == '{') {
+							sc.ChangeState(SCE_JULIA_TYPE);
+						}
+					}
+					if (sc.state != SCE_JULIA_WORD) {
+						kwType = SCE_JULIA_DEFAULT;
+					}
+					maybeType = false;
 				}
 				sc.SetState(SCE_JULIA_DEFAULT);
 			}
@@ -212,12 +210,11 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Forward();
 				} else if (IsIdentifierStartEx(sc.chNext)) {
 					escSeq.outerState = sc.state;
-					sc.SetState(SCE_JULIA_VARIABLE);
+					sc.SetState(SCE_JULIA_VARIABLE2);
 				}
 			} else if ((sc.ch == '"' && (sc.state == SCE_JULIA_STRING || (sc.state == SCE_JULIA_TRIPLE_STRING && sc.MatchNext('"', '"'))))
 				|| (sc.ch == '`' && (sc.state == SCE_JULIA_BACKTICKS || (sc.state == SCE_JULIA_TRIPLE_BACKTICKS && sc.MatchNext('`', '`'))))) {
 				if (sc.state == SCE_JULIA_TRIPLE_STRING || sc.state == SCE_JULIA_TRIPLE_BACKTICKS) {
-					sc.SetState((sc.state == SCE_JULIA_TRIPLE_STRING) ? SCE_JULIA_TRIPLE_STRINGEND : SCE_JULIA_TRIPLE_BACKTICKSEND);
 					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_JULIA_DEFAULT);
@@ -323,22 +320,20 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if (sc.ch == '\"') {
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_JULIA_TRIPLE_STRINGSTART);
+					sc.SetState(SCE_JULIA_TRIPLE_STRING);
 					sc.Advance(2);
-					sc.ForwardSetState(SCE_JULIA_TRIPLE_STRING);
-					continue;
+				} else {
+					sc.SetState(SCE_JULIA_STRING);
 				}
-				sc.SetState(SCE_JULIA_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_JULIA_CHARACTER);
 			} else if (sc.ch == '`') {
 				if (sc.MatchNext('`', '`')) {
-					sc.SetState(SCE_JULIA_TRIPLE_BACKTICKSSTART);
+					sc.SetState(SCE_JULIA_TRIPLE_BACKTICKS);
 					sc.Advance(2);
-					sc.ForwardSetState(SCE_JULIA_TRIPLE_BACKTICKS);
-					continue;
+				} else {
+					sc.SetState(SCE_JULIA_BACKTICKS);
 				}
-				sc.SetState(SCE_JULIA_BACKTICKS);
 			} else if (sc.Match('r', '\"')) {
 				sc.SetState(SCE_JULIA_REGEX);
 				sc.Forward();
@@ -365,7 +360,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (symbol && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_JULIA_SYMBOL);
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				escSeq.outerState = SCE_JULIA_DEFAULT;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_VARIABLE);
 			} else if (sc.ch == '0') {
@@ -437,12 +431,22 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	sc.Complete();
 }
 
-constexpr bool IsStringInnerStyle(int style) noexcept {
-	return style == SCE_JULIA_ESCAPECHAR;
-}
-
 constexpr int GetLineCommentState(int lineState) noexcept {
 	return lineState & SimpleLineStateMaskLineComment;
+}
+
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_JULIA_STRING
+		|| style == SCE_JULIA_TRIPLE_STRING
+		|| style == SCE_JULIA_BACKTICKS
+		|| style == SCE_JULIA_TRIPLE_BACKTICKS
+		|| style == SCE_JULIA_RAWSTRING
+		|| style == SCE_JULIA_TRIPLE_RAWSTRING
+		|| style == SCE_JULIA_BYTESTRING
+		|| style == SCE_JULIA_TRIPLE_BYTESTRING
+		|| style == SCE_JULIA_OPERATOR2
+		|| style == SCE_JULIA_VARIABLE2
+		|| style == SCE_JULIA_ESCAPECHAR;
 }
 
 void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -510,29 +514,26 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			}
 			break;
 
-		case SCE_JULIA_TRIPLE_STRINGSTART:
-		case SCE_JULIA_TRIPLE_BACKTICKSSTART:
-			if (style != stylePrev) {
-				levelNext++;
-			}
-			break;
-
-		case SCE_JULIA_TRIPLE_STRINGEND:
-		case SCE_JULIA_TRIPLE_BACKTICKSEND:
-			if (style != styleNext) {
-				levelNext--;
-			}
-			break;
-
+		case SCE_JULIA_STRING:
+		case SCE_JULIA_TRIPLE_STRING:
+		case SCE_JULIA_BACKTICKS:
+		case SCE_JULIA_TRIPLE_BACKTICKS:
 		case SCE_JULIA_RAWSTRING:
 		case SCE_JULIA_TRIPLE_RAWSTRING:
 		case SCE_JULIA_BYTESTRING:
 		case SCE_JULIA_TRIPLE_BYTESTRING:
+			if (!IsMultilineStringStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsMultilineStringStyle(styleNext)) {
+				levelNext--;
+			}
+			break;
+
 		case SCE_JULIA_REGEX:
 		case SCE_JULIA_TRIPLE_REGEX:
-			if (style != stylePrev && !IsStringInnerStyle(stylePrev)) {
+			if (style != stylePrev) {
 				levelNext++;
-			} else if (style != styleNext && !IsStringInnerStyle(styleNext)) {
+			} else if (style != styleNext) {
 				levelNext--;
 			}
 			break;

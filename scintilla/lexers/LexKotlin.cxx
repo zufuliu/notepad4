@@ -117,90 +117,92 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 			break;
 
-		case SCE_KOTLIN_IDENTIFIER:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
-				sc.GetCurrent(s, sizeof(s));
-				if (keywordLists[0]->InList(s)) {
-					sc.ChangeState(SCE_KOTLIN_WORD);
-					if (StrEqual(s, "import")) {
-						if (visibleChars == sc.LengthCurrent()) {
-							lineStateLineType = KotlinLineStateMaskImport;
-						}
-					} else if (StrEqualsAny(s, "break", "continue", "return", "this", "super")) {
-						kwType = KeywordType::Label;
-					} else if (StrEqualsAny(s, "class", "typealias")) {
-						if (!(kwType == KeywordType::Annotation || kwType == KeywordType::Enum)) {
-							kwType = KeywordType::Class;
-						}
-					} else if (StrEqual(s, "enum")) {
-						kwType = KeywordType::Enum;
-					} else if (StrEqual(s, "annotation")) {
-						kwType = KeywordType::Annotation;
-					} else if (StrEqual(s, "interface")) {
-						kwType = KeywordType::Interface;
-					} else if (StrEqual(s, "return")) {
-						kwType = KeywordType::Return;
-					}
-					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
-						const int chNext = sc.GetDocNextChar();
-						if (!((kwType == KeywordType::Label) ? (chNext == '@') : IsIdentifierStartEx(chNext))) {
-							kwType = KeywordType::None;
-						}
-					}
-				} else if (sc.ch == '@') {
-					sc.ChangeState(SCE_KOTLIN_LABEL);
-					sc.Forward();
-				} else if (keywordLists[1]->InList(s)) {
-					sc.ChangeState(SCE_KOTLIN_CLASS);
-				} else if (keywordLists[2]->InList(s)) {
-					sc.ChangeState(SCE_KOTLIN_INTERFACE);
-				} else if (keywordLists[3]->InList(s)) {
-					sc.ChangeState(SCE_KOTLIN_ENUM);
-				} else if (sc.ch != '.') {
-					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
-						sc.ChangeState(static_cast<int>(kwType));
-					} else {
-						const int chNext = sc.GetDocNextChar(sc.ch == '?');
-						if (chNext == '(') {
-							// type function()
-							// type[] function()
-							// type<type> function()
-							if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
-								sc.ChangeState(SCE_KOTLIN_FUNCTION_DEFINITION);
-							} else {
-								sc.ChangeState(SCE_KOTLIN_FUNCTION);
-							}
-						} else if (sc.Match(':', ':')
-							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
-							// type::class
-							// type<type>
-							// type<type?>
-							// type<type<type>>
-							sc.ChangeState(SCE_KOTLIN_CLASS);
-						}
-					}
-				}
-				if (sc.state != SCE_KOTLIN_WORD && sc.ch != '.') {
-					kwType = KeywordType::None;
-				}
-				sc.SetState(SCE_KOTLIN_DEFAULT);
-			}
-			break;
-
+		case SCE_KOTLIN_VARIABLE:
 		case SCE_KOTLIN_LABEL:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				sc.SetState(SCE_KOTLIN_DEFAULT);
-			}
-			break;
-
+		case SCE_KOTLIN_IDENTIFIER:
 		case SCE_KOTLIN_ANNOTATION:
-			if (sc.ch == '.' || sc.ch == ':') {
-				sc.SetState(SCE_KOTLIN_OPERATOR);
-				sc.ForwardSetState(SCE_KOTLIN_ANNOTATION);
-				continue;
-			}
 			if (!IsIdentifierCharEx(sc.ch)) {
+				switch (sc.state) {
+				case SCE_KOTLIN_VARIABLE:
+					sc.SetState(escSeq.outerState);
+					continue;
+
+				case SCE_KOTLIN_ANNOTATION:
+					if (sc.ch == '.' || sc.ch == ':') {
+						sc.SetState(SCE_KOTLIN_OPERATOR);
+						sc.ForwardSetState(SCE_KOTLIN_ANNOTATION);
+						continue;
+					}
+					break;
+
+				case SCE_KOTLIN_IDENTIFIER: {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					if (keywordLists[0]->InList(s)) {
+						sc.ChangeState(SCE_KOTLIN_WORD);
+						if (StrEqual(s, "import")) {
+							if (visibleChars == sc.LengthCurrent()) {
+								lineStateLineType = KotlinLineStateMaskImport;
+							}
+						} else if (StrEqualsAny(s, "break", "continue", "return", "this", "super")) {
+							kwType = KeywordType::Label;
+						} else if (StrEqualsAny(s, "class", "typealias")) {
+							if (!(kwType == KeywordType::Annotation || kwType == KeywordType::Enum)) {
+								kwType = KeywordType::Class;
+							}
+						} else if (StrEqual(s, "enum")) {
+							kwType = KeywordType::Enum;
+						} else if (StrEqual(s, "annotation")) {
+							kwType = KeywordType::Annotation;
+						} else if (StrEqual(s, "interface")) {
+							kwType = KeywordType::Interface;
+						} else if (StrEqual(s, "return")) {
+							kwType = KeywordType::Return;
+						}
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+							const int chNext = sc.GetDocNextChar();
+							if (!((kwType == KeywordType::Label) ? (chNext == '@') : IsIdentifierStartEx(chNext))) {
+								kwType = KeywordType::None;
+							}
+						}
+					} else if (sc.ch == '@') {
+						sc.ChangeState(SCE_KOTLIN_LABEL);
+						sc.Forward();
+					} else if (keywordLists[1]->InList(s)) {
+						sc.ChangeState(SCE_KOTLIN_CLASS);
+					} else if (keywordLists[2]->InList(s)) {
+						sc.ChangeState(SCE_KOTLIN_INTERFACE);
+					} else if (keywordLists[3]->InList(s)) {
+						sc.ChangeState(SCE_KOTLIN_ENUM);
+					} else if (sc.ch != '.') {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+							sc.ChangeState(static_cast<int>(kwType));
+						} else {
+							const int chNext = sc.GetDocNextChar(sc.ch == '?');
+							if (chNext == '(') {
+								// type function()
+								// type[] function()
+								// type<type> function()
+								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+									sc.ChangeState(SCE_KOTLIN_FUNCTION_DEFINITION);
+								} else {
+									sc.ChangeState(SCE_KOTLIN_FUNCTION);
+								}
+							} else if (sc.Match(':', ':')
+								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+								// type::class
+								// type<type>
+								// type<type?>
+								// type<type<type>>
+								sc.ChangeState(SCE_KOTLIN_CLASS);
+							}
+						}
+					}
+					if (sc.state != SCE_KOTLIN_WORD && sc.ch != '.') {
+						kwType = KeywordType::None;
+					}
+				} break;
+				}
 				sc.SetState(SCE_KOTLIN_DEFAULT);
 			}
 			break;
@@ -259,7 +261,6 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 			} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_KOTLIN_RAWSTRING) {
-					sc.SetState(SCE_KOTLIN_RAWSTRINGEND);
 					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
@@ -281,13 +282,6 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_KOTLIN_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				sc.SetState(escSeq.outerState);
-				continue;
-			}
-			break;
-
-		case SCE_KOTLIN_VARIABLE:
-			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 				continue;
 			}
@@ -322,12 +316,11 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 			if (sc.ch == '\"') {
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_KOTLIN_RAWSTRINGSTART);
+					sc.SetState(SCE_KOTLIN_RAWSTRING);
 					sc.Advance(2);
-					sc.ForwardSetState(SCE_KOTLIN_RAWSTRING);
-					continue;
+				} else {
+					sc.SetState(SCE_KOTLIN_STRING);
 				}
-				sc.SetState(SCE_KOTLIN_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_KOTLIN_CHARACTER);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
@@ -390,6 +383,13 @@ struct FoldLineState {
 	}
 };
 
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_KOTLIN_RAWSTRING
+		|| style == SCE_KOTLIN_OPERATOR2
+		|| style == SCE_KOTLIN_ESCAPECHAR
+		|| style == SCE_KOTLIN_VARIABLE;
+}
+
 void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -433,14 +433,10 @@ void FoldKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			}
 		} break;
 
-		case SCE_KOTLIN_RAWSTRINGSTART:
-			if (style != stylePrev) {
+		case SCE_KOTLIN_RAWSTRING:
+			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
-			}
-			break;
-
-		case SCE_KOTLIN_RAWSTRINGEND:
-			if (style != styleNext) {
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

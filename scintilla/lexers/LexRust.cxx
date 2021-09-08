@@ -120,81 +120,78 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_RUST_IDENTIFIER:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				if (lineStateAttribute) {
-					sc.ChangeState(SCE_RUST_ATTRIBUTE);
-				} else if (sc.ch == '!') {
-					sc.ChangeState(SCE_RUST_MACRO);
-					sc.Forward();
-				} else {
-					char s[128];
-					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[0]->InList(s)) {
-						sc.ChangeState(SCE_RUST_WORD);
-						if (StrEqual(s, "struct")) {
-							kwType = SCE_RUST_STRUCT;
-						} else if (StrEqual(s, "fn")) {
-							kwType = SCE_RUST_FUNCTION_DEFINITION;
-						} else if (StrEqual(s, "trait")) {
-							kwType = SCE_RUST_TRAIT;
-						} else if (StrEqual(s, "enum")) {
-							kwType = SCE_RUST_ENUMERATION;
-						} else if (StrEqual(s, "type")) {
-							kwType = SCE_RUST_TYPE; // type alias
-						} else if (StrEqual(s, "const")) {
-							kwType = SCE_RUST_CONSTANT;
-						} else if (StrEqual(s, "union")) {
-							kwType = SCE_RUST_UNION;
-						}
-						if (kwType != SCE_RUST_DEFAULT) {
-							const int chNext = sc.GetDocNextChar();
-							if (!IsIdentifierStartEx(chNext)) {
-								kwType = SCE_RUST_DEFAULT;
-							}
-						}
-						if ((visibleChars == 3 || visibleChars == 6) && StrEqual(s, "use")) {
-							lineStateLineType = RustLineStateMaskPubUse;
-						}
-					} else if (keywordLists[1]->InList(s)) {
-						sc.ChangeState(SCE_RUST_WORD2);
-					} else if (keywordLists[2]->InList(s)) {
-						sc.ChangeState(SCE_RUST_TYPE);
-					} else if (keywordLists[3]->InList(s)) {
-						sc.ChangeState(SCE_RUST_STRUCT);
-					} else if (keywordLists[4]->InList(s)) {
-						sc.ChangeState(SCE_RUST_TRAIT);
-					} else if (keywordLists[5]->InList(s)) {
-						sc.ChangeState(SCE_RUST_ENUMERATION);
-					} else if (keywordLists[6]->InList(s)) {
-						sc.ChangeState(SCE_RUST_UNION);
-					} else if (keywordLists[7]->InList(s)) {
-						sc.ChangeState(SCE_RUST_CONSTANT);
-					} else if (sc.ch != '.') {
-						const int chNext = sc.GetDocNextChar();
-						if (chNext == '(') {
-							sc.ChangeState((kwType == SCE_RUST_FUNCTION_DEFINITION)? kwType : SCE_RUST_FUNCTION);
-						} else if (chNext == '!') {
-							sc.ChangeState(SCE_RUST_MACRO);
-						} else if (kwType != SCE_RUST_DEFAULT) {
-							if (kwType != SCE_RUST_CONSTANT || chNext == ':') {
-								sc.ChangeState(kwType);
-							} else if (chBeforeIdentifier == '[' && sc.ch == ';') {
-								// array: [T; N]
-								sc.ChangeState(SCE_RUST_TYPE);
-							}
-						}
-					}
-				}
-				if (sc.state != SCE_RUST_WORD && sc.ch != '.') {
-					kwType = SCE_RUST_DEFAULT;
-				}
-				sc.SetState(SCE_RUST_DEFAULT);
-			}
-			break;
-
 		case SCE_RUST_VARIABLE:
 		case SCE_RUST_LIFETIME:
 			if (!IsIdentifierCharEx(sc.ch)) {
+				if (sc.state == SCE_RUST_IDENTIFIER) {
+					if (lineStateAttribute) {
+						sc.ChangeState(SCE_RUST_ATTRIBUTE);
+					} else if (sc.ch == '!') {
+						sc.ChangeState(SCE_RUST_MACRO);
+						sc.Forward();
+					} else {
+						char s[128];
+						sc.GetCurrent(s, sizeof(s));
+						if (keywordLists[0]->InList(s)) {
+							sc.ChangeState(SCE_RUST_WORD);
+							if (StrEqual(s, "struct")) {
+								kwType = SCE_RUST_STRUCT;
+							} else if (StrEqual(s, "fn")) {
+								kwType = SCE_RUST_FUNCTION_DEFINITION;
+							} else if (StrEqual(s, "trait")) {
+								kwType = SCE_RUST_TRAIT;
+							} else if (StrEqual(s, "enum")) {
+								kwType = SCE_RUST_ENUMERATION;
+							} else if (StrEqual(s, "type")) {
+								kwType = SCE_RUST_TYPE; // type alias
+							} else if (StrEqual(s, "const")) {
+								kwType = SCE_RUST_CONSTANT;
+							} else if (StrEqual(s, "union")) {
+								kwType = SCE_RUST_UNION;
+							}
+							if (kwType != SCE_RUST_DEFAULT) {
+								const int chNext = sc.GetDocNextChar();
+								if (!IsIdentifierStartEx(chNext)) {
+									kwType = SCE_RUST_DEFAULT;
+								}
+							}
+							if ((visibleChars == 3 || visibleChars == 6) && StrEqual(s, "use")) {
+								lineStateLineType = RustLineStateMaskPubUse;
+							}
+						} else if (keywordLists[1]->InList(s)) {
+							sc.ChangeState(SCE_RUST_WORD2);
+						} else if (keywordLists[2]->InList(s)) {
+							sc.ChangeState(SCE_RUST_TYPE);
+						} else if (keywordLists[3]->InList(s)) {
+							sc.ChangeState(SCE_RUST_STRUCT);
+						} else if (keywordLists[4]->InList(s)) {
+							sc.ChangeState(SCE_RUST_TRAIT);
+						} else if (keywordLists[5]->InList(s)) {
+							sc.ChangeState(SCE_RUST_ENUMERATION);
+						} else if (keywordLists[6]->InList(s)) {
+							sc.ChangeState(SCE_RUST_UNION);
+						} else if (keywordLists[7]->InList(s)) {
+							sc.ChangeState(SCE_RUST_CONSTANT);
+						} else if (sc.ch != '.') {
+							const int chNext = sc.GetDocNextChar();
+							if (chNext == '(') {
+								sc.ChangeState((kwType == SCE_RUST_FUNCTION_DEFINITION)? kwType : SCE_RUST_FUNCTION);
+							} else if (chNext == '!') {
+								sc.ChangeState(SCE_RUST_MACRO);
+							} else if (kwType != SCE_RUST_DEFAULT) {
+								if (kwType != SCE_RUST_CONSTANT || chNext == ':') {
+									sc.ChangeState(kwType);
+								} else if (chBeforeIdentifier == '[' && sc.ch == ';') {
+									// array: [T; N]
+									sc.ChangeState(SCE_RUST_TYPE);
+								}
+							}
+						}
+					}
+					if (sc.state != SCE_RUST_WORD && sc.ch != '.') {
+						kwType = SCE_RUST_DEFAULT;
+					}
+				}
 				sc.SetState(SCE_RUST_DEFAULT);
 			}
 			break;

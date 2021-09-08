@@ -2186,11 +2186,12 @@ void EditChar2Hex(void) {
 		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)(count + 1)) - 1; // '\0'
 		int j = 0;
 		for (Sci_Position i = 0; i < count; i++) {
-			if (wch[i] <= 0xFF) {
-				sprintf(ch + j, "\\x%02X", wch[i]); // \xHH
+			const WCHAR c = wch[i];
+			if (c <= 0xFF) {
+				sprintf(ch + j, "\\x%02X", c); // \xHH
 				j += 4;
 			} else {
-				sprintf(ch + j, "\\u%04X", wch[i]); // \uHHHH
+				sprintf(ch + j, "\\u%04X", c); // \uHHHH
 				j += 6;
 			}
 		}

@@ -255,7 +255,6 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '"' && (sc.state == SCE_SWIFT_STRING
 				|| (sc.state == SCE_SWIFT_TRIPLE_STRING && sc.MatchNext('"', '"')))) {
 				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
-					sc.SetState(SCE_SWIFT_TRIPLE_STRINGEND);
 					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_SWIFT_DEFAULT);
@@ -285,9 +284,6 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				|| (sc.state == SCE_SWIFT_TRIPLE_STRING_ED && sc.MatchNext('"', '"', '#')))) {
 				const int offset = (sc.state == SCE_SWIFT_STRING_ED) ? 1 : 3;
 				if (CheckSwiftStringDelimiter(styler, sc.currentPos + offset, DelimiterCheck::End, delimiterCount)) {
-					if (sc.state == SCE_SWIFT_TRIPLE_STRING_ED) {
-						sc.SetState(SCE_SWIFT_TRIPLE_STRING_EDEND);
-					}
 					sc.Advance(delimiterCount + offset);
 					sc.SetState(SCE_SWIFT_DEFAULT);
 					delimiterCount = TryPopAndPeek(delimiters);
@@ -318,12 +314,11 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 			if (sc.ch == '"') {
 				if (sc.MatchNext('"', '"')) {
-					sc.SetState(SCE_SWIFT_TRIPLE_STRINGSTART);
+					sc.SetState(SCE_SWIFT_TRIPLE_STRING);
 					sc.Advance(2);
-					sc.ForwardSetState(SCE_SWIFT_TRIPLE_STRING);
-					continue;
+				} else {
+					sc.SetState(SCE_SWIFT_STRING);
 				}
-				sc.SetState(SCE_SWIFT_STRING);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
 			} else if ((sc.ch == '@' || sc.ch == '`') && IsIdentifierStartEx(sc.chNext)) {
@@ -344,10 +339,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						sc.SetState(SCE_SWIFT_STRING_ED);
 						sc.Advance(delimiter);
 						if (sc.Match('"', '"', '"')) {
-							sc.ChangeState(SCE_SWIFT_TRIPLE_STRING_EDSTART);
+							sc.ChangeState(SCE_SWIFT_TRIPLE_STRING_ED);
 							sc.Advance(2);
-							sc.ForwardSetState(SCE_SWIFT_TRIPLE_STRING_ED);
-							continue;
 						}
 					}
 				}
@@ -400,6 +393,13 @@ struct FoldLineState {
 	}
 };
 
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_SWIFT_TRIPLE_STRING
+		|| style == SCE_SWIFT_TRIPLE_STRING_ED
+		|| style == SCE_SWIFT_OPERATOR2
+		|| style == SCE_SWIFT_ESCAPECHAR;
+}
+
 void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -443,16 +443,11 @@ void FoldSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			}
 		} break;
 
-		case SCE_SWIFT_TRIPLE_STRINGSTART:
-		case SCE_SWIFT_TRIPLE_STRING_EDSTART:
-			if (style != stylePrev) {
+		case SCE_SWIFT_TRIPLE_STRING:
+		case SCE_SWIFT_TRIPLE_STRING_ED:
+			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
-			}
-			break;
-
-		case SCE_SWIFT_TRIPLE_STRINGEND:
-		case SCE_SWIFT_TRIPLE_STRING_EDEND:
-			if (style != styleNext) {
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

@@ -192,113 +192,111 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_JAVA_IDENTIFIER:
+		case SCE_JAVA_ANNOTATION:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
-				sc.GetCurrent(s, sizeof(s));
-				if (s[0] == '@') {
-					if (StrEqual(s, "@interface")) {
-						sc.ChangeState(SCE_JAVA_WORD);
-						kwType = KeywordType::Annotation;
-					} else {
-						sc.ChangeState(SCE_JAVA_ANNOTATION);
+				if (sc.state == SCE_JAVA_ANNOTATION) {
+					if (sc.ch == '.' || sc.ch == '$') {
+						sc.SetState(SCE_JAVA_OPERATOR);
+						sc.ForwardSetState(SCE_JAVA_ANNOTATION);
 						continue;
 					}
-				} else if (keywordLists[0]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_WORD);
-					if (StrEqual(s, "import")) {
-						if (visibleChars == sc.LengthCurrent()) {
-							lineStateLineType = JavaLineStateMaskImport;
+				} else {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					if (s[0] == '@') {
+						if (StrEqual(s, "@interface")) {
+							sc.ChangeState(SCE_JAVA_WORD);
+							kwType = KeywordType::Annotation;
+						} else {
+							sc.ChangeState(SCE_JAVA_ANNOTATION);
+							continue;
 						}
-					} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws")) {
-						kwType = KeywordType::Class;
-					} else if (StrEqualsAny(s, "interface", "implements")) {
-						kwType = KeywordType::Interface;
-					} else if (StrEqual(s, "enum")) {
-						kwType = KeywordType::Enum;
-					} else if (StrEqual(s, "record")) {
-						kwType = KeywordType::Record;
-					} else if (StrEqualsAny(s, "break", "continue")) {
-						kwType = KeywordType::Label;
-					} else if (StrEqualsAny(s, "return", "yield")) {
-						kwType = KeywordType::Return;
-					} else if (StrEqualsAny(s, "if", "while")) {
-						// to avoid treating following code as type cast:
-						// if (identifier) expression, while (identifier) expression
-						kwType = KeywordType::While;
-					}
-					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
-						const int chNext = sc.GetDocNextChar();
-						if (!IsIdentifierStartEx(chNext)) {
-							kwType = KeywordType::None;
+					} else if (keywordLists[0]->InList(s)) {
+						sc.ChangeState(SCE_JAVA_WORD);
+						if (StrEqual(s, "import")) {
+							if (visibleChars == sc.LengthCurrent()) {
+								lineStateLineType = JavaLineStateMaskImport;
+							}
+						} else if (StrEqualsAny(s, "class", "new", "extends", "instanceof", "throws")) {
+							kwType = KeywordType::Class;
+						} else if (StrEqualsAny(s, "interface", "implements")) {
+							kwType = KeywordType::Interface;
+						} else if (StrEqual(s, "enum")) {
+							kwType = KeywordType::Enum;
+						} else if (StrEqual(s, "record")) {
+							kwType = KeywordType::Record;
+						} else if (StrEqualsAny(s, "break", "continue")) {
+							kwType = KeywordType::Label;
+						} else if (StrEqualsAny(s, "return", "yield")) {
+							kwType = KeywordType::Return;
+						} else if (StrEqualsAny(s, "if", "while")) {
+							// to avoid treating following code as type cast:
+							// if (identifier) expression, while (identifier) expression
+							kwType = KeywordType::While;
 						}
-					}
-				} else if (keywordLists[1]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_WORD2);
-				} else if (keywordLists[2]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_DIRECTIVE);
-				} else if (keywordLists[3]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_CLASS);
-				} else if (keywordLists[4]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_INTERFACE);
-				} else if (keywordLists[5]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_ENUM);
-				} else if (keywordLists[6]->InList(s)) {
-					sc.ChangeState(SCE_JAVA_CONSTANT);
-				} else if (sc.ch == ':') {
-					if (sc.chNext == ':') {
-						// type::method
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+							const int chNext = sc.GetDocNextChar();
+							if (!IsIdentifierStartEx(chNext)) {
+								kwType = KeywordType::None;
+							}
+						}
+					} else if (keywordLists[1]->InList(s)) {
+						sc.ChangeState(SCE_JAVA_WORD2);
+					} else if (keywordLists[2]->InList(s)) {
+						sc.ChangeState(SCE_JAVA_DIRECTIVE);
+					} else if (keywordLists[3]->InList(s)) {
 						sc.ChangeState(SCE_JAVA_CLASS);
-					} else if (visibleChars == sc.LengthCurrent()) {
-						sc.ChangeState(SCE_JAVA_LABEL);
-					}
-				} else if (sc.ch != '.') {
-					if (kwType > KeywordType::None && kwType < KeywordType::Return) {
-						sc.ChangeState(static_cast<int>(kwType));
-					} else {
-						const int chNext = sc.GetDocNextChar(sc.ch == ')');
-						if (sc.ch == ')') {
-							if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != KeywordType::While && IsIdentifierCharEx(chNext)))) {
-								// (type)(expression)
-								// (type)expression, (type)++identifier, (type)--identifier
+					} else if (keywordLists[4]->InList(s)) {
+						sc.ChangeState(SCE_JAVA_INTERFACE);
+					} else if (keywordLists[5]->InList(s)) {
+						sc.ChangeState(SCE_JAVA_ENUM);
+					} else if (keywordLists[6]->InList(s)) {
+						sc.ChangeState(SCE_JAVA_CONSTANT);
+					} else if (sc.ch == ':') {
+						if (sc.chNext == ':') {
+							// type::method
+							sc.ChangeState(SCE_JAVA_CLASS);
+						} else if (visibleChars == sc.LengthCurrent()) {
+							sc.ChangeState(SCE_JAVA_LABEL);
+						}
+					} else if (sc.ch != '.') {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
+							sc.ChangeState(static_cast<int>(kwType));
+						} else {
+							const int chNext = sc.GetDocNextChar(sc.ch == ')');
+							if (sc.ch == ')') {
+								if (chBeforeIdentifier == '(' && (chNext == '(' || (kwType != KeywordType::While && IsIdentifierCharEx(chNext)))) {
+									// (type)(expression)
+									// (type)expression, (type)++identifier, (type)--identifier
+									sc.ChangeState(SCE_JAVA_CLASS);
+								}
+							} else if (chNext == '(') {
+								// type method()
+								// type[] method()
+								// type<type> method()
+								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
+									sc.ChangeState(SCE_JAVA_FUNCTION_DEFINITION);
+								} else {
+									sc.ChangeState(SCE_JAVA_FUNCTION);
+								}
+							} else if (sc.Match('[', ']')
+								|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
+								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
+								|| IsIdentifierStartEx(chNext)) {
+								// type[] identifier
+								// TODO: fix C/C++ style: type identifier[]
+								// type<>, type<?>, type<? super T>
+								// type<type>
+								// type<type<type>>
+								// type identifier
 								sc.ChangeState(SCE_JAVA_CLASS);
 							}
-						} else if (chNext == '(') {
-							// type method()
-							// type[] method()
-							// type<type> method()
-							if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBefore) || chBefore == ']')) {
-								sc.ChangeState(SCE_JAVA_FUNCTION_DEFINITION);
-							} else {
-								sc.ChangeState(SCE_JAVA_FUNCTION);
-							}
-						} else if (sc.Match('[', ']')
-							|| (sc.ch == '<' && (sc.chNext == '>' || sc.chNext == '?'))
-							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))
-							|| IsIdentifierStartEx(chNext)) {
-							// type[] identifier
-							// TODO: fix C/C++ style: type identifier[]
-							// type<>, type<?>, type<? super T>
-							// type<type>
-							// type<type<type>>
-							// type identifier
-							sc.ChangeState(SCE_JAVA_CLASS);
 						}
 					}
+					if (sc.state != SCE_JAVA_WORD && sc.ch != '.') {
+						kwType = KeywordType::None;
+					}
 				}
-				if (sc.state != SCE_JAVA_WORD && sc.ch != '.') {
-					kwType = KeywordType::None;
-				}
-				sc.SetState(SCE_JAVA_DEFAULT);
-			}
-			break;
-
-		case SCE_JAVA_ANNOTATION:
-			if (sc.ch == '.' || sc.ch == '$') {
-				sc.SetState(SCE_JAVA_OPERATOR);
-				sc.ForwardSetState(SCE_JAVA_ANNOTATION);
-				continue;
-			}
-			if (!IsIdentifierCharEx(sc.ch)) {
 				sc.SetState(SCE_JAVA_DEFAULT);
 			}
 			break;

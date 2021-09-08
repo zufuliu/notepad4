@@ -288,7 +288,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.Forward();
 			} else if (sc.ch == '`') {
-				sc.SetState(SCE_JS_STRING_BTEND);
 				sc.ForwardSetState(SCE_JS_DEFAULT);
 			}
 			break;
@@ -461,9 +460,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (sc.ch == '"') {
 				sc.SetState(SCE_JS_STRING_DQ);
 			} else if (sc.ch == '`') {
-				sc.SetState(SCE_JS_STRING_BTSTART);
-				sc.ForwardSetState(SCE_JS_STRING_BT);
-				continue;
+				sc.SetState(SCE_JS_STRING_BT);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_JS_NUMBER);
 			} else if (sc.ch == '@' && IsJsIdentifierStartNext(sc)) {
@@ -565,6 +562,12 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 		|| style == SCE_JS_TASKMARKER;
 }
 
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_JS_STRING_BT
+		|| style == SCE_JS_OPERATOR2
+		|| style == SCE_JS_ESCAPECHAR;
+}
+
 void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -606,14 +609,10 @@ void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 			}
 			break;
 
-		case SCE_JS_STRING_BTSTART:
-			if (style != stylePrev) {
+		case SCE_JS_STRING_BT:
+			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
-			}
-			break;
-
-		case SCE_JS_STRING_BTEND:
-			if (style != styleNext) {
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

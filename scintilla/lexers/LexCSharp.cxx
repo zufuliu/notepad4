@@ -451,9 +451,6 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_CSHARP_ESCAPECHAR);
 					sc.Forward();
 				} else {
-					if (IsVerbatimString(sc.state)) {
-						sc.SetState(SCE_CSHARP_VERBATIM_STRINGEND);
-					}
 					sc.ForwardSetState(SCE_CSHARP_DEFAULT);
 					if (!nestedState.empty() && nestedState.back().state == sc.state) {
 						nestedState.pop_back();
@@ -556,18 +553,13 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				continue;
 			} else if (sc.ch == '$' || sc.ch == '@') {
 				if (sc.chNext == '\"') {
-					const bool verbatim = sc.ch == '@';
-					sc.SetState(verbatim ? SCE_CSHARP_VERBATIM_STRINGSTART : SCE_CSHARP_INTERPOLATED_STRING);
+					sc.SetState((sc.ch == '@') ? SCE_CSHARP_VERBATIM_STRING : SCE_CSHARP_INTERPOLATED_STRING);
 					sc.Forward();
-					if (verbatim) {
-						sc.SetState(SCE_CSHARP_VERBATIM_STRING);
-					}
 				} else if (sc.ch != sc.chNext) {
 					const int chNext = sc.GetRelative(2);
 					if ((sc.chNext == '$' || sc.chNext == '@') && chNext == '\"') {
-						sc.SetState(SCE_CSHARP_VERBATIM_STRINGSTART);
-						sc.Advance(2);
 						sc.SetState(SCE_CSHARP_INTERPOLATED_VERBATIM_STRING);
+						sc.Advance(2);
 					} else if (sc.ch == '@' && IsCsIdentifierStart(sc.chNext, chNext)) {
 						chBefore = chPrevNonWhite;
 						if (chPrevNonWhite != '.') {
@@ -670,6 +662,15 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 		|| style == SCE_CSHARP_TASKMARKER;
 }
 
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_CSHARP_VERBATIM_STRING
+		|| style == SCE_CSHARP_INTERPOLATED_VERBATIM_STRING
+		|| style == SCE_CSHARP_OPERATOR2
+		|| style == SCE_CSHARP_ESCAPECHAR
+		|| style == SCE_CSHARP_FORMAT_SPECIFIER
+		|| style == SCE_CSHARP_PLACEHOLDER;
+}
+
 void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -712,14 +713,11 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			}
 			break;
 
-		case SCE_CSHARP_VERBATIM_STRINGSTART:
-			if (style != stylePrev) {
+		case SCE_CSHARP_VERBATIM_STRING:
+		case SCE_CSHARP_INTERPOLATED_VERBATIM_STRING:
+			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
-			}
-			break;
-
-		case SCE_CSHARP_VERBATIM_STRINGEND:
-			if (style != styleNext) {
+			} else if (!IsMultilineStringStyle(styleNext)) {
 				levelNext--;
 			}
 			break;

@@ -43,6 +43,7 @@ def printLexHFile(f):
 						autoValue = STYLE_LASTPREDEFINED + 1
 					if val in valueMap:
 						raise Exception("Duplicate Style Value: %s = %d, %s" % (name, val, valueMap[val]))
+					valueMap[val] = name
 					if val >= STYLE_DEFAULT and val <= STYLE_LASTPREDEFINED:
 						raise Exception("Invalid Style Value: %s = %d" % (name, val))
 				out.append("#define " + name + " " + value)

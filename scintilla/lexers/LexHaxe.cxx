@@ -103,82 +103,83 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_HAXE_IDENTIFIER:
-			if (!IsIdentifierCharEx(sc.ch)) {
-				char s[128];
-				sc.GetCurrent(s, sizeof(s));
-				if (s[0] == '#') {
-					if (keywordLists[1]->InList(s + 1)) {
-						sc.ChangeState(SCE_HAXE_PREPROCESSOR);
-					}
-				} else if (keywordLists[0]->InList(s)) {
-					sc.ChangeState(SCE_HAXE_WORD);
-					if (StrEqual(s, "import")) {
-						if (visibleChars == sc.LengthCurrent()) {
-							lineStateLineType = HaxeLineStateMaskImport;
-						}
-					} else if (StrEqualsAny(s, "class", "new", "extends", "abstract", "typedef")) {
-						if (kwType != SCE_HAXE_ENUM) {
-							kwType = SCE_HAXE_CLASS;
-						}
-					} else if (StrEqualsAny(s, "interface", "implements")) {
-						kwType = SCE_HAXE_INTERFACE;
-					} else if (StrEqual(s, "enum")) {
-						kwType = SCE_HAXE_ENUM;
-					} else if (StrEqual(s, "function")) {
-						kwType = SCE_HAXE_FUNCTION_DEFINITION;
-					}
-					if (kwType != SCE_HAXE_DEFAULT) {
-						const int chNext = sc.GetDocNextChar();
-						if (!IsIdentifierStartEx(chNext)) {
-							kwType = SCE_HAXE_DEFAULT;
-						}
-					}
-				} else if (keywordLists[2]->InList(s)) {
-					sc.ChangeState(SCE_HAXE_CLASS);
-				} else if (keywordLists[3]->InList(s)) {
-					sc.ChangeState(SCE_HAXE_INTERFACE);
-				} else if (keywordLists[4]->InList(s)) {
-					sc.ChangeState(SCE_HAXE_ENUM);
-				} else if (keywordLists[5]->InList(s)) {
-					sc.ChangeState(SCE_HAXE_CONSTANT);
-				} else if (sc.ch != '.') {
-					if (kwType != SCE_HAXE_DEFAULT) {
-						sc.ChangeState(kwType);
-					} else {
-						const int chNext = sc.GetDocNextChar();
-						if (chNext == '(') {
-							sc.ChangeState(SCE_HAXE_FUNCTION);
-						} else if (sc.Match('[', ']')
-							|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
-							// type[]
-							// type<type>
-							// type<type<type>>
-							sc.ChangeState(SCE_HAXE_CLASS);
-						}
-					}
-				}
-				if (sc.state != SCE_HAXE_WORD && sc.ch != '.') {
-					kwType = SCE_HAXE_DEFAULT;
-				}
-				sc.SetState(SCE_HAXE_DEFAULT);
-			}
-			break;
-
 		case SCE_HAXE_MATADATA:
-			if (sc.ch == '.') {
-				sc.SetState(SCE_HAXE_OPERATOR);
-				sc.ForwardSetState(SCE_HAXE_MATADATA);
-				continue;
-			}
-			if (!IsIdentifierCharEx(sc.ch)) {
-				sc.SetState(SCE_HAXE_DEFAULT);
-			}
-			break;
-
 		case SCE_HAXE_VARIABLE:
+		case SCE_HAXE_VARIABLE2:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				sc.SetState(escSeq.outerState);
-				continue;
+				switch (sc.state) {
+				case SCE_HAXE_VARIABLE2:
+					sc.SetState(escSeq.outerState);
+					continue;
+
+				case SCE_HAXE_MATADATA:
+					if (sc.ch == '.') {
+						sc.SetState(SCE_HAXE_OPERATOR);
+						sc.ForwardSetState(SCE_HAXE_MATADATA);
+						continue;
+					}
+					break;
+
+				case SCE_HAXE_IDENTIFIER: {
+					char s[128];
+					sc.GetCurrent(s, sizeof(s));
+					if (s[0] == '#') {
+						if (keywordLists[1]->InList(s + 1)) {
+							sc.ChangeState(SCE_HAXE_PREPROCESSOR);
+						}
+					} else if (keywordLists[0]->InList(s)) {
+						sc.ChangeState(SCE_HAXE_WORD);
+						if (StrEqual(s, "import")) {
+							if (visibleChars == sc.LengthCurrent()) {
+								lineStateLineType = HaxeLineStateMaskImport;
+							}
+						} else if (StrEqualsAny(s, "class", "new", "extends", "abstract", "typedef")) {
+							if (kwType != SCE_HAXE_ENUM) {
+								kwType = SCE_HAXE_CLASS;
+							}
+						} else if (StrEqualsAny(s, "interface", "implements")) {
+							kwType = SCE_HAXE_INTERFACE;
+						} else if (StrEqual(s, "enum")) {
+							kwType = SCE_HAXE_ENUM;
+						} else if (StrEqual(s, "function")) {
+							kwType = SCE_HAXE_FUNCTION_DEFINITION;
+						}
+						if (kwType != SCE_HAXE_DEFAULT) {
+							const int chNext = sc.GetDocNextChar();
+							if (!IsIdentifierStartEx(chNext)) {
+								kwType = SCE_HAXE_DEFAULT;
+							}
+						}
+					} else if (keywordLists[2]->InList(s)) {
+						sc.ChangeState(SCE_HAXE_CLASS);
+					} else if (keywordLists[3]->InList(s)) {
+						sc.ChangeState(SCE_HAXE_INTERFACE);
+					} else if (keywordLists[4]->InList(s)) {
+						sc.ChangeState(SCE_HAXE_ENUM);
+					} else if (keywordLists[5]->InList(s)) {
+						sc.ChangeState(SCE_HAXE_CONSTANT);
+					} else if (sc.ch != '.') {
+						if (kwType != SCE_HAXE_DEFAULT) {
+							sc.ChangeState(kwType);
+						} else {
+							const int chNext = sc.GetDocNextChar();
+							if (chNext == '(') {
+								sc.ChangeState(SCE_HAXE_FUNCTION);
+							} else if (sc.Match('[', ']')
+								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
+								// type[]
+								// type<type>
+								// type<type<type>>
+								sc.ChangeState(SCE_HAXE_CLASS);
+							}
+						}
+					}
+					if (sc.state != SCE_HAXE_WORD && sc.ch != '.') {
+						kwType = SCE_HAXE_DEFAULT;
+					}
+				} break;
+				}
+				sc.SetState(SCE_HAXE_DEFAULT);
 			}
 			break;
 
@@ -196,11 +197,10 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				} else if (IsIdentifierStartEx(sc.chNext)) {
 					escSeq.outerState = sc.state;
-					sc.SetState(SCE_HAXE_VARIABLE);
+					sc.SetState(SCE_HAXE_VARIABLE2);
 				}
 			} else if ((sc.state == SCE_HAXE_STRINGDQ && sc.ch == '"')
 				|| (sc.state == SCE_HAXE_STRINGSQ && sc.ch == '\'')) {
-				sc.SetState(SCE_HAXE_STRING_END);
 				sc.ForwardSetState(SCE_HAXE_DEFAULT);
 			}
 			break;
@@ -274,11 +274,10 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				insideRegexRange = false;
 				sc.SetState(SCE_HAXE_REGEX);
 				sc.Forward();
-			} else if (sc.ch == '\"' || sc.ch == '\'') {
-				const int state = (sc.ch == '\"') ? SCE_HAXE_STRINGDQ : SCE_HAXE_STRINGSQ;
-				sc.SetState(SCE_HAXE_STRING_BEGIN);
-				sc.ForwardSetState(state);
-				continue;
+			} else if ( sc.ch == '\'') {
+				sc.SetState(SCE_HAXE_STRINGSQ);
+			} else if (sc.ch == '\"') {
+				sc.SetState(SCE_HAXE_STRINGDQ);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_HAXE_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch) || (sc.ch == '#' && (sc.chNext == 'e' || sc.chNext == 'i'))) {
@@ -292,7 +291,6 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
-				escSeq.outerState = sc.state;
 				sc.SetState(SCE_HAXE_VARIABLE);
 			} else if (isoperator(sc.ch)) {
 				const bool interpolating = !nestedState.empty();
@@ -345,6 +343,14 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 		|| style == SCE_HAXE_TASKMARKER;
 }
 
+constexpr bool IsMultilineStringStyle(int style) noexcept {
+	return style == SCE_HAXE_STRINGDQ
+		|| style == SCE_HAXE_STRINGSQ
+		|| style == SCE_HAXE_OPERATOR2
+		|| style == SCE_HAXE_VARIABLE2
+		|| style == SCE_HAXE_ESCAPECHAR;
+}
+
 void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -394,12 +400,13 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			}
 			break;
 
-		case SCE_HAXE_STRING_BEGIN:
-			levelNext++;
-			break;
-
-		case SCE_HAXE_STRING_END:
-			levelNext--;
+		case SCE_HAXE_STRINGSQ:
+		case SCE_HAXE_STRINGDQ:
+			if (!IsMultilineStringStyle(stylePrev)) {
+				levelNext++;
+			} else if (!IsMultilineStringStyle(styleNext)) {
+				levelNext--;
+			}
 			break;
 
 		case SCE_HAXE_OPERATOR:
