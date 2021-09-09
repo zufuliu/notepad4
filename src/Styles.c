@@ -1253,7 +1253,7 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[2] = KeywordAttr_MakeLower | KeywordAttr_NoAutoComp;	// VBScript
 		attr[3] = KeywordAttr_NoAutoComp;	// Python
 		attr[4] = KeywordAttr_NoAutoComp;	// PHP
-		attr[7] = KeywordAttr_NoLexer;		// Value
+		attr[8] = KeywordAttr_NoLexer;		// Value
 		break;
 	case NP2LEX_RC:
 		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor

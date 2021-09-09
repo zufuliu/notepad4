@@ -97,7 +97,7 @@ NULL
 "scrolling standby text topmargin "
 "urn valign valuetype version vlink vspace "
 
-// Event Handle
+, // 7 Event Handle
 "onaddtrack onabort onafterprint onauxclick onbeforeprint onbeforeunload onblur oncancel oncanplay oncanplaythrough onchange onclick onclose "
 "oncontextmenu oncopy oncuechange oncut ondblclick ondrag ondragend ondragenter ondragexit ondragleave "
 "ondragover ondragstart ondrop ondurationchange onemptied onended onerror onenter onexit "
@@ -107,8 +107,11 @@ NULL
 "onmouseup onmousewheel onwheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
 "onscroll onsecuritypolicyviolation onseeked onseeking onselect onslotchange onshow onstalled onstorage onsubmit onsuspend "
 "ontimeupdate ontoggle onvolumechange onunhandledrejection onunload onwaiting "
+"onanimationcancel onanimationend onanimationiteration oncontextlost oncontextrestored ongotpointercapture onlostpointercapture "
+"onpointercancel onpointerdown onpointerenter onpointerleave onpointermove onpointerout onpointerover onpointerup "
+"onselectionchange onselectstart ontouchcancel ontouchstart ontransitioncancel ontransitionend "
 
-, // 7 Value
+, // 8 Value
 // metadata names
 "application-name author description generator keywords referrer theme-color "
 // Link types
@@ -141,7 +144,7 @@ NULL
 "row col rowgroup colgroup any "
 "command context toolbar soft hard "
 
-,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};
 
 static EDITSTYLE Styles_HTML[] = {

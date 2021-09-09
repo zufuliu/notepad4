@@ -70,7 +70,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* blockdiag, seqdiag, actdiag and nwdiag
 	* [Groovy](../master/tools/lang/Groovy.groovy), up to Groovy 4.0.
 	* [Haxe](../master/tools/lang/Haxe.hx), up to Haxe 4.1
-	* [HTML](../master/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2020-02-12. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
+	* [HTML](../master/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2021-09-08. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP

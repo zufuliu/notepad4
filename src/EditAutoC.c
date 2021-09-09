@@ -728,6 +728,7 @@ enum {
 };
 
 extern EDITLEXER lexCSS;
+extern EDITLEXER lexHTML;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexJulia;
 extern EDITLEXER lexPHP;
@@ -1020,6 +1021,10 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 				WordList_AddListEx(pWList, pKeywords);
 			}
 		}
+	}
+	if (pLexCurrent->rid == NP2LEX_JAVASCRIPT || pLexCurrent->rid == NP2LEX_TYPESCRIPT) {
+		// event handler
+		WordList_AddListEx(pWList, lexHTML.pKeyWords->pszKeyWords[7]);
 	}
 }
 

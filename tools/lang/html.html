@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 2020-02-12
+https://whatwg.org/ 2021-09-08
 HTML 4.01 https://www.w3.org/TR/html4/ 1999-12-24
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 -->
@@ -45,18 +45,24 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 			rel="alternate author dns-prefetch help icon license modulepreload next pingback preconnect prefetch preload prerender prev search stylesheet"
 			media integrity hreflang type="text/plain text/css"
 			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin"
-			sizes imagesrcset imagesizes as color>
+			sizes imagesrcset imagesizes as color disabled>
 		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#document-metadata#standard-metadata-names
 		application-name author description generator keywords
 		referrer[never default always origin-when-crossorigin]
 		theme-color
 		-->
-		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy" content charset="utf-8">
-		<style media type="text/css"></style>
+		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
+			content charset="utf-8" media>
+		<style media type="text/css" title></style>
 	</head>
 	<!-- event handler content attributes https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
+	<!-- https://html.spec.whatwg.org/multipage/webappapis.html#events -->
+	<!-- https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers -->
 	<body
 		onabort
+		onanimationcancel
+		onanimationend
+		onanimationiteration
 		onauxclick
 		onblur*
 		oncancel
@@ -65,7 +71,9 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		onchange
 		onclick
 		onclose
+		oncontextlost
 		oncontextmenu
+		oncontextrestored
 		oncopy
 		oncuechange
 		oncut
@@ -84,6 +92,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		onerror*
 		onfocus*
 		onformdata
+		ongotpointercapture
 		oninput
 		oninvalid
 		onkeydown
@@ -94,6 +103,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		onloadedmetadata
 		onloadend
 		onloadstart
+		onlostpointercapture
 		onmousedown
 		onmouseenter
 		onmouseleave
@@ -105,6 +115,14 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		onpause
 		onplay
 		onplaying
+		onpointercancel
+		onpointerdown
+		onpointerenter
+		onpointerleave
+		onpointermove
+		onpointerout
+		onpointerover
+		onpointerup
 		onprogress
 		onratechange
 		onreset
@@ -114,13 +132,19 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		onseeked
 		onseeking
 		onselect
-		onslotchange
+		onselectionchange
+		onselectstart
 		onshow?
+		onslotchange
 		onstalled
 		onsubmit
 		onsuspend
 		ontimeupdate
 		ontoggle
+		ontouchcancel
+		ontouchstart
+		ontransitioncancel
+		ontransitionend
 		onvolumechange
 		onwaiting
 		onwheel
@@ -184,9 +208,9 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		<small></small>
 		<s></s>
 		<cite></cite>
-		<q></q>
-		<dfn></dfn>
-		<abbr></abbr>
+		<q cite></q>
+		<dfn title></dfn>
+		<abbr title></abbr>
 		<ruby></ruby>
 		<rt></rt>
 		<rp></rp>
@@ -202,8 +226,8 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		<b></b>
 		<u></u>
 		<mark></mark>
-		<bdi></bdi>
-		<bdo></bdo>
+		<bdi dir></bdi>
+		<bdo dir></bdo>
 		<span></span>
 		<br>
 		<wbr>
@@ -212,10 +236,10 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		<del cite datetime></del>
 		<!-- Embedded content https://html.spec.whatwg.org/multipage/embedded-content.html -->
 		<picture></picture>
-		<source src type srcset sizes media>
+		<source src type srcset sizes media width height>
 		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy decoding loading>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
-		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy></iframe>
+		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy loading></iframe>
 		<embed src type width height>
 		<object data type typemustmatch name usemap form width height></object>
 		<param name value>
@@ -233,6 +257,9 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		<!-- https://html.spec.whatwg.org/multipage/image-maps.html -->
 		<map name></map>
 		<area alt coords href download hreflang ping rel shape="circle circ default poly polygon rect rectangle" target type referrerpolicy>
+		<!-- https://html.spec.whatwg.org/multipage/embedded-content-other.html -->
+		<math></math>
+		<svg></svg>
 		<!-- Tabular data https://html.spec.whatwg.org/multipage/tables.html -->
 		<table border>
 			<caption></caption>
@@ -256,7 +283,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 				alt autocomplete checked dirname disabled form formaction formenctype formmethod formnovalidate formtarget
 				height list max maxlength min minlength multiple name pattern placeholder readonly required size src step
 				type="hidden text search tel url email password date month week time datetime-local number range color checkbox radio file submit image reset button"
-				value width>
+				value width title>
 			<!-- https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element -->
 			<button disabled form formaction formenctype formmethod formnovalidate formtarget name type="submit reset button" value></button>
 			<select autocomplete disabled form multiple name required size>
@@ -287,6 +314,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		<canvas width height></canvas>
 		<!-- Microdata https://html.spec.whatwg.org/multipage/microdata.html -->
 		<div itemid itemprop itemref itemscope itemtype></div>
+
 		<!-- Obsolete features https://html.spec.whatwg.org/multipage/obsolete.html -->
 		<!-- Obsolete Elements https://html.spec.whatwg.org/multipage/obsolete.html#non-conforming-features -->
 		<applet datafld datasrc></applet>
@@ -318,6 +346,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 2010-12-16
 		<strike></strike>
 		<tt></tt>
 		<xmp></xmp>
+
 		<!-- Obsolete Attributes -->
 		<html version>
 			<head profile>
