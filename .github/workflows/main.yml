@@ -7,9 +7,9 @@ defaults:
     shell: cmd
 
 jobs:
-  msvc:
-    name: Build with Visual C++
-    runs-on: windows-latest
+  msvc2019:
+    name: Build with Visual C++ 2019
+    runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
 
@@ -48,32 +48,96 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_MSVC_i18n_x64
+          name: Notepad2_MSVC2019_i18n_x64
           path: 'build\Notepad2_i18n_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_MSVC_i18n_Win32
+          name: Notepad2_MSVC2019_i18n_Win32
           path: 'build\Notepad2_i18n_Win32_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_MSVC_i18n_AVX2
+          name: Notepad2_MSVC2019_i18n_AVX2
           path: 'build\Notepad2_i18n_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_MSVC_i18n_ARM64
+          name: Notepad2_MSVC2019_i18n_ARM64
           path: 'build\Notepad2_i18n_ARM64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_MSVC_en_ARM
+          name: Notepad2_MSVC2019_en_ARM
           path: 'build\Notepad2_ARM_*.zip'
 
-  llvm_msvc:
-    name: Build with LLVM (Visual C++)
-    runs-on: windows-latest
+  msvc2022:
+    name: Build with Visual C++ 2022
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+
+    - name: MSVC x64 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build x64 Release 1
+        CALL "locale\build.bat" Build x64 Release 1
+        CALL "build\make_zip.bat" MSVC x64 Release Locale 1
+
+    - name: MSVC Win32 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build Win32 Release 1
+        CALL "locale\build.bat" Build Win32 Release 1
+        CALL "build\make_zip.bat" MSVC Win32 Release Locale 1
+
+    - name: MSVC AVX2 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build AVX2 Release 1
+        CALL "locale\build.bat" Build AVX2 Release 1
+        CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
+
+    - name: MSVC ARM64 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build ARM64 Release 1
+        CALL "locale\build.bat" Build ARM64 Release 1
+        CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
+
+    - name: MSVC ARM Release
+      run: |
+        CALL "build\VS2017\build.bat" Build ARM Release 1
+        CALL "build\make_zip.bat" MSVC ARM Release 1
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_MSVC2022_i18n_x64
+          path: 'build\Notepad2_i18n_x64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_MSVC2022_i18n_Win32
+          path: 'build\Notepad2_i18n_Win32_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_MSVC2022_i18n_AVX2
+          path: 'build\Notepad2_i18n_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_MSVC2022_i18n_ARM64
+          path: 'build\Notepad2_i18n_ARM64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_MSVC2022_en_ARM
+          path: 'build\Notepad2_ARM_*.zip'
+
+  llvm_msvc2019:
+    name: Build with LLVM (Visual C++ 2019)
+    runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
 
@@ -105,35 +169,79 @@ jobs:
         CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM ARM64 Release 1
 
-    #- name: Clang ARM Release
-    #  run: |
-    #    CALL "build\VS2017\build.bat" Build ARM LLVMRelease 1
-    #    CALL "build\make_zip.bat" LLVM ARM Release 1
-
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_MSVC_en_x64
+          name: Notepad2_Clang_MSVC2019_en_x64
           path: 'build\Notepad2_LLVM_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_MSVC_en_Win32
+          name: Notepad2_Clang_MSVC2019_en_Win32
           path: 'build\Notepad2_LLVM_Win32_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_MSVC_en_AVX2
+          name: Notepad2_Clang_MSVC2019_en_AVX2
           path: 'build\Notepad2_LLVM_AVX2_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_MSVC_en_ARM64
+          name: Notepad2_Clang_MSVC2019_en_ARM64
           path: 'build\Notepad2_LLVM_ARM64_*.zip'
 
-    #- uses: actions/upload-artifact@v2
-    #  with:
-    #      name: Notepad2_Clang_MSVC_en_ARM
-    #      path: 'build\Notepad2_LLVM_ARM_*.zip'
+  llvm_msvc2022:
+    name: Build with LLVM (Visual C++ 2022)
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Update Version Hash
+      run: |
+        "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
+
+    - name: Install LLVM
+      run: |
+        CALL "build\install_llvm.bat" latest 1
+
+    - name: Clang x64 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM x64 Release 1
+
+    - name: Clang Win32 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM Win32 Release 1
+
+    - name: Clang AVX2 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build AVX2 LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM AVX2 Release 1
+
+    - name: Clang ARM64 Release
+      run: |
+        CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
+        CALL "build\make_zip.bat" LLVM ARM64 Release 1
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_Clang_MSVC2022_en_x64
+          path: 'build\Notepad2_LLVM_x64_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_Clang_MSVC2022_en_Win32
+          path: 'build\Notepad2_LLVM_Win32_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_Clang_MSVC2022_en_AVX2
+          path: 'build\Notepad2_LLVM_AVX2_*.zip'
+
+    - uses: actions/upload-artifact@v2
+      with:
+          name: Notepad2_Clang_MSVC2022_en_ARM64
+          path: 'build\Notepad2_LLVM_ARM64_*.zip'
 
   llvm_mingw:
     name: Build with llvm-mingw
