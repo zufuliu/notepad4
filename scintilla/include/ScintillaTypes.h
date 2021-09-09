@@ -108,14 +108,16 @@ enum class MarginType {
 };
 
 enum class StylesCommon {
-	Default = 32,
-	LineNumber = 33,
+	Default = 0,
+	LineNumber = 32,
+	HotSpot = 33,
 	BraceLight = 34,
 	BraceBad = 35,
 	ControlChar = 36,
 	IndentGuide = 37,
 	CallTip = 38,
 	FoldDisplayText = 39,
+	FirstPredefined = 32,
 	LastPredefined = 39,
 	Max = 255,
 };

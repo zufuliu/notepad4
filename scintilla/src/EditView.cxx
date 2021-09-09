@@ -2800,12 +2800,14 @@ Sci::Position EditView::FormatRange(bool draw, const RangeToFormat *pfr, Surface
 	// Modify the view style for printing as do not normally want any of the transient features to be printed
 	// Printing supports only the line number margin.
 	int lineNumberIndex = -1;
-	for (size_t margin = 0; margin < vs.ms.size(); margin++) {
-		if ((vsPrint.ms[margin].style == MarginType::Number) && (vsPrint.ms[margin].width > 0)) {
-			lineNumberIndex = static_cast<int>(margin);
+	int margin = 0;
+	for (auto &style : vsPrint.ms) {
+		if (style.style == MarginType::Number && style.width > 0) {
+			lineNumberIndex = margin;
 		} else {
-			vsPrint.ms[margin].width = 0;
+			style.width = 0;
 		}
+		++margin;
 	}
 	vsPrint.fixedColumnWidth = 0;
 	vsPrint.zoomLevel = printParameters.magnification;
@@ -2821,24 +2823,23 @@ Sci::Position EditView::FormatRange(bool draw, const RangeToFormat *pfr, Surface
 	vsPrint.braceBadLightIndicatorSet = false;
 
 	// Set colours for printing according to users settings
-	for (size_t sty = 0; sty < vsPrint.styles.size(); sty++) {
-		if (printParameters.colourMode == PrintOption::InvertLight) {
-			vsPrint.styles[sty].fore = InvertedLight(vsPrint.styles[sty].fore);
-			vsPrint.styles[sty].back = InvertedLight(vsPrint.styles[sty].back);
-		} else if (printParameters.colourMode == PrintOption::BlackOnWhite) {
-			vsPrint.styles[sty].fore = ColourRGBA(0, 0, 0);
-			vsPrint.styles[sty].back = ColourRGBA(0xff, 0xff, 0xff);
-		} else if (printParameters.colourMode == PrintOption::ColourOnWhite) {
-			vsPrint.styles[sty].back = ColourRGBA(0xff, 0xff, 0xff);
-		} else if (printParameters.colourMode == PrintOption::ColourOnWhiteDefaultBG) {
-			if (sty <= StyleDefault) {
-				vsPrint.styles[sty].back = ColourRGBA(0xff, 0xff, 0xff);
-			}
+	const PrintOption colourMode = printParameters.colourMode;
+	const auto endStyles = (colourMode == PrintOption::ColourOnWhiteDefaultBG) ? vsPrint.styles.begin() + StyleLineNumber : vsPrint.styles.end();
+	for (auto it = vsPrint.styles.begin(); it < endStyles; ++it) {
+		if (colourMode == PrintOption::InvertLight) {
+			it->fore = InvertedLight(it->fore);
+			it->back = InvertedLight(it->back);
+		} else if (colourMode == PrintOption::BlackOnWhite) {
+			it->fore = ColourRGBA(0, 0, 0);
+			it->back = ColourRGBA(0xff, 0xff, 0xff);
+		} else if (colourMode == PrintOption::ColourOnWhite || colourMode == PrintOption::ColourOnWhiteDefaultBG) {
+			it->back = ColourRGBA(0xff, 0xff, 0xff);
 		}
 	}
 	// White background for the line numbers if PrintOption::ScreenColours isn't used
-	if (printParameters.colourMode != PrintOption::ScreenColours)
+	if (colourMode != PrintOption::ScreenColours) {
 		vsPrint.styles[StyleLineNumber].back = ColourRGBA(0xff, 0xff, 0xff);
+	}
 
 	// Printing uses different margins, so reset screen margins
 	vsPrint.leftMarginWidth = 0;

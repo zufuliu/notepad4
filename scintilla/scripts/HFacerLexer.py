@@ -10,7 +10,7 @@ import FileGenerator
 
 def printLexHFile(f):
 	# StylesCommon in Scintilla.iface
-	STYLE_DEFAULT = 32
+	STYLE_FIRSTPREDEFINED = 32
 	STYLE_LASTPREDEFINED = 39
 
 	out = []
@@ -39,12 +39,12 @@ def printLexHFile(f):
 					else:
 						val = int(value)
 					autoValue = val + 1
-					if autoValue == STYLE_DEFAULT:
+					if autoValue == STYLE_FIRSTPREDEFINED:
 						autoValue = STYLE_LASTPREDEFINED + 1
 					if val in valueMap:
 						raise Exception("Duplicate Style Value: %s = %d, %s" % (name, val, valueMap[val]))
 					valueMap[val] = name
-					if val >= STYLE_DEFAULT and val <= STYLE_LASTPREDEFINED:
+					if val >= STYLE_FIRSTPREDEFINED and val <= STYLE_LASTPREDEFINED:
 						raise Exception("Invalid Style Value: %s = %d" % (name, val))
 				out.append("#define " + name + " " + value)
 	return out

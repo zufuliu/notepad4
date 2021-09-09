@@ -55,7 +55,7 @@ def checkLexerDefinition():
 		values.append(name)
 
 	# StylesCommon in Scintilla.iface
-	STYLE_DEFAULT = 32
+	STYLE_FIRSTPREDEFINED = 32
 	STYLE_LASTPREDEFINED = 39
 	# ensure style number is unique within same lexer and not used by StylesCommon
 	prefixMap = {} # {prefix: lexer}
@@ -73,7 +73,7 @@ def checkLexerDefinition():
 		lexer = prefixMap[prefix]
 		valList = lexrList.setdefault(lexer, {})
 		value = int(value)
-		if value >= STYLE_DEFAULT and value <= STYLE_LASTPREDEFINED:
+		if value >= STYLE_FIRSTPREDEFINED and value <= STYLE_LASTPREDEFINED:
 			print(f'error value: {value} {name}')
 		values = valList.setdefault(value, [])
 		if values:

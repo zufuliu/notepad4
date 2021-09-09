@@ -37,6 +37,7 @@
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
+static_assert(StyleDefault == 0);
 
 MarginStyle::MarginStyle(MarginType style_, int width_, MarkerMask mask_) noexcept :
 	style(style_), width(width_), mask(mask_), sensitive(false), cursor(CursorShape::ReverseArrow) {
@@ -329,7 +330,6 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 		}
 
 		// Create a FontRealised object for each unique font in the styles.
-		CreateAndAddFont(styles[StyleDefault]);
 		for (const auto &style : styles) {
 			CreateAndAddFont(style);
 		}
@@ -410,10 +410,8 @@ void ViewStyle::ClearStyles() noexcept {
 	fontsValid = false;
 	// Reset all styles to be like the default style
 	const Style &source = styles[StyleDefault];
-	for (auto &style : styles) {
-		if (&style != &source) {
-			style = source;
-		}
+	for (auto it = styles.begin() + 1; it != styles.end(); ++it) {
+		*it = source;
 	}
 
 	styles[StyleLineNumber].back = Platform::Chrome();
@@ -736,12 +734,10 @@ void ViewStyle::AllocStyles(size_t sizeNew) {
 	fontsValid = false;
 	const size_t i = styles.size();
 	styles.resize(sizeNew);
-	if (i != 0 && sizeNew > StyleDefault) {
-		const auto back = styles.begin() + StyleDefault;
+	if (i != 0 && sizeNew > i) {
+		const Style &source = styles[StyleDefault];
 		for (auto it = styles.begin() + i; it != styles.end(); ++it) {
-			if (it != back) {
-				*it = *back;
-			}
+			*it = source;
 		}
 	}
 }
