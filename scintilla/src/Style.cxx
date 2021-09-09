@@ -55,6 +55,11 @@ Style::Style(const char *fontName_) noexcept :
 	FontSpecification(fontName_, Platform::DefaultFontSize() * FontSizeMultiplier) {
 }
 
+void Style::ResetDefault(const char *fontName_) noexcept {
+	font.reset();
+	new (this)Style(fontName_);
+}
+
 void Style::Copy(std::shared_ptr<Font> font_, const FontMeasurements &fm_) noexcept {
 	font = std::move(font_);
 	(FontMeasurements &)(*this) = fm_;

@@ -55,6 +55,7 @@ public:
 	std::shared_ptr<Font> font;
 
 	Style(const char *fontName_ = nullptr) noexcept;
+	void ResetDefault(const char *fontName_ = nullptr) noexcept;
 	void Copy(std::shared_ptr<Font> font_, const FontMeasurements &fm_) noexcept;
 	bool IsProtected() const noexcept {
 		return !(changeable && visible);

@@ -403,7 +403,7 @@ void ViewStyle::EnsureStyle(size_t index) {
 
 void ViewStyle::ResetDefaultStyle() {
 	fontsValid = false;
-	styles[StyleDefault] = Style(fontNames.Save(Platform::DefaultFont()));
+	styles[StyleDefault].ResetDefault(fontNames.Save(Platform::DefaultFont()));
 }
 
 void ViewStyle::ClearStyles() noexcept {
