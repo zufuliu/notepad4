@@ -22,8 +22,8 @@ public:
 class EditModel {
 public:
 	bool inOverstrike;
-	int xOffset;		///< Horizontal scrolled amount in pixels
 	bool trackLineWidth;
+	int xOffset;		///< Horizontal scrolled amount in pixels
 
 	SpecialRepresentations reprs;
 	Caret caret;
@@ -32,8 +32,8 @@ public:
 	int bracesMatchStyle;
 	int highlightGuideColumn;
 	bool hasFocus;
-	Selection sel;
 	bool primarySelection;
+	Selection sel;
 
 	Scintilla::IMEInteraction imeInteraction;
 	Scintilla::Bidirectional bidirectional;

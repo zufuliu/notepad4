@@ -34,6 +34,8 @@ public:
 
 	void DropGraphics() noexcept;
 	void RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw);
+	void PaintOneMargin(Surface *surface, Sci::Line topLine, PRectangle rc, PRectangle rcOneMargin,
+		const MarginStyle &margin, const EditModel &model, const ViewStyle &vs);
 	void SCICALL PaintMargin(Surface *surface, Sci::Line topLine, PRectangle rc, PRectangle rcMargin,
 		const EditModel &model, const ViewStyle &vs);
 };

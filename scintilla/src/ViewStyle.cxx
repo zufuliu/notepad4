@@ -89,12 +89,12 @@ ViewStyle::ViewStyle() : markers(MarkerMax + 1), indicators(static_cast<size_t>(
 ViewStyle::ViewStyle(const ViewStyle &source) : markers(MarkerMax + 1), indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
 	Init(source.styles.size());
 	styles = source.styles;
-	for (size_t sty = 0; sty < source.styles.size(); sty++) {
+	for (auto &style : styles) {
 		// Can't just copy fontName as its lifetime is relative to its owning ViewStyle
-		styles[sty].fontName = fontNames.Save(source.styles[sty].fontName);
+		style.fontName = fontNames.Save(style.fontName);
 	}
-	nextExtendedStyle = source.nextExtendedStyle;
 	markers = source.markers;
+	nextExtendedStyle = source.nextExtendedStyle;
 	CalcLargestMarkerHeight();
 
 	indicators = source.indicators;
@@ -104,26 +104,20 @@ ViewStyle::ViewStyle(const ViewStyle &source) : markers(MarkerMax + 1), indicato
 
 	selection = source.selection;
 
-	foldmarginColour = source.foldmarginColour;
-	foldmarginHighlightColour = source.foldmarginHighlightColour;
-
-	hotspotUnderline = source.hotspotUnderline;
-
 	controlCharSymbol = source.controlCharSymbol;
 	controlCharWidth = source.controlCharWidth;
 	selbar = source.selbar;
 	selbarlight = source.selbarlight;
-	caret = source.caret;
-	caretLine = source.caretLine;
-	someStylesProtected = false;
-	someStylesForceCase = false;
+	foldmarginColour = source.foldmarginColour;
+	foldmarginHighlightColour = source.foldmarginHighlightColour;
+	hotspotUnderline = source.hotspotUnderline;
+	marginInside = source.marginInside;
 	leftMarginWidth = source.leftMarginWidth;
 	rightMarginWidth = source.rightMarginWidth;
-	ms = source.ms;
 	maskInLine = source.maskInLine;
 	maskDrawInText = source.maskDrawInText;
+	ms = source.ms;
 	fixedColumnWidth = source.fixedColumnWidth;
-	marginInside = source.marginInside;
 	textStart = source.textStart;
 	zoomLevel = source.zoomLevel;
 	viewWhitespace = source.viewWhitespace;
@@ -131,23 +125,30 @@ ViewStyle::ViewStyle(const ViewStyle &source) : markers(MarkerMax + 1), indicato
 	whitespaceSize = source.whitespaceSize;
 	viewIndentationGuides = source.viewIndentationGuides;
 	viewEOL = source.viewEOL;
+
+	caret = source.caret;
+	caretLine = source.caretLine;
+
+	someStylesProtected = false;
+	someStylesForceCase = false;
 	extraFontFlag = source.extraFontFlag;
 	extraAscent = source.extraAscent;
 	extraDescent = source.extraDescent;
-	marginStyleOffset = source.marginStyleOffset;
+
 	annotationVisible = source.annotationVisible;
 	annotationStyleOffset = source.annotationStyleOffset;
 	eolAnnotationVisible = source.eolAnnotationVisible;
 	eolAnnotationStyleOffset = source.eolAnnotationStyleOffset;
 	braceHighlightIndicatorSet = source.braceHighlightIndicatorSet;
-	braceHighlightIndicator = source.braceHighlightIndicator;
 	braceBadLightIndicatorSet = source.braceBadLightIndicatorSet;
+	braceHighlightIndicator = source.braceHighlightIndicator;
 	braceBadLightIndicator = source.braceBadLightIndicator;
 
 	edgeState = source.edgeState;
 	theEdge = source.theEdge;
 	theMultiEdge = source.theMultiEdge;
 
+	marginStyleOffset = source.marginStyleOffset;
 	marginNumberPadding = source.marginNumberPadding;
 	ctrlCharPadding = source.ctrlCharPadding;
 	lastSegItalicsOffset = source.lastSegItalicsOffset;
@@ -192,20 +193,20 @@ void ViewStyle::CalculateMarginWidthAndMask() noexcept {
 
 void ViewStyle::Init(size_t stylesSize_) {
 	AllocStyles(stylesSize_);
-	nextExtendedStyle = 256;
 	fontNames.Clear();
 	ResetDefaultStyle();
-
-	// There are no image markers by default, so no need for calling CalcLargestMarkerHeight()
-	largestMarkerHeight = 0;
 
 	indicators[0] = Indicator(IndicatorStyle::Squiggle, ColourRGBA(0, 0x7f, 0));
 	indicators[1] = Indicator(IndicatorStyle::TT, ColourRGBA(0, 0, 0xff));
 	indicators[2] = Indicator(IndicatorStyle::Plain, ColourRGBA(0xff, 0, 0));
 
-	technology = Technology::Default;
+	nextExtendedStyle = 256;
+	// There are no image markers by default, so no need for calling CalcLargestMarkerHeight()
+	largestMarkerHeight = 0;
+
 	indicatorsDynamic = false;
 	indicatorsSetFore = false;
+	technology = Technology::Default;
 	lineHeight = 1;
 	lineOverlap = 0;
 	maxAscent = 1;
@@ -265,47 +266,47 @@ void ViewStyle::Init(size_t stylesSize_) {
 	caretLine.layer = Layer::Base;
 	caretLine.frame = 0;
 
-	someStylesProtected = false;
-	someStylesForceCase = false;
-
-	hotspotUnderline = true;
 	elementColours.erase(Element::HotSpotActive);
 	elementAllowsTranslucent.insert(Element::HotSpotActive);
+	hotspotUnderline = true;
 
+	marginInside = true;
 	leftMarginWidth = 1;
 	rightMarginWidth = 1;
 	ms.resize(MaxMargin + 1);
 	ms[0] = MarginStyle(MarginType::Number);
 	ms[1] = MarginStyle(MarginType::Symbol, 16, ~MaskFolders);
 	ms[2] = MarginStyle(MarginType::Symbol);
-	marginInside = true;
 	CalculateMarginWidthAndMask();
 	textStart = marginInside ? fixedColumnWidth : leftMarginWidth;
 	zoomLevel = 100;
 	viewWhitespace = WhiteSpace::Invisible;
 	tabDrawMode = TabDrawMode::LongArrow;
 	whitespaceSize = 1;
+	viewIndentationGuides = IndentView::None;
+	viewEOL = false;
 	elementColours.erase(Element::WhiteSpace);
 	elementAllowsTranslucent.insert(Element::WhiteSpace);
 
-	viewIndentationGuides = IndentView::None;
-	viewEOL = false;
+	someStylesProtected = false;
+	someStylesForceCase = false;
 	extraFontFlag = FontQuality::QualityDefault;
 	extraAscent = 0;
 	extraDescent = 0;
-	marginStyleOffset = 0;
+
 	annotationVisible = AnnotationVisible::Hidden;
 	annotationStyleOffset = 0;
 	eolAnnotationVisible = EOLAnnotationVisible::Hidden;
 	eolAnnotationStyleOffset = 0;
 	braceHighlightIndicatorSet = false;
-	braceHighlightIndicator = 0;
 	braceBadLightIndicatorSet = false;
+	braceHighlightIndicator = 0;
 	braceBadLightIndicator = 0;
 
 	edgeState = EdgeVisualStyle::None;
 	theEdge = EdgeProperties(0, ColourRGBA(0xc0, 0xc0, 0xc0));
 
+	marginStyleOffset = 0;
 	marginNumberPadding = 3;
 	ctrlCharPadding = 3; // +3 For a blank on front and rounded edge each side
 	lastSegItalicsOffset = 2;
@@ -325,12 +326,10 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 		fonts.clear();
 
 		// Apply the extra font flag which controls text drawing quality to each style.
-		for (auto &style : styles) {
-			style.extraFontFlag = extraFontFlag;
-		}
-
+		const FontQuality quality = extraFontFlag;
 		// Create a FontRealised object for each unique font in the styles.
-		for (const auto &style : styles) {
+		for (auto &style : styles) {
+			style.extraFontFlag = quality;
 			CreateAndAddFont(style);
 		}
 
@@ -352,11 +351,18 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	selbar = Platform::Chrome();
 	selbarlight = Platform::ChromeHighlight();
 
-	indicatorsDynamic = std::any_of(indicators.cbegin(), indicators.cend(),
-		[](const Indicator &indicator) noexcept { return indicator.IsDynamic(); });
-
-	indicatorsSetFore = std::any_of(indicators.cbegin(), indicators.cend(),
-		[](const Indicator &indicator) noexcept { return indicator.OverridesTextFore(); });
+	bool flagDynamic = false;
+	bool flagSetFore = false;
+	for (const auto &indicator : indicators) {
+		if (indicator.IsDynamic()) {
+			flagDynamic = true;
+		}
+		if (indicator.OverridesTextFore()) {
+			flagSetFore = true;
+		}
+	}
+	indicatorsDynamic = flagDynamic;
+	indicatorsSetFore = flagSetFore;
 
 	maxAscent = 1;
 	maxDescent = 1;
@@ -366,11 +372,18 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	lineHeight = maxAscent + maxDescent;
 	lineOverlap = std::clamp(lineHeight / 10, 2, lineHeight);
 
-	someStylesProtected = std::any_of(styles.cbegin(), styles.cend(),
-		[](const Style &style) noexcept { return style.IsProtected(); });
-
-	someStylesForceCase = std::any_of(styles.cbegin(), styles.cend(),
-		[](const Style &style) noexcept { return style.caseForce != Style::CaseForce::mixed; });
+	bool flagProtected = false;
+	bool flagForceCase = false;
+	for (const auto &style : styles) {
+		if (style.IsProtected()) {
+			flagProtected = true;
+		}
+		if (style.caseForce != Style::CaseForce::mixed) {
+			flagForceCase = true;
+		}
+	}
+	someStylesProtected = flagProtected;
+	someStylesForceCase = flagForceCase;
 
 	tabWidth = aveCharWidth * tabInChars;
 

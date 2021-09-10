@@ -113,10 +113,10 @@ class ViewStyle final {
 	FontMap fonts;
 public:
 	std::vector<Style> styles;
-	int nextExtendedStyle;
 	std::vector<LineMarker> markers;
-	int largestMarkerHeight;
 	std::vector<Indicator> indicators;
+	int nextExtendedStyle;
+	int largestMarkerHeight;
 	bool indicatorsDynamic;
 	bool indicatorsSetFore;
 	bool fontsValid;
@@ -138,6 +138,7 @@ public:
 	std::optional<ColourRGBA> foldmarginColour;
 	std::optional<ColourRGBA> foldmarginHighlightColour;
 	bool hotspotUnderline;
+	bool marginInside;	///< true: margin included in text view, false: separate views
 	/// Margins are ordered: Line Numbers, Selection Margin, Spacing Margin
 	int leftMarginWidth;	///< Spacing margin on left of text
 	int rightMarginWidth;	///< Spacing margin on right of text
@@ -145,7 +146,6 @@ public:
 	MarkerMask maskDrawInText;///< Mask for markers that always draw in text
 	std::vector<MarginStyle> ms;
 	int fixedColumnWidth;	///< Total width of margins
-	bool marginInside;	///< true: margin included in text view, false: separate views
 	int textStart;	///< Starting x position of text within the view
 	/// 2018-09-04 Changed to a percent value
 	int zoomLevel;
@@ -156,7 +156,6 @@ public:
 	bool viewEOL;
 
 	CaretAppearance caret;
-
 	CaretLineAppearance caretLine;
 
 	bool someStylesProtected;
@@ -164,7 +163,7 @@ public:
 	Scintilla::FontQuality extraFontFlag;
 	int extraAscent;
 	int extraDescent;
-	int marginStyleOffset;
+
 	Scintilla::AnnotationVisible annotationVisible;
 	int annotationStyleOffset;
 	Scintilla::EOLAnnotationVisible eolAnnotationVisible;
@@ -173,9 +172,12 @@ public:
 	bool braceBadLightIndicatorSet;
 	int braceHighlightIndicator;
 	int braceBadLightIndicator;
+
 	Scintilla::EdgeVisualStyle edgeState;
 	EdgeProperties theEdge;
 	std::vector<EdgeProperties> theMultiEdge;
+
+	int marginStyleOffset;
 	int marginNumberPadding; // the right-side padding of the number margin
 	int ctrlCharPadding; // the padding around control character text blobs
 	int lastSegItalicsOffset; // the offset so as not to clip italic characters at EOLs
