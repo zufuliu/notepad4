@@ -88,6 +88,7 @@ jobs:
         CALL "build\make_zip.bat" MSVC x64 Release Locale 1
 
     - name: MSVC Win32 Release
+      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build Win32 Release 1
         CALL "locale\build.bat" Build Win32 Release 1
@@ -100,12 +101,14 @@ jobs:
         CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
     - name: MSVC ARM64 Release
+      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build ARM64 Release 1
         CALL "locale\build.bat" Build ARM64 Release 1
         CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
     - name: MSVC ARM Release
+      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build ARM Release 1
         CALL "build\make_zip.bat" MSVC ARM Release 1
@@ -209,6 +212,7 @@ jobs:
         CALL "build\make_zip.bat" LLVM x64 Release 1
 
     - name: Clang Win32 Release
+      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build Win32 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM Win32 Release 1
@@ -219,6 +223,7 @@ jobs:
         CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
     - name: Clang ARM64 Release
+      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM ARM64 Release 1
