@@ -3186,7 +3186,7 @@ void Style_HighlightCurrentLine(void) {
 			}
 
 			SciCall_SetCaretLineFrame(size);
-			SciCall_SetCaretLineLayer(SC_LAYER_OVER_TEXT);
+			SciCall_SetCaretLineLayer(SC_LAYER_UNDER_TEXT);
 
 			int alpha;
 			if (!Style_StrGetAlphaEx(outline, szValue, &alpha)) {
