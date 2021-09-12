@@ -427,7 +427,6 @@ enum ANSIArtStyleIndex {
 #define IMEIndicatorDefaultColor	RGB(0x10, 0x80, 0x10)
 #define MarkOccurrencesDefaultAlpha	100
 #define SelectionDefaultAlpha		95
-#define CaretLineDefaultAlpha		90
 
 #define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
 #define	BookmarkLineDefaultColor	RGB(0, 0xff, 0)
@@ -3190,7 +3189,7 @@ void Style_HighlightCurrentLine(void) {
 
 			int alpha;
 			if (!Style_StrGetAlphaEx(outline, szValue, &alpha)) {
-				alpha = CaretLineDefaultAlpha;
+				alpha = SC_ALPHA_OPAQUE;
 			}
 			SciCall_SetElementColor(SC_ELEMENT_CARET_LINE_BACK, ColorAlpha(rgb, alpha));
 			return;
