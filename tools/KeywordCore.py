@@ -292,6 +292,31 @@ def parse_apdl_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.Default),
 	]
 
+def parse_asymptote_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'functions':
+			items = re.findall(r'(\w+\()', doc)
+			items = [item for item in items if len(item) > 2]
+		else:
+			items = doc.split()
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'structs',
+		'constants',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('structs', keywordMap['structs'], KeywordAttr.Default),
+		('constants', keywordMap['constants'], KeywordAttr.Default),
+		('functions', keywordMap['functions'], KeywordAttr.NoLexer),
+	]
+
 def parse_avisynth_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}

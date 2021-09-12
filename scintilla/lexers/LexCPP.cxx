@@ -1,6 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for C, C++, Rescouce Script, Asymptote, D, Objective C/C++, PHP, Scala, IDL/ODL
+//! Lexer for C, C++, Rescouce Script,  D, Objective C/C++, PHP, Scala, IDL/ODL
 
 #include <cassert>
 #include <cstring>
@@ -25,7 +25,6 @@ using namespace Lexilla;
 #define		LEX_CPP		1	// C/C++
 #define		LEX_RC		5	// Resouce Script
 #define		LEX_D		7	// D
-#define		LEX_ASY		8	// Asymptote
 #define		LEX_OBJC	10	// Objective C/C++
 #define		LEX_SCALA	14	// Scala Script
 #define		LEX_PHP		29
@@ -536,7 +535,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			break;
 		case SCE_C_STRING:
 			if (sc.atLineEnd) {
-				if (!(lexType == LEX_ASY || lexType == LEX_PHP)) {
+				if (!(lexType == LEX_PHP)) {
 					sc.ChangeState(SCE_C_STRINGEOL);
 				}
 			} else if (isIncludePreprocessor && sc.ch == '>') {

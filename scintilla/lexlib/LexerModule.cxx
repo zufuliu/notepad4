@@ -29,6 +29,7 @@ using namespace Lexilla;
 extern LexerModule lmAHK;
 extern LexerModule lmAPDL;
 extern LexerModule lmAsm;
+extern LexerModule lmAsymptote;
 extern LexerModule lmAU3;
 extern LexerModule lmAVS;
 extern LexerModule lmAwk;
@@ -100,6 +101,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmAHK,
 	&lmAPDL,
 	&lmAsm,
+	&lmAsymptote,
 	&lmAU3,
 	&lmAVS,
 	&lmAwk,

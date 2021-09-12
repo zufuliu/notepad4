@@ -63,7 +63,7 @@ extern EDITLEXER lexSmali;
 extern EDITLEXER lexANSI;
 extern EDITLEXER lexAPDL;
 extern EDITLEXER lexASM;
-extern EDITLEXER lexASY;
+extern EDITLEXER lexAsymptote;
 extern EDITLEXER lexAutoHotkey;
 extern EDITLEXER lexAU3;
 extern EDITLEXER lexAVS;
@@ -164,7 +164,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexANSI,
 	&lexAPDL,
 	&lexASM,
-	&lexASY,
+	&lexAsymptote,
 	&lexAutoHotkey,
 	&lexAU3,
 	&lexAVS,
@@ -1291,6 +1291,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[5] = KeywordAttr_MakeLower;	// keys
 		attr[6] = KeywordAttr_MakeLower;	// functions
 		attr[7] = KeywordAttr_NoLexer;		// misc
+		break;
+	case NP2LEX_ASYMPTOTE:
+		attr[4] = KeywordAttr_NoLexer;		// functions
 		break;
 	case NP2LEX_AVS:
 		attr[1] = KeywordAttr_MakeLower;	// internal functions

@@ -19,6 +19,7 @@
     <VirtualDirectory Name="lexers">
       <File Name="../../scintilla/lexers/LexAPDL.cxx"/>
       <File Name="../../scintilla/lexers/LexAsm.cxx"/>
+      <File Name="../../scintilla/lexers/LexAsymptote.cxx"/>
       <File Name="../../scintilla/lexers/LexAutoHotkey.cxx"/>
       <File Name="../../scintilla/lexers/LexAutoIt3.cxx"/>
       <File Name="../../scintilla/lexers/LexAviSynth.cxx"/>

@@ -7,6 +7,7 @@ def update_all_keyword():
 		('NP2LEX_ACTIONSCRIPT', 'stlActionScript.c', 'ActionScript.as', 1, parse_actionscript_api_file),
 		('NP2LEX_AHK', 'stlAutoHotkey.c', ['AutoHotkey_L.ahk', 'AutoHotkey_H.ahk'], 0, parse_autohotkey_api_file),
 		('NP2LEX_APDL', 'stlAPDL.c', 'APDL.cdb', 0, parse_apdl_api_file),
+		('NP2LEX_ASYMPTOTE', 'stlAsymptote.c', 'Asymptote.asy', 1, parse_asymptote_api_file),
 		('NP2LEX_AVS', 'stlAviSynth.c', 'AviSynth.avs', 0, parse_avisynth_api_file),
 		('NP2LEX_AWK', 'stlAwk.c', 'Awk.awk', 1, parse_awk_api_file),
 		('NP2LEX_BATCH', 'stlBatch.c', 'Batch.bat', 0, parse_batch_api_file),

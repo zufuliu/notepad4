@@ -36,10 +36,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexAsm.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\scintilla\lexers\LexAPDL.cxx">
+    <ClCompile Include="..\..\scintilla\lexers\LexAsymptote.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexAutoHotkey.cxx">

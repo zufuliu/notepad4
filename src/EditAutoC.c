@@ -2315,6 +2315,7 @@ void EditToggleCommentLine(void) {
 		EditToggleLineComments(L"@rem ", TRUE);
 		break;
 
+	case SCLEX_ASYMPTOTE:
 	case SCLEX_CIL:
 	case SCLEX_CPP:
 	case SCLEX_CSHARP:
@@ -2461,6 +2462,7 @@ void EditToggleCommentBlock(void) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_AHK:
 	case SCLEX_ASM:
+	case SCLEX_ASYMPTOTE:
 	case SCLEX_AVS:
 	case SCLEX_CIL:
 	case SCLEX_CPP:
