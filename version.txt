@@ -10,7 +10,7 @@ hg clone http://hg.code.sf.net/p/scintilla/code scintilla
 Lexilla (upstream)
 git clone https://github.com/ScintillaOrg/lexilla.git
 5.1.1
-2021-09-04 622d3b726fd85b1b09ff5f95bb5f3027d3107b12
+2021-09-11 c2d1cceb17745ae64ef4d27955585fb4ccf30db7
 
 SciTE (upstream)
 hg clone http://hg.code.sf.net/p/scintilla/scite

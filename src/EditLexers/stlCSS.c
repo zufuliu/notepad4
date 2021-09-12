@@ -95,7 +95,7 @@ static EDITSTYLE Styles_CSS[] = {
 	{ SCE_CSS_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_CSS_IMPORTANT, NP2StyleX_Important, L"bold; fore:#C80000" },
 	{ SCE_CSS_DIRECTIVE, NP2StyleX_Directive, L"bold; back:#FFF1A8" },
-	{ SCE_CSS_MEDIA, NP2StyleX_Media, L"bold; fore:#0A246A" },
+	{ SCE_CSS_GROUP_RULE, NP2StyleX_Media, L"bold; fore:#0A246A" },
 	{ SCE_CSS_VARIABLE, NP2StyleX_Variable, L"bold; fore:#FF4000" },
 	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, NP2StyleX_UnknownPseudoClass, L"fore:#C80000; back:#FFFF80" },
 	{ SCE_CSS_UNKNOWN_IDENTIFIER, NP2StyleX_UnknownProperty, L"fore:#C80000; back:#FFFF80" },

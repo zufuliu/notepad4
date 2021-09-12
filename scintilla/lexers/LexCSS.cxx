@@ -210,7 +210,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			case '{':
 				nestingLevel++;
 				switch (lastState) {
-				case SCE_CSS_MEDIA:
+				case SCE_CSS_GROUP_RULE:
 					sc.SetState(SCE_CSS_DEFAULT);
 					break;
 				case SCE_CSS_TAG:
@@ -459,8 +459,8 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.ChangeState(SCE_CSS_VALUE);
 				break;
 			case SCE_CSS_DIRECTIVE:
-				if (op == '@' && StrEqual(s2, "media"))
-					sc.ChangeState(SCE_CSS_MEDIA);
+				if (op == '@' && StrEqualsAny(s2, "media", "supports", "document", "-moz-document"))
+					sc.ChangeState(SCE_CSS_GROUP_RULE);
 				break;
 			}
 		}
@@ -493,7 +493,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 		} else if (IsCssOperator(sc.ch)
 			&& (sc.state != SCE_CSS_ATTRIBUTE || sc.ch == ']')
 			&& (sc.state != SCE_CSS_VALUE || sc.ch == ';' || sc.ch == '}' || sc.ch == '!')
-			&& ((sc.state != SCE_CSS_DIRECTIVE && sc.state != SCE_CSS_MEDIA) || sc.ch == ';' || sc.ch == '{')
+			&& ((sc.state != SCE_CSS_DIRECTIVE && sc.state != SCE_CSS_GROUP_RULE) || sc.ch == ';' || sc.ch == '{')
 			) {
 			if (sc.state != SCE_CSS_OPERATOR)
 				lastState = sc.state;

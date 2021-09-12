@@ -98,7 +98,7 @@
 #define NP2STYLE_UnknownPseudoClass		63405
 #define NP2STYLE_CSSProperty			63406
 #define NP2STYLE_UnknownProperty		63407
-#define NP2STYLE_Media					63408
+#define NP2STYLE_GroupRule				63408
 #define NP2STYLE_Value					63409
 #define NP2STYLE_Important				63410
 
