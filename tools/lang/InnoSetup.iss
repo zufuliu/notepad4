@@ -3,6 +3,7 @@
 ; https://jrsoftware.org/ispphelp/
 [ISPP]
 //! directives		===========================================================
+#preproc
 #define
 #dim
 #redim
@@ -344,6 +345,7 @@ sendto usersendto
 
 [Setup]
 ; Common Parameters
+Check:
 Languages:
 MinVersion:
 OnlyBelowVersion:

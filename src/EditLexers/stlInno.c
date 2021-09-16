@@ -15,7 +15,7 @@ static KEYWORDLIST Keywords_INNO = {{
 "AppendDefaultDirName AppendDefaultGroupName ArchitecturesAllowed ArchitecturesInstallIn64BitMode "
 "AssocFileExtension AssocingFileExtension Attribs AutoStartProgram AutoStartProgramGroupDescription "
 "BackColor BackColor2 BackColorDirection BackSolid BeveledLabel "
-"ChangesAssociations ChangesEnvironment CloseApplications CloseApplicationsFilter "
+"ChangesAssociations ChangesEnvironment Check CloseApplications CloseApplicationsFilter "
 "Comment Components Compression CompressionThreads CopyMode CopyrightFontName CopyrightFontSize "
 "CreateAppDir CreateDesktopIcon CreateQuickLaunchIcon CreateUninstallRegKey "
 "DEPCompatible "
@@ -66,7 +66,7 @@ static KEYWORDLIST Keywords_INNO = {{
 
 , // 4 directives
 "append define dim elif else emit endif endsub error expr file for if ifdef ifexist ifndef ifnexist include insert "
-"pragma redim sub undef "
+"pragma preproc redim sub undef "
 
 , // 5 types
 "any func int str void "

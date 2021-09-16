@@ -1143,9 +1143,9 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		break;
 
 	case SCLEX_INNOSETUP:
-		if (ch == '#' && (iCurrentStyle == SCE_INNO_PREPROCESSOR || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[3]); // preprocessor
-			return AutoC_AddSpecWord_Finish;
+		if (ch == '#' && (iCurrentStyle == SCE_INNO_DEFAULT || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // preprocessor
+			return (iCurrentStyle == SCE_INNO_DEFAULT) ? AutoC_AddSpecWord_Finish : AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
