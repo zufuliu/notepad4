@@ -2688,7 +2688,30 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			RegCloseKey(hKey);
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {
-		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
+		// on Windows 11, all keys were created by the system, we should not delete them.
+		HKEY hKey;
+		LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE, &hKey);
+		if (status == ERROR_SUCCESS) {
+			RegDeleteValue(hKey, L"Debugger");
+			Registry_SetInt(hKey, L"UseFilter", 1);
+			GetWindowsDirectory(tchModule, COUNTOF(tchModule));
+			LPCWSTR const suffix[] = {
+				L"System32\\notepad.exe",
+				L"SysWOW64\\notepad.exe",
+				L"notepad.exe",
+			};
+			for (WCHAR ch = 0; ch < 3; ch++) {
+				const WCHAR num[2] = { ch + L'0', L'\0' };
+				HKEY hSubKey;
+				status = RegOpenKeyEx(hKey, num, 0, KEY_WRITE, &hSubKey);
+				if (status == ERROR_SUCCESS) {
+					PathCombine(command, tchModule, suffix[ch]);
+					Registry_SetString(hSubKey, L"FilterFullPath", command);
+					RegCloseKey(hSubKey);
+				}
+			}
+			RegCloseKey(hKey);
+		}
 	}
 }
 
