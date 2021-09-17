@@ -56,7 +56,6 @@ struct WordList {
 	UINT nTotalLen;
 	UINT orderStart;
 	int iStartLen;
-	int iMaxLength;
 
 	struct WordNode *nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
 	struct WordNode *nodeCache;
@@ -264,9 +263,6 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
 	pWList->offset += align_up(len + 1);
-	if (len > pWList->iMaxLength) {
-		pWList->iMaxLength = len;
-	}
 }
 
 void WordList_Free(struct WordList *pWList) {
@@ -311,7 +307,6 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 	pWList->nWordCount = 0;
 	pWList->nTotalLen = 0;
 	pWList->iStartLen = iRootLen;
-	pWList->iMaxLength = iRootLen;
 
 	if (bIgnoreCase) {
 		pWList->WL_strcmp = _stricmp;
@@ -340,7 +335,6 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, BOOL bIgnoreCase) {
 static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, int iRootLen) {
 	pWList->pWordStart = pRoot;
 	pWList->iStartLen = iRootLen;
-	pWList->iMaxLength = (pWList->nWordCount == 0) ? iRootLen : max_i(iRootLen, pWList->iMaxLength);
 #if NP2_AUTOC_USE_STRING_ORDER
 	pWList->orderStart = pWList->WL_OrderFunc(pRoot, iRootLen);
 #endif
@@ -1468,7 +1462,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	printf("Notepad2 AddDocWord(%u, %u): %.6f\n", pWList->nWordCount, pWList->nTotalLen, elapsed);
 #endif
 
-	const BOOL bShow = pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->iMaxLength == iRootLen);
+	const BOOL bShow = pWList->nWordCount > 0 && !(pWList->nWordCount == 1 && pWList->nTotalLen == (UINT)(iRootLen + 1));
 	const BOOL bUpdated = (autoCompletionConfig.iPreviousItemCount == 0)
 		// deleted some words. leave some words that no longer matches current input at the top.
 		|| (iCondition == AutoCompleteCondition_OnCharAdded && autoCompletionConfig.iPreviousItemCount - pWList->nWordCount > autoCompletionConfig.iVisibleItemCount)
@@ -1487,7 +1481,6 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 		SciCall_AutoCSetSeparator('\n');
 		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
 		//SciCall_AutoCSetDropRestOfWord(TRUE); // delete orginal text: pRoot
-		SciCall_AutoCSetMaxWidth(pWList->iMaxLength << 1); // width columns, default auto
 		SciCall_AutoCSetMaxHeight(min_u(pWList->nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
 		SciCall_AutoCSetCancelAtStart(FALSE); // don't cancel the list when deleting character
 		SciCall_AutoCSetChooseSingle(autoInsert);

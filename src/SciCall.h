@@ -1061,10 +1061,6 @@ NP2_inline void SciCall_AutoCSetMaxHeight(int rowCount) {
 	SciCall(SCI_AUTOCSETMAXHEIGHT, rowCount, 0);
 }
 
-NP2_inline void SciCall_AutoCSetMaxWidth(int characterCount) {
-	SciCall(SCI_AUTOCSETMAXWIDTH, characterCount, 0);
-}
-
 NP2_inline BOOL SciCall_IsAutoCompletionWordCharacter(int ch) {
 	return (BOOL)SciCall(SCI_ISAUTOCOMPLETIONWORDCHARACTER, ch, 0);
 }
