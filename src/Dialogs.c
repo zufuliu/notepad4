@@ -2693,7 +2693,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE, &hKey);
 		if (status == ERROR_SUCCESS) {
 			RegDeleteValue(hKey, L"Debugger");
-			Registry_SetInt(hKey, L"UseFilter", 1);
+			RegDeleteValue(hKey, L"UseFilter");
 			GetWindowsDirectory(tchModule, COUNTOF(tchModule));
 			LPCWSTR const suffix[] = {
 				L"System32\\notepad.exe",
