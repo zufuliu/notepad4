@@ -47,7 +47,7 @@ static void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position length, in
 		switch (state) {
 		}
 
-		if (state == SCE_C_DEFAULT) {
+		if (state == SCE_MARKDOWN_DEFAULT) {
 		}
 	}
 

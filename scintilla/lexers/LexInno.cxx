@@ -228,6 +228,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							}
 						}
 					} else if (ppKind == PreprocessorKind::Pragma) {
+						// TODO: track whether C-style string literals (with escape sequences) is enabled or not.
 						ppKind = PreprocessorKind::None;
 						sc.ChangeState(SCE_INNO_PREPROCESSOR_WORD);
 					} else if (lineState & InnoLineStateCodeSection) {
@@ -344,6 +345,8 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else if (sc.Match('/', '*')) {
 					sc.SetState(SCE_INNO_ISPP_COMMENTBLOCK);
 					sc.Forward();
+				} else if (sc.ch == '\'') {
+					sc.SetState(SCE_INNO_STRING_SQ);
 				} else if (IsIdentifierStart(sc.ch)) {
 					chBeforeIdentifier = chPrevNonWhite;
 					sc.SetState(SCE_INNO_IDENTIFIER);

@@ -97,7 +97,7 @@ NULL
 "scrolling standby text topmargin "
 "urn valign valuetype version vlink vspace "
 
-, // 7 Event Handle
+, // 7 Event Handler
 "onaddtrack onabort onafterprint onauxclick onbeforeprint onbeforeunload onblur oncancel oncanplay oncanplaythrough onchange onclick onclose "
 "oncontextmenu oncopy oncuechange oncut ondblclick ondrag ondragend ondragenter ondragexit ondragleave "
 "ondragover ondragstart ondrop ondurationchange onemptied onended onerror onenter onexit "

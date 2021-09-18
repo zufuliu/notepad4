@@ -252,14 +252,11 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
 
-	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
@@ -282,13 +279,14 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 			}
 			break;
 
-		case SCE_ASY_OPERATOR:
+		case SCE_ASY_OPERATOR: {
+			const char ch = styler[i];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelNext--;
 			}
-			break;
+		} break;
 		}
 
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
@@ -305,7 +303,6 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				if (bracePos) {
 					levelNext++;
 					i = bracePos; // skip the brace
-					chNext = '\0';
 				}
 			}
 
