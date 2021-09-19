@@ -277,9 +277,9 @@ constexpr bool IsBraceFormatSpecifier(char ch) noexcept {
 
 inline bool IsPyFormattedStringEnd(const StyleContext &sc) noexcept {
 	return sc.ch == '}'
+		|| sc.ch == ':'
 		|| (sc.ch == '!' && sc.chNext != '=')
-		|| (sc.ch == '=' && !AnyOf(sc.chPrev, ':', '<', '>', '=', '!'))
-		|| (sc.ch == ':' && (sc.chNext != '=' || AnyOf(sc.GetRelative(2), '<', '>', '=', '^')));
+		|| (sc.ch == '=' && !AnyOf(sc.chPrev, '<', '>', '=', '!'));
 }
 
 Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
@@ -295,19 +295,24 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 	}
 
 	ch = styler.SafeGetCharAt(++pos);
+	char chNext = styler.SafeGetCharAt(pos + 1);
+	if (ch == '%' && IsDateTimeFormatSpecifier(chNext)) {
+		return pos + 2 - sc.currentPos;
+	}
 	// [[fill] align]
 	if (AnyOf(ch, '<', '>', '=', '^')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = chNext;
+		++pos;
 		if (AnyOf(ch, '<', '>', '=', '^')) {
 			ch = styler.SafeGetCharAt(++pos);
 		}
-	} else {
+	} else if (!AnyOf(ch, '\r', '\n', '{', '}')) {
 		Sci_Position width = 1;
 		if (ch & 0x80) {
 			styler.GetCharacterAndWidth(pos, &width);
+			chNext = styler.SafeGetCharAt(pos + width);
 		}
-		const char chNext = styler.SafeGetCharAt(pos + width);
-		if (!AnyOf(ch, '\r', '\n', '{', '}') && AnyOf(chNext, '<', '>', '=', '^')) {
+		if (AnyOf(chNext, '<', '>', '=', '^')) {
 			pos += 1 + width;
 			ch = styler.SafeGetCharAt(pos);
 		}

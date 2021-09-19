@@ -465,7 +465,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_CSHARP_ESCAPECHAR);
 					sc.Forward();
 				} else if (IsInterpolatedString(sc.state)) {
-					nestedState.push_back({sc.state,  parenCount});
+					nestedState.push_back({sc.state, parenCount});
 					sc.SetState(SCE_CSHARP_OPERATOR2);
 					sc.ForwardSetState(SCE_CSHARP_DEFAULT);
 				} else if (IsIdentifierCharEx(sc.chNext) || sc.chNext == '@' || sc.chNext == '$') {
