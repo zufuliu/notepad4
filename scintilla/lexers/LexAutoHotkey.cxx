@@ -430,9 +430,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				}
 				sc.ForwardSetState(SCE_AHK_DEFAULT);
 			} else if (sc.atLineStart) {
-				if (sc.atLineStart) {
-					sc.SetState(SCE_AHK_DEFAULT);
-				}
+				sc.SetState(SCE_AHK_DEFAULT);
 			}
 			break;
 

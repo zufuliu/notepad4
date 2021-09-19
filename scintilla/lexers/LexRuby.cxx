@@ -938,7 +938,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				const char *hit = strchr(q_chars, chNext);
 				if (hit && !isSafeWordcharOrHigh(chNext2)) {
 					Quote.New();
-					if (hit != nullptr) {
+					{
 						state = (int)((q_states >> ((hit - q_chars)*8)) & 0xff);
 						Quote.Open(chNext2);
 						i += 2;

@@ -3734,9 +3734,8 @@ LRESULT CALLBACK ListBoxX::ControlWndProc(HWND hWnd, UINT iMessage, WPARAM wPara
 			// We must take control of selection to prevent the ListBox activating
 			// the popup
 			const LRESULT lResult = ::SendMessage(hWnd, LB_ITEMFROMPOINT, 0, lParam);
-			const int item = LOWORD(lResult);
-			if (HIWORD(lResult) == 0 && item >= 0) {
-				ListBox_SetCurSel(hWnd, item);
+			if (HIWORD(lResult) == 0) {
+				ListBox_SetCurSel(hWnd, LOWORD(lResult));
 				if (lbx) {
 					lbx->OnSelChange();
 				}

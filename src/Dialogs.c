@@ -2674,8 +2674,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
 			Registry_SetInt(hKey, L"UseFilter", 0);
-			for (WCHAR ch = 0; ch < 3; ch++) {
-				const WCHAR num[2] = { ch + L'0', L'\0' };
+			WCHAR num[2] = { L'0', L'\0' };
+			for (int index = 0; index < 3; index++, num[0]++) {
 				HKEY hSubKey;
 				status = Registry_CreateKey(hKey, num, &hSubKey);
 				if (status == ERROR_SUCCESS) {
@@ -2700,12 +2700,12 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 				L"SysWOW64\\notepad.exe",
 				L"notepad.exe",
 			};
-			for (WCHAR ch = 0; ch < 3; ch++) {
-				const WCHAR num[2] = { ch + L'0', L'\0' };
+			WCHAR num[2] = { L'0', L'\0' };
+			for (int index = 0; index < 3; index++, num[0]++) {
 				HKEY hSubKey;
 				status = RegOpenKeyEx(hKey, num, 0, KEY_WRITE, &hSubKey);
 				if (status == ERROR_SUCCESS) {
-					PathCombine(command, tchModule, suffix[ch]);
+					PathCombine(command, tchModule, suffix[index]);
 					Registry_SetString(hSubKey, L"FilterFullPath", command);
 					RegCloseKey(hSubKey);
 				}

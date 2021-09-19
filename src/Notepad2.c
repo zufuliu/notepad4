@@ -6998,7 +6998,7 @@ void UpdateStatusbar(void) {
 		const Sci_Line iEndLine = SciCall_LineFromPosition(iSelEnd);
 		const Sci_Position iStartOfLinePos = SciCall_PositionFromLine(iEndLine);
 		Sci_Line iLinesSelected = iEndLine - iStartLine;
-		if (iSelStart != iSelEnd && iStartOfLinePos != iSelEnd) {
+		if (iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}
 		PosToStrW(iLinesSelected, tchLinesSelected);

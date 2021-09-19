@@ -66,7 +66,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	//const WordList &directives4foldend= *keywordLists[7];
 	const WordList &GNUdirective = *keywordLists[8];
 	const WordList &kwProprocessor = *keywordLists[9];
-	std::string delimiters;
+	constexpr std::string_view delimiters;
 	// Do not leak onto next line
 	if (initStyle == SCE_ASM_STRINGEOL)
 		initStyle = SCE_ASM_DEFAULT;
@@ -165,7 +165,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.SetState(SCE_ASM_DEFAULT);
 				}
 				if (IsDirective && StrEqual(s, "comment")) {
-					const char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
+					const char delimiter = delimiters.empty() ? '~' : delimiters[0];
 					while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd) {
 						sc.ForwardSetState(SCE_ASM_DEFAULT);
 					}
@@ -175,7 +175,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				}
 			}
 		} else if (sc.state == SCE_ASM_COMMENTDIRECTIVE) {
-			const char delimiter = delimiters.empty() ? '~' : delimiters.c_str()[0];
+			const char delimiter = delimiters.empty() ? '~' : delimiters[0];
 			if (sc.ch == delimiter) {
 				while (!sc.atLineEnd) {
 					sc.Forward();
@@ -206,7 +206,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.ChangeState(SCE_ASM_STRINGEOL);
 				sc.ForwardSetState(SCE_ASM_DEFAULT);
 			} else if (isIncludePreprocessor) {
-				if (sc.ch == '>' || sc.ch == '\"' || sc.ch == '\'') {
+				if (sc.ch == '>' || sc.ch == '\'') {
 					sc.ForwardSetState(SCE_ASM_DEFAULT);
 					isIncludePreprocessor = false;
 				}

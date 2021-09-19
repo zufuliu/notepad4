@@ -1948,7 +1948,7 @@ int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 		return i;
 	}
 
-	if (iIndex < 0 || iIndex > pmru->iSize - 1 || !pmru->pszItems[iIndex]) {
+	if (iIndex < 0 || iIndex >= pmru->iSize || !pmru->pszItems[iIndex]) {
 		return -1;
 	}
 	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
