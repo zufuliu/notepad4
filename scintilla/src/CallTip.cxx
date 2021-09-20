@@ -352,10 +352,6 @@ void CallTip::SetPosition(bool aboveText) noexcept {
 	above = aboveText;
 }
 
-bool CallTip::UseStyleCallTip() const noexcept {
-	return useStyleCallTip;
-}
-
 // It might be better to have two access functions for this and to use
 // them for all settings of colours.
 void CallTip::SetForeBack(ColourRGBA fore, ColourRGBA back) noexcept {

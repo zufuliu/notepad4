@@ -213,10 +213,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool mouseDownCaptures;
 	bool mouseWheelCaptures;
 
-	int xCaretMargin;	///< Ensure this many pixels visible on both sides of caret
 	bool horizontalScrollBarVisible;
-	int scrollWidth;
 	bool verticalScrollBarVisible;
+	int xCaretMargin;	///< Ensure this many pixels visible on both sides of caret
+	int scrollWidth;
 	int endAtLastLine;
 	Scintilla::CaretSticky caretSticky;
 	Scintilla::MarginOption marginOptions;
@@ -270,16 +270,16 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	enum class PaintState {
 		notPainting, painting, abandoned
 	} paintState;
-	bool paintAbandonedByStyling;
 	PRectangle rcPaint;
+	bool paintAbandonedByStyling;
 	bool paintingAllText;
 	bool willRedrawAll;
 	WorkNeeded workNeeded;
 	Scintilla::IdleStyling idleStyling;
 	bool needIdleStyling;
 
-	Scintilla::ModificationFlags modEventMask;
 	bool commandEvents;
+	Scintilla::ModificationFlags modEventMask;
 
 	SelectionText drag;
 
@@ -290,14 +290,13 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Sci::Position searchAnchor;
 
 	bool recordingMacro;
+	bool convertPastes;
 
 	Scintilla::AutomaticFold foldAutomatic;
 
 	// Wrapping support
 	WrapPending wrapPending;
 	ActionDuration durationWrapOneUnit;
-
-	bool convertPastes;
 
 	Editor();
 	// ~Editor() in public section

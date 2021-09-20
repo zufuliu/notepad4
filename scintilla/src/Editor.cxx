@@ -156,10 +156,10 @@ Editor::Editor() {
 
 	searchAnchor = 0;
 
-	xCaretMargin = 50;
 	horizontalScrollBarVisible = true;
-	scrollWidth = 2000;
 	verticalScrollBarVisible = true;
+	xCaretMargin = 50;
+	scrollWidth = 2000;
 	endAtLastLine = 1;
 	caretSticky = CaretSticky::Off;
 	marginOptions = MarginOption::None;
@@ -187,15 +187,14 @@ Editor::Editor() {
 	idleStyling = IdleStyling::None;
 	needIdleStyling = false;
 
-	modEventMask = ModificationFlags::EventMaskAll;
 	commandEvents = true;
+	modEventMask = ModificationFlags::EventMaskAll;
 
 	pdoc->AddWatcher(this, nullptr);
 
 	recordingMacro = false;
-	foldAutomatic = AutomaticFold::None;
-
 	convertPastes = true;
+	foldAutomatic = AutomaticFold::None;
 
 	SetRepresentations();
 }
@@ -7913,7 +7912,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::MultiEdgeAddLine:
-		vs.AddMultiEdge(wParam, lParam);
+		vs.AddMultiEdge(static_cast<int>(wParam), ColourRGBA::FromIpRGB(lParam));
 		InvalidateStyleRedraw();
 		break;
 

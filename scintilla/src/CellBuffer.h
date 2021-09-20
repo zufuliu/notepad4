@@ -139,11 +139,11 @@ class CellBuffer {
 private:
 	bool hasStyles;
 	const bool largeDocument;
-	SplitVector<char> substance;
-	SplitVector<char> style;
 	bool readOnly;
 	bool utf8Substance;
 	Scintilla::LineEndType utf8LineEnds;
+	SplitVector<char> substance;
+	SplitVector<char> style;
 
 	bool collectingUndo;
 	UndoHistory uh;

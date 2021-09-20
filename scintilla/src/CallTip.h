@@ -89,7 +89,9 @@ public:
 	void SetPosition(bool aboveText) noexcept;
 
 	/// Used to determine which STYLE_xxxx to use for call tip information
-	bool UseStyleCallTip() const noexcept;
+	bool UseStyleCallTip() const noexcept {
+		return useStyleCallTip;
+	}
 
 	// Modify foreground and background colours
 	void SetForeBack(ColourRGBA fore, ColourRGBA back) noexcept;

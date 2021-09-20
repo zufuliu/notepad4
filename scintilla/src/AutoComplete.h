@@ -12,10 +12,10 @@ namespace Scintilla::Internal {
  */
 class AutoComplete {
 	bool active;
-	std::string stopChars;
-	std::string fillUpChars;
 	char separator;
 	char typesep; // Type separator
+	std::string stopChars;
+	std::string fillUpChars;
 	enum {
 		maxItemLen = 1024
 	};
@@ -51,7 +51,9 @@ public:
 	~AutoComplete();
 
 	/// Is the auto completion list displayed?
-	bool Active() const noexcept;
+	bool Active() const noexcept {
+		return active;
+	}
 
 	/// Display the auto completion list positioned to be near a character position
 	void SCICALL Start(Window &parent, int ctrlID, Sci::Position position, Point location,

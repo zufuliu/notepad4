@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cassert>
 #include <cstring>
+#include <cmath>
 
 #include <stdexcept>
 #include <string>
@@ -50,13 +51,16 @@ bool MarginStyle::ShowsFolding() const noexcept {
 void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technology, const FontSpecification &fs, const char *localeName) {
 	PLATFORM_ASSERT(fs.fontName);
 	measurements.sizeZoomed = GetFontSizeZoomed(fs.size, zoomLevel);
-	const float deviceHeight = static_cast<float>(surface.DeviceHeightFont(measurements.sizeZoomed));
+	const XYPOSITION deviceHeight = static_cast<XYPOSITION>(surface.DeviceHeightFont(measurements.sizeZoomed));
 	const FontParameters fp(fs.fontName, deviceHeight / FontSizeMultiplier, fs.weight,
 		fs.italic, fs.extraFontFlag, technology, fs.characterSet, localeName);
 	font = Font::Allocate(fp);
 
-	measurements.ascent = static_cast<unsigned int>(surface.Ascent(font.get()));
-	measurements.descent = static_cast<unsigned int>(surface.Descent(font.get()));
+	// floor here is historical as platform layers have tweaked their values to match.
+	// ceil would likely be better to ensure (nearly) all of the ink of a character is seen
+	// but that would require platform layer changes.
+	measurements.ascent = surface.Ascent(font.get());
+	measurements.descent = surface.Descent(font.get());
 	measurements.capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
 	measurements.aveCharWidth = surface.AverageCharWidth(font.get());
 	measurements.spaceWidth = surface.WidthText(font.get(), " ");
@@ -66,7 +70,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		constexpr std::string_view allASCIIGraphic("Ayfi"
 		// python: ''.join(chr(ch) for ch in range(32, 127))
 		" !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
-		std::array<XYPOSITION, allASCIIGraphic.length()> positions;
+		std::array<XYPOSITION, allASCIIGraphic.length()> positions {};
 		surface.MeasureWidthsUTF8(font.get(), allASCIIGraphic, positions.data());
 		std::adjacent_difference(positions.begin(), positions.end(), positions.begin());
 		const XYPOSITION maxWidth = *std::max_element(positions.begin(), positions.end());
@@ -80,120 +84,11 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	}
 }
 
-ViewStyle::ViewStyle() : markers(MarkerMax + 1), indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
-	Init();
-}
+ViewStyle::ViewStyle(size_t stylesSize_):
+	styles(stylesSize_),
+	markers(MarkerMax + 1),
+	indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
 
-// Copy constructor only called when printing copies the screen ViewStyle so it can be
-// modified for printing styles.
-ViewStyle::ViewStyle(const ViewStyle &source) : markers(MarkerMax + 1), indicators(static_cast<size_t>(IndicatorNumbers::Max) + 1) {
-	Init(source.styles.size());
-	styles = source.styles;
-	for (auto &style : styles) {
-		// Can't just copy fontName as its lifetime is relative to its owning ViewStyle
-		style.fontName = fontNames.Save(style.fontName);
-	}
-	markers = source.markers;
-	nextExtendedStyle = source.nextExtendedStyle;
-	CalcLargestMarkerHeight();
-
-	indicators = source.indicators;
-
-	indicatorsDynamic = source.indicatorsDynamic;
-	indicatorsSetFore = source.indicatorsSetFore;
-
-	selection = source.selection;
-
-	controlCharSymbol = source.controlCharSymbol;
-	controlCharWidth = source.controlCharWidth;
-	selbar = source.selbar;
-	selbarlight = source.selbarlight;
-	foldmarginColour = source.foldmarginColour;
-	foldmarginHighlightColour = source.foldmarginHighlightColour;
-	hotspotUnderline = source.hotspotUnderline;
-	marginInside = source.marginInside;
-	leftMarginWidth = source.leftMarginWidth;
-	rightMarginWidth = source.rightMarginWidth;
-	maskInLine = source.maskInLine;
-	maskDrawInText = source.maskDrawInText;
-	ms = source.ms;
-	fixedColumnWidth = source.fixedColumnWidth;
-	textStart = source.textStart;
-	zoomLevel = source.zoomLevel;
-	viewWhitespace = source.viewWhitespace;
-	tabDrawMode = source.tabDrawMode;
-	whitespaceSize = source.whitespaceSize;
-	viewIndentationGuides = source.viewIndentationGuides;
-	viewEOL = source.viewEOL;
-
-	caret = source.caret;
-	caretLine = source.caretLine;
-
-	someStylesProtected = false;
-	someStylesForceCase = false;
-	extraFontFlag = source.extraFontFlag;
-	extraAscent = source.extraAscent;
-	extraDescent = source.extraDescent;
-
-	annotationVisible = source.annotationVisible;
-	annotationStyleOffset = source.annotationStyleOffset;
-	eolAnnotationVisible = source.eolAnnotationVisible;
-	eolAnnotationStyleOffset = source.eolAnnotationStyleOffset;
-	braceHighlightIndicatorSet = source.braceHighlightIndicatorSet;
-	braceBadLightIndicatorSet = source.braceBadLightIndicatorSet;
-	braceHighlightIndicator = source.braceHighlightIndicator;
-	braceBadLightIndicator = source.braceBadLightIndicator;
-
-	edgeState = source.edgeState;
-	theEdge = source.theEdge;
-	theMultiEdge = source.theMultiEdge;
-
-	marginStyleOffset = source.marginStyleOffset;
-	marginNumberPadding = source.marginNumberPadding;
-	ctrlCharPadding = source.ctrlCharPadding;
-	lastSegItalicsOffset = source.lastSegItalicsOffset;
-
-	wrap = source.wrap;
-
-	localeName = source.localeName;
-}
-
-ViewStyle::~ViewStyle() {
-	styles.clear();
-	fonts.clear();
-}
-
-void ViewStyle::CalculateMarginWidthAndMask() noexcept {
-	fixedColumnWidth = marginInside ? leftMarginWidth : 0;
-	maskInLine = 0xffffffffU;
-	MarkerMask maskDefinedMarkers = 0;
-	for (const MarginStyle &m : ms) {
-		fixedColumnWidth += m.width;
-		if (m.width > 0)
-			maskInLine &= ~m.mask;
-		maskDefinedMarkers |= m.mask;
-	}
-	maskDrawInText = 0;
-	for (int markBit = 0; markBit < MarkerBitCount; markBit++) {
-		const MarkerMask maskBit = 1U << markBit;
-		switch (markers[markBit].markType) {
-		case MarkerSymbol::Empty:
-			maskInLine &= ~maskBit;
-			break;
-		case MarkerSymbol::Background:
-		case MarkerSymbol::Underline:
-			maskInLine &= ~maskBit;
-			maskDrawInText |= maskDefinedMarkers & maskBit;
-			break;
-		default:	// Other marker types do not affect the masks
-			break;
-		}
-	}
-}
-
-void ViewStyle::Init(size_t stylesSize_) {
-	AllocStyles(stylesSize_);
-	fontNames.Clear();
 	ResetDefaultStyle();
 
 	indicators[0] = Indicator(IndicatorStyle::Squiggle, ColourRGBA(0, 0x7f, 0));
@@ -320,6 +215,109 @@ void ViewStyle::Init(size_t stylesSize_) {
 	localeName = localeNameDefault;
 }
 
+// Copy constructor only called when printing copies the screen ViewStyle so it can be
+// modified for printing styles.
+ViewStyle::ViewStyle(const ViewStyle &source) : ViewStyle(source.styles.size()) {
+	styles = source.styles;
+	for (auto &style : styles) {
+		// Can't just copy fontName as its lifetime is relative to its owning ViewStyle
+		style.fontName = fontNames.Save(style.fontName);
+	}
+	markers = source.markers;
+	nextExtendedStyle = source.nextExtendedStyle;
+	CalcLargestMarkerHeight();
+
+	indicators = source.indicators;
+
+	indicatorsDynamic = source.indicatorsDynamic;
+	indicatorsSetFore = source.indicatorsSetFore;
+
+	selection = source.selection;
+
+	controlCharSymbol = source.controlCharSymbol;
+	controlCharWidth = source.controlCharWidth;
+	selbar = source.selbar;
+	selbarlight = source.selbarlight;
+	foldmarginColour = source.foldmarginColour;
+	foldmarginHighlightColour = source.foldmarginHighlightColour;
+	hotspotUnderline = source.hotspotUnderline;
+	marginInside = source.marginInside;
+	leftMarginWidth = source.leftMarginWidth;
+	rightMarginWidth = source.rightMarginWidth;
+	maskInLine = source.maskInLine;
+	maskDrawInText = source.maskDrawInText;
+	ms = source.ms;
+	fixedColumnWidth = source.fixedColumnWidth;
+	textStart = source.textStart;
+	zoomLevel = source.zoomLevel;
+	viewWhitespace = source.viewWhitespace;
+	tabDrawMode = source.tabDrawMode;
+	whitespaceSize = source.whitespaceSize;
+	viewIndentationGuides = source.viewIndentationGuides;
+	viewEOL = source.viewEOL;
+
+	caret = source.caret;
+	caretLine = source.caretLine;
+
+	someStylesProtected = false;
+	someStylesForceCase = false;
+	extraFontFlag = source.extraFontFlag;
+	extraAscent = source.extraAscent;
+	extraDescent = source.extraDescent;
+
+	annotationVisible = source.annotationVisible;
+	annotationStyleOffset = source.annotationStyleOffset;
+	eolAnnotationVisible = source.eolAnnotationVisible;
+	eolAnnotationStyleOffset = source.eolAnnotationStyleOffset;
+	braceHighlightIndicatorSet = source.braceHighlightIndicatorSet;
+	braceBadLightIndicatorSet = source.braceBadLightIndicatorSet;
+	braceHighlightIndicator = source.braceHighlightIndicator;
+	braceBadLightIndicator = source.braceBadLightIndicator;
+
+	edgeState = source.edgeState;
+	theEdge = source.theEdge;
+	theMultiEdge = source.theMultiEdge;
+
+	marginStyleOffset = source.marginStyleOffset;
+	marginNumberPadding = source.marginNumberPadding;
+	ctrlCharPadding = source.ctrlCharPadding;
+	lastSegItalicsOffset = source.lastSegItalicsOffset;
+
+	wrap = source.wrap;
+
+	localeName = source.localeName;
+}
+
+ViewStyle::~ViewStyle() = default;
+
+void ViewStyle::CalculateMarginWidthAndMask() noexcept {
+	fixedColumnWidth = marginInside ? leftMarginWidth : 0;
+	maskInLine = 0xffffffffU;
+	MarkerMask maskDefinedMarkers = 0;
+	for (const MarginStyle &m : ms) {
+		fixedColumnWidth += m.width;
+		if (m.width > 0)
+			maskInLine &= ~m.mask;
+		maskDefinedMarkers |= m.mask;
+	}
+	maskDrawInText = 0;
+	for (int markBit = 0; markBit < MarkerBitCount; markBit++) {
+		const MarkerMask maskBit = 1U << markBit;
+		switch (markers[markBit].markType) {
+		case MarkerSymbol::Empty:
+			maskInLine &= ~maskBit;
+			break;
+		case MarkerSymbol::Background:
+		case MarkerSymbol::Underline:
+			maskInLine &= ~maskBit;
+			maskDrawInText |= maskDefinedMarkers & maskBit;
+			break;
+		default:	// Other marker types do not affect the masks
+			break;
+		}
+	}
+}
+
 void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	if (!fontsValid) {
 		fontsValid = true;
@@ -367,9 +365,10 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	maxAscent = 1;
 	maxDescent = 1;
 	FindMaxAscentDescent();
-	maxAscent += extraAscent;
-	maxDescent += extraDescent;
-	lineHeight = maxAscent + maxDescent;
+	// Ensure reasonable values: lines less than 1 pixel high will not work
+	maxAscent = std::max(1.0, maxAscent + extraAscent);
+	maxDescent = std::max(0.0, maxDescent + extraDescent);
+	lineHeight = static_cast<int>(std::lround(maxAscent + maxDescent));
 	lineOverlap = std::clamp(lineHeight / 10, 2, lineHeight);
 
 	bool flagProtected = false;
@@ -408,10 +407,19 @@ int ViewStyle::AllocateExtendedStyles(int numberStyles) {
 	return startRange;
 }
 
-void ViewStyle::EnsureStyle(size_t index) {
-	if (index >= styles.size()) {
-		AllocStyles(index + 1);
+void ViewStyle::EnsureStyle([[maybe_unused]] size_t index) {
+#if 0 // we don't use extended style
+	const size_t i = styles.size();
+	if (index >= i) {
+		fontsValid = false;
+		index += 1;
+		styles.resize(index);
+		const Style &source = styles[StyleDefault];
+		for (auto it = styles.begin() + i; it != styles.end(); ++it) {
+			*it = source;
+		}
 	}
+#endif
 }
 
 void ViewStyle::ResetDefaultStyle() {
@@ -464,14 +472,17 @@ int ViewStyle::ExternalMarginWidth() const noexcept {
 }
 
 int ViewStyle::MarginFromLocation(Point pt) const noexcept {
-	int margin = -1;
-	int x = marginInside ? 0 : -fixedColumnWidth;
-	for (size_t i = 0; i < ms.size(); i++) {
-		if ((pt.x >= x) && (pt.x < x + ms[i].width))
-			margin = static_cast<int>(i);
-		x += ms[i].width;
+	XYPOSITION x = marginInside ? 0 : -fixedColumnWidth;
+	int margin = 0;
+	for (const auto &marginStyle : ms) {
+		const XYPOSITION width = marginStyle.width;
+		if ((pt.x >= x) && (pt.x < x + width)) {
+			return margin;
+		}
+		++margin;
+		x += width;
 	}
-	return margin;
+	return -1;
 }
 
 bool ViewStyle::ValidStyle(size_t styleIndex) const noexcept {
@@ -574,14 +585,13 @@ ColourRGBA ViewStyle::WrapColour() const {
 }
 
 // Insert new edge in sorted order.
-void ViewStyle::AddMultiEdge(uptr_t wParam, sptr_t lParam) {
-	const int column = static_cast<int>(wParam);
+void ViewStyle::AddMultiEdge(int column, ColourRGBA colour) {
 	theMultiEdge.insert(
 		std::upper_bound(theMultiEdge.begin(), theMultiEdge.end(), column,
 		[](const EdgeProperties &a, const EdgeProperties &b) noexcept {
 			return a.column < b.column;
 		}),
-		EdgeProperties(column, lParam));
+		EdgeProperties(column, colour));
 }
 
 std::optional<ColourRGBA> ViewStyle::ElementColour(Element element) const {
@@ -741,18 +751,6 @@ bool ViewStyle::ZoomOut() noexcept {
 		}
 	}
 	return false;
-}
-
-void ViewStyle::AllocStyles(size_t sizeNew) {
-	fontsValid = false;
-	const size_t i = styles.size();
-	styles.resize(sizeNew);
-	if (i != 0 && sizeNew > i) {
-		const Style &source = styles[StyleDefault];
-		for (auto it = styles.begin() + i; it != styles.end(); ++it) {
-			*it = source;
-		}
-	}
 }
 
 void ViewStyle::CreateAndAddFont(const FontSpecification &fs) {

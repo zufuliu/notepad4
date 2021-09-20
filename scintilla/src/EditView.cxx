@@ -2824,7 +2824,8 @@ Sci::Position EditView::FormatRange(bool draw, const RangeToFormat *pfr, Surface
 
 	// Set colours for printing according to users settings
 	const PrintOption colourMode = printParameters.colourMode;
-	const auto endStyles = (colourMode == PrintOption::ColourOnWhiteDefaultBG) ? vsPrint.styles.begin() + StyleLineNumber : vsPrint.styles.end();
+	const auto endStyles = (colourMode == PrintOption::ColourOnWhiteDefaultBG) ?
+		vsPrint.styles.begin() + StyleLineNumber : vsPrint.styles.end();
 	for (auto it = vsPrint.styles.begin(); it < endStyles; ++it) {
 		if (colourMode == PrintOption::InvertLight) {
 			it->fore = InvertedLight(it->fore);
@@ -2927,7 +2928,7 @@ Sci::Position EditView::FormatRange(bool draw, const RangeToFormat *pfr, Surface
 				vsPrint.styles[StyleLineNumber].font.get(), number);
 			surface->FlushCachedState();
 			surface->DrawTextNoClip(rcNumber, vsPrint.styles[StyleLineNumber].font.get(),
-				static_cast<XYPOSITION>(ypos + vsPrint.maxAscent), number,
+				ypos + vsPrint.maxAscent, number,
 				vsPrint.styles[StyleLineNumber].fore,
 				vsPrint.styles[StyleLineNumber].back);
 		}

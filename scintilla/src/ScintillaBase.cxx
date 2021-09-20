@@ -477,8 +477,9 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	// StyleDefault for the face name, size and character set. Also use it
 	// for the foreground and background colour.
 	const int ctStyle = ct.UseStyleCallTip() ? StyleCallTip : StyleDefault;
+	const Style &style = vs.styles[ctStyle];
 	if (ct.UseStyleCallTip()) {
-		ct.SetForeBack(vs.styles[StyleCallTip].fore, vs.styles[StyleCallTip].back);
+		ct.SetForeBack(style.fore, style.back);
 	}
 	if (notifyPos == NotificationPosition::None) {
 		ct.innerMarginX = 12;
@@ -493,10 +494,10 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	PRectangle rc = ct.CallTipStart(sel.MainCaret(), pt,
 		vs.lineHeight,
 		defn,
-		vs.styles[ctStyle].fontName,
-		vs.styles[ctStyle].sizeZoomed,
+		style.fontName,
+		style.sizeZoomed,
 		CodePage(),
-		vs.styles[ctStyle].characterSet,
+		style.characterSet,
 		vs.technology,
 		vs.localeName.c_str(),
 		wMain);

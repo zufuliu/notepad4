@@ -35,8 +35,8 @@ using FontMap = std::map<FontSpecification, std::unique_ptr<FontRealised>>;
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	size = (size * zoomLevel + 50) / 100;
-	// Hangs if sizeZoomed (in point) <= 1
-	return std::max(size, 2 * Scintilla::FontSizeMultiplier);
+	// May fail if sizeZoomed (in point) < 1
+	return std::max(size, Scintilla::FontSizeMultiplier);
 }
 
 constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) {
@@ -88,10 +88,8 @@ struct WrapAppearance {
 struct EdgeProperties {
 	int column;
 	ColourRGBA colour;
-	EdgeProperties(int column_ = 0, ColourRGBA colour_ = ColourRGBA(0)) noexcept :
+	constexpr EdgeProperties(int column_ = 0, ColourRGBA colour_ = ColourRGBA(0)) noexcept :
 		column(column_), colour(colour_) {}
-	EdgeProperties(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept :
-		column(static_cast<int>(wParam)), colour(ColourRGBA::FromIpRGB(lParam)) {}
 };
 
 // This is an old style enum so that its members can be used directly as indices without casting
@@ -123,8 +121,8 @@ public:
 	Scintilla::Technology technology;
 	int lineHeight;
 	int lineOverlap;
-	unsigned int maxAscent;
-	unsigned int maxDescent;
+	XYPOSITION maxAscent;
+	XYPOSITION maxDescent;
 	XYPOSITION aveCharWidth;
 	XYPOSITION spaceWidth;
 	XYPOSITION tabWidth;
@@ -191,7 +189,7 @@ public:
 
 	std::string localeName;
 
-	ViewStyle();
+	ViewStyle(size_t stylesSize_ = 256);
 	ViewStyle(const ViewStyle &source);
 	ViewStyle(ViewStyle &&) = delete;
 	// Can only be copied through copy constructor which ensures font names initialised correctly
@@ -199,7 +197,6 @@ public:
 	ViewStyle &operator=(ViewStyle &&) = delete;
 	~ViewStyle();
 	void CalculateMarginWidthAndMask() noexcept;
-	void Init(size_t stylesSize_ = 256);
 	void Refresh(Surface &surface, int tabInChars);
 	void ReleaseAllExtendedStyles() noexcept;
 	int AllocateExtendedStyles(int numberStyles);
@@ -222,7 +219,7 @@ public:
 	bool WhitespaceBackgroundDrawn() const;
 	ColourRGBA WrapColour() const;
 
-	void AddMultiEdge(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
+	void AddMultiEdge(int column, ColourRGBA colour);
 
 	std::optional<ColourRGBA> ElementColour(Scintilla::Element element) const;
 	bool ElementAllowsTranslucent(Scintilla::Element element) const;
@@ -249,7 +246,6 @@ public:
 	bool ZoomOut() noexcept;
 
 private:
-	void AllocStyles(size_t sizeNew);
 	void CreateAndAddFont(const FontSpecification &fs);
 	FontRealised *Find(const FontSpecification &fs) const;
 	void FindMaxAscentDescent() noexcept;

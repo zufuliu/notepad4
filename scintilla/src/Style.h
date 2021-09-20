@@ -9,6 +9,7 @@
 namespace Scintilla::Internal {
 
 struct FontSpecification {
+	// fontName is allocated by a ViewStyle container object and may be null
 	const char *fontName;
 	int size;
 	Scintilla::FontWeight weight = Scintilla::FontWeight::Normal;
@@ -23,8 +24,8 @@ struct FontSpecification {
 };
 
 struct FontMeasurements {
-	unsigned int ascent = 1;
-	unsigned int descent = 1;
+	XYPOSITION ascent = 1;
+	XYPOSITION descent = 1;
 	XYPOSITION capitalHeight = 1;	// Top of capital letter to baseline: ascent - internal leading
 	XYPOSITION aveCharWidth = 1;
 	XYPOSITION spaceWidth = 1;

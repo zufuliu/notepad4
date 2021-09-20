@@ -10,7 +10,7 @@ namespace Lexilla {
 
 // A simple lexer with no state
 class LexerSimple final : public LexerBase {
-	const LexerModule * const module;
+	const LexerModule * const lexer;
 public:
 	explicit LexerSimple(const LexerModule *module_);
 	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) override;

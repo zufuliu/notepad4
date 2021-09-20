@@ -58,10 +58,6 @@ AutoComplete::~AutoComplete() {
 	}
 }
 
-bool AutoComplete::Active() const noexcept {
-	return active;
-}
-
 void AutoComplete::Start(Window &parent, int ctrlID,
 	Sci::Position position, Point location, Sci::Position startLen_,
 	int lineHeight, bool unicodeMode, Technology technology, ListOptions listOptions) noexcept {
