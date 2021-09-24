@@ -1,5 +1,5 @@
 // C++11 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf
-// C++14 https://github.com/cplusplus/draft/raw/master/papers/n4140.pdf
+// C++14 https://github.com/cplusplus/draft/raw/main/papers/n4140.pdf
 // C++17 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf
 // C++20 http://open-std.org/jtc1/sc22/wg21/docs/papers/2020/n4868.pdf
 // C++23 http://open-std.org/jtc1/sc22/wg21/docs/papers/2021/n4892.pdf

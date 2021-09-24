@@ -62,7 +62,7 @@ static_assert(DefaultNestedStateBaseStyle + 3 == SCE_DART_TRIPLE_STRING_SQ);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_DART_TRIPLE_STRING_DQ);
 
 constexpr bool IsDeclarableOperator(int ch) noexcept {
-	// https://github.com/dart-lang/sdk/blob/master/sdk/lib/core/symbol.dart
+	// https://github.com/dart-lang/sdk/blob/main/sdk/lib/core/symbol.dart
 	return AnyOf(ch, '+', '-', '*', '/', '%', '~', '&', '|',
 					 '^', '<', '>', '=', '[', ']');
 }

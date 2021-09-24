@@ -46,7 +46,7 @@ def update_all_keyword():
 								], 0, parse_sql_api_files),
 		('NP2LEX_SWIFT', 'stlSwift.c', 'Swift.swift', 0, parse_swift_api_file),
 		('NP2LEX_VIM', 'stlVim.c', 'Vim.vim', 0, parse_vim_api_file),
-		# https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt
+		# https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt
 		('NP2LEX_WASM', 'stlWASM.c', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),
 	]
 

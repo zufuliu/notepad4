@@ -5,7 +5,7 @@ curl -fsSL -o "LLVM-13.0.0-rc3-win64.exe" "https://github.com/llvm/llvm-project/
 "LLVM-13.0.0-rc3-win64.exe" /S
 
 IF /I "%~1" == "latest" (
-git clone -q --depth=1 --branch=master https://github.com/zufuliu/llvm-utils.git
+git clone -q --depth=1 --branch=main https://github.com/zufuliu/llvm-utils.git
 CALL "llvm-utils\VS2017\install.bat" %2
 ) ELSE (
 curl -fsSL -o "LLVM_VS2017.zip" "https://github.com/zufuliu/llvm-utils/releases/download/v21.06/LLVM_VS2017.zip"

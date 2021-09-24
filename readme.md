@@ -2,14 +2,14 @@
 
 > *Notepad2* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
 
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](../master/License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad2/total.svg)](https://github.com/zufuliu/notepad2/releases)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](../main/License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad2/total.svg)](https://github.com/zufuliu/notepad2/releases)
 
 ## Binaries
 Latest development builds (artifacts in Release configuration for each compiler and platform) are available on [GitHub Actions](https://github.com/zufuliu/notepad2/actions) and [AppVeyor](https://ci.appveyor.com/project/zufuliu/notepad2). Or you can build from source, see [Wiki](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2).
 
 | GitHub Actions (MSVC, Clang, GCC) | AppVeyor (MSVC, Clang) |
 | --------------- | -------- |
-| [![Build status](https://github.com/zufuliu/notepad2/workflows/CI/badge.svg)](https://github.com/zufuliu/notepad2/actions) | [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=master&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) |
+| [![Build status](https://github.com/zufuliu/notepad2/workflows/CI/badge.svg)](https://github.com/zufuliu/notepad2/actions) | [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=main&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) |
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
 ![v4.20.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.20.04.png)
@@ -22,72 +22,72 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Context-based auto-completion for some words](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#context-based-auto-completion)
 * [Enhanced auto indentation](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
 * [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
-* Syntax highlighting, code folding and API list for (see built-in [file extension list](../master/doc/FileExt.txt)):
+* Syntax highlighting, code folding and API list for (see built-in [file extension list](../main/doc/FileExt.txt)):
 	* Plain Text
-	* [ABAQUS](../master/tools/lang/ABAQUS.inp)
-	* [ActionScript](../master/tools/lang/ActionScript.as) for ActionScript 3 and 4.
+	* [ABAQUS](../main/tools/lang/ABAQUS.inp)
+	* [ActionScript](../main/tools/lang/ActionScript.as) for ActionScript 3 and 4.
 	* Android Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
 		* javap
 		* Jasmin
 	* ANSI Art
-	* [ANSYS](../master/tools/lang/APDL.cdb) Parametric Design Language
+	* [ANSYS](../main/tools/lang/APDL.cdb) Parametric Design Language
 	* Assembler, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#assembler)
 		* MASM
 		* GNU Assembler
 		* NASM
-	* [Asymptote Vector Graphics Language](../master/tools/lang/Asymptote.asy), up to Asymptote 2.70.
-	* [AutoHotkey_L](../master/tools/lang/AutoHotkey_L.ahk) and  [AutoHotkey_H](../master/tools/lang/AutoHotkey_H.ahk) Script, up to v2.
+	* [Asymptote Vector Graphics Language](../main/tools/lang/Asymptote.asy), up to Asymptote 2.70.
+	* [AutoHotkey_L](../main/tools/lang/AutoHotkey_L.ahk) and  [AutoHotkey_H](../main/tools/lang/AutoHotkey_H.ahk) Script, up to v2.
 	* AutoIt Script
-	* [AviSynth Script](../master/tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
-	* [AWK](../master/tools/lang/Awk.awk), up to GNU AWK 5.1.
-	* [Batch Script](../master/tools/lang/Batch.bat), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
-	* [C#](../master/tools/lang/CSharp.cs), up to C# 10.0. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
+	* [AviSynth Script](../main/tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
+	* [AWK](../main/tools/lang/Awk.awk), up to GNU AWK 5.1.
+	* [Batch Script](../main/tools/lang/Batch.bat), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
+	* [C#](../main/tools/lang/CSharp.cs), up to C# 10.0. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
 		* [Vala](https://wiki.gnome.org/Projects/Vala) 0.54
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
-		* [C Standard Library](../master/tools/lang/C.c), up to C2x.
-		* [C++ STL](../master/tools/lang/CPP.cpp), up to C++20.
+		* [C Standard Library](../main/tools/lang/C.c), up to C2x.
+		* [C++ STL](../main/tools/lang/CPP.cpp), up to C++20.
 	* CSS Style Sheet
 		* Sassy CSS
 		* Less CSS
 		* HSS
-	* [CMake](../master/tools/lang/CMake.cmake), up to CMake 3.20. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
-	* [CoffeeScript](../master/tools/lang/CoffeeScript.coffee), CoffeeScript 2.5.
+	* [CMake](../main/tools/lang/CMake.cmake), up to CMake 3.20. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
+	* [CoffeeScript](../main/tools/lang/CoffeeScript.coffee), CoffeeScript 2.5.
 	* Common Intermediate Language
 	* Configuration / Properties File
 		* Apache Configuration File
 	* D
-	* [Dart](../master/tools/lang/Dart.dart), up to Dart 2.12.
+	* [Dart](../main/tools/lang/Dart.dart), up to Dart 2.12.
 	* Diff/Patch File
 	* Doxygen
 	* F#
 	* Fortran, GNU Fortran
-	* [GN Build](../master/tools/lang/GN.gn), up to GN 2019-03-13.
-	* [Go](../master/tools/lang/Go.go), up to Go 1.14.
+	* [GN Build](../main/tools/lang/GN.gn), up to GN 2019-03-13.
+	* [Go](../main/tools/lang/Go.go), up to Go 1.14.
 		* Go+ (GoPlus) and the Q language
-	* [Gradle](../master/tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
+	* [Gradle](../main/tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 		* blockdiag, seqdiag, actdiag and nwdiag
-	* [Groovy](../master/tools/lang/Groovy.groovy), up to Groovy 4.0.
-	* [Haxe](../master/tools/lang/Haxe.hx), up to Haxe 4.1
-	* [HTML](../master/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2021-09-08. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
+	* [Groovy](../main/tools/lang/Groovy.groovy), up to Groovy 4.0.
+	* [Haxe](../main/tools/lang/Haxe.hx), up to Haxe 4.1
+	* [HTML](../main/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2021-09-08. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
 		* PHP
 	* INI Configuration File
-	* [Inno Setup](../master/tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
-	* [Boost Jam](../master/tools/lang/Jamfile.jam), up to Jam 4.4.1.
-	* [Java](../master/tools/lang/Java.java), up to Java 16. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
+	* [Inno Setup](../main/tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
+	* [Boost Jam](../main/tools/lang/Jamfile.jam), up to Jam 4.4.1.
+	* [Java](../main/tools/lang/Java.java), up to Java 16. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
-	* [JavaScript](../master/tools/lang/JavaScript.js), up to ECMAScript 2021 (12th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
+	* [JavaScript](../main/tools/lang/JavaScript.js), up to ECMAScript 2021 (12th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* JSON and JSON5 Document
-	* [Julia Script](../master/tools/lang/Julia.jl), up to Julia 1.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
-	* [Kotlin](../master/tools/lang/Kotlin.kt), up to Kotlin 1.5.
+	* [Julia Script](../main/tools/lang/Julia.jl), up to Julia 1.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
+	* [Kotlin](../main/tools/lang/Kotlin.kt), up to Kotlin 1.5.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
-	* [LLVM IR](../master/tools/lang/LLVM.ll), up to LLVM 12.
-	* [Lua Script](../master/tools/lang/Lua.lua), up to Lua 5.4.
+	* [LLVM IR](../main/tools/lang/LLVM.ll), up to LLVM 12.
+	* [Lua Script](../main/tools/lang/Lua.lua), up to Lua 5.4.
 	* Makefile, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#makefile)
 		* nmake
 		* gmake
@@ -98,40 +98,40 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Octave
 		* Scilab
 		* Gnuplot
-	* [Nullsoft Scriptable Install System](../master/tools/lang/NSIS.nsi), up to NSIS 3.06.
+	* [Nullsoft Scriptable Install System](../main/tools/lang/NSIS.nsi), up to NSIS 3.06.
 	* Pascal, Delphi
 	* Perl, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* PowerShell
-	* [Python](../master/tools/lang/Python.py), up to Python 3.10. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
+	* [Python](../main/tools/lang/Python.py), up to Python 3.10. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
 	* PHP Script, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 	* Windows Rescouce Script
-	* [R](../master/tools/lang/R.r), up to R 4.0.3.
-	* [REBOL](../master/tools/lang/Rebol.r) 3 and [Red](../master/tools/lang/Red.red)
-	* [Ruby](../master/tools/lang/Ruby.rb), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
-	* [Rust](../master/tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
+	* [R](../main/tools/lang/R.r), up to R 4.0.3.
+	* [REBOL](../main/tools/lang/Rebol.r) 3 and [Red](../main/tools/lang/Red.red)
+	* [Ruby](../main/tools/lang/Ruby.rb), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
+	* [Rust](../main/tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
 	* Scala Script
 	* Shell Script
 		* Bash likes (sh, bash, dash, ash, zsh, ksh), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
 		* C Shell (csh, tcsh)
 		* M4 Macro, limited support
 	* SQL Query
-		* [SQL Standard](../master/tools/lang/SQL.sql), up to SQL:2016.
-		* [MySQL](../master/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
-		* [SQLite3](../master/tools/lang/SQLite3.sql), up to 3.33.
-		* [PostgreSQL](../master/tools/lang/PostgreSQL.sql), PostgreSQL 13.
-		* [Transact-SQL](../master/tools/lang/Transact-SQL.sql), SQL Server 2019.
-		* [Oracle](../master/tools/lang/Oracle.sql), Oracle 20, incomplete.
-	* [Swift](../master/tools/lang/Swift.swift), Swift 5.5.
+		* [SQL Standard](../main/tools/lang/SQL.sql), up to SQL:2016.
+		* [MySQL](../main/tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
+		* [SQLite3](../main/tools/lang/SQLite3.sql), up to 3.33.
+		* [PostgreSQL](../main/tools/lang/PostgreSQL.sql), PostgreSQL 13.
+		* [Transact-SQL](../main/tools/lang/Transact-SQL.sql), SQL Server 2019.
+		* [Oracle](../main/tools/lang/Oracle.sql), Oracle 20, incomplete.
+	* [Swift](../main/tools/lang/Swift.swift), Swift 5.5.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File
-	* [TypeScript](../master/tools/lang/TypeScript.ts), TypeScript 4.3.
+	* [TypeScript](../main/tools/lang/TypeScript.ts), TypeScript 4.3.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* VHDL
 	* Verilog HDL
-	* [Vim Script](../master/tools/lang/Vim.vim)
-	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/master/src/lexer-keywords.txt), up to wabt 1.0.19.
+	* [Vim Script](../main/tools/lang/Vim.vim)
+	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.19.
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet
@@ -196,8 +196,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)
 * [Localization](https://github.com/zufuliu/notepad2/wiki/Localization)
 	* [日本語](https://github.com/maboroshin/notepad2) by [@maboroshin](https://github.com/maboroshin)
-	* [中文 (繁體)](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hant)
-	* [中文 (简体)](https://github.com/zufuliu/notepad2/tree/master/locale/zh-Hans)
+	* [中文 (繁體)](https://github.com/zufuliu/notepad2/tree/main/locale/zh-Hant)
+	* [中文 (简体)](https://github.com/zufuliu/notepad2/tree/main/locale/zh-Hans)
 	* [한국어](https://github.com/VenusGirl/notepad2) by [@VenusGirl](https://github.com/VenusGirl)
 	* [한국어](https://teus.me/category/IT/Notepad2) by [@bluenlive](https://github.com/bluenlive)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)

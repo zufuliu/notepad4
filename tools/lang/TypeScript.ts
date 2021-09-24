@@ -1,8 +1,8 @@
 // 4.3 https://www.typescriptlang.org/docs/
-// 1.8 https://github.com/microsoft/TypeScript/tree/master/doc/TypeScript Language Specification
+// 1.8 https://github.com/microsoft/TypeScript/tree/main/doc/TypeScript Language Specification
 
 //! keywords		===========================================================
-// https://github.com/microsoft/TypeScript/tree/master/src/compiler/scanner.ts
+// https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts
 abstract as asserts async await
 break
 case catch class const constructor continue
@@ -36,7 +36,7 @@ any bigint boolean never number object string symbol unknown void
 
 //! API				===========================================================
 // use what in JavaScript.js
-// https://github.com/microsoft/TypeScript/tree/master/lib/
+// https://github.com/microsoft/TypeScript/tree/main/lib/
 
 //! TSDoc			===========================================================
 // https://www.typescriptlang.org/docs/handbook/triple-slash-directives.html
