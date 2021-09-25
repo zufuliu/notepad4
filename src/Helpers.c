@@ -1605,7 +1605,51 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 	lstrcpy(lpFaceName, font);
 }
 #endif
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+
+BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
+	if (IsVistaAndAbove()) {
+		const BOOL closing = hFile == NULL;
+		if (closing) {
+			hFile = CreateFile(lpszSrc, FILE_READ_ATTRIBUTES,
+				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+				NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+		}
+		if (hFile != INVALID_HANDLE_VALUE) {
+			WCHAR path[8 + MAX_PATH] = L"";
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
+#else
+			typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = NULL;
+			if (pfnGetFinalPathNameByHandle == NULL) {
+				pfnGetFinalPathNameByHandle = DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
+			}
+			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
 #endif
+			// TODO: support long path
+			if (closing) {
+				CloseHandle(hFile);
+			}
+			if (cch != 0 && StrHasPrefix(path, L"\\\\?\\")) {
+				cch -= CSTRLEN(L"\\\\?\\");
+				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
+				if (StrHasPrefix(p, L"UNC\\")) {
+					cch -= 2;
+					p += 2;
+					*p = L'\\'; // replace 'C' with backslash
+				}
+				if (cch > 0 && cch < MAX_PATH) {
+					memcpy(lpszDest, p, (cch + 1)*sizeof(WCHAR));
+					return TRUE;
+				}
+			}
+		}
+	}
+
+	const DWORD cch = GetFullPathName(lpszSrc, MAX_PATH, lpszDest, NULL);
+	return cch > 0 && cch < MAX_PATH;
+}
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 #if !defined(_WIN64) && defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)

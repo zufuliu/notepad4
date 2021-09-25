@@ -1089,28 +1089,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	}
 
 	// display real path name
-	{
-		WCHAR path[MAX_PATH] = L"";
-		// since Windows Vista
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		if (GetFinalPathNameByHandleW(hFile, path, MAX_PATH, FILE_NAME_OPENED))
-#else
-		typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
-		GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle =
-			DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
-		if (pfnGetFinalPathNameByHandle && pfnGetFinalPathNameByHandle(hFile, path, MAX_PATH, FILE_NAME_OPENED))
-#endif
-		{
-			if (StrHasPrefix(path, L"\\\\?\\")) {
-				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
-				if (StrHasPrefix(p, L"UNC\\")) {
-					p += 2;
-					*p = L'\\'; // replace 'C' with backslash
-				}
-				lstrcpy(pszFile, p);
-			}
-		}
-	}
+	PathGetRealPath(hFile, pszFile, pszFile);
 
 	// Check if a warning message should be displayed for large files
 #if defined(_WIN64)

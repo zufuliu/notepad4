@@ -1022,7 +1022,51 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 	lstrcpy(lpFaceName, font);
 }
 #endif
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
+
+BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
+	if (IsVistaAndAbove()) {
+		const BOOL closing = hFile == NULL;
+		if (closing) {
+			hFile = CreateFile(lpszSrc, FILE_READ_ATTRIBUTES,
+				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+				NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+		}
+		if (hFile != INVALID_HANDLE_VALUE) {
+			WCHAR path[8 + MAX_PATH] = L"";
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
+#else
+			typedef DWORD (WINAPI *GetFinalPathNameByHandleSig)(HANDLE hFile, LPWSTR lpszFilePath, DWORD cchFilePath, DWORD dwFlags);
+			static GetFinalPathNameByHandleSig pfnGetFinalPathNameByHandle = NULL;
+			if (pfnGetFinalPathNameByHandle == NULL) {
+				pfnGetFinalPathNameByHandle = DLLFunctionEx(GetFinalPathNameByHandleSig, L"kernel32.dll", "GetFinalPathNameByHandleW");
+			}
+			DWORD cch = pfnGetFinalPathNameByHandle(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
 #endif
+			// TODO: support long path
+			if (closing) {
+				CloseHandle(hFile);
+			}
+			if (cch != 0 && StrHasPrefix(path, L"\\\\?\\")) {
+				cch -= CSTRLEN(L"\\\\?\\");
+				WCHAR *p = path + CSTRLEN(L"\\\\?\\");
+				if (StrHasPrefix(p, L"UNC\\")) {
+					cch -= 2;
+					p += 2;
+					*p = L'\\'; // replace 'C' with backslash
+				}
+				if (cch > 0 && cch < MAX_PATH) {
+					memcpy(lpszDest, p, (cch + 1)*sizeof(WCHAR));
+					return TRUE;
+				}
+			}
+		}
+	}
+
+	const DWORD cch = GetFullPathName(lpszSrc, MAX_PATH, lpszDest, NULL);
+	return cch > 0 && cch < MAX_PATH;
+}
 
 //=============================================================================
 //
@@ -1543,25 +1587,20 @@ extern WCHAR tchFavoritesDir[MAX_PATH];
 extern WCHAR szCurDir[MAX_PATH + 40];
 
 BOOL SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
-	DWORD dwRetVal = 0;
-
 	if (StrEqualExW(lpFileName, L"..") || StrEqualExW(lpFileName, L".")) {
 		if (StrEqualExW(lpFileName, L"..") && PathIsRoot(szCurDir)) {
-			lstrcpyn(lpBuffer, L"*.*", nBufferLength);
-			dwRetVal = 1;
+			lstrcpy(lpBuffer, L"*.*");
+			return TRUE;
 		}
 	}
 
-	if (!dwRetVal) {
-		dwRetVal = SearchPath(szCurDir, lpFileName, NULL, nBufferLength, lpBuffer, NULL);
+	DWORD cch = SearchPath(szCurDir, lpFileName, NULL, nBufferLength, lpBuffer, NULL);
+	if (cch == 0) {
+		// Search Favorites if no result
+		cch = SearchPath(tchFavoritesDir, lpFileName, NULL, nBufferLength, lpBuffer, NULL);
 	}
 
-	// Search Favorites if no result
-	if (!dwRetVal) {
-		dwRetVal = SearchPath(tchFavoritesDir, lpFileName, NULL, nBufferLength, lpBuffer, NULL);
-	}
-
-	return dwRetVal != 0;
+	return cch != 0 && cch < MAX_PATH;
 }
 
 //=============================================================================

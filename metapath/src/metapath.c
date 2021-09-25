@@ -3242,6 +3242,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, szTmp);
 	}
+	PathGetRealPath(NULL, szPath, szPath);
 
 	if (PathIsLnkFile(szPath)) {
 		return DisplayLnkFile(szPath);
@@ -3321,6 +3322,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, szTmp);
 	}
+	PathGetRealPath(NULL, szPath, szPath);
 
 	const DWORD dwAttr = GetFileAttributes(szPath);
 	if (dwAttr != INVALID_FILE_ATTRIBUTES) {

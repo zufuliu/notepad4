@@ -802,9 +802,10 @@ NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 #endif
 }
 
+// similar to realpath() and std::filesystem::canonical()
+BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest);
 // similar to std::filesystem::equivalent()
 BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
-
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
