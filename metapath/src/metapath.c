@@ -3396,7 +3396,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 *
 *
 ******************************************************************************/
-static BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3418,7 +3418,7 @@ BOOL ActivatePrevInst(void) {
 	}
 
 	HWND hwnd = NULL;
-	EnumWindows(EnumWndProc, (LPARAM)&hwnd);
+	EnumWindows(EnumWindProcReuseWindow, (LPARAM)&hwnd);
 
 	// Found a window
 	if (hwnd != NULL) {
@@ -3552,7 +3552,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 WCHAR szGlobalWndClass[256] = L"";
 BOOL bLoadLaunchSetingsLoaded = FALSE;
 
-static BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -3616,7 +3616,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 	if (iUseTargetApplication && iTargetApplicationMode == 1) {
 		HWND hwnd = NULL;
 		if (!bOpenNew) { // hwnd == NULL
-			EnumWindows(EnumWndProc2, (LPARAM)&hwnd);
+			EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd);
 		}
 
 		// Found a window
@@ -3746,7 +3746,7 @@ void SnapToTarget(HWND hwnd) {
 	}
 
 	HWND hwnd2 = NULL;
-	EnumWindows(EnumWndProc2, (LPARAM)&hwnd2);
+	EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd2);
 
 	// Found a window
 	if (hwnd2 != NULL) {

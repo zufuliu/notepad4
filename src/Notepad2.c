@@ -7710,7 +7710,7 @@ BOOL SaveFileDlg(HWND hwnd, BOOL Untitled, LPWSTR lpstrFile, int cchFile, LPCWST
 *
 *
 ******************************************************************************/
-BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -7728,7 +7728,7 @@ BOOL CALLBACK EnumWndProc(HWND hwnd, LPARAM lParam) {
 	return bContinue;
 }
 
-BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
+static BOOL CALLBACK EnumWindProcSingleFileInstance(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
 	WCHAR szClassName[64];
 
@@ -7771,7 +7771,7 @@ BOOL ActivatePrevInst(void) {
 		GetLongPathNameEx(lpFileArg, MAX_PATH);
 
 		HWND hwnd = NULL;
-		EnumWindows(EnumWndProc2, (LPARAM)&hwnd);
+		EnumWindows(EnumWindProcSingleFileInstance, (LPARAM)&hwnd);
 
 		if (hwnd != NULL) {
 			// Enabled
@@ -7839,7 +7839,7 @@ BOOL ActivatePrevInst(void) {
 	}
 
 	HWND hwnd = NULL;
-	EnumWindows(EnumWndProc, (LPARAM)&hwnd);
+	EnumWindows(EnumWindProcReuseWindow, (LPARAM)&hwnd);
 
 	// Found a window
 	if (hwnd != NULL) {
