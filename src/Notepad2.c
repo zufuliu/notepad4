@@ -1026,7 +1026,7 @@ static inline BOOL IsFileStartsWithDotLog(void) {
 	char tch[5] = "";
 	const Sci_Position len = SciCall_GetText(COUNTOF(tch), tch);
 	// upper case
-	return len >= 4 && StrEqualA(tch, ".LOG");
+	return len >= 4 && StrEqualExA(tch, ".LOG");
 }
 #endif
 
@@ -6741,7 +6741,7 @@ BOOL FindIniFile(void) {
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
-		if (StrEqual(szIniFile, L"*?")) {
+		if (StrEqualExW(szIniFile, L"*?")) {
 			return FALSE;
 		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
@@ -6780,7 +6780,7 @@ BOOL FindIniFile(void) {
 }
 
 BOOL TestIniFile(void) {
-	if (StrEqual(szIniFile, L"*?")) {
+	if (StrEqualExW(szIniFile, L"*?")) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
 		return FALSE;

@@ -2707,7 +2707,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			if (pDotFile) {
 				*pDotFile = TRUE;
 			}
-			if (StrHasPrefix(lpszExt, L"bash") || StrEqual(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
+			if (StrHasPrefix(lpszExt, L"bash") || StrEqualExW(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
 				pLexNew = &lexBash;
 				bFound = TRUE;
 			}
@@ -3402,15 +3402,15 @@ BOOL Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bD
 		TrimString(lpszFont);
 
 		if (bDefaultStyle) {
-			if (StrEqual(lpszFont, L"$(Text)")) {
+			if (StrEqualExW(lpszFont, L"$(Text)")) {
 				lstrcpyn(lpszFont, systemTextFontName, cchFont);
-			} else if (StrCaseEqual(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
+			} else if (StrEqualExW(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
 				lstrcpyn(lpszFont, systemCodeFontName, cchFont);
 			}
 		} else {
-			if (StrEqual(lpszFont, L"$(Text)")) {
+			if (StrEqualExW(lpszFont, L"$(Text)")) {
 				lstrcpyn(lpszFont, defaultTextFontName, cchFont);
-			} else if (StrCaseEqual(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
+			} else if (StrEqualExW(lpszFont, L"$(Code)") || !IsFontAvailable(lpszFont)) {
 				lstrcpyn(lpszFont, defaultCodeFontName, cchFont);
 			}
 		}
@@ -4308,7 +4308,7 @@ static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
 		WCHAR wch[MAX_EDITSTYLE_VALUE_SIZE] = L"";
 		// use "NULL" to distinguish between empty style value like: Keyword=
 		GetPrivateProfileString(pLex->pszName, pStyle->pszName, L"NULL", wch, COUNTOF(wch), themePath);
-		if (!StrEqual(wch, L"NULL")) {
+		if (!StrEqualExW(wch, L"NULL")) {
 			lstrcpy(pStyle->szValue, wch);
 			return;
 		}

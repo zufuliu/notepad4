@@ -1318,7 +1318,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 			SetListViewTheme(hwndDirList);
 		}
 
-		if (!StrEqual(tchFilter, L"*.*") || bNegFilter) {
+		if (!StrEqualExW(tchFilter, L"*.*") || bNegFilter) {
 			ListView_SetTextColor(hwndDirList, bDefColorFilter ? GetSysColor(COLOR_WINDOWTEXT) : colorFilter);
 			ListView_RedrawItems(hwndDirList, 0, ListView_GetItemCount(hwndDirList) - 1);
 		} else {

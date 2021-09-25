@@ -5575,7 +5575,7 @@ int EditPrepareReplace(HWND hwnd, char *szFind2, char **pszReplace2, BOOL *bRepl
 	}
 
 	*bReplaceRE = (searchFlags & SCFIND_REGEXP);
-	if (StrEqualA(lpefr->szReplace, "^c")) {
+	if (StrEqualExA(lpefr->szReplace, "^c")) {
 		*bReplaceRE = FALSE;
 		*pszReplace2 = EditGetClipboardText(hwnd);
 	} else {

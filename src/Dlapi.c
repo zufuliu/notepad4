@@ -780,7 +780,7 @@ BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 //
 void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter) {
 	ZeroMemory(pdlf, sizeof(DL_FILTER));
-	if (StrIsEmpty(lpszFileSpec) || StrEqual(lpszFileSpec, L"*.*")) {
+	if (StrIsEmpty(lpszFileSpec) || StrEqualExW(lpszFileSpec, L"*.*")) {
 		return;
 	}
 

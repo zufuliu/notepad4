@@ -191,7 +191,7 @@ static int	iOpacityLevel		= 75;
 static int	flagPosParam		= 0;
 
 static inline BOOL HasFilter(void) {
-	return !StrEqual(tchFilter, L"*.*") || bNegFilter;
+	return !StrEqualExW(tchFilter, L"*.*") || bNegFilter;
 }
 
 //=============================================================================
@@ -3121,7 +3121,7 @@ BOOL FindIniFile(void) {
 	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
-		if (StrEqual(szIniFile, L"*?")) {
+		if (StrEqualExW(szIniFile, L"*?")) {
 			return 0;
 		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
@@ -3160,7 +3160,7 @@ BOOL FindIniFile(void) {
 }
 
 BOOL TestIniFile(void) {
-	if (StrEqual(szIniFile, L"*?")) {
+	if (StrEqualExW(szIniFile, L"*?")) {
 		lstrcpy(szIniFile2, L"");
 		lstrcpy(szIniFile, L"");
 		return 0;

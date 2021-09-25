@@ -62,25 +62,10 @@ NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	return _wcsicmp(s1, s2) == 0;
 }
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN7) && !(defined(_MSC_VER) && _MSC_VER >= 1920)
-#define StrHasPrefix(s, prefix)				(FindStringOrdinal(FIND_STARTSWITH, (s), -1, (prefix), CSTRLEN(prefix), FALSE) == 0)
-#define StrHasPrefixCase(s, prefix)			(FindStringOrdinal(FIND_STARTSWITH, (s), -1, (prefix), CSTRLEN(prefix), TRUE) == 0)
-#define StrHasPrefixCaseEx(s, prefix, len)	(FindStringOrdinal(FIND_STARTSWITH, (s), -1, (prefix), (len), TRUE) == 0)
-
-NP2_inline LPWSTR StrStrEx(LPCWSTR pszFirst, LPCWSTR pszSrch, BOOL bIgnoreCase) {
-	const int index = FindStringOrdinal(FIND_FROMSTART, pszFirst, -1, pszSrch, -1, bIgnoreCase);
-	return (index == -1) ? NULL : (LPWSTR)(pszFirst + index);
-}
-
-#undef StrStr
-#undef StrStrI
-#define StrStr(pszFirst, pszSrch)			StrStrEx((pszFirst), (pszSrch), FALSE)
-#define StrStrI(pszFirst, pszSrch)			StrStrEx((pszFirst), (pszSrch), TRUE)
-#else
-#define StrHasPrefix(s, prefix)				(wcsncmp((s), (prefix), CSTRLEN(prefix)) == 0)
+#define StrEqualExW(s, t)					(memcmp((s), (t), sizeof(WCHAR)*COUNTOF(t)) == 0)
+#define StrHasPrefix(s, prefix)				(memcmp((s), (prefix), sizeof(WCHAR)*CSTRLEN(prefix)) == 0)
 #define StrHasPrefixCase(s, prefix)			(_wcsnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
 #define StrHasPrefixCaseEx(s, prefix, len)	(_wcsnicmp((s), (prefix), (len)) == 0)
-#endif
 
 NP2_inline BOOL CRTStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;

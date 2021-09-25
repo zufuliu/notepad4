@@ -1943,24 +1943,24 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_AU3:
 	case SCLEX_BASH:
 		if (np2LexLangIndex == IDM_LEXER_CSHELL) {
-			if (StrEqualA(word, "if")) {
+			if (StrEqualExA(word, "if")) {
 				*indent = 2;
 				endPart = "endif";
-			} else if (StrEqualA(word, "switch")) {
+			} else if (StrEqualExA(word, "switch")) {
 				*indent = 2;
 				endPart = "endsw";
-			} else if (StrEqualA(word, "foreach") || StrEqualA(word, "while")) {
+			} else if (StrEqualExA(word, "foreach") || StrEqualExA(word, "while")) {
 				*indent = 2;
 				endPart = "end";
 			}
 		} else {
-			if (StrEqualA(word, "if")) {
+			if (StrEqualExA(word, "if")) {
 				*indent = 2;
 				endPart = "fi";
-			} else if (StrEqualA(word, "case")) {
+			} else if (StrEqualExA(word, "case")) {
 				*indent = 2;
 				endPart = "esac";
-			} else if (StrEqualA(word, "do")) {
+			} else if (StrEqualExA(word, "do")) {
 				*indent = 2;
 				endPart = "done";
 			}
@@ -1968,19 +1968,19 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 		break;
 
 	case SCLEX_CMAKE:
-		if (StrEqualA(word, "function")) {
+		if (StrEqualExA(word, "function")) {
 			*indent = 2;
 			endPart = "endfunction()";
-		} else if (StrEqualA(word, "macro")) {
+		} else if (StrEqualExA(word, "macro")) {
 			*indent = 2;
 			endPart = "endmacro()";
-		} else if (StrEqualA(word, "if")) {
+		} else if (StrEqualExA(word, "if")) {
 			*indent = 2;
 			endPart = "endif()";
-		} else if (StrEqualA(word, "foreach")) {
+		} else if (StrEqualExA(word, "foreach")) {
 			*indent = 2;
 			endPart = "endforeach()";
-		} else if (StrEqualA(word, "while")) {
+		} else if (StrEqualExA(word, "while")) {
 			*indent = 2;
 			endPart = "endwhile()";
 		}
@@ -1999,40 +1999,40 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	} break;
 
 	case SCLEX_LUA:
-		if (StrEqualA(word, "function") || StrEqualA(word, "if") || StrEqualA(word, "do")) {
+		if (StrEqualExA(word, "function") || StrEqualExA(word, "if") || StrEqualExA(word, "do")) {
 			*indent = 2;
 			endPart = "end";
 		}
 		break;
 
 	case SCLEX_MAKEFILE:
-		if (StrEqualA(word, "if")) {
+		if (StrEqualExA(word, "if")) {
 			*indent = 2;
 			endPart = "endif";
-		} else if (StrEqualA(word, "define")) {
+		} else if (StrEqualExA(word, "define")) {
 			*indent = 2;
 			endPart = "endef";
-		} else if (StrEqualA(word, "for")) {
+		} else if (StrEqualExA(word, "for")) {
 			*indent = 2;
 			endPart = "endfor";
 		}
 		break;
 	case SCLEX_MATLAB:
-		if (StrEqualA(word, "function")) {
+		if (StrEqualExA(word, "function")) {
 			*indent = 1;
 			// 'end' is optional
-		} else if (StrEqualA(word, "if") || StrEqualA(word, "for") || StrEqualA(word, "while") || StrEqualA(word, "switch") || StrEqualA(word, "try")) {
+		} else if (StrEqualExA(word, "if") || StrEqualExA(word, "for") || StrEqualExA(word, "while") || StrEqualExA(word, "switch") || StrEqualExA(word, "try")) {
 			*indent = 2;
 			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LEXER_OCTAVE) {
-				if (StrEqualA(word, "if")) {
+				if (StrEqualExA(word, "if")) {
 					endPart = "endif";
-				} else if (StrEqualA(word, "for")) {
+				} else if (StrEqualExA(word, "for")) {
 					endPart = "endfor";
-				} else if (StrEqualA(word, "while")) {
+				} else if (StrEqualExA(word, "while")) {
 					endPart = "endwhile";
-				} else if (StrEqualA(word, "switch")) {
+				} else if (StrEqualExA(word, "switch")) {
 					endPart = "endswitch";
-				} else if (StrEqualA(word, "try")) {
+				} else if (StrEqualExA(word, "try")) {
 					endPart = "end_try_catch";
 				}
 			}
@@ -2045,36 +2045,36 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_NSIS:
 	//case SCLEX_PASCAL:
 	case SCLEX_RUBY:
-		if (StrEqualA(word, "if") || StrEqualA(word, "do") || StrEqualA(word, "while") || StrEqualA(word, "for")) {
+		if (StrEqualExA(word, "if") || StrEqualExA(word, "do") || StrEqualExA(word, "while") || StrEqualExA(word, "for")) {
 			*indent = 2;
 			endPart = "end";
 		}
 		break;
 
 	case SCLEX_SQL:
-		if (StrEqualA(word_low, "if")) {
+		if (StrEqualExA(word_low, "if")) {
 			*indent = 2;
 			endPart = "END IF;";
-		} else if (StrEqualA(word_low, "while")) {
+		} else if (StrEqualExA(word_low, "while")) {
 			*indent = 2;
 			endPart = "END WHILE;";
-		} else if (StrEqualA(word_low, "repeat")) {
+		} else if (StrEqualExA(word_low, "repeat")) {
 			*indent = 2;
 			endPart = "END REPEAT;";
-		} else if (StrEqualA(word_low, "loop") || StrEqualA(word_low, "for")) {
+		} else if (StrEqualExA(word_low, "loop") || StrEqualExA(word_low, "for")) {
 			*indent = 2;
 			endPart = "END LOOP;";
-		} else if (StrEqualA(word_low, "case")) {
+		} else if (StrEqualExA(word_low, "case")) {
 			*indent = 2;
 			endPart = "END CASE;";
-		} else if (StrEqualA(word_low, "begin")) {
+		} else if (StrEqualExA(word_low, "begin")) {
 			*indent = 2;
 			if (StrStrIA(head, "transaction") != NULL) {
 				endPart = "COMMIT;";
 			} else {
 				endPart = "END";
 			}
-		} else if (StrEqualA(word_low, "start")) {
+		} else if (StrEqualExA(word_low, "start")) {
 			if (StrStrIA(head, "transaction") != NULL) {
 				*indent = 2;
 				endPart = "COMMIT;";
