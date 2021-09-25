@@ -25,8 +25,6 @@
 // About
 #define IDD_ABOUT						100
 #define IDC_VERSION						100
-#define IDC_COPYRIGHT					101
-#define IDC_AUTHORNAME					102
 #define IDC_WEBPAGE_TEXT				103
 #define IDC_WEBPAGE_LINK				104
 #define IDC_EMAIL_TEXT					105

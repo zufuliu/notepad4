@@ -49,7 +49,7 @@ BEGIN
       VALUE "CompanyName",      VERSION_COMPANYNAME
       VALUE "FileVersion",      VERSION_FILEVERSION
       VALUE "ProductVersion",   VERSION_FILEVERSION
-      VALUE "LegalCopyright",   VERSION_LEGALCOPYRIGHT_LONG
+      VALUE "LegalCopyright",   VERSION_LEGALCOPYRIGHT
       VALUE "OriginalFilename", "metapath.exe"
     END
   END
