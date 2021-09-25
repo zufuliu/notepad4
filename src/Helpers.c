@@ -1608,6 +1608,12 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 #endif
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
+#if !defined(_WIN64) && defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+typedef struct FILE_ID_128 {
+	BYTE Identifier[16];
+} FILE_ID_128;
+#endif // Win32 XP with Windows 7 SDK.
+
 enum { FileIdInfo = 0x12 };
 typedef struct FILE_ID_INFO {
 	ULONGLONG VolumeSerialNumber;
