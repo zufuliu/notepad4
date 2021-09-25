@@ -87,7 +87,7 @@ jobs:
       run: |
         Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
         $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Preview"
-        $WorkLoads = '--add Microsoft.VisualStudio.Component.WinXP --add Microsoft.VisualStudio.Component.VC.Tools.ARM --add Microsoft.VisualStudio.Component.VC.Tools.ARM64'
+        $WorkLoads = '--add Microsoft.VisualStudio.Component.WinXP'
         $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"", $WorkLoads, '--quiet', '--norestart', '--nocache')
         $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
         if ($process.ExitCode -eq 0) {
@@ -116,14 +116,12 @@ jobs:
         CALL "build\make_zip.bat" MSVC AVX2 Release Locale 1
 
     - name: MSVC ARM64 Release
-      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build ARM64 Release 1
         CALL "locale\build.bat" Build ARM64 Release 1
         CALL "build\make_zip.bat" MSVC ARM64 Release Locale 1
 
     - name: MSVC ARM Release
-      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build ARM Release 1
         CALL "build\make_zip.bat" MSVC ARM Release 1
@@ -223,7 +221,7 @@ jobs:
       run: |
         Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
         $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Preview"
-        $WorkLoads = '--add Microsoft.VisualStudio.Component.WinXP --add Microsoft.VisualStudio.Component.VC.Tools.ARM64'
+        $WorkLoads = '--add Microsoft.VisualStudio.Component.WinXP'
         $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"", $WorkLoads, '--quiet', '--norestart', '--nocache')
         $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
         if ($process.ExitCode -eq 0) {
@@ -253,7 +251,6 @@ jobs:
         CALL "build\make_zip.bat" LLVM AVX2 Release 1
 
     - name: Clang ARM64 Release
-      continue-on-error: true
       run: |
         CALL "build\VS2017\build.bat" Build ARM64 LLVMRelease 1
         CALL "build\make_zip.bat" LLVM ARM64 Release 1
