@@ -793,6 +793,11 @@ NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
+NP2_inline BOOL PathIsSymbolicLink(LPCWSTR pszPath) {
+	// assume file exists, no check for INVALID_FILE_ATTRIBUTES.
+	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+}
+
 // https://docs.microsoft.com/en-us/windows/win32/intl/handling-sorting-in-your-applications#sort-strings-ordinally
 NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -804,6 +809,14 @@ NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 
 // similar to realpath() and std::filesystem::canonical()
 BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest);
+NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) {
+	GetModuleFileName(NULL, tchModule, nSize);
+	// for symbolic link, module path is link's path not target's.
+	if (PathIsSymbolicLink(tchModule)) {
+		PathGetRealPath(NULL, tchModule, tchModule);
+	}
+}
+
 // similar to std::filesystem::equivalent()
 BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,

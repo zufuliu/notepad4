@@ -3116,14 +3116,15 @@ BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 }
 
 BOOL FindIniFile(void) {
+	if (StrEqualExW(szIniFile, L"*?")) {
+		return FALSE;
+	}
+
 	WCHAR tchTest[MAX_PATH];
 	WCHAR tchModule[MAX_PATH];
-	GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+	GetProgramRealPath(tchModule, COUNTOF(tchModule));
 
 	if (StrNotEmpty(szIniFile)) {
-		if (StrEqualExW(szIniFile, L"*?")) {
-			return 0;
-		}
 		if (!CheckIniFile(szIniFile, tchModule)) {
 			ExpandEnvironmentStringsEx(szIniFile, COUNTOF(szIniFile));
 			if (PathIsRelative(szIniFile)) {
@@ -3173,7 +3174,7 @@ BOOL TestIniFile(void) {
 
 	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
 		WCHAR wchModule[MAX_PATH];
-		GetModuleFileName(NULL, wchModule, COUNTOF(wchModule));
+		GetProgramRealPath(wchModule, COUNTOF(wchModule));
 		PathAppend(szIniFile, PathFindFileName(wchModule));
 		PathRenameExtension(szIniFile, L".ini");
 		dwFileAttributes = GetFileAttributes(szIniFile);

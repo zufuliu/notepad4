@@ -7161,7 +7161,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 		lstrcpy(tchExeFile, L"metapath.exe");
 	}
 	if (PathIsRelative(tchExeFile)) {
-		GetModuleFileName(NULL, tchTemp, COUNTOF(tchTemp));
+		GetProgramRealPath(tchTemp, COUNTOF(tchTemp));
 		PathRemoveFileSpec(tchTemp);
 		PathAppend(tchTemp, tchExeFile);
 		if (PathIsFile(tchTemp)) {

@@ -310,7 +310,7 @@ BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath) {
 		}
 
 		// relative to program exe file
-		GetModuleFileName(NULL, tchBuild, COUNTOF(tchBuild));
+		GetProgramRealPath(tchBuild, COUNTOF(tchBuild));
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
 		if (PathIsFile(tchBuild)) {
 			lstrcpy(outPath, tchBuild);
@@ -983,7 +983,7 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	}
 
 	WCHAR path[MAX_PATH];
-	GetModuleFileName(NULL, path, COUNTOF(path));
+	GetProgramRealPath(path, COUNTOF(path));
 	PathRemoveFileSpec(path);
 	PathAppend(path, L"locale");
 	PathAppend(path, folder);
@@ -1073,15 +1073,10 @@ BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 //  PathRelativeToApp()
 //
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
-	WCHAR wchAppPath[MAX_PATH];
-	WCHAR wchWinDir[MAX_PATH];
 	WCHAR wchUserFiles[MAX_PATH];
 	WCHAR wchPath[MAX_PATH];
 	const DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 
-	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
-	PathRemoveFileSpec(wchAppPath);
-	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
 		return;
@@ -1094,6 +1089,12 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcI
 	lstrcpy(wchUserFiles, pszPath);
 	CoTaskMemFree(pszPath);
 #endif
+
+	WCHAR wchAppPath[MAX_PATH];
+	WCHAR wchWinDir[MAX_PATH];
+	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
+	PathRemoveFileSpec(wchAppPath);
+	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
 
 	if (bUnexpandMyDocs &&
 			!PathIsRelative(lpszSrc) &&
