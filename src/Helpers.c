@@ -856,7 +856,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 		lstrcat(szTitle, szExcerptQuote);
 	} else if (StrNotEmpty(lpszFile)) {
 		if (iFormat < 2 && !PathIsRoot(lpszFile)) {
-			if (!StrCaseEqual(szCachedFile, lpszFile)) {
+			if (!StrEqual(szCachedFile, lpszFile)) {
 				SHFILEINFO shfi;
 				lstrcpy(szCachedFile, lpszFile);
 				if (SHGetFileInfo2(lpszFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME)) {
@@ -2434,7 +2434,7 @@ LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
 	return pmru;
 }
 
-BOOL MRU_Destroy(LPMRULIST pmru) {
+void MRU_Destroy(LPMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
 			LocalFree(pmru->pszItems[i]);
@@ -2443,18 +2443,21 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 
 	ZeroMemory(pmru, sizeof(MRULIST));
 	NP2HeapFree(pmru);
-	return TRUE;
 }
 
-int MRU_Compare(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	return (pmru->iFlags & MRUFlags_CaseInsensitive) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
+static inline BOOL MRU_Equal(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
+	return (pmru->iFlags & MRUFlags_FilePath) ? PathEqual(psz1, psz2) : StrEqual(psz1, psz2);
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	int i;
 	for (i = 0; i < pmru->iSize; i++) {
-		if (MRU_Compare(pmru, pmru->pszItems[i], pszNew) == 0) {
-			LocalFree(pmru->pszItems[i]);
+		WCHAR * const item = pmru->pszItems[i];
+		if (item == NULL) {
+			break;
+		}
+		if (MRU_Equal(pmru, item, pszNew)) {
+			LocalFree(item);
 			break;
 		}
 	}
@@ -2478,18 +2481,19 @@ BOOL MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew) {
 BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
 	int i;
 	for (i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i] == NULL) {
+		WCHAR * const item = pmru->pszItems[i];
+		if (item == NULL) {
 			break;
 		}
-		if (StrCaseEqual(pmru->pszItems[i], pszFile)) {
-			LocalFree(pmru->pszItems[i]);
+		if (PathEqual(item, pszFile)) {
+			LocalFree(item);
 			break;
 		}
 		{
 			WCHAR wchItem[MAX_PATH];
-			PathAbsoluteFromApp(pmru->pszItems[i], wchItem, COUNTOF(wchItem), TRUE);
-			if (StrCaseEqual(wchItem, pszFile)) {
-				LocalFree(pmru->pszItems[i]);
+			PathAbsoluteFromApp(item, wchItem, COUNTOF(wchItem), TRUE);
+			if (PathEqual(wchItem, pszFile)) {
+				LocalFree(item);
 				break;
 			}
 		}
@@ -2533,7 +2537,7 @@ BOOL MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 
 	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) != -1) {
 		PathAbsoluteFromApp(wchItem, wchItem, COUNTOF(wchItem), TRUE);
-		if (StrCaseEqual(wchItem, pszFile)) {
+		if (PathEqual(wchItem, pszFile)) {
 			MRU_Delete(pmruStore, i);
 		} else {
 			i++;

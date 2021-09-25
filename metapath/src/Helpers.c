@@ -1737,40 +1737,24 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 //  History Functions
 //
 //
-BOOL History_Init(PHISTORY ph) {
-	if (!ph) {
-		return FALSE;
-	}
-
+void History_Init(PHISTORY ph) {
 	ZeroMemory(ph, sizeof(HISTORY));
 	ph->iCurItem = -1;
-
-	return TRUE;
 }
 
-BOOL History_Uninit(PHISTORY ph) {
-	if (!ph) {
-		return FALSE;
-	}
-
+void History_Uninit(PHISTORY ph) {
 	for (int i = 0; i < HISTORY_ITEMS; i++) {
 		if (ph->psz[i]) {
 			LocalFree(ph->psz[i]);
 		}
 		ph->psz[i] = NULL;
 	}
-
-	return TRUE;
 }
 
 BOOL History_Add(PHISTORY ph, LPCWSTR pszNew) {
-	if (!ph) {
-		return FALSE;
-	}
-
 	// Item to be added is equal to current item
-	if (ph->iCurItem >= 0 && ph->iCurItem <= (HISTORY_ITEMS - 1)) {
-		if (StrCaseEqual(pszNew, ph->psz[ph->iCurItem])) {
+	if (ph->iCurItem >= 0 && ph->iCurItem < HISTORY_ITEMS) {
+		if (ph->psz[ph->iCurItem] != NULL && PathEqual(pszNew, ph->psz[ph->iCurItem])) {
 			return FALSE;
 		}
 	}
@@ -1798,10 +1782,6 @@ BOOL History_Add(PHISTORY ph, LPCWSTR pszNew) {
 }
 
 BOOL History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem) {
-	if (!ph) {
-		return FALSE;
-	}
-
 	if (ph->iCurItem < (HISTORY_ITEMS - 1)) {
 		if (ph->psz[ph->iCurItem + 1]) {
 			ph->iCurItem++;
@@ -1814,10 +1794,6 @@ BOOL History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem) {
 }
 
 BOOL History_Back(PHISTORY ph, LPWSTR pszItem, int cItem) {
-	if (!ph) {
-		return FALSE;
-	}
-
 	if (ph->iCurItem > 0) {
 		if (ph->psz[ph->iCurItem - 1]) {
 			ph->iCurItem--;
@@ -1830,10 +1806,6 @@ BOOL History_Back(PHISTORY ph, LPWSTR pszItem, int cItem) {
 }
 
 BOOL History_CanForward(LCPHISTORY ph) {
-	if (!ph) {
-		return FALSE;
-	}
-
 	if (ph->iCurItem < (HISTORY_ITEMS - 1)) {
 		if (ph->psz[ph->iCurItem + 1]) {
 			return TRUE;
@@ -1844,10 +1816,6 @@ BOOL History_CanForward(LCPHISTORY ph) {
 }
 
 BOOL History_CanBack(LCPHISTORY ph) {
-	if (!ph) {
-		return FALSE;
-	}
-
 	if (ph->iCurItem > 0) {
 		if (ph->psz[ph->iCurItem - 1]) {
 			return TRUE;
@@ -1883,7 +1851,7 @@ LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
 	return pmru;
 }
 
-BOOL MRU_Destroy(LPMRULIST pmru) {
+void MRU_Destroy(LPMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
 			LocalFree(pmru->pszItems[i]);
@@ -1892,18 +1860,21 @@ BOOL MRU_Destroy(LPMRULIST pmru) {
 
 	ZeroMemory(pmru, sizeof(MRULIST));
 	NP2HeapFree(pmru);
-	return 1;
 }
 
-int MRU_Compare(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	return (pmru->iFlags & MRUFlags_CaseInsensitive) ? StrCmpI(psz1, psz2) : StrCmp(psz1, psz2);
+static inline BOOL MRU_Equal(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
+	return (pmru->iFlags & MRUFlags_FilePath) ? PathEqual(psz1, psz2) : StrEqual(psz1, psz2);
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	int i;
 	for (i = 0; i < pmru->iSize; i++) {
-		if (MRU_Compare(pmru, pmru->pszItems[i], pszNew) == 0) {
-			LocalFree(pmru->pszItems[i]);
+		WCHAR * const item = pmru->pszItems[i];
+		if (item == NULL) {
+			break;
+		}
+		if (MRU_Equal(pmru, item, pszNew)) {
+			LocalFree(item);
 			break;
 		}
 	}
@@ -2015,7 +1986,7 @@ BOOL MRU_Save(LPCMRULIST pmru) {
 
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 	WCHAR tch[MAX_PATH];
-	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_CaseInsensitive, MRU_MAX_COPY_MOVE_HISTORY);
+	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
 	MRU_Load(pmru);
 	for (int i = 0; i < MRU_GetCount(pmru); i++) {
 		MRU_Enum(pmru, i, tch, COUNTOF(tch));
@@ -2026,7 +1997,7 @@ void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 
 void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
 	if (StrNotEmpty(pszNewItem)) {
-		LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_CaseInsensitive, MRU_MAX_COPY_MOVE_HISTORY);
+		LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
 		MRU_Load(pmru);
 		MRU_Add(pmru, pszNewItem);
 		MRU_Save(pmru);
@@ -2035,7 +2006,7 @@ void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
 }
 
 void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
-	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_CaseInsensitive, MRU_MAX_COPY_MOVE_HISTORY);
+	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
 	MRU_Load(pmru);
 	MRU_Empty(pmru);
 	MRU_Save(pmru);

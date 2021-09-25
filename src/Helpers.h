@@ -808,6 +808,15 @@ NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
+// https://docs.microsoft.com/en-us/windows/win32/intl/handling-sorting-in-your-applications#sort-strings-ordinally
+NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	return CompareStringOrdinal(pszPath1, -1, pszPath2, -1, TRUE) == CSTR_EQUAL;
+#else
+	return CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, pszPath1, -1, pszPath2, -1) == CSTR_EQUAL;
+#endif
+}
+
 // similar to std::filesystem::equivalent()
 BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
 
@@ -856,7 +865,7 @@ UINT CodePageFromCharSet(UINT uCharSet);
 
 enum {
 	MRUFlags_Default = 0,
-	MRUFlags_CaseInsensitive = 1,
+	MRUFlags_FilePath = 1,
 	MRUFlags_QuoteValue = 2,
 };
 
@@ -873,7 +882,7 @@ typedef struct MRULIST {
 typedef const MRULIST * LPCMRULIST;
 
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
-BOOL	MRU_Destroy(LPMRULIST pmru);
+void	MRU_Destroy(LPMRULIST pmru);
 BOOL	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs);

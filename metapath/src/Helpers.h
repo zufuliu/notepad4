@@ -470,6 +470,15 @@ NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
+// https://docs.microsoft.com/en-us/windows/win32/intl/handling-sorting-in-your-applications#sort-strings-ordinally
+NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	return CompareStringOrdinal(pszPath1, -1, pszPath2, -1, TRUE) == CSTR_EQUAL;
+#else
+	return CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, pszPath1, -1, pszPath2, -1) == CSTR_EQUAL;
+#endif
+}
+
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
 					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
@@ -514,8 +523,8 @@ typedef struct HISTORY {
 
 typedef const HISTORY *LCPHISTORY;
 
-BOOL History_Init(PHISTORY ph);
-BOOL History_Uninit(PHISTORY ph);
+void History_Init(PHISTORY ph);
+void History_Uninit(PHISTORY ph);
 BOOL History_Add(PHISTORY ph, LPCWSTR pszNew);
 BOOL History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem);
 BOOL History_Back(PHISTORY ph, LPWSTR pszItem, int cItem);
@@ -528,7 +537,7 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 
 enum {
 	MRUFlags_Default = 0,
-	MRUFlags_CaseInsensitive = 1,
+	MRUFlags_FilePath = 1,
 };
 
 #define MRU_MAX_COPY_MOVE_HISTORY	24
@@ -545,7 +554,7 @@ typedef struct MRULIST {
 typedef const MRULIST *LPCMRULIST;
 
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
-BOOL MRU_Destroy(LPMRULIST pmru);
+void MRU_Destroy(LPMRULIST pmru);
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex);
 BOOL MRU_Empty(LPMRULIST pmru);
