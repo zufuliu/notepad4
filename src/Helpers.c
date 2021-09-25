@@ -1607,6 +1607,57 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 #endif
 #endif
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+enum { FileIdInfo = 0x12 };
+typedef struct FILE_ID_INFO {
+	ULONGLONG VolumeSerialNumber;
+	FILE_ID_128 FileId;
+} FILE_ID_INFO;
+#endif
+
+static inline BOOL PathGetFileId(LPCWSTR pszPath, FILE_ID_INFO *fileId) {
+	HANDLE hFile = CreateFile(pszPath, FILE_READ_ATTRIBUTES,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return FALSE;
+	}
+	BOOL success;
+	if (IsWin8AndAbove()) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		success = GetFileInformationByHandleEx(hFile, FileIdInfo, fileId, sizeof(FILE_ID_INFO));
+#else
+		typedef BOOL (WINAPI *GetFileInformationByHandleExSig)(HANDLE hFile, int FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
+		static GetFileInformationByHandleExSig pfnGetFileInformationByHandleEx = NULL;
+		if (pfnGetFileInformationByHandleEx == NULL) {
+			pfnGetFileInformationByHandleEx = DLLFunctionEx(GetFileInformationByHandleExSig, L"kernel32.dll", "GetFileInformationByHandleEx");
+		}
+		success = pfnGetFileInformationByHandleEx(hFile, FileIdInfo, fileId, sizeof(FILE_ID_INFO));
+#endif
+	} else {
+		BY_HANDLE_FILE_INFORMATION info;
+		success = GetFileInformationByHandle(hFile, &info);
+		if (success) {
+			fileId->VolumeSerialNumber = info.dwVolumeSerialNumber;
+			memcpy(fileId->FileId.Identifier, &info.nFileIndexHigh, 8);
+			memset(fileId->FileId.Identifier + 8, 0, 8);
+		}
+	}
+
+	CloseHandle(hFile);
+	return success;
+}
+
+BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
+	BOOL same = FALSE;
+	FILE_ID_INFO info1;
+	FILE_ID_INFO info2;
+	if (PathGetFileId(pszPath1, &info1) && PathGetFileId(pszPath2, &info2)) {
+		same = memcmp(&info1, &info2, sizeof(FILE_ID_INFO)) == 0;
+	}
+	return same;
+}
+
 //=============================================================================
 //
 // PathRelativeToApp()

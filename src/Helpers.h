@@ -808,6 +808,9 @@ NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
+// similar to std::filesystem::equivalent()
+BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
+
 void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);

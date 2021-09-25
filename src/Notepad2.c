@@ -7742,7 +7742,7 @@ BOOL CALLBACK EnumWndProc2(HWND hwnd, LPARAM lParam) {
 
 				WCHAR tchFileName[MAX_PATH] = L"";
 				GetDlgItemText(hwnd, IDC_FILENAME, tchFileName, COUNTOF(tchFileName));
-				if (StrCaseEqual(tchFileName, lpFileArg)) {
+				if (PathEquivalent(tchFileName, lpFileArg)) {
 					*(HWND *)lParam = hwnd;
 				} else {
 					bContinue = TRUE;
