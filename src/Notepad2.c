@@ -6533,9 +6533,7 @@ void ParseCommandLine(void) {
 			PathFixBackslashes(lpFileArg);
 			StrTrim(lpFileArg, L" \"");
 
-			if (!PathIsRelative(lpFileArg) && !PathIsUNC(lpFileArg) &&
-					PathGetDriveNumber(lpFileArg) == -1 /*&& PathGetDriveNumber(g_wchWorkingDirectory) != -1*/) {
-
+			if (!PathIsRelative(lpFileArg) && !PathIsUNC(lpFileArg) && PathGetDriveNumber(lpFileArg) == -1) {
 				WCHAR wchPath[MAX_PATH];
 				lstrcpy(wchPath, g_wchWorkingDirectory);
 				PathStripToRoot(wchPath);
@@ -7254,8 +7252,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		lstrcpy(szFileName, tch);
 	}
 
-	PathCanonicalizeEx(szFileName);
-	GetLongPathNameEx(szFileName, COUNTOF(szFileName));
+	if (PathCanonicalize(szFileName, tch)) {
+		lstrcpy(szFileName, tch);
+	}
+	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));
 
 	if (PathIsLnkFile(szFileName)) {
 		PathGetLnkPath(szFileName, szFileName, COUNTOF(szFileName));
@@ -7769,7 +7769,7 @@ BOOL ActivatePrevInst(void) {
 			lstrcpy(lpFileArg, tchTmp);
 		}
 
-		GetLongPathNameEx(lpFileArg, MAX_PATH);
+		GetLongPathName(lpFileArg, lpFileArg, MAX_PATH);
 
 		HWND hwnd = NULL;
 		EnumWindows(EnumWindProcSingleFileInstance, (LPARAM)&hwnd);

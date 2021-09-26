@@ -682,7 +682,6 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 		if (!(PathIsLnkFile(lpstrFile) && PathGetLnkPath(lpstrFile, szParam, COUNTOF(szParam)))) {
 			lstrcpy(szParam, lpstrFile);
 		}
-		//GetShortPathName(szParam, szParam, sizeof(WCHAR)*COUNTOF(szParam));
 		PathQuoteSpaces(szParam);
 
 		ShellExecuteEx(&sei);

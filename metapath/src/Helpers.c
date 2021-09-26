@@ -1162,9 +1162,8 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 		lstrcpyn(wchResult, wchPath, COUNTOF(wchResult));
 	}
 
-	PathCanonicalizeEx(wchResult);
-	if (PathGetDriveNumber(wchResult) != -1) {
-		CharUpperBuff(wchResult, 1);
+	if (PathCanonicalize(wchResult, wchPath)) {
+		lstrcpy(wchResult, wchPath);
 	}
 
 	lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
@@ -1247,8 +1246,11 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 #endif
 
 	if (bSucceeded) {
+		WCHAR wsz[MAX_PATH];
 		ExpandEnvironmentStringsEx(pszResPath, cchResPath);
-		PathCanonicalizeEx(pszResPath);
+		if (PathCanonicalize(pszResPath, wsz)) {
+			lstrcpy(pszResPath, wsz);
+		}
 	}
 
 	return bSucceeded;
@@ -1541,19 +1543,6 @@ void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc) {
 
 	if (ExpandEnvironmentStrings(lpSrc, szBuf, COUNTOF(szBuf))) {
 		lstrcpyn(lpSrc, szBuf, dwSrc);
-	}
-}
-
-//=============================================================================
-//
-//  PathCanonicalizeEx()
-//
-//
-void PathCanonicalizeEx(LPWSTR lpSrc) {
-	WCHAR szDst[MAX_PATH];
-
-	if (PathCanonicalize(szDst, lpSrc)) {
-		lstrcpy(lpSrc, szDst);
 	}
 }
 

@@ -842,8 +842,6 @@ void	StrTab2Space(LPWSTR lpsz);
 BOOL	PathFixBackslashes(LPWSTR lpsz);
 
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
-void	PathCanonicalizeEx(LPWSTR lpSrc);
-DWORD	GetLongPathNameEx(LPWSTR lpszPath, DWORD cchBuffer);
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
 						 SHFILEINFO *psfi, UINT cbFileInfo, UINT uFlags);
 

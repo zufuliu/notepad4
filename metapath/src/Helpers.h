@@ -502,7 +502,6 @@ void PrepareFilterStr(LPWSTR lpFilter);
 void StrTab2Space(LPWSTR lpsz);
 BOOL PathFixBackslashes(LPWSTR lpsz);
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
-void PathCanonicalizeEx(LPWSTR lpSrc);
 BOOL SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer);
 void FormatNumberStr(LPWSTR lpNumberStr);
 
