@@ -1025,6 +1025,7 @@ void GetLocaleDefaultUIFont(LANGID lang, LPWSTR lpFaceName, WORD *wSize) {
 #endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
+	WCHAR path[8 + MAX_PATH] = L"";
 	if (IsVistaAndAbove()) {
 		const BOOL closing = hFile == NULL;
 		if (closing) {
@@ -1033,7 +1034,6 @@ BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 				NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 		}
 		if (hFile != INVALID_HANDLE_VALUE) {
-			WCHAR path[8 + MAX_PATH] = L"";
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			DWORD cch = GetFinalPathNameByHandleW(hFile, path, COUNTOF(path), FILE_NAME_OPENED);
 #else
@@ -1064,8 +1064,24 @@ BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 		}
 	}
 
-	const DWORD cch = GetFullPathName(lpszSrc, MAX_PATH, lpszDest, NULL);
-	return cch > 0 && cch < MAX_PATH;
+	DWORD cch = GetFullPathName(lpszSrc, COUNTOF(path), path, NULL);
+	if (cch > 0 && cch < COUNTOF(path)) {
+		WCHAR *p = path;
+		if (StrHasPrefix(path, L"\\\\?\\")) {
+			cch -= CSTRLEN(L"\\\\?\\");
+			p += CSTRLEN(L"\\\\?\\");
+			if (StrHasPrefix(p, L"UNC\\")) {
+				cch -= 2;
+				p += 2;
+				*p = L'\\'; // replace 'C' with backslash
+			}
+		}
+		if (cch > 0 && cch < MAX_PATH) {
+			memcpy(lpszDest, p, (cch + 1)*sizeof(WCHAR));
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
 
 //=============================================================================
