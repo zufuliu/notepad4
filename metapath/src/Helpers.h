@@ -82,7 +82,7 @@ extern DWORD g_uWinVer;
 #endif
 
 // Operating System Version
-// https://docs.microsoft.com/en-us/windows/desktop/SysInfo/operating-system-version
+// https://docs.microsoft.com/en-us/windows/win32/sysinfo/operating-system-version
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #define IsVistaAndAbove()	TRUE
@@ -557,7 +557,7 @@ LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 void MRU_Destroy(LPMRULIST pmru);
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex);
-BOOL MRU_Empty(LPMRULIST pmru);
+void MRU_Empty(LPMRULIST pmru);
 int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
 NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
 	return MRU_Enum(pmru, 0, NULL, 0);

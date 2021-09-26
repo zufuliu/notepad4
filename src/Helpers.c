@@ -1822,26 +1822,9 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 // Manipulates:
 //
 BOOL PathIsLnkFile(LPCWSTR pszPath) {
-	if (!pszPath || !*pszPath) {
+	if (StrIsEmpty(pszPath)) {
 		return FALSE;
 	}
-
-	/*
-	LPCWSTR pszExt = StrRChr(pszPath, NULL, L'.');
-	if (!pszExt) {
-		return FALSE;
-	}
-	if (StrCaseEqual(pszExt, L".lnk")) {
-		return TRUE;
-	}
-	return FALSE;
-
-	if (StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
-		return TRUE;
-	}
-	return FALSE;
-	*/
-
 	if (!StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
 		return FALSE;
 	}
@@ -1974,7 +1957,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 #endif
 
 	WCHAR tchDescription[128];
-	// TODO: read custom menu text from registry, see System Integratio.
+	// TODO: read custom menu text from registry, see System Integration.
 	GetString(IDS_LINKDESCRIPTION, tchDescription, COUNTOF(tchDescription));
 	//StripMnemonic(tchDescription);
 
@@ -2490,18 +2473,23 @@ void MRU_Destroy(LPMRULIST pmru) {
 	NP2HeapFree(pmru);
 }
 
-static inline BOOL MRU_Equal(LPCMRULIST pmru, LPCWSTR psz1, LPCWSTR psz2) {
-	return (pmru->iFlags & MRUFlags_FilePath) ? PathEqual(psz1, psz2) : StrEqual(psz1, psz2);
+static inline BOOL MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	return CompareStringOrdinal(psz1, -1, psz2, -1, flags & MRUFlags_FilePath) == CSTR_EQUAL;
+#else
+	return (flags & MRUFlags_FilePath) ? PathEqual(psz1, psz2) : StrEqual(psz1, psz2);
+#endif
 }
 
 BOOL MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
+	const int flags = pmru->iFlags;
 	int i;
 	for (i = 0; i < pmru->iSize; i++) {
 		WCHAR * const item = pmru->pszItems[i];
 		if (item == NULL) {
 			break;
 		}
-		if (MRU_Equal(pmru, item, pszNew)) {
+		if (MRU_Equal(flags, item, pszNew)) {
 			LocalFree(item);
 			break;
 		}
@@ -2560,8 +2548,8 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 }
 
 BOOL MRU_Delete(LPMRULIST pmru, int iIndex) {
-	if (iIndex < 0 || iIndex > pmru->iSize - 1) {
-		return 0;
+	if (iIndex < 0 || iIndex >= pmru->iSize) {
+		return FALSE;
 	}
 	if (pmru->pszItems[iIndex]) {
 		LocalFree(pmru->pszItems[iIndex]);
@@ -2594,14 +2582,13 @@ BOOL MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 	return 1;
 }
 
-BOOL MRU_Empty(LPMRULIST pmru) {
+void MRU_Empty(LPMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
 			LocalFree(pmru->pszItems[i]);
 			pmru->pszItems[i] = NULL;
 		}
 	}
-	return TRUE;
 }
 
 int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
@@ -2613,7 +2600,7 @@ int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
 		return i;
 	}
 
-	if (iIndex < 0 || iIndex >= pmru->iSize || !pmru->pszItems[iIndex]) {
+	if (iIndex < 0 || iIndex >= pmru->iSize || pmru->pszItems[iIndex] == NULL) {
 		return -1;
 	}
 	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
