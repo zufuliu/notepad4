@@ -638,7 +638,7 @@ BEGIN
     IDS_ERR_DROP1           "無權存取拖曳放置的檔案或資料夾。"
     //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
     IDS_ERR_FAVORITES       "無權存取「我的最愛」資料夾。\n請在「選項」對話框中指定合法的資料夾。"
-    IDS_ERR_LNK_GETPATH     "沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
+    //IDS_ERR_LNK_GETPATH     "沒有可用於連結的物件的合法的檔案系統路徑。\n連結可能未指向一個檔案或資料夾。"
     IDS_ERR_LNK_NOACCESS    "無權存取連結物件的檔案系統路徑。\n請檢查磁碟或網路連線。"
     IDS_ERR_CREATELINK      "建立指定的連結時發生錯誤。\n可能目標資料夾被寫保護了。"
     IDS_ERR_FILTER          "沒有指定其他過濾項目。\n請參閱 metapath 自述檔案以取得更多資訊。"

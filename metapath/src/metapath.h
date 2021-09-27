@@ -130,7 +130,7 @@ BOOL TestIniFile(void);
 BOOL CreateIniFile(LPCWSTR lpszIniFile);
 
 BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError);
-BOOL DisplayLnkFile(LPCWSTR pszLnkFile);
+BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath);
 
 void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew);
 void SnapToTarget(HWND hwnd);

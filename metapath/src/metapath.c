@@ -1217,31 +1217,23 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			break;
 
-		case DLE_FILE:
-			BeginWaitCursor();
+		case DLE_FILE: {
 			const BOOL bOpenNew = LOWORD(wParam) == IDM_FILE_OPENNEW;
-			if (!PathIsLnkFile(dli.szFileName)) {
-				LaunchTarget(dli.szFileName, bOpenNew);
-			} else {
-				// PathIsLinkFile()
-				WCHAR tch[MAX_PATH];
-
-				if (PathGetLnkPath(dli.szFileName, tch, COUNTOF(tch))) {
-					ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
-					const DWORD dwAttr = GetFileAttributes(tch);
-					if ((dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
-						DisplayLnkFile(dli.szFileName);
-					} else {
-						// Made sure link points to a file
-						LaunchTarget(tch, bOpenNew);
-					}
+			WCHAR tch[MAX_PATH];
+			BeginWaitCursor();
+			if (PathGetLnkPath(dli.szFileName, tch)) {
+				const DWORD dwAttr = GetFileAttributes(tch);
+				if ((dwAttr & FILE_ATTRIBUTE_DIRECTORY)) {
+					DisplayLnkFile(dli.szFileName, tch);
 				} else {
-					DisplayLnkFile(dli.szFileName);
+					// Made sure link points to a file
+					LaunchTarget(tch, bOpenNew);
 				}
+			} else {
+				LaunchTarget(dli.szFileName, bOpenNew);
 			}
-
 			EndWaitCursor();
-			break;
+		} break;
 		}
 	}
 	break;
@@ -1290,7 +1282,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		WCHAR szTmp[MAX_PATH];
-		if (PathIsLnkFile(dli.szFileName) && PathGetLnkPath(dli.szFileName, szTmp, COUNTOF(szTmp))) {
+		if (PathGetLnkPath(dli.szFileName, szTmp)) {
 			GetShortPathName(szTmp, szTmp, COUNTOF(szTmp));
 		} else {
 			GetShortPathName(dli.szFileName, szTmp, COUNTOF(szTmp));
@@ -1857,26 +1849,24 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		DirList_GetItem(hwndDirList, -1, &dli);
 
 		if (dli.ntype == DLE_FILE) {
-			if (PathIsLnkFile(dli.szFileName)) {
-				WCHAR szFullPath[MAX_PATH];
+			WCHAR szFullPath[MAX_PATH];
 
-				//SetFocus(hwndDirList);
-				if (PathGetLnkPath(dli.szFileName, szFullPath, COUNTOF(szFullPath))) {
-					if (GetFileAttributes(szFullPath) != INVALID_FILE_ATTRIBUTES) {
-						WCHAR szDir[MAX_PATH];
-						WCHAR *p;
-						lstrcpy(szDir, szFullPath);
-						if ((p = StrRChr(szDir, NULL, L'\\')) != NULL) {
-							*(p + 1) = 0;
-							if (!PathIsRoot(szDir)) {
-								*p = 0;
-							}
+			//SetFocus(hwndDirList);
+			if (PathGetLnkPath(dli.szFileName, szFullPath)) {
+				if (GetFileAttributes(szFullPath) != INVALID_FILE_ATTRIBUTES) {
+					WCHAR szDir[MAX_PATH];
+					WCHAR *p;
+					lstrcpy(szDir, szFullPath);
+					if ((p = StrRChr(szDir, NULL, L'\\')) != NULL) {
+						*(p + 1) = 0;
+						if (!PathIsRoot(szDir)) {
+							*p = 0;
+						}
 
-							SetCurrentDirectory(szDir);
-							SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
-							if (!DirList_SelectItem(hwndDirList, NULL, szFullPath)) {
-								ListView_EnsureVisible(hwndDirList, 0, FALSE);
-							}
+						SetCurrentDirectory(szDir);
+						SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
+						if (!DirList_SelectItem(hwndDirList, NULL, szFullPath)) {
+							ListView_EnsureVisible(hwndDirList, 0, FALSE);
 						}
 					}
 				}
@@ -1971,7 +1961,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		int i;
 		WCHAR tch[MAX_PATH];
 		for (i = iItem + d; DirList_GetItem(hwndDirList, i, &dli) != (-1); i++) {
-			if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
+			if (dli.ntype == DLE_FILE && !(PathGetLnkPath(dli.szFileName, tch) && PathIsDirectory(tch))) {
 				break;
 			}
 		}
@@ -1979,7 +1969,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (dli.ntype != DLE_FILE) {
 			for (i = 0; i <= iItem; i++) {
 				DirList_GetItem(hwndDirList, i, &dli);
-				if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
+				if (dli.ntype == DLE_FILE && !(PathGetLnkPath(dli.szFileName, tch) && PathIsDirectory(tch))) {
 					break;
 				}
 			}
@@ -2008,7 +1998,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR tch[MAX_PATH];
 		for (i = iItem - d; i > (-1); i--) {
 			DirList_GetItem(hwndDirList, i, &dli);
-			if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
+			if (dli.ntype == DLE_FILE && !(PathGetLnkPath(dli.szFileName, tch) && PathIsDirectory(tch))) {
 				break;
 			}
 		}
@@ -2016,7 +2006,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (dli.ntype != DLE_FILE) {
 			for (i = ListView_GetItemCount(hwndDirList) - 1; i >= iItem; i--) {
 				DirList_GetItem(hwndDirList, i, &dli);
-				if (dli.ntype == DLE_FILE && !PathIsLnkToDirectory(dli.szFileName, tch, COUNTOF(tch))) {
+				if (dli.ntype == DLE_FILE && !(PathGetLnkPath(dli.szFileName, tch) && PathIsDirectory(tch))) {
 					break;
 				}
 			}
@@ -3245,8 +3235,8 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	}
 	PathGetRealPath(NULL, szPath, szPath);
 
-	if (PathIsLnkFile(szPath)) {
-		return DisplayLnkFile(szPath);
+	if (PathGetLnkPath(szPath, szTmp)) {
+		return DisplayLnkFile(szPath, szTmp);
 	}
 
 	const DWORD dwAttr = GetFileAttributes(szPath);
@@ -3295,33 +3285,10 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 //  DisplayLnkFile()
 //
 //
-BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
-	WCHAR szTmp[MAX_PATH];
-	if (!PathGetLnkPath(pszLnkFile, szTmp, COUNTOF(szTmp))) {
-		// Select lnk-file if target is not available
-		if (PathIsFile(pszLnkFile)) {
-			lstrcpy(szTmp, pszLnkFile);
-			PathRemoveFileSpec(szTmp);
-			SetCurrentDirectory(szTmp);
-
-			// Select new file
-			SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
-			SHFILEINFO shfi;
-			SHGetFileInfo(pszLnkFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-			if (!DirList_SelectItem(hwndDirList, shfi.szDisplayName, pszLnkFile)) {
-				ListView_EnsureVisible(hwndDirList, 0, FALSE);
-			}
-		}
-
-		MsgBoxWarn(MB_OK, IDS_ERR_LNK_GETPATH);
-		return FALSE;
-	}
-
-	ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
-
+BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 	WCHAR szPath[MAX_PATH];
-	if (!SearchPathEx(szTmp, COUNTOF(szPath), szPath)) {
-		lstrcpy(szPath, szTmp);
+	if (!SearchPathEx(pszResPath, COUNTOF(szPath), szPath)) {
+		lstrcpy(szPath, pszResPath);
 	}
 	PathGetRealPath(NULL, szPath, szPath);
 
@@ -3374,9 +3341,9 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile) {
 	// GetFileAttributes() failed
 	// Select lnk-file if target is not available
 	if (PathIsFile(pszLnkFile)) {
-		lstrcpy(szTmp, pszLnkFile);
-		PathRemoveFileSpec(szTmp);
-		SetCurrentDirectory(szTmp);
+		lstrcpy(szPath, pszLnkFile);
+		PathRemoveFileSpec(szPath);
+		SetCurrentDirectory(szPath);
 
 		// Select new file
 		SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
@@ -3644,7 +3611,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 
 			LPWSTR lpParam;
 			WCHAR szTmp[MAX_PATH];
-			if (PathIsLnkFile(lpFileName) && PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
+			if (PathGetLnkPath(lpFileName, szTmp)) {
 				lpParam = szTmp;
 			} else {
 				lpParam = (LPWSTR)lpFileName;
@@ -3692,7 +3659,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 
 		LPWSTR lpParam;
 		WCHAR szTmp[MAX_PATH];
-		if (PathIsLnkFile(lpFileName) && PathGetLnkPath(lpFileName, szTmp, COUNTOF(szTmp))) {
+		if (PathGetLnkPath(lpFileName, szTmp)) {
 			lpParam = szTmp;
 		} else {
 			lpParam = (LPWSTR)lpFileName;

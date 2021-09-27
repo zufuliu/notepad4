@@ -483,9 +483,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcI
 					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
 
-BOOL PathIsLnkFile(LPCWSTR pszPath);
-BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath);
-BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
+BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
 void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect);
 

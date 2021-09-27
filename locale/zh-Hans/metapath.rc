@@ -638,7 +638,7 @@ BEGIN
     IDS_ERR_DROP1           "无权访问拖拽放置的文件或文件夹。"
     //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
     IDS_ERR_FAVORITES       "无权访问“收藏夹”文件夹。\n请在“选项”对话框中指定一个有效的文件夹。"
-    IDS_ERR_LNK_GETPATH     "没有可用于快捷方式对象的有效的文件系统路径。\n快捷方式可能未指向一个文件或文件夹。"
+    //IDS_ERR_LNK_GETPATH     "没有可用于快捷方式对象的有效的文件系统路径。\n快捷方式可能未指向一个文件或文件夹。"
     IDS_ERR_LNK_NOACCESS    "无权访问快捷方式对象的文件系统路径。\n请检查磁盘或网络连接。"
     IDS_ERR_CREATELINK      "创建指定的快捷方式时出错。\n可能目标文件夹被写保护了。"
     IDS_ERR_FILTER          "未指定其他过滤项。\n请参阅 metapath 自述文件以获取更多信息。"

@@ -1829,28 +1829,6 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 ///////////////////////////////////////////////////////////////////////////////
 //
 //
-// Name: PathIsLnkFile()
-//
-// Purpose: Determine wheter pszPath is a Windows Shell Link File by
-// comparing the filename extension with L".lnk"
-//
-// Manipulates:
-//
-BOOL PathIsLnkFile(LPCWSTR pszPath) {
-	if (StrIsEmpty(pszPath)) {
-		return FALSE;
-	}
-	if (!StrCaseEqual(PathFindExtension(pszPath), L".lnk")) {
-		return FALSE;
-	}
-
-	WCHAR tchResPath[MAX_PATH];
-	return PathGetLnkPath(pszPath, tchResPath, COUNTOF(tchResPath));
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//
 // Name: PathGetLnkPath()
 //
 // Purpose: Try to get the path to which a lnk-file is linked
@@ -1858,24 +1836,26 @@ BOOL PathIsLnkFile(LPCWSTR pszPath) {
 //
 // Manipulates: pszResPath
 //
-BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
+BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
+	if (StrIsEmpty(pszLnkFile)) {
+		return FALSE;
+	}
+	if (!StrCaseEqual(PathFindExtension(pszLnkFile), L".lnk")) {
+		return FALSE;
+	}
+
 	IShellLink *psl;
-	BOOL bSucceeded = FALSE;
+	HRESULT hr = S_FALSE;
+	WCHAR tchPath[MAX_PATH];
+	tchPath[0] = L'\0';
 
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
-			WCHAR wsz[MAX_PATH];
-			lstrcpy(wsz, pszLnkFile);
-
-			if (SUCCEEDED(ppf->Load(wsz, STGM_READ))) {
-				WIN32_FIND_DATA fd;
-				if (S_OK == psl->GetPath(pszResPath, cchResPath, &fd, 0)) {
-					// This additional check seems reasonable
-					bSucceeded = StrNotEmpty(pszResPath);
-				}
+			if (SUCCEEDED(ppf->Load(pszLnkFile, STGM_READ))) {
+				hr = psl->GetPath(tchPath, COUNTOF(tchPath), nullptr, 0);
 			}
 			ppf->Release();
 		}
@@ -1886,15 +1866,8 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			WCHAR wsz[MAX_PATH];
-			lstrcpy(wsz, pszLnkFile);
-
-			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, wsz, STGM_READ))) {
-				WIN32_FIND_DATA fd;
-				if (S_OK == psl->lpVtbl->GetPath(psl, pszResPath, cchResPath, &fd, 0)) {
-					// This additional check seems reasonable
-					bSucceeded = StrNotEmpty(pszResPath);
-				}
+			if (SUCCEEDED(ppf->lpVtbl->Load(ppf, pszLnkFile, STGM_READ))) {
+				hr = psl->lpVtbl->GetPath(psl, tchPath, COUNTOF(tchPath), NULL, 0);
 			}
 			ppf->lpVtbl->Release(ppf);
 		}
@@ -1902,37 +1875,13 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 	}
 #endif
 
-	if (bSucceeded) {
-		WCHAR wsz[MAX_PATH];
-		ExpandEnvironmentStringsEx(pszResPath, cchResPath);
-		if (PathCanonicalize(wsz, pszResPath)) {
-			lstrcpy(pszResPath, wsz);
+	if (hr == S_OK && StrNotEmpty(tchPath)) {
+		ExpandEnvironmentStringsEx(tchPath, COUNTOF(tchPath));
+		if (!PathCanonicalize(pszResPath, tchPath)) {
+			lstrcpy(pszResPath, tchPath);
 		}
 	}
 
-	return bSucceeded;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//
-//
-// Name: PathIsLnkToDirectory()
-//
-// Purpose: Determine wheter pszPath is a Windows Shell Link File which
-// refers to a directory
-//
-// Manipulates: pszResPath
-//
-BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath) {
-	if (PathIsLnkFile(pszPath)) {
-		WCHAR tchResPath[MAX_PATH];
-		if (PathGetLnkPath(pszPath, tchResPath, COUNTOF(tchResPath))) {
-			if (PathIsDirectory(tchResPath)) {
-				lstrcpyn(pszResPath, tchResPath, cchResPath);
-				return TRUE;
-			}
-		}
-	}
 	return FALSE;
 }
 
@@ -1996,18 +1945,15 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	IShellLink *psl;
 	BOOL bSucceeded = FALSE;
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
-			WCHAR wsz[MAX_PATH];
-			lstrcpy(wsz, tchLnkFileName);
-
 			psl->SetPath(tchExeFile);
 			psl->SetArguments(tchArguments);
 			psl->SetDescription(tchDescription);
 
-			if (SUCCEEDED(ppf->Save(wsz, TRUE))) {
+			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
 				bSucceeded = TRUE;
 			}
 			ppf->Release();
@@ -2019,14 +1965,11 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			WCHAR wsz[MAX_PATH];
-			lstrcpy(wsz, tchLnkFileName);
-
 			psl->lpVtbl->SetPath(psl, tchExeFile);
 			psl->lpVtbl->SetArguments(psl, tchArguments);
 			psl->lpVtbl->SetDescription(psl, tchDescription);
 
-			if (SUCCEEDED(ppf->lpVtbl->Save(ppf, wsz, TRUE))) {
+			if (SUCCEEDED(ppf->lpVtbl->Save(ppf, tchLnkFileName, TRUE))) {
 				bSucceeded = TRUE;
 			}
 
@@ -2065,16 +2008,12 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	IShellLink *psl;
 	BOOL bSucceeded = FALSE;
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
-			WCHAR wsz[MAX_PATH];
-			lstrcpy(wsz, tchLnkFileName);
-
 			psl->SetPath(pszTarget);
-
-			if (SUCCEEDED(ppf->Save(wsz, TRUE))) {
+			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
 				bSucceeded = TRUE;
 			}
 
@@ -2087,12 +2026,8 @@ BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->lpVtbl->QueryInterface(psl, &IID_IPersistFile, (void **)(&ppf)))) {
-			WCHAR wsz[MAX_PATH];
-			lstrcpy(wsz, tchLnkFileName);
-
 			psl->lpVtbl->SetPath(psl, pszTarget);
-
-			if (SUCCEEDED(ppf->lpVtbl->Save(ppf, wsz, TRUE))) {
+			if (SUCCEEDED(ppf->lpVtbl->Save(ppf, tchLnkFileName, TRUE))) {
 				bSucceeded = TRUE;
 			}
 

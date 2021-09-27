@@ -679,7 +679,7 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 		sei.nShow = SW_SHOWNORMAL;
 
 		// resolve links and get short path name
-		if (!(PathIsLnkFile(lpstrFile) && PathGetLnkPath(lpstrFile, szParam, COUNTOF(szParam)))) {
+		if (!PathGetLnkPath(lpstrFile, szParam)) {
 			lstrcpy(szParam, lpstrFile);
 		}
 		PathQuoteSpaces(szParam);

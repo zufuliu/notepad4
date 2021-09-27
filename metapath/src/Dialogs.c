@@ -1969,8 +1969,8 @@ BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
 		WCHAR szDestination[MAX_PATH + 4];
 		ZeroMemory(szDestination, sizeof(szDestination));
-
-		if (PathIsLnkToDirectory(dliOpenWith.szFileName, szDestination, COUNTOF(szDestination))) {
+		const BOOL link = PathGetLnkPath(dliOpenWith.szFileName, szDestination);
+		if (link && PathIsDirectory(szDestination)) {
 			WCHAR szSource[MAX_PATH + 4];
 			ZeroMemory(szSource, sizeof(szSource));
 			lstrcpy(szSource, lpdliParam->szFileName);
@@ -1995,31 +1995,28 @@ BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 					}
 				}
 			}
-			return TRUE;
 		}
-		{
+		else {
 			SHELLEXECUTEINFO sei;
-			WCHAR szParam[MAX_PATH];
-
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = 0;
 			sei.hwnd = hwnd;
 			sei.lpVerb = NULL;
 			sei.lpFile = dliOpenWith.szFileName;
-			sei.lpParameters = szParam;
+			sei.lpParameters = szDestination;
 			sei.lpDirectory = szCurDir;
 			sei.nShow = SW_SHOWNORMAL;
 
 			// resolve links and get short path name
-			if (!(PathIsLnkFile(lpdliParam->szFileName) && PathGetLnkPath(lpdliParam->szFileName, szParam, COUNTOF(szParam)))) {
-				lstrcpy(szParam, lpdliParam->szFileName);
+			if (!link) {
+				lstrcpy(szDestination, lpdliParam->szFileName);
 			}
 
-			GetShortPathName(szParam, szParam, COUNTOF(szParam));
+			GetShortPathName(szDestination, szDestination, COUNTOF(szDestination));
 			ShellExecuteEx(&sei);
-			return TRUE;
 		}
+		return TRUE;
 	}
 
 	return FALSE;

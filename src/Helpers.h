@@ -823,9 +823,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
 
-BOOL PathIsLnkFile(LPCWSTR pszPath);
-BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath);
-BOOL PathIsLnkToDirectory(LPCWSTR pszPath, LPWSTR pszResPath, int cchResPath);
+BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 BOOL PathCreateDeskLnk(LPCWSTR pszDocument);
 BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
 void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect);

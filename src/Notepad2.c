@@ -2885,10 +2885,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			WCHAR tchSelItem[MAX_PATH];
 
 			if (FavoritesDlg(hwnd, tchSelItem)) {
-				if (PathIsLnkToDirectory(tchSelItem, NULL, 0)) {
-					PathGetLnkPath(tchSelItem, tchSelItem, COUNTOF(tchSelItem));
-				}
-
+				PathGetLnkPath(tchSelItem, tchSelItem);
 				if (PathIsDirectory(tchSelItem)) {
 					WCHAR tchFile[MAX_PATH];
 
@@ -7256,10 +7253,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		lstrcpy(szFileName, tch);
 	}
 	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));
-
-	if (PathIsLnkFile(szFileName)) {
-		PathGetLnkPath(szFileName, szFileName, COUNTOF(szFileName));
-	}
+	PathGetLnkPath(szFileName, szFileName);
 
 #if NP2_USE_DESIGNATED_INITIALIZER
 	EditFileIOStatus status = {
