@@ -7252,7 +7252,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		lstrcpy(szFileName, tch);
 	}
 
-	if (PathCanonicalize(szFileName, tch)) {
+	if (PathCanonicalize(tch, szFileName)) {
 		lstrcpy(szFileName, tch);
 	}
 	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));

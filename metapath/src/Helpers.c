@@ -1178,7 +1178,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 		lstrcpyn(wchResult, wchPath, COUNTOF(wchResult));
 	}
 
-	if (PathCanonicalize(wchResult, wchPath)) {
+	if (PathCanonicalize(wchPath, wchResult)) {
 		lstrcpy(wchResult, wchPath);
 	}
 
@@ -1264,7 +1264,7 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath, int cchResPath) {
 	if (bSucceeded) {
 		WCHAR wsz[MAX_PATH];
 		ExpandEnvironmentStringsEx(pszResPath, cchResPath);
-		if (PathCanonicalize(pszResPath, wsz)) {
+		if (PathCanonicalize(wsz, pszResPath)) {
 			lstrcpy(pszResPath, wsz);
 		}
 	}
