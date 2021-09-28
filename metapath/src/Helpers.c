@@ -1272,7 +1272,7 @@ BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 		IPersistFile *ppf;
 
 		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
-			psl->SetPath(pszPath)
+			psl->SetPath(pszPath);
 
 			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
 				bSucceeded = TRUE;
