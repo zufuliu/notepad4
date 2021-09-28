@@ -1271,7 +1271,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					if (params->flagLexerSpecified) {
 						if (params->iInitialLexer <= 0) {
 							WCHAR wchExt[32] = L".";
-							lstrcpyn(CharNext(wchExt), StrEnd(&params->wchData) + 1, 30);
+							lstrcpyn(wchExt + 1, StrEnd(&params->wchData) + 1, COUNTOF(wchExt) - 1);
 							Style_SetLexerFromName(&params->wchData, wchExt);
 						} else {
 							Style_SetLexerFromID(params->iInitialLexer);
@@ -6325,7 +6325,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			flagDefaultPos = 0;
 			state = 1;
 			while (*p && state == 1) {
-				switch (ToUpperA(*p)) {
+				switch (ToUpperA(*p++)) {
 				case L'F':
 					flagDefaultPos &= ~(4 | 8 | 16 | 32);
 					flagDefaultPos |= 64;
@@ -6362,7 +6362,6 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 					state = 0;
 					break;
 				}
-				p = CharNext(p);
 			}
 		}
 		break;

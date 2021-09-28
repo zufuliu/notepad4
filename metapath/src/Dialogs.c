@@ -1396,21 +1396,17 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 
 			DWORD dwIndex = 0;
 			DWORD dwCheck = 0xFFFF; // index of current filter
-			for (int i = 0; i < pIniSection->count; i++) {
+			for (int i = 0; i < pIniSection->count; i++, dwIndex++) {
 				const IniKeyValueNode *node = &pIniSection->nodeList[i];
 				LPCWSTR pszFilterValue = node->value;
 				if (*pszFilterValue) {
 					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node->key);
 					// Find description for current filter
 					const BOOL negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
-					if ((StrCaseEqual(pszFilterValue, szTypedFilter) && !negFilter) ||
-							(StrCaseEqual(CharNext(pszFilterValue), szTypedFilter) &&
-							 negFilter && *pszFilterValue == L'-')) {
+					if ((!negFilter || *pszFilterValue == L'-') && StrCaseEqual(pszFilterValue + negFilter, szTypedFilter)) {
 						dwCheck = dwIndex;
 					}
 				}
-
-				dwIndex++;
 			}
 			IniSectionFree(pIniSection);
 			NP2HeapFree(pIniSectionBuf);

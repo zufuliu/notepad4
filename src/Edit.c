@@ -4474,7 +4474,7 @@ void EditSortLines(int iSortFlags) {
 						if (col + tabs <= iSortColumn) {
 							col += tabs;
 							tabs = tabWidth;
-							pwszLine = CharNext(pwszLine);
+							++pwszLine;
 						} else {
 							break;
 						}
@@ -4483,7 +4483,7 @@ void EditSortLines(int iSortFlags) {
 						if (--tabs == 0) {
 							tabs = tabWidth;
 						}
-						pwszLine = CharNext(pwszLine);
+						pwszLine += 1 + IS_SURROGATE_PAIR(*pwszLine, pwszLine[1]);
 					} else {
 						break;
 					}

@@ -874,7 +874,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 			lvi.iItem = ListView_GetItemCount(hwnd);
 			LPWSTR pwsz = StrChr(pEE[i].wch, L';');
 			if (pwsz != NULL) {
-				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
+				lstrcpyn(wchBuf, pwsz + 1, COUNTOF(wchBuf));
 				pwsz = StrChr(wchBuf, L';');
 				if (pwsz != NULL) {
 					*pwsz = L'\0';
@@ -953,7 +953,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 			cbei.iItem = ComboBox_GetCount(hwnd);
 			LPWSTR pwsz = StrChr(pEE[i].wch, L';');
 			if (pwsz != NULL) {
-				lstrcpyn(wchBuf, CharNext(pwsz), COUNTOF(wchBuf));
+				lstrcpyn(wchBuf, pwsz + 1, COUNTOF(wchBuf));
 				pwsz = StrChr(wchBuf, L';');
 				if (pwsz != NULL) {
 					*pwsz = L'\0';

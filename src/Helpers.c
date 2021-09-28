@@ -2197,7 +2197,7 @@ BOOL PathFixBackslashes(LPWSTR lpsz) {
 	WCHAR *c = lpsz;
 	BOOL bFixed = FALSE;
 	while ((c = StrChr(c, L'/')) != NULL) {
-		if (*CharPrev(lpsz, c) == L':' && *CharNext(c) == L'/') {
+		if (c != lpsz && c[-1] == L':' && c[1] == L'/') {
 			c += 2;
 		} else {
 			*c++ = L'\\';
