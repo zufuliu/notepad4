@@ -1093,17 +1093,17 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcI
 	WCHAR wchPath[MAX_PATH];
 	const DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
-		return;
-	}
-#else
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	LPWSTR pszPath = NULL;
 	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 		return;
 	}
 	lstrcpy(wchUserFiles, pszPath);
 	CoTaskMemFree(pszPath);
+#else
+	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
+		return;
+	}
 #endif
 
 	WCHAR wchAppPath[MAX_PATH];
@@ -1148,17 +1148,17 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
-			return;
-		}
-#else
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = NULL;
 		if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			return;
 		}
 		lstrcpy(wchPath, pszPath);
 		CoTaskMemFree(pszPath);
+#else
+		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
+			return;
+		}
 #endif
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 	} else {
@@ -1577,10 +1577,10 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 	LPITEMIDLIST pidl;
 
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-	if (S_OK == SHGetFolderLocation(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_DEFAULT, &pidl))
-#else
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pidl))
+#else
+	if (S_OK == SHGetFolderLocation(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
 	{
 		SHGetPathFromIDList(pidl, lpFavDir);
@@ -1597,10 +1597,10 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
 	LPITEMIDLIST pidl;
 
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-	if (S_OK == SHGetFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_DEFAULT, &pidl))
-#else
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pidl))
+#else
+	if (S_OK == SHGetFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
 	{
 		SHGetPathFromIDList(pidl, lpOpenWithDir);
@@ -2025,7 +2025,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 		NONCLIENTMETRICS ncm;
 		ZeroMemory(&ncm, sizeof(ncm));
 		ncm.cbSize = sizeof(NONCLIENTMETRICS);
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		if (!IsVistaAndAbove()) {
 			ncm.cbSize -= sizeof(ncm.iPaddedBorderWidth);
 		}

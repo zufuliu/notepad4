@@ -885,10 +885,10 @@ int DriveBox_Fill(HWND hwnd) {
 
 	// Get pidl to [My Computer]
 	LPITEMIDLIST pidl;
-#if _WIN32_WINNT < _WIN32_WINNT_VISTA
-	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, NULL, SHGFP_TYPE_DEFAULT, &pidl))
-#else
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_ComputerFolder, KF_FLAG_DEFAULT, NULL, &pidl))
+#else
+	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, NULL, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
 	{
 		// Get Desktop Folder

@@ -2470,15 +2470,15 @@ void ScintillaWin::FineTickerStart(TickReason reason, int millis, int tolerance)
 	FineTickerCancel(reason);
 	const UINT_PTR reasonIndex = static_cast<UINT_PTR>(reason);
 	const UINT_PTR eventID = static_cast<UINT_PTR>(fineTimerStart) + reasonIndex;
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
-	if (SetCoalescableTimerFn && tolerance) {
-		timers[reasonIndex] = SetCoalescableTimerFn(MainHWND(), eventID, millis, nullptr, tolerance);
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+	if (tolerance) {
+		timers[reasonIndex] = ::SetCoalescableTimer(MainHWND(), eventID, millis, nullptr, tolerance);
 	} else {
 		timers[reasonIndex] = ::SetTimer(MainHWND(), eventID, millis, nullptr);
 	}
 #else
-	if (tolerance) {
-		timers[reasonIndex] = ::SetCoalescableTimer(MainHWND(), eventID, millis, nullptr, tolerance);
+	if (SetCoalescableTimerFn && tolerance) {
+		timers[reasonIndex] = SetCoalescableTimerFn(MainHWND(), eventID, millis, nullptr, tolerance);
 	} else {
 		timers[reasonIndex] = ::SetTimer(MainHWND(), eventID, millis, nullptr);
 	}

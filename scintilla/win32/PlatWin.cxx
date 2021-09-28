@@ -48,14 +48,14 @@
 #define LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800
 #endif
 
-#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
+#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
+#else
 #if NP2_FORCE_COMPILE_C_AS_CPP
 extern DWORD kSystemLibraryLoadFlags;
 #else
 extern "C" DWORD kSystemLibraryLoadFlags;
 #endif
-#else
-#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
 #endif
 
 #if NP2_FORCE_COMPILE_C_AS_CPP
