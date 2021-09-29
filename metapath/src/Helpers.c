@@ -1426,33 +1426,6 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 
 //=============================================================================
 //
-//  QuotateFilenameStr()
-//
-LPWSTR QuotateFilenameStr(LPWSTR lpFile) {
-	if (StrChr(lpFile, L' ')) {
-		MoveMemory(lpFile + 1, lpFile, sizeof(WCHAR) * (lstrlen(lpFile) + 1));
-		*lpFile = '\"';
-		lstrcat(lpFile, L"\"");
-	}
-	return lpFile;
-}
-
-//=============================================================================
-//
-//  GetFilenameStr()
-//
-LPWSTR GetFilenameStr(LPWSTR lpFile) {
-	LPWSTR psz = StrEnd(lpFile);
-
-	while (psz != lpFile && *CharPrev(lpFile, psz) != L'\\') {
-		psz = CharPrev(lpFile, psz);
-	}
-
-	return psz;
-}
-
-//=============================================================================
-//
 //  PrepareFilterStr()
 //
 void PrepareFilterStr(LPWSTR lpFilter) {

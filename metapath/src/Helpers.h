@@ -492,10 +492,6 @@ NP2_inline void TrimString(LPWSTR lpString) {
 }
 
 BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
-
-LPWSTR QuotateFilenameStr(LPWSTR lpFile);
-LPWSTR GetFilenameStr(LPWSTR lpFile);
-
 void PrepareFilterStr(LPWSTR lpFilter);
 void StrTab2Space(LPWSTR lpsz);
 BOOL PathFixBackslashes(LPWSTR lpsz);

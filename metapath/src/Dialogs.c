@@ -194,8 +194,8 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
-			LPWSTR psz = GetFilenameStr(dli.szFileName);
-			QuotateFilenameStr(psz);
+			LPWSTR psz = (LPWSTR)PathFindFileName(dli.szFileName);
+			PathQuoteSpaces(psz);
 			Edit_SetText(hwndCtl, psz);
 		}
 
@@ -263,7 +263,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			}
 
 			if (GetOpenFileName(&ofn)) {
-				QuotateFilenameStr(szFile);
+				PathQuoteSpaces(szFile);
 
 				if (StrNotEmpty(szArg2)) {
 					lstrcat(szFile, L" ");
@@ -1591,7 +1591,7 @@ BOOL RenameFileDlg(HWND hwnd) {
 	}
 
 	FILEOPDLGDATA fod;
-	lstrcpy(fod.szSource, GetFilenameStr(dli.szFileName));
+	lstrcpy(fod.szSource, PathFindFileName(dli.szFileName));
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_RENAME), hwnd, RenameFileDlgProc, (LPARAM)&fod)) {
 		WCHAR tchSource[MAX_PATH + 4];
@@ -1608,7 +1608,7 @@ BOOL RenameFileDlg(HWND hwnd) {
 
 		// Generate fully qualified destination
 		lstrcpy(szFullDestination, dli.szFileName);
-		*GetFilenameStr(szFullDestination) = 0;
+		*((LPWSTR)PathFindFileName(szFullDestination)) = L'\0';
 		lstrcat(szFullDestination, fod.szDestination);
 
 		// Double null terminated strings are essential!!!
@@ -1765,7 +1765,7 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 
 	FILEOPDLGDATA fod;
 	fod.wFunc = *wFunc;
-	lstrcpy(fod.szSource, GetFilenameStr(dli.szFileName));
+	lstrcpy(fod.szSource, PathFindFileName(dli.szFileName));
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COPYMOVE), hwnd, CopyMoveDlgProc, (LPARAM)&fod)) {
 		WCHAR tchSource[MAX_PATH + 4];
