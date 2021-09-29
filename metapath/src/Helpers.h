@@ -479,10 +479,8 @@ NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) {
 	}
 }
 
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bSrcIsFile,
-					   BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv);
-
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv);
 BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
 void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect);

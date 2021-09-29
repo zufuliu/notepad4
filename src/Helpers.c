@@ -1728,8 +1728,7 @@ BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 //
 // PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
-					   BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
 	WCHAR wchUserFiles[MAX_PATH];
 	WCHAR wchPath[MAX_PATH];
 	const DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
@@ -1753,39 +1752,26 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest,
 	PathRemoveFileSpec(wchAppPath);
 	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
 
-	if (bUnexpandMyDocs &&
-			!PathIsRelative(lpszSrc) &&
-			!PathIsPrefix(wchUserFiles, wchAppPath) &&
-			PathIsPrefix(wchUserFiles, lpszSrc) &&
-			PathRelativePathTo(wchPath, wchUserFiles, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
+	if (bUnexpandMyDocs && !PathIsRelative(lpszSrc) && !PathIsPrefix(wchUserFiles, wchAppPath) && PathIsPrefix(wchUserFiles, lpszSrc)
+		&& PathRelativePathTo(wchPath, wchUserFiles, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
 		lstrcpy(wchUserFiles, L"%CSIDL:MYDOCUMENTS%");
 		PathAppend(wchUserFiles, wchPath);
 		lstrcpy(wchPath, wchUserFiles);
-	} else if (PathIsRelative(lpszSrc) || PathCommonPrefix(wchAppPath, wchWinDir, NULL)) {
+	} else if (PathIsRelative(lpszSrc) || PathCommonPrefix(wchAppPath, wchWinDir, NULL)
+		|| !PathRelativePathTo(wchPath, wchAppPath, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
 		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
-	} else {
-		if (!PathRelativePathTo(wchPath, wchAppPath, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
-			lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
-		}
 	}
 
-	WCHAR wchResult[MAX_PATH];
-	if (bUnexpandEnv) {
-		if (!PathUnExpandEnvStrings(wchPath, wchResult, COUNTOF(wchResult))) {
-			lstrcpyn(wchResult, wchPath, COUNTOF(wchResult));
-		}
-	} else {
-		lstrcpyn(wchResult, wchPath, COUNTOF(wchResult));
+	if (!bUnexpandEnv || !PathUnExpandEnvStrings(wchPath, lpszDest, MAX_PATH)) {
+		lstrcpy(lpszDest, wchPath);
 	}
-
-	lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
 }
 
 //=============================================================================
 //
 // PathAbsoluteFromApp()
 //
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bExpandEnv) {
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv) {
 	WCHAR wchPath[MAX_PATH];
 
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
@@ -1811,19 +1797,16 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, int cchDest, BOOL bEx
 	}
 
 	WCHAR wchResult[MAX_PATH];
+	lpszSrc = wchPath;
 	if (PathIsRelative(wchPath)) {
 		GetModuleFileName(NULL, wchResult, COUNTOF(wchResult));
 		PathRemoveFileSpec(wchResult);
 		PathAppend(wchResult, wchPath);
-	} else {
-		lstrcpyn(wchResult, wchPath, COUNTOF(wchResult));
+		lpszSrc = wchResult;
 	}
-
-	if (PathCanonicalize(wchPath, wchResult)) {
-		lstrcpy(wchResult, wchPath);
+	if (!PathCanonicalize(lpszDest, lpszSrc)) {
+		lstrcpy(lpszDest, lpszSrc);
 	}
-
-	lstrcpyn(lpszDest, wchResult, (cchDest == 0) ? MAX_PATH : cchDest);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2449,7 +2432,7 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 		}
 		{
 			WCHAR wchItem[MAX_PATH];
-			PathAbsoluteFromApp(item, wchItem, COUNTOF(wchItem), TRUE);
+			PathAbsoluteFromApp(item, wchItem, TRUE);
 			if (PathEqual(wchItem, pszFile)) {
 				LocalFree(item);
 				break;
@@ -2463,7 +2446,7 @@ BOOL MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnex
 
 	if (bRelativePath) {
 		WCHAR wchFile[MAX_PATH];
-		PathRelativeToApp(pszFile, wchFile, COUNTOF(wchFile), TRUE, TRUE, bUnexpandMyDocs);
+		PathRelativeToApp(pszFile, wchFile, TRUE, TRUE, bUnexpandMyDocs);
 		pmru->pszItems[0] = StrDup(wchFile);
 	} else {
 		pmru->pszItems[0] = StrDup(pszFile);
@@ -2494,7 +2477,7 @@ BOOL MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 	MRU_Load(pmruStore);
 
 	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) != -1) {
-		PathAbsoluteFromApp(wchItem, wchItem, COUNTOF(wchItem), TRUE);
+		PathAbsoluteFromApp(wchItem, wchItem, TRUE);
 		if (PathEqual(wchItem, pszFile)) {
 			MRU_Delete(pmruStore, i);
 		} else {
@@ -2603,7 +2586,7 @@ BOOL MRU_MergeSave(LPCMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUn
 		for (int i = pmru->iSize - 1; i >= 0; i--) {
 			if (pmru->pszItems[i]) {
 				WCHAR wchItem[MAX_PATH];
-				PathAbsoluteFromApp(pmru->pszItems[i], wchItem, COUNTOF(wchItem), TRUE);
+				PathAbsoluteFromApp(pmru->pszItems[i], wchItem, TRUE);
 				MRU_AddFile(pmruBase, wchItem, bRelativePath, bUnexpandMyDocs);
 			}
 		}

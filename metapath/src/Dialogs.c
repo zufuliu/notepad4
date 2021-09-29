@@ -1840,7 +1840,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT | */LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 		};
@@ -2216,7 +2216,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDOK: {
 			WCHAR tch[MAX_PATH] = L"";
 			if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
-				PathRelativeToApp(tch, tch, COUNTOF(tch), TRUE, TRUE, flagPortableMyDocs);
+				PathRelativeToApp(tch, tch, TRUE, TRUE, flagPortableMyDocs);
 				PathQuoteSpaces(tch);
 				SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
 			}
@@ -2387,7 +2387,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			GetDlgItemText(hwnd, IDC_TARGETPATH, tchBuf, COUNTOF(tchBuf));
 			ExtractFirstArgument(tchBuf, szFile, szParams);
-			PathAbsoluteFromApp(szFile, szFile, COUNTOF(szFile), TRUE);
+			PathAbsoluteFromApp(szFile, szFile, TRUE);
 
 			WCHAR szTitle[32];
 			WCHAR szFilter[256];
@@ -2412,8 +2412,8 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
-				lstrcpyn(tchBuf, szFile, COUNTOF(tchBuf));
-				PathRelativeToApp(tchBuf, tchBuf, COUNTOF(tchBuf), TRUE, TRUE, flagPortableMyDocs);
+				lstrcpy(tchBuf, szFile);
+				PathRelativeToApp(tchBuf, tchBuf, TRUE, TRUE, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));

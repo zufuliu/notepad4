@@ -536,7 +536,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 		};
@@ -713,7 +713,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 		};
@@ -1037,7 +1037,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		//SetExplorerTheme(hwndLV);
 		ListView_SetExtendedListViewStyle(hwndLV, /*LVS_EX_FULLROWSELECT|*/LVS_EX_DOUBLEBUFFER | LVS_EX_LABELTIP);
 		LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 		};
@@ -1195,7 +1195,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			WCHAR tch[MAX_PATH];
 			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
 				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
-				PathAbsoluteFromApp(tch, tch, COUNTOF(tch), TRUE);
+				PathAbsoluteFromApp(tch, tch, TRUE);
 				lvi.iItem = i;
 				lvi.pszText = tch;
 				ListView_InsertItem(hwndLV, &lvi);

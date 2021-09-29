@@ -809,7 +809,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	ComboBox_SetExtendedUI(hwndDriveBox, TRUE);
 	// DirList
 	LVCOLUMN lvc = { LVCF_FMT | LVCF_TEXT, LVCFMT_LEFT, 0, NULL, -1, 0, 0, 0
-#if (NTDDI_VERSION >= NTDDI_VISTA)
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			, 0, 0, 0
 #endif
 	};
@@ -2481,7 +2481,7 @@ void LoadSettings(void) {
 		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
 #endif
 	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, TRUE);
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"Favorites");
@@ -2496,7 +2496,7 @@ void LoadSettings(void) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
 #endif
 	} else {
-		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir, TRUE);
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"Quikview.exe");
@@ -2505,7 +2505,7 @@ void LoadSettings(void) {
 		PathAddBackslash(szQuickview);
 		lstrcat(szQuickview, L"Viewers\\Quikview.exe");
 	} else {
-		PathAbsoluteFromApp(strValue, szQuickview, COUNTOF(szQuickview), TRUE);
+		PathAbsoluteFromApp(strValue, szQuickview, TRUE);
 	}
 
 	bHasQuickview = PathIsFile(szQuickview);
@@ -2710,12 +2710,12 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	if (iStartupDir == 1) {
 		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
 	}
-	PathRelativeToApp(tchFavoritesDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	PathRelativeToApp(szQuickview, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(szQuickview, wchTmp, FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
 	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
-	PathRelativeToApp(tchOpenWithDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
 	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
@@ -3631,7 +3631,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 
 			lstrcpy(szTmp, szTargetApplication);
 			WCHAR szFile[MAX_PATH];
-			PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
+			PathAbsoluteFromApp(szTmp, szFile, TRUE);
 
 			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
@@ -3681,7 +3681,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
 		WCHAR szFile[MAX_PATH];
-		PathAbsoluteFromApp(szTmp, szFile, COUNTOF(szFile), TRUE);
+		PathAbsoluteFromApp(szTmp, szFile, TRUE);
 
 		SHELLEXECUTEINFO sei;
 		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));

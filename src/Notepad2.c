@@ -5340,7 +5340,7 @@ void LoadSettings(void) {
 		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
 #endif
 	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, COUNTOF(tchOpenWithDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, TRUE);
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"Favorites");
@@ -5355,7 +5355,7 @@ void LoadSettings(void) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
 #endif
 	} else {
-		PathAbsoluteFromApp(strValue, tchFavoritesDir, COUNTOF(tchFavoritesDir), TRUE);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir, TRUE);
 	}
 
 	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
@@ -5710,9 +5710,9 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, 0);
 	}
 
-	PathRelativeToApp(tchOpenWithDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-	PathRelativeToApp(tchFavoritesDir, wchTmp, COUNTOF(wchTmp), FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"PathNameFormat", iPathNameFormat, 1);
 
