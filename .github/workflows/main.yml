@@ -81,7 +81,7 @@ jobs:
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
 
-    - name: Install v143 Toolset
+    - name: Install v141_xp Toolset
       continue-on-error: true
       shell: powershell
       run: |
@@ -215,7 +215,7 @@ jobs:
       run: |
         "c:/Program Files/Git/usr/bin/sed" -i "s/^\(.\+\)[0-9a-f]\{8\}\(.\+\)$/\1%GITHUB_SHA:~0,8%\2/gm" ./src/VersionRev.h ./metapath/src/VersionRev.h
 
-    - name: Install v143 Toolset
+    - name: Install v141_xp Toolset
       continue-on-error: true
       shell: powershell
       run: |
