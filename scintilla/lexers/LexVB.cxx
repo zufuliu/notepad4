@@ -248,6 +248,9 @@ static bool IsVBProperty(Sci_Line line, Sci_Position startPos, Accessor &styler)
 	return false;
 }
 static bool IsVBSome(Sci_Line line, int kind, Accessor &styler) noexcept {
+	if (line < 0) {
+		return false;
+	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);

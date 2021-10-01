@@ -320,6 +320,9 @@ static constexpr bool IsAsmDefaultStyle(int style) noexcept {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
 static bool IsEquLine(Sci_Line line, LexAccessor &styler) noexcept {
+	if (line < 0) {
+		return false;
+	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipWhiteSpace(startPos, endPos, styler, IsAsmDefaultStyle);
@@ -331,6 +334,9 @@ static bool IsEquLine(Sci_Line line, LexAccessor &styler) noexcept {
 	return false;
 }
 static bool IsAsmDefineLine(Sci_Line line, LexAccessor &styler) noexcept {
+	if (line < 0) {
+		return false;
+	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);

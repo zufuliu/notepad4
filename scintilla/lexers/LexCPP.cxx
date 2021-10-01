@@ -1031,6 +1031,9 @@ bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept {
 	return false;
 }
 static bool IsCppFoldingLine(Sci_Line line, LexAccessor &styler, int kind) noexcept {
+	if (line < 0) {
+		return false;
+	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);

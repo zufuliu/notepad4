@@ -237,10 +237,6 @@ constexpr int MultiStyle(int style1, int style2) noexcept {
 	return style1 | (style2 << 8);
 }
 
-constexpr bool IsSpaceOrTab(int ch) noexcept {
-	return ch == ' ' || ch == '\t';
-}
-
 constexpr bool IsWhiteSpace(int ch) noexcept {
 	return (ch == ' ') || ((ch >= 0x09) && (ch <= 0x0d));
 }
@@ -263,12 +259,13 @@ bool IsLexLineStartsWith(Sci_Line line, LexAccessor &styler, const char *word, b
 Sci_Position LexLineSkipSpaceTab(Sci_Line line, LexAccessor &styler) noexcept;
 
 inline Sci_Position LexSkipSpaceTab(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
-	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (!IsSpaceOrTab(styler.SafeGetCharAt(i))) {
-			return i;
+	for (; startPos < endPos; startPos++) {
+		const char ch = styler.SafeGetCharAt(startPos);
+		if (!(ch == ' ' || ch == '\t')) {
+			break;
 		}
 	}
-	return endPos;
+	return startPos;
 }
 
 Sci_Position LexSkipWhiteSpace(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept;
@@ -304,12 +301,11 @@ inline unsigned char LexGetNextChar(Sci_Position startPos, LexAccessor &styler) 
 }
 
 inline unsigned char LexGetNextChar(Sci_Position startPos, Sci_Position endPos, LexAccessor &styler) noexcept {
-	while (startPos < endPos) {
+	for (; startPos < endPos; startPos++) {
 		const unsigned char ch = styler[startPos];
 		if (!IsWhiteSpace(ch)) {
 			return ch;
 		}
-		++startPos;
 	}
 	return '\0';
 }

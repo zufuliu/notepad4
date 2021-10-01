@@ -133,6 +133,15 @@ constexpr bool IsASpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }
 
+constexpr bool IsSpaceOrTab(int ch) noexcept {
+	return ch == ' ' || ch == '\t';
+}
+
+constexpr bool IsBreakSpace(unsigned char ch) noexcept {
+	// used for text breaking, treat C0 control character as space.
+	return ch <= ' ';
+}
+
 constexpr bool IsADigit(int ch) noexcept {
 	return ch >= '0' && ch <= '9';
 }
