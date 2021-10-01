@@ -8,10 +8,6 @@
 
 namespace Scintilla::Internal {
 
-constexpr bool IsSpaceOrTab(int ch) noexcept {
-	return ch == ' ' || ch == '\t';
-}
-
 /**
 * A point in document space.
 * Uses double for sufficient resolution in large (>20,000,000 line) documents.
@@ -118,8 +114,8 @@ struct ScreenLine : public IScreenLine {
 	size_t len;
 	XYPOSITION width;
 	XYPOSITION height;
-	int ctrlCharPadding;
 	XYPOSITION tabWidth;
+	int ctrlCharPadding;
 	int tabWidthMinimumPixels;
 
 	ScreenLine(const LineLayout *ll_, int subLine, const ViewStyle &vs, XYPOSITION width_, int tabWidthMinimumPixels_) noexcept;
@@ -171,9 +167,9 @@ public:
 };
 
 class PositionCacheEntry {
-	unsigned int styleNumber : 8;
-	unsigned int len : 8;
-	unsigned int clock : 16;
+	uint16_t styleNumber;
+	uint16_t len;
+	uint32_t clock;
 	std::unique_ptr<XYPOSITION[]> positions;
 public:
 	PositionCacheEntry() noexcept;
@@ -184,10 +180,10 @@ public:
 	void operator=(const PositionCacheEntry &) = delete;
 	void operator=(PositionCacheEntry &&) = delete;
 	~PositionCacheEntry();
-	void Set(unsigned int styleNumber_, std::string_view sv, const XYPOSITION *positions_, unsigned int clock_);
+	void Set(uint16_t styleNumber_, std::string_view sv, const XYPOSITION *positions_, uint32_t clock_);
 	void Clear() noexcept;
-	bool Retrieve(unsigned int styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept;
-	static size_t Hash(unsigned int styleNumber_, std::string_view sv) noexcept;
+	bool Retrieve(uint16_t styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept;
+	static size_t Hash(uint16_t styleNumber_, std::string_view sv) noexcept;
 	bool NewerThan(const PositionCacheEntry &other) const noexcept;
 	void ResetClock() noexcept;
 };
@@ -275,14 +271,14 @@ public:
 
 class PositionCache {
 	std::vector<PositionCacheEntry> pces;
-	unsigned int clock;
+	uint32_t clock;
 	bool allClear;
 public:
 	PositionCache();
 	void Clear() noexcept;
 	void SetSize(size_t size_);
 	size_t GetSize() const noexcept;
-	void MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
+	void MeasureWidths(Surface *surface, const ViewStyle &vstyle, uint16_t styleNumber,
 		std::string_view sv, XYPOSITION *positions);
 };
 

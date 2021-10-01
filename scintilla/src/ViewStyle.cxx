@@ -63,6 +63,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 	measurements.descent = surface.Descent(font.get());
 	measurements.capitalHeight = surface.Ascent(font.get()) - surface.InternalLeading(font.get());
 	measurements.aveCharWidth = surface.AverageCharWidth(font.get());
+	//measurements.monospaceCharacterWidth = measurements.aveCharWidth;
 	measurements.spaceWidth = surface.WidthText(font.get(), " ");
 
 	if (fs.checkMonospaced) {
@@ -79,6 +80,7 @@ void FontRealised::Realise(Surface &surface, int zoomLevel, Technology technolog
 		const XYPOSITION scaledVariance = variance / measurements.aveCharWidth;
 		constexpr XYPOSITION monospaceWidthEpsilon = 0.000001;	// May need tweaking if monospace fonts vary more
 		measurements.monospaceASCII = scaledVariance < monospaceWidthEpsilon;
+		//measurements.monospaceCharacterWidth = minWidth;
 	} else {
 		measurements.monospaceASCII = false;
 	}

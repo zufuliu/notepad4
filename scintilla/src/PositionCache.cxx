@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <cstdint>
 #include <cstring>
 #include <cmath>
 #include <climits>
@@ -32,6 +33,7 @@
 #include "Platform.h"
 #include "VectorISA.h"
 
+#include "CharacterSet.h"
 //#include "CharacterCategory.h"
 #include "Position.h"
 #include "UniqueString.h"
@@ -312,8 +314,8 @@ ScreenLine::ScreenLine(
 	len(ll->LineLength(subLine)),
 	width(width_),
 	height(static_cast<float>(vs.lineHeight)),
-	ctrlCharPadding(vs.ctrlCharPadding),
 	tabWidth(vs.tabWidth),
+	ctrlCharPadding(vs.ctrlCharPadding),
 	tabWidthMinimumPixels(tabWidthMinimumPixels_) {}
 
 ScreenLine::~ScreenLine() noexcept = default;
@@ -869,7 +871,7 @@ PositionCacheEntry::PositionCacheEntry() noexcept :
 
 // Copy constructor not currently used, but needed for being element in std::vector.
 PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
-	styleNumber(other.styleNumber), len(other.styleNumber), clock(other.styleNumber) {
+	styleNumber(other.styleNumber), len(other.len), clock(other.clock) {
 	if (other.positions) {
 		const size_t lenData = len + (len / sizeof(XYPOSITION)) + 1;
 		positions = std::make_unique<XYPOSITION[]>(lenData);
@@ -877,10 +879,10 @@ PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
 	}
 }
 
-void PositionCacheEntry::Set(unsigned int styleNumber_, std::string_view sv,
-	const XYPOSITION *positions_, unsigned int clock_) {
+void PositionCacheEntry::Set(uint16_t styleNumber_, std::string_view sv,
+	const XYPOSITION *positions_, uint32_t clock_) {
 	styleNumber = styleNumber_;
-	len = static_cast<unsigned int>(sv.length());
+	len = static_cast<uint16_t>(sv.length());
 	clock = clock_;
 	if (sv.data() && positions_) {
 		positions = std::make_unique<XYPOSITION[]>(len + (len / sizeof(XYPOSITION)) + 1);
@@ -904,7 +906,7 @@ void PositionCacheEntry::Clear() noexcept {
 	clock = 0;
 }
 
-bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept {
+bool PositionCacheEntry::Retrieve(uint16_t styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept {
 	if ((styleNumber == styleNumber_) && (len == sv.length()) &&
 		(memcmp(&positions[len], sv.data(), sv.length()) == 0)) {
 		for (unsigned int i = 0; i < len; i++) {
@@ -916,9 +918,9 @@ bool PositionCacheEntry::Retrieve(unsigned int styleNumber_, std::string_view sv
 	}
 }
 
-size_t PositionCacheEntry::Hash(unsigned int styleNumber_, std::string_view sv) noexcept {
+size_t PositionCacheEntry::Hash(uint16_t styleNumber_, std::string_view sv) noexcept {
 	const size_t h1 = std::hash<std::string_view>{}(sv);
-	const size_t h2 = std::hash<unsigned int>{}(styleNumber_);
+	const size_t h2 = std::hash<uint16_t>{}(styleNumber_);
 	return h1 ^ (h2 << 1);
 }
 
@@ -969,10 +971,11 @@ size_t PositionCache::GetSize() const noexcept {
 	return pces.size();
 }
 
-void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, unsigned int styleNumber,
+void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uint16_t styleNumber,
 	std::string_view sv, XYPOSITION *positions) {
 	const Style &style = vstyle.styles[styleNumber];
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
+		//const XYPOSITION aveCharWidth = style.monospaceCharacterWidth;
 		const XYPOSITION aveCharWidth = style.aveCharWidth;
 		const size_t length = sv.length();
 #if NP2_USE_SSE2

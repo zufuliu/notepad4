@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <cstdint>
 #include <cassert>
 #include <cstring>
 #include <cstdio>
@@ -729,7 +730,7 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 							if (wrapState != Wrap::WhiteSpace && (ll->styles[pos - 1] != ll->styles[pos])) {
 								break;
 							}
-							if (IsSpaceOrTab(ll->chars[pos - 1]) && !IsSpaceOrTab(ll->chars[pos])) {
+							if (IsBreakSpace(ll->chars[pos - 1]) && !IsBreakSpace(ll->chars[pos])) {
 								break;
 							}
 

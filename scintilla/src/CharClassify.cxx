@@ -24,10 +24,10 @@ CharClassify::CharClassify() noexcept {
 
 void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	// Initialize all char classes to default values
-	for (int ch = 0; ch < 128; ch++) {
+	for (int ch = 0; ch < 127; ch++) {
 		if (IsEOLChar(ch))
 			charClass[ch] = CharacterClass::newLine;
-		else if (ch < 0x20 || ch == ' ')
+		else if (ch <= ' ')
 			charClass[ch] = CharacterClass::space;
 		else if (includeWordClass && (IsAlphaNumeric(ch) || ch == '_'))
 			charClass[ch] = CharacterClass::word;
@@ -36,6 +36,7 @@ void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	}
 
 	const CharacterClass w = includeWordClass ? CharacterClass::word : CharacterClass::punctuation;
+	charClass[127] = CharacterClass::space;
 	memset(charClass + 128, static_cast<int>(w), 128);
 }
 

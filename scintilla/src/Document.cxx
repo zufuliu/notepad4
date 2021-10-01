@@ -1086,10 +1086,6 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 		&& IsDBCSTrailByteNoExcept(cb.UCharAt(pos + 1));
 }
 
-static constexpr bool IsSpaceOrTab(int ch) noexcept {
-	return ch == ' ' || ch == '\t';
-}
-
 // Need to break text into segments near lengthSegment but taking into
 // account the encoding to not break inside a UTF-8 or DBCS character
 // and also trying to avoid breaking inside a pair of combining characters.
@@ -1097,38 +1093,41 @@ static constexpr bool IsSpaceOrTab(int ch) noexcept {
 // so that there will be at least one whole character to make a segment.
 // For UTF-8, text must consist only of valid whole characters.
 // In preference order from best to worst:
-//   1) Break after space
-//   2) Break before punctuation
+//   1) Break before or after space
+//   2) Break before or after punctuation
 //   3) Break after whole character
 
 int Document::SafeSegment(const char *text, int lengthSegment) const noexcept {
-	int lastSpaceBreak = -1;
-	int lastPunctuationBreak = -1;
+	int j = lengthSegment;
+	do {
+		if (IsBreakSpace(text[j])) {
+			return j;
+		}
+		--j;
+	} while (j != 0);
+
+	int lastPunctuationBreak = 0;
 	int lastEncodingAllowedBreak = 0;
-	int j = 0;
-	unsigned char chPrev = 0;
+	CharacterClass ccPrev = CharacterClass::space;
 	do {
 		const unsigned char ch = text[j];
-		if (IsSpaceOrTab(chPrev) && !IsSpaceOrTab(ch)) {
-			lastSpaceBreak = j;
-		}
-
-		chPrev = ch;
 		lastEncodingAllowedBreak = j;
+
+		CharacterClass cc = CharacterClass::word;
 		if (UTF8IsAscii(ch) || !dbcsCodePage) {
-			if (charClass.GetClass(ch) == CharacterClass::punctuation) {
-				lastPunctuationBreak = j;
-			}
+			cc = charClass.GetClass(ch);
 			j++;
 		} else if (dbcsCodePage == CpUtf8) {
 			j += UTF8BytesOfLead(ch);
 		} else {
 			j += 1 + IsDBCSLeadByteNoExcept(ch);
 		}
+		if (cc != ccPrev) {
+			ccPrev = cc;
+			lastPunctuationBreak = lastEncodingAllowedBreak;
+		}
 	} while (j < lengthSegment);
-	if (lastSpaceBreak >= 0) {
-		return lastSpaceBreak;
-	} else if (lastPunctuationBreak > 0) {
+	if (lastPunctuationBreak > 0) {
 		return lastPunctuationBreak;
 	}
 	return lastEncodingAllowedBreak;
