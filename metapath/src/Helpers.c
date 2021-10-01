@@ -1477,7 +1477,7 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 BOOL SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
 	if (StrEqualExW(lpFileName, L"..") || StrEqualExW(lpFileName, L".")) {
 		if (StrEqualExW(lpFileName, L"..") && PathIsRoot(szCurDir)) {
-			lstrcpy(lpBuffer, L"*.*");
+			StrCpyExW(lpBuffer, L"*.*");
 			return TRUE;
 		}
 	}

@@ -96,7 +96,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	WCHAR szTitle[256];
-	lstrcpy(szTitle, L"");
+	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	WCHAR szBase[MAX_PATH];
@@ -137,7 +137,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 #endif
 {
 	WCHAR szTitle[256];
-	lstrcpy(szTitle, L"");
+	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	LPITEMIDLIST pidlRoot;
@@ -1189,7 +1189,7 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				PathAddBackslash(szQuickview);
 				lstrcat(szQuickview, L"Viewers\\Quikview.exe");
 				PathQuoteSpaces(szQuickview);
-				lstrcpy(szQuickviewParams, L"");
+				StrCpyExW(szQuickviewParams, L"");
 			} else {
 				ExtractFirstArgument(tch, szQuickview, szQuickviewParams);
 			}
@@ -1457,7 +1457,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			if (GetDlgItemText(hwnd, IDC_FILTER, tchFilter, COUNTOF(tchFilter) - 1)) {
 				bNegFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 			} else {
-				lstrcpy(tchFilter, L"*.*");
+				StrCpyExW(tchFilter, L"*.*");
 				bNegFilter = FALSE;
 			}
 			EndDialog(hwnd, IDOK);
@@ -2514,8 +2514,8 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch));
 					ExtractFirstArgument(tch, szTargetApplication, szTargetApplicationParams);
 				} else {
-					lstrcpy(szTargetApplication, L"");
-					lstrcpy(szTargetApplicationParams, L"");
+					StrCpyExW(szTargetApplication, L"");
+					StrCpyExW(szTargetApplicationParams, L"");
 				}
 				IniSectionSetString(pIniSection, L"TargetApplicationPath", szTargetApplication);
 				IniSectionSetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams);
@@ -2536,7 +2536,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && !i) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 				} else {
-					lstrcpy(szTargetApplicationWndClass, L"");
+					StrCpyExW(szTargetApplicationWndClass, L"");
 				}
 				IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 
@@ -2544,21 +2544,21 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				if (i) {
 					GetDlgItemText(hwnd, IDC_DDEMSG, szDDEMsg, COUNTOF(szDDEMsg));
 				} else {
-					lstrcpy(szDDEMsg, L"");
+					StrCpyExW(szDDEMsg, L"");
 				}
 				IniSectionSetString(pIniSection, L"DDEMessage", szDDEMsg);
 
 				if (i) {
 					GetDlgItemText(hwnd, IDC_DDEAPP, szDDEApp, COUNTOF(szDDEApp));
 				} else {
-					lstrcpy(szDDEApp, L"");
+					StrCpyExW(szDDEApp, L"");
 				}
 				IniSectionSetString(pIniSection, L"DDEApplication", szDDEApp);
 
 				if (i) {
 					GetDlgItemText(hwnd, IDC_DDETOPIC, szDDETopic, COUNTOF(szDDETopic));
 				} else {
-					lstrcpy(szDDETopic, L"");
+					StrCpyExW(szDDETopic, L"");
 				}
 				IniSectionSetString(pIniSection, L"DDETopic", szDDETopic);
 

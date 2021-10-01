@@ -67,7 +67,7 @@ void DirList_Init(HWND hwnd, LPCWSTR pszHeader) {
 	lpdl->cbidl = 0;
 	lpdl->pidl = NULL;
 	lpdl->lpsf = NULL;
-	lstrcpy(lpdl->szPath, L"");
+	StrCpyExW(lpdl->szPath, L"");
 
 	SHFILEINFO shfi;
 	// Add Imagelists

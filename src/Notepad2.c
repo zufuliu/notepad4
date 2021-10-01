@@ -4328,7 +4328,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SHOWFILENAMEFIRST:
 	case IDM_VIEW_SHOWFULLPATH:
 		iPathNameFormat = LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY;
-		lstrcpy(szTitleExcerpt, L"");
+		StrCpyExW(szTitleExcerpt, L"");
 		UpdateWindowTitle();
 		break;
 
@@ -5628,7 +5628,7 @@ void SaveSettingsNow(BOOL bOnlySaveStyle, BOOL bQuiet) {
 		if (StrNotEmpty(szIniFile2)) {
 			if (CreateIniFile(szIniFile2)) {
 				lstrcpy(szIniFile, szIniFile2);
-				lstrcpy(szIniFile2, L"");
+				StrCpyExW(szIniFile2, L"");
 			} else {
 				bCreateFailure = TRUE;
 			}
@@ -6139,7 +6139,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 
 		case L'F':
 			if (chNext == L'0' || chNext == L'O') {
-				lstrcpy(szIniFile, L"*?");
+				StrCpyExW(szIniFile, L"*?");
 				state = 1;
 			}
 			break;
@@ -6776,8 +6776,8 @@ BOOL FindIniFile(void) {
 
 BOOL TestIniFile(void) {
 	if (StrEqualExW(szIniFile, L"*?")) {
-		lstrcpy(szIniFile2, L"");
-		lstrcpy(szIniFile, L"");
+		StrCpyExW(szIniFile2, L"");
+		StrCpyExW(szIniFile, L"");
 		return FALSE;
 	}
 
@@ -6805,7 +6805,7 @@ BOOL TestIniFile(void) {
 
 	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		lstrcpy(szIniFile2, szIniFile);
-		lstrcpy(szIniFile, L"");
+		StrCpyExW(szIniFile, L"");
 		return FALSE;
 	}
 
@@ -6969,8 +6969,8 @@ void UpdateStatusbar(void) {
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	if (iSelStart == iSelEnd) {
-		lstrcpy(tchSelByte, L"0");
-		lstrcpy(tchSelChar, L"0");
+		StrCpyExW(tchSelByte, L"0");
+		StrCpyExW(tchSelChar, L"0");
 	} else if (!SciCall_IsRectangleSelection()) {
 		Sci_Position iSel = SciCall_GetSelTextLength() - 1;
 		PosToStrW(iSel, tchSelByte);
@@ -6979,15 +6979,15 @@ void UpdateStatusbar(void) {
 		PosToStrW(iSel, tchSelChar);
 		FormatNumberStr(tchSelChar);
 	} else {
-		lstrcpy(tchSelByte, L"--");
-		lstrcpy(tchSelChar, L"--");
+		StrCpyExW(tchSelByte, L"--");
+		StrCpyExW(tchSelChar, L"--");
 	}
 
 	// Print number of selected lines in statusbar
 	WCHAR tchLinesSelected[32];
 	WCHAR tchMatchesCount[32];
 	if (iSelStart == iSelEnd) {
-		lstrcpy(tchLinesSelected, L"0");
+		StrCpyExW(tchLinesSelected, L"0");
 	} else {
 		const Sci_Line iStartLine = SciCall_LineFromPosition(iSelStart);
 		const Sci_Line iEndLine = SciCall_LineFromPosition(iSelEnd);
@@ -7201,11 +7201,11 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	}
 
 	if (bNew) {
-		lstrcpy(szCurFile, L"");
+		StrCpyExW(szCurFile, L"");
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 		if (!keepTitleExcerpt) {
-			lstrcpy(szTitleExcerpt, L"");
+			StrCpyExW(szTitleExcerpt, L"");
 		}
 		FileVars_Init(NULL, 0, &fvCurFile);
 		EditSetEmptyText();
@@ -7308,7 +7308,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 		if (!keepTitleExcerpt) {
-			lstrcpy(szTitleExcerpt, L"");
+			StrCpyExW(szTitleExcerpt, L"");
 		}
 		iOriginalEncoding = iEncoding;
 		bModified = FALSE;
@@ -7520,7 +7520,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 					SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 					SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
 					if (!fKeepTitleExcerpt) {
-						lstrcpy(szTitleExcerpt, L"");
+						StrCpyExW(szTitleExcerpt, L"");
 					}
 					if (flagLexerSpecified) {
 						if (pLexCurrent->rid == iInitialLexer) {
@@ -7605,7 +7605,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	}
 
 	WCHAR szFile[MAX_PATH];
-	lstrcpy(szFile, L"");
+	StrCpyExW(szFile, L"");
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(TRUE, szCurFile, lexers);
 
@@ -7936,7 +7936,7 @@ BOOL RelaunchMultiInst(void) {
 		LPWSTR lp2 = (LPWSTR)NP2HeapAlloc(cmdSize);
 
 		StrTab2Space(lpCmdLineNew);
-		lstrcpy(lpCmdLineNew + cchiFileList, L"");
+		StrCpyExW(lpCmdLineNew + cchiFileList, L"");
 
 		LPWSTR pwch = StrEnd(lpCmdLineNew) - 1;
 		int i = 0;
@@ -8267,9 +8267,9 @@ void SetNotifyIconTitle(HWND hwnd) {
 	}
 
 	if (IsDocumentModified()) {
-		lstrcpy(nid.szTip, L"* ");
+		StrCpyExW(nid.szTip, L"* ");
 	} else {
-		lstrcpy(nid.szTip, L"");
+		StrCpyExW(nid.szTip, L"");
 	}
 	lstrcat(nid.szTip, tchTitle);
 

@@ -3781,7 +3781,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
 	WCHAR tch[MAX_STYLE_VALUE_LENGTH];
 
-	lstrcpy(szNewStyle, L"");
+	StrCpyExW(szNewStyle, L"");
 	Style_StrCopyFont(szNewStyle, lpszStyle, tch);
 	Style_StrCopyCharSet(szNewStyle, lpszStyle, tch);
 	Style_StrCopyLocale(szNewStyle, lpszStyle, tch);
@@ -4012,7 +4012,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) {
 	}
 
 	WCHAR pszFile[MAX_PATH];
-	lstrcpy(pszFile, L"*.");
+	StrCpyExW(pszFile, L"*.");
 
 	// TODO: avoid copying all extensions then find separators.
 	// we only need the first extension, it's usually very short.
@@ -4029,7 +4029,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) {
 
 	// check for ; at beginning
 	if (p == pszFile + 2) {
-		lstrcpy(p, L"txt");
+		StrCpyExW(p, L"txt");
 	}
 
 	SHFILEINFO shfi;

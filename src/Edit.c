@@ -4714,7 +4714,7 @@ void EditEnsureConsistentLineEndings(void) {
 //
 void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	if (SciCall_IsSelectionEmpty() || SciCall_IsRectangleSelection()) {
-		lstrcpy(lpszExcerpt, L"");
+		StrCpyExW(lpszExcerpt, L"");
 		return;
 	}
 
@@ -6737,7 +6737,7 @@ static INT_PTR CALLBACK EditInsertTagDlgProc(HWND hwnd, UINT umsg, WPARAM wParam
 					LPCWSTR pwCur = StrChr(wszOpen.buffer, L'<');
 					if (pwCur != NULL) {
 						LPWSTR wchIns = (LPWSTR)NP2HeapAlloc((len + 5) * sizeof(WCHAR));
-						lstrcpy(wchIns, L"</");
+						StrCpyExW(wchIns, L"</");
 						int	cchIns = 2;
 
 						++pwCur;

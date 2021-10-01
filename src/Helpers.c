@@ -878,8 +878,8 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 			lstrcat(szTitle, lpszFile);
 		}
 	} else {
-		lstrcpy(szCachedFile, L"");
-		lstrcpy(szCachedDisplayName, L"");
+		StrCpyExW(szCachedFile, L"");
+		StrCpyExW(szCachedDisplayName, L"");
 		lstrcat(szTitle, szUntitled);
 	}
 
@@ -1892,7 +1892,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 	PathQuoteSpaces(tchDocTemp);
 
 	WCHAR tchArguments[MAX_PATH + 16];
-	lstrcpy(tchArguments, L"-n ");
+	StrCpyExW(tchArguments, L"-n ");
 	lstrcat(tchArguments, tchDocTemp);
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA

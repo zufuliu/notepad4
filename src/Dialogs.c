@@ -212,7 +212,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	WCHAR szTitle[256];
-	lstrcpy(szTitle, L"");
+	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
 	WCHAR szBase[MAX_PATH];

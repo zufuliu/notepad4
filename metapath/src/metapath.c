@@ -1335,7 +1335,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR szFilter[128];
 		WCHAR szTitle[32];
 
-		lstrcpy(szNewFile, L"");
+		StrCpyExW(szNewFile, L"");
 		GetString(IDS_FILTER_ALL, szFilter, COUNTOF(szFilter));
 		PrepareFilterStr(szFilter);
 		GetString(IDS_NEWFILE, szTitle, COUNTOF(szTitle));
@@ -1648,7 +1648,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_FILTERALL:
 		if (HasFilter()) {
-			lstrcpy(tchFilter, L"*.*");
+			StrCpyExW(tchFilter, L"*.*");
 			bNegFilter = FALSE;
 
 			// Store information about currently selected item
@@ -2525,7 +2525,7 @@ void LoadSettings(void) {
 	if (!lpFilterArg) {
 		strValue = IniSectionGetValue(pIniSection, L"FileFilter");
 		if (StrIsEmpty(strValue)) {
-			lstrcpy(tchFilter, L"*.*");
+			StrCpyExW(tchFilter, L"*.*");
 		} else {
 			lstrcpyn(tchFilter, strValue, COUNTOF(tchFilter));
 		}
@@ -2632,7 +2632,7 @@ void SaveSettingsNow(void) {
 		if (StrNotEmpty(szIniFile2)) {
 			if (CreateIniFile(szIniFile2)) {
 				lstrcpy(szIniFile, szIniFile2);
-				lstrcpy(szIniFile2, L"");
+				StrCpyExW(szIniFile2, L"");
 			} else {
 				bCreateFailure = TRUE;
 			}
@@ -2884,7 +2884,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 		switch (ch) {
 		case L'F':
 			if (chNext == L'0' || chNext == L'O') {
-				lstrcpy(szIniFile, L"*?");
+				StrCpyExW(szIniFile, L"*?");
 				state = 1;
 			}
 			break;
@@ -3152,8 +3152,8 @@ BOOL FindIniFile(void) {
 
 BOOL TestIniFile(void) {
 	if (StrEqualExW(szIniFile, L"*?")) {
-		lstrcpy(szIniFile2, L"");
-		lstrcpy(szIniFile, L"");
+		StrCpyExW(szIniFile2, L"");
+		StrCpyExW(szIniFile, L"");
 		return 0;
 	}
 
@@ -3181,7 +3181,7 @@ BOOL TestIniFile(void) {
 
 	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		lstrcpy(szIniFile2, szIniFile);
-		lstrcpy(szIniFile, L"");
+		StrCpyExW(szIniFile, L"");
 		return FALSE;
 	}
 	return TRUE;
@@ -3438,7 +3438,7 @@ BOOL ActivatePrevInst(void) {
 }
 
 void GetRelaunchParameters(LPWSTR szParameters) {
-	lstrcpy(szParameters, L" -f");
+	StrCpyExW(szParameters, L" -f");
 	if (StrNotEmpty(szIniFile)) {
 		lstrcat(szParameters, L" \"");
 		lstrcat(szParameters, szIniFile);
@@ -3561,11 +3561,11 @@ void LoadLaunchSetings(void) {
 		iUseTargetApplication = 1;
 		iTargetApplicationMode = 1;
 		lstrcpy(szTargetApplication, L"Notepad2.exe");
-		lstrcpy(szTargetApplicationParams, L"");
+		StrCpyExW(szTargetApplicationParams, L"");
 		lstrcpy(szTargetApplicationWndClass, L"Notepad2");
-		lstrcpy(szDDEMsg, L"");
-		lstrcpy(szDDEApp, L"");
-		lstrcpy(szDDETopic, L"");
+		StrCpyExW(szDDEMsg, L"");
+		StrCpyExW(szDDEApp, L"");
+		StrCpyExW(szDDETopic, L"");
 	}
 
 	lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
