@@ -6786,7 +6786,7 @@ BOOL TestIniFile(void) {
 		return TRUE;
 	}
 
-	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
+	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || (StrNotEmpty(szIniFile) && szIniFile[lstrlen(szIniFile) - 1] == L'\\')) {
 		WCHAR wchModule[MAX_PATH];
 		GetProgramRealPath(wchModule, COUNTOF(wchModule));
 		PathAppend(szIniFile, PathFindFileName(wchModule));
@@ -7938,11 +7938,11 @@ BOOL RelaunchMultiInst(void) {
 		StrTab2Space(lpCmdLineNew);
 		lstrcpy(lpCmdLineNew + cchiFileList, L"");
 
-		LPWSTR pwch = CharPrev(lpCmdLineNew, StrEnd(lpCmdLineNew));
+		LPWSTR pwch = StrEnd(lpCmdLineNew) - 1;
 		int i = 0;
 		while (*pwch == L' ' || *pwch == L'-' || *pwch == L'+') {
 			*pwch = L' ';
-			pwch = CharPrev(lpCmdLineNew, pwch);
+			pwch--;
 			if (i++ > 1) {
 				cchiFileList--;
 			}

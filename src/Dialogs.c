@@ -92,7 +92,7 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 		StrCatBuff(szText, L"\n", COUNTOF(szText));
 		StrCatBuff(szText, lpMsgBuf, COUNTOF(szText));
 		LocalFree(lpMsgBuf);
-		const WCHAR wcht = *CharPrev(szText, StrEnd(szText));
+		const WCHAR wcht = szText[lstrlen(szText) - 1];
 		if (IsCharAlphaNumeric(wcht) || wcht == L'"' || wcht == L'\'') {
 			StrCatBuff(szText, L".", COUNTOF(szText));
 		}

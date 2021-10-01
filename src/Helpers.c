@@ -2155,7 +2155,8 @@ BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
 void PrepareFilterStr(LPWSTR lpFilter) {
 	LPWSTR psz = StrEnd(lpFilter);
 	while (psz != lpFilter) {
-		if (*(psz = CharPrev(lpFilter, psz)) == L'|') {
+		--psz;
+		if (*psz == L'|') {
 			*psz = L'\0';
 		}
 	}
@@ -2276,17 +2277,6 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 
 	WCHAR *c = lpNumberStr + i;
 	WCHAR *end = c;
-#if 0
-	i = 0;
-	while ((c = CharPrev(lpNumberStr, c)) != lpNumberStr) {
-		if (++i == 3) {
-			i = 0;
-			MoveMemory(c + 1, c, sizeof(WCHAR) * (end - c + 1));
-			*c = sep;
-			++end;
-		}
-	}
-#endif
 	lpNumberStr += 3;
 	do {
 		c -= 3;

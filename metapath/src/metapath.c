@@ -3162,7 +3162,7 @@ BOOL TestIniFile(void) {
 		return TRUE;
 	}
 
-	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || *CharPrev(szIniFile, StrEnd(szIniFile)) == L'\\') {
+	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || (StrNotEmpty(szIniFile) && szIniFile[lstrlen(szIniFile) - 1] == L'\\')) {
 		WCHAR wchModule[MAX_PATH];
 		GetProgramRealPath(wchModule, COUNTOF(wchModule));
 		PathAppend(szIniFile, PathFindFileName(wchModule));
