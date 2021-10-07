@@ -585,17 +585,17 @@ def updateCharClassifyTable(filename, headfile):
 	args = {
 		'table_var': 'CharClassify::CharClassifyTable',
 		'table': 'CharClassifyTable',
-		'function': """static cc ClassifyCharacter(unsigned int ch) noexcept {
+		'function': """static CharacterClass ClassifyCharacter(unsigned int ch) noexcept {
 	if (ch < sizeof(classifyMap)) {
-		return static_cast<cc>(classifyMap[ch]);
+		return static_cast<CharacterClass>(classifyMap[ch]);
 	}
 	if (ch > maxUnicode) {
 		// Cn
-		return ccSpace;
+		return CharacterClass::space;
 	}
 
 	ch -= sizeof(classifyMap);""",
-		'returnType': 'cc'
+		'returnType': 'CharacterClass'
 	}
 
 	table, function = compressIndexTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], args)
