@@ -725,7 +725,7 @@ def isReservedOrUDC_GBK(ch, buf):
 # https://en.wikipedia.org/wiki/Big5
 def isReservedOrUDC_Big5(ch, buf):
 	for block in [(0x8140, 0xA0FE), (0xA3C0, 0xA3FE), (0xC6A1, 0xC8FE), (0xF9D6, 0xFEFE)]:
-		if ch >= block[0] or ch <= block[1]:
+		if ch >= block[0] and ch <= block[1]:
 			return True
 	return False
 
