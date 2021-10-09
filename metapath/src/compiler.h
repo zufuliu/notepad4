@@ -48,14 +48,14 @@
 #define NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS	__pragma(warning(disable: 4996))
 #endif
 
-#if defined(__GNUC__) && !defined(__cplusplus)
-#if defined(__NO_INLINE__) // O0
-#define NP2_inline	static inline
+#if defined(__cplusplus) || defined(_MSC_VER)
+	#define NP2_inline	inline
+#elif !(defined(__GNUC__) || defined(__clang__)) || defined(__NO_INLINE__) // O0
+	#define NP2_inline	static inline
+#elif defined(__clang__) && defined(__MINGW32__) && __clang_major__ >= 13
+	#define NP2_inline	static inline
 #else
-#define NP2_inline	extern inline __attribute__((__gnu_inline__, __artificial__))
-#endif
-#else
-#define NP2_inline	inline
+	#define NP2_inline	extern inline __attribute__((__gnu_inline__, __artificial__))
 #endif
 
 #define PP_CONCAT_(x, y)	x##y
