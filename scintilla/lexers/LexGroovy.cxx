@@ -656,7 +656,7 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				if (bracePos) {
 					levelNext++;
 					i = bracePos; // skip the brace
-					style = SCE_DART_OPERATOR;
+					style = SCE_GROOVY_OPERATOR;
 					styleNext = styler.StyleAt(i + 1);
 				}
 			}

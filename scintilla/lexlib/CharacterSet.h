@@ -316,6 +316,10 @@ constexpr bool IsJumpLabelNextChar(int chNext) noexcept {
 	return AnyOf(chNext, '\0', '/', 'f', 'w', 'd', 'i', 's', 'r');
 }
 
+constexpr bool IsInterfaceName(char ch, char chNext) noexcept {
+	return ch == 'I' && IsUpperCase(chNext);
+}
+
 // Simple case functions for ASCII supersets.
 
 template <typename T>

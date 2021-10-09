@@ -109,10 +109,6 @@ constexpr bool IsCsIdentifierChar(int ch, int chNext) noexcept {
 	return IsIdentifierCharEx(ch) || IsUnicodeEscape(ch, chNext);
 }
 
-constexpr bool IsInterfaceName(char ch, char chNext) noexcept {
-	return ch == 'I' && IsUpperCase(chNext);
-}
-
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_CSHARP_TASKMARKER;
 }
