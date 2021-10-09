@@ -581,6 +581,8 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 				if (bracePos) {
 					levelNext++;
 					i = bracePos; // skip the brace
+					style = SCE_GO_OPERATOR;
+					styleNext = styler.StyleAt(i + 1);
 				}
 			}
 

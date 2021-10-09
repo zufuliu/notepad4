@@ -315,7 +315,9 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				if (bracePos) {
 					levelNext++;
 					i = bracePos; // skip the brace
-					chNext = '\0';
+					style = SCE_AVS_OPERATOR;
+					chNext = styler.SafeGetCharAt(i + 1);
+					styleNext = styler.StyleAt(i + 1);
 				}
 			}
 

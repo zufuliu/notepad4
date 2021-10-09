@@ -836,6 +836,8 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				if (bracePos) {
 					levelNext++;
 					i = bracePos; // skip the brace
+					style = SCE_AHK_OPERATOR;
+					styleNext = styler.StyleAt(i + 1);
 				}
 			}
 
