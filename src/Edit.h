@@ -355,7 +355,11 @@ typedef struct NP2ENCODING {
 	LPWSTR wchLabel;
 } NP2ENCODING;
 
-// https://www.unicode.org/faq/utf_bom.html
+// see UniConversion.h and https://www.unicode.org/faq/utf_bom.html
+#define SURROGATE_LEAD_FIRST		0xD800
+#define SURROGATE_TRAIL_FIRST		0xDC00
+#define SUPPLEMENTAL_PLANE_FIRST	0x10000
+#define MAX_UNICODE					0x10ffff
 #define SURROGATE_OFFSET			(0x10000 - (0xD800 << 10) - 0xDC00)
 #define UTF16_TO_UTF32(lead, trail)	(((lead) << 10) + (trail) + SURROGATE_OFFSET)
 

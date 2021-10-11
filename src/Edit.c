@@ -2142,6 +2142,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 \uHHHHHH	6				1
 */
 #define BMP_UNICODE_HEX_DIGIT	4
+#define MAX_UNICODE_HEX_DIGIT	8
 
 void EditChar2Hex(void) {
 	Sci_Position count = SciCall_GetSelTextLength() - 1;
@@ -2206,43 +2207,50 @@ void EditHex2Char(void) {
 	char *ch = (char *)NP2HeapAlloc(count);
 	WCHAR *wch = (WCHAR *)NP2HeapAlloc(count * sizeof(WCHAR));
 	const UINT cpEdit = SciCall_GetCodePage();
-	int ci = 0;
-	int cch = 0;
 
 	SciCall_GetSelText(ch);
+	MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)count);
 
-	const uint8_t *p = (const uint8_t *)ch;
-	while (*p) {
-		if (*p == '\\') {
+	const WCHAR *p = wch;
+	WCHAR *t = wch;
+	BOOL changed = FALSE;
+	UINT wc;
+	while ((wc = *p) != L'\0') {
+		p++;
+		if ((wc == L'\\' && (*p == L'x' || *p == 'u' || *p == 'U')) || (wc == L'U' && *p == L'+')) {
+			const int digitCount = (wc == L'U' || *p == L'U') ? MAX_UNICODE_HEX_DIGIT : BMP_UNICODE_HEX_DIGIT;
+			UINT value = 0;
+			int ucc = 1;
 			p++;
-			if (*p == 'x' || *p == 'u') {
+			for (; ucc <= digitCount && *p; ucc++) {
+				const int hex = GetHexDigit(*p);
+				if (hex < 0) {
+					break;
+				}
+				value = (value << 4) | hex;
 				p++;
-				ci = 0;
-				int ucc = 0;
-				while (*p && (ucc++ < BMP_UNICODE_HEX_DIGIT)) {
-					const int hex = GetHexDigit(*p);
-					if (hex < 0) {
-						break;
-					}
-					ci = (ci << 4) | hex;
-					p++;
+			}
+			if (value != 0 && value <= MAX_UNICODE) {
+				changed = TRUE;
+				// see UTF16FromUTF32Character() in UniConversion.h
+				if (value < SUPPLEMENTAL_PLANE_FIRST) {
+					wc = value;
+				} else {
+					*t++ = (WCHAR)(((value - SUPPLEMENTAL_PLANE_FIRST) >> 10) + SURROGATE_LEAD_FIRST);
+					wc = (value & 0x3ff) + SURROGATE_TRAIL_FIRST;
 				}
 			} else {
-				wch[cch++] = L'\\';
-				ci = *p++;
+				p -= ucc;
 			}
-		} else {
-			ci = *p++;
 		}
-		wch[cch++] = (WCHAR)ci;
-		if (ci == 0) {
-			break;
-		}
+		*t++ = (WCHAR)wc;
 	}
 
-	wch[cch] = L'\0';
-	cch = WideCharToMultiByte(cpEdit, 0, wch, -1, ch, (int)(count + 1), NULL, NULL) - 1; // '\0'
-	EditReplaceMainSelection(cch, ch);
+	if (changed) {
+		*t = L'\0';
+		count = WideCharToMultiByte(cpEdit, 0, wch, (int)(t - wch), ch, (int)count, NULL, NULL);
+		EditReplaceMainSelection(count, ch);
+	}
 
 	NP2HeapFree(ch);
 	NP2HeapFree(wch);
