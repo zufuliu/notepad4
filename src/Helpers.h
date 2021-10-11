@@ -167,7 +167,7 @@ NP2_inline int ToLowerA(int ch) {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
-NP2_inline int GetHexDigit(unsigned char ch) {
+NP2_inline int GetHexDigit(int ch) {
 	unsigned int diff = ch - '0';
 	if (diff < 10) {
 		return diff;

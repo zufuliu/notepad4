@@ -2871,7 +2871,7 @@ unsigned int UnSlash(char *s, UINT cpEdit) {
 		case 'x':
 		case 'u': {
 			const int digitCount = (*s == 'x') ? 2 : 4;
-			int value = 0;
+			UINT value = 0;
 			int count = 0;
 			for (; count < digitCount; count++) {
 				const int hex = GetHexDigit(s[1]);

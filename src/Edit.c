@@ -2141,7 +2141,7 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 \xHHHH		4			1
 \uHHHHHH	6				1
 */
-#define MAX_ESCAPE_HEX_DIGIT	4
+#define BMP_UNICODE_HEX_DIGIT	4
 
 void EditChar2Hex(void) {
 	Sci_Position count = SciCall_GetSelTextLength() - 1;
@@ -2153,16 +2153,17 @@ void EditChar2Hex(void) {
 		return;
 	}
 
-	count *= 2 + MAX_ESCAPE_HEX_DIGIT;
+	count *= 2 + BMP_UNICODE_HEX_DIGIT;
+	count += 1;
 	char *ch = (char *)NP2HeapAlloc(count + 10);
-	WCHAR *wch = (WCHAR *)NP2HeapAlloc((count + 1) * sizeof(WCHAR));
+	WCHAR *wch = (WCHAR *)NP2HeapAlloc(count * sizeof(WCHAR));
 	SciCall_GetSelText(ch);
 
-	if (ch[0] == 0) {
+	if (ch[0] == '\0') {
 		strcpy(ch, "\\x00");
 	} else {
 		const UINT cpEdit = SciCall_GetCodePage();
-		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)(count + 1)) - 1; // '\0'
+		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)count) - 1; // '\0'
 		int j = 0;
 		for (Sci_Position i = 0; i < count; i++) {
 			const WCHAR c = wch[i];
@@ -2175,8 +2176,8 @@ void EditChar2Hex(void) {
 			}
 		}
 		if (count == 2 && IS_SURROGATE_PAIR(wch[0], wch[1])) {
-			const UINT ucc = UTF16_TO_UTF32(wch[0], wch[1]);
-			sprintf(ch + j, " U+%X", ucc);
+			const UINT value = UTF16_TO_UTF32(wch[0], wch[1]);
+			sprintf(ch + j, " U+%X", value);
 		}
 	}
 
@@ -2200,9 +2201,10 @@ void EditHex2Char(void) {
 		return;
 	}
 
-	count *= 2 + MAX_ESCAPE_HEX_DIGIT;
-	char *ch = (char *)NP2HeapAlloc(count + 1);
-	WCHAR *wch = (WCHAR *)NP2HeapAlloc((count + 1) * sizeof(WCHAR));
+	count *= 2 + BMP_UNICODE_HEX_DIGIT;
+	count += 1;
+	char *ch = (char *)NP2HeapAlloc(count);
+	WCHAR *wch = (WCHAR *)NP2HeapAlloc(count * sizeof(WCHAR));
 	const UINT cpEdit = SciCall_GetCodePage();
 	int ci = 0;
 	int cch = 0;
@@ -2217,7 +2219,7 @@ void EditHex2Char(void) {
 				p++;
 				ci = 0;
 				int ucc = 0;
-				while (*p && (ucc++ < MAX_ESCAPE_HEX_DIGIT)) {
+				while (*p && (ucc++ < BMP_UNICODE_HEX_DIGIT)) {
 					const int hex = GetHexDigit(*p);
 					if (hex < 0) {
 						break;
@@ -2359,13 +2361,13 @@ void EditConvertNumRadix(int radix) {
 	char *tch = (char *)NP2HeapAlloc(2 + count * 4 + 8 + 1);
 	Sci_Position cch = 0;
 	char *p = ch;
-	uint64_t ci = 0;
+	uint64_t value = 0;
 
 	SciCall_GetSelText(ch);
 
 	while (*p) {
 		if (*p == '0') {
-			ci = 0;
+			value = 0;
 			p++;
 			if ((*p == 'x' || *p == 'X') && radix != 16) {
 				p++;
@@ -2377,33 +2379,33 @@ void EditConvertNumRadix(int radix) {
 						if (hex < 0) {
 							break;
 						}
-						ci = (ci << 4) | hex;
+						value = (value << 4) | hex;
 						p++;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, ci, radix);
+				cch += ConvertNumRadix(tch + cch, value, radix);
 			} else if ((*p == 'o' || *p == 'O') && radix != 8) {
 				p++;
 				while (*p) {
 					if (*p >= '0' && *p <= '7') {
-						ci <<= 3;
-						ci += (*p++ - '0');
+						value <<= 3;
+						value += (*p++ - '0');
 					} else if (*p == '_') {
 						p++;
 					} else {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, ci, radix);
+				cch += ConvertNumRadix(tch + cch, value, radix);
 			} else if ((*p == 'b' || *p == 'B') && radix != 2) {
 				p++;
 				while (*p) {
 					if (*p == '0') {
-						ci <<= 1;
+						value <<= 1;
 						p++;
 					} else if (*p == '1') {
-						ci <<= 1;
-						ci |= 1;
+						value <<= 1;
+						value |= 1;
 						p++;
 					} else if (*p == '_') {
 						p++;
@@ -2411,36 +2413,36 @@ void EditConvertNumRadix(int radix) {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, ci, radix);
+				cch += ConvertNumRadix(tch + cch, value, radix);
 			} else if ((*p >= '0' && *p <= '9') && radix != 10) {
-				ci = *p++ - '0';
+				value = *p++ - '0';
 				while (*p) {
 					if (*p >= '0' && *p <= '9') {
-						ci *= 10;
-						ci += (*p++ - '0');
+						value *= 10;
+						value += (*p++ - '0');
 					} else if (*p == '_') {
 						p++;
 					} else {
 						break;
 					}
 				}
-				cch += ConvertNumRadix(tch + cch, ci, radix);
+				cch += ConvertNumRadix(tch + cch, value, radix);
 			} else {
 				tch[cch++] = '0';
 			}
 		} else if ((*p >= '1' && *p <= '9') && radix != 10) {
-			ci = *p++ - '0';
+			value = *p++ - '0';
 			while (*p) {
 				if (*p >= '0' && *p <= '9') {
-					ci *= 10;
-					ci += (*p++ - '0');
+					value *= 10;
+					value += (*p++ - '0');
 				} else if (*p == '_') {
 					p++;
 				} else {
 					break;
 				}
 			}
-			cch += ConvertNumRadix(tch + cch, ci, radix);
+			cch += ConvertNumRadix(tch + cch, value, radix);
 		} else if (IsAlphaNumeric(*p) || *p == '_') {
 			// radix and number prefix matches, no conversion
 			tch[cch++] = *p++;
