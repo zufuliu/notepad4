@@ -23,7 +23,7 @@
 #if !defined(__clang__)
 #define CSTRLEN(s)	(__builtin_constant_p(s) ? (_countof(s) - 1) : (1 / 0))
 #else
-// Clang complains when above CSTRLEN() is used in certain macros, such as EDITLEXER_HOLE()
+// Clang complains when above CSTRLEN() when used in certain macros, such as EDITLEXER_HOLE()
 #define CSTRLEN(s)	(COUNTOF(s) - 1)
 #endif
 #else
@@ -50,12 +50,8 @@
 
 #if defined(__cplusplus) || defined(_MSC_VER)
 	#define NP2_inline	inline
-#elif !(defined(__GNUC__) || defined(__clang__)) || defined(__NO_INLINE__) // O0
-	#define NP2_inline	static inline
-#elif defined(__clang__) && defined(__MINGW32__) && __clang_major__ >= 13
-	#define NP2_inline	static inline
 #else
-	#define NP2_inline	extern inline __attribute__((__gnu_inline__, __artificial__))
+	#define NP2_inline	static inline
 #endif
 
 #define PP_CONCAT_(x, y)	x##y
