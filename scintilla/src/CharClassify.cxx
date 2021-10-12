@@ -739,7 +739,7 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept:
 	// Byte ranges found in Wikipedia articles with relevant search strings in each case
 	switch (codePage_) {
 	case 932:
-		// Shift_JIS
+		// Shift-JIS
 		SetRange(leadByte, 0x81, 0x9F);
 		SetRange(leadByte, 0xE0, 0xFC);
 		// Lead bytes F0 to FC may be a Microsoft addition.

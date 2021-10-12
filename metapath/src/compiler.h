@@ -23,7 +23,7 @@
 #if !defined(__clang__)
 #define CSTRLEN(s)	(__builtin_constant_p(s) ? (_countof(s) - 1) : (1 / 0))
 #else
-// Clang complains when above CSTRLEN() when used in certain macros, such as EDITLEXER_HOLE()
+// Clang complains when above CSTRLEN() is used in certain macros, such as EDITLEXER_HOLE()
 #define CSTRLEN(s)	(COUNTOF(s) - 1)
 #endif
 #else

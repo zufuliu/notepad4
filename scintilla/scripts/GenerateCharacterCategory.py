@@ -239,7 +239,7 @@ def buildFoldDisplayEllipsis():
 
 	# DBCS
 	encodingList = [
-		('cp932', 932, 'Shift_JIS'),
+		('cp932', 932, 'Shift-JIS'),
 		('cp936', 936, 'GBK'),
 		('cp949', 949, 'UHC'),
 		('cp950', 950, 'Big5'),

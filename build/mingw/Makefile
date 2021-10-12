@@ -13,7 +13,7 @@ export LDLIBS += -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -ladvapi32 -l
 	-lshell32 -lole32 -loleaut32 -luuid -luxtheme
 export RCFLAGS += -DRC_INVOKED -DUNICODE -D_UNICODE
 
-# Target triplet if specified. e.g. x86_64-w64-mingw32 for 64bit.
+# Target triplet if specified. e.g. x86_64-w64-mingw32 for 64-bit.
 ifdef TRIPLET
 	export CC := $(TRIPLET)-$(if $(CLANG),clang,gcc)
 	export CXX := $(TRIPLET)-$(if $(CLANG),clang++,g++)

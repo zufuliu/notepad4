@@ -2214,9 +2214,8 @@ void EditHex2Char(void) {
 	const WCHAR *p = wch;
 	WCHAR *t = wch;
 	BOOL changed = FALSE;
-	UINT wc;
-	while ((wc = *p) != L'\0') {
-		p++;
+	while (*p) {
+		UINT wc = *p++;
 		if ((wc == L'\\' && (*p == L'x' || *p == 'u' || *p == 'U')) || (wc == L'U' && *p == L'+')) {
 			const int digitCount = (wc == L'U' || *p == L'U') ? MAX_UNICODE_HEX_DIGIT : BMP_UNICODE_HEX_DIGIT;
 			UINT value = 0;
