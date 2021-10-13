@@ -6951,6 +6951,10 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 void EditInsertUnicodeControlCharacter(int menu) {
 	menu = menu - IDM_INSERT_UNICODE_LRM;
 	const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[menu];
+	if (ucc.uccUTF8[1] != '\0' && iCurrentEncoding == CPI_DEFAULT) {
+		// TODO: convert from UTF-8 to ANSI.
+		return;
+	}
 	SciCall_ReplaceSel(ucc.uccUTF8);
 }
 

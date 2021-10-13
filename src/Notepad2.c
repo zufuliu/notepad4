@@ -2537,6 +2537,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SHOWWHITESPACE, bViewWhiteSpace);
 	CheckCmd(hmenu, IDM_VIEW_SHOWEOLS, bViewEOLs);
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAPSYMBOLS, bShowWordWrapSymbols);
+	EnableCmd(hmenu, IDM_VIEW_UNICODE_CONTROL_CHAR, iCurrentEncoding != CPI_DEFAULT);
 	CheckCmd(hmenu, IDM_VIEW_UNICODE_CONTROL_CHAR, bShowUnicodeControlCharacter);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
@@ -5150,7 +5151,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 		case SCN_CODEPAGECHANGED:
-			EditOnCodePageChanged(scn->oldCodePage);
+			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter);
 			break;
 		}
 		break;

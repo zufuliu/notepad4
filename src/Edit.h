@@ -388,7 +388,7 @@ static inline BOOL IsZeroFlagsCodePage(UINT page) {
 extern NP2ENCODING mEncoding[];
 void	Encoding_ReleaseResources(void);
 BOOL	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
-void	EditOnCodePageChanged(UINT oldCodePage);
+void	EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter);
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);

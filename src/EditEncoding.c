@@ -487,7 +487,7 @@ BOOL EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSa
 	return FALSE;
 }
 
-void EditOnCodePageChanged(UINT oldCodePage) {
+void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
 	if (oldCodePage == SC_CP_UTF8) {
@@ -500,6 +500,9 @@ void EditOnCodePageChanged(UINT oldCodePage) {
 			// UTF-8 to DBCS
 		}
 	} else {
+		if (showControlCharacter) {
+			EditShowUnicodeControlCharacter(TRUE);
+		}
 		if (oldCodePage == 0) {
 			// SBCS to UTF-8
 			SciCall_SetCharClassesEx(0, NULL);
