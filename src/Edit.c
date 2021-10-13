@@ -64,7 +64,7 @@ extern BOOL bLoadASCIIasUTF8;
 extern BOOL bLoadNFOasOEM;
 extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
-
+extern int iCurrentEncoding;
 extern int g_DOSEncoding;
 
 extern LPMRULIST mruFind;

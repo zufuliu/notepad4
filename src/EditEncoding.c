@@ -17,6 +17,7 @@
 extern BOOL bSkipUnicodeDetection;
 extern int iDefaultCodePage;
 extern int iDefaultCharSet;
+extern int iCurrentEncoding;
 
 int g_DOSEncoding;
 
@@ -459,13 +460,13 @@ static inline BOOL IsValidEncoding(int iEncoding) {
 //
 // EditSetNewEncoding()
 //
-BOOL EditSetNewEncoding(int iCurrentEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
-	if (iCurrentEncoding != iNewEncoding) {
-		if (iCurrentEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
+BOOL EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
+	if (iEncoding != iNewEncoding) {
+		if (iEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
 			return TRUE;
 		}
 
-		const UINT cpSrc = (mEncoding[iCurrentEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
+		const UINT cpSrc = (mEncoding[iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 		const UINT cpDest = (mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 
 		if (SciCall_GetLength() == 0) {
@@ -745,11 +746,8 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	HTREEITEM hSelNode = NULL;
 	HTREEITEM hSelParent = NULL;
 
-	// Notepad2.c
-	extern int iEncoding;
-	const UINT acp = GetACP();
-
 	// ANSI and OEM
+	const UINT acp = GetACP();
 	for (int id = CPI_DEFAULT; id <= CPI_OEM; id++) {
 		GetString(mEncoding[id].idsName, wchBuf, COUNTOF(wchBuf));
 		LPWSTR pwsz = StrChr(wchBuf, L';');
@@ -812,7 +810,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
 					expand = TRUE;
-				} else if (!expand && (id == iDefaultCodePage || id == iEncoding || acp == mEncoding[id].uCodePage)) {
+				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding || acp == mEncoding[id].uCodePage)) {
 					// group contains default code, current code page, ANSI code page.
 					expand = TRUE;
 				}

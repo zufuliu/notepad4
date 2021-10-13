@@ -331,7 +331,7 @@ static LPWSTR g_AllFileExtensions = NULL;
 
 // Notepad2.c
 extern HWND hwndMain;
-extern int	iEncoding;
+extern int	iCurrentEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
@@ -2825,7 +2825,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 			char tchText[256] = "";
 			SciCall_GetText(COUNTOF(tchText), tchText);
 			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
-				if (iEncoding != g_DOSEncoding || pLexSniffed != &lexTextFile
+				if (iCurrentEncoding != g_DOSEncoding || pLexSniffed != &lexTextFile
 						|| !(StrCaseEqual(lpszExt, L"nfo") || StrCaseEqual(lpszExt, L"diz"))) {
 					// Although .nfo and .diz were removed from the default lexer's
 					// default extensions list, they may still presist in the user's INI
@@ -2845,7 +2845,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		}
 	}
 
-	if (!bFound && iEncoding == g_DOSEncoding) {
+	if (!bFound && iCurrentEncoding == g_DOSEncoding) {
 		pLexNew = &lexANSI;
 		bFound = TRUE;
 	}
