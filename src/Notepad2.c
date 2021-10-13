@@ -163,7 +163,7 @@ BOOL	bNoEncodingTags;
 BOOL	bLargeFileMode = FALSE;
 #endif
 int		iDefaultEOLMode;
-static int iEOLMode;
+static int iCurrentEOLMode;
 BOOL	bWarnLineEndings;
 BOOL	bFixLineEndings;
 BOOL	bAutoStripBlanks;
@@ -1724,7 +1724,7 @@ void EditReplaceDocument(HANDLE pdoc) {
 	// reduce reference count to 1
 	SciCall_ReleaseDocument(pdoc);
 	SciCall_SetCodePage(cpEdit);
-	SciCall_SetEOLMode(iEOLMode);
+	SciCall_SetEOLMode(iCurrentEOLMode);
 }
 
 //=============================================================================
@@ -2113,7 +2113,7 @@ void UpdateStatusBarCache(int item) {
 		break;
 
 	case STATUS_EOLMODE:
-		cachedStatusItem.pszEOLMode = (iEOLMode == SC_EOL_LF) ? L"LF" : ((iEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
+		cachedStatusItem.pszEOLMode = (iCurrentEOLMode == SC_EOL_LF) ? L"LF" : ((iCurrentEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_EOLMode;
 		break;
 
@@ -2327,9 +2327,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	CheckMenuRadioItem(hmenu, IDM_ENCODING_ANSI, IDM_ENCODING_UTF8SIGN, i, MF_BYCOMMAND);
 
-	if (iEOLMode == SC_EOL_CRLF) {
+	if (iCurrentEOLMode == SC_EOL_CRLF) {
 		i = IDM_LINEENDINGS_CRLF;
-	} else if (iEOLMode == SC_EOL_LF) {
+	} else if (iCurrentEOLMode == SC_EOL_LF) {
 		i = IDM_LINEENDINGS_LF;
 	} else {
 		i = IDM_LINEENDINGS_CR;
@@ -2637,7 +2637,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 }
 
 static void ConvertLineEndings(int iNewEOLMode) {
-	iEOLMode = iNewEOLMode;
+	iCurrentEOLMode = iNewEOLMode;
 	SciCall_SetEOLMode(iNewEOLMode);
 	EditEnsureConsistentLineEndings();
 	UpdateStatusBarCache(STATUS_EOLMODE);
@@ -4979,7 +4979,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				// Auto indent
 				if (ch == '\r' || ch == '\n') {
 					// in CRLF mode handle LF only...
-					if (autoCompletionConfig.bIndentText && ((SC_EOL_CRLF == iEOLMode && ch != '\n') || SC_EOL_CRLF != iEOLMode)) {
+					if (autoCompletionConfig.bIndentText && ((SC_EOL_CRLF == iCurrentEOLMode && ch != '\n') || SC_EOL_CRLF != iCurrentEOLMode)) {
 						EditAutoIndent();
 					}
 					return 0;
@@ -5225,14 +5225,14 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				return TRUE;
 
 			case STATUS_EOLMODE:
-				if (iEOLMode == SC_EOL_CRLF) {
-					iEOLMode = SC_EOL_LF;
-				} else if (iEOLMode == SC_EOL_LF) {
-					iEOLMode = SC_EOL_CR;
+				if (iCurrentEOLMode == SC_EOL_CRLF) {
+					iCurrentEOLMode = SC_EOL_LF;
+				} else if (iCurrentEOLMode == SC_EOL_LF) {
+					iCurrentEOLMode = SC_EOL_CR;
 				} else {
-					iEOLMode = SC_EOL_CRLF;
+					iCurrentEOLMode = SC_EOL_CRLF;
 				}
-				ConvertLineEndings(iEOLMode);
+				ConvertLineEndings(iCurrentEOLMode);
 				return TRUE;
 
 			case STATUS_LEXER:
@@ -7213,8 +7213,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		EditSetEmptyText();
 		bModified = FALSE;
 		bReadOnly = FALSE;
-		iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
-		SciCall_SetEOLMode(iEOLMode);
+		iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
+		SciCall_SetEOLMode(iCurrentEOLMode);
 		iCurrentEncoding = iDefaultEncoding;
 		iOriginalEncoding = iDefaultEncoding;
 		SciCall_SetCodePage((iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
@@ -7259,10 +7259,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 #if NP2_USE_DESIGNATED_INITIALIZER
 	EditFileIOStatus status = {
 		.iEncoding = iCurrentEncoding,
-		.iEOLMode = iEOLMode,
+		.iEOLMode = iCurrentEOLMode,
 	};
 #else
-	EditFileIOStatus status = { iCurrentEncoding, iEOLMode };
+	EditFileIOStatus status = { iCurrentEncoding, iCurrentEOLMode };
 #endif
 
 	// Ask to create a new file...
@@ -7278,8 +7278,8 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				CloseHandle(hFile);
 				FileVars_Init(NULL, 0, &fvCurFile);
 				EditSetEmptyText();
-				iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
-				SciCall_SetEOLMode(iEOLMode);
+				iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
+				SciCall_SetEOLMode(iCurrentEOLMode);
 				if (iSrcEncoding != -1) {
 					iCurrentEncoding = iSrcEncoding;
 					iOriginalEncoding = iSrcEncoding;
@@ -7301,7 +7301,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		fSuccess = FileIO(TRUE, szFileName, bNoEncDetect, &status);
 		if (fSuccess) {
 			iCurrentEncoding = status.iEncoding;
-			iEOLMode = status.iEOLMode;
+			iCurrentEOLMode = status.iEOLMode;
 		}
 	}
 
@@ -7314,7 +7314,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		iOriginalEncoding = iCurrentEncoding;
 		bModified = FALSE;
-		SciCall_SetEOLMode(iEOLMode);
+		SciCall_SetEOLMode(iCurrentEOLMode);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
 		UpdateStatusBarCacheLineColumn();
@@ -7477,10 +7477,10 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 #if NP2_USE_DESIGNATED_INITIALIZER
 	EditFileIOStatus status = {
 		.iEncoding = iCurrentEncoding,
-		.iEOLMode = iEOLMode,
+		.iEOLMode = iCurrentEOLMode,
 	};
 #else
-	EditFileIOStatus status = { iCurrentEncoding, iEOLMode };
+	EditFileIOStatus status = { iCurrentEncoding, iCurrentEOLMode };
 #endif
 
 	// Read only...
