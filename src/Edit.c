@@ -3222,7 +3222,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 //
 // EditAlignText()
 //
-void EditAlignText(int nMode) {
+void EditAlignText(EditAlignMode nMode) {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3313,9 +3313,9 @@ void EditAlignText(int nMode) {
 				}
 
 				if (iWords > 0) {
-					if (nMode == ALIGN_JUSTIFY || nMode == ALIGN_JUSTIFY_EX) {
+					if (nMode == EditAlignMode_Justify || nMode == EditAlignMode_JustifyEx) {
 						BOOL bNextLineIsBlank = FALSE;
-						if (nMode == ALIGN_JUSTIFY_EX) {
+						if (nMode == EditAlignMode_JustifyEx) {
 							if (SciCall_GetLineCount() <= iLine + 1) {
 								bNextLineIsBlank = TRUE;
 							} else {
@@ -3327,9 +3327,9 @@ void EditAlignText(int nMode) {
 							}
 						}
 
-						if ((nMode == ALIGN_JUSTIFY || nMode == ALIGN_JUSTIFY_EX) &&
+						if ((nMode == EditAlignMode_Justify || nMode == EditAlignMode_JustifyEx) &&
 								iWords > 1 && iWordsLength >= 2 &&
-								((nMode != ALIGN_JUSTIFY_EX || !bNextLineIsBlank || iLineStart == iLineEnd) ||
+								((nMode != EditAlignMode_JustifyEx || !bNextLineIsBlank || iLineStart == iLineEnd) ||
 								 (bNextLineIsBlank && iWordsLength*4 > (iMaxLength - iMinIndent)*3))) {
 							const int iGaps = iWords - 1;
 							const Sci_Position iSpacesPerGap = (iMaxLength - iMinIndent - iWordsLength) / iGaps;
@@ -3384,14 +3384,14 @@ void EditAlignText(int nMode) {
 						WCHAR wchNewLineBuf[BUFSIZE_ALIGN * 3] = L"";
 						p = wchNewLineBuf;
 
-						if (nMode == ALIGN_RIGHT) {
+						if (nMode == EditAlignMode_Right) {
 							for (Sci_Position i = 0; i < iExtraSpaces; i++) {
 								*p++ = L' ';
 							}
 							*p = 0;
 						}
 
-						if (nMode == ALIGN_CENTER) {
+						if (nMode == EditAlignMode_Center) {
 							for (Sci_Position i = 1; i < iExtraSpaces - iOddSpaces; i += 2) {
 								*p++ = L' ';
 							}
@@ -3403,7 +3403,7 @@ void EditAlignText(int nMode) {
 							if (i < iWords - 1) {
 								lstrcat(p, L" ");
 							}
-							if (nMode == ALIGN_CENTER && iWords > 1 && iOddSpaces > 0 && i + 1 >= iWords / 2) {
+							if (nMode == EditAlignMode_Center && iWords > 1 && iOddSpaces > 0 && i + 1 >= iWords / 2) {
 								lstrcat(p, L" ");
 								iOddSpaces--;
 							}
@@ -3413,7 +3413,7 @@ void EditAlignText(int nMode) {
 						WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(tchLineBuf), NULL, NULL);
 
 						Sci_Position iPos;
-						if (nMode == ALIGN_RIGHT || nMode == ALIGN_CENTER) {
+						if (nMode == EditAlignMode_Right || nMode == EditAlignMode_Center) {
 							SciCall_SetLineIndentation(iLine, iMinIndent);
 							iPos = SciCall_GetLineIndentPosition(iLine);
 						} else {
@@ -3423,7 +3423,7 @@ void EditAlignText(int nMode) {
 						SciCall_SetTargetRange(iPos, SciCall_GetLineEndPosition(iLine));
 						SciCall_ReplaceTarget(strlen(tchLineBuf), tchLineBuf);
 
-						if (nMode == ALIGN_LEFT) {
+						if (nMode == EditAlignMode_Left) {
 							SciCall_SetLineIndentation(iLine, iMinIndent);
 						}
 					}
@@ -6600,7 +6600,7 @@ static INT_PTR CALLBACK EditAlignDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //
 // EditAlignDlg()
 //
-BOOL EditAlignDlg(HWND hwnd, int *piAlignMode) {
+BOOL EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ALIGN), hwnd, EditAlignDlgProc, (LPARAM)piAlignMode);
 	return iResult == IDOK;
 }

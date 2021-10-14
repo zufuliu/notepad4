@@ -283,7 +283,7 @@ EditMarkAllStatus editMarkAllStatus;
 HANDLE idleTaskTimer;
 
 static EditSortFlag iSortOptions = EditSortFlag_Ascending;
-static int iAlignMode	= 0;
+static EditAlignMode iAlignMode	= EditAlignMode_Left;
 extern int iFontQuality;
 extern int iCaretStyle;
 extern int iOvrCaretStyle;

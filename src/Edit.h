@@ -47,11 +47,13 @@ typedef struct EDITFINDREPLACE {
 
 typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
 
-#define ALIGN_LEFT			0
-#define ALIGN_RIGHT			1
-#define ALIGN_CENTER		2
-#define ALIGN_JUSTIFY		3
-#define ALIGN_JUSTIFY_EX	4
+typedef enum EditAlignMode {
+	EditAlignMode_Left = 0,
+	EditAlignMode_Right = 1,
+	EditAlignMode_Center = 2,
+	EditAlignMode_Justify = 3,
+	EditAlignMode_JustifyEx = 4,
+} EditAlignMode;
 
 typedef enum EditSortFlag {
 	EditSortFlag_Ascending = 0,
@@ -146,7 +148,7 @@ void	EditSpacesToTabs(int nTabWidth, BOOL bOnlyIndentingWS);
 void	EditMoveUp(void);
 void	EditMoveDown(void);
 void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend);
-void	EditAlignText(int nMode);
+void	EditAlignText(EditAlignMode nMode);
 void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose);
 void	EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart);
 void	EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup);
@@ -185,7 +187,7 @@ void	EditUpdateTimestampMatchTemplate(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(int menu);
 void	EditShowUnicodeControlCharacter(BOOL bShow);
 BOOL	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags);
-BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
+BOOL	EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode);
 void	EditSelectionAction(int action);
 void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn);
 void	EditOpenSelection(int type);
