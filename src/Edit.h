@@ -65,6 +65,7 @@ typedef enum EditSortFlag {
 	EditSortFlag_IgnoreCase = 32,
 	EditSortFlag_LogicalNumber = 64,
 	EditSortFlag_ColumnSort = 128,
+	EditSortFlag_GroupByFileType = 256,
 } EditSortFlag;
 
 // wrap indent

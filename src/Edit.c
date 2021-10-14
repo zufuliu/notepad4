@@ -4496,6 +4496,8 @@ void EditSortLines(EditSortFlag iSortFlags) {
 						break;
 					}
 				}
+			} else if (iSortFlags & EditSortFlag_GroupByFileType) {
+				pwszLine = PathFindExtension(pwszLine);
 			}
 			pLines[i].pwszSortEntry = pwszLine;
 		} else {
@@ -6985,6 +6987,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), FALSE);
 		} else {
 			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_ASC);
 		}
@@ -7008,6 +7011,9 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 
 		if (iSortFlags & EditSortFlag_LogicalNumber) {
 			CheckDlgButton(hwnd, IDC_SORT_LOGICAL_NUMBER, BST_CHECKED);
+		}
+		if (iSortFlags & EditSortFlag_GroupByFileType) {
+			CheckDlgButton(hwnd, IDC_SORT_GROUPBY_FILE_TYPE, BST_CHECKED);
 		}
 
 		if (!SciCall_IsRectangleSelection()) {
@@ -7047,6 +7053,9 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			if (IsButtonChecked(hwnd, IDC_SORT_LOGICAL_NUMBER)) {
 				iSortFlags |= EditSortFlag_LogicalNumber;
 			}
+			if (IsButtonChecked(hwnd, IDC_SORT_GROUPBY_FILE_TYPE)) {
+				iSortFlags |= EditSortFlag_GroupByFileType;
+			}
 			if (IsButtonChecked(hwnd, IDC_SORT_COLUMN)) {
 				iSortFlags |= EditSortFlag_ColumnSort;
 			}
@@ -7066,6 +7075,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), TRUE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), TRUE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), TRUE);
 			break;
 
 		case IDC_SORT_SHUFFLE:
@@ -7074,6 +7084,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_IGNORE_CASE), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), FALSE);
 			break;
 
 		case IDC_SORT_REMOVE_DUP:

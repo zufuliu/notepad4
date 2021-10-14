@@ -274,6 +274,7 @@
 #define IDC_SORT_IGNORE_CASE			106
 #define IDC_SORT_LOGICAL_NUMBER			107
 #define IDC_SORT_COLUMN					108
+#define IDC_SORT_GROUPBY_FILE_TYPE		109
 // Align Lines
 #define IDD_ALIGN						112
 #define IDC_ALIGN_LEFT					100
