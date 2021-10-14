@@ -282,7 +282,7 @@ BOOL	bReplaceInitialized = FALSE;
 EditMarkAllStatus editMarkAllStatus;
 HANDLE idleTaskTimer;
 
-static int iSortOptions = 0;
+static EditSortFlag iSortOptions = EditSortFlag_Ascending;
 static int iAlignMode	= 0;
 extern int iFontQuality;
 extern int iCaretStyle;

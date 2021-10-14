@@ -4383,7 +4383,7 @@ static int __cdecl CmpILogicalRev(const void *p1, const void *p2) {
 	return CmpILogical(p2, p1);
 }
 
-void EditSortLines(int iSortFlags) {
+void EditSortLines(EditSortFlag iSortFlags) {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
 	if (iCurPos == iAnchorPos) {
@@ -4445,7 +4445,7 @@ void EditSortLines(int iSortFlags) {
 
 	SciCall_BeginUndoAction();
 	if (bIsRectangular) {
-		EditPadWithSpaces(!(iSortFlags & SORT_SHUFFLE), TRUE);
+		EditPadWithSpaces(!(iSortFlags & EditSortFlag_Shuffle), TRUE);
 	}
 
 	SORTLINE *pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
@@ -4474,7 +4474,7 @@ void EditSortLines(int iSortFlags) {
 			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pwszLine, (int)(LocalSize(pwszLine) / sizeof(WCHAR)));
 			pLines[i].pwszLine = pwszLine;
 
-			if (iSortFlags & SORT_COLUMN) {
+			if (iSortFlags & EditSortFlag_ColumnSort) {
 				const int tabWidth = fvCurFile.iTabWidth;
 				Sci_Position col = 0;
 				Sci_Position tabs = tabWidth;
@@ -4506,12 +4506,12 @@ void EditSortLines(int iSortFlags) {
 		NP2HeapFree(pmsz);
 	}
 
-	if (iSortFlags & SORT_DESCENDING) {
-		QSortCmp cmpFunc = (iSortFlags & SORT_LOGICAL)
-			? ((iSortFlags & SORT_NOCASE) ? CmpILogicalRev : CmpLogicalRev)
-			: ((iSortFlags & SORT_NOCASE) ? CmpIStdRev : CmpStdRev);
+	if (iSortFlags & EditSortFlag_Descending) {
+		QSortCmp cmpFunc = (iSortFlags & EditSortFlag_LogicalNumber)
+			? ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpILogicalRev : CmpLogicalRev)
+			: ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpIStdRev : CmpStdRev);
 		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
-	} else if (iSortFlags & SORT_SHUFFLE) {
+	} else if (iSortFlags & EditSortFlag_Shuffle) {
 		srand(GetTickCount());
 		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
 			const Sci_Line j = rand() % i;
@@ -4520,9 +4520,9 @@ void EditSortLines(int iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		QSortCmp cmpFunc = (iSortFlags & SORT_LOGICAL)
-			? ((iSortFlags & SORT_NOCASE) ? CmpILogical : CmpLogical)
-			: ((iSortFlags & SORT_NOCASE) ? CmpIStd : CmpStd);
+		QSortCmp cmpFunc = (iSortFlags & EditSortFlag_LogicalNumber)
+			? ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpILogical : CmpLogical)
+			: ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpIStd : CmpStd);
 		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
 	}
 
@@ -4530,26 +4530,19 @@ void EditSortLines(int iSortFlags) {
 	char *pmszBuf = (char *)NP2HeapAlloc(ichlMax + 1);
 	const int cbPmszBuf = (int)NP2HeapSize(pmszBuf);
 	const int cbPmszResult = (int)NP2HeapSize(pmszResult);
-	FNSTRCMP pfnStrCmp = (iSortFlags & SORT_NOCASE) ? StrCmpIW : StrCmpW;
+	FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
 
 	BOOL bLastDup = FALSE;
 	for (Sci_Line i = 0; i < iLineCount; i++) {
-		if (pLines[i].pwszLine && ((iSortFlags & SORT_SHUFFLE) || StrNotEmpty(pLines[i].pwszLine))) {
+		if (pLines[i].pwszLine && ((iSortFlags & EditSortFlag_Shuffle) || StrNotEmpty(pLines[i].pwszLine))) {
 			BOOL bDropLine = FALSE;
-			if (!(iSortFlags & SORT_SHUFFLE)) {
-				if (iSortFlags & (SORT_MERGEDUP | SORT_UNIQDUP | SORT_UNIQUNIQ)) {
-					if (i < iLineCount - 1) {
-						if (pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
-							bLastDup = TRUE;
-							bDropLine = iSortFlags & (SORT_MERGEDUP | SORT_UNIQDUP);
-						} else {
-							bDropLine = (!bLastDup && (iSortFlags & SORT_UNIQUNIQ)) || (bLastDup && (iSortFlags & SORT_UNIQDUP));
-							bLastDup = FALSE;
-						}
-					} else {
-						bDropLine = (!bLastDup && (iSortFlags & SORT_UNIQUNIQ)) || (bLastDup && (iSortFlags & SORT_UNIQDUP));
-						bLastDup = FALSE;
-					}
+			if (iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate | EditSortFlag_RemoveUnique)) {
+				if (i < iLineCount - 1 && pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
+					bLastDup = TRUE;
+					bDropLine = iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate);
+				} else {
+					bDropLine = iSortFlags & (bLastDup ? EditSortFlag_RemoveDuplicate : EditSortFlag_RemoveUnique);
+					bLastDup = FALSE;
 				}
 			}
 
@@ -6985,9 +6978,9 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		int *piSortFlags = (int *)lParam;
 		const int iSortFlags = *piSortFlags;
 
-		if (iSortFlags & SORT_DESCENDING) {
+		if (iSortFlags & EditSortFlag_Descending) {
 			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_DESC);
-		} else if (iSortFlags & SORT_SHUFFLE) {
+		} else if (iSortFlags & EditSortFlag_Shuffle) {
 			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_SHUFFLE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), FALSE);
@@ -6998,32 +6991,32 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_ASC);
 		}
 
-		if (iSortFlags & SORT_MERGEDUP) {
+		if (iSortFlags & EditSortFlag_MergeDuplicate) {
 			CheckDlgButton(hwnd, IDC_SORT_MERGE_DUP, BST_CHECKED);
 		}
 
-		if (iSortFlags & SORT_UNIQDUP) {
+		if (iSortFlags & EditSortFlag_RemoveDuplicate) {
 			CheckDlgButton(hwnd, IDC_SORT_REMOVE_DUP, BST_CHECKED);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
 		}
 
-		if (iSortFlags & SORT_UNIQUNIQ) {
+		if (iSortFlags & EditSortFlag_RemoveUnique) {
 			CheckDlgButton(hwnd, IDC_SORT_REMOVE_UNIQUE, BST_CHECKED);
 		}
 
-		if (iSortFlags & SORT_NOCASE) {
+		if (iSortFlags & EditSortFlag_IgnoreCase) {
 			CheckDlgButton(hwnd, IDC_SORT_IGNORE_CASE, BST_CHECKED);
 		}
 
-		if (iSortFlags & SORT_LOGICAL) {
+		if (iSortFlags & EditSortFlag_LogicalNumber) {
 			CheckDlgButton(hwnd, IDC_SORT_LOGICAL_NUMBER, BST_CHECKED);
 		}
 
 		if (!SciCall_IsRectangleSelection()) {
-			*piSortFlags &= ~SORT_COLUMN;
+			*piSortFlags &= ~EditSortFlag_ColumnSort;
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_COLUMN), FALSE);
 		} else {
-			*piSortFlags |= SORT_COLUMN;
+			*piSortFlags |= EditSortFlag_ColumnSort;
 			CheckDlgButton(hwnd, IDC_SORT_COLUMN, BST_CHECKED);
 		}
 		CenterDlgInParent(hwnd);
@@ -7034,30 +7027,30 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			int *piSortFlags = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
-			int iSortFlags = 0;
+			int iSortFlags = EditSortFlag_Ascending;
 			if (IsButtonChecked(hwnd, IDC_SORT_DESC)) {
-				iSortFlags |= SORT_DESCENDING;
+				iSortFlags |= EditSortFlag_Descending;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_SHUFFLE)) {
-				iSortFlags |= SORT_SHUFFLE;
+				iSortFlags |= EditSortFlag_Shuffle;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_MERGE_DUP)) {
-				iSortFlags |= SORT_MERGEDUP;
+				iSortFlags |= EditSortFlag_MergeDuplicate;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_REMOVE_DUP)) {
-				iSortFlags |= SORT_UNIQDUP;
+				iSortFlags |= EditSortFlag_RemoveDuplicate;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_REMOVE_UNIQUE)) {
-				iSortFlags |= SORT_UNIQUNIQ;
+				iSortFlags |= EditSortFlag_RemoveUnique;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_IGNORE_CASE)) {
-				iSortFlags |= SORT_NOCASE;
+				iSortFlags |= EditSortFlag_IgnoreCase;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_LOGICAL_NUMBER)) {
-				iSortFlags |= SORT_LOGICAL;
+				iSortFlags |= EditSortFlag_LogicalNumber;
 			}
 			if (IsButtonChecked(hwnd, IDC_SORT_COLUMN)) {
-				iSortFlags |= SORT_COLUMN;
+				iSortFlags |= EditSortFlag_ColumnSort;
 			}
 			*piSortFlags = iSortFlags;
 			EndDialog(hwnd, IDOK);
@@ -7099,7 +7092,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 //
 // EditSortDlg()
 //
-BOOL EditSortDlg(HWND hwnd, int *piSortFlags) {
+BOOL EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_SORT), hwnd, EditSortDlgProc, (LPARAM)piSortFlags);
 	return iResult == IDOK;
 }

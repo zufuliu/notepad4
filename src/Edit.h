@@ -53,15 +53,17 @@ typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
 #define ALIGN_JUSTIFY		3
 #define ALIGN_JUSTIFY_EX	4
 
-#define SORT_ASCENDING		0
-#define SORT_DESCENDING		1
-#define SORT_SHUFFLE		2
-#define SORT_MERGEDUP		4
-#define SORT_UNIQDUP		8
-#define SORT_UNIQUNIQ		16
-#define SORT_NOCASE			32
-#define SORT_LOGICAL		64
-#define SORT_COLUMN			128
+typedef enum EditSortFlag {
+	EditSortFlag_Ascending = 0,
+	EditSortFlag_Descending = 1,
+	EditSortFlag_Shuffle = 2,
+	EditSortFlag_MergeDuplicate = 4,
+	EditSortFlag_RemoveDuplicate = 8,
+	EditSortFlag_RemoveUnique = 16,
+	EditSortFlag_IgnoreCase = 32,
+	EditSortFlag_LogicalNumber = 64,
+	EditSortFlag_ColumnSort = 128,
+} EditSortFlag;
 
 // wrap indent
 enum {
@@ -156,7 +158,7 @@ void	EditCompressSpaces(void);
 void	EditRemoveBlankLines(BOOL bMerge);
 void	EditWrapToColumn(int nColumn/*, int nTabWidth*/);
 void	EditJoinLinesEx(void);
-void	EditSortLines(int iSortFlags);
+void	EditSortLines(EditSortFlag iSortFlags);
 
 void	EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol);
 void	EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos);
@@ -182,7 +184,7 @@ void	EditInsertDateTime(BOOL bShort);
 void	EditUpdateTimestampMatchTemplate(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(int menu);
 void	EditShowUnicodeControlCharacter(BOOL bShow);
-BOOL	EditSortDlg(HWND hwnd, int *piSortFlags);
+BOOL	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, int *piAlignMode);
 void	EditSelectionAction(int action);
 void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn);
