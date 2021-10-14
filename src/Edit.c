@@ -45,7 +45,6 @@ extern HWND hwndMain;
 extern HWND hwndEdit;
 extern DWORD dwLastIOError;
 extern HWND hDlgFindReplace;
-extern UINT cpLastFind;
 extern BOOL bReplaceInitialized;
 
 extern int xFindReplaceDlg;
@@ -5214,7 +5213,6 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			const BOOL bIsFindDlg = (hwndRepl == NULL);
 			// Get current code page for Unicode conversion
 			const UINT cpEdit = SciCall_GetCodePage();
-			cpLastFind = cpEdit;
 
 			if (!GetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpefr->szFind, COUNTOF(lpefr->szFind))) {
 				EnableWindow(GetDlgItem(hwnd, IDOK), FALSE);

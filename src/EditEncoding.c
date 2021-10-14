@@ -487,10 +487,19 @@ BOOL EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSa
 	return FALSE;
 }
 
-void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter) {
+void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFINDREPLACE lpefr) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
+	const BOOL lastFind = StrNotEmptyA(lpefr->szFind); // need to convert last find & replace string.
+
 	if (oldCodePage == SC_CP_UTF8) {
+		if (lastFind) {
+			WCHAR wch[NP2_FIND_REPLACE_LIMIT];
+			MultiByteToWideChar(CP_UTF8, 0, lpefr->szFindUTF8, -1, wch, COUNTOF(wch));
+			WideCharToMultiByte(cpEdit, 0, wch, -1, lpefr->szFind, COUNTOF(lpefr->szFind), NULL, NULL);
+			MultiByteToWideChar(CP_UTF8, 0, lpefr->szReplaceUTF8, -1, wch, COUNTOF(wch));
+			WideCharToMultiByte(cpEdit, 0, wch, -1, lpefr->szReplace, COUNTOF(lpefr->szReplace), NULL, NULL);
+		}
 		if (cpEdit == 0) {
 			// UTF-8 to SBCS
 			int length = 32;
@@ -500,6 +509,10 @@ void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter) {
 			// UTF-8 to DBCS
 		}
 	} else {
+		if (lastFind) {
+			strcpy(lpefr->szFind, lpefr->szFindUTF8);
+			strcpy(lpefr->szReplace, lpefr->szReplaceUTF8);
+		}
 		if (showControlCharacter) {
 			EditShowUnicodeControlCharacter(TRUE);
 		}

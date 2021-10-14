@@ -277,7 +277,6 @@ static UINT msgTaskbarCreated = 0;
 
 static WIN32_FIND_DATA fdCurFile;
 static EDITFINDREPLACE efrData;
-UINT	cpLastFind = 0;
 BOOL	bReplaceInitialized = FALSE;
 EditMarkAllStatus editMarkAllStatus;
 HANDLE idleTaskTimer;
@@ -907,7 +906,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			const UINT cpEdit = SciCall_GetCodePage();
 			WideCharToMultiByte(cpEdit, 0, lpMatchArg, -1, efrData.szFind, COUNTOF(efrData.szFind), NULL, NULL);
 			WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), NULL, NULL);
-			cpLastFind = cpEdit;
 
 			if (flagMatchText & 4) {
 				efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
@@ -3818,23 +3816,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				SendWMCommand(hwnd, IDM_EDIT_REPLACE);
 			}
 		} else {
-			const UINT cpEdit = SciCall_GetCodePage();
-			if (cpLastFind != cpEdit) {
-				if (cpEdit != SC_CP_UTF8) {
-					WCHAR wch[NP2_FIND_REPLACE_LIMIT];
-
-					MultiByteToWideChar(CP_UTF8, 0, efrData.szFindUTF8, -1, wch, COUNTOF(wch));
-					WideCharToMultiByte(cpEdit, 0, wch, -1, efrData.szFind, COUNTOF(efrData.szFind), NULL, NULL);
-
-					MultiByteToWideChar(CP_UTF8, 0, efrData.szReplaceUTF8, -1, wch, COUNTOF(wch));
-					WideCharToMultiByte(cpEdit, 0, wch, -1, efrData.szReplace, COUNTOF(efrData.szReplace), NULL, NULL);
-				} else {
-					strcpy(efrData.szFind, efrData.szFindUTF8);
-					strcpy(efrData.szReplace, efrData.szReplaceUTF8);
-				}
-			}
-
-			cpLastFind = cpEdit;
 			switch (LOWORD(wParam)) {
 			case IDM_EDIT_FINDNEXT:
 				EditFindNext(&efrData, FALSE);
@@ -4657,12 +4638,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				*lpsz = '\0';
 			}
 
-			cpLastFind = SciCall_GetCodePage();
+			const UINT cpEdit = SciCall_GetCodePage();
 			strcpy(efrData.szFind, mszSelection);
 
-			if (cpLastFind != SC_CP_UTF8) {
+			if (cpEdit != SC_CP_UTF8) {
 				WCHAR wszBuf[NP2_FIND_REPLACE_LIMIT];
-				MultiByteToWideChar(cpLastFind, 0, mszSelection, -1, wszBuf, COUNTOF(wszBuf));
+				MultiByteToWideChar(cpEdit, 0, mszSelection, -1, wszBuf, COUNTOF(wszBuf));
 				WideCharToMultiByte(CP_UTF8, 0, wszBuf, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), NULL, NULL);
 			} else {
 				strcpy(efrData.szFindUTF8, mszSelection);
@@ -5151,7 +5132,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 		case SCN_CODEPAGECHANGED:
-			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter);
+			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, &efrData);
 			break;
 		}
 		break;
