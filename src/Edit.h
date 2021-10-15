@@ -58,12 +58,12 @@ typedef enum EditAlignMode {
 typedef enum EditSortFlag {
 	EditSortFlag_Ascending = 0,
 	EditSortFlag_Descending = 1,
-	EditSortFlag_Shuffle = 2,
-	EditSortFlag_MergeDuplicate = 4,
-	EditSortFlag_RemoveDuplicate = 8,
-	EditSortFlag_RemoveUnique = 16,
-	EditSortFlag_IgnoreCase = 32,
-	EditSortFlag_LogicalNumber = 64,
+	EditSortFlag_IgnoreCase = 2,
+	EditSortFlag_LogicalNumber = 4,
+	EditSortFlag_MergeDuplicate = 8,
+	EditSortFlag_RemoveDuplicate = 16,
+	EditSortFlag_RemoveUnique = 32,
+	EditSortFlag_Shuffle = 64,
 	EditSortFlag_ColumnSort = 128,
 	EditSortFlag_GroupByFileType = 256,
 } EditSortFlag;

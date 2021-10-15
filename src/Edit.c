@@ -4307,54 +4307,54 @@ typedef struct SORTLINE {
 typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
 typedef int (__cdecl *QSortCmp)(const void *, const void *);
 
-static int __cdecl CmpStd(const void *p1, const void *p2) {
+static int __cdecl CmpStdAesc(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	const int cmp = StrCmpW(s1->pwszSortEntry, s2->pwszSortEntry);
 	return cmp ? cmp : StrCmpW(s1->pwszLine, s2->pwszLine);
 }
 
-static int __cdecl CmpIStd(const void *p1, const void *p2) {
+static int __cdecl CmpIStdAesc(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	const int cmp = StrCmpIW(s1->pwszSortEntry, s2->pwszSortEntry);
 	return cmp ? cmp : StrCmpIW(s1->pwszLine, s2->pwszLine);
 }
 
-static int __cdecl CmpStdRev(const void *p1, const void *p2) {
-	return CmpStd(p2, p1);
+static int __cdecl CmpStdDesc(const void *p1, const void *p2) {
+	return CmpStdAesc(p2, p1);
 }
 
-static int __cdecl CmpIStdRev(const void *p1, const void *p2) {
-	return CmpIStd(p2, p1);
+static int __cdecl CmpIStdDesc(const void *p1, const void *p2) {
+	return CmpIStdAesc(p2, p1);
 }
 
-static int __cdecl CmpLogical(const void *p1, const void *p2) {
+static int __cdecl CmpLogicalAesc(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
 	if (cmp == 0) {
 		cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
 	}
-	return cmp ? cmp : CmpStd(p1, p2);
+	return cmp ? cmp : CmpStdAesc(p1, p2);
 }
 
-static int __cdecl CmpILogical(const void *p1, const void *p2) {
+static int __cdecl CmpILogicalAesc(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
 	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
 	if (cmp == 0) {
 		cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
 	}
-	return cmp ? cmp : CmpIStd(p1, p2);
+	return cmp ? cmp : CmpIStdAesc(p1, p2);
 }
 
-static int __cdecl CmpLogicalRev(const void *p1, const void *p2) {
-	return CmpLogical(p2, p1);
+static int __cdecl CmpLogicalDesc(const void *p1, const void *p2) {
+	return CmpLogicalAesc(p2, p1);
 }
 
-static int __cdecl CmpILogicalRev(const void *p1, const void *p2) {
-	return CmpILogical(p2, p1);
+static int __cdecl CmpILogicalDesc(const void *p1, const void *p2) {
+	return CmpILogicalAesc(p2, p1);
 }
 
 void EditSortLines(EditSortFlag iSortFlags) {
@@ -4407,31 +4407,27 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		return;
 	}
 
-	char mszEOL[] = "\r\n";
-	const UINT cpEdit = SciCall_GetCodePage();
-	const int iEOLMode = SciCall_GetEOLMode();
-	if (iEOLMode == SC_EOL_CR) {
-		mszEOL[1] = 0;
-	} else if (iEOLMode == SC_EOL_LF) {
-		mszEOL[0] = '\n';
-		mszEOL[1] = 0;
-	}
-
 	SciCall_BeginUndoAction();
 	if (bIsRectangular) {
 		EditPadWithSpaces(!(iSortFlags & EditSortFlag_Shuffle), TRUE);
 	}
 
+	const UINT cpEdit = SciCall_GetCodePage();
 	SORTLINE *pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
-	Sci_Position cchTotal = 0;
-	Sci_Position ichlMax = 3;
+	size_t cchTotal = 0;
+	size_t cbPmszBuf = 4096;
+	char *pmszBuf = (char *)NP2HeapAlloc(cbPmszBuf);
 	for (Sci_Line i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
-		const Sci_Position cchm = SciCall_GetLineLength(iLine);
-		char *pmsz = (char *)NP2HeapAlloc(cchm + 1);
-		SciCall_GetLine(iLine, pmsz);
+		const size_t cbLine = SciCall_GetLineLength(iLine);
+		cchTotal += cbLine;
+		if (cbLine >= cbPmszBuf) {
+			cbPmszBuf <<= 1;
+			pmszBuf = (char *)NP2HeapReAlloc(pmszBuf, cbPmszBuf);
+		}
+		SciCall_GetLine(iLine, pmszBuf);
 
 		// remove EOL
-		char *p = pmsz + cchm - 1;
+		char *p = pmszBuf + cbLine - 1;
 		if (*p == '\n' || *p == '\r') {
 			*p-- = '\0';
 		}
@@ -4439,13 +4435,10 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			*p-- = '\0';
 		}
 
-		cchTotal += cchm;
-		ichlMax = max_pos(ichlMax, cchm);
-
-		const int cchw = MultiByteToWideChar(cpEdit, 0, pmsz, -1, NULL, 0) - 1;
+		const int cchw = MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, NULL, 0) - 1;
 		if (cchw > 0) {
 			LPWSTR pwszLine = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
-			MultiByteToWideChar(cpEdit, 0, pmsz, -1, pwszLine, (int)(LocalSize(pwszLine) / sizeof(WCHAR)));
+			MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, pwszLine, (int)(LocalSize(pwszLine) / sizeof(WCHAR)));
 			pLines[i].pwszLine = pwszLine;
 
 			if (iSortFlags & EditSortFlag_ColumnSort) {
@@ -4476,18 +4469,14 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			}
 			pLines[i].pwszSortEntry = pwszLine;
 		} else {
-			pLines[i].pwszLine = StrDup(L"");
-			pLines[i].pwszSortEntry = pLines[i].pwszLine;
+			LPWSTR pwszLine = StrDup(L"");
+			pLines[i].pwszLine = pwszLine;
+			pLines[i].pwszSortEntry = pwszLine;
 		}
-		NP2HeapFree(pmsz);
 	}
 
-	if (iSortFlags & EditSortFlag_Descending) {
-		QSortCmp cmpFunc = (iSortFlags & EditSortFlag_LogicalNumber)
-			? ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpILogicalRev : CmpLogicalRev)
-			: ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpIStdRev : CmpStdRev);
-		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
-	} else if (iSortFlags & EditSortFlag_Shuffle) {
+	if (iSortFlags & EditSortFlag_Shuffle) {
+		iSortFlags = (EditSortFlag)(iSortFlags & ~(EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate | EditSortFlag_RemoveUnique));
 		srand(GetTickCount());
 		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
 			const Sci_Line j = rand() % i;
@@ -4496,24 +4485,34 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		QSortCmp cmpFunc = (iSortFlags & EditSortFlag_LogicalNumber)
-			? ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpILogical : CmpLogical)
-			: ((iSortFlags & EditSortFlag_IgnoreCase) ? CmpIStd : CmpStd);
+		static QSortCmp const cmpFuncList[] = {
+			CmpStdAesc,		// EditSortFlag_Ascending
+			CmpStdDesc,		// EditSortFlag_Descending
+			CmpIStdAesc,	// EditSortFlag_Ascending	EditSortFlag_IgnoreCase
+			CmpIStdDesc,	// EditSortFlag_Descending	EditSortFlag_IgnoreCase
+			CmpLogicalAesc,	// EditSortFlag_Ascending								EditSortFlag_LogicalNumber
+			CmpLogicalDesc,	// EditSortFlag_Descending								EditSortFlag_LogicalNumber
+			CmpILogicalAesc,// EditSortFlag_Ascending	EditSortFlag_IgnoreCase		EditSortFlag_LogicalNumber
+			CmpILogicalDesc,// EditSortFlag_Descending	EditSortFlag_IgnoreCase		EditSortFlag_LogicalNumber
+		};
+		QSortCmp cmpFunc = cmpFuncList[iSortFlags & (EditSortFlag_Descending | EditSortFlag_IgnoreCase | EditSortFlag_LogicalNumber)];
 		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
 	}
 
-	char *pmszResult = (char *)NP2HeapAlloc(cchTotal + 2 * iLineCount + 1);
-	char *pmszBuf = (char *)NP2HeapAlloc(ichlMax + 1);
-	const int cbPmszBuf = (int)NP2HeapSize(pmszBuf);
-	const int cbPmszResult = (int)NP2HeapSize(pmszResult);
+	cchTotal += 2 * iLineCount + 1;
+	pmszBuf = (char *)NP2HeapReAlloc(pmszBuf, cchTotal);
+	cchTotal = 0;
 	FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
+	const int iEOLMode = SciCall_GetEOLMode();
 
+	char *pszOut = pmszBuf;
 	BOOL bLastDup = FALSE;
 	for (Sci_Line i = 0; i < iLineCount; i++) {
-		if (pLines[i].pwszLine && ((iSortFlags & EditSortFlag_Shuffle) || StrNotEmpty(pLines[i].pwszLine))) {
+		LPWSTR pwszLine = pLines[i].pwszLine;
+		if (pwszLine && ((iSortFlags & EditSortFlag_Shuffle) || StrNotEmpty(pwszLine))) {
 			BOOL bDropLine = FALSE;
 			if (iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate | EditSortFlag_RemoveUnique)) {
-				if (i < iLineCount - 1 && pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
+				if (i + 1 < iLineCount && pfnStrCmp(pwszLine, pLines[i + 1].pwszLine) == 0) {
 					bLastDup = TRUE;
 					bDropLine = iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate);
 				} else {
@@ -4523,37 +4522,42 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			}
 
 			if (!bDropLine) {
-				WideCharToMultiByte(cpEdit, 0, pLines[i].pwszLine, -1, pmszBuf, cbPmszBuf, NULL, NULL);
-				strncat(pmszResult, pmszBuf, cbPmszResult);
-				strncat(pmszResult, mszEOL, cbPmszResult);
+				const UINT cbLine = WideCharToMultiByte(cpEdit, 0, pwszLine, -1, pszOut, (int)cbPmszBuf, NULL, NULL);
+				cchTotal += cbLine;
+				pszOut += cbLine - 1;
+				switch (iEOLMode) {
+				default: // SC_EOL_CRLF
+					++cchTotal;
+					*pszOut++ = '\r';
+					*pszOut++ = '\n';
+					break;
+				case SC_EOL_LF:
+					*pszOut++ = '\n';
+					break;
+				case SC_EOL_CR:
+					*pszOut++ = '\r';
+					break;
+				}
 			}
 		}
-	}
-
-	NP2HeapFree(pmszBuf);
-	for (Sci_Line i = 0; i < iLineCount; i++) {
-		if (pLines[i].pwszLine) {
-			LocalFree(pLines[i].pwszLine);
-		}
+		LocalFree(pwszLine);
 	}
 	NP2HeapFree(pLines);
 
-	const Sci_Position length = strlen(pmszResult);
 	if (!bIsRectangular) {
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
-			iAnchorPos = iSelStart + length;
+			iAnchorPos = iSelStart + cchTotal;
 		} else {
 			iAnchorPos = iSelStart;
-			iCurPos = iSelStart + length;
+			iCurPos = iSelStart + cchTotal;
 		}
 	}
 
 	SciCall_SetTargetRange(SciCall_PositionFromLine(iLineStart), SciCall_PositionFromLine(iLineEnd + 1));
-	SciCall_ReplaceTarget(length, pmszResult);
+	SciCall_ReplaceTarget(cchTotal, pmszBuf);
 	SciCall_EndUndoAction();
-
-	NP2HeapFree(pmszResult);
+	NP2HeapFree(pmszBuf);
 
 	if (!bIsRectangular) {
 		SciCall_SetSel(iAnchorPos, iCurPos);
@@ -4562,7 +4566,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		Sci_Position iTargetEnd = SciCall_GetTargetEnd();
 		SciCall_ClearSelections();
 		if (iTargetStart != iTargetEnd) {
-			iTargetEnd -= strlen(mszEOL);
+			iTargetEnd -= (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 			if (iRcAnchorLine > iRcCurLine) {
 				iCurPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetStart), iRcCurCol);
 				iAnchorPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetEnd), iRcAnchorCol);
