@@ -43,14 +43,14 @@ typedef struct NP2EncodingGroup {
 
 // encoding list, check with tools/Misc.py after make changes
 NP2ENCODING mEncoding[] = {
-	{ NCP_DEFAULT | NCP_RECODE, 0, "ANSI,ansi,ascii,", IDS_ENCODING_ANSI, NULL },
-	{ NCP_8BIT | NCP_RECODE, 0, "OEM,oem,", IDS_ENCODING_OEM, NULL },
+	{ NCP_DEFAULT | NCP_RECODE, CP_ACP, "ANSI,ansi,ascii,", IDS_ENCODING_ANSI, NULL },
+	{ NCP_8BIT | NCP_RECODE, CP_OEMCP, "OEM,oem,", IDS_ENCODING_OEM, NULL },
 	{ NCP_UNICODE | NCP_UNICODE_BOM, 0, "", IDS_ENCODING_UTF16LE_BOM, NULL },
 	{ NCP_UNICODE | NCP_UNICODE_REVERSE | NCP_UNICODE_BOM, 0, "", IDS_ENCODING_UTF16BE_BOM, NULL },
 	{ NCP_UNICODE | NCP_RECODE, 0, "UTF-16,utf16,unicode,ucs2,utf16le,", IDS_ENCODING_UTF16LE, NULL },
 	{ NCP_UNICODE | NCP_UNICODE_REVERSE | NCP_RECODE, 0, "UTF-16BE,utf16be,unicodebe,", IDS_ENCODING_UTF16BE, NULL },
-	{ NCP_UTF8 | NCP_RECODE, 0, "UTF-8,utf8,utf8mb4,cp65001,", IDS_ENCODING_UTF8, NULL },
-	{ NCP_UTF8 | NCP_UTF8_SIGN, 0, "UTF-8,utf8,utf8mb4,cp65001,", IDS_ENCODING_UTF8BOM, NULL },
+	{ NCP_UTF8 | NCP_RECODE, CP_UTF8, "UTF-8,utf8,utf8mb4,cp65001,", IDS_ENCODING_UTF8, NULL },
+	{ NCP_UTF8 | NCP_UTF8_SIGN, CP_UTF8, "UTF-8,utf8,utf8mb4,cp65001,", IDS_ENCODING_UTF8BOM, NULL },
 	{ NCP_7BIT | NCP_RECODE, CP_UTF7, "UTF-7,utf7,", IDS_ENCODING_UTF7, NULL },
 	// Latin-1
 	{ NCP_8BIT | NCP_RECODE, 28591, "ISO-8859-1,iso88591,cp819,latin1,ibm819,isoir100,l1,latin,", IDS_ENCODING_ISO8859_1, NULL },// ISO 8859-1 Latin-1; Western European (ISO)
@@ -679,7 +679,7 @@ int Encoding_MatchA(LPCSTR pchTest) {
 		}
 	}
 
-	return -1;
+	return CPI_NONE;
 }
 
 BOOL Encoding_IsValid(int iTestEncoding) {
@@ -695,8 +695,8 @@ static int __cdecl CmpEncoding(const void *s1, const void *s2) {
 	return StrCmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
 }
 
-static inline int Encoding_GetIndex(UINT page) {
-	for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); i++) {
+int Encoding_GetIndex(UINT page) {
+	for (int i = CPI_UTF8; i < (int)COUNTOF(mEncoding); i++) {
 		if (mEncoding[i].uCodePage == page) {
 			return i;
 		}
@@ -2115,5 +2115,5 @@ int FileVars_GetEncoding(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
 		return lpfv->iEncoding;
 	}
-	return -1;
+	return CPI_NONE;
 }

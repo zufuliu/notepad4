@@ -967,7 +967,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	}
 
 	int _iDefaultEncoding = bPreferOEM ? g_DOSEncoding : iDefaultEncoding;
-	if (iWeakSrcEncoding != -1 && Encoding_IsValid(iWeakSrcEncoding)) {
+	if (iWeakSrcEncoding != CPI_NONE && Encoding_IsValid(iWeakSrcEncoding)) {
 		_iDefaultEncoding = iWeakSrcEncoding;
 	}
 
@@ -976,7 +976,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	if (cbData == 0) {
 		FileVars_Init(NULL, 0, &fvCurFile);
 
-		if (iSrcEncoding == -1) {
+		if (iSrcEncoding == CPI_NONE) {
 			if ((bLoadANSIasUTF8 || bLoadASCIIasUTF8) && !bPreferOEM) {
 				iEncoding = CPI_UTF8;
 			} else {
@@ -996,7 +996,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	// file large than 2 GiB is loaded without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
 	if (cbData < MAX_NON_UTF8_SIZE && (
 		(iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
-		|| (!bSkipEncodingDetection && iSrcEncoding == -1 && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
+		|| (!bSkipEncodingDetection && iSrcEncoding == CPI_NONE && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
 	)) {
 		if (iSrcEncoding == CPI_UNICODE) {
 			bBOM = (lpData[0] == '\xFF' && lpData[1] == '\xFE');
@@ -1017,16 +1017,16 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	}
 
 	FileVars_Init(lpData, cbData, &fvCurFile);
-	if (iSrcEncoding == -1) {
+	if (iSrcEncoding == CPI_NONE) {
 		iSrcEncoding = FileVars_GetEncoding(&fvCurFile);
 	}
 
 	iEncoding = iSrcEncoding;
-	if (iEncoding == -1) {
+	if (iEncoding == CPI_NONE) {
 		if (fvCurFile.mask & FV_ENCODING) {
 			iEncoding = CPI_DEFAULT;
 		} else {
-			if ((iWeakSrcEncoding != -1) && (mEncoding[iWeakSrcEncoding].uFlags & NCP_INTERNAL)) {
+			if (iWeakSrcEncoding != CPI_NONE && (mEncoding[iWeakSrcEncoding].uFlags & NCP_INTERNAL)) {
 				iEncoding = iDefaultEncoding;
 			} else {
 				iEncoding = _iDefaultEncoding;
@@ -1037,7 +1037,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	// check UTF-8
 	bBOM = utf8Sig;
 	utf8Sig = (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN); // reload as UTF-8 or UTF-8 filevar
-	if (iSrcEncoding == -1) {
+	if (iSrcEncoding == CPI_NONE) {
 		if (bLoadANSIasUTF8 && !bPreferOEM) { // load ANSI as UTF-8
 			utf8Sig = TRUE;
 		} else if (!bSkipEncodingDetection || cbData >= MAX_NON_UTF8_SIZE) {
@@ -1080,8 +1080,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	dwLastIOError = GetLastError();
 
 	if (hFile == INVALID_HANDLE_VALUE) {
-		iSrcEncoding = -1;
-		iWeakSrcEncoding = -1;
+		iSrcEncoding = CPI_NONE;
+		iWeakSrcEncoding = CPI_NONE;
 		return FALSE;
 	}
 
@@ -1090,8 +1090,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	if (!GetFileSizeEx(hFile, &fileSize)) {
 		dwLastIOError = GetLastError();
 		CloseHandle(hFile);
-		iSrcEncoding = -1;
-		iWeakSrcEncoding = -1;
+		iSrcEncoding = CPI_NONE;
+		iWeakSrcEncoding = CPI_NONE;
 		return FALSE;
 	}
 
@@ -1131,8 +1131,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	if (fileSize.QuadPart > maxFileSize) {
 		CloseHandle(hFile);
 		status->bFileTooBig = TRUE;
-		iSrcEncoding = -1;
-		iWeakSrcEncoding = -1;
+		iSrcEncoding = CPI_NONE;
+		iWeakSrcEncoding = CPI_NONE;
 		WCHAR tchDocSize[32];
 		WCHAR tchMaxSize[32];
 		WCHAR tchDocBytes[32];
@@ -1157,8 +1157,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 	if (!bReadSuccess) {
 		NP2HeapFree(lpData);
-		iSrcEncoding = -1;
-		iWeakSrcEncoding = -1;
+		iSrcEncoding = CPI_NONE;
+		iWeakSrcEncoding = CPI_NONE;
 		return FALSE;
 	}
 
@@ -1170,8 +1170,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	const int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, bSkipEncodingDetection, &bBOM);
 	status->iEncoding = iEncoding;
 
-	iSrcEncoding = -1;
-	iWeakSrcEncoding = -1;
+	iSrcEncoding = CPI_NONE;
+	iWeakSrcEncoding = CPI_NONE;
 	const UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	if (cbData == 0) {

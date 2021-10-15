@@ -151,8 +151,8 @@ int		iDefaultCharSet;
 int		iDefaultEncoding;
 int		iCurrentEncoding;
 static int iOriginalEncoding;
-int		iSrcEncoding = -1;
-int		iWeakSrcEncoding = -1;
+int		iSrcEncoding = CPI_NONE;
+int		iWeakSrcEncoding = CPI_NONE;
 BOOL	bSkipUnicodeDetection;
 BOOL	bLoadANSIasUTF8;
 BOOL	bLoadASCIIasUTF8;
@@ -845,7 +845,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			}
 		}
 	} else {
-		if (iSrcEncoding != -1) {
+		if (iSrcEncoding != CPI_NONE) {
 			iCurrentEncoding = iSrcEncoding;
 			iOriginalEncoding = iSrcEncoding;
 			SciCall_SetCodePage((iSrcEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
@@ -862,7 +862,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	// reset
-	iSrcEncoding = -1;
+	iSrcEncoding = CPI_NONE;
 	flagQuietCreate = 0;
 	fKeepTitleExcerpt = 0;
 
@@ -1283,7 +1283,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 				// reset
-				iSrcEncoding = -1;
+				iSrcEncoding = CPI_NONE;
 			}
 
 			if (params->flagJumpTo) {
@@ -2976,7 +2976,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				iOriginalEncoding = iNewEncoding;
 			} else {
 				if (iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) {
-					iOriginalEncoding = -1;
+					iOriginalEncoding = CPI_NONE;
 				}
 				iCurrentEncoding = iNewEncoding;
 			}
@@ -7261,7 +7261,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				EditSetEmptyText();
 				iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 				SciCall_SetEOLMode(iCurrentEOLMode);
-				if (iSrcEncoding != -1) {
+				if (iSrcEncoding != CPI_NONE) {
 					iCurrentEncoding = iSrcEncoding;
 					iOriginalEncoding = iSrcEncoding;
 				} else {
@@ -7787,7 +7787,7 @@ BOOL ActivatePrevInst(void) {
 				params->iInitialLine = iInitialLine;
 				params->iInitialColumn = iInitialColumn;
 
-				params->iSrcEncoding = (lpEncodingArg) ? Encoding_Match(lpEncodingArg) : -1;
+				params->iSrcEncoding = (lpEncodingArg) ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 				params->flagSetEncoding = flagSetEncoding;
 				params->flagSetEOLMode = flagSetEOLMode;
 				params->flagTitleExcerpt = 0;
@@ -7874,7 +7874,7 @@ BOOL ActivatePrevInst(void) {
 				params->iInitialLine = iInitialLine;
 				params->iInitialColumn = iInitialColumn;
 
-				params->iSrcEncoding = (lpEncodingArg) ? Encoding_Match(lpEncodingArg) : -1;
+				params->iSrcEncoding = (lpEncodingArg) ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 				params->flagSetEncoding = flagSetEncoding;
 				params->flagSetEOLMode = flagSetEOLMode;
 

@@ -401,6 +401,7 @@ void	Encoding_GetLabel(int iEncoding);
 int 	Encoding_Match(LPCWSTR pwszTest);
 int 	Encoding_MatchA(LPCSTR pchTest);
 BOOL	Encoding_IsValid(int iTestEncoding);
+int		Encoding_GetIndex(UINT page);
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet);
 #if 0
