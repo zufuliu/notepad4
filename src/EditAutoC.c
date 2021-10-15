@@ -2213,7 +2213,7 @@ void EditAutoIndent(void) {
 			}
 			if (indent == 2) {
 				switch (iEOLMode) {
-				case SC_EOL_CRLF:
+				default: // SC_EOL_CRLF
 					*pPos++ = '\r';
 					*pPos++ = '\n';
 					break;

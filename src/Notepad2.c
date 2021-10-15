@@ -3342,7 +3342,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		BeginWaitCursor();
 		SciCall_TargetFromSelection();
 		SciCall_LinesJoin();
-		EditJoinLinesEx();
 		EndWaitCursor();
 		break;
 

@@ -307,15 +307,19 @@ char* EditGetClipboardText(HWND hwnd) {
 		WideCharToMultiByte(cpEdit, 0, pwch, wlen + 1, pmch, mlen + 1, NULL, NULL);
 
 		const int iEOLMode = SciCall_GetEOLMode();
-		for (int i = 0; (i < mlen) && (*s != 0); i++) {
+		for (int i = 0; (i < mlen) && (*s != '\0'); i++) {
 			if (*s == '\n' || *s == '\r') {
-				if (iEOLMode == SC_EOL_CR) {
-					*d++ = '\r';
-				} else if (iEOLMode == SC_EOL_LF) {
-					*d++ = '\n';
-				} else { // iEOLMode == SC_EOL_CRLF
+				switch (iEOLMode) {
+				default: // SC_EOL_CRLF
 					*d++ = '\r';
 					*d++ = '\n';
+					break;
+				case SC_EOL_LF:
+					*d++ = '\n';
+					break;
+				case SC_EOL_CR:
+					*d++ = '\r';
+					break;
 				}
 				if ((*s == '\r') && (i + 1 < mlen) && (*(s + 1) == '\n')) {
 					i++;
@@ -327,7 +331,7 @@ char* EditGetClipboardText(HWND hwnd) {
 			}
 		}
 
-		*d++ = 0;
+		*d++ = '\0';
 		LocalFree(pmch);
 		pmch = (char *)LocalAlloc(LPTR, (d - ptmp));
 		strcpy(pmch, ptmp);
@@ -355,17 +359,21 @@ LPWSTR EditGetClipboardTextW(void) {
 		LPWSTR d = ptmp;
 
 		const int iEOLMode = SciCall_GetEOLMode();
-		for (int i = 0; (i < wlen) && (*s != 0); i++) {
-			if (*s == '\n' || *s == '\r') {
-				if (iEOLMode == SC_EOL_CR) {
-					*d++ = '\r';
-				} else if (iEOLMode == SC_EOL_LF) {
-					*d++ = '\n';
-				} else { // iEOLMode == SC_EOL_CRLF
-					*d++ = '\r';
-					*d++ = '\n';
+		for (int i = 0; (i < wlen) && (*s != L'\0'); i++) {
+			if (*s == L'\n' || *s == L'\r') {
+				switch (iEOLMode) {
+				default: // SC_EOL_CRLF
+					*d++ = L'\r';
+					*d++ = L'\n';
+					break;
+				case SC_EOL_LF:
+					*d++ = L'\n';
+					break;
+				case SC_EOL_CR:
+					*d++ = L'\r';
+					break;
 				}
-				if ((*s == '\r') && (i + 1 < wlen) && (*(s + 1) == '\n')) {
+				if ((*s == L'\r') && (i + 1 < wlen) && (*(s + 1) == L'\n')) {
 					i++;
 					s++;
 				}
@@ -375,7 +383,7 @@ LPWSTR EditGetClipboardTextW(void) {
 			}
 		}
 
-		*d++ = 0;
+		*d++ = L'\0';
 	}
 
 	GlobalUnlock(hmem);
@@ -2740,16 +2748,9 @@ void EditMoveUp(void) {
 		NP2HeapFree(pLine);
 
 		if (iLineDest == SciCall_GetLineCount() - 1) {
-			char chaEOL[] = "\r\n";
 			const int iEOLMode = SciCall_GetEOLMode();
-			if (iEOLMode == SC_EOL_CR) {
-				chaEOL[1] = 0;
-			} else if (iEOLMode == SC_EOL_LF) {
-				chaEOL[0] = '\n';
-				chaEOL[1] = 0;
-			}
-
-			SciCall_InsertText(iLineDestStart, chaEOL);
+			LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : ((iEOLMode == SC_EOL_CR) ? "\r" : "\r\n");
+			SciCall_InsertText(iLineDestStart, lineEnd);
 			SciCall_SetTargetRange(SciCall_GetLineEndPosition(iLineDest), SciCall_GetLength());
 			SciCall_ReplaceTarget(0, "");
 		}
@@ -2824,15 +2825,9 @@ void EditMoveDown(void) {
 		}
 
 		if (bLastLine) {
-			char chaEOL[] = "\r\n";
 			const int iEOLMode = SciCall_GetEOLMode();
-			if (iEOLMode == SC_EOL_CR) {
-				chaEOL[1] = 0;
-			} else if (iEOLMode == SC_EOL_LF) {
-				chaEOL[0] = '\n';
-				chaEOL[1] = 0;
-			}
-			SciCall_AppendText(strlen(chaEOL), chaEOL);
+			LPCSTR lineEnd = (iEOLMode == SC_EOL_LF) ? "\n" : "\r\n";
+			SciCall_AppendText((iEOLMode == SC_EOL_CRLF) ? 2 : 1, lineEnd);
 		}
 
 		const Sci_Position cLine = SciCall_GetLineLength(iLineSrc);
@@ -4136,15 +4131,9 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 
 	LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(cchTextW * sizeof(WCHAR) * 3 + 2);
 
-	WCHAR wszEOL[] = L"\r\n";
-	int cchEOL = 2;
 	const int iEOLMode = SciCall_GetEOLMode();
-	if (iEOLMode == SC_EOL_CR) {
-		cchEOL = 1;
-	} else if (iEOLMode == SC_EOL_LF) {
-		cchEOL = 1;
-		wszEOL[0] = L'\n';
-	}
+	LPCWSTR wszEOL = (iEOLMode == SC_EOL_LF) ? L"\n" : L"\r\n";
+	const int cchEOL = (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 
 #define ISDELIMITER(wc) StrChr(L",;.:-+%&\xA6|/*?!\"\'~\xB4#=", wc)
 #define ISWHITE(wc)		IsASpaceOrTab(wc)
@@ -4159,31 +4148,29 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 		//if (ISDELIMITER(w)) {
 		//	int iNextWordLen = 0;
 		//	WCHAR w2 = pszTextW[iTextW + 1];
-
+		//
 		//	if (iLineLength + iNextWordLen + 1 > nColumn) {
-		//		pszConvW[cchConvW++] = wszEOL[0];
-		//		if (cchEOL > 1)
-		//			pszConvW[cchConvW++] = wszEOL[1];
+		//		memcpy(pszConvW + cchConvW, wszEOL, 2*sizeof(WCHAR));
+		//		cchConvW += cchEOL;
 		//		iLineLength = 0;
 		//		bModified = TRUE;
 		//	}
-
+		//
 		//	while (w2 != L'\0' && !ISWORDEND(w2)) {
 		//		iNextWordLen++;
 		//		w2 = pszTextW[iTextW + iNextWordLen + 1];
 		//	}
-
+		//
 		//	if (ISDELIMITER(w2) && iNextWordLen > 0) // delimiters go with the word
 		//		iNextWordLen++;
-
+		//
 		//	pszConvW[cchConvW++] = w;
 		//	iLineLength++;
-
+		//
 		//	if (iNextWordLen > 0) {
 		//		if (iLineLength + iNextWordLen + 1 > nColumn) {
-		//			pszConvW[cchConvW++] = wszEOL[0];
-		//			if (cchEOL > 1)
-		//				pszConvW[cchConvW++] = wszEOL[1];
+		//			memcpy(pszConvW + cchConvW, wszEOL, 2*sizeof(WCHAR));
+		//			cchConvW += cchEOL;
 		//			iLineLength = 0;
 		//			bModified = TRUE;
 		//		}
@@ -4208,10 +4195,8 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 			//	iNextWordLen++;
 			if (iNextWordLen > 0) {
 				if (iLineLength + iNextWordLen + 1 > nColumn) {
-					pszConvW[cchConvW++] = wszEOL[0];
-					if (cchEOL > 1) {
-						pszConvW[cchConvW++] = wszEOL[1];
-					}
+					memcpy(pszConvW + cchConvW, wszEOL, 2*sizeof(WCHAR));
+					cchConvW += cchEOL;
 					iLineLength = 0;
 					bModified = TRUE;
 				} else {
@@ -4268,15 +4253,9 @@ void EditJoinLinesEx(void) {
 	struct Sci_TextRange tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRange(&tr);
 
-	char szEOL[] = "\r\n";
-	int cchEOL = 2;
 	const int iEOLMode = SciCall_GetEOLMode();
-	if (iEOLMode == SC_EOL_CR) {
-		cchEOL = 1;
-	} else if (iEOLMode == SC_EOL_LF) {
-		cchEOL = 1;
-		szEOL[0] = '\n';
-	}
+	LPCSTR szEOL = (iEOLMode == SC_EOL_LF) ? "\n" : "\r\n";
+	const int cchEOL = (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 
 	Sci_Position cchJoin = 0;
 	BOOL bModified = FALSE;
@@ -4293,17 +4272,13 @@ void EditJoinLinesEx(void) {
 					i++;
 					bModified = TRUE;
 				}
-				if (pszText[i + 1] != 0) {
-					pszJoin[cchJoin++] = szEOL[0];
-					if (cchEOL > 1) {
-						pszJoin[cchJoin++] = szEOL[1];
+				if (pszText[i + 1] != '\0') {
+					if (cchJoin != 0) {
+						memcpy(pszJoin + cchJoin, szEOL, 2);
+						cchJoin += cchEOL;
 					}
-					if (cchJoin > cchEOL) {
-						pszJoin[cchJoin++] = szEOL[0];
-						if (cchEOL > 1) {
-							pszJoin[cchJoin++] = szEOL[1];
-						}
-					}
+					memcpy(pszJoin + cchJoin, szEOL, 2);
+					cchJoin += cchEOL;
 				}
 			}
 		} else {
