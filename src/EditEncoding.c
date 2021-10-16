@@ -447,13 +447,13 @@ void Encoding_ReleaseResources(void) {
 	}
 }
 
-static inline BOOL IsValidEncoding(int iEncoding) {
-	if (!(mEncoding[iEncoding].uFlags & NCP_INTERNAL)) {
-		const UINT cp = mEncoding[iEncoding].uCodePage;
-		CPINFO cpi;
-		return IsValidCodePage(cp) && GetCPInfo(cp, &cpi);
-	}
-	return TRUE;
+static inline BOOL IsValidCodePageEx(UINT codePage) {
+	CPINFO cpi;
+	return IsValidCodePage(codePage) && GetCPInfo(codePage, &cpi);
+}
+
+static inline BOOL IsValidEncoding(const NP2ENCODING *encoding) {
+	return (encoding->uFlags & NCP_INTERNAL) || IsValidCodePageEx(encoding->uCodePage);
 }
 
 //=============================================================================
@@ -556,13 +556,8 @@ void Encoding_InitDefaults(void) {
 
 	g_DOSEncoding = CPI_OEM;
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
-	if (oemcp != 437 && IsValidCodePage(437)) {
-		for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); ++i) {
-			if (mEncoding[i].uCodePage == 437) {
-				g_DOSEncoding = i;
-				break;
-			}
-		}
+	if (oemcp != 437 && IsValidCodePageEx(437)) {
+		g_DOSEncoding = Encoding_GetIndex(437);
 	}
 }
 
@@ -587,17 +582,14 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 			return CPI_UNICODEBE;
 		case 8:
 			return CPI_UTF7;
-		default: {
-			for (int i = CPI_UTF7 + 1; i < (int)COUNTOF(mEncoding); i++) {
-				if (mEncoding[i].uCodePage == (UINT)iSetting) {
-					if (IsValidEncoding(i)) {
-						return i;
-					}
-					break;
+		default:
+			if (IsValidCodePageEx(iSetting)) {
+				iSetting = Encoding_GetIndex(iSetting);
+				if (iSetting != CPI_NONE) {
+					return iSetting;
 				}
 			}
 			return CPI_DEFAULT;
-		}
 		}
 	} else {
 		switch (iSetting) {
@@ -671,8 +663,9 @@ int Encoding_MatchA(LPCSTR pchTest) {
 	*pchDst = '\0';
 
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
-		if (strstr(mEncoding[i].pszParseNames, chTest)) {
-			if (IsValidEncoding(i)) {
+		const NP2ENCODING *encoding = &mEncoding[i];
+		if (strstr(encoding->pszParseNames, chTest)) {
+			if (IsValidEncoding(encoding)) {
 				return i;
 			}
 			break;
@@ -683,7 +676,8 @@ int Encoding_MatchA(LPCSTR pchTest) {
 }
 
 BOOL Encoding_IsValid(int iTestEncoding) {
-	return iTestEncoding >= 0 && iTestEncoding < (int)COUNTOF(mEncoding) && IsValidEncoding(iTestEncoding);
+	return iTestEncoding >= 0 && iTestEncoding < (int)COUNTOF(mEncoding)
+		&& IsValidEncoding(&mEncoding[iTestEncoding]);
 }
 
 typedef struct ENCODINGENTRY {
@@ -695,9 +689,9 @@ static int __cdecl CmpEncoding(const void *s1, const void *s2) {
 	return StrCmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
 }
 
-int Encoding_GetIndex(UINT page) {
+int Encoding_GetIndex(UINT codePage) {
 	for (int i = CPI_UTF8; i < (int)COUNTOF(mEncoding); i++) {
-		if (mEncoding[i].uCodePage == page) {
+		if (mEncoding[i].uCodePage == codePage) {
 			return i;
 		}
 	}
@@ -714,9 +708,9 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 			// map code page to index
 			for (UINT j = 0; j < COUNTOF(group->encodings); j++) {
 				const UINT page = group->encodings[j];
-				const int index = page ? Encoding_GetIndex(page) : -1;
+				const int index = Encoding_GetIndex(page);
 				group->encodings[j] = index;
-				if (index < 0) {
+				if (index == CPI_NONE) {
 					break;
 				}
 			}
@@ -765,7 +759,8 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	// ANSI and OEM
 	const UINT acp = GetACP();
 	for (int id = CPI_DEFAULT; id <= CPI_OEM; id++) {
-		GetString(mEncoding[id].idsName, wchBuf, COUNTOF(wchBuf));
+		const NP2ENCODING *encoding = &mEncoding[id];
+		GetString(encoding->idsName, wchBuf, COUNTOF(wchBuf));
 		LPWSTR pwsz = StrChr(wchBuf, L';');
 		if (pwsz != NULL) {
 			*pwsz = L'\0';
@@ -778,7 +773,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 		tvis.hInsertAfter = hParent;
 		tvis.item.pszText = wchBuf;
-		tvis.item.iImage = IsValidEncoding(id) ? 0 : 1;
+		tvis.item.iImage = IsValidEncoding(encoding) ? 0 : 1;
 		tvis.item.iSelectedImage = tvis.item.iImage;
 		tvis.item.lParam = 1 + id;
 
@@ -808,8 +803,9 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 			if (id <= 0) {
 				break;
 			}
-			if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
-				GetString(mEncoding[id].idsName, wchBuf, COUNTOF(wchBuf));
+			const NP2ENCODING *encoding = &mEncoding[id];
+			if (!bRecodeOnly || (encoding->uFlags & NCP_RECODE)) {
+				GetString(encoding->idsName, wchBuf, COUNTOF(wchBuf));
 				LPWSTR pwsz = StrChr(wchBuf, L';');
 				if (pwsz != NULL) {
 					*pwsz = L'\0';
@@ -817,7 +813,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 				tvis.hInsertAfter = hTreeNode;
 				tvis.item.pszText = wchBuf;
-				tvis.item.iImage = IsValidEncoding(id) ? 0 : 1;
+				tvis.item.iImage = IsValidEncoding(encoding) ? 0 : 1;
 				tvis.item.iSelectedImage = tvis.item.iImage;
 				tvis.item.lParam = 1 + id;
 
@@ -826,7 +822,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
 					expand = TRUE;
-				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding || acp == mEncoding[id].uCodePage)) {
+				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding || acp == encoding->uCodePage)) {
 					// group contains default code, current code page, ANSI code page.
 					expand = TRUE;
 				}
@@ -884,7 +880,8 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	int iSelItem = -1;
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
-		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
+		const NP2ENCODING *encoding = &mEncoding[id];
+		if (!bRecodeOnly || (encoding->uFlags & NCP_RECODE)) {
 			lvi.iItem = ListView_GetItemCount(hwnd);
 			LPWSTR pwsz = StrChr(pEE[i].wch, L';');
 			if (pwsz != NULL) {
@@ -903,7 +900,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			lvi.iImage = IsValidEncoding(id) ? 0 : 1;
+			lvi.iImage = IsValidEncoding(encoding) ? 0 : 1;
 			lvi.lParam = (LPARAM)id;
 			ListView_InsertItem(hwnd, &lvi);
 
@@ -963,7 +960,8 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	int iSelItem = -1;
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		const int id = pEE[i].id;
-		if (!bRecodeOnly || (mEncoding[id].uFlags & NCP_RECODE)) {
+		const NP2ENCODING *encoding = &mEncoding[id];
+		if (!bRecodeOnly || (encoding->uFlags & NCP_RECODE)) {
 			cbei.iItem = ComboBox_GetCount(hwnd);
 			LPWSTR pwsz = StrChr(pEE[i].wch, L';');
 			if (pwsz != NULL) {
@@ -982,7 +980,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			cbei.iImage = IsValidEncoding(id) ? 0 : 1;
+			cbei.iImage = IsValidEncoding(encoding) ? 0 : 1;
 			cbei.lParam = (LPARAM)id;
 			SendMessage(hwnd, CBEM_INSERTITEM, 0, (LPARAM)&cbei);
 
@@ -2076,9 +2074,7 @@ BOOL IsStringCaseSensitiveA(LPCSTR pszText) {
 //
 BOOL FileVars_IsUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
-		if (_stricmp(lpfv->tchEncoding, "utf-8") == 0 || StrStartsWithCase(lpfv->tchEncoding, "utf8")) {
-			return TRUE;
-		}
+		return _stricmp(lpfv->tchEncoding, "utf-8") == 0 || StrStartsWithCase(lpfv->tchEncoding, "utf8");
 	}
 
 	return FALSE;
@@ -2090,10 +2086,7 @@ BOOL FileVars_IsUTF8(LPCFILEVARS lpfv) {
 //
 BOOL FileVars_IsNonUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
-		if (StrNotEmptyA(lpfv->tchEncoding) &&
-				_stricmp(lpfv->tchEncoding, "utf-8") != 0 && StrStartsWithCase(lpfv->tchEncoding, "utf8")) {
-			return TRUE;
-		}
+		return !(_stricmp(lpfv->tchEncoding, "utf-8") == 0 || StrStartsWithCase(lpfv->tchEncoding, "utf8"));
 	}
 
 	return FALSE;
