@@ -22,8 +22,8 @@ extern int iCurrentEncoding;
 int g_DOSEncoding;
 
 // Supported Encodings
-static WCHAR wchANSI[8];
-static WCHAR wchOEM [8];
+static WCHAR wchANSI[16];
+static WCHAR wchOEM [16];
 static LPWSTR g_AllEncodingLabel = NULL;
 
 typedef struct NP2EncodingGroup {
@@ -533,9 +533,15 @@ void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFI
 // Encoding Helper Functions
 //
 void Encoding_InitDefaults(void) {
-	const UINT acp = GetACP();
+	UINT acp = GetACP();
+	if (acp == CP_UTF8) {
+		GetLegacyACP(&acp);
+		wsprintf(wchANSI, L" (UTF-8, %u)", acp);
+	} else {
+		wsprintf(wchANSI, L" (%u)", acp);
+	}
+
 	if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
-		// TODO: fix issue #39 "Use Unicode UTF-8 for worldwide language support"
 		iDefaultCodePage = acp;
 	} else {
 		iDefaultCodePage = CP_ACP;
@@ -548,12 +554,15 @@ void Encoding_InitDefaults(void) {
 		iDefaultCharSet = ANSI_CHARSET;
 	}
 
-	const UINT oemcp = GetOEMCP();
+	UINT oemcp = GetOEMCP();
+	if (oemcp == CP_UTF8) {
+		GetLegacyOEMCP(&oemcp);
+		wsprintf(wchOEM, L" (UTF-8, %u)", oemcp);
+	} else {
+		wsprintf(wchOEM, L" (%u)", oemcp);
+	}
+
 	mEncoding[CPI_OEM].uCodePage = oemcp;
-
-	wsprintf(wchANSI, L" (%u)", acp);
-	wsprintf(wchOEM, L" (%u)", oemcp);
-
 	g_DOSEncoding = CPI_OEM;
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
 	if (oemcp != 437 && IsValidCodePageEx(437)) {
@@ -757,7 +766,6 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	HTREEITEM hSelParent = NULL;
 
 	// ANSI and OEM
-	const UINT acp = GetACP();
 	for (int id = CPI_DEFAULT; id <= CPI_OEM; id++) {
 		const NP2ENCODING *encoding = &mEncoding[id];
 		GetString(encoding->idsName, wchBuf, COUNTOF(wchBuf));
@@ -783,6 +791,11 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		}
 	}
 
+	const UINT acp = GetACP();
+	UINT legacyACP = acp;
+	if (legacyACP == CP_UTF8) {
+		GetLegacyACP(&legacyACP);
+	}
 	for (UINT i = 0; i < COUNTOF(sEncodingGroupList); i++) {
 		const NP2EncodingGroup *group = &sEncodingGroupList[pEE[i].id];
 		tvis.hParent = NULL;
@@ -822,7 +835,8 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
 					expand = TRUE;
-				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding || acp == encoding->uCodePage)) {
+				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding
+					|| acp == encoding->uCodePage || legacyACP == encoding->uCodePage)) {
 					// group contains default code, current code page, ANSI code page.
 					expand = TRUE;
 				}
@@ -1015,6 +1029,17 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 }
 #endif
 
+//=============================================================================
+//
+// CodePageFromCharSet()
+//
+UINT CodePageFromCharSet(UINT uCharSet) {
+	CHARSETINFO ci;
+	if (TranslateCharsetInfo((DWORD *)(UINT_PTR)uCharSet, &ci, TCI_SRCCHARSET)) {
+		return ci.ciACP;
+	}
+	return GetACP();
+}
 
 BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 	if (pBuffer == NULL || cb < 2 || (cb & 1) != 0) {
@@ -2086,7 +2111,8 @@ BOOL FileVars_IsUTF8(LPCFILEVARS lpfv) {
 //
 BOOL FileVars_IsNonUTF8(LPCFILEVARS lpfv) {
 	if (lpfv->mask & FV_ENCODING) {
-		return !(_stricmp(lpfv->tchEncoding, "utf-8") == 0 || StrStartsWithCase(lpfv->tchEncoding, "utf8"));
+		return StrNotEmptyA(lpfv->tchEncoding)
+			&& !(_stricmp(lpfv->tchEncoding, "utf-8") == 0 || StrStartsWithCase(lpfv->tchEncoding, "utf8"));
 	}
 
 	return FALSE;

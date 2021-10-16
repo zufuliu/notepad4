@@ -852,8 +852,6 @@ UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int 
 void	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);
 void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString);
 
-UINT CodePageFromCharSet(UINT uCharSet);
-
 //==== MRU Functions ==========================================================
 #define MRU_MAXITEMS	32
 

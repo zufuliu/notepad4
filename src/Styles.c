@@ -1682,9 +1682,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			GetUserDefaultLocaleName(localeWide, COUNTOF(localeWide));
 #else
-#ifndef LOCALE_SNAME
-#define LOCALE_SNAME	0x0000005c
-#endif
 			GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_SNAME, localeWide, COUNTOF(localeWide));
 #endif
 		}

@@ -1194,6 +1194,12 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	}
 
 	char *lpDataUTF8 = lpData;
+	const UINT acp = GetACP();
+	UINT legacyACP = acp;
+	if (legacyACP == CP_UTF8) {
+		GetLegacyACP(&legacyACP);
+	}
+
 	if (uFlags & NCP_UNICODE) {
 		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
 		lpDataUTF8 = (char *)NP2HeapAlloc((cbData + 1)*sizeof(WCHAR));
@@ -1202,7 +1208,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		const DWORD cchTextW = bBOM ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
 		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 		if (cbData == 0) {
-			cbData = WideCharToMultiByte(CP_ACP, 0, pszTextW, -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
+			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 			status->bUnicodeErr = TRUE;
 		}
 		if (cbData != 0) {
@@ -1223,14 +1229,14 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		lpDataUTF8 = EncodeAsUTF8(lpData, &cbData, uCodePage, 0);
 		NP2HeapFree(lpData);
 		lpData = lpDataUTF8;
-	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE && bLoadANSIasUTF8
-		&& iSrcEncoding == CPI_NONE && iWeakSrcEncoding == CPI_NONE) {
+	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE
+		&& iSrcEncoding == CPI_NONE && iWeakSrcEncoding == CPI_NONE
+		&& (bLoadANSIasUTF8 || acp == CP_UTF8)) {
 		// try to load ANSI / unknown encoding as UTF-8
-		const UINT acp = GetACP();
-		iEncoding = Encoding_GetIndex(acp);
+		iEncoding = Encoding_GetIndex(legacyACP);
 		if (iEncoding != CPI_NONE) {
 			DWORD back = cbData;
-			lpDataUTF8 = EncodeAsUTF8(lpData, &back, acp, MB_ERR_INVALID_CHARS);
+			lpDataUTF8 = EncodeAsUTF8(lpData, &back, legacyACP, MB_ERR_INVALID_CHARS);
 			if (lpDataUTF8) {
 				status->iEncoding = iEncoding;
 				uFlags = mEncoding[iEncoding].uFlags;
@@ -1843,10 +1849,10 @@ void EditSentenceCase(void) {
 	NP2HeapFree(pszTextW);
 }
 
-#ifndef URL_ESCAPE_AS_UTF8		// (NTDDI_VERSION >= NTDDI_WIN7)
+#ifndef URL_ESCAPE_AS_UTF8		// NTDDI_VERSION >= NTDDI_WIN7
 #define URL_ESCAPE_AS_UTF8		0x00040000
 #endif
-#ifndef URL_UNESCAPE_AS_UTF8	// (NTDDI_VERSION >= NTDDI_WIN8)
+#ifndef URL_UNESCAPE_AS_UTF8	// NTDDI_VERSION >= NTDDI_WIN8
 #define URL_UNESCAPE_AS_UTF8	URL_ESCAPE_AS_UTF8
 #endif
 

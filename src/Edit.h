@@ -368,6 +368,36 @@ typedef struct NP2ENCODING {
 #define SURROGATE_OFFSET			(0x10000 - (0xD800 << 10) - 0xDC00)
 #define UTF16_TO_UTF32(lead, trail)	(((lead) << 10) + (trail) + SURROGATE_OFFSET)
 
+#ifndef LOCALE_IUSEUTF8LEGACYACP
+#define LOCALE_IUSEUTF8LEGACYACP     0x00000666	// NTDDI_VERSION >= NTDDI_WIN10_MN
+#endif
+#ifndef LOCALE_IUSEUTF8LEGACYOEMCP
+#define LOCALE_IUSEUTF8LEGACYOEMCP   0x00000999	// NTDDI_VERSION >= NTDDI_WIN10_MN
+#endif
+#ifndef LOCALE_SNAME
+#define LOCALE_SNAME				0x0000005c	// _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#endif
+
+static inline BOOL GetLegacyACP(UINT *acp) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
+		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
+#else
+	return GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYACP | LOCALE_RETURN_NUMBER,
+		(LPWSTR)(acp), sizeof(UINT) / sizeof(WCHAR));
+#endif
+}
+
+static inline BOOL GetLegacyOEMCP(UINT *oemcp) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	return GetLocaleInfoEx(LOCALE_NAME_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
+		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
+#else
+	return GetLocaleInfoW(LOCALE_SYSTEM_DEFAULT, LOCALE_IUSEUTF8LEGACYOEMCP | LOCALE_RETURN_NUMBER,
+		(LPWSTR)(oemcp), sizeof(UINT) / sizeof(WCHAR));
+#endif
+}
+
 // 932 Shift-JIS, 936 GBK, 949 UHC, 950 Big5, 1361 Johab
 static inline BOOL IsDBCSCodePage(UINT page) {
 	return page == 932 || page == 936 || page == 949 || page == 950 || page == 1361;
@@ -411,6 +441,7 @@ void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
 #endif
 
+UINT	CodePageFromCharSet(UINT uCharSet);
 BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
 BOOL	IsUTF8(const char *pTest, DWORD nLength);
 BOOL	IsUTF7(const char *pTest, DWORD nLength);

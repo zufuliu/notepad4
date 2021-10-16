@@ -2342,18 +2342,6 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
 
 //=============================================================================
 //
-// CodePageFromCharSet()
-//
-UINT CodePageFromCharSet(UINT uCharSet) {
-	CHARSETINFO ci;
-	if (TranslateCharsetInfo((DWORD *)(UINT_PTR)uCharSet, &ci, TCI_SRCCHARSET)) {
-		return ci.ciACP;
-	}
-	return GetACP();
-}
-
-//=============================================================================
-//
 // MRU functions
 //
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
