@@ -70,7 +70,7 @@ public:
 	void operator=(const ContractionState &) = delete;
 	ContractionState(ContractionState &&) = delete;
 	void operator=(ContractionState &&) = delete;
-	~ContractionState() override;
+	~ContractionState() noexcept override;
 
 	void Clear() noexcept override;
 
@@ -113,9 +113,7 @@ ContractionState<LINE>::ContractionState() noexcept : linesInDocument(1) {
 }
 
 template <typename LINE>
-ContractionState<LINE>::~ContractionState() {
-	Clear();
-}
+ContractionState<LINE>::~ContractionState() noexcept = default;
 
 template <typename LINE>
 void ContractionState<LINE>::EnsureData() {

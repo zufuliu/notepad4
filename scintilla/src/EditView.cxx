@@ -453,12 +453,6 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 	return WrapBreak::Undefined;
 }
 
-constexpr bool IsControlCharacter(unsigned char ch) noexcept {
-	// iscntrl() returns true for lots of characters > 127 which are displayable,
-	// currently only check C0 control characters.
-	return ch < 32 || ch == 127;
-}
-
 constexpr bool ViewIsASCII(std::string_view text) noexcept {
 	for (const unsigned char ch : text) {
 		if (ch & 0x80) {

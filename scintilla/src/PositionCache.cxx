@@ -33,7 +33,7 @@
 #include "Platform.h"
 #include "VectorISA.h"
 
-#include "CharacterSet.h"
+//#include "CharacterSet.h"
 //#include "CharacterCategory.h"
 #include "Position.h"
 #include "UniqueString.h"
@@ -637,16 +637,17 @@ constexpr unsigned int representationKeyCrLf = ('\r' << 8) | '\n';
 void SpecialRepresentations::SetRepresentation(std::string_view charBytes, std::string_view value) {
 	if ((charBytes.length() <= 4) && (value.length() <= Representation::maxLength)) {
 		const unsigned int key = KeyFromString(charBytes);
-		const auto [it, inserted] = mapReprs.try_emplace(key, value);
+		const bool inserted = mapReprs.insert_or_assign(key, Representation(value)).second;
 		if (inserted) {
 			// New entry so increment for first byte
 			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
 			startByteHasReprs[ucStart]++;
+			if (key > maxKey) {
+				maxKey = key;
+			}
 			if (key == representationKeyCrLf) {
 				crlf = true;
 			}
-		} else {
-			it->second = Representation(value);
 		}
 	}
 }
@@ -684,6 +685,9 @@ void SpecialRepresentations::ClearRepresentation(std::string_view charBytes) {
 			mapReprs.erase(it);
 			const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
 			startByteHasReprs[ucStart]--;
+			if (key == maxKey && startByteHasReprs[ucStart] == 0) {
+				maxKey = mapReprs.empty() ? 0 : mapReprs.crbegin()->first;
+			}
 			if (key == representationKeyCrLf) {
 				crlf = false;
 			}
@@ -692,7 +696,11 @@ void SpecialRepresentations::ClearRepresentation(std::string_view charBytes) {
 }
 
 const Representation *SpecialRepresentations::GetRepresentation(std::string_view charBytes) const {
-	const auto it = mapReprs.find(KeyFromString(charBytes));
+	const unsigned int key = KeyFromString(charBytes);
+	if (key > maxKey) {
+		return nullptr;
+	}
+	const auto it = mapReprs.find(key);
 	if (it != mapReprs.end()) {
 		return &(it->second);
 	}
@@ -702,29 +710,19 @@ const Representation *SpecialRepresentations::GetRepresentation(std::string_view
 const Representation *SpecialRepresentations::RepresentationFromCharacter(std::string_view charBytes) const {
 	if (charBytes.length() <= 4) {
 		const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
-		if (!startByteHasReprs[ucStart])
+		if (!startByteHasReprs[ucStart]) {
 			return nullptr;
-		const auto it = mapReprs.find(KeyFromString(charBytes));
-		if (it != mapReprs.end()) {
-			return &(it->second);
 		}
+		return GetRepresentation(charBytes);
 	}
 	return nullptr;
-}
-
-bool SpecialRepresentations::Contains(std::string_view charBytes) const {
-	PLATFORM_ASSERT(charBytes.length() <= 4);
-	const unsigned char ucStart = charBytes.empty() ? 0 : charBytes[0];
-	if (!startByteHasReprs[ucStart])
-		return false;
-	const auto it = mapReprs.find(KeyFromString(charBytes));
-	return it != mapReprs.end();
 }
 
 void SpecialRepresentations::Clear() noexcept {
 	mapReprs.clear();
 	constexpr unsigned char none = 0;
 	std::fill(startByteHasReprs, std::end(startByteHasReprs), none);
+	maxKey = 0;
 	crlf = false;
 }
 
@@ -746,9 +744,9 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 	lineRange(lineRange_),
 	posLineStart(posLineStart_),
 	nextBreak(static_cast<int>(lineRange_.start)),
+	subBreak(-1),
 	saeCurrentPos(0),
 	saeNext(0),
-	subBreak(-1),
 	pdoc(pdoc_),
 	encodingFamily(pdoc_->CodePageFamily()),
 	preprs(preprs_) {
@@ -795,8 +793,9 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 BreakFinder::~BreakFinder() = default;
 
 TextSegment BreakFinder::Next() {
-	if (subBreak == -1) {
+	if (subBreak < 0) {
 		const int prev = nextBreak;
+		const Representation *repr = nullptr;
 		while (nextBreak < lineRange.end) {
 			int charWidth = 1;
 			const char * const chars = &ll->chars[nextBreak];
@@ -808,7 +807,7 @@ TextSegment BreakFinder::Next() {
 					charWidth = pdoc->DBCSDrawBytes(chars, lineRange.end - nextBreak);
 				}
 			}
-			const Representation *repr = nullptr;
+			repr = nullptr;
 			if (preprs->MayContains(ch)) {
 				// Special case \r\n line ends if there is a representation
 				if (ch == '\r' && preprs->ContainsCrLf() && chars[1] == '\n') {
@@ -830,35 +829,32 @@ TextSegment BreakFinder::Next() {
 					} else {
 						repr = nullptr;	// Optimize -> should remember repr
 					}
-					if ((nextBreak - prev) < lengthStartSubdivision) {
-						return TextSegment(prev, nextBreak - prev, repr);
-					} else {
-						break;
-					}
+					break;
 				}
 			}
 			nextBreak += charWidth;
 		}
-		if ((nextBreak - prev) < lengthStartSubdivision) {
-			return TextSegment(prev, nextBreak - prev);
+
+		const int lengthSegment = nextBreak - prev;
+		if (lengthSegment < lengthStartSubdivision) {
+			return TextSegment(prev, lengthSegment, repr);
 		}
 		subBreak = prev;
 	}
+
 	// Splitting up a long run from prev to nextBreak in lots of approximately lengthEachSubdivision.
-	// For very long runs add extra breaks after spaces or if no spaces before low punctuation.
 	const int startSegment = subBreak;
-	if ((nextBreak - subBreak) <= lengthEachSubdivision) {
-		subBreak = -1;
-		return TextSegment(startSegment, nextBreak - startSegment);
-	} else {
-		subBreak += pdoc->SafeSegment(&ll->chars[subBreak], lengthEachSubdivision);
-		if (subBreak >= nextBreak) {
-			subBreak = -1;
-			return TextSegment(startSegment, nextBreak - startSegment);
-		} else {
-			return TextSegment(startSegment, subBreak - startSegment);
-		}
+	const int remaining = nextBreak - startSegment;
+	int lengthSegment = remaining;
+	if (lengthSegment > lengthEachSubdivision) {
+		lengthSegment = pdoc->SafeSegment(&ll->chars[startSegment], lengthEachSubdivision, encodingFamily);
 	}
+	if (lengthSegment < remaining) {
+		subBreak += lengthSegment;
+	} else {
+		subBreak = -1;
+	}
+	return TextSegment(startSegment, lengthSegment);
 }
 
 bool BreakFinder::More() const noexcept {
@@ -975,14 +971,17 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uin
 	std::string_view sv, XYPOSITION *positions) {
 	const Style &style = vstyle.styles[styleNumber];
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
-		//const XYPOSITION aveCharWidth = style.monospaceCharacterWidth;
-		const XYPOSITION aveCharWidth = style.aveCharWidth;
+#if PLAT_MACOSX
+		const XYPOSITION characterWidth = style.monospaceCharacterWidth;
+#else
+		const XYPOSITION characterWidth = style.aveCharWidth;
+#endif
 		const size_t length = sv.length();
 #if NP2_USE_SSE2
 		if (length >= 2) {
 			XYPOSITION *ptr = positions;
 			const XYPOSITION * const end = ptr + length - 1;
-			const __m128d one = _mm_set1_pd(aveCharWidth);
+			const __m128d one = _mm_set1_pd(characterWidth);
 			const __m128d two = _mm_set1_pd(2);
 			__m128d inc = _mm_setr_pd(1, 2);
 			do {
@@ -994,11 +993,11 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uin
 				_mm_store_sd(ptr, _mm_mul_sd(one, inc));
 			}
 		} else {
-			positions[0] = aveCharWidth;
+			positions[0] = characterWidth;
 		}
 #else
 		for (size_t i = 0; i < length; i++) {
-			positions[i] = aveCharWidth * (i + 1);
+			positions[i] = characterWidth * (i + 1);
 		}
 #endif
 		return;

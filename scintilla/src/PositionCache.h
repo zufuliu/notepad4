@@ -198,21 +198,23 @@ public:
 		stringRep(value), appearance(appearance_) {}
 };
 
-typedef std::map<unsigned int, Representation> MapRepresentation;
-
 class SpecialRepresentations {
-	MapRepresentation mapReprs;
+	std::map<unsigned int, Representation> mapReprs;
 	unsigned char startByteHasReprs[0x100] {};
+	unsigned int maxKey = 0;
 	bool crlf = false;
 public:
-	SpecialRepresentations() noexcept {}
+#if !defined(_MSC_VER) || (_MSC_VER >= 1920)
+	SpecialRepresentations() noexcept = default;
+#else
+	SpecialRepresentations() noexcept {} // for Visual C++ 2017
+#endif
 	void SetRepresentation(std::string_view charBytes, std::string_view value);
 	void SetRepresentationAppearance(std::string_view charBytes, RepresentationAppearance appearance);
 	void SetRepresentationColour(std::string_view charBytes, ColourRGBA colour);
 	void ClearRepresentation(std::string_view charBytes);
 	const Representation *GetRepresentation(std::string_view charBytes) const;
 	const Representation *RepresentationFromCharacter(std::string_view charBytes) const;
-	bool Contains(std::string_view charBytes) const;
 	bool ContainsCrLf() const noexcept {
 		return crlf;
 	}
@@ -239,12 +241,12 @@ class BreakFinder {
 	Range lineRange;
 	Sci::Position posLineStart;
 	int nextBreak;
+	int subBreak;
 	std::vector<int> selAndEdge;
 	unsigned int saeCurrentPos;
 	int saeNext;
-	int subBreak;
 	const Document *pdoc;
-	EncodingFamily encodingFamily;
+	const EncodingFamily encodingFamily;
 	const SpecialRepresentations *preprs;
 	void Insert(Sci::Position val);
 public:
@@ -255,7 +257,7 @@ public:
 	};
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
 	enum {
-		lengthEachSubdivision = 100
+		lengthEachSubdivision = 130
 	};
 	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
 		XYPOSITION xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);

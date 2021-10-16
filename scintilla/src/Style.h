@@ -28,7 +28,9 @@ struct FontMeasurements {
 	XYPOSITION descent = 1;
 	XYPOSITION capitalHeight = 1;	// Top of capital letter to baseline: ascent - internal leading
 	XYPOSITION aveCharWidth = 1;
-	//XYPOSITION monospaceCharacterWidth = 1; // for macOS
+#if PLAT_MACOSX
+	XYPOSITION monospaceCharacterWidth = 1; // for macOS
+#endif
 	XYPOSITION spaceWidth = 1;
 	bool monospaceASCII = false;
 	int sizeZoomed = 2;

@@ -1088,49 +1088,78 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 
 // Need to break text into segments near lengthSegment but taking into
 // account the encoding to not break inside a UTF-8 or DBCS character
-// and also trying to avoid breaking inside a pair of combining characters.
+// and also trying to avoid breaking inside a pair of combining characters,
+// or inside ligatures. TODO: implement grapheme cluster boundaries,
+// see https://www.unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
+//
 // The segment length must always be long enough (more than 4 bytes)
 // so that there will be at least one whole character to make a segment.
 // For UTF-8, text must consist only of valid whole characters.
 // In preference order from best to worst:
-//   1) Break before or after space
-//   2) Break before or after punctuation
-//   3) Break after whole character
+//   1) Break before or after spaces or controls
+//   2) Break at word and punctuation boundary for better kerning and ligature support
+//   3) Break after whole character, this may breaks combining characters
 
-int Document::SafeSegment(const char *text, int lengthSegment) const noexcept {
-	int j = lengthSegment;
+int Document::SafeSegment(const char *text, int lengthSegment, EncodingFamily encodingFamily) const noexcept {
+	const char * const end = text + lengthSegment;
+	const char *ptr = end;
+	// check space first as most written language use spaces.
 	do {
-		if (IsBreakSpace(text[j])) {
-			return j;
+		if (IsBreakSpace(*ptr)) {
+			return static_cast<int>(ptr - text + 1);
 		}
-		--j;
-	} while (j != 0);
+		--ptr;
+	} while (ptr != text);
 
-	int lastPunctuationBreak = 0;
-	int lastEncodingAllowedBreak = 0;
-	CharacterClass ccPrev = CharacterClass::space;
-	do {
-		const unsigned char ch = text[j];
-		lastEncodingAllowedBreak = j;
+	if (encodingFamily != EncodingFamily::dbcs) {
+		// backward iterate for UTF-8 and single byte encoding to find word and punctuation boundary.
+		ptr = end;
+		const CharacterClass ccPrev = charClass.GetClass(*ptr--);
+		do {
+			const CharacterClass cc = charClass.GetClass(*ptr);
+			if (cc != ccPrev) {
+				return static_cast<int>(ptr - text + 1);
+			}
+			--ptr;
+		} while (ptr != text);
 
-		CharacterClass cc = CharacterClass::word;
-		if (UTF8IsAscii(ch) || !dbcsCodePage) {
-			cc = charClass.GetClass(ch);
-			j++;
-		} else if (dbcsCodePage == CpUtf8) {
-			j += UTF8BytesOfLead(ch);
-		} else {
-			j += 1 + IsDBCSLeadByteNoExcept(ch);
+		ptr = end;
+		if (encodingFamily != EncodingFamily::eightBit) {
+			// for UTF-8 go back the start of last character.
+			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*ptr); trail++) {
+				--ptr;
+			}
 		}
-		if (cc != ccPrev) {
-			ccPrev = cc;
-			lastPunctuationBreak = lastEncodingAllowedBreak;
-		}
-	} while (j < lengthSegment);
-	if (lastPunctuationBreak > 0) {
-		return lastPunctuationBreak;
+		return static_cast<int>(ptr - text);
 	}
-	return lastEncodingAllowedBreak;
+
+	{
+		// forward iterate for DBCS to find word and punctuation boundary.
+		int lastPunctuationBreak = 0;
+		int lastEncodingAllowedBreak = 0;
+		CharacterClass ccPrev = CharacterClass::space;
+		int j = 0;
+		do {
+			const unsigned char ch = text[j];
+			lastEncodingAllowedBreak = j++;
+
+			CharacterClass cc;
+			if (UTF8IsAscii(ch)) {
+				cc = charClass.GetClass(ch);
+			} else {
+				cc = CharacterClass::word;
+				j += IsDBCSLeadByteNoExcept(ch);
+			}
+			if (cc != ccPrev) {
+				ccPrev = cc;
+				lastPunctuationBreak = lastEncodingAllowedBreak;
+			}
+		} while (j <= lengthSegment);
+		if (lastPunctuationBreak > 0) {
+			return lastPunctuationBreak;
+		}
+		return lastEncodingAllowedBreak;
+	}
 }
 
 EncodingFamily Document::CodePageFamily() const noexcept {
@@ -1644,7 +1673,7 @@ void Document::Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop) {
 std::string Document::TransformLineEnds(const char *s, size_t len, EndOfLine eolModeWanted) {
 	std::string dest;
 	for (size_t i = 0; (i < len) && (s[i]); i++) {
-		if (IsEOLChar(s[i])) {
+		if (IsEOLCharacter(s[i])) {
 			if (eolModeWanted == EndOfLine::Cr) {
 				dest.push_back('\r');
 			} else if (eolModeWanted == EndOfLine::Lf) {
@@ -2592,14 +2621,9 @@ void Document::NotifyModified(DocModification mh) {
 	}
 }
 
-// Used for word part navigation.
-static constexpr bool IsASCIIPunctuationCharacter(unsigned int ch) noexcept {
-	return IsPunctuation(ch);
-}
-
 bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
 	const CharacterClass cc = WordCharacterClass(ch);
-	return (cc == CharacterClass::word || cc == CharacterClass::cjkWord) && IsASCIIPunctuationCharacter(ch);
+	return (cc == CharacterClass::word || cc == CharacterClass::cjkWord) && IsPunctuation(ch);
 }
 
 Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
@@ -2640,10 +2664,10 @@ Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {
 				if (!IsADigit(CharacterAfter(pos).character))
 					pos += CharacterAfter(pos).widthBytes;
 			} else if (IsGraphic(ceStart.character)) {
-				while (pos > 0 && IsASCIIPunctuationCharacter(CharacterAfter(pos).character)) {
+				while (pos > 0 && IsPunctuation(CharacterAfter(pos).character)) {
 					pos -= CharacterBefore(pos).widthBytes;
 				}
-				if (!IsASCIIPunctuationCharacter(CharacterAfter(pos).character))
+				if (!IsPunctuation(CharacterAfter(pos).character))
 					pos += CharacterAfter(pos).widthBytes;
 			} else if (isspacechar(ceStart.character)) {
 				while (pos > 0 && isspacechar(CharacterAfter(pos).character)) {
@@ -2703,7 +2727,7 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 			ceStart = CharacterAfter(pos);
 		}
 	} else if (IsGraphic(ceStart.character)) {
-		while (pos < length && IsASCIIPunctuationCharacter(ceStart.character)) {
+		while (pos < length && IsPunctuation(ceStart.character)) {
 			pos += ceStart.widthBytes;
 			ceStart = CharacterAfter(pos);
 		}
@@ -2721,11 +2745,11 @@ Sci::Position Document::WordPartRight(Sci::Position pos) const noexcept {
 Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool singleLine) noexcept {
 	const char sStart = cb.StyleAt(pos);
 	if (delta < 0) {
-		while (pos > 0 && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLChar(cb.CharAt(pos))))
+		while (pos > 0 && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLCharacter(cb.CharAt(pos))))
 			pos--;
 		pos++;
 	} else {
-		while (pos < (Length()) && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLChar(cb.CharAt(pos))))
+		while (pos < (Length()) && (cb.StyleAt(pos) == sStart) && (!singleLine || !IsEOLCharacter(cb.CharAt(pos))))
 			pos++;
 	}
 	return pos;
@@ -3204,7 +3228,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	}
 #endif
 	if (matched) {
-		const size_t maxTag = std::min(<size_t>(match.size(), RESearch::MAXTAG);
+		const size_t maxTag = std::min<size_t>(match.size(), RESearch::MAXTAG);
 		for (size_t co = 0; co < maxTag; co++) {
 			search.bopat[co] = match[co].first.Pos();
 			search.eopat[co] = match[co].second.PosRoundUp();
