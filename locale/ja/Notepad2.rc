@@ -92,10 +92,11 @@ BEGIN
 			MENUITEM "UTF-8 として(&8)\tShift+F8",			CMD_RELOADUTF8
 			MENUITEM "ANSI として(&A)\tCtrl+Shift+A",		CMD_RELOADANSI
 			MENUITEM "OEM として(&O)\tCtrl+Shift+O",		CMD_RELOADOEM
+			MENUITEM SEPARATOR
+			MENUITEM "&Default Encoding(&D)\tCtrl+Alt+F",CMD_RECODEDEFAULT
 			MENUITEM "文字コードを指定(&W)...\tF8",		IDM_RECODE_SELECT
 			MENUITEM SEPARATOR
 			MENUITEM "文字コード解析をパス(&N)\tAlt+F8",	CMD_RELOADNOFILEVARS
-			MENUITEM "デフォルト(&D)\tCtrl+Alt+F",		CMD_RECODEDEFAULT
 #if defined(_WIN64)
 			MENUITEM "巨大ファイルモード(&L)",			IDM_FILE_LARGE_FILE_MODE_RELOAD
 #endif
