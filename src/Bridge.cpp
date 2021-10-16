@@ -151,7 +151,11 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		// (There are 2540 hundredths of a mm in an inch.)
 
 		WCHAR localeInfo[3];
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
+#else
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
+#endif
 
 		if (localeInfo[0] == L'0') {	// Metric system. L'1' is US System
 			rectSetup.left		= MulDiv(pageSetupMargin.left, ptDpi.x, 2540);
@@ -561,7 +565,11 @@ static void EditPrintInit() noexcept {
 	if (pageSetupMargin.left == -1 || pageSetupMargin.top == -1 ||
 			pageSetupMargin.right == -1 || pageSetupMargin.bottom == -1) {
 		WCHAR localeInfo[3];
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
+#else
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
+#endif
 
 		if (localeInfo[0] == L'0') {	// Metric system. L'1' is US System
 			pageSetupMargin.left = 2000;

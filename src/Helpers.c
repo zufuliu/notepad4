@@ -2273,7 +2273,11 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sthousand
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sgrouping
 	WCHAR szSep[4];
-	const WCHAR sep = GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	const WCHAR sep = GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
+#else
+	const WCHAR sep = GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
+#endif
 
 	WCHAR *c = lpNumberStr + i;
 	WCHAR *end = c;
