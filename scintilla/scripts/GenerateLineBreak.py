@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # Script to generate line breaking data from
+# https://www.unicode.org/reports/tr41/
+# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/LineBreakTest.html
 # https://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
 
 import platform
@@ -12,7 +14,6 @@ from GenerateCharacterCategory import *
 
 # Unicode Line Breaking Algorithm
 # https://www.unicode.org/reports/tr14/
-
 class LineBreak(IntFlag):
 	NonBreak = 0
 	BreakBefore = 1	# B

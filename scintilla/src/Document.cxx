@@ -1106,7 +1106,7 @@ int Document::SafeSegment(const char *text, int lengthSegment, EncodingFamily en
 	// check space first as most written language use spaces.
 	do {
 		if (IsBreakSpace(*ptr)) {
-			return static_cast<int>(ptr - text + 1);
+			return static_cast<int>(ptr - text);
 		}
 		--ptr;
 	} while (ptr != text);

@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
+# https://www.unicode.org/reports/tr41/
+# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html
+# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakProperty.txt
+# https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt
 import sys
 from enum import IntEnum
 
 from GenerateCharacterCategory import *
 
+# Unicode Text Segmentation
+# https://www.unicode.org/reports/tr29/#Grapheme_Cluster_Break_Property_Values
 class GraphemeBreak(IntEnum):
 	Other = 0
 
