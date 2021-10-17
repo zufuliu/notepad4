@@ -1155,10 +1155,7 @@ int Document::SafeSegment(const char *text, int lengthSegment, EncodingFamily en
 				lastPunctuationBreak = lastEncodingAllowedBreak;
 			}
 		} while (j <= lengthSegment);
-		if (lastPunctuationBreak > 0) {
-			return lastPunctuationBreak;
-		}
-		return lastEncodingAllowedBreak;
+		return lastPunctuationBreak ? lastPunctuationBreak : lastEncodingAllowedBreak;
 	}
 }
 

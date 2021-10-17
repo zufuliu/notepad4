@@ -368,12 +368,15 @@ typedef struct NP2ENCODING {
 #define SURROGATE_OFFSET			(0x10000 - (0xD800 << 10) - 0xDC00)
 #define UTF16_TO_UTF32(lead, trail)	(((lead) << 10) + (trail) + SURROGATE_OFFSET)
 
+// https://docs.microsoft.com/en-us/windows/win32/intl/locale_iuseutf8legacyacp
 #ifndef LOCALE_IUSEUTF8LEGACYACP
 #define LOCALE_IUSEUTF8LEGACYACP     0x00000666	// NTDDI_VERSION >= NTDDI_WIN10_MN
 #endif
+// https://docs.microsoft.com/en-us/windows/win32/intl/locale_iuseutf8legacyoemcp
 #ifndef LOCALE_IUSEUTF8LEGACYOEMCP
 #define LOCALE_IUSEUTF8LEGACYOEMCP   0x00000999	// NTDDI_VERSION >= NTDDI_WIN10_MN
 #endif
+// https://docs.microsoft.com/en-us/windows/win32/intl/locale-sname
 #ifndef LOCALE_SNAME
 #define LOCALE_SNAME				0x0000005c	// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif

@@ -65,6 +65,23 @@ static HGLOBAL hDevNames {};
 
 static void EditPrintInit() noexcept;
 
+// https://docs.microsoft.com/en-us/windows/win32/intl/locale-imeasure
+// This value is 0 if the metric system (Systéme International d'Units,
+// or S.I.) is used, and 1 if the United States system is used.
+#define MeasurementInternational	0
+#define MeasurementUnitedStates		1
+static inline UINT GetLocaleMeasurement() noexcept {
+	UINT measurement = MeasurementInternational;
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
+		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
+#else
+	GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
+		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
+#endif
+	return measurement;
+}
+
 //=============================================================================
 //
 // EditPrint() - Code from SciTEWin::Print()
@@ -150,14 +167,8 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		// from the Page Setup dialog to device units.
 		// (There are 2540 hundredths of a mm in an inch.)
 
-		WCHAR localeInfo[3];
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
-#else
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
-#endif
-
-		if (localeInfo[0] == L'0') {	// Metric system. L'1' is US System
+		const UINT measurement = GetLocaleMeasurement();
+		if (measurement == MeasurementInternational) {
 			rectSetup.left		= MulDiv(pageSetupMargin.left, ptDpi.x, 2540);
 			rectSetup.top		= MulDiv(pageSetupMargin.top, ptDpi.y, 2540);
 			rectSetup.right		= MulDiv(pageSetupMargin.right, ptDpi.x, 2540);
@@ -532,8 +543,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 	pdlg.hInstance = g_hInstance;
 
 	EditPrintInit();
-	if (pageSetupMargin.left != 0 || pageSetupMargin.right != 0 ||
-			pageSetupMargin.top != 0 || pageSetupMargin.bottom != 0) {
+	if (pageSetupMargin.left != 0 || pageSetupMargin.right != 0 || pageSetupMargin.top != 0 || pageSetupMargin.bottom != 0) {
 		pdlg.Flags |= PSD_MARGINS;
 		pdlg.rtMargin.left		= pageSetupMargin.left;
 		pdlg.rtMargin.top		= pageSetupMargin.top;
@@ -562,16 +572,9 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 // EditPrintInit() - Setup default page margin if no values from registry
 //
 static void EditPrintInit() noexcept {
-	if (pageSetupMargin.left == -1 || pageSetupMargin.top == -1 ||
-			pageSetupMargin.right == -1 || pageSetupMargin.bottom == -1) {
-		WCHAR localeInfo[3];
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
-#else
-		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IMEASURE, localeInfo, COUNTOF(localeInfo));
-#endif
-
-		if (localeInfo[0] == L'0') {	// Metric system. L'1' is US System
+	if (pageSetupMargin.left == -1 || pageSetupMargin.top == -1 || pageSetupMargin.right == -1 || pageSetupMargin.bottom == -1) {
+		const UINT measurement = GetLocaleMeasurement();
+		if (measurement == MeasurementInternational) {
 			pageSetupMargin.left = 2000;
 			pageSetupMargin.top = 2000;
 			pageSetupMargin.right = 2000;
