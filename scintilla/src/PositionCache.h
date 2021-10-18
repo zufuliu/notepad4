@@ -257,7 +257,7 @@ public:
 	};
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
 	enum {
-		lengthEachSubdivision = 130
+		lengthEachSubdivision = 128 + 12
 	};
 	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
 		XYPOSITION xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);

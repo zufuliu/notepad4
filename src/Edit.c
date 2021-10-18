@@ -1179,7 +1179,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	status->totalLineCount = 1;
 
 	BOOL bBOM = FALSE;
-	int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, bSkipEncodingDetection, &bBOM);
+	const int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, bSkipEncodingDetection, &bBOM);
 	status->iEncoding = iEncoding;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
@@ -1232,14 +1232,16 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE
 		&& iSrcEncoding == CPI_NONE && iWeakSrcEncoding == CPI_NONE
 		&& (bLoadANSIasUTF8 || acp == CP_UTF8)) {
-		// try to load ANSI / unknown encoding as UTF-8
-		iEncoding = Encoding_GetIndex(legacyACP);
-		if (iEncoding != CPI_NONE) {
+		if (bSkipEncodingDetection && IsUTF8(lpData, cbData)) {
+			uFlags = 0;
+			status->iEncoding = CPI_UTF8;
+		} else {
+			// try to load ANSI / unknown encoding as UTF-8
 			DWORD back = cbData;
 			lpDataUTF8 = EncodeAsUTF8(lpData, &back, legacyACP, MB_ERR_INVALID_CHARS);
 			if (lpDataUTF8) {
-				status->iEncoding = iEncoding;
-				uFlags = mEncoding[iEncoding].uFlags;
+				uFlags = 0;
+				status->iEncoding = Encoding_GetIndex(legacyACP);
 				NP2HeapFree(lpData);
 				lpData = lpDataUTF8;
 				cbData = back;

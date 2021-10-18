@@ -1562,7 +1562,7 @@ constexpr Message SciMessageFromEM(unsigned int iMessage) noexcept {
 }
 
 UINT ScintillaWin::CodePageOfDocument() const noexcept {
-	return pdoc->dbcsCodePage; // see SCI_GETCODEPAGE in Editor.cxx
+	return pdoc->dbcsCodePage; // see Message::GetCodePage in Editor.cxx
 }
 
 std::string ScintillaWin::EncodeWString(std::wstring_view wsv) {
@@ -2672,10 +2672,10 @@ bool ScintillaWin::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) {
 	}
 
 	const PRectangle rcText = GetTextRectangle();
-	int horizEndPreferred = scrollWidth;
+	int pageWidth = static_cast<int>(rcText.Width());
+	int horizEndPreferred = std::max(scrollWidth, pageWidth - 1);
 	if (horizEndPreferred < 0)
 		horizEndPreferred = 0;
-	int pageWidth = static_cast<int>(rcText.Width());
 	if (!horizontalScrollBarVisible || Wrapping())
 		pageWidth = horizEndPreferred + 1;
 	sci.fMask = SIF_PAGE | SIF_RANGE;

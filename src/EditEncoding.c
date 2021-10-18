@@ -791,8 +791,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		}
 	}
 
-	const UINT acp = GetACP();
-	UINT legacyACP = acp;
+	UINT legacyACP = GetACP();
 	if (legacyACP == CP_UTF8) {
 		GetLegacyACP(&legacyACP);
 	}
@@ -836,7 +835,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 					hSelParent = hParent;
 					expand = TRUE;
 				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding
-					|| acp == encoding->uCodePage || legacyACP == encoding->uCodePage)) {
+					|| legacyACP == encoding->uCodePage)) {
 					// group contains default code, current code page, ANSI code page.
 					expand = TRUE;
 				}
