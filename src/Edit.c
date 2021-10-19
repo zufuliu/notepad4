@@ -91,7 +91,8 @@ static HMODULE hELSCoreDLL = NULL;
 #pragma comment(lib, "elscore.lib")
 #endif
 
-#define MAX_NON_UTF8_SIZE	(UINT_MAX/2 - 16)
+// MultiByteToWideChar() and WideCharToMultiByte() uses int as length.
+#define MAX_NON_UTF8_SIZE	((1U << 31) - 16)
 
 void Edit_ReleaseResources(void) {
 	DStringW_Free(&wchPrefixSelection);
@@ -187,7 +188,7 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	}
 
 	const Sci_Position length = SciCall_GetLength();
-	if (length >= (int)MAX_NON_UTF8_SIZE) {
+	if ((size_t)length >= MAX_NON_UTF8_SIZE) {
 		return TRUE;
 	}
 

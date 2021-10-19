@@ -447,13 +447,8 @@ void Encoding_ReleaseResources(void) {
 	}
 }
 
-static inline BOOL IsValidCodePageEx(UINT codePage) {
-	CPINFO cpi;
-	return IsValidCodePage(codePage) && GetCPInfo(codePage, &cpi);
-}
-
 static inline BOOL IsValidEncoding(const NP2ENCODING *encoding) {
-	return (encoding->uFlags & NCP_INTERNAL) || IsValidCodePageEx(encoding->uCodePage);
+	return (encoding->uFlags & NCP_INTERNAL) || IsValidCodePage(encoding->uCodePage);
 }
 
 //=============================================================================
@@ -565,7 +560,7 @@ void Encoding_InitDefaults(void) {
 	mEncoding[CPI_OEM].uCodePage = oemcp;
 	g_DOSEncoding = CPI_OEM;
 	// Try to set the DOS encoding to DOS-437 if the default OEMCP is not DOS-437
-	if (oemcp != 437 && IsValidCodePageEx(437)) {
+	if (oemcp != 437 && IsValidCodePage(437)) {
 		g_DOSEncoding = Encoding_GetIndex(437);
 	}
 }
@@ -592,7 +587,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 		case 8:
 			return CPI_UTF7;
 		default:
-			if (IsValidCodePageEx(iSetting)) {
+			if (IsValidCodePage(iSetting)) {
 				iSetting = Encoding_GetIndex(iSetting);
 				if (iSetting != CPI_NONE) {
 					return iSetting;
