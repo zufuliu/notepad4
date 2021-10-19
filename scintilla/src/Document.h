@@ -363,7 +363,7 @@ public:
 	}
 	bool IsDBCSDualByteAt(Sci::Position pos) const noexcept;
 	int DBCSDrawBytes(const char *text, size_t length) const noexcept;
-	int SafeSegment(const char *text, int lengthSegment, EncodingFamily encodingFamily) const noexcept;
+	size_t SafeSegment(const char *text, size_t lengthSegment, EncodingFamily encodingFamily) const noexcept;
 	EncodingFamily CodePageFamily() const noexcept;
 
 	// Gateways to modifying document

@@ -847,7 +847,7 @@ TextSegment BreakFinder::Next() {
 	const int remaining = nextBreak - startSegment;
 	int lengthSegment = remaining;
 	if (lengthSegment > lengthEachSubdivision) {
-		lengthSegment = pdoc->SafeSegment(&ll->chars[startSegment], lengthEachSubdivision, encodingFamily);
+		lengthSegment = static_cast<int>(pdoc->SafeSegment(&ll->chars[startSegment], lengthEachSubdivision, encodingFamily));
 	}
 	if (lengthSegment < remaining) {
 		subBreak += lengthSegment;

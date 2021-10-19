@@ -1100,45 +1100,45 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 //   2) Break at word and punctuation boundary for better kerning and ligature support
 //   3) Break after whole character, this may breaks combining characters
 
-int Document::SafeSegment(const char *text, int lengthSegment, EncodingFamily encodingFamily) const noexcept {
+size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFamily encodingFamily) const noexcept {
 	const char * const end = text + lengthSegment;
-	const char *ptr = end;
+	const char *it = end;
 	// check space first as most written language use spaces.
 	do {
-		if (IsBreakSpace(*ptr)) {
-			return static_cast<int>(ptr - text);
+		if (IsBreakSpace(*it)) {
+			return it - text;
 		}
-		--ptr;
-	} while (ptr != text);
+		--it;
+	} while (it != text);
 
 	if (encodingFamily != EncodingFamily::dbcs) {
 		// backward iterate for UTF-8 and single byte encoding to find word and punctuation boundary.
-		ptr = end;
-		const CharacterClass ccPrev = charClass.GetClass(*ptr--);
+		it = end;
+		const CharacterClass ccPrev = charClass.GetClass(*it);
 		do {
-			const CharacterClass cc = charClass.GetClass(*ptr);
+			--it;
+			const CharacterClass cc = charClass.GetClass(*it);
 			if (cc != ccPrev) {
-				return static_cast<int>(ptr - text + 1);
+				return it - text + 1;
 			}
-			--ptr;
-		} while (ptr != text);
+		} while (it != text);
 
-		ptr = end;
+		it = end;
 		if (encodingFamily != EncodingFamily::eightBit) {
 			// for UTF-8 go back the start of last character.
-			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*ptr); trail++) {
-				--ptr;
+			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
+				--it;
 			}
 		}
-		return static_cast<int>(ptr - text);
+		return it - text;
 	}
 
 	{
 		// forward iterate for DBCS to find word and punctuation boundary.
-		int lastPunctuationBreak = 0;
-		int lastEncodingAllowedBreak = 0;
+		size_t lastPunctuationBreak = 0;
+		size_t lastEncodingAllowedBreak = 0;
 		CharacterClass ccPrev = CharacterClass::space;
-		int j = 0;
+		size_t j = 0;
 		do {
 			const unsigned char ch = text[j];
 			lastEncodingAllowedBreak = j++;
