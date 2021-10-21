@@ -1124,7 +1124,7 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 		} while (it != text);
 
 		it = end;
-		if (encodingFamily != EncodingFamily::eightBit) {
+		if (encodingFamily != EncodingFamily::eightBit && ccPrev == CharacterClass::word) {
 			// for UTF-8 go back the start of last character.
 			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
 				--it;

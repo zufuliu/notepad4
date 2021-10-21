@@ -3189,7 +3189,7 @@ fun int DescribeKeyWordSets=4017(, stringresult descriptions)
 
 # Bit set of LineEndType enumertion for which line ends beyond the standard
 # LF, CR, and CRLF are supported by the lexer.
-get int GetLineEndTypesSupported=4018(,)
+get LineEndType GetLineEndTypesSupported=4018(,)
 
 # Allocate a set of sub styles for a particular base style, returning start of range
 fun int AllocateSubStyles=4020(int styleBase, int numberStyles)

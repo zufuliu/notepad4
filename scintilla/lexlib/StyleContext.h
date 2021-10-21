@@ -38,7 +38,7 @@ private:
 public:
 	Sci_PositionU currentPos;
 	Sci_Line currentLine;
-	Sci_Line lineDocEnd;
+	const Sci_Line lineDocEnd;
 	//Sci_PositionU lineEnd;
 	Sci_PositionU lineStartNext;
 	const bool multiByteAccess;
@@ -54,13 +54,13 @@ public:
 	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
 		int initStyle, LexAccessor &styler_) noexcept :
 	styler(styler_),
-	endPos(startPos + length),
+	endPos(styler.StyleEndPos(startPos, length)),
+	currentLine(styler.GetLine(startPos)),
+	lineDocEnd(styler.GetLine(styler.Length())),
 	multiByteAccess(styler.Encoding() == EncodingType::dbcs),
 	state(initStyle) {
 		styler.StartAt(startPos);
 		styler.StartSegment(startPos);
-		currentLine = styler.GetLine(startPos);
-		lineDocEnd = styler.GetLine(styler.Length());
 		//lineEnd = styler.LineEnd(currentLine);
 		lineStartNext = styler.LineStart(currentLine + 1);
 		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
@@ -72,7 +72,11 @@ public:
 	StyleContext &operator=(const StyleContext &) = delete;
 	StyleContext &operator=(StyleContext &&) = delete;
 	void Complete() {
+#ifndef NDEBUG
+		styler.ColorTo(sci::min<Sci_PositionU>(currentPos, styler.Length()), state);
+#else
 		styler.ColorTo(currentPos, state);
+#endif
 		styler.Flush();
 	}
 	bool More() const noexcept {
@@ -119,7 +123,11 @@ public:
 		state = state_;
 	}
 	void SetState(int state_) {
+#ifndef NDEBUG
+		styler.ColorTo(sci::min<Sci_PositionU>(currentPos, styler.Length()), state);
+#else
 		styler.ColorTo(currentPos, state);
+#endif
 		state = state_;
 	}
 	void ForwardSetState(int state_) {
