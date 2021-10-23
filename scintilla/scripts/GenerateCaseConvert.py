@@ -15,7 +15,6 @@
 # strings with original, folded, upper, and lower separated by '|'.
 # There are 126 complex cases.
 
-import sys
 import platform
 import unicodedata
 import io
@@ -25,14 +24,7 @@ from pprint import pprint
 
 from FileGenerator import Regenerate
 from GenerateCharacterCategory import compressIndexTable
-
-UnicodeCharacterCount = sys.maxunicode + 1
-
-def getCharName(ch):
-	try:
-		return unicodedata.name(ch).title()
-	except ValueError:
-		return ''
+from UnicodeData import *
 
 def isCaseSensitive(ch):
 	return ch != ch.upper() or ch != ch.lower() or ch != ch.casefold()
@@ -235,7 +227,7 @@ def checkUnicodeCaseSensitivity(filename=None):
 	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
 		if isCaseSensitive(uch):
-			caseList.append((ch, hex(ch), uch, getCharName(uch)))
+			caseList.append((ch, hex(ch), uch, getCharacterName(uch)))
 			caseTable[ch] = '1'
 
 	print(len(caseList), caseList[-1])

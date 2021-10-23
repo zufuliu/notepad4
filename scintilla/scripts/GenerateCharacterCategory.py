@@ -2,7 +2,6 @@
 # Script to generate CharacterCategory.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
 
-import sys
 import codecs
 import platform
 import unicodedata
@@ -11,10 +10,7 @@ import math
 
 from FileGenerator import Regenerate
 from splitbins import *
-
-UnicodeCharacterCount = sys.maxunicode + 1
-BMPCharacterCharacterCount = 0xffff + 1
-DBCSCharacterCount = 0xffff + 1
+from UnicodeData import *
 
 class CharClassify(IntEnum):
 	ccSpace = 0

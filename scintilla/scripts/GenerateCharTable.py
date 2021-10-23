@@ -3,6 +3,7 @@ import unicodedata
 
 from FileGenerator import Regenerate
 from GenerateCharacterCategory import dumpArray
+import UnicodeData
 
 def GenerateUTF8Table():
 	# for UTF8ClassifyTable in UniConversion.cxx
@@ -97,12 +98,6 @@ def GenerateUTF8Table():
 	print('UTF8_3ByteMask: 0x%016x' % UTF8_3ByteMask)
 	print('UTF8_4ByteMask: 0x%016x' % UTF8_4ByteMask)
 
-def GetCharName(ch):
-	try:
-		return unicodedata.name(ch).title()
-	except ValueError:
-		return ''
-
 def GenerateUnicodeControlCharacters():
 	# for kUnicodeControlCharacterTable in Edit.c
 	ucc_table = [
@@ -137,7 +132,7 @@ def GenerateUnicodeControlCharacters():
 	for ucc in ucc_table:
 		utf8bytes = ucc.encode('utf-8')
 		utf8str = ''.join('\\x%02x' % b for b in utf8bytes)
-		print(utf8str, 'U+%04X' % ord(ucc), unicodedata.category(ucc), GetCharName(ucc))
+		print(utf8str, 'U+%04X' % ord(ucc), unicodedata.category(ucc), UnicodeData.getCharacterName(ucc))
 
 def GenerateJsonCharClass():
 	keywords = ["false", "null", "true", "Infinity", "NaN"]

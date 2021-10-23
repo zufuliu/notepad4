@@ -11,6 +11,7 @@ import re
 
 from FileGenerator import Regenerate
 from GenerateCharacterCategory import *
+from UnicodeData import *
 
 # Unicode Line Breaking Algorithm
 # https://www.unicode.org/reports/tr14/
@@ -186,11 +187,7 @@ def updateUnicodeLineBreak(filename):
 			prop = kUnicodeLineBreak[ch]
 			lb = LineBreakMap[prop]
 			category = unicodedata.category(uch)
-			name = ''
-			try:
-				name = unicodedata.name(uch)
-			except ValueError:
-				pass
+			name = getCharacterName(uch)
 
 			uch = escapeMap.get(uch, uch)
 			fd.write(f'{ch :02X} {value}; {category} {prop} {lb.name}; {uch} {name}\n')
