@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-# Script to generate line breaking data from
+# script to generate line breaking data.
 # https://www.unicode.org/reports/tr41/
 # https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/LineBreakTest.html
-# https://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
 
 import platform
 import unicodedata
 from enum import IntFlag
-import re
 
 from FileGenerator import Regenerate
 from GenerateCharacterCategory import CharClassify, ClassifyMap
@@ -86,72 +84,33 @@ for key, items in LineBreakPropertyMap.items():
 	for prop in items:
 		LineBreakMap[prop] = key
 
-kUnicodeLineBreak = []
-kUnicodeLineBreakVersion = unicodedata.unidata_version
+def updateUnicodeLineBreak(filename):
+	lineBreakTable = ['XX'] * UnicodeCharacterCount	# @missing
+	# https://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt
+	version, propertyList = readUnicodePropertyFile('LineBreak.txt')
+	flattenUnicodePropertyTable(lineBreakTable, propertyList)
 
-def readLineBreakFile(filename='LineBreak.txt'):
-	global kUnicodeLineBreak, kUnicodeLineBreakVersion
-
-	data = ['XX'] * UnicodeCharacterCount	# @missing
-	# ID: Ideographic (B/A)
-	# The unassigned code points in the following blocks default to ID:
-	setRange(data, 0x3400, 0x4DBF, 'ID')	# CJK Unified Ideographs Extension A
-	setRange(data, 0x4E00, 0x9FFF, 'ID')	# CJK Unified Ideographs
-	setRange(data, 0xF900, 0xFAFF, 'ID')	# CJK Compatibility Ideographs
-	setRange(data, 0x20000, 0x2FFFD, 'ID')	# Plane 2
-	setRange(data, 0x30000, 0x3FFFD, 'ID')	# Plane 3
-	setRange(data, 0x1F000, 0x1FFFD, 'ID')	# Plane 1 range
-	setRange(data, 0x3130, 0x318F, 'ID')	# Hangul Compatibility Jamo
-	# PR: Prefix Numeric (XA)
-	# 22.1 Currency Symbols
-	setRange(data, 0x20A0, 0x20CF, 'PR')	# Currency Symbols
-
-	version = ''
-	with open(filename, encoding='utf-8') as fd:
-		for line in fd.readlines():
-			line = line.strip()
-			if not line or line[0] == '#':
-				if not version:
-					# first line
-					version = re.findall(r'(\d+\.\d+\.\d+)', line)[0]
-				continue
-
-			m = re.match(r'(\w+)(\.\.(\w+))?;(\w+)', line)
-			start = int(m.groups()[0], 16)
-			end = m.groups()[2]
-			value = m.groups()[3]
-			if end:
-				end = int(end, 16)
-				setRange(data, start, end, value)
-			else:
-				data[start] = value
-
-	data[ord('<')] = 'OP' # open punctuation
-	data[ord('>')] = 'CL' # close punctuation
-	data[ord('#')] = 'PR' # prefix
-	data[ord('@')] = 'PR' # prefix
+	lineBreakTable[ord('<')] = 'OP' # open punctuation
+	lineBreakTable[ord('>')] = 'CL' # close punctuation
+	lineBreakTable[ord('#')] = 'PR' # prefix
+	lineBreakTable[ord('@')] = 'PR' # prefix
 
 	# AL => break after
-	data[ord('&')] = 'BA'
-	data[ord('*')] = 'BA'
-	data[ord('=')] = 'BA'
-	data[ord('^')] = 'BA'
+	lineBreakTable[ord('&')] = 'BA'
+	lineBreakTable[ord('*')] = 'BA'
+	lineBreakTable[ord('=')] = 'BA'
+	lineBreakTable[ord('^')] = 'BA'
 
 	# AL => break before
-	data[ord('~')] = 'BB'
+	lineBreakTable[ord('~')] = 'BB'
 
 	# fullwidth forms
 	# https://en.wikipedia.org/wiki/Halfwidth_and_fullwidth_forms
 	for ch in range(0xFF01, 0xFF5F):
-		data[ch] = data[ch - 0xFEE0]
+		lineBreakTable[ch] = lineBreakTable[ch - 0xFEE0]
 
-	kUnicodeLineBreak = data
-	kUnicodeLineBreakVersion = version
-	print('Unicode LineBreak version:', version)
-
-def updateUnicodeLineBreak(filename):
 	indexTable = [0] * UnicodeCharacterCount
-	for ch, prop in enumerate(kUnicodeLineBreak):
+	for ch, prop in enumerate(lineBreakTable):
 		category = unicodedata.category(chr(ch))
 		cc = ClassifyMap[category]
 		lb = LineBreakMap[prop]
@@ -160,10 +119,19 @@ def updateUnicodeLineBreak(filename):
 		indexTable[ch] = int(lb)
 
 	runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount], LineBreak.RLEValueBit)
-	#buildMultiStageTable('Unicode LineBreak', indexTable, args)
+	args = {
+		'tableName': 'lineBreakTable',
+		'function': """LineBreakProperty GetLineBreakProperty(uint32_t ch) noexcept {
+	if (ch >= maxUnicode) {
+		return LineBreakProperty::XX;
+	}
+""",
+		'returnType': 'LineBreakProperty',
+	}
+	buildMultiStageTable('Unicode LineBreak', indexTable, args)
 
 	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), kUnicodeLineBreakVersion)]
+		platform.python_version(), version)]
 	lines = dumpArray(indexTable[:128], 16)
 	output.extend(lines)
 	Regenerate(filename, "//", output)
@@ -180,7 +148,7 @@ def updateUnicodeLineBreak(filename):
 			if uch.isalnum():
 				continue
 
-			prop = kUnicodeLineBreak[ch]
+			prop = lineBreakTable[ch]
 			lb = LineBreakMap[prop]
 			category = unicodedata.category(uch)
 			name = getCharacterName(uch)
@@ -189,5 +157,4 @@ def updateUnicodeLineBreak(filename):
 			fd.write(f'{ch :02X} {value}; {category} {prop} {lb.name}; {uch} {name}\n')
 
 if __name__ == '__main__':
-	readLineBreakFile()
 	updateUnicodeLineBreak("../src/EditView.cxx")

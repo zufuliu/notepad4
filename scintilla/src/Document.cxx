@@ -37,6 +37,7 @@
 
 #include "CharacterSet.h"
 //#include "CharacterCategory.h"
+//#include "GraphemeBreak.h"
 #include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
@@ -1127,9 +1128,24 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 		it = end;
 		if (encodingFamily != EncodingFamily::eightBit && ccPrev == CharacterClass::word) {
 			// for UTF-8 go back to the start of last character.
+			// in case text ends with a longest sequence, we need to go back
+			// another code point to detect the grapheme cluster boundary.
+			//it -= longestUnicodeCharacterSquenceBytes + UTF8MaxBytes;
 			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
 				--it;
 			}
+#if 0
+			GraphemeBreakProperty prev = GraphemeBreakProperty::Sentinel;
+			do {
+				const uint32_t ch = UnicodeFromUTF8(reinterpret_cast<const unsigned char *>(it));
+				const GraphemeBreakProperty current = GetGraphemeBreakProperty(ch);
+				if (IsGraphemeClusterBoundary(prev, current)) {
+					break;
+				}
+				prev = current;
+				it += UTF8BytesOfLead(static_cast<unsigned char>(*it));
+			} while (it < end);
+#endif
 		}
 		return it - text;
 	}

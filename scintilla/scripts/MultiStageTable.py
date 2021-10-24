@@ -23,6 +23,13 @@ def alignUp(value, align):
 		value += 1
 	return value * align
 
+def bitValue(value, bitCount=16, separator='\''):
+	s = bin(value)[2:]
+	bit = len(s)
+	if bit < bitCount:
+		s = '0'*(bitCount - bit) + s
+	return '0b' + separator.join(s[i:i+8] for i in range(0, bitCount, 8))
+
 def setRange(table, low, high, value):
 	while low <= high:
 		table[low] = value

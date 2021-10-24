@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
+# script to generate grapheme cluster boundary data.
 # https://www.unicode.org/reports/tr41/
-# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html
-# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakProperty.txt
-# https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt
-
 from enum import IntEnum
 
 from MultiStageTable import *
@@ -11,9 +8,8 @@ from UnicodeData import *
 
 # Unicode Text Segmentation
 # https://www.unicode.org/reports/tr29/#Grapheme_Cluster_Break_Property_Values
-class GraphemeBreak(IntEnum):
+class GraphemeBreakProperty(IntEnum):
 	Other = 0
-
 	CR = 1
 	LF = 2
 	Control = 3
@@ -21,108 +17,212 @@ class GraphemeBreak(IntEnum):
 	RegionalIndicator = 5
 	Prepend = 6
 	SpacingMark = 7
-	HangulChoseong_L = 8
-	HangulJungseong_V = 9
-	HangulJongseong_T = 10
-	HangulSyllable_LV = 11
-	HangulSyllable_LVT = 12
+	HangulL = 8
+	HangulV = 9
+	HangulT = 10
+	HangulLV = 11
+	HangulLVT = 12
 	ExtendedPictographic = 13
 	ZeroWidthJoiner = 14
+	Sentinel = 15
 
-	ValueBit = 4
-
-GraphemeBreakMap = {
-	'Other': GraphemeBreak.Other,
-	'CR': GraphemeBreak.CR,
-	'LF': GraphemeBreak.LF,
-	'Control': GraphemeBreak.Control,
-	'Extend': GraphemeBreak.Extend,
-	'Regional_Indicator': GraphemeBreak.RegionalIndicator,
-	'Prepend': GraphemeBreak.Prepend,
-	'SpacingMark': GraphemeBreak.SpacingMark,
-	'L': GraphemeBreak.HangulChoseong_L,
-	'V': GraphemeBreak.HangulJungseong_V,
-	'T': GraphemeBreak.HangulJongseong_T,
-	'LV': GraphemeBreak.HangulSyllable_LV,
-	'LVT': GraphemeBreak.HangulSyllable_LVT,
-	'Extended_Pictographic': GraphemeBreak.ExtendedPictographic,
-	'ZWJ': GraphemeBreak.ZeroWidthJoiner,
+GraphemeBreakPropertyMap = {
+	'Other': GraphemeBreakProperty.Other,
+	'CR': GraphemeBreakProperty.CR,
+	'LF': GraphemeBreakProperty.LF,
+	'Control': GraphemeBreakProperty.Control,
+	'Extend': GraphemeBreakProperty.Extend,
+	'Regional_Indicator': GraphemeBreakProperty.RegionalIndicator,
+	'RI': GraphemeBreakProperty.RegionalIndicator,
+	'Prepend': GraphemeBreakProperty.Prepend,
+	'SpacingMark': GraphemeBreakProperty.SpacingMark,
+	'L': GraphemeBreakProperty.HangulL,
+	'V': GraphemeBreakProperty.HangulV,
+	'T': GraphemeBreakProperty.HangulT,
+	'LV': GraphemeBreakProperty.HangulLV,
+	'LVT': GraphemeBreakProperty.HangulLVT,
+	'Extended_Pictographic': GraphemeBreakProperty.ExtendedPictographic,
+	'ExtPict': GraphemeBreakProperty.ExtendedPictographic,
+	'ZWJ': GraphemeBreakProperty.ZeroWidthJoiner,
 }
 
-def parsePropertyLine(line):
-	line = line.split('#', 2)[0] # strip comment
-	code, prop = line.split(';', 2)
-	code = code.split('.')
-	start = int(code[0], 16)
-	if len(code) == 1:
-		end = start
-	else:
-		end = int(code[-1], 16)
-	return start, end, prop.strip()
+graphemeClusterBoundary = [0xffff] * (GraphemeBreakProperty.Sentinel + 1)
+def buildGraphemeClusterBoundary():
+	table = graphemeClusterBoundary
+	table[GraphemeBreakProperty.Sentinel] = (1 << GraphemeBreakProperty.CR) \
+										| (1 << GraphemeBreakProperty.LF) \
+										| (1 << GraphemeBreakProperty.Control)
 
-def readGraphemeBreakProperty(table, maxIndex, path, include=None):
+	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html
+	notBreak = [
+		['Other', 'Extend', 'SpacingMark', 'ZWJ'],
+		['CR', 'LF'],
+		['Extend', 'Extend', 'SpacingMark', 'ZWJ'],
+		['RI', 'Extend', 'RI', 'SpacingMark', 'ZWJ'],
+		['Prepend', 'Other', 'Extend', 'RI', 'Prepend', 'SpacingMark', 'L', 'V', 'T', 'LV', 'LVT', 'ExtPict', 'ZWJ'],
+		['SpacingMark', 'Extend', 'SpacingMark', 'ZWJ'],
+		['L', 'Extend', 'SpacingMark', 'L', 'V', 'LV', 'LVT', 'ZWJ'],
+		['V', 'Extend', 'SpacingMark', 'V', 'T', 'ZWJ'],
+		['T', 'Extend', 'SpacingMark', 'T', 'ZWJ'],
+		['LV', 'Extend', 'SpacingMark', 'V', 'T', 'ZWJ'],
+		['LVT', 'Extend', 'SpacingMark', 'T', 'ZWJ'],
+		['ExtPict', 'Extend', 'SpacingMark', 'ZWJ'],
+		#['ZWJ', 'Extend', 'SpacingMark', 'ZWJ'],
+		['ZWJ', 'Extend', 'SpacingMark', 'ExtPict', 'ZWJ'],
+	]
+
+	for row in notBreak:
+		first = GraphemeBreakPropertyMap[row[0]]
+		for item in row[1:]:
+			second = GraphemeBreakPropertyMap[item]
+			table[first] &= ~(1 << second)
+
+	for index, value in enumerate(table):
+		prev = GraphemeBreakProperty(index)
+		for j in range(index + 1, len(table)):
+			if value == table[j]:
+				first = tuple((item >> index) & 1 for item in table)
+				second = tuple((item >> j) & 1 for item in table)
+				if first == second:
+					current = GraphemeBreakProperty(j)
+					print('same row and column:', prev.name, current.name)
+
+def findLongestCharacterSquence(path):
+	longestSquenceCount = 0
+	longestSquenceBytes = 0
+	version, propertyList = readUnicodePropertyFile(path)
+	for codeList in propertyList.values():
+		for squence in codeList:
+			character = ''.join(chr(code) for code in squence)
+			assert len(squence) == len(character)
+			longestSquenceCount = max(longestSquenceCount, len(squence))
+			longestSquenceBytes = max(longestSquenceBytes, len(character.encode('utf-8')))
+
+	print(path, 'longest character squence:', longestSquenceCount, longestSquenceBytes)
+	return longestSquenceCount, longestSquenceBytes
+
+def testGraphemeBreak(path, graphemeBreakTable):
+	opportunity = '×÷'
+	allow = opportunity[1]
+	totalCount = 0
+	failCount = 0
 	with open(path, encoding='utf-8') as fd:
+		lineno = 0
 		for line in fd.readlines():
+			lineno += 1
 			line = line.strip()
 			if not line or line[0] == '#':
 				continue
-			start, end, prop = parsePropertyLine(line)
-			if include and prop not in include:
-				continue
-			value = int(GraphemeBreakMap[prop])
-			if value == 0:
-				continue
-			while start <= end:
-				table[start] = value
-				start += 1
-			maxIndex = max(end, maxIndex)
-	return maxIndex
 
-def updateGraphemeBreakTable():
-	tableSize = 0
-	indexTable = [0] * UnicodeCharacterCount
-	tableSize = readGraphemeBreakProperty(indexTable, tableSize, 'GraphemeBreakProperty.txt')
-	tableSize = readGraphemeBreakProperty(indexTable, tableSize, 'emoji-data.txt', ['Extended_Pictographic'])
-	maxNonOtherChar = tableSize
-	print('Grapheme Break table size', tableSize + 1, indexTable[tableSize])
-	tableSize = alignUp(tableSize, 128)
+			squence = line.split('#', 2)[0].split()
+			# break at the start and end of text
+			assert squence[0] == allow, (lineno, squence)
+			assert squence[-1] == allow, (lineno, squence)
+			for index in range(1, len(squence) - 2, 2):
+				ch = squence[index]
+				offcial = squence[index + 1]
+				chNext = squence[index + 2]
+				prop = GraphemeBreakProperty(graphemeBreakTable[int(ch, 16)])
+				propNext = GraphemeBreakProperty(graphemeBreakTable[int(chNext, 16)])
+				value = opportunity[(graphemeClusterBoundary[prop] >> propNext) & 1]
+				totalCount += 1
+				if value != offcial:
+					failCount += 1
+					print(f'test fail on line {lineno}: {ch} {offcial} {chNext} => {prop.name} {value} {propNext.name}')
+	print(f'{path} total test: {totalCount}, failed test: {failCount}')
 
-	if GraphemeBreak.ValueBit == 4:
-		index = alignUp(tableSize // 2, 16)
-		valueTable = [0] * index
-		index = 0
-		for j in range(0, tableSize, 2):
-			valueTable[index] = indexTable[j] | (indexTable[j + 1] << 4)
-			index += 1
-	if GraphemeBreak.ValueBit == 2:
-		index = alignUp(tableSize // 4, 16)
-		valueTable = [0] * index
-		index = 0
-		for j in range(0, tableSize, 4):
-			valueTable[index] = indexTable[j] | (indexTable[j + 1] << 2) | (indexTable[j + 2] << 4) | (indexTable[j + 3] << 6)
-			index += 1
-	elif GraphemeBreak.ValueBit == 1:
-		index = alignUp(tableSize // 8, 16)
-		valueTable = [0] * index
-		index = 0
-		for j in range(0, tableSize, 8):
-			valueTable[index] = indexTable[j] | (indexTable[j + 1] << 1) | (indexTable[j + 2] << 2) | (indexTable[j + 3] << 3) \
-							| (indexTable[j + 4] << 5) | (indexTable[j + 5] << 5) | (indexTable[j + 6] << 6) | (indexTable[j + 7] << 7)
-			index += 1
+def updateGraphemeBreakTable(filename):
+	defaultValue = int(GraphemeBreakProperty.Other)
+	graphemeBreakTable = [defaultValue] * UnicodeCharacterCount
+	# https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt
+	version, propertyList = readUnicodePropertyFile('emoji-data.txt')
+	buildUnicodePropertyTable(graphemeBreakTable, GraphemeBreakPropertyMap, propertyList)
+	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakProperty.txt
+	version, propertyList = readUnicodePropertyFile('GraphemeBreakProperty.txt')
+	buildUnicodePropertyTable(graphemeBreakTable, GraphemeBreakPropertyMap, propertyList)
 
-	print('Grapheme Break value size', index, max(valueTable))
-	if False:
-		args = {
-			'tableName': 'GraphemeBreakTable',
-			'function': """static GraphemeBreak GetGraphemeBreak(unsigned int ch) noexcept {
-	if (ch > maxNonOtherChar) {
-		return GraphemeBreak::Other;
+	tableSize = getMinTableSize(graphemeBreakTable, defaultValue)
+	print(f'Grapheme Break table size: {tableSize}, last value: {GraphemeBreakProperty(graphemeBreakTable[tableSize - 1]).name}')
+
+	# https://www.unicode.org/Public/emoji/latest/emoji-zwj-sequences.txt
+	longestSquenceCount, longestSquenceBytes = findLongestCharacterSquence('emoji-zwj-sequences.txt')
+	buildGraphemeClusterBoundary()
+
+	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.txt
+	testGraphemeBreak('GraphemeBreakTest.txt', graphemeBreakTable)
+	graphemeBreakTable = graphemeBreakTable[:tableSize]
+
+	output = []
+	output.append('#pragma once')
+	output.append('#include <cstdint>')
+	output.append("#include <algorithm>")
+	output.append("#include <iterator>")
+	output.append('')
+	output.append('namespace {')
+	output.append('')
+	output.append('enum class GraphemeBreakProperty {')
+	for prop in GraphemeBreakProperty.__members__.values():
+		output.append(f'\t{prop.name} = {prop.value},')
+	output.append('};')
+
+	output.append('')
+	output.append(f'constexpr int maxUnicodeGraphemeBreakCharacter = {hex(len(graphemeBreakTable))};')
+	output.append(f'constexpr int longestUnicodeCharacterSquenceCount = {longestSquenceCount};')
+	output.append(f'constexpr int longestUnicodeCharacterSquenceBytes = {longestSquenceBytes};')
+
+	output.append('')
+	output.append('constexpr uint16_t graphemeClusterBoundary[] = {')
+	output.extend(bitValue(value) + ', // ' + GraphemeBreakProperty(index).name for index, value in enumerate(graphemeClusterBoundary))
+	output.append('};')
+
+	output.append("""
+constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBreakProperty current) noexcept {
+	return (graphemeClusterBoundary[static_cast<int>(prev)] >> (static_cast<int>(current))) & true;
+}
+""")
+
+	output.append('#define GraphemeBreakUseRangeList 0')
+	output.append('#if GraphemeBreakUseRangeList')
+	sentinel = (UnicodeCharacterCount << 4) | GraphemeBreakProperty.Other
+	rangeList = rangeEncode('Unicode Grapheme Break range', graphemeBreakTable, 4, sentinel)
+	output.append('constexpr int graphemeBreakMask = 15;')
+	output.append('')
+	output.append('const int graphemeBreakRanges[] = {')
+	output.extend(hex(value) + ',' for value in rangeList)
+	output.append("};")
+	output.append("""
+GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
+	if (character < 0 || character >= maxUnicodeGraphemeBreakCharacter) {
+		return GraphemeBreakProperty::Other;
 	}
-	ch >>= 1;
+	const int baseValue = character * (graphemeBreakMask + 1) + graphemeBreakMask;
+	const int *placeAfter = std::lower_bound(graphemeBreakRanges, std::end(graphemeBreakRanges), baseValue);
+	return static_cast<GraphemeBreakProperty>(*(placeAfter - 1) & graphemeBreakMask);
+}""")
+
+	output.append('')
+	output.append('#else')
+	args = {
+		'tableName': 'graphemeBreakTable',
+		'function': """GraphemeBreakProperty GetGraphemeBreakProperty(uint32_t ch) noexcept {
+	if (ch >= maxUnicodeGraphemeBreakCharacter) {
+		return GraphemeBreakProperty::Other;
+	}
 """,
-			'returnType': 'GraphemeBreak'
-		}
+		'returnType': 'GraphemeBreakProperty'
+	}
 
-		table, function = buildMultiStageTable('Unicode Grapheme Break', valueTable, args)
+	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, args)
+	output.extend(table)
+	output.append('')
+	output.extend(function)
+	output.append("#endif")
+	output.append('')
+	output.append('}')
+	output.append('')
 
-updateGraphemeBreakTable()
+	with open(filename, 'w', encoding='utf-8', newline='\n') as fd:
+		fd.write('\n'.join(output))
+
+if __name__ == '__main__':
+	updateGraphemeBreakTable('../src/GraphemeBreak.h')
