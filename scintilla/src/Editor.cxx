@@ -7565,7 +7565,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return static_cast<sptr_t>(vs.selection.layer);
 
 	case Message::SetCaretStyle:
-		if (static_cast<CaretStyle>(wParam) <= (CaretStyle::Block | CaretStyle::OverstrikeBlock | CaretStyle::BlockAfter))
+		if (static_cast<CaretStyle>(wParam) <= (CaretStyle::Block | CaretStyle::OverstrikeBlock | CaretStyle::Curses | CaretStyle::BlockAfter))
 			vs.caret.style = static_cast<CaretStyle>(wParam);
 		else
 			/* Default to the line caret */

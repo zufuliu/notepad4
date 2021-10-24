@@ -685,11 +685,14 @@ bool ViewStyle::SetWrapIndentMode(WrapIndentMode wrapIndentMode_) noexcept {
 
 bool ViewStyle::IsBlockCaretStyle() const noexcept {
 	return ((caret.style & CaretStyle::InsMask) == CaretStyle::Block) ||
-		FlagSet(caret.style, CaretStyle::OverstrikeBlock);
+		FlagSet(caret.style, CaretStyle::OverstrikeBlock) ||
+		FlagSet(caret.style, CaretStyle::Curses);
 }
 
-bool ViewStyle::IsCaretVisible() const noexcept {
-	return caret.width > 0 && caret.style != CaretStyle::Invisible;
+bool ViewStyle::IsCaretVisible(bool isMainSelection) const noexcept {
+	return caret.width > 0 &&
+		((caret.style & CaretStyle::InsMask) != CaretStyle::Invisible ||
+		(FlagSet(caret.style, CaretStyle::Curses) && !isMainSelection)); // only draw additional selections in curses mode
 }
 
 bool ViewStyle::DrawCaretInsideSelection(bool inOverstrike, bool imeCaretBlockOverride) const noexcept {
@@ -698,10 +701,11 @@ bool ViewStyle::DrawCaretInsideSelection(bool inOverstrike, bool imeCaretBlockOv
 	}
 	return ((caret.style & CaretStyle::InsMask) == CaretStyle::Block) ||
 		(inOverstrike && FlagSet(caret.style, CaretStyle::OverstrikeBlock)) ||
-		imeCaretBlockOverride;
+		imeCaretBlockOverride ||
+		FlagSet(caret.style, CaretStyle::Curses);
 }
 
-ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawDrag, bool drawOverstrikeCaret, bool imeCaretBlockOverride) const noexcept {
+ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool isMainSelection, bool drawDrag, bool drawOverstrikeCaret, bool imeCaretBlockOverride) const noexcept {
 	if (drawDrag) {
 		// Dragging text, use a line caret
 		return CaretShape::line;
@@ -714,7 +718,7 @@ ViewStyle::CaretShape ViewStyle::CaretShapeForMode(bool inOverstrike, bool drawD
 			return CaretShape::bar;
 		}
 	}
-	if (imeCaretBlockOverride) {
+	if (imeCaretBlockOverride || (FlagSet(caret.style, CaretStyle::Curses) && !isMainSelection)) {
 		return CaretShape::block;
 	}
 	const CaretStyle style = caret.style & CaretStyle::InsMask;

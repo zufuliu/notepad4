@@ -588,7 +588,7 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 		ll->positions[0] = 0;
 		bool lastSegItalics = false;
 
-		BreakFinder bfLayout(ll, nullptr, Range(0, numCharsInLine), posLineStart, 0, false, model.pdoc, &model.reprs, nullptr);
+		BreakFinder bfLayout(ll, nullptr, Range(0, numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
 		while (bfLayout.More()) {
 
 			const TextSegment ts = bfLayout.Next();
@@ -1833,7 +1833,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 			}
 			const bool caretBlinkState = (model.caret.active && model.caret.on) || (!additionalCaretsBlink && !mainCaret);
 			const bool caretVisibleState = additionalCaretsVisible || mainCaret;
-			if ((xposCaret >= 0) && vsDraw.IsCaretVisible() &&
+			if ((xposCaret >= 0) && vsDraw.IsCaretVisible(mainCaret) &&
 				(drawDrag || (caretBlinkState && caretVisibleState))) {
 				bool canDrawBlockCaret = true;
 				bool drawBlockCaret = false;
@@ -1841,7 +1841,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 				XYPOSITION caretWidthOffset = 0;
 				PRectangle rcCaret = rcLine;
 
-				const ViewStyle::CaretShape caretShape = vsDraw.CaretShapeForMode(model.inOverstrike, drawDrag, drawOverstrikeCaret, imeCaretBlockOverride);
+				const ViewStyle::CaretShape caretShape = vsDraw.CaretShapeForMode(model.inOverstrike, mainCaret, drawDrag, drawOverstrikeCaret, imeCaretBlockOverride);
 				if (caretShape != ViewStyle::CaretShape::line) {
 					if (posCaret.Position() == model.pdoc->Length()) {   // At end of document
 						canDrawBlockCaret = false;
@@ -1931,6 +1931,21 @@ static void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, c
 	}
 }
 
+// On the curses platform, the terminal is drawing its own caret, so if the caret is within
+// the main selection, do not draw the selection at that position.
+// Use iDoc from DrawBackground and DrawForeground here because TextSegment has been adjusted
+// such that, if the caret is inside the main selection, the beginning or end of that selection
+// is at the end of a text segment.
+// This function should only be called if iDoc is within the main selection.
+static InSelection CharacterInCursesSelection(Sci::Position iDoc, const EditModel &model, const ViewStyle &vsDraw) {
+	const SelectionPosition &posCaret = model.sel.RangeMain().caret;
+	const bool caretAtStart = posCaret < model.sel.RangeMain().anchor && posCaret.Position() == iDoc;
+	const bool caretAtEnd = posCaret > model.sel.RangeMain().anchor &&
+		vsDraw.DrawCaretInsideSelection(false, false) &&
+		model.pdoc->MovePositionOutsideChar(posCaret.Position() - 1, -1) == iDoc;
+	return (caretAtStart || caretAtEnd) ? InSelection::inNone : InSelection::inMain;
+}
+
 void EditView::DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	PRectangle rcLine, Range lineRange, Sci::Position posLineStart, int xStart,
 	int subLine, std::optional<ColourRGBA> background) const {
@@ -1941,7 +1956,8 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 	// Does not take margin into account but not significant
 	const XYPOSITION xStartVisible = static_cast<XYPOSITION>(subLineStart - xStart);
 
-	BreakFinder bfBack(ll, &model.sel, lineRange, posLineStart, xStartVisible, selBackDrawn, model.pdoc, &model.reprs, nullptr);
+	const BreakFinder::BreakFor breakFor = selBackDrawn ? BreakFinder::BreakFor::Selection : BreakFinder::BreakFor::Text;
+	BreakFinder bfBack(ll, &model.sel, lineRange, posLineStart, xStartVisible, breakFor, model.pdoc, &model.reprs, &vsDraw);
 
 	const bool drawWhitespaceBackground = vsDraw.WhitespaceBackgroundDrawn() && !background;
 
@@ -1962,7 +1978,9 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 			rcSegment.left = std::max(rcSegment.left, rcLine.left);
 			rcSegment.right = std::min(rcSegment.right, rcLine.right);
 
-			const InSelection inSelection = hideSelection ? InSelection::inNone : model.sel.CharacterInSelection(iDoc);
+			InSelection inSelection = hideSelection ? InSelection::inNone : model.sel.CharacterInSelection(iDoc);
+			if (FlagSet(vsDraw.caret.style, CaretStyle::Curses) && (inSelection == InSelection::inMain))
+				inSelection = CharacterInCursesSelection(iDoc, model, vsDraw);
 			const bool inHotspot = model.hotspot.Valid() && model.hotspot.ContainsCharacter(iDoc);
 			ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, inSelection,
 				inHotspot, ll->styles[i], i);
@@ -2155,8 +2173,9 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 	const XYPOSITION xStartVisible = static_cast<XYPOSITION>(subLineStart - xStart);
 
 	// Foreground drawing loop
-	BreakFinder bfFore(ll, &model.sel, lineRange, posLineStart, xStartVisible,
-		(((phasesDraw == PhasesDraw::One) && selBackDrawn) || vsDraw.SelectionTextDrawn()), model.pdoc, &model.reprs, &vsDraw);
+	const BreakFinder::BreakFor breakFor = (((phasesDraw == PhasesDraw::One) && selBackDrawn) || vsDraw.SelectionTextDrawn())
+		? BreakFinder::BreakFor::ForegroundAndSelection : BreakFinder::BreakFor::Foreground;
+	BreakFinder bfFore(ll, &model.sel, lineRange, posLineStart, xStartVisible, breakFor, model.pdoc, &model.reprs, &vsDraw);
 
 	while (bfFore.More()) {
 
@@ -2207,7 +2226,9 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 					}
 				}
 			}
-			const InSelection inSelection = hideSelection ? InSelection::inNone : model.sel.CharacterInSelection(iDoc);
+			InSelection inSelection = hideSelection ? InSelection::inNone : model.sel.CharacterInSelection(iDoc);
+			if (FlagSet(vsDraw.caret.style, CaretStyle::Curses) && (inSelection == InSelection::inMain))
+				inSelection = CharacterInCursesSelection(iDoc, model, vsDraw);
 			const std::optional<ColourRGBA> selectionFore = SelectionForeground(model, vsDraw, inSelection);
 			if (selectionFore) {
 				textFore = *selectionFore;

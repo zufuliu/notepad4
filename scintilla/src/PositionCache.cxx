@@ -739,7 +739,7 @@ void BreakFinder::Insert(Sci::Position val) {
 }
 
 BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
-	XYPOSITION xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
+	XYPOSITION xStart, BreakFor breakFor, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
 	ll(ll_),
 	lineRange(lineRange_),
 	posLineStart(posLineStart_),
@@ -760,7 +760,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 		nextBreak--;
 	}
 
-	if (breakForSelection) {
+	if (FlagSet(breakFor, BreakFor::Selection)) {
 		const SelectionPosition posStart(posLineStart);
 		const SelectionPosition posEnd(posLineStart + lineRange.end);
 		const SelectionSegment segmentLine(posStart, posEnd);
@@ -773,8 +773,23 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 					Insert(portion.end.Position() - posLineStart);
 			}
 		}
+		// On the curses platform, the terminal is drawing its own caret, so add breaks around the
+		// caret in the main selection in order to help prevent the selection from being drawn in
+		// the caret's cell.
+		if (FlagSet(pvsDraw->caret.style, CaretStyle::Curses) && !psel->RangeMain().Empty()) {
+			const Sci::Position caretPos = psel->RangeMain().caret.Position();
+			const Sci::Position anchorPos = psel->RangeMain().anchor.Position();
+			if (caretPos < anchorPos) {
+				const Sci::Position nextPos = pdoc->MovePositionOutsideChar(caretPos + 1, 1);
+				Insert(nextPos - posLineStart);
+			} else if (caretPos > anchorPos && pvsDraw->DrawCaretInsideSelection(false, false)) {
+				const Sci::Position prevPos = pdoc->MovePositionOutsideChar(caretPos - 1, -1);
+				if (prevPos > anchorPos)
+					Insert(prevPos - posLineStart);
+			}
+		}
 	}
-	if (pvsDraw && pvsDraw->indicatorsSetFore) {
+	if (FlagSet(breakFor, BreakFor::Foreground) && pvsDraw->indicatorsSetFore) {
 		for (const auto *const deco : pdoc->decorations->View()) {
 			if (pvsDraw->indicators[deco->Indicator()].OverridesTextFore()) {
 				Sci::Position startPos = deco->EndRun(posLineStart);

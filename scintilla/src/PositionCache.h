@@ -260,8 +260,14 @@ public:
 	enum {
 		lengthEachSubdivision = 128 + 12
 	};
+	enum class BreakFor {
+		Text = 0,
+		Selection = 1,
+		Foreground = 2,
+		ForegroundAndSelection = 3,
+	};
 	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
-		XYPOSITION xStart, bool breakForSelection, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
+		XYPOSITION xStart, BreakFor breakFor, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;
 	BreakFinder(BreakFinder &&) = delete;
