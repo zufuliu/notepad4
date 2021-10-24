@@ -385,12 +385,12 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_GCC_en_x64_ucrt
+          name: Notepad2_Clang_mingw_en_x64_ucrt
           path: 'build\Notepad2_Clang_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_GCC_en_AVX2_ucrt
+          name: Notepad2_Clang_mingw_en_AVX2_ucrt
           path: 'build\Notepad2_Clang_AVX2_*.zip'
 
   gcc_x86_64:
@@ -439,12 +439,12 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_GCC_en_x64
+          name: Notepad2_Clang_mingw_en_x64
           path: 'build\Notepad2_Clang_x64_*.zip'
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_GCC_en_AVX2
+          name: Notepad2_Clang_mingw_en_AVX2
           path: 'build\Notepad2_Clang_AVX2_*.zip'
 
   gcc_i686:
@@ -478,5 +478,5 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-          name: Notepad2_Clang_GCC_en_Win32
+          name: Notepad2_Clang_mingw_en_Win32
           path: 'build\Notepad2_Clang_Win32_*.zip'
