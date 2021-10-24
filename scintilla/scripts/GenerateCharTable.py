@@ -2,7 +2,7 @@
 import unicodedata
 
 from FileGenerator import Regenerate
-from GenerateCharacterCategory import dumpArray
+import MultiStageTable
 import UnicodeData
 
 def GenerateUTF8Table():
@@ -207,7 +207,7 @@ def GenerateJsonCharClass():
 
 	nonAscii = (SCE_JSON_IDENTIFIER << 5) | JsonMask_Identifier | JsonChar_Ignore
 	table.extend([nonAscii]*128)
-	lines = dumpArray(table, 16)
+	lines = MultiStageTable.dumpArray(table, 16)
 	Regenerate("../lexers/LexJSON.cxx", "//", lines)
 
 if __name__ == '__main__':

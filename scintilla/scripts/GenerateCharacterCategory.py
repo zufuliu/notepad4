@@ -6,10 +6,9 @@ import codecs
 import platform
 import unicodedata
 from enum import IntEnum
-import math
 
 from FileGenerator import Regenerate
-from splitbins import *
+from MultiStageTable import *
 from UnicodeData import *
 
 class CharClassify(IntEnum):
@@ -167,62 +166,6 @@ def isCJKCharacter(category, ch):
 			return True
 
 	return False
-
-def dumpArray(items, step, fmt='%d'):
-	lines = []
-	if step:
-		for i in range(0, len(items), step):
-			line = ", ".join(fmt % value for value in items[i:i+step]) + ","
-			lines.append(line)
-	else:
-		line = ", ".join(fmt % value for value in items)
-		lines.append(line)
-	return lines
-
-def updateCharacterCategory(categories):
-	values = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
-
-	# catLatin
-	values.append("#if CHARACTERCATEGORY_OPTIMIZE_LATIN1")
-	values.append("const unsigned char catLatin[] = {")
-	table = [categories.index(unicodedata.category(chr(ch))) for ch in range(256)]
-	for i in range(0, len(table), 16):
-		line = ', '.join(str(value) for value in table[i:i+16]) + ','
-		values.append(line)
-	values.append("};")
-	values.append("#endif")
-	values.append("")
-
-	# catRanges
-	startRange = 0
-	category = unicodedata.category(chr(startRange))
-	table = []
-	for ch in range(sys.maxunicode):
-		uch = chr(ch)
-		current = unicodedata.category(uch)
-		if current != category:
-			value = startRange * 32 + categories.index(category)
-			table.append(value)
-			category = current
-			startRange = ch
-	value = startRange * 32 + categories.index(category)
-	table.append(value)
-
-	# the sentinel value is used to simplify CharacterMap::Optimize()
-	category = 'Cn'
-	value = (sys.maxunicode + 1)*32 + categories.index(category)
-	table.append(value)
-
-	print('catRanges:', len(table), 4*len(table)/1024, math.ceil(math.log2(len(table))))
-	values.append("#if CHARACTERCATEGORY_USE_BINARY_SEARCH")
-	values.append("const int catRanges[] = {")
-	values.extend(["%d," % value for value in table])
-	values.append("};")
-	values.append("")
-	values.append("#else")
-
-	return values
 
 def bytesToHex(b):
 	return ''.join('\\x%02X' % ch for ch in b)
@@ -402,160 +345,6 @@ def buildANSICharClassifyTable(filename):
 	print('ANSICharClassifyTable:', len(result), len(encodingList))
 	Regenerate(filename, "//", output)
 
-def compressIndexTable(head, indexTable, args):
-	indexA, indexC, indexD, shiftA, shiftC = splitbins(indexTable, True)
-	print(f'{head}:', (len(indexA), max(indexA)), (len(indexC), max(indexC)), len(indexD), (shiftA, shiftC))
-
-	sizeA = getsize(indexA)
-	sizeC = getsize(indexC)
-	sizeD = getsize(indexD)
-	total = len(indexA)*sizeA + len(indexC)*sizeC + len(indexD)*sizeD
-	print(f'{head} total size:', total/1024)
-
-	maskA = (1 << shiftA) - 1
-	maskC = (1 << shiftC) - 1
-	shiftA2 = shiftA
-	shiftC2 = shiftC
-
-	if True:
-		shiftA2 = preshift(indexA, shiftA)
-		shiftC2 = preshift(indexC, shiftC)
-
-	for ch in range(len(indexTable)):
-		i = (indexA[ch >> shiftA] << shiftA2) | (ch & maskA)
-		i = (indexC[i >> shiftC] << shiftC2) | (i & maskC)
-		value = indexD[i]
-		expect = indexTable[ch]
-		if value != expect:
-			print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (ch, expect, value))
-			return None
-
-	typemap = {
-		1: 'unsigned char',
-		2: 'unsigned short',
-	}
-
-	prefix = args['table']
-	with_function = args.get('with_function', True)
-
-	# one table
-	if sizeA == sizeC == sizeD:
-		output = []
-		name = args.get('table_var', prefix)
-		output.append("const %s %s[] = {" % (typemap[sizeA], name))
-		output.append("// %s1" % prefix)
-		output.extend(dumpArray(indexA, 20))
-		output.append("// %s2" % prefix)
-		output.extend(dumpArray(indexC, 20))
-		output.append("// %s" % prefix)
-		output.extend(dumpArray(indexD, 20))
-		output.append("};")
-		table = '\n'.join(output)
-
-		args.update({
-			'shiftA': shiftA,
-			'shiftA2': shiftA2,
-			'maskA': maskA,
-			'offsetC': len(indexA),
-			'shiftC': shiftC,
-			'shiftC2': shiftC2,
-			'maskC': maskC,
-			'offsetD': len(indexA) + len(indexC)
-		})
-		if with_function:
-			function = """{function}
-	ch = ({table}[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
-	ch = ({table}[{offsetC} + (ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
-	return static_cast<{returnType}>({table}[{offsetD} + ch]);
-}}""".format(**args)
-		else:
-			function = """
-constexpr int {table}Shift11 = {shiftA};
-constexpr int {table}Shift12 = {shiftA2};
-constexpr int {table}Mask1 = {maskA};
-constexpr int {table}Offset1 = {offsetC};
-constexpr int {table}Shift21 = {shiftC};
-constexpr int {table}Shift22 = {shiftC2};
-constexpr int {table}Mask2 = {maskC};
-constexpr int {table}Offset2 = {offsetD};
-""".format(**args)
-	# three tables
-	else:
-		output = []
-		output.append("const %s %s1[] = {" % (typemap[sizeA], prefix))
-		output.extend(dumpArray(indexA, 20))
-		output.append("};")
-		output.append("")
-		output.append("const %s %s2[] = {" % (typemap[sizeC], prefix))
-		output.extend(dumpArray(indexC, 20))
-		output.append("};")
-		output.append("")
-		output.append("const %s %s[] = {" % (typemap[sizeD], prefix))
-		output.extend(dumpArray(indexD, 20))
-		output.append("};")
-		table = '\n'.join(output)
-
-		args.update({
-			'shiftA': shiftA,
-			'shiftA2': shiftA2,
-			'maskA': maskA,
-			'shiftC': shiftC,
-			'shiftC2': shiftC2,
-			'maskC': maskC,
-		})
-		if with_function:
-			function = """{function}
-	ch = ({table}1[ch >> {shiftA}] << {shiftA2}) | (ch & {maskA});
-	ch = ({table}2[(ch >> {shiftC})] << {shiftC2}) | (ch & {maskC});
-	return static_cast<{returnType}>({table}[ch]);
-}}""".format(**args)
-		else:
-			function = """
-constexpr int {table}Shift11 = {shiftA};
-constexpr int {table}Shift12 = {shiftA2};
-constexpr int {table}Mask1 = {maskA};
-constexpr int {table}Shift21 = {shiftC};
-constexpr int {table}Shift22 = {shiftC2};
-constexpr int {table}Mask2 = {maskC};
-""".format(**args)
-	return table, function
-
-def runLengthEncode(head, indexTable, valueBit, totalBit=16):
-	assert max(indexTable) < 2**valueBit
-	maxLength = 2**(totalBit - valueBit) - 1
-
-	values = []
-	prevValue = indexTable[0]
-	prevIndex = 0;
-	for index, value in enumerate(indexTable):
-		if value != prevValue:
-			values.append((prevValue, index - prevIndex))
-			prevValue = value
-			prevIndex = index
-	values.append((prevValue, len(indexTable) - prevIndex))
-
-	output = []
-	for value, count in values:
-		if count > maxLength:
-			output.extend([(maxLength << valueBit) | value] * (count // maxLength))
-			count = count % maxLength
-			if count == 0:
-				continue
-		output.append((count << valueBit) | value)
-
-	total = getsize(output)*len(output)/1024
-	print(f'{head} RLE size: {len(output)} {total}')
-
-	result = []
-	mask = 2**valueBit - 1
-	for ch in output:
-		value = ch & mask
-		count = ch >> valueBit
-		result.extend([value] * count)
-
-	assert result == indexTable
-	return output
-
 def updateCharClassifyTable(filename, headfile):
 	indexTable = [0] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
@@ -579,8 +368,8 @@ def updateCharClassifyTable(filename, headfile):
 	output.append("")
 
 	args = {
-		'table_var': 'CharClassify::CharClassifyTable',
-		'table': 'CharClassifyTable',
+		'tableVarName': 'CharClassify::CharClassifyTable',
+		'tableName': 'CharClassifyTable',
 		'function': """static CharacterClass ClassifyCharacter(unsigned int ch) noexcept {
 	if (ch < sizeof(classifyMap)) {
 		return static_cast<CharacterClass>(classifyMap[ch]);
@@ -594,18 +383,17 @@ def updateCharClassifyTable(filename, headfile):
 		'returnType': 'CharacterClass'
 	}
 
-	table, function = compressIndexTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], args)
-	output.extend(table.splitlines())
-
-	for line in function.splitlines():
-		head_output.append('\t' + line)
+	table, function = buildMultiStageTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], args)
+	output.extend(table)
+	head_output.extend('\t' + line for line in function)
 
 	Regenerate(filename, "//", output)
 	Regenerate(headfile, "//", head_output)
 
 def updateCharacterCategoryTable(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
-	output = updateCharacterCategory(categories)
+	output = ["// Created with Python %s, Unicode %s" % (
+		platform.python_version(), unicodedata.unidata_version)]
 
 	indexTable = [0] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
@@ -614,17 +402,29 @@ def updateCharacterCategoryTable(filename):
 		value = categories.index(category)
 		indexTable[ch] = value
 
-	args = {
-		'table': 'catTable',
-		'with_function': False,
-	}
-
-	table, function = compressIndexTable('CharacterCategoryTable', indexTable, args)
+	# the sentinel value is used to simplify CharacterMap::Optimize()
+	sentinel = UnicodeCharacterCount*32 + categories.index('Cn')
+	rangeList = rangeEncode('catRanges', indexTable, 5, sentinel)
+	output.append("#if CharacterCategoryUseRangeList")
+	output.append("const int catRanges[] = {")
+	output.extend("%d," % value for value in rangeList)
+	output.append("};")
 	output.append("")
-	output.extend(table.splitlines())
-	output.extend(function.splitlines())
+	output.append("#else")
 
-	data = runLengthEncode('CharacterCategoryTable', indexTable[:BMPCharacterCharacterCount], 5)
+	args = {
+		'tableName': 'catTable',
+		'function': """CharacterCategory CategoriseCharacter(int character) noexcept {
+	if (character < 0 || character > maxUnicode) {
+		return ccCn;
+	}""",
+		'returnType': 'CharacterCategory',
+	}
+	table, function = buildMultiStageTable('CharacterCategory', indexTable, args)
+	output.append("")
+	output.extend(table)
+
+	data = runLengthEncode('CharacterCategory BMP', indexTable[:BMPCharacterCharacterCount], 5)
 	output.append("")
 	output.append(f'const unsigned short CatTableRLE_BMP[] = {{')
 	output.extend(dumpArray(data, 20))
@@ -634,6 +434,7 @@ def updateCharacterCategoryTable(filename):
 	output.append("#endif")
 
 	Regenerate(filename, "//", output)
+	Regenerate(filename, "//function", function)
 
 def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
 	buf = bytes([ch]) if ch < 256 else bytes([ch >> 8, ch & 0xff])
@@ -686,7 +487,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 
 	if False:
 		args = {
-			'table': 'CharClassifyTable' + suffix,
+			'tableName': 'CharClassifyTable' + suffix,
 			'function': """CharClassify::cc ClassifyCharacter%s(unsigned int ch) noexcept {
 	if (ch > maxDBCSCharacter) {
 		// Cn
@@ -696,10 +497,10 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 			'returnType': 'CharClassify::cc'
 		}
 
-		table, function = compressIndexTable(head, indexTable, args)
-		output.extend(table.splitlines())
+		table, function = buildMultiStageTable(head, indexTable, args)
+		output.extend(table)
 		output.append('')
-		output.extend(function.splitlines())
+		output.extend(function)
 		output.append('')
 
 # https://en.wikipedia.org/wiki/GBK_(character_encoding)

@@ -6,7 +6,7 @@
 
 from enum import IntEnum
 
-from GenerateCharacterCategory import *
+from MultiStageTable import *
 from UnicodeData import *
 
 # Unicode Text Segmentation
@@ -78,45 +78,6 @@ def readGraphemeBreakProperty(table, maxIndex, path, include=None):
 			maxIndex = max(end, maxIndex)
 	return maxIndex
 
-def alignUp(value, align):
-	value, rem = divmod(value, align)
-	if rem:
-		value += 1
-	return value * align
-
-def compressValueTable(valueTable):
-	tableSize = len(valueTable)
-	minTotalSize = 0
-	minBlockSize = 0
-	minBlockList = 0
-	minIndexList = 0
-	for blockSize in (1024, 512, 256, 128, 64, 32, 16, 8, 4, 2):
-		blockList = []
-		blockMap = {}
-		indexList = [(0, 0)]
-		for i in range(0, tableSize, blockSize):
-			block = tuple(valueTable[i:i + blockSize])
-			if sum(block) == 0:
-				continue
-			if block in blockMap:
-				index = blockMap[block]
-			else:
-				index = len(blockList) + 1
-				blockList.append(block)
-				blockMap[block] = index
-			blockId = i // blockSize
-			indexList.append((blockId, index))
-
-		totalSize = len(blockList)*blockSize
-		totalSize += len(indexList)*2
-		if minTotalSize == 0 or totalSize < minTotalSize:
-			minTotalSize = totalSize
-			minBlockSize = blockSize
-			minBlockList = blockList
-			minIndexList = indexList
-
-	print('block size:', (minBlockSize, minTotalSize/1024), 'block:', len(minBlockList), 'index:', len(minIndexList))
-
 def updateGraphemeBreakTable():
 	tableSize = 0
 	indexTable = [0] * UnicodeCharacterCount
@@ -150,10 +111,9 @@ def updateGraphemeBreakTable():
 			index += 1
 
 	print('Grapheme Break value size', index, max(valueTable))
-	if True:
+	if False:
 		args = {
-			'table_var': 'CharClassify::GraphemeBreakTable',
-			'table': 'GraphemeBreakTable',
+			'tableName': 'GraphemeBreakTable',
 			'function': """static GraphemeBreak GetGraphemeBreak(unsigned int ch) noexcept {
 	if (ch > maxNonOtherChar) {
 		return GraphemeBreak::Other;
@@ -163,8 +123,6 @@ def updateGraphemeBreakTable():
 			'returnType': 'GraphemeBreak'
 		}
 
-		table, function = compressIndexTable('Unicode Grapheme Break', valueTable, args)
-
-	compressValueTable(valueTable)
+		table, function = buildMultiStageTable('Unicode Grapheme Break', valueTable, args)
 
 updateGraphemeBreakTable()

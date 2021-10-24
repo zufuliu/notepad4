@@ -10,7 +10,8 @@ from enum import IntFlag
 import re
 
 from FileGenerator import Regenerate
-from GenerateCharacterCategory import *
+from GenerateCharacterCategory import CharClassify, ClassifyMap
+from MultiStageTable import *
 from UnicodeData import *
 
 # Unicode Line Breaking Algorithm
@@ -85,11 +86,6 @@ for key, items in LineBreakPropertyMap.items():
 	for prop in items:
 		LineBreakMap[prop] = key
 
-def setRange(values, low, high, value):
-	while low <= high:
-		values[low] = value
-		low += 1
-
 kUnicodeLineBreak = []
 kUnicodeLineBreakVersion = unicodedata.unidata_version
 
@@ -163,8 +159,8 @@ def updateUnicodeLineBreak(filename):
 			lb = LineBreak.NonBreak
 		indexTable[ch] = int(lb)
 
-	#runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount], LineBreak.RLEValueBit)
-	#compressIndexTable('Unicode LineBreak', indexTable, args)
+	runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount], LineBreak.RLEValueBit)
+	#buildMultiStageTable('Unicode LineBreak', indexTable, args)
 
 	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), kUnicodeLineBreakVersion)]

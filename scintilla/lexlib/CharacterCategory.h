@@ -18,12 +18,6 @@ enum CharacterCategory {
 	ccCc, ccCf, ccCs, ccCo, ccCn
 };
 
-// `character` argument must be UTF-32 code point, otherwise the result is undefined.
-// see https://sourceforge.net/p/scintilla/feature-requests/1259/ for these changes.
-#define CHARACTERCATEGORY_USE_BINARY_SEARCH		0
-// most calls already checked for ASCII, optimization for Latin-1 may not benefit a lot.
-#define CHARACTERCATEGORY_OPTIMIZE_LATIN1		0
-
 CharacterCategory CategoriseCharacter(int character) noexcept;
 
 // Common definitions of allowable characters in identifiers from UAX #31.

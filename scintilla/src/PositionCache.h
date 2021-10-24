@@ -256,6 +256,7 @@ public:
 		lengthStartSubdivision = 300
 	};
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
+	// 100 + 35 (longest emoji sequence) + 4 (UTF8MaxBytes)
 	enum {
 		lengthEachSubdivision = 128 + 12
 	};

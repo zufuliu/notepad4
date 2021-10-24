@@ -1086,10 +1086,11 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 		&& IsDBCSTrailByteNoExcept(cb.UCharAt(pos + 1));
 }
 
-// Need to break text into segments near lengthSegment but taking into
-// account the encoding to not break inside a UTF-8 or DBCS character
-// and also trying to avoid breaking inside a pair of combining characters,
-// or inside ligatures. TODO: implement grapheme cluster boundaries,
+// Need to break text into segments near end but taking into account the
+// encoding to not break inside a UTF-8 or DBCS character and also trying
+// to avoid breaking inside a pair of combining characters, or inside
+// ligatures.
+// TODO: implement grapheme cluster boundaries,
 // see https://www.unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries.
 //
 // The segment length must always be long enough (more than 4 bytes)
@@ -1098,7 +1099,7 @@ bool Document::IsDBCSDualByteAt(Sci::Position pos) const noexcept {
 // In preference order from best to worst:
 //   1) Break before or after spaces or controls
 //   2) Break at word and punctuation boundary for better kerning and ligature support
-//   3) Break after whole character, this may breaks combining characters
+//   3) Break after whole character, this may break combining characters
 
 size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFamily encodingFamily) const noexcept {
 	const char * const end = text + lengthSegment;
@@ -1125,7 +1126,7 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 
 		it = end;
 		if (encodingFamily != EncodingFamily::eightBit && ccPrev == CharacterClass::word) {
-			// for UTF-8 go back the start of last character.
+			// for UTF-8 go back to the start of last character.
 			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
 				--it;
 			}
