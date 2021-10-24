@@ -37,7 +37,10 @@ def setRange(table, low, high, value):
 
 def dumpArray(items, step, fmt='%d'):
 	lines = []
-	if step:
+	if step == 1:
+		fmt += ','
+		lines.extend(fmt % value for value in items)
+	elif step:
 		for i in range(0, len(items), step):
 			line = ", ".join(fmt % value for value in items[i:i+step]) + ","
 			lines.append(line)
@@ -52,12 +55,6 @@ def getMinTableSize(table, defaultValue):
 		if value != defaultValue:
 			lastIndex = index
 	return lastIndex + 1
-
-def _startsWith(prev, current):
-	for index, value in enumerate(current):
-		if prev[index] != value:
-			return False
-	return True
 
 def _compressTable(table, shift):
 	indexList = []
@@ -78,10 +75,10 @@ def _compressTable(table, shift):
 	blockList = list(blockMap.keys())
 	dataCount = len(blockList) << shift
 	if remain:
-		block = table[-remain:]
+		block = tuple(table[-remain:])
 		found = False
 		for index, prev in enumerate(blockList):
-			if _startsWith(prev, block):
+			if block == prev[:remain]:
 				found = True
 				break
 		if not found:
@@ -103,7 +100,7 @@ def _compressTableEx(table, secondLevel=True):
 	level1MaxShift = len(table).bit_length()
 
 	minSize = sys.maxsize
-	minResult = {}
+	minResult = None
 	for level1Shift in range(1, level1MaxShift):
 		level1IndexList, level1BlockList, level1DataCount = _compressTable(table, level1Shift)
 		level1Size = level1DataCount*level1ItemSize
@@ -139,6 +136,36 @@ def _compressTableEx(table, secondLevel=True):
 
 	return minSize, minResult
 
+def _getMergedLength(prev, current):
+	if prev[-1] == current[0]:
+		length = len(current)
+		for merged in range(2, length + 1):
+			if prev[-merged:] != current[:merged]:
+				return merged - 1
+		return length
+	return 0
+
+def _mergeBlockList(blockList, indexList):
+	blockData = []
+	blockOffset = [0]*len(blockList)
+	prev = None
+	for index, block in enumerate(blockList):
+		blockOffset[index] = len(blockData)
+		if prev == None:
+			blockData.extend(block)
+		else:
+			offset = len(blockData)
+			if merged := _getMergedLength(prev, block):
+				offset -= merged
+				blockData.extend(block[merged:])
+			else:
+				blockData.extend(block)
+			blockOffset[index] = offset
+		prev = block
+
+	offsetList = [blockOffset[value] for value in indexList]
+	return offsetList, blockData
+
 def _preShift(indexList, shift):
 	maxItem = max(indexList)
 	remain = 8*getItemSize(maxItem) - maxItem.bit_length();
@@ -149,8 +176,7 @@ def _preShift(indexList, shift):
 			indexList[index] <<= remain
 	return shift
 
-def buildMultiStageTable(head, dataTable, args):
-	secondLevel = args.get('secondLevel', True)
+def buildMultiStageTable(head, dataTable, args=None, secondLevel=True):
 	startTime = time.perf_counter_ns()
 	minSize, minResult = _compressTableEx(dataTable, secondLevel)
 	endTime = time.perf_counter_ns()
@@ -172,7 +198,9 @@ def buildMultiStageTable(head, dataTable, args):
 		size += len(level1IndexList)*indexItemSize
 
 	assert minSize == size, (head, minSize, size)
-	print(f'{head} compress time: {(endTime - startTime)/1e6}, {secondLevel} size: {minSize}, {minSize/1024}')
+	print(f'{head} compress time: {(endTime - startTime)/1e6}, {secondLevel} size: {minSize} {minSize/1024}')
+	if not args:
+		return [], []
 
 	typeMap = {
 		1: 'unsigned char',
@@ -420,11 +448,11 @@ def _compressTableSkipDefault(table, shift):
 
 	dataCount = len(blockList) << shift
 	if remain:
-		block = table[-remain:]
-		if not defaultBlock or not _startsWith(defaultBlock, block):
+		block = tuple(table[-remain:])
+		if defaultBlock == None or block != defaultBlock[:remain]:
 			found = False
 			for index, prev in enumerate(blockList):
-				if _startsWith(prev, block):
+				if block == prev[:remain]:
 					found = True
 					break
 			if not found:
@@ -432,7 +460,6 @@ def _compressTableSkipDefault(table, shift):
 				index = len(blockList)
 				blockList.append(block)
 			indexList.append((len(table) >> shift, index))
-
 	return indexList, blockList, dataCount, defaultBlock
 
 def rangeBlockEncode(head, table):
@@ -447,9 +474,101 @@ def rangeBlockEncode(head, table):
 		size = dataCount*itemSize + len(indexList)*indexItemSize
 		if size < minSize:
 			minSize = size
-			minResult = shift, indexList, blockList, defaultBlock
+			minResult = {
+				'shift': shift,
+				'indexList': indexList,
+				'blockList': blockList,
+				'defaultBlock': defaultBlock,
+			}
 
 	endTime = time.perf_counter_ns()
-	defaultBlock = minResult[-1]
+	defaultBlock = minResult['defaultBlock']
 	defaultValue = defaultBlock[0] if defaultBlock else None
-	print(f'{head} compress time: {(endTime - startTime)/1e6}, size: {minSize}, {minSize/1024}, default: {defaultValue}')
+	print(f'{head} compress time: {(endTime - startTime)/1e6}, size: {minSize} {minSize/1024}, default: {defaultValue}')
+
+def compressTableMerged(head, table, secondLevel=True):
+	startTime = time.perf_counter_ns()
+	level1ItemSize = getItemSize(table)
+	level1MaxShift = len(table).bit_length()
+
+	minSize = sys.maxsize
+	minResult = None
+	for level1Shift in range(1, level1MaxShift):
+		level1IndexList, level1BlockList, level1DataCount = _compressTable(table, level1Shift)
+		level1OffsetList, level1BlockData = _mergeBlockList(level1BlockList, level1IndexList)
+		level1Merged = False
+
+		minLevel2Result = None
+		if secondLevel:
+			level2ItemSize = getItemSize(level1IndexList)
+			level2MaxShift = len(level1IndexList).bit_length()
+			minLevel2Size = sys.maxsize
+			for level2Shift in range(1, level2MaxShift):
+				level2IndexList, level2BlockList, level2DataCount = _compressTable(level1IndexList, level2Shift)
+				level2OffsetList, level2BlockData = _mergeBlockList(level2BlockList, level2IndexList)
+
+				level2Size = level2DataCount*level2ItemSize + len(level2IndexList)*getItemSize(level2IndexList)
+				level2SizeM = len(level2BlockData)*level2ItemSize + len(level2OffsetList)*getItemSize(level2OffsetList)
+				if level2Merged := level2Size > level2SizeM:
+					level2Size = level2SizeM
+				if level2Size < minLevel2Size:
+					minLevel2Size = level2Size
+					minLevel2Result = {
+						'level2Shift': level2Shift,
+						'level2IndexList': level2IndexList,
+						'level2BlockList': level2BlockList,
+						'level2Merged': level2Merged,
+						'level2OffsetList': level2OffsetList,
+						'level2BlockData': level2BlockData,
+					}
+
+			level1Size = level1DataCount*level1ItemSize + minLevel2Size
+			dataSize = len(level1BlockData)*level1ItemSize
+			minLevel2Size = level1Size - dataSize
+			if minLevel2Size > 0:
+				level2ItemSize = getItemSize(level1OffsetList)
+				for level2Shift in range(1, level2MaxShift):
+					level2IndexList, level2BlockList, level2DataCount = _compressTable(level1OffsetList, level2Shift)
+					level2OffsetList, level2BlockData = _mergeBlockList(level2BlockList, level2IndexList)
+
+					level2Size = level2DataCount*level2ItemSize + len(level2IndexList)*getItemSize(level2IndexList)
+					level2SizeM = len(level2BlockData)*level2ItemSize + len(level2OffsetList)*getItemSize(level2OffsetList)
+					if level2Merged := level2Size > level2SizeM:
+						level2Size = level2SizeM
+					if level2Size < minLevel2Size:
+						minLevel2Size = level2Size
+						level1Size = dataSize + level2Size
+						level1Merged = True
+						minLevel2Result = {
+							'level2Shift': level2Shift,
+							'level2IndexList': level2IndexList,
+							'level2BlockList': level2BlockList,
+							'level2Merged': level2Merged,
+							'level2OffsetList': level2OffsetList,
+							'level2BlockData': level2BlockData,
+						}
+		else:
+			level1Size = level1DataCount*level1ItemSize + len(level1IndexList)*getItemSize(level1IndexList)
+			level1SizeM = len(level1BlockData)*level1ItemSize + len(level1OffsetList)*getItemSize(level1OffsetList)
+			if level1Merged := level1Size > level1SizeM:
+				level1Size = level1SizeM
+
+		if level1Size < minSize:
+			minSize = level1Size
+			minResult = {
+				'level1Shift': level1Shift,
+				'level1IndexList': level1IndexList,
+				'level1BlockList': level1BlockList,
+				'level1Merged': level1Merged,
+				'level1OffsetList': level1OffsetList,
+				'level1BlockData': level1BlockData,
+			}
+			if minLevel2Result:
+				minResult.update(minLevel2Result)
+
+	endTime = time.perf_counter_ns()
+	print(f'{head} compress time: {(endTime - startTime)/1e6}, {secondLevel} size: {minSize} {minSize/1024}')
+	if secondLevel:
+		print(f"{head} shift: {minResult['level1Shift']} {minResult['level2Shift']}, merged: {minResult['level1Merged']} {minResult['level2Merged']}")
+	else:
+		print(f"{head} shift: {minResult['level1Shift']}, merged: {minResult['level1Merged']}")
