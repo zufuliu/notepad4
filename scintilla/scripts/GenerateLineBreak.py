@@ -119,7 +119,7 @@ def updateUnicodeLineBreak(filename):
 		indexTable[ch] = int(lb)
 
 	runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount], LineBreak.RLEValueBit)
-	args = {
+	config = {
 		'tableName': 'lineBreakTable',
 		'function': """LineBreakProperty GetLineBreakProperty(uint32_t ch) noexcept {
 	if (ch >= maxUnicode) {
@@ -128,7 +128,7 @@ def updateUnicodeLineBreak(filename):
 """,
 		'returnType': 'LineBreakProperty',
 	}
-	buildMultiStageTable('Unicode LineBreak', indexTable, args)
+	buildMultiStageTable('Unicode LineBreak', indexTable, config)
 
 	output = ["// Created with Python %s, Unicode %s" % (
 		platform.python_version(), version)]

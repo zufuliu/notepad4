@@ -26,16 +26,9 @@ class GraphemeBreakProperty(IntEnum):
 	ZeroWidthJoiner = 14
 	Sentinel = 15
 
-GraphemeBreakPropertyMap = {
-	'Other': GraphemeBreakProperty.Other,
-	'CR': GraphemeBreakProperty.CR,
-	'LF': GraphemeBreakProperty.LF,
-	'Control': GraphemeBreakProperty.Control,
-	'Extend': GraphemeBreakProperty.Extend,
+GraphemeBreakPropertyMap = GraphemeBreakProperty.__members__ | {
 	'Regional_Indicator': GraphemeBreakProperty.RegionalIndicator,
 	'RI': GraphemeBreakProperty.RegionalIndicator,
-	'Prepend': GraphemeBreakProperty.Prepend,
-	'SpacingMark': GraphemeBreakProperty.SpacingMark,
 	'L': GraphemeBreakProperty.HangulL,
 	'V': GraphemeBreakProperty.HangulV,
 	'T': GraphemeBreakProperty.HangulT,
@@ -136,14 +129,15 @@ def updateGraphemeBreakTable(filename):
 	graphemeBreakTable = [defaultValue] * UnicodeCharacterCount
 	# https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt
 	version, propertyList = readUnicodePropertyFile('emoji-data.txt')
-	buildUnicodePropertyTable(graphemeBreakTable, GraphemeBreakPropertyMap, propertyList)
+	updateUnicodePropertyTable(graphemeBreakTable, GraphemeBreakPropertyMap, propertyList)
 	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakProperty.txt
 	version, propertyList = readUnicodePropertyFile('GraphemeBreakProperty.txt')
-	buildUnicodePropertyTable(graphemeBreakTable, GraphemeBreakPropertyMap, propertyList)
+	updateUnicodePropertyTable(graphemeBreakTable, GraphemeBreakPropertyMap, propertyList)
 
 	tableSize = getMinTableSize(graphemeBreakTable, defaultValue)
 	print(f'Grapheme Break table size: {tableSize}, last value: {GraphemeBreakProperty(graphemeBreakTable[tableSize - 1]).name}')
 
+	# https://www.unicode.org/emoji/charts/full-emoji-modifiers.html
 	# https://www.unicode.org/Public/emoji/latest/emoji-zwj-sequences.txt
 	longestSquenceCount, longestSquenceBytes = findLongestCharacterSquence('emoji-zwj-sequences.txt')
 	buildGraphemeClusterBoundary()
@@ -202,7 +196,7 @@ GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
 
 	output.append('')
 	output.append('#else')
-	args = {
+	config = {
 		'tableName': 'graphemeBreakTable',
 		'function': """GraphemeBreakProperty GetGraphemeBreakProperty(uint32_t ch) noexcept {
 	if (ch >= maxUnicodeGraphemeBreakCharacter) {
@@ -212,7 +206,7 @@ GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
 		'returnType': 'GraphemeBreakProperty'
 	}
 
-	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, args)
+	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config)
 	output.extend(table)
 	output.append('')
 	output.extend(function)

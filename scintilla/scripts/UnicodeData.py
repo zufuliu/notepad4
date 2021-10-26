@@ -55,7 +55,7 @@ def readUnicodePropertyFile(path, propertyIndex=1):
 	print(path, version, ', '.join(propertyList.keys()))
 	return version, propertyList
 
-def buildUnicodePropertyTable(table, propertyMap, propertyList):
+def updateUnicodePropertyTable(table, propertyMap, propertyList):
 	for name, codeList in propertyList.items():
 		if name not in propertyMap:
 			continue

@@ -367,7 +367,7 @@ def updateCharClassifyTable(filename, headfile):
 	output.append("}") # namespace
 	output.append("")
 
-	args = {
+	config = {
 		'tableVarName': 'CharClassify::CharClassifyTable',
 		'tableName': 'CharClassifyTable',
 		'function': """static CharacterClass ClassifyCharacter(unsigned int ch) noexcept {
@@ -383,7 +383,7 @@ def updateCharClassifyTable(filename, headfile):
 		'returnType': 'CharacterClass'
 	}
 
-	table, function = buildMultiStageTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], args)
+	table, function = buildMultiStageTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], config)
 	output.extend(table)
 	head_output.extend('\t' + line for line in function)
 
@@ -412,7 +412,7 @@ def updateCharacterCategoryTable(filename):
 	output.append("")
 	output.append("#else")
 
-	args = {
+	config = {
 		'tableName': 'catTable',
 		'function': """CharacterCategory CategoriseCharacter(int character) noexcept {
 	if (character < 0 || character > maxUnicode) {
@@ -420,7 +420,7 @@ def updateCharacterCategoryTable(filename):
 	}""",
 		'returnType': 'CharacterCategory',
 	}
-	table, function = buildMultiStageTable('CharacterCategory', indexTable, args)
+	table, function = buildMultiStageTable('CharacterCategory', indexTable, config)
 	output.append("")
 	output.extend(table)
 
@@ -486,7 +486,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 		output.append("")
 
 	if False:
-		args = {
+		config = {
 			'tableName': 'CharClassifyTable' + suffix,
 			'function': """CharClassify::cc ClassifyCharacter%s(unsigned int ch) noexcept {
 	if (ch > maxDBCSCharacter) {
@@ -497,7 +497,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 			'returnType': 'CharClassify::cc'
 		}
 
-		table, function = buildMultiStageTable(head, indexTable, args)
+		table, function = buildMultiStageTable(head, indexTable, config)
 		output.extend(table)
 		output.append('')
 		output.extend(function)

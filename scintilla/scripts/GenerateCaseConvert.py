@@ -341,14 +341,14 @@ def updateCaseSensitivity(filename, test=False):
 
 	print('Unicode Case Sensitivity maskList:', len(maskList), 'indexTable:', len(indexTable), maskCount, maxCh)
 
-	args = {
+	config = {
 		'tableName': 'UnicodeCaseSensitivityIndex',
 		'function': """static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {
 	const uint32_t lower = ch & 31;
 	ch = (ch - kUnicodeCaseSensitiveFirst) >> 5;""",
 	}
 
-	table, function = buildMultiStageTable('Unicode Case Sensitivity', indexTable, args)
+	table, function = buildMultiStageTable('Unicode Case Sensitivity', indexTable, config)
 	table[0] = 'static ' + table[0]
 	function.append('\treturn bittest(UnicodeCaseSensitivityMask + ch, lower);')
 	function.append('}')

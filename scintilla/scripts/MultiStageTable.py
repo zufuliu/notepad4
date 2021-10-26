@@ -12,10 +12,23 @@ def getItemSize(items):
 		maxItem = items
 	if maxItem < 256:
 		return 1
-	elif maxItem < 65536:
+	if maxItem < 65536:
 		return 2
-	else:
-		return 4
+	return 4
+
+def getValueSize(value):
+	if value < 256:
+		return 1
+	if value < 65536:
+		return 2
+	return 4
+
+def sizeForBitCount(bitCount):
+	if bitCount <= 8:
+		return 1
+	if bitCount <= 16:
+		return 2
+	return 4
 
 def alignUp(value, align):
 	value, rem = divmod(value, align)
@@ -95,45 +108,29 @@ def _compressTable(table, shift):
 			assert expect == value, (index, expect, value)
 	return indexList, blockList, dataCount
 
-def _compressTableEx(table, secondLevel=True):
-	level1ItemSize = getItemSize(table)
-	level1MaxShift = len(table).bit_length()
-
+def _compressTableEx(table, itemSize, level):
 	minSize = sys.maxsize
 	minResult = None
-	for level1Shift in range(1, level1MaxShift):
-		level1IndexList, level1BlockList, level1DataCount = _compressTable(table, level1Shift)
-		level1Size = level1DataCount*level1ItemSize
+	for shift in range(1, len(table).bit_length()):
+		indexList, blockList, dataCount = _compressTable(table, shift)
+		dataSize = dataCount*itemSize
 
-		minLevel2Result = None
-		if secondLevel:
-			level2ItemSize = getItemSize(level1IndexList)
-			level2MaxShift = len(level1IndexList).bit_length()
-			minLevel2Size = sys.maxsize
-			for level2Shift in range(1, level2MaxShift):
-				level2IndexList, level2BlockList, level2DataCount = _compressTable(level1IndexList, level2Shift)
-				level2Size = level2DataCount*level2ItemSize + len(level2IndexList)*getItemSize(level2IndexList)
-				if level2Size < minLevel2Size:
-					minLevel2Size = level2Size
-					minLevel2Result = {
-						'level2Shift': level2Shift,
-						'level2IndexList': level2IndexList,
-						'level2BlockList': level2BlockList,
-					}
-			level1Size += minLevel2Size
+		indexItemSize = getValueSize(len(blockList) - 1)
+		if level > 1:
+			size, result = _compressTableEx(indexList, indexItemSize, level - 1)
+			size += dataSize
+			if size < minSize:
+				minSize = size
+				result.append((shift, indexList, blockList))
+				minResult = result
 		else:
-			level1Size += len(level1IndexList)*getItemSize(level1IndexList)
+			dataSize += len(indexList)*indexItemSize
+			if dataSize < minSize:
+				minSize = dataSize
+				minResult = shift, indexList, blockList
 
-		if level1Size < minSize:
-			minSize = level1Size
-			minResult = {
-				'level1Shift': level1Shift,
-				'level1IndexList': level1IndexList,
-				'level1BlockList': level1BlockList,
-			}
-			if minLevel2Result:
-				minResult.update(minLevel2Result)
-
+	if level == 1:
+		minResult = [minResult]
 	return minSize, minResult
 
 def _getMergedLength(prev, current):
@@ -147,20 +144,19 @@ def _getMergedLength(prev, current):
 
 def _mergeBlockList(blockList, indexList):
 	blockData = []
-	blockOffset = [0]*len(blockList)
+	blockOffset = []
 	prev = None
 	for index, block in enumerate(blockList):
-		blockOffset[index] = len(blockData)
+		offset = len(blockData)
 		if prev == None:
 			blockData.extend(block)
 		else:
-			offset = len(blockData)
 			if merged := _getMergedLength(prev, block):
 				offset -= merged
 				blockData.extend(block[merged:])
 			else:
 				blockData.extend(block)
-			blockOffset[index] = offset
+		blockOffset.append(offset)
 		prev = block
 
 	offsetList = [blockOffset[value] for value in indexList]
@@ -168,7 +164,7 @@ def _mergeBlockList(blockList, indexList):
 
 def _preShift(indexList, shift):
 	maxItem = max(indexList)
-	remain = 8*getItemSize(maxItem) - maxItem.bit_length();
+	remain = 8*getValueSize(maxItem) - maxItem.bit_length();
 	if remain != 0:
 		remain = min(remain, shift)
 		shift -= remain
@@ -176,189 +172,178 @@ def _preShift(indexList, shift):
 			indexList[index] <<= remain
 	return shift
 
-def buildMultiStageTable(head, dataTable, args=None, secondLevel=True):
+def buildMultiStageTable(head, dataTable, config=None, level=2):
+	assert level >= 1
 	startTime = time.perf_counter_ns()
-	minSize, minResult = _compressTableEx(dataTable, secondLevel)
+	itemSize = getItemSize(dataTable)
+	minSize, minResult = _compressTableEx(dataTable, itemSize, level)
 	endTime = time.perf_counter_ns()
 
-	level1Shift = minResult['level1Shift']
-	level1BlockList = list(itertools.chain.from_iterable(minResult['level1BlockList']))
-	level1ItemSize = getItemSize(level1BlockList)
-	size = len(level1BlockList)*level1ItemSize
-	if secondLevel:
-		level2Shift = minResult['level2Shift']
-		level2IndexList = minResult['level2IndexList']
-		level2BlockList = list(itertools.chain.from_iterable(minResult['level2BlockList']))
-		indexItemSize = getItemSize(level2IndexList)
-		level2ItemSize = getItemSize(level2BlockList)
-		size += len(level2IndexList)*indexItemSize + len(level2BlockList)*level2ItemSize
-	else:
-		level1IndexList = minResult['level1IndexList']
-		indexItemSize = getItemSize(level1IndexList)
-		size += len(level1IndexList)*indexItemSize
+	size = 0
+	tableList = []
+	shiftList = []
+	for index, result in enumerate(minResult):
+		shiftList.append(result[0])
+		if index == 0:
+			indexList = result[1]
+			itemSize = getItemSize(indexList)
+			size += len(indexList)*itemSize
+			tableList.append({
+				'itemSize': itemSize,
+				'dataList': indexList,
+			})
 
+		blockData = list(itertools.chain.from_iterable(result[2]))
+		itemSize = getItemSize(blockData)
+		size += len(blockData)*itemSize
+		tableList.append({
+			'itemSize': itemSize,
+			'dataList': blockData,
+		})
+
+	dataSize = len(tableList[-1]['dataList'])*tableList[-1]['itemSize']
 	assert minSize == size, (head, minSize, size)
-	print(f'{head} compress time: {(endTime - startTime)/1e6}, {secondLevel} size: {minSize} {minSize/1024}')
-	if not args:
+	print(f'{head} compress {level} time: {(endTime - startTime)/1e6}, size: {minSize, dataSize} {minSize/1024}')
+	if not config:
 		return [], []
+
+	shiftList = list(itertools.accumulate(reversed(shiftList)))
+	shiftList.reverse()
+	for index, shift in enumerate(shiftList):
+		table = tableList[index]
+		table['shift'] = shift
+		table['mask'] = (1 << shift) - 1
+		table['leftShift'] = _preShift(table['dataList'], shift)
+
+	if True:
+		startTime = time.perf_counter_ns()
+		dataList = tableList[-1]['dataList']
+		for index, expect in enumerate(dataTable):
+			offset = index
+			for k in range(level):
+				table = tableList[k]
+				offset = (table['dataList'][offset >> table['shift']] << table['leftShift']) | (offset & table['mask'])
+			value = dataList[offset]
+			if expect != value:
+				print(f'{head} first verify {level} fail: {index:04X}, expect: {expect}, got: {value}')
+				return None
+		endTime = time.perf_counter_ns()
+		print(f'{head} first verify {level} time: {(endTime - startTime)/1e6}')
+
+	# merge table by item size
+	tableGroup = {
+		1: {},
+		2: {},
+		4: {},
+	}
+	for index, table in enumerate(tableList):
+		offset = 0
+		group = tableGroup[table['itemSize']]
+		if group:
+			offset = len(group['dataList'])
+		else:
+			group['suffix'] = ''
+			group['tableList'] = []
+			group['dataList'] = []
+		table['offset'] = offset
+		group['tableList'].append(index)
+		group['dataList'].extend(table['dataList'])
+
+	if False:
+		startTime = time.perf_counter_ns()
+		dataList = tableGroup[tableList[-1]['itemSize']]['dataList']
+		for index, expect in enumerate(dataTable):
+			offset = index
+			for k in range(level):
+				table = tableList[k]
+				indexList = tableGroup[table['itemSize']]['dataList']
+				offset = (indexList[(offset >> table['shift']) + table['offset']] << table['leftShift']) | (offset & table['mask'])
+			value = dataList[offset + tableList[-1]['offset']]
+			if expect != value:
+				print(f'{head} second verify {level} fail: {index:04X}, expect: {expect}, got: {value}')
+				return None
+		endTime = time.perf_counter_ns()
+		print(f'{head} second verify {level} time: {(endTime - startTime)/1e6}')
+
+	tableGroup = dict(item for item in tableGroup.items() if item[1])
+	count = len(tableGroup)
+	if count > 1:
+		# add suffix for index table
+		index = 1
+		dataSize = tableList[-1]['itemSize']
+		for itemSize, group in tableGroup.items():
+			if itemSize != dataSize:
+				if count == 2:
+					group['suffix'] = 'Index'
+				else:
+					group['suffix'] = f'Index{index}'
+					index += 1
+	if count != len(tableList):
+		# add comment for merged table content
+		count = len(tableList) - 1
+		for index, table in enumerate(tableList):
+			group = tableGroup[table['itemSize']]
+			if index < count:
+				if count == 1:
+					table['comment'] = 'index'
+				else:
+					table['comment'] = f'index {index + 1}'
+			elif len(group['tableList']) != 1:
+				table['comment'] = 'values'
 
 	typeMap = {
 		1: 'unsigned char',
 		2: 'unsigned short',
+		4: 'unsigned int',
 	}
-	tableName = args['tableName']
-	tableVarName = args.get('tableVarName', tableName)
-	definition = args['function']
+
+	tableName = config['tableName']
+	tableVarName = config.get('tableVarName', tableName)
+	itemCount = config.get('itemCount', 20)
+	content = []
+	for itemSize, group in tableGroup.items():
+		if content:
+			content.append('')
+		content.append(f"const {typeMap[itemSize]} {tableVarName}{group['suffix']}[] = {{")
+		for index in group['tableList']:
+			table = tableList[index]
+			if comment := table.get('comment', ''):
+				content.append(f'// {tableName} {comment}')
+			content.extend(dumpArray(table['dataList'], itemCount))
+		content.append('};')
+
+	definition = config['function']
 	varName = re.findall(r'\w+\s+(\w+)\s*\)', definition)[0]
-	returnType = args.get('returnType', None)
-	table = []
+	indent = config.get('indent', '\t')
 	function = definition.splitlines()
-
-	if secondLevel:
-		level1Mask = (1 << level1Shift) - 1
-		level1LeftShift = _preShift(level2BlockList, level1Shift)
-		level2Shift += level1Shift
-		level2Mask = (1 << level2Shift) - 1
-		level2LeftShift = _preShift(level2IndexList, level2Shift)
-		for index, expect in enumerate(dataTable):
-			offset = (level2IndexList[index >> level2Shift] << level2LeftShift) | (index & level2Mask)
-			offset = (level2BlockList[offset >> level1Shift] << level1LeftShift) | (offset & level1Mask)
-			value = level1BlockList[offset]
-			if expect != value:
-				print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (index, expect, value))
-				return None
-
-		indexTableName = [tableName, tableName]
-		dataOffset = [0, 0]
-		if indexItemSize == level2ItemSize == level1ItemSize:
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}[] = {{')
-			table.append(f'// {tableName} index 1')
-			table.extend(dumpArray(level2IndexList, 20))
-
-			dataOffset[0] = len(level2IndexList)
-			table.append(f'// {tableName} index 2')
-			table.extend(dumpArray(level2BlockList, 20))
-
-			dataOffset[1] = len(level2IndexList) + len(level2BlockList)
-			table.append(f'// {tableName} values')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-		elif indexItemSize == level2ItemSize:
-			indexTableName[0] = tableName + 'Index'
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}Index[] = {{')
-			table.append(f'// {tableName} index 1')
-			table.extend(dumpArray(level2IndexList, 20))
-
-			dataOffset[0] = len(level2IndexList)
-			indexTableName[1] = tableName + 'Index'
-			table.append(f'// {tableName} index 2')
-			table.extend(dumpArray(level2BlockList, 20))
-			table.append('};')
-
-			table.append('')
-			table.append(f'const {typeMap[level1ItemSize]} {tableVarName}[] = {{')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-		elif indexItemSize == level1ItemSize:
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}[] = {{')
-			table.append(f'// {tableName} index 1')
-			table.extend(dumpArray(level2IndexList, 20))
-
-			dataOffset[1] = len(level2IndexList)
-			table.append(f'// {tableName} values')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-
-			indexTableName[1] = tableName + 'Index'
-			table.append('')
-			table.append(f'const {typeMap[level2ItemSize]} {tableVarName}Index[] = {{')
-			table.extend(dumpArray(level2BlockList, 20))
-			table.append('};')
-		elif level2ItemSize == level1ItemSize:
-			indexTableName[0] = tableName + 'Index'
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}Index[] = {{')
-			table.extend(dumpArray(level2IndexList, 20))
-			table.append('};')
-
-			table.append('')
-			table.append(f'const {typeMap[level2ItemSize]} {tableVarName}[] = {{')
-			table.append(f'// {tableName} index 2')
-			table.extend(dumpArray(level2BlockList, 20))
-
-			dataOffset[1] = len(level2BlockList)
-			table.append(f'// {tableName} values')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-		else:
-			indexTableName[0] = tableName + 'Index1'
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}Index1[] = {{')
-			table.extend(dumpArray(level2IndexList, 20))
-			table.append('};')
-
-			indexTableName[1] = tableName + 'Index2'
-			table.append('')
-			table.append(f'const {typeMap[level2ItemSize]} {tableVarName}Index2[] = {{')
-			table.extend(dumpArray(level2BlockList, 20))
-			table.append('};')
-
-			table.append('')
-			table.append(f'const {typeMap[level1ItemSize]} {tableVarName}[] = {{')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-
-		function.append(f'\t{varName} = ({indexTableName[0]}[{varName} >> {level2Shift}] << {level2LeftShift}) | ({varName} & {level2Mask});')
-		function.append(f'\t{varName} = ({indexTableName[1]}[({varName} >> {level1Shift}) + {dataOffset[0]}] << {level1LeftShift}) | ({varName} & {level1Mask});')
-		if returnType == None:
-			function.append(f'\t{varName} = {tableName}[{varName} + {dataOffset[1]}];')
-		elif returnType:
-			function.append(f'\treturn static_cast<{returnType}>({tableName}[{varName} + {dataOffset[1]}]);')
-			function.append('}')
-		else:
-			function.append(f'\treturn {tableName}[{varName} + {dataOffset[1]}];')
-			function.append('}')
+	for index in range(len(tableList) - 1):
+		table = tableList[index]
+		suffix = tableGroup[table['itemSize']]['suffix']
+		# index = (table[(index >> shift) + offset] << leftShift) | (index & mask)
+		stmt = f"{varName} >> {table['shift']}"
+		if offset := table['offset']:
+			stmt = f'({stmt}) + {offset}'
+		stmt = f'{tableName}{suffix}[{stmt}]'
+		if leftShift := table['leftShift']:
+			stmt = f'({stmt} << {leftShift})'
+		stmt = f"{indent}{varName} = {stmt} | ({varName} & {table['mask']});"
+		function.append(stmt)
+	# return static_cast<returnType>(table[index + offset])
+	offset = tableList[-1]['offset']
+	stmt = f'{varName} + {offset}' if offset else varName
+	stmt = f'{tableName}[{stmt}]'
+	returnType = config.get('returnType', None)
+	if returnType == None:
+		stmt = f'{indent}{varName} = {stmt};'
+	elif returnType:
+		stmt = f'{indent}return static_cast<{returnType}>({stmt});'
 	else:
-		level1LeftShift = _preShift(level1IndexList, level1Shift)
-		level1Mask = (1 << level1Shift) - 1
-		for index, expect in enumerate(dataTable):
-			offset = (level1IndexList[index >> level1Shift] << level1LeftShift) | (index & level1Mask)
-			value = level1BlockList[offset]
-			if expect != value:
-				print(f'{head} verify fail:', '%04X, expect: %d, got: %d' % (index, expect, value))
-				return None
+		stmt = f'{indent}return {stmt};'
+	function.append(stmt)
+	if returnType != None:
+		function.append('}')
 
-		indexTableName = tableName
-		dataOffset = 0
-		if indexItemSize == level1ItemSize:
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}[] = {{')
-			table.append(f'// {tableName} index')
-			table.extend(dumpArray(level1IndexList, 20))
-
-			dataOffset = len(level1IndexList)
-			table.append(f'// {tableName} values')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-		else:
-			indexTableName = tableName + 'Index'
-			table.append(f'const {typeMap[indexItemSize]} {tableVarName}Index[] = {{')
-			table.extend(dumpArray(level1IndexList, 20))
-			table.append('};')
-
-			table.append('')
-			table.append(f'const {typeMap[level1ItemSize]} {tableVarName}[] = {{')
-			table.extend(dumpArray(level1BlockList, 20))
-			table.append('};')
-
-		function.append(f'\t{varName} = ({indexTableName}[{varName} >> {level1Shift}] << {level1LeftShift}) | ({varName} & {level1Mask});')
-		if returnType == None:
-			function.append(f'\t{varName} = {tableName}[{varName} + {dataOffset}];')
-		elif returnType:
-			function.append(f'\treturn static_cast<{returnType}>({tableName}[{varName} + {dataOffset}]);')
-			function.append('}')
-		else:
-			function.append(f'\treturn {tableName}[{varName} + {dataOffset}];')
-			function.append('}')
-
-	return table, function
+	return content, function
 
 def runLengthEncode(head, table, valueBit, totalBit=16):
 	mask = (1 << valueBit) - 1
@@ -378,20 +363,22 @@ def runLengthEncode(head, table, valueBit, totalBit=16):
 	output = []
 	for value, count in values:
 		if count > maxLength:
-			output.extend([(maxLength << valueBit) | value] * (count // maxLength))
+			output.extend(itertools.repeat((maxLength << valueBit) | value, count // maxLength))
 			count = count % maxLength
 			if count == 0:
 				continue
 		output.append((count << valueBit) | value)
 
-	size = getItemSize(output)*len(output)
+	size = getItemSize(output)
+	assert size == sizeForBitCount(totalBit)
+	size *= len(output)
 	print(f'{head} RLE size: {len(output)} {size} {size/1024}')
 
 	result = []
 	for item in output:
 		value = item & mask
 		count = item >> valueBit
-		result.extend([value] * count)
+		result.extend(itertools.repeat(value, count))
 
 	assert result == table
 	return output
@@ -411,8 +398,8 @@ def rangeEncode(head, table, valueBit, sentinel=None):
 		rangeList.append(sentinel)
 
 	length = len(rangeList)
-	size = length*getItemSize(rangeList[-1])
-	print(f'{head} length: {length}, lookup: {length.bit_length()}, size: {size} {size/1024}')
+	size = length*getValueSize(rangeList[-1])
+	print(f'{head} lookup: {length} {length.bit_length()}, size: {size} {size/1024}')
 	return rangeList
 
 def _compressTableSkipDefault(table, shift):
@@ -462,113 +449,71 @@ def _compressTableSkipDefault(table, shift):
 			indexList.append((len(table) >> shift, index))
 	return indexList, blockList, dataCount, defaultBlock
 
-def rangeBlockEncode(head, table):
+def _rangeBlockEncode(head, table):
 	startTime = time.perf_counter_ns()
 	itemSize = getItemSize(table)
-	maxShift = len(table).bit_length()
 	minSize = sys.maxsize
 	minResult = None
-	for shift in range(1, maxShift):
+	for shift in range(1, len(table).bit_length()):
 		indexList, blockList, dataCount, defaultBlock = _compressTableSkipDefault(table, shift)
-		indexItemSize = alignUp(indexList[-1][0].bit_length() + len(blockList).bit_length(), 8) >> 3
+		indexItemSize = sizeForBitCount(indexList[-1][0].bit_length() + len(blockList).bit_length())
 		size = dataCount*itemSize + len(indexList)*indexItemSize
 		if size < minSize:
 			minSize = size
-			minResult = {
-				'shift': shift,
-				'indexList': indexList,
-				'blockList': blockList,
-				'defaultBlock': defaultBlock,
-			}
+			minResult = shift, indexList, blockList, defaultBlock
 
 	endTime = time.perf_counter_ns()
-	defaultBlock = minResult['defaultBlock']
+	shift, indexList, blockList, defaultBlock = minResult
 	defaultValue = defaultBlock[0] if defaultBlock else None
-	print(f'{head} compress time: {(endTime - startTime)/1e6}, size: {minSize} {minSize/1024}, default: {defaultValue}')
+	length = len(indexList)
+	print(f'{head} compress time: {(endTime - startTime)/1e6}, lookup: {length} {length.bit_length()}, size: {minSize} {minSize/1024}, default: {defaultValue}')
 
-def compressTableMerged(head, table, secondLevel=True):
-	startTime = time.perf_counter_ns()
-	level1ItemSize = getItemSize(table)
-	level1MaxShift = len(table).bit_length()
-
+def _compressTableMergedEx(table, itemSize, level):
 	minSize = sys.maxsize
 	minResult = None
-	for level1Shift in range(1, level1MaxShift):
-		level1IndexList, level1BlockList, level1DataCount = _compressTable(table, level1Shift)
-		level1OffsetList, level1BlockData = _mergeBlockList(level1BlockList, level1IndexList)
-		level1Merged = False
+	for shift in range(1, len(table).bit_length()):
+		indexList, blockList, dataCount = _compressTable(table, shift)
+		offsetList, blockData = _mergeBlockList(blockList, indexList)
+		dataSize = dataCount*itemSize
+		merged = False
 
-		minLevel2Result = None
-		if secondLevel:
-			level2ItemSize = getItemSize(level1IndexList)
-			level2MaxShift = len(level1IndexList).bit_length()
-			minLevel2Size = sys.maxsize
-			for level2Shift in range(1, level2MaxShift):
-				level2IndexList, level2BlockList, level2DataCount = _compressTable(level1IndexList, level2Shift)
-				level2OffsetList, level2BlockData = _mergeBlockList(level2BlockList, level2IndexList)
-
-				level2Size = level2DataCount*level2ItemSize + len(level2IndexList)*getItemSize(level2IndexList)
-				level2SizeM = len(level2BlockData)*level2ItemSize + len(level2OffsetList)*getItemSize(level2OffsetList)
-				if level2Merged := level2Size > level2SizeM:
-					level2Size = level2SizeM
-				if level2Size < minLevel2Size:
-					minLevel2Size = level2Size
-					minLevel2Result = {
-						'level2Shift': level2Shift,
-						'level2IndexList': level2IndexList,
-						'level2BlockList': level2BlockList,
-						'level2Merged': level2Merged,
-						'level2OffsetList': level2OffsetList,
-						'level2BlockData': level2BlockData,
-					}
-
-			level1Size = level1DataCount*level1ItemSize + minLevel2Size
-			dataSize = len(level1BlockData)*level1ItemSize
-			minLevel2Size = level1Size - dataSize
-			if minLevel2Size > 0:
-				level2ItemSize = getItemSize(level1OffsetList)
-				for level2Shift in range(1, level2MaxShift):
-					level2IndexList, level2BlockList, level2DataCount = _compressTable(level1OffsetList, level2Shift)
-					level2OffsetList, level2BlockData = _mergeBlockList(level2BlockList, level2IndexList)
-
-					level2Size = level2DataCount*level2ItemSize + len(level2IndexList)*getItemSize(level2IndexList)
-					level2SizeM = len(level2BlockData)*level2ItemSize + len(level2OffsetList)*getItemSize(level2OffsetList)
-					if level2Merged := level2Size > level2SizeM:
-						level2Size = level2SizeM
-					if level2Size < minLevel2Size:
-						minLevel2Size = level2Size
-						level1Size = dataSize + level2Size
-						level1Merged = True
-						minLevel2Result = {
-							'level2Shift': level2Shift,
-							'level2IndexList': level2IndexList,
-							'level2BlockList': level2BlockList,
-							'level2Merged': level2Merged,
-							'level2OffsetList': level2OffsetList,
-							'level2BlockData': level2BlockData,
-						}
+		indexItemSize = getValueSize(len(blockList) - 1)
+		if level > 1:
+			size, result = _compressTableMergedEx(indexList, indexItemSize, level - 1)
+			dataSize += size
+			blockSize = len(blockData)*itemSize
+			size = dataSize - blockSize
+			if size > 0:
+				mergedSize, mergedResult = _compressTableMergedEx(offsetList, getItemSize(offsetList), level - 1)
+				if mergedSize < size:
+					dataSize = blockSize + mergedSize
+					merged = True
+					result = mergedResult
+			if dataSize < minSize:
+				minSize = dataSize
+				result.append((shift, merged, indexList, blockList, offsetList, blockData))
+				minResult = result
 		else:
-			level1Size = level1DataCount*level1ItemSize + len(level1IndexList)*getItemSize(level1IndexList)
-			level1SizeM = len(level1BlockData)*level1ItemSize + len(level1OffsetList)*getItemSize(level1OffsetList)
-			if level1Merged := level1Size > level1SizeM:
-				level1Size = level1SizeM
+			dataSize += len(indexList)*indexItemSize
+			mergedSize = len(blockData)*itemSize + len(offsetList)*getItemSize(offsetList)
+			if dataSize > mergedSize:
+				merged = True
+				dataSize = mergedSize
+			if dataSize < minSize:
+				minSize = dataSize
+				minResult = shift, merged, indexList, blockList, offsetList, blockData
 
-		if level1Size < minSize:
-			minSize = level1Size
-			minResult = {
-				'level1Shift': level1Shift,
-				'level1IndexList': level1IndexList,
-				'level1BlockList': level1BlockList,
-				'level1Merged': level1Merged,
-				'level1OffsetList': level1OffsetList,
-				'level1BlockData': level1BlockData,
-			}
-			if minLevel2Result:
-				minResult.update(minLevel2Result)
+	if level == 1:
+		minResult = [minResult]
+	return minSize, minResult
 
+def _compressTableMerged(head, dataTable, level=1):
+	assert level >= 1
+	startTime = time.perf_counter_ns()
+	itemSize = getItemSize(dataTable)
+	minSize, minResult = _compressTableMergedEx(dataTable, itemSize, level)
 	endTime = time.perf_counter_ns()
-	print(f'{head} compress time: {(endTime - startTime)/1e6}, {secondLevel} size: {minSize} {minSize/1024}')
-	if secondLevel:
-		print(f"{head} shift: {minResult['level1Shift']} {minResult['level2Shift']}, merged: {minResult['level1Merged']} {minResult['level2Merged']}")
-	else:
-		print(f"{head} shift: {minResult['level1Shift']}, merged: {minResult['level1Merged']}")
+
+	merged = [item[1] for item in minResult]
+	merged.reverse()
+	print(f'{head} compress {level} time: {(endTime - startTime)/1e6}, size: {minSize} {minSize/1024}', merged)

@@ -3021,7 +3021,7 @@ public:
 	typedef wchar_t* pointer;
 	typedef wchar_t& reference;
 
-	UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0) noexcept :
+	explicit UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0) noexcept :
 		doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0), buffered{} {
 		buffered[0] = 0;
 		buffered[1] = 0;
