@@ -117,12 +117,12 @@ def _compressTableEx(table, itemSize, level):
 
 		indexItemSize = getValueSize(len(blockList) - 1)
 		if level > 1:
-			size, result = _compressTableEx(indexList, indexItemSize, level - 1)
-			size += dataSize
-			if size < minSize:
-				minSize = size
-				result.append((shift, indexList, blockList))
-				minResult = result
+			result = _compressTableEx(indexList, indexItemSize, level - 1)
+			dataSize += result[0]
+			if dataSize < minSize:
+				minSize = dataSize
+				minResult = result[1]
+				minResult.append((shift, indexList, blockList))
 		else:
 			dataSize += len(indexList)*indexItemSize
 			if dataSize < minSize:
@@ -478,27 +478,27 @@ def _compressTableMergedEx(table, itemSize, level):
 		merged = False
 
 		indexItemSize = getValueSize(len(blockList) - 1)
+		blockSize = len(blockData)*itemSize
 		if level > 1:
-			size, result = _compressTableMergedEx(indexList, indexItemSize, level - 1)
-			dataSize += size
-			blockSize = len(blockData)*itemSize
-			size = dataSize - blockSize
-			if size > 0:
-				mergedSize, mergedResult = _compressTableMergedEx(offsetList, getItemSize(offsetList), level - 1)
-				if mergedSize < size:
-					dataSize = blockSize + mergedSize
+			result = _compressTableMergedEx(indexList, indexItemSize, level - 1)
+			dataSize += result[0]
+			if dataSize > blockSize:
+				mergedResult = _compressTableMergedEx(offsetList, getItemSize(offsetList), level - 1)
+				blockSize += mergedResult[0]
+				if dataSize > blockSize:
 					merged = True
+					dataSize = blockSize
 					result = mergedResult
 			if dataSize < minSize:
 				minSize = dataSize
-				result.append((shift, merged, indexList, blockList, offsetList, blockData))
-				minResult = result
+				minResult = result[1]
+				minResult.append((shift, merged, indexList, blockList, offsetList, blockData))
 		else:
 			dataSize += len(indexList)*indexItemSize
-			mergedSize = len(blockData)*itemSize + len(offsetList)*getItemSize(offsetList)
-			if dataSize > mergedSize:
+			blockSize += len(offsetList)*getItemSize(offsetList)
+			if dataSize > blockSize:
 				merged = True
-				dataSize = mergedSize
+				dataSize = blockSize
 			if dataSize < minSize:
 				minSize = dataSize
 				minResult = shift, merged, indexList, blockList, offsetList, blockData
