@@ -178,7 +178,8 @@ constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBre
 	output.append('#define GraphemeBreakUseRangeList 0')
 	output.append('#if GraphemeBreakUseRangeList')
 	sentinel = (UnicodeCharacterCount << 4) | GraphemeBreakProperty.Other
-	rangeList = rangeEncode('Unicode Grapheme Break range', graphemeBreakTable, 4, sentinel)
+	valueBit, rangeList = rangeEncode('Unicode Grapheme Break range', graphemeBreakTable, sentinel=sentinel)
+	assert valueBit == 4
 	output.append('constexpr int graphemeBreakMask = 15;')
 	output.append('')
 	output.append('const int graphemeBreakRanges[] = {')

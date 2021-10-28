@@ -2,8 +2,15 @@
 # see Unicode Standard "5.1 Data Structures for Character Conversion".
 import sys
 import itertools
+from collections import Counter
 import time
 import re
+
+_sizeTypeMap = {
+	1: 'unsigned char',
+	2: 'unsigned short',
+	4: 'unsigned int',
+}
 
 def getItemSize(items):
 	try:
@@ -31,10 +38,10 @@ def sizeForBitCount(bitCount):
 	return 4
 
 def alignUp(value, align):
-	value, rem = divmod(value, align)
-	if rem:
-		value += 1
-	return value * align
+	remain = value % align
+	if remain:
+		value += align - remain
+	return value
 
 def bitValue(value, bitCount=16, separator='\''):
 	s = bin(value)[2:]
@@ -162,8 +169,7 @@ def _mergeBlockList(blockList, indexList):
 	offsetList = [blockOffset[value] for value in indexList]
 	return offsetList, blockData
 
-def _preShift(indexList, shift):
-	maxItem = max(indexList)
+def _preShift(indexList, maxItem, shift):
 	remain = 8*getValueSize(maxItem) - maxItem.bit_length();
 	if remain != 0:
 		remain = min(remain, shift)
@@ -186,18 +192,22 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 		shiftList.append(result[0])
 		if index == 0:
 			indexList = result[1]
-			itemSize = getItemSize(indexList)
+			maxItem = max(indexList)
+			itemSize = getValueSize(maxItem)
 			size += len(indexList)*itemSize
 			tableList.append({
 				'itemSize': itemSize,
+				'maxItem': maxItem,
 				'dataList': indexList,
 			})
 
 		blockData = list(itertools.chain.from_iterable(result[2]))
-		itemSize = getItemSize(blockData)
+		maxItem = max(blockData)
+		itemSize = getValueSize(maxItem)
 		size += len(blockData)*itemSize
 		tableList.append({
 			'itemSize': itemSize,
+			'maxItem': maxItem,
 			'dataList': blockData,
 		})
 
@@ -205,7 +215,7 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 	assert minSize == size, (head, minSize, size)
 	print(f'{head} compress {level} time: {(endTime - startTime)/1e6}, size: {minSize, dataSize} {minSize/1024}')
 	if not config:
-		return [], []
+		return None, None
 
 	shiftList = list(itertools.accumulate(reversed(shiftList)))
 	shiftList.reverse()
@@ -213,7 +223,7 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 		table = tableList[index]
 		table['shift'] = shift
 		table['mask'] = (1 << shift) - 1
-		table['leftShift'] = _preShift(table['dataList'], shift)
+		table['leftShift'] = _preShift(table['dataList'], table['maxItem'], shift)
 
 	if True:
 		startTime = time.perf_counter_ns()
@@ -252,13 +262,14 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 	if False:
 		startTime = time.perf_counter_ns()
 		dataList = tableGroup[tableList[-1]['itemSize']]['dataList']
+		dataOffset = tableList[-1]['offset']
 		for index, expect in enumerate(dataTable):
 			offset = index
 			for k in range(level):
 				table = tableList[k]
 				indexList = tableGroup[table['itemSize']]['dataList']
 				offset = (indexList[(offset >> table['shift']) + table['offset']] << table['leftShift']) | (offset & table['mask'])
-			value = dataList[offset + tableList[-1]['offset']]
+			value = dataList[offset + dataOffset]
 			if expect != value:
 				print(f'{head} second verify {level} fail: {index:04X}, expect: {expect}, got: {value}')
 				return None
@@ -291,12 +302,6 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 			elif len(group['tableList']) != 1:
 				table['comment'] = 'values'
 
-	typeMap = {
-		1: 'unsigned char',
-		2: 'unsigned short',
-		4: 'unsigned int',
-	}
-
 	tableName = config['tableName']
 	tableVarName = config.get('tableVarName', tableName)
 	itemCount = config.get('itemCount', 20)
@@ -304,7 +309,7 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 	for itemSize, group in tableGroup.items():
 		if content:
 			content.append('')
-		content.append(f"const {typeMap[itemSize]} {tableVarName}{group['suffix']}[] = {{")
+		content.append(f"const {_sizeTypeMap[itemSize]} {tableVarName}{group['suffix']}[] = {{")
 		for index in group['tableList']:
 			table = tableList[index]
 			if comment := table.get('comment', ''):
@@ -345,45 +350,71 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 
 	return content, function
 
-def runLengthEncode(head, table, valueBit, totalBit=16):
-	mask = (1 << valueBit) - 1
-	assert max(table) <= mask
-	maxLength = (1 << (totalBit - valueBit)) - 1
+def _divup(m, n):
+	quo = m // n
+	if m % n:
+		quo += 1
+	return quo
+
+def _runLengthEncode(table, valueBit=None, totalBit=None):
+	maxItem = max(table)
+	if not valueBit:
+		valueBit = maxItem.bit_length()
+	else:
+		assert maxItem < (1 << valueBit)
+
+	items = []
+	start = 0;
+	prev = table[0]
+	for index, value in enumerate(table):
+		if value != prev:
+			items.append((index - start, prev))
+			prev = value
+			start = index
+	items.append((len(table) - start, prev))
+
+	if not totalBit or totalBit <= valueBit:
+		minSize = sys.maxsize
+		for bitCount in (8, 16, 32):
+			if bitCount > valueBit:
+				maxLength = (1 << (bitCount - valueBit)) - 1
+				size = sum(_divup(item[0], maxLength) for item in items)
+				size *= sizeForBitCount(bitCount)
+				if size < minSize:
+					minSize = size
+					totalBit = bitCount
 
 	values = []
-	prevValue = table[0]
-	prevIndex = 0;
-	for index, value in enumerate(table):
-		if value != prevValue:
-			values.append((prevValue, index - prevIndex))
-			prevValue = value
-			prevIndex = index
-	values.append((prevValue, len(table) - prevIndex))
-
-	output = []
-	for value, count in values:
+	maxLength = (1 << (totalBit - valueBit)) - 1
+	for count, value in items:
 		if count > maxLength:
-			output.extend(itertools.repeat((maxLength << valueBit) | value, count // maxLength))
+			values.extend(itertools.repeat((maxLength << valueBit) | value, count // maxLength))
 			count = count % maxLength
 			if count == 0:
 				continue
-		output.append((count << valueBit) | value)
+		values.append((count << valueBit) | value)
 
-	size = getItemSize(output)
-	assert size == sizeForBitCount(totalBit)
-	size *= len(output)
-	print(f'{head} RLE size: {len(output)} {size} {size/1024}')
+	return valueBit, totalBit, values
+
+def runLengthEncode(head, table, valueBit=None, totalBit=None):
+	valueBit, totalBit, values = _runLengthEncode(table, valueBit=valueBit, totalBit=totalBit)
+	itemSize = sizeForBitCount(totalBit)
+	size = len(values)*itemSize
+	print(f'{head} RLE value bit: {totalBit} {valueBit}, length: {len(values)}, size: {size} {size/1024}')
 
 	result = []
-	for item in output:
+	mask = (1 << valueBit) - 1
+	for item in values:
 		value = item & mask
 		count = item >> valueBit
 		result.extend(itertools.repeat(value, count))
 
 	assert result == table
-	return output
+	return valueBit, totalBit, values
 
-def rangeEncode(head, table, valueBit, sentinel=None):
+def rangeEncode(head, table, valueBit=None, sentinel=None):
+	if not valueBit:
+		valueBit = max(table).bit_length()
 	rangeList = []
 	start = 0
 	prev = table[0]
@@ -392,81 +423,130 @@ def rangeEncode(head, table, valueBit, sentinel=None):
 			rangeList.append((start << valueBit) | prev)
 			start = index
 			prev = value
+
 	rangeList.append((start << valueBit) | prev)
 	if sentinel:
 		assert start < (sentinel >> valueBit)
 		rangeList.append(sentinel)
 
 	length = len(rangeList)
-	size = length*getValueSize(rangeList[-1])
-	print(f'{head} lookup: {length} {length.bit_length()}, size: {size} {size/1024}')
-	return rangeList
+	itemSize = getValueSize(rangeList[-1])
+	size = length*itemSize
+	print(f'{head} value bit: {itemSize*8} {valueBit}, lookup: {length} {length.bit_length()}, size: {size} {size/1024}')
+	return valueBit, rangeList
 
-def _compressTableSkipDefault(table, shift):
-	indexList = []
-	blockMap = {}
-	blockFreq = {}
-	tableSize = len(table)
-	blockSize = 1 << shift
-	if remain := tableSize & (blockSize - 1):
-		tableSize -= blockSize
-	for i in range(0, tableSize, blockSize):
-		block = tuple(table[i:i + blockSize])
-		try:
-			index = blockMap[block]
-			blockFreq[index] += 1
-		except KeyError:
-			index = len(blockMap)
-			blockMap[block] = index
-			blockFreq[index] = 1
-		indexList.append((i >> shift, index))
+def _dumpRunBlock(output, tableName, indexList, blockData, valueBit, shift):
+	itemSize = getItemSize(blockData)
+	indexItemSize = getItemSize(indexList)
+	output.append(f'constexpr int {tableName}IndexBit = {valueBit};')
+	output.append(f'constexpr int {tableName}BlockBit = {shift};')
+	if itemSize == indexItemSize:
+		output.append(f'constexpr int {tableName}Offset = {len(blockData)};')
+		output.append('')
+		output.append(f'const {_sizeTypeMap[itemSize]} {tableName}Data[] = {{')
+		output.append(f'// {tableName} values')
+		output.extend(dumpArray(blockData, 20))
+		output.append(f'// {tableName} index')
+		output.extend(dumpArray(indexList, 20))
+		output.append('};')
+	else:
+		output.append('')
+		output.append(f'const {_sizeTypeMap[indexItemSize]} {tableName}Index[] = {{')
+		output.extend(dumpArray(indexList, 20))
+		output.append('};')
+		output.append('')
+		output.append(f'const {_sizeTypeMap[itemSize]} {tableName}Data[] = {{')
+		output.extend(dumpArray(blockData, 20))
+		output.append('};')
+	return output
 
-	blockList = list(blockMap.keys())
-	items = sorted(((freq, index) for index, freq in blockFreq.items()), reverse=True)
-	defaultBlock = None
-	for item in items:
-		blockIndex = item[1]
-		block = blockList[blockIndex]
-		if block.count(block[0]) == blockSize:
-			indexList = [(offset, index - (index > blockIndex)) for offset, index in indexList if index != blockIndex]
-			defaultBlock = block
-			del blockList[blockIndex]
-			break
-
-	dataCount = len(blockList) << shift
-	if remain:
-		block = tuple(table[-remain:])
-		if defaultBlock == None or block != defaultBlock[:remain]:
-			found = False
-			for index, prev in enumerate(blockList):
-				if block == prev[:remain]:
-					found = True
-					break
-			if not found:
-				dataCount += remain
-				index = len(blockList)
-				blockList.append(block)
-			indexList.append((len(table) >> shift, index))
-	return indexList, blockList, dataCount, defaultBlock
-
-def _rangeBlockEncode(head, table):
-	startTime = time.perf_counter_ns()
+def runBlockEncode(head, table, tableName=''):
 	itemSize = getItemSize(table)
 	minSize = sys.maxsize
 	minResult = None
-	for shift in range(1, len(table).bit_length()):
-		indexList, blockList, dataCount, defaultBlock = _compressTableSkipDefault(table, shift)
-		indexItemSize = sizeForBitCount(indexList[-1][0].bit_length() + len(blockList).bit_length())
+	for shift in range(2, len(table).bit_length()):
+		indexList, blockList, dataCount = _compressTable(table, shift)
+		valueBit = (len(blockList) - 1).bit_length()
+		valueBit, totalBit, values = _runLengthEncode(indexList, valueBit=valueBit)
+		size = dataCount*itemSize + len(values)*sizeForBitCount(totalBit)
+		if size < minSize:
+			minSize = size
+			minResult = shift, valueBit, totalBit, values, blockList
+
+	shift, valueBit, totalBit, values, blockList = minResult
+	blockSize = 1 << shift
+	print(f'{head} run block value bit: {totalBit} {valueBit}, length: {len(values)}, size: {minSize} {minSize/1024}, block: {len(blockList)} {blockSize}')
+
+	if tableName:
+		output = []
+		mask = (1 << valueBit) - 1
+		for value in values:
+			index = value & mask
+			count = value >> valueBit
+			block = blockList[index]
+			for i in range(count):
+				output.extend(block)
+		assert output == table
+
+		output = []
+		blockData = list(itertools.chain.from_iterable(blockList))
+		_dumpRunBlock(output, tableName, values, blockData, valueBit, shift)
+		return output
+
+def skipBlockEncode(head, table, tableName=''):
+	itemSize = getItemSize(table)
+	minSize = sys.maxsize
+	minResult = None
+	for shift in range(2, len(table).bit_length()):
+		defaultBlock = None
+		indexList, blockList, dataCount = _compressTable(table, shift)
+		if len(blockList) > 1:
+			counter = Counter(indexList)
+			blockIndex = counter.most_common(1)[0][0]
+			block = blockList[blockIndex]
+			blockSize = 1 << shift
+			if block.count(block[0]) == blockSize:
+				dataCount -= blockSize
+				indexList = [(offset, index - (index > blockIndex)) for offset, index in enumerate(indexList) if index != blockIndex]
+				defaultBlock = block
+				del blockList[blockIndex]
+
+		if defaultBlock:
+			indexItemSize = sizeForBitCount(indexList[-1][0].bit_length() + (len(blockList) - 1).bit_length())
+		else:
+			indexItemSize = getValueSize(len(blockList) - 1)
 		size = dataCount*itemSize + len(indexList)*indexItemSize
 		if size < minSize:
 			minSize = size
 			minResult = shift, indexList, blockList, defaultBlock
 
-	endTime = time.perf_counter_ns()
 	shift, indexList, blockList, defaultBlock = minResult
 	defaultValue = defaultBlock[0] if defaultBlock else None
 	length = len(indexList)
-	print(f'{head} compress time: {(endTime - startTime)/1e6}, lookup: {length} {length.bit_length()}, size: {minSize} {minSize/1024}, default: {defaultValue}')
+	blockSize = 1 << shift
+	print(f'{head} skip block lookup: {length} {length.bit_length()}, size: {minSize} {minSize/1024}, block: {len(blockList)} {blockSize} default: {defaultValue}')
+
+	if tableName and defaultBlock and (len(table) & (blockSize - 1)) == 0:
+		bitCount = (len(blockList) - 1).bit_length()
+		offsetList = []
+		output = [defaultValue]*len(table)
+		for offset, index in indexList:
+			block = blockList[index]
+			offsetList.append((offset << bitCount) | index)
+			offset <<= shift
+			for k, value in enumerate(block):
+				output[offset + k] = value
+
+		blockData = list(itertools.chain.from_iterable(blockList))
+		size = len(blockData)*itemSize + len(offsetList)*getItemSize(offsetList)
+		assert minSize == size, (minSize, size)
+		assert output == table
+
+		output = []
+		if defaultValue:
+			output.append(f'constexpr {_sizeTypeMap[itemSize]} {tableName}DefaultValue = {defaultValue};')
+		_dumpRunBlock(output, tableName, offsetList, blockData, bitCount, shift)
+		return output
 
 def _compressTableMergedEx(table, itemSize, level):
 	minSize = sys.maxsize

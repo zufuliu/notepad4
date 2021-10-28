@@ -20,8 +20,6 @@ class LineBreak(IntFlag):
 	BreakAfter = 2	# A
 	BreakAny = 3	# B/A
 
-	RLEValueBit = 2
-
 # https://www.unicode.org/reports/tr14/#Properties
 LineBreakPropertyMap = {
 	LineBreak.NonBreak: [
@@ -118,7 +116,7 @@ def updateUnicodeLineBreak(filename):
 			lb = LineBreak.NonBreak
 		indexTable[ch] = int(lb)
 
-	runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount], LineBreak.RLEValueBit)
+	runLengthEncode('Unicode LineBreak', indexTable[:BMPCharacterCharacterCount])
 	config = {
 		'tableName': 'lineBreakTable',
 		'function': """LineBreakProperty GetLineBreakProperty(uint32_t ch) noexcept {

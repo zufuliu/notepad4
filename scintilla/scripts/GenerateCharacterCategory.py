@@ -18,8 +18,6 @@ class CharClassify(IntEnum):
 	ccPunctuation = 3
 	ccCJKWord = 4
 
-	RLEValueBit = 3
-
 CharClassifyOrder = [CharClassify.ccCJKWord, CharClassify.ccWord, CharClassify.ccPunctuation, CharClassify.ccNewLine]
 def prefCharClassify(values):
 	for value in CharClassifyOrder:
@@ -359,7 +357,9 @@ def updateCharClassifyTable(filename, headfile):
 		platform.python_version(), unicodedata.unidata_version)]
 	head_output = output[:]
 
-	data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount], int(CharClassify.RLEValueBit))
+	valueBit, totalBit, data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount])
+	assert valueBit == 3
+	assert totalBit == 16
 	output.append(f'const unsigned short CharClassifyRLE_BMP[] = {{')
 	output.extend(dumpArray(data, 20))
 	output.append("};")
@@ -404,7 +404,8 @@ def updateCharacterCategoryTable(filename):
 
 	# the sentinel value is used to simplify CharacterMap::Optimize()
 	sentinel = UnicodeCharacterCount*32 + categories.index('Cn')
-	rangeList = rangeEncode('catRanges', indexTable, 5, sentinel)
+	valueBit, rangeList = rangeEncode('catRanges', indexTable, sentinel=sentinel)
+	assert valueBit == 5
 	output.append("#if CharacterCategoryUseRangeList")
 	output.append("const int catRanges[] = {")
 	output.extend("%d," % value for value in rangeList)
@@ -424,7 +425,9 @@ def updateCharacterCategoryTable(filename):
 	output.append("")
 	output.extend(table)
 
-	data = runLengthEncode('CharacterCategory BMP', indexTable[:BMPCharacterCharacterCount], 5)
+	valueBit, totalBit, data = runLengthEncode('CharacterCategory BMP', indexTable[:BMPCharacterCharacterCount])
+	assert valueBit == 5
+	assert totalBit == 16
 	output.append("")
 	output.append(f'const unsigned short CatTableRLE_BMP[] = {{')
 	output.extend(dumpArray(data, 20))
@@ -478,12 +481,18 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	suffix = '_' + encodingList[0].upper()
 	head = 'CharClassify' + suffix
 
-	if True:
-		data = runLengthEncode(head, indexTable, int(CharClassify.RLEValueBit))
+	valueBit, totalBit, data = runLengthEncode(head, indexTable)
+	assert valueBit == 3
+	if encodingList[0] == 'cp1361':
+		#skipBlockEncode(head, indexTable, tableName=head)
+		data = runBlockEncode(head, indexTable, tableName=head)
+		output.extend(data)
+	else:
+		assert totalBit == 16
 		output.append(f'const unsigned short CharClassifyRLE{suffix}[] = {{')
 		output.extend(dumpArray(data, 20))
 		output.append("};")
-		output.append("")
+	output.append("")
 
 	if False:
 		config = {
