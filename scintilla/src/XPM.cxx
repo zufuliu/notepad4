@@ -100,8 +100,6 @@ XPM::XPM(const char *const *linesForm) {
 	Init(linesForm);
 }
 
-XPM::~XPM() = default;
-
 void XPM::Init(const char *textForm) {
 	// Test done is two parts to avoid possibility of overstepping the memory
 	// if memcmp implemented strangely. Must be 4 bytes at least at destination.
@@ -249,8 +247,6 @@ RGBAImage::RGBAImage(const XPM &xpm) {
 	}
 }
 
-RGBAImage::~RGBAImage() = default;
-
 int RGBAImage::CountBytes() const noexcept {
 	return width * height * 4;
 }
@@ -318,10 +314,6 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 }
 
 RGBAImageSet::RGBAImageSet() noexcept : height(-1), width(-1) {
-}
-
-RGBAImageSet::~RGBAImageSet() {
-	Clear();
 }
 
 /// Remove all images.

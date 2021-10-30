@@ -360,7 +360,7 @@ def updateCharClassifyTable(filename, headfile):
 	valueBit, totalBit, data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount])
 	assert valueBit == 3
 	assert totalBit == 16
-	output.append(f'const unsigned short CharClassifyRLE_BMP[] = {{')
+	output.append(f'const uint16_t CharClassifyRLE_BMP[] = {{')
 	output.extend(dumpArray(data, 20))
 	output.append("};")
 	output.append("")
@@ -370,7 +370,7 @@ def updateCharClassifyTable(filename, headfile):
 	config = {
 		'tableVarName': 'CharClassify::CharClassifyTable',
 		'tableName': 'CharClassifyTable',
-		'function': """static CharacterClass ClassifyCharacter(unsigned int ch) noexcept {
+		'function': """static CharacterClass ClassifyCharacter(uint32_t ch) noexcept {
 	if (ch < sizeof(classifyMap)) {
 		return static_cast<CharacterClass>(classifyMap[ch]);
 	}
@@ -429,7 +429,7 @@ def updateCharacterCategoryTable(filename):
 	assert valueBit == 5
 	assert totalBit == 16
 	output.append("")
-	output.append(f'const unsigned short CatTableRLE_BMP[] = {{')
+	output.append(f'const uint16_t CatTableRLE_BMP[] = {{')
 	output.extend(dumpArray(data, 20))
 	output.append("};")
 
@@ -489,7 +489,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 		output.extend(data)
 	else:
 		assert totalBit == 16
-		output.append(f'const unsigned short CharClassifyRLE{suffix}[] = {{')
+		output.append(f'const uint16_t CharClassifyRLE{suffix}[] = {{')
 		output.extend(dumpArray(data, 20))
 		output.append("};")
 	output.append("")
@@ -497,7 +497,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	if False:
 		config = {
 			'tableName': 'CharClassifyTable' + suffix,
-			'function': """CharClassify::cc ClassifyCharacter%s(unsigned int ch) noexcept {
+			'function': """CharClassify::cc ClassifyCharacter%s(uint32_t ch) noexcept {
 	if (ch > maxDBCSCharacter) {
 		// Cn
 		return CharClassify::ccSpace;

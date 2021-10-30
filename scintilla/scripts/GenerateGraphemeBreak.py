@@ -24,7 +24,6 @@ class GraphemeBreakProperty(IntEnum):
 	HangulLVT = 12
 	ExtendedPictographic = 13
 	ZeroWidthJoiner = 14
-	Sentinel = 15
 
 GraphemeBreakPropertyMap = GraphemeBreakProperty.__members__ | {
 	'Regional_Indicator': GraphemeBreakProperty.RegionalIndicator,
@@ -39,12 +38,9 @@ GraphemeBreakPropertyMap = GraphemeBreakProperty.__members__ | {
 	'ZWJ': GraphemeBreakProperty.ZeroWidthJoiner,
 }
 
-graphemeClusterBoundary = [0xffff] * (GraphemeBreakProperty.Sentinel + 1)
+graphemeClusterBoundary = [0xffff] * (max(GraphemeBreakProperty.__members__.values()) + 1)
 def buildGraphemeClusterBoundary():
 	table = graphemeClusterBoundary
-	table[GraphemeBreakProperty.Sentinel] = (1 << GraphemeBreakProperty.CR) \
-										| (1 << GraphemeBreakProperty.LF) \
-										| (1 << GraphemeBreakProperty.Control)
 
 	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html
 	notBreak = [
@@ -148,7 +144,6 @@ def updateGraphemeBreakTable(filename):
 
 	output = []
 	output.append('#pragma once')
-	output.append('#include <cstdint>')
 	output.append("#include <algorithm>")
 	output.append("#include <iterator>")
 	output.append('')
@@ -157,6 +152,7 @@ def updateGraphemeBreakTable(filename):
 	output.append('enum class GraphemeBreakProperty {')
 	for prop in GraphemeBreakProperty.__members__.values():
 		output.append(f'\t{prop.name} = {prop.value},')
+	output.append(f'\tSentinel = Prepend,')
 	output.append('};')
 
 	output.append('')

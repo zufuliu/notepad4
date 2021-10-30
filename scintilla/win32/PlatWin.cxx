@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <cstdint>
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
@@ -1000,7 +1001,7 @@ constexpr SIZE SizeOfRect(RECT rc) noexcept {
 	return { rc.right - rc.left, rc.bottom - rc.top };
 }
 
-constexpr const BLENDFUNCTION mergeAlpha = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+constexpr BLENDFUNCTION mergeAlpha = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
 
 }
 

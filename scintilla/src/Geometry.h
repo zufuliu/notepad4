@@ -197,7 +197,7 @@ PRectangle PixelAlignOutside(PRectangle rc, int pixelDivisions) noexcept;
 /**
 * Holds an RGBA colour with 8 bits for each component.
 */
-constexpr const float componentMaximum = 255.0f;
+constexpr float componentMaximum = 255.0f;
 class ColourRGBA final {
 	unsigned int co;
 public:

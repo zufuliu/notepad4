@@ -396,9 +396,6 @@ int IsCharacterCaseSensitive(uint32_t ch)	{
 		addCaseSensitivityTest(fd, caseTable, maskCount*32)
 
 def updateCaseSensitivityBlock(filename, test=False):
-	def getBitCount(value):
-		return len(bin(value)) - 2
-
 	caseTable = ['0']*UnicodeCharacterCount
 	maskTable = [0] * (UnicodeCharacterCount >> 5)
 	first = 0x600
@@ -424,7 +421,7 @@ def updateCaseSensitivityBlock(filename, test=False):
 	blockData = [(0, 0)] * blockIndexCount
 	blockIndex = [0] * blockIndexCount
 	maxBlockId = (maskCount // blockSize - 1) >> blockIndexValueBit
-	blockBitCount = getBitCount(maxBlockId)
+	blockBitCount = maxBlockId.bit_length()
 	indexBitCount = 8 - blockBitCount
 	maxIndex = 1 << indexBitCount
 	overlapped = False

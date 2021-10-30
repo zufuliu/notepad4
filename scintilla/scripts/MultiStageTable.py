@@ -7,9 +7,10 @@ import time
 import re
 
 _sizeTypeMap = {
-	1: 'unsigned char',
-	2: 'unsigned short',
-	4: 'unsigned int',
+	1: 'uint8_t',
+	2: 'uint16_t',
+	4: 'uint32_t',
+	8: 'uint64_t',
 }
 
 def getItemSize(items):
@@ -21,21 +22,27 @@ def getItemSize(items):
 		return 1
 	if maxItem < 65536:
 		return 2
-	return 4
+	if maxItem < 0x10000_0000:
+		return 4
+	return 8
 
 def getValueSize(value):
 	if value < 256:
 		return 1
 	if value < 65536:
 		return 2
-	return 4
+	if value < 0x10000_0000:
+		return 4
+	return 8
 
 def sizeForBitCount(bitCount):
 	if bitCount <= 8:
 		return 1
 	if bitCount <= 16:
 		return 2
-	return 4
+	if bitCount <= 32:
+		return 4
+	return 8
 
 def alignUp(value, align):
 	remain = value % align
@@ -215,7 +222,7 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 	assert minSize == size, (head, minSize, size)
 	print(f'{head} compress {level} time: {(endTime - startTime)/1e6}, size: {minSize, dataSize} {minSize/1024}')
 	if not config:
-		return None, None
+		return None
 
 	shiftList = list(itertools.accumulate(reversed(shiftList)))
 	shiftList.reverse()
@@ -245,6 +252,7 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 		1: {},
 		2: {},
 		4: {},
+		8: {},
 	}
 	for index, table in enumerate(tableList):
 		offset = 0
@@ -477,7 +485,7 @@ def runBlockEncode(head, table, tableName=''):
 	blockSize = 1 << shift
 	print(f'{head} run block value bit: {totalBit} {valueBit}, length: {len(values)}, size: {minSize} {minSize/1024}, block: {len(blockList)} {blockSize}')
 
-	if tableName:
+	if tableName and (len(table) & (blockSize - 1)) == 0:
 		output = []
 		mask = (1 << valueBit) - 1
 		for value in values:
