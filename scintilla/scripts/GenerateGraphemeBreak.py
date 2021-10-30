@@ -138,6 +138,12 @@ def updateGraphemeBreakTable(filename):
 	longestSquenceCount, longestSquenceBytes = findLongestCharacterSquence('emoji-zwj-sequences.txt')
 	buildGraphemeClusterBoundary()
 
+	valueMap = {
+		int(GraphemeBreakProperty.CR) : int(GraphemeBreakProperty.Control),
+		int(GraphemeBreakProperty.LF) : int(GraphemeBreakProperty.Control),
+		int(GraphemeBreakProperty.SpacingMark) : int(GraphemeBreakProperty.Extend),
+	}
+	graphemeBreakTable = [valueMap.get(value, value) for value in graphemeBreakTable]
 	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.txt
 	testGraphemeBreak('GraphemeBreakTest.txt', graphemeBreakTable)
 	graphemeBreakTable = graphemeBreakTable[:tableSize]
@@ -203,7 +209,7 @@ GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
 		'returnType': 'GraphemeBreakProperty'
 	}
 
-	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config)
+	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config=config, mergeValue=True)
 	output.extend(table)
 	output.append('')
 	output.extend(function)

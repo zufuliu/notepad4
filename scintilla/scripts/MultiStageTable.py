@@ -44,6 +44,12 @@ def sizeForBitCount(bitCount):
 		return 4
 	return 8
 
+def _roundValueBit(value):
+	valueBit = value.bit_length()
+	if valueBit & (valueBit - 1):
+		valueBit = 1 << valueBit.bit_length()
+	return valueBit
+
 def alignUp(value, align):
 	remain = value % align
 	if remain:
@@ -185,11 +191,29 @@ def _preShift(indexList, maxItem, shift):
 			indexList[index] <<= remain
 	return shift
 
-def buildMultiStageTable(head, dataTable, config=None, level=2):
+def buildMultiStageTable(head, dataTable, config=None, level=2, mergeValue=False):
 	assert level >= 1
+	merged = None
 	startTime = time.perf_counter_ns()
-	itemSize = getItemSize(dataTable)
+	maxItem = max(dataTable)
+	itemSize = getValueSize(maxItem)
 	minSize, minResult = _compressTableEx(dataTable, itemSize, level)
+	if mergeValue:
+		valueBit = _roundValueBit(maxItem)
+		prevTable = dataTable
+		for bitCount in (2, 4, 8, 16, 32, 64):
+			if bitCount > valueBit:
+				shift = bitCount >> 1
+				length = len(prevTable) - 1
+				table = [prevTable[i] | (prevTable[i + 1] << shift) for i in range(0, length, 2)]
+				if (length & 1) == 0:
+					table.append(prevTable[length])
+				size, result = _compressTableEx(table, sizeForBitCount(bitCount), level)
+				if size < minSize:
+					minSize = size
+					minResult = result
+					merged = bitCount, valueBit
+				prevTable = table
 	endTime = time.perf_counter_ns()
 
 	size = 0
@@ -220,7 +244,7 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 
 	dataSize = len(tableList[-1]['dataList'])*tableList[-1]['itemSize']
 	assert minSize == size, (head, minSize, size)
-	print(f'{head} compress {level} time: {(endTime - startTime)/1e6}, size: {minSize, dataSize} {minSize/1024}')
+	print(f'{head} compress {level} {merged} time: {(endTime - startTime)/1e6}, size: {minSize, dataSize} {minSize/1024}')
 	if not config:
 		return None
 
@@ -232,7 +256,27 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 		table['mask'] = (1 << shift) - 1
 		table['leftShift'] = _preShift(table['dataList'], table['maxItem'], shift)
 
-	if True:
+	if merged:
+		startTime = time.perf_counter_ns()
+		dataList = tableList[-1]['dataList']
+		bitCount, valueBit = merged
+		indexMask = (bitCount // valueBit) - 1
+		indexBit = indexMask.bit_length()
+		valueMask = (1 << valueBit) - 1
+		valueBit = (valueBit - 1).bit_length()
+		for index, expect in enumerate(dataTable):
+			valueShift = (index & indexMask) << valueBit
+			offset = index >> indexBit
+			for k in range(level):
+				table = tableList[k]
+				offset = (table['dataList'][offset >> table['shift']] << table['leftShift']) | (offset & table['mask'])
+			value = (dataList[offset] >> valueShift) & valueMask
+			if expect != value:
+				print(f'{head} first verify {level} {merged} fail: {index:04X}, expect: {expect}, got: {value}')
+				return None
+		endTime = time.perf_counter_ns()
+		print(f'{head} first verify {level} {merged} time: {(endTime - startTime)/1e6}')
+	else:
 		startTime = time.perf_counter_ns()
 		dataList = tableList[-1]['dataList']
 		for index, expect in enumerate(dataTable):
@@ -329,6 +373,16 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 	varName = re.findall(r'\w+\s+(\w+)\s*\)', definition)[0]
 	indent = config.get('indent', '\t')
 	function = definition.splitlines()
+	valueMask = 0
+	if merged:
+		bitCount, valueBit = merged
+		indexMask = (bitCount // valueBit) - 1
+		valueMask = (1 << valueBit) - 1
+		if valueBit == 1:
+			function.append(f'{indent}const int shift = {varName} & {indexMask};')
+		else:
+			function.append(f'{indent}const int shift = ({varName} & {indexMask}) << {(valueBit - 1).bit_length()};')
+		function.append(f'{indent}{varName} >>= {indexMask.bit_length()};')
 	for index in range(len(tableList) - 1):
 		table = tableList[index]
 		suffix = tableGroup[table['itemSize']]['suffix']
@@ -345,6 +399,8 @@ def buildMultiStageTable(head, dataTable, config=None, level=2):
 	offset = tableList[-1]['offset']
 	stmt = f'{varName} + {offset}' if offset else varName
 	stmt = f'{tableName}[{stmt}]'
+	if valueMask:
+		stmt = f'({stmt} >> shift) & {valueMask}'
 	returnType = config.get('returnType', None)
 	if returnType == None:
 		stmt = f'{indent}{varName} = {stmt};'

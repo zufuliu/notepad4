@@ -383,8 +383,9 @@ def updateCharClassifyTable(filename, headfile):
 		'returnType': 'CharacterClass'
 	}
 
-	table, function = buildMultiStageTable('CharClassify Unicode', indexTable[BMPCharacterCharacterCount:], config)
-	output.extend(table)
+	table = indexTable[BMPCharacterCharacterCount:]
+	data, function = buildMultiStageTable('CharClassify Unicode', table, config=config, mergeValue=True)
+	output.extend(data)
 	head_output.extend('\t' + line for line in function)
 
 	Regenerate(filename, "//", output)
