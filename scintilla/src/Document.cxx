@@ -1128,24 +1128,32 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 
 		it = end;
 		if (encodingFamily != EncodingFamily::eightBit && ccPrev == CharacterClass::word) {
+#if 1
 			// for UTF-8 go back to the start of last character.
-			// in case text ends with a longest sequence, we need to go back
-			// another code point to detect the grapheme cluster boundary.
-			//it -= longestUnicodeCharacterSquenceBytes + UTF8MaxBytes;
 			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
 				--it;
 			}
-#if 0
-			GraphemeBreakProperty prev = GraphemeBreakProperty::Sentinel;
-			do {
-				const uint32_t ch = UnicodeFromUTF8(reinterpret_cast<const unsigned char *>(it));
-				const GraphemeBreakProperty current = GetGraphemeBreakProperty(ch);
-				if (IsGraphemeClusterBoundary(prev, current)) {
-					break;
+#else
+			// for UTF-8 go back two code points to detect grapheme cluster boundary.
+			it -= 2*UTF8MaxBytes;
+			for (int tryCount = 0; tryCount < 2; tryCount++) {
+				// go back to the start of current character.
+				for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
+					--it;
 				}
-				prev = current;
-				it += UTF8BytesOfLead(static_cast<unsigned char>(*it));
-			} while (it < end);
+				GraphemeBreakProperty prev = GraphemeBreakProperty::Sentinel;
+				do {
+					const int character = UnicodeFromUTF8(reinterpret_cast<const unsigned char *>(it));
+					const GraphemeBreakProperty current = GetGraphemeBreakProperty(character);
+					if (IsGraphemeClusterBoundary(prev, current)) {
+						return it - text;
+					}
+					prev = current;
+					it += UTF8BytesOfLead(static_cast<unsigned char>(*it));
+				} while (it < end);
+				// no boundary between last two code points, assume text ends with a longest sequence.
+				it -= longestUnicodeCharacterSquenceBytes + UTF8MaxBytes;
+			}
 #endif
 		}
 		return it - text;
