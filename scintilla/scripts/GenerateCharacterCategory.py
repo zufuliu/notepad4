@@ -384,7 +384,7 @@ def updateCharClassifyTable(filename, headfile):
 	}
 
 	table = indexTable[BMPCharacterCharacterCount:]
-	data, function = buildMultiStageTable('CharClassify Unicode', table, config=config, mergeValue=True)
+	data, function = buildMultiStageTable('CharClassify Unicode', table, config=config, level=3)
 	output.extend(data)
 	head_output.extend('\t' + line for line in function)
 
@@ -422,7 +422,7 @@ def updateCharacterCategoryTable(filename):
 	}""",
 		'returnType': 'CharacterCategory',
 	}
-	table, function = buildMultiStageTable('CharacterCategory', indexTable, config)
+	table, function = buildMultiStageTable('CharacterCategory', indexTable, config=config, level=3)
 	output.append("")
 	output.extend(table)
 

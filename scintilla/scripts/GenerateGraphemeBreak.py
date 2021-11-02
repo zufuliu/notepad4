@@ -209,7 +209,7 @@ GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
 		'returnType': 'GraphemeBreakProperty'
 	}
 
-	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config=config, mergeValue=True)
+	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config=config, level=3)
 	output.extend(table)
 	output.append('')
 	output.extend(function)
