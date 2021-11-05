@@ -371,6 +371,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 	char chNext = styler[startPos];
 	int style = initStyle;
+	int styleEOL = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 	char word[MAX_ASM_WORD_LEN + 1] = "";
 	int wordlen = 0;
@@ -396,7 +397,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (atEOL && IsAsmDefineLine(lineCurrent, styler)) {
 			levelNext += IsAsmDefineLine(lineCurrent + 1, styler) - IsAsmDefineLine(lineCurrent - 1, styler);
 		}
-		if (atEOL) {
+		if (atEOL && !IsStreamCommentStyle(style) && !IsStreamCommentStyle(styleEOL)) {
 			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
 		}
 		if (atEOL && IsEquLine(lineCurrent, styler)) {
@@ -457,6 +458,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			}
 			lineCurrent++;
 			levelCurrent = levelNext;
+			styleEOL = style;
 		}
 	}
 }

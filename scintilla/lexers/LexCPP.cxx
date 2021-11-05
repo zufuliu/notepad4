@@ -1133,6 +1133,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 
 	char chNext = styler[startPos];
 	int style = initStyle;
+	int styleEOL = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 	bool isObjCProtocol = false;
 	bool lineCommentCurrent = IsCommentLine(lineCurrent);
@@ -1192,7 +1193,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			//}
 		}
 
-		if (atEOL && !IsStreamCommentStyle(style)) {
+		if (atEOL && !IsStreamCommentStyle(style) && !IsStreamCommentStyle(styleEOL)) {
 			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
 		}
 		if (atEOL && !(hasPreprocessor && IsCppInDefine(i, styler)) && IsOpenBraceLine(lineCurrent + 1, styler)) {
@@ -1281,6 +1282,7 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			levelCurrent = levelNext;
 			visibleChars = 0;
 			isObjCProtocol = false;
+			styleEOL = style;
 			lineCommentCurrent = IsCommentLine(lineCurrent);
 		}
 	}
