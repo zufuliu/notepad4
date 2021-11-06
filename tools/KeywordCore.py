@@ -814,7 +814,8 @@ def parse_graphviz_api_file(path):
 			values = []
 			doc = doc.replace('[', '').replace(']', '')
 			for line in doc.splitlines():
-				if '=' not in line:
+				line = line.strip()
+				if not line:
 					continue
 				items = line.split('=', 2)
 				attributes.append(items[0].strip())

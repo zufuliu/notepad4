@@ -13,7 +13,7 @@ NULL
 "default_fontsize default_group_color default_linecolor default_node_color default_shape default_textcolor description "
 "dir "
 "edge_layout folded fontsize height hstyle icon label node_height node_width numbered orientation rotate "
-"shape span_height span_width stacked style textcolor width "
+"shape span_height span_width stacked style textcolor thick width "
 
 , // 3 node shapes
 "actor beginpoint box circle cloud diamond dots ellipse endpoint "

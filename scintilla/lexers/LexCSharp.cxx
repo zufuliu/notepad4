@@ -461,7 +461,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_CSHARP_ESCAPECHAR);
 					sc.Forward();
 				} else if (IsInterpolatedString(sc.state)) {
-					nestedState.push_back({sc.state, parenCount});
+					nestedState.push_back({sc.state, 0});
 					sc.SetState(SCE_CSHARP_OPERATOR2);
 					sc.ForwardSetState(SCE_CSHARP_DEFAULT);
 				} else if (IsIdentifierCharEx(sc.chNext) || sc.chNext == '@' || sc.chNext == '$') {
@@ -580,15 +580,28 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 				sc.SetState(SCE_CSHARP_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				if (sc.ch == '(' || sc.ch == '[') {
-					++parenCount;
-				} else if ((sc.ch == ')' || sc.ch == ']') && parenCount > 0) {
-					--parenCount;
-				}
 				const bool interpolating = !nestedState.empty();
+				if (sc.ch == '(' || sc.ch == '[') {
+					if (interpolating) {
+						nestedState.back().parenCount += 1;
+					} else {
+						++parenCount;
+					}
+				} else if (sc.ch == ')' || sc.ch == ']') {
+					if (interpolating) {
+						InterpolatedStringState &state = nestedState.back();
+						if (state.parenCount > 0) {
+							--state.parenCount;
+						}
+					} else {
+						if (parenCount > 0) {
+							--parenCount;
+						}
+					}
+				}
 				if (interpolating) {
-					const InterpolatedStringState state = nestedState.back();
-					if (parenCount == state.parenCount && IsInterpolatedStringEnd(sc)) {
+					const InterpolatedStringState &state = nestedState.back();
+					if (state.parenCount == 0 && IsInterpolatedStringEnd(sc)) {
 						if (sc.ch == '}') {
 							sc.SetState(state.state);
 						} else {

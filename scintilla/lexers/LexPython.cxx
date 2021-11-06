@@ -85,7 +85,7 @@ struct EscapeSequence {
 
 struct FormattedStringState {
 	int state;
-	int braceCount;
+	int nestedLevel;
 	int parenCount;
 };
 
@@ -275,8 +275,8 @@ constexpr bool IsBraceFormatSpecifier(char ch) noexcept {
 					'%');
 }
 
-inline bool IsPyFormattedStringEnd(const StyleContext &sc) noexcept {
-	return sc.ch == '}'
+inline bool IsPyFormattedStringEnd(const StyleContext &sc, int braceCount) noexcept {
+	return (sc.ch == '}' && braceCount == 0) // f"{ {1:2}[1] }"
 		|| sc.ch == ':'
 		|| (sc.ch == '!' && sc.chNext != '=')
 		|| (sc.ch == '=' && !AnyOf(sc.chPrev, '<', '>', '=', '!'));
@@ -526,9 +526,9 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.Forward();
 					} else if (IsPyFormattedString(sc.state)) {
 						if (nestedState.empty()) {
-							nestedState.push_back({sc.state, 1, parenCount});
+							nestedState.push_back({sc.state, 1, 0});
 						} else {
-							nestedState.back().braceCount += 1;
+							nestedState.back().nestedLevel += 1;
 						}
 						insideFStringFormatSpec = false;
 						sc.SetState(SCE_PY_OPERATOR2);
@@ -546,8 +546,8 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						const bool interpolating = !nestedState.empty();
 						if (interpolating) {
 							FormattedStringState &state = nestedState.back();
-							if (state.braceCount > 1) {
-								--state.braceCount;
+							if (state.nestedLevel > 1) {
+								--state.nestedLevel;
 							} else {
 								nestedState.pop_back();
 							}
@@ -755,21 +755,37 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_PY_OPERATOR);
 				}
 			} else if (isoperator(sc.ch)) {
-				if (sc.ch == '(') {
-					++parenCount;
-				} else if (sc.ch == ')' && parenCount > 0) {
-					--parenCount;
-				}
 				const bool interpolating = !nestedState.empty();
+				int braceCount = 0;
+				if (sc.ch == '{' || sc.ch == '[' || sc.ch == '(') {
+					if (interpolating) {
+						nestedState.back().parenCount += 1;
+					} else {
+						++parenCount;
+					}
+				} else if (sc.ch == '}' || sc.ch == ']' || sc.ch == ')') {
+					if (interpolating) {
+						FormattedStringState &state = nestedState.back();
+						if (state.parenCount > 0) {
+							braceCount = state.parenCount;
+							--state.parenCount;
+						}
+					} else {
+						if (parenCount > 0) {
+							--parenCount;
+						}
+						if (visibleChars == 0) {
+							lineState |= PyLineStateMaskCloseBrace;
+						}
+					}
+				}
 				if (interpolating) {
-					const FormattedStringState state = nestedState.back();
-					if (parenCount == state.parenCount && IsPyFormattedStringEnd(sc)) {
+					const FormattedStringState &state = nestedState.back();
+					if (state.parenCount == 0 && IsPyFormattedStringEnd(sc, braceCount)) {
 						insideFStringFormatSpec = sc.ch != '}';
 						sc.SetState(state.state);
 						continue;
 					}
-				} else if (visibleChars == 0 && (sc.ch == '}' || sc.ch == ']' || sc.ch == ')')) {
-					lineState |= PyLineStateMaskCloseBrace;
 				}
 				sc.SetState(interpolating ? SCE_PY_OPERATOR2 : SCE_PY_OPERATOR);
 				kwType = SCE_PY_DEFAULT;

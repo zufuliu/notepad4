@@ -137,6 +137,7 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			if (sc.Match('-', '-', '>')) {
 				sc.Advance(3);
 				sc.SetState(htmlCommentStyle);
+				htmlCommentStyle = SCE_GRAPHVIZ_DEFAULT;
 			}
 			break;
 		}
