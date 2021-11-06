@@ -96,12 +96,11 @@ ifeq ($(ARCH), x64)
 	endif
 else ifeq ($(ARCH), AVX2)
 	# Windows 7 SP1, Windows Server 2008 R2 SP1, 64-bit only
-	# TODO: use -march=x86-64-v3 for GCC 11+ or Clang 12+
-	export CFLAGS += -mavx2 -mpopcnt -mbmi -mbmi2 -mlzcnt -mmovbe
-	export CXXFLAGS += -mavx2 -mpopcnt -mbmi -mbmi2 -mlzcnt -mmovbe
+	export CFLAGS += -march=x86-64-v3
+	export CXXFLAGS += -march=x86-64-v3
 	export RCFLAGS += -D_WIN64
 	export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0601 -DWINVER=0x0601
-	export LDFLAGS += -mavx2 -mpopcnt -mbmi -mbmi2 -mlzcnt -mmovbe -Wl,--major-os-version,6 -Wl,--minor-os-version,1
+	export LDFLAGS += -march=x86-64-v3 -Wl,--major-os-version,6 -Wl,--minor-os-version,1
 	ifndef LLD
 		export LDFLAGS += -Wl,--subsystem,windows:6.01
 	endif
