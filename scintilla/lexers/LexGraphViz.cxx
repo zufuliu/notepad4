@@ -1,6 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for GraphViz/Dot.
+//! Lexer for GraphViz Dot, blockdiag.
 
 #include <cassert>
 #include <cstring>
@@ -21,187 +21,208 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsGraphOp(int ch) noexcept {
-	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '='
-		|| ch == ';' || ch == ',' || ch == '>' || ch == '+' || ch == '-'
-		|| ch == ':' || ch == '<' || ch == '/';
+namespace {
+
+constexpr bool IsGraphVizOperator(int ch) noexcept {
+	return AnyOf(ch, '{', '}', '[', ']', '<', '>', '=', ';', ',', ':', '+', '-');
 }
 
-#define MAX_WORD_LENGTH	15
-static void ColouriseGraphDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool fold = styler.GetPropertyInt("fold", 1) != 0;
-	const WordList &keywords = *keywordLists[0]; // command
+constexpr bool IsEscapeSequence(int ch) noexcept {
+	// https://graphviz.gitlab.io/docs/attr-types/escString/
+	return AnyOf(ch, '\\', 't', 'n', 'r', '"', '\'');
+}
 
-	int state = initStyle;
-	int ch = 0;
-	int chNext = styler[startPos];
-	styler.StartAt(startPos);
-	styler.StartSegment(startPos);
-	const Sci_PositionU endPos = startPos + length;
+constexpr bool IsSpaceEquiv(int state) noexcept {
+	return state <= SCE_GRAPHVIZ_HTML_COMMENT;
+}
 
-	Sci_Line lineCurrent = styler.GetLine(startPos);
+void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+	const bool fold = styler.GetPropertyInt("fold", 1) & true;
 	int levelCurrent = SC_FOLDLEVELBASE;
-	if (lineCurrent > 0)
-		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
-	int levelNext = levelCurrent;
-	char buf[MAX_WORD_LENGTH + 1] = "";
-	int wordLen = 0;
-	int chPrevNonWhite = 0;
+
+	int htmlTagLevel = 0;
+	int htmlCommentStyle = SCE_GRAPHVIZ_DEFAULT;
 	int visibleChars = 0;
+	int chPrevNonWhite = 0;
+	int chBeforeIdentifier = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int chPrev = ch;
-		if (!IsASpace(ch) && state != SCE_C_COMMENTLINE && state != SCE_C_COMMENT && state != SCE_C_COMMENTDOC)
-			chPrevNonWhite = ch;
-		ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
+	StyleContext sc(startPos, lengthDoc, initStyle, styler);
+	if (sc.currentLine > 0) {
+		htmlTagLevel = styler.GetLineState(sc.currentLine - 1);
+		htmlCommentStyle = htmlTagLevel & 15;
+		htmlTagLevel >>= 4;
+		levelCurrent = styler.LevelAt(sc.currentLine - 1) >> 16;
+	}
+	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
+		LookbackNonWhite(styler, startPos,SCE_GRAPHVIZ_HTML_COMMENT, chPrevNonWhite, initStyle);
+	}
 
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = i == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
-		if (atLineStart) {
-			visibleChars = 0;
+	int levelNext = levelCurrent;
+
+	while (sc.More()) {
+		switch (sc.state) {
+		case SCE_GRAPHVIZ_OPERATOR:
+			sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			break;
+
+		case SCE_GRAPHVIZ_NUMBER:
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
+				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			}
+			break;
+
+		case SCE_GRAPHVIZ_IDENTIFIER:
+			if (!(IsIdentifierChar(sc.ch) || (sc.ch == '-' && sc.chNext != '>'))) {
+				if (chBeforeIdentifier == '[' || chBeforeIdentifier == ',') {
+					sc.ChangeState(SCE_GRAPHVIZ_ATTRIBUTE);
+				} else {
+					const int chNext = sc.GetDocNextChar();
+					if (chNext == '=' || (chBeforeIdentifier != '=' && (chNext == ']' || chNext == ','))) {
+						sc.ChangeState(SCE_GRAPHVIZ_ATTRIBUTE);
+					} else if (chBeforeIdentifier == '=') {
+						sc.ChangeState(SCE_GRAPHVIZ_VALUE);
+					} else {
+						char s[16];
+						sc.GetCurrent(s, sizeof(s));
+						if (keywordLists[0]->InList(s)) {
+							sc.ChangeState(SCE_GRAPHVIZ_WORD);
+						}
+					}
+				}
+				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			}
+			break;
+
+		case SCE_GRAPHVIZ_STRING:
+			if (sc.ch == '\\') {
+				if (IsEscapeSequence(sc.chNext)) {
+					sc.SetState(SCE_GRAPHVIZ_ESCAPECHAR);
+				}
+				sc.Forward();
+			} else if (sc.ch == '\"') {
+				sc.ForwardSetState(SCE_GRAPHVIZ_DEFAULT);
+			} else if (sc.atLineStart) {
+				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			}
+			break;
+
+		case SCE_GRAPHVIZ_ESCAPECHAR:
+			sc.SetState(SCE_GRAPHVIZ_STRING);
+			continue;
+
+		case SCE_GRAPHVIZ_COMMENTLINE:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			}
+			break;
+
+		case SCE_GRAPHVIZ_COMMENTBLOCK:
+			if (sc.Match('*', '/')) {
+				--levelNext;
+				sc.Forward();
+				sc.ForwardSetState(SCE_GRAPHVIZ_DEFAULT);
+			}
+			break;
+
+		case SCE_GRAPHVIZ_HTML_TAG:
+			if (sc.ch == '>') {
+				--htmlTagLevel;
+				sc.ForwardSetState(SCE_GRAPHVIZ_HTML_TEXT);
+			} else if (IsASpace(sc.ch)) {
+				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			}
+			break;
+
+		case SCE_GRAPHVIZ_HTML_COMMENT:
+			if (sc.Match('-', '-', '>')) {
+				sc.Advance(3);
+				sc.SetState(htmlCommentStyle);
+			}
+			break;
 		}
-		if (atEOL || i == endPos - 1) {
+
+		if (sc.state == SCE_GRAPHVIZ_HTML_TEXT || (sc.state == SCE_GRAPHVIZ_DEFAULT && htmlTagLevel != 0)) {
+			// https://graphviz.org/doc/info/shapes.html#html
+			if (sc.ch == '<') {
+				if (sc.chNext == '!') {
+					htmlCommentStyle = sc.state;
+					sc.SetState(SCE_GRAPHVIZ_HTML_COMMENT);
+					sc.Forward(3);
+				} else {
+					++htmlTagLevel;
+					sc.SetState(SCE_GRAPHVIZ_HTML_TAG);
+				}
+			} else if (sc.ch == '>') {
+				--htmlTagLevel;
+				if (htmlTagLevel == 0) {
+					sc.SetState(SCE_GRAPHVIZ_OPERATOR);
+				} else {
+					sc.SetState(SCE_GRAPHVIZ_HTML_TAG);
+					sc.ForwardSetState(SCE_GRAPHVIZ_HTML_TEXT);
+					continue;
+				}
+			} else if (sc.Match('/', '>')) {
+				sc.SetState(SCE_GRAPHVIZ_HTML_TAG);
+			} else if (sc.state == SCE_GRAPHVIZ_DEFAULT && sc.ch == '=') {
+				sc.SetState(SCE_GRAPHVIZ_OPERATOR);
+			}
+		}
+		else if (sc.state == SCE_GRAPHVIZ_DEFAULT && htmlTagLevel == 0) {
+			if (sc.Match('/', '/') || (visibleChars == 0 && sc.ch == '#')) {
+				sc.SetState(SCE_GRAPHVIZ_COMMENTLINE);
+			} else if (sc.Match('/', '*')) {
+				++levelNext;
+				sc.SetState(SCE_GRAPHVIZ_COMMENTBLOCK);
+				sc.Forward();
+			} else if (IsGraphVizOperator(sc.ch)) {
+				sc.SetState(SCE_GRAPHVIZ_OPERATOR);
+				if (sc.ch == '{' || sc.ch == '[') {
+					++levelNext;
+				} else if (sc.ch == '}' || sc.ch == ']') {
+					--levelNext;
+				} else if (sc.ch == '<' && chPrevNonWhite == '=' && sc.GetDocNextChar(true) == '<') {
+					// attr = < <tag> ... </tag> >
+					htmlTagLevel = 1;
+				}
+			}
+		}
+		if (sc.state == SCE_GRAPHVIZ_DEFAULT) {
+			if (sc.ch == '\"') {
+				sc.SetState(SCE_GRAPHVIZ_STRING);
+			} else if (chPrevNonWhite == '=' && IsNumberStart(sc.ch, sc.chNext)) {
+				sc.SetState(SCE_GRAPHVIZ_NUMBER);
+			} else if (IsIdentifierStart(sc.ch)) {
+				chBeforeIdentifier = chPrevNonWhite;
+				sc.SetState(SCE_GRAPHVIZ_IDENTIFIER);
+			}
+		}
+
+		if (!isspacechar(sc.ch)) {
+			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+			}
+		}
+		if (sc.atLineEnd) {
+			styler.SetLineState(sc.currentLine, (htmlTagLevel << 4) | htmlCommentStyle);
+			visibleChars = 0;
 			if (fold) {
 				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext)
 					lev |= SC_FOLDLEVELHEADERFLAG;
-				if (lev != styler.LevelAt(lineCurrent)) {
-					styler.SetLevel(lineCurrent, lev);
+				if (lev != styler.LevelAt(sc.currentLine)) {
+					styler.SetLevel(sc.currentLine, lev);
 				}
 				levelCurrent = levelNext;
 			}
-			lineCurrent++;
 		}
-
-		switch (state) {
-		case SCE_C_OPERATOR:
-			styler.ColorTo(i, state);
-			state = SCE_C_DEFAULT;
-			break;
-		case SCE_C_NUMBER:
-			if (!IsDecimalNumber(chPrev, ch, chNext)) {
-				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_IDENTIFIER:
-			if (!(iswordstart(ch) || (ch == '-' && chNext != '>'))) {
-				buf[wordLen] = '\0';
-				Sci_PositionU pos = i;
-				while (IsASpace(styler.SafeGetCharAt(pos++)));
-				if (styler[pos - 1] == '=') {
-					styler.ColorTo(i, SCE_C_WORD2);
-				} else if (keywords.InList(buf)) {
-					styler.ColorTo(i, SCE_C_WORD);
-				}
-				state = SCE_C_DEFAULT;
-			} else if (wordLen < MAX_WORD_LENGTH) {
-				buf[wordLen++] = static_cast<char>(ch);
-			}
-			break;
-		case SCE_C_LABEL:
-			if (!(iswordstart(ch) || ch == '-')) {
-				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_DIRECTIVE:
-			if (chPrev == '>' || IsASpace(ch)) {
-				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_STRING:
-			if (atLineStart) {
-				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
-			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
-				i++;
-				ch = chNext;
-				chNext = styler.SafeGetCharAt(i + 1);
-			} else if (ch == '\"') {
-				styler.ColorTo(i + 1, SCE_C_STRING);
-				state = SCE_C_DEFAULT;
-				continue;
-			}
-			break;
-		case SCE_C_COMMENTLINE:
-			if (atLineStart) {
-				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
-			}
-			break;
-		case SCE_C_COMMENT:
-			if (ch == '*' && chNext == '/') {
-				i++;
-				ch = chNext;
-				chNext = styler.SafeGetCharAt(i + 1);
-				styler.ColorTo(i + 1, state);
-				state = SCE_C_DEFAULT;
-				levelNext--;
-				continue;
-			}
-			break;
-		case SCE_C_COMMENTDOC:
-			if (chPrev == '-' && ch == '>') {
-				styler.ColorTo(i + 1, state);
-				state = SCE_C_DEFAULT;
-				continue;
-			}
-			break;
-		}
-
-		if (state == SCE_C_DEFAULT) {
-			if ((ch == '/' && chNext == '/') || (visibleChars == 0 && ch == '#')) {
-				styler.ColorTo(i, state);
-				state = SCE_C_COMMENTLINE;
-			} else if (ch == '/' && chNext == '*') {
-				styler.ColorTo(i, state);
-				state = SCE_C_COMMENT;
-				levelNext++;
-				i++;
-				ch = chNext;
-				chNext = styler.SafeGetCharAt(i + 1);
-			} else if (ch == '\"') {
-				styler.ColorTo(i, state);
-				state = SCE_C_STRING;
-			} else if (chPrevNonWhite == '=' && IsNumberStart(ch, chNext)) {
-				styler.ColorTo(i, state);
-				state = SCE_C_NUMBER;
-			} else if (chPrevNonWhite == '=' && iswordstart(ch)) {
-				styler.ColorTo(i, state);
-				state = SCE_C_LABEL;
-			} else if (ch == '<' && chNext == '!') {
-				styler.ColorTo(i, state);
-				state = SCE_C_COMMENTDOC;
-			} else if (ch == '<' && (IsAlpha(chNext) || chNext == '/')) {
-				styler.ColorTo(i, state);
-				state = SCE_C_DIRECTIVE;
-			} else if (iswordstart(ch)) {
-				styler.ColorTo(i, state);
-				state = SCE_C_IDENTIFIER;
-				buf[0] = static_cast<char>(ch);
-				wordLen = 1;
-			} else if (ch == '>' && !(chPrevNonWhite == '-' || chPrevNonWhite == '>')) {
-				styler.ColorTo(i + 1, SCE_C_DIRECTIVE);
-			} else if (IsGraphOp(ch)) {
-				styler.ColorTo(i, state);
-				state = SCE_C_OPERATOR;
-				if (ch == '{' || ch == '[') {
-					levelNext++;
-				} else if (ch == '}' || ch == ']') {
-					levelNext--;
-				}
-			}
-		}
-
-		visibleChars = visibleChars || !isspacechar(ch);
+		sc.Forward();
 	}
 
-	// Colourise remaining document
-	styler.ColorTo(endPos, state);
+	sc.Complete();
 }
 
-LexerModule lmGraphViz(SCLEX_GRAPHVIZ, ColouriseGraphDoc, "gv");
+}
+
+LexerModule lmGraphViz(SCLEX_GRAPHVIZ, ColouriseGraphVizDoc, "gv");

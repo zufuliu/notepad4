@@ -4,13 +4,15 @@ import os.path
 import re
 from collections import Counter
 from enum import IntFlag
+import string
 
 from FileGenerator import Regenerate
 
 AllKeywordAttrList = {}
+ColorNameList = set()
 JavaKeywordMap = {}
-GroovyKeyword = []
 JavaScriptKeywordMap = {}
+GroovyKeyword = []
 
 # see EditLexer.h
 class KeywordAttr(IntFlag):
@@ -795,6 +797,56 @@ def parse_gradle_api_file(path):
 		('annotation', JavaKeywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 		('function', functions, KeywordAttr.NoLexer),
 		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+	]
+
+def parse_graphviz_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {
+		'attributes': [],
+		'values': [],
+		'labels': [],
+	}
+	for key, doc in sections:
+		if key in ('keywords', 'node shapes'):
+			keywordMap[key] = doc.split()
+		elif key == 'attributes':
+			attributes = []
+			values = []
+			doc = doc.replace('[', '').replace(']', '')
+			for line in doc.splitlines():
+				if '=' not in line:
+					continue
+				items = line.split('=', 2)
+				attributes.append(items[0].strip())
+				if len(items) > 1:
+					items = [item for item in items[1].replace(',', ' ').split() if item]
+					values.extend(items)
+			keywordMap['attributes'].extend(attributes)
+			keywordMap['values'].extend(values)
+		elif key == 'color names':
+			items = [item for item in doc.split() if not item[-1] in string.digits]
+			ColorNameList.update(items)
+		elif key == 'labels':
+			items = re.findall(r'<(\w+)', doc)
+			keywordMap[key].extend(items)
+			items = re.findall(r'([\w\-]+)=', doc)
+			keywordMap['attributes'].extend(items)
+
+	keywordMap['color names'] = ColorNameList
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'color names',
+		'attributes',
+		'node shapes',
+		'values',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('labels', keywordMap['labels'], KeywordAttr.NoLexer),
+		('attributes', keywordMap['attributes'], KeywordAttr.NoLexer),
+		('node shapes', keywordMap['node shapes'], KeywordAttr.NoLexer),
+		('color names', ColorNameList, KeywordAttr.NoLexer),
+		('values', keywordMap['values'], KeywordAttr.NoLexer),
 	]
 
 def parse_groovy_api_file(path):

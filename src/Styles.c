@@ -70,6 +70,7 @@ extern EDITLEXER lexAVS;
 extern EDITLEXER lexAwk;
 
 extern EDITLEXER lexBatch;
+extern EDITLEXER lexBlockdiag;
 
 extern EDITLEXER lexCIL;
 extern EDITLEXER lexCMake;
@@ -86,7 +87,7 @@ extern EDITLEXER lexFortran;
 extern EDITLEXER lexGN;
 extern EDITLEXER lexGo;
 extern EDITLEXER lexGradle;
-extern EDITLEXER lexDOT;
+extern EDITLEXER lexGraphViz;
 extern EDITLEXER lexGroovy;
 
 extern EDITLEXER lexHaxe;
@@ -171,6 +172,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexAwk,
 
 	&lexBatch,
+	&lexBlockdiag,
 
 	&lexCIL,
 	&lexCMake,
@@ -187,7 +189,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexGN,
 	&lexGo,
 	&lexGradle,
-	&lexDOT,
+	&lexGraphViz,
 	&lexGroovy,
 
 	&lexHaxe,
@@ -1312,6 +1314,13 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[4] = KeywordAttr_NoLexer;		// environment variables
 		attr[5] = KeywordAttr_NoLexer;		// command options
 		break;
+	case NP2LEX_BLOCKDIAG:
+		attr[1] = KeywordAttr_NoLexer;		// labels
+		attr[2] = KeywordAttr_NoLexer;		// attributes
+		attr[3] = KeywordAttr_NoLexer;		// node shapes
+		attr[4] = KeywordAttr_NoLexer;		// color names
+		attr[5] = KeywordAttr_NoLexer;		// values
+		break;
 	case NP2LEX_CMAKE:
 		attr[6] = KeywordAttr_NoLexer;		// long properties
 		attr[7] = KeywordAttr_NoLexer;		// long variables
@@ -1338,6 +1347,13 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation
 		attr[8] = KeywordAttr_NoLexer;		// function
 		attr[9] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// GroovyDoc
+		break;
+	case NP2LEX_GRAPHVIZ:
+		attr[1] = KeywordAttr_NoLexer;		// labels
+		attr[2] = KeywordAttr_NoLexer;		// attributes
+		attr[3] = KeywordAttr_NoLexer;		// node shapes
+		attr[4] = KeywordAttr_NoLexer;		// color names
+		attr[5] = KeywordAttr_NoLexer;		// values
 		break;
 	case NP2LEX_GROOVY:
 		attr[7] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// annotation

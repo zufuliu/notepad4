@@ -195,6 +195,7 @@
       <File Name="../../src/EditLexers/stlAwk.c"/>
       <File Name="../../src/EditLexers/stlBash.c"/>
       <File Name="../../src/EditLexers/stlBatch.c"/>
+      <File Name="../../src/EditLexers/stlBlockdiag.c"/>
       <File Name="../../src/EditLexers/stlCIL.c"/>
       <File Name="../../src/EditLexers/stlCMake.c"/>
       <File Name="../../src/EditLexers/stlCoffeeScript.c"/>

@@ -1,0 +1,68 @@
+// http://blockdiag.com/en/
+// https://github.com/blockdiag
+
+//! keywords		===========================================================
+// http://blockdiag.com/en/blockdiag/index.html
+blockdiag group
+// http://blockdiag.com/en/seqdiag/index.html
+seqdiag
+// http://blockdiag.com/en/actdiag/index.html
+actdiag lane
+// http://blockdiag.com/en/nwdiag/index.html
+nwdiag network
+rackdiag rack packetdiag
+
+//! attributes		===========================================================
+// http://blockdiag.com/en/blockdiag/attributes/diagram.attributes.html
+[
+node_width =
+node_height =
+span_width =
+span_height =
+default_fontsize =
+default_shape =
+orientation = landscape, portrait
+default_node_color =
+default_group_color =
+default_linecolor =
+default_textcolor =
+edge_layout = normal, flowchart
+]
+
+// http://blockdiag.com/en/blockdiag/attributes/node.attributes.html
+[
+label =
+style = dotted, dashed
+color =
+numbered =
+shape =
+background =
+stacked =
+description =
+icon =
+textcolor =
+width =
+height =
+fontsize =
+rotate =
+]
+
+// http://blockdiag.com/en/blockdiag/attributes/edge.attributes.html
+[
+label =
+style = dotted, dashed, none
+hstyle = generalization, composition, aggregation
+color =
+dir = none, forward, back, both
+folded =
+textcolor =
+thick
+fontsize =
+]
+
+//! Node Shapes		===========================================================
+// http://blockdiag.com/en/blockdiag/examples.html#shape-of-nodes
+box square roundedbox dots circle ellipse diamond minidiamond
+note mail cloud actor beginpoint endpoint
+flowchart.condition flowchart.database flowchart.terminator flowchart.input
+flowchart.loopin flowchart.loopout

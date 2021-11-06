@@ -208,6 +208,9 @@ Batch File
 	bat
 	cmd
 
+blockdiag
+	diag
+
 
 CIL Assembly
 	il
@@ -301,8 +304,6 @@ Gradle Build Script
 GraphViz Dot
 	dot
 	gv
-
-	diag			blockdiag
 
 Groovy Script
 	groovy

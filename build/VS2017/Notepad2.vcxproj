@@ -1099,6 +1099,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlAwk.c" />
     <ClCompile Include="..\..\src\EditLexers\stlBash.c" />
     <ClCompile Include="..\..\src\EditLexers\stlBatch.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlBlockdiag.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCIL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCMake.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCoffeeScript.c" />

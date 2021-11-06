@@ -408,6 +408,9 @@
     <ClCompile Include="..\..\src\EditLexers\stlBatch.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlBlockdiag.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlCIL.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>

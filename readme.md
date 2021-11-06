@@ -41,6 +41,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [AviSynth Script](../main/tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
 	* [AWK](../main/tools/lang/Awk.awk), up to GNU AWK 5.1.
 	* [Batch Script](../main/tools/lang/Batch.bat), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
+	* [blockdiag](../main/tools/lang/blockdiag.diag), seqdiag, actdiag and nwdiag
 	* [C#](../main/tools/lang/CSharp.cs), up to C# 10.0. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#c)
 		* [Vala](https://wiki.gnome.org/Projects/Vala) 0.54
 	* C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cc)
@@ -66,8 +67,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Go](../main/tools/lang/Go.go), up to Go 1.14.
 		* Go+ (GoPlus) and the Q language
 	* [Gradle](../main/tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
-	* GraphViz Dot, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
-		* blockdiag, seqdiag, actdiag and nwdiag
+	* [GraphViz Dot](../main/tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 	* [Groovy](../main/tools/lang/Groovy.groovy), up to Groovy 4.0.
 	* [Haxe](../main/tools/lang/Haxe.hx), up to Haxe 4.1
 	* [HTML](../main/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2021-09-08. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)

@@ -519,8 +519,9 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_TEXTFILE:
 	case NP2LEX_2NDTEXTFILE:
 	case NP2LEX_ANSI:
+	case NP2LEX_BLOCKDIAG:
 	case NP2LEX_CSS:
-	case NP2LEX_DOT:
+	case NP2LEX_GRAPHVIZ:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
 		return (ch == '-');
@@ -1140,6 +1141,13 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		if (ch == '#' && (iCurrentStyle == SCE_INNO_DEFAULT || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // preprocessor
 			return (iCurrentStyle == SCE_INNO_DEFAULT) ? AutoC_AddSpecWord_Finish : AutoC_AddSpecWord_Keyword;
+		}
+		break;
+
+	case SCLEX_GRAPHVIZ:
+		if (ch == '<' || (chPrev == '<' && ch == '/')) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]);// Tag
+			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
@@ -2463,7 +2471,6 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_CSS:
 	case SCLEX_DART:
 	case SCLEX_GO:
-	case SCLEX_GRAPHVIZ:
 	case SCLEX_GROOVY:
 	case SCLEX_HAXE:
 	case SCLEX_JAVA:
@@ -2498,6 +2505,15 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_FSHARP:
 		EditEncloseSelection(L"(*", L"*)");
 		break;
+
+	case SCLEX_GRAPHVIZ: {
+		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
+		if (lineState) {
+			EditEncloseSelection(L"<!--", L"-->");
+		} else {
+			EditEncloseSelection(L"/*", L"*/");
+		}
+	} break;
 
 	case SCLEX_HTML:
 	case SCLEX_XML: {
