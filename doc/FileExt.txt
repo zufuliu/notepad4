@@ -50,6 +50,7 @@ CSS Style Sheet
 	scss			Sassy CSS
 	less			Less CSS
 	hss				HSS
+	wxss			WeChat Mini Program
 
 Java Source
 	java
@@ -157,6 +158,7 @@ XML Document
 	mm				FreeMind Mind Map
 	xrc				wxWidgets XML Resource
 	fbp				wxFormBuilder Project
+	wxml			WeChat Mini Program
 
 	web.config		ASP.NET Web Configuration
 

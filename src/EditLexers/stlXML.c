@@ -56,7 +56,7 @@ EDITLEXER lexXML = {
 	SCLEX_XML, NP2LEX_XML,
 	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"XML Document", Styles_XML),
-	L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; pom; mm; xrc; fbp",
+	L"xml; xsl; xslt; xsd; dtd; rss; svg; xul; axl; rdf; xaml; resx; plist; pom; mm; xrc; fbp; wxml",
 	&Keywords_XML,
 	Styles_XML
 };
