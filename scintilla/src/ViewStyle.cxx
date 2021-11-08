@@ -137,9 +137,6 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 		Element::SelectionBack,
 		Element::SelectionInactiveBack,
 	});
-	selection.layer = Layer::Base;
-	selection.eolFilled = false;
-	selection.eolSelectedWidth = 100;
 
 	foldmarginColour.reset();
 	foldmarginHighlightColour.reset();
@@ -157,15 +154,9 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 		Element::Caret,
 		Element::CaretAdditional,
 	});
-	caret.style = CaretStyle::Line;
-	caret.width = 1;
 
 	elementColours.erase(Element::CaretLineBack);
 	elementAllowsTranslucent.insert(Element::CaretLineBack);
-	caretLine.alwaysShow = false;
-	caretLine.subLine = false;
-	caretLine.layer = Layer::Base;
-	caretLine.frame = 0;
 
 	elementColours.erase(Element::HotSpotActive);
 	elementAllowsTranslucent.insert(Element::HotSpotActive);
@@ -211,12 +202,6 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	marginNumberPadding = 3;
 	ctrlCharPadding = 3; // +3 For a blank on front and rounded edge each side
 	lastSegItalicsOffset = 2;
-
-	wrap.state = Wrap::None;
-	wrap.visualFlags = WrapVisualFlag::None;
-	wrap.visualFlagsLocation = WrapVisualLocation::Default;
-	wrap.visualStartIndent = 0;
-	wrap.indentMode = WrapIndentMode::Fixed;
 
 	localeName = localeNameDefault;
 }

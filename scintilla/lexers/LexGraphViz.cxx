@@ -210,8 +210,9 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			if (fold) {
 				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
-				if (levelUse < levelNext)
+				if (levelUse < levelNext) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
+				}
 				if (lev != styler.LevelAt(sc.currentLine)) {
 					styler.SetLevel(sc.currentLine, lev);
 				}
