@@ -828,10 +828,13 @@ def parse_graphviz_api_file(path):
 			items = [item for item in doc.split() if not item[-1] in string.digits]
 			ColorNameList.update(items)
 		elif key == 'labels':
-			items = re.findall(r'<(\w+)', doc)
-			keywordMap[key].extend(items)
-			items = re.findall(r'([\w\-]+)=', doc)
-			keywordMap['attributes'].extend(items)
+			labels = re.findall(r'<(\w+)', doc)
+			keywordMap[key].extend(labels)
+			attributes = re.findall(r'([\w\-]+)=', doc)
+			keywordMap['attributes'].extend(attributes)
+			values = re.findall(r'\W([A-Z]+)', doc)
+			values = set(values) - set(labels) - set(attributes)
+			keywordMap['values'].extend(values)
 
 	keywordMap['color names'] = ColorNameList
 	RemoveDuplicateKeyword(keywordMap, [

@@ -241,17 +241,17 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 	}
 }
 
-void LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, int maxSpaceStyle, int &chPrevNonWhite, int &stylePrevNonWhite) noexcept {
-	Sci_PositionU back = startPos - 1;
-	while (back) {
-		const int style = styler.StyleAt(back);
+Sci_PositionU LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, int maxSpaceStyle, int &chPrevNonWhite, int &stylePrevNonWhite) noexcept {
+	 do {
+		--startPos;
+		const int style = styler.StyleAt(startPos);
 		if (style > maxSpaceStyle) {
-			chPrevNonWhite = static_cast<unsigned char>(styler.SafeGetCharAt(back));
 			stylePrevNonWhite = style;
+			chPrevNonWhite = static_cast<unsigned char>(styler.SafeGetCharAt(startPos));
 			break;
 		}
-		--back;
-	}
+	} while (startPos != 0);
+	return startPos;
 }
 
 Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operatorStyle, int maxSpaceStyle, int ignoreStyle) noexcept {

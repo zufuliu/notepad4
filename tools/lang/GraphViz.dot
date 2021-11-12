@@ -413,6 +413,7 @@ yellow 	yellowgreen
 //! Labels          ===========================================================
 // HTML-Like Labels
 // https://graphviz.org/doc/info/shapes.html#html
+label = <
 <TABLE
   ALIGN="CENTER|LEFT|RIGHT"
   BGCOLOR="color"
@@ -436,8 +437,8 @@ yellow 	yellowgreen
   TOOLTIP="value"
   VALIGN="MIDDLE|BOTTOM|TOP"
   WIDTH="value"
->
-<TR>
+> rows </TABLE>
+<TR> cells </TR>
 <TD
   ALIGN="CENTER|LEFT|RIGHT|TEXT"
   BALIGN="CENTER|LEFT|RIGHT"
@@ -461,12 +462,12 @@ yellow 	yellowgreen
   TOOLTIP="value"
   VALIGN="MIDDLE|BOTTOM|TOP"
   WIDTH="value"
->
+> label </TD>
 <FONT
   COLOR="color"
   FACE="fontname"
   POINT-SIZE="value"
->
+> text </FONT>
 <BR
   ALIGN="CENTER|LEFT|RIGHT"
 />
@@ -474,12 +475,13 @@ yellow 	yellowgreen
   SCALE="FALSE|TRUE|WIDTH|HEIGHT|BOTH"
   SRC="value"
 />
-<I>
-<B>
-<U>
-<O>
-<SUB>
-<SUP>
-<S>
+<I> text </I>
+<B> text </B>
+<U> text </U>
+<O> text </O>
+<SUB> text </SUB>
+<SUP> text </SUP>
+<S> text </S>
 <HR/>
 <VR/>
+>

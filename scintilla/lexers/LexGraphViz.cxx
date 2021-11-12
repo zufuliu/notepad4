@@ -33,7 +33,19 @@ constexpr bool IsEscapeSequence(int ch) noexcept {
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
-	return state <= SCE_GRAPHVIZ_HTML_COMMENT;
+	return state <= SCE_GRAPHVIZ_TASKMARKER;
+}
+
+inline bool IsAttributeValue(const LexAccessor &styler, Sci_PositionU startPos) noexcept {
+	int style = SCE_GRAPHVIZ_DEFAULT;
+	while (startPos != 0) {
+		--startPos;
+		style = styler.StyleAtEx(startPos);
+		if (!IsSpaceEquiv(style)) {
+			break;
+		}
+	}
+	return style == SCE_GRAPHVIZ_ATTRIBUTE;
 }
 
 void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -54,7 +66,7 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		levelCurrent = styler.LevelAt(sc.currentLine - 1) >> 16;
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
-		LookbackNonWhite(styler, startPos,SCE_GRAPHVIZ_HTML_COMMENT, chPrevNonWhite, initStyle);
+		startPos = LookbackNonWhite(styler, startPos, SCE_GRAPHVIZ_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	int levelNext = levelCurrent;
@@ -127,6 +139,9 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_GRAPHVIZ_HTML_TAG:
 			if (sc.ch == '>') {
 				--htmlTagLevel;
+				if (sc.chPrev == '/') {
+					--levelNext;
+				}
 				sc.ForwardSetState(SCE_GRAPHVIZ_HTML_TEXT);
 			} else if (IsASpace(sc.ch)) {
 				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
@@ -137,6 +152,7 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			if (sc.Match('-', '-', '>')) {
 				sc.Advance(3);
 				sc.SetState(htmlCommentStyle);
+				--levelNext;
 				htmlCommentStyle = SCE_GRAPHVIZ_DEFAULT;
 			}
 			break;
@@ -146,16 +162,23 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			// https://graphviz.org/doc/info/shapes.html#html
 			if (sc.ch == '<') {
 				if (sc.chNext == '!') {
+					++levelNext;
 					htmlCommentStyle = sc.state;
 					sc.SetState(SCE_GRAPHVIZ_HTML_COMMENT);
 					sc.Forward(3);
 				} else {
 					++htmlTagLevel;
+					if (sc.chNext == '/') {
+						--levelNext;
+					} else {
+						++levelNext;
+					}
 					sc.SetState(SCE_GRAPHVIZ_HTML_TAG);
 				}
 			} else if (sc.ch == '>') {
 				--htmlTagLevel;
 				if (htmlTagLevel == 0) {
+					--levelNext;
 					sc.SetState(SCE_GRAPHVIZ_OPERATOR);
 				} else {
 					sc.SetState(SCE_GRAPHVIZ_HTML_TAG);
@@ -181,9 +204,10 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					++levelNext;
 				} else if (sc.ch == '}' || sc.ch == ']') {
 					--levelNext;
-				} else if (sc.ch == '<' && chPrevNonWhite == '=' && sc.GetDocNextChar(true) == '<') {
-					// attr = < <tag> ... </tag> >
+				} else if (sc.ch == '<' && chPrevNonWhite == '=' && (sc.GetDocNextChar(true) == '<' || IsAttributeValue(styler, startPos))) {
+					// label = < text <tag> ... </tag> >
 					htmlTagLevel = 1;
+					++levelNext;
 				}
 			}
 		}
@@ -202,6 +226,7 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			visibleChars++;
 			if (!IsSpaceEquiv(sc.state)) {
 				chPrevNonWhite = sc.ch;
+				startPos = sc.currentPos;
 			}
 		}
 		if (sc.atLineEnd) {
