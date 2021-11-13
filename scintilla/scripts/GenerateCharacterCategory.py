@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Script to generate CharacterCategory.cxx from Python's Unicode data
 # Should be run rarely when a Python with a new version of Unicode data is available.
 
@@ -166,7 +165,7 @@ def isCJKCharacter(category, ch):
 	return False
 
 def bytesToHex(b):
-	return ''.join('\\x%02X' % ch for ch in b)
+	return ''.join(f'\\x{ch:02X}' for ch in b)
 
 def buildFoldDisplayEllipsis():
 	# Interpunct https://en.wikipedia.org/wiki/Interpunct
@@ -198,18 +197,18 @@ def buildFoldDisplayEllipsis():
 		values = result.setdefault(value, [])
 		values.append((codepage, comment))
 
-	utf8Text = defaultText.encode('utf-8');
+	utf8Text = defaultText.encode('utf-8')
 	utf8Text = bytesToHex(utf8Text)
 
 	output = []
 	output.append("const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp) {")
 	output.append("\tswitch (cpEdit) {")
 	output.append("\tcase SC_CP_UTF8:")
-	output.append('\t\treturn "%s";' % utf8Text)
+	output.append(f'\t\treturn "{utf8Text}";')
 	for key, values in result.items():
 		for codepage, comment in values:
-			output.append("\tcase %d: // %s" % (codepage, comment))
-		output.append('\t\treturn "%s";' % key)
+			output.append(f"\tcase {codepage}: // {comment}")
+		output.append(f'\t\treturn "{key}";')
 	output.append("\t}")
 
 	encodingList = [
@@ -248,8 +247,8 @@ def buildFoldDisplayEllipsis():
 			if codepage == 'default':
 				output.append("\tdefault:")
 			else:
-				output.append("\tcase %d: // %s" % (codepage, comment))
-		output.append('\t\treturn "%s";' % key)
+				output.append(f"\tcase {codepage}: // {comment}")
+		output.append(f'\t\treturn "{key}";')
 	output.append("\t}")
 	output.append("}")
 
@@ -312,9 +311,7 @@ def buildANSICharClassifyTable(filename):
 		else:
 			result[s]['codepage'].append((codepage, comment))
 
-	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
-
+	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	output.append("static const uint8_t ANSICharClassifyTable[] = {")
 	for item in result.values():
 		for page in item['codepage']:
@@ -328,8 +325,8 @@ def buildANSICharClassifyTable(filename):
 	output.append("\tswitch (cp) {")
 	for item in result.values():
 		for page in item['codepage']:
-			output.append("\tcase %d: // %s" % (page[0], page[1]))
-		output.append("\t\treturn ANSICharClassifyTable + %d;" % item['offset'])
+			output.append(f"\tcase {page[0]}: // {page[1]}")
+		output.append(f"\t\treturn ANSICharClassifyTable + {item['offset']};")
 	output.append("\tdefault:")
 	output.append("\t\t*length = 0;")
 	output.append("\t\treturn NULL;")
@@ -353,8 +350,7 @@ def updateCharClassifyTable(filename, headfile):
 			value = CharClassify.ccCJKWord
 		indexTable[ch] = int(value)
 
-	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
+	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	head_output = output[:]
 
 	valueBit, totalBit, data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount])
@@ -393,8 +389,7 @@ def updateCharClassifyTable(filename, headfile):
 
 def updateCharacterCategoryTable(filename):
 	categories = findCategories("../lexlib/CharacterCategory.h")
-	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
+	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 
 	indexTable = [0] * UnicodeCharacterCount
 	for ch in range(UnicodeCharacterCount):
@@ -409,7 +404,7 @@ def updateCharacterCategoryTable(filename):
 	assert valueBit == 5
 	output.append("#if CharacterCategoryUseRangeList")
 	output.append("const int catRanges[] = {")
-	output.extend("%d," % value for value in rangeList)
+	output.extend(f"{value}," for value in rangeList)
 	output.append("};")
 	output.append("")
 	output.append("#else")
@@ -498,12 +493,12 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	if False:
 		config = {
 			'tableName': 'CharClassifyTable' + suffix,
-			'function': """CharClassify::cc ClassifyCharacter%s(uint32_t ch) noexcept {
-	if (ch > maxDBCSCharacter) {
+			'function': f"""CharClassify::cc ClassifyCharacter{suffix}(uint32_t ch) noexcept {{
+	if (ch > maxDBCSCharacter) {{
 		// Cn
 		return CharClassify::ccSpace;
-	}
-	""" % suffix,
+	}}
+	""",
 			'returnType': 'CharClassify::cc'
 		}
 
@@ -537,8 +532,7 @@ def isReservedOrUDC_Big5(ch, buf):
 	return False
 
 def updateDBCSCharClassifyTable(filename):
-	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), unicodedata.unidata_version)]
+	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 
 	makeDBCSCharClassifyTable(output, ['cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213'])
 	makeDBCSCharClassifyTable(output, ['cp936', 'gbk'], isReservedOrUDC_GBK)

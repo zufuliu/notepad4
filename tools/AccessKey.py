@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 def is_access_key(ch):
 	return ch.isascii() and ch.isalnum()
 

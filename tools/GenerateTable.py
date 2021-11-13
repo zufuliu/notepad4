@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 def GenerateBraceMatchTable():
 	# used in IsBraceMatchChar()
 	table = [0] * 8

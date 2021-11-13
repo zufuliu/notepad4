@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # HFacer.py - regenerate the Scintilla.h file from the Scintilla.iface interface
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org
@@ -40,7 +39,7 @@ def RegenerateAll(root, showMaxID):
 	if showMaxID:
 		valueSet = set(int(x) for x in f.values if int(x) < 3000)
 		maximumID = max(valueSet)
-		print("Maximum ID is %d" % maximumID)
+		print("Maximum ID is", maximumID)
 		#~ valuesUnused = sorted(x for x in range(2001, maximumID) if x not in valueSet)
 		#~ print("\nUnused values")
 		#~ valueToName = {}

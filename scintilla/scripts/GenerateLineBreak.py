@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # script to generate line breaking data.
 # https://www.unicode.org/reports/tr41/
 # https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/LineBreakTest.html
@@ -128,8 +127,7 @@ def updateUnicodeLineBreak(filename):
 	}
 	buildMultiStageTable('Unicode LineBreak', indexTable, config)
 
-	output = ["// Created with Python %s, Unicode %s" % (
-		platform.python_version(), version)]
+	output = [f"// Created with Python {platform.python_version()}, Unicode {version}"]
 	lines = dumpArray(indexTable[:128], 16)
 	output.extend(lines)
 	Regenerate(filename, "//", output)

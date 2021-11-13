@@ -1,11 +1,11 @@
 import sys
-sys.path.append('../scintilla/scripts')
 import os.path
 import re
-from collections import Counter
+#from collections import Counter
 from enum import IntFlag
 import string
 
+sys.path.append('../scintilla/scripts')
 from FileGenerator import Regenerate
 
 AllKeywordAttrList = {}
@@ -109,7 +109,7 @@ def BuildKeywordContent(rid, keywordList, keywordCount=16):
 		comment, items, attr = item
 		lines = MakeKeywordLines(set(items))
 		if index != 0:
-			output.append(", // %d %s" % (index, comment))
+			output.append(f", // {index} {comment}")
 		if lines:
 			output.extend('"' + line + ' "' for line in lines)
 		else:
@@ -488,8 +488,7 @@ def parse_cmake_api_file(path):
 					break
 				items.append(item)
 			return items
-		else:
-			return [name]
+		return [name]
 
 	def get_prefix(name):
 		if '<' in name:
@@ -497,8 +496,7 @@ def parse_cmake_api_file(path):
 			if name.count('<') == 1 and name[-1] == '>':
 				# ignore suffix
 				name = name[:name.index('<')].strip('_')
-			else:
-				return '', False
+			return '', False
 		return name, is_long_name(name)
 
 	sections = read_api_file(path, '#')
@@ -704,7 +702,7 @@ def parse_go_api_file(path):
 				keywordMap[key] = items
 		else:
 			items = re.findall(r'^\s*(func\s+)?(?P<name>\w+\()', doc, re.MULTILINE)
-			items = set([item[1] for item in items])
+			items = set(item[1] for item in items)
 			if key == 'builtin':
 				keywordMap['builtin functions'] = items
 			else:
@@ -1872,7 +1870,6 @@ def parse_wasm_lexer_keywords(path):
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
 		('full instruction', keywordMap['full instruction'], KeywordAttr.NoLexer),
 	]
-	return keywordList
 
 # Style_UpdateLexerKeywordAttr()
 def update_lexer_keyword_attr(path):

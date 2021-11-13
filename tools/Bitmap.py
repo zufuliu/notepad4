@@ -8,7 +8,7 @@ from PIL import Image
 __all__ = ['Bitmap', 'ResizeMethod']
 
 # https://en.wikipedia.org/wiki/BMP_file_format
-class BitmapFileHeader(object):
+class BitmapFileHeader:
 	StructureSize = 14
 
 	def __init__(self):
@@ -68,7 +68,7 @@ class CompressionMethod(IntEnum):
 		except ValueError:
 			return f'Unknown-{value}'
 
-class BitmapInfoHeader(object):
+class BitmapInfoHeader:
 	StructureSize = 40
 
 	def __init__(self):
@@ -148,7 +148,7 @@ class BitmapInfoHeader(object):
 	colorImportant: {self.colorImportant :08X} {self.colorImportant}
 }}'''
 
-class Bitmap(object):
+class Bitmap:
 	def __init__(self, width=None, height=None, bitsPerPixel=32):
 		self.fileHeader = BitmapFileHeader()
 		self.infoHeader = BitmapInfoHeader()
@@ -368,7 +368,7 @@ class Bitmap(object):
 
 	@staticmethod
 	def fromImage(image):
-		if image.mode != 'RGB' and image.mode != 'RGBA':
+		if image.mode not in ('RGB', 'RGBA'):
 			image = image.convert('RGBA')
 
 		width, height = image.size

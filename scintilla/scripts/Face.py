@@ -19,22 +19,22 @@ def decodeFunction(featureVal):
 
 def decodeEvent(featureVal):
 	retType, rest = featureVal.split(" ", 1)
-	nameIdent, params = rest.split("(")
+	nameIdent = rest.split("(")[0]
 	name, value = nameIdent.split("=")
 	return retType, name, value
 
 def decodeParam(p):
 	param = p.strip()
-	type = ""
+	paramType = ""
 	name = ""
 	value = ""
 	if " " in param:
-		type, nv = param.split(" ")
+		paramType, nv = param.split(" ")
 		if "=" in nv:
 			name, value = nv.split("=")
 		else:
 			name = nv
-	return type, name, value
+	return paramType, name, value
 
 def IsEnumeration(t):
 	return t[:1].isupper()
@@ -86,11 +86,11 @@ class Face:
 				else:
 					currentCommentFinished = 1
 					featureType, featureVal = line.split(" ", 1)
-					if featureType in ["fun", "get", "set"]:
+					if featureType in ("fun", "get", "set"):
 						try:
 							retType, name, value, param1, param2 = decodeFunction(featureVal)
 						except ValueError:
-							print("Failed to decode line %d: %s" % (lineno, line))
+							print(f"Failed to decode line {lineno}: {line}")
 							raise
 						p1 = decodeParam(param1)
 						p2 = decodeParam(param2)
@@ -134,14 +134,14 @@ class Face:
 							else:
 								value = 'auto'
 						except ValueError:
-							print("Failure line %d: %s" % (lineno, featureVal))
+							print(f"Failure line {lineno}: {featureVal}")
 							raise
 						self.features[name] = {
 							"FeatureType": featureType,
 							"Category": currentCategory,
 							"Value": value }
 						self.order.append(name)
-					elif featureType == "enu" or featureType == "lex":
+					elif featureType in ("enu", "lex"):
 						name, value = featureVal.split("=", 1)
 						self.features[name] = {
 							"FeatureType": featureType,
@@ -155,4 +155,3 @@ class Face:
 						name, value = featureVal.split("=", 1)
 						self.aliases[name] = value
 						currentComment = []
-

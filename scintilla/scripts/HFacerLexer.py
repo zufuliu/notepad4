@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # HFacer.py - regenerate the SciLexer.h file from the SciLexer.iface interface
 # definition file.
 # Implemented 2000 by Neil Hodgson neilh@scintilla.org
@@ -29,9 +28,8 @@ def printLexHFile(f):
 				if "SCLEX_" in name:
 					val = int(value)
 					if val in lex:
-						raise Exception("Duplicate Lexer Value: %s = %d" % (name, val))
-					else:
-						lex.add(val)
+						raise Exception(f"Duplicate Lexer Value: {name} = {val}")
+					lex.add(val)
 				else:
 					if value == 'auto':
 						val = autoValue
@@ -42,11 +40,11 @@ def printLexHFile(f):
 					if autoValue == STYLE_FIRSTPREDEFINED:
 						autoValue = STYLE_LASTPREDEFINED + 1
 					if val in valueMap:
-						raise Exception("Duplicate Style Value: %s = %d, %s" % (name, val, valueMap[val]))
+						raise Exception(f"Duplicate Style Value: {name} = {val}, {valueMap[val]}")
 					valueMap[val] = name
 					if val >= STYLE_FIRSTPREDEFINED and val <= STYLE_LASTPREDEFINED:
-						raise Exception("Invalid Style Value: %s = %d" % (name, val))
-				out.append("#define " + name + " " + value)
+						raise Exception(f"Invalid Style Value: {name} = {val}")
+				out.append(f"#define {name} {value}")
 	return out
 
 def RegenerateAll(root):

@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 # Script to check that headers are in a consistent order
 # Canonical header order is defined in a file, normally scripts/HeaderOrder.txt
-# Requires Python 3.6 or later
 
-import pathlib, sys
+import sys
+import pathlib
 
 def IsHeader(x):
     return x.strip().startswith("#") and \

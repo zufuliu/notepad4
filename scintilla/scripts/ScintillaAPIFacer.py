@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
 # ScintillaAPIFacer.py - regenerate the ScintillaTypes.h, and ScintillaMessages.h
 # from the Scintilla.iface interface definition file.
 # Implemented 2019 by Neil Hodgson neilh@scintilla.org
-# Requires Python 3.6 or later
 
 import pathlib
 
@@ -51,23 +49,21 @@ deadValues = [
 	"INDIC_MAX",
 ]
 
-def ActualTypeName(type, identifier=None):
-	if type in typeAliases:
-		return typeAliases[type]
-	else:
-		return type
+def ActualTypeName(typeName, identifier=None):
+	if typeName in typeAliases:
+		return typeAliases[typeName]
+	return typeName
 
 def IsEnumeration(s):
 	if s in ["Position", "Line", "Colour", "ColourAlpha"]:
 		return False
 	return s[:1].isupper()
 
-def JoinTypeAndIdentifier(type, identifier):
+def JoinTypeAndIdentifier(typeName, identifier):
 	# Add a space to separate type from identifier unless type is pointer
-	if type.endswith("*"):
-		return type + identifier
-	else:
-		return type + " " + identifier
+	if typeName.endswith("*"):
+		return typeName + identifier
+	return typeName + " " + identifier
 
 def ParametersArgsCallname(v):
 	parameters = ""
@@ -122,8 +118,7 @@ def ParametersArgsCallname(v):
 def ParametersExceptLast(parameters):
 	if "," in parameters:
 		return parameters[:parameters.rfind(",")]
-	else:
-		return ""
+	return ""
 
 def HMessages(f):
 	out = ["enum class Message {"]
@@ -202,10 +197,10 @@ def HConstants(f):
 				if not hasPrefix:
 					if name.startswith("SC_"):
 						name = name[3:]
-					type = "int"
+					typeName = "int"
 					if name == "INVALID_POSITION":
-						type = "Position"
-					out.append("constexpr " + type + " " + Face.PascalCase(name) + " = " + v["Value"] + ";")
+						typeName = "Position"
+					out.append("constexpr " + typeName + " " + Face.PascalCase(name) + " = " + v["Value"] + ";")
 	return out
 
 def HMethods(f):

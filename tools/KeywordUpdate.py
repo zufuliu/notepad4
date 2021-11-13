@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from KeywordCore import *
 
 def update_all_keyword():

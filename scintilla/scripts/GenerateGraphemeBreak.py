@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # script to generate grapheme cluster boundary data.
 # https://www.unicode.org/reports/tr41/
 from enum import IntEnum
@@ -158,7 +157,7 @@ def updateGraphemeBreakTable(filename):
 	output.append('enum class GraphemeBreakProperty {')
 	for prop in GraphemeBreakProperty.__members__.values():
 		output.append(f'\t{prop.name} = {prop.value},')
-	output.append(f'\tSentinel = Prepend,')
+	output.append('\tSentinel = Prepend,')
 	output.append('};')
 
 	output.append('')

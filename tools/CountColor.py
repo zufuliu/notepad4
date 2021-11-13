@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 import os.path
 import re
@@ -54,10 +53,10 @@ def find_color_in_file(path, color_map):
 
 def print_color_count(color_map):
 	for color, color_stat in color_map.items():
-		print('%s\t%d' % (color, color_stat['total_count']))
+		print(f"{color}\t{color_stat['total_count']}")
 		usage = color_stat['usage']
 		for key, count in usage.items():
-			print('\t%d\t%s' % (count, key))
+			print(f'\t{count}\t{key}')
 
 def count_color(path):
 	# { color : { total_count: total_count, usage: { key: count}}}
@@ -79,4 +78,4 @@ if __name__ == '__main__':
 	if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]):
 		count_color(sys.argv[1])
 	else:
-		print("""Usage: %s path""" % sys.argv[0])
+		print(f"""Usage: {sys.argv[0]} path""")

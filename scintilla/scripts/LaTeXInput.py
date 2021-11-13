@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os.path
 import re
 import string
@@ -26,7 +25,7 @@ def escape_c_char(ch):
 	if ch in r'\'"':
 		return '\\' + ch
 	if ch < ' ' or ord(ch) >= 127:
-		return '\\x%02x' % ord(ch)
+		return f'\\x{ord(ch):02x}'
 	return ch
 
 def quote_c_char(ch):
@@ -189,7 +188,7 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 	output.append(f'static constexpr uint32_t {input_name}HashMultiplier = {multiplier};')
 	output.append('')
 	output.append(f'static const uint16_t {input_name}HashTable[] = {{')
-	output.extend('0x%04x,' % value for value in hash_table)
+	output.extend(f'0x{value:04x},' for value in hash_table)
 	output.append('};')
 	Regenerate(data_path, f'//{input_name} hash', output)
 
@@ -206,20 +205,20 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 		if len(character) == 1:
 			ch = ord(character)
 			if ch <= 0xffff:
-				code = '0x%04X' % ch
+				code = f'0x{ch:04X}'
 			else:
-				character = ('U+%X, ' % ch) + character
+				character = f'U+{ch:X}, {character}'
 				# convert to UTF-16
 				lead = LEAD_OFFSET + (ch >> 10)
 				trail = 0xDC00 + (ch & 0x3FF)
-				code = "0x%04X'%04X" % (trail, lead)
+				code = f"0x{trail:04X}'{lead:04X}"
 		else:
-			code = "0x%04X'%04X" % (ord(character[1]), ord(character[0]))
+			code = f"0x{ord(character[1]):04X}'{ord(character[0]):04X}"
 		magic = info['magic']
 		offset = info['offset']
 		sequence = prefix + info['sequence'] + suffix
 		name = info['name']
-		line = '{0x%04x, 0x%04x, %s}, // %s, %s, %s' % (magic, offset, code, character, sequence, name)
+		line = f'{{0x{magic:04x}, 0x{offset:04x}, {code}}}, // {character}, {sequence}, {name}'
 		output.append(line)
 	Regenerate(data_path, f'//{input_name} list', output)
 
@@ -313,18 +312,18 @@ def update_latex_input_header(latex_map, emoji_map):
 
 	output.append('enum {')
 	min_latex_len, max_latex_len = get_input_map_size_info('LaTeX', latex_map)
-	output.append('\tMinLaTeXInputSequenceLength = %d,' % min_latex_len)
-	output.append('\tMaxLaTeXInputSequenceLength = %d,' % max_latex_len)
+	output.append(f'\tMinLaTeXInputSequenceLength = {min_latex_len},')
+	output.append(f'\tMaxLaTeXInputSequenceLength = {max_latex_len},')
 	output.append('')
 
 	min_emoji_len, max_emoji_len = get_input_map_size_info('Emoji', emoji_map)
 	prefix = ':'
 	suffix = ':'
 	output.append('#if EnableLaTeXLikeEmojiInput')
-	output.append('\tEmojiInputSequencePrefixLength = %d,' % len(prefix))
-	output.append('\tEmojiInputSequenceSuffixLength = %d,' % len(suffix))
-	output.append('\tMinEmojiInputSequenceLength = %d + EmojiInputSequencePrefixLength, // suffix is optional' % min_emoji_len)
-	output.append('\tMaxEmojiInputSequenceLength = %d + EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,' % max_emoji_len)
+	output.append(f'\tEmojiInputSequencePrefixLength = {len(prefix)},')
+	output.append(f'\tEmojiInputSequenceSuffixLength = {len(suffix)},')
+	output.append(f'\tMinEmojiInputSequenceLength = {min_emoji_len} + EmojiInputSequencePrefixLength, // suffix is optional')
+	output.append(f'\tMaxEmojiInputSequenceLength = {max_emoji_len} + EmojiInputSequencePrefixLength + EmojiInputSequenceSuffixLength,')
 
 	output.append('')
 	if max_latex_len >= max_emoji_len + len(prefix) + len(suffix):

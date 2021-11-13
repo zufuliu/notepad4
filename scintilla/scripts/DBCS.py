@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 from enum import IntFlag
 
@@ -28,9 +27,9 @@ def format_byte_ranges(ranges):
 	result = []
 	for start, end in ranges:
 		if start == end:
-			result.append('[0x%02X]' % start)
+			result.append(f'[0x{start:02X}]')
 		else:
-			result.append('[0x%02X, 0x%02X]' % (start, end))
+			result.append(f'[0x{start:02X}, 0x{end:02X}]')
 	return ', '.join(result)
 
 class DBCSTrailKind(IntFlag):
@@ -101,7 +100,7 @@ def print_dbcs_char_by_trail(codePage, what):
 	for key, items in sorted(result.items()):
 		kind, trail, ch_trail = key
 		count = len(items)
-		print('\t', kind.name, '%02X' % trail, ch_trail, count)
+		print('\t', kind.name, f'{trail:02X}', ch_trail, count)
 		i = 0
 		while i < count:
 			print('\t\t', ' '.join(items[i:i + step]))

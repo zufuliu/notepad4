@@ -166,16 +166,15 @@ def _mergeBlockList(blockList, indexList):
 	blockData = []
 	blockOffset = []
 	prev = None
-	for index, block in enumerate(blockList):
+	for block in blockList:
 		offset = len(blockData)
-		if prev == None:
+		if prev is None:
 			blockData.extend(block)
+		elif merged := _getMergedLength(prev, block):
+			offset -= merged
+			blockData.extend(block[merged:])
 		else:
-			if merged := _getMergedLength(prev, block):
-				offset -= merged
-				blockData.extend(block[merged:])
-			else:
-				blockData.extend(block)
+			blockData.extend(block)
 		blockOffset.append(offset)
 		prev = block
 
@@ -183,12 +182,12 @@ def _mergeBlockList(blockList, indexList):
 	return offsetList, blockData
 
 def _preShift(indexList, maxItem, shift):
-	remain = 8*getValueSize(maxItem) - maxItem.bit_length();
+	remain = 8*getValueSize(maxItem) - maxItem.bit_length()
 	if remain != 0:
 		remain = min(remain, shift)
 		shift -= remain
-		for index in range(len(indexList)):
-			indexList[index] <<= remain
+		for index, value in enumerate(indexList):
+			indexList[index] = value << remain
 	return shift
 
 def buildMultiStageTable(head, dataTable, config=None, level=2, mergeValue=False):
@@ -402,14 +401,14 @@ def buildMultiStageTable(head, dataTable, config=None, level=2, mergeValue=False
 	if valueMask:
 		stmt = f'({stmt} >> shift) & {valueMask}'
 	returnType = config.get('returnType', None)
-	if returnType == None:
+	if returnType is None:
 		stmt = f'{indent}{varName} = {stmt};'
 	elif returnType:
 		stmt = f'{indent}return static_cast<{returnType}>({stmt});'
 	else:
 		stmt = f'{indent}return {stmt};'
 	function.append(stmt)
-	if returnType != None:
+	if returnType is not None:
 		function.append('}')
 
 	return content, function
@@ -428,7 +427,7 @@ def _runLengthEncode(table, valueBit=None, totalBit=None):
 		assert maxItem < (1 << valueBit)
 
 	items = []
-	start = 0;
+	start = 0
 	prev = table[0]
 	for index, value in enumerate(table):
 		if value != prev:
@@ -548,7 +547,8 @@ def runBlockEncode(head, table, tableName=''):
 			index = value & mask
 			count = value >> valueBit
 			block = blockList[index]
-			for i in range(count):
+			while count:
+				count -= 1
 				output.extend(block)
 		assert output == table
 
