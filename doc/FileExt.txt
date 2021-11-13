@@ -501,6 +501,7 @@ TOML File
 	toml			https://github.com/toml-lang/toml
 
 	Cargo.lock		Rust Cargo
+	.pylintrc		Pylint Configuration File
 
 TypeScript
 	ts

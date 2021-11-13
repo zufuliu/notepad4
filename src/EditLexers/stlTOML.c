@@ -29,7 +29,7 @@ EDITLEXER lexTOML = {
 	SCLEX_TOML, NP2LEX_TOML,
 	SCHEME_SETTINGS_DEFAULT,
 	EDITLEXER_HOLE(L"TOML File", Styles_TOML),
-	L"toml",
+	L"toml; pylintrc",
 	&Keywords_TOML,
 	Styles_TOML
 };

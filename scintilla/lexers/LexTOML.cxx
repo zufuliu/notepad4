@@ -175,6 +175,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							++tableLevel;
 						}
 					} else if (sc.state == SCE_TOML_KEY && sc.ch == '=') {
+						keyState = TOMLKeyState_End;
 						sc.SetState(SCE_TOML_OPERATOR);
 					} else if (sc.state == SCE_TOML_TABLE && sc.ch == ']') {
 						keyState = TOMLKeyState_End;
@@ -185,6 +186,12 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						const int chNext = sc.GetLineNextChar();
 						if (chNext == '#') {
 							sc.SetState(SCE_TOML_DEFAULT);
+						}
+					} else if (sc.state == SCE_TOML_KEY && !IsTOMLUnquotedKey(sc.ch)) {
+						const int chNext = sc.GetLineNextChar();
+						if (!AnyOf(chNext, '\'', '\"', '.', '=')) {
+							sc.ChangeState(SCE_TOML_ERROR);
+							continue;
 						}
 					}
 				}
@@ -244,8 +251,18 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_TOML_COMMENT:
 		case SCE_TOML_ERROR:
+			if (sc.ch == '#') {
+				sc.SetState(SCE_TOML_COMMENT);
+			} else if (sc.ch == ',') {
+				sc.SetState(SCE_TOML_OPERATOR);
+				sc.ForwardSetState(SCE_TOML_ERROR);
+			} else if (sc.atLineStart) {
+				sc.SetState(SCE_TOML_DEFAULT);
+			}
+			break;
+
+		case SCE_TOML_COMMENT:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_TOML_DEFAULT);
 			}

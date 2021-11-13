@@ -208,6 +208,8 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					// label = < text <tag> ... </tag> >
 					htmlTagLevel = 1;
 					++levelNext;
+					sc.ForwardSetState(SCE_GRAPHVIZ_HTML_TEXT);
+					continue;
 				}
 			}
 		}
