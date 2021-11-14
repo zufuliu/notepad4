@@ -1229,7 +1229,7 @@ void ScintillaWin::SelectionToHangul() {
 		const UINT codePage = CodePageOfDocument();
 
 		std::wstring uniStr = StringDecode(documentStr, codePage);
-		const int converted = GetHangulOfHanja(uniStr.data());
+		const int converted = HanjaDict::GetHangulOfHanja(uniStr.data());
 		documentStr = StringEncode(uniStr, codePage);
 
 		if (converted > 0) {

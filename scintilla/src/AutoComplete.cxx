@@ -111,6 +111,11 @@ struct Sorter {
 
 	Sorter(const AutoComplete *ac_, const char *list_) : ac(ac_), list(list_) {
 		int i = 0;
+		if (!list[i]) {
+			// Empty list has a single empty member
+			indices.push_back(i); // word start
+			indices.push_back(i); // word end
+		}
 		const char separator = ac->GetSeparator();
 		const char typesep = ac->GetTypesep();
 		while (list[i]) {
