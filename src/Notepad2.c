@@ -4619,10 +4619,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_FINDNEXTSEL:
 	case CMD_FINDPREVSEL:
 	case IDM_EDIT_SAVEFIND: {
-		Sci_Position cchSelection = SciCall_GetSelTextLength() - 1;
+		Sci_Position cchSelection = SciCall_GetSelTextLength();
 		if (cchSelection == 0) {
 			SendWMCommand(hwnd, IDM_EDIT_SELECTWORD);
-			cchSelection = SciCall_GetSelTextLength() - 1;
+			cchSelection = SciCall_GetSelTextLength();
 		}
 
 		if (cchSelection > 0 && cchSelection < NP2_FIND_REPLACE_LIMIT) {
@@ -6955,7 +6955,7 @@ void UpdateStatusbar(void) {
 		StrCpyExW(tchSelByte, L"0");
 		StrCpyExW(tchSelChar, L"0");
 	} else if (!SciCall_IsRectangleSelection()) {
-		Sci_Position iSel = SciCall_GetSelTextLength() - 1;
+		Sci_Position iSel = SciCall_GetSelTextLength();
 		PosToStrW(iSel, tchSelByte);
 		FormatNumberStr(tchSelByte);
 		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
