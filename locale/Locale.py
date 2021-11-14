@@ -25,7 +25,8 @@ def get_project_guid():
 	return '{' + str(uuid.uuid4()).upper() + '}'
 
 def patch_vc_project_file(path, src_lang, language):
-	doc = open(path, encoding='utf-8', newline='\n').read()
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
 	# change output folder
 	doc = doc.replace(f'\\{src_lang}\\', f'\\{language}\\')
 
@@ -37,7 +38,8 @@ def patch_vc_project_file(path, src_lang, language):
 		fd.write(doc)
 
 def update_resource_include_path(path, metapath):
-	doc = open(path, encoding='utf-8', newline='\n').read()
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
 	if metapath:
 		# resource path
 		doc = doc.replace(r'..\\res', r'..\\..\\metapath\\res')
@@ -94,7 +96,8 @@ def make_new_localization(language):
 
 
 def restore_resource_include_path(path, metapath):
-	doc = open(path, encoding='utf-8', newline='\n').read()
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
 	if metapath:
 		# include path
 		doc = doc.replace('../../metapath/src/', '')
@@ -142,13 +145,14 @@ class StringExtractor:
 			if not self.changed_lines:
 				return False
 
-		doc = open(path, encoding='utf-8', newline='\n').read()
+		with open(path, encoding='utf-8', newline='\n') as fd:
+			doc = fd.read()
 		self.lines = doc.splitlines()
 		return len(self.lines)
 
 	def find_changed_lines(self, reversion):
 		cmd = ['git', 'diff', '--no-color', '--unified=0', '--text', reversion, self.path]
-		result = subprocess.run(cmd, capture_output=True, encoding='utf-8')
+		result = subprocess.run(cmd, capture_output=True, check=True, encoding='utf-8')
 		if result.stderr:
 			print(result.stderr, file=sys.stderr)
 
@@ -167,7 +171,7 @@ class StringExtractor:
 
 		# reversion time
 		cmd =['git', 'show', '--no-patch', '--no-notes', "--pretty='%ci'", reversion]
-		result = subprocess.run(cmd, capture_output=True, encoding='utf-8')
+		result = subprocess.run(cmd, capture_output=True, check=True, encoding='utf-8')
 		if result.stderr:
 			print(result.stderr, file=sys.stderr)
 		items = result.stdout.replace("'", '').split()[:2]
@@ -387,7 +391,7 @@ class StringExtractor:
 						block_items = []
 			elif block_type != Block_Ignore:
 				try:
-					if block_type == Block_Menu or block_type == Block_DialogEx:
+					if block_type in (Block_Menu, Block_DialogEx):
 						caption = self.parse_resource_item(lineno, line, block_items)
 						if caption:
 							block_caption = caption
@@ -463,17 +467,17 @@ def main():
 	availableLocales = get_available_locales()
 	if action == 'new':
 		if language in availableLocales:
-			print(f'{app}: language {language} already localized.');
+			print(f'{app}: language {language} already localized.')
 			return
 		make_new_localization(language)
 	elif action == 'back':
 		if language not in availableLocales:
-			print(f'{app}: language {language} not localized [{", ".join(availableLocales)}].');
+			print(f'{app}: language {language} not localized [{", ".join(availableLocales)}].')
 			return
 		copy_back_localized_resources(language)
 	elif action == 'string':
 		if language != 'en' and language not in availableLocales:
-			print(f'{app}: language {language} not localized [{", ".join(availableLocales)}].');
+			print(f'{app}: language {language} not localized [{", ".join(availableLocales)}].')
 			return
 		reversion = sys.argv[3] if len(sys.argv) > 3 else ''
 		extract_resource_string(language, reversion)
