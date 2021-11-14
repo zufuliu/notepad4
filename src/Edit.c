@@ -197,7 +197,7 @@ BOOL EditConvertText(UINT cpSource, UINT cpDest, BOOL bSetSavePoint) {
 	if (length > 0) {
 		// DBCS: length -> WCHAR: sizeof(WCHAR) * (length / 2) -> UTF-8: kMaxMultiByteCount * (length / 2)
 		pchText = (char *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
-		SciCall_GetText(NP2HeapSize(pchText), pchText);
+		SciCall_GetText(length, pchText);
 
 		WCHAR *pwchText = (WCHAR *)NP2HeapAlloc((length + 1) * sizeof(WCHAR));
 		const int cbwText = MultiByteToWideChar(cpSource, 0, pchText, (int)length, pwchText, (int)(NP2HeapSize(pwchText) / sizeof(WCHAR)));
@@ -246,9 +246,9 @@ void EditConvertToLargeMode(void) {
 	const Sci_Position length = SciCall_GetLength();
 	HANDLE pdoc = SciCall_CreateDocument(length + 1, options);
 	char *pchText = NULL;
-	if (length > 0) {
+	if (length != 0) {
 		pchText = (char *)NP2HeapAlloc(length + 1);
-		SciCall_GetText(NP2HeapSize(pchText), pchText);
+		SciCall_GetText(length, pchText);
 	}
 
 	bLockedForEditing = FALSE;
@@ -416,7 +416,7 @@ BOOL EditCopyAppend(HWND hwnd) {
 	} else {
 		const Sci_Position cchText = SciCall_GetLength();
 		pszText = (char *)NP2HeapAlloc(cchText + 1);
-		SciCall_GetText(NP2HeapSize(pszText), pszText);
+		SciCall_GetText(cchText, pszText);
 	}
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -1333,7 +1333,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		}
 
 		lpData = (char *)NP2HeapAlloc(cbData + 1);
-		SciCall_GetText(NP2HeapSize(lpData), lpData);
+		SciCall_GetText(cbData, lpData);
 		// FIXME: move checks in front of disk file access
 		/*if ((uFlags & NCP_UNICODE) == 0 && (uFlags & NCP_UTF8_SIGN) == 0) {
 				BOOL bEncodingMismatch = TRUE;

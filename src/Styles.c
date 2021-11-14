@@ -2102,7 +2102,7 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 //
 int Style_GetDocTypeLanguage(void) {
 	char tchText[4096] = ""; // maybe contains header comments
-	SciCall_GetText(COUNTOF(tchText), tchText);
+	SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 
 	// check DOCTYPE
 	const char *p = StrStrIA(tchText, "<!DOCTYPE");
@@ -2301,7 +2301,7 @@ BOOL MatchCPPKeyword(const char *p, int index) {
 
 PEDITLEXER Style_DetectObjCAndMatlab(void) {
 	char tchText[4096] = ""; // maybe contains header comments
-	SciCall_GetText(COUNTOF(tchText), tchText);
+	SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 
 	const char *p = tchText;
 	np2LexLangIndex = 0;
@@ -2366,7 +2366,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 // auto detect file type from content.
 PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	char tchText[4096] = ""; // maybe contains header comments
-	SciCall_GetText(COUNTOF(tchText), tchText);
+	SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 
 	const char *p = tchText;
 	const BOOL shebang = *p == '#' && p[1] == '!';
@@ -2615,7 +2615,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, BOOL bCheckNames) {
 			} else if (suffix == L'r') {
 				// check preface `REBOL []` at file beginning
 				char tchText[9] = "";
-				SciCall_GetText(COUNTOF(tchText), tchText);
+				SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 				const char after = tchText[CSTRLEN("rebol")];
 				if ((after == ' ' || after == '\t' || after == '[') && StrStartsWithCase(tchText, "rebol")) {
 					return &lexRebol;
@@ -2685,7 +2685,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 
 		if (!bFound && bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256] = "";
-			SciCall_GetText(COUNTOF(tchText), tchText);
+			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 			pLexNew = Style_SniffShebang(tchText);
 			bFound = pLexNew != NULL;
 		}
@@ -2786,7 +2786,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	// xml/html
 	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_PHP || pLexNew->rid == NP2LEX_CONF))) {
 		char tchText[256] = "";
-		SciCall_GetText(COUNTOF(tchText), tchText);
+		SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 		const char *p = tchText;
 		while (IsASpace(*p)) {
 			++p;
@@ -2839,7 +2839,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 
 		if (!fNoCGIGuess && (StrCaseEqual(wchMode, L"cgi") || StrCaseEqual(wchMode, L"fcgi"))) {
 			char tchText[256] = "";
-			SciCall_GetText(COUNTOF(tchText), tchText);
+			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
 				if (iCurrentEncoding != g_DOSEncoding || pLexSniffed != &lexTextFile
 						|| !(StrCaseEqual(lpszExt, L"nfo") || StrCaseEqual(lpszExt, L"diz"))) {
@@ -2937,7 +2937,7 @@ BOOL Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	}
 #else
 	uint8_t buf[5] = {0}; // file magic
-	SciCall_GetText(COUNTOF(buf), buf);
+	SciCall_GetText(COUNTOF(buf) - 1, buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
 	if (magic2 == 0x4D5AU ||	// PE (exe, dll, etc.): MZ
 		magic2 == 0x504BU ||	// ZIP (zip, jar, docx, apk, etc.): PK

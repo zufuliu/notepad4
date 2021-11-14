@@ -1023,9 +1023,9 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 #if NP2_ENABLE_DOT_LOG_FEATURE
 static inline BOOL IsFileStartsWithDotLog(void) {
 	char tch[5] = "";
-	const Sci_Position len = SciCall_GetText(COUNTOF(tch), tch);
+	const Sci_Position len = SciCall_GetText(COUNTOF(tch) - 1, tch);
 	// upper case
-	return len >= 4 && StrEqualExA(tch, ".LOG");
+	return len == 4 && StrEqualExA(tch, ".LOG");
 }
 #endif
 
@@ -7424,7 +7424,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			bIsEmptyNewFile = TRUE;
 		} else if (cchText < 2048) {
 			char tchText[2048] = "";
-			SciCall_GetText(COUNTOF(tchText), tchText);
+			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 			StrTrimA(tchText, " \t\n\r"); // failure means not empty.
 			if (StrIsEmptyA(tchText)) {
 				bIsEmptyNewFile = TRUE;
