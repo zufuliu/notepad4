@@ -1229,10 +1229,10 @@ void ScintillaWin::SelectionToHangul() {
 		const UINT codePage = CodePageOfDocument();
 
 		std::wstring uniStr = StringDecode(documentStr, codePage);
-		const int converted = HanjaDict::GetHangulOfHanja(uniStr.data());
-		documentStr = StringEncode(uniStr, codePage);
+		const bool converted = HanjaDict::GetHangulOfHanja(uniStr);
 
-		if (converted > 0) {
+		if (converted) {
+			documentStr = StringEncode(uniStr, codePage);
 			pdoc->BeginUndoAction();
 			ClearSelection();
 			InsertPaste(documentStr.data(), documentStr.size());

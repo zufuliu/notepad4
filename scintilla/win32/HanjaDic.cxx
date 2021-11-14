@@ -13,6 +13,8 @@
 #include <windows.h>
 #include <ole2.h>
 
+#include "Debugging.h"
+
 #include "HanjaDic.h"
 
 // see https://sourceforge.net/p/scintilla/bugs/2295/
@@ -21,6 +23,24 @@
 //using namespace IMKRHJDLib;
 
 namespace Scintilla::Internal::HanjaDict {
+
+// copied from PlatWin.h
+template <class T>
+inline void ReleaseUnknown(T *&ppUnknown) noexcept {
+	if (ppUnknown) {
+#if 0
+		ppUnknown->Release();
+#else
+		try {
+			ppUnknown->Release();
+		} catch (...) {
+			// Never occurs
+			NP2_unreachable();
+		}
+#endif
+		ppUnknown = nullptr;
+	}
+}
 
 #if 1
 interface IRadical;
@@ -68,19 +88,28 @@ class HanjaDic {
 
 public:
 	HanjaDic() noexcept {
-		CLSID CLSID_HanjaDic;
-		HRESULT hr = CLSIDFromProgID(OLESTR("mshjdic.hanjadic"), &CLSID_HanjaDic);
-		if (!SUCCEEDED(hr)) {
-			hr = CLSIDFromProgID(OLESTR("imkrhjd.hanjadic"), &CLSID_HanjaDic);
+		if (!OpenHanjaDic(OLESTR("imkrhjd.hanjadic"))) {
+			OpenHanjaDic(OLESTR("mshjdic.hanjadic"));
 		}
+	}
+
+	bool OpenHanjaDic(LPCOLESTR lpszProgID) noexcept {
+		CLSID CLSID_HanjaDic;
+		HRESULT hr = CLSIDFromProgID(lpszProgID, &CLSID_HanjaDic);
 		if (SUCCEEDED(hr)) {
 			hr = CoCreateInstance(CLSID_HanjaDic, nullptr,
 				//CLSCTX_INPROC_SERVER, __uuidof(IHanjaDic),
 				CLSCTX_INPROC_SERVER, IID_IHanjaDic,
 				(LPVOID *)&HJinterface);
-			if (!SUCCEEDED(hr)) {
+			if (SUCCEEDED(hr)) {
+				hr = HJinterface->OpenMainDic();
+				if (SUCCEEDED(hr)) {
+					return true;
+				}
 			}
+			ReleaseUnknown(HJinterface);
 		}
+		return false;
 	}
 
 	// Deleted so HanjaDic objects can not be copied.
@@ -91,26 +120,13 @@ public:
 
 	~HanjaDic() {
 		if (HJinterface) {
-			try {
-				// This can never fail but IUnknown::Release is not marked noexcept.
-				HJinterface->Release();
-			} catch (...) {
-				// Ignore any exception
-			}
+			HJinterface->CloseMainDic();
+			ReleaseUnknown(HJinterface);
 		}
 	}
 
 	bool HJdictAvailable() const noexcept {
 		return HJinterface != nullptr;
-	}
-
-	bool OpenMainDic() const noexcept {
-		const HRESULT hr = HJinterface->OpenMainDic();
-		return SUCCEEDED(hr);
-	}
-
-	void CloseMainDic() const noexcept {
-		HJinterface->CloseMainDic();
 	}
 
 	bool IsHanja(wchar_t hanja) const noexcept {
@@ -125,27 +141,25 @@ public:
 	}
 };
 
-int GetHangulOfHanja(wchar_t *inout) noexcept {
+bool GetHangulOfHanja(std::wstring &inout) noexcept {
 	// Convert every hanja to hangul.
-	// Return the number of characters converted.
-	int changed = 0;
+	// Return whether any character been converted.
+	bool changed = false;
 	const HanjaDic dict;
-	if (dict.HJdictAvailable() && dict.OpenMainDic()) {
-		const size_t len = lstrlenW(inout);
-		BSTR bstrHangul = nullptr;
-		for (size_t i = 0; i < len; i++) {
-			if (dict.IsHanja(inout[i])) { // Pass hanja only!
-				const wchar_t conv[2] = { inout[i], L'\0' };
-				BSTR bstrHanja = SysAllocString(conv);
+	if (dict.HJdictAvailable()) {
+		for (wchar_t &character : inout) {
+			if (dict.IsHanja(character)) { // Pass hanja only!
+				const wchar_t hanja[2] = { character, L'\0' };
+				BSTR bstrHanja = SysAllocString(hanja);
+				BSTR bstrHangul = nullptr;
 				if (dict.HanjaToHangul(bstrHanja, &bstrHangul)) {
-					inout[i] = bstrHangul[0];
-					changed += 1;
+					changed = true;
+					character = bstrHangul[0];
 				}
+				SysFreeString(bstrHangul);
 				SysFreeString(bstrHanja);
 			}
 		}
-		SysFreeString(bstrHangul);
-		dict.CloseMainDic();
 	}
 	return changed;
 }
@@ -153,7 +167,7 @@ int GetHangulOfHanja(wchar_t *inout) noexcept {
 }
 
 #if 0
-// cl /W4 /EHsc /std:c++17 /Ox /DNDEBUG /DUNICODE HanjaDic.cxx
+// cl /W4 /EHsc /std:c++17 /Ox /DNDEBUG /DUNICODE /I../src HanjaDic.cxx
 using namespace Scintilla::Internal::HanjaDict;
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "oleaut32.lib")
@@ -161,8 +175,8 @@ using namespace Scintilla::Internal::HanjaDict;
 int main() {
 	OleInitialize(nullptr);
 	// Hanja U+5357, Hangul U+B0A8
-	wchar_t inout[2] = { L'\u5357', L'\0' };
-	const int changed = GetHangulOfHanja(inout);
+	std::wstring inout = L"\u5357";
+	const bool changed = GetHangulOfHanja(inout);
 	printf("changed=%d, %04X\n", changed, inout[0]);
 	OleUninitialize();
 	return 0;

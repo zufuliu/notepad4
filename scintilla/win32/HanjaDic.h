@@ -9,6 +9,6 @@
 
 namespace Scintilla::Internal::HanjaDict {
 
-int GetHangulOfHanja(wchar_t *inout) noexcept;
+bool GetHangulOfHanja(std::wstring &inout) noexcept;
 
 }
