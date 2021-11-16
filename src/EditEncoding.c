@@ -536,6 +536,7 @@ void Encoding_InitDefaults(void) {
 		wsprintf(wchANSI, L" (%u)", acp);
 	}
 
+	mEncoding[CPI_DEFAULT].uCodePage = acp;
 	if (IsDBCSCodePage(acp) || acp == CP_UTF8) {
 		iDefaultCodePage = acp;
 	} else {
@@ -788,7 +789,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 	UINT legacyACP = GetACP();
 	if (legacyACP == CP_UTF8) {
-		GetLegacyACP(&legacyACP);
+		legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 	}
 	for (UINT i = 0; i < COUNTOF(sEncodingGroupList); i++) {
 		const NP2EncodingGroup *group = &sEncodingGroupList[pEE[i].id];

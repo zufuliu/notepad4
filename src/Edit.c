@@ -1195,12 +1195,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	}
 
 	char *lpDataUTF8 = lpData;
-	const UINT acp = GetACP();
-	UINT legacyACP = acp;
-	if (legacyACP == CP_UTF8) {
-		GetLegacyACP(&legacyACP);
-	}
-
 	if (uFlags & NCP_UNICODE) {
 		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
 		lpDataUTF8 = (char *)NP2HeapAlloc((cbData + 1)*sizeof(WCHAR));
@@ -1209,6 +1203,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		const DWORD cchTextW = bBOM ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
 		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 		if (cbData == 0) {
+			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 			cbData = WideCharToMultiByte(legacyACP, 0, pszTextW, -1, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 			status->bUnicodeErr = TRUE;
 		}
@@ -1232,12 +1227,13 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		lpData = lpDataUTF8;
 	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE
 		&& iSrcEncoding == CPI_NONE && iWeakSrcEncoding == CPI_NONE
-		&& (bLoadANSIasUTF8 || acp == CP_UTF8)) {
+		&& (bLoadANSIasUTF8 || GetACP() == CP_UTF8)) {
 		if (bSkipEncodingDetection && IsUTF8(lpData, cbData)) {
 			uFlags = 0;
 			status->iEncoding = CPI_UTF8;
 		} else {
 			// try to load ANSI / unknown encoding as UTF-8
+			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 			DWORD back = cbData;
 			lpDataUTF8 = EncodeAsUTF8(lpData, &back, legacyACP, MB_ERR_INVALID_CHARS);
 			if (lpDataUTF8) {
