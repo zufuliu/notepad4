@@ -14,7 +14,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
 "override final "
-"_Pragma defined __has_include __has_include_next __has_attribute __has_cpp_attribute "
+"_Pragma defined __has_include __has_include_next __has_attribute __has_c_attribute __has_cpp_attribute "
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 "concept requires audit axiom "
 "import module " "co_await co_return co_yield "
@@ -84,7 +84,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "byte "
 
 , // 2 Preprocessor
-" if elif else endif ifdef ifndef define undef include include_next import using pragma line error warning warn message "
+" if elif else endif ifdef elifdef ifndef elifndef define undef include include_next import using pragma line error warning warn message "
 "region endregion sccs ident assert unassert "
 
 , // 3 Directive: Objective C/C++

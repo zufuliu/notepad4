@@ -1,6 +1,6 @@
 // C99 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
 // C11 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf
-// C23 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2596.pdf
+// C23 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf
 // https://en.cppreference.com/w/c
 // https://en.cppreference.com/w/c/header
 // https://en.cppreference.com/w/c/links
@@ -42,8 +42,10 @@ __func__
 #endif
 defined
 #ifdef
+#elifdef
 #endif
 #ifndef
+#elifndef
 #endif
 #define
 #undef
@@ -52,6 +54,7 @@ defined
 #error
 #pragma
 _Pragma()
+__has_c_attribute(pp-tokens)
 
 // Argument substitution
 __VA_ARGS__
