@@ -153,10 +153,10 @@
       <Compiler Options="-g;-O0" C_Options="-g;-O0" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="_DEBUG"/>
         <Preprocessor Value="_WIN64"/>
-        <Preprocessor Value="_WIN32_WINNT=0x0502"/>
-        <Preprocessor Value="WINVER=0x0502"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0600"/>
+        <Preprocessor Value="WINVER=0x0600"/>
       </Compiler>
-      <Linker Options="-O0;-Wl,--major-os-version,5;-Wl,--minor-os-version,2;-Wl,--subsystem,windows:5.02" Required="yes"/>
+      <Linker Options="-O0;-Wl,--major-os-version,6;-Wl,--minor-os-version,0;-Wl,--subsystem,windows:6.00" Required="yes"/>
       <ResourceCompiler Options="-D_DEBUG;-D_WIN64" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
@@ -279,10 +279,10 @@
       <Compiler Options="-O2;-ffast-math;-fno-rtti;-fomit-frame-pointer" C_Options="-O2;-ffast-math;-fomit-frame-pointer" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="_WIN64"/>
-        <Preprocessor Value="_WIN32_WINNT=0x0502"/>
-        <Preprocessor Value="WINVER=0x0502"/>
+        <Preprocessor Value="_WIN32_WINNT=0x0600"/>
+        <Preprocessor Value="WINVER=0x0600"/>
       </Compiler>
-      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,5;-Wl,--minor-os-version,2;-Wl,--subsystem,windows:5.02" Required="yes"/>
+      <Linker Options="-s;-O2;-static;-Wl,--gc-sections;-ffast-math;-fno-rtti;-fomit-frame-pointer;-Wl,--major-os-version,6;-Wl,--minor-os-version,0;-Wl,--subsystem,windows:6.00" Required="yes"/>
       <ResourceCompiler Options="-D_WIN64" Required="no"/>
       <General OutputFile="$(WorkspacePath)/../bin/$(ConfigurationName)/$(ProjectName).exe" IntermediateDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)/obj/$(ProjectName)" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(WorkspacePath)/../bin/$(ConfigurationName)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>

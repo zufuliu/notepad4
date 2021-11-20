@@ -87,11 +87,11 @@ ifeq ($(ARCH), x64)
 			export LDFLAGS += -Wl,--subsystem,windows:6.01
 		endif
 	else
-		# Windows XP 64-bit, Windows Server 2003
-		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0502 -DWINVER=0x0502
-		export LDFLAGS += -Wl,--major-os-version,5 -Wl,--minor-os-version,2
+		# Windows Vista, Windows Server 2008
+		export CPPFLAGS += -D_WIN64 -D_WIN32_WINNT=0x0600 -DWINVER=0x0600
+		export LDFLAGS += -Wl,--major-os-version,6 -Wl,--minor-os-version,0
 		ifndef LLD
-			export LDFLAGS += -Wl,--subsystem,windows:5.02
+			export LDFLAGS += -Wl,--subsystem,windows:6.00
 		endif
 	endif
 else ifeq ($(ARCH), AVX2)
