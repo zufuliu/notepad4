@@ -7909,39 +7909,112 @@ static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
 	++levelStack->levelCount;
 }
 
-static UINT Style_GetDefaultFoldState(int rid, int *maxLevel) {
-	switch (rid) {
-	case NP2LEX_TEXTFILE:
-	case NP2LEX_2NDTEXTFILE:
-	case NP2LEX_ANSI:
+static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *ignoreInner) {
+	switch (iLexer) {
+	case SCLEX_NULL:
+	case SCLEX_COFFEESCRIPT: // class, function
 		*maxLevel = 2;
 		return (1 << 1) | (1 << 2);
-	case NP2LEX_CPP:
-	case NP2LEX_CSHARP:
-	case NP2LEX_XML:
-	case NP2LEX_HTML:
-	case NP2LEX_JSON:
-		*maxLevel = 3;
-		return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
-	case NP2LEX_JAVA:
-	case NP2LEX_RC:
-	case NP2LEX_SCALA:
-	case NP2LEX_RUBY:
+
+	case SCLEX_ASYMPTOTE: // struct, function
+		*ignoreInner = SCE_ASY_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_AWK: // namespace, function
+		*ignoreInner = SCE_AWK_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_CPP:
+		switch (rid) {
+		case NP2LEX_CPP: // preprocessor, namespace, class, method
+			*maxLevel = 3;
+			return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
+
+		case NP2LEX_SCALA: // class, inner class, method
+			*maxLevel = 2;
+			return (1 << 0) | (1 << 1) | (1 << 2);
+		}
+		break;
+
+	case SCLEX_CSHARP: // namespace, class, method
 		*maxLevel = 2;
+		*ignoreInner = SCE_CSHARP_FUNCTION_DEFINITION;
 		return (1 << 0) | (1 << 1) | (1 << 2);
-	case NP2LEX_INI:
-		*maxLevel = 0;
-		return (1 << 0);
-	case NP2LEX_DIFF:
+
+	case SCLEX_DART: // class, method
+		*ignoreInner = SCE_DART_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_DIFF: // file, diff in file
 		*maxLevel = 2;
 		return (1 << 0) | (1 << 2);
-	case NP2LEX_PYTHON:
+
+	case SCLEX_GO: // struct, function
+		*ignoreInner = SCE_GO_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_GROOVY: // class, method
+		*ignoreInner = SCE_GROOVY_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_HAXE: // class, method
+		*ignoreInner = SCE_HAXE_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_HTML:
+	case SCLEX_JSON:
+	case SCLEX_XML:
 		*maxLevel = 3;
-		return (1 << 1) | (1 << 2) | (1 << 3);
-	default:
-		*maxLevel = 1;
-		return (1 << 0) | (1 << 1);
+		return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
+
+	case SCLEX_JAVA: // class, inner class, method
+		*maxLevel = 2;
+		*ignoreInner = SCE_JAVA_FUNCTION_DEFINITION;
+		return (1 << 0) | (1 << 1) | (1 << 2);
+
+	case SCLEX_JAVASCRIPT: // object, anonymous object, function
+		*maxLevel = 2;
+		*ignoreInner = SCE_JS_FUNCTION_DEFINITION;
+		return (1 << 0) | (1 << 1) | (1 << 2);
+
+	case SCLEX_JULIA: // struct, function
+		*ignoreInner = SCE_JULIA_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_KOTLIN: // class, inner class, method
+		*maxLevel = 2;
+		*ignoreInner = SCE_KOTLIN_FUNCTION_DEFINITION;
+		return (1 << 0) | (1 << 1) | (1 << 2);
+
+	case SCLEX_PROPERTIES: // section
+	case SCLEX_TOML: // table
+		*maxLevel = 0;
+		return (1 << 0);
+
+	case SCLEX_PYTHON: // class, function
+		*maxLevel = 2;
+		*ignoreInner = SCE_PY_FUNCTION_DEFINITION;
+		return (1 << 1) | (1 << 2);
+
+	case SCLEX_RUBY: // module, class, method
+		*maxLevel = 2;
+		return (1 << 0) | (1 << 1) | (1 << 2);
+
+	case SCLEX_RUST: // struct, function
+		*ignoreInner = SCE_RUST_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_SWIFT: // class, function
+		*ignoreInner = SCE_SWIFT_FUNCTION_DEFINITION;
+		break;
+
+	case SCLEX_YAML:
+		*maxLevel = 4;
+		return (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4);
 	}
+
+	*maxLevel = 1;
+	return (1 << 0) | (1 << 1);
 }
 
 static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) {
@@ -7966,10 +8039,23 @@ static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) 
 	}
 }
 
+BOOL EditIsLineContainsStyle(Sci_Line line, int style) {
+	Sci_Position lineStart = SciCall_PositionFromLine(line);
+	const Sci_Position lineEnd = SciCall_PositionFromLine(line + 1);
+	do {
+		const int value = SciCall_GetStyleAt(lineStart);
+		if (value == style) {
+			return TRUE;
+		}
+		++lineStart;
+	} while (lineStart < lineEnd);
+	return FALSE;
+}
+
 void FoldToggleAll(FOLD_ACTION action) {
-	BOOL fToggled = FALSE;
 	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
+	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	for (Sci_Line line = 0; line < lineCount; ++line) {
@@ -7991,10 +8077,10 @@ void FoldToggleAll(FOLD_ACTION action) {
 }
 
 void FoldToggleLevel(int lev, FOLD_ACTION action) {
-	BOOL fToggled = FALSE;
 	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
+	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
@@ -8039,7 +8125,6 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 }
 
 void FoldToggleCurrentBlock(FOLD_ACTION action) {
-	BOOL fToggled = FALSE;
 	Sci_Line line = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 	const int level = SciCall_GetFoldLevel(line);
 
@@ -8050,6 +8135,7 @@ void FoldToggleCurrentBlock(FOLD_ACTION action) {
 		}
 	}
 
+	BOOL fToggled = FALSE;
 	FoldToggleNode(line, &action, &fToggled);
 	if (fToggled) {
 		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
@@ -8090,12 +8176,13 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 }
 
 void FoldToggleDefault(FOLD_ACTION action) {
-	BOOL fToggled = FALSE;
-	int maxLevel = 0;
 	SciCall_ColouriseAll();
-	const UINT state = Style_GetDefaultFoldState(pLexCurrent->rid, &maxLevel);
+	int maxLevel = 0;
+	int ignoreInner = 0;
+	const UINT levelMask = Style_GetDefaultFoldLevel(pLexCurrent->iLexer, pLexCurrent->rid, &maxLevel, &ignoreInner);
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
+	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
@@ -8106,9 +8193,9 @@ void FoldToggleDefault(FOLD_ACTION action) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				FoldLevelStack_Push(&levelStack, level);
 				const int lev = levelStack.levelCount;
-				if ((state >> lev) & 1) {
+				if ((levelMask >> lev) & 1) {
 					FoldToggleNode(line, &action, &fToggled);
-					if (lev == maxLevel) {
+					if (lev == maxLevel || (ignoreInner && EditIsLineContainsStyle(line, ignoreInner))) {
 						line = SciCall_GetLastChildEx(line, level);
 					}
 				}
@@ -8121,9 +8208,9 @@ void FoldToggleDefault(FOLD_ACTION action) {
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				const int lev = level - SC_FOLDLEVELBASE;
-				if ((state >> lev) & 1) {
+				if ((levelMask >> lev) & 1) {
 					FoldToggleNode(line, &action, &fToggled);
-					if (lev == maxLevel) {
+					if (lev == maxLevel || (ignoreInner && EditIsLineContainsStyle(line, ignoreInner))) {
 						line = SciCall_GetLastChildEx(line, level);
 					}
 				}
