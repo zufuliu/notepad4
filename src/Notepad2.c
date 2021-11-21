@@ -158,6 +158,7 @@ BOOL	bLoadANSIasUTF8;
 BOOL	bLoadASCIIasUTF8;
 BOOL	bLoadNFOasOEM;
 BOOL	bNoEncodingTags;
+extern int g_DOSEncoding;
 
 #if defined(_WIN64)
 BOOL	bLargeFileMode = FALSE;
@@ -7265,11 +7266,10 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 				SciCall_SetEOLMode(iCurrentEOLMode);
 				if (iSrcEncoding != CPI_NONE) {
 					iCurrentEncoding = iSrcEncoding;
-					iOriginalEncoding = iSrcEncoding;
 				} else {
 					iCurrentEncoding = iDefaultEncoding;
-					iOriginalEncoding = iDefaultEncoding;
 				}
+				iOriginalEncoding = iCurrentEncoding;
 				SciCall_SetCodePage((iCurrentEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 				Style_SetLexer(NULL, TRUE);
 				bReadOnly = FALSE;
@@ -7562,6 +7562,44 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 	}
 
 	return fSuccess;
+}
+
+void EditApplyDefaultEncoding(PEDITLEXER pLex) {
+	int iEncoding;
+	int iEOLMode;
+	switch (pLex->rid) {
+	case NP2LEX_ANSI:
+		iEncoding = bLoadNFOasOEM ? g_DOSEncoding : CPI_DEFAULT;
+		iEOLMode = SC_EOL_CRLF;
+		break;
+
+	case NP2LEX_BASH:
+		iEncoding = CPI_UTF8;
+		iEOLMode = SC_EOL_LF;
+		break;
+
+	case NP2LEX_BATCH:
+		iEncoding = CPI_DEFAULT;
+		iEOLMode = SC_EOL_CRLF;
+		break;
+
+	default:
+		iEncoding = iDefaultEncoding;
+		iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
+		break;
+	}
+
+	if (iEOLMode != iCurrentEOLMode) {
+		iCurrentEOLMode = iEOLMode;
+		SciCall_SetEOLMode(iEOLMode);
+		UpdateStatusBarCache(STATUS_EOLMODE);
+	}
+	if (iEncoding != iCurrentEncoding) {
+		iCurrentEncoding = iEncoding;
+		iOriginalEncoding = iEncoding;
+		SciCall_SetCodePage((iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
+		UpdateStatusBarCache(STATUS_CODEPAGE);
+	}
 }
 
 //=============================================================================

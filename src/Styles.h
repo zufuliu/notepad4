@@ -48,6 +48,7 @@ BOOL	Style_Import(HWND hwnd);
 BOOL	Style_Export(HWND hwnd);
 void	Style_LoadTabSettings(PEDITLEXER pLex);
 void	Style_SaveTabSettings(PEDITLEXER pLex);
+void	EditApplyDefaultEncoding(PEDITLEXER pLex);
 
 void	Style_DetectBaseFontSize(HWND hwnd);
 HFONT	Style_CreateCodeFont(UINT dpi);

@@ -333,6 +333,7 @@ static LPWSTR g_AllFileExtensions = NULL;
 
 // Notepad2.c
 extern HWND hwndMain;
+extern BOOL bDocumentModified;
 extern int	iCurrentEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
@@ -1594,6 +1595,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			// otherwise, the same tab settings already applied in EditSetNewText().
 			Style_LoadTabSettings(pLexNew);
 			FileVars_Apply(&fvCurFile);
+		}
+
+		// change empty file to use scheme default encoding and line ending
+		if (!bDocumentModified && SciCall_GetLength() == 0) {
+			EditApplyDefaultEncoding(pLexNew);
 		}
 		SciCall_SetLexer(iLexer);
 
