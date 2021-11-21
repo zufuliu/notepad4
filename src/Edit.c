@@ -955,19 +955,22 @@ labelStart:
 }
 
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, LPBOOL lpbBOM) {
-	BOOL bPreferOEM = FALSE;
-	if (bLoadNFOasOEM) {
-		LPCWSTR const pszExt = pszFile + lstrlen(pszFile) - 4;
-		if (pszExt >= pszFile && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
-			bPreferOEM = TRUE;
-		}
+	LPCWSTR const pszExt = PathFindExtension(pszFile);
+	int preferedEncoding = CPI_NONE;
+	if (bLoadNFOasOEM && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
+		preferedEncoding = g_DOSEncoding;
+	} else if (StrCaseEqual(pszExt, L".bat")) {
+		preferedEncoding = CPI_DEFAULT;
+	} else if (StrEqual(pszExt, L".sh") || StrStartsWith(lpData, "#!/")) {
+		// shell script: #!/bin/sh[LF]
+		preferedEncoding = CPI_UTF8;
 	}
 
 	if (!Encoding_IsValid(iDefaultEncoding)) {
 		iDefaultEncoding = CPI_UTF8;
 	}
 
-	int _iDefaultEncoding = bPreferOEM ? g_DOSEncoding : iDefaultEncoding;
+	int _iDefaultEncoding = (preferedEncoding == CPI_NONE) ? iDefaultEncoding : preferedEncoding;
 	if (iWeakSrcEncoding != CPI_NONE && Encoding_IsValid(iWeakSrcEncoding)) {
 		_iDefaultEncoding = iWeakSrcEncoding;
 	}
@@ -978,7 +981,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 		FileVars_Init(NULL, 0, &fvCurFile);
 
 		if (iSrcEncoding == CPI_NONE) {
-			if ((bLoadANSIasUTF8 || bLoadASCIIasUTF8) && !bPreferOEM) {
+			if ((bLoadANSIasUTF8 || bLoadASCIIasUTF8) && preferedEncoding == CPI_NONE) {
 				iEncoding = CPI_UTF8;
 			} else {
 				iEncoding = _iDefaultEncoding;
@@ -1040,7 +1043,8 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	utf8Sig = (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN); // reload as UTF-8 or UTF-8 filevar
 	if (iSrcEncoding == CPI_NONE) {
 		if (!bSkipEncodingDetection || cbData >= MAX_NON_UTF8_SIZE) {
-			if (!bBOM && !bLoadASCIIasUTF8 && cbData < MAX_NON_UTF8_SIZE && IsUTF7(lpData, cbData)) {
+			if (!bBOM && (!bLoadASCIIasUTF8 || preferedEncoding != CPI_NONE)
+				&& cbData < MAX_NON_UTF8_SIZE && IsUTF7(lpData, cbData)) {
 				// 7-bit / any encoding
 				return iEncoding;
 			}
