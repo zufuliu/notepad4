@@ -254,7 +254,7 @@ LPMRULIST	mruReplace;
 DWORD	dwLastIOError;
 WCHAR	szCurFile[MAX_PATH + 40];
 FILEVARS	fvCurFile;
-static BOOL bModified;
+BOOL bDocumentModified = FALSE;
 static BOOL bReadOnly = FALSE;
 BOOL bLockedForEditing = FALSE; // save call to SciCall_GetReadOnly()
 
@@ -378,7 +378,7 @@ static int	flagRelaunchElevated	= 0;
 static int	flagDisplayHelp			= 0;
 
 static inline BOOL IsDocumentModified(void) {
-	return bModified || iCurrentEncoding != iOriginalEncoding;
+	return bDocumentModified || iCurrentEncoding != iOriginalEncoding;
 }
 
 static inline BOOL IsTopMost(void) {
@@ -5097,7 +5097,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_SAVEPOINTREACHED:
-			bModified = FALSE;
+			bDocumentModified = FALSE;
 			UpdateDocumentModificationStatus();
 			break;
 
@@ -5120,7 +5120,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_SAVEPOINTLEFT:
-			bModified = TRUE;
+			bDocumentModified = TRUE;
 			UpdateDocumentModificationStatus();
 			break;
 
@@ -7194,13 +7194,13 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		FileVars_Init(NULL, 0, &fvCurFile);
 		EditSetEmptyText();
-		bModified = FALSE;
+		bDocumentModified = FALSE;
 		bReadOnly = FALSE;
 		iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 		SciCall_SetEOLMode(iCurrentEOLMode);
 		iCurrentEncoding = iDefaultEncoding;
-		iOriginalEncoding = iDefaultEncoding;
-		SciCall_SetCodePage((iDefaultEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
+		iOriginalEncoding = iCurrentEncoding;
+		SciCall_SetCodePage((iCurrentEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 		Style_SetLexer(NULL, TRUE);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
@@ -7296,7 +7296,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			StrCpyExW(szTitleExcerpt, L"");
 		}
 		iOriginalEncoding = iCurrentEncoding;
-		bModified = FALSE;
+		bDocumentModified = FALSE;
 		SciCall_SetEOLMode(iCurrentEOLMode);
 		UpdateStatusBarCache(STATUS_CODEPAGE);
 		UpdateStatusBarCache(STATUS_EOLMODE);
@@ -7535,7 +7535,7 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 
 	if (fSuccess) {
 		if (!bSaveCopy) {
-			bModified = FALSE;
+			bDocumentModified = FALSE;
 			iOriginalEncoding = iCurrentEncoding;
 			MRU_AddFile(pFileMRU, szCurFile, flagRelativeFileMRU, flagPortableMyDocs);
 			if (flagUseSystemMRU == 2) {
