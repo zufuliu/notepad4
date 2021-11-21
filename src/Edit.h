@@ -351,6 +351,12 @@ void	EditShowCallTips(Sci_Position position);
 
 #define MAX_ENCODING_LABEL_SIZE		32
 
+enum {
+	EncodingFlag_None = 0,
+	EncodingFlag_BOM = 1,
+	EncodingFlag_UTF7 = 2,
+};
+
 typedef struct NP2ENCODING {
 	const UINT uFlags;
 	/*const*/UINT uCodePage;

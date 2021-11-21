@@ -954,7 +954,7 @@ labelStart:
 #endif
 }
 
-int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, LPBOOL lpbBOM) {
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, int *encodingFlag) {
 	LPCWSTR const pszExt = PathFindExtension(pszFile);
 	int preferedEncoding = CPI_NONE;
 	if (bLoadNFOasOEM && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
@@ -1016,7 +1016,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 			iEncoding = bBOM ? CPI_UNICODEBOM : CPI_UNICODE;
 		}
 
-		*lpbBOM = bBOM;
+		*encodingFlag = bBOM;
 		return iEncoding;
 	}
 
@@ -1046,6 +1046,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 			if (!bBOM && (!bLoadASCIIasUTF8 || preferedEncoding != CPI_NONE)
 				&& cbData < MAX_NON_UTF8_SIZE && IsUTF7(lpData, cbData)) {
 				// 7-bit / any encoding
+				*encodingFlag = EncodingFlag_UTF7;
 				return iEncoding;
 			}
 			utf8Sig = bBOM || IsUTF8(lpData, cbData);
@@ -1053,7 +1054,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	}
 
 	if (utf8Sig) {
-		*lpbBOM = bBOM;
+		*encodingFlag = bBOM;
 		iEncoding = bBOM ? CPI_UTF8SIGN : CPI_UTF8;
 		return iEncoding;
 	}
@@ -1061,6 +1062,8 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	if (cbData < MAX_NON_UTF8_SIZE && iEncoding != CPI_DEFAULT) {
 		const UINT uFlags = mEncoding[iEncoding].uFlags;
 		if ((uFlags & NCP_8BIT) || ((uFlags & NCP_7BIT) && IsUTF7(lpData, cbData))) {
+			// 7-bit / any encoding
+			*encodingFlag = EncodingFlag_UTF7;
 			return iEncoding;
 		}
 	}
@@ -1183,8 +1186,8 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	status->bInconsistent = FALSE;
 	status->totalLineCount = 1;
 
-	BOOL bBOM = FALSE;
-	const int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, bSkipEncodingDetection, &bBOM);
+	int encodingFlag = EncodingFlag_None;
+	const int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, bSkipEncodingDetection, &encodingFlag);
 	status->iEncoding = iEncoding;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
@@ -1202,9 +1205,9 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	if (uFlags & NCP_UNICODE) {
 		// cbData/2 => WCHAR, WCHAR*3 => UTF-8
 		lpDataUTF8 = (char *)NP2HeapAlloc((cbData + 1)*sizeof(WCHAR));
-		LPCWSTR pszTextW = bBOM ? ((LPWSTR)lpData + 1) : (LPWSTR)lpData;
+		LPCWSTR pszTextW = encodingFlag ? ((LPWSTR)lpData + 1) : (LPWSTR)lpData;
 		// NOTE: requires two extra trailing NULL bytes.
-		const DWORD cchTextW = bBOM ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
+		const DWORD cchTextW = encodingFlag ? (cbData / sizeof(WCHAR)) : ((cbData / sizeof(WCHAR)) + 1);
 		cbData = WideCharToMultiByte(CP_UTF8, 0, pszTextW, cchTextW, lpDataUTF8, (int)NP2HeapSize(lpDataUTF8), NULL, NULL);
 		if (cbData == 0) {
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
@@ -1220,34 +1223,40 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		lpData = lpDataUTF8;
 		FileVars_Init(lpData, cbData, &fvCurFile);
 	} else if (uFlags & NCP_UTF8) {
-		if (bBOM) {
-			lpDataUTF8 = lpData + 3;
+		if (encodingFlag & EncodingFlag_BOM) {
+			lpDataUTF8 += 3;
 			cbData -= 3;
 		}
 	} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
-		const UINT uCodePage = mEncoding[iEncoding].uCodePage;
-		lpDataUTF8 = EncodeAsUTF8(lpData, &cbData, uCodePage, 0);
-		NP2HeapFree(lpData);
-		lpData = lpDataUTF8;
+		if ((encodingFlag & EncodingFlag_UTF7) == 0 || iEncoding == CPI_UTF7) {
+			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
+			lpDataUTF8 = EncodeAsUTF8(lpData, &cbData, uCodePage, 0);
+			NP2HeapFree(lpData);
+			lpData = lpDataUTF8;
+		}
 	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE
 		&& iSrcEncoding == CPI_NONE && iWeakSrcEncoding == CPI_NONE
 		&& (bLoadANSIasUTF8 || GetACP() == CP_UTF8)) {
-		if (bSkipEncodingDetection && IsUTF8(lpData, cbData)) {
+		if (bSkipEncodingDetection && ((encodingFlag & EncodingFlag_UTF7) || IsUTF8(lpData, cbData))) {
 			uFlags = 0;
 			status->iEncoding = CPI_UTF8;
 		} else {
 			// try to load ANSI / unknown encoding as UTF-8
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
-			DWORD back = cbData;
-			lpDataUTF8 = EncodeAsUTF8(lpData, &back, legacyACP, MB_ERR_INVALID_CHARS);
-			if (lpDataUTF8) {
+			if (encodingFlag & EncodingFlag_UTF7) {
 				uFlags = 0;
 				status->iEncoding = Encoding_GetIndex(legacyACP);
-				NP2HeapFree(lpData);
-				lpData = lpDataUTF8;
-				cbData = back;
 			} else {
-				lpDataUTF8 = lpData;
+				DWORD back = cbData;
+				char * const result = EncodeAsUTF8(lpData, &back, legacyACP, MB_ERR_INVALID_CHARS);
+				if (result) {
+					NP2HeapFree(lpData);
+					lpDataUTF8 = result;
+					lpData = result;
+					cbData = back;
+					uFlags = 0;
+					status->iEncoding = Encoding_GetIndex(legacyACP);
+				}
 			}
 		}
 	}

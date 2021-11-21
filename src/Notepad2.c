@@ -255,7 +255,7 @@ LPMRULIST	mruReplace;
 DWORD	dwLastIOError;
 WCHAR	szCurFile[MAX_PATH + 40];
 FILEVARS	fvCurFile;
-BOOL bDocumentModified = FALSE;
+static BOOL bDocumentModified = FALSE;
 static BOOL bReadOnly = FALSE;
 BOOL bLockedForEditing = FALSE; // save call to SciCall_GetReadOnly()
 
