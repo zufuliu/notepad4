@@ -166,11 +166,9 @@ public:
 
 struct LexerReleaser {
 	// Called by unique_ptr to destroy/free the Resource
-	void operator()(Scintilla::ILexer5 *pLexer) noexcept {
-		if (pLexer) {
-			// ILexer5::Release must not throw, ignore if it does.
-			pLexer->Release();
-		}
+	void operator()(Scintilla::ILexer5 *pLexer) const noexcept {
+		// ILexer5::Release must not throw, ignore if it does.
+		pLexer->Release();
 	}
 };
 

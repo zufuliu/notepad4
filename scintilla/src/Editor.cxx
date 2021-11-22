@@ -6656,7 +6656,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 				return lineEnd - lineStart;
 			}
 			char *ptr = CharPtrFromSPtr(lParam);
-			const Sci::Position len = std::min<uptr_t>(lineEnd - lineStart, wParam);
+			const Sci::Position len = std::min<Sci::Position>(lineEnd - lineStart, wParam);
 			pdoc->GetCharRange(ptr, lineStart, len);
 			ptr[len] = '\0';
 			return sel.MainCaret() - lineStart;

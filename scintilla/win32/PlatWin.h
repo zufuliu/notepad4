@@ -187,53 +187,6 @@ inline void SetWindowPointer(HWND hWnd, void *ptr) noexcept {
 	::SetWindowLongPtr(hWnd, 0, reinterpret_cast<LONG_PTR>(ptr));
 }
 
-/// Find a function in a DLL and convert to a function pointer.
-/// This avoids undefined and conditionally defined behaviour.
-template<typename T>
-inline T DLLFunction(HMODULE hModule, LPCSTR lpProcName) noexcept {
-#if 1
-#if defined(__GNUC__) && __GNUC__ >= 8
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wcast-function-type"
-	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
-	#pragma GCC diagnostic pop
-#else
-	return reinterpret_cast<T>(::GetProcAddress(hModule, lpProcName));
-#endif
-#else
-	FARPROC function = ::GetProcAddress(hModule, lpProcName);
-	static_assert(sizeof(T) == sizeof(function));
-	T fp {};
-	memcpy(&fp, &function, sizeof(T));
-	return fp;
-#endif
-}
-
-template<typename T>
-inline T DLLFunctionEx(LPCWSTR lpDllName, LPCSTR lpProcName) noexcept {
-	return DLLFunction<T>(::GetModuleHandleW(lpDllName), lpProcName);
-}
-
-// Release an IUnknown* and set to nullptr.
-// While IUnknown::Release must be noexcept, it isn't marked as such so produces
-// warnings which are avoided by the catch.
-template <class T>
-inline void ReleaseUnknown(T *&ppUnknown) noexcept {
-	if (ppUnknown) {
-#if 0
-		ppUnknown->Release();
-#else
-		try {
-			ppUnknown->Release();
-		} catch (...) {
-			// Never occurs
-			NP2_unreachable();
-		}
-#endif
-		ppUnknown = nullptr;
-	}
-}
-
 inline UINT DpiForWindow(WindowID wid) noexcept {
 	return GetWindowDPI(HwndFromWindowID(wid));
 }

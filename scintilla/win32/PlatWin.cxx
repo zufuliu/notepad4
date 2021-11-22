@@ -43,6 +43,7 @@
 #include "CharClassify.h"
 #include "UniConversion.h"
 
+#include "WinTypes.h"
 #include "PlatWin.h"
 
 #ifndef LOAD_LIBRARY_SEARCH_SYSTEM32

@@ -180,6 +180,7 @@
       <File Name="../../scintilla/win32/PlatWin.cxx"/>
       <File Name="../../scintilla/win32/PlatWin.h"/>
       <File Name="../../scintilla/win32/ScintillaWin.cxx"/>
+      <File Name="../../scintilla/win32/WinTypes.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Source Files">

@@ -776,6 +776,9 @@
     <ClInclude Include="..\..\scintilla\win32\PlatWin.h">
       <Filter>Scintilla\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\win32\WinTypes.h">
+      <Filter>Scintilla\win32</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>

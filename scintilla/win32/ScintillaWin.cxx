@@ -95,6 +95,7 @@ Used by VSCode, Atom etc.
 #include "AutoComplete.h"
 #include "ScintillaBase.h"
 
+#include "WinTypes.h"
 #include "PlatWin.h"
 #include "HanjaDic.h"
 #include "LaTeXInput.h"
@@ -350,8 +351,8 @@ public:
 class GlobalMemory;
 
 class ReverseArrowCursor {
-	UINT dpi = USER_DEFAULT_SCREEN_DPI;
 	HCURSOR cursor {};
+	UINT dpi = USER_DEFAULT_SCREEN_DPI;
 
 public:
 	ReverseArrowCursor() noexcept = default;
@@ -887,8 +888,7 @@ KeyMod ScintillaWin::MouseModifiers(uptr_t wParam) noexcept {
 namespace {
 
 /** Map the key codes to their equivalent Keys:: form. */
-constexpr Keys KeyTranslate(int keyIn) noexcept {
-	//PLATFORM_ASSERT(!keyIn);
+constexpr Keys KeyTranslate(uptr_t keyIn) noexcept {
 	switch (keyIn) {
 	case VK_DOWN:		return Keys::Down;
 	case VK_UP:			return Keys::Up;
@@ -1821,7 +1821,7 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
 		const KeyMod modifiers = ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown);
-		const int ret = KeyDownWithModifiers(KeyTranslate(static_cast<int>(wParam)), modifiers, &lastKeyDownConsumed);
+		const int ret = KeyDownWithModifiers(KeyTranslate(wParam), modifiers, &lastKeyDownConsumed);
 		if (!ret && !lastKeyDownConsumed) {
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
