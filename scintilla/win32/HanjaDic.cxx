@@ -174,6 +174,7 @@ bool GetHangulOfHanja(std::wstring &inout) noexcept {
 #pragma comment(lib, "oleaut32.lib")
 #endif
 
+using namespace Scintilla::Internal;
 using namespace Scintilla::Internal::HanjaDict;
 
 bool GetHangulOfHanja2(std::wstring &inout) {

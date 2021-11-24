@@ -90,6 +90,32 @@
 #endif
 #endif
 
+// find index of the highest set bit
+#if NP2_TARGET_ARM
+#if defined(__clang__) || defined(__GNUC__)
+	#define np2_bsr(x)		(__builtin_clz(x) ^ 31)
+	#define np2_bsr64(x)	(__builtin_clzll(x) ^ 63)
+#else
+	#define np2_bsr(x)		(_CountLeadingZeros(x) ^ 31)
+	#define np2_bsr64(x)	(_CountLeadingZeros64(x) ^ 63)
+#endif
+
+#else
+	static inline uint32_t np2_bsr(uint32_t value) NP2_noexcept {
+		unsigned long trailing;
+		_BitScanReverse(&trailing, value);
+		return trailing;
+	}
+
+#if defined(_WIN64)
+	static inline uint32_t np2_bsr64(uint64_t value) NP2_noexcept {
+		unsigned long trailing;
+		_BitScanReverse64(&trailing, value);
+		return trailing;
+	}
+#endif
+#endif
+
 // count leading zero bits
 #if defined(__clang__) || defined(__GNUC__)
 	#define np2_clz(x)		__builtin_clz(x)
@@ -97,23 +123,12 @@
 #elif NP2_TARGET_ARM
 	#define np2_clz(x)		_CountLeadingZeros(x)
 	#define np2_clz64(x)	_CountLeadingZeros64(x)
-//#elif NP2_USE_AVX2
-//	#define np2_clz(x)		_lzcnt_u32(x)
-//	#define np2_clz64(x)	_lzcnt_u64(x)
+#elif NP2_USE_AVX2
+	#define np2_clz(x)		_lzcnt_u32(x)
+	#define np2_clz64(x)	_lzcnt_u64(x)
 #else
-	static inline uint32_t np2_clz(uint32_t value) NP2_noexcept {
-		unsigned long trailing;
-		_BitScanReverse(&trailing, value);
-		return 31 - trailing;
-	}
-
-#if defined(_WIN64)
-	static inline uint32_t np2_clz64(uint64_t value) NP2_noexcept {
-		unsigned long trailing;
-		_BitScanReverse64(&trailing, value);
-		return 63 - trailing;
-	}
-#endif
+	#define np2_clz(x)		(np2_bsr(x) ^ 31)
+	#define np2_clz64(x)	(np2_bsr64(x) ^ 63)
 #endif
 
 // count bits set
@@ -240,10 +255,12 @@ static inline uint8_t bittest(const uint32_t *addr, uint32_t index) NP2_noexcept
 namespace np2 {
 inline auto ctz(uint32_t x) noexcept { return np2_ctz(x); }
 inline auto clz(uint32_t x) noexcept { return np2_clz(x); }
+inline auto bsr(uint32_t x) noexcept { return np2_bsr(x); }
 inline auto popcount(uint32_t x) noexcept { return np2_popcount(x); }
 #if defined(_WIN64)
 inline auto ctz(uint64_t x) noexcept { return np2_ctz64(x); }
 inline auto clz(uint64_t x) noexcept { return np2_clz64(x); }
+inline auto bsr(uint64_t x) noexcept { return np2_bsr64(x); }
 inline auto popcount(uint64_t x) noexcept { return np2_popcount64(x); }
 #endif
 }

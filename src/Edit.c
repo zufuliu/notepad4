@@ -959,7 +959,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	int preferedEncoding = CPI_NONE;
 	if (bLoadNFOasOEM && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
 		preferedEncoding = g_DOSEncoding;
-	} else if (StrCaseEqual(pszExt, L".bat")) {
+	} else if (StrCaseEqual(pszExt, L".bat") || StrCaseEqual(pszExt, L".cmd")) {
 		preferedEncoding = CPI_DEFAULT;
 	} else if (StrEqual(pszExt, L".sh") || StrStartsWith(lpData, "#!/")) {
 		// shell script: #!/bin/sh[LF]
@@ -7922,11 +7922,10 @@ static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
 	++levelStack->levelCount;
 }
 
-static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *ignoreInner) {
+static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *ignoreInner) {
 	switch (iLexer) {
 	case SCLEX_NULL:
 	case SCLEX_COFFEESCRIPT: // class, function
-		*maxLevel = 2;
 		return (1 << 1) | (1 << 2);
 
 	case SCLEX_ASYMPTOTE: // struct, function
@@ -7940,17 +7939,14 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *i
 	case SCLEX_CPP:
 		switch (rid) {
 		case NP2LEX_CPP: // preprocessor, namespace, class, method
-			*maxLevel = 3;
 			return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
 
 		case NP2LEX_SCALA: // class, inner class, method
-			*maxLevel = 2;
 			return (1 << 0) | (1 << 1) | (1 << 2);
 		}
 		break;
 
 	case SCLEX_CSHARP: // namespace, class, method
-		*maxLevel = 2;
 		*ignoreInner = SCE_CSHARP_FUNCTION_DEFINITION;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
@@ -7959,7 +7955,6 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *i
 		break;
 
 	case SCLEX_DIFF: // file, diff in file
-		*maxLevel = 2;
 		return (1 << 0) | (1 << 2);
 
 	case SCLEX_GO: // struct, function
@@ -7977,16 +7972,13 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *i
 	case SCLEX_HTML:
 	case SCLEX_JSON:
 	case SCLEX_XML:
-		*maxLevel = 3;
 		return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
 
 	case SCLEX_JAVA: // class, inner class, method
-		*maxLevel = 2;
 		*ignoreInner = SCE_JAVA_FUNCTION_DEFINITION;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
 	case SCLEX_JAVASCRIPT: // object, anonymous object, function
-		*maxLevel = 2;
 		*ignoreInner = SCE_JS_FUNCTION_DEFINITION;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
@@ -7995,22 +7987,18 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *i
 		break;
 
 	case SCLEX_KOTLIN: // class, inner class, method
-		*maxLevel = 2;
 		*ignoreInner = SCE_KOTLIN_FUNCTION_DEFINITION;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
 	case SCLEX_PROPERTIES: // section
 	case SCLEX_TOML: // table
-		*maxLevel = 0;
 		return (1 << 0);
 
 	case SCLEX_PYTHON: // class, function
-		*maxLevel = 2;
 		*ignoreInner = SCE_PY_FUNCTION_DEFINITION;
 		return (1 << 1) | (1 << 2);
 
 	case SCLEX_RUBY: // module, class, method
-		*maxLevel = 2;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
 	case SCLEX_RUST: // struct, function
@@ -8022,11 +8010,9 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *maxLevel, int *i
 		break;
 
 	case SCLEX_YAML:
-		*maxLevel = 4;
 		return (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4);
 	}
 
-	*maxLevel = 1;
 	return (1 << 0) | (1 << 1);
 }
 
@@ -8190,9 +8176,9 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 
 void FoldToggleDefault(FOLD_ACTION action) {
 	SciCall_ColouriseAll();
-	int maxLevel = 0;
 	int ignoreInner = 0;
-	const UINT levelMask = Style_GetDefaultFoldLevel(pLexCurrent->iLexer, pLexCurrent->rid, &maxLevel, &ignoreInner);
+	const UINT levelMask = Style_GetDefaultFoldLevel(pLexCurrent->iLexer, pLexCurrent->rid, &ignoreInner);
+	const int maxLevel = np2_bsr(levelMask);
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
 	BOOL fToggled = FALSE;

@@ -391,9 +391,9 @@ constexpr size_t NextPowerOfTwo(size_t x) noexcept {
 #else
 inline size_t NextPowerOfTwo(size_t x) noexcept {
 #if SIZE_MAX > UINT_MAX
-	return UINT64_C(1) << (64 - np2::clz(x - 1));
+	return UINT64_C(1) << (1 + np2::bsr(x - 1));
 #else
-	return 1U << (32 - np2::clz(x - 1));
+	return 1U << (1 + np2::bsr(x - 1));
 #endif
 }
 #endif
