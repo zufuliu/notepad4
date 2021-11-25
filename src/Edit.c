@@ -1280,20 +1280,20 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 //
 BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *status) {
 	HANDLE hFile = CreateFile(pszFile,
-					   GENERIC_WRITE,
+					   GENERIC_READ | GENERIC_WRITE,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
 					   NULL, OPEN_ALWAYS,
 					   FILE_ATTRIBUTE_NORMAL,
 					   NULL);
 	dwLastIOError = GetLastError();
 
-	// failure could be due to missing attributes (2k/XP)
+	// failure could be due to missing attributes (Windows 2000, XP)
 	if (hFile == INVALID_HANDLE_VALUE) {
 		DWORD dwAttributes = GetFileAttributes(pszFile);
 		if (dwAttributes != INVALID_FILE_ATTRIBUTES) {
 			dwAttributes = dwAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM);
 			hFile = CreateFile(pszFile,
-							   GENERIC_WRITE,
+							   GENERIC_READ | GENERIC_WRITE,
 							   FILE_SHARE_READ | FILE_SHARE_WRITE,
 							   NULL,
 							   OPEN_ALWAYS,
@@ -5880,7 +5880,8 @@ static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	// use increment search to ensure FindText() terminated in expected time.
 	//++EditMarkAll_Runs;
-	//printf("match %3u %s\n", EditMarkAll_Runs, GetCurrentLogTime());
+	//char logTime[16];
+	//printf("match %3u %s\n", EditMarkAll_Runs, GetCurrentLogTime(logTime));
 	QueryPerformanceCounter(&status->watch.begin);
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = status->iStartPos;

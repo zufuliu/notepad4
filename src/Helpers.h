@@ -230,7 +230,7 @@ NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
 
 int ParseCommaList(LPCWSTR str, int result[], int count);
 int ParseCommaList64(LPCWSTR str, int64_t result[], int count);
-LPCSTR GetCurrentLogTime(void);
+LPCSTR GetCurrentLogTime(char buf[16]);
 
 typedef struct StopWatch {
 	LARGE_INTEGER freq; // not changed after system boot
