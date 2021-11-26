@@ -1278,7 +1278,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 //
 // EditSaveFile()
 //
-BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *status) {
+BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *status) {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ | GENERIC_WRITE,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1307,14 +1307,16 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		return FALSE;
 	}
 
-	// ensure consistent line endings
-	if (bFixLineEndings) {
-		EditEnsureConsistentLineEndings();
-	}
+	if (!(saveFlag & FileSaveFlag_EndSession)) {
+		// ensure consistent line endings
+		if (bFixLineEndings) {
+			EditEnsureConsistentLineEndings();
+		}
 
-	// strip trailing blanks
-	if (bAutoStripBlanks) {
-		EditStripTrailingBlanks(hwnd, TRUE);
+		// strip trailing blanks
+		if (bAutoStripBlanks) {
+			EditStripTrailingBlanks(hwnd, TRUE);
+		}
 	}
 
 	BOOL bWriteSuccess;
@@ -1400,26 +1402,20 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 		} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
 			BOOL bCancelDataLoss = FALSE;
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
-			const BOOL zeroFlags = IsZeroFlagsCodePage(uCodePage);
 
 			LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(cbData * sizeof(WCHAR) + 16);
 			const int cbDataWide = MultiByteToWideChar(CP_UTF8, 0, lpData, cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
 
-			if (zeroFlags) {
+			if (IsZeroFlagsCodePage(uCodePage)) {
 				NP2HeapFree(lpData);
 				lpData = (char *)NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2);
 			} else {
 				ZeroMemory(lpData, NP2HeapSize(lpData));
+				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, &bCancelDataLoss);
 			}
 
-			if (zeroFlags) {
+			if (!bCancelDataLoss) {
 				cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
-			} else {
-				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, &bCancelDataLoss);
-				if (!bCancelDataLoss) {
-					cbData = WideCharToMultiByte(uCodePage, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
-					bCancelDataLoss = FALSE;
-				}
 			}
 			NP2HeapFree(lpDataWide);
 
@@ -1444,7 +1440,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, EditFileIOStatus *
 
 	CloseHandle(hFile);
 	if (bWriteSuccess) {
-		if (!bSaveCopy) {
+		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 			SciCall_SetSavePoint();
 		}
 		return TRUE;

@@ -820,11 +820,11 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		if (PathIsDirectory(lpFileArg)) {
 			WCHAR tchFile[MAX_PATH];
 			if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), lpFileArg)) {
-				bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
+				bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 				bFileLoadCalled = TRUE;
 			}
 		} else {
-			if ((bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, lpFileArg)) != FALSE) {
+			if ((bOpened = FileLoad(FileLoadFlag_Default, lpFileArg)) != FALSE) {
 				bFileLoadCalled = TRUE;
 				if (flagJumpTo) { // Jump to position
 					EditJumpTo(iInitialLine, iInitialColumn);
@@ -854,7 +854,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	if (!bFileLoadCalled) {
-		bOpened = FileLoad(TRUE, TRUE, FALSE, FALSE, L"");
+		bOpened = FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_New), L"");
 	}
 	if (!bOpened) {
 		UpdateStatusBarCache(STATUS_CODEPAGE);
@@ -994,7 +994,7 @@ static inline void EditMarkAll_Stop(void) {
 }
 
 static inline void ExitApplication(HWND hwnd) {
-	if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
+	if (FileSave(FileSaveFlag_Ask)) {
 		if (bInFullScreenMode) {
 			bInFullScreenMode = FALSE;
 			ToggleFullScreenMode();
@@ -1014,10 +1014,10 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 	if (PathIsDirectory(szBuf)) {
 		WCHAR tchFile[MAX_PATH];
 		if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf)) {
-			FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
+			FileLoad(FileLoadFlag_Default, tchFile);
 		}
 	} else {
-		FileLoad(FALSE, FALSE, FALSE, FALSE, szBuf);
+		FileLoad(FileLoadFlag_Default, szBuf);
 	}
 }
 
@@ -1137,7 +1137,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_QUERYENDSESSION:
-		if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		// we only have 5 seconds to save current file
+		if (FileSave((FileSaveFlag)(FileSaveFlag_Ask | FileSaveFlag_EndSession))) {
 			return TRUE;
 		}
 		return FALSE;
@@ -1239,10 +1240,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				if (PathIsDirectory(&params->wchData)) {
 					WCHAR tchFile[MAX_PATH];
 					if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), &params->wchData)) {
-						bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, tchFile);
+						bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 					}
 				} else {
-					bOpened = FileLoad(FALSE, FALSE, FALSE, FALSE, &params->wchData);
+					bOpened = FileLoad(FileLoadFlag_Default, &params->wchData);
 				}
 
 				if (bOpened) {
@@ -1391,7 +1392,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				const BOOL bIsTail = (iFileWatchingMode == 2) && (bFileWatchingKeepAtEnd || (SciCall_LineFromPosition(SciCall_GetCurrentPos()) + 1 == SciCall_GetLineCount()));
 
 				iWeakSrcEncoding = iCurrentEncoding;
-				if (FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile)) {
+				if (FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile)) {
 					if (bIsTail) {
 						SciCall_DocumentEnd();
 						EditEnsureSelectionVisible();
@@ -1400,7 +1401,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			}
 		} else {
 			if (MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY2) == IDYES) {
-				FileSave(TRUE, FALSE, FALSE, FALSE);
+				FileSave(FileSaveFlag_SaveAlways);
 			}
 		}
 
@@ -2674,11 +2675,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	switch (LOWORD(wParam)) {
 	case IDM_FILE_NEW:
-		FileLoad(FALSE, TRUE, FALSE, FALSE, L"");
+		FileLoad(FileLoadFlag_New, L"");
 		break;
 
 	case IDM_FILE_OPEN:
-		FileLoad(FALSE, FALSE, FALSE, FALSE, L"");
+		FileLoad(FileLoadFlag_Default, L"");
 		break;
 
 	case IDM_FILE_REVERT:
@@ -2688,20 +2689,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			iWeakSrcEncoding = iCurrentEncoding;
-			FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile);
 		}
 		break;
 
 	case IDM_FILE_SAVE:
-		FileSave(TRUE, FALSE, FALSE, FALSE);
+		FileSave(FileSaveFlag_SaveAlways);
 		break;
 
 	case IDM_FILE_SAVEAS:
-		FileSave(TRUE, FALSE, TRUE, FALSE);
+		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs));
 		break;
 
 	case IDM_FILE_SAVECOPY:
-		FileSave(TRUE, FALSE, TRUE, TRUE);
+		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
 		break;
 
 	case IDM_FILE_READONLY:
@@ -2740,7 +2741,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_NEWWINDOW2:
 	case IDM_FILE_RESTART: {
 		const BOOL emptyWind = LOWORD(wParam) == IDM_FILE_NEWWINDOW2;
-		if (!emptyWind && bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (!emptyWind && bSaveBeforeRunningTools && !FileSave(FileSaveFlag_Ask)) {
 			break;
 		}
 
@@ -2784,7 +2785,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (bSaveBeforeRunningTools && !FileSave(FileSaveFlag_Ask)) {
 			break;
 		}
 
@@ -2811,7 +2812,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RUN: {
-		if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (bSaveBeforeRunningTools && !FileSave(FileSaveFlag_Ask)) {
 			break;
 		}
 
@@ -2824,7 +2825,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_OPENWITH:
-		if (bSaveBeforeRunningTools && !FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (bSaveBeforeRunningTools && !FileSave(FileSaveFlag_Ask)) {
 			break;
 		}
 		OpenWithDlg(hwnd, szCurFile);
@@ -2884,7 +2885,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_OPENFAV:
-		if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
+		if (FileSave(FileSaveFlag_Ask)) {
 			WCHAR tchSelItem[MAX_PATH];
 
 			if (FavoritesDlg(hwnd, tchSelItem)) {
@@ -2893,10 +2894,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					WCHAR tchFile[MAX_PATH];
 
 					if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), tchSelItem)) {
-						FileLoad(TRUE, FALSE, FALSE, FALSE, tchFile);
+						FileLoad(FileLoadFlag_DontSave, tchFile);
 					}
 				} else {
-					FileLoad(TRUE, FALSE, FALSE, FALSE, tchSelItem);
+					FileLoad(FileLoadFlag_DontSave, tchSelItem);
 				}
 			}
 		}
@@ -2930,10 +2931,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_RECENT:
 		if (MRU_GetCount(pFileMRU) > 0) {
-			if (FileSave(FALSE, TRUE, FALSE, FALSE)) {
+			if (FileSave(FileSaveFlag_Ask)) {
 				WCHAR tchFile[MAX_PATH];
 				if (FileMRUDlg(hwnd, tchFile)) {
-					FileLoad(TRUE, FALSE, FALSE, FALSE, tchFile);
+					FileLoad(FileLoadFlag_DontSave, tchFile);
 				}
 			}
 		}
@@ -3018,7 +3019,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			if (SelectEncodingDlg(hwnd, &iNewEncoding, IDS_SELRECT_RELOAD_ENCODING)) {
 				iSrcEncoding = iNewEncoding;
-				FileLoad(TRUE, FALSE, TRUE, FALSE, szCurFile);
+				FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile);
 			}
 		}
 		break;
@@ -4488,28 +4489,28 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			} else {
 				iSrcEncoding = iDefaultEncoding;
 			}
-			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad(FileLoadFlag_Reload, szCurFile);
 		}
 		break;
 
 	case CMD_RELOADANSI:
 		if (StrNotEmpty(szCurFile)) {
 			iSrcEncoding = CPI_DEFAULT;
-			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad(FileLoadFlag_Reload, szCurFile);
 		}
 		break;
 
 	case CMD_RELOADOEM:
 		if (StrNotEmpty(szCurFile)) {
 			iSrcEncoding = CPI_OEM;
-			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad(FileLoadFlag_Reload, szCurFile);
 		}
 		break;
 
 	case CMD_RELOADUTF8:
 		if (StrNotEmpty(szCurFile)) {
 			iSrcEncoding = CPI_UTF8;
-			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad(FileLoadFlag_Reload, szCurFile);
 		}
 		break;
 
@@ -4519,7 +4520,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			const BOOL _bNoEncodingTags = bNoEncodingTags;
 			fNoFileVariables = 1;
 			bNoEncodingTags = 1;
-			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad(FileLoadFlag_Reload, szCurFile);
 			fNoFileVariables = _fNoFileVariables;
 			bNoEncodingTags = _bNoEncodingTags;
 		}
@@ -4530,7 +4531,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (StrNotEmpty(szCurFile)) {
 			bLargeFileMode = TRUE;
 			iSrcEncoding = iCurrentEncoding;
-			FileLoad(FALSE, FALSE, TRUE, FALSE, szCurFile);
+			FileLoad(FileLoadFlag_Reload, szCurFile);
 			bLargeFileMode = SciCall_GetDocumentOptions() & SC_DOCUMENTOPTION_TEXT_LARGE;
 		}
 		if (!bLargeFileMode) {
@@ -4756,7 +4757,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_OPENINIFILE:
 		if (StrNotEmpty(szIniFile)) {
 			CreateIniFile(szIniFile);
-			FileLoad(FALSE, FALSE, FALSE, FALSE, szIniFile);
+			FileLoad(FileLoadFlag_Default, szIniFile);
 		}
 		break;
 
@@ -7122,7 +7123,7 @@ void ToggleFullScreenMode(void) {
 //	FileIO()
 //
 //
-BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
+BOOL FileIO(BOOL fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status) {
 	BeginWaitCursor();
 
 	WCHAR tch[MAX_PATH + 128];
@@ -7135,7 +7136,7 @@ BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 	InvalidateRect(hwndStatus, NULL, TRUE);
 	UpdateWindow(hwndStatus);
 
-	const BOOL fSuccess = fLoad ? EditLoadFile(pszFile, bFlag, status) : EditSaveFile(hwndEdit, pszFile, bFlag, status);
+	const BOOL fSuccess = fLoad ? EditLoadFile(pszFile, flag, status) : EditSaveFile(hwndEdit, pszFile, flag, status);
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
 	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
@@ -7150,7 +7151,7 @@ BOOL FileIO(BOOL fLoad, LPWSTR pszFile, BOOL bFlag, EditFileIOStatus *status) {
 // FileLoad()
 //
 //
-BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWSTR lpszFile) {
+BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	WCHAR tch[MAX_PATH] = L"";
 	BOOL fSuccess = FALSE;
 	BOOL bRestoreView = FALSE;
@@ -7164,7 +7165,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 	int keepTitleExcerpt = fKeepTitleExcerpt;
 	BOOL keepCurrentLexer = FALSE;
 
-	if (!bNew && StrNotEmpty(lpszFile)) {
+	if (!(loadFlag & FileLoadFlag_New) && StrNotEmpty(lpszFile)) {
 		lstrcpy(tch, lpszFile);
 		if (lpszFile == szCurFile || PathEqual(lpszFile, szCurFile)) {
 			iCurPos = SciCall_GetCurrentPos();
@@ -7180,13 +7181,13 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 		fSuccess = TRUE;
 	}
-	if (!bDontSave) {
-		if (!FileSave(FALSE, TRUE, FALSE, FALSE)) {
+	if (!(loadFlag & FileLoadFlag_DontSave)) {
+		if (!FileSave(FileSaveFlag_Ask)) {
 			return FALSE;
 		}
 	}
 
-	if (bNew) {
+	if (loadFlag & FileLoadFlag_New) {
 		StrCpyExW(szCurFile, L"");
 		SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 		SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
@@ -7250,7 +7251,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 #endif
 
 	// Ask to create a new file...
-	if (!bReload && !PathIsFile(szFileName)) {
+	if (!(loadFlag & FileLoadFlag_Reload) && !PathIsFile(szFileName)) {
 		int result = IDCANCEL;
 		if (flagQuietCreate || (result = MsgBoxWarn(MB_YESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
 			HANDLE hFile = CreateFile(szFileName,
@@ -7281,7 +7282,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 			return FALSE;
 		}
 	} else {
-		fSuccess = FileIO(TRUE, szFileName, bNoEncDetect, &status);
+		fSuccess = FileIO(TRUE, szFileName, loadFlag & FileLoadFlag_NoEncDetect, &status);
 		if (fSuccess) {
 			iCurrentEncoding = status.iEncoding;
 			iCurrentEOLMode = status.iEOLMode;
@@ -7329,7 +7330,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 		}
 
 		// Install watching of the current file
-		if (!bReload && bResetFileWatching) {
+		if (!(loadFlag & FileLoadFlag_Reload) && bResetFileWatching) {
 			iFileWatchingMode = 0;
 		}
 		InstallFileWatching(FALSE);
@@ -7416,7 +7417,7 @@ BOOL FileLoad(BOOL bDontSave, BOOL bNew, BOOL bReload, BOOL bNoEncDetect, LPCWST
 // FileSave()
 //
 //
-BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
+BOOL FileSave(FileSaveFlag saveFlag) {
 	const BOOL Untitled = StrIsEmpty(szCurFile);
 	BOOL bIsEmptyNewFile = FALSE;
 
@@ -7434,11 +7435,12 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 	}
 
-	if (!bSaveAlways && (!IsDocumentModified() || bIsEmptyNewFile) && !bSaveAs) {
+	if (!(saveFlag & FileSaveFlag_SaveAlways) && (!IsDocumentModified() || bIsEmptyNewFile) && !(saveFlag & FileSaveFlag_SaveAs)) {
 		return TRUE;
 	}
 
-	if (bAsk) {
+	// TODO: avoid message boxes when FileSaveFlag_EndSession is set
+	if (saveFlag & FileSaveFlag_Ask) {
 		// File or "Untitled" ...
 		WCHAR tch[MAX_PATH];
 		if (!Untitled) {
@@ -7467,29 +7469,29 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 #endif
 
 	// Read only...
-	if (!bSaveAs && !bSaveCopy && !Untitled) {
+	if (!(saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) && !Untitled) {
 		const DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 		bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 		if (bReadOnly) {
 			UpdateWindowTitle();
 			if (MsgBoxWarn(MB_YESNO, IDS_READONLY_SAVE, szCurFile) == IDYES) {
-				bSaveAs = TRUE;
+				saveFlag = (FileSaveFlag)(saveFlag | FileSaveFlag_SaveAs);
 			} else {
 				return FALSE;
 			}
 		}
-		if (!bSaveAs) {
-			fSuccess = FileIO(FALSE, szCurFile, FALSE, &status);
+		if (!(saveFlag & FileSaveFlag_SaveAs)) {
+			fSuccess = FileIO(FALSE, szCurFile, saveFlag & FileSaveFlag_EndSession, &status);
 			if (!fSuccess) {
-				bSaveAs = TRUE;
+				saveFlag = (FileSaveFlag)(saveFlag | FileSaveFlag_SaveAs);
 			}
 		}
 	}
 
 	// Save As...
-	if (bSaveAs || bSaveCopy || Untitled) {
+	if ((saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) || Untitled) {
 		WCHAR tchInitialDir[MAX_PATH] = L"";
-		if (bSaveCopy && StrNotEmpty(tchLastSaveCopyDir)) {
+		if ((saveFlag & FileSaveFlag_SaveCopy) && StrNotEmpty(tchLastSaveCopyDir)) {
 			lstrcpy(tchInitialDir, tchLastSaveCopyDir);
 			lstrcpy(tchFile, tchLastSaveCopyDir);
 			PathAppend(tchFile, PathFindFileName(szCurFile));
@@ -7498,9 +7500,9 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 		}
 
 		if (SaveFileDlg(hwndMain, Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
-			fSuccess = FileIO(FALSE, tchFile, bSaveCopy, &status);
+			fSuccess = FileIO(FALSE, tchFile, saveFlag & (FileSaveFlag_SaveCopy | FileSaveFlag_EndSession), &status);
 			if (fSuccess) {
-				if (!bSaveCopy) {
+				if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 					lstrcpy(szCurFile, tchFile);
 					SetDlgItemText(hwndMain, IDC_FILENAME, szCurFile);
 					SetDlgItemInt(hwndMain, IDC_REUSELOCK, GetTickCount(), FALSE);
@@ -7530,24 +7532,24 @@ BOOL FileSave(BOOL bSaveAlways, BOOL bAsk, BOOL bSaveAs, BOOL bSaveCopy) {
 			return FALSE;
 		}
 	} else if (!fSuccess) {
-		fSuccess = FileIO(FALSE, szCurFile, FALSE, &status);
+		fSuccess = FileIO(FALSE, szCurFile, saveFlag & FileSaveFlag_EndSession, &status);
 	}
 
 	if (fSuccess) {
-		if (!bSaveCopy) {
+		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 			bDocumentModified = FALSE;
 			iOriginalEncoding = iCurrentEncoding;
 			MRU_AddFile(pFileMRU, szCurFile, flagRelativeFileMRU, flagPortableMyDocs);
 			if (flagUseSystemMRU == 2) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
-			if (flagRelaunchElevated == 2 && bSaveAs && iPathNameFormat == 0) {
+			if (flagRelaunchElevated == 2 && (saveFlag & FileSaveFlag_SaveAs) && iPathNameFormat == 0) {
 				iPathNameFormat = 1;
 			}
 			UpdateDocumentModificationStatus();
 
 			// Install watching of the current file
-			if (bSaveAs && bResetFileWatching) {
+			if ((saveFlag & FileSaveFlag_SaveAs) && bResetFileWatching) {
 				iFileWatchingMode = 0;
 			}
 			InstallFileWatching(FALSE);
@@ -8147,7 +8149,7 @@ BOOL RelaunchElevated(void) {
 		if (flagRelaunchElevated == 2) {
 			WCHAR tchFile[MAX_PATH];
 			lstrcpy(tchFile, szCurFile);
-			if (!FileSave(FALSE, TRUE, FALSE, FALSE)) {
+			if (!FileSave(FileSaveFlag_Ask)) {
 				return FALSE;
 			}
 

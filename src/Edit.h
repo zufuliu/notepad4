@@ -125,7 +125,7 @@ static inline int GetScintillaEOLMode(int mode) {
 struct EditFileIOStatus;
 void 	EditDetectEOLMode(LPCSTR lpData, DWORD cbData, struct EditFileIOStatus *status);
 BOOL	EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, struct EditFileIOStatus *status);
-BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, BOOL bSaveCopy, struct EditFileIOStatus *status);
+BOOL	EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, struct EditFileIOStatus *status);
 
 void	EditInvertCase(void);
 void	EditMapTextCase(int menu);
