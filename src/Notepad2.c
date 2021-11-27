@@ -265,7 +265,7 @@ DWORD dwAutoSavePeriod;
 static DWORD dwCurrentDocReversion = 0;
 static DWORD dwLastSavedDocReversion = 0;
 static BOOL bAutoSaveTimerSet = FALSE;
-#define MaxAutoSaveCount	1	// normal
+#define MaxAutoSaveCount	2	// normal
 #define AllAutoSaveCount	(MaxAutoSaveCount + 2) // suspend, shutdown
 static LPWSTR autoSavePathList[AllAutoSaveCount];
 static int autoSaveCount = 0;
@@ -7380,15 +7380,11 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
 
-		if (loadFlag & FileLoadFlag_Reload) {
-			AutoSave_Stop(FALSE);
-		} else {
-			AutoSave_Stop(TRUE);
-			if (bResetFileWatching) {
-				iFileWatchingMode = 0;
-			}
-		}
+		AutoSave_Stop(!(loadFlag & FileLoadFlag_Reload));
 		// Install watching of the current file
+		if (!(loadFlag & FileLoadFlag_Reload) && bResetFileWatching) {
+			iFileWatchingMode = 0;
+		}
 		InstallFileWatching(FALSE);
 
 		// check for binary file (file with unknown encoding: ANSI)
