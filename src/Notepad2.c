@@ -259,6 +259,18 @@ static BOOL bDocumentModified = FALSE;
 static BOOL bReadOnly = FALSE;
 BOOL bLockedForEditing = FALSE; // save call to SciCall_GetReadOnly()
 
+// AutoSave
+int iAutoSaveOption;
+DWORD dwAutoSavePeriod;
+static DWORD dwCurrentDocReversion = 0;
+static DWORD dwLastSavedDocReversion = 0;
+static BOOL bAutoSaveTimerSet = FALSE;
+#define MaxAutoSaveCount	1	// normal
+#define AllAutoSaveCount	(MaxAutoSaveCount + 2) // suspend, shutdown
+static LPWSTR autoSavePathList[AllAutoSaveCount];
+static int autoSaveCount = 0;
+static WCHAR szAutoSaveFolder[MAX_PATH];
+
 static Sci_Line iInitialLine;
 static Sci_Position iInitialColumn;
 static int iInitialLexer;
@@ -1065,6 +1077,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			WINDOWPLACEMENT wndpl;
 
 			EditMarkAll_Stop();
+			AutoSave_Stop(TRUE);
 			// Terminate file watching
 			InstallFileWatching(TRUE);
 
@@ -1138,10 +1151,22 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_QUERYENDSESSION:
 		// we only have 5 seconds to save current file
+		if (iAutoSaveOption & AutoSaveOption_Shutdown) {
+			AutoSave_DoWork(TRUE);
+		}
 		if (FileSave((FileSaveFlag)(FileSaveFlag_Ask | FileSaveFlag_EndSession))) {
 			return TRUE;
 		}
 		return FALSE;
+
+	case WM_POWERBROADCAST:
+		if (wParam == PBT_APMSUSPEND) {
+			// we only have 2 seconds to save current file
+			if (iAutoSaveOption & AutoSaveOption_Suspend) {
+				AutoSave_DoWork(TRUE);
+			}
+		}
+		break;
 
 	case WM_THEMECHANGED:
 		// Reinitialize theme-dependent values and resize windows
@@ -1164,8 +1189,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		Style_SetLexer(pLexCurrent, FALSE);
 		break;
 
-	//case WM_TIMER:
-	//	break;
+	case WM_TIMER:
+		if (wParam == ID_AUTOSAVETIMER) {
+			AutoSave_DoWork(FALSE);
+		}
+		break;
 
 	case WM_SIZE:
 		MsgSize(hwnd, wParam, lParam);
@@ -2597,6 +2625,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_SET_OPEN_FOLDER_METAPATH, bOpenFolderWithMetapath);
 
 	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, iFileWatchingMode);
+	CheckCmd(hmenu, IDM_SET_FILE_AUTOSAVE, (iAutoSaveOption & AutoSaveOption_Periodic) && dwAutoSavePeriod != 0);
 
 	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, IsVistaAndAbove());
 	CheckCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, bUseXPFileDialog);
@@ -2973,7 +3002,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 
-		if (EditSetNewEncoding(iCurrentEncoding, iNewEncoding, (flagSetEncoding), StrIsEmpty(szCurFile))) {
+		if (EditSetNewEncoding(iCurrentEncoding, iNewEncoding, flagSetEncoding, StrIsEmpty(szCurFile))) {
 			if (SciCall_GetLength() == 0) {
 				iCurrentEncoding = iNewEncoding;
 				iOriginalEncoding = iNewEncoding;
@@ -4346,6 +4375,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 		break;
 
+	case IDM_SET_FILE_AUTOSAVE: {
+		const DWORD backup = dwAutoSavePeriod;
+		if (AutoSaveSettingsDlg(hwnd)) {
+			if (iAutoSaveOption & AutoSaveOption_Periodic) {
+				AutoSave_Start(backup != dwAutoSavePeriod);
+			} else {
+				AutoSave_Stop(FALSE);
+			}
+		}
+	} break;
+
 	case IDM_VIEW_NOESCFUNC:
 		iEscFunction = 0;
 		break;
@@ -5088,10 +5128,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_MODIFIED:
+			// we only watch SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT
+			++dwCurrentDocReversion;
 			UpdateStatusBarCacheLineColumn();
 			if (scn->linesAdded) {
 				UpdateLineNumberWidth();
 			}
+			AutoSave_Start(FALSE);
 			break;
 
 		case SCN_ZOOM:
@@ -5492,6 +5535,9 @@ void LoadSettings(void) {
 	bFileWatchingKeepAtEnd = IniSectionGetBool(pIniSection, L"FileWatchingKeepAtEnd", 0);
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", 0);
 
+	iAutoSaveOption = IniSectionGetInt(pIniSection, L"AutoSaveOption", AutoSaveOption_Default);
+	dwAutoSavePeriod = IniSectionGetInt(pIniSection, L"AutoSavePeriod", AutoSaveDefaultPeriod);
+
 	iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
 	iEscFunction = clamp_i(iValue, 0, 2);
 
@@ -5775,10 +5821,14 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"PrintMarginBottom", pageSetupMargin.bottom, -1);
 	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, 0);
 	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMetapath", bOpenFolderWithMetapath, 1);
+
 	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, 2);
 	IniSectionSetBoolEx(pIniSection, L"FileWatchingMethod", iFileWatchingMethod, 0);
 	IniSectionSetBoolEx(pIniSection, L"FileWatchingKeepAtEnd", bFileWatchingKeepAtEnd, 0);
 	IniSectionSetBoolEx(pIniSection, L"ResetFileWatching", bResetFileWatching, 0);
+	IniSectionSetIntEx(pIniSection, L"AutoSaveOption", iAutoSaveOption, AutoSaveOption_Default);
+	IniSectionSetIntEx(pIniSection, L"AutoSavePeriod", dwAutoSavePeriod, AutoSaveDefaultPeriod);
+
 	IniSectionSetIntEx(pIniSection, L"EscFunction", iEscFunction, 0);
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
@@ -7209,6 +7259,7 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		UpdateStatusBarCacheLineColumn();
 		UpdateDocumentModificationStatus();
 
+		AutoSave_Stop(TRUE);
 		// Terminate file watching
 		if (bResetFileWatching) {
 			iFileWatchingMode = 0;
@@ -7329,10 +7380,15 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
 
-		// Install watching of the current file
-		if (!(loadFlag & FileLoadFlag_Reload) && bResetFileWatching) {
-			iFileWatchingMode = 0;
+		if (loadFlag & FileLoadFlag_Reload) {
+			AutoSave_Stop(FALSE);
+		} else {
+			AutoSave_Stop(TRUE);
+			if (bResetFileWatching) {
+				iFileWatchingMode = 0;
+			}
 		}
+		// Install watching of the current file
 		InstallFileWatching(FALSE);
 
 		// check for binary file (file with unknown encoding: ANSI)
@@ -7435,7 +7491,8 @@ BOOL FileSave(FileSaveFlag saveFlag) {
 		}
 	}
 
-	if (!(saveFlag & FileSaveFlag_SaveAlways) && (!IsDocumentModified() || bIsEmptyNewFile) && !(saveFlag & FileSaveFlag_SaveAs)) {
+	if (!(saveFlag & (FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs)) && (!IsDocumentModified() || bIsEmptyNewFile)) {
+		AutoSave_Stop(saveFlag & FileSaveFlag_EndSession);
 		return TRUE;
 	}
 
@@ -7453,6 +7510,7 @@ BOOL FileSave(FileSaveFlag saveFlag) {
 		case IDCANCEL:
 			return FALSE;
 		case IDNO:
+			AutoSave_Stop(FALSE);
 			return TRUE;
 		}
 	}
@@ -7554,8 +7612,10 @@ BOOL FileSave(FileSaveFlag saveFlag) {
 			}
 			InstallFileWatching(FALSE);
 		}
+
+		AutoSave_Stop(saveFlag & FileSaveFlag_EndSession);
 	} else if (!status.bCancelDataLoss) {
-		if (StrNotEmpty(szCurFile) != 0) {
+		if (StrNotEmpty(szCurFile)) {
 			lstrcpy(tchFile, szCurFile);
 		}
 
@@ -8473,5 +8533,182 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 		}
 
 		dwLastCopyTime = 0;
+	}
+}
+
+void AutoSave_Start(BOOL reset) {
+	if ((iAutoSaveOption & AutoSaveOption_Periodic) && dwAutoSavePeriod != 0) {
+		if (reset || !bAutoSaveTimerSet) {
+			bAutoSaveTimerSet = TRUE;
+			SetTimer(hwndMain, ID_AUTOSAVETIMER, dwAutoSavePeriod, NULL);
+		}
+		return;
+	}
+	if (bAutoSaveTimerSet) {
+		bAutoSaveTimerSet = FALSE;
+		KillTimer(hwndMain, ID_AUTOSAVETIMER);
+	}
+}
+
+void AutoSave_Stop(BOOL keepBackup) {
+	dwCurrentDocReversion = 0;
+	dwLastSavedDocReversion = 0;
+	if (bAutoSaveTimerSet) {
+		bAutoSaveTimerSet = FALSE;
+		KillTimer(hwndMain, ID_AUTOSAVETIMER);
+	}
+	if (autoSaveCount) {
+		for (int i = 0; i < autoSaveCount; i++) {
+			LPWSTR path = autoSavePathList[i];
+			if (path) {
+				if (!keepBackup) {
+					DeleteFile(path);
+				}
+				LocalFree(path);
+			}
+		}
+
+		autoSaveCount = 0;
+		memset(autoSavePathList, 0, sizeof(LPWSTR) * AllAutoSaveCount);
+	}
+}
+
+LPCWSTR AutoSave_GetDefaultFolder(void) {
+	LPWSTR szFolder = szAutoSaveFolder;
+	if (StrIsEmpty(szFolder)) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		LPWSTR pszPath = NULL;
+		const HRESULT hr = SHGetKnownFolderPath(&FOLDERID_LocalAppData, KF_FLAG_DEFAULT, NULL, &pszPath);
+		if (hr == S_OK) {
+			PathCombine(szFolder, pszPath, L"Notepad2");
+			CoTaskMemFree(pszPath);
+		} else {
+			GetModuleFileName(NULL, szFolder, MAX_PATH);
+			PathRemoveFileSpec(szFolder);
+		}
+#else
+		const HRESULT hr = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szFolder);
+		if (hr == S_OK) {
+			PathAppend(szFolder, L"Notepad2");
+		} else {
+			GetModuleFileName(NULL, szFolder, MAX_PATH);
+			PathRemoveFileSpec(szFolder);
+		}
+#endif
+
+		PathAppend(szFolder, L"AutoSave");
+	}
+
+	DWORD dwFileAttributes = GetFileAttributes(szFolder);
+	if (dwFileAttributes == INVALID_FILE_ATTRIBUTES) {
+		SHCreateDirectoryEx(NULL, szFolder, NULL);
+	}
+	return szFolder;
+}
+
+void AutoSave_DoWork(BOOL keepBackup) {
+	if (!IsDocumentModified() || dwCurrentDocReversion == dwLastSavedDocReversion) {
+		return;
+	}
+
+	const DWORD cbData = (DWORD)SciCall_GetLength();
+	if (cbData == 0) {
+		return;
+	}
+
+	WCHAR tchPath[MAX_PATH + 40];
+	const BOOL Untitled = StrIsEmpty(szCurFile);
+	if (Untitled) {
+		lstrcpy(tchPath, L"Untitled");
+	} else {
+		lstrcpy(tchPath, szCurFile);
+	}
+
+	// add timestamp + pid unique suffix
+	WCHAR suffix[MAX_PATH + 60];
+	int metaLen = 0;
+	const UINT pid = GetCurrentProcessId();
+	SYSTEMTIME lt;
+	GetLocalTime(&lt);
+	//printf("%u AutoSave at %02d:%02d:%02d.%03d\n", pid, lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
+	wsprintf(suffix, L" %04d%02d%02d %02d%02d%02d %03d%u.bak",
+		lt.wYear, lt.wMonth, lt.wDay,
+		lt.wHour, lt.wMinute, lt.wSecond,
+		lt.wMilliseconds, pid);
+	lstrcat(tchPath, suffix);
+
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	if (!Untitled) {
+		// try to save backup in the same folder as current file
+		hFile = CreateFile(tchPath,
+						   GENERIC_READ | GENERIC_WRITE,
+						   FILE_SHARE_READ | FILE_SHARE_WRITE,
+						   NULL, CREATE_NEW,
+						   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
+						   NULL);
+		dwLastIOError = GetLastError();
+	}
+	if (hFile == INVALID_HANDLE_VALUE) {
+		// save backup in AutoSave folder
+		if (Untitled) {
+			lstrcpy(suffix, tchPath);
+		} else {
+			metaLen = 1;
+			lstrcpy(suffix, PathFindFileName(tchPath));
+		}
+
+		PathCombine(tchPath, AutoSave_GetDefaultFolder(), suffix);
+		hFile = CreateFile(tchPath,
+						   GENERIC_READ | GENERIC_WRITE,
+						   FILE_SHARE_READ | FILE_SHARE_WRITE,
+						   NULL, CREATE_NEW,
+						   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
+						   NULL);
+		dwLastIOError = GetLastError();
+	}
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return;
+	}
+
+	DWORD length = cbData + COUNTOF(suffix)*kMaxMultiByteCount + 1;
+	char *lpData = (char *)NP2HeapAlloc(length);
+	if (metaLen) {
+		lstrcpy(suffix, L"AutoSave for ");
+		lstrcat(suffix, szCurFile);
+		LPCWSTR lineEnd = (iCurrentEOLMode == SC_EOL_LF) ? L"\n" : ((iCurrentEOLMode == SC_EOL_CR) ? L"\r" : L"\r\n");
+		lstrcat(suffix, lineEnd);
+		const UINT cpEdit = (iCurrentEncoding == CPI_DEFAULT) ? CP_ACP : CP_UTF8;
+		metaLen = WideCharToMultiByte(cpEdit, 0, suffix, -1, lpData, length, NULL, NULL);
+		if (metaLen != 0) {
+			// remove the NULL terminator.
+			metaLen -= 1;
+		}
+	}
+
+	SciCall_GetText(cbData, lpData + metaLen);
+	SetEndOfFile(hFile);
+	// no encoding conversion, always saved in UTF-8 or ANSI encoding
+	const BOOL bWriteSuccess = WriteFile(hFile, lpData, cbData + metaLen, &length, NULL);
+	dwLastIOError = GetLastError();
+	CloseHandle(hFile);
+	NP2HeapFree(lpData);
+
+	if (bWriteSuccess) {
+		if (!keepBackup && autoSaveCount == MaxAutoSaveCount) {
+			// delete oldest backup
+			LPWSTR old = autoSavePathList[0];
+			if (old) {
+				DeleteFile(old);
+				LocalFree(old);
+			}
+			memmove(autoSavePathList, autoSavePathList + 1, (AllAutoSaveCount - 1) * sizeof(LPWSTR));
+			autoSavePathList[AllAutoSaveCount - 1] = NULL;
+			--autoSaveCount;
+		}
+
+		autoSavePathList[autoSaveCount++] = StrDup(tchPath);
+		dwLastSavedDocReversion = dwCurrentDocReversion;
+	} else {
+		DeleteFile(tchPath);
 	}
 }

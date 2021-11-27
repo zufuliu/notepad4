@@ -56,6 +56,7 @@ void	InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel);
 BOOL	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
 void	ZoomLevelDlg(HWND hwnd, BOOL bBottom);
 BOOL	AutoCompletionSettingsDlg(HWND hwnd);
+BOOL	AutoSaveSettingsDlg(HWND hwnd);
 
 INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
 #define InfoBoxInfo(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONINFORMATION | (uType), (lpstrSetting), (uidMessage), ##__VA_ARGS__)

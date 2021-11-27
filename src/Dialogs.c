@@ -2227,7 +2227,6 @@ void ZoomLevelDlg(HWND hwnd, BOOL bBottom) {
 extern EditAutoCompletionConfig autoCompletionConfig;
 
 static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
 	switch (umsg) {
@@ -2403,6 +2402,81 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 
 BOOL AutoCompletionSettingsDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOCOMPLETION), hwnd, AutoCompletionSettingsDlgProc, 0);
+	return iResult == IDOK;
+}
+
+extern int iAutoSaveOption;
+extern DWORD dwAutoSavePeriod;
+
+static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch (umsg) {
+	case WM_INITDIALOG: {
+		if (iAutoSaveOption & AutoSaveOption_Periodic) {
+			CheckDlgButton(hwnd, IDC_AUTOSAVE_ENABLE, BST_CHECKED);
+		}
+		if (iAutoSaveOption & AutoSaveOption_Suspend) {
+			CheckDlgButton(hwnd, IDC_AUTOSAVE_SUSPEND, BST_CHECKED);
+		}
+		if (iAutoSaveOption & AutoSaveOption_Shutdown) {
+			CheckDlgButton(hwnd, IDC_AUTOSAVE_SHUTDOWN, BST_CHECKED);
+		}
+
+		WCHAR tch[32];
+		const UINT seconds = dwAutoSavePeriod / 1000;
+		const UINT milliseconds = dwAutoSavePeriod % 1000;
+		if (milliseconds) {
+			wsprintf(tch, L"%u.%03u", seconds, milliseconds);
+		} else {
+			wsprintf(tch, L"%u", seconds);
+		}
+		SetDlgItemText(hwnd, IDC_AUTOSAVE_PERIOD, tch);
+
+		CenterDlgInParent(hwnd);
+	};
+	return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDOK: {
+			int option = 0;
+			if (IsButtonChecked(hwnd, IDC_AUTOSAVE_ENABLE)) {
+				option |= AutoSaveOption_Periodic;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOSAVE_SUSPEND)) {
+				option |= AutoSaveOption_Suspend;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOSAVE_SHUTDOWN)) {
+				option |= AutoSaveOption_Shutdown;
+			}
+			iAutoSaveOption = option;
+
+			WCHAR tch[32] = L"";
+			GetDlgItemText(hwnd, IDC_AUTOSAVE_PERIOD, tch, COUNTOF(tch));
+			float period = 0;
+			StrToFloat(tch, &period);
+			dwAutoSavePeriod = (DWORD)(period * 1000);
+			EndDialog(hwnd, IDOK);
+		}
+		break;
+
+		case IDC_AUTOSAVE_OPENFOLDER: {
+			LPCWSTR szFolder = AutoSave_GetDefaultFolder();
+			OpenContainingFolder(hwnd, szFolder, FALSE);
+		} break;
+
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL AutoSaveSettingsDlg(HWND hwnd) {
+	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOSAVE), hwnd, AutoSaveSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
 
