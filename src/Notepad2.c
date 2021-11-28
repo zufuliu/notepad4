@@ -8653,7 +8653,8 @@ void AutoSave_DoWork(BOOL keepBackup) {
 			lstrcpy(suffix, PathFindFileName(tchPath));
 		}
 
-		PathCombine(tchPath, AutoSave_GetDefaultFolder(), suffix);
+		LPCWSTR szFolder = AutoSave_GetDefaultFolder();
+		PathCombine(tchPath, szFolder, suffix);
 		hFile = CreateFile(tchPath,
 						   GENERIC_READ | GENERIC_WRITE,
 						   FILE_SHARE_READ | FILE_SHARE_WRITE,

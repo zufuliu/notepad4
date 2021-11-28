@@ -35,6 +35,7 @@
 
 //#include "CharacterSet.h"
 //#include "CharacterCategory.h"
+//#include "EastAsianWidth.h"
 #include "Position.h"
 #include "UniqueString.h"
 #include "SplitVector.h"
@@ -1017,6 +1018,37 @@ void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uin
 #endif
 		return;
 	}
+
+#ifdef MeasureWidthsUseEastAsianWidth
+	if (style.monospaceASCII) {
+#if PLAT_MACOSX
+		const XYPOSITION characterWidth = style.monospaceCharacterWidth;
+#else
+		const XYPOSITION characterWidth = style.aveCharWidth;
+#endif
+		XYPOSITION *ptr = positions;
+		XYPOSITION lastPos = 0;
+		for (auto it = sv.begin(); it != sv.end();) {
+			const uint8_t ch = *it;
+			lastPos += characterWidth;
+			if (UTF8IsAscii(ch)) {
+				*ptr++ = lastPos;
+				++it;
+			} else {
+				int byteCount = UTF8BytesOfLead(ch);
+				const uint32_t character = UnicodeFromUTF8(reinterpret_cast<const uint8_t *>(&*it));
+				if (GetEastAsianWidth(character)) {
+					lastPos += characterWidth;
+				}
+				it += byteCount;
+				while (byteCount--) {
+					*ptr++ = lastPos;
+				}
+			}
+		}
+		return;
+	}
+#endif // MeasureWidthsUseEastAsianWidth
 
 	size_t probe = pces.size();	// Out of bounds
 	if ((sv.length() < 64)) {

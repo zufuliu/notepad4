@@ -2429,7 +2429,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		if (milliseconds) {
 			wsprintf(tch, L"%u.%03u", seconds, milliseconds);
 		} else {
-			wsprintf(tch, L"%u", seconds);
+			wsprintf(tch, L"%u.0", seconds);
 		}
 		SetDlgItemText(hwnd, IDC_AUTOSAVE_PERIOD, tch);
 
