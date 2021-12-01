@@ -456,18 +456,27 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 // Buffer to hold strings and string position arrays without always allocating on heap.
 // May sometimes have string too long to allocate on stack. So use a fixed stack-allocated buffer
 // when less than safe size otherwise allocate on heap and free automatically.
-template<typename T, int lengthStandard>
+template<typename T, size_t lengthStandard>
 class VarBuffer {
+	T * const buffer;
 	T bufferStandard[lengthStandard];
 public:
-	T * buffer;
-	explicit VarBuffer(size_t length) : buffer(nullptr) {
-		if (length > lengthStandard) {
-			buffer = new T[length];
-		} else {
-			buffer = bufferStandard;
-		}
+	explicit VarBuffer(size_t length) :
+		buffer {(length > lengthStandard) ? new T[length] : bufferStandard} {
 	}
+	const T *data() const noexcept {
+		return buffer;
+	}
+	T *data() noexcept {
+		return buffer;
+	}
+	const T& operator[](size_t index) const noexcept {
+		return buffer[index];
+	}
+	T& operator[](size_t index) noexcept {
+		return buffer[index];
+	}
+
 	// Deleted so VarBuffer objects can not be copied.
 	VarBuffer(const VarBuffer &) = delete;
 	VarBuffer(VarBuffer &&) = delete;
@@ -477,29 +486,48 @@ public:
 	~VarBuffer() noexcept {
 		if (buffer != bufferStandard) {
 			delete[]buffer;
-			buffer = nullptr;
 		}
 	}
 };
 
-// limited to BreakFinder::lengthStartSubdivision for drawing document text in editor window.
-// no limit for drawing other text, e.g. auto-completion list, calltip, annotation, etc.
-constexpr int stackBufferLength = 320;
-class TextWide : public VarBuffer<wchar_t, stackBufferLength> {
+constexpr size_t stackBufferLength = 512;
+class TextWide {
+	wchar_t * const buffer;
+	UINT len;	// Using UINT instead of size_t as most Win32 APIs take UINT.
+	wchar_t bufferStandard[stackBufferLength];
 public:
-	int tlen;	// Using int instead of size_t as most Win32 APIs take int.
 	TextWide(std::string_view text, int codePage) :
-		VarBuffer<wchar_t, stackBufferLength>(text.length()) {
+		buffer {(text.length() > stackBufferLength) ? new wchar_t[text.length()] : bufferStandard} {
 		if (codePage == CpUtf8) {
-			tlen = static_cast<int>(UTF16FromUTF8(text, buffer, text.length()));
+			len = static_cast<UINT>(UTF16FromUTF8(text, buffer, text.length()));
 		} else {
 			// Support Asian string display in 9x English
-			tlen = ::MultiByteToWideChar(codePage, 0, text.data(), static_cast<int>(text.length()),
+			len = ::MultiByteToWideChar(codePage, 0, text.data(), static_cast<int>(text.length()),
 				buffer, static_cast<int>(text.length()));
 		}
 	}
+	const wchar_t *data() const noexcept {
+		return buffer;
+	}
+	UINT length() const noexcept {
+		return len;
+	}
+
+	// Deleted so TextWide objects can not be copied.
+	TextWide(const TextWide &) = delete;
+	TextWide(TextWide &&) = delete;
+	TextWide &operator=(const TextWide &) = delete;
+	TextWide &operator=(TextWide &&) = delete;
+
+	~TextWide() noexcept {
+		if (buffer != bufferStandard) {
+			delete[]buffer;
+		}
+	}
 };
+
 using TextPositions = VarBuffer<XYPOSITION, stackBufferLength>;
+using TextPositionsI = VarBuffer<int, stackBufferLength>;
 
 class SurfaceGDI final : public Surface {
 	SurfaceMode mode;
@@ -1126,8 +1154,6 @@ std::unique_ptr<IScreenLineLayout> SurfaceGDI::Layout(const IScreenLine *) noexc
 	return {};
 }
 
-using TextPositionsI = VarBuffer<int, stackBufferLength>;
-
 void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, UINT fuOptions) {
 	SetFont(font_);
 	const RECT rcw = RectFromPRectangleEx(rc);
@@ -1136,7 +1162,7 @@ void SurfaceGDI::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 
 	if (mode.codePage == CpUtf8) {
 		const TextWide tbuf(text, CpUtf8);
-		::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer, tbuf.tlen, nullptr);
+		::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.data(), tbuf.length(), nullptr);
 	} else {
 		::ExtTextOutA(hdc, x, yBaseInt, fuOptions, &rcw, text.data(), static_cast<UINT>(text.length()), nullptr);
 	}
@@ -1180,8 +1206,8 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	const int len = static_cast<int>(text.length());
 	if (mode.codePage == CpUtf8) {
 		const TextWide tbuf(text, CpUtf8);
-		TextPositionsI poses(tbuf.tlen);
-		if (!::GetTextExtentExPointW(hdc, tbuf.buffer, tbuf.tlen, maxWidthMeasure, &fit, poses.buffer, &sz)) {
+		TextPositionsI poses(tbuf.length());
+		if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
 			// Failure
 			return;
 		}
@@ -1192,19 +1218,19 @@ void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			if (byteCount == 4) {	// Non-BMP
 				ui++;
 			}
-			const XYPOSITION pos = static_cast<XYPOSITION>(poses.buffer[ui]);
+			const XYPOSITION pos = static_cast<XYPOSITION>(poses[ui]);
 			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < len); bytePos++) {
 				positions[i++] = pos;
 			}
 		}
 	} else {
 		TextPositionsI poses(len);
-		if (!::GetTextExtentExPointA(hdc, text.data(), len, maxWidthMeasure, &fit, poses.buffer, &sz)) {
+		if (!::GetTextExtentExPointA(hdc, text.data(), len, maxWidthMeasure, &fit, poses.data(), &sz)) {
 			// Eeek - a NULL DC or other foolishness could cause this.
 			return;
 		}
 		while (i < fit) {
-			positions[i] = static_cast<XYPOSITION>(poses.buffer[i]);
+			positions[i] = static_cast<XYPOSITION>(poses[i]);
 			i++;
 		}
 	}
@@ -1220,7 +1246,7 @@ XYPOSITION SurfaceGDI::WidthText(const Font *font_, std::string_view text) {
 		::GetTextExtentPoint32A(hdc, text.data(), std::min(static_cast<int>(text.length()), maxLenText), &sz);
 	} else {
 		const TextWide tbuf(text, CpUtf8);
-		::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &sz);
+		::GetTextExtentPoint32W(hdc, tbuf.data(), tbuf.length(), &sz);
 	}
 	return static_cast<XYPOSITION>(sz.cx);
 }
@@ -1232,7 +1258,7 @@ void SurfaceGDI::DrawTextCommonUTF8(PRectangle rc, const Font *font_, XYPOSITION
 	const int yBaseInt = static_cast<int>(ybase);
 
 	const TextWide tbuf(text, CpUtf8);
-	::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.buffer, tbuf.tlen, nullptr);
+	::ExtTextOutW(hdc, x, yBaseInt, fuOptions, &rcw, tbuf.data(), tbuf.length(), nullptr);
 }
 
 void SurfaceGDI::DrawTextNoClipUTF8(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text,
@@ -1272,8 +1298,8 @@ void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 	int i = 0;
 	const int len = static_cast<int>(text.length());
 	const TextWide tbuf(text, CpUtf8);
-	TextPositionsI poses(tbuf.tlen);
-	if (!::GetTextExtentExPointW(hdc, tbuf.buffer, tbuf.tlen, maxWidthMeasure, &fit, poses.buffer, &sz)) {
+	TextPositionsI poses(tbuf.length());
+	if (!::GetTextExtentExPointW(hdc, tbuf.data(), tbuf.length(), maxWidthMeasure, &fit, poses.data(), &sz)) {
 		// Failure
 		return;
 	}
@@ -1285,7 +1311,7 @@ void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 			ui++;
 		}
 		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < len); bytePos++) {
-			positions[i++] = static_cast<XYPOSITION>(poses.buffer[ui]);
+			positions[i++] = static_cast<XYPOSITION>(poses[ui]);
 		}
 	}
 	// If any positions not filled in then use the last position for them
@@ -1297,7 +1323,7 @@ XYPOSITION SurfaceGDI::WidthTextUTF8(const Font *font_, std::string_view text) {
 	SetFont(font_);
 	SIZE sz = { 0,0 };
 	const TextWide tbuf(text, CpUtf8);
-	::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &sz);
+	::GetTextExtentPoint32W(hdc, tbuf.data(), tbuf.length(), &sz);
 	return static_cast<XYPOSITION>(sz.cx);
 }
 
@@ -2257,7 +2283,7 @@ void ScreenLineLayout::FillTextLayoutFormats(const IScreenLine *screenLine, IDWr
 
 std::wstring ScreenLineLayout::ReplaceRepresentation(std::string_view text) {
 	const TextWide wideText(text, CpUtf8);
-	std::wstring ws(wideText.buffer, wideText.tlen);
+	std::wstring ws(wideText.data(), wideText.length());
 	std::replace(ws.begin(), ws.end(), L'\t', L'X');
 	return ws;
 }
@@ -2461,7 +2487,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 
 		// Explicitly creating a text layout appears a little faster
 		IDWriteTextLayout *pTextLayout = nullptr;
-		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen,
+		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(),
 			pTextFormat,
 			static_cast<FLOAT>(rc.Width()),
 			static_cast<FLOAT>(rc.Height()),
@@ -2517,46 +2543,45 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		return;
 	}
 	const TextWide tbuf(text, mode.codePage);
-	TextPositions poses(tbuf.tlen);
+	TextPositions poses(tbuf.length());
 	// Initialize poses for safety.
-	std::fill(poses.buffer, poses.buffer + tbuf.tlen, 0.0f);
+	std::fill(poses.data(), poses.data() + tbuf.length(), 0.0f);
 	// Create a layout
 	IDWriteTextLayout *pTextLayout = nullptr;
-	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 10000.0, 1000.0, &pTextLayout);
+	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pTextFormat, 10000.0, 1000.0, &pTextLayout);
 	if (!SUCCEEDED(hrCreate) || !pTextLayout) {
 		return;
 	}
-	constexpr int clusters = stackBufferLength;
-	DWRITE_CLUSTER_METRICS clusterMetrics[clusters];
+	VarBuffer<DWRITE_CLUSTER_METRICS, stackBufferLength> clusterMetrics(tbuf.length());
 	UINT32 count = 0;
-	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics, clusters, &count);
+	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics.data(), tbuf.length(), &count);
 	ReleaseUnknown(pTextLayout);
 	if (!SUCCEEDED(hrGetCluster)) {
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	XYPOSITION position = 0.0;
-	int ti = 0;
+	UINT ti = 0;
 	for (UINT32 ci = 0; ci < count; ci++) {
 		const int length = clusterMetrics[ci].length;
 		const XYPOSITION width = clusterMetrics[ci].width;
 		for (int inCluster = 0; inCluster < length; inCluster++) {
-			poses.buffer[ti++] = position + width * (inCluster + 1) / length;
+			poses[ti++] = position + width * (inCluster + 1) / length;
 		}
 		position += width;
 	}
-	PLATFORM_ASSERT(ti == tbuf.tlen);
+	PLATFORM_ASSERT(ti == tbuf.length());
 	if (mode.codePage == CpUtf8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		size_t i = 0;
-		for (int ui = 0; ui < tbuf.tlen; ui++) {
+		for (UINT ui = 0; ui < tbuf.length(); ui++) {
 			const unsigned char uch = text[i];
 			const unsigned int byteCount = UTF8BytesOfLead(uch);
 			if (byteCount == 4) {	// Non-BMP
 				ui++;
 			}
-			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.tlen); bytePos++) {
-				positions[i++] = poses.buffer[ui];
+			for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.length()); bytePos++) {
+				positions[i++] = poses[ui];
 			}
 		}
 		const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
@@ -2567,11 +2592,11 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(mode.codePage);
 		if (dbcs) {
 			// May be one or two bytes per position
-			int ui = 0;
-			for (size_t i = 0; i < text.length() && ui < tbuf.tlen;) {
-				positions[i] = poses.buffer[ui];
+			UINT ui = 0;
+			for (size_t i = 0; i < text.length() && ui < tbuf.length();) {
+				positions[i] = poses[ui];
 				if (dbcs->IsLeadByte(text[i])) {
-					positions[i + 1] = poses.buffer[ui];
+					positions[i + 1] = poses[ui];
 					i += 2;
 				} else {
 					i++;
@@ -2581,9 +2606,9 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			}
 		} else {
 			// One char per position
-			PLATFORM_ASSERT(text.length() == static_cast<size_t>(tbuf.tlen));
-			for (int kk = 0; kk < tbuf.tlen; kk++) {
-				positions[kk] = poses.buffer[kk];
+			PLATFORM_ASSERT(text.length() == tbuf.length());
+			for (UINT kk = 0; kk < tbuf.length(); kk++) {
+				positions[kk] = poses[kk];
 			}
 		}
 	}
@@ -2596,7 +2621,7 @@ XYPOSITION SurfaceD2D::WidthText(const Font *font_, std::string_view text) {
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
-		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 1000.0, 1000.0, &pTextLayout);
+		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr) && pTextLayout) {
 			DWRITE_TEXT_METRICS textMetrics;
 			if (SUCCEEDED(pTextLayout->GetMetrics(&textMetrics)))
@@ -2646,38 +2671,37 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		return;
 	}
 	const TextWide tbuf(text, CpUtf8);
-	TextPositions poses(tbuf.tlen);
+	TextPositions poses(tbuf.length());
 	// Initialize poses for safety.
-	std::fill(poses.buffer, poses.buffer + tbuf.tlen, 0.0f);
+	std::fill(poses.data(), poses.data() + tbuf.length(), 0.0f);
 	// Create a layout
 	IDWriteTextLayout *pTextLayout = nullptr;
-	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 10000.0, 1000.0, &pTextLayout);
+	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pTextFormat, 10000.0, 1000.0, &pTextLayout);
 	if (!SUCCEEDED(hrCreate) || !pTextLayout) {
 		return;
 	}
-	constexpr int clusters = stackBufferLength;
-	DWRITE_CLUSTER_METRICS clusterMetrics[clusters];
+	VarBuffer<DWRITE_CLUSTER_METRICS, stackBufferLength> clusterMetrics(tbuf.length());
 	UINT32 count = 0;
-	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics, clusters, &count);
+	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics.data(), tbuf.length(), &count);
 	ReleaseUnknown(pTextLayout);
 	if (!SUCCEEDED(hrGetCluster)) {
 		return;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	XYPOSITION position = 0.0f;
-	int ti = 0;
+	UINT ti = 0;
 	for (UINT32 ci = 0; ci < count; ci++) {
 		const int length = clusterMetrics[ci].length;
 		const XYPOSITION width = clusterMetrics[ci].width;
 		for (int inCluster = 0; inCluster < length; inCluster++) {
-			poses.buffer[ti++] = position + width * (inCluster + 1) / length;
+			poses[ti++] = position + width * (inCluster + 1) / length;
 		}
 		position += width;
 	}
-	PLATFORM_ASSERT(ti == tbuf.tlen);
+	PLATFORM_ASSERT(ti == tbuf.length());
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 	size_t i = 0;
-	for (int ui = 0; ui < tbuf.tlen; ui++) {
+	for (UINT ui = 0; ui < tbuf.length(); ui++) {
 		const unsigned char uch = text[i];
 		const unsigned int byteCount = UTF8BytesOfLead(uch);
 		if (byteCount == 4) {	// Non-BMP
@@ -2685,7 +2709,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 			PLATFORM_ASSERT(ui < ti);
 		}
 		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()); bytePos++) {
-			positions[i++] = poses.buffer[ui];
+			positions[i++] = poses[ui];
 		}
 
 	}
@@ -2702,7 +2726,7 @@ XYPOSITION SurfaceD2D::WidthTextUTF8(const Font * font_, std::string_view text) 
 	if (pIDWriteFactory && pTextFormat) {
 		// Create a layout
 		IDWriteTextLayout *pTextLayout = nullptr;
-		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.buffer, tbuf.tlen, pTextFormat, 1000.0, 1000.0, &pTextLayout);
+		const HRESULT hr = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pTextFormat, 1000.0, 1000.0, &pTextLayout);
 		if (SUCCEEDED(hr)) {
 			DWRITE_TEXT_METRICS textMetrics;
 			if (SUCCEEDED(pTextLayout->GetMetrics(&textMetrics)))
@@ -3191,7 +3215,7 @@ PRectangle ListBoxX::GetDesiredRect() {
 		len = static_cast<int>(strlen(widestItem));
 		if (unicodeMode) {
 			const TextWide tbuf(widestItem, CpUtf8);
-			::GetTextExtentPoint32W(hdc, tbuf.buffer, tbuf.tlen, &textSize);
+			::GetTextExtentPoint32W(hdc, tbuf.data(), tbuf.length(), &textSize);
 		} else {
 			::GetTextExtentPoint32A(hdc, widestItem, len, &textSize);
 		}
@@ -3327,7 +3351,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 
 		if (unicodeMode) {
 			const TextWide tbuf(text, CpUtf8);
-			::DrawTextW(pDrawItem->hDC, tbuf.buffer, tbuf.tlen, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
+			::DrawTextW(pDrawItem->hDC, tbuf.data(), tbuf.length(), &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
 		} else {
 			::DrawTextA(pDrawItem->hDC, text, len, &rcText, DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_NOCLIP);
 		}

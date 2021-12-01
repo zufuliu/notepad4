@@ -253,12 +253,11 @@ public:
 	// If a whole run is longer than lengthStartSubdivision then subdivide
 	// into smaller runs at spaces or punctuation.
 	enum {
-		lengthStartSubdivision = 300
+		lengthStartSubdivision = 4096
 	};
 	// Try to make each subdivided run lengthEachSubdivision or shorter.
-	// 100 + 35 (longest emoji sequence) + 4 (UTF8MaxBytes)
 	enum {
-		lengthEachSubdivision = 128 + 12
+		lengthEachSubdivision = 1024
 	};
 	enum class BreakFor {
 		Text = 0,
