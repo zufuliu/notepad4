@@ -835,8 +835,8 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 		posLineStart = model.pdoc->LineStart(lineDoc);
 	}
 	const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
-	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
-	if (surface && ll) {
+	LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
+	if (surface) {
 		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const int posInLine = static_cast<int>(pos.Position() - posLineStart);
 		pt = ll->PointFromPosition(posInLine, vs.lineHeight, pe);
@@ -876,8 +876,8 @@ Range EditView::RangeDisplayLine(Surface *surface, const EditModel &model, Sci::
 	}
 	const Sci::Line lineDoc = model.pcs->DocFromDisplay(lineVisible);
 	const Sci::Position positionLineStart = model.pdoc->LineStart(lineDoc);
-	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
-	if (surface && ll) {
+	if (surface) {
+		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
 		const int subLine = static_cast<int>(lineVisible - lineStartSet);
@@ -907,8 +907,8 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 		return SelectionPosition(canReturnInvalid ? Sci::invalidPosition :
 			model.pdoc->Length());
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
-	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
-	if (surface && ll) {
+	if (surface) {
+		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Line lineStartSet = model.pcs->DisplayFromDoc(lineDoc);
 		const int subLine = static_cast<int>(visibleLine - lineStartSet);
@@ -958,10 +958,10 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 * This method is used for rectangular selections and does not work on wrapped lines.
 */
 SelectionPosition EditView::SPositionFromLineX(Surface *surface, const EditModel &model, Sci::Line lineDoc, int x, const ViewStyle &vs) {
-	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
-	if (surface && ll) {
-		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
+	if (surface) {
+		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 		LayoutLine(model, surface, vs, ll, model.wrapWidth);
+		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 		const Range rangeSubLine = ll->SubLineRange(0, LineLayout::Scope::visibleOnly);
 		const XYPOSITION subLineStart = ll->positions[rangeSubLine.start];
 		const Sci::Position positionInLine = ll->FindPositionFromX(x + subLineStart, rangeSubLine, false);
@@ -979,8 +979,8 @@ SelectionPosition EditView::SPositionFromLineX(Surface *surface, const EditModel
 Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model, Sci::Position pos, const ViewStyle &vs) {
 	const Sci::Line lineDoc = model.pdoc->SciLineFromPosition(pos);
 	Sci::Line lineDisplay = model.pcs->DisplayFromDoc(lineDoc);
-	LineLayout *ll = RetrieveLineLayout(lineDoc, model);
-	if (surface && ll) {
+	if (surface) {
+		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 		LayoutLine(model, surface, vs, ll, model.wrapWidth);
 		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 		const Sci::Position posInLine = pos - posLineStart;
@@ -996,11 +996,11 @@ Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model
 
 Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &model, Sci::Position pos, bool start, const ViewStyle &vs) {
 	const Sci::Line line = model.pdoc->SciLineFromPosition(pos);
-	LineLayout *ll = RetrieveLineLayout(line, model);
 	Sci::Position posRet = Sci::invalidPosition;
-	if (surface && ll) {
-		const Sci::Position posLineStart = model.pdoc->LineStart(line);
+	if (surface) {
+		LineLayout * const ll = RetrieveLineLayout(line, model);
 		LayoutLine(model, surface, vs, ll, model.wrapWidth);
+		const Sci::Position posLineStart = model.pdoc->LineStart(line);
 		const Sci::Position posInLine = pos - posLineStart;
 		if (posInLine <= ll->maxLineLength) {
 			for (int subLine = 0; subLine < ll->lines; subLine++) {
