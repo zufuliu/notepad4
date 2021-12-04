@@ -585,15 +585,15 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 
 		// Layout the line, determining the position of each character,
 		// with an extra element at the end for the end of the line.
-		ll->positions[0] = 0;
+		std::fill(&ll->positions[0], &ll->positions[lineLength + 1], 0.0f);
 		bool lastSegItalics = false;
 
 		BreakFinder bfLayout(ll, nullptr, Range(0, numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
 		while (bfLayout.More()) {
 
 			const TextSegment ts = bfLayout.Next();
+			const int endPos = ts.end();
 
-			std::fill(&ll->positions[ts.start + 1], &ll->positions[ts.end() + 1], 0.0f);
 			if (vstyle.styles[ll->styles[ts.start]].visible) {
 				if (ts.representation) {
 					XYPOSITION representationWidth = vstyle.controlCharWidth;
@@ -630,10 +630,10 @@ void EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSt
 							std::string_view(&ll->chars[ts.start], ts.length), &ll->positions[ts.start + 1]);
 					}
 				}
-				lastSegItalics = (!ts.representation) && ((ll->chars[ts.end() - 1] != ' ') && vstyle.styles[ll->styles[ts.start]].italic);
+				lastSegItalics = (!ts.representation) && ((ll->chars[endPos - 1] != ' ') && vstyle.styles[ll->styles[ts.start]].italic);
 			}
 
-			for (Sci::Position posToIncrease = ts.start + 1; posToIncrease <= ts.end(); posToIncrease++) {
+			for (int posToIncrease = ts.start + 1; posToIncrease <= endPos; posToIncrease++) {
 				ll->positions[posToIncrease] += ll->positions[ts.start];
 			}
 		}
@@ -1965,12 +1965,12 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 	while (bfBack.More()) {
 
 		const TextSegment ts = bfBack.Next();
-		const Sci::Position i = ts.end() - 1;
+		const int i = ts.end() - 1;
 		const Sci::Position iDoc = i + posLineStart;
 
 		PRectangle rcSegment = rcLine;
 		rcSegment.left = ll->positions[ts.start] + xStart - static_cast<XYPOSITION>(subLineStart);
-		rcSegment.right = ll->positions[ts.end()] + xStart - static_cast<XYPOSITION>(subLineStart);
+		rcSegment.right = ll->positions[i + 1] + xStart - static_cast<XYPOSITION>(subLineStart);
 		// Only try to draw if really visible - enhances performance by not calling environment to
 		// draw strings that are completely past the right side of the window.
 		if (!rcSegment.Empty() && rcSegment.Intersects(rcLine)) {
@@ -2180,12 +2180,12 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 	while (bfFore.More()) {
 
 		const TextSegment ts = bfFore.Next();
-		const Sci::Position i = ts.end() - 1;
+		const int i = ts.end() - 1;
 		const Sci::Position iDoc = i + posLineStart;
 
 		PRectangle rcSegment = rcLine;
 		rcSegment.left = ll->positions[ts.start] + xStart - static_cast<XYPOSITION>(subLineStart);
-		rcSegment.right = ll->positions[ts.end()] + xStart - static_cast<XYPOSITION>(subLineStart);
+		rcSegment.right = ll->positions[i + 1] + xStart - static_cast<XYPOSITION>(subLineStart);
 		// Only try to draw if really visible - enhances performance by not calling environment to
 		// draw strings that are completely past the right side of the window.
 		if (rcSegment.Intersects(rcLine)) {

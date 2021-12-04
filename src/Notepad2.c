@@ -8633,6 +8633,7 @@ void AutoSave_DoWork(BOOL keepBackup) {
 		lt.wMilliseconds, pid);
 	lstrcat(tchPath, suffix);
 
+	// TODO: check free space with GetDiskFreeSpaceExW()
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	if (!Untitled) {
 		// try to save backup in the same folder as current file
@@ -8672,13 +8673,20 @@ void AutoSave_DoWork(BOOL keepBackup) {
 	if (metaLen) {
 		lstrcpy(suffix, L"AutoSave for ");
 		lstrcat(suffix, szCurFile);
-		LPCWSTR lineEnd = (iCurrentEOLMode == SC_EOL_LF) ? L"\n" : ((iCurrentEOLMode == SC_EOL_CR) ? L"\r" : L"\r\n");
-		lstrcat(suffix, lineEnd);
+		metaLen = lstrlen(suffix);
 		const UINT cpEdit = (iCurrentEncoding == CPI_DEFAULT) ? CP_ACP : CP_UTF8;
-		metaLen = WideCharToMultiByte(cpEdit, 0, suffix, -1, lpData, length, NULL, NULL);
-		if (metaLen != 0) {
-			// remove the NULL terminator.
-			metaLen -= 1;
+		metaLen = WideCharToMultiByte(cpEdit, 0, suffix, metaLen, lpData, length, NULL, NULL);
+		switch (iCurrentEOLMode) {
+		default: // SC_EOL_CRLF
+			lpData[metaLen++] = '\r';
+			lpData[metaLen++] = '\n';
+			break;
+		case SC_EOL_LF:
+			lpData[metaLen++] = '\n';
+			break;
+		case SC_EOL_CR:
+			lpData[metaLen++] = '\r';
+			break;
 		}
 	}
 
