@@ -116,7 +116,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	bi.lParam = (LPARAM)szBase;
 	bi.iImage = 0;
 
-	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
@@ -140,7 +140,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
 
-	LPITEMIDLIST pidlRoot;
+	PIDLIST_ABSOLUTE pidlRoot;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	if (S_OK != SHGetKnownFolderIDList(iBase, KF_FLAG_DEFAULT, NULL, &pidlRoot))
 #else
@@ -160,7 +160,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 	bi.lParam = 0;
 	bi.iImage = 0;
 
-	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 	const BOOL fOk = pidl != NULL;
 	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);

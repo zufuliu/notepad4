@@ -1690,7 +1690,7 @@ static inline BOOL PathGetFileId(LPCWSTR pszPath, FILE_ID_INFO *fileId) {
 	BOOL success;
 	if (IsWin8AndAbove()) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		success = GetFileInformationByHandleEx(hFile, FileIdInfo, fileId, sizeof(FILE_ID_INFO));
+		success = GetFileInformationByHandleEx(hFile, (FILE_INFO_BY_HANDLE_CLASS)FileIdInfo, fileId, sizeof(FILE_ID_INFO));
 #else
 		typedef BOOL (WINAPI *GetFileInformationByHandleExSig)(HANDLE hFile, int FileInformationClass, LPVOID lpFileInformation, DWORD dwBufferSize);
 		static GetFileInformationByHandleExSig pfnGetFileInformationByHandleEx = NULL;
@@ -1734,7 +1734,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bSrcIsFile, BOOL b
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	LPWSTR pszPath = NULL;
-	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 		return;
 	}
 	lstrcpy(wchUserFiles, pszPath);
@@ -1776,7 +1776,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv) {
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = NULL;
-		if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			return;
 		}
 		lstrcpy(wchPath, pszPath);
@@ -1896,7 +1896,7 @@ BOOL PathCreateDeskLnk(LPCWSTR pszDocument) {
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	LPWSTR tchLinkDir = NULL;
-	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &tchLinkDir)) {
+	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, NULL, &tchLinkDir)) {
 		return FALSE;
 	}
 #else
@@ -2046,12 +2046,12 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		return;
 	}
 
-	LPITEMIDLIST pidl = ILCreateFromPath(wchDirectory);
+	PIDLIST_ABSOLUTE pidl = ILCreateFromPath(wchDirectory);
 	if (pidl) {
 		HRESULT hr;
-		LPITEMIDLIST pidlEntry = path ? ILCreateFromPath(path) : NULL;
+		PIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : NULL;
 		if (pidlEntry) {
-			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
+			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), 0);
 			CoTaskMemFree((LPVOID)pidlEntry);
 		} else if (!bSelect) {
 #if 0

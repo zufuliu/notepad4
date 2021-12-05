@@ -178,7 +178,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 
 	// Get Desktop Folder
 	LPSHELLFOLDER lpsfDesktop = NULL;
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_RELATIVE pidl = NULL;
 	LPSHELLFOLDER lpsf = NULL;
 	if (S_OK == SHGetDesktopFolder(&lpsfDesktop)) {
 		// Convert wszDir into a pidl
@@ -192,12 +192,12 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 				LPENUMIDLIST lpe = nullptr;
 				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of lpsf
-					LPITEMIDLIST pidlEntry = nullptr;
+					PITEMID_CHILD pidlEntry = nullptr;
 					while (S_OK == lpe->Next(1, &pidlEntry, nullptr)) {
 						// Add found item to the List
 						// Check if it's part of the Filesystem
 						dwAttributes = SFGAO_FILESYSTEM | SFGAO_FOLDER;
-						lpsf->GetAttributesOf(1, (LPCITEMIDLIST *)(&pidlEntry), &dwAttributes);
+						lpsf->GetAttributesOf(1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), &dwAttributes);
 
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Check if item matches specified filter
@@ -232,12 +232,12 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 				LPENUMIDLIST lpe = NULL;
 				if (S_OK == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of lpsf
-					LPITEMIDLIST pidlEntry = NULL;
+					PITEMID_CHILD pidlEntry = NULL;
 					while (S_OK == lpe->lpVtbl->Next(lpe, 1, &pidlEntry, NULL)) {
 						// Add found item to the List
 						// Check if it's part of the Filesystem
 						dwAttributes = SFGAO_FILESYSTEM | SFGAO_FOLDER;
-						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, (LPCITEMIDLIST *)(&pidlEntry), &dwAttributes);
+						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), &dwAttributes);
 
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Check if item matches specified filter
@@ -334,7 +334,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			lvi.mask = LVIF_IMAGE;
 
 #if defined(__cplusplus)
-			if (!lpshi || S_OK != lpshi->GetIconOf(lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
+			if (!lpshi || S_OK != lpshi->GetIconOf((PCUITEMID_CHILD)(lplvid->pidl), GIL_FORSHELL, &lvi.iImage)) {
 				SHFILEINFO shfi;
 				LPITEMIDLIST pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
@@ -342,7 +342,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 				lvi.iImage = shfi.iIcon;
 			}
 #else
-			if (!lpshi || S_OK != lpshi->lpVtbl->GetIconOf(lpshi, lplvid->pidl, GIL_FORSHELL, &lvi.iImage)) {
+			if (!lpshi || S_OK != lpshi->lpVtbl->GetIconOf(lpshi, (PCUITEMID_CHILD)(lplvid->pidl), GIL_FORSHELL, &lvi.iImage)) {
 				SHFILEINFO shfi;
 				LPITEMIDLIST pidl = IL_Create(lpdl->pidl, lpdl->cbidl, lplvid->pidl, 0);
 				SHGetFileInfo((LPCWSTR)pidl, 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
@@ -358,9 +358,9 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			DWORD dwAttributes = SFGAO_LINK | SFGAO_SHARE;
 			// Link and Share Overlay
 #if defined(__cplusplus)
-			lplvid->lpsf->GetAttributesOf(1, (LPCITEMIDLIST *)(&lplvid->pidl), &dwAttributes);
+			lplvid->lpsf->GetAttributesOf(1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), &dwAttributes);
 #else
-			lplvid->lpsf->lpVtbl->GetAttributesOf(lplvid->lpsf, 1, (LPCITEMIDLIST *)(&lplvid->pidl), &dwAttributes);
+			lplvid->lpsf->lpVtbl->GetAttributesOf(lplvid->lpsf, 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), &dwAttributes);
 #endif
 
 			if (dwAttributes & SFGAO_LINK) {
@@ -378,7 +378,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 			// Fade hidden/system files
 			if (!lpdl->bNoFadeHidden) {
 				WIN32_FIND_DATA fd;
-				if (S_OK == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl, SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
+				if (S_OK == SHGetDataFromIDList(lplvid->lpsf, (PCUITEMID_CHILD)(lplvid->pidl), SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
 					if ((fd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) || (fd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)) {
 						lvi.mask |= LVIF_STATE;
 						lvi.stateMask |= LVIS_CUT;
@@ -476,9 +476,9 @@ int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 	const LPCLV_ITEMDATA lplvid2 = (LPCLV_ITEMDATA)lp2;
 
 #if defined(__cplusplus)
-	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, lplvid1->pidl, lplvid2->pidl);
+	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #else
-	HRESULT hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, lFlags, lplvid1->pidl, lplvid2->pidl);
+	HRESULT hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, lFlags, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #endif
 	int result = (short)HRESULT_CODE(hr);
 
@@ -487,9 +487,9 @@ int CALLBACK DirList_CompareProcFw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 	}
 
 #if defined(__cplusplus)
-	hr = lplvid1->lpsf->CompareIDs(0, lplvid1->pidl, lplvid2->pidl);
+	hr = lplvid1->lpsf->CompareIDs(0, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #else
-	hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, 0, lplvid1->pidl, lplvid2->pidl);
+	hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, 0, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #endif
 	result = (short)HRESULT_CODE(hr);
 
@@ -501,9 +501,9 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 	const LPCLV_ITEMDATA lplvid2 = (LPCLV_ITEMDATA)lp2;
 
 #if defined(__cplusplus)
-	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, lplvid1->pidl, lplvid2->pidl);
+	HRESULT hr = lplvid1->lpsf->CompareIDs(lFlags, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #else
-	HRESULT hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, lFlags, lplvid1->pidl, lplvid2->pidl);
+	HRESULT hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, lFlags, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #endif
 	int result = -(short)HRESULT_CODE(hr);
 
@@ -512,9 +512,9 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 	}
 
 #if defined(__cplusplus)
-	hr = lplvid1->lpsf->CompareIDs(0, lplvid1->pidl, lplvid2->pidl);
+	hr = lplvid1->lpsf->CompareIDs(0, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #else
-	hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, 0, lplvid1->pidl, lplvid2->pidl);
+	hr = lplvid1->lpsf->lpVtbl->CompareIDs(lplvid1->lpsf, 0, (PCUIDLIST_RELATIVE)(lplvid1->pidl), (PCUIDLIST_RELATIVE)(lplvid2->pidl));
 #endif
 	result = -(short)HRESULT_CODE(hr);
 
@@ -575,7 +575,7 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli) {
 		WIN32_FIND_DATA fd;
 		//ULONG dwAttributes = SFGAO_FILESYSTEM;
 
-		if (S_OK == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl, SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
+		if (S_OK == SHGetDataFromIDList(lplvid->lpsf, (PCUITEMID_CHILD)lplvid->pidl, SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA))) {
 			lpdli->ntype = (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? DLE_DIR : DLE_FILE;
 		}
 		//lplvid->lpsf->lpVtbl->GetAttributesOf(lplvid->lpsf, 1, &lplvid->pidl, &dwAttributes);
@@ -610,7 +610,7 @@ int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
 	}
 
 	LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
-	if (S_OK == SHGetDataFromIDList(lplvid->lpsf, lplvid->pidl, SHGDFIL_FINDDATA, pfd, sizeof(WIN32_FIND_DATA))) {
+	if (S_OK == SHGetDataFromIDList(lplvid->lpsf, (PCUITEMID_CHILD)(lplvid->pidl), SHGDFIL_FINDDATA, pfd, sizeof(WIN32_FIND_DATA))) {
 		return iItem;
 	}
 	return -1;
@@ -647,7 +647,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), IID_IContextMenu, nullptr, (void **)(&lpcm))) {
+	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IContextMenu, nullptr, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -668,7 +668,7 @@ BOOL DirList_PropertyDlg(HWND hwnd, int iItem) {
 		bSuccess = FALSE;
 	}
 #else
-	if (S_OK == lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
+	if (S_OK == lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -717,7 +717,7 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 		LPLV_ITEMDATA lplvid = (LPLV_ITEMDATA)lvi.lParam;
 		LPDATAOBJECT lpdo;
 #if defined(__cplusplus)
-		if (SUCCEEDED(lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), IID_IDataObject, nullptr, (void **)(&lpdo)))) {
+		if (SUCCEEDED(lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IDataObject, nullptr, (void **)(&lpdo)))) {
 			LPDROPSOURCE lpds = (LPDROPSOURCE)CreateDropSource();
 			DWORD dwEffect;
 
@@ -727,7 +727,7 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 			lpds->Release();
 		}
 #else
-		if (SUCCEEDED(lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lplvid->pidl), &IID_IDataObject, NULL, (void **)(&lpdo)))) {
+		if (SUCCEEDED(lplvid->lpsf->lpVtbl->GetUIObjectOf(lplvid->lpsf, GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), &IID_IDataObject, NULL, (void **)(&lpdo)))) {
 			LPDROPSOURCE lpds = (LPDROPSOURCE)CreateDropSource();
 			DWORD dwEffect;
 
@@ -749,7 +749,7 @@ void DirList_DoDragDrop(HWND hwnd, LPARAM lParam) {
 BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath) {
 	WCHAR tch[MAX_PATH];
 	const LPCDLDATA lpdl = (LPCDLDATA)GetProp(hwnd, pDirListProp);
-	if (SHGetPathFromIDList(lpdl->pidl, tch)) {
+	if (SHGetPathFromIDList((PCIDLIST_ABSOLUTE)(lpdl->pidl), tch)) {
 		lstrcpy(lpszLongPath, tch);
 		return TRUE;
 	}
@@ -856,7 +856,7 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pd
 	}
 
 	WIN32_FIND_DATA fd;
-	SHGetDataFromIDList(lpsf, pidl, SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA));
+	SHGetDataFromIDList(lpsf, (PCUITEMID_CHILD)pidl, SHGDFIL_FINDDATA, &fd, sizeof(WIN32_FIND_DATA));
 
 	// All the directories are added
 	if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -928,9 +928,9 @@ int DriveBox_Fill(HWND hwnd) {
 	cbei.iSelectedImage = I_IMAGECALLBACK;
 
 	// Get pidl to [My Computer]
-	LPITEMIDLIST pidl;
+	PIDLIST_ABSOLUTE pidl;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_ComputerFolder, KF_FLAG_DEFAULT, NULL, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_ComputerFolder, KF_FLAG_DEFAULT, NULL, &pidl))
 #else
 	if (S_OK == SHGetFolderLocation(hwnd, CSIDL_DRIVES, NULL, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
@@ -947,12 +947,12 @@ int DriveBox_Fill(HWND hwnd) {
 				LPENUMIDLIST lpe;
 				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of [My Computer]
-					LPITEMIDLIST pidlEntry;
+					PITEMID_CHILD pidlEntry;
 					while (S_OK == lpe->Next(1, &pidlEntry, nullptr)) {
 						// Add item to the List if it is part of the
 						// Filesystem
 						ULONG dwAttributes = SFGAO_FILESYSTEM;
-						lpsf->GetAttributesOf(1, (LPCITEMIDLIST *)(&pidlEntry), &dwAttributes);
+						lpsf->GetAttributesOf(1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), &dwAttributes);
 
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Windows XP: check if pidlEntry is a drive
@@ -973,7 +973,7 @@ int DriveBox_Fill(HWND hwnd) {
 
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
 										const LPCLV_ITEMDATA lpdcid2 = (LPCLV_ITEMDATA)cbei2.lParam;
-										hr = lpdcid->lpsf->CompareIDs(0, lpdcid->pidl, lpdcid2->pidl);
+										hr = lpdcid->lpsf->CompareIDs(0, (PCUIDLIST_RELATIVE)(lpdcid->pidl), (PCUIDLIST_RELATIVE)(lpdcid2->pidl));
 
 										if ((short)HRESULT_CODE(hr) < 0) {
 											break;
@@ -1001,12 +1001,12 @@ int DriveBox_Fill(HWND hwnd) {
 				LPENUMIDLIST lpe;
 				if (S_OK == lpsf->lpVtbl->EnumObjects(lpsf, hwnd, grfFlags, &lpe)) {
 					// Enumerate the contents of [My Computer]
-					LPITEMIDLIST pidlEntry;
+					PITEMID_CHILD pidlEntry;
 					while (S_OK == lpe->lpVtbl->Next(lpe, 1, &pidlEntry, NULL)) {
 						// Add item to the List if it is part of the
 						// Filesystem
 						ULONG dwAttributes = SFGAO_FILESYSTEM;
-						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, (LPCITEMIDLIST *)(&pidlEntry), &dwAttributes);
+						lpsf->lpVtbl->GetAttributesOf(lpsf, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), &dwAttributes);
 
 						if (dwAttributes & SFGAO_FILESYSTEM) {
 							// Windows XP: check if pidlEntry is a drive
@@ -1027,7 +1027,7 @@ int DriveBox_Fill(HWND hwnd) {
 
 									while ((SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei2))) {
 										const LPCLV_ITEMDATA lpdcid2 = (LPCLV_ITEMDATA)cbei2.lParam;
-										hr = lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, lpdcid->pidl, lpdcid2->pidl);
+										hr = lpdcid->lpsf->lpVtbl->CompareIDs(lpdcid->lpsf, 0, (PCUIDLIST_RELATIVE)(lpdcid->pidl), (PCUIDLIST_RELATIVE)(lpdcid2->pidl));
 
 										if ((short)HRESULT_CODE(hr) < 0) {
 											break;
@@ -1154,7 +1154,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), IID_IContextMenu, nullptr, (void **)(&lpcm))) {
+	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), IID_IContextMenu, nullptr, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -1175,7 +1175,7 @@ BOOL DriveBox_PropertyDlg(HWND hwnd) {
 		bSuccess = FALSE;
 	}
 #else
-	if (S_OK == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf, GetParent(hwnd), 1, (LPCITEMIDLIST *)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
+	if (S_OK == lpdcid->lpsf->lpVtbl->GetUIObjectOf(lpdcid->lpsf, GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), &IID_IContextMenu, NULL, (void **)(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -1333,12 +1333,12 @@ BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LP
 	STRRET str;
 
 #if defined(__cplusplus)
-	if (S_OK == lpsf->GetDisplayNameOf(pidl, dwFlags, &str)) {
-		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName) == S_OK;
+	if (S_OK == lpsf->GetDisplayNameOf((PCUITEMID_CHILD)pidl, dwFlags, &str)) {
+		return StrRetToBuf(&str, (PCUITEMID_CHILD)pidl, lpszDisplayName, nDisplayName) == S_OK;
 	}
 #else
-	if (S_OK == lpsf->lpVtbl->GetDisplayNameOf(lpsf, pidl, dwFlags, &str)) {
-		return StrRetToBuf(&str, pidl, lpszDisplayName, nDisplayName) == S_OK;
+	if (S_OK == lpsf->lpVtbl->GetDisplayNameOf(lpsf, (PCUITEMID_CHILD)pidl, dwFlags, &str)) {
+		return StrRetToBuf(&str, (PCUITEMID_CHILD)pidl, lpszDisplayName, nDisplayName) == S_OK;
 	}
 #endif
 

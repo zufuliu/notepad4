@@ -5362,7 +5362,7 @@ void LoadSettings(void) {
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = NULL;
-		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Desktop, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			lstrcpy(tchOpenWithDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
@@ -5377,7 +5377,7 @@ void LoadSettings(void) {
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = NULL;
-		if (S_OK == SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		if (S_OK == SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			lstrcpy(tchFavoritesDir, pszPath);
 			CoTaskMemFree(pszPath);
 		}
@@ -6695,14 +6695,19 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		}
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		REFKNOWNFOLDERID rfidList[] = {
+		const KNOWNFOLDERID *rfidList[] = {
 			&FOLDERID_LocalAppData,
 			&FOLDERID_RoamingAppData,
 			&FOLDERID_Profile,
 		};
 		for (UINT i = 0; i < COUNTOF(rfidList); i++) {
 			LPWSTR pszPath = NULL;
-			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath)) {
+#if defined(__cplusplus)
+			if (S_OK == SHGetKnownFolderPath(*rfidList[i], KF_FLAG_DEFAULT, nullptr, &pszPath))
+#else
+			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath))
+#endif
+			{
 				lstrcpy(tchBuild, pszPath);
 				CoTaskMemFree(pszPath);
 				PathAppend(tchBuild, WC_NOTEPAD2);
@@ -8574,7 +8579,7 @@ LPCWSTR AutoSave_GetDefaultFolder(void) {
 	if (StrIsEmpty(szFolder)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = NULL;
-		const HRESULT hr = SHGetKnownFolderPath(&FOLDERID_LocalAppData, KF_FLAG_DEFAULT, NULL, &pszPath);
+		const HRESULT hr = SHGetKnownFolderPath(KnownFolderId_LocalAppData, KF_FLAG_DEFAULT, NULL, &pszPath);
 		if (hr == S_OK) {
 			PathCombine(szFolder, pszPath, L"Notepad2");
 			CoTaskMemFree(pszPath);

@@ -232,7 +232,7 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	bi.lParam = (LPARAM)szBase;
 	bi.iImage = 0;
 
-	LPITEMIDLIST pidl = SHBrowseForFolder(&bi);
+	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);

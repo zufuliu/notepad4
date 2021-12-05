@@ -1,1 +1,1 @@
-@clang-tidy %1 -- -m64 -std=c++20 -D_WIN64 -DNOMINMAX -DNDEBUG -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0502 -DWINVER=0x0502 -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -Iinclude -Isrc -Ilexlib -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wcomma 1>tidy.log
+@clang-tidy %1 -- -m64 -std=c++20 -D_WIN64 -DNOMINMAX -DNDEBUG -DSTRICT_TYPED_ITEMIDS -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -Iinclude -Isrc -Ilexlib -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wcomma 1>tidy.log

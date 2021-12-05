@@ -1095,7 +1095,7 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bSrcIsFile, BOOL b
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	LPWSTR pszPath = NULL;
-	if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 		return;
 	}
 	lstrcpy(wchUserFiles, pszPath);
@@ -1137,7 +1137,7 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv) {
 	if (StrHasPrefix(lpszSrc, L"%CSIDL:MYDOCUMENTS%")) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LPWSTR pszPath = NULL;
-		if (S_OK != SHGetKnownFolderPath(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
+		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			return;
 		}
 		lstrcpy(wchPath, pszPath);
@@ -1307,12 +1307,12 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 		return;
 	}
 
-	LPITEMIDLIST pidl = ILCreateFromPath(wchDirectory);
+	PCIDLIST_ABSOLUTE pidl = ILCreateFromPath(wchDirectory);
 	if (pidl) {
 		HRESULT hr;
-		LPITEMIDLIST pidlEntry = path ? ILCreateFromPath(path) : NULL;
+		PCIDLIST_ABSOLUTE pidlEntry = path ? ILCreateFromPath(path) : NULL;
 		if (pidlEntry) {
-			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidlEntry), 0);
+			hr = SHOpenFolderAndSelectItems(pidl, 1, (PCUITEMID_CHILD_ARRAY)(&pidlEntry), 0);
 			CoTaskMemFree((LPVOID)pidlEntry);
 		} else if (!bSelect) {
 #if 0
@@ -1526,10 +1526,10 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 //  GetDefaultFavoritesDir()
 //
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
-	LPITEMIDLIST pidl;
+	PIDLIST_ABSOLUTE pidl;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pidl))
 #else
 	if (S_OK == SHGetFolderLocation(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_DEFAULT, &pidl))
 #endif
@@ -1546,10 +1546,10 @@ void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir) {
 //  GetDefaultOpenWithDir()
 //
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir) {
-	LPITEMIDLIST pidl;
+	PIDLIST_ABSOLUTE pidl;
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	if (S_OK == SHGetKnownFolderIDList(&FOLDERID_Desktop, KF_FLAG_DEFAULT, NULL, &pidl))
+	if (S_OK == SHGetKnownFolderIDList(KnownFolderId_Desktop, KF_FLAG_DEFAULT, NULL, &pidl))
 #else
 	if (S_OK == SHGetFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_DEFAULT, &pidl))
 #endif

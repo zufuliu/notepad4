@@ -486,6 +486,18 @@ BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 BOOL PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);
 void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect);
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#if defined(__cplusplus)
+#define KnownFolderId_Desktop			FOLDERID_Desktop
+#define KnownFolderId_Documents			FOLDERID_Documents
+#define KnownFolderId_ComputerFolder	FOLDERID_ComputerFolder
+#else
+#define KnownFolderId_Desktop			(&FOLDERID_Desktop)
+#define KnownFolderId_Documents			(&FOLDERID_Documents)
+#define KnownFolderId_ComputerFolder	(&FOLDERID_ComputerFolder)
+#endif
+#endif
+
 NP2_inline void TrimString(LPWSTR lpString) {
 	StrTrim(lpString, L" ");
 }

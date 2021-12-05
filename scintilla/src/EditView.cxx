@@ -470,10 +470,6 @@ constexpr bool ViewIsASCII(std::string_view text) noexcept {
 * Also determine the x position at which each character starts.
 */
 int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option) {
-	if (!ll) {
-		return 0;
-	}
-
 	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
@@ -825,7 +821,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		}
 
 		validity = LineLayout::ValidLevel::lines;
-		if (option == LayoutLineOption::AutoUpdate && linesWrapped != ll->lines) {
+		if (partialLine && option == LayoutLineOption::AutoUpdate && linesWrapped != ll->lines) {
 			(const_cast<EditModel &>(model)).OnLineWrapped(line, ll->lines);
 		}
 	}

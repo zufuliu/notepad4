@@ -138,5 +138,4 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 UINT IL_GetSize(LPCITEMIDLIST pidl);
 
 //==== IL_GetDisplayName() ====================================================
-BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags,
-					   LPWSTR lpszDisplayName, int nDisplayName);
+BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);
