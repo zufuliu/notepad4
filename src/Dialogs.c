@@ -2593,20 +2593,9 @@ HKEY_CLASSES_ROOT\Applications\Notepad2.exe
 		(Default)			REG_SZ		"Notepad2.exe" "%1"
 
 HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\notepad.exe
+	(Default)				REG_SZ			Notepad2.exe
 	Debugger								REG_SZ		"Notepad2.exe" /z
 	UseFilter								REG_DWORD	0
-	0
-		AppExecutionAliasRedirect			REG_DWORD	1
-		AppExecutionAliasRedirectPackages	REG_SZ		*
-		FilterFullPath						REG_SZ		"Notepad2.exe"
-	1
-		AppExecutionAliasRedirect			REG_DWORD	1
-		AppExecutionAliasRedirectPackages	REG_SZ		*
-		FilterFullPath						REG_SZ		"Notepad2.exe"
-	2
-		AppExecutionAliasRedirect			REG_DWORD	1
-		AppExecutionAliasRedirectPackages	REG_SZ		*
-		FilterFullPath						REG_SZ		"Notepad2.exe"
 */
 extern BOOL fIsElevated;
 extern int flagUseSystemMRU;
@@ -2743,10 +2732,14 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 		LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
+			Registry_SetDefaultString(hKey, tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
 			Registry_SetInt(hKey, L"UseFilter", 0);
 			WCHAR num[2] = { L'0', L'\0' };
 			for (int index = 0; index < 3; index++, num[0]++) {
+#if 1
+				Registry_DeleteTree(hKey, num);
+#else
 				HKEY hSubKey;
 				status = Registry_CreateKey(hKey, num, &hSubKey);
 				if (status == ERROR_SUCCESS) {
@@ -2755,14 +2748,19 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 					Registry_SetString(hSubKey, L"FilterFullPath", tchModule);
 					RegCloseKey(hSubKey);
 				}
+#endif
 			}
 			RegCloseKey(hKey);
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {
+#if 1
+		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
+#else
 		// on Windows 11, all keys were created by the system, we should not delete them.
 		HKEY hKey;
 		LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE, &hKey);
 		if (status == ERROR_SUCCESS) {
+			RegDeleteValue(hKey, NULL);
 			RegDeleteValue(hKey, L"Debugger");
 			RegDeleteValue(hKey, L"UseFilter");
 			GetWindowsDirectory(tchModule, COUNTOF(tchModule));
@@ -2783,6 +2781,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			}
 			RegCloseKey(hKey);
 		}
+#endif
 	}
 }
 
