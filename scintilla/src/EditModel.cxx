@@ -22,6 +22,8 @@
 #include <algorithm>
 #include <memory>
 
+#include <windows.h>
+
 #include "ScintillaTypes.h"
 #include "ILoader.h"
 #include "ILexer.h"
@@ -81,11 +83,13 @@ EditModel::EditModel() : braces{} {
 	pdoc = new Document(DocumentOption::StylesNone);
 	pdoc->AddRef();
 	pcs = ContractionStateCreate(pdoc->IsLarge());
+	idleTaskTimer = CreateWaitableTimer(nullptr, true, nullptr);
 }
 
 EditModel::~EditModel() {
 	pdoc->Release();
 	pdoc = nullptr;
+	CloseHandle(idleTaskTimer);
 }
 
 bool EditModel::BidirectionalEnabled() const noexcept {
@@ -105,8 +109,8 @@ const char *EditModel::GetDefaultFoldDisplayText() const noexcept {
 	return defaultFoldDisplayText.get();
 }
 
-const char *EditModel::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
-	if (foldDisplayTextStyle == FoldDisplayTextStyle::Hidden || pcs->GetExpanded(lineDoc)) {
+const char *EditModel::GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept {
+	if (!partialLine && (foldDisplayTextStyle == FoldDisplayTextStyle::Hidden || pcs->GetExpanded(lineDoc))) {
 		return nullptr;
 	}
 
@@ -121,4 +125,14 @@ const char *EditModel::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
 InSelection EditModel::LineEndInSelection(Sci::Line lineDoc) const noexcept {
 	const Sci::Position posAfterLineEnd = pdoc->LineStart(lineDoc + 1);
 	return sel.InSelectionForEOL(posAfterLineEnd);
+}
+
+void EditModel::SetIdleTaskTime(uint32_t milliseconds) const noexcept {
+	LARGE_INTEGER dueTime;
+	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds; // convert to 100ns
+	SetWaitableTimer(idleTaskTimer, &dueTime, 0, nullptr, nullptr, false);
+}
+
+bool EditModel::IdleTaskTimeExpired() const noexcept {
+	return WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0;
 }

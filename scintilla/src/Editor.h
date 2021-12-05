@@ -319,6 +319,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	PRectangle GetTextRectangle() const noexcept;
 
 	Sci::Line LinesOnScreen() const noexcept override;
+	void OnLineWrapped(Sci::Line lineDoc, int linesWrapped) override;
 	Sci::Line LinesToScroll() const noexcept;
 	Sci::Line MaxScrollPos() const noexcept;
 	SelectionPosition ClampPositionIntoDocument(SelectionPosition sp) const noexcept;
@@ -404,7 +405,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void UpdateSystemCaret();
 
 	bool Wrapping() const noexcept;
-	void NeedWrapping(Sci::Line docLineStart = 0, Sci::Line docLineEnd = WrapPending::lineLarge) noexcept;
+	void NeedWrapping(Sci::Line docLineStart = 0, Sci::Line docLineEnd = WrapPending::lineLarge, bool invalidate = true) noexcept;
 	bool WrapOneLine(Surface *surface, Sci::Line lineToWrap);
 	enum class WrapScope {
 		wsAll, wsVisible, wsIdle

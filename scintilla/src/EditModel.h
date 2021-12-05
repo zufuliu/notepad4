@@ -49,8 +49,11 @@ public:
 
 	// Wrapping support
 	int wrapWidth;
+	static constexpr uint32_t IdleLineWrapTime = 125;
 
 	Document *pdoc;
+
+	void *idleTaskTimer;
 
 	EditModel();
 	// Deleted so EditModel objects can not be copied.
@@ -62,12 +65,15 @@ public:
 	virtual Sci::Line TopLineOfMain() const noexcept = 0;
 	virtual Point GetVisibleOriginInMain() const noexcept = 0;
 	virtual Sci::Line LinesOnScreen() const noexcept = 0;
+	virtual void OnLineWrapped(Sci::Line lineDoc, int linesWrapped) = 0;
 	bool BidirectionalEnabled() const noexcept;
 	bool BidirectionalR2L() const noexcept;
 	void SetDefaultFoldDisplayText(const char *text);
 	const char *GetDefaultFoldDisplayText() const noexcept;
-	const char *GetFoldDisplayText(Sci::Line lineDoc) const noexcept;
+	const char *GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept;
 	InSelection LineEndInSelection(Sci::Line lineDoc) const noexcept;
+	void SetIdleTaskTime(uint32_t milliseconds) const noexcept;
+	bool IdleTaskTimeExpired() const noexcept;
 };
 
 }
