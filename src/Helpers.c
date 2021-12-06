@@ -1714,13 +1714,16 @@ static inline BOOL PathGetFileId(LPCWSTR pszPath, FILE_ID_INFO *fileId) {
 }
 
 BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
-	BOOL same = FALSE;
+	if (PathEqual(pszPath1, pszPath2)) {
+		return TRUE;
+	}
+
 	FILE_ID_INFO info1;
 	FILE_ID_INFO info2;
 	if (PathGetFileId(pszPath1, &info1) && PathGetFileId(pszPath2, &info2)) {
-		same = memcmp(&info1, &info2, sizeof(FILE_ID_INFO)) == 0;
+		return memcmp(&info1, &info2, sizeof(FILE_ID_INFO)) == 0;
 	}
-	return same;
+	return FALSE;
 }
 
 //=============================================================================
