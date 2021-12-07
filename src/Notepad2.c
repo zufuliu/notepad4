@@ -785,7 +785,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	hwndMain = CreateWindowEx(
 				   0,
 				   wchWndClass,
-				   L"Notepad2",
+				   WC_NOTEPAD2,
 				   WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 				   wi.x,
 				   wi.y,
@@ -5743,9 +5743,9 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, 0);
 	}
 
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"PathNameFormat", iPathNameFormat, 1);
 
@@ -6708,9 +6708,8 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath))
 #endif
 			{
-				lstrcpy(tchBuild, pszPath);
+				PathCombine(tchBuild, pszPath, WC_NOTEPAD2);
 				CoTaskMemFree(pszPath);
-				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
@@ -7285,8 +7284,7 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	ExpandEnvironmentStringsEx(tch, COUNTOF(tch));
 
 	if (PathIsRelative(tch)) {
-		lstrcpyn(szFileName, g_wchWorkingDirectory, COUNTOF(szFileName));
-		PathAppend(szFileName, tch);
+		PathCombine(szFileName, g_wchWorkingDirectory, tch);
 	} else {
 		lstrcpy(szFileName, tch);
 	}
@@ -7552,8 +7550,7 @@ BOOL FileSave(FileSaveFlag saveFlag) {
 		WCHAR tchInitialDir[MAX_PATH] = L"";
 		if ((saveFlag & FileSaveFlag_SaveCopy) && StrNotEmpty(tchLastSaveCopyDir)) {
 			lstrcpy(tchInitialDir, tchLastSaveCopyDir);
-			lstrcpy(tchFile, tchLastSaveCopyDir);
-			PathAppend(tchFile, PathFindFileName(szCurFile));
+			PathCombine(tchFile, tchInitialDir, PathFindFileName(szCurFile));
 		} else {
 			lstrcpy(tchFile, szCurFile);
 		}
@@ -7843,8 +7840,7 @@ BOOL ActivatePrevInst(void) {
 
 		if (PathIsRelative(lpFileArg)) {
 			WCHAR tchTmp[MAX_PATH];
-			lstrcpyn(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
-			PathAppend(tchTmp, lpFileArg);
+			PathCombine(tchTmp, g_wchWorkingDirectory, lpFileArg);
 			lstrcpy(lpFileArg, tchTmp);
 		}
 
@@ -7944,8 +7940,7 @@ BOOL ActivatePrevInst(void) {
 
 				if (PathIsRelative(lpFileArg)) {
 					WCHAR tchTmp[MAX_PATH];
-					lstrcpyn(tchTmp, g_wchWorkingDirectory, COUNTOF(tchTmp));
-					PathAppend(tchTmp, lpFileArg);
+					PathCombine(tchTmp, g_wchWorkingDirectory, lpFileArg);
 					lstrcpy(lpFileArg, tchTmp);
 				}
 
@@ -8318,7 +8313,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	nid.uCallbackMessage = APPM_TRAYMESSAGE;
 	nid.hIcon = hIcon;
-	lstrcpy(nid.szTip, L"Notepad2");
+	lstrcpy(nid.szTip, WC_NOTEPAD2);
 
 	if (bAdd) {
 		Shell_NotifyIcon(NIM_ADD, &nid);
@@ -8440,11 +8435,10 @@ static inline BOOL IsCurrentFileChangedOutsideApp(void) {
 		return TRUE;
 	}
 
-	const BOOL changed = (fdCurFile.nFileSizeLow != fdUpdated.nFileSizeLow)
-			|| (fdCurFile.nFileSizeHigh != fdUpdated.nFileSizeHigh)
-			// CompareFileTime(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime) != 0
-			|| (fdCurFile.ftLastWriteTime.dwLowDateTime != fdUpdated.ftLastWriteTime.dwLowDateTime)
-			|| (fdCurFile.ftLastWriteTime.dwHighDateTime != fdUpdated.ftLastWriteTime.dwHighDateTime);
+	const BOOL changed = memcmp(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime, sizeof(FILETIME)) != 0
+		// CompareFileTime(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime) != 0
+		|| (fdCurFile.nFileSizeHigh != fdUpdated.nFileSizeHigh)
+		|| (fdCurFile.nFileSizeLow != fdUpdated.nFileSizeLow);
 	return changed;
 }
 
@@ -8581,7 +8575,7 @@ LPCWSTR AutoSave_GetDefaultFolder(void) {
 		LPWSTR pszPath = NULL;
 		const HRESULT hr = SHGetKnownFolderPath(KnownFolderId_LocalAppData, KF_FLAG_DEFAULT, NULL, &pszPath);
 		if (hr == S_OK) {
-			PathCombine(szFolder, pszPath, L"Notepad2");
+			PathCombine(szFolder, pszPath, WC_NOTEPAD2);
 			CoTaskMemFree(pszPath);
 		} else {
 			GetModuleFileName(NULL, szFolder, MAX_PATH);
@@ -8590,7 +8584,7 @@ LPCWSTR AutoSave_GetDefaultFolder(void) {
 #else
 		const HRESULT hr = SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, szFolder);
 		if (hr == S_OK) {
-			PathAppend(szFolder, L"Notepad2");
+			PathAppend(szFolder, WC_NOTEPAD2);
 		} else {
 			GetModuleFileName(NULL, szFolder, MAX_PATH);
 			PathRemoveFileSpec(szFolder);

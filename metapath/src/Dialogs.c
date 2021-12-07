@@ -1276,7 +1276,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	psh.dwFlags     = PSH_PROPSHEETPAGE | PSH_NOAPPLYNOW | PSH_PROPTITLE;
 	psh.hwndParent  = hwnd;
 	psh.hInstance   = hInstance;
-	psh.pszCaption  = L"metapath";
+	psh.pszCaption  = WC_METAPATH;
 	psh.nPages      = 4;
 	psh.nStartPage  = 0;
 	psh.ppsp        = psp;
@@ -2216,7 +2216,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDOK: {
 			WCHAR tch[MAX_PATH] = L"";
 			if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
-				PathRelativeToApp(tch, tch, TRUE, TRUE, flagPortableMyDocs);
+				PathRelativeToApp(tch, tch, 0, TRUE, flagPortableMyDocs);
 				PathQuoteSpaces(tch);
 				SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
 			}
@@ -2413,7 +2413,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
 				lstrcpy(tchBuf, szFile);
-				PathRelativeToApp(tchBuf, tchBuf, TRUE, TRUE, flagPortableMyDocs);
+				PathRelativeToApp(tchBuf, tchBuf, 0, TRUE, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));

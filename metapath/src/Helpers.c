@@ -1088,42 +1088,47 @@ BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 //
 //  PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
-	WCHAR wchUserFiles[MAX_PATH];
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs) {
 	WCHAR wchPath[MAX_PATH];
-	const DWORD dwAttrTo = bSrcIsFile ? 0 : FILE_ATTRIBUTE_DIRECTORY;
 
+	if (!PathIsRelative(lpszSrc)) {
+		WCHAR wchAppPath[MAX_PATH];
+		WCHAR wchWinDir[MAX_PATH];
+		GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
+		PathRemoveFileSpec(wchAppPath);
+
+		if (bUnexpandMyDocs) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-	LPWSTR pszPath = NULL;
-	if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
-		return;
-	}
-	lstrcpy(wchUserFiles, pszPath);
-	CoTaskMemFree(pszPath);
+			LPWSTR wchUserFiles = NULL;
+			if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &wchUserFiles)) {
+				return;
+			}
 #else
-	if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
-		return;
-	}
+			WCHAR wchUserFiles[MAX_PATH];
+			if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchUserFiles)) {
+				return;
+			}
 #endif
-
-	WCHAR wchAppPath[MAX_PATH];
-	WCHAR wchWinDir[MAX_PATH];
-	GetModuleFileName(NULL, wchAppPath, COUNTOF(wchAppPath));
-	PathRemoveFileSpec(wchAppPath);
-	GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
-
-	if (bUnexpandMyDocs && !PathIsRelative(lpszSrc) && !PathIsPrefix(wchUserFiles, wchAppPath) && PathIsPrefix(wchUserFiles, lpszSrc)
-		&& PathRelativePathTo(wchPath, wchUserFiles, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
-		lstrcpy(wchUserFiles, L"%CSIDL:MYDOCUMENTS%");
-		PathAppend(wchUserFiles, wchPath);
-		lstrcpy(wchPath, wchUserFiles);
-	} else if (PathIsRelative(lpszSrc) || PathCommonPrefix(wchAppPath, wchWinDir, NULL)
-		|| !PathRelativePathTo(wchPath, wchAppPath, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
-		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
+			if (!PathIsPrefix(wchUserFiles, wchAppPath) && PathIsPrefix(wchUserFiles, lpszSrc)
+				&& PathRelativePathTo(wchWinDir, wchUserFiles, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
+				PathCombine(wchPath, L"%CSIDL:MYDOCUMENTS%", wchWinDir);
+				lpszSrc = wchPath;
+			}
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+			CoTaskMemFree(wchUserFiles);
+#endif
+		}
+		if (lpszSrc != wchPath) {
+			GetWindowsDirectory(wchWinDir, COUNTOF(wchWinDir));
+			if (!PathCommonPrefix(wchAppPath, wchWinDir, NULL)
+				&& PathRelativePathTo(wchPath, wchAppPath, FILE_ATTRIBUTE_DIRECTORY, lpszSrc, dwAttrTo)) {
+				lpszSrc = wchPath;
+			}
+		}
 	}
 
-	if (!bUnexpandEnv || !PathUnExpandEnvStrings(wchPath, lpszDest, MAX_PATH)) {
-		lstrcpy(lpszDest, wchPath);
+	if (!bUnexpandEnv || !PathUnExpandEnvStrings(lpszSrc, lpszDest, MAX_PATH)) {
+		lstrcpy(lpszDest, lpszSrc);
 	}
 }
 
@@ -1140,14 +1145,14 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv) {
 		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			return;
 		}
-		lstrcpy(wchPath, pszPath);
+		PathCombine(wchPath, pszPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
 		CoTaskMemFree(pszPath);
 #else
 		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {
 			return;
 		}
-#endif
 		PathAppend(wchPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
+#endif
 	} else {
 		lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
 	}

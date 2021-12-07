@@ -820,7 +820,7 @@ NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) {
 
 // similar to std::filesystem::equivalent()
 BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bSrcIsFile, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv);
 BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 BOOL PathCreateDeskLnk(LPCWSTR pszDocument);

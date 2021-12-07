@@ -415,7 +415,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	hwndMain = CreateWindowEx(
 				   0,
 				   WC_METAPATH,
-				   L"metapath",
+				   WC_METAPATH,
 				   WS_METAPATH,
 				   wi.x,
 				   wi.y,
@@ -2710,12 +2710,12 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	if (iStartupDir == 1) {
 		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
 	}
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	PathRelativeToApp(szQuickview, wchTmp, FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
 	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FALSE, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
 	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
@@ -3047,9 +3047,8 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 			if (S_OK == SHGetKnownFolderPath(rfidList[i], KF_FLAG_DEFAULT, NULL, &pszPath))
 #endif
 			{
-				lstrcpy(tchBuild, pszPath);
+				PathCombine(tchBuild, pszPath, WC_NOTEPAD2);
 				CoTaskMemFree(pszPath);
-				PathAppend(tchBuild, WC_NOTEPAD2);
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
@@ -3507,7 +3506,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	nid.uCallbackMessage = APPM_TRAYMESSAGE;
 	nid.hIcon = hIcon;
-	lstrcpy(nid.szTip, L"metapath");
+	lstrcpy(nid.szTip, WC_METAPATH);
 
 	if (bAdd) {
 		Shell_NotifyIcon(NIM_ADD, &nid);
@@ -3567,7 +3566,7 @@ void LoadLaunchSetings(void) {
 		iTargetApplicationMode = 1;
 		lstrcpy(szTargetApplication, L"Notepad2.exe");
 		StrCpyExW(szTargetApplicationParams, L"");
-		lstrcpy(szTargetApplicationWndClass, L"Notepad2");
+		lstrcpy(szTargetApplicationWndClass, WC_NOTEPAD2);
 		StrCpyExW(szDDEMsg, L"");
 		StrCpyExW(szDDEApp, L"");
 		StrCpyExW(szDDETopic, L"");
