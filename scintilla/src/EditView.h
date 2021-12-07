@@ -33,7 +33,7 @@ enum class DrawPhase {
 	all = 0x1FF
 };
 
-enum LayoutLineOption {
+enum class LayoutLineOption {
 	WholeLine = 0,
 	AutoUpdate = 1,
 	ManualUpdate = 2,

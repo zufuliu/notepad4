@@ -565,7 +565,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 
 	size_t pos = 0;
 	LineLayout *ret = nullptr;
-	const int useLongCache = maxChars >> (10 + 8); // 1024*256
+	const int useLongCache = maxChars >> (10 + 10); // 1024*1024
 	if (useLongCache) {
 		for (const auto &ll : longCache) {
 			if (ll->LineNumber() == lineNumber) {
@@ -762,11 +762,10 @@ void BreakFinder::Insert(Sci::Position val) {
 	}
 }
 
-BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart_,
+BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart,
 	XYPOSITION xStart, BreakFor breakFor, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
 	ll(ll_),
 	lineRange(lineRange_),
-	posLineStart(posLineStart_),
 	nextBreak(static_cast<int>(lineRange_.start)),
 	subBreak(-1),
 	saeCurrentPos(0),
