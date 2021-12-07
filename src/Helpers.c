@@ -1680,14 +1680,8 @@ typedef struct FILE_ID_INFO {
 } FILE_ID_INFO;
 #endif
 
-static inline BOOL PathGetFileId(LPCWSTR pszPath, FILE_ID_INFO *fileId) {
-	HANDLE hFile = CreateFile(pszPath, FILE_READ_ATTRIBUTES,
-		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-		NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (hFile == INVALID_HANDLE_VALUE) {
-		return FALSE;
-	}
-	BOOL success;
+static inline BOOL PathGetFileId(HANDLE hFile, FILE_ID_INFO *fileId) {
+	BOOL success = FALSE;
 	if (IsWin8AndAbove()) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		success = GetFileInformationByHandleEx(hFile, (FILE_INFO_BY_HANDLE_CLASS)FileIdInfo, fileId, sizeof(FILE_ID_INFO));
@@ -1699,7 +1693,9 @@ static inline BOOL PathGetFileId(LPCWSTR pszPath, FILE_ID_INFO *fileId) {
 		}
 		success = pfnGetFileInformationByHandleEx(hFile, FileIdInfo, fileId, sizeof(FILE_ID_INFO));
 #endif
-	} else {
+		// failed on samba: GetLastError() => ERROR_INVALID_PARAMETER
+	}
+	if (!success) {
 		BY_HANDLE_FILE_INFORMATION info;
 		success = GetFileInformationByHandle(hFile, &info);
 		if (success) {
@@ -1709,21 +1705,40 @@ static inline BOOL PathGetFileId(LPCWSTR pszPath, FILE_ID_INFO *fileId) {
 		}
 	}
 
-	CloseHandle(hFile);
 	return success;
 }
 
 BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 	if (PathEqual(pszPath1, pszPath2)) {
+		// TODO: support WSL case sensitive path created by FILE_FLAG_POSIX_SEMANTICS
+		// https://devblogs.microsoft.com/commandline/per-directory-case-sensitivity-and-wsl/
 		return TRUE;
 	}
 
-	FILE_ID_INFO info1;
-	FILE_ID_INFO info2;
-	if (PathGetFileId(pszPath1, &info1) && PathGetFileId(pszPath2, &info2)) {
-		return memcmp(&info1, &info2, sizeof(FILE_ID_INFO)) == 0;
+	BOOL same = FALSE;
+	// https://docs.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_id_info
+	// To determine whether two open handles represent the same file,
+	// combine the identifier and the volume serial number for each file and compare them.
+	HANDLE hFile1 = CreateFile(pszPath1, FILE_READ_ATTRIBUTES,
+						FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+						NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (hFile1 != INVALID_HANDLE_VALUE) {
+		FILE_ID_INFO info1;
+		if (PathGetFileId(hFile1, &info1)) {
+			HANDLE hFile2 = CreateFile(pszPath2, FILE_READ_ATTRIBUTES,
+								FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+								NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+			if (hFile2 != INVALID_HANDLE_VALUE) {
+				FILE_ID_INFO info2;
+				if (PathGetFileId(hFile2, &info2)) {
+					same = memcmp(&info1, &info2, sizeof(FILE_ID_INFO)) == 0;
+				}
+				CloseHandle(hFile2);
+			}
+		}
+		CloseHandle(hFile1);
 	}
-	return FALSE;
+	return same;
 }
 
 //=============================================================================
