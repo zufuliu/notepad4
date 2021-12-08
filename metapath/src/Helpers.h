@@ -464,9 +464,10 @@ NP2_inline BOOL PathIsSymbolicLink(LPCWSTR pszPath) {
 // https://docs.microsoft.com/en-us/windows/win32/intl/handling-sorting-in-your-applications#sort-strings-ordinally
 NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	// the function maps case using the operating system uppercasing table
 	return CompareStringOrdinal(pszPath1, -1, pszPath2, -1, TRUE) == CSTR_EQUAL;
 #else
-	return CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, pszPath1, -1, pszPath2, -1) == CSTR_EQUAL;
+	return CompareString(LOCALE_SYSTEM_DEFAULT, NORM_IGNORECASE, pszPath1, -1, pszPath2, -1) == CSTR_EQUAL;
 #endif
 }
 

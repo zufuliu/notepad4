@@ -288,7 +288,12 @@ static DWORD dwChangeNotifyTime = 0;
 
 static UINT msgTaskbarCreated = 0;
 
-static WIN32_FIND_DATA fdCurFile;
+static struct WatchFileInformation {
+	FILETIME	ftLastWriteTime;
+	DWORD		nFileSizeHigh;
+	DWORD		nFileSizeLow;
+} fdCurFile;
+
 static EDITFINDREPLACE efrData;
 BOOL	bReplaceInitialized = FALSE;
 EditMarkAllStatus editMarkAllStatus;
@@ -8414,8 +8419,11 @@ void InstallFileWatching(BOOL terminate) {
 		PathRemoveFileSpec(tchDirectory);
 
 		// Save data of current file
-		if (!GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &fdCurFile)) {
-			ZeroMemory(&fdCurFile, sizeof(WIN32_FIND_DATA));
+		WIN32_FIND_DATA data;
+		if (GetFileAttributesEx(szCurFile, GetFileExInfoStandard, &data)) {
+			memcpy(&fdCurFile, &data.ftLastWriteTime, sizeof(fdCurFile));
+		} else {
+			ZeroMemory(&fdCurFile, sizeof(fdCurFile));
 		}
 
 		hChangeHandle = iFileWatchingMethod ? NULL : FindFirstChangeNotification(tchDirectory, FALSE,
@@ -8435,10 +8443,7 @@ static inline BOOL IsCurrentFileChangedOutsideApp(void) {
 		return TRUE;
 	}
 
-	const BOOL changed = memcmp(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime, sizeof(FILETIME)) != 0
-		// CompareFileTime(&fdCurFile.ftLastWriteTime, &fdUpdated.ftLastWriteTime) != 0
-		|| (fdCurFile.nFileSizeHigh != fdUpdated.nFileSizeHigh)
-		|| (fdCurFile.nFileSizeLow != fdUpdated.nFileSizeLow);
+	const BOOL changed = memcmp(&fdCurFile, &fdUpdated.ftLastWriteTime, sizeof(fdCurFile)) != 0;
 	return changed;
 }
 
