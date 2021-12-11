@@ -1061,9 +1061,10 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 
 	if (cbData < MAX_NON_UTF8_SIZE && iEncoding != CPI_DEFAULT) {
 		const UINT uFlags = mEncoding[iEncoding].uFlags;
-		if ((uFlags & NCP_8BIT) || ((uFlags & NCP_7BIT) && IsUTF7(lpData, cbData))) {
+		const BOOL ascii = IsUTF7(lpData, cbData);
+		if ((uFlags & NCP_8BIT) || ((uFlags & NCP_7BIT) && ascii)) {
 			// 7-bit / any encoding
-			*encodingFlag = EncodingFlag_UTF7;
+			*encodingFlag = ascii ? EncodingFlag_UTF7 : EncodingFlag_None;
 			return iEncoding;
 		}
 	}
