@@ -1229,7 +1229,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 			cbData -= 3;
 		}
 	} else if (uFlags & (NCP_8BIT | NCP_7BIT)) {
-		if ((encodingFlag & EncodingFlag_UTF7) == 0 || iEncoding == CPI_UTF7) {
+		if ((encodingFlag & EncodingFlag_UTF7) == 0 || (uFlags & NCP_7BIT) != 0) {
 			const UINT uCodePage = mEncoding[iEncoding].uCodePage;
 			lpDataUTF8 = EncodeAsUTF8(lpData, &cbData, uCodePage, 0);
 			NP2HeapFree(lpData);
