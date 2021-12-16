@@ -296,6 +296,7 @@ BEGIN
 				MENUITEM "ISS\tInhibit s&ymmetric swapping",		IDM_INSERT_UNICODE_ISS
 				MENUITEM "AAFS\tActivate Arabic &form shaping",		IDM_INSERT_UNICODE_AAFS
 				MENUITEM "IAFS\tInhibit Arabic form s&haping",		IDM_INSERT_UNICODE_IAFS
+				MENUITEM "ALM\t&Arabic letter mark",		        IDM_INSERT_UNICODE_ALM
 				MENUITEM "RS\tRecord Separator (&Block separator)", IDM_INSERT_UNICODE_RS
 				MENUITEM "US\tUnit Separator (&Segment separator)", IDM_INSERT_UNICODE_US
 				MENUITEM "LS\tL&ine Separator",						IDM_INSERT_UNICODE_LS

@@ -503,6 +503,7 @@
 #define IDM_INSERT_UNICODE_RLI			40282
 #define IDM_INSERT_UNICODE_FSI			40283
 #define IDM_INSERT_UNICODE_PDI			40284
+#define IDM_INSERT_UNICODE_ALM			40285
 
 #define IDM_EDIT_UNDO					40300	// Alt+Back Ctrl+Z Ctrl+Shift+Y
 #define IDM_EDIT_REDO					40301	// Ctrl+Y Ctrl+Shift+Z
