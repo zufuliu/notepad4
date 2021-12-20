@@ -124,6 +124,7 @@ def GenerateUnicodeControlCharacters():
 		"\u2066", # U+2066	LRI		Left-to-right isolate
 		"\u2067", # U+2067	RLI		Right-to-left isolate
 		"\u2068", # U+2068	FSI		First strong isolate
+		"\u2069", # U+2069	PDI		Pop directional isolate
 		"\u061C", # U+061C	ALM		Arabic letter mark
 	]
 
