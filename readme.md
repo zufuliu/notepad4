@@ -70,7 +70,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [GraphViz Dot](../main/tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 	* [Groovy](../main/tools/lang/Groovy.groovy), up to Groovy 4.0.
 	* [Haxe](../main/tools/lang/Haxe.hx), up to Haxe 4.1
-	* [HTML](../main/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2021-09-08. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
+	* [HTML](../main/tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2021-12-21. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP

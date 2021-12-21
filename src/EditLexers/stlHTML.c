@@ -76,7 +76,7 @@ NULL
 "keytype kind label lang list loading longdesc loop low nonce minlength manifest max "
 "maxlength media mediagroup method min multiple muted name nomodule novalidate open "
 "optimum pattern placeholder playsinline poster preload radiogroup readonly referrerpolicy rel required "
-"rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size span "
+"rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size slot span "
 "src srcdoc srclang srcset start step style tabindex target title translate type "
 "typemustmatch usemap value width wrap "
 
