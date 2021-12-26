@@ -47,10 +47,10 @@ C# Source
 
 CSS Style Sheet
 	css
-	scss			Sassy CSS
-	less			Less CSS
-	hss				HSS
-	wxss			WeChat Mini Program
+	scss			Sassy CSS, https://sass-lang.com/
+	less			Less CSS, https://lesscss.org/
+	hss				HSS, https://github.com/ncannasse/hss
+	wxss			WeChat Mini Program, https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxss.html
 
 Java Source
 	java

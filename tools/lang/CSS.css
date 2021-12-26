@@ -1,0 +1,1273 @@
+// 2020 https://www.w3.org/TR/CSS/
+// https://drafts.csswg.org/
+// https://github.com/w3c/csswg-drafts/
+// https://www.w3.org/Style/CSS/all-properties
+// https://www.w3.org/Style/CSS/all-descriptors
+// https://developer.mozilla.org/en-US/docs/Web/CSS
+
+// CSS 2.2 https://www.w3.org/TR/CSS22/ 12 April 2016
+@charset
+
+// CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 11 October 2018
+@keyframes
+{
+	animation-name: none;
+	animation-duration:;
+	animation-timing-function:;
+	animation-iteration-count:;
+	animation-direction: normal | reverse | alternate | alternate-reverse;
+	animation-play-state: running | paused;
+	animation-delay:;
+	animation-fill-mode: none | forwards | backwards | both;
+	animation:;
+}
+
+// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 26 July 2021
+// Box model https://www.w3.org/TR/CSS22/box.html
+{
+	background-color: transparent;
+	background-image: url(), none;
+	background-repeat: repeat | repeat-x | repeat-y | repeat | space | round | no-repeat;
+	background-attachment: scroll | fixed | local;
+	background-position: left | center | right | top | center | bottom;
+	background-clip: border-box | padding-box | content-box;
+	background-origin: border-box | padding-box | content-box;
+	background-size: auto | cover | contain;
+	background: inherit;
+
+	border-top-width: thin | medium | thick;
+	border-right-width: inherit;
+	border-bottom-width: inherit;
+	border-left-width: inherit;
+	border-width: inherit;
+
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-bottom-color: transparent;
+	border-left-color: transparent;
+	border-color: transparent;
+
+	border-top-style: none | hidden | dotted | dashed | solid | double | groove | ridge | inset | outset;
+	border-right-style: inherit;
+	border-bottom-style: inherit;
+	border-left-style: inherit;
+	border-style: inherit;
+
+	border-top: inherit;
+	border-right: inherit;
+	border-bottom: inherit;
+	border-left: inherit;
+	border: inherit;
+
+	border-top-left-radius:;
+	border-top-right-radius:;
+	border-bottom-right-radius:;
+	border-bottom-left-radius:;
+	border-radius:;
+
+	border-image-source: none;
+	border-image-slice: fill;
+	border-image-width: auto;
+	border-image-outset:;
+	border-image-repeat: stretch | repeat | round | space;
+	border-image:;
+	box-shadow: none | inset;
+}
+
+// CSS Basic User Interface Module Level 4 https://www.w3.org/TR/css-ui-4/ 16 March 2021
+// CSS Basic User Interface Module Level 3 https://www.w3.org/TR/css-ui-3/ 21 June 2018
+// User interface https://www.w3.org/TR/CSS22/ui.html
+{
+	box-sizing: content-box | border-box;
+
+	outline: inherit;
+	outline-width: medium;
+	outline-style: auto;
+	outline-color: invert;
+	outline-offset:;
+
+	resize: none | both | horizontal | vertical | block | inline;
+	text-overflow: clip | ellipsis;
+
+	cursor: auto | default | none | context-menu | help | pointer | progress | wait | cell | crosshair | text | vertical-text | alias | copy | move | no-drop | not-allowed | grab | grabbing | e-resize | n-resize | ne-resize | nw-resize | s-resize | se-resize | sw-resize | w-resize | ew-resize | ns-resize | nesw-resize | nwse-resize | col-resize | row-resize | all-scroll | zoom-in | zoom-out;
+	caret-color: auto;
+	caret-shape: auto | bar | block | underscore;
+	caret:;
+	nav-up: auto | current | root;
+	nav-right: auto | current | root;
+	nav-down: auto | current | root;
+	nav-left: auto | current | root;
+	user-select: auto | text | none | contain | all;
+	accent-color: auto;
+	appearance: none | auto | textfield | menulist-button | searchfield | textarea | push-button | slider-horizontal | checkbox | radio | square-button | menulist | listbox | meter | progress-bar | button;
+
+	// https://drafts.csswg.org/css-ui-4/
+	pointer-events: auto | none;
+	input-security: auto | none;
+}
+
+// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 21 April 2020
+// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 22 December 2020
+// Box model https://www.w3.org/TR/CSS22/box.html
+{
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-right: auto;
+	margin-left: auto;
+	margin: inherit;
+	margin-trim: none | in-flow | all;
+
+	padding-top: inherit;
+	padding-right: inherit;
+	padding-bottom: inherit;
+	padding-left: inherit;
+	padding: inherit;
+}
+
+// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 21 April 2020
+{
+	align-content: normal | first | last | baseline | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end;
+	justify-content: normal | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end | left | right;
+	place-content: normal;
+	justify-self: auto | normal | stretch | first | last | baseline | unsafe | safe | center | start | end | self-start | self-end |
+        flex-start | flex-end | left | right;
+	align-self: auto | normal | stretch;
+	place-self: auto;
+	justify-items: normal | stretch | left | right | legacy | center;
+	align-items: normal | stretch first | last | baseline | unsafe | safe | center | start | end | self-start | self-end |
+        flex-start | flex-end;
+    align-content: normal;
+    justify-content: normal | left | right;
+    place-content: normal;
+    justify-self: auto | normal | stretch | left | right;
+    align-self: auto | normal | stretch;
+    place-self: auto;
+    justify-items: normal | stretch | left | right | legacy | center;
+    align-items: normal | stretch;
+    place-items:;
+    row-gap: normal;
+    grid-row-gap: normal;
+    column-gap: normal;
+    grid-column-gap: normal;
+    gap:;
+    grid-gap:;
+}
+
+// CSS Box Sizing Module Level 4 https://www.w3.org/TR/css-sizing-4/ 20 May 2021
+// CSS Box Sizing Module Level 3 https://www.w3.org/TR/css-sizing-3/ 17 March 2021
+{
+	width: auto | min-content | max-content | fit-content();
+	height: auto | min-content | max-content | fit-content();
+	min-width: auto | min-content | max-content | fit-content();
+	min-height: auto | min-content | max-content | fit-content();
+	max-width: auto | min-content | max-content | fit-content();
+	max-height: auto | min-content | max-content | fit-content();
+	box-sizing: content-box | border-box;
+	column-width: auto | min-content | max-content | fit-content();
+	aspect-ratio: auto;
+	contain-intrinsic-width: none | auto;
+	contain-intrinsic-height: none | auto;
+	contain-intrinsic-block-size: none | auto;
+	contain-intrinsic-inline-size: none | auto;
+	contain-intrinsic-size: none | auto;
+	min-intrinsic-sizing: legacy | zero-if-scroll | zero-if-extrinsic;
+}
+
+// CSS Cascading and Inheritance Level 5 https://www.w3.org/TR/css-cascade-5/ 3 December 2021
+// CSS Cascading and Inheritance Level 4 https://www.w3.org/TR/css-cascade-4/ 3 December 2021
+// CSS Cascading and Inheritance Level 3 https://www.w3.org/TR/css-cascade-3/ 11 February 2021
+@import
+{
+	all: initial | inherit | unset | revert | revert-layer;
+}
+
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 15 December 2021
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 1 June 2021
+// CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 05 August 2021
+// Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
+{
+	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), currentColor;
+	color: Canvas, CanvasText, LinkText, VisitedText, ActiveText, ButtonFace, ButtonText, ButtonBorder, Field, FieldText, Highlight, HighlightText, Mark, MarkText, GrayText;
+	opacity: inherit;
+}
+@color-profile {
+	src:;
+	rendering-intent: relative-colorimetric | absolute-colorimetric | perceptual | saturation;
+	components:;
+}
+
+// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 16 June 2021
+{
+	color-scheme: normal | light | dark | only;
+	forced-color-adjust: auto | none | preserve-parent-color;
+	print-color-adjust: economy | exact;
+	color-adjust:;
+}
+
+// Compositing and Blending Level 1 https://www.w3.org/TR/compositing-1/ 13 January 2015
+{
+	mix-blend-mode: normal | multiply | screen | overlay | darken | lighten | color-dodge |color-burn | hard-light | soft-light | difference | exclusion | hue | saturation | color | luminosity;
+	isolation: auto | isolate;
+	background-blend-mode:;
+}
+
+// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 3 March 2020
+// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 8 December 2020
+@supports {
+}
+selector()
+
+// CSS Containment Module Level 3 https://www.w3.org/TR/css-contain-3/ 21 December 2021
+// CSS Containment Module Level 2 https://www.w3.org/TR/css-contain-2/ 16 December 2020
+// CSS Containment Module Level 1 https://www.w3.org/TR/css-contain-1/ 22 December 2020
+{
+	contain: none | strict | content | size | inline-size | layout | style | paint;
+	container-type: none | style || state | size | inline-size | block-size;
+	container-name: none;
+	container:;
+	content-visibility: visible | auto | hidden;
+}
+@container {
+	width:;
+	height:;
+	inline-size:;
+	block-size:;
+	aspect-ratio:;
+	orientation: portrait | landscape;
+}
+
+// CSS Custom Highlight API Module Level 1 https://www.w3.org/TR/css-highlight-api-1/ 15 December 2021
+::highlight()
+
+// CSS Custom Properties for Cascading Variables Module Level 1 https://www.w3.org/TR/css-variables-1/ 11 November 2021
+var()
+
+// CSS Counter Styles Level 3 https://www.w3.org/TR/css-counter-styles-3/ 27 July 2021
+@counter-style
+{
+	system: cyclic | numeric | alphabetic | symbolic | additive | fixed | extends;
+	negative:;
+	prefix:;
+	suffix:;
+	range:;
+	pad:;
+	fallback:;
+	symbols:;
+	additive-symbols:;
+	speak-as: auto | bullets | numbers | words | spell-out;
+}
+{
+	list-style-type: symbols();
+}
+
+// CSS Device Adaptation Module Level 1 https://www.w3.org/TR/css-device-adapt-1/ 29 March 2016
+@viewport {
+	width:;
+	min-width:;
+	max-width:;
+	height:;
+	min-height:;
+	max-height:;
+	zoom:;
+	min-zoom:;
+	max-zoom:;
+	user-zoom: zoom fixed;
+	orientation: auto portrait landscape;
+}
+
+// CSS Display Module Level 3 https://www.w3.org/TR/css-display-3/ 3 September 2021
+{
+	display: block | inline | run-in | flow | flow-root | table | flex | grid | ruby | flow | flow-root | list-item | table-row-group | table-header-group | table-footer-group | table-row | table-cell | table-column-group | table-column | table-caption | ruby-base | ruby-text | ruby-base-container |
+ ruby-text-container | contents | none | inline-block | inline-table | inline-flex | inline-grid;
+	order:;
+	visibility: visible | hidden | collapse;
+}
+
+// CSS Easing Functions Level 1 1 April 2021
+linear ease ease-in ease-out ease-in-out cubic-bezier()
+step-start step-end steps()
+
+// CSS Exclusions Module Level 1 https://www.w3.org/TR/css3-exclusions/ 15 January 2015
+{
+	wrap-flow: auto | both | start | end | minimum | maximum | clear;
+	wrap-through: wrap | none;
+}
+
+// CSS Fill and Stroke Module Level 3 https://www.w3.org/TR/fill-stroke-3/ 13 April 2017
+{
+	fill-rule: nonzero | evenodd;
+	fill-break: bounding-box | slice | clone;
+	fill-color: currentColor;
+	fill-image: none, child | child();
+	fill-origin: match-parent | fill-box | stroke-box | content-box | padding-box | border-box;
+	fill-position:;
+	fill-size: auto;
+	fill-repeat:;
+	fill:;
+	fill-opacity:;
+
+	stroke-width:;
+	stroke-align: center | inset | outset;
+	stroke-linecap: butt | round | square;
+	stroke-linejoin: crop | arcs | miter | bevel | round | stupid;
+	stroke-miterlimit:;
+	stroke-break: bounding-box | slice | clone;
+	stroke-dasharray: none;
+	stroke-dashoffset:;
+	stroke-dash-corner: none;
+	stroke-dash-justify: none | stretch | compress | dashes | gaps;
+	stroke-color: transparent;
+	stroke-image: none;
+	stroke-origin: match-parent | fill-box | stroke-box | content-box | padding-box | border-box;
+	stroke-position:;
+	stroke-size: auto;
+	stroke-repeat: repeat;
+	stroke:;
+	stroke-opacity:;
+}
+
+// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 16 July 2020
+// Filter Effects Module Level 1 https://www.w3.org/TR/filter-effects-1/ 18 December 2018
+{
+	filter: none | blur() | brightness() | contrast() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | sepia() | saturate();
+	flood-color: black;
+	flood-opacity:;
+	color-interpolation-filters: auto | sRGB | linearRGB;
+	lighting-color: white;
+	backdrop-filter: none;
+}
+
+// CSS Flexible Box Layout Module Level 1 https://www.w3.org/TR/css-flexbox-1/ 19 November 2018
+{
+	flex-direction: row | row-reverse | column | column-reverse;
+	flex-wrap: nowrap | wrap | wrap-reverse;
+	flex-flow:;
+	flex: none;
+	flex-grow:;
+	flex-shrink:;
+	flex-basis: content;
+
+	justify-content: flex-start | flex-end | center | space-between | space-around;
+	align-items: flex-start | flex-end | center | baseline | stretch;
+	align-self: auto | flex-start | flex-end | center | baseline | stretch;
+	align-content: flex-start | flex-end | center | space-between | space-around | stretch;
+}
+
+// CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 21 December 2021
+// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 29 July 2021
+// CSS Fonts Module Level 3 https://www.w3.org/TR/css-fonts-3/ 20 September 2018
+// Fonts https://www.w3.org/TR/CSS22/fonts.html
+{
+	font-family: serif | sans-serif | cursive | fantasy | monospace | system-ui | emoji | math | fangsong | ui-serif | ui-sans-serif | ui-monospace | ui-rounded;
+	font-weight: normal | bold | bolder | lighter;
+	font-stretch: normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded;
+	font-style: normal | italic | oblique;
+	font-size: xx-small | x-small | small | medium | large | x-large | xx-large | larger | smaller;
+	font-size-adjust: none | ex-height | cap-height | ch-width | ic-width | ic-height | from-font;
+	font: caption | icon | menu | message-box | small-caption | status-bar;
+	font-synthesis-weight:auto | none;
+	font-synthesis-style:auto | none;
+	font-synthesis-small-caps:auto | none;
+	font-synthesis: none | weight | style | small-caps;
+
+	font-kerning: auto | normal | none;
+	font-variant-ligatures:	normal | none | common-ligatures | no-common-ligatures | discretionary-ligatures | no-discretionary-ligatures | historical-ligatures | no-historical-ligature | contextual | no-contextual;
+	font-variant-position: normal | sub | super;
+	font-variant-caps: normal | small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps;
+	font-variant-numeric: normal, lining-nums, oldstyle-nums, proportional-nums, tabular-nums, diagonal-fractions, stacked-fractions | ordinal || slashed-zero;
+	font-variant-alternates: normal, stylistic(), historical-forms | styleset() | character-variant() | swash() | ornaments() | annotation();
+	font-variant-east-asian: normal, jis78, jis90, jis04, simplified, traditional, full-width, proportional-width | ruby;
+	font-variant: normal | none | petite-caps | all-petite-caps | unicase | titling-caps | ordinal | slashed-zero | ruby | sub | super;
+	font-optical-sizing: auto | none;
+	font-palette: none | normal | light | dark;
+}
+@font-face {
+	src: format(), techn(), local(), collection | embedded-opentype | opentype | svg | truetype | woff | woff2, variations | palettes | incremental, feature-opentype | feature-aat | feature-graphite, color-COLRv0 | color-COLRv1 | color-SVG | color-sbix | color-CBDT;
+	unicode-range:;
+	size-adjust:;
+	font-feature-settings: normal;
+	font-variation-settings: normal;
+	font-named-instance: auto;
+	font-display: auto | block | swap | fallback | optional;
+	font-language-override: normal;
+	ascent-override: normal;
+	descent-override: normal;
+	line-gap-override: normal;
+	superscript-position-override: normal | from-font;
+	subscript-position-override: normal | from-font;
+	superscript-size-override: normal | from-font;
+	subscript-size-override: normal | from-font;
+	font-variant-emoji: auto | text | emoji | unicode;
+}
+@font-feature-values {
+@stylistic
+@historical-forms
+@styleset
+@character-variant
+@swash
+@ornaments
+@annotation
+
+base-palette:;
+override-color:;
+}
+
+// CSS Fragmentation Module Level 4 https://www.w3.org/TR/css-break-4/ 18 December 2018
+// CSS Fragmentation Module Level 3 https://www.w3.org/TR/css-break-3/ 4 December 2018
+// Paged media https://www.w3.org/TR/CSS22/page.html
+{
+	break-before: auto | avoid | always | all | avoid-page | page | left | right | recto | verso | avoid-column | column | avoid-region | region;
+	break-after:;
+	break-inside: auto | avoid | avoid-page | avoid-column | avoid-region;
+	orphans: inherit;
+	widows: inherit;
+	page-break-before: auto | always | avoid | left | right;
+	page-break-after: auto | always | avoid | left | right;
+	page-break-inside: avoid | auto;
+	margin-break: auto | keep | discard;
+	box-decoration-break: slice | clone;
+}
+
+// CSS Generated Content Module Level 3 https://www.w3.org/TR/css-content-3/ 2 August 2019
+// https://www.w3.org/TR/CSS22/generate.html
+{
+	content: normal | none | contents | leader(), attr() | open-quote | close-quote | no-open-quote | no-close-quote, target-counter(), target-counters(), target-text(), counter(), counters();
+	quotes: auto | none;
+	string-set: none, string(), content();
+	bookmark-level: none;
+	bookmark-label: content();
+	bookmark-state: open | closed;
+}
+
+// CSS Generated Content for Paged Media Module https://www.w3.org/TR/css-gcpm-3/ 13 May 2014
+::footnote-call
+::footnote-marker
+{
+	string-set: none, counter(), counters(), content(), attr(), string();
+	position: running();
+	running: none;
+
+	float: footnote;
+	footnote-display: block | inline | compact;
+	footnote-policy: auto | line | block;
+
+	bookmark-level: none;
+	bookmark-label: none;
+	bookmark-state: open | closed;
+}
+
+// CSS Grid Layout Module Level 2 https://www.w3.org/TR/css-grid-2/ 18 December 2020
+// CSS Grid Layout Module Level 1 https://www.w3.org/TR/css-grid-1/ 18 December 2020
+{
+	display: grid | inline-grid;
+	grid-template-columns: none, min-content | max-content | auto, minmax(), fit-content(), subgrid;
+	grid-template-rows: none, min-content | max-content | auto, minmax(), fit-content(), subgrid;
+	grid-template-areas: none;
+	grid-template: none;
+	grid-auto-columns: auto;
+	grid-auto-rows: auto;
+	grid-auto-flow: row | column | dense;
+	grid: none | auto-flow | dense;
+	grid-row-start: auto | span;
+	grid-column-start: auto | span;
+	grid-row-end: auto | span;
+	grid-column-end: auto | span;
+	grid-row: auto;
+	grid-column: auto;
+	grid-area: auto;
+}
+
+// CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 17 December 2020
+{
+	background-image: url(), linear-gradient(), radial-gradient(), repeating-linear-gradient(), repeating-radial-gradient();
+	object-fit: fill | contain | cover | none | scale-down;
+	object-position:;
+	image-orientation: from-image | none | flip;
+	image-rendering: auto | smooth | high-quality | crisp-edges | pixelated;
+}
+
+// CSS Image Values and Replaced Content Module Level 4 https://www.w3.org/TR/css-images-4/ 13 April 2017
+{
+	background: image(), element(), linear-gradient(), radial-gradient(), conic-gradient();
+	image-resolution: from-image | snap;
+}
+
+// CSS Inline Layout Module Level 3 https://www.w3.org/TR/css-inline-3/ 27 August 2020
+{
+	dominant-baseline: auto | text-bottom | alphabetic | ideographic | middle | central | mathematical | hanging | text-top;
+	vertical-align: first | last;
+	baseline-source: auto | first | last;
+	alignment-baseline: baseline | text-bottom | alphabetic | ideographic | middle | central | mathematical | text-top;
+	baseline-shift: sub | super | top | center | bottom;
+	line-height: normal;
+	text-edge: leading | [ text | cap | ex | ideographic | ideographic-ink | text | alphabetic | ideographic | ideographic-ink;
+	leading-trim: normal | start | end | both;
+	inline-sizing: normal | stretch;
+	initial-letter: normal | drop | raise;
+	initial-letter-align: border-box | alphabetic | ideographic | hanging | leading;
+	initial-letter-wrap: none | first | all | grid;
+}
+
+// CSS Line Grid Module Level 1 https://www.w3.org/TR/css-line-grid-1/ 16 September 2014
+{
+	line-grid: match-parent | create;
+	line-snap: none | baseline | contain;
+	box-snap: none | block-start | block-end | center | first-baseline | last-baseline;
+}
+
+// CSS Lists and Counters Module Level 3 https://www.w3.org/TR/css-lists-3/ 17 November 2020
+::marker
+{
+	list-style-image: none;
+	list-style-type: disc | circle | square | decimal | decimal-leading-zero | lower-roman | upper-roman | lower-greek | lower-latin | upper-latin | armenian | georgian | lower-alpha | upper-alpha | none;
+	list-style-position: inside | outside;
+	list-style: inherit;
+
+	marker-side: match-self | match-parent;
+
+	counter-reset: none;
+	counter-increment: none;
+	counter-set: none;
+}
+
+// CSS Logical Properties and Values Level 1 https://www.w3.org/TR/css-logical-1/ 27 August 2018
+:recto
+:verso
+{
+	caption-side: inline-start | inline-end;
+	float: inline-start | inline-end;
+	clear: inline-start | inline-end;
+	text-align: start | end ;
+	resize: block | inline;
+	block-size: auto;
+	inline-size: auto;
+	min-block-size: none;
+	min-inline-size: none;
+	max-block-size: none;
+	max-inline-size: none;
+
+	margin-block-start:;
+	margin-block-end:;
+	margin-inline-start:;
+	margin-inline-end:;
+	margin-block:;
+	margin-inline:;
+
+	inset-block-start: auto;
+	inset-block-end: auto;
+	inset-inline-start: auto;
+	inset-inline-end: auto;
+	inset-block:;
+	inset-inline:;
+	inset:;
+
+	padding-block-start:;
+	padding-block-end:;
+	padding-inline-start:;
+	padding-inline-end:;
+	padding-block:;
+	padding-inline:;
+
+	border-block-start-width: medium;
+	border-block-end-width: medium;
+	border-inline-start-width: medium;
+	border-inline-end-width: medium;
+	border-block-width:;
+	border-inline-width:;
+	border-block-start-style: none;
+	border-block-end-style: none;
+	border-inline-start-style: none;
+	border-inline-end-style: none;
+	border-block-style:;
+	border-inline-style:;
+	border-block-start-color: currentColor;
+	border-block-end-color: currentColor;
+	border-inline-start-color: currentColor;
+	border-inline-end-color: currentColor;
+	border-block-color:;
+	border-inline-color:;
+	border-block-start:;
+	border-block-end:;
+	border-inline-start:;
+	border-inline-end:;
+	border-block:;
+	border-inline:;
+	border-start-start-radius:;
+	border-start-end-radius:;
+	border-end-start-radius:;
+	border-end-end-radius:;
+}
+
+// CSS Masking Module Level 1 https://www.w3.org/TR/css-masking-1/ 5 August 2021
+{
+	clip-path: fill-box | stroke-box | view-box | none;
+	clip-rule: nonzero | evenodd;
+	mask-image: none;
+	mask-mode: alpha | luminance | match-source;
+	mask-repeat: repeat-x | repeat-y | [repeat | space | round | no-repeat;
+	mask-position:;
+	mask-clip: no-clip;
+	mask-origin:;
+	mask-size: auto;
+	mask-composite: add | subtract | intersect | exclude;
+	mask:;
+	mask-border-source: none;
+	mask-border-mode: luminance | alpha;
+	mask-border-slice: fill;
+	mask-border-width: auto;
+	mask-border-outset:;
+	mask-border-repeat: stretch | repeat | round | space;
+	mask-border:;
+	mask-type: luminance | alpha;
+	clip: rect() | auto;
+}
+
+// Media Queries Level 5 https://www.w3.org/TR/mediaqueries-5/ 18 December 2021
+// Media Queries Level 4 https://www.w3.org/TR/mediaqueries-4/ 21 July 2020
+// https://www.w3.org/TR/CSS22/media.html
+@custom-media {}
+// 7.3 Recognized media types
+all braille embossed handheld print projection screen speech tty tv
+// 7.3.1 Media groups
+all continuous paged visual audio speech tactile grid bitmap interactive static
+// Viewport/Page Characteristics Media Features
+@media {
+	width:;
+	min-width:;
+	max-width:;
+	height:;
+	min-height:;
+	max-height:;
+	aspect-ratio:;
+	min-aspect-ratio:;
+	max-aspect-ratio:;
+	orientation: portrait landscape;
+	overflow-block: none scroll paged;
+	overflow-inline: none scroll;
+	horizontal-viewport-segments:;
+	vertical-viewport-segments:;
+	display-mode: fullscreen standalone minimal-ui browser;
+	// Display Quality Media Features
+	resolution: infinite;
+	min-resolution:;
+	 max-resolution:;
+	scan: interlace progressive;
+	grid:;
+	update: none slow fast;
+	environment-blending:; opaque additive subtractive
+	// Color Media Features
+	color:;
+	min-color:;
+	color-index: min-color-index:;
+	monochrome: min-monochrome:;
+	color-gamut: srgb p3 rec2020;
+	dynamic-range: standard high;
+	inverted-colors: none inverted;
+	// Interaction Media Features
+	pointer: none coarse fine;
+	hover: none hover;
+	any-pointer: none coarse fine;
+	any-hover: none hover;
+	nav-controls: none back;
+	// Video Prefixed Features
+	video-color-gamut: srgb p3 rec2020;
+	video-dynamic-range: standard high;
+	// Scripting Media Features
+	scripting none: initial-only enabled;
+	// User Preference Media Features
+	prefers-reduced-motion: no-preference reduce;
+	prefers-reduced-transparency: no-preference reduce;
+	prefers-contrast: no-preference less more custom;
+	forced-colors: none active;
+	prefers-color-scheme: light dark;
+	prefers-reduced-data: no-preference reduce;
+	// Deprecated Media Features
+	device-width:;
+	min-device-width:;
+	max-device-width:;
+	device-height:;
+	min-device-height:;
+	max-device-height:;
+	device-aspect-ratio:;
+	min-device-aspect-ratio:;
+	max-device-aspect-ratio:;
+}
+
+// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 21 February 2021
+{
+	text-size-adjust: auto | none;
+}
+
+// Motion Path Module Level 1 https://www.w3.org/TR/motion-1/ 18 December 2018
+{
+	offset-path: none | ray() | path();
+	offset-distance:;
+	offset-position: auto;
+	offset-anchor: auto;
+	offset-rotate: auto | reverse;
+	offset: auto | reverse;
+}
+
+// CSS Multi-column Layout Module Level 1 https://www.w3.org/TR/css-multicol-1/ 12 October 2021
+{
+	column-width: auto;
+	column-count: auto;
+	columns:;
+	column-gap:;
+	column-rule-color: currentColor;
+	column-rule-style:;
+	column-rule-width:;
+	column-rule:;
+	column-span: none | all;
+	column-fill: auto | balance | balance-all;
+}
+
+// CSS Namespaces Module Level 3 https://www.w3.org/TR/css3-namespace/ 20 March 2014
+@namespace
+
+// CSS Nesting Module https://www.w3.org/TR/css-nesting-1/ 31 August 2021
+@nest {}
+
+// CSS Overflow Module Level 4 https://www.w3.org/TR/css-overflow-4/ 13 June 2017
+// CSS Overflow Module Level 3 https://www.w3.org/TR/css-overflow-3/ 2 December 2021
+::nth-fragment()
+{
+	overflow-x: visible | hidden | clip | scroll | auto;
+	overflow-y: visible | hidden | clip | scroll | auto;
+	overflow: visible | hidden | clip | scroll | auto;
+	overflow-clip-margin:;
+	overflow-inline:;
+	overflow-block:;
+	scroll-behavior: auto | smooth;
+	scrollbar-gutter: auto | stable | both-edges | always | both | force;
+	text-overflow: clip | ellipsis;
+	block-ellipsis: none | auto;
+	line-clamp: none;
+	max-lines: none;
+	continue: auto | overflow | paginate | fragments | discard;
+}
+
+// CSS Overscroll Behavior Module Level 1 https://www.w3.org/TR/css-overscroll-1/ 6 June 2019
+{
+	overscroll-behavior: contain | none | auto;
+	overscroll-behavior-x: contain | none | auto;
+	overscroll-behavior-y: contain | none | auto;
+	overscroll-behavior-inline: contain | none | auto;
+	overscroll-behavior-block: contain | none | auto;
+}
+
+// CSS Page Floats https://www.w3.org/TR/css-page-floats-3/ 15 September 2015
+{
+	float-reference: inline | column | region | page;
+	float: block-start | block-end | inline-start | inline-end | snap-block | snap-inline | left | right | top | bottom | none;
+	clear: inline-start | inline-end | block-start | block-end | left | right | top | bottom | none;
+	float-defer: last | none;
+	float-offset:;
+}
+
+// CSS Paged Media Module Level 3 https://www.w3.org/TR/css-page-3/ 18 October 2018
+@page
+@top-left-corner {}
+@top-left {}
+@top-center {}
+@top-right {}
+@top-right-corner {}
+@bottom-left-corner {}
+@bottom-left {}
+@bottom-center {}
+@bottom-right {}
+@bottom-right-corner {}
+@left-top {}
+@left-middle {}
+@left-bottom {}
+@right-top {}
+@right-middle {}
+@right-bottom {}
+:left
+:right
+:first
+:blank
+{
+	size: auto |portrait | landscape;
+	marks: none | crop | cross;
+	bleed: auto;
+	page: auto;
+}
+
+// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 16 December 2021
+{
+	position: static | relative | absolute | sticky | fixed;
+	top: auto;
+	right: auto;
+	bottom: auto;
+	left: auto;
+	inset-block-start: auto;
+	inset-inline-start: auto;
+	inset-block-end: auto;
+	inset-inline-end: auto;
+	inset-block: auto;
+	inset-inline: auto;
+	inset: auto;
+}
+
+// CSS Presentation Levels Module https://www.w3.org/TR/css3-preslev/ 14 October 2014
+{
+	presentation-level: same | increment;
+}
+
+// CSS Properties and Values API Level 1 https://www.w3.org/TR/css-properties-values-api-1/ 13 October 2020
+@property {
+	syntax:;
+	inherits: true | false;
+	initial-value:;
+}
+
+// CSS Pseudo-Elements Module Level 4 https://www.w3.org/TR/css-pseudo-4/ 31 December 2020
+// https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
+::first-line
+::first-letter
+::selection
+::target-text
+::spelling-error
+::grammar-error
+::before
+::after
+::marker
+::placeholder
+::file-selector-button
+
+// CSS Regions Module Level 1 https://www.w3.org/TR/css-regions-1/ 9 October 2014
+{
+	flow-into: none;
+	flow-from: none | inherit;
+	break-before: auto | always | avoid | left | right | page | column | region | avoid-page | avoid-column | avoid-region;
+	break-after: auto | always | avoid | left | right | page | column | region | avoid-page | avoid-column | avoid-region;
+	break-inside: auto | avoid | avoid-page | avoid-column | avoid-region;
+	region-fragment: auto | break;
+}
+
+// CSS Rhythmic Sizing https://www.w3.org/TR/css-rhythm-1/ 2 March 2017
+{
+	line-height-step: none;
+	block-step-size: none;
+	block-step-insert: margin | padding;
+	block-step-align: auto | center | start | end;
+	block-step-round: up | down | nearest;
+	block-step:;
+}
+
+// CSS Round Display Level 1 https://www.w3.org/TR/css-round-display-1/ 22 December 2016
+@media
+{
+	shape: rect | round;
+}
+@viewport
+{
+	viewport-fit: auto | contain | cover;
+}
+{
+	shape-inside: auto | outside-shape | display;
+	border-boundary: none | parent | display;
+}
+
+// CSS Ruby Annotation Layout Module Level 1 https://www.w3.org/TR/css-ruby-1/ 2 December 2021
+{
+	display: ruby | ruby-base | ruby-text | ruby-base-container | ruby-text-container;
+	ruby-position: alternate | over | under | inter-character;
+	ruby-merge: separate | merge | auto;
+	ruby-align: start | center | space-between | space-around;
+	ruby-overhang: auto | none;
+}
+
+// CSS Scoping Module Level 1 https://www.w3.org/TR/css-scoping-1/ 3 April 2014
+@scope {}
+:scope
+:scope-context()
+:host
+:host()
+:host-context()
+::shadow
+::content
+::region
+
+// CSS Scroll Anchoring Module Level 1 https://www.w3.org/TR/css-scroll-anchoring-1/ 11 November 2020
+{
+	overflow-anchor: auto | none;
+}
+
+// CSS Scroll Snap Module Level 1 https://www.w3.org/TR/css-scroll-snap-1/ 11 March 2021
+{
+	scroll-snap-type: none | block | inline | both | mandatory | proximity;
+	scroll-padding: auto;
+	scroll-margin:;
+	scroll-snap-align: none | start | end | center;
+	scroll-snap-stop: normal | always;
+	scroll-padding-top: auto;
+	scroll-padding-right: auto;
+	scroll-padding-bottom: auto;
+	scroll-padding-left: auto;
+	scroll-padding-inline-start: auto;
+	scroll-padding-block-start: auto;
+	scroll-padding-inline-end: auto;
+	scroll-padding-block-end: auto;
+	scroll-padding-block: auto;
+	scroll-padding-inline: auto;
+	scroll-margin-top:;
+	scroll-margin-right:;
+	scroll-margin-bottom:;
+	scroll-margin-left:;
+	scroll-margin-block-start:;
+	scroll-margin-inline-start:;
+	scroll-margin-block-end:;
+	scroll-margin-inline-end:;
+	scroll-margin-block:;
+	scroll-margin-inline:;
+}
+
+// CSS Scrollbars Styling Module Level 1 https://www.w3.org/TR/css-scrollbars-1/ 9 December 2021
+{
+	scrollbar-color: auto;
+	scrollbar-width: auto | thin | none;
+}
+
+// Selectors Level 4 https://www.w3.org/TR/selectors-4/ 21 November 2018
+// Selectors Level 3 https://www.w3.org/TR/selectors-3/ 6 November 2018
+// pseudo-class
+:not()
+:is()
+:where()
+:has()
+
+:dir()
+:lang()
+
+:any-link
+:link
+:visited
+:local-link
+:target
+:target-within
+:scope
+
+:current
+:current()
+:past
+:future
+
+:active
+:hover
+:focus
+:focus-within
+:focus-visible
+
+:enabled
+:disabled
+:read-write
+:read-only
+:placeholder-shown
+:default
+:checked
+:indeterminate
+:valid
+:invalid
+:in-range
+:out-of-range
+:required
+:optional
+:blank
+:user-invalid
+
+:root
+:empty
+:nth-child()
+:nth-last-child()
+:first-child
+:last-child
+:only-child
+:nth-of-type()
+:nth-last-of-type()
+:first-of-type
+:last-of-type
+:only-of-type
+
+:nth-col()
+:nth-last-col()
+
+// pseudo-element
+:first-line
+:first-letter
+:before
+:after
+
+// CSS Shadow Parts https://www.w3.org/TR/css-shadow-parts-1/ 15 November 2018
+::part()
+
+// CSS Shapes Module Level 1 https://www.w3.org/TR/css-shapes-1/ 20 March 2014
+{
+	shape-outside: none | inset(), circle(), ellipse(), polygon() | margin-box | border-box | padding-box | content-box;
+	shape-image-threshold:;
+	shape-margin:;
+	shape-inside:;
+}
+
+// CSS Spatial Navigation Level 1 https://www.w3.org/TR/css-nav-1/
+{
+	spatial-navigation-contain: auto | contain;
+	spatial-navigation-action: auto | focus | scroll;
+	spatial-navigation-function: normal | grid;
+}
+
+// CSS Speech Module https://www.w3.org/TR/css-speech-1/ 10 March 2020
+{
+	voice-volume: silent | x-soft | soft | medium | loud | x-loud;
+	voice-balance: left | center | right | leftwards | rightwards;
+	speak: auto | never | always ;
+	speak-as: normal | spell-out || digits | literal-punctuation | no-punctuation;
+	pause-before: none | x-weak | weak | medium | strong | x-strong;
+	pause-after: none | x-weak | weak | medium | strong | x-strong;
+	pause:;
+	rest-before: none | x-weak | weak | medium | strong | x-strong;
+	rest-after: none | x-weak | weak | medium | strong | x-strong;
+	rest:;
+	cue-before: none;
+	cue-after: none;
+	cue:;
+	voice-family: child | young | old | male | female | neutral;
+	voice-rate: normal | x-slow | slow | medium | fast | x-fast;
+	voice-pitch: x-low | low | medium | high | x-high;
+	voice-range: x-low | low | medium | high | x-high;
+	voice-stress: normal | strong | moderate | none | reduced;
+	voice-duration: auto;
+}
+
+// Tables https://www.w3.org/TR/CSS22/tables.html
+{
+	caption-side: top | bottom;
+	table-layout: auto | fixed;
+	border-collapse: collapse | separate;
+	border-spacing: inherit;
+	empty-cells: show | hide;
+}
+
+// CSS Template Layout Module https://www.w3.org/TR/css-template-3/ 26 March 2015
+::slot()
+::blank()
+{
+	grid-template-areas: none;
+	grid-template-columns: auto;
+	grid-template-rows: auto;
+	grid-template: none;
+	grid:;
+	flow:;
+	contents: normal, none, inherit, contents;
+	chains: none;
+}
+
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 22 April 2021
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 13 November 2019
+// Text https://www.w3.org/TR/CSS22/text.html
+{
+	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
+	word-boundary-detection: normal | manual | auto();
+	word-boundary-expansion: none | space | ideographic-space;
+	text-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces;
+	text-space-trim: none | trim-inner | discard-before | discard-after;
+	text-wrap: wrap | nowrap | balance | stable | pretty;
+	wrap-before: auto | avoid | avoid-line | avoid-flex | line | flex;
+	wrap-after: auto | avoid | avoid-line | avoid-flex | line | flex;
+	wrap-inside: auto | avoid;
+	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
+	tab-size:;
+	word-break: normal | keep-all | break-all | break-word;
+	line-break: auto | loose | normal | strict | anywhere;
+	hyphens: none | manual | auto;
+	hyphenate-character: auto;
+	hyphenate-limit-zone:;
+	hyphenate-limit-chars: auto;
+	hyphenate-limit-lines: no-limit;
+	hyphenate-limit-last: none | always | column | page | spread;
+	overflow-wrap: normal | break-word | anywhere;
+	word-wrap: normal | break-word | anywhere;
+	text-align: start | end | left | right | center | justify | match-parent | justify-all;
+	text-group-align: none | start | end | left | right | center;
+	text-align-all: start | end | left | right | center | justify | match-parent;
+	text-align-last: auto | start | end | left | right | center | justify | match-parent;
+	text-justify: auto | none | inter-word | inter-character;
+	line-padding:;
+	text-spacing: normal | none | trim-start | space-start | space-first | trim-end | space-end | allow-end | trim-adjacent | space-adjacent | no-compress | ideograph-alpha | ideograph-numeric || punctuation;
+	word-spacing: normal;
+	letter-spacing: normal;
+	text-indent: inherit;
+	hanging-punctuation: none | first | force-end | allow-end | last;
+}
+
+// CSS Text Decoration Module Level 4 https://www.w3.org/TR/css-text-decor-4/ 6 May 2020
+// CSS Text Decoration Module Level 3 https://www.w3.org/TR/css-text-decor-3/ 13 August 2019
+{
+	text-decoration-line: none | underline | overline | line-through | blink | spelling-error | grammar-error;
+	text-decoration-style: solid | double | dotted | dashed | wavy;
+	text-decoration-color: currentColor;
+	text-decoration-thickness: auto | from-font;
+	text-decoration:;
+	text-underline-position: auto | from-font | under | left | right;
+	text-underline-offset: auto;
+	text-decoration-skip: none | auto;
+	text-decoration-skip-self: none | objects;
+	text-decoration-skip-box: none | all;
+	text-decoration-skip-inset: none | auto;
+	text-decoration-skip-spaces: none | all | start | end;
+	text-decoration-skip-ink: auto | none | all;
+
+	text-emphasis-style: none | filled | open | dot | circle | double-circle | triangle | sesame;
+	text-emphasis-color: currentColor;
+	text-emphasis:;
+	text-emphasis-position: over | under | right | left;
+	text-emphasis-skip: spaces | punctuation | symbols | narrow;
+	text-shadow: none;
+}
+
+// CSS Transforms Module Level 2 https://www.w3.org/TR/css-transforms-2/ 9 November 2021
+// CSS Transforms Module Level 1 https://www.w3.org/TR/css-transforms-1/ 14 February 2019
+{
+	translate: none;
+	rotate: none;
+	scale: none;
+	transform-style: flat | preserve-3d;
+	perspective: none;
+	perspective-origin:;
+	backface-visibility: visible | hidden;
+	transform: none | matrix(), translate(), translateX(), translateY(), scale(), scaleX(), scaleY(), rotate(), skew(), skewX(), skewY(), matrix3d(), translate3d(), translateZ(), scale3d(), scaleZ(), rotate3d(), rotateX(), rotateY(), rotateZ(), perspective();
+	transform-origin: left | center | right | top | bottom;
+	transform-box: content-box | border-box | fill-box | stroke-box | view-box;
+}
+
+// CSS Transitions Level 1 https://www.w3.org/TR/css-transitions-1/ 11 October 2018
+{
+	transition-property: none;
+	transition-duration:;
+	// https://www.w3.org/TR/css-easing-1/
+	transition-timing-function: linear, ease | ease-in | ease-out | ease-in-out | cubic-bezier(), step-start | step-end | steps(), jump-start | jump-end | jump-none | jump-both | start | end;
+	transition-delay:;
+	transition:;
+}
+
+// CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 6 June 2019
+
+// Visual formatting model https://www.w3.org/TR/CSS22/visuren.html
+{
+	position: static | relative | absolute | fixed;
+
+	top: inherit;
+	right: inherit;
+	bottom: inherit;
+	left: inherit;
+
+	float: left | right | none;
+	clear: none | left | right | both;
+
+	z-index: auto;
+}
+
+// Visual formatting model details https://www.w3.org/TR/CSS22/visudet.html
+{
+	width: auto;
+	min-width: inherit;
+	max-width: none;
+
+	height: auto;
+	min-height: inherit;
+	max-height: none;
+
+	line-height: normal;
+	vertical-align: baseline | sub | super | top | text-top | middle | bottom | text-bottom;
+}
+
+// Visual effects https://www.w3.org/TR/CSS22/visufx.html
+{
+	overflow: visible | hidden | scroll | auto;
+	clip: rect() | auto;
+}
+
+// CSS Will Change Module Level 1 https://www.w3.org/TR/css-will-change-1/ 3 December 2015
+{
+	will-change: auto | scroll-position | contents;
+}
+
+// CSS Writing Modes Level 4 https://www.w3.org/TR/css-writing-modes-4/ 30 July 2019
+// CSS Writing Modes Level 3 https://www.w3.org/TR/css-writing-modes-3/ 10 December 2019
+{
+	direction: ltr | rtl;
+	unicode-bidi: normal | embed | isolate | bidi-override | isolate-override | plaintext;
+	writing-mode: horizontal-tb | vertical-rl | vertical-lr | sideways-rl | sideways-lr;
+	text-orientation: mixed | upright | sideways;
+	glyph-orientation-vertical: auto;
+	text-combine-upright: none | all;
+}
+
+// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 16 December 2021
+// CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 6 June 2019
+initial nherit unset
+mix()
+calc()
+attr()
+min() max() clamp()
+round() mod() rem()
+sin() cos() tan() asin() acos() atan() atan2()
+pow() sqrt() hypot() log() exp()
+abs() sign()
+pi infinity NaN
+
+// Aural style sheets https://www.w3.org/TR/CSS22/aural.html
+@media aural speech
+{
+	volume: silent | x-soft | soft | medium | loud | x-loud;
+	play-during: mix | repeat | auto | none;
+	azimuth: left-side | far-left | left | center-left | center | center-right | right | far-right | right-side | behind | leftwards | rightwards;
+	elevation: below | level | above | higher | lower;
+	speech-rate: x-slow | slow | medium | fast | x-fast | faster | slower;
+	pitch: x-low | low | medium | high | x-high;
+	pitch-range: inherit;
+	stress: inherit;
+	richness: inherit;
+	speak-punctuation: code | none;
+	speak-numeral: digits | continuous;
+	speak-header: once | always;
+}
+
+// Compatibility https://compat.spec.whatwg.org/ 2 December 2021
+{
+	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
+}
+
+// Scalable Vector Graphics (SVG) 2 https://www.w3.org/TR/SVG2/ 4 October 2018
+{
+	text-rendering: auto | optimizeSpeed | optimizeLegibility | geometricPrecision;
+	pointer-events: auto | bounding-box | visiblePainted | visibleFill | visibleStroke | visible | painted | fill | stroke | all | none;
+}
+
+// SVG Markers https://www.w3.org/TR/svg-markers/ 9 April 2015
+{
+	marker-start: none;
+	marker-mid: none;
+	marker-end: none;
+	marker-segment: none;
+	marker-pattern: none;
+	marker: none;
+	marker-knockout-left:;
+	marker-knockout-right:;
+}
+
+// SVG Strokes https://www.w3.org/TR/svg-strokes/ 9 April 2015
+{
+	stroke: none;
+	stroke-alignment: center | inner | outer;
+	stroke-opacity:;
+	stroke-width:;
+	stroke-linecap: butt | round | square;
+	stroke-linejoin: miter | miter-clip | round | bevel | arcs;
+	stroke-miterlimit:;
+	stroke-dasharray: none;
+	stroke-dashoffset:;
+	stroke-dashcorner: none;
+	stroke-dashadjust: one | stretch | compress | dashes | gaps;
+}

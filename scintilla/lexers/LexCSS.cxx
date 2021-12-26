@@ -62,27 +62,10 @@ static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) noex
 	return nestingLevel;
 }
 
-/*static const char * const cssWordListDesc[] = {
-	"CSS1 Properties",
-	"Pseudo-classes",
-	"CSS2 Properties",
-	"CSS3 Properties",
-	"Pseudo-elements",
-	"Browser-Specific CSS Properties",
-	"Browser-Specific Pseudo-classes",
-	"Browser-Specific Pseudo-elements",
-	0
-};*/
-
 static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &css1Props = *keywordLists[0];
-	const WordList &pseudoClasses = *keywordLists[1];
-	const WordList &css2Props = *keywordLists[2];
-	const WordList &css3Props = *keywordLists[3];
-	const WordList &pseudoElements = *keywordLists[4];
-	const WordList &exProps = *keywordLists[5];
-	const WordList &exPseudoClasses = *keywordLists[6];
-	const WordList &exPseudoElements = *keywordLists[7];
+	const WordList &cssProps = *keywordLists[0];
+	const WordList &pseudoClasses = *keywordLists[2];
+	const WordList &pseudoElements = *keywordLists[3];
 
 	StyleContext sc(startPos, length, initStyle, styler);
 
@@ -427,14 +410,8 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			case SCE_CSS_IDENTIFIER3:
 			case SCE_CSS_EXTENDED_IDENTIFIER:
 			case SCE_CSS_UNKNOWN_IDENTIFIER:
-				if (css1Props.InList(s2))
+				if (cssProps.InList(s2))
 					sc.ChangeState(SCE_CSS_IDENTIFIER);
-				else if (css2Props.InList(s2))
-					sc.ChangeState(SCE_CSS_IDENTIFIER2);
-				else if (css3Props.InList(s2))
-					sc.ChangeState(SCE_CSS_IDENTIFIER3);
-				else if (exProps.InList(s2))
-					sc.ChangeState(SCE_CSS_EXTENDED_IDENTIFIER);
 				else
 					sc.ChangeState(SCE_CSS_UNKNOWN_IDENTIFIER);
 				break;
@@ -443,14 +420,10 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			case SCE_CSS_EXTENDED_PSEUDOCLASS:
 			case SCE_CSS_EXTENDED_PSEUDOELEMENT:
 			case SCE_CSS_UNKNOWN_PSEUDOCLASS:
-				if (op == ':' && opPrev != ':' && pseudoClasses.InList(s2))
+				if (op == ':' && opPrev != ':' && pseudoClasses.InListPrefixed(s2, '('))
 					sc.ChangeState(SCE_CSS_PSEUDOCLASS);
-				else if (opPrev == ':' && pseudoElements.InList(s2))
+				else if (opPrev == ':' && pseudoElements.InListPrefixed(s2, '('))
 					sc.ChangeState(SCE_CSS_PSEUDOELEMENT);
-				else if ((op == ':' || (op == '(' && lastState == SCE_CSS_EXTENDED_PSEUDOCLASS)) && opPrev != ':' && exPseudoClasses.InList(s2))
-					sc.ChangeState(SCE_CSS_EXTENDED_PSEUDOCLASS);
-				else if (opPrev == ':' && exPseudoElements.InList(s2))
-					sc.ChangeState(SCE_CSS_EXTENDED_PSEUDOELEMENT);
 				else
 					sc.ChangeState(SCE_CSS_UNKNOWN_PSEUDOCLASS);
 				break;

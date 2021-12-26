@@ -520,7 +520,6 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_2NDTEXTFILE:
 	case NP2LEX_ANSI:
 	case NP2LEX_BLOCKDIAG:
-	case NP2LEX_CSS:
 	case NP2LEX_GRAPHVIZ:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
@@ -552,6 +551,9 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_HAXE:
 	case NP2LEX_SWIFT:
 		return (ch == '#' || ch == '@');
+
+	case NP2LEX_CSS:
+		return (ch == '-' || ch == '$' || ch == '@');
 
 	case NP2LEX_D:
 	case NP2LEX_FSHARP:
@@ -1058,6 +1060,19 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
+
+#if 0
+	case SCLEX_CSS:
+		if (ch == '@' && iCurrentStyle == SCE_CSS_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[1]); // @rule
+			return AutoC_AddSpecWord_Keyword;
+		}
+		if (ch == ':' && iCurrentStyle == SCE_CSS_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(chPrev == ':') ? 3 : 2]);
+			return AutoC_AddSpecWord_Keyword;
+		}
+		break;
+#endif
 
 	case SCLEX_CPP:
 		if (IsCppCommentStyle(iCurrentStyle) && np2_LexKeyword) {

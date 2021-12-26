@@ -9,6 +9,7 @@ sys.path.append('../scintilla/scripts')
 from FileGenerator import Regenerate
 
 AllKeywordAttrList = {}
+# X11 and SVG color names
 ColorNameList = set()
 JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
@@ -627,6 +628,56 @@ def parse_csharp_api_file(path):
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('constant', [], KeywordAttr.Default),
 		('comment tag', keywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+	]
+
+def parse_css_api_file(pathList):
+	# https://developer.mozilla.org/en-US/docs/Glossary/Vendor_Prefix
+	# custom property https://www.w3.org/TR/css-variables-1/
+	vendor = '^-moz- ^-ms- ^-o- ^-webkit- ^--'
+	keywordMap = {
+		'properties': vendor.split(),
+		'at rules': [],
+		'pseudo classes': [],
+		'pseudo elements': [],
+	}
+
+	values = []
+	for path in pathList:
+		for line in read_file(path).splitlines():
+			line = line.strip()
+			if not line or line.startswith('//'):
+				continue
+			if line[0] == '@':
+				rule = line.split()[0][1:]
+				keywordMap['at rules'].append(rule)
+			elif line[0] == ':':
+				line = line.rstrip(')')
+				if line[1] == ':':
+					keywordMap['pseudo elements'].append(line[2:])
+				else:
+					keywordMap['pseudo classes'].append(line[1:])
+			elif line[0].isalpha():
+				index = line.find(':')
+				if index > 0:
+					name = line[:index].strip()
+					line = line[index+1:]
+					keywordMap['properties'].append(name)
+				line = line.replace(';', ' ').replace(',', ' ').replace('|', ' ').replace('[',  ' ').replace(']', ' ')
+				items = [item.strip(')') for item in line.split()]
+				values.extend(items)
+
+	keywordMap['values'] = set(values) - ColorNameList
+	RemoveDuplicateKeyword(keywordMap, [
+		'properties',
+		'values',
+	])
+	return [
+		('properties', keywordMap['properties'], KeywordAttr.Default),
+		('at rules', keywordMap['at rules'], KeywordAttr.NoLexer),
+		('pseudo classes', keywordMap['pseudo classes'], KeywordAttr.Default),
+		('pseudo elements', keywordMap['pseudo elements'], KeywordAttr.Default),
+		('color names', ColorNameList, KeywordAttr.NoLexer),
+		('values', keywordMap['values'], KeywordAttr.NoLexer),
 	]
 
 def parse_dart_api_file(path):

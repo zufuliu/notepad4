@@ -354,7 +354,7 @@ static EDITSTYLE Styles_Python[] = {
 	{ SCE_PY_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ MULTI_STYLE(SCE_PY_PLACEHOLDER, SCE_PY_DOLLAR_PLACEHOLDER, 0, 0), NP2StyleX_Placeholder, L"fore:#8080FF" },
 	{ SCE_PY_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_PY_OPERATOR, SCE_PY_OPERATOR2, 0, 0), NP2StyleX_Operator,L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_PY_OPERATOR, SCE_PY_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexPython = {
