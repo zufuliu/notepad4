@@ -296,7 +296,7 @@ BEGIN
 				MENUITEM "ISS\t대칭 교환 금지(&Y)",		IDM_INSERT_UNICODE_ISS
 				MENUITEM "AAFS\t아랍어 양식 형성 활성화(&F)",		IDM_INSERT_UNICODE_AAFS
 				MENUITEM "IAFS\t아랍어 양식 형성 금지(&H)",		IDM_INSERT_UNICODE_IAFS
-				MENUITEM "ALM\t&Arabic letter mark",		        IDM_INSERT_UNICODE_ALM
+				MENUITEM "ALM\t아랍어 문자 표시(&A)",		        IDM_INSERT_UNICODE_ALM
 				MENUITEM "RS\t기록 구분 (블록 구분)(&B)", IDM_INSERT_UNICODE_RS
 				MENUITEM "US\t단위 구분 (세그먼트 구분)(&S)", IDM_INSERT_UNICODE_US
 				MENUITEM "LS\t줄 구분(&I)",						IDM_INSERT_UNICODE_LS
