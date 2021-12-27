@@ -633,12 +633,12 @@ def parse_csharp_api_file(path):
 def parse_css_api_file(pathList):
 	# https://developer.mozilla.org/en-US/docs/Glossary/Vendor_Prefix
 	# custom property https://www.w3.org/TR/css-variables-1/
-	vendor = '^-moz- ^-ms- ^-o- ^-webkit- ^--'
+	vendor = '^-moz- ^-ms- ^-o- ^-webkit-'
 	keywordMap = {
-		'properties': vendor.split(),
+		'properties': vendor.split() + ['^--'],
 		'at rules': [],
-		'pseudo classes': [],
-		'pseudo elements': [],
+		'pseudo classes': vendor.split(),
+		'pseudo elements': vendor.split(),
 	}
 
 	values = []

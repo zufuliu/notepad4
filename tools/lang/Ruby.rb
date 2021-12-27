@@ -1,5 +1,6 @@
 # Ruby 2.6.5 https://www.ruby-lang.org/en/documentation/
 # https://ruby-doc.org/
+# https://rubyreferences.github.io/
 
 #! Keywords			===========================================================
 # https://ruby-doc.org/core-2.6.5/doc/keywords_rdoc.html

@@ -73,12 +73,13 @@ static KEYWORDLIST Keywords_CSS = {{
 "object-fit object-position offset offset-anchor offset-distance offset-path offset-position offset-rotate opacity "
 "order orientation orphans outline outline-color outline-offset outline-style outline-width "
 "overflow overflow-anchor overflow-block overflow-clip-margin overflow-inline overflow-wrap overflow-x overflow-y "
-"override-color "
+"override-colors "
 "overscroll-behavior overscroll-behavior-block overscroll-behavior-inline overscroll-behavior-x overscroll-behavior-y "
 "pad padding padding-block padding-block-end padding-block-start padding-bottom "
 "padding-inline padding-inline-end padding-inline-start padding-left padding-right padding-top "
-"page page-break-after page-break-before page-break-inside pause pause-after pause-before perspective perspective-origin "
-"pitch pitch-range place-content place-items place-self play-during pointer pointer-events position "
+"page page-break-after page-break-before page-break-inside page-orientation pause pause-after pause-before "
+"perspective perspective-origin pitch pitch-range place-content place-items place-self play-during "
+"pointer pointer-events position "
 "prefers-color-scheme prefers-contrast prefers-reduced-data prefers-reduced-motion prefers-reduced-transparency prefix "
 "presentation-level print-color-adjust "
 "quotes "
@@ -125,8 +126,8 @@ static KEYWORDLIST Keywords_CSS = {{
 "top-center top-left top-left-corner top-right top-right-corner viewport "
 
 , // 2 pseudo classes
-"active after any-link before blank checked current current( default dir( disabled empty enabled "
-"first first-child first-letter first-line first-of-type focus focus-visible focus-within future "
+"^-moz- ^-ms- ^-o- ^-webkit- active after any-link before blank checked current current( default dir( disabled "
+"empty enabled first first-child first-letter first-line first-of-type focus focus-visible focus-within future "
 "has( host host( host-context( hover in-range indeterminate invalid is( "
 "lang( last-child last-of-type left link local-link "
 "not( nth-child( nth-col( nth-last-child( nth-last-col( nth-last-of-type( nth-of-type( "
@@ -134,8 +135,9 @@ static KEYWORDLIST Keywords_CSS = {{
 "scope scope-context( target target-within user-invalid valid verso visited where( "
 
 , // 3 pseudo elements
-"after before blank( content file-selector-button first-letter first-line footnote-call footnote-marker grammar-error "
-"highlight( marker nth-fragment( part( placeholder region selection shadow slot( spelling-error target-text "
+"^-moz- ^-ms- ^-o- ^-webkit- after before blank( content "
+"file-selector-button first-letter first-line footnote-call footnote-marker grammar-error highlight( marker "
+"nth-fragment( part( placeholder region selection shadow slot( spelling-error target-text "
 
 , // 4 color names
 "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood "
@@ -215,8 +217,9 @@ static KEYWORDLIST Keywords_CSS = {{
 "progress progress-bar progressive projection proportional-nums proportional-width proximity punctuation push-button "
 "radial-gradient( radio raise ray( rec2020 rect rect( recto reduce reduced region relative relative-colorimetric rem( "
 "repeat repeat-x repeat-y repeating-linear-gradient( repeating-radial-gradient( reverse revert revert-layer rgb( rgba( "
-"ridge right-side rightwards root rotate( rotate3d( rotateX( rotateY( rotateZ( round round( row row-resize row-reverse "
-"rtl ruby ruby-base ruby-base-container ruby-text ruby-text-container run-in running( "
+"ridge right-side rightwards "
+"root rotate( rotate-left rotate-right rotate3d( rotateX( rotateY( rotateZ( round round( row row-resize row-reverse rtl "
+"ruby ruby-base ruby-base-container ruby-text ruby-text-container run-in running( "
 "s-resize sRGB safe same sans-serif saturate( saturation "
 "scale( scale-down scale3d( scaleX( scaleY( scaleZ( screen scroll scroll-position "
 "se-resize searchfield selector( self-end self-start semi-condensed semi-expanded separate sepia( serif sesame show "

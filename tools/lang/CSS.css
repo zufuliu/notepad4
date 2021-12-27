@@ -1,4 +1,4 @@
-// 2020 https://www.w3.org/TR/CSS/
+// 2021 https://www.w3.org/TR/CSS/
 // https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
@@ -124,18 +124,16 @@
 	padding: inherit;
 }
 
-// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 21 April 2020
+// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 24 December 2021
 {
 	align-content: normal | first | last | baseline | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end;
 	justify-content: normal | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end | left | right;
 	place-content: normal;
-	justify-self: auto | normal | stretch | first | last | baseline | unsafe | safe | center | start | end | self-start | self-end |
-        flex-start | flex-end | left | right;
+	justify-self: auto | normal | stretch | first | last | baseline | unsafe | safe | center | start | end | self-start | self-end | flex-start | flex-end | left | right;
 	align-self: auto | normal | stretch;
 	place-self: auto;
 	justify-items: normal | stretch | left | right | legacy | center;
-	align-items: normal | stretch first | last | baseline | unsafe | safe | center | start | end | self-start | self-end |
-        flex-start | flex-end;
+	align-items: normal | stretch first | last | baseline | unsafe | safe | center | start | end | self-start | self-end | flex-start | flex-end;
     align-content: normal;
     justify-content: normal | left | right;
     place-content: normal;
@@ -154,7 +152,7 @@
 }
 
 // CSS Box Sizing Module Level 4 https://www.w3.org/TR/css-sizing-4/ 20 May 2021
-// CSS Box Sizing Module Level 3 https://www.w3.org/TR/css-sizing-3/ 17 March 2021
+// CSS Box Sizing Module Level 3 https://www.w3.org/TR/css-sizing-3/ 17 December 2021
 {
 	width: auto | min-content | max-content | fit-content();
 	height: auto | min-content | max-content | fit-content();
@@ -211,8 +209,8 @@
 	background-blend-mode:;
 }
 
-// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 3 March 2020
-// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 8 December 2020
+// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 25 December 2021
+// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 23 December 2021
 @supports {
 }
 selector()
@@ -283,7 +281,7 @@ var()
 	visibility: visible | hidden | collapse;
 }
 
-// CSS Easing Functions Level 1 1 April 2021
+// CSS Easing Functions Level 1 https://www.w3.org/TR/css-easing-1/ 1 April 2021
 linear ease ease-in ease-out ease-in-out cubic-bezier()
 step-start step-end steps()
 
@@ -354,7 +352,7 @@ step-start step-end steps()
 }
 
 // CSS Fonts Module Level 5 https://www.w3.org/TR/css-fonts-5/ 21 December 2021
-// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 29 July 2021
+// CSS Fonts Module Level 4 https://www.w3.org/TR/css-fonts-4/ 21 December 2021
 // CSS Fonts Module Level 3 https://www.w3.org/TR/css-fonts-3/ 20 September 2018
 // Fonts https://www.w3.org/TR/CSS22/fonts.html
 {
@@ -409,7 +407,7 @@ step-start step-end steps()
 @annotation
 
 base-palette:;
-override-color:;
+override-colors:;
 }
 
 // CSS Fragmentation Module Level 4 https://www.w3.org/TR/css-break-4/ 18 December 2018
@@ -623,7 +621,7 @@ override-color:;
 }
 
 // Media Queries Level 5 https://www.w3.org/TR/mediaqueries-5/ 18 December 2021
-// Media Queries Level 4 https://www.w3.org/TR/mediaqueries-4/ 21 July 2020
+// Media Queries Level 4 https://www.w3.org/TR/mediaqueries-4/ 25 December 2021
 // https://www.w3.org/TR/CSS22/media.html
 @custom-media {}
 // 7.3 Recognized media types
@@ -729,7 +727,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 @nest {}
 
 // CSS Overflow Module Level 4 https://www.w3.org/TR/css-overflow-4/ 13 June 2017
-// CSS Overflow Module Level 3 https://www.w3.org/TR/css-overflow-3/ 2 December 2021
+// CSS Overflow Module Level 3 https://www.w3.org/TR/css-overflow-3/ 23 December 2021
 ::nth-fragment()
 {
 	overflow-x: visible | hidden | clip | scroll | auto;
@@ -792,6 +790,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	marks: none | crop | cross;
 	bleed: auto;
 	page: auto;
+	// https://drafts.csswg.org/css-page-3/
+	page-orientation: upright | rotate-left | rotate-right;
 }
 
 // CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 16 December 2021
@@ -1010,7 +1010,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	shape-inside:;
 }
 
-// CSS Spatial Navigation Level 1 https://www.w3.org/TR/css-nav-1/
+// CSS Spatial Navigation Level 1 https://www.w3.org/TR/css-nav-1/ 26 November 2019
 {
 	spatial-navigation-contain: auto | contain;
 	spatial-navigation-action: auto | focus | scroll;
@@ -1063,8 +1063,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	chains: none;
 }
 
-// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 22 April 2021
 // CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 13 November 2019
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 22 April 2021
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
@@ -1234,7 +1234,7 @@ pi infinity NaN
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 2 December 2021
+// Compatibility https://compat.spec.whatwg.org/ 19 December 2021
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }
