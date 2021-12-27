@@ -4639,7 +4639,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 	const Sci_Line iMaxLine = SciCall_GetLineCount();
 
 	// Jumpt to end with line set to -1
-	if (iNewLine < 0 || iNewLine >= iMaxLine) {
+	if (iNewLine < 0 || iNewLine > iMaxLine) {
 		SciCall_DocumentEnd();
 		return;
 	}
