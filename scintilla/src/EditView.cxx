@@ -469,7 +469,7 @@ constexpr bool ViewIsASCII(std::string_view text) noexcept {
 * Copy the given @a line and its styles from the document into local arrays.
 * Also determine the x position at which each character starts.
 */
-int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option) {
+int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option, int posInLine) {
 	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
@@ -595,6 +595,9 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
 		const int numCharsInLine = ll->numCharsInLine;
 		bool lastSegItalics = false;
+		if (posInLine <= 0) {
+			posInLine = BreakFinder::lengthEachSubdivision;
+		}
 
 		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
 		while (bfLayout.More()) {
@@ -645,8 +648,9 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 				ll->positions[posToIncrease] += ll->positions[ts.start];
 			}
 
-			if (option != LayoutLineOption::WholeLine && numCharsInLine - endPos > BreakFinder::lengthEachSubdivision && model.IdleTaskTimeExpired()) {
+			if (option != LayoutLineOption::WholeLine && endPos > posInLine && model.IdleTaskTimeExpired()) {
 				// treat remaining text as zero width
+				//printf("%s(%zd) posInLine=%d, lineLength=%d / %d, laidBytes=%d - %d\n", __func__, line, posInLine, laidBytes, numCharsInLine, endPos, ll->lastSegmentEnd);
 				laidBytes = endPos - ll->lastSegmentEnd;
 				ll->lastSegmentEnd = endPos;
 				const XYPOSITION last = ll->positions[endPos];
@@ -875,8 +879,8 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 	const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
 	LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 	if (surface) {
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const int posInLine = static_cast<int>(pos.Position() - posLineStart);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		pt = ll->PointFromPosition(posInLine, vs.lineHeight, pe);
 		pt.x += vs.textStart - model.xOffset;
 
@@ -1018,10 +1022,10 @@ Sci::Line EditView::DisplayFromPosition(Surface *surface, const EditModel &model
 	const Sci::Line lineDoc = model.pdoc->SciLineFromPosition(pos);
 	Sci::Line lineDisplay = model.pcs->DisplayFromDoc(lineDoc);
 	if (surface) {
-		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
-		const Sci::Position posInLine = pos - posLineStart;
+		const int posInLine = static_cast<int>(pos - posLineStart);
+		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		lineDisplay--; // To make up for first increment ahead.
 		for (int subLine = 0; subLine < ll->lines; subLine++) {
 			if (posInLine >= ll->LineStart(subLine)) {
@@ -1036,10 +1040,10 @@ Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &m
 	const Sci::Line line = model.pdoc->SciLineFromPosition(pos);
 	Sci::Position posRet = Sci::invalidPosition;
 	if (surface) {
-		LineLayout * const ll = RetrieveLineLayout(line, model);
-		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate);
 		const Sci::Position posLineStart = model.pdoc->LineStart(line);
-		const Sci::Position posInLine = pos - posLineStart;
+		const int posInLine = static_cast<int>(pos - posLineStart);
+		LineLayout * const ll = RetrieveLineLayout(line, model);
+		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		if (posInLine <= ll->maxLineLength) {
 			for (int subLine = 0; subLine < ll->lines; subLine++) {
 				if ((posInLine >= ll->LineStart(subLine)) &&

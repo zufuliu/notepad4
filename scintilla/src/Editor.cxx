@@ -1498,9 +1498,11 @@ void Editor::NeedWrapping(Sci::Line docLineStart, Sci::Line docLineEnd, bool inv
 	}
 }
 
-bool Editor::WrapOneLine(Surface *surface, Sci::Line lineToWrap) {
+bool Editor::WrapOneLine(Surface *surface, Sci::Position positionInsert) {
+	const Sci::Line lineToWrap = pdoc->SciLineFromPosition(positionInsert);
+	const int posInLine = static_cast<int>(positionInsert - pdoc->LineStart(lineToWrap));
 	LineLayout * const ll = view.RetrieveLineLayout(lineToWrap, *this);
-	view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
+	view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate, posInLine);
 	int linesWrapped = ll->lines;
 	if (vs.annotationVisible != AnnotationVisible::Hidden) {
 		linesWrapped += pdoc->AnnotationLines(lineToWrap);
@@ -2023,6 +2025,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	}
 	FilterSelections();
 	bool handled = false;
+	bool wrapOccurred = false;
 	{
 		UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
 		// enclose selection on typing punctuation, empty selection will be handled in Notification::CharAdded.
@@ -2095,18 +2098,18 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 				if (Wrapping()) {
 					AutoSurface surface(this);
 					if (surface) {
-						if (WrapOneLine(surface, pdoc->SciLineFromPosition(positionInsert))) {
-							SetScrollBars();
-							SetVerticalScrollPos();
-							Redraw();
+						if (WrapOneLine(surface, positionInsert)) {
+							wrapOccurred = true;
 						}
 					}
 				}
 			}
 		}
 	}
-	if (Wrapping()) {
+	if (wrapOccurred) {
 		SetScrollBars();
+		SetVerticalScrollPos();
+		Redraw();
 	}
 	ThinRectangularRange();
 	// If in wrap mode rewrap current line so EnsureCaretVisible has accurate information
@@ -3062,6 +3065,8 @@ void Editor::NotifyMacroRecord(Message iMessage, uptr_t wParam, sptr_t lParam) n
 // Something has changed that the container should know about
 void Editor::ContainerNeedsUpdate(Update flags) noexcept {
 	needUpdateUI = needUpdateUI | flags;
+	// layout as much as possible inside LayoutLine() to avoid unexpected scrolling
+	SetIdleTaskTime(IdleLineWrapTime);
 }
 
 /**
@@ -3105,8 +3110,8 @@ void Editor::PageMove(int direction, Selection::SelTypes selt, bool stuttered) {
 	if (topLineNew != topLine) {
 		SetTopLine(topLineNew);
 		MovePositionTo(newPos, selt);
-		Redraw();
 		SetVerticalScrollPos();
+		Redraw();
 	} else {
 		MovePositionTo(newPos, selt);
 	}
