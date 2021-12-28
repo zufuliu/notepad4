@@ -2751,6 +2751,8 @@ constexpr Sci::Position MovePositionForDeletion(Sci::Position position, Sci::Pos
 void Editor::NotifyModified(Document *, DocModification mh, void *) {
 	if (FlagSet(mh.modificationType, ModificationFlags::InsertText | ModificationFlags::DeleteText)) {
 		ContainerNeedsUpdate(Update::Content);
+		// layout as much as possible inside LayoutLine() to avoid unexpected scrolling
+		SetIdleTaskTime(IdleLineWrapTime);
 	}
 	if (paintState == PaintState::painting) {
 		CheckForChangeOutsidePaint(Range(mh.position, mh.position + mh.length));
@@ -3065,8 +3067,6 @@ void Editor::NotifyMacroRecord(Message iMessage, uptr_t wParam, sptr_t lParam) n
 // Something has changed that the container should know about
 void Editor::ContainerNeedsUpdate(Update flags) noexcept {
 	needUpdateUI = needUpdateUI | flags;
-	// layout as much as possible inside LayoutLine() to avoid unexpected scrolling
-	SetIdleTaskTime(IdleLineWrapTime);
 }
 
 /**
