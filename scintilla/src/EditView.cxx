@@ -595,9 +595,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
 		const int numCharsInLine = ll->numCharsInLine;
 		bool lastSegItalics = false;
-		if (posInLine <= 0) {
-			posInLine = BreakFinder::lengthEachSubdivision;
-		}
+		posInLine = std::max<int>(posInLine, BreakFinder::lengthEachSubdivision);
 
 		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
 		while (bfLayout.More()) {
