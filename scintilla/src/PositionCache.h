@@ -46,18 +46,18 @@ class LineLayout final {
 private:
 	friend class LineLayoutCache;
 	std::unique_ptr<int[]> lineStarts;
-	int lenLineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	const Sci::Line lineNumber;
+	int lenLineStarts;
 public:
 	enum {
 		wrapWidthInfinite = 0x7ffffff
 	};
 
 	int maxLineLength;
+	int lastSegmentEnd;
 	int numCharsInLine;
 	int numCharsBeforeEOL;
-	int lastSegmentEnd;
 	enum class ValidLevel {
 		invalid, checkTextAndStyle, positions, lines
 	} validity;
@@ -66,6 +66,7 @@ public:
 	bool containsCaret;
 	unsigned char bracePreviousStyles[2];
 	int edgeColumn;
+	int caretPosition;
 	std::unique_ptr<char[]> chars;
 	std::unique_ptr<unsigned char[]> styles;
 	std::unique_ptr<XYPOSITION[]> positions;
@@ -292,7 +293,7 @@ public:
 	void Clear() noexcept;
 	void SetSize(size_t size_);
 	size_t GetSize() const noexcept;
-	void MeasureWidths(Surface *surface, const ViewStyle &vstyle, uint16_t styleNumber,
+	void MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber,
 		std::string_view sv, XYPOSITION *positions);
 };
 

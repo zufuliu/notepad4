@@ -111,14 +111,6 @@ struct SplitView {
 
 	SplitView(const SplitVector<char> &instance) noexcept;
 
-	bool operator==(const SplitView &other) const noexcept {
-		return segment1 == other.segment1 && length1 == other.length1
-			&& segment2 == other.segment2 && length == other.length;
-	}
-	bool operator!=(const SplitView &other) const noexcept {
-		return !(*this == other);
-	}
-
 	char CharAt(size_t position) const noexcept {
 		if (position < length1) {
 			return segment1[position];

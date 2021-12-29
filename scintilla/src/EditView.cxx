@@ -378,11 +378,18 @@ LineLayout *EditView::RetrieveLineLayout(Sci::Line lineNumber, const EditModel &
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineNumber);
 	const Sci::Position posLineEnd = model.pdoc->LineStart(lineNumber + 1);
 	PLATFORM_ASSERT(posLineEnd >= posLineStart);
-	const Sci::Line lineCaret = model.pdoc->SciLineFromPosition(model.sel.MainCaret());
+	const Sci::Position caretPosition = model.sel.MainCaret();
+	const Sci::Line lineCaret = model.pdoc->SciLineFromPosition(caretPosition);
 	const Sci::Line topLine = model.pcs->DocFromDisplay(model.TopLineOfMain());
-	return llc.Retrieve(lineNumber, lineCaret,
+	LineLayout *ll = llc.Retrieve(lineNumber, lineCaret,
 		static_cast<int>(posLineEnd - posLineStart), model.pdoc->GetStyleClock(),
 		model.LinesOnScreen() + 1, model.pdoc->LinesTotal(), topLine);
+	if (lineNumber == lineCaret) {
+		ll->caretPosition = static_cast<int>(caretPosition - posLineStart);
+	} else {
+		ll->caretPosition =  0;
+	}
+	return ll;
 }
 
 namespace {
@@ -584,27 +591,29 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		// Layout the line, determining the position of each character,
 		// with an extra element at the end for the end of the line.
 		std::fill(&ll->positions[0], &ll->positions[lineLength + 1], 0.0f);
+		ll->lastSegmentEnd = 0;
 		ll->numCharsInLine = numCharsInLine;
 		ll->numCharsBeforeEOL = numCharsBeforeEOL;
-		ll->lastSegmentEnd = 0;
 	}
 
 	const bool partialLine = validity == LineLayout::ValidLevel::lines
 		&& ll->PartialPosition() && width == ll->widthLine;
 	if (validity == LineLayout::ValidLevel::invalid
 		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
-		const int numCharsInLine = ll->numCharsInLine;
 		bool lastSegItalics = false;
-		posInLine = std::max<int>(posInLine, BreakFinder::lengthEachSubdivision);
+		bool wholeLine = true;
+		posInLine = std::max(posInLine, ll->caretPosition) + BreakFinder::lengthEachSubdivision;
 
-		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
+		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, ll->numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
 		while (bfLayout.More()) {
 
 			const TextSegment ts = bfLayout.Next();
 			const int endPos = ts.end();
 
-			if (vstyle.styles[ll->styles[ts.start]].visible) {
+			const Style &style = vstyle.styles[ll->styles[ts.start]];
+			if (style.visible) {
 				if (ts.representation) {
+					lastSegItalics = false;
 					XYPOSITION representationWidth = vstyle.controlCharWidth;
 					if (ll->chars[ts.start] == '\t') {
 						// Tab is a special case of representation, taking a variable amount of space
@@ -616,10 +625,11 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 							XYPOSITION positionsRepr[Representation::maxLength + 1];
 							// ts.representation->stringRep is UTF-8 which only matches cache if document is UTF-8
 							// or it only contains ASCII which is a subset of all currently supported encodings.
+							const Style &styleCtrl = vstyle.styles[StyleControlChar];
 							if ((CpUtf8 == model.pdoc->dbcsCodePage) || ViewIsASCII(ts.representation->stringRep)) {
-								posCache.MeasureWidths(surface, vstyle, StyleControlChar, ts.representation->stringRep, positionsRepr);
+								posCache.MeasureWidths(surface, styleCtrl, StyleControlChar, ts.representation->stringRep, positionsRepr);
 							} else {
-								surface->MeasureWidthsUTF8(vstyle.styles[StyleControlChar].font.get(), ts.representation->stringRep, positionsRepr);
+								surface->MeasureWidthsUTF8(styleCtrl.font.get(), ts.representation->stringRep, positionsRepr);
 							}
 							representationWidth = positionsRepr[ts.representation->stringRep.length() - 1];
 							if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
@@ -631,15 +641,15 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 						ll->positions[ts.start + 1 + ii] = representationWidth;
 					}
 				} else {
+					lastSegItalics = style.italic && (ll->chars[endPos - 1] != ' ');
 					if ((ts.length == 1) && (' ' == ll->chars[ts.start])) {
 						// Over half the segments are single characters and of these about half are space characters.
-						ll->positions[ts.start + 1] = vstyle.styles[ll->styles[ts.start]].spaceWidth;
+						ll->positions[ts.start + 1] = style.spaceWidth;
 					} else {
-						posCache.MeasureWidths(surface, vstyle, ll->styles[ts.start],
+						posCache.MeasureWidths(surface, style, ll->styles[ts.start],
 							std::string_view(&ll->chars[ts.start], ts.length), &ll->positions[ts.start + 1]);
 					}
 				}
-				lastSegItalics = (!ts.representation) && ((ll->chars[endPos - 1] != ' ') && vstyle.styles[ll->styles[ts.start]].italic);
 			}
 
 			for (int posToIncrease = ts.start + 1; posToIncrease <= endPos; posToIncrease++) {
@@ -648,21 +658,25 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 
 			if (option != LayoutLineOption::WholeLine && endPos > posInLine && model.IdleTaskTimeExpired()) {
 				// treat remaining text as zero width
-				//printf("%s(%zd) posInLine=%d, lineLength=%d / %d, laidBytes=%d - %d\n", __func__, line, posInLine, laidBytes, numCharsInLine, endPos, ll->lastSegmentEnd);
-				laidBytes = endPos - ll->lastSegmentEnd;
-				ll->lastSegmentEnd = endPos;
-				const XYPOSITION last = ll->positions[endPos];
-				std::fill(&ll->positions[endPos + 1], &ll->positions[numCharsInLine + 1], last);
+				//printf("%s(%d, %zd) posInLine=%d, lineLength=%d / %d, laidBytes=%d - %d\n", __func__,
+				//	(int)option, line, posInLine, laidBytes, ll->numCharsInLine, endPos, ll->lastSegmentEnd);
+				if (endPos < ll->numCharsInLine) {
+					wholeLine = false;
+					laidBytes = endPos - ll->lastSegmentEnd;
+					ll->lastSegmentEnd = endPos;
+					const XYPOSITION last = ll->positions[endPos];
+					std::fill(&ll->positions[endPos + 1], &ll->positions[ll->numCharsInLine + 1], last);
+				}
 				break;
 			}
 		}
 
 		// Small hack to make lines that end with italics not cut off the edge of the last character
-		if (!bfLayout.More()) {
+		if (wholeLine) {
 			laidBytes -= ll->lastSegmentEnd;
 			ll->lastSegmentEnd = ll->numCharsInLine;
 			if (lastSegItalics) {
-				ll->positions[numCharsInLine] += vstyle.lastSegItalicsOffset;
+				ll->positions[ll->numCharsInLine] += vstyle.lastSegItalicsOffset;
 			}
 		}
 		validity = LineLayout::ValidLevel::positions;
@@ -1144,8 +1158,9 @@ static void DrawTextBlob(Surface *surface, const ViewStyle &vsDraw, PRectangle r
 	if (fillBackground) {
 		surface->FillRectangleAligned(rcSegment, Fill(textBack));
 	}
-	const Font *ctrlCharsFont = vsDraw.styles[StyleControlChar].font.get();
-	const XYPOSITION normalCharHeight = std::ceil(vsDraw.styles[StyleControlChar].capitalHeight);
+	const Style &styleCtrl = vsDraw.styles[StyleControlChar];
+	const Font *ctrlCharsFont = styleCtrl.font.get();
+	const XYPOSITION normalCharHeight = std::ceil(styleCtrl.capitalHeight);
 	PRectangle rcCChar = rcSegment;
 	rcCChar.left = rcCChar.left + 1;
 	rcCChar.top = rcSegment.top + vsDraw.maxAscent - normalCharHeight;

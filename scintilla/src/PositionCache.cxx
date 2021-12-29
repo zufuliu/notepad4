@@ -65,18 +65,19 @@ void BidiData::Resize(size_t maxLineLength_) {
 }
 
 LineLayout::LineLayout(Sci::Line lineNumber_, int maxLineLength_) :
-	lenLineStarts(0),
 	lineNumber(lineNumber_),
+	lenLineStarts(0),
 	maxLineLength(-1),
+	lastSegmentEnd(0),
 	numCharsInLine(0),
 	numCharsBeforeEOL(0),
-	lastSegmentEnd(0),
 	validity(ValidLevel::invalid),
 	xHighlightGuide(0),
 	highlightColumn(false),
 	containsCaret(false),
 	bracePreviousStyles{},
 	edgeColumn(0),
+	caretPosition(0),
 	widthLine(wrapWidthInfinite),
 	lines(1),
 	wrapIndent(0) {
@@ -1005,9 +1006,8 @@ size_t PositionCache::GetSize() const noexcept {
 	return pces.size();
 }
 
-void PositionCache::MeasureWidths(Surface *surface, const ViewStyle &vstyle, uint16_t styleNumber,
+void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber,
 	std::string_view sv, XYPOSITION *positions) {
-	const Style &style = vstyle.styles[styleNumber];
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
 #if PLAT_MACOSX
 		const XYPOSITION characterWidth = style.monospaceCharacterWidth;
