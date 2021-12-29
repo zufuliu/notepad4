@@ -93,10 +93,13 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 			visibleChars = 0;
 		}
 
-		if (sc.state == SCE_B_OPERATOR) {
+		switch (sc.state) {
+		case SCE_B_OPERATOR:
 			sc.SetState(SCE_B_DEFAULT);
-		} else if (sc.state == SCE_B_IDENTIFIER) {
-			if (!(iswordstart(sc.ch))) {
+			break;
+
+		case SCE_B_IDENTIFIER:
+			if (!iswordstart(sc.ch)) {
 				// In Basic (except VBScript), a variable name or a function name
 				// can end with a special character indicating the type of the value
 				// held or returned.
@@ -143,11 +146,15 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 						sc.SetState(SCE_B_DEFAULT);
 					}
 			}
-		} else if (sc.state == SCE_B_NUMBER) {
+			break;
+
+		case SCE_B_NUMBER:
 			if (!IsVBNumber(sc.ch, sc.chPrev)) {
 				sc.SetState(SCE_B_DEFAULT);
 			}
-		} else if (sc.state == SCE_B_STRING) {
+			break;
+
+		case SCE_B_STRING:
 			// VB doubles quotes to preserve them, so just end this string
 			// state now as a following quote will start again
 			if (sc.ch == '\"') {
@@ -159,15 +166,18 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 					}
 					sc.ForwardSetState(SCE_B_DEFAULT);
 				}
-			} else if (sc.atLineEnd) {
-				sc.ChangeState(SCE_B_STRINGEOL);
-				sc.ForwardSetState(SCE_B_DEFAULT);
+			} else if (sc.atLineStart) {
+				sc.SetState(SCE_B_DEFAULT);
 			}
-		} else if (sc.state == SCE_B_COMMENT) {
+			break;
+
+		case SCE_B_COMMENT:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_B_DEFAULT);
 			}
-		} else if (sc.state == SCE_B_FILENUMBER) {
+			break;
+
+		case SCE_B_FILENUMBER:
 			if (IsADigit(sc.ch)) {
 				fileNbDigits++;
 				if (fileNbDigits > 3) {
@@ -188,13 +198,15 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (sc.state != SCE_B_FILENUMBER) {
 				fileNbDigits = 0;
 			}
-		} else if (sc.state == SCE_B_DATE) {
-			if (sc.atLineEnd) {
-				sc.ChangeState(SCE_B_STRINGEOL);
+			break;
+
+		case SCE_B_DATE:
+			if (sc.ch == '#') {
 				sc.ForwardSetState(SCE_B_DEFAULT);
-			} else if (sc.ch == '#') {
-				sc.ForwardSetState(SCE_B_DEFAULT);
+			} else if (sc.atLineStart) {
+				sc.SetState(SCE_B_DEFAULT);
 			}
+			break;
 		}
 
 		if (sc.state == SCE_B_DEFAULT) {
