@@ -149,8 +149,6 @@ def updateGraphemeBreakTable(filename):
 
 	output = []
 	output.append('#pragma once')
-	output.append("#include <algorithm>")
-	output.append("#include <iterator>")
 	output.append('')
 	output.append('namespace {')
 	output.append('')
@@ -176,28 +174,10 @@ constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBre
 }
 """)
 
-	output.append('#define GraphemeBreakUseRangeList 0')
-	output.append('#if GraphemeBreakUseRangeList')
 	sentinel = (UnicodeCharacterCount << 4) | GraphemeBreakProperty.Other
 	valueBit, rangeList = rangeEncode('Unicode Grapheme Break range', graphemeBreakTable, sentinel=sentinel)
 	assert valueBit == 4
-	output.append('constexpr int graphemeBreakMask = 15;')
-	output.append('')
-	output.append('const int graphemeBreakRanges[] = {')
-	output.extend(hex(value) + ',' for value in rangeList)
-	output.append("};")
-	output.append("""
-GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
-	if (character < 0 || character >= maxUnicodeGraphemeBreakCharacter) {
-		return GraphemeBreakProperty::Other;
-	}
-	const int baseValue = character * (graphemeBreakMask + 1) + graphemeBreakMask;
-	const int *placeAfter = std::lower_bound(graphemeBreakRanges, std::end(graphemeBreakRanges), baseValue);
-	return static_cast<GraphemeBreakProperty>(*(placeAfter - 1) & graphemeBreakMask);
-}""")
 
-	output.append('')
-	output.append('#else')
 	config = {
 		'tableName': 'graphemeBreakTable',
 		'function': """GraphemeBreakProperty GetGraphemeBreakProperty(uint32_t ch) noexcept {
@@ -212,7 +192,6 @@ GraphemeBreakProperty GetGraphemeBreakProperty(int character) noexcept {
 	output.extend(table)
 	output.append('')
 	output.extend(function)
-	output.append("#endif")
 	output.append('')
 	output.append('}')
 	output.append('')

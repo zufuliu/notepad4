@@ -404,7 +404,7 @@ def updateCharacterCategoryTable(filename):
 	assert valueBit == 5
 	output.append("#if CharacterCategoryUseRangeList")
 	output.append("const int catRanges[] = {")
-	output.extend(f"{value}," for value in rangeList)
+	#output.extend(f"{value}," for value in rangeList)
 	output.append("};")
 	output.append("")
 	output.append("#else")

@@ -1,12 +1,12 @@
 # https://www.unicode.org/reports/tr41/
 # https://www.unicode.org/reports/tr11/
-# https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt
 
 from FileGenerator import Regenerate
 from MultiStageTable import *
 from UnicodeData import *
 
 def updateEastAsianWidthTable(filename):
+	# https://www.unicode.org/Public/UCD/latest/ucd/EastAsianWidth.txt
 	version, propertyList = readUnicodePropertyFile('EastAsianWidth.txt')
 	# https://www.unicode.org/reports/tr11/#Recommendations
 	widthMap = {
