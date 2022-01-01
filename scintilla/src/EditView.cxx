@@ -387,7 +387,7 @@ LineLayout *EditView::RetrieveLineLayout(Sci::Line lineNumber, const EditModel &
 	if (lineNumber == lineCaret) {
 		ll->caretPosition = static_cast<int>(caretPosition - posLineStart);
 	} else {
-		ll->caretPosition =  0;
+		ll->caretPosition = 0;
 	}
 	return ll;
 }

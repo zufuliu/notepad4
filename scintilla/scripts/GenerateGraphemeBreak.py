@@ -2,6 +2,7 @@
 # https://www.unicode.org/reports/tr41/
 from enum import IntEnum
 
+from FileGenerator import Regenerate
 from MultiStageTable import *
 from UnicodeData import *
 
@@ -119,7 +120,7 @@ def testGraphemeBreak(path, graphemeBreakTable):
 					print(f'test fail on line {lineno}: {ch} {offcial} {chNext} => {prop.name} {value} {propNext.name}')
 	print(f'{path} total test: {totalCount}, failed test: {failCount}')
 
-def updateGraphemeBreakTable(filename):
+def updateGraphemeBreakTable(headerFile, sourceFile):
 	defaultValue = int(GraphemeBreakProperty.Other)
 	graphemeBreakTable = [defaultValue] * UnicodeCharacterCount
 	# https://www.unicode.org/Public/UCD/latest/ucd/emoji/emoji-data.txt
@@ -148,10 +149,6 @@ def updateGraphemeBreakTable(filename):
 	graphemeBreakTable = graphemeBreakTable[:tableSize]
 
 	output = []
-	output.append('#pragma once')
-	output.append('')
-	output.append('namespace {')
-	output.append('')
 	output.append('enum class GraphemeBreakProperty {')
 	for prop in GraphemeBreakProperty.__members__.values():
 		output.append(f'\t{prop.name} = {prop.value},')
@@ -171,16 +168,16 @@ def updateGraphemeBreakTable(filename):
 	output.append("""
 constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBreakProperty current) noexcept {
 	return (graphemeClusterBoundary[static_cast<int>(prev)] >> (static_cast<int>(current))) & true;
-}
-""")
+}""")
 
 	sentinel = (UnicodeCharacterCount << 4) | GraphemeBreakProperty.Other
 	valueBit, rangeList = rangeEncode('Unicode Grapheme Break range', graphemeBreakTable, sentinel=sentinel)
 	assert valueBit == 4
 
 	config = {
-		'tableName': 'graphemeBreakTable',
-		'function': """GraphemeBreakProperty GetGraphemeBreakProperty(uint32_t ch) noexcept {
+		'tableName': 'GraphemeBreakTable',
+		'tableVarName': 'CharClassify::GraphemeBreakTable',
+		'function': """static GraphemeBreakProperty GetGraphemeBreakProperty(uint32_t ch) noexcept {
 	if (ch >= maxUnicodeGraphemeBreakCharacter) {
 		return GraphemeBreakProperty::Other;
 	}
@@ -188,16 +185,11 @@ constexpr bool IsGraphemeClusterBoundary(GraphemeBreakProperty prev, GraphemeBre
 		'returnType': 'GraphemeBreakProperty'
 	}
 
+	Regenerate(headerFile, "//grapheme type", output)
 	table, function = buildMultiStageTable('Unicode Grapheme Break', graphemeBreakTable, config=config, level=3)
-	output.extend(table)
-	output.append('')
-	output.extend(function)
-	output.append('')
-	output.append('}')
-	output.append('')
-
-	with open(filename, 'w', encoding='utf-8', newline='\n') as fd:
-		fd.write('\n'.join(output))
+	output = ['\t' + line for line in function]
+	Regenerate(headerFile, "//grapheme function", output)
+	Regenerate(sourceFile, "//grapheme table", table)
 
 if __name__ == '__main__':
-	updateGraphemeBreakTable('../src/GraphemeBreak.h')
+	updateGraphemeBreakTable('../src/CharClassify.h', '../src/CharClassify.cxx')

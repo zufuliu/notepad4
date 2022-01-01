@@ -38,7 +38,6 @@
 
 #include "CharacterSet.h"
 //#include "CharacterCategory.h"
-//#include "GraphemeBreak.h"
 #include "Position.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
@@ -1128,7 +1127,7 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 
 		it = end;
 		if (encodingFamily != EncodingFamily::eightBit && ccPrev == CharacterClass::word) {
-#if 1
+#if 0
 			// for UTF-8 go back to the start of last character.
 			for (int trail = 0; trail < UTF8MaxBytes - 1 && UTF8IsTrailByte(*it); trail++) {
 				--it;
@@ -1144,7 +1143,7 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 				GraphemeBreakProperty prev = GraphemeBreakProperty::Sentinel;
 				do {
 					const int character = UnicodeFromUTF8(reinterpret_cast<const unsigned char *>(it));
-					const GraphemeBreakProperty current = GetGraphemeBreakProperty(character);
+					const GraphemeBreakProperty current = CharClassify::GetGraphemeBreakProperty(character);
 					if (IsGraphemeClusterBoundary(prev, current)) {
 						return it - text;
 					}
