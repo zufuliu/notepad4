@@ -1786,20 +1786,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (LOWORD(wParam) == IDM_POP_COPY_FILENAME) {
 			path = PathFindFileName(path);
 		}
-
-		HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-							sizeof(WCHAR) * (lstrlen(path) + 1));
-		LPWSTR pData = (LPWSTR)GlobalLock(hData);
-		lstrcpy(pData, path);
-		GlobalUnlock(hData);
-
-		if (OpenClipboard(hwnd)) {
-			EmptyClipboard();
-			SetClipboardData(CF_UNICODETEXT, hData);
-			CloseClipboard();
-		} else {
-			GlobalFree(hData);
-		}
+		SetClipData(hwnd, path);
 	}
 	break;
 

@@ -36,6 +36,7 @@
 #define IDC_NEW_PAGE_TEXT				109
 #define IDC_NEW_PAGE_LINK				110
 #define IDC_BUILD_INFO					111
+#define IDC_COPY_BUILD_INFO				112
 // Run
 #define IDD_RUN							101
 #define IDC_COMMANDLINE					100

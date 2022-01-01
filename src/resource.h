@@ -36,6 +36,7 @@
 #define IDC_SCI_PAGE_TEXT				111
 #define IDC_SCI_PAGE_LINK				112
 #define IDC_BUILD_INFO					113
+#define IDC_COPY_BUILD_INFO				114
 // Find/Replace Text
 #define IDD_FIND						118
 #define IDD_REPLACE						119

@@ -847,6 +847,22 @@ void DeleteBitmapButton(HWND hwnd, int nCtlId) {
 
 //=============================================================================
 //
+// SetClipData()
+//
+void SetClipData(HWND hwnd, LPCWSTR pszData) {
+	if (OpenClipboard(hwnd)) {
+		EmptyClipboard();
+		HANDLE hData = GlobalAlloc(GHND, sizeof(WCHAR) * (lstrlen(pszData) + 1));
+		WCHAR *pData = (WCHAR *)GlobalLock(hData);
+		lstrcpyn(pData, pszData, (int)(GlobalSize(hData) / sizeof(WCHAR)));
+		GlobalUnlock(hData);
+		SetClipboardData(CF_UNICODETEXT, hData);
+		CloseClipboard();
+	}
+}
+
+//=============================================================================
+//
 //  SetWindowTransparentMode()
 //
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {

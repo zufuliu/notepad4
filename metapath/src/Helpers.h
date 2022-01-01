@@ -395,6 +395,7 @@ HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlag
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
+void SetClipData(HWND hwnd, LPCWSTR pszData);
 void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel);
 void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
 
