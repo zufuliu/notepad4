@@ -197,6 +197,9 @@ static inline LPCWSTR GetProcessorArchitecture(void) {
 	SYSTEM_INFO info;
 	ZeroMemory(&info, sizeof(info));
 	GetNativeSystemInfo(&info);
+#ifndef PROCESSOR_ARCHITECTURE_ARM64
+#define PROCESSOR_ARCHITECTURE_ARM64	12
+#endif
 	switch (info.wProcessorArchitecture) {
 	case PROCESSOR_ARCHITECTURE_AMD64:
 		return L"x64";
@@ -367,9 +370,9 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 				WCHAR tch[256];
 				LPCWSTR arch = GetProcessorArchitecture();
 				GetDlgItemText(hwnd, IDC_BUILD_INFO, wch, COUNTOF(wch));
-				wsprintf(tch, L"%s\n%s\nEncoding: %s\nScheme: %s\nSystem: %u.%u.%u %s %s\n",
+				wsprintf(tch, L"%s\n%s\nEncoding: %s, %u\nScheme: %s\nSystem: %u.%u.%u %s %s\n",
 					VERSION_FILEVERSION_LONG, wch,
-					mEncoding[iCurrentEncoding].wchLabel, pLexCurrent->pszName,
+					mEncoding[iCurrentEncoding].wchLabel, mEncoding[CPI_DEFAULT].uCodePage, pLexCurrent->pszName,
 					version.dwMajorVersion, version.dwMinorVersion, version.dwBuildNumber,
 					version.szCSDVersion, arch);
 				SetClipData(hwnd, tch);

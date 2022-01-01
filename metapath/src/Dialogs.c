@@ -475,6 +475,9 @@ static inline LPCWSTR GetProcessorArchitecture(void) {
 	SYSTEM_INFO info;
 	ZeroMemory(&info, sizeof(info));
 	GetNativeSystemInfo(&info);
+#ifndef PROCESSOR_ARCHITECTURE_ARM64
+#define PROCESSOR_ARCHITECTURE_ARM64	12
+#endif
 	switch (info.wProcessorArchitecture) {
 	case PROCESSOR_ARCHITECTURE_AMD64:
 		return L"x64";
