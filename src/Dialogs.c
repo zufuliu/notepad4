@@ -367,12 +367,15 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 				NP2_COMPILER_WARNING_POP
 
 				WCHAR wch[128];
-				WCHAR tch[256];
+				WCHAR tch[512];
 				LPCWSTR arch = GetProcessorArchitecture();
+				const int iEncoding = Encoding_GetIndex(mEncoding[CPI_DEFAULT].uCodePage);
+				Encoding_GetLabel(iEncoding);
 				GetDlgItemText(hwnd, IDC_BUILD_INFO, wch, COUNTOF(wch));
-				wsprintf(tch, L"%s\n%s\nEncoding: %s, %u\nScheme: %s\nSystem: %u.%u.%u %s %s\n",
+				wsprintf(tch, L"%s\n%s\nEncoding: %s, %s\nScheme: %s, %s\nSystem: %u.%u.%u %s %s\n",
 					VERSION_FILEVERSION_LONG, wch,
-					mEncoding[iCurrentEncoding].wchLabel, mEncoding[CPI_DEFAULT].uCodePage, pLexCurrent->pszName,
+					mEncoding[iCurrentEncoding].wchLabel, mEncoding[iEncoding].wchLabel,
+					PathFindExtension(szCurFile), pLexCurrent->pszName,
 					version.dwMajorVersion, version.dwMinorVersion, version.dwBuildNumber,
 					version.szCSDVersion, arch);
 				SetClipData(hwnd, tch);
