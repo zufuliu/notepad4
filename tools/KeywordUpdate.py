@@ -12,6 +12,7 @@ def update_all_keyword():
 		('NP2LEX_BATCH', 'stlBatch.c', 'Batch.bat', 0, parse_batch_api_file),
 		('NP2LEX_CMAKE', 'stlCMake.c', 'CMake.cmake', 0, parse_cmake_api_file),
 		('NP2LEX_CSHARP', 'stlCSharp.c', 'CSharp.cs', 1, parse_csharp_api_file),
+		('NP2LEX_D', 'stlD.c', 'D.d', 1, parse_dlang_api_file),
 		('NP2LEX_DART', 'stlDart.c', 'Dart.dart', 0, parse_dart_api_file),
 		('NP2LEX_GN', 'stlGN.c', 'GN.gn', 0, parse_gn_api_file),
 		('NP2LEX_GRAPHVIZ', 'stlGraphViz.c', 'GraphViz.dot', 0, parse_graphviz_api_file),

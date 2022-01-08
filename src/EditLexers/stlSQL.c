@@ -505,7 +505,7 @@ static EDITSTYLE Styles_SQL[] = {
 	{ MULTI_STYLE(SCE_SQL_STRING, SCE_SQL_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_SQL_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_SQL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ MULTI_STYLE(SCE_SQL_HEX, SCE_SQL_HEX2, 0, 0), NP2StyleX_BlobHex, L"fore:#C08000" },
+	{ MULTI_STYLE(SCE_SQL_HEX, SCE_SQL_HEX2, 0, 0), NP2StyleX_HexString, L"fore:#C08000" },
 	{ MULTI_STYLE(SCE_SQL_BIT, SCE_SQL_BIT2, 0, 0), NP2StyleX_BitField, L"fore:#C08000" },
 	{ SCE_SQL_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
 	{ MULTI_STYLE(SCE_SQL_OPERATOR, SCE_SQL_QOPERATOR, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },

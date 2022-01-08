@@ -1134,6 +1134,13 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		}
 		break;
 
+	case SCLEX_D:
+		if ((ch == '#' || ch == '@') && iCurrentStyle == SCE_D_DEFAULT) {
+			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(ch == '#') ? 2 : 3]); // preprocessor, attribute
+			return AutoC_AddSpecWord_Finish;
+		}
+		break;
+
 	case SCLEX_DART:
 		if (ch == '@' && iCurrentStyle == SCE_DART_DEFAULT) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[4]); // metadata
@@ -2336,6 +2343,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_CPP:
 	case SCLEX_CSHARP:
 	case SCLEX_CSS: // for SCSS, LESS, HSS
+	case SCLEX_D:
 	case SCLEX_DART:
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
@@ -2484,6 +2492,7 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_CPP:
 	case SCLEX_CSHARP:
 	case SCLEX_CSS:
+	case SCLEX_D:
 	case SCLEX_DART:
 	case SCLEX_GO:
 	case SCLEX_GROOVY:

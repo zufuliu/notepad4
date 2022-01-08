@@ -7949,6 +7949,10 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *ignoreInner) {
 		*ignoreInner = SCE_CSHARP_FUNCTION_DEFINITION;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
+	case SCLEX_D: // class, function
+		*ignoreInner = SCE_D_FUNCTION_DEFINITION;
+		break;
+
 	case SCLEX_DART: // class, method
 		*ignoreInner = SCE_DART_FUNCTION_DEFINITION;
 		break;

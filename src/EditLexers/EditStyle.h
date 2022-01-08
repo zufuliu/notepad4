@@ -262,5 +262,4 @@
 #define NP2STYLE_Callback				63695
 #define NP2STYLE_Target					63696
 #define NP2STYLE_Rule					63697
-#define NP2STYLE_BlobHex				63698
 #define NP2STYLE_BitField				63699

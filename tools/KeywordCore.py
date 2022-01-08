@@ -680,6 +680,52 @@ def parse_css_api_file(pathList):
 		('values', keywordMap['values'], KeywordAttr.NoLexer),
 	]
 
+def parse_dlang_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'library':
+			keywordMap['class'] = re.findall(r'class\s+(\w+)', doc)
+			keywordMap['struct'] = re.findall(r'struct\s+(\w+)', doc)
+			keywordMap['union'] = re.findall(r'union\s+(\w+)', doc)
+			keywordMap['interface'] = re.findall(r'interface\s+(\w+)', doc)
+			keywordMap['enumeration'] = re.findall(r'enum\s+(\w+)', doc)
+		else:
+			items = doc.split()
+			if key in ('preprocessor', 'attribute'):
+				items = [item[1:] for item in items]
+			keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+		'class',
+		'struct',
+		'union',
+		'interface',
+		'trait',
+		'enumeration',
+		'constant',
+	])
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('attribute', keywordMap['attribute'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('struct', keywordMap['struct'], KeywordAttr.Default),
+		('union', keywordMap['union'], KeywordAttr.Default),
+		('interface', keywordMap['interface'], KeywordAttr.Default),
+		('trait', keywordMap['trait'], KeywordAttr.Default),
+		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
+		('constant', keywordMap['constant'], KeywordAttr.Default),
+		('asm keywords', keywordMap['asm keywords'], KeywordAttr.NoAutoComp),
+		('asm register', keywordMap['asm register'], KeywordAttr.NoAutoComp),
+		('asm instruction', keywordMap['asm instruction'], KeywordAttr.NoAutoComp),
+		('function', [], KeywordAttr.NoLexer),
+	]
+
 def parse_dart_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}

@@ -274,7 +274,6 @@
 #define NP2StyleX_Callback				EDITSTYLE_HOLE(Callback, L"Callback")
 #define NP2StyleX_Target				EDITSTYLE_HOLE(Target, L"Target")
 #define NP2StyleX_Rule					EDITSTYLE_HOLE(Rule, L"Rule")
-#define NP2StyleX_BlobHex				EDITSTYLE_HOLE(BlobHex, L"Blob Hex")
 #define NP2StyleX_BitField				EDITSTYLE_HOLE(BitField, L"Bit Field")
 
 #define EDITSTYLE_DEFAULT 				{ STYLE_DEFAULT, NP2StyleX_Default, L"" }

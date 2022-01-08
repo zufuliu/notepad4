@@ -95,7 +95,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_JAVASCRIPT	63004	// SCLEX_JAVASCRIPT	JavaScript
 #define NP2LEX_RC			63005	// SCLEX_CPP		Resource Script
 //#define NP2LEX_IDL		63006	// SCLEX_CPP		Interface Definition Language
-#define NP2LEX_D			63007	// SCLEX_CPP		D Source
+#define NP2LEX_D			63007	// SCLEX_D			D Source
 #define NP2LEX_ASYMPTOTE	63008	// SCLEX_ASYMPTOTE	Asymptote Code
 #define NP2LEX_CIL			63009	// SCLEX_CIL		CIL Assembly
 //#define NP2LEX_OBJC		63010	// SCLEX_CPP		Objective C/C++

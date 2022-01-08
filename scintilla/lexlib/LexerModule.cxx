@@ -42,6 +42,7 @@ extern LexerModule lmConf;
 extern LexerModule lmCPP;
 extern LexerModule lmCSharp;
 extern LexerModule lmCss;
+extern LexerModule lmD;
 extern LexerModule lmDart;
 extern LexerModule lmDiff;
 extern LexerModule lmFortran;
@@ -114,6 +115,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmCPP,
 	&lmCSharp,
 	&lmCss,
+	&lmD,
 	&lmDart,
 	&lmDiff,
 	&lmFortran,

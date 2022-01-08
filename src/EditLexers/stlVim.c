@@ -25,7 +25,7 @@ static EDITSTYLE Styles_VIM[] = {
 	{ MULTI_STYLE(SCE_VIM_STRING, SCE_VIM_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_VIM_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	//{ SCE_VIM_HEREDOC, NP2StyleX_HeredocString, L"fore:#648000" },
-	{ SCE_VIM_BLOB_HEX, NP2StyleX_BlobHex, L"fore:#C08000" },
+	{ SCE_VIM_BLOB_HEX, NP2StyleX_HexString, L"fore:#C08000" },
 	//{ SCE_VIM_REGEX, NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8" },
 	{ SCE_VIM_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_VIM_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },

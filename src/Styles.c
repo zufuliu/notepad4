@@ -1242,11 +1242,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[13] = KeywordAttr_NoLexer;		// C Function
 		attr[14] = KeywordAttr_NoLexer;		// C++ Function
 		break;
-	case NP2LEX_D:
-		attr[2] = KeywordAttr_NoAutoComp;	// Preprocessor
-		attr[11] = KeywordAttr_NoAutoComp;	// Assembler Intruction
-		attr[12] = KeywordAttr_NoAutoComp;	// Assembler Register
-		break;
 	case NP2LEX_HTML:
 		attr[1] = KeywordAttr_NoAutoComp;	// JavaScript
 		attr[2] = KeywordAttr_MakeLower | KeywordAttr_NoAutoComp;	// VBScript
@@ -1332,6 +1327,14 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[1] = KeywordAttr_NoLexer;		// at rules
 		attr[4] = KeywordAttr_NoLexer;		// color names
 		attr[5] = KeywordAttr_NoLexer;		// values
+		break;
+	case NP2LEX_D:
+		attr[2] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// preprocessor
+		attr[3] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// attribute
+		attr[11] = KeywordAttr_NoAutoComp;	// asm keywords
+		attr[12] = KeywordAttr_NoAutoComp;	// asm register
+		attr[13] = KeywordAttr_NoAutoComp;	// asm instruction
+		attr[14] = KeywordAttr_NoLexer;		// function
 		break;
 	case NP2LEX_DART:
 		attr[4] = KeywordAttr_NoLexer;		// metadata
