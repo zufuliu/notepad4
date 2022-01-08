@@ -674,10 +674,6 @@ NP2_inline void SciCall_StyleSetCharacterSet(int style, int characterSet) {
 	SciCall(SCI_STYLESETCHARACTERSET, style, characterSet);
 }
 
-NP2_inline void SciCall_StyleSetCase(int style, int caseVisible) {
-	SciCall(SCI_STYLESETCASE, style, caseVisible);
-}
-
 NP2_inline void SciCall_StyleSetCheckMonospaced(int style, BOOL checkMonospaced) {
 	SciCall(SCI_STYLESETCHECKMONOSPACED, style, checkMonospaced);
 }

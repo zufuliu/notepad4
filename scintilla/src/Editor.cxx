@@ -2758,8 +2758,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 	if (FlagSet(mh.modificationType, ModificationFlags::ChangeLineState)) {
 		if (paintState == PaintState::painting) {
 			CheckForChangeOutsidePaint(
-				Range(pdoc->LineStart(mh.line),
-					pdoc->LineStart(mh.line + 1)));
+				Range(mh.position, pdoc->LineStart(mh.line + 1)));
 		} else {
 			// Could check that change is before last visible line.
 			Redraw();

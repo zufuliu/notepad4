@@ -396,30 +396,6 @@ namespace {
 
 constexpr XYPOSITION epsilon = 0.0001f;	// A small nudge to avoid floating point precision issues
 
-/**
-* Return the chDoc argument with case transformed as indicated by the caseForce argument.
-* chPrevious is needed for camel casing.
-* This only affects ASCII characters and is provided for languages with case-insensitive
-* ASCII keywords where the user wishes to view keywords in a preferred case.
-*/
-constexpr char CaseForce(Style::CaseForce caseForce, char chDoc, char chPrevious) noexcept {
-	switch (caseForce) {
-	case Style::CaseForce::mixed:
-		return chDoc;
-	case Style::CaseForce::lower:
-		return MakeLowerCase(chDoc);
-	case Style::CaseForce::upper:
-		return MakeUpperCase(chDoc);
-	case Style::CaseForce::camel:
-	default:	// default should not occur, included to avoid warnings
-		if (IsUpperOrLowerCase(chDoc) && !IsUpperOrLowerCase(chPrevious)) {
-			return MakeUpperCase(chDoc);
-		} else {
-			return MakeLowerCase(chDoc);
-		}
-	}
-}
-
 enum class WrapBreak {
 	None = 0,
 	Before = 1,
@@ -496,28 +472,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 			// See if chars, styles, indicators, are all the same
 			int allSame = 0;
 			// Check base line layout
-#if 0
-			if (vstyle.someStylesForceCase) {
-				char chPrevious = '\0';
-				for (Sci::Position numCharsInLine = 0, charInDoc = posLineStart; numCharsInLine < lineLength; ++numCharsInLine, ++charInDoc) {
-					const int styleByte = model.pdoc->StyleIndexAt(charInDoc);
-					const char chDoc = model.pdoc->CharAt(charInDoc);
-					allSame |= (ll->styles[numCharsInLine] ^ styleByte)
-						| (ll->chars[numCharsInLine] ^ CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious));
-					chPrevious = chDoc;
-				}
-			} else {
-				for (Sci::Position numCharsInLine = 0, charInDoc = posLineStart; numCharsInLine < lineLength; ++numCharsInLine, ++charInDoc) {
-					allSame |= (ll->styles[numCharsInLine] ^ model.pdoc->StyleIndexAt(charInDoc))
-						| (ll->chars[numCharsInLine] ^ model.pdoc->CharAt(charInDoc));
-				}
-			}
-
-			const int styleByteLast = (posLineEnd == posLineStart) ? 0 : model.pdoc->StyleIndexAt(posLineEnd - 1);
-			allSame |= ll->styles[lineLength] ^ styleByteLast; // For eolFilled
-#else
 			const uint8_t *styles = ll->styles.get();
-			const uint8_t * const end = styles + lineLength;
 
 			if (lineLength != 0) {
 				const char *docStyles = model.pdoc->StyleRangePointer(posLineStart, lineLength);
@@ -528,24 +483,12 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 
 				const char *docChars = model.pdoc->RangePointer(posLineStart, lineLength);
 				const char *chars = ll->chars.get();
-				if (vstyle.someStylesForceCase) {
-					char chPrevious = '\0';
-					do {
-						// if styles differ, allSame is already non-zero
-						const uint8_t styleByte = *styles++;
-						const char chDoc = *docChars++;
-						allSame |= CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious) ^ *chars++;
-						chPrevious = chDoc;
-					} while (styles < end);
-				} else {
-					// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
-					allSame |= memcmp(docChars, chars, lineLength);
-				}
+				// NOLINTNEXTLINE(bugprone-suspicious-string-compare)
+				allSame |= memcmp(docChars, chars, lineLength);
 			}
 
 			const int styleByteLast = (posLineEnd == posLineStart) ? 0 : model.pdoc->StyleIndexAt(posLineEnd - 1);
-			allSame |= *end ^ styleByteLast; // For eolFilled
-#endif
+			allSame |= styles[lineLength] ^ styleByteLast; // For eolFilled
 			//const double duration = period.Duration()*1e3;
 			//printf("check line=%zd (%zd) allSame=%d, duration=%f\n", line + 1, lineLength, allSame, duration);
 			if (allSame == 0) {
@@ -574,15 +517,6 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
 		const int numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
 		const unsigned char styleByteLast = (lineLength == 0) ? 0 : ll->styles[lineLength - 1];
-		if (vstyle.someStylesForceCase) {
-			char chPrevious = '\0';
-			for (int charInLine = 0; charInLine < lineLength; charInLine++) {
-				const char chDoc = ll->chars[charInLine];
-				const int styleByte = ll->styles[charInLine];
-				ll->chars[charInLine] = CaseForce(vstyle.styles[styleByte].caseForce, chDoc, chPrevious);
-				chPrevious = chDoc;
-			}
-		}
 		ll->xHighlightGuide = 0;
 		// Extra element at the end of the line to hold end x position and act as
 		ll->chars[numCharsInLine] = 0;   // Also triggers processing in the loops as this is a control character

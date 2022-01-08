@@ -351,8 +351,7 @@ extern BOOL bUseXPFileDialog;
 #define STYLE_MASK_FORE_COLOR	(1 << 2)
 #define STYLE_MASK_BACK_COLOR	(1 << 3)
 #define STYLE_MASK_FONT_WEIGHT	(1 << 4)
-#define STYLE_MASK_FORCE_CASE	(1 << 5)
-#define STYLE_MASK_CHARSET		(1 << 6)
+#define STYLE_MASK_CHARSET		(1 << 5)
 
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
 #define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
@@ -367,7 +366,6 @@ struct DetailStyle {
 	BOOL underline;
 	BOOL strike;
 	BOOL eolFilled;
-	int forceCase;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
@@ -3610,40 +3608,6 @@ BOOL Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb) {
 
 //=============================================================================
 //
-// Style_StrGetCase()
-//
-BOOL Style_StrGetCase(LPCWSTR lpszStyle, int *forceCase) {
-	LPCWSTR p = StrStr(lpszStyle, L"case:");
-
-	if (p != NULL) {
-		p += CSTRLEN(L"case:");
-		while (*p == L' ') {
-			++p;
-		}
-		switch (*p) {
-		case L'u':
-		case L'U':
-			*forceCase = SC_CASE_UPPER;
-			return TRUE;
-		case L'l':
-		case L'L':
-			*forceCase = SC_CASE_LOWER;
-			return TRUE;
-		case L'c':
-		case L'C':
-			*forceCase = SC_CASE_CAMEL;
-			return TRUE;
-		//case L'm':
-		//case L'M':
-		//	*forceCase = SC_CASE_MIXED; // default normal case
-		//	return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-//=============================================================================
-//
 // Style_StrGetAlphaEx()
 //
 BOOL Style_StrGetAlphaEx(BOOL outline, LPCWSTR lpszStyle, int *alpha) {
@@ -3897,11 +3861,6 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 		SciCall_StyleSetEOLFilled(iStyle, TRUE);
 	}
 
-	// Case
-	if (Style_StrGetCase(lpszStyle, &iValue)) {
-		SciCall_StyleSetCase(iStyle, iValue);
-	}
-
 	// Character Set
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
 		SciCall_StyleSetCharacterSet(iStyle, iValue);
@@ -3952,12 +3911,6 @@ void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	style->strike = Style_StrGetStrike(lpszStyle);
 	// EOL Filled
 	style->eolFilled = Style_StrGetEOLFilled(lpszStyle);
-
-	// Case
-	if (Style_StrGetCase(lpszStyle, &iValue)) {
-		style->forceCase = iValue;
-		mask |= STYLE_MASK_FORCE_CASE;
-	}
 
 	// Character Set
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {

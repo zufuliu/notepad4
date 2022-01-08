@@ -363,14 +363,15 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	lineOverlap = std::clamp(lineHeight / 10, 2, lineHeight);
 
 	bool flagProtected = false;
-	bool flagForceCase = false;
+	constexpr bool flagForceCase = false;
 	for (const auto &style : styles) {
 		if (style.IsProtected()) {
 			flagProtected = true;
+			break;
 		}
-		if (style.caseForce != Style::CaseForce::mixed) {
-			flagForceCase = true;
-		}
+		//if (style.caseForce != Style::CaseForce::mixed) {
+		//	flagForceCase = true;
+		//}
 	}
 	someStylesProtected = flagProtected;
 	someStylesForceCase = flagForceCase;

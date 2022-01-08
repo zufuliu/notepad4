@@ -96,9 +96,7 @@ NP2_inline BOOL Style_StrGetBackColor(LPCWSTR lpszStyle, COLORREF *rgb) {
 	return Style_StrGetColor(FALSE, lpszStyle, rgb);
 }
 
-BOOL	Style_StrGetCase(LPCWSTR lpszStyle, int *forceCase);
 BOOL	Style_StrGetAlphaEx(BOOL outline, LPCWSTR lpszStyle, int *alpha);
-
 NP2_inline BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
 	return Style_StrGetAlphaEx(FALSE, lpszStyle, alpha);
 }

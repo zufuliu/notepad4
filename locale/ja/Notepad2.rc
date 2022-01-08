@@ -2154,7 +2154,7 @@ BEGIN
 \r\n\
 設定書式: 各指定は省略可能\r\n\
 \tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic; underline; strike;\r\n\
-\tcharset:dd; locale:Name; case:[Upper|Lower|Camel];\r\n\
+\tcharset:dd; locale:Name;\r\n\
 \tfore:#RRGGBB; back:#RRGGBB; alpha:aa; outline:aa; eolfilled;\r\n\
 \r\n\
 コピーペーストやドラッグドロップでも指定を変更できます。\r\n\
