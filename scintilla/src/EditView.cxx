@@ -2498,6 +2498,7 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 	}
 }
 
+#if 0
 static void DrawFoldLines(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 	Sci::Line line, PRectangle rcLine, int subLine) {
 	const bool lastSubLine = subLine == (ll->lines - 1);
@@ -2536,6 +2537,7 @@ static void DrawFoldLines(Surface *surface, const EditModel &model, const ViewSt
 		}
 	}
 }
+#endif
 
 void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectangle rcArea,
 	PRectangle rcClient, const ViewStyle &vsDraw) {
@@ -2588,13 +2590,11 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 #endif
 		const bool bracesIgnoreStyle = ((vsDraw.braceHighlightIndicatorSet && (model.bracesMatchStyle == StyleBraceLight)) ||
 			(vsDraw.braceBadLightIndicatorSet && (model.bracesMatchStyle == StyleBraceBad)));
-		const bool needDrawFoldLines = FlagSet(model.foldFlags, (FoldFlag::LineBeforeExpanded | FoldFlag::LineBeforeContracted
-			| FoldFlag::LineAfterExpanded | FoldFlag::LineAfterContracted));
 
 		Sci::Line lineDocPrevious = -1;	// Used to avoid laying out one document line multiple times
 		LineLayout *ll = nullptr;
 		int phaseCount;
-		DrawPhase phases[MaxDrawPhaseCount];
+		DrawPhase phases[8];
 		if ((phasesDraw == PhasesDraw::Multiple) && !bufferedDraw) {
 			phases[0] = DrawPhase::back;
 			phases[1] = DrawPhase::indicatorsBack;
@@ -2603,17 +2603,10 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 			phases[4] = DrawPhase::indicatorsFore;
 			phases[5] = DrawPhase::selectionTranslucent;
 			phases[6] = DrawPhase::lineTranslucent;
-			phases[7] = DrawPhase::foldLines;
-			phases[8] = DrawPhase::carets;
-			if (needDrawFoldLines) {
-				phaseCount = 9;
-			} else {
-				phaseCount = 8;
-				phases[7] = DrawPhase::carets;
-			}
+			phases[7] = DrawPhase::carets;
+			phaseCount = 8;
 		} else {
-			phases[0] = needDrawFoldLines ? DrawPhase::all :
-				static_cast<DrawPhase>(static_cast<int>(DrawPhase::all) & ~static_cast<int>(DrawPhase::foldLines));
+			phases[0] = DrawPhase::all;
 			phaseCount = 1;
 		}
 
@@ -2679,11 +2672,11 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 #endif
 					// Restore the previous styles for the brace highlights in case layout is in cache.
 					ll->RestoreBracesHighlight(rangeLine, model.braces, bracesIgnoreStyle);
-
+#if 0
 					if (FlagSet(phase, DrawPhase::foldLines)) {
 						DrawFoldLines(surface, model, vsDraw, ll, lineDoc, rcLine, subLine);
 					}
-
+#endif
 					if (FlagSet(phase, DrawPhase::carets)) {
 						DrawCarets(surface, model, vsDraw, ll, lineDoc, xStart, rcLine, subLine);
 					}
