@@ -2276,6 +2276,8 @@ BOOL IsIMEInNativeMode(void) {
 }
 
 void MsgNotifyZoom(void) {
+	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
+	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 	iZoomLevel = SciCall_GetZoom();
 
 #if 0
@@ -2293,7 +2295,8 @@ void MsgNotifyZoom(void) {
 	UpdateLineNumberWidth();
 	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
-	EditEnsureSelectionVisible();
+	SciCall_SetFirstVisibleLine(iVisTopLine);
+	SciCall_EnsureVisible(iDocTopLine);
 	UpdateStatusbar();
 }
 

@@ -491,6 +491,10 @@ NP2_inline Sci_Line SciCall_GetFirstVisibleLine(void) {
 	return SciCall(SCI_GETFIRSTVISIBLELINE, 0, 0);
 }
 
+NP2_inline Sci_Line SciCall_SetFirstVisibleLine(Sci_Line displayLine) {
+	return SciCall(SCI_SETFIRSTVISIBLELINE, displayLine, 0);
+}
+
 NP2_inline void SciCall_SetXOffset(int xOffset) {
 	SciCall(SCI_SETXOFFSET, xOffset, 0);
 }
