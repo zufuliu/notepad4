@@ -198,7 +198,8 @@ public:
 
 class Representation {
 public:
-	static constexpr size_t maxLength = 200;
+	// for Unicode control or format characters in BMP
+	static constexpr size_t maxLength = 7;
 	std::string stringRep;
 	RepresentationAppearance appearance;
 	ColourRGBA colour;

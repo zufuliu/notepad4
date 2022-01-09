@@ -266,12 +266,12 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	EscapeSequence escSeq;
 
 	// for delimited strings
-	std::string delimiters;
+	std::string delimiterID;
 	int delimiterChar = 0;
 	int matchingDelimiter = 0;
 
 	if (startPos != 0) {
-		// backtrack to restore delimiters
+		// backtrack to restore delimiter
 		BacktrackToStart(styler, DLineStateMaskDelimitedString, startPos, lengthDoc, initStyle);
 	}
 
@@ -480,13 +480,13 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_D_DELIMITED_ID:
 			if (!IsIdentifierCharEx(sc.ch)) {
-				delimiters = styler.GetRange(styler.GetStartSegment(), sc.currentPos);
+				delimiterID = styler.GetRange(styler.GetStartSegment(), sc.currentPos);
 				sc.ChangeState(SCE_D_DELIMITED_STRING);
 			}
 			break;
 
 		case SCE_D_DELIMITED_STRING:
-			if (delimiters.empty()) {
+			if (delimiterID.empty()) {
 				if (sc.ch == matchingDelimiter) {
 					if (delimiterChar != matchingDelimiter) {
 						--nestedLevel;
@@ -503,8 +503,8 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					++nestedLevel;
 				}
 			} else if (sc.atLineStart) {
-				if (sc.GetRelative(delimiters.length()) == '\"' && sc.Match(delimiters.c_str())) {
-					sc.Advance(delimiters.length());
+				if (sc.GetRelative(delimiterID.length()) == '\"' && sc.Match(delimiterID.c_str())) {
+					sc.Advance(delimiterID.length());
 					sc.Forward();
 					if (IsDStringPostfix(sc.ch)) {
 						sc.Forward();
@@ -558,7 +558,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				sc.Forward(2);
 				insideUrl = false;
 				nestedLevel = 0;
-				delimiters.clear();
+				delimiterID.clear();
 				delimiterChar = sc.ch;
 				matchingDelimiter = GetMatchingDelimiter(delimiterChar);
 				if (delimiterChar != matchingDelimiter) {

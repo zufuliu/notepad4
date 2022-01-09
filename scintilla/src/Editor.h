@@ -303,7 +303,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void Initialise() noexcept = 0;
 	virtual void Finalise() noexcept;
 
-	void InvalidateStyleData();
+	void InvalidateStyleData() noexcept;
 	void InvalidateStyleRedraw();
 	void RefreshStyleData();
 	void SetRepresentations();

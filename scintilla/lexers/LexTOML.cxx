@@ -77,23 +77,25 @@ bool IsTOMLKey(StyleContext& sc, int braceCount, const WordList *kwList) {
 	return false;
 }
 
-enum {
-	TOMLLineType_None = 0,
-	TOMLLineType_Table = 1,
-	TOMLLineType_CommentLine = 2,
+enum class TOMLLineType {
+	None = 0,
+	Table,
+	CommentLine,
+};
 
-	TOMLKeyState_Unquoted = 0,
-	TOMLKeyState_Literal = 1,
-	TOMLKeyState_Quoted = 2,
-	TOMLKeyState_End = 3,
+enum class TOMLKeyState {
+	Unquoted = 0,
+	Literal,
+	Quoted,
+	End,
 };
 
 void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int visibleChars = 0;
 	int tableLevel = 0;
 	int braceCount = 0;
-	int lineType = TOMLLineType_None;
-	int keyState = TOMLKeyState_Unquoted;
+	TOMLLineType lineType = TOMLLineType::None;
+	TOMLKeyState keyState = TOMLKeyState::Unquoted;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -145,28 +147,28 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_TOML_DEFAULT);
 			} else {
 				switch (keyState) {
-				case TOMLKeyState_Literal:
+				case TOMLKeyState::Literal:
 					if (sc.ch == '\'') {
 						sc.Forward();
-						keyState = TOMLKeyState_Unquoted;
+						keyState = TOMLKeyState::Unquoted;
 					}
 					break;
-				case TOMLKeyState_Quoted:
+				case TOMLKeyState::Quoted:
 					if (sc.ch == '\\') {
 						sc.Forward();
 					} else if (sc.ch == '\"') {
 						sc.Forward();
-						keyState = TOMLKeyState_Unquoted;
+						keyState = TOMLKeyState::Unquoted;
 					}
 					break;
 				default:
 					break;
 				}
-				if (keyState == TOMLKeyState_Unquoted) {
+				if (keyState == TOMLKeyState::Unquoted) {
 					if (sc.ch == '\'') {
-						keyState = TOMLKeyState_Literal;
+						keyState = TOMLKeyState::Literal;
 					} else if (sc.ch == '\"') {
-						keyState = TOMLKeyState_Quoted;
+						keyState = TOMLKeyState::Quoted;
 					} else if (sc.ch == '.') {
 						if (sc.state == SCE_TOML_KEY) {
 							sc.SetState(SCE_TOML_OPERATOR);
@@ -175,10 +177,10 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							++tableLevel;
 						}
 					} else if (sc.state == SCE_TOML_KEY && sc.ch == '=') {
-						keyState = TOMLKeyState_End;
+						keyState = TOMLKeyState::End;
 						sc.SetState(SCE_TOML_OPERATOR);
 					} else if (sc.state == SCE_TOML_TABLE && sc.ch == ']') {
-						keyState = TOMLKeyState_End;
+						keyState = TOMLKeyState::End;
 						sc.Forward();
 						if (sc.ch == ']') {
 							sc.Forward();
@@ -273,21 +275,21 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (visibleChars == 0 && !braceCount) {
 				if (sc.ch == '#') {
 					sc.SetState(SCE_TOML_COMMENT);
-					lineType = TOMLLineType_CommentLine;
+					lineType = TOMLLineType::CommentLine;
 				} else if (sc.ch == '[') {
 					tableLevel = 0;
 					sc.SetState(SCE_TOML_TABLE);
 					if (sc.chNext == '[') {
 						sc.Forward();
 					}
-					keyState = TOMLKeyState_Unquoted;
-					lineType = TOMLLineType_Table;
+					keyState = TOMLKeyState::Unquoted;
+					lineType = TOMLLineType::Table;
 				} else if (sc.ch == '\'' || sc.ch == '\"') {
 					sc.SetState(SCE_TOML_KEY);
-					keyState = (sc.ch == '\'')? TOMLKeyState_Literal : TOMLKeyState_Quoted;
+					keyState = (sc.ch == '\'')? TOMLKeyState::Literal : TOMLKeyState::Quoted;
 				} else if (IsTOMLUnquotedKey(sc.ch)) {
 					sc.SetState(SCE_TOML_KEY);
-					keyState = TOMLKeyState_Unquoted;
+					keyState = TOMLKeyState::Unquoted;
 				} else if (!isspacechar(sc.ch)) {
 					// each line must be: key = value
 					sc.SetState(SCE_TOML_ERROR);
@@ -296,7 +298,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.ch == '#') {
 					sc.SetState(SCE_TOML_COMMENT);
 					if (visibleChars == 0) {
-						lineType = TOMLLineType_CommentLine;
+						lineType = TOMLLineType::CommentLine;
 					}
 				} else if (sc.ch == '\'') {
 					if (sc.MatchNext('\'', '\'')) {
@@ -326,7 +328,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else if (braceCount && IsTOMLUnquotedKey(sc.ch)) {
 					// Inline Table
 					sc.SetState(SCE_TOML_KEY);
-					keyState = TOMLKeyState_Unquoted;
+					keyState = TOMLKeyState::Unquoted;
 				}
 			}
 		}
@@ -335,12 +337,12 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			++visibleChars;
 		}
 		if (sc.atLineEnd) {
-			const int lineState = (tableLevel << 2) | (braceCount << 10) | lineType;
+			const int lineState = (tableLevel << 2) | (braceCount << 10) | static_cast<int>(lineType);
 			styler.SetLineState(sc.currentLine, lineState);
-			lineType = TOMLLineType_None;
+			lineType = TOMLLineType::None;
 			visibleChars = 0;
 			tableLevel = 0;
-			keyState = TOMLKeyState_Unquoted;
+			keyState = TOMLKeyState::Unquoted;
 		}
 		sc.Forward();
 	}
@@ -348,8 +350,8 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	sc.Complete();
 }
 
-constexpr int GetLineType(int lineState) noexcept {
-	return lineState & 3;
+constexpr TOMLLineType GetLineType(int lineState) noexcept {
+	return static_cast<TOMLLineType>(lineState & 3);
 }
 
 constexpr int GetTableLevel(int lineState) noexcept {
@@ -368,17 +370,17 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	bool prev2Comment = false;
 	if (lineCurrent > 0) {
 		prevLevel = styler.LevelAt(lineCurrent - 1);
-		prevComment = GetLineType(styler.GetLineState(lineCurrent - 1)) == TOMLLineType_CommentLine;
-		prev2Comment = lineCurrent > 1 && GetLineType(styler.GetLineState(lineCurrent - 2)) == TOMLLineType_CommentLine;
+		prevComment = GetLineType(styler.GetLineState(lineCurrent - 1)) == TOMLLineType::CommentLine;
+		prev2Comment = lineCurrent > 1 && GetLineType(styler.GetLineState(lineCurrent - 2)) == TOMLLineType::CommentLine;
 	}
 
 	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
 	while (lineCurrent <= maxLines) {
 		int nextLevel;
 		const int lineState = styler.GetLineState(lineCurrent);
-		const int lineType = GetLineType(lineState);
+		const TOMLLineType lineType = GetLineType(lineState);
 
-		const bool currentComment = lineType == TOMLLineType_CommentLine;
+		const bool currentComment = lineType == TOMLLineType::CommentLine;
 		if (currentComment) {
 			commentHead = !prevComment;
 			if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
@@ -388,7 +390,7 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			}
 			nextLevel |= commentHead ? SC_FOLDLEVELHEADERFLAG : 0;
 		} else {
-			if (lineType == TOMLLineType_Table) {
+			if (lineType == TOMLLineType::Table) {
 				nextLevel = SC_FOLDLEVELBASE + GetTableLevel(lineState);
 				if (prevComment && prevLevel <= nextLevel) {
 					// comment above nested table

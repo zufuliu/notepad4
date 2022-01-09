@@ -51,13 +51,13 @@ struct EscapeSequence {
 	}
 };
 
-enum {
-	GoFunction_None = 0,
-	GoFunction_Define,
-	GoFunction_Caller,
-	GoFunction_Name,
-	GoFunction_Param,
-	GoFunction_Return,
+enum class GoFunction {
+	None = 0,
+	Define,
+	Caller,
+	Name,
+	Param,
+	Return,
 };
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
@@ -160,9 +160,9 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	return 0;
 }
 
-inline int DetectIdentifierType(LexAccessor &styler, int funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
-	if (((funcState == GoFunction_Caller || funcState == GoFunction_Return) && (chNext == ')' || chNext == ','))
-		|| (funcState > GoFunction_Name && chNext == '{')) {
+inline int DetectIdentifierType(LexAccessor &styler, GoFunction funcState, int chNext, Sci_Position startPos, Sci_Position lineStartCurrent) noexcept {
+	if (((funcState == GoFunction::Caller || funcState == GoFunction::Return) && (chNext == ')' || chNext == ','))
+		|| (funcState > GoFunction::Name && chNext == '{')) {
 		// func (identifier *Type) (Type, error)
 		// func (identifier Type) Type
 		return SCE_GO_TYPE;
@@ -228,7 +228,7 @@ inline int DetectIdentifierType(LexAccessor &styler, int funcState, int chNext, 
 
 void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineComment = 0;
-	int funcState = GoFunction_None;
+	GoFunction funcState = GoFunction::None;
 	int kwType = SCE_GO_DEFAULT;
 
 	int visibleChars = 0;
@@ -261,7 +261,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_GO_WORD);
 					if (StrEqual(s, "func")) {
-						funcState = (visibleChars == 4)? GoFunction_Define : GoFunction_Param;
+						funcState = (visibleChars == 4)? GoFunction::Define : GoFunction::Param;
 					} else if (StrEqual(s, "type")) {
 						kwType = SCE_GO_TYPE;
 					} else if (StrEqual(s, "const")) {
@@ -300,8 +300,8 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(SCE_GO_LABEL);
 						}
 					} else if (chNext == '(') {
-						if (funcState != GoFunction_None) {
-							funcState = GoFunction_Name;
+						if (funcState != GoFunction::None) {
+							funcState = GoFunction::Name;
 							sc.ChangeState(SCE_GO_FUNCTION_DEFINITION);
 						} else {
 							sc.ChangeState(SCE_GO_FUNCTION);
@@ -445,38 +445,38 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_GO_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_GO_OPERATOR);
-				if (funcState != GoFunction_None) {
+				if (funcState != GoFunction::None) {
 					switch (sc.ch) {
 					case '(':
 						switch (funcState) {
-						case GoFunction_Define:
-							funcState = GoFunction_Caller;
+						case GoFunction::Define:
+							funcState = GoFunction::Caller;
 							break;
-						case GoFunction_Caller:
-						case GoFunction_Name:
-							funcState = GoFunction_Param;
+						case GoFunction::Caller:
+						case GoFunction::Name:
+							funcState = GoFunction::Param;
 							break;
-						case GoFunction_Param:
-							funcState = GoFunction_Return;
+						case GoFunction::Param:
+							funcState = GoFunction::Return;
 							break;
 						default:
 							break;
 						}
 						break;
 					case ')':
-						if (funcState == GoFunction_Param) {
-							funcState = GoFunction_Return;
+						if (funcState == GoFunction::Param) {
+							funcState = GoFunction::Return;
 						}
 						break;
 					case '{':
 						if (!(sc.chPrev == 'e' && sc.chNext == '}')) {
 							// interface{}
-							funcState = GoFunction_None;
+							funcState = GoFunction::None;
 						}
 						break;
 					}
 				} else if (sc.ch == ')' && IsASpaceOrTab(sc.chNext) && sc.GetLineNextChar(true) == '(') {
-					funcState = GoFunction_Return;
+					funcState = GoFunction::Return;
 				}
 			}
 		}
@@ -489,7 +489,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			lineStateLineComment = 0;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
-			funcState = GoFunction_None;
+			funcState = GoFunction::None;
 			lineStartCurrent = sc.lineStartNext;
 			identifierStartPos = 0;
 		}

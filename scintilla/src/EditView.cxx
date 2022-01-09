@@ -1926,7 +1926,7 @@ static void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, c
 // such that, if the caret is inside the main selection, the beginning or end of that selection
 // is at the end of a text segment.
 // This function should only be called if iDoc is within the main selection.
-static InSelection CharacterInCursesSelection(Sci::Position iDoc, const EditModel &model, const ViewStyle &vsDraw) {
+static InSelection CharacterInCursesSelection(Sci::Position iDoc, const EditModel &model, const ViewStyle &vsDraw) noexcept {
 	const SelectionPosition &posCaret = model.sel.RangeMain().caret;
 	const bool caretAtStart = posCaret < model.sel.RangeMain().anchor && posCaret.Position() == iDoc;
 	const bool caretAtEnd = posCaret > model.sel.RangeMain().anchor &&

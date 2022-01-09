@@ -28,10 +28,12 @@ enum {
 	AviSynthLineStateMaskLineComment = (1 << 0),
 	AviSynthLineStateMaskLineContinuation = (1 << 1),
 	AviSynthLineStateMaskInsideScript = (1 << 2),
+};
 
-	ScriptEvalState_None = 0,
-	ScriptEvalState_Name = 1,
-	ScriptEvalState_Paren = 2,
+enum class ScriptEvalState {
+	None = 0,
+	Name,
+	Paren,
 };
 
 constexpr int GetLineCommentState(int lineState) noexcept {
@@ -49,7 +51,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	int commentLevel = 0;
 	int lineContinuation = 0;
 	int insideScript = 0;
-	int scriptEval = ScriptEvalState_None;
+	ScriptEvalState scriptEval = ScriptEvalState::None;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
@@ -84,7 +86,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (!IsIdentifierChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s));
-				scriptEval = ScriptEvalState_None;
+				scriptEval = ScriptEvalState::None;
 				if (keywordLists[0]->InList(s)) {
 					sc.ChangeState(SCE_AVS_KEYWORD);
 				} else if (sc.GetLineNextChar() == '(') {
@@ -92,7 +94,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					if (keywordLists[1]->InListPrefixed(s, '(')) {
 						state = SCE_AVS_FUNCTION;
 						if (!insideScript && StrEqualsAny(s, "eval", "gscript", "geval")) {
-							scriptEval = ScriptEvalState_Name;
+							scriptEval = ScriptEvalState::Name;
 						}
 					} else if (keywordLists[2]->InListPrefixed(s, '(')) {
 						state = SCE_AVS_FILTER;
@@ -192,7 +194,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_AVS_TRIPLESTRING);
 					sc.Advance(2);
-					if (scriptEval == ScriptEvalState_Paren) {
+					if (scriptEval == ScriptEvalState::Paren) {
 						// first argument
 						insideScript = AviSynthLineStateMaskInsideScript;
 					}
@@ -215,11 +217,11 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_AVS_OPERATOR);
 			}
-			if (scriptEval && !isspacechar(sc.ch)) {
-				if (sc.ch == '(' && scriptEval == ScriptEvalState_Name) {
-					scriptEval = ScriptEvalState_Paren;
+			if (scriptEval != ScriptEvalState::None && !isspacechar(sc.ch)) {
+				if (sc.ch == '(' && scriptEval == ScriptEvalState::Name) {
+					scriptEval = ScriptEvalState::Paren;
 				} else {
-					scriptEval = ScriptEvalState_None;
+					scriptEval = ScriptEvalState::None;
 				}
 			}
 		}
@@ -232,7 +234,7 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			styler.SetLineState(sc.currentLine, lineState);
 			visibleChars = 0;
 			visibleCharsBefore = 0;
-			scriptEval = ScriptEvalState_None;
+			scriptEval = ScriptEvalState::None;
 			if (!lineContinuation) {
 				lineStateLineComment = 0;
 			}

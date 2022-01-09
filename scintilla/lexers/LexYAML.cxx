@@ -127,19 +127,19 @@ bool IsYAMLTextBlockEnd(int state, int &indentCount, int textIndentCount,
 	return true;
 }
 
-enum {
-	YAMLLineType_None = 0,
-	YAMLLineType_EmptyLine = 1,
-	YAMLLineType_CommentLine = 2,
-	YAMLLineType_BlockSequence = 3,
+enum class YAMLLineType {
+	None = 0,
+	EmptyLine,
+	CommentLine,
+	BlockSequence,
 };
 
 constexpr int GetIndentCount(int lineState) noexcept {
 	return lineState >> 19;
 }
 
-constexpr int GetLineType(int lineState) noexcept {
-	return lineState & 3;
+constexpr YAMLLineType GetLineType(int lineState) noexcept {
+	return static_cast<YAMLLineType>(lineState & 3);
 }
 
 void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -150,7 +150,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	int indentBefore = 0;
 	int textIndentCount = 0;
 	int braceCount = 0;
-	int lineType = YAMLLineType_None;
+	YAMLLineType lineType = YAMLLineType::None;
 	int lineStatePrev = 0;
 	EscapeSequence escSeq;
 
@@ -329,9 +329,9 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_YAML_DIRECTIVE);
 			} else if (sc.ch == '#' && (visibleChars == 0 || isspacechar(sc.chPrev))) {
 				sc.SetState(SCE_YAML_COMMENT);
-				if (visibleChars == 0 && lineType == YAMLLineType_None) {
+				if (visibleChars == 0 && lineType == YAMLLineType::None) {
 					indentCount = 0;
-					lineType = YAMLLineType_CommentLine;
+					lineType = YAMLLineType::CommentLine;
 				}
 			} else if (sc.atLineStart && (sc.Match('-', '-', '-') || sc.Match('.', '.', '.'))) {
 				// reset document state
@@ -361,7 +361,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == '|' || sc.ch == '>') {
 				// ignore block scalar header or comment
-				if (lineType == YAMLLineType_BlockSequence) {
+				if (lineType == YAMLLineType::BlockSequence) {
 					textIndentCount = hasKey ? indentCount : indentBefore;
 					++textIndentCount;
 				} else {
@@ -383,11 +383,11 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if ((sc.ch == '-' && isspacechar(sc.chNext))) {
 					sc.SetState(SCE_YAML_OPERATOR);
 					sc.ForwardSetState(SCE_YAML_DEFAULT);
-					if (visibleChars == 0 && lineType == YAMLLineType_None) {
+					if (visibleChars == 0 && lineType == YAMLLineType::None) {
 						// spaces after '-' are indentation white space when '- ' followed by key.
 						indentBefore = indentCount;
 						indentEnded = false;
-						lineType = YAMLLineType_BlockSequence;
+						lineType = YAMLLineType::BlockSequence;
 					} else {
 						++visibleChars;
 					}
@@ -416,13 +416,13 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 		if (sc.atLineEnd) {
 			if (sc.state == SCE_YAML_TEXT && !braceCount) {
-				if (lineType == YAMLLineType_BlockSequence) {
+				if (lineType == YAMLLineType::BlockSequence) {
 					textIndentCount = hasKey ? indentCount : indentBefore;
 					++textIndentCount;
 				} else {
 					textIndentCount = indentCount;
 				}
-			} else if (lineType == YAMLLineType_BlockSequence) {
+			} else if (lineType == YAMLLineType::BlockSequence) {
 				// temporary fix for unindented block sequence:
 				// children content should be indented at least two levels (for '- ') greater than current line,
 				// thus increase one indentation level doesn't break code folding.
@@ -431,12 +431,12 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (visibleChars == 0 && !(sc.state == SCE_YAML_BLOCK_SCALAR || sc.state == SCE_YAML_INDENTED_TEXT)) {
 				indentCount = 0;
-				lineType = YAMLLineType_EmptyLine;
+				lineType = YAMLLineType::EmptyLine;
 			}
 
-			lineStatePrev = (braceCount << 2) | (textIndentCount << 10) | (indentCount << 19) | lineType;
+			lineStatePrev = (braceCount << 2) | (textIndentCount << 10) | (indentCount << 19) | static_cast<int>(lineType);
 			styler.SetLineState(sc.currentLine, lineStatePrev);
-			lineType = YAMLLineType_None;
+			lineType = YAMLLineType::None;
 		}
 		sc.Forward();
 	}
@@ -446,13 +446,13 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 struct FoldLineState {
 	int indentCount;
-	int lineType;
+	YAMLLineType lineType;
 	constexpr explicit FoldLineState(int lineState) noexcept:
 		indentCount(GetIndentCount(lineState)),
 		lineType(GetLineType(lineState)) {
 	}
 	constexpr bool Empty() const noexcept {
-		return lineType == YAMLLineType_EmptyLine || lineType == YAMLLineType_CommentLine;
+		return lineType == YAMLLineType::EmptyLine || lineType == YAMLLineType::CommentLine;
 	}
 };
 
@@ -500,21 +500,21 @@ void FoldYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			const int levelAfterBlank = stateNext.indentCount;
 			const int skipLevel = levelAfterBlank + SC_FOLDLEVELBASE;
 
-			int prevLineType = stateCurrent.lineType;
-			int nextLineType = GetLineType(styler.GetLineState(lineCurrent));
+			YAMLLineType prevLineType = stateCurrent.lineType;
+			YAMLLineType nextLineType = GetLineType(styler.GetLineState(lineCurrent));
 			int prevLevel = skipLevel;
 			// comment on first line
-			if (prevLineType == YAMLLineType_CommentLine) {
+			if (prevLineType == YAMLLineType::CommentLine) {
 				nextLineType = prevLineType;
-				prevLineType = YAMLLineType_None;
+				prevLineType = YAMLLineType::None;
 				--lineCurrent;
 			}
 			for (; lineCurrent < lineNext; lineCurrent++) {
 				int level = skipLevel;
-				const int currentLineType = nextLineType;
+				const YAMLLineType currentLineType = nextLineType;
 				nextLineType = GetLineType(styler.GetLineState(lineCurrent + 1));
-				if (currentLineType == YAMLLineType_CommentLine) {
-					if (nextLineType == YAMLLineType_CommentLine && prevLineType != YAMLLineType_CommentLine) {
+				if (currentLineType == YAMLLineType::CommentLine) {
+					if (nextLineType == YAMLLineType::CommentLine && prevLineType != YAMLLineType::CommentLine) {
 						level |= SC_FOLDLEVELHEADERFLAG;
 					} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
 						level++;
