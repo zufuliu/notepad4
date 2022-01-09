@@ -4640,17 +4640,18 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > iMaxLine) {
-		SciCall_DocumentEnd();
-		return;
+		iNewCol = SciCall_GetLength();
+		if (iNewCol != 0) {
+			--iNewCol;
+		}
+	} else {
+		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine - 1);
+		iNewCol = min_pos(iNewCol, iLineEndPos);
+		iNewCol = SciCall_FindColumn(iNewLine - 1, iNewCol - 1);
 	}
 
-	const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine - 1);
-	iNewCol = min_pos(iNewCol, iLineEndPos);
-	const Sci_Position iNewPos = SciCall_FindColumn(iNewLine - 1, iNewCol - 1);
-	// SciCall_GotoPos(pos) is equivalent to SciCall_SetSel(-1, pos)
-	EditSelectEx(INVALID_POSITION, iNewPos);
+	EditSelectEx(iNewCol, iNewCol);
 	SciCall_ChooseCaretX();
-	EditEnsureSelectionVisible();
 }
 
 //=============================================================================
@@ -4658,22 +4659,26 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 // EditSelectEx()
 //
 void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
+	const BOOL same = iAnchorPos == iCurrentPos;
 	const Sci_Line iNewLine = SciCall_LineFromPosition(iCurrentPos);
-	const Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
+	const Sci_Line iAnchorLine = same? iNewLine : SciCall_LineFromPosition(iAnchorPos);
 
+	SciCall_EnsureVisible(iAnchorLine);
 	if (iAnchorLine == iNewLine) {
 		// TODO: center current line on screen when it's not visible
-		SciCall_EnsureVisible(iAnchorLine);
 	} else {
 		// Ensure that the first and last lines of a selection are always unfolded
 		// This needs to be done *before* the SciCall_SetSel() message
-		SciCall_EnsureVisible(iAnchorLine);
 		SciCall_EnsureVisible(iNewLine);
 	}
 
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-	SciCall_SetSel(iAnchorPos, iCurrentPos);
+	if (same) {
+		SciCall_GotoPos(iCurrentPos);
+	} else {
+		SciCall_SetSel(iAnchorPos, iCurrentPos);
+	}
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
 }
@@ -6335,7 +6340,8 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 			// directly goto specific position
 			if (fTranslated2 && !fTranslated) {
 				if (iNewCol > 0 && iNewCol <= iLength) {
-					SciCall_GotoPos(iNewCol - 1);
+					--iNewCol;
+					EditSelectEx(iNewCol, iNewCol);
 					SciCall_ChooseCaretX();
 					EndDialog(hwnd, IDOK);
 				} else {

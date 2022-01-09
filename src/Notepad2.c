@@ -936,14 +936,13 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 					SciCall_DocumentEnd();
 				}
 				EditFindPrev(&efrData, FALSE);
-				EditEnsureSelectionVisible();
 			} else {
 				if (!flagJumpTo) {
 					SciCall_DocumentStart();
 				}
 				EditFindNext(&efrData, FALSE);
-				EditEnsureSelectionVisible();
 			}
+			EditEnsureSelectionVisible();
 		}
 		LocalFree(lpMatchArg);
 	}
@@ -1426,8 +1425,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				iWeakSrcEncoding = iCurrentEncoding;
 				if (FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile)) {
 					if (bIsTail) {
-						SciCall_DocumentEnd();
-						EditEnsureSelectionVisible();
+						EditJumpTo(INVALID_POSITION, 0);
 					}
 				}
 			}
