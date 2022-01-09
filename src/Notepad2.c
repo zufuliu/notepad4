@@ -845,7 +845,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				bFileLoadCalled = TRUE;
 				if (flagJumpTo) { // Jump to position
 					EditJumpTo(iInitialLine, iInitialColumn);
-					EditEnsureSelectionVisible();
 				}
 			}
 		}
@@ -901,8 +900,9 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			autoCompletionConfig.bIndentText = back;
 			if (flagJumpTo) {
 				EditJumpTo(iInitialLine, iInitialColumn);
+			} else {
+				EditEnsureSelectionVisible();
 			}
-			EditEnsureSelectionVisible();
 		}
 	}
 
@@ -1326,7 +1326,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					params->iInitialLine = 1;
 				}
 				EditJumpTo(params->iInitialLine, params->iInitialColumn);
-				EditEnsureSelectionVisible();
 			}
 
 			flagLexerSpecified = 0;
@@ -2022,6 +2021,8 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
+	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
+	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -2034,7 +2035,8 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateLineNumberWidth();
 	UpdateBookmarkMarginWidth();
 	UpdateFoldMarginWidth();
-	EditEnsureSelectionVisible();
+	SciCall_SetFirstVisibleLine(iVisTopLine);
+	SciCall_EnsureVisible(iDocTopLine);
 	UpdateToolbar();
 	UpdateStatusbar();
 }
@@ -3946,20 +3948,26 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		Style_SetDefaultFont(hwndEdit, LOWORD(wParam) == IDM_VIEW_DEFAULT_CODE_FONT);
 		break;
 
-	case IDM_VIEW_WORDWRAP:
+	case IDM_VIEW_WORDWRAP: {
 		fWordWrapG = fvCurFile.fWordWrap = !fvCurFile.fWordWrap;
+		const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
+		const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 		SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
-		EditEnsureSelectionVisible();
+		SciCall_SetFirstVisibleLine(iVisTopLine);
+		SciCall_EnsureVisible(iDocTopLine);
 		UpdateToolbar();
-		break;
+	} break;
 
 	case IDM_VIEW_WORDWRAPSETTINGS:
 		if (WordWrapSettingsDlg(hwnd)) {
+			const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
+			const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
 			SciCall_SetMarginOptions(bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE);
 			EditSetWrapIndentMode(fvCurFile.iTabWidth, fvCurFile.iIndentWidth);
 			SetWrapVisualFlags();
-			EditEnsureSelectionVisible();
+			SciCall_SetFirstVisibleLine(iVisTopLine);
+			SciCall_EnsureVisible(iDocTopLine);
 			UpdateToolbar();
 		}
 		break;
@@ -7235,7 +7243,7 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			iVisTopLine = SciCall_GetFirstVisibleLine();
 			iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			iXOffset = SciCall_GetXOffset();
-			bRestoreView = iLine > 1 || iCol > 1;
+			bRestoreView = TRUE;
 			keepTitleExcerpt = 1;
 			keepCurrentLexer = TRUE;
 		}
@@ -7435,7 +7443,6 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 					SciCall_LineScroll(0, iVisTopLine - iNewTopLine);
 					SciCall_SetXOffset(iXOffset);
 				}
-				EditEnsureSelectionVisible();
 			}
 		}
 

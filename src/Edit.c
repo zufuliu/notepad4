@@ -4650,6 +4650,7 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 	// SciCall_GotoPos(pos) is equivalent to SciCall_SetSel(-1, pos)
 	EditSelectEx(INVALID_POSITION, iNewPos);
 	SciCall_ChooseCaretX();
+	EditEnsureSelectionVisible();
 }
 
 //=============================================================================
