@@ -50,10 +50,80 @@ struct EscapeSequence {
 	}
 };
 
+constexpr bool IsFormatSpecifier(char ch) noexcept {
+	// copied from LexAwk
+	return AnyOf(ch, 'a', 'A',
+					'c',
+					'd',
+					'e', 'E',
+					'f', 'F',
+					'g', 'G',
+					'i',
+					'o',
+					's',
+					'u',
+					'x', 'X');
+}
+
+// https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/sprintf
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+	if (sc.chNext == '%') {
+		return 2;
+	}
+	if (insideUrl && IsHexDigit(sc.chNext)) {
+		// percent encoded URL string
+		return 0;
+	}
+	if (IsASpaceOrTab(sc.chNext) && IsADigit(sc.chPrev)) {
+		// ignore word after percent: "5% x"
+		return 0;
+	}
+
+	// similar to LexAwk
+	Sci_PositionU pos = sc.currentPos + 1;
+	char ch = styler.SafeGetCharAt(pos);
+	// argument
+	while (IsADigit(ch)) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	if (ch == '$') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// flags
+	while (AnyOf(ch, '-', '+', ' ', '#', '0')) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	for (int i = 0; i < 2; i++) {
+		// width
+		const bool argument = ch == '*';
+		if (argument) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		while (IsADigit(ch)) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		if (argument && ch == '$') {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		// precision
+		if (i == 0 && ch == '.') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else {
+			break;
+		}
+	}
+	// conversion format specifier
+	if (IsFormatSpecifier(ch)) {
+		return pos - sc.currentPos + 1;
+	}
+	return 0;
+}
+
 void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineComment = 0;
 	int chBeforeIdentifier = 0;
 	int visibleChars = 0;
+	bool insideUrl = false;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -111,11 +181,24 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_R_ESCAPECHAR);
 				sc.Forward();
+			} else if (sc.ch == '%') {
+				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
+				if (length != 0) {
+					const int state = sc.state;
+					sc.SetState(SCE_R_FORMAT_SPECIFIER);
+					sc.Advance(length);
+					sc.SetState(state);
+					continue;
+				}
 			} else if ((sc.state == SCE_R_STRING && sc.ch == '\'')
 				|| (sc.state == SCE_R_STRING2 && sc.ch == '\"')) {
 				sc.ForwardSetState(SCE_R_DEFAULT);
 			} else if (sc.atLineStart) {
 				sc.SetState(SCE_R_DEFAULT);
+			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+				insideUrl = true;
+			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+				insideUrl = false;
 			}
 			break;
 
@@ -146,8 +229,10 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					}
 				}
 			} else if (sc.ch == '\"') {
+				insideUrl = false;
 				sc.SetState(SCE_R_STRING2);
 			} else if (sc.ch == '\'') {
+				insideUrl = false;
 				sc.SetState(SCE_R_STRING);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_R_BACKTICKS);
@@ -170,6 +255,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			styler.SetLineState(sc.currentLine, lineStateLineComment);
 			lineStateLineComment = 0;
 			visibleChars = 0;
+			insideUrl = false;
 		}
 		sc.Forward();
 	}

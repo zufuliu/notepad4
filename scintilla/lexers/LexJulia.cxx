@@ -69,10 +69,90 @@ constexpr bool IsJuliaRegexFlag(int ch) noexcept {
 	return ch == 'i' || ch == 'm' || ch == 's' || ch == 'x' || ch == 'a';
 }
 
-static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JULIA_STRING);
-static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JULIA_BACKTICKS);
-static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JULIA_TRIPLE_STRING);
-static_assert(DefaultNestedStateBaseStyle + 4 == SCE_JULIA_TRIPLE_BACKTICKS);
+constexpr bool IsFormatSpecifier(char ch) noexcept {
+	// copied from LexAwk
+	return AnyOf(ch, 'a', 'A',
+					'c',
+					'd',
+					'e', 'E',
+					'f', 'F',
+					'g', 'G',
+					'i',
+					'o',
+					's',
+					'u',
+					'x', 'X');
+}
+
+// https://docs.julialang.org/en/v1/stdlib/Printf/#Printf.@sprintf
+// https://en.cppreference.com/w/c/io/fprintf
+inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+	if (sc.chNext == '%') {
+		return 2;
+	}
+	if (insideUrl && IsHexDigit(sc.chNext)) {
+		// percent encoded URL string
+		return 0;
+	}
+	if (IsASpaceOrTab(sc.chNext) && IsADigit(sc.chPrev)) {
+		// ignore word after percent: "5% x"
+		return 0;
+	}
+
+	Sci_PositionU pos = sc.currentPos + 1;
+	char ch = styler.SafeGetCharAt(pos);
+	// flags
+	while (AnyOf(ch, '-', '+', ' ', '#', '0')) {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// width
+	if (ch == '*') {
+		ch = styler.SafeGetCharAt(++pos);
+	} else {
+		while (IsADigit(ch)) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+	}
+	// precision
+	if (ch == '.') {
+		ch = styler.SafeGetCharAt(++pos);
+		if (ch == '*') {
+			ch = styler.SafeGetCharAt(++pos);
+		} else {
+			while (IsADigit(ch)) {
+				ch = styler.SafeGetCharAt(++pos);
+			}
+		}
+	}
+	// conversion format specifier
+	if (IsFormatSpecifier(ch)) {
+		return pos - sc.currentPos + 1;
+	}
+	return 0;
+}
+
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JULIA_BACKTICKS);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JULIA_TRIPLE_BACKTICKS);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JULIA_STRING);
+static_assert(DefaultNestedStateBaseStyle + 4 == SCE_JULIA_TRIPLE_STRING);
+
+constexpr bool IsInterpolatedString(int state) noexcept {
+	return state == SCE_JULIA_STRING
+		|| state == SCE_JULIA_TRIPLE_STRING
+		|| state == SCE_JULIA_BACKTICKS
+		|| state == SCE_JULIA_TRIPLE_BACKTICKS;
+}
+
+constexpr bool IsTripleQuotedString(int state) noexcept {
+	return (state & 1) == 0;
+}
+
+inline bool IsStringEnd(const StyleContext &sc) noexcept {
+	if (sc.state < SCE_JULIA_STRING) {
+		return sc.ch == '`' && (sc.state == SCE_JULIA_BACKTICKS || sc.MatchNext('`', '`'));
+	}
+	return sc.ch == '\"' && (!IsTripleQuotedString(sc.state) || sc.MatchNext('"', '"'));
+}
 
 void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineComment = 0;
@@ -87,6 +167,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int chBeforeIdentifier = 0;
 	bool isTransposeOperator = false; // "'"
 
+	bool insideUrl = false;
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
 	EscapeSequence escSeq;
@@ -197,27 +278,48 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_JULIA_TRIPLE_STRING:
 		case SCE_JULIA_BACKTICKS:
 		case SCE_JULIA_TRIPLE_BACKTICKS:
+
+		case SCE_JULIA_RAWSTRING:
+		case SCE_JULIA_TRIPLE_RAWSTRING:
+		case SCE_JULIA_BYTESTRING:
+		case SCE_JULIA_TRIPLE_BYTESTRING:
 			if (sc.ch == '\\') {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_JULIA_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '$') {
-				if (sc.chNext == '(') {
-					++braceCount;
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_JULIA_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_JULIA_VARIABLE2);
+			} else if (sc.ch == '%') {
+				if (sc.state >= SCE_JULIA_STRING) {
+					const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
+					if (length != 0) {
+						const int state = sc.state;
+						sc.SetState(SCE_JULIA_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(state);
+						continue;
+					}
 				}
-			} else if ((sc.ch == '"' && (sc.state == SCE_JULIA_STRING || (sc.state == SCE_JULIA_TRIPLE_STRING && sc.MatchNext('"', '"'))))
-				|| (sc.ch == '`' && (sc.state == SCE_JULIA_BACKTICKS || (sc.state == SCE_JULIA_TRIPLE_BACKTICKS && sc.MatchNext('`', '`'))))) {
-				if (sc.state == SCE_JULIA_TRIPLE_STRING || sc.state == SCE_JULIA_TRIPLE_BACKTICKS) {
+			} else if (sc.ch == '$') {
+				if (IsInterpolatedString(sc.state)) {
+					if (sc.chNext == '(') {
+						++braceCount;
+						nestedState.push_back(sc.state);
+						sc.SetState(SCE_JULIA_OPERATOR2);
+						sc.Forward();
+					} else if (IsIdentifierStartEx(sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_JULIA_VARIABLE2);
+					}
+				}
+			} else if (IsStringEnd(sc)) {
+				if (IsTripleQuotedString(sc.state)) {
 					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_JULIA_DEFAULT);
+			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+				insideUrl = true;
+			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+				insideUrl = false;
 			}
 			break;
 
@@ -256,23 +358,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Forward();
 				}
 				sc.SetState(SCE_JULIA_DEFAULT);
-			}
-			break;
-
-		case SCE_JULIA_RAWSTRING:
-		case SCE_JULIA_TRIPLE_RAWSTRING:
-		case SCE_JULIA_BYTESTRING:
-		case SCE_JULIA_TRIPLE_BYTESTRING:
-			if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_JULIA_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.ch == '\"' && (sc.state == SCE_JULIA_RAWSTRING || sc.state == SCE_JULIA_BYTESTRING || sc.MatchNext('"', '"'))) {
-				if (sc.state == SCE_JULIA_TRIPLE_RAWSTRING || sc.state == SCE_JULIA_TRIPLE_BYTESTRING) {
-					sc.Advance(2);
-				}
-				sc.ForwardSetState(SCE_JULIA_DEFAULT);
 			}
 			break;
 
@@ -319,6 +404,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 				}
 			} else if (sc.ch == '\"') {
+				insideUrl = false;
 				if (sc.MatchNext('"', '"')) {
 					sc.SetState(SCE_JULIA_TRIPLE_STRING);
 					sc.Advance(2);
@@ -342,6 +428,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Advance(2);
 				}
 			} else if (sc.Match('r', 'a', 'w', '"')) {
+				insideUrl = false;
 				sc.SetState(SCE_JULIA_RAWSTRING);
 				sc.Advance(3);
 				if (sc.MatchNext('"', '"')) {
@@ -349,6 +436,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Advance(2);
 				}
 			} else if (sc.Match('b', '\"')) {
+				insideUrl = false;
 				sc.SetState(SCE_JULIA_BYTESTRING);
 				sc.Forward();
 				if (sc.MatchNext('"', '"')) {
@@ -424,6 +512,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			lineStateLineComment = 0;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
+			insideUrl = false;
 		}
 		sc.Forward();
 	}
@@ -446,7 +535,8 @@ constexpr bool IsMultilineStringStyle(int style) noexcept {
 		|| style == SCE_JULIA_TRIPLE_BYTESTRING
 		|| style == SCE_JULIA_OPERATOR2
 		|| style == SCE_JULIA_VARIABLE2
-		|| style == SCE_JULIA_ESCAPECHAR;
+		|| style == SCE_JULIA_ESCAPECHAR
+		|| style == SCE_JULIA_FORMAT_SPECIFIER;
 }
 
 void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {

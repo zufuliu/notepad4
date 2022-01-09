@@ -116,6 +116,7 @@ static EDITSTYLE Styles_R[] = {
 	{ SCE_R_COMMENT, NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_R_STRING, SCE_R_STRING2, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_R_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_R_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_R_BACKTICKS, NP2StyleX_Backticks, L"fore:#7C5AF3" },
 	{ SCE_R_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_R_OPERATOR, SCE_R_INFIX, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },

@@ -138,7 +138,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	while (IsADigit(ch)) {
 		ch = styler.SafeGetCharAt(++pos);
 	}
-	if (ch == '$' && IsADigit(sc.chNext)) {
+	if (ch == '$') {
 		ch = styler.SafeGetCharAt(++pos);
 	}
 	// modifiers

@@ -254,7 +254,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	int lineStateLineType = 0;
 	int nestedLevel = 0; // nested block comment level or nesting delimiter
 	bool insideUrl = false;
-	// TODO: highlight token string
+	// TODO: highlight token string q{}
 
 	KeywordType kwType = KeywordType::None;
 	InlineAssembler asmState = InlineAssembler::None;
@@ -542,17 +542,21 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					sc.ChangeState(SCE_D_NESTED_COMMENTDOC);
 				}
 			} else if ((sc.ch == 'r' || sc.ch == 'x') && sc.chNext == '\"') {
+				insideUrl = false;
 				sc.SetState((sc.ch == 'r') ? SCE_D_RAWSTRING : SCE_D_HEXSTRING);
 				sc.Forward();
 			} else if (sc.ch == '`') {
+				insideUrl = false;
 				sc.SetState(SCE_D_STRING_BT);
 			} else if (sc.ch == '"') {
+				insideUrl = false;
 				sc.SetState(SCE_D_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_D_CHARACTER);
 			} else if (sc.Match('q', '\"')) {
 				sc.SetState(SCE_D_DELIMITED_STRING);
 				sc.Forward(2);
+				insideUrl = false;
 				nestedLevel = 0;
 				delimiters.clear();
 				delimiterChar = sc.ch;
@@ -597,6 +601,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			kwType = KeywordType::None;
+			insideUrl = false;
 		}
 		sc.Forward();
 	}
