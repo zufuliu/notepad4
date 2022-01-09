@@ -1,6 +1,6 @@
 # Notepad2 and metapath
 
-> *Notepad2* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
+> *Notepad2-zufuliu* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](../main/License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad2/total.svg)](https://github.com/zufuliu/notepad2/releases)
 
@@ -27,14 +27,14 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [ABAQUS](../main/tools/lang/ABAQUS.inp)
 	* [ActionScript](../main/tools/lang/ActionScript.as) for ActionScript 3 and 4.
 	* Android Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
-		* javap
-		* Jasmin
+		* [javap](https://docs.oracle.com/en/java/javase/17/docs/specs/man/javap.html)
+		* [Jasmin](http://jasmin.sourceforge.net/)
 	* ANSI Art
 	* [ANSYS](../main/tools/lang/APDL.cdb) Parametric Design Language
 	* Assembler, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#assembler)
 		* MASM
 		* GNU Assembler
-		* NASM
+		* [NASM](https://nasm.us/)
 	* [Asymptote Vector Graphics Language](../main/tools/lang/Asymptote.asy), up to Asymptote 2.70.
 	* [AutoHotkey_L](../main/tools/lang/AutoHotkey_L.ahk) and  [AutoHotkey_H](../main/tools/lang/AutoHotkey_H.ahk) Script, up to v2.
 	* AutoIt Script
@@ -49,9 +49,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](../main/tools/lang/C.c), up to C2x.
 		* [C++ STL](../main/tools/lang/CPP.cpp), up to C++20.
 	* [CSS Style Sheet](../main/tools/lang/CSS.css), up to 2021 snapshot.
-		* Sassy CSS
-		* Less CSS
-		* HSS
+		* [Sassy CSS](https://sass-lang.com/)
+		* [Less CSS](https://lesscss.org/)
+		* [HSS](https://github.com/ncannasse/hss)
 	* [CMake](../main/tools/lang/CMake.cmake), up to CMake 3.20. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
 	* [CoffeeScript](../main/tools/lang/CoffeeScript.coffee), CoffeeScript 2.5.
 	* Common Intermediate Language
@@ -65,7 +65,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Fortran, GNU Fortran
 	* [GN Build](../main/tools/lang/GN.gn), up to GN 2019-03-13.
 	* [Go](../main/tools/lang/Go.go), up to Go 1.14.
-		* Go+ (GoPlus) and the Q language
+		* [Go+ (GoPlus)](https://goplus.org/) and the Q language
 	* [Gradle](../main/tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* [GraphViz Dot](../main/tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 	* [Groovy](../main/tools/lang/Groovy.groovy), up to Groovy 4.0.
