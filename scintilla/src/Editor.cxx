@@ -8152,7 +8152,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			const Representation *repr = reprs.RepresentationFromCharacter(
 				ConstCharPtrFromUPtr(wParam));
 			if (repr) {
-				return StringResult(lParam, repr->stringRep.c_str());
+				return StringResult(lParam, repr->stringRep);
 			}
 			return 0;
 		}

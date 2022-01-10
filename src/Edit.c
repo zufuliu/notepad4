@@ -4636,18 +4636,17 @@ void EditSortLines(EditSortFlag iSortFlags) {
 // EditJumpTo()
 //
 void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
-	const Sci_Line iMaxLine = SciCall_GetLineCount();
-
 	// Jumpt to end with line set to -1
-	if (iNewLine < 0 || iNewLine > iMaxLine) {
+	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
 		iNewCol = SciCall_GetLength();
 		if (iNewCol != 0) {
 			--iNewCol;
 		}
 	} else {
-		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine - 1);
+		--iNewLine;
+		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
 		iNewCol = min_pos(iNewCol, iLineEndPos);
-		iNewCol = SciCall_FindColumn(iNewLine - 1, iNewCol - 1);
+		iNewCol = SciCall_FindColumn(iNewLine, iNewCol - 1);
 	}
 
 	EditSelectEx(iNewCol, iNewCol);
@@ -4659,9 +4658,8 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 // EditSelectEx()
 //
 void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
-	const BOOL same = iAnchorPos == iCurrentPos;
 	const Sci_Line iNewLine = SciCall_LineFromPosition(iCurrentPos);
-	const Sci_Line iAnchorLine = same? iNewLine : SciCall_LineFromPosition(iAnchorPos);
+	const Sci_Line iAnchorLine = (iAnchorPos == iCurrentPos)? iNewLine : SciCall_LineFromPosition(iAnchorPos);
 
 	SciCall_EnsureVisible(iAnchorLine);
 	if (iAnchorLine == iNewLine) {
@@ -4674,8 +4672,8 @@ void EditSelectEx(Sci_Position iAnchorPos, Sci_Position iCurrentPos) {
 
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-	if (same) {
-		SciCall_GotoPos(iCurrentPos);
+	if (iAnchorPos == iCurrentPos) {
+		SciCall_GotoPos(iAnchorPos);
 	} else {
 		SciCall_SetSel(iAnchorPos, iCurrentPos);
 	}

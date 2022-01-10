@@ -198,13 +198,19 @@ public:
 
 class Representation {
 public:
-	// for Unicode control or format characters in BMP
+	// for Unicode control or format characters in hex code form
 	static constexpr size_t maxLength = 7;
-	std::string stringRep;
-	RepresentationAppearance appearance;
+	char stringRep[maxLength + 1]{};
+	size_t length;
+	RepresentationAppearance appearance = RepresentationAppearance::Blob;
 	ColourRGBA colour;
-	explicit Representation(std::string_view value="", RepresentationAppearance appearance_= RepresentationAppearance::Blob) :
-		stringRep(value), appearance(appearance_) {}
+	explicit Representation(std::string_view value) noexcept {
+		memcpy(stringRep, value.data(), value.length());
+		length = value.length();
+	}
+	std::string_view GetStringRep() const noexcept {
+		return std::string_view(stringRep, length);
+	}
 };
 
 class SpecialRepresentations {

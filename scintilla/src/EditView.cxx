@@ -436,15 +436,6 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 	return WrapBreak::Undefined;
 }
 
-constexpr bool ViewIsASCII(std::string_view text) noexcept {
-	for (const unsigned char ch : text) {
-		if (ch & 0x80) {
-			return false;
-		}
-	}
-	return true;
-}
-
 }
 
 /**
@@ -555,17 +546,16 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 						representationWidth = NextTabstopPos(line, x, vstyle.tabWidth) - ll->positions[ts.start];
 					} else {
 						if (representationWidth <= 0.0) {
-							assert(ts.representation->stringRep.length() <= Representation::maxLength);
-							XYPOSITION positionsRepr[Representation::maxLength + 1];
-							// ts.representation->stringRep is UTF-8 which only matches cache if document is UTF-8
-							// or it only contains ASCII which is a subset of all currently supported encodings.
 							const Style &styleCtrl = vstyle.styles[StyleControlChar];
-							if ((CpUtf8 == model.pdoc->dbcsCodePage) || ViewIsASCII(ts.representation->stringRep)) {
-								posCache.MeasureWidths(surface, styleCtrl, StyleControlChar, ts.representation->stringRep, positionsRepr);
+							// only supports character representation with ASCII text
+							if (styleCtrl.monospaceASCII) {
+								representationWidth = style.aveCharWidth * ts.representation->length;
 							} else {
-								surface->MeasureWidthsUTF8(styleCtrl.font.get(), ts.representation->stringRep, positionsRepr);
+								XYPOSITION positionsRepr[Representation::maxLength + 1];
+								const std::string_view stringRep = ts.representation->GetStringRep();
+								posCache.MeasureWidths(surface, styleCtrl, StyleControlChar, stringRep, positionsRepr);
+								representationWidth = positionsRepr[ts.representation->length - 1];
 							}
-							representationWidth = positionsRepr[ts.representation->stringRep.length() - 1];
 							if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
 								representationWidth += vstyle.ctrlCharPadding;
 							}
@@ -1212,7 +1202,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 				repr = model.reprs.RepresentationFromCharacter(std::string_view(&ll->chars[eolPos], 1));
 			}
 			if (repr) {
-				ctrlChar = repr->stringRep;
+				ctrlChar = repr->GetStringRep();
 				appearance = repr->appearance;
 				if (FlagSet(appearance, RepresentationAppearance::Colour)) {
 					textFore = repr->colour;
@@ -2266,15 +2256,16 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 							rcSegment.top + vsDraw.maxAscent,
 							cc, textBack, textFore);
 					} else {
+						const std::string_view stringRep = ts.representation->GetStringRep();
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Colour)) {
 							textFore = ts.representation->colour;
 						}
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
-							DrawTextBlob(surface, vsDraw, rcSegment, ts.representation->stringRep,
+							DrawTextBlob(surface, vsDraw, rcSegment, stringRep,
 								textBack, textFore, phasesDraw == PhasesDraw::One);
 						} else {
 							surface->DrawTextTransparentUTF8(rcSegment, vsDraw.styles[StyleControlChar].font.get(),
-								rcSegment.top + vsDraw.maxAscent, ts.representation->stringRep, textFore);
+								rcSegment.top + vsDraw.maxAscent, stringRep, textFore);
 						}
 					}
 				}

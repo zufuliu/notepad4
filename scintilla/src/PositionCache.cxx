@@ -1009,11 +1009,7 @@ size_t PositionCache::GetSize() const noexcept {
 void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber,
 	std::string_view sv, XYPOSITION *positions) {
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
-#if PLAT_MACOSX
-		const XYPOSITION characterWidth = style.monospaceCharacterWidth;
-#else
 		const XYPOSITION characterWidth = style.aveCharWidth;
-#endif
 		const size_t length = sv.length();
 #if NP2_USE_SSE2
 		if (length >= 2) {
@@ -1043,11 +1039,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 
 #ifdef MeasureWidthsUseEastAsianWidth
 	if (style.monospaceASCII) {
-#if PLAT_MACOSX
-		const XYPOSITION characterWidth = style.monospaceCharacterWidth;
-#else
 		const XYPOSITION characterWidth = style.aveCharWidth;
-#endif
 		XYPOSITION *ptr = positions;
 		XYPOSITION lastPos = 0;
 		for (auto it = sv.begin(); it != sv.end();) {
