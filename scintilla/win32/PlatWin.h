@@ -194,20 +194,12 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept;
 
 constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
-	switch (extraFontFlag & FontQuality::QualityMask) {
-
-	case FontQuality::QualityNonAntialiased:
-		return NONANTIALIASED_QUALITY;
-
-	case FontQuality::QualityAntialiased:
-		return ANTIALIASED_QUALITY;
-
-	case FontQuality::QualityLcdOptimized:
-		return CLEARTYPE_QUALITY;
-
-	default:
-		return DEFAULT_QUALITY;
-	}
+	constexpr UINT mask = (DEFAULT_QUALITY << static_cast<int>(FontQuality::QualityDefault))
+		| (NONANTIALIASED_QUALITY << (4 *static_cast<int>(FontQuality::QualityNonAntialiased)))
+		| (ANTIALIASED_QUALITY << (4 * static_cast<int>(FontQuality::QualityAntialiased)))
+		| (CLEARTYPE_QUALITY << (4 * static_cast<int>(FontQuality::QualityLcdOptimized)))
+		;
+	return static_cast<BYTE>((mask >> (4*static_cast<int>(extraFontFlag & FontQuality::QualityMask))) & 15);
 }
 
 #if defined(USE_D2D)
