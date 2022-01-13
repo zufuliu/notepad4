@@ -21,6 +21,7 @@ public:
 
 class EditModel {
 public:
+	Document *pdoc;
 	bool inOverstrike;
 	bool trackLineWidth;
 	int xOffset;		///< Horizontal scrolled amount in pixels
@@ -50,9 +51,7 @@ public:
 	// Wrapping support
 	int wrapWidth;
 	static constexpr uint32_t IdleLineWrapTime = 125;
-
-	Document *pdoc;
-
+	static constexpr uint32_t ActiveLineWrapTime = 250;
 	void *idleTaskTimer;
 
 	EditModel();

@@ -473,7 +473,6 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 
 static inline LPCWSTR GetProcessorArchitecture(void) {
 	SYSTEM_INFO info;
-	ZeroMemory(&info, sizeof(info));
 	GetNativeSystemInfo(&info);
 #ifndef PROCESSOR_ARCHITECTURE_ARM64
 #define PROCESSOR_ARCHITECTURE_ARM64	12

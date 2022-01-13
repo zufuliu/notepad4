@@ -2458,7 +2458,7 @@ std::unique_ptr<IScreenLineLayout> SurfaceD2D::Layout(const IScreenLine *screenL
 
 void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION ybase, std::string_view text, int codePageOverride, UINT fuOptions) {
 	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
-	if (pfm->pTextFormat && pRenderTarget) {
+	if (pfm->pTextFormat) {
 		// Use Unicode calls
 		const int codePageDraw = codePageOverride ? codePageOverride : mode.codePage;
 		const TextWide tbuf(text, codePageDraw);
@@ -3949,8 +3949,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
-LRESULT CALLBACK ListBoxX::StaticWndProc(
-	HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK ListBoxX::StaticWndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	if (iMessage == WM_CREATE) {
 		CREATESTRUCT *pCreate = reinterpret_cast<CREATESTRUCT *>(lParam);
 		SetWindowPointer(hWnd, pCreate->lpCreateParams);

@@ -972,12 +972,12 @@ void PositionCacheEntry::ResetClock() noexcept {
 #define PositionCacheHashSizeUsePowerOfTwo	1
 PositionCache::PositionCache() {
 	clock = 1;
+	allClear = true;
 #if PositionCacheHashSizeUsePowerOfTwo
 	pces.resize(2048);
 #else
 	pces.resize(2039);
 #endif
-	allClear = true;
 }
 
 void PositionCache::Clear() noexcept {

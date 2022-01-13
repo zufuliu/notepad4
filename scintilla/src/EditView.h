@@ -34,10 +34,9 @@ enum class DrawPhase {
 };
 
 enum class LayoutLineOption {
-	WholeLine = 0,
-	AutoUpdate = 1,
-	ManualUpdate = 2,
-	KeepPosition = 3,
+	AutoUpdate ,
+	ManualUpdate ,
+	KeepPosition,
 };
 
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept;

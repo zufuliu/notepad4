@@ -1587,6 +1587,9 @@ Sci::Position Document::GetColumn(Sci::Position pos) noexcept {
 				return column;
 			} else if (ch == '\n') {
 				return column;
+			} else if (UTF8IsAscii(ch)) {
+				column++;
+				i++;
 			} else if (i >= Length()) {
 				return column;
 			} else {
@@ -1667,6 +1670,9 @@ Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) noexcep
 				return position;
 			} else if (ch == '\n') {
 				return position;
+			} else if (UTF8IsAscii(ch)) {
+				columnCurrent++;
+				position++;
 			} else {
 				columnCurrent++;
 				position = NextPosition(position, 1);

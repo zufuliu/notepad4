@@ -209,7 +209,7 @@ public:
 		length = value.length();
 	}
 	std::string_view GetStringRep() const noexcept {
-		return std::string_view(stringRep, length);
+		return {stringRep, length};
 	}
 };
 

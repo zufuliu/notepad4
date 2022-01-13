@@ -1667,6 +1667,7 @@ bool Editor::WrapLines(WrapScope ws) {
 
 		// If wrapping is done, bring it to resting position
 		if (!partialLine && wrapPending.start >= lineEndNeedWrap) {
+			//printf("%s durationStyleOneUnit: %f\n", __func__, durationWrapOneUnit.Duration()*1e3);
 			wrapPending.Reset();
 #ifdef WRAP_LINES_TIMING
 			const double totalTime = wrapTiming.TotalTime();
@@ -1733,7 +1734,7 @@ void Editor::LinesSplit(int pixelWidth) {
 			if (surface) {
 				const Sci::Position posLineStart = pdoc->LineStart(line);
 				LineLayout * const ll = view.RetrieveLineLayout(line, *this);
-				view.LayoutLine(*this, surface, vs, ll, pixelWidth, LayoutLineOption::WholeLine);
+				view.LayoutLine(*this, surface, vs, ll, pixelWidth, LayoutLineOption::AutoUpdate, ll->maxLineLength);
 				Sci::Position lengthInsertedTotal = 0;
 				for (int subLine = 1; subLine < ll->lines; subLine++) {
 					const Sci::Position lengthInserted = pdoc->InsertString(
@@ -3065,7 +3066,7 @@ void Editor::NotifyMacroRecord(Message iMessage, uptr_t wParam, sptr_t lParam) n
 void Editor::ContainerNeedsUpdate(Update flags) noexcept {
 	needUpdateUI = needUpdateUI | flags;
 	// layout as much as possible inside LayoutLine() to avoid unexpected scrolling
-	SetIdleTaskTime(IdleLineWrapTime);
+	SetIdleTaskTime(ActiveLineWrapTime);
 }
 
 /**

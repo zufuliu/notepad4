@@ -447,10 +447,10 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
-	int laidBytes = ll->maxLineLength;
+	int laidBytes = 0; // lower bound, only care time spend on MeasureWidths()
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
 	// If the line is very long, limit the treatment to a length that should fit in the viewport
-	const Sci::Position posLineEnd = std::min(model.pdoc->LineStart(line + 1), posLineStart + laidBytes);
+	const Sci::Position posLineEnd = std::min(model.pdoc->LineStart(line + 1), posLineStart + ll->maxLineLength);
 	// Hard to cope when too narrow, so just assume there is space
 	width = std::max(width, 20);
 
@@ -488,19 +488,6 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		}
 	}
 	if (validity == LineLayout::ValidLevel::invalid) {
-		//const ElapsedPeriod period;
-		ll->widthLine = LineLayout::wrapWidthInfinite;
-		ll->lines = 1;
-		if (vstyle.edgeState == EdgeVisualStyle::Background) {
-			Sci::Position edgePosition = model.pdoc->FindColumn(line, vstyle.theEdge.column);
-			if (edgePosition >= posLineStart) {
-				edgePosition -= posLineStart;
-			}
-			ll->edgeColumn = static_cast<int>(edgePosition);
-		} else {
-			ll->edgeColumn = -1;
-		}
-
 		// Fill base line layout
 		const int lineLength = static_cast<int>(posLineEnd - posLineStart);
 		model.pdoc->GetCharRange(ll->chars.get(), posLineStart, lineLength);
@@ -508,7 +495,6 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		const int numCharsBeforeEOL = static_cast<int>(model.pdoc->LineEnd(line) - posLineStart);
 		const int numCharsInLine = vstyle.viewEOL ? lineLength : numCharsBeforeEOL;
 		const unsigned char styleByteLast = (lineLength == 0) ? 0 : ll->styles[lineLength - 1];
-		ll->xHighlightGuide = 0;
 		// Extra element at the end of the line to hold end x position and act as
 		ll->chars[numCharsInLine] = 0;   // Also triggers processing in the loops as this is a control character
 		ll->styles[numCharsInLine] = styleByteLast;	// For eolFilled
@@ -519,6 +505,23 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		ll->lastSegmentEnd = 0;
 		ll->numCharsInLine = numCharsInLine;
 		ll->numCharsBeforeEOL = numCharsBeforeEOL;
+
+		ll->xHighlightGuide = 0;
+		ll->edgeColumn = -1;
+		ll->widthLine = LineLayout::wrapWidthInfinite;
+		ll->lines = 1;
+		if (numCharsInLine == 0) {
+			// empty line with viewEOL disabled
+			ll->widthLine = width;
+			ll->wrapIndent = 0;
+			validity = LineLayout::ValidLevel::lines;
+		} else if (vstyle.edgeState == EdgeVisualStyle::Background) {
+			Sci::Position edgePosition = model.pdoc->FindColumn(line, vstyle.theEdge.column);
+			if (edgePosition >= posLineStart) {
+				edgePosition -= posLineStart;
+			}
+			ll->edgeColumn = static_cast<int>(edgePosition);
+		}
 	}
 
 	const bool partialLine = validity == LineLayout::ValidLevel::lines
@@ -527,11 +530,14 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
 		bool lastSegItalics = false;
 		bool wholeLine = true;
-		posInLine = std::max(posInLine, ll->caretPosition) + BreakFinder::lengthEachSubdivision;
+		if (model.BidirectionalEnabled()) {
+			posInLine = ll->numCharsInLine; // whole line
+		} else {
+			posInLine = std::max(posInLine, ll->caretPosition) + BreakFinder::lengthEachSubdivision;
+		}
 
 		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, ll->numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
 		while (bfLayout.More()) {
-
 			const TextSegment ts = bfLayout.Next();
 			const int endPos = ts.end();
 
@@ -580,7 +586,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 				ll->positions[posToIncrease] += ll->positions[ts.start];
 			}
 
-			if (option != LayoutLineOption::WholeLine && endPos > posInLine && model.IdleTaskTimeExpired()) {
+			if (endPos > posInLine && model.IdleTaskTimeExpired()) {
 				// treat remaining text as zero width
 				//printf("%s(%d, %zd) posInLine=%d, lineLength=%d / %d, laidBytes=%d - %d\n", __func__,
 				//	(int)option, line, posInLine, laidBytes, ll->numCharsInLine, endPos, ll->lastSegmentEnd);
@@ -597,7 +603,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 
 		// Small hack to make lines that end with italics not cut off the edge of the last character
 		if (wholeLine) {
-			laidBytes -= ll->lastSegmentEnd;
+			laidBytes = ll->numCharsInLine - ll->lastSegmentEnd;
 			ll->lastSegmentEnd = ll->numCharsInLine;
 			if (lastSegItalics) {
 				ll->positions[ll->numCharsInLine] += vstyle.lastSegItalicsOffset;
@@ -2880,7 +2886,7 @@ Sci::Position EditView::FormatRange(bool draw, const RangeToFormat *pfr, Surface
 		// Copy this line and its styles from the document into local arrays
 		// and determine the x position at which each character starts.
 		LineLayout ll(lineDoc, static_cast<int>(model.pdoc->LineStart(lineDoc + 1) - model.pdoc->LineStart(lineDoc) + 1));
-		LayoutLine(model, surfaceMeasure, vsPrint, &ll, widthPrint, LayoutLineOption::WholeLine);
+		LayoutLine(model, surfaceMeasure, vsPrint, &ll, widthPrint, LayoutLineOption::ManualUpdate, ll.maxLineLength);
 
 		ll.containsCaret = false;
 
