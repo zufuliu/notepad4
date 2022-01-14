@@ -118,10 +118,6 @@ void ActionDuration::AddSample(Sci::Position numberActions, double durationOfAct
 	//	durationOfActions, numberActions, durationOne, duration_, duration, minDuration, maxDuration);
 }
 
-double ActionDuration::Duration() const noexcept {
-	return duration;
-}
-
 Sci::Position ActionDuration::ActionsInAllowedTime(double secondsAllowed) const noexcept {
 	const Sci::Position actions = std::clamp<Sci::Position>(static_cast<Sci::Position>(secondsAllowed / duration), 8, 0x10000);
 	return actions * unitBytes;

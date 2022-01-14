@@ -444,10 +444,10 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 * Also determine the x position at which each character starts.
 */
 int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option, int posInLine) {
+	int wrappedBytes = 0; // only care about time spend on MeasureWidths()
 	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
-	int laidBytes = 0; // lower bound, only care time spend on MeasureWidths()
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
 	// If the line is very long, limit the treatment to a length that should fit in the viewport
 	const Sci::Position posLineEnd = std::min(model.pdoc->LineStart(line + 1), posLineStart + ll->maxLineLength);
@@ -588,11 +588,11 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 
 			if (endPos > posInLine && model.IdleTaskTimeExpired()) {
 				// treat remaining text as zero width
-				//printf("%s(%d, %zd) posInLine=%d, lineLength=%d / %d, laidBytes=%d - %d\n", __func__,
-				//	(int)option, line, posInLine, laidBytes, ll->numCharsInLine, endPos, ll->lastSegmentEnd);
+				//printf("%s(%d, %zd) posInLine=%d, lineLength=%d / %d, wrappedBytes=%d - %d\n", __func__,
+				//	(int)option, line, posInLine, wrappedBytes, ll->numCharsInLine, endPos, ll->lastSegmentEnd);
 				if (endPos < ll->numCharsInLine) {
 					wholeLine = false;
-					laidBytes = endPos - ll->lastSegmentEnd;
+					wrappedBytes = endPos - ll->lastSegmentEnd;
 					ll->lastSegmentEnd = endPos;
 					const XYPOSITION last = ll->positions[endPos];
 					std::fill(&ll->positions[endPos + 1], &ll->positions[ll->numCharsInLine + 1], last);
@@ -603,7 +603,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 
 		// Small hack to make lines that end with italics not cut off the edge of the last character
 		if (wholeLine) {
-			laidBytes = ll->numCharsInLine - ll->lastSegmentEnd;
+			wrappedBytes = ll->numCharsInLine - ll->lastSegmentEnd;
 			ll->lastSegmentEnd = ll->numCharsInLine;
 			if (lastSegItalics) {
 				ll->positions[ll->numCharsInLine] += vstyle.lastSegItalicsOffset;
@@ -772,7 +772,7 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		}
 	}
 	ll->validity = validity;
-	return laidBytes;
+	return wrappedBytes;
 }
 
 // Fill the LineLayout bidirectional data fields according to each char style
@@ -2633,7 +2633,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 					LayoutLine(model, surface, vsDraw, ll, model.wrapWidth, LayoutLineOption::KeepPosition);
 				}
 #if defined(TIME_PAINTING)
-				durLayout += ep.Duration(true);
+				durLayout += ep.Reset();
 #endif
 				if (ll) {
 					ll->containsCaret = !hideSelection && (lineDoc == lineCaret)
@@ -2665,7 +2665,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 
 					DrawLine(surface, model, vsDraw, ll, lineDoc, visibleLine, xStart, rcLine, subLine, phase);
 #if defined(TIME_PAINTING)
-					durPaint += ep.Duration(true);
+					durPaint += ep.Reset();
 #endif
 					// Restore the previous styles for the brace highlights in case layout is in cache.
 					ll->RestoreBracesHighlight(rangeLine, model.braces, bracesIgnoreStyle);

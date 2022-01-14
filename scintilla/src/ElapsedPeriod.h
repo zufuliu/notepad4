@@ -16,12 +16,10 @@ public:
 	/// Capture the moment
 	ElapsedPeriod() noexcept : tp(ElapsedClock::now()) {}
 	/// Return duration as floating point seconds
-	double Duration(bool reset) noexcept {
+	double Reset() noexcept {
 		const auto tpNow = ElapsedClock::now();
 		const auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(tpNow - tp);
-		if (reset) {
-			tp = tpNow;
-		}
+		tp = tpNow;
 		return duration.count();
 	}
 

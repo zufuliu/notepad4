@@ -34,8 +34,8 @@ enum class DrawPhase {
 };
 
 enum class LayoutLineOption {
-	AutoUpdate ,
-	ManualUpdate ,
+	AutoUpdate,
+	ManualUpdate,
 	KeepPosition,
 };
 

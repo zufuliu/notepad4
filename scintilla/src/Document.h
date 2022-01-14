@@ -217,7 +217,9 @@ class ActionDuration {
 public:
 	static constexpr int InitialBytes = 1024*1024;
 	void AddSample(Sci::Position numberActions, double durationOfActions) noexcept;
-	double Duration() const noexcept;
+	double Duration() const noexcept {
+		return duration;
+	}
 	Sci::Position ActionsInAllowedTime(double secondsAllowed) const noexcept;
 };
 
