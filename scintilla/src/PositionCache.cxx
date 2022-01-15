@@ -364,7 +364,7 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 	return (std::floor((xPosition + TabWidthMinimumPixels()) / TabWidth()) + 1) * TabWidth();
 }
 
-LineLayoutCache::LineLayoutCache() :
+LineLayoutCache::LineLayoutCache() noexcept:
 	lastCaretSlot(SIZE_MAX),
 	level(LineCache::None),
 	allInvalidated(false), styleClock(-1) {
@@ -876,7 +876,7 @@ TextSegment BreakFinder::Next() {
 
 		const int lengthSegment = nextBreak - prev;
 		if (lengthSegment < lengthStartSubdivision) {
-			return TextSegment(prev, lengthSegment, repr);
+			return {prev, lengthSegment, repr};
 		}
 		subBreak = prev;
 	}
@@ -893,7 +893,7 @@ TextSegment BreakFinder::Next() {
 	} else {
 		subBreak = -1;
 	}
-	return TextSegment(startSegment, lengthSegment);
+	return {startSegment, lengthSegment, nullptr};
 }
 
 bool BreakFinder::More() const noexcept {

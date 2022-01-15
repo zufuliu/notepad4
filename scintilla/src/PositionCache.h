@@ -157,7 +157,7 @@ private:
 	int styleClock;
 	void AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc);
 public:
-	LineLayoutCache();
+	LineLayoutCache() noexcept;
 	// Deleted so LineLayoutCache objects can not be copied.
 	LineLayoutCache(const LineLayoutCache &) = delete;
 	LineLayoutCache(LineLayoutCache &&) = delete;
@@ -243,8 +243,6 @@ struct TextSegment {
 	const int start;
 	const int length;
 	const Representation * const representation;
-	TextSegment(int start_ = 0, int length_ = 0, const Representation *representation_ = nullptr) noexcept :
-		start(start_), length(length_), representation(representation_) {}
 	int end() const noexcept {
 		return start + length;
 	}

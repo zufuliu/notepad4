@@ -88,7 +88,7 @@ private:
 	}
 
 public:
-	explicit Partitioning(int growSize) : stepPartition(0), stepLength(0) {
+	explicit Partitioning(int growSize) {
 		Allocate(growSize);
 	}
 
