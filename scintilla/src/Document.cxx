@@ -124,7 +124,8 @@ Sci::Position ActionDuration::ActionsInAllowedTime(double secondsAllowed) const 
 }
 
 Document::Document(DocumentOption options) :
-	cb(!FlagSet(options, DocumentOption::StylesNone), FlagSet(options, DocumentOption::TextLarge)) {
+	cb(!FlagSet(options, DocumentOption::StylesNone), FlagSet(options, DocumentOption::TextLarge)),
+	durationStyleOneUnit(1e-6) {
 	refCount = 0;
 #ifdef _WIN32
 	eolMode = EndOfLine::CrLf;

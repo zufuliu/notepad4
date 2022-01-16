@@ -50,6 +50,9 @@ public:
 
 	// Wrapping support
 	int wrapWidth;
+	uint32_t hardwareConcurrency;
+	ActionDuration durationWrapOneUnit;
+	ActionDuration durationWrapOneThread;
 	static constexpr uint32_t IdleLineWrapTime = 125;
 	static constexpr uint32_t ActiveLineWrapTime = 250;
 	void *idleTaskTimer;
@@ -73,6 +76,7 @@ public:
 	InSelection LineEndInSelection(Sci::Line lineDoc) const noexcept;
 	void SetIdleTaskTime(uint32_t milliseconds) const noexcept;
 	bool IdleTaskTimeExpired() const noexcept;
+	bool UseParallelLayout(int length) const noexcept;
 };
 
 }

@@ -1600,11 +1600,13 @@ bool Editor::WrapLines(WrapScope ws) {
 				//Platform::DebugPrintf("Wraplines: scope=%0d need=%0d..%0d perform=%0d..%0d\n", ws, wrapPending.start, wrapPending.end, lineToWrap, lineToWrapEnd);
 				const ElapsedPeriod epWrapping;
 				SetIdleTaskTime(IdleLineWrapTime);
-				Sci::Position bytesBeingWrapped = 0;
+				uint32_t wrappedBytesAllThread = 0;
+				uint32_t wrappedBytesOneThread = 0;
 				while (lineToWrap < lineToWrapEnd) {
 					LineLayout * const ll = view.RetrieveLineLayout(lineToWrap, *this);
-					const int laidBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
-					bytesBeingWrapped += laidBytes;
+					const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
+					wrappedBytesAllThread += wrappedBytes & UINT32_MAX;
+					wrappedBytesOneThread += wrappedBytes >> 32;
 					int linesWrapped = ll->lines;
 					if (vs.annotationVisible != AnnotationVisible::Hidden) {
 						linesWrapped += pdoc->AnnotationLines(lineToWrap);
@@ -1620,7 +1622,8 @@ bool Editor::WrapLines(WrapScope ws) {
 					lineToWrap++;
 				}
 				const double duration = epWrapping.Duration();
-				durationWrapOneUnit.AddSample(bytesBeingWrapped, duration);
+				durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
+				durationWrapOneThread.AddSample(wrappedBytesOneThread, duration);
 
 				goodTopLine = pcs->DisplayFromDoc(lineDocTop) + std::min(
 					subLineTop, static_cast<Sci::Line>(pcs->GetHeight(lineDocTop) - 1));
@@ -1629,7 +1632,10 @@ bool Editor::WrapLines(WrapScope ws) {
 
 		// If wrapping is done, bring it to resting position
 		if (!partialLine && wrapPending.start >= lineEndNeedWrap) {
-			//printf("%s durationStyleOneUnit: %f\n", __func__, durationWrapOneUnit.Duration()*1e3);
+			//constexpr double scale = 1e3; // 1 KiB in millisecond
+			//printf("%s idle style duration: %f, wrap duration: %f, %f\n", __func__,
+			//	pdoc->durationStyleOneUnit.Duration()*scale,
+			//	durationWrapOneUnit.Duration()*scale, durationWrapOneThread.Duration()*scale);
 			wrapPending.Reset();
 		}
 	}

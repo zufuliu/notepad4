@@ -118,7 +118,7 @@ public:
 	void RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw);
 
 	LineLayout *RetrieveLineLayout(Sci::Line lineNumber, const EditModel &model);
-	int LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle,
+	uint64_t LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle,
 		LineLayout *ll, int width, LayoutLineOption option, int posInLine = 0);
 
 	static void UpdateBidiData(const EditModel &model, const ViewStyle &vstyle, LineLayout *ll);

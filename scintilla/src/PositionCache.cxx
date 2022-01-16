@@ -23,6 +23,11 @@
 #include <iterator>
 #include <memory>
 
+#include <windows.h>
+#ifndef _WIN32_WINNT_VISTA
+#define _WIN32_WINNT_VISTA	0x0600
+#endif
+
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
 #include "ILoader.h"
@@ -566,7 +571,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 
 	size_t pos = 0;
 	LineLayout *ret = nullptr;
-	const int useLongCache = maxChars >> (10 + 10); // 1024*1024
+	const int useLongCache = maxChars >> (10 + 11); // 1024*1024*2
 	if (useLongCache) {
 		for (const auto &ll : longCache) {
 			if (ll->LineNumber() == lineNumber) {
@@ -1006,6 +1011,63 @@ size_t PositionCache::GetSize() const noexcept {
 	return pces.size();
 }
 
+namespace {
+// std::shared_mutex
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+SRWLOCK cacheLock = SRWLOCK_INIT;
+struct CacheWriteLock {
+	CacheWriteLock() noexcept  {
+		AcquireSRWLockExclusive(&cacheLock);
+	}
+	~CacheWriteLock() {
+		ReleaseSRWLockExclusive(&cacheLock);
+	}
+};
+
+// https://stackoverflow.com/questions/13206414/why-slim-reader-writer-exclusive-lock-outperformance-the-shared-one
+#if 0
+struct CacheReadLock {
+	CacheReadLock() noexcept  {
+		AcquireSRWLockShared(&cacheLock);
+	}
+	~CacheReadLock() {
+		ReleaseSRWLockShared(&cacheLock);
+	}
+};
+#else
+using CacheReadLock = CacheWriteLock;
+#endif
+
+#else
+struct CriticalSection {
+	CRITICAL_SECTION section;
+	CriticalSection() noexcept {
+		InitializeCriticalSectionAndSpinCount(&section, 4);
+	}
+	void lock() noexcept {
+		EnterCriticalSection(&section);
+	}
+	void unlock() noexcept {
+		LeaveCriticalSection(&section);
+	}
+	~CriticalSection() {
+		DeleteCriticalSection(&section);
+	}
+};
+
+CriticalSection cacheLock;
+struct CacheWriteLock {
+	CacheWriteLock() noexcept  {
+		cacheLock.lock();
+	}
+	~CacheWriteLock() {
+		cacheLock.unlock();
+	}
+};
+using CacheReadLock = CacheWriteLock;
+#endif
+}
+
 void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber,
 	std::string_view sv, XYPOSITION *positions) {
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
@@ -1080,6 +1142,8 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 #else
 		probe = hashValue % modulo;
 #endif
+
+		const CacheReadLock readLock;
 		if (pces[probe].Retrieve(styleNumber, sv, positions)) {
 			return;
 		}
@@ -1100,6 +1164,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 	surface->MeasureWidths(style.font.get(), sv, positions);
 	if (probe < pces.size()) {
 		// Store into cache
+		const CacheWriteLock writeLock;
 		clock++;
 		if (clock > 60000) {
 			// Since there are only 16 bits for the clock, wrap it round and

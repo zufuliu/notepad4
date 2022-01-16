@@ -60,7 +60,7 @@ using namespace Scintilla::Internal;
 Caret::Caret() noexcept :
 	active(false), on(false), period(500) {}
 
-EditModel::EditModel() {
+EditModel::EditModel() : durationWrapOneUnit(1e-6), durationWrapOneThread(0.01 / 32) {
 	inOverstrike = false;
 	trackLineWidth = false;
 	xOffset = 0;
@@ -83,6 +83,9 @@ EditModel::EditModel() {
 	pdoc = new Document(DocumentOption::StylesNone);
 	pdoc->AddRef();
 	pcs = ContractionStateCreate(pdoc->IsLarge());
+	SYSTEM_INFO info;
+	GetNativeSystemInfo(&info);
+	hardwareConcurrency = info.dwNumberOfProcessors;
 	idleTaskTimer = CreateWaitableTimer(nullptr, true, nullptr);
 }
 
@@ -135,4 +138,14 @@ void EditModel::SetIdleTaskTime(uint32_t milliseconds) const noexcept {
 
 bool EditModel::IdleTaskTimeExpired() const noexcept {
 	return WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0;
+}
+
+bool EditModel::UseParallelLayout(int length) const noexcept {
+	if (hardwareConcurrency < 2) {
+		return false;
+	}
+
+	constexpr double secondsAllowed = 0.01;
+	const Sci::Position actionsInAllowedTime = durationWrapOneThread.ActionsInAllowedTime(secondsAllowed);
+	return length >= actionsInAllowedTime;
 }

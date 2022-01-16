@@ -26,6 +26,13 @@
 #include <memory>
 #include <chrono>
 
+#include <atomic>
+//#include <future>
+#include <windows.h>
+#ifndef _WIN32_WINNT_VISTA
+#define _WIN32_WINNT_VISTA	0x0600
+#endif
+
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
 #include "ScintillaStructures.h"
@@ -436,6 +443,210 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 	return WrapBreak::Undefined;
 }
 
+struct LayoutWorker {
+	LineLayout * const ll;
+	const ViewStyle &vstyle;
+	Surface * const sharedSurface;
+	PositionCache &posCache;
+	const EditModel &model;
+
+	std::vector<TextSegment> segmentList;
+	uint32_t segmentCount = 0;
+	int maxPosInLine = 0;
+	std::atomic<uint32_t> nextIndex = 0;
+	std::atomic<uint32_t> finishedCount = 0;
+
+#define USE_STD_ASYNC_FUTURE	0
+#if USE_STD_ASYNC_FUTURE
+#define USE_WIN32_PTP_WORK		0
+#define USE_WIN32_WORK_ITEM		0
+#elif _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#define USE_WIN32_PTP_WORK		1
+#define USE_WIN32_WORK_ITEM		0
+#else
+#define USE_WIN32_PTP_WORK		0
+#define USE_WIN32_WORK_ITEM		1
+#endif
+
+#if USE_WIN32_WORK_ITEM
+	HANDLE finishedEvent = nullptr;
+	std::atomic<uint32_t> runningThread = 0;
+#endif
+
+	template<typename T>
+	static inline void UpdateMaximum(std::atomic<T> &maximum, const T &value) noexcept {
+		// https://stackoverflow.com/questions/16190078/how-to-atomically-update-a-maximum-value
+		T prev = maximum;
+		while(prev < value && !maximum.compare_exchange_weak(prev, value)) {}
+	}
+
+	void Layout(const TextSegment &ts, Surface *surface) {
+		const Style &style = vstyle.styles[ll->styles[ts.start]];
+		if (style.visible) {
+			if (ts.representation) {
+				if (ll->chars[ts.start] == '\t') {
+					// Tab is a special case of representation, taking a variable amount of space
+					// which will be filled in later.
+				} else {
+					XYPOSITION representationWidth = vstyle.controlCharWidth;
+					if (representationWidth <= 0.0) {
+						const Style &styleCtrl = vstyle.styles[StyleControlChar];
+						// only supports character representation with ASCII text
+						if (styleCtrl.monospaceASCII) {
+							representationWidth = style.aveCharWidth * ts.representation->length;
+						} else {
+							XYPOSITION positionsRepr[Representation::maxLength + 1];
+							const std::string_view stringRep = ts.representation->GetStringRep();
+							posCache.MeasureWidths(surface, styleCtrl, StyleControlChar, stringRep, positionsRepr);
+							representationWidth = positionsRepr[ts.representation->length - 1];
+						}
+						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
+							representationWidth += vstyle.ctrlCharPadding;
+						}
+					}
+					for (int ii = 0; ii < ts.length; ii++) {
+						ll->positions[ts.start + 1 + ii] = representationWidth;
+					}
+				}
+			} else {
+				if ((ts.length == 1) && (' ' == ll->chars[ts.start])) {
+					// Over half the segments are single characters and of these about half are space characters.
+					ll->positions[ts.start + 1] = style.spaceWidth;
+				} else {
+					posCache.MeasureWidths(surface, style, ll->styles[ts.start],
+						std::string_view(&ll->chars[ts.start], ts.length), &ll->positions[ts.start + 1]);
+				}
+			}
+		}
+	}
+
+	uint32_t Start(Sci::Position posLineStart, int posInLine) {
+		if (model.BidirectionalEnabled()) {
+			posInLine = ll->numCharsInLine; // whole line
+		} else {
+			posInLine = std::max(posInLine, ll->caretPosition) + BreakFinder::lengthStartSubdivision;
+		}
+
+		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, ll->numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
+		do {
+			segmentList.push_back(bfLayout.Next());
+		} while (bfLayout.More());
+
+		maxPosInLine = posInLine;
+		const int length = ll->numCharsInLine - ll->lastSegmentEnd;
+		if (length >= BreakFinder::lengthStartSubdivision && model.UseParallelLayout(length)) {
+			segmentCount = static_cast<uint32_t>(segmentList.size());
+			const uint32_t threadCount = std::min(segmentCount/2, model.hardwareConcurrency);
+#if USE_STD_ASYNC_FUTURE
+			std::vector<std::future<void>> features;
+			for (uint32_t i = 0; i < threadCount; i++) {
+				features.push_back(std::async(std::launch::async, [this] {
+					DoWork();
+				}));
+			}
+			for (std::future<void> &f : features) {
+				f.wait();
+			}
+
+#elif USE_WIN32_PTP_WORK
+			PTP_WORK work = CreateThreadpoolWork(WorkCallback, this, nullptr);
+			for (uint32_t i = 0; i < threadCount; i++) {
+				SubmitThreadpoolWork(work);
+			}
+			WaitForThreadpoolWorkCallbacks(work, FALSE);
+			CloseThreadpoolWork(work);
+
+#else
+			runningThread = threadCount;
+			finishedEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+			for (uint32_t i = 0; i < threadCount; i++) {
+				QueueUserWorkItem(ThreadProc, this, WT_EXECUTEDEFAULT);
+			}
+			while (true) {
+				const DWORD result = WaitForSingleObject(finishedEvent, 0);
+				if (result == WAIT_OBJECT_0) {
+					if (runningThread.load() == 0) {
+						break;
+					}
+				} else if (result == WAIT_TIMEOUT) {
+				}
+				SwitchToThread();
+				//Sleep(0);
+				//YieldProcessor();
+			}
+			CloseHandle(finishedEvent);
+#endif // USE_WIN32_WORK_ITEM
+			return threadCount;
+		}
+
+		void * const idleTaskTimer = model.idleTaskTimer;
+		Surface * const surface = sharedSurface;
+		auto it = segmentList.begin();
+		while (true) {
+			const TextSegment &ts = *it++;
+			Layout(ts, surface);
+			if (it == segmentList.end()) {
+				break;
+			}
+			if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
+				break;
+			}
+		}
+
+		finishedCount = static_cast<uint32_t>(it - segmentList.begin());
+		return 1;
+	}
+
+	void DoWork() {
+		uint32_t finished = 0;
+		void * const idleTaskTimer = model.idleTaskTimer;
+		Surface *surface;
+		std::unique_ptr<Surface> surf;
+		if (vstyle.technology != Technology::Default) {
+			surface = sharedSurface;
+		} else {
+			surf = Surface::Allocate(Technology::Default);
+			surf->Init(nullptr);
+			surf->SetMode(SurfaceMode(model.pdoc->dbcsCodePage, false));
+			surface = surf.get();
+		}
+
+		while (true) {
+			const uint32_t index = nextIndex.fetch_add(1);
+			if (index >= segmentCount) {
+				break;
+			}
+
+			const TextSegment &ts = segmentList[index];
+			Layout(ts, surface);
+			finished = index + 1;
+			if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
+				break;
+			}
+		}
+
+		UpdateMaximum(finishedCount, finished);
+#if USE_WIN32_WORK_ITEM
+		SetEvent(finishedEvent);
+		runningThread -= 1;
+#endif
+	}
+
+#if USE_WIN32_PTP_WORK
+	static VOID CALLBACK WorkCallback([[maybe_unused]] PTP_CALLBACK_INSTANCE instance, PVOID context, [[maybe_unused]] PTP_WORK work) {
+		LayoutWorker *worker = static_cast<LayoutWorker *>(context);
+		worker->DoWork();
+	}
+#elif USE_WIN32_WORK_ITEM
+	static DWORD WINAPI ThreadProc(LPVOID lpParameter) {
+		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+		LayoutWorker *worker = static_cast<LayoutWorker *>(lpParameter);
+		worker->DoWork();
+		return 0;
+	}
+#endif
+};
+
 }
 
 /**
@@ -443,8 +654,8 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 * Copy the given @a line and its styles from the document into local arrays.
 * Also determine the x position at which each character starts.
 */
-int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option, int posInLine) {
-	int wrappedBytes = 0; // only care about time spend on MeasureWidths()
+uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewStyle &vstyle, LineLayout *ll, int width, LayoutLineOption option, int posInLine) {
+	uint64_t wrappedBytes = 0; // only care about time spend on MeasureWidths()
 	const Sci::Line line = ll->LineNumber();
 	PLATFORM_ASSERT(line < model.pdoc->LinesTotal());
 	PLATFORM_ASSERT(ll->chars);
@@ -528,90 +739,52 @@ int EditView::LayoutLine(const EditModel &model, Surface *surface, const ViewSty
 		&& ll->PartialPosition() && width == ll->widthLine;
 	if (validity == LineLayout::ValidLevel::invalid
 		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
-		bool lastSegItalics = false;
-		bool wholeLine = true;
-		if (model.BidirectionalEnabled()) {
-			posInLine = ll->numCharsInLine; // whole line
-		} else {
-			posInLine = std::max(posInLine, ll->caretPosition) + BreakFinder::lengthEachSubdivision;
-		}
+		//const ElapsedPeriod period;
+		//posInLine = ll->numCharsInLine; // whole line
+		LayoutWorker worker{ ll, vstyle, surface, posCache, model, {}};
+		const uint32_t threadCount = worker.Start(posLineStart, posInLine);
 
-		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, ll->numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
-		while (bfLayout.More()) {
-			const TextSegment ts = bfLayout.Next();
-			const int endPos = ts.end();
-
-			const Style &style = vstyle.styles[ll->styles[ts.start]];
-			if (style.visible) {
-				if (ts.representation) {
-					lastSegItalics = false;
-					XYPOSITION representationWidth = vstyle.controlCharWidth;
-					if (ll->chars[ts.start] == '\t') {
-						// Tab is a special case of representation, taking a variable amount of space
-						const XYPOSITION x = ll->positions[ts.start];
-						representationWidth = NextTabstopPos(line, x, vstyle.tabWidth) - ll->positions[ts.start];
-					} else {
-						if (representationWidth <= 0.0) {
-							const Style &styleCtrl = vstyle.styles[StyleControlChar];
-							// only supports character representation with ASCII text
-							if (styleCtrl.monospaceASCII) {
-								representationWidth = style.aveCharWidth * ts.representation->length;
-							} else {
-								XYPOSITION positionsRepr[Representation::maxLength + 1];
-								const std::string_view stringRep = ts.representation->GetStringRep();
-								posCache.MeasureWidths(surface, styleCtrl, StyleControlChar, stringRep, positionsRepr);
-								representationWidth = positionsRepr[ts.representation->length - 1];
-							}
-							if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
-								representationWidth += vstyle.ctrlCharPadding;
-							}
-						}
-					}
-					for (int ii = 0; ii < ts.length; ii++) {
-						ll->positions[ts.start + 1 + ii] = representationWidth;
-					}
-				} else {
-					lastSegItalics = style.italic && (ll->chars[endPos - 1] != ' ');
-					if ((ts.length == 1) && (' ' == ll->chars[ts.start])) {
-						// Over half the segments are single characters and of these about half are space characters.
-						ll->positions[ts.start + 1] = style.spaceWidth;
-					} else {
-						posCache.MeasureWidths(surface, style, ll->styles[ts.start],
-							std::string_view(&ll->chars[ts.start], ts.length), &ll->positions[ts.start + 1]);
-					}
-				}
+		// Accumulate absolute positions from relative positions within segments and expand tabs
+		const uint32_t finishedCount = worker.finishedCount;
+		uint32_t iByte = ll->lastSegmentEnd;
+		XYPOSITION xPosition = ll->positions[iByte++];
+		for (auto it = worker.segmentList.begin(); it != worker.segmentList.begin() + finishedCount; ++it) {
+			const TextSegment &ts = *it;
+			if (ts.representation && (ll->chars[ts.start] == '\t') && vstyle.styles[ll->styles[ts.start]].visible) {
+				// Simple visible tab, go to next tab stop
+				const XYPOSITION startTab = ll->positions[ts.start];
+				const XYPOSITION nextTab = NextTabstopPos(line, startTab, vstyle.tabWidth);
+				xPosition += nextTab - startTab;
 			}
 
-			for (int posToIncrease = ts.start + 1; posToIncrease <= endPos; posToIncrease++) {
-				ll->positions[posToIncrease] += ll->positions[ts.start];
-			}
-
-			if (endPos > posInLine && model.IdleTaskTimeExpired()) {
-				// treat remaining text as zero width
-				//printf("%s(%d, %zd) posInLine=%d, lineLength=%d / %d, wrappedBytes=%d - %d\n", __func__,
-				//	(int)option, line, posInLine, wrappedBytes, ll->numCharsInLine, endPos, ll->lastSegmentEnd);
-				if (endPos < ll->numCharsInLine) {
-					wholeLine = false;
-					wrappedBytes = endPos - ll->lastSegmentEnd;
-					ll->lastSegmentEnd = endPos;
-					const XYPOSITION last = ll->positions[endPos];
-					std::fill(&ll->positions[endPos + 1], &ll->positions[ll->numCharsInLine + 1], last);
-				}
-				break;
+			const XYPOSITION xBeginSegment = xPosition;
+			for (int i = 0; i < ts.length; i++) {
+				xPosition = ll->positions[iByte] + xBeginSegment;
+				ll->positions[iByte++] = xPosition;
 			}
 		}
 
-		// Small hack to make lines that end with italics not cut off the edge of the last character
-		if (wholeLine) {
-			wrappedBytes = ll->numCharsInLine - ll->lastSegmentEnd;
-			ll->lastSegmentEnd = ll->numCharsInLine;
-			if (lastSegItalics) {
-				ll->positions[ll->numCharsInLine] += vstyle.lastSegItalicsOffset;
+		const TextSegment &ts = worker.segmentList[finishedCount - 1];
+		const int endPos = ts.end();
+		const uint32_t bytes = endPos - ll->lastSegmentEnd;
+		wrappedBytes = bytes | (static_cast<uint64_t>(bytes / threadCount) << 32);
+#if 0
+		if (ll->numCharsInLine - ll->lastSegmentEnd > BreakFinder::lengthStartSubdivision) {
+			const double duration = period.Duration()*1e3;
+			printf("invalid line=%zd (%u / %zu), (%d / %d) (%u / %u, %u), duration=%f, %f\n", line + 1,
+				finishedCount, worker.segmentList.size(), worker.maxPosInLine, ll->maxLineLength,
+				bytes, threadCount, bytes / threadCount, duration, model.durationWrapOneThread.Duration()*1e3);
+		}
+#endif
+		ll->lastSegmentEnd = endPos;
+		if (endPos == ll->numCharsInLine) {
+			// Small hack to make lines that end with italics not cut off the edge of the last character
+			// Not quite the same as before which would effectively ignore trailing invisible segments
+			if (!ts.representation && (ll->chars[endPos - 1] != ' ') && vstyle.styles[ll->styles[ts.start]].italic) {
+				ll->positions[endPos] += vstyle.lastSegItalicsOffset;
 			}
 		}
 		validity = LineLayout::ValidLevel::positions;
-		//const double duration = period.Duration()*1e3;
-		//printf("invalid line=%zd (%d) duration=%f\n", line + 1, lineLength, duration);
 	}
 	if ((validity == LineLayout::ValidLevel::positions) || (ll->widthLine != width)) {
 		const int linesWrapped = ll->lines;

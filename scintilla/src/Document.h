@@ -209,13 +209,14 @@ struct RegexError : public std::runtime_error {
  */
 
 class ActionDuration {
-	double duration = 1e-6;
+	double duration;
 	static constexpr double minDuration = 1e-7;
 	static constexpr double maxDuration = 1e-4;
 	// measure time in KiB instead of byte.
 	static constexpr int unitBytes = 1024;
 public:
 	static constexpr int InitialBytes = 1024*1024;
+	ActionDuration(double initial) noexcept : duration{initial} {}
 	void AddSample(Sci::Position numberActions, double durationOfActions) noexcept;
 	double Duration() const noexcept {
 		return duration;
