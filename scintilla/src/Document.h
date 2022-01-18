@@ -221,7 +221,7 @@ public:
 	double Duration() const noexcept {
 		return duration;
 	}
-	Sci::Position ActionsInAllowedTime(double secondsAllowed) const noexcept;
+	int ActionsInAllowedTime(double secondsAllowed) const noexcept;
 };
 
 /**

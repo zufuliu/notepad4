@@ -473,6 +473,8 @@ struct LayoutWorker {
 	std::atomic<uint32_t> runningThread = 0;
 #endif
 
+	static constexpr int blockSize = 4096;
+
 	template<typename T>
 	static inline void UpdateMaximum(std::atomic<T> &maximum, const T &value) noexcept {
 		// https://stackoverflow.com/questions/16190078/how-to-atomically-update-a-maximum-value
@@ -520,23 +522,28 @@ struct LayoutWorker {
 		}
 	}
 
-	uint32_t Start(Sci::Position posLineStart, int posInLine) {
-		if (model.BidirectionalEnabled()) {
-			posInLine = ll->numCharsInLine; // whole line
+	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine) {
+		const int startPos = ll->lastSegmentEnd;
+		const int endPos = ll->numCharsInLine;
+		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
+			posInLine = std::max<uint32_t>(posInLine, ll->caretPosition) + blockSize;
+			if (posInLine > static_cast<uint32_t>(endPos)) {
+				posInLine = endPos;
+			}
 		} else {
-			posInLine = std::max(posInLine, ll->caretPosition) + BreakFinder::lengthStartSubdivision;
+			posInLine = endPos;
 		}
 
-		BreakFinder bfLayout(ll, nullptr, Range(ll->lastSegmentEnd, ll->numCharsInLine), posLineStart, 0, BreakFinder::BreakFor::Text, model.pdoc, &model.reprs, nullptr);
+		BreakFinder bfLayout(ll, nullptr, Range(startPos, endPos), posLineStart, 0, BreakFinder::BreakFor::Layout, model, nullptr, posInLine);
 		do {
 			segmentList.push_back(bfLayout.Next());
 		} while (bfLayout.More());
 
-		maxPosInLine = posInLine;
-		const int length = ll->numCharsInLine - ll->lastSegmentEnd;
-		if (length >= BreakFinder::lengthStartSubdivision && model.UseParallelLayout(length)) {
+		maxPosInLine = static_cast<int>(posInLine);
+		const uint32_t length = bfLayout.CurrentPos() - startPos;
+		if (length >= model.minParallelLayoutLength && model.hardwareConcurrency > 1) {
 			segmentCount = static_cast<uint32_t>(segmentList.size());
-			const uint32_t threadCount = std::min(segmentCount/2, model.hardwareConcurrency);
+			const uint32_t threadCount = std::min(length/blockSize, model.hardwareConcurrency);
 #if USE_STD_ASYNC_FUTURE
 			std::vector<std::future<void>> features;
 			for (uint32_t i = 0; i < threadCount; i++) {
@@ -581,6 +588,7 @@ struct LayoutWorker {
 
 		void * const idleTaskTimer = model.idleTaskTimer;
 		Surface * const surface = sharedSurface;
+		int processed = 0;
 		auto it = segmentList.begin();
 		while (true) {
 			const TextSegment &ts = *it++;
@@ -588,8 +596,12 @@ struct LayoutWorker {
 			if (it == segmentList.end()) {
 				break;
 			}
-			if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
-				break;
+			processed += ts.length;
+			if (processed >= blockSize) {
+				processed = 0;
+				if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
+					break;
+				}
 			}
 		}
 
@@ -611,6 +623,7 @@ struct LayoutWorker {
 			surface = surf.get();
 		}
 
+		int processed = 0;
 		while (true) {
 			const uint32_t index = nextIndex.fetch_add(1);
 			if (index >= segmentCount) {
@@ -620,8 +633,12 @@ struct LayoutWorker {
 			const TextSegment &ts = segmentList[index];
 			Layout(ts, surface);
 			finished = index + 1;
-			if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
-				break;
+			processed += ts.length;
+			if (processed >= blockSize) {
+				processed = 0;
+				if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
+					break;
+				}
 			}
 		}
 
@@ -769,9 +786,9 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		const uint32_t bytes = endPos - ll->lastSegmentEnd;
 		wrappedBytes = bytes | (static_cast<uint64_t>(bytes / threadCount) << 32);
 #if 0
-		if (ll->numCharsInLine - ll->lastSegmentEnd > BreakFinder::lengthStartSubdivision) {
+		if (bytes > LayoutWorker::blockSize) {
 			const double duration = period.Duration()*1e3;
-			printf("invalid line=%zd (%u / %zu), (%d / %d) (%u / %u, %u), duration=%f, %f\n", line + 1,
+			printf("invalid line=%zd segment=(%u / %zu), posInLine=(%d / %d) (%u / %u, %u), duration=%f, %f\n", line + 1,
 				finishedCount, worker.segmentList.size(), worker.maxPosInLine, ll->maxLineLength,
 				bytes, threadCount, bytes / threadCount, duration, model.durationWrapOneThread.Duration()*1e3);
 		}
@@ -2115,7 +2132,7 @@ void EditView::DrawBackground(Surface *surface, const EditModel &model, const Vi
 	const XYPOSITION xStartVisible = static_cast<XYPOSITION>(subLineStart - xStart);
 
 	const BreakFinder::BreakFor breakFor = selBackDrawn ? BreakFinder::BreakFor::Selection : BreakFinder::BreakFor::Text;
-	BreakFinder bfBack(ll, &model.sel, lineRange, posLineStart, xStartVisible, breakFor, model.pdoc, &model.reprs, &vsDraw);
+	BreakFinder bfBack(ll, &model.sel, lineRange, posLineStart, xStartVisible, breakFor, model, &vsDraw, 0);
 
 	const bool drawWhitespaceBackground = vsDraw.WhitespaceBackgroundDrawn() && !background;
 
@@ -2333,7 +2350,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 	// Foreground drawing loop
 	const BreakFinder::BreakFor breakFor = (((phasesDraw == PhasesDraw::One) && selBackDrawn) || vsDraw.SelectionTextDrawn())
 		? BreakFinder::BreakFor::ForegroundAndSelection : BreakFinder::BreakFor::Foreground;
-	BreakFinder bfFore(ll, &model.sel, lineRange, posLineStart, xStartVisible, breakFor, model.pdoc, &model.reprs, &vsDraw);
+	BreakFinder bfFore(ll, &model.sel, lineRange, posLineStart, xStartVisible, breakFor, model, &vsDraw, 0);
 
 	while (bfFore.More()) {
 

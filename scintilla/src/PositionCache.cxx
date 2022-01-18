@@ -60,6 +60,7 @@
 #include "UniConversion.h"
 #include "Selection.h"
 #include "PositionCache.h"
+#include "EditModel.h"
 
 using namespace Scintilla;
 using namespace Scintilla::Internal;
@@ -571,7 +572,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 
 	size_t pos = 0;
 	LineLayout *ret = nullptr;
-	const int useLongCache = maxChars >> (10 + 11); // 1024*1024*2
+	const int useLongCache = maxChars >> (20 + 1); // 2MiB
 	if (useLongCache) {
 		for (const auto &ll : longCache) {
 			if (ll->LineNumber() == lineNumber) {
@@ -768,30 +769,41 @@ void BreakFinder::Insert(Sci::Position val) {
 	}
 }
 
-BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart,
-	XYPOSITION xStart, BreakFor breakFor, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw) :
+BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange, Sci::Position posLineStart,
+	XYPOSITION xStart, BreakFor breakFor, const EditModel &model, const ViewStyle *pvsDraw, uint32_t posInLine) :
 	ll(ll_),
-	lineRange(lineRange_),
-	nextBreak(static_cast<int>(lineRange_.start)),
+	nextBreak(static_cast<int>(lineRange.start)),
 	subBreak(-1),
+	endPos(static_cast<int>(lineRange.end)),
+	stopPos(endPos),
 	saeCurrentPos(0),
 	saeNext(0),
-	pdoc(pdoc_),
-	encodingFamily(pdoc_->CodePageFamily()),
-	preprs(preprs_) {
+	pdoc(model.pdoc),
+	encodingFamily(pdoc->CodePageFamily()),
+	reprs(model.reprs) {
 
 	// Search for first visible break
 	// First find the first visible character
-	if (xStart > 0.0f)
+	if (xStart > 0.0f) {
+		const int startPos = nextBreak;
 		nextBreak = ll->FindBefore(xStart, lineRange);
-	// Now back to a style break
-	while ((nextBreak > lineRange.start) && (ll->styles[nextBreak] == ll->styles[nextBreak - 1])) {
-		nextBreak--;
+		// Now back to a style break
+		while ((nextBreak > startPos) && (ll->styles[nextBreak] == ll->styles[nextBreak - 1])) {
+			nextBreak--;
+		}
+	}
+
+	currentPos = nextBreak;
+	if (breakFor == BreakFor::Layout && posInLine < static_cast<uint32_t>(stopPos)) {
+		posInLine = std::max(posInLine, currentPos + model.maxParallelLayoutLength);
+		if (posInLine < static_cast<uint32_t>(stopPos)) {
+			stopPos = static_cast<int>(posInLine);
+		}
 	}
 
 	if (FlagSet(breakFor, BreakFor::Selection)) {
 		const SelectionPosition posStart(posLineStart);
-		const SelectionPosition posEnd(posLineStart + lineRange.end);
+		const SelectionPosition posEnd(posLineStart + endPos);
 		const SelectionSegment segmentLine(posStart, posEnd);
 		for (size_t r = 0; r < psel->Count(); r++) {
 			const SelectionSegment portion = psel->Range(r).Intersect(segmentLine);
@@ -822,7 +834,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 		for (const auto *const deco : pdoc->decorations->View()) {
 			if (pvsDraw->indicators[deco->Indicator()].OverridesTextFore()) {
 				Sci::Position startPos = deco->EndRun(posLineStart);
-				while (startPos < (posLineStart + lineRange.end)) {
+				while (startPos < (posLineStart + endPos)) {
 					Insert(startPos - posLineStart);
 					startPos = deco->EndRun(startPos);
 				}
@@ -830,7 +842,7 @@ BreakFinder::BreakFinder(const LineLayout *ll_, const Selection *psel, Range lin
 		}
 	}
 	Insert(ll->edgeColumn);
-	Insert(lineRange.end);
+	Insert(endPos);
 	saeNext = (!selAndEdge.empty()) ? selAndEdge[0] : -1;
 }
 
@@ -840,31 +852,31 @@ TextSegment BreakFinder::Next() {
 	if (subBreak < 0) {
 		const int prev = nextBreak;
 		const Representation *repr = nullptr;
-		while (nextBreak < lineRange.end) {
+		while (nextBreak < endPos) {
 			int charWidth = 1;
 			const char * const chars = &ll->chars[nextBreak];
 			const unsigned char ch = chars[0];
 			if (!UTF8IsAscii(ch) && encodingFamily != EncodingFamily::eightBit) {
 				if (encodingFamily == EncodingFamily::unicode) {
-					charWidth = UTF8DrawBytes(chars, lineRange.end - nextBreak);
+					charWidth = UTF8DrawBytes(chars, endPos - nextBreak);
 				} else {
-					charWidth = pdoc->DBCSDrawBytes(chars, lineRange.end - nextBreak);
+					charWidth = pdoc->DBCSDrawBytes(chars, endPos - nextBreak);
 				}
 			}
 			repr = nullptr;
-			if (preprs->MayContains(ch)) {
+			if (reprs.MayContains(ch)) {
 				// Special case \r\n line ends if there is a representation
-				if (ch == '\r' && preprs->ContainsCrLf() && chars[1] == '\n') {
+				if (ch == '\r' && reprs.ContainsCrLf() && chars[1] == '\n') {
 					charWidth = 2;
 				}
-				repr = preprs->GetRepresentation(std::string_view(chars, charWidth));
+				repr = reprs.GetRepresentation(std::string_view(chars, charWidth));
 			}
 			if (((nextBreak > 0) && (ll->styles[nextBreak] != ll->styles[nextBreak - 1])) ||
 				repr ||
 				(nextBreak == saeNext)) {
-				while ((nextBreak >= saeNext) && (saeNext < lineRange.end)) {
+				while ((nextBreak >= saeNext) && (saeNext < endPos)) {
 					saeCurrentPos++;
-					saeNext = static_cast<int>((saeCurrentPos < selAndEdge.size()) ? selAndEdge[saeCurrentPos] : lineRange.end);
+					saeNext = static_cast<int>((saeCurrentPos < selAndEdge.size()) ? selAndEdge[saeCurrentPos] : endPos);
 				}
 				if ((nextBreak > prev) || repr) {
 					// Have a segment to report
@@ -881,6 +893,7 @@ TextSegment BreakFinder::Next() {
 
 		const int lengthSegment = nextBreak - prev;
 		if (lengthSegment < lengthStartSubdivision) {
+			currentPos = nextBreak;
 			return {prev, lengthSegment, repr};
 		}
 		subBreak = prev;
@@ -898,11 +911,8 @@ TextSegment BreakFinder::Next() {
 	} else {
 		subBreak = -1;
 	}
+	currentPos += lengthSegment;
 	return {startSegment, lengthSegment, nullptr};
-}
-
-bool BreakFinder::More() const noexcept {
-	return (subBreak >= 0) || (nextBreak < lineRange.end);
 }
 
 PositionCacheEntry::PositionCacheEntry() noexcept :

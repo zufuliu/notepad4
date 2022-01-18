@@ -1578,7 +1578,7 @@ bool Editor::WrapLines(WrapScope ws) {
 		} else if (ws == WrapScope::wsIdle) {
 			// Try to keep time taken by wrapping reasonable so interaction remains smooth.
 			constexpr double secondsAllowed = 0.01;
-			const Sci::Position actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
+			const int actionsInAllowedTime = durationWrapOneUnit.ActionsInAllowedTime(secondsAllowed);
 			lineToWrapEnd = pdoc->LineFromPositionAfter(lineToWrap, actionsInAllowedTime);
 		}
 
@@ -1624,6 +1624,7 @@ bool Editor::WrapLines(WrapScope ws) {
 				const double duration = epWrapping.Duration();
 				durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
 				durationWrapOneThread.AddSample(wrappedBytesOneThread, duration);
+				UpdateParallelLayoutThreshold();
 
 				goodTopLine = pcs->DisplayFromDoc(lineDocTop) + std::min(
 					subLineTop, static_cast<Sci::Line>(pcs->GetHeight(lineDocTop) - 1));
@@ -1632,12 +1633,15 @@ bool Editor::WrapLines(WrapScope ws) {
 
 		// If wrapping is done, bring it to resting position
 		if (!partialLine && wrapPending.start >= lineEndNeedWrap) {
-			//constexpr double scale = 1e3; // 1 KiB in millisecond
-			//printf("%s idle style duration: %f, wrap duration: %f, %f\n", __func__,
-			//	pdoc->durationStyleOneUnit.Duration()*scale,
-			//	durationWrapOneUnit.Duration()*scale, durationWrapOneThread.Duration()*scale);
 			wrapPending.Reset();
 		}
+#if 0
+		constexpr double scale = 1e3; // 1 KiB in millisecond
+		printf("%s idle style duration: %f, wrap duration: %f, %f, parallel=%u, %u\n", __func__,
+			pdoc->durationStyleOneUnit.Duration()*scale,
+			durationWrapOneUnit.Duration()*scale, durationWrapOneThread.Duration()*scale,
+			minParallelLayoutLength/1024, maxParallelLayoutLength/1024);
+#endif
 	}
 
 	if (wrapOccurred) {
@@ -5227,7 +5231,7 @@ Sci::Position Editor::PositionAfterMaxStyling(Sci::Position posMax, bool scrolli
 	const double secondsAllowed = scrolling ? 0.005 : 0.02;
 
 	Sci::Line lineLast = pdoc->SciLineFromPosition(pdoc->GetEndStyled());
-	const Sci::Position actionsInAllowedTime = pdoc->durationStyleOneUnit.ActionsInAllowedTime(secondsAllowed);
+	const int actionsInAllowedTime = pdoc->durationStyleOneUnit.ActionsInAllowedTime(secondsAllowed);
 	lineLast = pdoc->LineFromPositionAfter(lineLast, actionsInAllowedTime);
 
 	const Sci::Line stylingMaxLine = std::min(lineLast, pdoc->LinesTotal());

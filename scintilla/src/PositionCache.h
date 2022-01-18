@@ -248,18 +248,22 @@ struct TextSegment {
 	}
 };
 
+class EditModel;
+
 // Class to break a line of text into shorter runs at sensible places.
 class BreakFinder {
 	const LineLayout *ll;
-	const Range lineRange;
 	int nextBreak;
 	int subBreak;
+	const int endPos;
+	int stopPos;
+	int currentPos;
 	std::vector<int> selAndEdge;
 	unsigned int saeCurrentPos;
 	int saeNext;
 	const Document *pdoc;
 	const EncodingFamily encodingFamily;
-	const SpecialRepresentations * const preprs;
+	const SpecialRepresentations &reprs;
 	void Insert(Sci::Position val);
 public:
 	// If a whole run is longer than lengthStartSubdivision then subdivide
@@ -276,9 +280,10 @@ public:
 		Selection = 1,
 		Foreground = 2,
 		ForegroundAndSelection = 3,
+		Layout = 4,
 	};
-	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange_, Sci::Position posLineStart,
-		XYPOSITION xStart, BreakFor breakFor, const Document *pdoc_, const SpecialRepresentations *preprs_, const ViewStyle *pvsDraw);
+	BreakFinder(const LineLayout *ll_, const Selection *psel, Range lineRange, Sci::Position posLineStart,
+		XYPOSITION xStart, BreakFor breakFor, const EditModel &model, const ViewStyle *pvsDraw, uint32_t posInLine);
 	// Deleted so BreakFinder objects can not be copied.
 	BreakFinder(const BreakFinder &) = delete;
 	BreakFinder(BreakFinder &&) = delete;
@@ -286,7 +291,12 @@ public:
 	void operator=(BreakFinder &&) = delete;
 	~BreakFinder();
 	TextSegment Next();
-	bool More() const noexcept;
+	bool More() const noexcept {
+		return currentPos < stopPos;
+	}
+	int CurrentPos() const noexcept {
+		return currentPos;
+	}
 };
 
 class PositionCache {
