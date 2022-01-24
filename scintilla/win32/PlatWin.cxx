@@ -1190,8 +1190,6 @@ void SurfaceGDI::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 }
 
 void SurfaceGDI::MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	// Zero positions to avoid random behaviour on failure.
-	std::fill(positions, positions + text.length(), 0.0f);
 	SetFont(font_);
 	SIZE sz {};
 	int fit = 0;
@@ -1283,8 +1281,6 @@ void SurfaceGDI::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOS
 }
 
 void SurfaceGDI::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	// Zero positions to avoid random behaviour on failure.
-	std::fill(positions, positions + text.length(), 0.0f);
 	SetFont(font_);
 	SIZE sz = { 0,0 };
 	int fit = 0;
@@ -2527,8 +2523,6 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 	}
 	const TextWide tbuf(text, mode.codePage);
 	TextPositions poses(tbuf.length());
-	// Initialize poses for safety.
-	std::fill(poses.data(), poses.data() + tbuf.length(), 0.0f);
 	// Create a layout
 	IDWriteTextLayout *pTextLayout = nullptr;
 	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pfm->pTextFormat, 10000.0, 1000.0, &pTextLayout);
@@ -2655,8 +2649,6 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 
 	const TextWide tbuf(text, CpUtf8);
 	TextPositions poses(tbuf.length());
-	// Initialize poses for safety.
-	std::fill(poses.data(), poses.data() + tbuf.length(), 0.0f);
 	// Create a layout
 	IDWriteTextLayout *pTextLayout = nullptr;
 	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pfm->pTextFormat, 10000.0, 1000.0, &pTextLayout);

@@ -756,6 +756,9 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		&& ll->PartialPosition() && width == ll->widthLine;
 	if (validity == LineLayout::ValidLevel::invalid
 		|| (option != LayoutLineOption::KeepPosition && ll->PartialPosition())) {
+		//if (ll->maxLineLength > LayoutWorker::blockSize) {
+		//	printf("start layout line=%zd, posInLine=%d\n", line + 1, posInLine);
+		//}
 		//const ElapsedPeriod period;
 		//posInLine = ll->numCharsInLine; // whole line
 		LayoutWorker worker{ ll, vstyle, surface, posCache, model, {}};
@@ -788,7 +791,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 #if 0
 		if (bytes > LayoutWorker::blockSize) {
 			const double duration = period.Duration()*1e3;
-			printf("invalid line=%zd segment=(%u / %zu), posInLine=(%d / %d) (%u / %u, %u), duration=%f, %f\n", line + 1,
+			printf("layout line=%zd segment=(%u / %zu), posInLine=(%d / %d) (%u / %u, %u), duration=%f, %f\n", line + 1,
 				finishedCount, worker.segmentList.size(), worker.maxPosInLine, ll->maxLineLength,
 				bytes, threadCount, bytes / threadCount, duration, model.durationWrapOneThread.Duration()*1e3);
 		}

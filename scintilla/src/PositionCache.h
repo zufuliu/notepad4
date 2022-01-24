@@ -175,20 +175,12 @@ public:
 };
 
 class PositionCacheEntry {
-	uint16_t styleNumber;
-	uint16_t len;
-	uint32_t clock;
+	uint16_t styleNumber = 0;
+	uint16_t clock = 0;
+	uint32_t len = 0;
 	std::unique_ptr<XYPOSITION[]> positions;
 public:
-	PositionCacheEntry() noexcept;
-	// Copy constructor not currently used, but needed for being element in std::vector.
-	PositionCacheEntry(const PositionCacheEntry &);
-	PositionCacheEntry(PositionCacheEntry &&) noexcept = default;
-	// Deleted so PositionCacheEntry objects can not be assigned.
-	void operator=(const PositionCacheEntry &) = delete;
-	void operator=(PositionCacheEntry &&) = delete;
-	~PositionCacheEntry();
-	void Set(uint16_t styleNumber_, std::string_view sv, const XYPOSITION *positions_, uint32_t clock_);
+	void Set(uint16_t styleNumber_, size_t length, std::unique_ptr<XYPOSITION[]> &positions_, uint32_t clock_) noexcept;
 	void Clear() noexcept;
 	bool Retrieve(uint16_t styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept;
 	static size_t Hash(uint16_t styleNumber_, std::string_view sv) noexcept;
@@ -308,8 +300,7 @@ public:
 	void Clear() noexcept;
 	void SetSize(size_t size_);
 	size_t GetSize() const noexcept;
-	void MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber,
-		std::string_view sv, XYPOSITION *positions);
+	void MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions);
 };
 
 }

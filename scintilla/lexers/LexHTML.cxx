@@ -719,7 +719,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					if (ch == '*' && chNext == '/') {
 						levelCurrent--;
 					}
-				} else if (!(state == SCE_HPHP_COMMENTLINE || state == SCE_HJ_COMMENTLINE || isStringState(state))) {
+				} else if (!(state == SCE_HPHP_COMMENTLINE || state == SCE_HJ_COMMENTLINE || isStringState(state) || state == SCE_HJ_REGEX)) {
 				//Platform::DebugPrintf("state=%d, StateToPrint=%d, initStyle=%d\n", state, StateToPrint, initStyle);
 					if (ch == '#') {
 						Sci_Position j = i + 1;

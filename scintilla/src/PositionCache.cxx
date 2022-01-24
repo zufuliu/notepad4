@@ -915,57 +915,27 @@ TextSegment BreakFinder::Next() {
 	return {startSegment, lengthSegment, nullptr};
 }
 
-PositionCacheEntry::PositionCacheEntry() noexcept :
-	styleNumber(0), len(0), clock(0) {
-}
-
-// Copy constructor not currently used, but needed for being element in std::vector.
-PositionCacheEntry::PositionCacheEntry(const PositionCacheEntry &other) :
-	styleNumber(other.styleNumber), len(other.len), clock(other.clock) {
-	if (other.positions) {
-		const size_t lenData = len + (len / sizeof(XYPOSITION)) + 1;
-		positions = std::make_unique<XYPOSITION[]>(lenData);
-		memcpy(positions.get(), other.positions.get(), lenData * sizeof(XYPOSITION));
-	}
-}
-
-void PositionCacheEntry::Set(uint16_t styleNumber_, std::string_view sv,
-	const XYPOSITION *positions_, uint32_t clock_) {
+void PositionCacheEntry::Set(uint16_t styleNumber_, size_t length, std::unique_ptr<XYPOSITION[]> &positions_, uint32_t clock_) noexcept {
 	styleNumber = styleNumber_;
-	len = static_cast<uint16_t>(sv.length());
-	clock = clock_;
-	if (sv.data() && positions_) {
-		positions = std::make_unique<XYPOSITION[]>(len + (len / sizeof(XYPOSITION)) + 1);
-		for (unsigned int i = 0; i < len; i++) {
-			positions[i] = positions_[i];
-		}
-		memcpy(&positions[len], sv.data(), sv.length());
-	} else {
-		positions.reset();
-	}
-}
-
-PositionCacheEntry::~PositionCacheEntry() {
-	Clear();
+	clock = static_cast<uint16_t>(clock_);
+	len = static_cast<uint32_t>(length);
+	positions.swap(positions_);
 }
 
 void PositionCacheEntry::Clear() noexcept {
-	positions.reset();
 	styleNumber = 0;
-	len = 0;
 	clock = 0;
+	len = 0;
+	positions.reset();
 }
 
 bool PositionCacheEntry::Retrieve(uint16_t styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept {
 	if ((styleNumber == styleNumber_) && (len == sv.length()) &&
-		(memcmp(&positions[len], sv.data(), sv.length()) == 0)) {
-		for (unsigned int i = 0; i < len; i++) {
-			positions_[i] = positions[i];
-		}
+		(memcmp(&positions[sv.length()], sv.data(), sv.length()) == 0)) {
+		memcpy(positions_, &positions[0], sv.length()*sizeof(XYPOSITION));
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 }
 
 size_t PositionCacheEntry::Hash(uint16_t styleNumber_, std::string_view sv) noexcept {
@@ -984,15 +954,10 @@ void PositionCacheEntry::ResetClock() noexcept {
 	}
 }
 
-#define PositionCacheHashSizeUsePowerOfTwo	1
 PositionCache::PositionCache() {
 	clock = 1;
 	allClear = true;
-#if PositionCacheHashSizeUsePowerOfTwo
-	pces.resize(2048);
-#else
-	pces.resize(2039);
-#endif
+	pces.resize(1024);
 }
 
 void PositionCache::Clear() noexcept {
@@ -1007,12 +972,10 @@ void PositionCache::Clear() noexcept {
 
 void PositionCache::SetSize(size_t size_) {
 	Clear();
+	if (size_ & (size_ - 1)) {
+		size_ = NextPowerOfTwo(size_);
+	}
 	if (size_ != pces.size()) {
-#if PositionCacheHashSizeUsePowerOfTwo
-		if (size_ & (size_ - 1)) {
-			size_ = NextPowerOfTwo(size_);
-		}
-#endif
 		pces.resize(size_);
 	}
 }
@@ -1078,8 +1041,7 @@ using CacheReadLock = CacheWriteLock;
 #endif
 }
 
-void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber,
-	std::string_view sv, XYPOSITION *positions) {
+void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions) {
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
 		const XYPOSITION characterWidth = style.aveCharWidth;
 		const size_t length = sv.length();
@@ -1136,47 +1098,48 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 	}
 #endif // MeasureWidthsUseEastAsianWidth
 
-	size_t probe = pces.size();	// Out of bounds
-	if ((sv.length() < 64)) {
+	PositionCacheEntry *entry = nullptr;
+	PositionCacheEntry *entry2 = nullptr;
+	constexpr size_t maxLength = (512 - 16)/(sizeof(XYPOSITION) + 1);
+	if (sv.length() <= maxLength) {
 		// Only store short strings in the cache so it doesn't churn with
 		// long comments with only a single comment.
-#if PositionCacheHashSizeUsePowerOfTwo
-		const size_t mask = probe - 1;
-#else
-		const size_t modulo = probe;
-#endif
+
 		// Two way associative: try two probe positions.
 		const size_t hashValue = PositionCacheEntry::Hash(styleNumber, sv);
-#if PositionCacheHashSizeUsePowerOfTwo
-		probe = hashValue & mask;
-#else
-		probe = hashValue % modulo;
-#endif
+		const size_t mask = pces.size() - 1;
+		const size_t probe = hashValue & mask;
+		entry = &pces[probe];
 
 		const CacheReadLock readLock;
-		if (pces[probe].Retrieve(styleNumber, sv, positions)) {
+		if (entry->Retrieve(styleNumber, sv, positions)) {
 			return;
 		}
-#if PositionCacheHashSizeUsePowerOfTwo
+
 		const size_t probe2 = (hashValue * 37) & mask;
-#else
-		const size_t probe2 = (hashValue * 37) % modulo;
-#endif
-		if (pces[probe2].Retrieve(styleNumber, sv, positions)) {
+		entry2 = &pces[probe2];
+		if (entry2->Retrieve(styleNumber, sv, positions)) {
 			return;
-		}
-		// Not found. Choose the oldest of the two slots to replace
-		if (pces[probe].NewerThan(pces[probe2])) {
-			probe = probe2;
 		}
 	}
 
 	surface->MeasureWidths(style.font.get(), sv, positions);
-	if (probe < pces.size()) {
+	if (entry) {
+		// constructed here to reduce lock time
+		const size_t length = sv.length();
+		std::unique_ptr<XYPOSITION[]> positions_{new XYPOSITION[length + AlignUp(length, sizeof(XYPOSITION))/sizeof(XYPOSITION)]};
+		memcpy(&positions_[0], positions, length*sizeof(XYPOSITION));
+		memcpy(&positions_[length], sv.data(), length);
+
 		// Store into cache
 		const CacheWriteLock writeLock;
+		// Choose the oldest of the two slots to replace
+		if (entry->NewerThan(*entry2)) {
+			entry = entry2;
+		}
+
 		clock++;
-		if (clock > 60000) {
+		if (clock > UINT16_MAX) {
 			// Since there are only 16 bits for the clock, wrap it round and
 			// reset all cache entries so none get stuck with a high clock.
 			for (PositionCacheEntry &pce : pces) {
@@ -1185,6 +1148,6 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 			clock = 2;
 		}
 		allClear = false;
-		pces[probe].Set(styleNumber, sv, positions, clock);
+		entry->Set(styleNumber, length, positions_, clock);
 	}
 }
