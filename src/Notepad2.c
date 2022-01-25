@@ -3745,7 +3745,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_SELTOMATCHINGBRACE: {
 		Sci_Position iBrace2 = INVALID_POSITION;
-		Sci_Position iPos = SciCall_GetCurrentPos();
+		Sci_Position iCurPos = SciCall_GetCurrentPos();
+		Sci_Position iPos = iCurPos;
 		int ch = SciCall_GetCharAt(iPos);
 		if (IsBraceMatchChar(ch)) {
 			iBrace2 = SciCall_BraceMatch(iPos);
@@ -3757,11 +3758,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 		}
 		if (iBrace2 >= 0) {
+			Sci_Position iAnchorPos = SciCall_GetAnchor();
+			const Sci_Position iMinPos = min_pos(iAnchorPos, iCurPos);
+			const Sci_Position iMaxPos = max_pos(iAnchorPos, iCurPos);
 			if (iBrace2 > iPos) {
-				SciCall_SetSel(iPos, iBrace2 + 1);
+				iAnchorPos = min_pos(iPos, iMinPos);
+				iCurPos = max_pos(iBrace2 + 1, iMaxPos);
 			} else {
-				SciCall_SetSel(iPos + 1, iBrace2);
+				iAnchorPos = max_pos(iPos + 1, iMaxPos);
+				iCurPos = min_pos(iBrace2, iMinPos);
 			}
+			SciCall_SetSel(iAnchorPos, iCurPos);
 		}
 	}
 	break;
