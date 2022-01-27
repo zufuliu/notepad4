@@ -456,6 +456,8 @@ class VarBuffer {
 public:
 	explicit VarBuffer(size_t length) :
 		buffer {(length > lengthStandard) ? new T[length] : bufferStandard} {
+		const T empty{};
+		std::fill_n(buffer, length, empty);
 	}
 	const T *data() const noexcept {
 		return buffer;

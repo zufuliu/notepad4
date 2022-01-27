@@ -940,7 +940,7 @@ bool PositionCacheEntry::Retrieve(uint16_t styleNumber_, std::string_view sv, XY
 
 size_t PositionCacheEntry::Hash(uint16_t styleNumber_, std::string_view sv) noexcept {
 	const size_t h1 = std::hash<std::string_view>{}(sv);
-	const size_t h2 = std::hash<uint16_t>{}(styleNumber_);
+	const size_t h2 = std::hash<uint8_t>{}(styleNumber_ & 0xff);
 	return h1 ^ (h2 << 1);
 }
 
@@ -975,9 +975,7 @@ void PositionCache::SetSize(size_t size_) {
 	if (size_ & (size_ - 1)) {
 		size_ = NextPowerOfTwo(size_);
 	}
-	if (size_ != pces.size()) {
-		pces.resize(size_);
-	}
+	pces.resize(size_);
 }
 
 size_t PositionCache::GetSize() const noexcept {
