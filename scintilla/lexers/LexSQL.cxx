@@ -463,7 +463,7 @@ static constexpr bool IsCommentStyle (int style) noexcept {
 	return style == SCE_SQL_COMMENT || style == SCE_SQL_COMMENTLINE || style == SCE_SQL_COMMENTLINEDOC;
 }
 
-#define IsCommentLine(line)			IsLexCommentLine(line, styler, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
+#define IsCommentLine(line)			IsLexCommentLine(styler, line, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
 
 static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	constexpr bool foldOnlyBegin = false;// styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;

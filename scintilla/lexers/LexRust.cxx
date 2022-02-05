@@ -299,7 +299,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				continue;
 			}
 			if (sc.ch == '#') {
-				if (sc.chNext == '[' || ((sc.chNext == '!' || isspacechar(sc.chNext)) && LexGetNextChar(sc.currentPos + 2, styler) == '[')) {
+				if (sc.chNext == '[' || ((sc.chNext == '!' || isspacechar(sc.chNext)) && LexGetNextChar(styler, sc.currentPos + 2) == '[')) {
 					// only support `#...[attr]` or `#!...[attr]`, not `#...!...[attr]`
 					sc.SetState(SCE_RUST_ATTRIBUTE);
 					if (sc.chNext == '!') {

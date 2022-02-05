@@ -153,7 +153,7 @@ static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int
 static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_V_COMMENT;
 }
-#define IsCommentLine(line) IsLexCommentLine(line, styler, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
+#define IsCommentLine(line) IsLexCommentLine(styler, line, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
 
 static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
@@ -186,7 +186,7 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
 		if (ch == '`' && (style == SCE_V_PREPROCESSOR)) {
-			const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+			const Sci_Position pos = LexSkipSpaceTab(styler, i + 1, endPos);
 			if (styler.Match(pos, "if")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {

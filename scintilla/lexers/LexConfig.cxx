@@ -204,7 +204,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.ColorTo(endPos, state);
 }
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_CONF_COMMENT)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_CONF_COMMENT)
 
 static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;

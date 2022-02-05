@@ -235,8 +235,8 @@ static void ColouriseLatexDoc(Sci_PositionU startPos, Sci_Position length, int i
 	sc.Complete();
 }
 
-static bool IsLBegin(Sci_Line line, Accessor &styler, const char* word, int wlen) noexcept {
-	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
+static bool IsLBegin(LexAccessor &styler, Sci_Line line, const char* word, int wlen) noexcept {
+	const Sci_Position pos = LexLineSkipSpaceTab(styler, line);
 	const Sci_Position chp = pos + 1 + wlen;
 	if (styler[pos] == '\\' && styler.StyleAt(pos) == SCE_L_COMMAND
 		&& (styler[chp] == '{' || (styler[chp] == '*' && styler[chp + 1] == '{'))
@@ -244,20 +244,20 @@ static bool IsLBegin(Sci_Line line, Accessor &styler, const char* word, int wlen
 		return true;
 	return false;
 }
-static bool IsLEnd(Sci_Line line, Accessor &styler) noexcept {
-	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
+static bool IsLEnd(LexAccessor &styler, Sci_Line line) noexcept {
+	const Sci_Position pos = LexLineSkipSpaceTab(styler, line);
 	if (styler[pos] == '\\' && styler.StyleAt(pos) == SCE_L_COMMAND && styler.Match(pos + 1, "end")) {
 		if (styler.Match(pos + 4, "{document}") || styler.Match(pos + 4, "input"))
 			return true;
 	}
 	return false;
 }
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_L_COMMENT)
-#define IsChapter(line)			IsLBegin(line, styler, "chapter", 7)
-#define IsSection(line)			IsLBegin(line, styler, "section", 7)
-#define IsSubsection(line)		IsLBegin(line, styler, "subsection", 10)
-#define IsSubsubsection(line)	IsLBegin(line, styler, "subsubsection", 13)
-#define IsEndDoc(line)			IsLEnd(line, styler)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_L_COMMENT)
+#define IsChapter(line)			IsLBegin(styler, line, "chapter", 7)
+#define IsSection(line)			IsLBegin(styler, line, "section", 7)
+#define IsSubsection(line)		IsLBegin(styler, line, "subsection", 10)
+#define IsSubsubsection(line)	IsLBegin(styler, line, "subsubsection", 13)
+#define IsEndDoc(line)			IsLEnd(styler, line)
 
 static void FoldLatexDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;

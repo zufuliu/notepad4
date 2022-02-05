@@ -311,7 +311,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_GO_TYPE);
 					} else if (kwType != SCE_GO_DEFAULT) {
 						if (kwType == SCE_GO_TYPE) {
-							const Sci_Position pos = LexSkipWhiteSpace(sc.currentPos + 1, sc.lineStartNext, styler);
+							const Sci_Position pos = LexSkipWhiteSpace(styler, sc.currentPos + 1, sc.lineStartNext);
 							if (chNext == 'i' && styler.Match(pos, "interface")) {
 								kwType = SCE_GO_INTERFACE;
 							} else if (chNext == 's' && styler.Match(pos, "struct")) {

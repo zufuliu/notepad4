@@ -162,7 +162,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	styler.ColorTo(endPos, state);
 }
 
-#define IsCommentLine(line)			IsLexCommentLine(line, styler, SCE_C_COMMENTLINE)
+#define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_C_COMMENTLINE)
 #define IsStreamCommentStyle(style)	((style) == SCE_C_COMMENT)
 static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;

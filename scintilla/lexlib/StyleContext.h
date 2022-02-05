@@ -247,10 +247,12 @@ public:
 	}
 
 	void BackTo(Sci_PositionU startPos) {
-		assert(startPos < styler.GetStartSegment());
-		styler.Flush();
-		styler.StartAt(startPos);
-		styler.StartSegment(startPos);
+		assert(startPos <= styler.GetStartSegment());
+		if (startPos < styler.GetStartSegment()) {
+			styler.Flush();
+			styler.StartAt(startPos);
+			styler.StartSegment(startPos);
+		}
 		SeekTo(startPos);
 	}
 
@@ -279,7 +281,7 @@ public:
 		if (!IsWhiteSpace(chNext)) {
 			return chNext;
 		}
-		return LexGetNextChar(currentPos + 2, styler);
+		return LexGetNextChar(styler, currentPos + 2);
 	}
 
 	int GetLineNextChar(bool ignoreCurrent = false) const noexcept {
@@ -292,7 +294,7 @@ public:
 		if (!IsWhiteSpace(chNext)) {
 			return chNext;
 		}
-		return LexGetNextChar(currentPos + 2, lineStartNext, styler);
+		return LexGetNextChar(styler, currentPos + 2, lineStartNext);
 	}
 };
 

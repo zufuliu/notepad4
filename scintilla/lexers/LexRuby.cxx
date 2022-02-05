@@ -294,7 +294,7 @@ bool sureThisIsHeredoc(Sci_Position iPrev, Accessor &styler, char *prevWord) {
 	styler.Flush();
 
 	// Find the first word after some whitespace
-	const Sci_Position firstWordPosn = LexSkipSpaceTab(lineStartPosn, iPrev, styler);
+	const Sci_Position firstWordPosn = LexSkipSpaceTab(styler, lineStartPosn, iPrev);
 	if (firstWordPosn >= iPrev) {
 		// Have something like {^	  <<}
 		//XXX Look at the first previous non-comment non-white line
@@ -397,7 +397,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	const Sci_Position exprStartPosn = findExpressionStart(lt2StartPos, lineStartPosn, styler);
 
 	// Find the first word after some whitespace
-	Sci_Position firstWordPosn = LexSkipWhiteSpace(exprStartPosn, lt2StartPos, styler);
+	Sci_Position firstWordPosn = LexSkipWhiteSpace(styler, exprStartPosn, lt2StartPos);
 	if (firstWordPosn >= lt2StartPos) {
 		return definitely_not_a_here_doc;
 	}
@@ -441,7 +441,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
         prevStyle = SCE_RB_IDENTIFIER;
 	}
 	// Skip next batch of white-space
-	firstWordPosn = LexSkipSpaceTab(firstWordPosn, lt2StartPos, styler);
+	firstWordPosn = LexSkipSpaceTab(styler, firstWordPosn, lt2StartPos);
 	// possible symbol for an implicit hash argument
 	if (firstWordPosn < lt2StartPos && styler.StyleAt(firstWordPosn) == SCE_RB_SYMBOL) {
 		for (; firstWordPosn <= lt2StartPos; firstWordPosn += 1) {
@@ -450,7 +450,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 			}
 		}
 		// Skip next batch of white-space
-		firstWordPosn = LexSkipWhiteSpace(firstWordPosn, lt2StartPos, styler);
+		firstWordPosn = LexSkipWhiteSpace(styler, firstWordPosn, lt2StartPos);
 	}
 	if (firstWordPosn != lt2StartPos) {
 		// Have [[^ws[identifier]ws[*something_else*]ws<<
@@ -466,7 +466,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	if (nextLineStartPosn >= lengthDoc) {
 		return definitely_not_a_here_doc;
 	}
-	j = LexSkipSpaceTab(j + 1, nextLineStartPosn, styler);
+	j = LexSkipSpaceTab(styler, j + 1, nextLineStartPosn);
 	if (j >= lengthDoc) {
 		return definitely_not_a_here_doc;
 	}
@@ -514,7 +514,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 				// Now we can move to the character after the string delimiter.
 				j += 1;
 			}
-			j = LexSkipSpaceTab(j, lengthDoc, styler);
+			j = LexSkipSpaceTab(styler, j, lengthDoc);
 			if (j >= lengthDoc) {
 				return definitely_not_a_here_doc;
 			} else {
@@ -537,7 +537,7 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	}
 	for (Sci_Line line_num = lineStart + 1; line_num <= last_line; line_num++) {
 		if (allow_indent) {
-			j = LexSkipSpaceTab(styler.LineStart(line_num), lengthDoc, styler);
+			j = LexSkipSpaceTab(styler, styler.LineStart(line_num), lengthDoc);
 		} else {
 			j = styler.LineStart(line_num);
 		}
@@ -1630,7 +1630,7 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
  *  Later offer to fold POD, here-docs, strings, and blocks of comments
  */
 
-#define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_RB_COMMENTLINE)
+#define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_RB_COMMENTLINE)
 
 void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &kwFold = *keywordLists[1];

@@ -179,8 +179,8 @@ static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int 
 	sc.Complete();
 }
 
-#define IsFSLine(line, word)	IsLexLineStartsWith(line, styler, word, true, SCE_FSHARP_KEYWORD)
-#define IsCommentLine(line) 	IsLexCommentLine(line, styler, SCE_FSHARP_COMMENTLINE)
+#define IsFSLine(line, word)	IsLexLineStartsWith(styler, line, word, true, SCE_FSHARP_KEYWORD)
+#define IsCommentLine(line) 	IsLexCommentLine(styler, line, SCE_FSHARP_COMMENTLINE)
 
 static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_FSHARP_COMMENT;

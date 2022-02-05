@@ -242,16 +242,16 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 	sc.Complete();
 }
 
-static bool VBLineStartsWith(Sci_Line line, Accessor &styler, const char* word) noexcept {
-	const Sci_Position pos = LexLineSkipSpaceTab(line, styler);
+static bool VBLineStartsWith(LexAccessor &styler, Sci_Line line, const char* word) noexcept {
+	const Sci_Position pos = LexLineSkipSpaceTab(styler, line);
 	return (styler.StyleAt(pos) == SCE_B_KEYWORD) && (styler.MatchIgnoreCase(pos, word));
 }
-static bool VBMatchNextWord(Sci_Position startPos, Sci_Position endPos, Accessor &styler, const char *word) noexcept {
-	const Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+static bool VBMatchNextWord(LexAccessor &styler, Sci_Position startPos, Sci_Position endPos, const char *word) noexcept {
+	const Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	return isspacechar(LexCharAt(pos + static_cast<int>(strlen(word))))
 		&& styler.MatchIgnoreCase(pos, word);
 }
-static bool IsVBProperty(Sci_Line line, Sci_Position startPos, Accessor &styler) noexcept {
+static bool IsVBProperty(LexAccessor &styler, Sci_Line line, Sci_Position startPos) noexcept {
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		if (styler.StyleAt(i) == SCE_B_OPERATOR && LexCharAt(i) == '(')
@@ -259,13 +259,13 @@ static bool IsVBProperty(Sci_Line line, Sci_Position startPos, Accessor &styler)
 	}
 	return false;
 }
-static bool IsVBSome(Sci_Line line, int kind, Accessor &styler) noexcept {
+static bool IsVBSome(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 	if (line < 0) {
 		return false;
 	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+	Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	int stl = styler.StyleAt(pos);
 	if (stl == SCE_B_KEYWORD) {
 		if (styler.MatchIgnoreCase(pos, "public")) {
@@ -274,11 +274,11 @@ static bool IsVBSome(Sci_Line line, int kind, Accessor &styler) noexcept {
 			pos += 7;
 		} else if (styler.MatchIgnoreCase(pos, "protected")) {
 			pos += 9;
-			pos = LexSkipSpaceTab(endPos, pos, styler);
+			pos = LexSkipSpaceTab(styler, endPos, pos);
 		}
 		if (styler.MatchIgnoreCase(pos, "friend"))
 			pos += 6;
-		pos = LexSkipSpaceTab(pos, endPos, styler);
+		pos = LexSkipSpaceTab(styler, pos, endPos);
 		stl = styler.StyleAt(pos);
 		if (stl == SCE_B_KEYWORD) {
 			return (kind == 1 && isspacechar(LexCharAt(pos + 4)) && styler.MatchIgnoreCase(pos, "type"))
@@ -288,11 +288,11 @@ static bool IsVBSome(Sci_Line line, int kind, Accessor &styler) noexcept {
 	return false;
 }
 #define VBMatch(word)			styler.MatchIgnoreCase(i, word)
-#define VBMatchNext(pos, word)	VBMatchNextWord(pos, endPos, styler, word)
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_B_COMMENT)
-#define IsDimLine(line)			VBLineStartsWith(line, styler, "dim")
-#define IsConstLine(line)		IsVBSome(line, 2, styler)
-#define IsVB6Type(line)			IsVBSome(line, 1, styler)
+#define VBMatchNext(pos, word)	VBMatchNextWord(styler, pos, endPos, word)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_B_COMMENT)
+#define IsDimLine(line)			VBLineStartsWith(styler, line, "dim")
+#define IsConstLine(line)		IsVBSome(styler, line, 2)
+#define IsVB6Type(line)			IsVBSome(styler, line, 1)
 
 static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
@@ -366,7 +366,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				levelNext--;
 				int chEnd = static_cast<unsigned char>(LexCharAt(i + 3));
 				if (chEnd == ' ' || chEnd == '\t') {
-					const Sci_Position pos = LexSkipSpaceTab(i + 3, endPos, styler);
+					const Sci_Position pos = LexSkipSpaceTab(styler, i + 3, endPos);
 					chEnd = static_cast<unsigned char>(LexCharAt(pos));
 					// check if End is used to terminate statement
 					if (IsAlpha(chEnd) && (VBMatchNext(pos, "function") || VBMatchNext(pos, "sub")
@@ -397,7 +397,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			} else if (VBMatch("then")) {
 				if (isIf) {
 					isIf = false;
-					const Sci_Position pos = LexSkipSpaceTab(i + 4, endPos, styler);
+					const Sci_Position pos = LexSkipSpaceTab(styler, i + 4, endPos);
 					const char chEnd = LexCharAt(pos);
 					if (!(chEnd == '\r' || chEnd == '\n' || chEnd == '\''))
 						levelNext--;
@@ -427,7 +427,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				isProperty = true;
 				if (!(isEnd || isExit)) {
 					levelNext++;
-					if (!IsVBProperty(lineCurrent, i + 8, styler)) {
+					if (!IsVBProperty(styler, lineCurrent, i + 8)) {
 						isProperty = false;
 						levelNext--;
 					}

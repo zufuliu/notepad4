@@ -291,7 +291,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_MAT_COMMENTBLOCK;
 }
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_MAT_COMMENT)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_MAT_COMMENT)
 
 static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_MATLAB);
@@ -340,8 +340,8 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 
 		if (style == SCE_MAT_KEYWORD && stylePrev != SCE_MAT_KEYWORD && numBrace == 0 && chPrev != '.' && chPrev != ':') {
 			char word[16]; // unwind_protect
-			const Sci_PositionU len = LexGetRange(i, styler, iswordstart, word, sizeof(word));
-			if ((StrEqual(word, "function") && LexGetNextChar(i + len, styler) != '(')
+			const Sci_PositionU len = LexGetRange(styler, i, iswordstart, word, sizeof(word));
+			if ((StrEqual(word, "function") && LexGetNextChar(styler, i + len) != '(')
 				|| StrEqualsAny(word, "if", "for", "while", "try")
 				|| (IsMatlabOctave(lexType) && StrEqualsAny(word, "switch", "classdef", "parfor"))
 				|| ((lexType == LEX_OCTAVE) && StrEqualsAny(word, "do", "unwind_protect"))
@@ -361,13 +361,13 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 				//}
 			} else if (IsMatlabOctave(lexType) && chPrev != '@' && StrEqualsAny(word, "methods", "properties", "events", "enumeration")) {
 				// Matlab classdef
-				Sci_Position pos = LexSkipSpaceTab(i + len, endPos, styler);
+				Sci_Position pos = LexSkipSpaceTab(styler, i + len, endPos);
 				const char chEnd = styler.SafeGetCharAt(pos);
 				if (IsMatEndChar(chEnd, styler.StyleAt(pos))) {
 					levelNext++;
 				} else if (chEnd == '(') {
 					pos++;
-					pos = LexSkipSpaceTab(pos, endPos, styler);
+					pos = LexSkipSpaceTab(styler, pos, endPos);
 					if (styler.StyleAt(pos) == SCE_MAT_ATTRIBUTE)
 						levelNext++;
 				}

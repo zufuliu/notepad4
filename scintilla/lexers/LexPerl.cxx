@@ -86,7 +86,7 @@ namespace {
 // we also assume SCE_PL_STRING_VAR is the interpolated style with the smallest value
 #define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING)
 
-bool isPerlKeyword(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
+bool isPerlKeyword(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
 	char s[128];
@@ -320,7 +320,7 @@ constexpr int opposite(int ch) noexcept {
 	return ch;
 }
 
-bool IsPackageLine(Sci_Line line, LexAccessor &styler) noexcept {
+bool IsPackageLine(LexAccessor &styler, Sci_Line line) noexcept {
 	const Sci_Position pos = styler.LineStart(line);
 	const int style = styler.StyleAt(pos);
 	if (style == SCE_PL_WORD && styler.Match(pos, "package")) {
@@ -329,7 +329,7 @@ bool IsPackageLine(Sci_Line line, LexAccessor &styler) noexcept {
 	return false;
 }
 
-int PodHeadingLevel(Sci_Position pos, LexAccessor &styler) noexcept {
+int PodHeadingLevel(LexAccessor &styler, Sci_Position pos) noexcept {
 	const int lvl = static_cast<unsigned char>(styler.SafeGetCharAt(pos + 5));
 	if (lvl >= '1' && lvl <= '4') {
 		return lvl - '0';
@@ -1285,7 +1285,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				if (sc.state == SCE_PL_WORD) {
 					while (IsIdentifierCharEx(static_cast<unsigned char>(styler.SafeGetCharAt(fw))))
 						fw++;
-					if (!isPerlKeyword(styler.GetStartSegment(), fw, keywords, styler)) {
+					if (!isPerlKeyword(styler, styler.GetStartSegment(), fw, keywords)) {
 						sc.ChangeState(SCE_PL_IDENTIFIER);
 					}
 				}
@@ -1424,7 +1424,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 							while (bk > 0 && styler.StyleAt(bk - 1) == SCE_PL_WORD) {
 								bk--;
 							}
-							if (isPerlKeyword(bk, bkend, reWords, styler))
+							if (isPerlKeyword(styler, bk, bkend, reWords))
 								break;
 							if (IsASpace(sc.chNext) || IsADigit(sc.chNext) || sc.chNext == '/')
 								preferRE = false;
@@ -1570,7 +1570,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 #define PERL_HEADFOLD_SHIFT		4
 #define PERL_HEADFOLD_MASK		0xF0
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PL_COMMENTLINE)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_PL_COMMENTLINE)
 
 void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	constexpr bool foldPOD = true;//styler.GetPropertyInt("fold.perl.pod", 1) != 0;
@@ -1642,14 +1642,14 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 				else if (styler.Match(i, "=cut"))
 					levelCurrent = (levelCurrent & ~PERL_HEADFOLD_MASK) - 1;
 				else if (styler.Match(i, "=head"))
-					podHeading = PodHeadingLevel(i, styler);
+					podHeading = PodHeadingLevel(styler, i);
 			} else if (style == SCE_PL_DATASECTION) {
 				if (ch == '=' && IsAlpha(chNext) && levelCurrent == SC_FOLDLEVELBASE)
 					levelCurrent++;
 				else if (styler.Match(i, "=cut") && levelCurrent > SC_FOLDLEVELBASE)
 					levelCurrent = (levelCurrent & ~PERL_HEADFOLD_MASK) - 1;
 				else if (styler.Match(i, "=head"))
-					podHeading = PodHeadingLevel(i, styler);
+					podHeading = PodHeadingLevel(styler, i);
 				// if package used or unclosed brace, level > SC_FOLDLEVELBASE!
 				// reset needed as level test is vs. SC_FOLDLEVELBASE
 				else if (stylePrevCh != SCE_PL_DATASECTION)
@@ -1658,8 +1658,8 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		}
 		// package folding
 		if (foldPackage && atLineStart) {
-			if (IsPackageLine(lineCurrent, styler)
-				&& !IsPackageLine(lineCurrent + 1, styler))
+			if (IsPackageLine(styler, lineCurrent)
+				&& !IsPackageLine(styler, lineCurrent + 1))
 				isPackageLine = true;
 		}
 

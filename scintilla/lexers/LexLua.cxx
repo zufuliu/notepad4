@@ -308,7 +308,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	sc.Complete();
 }
 
-#define IsCommentLine(line)	IsLexCommentLine(line, styler, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
+#define IsCommentLine(line)	IsLexCommentLine(styler, line, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
 
 void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU lengthDoc = startPos + length;

@@ -48,7 +48,7 @@ static constexpr bool IsCssOperator(int ch) noexcept {
 }
 
 // look behind (from start of document to our start position) to determine current nesting level
-static int NestingLevelLookBehind(Sci_PositionU startPos, Accessor &styler) noexcept {
+static int NestingLevelLookBehind(LexAccessor &styler, Sci_PositionU startPos) noexcept {
 	int nestingLevel = 0;
 
 	for (Sci_PositionU i = 0; i < startPos; i++) {
@@ -108,7 +108,7 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	int nestingLevel = 0;
 	if (isScssDocument || isLessDocument || isHssDocument) {
 		hasNesting = true;
-		nestingLevel = NestingLevelLookBehind(startPos, styler);
+		nestingLevel = NestingLevelLookBehind(styler, startPos);
 	}
 
 	// "the loop"

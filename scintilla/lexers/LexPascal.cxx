@@ -260,7 +260,7 @@ void ClassifyPascalPreprocessorFoldPoint(int &levelCurrent, int &lineFoldStateCu
 	const CharacterSet setWord(CharacterSet::setAlpha);
 
 	char s[16];	// Size of the longest possible keyword + one additional character + null
-	LexGetRangeLowered(startPos, styler, setWord, s, sizeof(s));
+	LexGetRangeLowered(styler, startPos, setWord, s, sizeof(s));
 
 	unsigned int nestLevel = GetFoldInPreprocessorLevelFlag(lineFoldStateCurrent);
 
@@ -298,7 +298,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 	} else if (StrEqualsAny(s, "class", "object")) {
 		// "class" & "object" keywords require special handling...
 		bool ignoreKeyword = false;
-		Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler, IsStreamCommentStyle);
+		Sci_PositionU j = LexSkipWhiteSpace(styler, currentPos, endPos, IsStreamCommentStyle);
 		if (j < endPos) {
 
 			if (styler.SafeGetCharAt(j) == ';') {
@@ -309,16 +309,16 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 				// "class" keyword has a few more special cases...
 				if (styler.SafeGetCharAt(j) == '(') {
 					// Handle simplified complete class declarations ("type TMyClass = class(TObject);")
-					j = LexSkipWhiteSpace(j, endPos, styler, IsStreamCommentStyle, setWord);
+					j = LexSkipWhiteSpace(styler, j, endPos, IsStreamCommentStyle, setWord);
 					if (j < endPos && styler.SafeGetCharAt(j) == ')') {
-						j = LexSkipWhiteSpace(j, endPos, styler, IsStreamCommentStyle);
+						j = LexSkipWhiteSpace(styler, j, endPos, IsStreamCommentStyle);
 						if (j < endPos && styler.SafeGetCharAt(j) == ';') {
 							ignoreKeyword = true;
 						}
 					}
 				} else if (IsAlpha(styler.SafeGetCharAt(j))) {
 					char s2[16];	// Size of the longest possible keyword + one additional character + null
-					LexGetRangeLowered(j, styler, setWord, s2, sizeof(s2));
+					LexGetRangeLowered(styler, j, setWord, s2, sizeof(s2));
 
 					if (StrEqualsAny(s2, "procedure", "function", "of", "var", "property", "operator")) {
 						ignoreKeyword = true;
@@ -343,7 +343,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 			ignoreKeyword = false;
 		}
 		if (!ignoreKeyword) {
-			const Sci_PositionU k = LexSkipWhiteSpace(currentPos, endPos, styler);
+			const Sci_PositionU k = LexSkipWhiteSpace(styler, currentPos, endPos);
 			if (k < endPos && styler.SafeGetCharAt(k) == ';') {
 				// Handle forward interface declarations ("type IMyInterface = interface;")
 				ignoreKeyword = true;
@@ -355,7 +355,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 	} else if (StrEqual(s, "dispinterface")) {
 		// "dispinterface" keyword requires special handling...
 		bool ignoreKeyword = false;
-		const Sci_PositionU j = LexSkipWhiteSpace(currentPos, endPos, styler);
+		const Sci_PositionU j = LexSkipWhiteSpace(styler, currentPos, endPos);
 		if (j < endPos && styler.SafeGetCharAt(j) == ';') {
 			// Handle forward dispinterface declarations ("type IMyInterface = dispinterface;")
 			ignoreKeyword = true;
@@ -372,7 +372,7 @@ void ClassifyPascalWordFoldPoint(const CharacterSet &setWord, int &levelCurrent,
 	}
 }
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_PAS_COMMENTLINE)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_PAS_COMMENTLINE)
 
 void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;

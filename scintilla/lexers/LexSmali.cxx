@@ -308,19 +308,19 @@ static void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int i
 	styler.ColorTo(endPos, state);
 }
 
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_SMALI_COMMENTLINE)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_SMALI_COMMENTLINE)
 static inline bool IsFoldWord(const char *word) noexcept {
 	return StrEqualsAny(word, "method", "annotation", "subannotation", "packed-switch", "sparse-switch", "array-data")
 		// not used in Smali and Jasmin or javap
 		|| StrEqualsAny(word, "tableswitch", "lookupswitch", "constant-pool", "attribute");
 }
 // field/parameter with annotation?
-static bool IsAnnotationLine(Sci_Line line, Accessor &styler) noexcept {
+static bool IsAnnotationLine(LexAccessor &styler, Sci_Line line) noexcept {
 	Sci_Line scan_line = 10;
 	while (scan_line-- > 0) {
 		const Sci_Position startPos = styler.LineStart(line);
 		const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-		const Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+		const Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 		if (styler[pos] == '.') {
 			return styler.StyleAt(pos) == SCE_SMALI_DIRECTIVE && styler[pos + 1] == 'a';
 		}
@@ -355,8 +355,8 @@ static void FoldSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initSt
 
 		if (iswordchar(ch) && style == SCE_SMALI_DIRECTIVE && stylePrev != SCE_SMALI_DIRECTIVE) {
 			char buf[MAX_WORD_LENGTH + 1];
-			LexGetRange(i, styler, IsSmaliWordCharX, buf, sizeof(buf));
-			if (buf[0] == '.' && (IsFoldWord(buf + 1) || (StrEqual(buf + 1,"field") && IsAnnotationLine(lineCurrent + 1, styler)))) {
+			LexGetRange(styler, i, IsSmaliWordCharX, buf, sizeof(buf));
+			if (buf[0] == '.' && (IsFoldWord(buf + 1) || (StrEqual(buf + 1,"field") && IsAnnotationLine(styler, lineCurrent + 1)))) {
 				levelNext++;
 			} else if (buf[0] != '.' && (IsFoldWord(buf) || StrEqual(buf, "field"))) {
 				levelNext--;

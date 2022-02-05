@@ -831,7 +831,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 							sc.Advance(3);
 							if (sc.ch == '\'' || sc.ch == '\"')
 								sc.Forward();
-							heredoc_len = LexGetRange(sc.currentPos + 1, styler, iswordstart, heredoc, sizeof(heredoc));
+							heredoc_len = LexGetRange(styler, sc.currentPos + 1, iswordstart, heredoc, sizeof(heredoc));
 							sc.Advance(heredoc_len);
 							if (sc.ch == '\'' || sc.ch == '\"')
 								sc.Forward();
@@ -923,13 +923,13 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	sc.Complete();
 }
 
-static bool IsCppDefineLine(Sci_Line line, LexAccessor &styler, Sci_Position &DefinePos) noexcept {
+static bool IsCppDefineLine(LexAccessor &styler, Sci_Line line, Sci_Position &DefinePos) noexcept {
 	Sci_Position pos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-	pos = LexSkipSpaceTab(pos, endPos, styler);
+	pos = LexSkipSpaceTab(styler, pos, endPos);
 	if (styler[pos] == '#' && styler.StyleAt(pos) == SCE_C_PREPROCESSOR) {
 		pos++;
-		pos = LexSkipSpaceTab(pos, endPos, styler);
+		pos = LexSkipSpaceTab(styler, pos, endPos);
 		if (styler.Match(pos, "define") && IsASpaceOrTab(styler[pos + 6])) {
 			DefinePos = pos + 6;
 			return true;
@@ -938,28 +938,28 @@ static bool IsCppDefineLine(Sci_Line line, LexAccessor &styler, Sci_Position &De
 	return false;
 }
 // also used in LexAsm.cxx
-bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept {
+bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept {
 	Sci_Line line = styler.GetLine(currentPos);
 	Sci_Position pos;
-	if (IsCppDefineLine(line, styler, pos)) {
+	if (IsCppDefineLine(styler, line, pos)) {
 		if (pos < currentPos)
 			return true;
 	}
 	line--;
-	while (line > 0 && IsBackslashLine(line, styler) && !IsCppDefineLine(line, styler, pos))
+	while (line > 0 && IsBackslashLine(styler, line) && !IsCppDefineLine(styler, line, pos))
 		line--;
-	if (line >= 0 && IsCppDefineLine(line, styler, pos) && IsBackslashLine(line, styler)) {
+	if (line >= 0 && IsCppDefineLine(styler, line, pos) && IsBackslashLine(styler, line)) {
 		return true;
 	}
 	return false;
 }
-static bool IsCppFoldingLine(Sci_Line line, LexAccessor &styler, int kind) noexcept {
+static bool IsCppFoldingLine(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 	if (line < 0) {
 		return false;
 	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+	Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	const int stl = styler.StyleAt(pos);
 	char ch = styler[pos];
 	switch (kind) {
@@ -975,25 +975,25 @@ static bool IsCppFoldingLine(Sci_Line line, LexAccessor &styler, int kind) noexc
 		if (!(stl == SCE_C_PREPROCESSOR && (ch == '#' || ch == '!')))
 			return false;
 		pos++;
-		pos = LexSkipSpaceTab(pos, endPos, styler);
+		pos = LexSkipSpaceTab(styler, pos, endPos);
 		ch = styler[pos];
 		if (kind == 3 && (ch == 'i' || ch == 'u')) {
 			return styler.Match(pos, "include") || styler.Match(pos, "using") || styler.Match(pos, "import");
 		} else if (kind == 4 && ch == 'd') {
-			return styler.Match(pos, "define") && !IsBackslashLine(line, styler); // multi-line #define
+			return styler.Match(pos, "define") && !IsBackslashLine(styler, line); // multi-line #define
 		} else if (kind == 5 && ch == 'u') {
 			return styler.Match(pos, "undef");
 		}
 		return false;
 	}
 }
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, MultiStyle(SCE_C_COMMENTLINE, SCE_C_COMMENTLINEDOC))
-//#define IsCommentLine(line)		IsCppFoldingLine(line, styler, 0)
-#define IsUsingLine(line)		IsCppFoldingLine(line, styler, 1)
-//#define IsPropertyLine(line)	IsCppFoldingLine(line, styler, 2)
-#define IsIncludeLine(line)		IsCppFoldingLine(line, styler, 3)
-#define IsDefineLine(line)		IsCppFoldingLine(line, styler, 4)
-#define IsUnDefLine(line)		IsCppFoldingLine(line, styler, 5)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, MultiStyle(SCE_C_COMMENTLINE, SCE_C_COMMENTLINEDOC))
+//#define IsCommentLine(line)		IsCppFoldingLine(styler, line, 0)
+#define IsUsingLine(line)		IsCppFoldingLine(styler, line, 1)
+//#define IsPropertyLine(line)	IsCppFoldingLine(styler, line, 2)
+#define IsIncludeLine(line)		IsCppFoldingLine(styler, line, 3)
+#define IsDefineLine(line)		IsCppFoldingLine(styler, line, 4)
+#define IsUnDefLine(line)		IsCppFoldingLine(styler, line, 5)
 
 static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC;
@@ -1007,11 +1007,11 @@ static constexpr bool IsInnerCommentStyle(int style) noexcept {
 static constexpr bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
 }
-static bool IsOpenBraceLine(Sci_Line line, LexAccessor &styler) noexcept {
+static bool IsOpenBraceLine(LexAccessor &styler, Sci_Line line) noexcept {
 	// above line
 	Sci_Position startPos = styler.LineStart(line - 1);
 	Sci_Position endPos = styler.LineStart(line) - 1;
-	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+	Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	char ch = styler[pos];
 	int stl = styler.StyleAt(pos);
 	if (IsEOLChar(ch) || IsSpaceEquiv(stl) || (stl == SCE_C_PREPROCESSOR || stl == SCE_C_XML_TAG))
@@ -1029,7 +1029,7 @@ static bool IsOpenBraceLine(Sci_Line line, LexAccessor &styler) noexcept {
 	// current line
 	startPos = styler.LineStart(line);
 	endPos = styler.LineStart(line + 1) - 1;
-	pos = LexSkipSpaceTab(startPos, endPos, styler);
+	pos = LexSkipSpaceTab(styler, startPos, endPos);
 	// only '{' line
 	if (styler.StyleAt(pos) == SCE_C_OPERATOR && styler[pos] == '{') {
 		return true;
@@ -1110,20 +1110,20 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		}
 
 		if (atEOL && !IsStreamCommentStyle(style) && !IsStreamCommentStyle(styleEOL)) {
-			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
+			levelNext += IsBackslashLine(styler, lineCurrent) - IsBackslashLine(styler, lineCurrent - 1);
 		}
-		if (atEOL && !(hasPreprocessor && IsCppInDefine(i, styler)) && IsOpenBraceLine(lineCurrent + 1, styler)) {
+		if (atEOL && !(hasPreprocessor && IsCppInDefine(styler, i)) && IsOpenBraceLine(styler, lineCurrent + 1)) {
 			levelNext++;
 		}
 
 		if (hasPreprocessor && ch == '#' && style == SCE_C_PREPROCESSOR) {
-			Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+			Sci_Position pos = LexSkipSpaceTab(styler, i + 1, endPos);
 			if (styler.Match(pos, "if") || styler.Match(pos, "region")) {
 				levelNext++;
 			} else if (styler.Match(pos, "end")) {
 				levelNext--;
 			} else if (styler.Match(pos, "pragma")) { // #pragma region, #pragma endregion
-				pos = LexSkipSpaceTab(pos + 7, endPos, styler);
+				pos = LexSkipSpaceTab(styler, pos + 7, endPos);
 				if (styler.StyleAt(pos) == SCE_C_PREPROCESSOR) {
 					if (styler.Match(pos, "region")) {
 						levelNext++;
@@ -1142,16 +1142,16 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				levelNext--;
 				isObjCProtocol = false;
 			} else if (styler.Match(i + 1, "protocol")) {
-				if (LexGetNextChar(i + 9, styler) != '(') { // @protocol()
+				if (LexGetNextChar(styler, i + 9) != '(') { // @protocol()
 					isObjCProtocol = true;
 					levelNext++;
 				}
 			}
 		}
 
-		if (style == SCE_C_OPERATOR && !(hasPreprocessor && IsCppInDefine(i, styler))) {
+		if (style == SCE_C_OPERATOR && !(hasPreprocessor && IsCppInDefine(styler, i))) {
 			// maybe failed in multi-line define section, MFC's afx.h is a example
-			if (ch == '{' && !(lineCurrent > 0 && visibleChars == 0 && IsOpenBraceLine(lineCurrent, styler))) {
+			if (ch == '{' && !(lineCurrent > 0 && visibleChars == 0 && IsOpenBraceLine(styler, lineCurrent))) {
 				levelNext++;
 			} else if (ch == '}') {
 				levelNext--;

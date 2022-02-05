@@ -33,7 +33,7 @@ constexpr bool IsCMakeChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.' || ch == '-' || ch == '+';
 }
 
-bool IsBracketArgument(Accessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
+bool IsBracketArgument(LexAccessor &styler, Sci_PositionU pos, bool start, int &bracketNumber) noexcept {
 	int offset = 0;
 	char ch;
 	++pos; // bracket

@@ -311,7 +311,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 								command = Command::Goto;
 							}
 							if (levelCurrent == SC_FOLDLEVELBASE + 1 && parenCount == 0 && (lineVisibleChars == 4
-								|| (lineVisibleChars == 5 && LexGetPrevChar(sc.currentPos - 4, styler) == '@'))) {
+								|| (lineVisibleChars == 5 && LexGetPrevChar(styler, sc.currentPos - 4) == '@'))) {
 								levelNext--;
 							}
 						} else if (StrEqual(s, "call")) {

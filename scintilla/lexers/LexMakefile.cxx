@@ -228,7 +228,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 	styler.ColorTo(endPos, state);
 }
 
-#define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_MAKE_COMMENT)
+#define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_MAKE_COMMENT)
 
 static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
@@ -255,7 +255,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 		 	if (IsCommentLine(lineCurrent)) {
 				levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			} else {
-				levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
+				levelNext += IsBackslashLine(styler, lineCurrent) - IsBackslashLine(styler, lineCurrent - 1);
 			}
 		}
 
@@ -265,7 +265,7 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			Sci_Position j = i;
 			if (ch == '!' || ch == '.')
 				j++;
-			LexGetRangeLowered(j, styler, iswordchar, buf, MAX_WORD_LENGTH);
+			LexGetRangeLowered(styler, j, iswordchar, buf, MAX_WORD_LENGTH);
 			if (StrStartsWith(buf, "if") || StrEqualsAny(buf, "define", "for"))
 				levelNext++;
 			else if (StrEqualsAny(buf, "endif", "endef", "endfor"))

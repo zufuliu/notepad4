@@ -53,7 +53,7 @@ static constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 	0
 };*/
 
-extern bool IsCppInDefine(Sci_Position currentPos, LexAccessor &styler) noexcept;
+extern bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept;
 
 static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &cpuInstruction = *keywordLists[0];
@@ -236,7 +236,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 						sc.SetState(SCE_ASM_DEFAULT);
 					else
 						sc.SetState(SCE_ASM_COMMENTLINE);
-				} else if (IsCppInDefine(sc.currentPos, styler))
+				} else if (IsCppInDefine(styler, sc.currentPos))
 					sc.SetState(SCE_ASM_DEFAULT);
 				else
 					sc.SetState(SCE_ASM_COMMENTLINE);
@@ -255,7 +255,7 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.SetState(SCE_ASM_IDENTIFIER);
 				}
 			} else if (sc.ch == '#') {
-				if (IsCppInDefine(sc.currentPos, styler)) {
+				if (IsCppInDefine(styler, sc.currentPos)) {
 					sc.SetState(SCE_ASM_OPERATOR);
 					if (sc.chNext == '#')
 						sc.Forward();
@@ -265,8 +265,8 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 					sc.SetState(SCE_ASM_IDENTIFIER);
 				} else {
 					char pp[128];
-					const Sci_Position pos = LexSkipSpaceTab(sc.currentPos + 1, endPos, styler);
-					const Sci_PositionU len = LexGetRange(pos, styler, iswordstart, pp, sizeof(pp));
+					const Sci_Position pos = LexSkipSpaceTab(styler, sc.currentPos + 1, endPos);
+					const Sci_PositionU len = LexGetRange(styler, pos, iswordstart, pp, sizeof(pp));
 					if (kwProprocessor.InList(pp)) {
 						sc.SetState(SCE_ASM_PREPROCESSOR);
 						sc.Advance(pos - sc.currentPos + len);
@@ -314,18 +314,18 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 static constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_ASM_COMMENT || style == SCE_ASM_COMMENT2 || style == SCE_ASM_COMMENTDIRECTIVE;
 }
-#define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_ASM_COMMENTLINE)
+#define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_ASM_COMMENTLINE)
 
 static constexpr bool IsAsmDefaultStyle(int style) noexcept {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
-static bool IsEquLine(Sci_Line line, LexAccessor &styler) noexcept {
+static bool IsEquLine(LexAccessor &styler, Sci_Line line) noexcept {
 	if (line < 0) {
 		return false;
 	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-	Sci_Position pos = LexSkipWhiteSpace(startPos, endPos, styler, IsAsmDefaultStyle);
+	Sci_Position pos = LexSkipWhiteSpace(styler, startPos, endPos, IsAsmDefaultStyle);
 	if (styler.StyleAt(pos) == SCE_ASM_DIRECTIVE) {
 		if (styler[pos] == '.')
 			pos++;
@@ -333,13 +333,13 @@ static bool IsEquLine(Sci_Line line, LexAccessor &styler) noexcept {
 	}
 	return false;
 }
-static bool IsAsmDefineLine(Sci_Line line, LexAccessor &styler) noexcept {
+static bool IsAsmDefineLine(LexAccessor &styler, Sci_Line line) noexcept {
 	if (line < 0) {
 		return false;
 	}
 	const Sci_Position startPos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
-	Sci_Position pos = LexSkipSpaceTab(startPos, endPos, styler);
+	Sci_Position pos = LexSkipSpaceTab(styler, startPos, endPos);
 	const char ch = styler[pos];
 	const int stl = styler.StyleAt(pos);
 	if (stl == SCE_ASM_DIRECTIVE) {
@@ -349,13 +349,13 @@ static bool IsAsmDefineLine(Sci_Line line, LexAccessor &styler) noexcept {
 	}
 	if ((ch == '#' || ch == '%') && stl == SCE_ASM_PREPROCESSOR) {
 		pos++;
-		pos = LexSkipSpaceTab(pos, endPos, styler);
-		return (styler.Match(pos, "inclide") || (styler.Match(pos, "define") && !IsBackslashLine(line, styler)));
+		pos = LexSkipSpaceTab(styler, pos, endPos);
+		return (styler.Match(pos, "inclide") || (styler.Match(pos, "define") && !IsBackslashLine(styler, line)));
 	}
 	return false;
 }
 
-#define IsEndLine(line)			IsLexLineStartsWith(line, styler, "end", false, SCE_ASM_DIRECTIVE)
+#define IsEndLine(line)			IsLexLineStartsWith(styler, line, "end", false, SCE_ASM_DIRECTIVE)
 
 #define MAX_ASM_WORD_LEN	15
 static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -394,14 +394,14 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 		if (atEOL && IsCommentLine(lineCurrent)) {
 			levelNext += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 		}
-		if (atEOL && IsAsmDefineLine(lineCurrent, styler)) {
-			levelNext += IsAsmDefineLine(lineCurrent + 1, styler) - IsAsmDefineLine(lineCurrent - 1, styler);
+		if (atEOL && IsAsmDefineLine(styler, lineCurrent)) {
+			levelNext += IsAsmDefineLine(styler, lineCurrent + 1) - IsAsmDefineLine(styler, lineCurrent - 1);
 		}
 		if (atEOL && !IsStreamCommentStyle(style) && !IsStreamCommentStyle(styleEOL)) {
-			levelNext += IsBackslashLine(lineCurrent, styler) - IsBackslashLine(lineCurrent - 1, styler);
+			levelNext += IsBackslashLine(styler, lineCurrent) - IsBackslashLine(styler, lineCurrent - 1);
 		}
-		if (atEOL && IsEquLine(lineCurrent, styler)) {
-			levelNext += IsEquLine(lineCurrent + 1, styler) - IsEquLine(lineCurrent - 1, styler);
+		if (atEOL && IsEquLine(styler, lineCurrent)) {
+			levelNext += IsEquLine(styler, lineCurrent + 1) - IsEquLine(styler, lineCurrent - 1);
 		}
 		if (style == SCE_ASM_OPERATOR) {
 			if (ch == '{') {
@@ -426,7 +426,7 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				if (directives4foldstart.InList(word)) {
 					levelNext++;
 					if (StrEqual(word, "dialog")) {
-						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+						const Sci_Position pos = LexSkipSpaceTab(styler, i + 1, endPos);
 						if (styler[pos] == '\"')
 							levelNext--;
 					}
@@ -436,12 +436,12 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 				} else if (directives4foldend.InList(word)) {
 					levelNext--;
 					if (StrEqual(word, "enddialog")) {
-						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+						const Sci_Position pos = LexSkipSpaceTab(styler, i + 1, endPos);
 						if (styler[pos] == ',')
 							levelNext++;
 					}
 					if (StrEqual(word, "endproc")) {
-						const Sci_Position pos = LexSkipSpaceTab(i + 1, endPos, styler);
+						const Sci_Position pos = LexSkipSpaceTab(styler, i + 1, endPos);
 						if (styler[pos] == '(')
 							levelNext++;
 					}

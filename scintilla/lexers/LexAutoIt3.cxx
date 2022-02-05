@@ -106,7 +106,7 @@ static int GetSendKey(const char *szLine, char *szKey) noexcept {
 //
 // Routine to check the last "none comment" character on a line to see if its a continuation
 //
-static bool IsContinuationLine(Sci_Line szLine, Accessor &styler) noexcept {
+static bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 	const Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
 	//int stylech = styler.StyleAt(nsPos);
@@ -151,8 +151,8 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 	const Sci_Position s_startPos = startPos;
 	// When not inside a Block comment: find First line without _
 	if (!(initStyle == SCE_AU3_COMMENTBLOCK)) {
-		while ((lineCurrent > 0 && IsContinuationLine(lineCurrent, styler)) ||
-			(lineCurrent > 1 && IsContinuationLine(lineCurrent - 1, styler))) {
+		while ((lineCurrent > 0 && IsContinuationLine(styler, lineCurrent)) ||
+			(lineCurrent > 1 && IsContinuationLine(styler, lineCurrent - 1))) {
 			lineCurrent--;
 			startPos = styler.LineStart(lineCurrent); // get start position
 			initStyle = 0;		// reset the start style to 0
@@ -368,7 +368,7 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 				si = 0;
 				// at line end and not found a continuation char then reset to default
 				lineCurrent = styler.GetLine(sc.currentPos);
-				if (!IsContinuationLine(lineCurrent, styler)) {
+				if (!IsContinuationLine(styler, lineCurrent)) {
 					sc.SetState(SCE_AU3_DEFAULT);
 					break;
 				}
@@ -556,7 +556,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 //
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
-static int GetStyleFirstWord(Sci_Line szLine, Accessor &styler) noexcept {
+static int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
 	Sci_Position nsPos = styler.LineStart(szLine);
 	const Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
 	while (isspacechar(styler.SafeGetCharAt(nsPos)) && nsPos < nePos) {
@@ -581,16 +581,16 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 		}
 	}
 	// vars for style of previous/current/next lines
-	int style = GetStyleFirstWord(lineCurrent, styler);
+	int style = GetStyleFirstWord(styler, lineCurrent);
 	int stylePrev = 0;
 	// find the first previous line without continuation character at the end
-	while ((lineCurrent > 0 && IsContinuationLine(lineCurrent, styler)) ||
-		(lineCurrent > 1 && IsContinuationLine(lineCurrent - 1, styler))) {
+	while ((lineCurrent > 0 && IsContinuationLine(styler, lineCurrent)) ||
+		(lineCurrent > 1 && IsContinuationLine(styler, lineCurrent - 1))) {
 		lineCurrent--;
 		startPos = styler.LineStart(lineCurrent);
 	}
 	if (lineCurrent > 0) {
-		stylePrev = GetStyleFirstWord(lineCurrent - 1, styler);
+		stylePrev = GetStyleFirstWord(styler, lineCurrent - 1);
 	}
 	// vars for getting first word to check for keywords
 	bool FirstWordStart = false;
@@ -703,7 +703,7 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 				}
 			}
 			// Preprocessor and Comment folding
-			const int styleNext = GetStyleFirstWord(lineCurrent + 1, styler);
+			const int styleNext = GetStyleFirstWord(styler, lineCurrent + 1);
 			// *************************************
 			// Folding logic for preprocessor blocks
 			// *************************************
