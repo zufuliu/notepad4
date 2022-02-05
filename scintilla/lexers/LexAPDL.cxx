@@ -32,7 +32,7 @@ enum {
 };
 
 void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool apdl = styler.GetPropertyInt("lexer.apdl") & true;
+	const bool apdl = styler.GetPropertyInt("lexer.lang") & true;
 
 	int visibleChars = 0;
 	int lineStateLineType = APDLLineStateLineNone;
@@ -178,7 +178,7 @@ struct FoldLineState {
 };
 
 void FoldAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
-	const bool apdl = styler.GetPropertyInt("lexer.apdl") & true;
+	const bool apdl = styler.GetPropertyInt("lexer.lang") & true;
 
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);

@@ -88,7 +88,7 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 	const WordList &function1 = *keywordLists[3];
 	const WordList &function2 = *keywordLists[4];
 
-	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
+	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_MATLAB);
 
 	int visibleChars = 0;
 	StyleContext sc(startPos, length, initStyle, styler);
@@ -294,7 +294,7 @@ static constexpr bool IsStreamCommentStyle(int style) noexcept {
 #define IsCommentLine(line)		IsLexCommentLine(line, styler, SCE_MAT_COMMENT)
 
 static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_MATLAB);
+	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_MATLAB);
 
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;

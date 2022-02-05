@@ -838,7 +838,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 #define IsCommentLine(line)	IsLexCommentLine(line, styler, SCE_SH_COMMENTLINE)
 
 void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const bool isCShell = styler.GetPropertyInt("lexer.bash.csh") != 0;
+	const bool isCShell = styler.GetPropertyInt("lexer.lang") & true;
 
 	const Sci_PositionU endPos = startPos + length;
 	int skipHereCh = 0;

@@ -1619,7 +1619,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 			char msg[10];
 			_itoa(rid - NP2LEX_TEXTFILE, msg, 10);
-			SciCall_SetProperty("lexer.lang.type", msg);
+			SciCall_SetProperty("lexer.lang", msg);
 		}
 
 		// Code folding
@@ -1643,19 +1643,19 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case NP2LEX_BASH:
-			SciCall_SetProperty("lexer.bash.csh", ((np2LexLangIndex == IDM_LEXER_CSHELL)? "1" : "0"));
+			SciCall_SetProperty("lexer.lang", ((np2LexLangIndex == IDM_LEXER_CSHELL)? "1" : "0"));
 			break;
 
 		case NP2LEX_JAVASCRIPT:
 		case NP2LEX_TYPESCRIPT: {
 			LPCWSTR lpszExt = PathFindExtension(szCurFile);
 			const char *jsx = (StrNotEmpty(lpszExt) && (StrCaseEqual(lpszExt, L".jsx") || StrCaseEqual(lpszExt, L".tsx")))? "1" : "0";
-			SciCall_SetProperty("lexer.jsx", jsx);
+			SciCall_SetProperty("lexer.lang", jsx);
 		} break;
 
 		case NP2LEX_APDL:
 		case NP2LEX_ABAQUS:
-			SciCall_SetProperty("lexer.apdl", (rid == NP2LEX_APDL) ? "1" : "0");
+			SciCall_SetProperty("lexer.lang", (rid == NP2LEX_APDL) ? "1" : "0");
 			break;
 		}
 

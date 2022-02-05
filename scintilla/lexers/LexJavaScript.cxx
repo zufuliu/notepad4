@@ -110,7 +110,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	// JSX syntax conflicts with TypeScript type assert.
 	// https://www.typescriptlang.org/docs/handbook/jsx.html
-	const bool enableJsx = styler.GetPropertyInt("lexer.jsx", 1) & true;
+	const bool enableJsx = styler.GetPropertyInt("lexer.lang", 1) & true;
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;

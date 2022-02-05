@@ -106,7 +106,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	const WordList &kwAsmRegister = *keywordLists[12];
 
 	static bool isObjCSource = false;
-	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
+	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_CPP);
 	if (lexType == LEX_PHP && startPos == 0) {
 		initStyle = SCE_C_XML_DEFAULT;
 	}
@@ -1043,7 +1043,7 @@ static bool IsOpenBraceLine(Sci_Line line, LexAccessor &styler) noexcept {
 }
 
 static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const int lexType = styler.GetPropertyInt("lexer.lang.type", LEX_CPP);
+	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_CPP);
 	const bool hasPreprocessor = HasPreprocessor(lexType);
 
 	const Sci_PositionU endPos = startPos + length;
