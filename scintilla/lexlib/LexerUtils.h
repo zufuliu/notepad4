@@ -54,7 +54,8 @@ enum {
 int PackLineState(const std::vector<int>& states) noexcept;
 void UnpackLineState(int lineState, std::vector<int>& states);
 
-inline int TryTakeAndPop(std::vector<int>& states, int value = 0) {
+template <typename T>
+inline T TryTakeAndPop(std::vector<T>& states, T value = {}) {
 	if (!states.empty()) {
 		value = states.back();
 		states.pop_back();
@@ -62,13 +63,22 @@ inline int TryTakeAndPop(std::vector<int>& states, int value = 0) {
 	return value;
 }
 
-inline int TakeAndPop(std::vector<int>& states) {
-	const int value = states.back();
+template <typename T>
+inline void TryPopBack(std::vector<T>& states) {
+	if (!states.empty()) {
+		states.pop_back();
+	}
+}
+
+template <typename T>
+inline T TakeAndPop(std::vector<T>& states) {
+	const T value = states.back();
 	states.pop_back();
 	return value;
 }
 
-inline int TryPopAndPeek(std::vector<int>& states, int value = 0) {
+template <typename T>
+inline T TryPopAndPeek(std::vector<T>& states, T value = {}) {
 	if (!states.empty()) {
 		states.pop_back();
 		if (!states.empty()) {
