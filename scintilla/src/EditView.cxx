@@ -564,7 +564,7 @@ struct LayoutWorker {
 			CloseThreadpoolWork(work);
 
 #else
-			runningThread = threadCount;
+			runningThread.store(threadCount, std::memory_order_relaxed);
 			finishedEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
 			for (uint32_t i = 0; i < threadCount; i++) {
 				QueueUserWorkItem(ThreadProc, this, WT_EXECUTEDEFAULT);
@@ -572,7 +572,7 @@ struct LayoutWorker {
 			while (true) {
 				const DWORD result = WaitForSingleObject(finishedEvent, 0);
 				if (result == WAIT_OBJECT_0) {
-					if (runningThread.load() == 0) {
+					if (runningThread.load(std::memory_order_relaxed) == 0) {
 						break;
 					}
 				} else if (result == WAIT_TIMEOUT) {
@@ -605,18 +605,16 @@ struct LayoutWorker {
 			}
 		}
 
-		finishedCount = static_cast<uint32_t>(it - segmentList.begin());
+		finishedCount.store(static_cast<uint32_t>(it - segmentList.begin()), std::memory_order_relaxed);
 		return 1;
 	}
 
 	void DoWork() {
 		uint32_t finished = 0;
 		void * const idleTaskTimer = model.idleTaskTimer;
-		Surface *surface;
+		Surface *surface = sharedSurface;
 		std::unique_ptr<Surface> surf;
-		if (vstyle.technology != Technology::Default) {
-			surface = sharedSurface;
-		} else {
+		if (vstyle.technology == Technology::Default) {
 			surf = Surface::Allocate(Technology::Default);
 			surf->Init(nullptr);
 			surf->SetMode(SurfaceMode(model.pdoc->dbcsCodePage, false));
@@ -625,7 +623,7 @@ struct LayoutWorker {
 
 		int processed = 0;
 		while (true) {
-			const uint32_t index = nextIndex.fetch_add(1);
+			const uint32_t index = nextIndex.fetch_add(1, std::memory_order_relaxed);
 			if (index >= segmentCount) {
 				break;
 			}
@@ -645,7 +643,7 @@ struct LayoutWorker {
 		UpdateMaximum(finishedCount, finished);
 #if USE_WIN32_WORK_ITEM
 		SetEvent(finishedEvent);
-		runningThread -= 1;
+		runningThread.fetch_sub(1, std::memory_order_relaxed);
 #endif
 	}
 
@@ -765,7 +763,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		const uint32_t threadCount = worker.Start(posLineStart, posInLine);
 
 		// Accumulate absolute positions from relative positions within segments and expand tabs
-		const uint32_t finishedCount = worker.finishedCount;
+		const uint32_t finishedCount = worker.finishedCount.load(std::memory_order_relaxed);
 		uint32_t iByte = ll->lastSegmentEnd;
 		XYPOSITION xPosition = ll->positions[iByte++];
 		for (auto it = worker.segmentList.begin(); it != worker.segmentList.begin() + finishedCount; ++it) {
