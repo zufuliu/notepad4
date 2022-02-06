@@ -41,6 +41,7 @@ struct StylePod {
 	bool eolFilled = false;
 	bool underline = false;
 	bool strike = false;
+	bool overline = false;
 	enum class CaseForce : uint8_t {
 		mixed, upper, lower, camel
 	};

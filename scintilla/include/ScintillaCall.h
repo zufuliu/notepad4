@@ -173,6 +173,7 @@ public:
 	void StyleResetDefault();
 	void StyleSetUnderline(int style, bool underline);
 	void StyleSetStrike(int style, bool strike);
+	void StyleSetOverline(int style, bool overline);
 	Colour StyleGetFore(int style);
 	Colour StyleGetBack(int style);
 	bool StyleGetBold(int style);

@@ -248,7 +248,8 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_STYLESETEOLFILLED 2057
 #define SCI_STYLERESETDEFAULT 2058
 #define SCI_STYLESETUNDERLINE 2059
-#define SCI_STYLESETSTRIKE 2474
+#define SCI_STYLESETSTRIKE 2041
+#define SCI_STYLESETOVERLINE 2042
 #define SC_CASE_MIXED 0
 #define SC_CASE_UPPER 1
 #define SC_CASE_LOWER 2

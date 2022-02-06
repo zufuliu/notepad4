@@ -5836,9 +5836,11 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetUnderline:
 		vs.styles[wParam].underline = lParam != 0;
 		break;
-		// Added strike style, 2011-12-20
-	case Message::StyleSetStrike:
+	case Message::StyleSetStrike: // 2011-12-20
 		vs.styles[wParam].strike = lParam != 0;
+		break;
+	case Message::StyleSetOverline: // 2022-02-06
+		vs.styles[wParam].overline = lParam != 0;
 		break;
 	case Message::StyleSetCase:
 		vs.styles[wParam].caseForce = static_cast<Style::CaseForce>(lParam);
@@ -7286,6 +7288,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetFont:
 	case Message::StyleSetUnderline:
 	case Message::StyleSetStrike:
+	case Message::StyleSetOverline:
 	case Message::StyleSetCase:
 	case Message::StyleSetCharacterSet:
 	case Message::StyleSetVisible:

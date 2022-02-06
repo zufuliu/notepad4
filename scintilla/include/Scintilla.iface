@@ -613,7 +613,10 @@ fun void StyleResetDefault=2058(,)
 set void StyleSetUnderline=2059(int style, bool underline)
 
 # Set a style to be strike or not.
-set void StyleSetStrike=2474(int style, bool strike)
+set void StyleSetStrike=2041(int style, bool strike)
+
+# Set a style to be overline or not.
+set void StyleSetOverline=2042(int style, bool overline)
 
 enu CaseVisible=SC_CASE_
 val SC_CASE_MIXED=0

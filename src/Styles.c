@@ -365,6 +365,7 @@ struct DetailStyle {
 	BOOL italic;
 	BOOL underline;
 	BOOL strike;
+	BOOL overline;
 	BOOL eolFilled;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
@@ -1500,6 +1501,7 @@ static BOOL Style_StrGetAttributeEx(LPCWSTR lpszStyle, LPCWSTR key, int keyLen) 
 #define Style_StrGetItalic(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"italic")
 #define Style_StrGetUnderline(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"underline")
 #define Style_StrGetStrike(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"strike")
+#define Style_StrGetOverline(lpszStyle)			Style_StrGetAttribute((lpszStyle), L"overline")
 #define Style_StrGetEOLFilled(lpszStyle)		Style_StrGetAttribute((lpszStyle), L"eolfilled")
 
 // set default colors to avoid showing white (COLOR_WINDOW or COLOR_3DFACE) window or margin while loading big file.
@@ -3587,6 +3589,7 @@ BOOL Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale) {
 #define Style_StrCopyItalic(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"italic")
 #define Style_StrCopyUnderline(szNewStyle, lpszStyle)		Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"underline")
 #define Style_StrCopyStrike(szNewStyle, lpszStyle)			Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"strike")
+#define Style_StrCopyOverline(szNewStyle, lpszStyle)		Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"overline")
 #define Style_StrCopyEOLFilled(szNewStyle, lpszStyle)		Style_StrCopyAttribute((szNewStyle), (lpszStyle), L"eolfilled")
 
 //=============================================================================
@@ -3721,6 +3724,7 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 		lstrcat(szNewStyle, L"; strike");
 	}
 
+	Style_StrCopyOverline(szNewStyle, lpszStyle);
 	Style_StrCopyCase(szNewStyle, lpszStyle, tch);
 	Style_StrCopyFore(szNewStyle, lpszStyle, tch);
 	Style_StrCopyBack(szNewStyle, lpszStyle, tch);
@@ -3785,6 +3789,7 @@ BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	Style_StrCopyItalic(szNewStyle, lpszStyle);
 	Style_StrCopyUnderline(szNewStyle, lpszStyle);
 	Style_StrCopyStrike(szNewStyle, lpszStyle);
+	Style_StrCopyOverline(szNewStyle, lpszStyle);
 	Style_StrCopyCase(szNewStyle, lpszStyle, tch);
 
 	if (bFore) {
@@ -3859,6 +3864,10 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 	if (Style_StrGetStrike(lpszStyle)) {
 		SciCall_StyleSetStrike(iStyle, TRUE);
 	}
+	// Overline
+	if (Style_StrGetOverline(lpszStyle)) {
+		SciCall_StyleSetOverline(iStyle, TRUE);
+	}
 	// EOL Filled
 	if (Style_StrGetEOLFilled(lpszStyle)) {
 		SciCall_StyleSetEOLFilled(iStyle, TRUE);
@@ -3912,6 +3921,8 @@ void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	style->underline = Style_StrGetUnderline(lpszStyle);
 	// Strike
 	style->strike = Style_StrGetStrike(lpszStyle);
+	// Overline
+	style->overline = Style_StrGetOverline(lpszStyle);
 	// EOL Filled
 	style->eolFilled = Style_StrGetEOLFilled(lpszStyle);
 
@@ -3963,6 +3974,10 @@ void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
 	// Strike
 	if (style->strike) {
 		SciCall_StyleSetStrike(iStyle, TRUE);
+	}
+	// Overline
+	if (style->overline) {
+		SciCall_StyleSetOverline(iStyle, TRUE);
 	}
 	// EOL Filled
 	if (style->eolFilled) {

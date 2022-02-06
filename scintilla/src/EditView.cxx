@@ -2534,10 +2534,14 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 				rcUL.top = rcUL.top + vsDraw.maxAscent + 1;
 				rcUL.bottom = rcUL.top + 1;
 				surface->FillRectangleAligned(rcUL, Fill(textFore));
-				// Added strike style, 2011-12-20
-			} else if (vsDraw.styles[styleMain].strike) {
+			} else if (vsDraw.styles[styleMain].strike) { // 2011-12-20
 				PRectangle rcUL = rcSegment;
 				rcUL.top = rcUL.top + std::ceil((rcUL.bottom - rcUL.top) / 2);
+				rcUL.bottom = rcUL.top + 1;
+				surface->FillRectangleAligned(rcUL, Fill(textFore));
+			} else if (vsDraw.styles[styleMain].overline) {// 2022-02-06
+				PRectangle rcUL = rcSegment;
+				rcUL.top = rcUL.top + 1;
 				rcUL.bottom = rcUL.top + 1;
 				surface->FillRectangleAligned(rcUL, Fill(textFore));
 			}

@@ -654,6 +654,10 @@ NP2_inline void SciCall_StyleSetStrike(int style, BOOL strike) {
 	SciCall(SCI_STYLESETSTRIKE, style, strike);
 }
 
+NP2_inline void SciCall_StyleSetOverline(int style, BOOL overline) {
+	SciCall(SCI_STYLESETOVERLINE, style, overline);
+}
+
 NP2_inline void SciCall_StyleSetFore(int style, COLORREF fore) {
 	SciCall(SCI_STYLESETFORE, style, fore);
 }

@@ -538,6 +538,10 @@ void ScintillaCall::StyleSetStrike(int style, bool strike) {
 	Call(Message::StyleSetStrike, style, strike);
 }
 
+void ScintillaCall::StyleSetOverline(int style, bool overline) {
+	Call(Message::StyleSetOverline, style, overline);
+}
+
 Colour ScintillaCall::StyleGetFore(int style) {
 	return static_cast<Colour>(Call(Message::StyleGetFore, style));
 }
