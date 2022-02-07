@@ -145,8 +145,8 @@ NP2_inline int SciCall_GetCharacterAt(Sci_Position position) {
 typedef enum CharacterClass {
 	CharacterClass_Space,
 	CharacterClass_NewLine,
-	CharacterClass_Word,
 	CharacterClass_Punctuation,
+	CharacterClass_Word,
 	CharacterClass_CJKWord
 } CharacterClass;
 

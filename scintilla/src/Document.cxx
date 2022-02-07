@@ -1954,8 +1954,7 @@ Sci::Position Document::NextWordEnd(Sci::Position pos, int delta) const noexcept
 namespace {
 
 constexpr bool IsWordEdge(CharacterClass cc, CharacterClass ccNext) noexcept {
-	return (cc != ccNext)
-		&& (cc == CharacterClass::word || cc == CharacterClass::punctuation || cc == CharacterClass::cjkWord);
+	return (cc != ccNext) && (cc >= CharacterClass::punctuation);
 }
 
 }
@@ -2651,7 +2650,7 @@ void Document::NotifyModified(DocModification mh) {
 
 bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
 	const CharacterClass cc = WordCharacterClass(ch);
-	return (cc == CharacterClass::word || cc == CharacterClass::cjkWord) && IsPunctuation(ch);
+	return (cc >= CharacterClass::word) && IsPunctuation(ch);
 }
 
 Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {

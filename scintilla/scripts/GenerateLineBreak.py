@@ -7,7 +7,7 @@ import unicodedata
 from enum import IntFlag
 
 from FileGenerator import Regenerate
-from GenerateCharacterCategory import CharClassify, ClassifyMap
+from GenerateCharacterCategory import CharacterClass, CategoryClassifyMap
 from MultiStageTable import *
 from UnicodeData import *
 
@@ -109,9 +109,9 @@ def updateUnicodeLineBreak(filename):
 	indexTable = [0] * UnicodeCharacterCount
 	for ch, prop in enumerate(lineBreakTable):
 		category = unicodedata.category(chr(ch))
-		cc = ClassifyMap[category]
+		cc = CategoryClassifyMap[category]
 		lb = LineBreakMap[prop]
-		if cc == CharClassify.ccWord and lb != LineBreak.BreakAny:
+		if cc == CharacterClass.Word and lb != LineBreak.BreakAny:
 			lb = LineBreak.NonBreak
 		indexTable[ch] = int(lb)
 

@@ -15,7 +15,7 @@ enum {
 };
 
 // moved from CharClassify.h
-enum class CharacterClass { space, newLine, word, punctuation, cjkWord };
+enum class CharacterClass { space, newLine, punctuation, word, cjkWord };
 
 class IDocument {
 public:

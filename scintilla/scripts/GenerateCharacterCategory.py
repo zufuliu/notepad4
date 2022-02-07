@@ -10,25 +10,25 @@ from FileGenerator import Regenerate
 from MultiStageTable import *
 from UnicodeData import *
 
-class CharClassify(IntEnum):
-	ccSpace = 0
-	ccNewLine = 1
-	ccWord = 2
-	ccPunctuation = 3
-	ccCJKWord = 4
+class CharacterClass(IntEnum):
+	Space = 0
+	NewLine = 1
+	Punctuation = 2
+	Word = 3
+	CJKWord = 4
 
-CharClassifyOrder = [CharClassify.ccCJKWord, CharClassify.ccWord, CharClassify.ccPunctuation, CharClassify.ccNewLine]
-def prefCharClassify(values):
-	for value in CharClassifyOrder:
+CharacterClassOrder = [CharacterClass.CJKWord, CharacterClass.Word, CharacterClass.Punctuation, CharacterClass.NewLine]
+def GetPreferredCharacterClass(values):
+	for value in CharacterClassOrder:
 		if value in values:
 			return value
 	# Cn
-	return CharClassify.ccSpace
+	return CharacterClass.Space
 
 # https://en.wikipedia.org/wiki/Unicode_character_property
 # Document::WordCharacterClass()
 CharClassifyMap = {
-	CharClassify.ccSpace: [
+	CharacterClass.Space: [
 		'Zs',
 		# Other
 		'Cc',
@@ -37,11 +37,11 @@ CharClassifyMap = {
 		'Co',
 		'Cn',
 	],
-	CharClassify.ccNewLine: [
+	CharacterClass.NewLine: [
 		'Zl',
 		'Zp',
 	],
-	CharClassify.ccWord: [
+	CharacterClass.Word: [
 		# Letter
 		'Lu',
 		'Ll',
@@ -57,7 +57,7 @@ CharClassifyMap = {
 		'Mc',
 		'Me',
 	],
-	CharClassify.ccPunctuation: [
+	CharacterClass.Punctuation: [
 		# Punctuation
 		'Pc',
 		'Pd',
@@ -74,10 +74,10 @@ CharClassifyMap = {
 	],
 }
 
-ClassifyMap = {}
+CategoryClassifyMap = {}
 for key, items in CharClassifyMap.items():
 	for category in items:
-		ClassifyMap[category] = key
+		CategoryClassifyMap[category] = key
 
 
 # https://en.wikipedia.org/wiki/Private_Use_Areas
@@ -155,7 +155,7 @@ def findCategories(filename):
 	return [v[2:] for v in values]
 
 def isCJKCharacter(category, ch):
-	if category not in CharClassifyMap[CharClassify.ccWord]:
+	if category not in CharClassifyMap[CharacterClass.Word]:
 		return False
 
 	for block in CJKBlockList:
@@ -266,7 +266,7 @@ def getCharClassify(decode, ch):
 		# undefined, treat as Cn, Not assigned
 		category = 'Cn'
 
-	cc = ClassifyMap[category]
+	cc = CategoryClassifyMap[category]
 	return int(cc)
 
 def buildCharClassify(cp):
@@ -345,9 +345,9 @@ def updateCharClassifyTable(filename, headfile):
 	for ch in range(UnicodeCharacterCount):
 		uch = chr(ch)
 		category = unicodedata.category(uch)
-		value = ClassifyMap[category]
+		value = CategoryClassifyMap[category]
 		if isCJKCharacter(category, ch):
-			value = CharClassify.ccCJKWord
+			value = CharacterClass.CJKWord
 		indexTable[ch] = int(value)
 
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
@@ -356,7 +356,7 @@ def updateCharClassifyTable(filename, headfile):
 	valueBit, totalBit, data = runLengthEncode('CharClassify Unicode BMP', indexTable[:BMPCharacterCharacterCount])
 	assert valueBit == 3
 	assert totalBit == 16
-	output.append(f'const uint16_t CharClassifyRLE_BMP[] = {{')
+	output.append('const uint16_t CharClassifyRLE_BMP[] = {')
 	output.extend(dumpArray(data, 20))
 	output.append("};")
 	output.append("")
@@ -425,7 +425,7 @@ def updateCharacterCategoryTable(filename):
 	assert valueBit == 5
 	assert totalBit == 16
 	output.append("")
-	output.append(f'const uint16_t CatTableRLE_BMP[] = {{')
+	output.append('const uint16_t CatTableRLE_BMP[] = {')
 	output.extend(dumpArray(data, 20))
 	output.append("};")
 
@@ -447,15 +447,15 @@ def getDBCSCharClassify(decode, ch, isReservedOrUDC=None):
 		ch = ord(uch[0])
 		# treat PUA in DBCS as word instead of punctuation or space
 		if isCJKCharacter(category, ch) or (category == 'Co' and isPrivateChar(ch)):
-			return int(CharClassify.ccCJKWord)
+			return int(CharacterClass.CJKWord)
 	else:
 		# treat reserved or user-defined characters as word
 		if isReservedOrUDC and isReservedOrUDC(ch, buf):
-			return int(CharClassify.ccCJKWord)
+			return int(CharacterClass.CJKWord)
 		# undefined, treat as Cn, Not assigned
 		category = 'Cn'
 
-	cc = ClassifyMap[category]
+	cc = CategoryClassifyMap[category]
 	return int(cc)
 
 def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
@@ -472,7 +472,7 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 
 	indexTable = [0] * DBCSCharacterCount
 	for ch in range(DBCSCharacterCount):
-		indexTable[ch] = int(prefCharClassify(result[ch]))
+		indexTable[ch] = int(GetPreferredCharacterClass(result[ch]))
 
 	suffix = '_' + encodingList[0].upper()
 	head = 'CharClassify' + suffix
@@ -493,13 +493,13 @@ def makeDBCSCharClassifyTable(output, encodingList, isReservedOrUDC=None):
 	if False:
 		config = {
 			'tableName': 'CharClassifyTable' + suffix,
-			'function': f"""CharClassify::cc ClassifyCharacter{suffix}(uint32_t ch) noexcept {{
+			'function': f"""CharacterClass ClassifyCharacter{suffix}(uint32_t ch) noexcept {{
 	if (ch > maxDBCSCharacter) {{
 		// Cn
-		return CharClassify::ccSpace;
+		return CharacterClass::space;
 	}}
 	""",
-			'returnType': 'CharClassify::cc'
+			'returnType': 'CharacterClass'
 		}
 
 		table, function = buildMultiStageTable(head, indexTable, config)
