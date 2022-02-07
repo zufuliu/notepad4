@@ -32,14 +32,15 @@
 #endif
 
 #if defined(USE_D2D)
-#if defined(_MSC_BUILD) && defined(VER_PRODUCTVERSION_W) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 #pragma warning(push)
 #pragma warning(disable: 4458)
+// Win32 XP v141_xp toolset with Windows 7 SDK.
 // d2d1helper.h(677,19): warning C4458:  declaration of 'a' hides class member
 #endif
 #include <d2d1.h>
 #include <dwrite.h>
-#if defined(_MSC_BUILD) && defined(VER_PRODUCTVERSION_W) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 #pragma warning(pop)
 #endif
 #endif
