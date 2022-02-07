@@ -29,6 +29,11 @@ public:
 		return GetPropertyInt(key, N - 1, defaultValue);
 	}
 
+	template <size_t N>
+	bool GetPropertyBool(const char (&key)[N], bool defaultValue = false) const {
+		return GetPropertyInt(key, N - 1, defaultValue) & true;
+	}
+
 	int IndentAmount(Sci_Line line) noexcept;
 
 	[[deprecated]]

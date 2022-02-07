@@ -454,7 +454,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			sc.SetState(SCE_SH_DEFAULT);
 			break;
 		case SCE_SH_COMMENTLINE:
-			if (sc.atLineEnd && sc.chPrev != '\\') {
+			if (sc.MatchLineEnd() && sc.chPrev != '\\') {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
@@ -523,13 +523,13 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (sc.atLineStart) {
 				sc.SetState(SCE_SH_HERE_Q);
 				int prefixws = 0;
-				while (sc.ch == '\t' && !sc.atLineEnd) {	// tabulation prefix
+				while (sc.ch == '\t' && !sc.MatchLineEnd()) {	// tabulation prefix
 					sc.Forward();
 					prefixws++;
 				}
 				if (prefixws > 0)
 					sc.SetState(SCE_SH_HERE_Q);
-				while (!sc.atLineEnd) {
+				while (!sc.MatchLineEnd()) {
 					sc.Forward();
 				}
 				char s[HERE_DELIM_MAX];
@@ -635,7 +635,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 
 		// Must check end of HereDoc state 1 before default state is handled
-		if (HereDoc.State == 1 && sc.atLineEnd) {
+		if (HereDoc.State == 1 && sc.MatchLineEnd()) {
 			// Begin of here-doc (the line after the here-doc delimiter):
 			// Lexically, the here-doc starts from the next line after the >>, but the
 			// first line of here-doc seem to follow the style of the last EOL sequence
@@ -838,7 +838,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_SH_COMMENTLINE)
 
 void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const bool isCShell = styler.GetPropertyInt("lexer.lang") & true;
+	const bool isCShell = styler.GetPropertyBool("lexer.lang");
 
 	const Sci_PositionU endPos = startPos + length;
 	int skipHereCh = 0;

@@ -80,15 +80,15 @@ static void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 	// property lexer.css.scss.language
 	//	Set to 1 for Sassy CSS (.scss)
-	const bool isScssDocument = styler.GetPropertyInt("lexer.css.scss") != 0;
+	const bool isScssDocument = styler.GetPropertyBool("lexer.css.scss");
 
 	// property lexer.css.less.language
 	// Set to 1 for Less CSS (.less)
-	const bool isLessDocument = styler.GetPropertyInt("lexer.css.less") != 0;
+	const bool isLessDocument = styler.GetPropertyBool("lexer.css.less");
 
 	// property lexer.css.hss.language
 	// Set to 1 for HSS (.hss)
-	const bool isHssDocument = styler.GetPropertyInt("lexer.css.hss") != 0;
+	const bool isHssDocument = styler.GetPropertyBool("lexer.css.hss");
 
 	// SCSS/LESS/HSS have the concept of variable
 	const bool hasVariables = isScssDocument || isLessDocument || isHssDocument;

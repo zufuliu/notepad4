@@ -49,7 +49,7 @@ inline bool IsAttributeValue(const LexAccessor &styler, Sci_PositionU startPos) 
 }
 
 void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool fold = styler.GetPropertyInt("fold", 1) & true;
+	const bool fold = styler.GetPropertyBool("fold");
 	int levelCurrent = SC_FOLDLEVELBASE;
 
 	int htmlTagLevel = 0;

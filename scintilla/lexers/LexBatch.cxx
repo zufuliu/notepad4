@@ -206,7 +206,7 @@ constexpr bool IsCommentLine(int lineState) noexcept {
 }
 
 void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool fold = styler.GetPropertyInt("fold", 1) & true;
+	const bool fold = styler.GetPropertyBool("fold");
 	int varQuoteChar = '\0'; // %var% or !var! after SetLocal EnableDelayedExpansion
 	int outerStyle = SCE_BAT_DEFAULT;
 	int logicalVisibleChars = 0;

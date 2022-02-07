@@ -36,7 +36,7 @@ enum {
 };
 
 void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const bool fold = styler.GetPropertyInt("fold", 1) & true;
+	const bool fold = styler.GetPropertyBool("fold");
 
 	int state = initStyle;
 	uint8_t chNext = styler[startPos];

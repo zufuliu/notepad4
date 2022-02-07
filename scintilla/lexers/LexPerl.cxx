@@ -1573,8 +1573,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_PL_COMMENTLINE)
 
 void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
-	constexpr bool foldPOD = true;//styler.GetPropertyInt("fold.perl.pod", 1) != 0;
-	constexpr bool foldPackage = true;//styler.GetPropertyInt("fold.perl.package", 1) != 0;
+	constexpr bool foldPOD = true;//styler.GetPropertyBool("fold.perl.pod", true);
+	constexpr bool foldPackage = true;//styler.GetPropertyBool("fold.perl.package", true);
 
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);

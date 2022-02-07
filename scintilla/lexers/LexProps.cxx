@@ -40,7 +40,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	//	For properties files, set to 0 to style all lines that start with whitespace in the default style.
 	//	This is not suitable for SciTE .properties files which use indentation for flow control but
 	//	can be used for RFC2822 text where indentation is used for continuation lines.
-	const bool allowInitialSpaces = styler.GetPropertyInt("lexer.props.allow.initial.spaces", 1) & true;
+	const bool allowInitialSpaces = styler.GetPropertyBool("lexer.props.allow.initial.spaces", true);
 
 	const Sci_Position endPos = startPos + lengthDoc;
 	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
@@ -53,7 +53,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 
 #if !ENABLE_FOLD_PROPS_COMMENT
-	const int fold = styler.GetPropertyInt("fold", 1);
+	const bool fold = styler.GetPropertyBool("fold");
 	int prevLevel = (lineCurrent > 0) ? styler.LevelAt(lineCurrent - 1) : SC_FOLDLEVELBASE;
 #endif
 

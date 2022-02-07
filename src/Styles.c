@@ -1633,7 +1633,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		switch (rid) {
 		case NP2LEX_HTML:
 		case NP2LEX_XML:
-			SciCall_SetProperty("fold.html", "1");
+			//SciCall_SetProperty("fold.html", "1");
 			//SciCall_SetProperty("fold.hypertext.comment", "1");
 			//SciCall_SetProperty("fold.hypertext.heredoc", "1");
 			break;

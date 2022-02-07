@@ -624,41 +624,41 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	// property fold.html
 	//	Folding is turned on or off for HTML and XML files with this option.
 	//	The fold option must also be on for folding to occur.
-	const bool foldHTML = styler.GetPropertyInt("fold.html", 1) != 0;
+	constexpr bool foldHTML = true;//styler.GetPropertyBool("fold.html", true);
 
-	const bool fold = foldHTML && styler.GetPropertyInt("fold", 1);
+	const bool fold = foldHTML && styler.GetPropertyInt("fold");
 
 	// property fold.html.preprocessor
 	//	Folding is turned on or off for scripts embedded in HTML files with this option.
 	//	The default is on.
-	const bool foldHTMLPreprocessor = foldHTML;// && styler.GetPropertyInt("fold.html.preprocessor", 1);
+	constexpr bool foldHTMLPreprocessor = foldHTML;// && styler.GetPropertyBool("fold.html.preprocessor", true);
 
 	// property fold.hypertext.heredoc
 	//	Allow folding for heredocs in scripts embedded in HTML.
 	//	The default is off.
-	const bool foldHeredoc = fold;// && styler.GetPropertyInt("fold.hypertext.heredoc", 0) != 0;
+	const bool foldHeredoc = fold;// && styler.GetPropertyBool("fold.hypertext.heredoc", false);
 
 	// property fold.xml.at.tag.open
 	//	Enable folding for XML at the start of open tag.
 	//	The default is on.
-	const bool foldXmlAtTagOpen = isXml && fold;// && styler.GetPropertyInt("fold.xml.at.tag.open", 1) != 0;
+	const bool foldXmlAtTagOpen = isXml & fold;// && styler.GetPropertyBool("fold.xml.at.tag.open", true);
 
 	// property html.tags.case.sensitive
 	//	For XML and HTML, setting this property to 1 will make tags match in a case
 	//	sensitive way which is the expected behaviour for XML and XHTML.
-	constexpr bool caseSensitive = false;//styler.GetPropertyInt("html.tags.case.sensitive", 0) != 0;
+	constexpr bool caseSensitive = false;//styler.GetPropertyBool("html.tags.case.sensitive", false);
 
 	// property lexer.xml.allow.scripts
 	//	Set to 0 to disable scripts in XML.
-	const bool allowScripts = styler.GetPropertyInt("lexer.xml.allow.scripts", 1) != 0;
+	const bool allowScripts = styler.GetPropertyBool("lexer.xml.allow.scripts", true);
 
 	// property lexer.html.mako
 	//	Set to 1 to enable the mako template language.
-	constexpr bool isMako = false;//styler.GetPropertyInt("lexer.html.mako", 0) != 0;
+	constexpr bool isMako = false;//styler.GetPropertyBool("lexer.html.mako", false);
 
 	// property lexer.html.django
 	//	Set to 1 to enable the django template language.
-	constexpr bool isDjango = false;//styler.GetPropertyInt("lexer.html.django", 0) != 0;
+	constexpr bool isDjango = false;//styler.GetPropertyBool("lexer.html.django", false);
 
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
@@ -1064,7 +1064,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_H_SGML_COMMAND; // wait for a pending command
 			}
 			// fold whole tag (-- when closing the tag)
-			if (foldHTMLPreprocessor || state == SCE_H_COMMENT || state == SCE_H_CDATA)
+			if constexpr (foldHTMLPreprocessor || state == SCE_H_COMMENT || state == SCE_H_CDATA)
 				levelCurrent++;
 			continue;
 		}

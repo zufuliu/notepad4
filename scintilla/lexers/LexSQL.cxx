@@ -60,10 +60,10 @@ static void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	//const WordList &kw_user3 = *keywordLists[6];
 	//const WordList &kw_user4 = *keywordLists[7];
 
-	const bool sqlBackticksIdentifier = styler.GetPropertyInt("lexer.sql.backticks.identifier", 1) != 0;
-	const bool sqlNumbersignComment = styler.GetPropertyInt("lexer.sql.numbersign.comment", 1) != 0;
-	const bool sqlBackslashEscapes = styler.GetPropertyInt("lexer.sql.backslash.escapes", 1) != 0;
-	const bool sqlAllowDottedWord = styler.GetPropertyInt("lexer.sql.allow.dotted.word", 0) != 0;
+	const bool sqlBackticksIdentifier = styler.GetPropertyBool("lexer.sql.backticks.identifier", true);
+	const bool sqlNumbersignComment = styler.GetPropertyBool("lexer.sql.numbersign.comment", true);
+	const bool sqlBackslashEscapes = styler.GetPropertyBool("lexer.sql.backslash.escapes", true);
+	const bool sqlAllowDottedWord = styler.GetPropertyBool("lexer.sql.allow.dotted.word", false);
 
 	StyleContext sc(startPos, length, initStyle, styler);
 	//int styleBeforeDCKeyword = SCE_SQL_DEFAULT;
@@ -466,8 +466,8 @@ static constexpr bool IsCommentStyle (int style) noexcept {
 #define IsCommentLine(line)			IsLexCommentLine(styler, line, MultiStyle(SCE_SQL_COMMENTLINE, SCE_SQL_COMMENTLINEDOC))
 
 static void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	constexpr bool foldOnlyBegin = false;// styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;
-	constexpr bool foldAtElse = false;// styler.GetPropertyInt("fold.sql.at.else", 0) != 0;
+	constexpr bool foldOnlyBegin = false;// styler.GetPropertyBool("fold.sql.only.begin", false);
+	constexpr bool foldAtElse = false;// styler.GetPropertyBool("fold.sql.at.else", false);
 
 	SQLStates sqlStates;
 	Sci_PositionU endPos = startPos + length;
