@@ -32,14 +32,14 @@
 #endif
 
 #if defined(USE_D2D)
-#if defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#if defined(_MSC_BUILD) && defined(VER_PRODUCTVERSION_W) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
 #pragma warning(push)
 #pragma warning(disable: 4458)
 // d2d1helper.h(677,19): warning C4458:  declaration of 'a' hides class member
 #endif
 #include <d2d1.h>
 #include <dwrite.h>
-#if defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#if defined(_MSC_BUILD) && defined(VER_PRODUCTVERSION_W) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
 #pragma warning(pop)
 #endif
 #endif
