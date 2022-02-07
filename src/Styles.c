@@ -1934,6 +1934,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 				SciCall_CopyStyles(first, iStyle >> 8);
 			}
 		}
+
 		switch (iLexer) {
 		case SCLEX_PERL:
 #if defined(_WIN64)
@@ -3013,6 +3014,7 @@ void Style_SetLexerByLangIndex(int lang) {
 	np2LexLangIndex = lang;
 
 	switch (lang) {
+	// Text File
 	case IDM_LEXER_TEXTFILE:
 		np2LexLangIndex = 0;
 		pLex = &lexTextFile;
@@ -3027,6 +3029,7 @@ void Style_SetLexerByLangIndex(int lang) {
 		pLex = &lexCONF;
 		break;
 
+	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_PHP:
 	case IDM_LEXER_JSP:
@@ -3040,6 +3043,7 @@ void Style_SetLexerByLangIndex(int lang) {
 		pLex = &lexHTML;
 		break;
 
+	// XML Document
 	case IDM_LEXER_XML:
 	case IDM_LEXER_XSD:
 	case IDM_LEXER_XSLT:
@@ -3075,18 +3079,21 @@ void Style_SetLexerByLangIndex(int lang) {
 		pLex = &lexXML;
 		break;
 
+	// Shell Script
 	case IDM_LEXER_BASH:
 	case IDM_LEXER_CSHELL:
 	case IDM_LEXER_M4:
 		pLex = &lexBash;
 		break;
 
+	// Math
 	case IDM_LEXER_MATLAB:
 	case IDM_LEXER_OCTAVE:
 	case IDM_LEXER_SCILAB:
 		pLex = &lexMatlab;
 		break;
 
+	// CSS Style Sheet
 	case IDM_LEXER_CSS:
 	case IDM_LEXER_SCSS:
 	case IDM_LEXER_LESS:
@@ -3106,21 +3113,26 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 	int lang = np2LexLangIndex;
 	if (lang == 0) {
 		switch (pLexCurrent->rid) {
+		// Text File
 		case NP2LEX_TEXTFILE:
 			lang = IDM_LEXER_TEXTFILE;
 			break;
 		case NP2LEX_2NDTEXTFILE:
 			lang = IDM_LEXER_2NDTEXTFILE;
 			break;
+		// Web Source Code
 		case NP2LEX_HTML:
 			lang = IDM_LEXER_WEB;
 			break;
+		// XML Document
 		case NP2LEX_XML:
 			lang = IDM_LEXER_XML;
 			break;
+		// Shell Script
 		case NP2LEX_BASH:
 			lang = IDM_LEXER_BASH;
 			break;
+		// Math
 		case NP2LEX_MATLAB:
 			lang = IDM_LEXER_MATLAB;
 			break;
@@ -3130,6 +3142,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 		case NP2LEX_SCILAB:
 			lang = IDM_LEXER_SCILAB;
 			break;
+		// CSS Style Sheet
 		case NP2LEX_CSS:
 			lang = IDM_LEXER_CSS;
 			break;

@@ -1667,7 +1667,7 @@ BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 }
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
-#if !defined(_WIN64) && defined(_MSC_BUILD) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
+#if !defined(_WIN64) && defined(_MSC_BUILD) && defined(VER_PRODUCTVERSION_W) && (VER_PRODUCTVERSION_W <= _WIN32_WINNT_WIN7)
 typedef struct FILE_ID_128 {
 	BYTE Identifier[16];
 } FILE_ID_128;
