@@ -33,6 +33,7 @@
 #include <shlwapi.h>
 
 #include "ScintillaTypes.h"
+#include "ILexer.h"
 
 #include "Debugging.h"
 #include "Geometry.h"

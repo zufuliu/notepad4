@@ -354,6 +354,7 @@ public:
 	Sci_Position SCI_METHOD GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const noexcept override;
 	Sci::Position GetRelativePositionUTF16(Sci::Position positionStart, Sci::Position characterOffset) const noexcept;
 	int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept override;
+	CharacterClass SCI_METHOD GetCharacterClass(unsigned int ch) const noexcept override;
 	int SCI_METHOD CodePage() const noexcept override;
 	bool SCI_METHOD IsDBCSLeadByte(unsigned char ch) const noexcept override;
 	bool IsDBCSLeadByteNoExcept(unsigned char ch) const noexcept {
@@ -581,7 +582,9 @@ public:
 	bool AddWatcher(DocWatcher *watcher, void *userData);
 	bool RemoveWatcher(DocWatcher *watcher, void *userData) noexcept;
 
-	CharacterClass WordCharacterClass(unsigned int ch) const noexcept;
+	CharacterClass WordCharacterClass(unsigned int ch) const noexcept {
+		return GetCharacterClass(ch);
+	}
 	bool IsWordPartSeparator(unsigned int ch) const noexcept;
 	Sci::Position WordPartLeft(Sci::Position pos) const noexcept;
 	Sci::Position WordPartRight(Sci::Position pos) const noexcept;
@@ -593,10 +596,6 @@ public:
 		return actualIndentInChars;
 	}
 	Sci::Position BraceMatch(Sci::Position position, Sci::Position maxReStyle, Sci::Position startPos, bool useStartPos) const noexcept;
-
-	bool IsAutoCompletionWordCharacter(unsigned int ch) const noexcept {
-		return WordCharacterClass(ch) == CharacterClass::word;
-	}
 
 private:
 	void NotifyModifyAttempt() noexcept;

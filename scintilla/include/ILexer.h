@@ -14,6 +14,9 @@ enum {
 	dvRelease4 = 2,
 };
 
+// moved from CharClassify.h
+enum class CharacterClass { space, newLine, word, punctuation, cjkWord };
+
 class IDocument {
 public:
 	virtual int SCI_METHOD Version() const noexcept = 0;
@@ -40,6 +43,7 @@ public:
 	virtual Sci_Position SCI_METHOD LineEnd(Sci_Line line) const noexcept = 0;
 	virtual Sci_Position SCI_METHOD GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const noexcept = 0;
 	virtual int SCI_METHOD GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept = 0;
+	virtual CharacterClass SCI_METHOD GetCharacterClass(unsigned int character) const noexcept = 0;
 };
 
 enum {

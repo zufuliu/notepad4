@@ -6489,8 +6489,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetCharacterAndWidth:
 		return pdoc->GetCharacterAndWidth(wParam, reinterpret_cast<Sci_Position *>(lParam));
 
-	case Message::IsAutoCompletionWordCharacter:
-		return pdoc->IsAutoCompletionWordCharacter(static_cast<unsigned int>(wParam));
+	case Message::GetCharacterClass:
+		return static_cast<int>(pdoc->GetCharacterClass(static_cast<unsigned int>(wParam)));
 
 	case Message::SetCurrentPos:
 		if (sel.IsRectangular()) {

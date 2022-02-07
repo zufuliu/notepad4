@@ -8,6 +8,7 @@
 
 namespace Lexilla {
 
+// same as EncodingFamily in Document.h
 enum class EncodingType { eightBit, unicode, dbcs };
 
 class LexAccessor {
@@ -75,8 +76,12 @@ public:
 	constexpr Scintilla::IDocument *MultiByteAccess() const noexcept {
 		return pAccess;
 	}
-	int GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {
+	int GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth = nullptr) const noexcept {
 		return pAccess->GetCharacterAndWidth(position, pWidth);
+	}
+	Scintilla::CharacterClass GetCharacterClass(unsigned int character) const noexcept {
+		// NOTE: '_' is classified as word in CharClassify::SetDefaultCharClasses()
+		return pAccess->GetCharacterClass(character);
 	}
 
 	/** Safe version of operator[], returning a defined value for invalid position. */

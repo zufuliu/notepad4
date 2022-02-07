@@ -124,8 +124,8 @@ get int GetCharAt=2007(position pos,)
 # Returns the character at the position and.
 get int GetCharacterAndWidth=2038(position pos, position width)
 
-# Is character part of auto-completion word.
-get bool IsAutoCompletionWordCharacter=2039(int ch,)
+# Returns character class for the character.
+get int GetCharacterClass=2039(int character,)
 
 # Returns the position of the caret.
 get position GetCurrentPos=2008(,)

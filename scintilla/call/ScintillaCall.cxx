@@ -182,8 +182,8 @@ int ScintillaCall::CharacterAndWidth(Position pos, Position width) {
 	return static_cast<int>(Call(Message::GetCharacterAndWidth, pos, width));
 }
 
-bool ScintillaCall::IsAutoCompletionWordCharacter(int ch) {
-	return Call(Message::IsAutoCompletionWordCharacter, ch);
+int ScintillaCall::CharacterClass(int character) {
+	return static_cast<int>(Call(Message::GetCharacterClass, character));
 }
 
 Position ScintillaCall::CurrentPos() {

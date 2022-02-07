@@ -24,7 +24,7 @@ enum class Message {
 	GetLength = 2006,
 	GetCharAt = 2007,
 	GetCharacterAndWidth = 2038,
-	IsAutoCompletionWordCharacter = 2039,
+	GetCharacterClass = 2039,
 	GetCurrentPos = 2008,
 	GetAnchor = 2009,
 	GetStyleAt = 2010,

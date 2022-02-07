@@ -211,6 +211,7 @@
 #include <iterator>
 
 #include "ScintillaTypes.h"
+#include "ILexer.h"
 
 #include "Position.h"
 #include "CharClassify.h"

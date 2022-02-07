@@ -1025,6 +1025,9 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 }
 
 int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {
+	if (pWidth && *pWidth < 0) {
+		position = MovePositionOutsideChar(position, -1, false);
+	}
 	int bytesInCharacter = 1;
 	const unsigned char leadByte = cb.UCharAt(position);
 	int character = leadByte;
@@ -1799,7 +1802,7 @@ Sci::Position Document::ParaDown(Sci::Position pos) const noexcept {
 		return LineEnd(line - 1);
 }
 
-CharacterClass Document::WordCharacterClass(unsigned int ch) const noexcept {
+CharacterClass SCI_METHOD Document::GetCharacterClass(unsigned int ch) const noexcept {
 	if (dbcsCodePage && !IsASCIICharacter(ch)) {
 		if (CpUtf8 == dbcsCodePage) {
 			return CharClassify::ClassifyCharacter(ch);

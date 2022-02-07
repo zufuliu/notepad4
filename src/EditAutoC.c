@@ -601,7 +601,11 @@ BOOL IsDocWordChar(int ch) {
 }
 
 BOOL IsAutoCompletionWordCharacter(int ch) {
-	return (ch < 0x80) ? IsDocWordChar(ch) : SciCall_IsAutoCompletionWordCharacter(ch);
+	if (ch < 0x80) {
+		return IsDocWordChar(ch);
+	}
+	const CharacterClass cc = SciCall_GetCharacterClass(ch);
+	return cc == CharacterClass_Word;
 }
 
 static inline BOOL IsWordStyleToIgnore(int style) {

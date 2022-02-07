@@ -13,9 +13,12 @@
 #include <vector>
 #include <memory>
 
+#include "ILexer.h"
+
 #include "CharacterSet.h"
 #include "CharClassify.h"
 
+using namespace Scintilla;
 using namespace Scintilla::Internal;
 using namespace Lexilla;
 
@@ -26,18 +29,20 @@ CharClassify::CharClassify() noexcept {
 void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	// Initialize all char classes to default values
 	for (int ch = 0; ch < 127; ch++) {
+		CharacterClass cc;
 		if (IsEOLChar(ch))
-			charClass[ch] = CharacterClass::newLine;
+			cc = CharacterClass::newLine;
 		else if (ch <= ' ')
-			charClass[ch] = CharacterClass::space;
+			cc = CharacterClass::space;
 		else if (includeWordClass && (IsAlphaNumeric(ch) || ch == '_'))
-			charClass[ch] = CharacterClass::word;
+			cc = CharacterClass::word;
 		else
-			charClass[ch] = CharacterClass::punctuation;
+			cc = CharacterClass::punctuation;
+		charClass[ch] = static_cast<uint8_t>(cc);
 	}
 
 	const CharacterClass cc = includeWordClass ? CharacterClass::word : CharacterClass::punctuation;
-	charClass[127] = CharacterClass::space;
+	charClass[127] = static_cast<uint8_t>(CharacterClass::space);
 	memset(charClass + 128, static_cast<int>(cc), 128);
 }
 
@@ -45,7 +50,7 @@ void CharClassify::SetCharClasses(const unsigned char *chars, CharacterClass new
 	// Apply the newCharClass to the specified chars
 	if (chars) {
 		while (*chars) {
-			charClass[*chars] = newCharClass;
+			charClass[*chars] = static_cast<uint8_t>(newCharClass);
 			chars++;
 		}
 	}
@@ -58,7 +63,7 @@ void CharClassify::SetCharClassesEx(const unsigned char *chars, size_t length) n
 		assert(length == 32);
 		for (int i = 0; i < 128; i++) {
 			const unsigned char cc = (chars[i >> 2] >> (2 * (i & 3))) & 3;
-			charClass[i + 128] = static_cast<CharacterClass>(cc);
+			charClass[i + 128] = cc;
 		}
 	}
 }
@@ -68,7 +73,7 @@ int CharClassify::GetCharsOfClass(CharacterClass characterClass, unsigned char *
 	// of characters (if the buffer is NULL, don't write to it).
 	int count = 0;
 	for (int ch = maxChar - 1; ch >= 0; --ch) {
-		if (charClass[ch] == characterClass) {
+		if (static_cast<CharacterClass>(charClass[ch]) == characterClass) {
 			++count;
 			if (buffer) {
 				*buffer = static_cast<unsigned char>(ch);

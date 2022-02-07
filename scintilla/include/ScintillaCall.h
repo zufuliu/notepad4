@@ -84,7 +84,7 @@ public:
 	Position Length();
 	int CharAt(Position pos);
 	int CharacterAndWidth(Position pos, Position width);
-	bool IsAutoCompletionWordCharacter(int ch);
+	int CharacterClass(int character);
 	Position CurrentPos();
 	Position Anchor();
 	int StyleAt(Position pos);
