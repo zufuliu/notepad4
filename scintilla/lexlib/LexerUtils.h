@@ -55,6 +55,16 @@ int PackLineState(const std::vector<int>& states) noexcept;
 void UnpackLineState(int lineState, std::vector<int>& states);
 
 template <typename T>
+inline T TryGetFront(std::vector<T>& states, T value = {}) noexcept {
+	return states.empty() ? value : states.front();
+}
+
+template <typename T>
+inline T TryGetBack(std::vector<T>& states, T value = {}) noexcept {
+	return states.empty() ? value : states.back();
+}
+
+template <typename T>
 inline T TryTakeAndPop(std::vector<T>& states, T value = {}) {
 	if (!states.empty()) {
 		value = states.back();

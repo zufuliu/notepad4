@@ -425,14 +425,16 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					continue;
 				}
 			} else if (sc.state == SCE_BAT_STRINGDQ) {
-				if (sc.ch == '=' && command == Command::Set) {
-					command = Command::SetValue;
+				if (IsBatchOperator(sc.ch, command)) {
+					if (sc.ch == '=' && command == Command::Set) {
+						command = Command::SetValue;
+					}
 					sc.SetState(SCE_BAT_OPERATOR);
 					sc.ForwardSetState(SCE_BAT_STRINGDQ);
 					continue;
 				}
 			} else if (sc.state == SCE_BAT_STRINGNQ) {
-				const int state = nestedState.empty() ? SCE_BAT_DEFAULT : nestedState.back();
+				const int state = TryGetBack(nestedState);
 				if (IsStringArgumentEnd(sc, state, command, parenCount)) {
 					sc.SetState(state);
 					continue;
