@@ -56,6 +56,7 @@
       <File Name="../../scintilla/lexers/LexLLVM.cxx"/>
       <File Name="../../scintilla/lexers/LexLua.cxx"/>
       <File Name="../../scintilla/lexers/LexMakefile.cxx"/>
+      <File Name="../../scintilla/lexers/LexMarkdown.cxx"/>
       <File Name="../../scintilla/lexers/LexMatlab.cxx"/>
       <File Name="../../scintilla/lexers/LexNSIS.cxx"/>
       <File Name="../../scintilla/lexers/LexNull.cxx"/>

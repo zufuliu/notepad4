@@ -2598,6 +2598,10 @@ void EditToggleCommentBlock(void) {
 		EditEncloseSelection(L"--[[", L"--]]");
 		break;
 
+	case SCLEX_MARKDOWN:
+		EditEncloseSelection(L"<!--", L"-->");
+		break;
+
 	case SCLEX_MATLAB:
 		if (pLexCurrent->rid == NP2LEX_SCILAB || np2LexLangIndex == IDM_LEXER_SCILAB) {
 			EditEncloseSelection(L"/*", L"*/");

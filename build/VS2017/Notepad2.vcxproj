@@ -1014,6 +1014,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexLLVM.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexLua.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMakefile.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexMarkdown.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMatlab.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexNSIS.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexNull.cxx" />

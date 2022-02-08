@@ -161,7 +161,7 @@ static EDITSTYLE Styles_HTML[] = {
 	{ SCE_H_DEFAULT, NP2StyleX_HTMLElementText, L"" },
 	{ MULTI_STYLE(SCE_H_XMLSTART, SCE_H_XMLEND, SCE_H_SGML_COMMAND, 0), NP2StyleX_XMLIdentifier, L"bold; fore:#881280" },
 	{ MULTI_STYLE(SCE_H_SGML_DEFAULT, SCE_H_SGML_BLOCK_DEFAULT, 0, 0), NP2StyleX_XMLSGML, L"fore:#881280" },
-	{ SCE_H_CDATA, NP2StyleX_XMLCDATA, L"fore:#646464" },
+	{ SCE_H_CDATA, NP2StyleX_XMLCDATA, L"back:#C5C5C5; eolfilled" },
 	{ MULTI_STYLE(SCE_H_ASP, SCE_H_ASPAT, 0, 0), NP2StyleX_ASPTag, L"bold; fore:#8B008B" },
 	{ SCE_H_QUESTION, NP2StyleX_PHPTag, L"bold; fore:#8B008B" },
 

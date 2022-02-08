@@ -153,6 +153,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexMakefile.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexMarkdown.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexMatlab.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>

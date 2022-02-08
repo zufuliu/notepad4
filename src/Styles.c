@@ -106,6 +106,7 @@ extern EDITLEXER lexLLVM;
 extern EDITLEXER lexLua;
 
 extern EDITLEXER lexMake;
+extern EDITLEXER lexMarkdown;
 extern EDITLEXER lexMatlab;
 
 extern EDITLEXER lexNsis;
@@ -208,6 +209,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexLua,
 
 	&lexMake,
+	&lexMarkdown,
 	&lexMatlab,
 
 	&lexNsis,
@@ -1655,6 +1657,13 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SciCall_SetProperty("lexer.lang", jsx);
 		} break;
 
+		case NP2LEX_MARKDOWN: {
+			const char *lang = (np2LexLangIndex == IDM_LEXER_MARKDOWN_GITLAB) ? "1"
+				: ((np2LexLangIndex == IDM_LEXER_MARKDOWN_PANDOC) ? "2" : "0");
+			SciCall_SetProperty("lexer.lang", lang);
+			break;
+		} break;
+
 		case NP2LEX_APDL:
 		case NP2LEX_ABAQUS:
 			SciCall_SetProperty("lexer.lang", (rid == NP2LEX_APDL) ? "1" : "0");
@@ -1923,7 +1932,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (rid != NP2LEX_ANSI) {
 		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 
-		const UINT iStyleCount = pLexNew->iStyleCount;
+		UINT iStyleCount = pLexNew->iStyleCount;
 		// first style is the default style.
 		for (UINT i = 1; i < iStyleCount; i++) {
 			const UINT iStyle = pLexNew->Styles[i].iStyle;
@@ -1944,6 +1953,24 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE(SCE_PL_REGEX_VAR, SCE_PL_REGSUBST_VAR, SCE_PL_BACKTICKS_VAR, SCE_PL_HERE_QQ_VAR));
 			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE(SCE_PL_HERE_QX_VAR, SCE_PL_STRING_QQ_VAR, SCE_PL_STRING_QX_VAR, SCE_PL_STRING_QR_VAR));
 #endif
+			break;
+
+		case SCLEX_MARKDOWN:
+			if (!IsStyleLoaded(&lexHTML)) {
+				Style_LoadOne(&lexHTML);
+			}
+			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {
+				const UINT iStyle = lexHTML.Styles[i].iStyle;
+				szValue = lexHTML.Styles[i].szValue;
+				const int first = iStyle & 0xff;
+				Style_SetStyles(first, szValue);
+				if (iStyle > 0xFF) {
+					SciCall_CopyStyles(first, iStyle >> 8);
+				}
+				if (iStyle == SCE_H_QUESTION) {
+					break;
+				}
+			}
 			break;
 		}
 	} else {
@@ -3086,6 +3113,13 @@ void Style_SetLexerByLangIndex(int lang) {
 		pLex = &lexBash;
 		break;
 
+	// Markdown
+	case IDM_LEXER_MARKDOWN_GITHUB:
+	case IDM_LEXER_MARKDOWN_GITLAB:
+	case IDM_LEXER_MARKDOWN_PANDOC:
+		pLex = &lexMarkdown;
+		break;
+
 	// Math
 	case IDM_LEXER_MATLAB:
 	case IDM_LEXER_OCTAVE:
@@ -3131,6 +3165,10 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 		// Shell Script
 		case NP2LEX_BASH:
 			lang = IDM_LEXER_BASH;
+			break;
+		// Markdown
+		case NP2LEX_MARKDOWN:
+			lang = IDM_LEXER_MARKDOWN_GITHUB;
 			break;
 		// Math
 		case NP2LEX_MATLAB:

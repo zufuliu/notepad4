@@ -94,6 +94,10 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Borland bmake
 		* qmake
 		* ninja
+	* Markdown, up to [CommonMark](https://spec.commonmark.org/) 0.30, with following extensions:
+		* [GitHub Flavored Markdown](https://github.github.com/gfm/)
+		* [GitLab Flavored Markdown](https://docs.gitlab.com/ee/user/markdown.html)
+		* [Pandoc’s Markdown](https://pandoc.org/MANUAL.html#pandocs-markdown)
 	* MATLAB, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#matlab-octave)
 		* Octave
 		* Scilab

@@ -400,6 +400,15 @@ Makefile
 	Makefile*
 	Kbuild*			Linux Kernel Build
 
+Markdown
+	md
+	markdown
+	mdown
+	mkdn
+	mkd
+
+	litcoffee		Literate CoffeeScript
+
 MATLAB Code
 	m				MATLAB / Octave
 	sce				Scilab

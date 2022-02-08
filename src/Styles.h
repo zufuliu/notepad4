@@ -131,6 +131,7 @@ static inline BOOL IsPythonLikeFolding(int iLexer) {
 static inline BOOL DidLexerHasLineComment(int iLexer) {
 	return !(iLexer == SCLEX_NULL
 		|| iLexer == SCLEX_DIFF
+		|| iLexer == SCLEX_MARKDOWN
 	);
 }
 
