@@ -76,7 +76,7 @@ constexpr bool IsInlineStyle(int state) noexcept {
 }
 
 constexpr bool StyleNeedsBacktrack(int state) noexcept {
-	return state == SCE_MARKDOWN_SETEXT_H1 || SCE_MARKDOWN_SETEXT_H2
+	return state == SCE_MARKDOWN_SETEXT_H1 || state == SCE_MARKDOWN_SETEXT_H2
 		|| state == SCE_MARKDOWN_CODE_SPAN;
 }
 
@@ -214,10 +214,11 @@ struct MarkdownLexer {
 	int delimiterCount = 0; // code fence, autoLink
 	int bracketCount = 0; // link text
 	int parenCount = 0; // link	destination, link title, autoLink
+	int periodCount = 0; // autoLink domain
 	AutoLink autoLink = AutoLink::None;
 	const Markdown markdown;
 
-	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler_) noexcept :
+	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler_):
 		sc(startPos, lengthDoc, initStyle, styler_),
 		markdown{static_cast<Markdown>(styler_.GetPropertyInt("lexer.lang"))} {}
 
@@ -407,18 +408,15 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 		type = OrderedListType::Decimal;
 		if (IsADigit(chNext)) {
 			++count;
-			++pos;
 		}
 	} else if (IsLowerCase(marker)) {
 		type = OrderedListType::LowerAlpha;
-		++pos;
 		if (IsLowerRoman(marker) && IsLowerRoman(chNext)) {
 			type = OrderedListType::LowerRoman;
 			++count;
 		}
 	} else if (IsUpperCase(marker)) {
 		type = OrderedListType::UpperAlpha;
-		++pos;
 		if (IsUpperRoman(marker) && IsUpperRoman(chNext)) {
 			type = OrderedListType::UpperRoman;
 			++count;
@@ -427,7 +425,8 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 		return OrderedListType::None;
 	}
 
-	if (type < OrderedListType::LowerAlpha) {
+	++pos; // move to chNext
+	if (count == 2) {
 		while (true) {
 			chNext = static_cast<uint8_t>(styler.SafeGetCharAt(++pos));
 			const bool handled = (type == OrderedListType::Decimal) ? IsADigit(chNext)
@@ -837,7 +836,7 @@ bool MarkdownLexer::TryHighlightAutoLink() {
 
 	if (result != AutoLink::None) {
 		tagState = HtmlTagState::None;
-		delimiterCount = 0;
+		periodCount = 0;
 		autoLink = result;
 		SaveOuterStyle(sc.state);
 		sc.SetState(SCE_MARKDOWN_AUTOLINK);
@@ -868,7 +867,7 @@ bool MarkdownLexer::HighlightAutoLink() {
 		} else if (!IsSchemeNameChar(sc.ch)) {
 			if (sc.Match(':', '/', '/') && IsDomainNameChar(sc.GetRelative(3))) {
 				tagState = HtmlTagState::Question;
-				delimiterCount = 0;
+				periodCount = 0;
 				autoLink = AutoLink::Domain;
 				sc.Advance(3);
 			} else {
@@ -879,13 +878,13 @@ bool MarkdownLexer::HighlightAutoLink() {
 
 	case AutoLink::Domain:
 		if (sc.ch == '.' && IsDomainNameChar(sc.chNext)) {
-			++delimiterCount;
+			++periodCount;
 			sc.Forward();
 		} else if (!IsDomainNameChar(sc.ch)) {
-			invalid = (delimiterCount == 0 && tagState == HtmlTagState::None)
+			invalid = (periodCount == 0 && tagState == HtmlTagState::None)
 				|| (sc.ch == ':' && !IsADigit(sc.chNext));
 			tagState = HtmlTagState::None;
-			delimiterCount = 0;
+			periodCount = 0;
 			if (!invalid) {
 				if (sc.ch == ':' || ((sc.ch == '/' || sc.ch == '?') && !IsInvalidUrlChar(sc.chNext))) {
 					parenCount = 0;
