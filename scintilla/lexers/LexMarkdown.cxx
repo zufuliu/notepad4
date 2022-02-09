@@ -135,11 +135,11 @@ enum class OrderedListType {
 	Parenthesis = 8,
 };
 
-constexpr bool IsUpperRoman(int ch) {
+constexpr bool IsUpperRoman(int ch) noexcept {
 	return AnyOf(ch, 'I', 'V', 'X', 'L', 'C', 'D', 'M');
 }
 
-constexpr bool IsLowerRoman(int ch) {
+constexpr bool IsLowerRoman(int ch) noexcept {
 	return AnyOf(ch, 'i', 'v', 'x', 'l', 'c', 'd', 'm');
 }
 
@@ -252,7 +252,7 @@ struct MarkdownLexer {
 	bool HighlightLinkText();
 	bool HighlightLinkDestination();
 
-	AutoLink RoughCheckAutoLink() const noexcept;
+	bool TryHighlightAutoLink();
 	bool HighlightAutoLink();
 
 	void HighlightDelimiterRow();
@@ -802,15 +802,19 @@ constexpr bool IsDomainNameChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '-';
 }
 
-AutoLink MarkdownLexer::RoughCheckAutoLink() const noexcept {
+bool MarkdownLexer::TryHighlightAutoLink() {
+	if (!IsAlpha(sc.ch) || IsIdentifierChar(sc.chPrev)) {
+		return false;
+	}
+
+	AutoLink result = AutoLink::None;
 	Sci_PositionU pos = sc.currentPos;
 	if (sc.Match('w', 'w')
 		&& sc.styler.SafeGetCharAt(pos + 2) == 'w'
 		&& sc.styler.SafeGetCharAt(pos + 3) == '.'
 		&& IsDomainNameChar(sc.styler.SafeGetCharAt(pos + 4))) {
-		return AutoLink::Domain;
-	}
-	if (IsSchemeNameChar(sc.chNext) || sc.chNext == '.') {
+		result = AutoLink::Domain;
+	 } else if (IsSchemeNameChar(sc.chNext) || sc.chNext == '.') {
 		int length = 2;
 		pos += 2;
 		while (true) {
@@ -824,13 +828,25 @@ AutoLink MarkdownLexer::RoughCheckAutoLink() const noexcept {
 				if (ch == ':' && sc.styler.SafeGetCharAt(pos) == '/'
 					&& sc.styler.SafeGetCharAt(pos + 1) == '/'
 					&& IsDomainNameChar(sc.styler.SafeGetCharAt(pos + 2))) {
-					return AutoLink::Scheme;
+					result = AutoLink::Scheme;
 				}
 				break;
 			}
 		}
 	}
-	return AutoLink::None;
+
+	if (result != AutoLink::None) {
+		tagState = HtmlTagState::None;
+		delimiterCount = 0;
+		autoLink = result;
+		SaveOuterStyle(sc.state);
+		sc.SetState(SCE_MARKDOWN_AUTOLINK);
+		if (result == AutoLink::Domain) {
+			sc.Advance(3);
+		}
+		return true;
+	}
+	return false;
 }
 
 bool MarkdownLexer::HighlightAutoLink() {
@@ -943,11 +959,11 @@ constexpr bool IsHtmlBlockStartChar(int ch) noexcept {
 }
 
 // https://pandoc.org/MANUAL.html#math
-constexpr bool IsMathOpenDollar(int chNext) {
+constexpr bool IsMathOpenDollar(int chNext) noexcept {
 	return !IsASpace(chNext);
 }
 
-constexpr bool IsMathCloseDollar(int chPrev, int chNext) {
+constexpr bool IsMathCloseDollar(int chPrev, int chNext) noexcept {
 	return !IsASpace(chPrev) && !IsADigit(chNext);
 }
 
@@ -1076,7 +1092,7 @@ int MarkdownLexer::HighlightBlockText() {
 					char info[8]{};
 					sc.styler.GetRangeLowered(pos, sc.lineStartNext, info, sizeof(info));
 					if (StrStartsWith(info, "math") || StrStartsWith(info, "latex")) {
-						style += 1;
+						style += SCE_MARKDOWN_BACKTICK_MATH - SCE_MARKDOWN_BACKTICK_BLOCK;
 					}
 				}
 				sc.SetState(style);
@@ -1237,7 +1253,7 @@ void MarkdownLexer::HighlightInlineText() {
 			if (delimiter == sc.chNext) {
 				sc.Forward(); // longest match
 			}
-		} else if (markdown == Markdown::Pandoc && !IsMarkdownSpace(sc.chNext)) {
+		} else if (markdown == Markdown::Pandoc && IsGraphic(sc.chNext)) {
 			sc.SetState(SCE_MARKDOWN_SUBSCRIPT);
 		}
 		break;
@@ -1311,7 +1327,7 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	case '^':
-		if (markdown == Markdown::Pandoc && !IsMarkdownSpace(sc.chNext)) {
+		if (markdown == Markdown::Pandoc && IsGraphic(sc.chNext)) {
 			sc.SetState(SCE_MARKDOWN_SUPERSCRIPT);
 		}
 		break;
@@ -1323,17 +1339,8 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	default:
-		if (bracketCount == 0 && IsAlpha(sc.ch) && !IsIdentifierChar(sc.chPrev)) {
-			const AutoLink result = RoughCheckAutoLink();
-			if (result != AutoLink::None) {
-				tagState = HtmlTagState::None;
-				delimiterCount = 0;
-				autoLink = result;
-				sc.SetState(SCE_MARKDOWN_AUTOLINK);
-				if (result == AutoLink::Domain) {
-					sc.Advance(3);
-				}
-			}
+		if (bracketCount == 0 && TryHighlightAutoLink()) {
+			return;
 		}
 		break;
 	}
@@ -1496,8 +1503,10 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				const int count = GetMatchedDelimiterCount(styler, sc.currentPos, sc.ch);
 				if (count >= lexer.delimiterCount) {
 					lineState |= LineStateBlockEndLine;
+					break;
 				}
 			}
+			lexer.TryHighlightAutoLink();
 			break;
 
 		case SCE_MARKDOWN_BLOCKQUOTE:
@@ -1534,8 +1543,10 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					|| (sc.state == SCE_MARKDOWN_METADATA_YAML && sc.Match('.', '.', '.'))) {
 					// `...` YAML document end marker, used by Pandoc
 					lineState |= LineStateBlockEndLine;
+					break;
 				}
 			}
+			lexer.TryHighlightAutoLink();
 			break;
 
 		case SCE_MARKDOWN_TITLE_BLOCK:
@@ -1689,7 +1700,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				continue;
 			}
 			if (!IsHtmlTagChar(sc.ch)) {
-				if (IsASpace(sc.ch)) {
+				if (lexer.tagState == HtmlTagState::Open && IsASpace(sc.ch)) {
 					// tag attribute
 					sc.SetState(SCE_MARKDOWN_DEFAULT);
 				} else {

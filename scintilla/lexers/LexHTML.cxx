@@ -626,7 +626,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	//	The fold option must also be on for folding to occur.
 	constexpr bool foldHTML = true;//styler.GetPropertyBool("fold.html", true);
 
-	const bool fold = foldHTML && styler.GetPropertyInt("fold");
+	const bool fold = foldHTML & styler.GetPropertyInt("fold");
 
 	// property fold.html.preprocessor
 	//	Folding is turned on or off for scripts embedded in HTML files with this option.

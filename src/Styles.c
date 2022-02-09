@@ -1932,7 +1932,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	if (rid != NP2LEX_ANSI) {
 		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 
-		UINT iStyleCount = pLexNew->iStyleCount;
+		const UINT iStyleCount = pLexNew->iStyleCount;
 		// first style is the default style.
 		for (UINT i = 1; i < iStyleCount; i++) {
 			const UINT iStyle = pLexNew->Styles[i].iStyle;
