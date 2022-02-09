@@ -614,6 +614,7 @@ struct LayoutWorker {
 		void * const idleTaskTimer = model.idleTaskTimer;
 		Surface *surface = sharedSurface;
 		std::unique_ptr<Surface> surf;
+		// if (!surface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
 		if (vstyle.technology == Technology::Default) {
 			surf = Surface::Allocate(Technology::Default);
 			surf->Init(nullptr);

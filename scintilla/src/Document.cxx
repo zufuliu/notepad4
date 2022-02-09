@@ -2649,8 +2649,8 @@ void Document::NotifyModified(DocModification mh) {
 }
 
 bool Document::IsWordPartSeparator(unsigned int ch) const noexcept {
-	const CharacterClass cc = WordCharacterClass(ch);
-	return (cc >= CharacterClass::word) && IsPunctuation(ch);
+	// can be simplified to `return ch == '_';`
+	return (ch < 0x80) && (charClass.GetClass(static_cast<uint8_t>(ch)) == CharacterClass::word) && IsPunctuation(ch);
 }
 
 Sci::Position Document::WordPartLeft(Sci::Position pos) const noexcept {

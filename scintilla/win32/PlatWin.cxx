@@ -1429,7 +1429,8 @@ constexpr unsigned int SupportsD2D =
 	(1 << static_cast<int>(Supports::LineDrawsFinal)) |
 	(1 << static_cast<int>(Supports::FractionalStrokeWidth)) |
 	(1 << static_cast<int>(Supports::TranslucentStroke)) |
-	(1 << static_cast<int>(Supports::PixelModification));
+	(1 << static_cast<int>(Supports::PixelModification)) |
+	(1 << static_cast<int>(Supports::ThreadSafeMeasureWidths));
 
 #if NP2_USE_SSE2
 static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
