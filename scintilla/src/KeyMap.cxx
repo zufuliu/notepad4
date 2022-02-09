@@ -18,7 +18,8 @@
 #include "ScintillaMessages.h"
 
 #include "Debugging.h"
-
+#include "Geometry.h"
+#include "Platform.h"
 #include "KeyMap.h"
 
 using namespace Scintilla;
