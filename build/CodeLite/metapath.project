@@ -40,7 +40,7 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=gnu++17;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" C_Options="-std=gnu11;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" Assembler="">
+      <Compiler Options="-std=gnu++20;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" C_Options="-std=gnu17;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" Assembler="">
         <Preprocessor Value="_WINDOWS"/>
         <Preprocessor Value="NOMINMAX"/>
         <Preprocessor Value="WIN32_LEAN_AND_MEAN"/>

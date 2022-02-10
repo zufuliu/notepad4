@@ -167,8 +167,8 @@ bool GetHangulOfHanja(std::wstring &inout) noexcept {
 }
 
 #if 0
-// cl /utf-8 /W4 /EHsc /std:c++17 /GS- /GR- /Gv /Ox /FAcs /DNDEBUG /DUNICODE /I../src HanjaDic.cxx
-// g++ -Wall -Wextra -std=gnu++17 -O2 -fno-rtti -DNDEBUG -DUNICODE -I../src HanjaDic.cxx -lole32 -loleaut32
+// cl /utf-8 /W4 /EHsc /std:c++20 /GS- /GR- /Gv /Ox /FAcs /DNDEBUG /DUNICODE /I../src HanjaDic.cxx
+// g++ -Wall -Wextra -std=gnu++20 -O2 -fno-rtti -DNDEBUG -DUNICODE -I../src HanjaDic.cxx -lole32 -loleaut32
 #ifdef _MSC_VER
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "oleaut32.lib")

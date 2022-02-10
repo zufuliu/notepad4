@@ -300,7 +300,7 @@
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=gnu++17;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" C_Options="-std=gnu11;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" Assembler="">
+      <Compiler Options="-std=gnu++20;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" C_Options="-std=gnu17;-municode;-Wall;-Wextra;-Wshadow;-Wimplicit-fallthrough;-Wformat=2;-Wundef" Assembler="">
         <IncludePath Value="../../src"/>
         <IncludePath Value="../../scintilla/include"/>
         <IncludePath Value="../../scintilla/lexlib"/>
