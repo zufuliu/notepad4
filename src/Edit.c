@@ -7415,6 +7415,18 @@ void EditOpenSelection(int type) {
 			}
 		}
 
+		// link or full path, ignore any character before scheme name
+		if ((p = StrChr(link, L':')) != NULL) {
+			--p;
+			while (p != link && IsSchemeNameChar(*p)) {
+				--p;
+			}
+			while (!IsAlpha(*p)) {
+				++p;
+			}
+			link = p;
+		}
+
 		WCHAR path[MAX_PATH * 2];
 		WCHAR wchDirectory[MAX_PATH];
 		DWORD dwAttributes = EditOpenSelectionCheckFile(link, path, COUNTOF(path), wchDirectory);

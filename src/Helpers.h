@@ -159,6 +159,10 @@ NP2_inline BOOL IsHtmlTagChar(int ch) {
 	return IsAlphaNumeric(ch) || ch == ':' || ch == '_' || ch == '-' || ch == '.';
 }
 
+NP2_inline BOOL IsSchemeNameChar(int ch) {
+	return IsAlphaNumeric(ch) || ch == '+' || ch == '-' || ch == '.';
+}
+
 NP2_inline int ToUpperA(int ch) {
 	return (ch >= 'a' && ch <= 'z') ? (ch - 'a' + 'A') : ch;
 }

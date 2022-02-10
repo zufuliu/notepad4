@@ -54,7 +54,6 @@ enum class HtmlTagState {
 enum class AutoLink {
 	None,
 	Angle,
-	Scheme,
 	Domain,
 	Path,
 };
@@ -211,7 +210,7 @@ struct MarkdownLexer {
 	std::vector<Sci_PositionU> backPos;
 
 	HtmlTagState tagState = HtmlTagState::None; // html tag, link title
-	int delimiterCount = 0; // code fence, autoLink
+	int delimiterCount = 0; // code fence
 	int bracketCount = 0; // link text
 	int parenCount = 0; // link	destination, link title, autoLink
 	int periodCount = 0; // autoLink domain
@@ -253,7 +252,7 @@ struct MarkdownLexer {
 	bool HighlightLinkText();
 	bool HighlightLinkDestination();
 
-	bool TryHighlightAutoLink();
+	bool DetectAutoLink();
 	bool HighlightAutoLink();
 
 	void HighlightDelimiterRow();
@@ -794,40 +793,47 @@ bool MarkdownLexer::HighlightLinkDestination() {
 
 // 6.9 Autolinks (extension)
 constexpr bool IsSchemeNameChar(int ch) noexcept {
-	return IsIdentifierChar(ch) || ch == '+' || ch == '-';
+	return IsAlphaNumeric(ch) || ch == '+' || ch == '-' || ch == '.';
 }
 
 constexpr bool IsDomainNameChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '-';
 }
 
-bool MarkdownLexer::TryHighlightAutoLink() {
+bool MarkdownLexer::DetectAutoLink() {
 	if (!IsAlpha(sc.ch) || IsIdentifierChar(sc.chPrev)) {
 		return false;
 	}
 
+	int offset = 0;
 	AutoLink result = AutoLink::None;
 	Sci_PositionU pos = sc.currentPos;
 	if (sc.Match('w', 'w')
 		&& sc.styler.SafeGetCharAt(pos + 2) == 'w'
 		&& sc.styler.SafeGetCharAt(pos + 3) == '.'
 		&& IsDomainNameChar(sc.styler.SafeGetCharAt(pos + 4))) {
+		offset = 3;
 		result = AutoLink::Domain;
-	 } else if (IsSchemeNameChar(sc.chNext) || sc.chNext == '.') {
+	 } else if (IsSchemeNameChar(sc.chNext)) {
 		int length = 2;
 		pos += 2;
 		while (true) {
 			const uint8_t ch = sc.styler.SafeGetCharAt(pos++);
-			if (IsSchemeNameChar(ch) || ch == '.' ) {
+			if (IsSchemeNameChar(ch)) {
 				++length;
 				if (length > 32) {
 					break;
 				}
 			} else {
-				if (ch == ':' && sc.styler.SafeGetCharAt(pos) == '/'
-					&& sc.styler.SafeGetCharAt(pos + 1) == '/'
-					&& IsDomainNameChar(sc.styler.SafeGetCharAt(pos + 2))) {
-					result = AutoLink::Scheme;
+				if (ch == ':' && sc.styler.SafeGetCharAt(pos) == '/' && sc.styler.SafeGetCharAt(pos + 1) == '/') {
+					// scheme://domain/path, file:///drive:/path
+					const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 2);
+					offset = length + 3;
+					if (chNext == '/') {
+						result = AutoLink::Path;
+					} else if (IsDomainNameChar(chNext)) {
+						result = AutoLink::Domain;
+					}
 				}
 				break;
 			}
@@ -840,9 +846,7 @@ bool MarkdownLexer::TryHighlightAutoLink() {
 		autoLink = result;
 		SaveOuterStyle(sc.state);
 		sc.SetState(SCE_MARKDOWN_AUTOLINK);
-		if (result == AutoLink::Domain) {
-			sc.Advance(3);
-		}
+		sc.Advance(offset);
 		return true;
 	}
 	return false;
@@ -858,21 +862,6 @@ bool MarkdownLexer::HighlightAutoLink() {
 		}
 		if (sc.ch == '<' || !IsGraphic(sc.ch)) {
 			invalid = true;
-		}
-		break;
-
-	case AutoLink::Scheme:
-		if (sc.ch == '.' && IsSchemeNameChar(sc.chNext)) {
-			sc.Forward();
-		} else if (!IsSchemeNameChar(sc.ch)) {
-			if (sc.Match(':', '/', '/') && IsDomainNameChar(sc.GetRelative(3))) {
-				tagState = HtmlTagState::Question;
-				periodCount = 0;
-				autoLink = AutoLink::Domain;
-				sc.Advance(3);
-			} else {
-				invalid = true;
-			}
 		}
 		break;
 
@@ -900,14 +889,43 @@ bool MarkdownLexer::HighlightAutoLink() {
 		}
 		break;
 
-	case AutoLink::Path:
+	default: {
 		if (sc.ch == '(') {
 			++parenCount;
 		} else if (sc.ch == ')') {
 			--parenCount;
 		}
-		if (IsInvalidUrlChar(sc.chNext)) {
-			if (sc.ch == '/' || (sc.ch == ')' && parenCount == 0) || !IsPunctuation(sc.ch)) {
+		invalid = IsInvalidUrlChar(sc.chNext);
+		const bool punctuation = IsPunctuation(sc.ch);
+		if (punctuation && !invalid) {
+			const int outer = nestedState.back();
+			switch (outer) {
+			case SCE_MARKDOWN_EM_UNDERSCORE:
+			case SCE_MARKDOWN_STRONG_UNDERSCORE:
+				if (sc.ch == '_') {
+					// similar to HighlightEmphasis()
+					DelimiterRun delimiterRun;
+					const int length = GetCurrentDelimiterRun(delimiterRun);
+					invalid = (length == 1 && sc.state == SCE_MARKDOWN_STRONG_UNDERSCORE)
+						|| delimiterRun.CanOpen('_') || delimiterRun.CanClose('_');
+				}
+				break;
+
+			case SCE_MARKDOWN_STRIKEOUT:
+				invalid = sc.Match('~', '~');
+				break;
+
+			case SCE_H_COMMENT:
+				invalid = sc.Match('-', '-', '>');
+				break;
+
+			case SCE_H_CDATA:
+				invalid = sc.Match(']', ']', '>');
+				break;
+			}
+		}
+		if (invalid) {
+			if (!punctuation || sc.ch == '/' || (sc.ch == ')' && parenCount == 0)) {
 				sc.Forward();
 			}
 			parenCount = 0;
@@ -915,10 +933,7 @@ bool MarkdownLexer::HighlightAutoLink() {
 			sc.SetState(TakeOuterStyle());
 			return true;
 		}
-		break;
-
-	default:
-		break;
+	} break;
 	}
 	if (invalid) {
 		parenCount = 0;
@@ -1338,7 +1353,7 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	default:
-		if (bracketCount == 0 && TryHighlightAutoLink()) {
+		if (bracketCount == 0 && DetectAutoLink()) {
 			return;
 		}
 		break;
@@ -1505,7 +1520,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					break;
 				}
 			}
-			lexer.TryHighlightAutoLink();
+			lexer.DetectAutoLink();
 			break;
 
 		case SCE_MARKDOWN_BLOCKQUOTE:
@@ -1545,7 +1560,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					break;
 				}
 			}
-			lexer.TryHighlightAutoLink();
+			lexer.DetectAutoLink();
 			break;
 
 		case SCE_MARKDOWN_TITLE_BLOCK:
@@ -1757,6 +1772,8 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			if (sc.Match('-', '-', '>')) {
 				sc.Advance(3);
 				sc.SetState(SCE_MARKDOWN_DEFAULT);
+			} else {
+				lexer.DetectAutoLink();
 			}
 			break;
 
@@ -1768,6 +1785,8 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				} else {
 					sc.SetState(SCE_MARKDOWN_DEFAULT);
 				}
+			} else {
+				lexer.DetectAutoLink();
 			}
 			break;
 
@@ -1813,6 +1832,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					sc.SetState(SCE_MARKDOWN_DEFAULT);
 					continue;
 				}
+				lexer.DetectAutoLink();
 				break;
 
 			default:
