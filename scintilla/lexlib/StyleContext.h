@@ -235,7 +235,7 @@ public:
 			ch = static_cast<unsigned char>(styler[startPos]);
 			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(startPos + 1));
 		} else {
-			ch =  styler.GetCharacterAndWidth(startPos, &widthNext);
+			ch = styler.GetCharacterAndWidth(startPos, &widthNext);
 			width = widthNext;
 			chNext = styler.GetCharacterAndWidth(startPos + width, &widthNext);
 		}
@@ -281,6 +281,7 @@ public:
 		if (!IsWhiteSpace(chNext)) {
 			return chNext;
 		}
+		// currentPos + width + widthNext
 		return LexGetNextChar(styler, currentPos + 2);
 	}
 
@@ -288,12 +289,14 @@ public:
 		if (!ignoreCurrent && !IsWhiteSpace(ch)) {
 			return ch;
 		}
+		// currentPos + width for Unicode line ending
 		if (currentPos + 1 == lineStartNext) {
 			return '\0';
 		}
 		if (!IsWhiteSpace(chNext)) {
 			return chNext;
 		}
+		// currentPos + width + widthNext
 		return LexGetNextChar(styler, currentPos + 2, lineStartNext);
 	}
 };

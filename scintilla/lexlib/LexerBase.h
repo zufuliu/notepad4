@@ -9,12 +9,12 @@
 namespace Lexilla {
 
 // A simple lexer with no state
-class LexerBase : public Scintilla::ILexer5 {
-protected:
+class LexerBase final : public Scintilla::ILexer5 {
+	const LexerModule lexer;
 	PropSetSimple props;
 	WordList *keywordLists[KEYWORDSET_MAX];
 public:
-	LexerBase();
+	LexerBase(const LexerModule *module_);
 	virtual ~LexerBase();
 	void SCI_METHOD Release() noexcept override;
 	int SCI_METHOD Version() const noexcept override;
@@ -24,8 +24,8 @@ public:
 	Sci_Position SCI_METHOD PropertySet(const char *key, const char *val) override;
 	const char * SCI_METHOD DescribeWordListSets() const noexcept override;
 	Sci_Position SCI_METHOD WordListSet(int n, bool toLower, const char *wl) override;
-	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) override = 0;
-	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) override = 0;
+	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) override;
+	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) override;
 	void *SCI_METHOD PrivateCall(int operation, void *pointer) noexcept override;
 	int SCI_METHOD LineEndTypesSupported() const noexcept override;
 	int SCI_METHOD AllocateSubStyles(int styleBase, int numberStyles) noexcept override;

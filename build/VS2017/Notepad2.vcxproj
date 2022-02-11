@@ -1045,7 +1045,6 @@
     <ClCompile Include="..\..\scintilla\lexlib\LexAccessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexerBase.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\LexerModule.cxx" />
-    <ClCompile Include="..\..\scintilla\lexlib\LexerSimple.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\PropSetSimple.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\StyleContext.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\WordList.cxx" />
@@ -1179,7 +1178,6 @@
     <ClInclude Include="..\..\scintilla\lexlib\LexAccessor.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerBase.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerModule.h" />
-    <ClInclude Include="..\..\scintilla\lexlib\LexerSimple.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerUtils.h" />
     <ClInclude Include="..\..\scintilla\lexlib\OptionSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\PropSetSimple.h" />

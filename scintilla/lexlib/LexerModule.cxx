@@ -20,7 +20,6 @@
 #include "Accessor.h"
 #include "LexerModule.h"
 #include "LexerBase.h"
-#include "LexerSimple.h"
 
 using namespace Lexilla;
 
@@ -185,5 +184,5 @@ Scintilla::ILexer5 *LexerModule::Create() const {
 	if (fnFactory) {
 		return fnFactory();
 	}
-	return new LexerSimple(this);
+	return new LexerBase(this);
 }

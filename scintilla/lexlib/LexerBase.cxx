@@ -23,7 +23,7 @@
 
 using namespace Lexilla;
 
-LexerBase::LexerBase() {
+LexerBase::LexerBase(const LexerModule *module_) : lexer(*module_) {
 	auto *iter = keywordLists;
 	for (int wl = KEYWORDSET_MAX; wl; wl--) {
 		*iter++ = new WordList;
@@ -79,6 +79,32 @@ Sci_Position SCI_METHOD LexerBase::WordListSet(int n, bool toLower, const char *
 		}
 	}
 	return -1;
+}
+
+void SCI_METHOD LexerBase::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) {
+	Accessor styler(pAccess, &props);
+	lexer.fnLexer(startPos, lengthDoc, initStyle, keywordLists, styler);
+	styler.Flush();
+}
+
+void SCI_METHOD LexerBase::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) {
+	if (lexer.fnFolder && props.GetInt("fold")) {
+		Sci_Line lineCurrent = pAccess->LineFromPosition(startPos);
+		// Move back one line in case deletion wrecked current line fold state
+		if (lineCurrent != 0) {
+			lineCurrent--;
+			const Sci_Position newStartPos = pAccess->LineStart(lineCurrent);
+			lengthDoc += startPos - newStartPos;
+			startPos = newStartPos;
+			initStyle = 0;
+			if (startPos != 0) {
+				initStyle = pAccess->StyleAt(startPos - 1);
+			}
+		}
+
+		Accessor styler(pAccess, &props);
+		lexer.fnFolder(startPos, lengthDoc, initStyle, keywordLists, styler);
+	}
 }
 
 void * SCI_METHOD LexerBase::PrivateCall(int, void *) noexcept {
@@ -142,9 +168,9 @@ const char * SCI_METHOD LexerBase::DescriptionOfStyle([[maybe_unused]] int style
 // ILexer5 methods
 
 const char *SCI_METHOD LexerBase::GetName() const noexcept {
-	return "";
+	return lexer.languageName;
 }
 
 int SCI_METHOD LexerBase::GetIdentifier() const noexcept {
-	return SCLEX_AUTOMATIC;
+	return lexer.GetLanguage();
 }

@@ -21,13 +21,13 @@ typedef Scintilla::ILexer5 *(*LexerFactoryFunction)();
  * A LexerModule is responsible for lexing and folding a particular language.
  */
 class LexerModule final {
+public:
 	const int language;
 	LexerFunction const fnLexer;
 	LexerFunction const fnFolder;
 	LexerFactoryFunction const fnFactory;
-
-public:
 	const char *const languageName;
+
 	constexpr LexerModule(
 		int language_,
 		LexerFunction fnLexer_,
@@ -58,8 +58,6 @@ public:
 	Scintilla::ILexer5 *Create() const;
 
 	static const LexerModule *Find(int language_) noexcept;
-
-	friend class LexerSimple;
 };
 
 constexpr int SCE_SIMPLE_OPERATOR = 5;

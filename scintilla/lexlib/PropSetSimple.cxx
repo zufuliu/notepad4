@@ -36,7 +36,6 @@ PropSetSimple::PropSetSimple() {
 PropSetSimple::~PropSetSimple() {
 	mapss *props = PropsFromPointer(impl);
 	delete props;
-	impl = nullptr;
 }
 
 bool PropSetSimple::Set(std::string_view key, std::string_view val) {

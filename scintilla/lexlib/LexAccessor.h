@@ -25,16 +25,16 @@ class LexAccessor {
 		slopSize = bufferSize / 8,
 	};
 	char buf[bufferSize + 1];
-	Sci_Position startPos;
-	Sci_Position endPos;
+	Sci_Position startPos = 0;
+	Sci_Position endPos = 0;
 	//const int codePage;
 	//const int documentVersion;
 	const EncodingType encodingType;
 	const Sci_Position lenDoc;
 	unsigned char styleBuf[bufferSize];
-	Sci_Position validLen;
-	Sci_PositionU startSeg;
-	Sci_Position startPosStyling;
+	Sci_Position validLen = 0;
+	Sci_PositionU startSeg = 0;
+	Sci_Position startPosStyling = 0;
 
 	void Fill(Sci_Position position) noexcept {
 		Sci_Position m = lenDoc - bufferSize;
@@ -55,14 +55,11 @@ class LexAccessor {
 
 public:
 	explicit LexAccessor(Scintilla::IDocument *pAccess_) noexcept :
-		pAccess(pAccess_), startPos(0), endPos(0),
+		pAccess(pAccess_),
 		//codePage(pAccess->CodePage()),
 		//documentVersion(pAccess->Version()),
 		encodingType(EncodingTypeForCodePage(pAccess->CodePage())),
-		lenDoc(pAccess->Length()),
-		validLen(0),
-		startSeg(0),
-		startPosStyling(0) {
+		lenDoc(pAccess->Length()) {
 		// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
 		buf[0] = 0;
 		styleBuf[0] = 0;

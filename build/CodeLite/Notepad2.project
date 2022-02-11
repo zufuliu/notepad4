@@ -96,8 +96,6 @@
       <File Name="../../scintilla/lexlib/LexerBase.h"/>
       <File Name="../../scintilla/lexlib/LexerModule.cxx"/>
       <File Name="../../scintilla/lexlib/LexerModule.h"/>
-      <File Name="../../scintilla/lexlib/LexerSimple.cxx"/>
-      <File Name="../../scintilla/lexlib/LexerSimple.h"/>
       <File Name="../../scintilla/lexlib/LexerUtils.h"/>
       <File Name="../../scintilla/lexlib/OptionSet.h"/>
       <File Name="../../scintilla/lexlib/PropSetSimple.cxx"/>
