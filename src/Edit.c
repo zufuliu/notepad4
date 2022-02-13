@@ -7261,16 +7261,16 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 
 	const int style = SciCall_GetStyleAt(iCurrentPos);
 	if (SciCall_StyleGetHotSpot(style)) {
-		Sci_Position iPos = iCurrentPos - 1;
-		while (SciCall_GetStyleAt(iPos) == style) {
-			--iPos;
+		iLineStart = iCurrentPos - 1;
+		while (SciCall_GetStyleAt(iLineStart) == style) {
+			--iLineStart;
 		}
-		iLineStart = iPos + 1;
-		iPos = iCurrentPos + 1;
-		while (SciCall_GetStyleAt(iPos) == style) {
-			++iPos;
+		++iLineStart;
+		iLineEnd = iCurrentPos + 1;
+		while (SciCall_GetStyleAt(iLineEnd) == style) {
+			++iLineEnd;
 		}
-		iLineEnd = iPos;
+
 		goto labelEnd;
 	}
 
@@ -7329,12 +7329,12 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 		return NULL;
 	}
 
-labelEnd:
+labelEnd: {
 	char *mszSelection = (char *)NP2HeapAlloc(iLineEnd - iLineStart + 1);
 	struct Sci_TextRange tr = { { iLineStart, iLineEnd }, mszSelection };
 	SciCall_GetTextRange(&tr);
-
 	return mszSelection;
+}
 }
 
 extern BOOL bOpenFolderWithMetapath;
