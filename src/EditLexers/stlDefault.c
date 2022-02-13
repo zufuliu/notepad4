@@ -28,6 +28,7 @@ static EDITSTYLE Styles_Global[] = {
 	{ 0, NP2StyleX_MarkOccurrences, L"alpha:100; outline:150" },
 	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
 	{ STYLE_CALLTIP, NP2StyleX_CallTip, L"" },
+	{ STYLE_LINK, NP2StyleX_Link, L"fore:#648000" },
 };
 
 static EDITSTYLE Styles_2ndGlobal[] = {
@@ -51,6 +52,7 @@ static EDITSTYLE Styles_2ndGlobal[] = {
 	{ 0, NP2StyleX_MarkOccurrences, L"alpha:100; outline:150" },
 	{ 0, NP2StyleX_Bookmark, L"fore:#408040; back:#00FF00; alpha:40" },
 	{ STYLE_CALLTIP, NP2StyleX_CallTip, L"" },
+	{ STYLE_LINK, NP2StyleX_Link, L"fore:#648000" },
 };
 
 EDITLEXER lexGlobal = {
@@ -196,7 +198,6 @@ static EDITSTYLE Styles_Markdown[] = {
 	{ MULTI_STYLE(SCE_MARKDOWN_DISPLAY_MATH, SCE_MARKDOWN_BACKTICK_MATH, SCE_MARKDOWN_TILDE_MATH, 0), NP2StyleX_DisplayMath, L"back:#C5C5C5; eolfilled" },
 	{ SCE_MARKDOWN_INLINE_MATH, NP2StyleX_InlineMath, L"back:#C5C5C5" },
 	{ MULTI_STYLE(SCE_MARKDOWN_LINK_TEXT, SCE_MARKDOWN_LINK_TITLE_SQ, SCE_MARKDOWN_LINK_TITLE_DQ, SCE_MARKDOWN_LINK_TITLE_PAREN), NP2StyleX_LinkText, L"fore:#3A6EA5" },
-	{ MULTI_STYLE(SCE_MARKDOWN_AUTOLINK, SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK), NP2StyleX_Link, L"fore:#648000" },
 	{ MULTI_STYLE(SCE_MARKDOWN_EM_ASTERISK, SCE_MARKDOWN_EM_UNDERSCORE, 0, 0), NP2StyleX_Emphasis, L"italic" },
 	{ MULTI_STYLE(SCE_MARKDOWN_STRONG_ASTERISK, SCE_MARKDOWN_STRONG_UNDERSCORE, 0, 0), NP2StyleX_Strong, L"bold" },
 	{ SCE_MARKDOWN_STRIKEOUT, NP2StyleX_Strikethrough, L"strike" },

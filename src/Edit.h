@@ -191,7 +191,15 @@ BOOL	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags);
 BOOL	EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode);
 void	EditSelectionAction(int action);
 void	TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn);
-void	EditOpenSelection(int type);
+
+typedef enum OpenSelectionType {
+	OpenSelectionType_None,
+	OpenSelectionType_Link,
+	OpenSelectionType_File,
+	OpenSelectionType_Folder,
+	OpenSelectionType_ContainingFolder,
+} OpenSelectionType;
+void EditOpenSelection(OpenSelectionType type);
 
 // in Print.cpp
 #ifdef __cplusplus

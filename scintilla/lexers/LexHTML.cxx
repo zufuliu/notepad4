@@ -525,11 +525,6 @@ constexpr bool IsAttributeContinue(int ch) noexcept {
 	return IsAlphaNumeric(ch) || AnyOf(ch, '.', '-', '_', ':', '!', '#', '/') || ch >= 0x80;
 }
 
-constexpr bool IsInvalidAttrChar(int ch) noexcept {
-	// characters not allowed in unquoted attribute value
-	return ch <= 32 || ch == 127 || AnyOf(ch, '"', '\'', '\\', '`', '=', '<', '>');
-}
-
 constexpr bool IsOKBeforeJSRE(int ch) noexcept {
 	// TODO: also handle + and - (except if they're part of ++ or --) and return keywords
 	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~');
@@ -1514,7 +1509,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_VALUE:
-			if (IsInvalidAttrChar(ch)) {
+			if (IsHtmlInvalidAttrChar(ch)) {
 				if (ch == '\"' && chPrev == '=') {
 					// Should really test for being first character
 					state = SCE_H_DOUBLESTRING;

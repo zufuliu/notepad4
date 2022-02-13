@@ -2204,6 +2204,7 @@ BEGIN
 	NP2STYLE_Bookmark				"書籤"
 	NP2STYLE_CallTip				"呼叫提示"
 	NP2STYLE_CodeFolding			"程式碼折疊"
+	NP2STYLE_Link					"連結"
 
 	NP2STYLE_Default				"預設樣式"
 END

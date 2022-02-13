@@ -768,7 +768,7 @@ static int GetCurrentHtmlTextBlock(void) {
 	return GetCurrentHtmlTextBlockEx(iCurrentStyle);
 }
 
-static void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) {
+void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) {
 	char ch;
 	while ((ch = *pszIn++) != '\0') {
 		if (ch == '.'		// any character

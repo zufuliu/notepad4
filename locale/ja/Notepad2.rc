@@ -2205,6 +2205,7 @@ BEGIN
 	NP2STYLE_Bookmark				"ブックマーク"
 	NP2STYLE_CallTip				"コールチップ"
 	NP2STYLE_CodeFolding			"コード折りたたみ"
+	NP2STYLE_Link					"Link"
 
 	NP2STYLE_Default				"標準"
 END

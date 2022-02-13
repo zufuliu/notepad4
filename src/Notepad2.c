@@ -4675,10 +4675,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_OPEN_PATH_OR_LINK:
-		EditOpenSelection(0);
+		EditOpenSelection(OpenSelectionType_None);
 		break;
 	case CMD_OPEN_CONTAINING_FOLDER:
-		EditOpenSelection(4);
+		EditOpenSelection(OpenSelectionType_ContainingFolder);
 		break;
 
 	case CMD_ONLINE_SEARCH_GOOGLE:
@@ -5208,6 +5208,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_CODEPAGECHANGED:
 			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, &efrData);
+			break;
+
+		case SCN_HOTSPOTCLICK:
+			if (scn->modifiers & SCMOD_CTRL) {
+				SciCall_SetSel(scn->position, scn->position);
+				EditOpenSelection(OpenSelectionType_None);
+			}
 			break;
 		}
 		break;

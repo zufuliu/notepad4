@@ -109,8 +109,8 @@ enum class MarginType {
 
 enum class StylesCommon {
 	Default = 0,
-	LineNumber = 32,
-	HotSpot = 33,
+	Link = 32,
+	LineNumber = 33,
 	BraceLight = 34,
 	BraceBad = 35,
 	ControlChar = 36,

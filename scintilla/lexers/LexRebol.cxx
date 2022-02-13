@@ -238,7 +238,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_REBOL_FILE:
 		case SCE_REBOL_EMAIL:
 		case SCE_REBOL_URL:
-			if (sc.atLineEnd || isspacechar(sc.ch) || sc.ch == ']') {
+			if (sc.atLineEnd || !IsGraphic(sc.ch) || sc.ch == ']') {
 				sc.SetState(SCE_REBOL_DEFAULT);
 			}
 			break;

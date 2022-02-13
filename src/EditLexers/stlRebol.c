@@ -82,7 +82,6 @@ static EDITSTYLE Styles_Rebol[] = {
 	{ SCE_REBOL_SYMBOL, NP2StyleX_Symbol, L"fore:#7C5AF3" },
 	{ SCE_REBOL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_REBOL_FILE, SCE_REBOL_QUOTEDFILE, 0, 0), NP2StyleX_File, L"fore:#648000" },
-	{ MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0), NP2StyleX_Link, L"fore:#648000" },
 	{ SCE_REBOL_MONEY, NP2StyleX_Money, L"fore:#7C5AF3" },
 	{ SCE_REBOL_ISSUE, NP2StyleX_Issue, L"fore:#9E4D2A" },
 	{ MULTI_STYLE(SCE_REBOL_DATE, SCE_REBOL_TIME, 0, 0), NP2StyleX_DateTime, L"fore:#008080" },

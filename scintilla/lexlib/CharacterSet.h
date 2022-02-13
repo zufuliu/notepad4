@@ -172,6 +172,16 @@ constexpr bool IsHexDigit(int ch) noexcept {
 		|| (ch >= 'a' && ch <= 'f');
 }
 
+constexpr bool IsLowerHex(int ch) noexcept {
+	return (ch >= '0' && ch <= '9')
+		|| (ch >= 'a' && ch <= 'f');
+}
+
+constexpr bool IsUpperHex(int ch) noexcept {
+	return (ch >= '0' && ch <= '9')
+		|| (ch >= 'A' && ch <= 'F');
+}
+
 constexpr bool IsOctalDigit(int ch) noexcept {
 	return ch >= '0' && ch <= '7';
 }
@@ -323,9 +333,22 @@ constexpr bool IsCommentTagPrev(int chPrev) noexcept {
 	return chPrev <= 32 || AnyOf(chPrev, '/', '*', '!');
 }
 
+constexpr bool IsSchemeNameChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '+' || ch == '-' || ch == '.';
+}
+
+constexpr bool IsDomainNameChar(int ch) noexcept {
+	return IsIdentifierChar(ch) || ch == '-';
+}
+
 constexpr bool IsInvalidUrlChar(int ch) noexcept {
-	// win32 file name reserved characters: '<', '>', ':', '"', '|', '?', '*'
-	return ch <= 32 || AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}', '*', 127);
+	// TODO: https://url.spec.whatwg.org/ and https://www.rfc-editor.org/rfc/rfc3986
+	return ch <= 32 || AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}', 127);
+}
+
+constexpr bool IsHtmlInvalidAttrChar(int ch) noexcept {
+	// characters not allowed in unquoted attribute value
+	return ch <= 32 || AnyOf(ch, '"', '\'', '\\', '`', '=', '<', '>', 127);
 }
 
 // characters can follow jump `label:`, based on Swift's document Labeled Statement at

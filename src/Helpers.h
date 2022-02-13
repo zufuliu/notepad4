@@ -940,6 +940,7 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);
 BOOL AddBackslashA(char *pszOut, const char *pszInput);
 BOOL AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput);
+void EscapeRegex(LPSTR pszOut, LPCSTR pszIn);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
 BOOL GetDoAnimateMinimize(void);

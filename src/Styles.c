@@ -404,6 +404,7 @@ enum GlobalStyleIndex {
 	GlobalStyleIndex_MarkOccurrences,	// indicator style. `fore`, `alpha`, `outline`
 	GlobalStyleIndex_Bookmark,			// indicator style. `fore`, `back`, `alpha`
 	GlobalStyleIndex_CallTip,			// inherited style.
+	GlobalStyleIndex_Link,				// inherited style.
 };
 
 // styles in ANSI Art used to override global styles.
@@ -1900,6 +1901,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 	// CallTip
 	Style_SetDefaultStyle(GlobalStyleIndex_CallTip);
+	// HotSpot
+	Style_SetDefaultStyle(GlobalStyleIndex_Link);
+	SciCall_StyleSetHotSpot(STYLE_LINK, TRUE);
 
 	if (SciCall_GetIndentationGuides() != SC_IV_NONE) {
 		Style_SetIndentGuides(TRUE);
@@ -1955,10 +1959,15 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 #endif
 			break;
 
+		case SCLEX_REBOL:
+			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0));
+			break;
+
 		case SCLEX_MARKDOWN:
 			if (!IsStyleLoaded(&lexHTML)) {
 				Style_LoadOne(&lexHTML);
 			}
+			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
 			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {
 				const UINT iStyle = lexHTML.Styles[i].iStyle;
 				szValue = lexHTML.Styles[i].szValue;

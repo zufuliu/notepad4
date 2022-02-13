@@ -2205,6 +2205,7 @@ BEGIN
 	NP2STYLE_Bookmark				"책갈피"
 	NP2STYLE_CallTip				"호출팁"
 	NP2STYLE_CodeFolding			"코드 접기"
+	NP2STYLE_Link					"Link"
 
 	NP2STYLE_Default				"기본값"
 END

@@ -20,6 +20,7 @@
 #define NP2STYLE_Bookmark				63218
 #define NP2STYLE_CallTip				63219
 #define NP2STYLE_CodeFolding			63220
+#define NP2STYLE_Link					63221
 
 #define NP2STYLE_Default				63226
 #define NP2STYLE_Comment				63227
@@ -245,7 +246,7 @@
 #define NP2STYLE_InternalFilter			63655
 #define NP2STYLE_ExternalFilter			63656
 #define NP2STYLE_File					63657
-#define NP2STYLE_Link					63658
+
 #define NP2STYLE_Money					63659
 #define NP2STYLE_Issue					63660
 #define NP2STYLE_MagicMethod			63661

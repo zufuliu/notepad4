@@ -32,6 +32,7 @@
 #define NP2StyleX_Bookmark				EDITSTYLE_HOLE(Bookmark, L"Bookmark")
 #define NP2StyleX_CallTip				EDITSTYLE_HOLE(CallTip, L"CallTip")
 #define NP2StyleX_CodeFolding			EDITSTYLE_HOLE(CodeFolding, L"Code Folding")
+#define NP2StyleX_Link					EDITSTYLE_HOLE(Link, L"Link")
 
 #define NP2StyleX_Default				EDITSTYLE_HOLE(Default, L"Default")
 #define NP2StyleX_Comment				EDITSTYLE_HOLE(Comment, L"Comment")
@@ -257,7 +258,7 @@
 #define NP2StyleX_InternalFilter		EDITSTYLE_HOLE(InternalFilter, L"Internal Filter")
 #define NP2StyleX_ExternalFilter		EDITSTYLE_HOLE(ExternalFilter, L"External Filter")
 #define NP2StyleX_File					EDITSTYLE_HOLE(File, L"File")
-#define NP2StyleX_Link					EDITSTYLE_HOLE(Link, L"Link")
+
 #define NP2StyleX_Money					EDITSTYLE_HOLE(Money, L"Money")
 #define NP2StyleX_Issue					EDITSTYLE_HOLE(Issue, L"Issue")
 #define NP2StyleX_MagicMethod			EDITSTYLE_HOLE(MagicMethod, L"Magic Method")

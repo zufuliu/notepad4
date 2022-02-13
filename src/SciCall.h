@@ -695,6 +695,14 @@ NP2_inline void SciCall_StyleSetCharacterSet(int style, int characterSet) {
 	SciCall(SCI_STYLESETCHARACTERSET, style, characterSet);
 }
 
+NP2_inline void SciCall_StyleSetHotSpot(int style, BOOL hotspot) {
+	SciCall(SCI_STYLESETHOTSPOT, style, hotspot);
+}
+
+NP2_inline BOOL SciCall_StyleGetHotSpot(int style) {
+	return (BOOL)SciCall(SCI_STYLEGETHOTSPOT, style, 0);
+}
+
 NP2_inline void SciCall_StyleSetCheckMonospaced(int style, BOOL checkMonospaced) {
 	SciCall(SCI_STYLESETCHECKMONOSPACED, style, checkMonospaced);
 }
