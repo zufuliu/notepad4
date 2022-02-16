@@ -74,6 +74,14 @@ constexpr bool IsInlineStyle(int state) noexcept {
 	return state >= SCE_MARKDOWN_ESCAPECHAR || state == SCE_H_TAG || state == SCE_H_ENTITY;
 }
 
+constexpr bool IsCodeStyle(int state) noexcept {
+	return state == SCE_MARKDOWN_BACKTICK_BLOCK
+		|| state == SCE_MARKDOWN_BACKTICK_MATH
+		|| state == SCE_MARKDOWN_TILDE_BLOCK
+		|| state == SCE_MARKDOWN_TILDE_MATH
+		|| state == SCE_MARKDOWN_CODE_SPAN;
+}
+
 constexpr bool StyleNeedsBacktrack(int state) noexcept {
 	return state == SCE_MARKDOWN_SETEXT_H1 || state == SCE_MARKDOWN_SETEXT_H2
 		|| state == SCE_MARKDOWN_CODE_SPAN;
@@ -930,13 +938,13 @@ bool MarkdownLexer::HighlightAutoLink() {
 		} else if (sc.ch == ')') {
 			--periodCount;
 		}
-		bool invalid = IsInvalidUrlChar(sc.chNext);
+		bool invalid = (sc.chNext == ')' && periodCount == 0) || IsInvalidUrlChar(sc.chNext);
 		const bool punctuation = IsPunctuation(sc.ch);
 		if (punctuation && !invalid) {
 			const int outer = nestedState.back();
 			switch (outer) {
 			default:
-				if (sc.state >= SCE_MARKDOWN_HEADER1) {
+				if (outer == SCE_MARKDOWN_DEFAULT || (outer >= SCE_MARKDOWN_HEADER1 && !IsCodeStyle(outer))) {
 					const bool current = IsEmphasisDelimiter(sc.ch);
 					if (current || IsEmphasisDelimiter(sc.chNext)) {
 						// similar to HighlightEmphasis()

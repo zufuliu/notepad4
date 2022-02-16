@@ -1508,6 +1508,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 
+	case APPM_POST_HOTSPOTCLICK:
+		SciCall_SetMultipleSelection(TRUE);
+		break;
+
 	default:
 		if (umsg == msgTaskbarCreated) {
 			if (!IsWindowVisible(hwnd)) {
@@ -5141,6 +5145,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 #if NP2_ENABLE_SHOW_CALLTIPS
 		case SCN_DWELLSTART:
+			// show "Ctrl + click to follow link"?
 			if (bShowCallTips && scn->position >= 0) {
 				EditShowCallTips(scn->position);
 			}
@@ -5212,8 +5217,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_HOTSPOTCLICK:
 			if (scn->modifiers & SCMOD_CTRL) {
+				// disable multiple selection to avoid two carets after Ctrl + click
+				SciCall_SetMultipleSelection(FALSE);
 				SciCall_SetSel(scn->position, scn->position);
 				EditOpenSelection(OpenSelectionType_None);
+				PostMessage(hwnd, APPM_POST_HOTSPOTCLICK, 0, 0);
 			}
 			break;
 		}

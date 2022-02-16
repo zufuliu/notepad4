@@ -83,6 +83,7 @@ typedef struct NP2PARAMS {
 #define APPM_CHANGENOTIFY			(WM_APP + 2)	// file change notifications
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
 #define APPM_TRAYMESSAGE			(WM_APP + 4)	// callback message from system tray
+#define APPM_POST_HOTSPOTCLICK		(WM_APP + 5)
 
 #define ID_WATCHTIMER				0xA000	// file watch timer
 #define ID_PASTEBOARDTIMER			0xA001	// paste board timer
