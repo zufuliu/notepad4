@@ -29,6 +29,15 @@ constexpr bool IsCMakeOperator(int ch) noexcept {
 					 '$', '<', '>', ','); // Generator expressions
 }
 
+constexpr bool IsCMakeEscapeChar(int ch) noexcept {
+	// https://cmake.org/cmake/help/latest/manual/cmake-language.7.html#escape-sequences
+	// similar to IsPunctuation(), ignore any alphanumeric character
+	return (ch < '0')
+		|| (ch > '9' && ch < 'A')
+		|| (ch > 'Z' && ch < 'a')
+		|| (ch > 'z' && ch <= 127);
+}
+
 constexpr bool IsCMakeChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.' || ch == '-' || ch == '+';
 }
@@ -160,7 +169,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (IsEOLChar(sc.chNext)) {
 					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
 					sc.ForwardSetState(SCE_CMAKE_STRING);
-				} else {
+				} else if (IsCMakeEscapeChar(sc.chNext)) {
 					sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
 					sc.Forward();
 				}
@@ -186,18 +195,9 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_CMAKE_ESCAPE_SEQUENCE:
-			if (sc.ch == '\\') {
-				if (IsEOLChar(sc.chNext)) {
-					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
-					sc.ForwardSetState(outerStyle);
-				} else {
-					sc.Forward();
-				}
-			} else {
-				sc.SetState(outerStyle);
-				if (outerStyle != SCE_CMAKE_DEFAULT) {
-					continue;
-				}
+			sc.SetState(outerStyle);
+			if (outerStyle != SCE_CMAKE_DEFAULT) {
+				continue;
 			}
 			break;
 
@@ -269,9 +269,9 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.Advance(2 + bracketNumber);
 				}
 			} else if (sc.Match('/', '/')) { // CMakeCache.txt
-				sc.SetState(SCE_CMAKE_COMMENT);
 				if (visibleChars == 0) {
 					lineStateLineComment = SimpleLineStateMaskLineComment;
+					sc.SetState(SCE_CMAKE_COMMENT);
 				}
 			} else if (sc.ch == '\"') {
 				outerStyle = SCE_CMAKE_STRING;
@@ -285,8 +285,10 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.SetState((sc.ch == '$') ? SCE_CMAKE_VARIABLE_DOLLAR : SCE_CMAKE_VARIABLE_AT);
 				sc.Forward();
 			} else if (sc.ch == '\\') {
-				sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
-				sc.Forward();
+				if (IsCMakeEscapeChar(sc.chNext)) {
+					sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
+					sc.Forward();
+				}
 			} else if (IsIdentifierStart(sc.ch)) {
 				chIdentifierStart = sc.ch;
 				sc.SetState(SCE_CMAKE_IDENTIFIER);
