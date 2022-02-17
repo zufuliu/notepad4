@@ -1509,6 +1509,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	break;
 
 	case APPM_POST_HOTSPOTCLICK:
+		ReleaseCapture();
 		SciCall_SetMultipleSelection(TRUE);
 		break;
 

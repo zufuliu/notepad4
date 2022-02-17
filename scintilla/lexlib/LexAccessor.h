@@ -139,7 +139,9 @@ public:
 		return pAccess->StyleAt(position);
 	}
 	// only used in Colourise() or Lex() function, validLen is always zero in Fold() function.
-	unsigned char StyleAtEx(Sci_Position position) const noexcept {
+	// Return style value from buffer when in buffer, else retrieve from document.
+	// This is faster and can avoid calls to Flush() as that may be expensive.
+	unsigned char BufferStyleAt(Sci_Position position) const noexcept {
 		const Sci_Position index = position - startPosStyling;
 		if (index >= 0 && index < validLen) {
 			return styleBuf[index];

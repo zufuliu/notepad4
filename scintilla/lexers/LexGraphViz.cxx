@@ -40,7 +40,7 @@ inline bool IsAttributeValue(const LexAccessor &styler, Sci_PositionU startPos) 
 	int style = SCE_GRAPHVIZ_DEFAULT;
 	while (startPos != 0) {
 		--startPos;
-		style = styler.StyleAtEx(startPos);
+		style = styler.BufferStyleAt(startPos);
 		if (!IsSpaceEquiv(style)) {
 			break;
 		}

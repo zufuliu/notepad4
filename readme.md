@@ -57,7 +57,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Common Intermediate Language
 	* Configuration / Properties File
 		* Apache Configuration File
-	* [D](../main/tools/lang/D.), up to D language 2.0.
+	* [D](../main/tools/lang/D.d), up to D language 2.0.
 	* [Dart](../main/tools/lang/Dart.dart), up to Dart 2.12.
 	* Diff/Patch File
 	* Doxygen
