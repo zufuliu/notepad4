@@ -501,14 +501,15 @@ int MarkdownLexer::GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignor
 	// unlike official Lexilla, for performance reason our StyleContext
 	// for UTF-8 encoding is byte oriented instead of character oriented.
 	if ((chPrev & 0x80) != 0 && sc.styler.Encoding() == EncodingType::unicode) {
-		Sci_Position width = -1; // get full character before currentPos
-		chPrev = sc.styler.GetCharacterAndWidth(pos - 1, &width);
+		// get full character before delimiter
+		const Sci_Position position = sc.styler.GetRelativePosition(pos, -1);
+		chPrev = sc.styler.GetCharacterAt(position);
 	}
 
 	const Sci_PositionU startPos = pos;
 	int chNext = GetCharAfterDelimiter(sc.styler, pos, delimiter);
 	if (chNext & 0x80) {
-		chNext = sc.styler.GetCharacterAndWidth(pos);
+		chNext = sc.styler.GetCharacterAt(pos);
 	}
 
 	// not same as Unicode whitespace or punctuation character defined in "2.1 Characters and lines",

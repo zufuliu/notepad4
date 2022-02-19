@@ -160,7 +160,7 @@ public:
 			}
 			const Sci_Position diffRelative = n - offsetRelative;
 			const Sci_Position posNew = styler.GetRelativePosition(posRelative, diffRelative);
-			const int chReturn = styler.GetCharacterAndWidth(posNew);
+			const int chReturn = styler.GetCharacterAt(posNew);
 			posRelative = posNew;
 			currentPosLastRelative = currentPos;
 			offsetRelative = n;

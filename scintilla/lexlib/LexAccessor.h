@@ -73,8 +73,14 @@ public:
 	constexpr Scintilla::IDocument *MultiByteAccess() const noexcept {
 		return pAccess;
 	}
+	Sci_Position GetRelativePosition(Sci_Position positionStart, Sci_Position characterOffset) const noexcept {
+		return pAccess->GetRelativePosition(positionStart, characterOffset);
+	}
 	int GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth = nullptr) const noexcept {
 		return pAccess->GetCharacterAndWidth(position, pWidth);
+	}
+	int GetCharacterAt(Sci_Position position) const noexcept {
+		return pAccess->GetCharacterAndWidth(position, nullptr);
 	}
 	Scintilla::CharacterClass GetCharacterClass(unsigned int character) const noexcept {
 		// NOTE: '_' is classified as word in CharClassify::SetDefaultCharClasses()

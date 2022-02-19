@@ -1025,9 +1025,6 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 }
 
 int SCI_METHOD Document::GetCharacterAndWidth(Sci_Position position, Sci_Position *pWidth) const noexcept {
-	if (pWidth && *pWidth < 0) {
-		position = MovePositionOutsideChar(position, -1, false);
-	}
 	int bytesInCharacter = 1;
 	const unsigned char leadByte = cb.UCharAt(position);
 	int character = leadByte;

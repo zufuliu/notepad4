@@ -7563,7 +7563,7 @@ void EditOpenSelection(OpenSelectionType type) {
 					ft.lpstrText = lpstrText;
 					iPos = SciCall_FindText(SCFIND_REGEXP | SCFIND_POSIX, &ft);
 				}
-				NP2HeapSize(mszSelection);
+				NP2HeapFree(mszSelection);
 				if (iPos >= 0) {
 					EditSelectEx(ft.chrgText.cpMin, ft.chrgText.cpMax);
 				}
