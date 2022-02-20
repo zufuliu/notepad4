@@ -123,17 +123,11 @@ constexpr bool IsBlockStartChar(int ch) noexcept {
 		|| IsADigit(ch);// ordered list
 }
 
-inline uint8_t GetCharAfterIndent(LexAccessor &styler, Sci_PositionU &startPos, int indentCount) noexcept {
+inline uint8_t GetCharAfterSpace(LexAccessor &styler, Sci_PositionU &startPos, int count) noexcept {
 	Sci_PositionU pos = startPos;
 	uint8_t ch = styler.SafeGetCharAt(pos);
-	while (indentCount != 0) {
-		if (ch == ' ') {
-			--indentCount;
-		} else if (ch == '\t' && indentCount >= 4) {
-			indentCount -= 4;
-		} else {
-			break;
-		}
+	while (ch == ' ' && count != 0) {
+		--count;
 		ch = styler.SafeGetCharAt(++pos);
 	}
 	startPos = pos;
@@ -163,6 +157,10 @@ enum class OrderedListType {
 	NumberSign, // Pandoc #.
 	Parenthesis = 8,
 };
+
+constexpr bool IsStandardList(OrderedListType listType, Markdown markdown) noexcept {
+	return listType == OrderedListType::Decimal || (listType != OrderedListType::None && markdown == Markdown::Pandoc);
+}
 
 constexpr bool IsUpperRoman(int ch) noexcept {
 	return AnyOf(ch, 'I', 'V', 'X', 'L', 'C', 'D', 'M');
@@ -330,7 +328,7 @@ int CheckATXHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 
 // 4.3 Setext headings
 int CheckSetextHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
-	const uint8_t marker = GetCharAfterIndent(styler, pos, 3);
+	const uint8_t marker = GetCharAfterSpace(styler, pos, 3);
 	if (marker == '=' || marker == '-') {
 		uint8_t ch;
 		do {
@@ -506,7 +504,7 @@ uint32_t MarkdownLexer::HighlightIndentedText(uint32_t lineState, int indentCoun
 			}
 		} else {
 			const OrderedListType listType = CheckOrderedList(sc.styler, sc.currentPos, sc.ch, sc.chNext);
-			if (listType == OrderedListType::Decimal || (listType != OrderedListType::None && markdown == Markdown::Pandoc)) {
+			if (IsStandardList(listType, markdown)) {
 				sc.SetState(SCE_MARKDOWN_ORDERED_LIST);
 				return lineState;
 			}
@@ -724,7 +722,7 @@ bool MarkdownLexer::HighlightEmphasis() {
 // 4.7 Link reference definitions
 inline bool IsLinkReferenceDefinition(LexAccessor &styler, Sci_Line line, Sci_PositionU startPos) noexcept {
 	Sci_PositionU pos = styler.LineStart(line);
-	const uint8_t ch = GetCharAfterIndent(styler, pos, 3);
+	const uint8_t ch = GetCharAfterSpace(styler, pos, 3);
 	return ch == '[' && pos == startPos;
 }
 
@@ -978,7 +976,8 @@ bool MarkdownLexer::DetectAutoLink() {
 		break;
 
 	case ':':
-		if (sc.chNext == '/' && pos >= 2 && IsLowerCase(sc.chPrev) && sc.styler.SafeGetCharAt(pos + 2) == '/') {
+		if (sc.chNext == '/' && pos >= 2 && IsLowerCase(sc.chPrev) && sc.styler.SafeGetCharAt(pos + 2) == '/'
+			&& !IsInvalidUrlChar(sc.styler.SafeGetCharAt(pos + 3))) {
 			// backtrack to find scheme name before `://`, this is more efficient than forward check every word
 			constexpr int kMinSchemeNameLength = 2;
 			constexpr int kMaxSchemeNameLength = 32;
@@ -1005,7 +1004,7 @@ bool MarkdownLexer::DetectAutoLink() {
 
 			offset = static_cast<int>(endPos - pos);
 			if (offset >= kMinSchemeNameLength && !IsIdentifierChar(chPrev)) {
-				offset += 3;
+				offset += 2;
 				result = AutoLink::Path;
 				// go back to scheme start position and change style from here
 				sc.currentPos = pos;
@@ -1166,7 +1165,34 @@ constexpr bool IsMathCloseDollar(int chPrev, int chNext) noexcept {
 
 bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos) const noexcept {
 	Sci_PositionU pos = startPos;
-	uint8_t ch = GetCharAfterIndent(sc.styler, pos, indentParent + 3);
+	int indentCount = indentParent + 4;
+	uint8_t ch = sc.styler.SafeGetCharAt(pos);
+	while (IsSpaceOrTab(ch) && indentCount > 0) {
+		if (ch == ' ') {
+			--indentCount;
+		} else {
+			indentCount -= 4;
+		}
+		ch = sc.styler.SafeGetCharAt(++pos);
+	}
+
+	const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
+	if (indentCount <= 0) {
+		if (indentCount == 0 && indentParent != 0 && ch > ' ') {
+			// check indented list item
+			if (ch == '+' || ch == '-' || ch == '*') {
+				return IsMarkdownSpace(chNext);
+			}
+			const OrderedListType listType = CheckOrderedList(sc.styler, pos, ch, chNext);
+			return IsStandardList(listType, markdown);
+		}
+		// TODO: check indented code block
+		while (IsSpaceOrTab(ch)) {
+			ch = sc.styler.SafeGetCharAt(++pos);
+		}
+		return IsEOLChar(ch); // empty line
+	}
+
 	switch (ch) {
 	case '\r':	// empty line
 	case '\n':	// empty line
@@ -1174,18 +1200,16 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos) const noexcept {
 		return true;
 
 	case '#':
-		ch = sc.styler.SafeGetCharAt(pos + 1);
-		if (IsMarkdownSpace(ch)) {
+		if (IsMarkdownSpace(chNext)) {
 			return true;
 		}
-		if (ch == '#') {
+		if (chNext == '#') {
 			return CheckATXHeading(sc.styler, pos);
 		}
 		break;
 
 	case '<':
-		ch = sc.styler.SafeGetCharAt(++pos);
-		return IsHtmlBlockStartChar(ch);
+		return IsHtmlBlockStartChar(chNext);
 
 	case '+':
 	case '-':
@@ -1195,8 +1219,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos) const noexcept {
 			return true;
 		}
 		if (ch != '_') { // bullet list
-			ch = sc.styler.SafeGetCharAt(++pos);
-			return IsMarkdownSpace(ch);
+			return IsMarkdownSpace(chNext);
 		}
 		[[fallthrough]];
 	case '=':
@@ -1204,35 +1227,17 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos) const noexcept {
 
 	case '`':
 	case '~': // fenced code block
-		return GetMatchedDelimiterCount(sc.styler, pos, ch) >= 3;
+		return ch == chNext && static_cast<uint8_t>(sc.styler.SafeGetCharAt(pos + 2)) == chNext;
 
 	case '[': // link reference definition
-		ch = sc.styler.SafeGetCharAt(++pos);
-		return !IsEOLChar(ch);
+		return indentParent == 0 && !IsEOLChar(chNext);
 
 	case '$':
-		if (markdown == Markdown::Pandoc && pos - startPos == 1) {
-			ch = sc.styler.SafeGetCharAt(++pos);
-			return ch == '$';
-		}
-		break;
+		return chNext == '$' && pos == startPos && markdown == Markdown::Pandoc;
 	}
 
-	// check for indented list item
-	while (IsSpaceOrTab(ch)) {
-		ch = sc.styler.SafeGetCharAt(++pos);
-	}
-	if (IsEOLChar(ch)) {
-		return true; // empty line
-	}
-
-	const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
-	if (ch == '+' || ch == '-' || ch == '*') {
-		return IsMarkdownSpace(chNext);
-	}
 	const OrderedListType listType = CheckOrderedList(sc.styler, pos, ch, chNext);
-	return listType == OrderedListType::Decimal
-		|| (listType != OrderedListType::None && markdown == Markdown::Pandoc);
+	return IsStandardList(listType, markdown);
 }
 
 int MarkdownLexer::HighlightBlockText() {
@@ -1314,8 +1319,7 @@ int MarkdownLexer::HighlightBlockText() {
 	}
 
 	const OrderedListType listType = CheckOrderedList(sc.styler, sc.currentPos, sc.ch, sc.chNext);
-	if (listType == OrderedListType::Decimal
-		|| (listType != OrderedListType::None && markdown == Markdown::Pandoc)) {
+	if (IsStandardList(listType, markdown)) {
 		sc.SetState(SCE_MARKDOWN_ORDERED_LIST);
 		return 0;
 	}
@@ -1577,7 +1581,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 	if (startPos != 0) {
 		BacktrackToStart(styler, LineStateNestedStateLine, startPos, lengthDoc, initStyle);
 		Sci_PositionU pos = startPos;
-		const uint8_t ch = GetCharAfterIndent(styler, pos, 4);
+		const uint8_t ch = GetCharAfterSpace(styler, pos, 4);
 		if (IsBlockStartChar(ch) || pos - startPos == 4) {
 			// backtrack to previous line for better coloring on typing.
 			const Sci_PositionU endPos = startPos + lengthDoc;
