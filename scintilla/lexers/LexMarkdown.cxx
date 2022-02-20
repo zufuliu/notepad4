@@ -64,6 +64,12 @@ enum {
 	LineStateListItemFirstLine = 1 << 4,
 	LineStateBlockEndLine = 1 << 5,
 	LineStateSetextFirstLine = 1 << 6,
+
+	// minimum indentChild for unordered list as container
+	// TODO: support block quote as container
+	MinContainerIndentChild = 2,
+	LineStateHtmlTagMask = 3,
+	LineStateBlockMask = ((1 << 7) - 1) ^ LineStateNestedStateLine,
 };
 
 constexpr bool IsHeaderStyle(int state) noexcept {
@@ -73,6 +79,11 @@ constexpr bool IsHeaderStyle(int state) noexcept {
 constexpr bool IsHtmlBlockStyle(int state) noexcept {
 	// always treat SCE_H_TAG as inline style
 	return state == SCE_H_COMMENT || state == SCE_H_CDATA || state == SCE_H_QUESTION;
+}
+
+constexpr bool IsBlockStyle(int state) noexcept {
+	return (state >= SCE_MARKDOWN_HEADER1 && state < SCE_MARKDOWN_ESCAPECHAR)
+		|| IsHtmlBlockStyle(state);
 }
 
 constexpr bool IsCodeStyle(int state) noexcept {
@@ -86,6 +97,10 @@ constexpr bool IsCodeStyle(int state) noexcept {
 constexpr bool StyleNeedsBacktrack(int state) noexcept {
 	return state == SCE_MARKDOWN_SETEXT_H1 || state == SCE_MARKDOWN_SETEXT_H2
 		|| state == SCE_MARKDOWN_CODE_SPAN;
+}
+
+constexpr int GetIndentCount(uint32_t lineState) noexcept {
+	return (lineState >> 16) & 0xff;
 }
 
 constexpr bool IsMarkdownSpace(int ch) noexcept {
@@ -111,8 +126,14 @@ constexpr bool IsBlockStartChar(int ch) noexcept {
 inline uint8_t GetCharAfterIndent(LexAccessor &styler, Sci_PositionU &startPos, int indentCount) noexcept {
 	Sci_PositionU pos = startPos;
 	uint8_t ch = styler.SafeGetCharAt(pos);
-	while (ch == ' ' && indentCount != 0) {
-		--indentCount;
+	while (indentCount != 0) {
+		if (ch == ' ') {
+			--indentCount;
+		} else if (ch == '\t' && indentCount >= 4) {
+			indentCount -= 4;
+		} else {
+			break;
+		}
 		ch = styler.SafeGetCharAt(++pos);
 	}
 	startPos = pos;
@@ -219,6 +240,7 @@ struct MarkdownLexer {
 	std::vector<Sci_PositionU> backPos;
 
 	HtmlTagState tagState = HtmlTagState::None; // html tag, link title
+	int indentParent = 0; // parent container's indentChild
 	int delimiterCount = 0; // code fence
 	int bracketCount = 0; // link text
 	int parenCount = 0; // link	destination, link title
@@ -253,7 +275,11 @@ struct MarkdownLexer {
 	bool IsParagraphEnd(Sci_PositionU startPos) const noexcept;
 	int HighlightBlockText();
 	void HighlightInlineText();
-	void HighlightIndentedText();
+
+	int GetListChildIndentCount(int indentCurrent) const noexcept;
+	int UpdateParentIndentCount(int indentCurrent) noexcept;
+	uint32_t HighlightIndentedText(uint32_t lineState, int indentCount);
+	bool IsIndentedBlockEnd() const noexcept;
 
 	int GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignoreCurrent = false) const noexcept;
 	bool HighlightEmphasis();
@@ -470,23 +496,134 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 }
 
 // 4.4 Indented code blocks
-void MarkdownLexer::HighlightIndentedText() {
-	// indented code block
-
-	// paragraph continuation text
-
-	// indented list item
-	if (sc.ch == '+' || sc.ch == '-' || sc.ch == '*') {
-		if (IsMarkdownSpace(sc.chNext)) {
-			sc.SetState(SCE_MARKDOWN_BULLET_LIST);
-		}
-	} else {
-		const OrderedListType listType = CheckOrderedList(sc.styler, sc.currentPos, sc.ch, sc.chNext);
-		if (listType != OrderedListType::None) {
-			const int style = (listType == OrderedListType::Decimal || markdown == Markdown::Pandoc) ? SCE_MARKDOWN_ORDERED_LIST : SCE_MARKDOWN_EXT_ORDERED_LIST;
-			sc.SetState(style);
+uint32_t MarkdownLexer::HighlightIndentedText(uint32_t lineState, int indentCount) {
+	// prefer indented list item
+	if (indentCount == 4 && indentParent != 0) {
+		if (sc.ch == '+' || sc.ch == '-' || sc.ch == '*') {
+			if (IsMarkdownSpace(sc.chNext)) {
+				sc.SetState(SCE_MARKDOWN_BULLET_LIST);
+				return lineState;
+			}
+		} else {
+			const OrderedListType listType = CheckOrderedList(sc.styler, sc.currentPos, sc.ch, sc.chNext);
+			if (listType == OrderedListType::Decimal || (listType != OrderedListType::None && markdown == Markdown::Pandoc)) {
+				sc.SetState(SCE_MARKDOWN_ORDERED_LIST);
+				return lineState;
+			}
 		}
 	}
+
+	// check paragraph continuation text
+	if (lineState & LineStateListItemFirstLine) {
+		return lineState;
+	}
+	if ((lineState & LineStateBlockMask) == 0 && sc.currentLine != 0) {
+		indentCount = GetIndentCount(lineState);
+		Sci_PositionU pos = sc.styler.LineStart(sc.currentLine - 1);
+		pos += indentCount;
+		const int style = sc.styler.BufferStyleAt(pos);
+		if (!IsBlockStyle(style)) {
+			return lineState;
+		}
+	}
+
+	// indented code block
+	sc.SetState(SCE_MARKDOWN_INDENTED_BLOCK);
+	// for single line indented code block
+	if (IsIndentedBlockEnd()) {
+		lineState |= LineStateBlockEndLine;
+	}
+	return lineState;
+}
+
+bool MarkdownLexer::IsIndentedBlockEnd() const noexcept {
+	// only check indentCount on next two lines to keep trailing blank lines in current block
+	bool next = false;
+	int indentCount = 0;
+	Sci_PositionU pos = sc.lineStartNext;
+	const Sci_PositionU endPos = sc.styler.Length();
+	while (true) {
+		const uint8_t ch = sc.styler.SafeGetCharAt(pos++);
+		if (ch == ' ') {
+			++indentCount;
+		} else if (ch == '\t') {
+			indentCount = (indentCount/4 + 1)*4;
+		} else if (IsEOLChar(ch) || pos >= endPos) {
+			if (!next && pos < endPos) {
+				next = true;
+				indentCount = 0;
+				pos = sc.styler.LineStart(sc.currentLine + 2);
+				continue;
+			}
+			return false;
+		} else {
+			break;
+		}
+	}
+	return indentCount < indentParent + 4;
+}
+
+// 5 Container blocks
+int MarkdownLexer::GetListChildIndentCount(int indentCurrent) const noexcept {
+	Sci_PositionU pos = sc.currentPos;
+	indentCurrent += static_cast<int>(pos - sc.styler.GetStartSegment());
+	if (sc.ch == '\t') {
+		indentCurrent += 4;
+	} else if (sc.ch == ' ') {
+		int count = 1;
+		while (count < 4) {
+			const uint8_t ch = sc.styler.SafeGetCharAt(++pos);
+			if (ch != ' ') {
+				break;
+			}
+			++count;
+		}
+		indentCurrent += count;
+	}
+	return indentCurrent;
+}
+
+int MarkdownLexer::UpdateParentIndentCount(int indentCurrent) noexcept {
+	int indentCount = indentCurrent;
+	Sci_Line line = sc.currentLine;
+	while (line != 0) {
+		--line;
+		const uint32_t lineState = sc.styler.GetLineState(line);
+		const auto tag = static_cast<HtmlTagState>(lineState & LineStateHtmlTagMask);
+		if (tag > HtmlTagState::Question) {
+			continue;
+		}
+		if (lineState & LineStateEmptyLine) {
+			if (indentCount >= 0 && indentCount < MinContainerIndentChild) {
+				break;
+			}
+		} else {
+			indentCount = GetIndentCount(lineState);
+			if (indentCurrent < 0) {
+				indentCurrent = indentCount;
+			} else if (lineState & LineStateListItemFirstLine) {
+				const int indentChild = lineState >> 24;
+				if (indentChild < indentCurrent) {
+					indentParent = indentChild;
+					return indentCurrent;
+				}
+			}
+			if (indentCount < MinContainerIndentChild) {
+				if (lineState & LineStateBlockMask) {
+					break;
+				}
+				Sci_PositionU pos = sc.styler.LineStart(line);
+				pos += indentCount;
+				const int style = sc.styler.BufferStyleAt(pos);
+				if (IsBlockStyle(style)) {
+					break;
+				}
+			}
+		}
+	}
+
+	indentParent = 0;
+	return indentCurrent;
 }
 
 int MarkdownLexer::GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignoreCurrent) const noexcept {
@@ -1029,7 +1166,7 @@ constexpr bool IsMathCloseDollar(int chPrev, int chNext) noexcept {
 
 bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos) const noexcept {
 	Sci_PositionU pos = startPos;
-	uint8_t ch = GetCharAfterIndent(sc.styler, pos, 3);
+	uint8_t ch = GetCharAfterIndent(sc.styler, pos, indentParent + 3);
 	switch (ch) {
 	case '\r':	// empty line
 	case '\n':	// empty line
@@ -1458,16 +1595,15 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 	uint32_t lineState = 0;
 	int visibleChars = 0;
 	int indentCurrent = 0;
-	// parent block indentation count for indented code block,
-	// indented code block ends on the line when indentParent - indentCurrent < 4
-	//int indentParent = 0;
+	int indentPrevious = 0;
+	int indentChild = 0;
 	int headerLevel = 0;
 	int prevLevel = SC_FOLDLEVELBASE;
 
 	if (sc.currentLine > 0) {
 		prevLevel = styler.LevelAt(sc.currentLine - 1);
 		lineState = styler.GetLineState(sc.currentLine - 1);
-		lexer.tagState = static_cast<HtmlTagState>(lineState & 3);
+		lexer.tagState = static_cast<HtmlTagState>(lineState & LineStateHtmlTagMask);
 		lexer.delimiterCount = (lineState >> 8) & 0xff;
 		/*
 		2: tagState
@@ -1479,8 +1615,10 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		1: unused
 		8: delimiterCount
 		8: indentCurrent
-		8: indentParent
+		8: indentChild
 		*/
+		indentPrevious = lexer.UpdateParentIndentCount(-1);
+		indentPrevious = std::max(indentPrevious, 0);
 	}
 	if (startPos == 0) {
 		switch (sc.ch) {
@@ -1513,6 +1651,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		if (sc.atLineStart) {
 			visibleChars = 0;
 			indentCurrent = 0;
+			indentChild = 0;
 			headerLevel = 0;
 			if (lineState & LineStateBlockEndLine) {
 				lineState &= ~LineStateBlockEndLine;
@@ -1559,7 +1698,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_BACKTICK_MATH:
 		case SCE_MARKDOWN_TILDE_BLOCK:
 		case SCE_MARKDOWN_TILDE_MATH:
-			if (visibleChars == 0 && indentCurrent < 4
+			if (visibleChars == 0 && indentCurrent < lexer.indentParent + 4
 				&& sc.ch == ((sc.state <= SCE_MARKDOWN_BACKTICK_MATH) ? '`' : '~')) {
 				const int count = GetMatchedDelimiterCount(styler, sc.currentPos, sc.ch);
 				if (count >= lexer.delimiterCount) {
@@ -1568,6 +1707,16 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				}
 			}
 			lexer.DetectAutoLink();
+			break;
+
+		case SCE_MARKDOWN_INDENTED_BLOCK:
+			if (sc.atLineStart) {
+				if (lexer.IsIndentedBlockEnd()) {
+					lineState |= LineStateBlockEndLine;
+				}
+			} else {
+				lexer.DetectAutoLink();
+			}
 			break;
 
 		case SCE_MARKDOWN_BLOCKQUOTE:
@@ -1590,6 +1739,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_ORDERED_LIST:
 		case SCE_MARKDOWN_EXT_ORDERED_LIST:
 			if (!IsGraphic(sc.ch)) {
+				if (sc.state != SCE_MARKDOWN_EXT_ORDERED_LIST) {
+					indentChild = lexer.GetListChildIndentCount(indentCurrent);
+				}
 				sc.SetState(SCE_MARKDOWN_DEFAULT);
 			}
 			break;
@@ -1858,16 +2010,20 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			case HtmlTagState::None:
 				if (sc.ch > ' ') {
 					if (visibleChars == 0) {
-						if (indentCurrent < 4) {
+						if (indentCurrent != indentPrevious) {
+							lexer.UpdateParentIndentCount(indentCurrent);
+						}
+						const int indentCount = indentCurrent - lexer.indentParent;
+						if (indentCount < 4) {
 							headerLevel = lexer.HighlightBlockText();
 							if (headerLevel == SCE_MARKDOWN_SETEXT_H1 || headerLevel == SCE_MARKDOWN_SETEXT_H2) {
 								lineState |= LineStateSetextFirstLine;
 							}
+							if (headerLevel != 0 && lexer.indentParent != 0) {
+								headerLevel = 0; // avoid code folding inside container
+							}
 						} else {
-							lexer.HighlightIndentedText();
-						}
-						if (sc.state == SCE_MARKDOWN_BULLET_LIST || sc.state == SCE_MARKDOWN_ORDERED_LIST) {
-							lineState |= LineStateListItemFirstLine;
+							lineState = lexer.HighlightIndentedText(lineState, indentCount);
 						}
 					}
 					if (sc.state == SCE_MARKDOWN_DEFAULT) {
@@ -1941,13 +2097,17 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				prevLevel = nextLevel;
 			}
 
-			lineState = (lineState & (LineStateListItemFirstLine | LineStateBlockEndLine))
+			lineState = (lineState & LineStateBlockEndLine)
 				| static_cast<int>(lexer.tagState)
 				| (lexer.delimiterCount << 8);
 			if (visibleChars == 0) {
 				lineState |= LineStateEmptyLine;
 			} else {
 				lineState |= (indentCurrent << 16);
+				indentPrevious = indentCurrent;
+			}
+			if (indentChild != 0) {
+				lineState |= LineStateListItemFirstLine | (static_cast<uint32_t>(indentChild) << 24);
 			}
 			if (lexer.tagState >= HtmlTagState::Open || StyleNeedsBacktrack(sc.state)) {
 				lineState |= LineStateNestedStateLine;
@@ -1963,7 +2123,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				}
 			}
 			styler.SetLineState(sc.currentLine, static_cast<int>(lineState));
-			lineState &= ~LineStateListItemFirstLine;
 		}
 		sc.Forward();
 	}

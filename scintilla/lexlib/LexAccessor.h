@@ -215,7 +215,7 @@ public:
 			if (validLen + len >= bufferSize) {
 				Flush();
 			}
-			const unsigned char attr = static_cast<unsigned char>(chAttr);
+			const auto attr = static_cast<unsigned char>(chAttr);
 			if (validLen + len >= bufferSize) {
 				// Too big for buffer so send directly
 				pAccess->SetStyleFor(len, attr);
