@@ -70,8 +70,9 @@ constexpr bool IsHeaderStyle(int state) noexcept {
 	return state >= SCE_MARKDOWN_HEADER1 && state <= SCE_MARKDOWN_SETEXT_H2;
 }
 
-constexpr bool IsInlineStyle(int state) noexcept {
-	return state >= SCE_MARKDOWN_ESCAPECHAR || state == SCE_H_TAG || state == SCE_H_ENTITY;
+constexpr bool IsHtmlBlockStyle(int state) noexcept {
+	// always treat SCE_H_TAG as inline style
+	return state == SCE_H_COMMENT || state == SCE_H_CDATA || state == SCE_H_QUESTION;
 }
 
 constexpr bool IsCodeStyle(int state) noexcept {
@@ -890,16 +891,22 @@ bool MarkdownLexer::DetectAutoLink() {
 bool MarkdownLexer::HighlightAutoLink() {
 	switch (autoLink) {
 	case AutoLink::Angle:
-		if (sc.ch == '>') {
-			sc.ForwardSetState(TakeOuterStyle());
-			return true;
+		// absolute URI or email
+		if (sc.ch == ':' || sc.ch == '@') {
+			++periodCount;
 		}
-		if (sc.ch == '<' || !IsGraphic(sc.ch)) {
+		if (sc.ch == '<' || sc.ch == '>' || !IsGraphic(sc.ch)) {
+			const int count = periodCount;
 			periodCount = 0;
 			autoLink = AutoLink::None;
-			sc.ChangeState(TakeOuterStyle());
-			sc.Rewind();
-			sc.Forward();
+			const int outer = TakeOuterStyle();
+			if (sc.ch == '>' && count != 0) {
+				sc.ForwardSetState(outer);
+			} else {
+				sc.ChangeState(outer);
+				sc.Rewind();
+				sc.Forward();
+			}
 			return true;
 		}
 		break;
@@ -1256,6 +1263,7 @@ void MarkdownLexer::HighlightInlineText() {
 				sc.Forward();
 			} else {
 				autoLink = AutoLink::Angle;
+				periodCount = 0;
 				sc.SetState(STYLE_LINK);
 			}
 		} else if (sc.chNext == '?') {
@@ -1272,6 +1280,7 @@ void MarkdownLexer::HighlightInlineText() {
 			}
 		} else if (!IsInvalidUrlChar(sc.chNext)) {
 			autoLink = AutoLink::Angle;
+			periodCount = 0;
 			sc.SetState(STYLE_LINK);
 		}
 		break;
@@ -1392,7 +1401,7 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 	}
 	if (handled || current != sc.state) {
-		if (handled || IsInlineStyle(sc.state)) {
+		if (handled || !IsHtmlBlockStyle(sc.state)) {
 			SaveOuterStyle(current);
 		}
 	} else if (bracketCount == 0) {
@@ -1759,6 +1768,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					sc.SetState(SCE_MARKDOWN_DEFAULT);
 				} else {
 					lexer.tagState = HtmlTagState::None;
+					lexer.periodCount = 0;
 					lexer.autoLink = AutoLink::Angle;
 					sc.ChangeState(STYLE_LINK);
 					continue;
