@@ -1618,7 +1618,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		8: indentChild
 		*/
 		indentPrevious = lexer.UpdateParentIndentCount(-1);
-		indentPrevious = std::max(indentPrevious, 0);
+		indentPrevious = sci::max(indentPrevious, 0);
 	}
 	if (startPos == 0) {
 		switch (sc.ch) {
