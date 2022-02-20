@@ -600,9 +600,8 @@ int MarkdownLexer::UpdateParentIndentCount(int indentCurrent) noexcept {
 			if (indentCurrent < 0) {
 				indentCurrent = indentCount;
 			} else if (lineState & LineStateListItemFirstLine) {
-				const int indentChild = lineState >> 24;
-				if (indentChild < indentCurrent) {
-					indentParent = indentChild;
+				if (indentCount < indentCurrent) {
+					indentParent = lineState >> 24;
 					return indentCurrent;
 				}
 			}
@@ -753,9 +752,7 @@ bool MarkdownLexer::HighlightLinkText() {
 				const int style = (chNext == '<') ? SCE_MARKDOWN_ANGLE_LINK
 					: (parenCount ? SCE_MARKDOWN_PAREN_LINK : SCE_MARKDOWN_PLAIN_LINK);
 				sc.SetState(parenCount ? SCE_MARKDOWN_LINK_TEXT : SCE_MARKDOWN_DELIMITER);
-				sc.Forward();
-				sc.SetState(style);
-				sc.Forward();
+				sc.ForwardSetState(style);
 				if (tagState == HtmlTagState::None) {
 					// skip whitespace between link text and destination
 					while (IsSpaceOrTab(sc.ch)) {
@@ -764,6 +761,9 @@ bool MarkdownLexer::HighlightLinkText() {
 					if (sc.ch == '<') {
 						sc.Forward();
 					}
+				} else {
+					sc.Advance(startPos - sc.currentPos - 1);
+					return false;
 				}
 			}
 		}
