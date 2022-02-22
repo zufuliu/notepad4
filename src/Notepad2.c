@@ -1508,10 +1508,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 
-	case APPM_POST_HOTSPOTCLICK:
-		ReleaseCapture();
+	case APPM_POST_HOTSPOTCLICK: {
+		// release mouse capture and restore selection
+		const int x = SciCall_PointXFromPosition(lParam);
+		const int y = SciCall_PointYFromPosition(lParam);
+		SendMessage(hwndEdit, WM_LBUTTONUP, MAKELPARAM(x, y), VK_CONTROL);
+		EditSelectEx(wParam, lParam);
 		SciCall_SetMultipleSelection(TRUE);
-		break;
+	} break;
 
 	default:
 		if (umsg == msgTaskbarCreated) {
@@ -5222,7 +5226,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				SciCall_SetMultipleSelection(FALSE);
 				SciCall_SetSel(scn->position, scn->position);
 				EditOpenSelection(OpenSelectionType_None);
-				PostMessage(hwnd, APPM_POST_HOTSPOTCLICK, 0, 0);
+				const Sci_Position iAnchorPos = SciCall_GetAnchor();
+				const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+				PostMessage(hwnd, APPM_POST_HOTSPOTCLICK, iAnchorPos, iCurrentPos);
 			}
 			break;
 		}
