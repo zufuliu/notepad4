@@ -258,7 +258,7 @@
 #define NP2StyleX_InternalFilter		EDITSTYLE_HOLE(InternalFilter, L"Internal Filter")
 #define NP2StyleX_ExternalFilter		EDITSTYLE_HOLE(ExternalFilter, L"External Filter")
 #define NP2StyleX_File					EDITSTYLE_HOLE(File, L"File")
-
+#define NP2StyleX_DefinitionList		EDITSTYLE_HOLE(DefinitionList, L"Definition List")
 #define NP2StyleX_Money					EDITSTYLE_HOLE(Money, L"Money")
 #define NP2StyleX_Issue					EDITSTYLE_HOLE(Issue, L"Issue")
 #define NP2StyleX_MagicMethod			EDITSTYLE_HOLE(MagicMethod, L"Magic Method")

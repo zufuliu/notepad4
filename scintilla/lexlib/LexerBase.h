@@ -14,7 +14,7 @@ class LexerBase final : public Scintilla::ILexer5 {
 	PropSetSimple props;
 	WordList *keywordLists[KEYWORDSET_MAX];
 public:
-	LexerBase(const LexerModule *module_);
+	explicit LexerBase(const LexerModule *module_);
 	virtual ~LexerBase();
 	void SCI_METHOD Release() noexcept override;
 	int SCI_METHOD Version() const noexcept override;

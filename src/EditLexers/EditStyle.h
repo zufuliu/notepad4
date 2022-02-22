@@ -246,7 +246,7 @@
 #define NP2STYLE_InternalFilter			63655
 #define NP2STYLE_ExternalFilter			63656
 #define NP2STYLE_File					63657
-
+#define NP2STYLE_DefinitionList			63658
 #define NP2STYLE_Money					63659
 #define NP2STYLE_Issue					63660
 #define NP2STYLE_MagicMethod			63661

@@ -174,9 +174,6 @@ constexpr bool IsLowerRoman(int ch) noexcept {
 	return AnyOf(ch, 'i', 'v', 'x', 'l', 'c', 'd', 'm');
 }
 
-// simple treat definition list as unordered list
-#define SCE_MARKDOWN_DEFINITION_LIST	SCE_MARKDOWN_BULLET_LIST
-
 // 6.2 Emphasis and strong emphasis
 // 6.5 Strikethrough (extension), handled similar to `**` except no nesting
 struct DelimiterRun {
@@ -253,9 +250,9 @@ struct MarkdownLexer {
 	AutoLink autoLink = AutoLink::None;
 	const Markdown markdown;
 
-	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler_):
-		sc(startPos, lengthDoc, initStyle, styler_),
-		markdown{static_cast<Markdown>(styler_.GetPropertyInt("lexer.lang"))} {}
+	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
+		sc(startPos, lengthDoc, initStyle, styler),
+		markdown{static_cast<Markdown>(styler.GetPropertyInt("lexer.lang"))} {}
 
 	void SaveOuterStyle(int style) {
 		nestedState.push_back(style);
@@ -277,7 +274,7 @@ struct MarkdownLexer {
 		backPos.pop_back();
 	}
 
-	bool IsParagraphEnd(Sci_PositionU startPos, uint32_t lineState) const noexcept;
+	bool IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const noexcept;
 	int HighlightBlockText();
 	void HighlightInlineText();
 
@@ -287,9 +284,9 @@ struct MarkdownLexer {
 	bool IsIndentedBlockEnd() const noexcept;
 
 	int GetCurrentDelimiterRun(DelimiterRun &delimiterRun, bool ignoreCurrent = false) const noexcept;
-	bool HighlightEmphasis();
+	bool HighlightEmphasis(uint32_t lineState);
 
-	bool HighlightLinkText();
+	bool HighlightLinkText(uint32_t lineState);
 	bool HighlightLinkDestination(uint32_t lineState);
 
 	bool DetectAutoLink();
@@ -680,15 +677,18 @@ constexpr uint8_t GetEmphasisDelimiter(int state) noexcept {
 	return (state == SCE_MARKDOWN_STRIKEOUT) ? '~' : ((state & 1) ? '_' : '*');
 }
 
-bool MarkdownLexer::HighlightEmphasis() {
-	if (sc.ch == ']' && bracketCount != 0) {
+bool MarkdownLexer::HighlightEmphasis(uint32_t lineState) {
+	const int current = sc.state;
+	if ((sc.ch == ']' && bracketCount != 0) || (sc.atLineEnd && IsParagraphEnd(sc.lineStartNext, lineState))) {
 		sc.ChangeState(TakeOuterStyle());
 		sc.BackTo(TakeOuterStart());
 		sc.Forward();
+		if (current >= SCE_MARKDOWN_STRONG_ASTERISK) {
+			sc.Forward();
+		}
 		return true;
 	}
 
-	const int current = sc.state;
 	const int delimiter = GetEmphasisDelimiter(current);
 	if (sc.ch == delimiter && (current != SCE_MARKDOWN_STRIKEOUT || sc.chNext == '~')) {
 		DelimiterRun delimiterRun;
@@ -741,12 +741,13 @@ inline bool IsLinkReferenceDefinition(LexAccessor &styler, Sci_Line line, Sci_Po
 	return ch == '[' && pos == startPos;
 }
 
-bool MarkdownLexer::HighlightLinkText() {
+bool MarkdownLexer::HighlightLinkText(uint32_t lineState) {
 	if (sc.ch == ']') {
 		sc.Forward();
 		Sci_PositionU startPos = 0;
 		--bracketCount;
 		if (bracketCount == 0) {
+			tagState = HtmlTagState::None;
 			startPos = TakeOuterStart();
 			sc.SetState(TakeOuterStyle());
 		}
@@ -786,7 +787,14 @@ bool MarkdownLexer::HighlightLinkText() {
 		return true;
 	}
 
-	if (IsEOLChar(sc.ch)) {
+	if (sc.atLineEnd) {
+		// TODO: support multiline link text
+		if (tagState == HtmlTagState::None && bracketCount == 1 && !IsParagraphEnd(sc.lineStartNext, lineState)) {
+			tagState = HtmlTagState::Open;
+			return false;
+		}
+
+		tagState = HtmlTagState::None;
 		bracketCount = 0;
 		sc.ChangeState(TakeOuterStyle());
 		sc.BackTo(TakeOuterStart());
@@ -1177,8 +1185,7 @@ constexpr bool IsMathCloseDollar(int chPrev, int chNext) noexcept {
 	return !IsASpace(chPrev) && !IsADigit(chNext);
 }
 
-bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos, uint32_t lineState) const noexcept {
-	Sci_PositionU pos = startPos;
+bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const noexcept {
 	int indentCount = indentParent;
 	if (lineState & LineStateListItemFirstLine) {
 		indentCount = GetIndentChild(lineState);
@@ -1258,7 +1265,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU startPos, uint32_t lineState) c
 		return indentParent == 0 && !IsEOLChar(chNext);
 
 	case '$':
-		return chNext == '$' && pos == startPos && markdown == Markdown::Pandoc;
+		return chNext == '$' && markdown == Markdown::Pandoc;
 	}
 
 	const OrderedListType listType = CheckOrderedList(sc.styler, pos, ch, chNext);
@@ -1336,7 +1343,7 @@ int MarkdownLexer::HighlightBlockText() {
 		break;
 
 	case '$':
-		if (markdown == Markdown::Pandoc && sc.atLineStart && sc.chNext == '$') {
+		if (sc.chNext == '$' && markdown == Markdown::Pandoc) {
 			sc.SetState(SCE_MARKDOWN_DISPLAY_MATH);
 			return 0;
 		}
@@ -1767,12 +1774,13 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_MARKDOWN_BULLET_LIST:
-		//case SCE_MARKDOWN_DEFINITION_LIST:
+		case SCE_MARKDOWN_DEFINITION_LIST:
 		case SCE_MARKDOWN_ORDERED_LIST:
 		case SCE_MARKDOWN_EXT_ORDERED_LIST:
 			if (!IsGraphic(sc.ch)) {
 				if (sc.state != SCE_MARKDOWN_EXT_ORDERED_LIST) {
 					indentChild = lexer.GetListChildIndentCount(indentCurrent);
+					lineState |= LineStateListItemFirstLine | (static_cast<uint32_t>(indentChild) << 24);
 				}
 				sc.SetState(SCE_MARKDOWN_DEFAULT);
 			}
@@ -1803,7 +1811,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_MARKDOWN_DISPLAY_MATH:
-			if (sc.atLineStart && sc.Match('$', '$')) {
+			if (sc.Match('$', '$')) {
 				lineState |= LineStateBlockEndLine;
 			}
 			break;
@@ -1820,13 +1828,13 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_STRONG_ASTERISK:
 		case SCE_MARKDOWN_STRONG_UNDERSCORE:
 		case SCE_MARKDOWN_STRIKEOUT:
-			if (lexer.HighlightEmphasis()) {
+			if (lexer.HighlightEmphasis(lineState)) {
 				continue;
 			}
 			break;
 
 		case SCE_MARKDOWN_LINK_TEXT:
-			if (lexer.HighlightLinkText()) {
+			if (lexer.HighlightLinkText(lineState)) {
 				continue;
 			}
 			break;
