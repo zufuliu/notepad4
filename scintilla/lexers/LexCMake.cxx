@@ -7,6 +7,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -19,10 +20,15 @@
 #include "CharacterSet.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
+#include "LexerUtils.h"
 
 using namespace Lexilla;
 
 namespace {
+
+enum {
+	LineStateNestedStateLine = 1 << 1,
+};
 
 constexpr bool IsCMakeOperator(int ch) noexcept {
 	return AnyOf(ch, '(', ')', '=', ':', ';',
@@ -69,26 +75,26 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 	int outerStyle = SCE_CMAKE_DEFAULT;
 	int varNestedLevel = 0; // nested variable: ${${}}
-	int generatorExpr = 0; // nested generator expressions: $<$<>>
+	std::vector<int> nestedState; // nested generator expressions: $<$<>>
 	int bracketNumber = 0; // number of '=' in bracket: [[]]
 	int userDefType = SCE_CMAKE_DEFAULT;
 	int chBeforeNumber = 0;
 	int chIdentifierStart = 0;
 	int visibleChars = 0;
 
+	if (startPos != 0) {
+		BacktrackToStart(styler, LineStateNestedStateLine, startPos, lengthDoc, initStyle);
+	}
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		1: lineStateLineComment
-		7: outerStyle
+		1: nestedState
+		6: unused
 		8: bracketNumber
 		*/
-		outerStyle = (lineState >> 1) & 0x7f;
 		bracketNumber = (lineState >> 8) & 0xff;
-		if (outerStyle != SCE_CMAKE_DEFAULT) {
-			sc.SetState(outerStyle);
-		}
 	}
 
 	while (sc.More()) {
@@ -166,6 +172,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_CMAKE_STRING:
 			if (sc.ch == '\\') {
+				outerStyle = SCE_CMAKE_STRING;
 				if (IsEOLChar(sc.chNext)) {
 					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
 					sc.ForwardSetState(SCE_CMAKE_STRING);
@@ -175,31 +182,22 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if (sc.Match('$', '{')) {
 				varNestedLevel = 1;
+				outerStyle = SCE_CMAKE_STRING;
 				sc.SetState(SCE_CMAKE_VARIABLE);
 			} else if (sc.Match('$', '<')) {
-				generatorExpr = 1;
+				nestedState.push_back(SCE_CMAKE_STRING);
 				sc.SetState(SCE_CMAKE_OPERATOR);
 			} else if ((sc.ch == '$' || sc.ch == '@') && IsIdentifierStart(sc.chNext)) {
+				outerStyle = SCE_CMAKE_STRING;
 				sc.SetState((sc.ch == '$') ? SCE_CMAKE_VARIABLE_DOLLAR : SCE_CMAKE_VARIABLE_AT);
-			} else if (generatorExpr && IsCMakeOperator(sc.ch)) {
-				if (sc.ch == '>') {
-					--generatorExpr;
-				}
-				sc.SetState(SCE_CMAKE_OPERATOR);
-				sc.ForwardSetState(SCE_CMAKE_STRING);
-				continue;
 			} else if (sc.ch == '\"') {
 				sc.ForwardSetState(SCE_CMAKE_DEFAULT);
-				outerStyle = SCE_CMAKE_DEFAULT;
 			}
 			break;
 
 		case SCE_CMAKE_ESCAPE_SEQUENCE:
 			sc.SetState(outerStyle);
-			if (outerStyle != SCE_CMAKE_DEFAULT) {
-				continue;
-			}
-			break;
+			continue;
 
 		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
@@ -216,19 +214,20 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				--varNestedLevel;
 				if (varNestedLevel == 0) {
 					sc.ForwardSetState(outerStyle);
-					if (outerStyle != SCE_CMAKE_DEFAULT) {
-						continue;
-					}
+					continue;
 				}
 			} else if (sc.Match('$', '{')) {
 				++varNestedLevel;
+			} else if (sc.atLineEnd) {
+				varNestedLevel = 0;
+				sc.SetState(outerStyle);
 			}
 			break;
 
 		case SCE_CMAKE_VARIABLE_DOLLAR:
 		case SCE_CMAKE_VARIABLE_AT:
 			if (!IsIdentifierChar(sc.ch)) {
-				bool done = false;
+				bool handled = false;
 				if (sc.state == SCE_CMAKE_VARIABLE_AT) {
 					if (sc.ch == '@') {
 						sc.Forward();
@@ -239,14 +238,12 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					if (StrEqualsAny(s, "$ENV", "$CACHE")) {
 						sc.SetState(SCE_CMAKE_VARIABLE);
 						varNestedLevel = 1;
-						done = true;
+						handled = true;
 					}
 				}
-				if (!done) {
+				if (!handled) {
 					sc.SetState(outerStyle);
-					if (outerStyle != SCE_CMAKE_DEFAULT) {
-						continue;
-					}
+					continue;
 				}
 			}
 			break;
@@ -274,18 +271,18 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.SetState(SCE_CMAKE_COMMENT);
 				}
 			} else if (sc.ch == '\"') {
-				outerStyle = SCE_CMAKE_STRING;
 				sc.SetState(SCE_CMAKE_STRING);
 			} else if (sc.Match('$', '{')) {
 				varNestedLevel = 1;
-				outerStyle = generatorExpr ? outerStyle : SCE_CMAKE_DEFAULT;
+				outerStyle = SCE_CMAKE_DEFAULT;
 				sc.SetState(SCE_CMAKE_VARIABLE);
 			} else if ((sc.ch == '$' || sc.ch == '@') && IsIdentifierStart(sc.chNext)) {
-				outerStyle = generatorExpr ? outerStyle : SCE_CMAKE_DEFAULT;
+				outerStyle = SCE_CMAKE_DEFAULT;
 				sc.SetState((sc.ch == '$') ? SCE_CMAKE_VARIABLE_DOLLAR : SCE_CMAKE_VARIABLE_AT);
 				sc.Forward();
 			} else if (sc.ch == '\\') {
 				if (IsCMakeEscapeChar(sc.chNext)) {
+					outerStyle = SCE_CMAKE_DEFAULT;
 					sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
 					sc.Forward();
 				}
@@ -297,14 +294,11 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				chBeforeNumber = sc.chPrev;
 			} else if (IsCMakeOperator(sc.ch)) {
 				sc.SetState(SCE_CMAKE_OPERATOR);
-				if (generatorExpr) {
-					if (sc.Match('$', '<')) {
-						++generatorExpr;
-					} else if (sc.ch == '>') {
-						--generatorExpr;
-						sc.ForwardSetState(generatorExpr ? SCE_CMAKE_DEFAULT : outerStyle);
-						continue;
-					}
+				if (sc.Match('$', '<')) {
+					nestedState.push_back(SCE_CMAKE_DEFAULT);
+				} else if (sc.ch == '>' && !nestedState.empty()) {
+					sc.ForwardSetState(TakeAndPop(nestedState));
+					continue;
 				}
 			}
 		}
@@ -313,7 +307,11 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, (bracketNumber << 8) | (outerStyle << 1) | lineStateLineComment);
+			int lineState = lineStateLineComment | (bracketNumber << 8);
+			if (!nestedState.empty()) {
+				lineState |= LineStateNestedStateLine;
+			}
+			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineComment = 0;
 			visibleChars = 0;
 		}
