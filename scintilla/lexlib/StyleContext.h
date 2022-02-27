@@ -229,6 +229,7 @@ public:
 	}
 
 	void SeekTo(Sci_PositionU startPos) noexcept {
+		assert(startPos < lineStartNext && startPos >= static_cast<Sci_PositionU>(styler.LineStart(currentLine)));
 		currentPos = startPos;
 		chPrev = 0;
 		if (!multiByteAccess) {
@@ -239,6 +240,7 @@ public:
 			width = widthNext;
 			chNext = styler.GetCharacterAndWidth(startPos + width, &widthNext);
 		}
+		//atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
 		atLineEnd = startPos >= lineStartNext - (currentLine < lineDocEnd);
 	}
 
@@ -246,17 +248,24 @@ public:
 		SeekTo(styler.GetStartSegment());
 	}
 
-	void BackTo(Sci_PositionU startPos) {
+	[[nodiscard]] bool BackTo(Sci_PositionU startPos) {
 		assert(startPos <= styler.GetStartSegment());
 		if (startPos < styler.GetStartSegment()) {
 			styler.Flush();
 			styler.StartAt(startPos);
 			styler.StartSegment(startPos);
 		}
+
+		const Sci_Line previousLine = currentLine;
+		currentLine = styler.GetLine(startPos);
+		//lineEnd = styler.LineEnd(currentLine);
+		lineStartNext = styler.LineStart(currentLine + 1);
 		SeekTo(startPos);
+		return previousLine != currentLine;
 	}
 
 	void Advance(Sci_Position nb) noexcept {
+		assert(nb >= 0 && currentPos + nb < lineStartNext);
 		if (nb) {
 			SeekTo(currentPos + nb);
 		}

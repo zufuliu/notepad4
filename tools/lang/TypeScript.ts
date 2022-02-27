@@ -1,5 +1,5 @@
 // 4.3 https://www.typescriptlang.org/docs/
-// 1.8 https://github.com/microsoft/TypeScript/tree/main/doc/TypeScript Language Specification
+// 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
 // https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts

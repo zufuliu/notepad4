@@ -377,7 +377,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 							// unknown option
 							sectionState = AHKSectionState::None;
 							sectionOption = AHKSectionOption_None;
-							sc.BackTo(backPos);
+							(void)sc.BackTo(backPos);
 							sc.ChangeState(SCE_AHK_OPERATOR);
 							break;
 						}
@@ -551,7 +551,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 							// unknown option
 							sectionState = AHKSectionState::None;
 							sectionOption = AHKSectionOption_None;
-							sc.BackTo(backPos);
+							(void)sc.BackTo(backPos);
 							sc.ChangeState(SCE_AHK_OPERATOR);
 						}
 					}
@@ -622,7 +622,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				} else if (sc.ch == stringQuoteChar) {
 					sectionState = AHKSectionState::None;
 					sectionOption = AHKSectionOption_None;
-					sc.BackTo(backPos);
+					(void)sc.BackTo(backPos);
 					sc.ChangeState((stringQuoteChar == '\'') ? SCE_AHK_STRING_SQ : SCE_AHK_STRING_DQ);
 					break;
 				}

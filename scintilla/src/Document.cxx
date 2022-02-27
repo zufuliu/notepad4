@@ -78,7 +78,7 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 
 		int styleStart = 0;
 		if (start > 0)
-			styleStart = pdoc->StyleAt(start - 1);
+			styleStart = pdoc->StyleIndexAt(start - 1);
 
 		if (len > 0) {
 			instance->Lex(start, len, styleStart, pdoc);
@@ -1827,10 +1827,10 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 				return MovePositionOutsideChar(pos, delta, true);
 			}
 		}
-		//const int style = StyleAt(pos);
+		//const int style = StyleIndexAt(pos);
 		while (pos > 0) {
 			const CharacterExtracted ce = CharacterBefore(pos);
-			if (/*StyleAt(pos - 1) != style || */WordCharacterClass(ce.character) != ccStart)
+			if (/*StyleIndexAt(pos - 1) != style || */WordCharacterClass(ce.character) != ccStart)
 				break;
 			pos -= ce.widthBytes;
 		}
@@ -1845,10 +1845,10 @@ Sci::Position Document::ExtendWordSelect(Sci::Position pos, int delta, bool only
 				return MovePositionOutsideChar(pos, delta, true);
 			}
 		}
-		//const int style = StyleAt(pos - 1);
+		//const int style = StyleIndexAt(pos - 1);
 		while (pos < Length()) {
 			const CharacterExtracted ce = CharacterAfter(pos);
-			if (/*StyleAt(pos) != style || */WordCharacterClass(ce.character) != ccStart)
+			if (/*StyleIndexAt(pos) != style || */WordCharacterClass(ce.character) != ccStart)
 				break;
 			pos += ce.widthBytes;
 		}

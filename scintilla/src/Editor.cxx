@@ -6561,7 +6561,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		if (PositionFromUPtr(wParam) >= pdoc->Length())
 			return 0;
 		else
-			return pdoc->StyleAt(PositionFromUPtr(wParam));
+			return pdoc->StyleIndexAt(PositionFromUPtr(wParam));
 
 	case Message::Redo:
 		Redo();
