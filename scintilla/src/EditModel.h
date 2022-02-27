@@ -71,7 +71,15 @@ public:
 	virtual Sci::Line LinesOnScreen() const noexcept = 0;
 	virtual void OnLineWrapped(Sci::Line lineDoc, int linesWrapped) = 0;
 	bool BidirectionalEnabled() const noexcept;
-	bool BidirectionalR2L() const noexcept;
+	bool BidirectionalR2L() const noexcept {
+		return bidirectional == Scintilla::Bidirectional::R2L;
+	}
+	SurfaceMode CurrentSurfaceMode() const noexcept {
+		return GetSurfaceMode(pdoc->dbcsCodePage);
+	}
+	virtual SurfaceMode GetSurfaceMode(int codePage) const noexcept {
+		return { codePage, BidirectionalR2L() };
+	}
 	void SetDefaultFoldDisplayText(const char *text);
 	const char *GetDefaultFoldDisplayText() const noexcept;
 	const char *GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept;

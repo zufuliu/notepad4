@@ -156,8 +156,6 @@ namespace Scintilla::Internal {
 #if defined(USE_D2D)
 IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
-IDWriteRenderingParams *defaultRenderingParams = nullptr;
-IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
 IDWriteGdiInterop *gdiInterop = nullptr;
 D2D1_DRAW_TEXT_OPTIONS d2dDrawTextOptions = D2D1_DRAW_TEXT_OPTIONS_NONE;
 
@@ -222,23 +220,7 @@ static void LoadD2DOnce() noexcept
 	}
 
 	if (pIDWriteFactory) {
-		HRESULT hr = pIDWriteFactory->CreateRenderingParams(&defaultRenderingParams);
-		if (SUCCEEDED(hr)) {
-			unsigned int clearTypeContrast = 0;
-			if (::SystemParametersInfo(SPI_GETFONTSMOOTHINGCONTRAST, 0, &clearTypeContrast, 0)) {
-
-				FLOAT gamma;
-				if (clearTypeContrast >= 1000 && clearTypeContrast <= 2200)
-					gamma = static_cast<FLOAT>(clearTypeContrast) / 1000.0f;
-				else
-					gamma = defaultRenderingParams->GetGamma();
-
-				pIDWriteFactory->CreateCustomRenderingParams(gamma, defaultRenderingParams->GetEnhancedContrast(), defaultRenderingParams->GetClearTypeLevel(),
-					defaultRenderingParams->GetPixelGeometry(), defaultRenderingParams->GetRenderingMode(), &customClearTypeRenderingParams);
-			}
-		}
-
-		hr = pIDWriteFactory->GetGdiInterop(&gdiInterop);
+		const HRESULT hr = pIDWriteFactory->GetGdiInterop(&gdiInterop);
 		if (!SUCCEEDED(hr)) {
 			ReleaseUnknown(gdiInterop);
 		}
@@ -673,7 +655,6 @@ bool SurfaceGDI::Initialised() const noexcept {
 }
 
 void SurfaceGDI::Init(WindowID wid) noexcept {
-	Release();
 	logPixelsY = DpiForWindow(wid);
 	hdc = ::CreateCompatibleDC({});
 	hdcOwned = true;
@@ -681,7 +662,6 @@ void SurfaceGDI::Init(WindowID wid) noexcept {
 }
 
 void SurfaceGDI::Init(SurfaceID sid, WindowID wid, bool printing) noexcept {
-	Release();
 	hdc = static_cast<HDC>(sid);
 	// Windows on screen are scaled but printers are not.
 	//const bool printing = (::GetDeviceCaps(hdc, TECHNOLOGY) != DT_RASDISPLAY);
@@ -1480,7 +1460,9 @@ class SurfaceD2D final : public Surface {
 	SurfaceMode mode;
 	bool ownRenderTarget = false;
 	int clipsActive = 0;
-	FontQuality fontQuality = FontQuality::QualityMask;
+
+	static constexpr FontQuality invalidFontQuality = FontQuality::QualityMask;
+	FontQuality fontQuality = invalidFontQuality;
 	int logPixelsY = USER_DEFAULT_SCREEN_DPI;
 
 	void Clear() noexcept;
@@ -1611,16 +1593,14 @@ bool SurfaceD2D::Initialised() const noexcept {
 }
 
 void SurfaceD2D::Init(WindowID wid) noexcept {
-	Release();
-	fontQuality = FontQuality::QualityMask;
+	fontQuality = invalidFontQuality;
 	logPixelsY = DpiForWindow(wid);
 }
 
 void SurfaceD2D::Init(SurfaceID sid, WindowID wid, bool /*printing*/) noexcept {
-	Release();
 	// printing always using GDI
 	pRenderTarget = static_cast<ID2D1RenderTarget *>(sid);
-	fontQuality = FontQuality::QualityMask;
+	fontQuality = invalidFontQuality;
 	logPixelsY = DpiForWindow(wid);
 }
 
@@ -1655,12 +1635,11 @@ void SurfaceD2D::SetFontQuality(FontQuality extraFontFlag) noexcept {
 	if (fontQuality != extraFontFlag) {
 		fontQuality = extraFontFlag;
 		const D2D1_TEXT_ANTIALIAS_MODE aaMode = DWriteMapFontQuality(extraFontFlag);
-
-		if (aaMode == D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE && customClearTypeRenderingParams)
-			pRenderTarget->SetTextRenderingParams(customClearTypeRenderingParams);
-		else if (defaultRenderingParams)
-			pRenderTarget->SetTextRenderingParams(defaultRenderingParams);
-
+		if (aaMode == D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE && mode.customRenderingParams) {
+			pRenderTarget->SetTextRenderingParams(static_cast<IDWriteRenderingParams *>(mode.customRenderingParams));
+		} else if (mode.defaultRenderingParams) {
+			pRenderTarget->SetTextRenderingParams(static_cast<IDWriteRenderingParams *>(mode.defaultRenderingParams));
+		}
 		pRenderTarget->SetTextAntialiasMode(aaMode);
 	}
 }
@@ -4091,8 +4070,6 @@ void Platform_Initialise(void *hInstance) noexcept {
 void Platform_Finalise(bool fromDllMain) noexcept {
 #if defined(USE_D2D)
 	if (!fromDllMain) {
-		ReleaseUnknown(defaultRenderingParams);
-		ReleaseUnknown(customClearTypeRenderingParams);
 		ReleaseUnknown(gdiInterop);
 		ReleaseUnknown(pIDWriteFactory);
 		ReleaseUnknown(pD2DFactory);

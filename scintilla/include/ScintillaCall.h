@@ -64,7 +64,6 @@ public:
 	void SetTarget(Span span);
 	void ColouriseAll();
 	char CharacterAt(Position position);
-	int UnsignedStyleAt(Position position);
 	std::string StringOfSpan(Span span);
 	Position ReplaceTarget(std::string_view text);
 	Position ReplaceTargetRE(std::string_view text);

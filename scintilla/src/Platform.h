@@ -170,8 +170,8 @@ public:
 struct SurfaceMode final {
 	int codePage = 0;
 	bool bidiR2L = false;
-	constexpr SurfaceMode() noexcept = default;
-	constexpr explicit SurfaceMode(int codePage_, bool bidiR2L_) noexcept : codePage(codePage_), bidiR2L(bidiR2L_) {}
+	void *defaultRenderingParams = nullptr;
+	void *customRenderingParams = nullptr;
 };
 
 /**

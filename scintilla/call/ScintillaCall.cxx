@@ -94,11 +94,6 @@ char ScintillaCall::CharacterAt(Position position) {
 	return static_cast<char>(Call(Message::GetCharAt, position));
 }
 
-int ScintillaCall::UnsignedStyleAt(Position position) {
-	// Returns signed value but easier to use as unsigned
-	return static_cast<unsigned char>(Call(Message::GetStyleAt, position));
-}
-
 std::string ScintillaCall::StringOfSpan(Span span) {
 	std::string text;
 	if (span.Length() != 0) {

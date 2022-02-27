@@ -102,10 +102,6 @@ bool EditModel::BidirectionalEnabled() const noexcept {
 		(CpUtf8 == pdoc->dbcsCodePage);
 }
 
-bool EditModel::BidirectionalR2L() const noexcept {
-	return bidirectional == Bidirectional::R2L;
-}
-
 void EditModel::SetDefaultFoldDisplayText(const char *text) {
 	defaultFoldDisplayText = UniqueStringCopy(text);
 }
