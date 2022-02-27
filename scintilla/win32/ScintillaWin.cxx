@@ -390,11 +390,13 @@ namespace Scintilla::Internal {
 class ScintillaWin final :
 	public ScintillaBase {
 
-	wchar_t lastHighSurrogateChar = 0;
 	bool lastKeyDownConsumed = false;
+	bool styleIdleInQueue = false;
+	wchar_t lastHighSurrogateChar = 0;
 
 	bool capturedMouse = false;
 	bool trackedMouseLeave = false;
+	bool hasOKText = false;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	SetCoalescableTimerSig SetCoalescableTimerFn = nullptr;
 #endif
@@ -408,8 +410,6 @@ class ScintillaWin final :
 
 	PRectangle rectangleClient;
 	HRGN hRgnUpdate {};
-
-	bool hasOKText = false;
 
 	CLIPFORMAT cfColumnSelect;
 	UINT cfBorlandIDEBlockType;
@@ -440,10 +440,10 @@ class ScintillaWin final :
 	LANGID inputLang = LANG_USER_DEFAULT;
 
 #if defined(USE_D2D)
-	bool renderTargetValid;
+	bool renderTargetValid = true;
 	ID2D1RenderTarget *pRenderTarget = nullptr;
 	// rendering parameters for current monitor
-	HMONITOR hPreviousMonitor {};
+	HMONITOR hCurrentMonitor {};
 	std::unique_ptr<IDWriteRenderingParams, UnknownReleaser> defaultRenderingParams;
 	std::unique_ptr<IDWriteRenderingParams, UnknownReleaser> customRenderingParams;
 #endif
@@ -645,7 +645,6 @@ private:
 	HBITMAP sysCaretBitmap {};
 	int sysCaretWidth = 0;
 	int sysCaretHeight = 0;
-	bool styleIdleInQueue = false;
 };
 
 HINSTANCE ScintillaWin::hInstance {};
@@ -728,7 +727,7 @@ void ScintillaWin::Finalise() noexcept {
 #if defined(USE_D2D)
 bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 	HMONITOR monitor = ::MonitorFromWindow(MainHWND(), MONITOR_DEFAULTTONEAREST);
-	if (!force && monitor == hPreviousMonitor && defaultRenderingParams) {
+	if (!force && monitor == hCurrentMonitor && defaultRenderingParams) {
 		// monitor not changed and not called from WM_SETTINGCHANGE
 		return false;
 	}
@@ -749,7 +748,7 @@ bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 		}
 	}
 
-	hPreviousMonitor = monitor;
+	hCurrentMonitor = monitor;
 	defaultRenderingParams.reset(monitorRenderingParams);
 	customRenderingParams.reset(customClearTypeRenderingParams);
 	return true;
