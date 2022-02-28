@@ -2152,7 +2152,7 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 						// Failed to load Direct2D or DirectWrite so no effect
 						return 0;
 					}
-					UpdateRenderingParams(false);
+					UpdateRenderingParams(true);
 #else
 					return 0;
 #endif

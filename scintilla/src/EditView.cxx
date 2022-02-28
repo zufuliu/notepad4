@@ -1010,9 +1010,8 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 		lineDoc--;
 		posLineStart = model.pdoc->LineStart(lineDoc);
 	}
-	const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
-	LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 	if (surface) {
+		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
 		const int posInLine = static_cast<int>(pos.Position() - posLineStart);
 		LayoutLine(model, surface, vs, ll, model.wrapWidth, LayoutLineOption::AutoUpdate, posInLine);
 		pt = ll->PointFromPosition(posInLine, vs.lineHeight, pe);
@@ -1039,9 +1038,11 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 				pt.y = static_cast<XYPOSITION>(subLine*vs.lineHeight);
 			}
 		}
+
+		const Sci::Line lineVisible = model.pcs->DisplayFromDoc(lineDoc);
 		pt.y += (lineVisible - topLine) * vs.lineHeight;
+		pt.x += pos.VirtualSpace() * vs.styles[ll->EndLineStyle()].spaceWidth;
 	}
-	pt.x += pos.VirtualSpace() * vs.styles[ll->EndLineStyle()].spaceWidth;
 	return pt;
 }
 

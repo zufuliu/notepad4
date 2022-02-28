@@ -183,7 +183,6 @@ public:
 	using ElementMap = std::map<Scintilla::Element, std::optional<ColourRGBA>>;
 	ElementMap elementColours;
 	ElementMap elementBaseColours;
-	std::set<Scintilla::Element> elementAllowsTranslucent;
 
 	WrapAppearance wrap;
 
@@ -222,7 +221,10 @@ public:
 	void AddMultiEdge(int column, ColourRGBA colour);
 
 	std::optional<ColourRGBA> ElementColour(Scintilla::Element element) const;
-	bool ElementAllowsTranslucent(Scintilla::Element element) const;
+	static constexpr bool ElementAllowsTranslucent(Scintilla::Element element) noexcept {
+		return (element >= Scintilla::Element::SelectionText && element <= Scintilla::Element::WhiteSpace)
+			|| element == Scintilla::Element::HotSpotActive;
+	}
 	bool ResetElement(Scintilla::Element element);
 	bool SetElementColour(Scintilla::Element element, ColourRGBA colour);
 	bool ElementIsSet(Scintilla::Element element) const;

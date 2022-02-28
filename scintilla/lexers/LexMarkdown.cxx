@@ -1732,7 +1732,6 @@ bool MarkdownLexer::HighlightCriticMarkup() {
 
 void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	if (startPos != 0) {
-		BacktrackToStart(styler, LineStateNestedStateLine, startPos, lengthDoc, initStyle);
 		Sci_PositionU pos = startPos;
 		const uint8_t ch = GetCharAfterSpace(styler, pos, 4);
 		if (IsBlockStartChar(ch) || pos - startPos == 4) {
@@ -1742,6 +1741,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			startPos = styler.LineStart(currentLine - 1);
 			lengthDoc = endPos - startPos;
 			initStyle = (startPos == 0) ? 0 : styler.StyleAt(startPos - 1);
+		}
+		if (startPos != 0) {
+			BacktrackToStart(styler, LineStateNestedStateLine, startPos, lengthDoc, initStyle);
 		}
 	}
 

@@ -205,24 +205,20 @@ static void LoadD2DOnce() noexcept
 	if (hDLLDWrite) {
 		DWriteCreateFactorySig fnDWCF = DLLFunction<DWriteCreateFactorySig>(hDLLDWrite, "DWriteCreateFactory");
 		if (fnDWCF) {
-			const HRESULT hr = fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
+			HRESULT hr = fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
 				IID_IDWriteFactory2,
 				reinterpret_cast<IUnknown**>(&pIDWriteFactory));
 			if (SUCCEEDED(hr)) {
 				// D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT
 				d2dDrawTextOptions = static_cast<D2D1_DRAW_TEXT_OPTIONS>(0x00000004);
 			} else {
-				fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
+				hr = fnDWCF(DWRITE_FACTORY_TYPE_SHARED,
 					__uuidof(IDWriteFactory),
 					reinterpret_cast<IUnknown**>(&pIDWriteFactory));
 			}
-		}
-	}
-
-	if (pIDWriteFactory) {
-		const HRESULT hr = pIDWriteFactory->GetGdiInterop(&gdiInterop);
-		if (!SUCCEEDED(hr)) {
-			ReleaseUnknown(gdiInterop);
+			if (SUCCEEDED(hr)) {
+				pIDWriteFactory->GetGdiInterop(&gdiInterop);
+			}
 		}
 	}
 

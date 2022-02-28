@@ -7340,7 +7340,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.ElementColour(static_cast<Element>(wParam)).has_value();
 
 	case Message::GetElementAllowsTranslucent:
-		return vs.ElementAllowsTranslucent(static_cast<Element>(wParam));
+		return ViewStyle::ElementAllowsTranslucent(static_cast<Element>(wParam));
 
 	case Message::GetElementBaseColour:
 		return vs.elementBaseColours[static_cast<Element>(wParam)].value_or(ColourRGBA()).AsInteger();

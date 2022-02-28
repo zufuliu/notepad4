@@ -122,17 +122,6 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	elementBaseColours[Element::SelectionAdditionalBack] = ColourRGBA(0xd7, 0xd7, 0xd7, 0xff);
 	elementBaseColours[Element::SelectionSecondaryBack] = ColourRGBA(0xb0, 0xb0, 0xb0, 0xff);
 	elementBaseColours[Element::SelectionInactiveBack] = ColourRGBA(0x80, 0x80, 0x80, 0x3f);
-	elementAllowsTranslucent.insert({
-		Element::SelectionText,
-		Element::SelectionBack,
-		Element::SelectionAdditionalText,
-		Element::SelectionAdditionalBack,
-		Element::SelectionSecondaryText,
-		Element::SelectionSecondaryBack,
-		Element::SelectionInactiveText,
-		Element::SelectionBack,
-		Element::SelectionInactiveBack,
-	});
 
 	foldmarginColour.reset();
 	foldmarginHighlightColour.reset();
@@ -146,16 +135,10 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 
 	elementBaseColours[Element::Caret] = ColourRGBA(0, 0, 0);
 	elementBaseColours[Element::CaretAdditional] = ColourRGBA(0x7f, 0x7f, 0x7f);
-	elementAllowsTranslucent.insert({
-		Element::Caret,
-		Element::CaretAdditional,
-	});
 
 	elementColours.erase(Element::CaretLineBack);
-	elementAllowsTranslucent.insert(Element::CaretLineBack);
 
 	elementColours.erase(Element::HotSpotActive);
-	elementAllowsTranslucent.insert(Element::HotSpotActive);
 	hotspotUnderline = true;
 
 	marginInside = true;
@@ -174,7 +157,6 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	viewIndentationGuides = IndentView::None;
 	viewEOL = false;
 	elementColours.erase(Element::WhiteSpace);
-	elementAllowsTranslucent.insert(Element::WhiteSpace);
 
 	someStylesProtected = false;
 	someStylesForceCase = false;
@@ -596,10 +578,6 @@ std::optional<ColourRGBA> ViewStyle::ElementColour(Element element) const {
 		}
 	}
 	return {};
-}
-
-bool ViewStyle::ElementAllowsTranslucent(Element element) const {
-	return elementAllowsTranslucent.count(element) != 0;
 }
 
 bool ViewStyle::ResetElement(Element element) {
