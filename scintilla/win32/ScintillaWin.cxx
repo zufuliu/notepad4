@@ -728,7 +728,6 @@ void ScintillaWin::Finalise() noexcept {
 bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 	HMONITOR monitor = ::MonitorFromWindow(MainHWND(), MONITOR_DEFAULTTONEAREST);
 	if (!force && monitor == hCurrentMonitor && defaultRenderingParams) {
-		// monitor not changed and not called from WM_SETTINGCHANGE
 		return false;
 	}
 

@@ -46,6 +46,10 @@ size_t UTF8PositionFromUTF16Position(std::string_view u8Text, size_t positionUTF
 	return positionUTF8;
 }
 
+// https://www.unicode.org/faq/utf_bom.html
+#define SURROGATE_OFFSET			(0x10000 - (0xD800 << 10) - 0xDC00)
+#define UTF16_TO_UTF32(lead, trail)	(((lead) << 10) + (trail) + SURROGATE_OFFSET)
+
 void UTF8FromUTF16(std::wstring_view wsv, char *putf, size_t len) noexcept {
 	size_t k = 0;
 	for (size_t i = 0; i < wsv.length() && wsv[i];) {
@@ -58,7 +62,7 @@ void UTF8FromUTF16(std::wstring_view wsv, char *putf, size_t len) noexcept {
 		} else if ((uch >= SURROGATE_LEAD_FIRST) && (uch <= SURROGATE_TRAIL_LAST)) {
 			// Half a surrogate pair
 			i++;
-			const unsigned int xch = 0x10000 | ((uch & 0x3ff) << 10) | (wsv[i] & 0x3ff);
+			const unsigned int xch = UTF16_TO_UTF32(uch, wsv[i]);
 			putf[k++] = static_cast<char>(0xF0 | (xch >> 18));
 			putf[k++] = static_cast<char>(0x80 | ((xch >> 12) & 0x3f));
 			putf[k++] = static_cast<char>(0x80 | ((xch >> 6) & 0x3f));
