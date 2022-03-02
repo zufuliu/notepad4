@@ -439,20 +439,17 @@ class ScintillaWin final :
 	// The current input Language ID.
 	LANGID inputLang = LANG_USER_DEFAULT;
 
-#if defined(USE_D2D)
 	bool renderTargetValid = true;
 	ID2D1RenderTarget *pRenderTarget = nullptr;
 	// rendering parameters for current monitor
 	HMONITOR hCurrentMonitor {};
 	std::unique_ptr<IDWriteRenderingParams, UnknownReleaser> defaultRenderingParams;
 	std::unique_ptr<IDWriteRenderingParams, UnknownReleaser> customRenderingParams;
-#endif
 
 	explicit ScintillaWin(HWND hwnd) noexcept;
 	// ~ScintillaWin() in public section
 
 	void Finalise() noexcept override;
-#if defined(USE_D2D)
 	SurfaceMode GetSurfaceMode(int codePage) const noexcept override {
 		return { codePage, BidirectionalR2L(), defaultRenderingParams.get(), customRenderingParams.get() };
 	}
@@ -461,9 +458,6 @@ class ScintillaWin final :
 	void DropRenderTarget() noexcept {
 		ReleaseUnknown(pRenderTarget);
 	}
-#else
-	static constexpr void DropRenderTarget() noexcept {}
-#endif
 	HWND MainHWND() const noexcept {
 		return HwndFromWindow(wMain);
 	}
@@ -724,7 +718,6 @@ void ScintillaWin::Finalise() noexcept {
 	::RevokeDragDrop(MainHWND());
 }
 
-#if defined(USE_D2D)
 bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 	HMONITOR monitor = ::MonitorFromWindow(MainHWND(), MONITOR_DEFAULTTONEAREST);
 	if (!force && monitor == hCurrentMonitor && defaultRenderingParams) {
@@ -820,7 +813,6 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 		}
 	}
 }
-#endif
 
 void ScintillaWin::DisplayCursor(Window::Cursor c) noexcept {
 	if (cursorMode != CursorShape::Normal) {
@@ -1035,7 +1027,6 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 			surfaceWindow->Release();
 		}
 	} else {
-#if defined(USE_D2D)
 		EnsureRenderTarget(hdc);
 		if (pRenderTarget) {
 			AutoSurface surfaceWindow(pRenderTarget, this);
@@ -1050,7 +1041,6 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 				}
 			}
 		}
-#endif
 	}
 
 	return true;
@@ -1641,13 +1631,11 @@ sptr_t ScintillaWin::ShowContextMenu(unsigned int iMessage, uptr_t wParam, sptr_
 #endif
 
 void ScintillaWin::SizeWindow() {
-#if defined(USE_D2D)
 	if (paintState == PaintState::notPainting) {
 		DropRenderTarget();
 	} else {
 		renderTargetValid = false;
 	}
-#endif
 	//Platform::DebugPrintf("Scintilla WM_SIZE %d %d\n", LOWORD(lParam), HIWORD(lParam));
 	rectangleClient = wMain.GetClientPosition();
 	ChangeSize();
@@ -2146,15 +2134,11 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 			(technologyNew == Technology::DirectWrite)) {
 			if (technology != technologyNew) {
 				if (technologyNew != Technology::Default) {
-#if defined(USE_D2D)
 					if (!LoadD2D()) {
 						// Failed to load Direct2D or DirectWrite so no effect
 						return 0;
 					}
 					UpdateRenderingParams(true);
-#else
-					return 0;
-#endif
 				} else {
 					bidirectional = Bidirectional::Disabled;
 				}
@@ -2281,11 +2265,9 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 		case WM_SETTINGCHANGE:
 			//Platform::DebugPrintf("Setting Changed\n");
-#if defined(USE_D2D)
 			if (technology != Technology::Default) {
 				UpdateRenderingParams(true);
 			}
-#endif
 			UpdateBaseElements();
 			InvalidateStyleData();
 			// Get Intellimouse scroll line parameters
@@ -2359,13 +2341,11 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
 		case WM_WINDOWPOSCHANGED:
-#if defined(USE_D2D)
 			if (technology != Technology::Default) {
 				if (UpdateRenderingParams(false)) {
 					Redraw();
 				}
 			}
-#endif
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
 		case WM_GETTEXTLENGTH:
@@ -4019,15 +3999,12 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 				PAINTSTRUCT ps;
 				::BeginPaint(hWnd, &ps);
 				std::unique_ptr<Surface> surfaceWindow(Surface::Allocate(sciThis->technology));
-#if defined(USE_D2D)
 				ID2D1HwndRenderTarget *pCTRenderTarget = nullptr;
-#endif
 				RECT rc;
 				GetClientRect(hWnd, &rc);
 				if (sciThis->technology == Technology::Default) {
 					surfaceWindow->Init(ps.hdc, hWnd);
 				} else {
-#if defined(USE_D2D)
 					// Create a Direct2D render target.
 					D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp {};
 					dhrtp.hwnd = hWnd;
@@ -4055,18 +4032,14 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 						surfaceWindow->Init(pCTRenderTarget, hWnd);
 						pCTRenderTarget->BeginDraw();
 					}
-#endif
 				}
 				surfaceWindow->SetMode(sciThis->GetSurfaceMode(sciThis->ct.codePage));
 				sciThis->ct.PaintCT(surfaceWindow.get());
-#if defined(USE_D2D)
-				if (pCTRenderTarget)
+				if (pCTRenderTarget) {
 					pCTRenderTarget->EndDraw();
-#endif
+				}
 				surfaceWindow->Release();
-#if defined(USE_D2D)
 				ReleaseUnknown(pCTRenderTarget);
-#endif
 				::EndPaint(hWnd, &ps);
 				return 0;
 			} else if ((iMessage == WM_NCLBUTTONDOWN) || (iMessage == WM_NCLBUTTONDBLCLK)) {

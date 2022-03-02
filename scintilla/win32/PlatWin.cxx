@@ -153,7 +153,6 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 
 namespace Scintilla::Internal {
 
-#if defined(USE_D2D)
 IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
 IDWriteGdiInterop *gdiInterop = nullptr;
@@ -242,16 +241,13 @@ bool LoadD2D() noexcept {
 #endif
 	return pIDWriteFactory && pD2DFactory;
 }
-#endif
 
 namespace {
 
 // Both GDI and DirectWrite can produce a HFONT for use in list boxes
 struct FontWin final : public Font {
 	HFONT hfont{};
-#if defined(USE_D2D)
 	IDWriteTextFormat *pTextFormat = nullptr;
-#endif
 	FontQuality extraFontFlag;
 	FLOAT yAscent = 2.0f;
 	FLOAT yDescent = 1.0f;
@@ -261,7 +257,6 @@ struct FontWin final : public Font {
 		hfont(hfont_),
 		extraFontFlag(extraFontFlag_),
 		lf(lf_) {}
-#if defined(USE_D2D)
 	FontWin(const LOGFONTW &lf_, IDWriteTextFormat *pTextFormat_,
 		FontQuality extraFontFlag_,
 		FLOAT yAscent_,
@@ -273,18 +268,16 @@ struct FontWin final : public Font {
 		yDescent(yDescent_),
 		yInternalLeading(yInternalLeading_),
 		lf(lf_) {}
-#endif
 	FontWin(const FontWin &) = delete;
 	FontWin(FontWin &&) = delete;
 	FontWin &operator=(const FontWin &) = delete;
 	FontWin &operator=(FontWin &&) = delete;
 
 	~FontWin() noexcept override {
-		if (hfont)
+		if (hfont) {
 			::DeleteObject(hfont);
-#if defined(USE_D2D)
+		}
 		ReleaseUnknown(pTextFormat);
-#endif
 	}
 	HFONT HFont() const noexcept {
 		return ::CreateFontIndirectW(&lf);
@@ -303,7 +296,6 @@ HINSTANCE hinstPlatformRes {};
 constexpr Supports SupportsGDI =
 	Supports::PixelModification;
 
-#if defined(USE_D2D)
 constexpr D2D1_TEXT_ANTIALIAS_MODE DWriteMapFontQuality(FontQuality extraFontFlag) noexcept {
 	constexpr UINT mask = (D2D1_TEXT_ANTIALIAS_MODE_DEFAULT << static_cast<int>(FontQuality::QualityDefault))
 		| (D2D1_TEXT_ANTIALIAS_MODE_ALIASED << (2 * static_cast<int>(FontQuality::QualityNonAntialiased)))
@@ -355,7 +347,6 @@ bool GetDWriteFontProperties(const LOGFONTW &lf, std::wstring &wsFamily,
 	}
 	return success;
 }
-#endif
 
 }
 
@@ -372,7 +363,6 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
 		return std::make_shared<FontGDI>(lf, hfont, fp.extraFontFlag);
 	} else {
-#if defined(USE_D2D)
 		IDWriteTextFormat *pTextFormat = nullptr;
 		std::wstring wsFamily;
 		const FLOAT fHeight = static_cast<FLOAT>(fp.size);
@@ -420,7 +410,6 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 			}
 			return std::make_shared<FontDirectWrite>(lf, pTextFormat, fp.extraFontFlag, yAscent, yDescent, yInternalLeading);
 		}
-#endif
 	}
 	return {};
 }
@@ -1347,8 +1336,6 @@ void SurfaceGDI::FlushCachedState() noexcept {
 
 void SurfaceGDI::FlushDrawing() noexcept {
 }
-
-#if defined(USE_D2D)
 
 namespace {
 
@@ -2757,17 +2744,11 @@ void SurfaceD2D::FlushDrawing() noexcept {
 	}
 }
 
-#endif
-
 std::unique_ptr<Surface> Surface::Allocate(Technology technology) {
-#if defined(USE_D2D)
 	if (technology == Technology::Default)
 		return std::make_unique<SurfaceGDI>();
 	else
 		return std::make_unique<SurfaceD2D>();
-#else
-	return std::make_unique<SurfaceGDI>();
-#endif
 }
 
 void Window::Destroy() noexcept {
@@ -3324,7 +3305,6 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 					pimage->GetWidth(), pimage->GetHeight(), pimage->Pixels());
 				::SetTextAlign(pDrawItem->hDC, TA_TOP);
 			} else {
-#if defined(USE_D2D)
 				const D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
 					D2D1_RENDER_TARGET_TYPE_DEFAULT,
 					D2D1::PixelFormat(
@@ -3353,7 +3333,6 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 						ReleaseUnknown(pDCRT);
 					}
 				}
-#endif
 			}
 		}
 	}
@@ -4064,7 +4043,6 @@ void Platform_Initialise(void *hInstance) noexcept {
 }
 
 void Platform_Finalise(bool fromDllMain) noexcept {
-#if defined(USE_D2D)
 	if (!fromDllMain) {
 		ReleaseUnknown(gdiInterop);
 		ReleaseUnknown(pIDWriteFactory);
@@ -4078,7 +4056,6 @@ void Platform_Finalise(bool fromDllMain) noexcept {
 			hDLLD2D = {};
 		}
 	}
-#endif
 #if !NP2_HAS_GETDPIFORWINDOW
 	if (!fromDllMain && hShcoreDLL) {
 		FreeLibrary(hShcoreDLL);

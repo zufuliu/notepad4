@@ -27,11 +27,6 @@
 #define USER_DEFAULT_SCREEN_DPI		96
 #endif
 
-#if !defined(DISABLE_D2D)
-#define USE_D2D		1
-#endif
-
-#if defined(USE_D2D)
 #if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 #pragma warning(push)
 #pragma warning(disable: 4458)
@@ -42,7 +37,6 @@
 #include <dwrite.h>
 #if defined(_MSC_BUILD) && (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 #pragma warning(pop)
-#endif
 #endif
 
 // force compile C as CPP
@@ -203,10 +197,8 @@ constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
 	return static_cast<BYTE>((mask >> (4*static_cast<int>(extraFontFlag & FontQuality::QualityMask))) & 15);
 }
 
-#if defined(USE_D2D)
 extern bool LoadD2D() noexcept;
 extern ID2D1Factory *pD2DFactory;
 extern IDWriteFactory *pIDWriteFactory;
-#endif
 
 }
