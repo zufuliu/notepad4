@@ -68,6 +68,33 @@ extern "C" const GUID __declspec(selectany) IID_IHanjaDic =
 { 0xad75f3ac, 0x18cd, 0x48c6, { 0xa2, 0x7d, 0xf1, 0xe9, 0xa7, 0xdc, 0xe4, 0x32 } };
 #endif
 
+#if 0
+class ScopedBSTR {
+	BSTR bstr = nullptr;
+public:
+	ScopedBSTR(BSTR value = nullptr) noexcept : bstr{value} {}
+	// Deleted so ScopedBSTR objects can not be copied. Moves are OK.
+	ScopedBSTR(const ScopedBSTR &) = delete;
+	ScopedBSTR &operator=(const ScopedBSTR &) = delete;
+	// Moves are OK.
+	ScopedBSTR(ScopedBSTR &&) = default;
+	ScopedBSTR &operator=(ScopedBSTR &&) = default;
+	~ScopedBSTR() {
+		SysFreeString(bstr);
+	}
+
+	BSTR get() const noexcept {
+		return bstr;
+	}
+	void reset(BSTR value = nullptr) noexcept {
+		// https://en.cppreference.com/w/cpp/memory/unique_ptr/reset
+		BSTR old = bstr;
+		bstr = value;
+		SysFreeString(old);
+	}
+};
+#endif
+
 class HanjaDic {
 	std::unique_ptr<IHanjaDic, UnknownReleaser> HJinterface;
 
@@ -113,13 +140,14 @@ public:
 		const HRESULT hr = HJinterface->HanjaToHangul(bstrHanja, pbstrHangul);
 		return SUCCEEDED(hr);
 	}
-
-	bool HanjaToHangul(BSTR bstrHanja, UniqueBSTR &bstrHangul) const noexcept {
+#if 0
+	bool HanjaToHangul(BSTR bstrHanja, ScopedBSTR &bstrHangul) const noexcept {
 		BSTR result = nullptr;
 		const HRESULT hr = HJinterface->HanjaToHangul(bstrHanja, &result);
 		bstrHangul.reset(result);
 		return SUCCEEDED(hr);
 	}
+#endif
 };
 
 struct HanjaDicCloser {
@@ -141,11 +169,11 @@ bool GetHangulOfHanja(std::wstring &inout) noexcept {
 		for (wchar_t &character : inout) {
 			if (dict.IsHanja(character)) { // Pass hanja only!
 #if 0
-				const UniqueBSTR bstrHanja{SysAllocStringLen(&character, 1)};
-				UniqueBSTR bstrHangul;
+				const ScopedBSTR bstrHanja{SysAllocStringLen(&character, 1)};
+				ScopedBSTR bstrHangul;
 				if (dict.HanjaToHangul(bstrHanja.get(), bstrHangul)) {
 					changed = true;
-					character = bstrHangul[0];
+					character = bstrHangul.get()[0];
 				}
 #else
 				BSTR bstrHanja = SysAllocStringLen(&character, 1);
@@ -191,17 +219,16 @@ bool GetHangulOfHanja2(std::wstring &inout) {
 				while (next != inout.cend() && dict.IsHanja(*next)) {
 					++next;
 				}
-				const UniqueBSTR bstrHanja{SysAllocStringLen(&*it, static_cast<UINT>(next - it))};
-				BSTR temp = nullptr;
-				converted = dict.HanjaToHangul(bstrHanja.get(), &temp);
-				const UniqueBSTR bstrHangul{temp};
+				const ScopedBSTR bstrHanja{SysAllocStringLen(&*it, static_cast<UINT>(next - it))};
+				ScopedBSTR bstrHangul;
+				converted = dict.HanjaToHangul(bstrHanja.get(), bstrHangul);
 				if (converted) {
 					changed = true;
 					it = next;
 					const UINT len = SysStringLen(bstrHangul.get());
 					//printf("converted %u => %u\n", SysStringLen(bstrHanja.get()), len);
 					for (UINT i = 0; i < len; i++) {
-						result.push_back(bstrHangul[i]);
+						result.push_back(bstrHangul.get()[i]);
 					}
 				}
 			}

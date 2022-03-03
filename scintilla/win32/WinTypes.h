@@ -38,14 +38,6 @@ struct UnknownReleaser {
 	}
 };
 
-struct BSTRDeleter {
-	void operator()(BSTR bstr) const noexcept {
-		SysFreeString(bstr);
-	}
-};
-
-using UniqueBSTR = std::unique_ptr<OLECHAR[], BSTRDeleter>;
-
 /// Find a function in a DLL and convert to a function pointer.
 /// This avoids undefined and conditionally defined behaviour.
 template<typename T>
