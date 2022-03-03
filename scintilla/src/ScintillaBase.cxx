@@ -492,16 +492,13 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	if (wMargin.Created()) {
 		pt = pt + GetVisibleOriginInMain();
 	}
+	AutoSurface surfaceMeasure(this);
 	PRectangle rc = ct.CallTipStart(sel.MainCaret(), pt,
 		vs.lineHeight,
 		defn,
-		style.fontName,
-		style.sizeZoomed,
 		CodePage(),
-		style.characterSet,
-		vs.technology,
-		vs.localeName.c_str(),
-		wMain);
+		surfaceMeasure,
+		style.font);
 	// If the call-tip window would be out of the client
 	// space
 	const PRectangle rcClient = GetClientRectangle();

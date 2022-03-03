@@ -2267,6 +2267,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			//Platform::DebugPrintf("Setting Changed\n");
 			if (technology != Technology::Default) {
 				UpdateRenderingParams(true);
+				//DropGraphics(); // no bufferedDraw
 			}
 			UpdateBaseElements();
 			InvalidateStyleData();
@@ -2343,6 +2344,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_WINDOWPOSCHANGED:
 			if (technology != Technology::Default) {
 				if (UpdateRenderingParams(false)) {
+					//DropGraphics(); // no bufferedDraw
 					Redraw();
 				}
 			}

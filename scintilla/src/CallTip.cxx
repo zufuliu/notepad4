@@ -279,24 +279,14 @@ void CallTip::MouseClick(Point pt) noexcept {
 }
 
 PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
-	const char *faceName, int size,
-	int codePage_, CharacterSet characterSet,
-	Technology technology,
-	const char *localeName,
-	const Window &wParent) {
+	int codePage_, Surface *surfaceMeasure, std::shared_ptr<Font> font_) {
 	clickPlace = 0;
 	val = defn;
 	codePage = codePage_;
-	std::unique_ptr<Surface> surfaceMeasure = Surface::Allocate(technology);
-	surfaceMeasure->Init(wParent.GetID());
-	surfaceMeasure->SetMode({codePage, false});
 	highlight = Chunk();
 	inCallTipMode = true;
 	posStartCallTip = pos;
-	const XYPOSITION deviceHeight = static_cast<XYPOSITION>(surfaceMeasure->DeviceHeightFont(size));
-	const FontParameters fp(faceName, deviceHeight / FontSizeMultiplier, FontWeight::Normal,
-		false, FontQuality::QualityDefault, technology, characterSet, localeName);
-	font = Font::Allocate(fp);
+	font = std::move(font_);
 	// Look for multiple lines in the text
 	// Only support \n here - simply means container must avoid \r!
 	const int numLines = 1 + static_cast<int>(std::count(val.begin(), val.end(), '\n'));
@@ -308,7 +298,7 @@ PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, co
 #if !PLAT_CURSES
 	widthArrow = lineHeight * 9 / 10;
 #endif
-	const int width = PaintContents(surfaceMeasure.get(), false) + insetX + innerMarginX;
+	const int width = PaintContents(surfaceMeasure, false) + insetX + innerMarginX;
 
 	// The returned
 	// rectangle is aligned to the right edge of the last arrow encountered in

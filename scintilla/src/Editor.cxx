@@ -1739,6 +1739,7 @@ void Editor::PaintSelMargin(Surface *surfaceWindow, PRectangle rc) {
 	Surface *surface;
 	if (view.bufferedDraw) {
 		surface = marginView.pixmapSelMargin.get();
+		surface->SetMode(CurrentSurfaceMode());
 	} else {
 		surface = surfaceWindow;
 	}

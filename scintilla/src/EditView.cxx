@@ -618,7 +618,7 @@ struct LayoutWorker {
 		if (vstyle.technology == Technology::Default) {
 			surf = Surface::Allocate(Technology::Default);
 			surf->Init(nullptr);
-			surf->SetMode({model.pdoc->dbcsCodePage, false});
+			surf->SetMode(model.CurrentSurfaceMode());
 			surface = surf.get();
 		}
 
@@ -2746,8 +2746,8 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 		if (bufferedDraw) {
 			surface = pixmapLine.get();
 			PLATFORM_ASSERT(pixmapLine->Initialised());
+			surface->SetMode(model.CurrentSurfaceMode());
 		}
-		surface->SetMode(model.CurrentSurfaceMode());
 
 		const Point ptOrigin = model.GetVisibleOriginInMain();
 
