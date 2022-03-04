@@ -127,9 +127,9 @@ def BuildKeywordContent(rid, keywordList, keywordCount=16):
 		AllKeywordAttrList[rid] = nonzero
 	return output
 
-def UpdateKeywordFile(rid, path, keywordList, keywordCount=16):
+def UpdateKeywordFile(rid, path, keywordList, keywordCount=16, suffix=''):
 	output = BuildKeywordContent(rid, keywordList, keywordCount=keywordCount)
-	Regenerate(path, '//', output)
+	Regenerate(path, '//' + suffix, output)
 
 def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
@@ -1463,6 +1463,14 @@ def parse_llvm_api_file(path):
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('attribute', keywordMap['attribute'], KeywordAttr.Default),
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
+	]
+
+def parse_markdown_api_file(path):
+	blockTag = ['pre', 'script', 'style', 'textarea'] # type 1
+	type6 = "address, article, aside, base, basefont, blockquote, body, caption, center, col, colgroup, dd, details, dialog, dir, div, dl, dt, fieldset, figcaption, figure, footer, form, frame, frameset, h1, h2, h3, h4, h5, h6, head, header, hr, html, iframe, legend, li, link, main, menu, menuitem, nav, noframes, ol, optgroup, option, p, param, section, source, summary, table, tbody, td, tfoot, th, thead, title, tr, track, ul"
+	blockTag.extend(type6.replace(',', ' ').split())
+	return [
+		('html block tag', blockTag, KeywordAttr.NoAutoComp),
 	]
 
 def parse_nsis_api_file(path):

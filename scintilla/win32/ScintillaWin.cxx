@@ -2147,7 +2147,6 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 				technology = technologyNew;
 				// Invalidate all cached information including layout.
 				vs.fontsValid = false;
-				DropGraphics();
 				InvalidateStyleRedraw();
 			}
 		}
@@ -2160,7 +2159,6 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 			bidirectional = static_cast<Bidirectional>(wParam);
 		}
 		// Invalidate all cached information including layout.
-		DropGraphics();
 		InvalidateStyleRedraw();
 		break;
 
@@ -2267,7 +2265,6 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			//Platform::DebugPrintf("Setting Changed\n");
 			if (technology != Technology::Default) {
 				UpdateRenderingParams(true);
-				//DropGraphics(); // no bufferedDraw
 			}
 			UpdateBaseElements();
 			InvalidateStyleData();

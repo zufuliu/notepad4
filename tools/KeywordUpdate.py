@@ -32,6 +32,7 @@ def update_all_keyword():
 		('NP2LEX_JULIA', 'stlJulia.c', 'Julia.jl', 0, parse_julia_api_file),
 		('NP2LEX_LLVM', 'stlLLVM.c', 'LLVM.ll', 0, parse_llvm_api_file),
 		('NP2LEX_LUA', 'stlLua.c', 'Lua.lua', 0, parse_lua_api_file),
+		('NP2LEX_MARKDOWN', 'stlDefault.c', '', (0, 'markdown'), parse_markdown_api_file),
 		('NP2LEX_NSIS', 'stlNsis.c', 'NSIS.nsi', 0, parse_nsis_api_file),
 		('NP2LEX_PYTHON', 'stlPython.c', 'Python.py', 0, parse_python_api_file),
 		('NP2LEX_R', 'stlR.c', 'R.r', 0, parse_r_api_file),
@@ -62,7 +63,12 @@ def update_all_keyword():
 			keywordList = parse(pathList)
 		if keywordList:
 			output = '../src/EditLexers/' + output
-			UpdateKeywordFile(rid, output, keywordList, numKeyword - count)
+			if isinstance(count, tuple):
+				num, suffix = count
+			else:
+				num = count
+				suffix = ''
+			UpdateKeywordFile(rid, output, keywordList, numKeyword - num, suffix)
 
 	update_lexer_keyword_attr('../src/Styles.c')
 

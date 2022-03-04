@@ -46,7 +46,7 @@ enum class Markdown {
 
 enum class HtmlTagState {
 	None,
-	Question,
+	Inline,
 	Open,
 	Value,
 };
@@ -89,9 +89,16 @@ constexpr bool IsHeaderStyle(int state) noexcept {
 	return state >= SCE_MARKDOWN_HEADER1 && state <= SCE_MARKDOWN_SETEXT_H2;
 }
 
+#define SCE_H_BLOCK_TAG			SCE_H_TAGEND	// style for block tag name
+#define SCE_H_PROCESS_TEXT		SCE_H_SGML_BLOCK_DEFAULT
 constexpr bool IsHtmlBlockStyle(int state) noexcept {
-	// always treat SCE_H_TAG as inline style
-	return state == SCE_H_COMMENT || state == SCE_H_CDATA || state == SCE_H_QUESTION;
+	return state == SCE_H_BLOCK_TAG
+		|| state == SCE_H_COMMENT
+		|| state == SCE_H_CDATA
+		|| state == SCE_H_SGML_COMMAND
+		|| state == SCE_H_SGML_DEFAULT
+		|| state == SCE_H_PROCESS_TEXT
+		|| state == SCE_H_QUESTION;
 }
 
 constexpr bool IsBlockStyle(int state) noexcept {
@@ -260,16 +267,21 @@ struct MarkdownLexer {
 	int periodCount = 0; // autoLink domain and path
 	AutoLink autoLink = AutoLink::None;
 	const Markdown markdown;
+	const WordList &blockTagList;
 
-	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
+	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler):
 		sc(startPos, lengthDoc, initStyle, styler),
-		markdown{static_cast<Markdown>(styler.GetPropertyInt("lexer.lang"))} {}
+		markdown{static_cast<Markdown>(styler.GetPropertyInt("lexer.lang"))},
+		blockTagList{*keywordLists[0]} {}
 
 	void SaveOuterStyle(int style) {
 		nestedState.push_back(style);
 	}
 	int TakeOuterStyle() {
 		return TakeAndPop(nestedState);
+	}
+	int TryTakeOuterStyle() {
+		return TryTakeAndPop(nestedState);
 	}
 	void DropOuterStyle() {
 		nestedState.pop_back();
@@ -296,6 +308,9 @@ struct MarkdownLexer {
 	int HighlightBlockText(uint32_t lineState);
 	void HighlightInlineText();
 
+	bool CheckHtmlBlockTag(Sci_PositionU startPos, int chNext, bool paragraph) const noexcept;
+	bool HandleHtmlTag(bool blockOnly);
+
 	bool CheckDefinitionList(Sci_PositionU startPos, uint32_t lineState) const noexcept;
 	int GetListChildIndentCount(int indentCurrent) const noexcept;
 
@@ -313,7 +328,7 @@ struct MarkdownLexer {
 	bool DetectAutoLink();
 	bool HighlightAutoLink();
 
-	void HighlightDelimiterRow(uint32_t lineState);
+	void HighlightDelimiterRow();
 	bool HighlightCriticMarkup();
 };
 
@@ -383,9 +398,23 @@ int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimit
 	return count;
 }
 
+int GetBlockStyle(const LexAccessor &styler, Sci_Line line, int lineState) noexcept {
+	Sci_PositionU pos = styler.LineStart(line);
+	pos += GetIndentCount(lineState);
+	int style = styler.BufferStyleAt(pos);
+	if (style == SCE_H_TAG) {
+		// <script> </script>
+		style = styler.BufferStyleAt(pos + 1);
+		if (style == SCE_H_TAG) {
+			style = styler.BufferStyleAt(pos + 2);
+		}
+	}
+	return style;
+}
+
 // 4.10 Tables (extension)
 // https://pandoc.org/MANUAL.html#tables
-void MarkdownLexer::HighlightDelimiterRow(uint32_t lineState) {
+void MarkdownLexer::HighlightDelimiterRow() {
 	bool pipe = false;
 	bool minus = false;
 	bool plus = false;
@@ -413,12 +442,8 @@ void MarkdownLexer::HighlightDelimiterRow(uint32_t lineState) {
 				if (sc.ch == ':' && (sc.chNext == ':' || IsSpaceOrTab(sc.chNext))) {
 					// Pandoc fenced divs
 					// Pandoc, MultiMarkdown, PHP Markdown Extra definition list
-					int style = SCE_MARKDOWN_DEFINITION_LIST;
-					if (sc.chNext == ':' || markdown != Markdown::Pandoc || !CheckDefinitionList(sc.currentPos, lineState)) {
-						style = SCE_MARKDOWN_DELIMITER;
-						SaveOuterStyle(SCE_MARKDOWN_DEFAULT);
-					}
-					sc.SetState(style);
+					SaveOuterStyle(SCE_MARKDOWN_DEFAULT);
+					sc.SetState(SCE_MARKDOWN_DELIMITER);
 				}
 				return;
 			}
@@ -544,9 +569,7 @@ bool MarkdownLexer::CheckDefinitionList(Sci_PositionU startPos, uint32_t lineSta
 		return true; // teat as multiple definitions
 	}
 
-	startPos = sc.styler.LineStart(termLine);
-	startPos += GetIndentCount(lineState);
-	const int style = sc.styler.BufferStyleAt(startPos);
+	const int style = GetBlockStyle(sc.styler, termLine, lineState);
 	return style == SCE_MARKDOWN_DEFINITION_LIST || !IsBlockStyle(style);
 }
 
@@ -578,10 +601,7 @@ uint32_t MarkdownLexer::HighlightIndentedText(uint32_t lineState, int indentCoun
 		return lineState;
 	}
 	if ((lineState & LineStateBlockMask) == 0 && sc.currentLine != 0) {
-		indentCount = GetIndentCount(lineState);
-		Sci_PositionU pos = sc.styler.LineStart(sc.currentLine - 1);
-		pos += indentCount;
-		const int style = sc.styler.BufferStyleAt(pos);
+		const int style = GetBlockStyle(sc.styler, sc.currentLine - 1, lineState);
 		if (!IsBlockStyle(style)) {
 			return lineState;
 		}
@@ -650,7 +670,7 @@ int MarkdownLexer::UpdateParentIndentCount(int indentCurrent) noexcept {
 		--line;
 		const uint32_t lineState = sc.styler.GetLineState(line);
 		const auto tag = static_cast<HtmlTagState>(lineState & LineStateHtmlTagMask);
-		if (tag > HtmlTagState::Question) {
+		if (tag != HtmlTagState::None) {
 			continue;
 		}
 		if (lineState & LineStateEmptyLine) {
@@ -671,9 +691,7 @@ int MarkdownLexer::UpdateParentIndentCount(int indentCurrent) noexcept {
 				if (lineState & LineStateBlockMask) {
 					break;
 				}
-				Sci_PositionU pos = sc.styler.LineStart(line);
-				pos += indentCount;
-				const int style = sc.styler.BufferStyleAt(pos);
+				const int style = GetBlockStyle(sc.styler, line, lineState);
 				if (IsBlockStyle(style)) {
 					break;
 				}
@@ -1230,8 +1248,116 @@ constexpr bool IsHtmlAttrChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == ':' || ch == '.' || ch == '-';
 }
 
-constexpr bool IsHtmlBlockStartChar(int ch) noexcept {
-	return ch == '!' || ch == '?' || ch == '/' || IsHtmlTagStart(ch);
+// 4.6 HTML blocks
+bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, int chNext, bool paragraph) const noexcept {
+	char tag[16]{};
+	pos += 1 + (chNext == '/');
+	sc.styler.GetRangeLowered(pos, pos + sizeof(tag), tag, sizeof(tag) - 1);
+	char *ptr = tag;
+	while (IsLowerCase(*ptr)) {
+		++ptr;
+	}
+	if (IsADigit(*ptr)) {
+		++ptr;
+	}
+
+	uint8_t ch = *ptr;
+	bool complete = (ch == '>') || (chNext != '/' && (IsASpace(ch) || (ch == '/' && ptr[1] == '>')));
+	if (complete) {
+		// check type 1 and type 6 tag
+		*ptr = '\0';
+		if (blockTagList.InList(tag)) {
+			return true;
+		}
+	}
+	if (!paragraph) {
+		// type 7 may not interrupt a paragraph
+		pos += ptr - tag;
+		if (!complete) {
+			while (true) {
+				ch = sc.styler.SafeGetCharAt(pos++);
+				if (!IsHtmlTagChar(ch)) {
+					complete = (ch == '>') || (chNext != '/' && (IsASpace(ch) || (ch == '/' && sc.styler.SafeGetCharAt(pos) == '>')));
+					break;
+				}
+			}
+		}
+		if (complete) {
+			complete = chNext == '/';
+			pos += ch == '/';
+			uint8_t quote = '\0'; // ignore character inside attribute string
+			while (pos < sc.lineStartNext) {
+				ch = sc.styler.SafeGetCharAt(pos++);
+				if (!IsASpace(ch)) {
+					if (complete) {
+						return false;
+					}
+					if (ch == '\'' || ch == '\"') {
+						if (quote == '\0') {
+							quote = ch;
+						} else if (quote == ch) {
+							quote = '\0';
+						}
+					} else if (ch == '>' && quote == '\0') {
+						complete = true;
+					}
+				}
+			}
+			return complete;
+		}
+	}
+	return false;
+}
+
+bool MarkdownLexer::HandleHtmlTag(bool blockOnly) {
+	const int current = sc.state;
+	if (sc.chNext == '!') {
+		const int chNext = sc.GetRelative(2);
+		if (chNext == '-' && sc.GetRelative(3) == '-') {
+			sc.SetState(SCE_H_COMMENT);
+			sc.Advance(3);
+		} else if (chNext == '[' && sc.styler.Match(sc.currentPos + 3, "CDATA[")) {
+			// <![CDATA[ ]]>
+			sc.SetState(SCE_H_CDATA);
+			sc.Advance(8);
+		} else if (IsAlpha(chNext)) {
+			// <!DOCTYPE html>
+			sc.SetState(SCE_H_SGML_COMMAND);
+		} else if (!blockOnly) {
+			sc.SetState(STYLE_LINK);
+		}
+	} else if (sc.chNext == '?') {
+		// <?php ?>
+		sc.SetState(SCE_H_QUESTION);
+	} else if (IsHtmlTagStart(sc.chNext) || (sc.chNext == '/' && IsHtmlTagStart(sc.GetRelative(2)))) {
+		if (blockOnly && !CheckHtmlBlockTag(sc.currentPos, sc.chNext, false)) {
+			return false;
+		}
+		sc.SetState(SCE_H_TAG);
+		if (sc.chNext == '/') {
+			sc.Forward();
+		} else {
+			tagState = HtmlTagState::Open;
+		}
+		if (blockOnly) {
+			sc.ForwardSetState(SCE_H_BLOCK_TAG);
+		}
+	} else if (!(blockOnly || IsInvalidUrlChar(sc.chNext))) {
+		sc.SetState(STYLE_LINK);
+	}
+	if (current != sc.state) {
+		if (!blockOnly) {
+			if (sc.state == STYLE_LINK) {
+				autoLink = AutoLink::Angle;
+				periodCount = 0;
+			} else if (tagState != HtmlTagState::Open) {
+				tagState = HtmlTagState::Inline;
+			}
+			SaveOuterStyle(current);
+		}
+		return true;
+	}
+	return false;
 }
 
 // https://pandoc.org/MANUAL.html#math
@@ -1295,7 +1421,21 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 		break;
 
 	case '<':
-		return IsHtmlBlockStartChar(chNext);
+		if (chNext == '?') {
+			return true;
+		}
+		if (chNext == '!') {
+			ch = sc.styler.SafeGetCharAt(pos + 2);
+			switch (ch) {
+			case '-':
+				return sc.styler.SafeGetCharAt(pos + 3) == '-';
+			case '[':
+				return sc.styler.Match(pos + 3, "CDATA[");
+			default:
+				return IsAlpha(ch);
+			}
+		}
+		return (IsHtmlTagStart(chNext) || chNext == '/') && CheckHtmlBlockTag(pos, chNext, true);
 
 	case '+':
 	case '-':
@@ -1391,11 +1531,16 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 				return 0;
 			}
 		}
+		[[fallthrough]];
+	case ':':
+		if (markdown == Markdown::Pandoc && sc.ch != '`' && IsSpaceOrTab(sc.chNext) && CheckDefinitionList(sc.currentPos, lineState)) {
+			sc.SetState(SCE_MARKDOWN_DEFINITION_LIST);
+			return 0;
+		}
 		break;
 
 	case '<':
-		if (IsHtmlBlockStartChar(sc.chNext)) {
-			HighlightInlineText();
+		if (HandleHtmlTag(true)) {
 			return 0;
 		}
 		break;
@@ -1431,26 +1576,22 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 	case '~':
 		if (IsSpaceOrTab(sc.chNext)) {
 			// Pandoc definition list
-			int style = SCE_MARKDOWN_DEFINITION_LIST;
-			if (markdown != Markdown::Pandoc || !CheckDefinitionList(sc.currentPos, lineState)) {
-				style = SCE_MARKDOWN_DELIMITER;
-				SaveOuterStyle(SCE_MARKDOWN_DEFAULT);
-			}
-			sc.SetState(style);
+			SaveOuterStyle(SCE_MARKDOWN_DEFAULT);
+			sc.SetState(SCE_MARKDOWN_DELIMITER);
 		}
 		break;
 
 	case '+':
 	case '=':
 		if (markdown == Markdown::Pandoc) {
-			HighlightDelimiterRow(lineState);
+			HighlightDelimiterRow();
 		}
 		break;
 
 	case '|':
 	case ':':
 	case '-':
-		HighlightDelimiterRow(lineState);
+		HighlightDelimiterRow();
 		break;
 	}
 	return 0;
@@ -1480,43 +1621,8 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	case '<':
-		// 4.6 HTML blocks
-		if (sc.chNext == '!') {
-			const int chNext = sc.GetRelative(2);
-			if (chNext == '-' && sc.GetRelative(3) == '-') {
-				sc.SetState(SCE_H_COMMENT);
-				sc.Advance(3);
-			} else if (chNext == '[' && sc.styler.Match(sc.currentPos + 3, "CDATA[")) {
-				// <![CDATA[ ]]>
-				sc.SetState(SCE_H_CDATA);
-				sc.Advance(8);
-			} else if (IsAlpha(chNext)) {
-				// <!DOCTYPE html>
-				tagState = HtmlTagState::Open;
-				// highlighted as tag instead of SGML
-				sc.SetState(SCE_H_TAG);
-				sc.Forward();
-			} else {
-				autoLink = AutoLink::Angle;
-				periodCount = 0;
-				sc.SetState(STYLE_LINK);
-			}
-		} else if (sc.chNext == '?') {
-			// <?php ?>
-			tagState = HtmlTagState::Question;
-			sc.SetState(SCE_H_QUESTION);
-		} else if (IsHtmlTagStart(sc.chNext) || (sc.chNext == '/' && IsHtmlTagStart(sc.GetRelative(2)))) {
-			sc.SetState(SCE_H_TAG);
-			if (sc.chNext == '/') {
-				tagState = HtmlTagState::None;
-				sc.Forward();
-			} else {
-				tagState = HtmlTagState::Open;
-			}
-		} else if (!IsInvalidUrlChar(sc.chNext)) {
-			autoLink = AutoLink::Angle;
-			periodCount = 0;
-			sc.SetState(STYLE_LINK);
+		if (HandleHtmlTag(false)) {
+			return;
 		}
 		break;
 
@@ -1637,9 +1743,7 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 	}
 	if (handled || current != sc.state) {
-		if (handled || !IsHtmlBlockStyle(sc.state)) {
-			SaveOuterStyle(current);
-		}
+		SaveOuterStyle(current);
 	} else if (bracketCount == 0) {
 		DetectAutoLink();
 	}
@@ -1730,7 +1834,7 @@ bool MarkdownLexer::HighlightCriticMarkup() {
 	return false;
 }
 
-void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
+void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	if (startPos != 0) {
 		Sci_PositionU pos = startPos;
 		const uint8_t ch = GetCharAfterSpace(styler, pos, 4);
@@ -1747,7 +1851,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		}
 	}
 
-	MarkdownLexer lexer(startPos, lengthDoc, initStyle, styler);
+	MarkdownLexer lexer(startPos, lengthDoc, initStyle, keywordLists, styler);
 	const bool fold = styler.GetPropertyBool("fold");
 
 	StyleContext &sc = lexer.sc;
@@ -2060,10 +2164,14 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		// basic html
 		case SCE_H_TAG:
+		case SCE_H_BLOCK_TAG:
 			if (sc.ch == '>' || sc.Match('/', '>')) {
+				if (sc.state == SCE_H_BLOCK_TAG) {
+					sc.SetState(SCE_H_TAG);
+				}
 				lexer.tagState = HtmlTagState::None;
 				sc.Forward((sc.ch == '/') ? 2 : 1);
-				sc.SetState(lexer.TakeOuterStyle());
+				sc.SetState(lexer.TryTakeOuterStyle());
 				continue;
 			}
 			if (!IsHtmlTagChar(sc.ch)) {
@@ -2126,20 +2234,24 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		case SCE_H_COMMENT:
 			if (sc.Match('-', '-', '>')) {
+				lexer.tagState = HtmlTagState::None;
 				sc.Advance(3);
-				sc.SetState(SCE_MARKDOWN_DEFAULT);
-			} else {
-				lexer.DetectAutoLink();
+				sc.SetState(lexer.TryTakeOuterStyle());
+				continue;
 			}
+			lexer.DetectAutoLink();
 			break;
 
 		case SCE_H_CDATA:
 			if (sc.Match(']', ']', '>')) {
+				const HtmlTagState tag = lexer.tagState;
+				lexer.tagState = HtmlTagState::None;
 				sc.Forward(3);
-				if (sc.GetLineNextChar() == '\0') {
+				if (tag == HtmlTagState::None && sc.GetLineNextChar() == '\0') {
 					lineState |= LineStateBlockEndLine;
 				} else {
-					sc.SetState(SCE_MARKDOWN_DEFAULT);
+					sc.SetState(lexer.TryTakeOuterStyle());
+					continue;
 				}
 			} else {
 				lexer.DetectAutoLink();
@@ -2147,19 +2259,49 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_H_QUESTION:
-			if (sc.Match('?', '>') || IsASpace(sc.ch)) {
-				if (sc.ch == '?') {
-					lexer.tagState = HtmlTagState::None;
-					sc.Forward(2);
+		case SCE_H_PROCESS_TEXT:
+			if (sc.Match('?', '>')) {
+				if (sc.state == SCE_H_PROCESS_TEXT) {
+					sc.SetState(SCE_H_QUESTION);
 				}
-				sc.SetState(SCE_MARKDOWN_DEFAULT);
+				lexer.tagState = HtmlTagState::None;
+				sc.Forward(2);
+				sc.SetState(lexer.TryTakeOuterStyle());
+				continue;
+			}
+			if (sc.state == SCE_H_QUESTION) {
+				if (IsASpace(sc.ch)) {
+					sc.SetState(SCE_H_PROCESS_TEXT);
+				}
+			} else {
+				lexer.DetectAutoLink();
+			}
+			break;
+
+		case SCE_H_SGML_COMMAND:
+		case SCE_H_SGML_DEFAULT:
+			if (sc.ch == '>') {
+				if (sc.state == SCE_H_SGML_DEFAULT) {
+					sc.SetState(SCE_H_SGML_COMMAND);
+				}
+				lexer.tagState = HtmlTagState::None;
+				sc.ForwardSetState(lexer.TryTakeOuterStyle());
+				continue;
+			}
+			if (sc.state == SCE_H_SGML_COMMAND) {
+				if (IsASpace(sc.ch)) {
+					sc.SetState(SCE_H_SGML_DEFAULT);
+				}
+			} else {
+				if (IsASpace(sc.chPrev) && (IsUpperCase(sc.ch) || (sc.ch == '#' && IsUpperCase(sc.chNext)))) {
+					sc.SetState(SCE_H_SGML_COMMAND);
+				}
 			}
 			break;
 		}
 
 		if (sc.state == SCE_MARKDOWN_DEFAULT) {
-			switch (lexer.tagState) {
-			case HtmlTagState::None:
+			if  (lexer.tagState == HtmlTagState::None) {
 				if (sc.ch > ' ') {
 					if (visibleChars == 0) {
 						if (indentCurrent != indentPrevious) {
@@ -2182,25 +2324,12 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 						lexer.HighlightInlineText();
 					}
 				}
-				break;
-
-			case HtmlTagState::Question:
-				if (sc.Match('?', '>')) {
-					lexer.tagState = HtmlTagState::None;
-					sc.SetState(SCE_H_QUESTION);
-					sc.Forward(2);
-					sc.SetState(SCE_MARKDOWN_DEFAULT);
-					continue;
-				}
-				lexer.DetectAutoLink();
-				break;
-
-			default:
+			} else {
 				if (sc.ch == '>' || sc.Match('/', '>')) {
 					lexer.tagState = HtmlTagState::None;
 					sc.SetState(SCE_H_TAG);
 					sc.Forward((sc.ch == '/') ? 2 : 1);
-					sc.SetState(lexer.TakeOuterStyle());
+					sc.SetState(lexer.TryTakeOuterStyle());
 					continue;
 				}
 				if (sc.ch == '\'') {
@@ -2217,7 +2346,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (sc.state != SCE_MARKDOWN_DEFAULT) {
 					lexer.tagState = (sc.state == SCE_H_OTHER) ? HtmlTagState::Value : HtmlTagState::Open;
 				}
-				break;
 			}
 		}
 
@@ -2248,6 +2376,15 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				styler.SetLevel(sc.currentLine, nextLevel);
 				prevLevel = nextLevel;
 			}
+			if (!lexer.nestedState.empty()) {
+				const int outer = lexer.nestedState.front();
+				if (IsHeaderStyle(outer)) {
+					lexer.tagState = HtmlTagState::None;
+					lexer.nestedState.clear();
+					lexer.backPos.clear();
+					sc.SetState(outer);
+				}
+			}
 
 			lineState = (lineState & LineStateBlockEndLine)
 				| static_cast<int>(lexer.tagState)
@@ -2261,7 +2398,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			if (indentChild != 0) {
 				lineState |= LineStateListItemFirstLine | (static_cast<uint32_t>(indentChild) << 24);
 			}
-			if (lexer.tagState >= HtmlTagState::Open || StyleNeedsBacktrack(sc.state) || !lexer.nestedState.empty()) {
+			if (lexer.tagState != HtmlTagState::None || StyleNeedsBacktrack(sc.state) || !lexer.nestedState.empty()) {
 				lineState |= LineStateNestedStateLine;
 			}
 			styler.SetLineState(sc.currentLine, static_cast<int>(lineState));

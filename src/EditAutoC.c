@@ -1138,6 +1138,13 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 		}
 		break;
 
+	case SCLEX_MARKDOWN:
+		if (ch == '<' || (chPrev == '<' && ch == '/')) {
+			WordList_AddList(pWList, lexHTML.pKeyWords->pszKeyWords[0]);// Tag
+			return AutoC_AddSpecWord_Keyword; // custom tags
+		}
+		break;
+
 	case SCLEX_D:
 		if ((ch == '#' || ch == '@') && iCurrentStyle == SCE_D_DEFAULT) {
 			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[(ch == '#') ? 2 : 3]); // preprocessor, attribute

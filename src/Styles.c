@@ -1413,6 +1413,9 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 	case NP2LEX_LUA:
 		attr[3] = KeywordAttr_NoLexer;		// standard library
 		break;
+	case NP2LEX_MARKDOWN:
+		attr[0] = KeywordAttr_NoAutoComp;	// html block tag
+		break;
 	case NP2LEX_NSIS:
 		attr[0] = KeywordAttr_MakeLower;	// keywords
 		attr[1] = KeywordAttr_NoLexer;		// preprocessor
