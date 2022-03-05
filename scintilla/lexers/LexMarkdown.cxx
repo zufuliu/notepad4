@@ -600,9 +600,13 @@ uint32_t MarkdownLexer::HighlightIndentedText(uint32_t lineState, int indentCoun
 	if (lineState & LineStateListItemFirstLine) {
 		return lineState;
 	}
-	if ((lineState & LineStateBlockMask) == 0 && sc.currentLine != 0) {
+	if (sc.currentLine != 0 && ((lineState & LineStateBlockMask) == 0 || sc.ch == '<')) {
 		const int style = GetBlockStyle(sc.styler, sc.currentLine - 1, lineState);
-		if (!IsBlockStyle(style)) {
+		// inner html block
+		if (style == SCE_H_BLOCK_TAG && sc.ch == '<' && HandleHtmlTag(true)) {
+			return lineState;
+		}
+		if ((lineState & LineStateBlockMask) == 0 && !IsBlockStyle(style)) {
 			return lineState;
 		}
 	}
