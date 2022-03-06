@@ -69,6 +69,59 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_RUST_TASKMARKER;
 }
 
+// https://doc.rust-lang.org/std/fmt/#syntax
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
+	Sci_PositionU pos = sc.currentPos + 1; // ':'
+	char ch = static_cast<char>(sc.chNext);
+	// [[fill] align]
+	if (!AnyOf(ch, '\r', '\n', '{', '}')) {
+		Sci_Position width = 1;
+		if (ch & 0x80) {
+			styler.GetCharacterAndWidth(pos, &width);
+		}
+		const char chNext = styler.SafeGetCharAt(pos + width);
+		if (AnyOf(ch, '<', '^', '>') || AnyOf(chNext, '<', '^', '>')) {
+			pos += 1 + width;
+			ch = styler.SafeGetCharAt(pos);
+		}
+	}
+	// [sign]['#']['0']
+	if (ch == '+' || ch == '-') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	if (ch == '#') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	if (ch == '0') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	// [width]['.' precision]type
+	for (int i = 0; i < 3; i++) {
+		if (i < 2 && ch == '.') {
+			i = 1;
+			ch = styler.SafeGetCharAt(++pos);
+			if (ch == '*') {
+				i = 2;
+				ch = styler.SafeGetCharAt(++pos);
+			}
+		}
+		while (IsIdentifierCharEx(static_cast<uint8_t>(ch))) {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		if (i < 2 && ch == '$') {
+			ch = styler.SafeGetCharAt(++pos);
+		}
+		if (ch == '?') {
+			ch = styler.SafeGetCharAt(++pos);
+			break;
+		}
+	}
+	if (ch == '}') {
+		return pos - sc.currentPos;
+	}
+	return 0;
+}
+
 void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateAttribute = 0;
 	int lineStateLineType = 0;
@@ -230,18 +283,64 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_RUST_STRING:
 		case SCE_RUST_BYTESTRING:
-			if (sc.ch == '\\') {
-				const int state = sc.state;
-				if (IsEOLChar(sc.chNext)) {
-					sc.SetState(SCE_RUST_LINE_CONTINUATION);
-					sc.ForwardSetState(state);
-				} else {
-					escSeq.resetEscapeState(state, sc.chNext);
+		case SCE_RUST_RAW_STRING:
+		case SCE_RUST_RAW_BYTESTRING:
+			switch (sc.ch) {
+			case '\\':
+				if (sc.state < SCE_RUST_RAW_STRING) {
+					const int state = sc.state;
+					if (IsEOLChar(sc.chNext)) {
+						sc.SetState(SCE_RUST_LINE_CONTINUATION);
+						sc.ForwardSetState(state);
+					} else {
+						escSeq.resetEscapeState(state, sc.chNext);
+						sc.SetState(SCE_RUST_ESCAPECHAR);
+						sc.Forward();
+					}
+				}
+				break;
+
+			case '\"':
+				if (hashCount == 0 || (sc.chNext == '#' && IsRustRawString(styler, sc.currentPos + 1, false, hashCount))) {
+					sc.Advance(hashCount);
+					hashCount = 0;
+					sc.ForwardSetState(SCE_RUST_DEFAULT);
+				}
+				break;
+
+			case '{':
+			case '}':
+				if (sc.ch == sc.chNext) {
+					escSeq.outerState = sc.state;
+					escSeq.digitsLeft = 1;
 					sc.SetState(SCE_RUST_ESCAPECHAR);
 					sc.Forward();
+				} else if (sc.ch == '{' && (sc.chNext == '}' || sc.chNext == ':' || IsIdentifierCharEx(sc.chNext))) {
+					escSeq.outerState = sc.state;
+					sc.SetState(SCE_RUST_PLACEHOLDER);
 				}
-			} else if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_RUST_DEFAULT);
+				break;
+			}
+			break;
+
+		case SCE_RUST_PLACEHOLDER:
+			if (!IsIdentifierCharEx(sc.ch)) {
+				if (sc.ch == ':') {
+					const Sci_Position length = CheckFormatSpecifier(sc, styler);
+					if (length != 0) {
+						sc.SetState(SCE_RUST_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(SCE_RUST_PLACEHOLDER);
+						sc.ForwardSetState(escSeq.outerState);
+						continue;
+					}
+				}
+				if (sc.ch != '}') {
+					sc.Rewind();
+					sc.ChangeState(escSeq.outerState);
+				}
+				sc.ForwardSetState(escSeq.outerState);
+				continue;
 			}
 			break;
 
@@ -265,17 +364,6 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (escSeq.atEscapeEnd(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 				continue;
-			}
-			break;
-
-		case SCE_RUST_RAW_STRING:
-		case SCE_RUST_RAW_BYTESTRING:
-			if (sc.ch == '\"') {
-				if (hashCount == 0 || (sc.chNext == '#' && IsRustRawString(styler, sc.currentPos + 1, false, hashCount))) {
-					sc.Advance(hashCount);
-					hashCount = 0;
-					sc.ForwardSetState(SCE_RUST_DEFAULT);
-				}
 			}
 			break;
 		}
@@ -409,6 +497,8 @@ constexpr bool IsMultilineStringStyle(int style) noexcept {
 		|| style == SCE_RUST_RAW_STRING
 		|| style == SCE_RUST_RAW_BYTESTRING
 		|| style == SCE_RUST_ESCAPECHAR
+		|| style == SCE_RUST_FORMAT_SPECIFIER
+		|| style == SCE_RUST_PLACEHOLDER
 		|| style == SCE_RUST_LINE_CONTINUATION;
 }
 

@@ -295,24 +295,20 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 	}
 
 	ch = styler.SafeGetCharAt(++pos);
-	char chNext = styler.SafeGetCharAt(pos + 1);
-	if (ch == '%' && IsDateTimeFormatSpecifier(chNext)) {
-		return pos + 2 - sc.currentPos;
+	if (ch == '%') {
+		const char chNext = styler.SafeGetCharAt(pos + 1);
+		if (IsDateTimeFormatSpecifier(chNext)) {
+			return pos + 2 - sc.currentPos;
+		}
 	}
 	// [[fill] align]
-	if (AnyOf(ch, '<', '>', '=', '^')) {
-		ch = chNext;
-		++pos;
-		if (AnyOf(ch, '<', '>', '=', '^')) {
-			ch = styler.SafeGetCharAt(++pos);
-		}
-	} else if (!AnyOf(ch, '\r', '\n', '{', '}')) {
+	if (!AnyOf(ch, '\r', '\n', '{', '}')) {
 		Sci_Position width = 1;
 		if (ch & 0x80) {
 			styler.GetCharacterAndWidth(pos, &width);
-			chNext = styler.SafeGetCharAt(pos + width);
 		}
-		if (AnyOf(chNext, '<', '>', '=', '^')) {
+		const char chNext = styler.SafeGetCharAt(pos + width);
+		if (AnyOf(ch, '<', '>', '=', '^') || AnyOf(chNext, '<', '>', '=', '^')) {
 			pos += 1 + width;
 			ch = styler.SafeGetCharAt(pos);
 		}
