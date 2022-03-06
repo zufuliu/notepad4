@@ -450,8 +450,8 @@ class ScintillaWin final :
 	// ~ScintillaWin() in public section
 
 	void Finalise() noexcept override;
-	SurfaceMode GetSurfaceMode(int codePage) const noexcept override {
-		return { codePage, BidirectionalR2L(), defaultRenderingParams.get(), customRenderingParams.get() };
+	SurfaceMode CurrentSurfaceMode() const noexcept override {
+		return { pdoc->dbcsCodePage, BidirectionalR2L(), defaultRenderingParams.get(), customRenderingParams.get() };
 	}
 	bool UpdateRenderingParams(bool force) noexcept;
 	void EnsureRenderTarget(HDC hdc) noexcept;
@@ -4032,7 +4032,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 						pCTRenderTarget->BeginDraw();
 					}
 				}
-				surfaceWindow->SetMode(sciThis->GetSurfaceMode(sciThis->ct.codePage));
+				surfaceWindow->SetMode(sciThis->CurrentSurfaceMode());
 				sciThis->ct.PaintCT(surfaceWindow.get());
 				if (pCTRenderTarget) {
 					pCTRenderTarget->EndDraw();

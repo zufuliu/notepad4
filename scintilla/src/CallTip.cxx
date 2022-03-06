@@ -68,7 +68,6 @@ CallTip::CallTip() noexcept {
 	colourSel = ColourRGBA(0, 0, 0x80);
 	colourShade = ColourRGBA(0, 0, 0);
 	colourLight = ColourRGBA(0xc0, 0xc0, 0xc0);
-	codePage = 0;
 	clickPlace = 0;
 }
 
@@ -279,14 +278,13 @@ void CallTip::MouseClick(Point pt) noexcept {
 }
 
 PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
-	int codePage_, Surface *surfaceMeasure, std::shared_ptr<Font> font_) {
+	Surface *surfaceMeasure, std::shared_ptr<Font> font_) {
 	clickPlace = 0;
 	val = defn;
-	codePage = codePage_;
 	highlight = Chunk();
 	inCallTipMode = true;
 	posStartCallTip = pos;
-	font = font_;
+	font = std::move(font_);
 	// Look for multiple lines in the text
 	// Only support \n here - simply means container must avoid \r!
 	const int numLines = 1 + static_cast<int>(std::count(val.begin(), val.end(), '\n'));

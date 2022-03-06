@@ -202,7 +202,6 @@ Editor::Editor() {
 
 Editor::~Editor() {
 	pdoc->RemoveWatcher(this, nullptr);
-	DropGraphics();
 }
 
 void Editor::Finalise() noexcept {

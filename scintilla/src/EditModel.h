@@ -74,12 +74,7 @@ public:
 	bool BidirectionalR2L() const noexcept {
 		return bidirectional == Scintilla::Bidirectional::R2L;
 	}
-	SurfaceMode CurrentSurfaceMode() const noexcept {
-		return GetSurfaceMode(pdoc->dbcsCodePage);
-	}
-	virtual SurfaceMode GetSurfaceMode(int codePage) const noexcept {
-		return { codePage, BidirectionalR2L() };
-	}
+	virtual SurfaceMode CurrentSurfaceMode() const noexcept;
 	void SetDefaultFoldDisplayText(const char *text);
 	const char *GetDefaultFoldDisplayText() const noexcept;
 	const char *GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept;
