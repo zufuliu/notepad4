@@ -136,7 +136,7 @@ static BOOL bMarkOccurrencesMatchCase;
 static BOOL bMarkOccurrencesMatchWords;
 static BOOL bMarkOccurrencesBookmark;
 EditAutoCompletionConfig autoCompletionConfig;
-static BOOL bEnableLineSelectionMode;
+static int iLineSelectionMode;
 static BOOL bShowCodeFolding;
 #if NP2_ENABLE_SHOW_CALLTIPS
 static BOOL bShowCallTips = TRUE;
@@ -2568,7 +2568,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
 	CheckCmd(hmenu, IDM_SET_LATEX_INPUT_METHOD, autoCompletionConfig.bLaTeXInputMethod);
-	CheckCmd(hmenu, IDM_SET_LINE_SELECTION_MODE, bEnableLineSelectionMode);
+	i = IDM_LINE_SELECTION_MODE_NONE + iLineSelectionMode;
+	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_NORMAL, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_OFF, !bMarkOccurrences);
 	CheckCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrencesMatchCase);
@@ -3096,10 +3097,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		if (SciCall_IsSelectionEmpty()) {
+		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
 			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Position iCol = SciCall_GetColumn(iCurrentPos) + 1;
-			SciCall_LineCut(bEnableLineSelectionMode);
+			SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
 			iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
 			EditJumpTo(iCurLine, iCol);
@@ -3119,8 +3120,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		if (SciCall_IsSelectionEmpty()) {
-			SciCall_LineCopy(bEnableLineSelectionMode);
+		if (SciCall_IsSelectionEmpty() && iLineSelectionMode != LineSelectionMode_None) {
+			SciCall_LineCopy(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		} else {
 			SciCall_Copy(FALSE);
 		}
@@ -3215,7 +3216,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_SELECTLINE:
 	case IDM_EDIT_SELECTLINE_BLOCK:
-		EditSelectLines(LOWORD(wParam) == IDM_EDIT_SELECTLINE_BLOCK, bEnableLineSelectionMode);
+		EditSelectLines(LOWORD(wParam) == IDM_EDIT_SELECTLINE_BLOCK, iLineSelectionMode & LineSelectionMode_VisualStudio);
 		break;
 
 	case IDM_EDIT_MOVELINEUP:
@@ -3238,14 +3239,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_LineCut(bEnableLineSelectionMode);
+		SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		break;
 
 	case IDM_EDIT_COPYLINE:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = TRUE;
 		}
-		SciCall_LineCopy(bEnableLineSelectionMode);
+		SciCall_LineCopy(iLineSelectionMode & LineSelectionMode_VisualStudio);
 		UpdateToolbar();
 		break;
 
@@ -4051,9 +4052,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		autoCompletionConfig.bLaTeXInputMethod = !autoCompletionConfig.bLaTeXInputMethod;
 		break;
 
-	case IDM_SET_LINE_SELECTION_MODE:
-		bEnableLineSelectionMode = !bEnableLineSelectionMode;
-		if (!bEnableLineSelectionMode) {
+	case IDM_LINE_SELECTION_MODE_NONE:
+	case IDM_LINE_SELECTION_MODE_VS:
+	case IDM_LINE_SELECTION_MODE_NORMAL:
+		iLineSelectionMode = LOWORD(wParam) - IDM_LINE_SELECTION_MODE_NONE;
+		if (iLineSelectionMode == LineSelectionMode_None) {
 			SciCall_SetSelectionMode(SC_SEL_STREAM);
 		}
 		break;
@@ -5493,7 +5496,7 @@ void LoadSettings(void) {
 	}
 	EditCompleteUpdateConfig();
 
-	bEnableLineSelectionMode = IniSectionGetBool(pIniSection, L"LineSelection", 1);
+	iLineSelectionMode = IniSectionGetBool(pIniSection, L"LineSelection", LineSelectionMode_VisualStudio);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", TRUE);
 	iValue = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
@@ -5828,7 +5831,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
 	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
-	IniSectionSetBoolEx(pIniSection, L"LineSelection", bEnableLineSelectionMode, 1);
+	IniSectionSetBoolEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, TRUE);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);

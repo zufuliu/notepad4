@@ -541,3 +541,9 @@ void FoldToggleDefault(FOLD_ACTION action);
 void FoldClickAt(Sci_Position pos, int mode);
 void FoldAltArrow(int key, int mode);
 void EditGotoBlock(int menu);
+
+enum LineSelectionMode {
+	LineSelectionMode_None,
+	LineSelectionMode_VisualStudio,
+	LineSelectionMode_Normal,
+};
