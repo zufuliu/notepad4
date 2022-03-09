@@ -123,7 +123,9 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	HWND hParent;
 	HWND hwnd = GetMsgBoxParent(&hParent);
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hParent, 0);
-	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
+	SetActiveWindow(hParent);
+	return result;
 }
 
 //=============================================================================
@@ -2629,7 +2631,9 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
 	HWND hwnd = GetMsgBoxParent(&ib.hParent);
 	MessageBeep(MB_ICONEXCLAMATION);
-	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
+	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
+	SetActiveWindow(ib.hParent);
+	return result;
 }
 
 /*

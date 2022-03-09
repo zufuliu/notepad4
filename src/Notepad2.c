@@ -5496,7 +5496,7 @@ void LoadSettings(void) {
 	}
 	EditCompleteUpdateConfig();
 
-	iLineSelectionMode = IniSectionGetBool(pIniSection, L"LineSelection", LineSelectionMode_VisualStudio);
+	iLineSelectionMode = IniSectionGetInt(pIniSection, L"LineSelection", LineSelectionMode_VisualStudio);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", TRUE);
 	iValue = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
@@ -5831,7 +5831,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
 	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
-	IniSectionSetBoolEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
+	IniSectionSetIntEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, TRUE);
 	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);
