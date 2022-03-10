@@ -1798,6 +1798,14 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 		const KeyMod modifiers = ModifierFlags(KeyboardIsKeyDown(VK_SHIFT), KeyboardIsKeyDown(VK_CONTROL), altDown);
 		const int ret = KeyDownWithModifiers(KeyTranslate(wParam), modifiers, &lastKeyDownConsumed);
 		if (!ret && !lastKeyDownConsumed) {
+#if 0
+			if (FlagSet(modifiers, KeyMod::Ctrl)) {
+				if (::SendMessage(::GetParent(MainHWND()), WM_KEYDOWN, wParam, lParam)) {
+					lastKeyDownConsumed = true;
+					break;
+				}
+			}
+#endif
 			return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 		}
 		break;
@@ -1809,6 +1817,13 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 
 	case WM_CHAR:
 		if (!lastKeyDownConsumed) {
+			// filter out control characters
+			// https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input#character-messages
+			if (wParam < ' ' && KeyboardIsKeyDown(VK_CONTROL)) {
+				::SendMessage(::GetParent(MainHWND()), WM_CHAR, wParam, lParam);
+				return 0;
+			}
+
 			const wchar_t ch = static_cast<wchar_t>(wParam);
 			wchar_t wcs[3] = { ch, 0 };
 			unsigned int wclen = 1;

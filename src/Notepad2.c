@@ -1465,6 +1465,30 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+#if 0
+	case WM_KEYDOWN: {
+		//printf("%s:%d WM_KEYDOWN %u\n", __func__, __LINE__, (UINT)wParam);
+		MSG msg;
+		ZeroMemory(&msg, sizeof(msg));
+		msg.hwnd = hwnd;
+		msg.message = WM_KEYDOWN;
+		msg.wParam = wParam;
+		msg.lParam = lParam;
+		return TranslateAccelerator(hwnd, hAccMain, &msg);
+	}
+#endif
+
+	case WM_CHAR: {
+		//printf("%s:%d WM_CHAR %u\n", __func__, __LINE__, (UINT)wParam);
+		MSG msg;
+		ZeroMemory(&msg, sizeof(msg));
+		msg.hwnd = hwnd;
+		msg.message = WM_KEYDOWN;
+		msg.lParam = lParam;
+		msg.wParam = MapVirtualKey((lParam >> 16) & 0xff, MAPVK_VSC_TO_VK);
+		TranslateAccelerator(hwnd, hAccMain, &msg);
+	} break;
+
 	case APPM_TRAYMESSAGE:
 		switch (lParam) {
 		case WM_RBUTTONUP: {
