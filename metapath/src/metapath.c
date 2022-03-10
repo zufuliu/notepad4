@@ -742,7 +742,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		HWND box = FindWindow(L"#32770", NULL);
 		HWND parent = GetParent(box);
 		// MessageBox belongs to us.
-		if (parent == (HWND)wParam || parent == hwndMain) {
+		if (parent == (HWND)wParam || parent == hwnd) {
 			CenterDlgInParentEx(box, parent);
 			SnapToDefaultButton(box);
 		}
@@ -1576,9 +1576,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			DLITEM dli;
 			dli.mask = DLI_FILENAME;
 			DirList_GetItem(hwndDirList, -1, &dli);
-			OpenContainingFolder(hwndMain, dli.szFileName, TRUE);
+			OpenContainingFolder(hwnd, dli.szFileName, TRUE);
 		} else {
-			OpenContainingFolder(hwndMain, szCurDir, FALSE);
+			OpenContainingFolder(hwnd, szCurDir, FALSE);
 		}
 	}
 	break;
@@ -1851,7 +1851,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						}
 
 						SetCurrentDirectory(szDir);
-						SendWMCommand(hwndMain, IDM_VIEW_UPDATE);
+						SendWMCommand(hwnd, IDM_VIEW_UPDATE);
 						if (!DirList_SelectItem(hwndDirList, NULL, szFullPath)) {
 							ListView_EnsureVisible(hwndDirList, 0, FALSE);
 						}

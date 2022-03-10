@@ -38,7 +38,6 @@
 #include "Version.h"
 
 extern HWND		hwndMain;
-extern HWND		hDlgFindReplace;
 extern DWORD	dwLastIOError;
 extern int		iCurrentEncoding;
 extern BOOL		bSkipUnicodeDetection;
@@ -58,16 +57,9 @@ extern EditTabSettings tabSettings;
 extern int iWrapColumn;
 extern BOOL bUseXPFileDialog;
 
-HWND GetMsgBoxParent(HWND *hParent) {
+static inline HWND GetMsgBoxParent(void) {
 	HWND hwnd = GetActiveWindow();
-	// workaround for https://github.com/zufuliu/notepad2/issues/440
-	// prevent document change by Ctrl + S (which generates WM_CHAR).
-	// NOTE: need handle other modeless dialog when added
-	*hParent = (hwnd == NULL) ? hwndMain : hwnd;
-	if (hwnd == NULL || hwnd == hDlgFindReplace) {
-		hwnd = hwndMain;
-	}
-	return hwnd;
+	return (hwnd == NULL) ? hwndMain : hwnd;
 }
 
 //=============================================================================
@@ -120,12 +112,9 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 		uType |= MB_RTLREADING;
 	}
 
-	HWND hParent;
-	HWND hwnd = GetMsgBoxParent(&hParent);
-	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hParent, 0);
-	const int result = MessageBoxEx(hwnd, szText, szTitle, uType, lang);
-	SetActiveWindow(hParent);
-	return result;
+	HWND hwnd = GetMsgBoxParent();
+	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
+	return MessageBoxEx(hwnd, szText, szTitle, uType, lang);
 }
 
 //=============================================================================
@@ -2545,7 +2534,6 @@ BOOL AutoSaveSettingsDlg(HWND hwnd) {
 //
 //
 typedef struct INFOBOX {
-	HWND hParent;
 	LPWSTR lpstrMessage;
 	LPCWSTR lpstrSetting;
 	LPCWSTR idiIcon;
@@ -2566,7 +2554,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			EnableWindow(GetDlgItem(hwnd, IDC_INFOBOXCHECK), FALSE);
 		}
 		NP2HeapFree(lpib->lpstrMessage);
-		CenterDlgInParentEx(hwnd, lpib->hParent);
+		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
 
@@ -2629,11 +2617,9 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
 
 	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
-	HWND hwnd = GetMsgBoxParent(&ib.hParent);
+	HWND hwnd = GetMsgBoxParent();
 	MessageBeep(MB_ICONEXCLAMATION);
-	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
-	SetActiveWindow(ib.hParent);
-	return result;
+	return ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(idDlg), hwnd, InfoBoxDlgProc, (LPARAM)&ib);
 }
 
 /*

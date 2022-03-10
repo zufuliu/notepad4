@@ -39,6 +39,11 @@ extern HWND hwndMain;
 extern LANGID uiLanguage;
 #endif
 
+static inline HWND GetMsgBoxParent(void) {
+	HWND hwnd = GetActiveWindow();
+	return (hwnd == NULL) ? hwndMain : hwnd;
+}
+
 //=============================================================================
 //
 // MsgBox()
@@ -57,16 +62,12 @@ int MsgBox(UINT uType, UINT uIdMsg, ...) {
 	WCHAR szTitle[128];
 	GetString(IDS_APPTITLE, szTitle, COUNTOF(szTitle));
 
-	HWND hwnd;
-	if ((hwnd = GetActiveWindow()) == NULL) {
-		hwnd = hwndMain;
-	}
-
 	uType |= MB_SETFOREGROUND;
 	if (bWindowLayoutRTL) {
 		uType |= MB_RTLREADING;
 	}
 
+	HWND hwnd = GetMsgBoxParent();
 	PostMessage(hwndMain, APPM_CENTER_MESSAGE_BOX, (WPARAM)hwnd, 0);
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 	return MessageBoxEx(hwnd, szText, szTitle, uType, uiLanguage);

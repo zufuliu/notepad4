@@ -1029,7 +1029,7 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 	//SetForegroundWindow(hwnd);
 	if (PathIsDirectory(szBuf)) {
 		WCHAR tchFile[MAX_PATH];
-		if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), szBuf)) {
+		if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), szBuf)) {
 			FileLoad(FileLoadFlag_Default, tchFile);
 		}
 	} else {
@@ -1205,7 +1205,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_GETMINMAXINFO:
 		if (bInFullScreenMode) {
-			HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+			HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 			MONITORINFO mi;
 			mi.cbSize = sizeof(mi);
 			GetMonitorInfo(hMonitor, &mi);
@@ -1271,7 +1271,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 				if (PathIsDirectory(&params->wchData)) {
 					WCHAR tchFile[MAX_PATH];
-					if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), &params->wchData)) {
+					if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), &params->wchData)) {
 						bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 					}
 				} else {
@@ -1501,8 +1501,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		HWND box = FindWindow(L"#32770", NULL);
 		HWND parent = GetParent(box);
 		// MessageBox belongs to us.
-		if (parent == (HWND)wParam || parent == hwndMain) {
-			parent = wParam ? ((HWND)wParam) : hwndMain;
+		if (parent == (HWND)wParam || parent == hwnd) {
 			CenterDlgInParentEx(box, parent);
 			SnapToDefaultButton(box);
 		}
@@ -4816,13 +4815,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case CMD_COPYWINPOS: {
 		WINDOWPLACEMENT wndpl;
 		wndpl.length = sizeof(WINDOWPLACEMENT);
-		GetWindowPlacement(hwndMain, &wndpl);
+		GetWindowPlacement(hwnd, &wndpl);
 
 		const int x = wndpl.rcNormalPosition.left;
 		const int y = wndpl.rcNormalPosition.top;
 		const int cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
 		const int cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-		const BOOL max = IsZoomed(hwndMain) || (wndpl.flags & WPF_RESTORETOMAXIMIZED);
+		const BOOL max = IsZoomed(hwnd) || (wndpl.flags & WPF_RESTORETOMAXIMIZED);
 
 		WCHAR wszWinPos[64];
 		wsprintf(wszWinPos, L"/pos %i,%i,%i,%i,%i", x, y, cx, cy, max);
@@ -5275,7 +5274,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			tpm.rcExclude = rc;
 			TrackPopupMenuEx(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_FOLD),
 							TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-							rc.left, rc.bottom, hwndMain, &tpm);
+							rc.left, rc.bottom, hwnd, &tpm);
 			DestroyMenu(hmenu);
 		}
 		return FALSE;
