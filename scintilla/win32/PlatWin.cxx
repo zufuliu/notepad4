@@ -531,6 +531,7 @@ public:
 	std::unique_ptr<Surface> AllocatePixMap(int width, int height) override;
 
 	void SetMode(SurfaceMode mode_) noexcept override;
+	void SetRenderingParams(void *defaultRenderingParams, void *customRenderingParams) noexcept override;
 
 	void Release() noexcept override;
 	bool SupportsFeature(Supports feature) const noexcept override;
@@ -660,6 +661,9 @@ std::unique_ptr<Surface> SurfaceGDI::AllocatePixMap(int width, int height) {
 
 void SurfaceGDI::SetMode(SurfaceMode mode_) noexcept {
 	mode = mode_;
+}
+
+void SurfaceGDI::SetRenderingParams([[maybe_unused]] void *defaultRenderingParams, [[maybe_unused]] void *customRenderingParams) noexcept {
 }
 
 void SurfaceGDI::PenColour(ColourRGBA fore, XYPOSITION widthStroke) noexcept {
@@ -1447,6 +1451,8 @@ class SurfaceD2D final : public Surface {
 	static constexpr FontQuality invalidFontQuality = FontQuality::QualityMask;
 	FontQuality fontQuality = invalidFontQuality;
 	int logPixelsY = USER_DEFAULT_SCREEN_DPI;
+	IDWriteRenderingParams *defaultRenderingParams = nullptr;
+	IDWriteRenderingParams *customRenderingParams = nullptr;
 
 	void Clear() noexcept;
 	void SetFontQuality(FontQuality extraFontFlag) noexcept;
@@ -1454,7 +1460,8 @@ class SurfaceD2D final : public Surface {
 
 public:
 	SurfaceD2D() noexcept = default;
-	SurfaceD2D(ID2D1RenderTarget *pRenderTargetCompatible, int width, int height, SurfaceMode mode_, int logPixelsY_) noexcept;
+	SurfaceD2D(ID2D1RenderTarget *pRenderTargetCompatible, int width, int height, SurfaceMode mode_, int logPixelsY_,
+		IDWriteRenderingParams *defaultRenderingParams_, IDWriteRenderingParams *customRenderingParams_) noexcept;
 	// Deleted so SurfaceD2D objects can not be copied.
 	SurfaceD2D(const SurfaceD2D &) = delete;
 	SurfaceD2D(SurfaceD2D &&) = delete;
@@ -1467,6 +1474,7 @@ public:
 	std::unique_ptr<Surface> AllocatePixMap(int width, int height) override;
 
 	void SetMode(SurfaceMode mode_) noexcept override;
+	void SetRenderingParams(void *defaultRenderingParams_, void *customRenderingParams_) noexcept override;
 
 	void Release() noexcept override;
 	bool SupportsFeature(Supports feature) const noexcept override;
@@ -1522,7 +1530,8 @@ public:
 	void FlushDrawing() noexcept override;
 };
 
-SurfaceD2D::SurfaceD2D(ID2D1RenderTarget *pRenderTargetCompatible, int width, int height, SurfaceMode mode_, int logPixelsY_) noexcept {
+SurfaceD2D::SurfaceD2D(ID2D1RenderTarget *pRenderTargetCompatible, int width, int height, SurfaceMode mode_, int logPixelsY_,
+	IDWriteRenderingParams *defaultRenderingParams_, IDWriteRenderingParams *customRenderingParams_) noexcept {
 	const D2D1_SIZE_F desiredSize = D2D1::SizeF(static_cast<float>(width), static_cast<float>(height));
 	D2D1_PIXEL_FORMAT desiredFormat;
 #ifdef __MINGW32__
@@ -1540,6 +1549,8 @@ SurfaceD2D::SurfaceD2D(ID2D1RenderTarget *pRenderTargetCompatible, int width, in
 	}
 	mode = mode_;
 	logPixelsY = logPixelsY_;
+	defaultRenderingParams = defaultRenderingParams_;
+	customRenderingParams = customRenderingParams_;
 }
 
 SurfaceD2D::~SurfaceD2D() noexcept {
@@ -1588,11 +1599,16 @@ void SurfaceD2D::Init(SurfaceID sid, WindowID wid, bool /*printing*/) noexcept {
 }
 
 std::unique_ptr<Surface> SurfaceD2D::AllocatePixMap(int width, int height) {
-	return std::make_unique<SurfaceD2D>(pRenderTarget, width, height, mode, logPixelsY);
+	return std::make_unique<SurfaceD2D>(pRenderTarget, width, height, mode, logPixelsY, defaultRenderingParams, customRenderingParams);
 }
 
 void SurfaceD2D::SetMode(SurfaceMode mode_) noexcept {
 	mode = mode_;
+}
+
+void SurfaceD2D::SetRenderingParams(void *defaultRP, void *customRP) noexcept {
+	defaultRenderingParams = static_cast<IDWriteRenderingParams *>(defaultRP);
+	customRenderingParams = static_cast<IDWriteRenderingParams *>(customRP);
 }
 
 HRESULT SurfaceD2D::GetBitmap(ID2D1Bitmap **ppBitmap) {
@@ -1618,10 +1634,10 @@ void SurfaceD2D::SetFontQuality(FontQuality extraFontFlag) noexcept {
 	if (fontQuality != extraFontFlag) {
 		fontQuality = extraFontFlag;
 		const D2D1_TEXT_ANTIALIAS_MODE aaMode = DWriteMapFontQuality(extraFontFlag);
-		if (aaMode == D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE && mode.customRenderingParams) {
-			pRenderTarget->SetTextRenderingParams(static_cast<IDWriteRenderingParams *>(mode.customRenderingParams));
-		} else if (mode.defaultRenderingParams) {
-			pRenderTarget->SetTextRenderingParams(static_cast<IDWriteRenderingParams *>(mode.defaultRenderingParams));
+		if (aaMode == D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE && customRenderingParams) {
+			pRenderTarget->SetTextRenderingParams(customRenderingParams);
+		} else if (defaultRenderingParams) {
+			pRenderTarget->SetTextRenderingParams(defaultRenderingParams);
 		}
 		pRenderTarget->SetTextAntialiasMode(aaMode);
 	}

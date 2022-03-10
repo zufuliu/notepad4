@@ -609,18 +609,22 @@ struct LayoutWorker {
 		return 1;
 	}
 
+	std::unique_ptr<Surface> CreateMeasurementSurface() const {
+		// if (!surface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
+		if (vstyle.technology == Technology::Default) {
+			std::unique_ptr<Surface> surf = Surface::Allocate(Technology::Default);
+			surf->Init(nullptr);
+			surf->SetMode(model.CurrentSurfaceMode());
+			return surf;
+		}
+		return {};
+	}
+
 	void DoWork() {
 		uint32_t finished = 0;
 		void * const idleTaskTimer = model.idleTaskTimer;
-		Surface *surface = sharedSurface;
-		std::unique_ptr<Surface> surf;
-		// if (!surface->SupportsFeature(Supports::ThreadSafeMeasureWidths))
-		if (vstyle.technology == Technology::Default) {
-			surf = Surface::Allocate(Technology::Default);
-			surf->Init(nullptr);
-			surf->SetMode(model.CurrentSurfaceMode());
-			surface = surf.get();
-		}
+		const std::unique_ptr<Surface> surf{CreateMeasurementSurface()};
+		Surface * const surface = surf ? surf.get() : sharedSurface;
 
 		int processed = 0;
 		while (true) {
@@ -1772,7 +1776,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 	const char *textFoldDisplay = model.GetFoldDisplayText(line, ll->PartialPosition());
 	if (textFoldDisplay) {
 		const std::string_view foldDisplayText(textFoldDisplay);
-		rcSegment.left += (surface->WidthText(fontText, foldDisplayText) + vsDraw.aveCharWidth);
+		rcSegment.left += (surface->WidthText(vsDraw.styles[StyleFoldDisplayText].font.get(), foldDisplayText) + vsDraw.aveCharWidth);
 	}
 	rcSegment.right = rcSegment.left + widthEOLAnnotationText;
 

@@ -1868,16 +1868,12 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 // such as the margin markers, line numbers, selection and caret
 // Should be merged back into a combined Draw method.
 Sci::Position Editor::FormatRange(bool draw, const RangeToFormat *pfr) {
-	if (!pfr)
-		return 0;
-
-	AutoSurface surface(pfr->hdc, this, Technology::Default, true);
-	if (!surface)
-		return 0;
-	AutoSurface surfaceMeasure(pfr->hdcTarget, this, Technology::Default, true);
-	if (!surfaceMeasure) {
+	if (!pfr || !wMain.GetID()) {
 		return 0;
 	}
+
+	AutoSurface surface(pfr->hdc, this, true);
+	AutoSurface surfaceMeasure(pfr->hdcTarget, this, true);
 	return view.FormatRange(draw, pfr, surface, surfaceMeasure, *this, vs);
 }
 
@@ -5761,6 +5757,26 @@ int Editor::CodePage() const noexcept {
 		return pdoc->dbcsCodePage;
 	else
 		return 0;
+}
+
+std::unique_ptr<Surface> Editor::CreateMeasurementSurface() const {
+	if (!wMain.GetID()) {
+		return {};
+	}
+	std::unique_ptr<Surface> surf = Surface::Allocate(technology);
+	surf->Init(wMain.GetID());
+	surf->SetMode(CurrentSurfaceMode());
+	return surf;
+}
+
+std::unique_ptr<Surface> Editor::CreateDrawingSurface(SurfaceID sid, bool printing) const {
+	if (!wMain.GetID()) {
+		return {};
+	}
+	std::unique_ptr<Surface> surf = Surface::Allocate(printing ? Technology::Default : technology);
+	surf->Init(sid, wMain.GetID());
+	surf->SetMode(CurrentSurfaceMode());
+	return surf;
 }
 
 Sci::Line Editor::WrapCount(Sci::Line line) {

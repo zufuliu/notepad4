@@ -450,8 +450,8 @@ class ScintillaWin final :
 	// ~ScintillaWin() in public section
 
 	void Finalise() noexcept override;
-	SurfaceMode CurrentSurfaceMode() const noexcept override {
-		return { pdoc->dbcsCodePage, BidirectionalR2L(), defaultRenderingParams.get(), customRenderingParams.get() };
+	void SetRenderingParams(Surface *surface) const noexcept {
+		surface->SetRenderingParams(defaultRenderingParams.get(), customRenderingParams.get());
 	}
 	bool UpdateRenderingParams(bool force) noexcept;
 	void EnsureRenderTarget(HDC hdc) noexcept;
@@ -1031,6 +1031,7 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 		if (pRenderTarget) {
 			AutoSurface surfaceWindow(pRenderTarget, this);
 			if (surfaceWindow) {
+				SetRenderingParams(surfaceWindow);
 				pRenderTarget->BeginDraw();
 				Paint(surfaceWindow, rcPaint);
 				surfaceWindow->Release();
@@ -2341,7 +2342,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_WINDOWPOSCHANGED:
 			if (technology != Technology::Default) {
 				if (UpdateRenderingParams(false)) {
-					//DropGraphics(); // no bufferedDraw
+					DropGraphics();
 					Redraw();
 				}
 			}
@@ -4029,6 +4030,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 					assert(pCTRenderTarget);
 					if (pCTRenderTarget) {
 						surfaceWindow->Init(pCTRenderTarget, hWnd);
+						sciThis->SetRenderingParams(surfaceWindow.get());
 						pCTRenderTarget->BeginDraw();
 					}
 				}

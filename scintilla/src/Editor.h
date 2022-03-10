@@ -624,6 +624,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 	virtual std::string UTF8FromEncoded(std::string_view encoded) const = 0;
 	virtual std::string EncodedFromUTF8(std::string_view utf8) const = 0;
+	std::unique_ptr<Surface> CreateMeasurementSurface() const;
+	std::unique_ptr<Surface> CreateDrawingSurface(SurfaceID sid, bool printing = false) const;
 
 	Sci::Line WrapCount(Sci::Line line);
 	void AddStyledText(const char *buffer, Sci::Position appendLength);
@@ -718,22 +720,13 @@ public:
  * A smart pointer class to ensure Surfaces are set up and deleted correctly.
  */
 class AutoSurface {
-private:
-	std::unique_ptr<Surface> surf;
+	const std::unique_ptr<Surface> surf;
 public:
-	AutoSurface(const Editor *ed) {
-		if (ed->wMain.GetID()) {
-			surf = Surface::Allocate(ed->technology);
-			surf->Init(ed->wMain.GetID());
-			surf->SetMode(ed->CurrentSurfaceMode());
-		}
+	AutoSurface(const Editor *ed):
+		surf{ed->CreateMeasurementSurface()} {
 	}
-	AutoSurface(SurfaceID sid, const Editor *ed, std::optional<Scintilla::Technology> technology = {}, bool printing = false) {
-		if (ed->wMain.GetID()) {
-			surf = Surface::Allocate(technology ? *technology : ed->technology);
-			surf->Init(sid, ed->wMain.GetID(), printing);
-			surf->SetMode(ed->CurrentSurfaceMode());
-		}
+	AutoSurface(SurfaceID sid, const Editor *ed, bool printing = false):
+		surf{ed->CreateDrawingSurface(sid, printing)} {
 	}
 	// Deleted so AutoSurface objects can not be copied.
 	AutoSurface(const AutoSurface &) = delete;
