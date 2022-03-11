@@ -722,7 +722,7 @@ public:
 class AutoSurface {
 	const std::unique_ptr<Surface> surf;
 public:
-	AutoSurface(const Editor *ed):
+	explicit AutoSurface(const Editor *ed):
 		surf{ed->CreateMeasurementSurface()} {
 	}
 	AutoSurface(SurfaceID sid, const Editor *ed, bool printing = false):

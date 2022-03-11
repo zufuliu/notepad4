@@ -1816,12 +1816,15 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 	case WM_CHAR:
-		if (!lastKeyDownConsumed) {
+		if (wParam >= ' ' || !lastKeyDownConsumed) {
 			// filter out control characters
 			// https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input#character-messages
+			// What's broken in the WM_KEYDOWN-WM_CHAR input model?
+			// http://www.ngedit.com/a_wm_keydown_wm_char.html
 			if (wParam < ' ' && KeyboardIsKeyDown(VK_CONTROL)) {
-				::SendMessage(::GetParent(MainHWND()), WM_CHAR, wParam, lParam);
-				return 0;
+				if (::SendMessage(::GetParent(MainHWND()), WM_CHAR, wParam, lParam)) {
+					return 0;
+				}
 			}
 
 			const wchar_t ch = static_cast<wchar_t>(wParam);
@@ -2238,7 +2241,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 		case WM_TIMER:
 			if (wParam == idleTimerID && idler.state) {
-				SendMessage(MainHWND(), SC_WIN_IDLE, 0, 1);
+				::SendMessage(MainHWND(), SC_WIN_IDLE, 0, 1);
 			} else {
 				TickFor(static_cast<TickReason>(wParam - fineTimerStart));
 			}
