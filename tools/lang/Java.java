@@ -1,10 +1,10 @@
-// Java SE 15 https://docs.oracle.com/en/java/javase/index.html
-// JDK 16 http://openjdk.java.net/projects/jdk/16/
+// Java SE 17 https://docs.oracle.com/en/java/javase/index.html
+// JDK http://openjdk.java.net/projects/
 // https://docs.oracle.com/javase/specs/index.html
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
 
 //! keywords		===========================================================
-// https://docs.oracle.com/javase/specs/jls/se16/html/jls-3.html#jls-3.9
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.9
 abstract assert
 break
 case catch
@@ -25,17 +25,21 @@ while
 // others
 false true null
 
-// Blocks and Statements
-// https://docs.oracle.com/javase/specs/jls/se16/html/jls-14.html
-var yield
-
-// Sealed Classes
-// https://docs.oracle.com/javase/specs/jls/se16/preview/specs/sealed-classes-jls.html
+// Class Modifiers
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.1.1
 sealed non-sealed
-
-// Records
-// https://docs.oracle.com/javase/specs/jls/se16/preview/specs/records-jls.html
+// Permitted Direct Subclasses
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.1.6
+permits
+// Record Classes
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.10
 record
+// Local Variable Declarations
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-14.html#jls-14.4
+var
+// The yield Statement
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-14.html#jls-14.21
+yield
 
 // Android IDL
 parcelable
@@ -44,8 +48,8 @@ parcelable
 boolean byte char double float int long short void
 
 //! directive		===========================================================
-// Packages and Modules
-// https://docs.oracle.com/javase/specs/jls/se16/html/jls-7.html
+// Module Declarations
+// https://docs.oracle.com/javase/specs/jls/se17/html/jls-7.html#jls-7.7
 open module
 requires
 exports to
@@ -55,7 +59,7 @@ provides with
 transitive static
 
 //! API				===========================================================
-// https://docs.oracle.com/en/java/javase/16/docs/api/index.html
+// https://docs.oracle.com/en/java/javase/17/docs/api/index.html
 
 module java.base {
 
@@ -590,25 +594,36 @@ module gradle {
 }
 
 //! Javadoc			===========================================================
-// https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#CHDJGIJB
+// https://docs.oracle.com/en/java/javase/17/docs/specs/javadoc/doc-comment-spec.html
 /**
  * @author name-text
  * {@code text}
  * @deprecated deprecated-text
  * {@docRoot}
  * @exception class-name description
+ * @hidden													JDK 9
+ * {@index word description }								JDK 9
+ * {@index "phrase" description }							JDK 9
  * {@inheritDoc}
- * {@link package.class#member label}
- * {@linkplain package.class#member label}
+ * {@link module/package.class#member label}
+ * {@linkplain module/package.class#member label}
  * {@literal text}
  * @param parameter-name description
+ * @param <type-parameter-name> description
+ * @provides service-type description						JDK 9
  * @return description
- * @see reference
+ * {@return description }									JDK 16
+ * @see "string"
+ * @see <a href="url">label</a>
+ * @see module/package.class#member label
  * @serial field-description | include | exclude
  * @serialData data-description
  * @serialField field-name field-type field-description
  * @since since-text
+ * {@summary text }											JDK 10
+ * {@systemProperty property-name }							JDK 12
  * @throws class-name description
+ * @uses service-type description							JDK 9
  * {@value package.class#field}
  * @version version-text
  *

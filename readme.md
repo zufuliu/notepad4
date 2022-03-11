@@ -78,12 +78,12 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* INI Configuration File
 	* [Inno Setup](../main/tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
 	* [Boost Jam](../main/tools/lang/Jamfile.jam), up to Jam 4.4.1.
-	* [Java](../main/tools/lang/Java.java), up to Java 16. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
+	* [Java](../main/tools/lang/Java.java), up to Java 17. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](../main/tools/lang/JavaScript.js), up to ECMAScript 2021 (12th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* JSON and JSON5 Document
 	* [Julia Script](../main/tools/lang/Julia.jl), up to Julia 1.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
-	* [Kotlin](../main/tools/lang/Kotlin.kt), up to Kotlin 1.5.
+	* [Kotlin](../main/tools/lang/Kotlin.kt), up to Kotlin 1.6.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](../main/tools/lang/LLVM.ll), up to LLVM 12.

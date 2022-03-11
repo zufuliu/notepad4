@@ -1,4 +1,4 @@
-// Kotlin 1.5 https://kotlinlang.org/docs/reference/
+// Kotlin 1.6 https://kotlinlang.org/docs/reference/
 
 //! Keywords		===========================================================
 // https://kotlinlang.org/docs/reference/keyword-reference.html
@@ -36,7 +36,7 @@ field
 it
 
 // Modifier Keywords
-actual abstract annotation
+abstract actual annotation
 companion const crossinline
 data
 enum expect external
