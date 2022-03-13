@@ -24,6 +24,21 @@ using namespace Lexilla;
 
 namespace Lexilla {
 
+StyleContext::StyleContext(Sci_PositionU startPos, Sci_PositionU length, int initStyle, LexAccessor &styler_) noexcept :
+	styler(styler_),
+	endPos(styler.StyleEndPos(startPos, length)),
+	currentLine(styler.GetLine(startPos)),
+	lineDocEnd(styler.GetLine(styler.Length())),
+	multiByteAccess(styler.Encoding() == EncodingType::dbcs),
+	state(initStyle) {
+	styler.StartAt(startPos);
+	styler.StartSegment(startPos);
+	//lineEnd = styler.LineEnd(currentLine);
+	lineStartNext = styler.LineStart(currentLine + 1);
+	atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
+	SeekTo(startPos);
+}
+
 bool StyleContext::MatchIgnoreCase(const char *s) const noexcept {
 	if (MakeLowerCase(ch) != static_cast<unsigned char>(*s)) {
 		return false;

@@ -969,6 +969,16 @@ std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
 	return wsConverted;
 }
 
+#if 0
+const char *GetCurrentLogTime() {
+	static char buf[16];
+	SYSTEMTIME lt;
+	GetLocalTime(&lt);
+	sprintf(buf, "%02d:%02d:%02d.%03d", lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
+	return buf;
+}
+#endif
+
 }
 
 // Returns the target converted to UTF8.
@@ -1020,6 +1030,7 @@ Sci::Position ScintillaWin::EncodedFromUTF8(const char *utf8, char *encoded) con
 }
 
 bool ScintillaWin::PaintDC(HDC hdc) {
+	//printf("%s %s\n", GetCurrentLogTime(), __func__);
 	if (technology == Technology::Default) {
 		AutoSurface surfaceWindow(hdc, this);
 		if (surfaceWindow) {
@@ -1816,6 +1827,7 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 	case WM_CHAR:
+		//printf("%s:%d WM_CHAR %u, consumed=%d\n", __func__, __LINE__, (UINT)wParam, lastKeyDownConsumed);
 		if (wParam >= ' ' || !lastKeyDownConsumed) {
 			// filter out control characters
 			// https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input#character-messages
@@ -2281,6 +2293,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			return KeyMessage(msg, wParam, lParam);
 
 		case WM_SETTINGCHANGE:
+			//printf("%s before %s\n", GetCurrentLogTime(), "WM_SETTINGCHANGE");
 			//Platform::DebugPrintf("Setting Changed\n");
 			if (technology != Technology::Default) {
 				UpdateRenderingParams(true);
@@ -2289,6 +2302,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			InvalidateStyleData();
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
+			//printf("%s after %s\n", GetCurrentLogTime(), "WM_SETTINGCHANGE");
 			break;
 
 		case WM_GETDLGCODE:
@@ -2300,8 +2314,10 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 		case WM_SYSCOLORCHANGE:
 			//Platform::DebugPrintf("Setting Changed\n");
+			//printf("%s before %s\n", GetCurrentLogTime(), "WM_SYSCOLORCHANGE");
 			UpdateBaseElements();
 			InvalidateStyleData();
+			//printf("%s after %s\n", GetCurrentLogTime(), "WM_SYSCOLORCHANGE");
 			break;
 
 		case WM_DPICHANGED:

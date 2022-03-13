@@ -308,7 +308,7 @@ struct MarkdownLexer {
 	int HighlightBlockText(uint32_t lineState);
 	void HighlightInlineText();
 
-	bool CheckHtmlBlockTag(Sci_PositionU startPos, int chNext, bool paragraph) const noexcept;
+	bool CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept;
 	bool HandleHtmlTag(bool blockOnly);
 
 	bool CheckDefinitionList(Sci_PositionU startPos, uint32_t lineState) const noexcept;
@@ -1253,10 +1253,10 @@ constexpr bool IsHtmlAttrChar(int ch) noexcept {
 }
 
 // 4.6 HTML blocks
-bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, int chNext, bool paragraph) const noexcept {
+bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept {
 	char tag[16]{};
 	pos += 1 + (chNext == '/');
-	sc.styler.GetRangeLowered(pos, pos + sizeof(tag), tag, sizeof(tag) - 1);
+	sc.styler.GetRangeLowered(pos, endPos, tag, sizeof(tag) - 1);
 	char *ptr = tag;
 	while (IsLowerCase(*ptr)) {
 		++ptr;
@@ -1290,7 +1290,7 @@ bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, int chNext, bool paragr
 			complete = chNext == '/';
 			pos += ch == '/';
 			uint8_t quote = '\0'; // ignore character inside attribute string
-			while (pos < sc.lineStartNext) {
+			while (pos < endPos) {
 				ch = sc.styler.SafeGetCharAt(pos++);
 				if (!IsASpace(ch)) {
 					if (complete) {
@@ -1334,7 +1334,7 @@ bool MarkdownLexer::HandleHtmlTag(bool blockOnly) {
 		// <?php ?>
 		sc.SetState(SCE_H_QUESTION);
 	} else if (IsHtmlTagStart(sc.chNext) || (sc.chNext == '/' && IsHtmlTagStart(sc.GetRelative(2)))) {
-		if (blockOnly && !CheckHtmlBlockTag(sc.currentPos, sc.chNext, false)) {
+		if (blockOnly && !CheckHtmlBlockTag(sc.currentPos, sc.lineStartNext, sc.chNext, false)) {
 			return false;
 		}
 		sc.SetState(SCE_H_TAG);
@@ -1439,7 +1439,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 				return IsAlpha(ch);
 			}
 		}
-		return (IsHtmlTagStart(chNext) || chNext == '/') && CheckHtmlBlockTag(pos, chNext, true);
+		return (IsHtmlTagStart(chNext) || chNext == '/') && CheckHtmlBlockTag(pos, sc.styler.Length(), chNext, true);
 
 	case '+':
 	case '-':

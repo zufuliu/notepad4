@@ -5881,8 +5881,7 @@ static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *
 BOOL EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	// use increment search to ensure FindText() terminated in expected time.
 	//++EditMarkAll_Runs;
-	//char logTime[16];
-	//printf("match %3u %s\n", EditMarkAll_Runs, GetCurrentLogTime(logTime));
+	//printf("match %3u %s\n", EditMarkAll_Runs, GetCurrentLogTime());
 	QueryPerformanceCounter(&status->watch.begin);
 	const Sci_Position iLength = SciCall_GetLength();
 	Sci_Position iStartPos = status->iStartPos;

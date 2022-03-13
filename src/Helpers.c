@@ -37,7 +37,8 @@
 #include "GraphicUtils.h"
 #include "resource.h"
 
-LPCSTR GetCurrentLogTime(char buf[16]) {
+LPCSTR GetCurrentLogTime() {
+	static char buf[16];
 	SYSTEMTIME lt;
 	GetLocalTime(&lt);
 	sprintf(buf, "%02d:%02d:%02d.%03d", lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);

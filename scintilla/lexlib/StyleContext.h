@@ -51,21 +51,7 @@ public:
 	Sci_Position width = 1;
 	Sci_Position widthNext = 1;
 
-	StyleContext(Sci_PositionU startPos, Sci_PositionU length,
-		int initStyle, LexAccessor &styler_) noexcept :
-	styler(styler_),
-	endPos(styler.StyleEndPos(startPos, length)),
-	currentLine(styler.GetLine(startPos)),
-	lineDocEnd(styler.GetLine(styler.Length())),
-	multiByteAccess(styler.Encoding() == EncodingType::dbcs),
-	state(initStyle) {
-		styler.StartAt(startPos);
-		styler.StartSegment(startPos);
-		//lineEnd = styler.LineEnd(currentLine);
-		lineStartNext = styler.LineStart(currentLine + 1);
-		atLineStart = static_cast<Sci_PositionU>(styler.LineStart(currentLine)) == startPos;
-		SeekTo(startPos);
-	}
+	StyleContext(Sci_PositionU startPos, Sci_PositionU length, int initStyle, LexAccessor &styler_) noexcept;
 	// Deleted so StyleContext objects can not be copied.
 	StyleContext(const StyleContext &) = delete;
 	StyleContext(StyleContext &&) = delete;

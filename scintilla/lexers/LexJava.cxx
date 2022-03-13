@@ -157,9 +157,9 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	return 0;
 }
 
-inline bool MatchSealed(LexAccessor &styler, Sci_PositionU pos) noexcept {
+inline bool MatchSealed(LexAccessor &styler, Sci_PositionU pos, Sci_PositionU endPos) noexcept {
 	char s[8]{};
-	styler.GetRange(pos, pos + sizeof(s), s, sizeof(s));
+	styler.GetRange(pos, endPos, s, sizeof(s));
 	return StrStartsWith(s, "ealed")
 		&& !IsIdentifierCharEx(static_cast<uint8_t>(s[CStrLen("ealed")]));
 }
@@ -247,7 +247,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								kwType = KeywordType::None;
 							}
 						}
-					} else if (sc.Match('-', 's') && StrEqual(s, "non") && MatchSealed(styler, sc.currentPos + 2)) {
+					} else if (sc.Match('-', 's') && StrEqual(s, "non") && MatchSealed(styler, sc.currentPos + 2, sc.lineStartNext)) {
 						// the non-sealed keyword
 						sc.ChangeState(SCE_JAVA_WORD);
 						sc.Advance(CStrLen("sealed") + 1);
