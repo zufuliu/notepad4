@@ -17,7 +17,7 @@ static KEYWORDLIST Keywords_Swift = {{
 , // 2 attribute
 "GKInspectable NSApplicationMain NSCopying NSManaged UIApplicationMain autoclosure available( convention "
 "discardableResult dynamicCallable dynamicMemberLookup escaping frozen inlinable main nonobjc objc objcMembers "
-"propertyWrapper requires_stored_property_inits testable unknown warn_unqualified_access "
+"propertyWrapper requires_stored_property_inits resultBuilder testable unknown usableFromInline warn_unqualified_access "
 
 , // 3 class
 "AnyClass AnyKeyPath AnyObject KeyPath PartialKeyPath WritableKeyPath "

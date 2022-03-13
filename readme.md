@@ -125,7 +125,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [PostgreSQL](../main/tools/lang/PostgreSQL.sql), PostgreSQL 13.
 		* [Transact-SQL](../main/tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](../main/tools/lang/Oracle.sql), Oracle 20, incomplete.
-	* [Swift](../main/tools/lang/Swift.swift), Swift 5.5.
+	* [Swift](../main/tools/lang/Swift.swift), Swift 5.6.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File

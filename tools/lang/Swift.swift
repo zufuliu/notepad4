@@ -1,4 +1,4 @@
-// 5.5 https://docs.swift.org/
+// 5.6 https://docs.swift.org/
 // https://docs.swift.org/swift-book/
 // https://swift.org/documentation/
 // https://github.com/apple/swift
@@ -15,7 +15,7 @@ fileprivate func
 import init inout internal
 let
 open operator
-private protocol public
+private precedencegroup protocol public
 rethrows
 static struct subscript
 typealias
@@ -23,48 +23,50 @@ var
 
 // Keywords used in statements
 break
-case continue
+case catch continue
 default defer do
 else
 fallthrough for
 guard
 if in
 repeat return
+throw
 switch
 where while
 
 // Keywords used in expressions and types
-as Any
+Any as
 catch
 false
 is
 nil
-super self Self
+rethrows
+self Self super
 throw throws
 true try
 
 // Keywords reserved in particular contexts
 associativity
 convenience
-dynamic didSet
+didSet dynamic
 final
 get
-infix indirect
+indirect infix
 lazy left
 mutating
 none nonmutating
 optional override
 postfix precedence prefix Protocol
 required right
-some set
+set some
 Type
 unowned
 weak willSet
-precedencegroup
 
 async await
 
 //! directive		===========================================================
+// Keywords that begin with a number sign
 // Compiler Control Statements
 // https://docs.swift.org/swift-book/ReferenceManual/Statements.html
 #if
@@ -115,9 +117,11 @@ async await
 @objc
 @objcMembers
 @propertyWrapper
+@resultBuilder
 @requires_stored_property_inits
 @testable
 @UIApplicationMain
+@usableFromInline
 @warn_unqualified_access
 
 // Type Attributes
