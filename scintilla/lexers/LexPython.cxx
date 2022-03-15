@@ -190,7 +190,7 @@ constexpr bool IsInvalidMappingKey(char ch) noexcept {
 	return (ch >= 0 && ch < 32) || AnyOf(ch, '(', ')', '\'', '\"', '\\', '{', '}', '%', '$', '\x7F');
 }
 
-inline Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &styler, Sci_Position &keyLen, bool insideUrl) noexcept {
+Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &styler, Sci_Position &keyLen, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -313,8 +313,11 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 			ch = styler.SafeGetCharAt(pos);
 		}
 	}
-	// [sign][#]
+	// [sign][z][#]
 	if (ch == '+' || ch == '-' || ch == ' ') {
+		ch = styler.SafeGetCharAt(++pos);
+	}
+	if (ch == 'z') { // PEP 682
 		ch = styler.SafeGetCharAt(++pos);
 	}
 	if (ch == '#') {

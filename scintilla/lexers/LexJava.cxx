@@ -104,7 +104,7 @@ constexpr bool IsDateTimeFormatSpecifier(char ch) noexcept {
 		'R', 'T', 'r', 'D', 'F', 'c'); // date/time
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -160,8 +160,11 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 inline bool MatchSealed(LexAccessor &styler, Sci_PositionU pos, Sci_PositionU endPos) noexcept {
 	char s[8]{};
 	styler.GetRange(pos, endPos, s, sizeof(s));
-	return StrStartsWith(s, "ealed")
-		&& !IsIdentifierCharEx(static_cast<uint8_t>(s[CStrLen("ealed")]));
+	if (StrStartsWith(s, "ealed")) {
+		const uint8_t ch = s[CStrLen("ealed")];
+		return ch == '\0' || isspacechar(ch) || ch == '/'; // space or comment
+	}
+	return false;
 }
 
 void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -251,7 +254,6 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						// the non-sealed keyword
 						sc.ChangeState(SCE_JAVA_WORD);
 						sc.Advance(CStrLen("sealed") + 1);
-						sc.chPrev = 'd';
 					} else if (keywordLists[1]->InList(s)) {
 						sc.ChangeState(SCE_JAVA_WORD2);
 					} else if (keywordLists[2]->InList(s)) {
