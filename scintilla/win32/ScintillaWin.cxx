@@ -2299,9 +2299,9 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 				UpdateRenderingParams(true);
 			}
 			UpdateBaseElements();
-			InvalidateStyleData();
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
+			InvalidateStyleRedraw();
 			//printf("%s after %s\n", GetCurrentLogTime(), "WM_SETTINGCHANGE");
 			break;
 

@@ -1188,6 +1188,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SYSCOLORCHANGE:
+		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		// update Scintilla colors
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, FALSE);
