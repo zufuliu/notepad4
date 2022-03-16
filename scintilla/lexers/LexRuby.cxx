@@ -638,6 +638,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		false);
 
 	bool preferRE = true;
+	bool afterDef = false;
 	int state = initStyle;
 	const Sci_Position lengthDoc = startPos + length;
 
@@ -785,7 +786,10 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				Quote.New();
 				Quote.Open(ch);
 			} else if (ch == '<' && chNext == '<' && chNext2 != '=') {
-
+				if (afterDef) {
+					afterDef = false;
+					prevWord[0] = 0;
+				}
 				// Recognise the '<<' symbol - either a here document or a binary op
 				styler.ColorTo(i, state);
 				i++;
@@ -816,6 +820,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 				preferRE = (state != SCE_RB_HERE_DELIM);
 			} else if (ch == ':') {
+				afterDef = false;
 				styler.ColorTo(i, state);
 				if (chNext == ':') {
 					// Mark "::" as an operator, not symbol start
@@ -932,7 +937,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					state = SCE_RB_DEFAULT;
 					preferRE = true;
 				}
-			} else if (ch == '%') {
+			} else if (ch == '%' && !afterDef) {
 				styler.ColorTo(i, state);
 				bool have_string = false;
 				const char *hit = strchr(q_chars, chNext);
@@ -969,6 +974,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					preferRE = true;
 				}
 			} else if (ch == '?') {
+				afterDef = false;
 				styler.ColorTo(i, state);
 				if (IsASpaceOrTab(chNext) || chNext == '\n' || chNext == '\r') {
 					styler.ColorTo(i + 1, SCE_RB_OPERATOR);
@@ -980,6 +986,16 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 			} else if (isoperator(ch) || ch == '.') {
 				styler.ColorTo(i, state);
+				if (afterDef) {
+					afterDef = false;
+					prevWord[0] = 0;
+					if (chNext == '@' && (ch == '+' || ch == '-' || ch == '!')) {
+						// unary operator method
+						ch = chNext;
+						chNext = chNext2;
+						i += 1;
+					}
+				}
 				styler.ColorTo(i + 1, SCE_RB_OPERATOR);
 				// If we're ending an expression or block,
 				// assume it ends an object, and the ambivalent
@@ -1005,12 +1021,16 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 				// Stay in default state
 			} else if (IsEOLChar(ch)) {
+				afterDef = false;
 				// Make sure it's a true line-end, with no backslash
 				if ((ch == '\r' || (ch == '\n' && chPrev != '\r'))
 					&& chPrev != '\\') {
 					// Assume we've hit the end of the statement.
 					preferRE = true;
 				}
+			}
+			if (afterDef && state != SCE_RB_DEFAULT) {
+				afterDef = false;
 			}
 		} else if (state == SCE_RB_WORD) {
 			if (ch == '.' || !isSafeWordcharOrHigh(ch)) {
@@ -1051,6 +1071,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					const int word_style = ClassifyWordRb(wordStartPos, i, keywords, styler, prevWord);
 					switch (word_style) {
 					case SCE_RB_WORD:
+						afterDef = StrEqual(prevWord, "def");
 						preferRE = kwREFollowKeyword.InList(prevWord);
 						break;
 
@@ -1646,7 +1667,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrev = startPos <= 1 ? SCE_RB_DEFAULT : styler.StyleAt(startPos - 1);
 	bool buffer_ends_with_eol = false;
-	// detect shorthand method definition to avoid code folding
+	// detect endless method definition to avoid code folding
 	enum class MethodDefinition {
 		None,
 		Define,
@@ -1716,19 +1737,27 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 		if (method_definition != MethodDefinition::None) {
 			switch (method_definition) {
 			case MethodDefinition::Define:
-				if (style != SCE_RB_WORD && !IsASpaceOrTab(ch)) {
-					method_definition = isoperator(ch) ? MethodDefinition::Operator : MethodDefinition::Name;
+				if (style == SCE_RB_OPERATOR) {
+					method_definition = MethodDefinition::Operator;
+				} else if (style == SCE_RB_DEFNAME) {
+					method_definition = MethodDefinition::Name;
+				} else if (!(style == SCE_RB_DEFAULT || style == SCE_RB_WORD)) {
+					method_definition = MethodDefinition::None;
 				}
-				break;
+				if (method_definition <= MethodDefinition::Define) {
+					break;
+				}
+				// fall through for unary operator or single letter name
+				[[fallthrough]];
 			case MethodDefinition::Operator:
 			case MethodDefinition::Name:
-				if (IsASpaceOrTab(ch) || ch == '(') {
-					// Assignment methods can not be defined using the shorthand syntax.
-					if (method_definition == MethodDefinition::Operator || chPrev != '=') {
-						method_definition = MethodDefinition::Argument;
-						argument_paren_count = ch == '(';
-					} else {
+				if (chNext == '(' || !(styleNext == SCE_RB_OPERATOR || styleNext == SCE_RB_DEFNAME)) {
+					// setter method cannot be defined in an endless method definition.
+					if (ch == '=' && (method_definition == MethodDefinition::Name || chPrev == ']')) {
 						method_definition = MethodDefinition::None;
+					} else {
+						method_definition = MethodDefinition::Argument;
+						argument_paren_count = 0;
 					}
 				}
 				break;
