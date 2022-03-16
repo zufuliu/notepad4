@@ -1,9 +1,9 @@
-# Ruby 2.6.5 https://www.ruby-lang.org/en/documentation/
+# Ruby 3.1.1 https://www.ruby-lang.org/en/documentation/
 # https://ruby-doc.org/
 # https://rubyreferences.github.io/
 
 #! Keywords			===========================================================
-# https://ruby-doc.org/core-2.6.5/doc/keywords_rdoc.html
+# https://ruby-doc.org/core-3.1.1/doc/keywords_rdoc.html
 __ENCODING__
 __LINE__
 __FILE__
@@ -36,11 +36,11 @@ end
 yield
 
 # Exception Handling
-# https://ruby-doc.org/core-2.6.5/doc/syntax/exceptions_rdoc.html
+# https://ruby-doc.org/core-3.1.1/doc/syntax/exceptions_rdoc.html
 raise
 
 # Modules
-# https://ruby-doc.org/core-2.6.5/doc/syntax/modules_and_classes_rdoc.html
+# https://ruby-doc.org/core-3.1.1/doc/syntax/modules_and_classes_rdoc.html
 public
 protected
 private
@@ -48,11 +48,11 @@ require
 include
 
 # Refinements
-# https://ruby-doc.org/core-2.6.5/doc/syntax/refinements_rdoc.html
+# https://ruby-doc.org/core-3.1.1/doc/syntax/refinements_rdoc.html
 refine
 
 # Pre-defined global constants
-# https://ruby-doc.org/core-2.6.5/doc/globals_rdoc.html#label-Pre-defined+global+constants
+# https://ruby-doc.org/core-3.1.1/doc/globals_rdoc.html#label-Pre-defined+global+constants
 TRUE
 FALSE
 NIL
@@ -63,6 +63,7 @@ ENV
 ARGF
 ARGV
 DATA
+TOPLEVEL_BINDING
 RUBY_VERSION
 RUBY_RELEASE_DATE
 RUBY_PLATFORM
@@ -92,7 +93,7 @@ while
 end
 
 #! Pre-defined variables	===================================================
-# https://ruby-doc.org/core-2.6.5/doc/globals_rdoc.html
+# https://ruby-doc.org/core-3.1.1/doc/globals_rdoc.html
 $DEBUG
 $LOADED_FEATURES
 $FILENAME

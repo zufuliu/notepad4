@@ -1641,10 +1641,21 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = startPos == 0 ? 0 : (styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK & ~SC_FOLDLEVELBASE);
 	int levelCurrent = levelPrev;
+	char chPrev = '\0';
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrev = startPos <= 1 ? SCE_RB_DEFAULT : styler.StyleAt(startPos - 1);
 	bool buffer_ends_with_eol = false;
+	// detect shorthand method definition to avoid code folding
+	enum class MethodDefinition {
+		None,
+		Define,
+		Operator,
+		Name,
+		Argument,
+	};
+	MethodDefinition method_definition = MethodDefinition::None;
+	int argument_paren_count = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const char ch = chNext;
@@ -1689,6 +1700,9 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				// Don't decrement below 0
 				if (levelCurrent > 0)
 					levelCurrent--;
+			} else if (StrEqual(prevWord, "def")) {
+				levelCurrent++;
+				method_definition = MethodDefinition::Define;
 			} else if (kwFold.InList(prevWord)) {
 				levelCurrent++;
 			}
@@ -1699,6 +1713,43 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				levelCurrent--;
 			}
 		}
+		if (method_definition != MethodDefinition::None) {
+			switch (method_definition) {
+			case MethodDefinition::Define:
+				if (style != SCE_RB_WORD && !IsASpaceOrTab(ch)) {
+					method_definition = isoperator(ch) ? MethodDefinition::Operator : MethodDefinition::Name;
+				}
+				break;
+			case MethodDefinition::Operator:
+			case MethodDefinition::Name:
+				if (IsASpaceOrTab(ch) || ch == '(') {
+					// Assignment methods can not be defined using the shorthand syntax.
+					if (method_definition == MethodDefinition::Operator || chPrev != '=') {
+						method_definition = MethodDefinition::Argument;
+						argument_paren_count = ch == '(';
+					} else {
+						method_definition = MethodDefinition::None;
+					}
+				}
+				break;
+			case MethodDefinition::Argument:
+				if (style == SCE_RB_OPERATOR) {
+					if (ch == '(') {
+						++argument_paren_count;
+					} else if (ch == ')') {
+						--argument_paren_count;
+					} else if (ch == '=' && argument_paren_count == 0) {
+						method_definition = MethodDefinition::None;
+						if (levelCurrent > 0) {
+							levelCurrent--;
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
 		if (atEOL || (i == endPos - 1)) {
 			int lev = levelPrev;
 			if ((levelCurrent > levelPrev))
@@ -1707,9 +1758,12 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			lineCurrent++;
 			levelPrev = levelCurrent;
 			buffer_ends_with_eol = true;
+			method_definition = MethodDefinition::None;
+			argument_paren_count = 0;
 		} else if (!isspacechar(ch)) {
 			buffer_ends_with_eol = false;
 		}
+		chPrev = ch;
 		stylePrev = style;
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
