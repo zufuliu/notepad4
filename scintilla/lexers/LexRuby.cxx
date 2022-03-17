@@ -28,7 +28,9 @@ using namespace Lexilla;
 namespace {
 
 // This one's redundant, but makes for more readable code
-#define isHighBitChar(ch) ((unsigned int)(ch) > 127)
+constexpr bool isHighBitChar(char ch) noexcept {
+	return static_cast<signed char>(ch) < 0;
+}
 
 constexpr bool isSafeAlpha(char ch) noexcept {
 	return IsAlpha(ch) || ch == '_';
@@ -59,13 +61,10 @@ constexpr bool isEscapeSequence(char ch) {
 
 #define MAX_KEYWORD_LENGTH 127
 
-#define STYLE_MASK 63
-#define actual_style(style) ((style) & STYLE_MASK)
-
 bool followsDot(Sci_PositionU pos, Accessor &styler) {
 	styler.Flush();
 	for (; pos >= 1; --pos) {
-		const int style = actual_style(styler.StyleAt(pos));
+		const int style = styler.StyleAt(pos);
 		char ch;
 		switch (style) {
 		case SCE_RB_DEFAULT:
@@ -209,7 +208,7 @@ bool currLineContainsHereDelims(Sci_Position &startPos, Accessor &styler) {
 			return false;
 		} else {
 			styler.Flush();
-			if (actual_style(styler.StyleAt(pos)) == SCE_RB_HERE_DELIM) {
+			if (styler.StyleAt(pos) == SCE_RB_HERE_DELIM) {
 				break;
 			}
 		}
@@ -558,7 +557,7 @@ void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &in
 	Accessor &styler, bool skipWhiteSpace = false) {
 
 	styler.Flush();
-	const int style = actual_style(styler.StyleAt(startPos));
+	const int style = styler.StyleAt(startPos);
 	switch (style) {
 	case SCE_RB_STDIN:
 	case SCE_RB_STDOUT:
@@ -584,7 +583,7 @@ void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &in
 		}
 		if (styler.SafeGetCharAt(pos - 1) == '\\') {
 			// Continuation line -- keep going
-		} else if (actual_style(styler.StyleAt(pos)) != SCE_RB_DEFAULT) {
+		} else if (styler.StyleAt(pos) != SCE_RB_DEFAULT) {
 			// Part of multi-line construct -- keep going
 		} else if (currLineContainsHereDelims(pos, styler)) {
 			// Keep going, with pos and length now pointing
@@ -1414,7 +1413,7 @@ void getPrevWord(Sci_Position pos, char *prevWord, Accessor &styler, int word_st
 	Sci_Position i;
 	styler.Flush();
 	for (i = pos - 1; i > 0; i--) {
-		if (actual_style(styler.StyleAt(i)) != word_state) {
+		if (styler.StyleAt(i) != word_state) {
 			i++;
 			break;
 		}
@@ -1473,7 +1472,7 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 
 	styler.Flush();
 	while (--pos >= lineStartPosn) {
-		style = actual_style(styler.StyleAt(pos));
+		style = styler.StyleAt(pos);
 		if (style == SCE_RB_DEFAULT) {
 			if (IsASpaceOrTab(ch = styler[pos])) {
 				//continue
@@ -1555,7 +1554,7 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 	const Sci_Position lineStartPosn = styler.LineStart(lineStart);
 	styler.Flush();
 	while (--pos >= lineStartPosn) {
-		const int style = actual_style(styler.StyleAt(pos));
+		const int style = styler.StyleAt(pos);
 		if (style == SCE_RB_DEFAULT) {
 			char ch;
 			if ((ch = styler[pos]) == '\r' || ch == '\n') {
@@ -1571,7 +1570,7 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 			int wordLen = 0;
 			Sci_Position start_word;
 			for (start_word = pos;
-				start_word >= lineStartPosn && actual_style(styler.StyleAt(start_word)) == SCE_RB_WORD;
+				start_word >= lineStartPosn && styler.StyleAt(start_word) == SCE_RB_WORD;
 				start_word--) {
 				if (++wordLen < MAX_KEYWORD_LENGTH) {
 					*dst++ = styler[start_word];
@@ -1662,12 +1661,12 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = startPos == 0 ? 0 : (styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK & ~SC_FOLDLEVELBASE);
 	int levelCurrent = levelPrev;
-	char chPrev = '\0';
-	char chNext = styler[startPos];
+	uint8_t chPrev = '\0';
+	uint8_t chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrev = startPos <= 1 ? SCE_RB_DEFAULT : styler.StyleAt(startPos - 1);
 	bool buffer_ends_with_eol = false;
-	// detect endless method definition to avoid code folding
+	// detect endless method definition to fix up code folding
 	enum class MethodDefinition {
 		None,
 		Define,
@@ -1679,7 +1678,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	int argument_paren_count = 0;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = chNext;
+		const uint8_t ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
@@ -1741,7 +1740,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 					method_definition = MethodDefinition::Operator;
 				} else if (style == SCE_RB_DEFNAME) {
 					method_definition = MethodDefinition::Name;
-				} else if (!(style == SCE_RB_DEFAULT || style == SCE_RB_WORD)) {
+				} else if (!(style == SCE_RB_WORD || IsASpaceOrTab(ch))) {
 					method_definition = MethodDefinition::None;
 				}
 				if (method_definition <= MethodDefinition::Define) {
@@ -1751,7 +1750,9 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				[[fallthrough]];
 			case MethodDefinition::Operator:
 			case MethodDefinition::Name:
-				if (chNext == '(' || !(styleNext == SCE_RB_OPERATOR || styleNext == SCE_RB_DEFNAME)) {
+				if (IsEOLChar(chNext) || chNext == '#') {
+					method_definition = MethodDefinition::None;
+				} else if (chNext == '(' || chNext <= ' ') {
 					// setter method cannot be defined in an endless method definition.
 					if (ch == '=' && (method_definition == MethodDefinition::Name || chPrev == ']')) {
 						method_definition = MethodDefinition::None;
@@ -1767,12 +1768,15 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 						++argument_paren_count;
 					} else if (ch == ')') {
 						--argument_paren_count;
-					} else if (ch == '=' && argument_paren_count == 0) {
+					} else if (argument_paren_count == 0) {
 						method_definition = MethodDefinition::None;
-						if (levelCurrent > 0) {
+						if (ch == '=' && levelCurrent > 0) {
 							levelCurrent--;
 						}
 					}
+				} else if (argument_paren_count == 0 && !IsASpaceOrTab(ch)) {
+					// '=' must be first character after method name or right parenthesis
+					method_definition = MethodDefinition::None;
 				}
 				break;
 			default:
