@@ -51,6 +51,12 @@ enum class HtmlTagState {
 	Value,
 };
 
+enum class HtmlTagType {
+	Inline,
+	Block,
+	Both,
+};
+
 enum class AutoLink {
 	None,
 	Angle,
@@ -308,8 +314,8 @@ struct MarkdownLexer {
 	int HighlightBlockText(uint32_t lineState);
 	void HighlightInlineText();
 
-	bool CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept;
-	bool HandleHtmlTag(bool blockOnly);
+	HtmlTagType CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept;
+	bool HandleHtmlTag(HtmlTagType tagType);
 
 	bool CheckDefinitionList(Sci_PositionU startPos, uint32_t lineState) const noexcept;
 	int GetListChildIndentCount(int indentCurrent) const noexcept;
@@ -603,7 +609,7 @@ uint32_t MarkdownLexer::HighlightIndentedText(uint32_t lineState, int indentCoun
 	if (sc.currentLine != 0 && ((lineState & LineStateBlockMask) == 0 || sc.ch == '<')) {
 		const int style = GetBlockStyle(sc.styler, sc.currentLine - 1, lineState);
 		// inner html block
-		if (style == SCE_H_BLOCK_TAG && sc.ch == '<' && HandleHtmlTag(true)) {
+		if (sc.ch == '<' && (IsHtmlBlockStyle(style) || style == SCE_H_TAG) && HandleHtmlTag(HtmlTagType::Both)) {
 			return lineState;
 		}
 		if ((lineState & LineStateBlockMask) == 0 && !IsBlockStyle(style)) {
@@ -1253,7 +1259,7 @@ constexpr bool IsHtmlAttrChar(int ch) noexcept {
 }
 
 // 4.6 HTML blocks
-bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept {
+HtmlTagType MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, int chNext, bool paragraph) const noexcept {
 	char tag[16]{};
 	pos += 1 + (chNext == '/');
 	sc.styler.GetRangeLowered(pos, endPos, tag, sizeof(tag) - 1);
@@ -1271,7 +1277,7 @@ bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, i
 		// check type 1 and type 6 tag
 		*ptr = '\0';
 		if (blockTagList.InList(tag)) {
-			return true;
+			return HtmlTagType::Block;
 		}
 	}
 	if (!paragraph) {
@@ -1294,7 +1300,7 @@ bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, i
 				ch = sc.styler.SafeGetCharAt(pos++);
 				if (!IsASpace(ch)) {
 					if (complete) {
-						return false;
+						return HtmlTagType::Both;
 					}
 					if (ch == '\'' || ch == '\"') {
 						if (quote == '\0') {
@@ -1307,13 +1313,13 @@ bool MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU endPos, i
 					}
 				}
 			}
-			return complete;
+			return complete ? HtmlTagType::Block : HtmlTagType::Both;
 		}
 	}
-	return false;
+	return HtmlTagType::Inline;
 }
 
-bool MarkdownLexer::HandleHtmlTag(bool blockOnly) {
+bool MarkdownLexer::HandleHtmlTag(HtmlTagType tagType) {
 	const int current = sc.state;
 	if (sc.chNext == '!') {
 		const int chNext = sc.GetRelative(2);
@@ -1327,15 +1333,28 @@ bool MarkdownLexer::HandleHtmlTag(bool blockOnly) {
 		} else if (IsAlpha(chNext)) {
 			// <!DOCTYPE html>
 			sc.SetState(SCE_H_SGML_COMMAND);
-		} else if (!blockOnly) {
+		} else if (tagType == HtmlTagType::Inline) {
 			sc.SetState(STYLE_LINK);
 		}
 	} else if (sc.chNext == '?') {
 		// <?php ?>
 		sc.SetState(SCE_H_QUESTION);
 	} else if (IsHtmlTagStart(sc.chNext) || (sc.chNext == '/' && IsHtmlTagStart(sc.GetRelative(2)))) {
-		if (blockOnly && !CheckHtmlBlockTag(sc.currentPos, sc.lineStartNext, sc.chNext, false)) {
-			return false;
+		if (tagType != HtmlTagType::Inline) {
+			const HtmlTagType result = CheckHtmlBlockTag(sc.currentPos, sc.lineStartNext, sc.chNext, false);
+			switch (result) {
+			case HtmlTagType::Inline:
+				return false;
+			case HtmlTagType::Block:
+				tagType = HtmlTagType::Block;
+				break;
+			case HtmlTagType::Both:
+				if (tagType == HtmlTagType::Block) {
+					return false;
+				}
+				tagType = HtmlTagType::Inline;
+				break;
+			}
 		}
 		sc.SetState(SCE_H_TAG);
 		if (sc.chNext == '/') {
@@ -1343,14 +1362,14 @@ bool MarkdownLexer::HandleHtmlTag(bool blockOnly) {
 		} else {
 			tagState = HtmlTagState::Open;
 		}
-		if (blockOnly) {
+		if (tagType == HtmlTagType::Block) {
 			sc.ForwardSetState(SCE_H_BLOCK_TAG);
 		}
-	} else if (!(blockOnly || IsInvalidUrlChar(sc.chNext))) {
+	} else if (tagType == HtmlTagType::Inline && !IsInvalidUrlChar(sc.chNext)) {
 		sc.SetState(STYLE_LINK);
 	}
 	if (current != sc.state) {
-		if (!blockOnly) {
+		if (tagType == HtmlTagType::Inline) {
 			if (sc.state == STYLE_LINK) {
 				autoLink = AutoLink::Angle;
 				periodCount = 0;
@@ -1439,7 +1458,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 				return IsAlpha(ch);
 			}
 		}
-		return (IsHtmlTagStart(chNext) || chNext == '/') && CheckHtmlBlockTag(pos, sc.styler.Length(), chNext, true);
+		return (IsHtmlTagStart(chNext) || chNext == '/') && CheckHtmlBlockTag(pos, sc.styler.Length(), chNext, true) == HtmlTagType::Block;
 
 	case '+':
 	case '-':
@@ -1544,7 +1563,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 		break;
 
 	case '<':
-		if (HandleHtmlTag(true)) {
+		if (HandleHtmlTag(HtmlTagType::Block)) {
 			return 0;
 		}
 		break;
@@ -1625,7 +1644,7 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	case '<':
-		if (HandleHtmlTag(false)) {
+		if (HandleHtmlTag(HtmlTagType::Inline)) {
 			return;
 		}
 		break;
