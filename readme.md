@@ -111,7 +111,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Windows Rescouce Script
 	* [R](../main/tools/lang/R.r), up to R 4.0.3.
 	* [REBOL](../main/tools/lang/Rebol.r) 3 and [Red](../main/tools/lang/Red.red)
-	* [Ruby](../main/tools/lang/Ruby.rb), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
+	* [Ruby](../main/tools/lang/Ruby.rb), up to Ruby 3.1. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* [Rust](../main/tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
 	* Scala Script
 	* Shell Script

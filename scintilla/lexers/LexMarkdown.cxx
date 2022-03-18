@@ -414,6 +414,10 @@ int GetBlockStyle(const LexAccessor &styler, Sci_Line line, int lineState) noexc
 		if (style == SCE_H_TAG) {
 			style = styler.BufferStyleAt(pos + 2);
 		}
+		if (style != SCE_H_BLOCK_TAG) {
+			// <a href=""> </a>
+			style = SCE_H_TAG;
+		}
 	}
 	return style;
 }
