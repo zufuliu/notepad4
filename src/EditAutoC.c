@@ -751,10 +751,6 @@ static int GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
 		|| (iCurrentStyle >= SCE_HBA_START && iCurrentStyle <= SCE_HBA_OPERATOR)) {
 		return HTML_TEXT_BLOCK_VBS;
 	}
-	if ((iCurrentStyle >= SCE_HP_START && iCurrentStyle <= SCE_HP_IDENTIFIER)
-		|| (iCurrentStyle >= SCE_HPA_START && iCurrentStyle <= SCE_HPA_IDENTIFIER)) {
-		return HTML_TEXT_BLOCK_PYTHON;
-	}
 	if ((iCurrentStyle >= SCE_HPHP_DEFAULT && iCurrentStyle <= SCE_HPHP_COMPLEX_VARIABLE)) {
 		return HTML_TEXT_BLOCK_PHP;
 	}
