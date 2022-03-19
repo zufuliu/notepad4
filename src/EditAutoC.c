@@ -577,7 +577,6 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_SCALA:
 	case NP2LEX_PYTHON:
 	case NP2LEX_PERL:
-	case NP2LEX_RUBY:
 	case NP2LEX_SQL:
 	case NP2LEX_TCL:
 		return (ch == '$' || ch == '@');
@@ -593,6 +592,9 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_REBOL:
 		// http://www.rebol.com/r3/docs/guide/code-syntax.html#section-4
 		return (ch == '-' || ch == '!' || ch == '?' || ch == '~' || ch == '+' || ch == '&' || ch == '*' || ch == '=');
+
+	case NP2LEX_RUBY:
+		return (ch == '$' || ch == '@' || ch == '?' || ch == '!');
 
 	case NP2LEX_XML:
 		return (ch == '-' || ch == ':');

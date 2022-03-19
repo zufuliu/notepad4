@@ -8067,6 +8067,7 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *ignoreInner) {
 		return (1 << 1) | (1 << 2);
 
 	case SCLEX_RUBY: // module, class, method
+		*ignoreInner = SCE_RB_DEF_NAME;
 		return (1 << 0) | (1 << 1) | (1 << 2);
 
 	case SCLEX_RUST: // struct, function

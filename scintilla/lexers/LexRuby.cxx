@@ -91,27 +91,35 @@ bool keywordIsAmbiguous(const char *prevWord) noexcept;
 bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler);
 bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler);
 
-int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext, const WordList &keywords, Accessor &styler, char *prevWord) {
+constexpr bool IsIdentifierStyle(int style) noexcept {
+	return style == SCE_RB_IDENTIFIER
+		|| style == SCE_RB_LIKE_MODULE
+		|| style == SCE_RB_LIKE_CLASS
+		|| style == SCE_RB_BUILTIN_CONSTANT
+		|| style == SCE_RB_BUILTIN_FUNCTION;
+}
+
+int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext, LexerWordList keywordLists, Accessor &styler, char *prevWord) {
 	char s[MAX_KEYWORD_LENGTH + 1];
 	styler.GetRange(start, end, s, sizeof(s));
 	int chAttr = SCE_RB_IDENTIFIER;
 	int style = SCE_RB_DEFAULT;
 	if (StrEqual(prevWord, "class")) {
-		chAttr = SCE_RB_CLASSNAME;
+		chAttr = SCE_RB_CLASS_NAME;
 	} else if (StrEqual(prevWord, "module")) {
 		chAttr = SCE_RB_MODULE_NAME;
 	} else if (StrEqual(prevWord, "def")) {
-		chAttr = SCE_RB_DEFNAME;
+		chAttr = SCE_RB_DEF_NAME;
 		if (ch == '.') {
 			if (StrEqual(s, "self")) {
 				style = SCE_RB_WORD_DEMOTED;
 			} else if (IsUpperCase(s[0])) {
-				style = SCE_RB_CLASSNAME;
+				style = SCE_RB_LIKE_CLASS;
 			} else {
 				style = SCE_RB_IDENTIFIER;
 			}
 		}
-	} else if (keywords.InList(s) && ((start == 0) || !followsDot(start - 1, styler))) {
+	} else if (keywordLists[0]->InList(s) && ((start == 0) || !followsDot(start - 1, styler))) {
 		if (keywordIsAmbiguous(s) && keywordIsModifier(s, start, styler)) {
 
 			// Demoted keywords are colored as keywords,
@@ -130,10 +138,22 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 			strcpy(prevWord, s);
 		}
 	} else {
-		if (ch == ':' && chNext == ':') {
-			// module::class::name
-			chAttr = SCE_RB_MODULE_NAME;
-		} else if (ch == '(') {
+		if (IsUpperCase(s[0])) {
+			if (keywordLists[3]->InList(s)) {
+				chAttr = SCE_RB_BUILTIN_CONSTANT;
+			} else if ((ch == ':' && chNext == ':') || keywordLists[5]->InList(s)) {
+				// module::class::name
+				chAttr = SCE_RB_LIKE_MODULE;
+			} else if ((ch == '.' && chNext == 'n') || keywordLists[6]->InList(s)) {
+				// Class.new
+				chAttr = SCE_RB_LIKE_CLASS;
+			}
+		} else if (IsLowerCase(s[0]) || s[0] == '_') {
+			if (keywordLists[7]->InList(s)) {
+				chAttr = SCE_RB_BUILTIN_FUNCTION;
+			}
+		}
+		if (chAttr == SCE_RB_IDENTIFIER && ch == '(') {
 			chAttr = SCE_RB_FUNCTION;
 		}
 	}
@@ -315,10 +335,10 @@ bool sureThisIsHeredoc(Sci_Position iPrev, Accessor &styler, char *prevWord) {
 		// to establish the context.  Not too likely though.
 		return true;
 	} else {
-		switch (prevStyle = styler.StyleAt(firstWordPosn)) {
+		prevStyle = styler.StyleAt(firstWordPosn);
+		switch (prevStyle) {
 		case SCE_RB_WORD:
 		case SCE_RB_WORD_DEMOTED:
-		case SCE_RB_IDENTIFIER:
 			break;
 		default:
 			return true;
@@ -418,9 +438,9 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 	// If we have '<<' following a keyword, it's not a heredoc
 	if (prevStyle != SCE_RB_IDENTIFIER
 		&& prevStyle != SCE_RB_GLOBAL 		// $stdout and $stderr
-		&& prevStyle != SCE_RB_WORD 		// raise
-		&& prevStyle != SCE_RB_WORD_DEMOTED
-		&& prevStyle != SCE_RB_MODULE_NAME	// module::method
+		&& prevStyle != SCE_RB_BUILTIN_FUNCTION
+		&& prevStyle != SCE_RB_LIKE_MODULE	// module::method
+		&& prevStyle != SCE_RB_LIKE_CLASS	// class::method
 		&& prevStyle != SCE_RB_INSTANCE_VAR
 		&& prevStyle != SCE_RB_CLASS_VAR) {
 		return definitely_not_a_here_doc;
@@ -625,9 +645,6 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	// which characters are being used as quotes, how deeply nested is the
 	// start position and what the termination string is for here documents
 
-	const WordList &keywords = *keywordLists[0];
-	const WordList &kwREFollowKeyword = *keywordLists[2];
-
 	class HereDocCls {
 	public:
 		int State = 0;
@@ -732,7 +749,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			HereDoc.State = 2;
 			if (state == SCE_RB_WORD) {
 				const Sci_Position wordStartPos = styler.GetStartSegment();
-				ClassifyWordRb(wordStartPos, i, ch, chNext, keywords, styler, prevWord);
+				ClassifyWordRb(wordStartPos, i, ch, chNext, keywordLists, styler, prevWord);
 			} else {
 				styler.ColorTo(i, state);
 			}
@@ -947,7 +964,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						styler.ColorTo(i + 1, SCE_RB_SYMBOL);
 						state = SCE_RB_DEFAULT;
 					}
-				} else if (!preferRE) {
+				} else if (!preferRE && !IsASpace(chNext)) {
 					// Don't color symbol strings (yet)
 					// Just color the ":" and color rest as string
 					styler.ColorTo(i + 1, SCE_RB_SYMBOL);
@@ -998,6 +1015,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				styler.ColorTo(i, state);
 				if (IsASpaceOrTab(chNext) || chNext == '\n' || chNext == '\r') {
 					styler.ColorTo(i + 1, SCE_RB_OPERATOR);
+					preferRE = true;
 				} else {
 					// It's the start of a character code escape sequence
 					// Color it as a number.
@@ -1088,33 +1106,30 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					preferRE = false;
 				} else {
 					const Sci_Position wordStartPos = styler.GetStartSegment();
-					const int word_style = ClassifyWordRb(wordStartPos, i, ch, chNext, keywords, styler, prevWord);
+					const int word_style = ClassifyWordRb(wordStartPos, i, ch, chNext, keywordLists, styler, prevWord);
 					switch (word_style) {
 					case SCE_RB_WORD:
 						afterDef = StrEqual(prevWord, "def");
-						preferRE = kwREFollowKeyword.InList(prevWord);
+						preferRE = !IsLowerCase(prevWord[0]) || keywordLists[2]->InList(prevWord);
 						break;
 
 					case SCE_RB_WORD_DEMOTED:
+					case SCE_RB_BUILTIN_FUNCTION:
 						preferRE = true;
 						break;
 
 					case SCE_RB_IDENTIFIER:
-						if (isMatch(styler, lengthDoc, wordStartPos, "print")) {
-							preferRE = true;
-						} else if (IsEOLChar(ch)) {
-							preferRE = true;
-						} else {
-							preferRE = false;
-						}
+						preferRE = IsEOLChar(ch);
 						break;
+
 					default:
 						preferRE = false;
+						break;
 					}
 					if (ch == '.') {
 						// We might be redefining an operator-method
 						preferRE = false;
-						afterDef = word_style == SCE_RB_DEFNAME;
+						afterDef = word_style == SCE_RB_DEF_NAME;
 					}
 					// And if it's the first
 					redo_char(i, ch, chNext, chNext2, state); // pass by ref
@@ -1422,7 +1437,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	if (state == SCE_RB_WORD) {
 		// We've ended on a word, possibly at EOF, and need to
 		// classify it.
-		ClassifyWordRb(styler.GetStartSegment(), lengthDoc, '\0', '\0', keywords, styler, prevWord);
+		ClassifyWordRb(styler.GetStartSegment(), lengthDoc, '\0', '\0', keywordLists, styler, prevWord);
 	} else {
 		styler.ColorTo(lengthDoc, state);
 	}
@@ -1529,8 +1544,8 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 	case SCE_RB_DEFAULT:
 	case SCE_RB_COMMENTLINE:
 	case SCE_RB_POD:
-	case SCE_RB_CLASSNAME:
-	case SCE_RB_DEFNAME:
+	case SCE_RB_CLASS_NAME:
+	case SCE_RB_DEF_NAME:
 	case SCE_RB_MODULE_NAME:
 		return false;
 	case SCE_RB_OPERATOR:
@@ -1675,8 +1690,6 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_RB_COMMENTLINE)
 
 void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &kwFold = *keywordLists[1];
-
 	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
 		false);
 	const Sci_PositionU endPos = startPos + length;
@@ -1735,7 +1748,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			} else if (StrEqual(prevWord, "def")) {
 				levelCurrent++;
 				method_definition = MethodDefinition::Define;
-			} else if (kwFold.InList(prevWord)) {
+			} else if (keywordLists[1]->InList(prevWord)) {
 				levelCurrent++;
 			}
 		} else if (style == SCE_RB_HERE_DELIM) {
@@ -1756,7 +1769,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			case MethodDefinition::Define:
 				if (style == SCE_RB_OPERATOR) {
 					method_definition = MethodDefinition::Operator;
-				} else if (style == SCE_RB_DEFNAME || style == SCE_RB_WORD_DEMOTED || style == SCE_RB_CLASSNAME || style == SCE_RB_IDENTIFIER) {
+				} else if (style == SCE_RB_DEF_NAME || style == SCE_RB_WORD_DEMOTED || IsIdentifierStyle(style)) {
 					method_definition = MethodDefinition::Name;
 				} else if (!(style == SCE_RB_WORD || IsASpaceOrTab(ch))) {
 					method_definition = MethodDefinition::None;

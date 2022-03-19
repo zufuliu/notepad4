@@ -1659,20 +1659,48 @@ def parse_rebol_api_file(pathList):
 
 def parse_ruby_api_file(path):
 	sections = read_api_file(path, '#')
-	keywordMap = {}
+	keywordMap = {
+		'module': [],
+		'class': [],
+		'function': [],
+	}
 	for key, doc in sections:
-		items = set(doc.split())
-		keywordMap[key] = items
+		if key in ('built-in', 'core', 'library'):
+			items = re.findall(r'module\s+(\w+)', doc)
+			keywordMap['module'].extend(items)
+			items = re.findall(r'class\s+(\w+)', doc)
+			keywordMap['class'].extend(items)
+			items = re.findall(r'\sdef\s+(\w+[!?]?)', doc)
+			if key == 'built-in':
+				keywordMap['built-in function'] = items
+			else:
+				keywordMap['function'].extend(items)
+		else:
+			items = set(doc.split())
+			keywordMap[key] = items
 
-	codeFold = keywordMap['code fold']
-	keywordMap['keywords'] |= codeFold
-	codeFold.remove('end')
-
+	folding = keywordMap['code folding']
+	keywordMap['keywords'] |= folding
+	folding.remove('end')
+	keywordMap['regex'].remove('end')
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'pre-defined constants',
+		'module',
+		'class',
+		'built-in function',
+		'function',
+	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('code fold', codeFold, KeywordAttr.NoAutoComp),
-		('re', keywordMap['re'], KeywordAttr.NoAutoComp),
+		('code folding', folding, KeywordAttr.NoAutoComp),
+		('regex', keywordMap['regex'], KeywordAttr.NoAutoComp),
+		('pre-defined constants', keywordMap['pre-defined constants'], KeywordAttr.Default),
 		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer),
+		('module', keywordMap['module'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('built-in function', keywordMap['built-in function'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
 def parse_rust_api_file(path):
