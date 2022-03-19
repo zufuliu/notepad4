@@ -1218,6 +1218,7 @@ bool MarkdownLexer::HighlightAutoLink() {
 				break;
 
 			case SCE_H_SINGLESTRING:
+			case SCE_H_SGML_SIMPLESTRING:
 				invalid = sc.ch == '\'';
 				break;
 
@@ -2234,22 +2235,37 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_H_VALUE:
+		case SCE_H_SGML_1ST_PARAM:
 			if (IsHtmlInvalidAttrChar(sc.ch)) {
-				sc.SetState(SCE_MARKDOWN_DEFAULT);
+				const int outer = (sc.state == SCE_H_VALUE) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
+				sc.SetState(outer);
+				if (outer != SCE_MARKDOWN_DEFAULT) {
+					continue;
+				}
 			}
 			break;
 
 		case SCE_H_SINGLESTRING:
+		case SCE_H_SGML_SIMPLESTRING:
 			if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_MARKDOWN_DEFAULT);
+				const int outer = (sc.state == SCE_H_SINGLESTRING) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
+				sc.ForwardSetState(outer);
+				if (outer != SCE_MARKDOWN_DEFAULT) {
+					continue;
+				}
 			} else {
 				lexer.DetectAutoLink();
 			}
 			break;
 
 		case SCE_H_DOUBLESTRING:
+		case SCE_H_SGML_DOUBLESTRING:
 			if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_MARKDOWN_DEFAULT);
+				const int outer = (sc.state == SCE_H_DOUBLESTRING) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
+				sc.ForwardSetState(outer);
+				if (outer != SCE_MARKDOWN_DEFAULT) {
+					continue;
+				}
 			} else {
 				lexer.DetectAutoLink();
 			}
@@ -2305,6 +2321,14 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			}
 			break;
 
+		case SCE_H_SGML_COMMENT:
+			if (sc.Match('-', '-')) {
+				sc.Forward();
+				sc.ForwardSetState(SCE_H_SGML_DEFAULT);
+				continue;
+			}
+			break;
+
 		case SCE_H_SGML_COMMAND:
 		case SCE_H_SGML_DEFAULT:
 			if (sc.ch == '>') {
@@ -2320,8 +2344,19 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					sc.SetState(SCE_H_SGML_DEFAULT);
 				}
 			} else {
-				if (IsASpace(sc.chPrev) && (IsUpperCase(sc.ch) || (sc.ch == '#' && IsUpperCase(sc.chNext)))) {
-					sc.SetState(SCE_H_SGML_COMMAND);
+				if (sc.ch == '\"') {
+					sc.SetState(SCE_H_SGML_DOUBLESTRING);
+				} else if (sc.ch == '\'') {
+					sc.SetState(SCE_H_SGML_SIMPLESTRING);
+				} else if (sc.Match('-', '-')) {
+					sc.SetState(SCE_H_SGML_COMMENT);
+					sc.Forward();
+				} else if (IsASpace(sc.chPrev)) {
+					if (IsUpperCase(sc.ch) || (sc.ch == '#' && IsUpperCase(sc.chNext))) {
+						sc.SetState(SCE_H_SGML_COMMAND);
+					} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
+						sc.SetState(SCE_H_SGML_1ST_PARAM);
+					}
 				}
 			}
 			break;
