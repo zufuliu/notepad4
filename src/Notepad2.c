@@ -3067,7 +3067,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			int iNewEncoding;
 			switch (iCurrentEncoding) {
 			case CPI_DEFAULT:
-				iNewEncoding = -1;
+				iNewEncoding = CPI_NONE; // unknown encoding
 				break;
 			case CPI_UTF8SIGN:
 				iNewEncoding = CPI_UTF8;
@@ -7270,14 +7270,21 @@ BOOL FileIO(BOOL fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status) {
 	InvalidateRect(hwndStatus, NULL, TRUE);
 	UpdateWindow(hwndStatus);
 
-	const BOOL fSuccess = fLoad ? EditLoadFile(pszFile, flag, status) : EditSaveFile(hwndEdit, pszFile, flag, status);
+	if (fLoad) {
+		fLoad = EditLoadFile(pszFile, status);
+		iSrcEncoding = CPI_NONE;
+		iWeakSrcEncoding = CPI_NONE;
+	} else {
+		fLoad = EditSaveFile(hwndEdit, pszFile, flag, status);
+	}
+
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
 	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
 	StatusSetSimple(hwndStatus, FALSE);
 	EndWaitCursor();
 
-	return fSuccess;
+	return fLoad;
 }
 
 //=============================================================================
@@ -7416,7 +7423,7 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			return FALSE;
 		}
 	} else {
-		fSuccess = FileIO(TRUE, szFileName, loadFlag & FileLoadFlag_NoEncDetect, &status);
+		fSuccess = FileIO(TRUE, szFileName, 0, &status);
 		if (fSuccess) {
 			iCurrentEncoding = status.iEncoding;
 			iCurrentEOLMode = status.iEOLMode;
@@ -7965,7 +7972,7 @@ BOOL ActivatePrevInst(void) {
 				params->iInitialLine = iInitialLine;
 				params->iInitialColumn = iInitialColumn;
 
-				params->iSrcEncoding = (lpEncodingArg) ? Encoding_Match(lpEncodingArg) : CPI_NONE;
+				params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 				params->flagSetEncoding = flagSetEncoding;
 				params->flagSetEOLMode = flagSetEOLMode;
 				params->flagTitleExcerpt = 0;
@@ -8051,7 +8058,7 @@ BOOL ActivatePrevInst(void) {
 				params->iInitialLine = iInitialLine;
 				params->iInitialColumn = iInitialColumn;
 
-				params->iSrcEncoding = (lpEncodingArg) ? Encoding_Match(lpEncodingArg) : CPI_NONE;
+				params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 				params->flagSetEncoding = flagSetEncoding;
 				params->flagSetEOLMode = flagSetEOLMode;
 

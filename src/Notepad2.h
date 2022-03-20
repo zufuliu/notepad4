@@ -198,7 +198,6 @@ typedef enum FileLoadFlag {
 	FileLoadFlag_DontSave = 1,
 	FileLoadFlag_New = 2,
 	FileLoadFlag_Reload = 4,
-	FileLoadFlag_NoEncDetect = 8,
 } FileLoadFlag;
 
 typedef enum FileSaveFlag {

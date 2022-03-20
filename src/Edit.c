@@ -954,7 +954,7 @@ labelStart:
 #endif
 }
 
-int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSkipEncodingDetection, int *encodingFlag) {
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) {
 	LPCWSTR const pszExt = PathFindExtension(pszFile);
 	int preferedEncoding = CPI_NONE;
 	if (bLoadNFOasOEM && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
@@ -971,7 +971,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	}
 
 	int _iDefaultEncoding = (preferedEncoding == CPI_NONE) ? iDefaultEncoding : preferedEncoding;
-	if (iWeakSrcEncoding != CPI_NONE && Encoding_IsValid(iWeakSrcEncoding)) {
+	if (iWeakSrcEncoding != CPI_NONE) {
 		_iDefaultEncoding = iWeakSrcEncoding;
 	}
 
@@ -1000,7 +1000,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	// file large than 2 GiB is loaded without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
 	if (cbData < MAX_NON_UTF8_SIZE && (
 		(iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
-		|| (!bSkipEncodingDetection && iSrcEncoding == CPI_NONE && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
+		|| (iSrcEncoding == CPI_NONE && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
 	)) {
 		if (iSrcEncoding == CPI_UNICODE) {
 			bBOM = (lpData[0] == '\xFF' && lpData[1] == '\xFE');
@@ -1042,7 +1042,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, BOOL bSki
 	bBOM = utf8Sig;
 	utf8Sig = (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN); // reload as UTF-8 or UTF-8 filevar
 	if (iSrcEncoding == CPI_NONE) {
-		if (!bSkipEncodingDetection || cbData >= MAX_NON_UTF8_SIZE) {
+		{
 			if (!bBOM && (!bLoadASCIIasUTF8 || preferedEncoding != CPI_NONE)
 				&& cbData < MAX_NON_UTF8_SIZE && IsUTF7(lpData, cbData)) {
 				// 7-bit / any encoding
@@ -1091,7 +1091,7 @@ static LPSTR EncodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flag
 //
 // EditLoadFile()
 //
-BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus *status) {
+BOOL EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 	HANDLE hFile = CreateFile(pszFile,
 					   GENERIC_READ,
 					   FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -1101,8 +1101,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	dwLastIOError = GetLastError();
 
 	if (hFile == INVALID_HANDLE_VALUE) {
-		iSrcEncoding = CPI_NONE;
-		iWeakSrcEncoding = CPI_NONE;
 		return FALSE;
 	}
 
@@ -1111,8 +1109,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	if (!GetFileSizeEx(hFile, &fileSize)) {
 		dwLastIOError = GetLastError();
 		CloseHandle(hFile);
-		iSrcEncoding = CPI_NONE;
-		iWeakSrcEncoding = CPI_NONE;
 		return FALSE;
 	}
 
@@ -1152,8 +1148,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	if (fileSize.QuadPart > maxFileSize) {
 		CloseHandle(hFile);
 		status->bFileTooBig = TRUE;
-		iSrcEncoding = CPI_NONE;
-		iWeakSrcEncoding = CPI_NONE;
 		WCHAR tchDocSize[32];
 		WCHAR tchMaxSize[32];
 		WCHAR tchDocBytes[32];
@@ -1178,8 +1172,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 
 	if (!bReadSuccess) {
 		NP2HeapFree(lpData);
-		iSrcEncoding = CPI_NONE;
-		iWeakSrcEncoding = CPI_NONE;
 		return FALSE;
 	}
 
@@ -1188,13 +1180,11 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	status->totalLineCount = 1;
 
 	int encodingFlag = EncodingFlag_None;
-	const int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, bSkipEncodingDetection, &encodingFlag);
+	const int iEncoding = EditDetermineEncoding(pszFile, lpData, cbData, &encodingFlag);
 	status->iEncoding = iEncoding;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	if (cbData == 0) {
-		iSrcEncoding = CPI_NONE;
-		iWeakSrcEncoding = CPI_NONE;
 		SciCall_SetCodePage((uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 		EditSetEmptyText();
 		SciCall_SetEOLMode(status->iEOLMode);
@@ -1238,10 +1228,7 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE
 		&& iSrcEncoding == CPI_NONE && iWeakSrcEncoding == CPI_NONE
 		&& (bLoadANSIasUTF8 || GetACP() == CP_UTF8)) {
-		if (bSkipEncodingDetection && ((encodingFlag & EncodingFlag_UTF7) || IsUTF8(lpData, cbData))) {
-			uFlags = 0;
-			status->iEncoding = CPI_UTF8;
-		} else {
+		{
 			// try to load ANSI / unknown encoding as UTF-8
 			const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 			if (encodingFlag & EncodingFlag_UTF7) {
@@ -1262,8 +1249,6 @@ BOOL EditLoadFile(LPWSTR pszFile, BOOL bSkipEncodingDetection, EditFileIOStatus 
 		}
 	}
 
-	iSrcEncoding = CPI_NONE;
-	iWeakSrcEncoding = CPI_NONE;
 	if (cbData) {
 		EditDetectEOLMode(lpDataUTF8, cbData, status);
 		EditDetectIndentation(lpDataUTF8, cbData, &fvCurFile);
