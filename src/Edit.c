@@ -966,10 +966,6 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		preferedEncoding = CPI_UTF8;
 	}
 
-	if (!Encoding_IsValid(iDefaultEncoding)) {
-		iDefaultEncoding = CPI_UTF8;
-	}
-
 	int _iDefaultEncoding = (preferedEncoding == CPI_NONE) ? iDefaultEncoding : preferedEncoding;
 	if (iWeakSrcEncoding != CPI_NONE) {
 		_iDefaultEncoding = iWeakSrcEncoding;
@@ -992,21 +988,20 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		return iEncoding;
 	}
 
-	BOOL utf8Sig = IsUTF8Signature(lpData);
-	BOOL bBOM = FALSE;
-	BOOL bReverse = FALSE;
-
+	const uint16_t bom = *(const uint16_t *)lpData;
 	// check Unicode / UTF-16
 	// file large than 2 GiB is loaded without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
 	if (cbData < MAX_NON_UTF8_SIZE && (
 		(iSrcEncoding == CPI_UNICODE || iSrcEncoding == CPI_UNICODEBE) // reload as UTF-16
-		|| (iSrcEncoding == CPI_NONE && !utf8Sig && IsUnicode(lpData, cbData, &bBOM, &bReverse))
+		|| (iSrcEncoding == CPI_NONE && (cbData & 1) == 0 && (bom == BOM_UTF16LE || bom == BOM_UTF16BE))
 	)) {
+		BOOL bBOM = iSrcEncoding == CPI_NONE;
+		BOOL bReverse = bom == BOM_UTF16BE;
 		if (iSrcEncoding == CPI_UNICODE) {
-			bBOM = (lpData[0] == '\xFF' && lpData[1] == '\xFE');
+			bBOM = bom == BOM_UTF16LE;
 			bReverse = FALSE;
 		} else if (iSrcEncoding == CPI_UNICODEBE) {
-			bBOM = (lpData[0] == '\xFE' && lpData[1] == '\xFF');
+			bBOM = bom == BOM_UTF16BE;
 		}
 
 		if (iSrcEncoding == CPI_UNICODEBE || bReverse) {
@@ -1039,8 +1034,8 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	}
 
 	// check UTF-8
-	bBOM = utf8Sig;
-	utf8Sig = (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN); // reload as UTF-8 or UTF-8 filevar
+	const BOOL bBOM = IsUTF8Signature(lpData);
+	BOOL utf8Sig = (iSrcEncoding == CPI_UTF8 || iSrcEncoding == CPI_UTF8SIGN); // reload as UTF-8 or UTF-8 filevar
 	if (iSrcEncoding == CPI_NONE) {
 		{
 			if (!bBOM && (!bLoadASCIIasUTF8 || preferedEncoding != CPI_NONE)

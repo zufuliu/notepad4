@@ -459,15 +459,18 @@ BOOL	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
 #endif
 
 UINT	CodePageFromCharSet(UINT uCharSet);
-BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
+//BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
 BOOL	IsUTF8(const char *pTest, DWORD nLength);
 BOOL	IsUTF7(const char *pTest, DWORD nLength);
 //INT		UTF8_mbslen(LPCSTR source, INT byte_length);
 //INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
+#define BOM_UTF8		0xBFBBEF
+#define BOM_UTF16LE		0xFEFF
+#define BOM_UTF16BE		0xFFFE
 static inline BOOL IsUTF8Signature(const char *p) {
 	//return p[0] == '\xEF' && p[1] == '\xBB' && p[2] == '\xBF';
-	return (*((const UINT *)p) & 0xFFFFFF) == 0xBFBBEF;
+	return (*((const UINT *)p) & 0xFFFFFF) == BOM_UTF8;
 }
 
 BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW);

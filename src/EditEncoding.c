@@ -1036,6 +1036,7 @@ UINT CodePageFromCharSet(UINT uCharSet) {
 	return GetACP();
 }
 
+#if 0
 BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
 	if (pBuffer == NULL || cb < 2 || (cb & 1) != 0) {
 		// reject odd bytes
@@ -1046,8 +1047,8 @@ BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) 
 	const BOOL bIsTextUnicode = bSkipUnicodeDetection ? FALSE : IsTextUnicode(pBuffer, cb, &i);
 	//const BOOL bHasBOM = (pBuffer[0] == '\xFF' && pBuffer[1] == '\xFE');
 	//const BOOL bHasRBOM = (pBuffer[0] == '\xFE' && pBuffer[1] == '\xFF');
-	const BOOL bHasBOM = (*(const WORD *)pBuffer) == 0xFEFF;
-	const BOOL bHasRBOM = (*(const WORD *)pBuffer) == 0xFFFE;
+	const BOOL bHasBOM = (*(const WORD *)pBuffer) == BOM_UTF16LE;
+	const BOOL bHasRBOM = (*(const WORD *)pBuffer) == BOM_UTF16BE;
 
 	if (i == 0xFFFF) { // i doesn't seem to have been modified ...
 		i = 0;
@@ -1071,6 +1072,7 @@ BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) 
 
 	return FALSE;
 }
+#endif
 
 #if 0
 BOOL IsUTF8(const char *pTest, DWORD nLength) {
