@@ -511,8 +511,8 @@ typedef struct FILEVARS {
 	BOOL	bTabIndents;
 	BOOL	fWordWrap;
 	int 	iLongLinesLimit;
-	char	tchEncoding[32];
 	int 	iEncoding;
+	char	tchEncoding[32];
 	char	tchMode[32];
 } FILEVARS, *LPFILEVARS;
 
@@ -524,11 +524,9 @@ void	FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv);
 void	FileVars_Apply(LPFILEVARS lpfv);
 BOOL	FileVars_ParseInt(LPCSTR pszData, LPCSTR pszName, int *piValue);
 BOOL	FileVars_ParseStr(LPCSTR pszData, LPCSTR pszName, char *pszValue, int cchValue);
-// in EditEncoding.c
-BOOL	FileVars_IsUTF8(LPCFILEVARS lpfv);
-BOOL	FileVars_IsNonUTF8(LPCFILEVARS lpfv);
-BOOL	FileVars_IsValidEncoding(LPCFILEVARS lpfv);
-int 	FileVars_GetEncoding(LPCFILEVARS lpfv);
+static inline int FileVars_GetEncoding(LPCFILEVARS lpfv) {
+	return (lpfv->mask & FV_ENCODING) ? lpfv->iEncoding : CPI_NONE;
+}
 
 typedef enum {
 	FOLD_ACTION_FOLD	= 0, // SC_FOLDACTION_CONTRACT

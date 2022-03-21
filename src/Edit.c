@@ -1326,29 +1326,22 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 
 		lpData = (char *)NP2HeapAlloc(cbData + 1);
 		SciCall_GetText(cbData, lpData);
+#if 0
 		// FIXME: move checks in front of disk file access
-		/*if ((uFlags & NCP_UNICODE) == 0 && (uFlags & NCP_UTF8_SIGN) == 0) {
-				BOOL bEncodingMismatch = TRUE;
-				FILEVARS fv;
-				FileVars_Init(lpData, cbData, &fv);
-				if (fv.mask & FV_ENCODING) {
-					int iAltEncoding;
-					if (FileVars_IsValidEncoding(&fv)) {
-						iAltEncoding = FileVars_GetEncoding(&fv);
-						if (iAltEncoding == iEncoding)
-							bEncodingMismatch = FALSE;
-						else if ((mEncoding[iAltEncoding].uFlags & NCP_UTF8) && (uFlags & NCP_UTF8))
-							bEncodingMismatch = FALSE;
-					}
-					if (bEncodingMismatch) {
-						Encoding_GetLabel(iAltEncoding);
-						Encoding_GetLabel(iEncoding);
-						InfoBoxWarn(MB_OK, L"MsgEncodingMismatch", IDS_ENCODINGMISMATCH,
-							mEncoding[iAltEncoding].wchLabel,
-							mEncoding[iEncoding].wchLabel);
-					}
-				}
-			}*/
+		if ((uFlags & (NCP_UNICODE | NCP_UTF8_SIGN)) == 0) {
+			FILEVARS fv;
+			FileVars_Init(lpData, cbData, &fv);
+			const int iAltEncoding = FileVars_GetEncoding(&fv);
+			if (iAltEncoding != CPI_NONE && iAltEncoding != iEncoding
+				&& !((uFlags & NCP_UTF8) && (mEncoding[iAltEncoding].uFlags & NCP_UTF8))) {
+				Encoding_GetLabel(iAltEncoding);
+				Encoding_GetLabel(iEncoding);
+				InfoBoxWarn(MB_OK, L"MsgEncodingMismatch", IDS_ENCODINGMISMATCH,
+					mEncoding[iAltEncoding].wchLabel,
+					mEncoding[iEncoding].wchLabel);
+			}
+		}
+#endif
 		if (uFlags & NCP_UNICODE) {
 			SetEndOfFile(hFile);
 
