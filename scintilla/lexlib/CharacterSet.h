@@ -141,6 +141,10 @@ constexpr bool IsSpaceOrTab(int ch) noexcept {
 	return ch == ' ' || ch == '\t';
 }
 
+constexpr int GetTabIndentCount(int indentCount) noexcept {
+	return (indentCount + 4) & -4;
+}
+
 constexpr bool IsControlCharacter(unsigned char ch) noexcept {
 	// iscntrl() returns true for lots of characters > 127 which are displayable,
 	// currently only check C0 control characters.
@@ -344,6 +348,23 @@ constexpr bool IsDomainNameChar(int ch) noexcept {
 constexpr bool IsInvalidUrlChar(int ch) noexcept {
 	// TODO: https://url.spec.whatwg.org/ and https://www.rfc-editor.org/rfc/rfc3986
 	return ch <= 32 || AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}', 127);
+}
+
+// based on CommonMark Spec 6.6 Raw HTML
+constexpr bool IsHtmlTagStart(int ch) noexcept {
+	return IsAlpha(ch);
+}
+
+constexpr bool IsHtmlTagChar(int ch) noexcept {
+	return IsAlphaNumeric(ch) || ch == '-' || ch == ':';
+}
+
+constexpr bool IsHtmlAttrStart(int ch) noexcept {
+	return IsIdentifierStart(ch) || ch == ':';
+}
+
+constexpr bool IsHtmlAttrChar(int ch) noexcept {
+	return IsIdentifierChar(ch) || ch == ':' || ch == '.' || ch == '-';
 }
 
 constexpr bool IsHtmlInvalidAttrChar(int ch) noexcept {

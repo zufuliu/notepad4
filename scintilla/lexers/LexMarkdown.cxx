@@ -404,9 +404,16 @@ int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimit
 	return count;
 }
 
-int GetBlockStyle(const LexAccessor &styler, Sci_Line line, int lineState) noexcept {
+int GetBlockStyle(LexAccessor &styler, Sci_Line line, uint32_t lineState) noexcept {
 	Sci_PositionU pos = styler.LineStart(line);
-	pos += GetIndentCount(lineState);
+	int indentCount = GetIndentCount(lineState);
+	if (indentCount < 4) {
+		pos += indentCount;
+	} else {
+		while (IsSpaceOrTab(styler[pos])) {
+			++pos;
+		}
+	}
 	int style = styler.BufferStyleAt(pos);
 	if (style == SCE_H_TAG) {
 		// <script> </script>
@@ -641,7 +648,7 @@ bool MarkdownLexer::IsIndentedBlockEnd() const noexcept {
 		if (ch == ' ') {
 			++indentCount;
 		} else if (ch == '\t') {
-			indentCount = (indentCount/4 + 1)*4;
+			indentCount = GetTabIndentCount(indentCount);
 		} else if (IsEOLChar(ch) || pos >= endPos) {
 			if (!next && pos < endPos) {
 				next = true;
@@ -1244,23 +1251,6 @@ bool MarkdownLexer::HighlightAutoLink() {
 	}
 
 	return false;
-}
-
-// 6.6 Raw HTML
-constexpr bool IsHtmlTagStart(int ch) noexcept {
-	return IsAlpha(ch);
-}
-
-constexpr bool IsHtmlTagChar(int ch) noexcept {
-	return IsAlphaNumeric(ch) || ch == '-';
-}
-
-constexpr bool IsHtmlAttrStart(int ch) noexcept {
-	return IsIdentifierStart(ch) || ch == ':';
-}
-
-constexpr bool IsHtmlAttrChar(int ch) noexcept {
-	return IsIdentifierChar(ch) || ch == ':' || ch == '.' || ch == '-';
 }
 
 // 4.6 HTML blocks
@@ -1894,7 +1884,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 	if (sc.currentLine > 0) {
 		prevLevel = styler.LevelAt(sc.currentLine - 1);
 		lineState = styler.GetLineState(sc.currentLine - 1);
-		lexer.tagState = static_cast<HtmlTagState>(lineState & LineStateHtmlTagMask);
 		lexer.delimiterCount = (lineState >> 8) & 0xff;
 		/*
 		2: tagState
@@ -1951,6 +1940,17 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			}
 		}
 
+		const int visibleBefore = visibleChars;
+		if (visibleBefore == 0) {
+			if (sc.ch == ' ') {
+				indentCurrent += 1;
+			} else if (sc.ch == '\t') {
+				indentCurrent = GetTabIndentCount(indentCurrent);
+			} else if (!IsASpace(sc.ch)) {
+				visibleChars = 1;
+			}
+		}
+
 		switch (sc.state) {
 		// block
 		case SCE_MARKDOWN_HEADER1:
@@ -1970,7 +1970,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_SETEXT_H2:
 			if (lineState & LineStateSetextFirstLine) {
 				lexer.HighlightInlineText();
-			} else if (visibleChars == 0 && sc.ch == ((sc.state == SCE_MARKDOWN_SETEXT_H1) ? '=' : '-')) {
+			} else if (visibleBefore == 0 && sc.ch == ((sc.state == SCE_MARKDOWN_SETEXT_H1) ? '=' : '-')) {
 				lineState |= LineStateBlockEndLine;
 			}
 			break;
@@ -1989,7 +1989,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_BACKTICK_MATH:
 		case SCE_MARKDOWN_TILDE_BLOCK:
 		case SCE_MARKDOWN_TILDE_MATH:
-			if (visibleChars == 0 && indentCurrent < lexer.indentParent + 4
+			if (visibleBefore == 0 && indentCurrent < lexer.indentParent + 4
 				&& sc.ch == ((sc.state <= SCE_MARKDOWN_BACKTICK_MATH) ? '`' : '~')) {
 				const int count = GetMatchedDelimiterCount(styler, sc.currentPos, sc.ch);
 				if (count >= lexer.delimiterCount) {
@@ -2365,7 +2365,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		if (sc.state == SCE_MARKDOWN_DEFAULT) {
 			if  (lexer.tagState == HtmlTagState::None) {
 				if (sc.ch > ' ') {
-					if (visibleChars == 0) {
+					if (visibleBefore == 0) {
 						if (indentCurrent != indentPrevious) {
 							lexer.UpdateParentIndentCount(indentCurrent);
 						}
@@ -2411,15 +2411,6 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			}
 		}
 
-		if (visibleChars == 0) {
-			if (sc.ch == ' ') {
-				indentCurrent += 1;
-			} else if (sc.ch == '\t') {
-				indentCurrent = (indentCurrent/4 + 1)*4;
-			} else if (!IsASpace(sc.ch)) {
-				visibleChars = 1;
-			}
-		}
 		if (sc.atLineEnd) {
 			if (fold) {
 				int nextLevel;

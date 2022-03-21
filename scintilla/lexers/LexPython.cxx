@@ -791,11 +791,11 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 		}
 
-		if (visibleChars == 0 && IsASpaceOrTab(sc.ch)) {
+		if (visibleChars == 0) {
 			if (sc.ch == ' ') {
 				++indentCount;
-			} else {
-				indentCount = (indentCount / 4 + 1) * 4;
+			} else if (sc.ch == '\t') {
+				indentCount = GetTabIndentCount(indentCount);
 			}
 		}
 		if (!isspacechar(sc.ch)) {

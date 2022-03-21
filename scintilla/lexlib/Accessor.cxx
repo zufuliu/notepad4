@@ -34,7 +34,7 @@ int Accessor::IndentAmount(Sci_Line line) noexcept {
 	Sci_Position pos = LineStart(line);
 
 	char ch = '\0';
-	unsigned int indent = 0;
+	int indent = 0;
 
 	// TODO: avoid expanding tab, mixed indentation with space and tab is syntax error in languages like Python.
 	while (pos < end) {
@@ -42,7 +42,7 @@ int Accessor::IndentAmount(Sci_Line line) noexcept {
 		if (ch == ' ') {
 			indent++;
 		} else if (ch == '\t') {
-			indent = (indent / 4 + 1) * 4;
+			indent = (indent + 4) & -4;
 		} else {
 			break;
 		}
