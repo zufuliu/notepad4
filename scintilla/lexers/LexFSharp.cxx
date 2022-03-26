@@ -20,11 +20,13 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsFSOperator(int ch) noexcept {
+namespace {
+
+constexpr bool IsFSOperator(int ch) noexcept {
 	return isoperator(ch) || (ch == '\'' || ch == '@' || ch == '$' || ch == '#' || ch == '`');
 }
 
-/*static const char *const fsharpWordLists[] = {
+/*const char *const fsharpWordLists[] = {
 	"Primary keywords",
 	"Type Keywords",
 	"preprocessor",
@@ -32,7 +34,7 @@ static constexpr bool IsFSOperator(int ch) noexcept {
 	0
 };*/
 
-static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -182,12 +184,12 @@ static void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int 
 #define IsFSLine(line, word)	IsLexLineStartsWith(styler, line, word, true, SCE_FSHARP_KEYWORD)
 #define IsCommentLine(line) 	IsLexCommentLine(styler, line, SCE_FSHARP_COMMENTLINE)
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_FSHARP_COMMENT;
 }
 #define IsOpenLine(line)		IsFSLine(line, "open")
 
-static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -258,6 +260,8 @@ static void FoldFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			levelCurrent = levelNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmFSharp(SCLEX_FSHARP, ColouriseFSharpDoc, "fsharp", FoldFSharpDoc);

@@ -21,9 +21,10 @@
 
 using namespace Lexilla;
 
+namespace {
 // TODO: https://www.gnu.org/software/emacs/manual/html_node/elisp/Character-Type.html
 
-static constexpr bool IsLispOp(int ch) noexcept {
+constexpr bool IsLispOp(int ch) noexcept {
 	return ch == '(' || ch == ')' || ch == '[' || ch == ']'
 		|| ch == '\'' || ch == '*' || ch == '?' || ch == '.'
 		|| ch == '+' || ch == '-' || ch == '<' || ch == '>'
@@ -32,7 +33,7 @@ static constexpr bool IsLispOp(int ch) noexcept {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 
 	int state = initStyle;
@@ -152,7 +153,7 @@ static void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int in
 #define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_C_COMMENTLINE)
 #define IsStreamStyle(style)		((style) == SCE_C_STRING)
 #define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
-static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -208,6 +209,8 @@ static void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			levelCurrent = levelNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmLisp(SCLEX_LISP, ColouriseLispDoc, "lisp", FoldListDoc);

@@ -42,7 +42,7 @@ int Accessor::IndentAmount(Sci_Line line) noexcept {
 		if (ch == ' ') {
 			indent++;
 		} else if (ch == '\t') {
-			indent = (indent + 4) & -4;
+			indent = (indent + 4) & ~3;
 		} else {
 			break;
 		}

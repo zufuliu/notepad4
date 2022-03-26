@@ -27,18 +27,20 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsAu3TypeCharacter(int ch) noexcept {
+namespace {
+
+constexpr bool IsAu3TypeCharacter(int ch) noexcept {
 	return ch == '$';
 }
-static constexpr bool IsAu3WordChar(int ch) noexcept {
+constexpr bool IsAu3WordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
 
-static constexpr bool IsAu3WordStart(int ch) noexcept {
+constexpr bool IsAu3WordStart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_' || ch == '@' || ch == '#' || ch == '$' || ch == '.';
 }
 
-static constexpr bool IsAu3Operator(int ch) noexcept {
+constexpr bool IsAu3Operator(int ch) noexcept {
 	return ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
 		ch == '&' || ch == '^' || ch == '=' || ch == '<' || ch == '>' ||
 		ch == '(' || ch == ')' || ch == '[' || ch == ']' || ch == ',';
@@ -50,7 +52,7 @@ static constexpr bool IsAu3Operator(int ch) noexcept {
 // also check if the second portion is valid... (up, down.on.off, toggle or a number)
 ///////////////////////////////////////////////////////////////////////////////
 
-static int GetSendKey(const char *szLine, char *szKey) noexcept {
+int GetSendKey(const char *szLine, char *szKey) noexcept {
 	int nFlag = 0;
 	int nStartFound = 0;
 	int nKeyPos = 0;
@@ -106,7 +108,7 @@ static int GetSendKey(const char *szLine, char *szKey) noexcept {
 //
 // Routine to check the last "none comment" character on a line to see if its a continuation
 //
-static bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
+bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 	const Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
 	//int stylech = styler.StyleAt(nsPos);
@@ -124,7 +126,7 @@ static bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 	return false;
 }
 
-/*static const char * const AU3WordLists[] = {
+/*const char * const AU3WordLists[] = {
 	"#autoit keywords",
 	"#autoit functions",
 	"#autoit macros",
@@ -137,7 +139,7 @@ static bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 };*/
 
 // syntax highlighting logic
-static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -549,14 +551,14 @@ static void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int ini
 }
 
 //
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_AU3_COMMENT || style == SCE_AU3_COMMENTBLOCK;
 }
 
 //
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
-static int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
+int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
 	Sci_Position nsPos = styler.LineStart(szLine);
 	const Sci_Position nePos = styler.LineStart(szLine + 1) - 1;
 	while (isspacechar(styler.SafeGetCharAt(nsPos)) && nsPos < nePos) {
@@ -569,7 +571,7 @@ static int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
 
 
 //
-static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
+void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const Sci_Position endPos = startPos + length;
 	constexpr bool foldInComment = false;
 	// Backtrack to previous line in case need to fix its fold status
@@ -764,6 +766,8 @@ static void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWo
 			chPrev = ch;
 		}
 	}
+}
+
 }
 
 LexerModule lmAU3(SCLEX_AU3, ColouriseAU3Doc, "au3", FoldAU3Doc);

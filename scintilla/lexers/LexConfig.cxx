@@ -20,18 +20,20 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsConfOp(int ch) noexcept {
+namespace {
+
+constexpr bool IsConfOp(int ch) noexcept {
 	return ch == '=' || ch == ':' || ch == ';' || ch == '{' || ch == '}' || ch == '(' || ch == ')' ||
 		ch == '!' || ch == ',' || ch == '|' || ch == '*' || ch == '$' || ch == '.';
 }
-static constexpr bool IsUnit(int ch) noexcept {
+constexpr bool IsUnit(int ch) noexcept {
 	return ch == 'K' || ch == 'M' || ch == 'G' || ch == 'k' || ch == 'm' || ch == 'g';
 }
-static constexpr bool IsDelimiter(int ch) noexcept {
+constexpr bool IsDelimiter(int ch) noexcept {
 	return IsASpace(ch) || IsConfOp(ch);
 }
 
-static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	int state = initStyle;
 	int chNext = styler[startPos];
 	styler.StartAt(startPos);
@@ -206,7 +208,7 @@ static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_CONF_COMMENT)
 
-static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -273,6 +275,8 @@ static void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			visibleChars = 0;
 		}
 	}
+}
+
 }
 
 LexerModule lmConf(SCLEX_CONF, ColouriseConfDoc, "conf", FoldConfDoc);

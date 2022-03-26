@@ -22,15 +22,17 @@
 
 using namespace Lexilla;
 
+namespace {
+
 #define	LEX_MATLAB		40
 #define	LEX_OCTAVE		61
 #define	LEX_SCILAB		62
 
-static constexpr bool IsMatlabOctave(int lexType) noexcept {
+constexpr bool IsMatlabOctave(int lexType) noexcept {
 	return lexType == LEX_MATLAB || lexType == LEX_OCTAVE;
 }
 
-static bool IsLineCommentStart(int lexType, const StyleContext &sc, int visibleChars) noexcept {
+bool IsLineCommentStart(int lexType, const StyleContext &sc, int visibleChars) noexcept {
 	const int ch = sc.ch;
 	const int chNext = sc.chNext;
 	return ch == '#'	// Octave, Julia, Gnuplot, Shebang or invalid character
@@ -38,50 +40,50 @@ static bool IsLineCommentStart(int lexType, const StyleContext &sc, int visibleC
 		|| (ch == '/' && chNext == '/'); // Scilab
 }
 
-static bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsNestedCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return visibleChars == 0 && chNext == '{'
 		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
 		&& IsLexSpaceToEOL(styler, currentPos + 2);
 }
 
-static bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsNestedCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return visibleChars == 0 && chNext == '}'
 		&& ((lexType == LEX_MATLAB && ch == '%') || (lexType == LEX_OCTAVE && (ch == '%' || ch == '#')))
 		&& IsLexSpaceToEOL(styler, currentPos + 2);
 }
 
-static bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsBlockCommentStart(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return IsNestedCommentStart(lexType, ch, chNext, visibleChars, styler, currentPos)
 		|| (ch == '/' && chNext == '*'); // Scilab
 }
 
-static bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
+bool IsBlockCommentEnd(int lexType, int ch, int chNext, int visibleChars, LexAccessor &styler, Sci_PositionU currentPos) noexcept {
 	return IsNestedCommentEnd(lexType, ch, chNext, visibleChars, styler, currentPos)
 		|| (ch == '*' && chNext == '/'); // Scilab
 }
 
-static bool IsBlockCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
+bool IsBlockCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
 	return IsBlockCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static bool IsBlockCommentEnd(int lexType, StyleContext &sc, int visibleChars) noexcept {
+bool IsBlockCommentEnd(int lexType, StyleContext &sc, int visibleChars) noexcept {
 	return IsBlockCommentEnd(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
+bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) noexcept {
 	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-static constexpr bool IsMatOperator(int ch) noexcept {
+constexpr bool IsMatOperator(int ch) noexcept {
 	return isoperator(ch) || ch == '@' || ch == '\\' || ch == '$';
 }
 
-static constexpr bool IsInvalidFileName(int ch) noexcept {
+constexpr bool IsInvalidFileName(int ch) noexcept {
 	return isspacechar(ch) || ch == '<' || ch == '>' || ch == '/' || ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '|' || ch == '*' || ch == '?';
 }
 
-static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &attributes = *keywordLists[1];
 	const WordList &commands = *keywordLists[2];
@@ -282,18 +284,18 @@ static void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int 
 }
 
 // character after the "end" statement (skiped space and tabs)
-static constexpr bool IsMatEndChar(char chEnd, int style) noexcept {
+constexpr bool IsMatEndChar(char chEnd, int style) noexcept {
 	return (chEnd == '\r' || chEnd == '\n' || chEnd == ';')
 		|| (style == SCE_MAT_COMMENT || style == SCE_MAT_COMMENTBLOCK);
 }
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_MAT_COMMENTBLOCK;
 }
 
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_MAT_COMMENT)
 
-static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_MATLAB);
 
 	const Sci_PositionU endPos = startPos + length;
@@ -400,6 +402,8 @@ static void FoldMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initS
 			visibleChars = 0;
 		}
 	}
+}
+
 }
 
 LexerModule lmMatlab(SCLEX_MATLAB, ColouriseMatlabDoc, "matlab", FoldMatlabDoc);

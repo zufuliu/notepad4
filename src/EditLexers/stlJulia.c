@@ -6,7 +6,7 @@ static KEYWORDLIST Keywords_Julia = {{
 "abstract baremodule begin break catch const continue do else elseif end export finally for function global "
 "if import in isa let local macro module mutable primitive quote return struct try type using var where while "
 
-, // 1 code fold
+, // 1 code folding
 "baremodule begin do for function if let macro module quote struct try type while "
 
 , // 2 type

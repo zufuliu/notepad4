@@ -24,22 +24,24 @@
 
 using namespace Lexilla;
 
+namespace {
+
 // Extended to accept accented characters
-static constexpr bool IsAWordChar(int ch) noexcept {
+constexpr bool IsAWordChar(int ch) noexcept {
 	return ch >= 0x80 || (IsAlphaNumeric(ch) || ch == '_' || ch == ':' || ch == '.'); // : name space separator
 }
 
-static constexpr bool IsAWordStart(int ch) noexcept {
+constexpr bool IsAWordStart(int ch) noexcept {
 	return ch >= 0x80 || (ch == ':' || IsAlpha(ch) || ch == '_');
 }
 
-static constexpr bool IsANumberChar(int ch) noexcept {
+constexpr bool IsANumberChar(int ch) noexcept {
 	// Not exactly following number definition (several dots are seen as OK, etc.)
 	// but probably enough in most cases.
 	return IsHexDigit(ch) || ch == 'E' || ch == 'e' || ch == '.' || ch == '-' || ch == '+';
 }
 
-static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList keywordLists, Accessor &styler) {
 #define  isComment(s) ((s) == SCE_TCL_COMMENT || (s) == SCE_TCL_COMMENTLINE || (s) == SCE_TCL_COMMENT_BOX || (s) == SCE_TCL_BLOCK_COMMENT)
 	bool commentLevel = false;
 	bool subBrace = false; // substitution begin with a brace ${.....}
@@ -379,7 +381,7 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 	sc.Complete();
 }
 
-/*static const char *const tclWordListDesc[] = {
+/*const char *const tclWordListDesc[] = {
 	"TCL Keywords",
 	"TK Keywords",
 	"iTCL Keywords",
@@ -392,5 +394,6 @@ static void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, Le
 	0
 };*/
 
-// this code supports folding in the colourizer
+}
+
 LexerModule lmTCL(SCLEX_TCL, ColouriseTCLDoc, "tcl");

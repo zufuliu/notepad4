@@ -32,7 +32,7 @@ NULL
 , // 7 function
 NULL
 
-, // 8 comment
+, // 8 comment tag
 "see "
 
 , NULL, NULL, NULL, NULL, NULL, NULL

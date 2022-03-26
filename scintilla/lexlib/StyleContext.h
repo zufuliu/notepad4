@@ -298,4 +298,6 @@ public:
 
 bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle);
 
+bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept;
+
 }

@@ -20,16 +20,18 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsCILOp(int ch) noexcept {
+namespace {
+
+constexpr bool IsCILOp(int ch) noexcept {
 	return ch == '{' || ch == '}' || ch == '[' || ch == ']' || ch == '(' || ch == ')' || ch == '=' || ch == '&'
 		|| ch == ':' || ch == ',' || ch == '+' || ch == '-' || ch == '.';
 }
-static constexpr bool IsCILWordChar(int ch) noexcept {
+constexpr bool IsCILWordChar(int ch) noexcept {
 	return iswordchar(ch) || ch == '-' || ch == '/' || ch == '$';
 }
 
 #define MAX_WORD_LENGTH	31
-static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &kwInstruction = *keywordLists[10];
@@ -164,7 +166,7 @@ static void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int ini
 
 #define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_C_COMMENTLINE)
 #define IsStreamCommentStyle(style)	((style) == SCE_C_COMMENT)
-static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -215,6 +217,8 @@ static void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			levelCurrent = levelNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmCIL(SCLEX_CIL, ColouriseCILDoc, "cil", FoldCILDoc);

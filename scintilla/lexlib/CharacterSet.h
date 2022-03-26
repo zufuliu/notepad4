@@ -142,7 +142,7 @@ constexpr bool IsSpaceOrTab(int ch) noexcept {
 }
 
 constexpr int GetTabIndentCount(int indentCount) noexcept {
-	return (indentCount + 4) & -4;
+	return (indentCount + 4) & ~3;
 }
 
 constexpr bool IsControlCharacter(unsigned char ch) noexcept {

@@ -22,17 +22,19 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsAsmWordChar(int ch) noexcept {
+namespace {
+
+constexpr bool IsAsmWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == '?' || ch == '@' || ch == '$';
 }
-static constexpr bool IsAsmWordStart(int ch) noexcept {
+constexpr bool IsAsmWordStart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_' || ch == '.' ||
 		ch == '%' || ch == '@' || ch == '$' || ch == '?' || ch == '#';
 }
-static constexpr bool IsAsmOperator(int ch) noexcept {
+constexpr bool IsAsmOperator(int ch) noexcept {
 	return isoperator(ch) && !(ch == '%' || ch == '$' || ch == '#');
 }
-static constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
+constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 	return IsHexDigit(ch)
 		|| ((ch == 'x' || ch == 'X') && chPrev == '0')
 		|| ((ch == 'H' || ch == 'h') && IsHexDigit(chPrev))
@@ -40,7 +42,7 @@ static constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 		|| ((ch == 'Q' || ch == 'q') && IsOctalDigit(chPrev));
 }
 
-/*static const char * const asmWordListDesc[] = {
+/*const char * const asmWordListDesc[] = {
 	"CPU instructions",
 	"FPU instructions",
 	"Registers",
@@ -53,9 +55,8 @@ static constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 	0
 };*/
 
-extern bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept;
 
-static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &cpuInstruction = *keywordLists[0];
 	const WordList &mathInstruction = *keywordLists[1];
 	const WordList &registers = *keywordLists[2];
@@ -311,15 +312,15 @@ static void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	sc.Complete();
 }
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_ASM_COMMENT || style == SCE_ASM_COMMENT2 || style == SCE_ASM_COMMENTDIRECTIVE;
 }
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_ASM_COMMENTLINE)
 
-static constexpr bool IsAsmDefaultStyle(int style) noexcept {
+constexpr bool IsAsmDefaultStyle(int style) noexcept {
 	return style == SCE_ASM_DEFAULT || style == SCE_ASM_IDENTIFIER;
 }
-static bool IsEquLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsEquLine(LexAccessor &styler, Sci_Line line) noexcept {
 	if (line < 0) {
 		return false;
 	}
@@ -333,7 +334,7 @@ static bool IsEquLine(LexAccessor &styler, Sci_Line line) noexcept {
 	}
 	return false;
 }
-static bool IsAsmDefineLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsAsmDefineLine(LexAccessor &styler, Sci_Line line) noexcept {
 	if (line < 0) {
 		return false;
 	}
@@ -358,7 +359,7 @@ static bool IsAsmDefineLine(LexAccessor &styler, Sci_Line line) noexcept {
 #define IsEndLine(line)			IsLexLineStartsWith(styler, line, "end", false, SCE_ASM_DIRECTIVE)
 
 #define MAX_ASM_WORD_LEN	15
-static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &directives4foldstart = *keywordLists[6];
 	const WordList &directives4foldend = *keywordLists[7];
 
@@ -461,6 +462,8 @@ static void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			styleEOL = style;
 		}
 	}
+}
+
 }
 
 LexerModule lmAsm(SCLEX_ASM, ColouriseAsmDoc, "asm", FoldAsmDoc);

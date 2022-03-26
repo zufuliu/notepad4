@@ -30,7 +30,9 @@
 
 using namespace Lexilla;
 
-/*static const char * const VHDLWordLists[] = {
+namespace {
+
+/*const char * const VHDLWordLists[] = {
 	"Keywords",
 	"Operators",
 	"Attributes",
@@ -43,7 +45,7 @@ using namespace Lexilla;
 	0,
 };*/
 
-static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &Keywords = *keywordLists[0];
 	const WordList &Operators = *keywordLists[1];
 	const WordList &Attributes = *keywordLists[2];
@@ -131,18 +133,18 @@ static void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position length, int in
 	sc.Complete();
 }
 
-static constexpr bool IsCommentStyle(int style) noexcept {
+constexpr bool IsCommentStyle(int style) noexcept {
 	return style == SCE_VHDL_BLOCK_COMMENT || style == SCE_VHDL_COMMENT || style == SCE_VHDL_COMMENTLINEBANG;
 }
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_VHDL_BLOCK_COMMENT;
 }
 
 #define IsCommentLine(line) IsLexCommentLine(styler, line, MultiStyle(SCE_VHDL_COMMENT, SCE_VHDL_COMMENTLINEBANG))
 
 // Folding the code
-static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
+void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &kwFold = *keywordLists[8];
 	const bool foldAtBegin = styler.GetPropertyBool("fold.at.Begin", true);
 	const Sci_PositionU endPos = startPos + length;
@@ -341,6 +343,8 @@ static void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initS
 			levelMinCurrentBegin = levelCurrent;
 		}
 	}
+}
+
 }
 
 LexerModule lmVHDL(SCLEX_VHDL, ColouriseVHDLDoc, "vhdl", FoldVHDLDoc);

@@ -24,15 +24,17 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsVWordChar(int ch) noexcept {
+namespace {
+
+constexpr bool IsVWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '.' || ch == '_' || ch == '\''|| ch == '$';
 }
 
-static constexpr bool IsVWordStart(int ch) noexcept {
+constexpr bool IsVWordStart(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_' || ch == '$';
 }
 
-/*static const char * const verilogWordLists[] = {
+/*const char * const verilogWordLists[] = {
 	"Primary keywords and identifiers",
 	"Secondary keywords and identifiers",
 	"System Tasks",
@@ -41,7 +43,7 @@ static constexpr bool IsVWordStart(int ch) noexcept {
 	0,
 };*/
 
-static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -150,12 +152,12 @@ static void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position length, int
 	sc.Complete();
 }
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_V_COMMENT;
 }
 #define IsCommentLine(line) IsLexCommentLine(styler, line, MultiStyle(SCE_V_COMMENTLINE, SCE_V_COMMENTLINEBANG))
 
-static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -225,6 +227,8 @@ static void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position length, int init
 			levelCurrent = levelNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmVerilog(SCLEX_VERILOG, ColouriseVerilogDoc, "verilog", FoldVerilogDoc);

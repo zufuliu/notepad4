@@ -20,12 +20,14 @@
 
 using namespace Lexilla;
 
+namespace {
+
 // Extended to accept accented characters
-static constexpr bool IsPSWordChar(int ch) noexcept {
+constexpr bool IsPSWordChar(int ch) noexcept {
 	return ch >= 0x80 || IsAlphaNumeric(ch) || ch == '-' || ch == '_';
 }
 
-/*static const char * const powershellWordLists[] = {
+/*const char * const powershellWordLists[] = {
 	"Commands",
 	"Cmdlets",
 	"Aliases",
@@ -34,7 +36,7 @@ static constexpr bool IsPSWordChar(int ch) noexcept {
 	0
 };*/
 
-static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -131,7 +133,7 @@ static void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, 
 // Store both the current line's fold level and the next lines in the
 // level store to make it easy to pick up with each increment
 // and to make it possible to fiddle the current level for "} else {".
-static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -173,6 +175,8 @@ static void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position length, int i
 			levelCurrent = levelNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmPowerShell(SCLEX_POWERSHELL, ColourisePowerShellDoc, "powershell", FoldPowerShellDoc);

@@ -8,7 +8,16 @@ import string
 sys.path.append('../scintilla/scripts')
 from FileGenerator import Regenerate
 
+SinglyWordMap = {
+	'class': 'class',
+	'classes': 'class',
+	'properties': 'property',
+}
+
 AllKeywordAttrList = {}
+# for keyword list used in AutoC_AddSpecWord()
+SpecialKeywordIndexList = {}
+LexerKeywordIndexList = {}
 # X11 and SVG color names
 ColorNameList = set()
 JavaKeywordMap = {}
@@ -21,6 +30,7 @@ class KeywordAttr(IntFlag):
 	NoLexer = 1
 	MakeLower = 2
 	NoAutoComp = 4
+	Special = 256
 
 	@staticmethod
 	def get_c_expr(flags):
@@ -103,9 +113,23 @@ def RemoveDuplicateKeyword(keywordMap, orderedKeys):
 			unique |= items
 		keywordMap[key] = items
 
-def BuildKeywordContent(rid, keywordList, keywordCount=16):
+def build_enum_name(comment):
+	items = [item.replace('-', '') for item in comment.split()]
+	item = items[-1]
+	if item[-1] == 's':
+		if item in SinglyWordMap:
+			singly = SinglyWordMap[item]
+		else:
+			singly = item[:-1]
+			SinglyWordMap[item] = singly
+		items[-1] = singly
+	return ''.join(item.title() for item in items)
+
+def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	output = []
 	nonzero = []
+	indexList = LexerKeywordIndexList.setdefault(lexer, {})
+	prefix = lexer[3:-4] + 'KeywordIndex_'
 	for index, item in enumerate(keywordList):
 		comment, items, attr = item
 		lines = MakeKeywordLines(set(items))
@@ -117,6 +141,20 @@ def BuildKeywordContent(rid, keywordList, keywordCount=16):
 			output.append('NULL')
 		if index + 1 < keywordCount:
 			output.append("")
+
+		indexName = build_enum_name(comment)
+		if not attr & KeywordAttr.NoLexer and  comment != 'unused':
+			if indexName in indexList:
+				assert index == indexList[indexName][0], (rid, lexer, comment)
+			else:
+				indexList[indexName] = (index, rid)
+		if attr & KeywordAttr.Special:
+			attr &= ~KeywordAttr.Special
+			indexName = prefix + indexName
+			if indexName in SpecialKeywordIndexList:
+				assert index == SpecialKeywordIndexList[indexName], (rid, lexer, comment)
+			else:
+				SpecialKeywordIndexList[indexName] = index
 		if attr != KeywordAttr.Default:
 			nonzero.append((index, attr, comment))
 
@@ -127,8 +165,8 @@ def BuildKeywordContent(rid, keywordList, keywordCount=16):
 		AllKeywordAttrList[rid] = nonzero
 	return output
 
-def UpdateKeywordFile(rid, path, keywordList, keywordCount=16, suffix=''):
-	output = BuildKeywordContent(rid, keywordList, keywordCount=keywordCount)
+def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix=''):
+	output = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
 	Regenerate(path, '//' + suffix, output)
 
 def split_api_section(doc, comment, commentKind=0):
@@ -220,8 +258,8 @@ def parse_actionscript_api_file(path):
 		('constant', [], KeywordAttr.Default),
 		('metadata', [], KeywordAttr.Default),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
-		('properties', [], KeywordAttr.Default),
-		('doc tag', [], KeywordAttr.Default),
+		('properties', [], KeywordAttr.NoLexer),
+		('doc tag', [], KeywordAttr.NoLexer),
 	]
 
 def parse_autohotkey_api_file(pathList):
@@ -261,8 +299,8 @@ def parse_autohotkey_api_file(pathList):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
-		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
-		('compiler directives', keywordMap['script compiler directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('compiler directives', keywordMap['script compiler directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('objects', keywordMap['objects'], KeywordAttr.MakeLower),
 		('built-in variables', keywordMap['built-in variables'], KeywordAttr.MakeLower),
 		('keys', keywordMap['keys'], KeywordAttr.MakeLower),
@@ -287,10 +325,10 @@ def parse_apdl_api_file(path):
 
 	keywordMap['star command'].extend(keywordMap['code folding']) # for auto-completion
 	return [
-		('keywords', keywordMap['code folding'], KeywordAttr.Default),
+		('code folding', keywordMap['code folding'], KeywordAttr.Default),
 		('command', keywordMap['command'], KeywordAttr.Default),
-		('slash command', keywordMap['slash command'], KeywordAttr.Default),
-		('star command', keywordMap['star command'], KeywordAttr.Default),
+		('slash command', keywordMap['slash command'], KeywordAttr.Default | KeywordAttr.Special),
+		('star command', keywordMap['star command'], KeywordAttr.Default | KeywordAttr.Special),
 		('argument', keywordMap['argument'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.Default),
 	]
@@ -620,14 +658,14 @@ def parse_csharp_api_file(path):
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
 		('vala types', keywordMap['vala types'], KeywordAttr.NoAutoComp),
-		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoAutoComp),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('attributes', keywordMap['attributes'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('struct', keywordMap['struct'], KeywordAttr.Default),
 		('interface', keywordMap['interface'], KeywordAttr.Default),
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('constant', [], KeywordAttr.Default),
-		('comment tag', keywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('comment tag', keywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_css_api_file(pathList):
@@ -673,9 +711,9 @@ def parse_css_api_file(pathList):
 	])
 	return [
 		('properties', keywordMap['properties'], KeywordAttr.Default),
-		('at rules', keywordMap['at rules'], KeywordAttr.NoLexer),
-		('pseudo classes', keywordMap['pseudo classes'], KeywordAttr.Default),
-		('pseudo elements', keywordMap['pseudo elements'], KeywordAttr.Default),
+		('at rules', keywordMap['at rules'], KeywordAttr.NoLexer | KeywordAttr.Special),
+		('pseudo classes', keywordMap['pseudo classes'], KeywordAttr.Default | KeywordAttr.Special),
+		('pseudo elements', keywordMap['pseudo elements'], KeywordAttr.Default | KeywordAttr.Special),
 		('color names', ColorNameList, KeywordAttr.NoLexer),
 		('values', keywordMap['values'], KeywordAttr.NoLexer),
 	]
@@ -711,8 +749,8 @@ def parse_dlang_api_file(path):
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
-		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
-		('attribute', keywordMap['attribute'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attribute', keywordMap['attribute'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('struct', keywordMap['struct'], KeywordAttr.Default),
 		('union', keywordMap['union'], KeywordAttr.Default),
@@ -759,7 +797,7 @@ def parse_dart_api_file(path):
 		('types', keywordMap['types'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
-		('metadata', keywordMap['metadata'], KeywordAttr.NoLexer),
+		('metadata', keywordMap['metadata'], KeywordAttr.NoLexer | KeywordAttr.Special),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
@@ -941,7 +979,7 @@ def parse_graphviz_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('labels', keywordMap['labels'], KeywordAttr.NoLexer),
+		('html labels', keywordMap['labels'], KeywordAttr.NoLexer | KeywordAttr.Special),
 		('attributes', keywordMap['attributes'], KeywordAttr.NoLexer),
 		('node shapes', keywordMap['node shapes'], KeywordAttr.NoLexer),
 		('color names', ColorNameList, KeywordAttr.NoLexer),
@@ -965,9 +1003,9 @@ def parse_groovy_api_file(path):
 		('interface', JavaKeywordMap['interface'], KeywordAttr.Default),
 		('enumeration', JavaKeywordMap['enumeration'], KeywordAttr.Default),
 		('constant', [], KeywordAttr.Default),
-		('annotation', JavaKeywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
-		('function', [], KeywordAttr.Default),
-		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('annotation', JavaKeywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('function', [], KeywordAttr.NoLexer),
+		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_haxe_api_file(path):
@@ -999,14 +1037,14 @@ def parse_haxe_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoAutoComp),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('interface', keywordMap['interface'], KeywordAttr.Default),
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('constant', [], KeywordAttr.Default),
 		('metadata', [], KeywordAttr.Default),
 		('function', [], KeywordAttr.Default),
-		('comment', keywordMap['comment'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('comment tag', keywordMap['comment'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_inno_setup_api_file(path):
@@ -1119,7 +1157,7 @@ def parse_inno_setup_api_file(path):
 		('constants', keywordMap['constants'], KeywordAttr.NoLexer),
 
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('types', keywordMap['types'], KeywordAttr.Default),
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.MakeLower),
 		('functions', keywordMap['functions'], KeywordAttr.NoLexer),
@@ -1206,9 +1244,9 @@ def parse_java_api_file(path):
 		('interface', keywordMap['interface'], KeywordAttr.Default),
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('constant', [], KeywordAttr.Default),
-		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('function', [], KeywordAttr.Default),
-		('Javadoc', keywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('Javadoc', keywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_javascript_api_file(path):
@@ -1276,10 +1314,10 @@ def parse_javascript_api_file(path):
 		('interface', [], KeywordAttr.Default),
 		('enumeration', [], KeywordAttr.Default),
 		('constant', keywordMap['constant'], KeywordAttr.Default),
-		('decorator', [], KeywordAttr.Default),
+		('decorator', [], KeywordAttr.Default | KeywordAttr.Special),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('properties', keywordMap['properties'], KeywordAttr.NoLexer),
-		('JSDoc', keywordMap['jsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('JSDoc', keywordMap['jsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_julia_api_file(path):
@@ -1310,10 +1348,10 @@ def parse_julia_api_file(path):
 		else:
 			keywordMap[key] = set(doc.split())
 
-	codeFold = keywordMap['code fold']
-	keywordMap['keywords'] |= codeFold
-	codeFold.remove('end')
-	codeFold.add('type')
+	folding = keywordMap['code folding']
+	keywordMap['keywords'] |= folding
+	folding.remove('end')
+	folding.add('type')
 
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
@@ -1324,12 +1362,12 @@ def parse_julia_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('code fold', codeFold, KeywordAttr.NoAutoComp),
+		('code folding', folding, KeywordAttr.NoAutoComp),
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('constant', keywordMap['constant'], KeywordAttr.Default),
 		('basic function', keywordMap['basic function'], KeywordAttr.Default),
 		('module', keywordMap['module'], KeywordAttr.NoLexer),
-		('macro', keywordMap['macro'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('macro', keywordMap['macro'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
@@ -1386,9 +1424,9 @@ def parse_kotlin_api_file(path):
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('interface', keywordMap['interface'], KeywordAttr.Default),
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
-		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer),
+		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.Special),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
-		('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
+		('KDoc', keywordMap['kdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_lua_api_file(path):
@@ -1601,14 +1639,13 @@ def parse_python_api_file(path):
 		('attribute', keywordMap['attributes'], KeywordAttr.Default),
 		('special method', keywordMap['special method'], KeywordAttr.Default),
 		('class', keywordMap['classes'], KeywordAttr.Default),
-		('decorator', keywordMap['decorators'], KeywordAttr.NoLexer),
+		('decorator', keywordMap['decorators'], KeywordAttr.NoLexer | KeywordAttr.Special),
 		('module', keywordMap['modules'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('field', keywordMap['fields'], KeywordAttr.NoLexer),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 		('comment tag', keywordMap['comment'], KeywordAttr.NoLexer),
 	]
-
 
 def parse_r_api_file(path):
 	sections = read_api_file(path, '#')
@@ -1652,7 +1689,7 @@ def parse_rebol_api_file(pathList):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directive', keywordMap['directive'], KeywordAttr.Default),
+		('directive', keywordMap['directive'], KeywordAttr.Default | KeywordAttr.Special),
 		('datatype', keywordMap['datatypes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
@@ -1886,8 +1923,8 @@ def parse_swift_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directive', keywordMap['directive'], KeywordAttr.Default),
-		('attribute', keywordMap['attribute'], KeywordAttr.Default),
+		('directive', keywordMap['directive'], KeywordAttr.Default | KeywordAttr.Special),
+		('attribute', keywordMap['attribute'], KeywordAttr.Default | KeywordAttr.Special),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('struct', keywordMap['struct'], KeywordAttr.Default),
 		('protocol', keywordMap['protocol'], KeywordAttr.Default),
@@ -1924,8 +1961,8 @@ def parse_typescript_api_file(path):
 		('enumeration', [], KeywordAttr.Default),
 		('constant', keywordMap['constant'], KeywordAttr.Default),
 		('decorator', [], KeywordAttr.Default),
-		('function', [], KeywordAttr.Default),
-		('properties', [], KeywordAttr.Default),
+		('function', [], KeywordAttr.NoLexer),
+		('properties', [], KeywordAttr.NoLexer),
 		('TSDoc', keywordMap['tsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 
@@ -2005,7 +2042,7 @@ def parse_wasm_lexer_keywords(path):
 	]
 
 # Style_UpdateLexerKeywordAttr()
-def update_lexer_keyword_attr(path):
+def update_lexer_keyword_attr(path, indexPath, lexerPath):
 	output = []
 	for rid, nonzero in sorted(AllKeywordAttrList.items()):
 		output.append(f'\tcase {rid}:')
@@ -2023,3 +2060,29 @@ def update_lexer_keyword_attr(path):
 		output.append('\t\tbreak;')
 
 	Regenerate(path, '//', output)
+
+	#print(SinglyWordMap)
+	output = []
+	if AllKeywordAttrList:
+		output.append('enum {')
+		output.extend(f'\t{key} = {value},' for key, value in sorted(SpecialKeywordIndexList.items()))
+		output.append('};')
+	Regenerate(indexPath, '//KeywordIndex', output)
+
+	for lexer, indexList in LexerKeywordIndexList.items():
+		output = []
+		if indexList:
+			items = [(value[0], key, value[1]) for key, value in indexList.items()]
+			items.sort()
+			prev = (-1, '')
+			output.append('enum {')
+			for item in items:
+				value, key, rid = item
+				if value == prev[0]:
+					print(f'{lexer} same keyword index {value}: ({key} {rid[7:]}), ({prev[1]} {prev[2][7:]})')
+				output.append(f'\tKeywordIndex_{key} = {value},')
+				prev = item
+			output.append('};')
+
+		path = lexerPath + lexer
+		Regenerate(path, '//KeywordIndex', output)

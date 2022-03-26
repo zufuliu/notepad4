@@ -20,17 +20,19 @@
 
 using namespace Lexilla;
 
-static constexpr bool IsFWordChar(int ch) noexcept {
+namespace {
+
+constexpr bool IsFWordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_' || ch == '%';
 }
-/*static const char *const fortranWordLists[] = {
+/*const char *const fortranWordLists[] = {
 	"Primary keywords",
 	"user1",
 	"user2",
 	0
 };*/
 
-static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -158,7 +160,7 @@ static void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position length, int
 
 #define IsCommentLine(line)		IsLexCommentLine(styler, line, SCE_F_COMMENT)
 
-static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
@@ -199,6 +201,8 @@ static void FoldFortranDoc(Sci_PositionU startPos, Sci_Position length, int /*in
 			levelCurrent = levelNext;
 		}
 	}
+}
+
 }
 
 LexerModule lmFortran(SCLEX_FORTRAN, ColouriseFortranDoc, "fortran", FoldFortranDoc);

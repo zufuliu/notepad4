@@ -22,44 +22,46 @@
 
 using namespace Lexilla;
 
+namespace {
+
 #define		LEX_CPP		1	// C/C++
 #define		LEX_RC		5	// Resouce Script
 #define		LEX_OBJC	10	// Objective C/C++
 #define		LEX_SCALA	14	// Scala Script
 #define		LEX_PHP		29
 
-static constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocessor
+constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocessor
 	return lex == LEX_CPP || lex == LEX_RC || lex == LEX_OBJC;
 }
-static constexpr bool HasAnotation(int lex) noexcept { // @anotation
+constexpr bool HasAnotation(int lex) noexcept { // @anotation
 	return lex == LEX_SCALA;
 }
-static constexpr bool HasTripleVerbatim(int lex) noexcept {
+constexpr bool HasTripleVerbatim(int lex) noexcept {
 	return lex == LEX_SCALA;
 }
-static constexpr bool HasXML(int lex) noexcept {
+constexpr bool HasXML(int lex) noexcept {
 	return lex == LEX_SCALA;
 }
-static constexpr bool SquareBraceAfterType(int lex) noexcept {
+constexpr bool SquareBraceAfterType(int lex) noexcept {
 	return lex == LEX_SCALA;
 }
-static constexpr bool Use2ndKeyword(int lex) noexcept {
+constexpr bool Use2ndKeyword(int lex) noexcept {
 	return lex == LEX_OBJC;
 }
-static constexpr bool Use2ndKeyword2(int lex) noexcept {
+constexpr bool Use2ndKeyword2(int lex) noexcept {
 	return lex == LEX_CPP || lex == LEX_OBJC;
 }
-static constexpr bool IsSpaceEquiv(int state) noexcept {
+constexpr bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_C_DEFAULT, SCE_C_COMMENT, SCE_C_COMMENTLINE
 	// SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG, SCE_C_COMMENTDOC_TAG_XML
 	return (state < SCE_C_IDENTIFIER);
 }
-static constexpr bool IsEscapeChar(int ch) noexcept {
+constexpr bool IsEscapeChar(int ch) noexcept {
 	return ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '$'; // PHP
 }
 
-/*static const char* const cppWordLists[] = {
+/*const char* const cppWordLists[] = {
 	"Primary keywords",		// SCE_C_WORD
 	"Type keywords",		// SCE_C_WORD2
 	"Preprocessor",			// SCE_C_PREPROCESSOR	#preprocessor
@@ -88,7 +90,7 @@ static constexpr bool IsEscapeChar(int ch) noexcept {
 #define DOC_TAG_OPEN_XML	3	/// <param name="path">file path
 #define DOC_TAG_CLOSE_XML	4	/// </param>
 
-static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywords = *keywordLists[0];
 	const WordList &keywords2 = *keywordLists[1];
 	const WordList &keywords3 = *keywordLists[2];
@@ -923,7 +925,7 @@ static void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int ini
 	sc.Complete();
 }
 
-static bool IsCppDefineLine(LexAccessor &styler, Sci_Line line, Sci_Position &DefinePos) noexcept {
+bool IsCppDefineLine(LexAccessor &styler, Sci_Line line, Sci_Position &DefinePos) noexcept {
 	Sci_Position pos = styler.LineStart(line);
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
 	pos = LexSkipSpaceTab(styler, pos, endPos);
@@ -937,8 +939,11 @@ static bool IsCppDefineLine(LexAccessor &styler, Sci_Line line, Sci_Position &De
 	}
 	return false;
 }
+
+}
+
 // also used in LexAsm.cxx
-bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept {
+bool Lexilla::IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept {
 	Sci_Line line = styler.GetLine(currentPos);
 	Sci_Position pos;
 	if (IsCppDefineLine(styler, line, pos)) {
@@ -953,7 +958,10 @@ bool IsCppInDefine(LexAccessor &styler, Sci_Position currentPos) noexcept {
 	}
 	return false;
 }
-static bool IsCppFoldingLine(LexAccessor &styler, Sci_Line line, int kind) noexcept {
+
+namespace {
+
+bool IsCppFoldingLine(LexAccessor &styler, Sci_Line line, int kind) noexcept {
 	if (line < 0) {
 		return false;
 	}
@@ -995,19 +1003,19 @@ static bool IsCppFoldingLine(LexAccessor &styler, Sci_Line line, int kind) noexc
 #define IsDefineLine(line)		IsCppFoldingLine(styler, line, 4)
 #define IsUnDefLine(line)		IsCppFoldingLine(styler, line, 5)
 
-static constexpr bool IsStreamCommentStyle(int style) noexcept {
+constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT || style == SCE_C_COMMENTDOC;
 }
-static constexpr bool IsInnerCommentStyle(int style) noexcept {
+constexpr bool IsInnerCommentStyle(int style) noexcept {
 	return style == SCE_C_COMMENT
 		|| style == SCE_C_COMMENTDOC
 		|| style == SCE_C_COMMENTDOC_TAG
 		|| style == SCE_C_COMMENTDOC_TAG_XML;
 }
-static constexpr bool IsHear_NowDocStyle(int style) noexcept {
+constexpr bool IsHear_NowDocStyle(int style) noexcept {
 	return style == SCE_C_HEREDOC || style == SCE_C_NOWDOC;
 }
-static bool IsOpenBraceLine(LexAccessor &styler, Sci_Line line) noexcept {
+bool IsOpenBraceLine(LexAccessor &styler, Sci_Line line) noexcept {
 	// above line
 	Sci_Position startPos = styler.LineStart(line - 1);
 	Sci_Position endPos = styler.LineStart(line) - 1;
@@ -1042,7 +1050,7 @@ static bool IsOpenBraceLine(LexAccessor &styler, Sci_Line line) noexcept {
 	return false;
 }
 
-static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_CPP);
 	const bool hasPreprocessor = HasPreprocessor(lexType);
 
@@ -1202,6 +1210,8 @@ static void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 			lineCommentCurrent = IsCommentLine(lineCurrent);
 		}
 	}
+}
+
 }
 
 LexerModule lmCPP(SCLEX_CPP, ColouriseCppDoc, "cpp", FoldCppDoc);

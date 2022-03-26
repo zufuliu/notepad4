@@ -22,12 +22,14 @@
 
 using namespace Lexilla;
 
+namespace {
+
 #define MAKE_TYPE_GMAKE 0
 #define MAKE_TYPE_NMAKE 1
 #define MAKE_TYPE_BMAKE 2
 #define MAKE_TYPE_QMAKE 3
 #define MAKE_TYPE_NINJA 4
-static constexpr bool IsMakeOp(int ch, int chNext) noexcept {
+constexpr bool IsMakeOp(int ch, int chNext) noexcept {
 	return ch == '=' || ch == ':' || ch == '{' || ch == '}' || ch == '(' || ch == ')' || ch == ','
 		|| ch == '$' || ch == '@' || ch == '%' || ch == '<' || ch == '?' || ch == '^'
 		|| ch == '|' || ch == '*' || ch == '>' || ch == ';' || ch == '&' || ch == '!'
@@ -35,7 +37,7 @@ static constexpr bool IsMakeOp(int ch, int chNext) noexcept {
 }
 
 #define MAX_WORD_LENGTH	15
-static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
+void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const WordList &keywordsGP = *keywordLists[0];		// gnu make Preprocessor
 	const WordList &keywordsDP2 = *keywordLists[6];		// bmake
 	const WordList &keywordsNinja = *keywordLists[7];	// ninja
@@ -230,7 +232,7 @@ static void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int in
 
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_MAKE_COMMENT)
 
-static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
+void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -295,6 +297,8 @@ static void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			visibleChars = 0;
 		}
 	}
+}
+
 }
 
 LexerModule lmMake(SCLEX_MAKEFILE, ColouriseMakeDoc, "makefile", FoldMakeDoc);
