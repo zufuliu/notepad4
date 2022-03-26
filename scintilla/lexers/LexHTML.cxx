@@ -454,8 +454,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	const WordList &keywordsEvent = *keywordLists[7];
 
 	styler.StartAt(startPos);
-	char prevWord[256];
-	prevWord[0] = '\0';
 	char phpStringDelimiter[256]; // PHP is not limited in length, we are
 	phpStringDelimiter[0] = '\0';
 	int outerStyle = SCE_H_DEFAULT;

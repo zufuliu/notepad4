@@ -67,8 +67,17 @@ constexpr bool isSafeWordcharOrHigh(char ch) noexcept {
 	return isHighBitChar(ch) || IsAlphaNumeric(ch) || ch == '_';
 }
 
-constexpr bool isEscapeSequence(char ch) {
+constexpr bool isEscapeSequence(char ch) noexcept {
 	return AnyOf(ch, '\\', 'a', 'b', 'e', 'f', 'n', 'r', 's', 't', 'v');
+}
+
+constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
+	// followed by a single character or escape sequence that corresponds to a single codepoint
+	if (isSafeAlnum(chNext)) {
+		return !isSafeWordcharOrHigh(chNext2);
+	}
+	// multibyte character, escape sequence, punctuation
+	return true;
 }
 
 #define MAX_KEYWORD_LENGTH 127
@@ -1025,7 +1034,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (ch == '?') {
 				afterDef = false;
 				styler.ColorTo(i, state);
-				if (IsASpaceOrTab(chNext) || chNext == '\n' || chNext == '\r') {
+				if (IsASpace(chNext) || !isQestionMarkChar(chNext, chNext2)) {
 					styler.ColorTo(i + 1, SCE_RB_OPERATOR);
 					preferRE = true;
 				} else {
