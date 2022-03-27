@@ -77,7 +77,7 @@ constexpr bool isQestionMarkChar(char chNext, char chNext2) noexcept {
 		return !isSafeWordcharOrHigh(chNext2);
 	}
 	// multibyte character, escape sequence, punctuation
-	return true;
+	return !IsASpace(chNext);
 }
 
 #define MAX_KEYWORD_LENGTH 127
@@ -1034,9 +1034,22 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (ch == '?') {
 				afterDef = false;
 				styler.ColorTo(i, state);
-				if (IsASpace(chNext) || !isQestionMarkChar(chNext, chNext2)) {
+				if (isHighBitChar(chNext)) {
+					preferRE = false;
+					Sci_Position width = 1;
+					styler.GetCharacterAndWidth(i + 1, &width);
+					chNext = styler.SafeGetCharAt(i + 1 + width);
+					if (isSafeWordcharOrHigh(chNext)) {
+						styler.ColorTo(i + 1, SCE_RB_OPERATOR);
+						i += width;
+						state = SCE_RB_WORD;
+					} else {
+						i += width;
+						styler.ColorTo(i + 1, SCE_RB_NUMBER);
+					}
+				} else if (!isQestionMarkChar(chNext, chNext2)) {
 					styler.ColorTo(i + 1, SCE_RB_OPERATOR);
-					preferRE = true;
+					preferRE = chNext <= ' ';
 				} else {
 					// It's the start of a character code escape sequence
 					// Color it as a number.
