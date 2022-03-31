@@ -534,6 +534,7 @@ typedef enum {
 	FOLD_ACTION_SNIFF	= 2, // SC_FOLDACTION_TOGGLE
 } FOLD_ACTION;
 
+void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd);
 void FoldToggleAll(FOLD_ACTION action);
 void FoldToggleLevel(int lev, FOLD_ACTION action);
 void FoldToggleCurrentBlock(FOLD_ACTION action);

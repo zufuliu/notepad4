@@ -3125,6 +3125,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		}
 	}
 
+	FoldExpandRange(iLineStart, iLineEnd);
 	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(iPrefixLen, iAppendLen) * kMaxMultiByteCount + 1);
 	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
@@ -3258,6 +3259,7 @@ void EditAlignText(EditAlignMode nMode) {
 		}
 	}
 
+	FoldExpandRange(iLineStart, iLineEnd);
 	Sci_Position iMinIndent = BUFSIZE_ALIGN;
 	Sci_Position iMaxLength = 0;
 	for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
@@ -3497,6 +3499,7 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 		ConvertWinEditLineEndings(mszClose, iEOLMode);
 	}
 
+	FoldExpandRange(SciCall_LineFromPosition(iSelStart), SciCall_LineFromPosition(iSelEnd));
 	SciCall_BeginUndoAction();
 	len = 0;
 
@@ -3583,6 +3586,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 		}
 	}
 
+	FoldExpandRange(iLineStart, iLineEnd);
 	SciCall_BeginUndoAction();
 	int iAction = 0;
 
@@ -3745,6 +3749,7 @@ void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 			SciCall_BeginUndoAction();
 		}
 
+		FoldExpandRange(iLineStart, iLineEnd);
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iLineSelEndPos = SciCall_GetLineSelEndPosition(iLine);
 			if (bIsRectangular && iLineSelEndPos < 0) {
@@ -8091,6 +8096,28 @@ BOOL EditIsLineContainsStyle(Sci_Line line, int style) {
 		++lineStart;
 	} while (lineStart < lineEnd);
 	return FALSE;
+}
+
+void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) {
+	BOOL fToggled = FALSE;
+	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
+	for (Sci_Line line = lineStart; line <= lineEnd; line++) {
+		const int level = SciCall_GetFoldLevel(line);
+		if ((level & SC_FOLDLEVELHEADERFLAG) != 0 && !SciCall_GetFoldExpanded(line)) {
+			SciCall_ExpandChildren(line, level);
+			fToggled = fToggled || SciCall_GetFoldExpanded(line);
+		}
+	}
+
+	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+	if (fToggled) {
+		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
+		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
+		SciCall_ScrollCaret();
+		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
+		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
+		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	}
 }
 
 void FoldToggleAll(FOLD_ACTION action) {
