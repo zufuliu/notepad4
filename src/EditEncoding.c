@@ -1162,7 +1162,7 @@ static int DetectUTF16Latin1(const char *pTest, DWORD nLength) {
 				mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, zero));
 				uint32_t last = padding;
 				if (nLength > sizeof(__m128i)) {
-					_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, zero));
+					last = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, zero));
 					last &= lower;
 				}
 				mask |= last;
@@ -1970,13 +1970,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	}
 	// end NP2_USE_SSE2
 #elif defined(_WIN64)
-	const uint64_t *temp = (const uint64_t *)pt;
-	const uint64_t * const temp_end = temp + (nLength / sizeof(uint64_t));
-	while (temp < temp_end) {
-		const uint64_t val = *temp;
+	while (pt + sizeof(uint64_t) <= end) {
+		const uint64_t val = *((const uint64_t *)pt);
 		if (val & UINT64_C(0x8080808080808080)) {
 #if 0
-			pt = (const uint8_t *)temp;
 			state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
 			state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
 			state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
@@ -2002,18 +1999,14 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		} else if (state != UTF8_ACCEPT) {
 			return FALSE;
 		}
-		++temp;
+		pt += sizeof(uint64_t);
 	}
-	pt = (const uint8_t *)temp;
 	// end _WIN64
 #else
-	const uint32_t *temp = (const uint32_t *)pt;
-	const uint32_t * const temp_end = temp + (nLength / sizeof(uint32_t));
-	while (temp < temp_end) {
-		const uint32_t val = *temp;
+	while (pt + sizeof(uint32_t) <= end) {
+		const uint32_t val = *((const uint32_t *)pt);
 		if (val & 0x80808080U) {
 #if 0
-			pt = (const uint8_t *)temp;
 			state = utf8_dfa[256 + state + utf8_dfa[pt[0]]];
 			state = utf8_dfa[256 + state + utf8_dfa[pt[1]]];
 			state = utf8_dfa[256 + state + utf8_dfa[pt[2]]];
@@ -2031,9 +2024,8 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 		} else if (state != UTF8_ACCEPT) {
 			return FALSE;
 		}
-		++temp;
+		pt += sizeof(uint32_t);
 	}
-	pt = (const uint8_t *)temp;
 	// end _WIN32
 #endif
 
@@ -2072,7 +2064,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 		__m256i chunk = _mm256_loadu_si256((__m256i *)pt);
 		uint32_t last = _mm256_movemask_epi8(chunk);
 		if (nLength > sizeof(__m256i)) {
-			nLength -= sizeof(__m256i);
+			nLength &= sizeof(__m256i) - 1;
 			mask = last;
 			chunk = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
 			last = _mm256_movemask_epi8(chunk);
