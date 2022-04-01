@@ -15,9 +15,16 @@
 #include "resource.h"
 
 extern BOOL bSkipUnicodeDetection;
+extern int iDefaultEncoding;
 extern int iDefaultCodePage;
+extern BOOL bLoadANSIasUTF8;
+extern BOOL bLoadASCIIasUTF8;
+extern BOOL bLoadNFOasOEM;
 extern int iDefaultCharSet;
+extern int iSrcEncoding;
+extern int iWeakSrcEncoding;
 extern int iCurrentEncoding;
+extern FILEVARS fvCurFile;
 
 int g_DOSEncoding;
 
@@ -590,7 +597,7 @@ int Encoding_MapIniSetting(BOOL bLoad, int iSetting) {
 		default:
 			if (IsValidCodePage(iSetting)) {
 				iSetting = Encoding_GetIndex(iSetting);
-				if (iSetting != CPI_NONE) {
+				if (iSetting >= CPI_FIRST) {
 					return iSetting;
 				}
 			}
@@ -680,9 +687,9 @@ int Encoding_MatchA(LPCSTR pchTest) {
 	return CPI_NONE;
 }
 
-BOOL Encoding_IsValid(int iTestEncoding) {
-	return iTestEncoding >= 0 && iTestEncoding < (int)COUNTOF(mEncoding)
-		&& IsValidEncoding(&mEncoding[iTestEncoding]);
+BOOL Encoding_IsValid(int iEncoding) {
+	return iEncoding >= CPI_FIRST && iEncoding < (int)COUNTOF(mEncoding)
+		&& IsValidEncoding(&mEncoding[iEncoding]);
 }
 
 typedef struct ENCODINGENTRY {
@@ -703,6 +710,17 @@ int Encoding_GetIndex(UINT codePage) {
 	return CPI_NONE;
 }
 
+int Encoding_GetAnsiIndex(void) {
+	int iEncoding = CPI_DEFAULT;
+	UINT acp = GetACP();
+	if (acp == CP_UTF8) {
+		iEncoding = CPI_UTF8;
+	} else if (bLoadANSIasUTF8 || bLoadASCIIasUTF8) {
+		iEncoding = Encoding_GetIndex(acp);
+	}
+	return iEncoding;
+}
+
 void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY));
 	for (int i = 0; i < (int)COUNTOF(sEncodingGroupList); i++) {
@@ -715,7 +733,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				const UINT page = group->encodings[j];
 				const int index = Encoding_GetIndex(page);
 				group->encodings[j] = index;
-				if (index == CPI_NONE) {
+				if (index < CPI_FIRST) {
 					break;
 				}
 			}
@@ -1036,43 +1054,303 @@ UINT CodePageFromCharSet(UINT uCharSet) {
 	return GetACP();
 }
 
-#if 0
-BOOL IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse) {
-	if (pBuffer == NULL || cb < 2 || (cb & 1) != 0) {
-		// reject odd bytes
-		return FALSE;
+
+static inline BOOL IsValidMultiByte(UINT codePage, const char *lpData, DWORD cbData) {
+	return MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, lpData, cbData, NULL, 0);
+}
+
+static inline BOOL IsValidWideChar(LPCWSTR lpWide, DWORD cchWide) {
+	return WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, lpWide, cchWide, NULL, 0, NULL, NULL);
+}
+
+static int DetectUnicode(char *pTest, DWORD nLength, BOOL ascii) {
+	if (ascii) {
+		// find ASCII inside first or last 4 KiB text
+		const DWORD size = 4096;
+		if (memchr(pTest, 0, min_u(nLength, size)) == NULL
+			&& (nLength <= size || memchr(pTest + (nLength - size), 0, size) == NULL)) {
+			return CPI_DEFAULT;
+		}
 	}
 
 	int i = 0xFFFF;
-	const BOOL bIsTextUnicode = bSkipUnicodeDetection ? FALSE : IsTextUnicode(pBuffer, cb, &i);
-	//const BOOL bHasBOM = (pBuffer[0] == '\xFF' && pBuffer[1] == '\xFE');
-	//const BOOL bHasRBOM = (pBuffer[0] == '\xFE' && pBuffer[1] == '\xFF');
-	const BOOL bHasBOM = (*(const WORD *)pBuffer) == BOM_UTF16LE;
-	const BOOL bHasRBOM = (*(const WORD *)pBuffer) == BOM_UTF16BE;
-
-	if (i == 0xFFFF) { // i doesn't seem to have been modified ...
-		i = 0;
-	}
-
-	if (bIsTextUnicode || bHasBOM || bHasRBOM ||
-			((i & (IS_TEXT_UNICODE_UNICODE_MASK | IS_TEXT_UNICODE_REVERSE_MASK)) &&
-			 !((i & IS_TEXT_UNICODE_UNICODE_MASK) && (i & IS_TEXT_UNICODE_REVERSE_MASK)) &&
-			 !(i & IS_TEXT_UNICODE_ODD_LENGTH) &&
-			 !(i & IS_TEXT_UNICODE_ILLEGAL_CHARS && !(i & IS_TEXT_UNICODE_REVERSE_SIGNATURE)) &&
-			 !((i & IS_TEXT_UNICODE_REVERSE_MASK) == IS_TEXT_UNICODE_REVERSE_STATISTICS))) {
-		if (lpbBOM) {
-			*lpbBOM = bHasBOM || bHasRBOM ||
-					   (i & (IS_TEXT_UNICODE_SIGNATURE | IS_TEXT_UNICODE_REVERSE_SIGNATURE));
+	IsTextUnicode(pTest, nLength, &i);
+	if (i != 0xFFFF && (i & IS_TEXT_UNICODE_ILLEGAL_CHARS) == 0) {
+		if (i & IS_TEXT_UNICODE_UNICODE_MASK) {
+			if (IsValidWideChar((LPCWSTR)(pTest), nLength/2)) {
+				return CPI_UNICODE;
+			}
 		}
-		if (lpbReverse) {
-			*lpbReverse = bHasRBOM || (i & IS_TEXT_UNICODE_REVERSE_MASK);
+		if (i & IS_TEXT_UNICODE_REVERSE_MASK) {
+			_swab(pTest, pTest, nLength);
+			if (IsValidWideChar((LPCWSTR)(pTest), nLength/2)) {
+				return CPI_UNICODEBE;
+			}
+			_swab(pTest, pTest, nLength);
 		}
-		return TRUE;
 	}
+	return CPI_DEFAULT;
+}
 
-	return FALSE;
+#if 0
+static int DetectUTF16Latin1(const char *pTest, DWORD nLength) {
+	const char *pt = pTest;
+	const char * const end = pt + nLength;
+
+#if NP2_USE_AVX2
+	nLength &= sizeof(__m256i) - 1;
+	nLength = UINT32_MAX << nLength;
+	const __m256i zero = _mm256_setzero_si256();
+	__m256i test = _mm256_set1_epi16(0xFF00);
+	uint32_t expected = 0xAAAAAAAA;
+	do {
+		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		pt += sizeof(__m256i);
+		if (_mm256_testz_si256(chunk, test) == 0)
+		//if (andn_u32(mask, expected) != 0)
+		{
+			uint32_t mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(chunk, zero));
+			if (pt > end) {
+				mask |= nLength;
+				if (andn_u32(mask, expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 1) == 0) {
+				expected >>= 1;
+				if (andn_u32(mask, expected) == 0) {
+					pt = pTest;
+					test = _mm256_srli_si256(test, 1);
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	// end NP2_USE_AVX2
+#elif NP2_USE_SSE2
+	uint32_t padding = nLength & (sizeof(__m128i) - 1);
+	const uint32_t temp = UINT32_MAX << padding;
+	const uint32_t lower = ~temp; // (1 << padding) - 1
+	padding = padding ? temp : 0;
+	nLength &= 2*sizeof(__m128i) - 1;
+	const __m128i zero = _mm_setzero_si128();
+	uint32_t expected = 0xAAAA;
+	do {
+		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		pt += 2*sizeof(__m128i);
+		uint32_t mask = ~_mm_movemask_epi8(_mm_cmpeq_epi8(_mm_or_si128(chunk1, chunk2), zero));
+		if ((mask & expected) != 0) {
+			if (pt > end) {
+				mask = _mm_movemask_epi8(_mm_cmpeq_epi8(chunk1, zero));
+				uint32_t last = padding;
+				if (nLength > sizeof(__m128i)) {
+					_mm_movemask_epi8(_mm_cmpeq_epi8(chunk2, zero));
+					last &= lower;
+				}
+				mask |= last;
+				mask = ~mask;
+				if ((mask & expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 1) == 0) {
+				expected >>= 1;
+				if ((mask & expected) == 0) {
+					pt = pTest;
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	// end NP2_USE_SSE2
+#elif defined(_WIN64)
+	nLength &= sizeof(uint64_t) - 1;
+	nLength = (sizeof(uint64_t) - nLength)*8;
+	uint64_t expected = UINT64_C(0xFF00FF00FF00FF00);
+	do {
+		uint64_t value = *((const uint64_t *)pt);
+		pt += sizeof(uint64_t);
+		if ((value & expected) != 0) {
+			if (pt > end) {
+				value <<= nLength;
+				if ((value & expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 1) == 0) {
+				expected >>= 8;
+				if ((value & expected) == 0) {
+					pt = pTest;
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	// end _WIN64
+#else
+	nLength &= sizeof(uint32_t) - 1;
+	nLength = (sizeof(uint32_t) - nLength)*8;
+	uint32_t expected = 0xFF00FF00U;
+	do {
+		uint32_t value = *((const uint32_t *)pt);
+		pt += sizeof(uint32_t);
+		if ((value & expected) != 0) {
+			if (pt > end) {
+				value <<= nLength;
+				if ((value & expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 1) == 0) {
+				expected >>= 8;
+				if ((value & expected) == 0) {
+					pt = pTest;
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	// end _WIN32
+#endif
+
+	return CPI_UNICODE + (expected & 1);
 }
 #endif
+
+static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) {
+	const char *pt = pTest;
+	const char * const end = pt + nLength;
+
+#if NP2_USE_AVX2
+	nLength &= sizeof(__m256i) - 1;
+	nLength = UINT32_MAX << nLength;
+	const __m256i vectC0 = _mm256_set1_epi8(7);
+	__m256i test = _mm256_set1_epi16(0xF800);
+	uint32_t expected = 0xAAAAAAAA;
+	do {
+		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
+		pt += sizeof(__m256i);
+		if (_mm256_testz_si256(chunk, test) == 0)
+		//if (andn_u32(mask, expected) != 0)
+		{
+			uint32_t mask = _mm256_movemask_epi8(mm256_cmple_epu8(chunk, vectC0));
+			if (pt > end) {
+				mask |= nLength;
+				if (andn_u32(mask, expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 1) == 0) {
+				expected >>= 1;
+				if (andn_u32(mask, expected) == 0) {
+					pt = pTest;
+					test = _mm256_srli_si256(test, 1);
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	// end NP2_USE_AVX2
+#elif NP2_USE_SSE2
+	uint32_t padding = nLength & (sizeof(__m128i) - 1);
+	const uint32_t temp = UINT32_MAX << padding;
+	const uint32_t lower = ~temp; // (1 << padding) - 1
+	padding = padding ? temp : 0;
+	nLength &= 2*sizeof(__m128i) - 1;
+	const __m128i vectC0 = _mm_set1_epi8(7);
+	uint32_t expected = 0xAAAA;
+	do {
+		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
+		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
+		pt += 2*sizeof(__m128i);
+		uint32_t mask = ~_mm_movemask_epi8(mm_cmple_epu8(_mm_or_si128(chunk1, chunk2), vectC0));
+		if ((mask & expected) != 0) {
+			if (pt > end) {
+				mask = _mm_movemask_epi8(mm_cmple_epu8(chunk1, vectC0));
+				uint32_t last = padding;
+				if (nLength > sizeof(__m128i)) {
+					last = _mm_movemask_epi8(mm_cmple_epu8(chunk2, vectC0));
+					last &= lower;
+				}
+				mask |= last;
+				mask = ~mask;
+				if ((mask & expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 1) == 0) {
+				expected >>= 1;
+				if ((mask & expected) == 0) {
+					pt = pTest;
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	// end NP2_USE_SSE2
+#elif defined(_WIN64)
+	nLength &= sizeof(uint64_t) - 1;
+	nLength = (sizeof(uint64_t) - nLength)*8;
+	uint64_t expected = UINT64_C(0xF800F800F800F800);
+	do {
+		uint64_t value = *((const uint64_t *)pt);
+		pt += sizeof(uint64_t);
+		if ((value & expected) != 0) {
+			if (pt > end) {
+				value <<= nLength;
+				if ((value & expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 8) == 0) {
+				expected >>= 8;
+				if ((value & expected) == 0) {
+					pt = pTest;
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	expected >>= 3;
+	// end _WIN64
+#else
+	nLength &= sizeof(uint32_t) - 1;
+	nLength = (sizeof(uint32_t) - nLength)*8;
+	uint32_t expected = 0xF800F800U;
+	do {
+		uint32_t value = *((const uint32_t *)pt);
+		pt += sizeof(uint32_t);
+		if ((value & expected) != 0) {
+			if (pt > end) {
+				value <<= nLength;
+				if ((value & expected) == 0) {
+					break;
+				}
+			}
+			if ((expected & 8) == 0) {
+				expected >>= 8;
+				if ((value & expected) == 0) {
+					pt = pTest;
+					continue;
+				}
+			}
+			return CPI_DEFAULT;
+		}
+	} while (pt < end);
+	expected >>= 3;
+	// end _WIN32
+#endif
+
+	return CPI_UNICODE + (expected & 1);
+}
 
 #if 0
 BOOL IsUTF8(const char *pTest, DWORD nLength) {
@@ -1676,13 +1954,8 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	}
 	// end NP2_USE_SSE2
 #elif defined(_WIN64)
-	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
-	while (pt < ptr) {
-		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-	}
-
 	const uint64_t *temp = (const uint64_t *)pt;
-	const uint64_t * const temp_end = (const uint64_t *)end;
+	const uint64_t * const temp_end = temp + (nLength / sizeof(uint64_t));
 	while (temp < temp_end) {
 		const uint64_t val = *temp;
 		if (val & UINT64_C(0x8080808080808080)) {
@@ -1718,13 +1991,8 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 	pt = (const uint8_t *)temp;
 	// end _WIN64
 #else
-	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
-	while (pt < ptr) {
-		state = utf8_dfa[256 + state + utf8_dfa[*pt++]];
-	}
-
 	const uint32_t *temp = (const uint32_t *)pt;
-	const uint32_t * const temp_end = (const uint32_t *)end;
+	const uint32_t * const temp_end = temp + (nLength / sizeof(uint32_t));
 	while (temp < temp_end) {
 		const uint32_t val = *temp;
 		if (val & 0x80808080U) {
@@ -1767,11 +2035,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 }
 
 BOOL IsUTF7(const char *pTest, DWORD nLength) {
-	const uint8_t *pt = (const uint8_t *)pTest;
-
+	const char *pt = pTest;
 #if NP2_USE_AVX2
 	if (nLength >= 2*sizeof(__m256i)) {
-		const uint8_t * const end = pt + nLength - 2*sizeof(__m256i);
+		const char * const end = pt + nLength - 2*sizeof(__m256i);
 		do {
 			const __m256i chunk1 = _mm256_loadu_si256((__m256i *)pt);
 			const __m256i chunk2 = _mm256_loadu_si256((__m256i *)(pt + sizeof(__m256i)));
@@ -1801,7 +2068,7 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	// end NP2_USE_AVX2
 #elif NP2_USE_SSE2
 	if (nLength >= 4*sizeof(__m128i)) {
-		const uint8_t * const end = pt + nLength - 4*sizeof(__m128i);
+		const char * const end = pt + nLength - 4*sizeof(__m128i);
 		do {
 			const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
 			const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
@@ -1836,54 +2103,42 @@ BOOL IsUTF7(const char *pTest, DWORD nLength) {
 	}
 	return TRUE;
 	// end NP2_USE_SSE2
-#else
-	const uint8_t * const end = pt + nLength;
-
-#if defined(_WIN64)
-	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint64_t));
-	while (pt < ptr && (*pt & 0x80) == 0) {
-		++pt;
-	}
-	if (pt != ptr) {
-		return FALSE;
-	}
-
-	const uint64_t *temp = (const uint64_t *)pt;
-	const uint64_t * const temp_end = (const uint64_t *)end;
-	while (temp < temp_end) {
-		if (*temp & UINT64_C(0x8080808080808080)) {
+#elif defined(_WIN64)
+	const char * const end = pt + nLength;
+	nLength &= sizeof(uint64_t) - 1;
+	nLength = (sizeof(uint64_t) - nLength)*8;
+	do {
+		uint64_t value = *((const uint64_t *)pt);
+		pt += sizeof(uint64_t);
+		value &= UINT64_C(0x8080808080808080);
+		if (value != 0) {
+			if (pt > end) {
+				value <<= nLength;
+				return value == 0;
+			}
 			return FALSE;
 		}
-		++temp;
-	}
-	pt = (const uint8_t *)temp;
+	} while (pt < end);
+	return TRUE;
 	// end _WIN64
 #else
-	const uint8_t * const ptr = (const uint8_t *)align_ptr_ex(pt, sizeof(uint32_t));
-	while (pt < ptr && (*pt & 0x80) == 0) {
-		++pt;
-	}
-	if (pt != ptr) {
-		return FALSE;
-	}
-
-	const uint32_t *temp = (const uint32_t *)pt;
-	const uint32_t * const temp_end = (const uint32_t *)end;
-	while (temp < temp_end) {
-		if (*temp & 0x80808080U) {
+	const char * const end = pt + nLength;
+	nLength &= sizeof(uint32_t) - 1;
+	nLength = (sizeof(uint32_t) - nLength)*8;
+	do {
+		uint32_t value = *((const uint32_t *)pt);
+		pt += sizeof(uint32_t);
+		value &= 0x80808080U;
+		if (value != 0) {
+			if (pt > end) {
+				value <<= nLength;
+				return value == 0;
+			}
 			return FALSE;
 		}
-		++temp;
-	}
-	pt = (const uint8_t *)temp;
+	} while (pt < end);
+	return TRUE;
 	// end _WIN32
-#endif
-
-	while (pt < end && (*pt & 0x80) == 0) {
-		++pt;
-	}
-
-	return pt == end;
 #endif
 }
 
@@ -1982,6 +2237,180 @@ INT UTF8_mbslen(LPCSTR source, INT byte_length) {
 }
 #endif
 
+
+LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags) {
+	LPWSTR lpDataWide = (LPWSTR)NP2HeapAlloc(*cbData * sizeof(WCHAR) + 16);
+	const int cbDataWide = MultiByteToWideChar(codePage, flags, lpData, *cbData, lpDataWide, (int)(NP2HeapSize(lpDataWide) / sizeof(WCHAR)));
+	if (cbDataWide) {
+		lpData = (char *)NP2HeapAlloc(cbDataWide * kMaxMultiByteCount + 16);
+		*cbData = WideCharToMultiByte(CP_UTF8, 0, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, NULL);
+	} else {
+		lpData = NULL;
+		*cbData = 0;
+	}
+	NP2HeapFree(lpDataWide);
+	return lpData;
+}
+
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag) {
+	// TODO: scheme default encoding
+	LPCWSTR const pszExt = PathFindExtension(pszFile);
+	int preferedEncoding = CPI_NONE;
+	if (bLoadNFOasOEM && (StrCaseEqual(pszExt, L".nfo") || StrCaseEqual(pszExt, L".diz"))) {
+		preferedEncoding = g_DOSEncoding;
+	} else if (StrCaseEqual(pszExt, L".bat") || StrCaseEqual(pszExt, L".cmd")) {
+		preferedEncoding = CPI_DEFAULT;
+	} else if (StrEqual(pszExt, L".sh") || StrStartsWith(lpData, "#!/")) {
+		// shell script: #!/bin/sh[LF]
+		preferedEncoding = CPI_UTF8;
+	}
+
+	int iEncoding = CPI_DEFAULT;
+	// default encoding for empty file.
+	if (cbData == 0) {
+		FileVars_Init(NULL, 0, &fvCurFile);
+		*encodingFlag = EncodingFlag_UTF7;
+		if (iSrcEncoding >= CPI_FIRST) {
+			iEncoding = iSrcEncoding;
+		} else if (iWeakSrcEncoding >= CPI_FIRST) {
+			iEncoding = iWeakSrcEncoding;
+		} else if (preferedEncoding >= CPI_FIRST) {
+			iEncoding = preferedEncoding;
+		} else if (bLoadASCIIasUTF8) {
+			iEncoding = CPI_UTF8;
+		} else {
+			iEncoding = iDefaultEncoding;
+		}
+		return iEncoding;
+	}
+
+	// check Unicode / UTF-16 BOM
+	const UINT bom = *(const uint16_t *)lpData;
+	if (cbData < MAX_NON_UTF8_SIZE && (Encoding_IsUnicode(iSrcEncoding) // reload as UTF-16
+		|| (iSrcEncoding < CPI_FIRST && (cbData & 1) == 0 && (bom == BOM_UTF16LE || bom == BOM_UTF16BE)))) {
+		BOOL bBOM = iSrcEncoding < CPI_FIRST;
+		BOOL bReverse = bom == BOM_UTF16BE;
+		if (iSrcEncoding == CPI_UNICODE) {
+			bBOM = bom == BOM_UTF16LE;
+			bReverse = FALSE;
+		} else if (iSrcEncoding == CPI_UNICODEBE) {
+			bBOM = bom == BOM_UTF16BE;
+			bReverse = TRUE;
+		}
+
+		NP2_static_assert(CPI_UNICODE + 1 == CPI_UNICODEBE);
+		NP2_static_assert(CPI_UNICODEBOM + 2 == CPI_UNICODE);
+		NP2_static_assert(CPI_UNICODEBEBOM + 2 == CPI_UNICODEBE);
+		iEncoding = CPI_UNICODE + bReverse;
+		iEncoding -= bBOM << 1;
+		return iEncoding;
+	}
+
+	FileVars_Init(lpData, cbData, &fvCurFile);
+	// check UTF-8 BOM
+	const BOOL utf8Sig = IsUTF8Signature(lpData);
+	if (Encoding_IsUTF8(iSrcEncoding) // reload as UTF-8
+		|| (iSrcEncoding < CPI_FIRST && utf8Sig)) {
+		NP2_static_assert(CPI_UTF8 + 1 == CPI_UTF8SIGN);
+		iEncoding = CPI_UTF8 + utf8Sig;
+		return iEncoding;
+	}
+
+	// file large than 2 GiB is loaded without encoding conversion, i.e. loaded as UTF-8 or ANSI only.
+	if (cbData >= MAX_NON_UTF8_SIZE) {
+		if (iSrcEncoding != CPI_DEFAULT && (utf8Sig || IsUTF8(lpData, cbData))) {
+			iEncoding = CPI_UTF8 + utf8Sig;
+		}
+		return iEncoding;
+	}
+
+	// check UTF-16 without BOM for Latin
+	if ((cbData & 1) == 0 && iSrcEncoding < CPI_FIRST
+		// first or second byte is lower C0 control character U+0000 to U+0007
+		&& ((bom & 0xF800) == 0 || (bom & 0x00F8) == 0)
+		&& fvCurFile.mask == 0) {
+#if 0
+		// Basic Latin and Latin-1: U+0000 to U+00FF
+		iEncoding = DetectUTF16Latin1(lpData, cbData);
+		if (iEncoding != CPI_DEFAULT) {
+			return iEncoding;
+		}
+#endif
+		// Latin Extended-A U+0100 to NKo U+07FF
+		iEncoding = DetectUTF16LatinExt(lpData, cbData);
+		if (iEncoding != CPI_DEFAULT) {
+			return iEncoding;
+		}
+	}
+
+	// treat as unreliable encoding declaration as we don't follow strict parse rules.
+	const int sniffedEncoding = FileVars_GetEncoding(&fvCurFile);
+	// check 7-bit ASCII
+	if (IsUTF7(lpData, cbData)) {
+		// 7-bit / any encoding, similar to empty file
+		*encodingFlag = EncodingFlag_UTF7;
+		if (iSrcEncoding >= CPI_FIRST) {
+			iEncoding = iSrcEncoding;
+		} else if (iWeakSrcEncoding >= CPI_FIRST && !Encoding_IsUnicode(iWeakSrcEncoding)) {
+			iEncoding = iWeakSrcEncoding;
+		} else if (preferedEncoding >= CPI_FIRST) {
+			iEncoding = preferedEncoding;
+		} else if (sniffedEncoding >= CPI_FIRST) {
+			iEncoding = sniffedEncoding;
+		} else if (bLoadASCIIasUTF8) {
+			iEncoding = CPI_UTF8;
+		} else if (!Encoding_IsUnicode(iDefaultEncoding)) {
+			iEncoding = iDefaultEncoding;
+		}
+		return iEncoding;
+	}
+
+	// reload with specific encoding
+	if (iSrcEncoding >= CPI_FIRST && (mEncoding[iSrcEncoding].uFlags & (NCP_8BIT | NCP_DEFAULT)) != 0) {
+		return iSrcEncoding;
+	}
+
+	// prefer UTF-8 when no encoding specified
+	if (IsUTF8(lpData, cbData)) {
+		return CPI_UTF8;
+	}
+
+	// brute force test other encoding
+	const int encodings[4] = {
+		// auto reload with current encoding
+		iWeakSrcEncoding,
+		// fallback encoding
+		preferedEncoding,
+		sniffedEncoding,
+		iDefaultEncoding,
+	};
+	for (int i = 0; i < (int)COUNTOF(encodings); i++) {
+		iEncoding = encodings[i];
+		if (iEncoding >= CPI_FIRST && mEncoding[iEncoding].uFlags & NCP_8BIT) {
+			const UINT codePage = mEncoding[iEncoding].uCodePage;
+			if (IsValidMultiByte(codePage, lpData, cbData)) {
+				return iEncoding;
+			}
+		}
+	}
+
+	// test system ANSI code page
+	iEncoding = CPI_DEFAULT;
+	const UINT acp = GetACP();
+	if (acp == CP_UTF8 || !IsValidMultiByte(acp, lpData, cbData)) {
+		*encodingFlag = EncodingFlag_Invalid;
+		// check UTF-16 without BOM
+		if ((cbData & 1) == 0 && fvCurFile.mask == 0) {
+			iEncoding = DetectUnicode(lpData, cbData, bSkipUnicodeDetection);
+			if (iEncoding == CPI_UNICODEBE) {
+				*encodingFlag = EncodingFlag_Reversed;
+			}
+		}
+	}
+
+	// unknown encoding
+	return iEncoding;
+}
 
 //case++Autogenerated -- start of section automatically generated
 // Created with Python 3.11.0a5, Unicode 14.0.0

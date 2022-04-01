@@ -862,7 +862,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			}
 		}
 	} else {
-		if (iSrcEncoding != CPI_NONE) {
+		if (iSrcEncoding >= CPI_FIRST) {
 			iCurrentEncoding = iSrcEncoding;
 			iOriginalEncoding = iSrcEncoding;
 			SciCall_SetCodePage((iSrcEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
@@ -7406,7 +7406,7 @@ BOOL FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 				EditSetEmptyText();
 				iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 				SciCall_SetEOLMode(iCurrentEOLMode);
-				if (iSrcEncoding != CPI_NONE) {
+				if (iSrcEncoding >= CPI_FIRST) {
 					iCurrentEncoding = iSrcEncoding;
 				} else {
 					iCurrentEncoding = iDefaultEncoding;
@@ -7739,6 +7739,9 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex) {
 		iCurrentEOLMode = iEOLMode;
 		SciCall_SetEOLMode(iEOLMode);
 		UpdateStatusBarCache(STATUS_EOLMODE);
+	}
+	if (iEncoding == CPI_DEFAULT) {
+		iEncoding = Encoding_GetAnsiIndex();
 	}
 	if (iEncoding != iCurrentEncoding) {
 		iCurrentEncoding = iEncoding;

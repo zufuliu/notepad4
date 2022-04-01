@@ -347,6 +347,7 @@ void	EditShowCallTips(Sci_Position position);
 #define NCP_RECODE					128
 #define NCP_7BIT					256		// encoded in ASCII with escapes: UTF-7, ISO-2022, HZ-GB-2312
 #define CPI_NONE					(-1)
+#define CPI_FIRST					0
 #define CPI_DEFAULT					0
 #define CPI_OEM						1
 #define CPI_UNICODEBOM				2
@@ -358,11 +359,16 @@ void	EditShowCallTips(Sci_Position position);
 #define CPI_UTF7					8
 
 #define MAX_ENCODING_LABEL_SIZE		32
+// MultiByteToWideChar() and WideCharToMultiByte() uses int as length.
+#define MAX_NON_UTF8_SIZE	((1U << 31) - 16)
+// added 32 bytes padding as encoding detection may read beyond cbData.
+#define NP2_ENCODING_DETECTION_PADDING	32
 
 enum {
 	EncodingFlag_None = 0,
-	EncodingFlag_BOM = 1,
+	EncodingFlag_Invalid = 1,
 	EncodingFlag_UTF7 = 2,
+	EncodingFlag_Reversed = 4,
 };
 
 typedef struct NP2ENCODING {
@@ -438,6 +444,18 @@ static inline BOOL IsZeroFlagsCodePage(UINT page) {
 
 // in EditEncoding.c
 extern NP2ENCODING mEncoding[];
+static inline BOOL Encoding_IsUnicode(int iEncoding) {
+	return iEncoding == CPI_UNICODEBOM
+		|| iEncoding == CPI_UNICODEBEBOM
+		|| iEncoding == CPI_UNICODE
+		|| iEncoding == CPI_UNICODEBE;
+}
+
+static inline BOOL Encoding_IsUTF8(int iEncoding) {
+	return iEncoding == CPI_UTF8
+		|| iEncoding == CPI_UTF8SIGN;
+}
+
 void	Encoding_ReleaseResources(void);
 BOOL	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint);
 void	EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFINDREPLACE lpefr);
@@ -447,8 +465,9 @@ int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
 void	Encoding_GetLabel(int iEncoding);
 int 	Encoding_Match(LPCWSTR pwszTest);
 int 	Encoding_MatchA(LPCSTR pchTest);
-BOOL	Encoding_IsValid(int iTestEncoding);
+BOOL	Encoding_IsValid(int iEncoding);
 int		Encoding_GetIndex(UINT codePage);
+int		Encoding_GetAnsiIndex(void);
 void	Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly);
 BOOL	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet);
 #if 0
@@ -459,11 +478,8 @@ BOOL	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
 #endif
 
 UINT	CodePageFromCharSet(UINT uCharSet);
-//BOOL	IsUnicode(const char *pBuffer, DWORD cb, LPBOOL lpbBOM, LPBOOL lpbReverse);
 BOOL	IsUTF8(const char *pTest, DWORD nLength);
 BOOL	IsUTF7(const char *pTest, DWORD nLength);
-//INT		UTF8_mbslen(LPCSTR source, INT byte_length);
-//INT		UTF8_mbslen_bytes(LPCSTR utf8_string);
 
 #define BOM_UTF8		0xBFBBEF
 #define BOM_UTF16LE		0xFEFF
@@ -473,6 +489,8 @@ static inline BOOL IsUTF8Signature(const char *p) {
 	return (*((const UINT *)p) & 0xFFFFFF) == BOM_UTF8;
 }
 
+LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags);
+int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag);
 BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW);
 BOOL IsStringCaseSensitiveA(LPCSTR pszText);
 

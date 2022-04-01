@@ -7,8 +7,8 @@
 #include <cstdlib>
 #include <vector>
 
-#include "include/VectorISA.h"
-#include "include/GraphicUtils.h"
+#include "../include/VectorISA.h"
+#include "../include/GraphicUtils.h"
 #if defined(_MSC_VER)
 #pragma comment(lib, "gdi32.lib")
 #endif
