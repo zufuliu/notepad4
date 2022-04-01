@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   msvc2019:
-    name: Build with Visual C++ 2019
+    name: Visual C++ 2019
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
@@ -72,7 +72,7 @@ jobs:
           path: 'build\Notepad2_ARM_*.zip'
 
   msvc2022:
-    name: Build with Visual C++ 2022
+    name: Visual C++ 2022
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
@@ -152,7 +152,7 @@ jobs:
           path: 'build\Notepad2_ARM_*.zip'
 
   llvm_msvc2019:
-    name: Build with LLVM (Visual C++ 2019)
+    name: LLVM (Visual C++ 2019)
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
@@ -206,7 +206,7 @@ jobs:
           path: 'build\Notepad2_LLVM_ARM64_*.zip'
 
   llvm_msvc2022:
-    name: Build with LLVM (Visual C++ 2022)
+    name: LLVM (Visual C++ 2022)
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
@@ -276,7 +276,7 @@ jobs:
           path: 'build\Notepad2_LLVM_ARM64_*.zip'
 
   llvm_mingw:
-    name: Build with llvm-mingw
+    name: llvm-mingw
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -340,7 +340,7 @@ jobs:
           path: 'build\Notepad2_Clang_ARM_*.zip'
 
   gcc_ucrt:
-    name: Build with ucrt GCC and Clang
+    name: ucrt GCC and Clang
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -394,7 +394,7 @@ jobs:
           path: 'build\Notepad2_Clang_AVX2_*.zip'
 
   gcc_x86_64:
-    name: Build with 64-bit GCC and Clang
+    name: 64-bit GCC and Clang
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -448,7 +448,7 @@ jobs:
           path: 'build\Notepad2_Clang_AVX2_*.zip'
 
   gcc_i686:
-    name: Build with 32-bit GCC and Clang
+    name: 32-bit GCC and Clang
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
