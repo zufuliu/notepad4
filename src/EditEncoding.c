@@ -1059,9 +1059,11 @@ static inline BOOL IsValidMultiByte(UINT codePage, const char *lpData, DWORD cbD
 	return MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, lpData, cbData, NULL, 0);
 }
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 static inline BOOL IsValidWideChar(LPCWSTR lpWide, DWORD cchWide) {
 	return WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, lpWide, cchWide, NULL, 0, NULL, NULL);
 }
+#endif
 
 static int DetectUnicode(char *pTest, DWORD nLength, BOOL ascii) {
 	if (ascii) {
@@ -1075,6 +1077,7 @@ static int DetectUnicode(char *pTest, DWORD nLength, BOOL ascii) {
 
 	int i = 0xFFFF;
 	IsTextUnicode(pTest, nLength, &i);
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	if (i != 0xFFFF && (i & IS_TEXT_UNICODE_ILLEGAL_CHARS) == 0) {
 		if (i & IS_TEXT_UNICODE_UNICODE_MASK) {
 			if (IsValidWideChar((LPCWSTR)(pTest), nLength/2)) {
@@ -1089,6 +1092,19 @@ static int DetectUnicode(char *pTest, DWORD nLength, BOOL ascii) {
 			_swab(pTest, pTest, nLength);
 		}
 	}
+
+#else
+	if (i != 0xFFFF && (i & IS_TEXT_UNICODE_ILLEGAL_CHARS) == 0) {
+		UINT mask = ascii ? (IS_TEXT_UNICODE_UNICODE_MASK & ~IS_TEXT_UNICODE_STATISTICS) : IS_TEXT_UNICODE_UNICODE_MASK;
+		if (i & mask) {
+			return CPI_UNICODE;
+		}
+		mask = ascii ? (IS_TEXT_UNICODE_REVERSE_MASK & ~IS_TEXT_UNICODE_REVERSE_STATISTICS) : IS_TEXT_UNICODE_REVERSE_MASK;
+		if (i & mask) {
+			return CPI_UNICODEBE;
+		}
+	}
+#endif
 	return CPI_DEFAULT;
 }
 
@@ -2402,9 +2418,11 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		// check UTF-16 without BOM
 		if ((cbData & 1) == 0 && fvCurFile.mask == 0) {
 			iEncoding = DetectUnicode(lpData, cbData, bSkipUnicodeDetection);
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 			if (iEncoding == CPI_UNICODEBE) {
 				*encodingFlag = EncodingFlag_Reversed;
 			}
+#endif
 		}
 	}
 
