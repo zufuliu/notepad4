@@ -16,7 +16,10 @@ locale/en
 *.VC.db
 *.opendb
 *.aps
+*.asm
+*.s
 *.obj
+*.o
 *.exe
 *.cod
 *.pyc

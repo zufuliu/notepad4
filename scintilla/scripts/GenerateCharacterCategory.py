@@ -167,6 +167,19 @@ def isCJKCharacter(category, ch):
 def bytesToHex(b):
 	return ''.join(f'\\x{ch:02X}' for ch in b)
 
+SBCSCodePageList = [
+	('cp1250', 1250, 'Central European (Windows-1250)'),
+	('cp1251', 1251, 'Cyrillic (Windows-1251)'),
+	('cp1252', 1252, 'Western European (Windows-1252)'),
+	('cp1253', 1253, 'Greek (Windows-1253)'),
+	('cp1254', 1254, 'Turkish (Windows-1254)'),
+	('cp1255', 1255, 'Hebrew (Windows-1255)'),
+	('cp1256', 1256, 'Arabic (Windows-1256)'),
+	('cp1257', 1257, 'Baltic (Windows-1257)'),
+	('cp1258', 1258, 'Vietnamese (Windows-1258)'),
+	('cp874', 874, 'Thai (Windows-874)'),
+]
+
 def buildFoldDisplayEllipsis():
 	# Interpunct https://en.wikipedia.org/wiki/Interpunct
 	defaultText = '\u00B7' * 3	# U+00B7 Middle Dot
@@ -211,45 +224,26 @@ def buildFoldDisplayEllipsis():
 		output.append(f'\t\treturn "{key}";')
 	output.append("\t}")
 
-	encodingList = [
-		('cp1250', 1250, 'Central European (Windows-1250)'),
-		('cp1251', 1251, 'Cyrillic (Windows-1251)'),
-		('cp1252', 1252, 'Western European (Windows-1252)'),
-		('cp1253', 1253, 'Greek (Windows-1253)'),
-		('cp1254', 1254, 'Turkish (Windows-1254)'),
-		('cp1255', 1255, 'Hebrew (Windows-1255)'),
-		('cp1256', 1256, 'Arabic (Windows-1256)'),
-		('cp1257', 1257, 'Baltic (Windows-1257)'),
-		('cp1258', 1258, 'Vietnamese (Windows-1258)'),
-		('cp874', 874, 'Thai (Windows-874)'),
-	]
-
 	result = {}
-	fallback = []
-	for encoding, codepage, comment in encodingList:
+	for encoding, codepage, comment in SBCSCodePageList:
 		try:
 			value = defaultText.encode(encoding)
 			value = bytesToHex(value)
+			result[codepage] = value
 		except UnicodeEncodeError:
-			fallback.append((codepage, comment))
-			continue
+			pass
 
-		values = result.setdefault(value, [])
-		values.append((codepage, comment))
-
-	fallback.append(('default', ''))
-	result[fallbackText] = fallback
+	assert len(set(result.values())) == 1
+	assert len(result) == len(SBCSCodePageList) - 1
+	assert 874 not in result
 
 	output.append("\t// SBCS")
-	output.append("\tswitch (acp) {")
-	for key, values in result.items():
-		for codepage, comment in values:
-			if codepage == 'default':
-				output.append("\tdefault:")
-			else:
-				output.append(f"\tcase {codepage}: // {comment}")
-		output.append(f'\t\treturn "{key}";')
-	output.append("\t}")
+	lines = f'''cpEdit = acp - 1250;
+if (cpEdit <= 1258 - 1250) {{
+	return "{result[1250]}";
+}}
+return "{fallbackText}";'''.splitlines()
+	output.extend('\t' + line for line in lines)
 	output.append("}")
 
 	return output
@@ -281,35 +275,15 @@ def buildCharClassify(cp):
 		ch -= 128
 		output[ch >> 2] |= value << (2 * (ch & 3))
 
-	s = ''.join('%02X' % ch for ch in output)
-	return s, output
+	return output
 
 def buildANSICharClassifyTable(filename):
-	encodingList = [
-		('cp1250', 1250, 'Central European (Windows-1250)'),
-		('cp1251', 1251, 'Cyrillic (Windows-1251)'),
-		('cp1252', 1252, 'Western European (Windows-1252)'),
-		('cp1253', 1253, 'Greek (Windows-1253)'),
-		('cp1254', 1254, 'Turkish (Windows-1254)'),
-		('cp1255', 1255, 'Hebrew (Windows-1255)'),
-		('cp1256', 1256, 'Arabic (Windows-1256)'),
-		('cp1257', 1257, 'Baltic (Windows-1257)'),
-		('cp1258', 1258, 'Vietnamese (Windows-1258)'),
-		('cp874', 874, 'Thai (Windows-874)'),
-	]
-
 	result = {}
 	offset = 0
-	for encoding, codepage, comment in encodingList:
-		s, m = buildCharClassify(encoding)
-		if not s:
-			continue
-
-		if s not in result:
-			result[s] = { 'data': m, 'offset': offset, 'codepage': [(codepage, comment)]}
-			offset += len(m)
-		else:
-			result[s]['codepage'].append((codepage, comment))
+	for encoding, codepage, comment in SBCSCodePageList:
+		data = buildCharClassify(encoding)
+		result[codepage] = { 'data': data, 'offset': offset, 'codepage': [(codepage, comment)]}
+		offset += len(data)
 
 	output = [f"// Created with Python {platform.python_version()}, Unicode {unicodedata.unidata_version}"]
 	output.append("static const uint8_t ANSICharClassifyTable[] = {")
@@ -321,23 +295,25 @@ def buildANSICharClassifyTable(filename):
 	output.append("};")
 	output.append("")
 
-	output.append("static const uint8_t* GetANSICharClassifyTable(UINT cp, int *length) {")
-	output.append("\tswitch (cp) {")
-	for item in result.values():
-		for page in item['codepage']:
-			output.append(f"\tcase {page[0]}: // {page[1]}")
-		output.append(f"\t\treturn ANSICharClassifyTable + {item['offset']};")
-	output.append("\tdefault:")
-	output.append("\t\t*length = 0;")
-	output.append("\t\treturn NULL;")
-	output.append("\t}")
+	output.append("static inline const uint8_t* GetANSICharClassifyTable(UINT acp, int *length) {")
+	lines = f"""const UINT diff = acp - 1250;
+if (diff <= 1258 - 1250) {{
+	return ANSICharClassifyTable + diff*32;
+}}
+if (acp == 874) {{
+	return ANSICharClassifyTable + {result[874]['offset']};
+}}
+*length = 0;
+return NULL;
+""".splitlines()
+	output.extend('\t' + line for line in lines)
 	output.append("}")
 
 	output.append("")
 	ellipsis = buildFoldDisplayEllipsis()
 	output.extend(ellipsis)
 
-	print('ANSICharClassifyTable:', len(result), len(encodingList))
+	print('ANSICharClassifyTable:', len(result), len(SBCSCodePageList))
 	Regenerate(filename, "//", output)
 
 def updateCharClassifyTable(filename, headfile):

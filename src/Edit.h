@@ -461,7 +461,7 @@ BOOL	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSa
 void	EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFINDREPLACE lpefr);
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
 void	Encoding_InitDefaults(void);
-int 	Encoding_MapIniSetting(BOOL bLoad, int iSetting);
+int 	Encoding_MapIniSetting(BOOL bLoad, UINT iSetting);
 void	Encoding_GetLabel(int iEncoding);
 int 	Encoding_Match(LPCWSTR pwszTest);
 int 	Encoding_MatchA(LPCSTR pchTest);

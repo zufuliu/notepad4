@@ -1089,10 +1089,9 @@ BOOL EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 			NP2HeapFree(lpData);
 			lpData = lpDataUTF8;
 		}
-	} else if (iEncoding == CPI_DEFAULT && cbData < MAX_NON_UTF8_SIZE
-		&& encodingFlag != EncodingFlag_Invalid
-		&& iSrcEncoding != CPI_DEFAULT && iWeakSrcEncoding != CPI_DEFAULT
-		&& (bLoadANSIasUTF8 || GetACP() == CP_UTF8)) {
+	} else if (cbData < MAX_NON_UTF8_SIZE && encodingFlag != EncodingFlag_Invalid
+		&& ((bLoadANSIasUTF8 && !(iSrcEncoding == CPI_DEFAULT || iWeakSrcEncoding == CPI_DEFAULT))
+		|| (GetACP() == CP_UTF8))) {
 		// try to load ANSI / unknown encoding as UTF-8
 		DWORD back = cbData;
 		const UINT legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
