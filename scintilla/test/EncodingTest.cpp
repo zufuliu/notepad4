@@ -71,7 +71,7 @@ void TestUTF7() {
 	printf("UTF-7/%3u %02X\n", maxUTF7Len, (uint8_t)DocUTF16[maxUTF7Len]);
 	for (unsigned size = 1; size + 1 < sizeof(DocUTF16); size++) {
 		const EndUTF16Doc dummy(size);
-		const bool detect = IsUTF7(DocUTF16, size);
+		const bool detect = CheckUTF7(DocUTF16, size) == nullptr;
 		const bool expect = GetUTF7(size);
 		if (detect != expect) {
 			printf("UTF-7/%3u result=(%d, %d)\n", size, detect, expect);

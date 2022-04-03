@@ -1072,7 +1072,7 @@ static int DetectUTF16Latin1(const char *pTest, DWORD nLength) {
 	nLength &= sizeof(__m256i) - 1;
 	nLength = UINT32_MAX << nLength;
 	const __m256i zero = _mm256_setzero_si256();
-	__m256i test = _mm256_set1_epi16(0xFF00);
+	__m256i test = _mm256_set1_epi16(-0x0100); // 0xFF00
 	uint32_t expected = 0xAAAAAAAA;
 	do {
 		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
@@ -1200,8 +1200,8 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) {
 #if NP2_USE_AVX2
 	nLength &= sizeof(__m256i) - 1;
 	nLength = UINT32_MAX << nLength;
-	const __m256i vectC0 = _mm256_set1_epi8(7);
-	__m256i test = _mm256_set1_epi16(0xF800);
+	const __m256i zero = _mm256_setzero_si256();
+	__m256i test = _mm256_set1_epi16(-0x0800); // 0xF800
 	uint32_t expected = 0xAAAAAAAA;
 	do {
 		const __m256i chunk = _mm256_loadu_si256((__m256i *)pt);
@@ -1209,7 +1209,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) {
 		if (_mm256_testz_si256(chunk, test) == 0)
 		//if (andn_u32(mask, expected) != 0)
 		{
-			uint32_t mask = _mm256_movemask_epi8(mm256_cmple_epu8(chunk, vectC0));
+			uint32_t mask = _mm256_movemask_epi8(_mm256_cmpeq_epi8(_mm256_and_si256(chunk, test), zero));
 			if (pt > end) {
 				mask |= nLength;
 				if (andn_u32(mask, expected) == 0) {
@@ -1234,19 +1234,20 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) {
 	const uint32_t lower = ~high; // (1 << padding) - 1
 	padding = padding ? high : 0;
 	nLength &= 2*sizeof(__m128i) - 1;
-	const __m128i vectC0 = _mm_set1_epi8(7);
+	__m128i test = _mm_set1_epi16(-0x0800); // 0xF800
+	const __m128i zero = _mm_setzero_si128();
 	uint32_t expected = 0xAAAA;
 	do {
 		const __m128i chunk1 = _mm_loadu_si128((__m128i *)pt);
 		const __m128i chunk2 = _mm_loadu_si128((__m128i *)(pt + sizeof(__m128i)));
 		pt += 2*sizeof(__m128i);
-		uint32_t mask = ~_mm_movemask_epi8(mm_cmple_epu8(_mm_or_si128(chunk1, chunk2), vectC0));
+		uint32_t mask = ~_mm_movemask_epi8(_mm_cmpeq_epi8(_mm_and_si128(_mm_or_si128(chunk1, chunk2), test), zero));
 		if ((mask & expected) != 0) {
 			if (pt > end) {
-				mask = _mm_movemask_epi8(mm_cmple_epu8(chunk1, vectC0));
+				mask = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_and_si128(chunk1, test), zero));
 				uint32_t last = padding;
 				if (nLength > sizeof(__m128i)) {
-					last = _mm_movemask_epi8(mm_cmple_epu8(chunk2, vectC0));
+					last = _mm_movemask_epi8(_mm_cmpeq_epi8(_mm_and_si128(chunk2, test), zero));
 					last &= lower;
 				}
 				mask |= last;
@@ -1259,6 +1260,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) {
 				expected >>= 1;
 				if ((mask & expected) == 0) {
 					pt = pTest;
+					test = _mm_srli_si128(test, 1);
 					continue;
 				}
 			}
@@ -2358,7 +2360,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	};
 	for (int i = 0; i < (int)COUNTOF(encodings); i++) {
 		iEncoding = encodings[i];
-		if (iEncoding >= CPI_FIRST && (mEncoding[iEncoding].uFlags & NCP_8BIT) != 0) {
+		if (iEncoding > CPI_DEFAULT && (mEncoding[iEncoding].uFlags & NCP_8BIT) != 0) {
 			const UINT codePage = mEncoding[iEncoding].uCodePage;
 			if (IsValidMultiByte(codePage, multiData, multiLen)) {
 				return iEncoding;

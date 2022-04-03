@@ -17,6 +17,7 @@ Checks: >
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-narrowing-conversions,
     -modernize-avoid-c-arrays,
+    -modernize-macro-to-enum,
     -modernize-redundant-void-arg,
     -modernize-use-nodiscard,
     -modernize-use-trailing-return-type,
