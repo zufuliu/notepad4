@@ -53,7 +53,7 @@ struct SwapUTF16Doc {
 	SwapUTF16Doc() noexcept {
 		_swab(DocUTF16, DocUTF16, sizeof(DocUTF16));
 	}
-	~SwapUTF16Doc() noexcept {
+	~SwapUTF16Doc() {
 		_swab(DocUTF16, DocUTF16, sizeof(DocUTF16));
 	}
 };

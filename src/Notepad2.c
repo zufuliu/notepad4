@@ -5260,6 +5260,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				PostMessage(hwnd, APPM_POST_HOTSPOTCLICK, iAnchorPos, iCurrentPos);
 			}
 			break;
+
+		case SCN_NEEDSHOWN: {
+			const Sci_Line lineStart = SciCall_LineFromPosition(scn->position);
+			const Sci_Line lineEnd = SciCall_LineFromPosition(scn->position + scn->length);
+			//printf("SCN_NEEDSHOWN %zd %zd\n", lineStart, lineEnd);
+			FoldExpandRange(lineStart, lineEnd);
+		} break;
 		}
 		break;
 

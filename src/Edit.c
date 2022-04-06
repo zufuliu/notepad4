@@ -7966,24 +7966,12 @@ BOOL EditIsLineContainsStyle(Sci_Line line, int style) {
 }
 
 void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) {
-	BOOL fToggled = FALSE;
-	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	for (Sci_Line line = lineStart; line <= lineEnd; line++) {
 		const int level = SciCall_GetFoldLevel(line);
 		if ((level & SC_FOLDLEVELHEADERFLAG) != 0 && !SciCall_GetFoldExpanded(line)) {
 			SciCall_ExpandChildren(line, level);
-			fToggled = fToggled || SciCall_GetFoldExpanded(line);
+			line = SciCall_GetLastChildEx(line, level);
 		}
-	}
-
-	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-	if (fToggled) {
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-		SciCall_ScrollCaret();
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 }
 

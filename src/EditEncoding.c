@@ -2255,7 +2255,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	}
 
 	// check Unicode / UTF-16 BOM
-	const UINT bom = *(const uint16_t *)lpData;
+	const UINT bom = *((const uint16_t *)lpData);
 	if (cbData < MAX_NON_UTF8_SIZE && (Encoding_IsUnicode(iSrcEncoding) // reload as UTF-16
 		|| (iSrcEncoding < CPI_FIRST && (cbData & 1) == 0 && (bom == BOM_UTF16LE || bom == BOM_UTF16BE)))) {
 		BOOL bBOM = iSrcEncoding < CPI_FIRST;
@@ -2296,7 +2296,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 
 	// check UTF-16 without BOM for Latin
 	if ((cbData & 1) == 0 && iSrcEncoding < CPI_FIRST
-		// first or second byte is lower C0 control character U+0000 to U+0007
+		// odd or even byte is lower C0 control character U+0000 to U+0007
 		&& ((bom & 0xF800) == 0 || (bom & 0x00F8) == 0)
 		&& fvCurFile.mask == 0) {
 #if 0
