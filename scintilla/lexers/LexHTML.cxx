@@ -440,7 +440,7 @@ constexpr bool IsAttributeContinue(int ch) noexcept {
 
 constexpr bool IsOKBeforeJSRE(int ch) noexcept {
 	// TODO: also handle + and - (except if they're part of ++ or --) and return keywords
-	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~');
+	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~', '>');
 }
 
 void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,

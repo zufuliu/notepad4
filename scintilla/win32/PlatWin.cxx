@@ -584,7 +584,7 @@ public:
 };
 
 SurfaceGDI::SurfaceGDI(HDC hdcCompatible, int width, int height, SurfaceMode mode_, int logPixelsY_) noexcept {
-	hdc = ::CreateCompatibleDC(hdc);
+	hdc = ::CreateCompatibleDC(hdcCompatible);
 	bitmap = ::CreateCompatibleBitmap(hdcCompatible, width, height);
 	bitmapOld = SelectBitmap(hdc, bitmap);
 	::SetTextAlign(hdc, TA_BASELINE);

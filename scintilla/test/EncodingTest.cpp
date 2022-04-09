@@ -141,7 +141,7 @@ void TestUTF16LatinExt() {
 
 }
 
-int __cdecl main(void) {
+int __cdecl main() {
 	printf("doc size=%u, UTF-7=%u, Latin-1=%u, Latin-Ext=%u\n",
 		(unsigned)sizeof(DocUTF16), maxUTF7Len, maxLatin1Len, maxLatinExtLen);
 	TestUTF7();

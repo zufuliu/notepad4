@@ -13,12 +13,18 @@
 
 using namespace Scintilla::Internal;
 
+namespace {
+
 template <typename T>
-static constexpr T MakeLowerCase(T ch) noexcept {
+constexpr T MakeLowerCase(T ch) noexcept {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
-CaseFolder::~CaseFolder() noexcept = default;
+constexpr unsigned char IndexFromChar(char ch) noexcept {
+	return static_cast<unsigned char>(ch);
+}
+
+}
 
 CaseFolderTable::CaseFolderTable() noexcept {
 	for (int iChar = 0; iChar < 256; iChar++) {
@@ -31,7 +37,7 @@ size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed,
 		return 0;
 	} else {
 		for (size_t i = 0; i < lenMixed; i++) {
-			folded[i] = mapping[static_cast<unsigned char>(mixed[i])];
+			folded[i] = mapping[IndexFromChar(mixed[i])];
 		}
 		return lenMixed;
 	}
