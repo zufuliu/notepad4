@@ -1664,6 +1664,10 @@ HWND EditCreate(HWND hwndParent) {
 						  (HMENU)IDC_EDIT,
 						  g_hInstance,
 						  NULL);
+	//SciInitThemes(hwnd);
+	if (bEditLayoutRTL) {
+		SetWindowLayoutRTL(hwnd, TRUE);
+	}
 
 	InitScintillaHandle(hwnd);
 	Style_InitDefaultColor();
@@ -1698,11 +1702,6 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_AssignCmdKey((SCK_END + (SCMOD_NORM << 16)), SCI_LINEENDWRAP);
 	SciCall_AssignCmdKey((SCK_HOME + (SCMOD_SHIFT << 16)), SCI_VCHOMEWRAPEXTEND);
 	SciCall_AssignCmdKey((SCK_END + (SCMOD_SHIFT << 16)), SCI_LINEENDWRAPEXTEND);
-
-	//SciInitThemes(hwnd);
-	if (bEditLayoutRTL) {
-		SetWindowLayoutRTL(hwnd, TRUE);
-	}
 
 	iRenderingTechnology = SciCall_GetTechnology();
 	iBidirectional = SciCall_GetBidirectional();
@@ -2648,7 +2647,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_SET_RENDER_TECH_GDI + iRenderingTechnology;
 	CheckMenuRadioItem(hmenu, IDM_SET_RENDER_TECH_GDI, IDM_SET_RENDER_TECH_D2DDC, i, MF_BYCOMMAND);
 	// RTL Layout
-	EnableCmd(hmenu, IDM_SET_RTL_LAYOUT_EDIT, iRenderingTechnology == SC_TECHNOLOGY_DEFAULT);
 	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_EDIT, bEditLayoutRTL);
 	CheckCmd(hmenu, IDM_SET_RTL_LAYOUT_OTHER, bWindowLayoutRTL);
 	// Bidirectional
@@ -4346,6 +4344,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_SET_RTL_LAYOUT_EDIT:
 		bEditLayoutRTL = !bEditLayoutRTL;
+		if (bEditLayoutRTL && iRenderingTechnology != SC_TECHNOLOGY_DEFAULT) {
+			SendWMCommand(hwnd, IDM_SET_RENDER_TECH_GDI);
+		}
 		SetWindowLayoutRTL(hwndEdit, bEditLayoutRTL);
 		InvalidateStyleRedraw();
 		break;
@@ -5638,8 +5639,7 @@ void LoadSettings(void) {
 
 	iValue = IniSectionGetInt(pIniSection, L"RenderingTechnology", GetDefualtRenderingTechnology());
 	iValue = clamp_i(iValue, SC_TECHNOLOGY_DEFAULT, SC_TECHNOLOGY_DIRECTWRITEDC);
-	iRenderingTechnology = iValue;
-	bEditLayoutRTL = bEditLayoutRTL && iValue == SC_TECHNOLOGY_DEFAULT;
+	iRenderingTechnology = bEditLayoutRTL ? SC_TECHNOLOGY_DEFAULT : iValue;
 
 	iValue = IniSectionGetInt(pIniSection, L"Bidirectional", SC_BIDIRECTIONAL_DISABLED);
 	iBidirectional = clamp_i(iValue, SC_BIDIRECTIONAL_DISABLED, SC_BIDIRECTIONAL_R2L);

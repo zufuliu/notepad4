@@ -145,7 +145,7 @@ public:
 		return pAccess->StyleAt(position);
 	}
 	unsigned char StyleIndexAt(Sci_Position position) const noexcept {
-		pAccess->StyleAt(position);
+		return pAccess->StyleAt(position);
 	}
 	// only used in Colourise() or Lex() function, validLen is always zero in Fold() function.
 	// Return style value from buffer when in buffer, else retrieve from document.
