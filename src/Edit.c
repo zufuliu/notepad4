@@ -7179,6 +7179,13 @@ labelEnd: {
 extern BOOL bOpenFolderWithMetapath;
 
 static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) {
+	if (StrHasPrefix(link, L"//")) {
+		// issue #454, treat as link
+		lstrcpy(path, L"http:");
+		lstrcpy(path + CSTRLEN(L"http:"), link);
+		return 0;
+	}
+
 	DWORD dwAttributes = GetFileAttributes(link);
 	if (dwAttributes == INVALID_FILE_ATTRIBUTES) {
 		if (StrNotEmpty(szCurFile)) {
@@ -7299,6 +7306,9 @@ void EditOpenSelection(OpenSelectionType type) {
 			}
 		} else {
 			link = path;
+			if (dwAttributes == 0) {
+				dwAttributes = INVALID_FILE_ATTRIBUTES;
+			}
 			if (*back != L'\0') {
 				line = NULL;
 			}
