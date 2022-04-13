@@ -2987,7 +2987,6 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		}
 	}
 
-	FoldExpandRange(iLineStart, iLineEnd);
 	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(iPrefixLen, iAppendLen) * kMaxMultiByteCount + 1);
 	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
@@ -3121,7 +3120,6 @@ void EditAlignText(EditAlignMode nMode) {
 		}
 	}
 
-	FoldExpandRange(iLineStart, iLineEnd);
 	Sci_Position iMinIndent = BUFSIZE_ALIGN;
 	Sci_Position iMaxLength = 0;
 	for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
@@ -3361,7 +3359,6 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 		ConvertWinEditLineEndings(mszClose, iEOLMode);
 	}
 
-	FoldExpandRange(SciCall_LineFromPosition(iSelStart), SciCall_LineFromPosition(iSelEnd));
 	SciCall_BeginUndoAction();
 	len = 0;
 
@@ -3448,7 +3445,6 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 		}
 	}
 
-	FoldExpandRange(iLineStart, iLineEnd);
 	SciCall_BeginUndoAction();
 	int iAction = 0;
 
@@ -3611,7 +3607,6 @@ void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 			SciCall_BeginUndoAction();
 		}
 
-		FoldExpandRange(iLineStart, iLineEnd);
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iLineSelEndPos = SciCall_GetLineSelEndPosition(iLine);
 			if (bIsRectangular && iLineSelEndPos < 0) {

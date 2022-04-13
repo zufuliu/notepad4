@@ -1758,6 +1758,7 @@ HWND EditCreate(HWND hwndParent) {
 #if NP2_DEBUG_FOLD_LEVEL
 	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
 #endif
+	SciCall_SetAutomaticFold(SC_AUTOMATICFOLD_SHOW | SC_AUTOMATICFOLD_CLICK | SC_AUTOMATICFOLD_CHANGE);
 	SciCall_FoldDisplayTextSetStyle(SC_FOLDDISPLAYTEXT_BOXED);
 	const char *text = GetFoldDisplayEllipsis(SC_CP_UTF8, 0); // internal default encoding
 	SciCall_SetDefaultFoldDisplayText(text);
@@ -5217,9 +5218,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_MARGINCLICK:
 			switch (scn->margin) {
+#if 0
 			case MarginNumber_CodeFolding:
 				FoldClickAt(scn->position, scn->modifiers);
 				break;
+#endif
 			case MarginNumber_Bookmark:
 				EditToggleBookmarkAt(scn->position);
 				break;
@@ -5262,12 +5265,14 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			break;
 
+#if 0
 		case SCN_NEEDSHOWN: {
 			const Sci_Line lineStart = SciCall_LineFromPosition(scn->position);
 			const Sci_Line lineEnd = SciCall_LineFromPosition(scn->position + scn->length);
 			//printf("SCN_NEEDSHOWN %zd %zd\n", lineStart, lineEnd);
 			FoldExpandRange(lineStart, lineEnd);
 		} break;
+#endif
 		}
 		break;
 

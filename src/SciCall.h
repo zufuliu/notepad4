@@ -1302,6 +1302,10 @@ NP2_inline void SciCall_ExpandChildren(Sci_Line line, int level) {
 	SciCall(SCI_EXPANDCHILDREN, line, level);
 }
 
+NP2_inline void SciCall_SetAutomaticFold(int automaticFold) {
+	SciCall(SCI_SETAUTOMATICFOLD, automaticFold, 0);
+}
+
 NP2_inline void SciCall_EnsureVisible(Sci_Line line) {
 	SciCall(SCI_ENSUREVISIBLE, line, 0);
 }
