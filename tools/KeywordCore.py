@@ -1297,7 +1297,6 @@ def parse_javascript_api_file(path):
 			keywordMap['properties'] = properties
 
 	RemoveDuplicateKeyword(keywordMap, [
-		'directive',
 		'keywords',
 		'future reserved words',
 		'class',

@@ -198,7 +198,12 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (sc.state == SCE_JS_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Directive]->InList(s)) {
+						sc.ChangeState(SCE_JS_DIRECTIVE);
+						if (StrEqualsAny(s, "import", "require")) {
+							lineStateLineType = JsLineStateMaskImport;
+						}
+					} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
 						sc.ChangeState(SCE_JS_WORD);
 						if (StrEqualsAny(s, "class", "extends","new", "type", "as", "is")) {
 							kwType = SCE_JS_CLASS;
@@ -219,11 +224,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						}
 					} else if (keywordLists[KeywordIndex_FutureReservedWord]->InList(s)) {
 						sc.ChangeState(SCE_JS_WORD2);
-					} else if (keywordLists[KeywordIndex_Directive]->InList(s)) {
-						sc.ChangeState(SCE_JS_DIRECTIVE);
-						if (StrEqualsAny(s, "import", "require")) {
-							lineStateLineType = JsLineStateMaskImport;
-						}
 					} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
 						sc.ChangeState(SCE_JS_CLASS);
 					} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
