@@ -129,7 +129,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* TOML File
-	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 4.3.
+	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 4.7.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* VHDL

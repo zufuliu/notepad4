@@ -1,9 +1,9 @@
-// 4.3 https://www.typescriptlang.org/docs/
+// 4.6 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
 // https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts
-abstract as asserts async await
+abstract as assert asserts async await
 break
 case catch class const constructor continue
 debugger declare default delete do
@@ -14,7 +14,7 @@ if implements in infer instanceof interface intrinsic is
 keyof
 let
 new null
-of override
+of out override
 package private protected public
 readonly return
 set static super switch
