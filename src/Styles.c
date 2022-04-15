@@ -1266,13 +1266,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[5] = KeywordAttr_MakeLower;
 		attr[6] = KeywordAttr_MakeLower;
 		break;
-	case NP2LEX_PHP:
-		attr[9] = KeywordAttr_NoLexer;		// Function
-		attr[10] = KeywordAttr_NoLexer;		// Field
-		attr[11] = KeywordAttr_NoLexer;		// Method
-		attr[12] = KeywordAttr_NoLexer;		// Tag
-		attr[13] = KeywordAttr_NoLexer;		// String Constant
-		break;
 	case NP2LEX_XML:
 		attr[6] = KeywordAttr_NoLexer;		// Attribute
 		attr[7] = KeywordAttr_NoLexer;		// Value
@@ -1427,6 +1420,16 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[4] = KeywordAttr_NoLexer;		// function
 		attr[5] = KeywordAttr_NoLexer;		// predefined variables
 		break;
+	case NP2LEX_PHP:
+		attr[2] = KeywordAttr_MakeLower;	// class
+		attr[3] = KeywordAttr_MakeLower;	// interface
+		attr[6] = KeywordAttr_MakeLower;	// magic method
+		attr[7] = KeywordAttr_NoLexer;		// constant
+		attr[8] = KeywordAttr_NoLexer;		// function
+		attr[9] = KeywordAttr_NoLexer;		// misc
+		attr[10] = KeywordAttr_NoAutoComp;	// JavaScript
+		attr[11] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// phpdoc
+		break;
 	case NP2LEX_PYTHON:
 		attr[7] = KeywordAttr_NoLexer;		// decorator
 		attr[8] = KeywordAttr_NoLexer;		// module
@@ -1479,6 +1482,25 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 
 static inline void Style_SetDefaultStyle(int index) {
 	Style_SetStyles(pLexGlobal->Styles[index].iStyle, pLexGlobal->Styles[index].szValue);
+}
+
+static void Style_SetAllStyle(PEDITLEXER pLex, int offset) {
+	if (!IsStyleLoaded(pLex)) {
+		Style_LoadOne(pLex);
+	}
+
+	const int high = offset << 8;
+	const UINT iStyleCount = pLex->iStyleCount;
+	// first style is the default style.
+	for (UINT i = 1; i < iStyleCount; i++) {
+		UINT iStyle = pLex->Styles[i].iStyle;
+		LPCWSTR szValue = pLex->Styles[i].szValue;
+		const int first = (iStyle & 0xff) + offset;
+		Style_SetStyles(first, szValue);
+		if (iStyle > 0xff) {
+			SciCall_CopyStyles(first | high, iStyle >> 8);
+		}
+	}
 }
 
 // parse a style attribute separated by ';'
@@ -1944,18 +1966,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	// other lexer styles
 	if (rid != NP2LEX_ANSI) {
 		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
-
-		const UINT iStyleCount = pLexNew->iStyleCount;
-		// first style is the default style.
-		for (UINT i = 1; i < iStyleCount; i++) {
-			const UINT iStyle = pLexNew->Styles[i].iStyle;
-			szValue = pLexNew->Styles[i].szValue;
-			const int first = iStyle & 0xff;
-			Style_SetStyles(first, szValue);
-			if (iStyle > 0xFF) {
-				SciCall_CopyStyles(first, iStyle >> 8);
-			}
-		}
+		Style_SetAllStyle(pLexNew, 0);
 
 		switch (iLexer) {
 		case SCLEX_PERL:
@@ -1973,10 +1984,16 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case SCLEX_MARKDOWN:
+		case SCLEX_PHPSCRIPT:
 			if (!IsStyleLoaded(&lexHTML)) {
 				Style_LoadOne(&lexHTML);
 			}
-			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
+			if (iLexer == SCLEX_MARKDOWN) {
+				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
+			} else {
+				Style_SetAllStyle(&lexJavaScript, SCE_PHP_LABEL + 1);
+				Style_SetAllStyle(&lexCSS, SCE_PHP_LABEL + SCE_JS_LABEL + 2);
+			}
 			for (UINT i = 1; i < lexHTML.iStyleCount; i++) {
 				const UINT iStyle = lexHTML.Styles[i].iStyle;
 				szValue = lexHTML.Styles[i].szValue;
@@ -2126,7 +2143,6 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 				return &lexLua;
 			}
 			if (StrStartsWith(name, "php")) {
-				//np2LexLangIndex = IDM_LEXER_PHP;
 				return &lexPHP;
 			}
 			if (StrStartsWith(name, "tcl")) {
@@ -2200,9 +2216,9 @@ int Style_GetDocTypeLanguage(void) {
 		}
 	}
 
-	if (strstr(tchText, "<?php")) {
-		return IDM_LEXER_PHP;
-	}
+	//if (strstr(tchText, "<?php")) {
+	//	return IDM_LEXER_PHP;
+	//}
 	// check Language
 	if ((p = strstr(tchText, "<%@")) != NULL && (p = StrStrIA(p + CSTRLEN("<%@"), "Language")) != NULL) {
 		p += CSTRLEN("Language") + 1;
@@ -2843,19 +2859,14 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	}
 
 	// xml/html
-	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_PHP || pLexNew->rid == NP2LEX_CONF))) {
+	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_CONF))) {
 		char tchText[256] = "";
 		SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 		const char *p = tchText;
 		while (IsASpace(*p)) {
 			++p;
 		}
-		const BOOL bPHP = StrStartsWith(p, "<?php");
-		if ((pLexNew->rid == NP2LEX_PHP) != bPHP) {
-			pLexNew = &lexHTML;
-			np2LexLangIndex = IDM_LEXER_PHP;
-			bFound = TRUE;
-		} else if (*p == '<') {
+		if (*p == '<') {
 			if (StrStartsWith(p, "<?xml")) {
 				// some conf/cfg file is xml
 				pLexNew = &lexXML;
@@ -3076,7 +3087,6 @@ void Style_SetLexerByLangIndex(int lang) {
 
 	// Web Source Code
 	case IDM_LEXER_WEB:
-	case IDM_LEXER_PHP:
 	case IDM_LEXER_JSP:
 	case IDM_LEXER_ASPX_CS:
 	case IDM_LEXER_ASPX_VB:
@@ -3086,6 +3096,9 @@ void Style_SetLexerByLangIndex(int lang) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
 		pLex = &lexHTML;
+		break;
+	case IDM_LEXER_PHP:
+		pLex = &lexPHP;
 		break;
 
 	// XML Document

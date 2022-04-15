@@ -412,9 +412,11 @@ void ViewStyle::ClearStyles() noexcept {
 }
 
 void ViewStyle::CopyStyles(size_t sourceIndex, size_t destStyles) {
+	const size_t offset = sourceIndex >> 8;
+	sourceIndex &= 0xff;
 	const Style &source = styles[sourceIndex];
 	do {
-		const size_t index = destStyles & 0xff;
+		const size_t index = (destStyles & 0xff) + offset;
 		assert(sourceIndex != index);
 		if (index != sourceIndex) {
 			styles[index] = source;

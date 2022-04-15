@@ -171,6 +171,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexPerl.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexPHP.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -630,6 +633,9 @@
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\DefaultLexer.h">
+      <Filter>Scintilla\lexlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\scintilla\lexlib\DocUtils.h">
       <Filter>Scintilla\lexlib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\scintilla\lexlib\LexAccessor.h">

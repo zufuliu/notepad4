@@ -18,6 +18,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "DocUtils.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
@@ -84,15 +85,6 @@ enum class DocTagState {
 
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JS_STRING_BT);
 static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JSX_TEXT);
-
-constexpr bool IsJsIdentifierStart(int ch) noexcept {
-	return IsIdentifierStartEx(ch) || ch == '$'
-		|| ch == '#'; // ECMAScript 2021 private field and method
-}
-
-constexpr bool IsJsIdentifierChar(int ch) noexcept {
-	return IsIdentifierCharEx(ch) || ch == '$';
-}
 
 inline bool IsJsIdentifierStartNext(const StyleContext &sc) noexcept {
 	return IsJsIdentifierStart(sc.chNext) || (sc.chNext == '\\' && sc.GetRelative(2) == 'u');

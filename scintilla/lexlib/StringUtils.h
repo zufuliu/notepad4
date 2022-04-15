@@ -17,6 +17,15 @@ constexpr bool IsEmpty(const char *s) noexcept {
 	return *s == '\0';
 }
 
+inline bool IsUpperOrNumeric(const char *s) noexcept {
+	signed char ch;
+	while ((ch = static_cast<signed char>(*s++)) > '\0') {
+		if (ch >= 'a' && ch <= 'z') {
+			return false;
+		}
+	}
+	return true;
+}
 
 inline bool strequ(const char *s, const char *t) noexcept {
 	return std::strcmp(s, t) == 0;

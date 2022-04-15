@@ -41,12 +41,7 @@ void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char 
 
 void LexAccessor::GetRangeLowered(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	GetRange(startPos_, endPos_, s, len);
-	while (*s) {
-		if (*s >= 'A' && *s <= 'Z') {
-			*s += 'a' - 'A';
-		}
-		++s;
-	}
+	ToLowerCase(s);
 }
 
 std::string LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_) {

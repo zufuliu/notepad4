@@ -350,28 +350,6 @@ constexpr bool IsInvalidUrlChar(int ch) noexcept {
 	return ch <= 32 || AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}', 127);
 }
 
-// based on CommonMark Spec 6.6 Raw HTML
-constexpr bool IsHtmlTagStart(int ch) noexcept {
-	return IsAlpha(ch);
-}
-
-constexpr bool IsHtmlTagChar(int ch) noexcept {
-	return IsAlphaNumeric(ch) || ch == '-' || ch == ':';
-}
-
-constexpr bool IsHtmlAttrStart(int ch) noexcept {
-	return IsIdentifierStart(ch) || ch == ':';
-}
-
-constexpr bool IsHtmlAttrChar(int ch) noexcept {
-	return IsIdentifierChar(ch) || ch == ':' || ch == '.' || ch == '-';
-}
-
-constexpr bool IsHtmlInvalidAttrChar(int ch) noexcept {
-	// characters not allowed in unquoted attribute value
-	return ch <= 32 || AnyOf(ch, '"', '\'', '\\', '`', '=', '<', '>', 127);
-}
-
 // characters can follow jump `label:`, based on Swift's document Labeled Statement at
 // https://docs.swift.org/swift-book/ReferenceManual/Statements.html#grammar_labeled-statement
 // good coding style should place left aligned label on it's own line.
@@ -404,5 +382,14 @@ constexpr T MakeLowerCase(T ch) noexcept {
 #define CompareCaseInsensitive		_stricmp
 #define CompareNCaseInsensitive		_strnicmp
 #endif
+
+inline void ToLowerCase(char *s) noexcept {
+	while (*s) {
+		if (*s >= 'A' && *s <= 'Z') {
+			*s += 'a' - 'A';
+		}
+		++s;
+	}
+}
 
 }

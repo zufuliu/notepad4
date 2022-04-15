@@ -62,6 +62,7 @@
       <File Name="../../scintilla/lexers/LexNull.cxx"/>
       <File Name="../../scintilla/lexers/LexPascal.cxx"/>
       <File Name="../../scintilla/lexers/LexPerl.cxx"/>
+      <File Name="../../scintilla/lexers/LexPHP.cxx"/>
       <File Name="../../scintilla/lexers/LexPowerShell.cxx"/>
       <File Name="../../scintilla/lexers/LexProps.cxx"/>
       <File Name="../../scintilla/lexers/LexPython.cxx"/>
@@ -89,6 +90,7 @@
       <File Name="../../scintilla/lexlib/CharacterCategory.h"/>
       <File Name="../../scintilla/lexlib/CharacterSet.h"/>
       <File Name="../../scintilla/lexlib/DefaultLexer.cxx"/>
+      <File Name="../../scintilla/lexlib/DocUtils.h"/>
       <File Name="../../scintilla/lexlib/DefaultLexer.h"/>
       <File Name="../../scintilla/lexlib/LexAccessor.cxx"/>
       <File Name="../../scintilla/lexlib/LexAccessor.h"/>

@@ -70,6 +70,7 @@ extern LexerModule lmNsis;
 extern LexerModule lmNull;
 extern LexerModule lmPascal;
 extern LexerModule lmPerl;
+extern LexerModule lmPHPScript;
 extern LexerModule lmPowerShell;
 extern LexerModule lmProps;
 extern LexerModule lmPython;
@@ -144,6 +145,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmNull,
 	&lmPascal,
 	&lmPerl,
+	&lmPHPScript,
 	&lmPowerShell,
 	&lmProps,
 	&lmPython,

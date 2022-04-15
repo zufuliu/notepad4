@@ -24,6 +24,7 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
+#include "DocUtils.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
 
@@ -46,14 +47,6 @@ constexpr bool IsAWordChar(int ch) noexcept {
 	 * that our byte is between U+0080 - U+00A0 (to return false), so we have to allow all characters U+0080 and higher
 	 */
 	return ch >= 0x80 || IsAlphaNumeric(ch) || ch == '-' || ch == '_';
-}
-
-constexpr bool IsCssOperator(int ch) noexcept {
-	return ch == '{' || ch == '}' || ch == ':' || ch == ',' || ch == ';' ||
-			ch == '.' || ch == '#' || ch == '!' || ch == '@' ||
-			/* CSS2 */
-			ch == '*' || ch == '>' || ch == '+' || ch == '=' || ch == '~' || ch == '|' ||
-			ch == '[' || ch == ']' || ch == '(' || ch == ')';
 }
 
 // look behind (from start of document to our start position) to determine current nesting level

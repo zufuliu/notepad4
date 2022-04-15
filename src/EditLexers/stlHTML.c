@@ -37,23 +37,7 @@ static KEYWORDLIST Keywords_HTML = {{
 NULL
 
 , // 4 PHP
-"abstract and as break callable case catch class clone const continue declare default "
-"do else elseif enddeclare endfor endforeach endif endswitch endwhile extends final "
-"finally for foreach function global goto if implements instanceof insteadof interface "
-"namespace new or parent private protected public return self static switch throw trait "
-"try use var while xor yield "
-"array bool boolean real double float int integer object string " // cast
-"null true false NULL TRUE FALSE NAN " // literal
-"define defined die echo empty eval exit include include_once isset list print "
-"require require_once unset __halt_compiler "
-// magic method
-"__autoload __call __callStatic __clone __construct __destruct __get __invoke __isset "
-"__set __set_state __sleep __toString __unset __wakeup "
-// basic class/interface
-"Traversable Iterator IteratorAggregate ArrayAccess Serializable Closure Generator "
-"stdClass Exception ErrorException Directory php_user_filter DateTime "
-//
-"__CLASS__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
+NULL
 
 , // 5 SGML/DTD
 "doctype DOCTYPE PUBLIC SYSTEM "
@@ -162,19 +146,6 @@ static EDITSTYLE Styles_HTML[] = {
 	{ SCE_H_CDATA, NP2StyleX_XMLCDATA, L"back:#C5C5C5; eolfilled" },
 	{ MULTI_STYLE(SCE_H_ASP, SCE_H_ASPAT, 0, 0), NP2StyleX_ASPTag, L"bold; fore:#8B008B" },
 	{ SCE_H_QUESTION, NP2StyleX_PHPTag, L"bold; fore:#8B008B" },
-
-	// PHP
-	{ SCE_HPHP_DEFAULT, NP2StyleX_PHPDefault, L"" },
-	{ SCE_HPHP_WORD, NP2StyleX_PHPKeyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_HPHP_COMMENT, SCE_HPHP_COMMENTLINE, 0, 0), NP2StyleX_PHPComment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_HPHP_HSTRING, SCE_HPHP_SIMPLESTRING, 0, 0), NP2StyleX_PHPString, L"fore:#008000" },
-	{ SCE_HPHP_HEREDOC, NP2StyleX_PHPHeredocString, L"fore:#648000" },
-	{ SCE_HPHP_NOWDOC, NP2StyleX_PHPNowdocString, L"fore:#A46000" },
-	{ SCE_HPHP_NUMBER, NP2StyleX_PHPNumber, L"fore:#FF0000" },
-	{ SCE_HPHP_OPERATOR, NP2StyleX_PHPOperator, L"fore:#B000B0" },
-	{ SCE_HPHP_VARIABLE, NP2StyleX_PHPVariable, L"italic; fore:#003CE6" },
-	{ SCE_HPHP_HSTRING_VARIABLE, NP2StyleX_PHPStringVariable, L"fore:#000080" },
-	{ SCE_HPHP_COMPLEX_VARIABLE, NP2StyleX_PHPComplexVariable, L"fore:#000080" },
 
 	// JavaScript
 	{ MULTI_STYLE(SCE_HJ_START, SCE_HJ_DEFAULT, SCE_HJA_START, SCE_HJA_DEFAULT), NP2StyleX_JSDefault, L"" },

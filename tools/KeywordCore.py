@@ -1543,6 +1543,61 @@ def parse_nsis_api_file(path):
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer),
 	]
 
+def parse_php_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '//')
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = [item.replace('()', '(') for item in doc.split()]
+		elif key == 'type':
+			keywordMap[key] = doc.split()
+		elif key == 'predefined variable':
+			items = doc.split()
+			keywordMap[key] = [item for item in items if item[0] == '$']
+			keywordMap['misc'] = [item for item in items if item[0].isalpha()]
+		elif key == 'api':
+			items = re.findall(r'\w+\(', doc)
+			keywordMap['magic method'] = [item for item in items if item.startswith('__')]
+			keywordMap['function'] = items
+			keywordMap['class'] = re.findall(r'\Wclass\s+(\w+)', doc)
+			keywordMap['interface'] = re.findall(r'\Winterface\s+(\w+)', doc)
+			items = re.findall(r'^\s*([_A-Z0-9]+)\s*$', doc, re.MULTILINE)
+			keywordMap['magic constant'] = [item for item in items if item.startswith('__')]
+			keywordMap['constant'] = items
+			# field
+			items = re.findall(r'\Wconst\s+\w+\s+([_A-Z0-9]+)', doc)
+			keywordMap['constant'].extend(items)
+			items = re.findall(r'(public|protected)\s+[\w\?\|]+\s+\$(\w+)', doc)
+			keywordMap['misc'].extend(item[1] for item in items)
+		elif key == 'phpdoc':
+			keywordMap[key] = re.findall(r'@(\w+)', doc)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'type',
+		'class',
+		'interface',
+		'magic constant',
+		'magic method',
+		'constant',
+		'function',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.MakeLower),
+		('interface', keywordMap['interface'], KeywordAttr.MakeLower),
+		('predefined variable', keywordMap['predefined variable'], KeywordAttr.Default),
+		('magic constant', keywordMap['magic constant'], KeywordAttr.Default),
+		('magic method', keywordMap['magic method'], KeywordAttr.MakeLower),
+		('constant', keywordMap['constant'], KeywordAttr.NoLexer),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
+		('phpdoc', keywordMap['phpdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
 def parse_python_api_file(path):
 	keywordMap = {
 		'modules': [],

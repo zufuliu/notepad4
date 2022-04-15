@@ -1040,6 +1040,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexNull.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPascal.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPerl.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexPHP.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPowerShell.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexProps.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPython.cxx" />
@@ -1195,6 +1196,7 @@
     <ClInclude Include="..\..\scintilla\lexlib\CharacterCategory.h" />
     <ClInclude Include="..\..\scintilla\lexlib\CharacterSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\DefaultLexer.h" />
+    <ClInclude Include="..\..\scintilla\lexlib\DocUtils.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexAccessor.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerBase.h" />
     <ClInclude Include="..\..\scintilla\lexlib\LexerModule.h" />

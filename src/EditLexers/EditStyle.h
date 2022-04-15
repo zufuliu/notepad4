@@ -63,18 +63,6 @@
 #define NP2STYLE_ASPTag					63272
 #define NP2STYLE_PHPTag					63273
 
-#define NP2STYLE_PHPDefault				63281
-#define NP2STYLE_PHPComment				63282
-#define NP2STYLE_PHPKeyword				63283
-#define NP2STYLE_PHPString				63284
-#define NP2STYLE_PHPHeredocString		63285
-#define NP2STYLE_PHPNowdocString		63286
-#define NP2STYLE_PHPNumber				63287
-#define NP2STYLE_PHPOperator			63288
-#define NP2STYLE_PHPVariable			63289
-#define NP2STYLE_PHPStringVariable		63290
-#define NP2STYLE_PHPComplexVariable		63291
-
 #define NP2STYLE_JSDefault				63301
 #define NP2STYLE_JSComment				63302
 #define NP2STYLE_JSKeyword				63303

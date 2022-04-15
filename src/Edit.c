@@ -7912,6 +7912,10 @@ static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *ignoreInner) {
 	case SCLEX_TOML: // table
 		return (1 << 0);
 
+	case SCLEX_PHPSCRIPT: // php tag, class, function
+		*ignoreInner = SCE_PHP_FUNCTION_DEFINITION;
+		return (1 << 1) | (1 << 2);
+
 	case SCLEX_PYTHON: // class, function
 		*ignoreInner = SCE_PY_FUNCTION_DEFINITION;
 		return (1 << 1) | (1 << 2);

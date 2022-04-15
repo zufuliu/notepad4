@@ -34,6 +34,7 @@ def update_all_keyword():
 		('NP2LEX_LUA', 'stlLua.c', 'LexLua.cxx', 'Lua.lua', 0, parse_lua_api_file),
 		('NP2LEX_MARKDOWN', 'stlDefault.c', 'LexMarkdown.cxx', '', (0, 'markdown'), parse_markdown_api_file),
 		('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
+		('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
 		('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
 		('NP2LEX_R', 'stlR.c', 'LexR.cxx', 'R.r', 0, parse_r_api_file),
 		('NP2LEX_REBOL', 'stlRebol.c', 'LexRebol.cxx', ['Rebol.r', 'Red.red'], 1, parse_rebol_api_file),

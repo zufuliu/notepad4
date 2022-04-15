@@ -114,7 +114,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_HTML			63026	// SCLEX_HTML		Web Source Code
 #define NP2LEX_CSS			63027	// SCLEX_CSS		CSS Style Sheet
 #define NP2LEX_SQL			63028	// SCLEX_SQL		SQL Query
-#define NP2LEX_PHP			63029	// SCLEX_CPP		PHP Script
+#define NP2LEX_PHP			63029	// SCLEX_PHPSCRIPT	PHP Script
 #define NP2LEX_VBS			63030	// SCLEX_VBSCRIPT	VBScript
 #define NP2LEX_PERL			63031	// SCLEX_PERL		Perl Script
 #define NP2LEX_PYTHON		63032	// SCLEX_PYTHON		Python Script

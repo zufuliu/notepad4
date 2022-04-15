@@ -75,18 +75,6 @@
 #define NP2StyleX_ASPTag				EDITSTYLE_HOLE(ASPTag, L"ASP Tag")
 #define NP2StyleX_PHPTag				EDITSTYLE_HOLE(PHPTag, L"PHP Tag")
 
-#define NP2StyleX_PHPDefault			EDITSTYLE_HOLE(PHPDefault, L"PHP Default")
-#define NP2StyleX_PHPComment			EDITSTYLE_HOLE(PHPComment, L"PHP Comment")
-#define NP2StyleX_PHPKeyword			EDITSTYLE_HOLE(PHPKeyword, L"PHP Keyword")
-#define NP2StyleX_PHPString				EDITSTYLE_HOLE(PHPString, L"PHP String")
-#define NP2StyleX_PHPHeredocString		EDITSTYLE_HOLE(PHPHeredocString, L"PHP Heredoc String")
-#define NP2StyleX_PHPNowdocString		EDITSTYLE_HOLE(PHPNowdocString, L"PHP Nowdoc String")
-#define NP2StyleX_PHPNumber				EDITSTYLE_HOLE(PHPNumber, L"PHP Number")
-#define NP2StyleX_PHPOperator			EDITSTYLE_HOLE(PHPOperator, L"PHP Operator")
-#define NP2StyleX_PHPVariable			EDITSTYLE_HOLE(PHPVariable, L"PHP Variable")
-#define NP2StyleX_PHPStringVariable		EDITSTYLE_HOLE(PHPStringVariable, L"PHP String Variable")
-#define NP2StyleX_PHPComplexVariable	EDITSTYLE_HOLE(PHPComplexVariable, L"PHP Complex Variable")
-
 #define NP2StyleX_JSDefault				EDITSTYLE_HOLE(JSDefault, L"JS Default")
 #define NP2StyleX_JSComment				EDITSTYLE_HOLE(JSComment, L"JS Comment")
 #define NP2StyleX_JSKeyword				EDITSTYLE_HOLE(JSKeyword, L"JS Keyword")
