@@ -697,7 +697,7 @@ static inline BOOL IsEscapeCharEx(int ch, int style) {
 		return FALSE;
 
 	case SCLEX_CPP:
-		return !(style == SCE_C_STRINGRAW || style == SCE_C_VERBATIM || style == SCE_C_COMMENTDOC_TAG);
+		return !(style == SCE_C_STRINGRAW || style == SCE_C_COMMENTDOC_TAG);
 
 	case SCLEX_CSHARP:
 		return !(style == SCE_CSHARP_VERBATIM_STRING || style == SCE_CSHARP_INTERPOLATED_VERBATIM_STRING);
@@ -715,15 +715,6 @@ static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) 
 		, word);
 	return p != NULL && p[-1] == ' ' && p[length] == ' ';
 }
-
-#define HTML_TEXT_BLOCK_TAG		0
-#define HTML_TEXT_BLOCK_CDATA	1
-#define HTML_TEXT_BLOCK_JS		2
-#define HTML_TEXT_BLOCK_VBS		3
-#define HTML_TEXT_BLOCK_PYTHON	4
-#define HTML_TEXT_BLOCK_PHP		5
-#define HTML_TEXT_BLOCK_CSS		6
-#define HTML_TEXT_BLOCK_SGML	7
 
 enum {
 	InnoLineStatePreprocessor = 8,
@@ -773,28 +764,39 @@ extern EDITLEXER lexPython;
 extern EDITLEXER lexVBS;
 extern HANDLE idleTaskTimer;
 
-static int GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
+typedef enum HtmlTextBlock {
+	HtmlTextBlock_Tag,
+	HtmlTextBlock_CDATA,
+	HtmlTextBlock_SGML,
+	HtmlTextBlock_JS,
+	HtmlTextBlock_VBS,
+	HtmlTextBlock_Python,
+	HtmlTextBlock_PHP,
+	HtmlTextBlock_CSS,
+} HtmlTextBlock;
+
+static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iCurrentStyle) {
 	if (iCurrentStyle == SCE_H_CDATA) {
-		return HTML_TEXT_BLOCK_CDATA;
+		return HtmlTextBlock_CDATA;
 	}
 	if ((iCurrentStyle >= SCE_HJ_START && iCurrentStyle <= SCE_HJ_TEMPLATELITERAL)
 		|| (iCurrentStyle >= SCE_HJA_START && iCurrentStyle <= SCE_HJA_TEMPLATELITERAL)) {
-		return HTML_TEXT_BLOCK_JS;
+		return HtmlTextBlock_JS;
 	}
 	if ((iCurrentStyle >= SCE_HB_START && iCurrentStyle <= SCE_HB_OPERATOR)
 		|| (iCurrentStyle >= SCE_HBA_START && iCurrentStyle <= SCE_HBA_OPERATOR)) {
-		return HTML_TEXT_BLOCK_VBS;
+		return HtmlTextBlock_VBS;
 	}
 	if ((iCurrentStyle >= SCE_HPHP_DEFAULT && iCurrentStyle <= SCE_HPHP_COMPLEX_VARIABLE)) {
-		return HTML_TEXT_BLOCK_PHP;
+		return HtmlTextBlock_PHP;
 	}
 	if ((iCurrentStyle >= SCE_H_SGML_DEFAULT && iCurrentStyle <= SCE_H_SGML_BLOCK_DEFAULT)) {
-		return HTML_TEXT_BLOCK_SGML;
+		return HtmlTextBlock_SGML;
 	}
-	return HTML_TEXT_BLOCK_TAG;
+	return HtmlTextBlock_Tag;
 }
 
-static int GetCurrentHtmlTextBlock(void) {
+static HtmlTextBlock GetCurrentHtmlTextBlock(void) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
 	return GetCurrentHtmlTextBlockEx(iCurrentStyle);
@@ -1026,22 +1028,24 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	// embedded script
 	PEDITLEXER pLex = NULL;
 	if (pLexCurrent->rid == NP2LEX_HTML) {
-		const int block = GetCurrentHtmlTextBlockEx(iCurrentStyle);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iCurrentStyle);
 		switch (block) {
-		case HTML_TEXT_BLOCK_JS:
+		case HtmlTextBlock_JS:
 			pLex = &lexJavaScript;
 			break;
-		case HTML_TEXT_BLOCK_VBS:
+		case HtmlTextBlock_VBS:
 			pLex = &lexVBS;
 			break;
-		case HTML_TEXT_BLOCK_PYTHON:
+		case HtmlTextBlock_Python:
 			pLex = &lexPython;
 			break;
-		case HTML_TEXT_BLOCK_PHP:
+		case HtmlTextBlock_PHP:
 			pLex = &lexPHP;
 			break;
-		case HTML_TEXT_BLOCK_CSS:
+		case HtmlTextBlock_CSS:
 			pLex = &lexCSS;
+			break;
+		default:
 			break;
 		}
 	} else if (pLexCurrent->rid == NP2LEX_TYPESCRIPT) {
@@ -2440,18 +2444,21 @@ void EditToggleCommentLine(void) {
 	case SCLEX_XML: {
 		const int block = GetCurrentHtmlTextBlock();
 		switch (block) {
-		case HTML_TEXT_BLOCK_VBS:
+		case HtmlTextBlock_VBS:
 			EditToggleLineComments(L"'", FALSE);
 			break;
 
-		case HTML_TEXT_BLOCK_PYTHON:
+		case HtmlTextBlock_Python:
 			EditToggleLineComments(L"#", FALSE);
 			break;
 
-		case HTML_TEXT_BLOCK_CDATA:
-		case HTML_TEXT_BLOCK_JS:
-		case HTML_TEXT_BLOCK_PHP:
+		case HtmlTextBlock_CDATA:
+		case HtmlTextBlock_JS:
+		case HtmlTextBlock_PHP:
 			EditToggleLineComments(L"//", FALSE);
+			break;
+
+		default:
 			break;
 		}
 	}
@@ -2592,21 +2599,24 @@ void EditToggleCommentBlock(void) {
 	case SCLEX_XML: {
 		const int block = GetCurrentHtmlTextBlock();
 		switch (block) {
-		case HTML_TEXT_BLOCK_TAG:
+		case HtmlTextBlock_Tag:
 			EditEncloseSelection(L"<!--", L"-->");
 			break;
 
-		case HTML_TEXT_BLOCK_CDATA:
-		case HTML_TEXT_BLOCK_JS:
-		case HTML_TEXT_BLOCK_PHP:
-		case HTML_TEXT_BLOCK_CSS:
+		case HtmlTextBlock_CDATA:
+		case HtmlTextBlock_JS:
+		case HtmlTextBlock_PHP:
+		case HtmlTextBlock_CSS:
 			EditEncloseSelection(L"/*", L"*/");
 			break;
 
-		case HTML_TEXT_BLOCK_SGML:
+		case HtmlTextBlock_SGML:
 			// A brief SGML tutorial
 			// https://www.w3.org/TR/WD-html40-970708/intro/sgmltut.html
 			EditEncloseSelection(L"--", L"--");
+			break;
+
+		default:
 			break;
 		}
 	}
