@@ -3045,7 +3045,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (EditSetNewEncoding(iCurrentEncoding, iNewEncoding, flagSetEncoding, StrIsEmpty(szCurFile))) {
 			if (SciCall_GetLength() == 0) {
 				iCurrentEncoding = iNewEncoding;
-				iOriginalEncoding = iNewEncoding;
+				if (StrIsEmpty(szCurFile) || Encoding_HasBOM(iNewEncoding) == Encoding_HasBOM(iOriginalEncoding)) {
+					iOriginalEncoding = iNewEncoding;
+				}
 			} else {
 				if (iCurrentEncoding == CPI_DEFAULT || iNewEncoding == CPI_DEFAULT) {
 					iOriginalEncoding = CPI_NONE;

@@ -489,6 +489,12 @@ static inline BOOL IsUTF8Signature(const char *p) {
 	return (*((const UINT *)p) & 0xFFFFFF) == BOM_UTF8;
 }
 
+static inline BOOL Encoding_HasBOM(int iEncoding) {
+	return (iEncoding == CPI_UNICODEBOM
+		|| iEncoding == CPI_UNICODEBEBOM
+		|| iEncoding == CPI_UTF8SIGN) ? iEncoding : FALSE;
+}
+
 LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags);
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag);
 BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW);
