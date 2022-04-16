@@ -335,6 +335,21 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 			}
 			sc.SetState(SCE_PHP_NOWDOC);
 		}
+		return false;
+	}
+	if (variableType == VariableType::Simple && braceCount == 0) {
+		// avoid highlighting object property to simplify code folding
+		if (sc.state != SCE_PHP_VARIABLE2) {
+			sc.ChangeState(SCE_PHP_IDENTIFIER2);
+		}
+		if (sc.ch == '[') {
+			braceCount = 1;
+		} else if (!sc.Match('-', '>')) {
+			kwType = KeywordType::None;
+			variableType = VariableType::Normal;
+			sc.SetState(TakeOuterStyle());
+			return true;
+		}
 	} else {
 		char s[128];
 		sc.GetCurrent(s, sizeof(s));
@@ -417,19 +432,9 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 				kwType = KeywordType::None;
 			}
 		}
-
-		if (variableType == VariableType::Simple) {
-			if (sc.ch == '[') {
-				braceCount = 1;
-			} else if (braceCount == 0 && !sc.Match('-', '>')) {
-				kwType = KeywordType::None;
-				variableType = VariableType::Normal;
-				sc.SetState(TakeOuterStyle());
-				return true;
-			}
-		}
-		sc.SetState(SCE_PHP_DEFAULT);
 	}
+
+	sc.SetState(SCE_PHP_DEFAULT);
 	return false;
 }
 
@@ -573,7 +578,7 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block) {
 				++braceCount;
 			} else if (sc.ch == '}') {
 				--braceCount;
-				if (braceCount <= 0) {
+				if (braceCount == 0) {
 					variableType = VariableType::Normal;
 					sc.ForwardSetState(TakeOuterStyle());
 					return true;
@@ -1246,7 +1251,7 @@ struct FoldLineState {
 };
 
 constexpr bool IsMultilinePHPStringStyle(int style) noexcept {
-	return style >= SCE_PHP_OPERATOR2 && style <= SCE_PHP_VARIABLE2;
+	return style >= SCE_PHP_OPERATOR2 && style <= SCE_PHP_IDENTIFIER2;
 }
 
 constexpr bool IsMultilineJsStringStyle(int style) noexcept {

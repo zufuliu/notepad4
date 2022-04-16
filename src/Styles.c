@@ -1493,7 +1493,7 @@ static void Style_SetAllStyle(PEDITLEXER pLex, int offset) {
 	const UINT iStyleCount = pLex->iStyleCount;
 	// first style is the default style.
 	for (UINT i = 1; i < iStyleCount; i++) {
-		UINT iStyle = pLex->Styles[i].iStyle;
+		const UINT iStyle = pLex->Styles[i].iStyle;
 		LPCWSTR szValue = pLex->Styles[i].szValue;
 		const int first = (iStyle & 0xff) + offset;
 		Style_SetStyles(first, szValue);
