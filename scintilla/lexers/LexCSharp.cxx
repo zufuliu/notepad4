@@ -25,14 +25,28 @@ using namespace Lexilla;
 
 namespace {
 
+constexpr bool HasEscapeChar(int state) noexcept {
+	return state <= SCE_CSHARP_INTERPOLATED_STRING;
+}
+
 constexpr bool IsVerbatimString(int state) noexcept {
-	return state == SCE_CSHARP_VERBATIM_STRING
-		|| state == SCE_CSHARP_INTERPOLATED_VERBATIM_STRING;
+	return state >= SCE_CSHARP_VERBATIM_STRING;
 }
 
 constexpr bool IsInterpolatedString(int state) noexcept {
-	return state == SCE_CSHARP_INTERPOLATED_STRING
-		|| state == SCE_CSHARP_INTERPOLATED_VERBATIM_STRING;
+	if constexpr (SCE_CSHARP_INTERPOLATED_STRING & 1) {
+		return (state & 1);
+	} else {
+		return (state & 1) == 0;
+	}
+}
+
+constexpr bool IsSingleLineString(int state) noexcept {
+	return state < SCE_CSHARP_RAWSTRING_ML;
+}
+
+constexpr bool IsPlainString(int state) noexcept {
+	return state < SCE_CSHARP_RAWSTRING_SL || state > SCE_CSHARP_INTERPOLATED_RAWSTRING_ML;
 }
 
 struct EscapeSequence {
@@ -62,6 +76,8 @@ struct EscapeSequence {
 struct InterpolatedStringState {
 	int state;
 	int parenCount;
+	int delimiterCount;
+	int interpolatorCount;
 };
 
 enum {
@@ -172,6 +188,8 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 	int parenCount = 0;
+	int stringDelimiterCount = 0;
+	int stringInterpolatorCount = 0;
 	PreprocessorKind ppKind = PreprocessorKind::None;
 
 	int visibleChars = 0;
@@ -191,7 +209,18 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
 		const int lineState = styler.GetLineState(sc.currentLine - 1);
-		parenCount = lineState >> 4;
+		/*
+		1: CSharpLineStateMaskLineComment
+		1: CSharpLineStateMaskUsing
+		1: CSharpLineStateMaskInterpolation
+		1: unused
+		8: stringDelimiterCount
+		8: stringInterpolatorCount
+		12: parenCount
+		*/
+		stringDelimiterCount = (lineState >> 4) & 0xff;
+		stringInterpolatorCount = (lineState >> 12) & 0xff;
+		parenCount = lineState >> 20;
 	}
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
@@ -441,13 +470,17 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		case SCE_CSHARP_INTERPOLATED_STRING:
 		case SCE_CSHARP_VERBATIM_STRING:
 		case SCE_CSHARP_INTERPOLATED_VERBATIM_STRING:
-			if (sc.atLineStart && !IsVerbatimString(sc.state)) {
+		case SCE_CSHARP_RAWSTRING_SL:
+		case SCE_CSHARP_INTERPOLATED_RAWSTRING_SL:
+		case SCE_CSHARP_RAWSTRING_ML:
+		case SCE_CSHARP_INTERPOLATED_RAWSTRING_ML:
+			if (sc.atLineStart && IsSingleLineString(sc.state)) {
 				sc.SetState(SCE_CSHARP_DEFAULT);
 				break;
 			}
 			switch (sc.ch) {
 			case '\\':
-				if (!IsVerbatimString(sc.state)) {
+				if (HasEscapeChar(sc.state)) {
 					if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 						sc.SetState(SCE_CSHARP_ESCAPECHAR);
 						sc.Forward();
@@ -462,24 +495,51 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.SetState(SCE_CSHARP_ESCAPECHAR);
 					sc.Forward();
 				} else {
-					sc.ForwardSetState(SCE_CSHARP_DEFAULT);
-					if (!nestedState.empty() && nestedState.back().state == sc.state) {
-						nestedState.pop_back();
+					sc.Forward();
+					bool handled = IsPlainString(sc.state);
+					if (!handled && sc.Match('\"', '\"') && (visibleChars == 0 || IsSingleLineString(sc.state))) {
+						const int delimiterCount = GetMatchedDelimiterCount(styler, sc.currentPos + 1, '\"') + 2;
+						if (delimiterCount == stringDelimiterCount) {
+							handled = true;
+							stringDelimiterCount = 0;
+							stringInterpolatorCount = 0;
+							sc.Advance(delimiterCount - 1);
+						}
+					}
+					if (handled) {
+						if (sc.chNext == '8' && (sc.ch | 0x20) == 'u') {
+							sc.Forward(2); // C# 11 UTF-8 string literal
+						}
+						sc.SetState(SCE_CSHARP_DEFAULT);
+						if (!nestedState.empty() && nestedState.back().state == sc.state) {
+							nestedState.pop_back();
+						}
 					}
 				}
 				break;
 
 			case '{':
-				if (sc.chNext == '{') {
+				if (sc.chNext == '{' && IsPlainString(sc.state)) {
 					escSeq.outerState = sc.state;
 					escSeq.digitsLeft = 1;
 					sc.SetState(SCE_CSHARP_ESCAPECHAR);
 					sc.Forward();
-				} else if (IsInterpolatedString(sc.state)) {
-					nestedState.push_back({sc.state, 0});
-					sc.SetState(SCE_CSHARP_OPERATOR2);
-					sc.ForwardSetState(SCE_CSHARP_DEFAULT);
-				} else if (IsIdentifierCharEx(sc.chNext) || sc.chNext == '@' || sc.chNext == '$') {
+					break;
+				}
+				if (IsInterpolatedString(sc.state)) {
+					const int interpolatorCount = GetMatchedDelimiterCount(styler, sc.currentPos, '{');
+					if (IsPlainString(sc.state) || interpolatorCount >= stringInterpolatorCount) {
+						nestedState.push_back({sc.state, 0, stringDelimiterCount, stringInterpolatorCount});
+						sc.Advance(interpolatorCount - stringInterpolatorCount); // outer content
+						sc.SetState(SCE_CSHARP_OPERATOR2);
+						sc.Advance(stringInterpolatorCount - 1); // inner interpolation
+						sc.ForwardSetState(SCE_CSHARP_DEFAULT);
+						stringDelimiterCount = 0;
+						stringInterpolatorCount = 0;
+						break;
+					}
+				}
+				if (IsIdentifierCharEx(sc.chNext) || sc.chNext == '@' || sc.chNext == '$') {
 					// standard format: {index,alignment:format}
 					// third party string template library: {@identifier} {$identifier} {identifier}
 					escSeq.outerState = sc.state;
@@ -492,18 +552,21 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 			case '}':
 				if (IsInterpolatedString(sc.state)) {
-					const bool interpolating = !nestedState.empty();
+					const int interpolatorCount = IsPlainString(sc.state) ? 1 : GetMatchedDelimiterCount(styler, sc.currentPos, '}');
+					const bool interpolating = !nestedState.empty() && (interpolatorCount >= stringInterpolatorCount);
 					if (interpolating) {
 						nestedState.pop_back();
 					}
-					if (interpolating || sc.chNext != '}') {
+					if (interpolating || (sc.chNext != '}' && IsPlainString(sc.state))) {
 						const int state = sc.state;
 						sc.SetState(SCE_CSHARP_OPERATOR2);
+						sc.Advance(stringInterpolatorCount - 1); // inner interpolation
 						sc.ForwardSetState(state);
+						sc.Advance(interpolatorCount - stringInterpolatorCount); // outer content
 						continue;
 					}
 				}
-				if (sc.chNext == '}') {
+				if (sc.chNext == '}' && IsPlainString(sc.state)) {
 					escSeq.outerState = sc.state;
 					escSeq.digitsLeft = 1;
 					sc.SetState(SCE_CSHARP_ESCAPECHAR);
@@ -562,25 +625,67 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					sc.ChangeState((chNext == '/') ? SCE_CSHARP_COMMENTLINEDOC : SCE_CSHARP_COMMENTBLOCKDOC);
 				}
 				continue;
-			} else if (sc.ch == '$' || sc.ch == '@') {
-				if (sc.chNext == '\"') {
-					sc.SetState((sc.ch == '@') ? SCE_CSHARP_VERBATIM_STRING : SCE_CSHARP_INTERPOLATED_STRING);
-					sc.Forward();
-				} else if (sc.ch != sc.chNext) {
-					const int chNext = sc.GetRelative(2);
-					if ((sc.chNext == '$' || sc.chNext == '@') && chNext == '\"') {
-						sc.SetState(SCE_CSHARP_INTERPOLATED_VERBATIM_STRING);
-						sc.Advance(2);
-					} else if (sc.ch == '@' && IsCsIdentifierStart(sc.chNext, chNext)) {
+			} else if (sc.ch == '\"' || sc.ch == '$' || sc.ch == '@') {
+				int chNext = sc.GetRelative(2);
+				// C# 8 verbatim interpolated string: @$""
+				if (chNext == '\"' && (sc.Match('$', '@') || sc.Match('@', '$'))) {
+					stringDelimiterCount = 0;
+					stringInterpolatorCount = 1;
+					sc.SetState(SCE_CSHARP_INTERPOLATED_VERBATIM_STRING);
+					sc.Advance(2);
+				} else if (sc.ch == '@') {
+					int state = SCE_CSHARP_DEFAULT;
+					if (sc.chNext == '\"') {
+						state = SCE_CSHARP_VERBATIM_STRING;
+						stringDelimiterCount = 0;
+						stringInterpolatorCount = 0;
+					} else if (IsCsIdentifierStart(sc.chNext, chNext)) {
+						state = SCE_CSHARP_IDENTIFIER;
 						chBefore = chPrevNonWhite;
 						if (chPrevNonWhite != '.') {
 							chBeforeIdentifier = chPrevNonWhite;
 						}
-						sc.SetState(SCE_CSHARP_IDENTIFIER);
+					}
+					if (state != SCE_CSHARP_DEFAULT) {
+						sc.SetState(state);
+						sc.Forward();
+					}
+				} else {
+					int interpolatorCount = 0;
+					Sci_PositionU pos = sc.currentPos;
+					chNext = sc.ch;
+					if (chNext == '$') {
+						if (sc.chNext == '\"') {
+							chNext = '\"';
+							pos += 1;
+						} else if (sc.chNext == '$') {
+							interpolatorCount = GetMatchedDelimiterCount(styler, pos + 1, '$') + 1;
+							pos += interpolatorCount;
+							chNext = static_cast<uint8_t>(styler.SafeGetCharAt(pos));
+						}
+					}
+					if (chNext == '\"') {
+						int delimiterCount = GetMatchedDelimiterCount(styler, pos, '\"');
+						int state;
+						if (delimiterCount >= 3) {
+							chNext = LexGetNextChar(styler, pos + delimiterCount, sc.lineStartNext);
+							stringDelimiterCount = delimiterCount;
+							stringInterpolatorCount = interpolatorCount;
+							state = (chNext == '\0') ? SCE_CSHARP_RAWSTRING_ML : SCE_CSHARP_RAWSTRING_SL;
+							if (interpolatorCount) {
+								state += SCE_CSHARP_INTERPOLATED_RAWSTRING_SL - SCE_CSHARP_RAWSTRING_SL;
+							}
+						} else {
+							delimiterCount = 1;
+							stringDelimiterCount = 0;
+							stringInterpolatorCount = interpolatorCount = sc.ch == '$';
+							state = interpolatorCount + SCE_CSHARP_STRING;
+						}
+						sc.SetState(state);
+						sc.Advance(interpolatorCount);
+						sc.Advance(delimiterCount - 1);
 					}
 				}
-			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_CSHARP_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_CSHARP_CHARACTER);
 			} else if (visibleChars == 0 && sc.ch == '#') {
@@ -617,6 +722,8 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				if (interpolating) {
 					const InterpolatedStringState &state = nestedState.back();
 					if (state.parenCount == 0 && IsInterpolatedStringEnd(sc)) {
+						stringDelimiterCount = state.delimiterCount;
+						stringInterpolatorCount = state.interpolatorCount;
 						if (sc.ch == '}') {
 							sc.SetState(state.state);
 						} else {
@@ -645,18 +752,15 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 		}
 		if (sc.atLineEnd) {
-			int lineState = lineStateLineType | (parenCount << 4);
+			uint32_t lineState = lineStateLineType
+				| (static_cast<uint32_t>(stringDelimiterCount) << 4)
+				| (static_cast<uint32_t>(stringInterpolatorCount) << 12)
+				| (static_cast<uint32_t>(parenCount) << 20);
 			if (!nestedState.empty()) {
-				const int state = nestedState.back().state;
-				if (!IsVerbatimString(state)) {
-					nestedState.pop_back();
-					sc.SetState(state);
-				}
-				if (!nestedState.empty()) {
-					lineState |= CSharpLineStateMaskInterpolation;
-				}
+				// C# 11 allows new line
+				lineState |= CSharpLineStateMaskInterpolation;
 			}
-			styler.SetLineState(sc.currentLine, lineState);
+			styler.SetLineState(sc.currentLine, static_cast<int>(lineState));
 			lineStateLineType = 0;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
@@ -689,6 +793,8 @@ constexpr bool IsStreamCommentStyle(int style) noexcept {
 constexpr bool IsMultilineStringStyle(int style) noexcept {
 	return style == SCE_CSHARP_VERBATIM_STRING
 		|| style == SCE_CSHARP_INTERPOLATED_VERBATIM_STRING
+		|| style == SCE_CSHARP_RAWSTRING_ML
+		|| style == SCE_CSHARP_INTERPOLATED_RAWSTRING_ML
 		|| style == SCE_CSHARP_OPERATOR2
 		|| style == SCE_CSHARP_ESCAPECHAR
 		|| style == SCE_CSHARP_FORMAT_SPECIFIER
@@ -739,6 +845,8 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_CSHARP_VERBATIM_STRING:
 		case SCE_CSHARP_INTERPOLATED_VERBATIM_STRING:
+		case SCE_CSHARP_RAWSTRING_ML:
+		case SCE_CSHARP_INTERPOLATED_RAWSTRING_ML:
 			if (!IsMultilineStringStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsMultilineStringStyle(styleNext)) {

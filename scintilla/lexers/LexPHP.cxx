@@ -715,11 +715,14 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	int hereDocStartChar = 0;
 
 	if (sc.currentLine > 0) {
+		const int lineState = styler.GetLineState(sc.currentLine - 1);
 		/*
 		3: lineStateLineType
 		1: lineStateAttribute
 		1: lineContinuation
 		*/
+		lexer.lineStateAttribute = lineState & LineStateAttributeLine;
+		lexer.lineContinuation = lineState & JsLineStateLineContinuation;
 	}
 	if (startPos == 0) {
 		if (sc.Match('#', '!')) {

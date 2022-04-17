@@ -397,20 +397,6 @@ int CheckSetextHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 	return 0;
 }
 
-// 4.5 Fenced code blocks
-int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
-	int count = 1;
-	while (true) {
-		const uint8_t ch = styler.SafeGetCharAt(++pos);
-		if (ch == delimiter) {
-			++count;
-		} else {
-			break;
-		}
-	}
-	return count;
-}
-
 int GetBlockStyle(LexAccessor &styler, Sci_Line line, uint32_t lineState) noexcept {
 	Sci_PositionU pos = styler.LineStart(line);
 	const int indentCount = GetIndentCount(lineState);

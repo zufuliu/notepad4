@@ -217,7 +217,7 @@ static EDITSTYLE Styles_Markdown[] = {
 	{ MULTI_STYLE(SCE_MARKDOWN_SUBSCRIPT, SCE_MARKDOWN_SHORT_SUBSCRIPT, 0, 0), NP2StyleX_Subscript, L"underline" },
 	{ SCE_MARKDOWN_CITATION_AT, NP2StyleX_Citation, L"fore:#408040" },
 	{ SCE_MARKDOWN_DELIMITER_ROW, NP2StyleX_DelimiterRow, L"bold; back:#FFC040; eolfilled" },
-	{ SCE_MARKDOWN_DELIMITER, NP2StyleX_Delimiter, L"fore:#0080C0" },
+	{ SCE_MARKDOWN_DELIMITER, NP2StyleX_Delimiter, L"bold; fore:#0080C0" },
 	{ SCE_MARKDOWN_EMOJI, NP2StyleX_Emoji, L"fore:#FF8000" },
 	{ SCE_MARKDOWN_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ MULTI_STYLE(SCE_MARKDOWN_DIFF_ADD_CURLY, SCE_MARKDOWN_DIFF_ADD_SQUARE, 0, 0), NP2StyleX_LineAddition, L"back:#80FF80" },

@@ -330,6 +330,19 @@ inline unsigned char LexGetNextChar(LexAccessor &styler, Sci_Position startPos, 
 	return '\0';
 }
 
+inline int GetMatchedDelimiterCount(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
+	int count = 1;
+	while (true) {
+		const uint8_t ch = styler.SafeGetCharAt(++pos);
+		if (ch == delimiter) {
+			++count;
+		} else {
+			break;
+		}
+	}
+	return count;
+}
+
 void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &startPos, Sci_Position &lengthDoc, int &initStyle) noexcept;
 Sci_PositionU LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, int maxSpaceStyle, int &chPrevNonWhite, int &stylePrevNonWhite) noexcept;
 Sci_PositionU CheckBraceOnNextLine(LexAccessor &styler, Sci_Line line, int operatorStyle, int maxSpaceStyle, int ignoreStyle = 0) noexcept;

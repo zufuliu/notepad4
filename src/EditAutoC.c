@@ -718,7 +718,7 @@ static inline BOOL IsEscapeCharEx(int ch, int style) {
 		return FALSE;
 
 	case SCLEX_CSHARP:
-		return style != SCE_CSHARP_VERBATIM_STRING && style != SCE_CSHARP_INTERPOLATED_VERBATIM_STRING;
+		return style < SCE_CSHARP_RAWSTRING_SL || style > SCE_CSHARP_INTERPOLATED_VERBATIM_STRING;
 	case SCLEX_CPP:
 		return style != SCE_C_STRINGRAW && style != SCE_C_COMMENTDOC_TAG;
 
