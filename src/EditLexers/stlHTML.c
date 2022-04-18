@@ -50,11 +50,11 @@ NULL
 , // 6 Attribute
 // Attribute
 "abbr accept accept-charset accesskey action allow allowfullscreen allowpaymentrequest alt as async autocapitalize autocomplete autofocus autoplay "
-"border challenge charset checked cite class cols colspan command content "
+"blocking border challenge charset checked cite class cols colspan command content "
 "contenteditable contextmenu controls coords crossorigin data datetime decoding default "
 "defer dir dirname disabled download draggable dropzone enctype enterkeyhint for form formaction "
 "formenctype formmethod formnovalidate formtarget headers height hidden inputmode high href hreflang "
-"http-equiv icon id imagesrcset imagesizes integrity is ismap itemid itemprop itemref itemscope itemtype "
+"http-equiv icon id imagesrcset imagesizes inert integrity is ismap itemid itemprop itemref itemscope itemtype "
 "keytype kind label lang list loading longdesc loop low nonce minlength manifest max "
 "maxlength media mediagroup method min multiple muted name nomodule novalidate open "
 "optimum pattern placeholder playsinline poster preload radiogroup readonly referrerpolicy rel required "
@@ -80,7 +80,8 @@ NULL
 "urn valign valuetype version vlink vspace "
 
 , // 7 Event Handler
-"onaddtrack onabort onafterprint onauxclick onbeforeprint onbeforeunload onblur oncancel oncanplay oncanplaythrough onchange onclick onclose "
+"onaddtrack onabort onafterprint onauxclick onbeforematch onbeforeprint onbeforeunload onblur "
+"oncancel oncanplay oncanplaythrough onchange onclick onclose "
 "oncontextmenu oncopy oncuechange oncut ondblclick ondrag ondragend ondragenter ondragexit ondragleave "
 "ondragover ondragstart ondrop ondurationchange onemptied onended onerror onenter onexit "
 "onformchange onforminput onmessage onmessageerror onpopstate onreadystatechange onredo onresize onundo "

@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 21 December 2021
+https://whatwg.org/ 14 April 2022
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 -->
@@ -15,6 +15,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	draggable
 	enterkeyhint="enter done go next previous search send"
 	hidden
+	inert
 	inputmode="none text tel url email numeric decimal search"
 	is
 	itemid
@@ -44,7 +45,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 			rel="alternate author dns-prefetch help icon license modulepreload next pingback preconnect prefetch preload prerender prev search stylesheet"
 			media integrity hreflang type="text/plain text/css"
 			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin"
-			sizes imagesrcset imagesizes as color disabled>
+			sizes imagesrcset imagesizes as blocking color disabled>
 		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#document-metadata#standard-metadata-names
 		application-name author description generator keywords
 		referrer[never default always origin-when-crossorigin]
@@ -52,7 +53,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		-->
 		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
 			content charset="utf-8" media>
-		<style media type="text/css" title></style>
+		<style media blocking type="text/css" title></style>
 	</head>
 	<!-- event handler content attributes https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
 	<!-- https://html.spec.whatwg.org/multipage/webappapis.html#events -->
@@ -63,6 +64,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		onanimationend
 		onanimationiteration
 		onauxclick
+    onbeforematch
 		onblur*
 		oncancel
 		oncanplay
@@ -305,7 +307,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<dialog open></dialog>
 		<!-- Scripting https://html.spec.whatwg.org/multipage/scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
-			charset nomodule async defer crossorigin integrity referrerpolicy></script>
+			charset nomodule async defer crossorigin integrity referrerpolicy blocking></script>
 		<noscript></noscript>
 		<template></template>
 		<slot name></slot>
