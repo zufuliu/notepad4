@@ -1,4 +1,4 @@
-// 4.1.5 https://haxe.org
+// 4.2.5 https://haxe.org
 
 //! keywords
 // https://haxe.org/manual/expression.html#keywords
@@ -11,10 +11,10 @@ false final
 for function
 if implements import
 in inline interface
+macro
 new null
 operator overload override
 package private public
-macro
 return
 static switch
 this throw true try typedef

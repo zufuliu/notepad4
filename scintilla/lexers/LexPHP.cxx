@@ -538,12 +538,14 @@ bool PHPLexer::HighlightInnerString() {
 			}
 		}
 	} else if (sc.ch == '$') {
-		if (ExpandVariable(sc.state) && (sc.chNext == '{' || IsIdentifierStartEx(sc.chNext))) {
+		// ${} was deprecated since PHP 8.2 and removed in PHP 9.0
+		// see https://wiki.php.net/rfc/deprecate_dollar_brace_string_interpolation
+		if (ExpandVariable(sc.state) && IsIdentifierStartEx(sc.chNext)) {
 			SaveOuterStyle(sc.state);
 			insideUrl = false;
 			braceCount = 0;
-			variableType = (sc.chNext == '{') ? VariableType::Complex : VariableType::Simple;
-			sc.SetState((sc.chNext == '{') ? SCE_PHP_OPERATOR2 : SCE_PHP_VARIABLE2);
+			variableType = VariableType::Simple;
+			sc.SetState(SCE_PHP_VARIABLE2);
 		}
 	} else if (sc.Match('{', '$')) {
 		insideUrl = false;

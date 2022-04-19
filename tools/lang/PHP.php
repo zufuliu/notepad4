@@ -1,5 +1,6 @@
 <?php
 // 8.1.5 https://www.php.net/
+// https://wiki.php.net/rfc
 
 //! keywords			=======================================================
 // https://www.php.net/manual/en/reserved.keywords.php

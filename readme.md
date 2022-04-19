@@ -69,7 +69,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Gradle](tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* [GraphViz Dot](tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 4.0.
-	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.1
+	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.2
 	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) 2022-04-14. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
@@ -77,7 +77,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* PHP
 	* INI Configuration File
 	* [Inno Setup](tools/lang/InnoSetup.iss), up to Inno Setup 6.2.
-	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.1.
+	* [Boost Jam](tools/lang/Jamfile.jam), up to Jam 4.4.
 	* [Java](tools/lang/Java.java), up to Java 17. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2021 (12th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
@@ -135,7 +135,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* VHDL
 	* Verilog HDL
 	* [Vim Script](tools/lang/Vim.vim)
-	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.19.
+	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet
