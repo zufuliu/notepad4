@@ -1,4 +1,4 @@
-# 2.5.1 https://coffeescript.org/
+# 2.7 https://coffeescript.org/
 # https://github.com/bevry/cson
 
 # https://coffeescript.org/annotated-source/lexer.html#section-87

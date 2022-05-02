@@ -18,10 +18,10 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
-#include "DocUtils.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
+#include "DocUtils.h"
 
 using namespace Scintilla;
 using namespace Lexilla;

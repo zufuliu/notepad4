@@ -1323,7 +1323,6 @@ void Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew) {
 		attr[10] = KeywordAttr_NoLexer | KeywordAttr_NoAutoComp;	// comment tag
 		break;
 	case NP2LEX_CSS:
-		attr[1] = KeywordAttr_NoLexer;		// at rules
 		attr[4] = KeywordAttr_NoLexer;		// color names
 		attr[5] = KeywordAttr_NoLexer;		// values
 		break;

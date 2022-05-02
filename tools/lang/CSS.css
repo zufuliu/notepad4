@@ -7,6 +7,7 @@
 
 // CSS 2.2 https://www.w3.org/TR/CSS22/ 12 April 2016
 @charset
+// https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 
 // CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 11 October 2018
 @keyframes
@@ -171,17 +172,18 @@
 	min-intrinsic-sizing: legacy | zero-if-scroll | zero-if-extrinsic;
 }
 
-// CSS Cascading and Inheritance Level 5 https://www.w3.org/TR/css-cascade-5/ 3 December 2021
-// CSS Cascading and Inheritance Level 4 https://www.w3.org/TR/css-cascade-4/ 3 December 2021
+// CSS Cascading and Inheritance Level 6 https://www.w3.org/TR/css-cascade-6/ 21 December 2021
+// CSS Cascading and Inheritance Level 5 https://www.w3.org/TR/css-cascade-5/ 13 January 2022
+// CSS Cascading and Inheritance Level 4 https://www.w3.org/TR/css-cascade-4/ 13 January 2022
 // CSS Cascading and Inheritance Level 3 https://www.w3.org/TR/css-cascade-3/ 11 February 2021
 @import
 {
 	all: initial | inherit | unset | revert | revert-layer;
 }
 
-// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 15 December 2021
-// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 1 June 2021
-// CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 05 August 2021
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 28 April 2022
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 28 April 2022
+// CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
 	color: color-mix(), color-contrast(), rgb(), rgba(), hsl(), hsla(), hwb(), lab(), oklab(), lch(), oklch(), color(), device-cmyk(), currentColor;
@@ -194,7 +196,7 @@
 	components:;
 }
 
-// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 16 June 2021
+// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 10 February 2022
 {
 	color-scheme: normal | light | dark | only;
 	forced-color-adjust: auto | none | preserve-parent-color;
@@ -209,9 +211,14 @@
 	background-blend-mode:;
 }
 
-// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 25 December 2021
-// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 23 December 2021
+// CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 21 December 2021
+// CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 17 February 2022
+// CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 13 January 2022
 @supports {
+}
+@when {
+}
+@else {
 }
 selector()
 
@@ -220,7 +227,7 @@ selector()
 // CSS Containment Module Level 1 https://www.w3.org/TR/css-contain-1/ 22 December 2020
 {
 	contain: none | strict | content | size | inline-size | layout | style | paint;
-	container-type: none | style || state | size | inline-size | block-size;
+	container-type: none | style | state | size | inline-size | block-size;
 	container-name: none;
 	container:;
 	content-visibility: visible | auto | hidden;
@@ -324,7 +331,7 @@ step-start step-end steps()
 	stroke-opacity:;
 }
 
-// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 16 July 2020
+// Filter Effects Module Level 2 https://drafts.fxtf.org/filter-effects-2/ 10 February 2022
 // Filter Effects Module Level 1 https://www.w3.org/TR/filter-effects-1/ 18 December 2018
 {
 	filter: none | blur() | brightness() | contrast() | drop-shadow() | grayscale() | hue-rotate() | invert() | opacity() | sepia() | saturate();
@@ -372,7 +379,7 @@ step-start step-end steps()
 	font-variant-ligatures:	normal | none | common-ligatures | no-common-ligatures | discretionary-ligatures | no-discretionary-ligatures | historical-ligatures | no-historical-ligature | contextual | no-contextual;
 	font-variant-position: normal | sub | super;
 	font-variant-caps: normal | small-caps | all-small-caps | petite-caps | all-petite-caps | unicase | titling-caps;
-	font-variant-numeric: normal, lining-nums, oldstyle-nums, proportional-nums, tabular-nums, diagonal-fractions, stacked-fractions | ordinal || slashed-zero;
+	font-variant-numeric: normal, lining-nums, oldstyle-nums, proportional-nums, tabular-nums, diagonal-fractions, stacked-fractions | ordinal | slashed-zero;
 	font-variant-alternates: normal, stylistic(), historical-forms | styleset() | character-variant() | swash() | ornaments() | annotation();
 	font-variant-east-asian: normal, jis78, jis90, jis04, simplified, traditional, full-width, proportional-width | ruby;
 	font-variant: normal | none | petite-caps | all-petite-caps | unicase | titling-caps | ordinal | slashed-zero | ruby | sub | super;
@@ -498,7 +505,7 @@ override-colors:;
 	alignment-baseline: baseline | text-bottom | alphabetic | ideographic | middle | central | mathematical | text-top;
 	baseline-shift: sub | super | top | center | bottom;
 	line-height: normal;
-	text-edge: leading | [ text | cap | ex | ideographic | ideographic-ink | text | alphabetic | ideographic | ideographic-ink;
+	text-edge: leading | text | cap | ex | ideographic | ideographic-ink | text | alphabetic | ideographic | ideographic-ink;
 	leading-trim: normal | start | end | both;
 	inline-sizing: normal | stretch;
 	initial-letter: normal | drop | raise;
@@ -535,7 +542,7 @@ override-colors:;
 	caption-side: inline-start | inline-end;
 	float: inline-start | inline-end;
 	clear: inline-start | inline-end;
-	text-align: start | end ;
+	text-align: start | end;
 	resize: block | inline;
 	block-size: auto;
 	inline-size: auto;
@@ -602,7 +609,7 @@ override-colors:;
 	clip-rule: nonzero | evenodd;
 	mask-image: none;
 	mask-mode: alpha | luminance | match-source;
-	mask-repeat: repeat-x | repeat-y | [repeat | space | round | no-repeat;
+	mask-repeat: repeat-x | repeat-y | repeat | space | round | no-repeat;
 	mask-position:;
 	mask-clip: no-clip;
 	mask-origin:;
@@ -622,6 +629,7 @@ override-colors:;
 
 // Media Queries Level 5 https://www.w3.org/TR/mediaqueries-5/ 18 December 2021
 // Media Queries Level 4 https://www.w3.org/TR/mediaqueries-4/ 25 December 2021
+// Media Queries Level 3 https://www.w3.org/TR/mediaqueries-3/ 05 April 2022
 // https://www.w3.org/TR/CSS22/media.html
 @custom-media {}
 // 7.3 Recognized media types
@@ -648,7 +656,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	// Display Quality Media Features
 	resolution: infinite;
 	min-resolution:;
-	 max-resolution:;
+	max-resolution:;
 	scan: interlace progressive;
 	grid:;
 	update: none slow fast;
@@ -671,7 +679,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	video-color-gamut: srgb p3 rec2020;
 	video-dynamic-range: standard high;
 	// Scripting Media Features
-	scripting none: initial-only enabled;
+	scripting: none initial-only enabled;
 	// User Preference Media Features
 	prefers-reduced-motion: no-preference reduce;
 	prefers-reduced-transparency: no-preference reduce;
@@ -1021,8 +1029,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 {
 	voice-volume: silent | x-soft | soft | medium | loud | x-loud;
 	voice-balance: left | center | right | leftwards | rightwards;
-	speak: auto | never | always ;
-	speak-as: normal | spell-out || digits | literal-punctuation | no-punctuation;
+	speak: auto | never | always;
+	speak-as: normal | spell-out | digits | literal-punctuation | no-punctuation;
 	pause-before: none | x-weak | weak | medium | strong | x-strong;
 	pause-after: none | x-weak | weak | medium | strong | x-strong;
 	pause:;
@@ -1063,20 +1071,16 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 13 November 2019
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 18 March 2022
 // CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 22 April 2021
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
 	word-boundary-detection: normal | manual | auto();
 	word-boundary-expansion: none | space | ideographic-space;
+	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
 	text-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces;
 	text-space-trim: none | trim-inner | discard-before | discard-after;
-	text-wrap: wrap | nowrap | balance | stable | pretty;
-	wrap-before: auto | avoid | avoid-line | avoid-flex | line | flex;
-	wrap-after: auto | avoid | avoid-line | avoid-flex | line | flex;
-	wrap-inside: auto | avoid;
-	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
 	tab-size:;
 	word-break: normal | keep-all | break-all | break-word;
 	line-break: auto | loose | normal | strict | anywhere;
@@ -1088,16 +1092,20 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	hyphenate-limit-last: none | always | column | page | spread;
 	overflow-wrap: normal | break-word | anywhere;
 	word-wrap: normal | break-word | anywhere;
+	text-wrap: wrap | nowrap | balance | stable | pretty;
+	wrap-before: auto | avoid | avoid-line | avoid-flex | line | flex;
+	wrap-after: auto | avoid | avoid-line | avoid-flex | line | flex;
+	wrap-inside: auto | avoid;
 	text-align: start | end | left | right | center | justify | match-parent | justify-all;
-	text-group-align: none | start | end | left | right | center;
 	text-align-all: start | end | left | right | center | justify | match-parent;
+	text-group-align: none | start | end | left | right | center;
 	text-align-last: auto | start | end | left | right | center | justify | match-parent;
 	text-justify: auto | none | inter-word | inter-character;
-	line-padding:;
-	text-spacing: normal | none | trim-start | space-start | space-first | trim-end | space-end | allow-end | trim-adjacent | space-adjacent | no-compress | ideograph-alpha | ideograph-numeric || punctuation;
 	word-spacing: normal;
 	letter-spacing: normal;
-	text-indent: inherit;
+	line-padding:;
+	text-spacing: normal | none | trim-start | space-start | space-first | trim-end | space-end | allow-end | trim-adjacent | space-adjacent | no-compress | ideograph-alpha | ideograph-numeric | punctuation;
+	text-indent: hanging | each-line;
 	hanging-punctuation: none | first | force-end | allow-end | last;
 }
 
@@ -1151,7 +1159,18 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	transition:;
 }
 
+// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 16 December 2021
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 6 June 2019
+initial nherit unset
+mix()
+calc()
+attr()
+min() max() clamp()
+round() mod() rem()
+sin() cos() tan() asin() acos() atan() atan2()
+pow() sqrt() hypot() log() exp()
+abs() sign()
+pi infinity NaN
 
 // Visual formatting model https://www.w3.org/TR/CSS22/visuren.html
 {
@@ -1204,19 +1223,6 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	text-combine-upright: none | all;
 }
 
-// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 16 December 2021
-// CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 6 June 2019
-initial nherit unset
-mix()
-calc()
-attr()
-min() max() clamp()
-round() mod() rem()
-sin() cos() tan() asin() acos() atan() atan2()
-pow() sqrt() hypot() log() exp()
-abs() sign()
-pi infinity NaN
-
 // Aural style sheets https://www.w3.org/TR/CSS22/aural.html
 @media aural speech
 {
@@ -1234,7 +1240,7 @@ pi infinity NaN
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 19 December 2021
+// Compatibility https://compat.spec.whatwg.org/ 8 April 2022
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

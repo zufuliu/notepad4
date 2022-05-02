@@ -327,8 +327,8 @@ def parse_apdl_api_file(path):
 	return [
 		('code folding', keywordMap['code folding'], KeywordAttr.Default),
 		('command', keywordMap['command'], KeywordAttr.Default),
-		('slash command', keywordMap['slash command'], KeywordAttr.Default | KeywordAttr.Special),
-		('star command', keywordMap['star command'], KeywordAttr.Default | KeywordAttr.Special),
+		('slash command', keywordMap['slash command'], KeywordAttr.Special),
+		('star command', keywordMap['star command'], KeywordAttr.Special),
 		('argument', keywordMap['argument'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.Default),
 	]
@@ -674,12 +674,12 @@ def parse_css_api_file(pathList):
 	vendor = '^-moz- ^-ms- ^-o- ^-webkit-'.split()
 	keywordMap = {
 		'properties': vendor + ['^--'],
-		'at rules': [],
+		'at rules': vendor[:],
 		'pseudo classes': vendor[:],
 		'pseudo elements': vendor,
 	}
 
-	values = []
+	values = ['important']
 	for path in pathList:
 		for line in read_file(path).splitlines():
 			line = line.strip()
@@ -711,9 +711,9 @@ def parse_css_api_file(pathList):
 	])
 	return [
 		('properties', keywordMap['properties'], KeywordAttr.Default),
-		('at rules', keywordMap['at rules'], KeywordAttr.NoLexer | KeywordAttr.Special),
-		('pseudo classes', keywordMap['pseudo classes'], KeywordAttr.Default | KeywordAttr.Special),
-		('pseudo elements', keywordMap['pseudo elements'], KeywordAttr.Default | KeywordAttr.Special),
+		('at rules', keywordMap['at rules'], KeywordAttr.Special),
+		('pseudo classes', keywordMap['pseudo classes'], KeywordAttr.Special),
+		('pseudo elements', keywordMap['pseudo elements'], KeywordAttr.Special),
 		('color names', ColorNameList, KeywordAttr.NoLexer),
 		('values', keywordMap['values'], KeywordAttr.NoLexer),
 	]
@@ -1313,7 +1313,7 @@ def parse_javascript_api_file(path):
 		('interface', [], KeywordAttr.Default),
 		('enumeration', [], KeywordAttr.Default),
 		('constant', keywordMap['constant'], KeywordAttr.Default),
-		('decorator', [], KeywordAttr.Default | KeywordAttr.Special),
+		('decorator', [], KeywordAttr.Special),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 		('properties', keywordMap['properties'], KeywordAttr.NoLexer),
 		('JSDoc', keywordMap['jsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
@@ -1743,7 +1743,7 @@ def parse_rebol_api_file(pathList):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directive', keywordMap['directive'], KeywordAttr.Default | KeywordAttr.Special),
+		('directive', keywordMap['directive'], KeywordAttr.Special),
 		('datatype', keywordMap['datatypes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
@@ -1977,8 +1977,8 @@ def parse_swift_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directive', keywordMap['directive'], KeywordAttr.Default | KeywordAttr.Special),
-		('attribute', keywordMap['attribute'], KeywordAttr.Default | KeywordAttr.Special),
+		('directive', keywordMap['directive'], KeywordAttr.Special),
+		('attribute', keywordMap['attribute'], KeywordAttr.Special),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('struct', keywordMap['struct'], KeywordAttr.Default),
 		('protocol', keywordMap['protocol'], KeywordAttr.Default),

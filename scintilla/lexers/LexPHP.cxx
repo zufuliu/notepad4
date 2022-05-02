@@ -18,10 +18,10 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
-#include "DocUtils.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
 #include "LexerUtils.h"
+#include "DocUtils.h"
 
 using namespace Scintilla;
 using namespace Lexilla;
@@ -169,7 +169,7 @@ struct PHPLexer {
 	int braceCount = 0;
 	bool insideUrl = false;
 
-	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler) noexcept:
+	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
 		sc(startPos, lengthDoc, initStyle, styler) {}
 
 	void SaveOuterStyle(int style) {
@@ -1149,7 +1149,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_PHP_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_PHP_IDENTIFIER);
-			} else if (IsGraphic(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				if (lexer.HighlightOperator(HtmlTextBlock::PHP)) {
 					continue;
 				}

@@ -20,9 +20,9 @@
 #include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
-#include "DocUtils.h"
 #include "StringUtils.h"
 #include "LexerModule.h"
+#include "DocUtils.h"
 
 using namespace Lexilla;
 
