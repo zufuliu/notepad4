@@ -1,0 +1,123 @@
+// 4.1 https://lesscss.org/
+
+when and not
+
+// https://lesscss.org/features/#extend-feature
+:extend()
+// https://lesscss.org/features/#mixins-feature-mixins-parametric-feature
+arguments
+rest
+
+// https://lesscss.org/features/#import-atrules-feature
+@import ;
+reference inline less css once multiple optional
+
+@plugin ;
+
+// https://lesscss.org/functions/
+// Logical Functions
+if(condition, value1, value2)
+boolean(condition)
+
+// String Functions
+escape("")
+replace(string, pattern, replacement, flags)
+
+// List Functions
+length(list)
+extract(list, index)
+range(start, end, step)
+each(list, rules)
+
+// Math Functions
+ceil(number)
+floor(number)
+percentage(number)
+round(number)
+sqrt(number)
+abs(number)
+sin(number)
+asin(number)
+cos(number)
+acos(number)
+tan(number)
+atan(number)
+pi(number)
+pow(base, exponent)
+mod(first, second)
+min(values)
+max(values)
+
+// Type Functions
+isnumber(value)
+isstring(value)
+iscolor(value)
+iskeyword(value)
+isurl(value)
+ispixel(value)
+isem(value)
+ispercentage(value)
+isunit(value)
+isruleset(value)
+isdefined(value)
+
+// Misc Functions
+color(value)
+image-size(file)
+image-width(file)
+image-height(file)
+convert(number, unit)
+data-uri(mimetype, url)
+default()
+unit(dimension, unit)
+get-unit(number)
+svg-gradient(direction, color)
+
+// Color Definition Functions
+rgb(red, green, blue)
+rgba(red, green, blue, alpha)
+argb(color)
+hsl(hue, saturation, lightness)
+hsla(hue, saturation, lightness, alpha)
+hsv(hue, saturation, value)
+hsva(hue, saturation, value, alpha)
+
+// Color Channel Functions
+hue(color)
+saturation(color)
+lightness(color)
+hsvhue(color)
+hsvsaturation(color)
+hsvvalue(color)
+red(color)
+green(color)
+blue(color)
+alpha(color)
+luma(color)
+luminance(color)
+
+// Color Operation Functions
+saturate(color, amount, method)
+desaturate(color, amount, method)
+lighten(color, amount, method)
+darken(color, amount, method)
+fadein(color, amount, method)
+fadeout(color, amount, method)
+fade(color, amount)
+spin(color, angle)
+mix(color1, color2, weight)
+tint(color, weight)
+shade(color, weight)
+greyscale(color)
+contrast(color, dark, light, threshold)
+
+// Color Blending Functions
+multiply(color1, color2)
+screen(color1, color2)
+overlay(color1, color2)
+softlight(color1, color2)
+hardlight(color1, color2)
+difference(color1, color2)
+exclusion(color1, color2)
+average(color1, color2)
+negation(color1, color2)

@@ -1,0 +1,18 @@
+// https://github.com/ncannasse/hss
+
+var
+
+@if
+@else
+@elseif
+@else
+@end
+@include ()
+
+CSS(values)
+alphamix(foreground, alpha, background)
+int(float)
+string(expr)
+embed("")
+hss-width
+hss-height

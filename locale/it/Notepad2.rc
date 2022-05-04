@@ -503,10 +503,10 @@ BEGIN
 		END
 		POPUP "CSS Style S&heet"
 		BEGIN
-			MENUITEM "&CSS",						IDM_LEXER_CSS
-			MENUITEM "&Sassy CSS",					IDM_LEXER_SCSS
-			MENUITEM "&Less CSS",					IDM_LEXER_LESS
-			MENUITEM "&HSS",						IDM_LEXER_HSS
+			MENUITEM "&CSS Style Sheet",			IDM_LEXER_CSS
+			MENUITEM "&SCSS Style Sheet",			IDM_LEXER_SCSS
+			MENUITEM "&Less Style Sheet",			IDM_LEXER_LESS
+			MENUITEM "&HSS Style Sheet",			IDM_LEXER_HSS
 		END
 		POPUP "&Web Source Code"
 		BEGIN

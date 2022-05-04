@@ -119,15 +119,17 @@ static KEYWORDLIST Keywords_CSS = {{
 "z-index zoom "
 
 , // 1 at rules
-"^-moz- ^-ms- ^-o- ^-webkit- annotation bottom-center bottom-left bottom-left-corner bottom-right bottom-right-corner "
-"character-variant charset color-profile container counter-style custom-media else font-face font-feature-values "
-"historical-forms import keyframes left-bottom left-middle left-top media namespace nest ornaments page property "
-"right-bottom right-middle right-top scope styleset stylistic supports swash "
-"top-center top-left top-left-corner top-right top-right-corner viewport when "
+"^-moz- ^-ms- ^-o- ^-webkit- annotation at-root "
+"bottom-center bottom-left bottom-left-corner bottom-right bottom-right-corner "
+"character-variant charset color-profile container counter-style custom-media debug each else elseif end error extend "
+"font-face font-feature-values for forward function historical-forms if import include keyframes "
+"layer left-bottom left-middle left-top media mixin namespace nest ornaments page plugin property "
+"return right-bottom right-middle right-top scope styleset stylistic supports swash "
+"top-center top-left top-left-corner top-right top-right-corner use viewport warn when while "
 
 , // 2 pseudo classes
 "^-moz- ^-ms- ^-o- ^-webkit- active after any-link before blank checked current current( default dir( disabled "
-"empty enabled first first-child first-letter first-line first-of-type focus focus-visible focus-within future "
+"empty enabled extend( first first-child first-letter first-line first-of-type focus focus-visible focus-within future "
 "has( host host( host-context( hover in-range indeterminate invalid is( "
 "lang( last-child last-of-type left link local-link "
 "not( nth-child( nth-col( nth-last-child( nth-last-col( nth-last-of-type( nth-of-type( "
@@ -163,87 +165,100 @@ static KEYWORDLIST Keywords_CSS = {{
 "yellow yellowgreen "
 
 , // 5 values
-"ActiveText ButtonBorder ButtonFace ButtonText Canvas CanvasText Field FieldText GrayText Highlight HighlightText "
+"ActiveText ButtonBorder ButtonFace ButtonText CSS( Canvas CanvasText Field FieldText GrayText Highlight HighlightText "
 "LinkText Mark MarkText NaN VisitedText "
-"above abs( absolute absolute-colorimetric acos( active add additive "
-"alias all-petite-caps all-scroll all-small-caps allow-end alpha alphabetic alternate alternate-reverse always "
-"annotation( anywhere arcs armenian asin( atan( atan2( attr( audio auto auto( auto-flow "
-"avoid avoid-column avoid-flex avoid-line avoid-page avoid-region "
+"above abs( absolute absolute-colorimetric acos( add additive adjust( alias "
+"all-petite-caps all-scroll all-small-caps allow-end alpha alpha( alphabetic alphamix( alternate alternate-reverse "
+"always and annotation( anywhere append( arcs argb( arguments armenian as asin( atan( atan2( attr( "
+"audio aural auto auto( auto-flow average( avoid avoid-column avoid-flex avoid-line avoid-page avoid-region "
 "back backwards balance balance-all bar baseline behind below bevel bidi-override bitmap "
-"blink block block-end block-start blur( bold bolder border-box both both-edges bounding-box "
+"blackness( blink block block-end block-start blue( blur( bold bolder boolean( border-box both both-edges bounding-box "
 "braille break break-all break-spaces break-word brightness( browser bullets butt button "
-"calc( cap cap-height capitalize caption cell center center-left center-right central "
-"ch-width character-variant( checkbox child child( circle circle( clamp( clone close-quote closed coarse code col-resize "
-"collapse collection "
+"calc( calc-args( calc-name( call( cap cap-height capitalize caption ceil( cell center center-left center-right central "
+"ch-width change( character-variant( checkbox child child( circle circle( clamp( clone close-quote closed coarse code "
+"col-resize collapse collection "
 "color( color-CBDT color-COLRv0 color-COLRv1 color-SVG color-burn color-contrast( color-dodge color-mix( color-sbix "
-"column column-reverse common-ligatures compact compress "
-"condensed conic-gradient( content( content-box context-menu contextual continuous contrast( copy cos( "
-"counter( counters( cover create crisp-edges crop cross crosshair cubic-bezier( current currentColor cursive custom "
-"cyclic "
-"dark darken dashed dashes decimal decimal-leading-zero default dense device-cmyk( "
-"diagonal-fractions difference digits disc discard discard-after discard-before discretionary-ligatures "
+"column column-reverse common-ligatures compact compatible( complement( compress "
+"condensed conic-gradient( content( content-box content-exists( context-menu contextual continuous contrast( convert( "
+"copy cos( counter( counters( cover create crisp-edges crop cross crosshair css "
+"cubic-bezier( currentColor cursive custom cyclic "
+"dark darken darken( dashed dashes data-uri( "
+"decimal decimal-leading-zero deep-merge( deep-remove( default( dense desaturate( device-cmyk( "
+"diagonal-fractions difference difference( digits disc discard discard-after discard-before discretionary-ligatures div( "
 "dot dotted double double-circle down drop drop-shadow( "
-"e-resize each-line ease ease-in ease-in-out ease-out economy element( ellipse( ellipsis "
-"embed embedded-opentype embossed emoji enabled end evenodd ew-resize "
-"ex ex-height exact exclude exclusion exp( expanded extends extra-condensed extra-expanded "
-"false fangsong fantasy far-left far-right fast faster feature-aat feature-graphite feature-opentype female "
-"fill-box filled fine first first-baseline fit-content( fixed flat flex-end flex-start flip flow-root "
-"focus footnote force force-end format( forwards fragments from-font from-image full-size-kana full-width fullscreen "
-"gaps geometricPrecision georgian grab grabbing grammar-error grayscale( groove "
-"handheld hanging hard-light help hidden hide high high-quality higher historical-forms historical-ligatures "
-"horizontal horizontal-tb hsl( hsla( hue hue-rotate( hwb( hypot( "
-"ic-height ic-width icon ideograph-alpha ideograph-numeric ideographic ideographic-ink ideographic-space "
-"image( important in-flow increment incremental infinite infinity inherit initial initial-only "
-"inline inline-block inline-end inline-flex inline-grid inline-start inline-table inner inset( inside "
-"inter-character inter-word interactive interlace intersect invert invert( inverted isolate isolate-override italic "
-"jis04 jis78 jis90 jump-both jump-end jump-none jump-start justify justify-all keep keep-all "
-"lab( landscape large larger last last-baseline layout lch( leader( leading left-side leftwards legacy less level "
-"light lighten lighter line line-through linear linear-gradient( linearRGB lining-nums list-item listbox "
-"literal-punctuation local local( log( loose loud low lower lower-alpha lower-greek lower-latin lower-roman lowercase "
-"ltr luminance luminosity "
-"male mandatory manipulation manual margin-box match-parent match-self match-source math mathematical matrix( matrix3d( "
-"max( max-content maximum medium menu menulist menulist-button merge message-box meter "
-"middle min( min-color-index: min-content min-monochrome: minimal-ui minimum minmax( miter miter-clip mix mix( mixed "
-"mod( moderate monospace more move multiply "
-"n-resize narrow ne-resize nearest nesw-resize neutral never nherit "
+"e-resize each( each-line ease ease-in ease-in-out ease-out economy element( ellipse( ellipsis "
+"embed embed( embedded-opentype embossed emoji escape( evenodd ew-resize "
+"ex ex-height exact exclude exclusion exclusion( exp( expanded extends extra-condensed extra-expanded extract( "
+"fade( fade-in( fade-out( fadein( fadeout( false fangsong fantasy far-left far-right fast faster "
+"feature-aat feature-exists( feature-graphite feature-opentype female "
+"fill-box filled fine first-baseline fit-content( fixed flat flex-end flex-start flip floor( flow-root "
+"font-format( font-tech( footnote force force-end format( forwards fragments from from-font from-image "
+"full-size-kana full-width fullscreen function-exists( "
+"gaps geometricPrecision georgian get( get-function( get-unit( global global-variable-exists( "
+"grab grabbing grayscale( green( greyscale( groove "
+"handheld hanging hard-light hardlight( has-key( help hidden hide high high-quality higher historical-ligatures "
+"horizontal horizontal-tb hsl( hsla( hss-height hss-width hsv( hsva( hsvhue( hsvsaturation( hsvvalue( "
+"hue hue( hue-rotate( hwb( hypot( "
+"ic-height ic-width icon ideograph-alpha ideograph-numeric ideographic ideographic-ink ideographic-space ie-hex-str( if( "
+"image( image-height( image-size( image-width( important in in-flow increment incremental index( infinite infinity "
+"inherit initial initial-only inline inline-block inline-end inline-flex inline-grid inline-start inline-table inner "
+"insert( inset( inside inspect( int( inter-character inter-word interactive interlace intersect invert invert( inverted "
+"is-bracketed( is-superselector( is-unitless( iscolor( isdefined( isem( iskeyword( isnumber( isolate isolate-override "
+"ispercentage( ispixel( isruleset( isstring( isunit( isurl( italic "
+"jis04 jis78 jis90 join( jump-both jump-end jump-none jump-start justify justify-all keep keep-all keys( keywords( "
+"lab( landscape large larger last last-baseline layer( layout lch( "
+"leader( leading left-side leftwards legacy length( less level light lighten lighten( lighter lightness( "
+"line line-through linear linear-gradient( linearRGB lining-nums list list-item listbox literal-punctuation "
+"load-css( local local( log( loose loud low lower lower-alpha lower-greek lower-latin lower-roman lowercase ltr "
+"luma( luminance luminance( luminosity "
+"male mandatory manipulation manual map margin-box "
+"match-parent match-self match-source math mathematical matrix( matrix3d( max( max-content maximum "
+"media( medium menu menulist menulist-button merge merge( message-box meta meter middle "
+"min( min-color-index min-content min-monochrome minimal-ui minimum minmax( miter miter-clip "
+"mix mix( mixed mixin-exists( mod( moderate module-functions( module-variables( monospace more move "
+"multiple multiply multiply( "
+"n-resize name( narrow ne-resize nearest negation( nest( nesw-resize neutral never nherit "
 "no-clip no-close-quote no-common-ligatures no-compress no-contextual no-discretionary-ligatures no-drop "
-"no-historical-ligature no-limit no-open-quote no-preference no-punctuation no-repeat nonzero normal not-allowed nowrap "
-"ns-resize numbers numeric nw-resize nwse-resize "
+"no-historical-ligature no-limit no-open-quote no-preference no-punctuation no-repeat nonzero normal not not-allowed "
+"nowrap ns-resize nth( null numbers numeric nw-resize nwse-resize "
 "objects oblique oklab( oklch( old oldstyle-nums once one only "
-"opacity( opaque open open-quote opentype optimizeLegibility optimizeSpeed optional ordinal ornaments( "
-"outer outset outside outside-shape over overlay overline "
-"p3 padding-box paged paginate paint painted palettes pan-down pan-left pan-right pan-up pan-x pan-y parent path( paused "
-"perceptual perspective( petite-caps pi pinch-zoom pixelated plaintext polygon( portrait pow( "
+"opacity( opaque open open-quote opentype optimizeLegibility optimizeSpeed or ordinal ornaments( "
+"outer outset outside outside-shape over overlay overlay( overline "
+"p3 padding-box paged paginate paint painted palettes pan-down pan-left pan-right pan-up pan-x pan-y parent parse( path( "
+"paused percentage( perceptual perspective( petite-caps pi pi( pinch-zoom pixelated plaintext polygon( portrait pow( "
 "pre pre-line pre-wrap preserve preserve-3d preserve-breaks preserve-parent-color preserve-spaces pretty print "
 "progress progress-bar progressive projection proportional-nums proportional-width proximity punctuation push-button "
-"radial-gradient( radio raise ray( rec2020 rect rect( recto reduce reduced region relative relative-colorimetric rem( "
-"repeat repeat-x repeat-y repeating-linear-gradient( repeating-radial-gradient( reverse revert revert-layer rgb( rgba( "
-"ridge right-side rightwards "
-"root rotate( rotate-left rotate-right rotate3d( rotateX( rotateY( rotateZ( round round( row row-resize row-reverse rtl "
+"quote( "
+"radial-gradient( radio raise random( range( ray( rec2020 rect rect( red( reduce reduced reference "
+"relative relative-colorimetric rem( remove( "
+"repeat repeat-x repeat-y repeating-linear-gradient( repeating-radial-gradient( replace( reverse revert revert-layer "
+"rgb( rgba( ridge right-side rightwards "
+"rotate( rotate-left rotate-right rotate3d( rotateX( rotateY( rotateZ( round round( row row-resize row-reverse rtl "
 "ruby ruby-base ruby-base-container ruby-text ruby-text-container run-in running( "
-"s-resize sRGB safe same sans-serif saturate( saturation "
-"scale( scale-down scale3d( scaleX( scaleY( scaleZ( screen scroll scroll-position "
-"se-resize searchfield selector( self-end self-start semi-condensed semi-expanded separate sepia( serif sesame show "
-"sideways sideways-lr sideways-rl sign( silent simplified sin( skew( skewX( skewY( "
-"slashed-zero slice slider-horizontal slow slower small small-caps small-caption smaller smooth "
-"snap snap-block snap-inline soft soft-light solid "
+"s-resize sRGB safe same sans-serif saturate( saturation saturation( "
+"scale( scale-down scale3d( scaleX( scaleY( scaleZ( screen screen( scroll scroll-position se-resize searchfield "
+"selector selector( self-end self-start semi-condensed semi-expanded separate separator( sepia( serif sesame "
+"set( set-nth( shade( show sideways sideways-lr sideways-rl sign( silent simple-selectors( simplified sin( size( "
+"skew( skewX( skewY( slash( slashed-zero slice slice( slider-horizontal slow slower "
+"small small-caps small-caption smaller smooth snap snap-block snap-inline soft soft-light softlight( solid "
 "space space-adjacent space-around space-between space-end space-evenly space-first space-start spaces span "
-"speech spell-out spelling-error spread sqrt( square square-button srgb "
+"speech spell-out spin( spread sqrt( square square-button srgb "
 "stable stacked-fractions standalone standard start state static status-bar step-end step-start steps( sticky "
-"stretch strict string( stroke-box strong stupid style styleset( stylistic( sub subgrid subtract subtractive super svg "
-"sw-resize swap swash( symbolic symbols( system-ui "
+"stretch strict string string( stroke-box strong stupid style style( styleset( stylistic( "
+"sub subgrid subtract subtractive super supports( svg svg-gradient( sw-resize swap swash( symbolic symbols( system-ui "
 "table table-caption table-cell table-column table-column-group table-footer-group table-header-group "
 "table-row table-row-group tabular-nums tactile tan( target-counter( target-counters( target-text( "
-"techn( text text-bottom text-top textarea textfield thick thin titling-caps "
-"traditional translate( translate3d( translateX( translateY( translateZ( "
-"triangle trim-adjacent trim-end trim-inner trim-start true truetype tty tv "
+"techn( text text-bottom text-top textarea textfield thick thin through tint( titling-caps "
+"to to-lower-case( to-upper-case( traditional translate( translate3d( translateX( translateY( translateZ( "
+"triangle trim-adjacent trim-end trim-inner trim-start true truetype tty tv type( type-of( "
 "ui-monospace ui-rounded ui-sans-serif ui-serif ultra-condensed ultra-expanded "
-"under underline underscore unicase unicode unsafe unset up upper-alpha upper-latin upper-roman uppercase upright url( "
-"var( variations verso vertical vertical-lr vertical-rl vertical-text "
+"under underline underscore unicase unicode unify( unique-id( unit( unquote( unsafe unset "
+"up upper-alpha upper-latin upper-roman uppercase upright url( "
+"values( var var( variable-exists( variations vertical vertical-lr vertical-rl vertical-text "
 "view-box visible visibleFill visiblePainted visibleStroke visual "
-"w-resize wait wavy weak weight woff woff2 words wrap wrap-reverse "
+"w-resize wait wavy weak weight whiteness( with woff woff2 words wrap wrap-reverse "
 "x-fast x-high x-large x-loud x-low x-slow x-small x-soft x-strong x-weak xx-large xx-small young "
-"zero-if-extrinsic zero-if-scroll zoom-in zoom-out "
+"zero-if-extrinsic zero-if-scroll zip( zoom-in zoom-out "
 
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 //--Autogenerated -- end of section automatically generated
@@ -251,22 +266,28 @@ static KEYWORDLIST Keywords_CSS = {{
 
 static EDITSTYLE Styles_CSS[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_CSS_COMMENT, NP2StyleX_Comment, L"fore:#608060" },
-	{ SCE_CSS_TAG, NP2StyleX_HTMLTag, L"bold; fore:#0A246A" },
-	{ SCE_CSS_CLASS, NP2StyleX_TagClass, L"fore:#648000" },
+	{ SCE_CSS_AT_RULE, NP2StyleX_AtRule, L"fore:#FF8000" },
+	{ SCE_CSS_TAG, NP2StyleX_HTMLTag, L"bold; fore:#0080FF" },
+	{ SCE_CSS_CLASS, NP2StyleX_TagClass, L"fore:#7C5AF3" },
 	{ SCE_CSS_ID, NP2StyleX_TagId, L"fore:#648000" },
 	{ SCE_CSS_ATTRIBUTE, NP2StyleX_TagAttribute, L"italic; fore:#648000" },
-	{ MULTI_STYLE(SCE_CSS_PSEUDOCLASS, SCE_CSS_EXTENDED_PSEUDOCLASS, SCE_CSS_PSEUDOELEMENT, SCE_CSS_EXTENDED_PSEUDOELEMENT), NP2StyleX_PseudoClassElement, L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_CSS_IDENTIFIER, SCE_CSS_IDENTIFIER2, SCE_CSS_IDENTIFIER3, SCE_CSS_EXTENDED_IDENTIFIER), NP2StyleX_CSSProperty, L"fore:#FF4000" },
-	{ MULTI_STYLE(SCE_CSS_DOUBLESTRING, SCE_CSS_SINGLESTRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_CSS_PROPERTY, NP2StyleX_Property, L"fore:#FF4000" },
+	{ SCE_CSS_PSEUDOCLASS, NP2StyleX_PseudoClass, L"fore:#0066CC" },
+	{ SCE_CSS_PSEUDOELEMENT, NP2StyleX_PseudoElement, L"fore:#0080C0" },
+	{ SCE_CSS_UNKNOWN_PROPERTY, NP2StyleX_UnknownProperty, L"fore:#C80000" },
+	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, NP2StyleX_UnknownPseudoClass, L"fore:#C80000" },
+	{ SCE_CSS_UNKNOWN_PSEUDOELEMENT, NP2StyleX_UnknownPseudoElement, L"fore:#C80000" },
+	{ MULTI_STYLE(SCE_CSS_COMMENTLINE, SCE_CSS_COMMENTBLOCK, SCE_CSS_CDO_CDC, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_CSS_COMMENTLINEDOC, SCE_CSS_COMMENTBLOCKDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },
+	{ MULTI_STYLE(SCE_CSS_STRING_SQ, SCE_CSS_STRING_DQ, SCE_CSS_URL, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_CSS_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_CSS_PLACEHOLDER, NP2StyleX_Placeholder, L"fore:#8080FF" },
+	{ SCE_CSS_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ SCE_CSS_IMPORTANT, NP2StyleX_Important, L"bold; fore:#408040" },
 	{ SCE_CSS_VALUE, NP2StyleX_Value, L"fore:#3A6EA5" },
+	{ SCE_CSS_VARIABLE, NP2StyleX_Variable, L"italic; fore:#003CE6" },
+	{ MULTI_STYLE(SCE_CSS_NUMBER, SCE_CSS_DIMENSION, SCE_CSS_UNICODE_RANGE, 0), NP2StyleX_Number, L"fore:#007F7F" },
 	{ SCE_CSS_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
-	{ SCE_CSS_IMPORTANT, NP2StyleX_Important, L"bold; fore:#C80000" },
-	{ SCE_CSS_DIRECTIVE, NP2StyleX_Directive, L"bold; back:#FFF1A8" },
-	{ SCE_CSS_GROUP_RULE, NP2StyleX_GroupRule, L"bold; fore:#0A246A" },
-	{ SCE_CSS_VARIABLE, NP2StyleX_Variable, L"bold; fore:#FF4000" },
-	{ SCE_CSS_UNKNOWN_PSEUDOCLASS, NP2StyleX_UnknownPseudoClass, L"fore:#C80000; back:#FFFF80" },
-	{ SCE_CSS_UNKNOWN_IDENTIFIER, NP2StyleX_UnknownProperty, L"fore:#C80000; back:#FFFF80" },
 };
 
 EDITLEXER lexCSS = {

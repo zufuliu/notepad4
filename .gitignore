@@ -10,6 +10,9 @@ build/CodeLite/*.json
 build/CodeLite/Makefile
 build/CodeLite/build*
 locale/en
+scintilla/scripts/*.html
+scintilla/scripts/*.json
+scintilla/scripts/*.txt
 *.suo
 *.sdf
 *.user

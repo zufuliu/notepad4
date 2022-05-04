@@ -17,7 +17,7 @@ def update_all_keyword():
 		('NP2LEX_GN', 'stlGN.c', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),
 		('NP2LEX_GRAPHVIZ', 'stlGraphViz.c', 'LexGraphViz.cxx', 'GraphViz.dot', 0, parse_graphviz_api_file),
 			('NP2LEX_BLOCKDIAG', 'stlBlockdiag.c', 'LexGraphViz.cxx', 'blockdiag.diag', 0, parse_graphviz_api_file),
-			('NP2LEX_CSS', 'stlCSS.c', 'LexCSS.cxx', ['CSS.css'], 0, parse_css_api_file),
+			('NP2LEX_CSS', 'stlCSS.c', 'LexCSS.cxx', ['CSS.css', 'SCSS.scss', 'Less.less', 'HSS.hss'], 0, parse_css_api_file),
 		('NP2LEX_GO', 'stlGO.c', 'LexGo.cxx', 'Go.go', 0, parse_go_api_file),
 		('NP2LEX_HAXE', 'stlHaxe.c', 'LexHaxe.cxx', 'Haxe.hx', 1, parse_haxe_api_file),
 		('NP2LEX_INNO', 'stlInno.c', 'LexInno.cxx', 'InnoSetup.iss', 0, parse_inno_setup_api_file),

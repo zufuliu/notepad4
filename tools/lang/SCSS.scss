@@ -1,0 +1,178 @@
+// Dart Sass 1.50 https://sass-lang.com/documentation
+
+not and or
+true false null
+
+!global
+!default
+
+// https://sass-lang.com/documentation/at-rules
+@use ;
+as with
+@forward ;
+as show hide
+@import ;
+@mixin {}
+@include ;
+@function {}
+@return ;
+@extend ;
+@error ;
+@warn ;
+@debug ;
+@at-root {}
+
+@if {}
+@else {}
+@else {}
+if
+@each {}
+in
+@for {}
+from to through
+@while {}
+
+// https://sass-lang.com/documentation/modules
+// Global Functions
+hsl($hue $saturation $lightness)
+hsl($hue $saturation $lightness / $alpha)
+hsl($hue, $saturation, $lightness, $alpha: 1)
+hsla($hue $saturation $lightness)
+hsla($hue $saturation $lightness / $alpha)
+hsla($hue, $saturation, $lightness, $alpha: 1)
+if($condition, $if-true, $if-false)
+rgb($red $green $blue)
+rgb($red $green $blue / $alpha)
+rgb($red, $green, $blue, $alpha: 1)
+rgb($color, $alpha)
+rgba($red $green $blue)
+rgba($red $green $blue / $alpha)
+rgba($red, $green, $blue, $alpha: 1)
+rgba($color, $alpha)
+
+// sass:color
+{
+color.adjust($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)
+color.alpha($color)
+opacity($color)
+color.blackness($color)
+color.blue($color)
+color.change($color, $red: null, $green: null, $blue: null, $hue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)
+color.complement($color)
+color.grayscale($color)
+color.green($color)
+color.hue($color)
+color.hwb($hue $whiteness $blackness)
+color.ie-hex-str($color)
+color.invert($color, $weight: 100%)
+color.lightness($color)
+color.mix($color1, $color2, $weight: 50%)
+fade-in($color, $amount)
+color.red($color)
+color.saturation($color)
+color.scale($color, $red: null, $green: null, $blue: null, $saturation: null, $lightness: null, $whiteness: null, $blackness: null, $alpha: null)
+fade-out($color, $amount)
+color.whiteness($color)
+}
+
+// sass:list
+{
+list.append($list, $val, $separator: auto)
+list.index($list, $value)
+list.is-bracketed($list)
+list.join($list1, $list2, $separator: auto, $bracketed: auto)
+list.length($list)
+list.separator($list)
+list.nth($list, $n)
+list.set-nth($list, $n, $value)
+list.slash($elements...)
+list.zip($lists...)
+}
+
+// sass:map
+{
+map.deep-merge($map1, $map2)
+map.deep-remove($map, $key, $keys...)
+map.get($map, $key, $keys...)
+map.has-key($map, $key, $keys...)
+map.keys($map)
+map.merge($map1, $map2)
+map.merge($map1, $keys..., $map2)
+map.remove($map, $keys...)
+map.set($map, $key, $value)
+map.set($map, $keys..., $key, $value)
+map.values($map)
+}
+
+// sass:math
+{
+math.ceil($number)
+math.clamp($min, $number, $max)
+math.floor($number)
+math.max($number...)
+math.min($number...)
+math.round($number)
+math.abs($number)
+math.hypot($number...)
+math.log($number, $base: null)
+math.pow($base, $exponent)
+math.sqrt($number)
+math.cos($number)
+math.sin($number)
+math.tan($number)
+math.acos($number)
+math.asin($number)
+math.atan($number)
+math.atan2($y, $x)
+math.compatible($number1, $number2)
+math.is-unitless($number)
+math.unit($number)
+math.div($number1, $number2)
+math.percentage($number)
+math.random($limit: null)
+}
+
+// sass:meta
+{
+meta.load-css($url, $with: null)
+meta.calc-args($calc)
+meta.calc-name($calc)
+meta.call($function, $args...)
+meta.content-exists()
+meta.feature-exists($feature)
+meta.function-exists($name, $module: null)
+meta.get-function($name, $css: false, $module: null)
+meta.global-variable-exists($name, $module: null)
+meta.inspect($value)
+meta.keywords($args)
+meta.mixin-exists($name, $module: null)
+meta.module-functions($module)
+meta.module-variables($module)
+meta.type-of($value)
+meta.variable-exists($name)
+}
+
+// sass:selector
+{
+selector.is-superselector($super, $sub)
+selector.append($selectors...)
+selector.extend($selector, $extendee, $extender)
+selector.nest($selectors...)
+selector.parse($selector)
+selector.replace($selector, $original, $replacement)
+selector.unify($selector1, $selector2)
+selector.simple-selectors($selector)
+}
+
+// sass:string
+{
+string.quote($string)
+string.index($string, $substring)
+string.insert($string, $insert, $index)
+string.length($string)
+string.slice($string, $start-at, $end-at: -1)
+string.to-upper-case($string)
+string.to-lower-case($string)
+string.unique-id()
+string.unquote($string)
+}

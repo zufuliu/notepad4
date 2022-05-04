@@ -1187,7 +1187,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle
 				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_PseudoElement]);
 				return AutoC_AddSpecWord_Keyword;
 			}
-			if (!(iPrevStyle == SCE_CSS_IDENTIFIER || iPrevStyle == SCE_CSS_UNKNOWN_IDENTIFIER)) {
+			if (!(iPrevStyle == SCE_CSS_PROPERTY || iPrevStyle == SCE_CSS_UNKNOWN_PROPERTY)) {
 				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_PseudoClass]);
 				return AutoC_AddSpecWord_Keyword;
 			}

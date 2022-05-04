@@ -49,9 +49,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [C Standard Library](tools/lang/C.c), up to C2x.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++20.
 	* [CSS Style Sheet](tools/lang/CSS.css), up to 2021 snapshot.
-		* [Sassy CSS](https://sass-lang.com/)
-		* [Less CSS](https://lesscss.org/)
-		* [HSS](https://github.com/ncannasse/hss)
+		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
+		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
+		* [HSS Style Sheet](tools/lang/HSS.hss)
 	* [CMake](tools/lang/CMake.cmake), up to CMake 3.20. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#cmake)
 	* [CoffeeScript](tools/lang/CoffeeScript.coffee), CoffeeScript 2.7.
 	* Common Intermediate Language
@@ -81,7 +81,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Java](tools/lang/Java.java), up to Java 17. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#java)
 		* [BeanShell](https://github.com/beanshell/beanshell)
 	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2021 (12th edition) with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
-	* JSON and JSON5 Document
+	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
 	* [Julia Script](tools/lang/Julia.jl), up to Julia 1.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
 	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 1.6.
 	* LaTeX
@@ -128,7 +128,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Swift](tools/lang/Swift.swift), Swift 5.6.
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
-	* TOML File
+	* [TOML File](https://toml.io/)
 	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 4.7.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
@@ -154,7 +154,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Spring Beans
 		* Apple Property List
 		* Android Manifest
-	* YAML Document
+	* [YAML Document](https://yaml.org/)
 	* Many Others
 * Toggle fold for specific level, shortcuts: <kbd>Alt</kbd>+<kbd>Number</kbd>
 * Toggle fold for current block without scrolling back to the block start line, shortcut: <kbd>Alt</kbd>+<kbd>C</kbd>, or context menu "Toggle Fold"

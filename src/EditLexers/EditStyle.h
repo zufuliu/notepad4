@@ -83,13 +83,14 @@
 #define NP2STYLE_TagClass				63401
 #define NP2STYLE_TagId					63402
 #define NP2STYLE_TagAttribute			63403
-#define NP2STYLE_PseudoClassElement		63404
+#define NP2STYLE_PseudoClass			63404
 #define NP2STYLE_UnknownPseudoClass		63405
-#define NP2STYLE_CSSProperty			63406
+#define NP2STYLE_PseudoElement			63406
 #define NP2STYLE_UnknownProperty		63407
-#define NP2STYLE_GroupRule				63408
+#define NP2STYLE_AtRule					63408
 #define NP2STYLE_Value					63409
 #define NP2STYLE_Important				63410
+#define NP2STYLE_UnknownPseudoElement	63411
 
 #define NP2STYLE_Class					63420
 #define NP2STYLE_Structure				63421

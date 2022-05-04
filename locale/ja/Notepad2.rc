@@ -503,10 +503,10 @@ BEGIN
 		END
 		POPUP "CSSスタイルシート(&H)"
 		BEGIN
-			MENUITEM "&CSS",						IDM_LEXER_CSS
-			MENUITEM "&Sassy CSS",					IDM_LEXER_SCSS
-			MENUITEM "&Less CSS",					IDM_LEXER_LESS
-			MENUITEM "&HSS",						IDM_LEXER_HSS
+			MENUITEM "CSSスタイルシート(&C)",			IDM_LEXER_CSS
+			MENUITEM "SCSSスタイルシート(&S)",			IDM_LEXER_SCSS
+			MENUITEM "Lessスタイルシート(&L)",			IDM_LEXER_LESS
+			MENUITEM "HSSスタイルシート(&H)",			IDM_LEXER_HSS
 		END
 		POPUP "Webソースコード(&W)"
 		BEGIN

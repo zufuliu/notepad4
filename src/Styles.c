@@ -1663,6 +1663,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		//SciCall_SetProperty("fold.preprocessor", "1");
 		//SciCall_SetProperty("fold.compact", "0");
 
+		int dialect = 0;
 		switch (rid) {
 		case NP2LEX_HTML:
 		case NP2LEX_XML:
@@ -1672,33 +1673,34 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 
 		case NP2LEX_CSS:
-			SciCall_SetProperty("lexer.css.scss", ((np2LexLangIndex == IDM_LEXER_SCSS)? "1" : "0"));
-			SciCall_SetProperty("lexer.css.less", ((np2LexLangIndex == IDM_LEXER_LESS)? "1" : "0"));
-			SciCall_SetProperty("lexer.css.hss", ((np2LexLangIndex == IDM_LEXER_HSS)? "1" : "0"));
+			dialect = np2LexLangIndex - IDM_LEXER_CSS;
 			break;
 
 		case NP2LEX_BASH:
-			SciCall_SetProperty("lexer.lang", ((np2LexLangIndex == IDM_LEXER_CSHELL)? "1" : "0"));
+			dialect = np2LexLangIndex == IDM_LEXER_CSHELL;
 			break;
 
 		case NP2LEX_JAVASCRIPT:
 		case NP2LEX_TYPESCRIPT: {
 			LPCWSTR lpszExt = PathFindExtension(szCurFile);
-			const char *jsx = (StrNotEmpty(lpszExt) && (StrCaseEqual(lpszExt, L".jsx") || StrCaseEqual(lpszExt, L".tsx")))? "1" : "0";
-			SciCall_SetProperty("lexer.lang", jsx);
+			if (StrNotEmpty(lpszExt) && (StrCaseEqual(lpszExt, L".jsx") || StrCaseEqual(lpszExt, L".tsx"))) {
+				dialect = 1;
+			}
 		} break;
 
-		case NP2LEX_MARKDOWN: {
-			const char *lang = (np2LexLangIndex == IDM_LEXER_MARKDOWN_GITLAB) ? "1"
-				: ((np2LexLangIndex == IDM_LEXER_MARKDOWN_PANDOC) ? "2" : "0");
-			SciCall_SetProperty("lexer.lang", lang);
+		case NP2LEX_MARKDOWN:
+			dialect = np2LexLangIndex - IDM_LEXER_MARKDOWN_GITHUB;
 			break;
-		} break;
 
 		case NP2LEX_APDL:
 		case NP2LEX_ABAQUS:
-			SciCall_SetProperty("lexer.lang", (rid == NP2LEX_APDL) ? "1" : "0");
+			dialect = rid == NP2LEX_APDL;
 			break;
+		}
+		if (dialect > 0) {
+			char lang[2] = "";
+			lang[0] = (char)(dialect + '0');
+			SciCall_SetProperty("lexer.lang", lang);
 		}
 
 		Style_UpdateLexerKeywords(pLexNew);

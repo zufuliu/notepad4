@@ -679,7 +679,7 @@ def parse_css_api_file(pathList):
 		'pseudo elements': vendor,
 	}
 
-	values = ['important']
+	values = []
 	for path in pathList:
 		for line in read_file(path).splitlines():
 			line = line.strip()
@@ -688,6 +688,8 @@ def parse_css_api_file(pathList):
 			if line[0] == '@':
 				rule = line.split()[0][1:]
 				keywordMap['at rules'].append(rule)
+			elif line[0] == '!':
+				values.append(line[1:])
 			elif line[0] == ':':
 				line = line.rstrip(')')
 				if line[1] == ':':
@@ -695,20 +697,19 @@ def parse_css_api_file(pathList):
 				else:
 					keywordMap['pseudo classes'].append(line[1:])
 			elif line[0].isalpha():
+				line = re.sub(r'\(.*?\)', '(', line)
 				index = line.find(':')
 				if index > 0:
 					name = line[:index].strip()
-					line = line[index+1:]
 					keywordMap['properties'].append(name)
-				line = line.replace(';', ' ').replace(',', ' ').replace('|', ' ').replace('[',  ' ').replace(']', ' ')
-				items = [item.strip(')') for item in line.split()]
+				line = re.sub(r'[!:;,.|\[\])]', ' ', line)
+				items = line.split()
 				values.extend(items)
 
-	keywordMap['values'] = set(values) - ColorNameList
-	RemoveDuplicateKeyword(keywordMap, [
-		'properties',
-		'values',
-	])
+	items = []
+	for value in keywordMap.values():
+		items.extend(value)
+	keywordMap['values'] = set(values) - ColorNameList - set(items)
 	return [
 		('properties', keywordMap['properties'], KeywordAttr.Default),
 		('at rules', keywordMap['at rules'], KeywordAttr.Special),

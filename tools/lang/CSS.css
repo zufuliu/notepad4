@@ -6,11 +6,13 @@
 // https://developer.mozilla.org/en-US/docs/Web/CSS
 
 // CSS 2.2 https://www.w3.org/TR/CSS22/ 12 April 2016
-@charset
+@charset ;
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
+!important
 
 // CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 11 October 2018
 @keyframes
+from to
 {
 	animation-name: none;
 	animation-duration:;
@@ -177,9 +179,16 @@
 // CSS Cascading and Inheritance Level 4 https://www.w3.org/TR/css-cascade-4/ 13 January 2022
 // CSS Cascading and Inheritance Level 3 https://www.w3.org/TR/css-cascade-3/ 11 February 2021
 @import
+layer
+layer()
+supports()
 {
 	all: initial | inherit | unset | revert | revert-layer;
 }
+@layer {}
+initial inherit unset revert revert-layer
+@scope {}
+:scope
 
 // CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 28 April 2022
 // CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 28 April 2022
@@ -206,7 +215,7 @@
 
 // Compositing and Blending Level 1 https://www.w3.org/TR/compositing-1/ 13 January 2015
 {
-	mix-blend-mode: normal | multiply | screen | overlay | darken | lighten | color-dodge |color-burn | hard-light | soft-light | difference | exclusion | hue | saturation | color | luminosity;
+	mix-blend-mode: normal | multiply | screen | overlay | darken | lighten | color-dodge | color-burn | hard-light | soft-light | difference | exclusion | hue | saturation | color | luminosity;
 	isolation: auto | isolate;
 	background-blend-mode:;
 }
@@ -214,6 +223,7 @@
 // CSS Conditional Rules Module Level 5 https://www.w3.org/TR/css-conditional-5/ 21 December 2021
 // CSS Conditional Rules Module Level 4 https://www.w3.org/TR/css-conditional-4/ 17 February 2022
 // CSS Conditional Rules Module Level 3 https://www.w3.org/TR/css-conditional-3/ 13 January 2022
+not and or
 @supports {
 }
 @when {
@@ -221,6 +231,10 @@
 @else {
 }
 selector()
+font-tech()
+font-format()
+media()
+supports()
 
 // CSS Containment Module Level 3 https://www.w3.org/TR/css-contain-3/ 21 December 2021
 // CSS Containment Module Level 2 https://www.w3.org/TR/css-contain-2/ 16 December 2020
@@ -240,6 +254,10 @@ selector()
 	aspect-ratio:;
 	orientation: portrait | landscape;
 }
+name()
+type()
+size()
+style()
 
 // CSS Custom Highlight API Module Level 1 https://www.w3.org/TR/css-highlight-api-1/ 15 December 2021
 ::highlight()
@@ -405,13 +423,13 @@ step-start step-end steps()
 	font-variant-emoji: auto | text | emoji | unicode;
 }
 @font-feature-values {
-@stylistic
-@historical-forms
-@styleset
-@character-variant
-@swash
-@ornaments
-@annotation
+@stylistic {}
+@historical-forms {}
+@styleset {}
+@character-variant {}
+@swash {}
+@ornaments {}
+@annotation {}
 
 base-palette:;
 override-colors:;
@@ -660,7 +678,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	scan: interlace progressive;
 	grid:;
 	update: none slow fast;
-	environment-blending:; opaque additive subtractive
+	environment-blending: opaque additive subtractive;
 	// Color Media Features
 	color:;
 	min-color:;
@@ -729,7 +747,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 }
 
 // CSS Namespaces Module Level 3 https://www.w3.org/TR/css3-namespace/ 20 March 2014
-@namespace
+@namespace ;
 
 // CSS Nesting Module https://www.w3.org/TR/css-nesting-1/ 31 August 2021
 @nest {}
@@ -772,7 +790,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 }
 
 // CSS Paged Media Module Level 3 https://www.w3.org/TR/css-page-3/ 18 October 2018
-@page
+@page {}
 @top-left-corner {}
 @top-left {}
 @top-center {}
@@ -794,7 +812,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 :first
 :blank
 {
-	size: auto |portrait | landscape;
+	size: auto | portrait | landscape;
 	marks: none | crop | cross;
 	bleed: auto;
 	page: auto;
@@ -1224,7 +1242,8 @@ pi infinity NaN
 }
 
 // Aural style sheets https://www.w3.org/TR/CSS22/aural.html
-@media aural speech
+@media
+aural speech
 {
 	volume: silent | x-soft | soft | medium | loud | x-loud;
 	play-during: mix | repeat | auto | none;
