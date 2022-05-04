@@ -491,6 +491,7 @@ static inline BOOL IsSpecialStartChar(int ch, int chPrev) {
 		// ObjC Keyword, Java Annotation, Python Decorator, Cobra Directive
 		|| (ch == '<') // HTML/XML Tag, C# Doc Tag
 		|| (ch == '\\')// Doxygen Doc Tag, LaTeX Command
+		|| (ch == ':') // CSS pseudo class
 		|| (chPrev == '\\' && (ch == '^' || ch == ':'))// LaTeX input, Emoji input
 		// TODO: show emoji list after typing ':'.
 		|| (chPrev == '<' && ch == '/')	// HTML/XML Close Tag
@@ -1079,7 +1080,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	}
 
 	// embedded script
-	PEDITLEXER pLex = NULL;
+	LPCEDITLEXER pLex = NULL;
 	if (iLexer == SCLEX_HTML || iLexer == SCLEX_PHPSCRIPT) {
 		const int block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 		switch (block) {
@@ -1122,7 +1123,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 
 #define AutoC_AddSpecWord_Finish	1
 #define AutoC_AddSpecWord_Keyword	2
-INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int chPrev) {
+INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle, int ch, int chPrev) {
 #if EnableLaTeXLikeEmojiInput
 	if ((ch == '\\' || (chPrev == '\\' && (ch == '^' || ch == ':'))) && autoCompletionConfig.bLaTeXInputMethod) {
 		if (ch != ':') {
@@ -1137,14 +1138,33 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	}
 #endif
 
-	switch (pLexCurrent->iLexer) {
+	LPCEDITLEXER pLex = pLexCurrent;
+	int iLexer = pLex->iLexer;
+	if (iLexer == SCLEX_PHPSCRIPT) {
+		if (iCurrentStyle >= css_style(SCE_CSS_DEFAULT)) {
+			iCurrentStyle -= css_style(SCE_CSS_DEFAULT);
+			iPrevStyle -= css_style(SCE_CSS_DEFAULT);
+			iLexer = SCLEX_CSS;
+			pLex = &lexCSS;
+		} else if (iCurrentStyle >= js_style(SCE_JS_DEFAULT)) {
+			iCurrentStyle -= js_style(SCE_JS_DEFAULT);
+			iPrevStyle -= js_style(SCE_JS_DEFAULT);
+			iLexer = SCLEX_JAVASCRIPT;
+			pLex = &lexJavaScript;
+		} else if (iCurrentStyle < SCE_PHP_DEFAULT) {
+			iLexer = SCLEX_HTML;
+			pLex = &lexHTML;
+		}
+	}
+
+	switch (iLexer) {
 	case SCLEX_AHK:
 		if (ch == '#' && iCurrentStyle == SCE_AHK_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[AutoHotkeyKeywordIndex_Directive]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoHotkeyKeywordIndex_Directive]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		if (ch == '@' && (iCurrentStyle == SCE_AHK_COMMENTLINE || iCurrentStyle == SCE_AHK_COMMENTBLOCK)) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[AutoHotkeyKeywordIndex_CompilerDirective]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoHotkeyKeywordIndex_CompilerDirective]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		break;
@@ -1152,24 +1172,27 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_APDL:
 		if (iCurrentStyle == 0 && (ch == '*' || ch == '/')) {
 			const int index = (ch == '/') ? APDLKeywordIndex_SlashCommand : APDLKeywordIndex_StarCommand;
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[index]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[index]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
-#if 0
 	case SCLEX_CSS:
 		if (ch == '@' && iCurrentStyle == SCE_CSS_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[CSSKeywordIndex_AtRule]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_AtRule]);
 			return AutoC_AddSpecWord_Keyword;
 		}
-		if (ch == ':' && iCurrentStyle == SCE_CSS_DEFAULT) {
-			const int index = (chPrev == ':') ? CSSKeywordIndex_PseudoElement : CSSKeywordIndex_PseudoClass;
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[index]);
-			return AutoC_AddSpecWord_Keyword;
+		if (ch == ':' && (iCurrentStyle == SCE_CSS_DEFAULT || iCurrentStyle == SCE_CSS_OPERATOR)) {
+			if (chPrev == ':') {
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_PseudoElement]);
+				return AutoC_AddSpecWord_Keyword;
+			}
+			if (!(iPrevStyle == SCE_CSS_IDENTIFIER || iPrevStyle == SCE_CSS_UNKNOWN_IDENTIFIER)) {
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_PseudoClass]);
+				return AutoC_AddSpecWord_Keyword;
+			}
 		}
 		break;
-#endif
 
 	case SCLEX_CPP:
 		if (IsCppCommentStyle(iCurrentStyle) && np2_LexKeyword) {
@@ -1184,13 +1207,13 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			}
 		} else if (iCurrentStyle == SCE_C_DEFAULT) {
 			if (ch == '#') { // #preprocessor
-				const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[2];
+				const char *pKeywords = pLex->pKeyWords->pszKeyWords[2];
 				if (StrNotEmptyA(pKeywords)) {
 					WordList_AddListEx(pWList, pKeywords);
 					return AutoC_AddSpecWord_Finish;
 				}
 			} else if (ch == '@') { // @directive, @annotation, @decorator
-				const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3];
+				const char *pKeywords = pLex->pKeyWords->pszKeyWords[3];
 				if (StrNotEmptyA(pKeywords)) {
 					WordList_AddListEx(pWList, pKeywords);
 					// user defined annotation
@@ -1208,11 +1231,11 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 
 	case SCLEX_CSHARP:
 		if (ch == '#' && iCurrentStyle == SCE_CSHARP_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[CSharpKeywordIndex_Preprocessor]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSharpKeywordIndex_Preprocessor]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		if ((ch == '<' || (chPrev == '<' && ch == '/')) && (iCurrentStyle > SCE_CSHARP_DEFAULT && iCurrentStyle < SCE_CSHARP_TASKMARKER)) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[CSharpKeywordIndex_CommentTag]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSharpKeywordIndex_CommentTag]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		break;
@@ -1221,8 +1244,8 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_HTML:
 	case SCLEX_XML:
 		if (ch == '<' || (chPrev == '<' && ch == '/')) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[0]);// Tag
-			if (pLexCurrent->rid == NP2LEX_XML) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[0]);// Tag
+			if (pLex->rid == NP2LEX_XML) {
 				if (np2_LexKeyword) { // XML Tag
 					WordList_AddList(pWList, (*np2_LexKeyword)[0]);
 				}
@@ -1241,39 +1264,39 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_D:
 		if ((ch == '#' || ch == '@') && iCurrentStyle == SCE_D_DEFAULT) {
 			const int index = (ch == '#') ? DKeywordIndex_Preprocessor : DKeywordIndex_Attribute;
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[index]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[index]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		break;
 
 	case SCLEX_DART:
 		if (ch == '@' && iCurrentStyle == SCE_DART_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[DartKeywordIndex_Metadata]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[DartKeywordIndex_Metadata]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
 	case SCLEX_HAXE:
 		if (ch == '#' && iCurrentStyle == SCE_HAXE_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[HaxeKeywordIndex_Preprocessor]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[HaxeKeywordIndex_Preprocessor]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		if (ch == '@' && iCurrentStyle == SCE_HAXE_COMMENTBLOCKDOC) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[HaxeKeywordIndex_CommentTag]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[HaxeKeywordIndex_CommentTag]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
 	case SCLEX_INNOSETUP:
 		if (ch == '#' && (iCurrentStyle == SCE_INNO_DEFAULT || iCurrentStyle == SCE_INNO_INLINE_EXPANSION)) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[InnoKeywordIndex_Directive]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[InnoKeywordIndex_Directive]);
 			return (iCurrentStyle == SCE_INNO_DEFAULT) ? AutoC_AddSpecWord_Finish : AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
 	case SCLEX_GRAPHVIZ:
 		if (ch == '<' || (chPrev == '<' && ch == '/')) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[GraphVizKeywordIndex_HtmlLabel]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[GraphVizKeywordIndex_HtmlLabel]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
@@ -1284,25 +1307,25 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 			NP2_static_assert(JavaKeywordIndex_Annotation == GroovyKeywordIndex_Annotation);
 			NP2_static_assert(JavaKeywordIndex_Javadoc == GroovyKeywordIndex_Groovydoc);
 			if (iCurrentStyle == SCE_JAVA_DEFAULT) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[JavaKeywordIndex_Annotation]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaKeywordIndex_Annotation]);
 				return AutoC_AddSpecWord_Keyword;
 			}
 			if (iCurrentStyle >= SCE_JAVA_COMMENTBLOCKDOC && iCurrentStyle <= SCE_JAVA_TASKMARKER) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[JavaKeywordIndex_Javadoc]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaKeywordIndex_Javadoc]);
 				return AutoC_AddSpecWord_Finish;
 			}
 		}
 		break;
 
 	case SCLEX_JAVASCRIPT:
-		if (ch == '@' || (ch == '<' && pLexCurrent->rid == NP2LEX_TYPESCRIPT)) {
+		if (ch == '@' || (ch == '<' && pLex->rid == NP2LEX_TYPESCRIPT)) {
 			if (iCurrentStyle >= SCE_JS_COMMENTLINE && iCurrentStyle <= SCE_JS_TASKMARKER) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
 				return AutoC_AddSpecWord_Finish;
 			}
 #if 0
 			if (ch == '@' && iCurrentStyle == SCE_JS_DEFAULT) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Decorator]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Decorator]);
 				return AutoC_AddSpecWord_Keyword;
 			}
 #endif
@@ -1311,7 +1334,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 
 	case SCLEX_JULIA:
 		if (ch == '@' && iCurrentStyle == SCE_JULIA_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[JuliaKeywordIndex_Macro]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JuliaKeywordIndex_Macro]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
@@ -1319,11 +1342,11 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_KOTLIN:
 		if (ch == '@') {
 			if (iCurrentStyle == SCE_KOTLIN_DEFAULT) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[KotlinKeywordIndex_Annotation]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[KotlinKeywordIndex_Annotation]);
 				return AutoC_AddSpecWord_Keyword;
 			}
 			if (iCurrentStyle >= SCE_KOTLIN_COMMENTLINE && iCurrentStyle <= SCE_KOTLIN_TASKMARKER) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[KotlinKeywordIndex_Kdoc]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[KotlinKeywordIndex_Kdoc]);
 				return AutoC_AddSpecWord_Finish;
 			}
 		}
@@ -1340,11 +1363,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_PHPSCRIPT:
 		if (ch == '@') {
 			if (iCurrentStyle >= SCE_PHP_COMMENTLINE && iCurrentStyle <= SCE_PHP_TASKMARKER) {
-				WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[PHPKeywordIndex_Phpdoc]);
-				return AutoC_AddSpecWord_Finish;
-			}
-			if (iCurrentStyle >= js_style(SCE_JS_COMMENTLINE) && iCurrentStyle <= js_style(SCE_JS_TASKMARKER)) {
-				WordList_AddList(pWList, lexJavaScript.pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[PHPKeywordIndex_Phpdoc]);
 				return AutoC_AddSpecWord_Finish;
 			}
 		}
@@ -1352,7 +1371,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 
 	case SCLEX_PYTHON:
 		if (ch == '@' && iCurrentStyle == SCE_PY_DEFAULT) {
-			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[PythonKeywordIndex_Decorator];
+			const char *pKeywords = pLex->pKeyWords->pszKeyWords[PythonKeywordIndex_Decorator];
 			if (StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
 				return AutoC_AddSpecWord_Keyword;
@@ -1362,14 +1381,14 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 
 	case SCLEX_REBOL:
 		if (ch == '#' && iCurrentStyle == SCE_REBOL_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[RebolKeywordIndex_Directive]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[RebolKeywordIndex_Directive]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
 	case SCLEX_SMALI:
 		if (ch == '.' && iCurrentStyle == SCE_C_DEFAULT) {
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[9]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[9]);
 			return AutoC_AddSpecWord_Finish;
 		}
 		break;
@@ -1377,14 +1396,14 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int ch, int ch
 	case SCLEX_SWIFT:
 		if ((ch == '@' || ch == '#') && iCurrentStyle == SCE_SWIFT_DEFAULT) {
 			const int index = (ch == '#') ? SwiftKeywordIndex_Directive : SwiftKeywordIndex_Attribute;
-			WordList_AddList(pWList, pLexCurrent->pKeyWords->pszKeyWords[index]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[index]);
 			return AutoC_AddSpecWord_Keyword;
 		}
 		break;
 
 	case SCLEX_VB:
 		if (ch == '#' && iCurrentStyle == SCE_B_DEFAULT) {
-			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[3]; // #preprocessor
+			const char *pKeywords = pLex->pKeyWords->pszKeyWords[3]; // #preprocessor
 			if (StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
 				return AutoC_AddSpecWord_Finish;
@@ -1557,7 +1576,13 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	char prefix = '\0';
 
 	if (!bIgnore && IsSpecialStartChar(ch, chPrev)) {
-		const int result = AutoC_AddSpecWord(pWList, iCurrentStyle, ch, chPrev);
+		int iPrevStyle = 0;
+		if (ch == ':' && chPrev != ':') {
+			Sci_Position iPos = SciCall_WordStartPosition(iStartWordPos - 1, FALSE);
+			iPrevStyle = SciCall_GetStyleAt(iPos);
+		}
+
+		const int result = AutoC_AddSpecWord(pWList, iCurrentStyle, iPrevStyle, ch, chPrev);
 		if (result == AutoC_AddSpecWord_Finish) {
 			bIgnore = TRUE;
 			bIgnoreDoc = TRUE;
