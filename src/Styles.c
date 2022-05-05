@@ -311,8 +311,6 @@ static BOOL iCustomColorLoaded = FALSE;
 
 BOOL	bUse2ndGlobalStyle;
 int		np2StyleTheme;
-BOOL	bCurrentLexerHasLineComment;
-BOOL	bCurrentLexerHasBlockComment;
 static UINT fStylesModified = STYLESMODIFIED_NONE;
 static BOOL fWarnedNoIniFile = FALSE;
 static int	defaultBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
@@ -627,27 +625,30 @@ static inline void FindDarkThemeFile(void) {
 
 void Style_LoadTabSettings(PEDITLEXER pLex) {
 	LPCWSTR lpSection = pLex->pszName;
+	const UINT lexerAttr = pLex->lexerAttr;
 	int iValue = IniGetInt(lpSection, L"TabWidth", pLex->defaultTabWidth);
 	tabSettings.schemeTabWidth = clamp_i(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
 	iValue = IniGetInt(lpSection, L"IndentWidth", pLex->defaultIndentWidth);
 	tabSettings.schemeIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
-	tabSettings.schemeTabsAsSpaces = IniGetInt(lpSection, L"TabsAsSpaces", pLex->defaultTabsAsSpaces);
-	tabSettings.schemeUseGlobalTabSettings = IniGetInt(lpSection, L"UseGlobalTabSettings", pLex->defaultUseGlobalTabSettings);
+	tabSettings.schemeTabsAsSpaces = IniGetInt(lpSection, L"TabsAsSpaces", LexerAttr_GetTabAsSpaces(lexerAttr));
+	tabSettings.schemeUseGlobalTabSettings = IniGetInt(lpSection, L"UseGlobalTabSettings", LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
 
 void Style_SaveTabSettings(PEDITLEXER pLex) {
 	LPCWSTR lpSection = pLex->pszName;
+	const UINT lexerAttr = pLex->lexerAttr;
 	IniSetIntEx(lpSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
 	IniSetIntEx(lpSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
-	IniSetBoolEx(lpSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLex->defaultTabsAsSpaces);
-	IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLex->defaultUseGlobalTabSettings);
+	IniSetBoolEx(lpSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, LexerAttr_GetTabAsSpaces(lexerAttr));
+	IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
 
 static inline void SaveLexTabSettings(IniSectionOnSave *pIniSection, PEDITLEXER pLex) {
+	const UINT lexerAttr = pLex->lexerAttr;
 	IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
 	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
-	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, pLex->defaultTabsAsSpaces);
-	IniSectionSetBoolEx(pIniSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, pLex->defaultUseGlobalTabSettings);
+	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.schemeTabsAsSpaces, LexerAttr_GetTabAsSpaces(lexerAttr));
+	IniSectionSetBoolEx(pIniSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
 
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
@@ -667,7 +668,7 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
-		pLex->bUseDefaultCodeStyle = IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
+		pLex->bUseDefaultCodeStyle = (uint8_t)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 		for (UINT i = 0; i < iStyleCount; i++) {
 			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
 			pLex->Styles[i].szValue = szValue;
@@ -680,7 +681,7 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 		}
 	}
 
-	pLex->iStyleTheme = np2StyleTheme;
+	pLex->iStyleTheme = (uint8_t)np2StyleTheme;
 }
 
 void Style_SetFavoriteSchemes(void) {
@@ -1021,7 +1022,7 @@ BOOL Style_Import(HWND hwnd) {
 				if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
 					continue;
 				}
-				pLex->bUseDefaultCodeStyle = IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
+				pLex->bUseDefaultCodeStyle = (uint8_t)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 				const UINT iStyleCount = pLex->iStyleCount;
 				for (UINT i = 0; i < iStyleCount; i++) {
 					LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
@@ -1118,7 +1119,7 @@ static void Style_ResetAll(BOOL resetColor) {
 			lstrcpy(pLex->szExtensions, pLex->pszDefExt);
 		}
 		pLex->bStyleChanged = TRUE;
-		pLex->bUseDefaultCodeStyle = (pLex->rid == NP2LEX_TEXTFILE)? 0 : 1;
+		pLex->bUseDefaultCodeStyle = (pLex->rid == NP2LEX_TEXTFILE);
 		if (resetColor) {
 			const UINT iStyleCount = pLex->iStyleCount;
 			for (UINT i = 0; i < iStyleCount; i++) {
@@ -2038,8 +2039,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		// Save current lexer
 		pLexCurrent = pLexNew;
-		bCurrentLexerHasLineComment = DidLexerHasLineComment(iLexer);
-		bCurrentLexerHasBlockComment = DidLexerHasBlockComment(iLexer);
 		UpdateStatusBarCache(STATUS_LEXER);
 		UpdateStatusbar();
 	}
@@ -3323,7 +3322,7 @@ void Style_SetIndentGuides(BOOL bShow) {
 	int iIndentView = SC_IV_NONE;
 	if (bShow) {
 		if (!flagSimpleIndentGuides) {
-			if (IsPythonLikeFolding(pLexCurrent->iLexer)) {
+			if (pLexCurrent->lexerAttr & LexerAttr_IndentLookForward) {
 				iIndentView = SC_IV_LOOKFORWARD;
 			} else {
 				iIndentView = SC_IV_LOOKBOTH;

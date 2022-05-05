@@ -8015,7 +8015,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
-	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
+	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
 		struct FoldLevelStack levelStack = { 0, { 0 }};
 		++lev;
 		while (line < lineCount) {
@@ -8093,7 +8093,7 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 	level &= SC_FOLDLEVELNUMBERMASK;
 	level -= SC_FOLDLEVELBASE;
 
-	if (level != 0 && IsFoldIndentationBased(pLexCurrent->iLexer)) {
+	if (level != 0 && (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding)) {
 		level = 0;
 		while (line != 0 && level < MAX_EDIT_TOGGLE_FOLD_LEVEL - 1) {
 			line = SciCall_GetFoldParent(line);
@@ -8117,7 +8117,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
-	if (IsFoldIndentationBased(pLexCurrent->iLexer)) {
+	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
 		struct FoldLevelStack levelStack = { 0, { 0 }};
 		while (line < lineCount) {
 			int level = SciCall_GetFoldLevel(line);

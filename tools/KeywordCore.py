@@ -7,6 +7,7 @@ import string
 
 sys.path.append('../scintilla/scripts')
 from FileGenerator import Regenerate
+from LexerConfig import *
 
 SinglyWordMap = {
 	'class': 'class',
@@ -31,17 +32,6 @@ class KeywordAttr(IntFlag):
 	MakeLower = 2
 	NoAutoComp = 4
 	Special = 256
-
-	@staticmethod
-	def get_c_expr(flags):
-		if flags.name:
-			return 'KeywordAttr_' + flags.name
-
-		comb = []
-		for value in KeywordAttr.__members__.values():
-			if flags & value:
-				comb.append('KeywordAttr_' + value.name)
-		return ' | '.join(comb)
 
 def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
 	items = sorted(items)
@@ -166,8 +156,16 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	return output
 
 def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix=''):
-	output = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
-	Regenerate(path, '//' + suffix, output)
+	if keywordList:
+		output = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
+		if len(output) > 1:
+			Regenerate(path, '//' + suffix, output)
+
+	output = BuildLexerConfigContent(rid)
+	if output:
+		suffix = (suffix + ' Settings').strip()
+		Regenerate(path, '//' + suffix, output)
+
 
 def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
@@ -2104,7 +2102,7 @@ def update_lexer_keyword_attr(path, indexPath, lexerPath):
 		tab_width = 4
 		max_width = 36
 		for index, attr, comment in nonzero:
-			expr = KeywordAttr.get_c_expr(attr)
+			expr = get_enum_flag_expr(attr)
 			line = f'attr[{index}] = {expr};'
 			if '|' in line:
 				padding = 1

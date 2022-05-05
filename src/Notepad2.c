@@ -2511,8 +2511,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_VIEW_SHOWEXCERPT, i);
 
-	EnableCmd(hmenu, IDM_EDIT_LINECOMMENT, bCurrentLexerHasLineComment);
-	EnableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, bCurrentLexerHasBlockComment);
+	EnableCmd(hmenu, IDM_EDIT_LINECOMMENT, !(pLexCurrent->lexerAttr & LexerAttr_NoLineComment));
+	EnableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, !(pLexCurrent->lexerAttr & LexerAttr_NoBlockComment));
 
 	EnableCmd(hmenu, IDM_EDIT_INSERT_ENCODING, *mEncoding[iCurrentEncoding].pszParseNames);
 

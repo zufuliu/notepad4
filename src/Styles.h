@@ -37,8 +37,6 @@ extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndGlobalStyle;
 extern int np2StyleTheme;
-extern BOOL bCurrentLexerHasLineComment;
-extern BOOL bCurrentLexerHasBlockComment;
 extern uint8_t currentLexKeywordAttr[KEYWORDSET_MAX + 1];
 
 void	Style_ReleaseResources(void);
@@ -112,50 +110,3 @@ void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle);
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags);
 void	Style_ConfigDlg(HWND hwnd);
 void	Style_SelectLexerDlg(HWND hwnd, BOOL favorite);
-
-static inline BOOL IsFoldIndentationBased(int iLexer) {
-	return iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_COFFEESCRIPT
-		|| iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_YAML;
-}
-
-// Python like indentation based code folding that can use SC_IV_LOOKFORWARD
-static inline BOOL IsPythonLikeFolding(int iLexer) {
-	return iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_COFFEESCRIPT
-		|| iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_YAML;
-}
-
-static inline BOOL DidLexerHasLineComment(int iLexer) {
-	return !(iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_DIFF
-		|| iLexer == SCLEX_MARKDOWN
-	);
-}
-
-static inline BOOL DidLexerHasBlockComment(int iLexer) {
-	return !(iLexer == SCLEX_NULL
-		|| iLexer == SCLEX_APDL
-		|| iLexer == SCLEX_AWK
-		|| iLexer == SCLEX_BASH
-		|| iLexer == SCLEX_BATCH
-		|| iLexer == SCLEX_CONF
-		|| iLexer == SCLEX_DIFF
-		|| iLexer == SCLEX_GN
-		|| iLexer == SCLEX_LLVM
-		|| iLexer == SCLEX_MAKEFILE
-		|| iLexer == SCLEX_PERL
-		|| iLexer == SCLEX_PROPERTIES
-		|| iLexer == SCLEX_PYTHON
-		|| iLexer == SCLEX_RUBY
-		|| iLexer == SCLEX_SMALI
-		|| iLexer == SCLEX_TEXINFO
-		|| iLexer == SCLEX_TOML
-		|| iLexer == SCLEX_VB
-		|| iLexer == SCLEX_VBSCRIPT
-		|| iLexer == SCLEX_VIM
-		|| iLexer == SCLEX_YAML
-	);
-}

@@ -13,8 +13,6 @@
 #define INDENT_WIDTH_2		2
 #define INDENT_WIDTH_MIN	0
 #define INDENT_WIDTH_MAX	256
-#define TAB_AS_TAB			0
-#define TAB_AS_SPACES		1
 
 #define MAX_EDITSTYLE_VALUE_SIZE	256
 #define MAX_EDITLEXER_EXT_SIZE		512
@@ -27,6 +25,19 @@ enum {
 	StyleTheme_Dark = 1,
 	StyleTheme_Max = StyleTheme_Dark,
 };
+
+enum {
+	LexerAttr_Default = 0,
+	LexerAttr_NoGlobalTabSettings = 1 << 0,
+	LexerAttr_TabAsSpaces = 1 << 1,
+	LexerAttr_NoLineComment = 1 << 2,
+	LexerAttr_NoBlockComment = 1 << 3,
+	LexerAttr_IndentBasedFolding = 1 << 4,
+	LexerAttr_IndentLookForward = 1 << 5,
+};
+
+#define LexerAttr_GetTabAsSpaces(attr)			(((attr) & LexerAttr_TabAsSpaces) >> 1)
+#define LexerAttr_GetGlobalTabSettings(attr)	(!((attr) & LexerAttr_NoGlobalTabSettings))
 
 typedef struct EDITSTYLE {
 	const int iStyle;
@@ -58,17 +69,16 @@ typedef struct KEYWORDLIST {
 typedef struct EDITLEXER {
 	const int iLexer;
 	const int rid;
-	// default Tab settings for this scheme.
+	// default settings for this scheme.
 	struct {
-		const unsigned char defaultTabWidth;
-		const unsigned char defaultIndentWidth;
-		const unsigned char defaultTabsAsSpaces;
-		const unsigned char defaultUseGlobalTabSettings;
+		const uint8_t lexerAttr;
+		const uint8_t defaultTabWidth;
+		const uint8_t defaultIndentWidth;
 	};
 	struct {
-		int iStyleTheme;
-		int bStyleChanged;
-		int bUseDefaultCodeStyle;
+		uint8_t iStyleTheme;
+		uint8_t bStyleChanged;
+		uint8_t bUseDefaultCodeStyle;
 		int iFavoriteOrder;
 		const unsigned int iStyleCount;
 		const int iNameLen;
