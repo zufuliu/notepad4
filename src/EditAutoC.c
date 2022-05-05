@@ -1196,7 +1196,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle
 
 	case SCLEX_CPP:
 		if (IsCppCommentStyle(iCurrentStyle) && np2_LexKeyword) {
-			if ((ch == '@' && (np2_LexKeyword == &kwJavaDoc || np2_LexKeyword == &kwPHPDoc || np2_LexKeyword == &kwDoxyDoc))
+			if ((ch == '@' && (np2_LexKeyword == &kwJavaDoc || np2_LexKeyword == &kwDoxyDoc))
 					|| (ch == '\\' && np2_LexKeyword == &kwDoxyDoc)
 					|| ((ch == '<' || chPrev == '<') && np2_LexKeyword == &kwNETDoc)) {
 				WordList_AddList(pWList, (*np2_LexKeyword)[0]);

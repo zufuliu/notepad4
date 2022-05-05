@@ -8,18 +8,6 @@ static NP2_KEYWORDS kwJavaDoc = {
 , NULL, NULL, NULL
 };
 
-// PHPDoc
-static NP2_KEYWORDS kwPHPDoc = {
-"abstract access api author category copyright deprecated example filesource final "
-"global id ignore inheritdoc internal license link method name package param "
-"property property-read property-write return see since source static staticvar "
-"subpackage toc todo throws tutorial type uses var version "
-, // pesudo type
-"resource mixed number callback void scalar "
-,
-"readonly", NULL
-};
-
 // C# Doc
 static NP2_KEYWORDS kwNETDoc = {
 "code example exception include inheritdoc list para param paramref permission remarks returns "
@@ -465,9 +453,6 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 	switch (pLexNew->rid) {
 	case NP2LEX_SCALA:
 		np2_LexKeyword = &kwJavaDoc;
-		return;
-	case NP2LEX_PHP:
-		np2_LexKeyword = &kwPHPDoc;
 		return;
 	case NP2LEX_FSHARP: // .NET Platform
 		//case NP2LEX_VB:
