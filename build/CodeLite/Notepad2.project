@@ -229,6 +229,7 @@
       <File Name="../../src/EditLexers/stlLLVM.c"/>
       <File Name="../../src/EditLexers/stlLua.c"/>
       <File Name="../../src/EditLexers/stlMake.c"/>
+      <File Name="../../src/EditLexers/stlMarkdown.c"/>
       <File Name="../../src/EditLexers/stlMATLAB.c"/>
       <File Name="../../src/EditLexers/stlNsis.c"/>
       <File Name="../../src/EditLexers/stlPascal.c"/>
@@ -246,6 +247,7 @@
       <File Name="../../src/EditLexers/stlSQL.c"/>
       <File Name="../../src/EditLexers/stlSwift.c"/>
       <File Name="../../src/EditLexers/stlTcl.c"/>
+      <File Name="../../src/EditLexers/stlTexinfo.c"/>
       <File Name="../../src/EditLexers/stlTOML.c"/>
       <File Name="../../src/EditLexers/stlTypeScript.c"/>
       <File Name="../../src/EditLexers/stlVB.c"/>

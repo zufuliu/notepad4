@@ -1152,6 +1152,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlLLVM.c" />
     <ClCompile Include="..\..\src\EditLexers\stlLua.c" />
     <ClCompile Include="..\..\src\EditLexers\stlMake.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlMarkdown.c" />
     <ClCompile Include="..\..\src\EditLexers\stlMATLAB.c" />
     <ClCompile Include="..\..\src\EditLexers\stlNsis.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPascal.c" />
@@ -1169,6 +1170,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlSQL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlSwift.c" />
     <ClCompile Include="..\..\src\EditLexers\stlTcl.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlTexinfo.c" />
     <ClCompile Include="..\..\src\EditLexers\stlTOML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlTypeScript.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVB.c" />

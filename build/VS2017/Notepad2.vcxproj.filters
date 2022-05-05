@@ -507,6 +507,9 @@
     <ClCompile Include="..\..\src\EditLexers\stlMake.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlMarkdown.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlMATLAB.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
@@ -556,6 +559,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlTcl.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlTexinfo.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlTOML.c">

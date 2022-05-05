@@ -32,7 +32,7 @@ def update_all_keyword():
 		('NP2LEX_JULIA', 'stlJulia.c', 'LexJulia.cxx', 'Julia.jl', 0, parse_julia_api_file),
 		('NP2LEX_LLVM', 'stlLLVM.c', 'LexLLVM.cxx', 'LLVM.ll', 0, parse_llvm_api_file),
 		('NP2LEX_LUA', 'stlLua.c', 'LexLua.cxx', 'Lua.lua', 0, parse_lua_api_file),
-		('NP2LEX_MARKDOWN', 'stlDefault.c', 'LexMarkdown.cxx', '', (0, 'markdown'), parse_markdown_api_file),
+		('NP2LEX_MARKDOWN', 'stlDefault.c', 'LexMarkdown.cxx', '', 0, parse_markdown_api_file),
 		('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
 		('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
 		('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
