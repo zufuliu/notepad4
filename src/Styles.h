@@ -39,7 +39,7 @@ extern BOOL bUse2ndGlobalStyle;
 extern int np2StyleTheme;
 extern BOOL bCurrentLexerHasLineComment;
 extern BOOL bCurrentLexerHasBlockComment;
-extern uint8_t currentLexKeywordAttr[NUMKEYWORD];
+extern uint8_t currentLexKeywordAttr[KEYWORDSET_MAX + 1];
 
 void	Style_ReleaseResources(void);
 void	Style_Load(void);

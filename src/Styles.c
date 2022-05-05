@@ -271,7 +271,7 @@ static WCHAR favoriteSchemesConfig[MAX_FAVORITE_SCHEMES_CONFIG_SIZE];
 static PEDITLEXER pLexGlobal = &lexGlobal;
 PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
-uint8_t currentLexKeywordAttr[NUMKEYWORD] = {0};
+uint8_t currentLexKeywordAttr[KEYWORDSET_MAX + 1] = {0};
 
 #define STYLESMODIFIED_NONE			0
 #define STYLESMODIFIED_SOME_STYLE	1

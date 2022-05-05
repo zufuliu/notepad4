@@ -1063,7 +1063,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	const int iLexer = pLexCurrent->iLexer;
 	if (iLexer != SCLEX_PHPSCRIPT) {
-		for (int i = 0; i < NUMKEYWORD; i++) {
+		for (int i = 0; i <= KEYWORDSET_MAX; i++) {
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
 			if (StrNotEmptyA(pKeywords) && !(currentLexKeywordAttr[i] & KeywordAttr_NoAutoComp)) {
 				WordList_AddListEx(pWList, pKeywords);
@@ -1106,7 +1106,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		pLex = &lexJavaScript;
 	}
 	if (pLex != NULL) {
-		for (int i = 0; i < NUMKEYWORD; i++) {
+		for (int i = 0; i <= KEYWORDSET_MAX; i++) {
 			const char *pKeywords = pLex->pKeyWords->pszKeyWords[i];
 			if (StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
@@ -1697,7 +1697,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	const int iLexer = pLexCurrent->iLexer;
 	if (chPrev >= 0x80	// someone's
 		|| (iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
-		|| (iLexer == SCLEX_JULIA && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
+		|| (iLexer == SCLEX_JULIA && (iCurrentStyle == SCE_JULIA_OPERATOR || iCurrentStyle == SCE_JULIA_OPERATOR2)) // transpose operator
 		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
 		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
 		|| (iLexer == SCLEX_PERL && iCurrentStyle == SCE_PL_OPERATOR && chPrev == '&') // SCE_PL_IDENTIFIER

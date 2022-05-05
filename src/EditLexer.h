@@ -5,8 +5,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#define	NUMKEYWORD				(KEYWORDSET_MAX + 1)
-
 #define TAB_WIDTH_4		4
 #define TAB_WIDTH_2		2
 #define TAB_WIDTH_MIN	1
@@ -54,7 +52,7 @@ typedef struct EDITSTYLE {
 #define KeywordAttr_NoAutoComp	4
 
 typedef struct KEYWORDLIST {
-	const char * const pszKeyWords[NUMKEYWORD];
+	const char * const pszKeyWords[KEYWORDSET_MAX + 1];
 } KEYWORDLIST, *PKEYWORDLIST;
 
 typedef struct EDITLEXER {
