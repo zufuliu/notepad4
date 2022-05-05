@@ -232,8 +232,8 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (!IsEOLChar(sc.chNext)) {
 					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_CSS_ESCAPECHAR);
+					sc.Forward();
 				}
-				sc.Forward();
 			} else if (sc.ch == ')' && sc.state == SCE_CSS_URL) {
 				sc.SetState(SCE_CSS_DEFAULT);
 			} else if ((sc.ch == '\'' && sc.state == SCE_CSS_STRING_SQ)

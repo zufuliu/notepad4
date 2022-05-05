@@ -1137,8 +1137,8 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					escSeq.numBase = 16;
 					escSeq.digitsLeft = IsHexDigit(sc.chNext) ? 6 : 1;
 					sc.SetState(css_style(SCE_CSS_ESCAPECHAR));
+					sc.Forward();
 				}
-				sc.Forward();
 			} else if (sc.ch == ')' && sc.state == css_style(SCE_CSS_URL)) {
 				sc.SetState(css_style(SCE_CSS_DEFAULT));
 			} else if ((sc.ch == '\'' && sc.state == css_style(SCE_CSS_STRING_SQ))

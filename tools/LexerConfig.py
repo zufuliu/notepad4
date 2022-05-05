@@ -7,15 +7,30 @@ def get_enum_flag_expr(flag, separator='_'):
 		return prefix + flag.name
 
 	comb = []
-	for value in cls.__members__.values():
+	values = cls.__members__.values()
+	for value in values:
 		if flag & value:
 			comb.append(prefix + value.name)
 	return ' | '.join(comb)
 
+def dump_enum_flag(cls, indent='', max_value=None, separator='_'):
+	prefix = cls.__name__ + separator
+	values = cls.__members__.values()
+	output = [f'{indent}enum {{']
+	for flag in values:
+		value = int(flag)
+		if not max_value or value < max_value:
+			if value:
+				assert value.bit_count() == 1
+				value = f'1 << {value.bit_length() - 1}'
+			output.append(f'{indent}\t{prefix}{flag.name} = {value},')
+	output.append(f'{indent}}};')
+	return output
+
 class LexerAttr(IntFlag):
 	Default = 0
-	NoGlobalTabSettings = 1 << 0
-	TabAsSpaces = 1 << 1
+	TabAsSpaces = 1 << 0
+	NoGlobalTabSettings = 1 << 1
 	NoLineComment = 1 << 2
 	NoBlockComment = 1 << 3
 	IndentBasedFolding = 1 << 4

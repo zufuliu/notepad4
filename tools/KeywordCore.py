@@ -166,6 +166,10 @@ def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix='')
 		suffix = (suffix + ' Settings').strip()
 		Regenerate(path, '//' + suffix, output)
 
+def UpdateLexerEnumFile(path):
+	output = dump_enum_flag(LexerAttr)
+	Regenerate(path, '//Lexer Enum', output)
+
 
 def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
