@@ -13,6 +13,13 @@ namespace Lexilla {
 class WordList final {
 public:
 	using range_t = unsigned int;
+	// see EditLexer.h
+	enum KeywordAttr {
+		KeywordAttr_Deafult = 0,
+		KeywordAttr_MakeLower = 1,
+		KeywordAttr_PreSorted = 2,
+	};
+
 private:
 	// Each word contains at least one character - a empty word acts as sentinel at the end.
 	char **words;
@@ -34,7 +41,7 @@ public:
 	}
 	range_t Length() const noexcept;
 	void Clear() noexcept;
-	bool Set(const char *s, bool toLower);
+	bool Set(const char *s, KeywordAttr attribute = KeywordAttr_Deafult);
 	bool InList(const char *s) const noexcept;
 	bool InListPrefixed(const char *s, char marker) const noexcept;
 	bool InListAbbreviated(const char *s, char marker) const noexcept;

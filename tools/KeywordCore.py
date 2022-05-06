@@ -25,14 +25,6 @@ JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
 GroovyKeyword = []
 
-# see EditLexer.h
-class KeywordAttr(IntFlag):
-	Default = 0
-	NoLexer = 1
-	MakeLower = 2
-	NoAutoComp = 4
-	Special = 256
-
 def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
 	items = sorted(items)
 	groups = {}
@@ -103,6 +95,9 @@ def RemoveDuplicateKeyword(keywordMap, orderedKeys):
 			unique |= items
 		keywordMap[key] = items
 
+def to_lower(items):
+	return [item.lower() for item in items]
+
 def build_enum_name(comment):
 	items = [item.replace('-', '') for item in comment.split()]
 	item = items[-1]
@@ -117,7 +112,7 @@ def build_enum_name(comment):
 
 def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	output = []
-	nonzero = []
+	attrList = []
 	indexList = LexerKeywordIndexList.setdefault(lexer, {})
 	prefix = lexer[3:-4] + 'KeywordIndex_'
 	for index, item in enumerate(keywordList):
@@ -133,11 +128,13 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 			output.append("")
 
 		indexName = build_enum_name(comment)
-		if not attr & KeywordAttr.NoLexer and  comment != 'unused':
+		# keyword index for lexer
+		if not (attr & KeywordAttr.NoLexer) and comment != 'unused':
 			if indexName in indexList:
 				assert index == indexList[indexName][0], (rid, lexer, comment)
 			else:
 				indexList[indexName] = (index, rid)
+		# keyword index for smart auto-completion
 		if attr & KeywordAttr.Special:
 			attr &= ~KeywordAttr.Special
 			indexName = prefix + indexName
@@ -145,29 +142,41 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 				assert index == SpecialKeywordIndexList[indexName], (rid, lexer, comment)
 			else:
 				SpecialKeywordIndexList[indexName] = index
+		# keyword attribute for lexer
+		if lines and not (attr & KeywordAttr.NoLexer):
+			attr |= KeywordAttr.PreSorted
+			if attr & KeywordAttr.MakeLower:
+				result = sorted(to_lower(items))
+				if set(result) == set(items):
+					attr &= ~KeywordAttr.MakeLower
+				if sorted(items) != sorted(result):
+					attr &= ~KeywordAttr.PreSorted
 		if attr != KeywordAttr.Default:
-			nonzero.append((index, attr, comment))
+			attrList.append((index, attr, comment))
 
 	count = keywordCount - len(keywordList)
 	if count:
 		output.append(", NULL" * count)
-	if nonzero:
-		AllKeywordAttrList[rid] = nonzero
-	return output
+	if attrList:
+		AllKeywordAttrList[rid] = attrList
+	return output, attrList
 
 def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix=''):
+	attrList = []
 	if keywordList:
-		output = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
+		output, attrList = BuildKeywordContent(rid, lexer, keywordList, keywordCount=keywordCount)
 		if len(output) > 1:
 			Regenerate(path, '//' + suffix, output)
 
-	output = BuildLexerConfigContent(rid)
+	output = BuildLexerConfigContent(rid, attrList)
 	if output:
 		suffix = (suffix + ' Settings').strip()
 		Regenerate(path, '//' + suffix, output)
 
 def UpdateLexerEnumFile(path):
-	output = dump_enum_flag(LexerAttr)
+	output = dump_enum_flag(LexerAttr, as_shift=True)
+	output.append('')
+	output.extend(dump_enum_flag(KeywordAttr, max_value=256))
 	Regenerate(path, '//Lexer Enum', output)
 
 
@@ -205,9 +214,6 @@ def read_file(path):
 def read_api_file(path, comment, commentKind=0):
 	doc = read_file(path)
 	return split_api_section(doc, comment, commentKind=commentKind)
-
-def to_lower(items):
-	return [item.lower() for item in items]
 
 def has_upper_char(s):
 	return any(ch.isupper() for ch in s)
@@ -619,6 +625,25 @@ def parse_cmake_api_file(path):
 		#('long variables', keywordMap['long variables'], KeywordAttr.NoLexer),
 		('long properties', [], KeywordAttr.NoLexer),
 		('long variables', [], KeywordAttr.NoLexer),
+	]
+
+def parse_cpp_api_file(path):
+	return [
+		('keywords', [], KeywordAttr.Default),
+		('type keyword', [], KeywordAttr.Default),
+		('preprocessor', [], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('directive', [], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attribute', [], KeywordAttr.Default),
+		('class', [], KeywordAttr.Default),
+		('interface', [], KeywordAttr.Default),
+		('enumeration', [], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('2nd keyword', [], KeywordAttr.Default),
+		('2nd type keyword', [], KeywordAttr.Default),
+		('asm intruction', [], KeywordAttr.NoAutoComp),
+		('asm register', [], KeywordAttr.NoAutoComp),
+		('function', [], KeywordAttr.NoLexer),
+		('C++ method', [], KeywordAttr.NoLexer),
 	]
 
 def parse_csharp_api_file(path):
@@ -1048,6 +1073,19 @@ def parse_haxe_api_file(path):
 		('metadata', [], KeywordAttr.Default),
 		('function', [], KeywordAttr.Default),
 		('comment tag', keywordMap['comment'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
+def parse_html_api_file(path):
+	return [
+		('tag', [], KeywordAttr.Special),
+		('JavaScript', [], KeywordAttr.NoAutoComp),
+		('VBScript', [], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp),
+		('Python', [], KeywordAttr.Default),
+		('PHP', [], KeywordAttr.Default),
+		('SGML', [], KeywordAttr.Default),
+		('attribute', [], KeywordAttr.Special),
+		('event handler', [], KeywordAttr.Special),
+		('value', [], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
 def parse_inno_setup_api_file(path):
@@ -1627,7 +1665,7 @@ def parse_python_api_file(path):
 			if key == 'api':
 				keywordMap['classes'].extend(items)
 			else:
-				keywordMap['types'] =  items
+				keywordMap['types'] = items
 			items = re.findall(r'exception\s+(\w+)', doc)
 			keywordMap['classes'].extend(items)
 			items = re.findall(r'(\w+)\(', doc)
@@ -1749,6 +1787,13 @@ def parse_rebol_api_file(pathList):
 		('directive', keywordMap['directive'], KeywordAttr.Special),
 		('datatype', keywordMap['datatypes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
+	]
+
+def parse_resource_script_api_file(path):
+	return [
+		('keywords', [], KeywordAttr.Default),
+		('type keyword', [], KeywordAttr.Default),
+		('preprocessor', [], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_ruby_api_file(path):
@@ -1891,6 +1936,21 @@ def parse_rust_api_file(path):
 		('macro', keywordMap['macros'], KeywordAttr.NoLexer),
 		('module', keywordMap['modules'], KeywordAttr.NoLexer),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+
+def parse_smali_api_file(path):
+	return [
+		('keywords', [], KeywordAttr.Default),
+		('type keyword', [], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('unused', [], KeywordAttr.Default),
+		('constant', [], KeywordAttr.Default),
+		('directive', [], KeywordAttr.Special),
+		('instruction', [], KeywordAttr.Default),
 	]
 
 def parse_sql_api_files(pathList):
@@ -2039,6 +2099,16 @@ def parse_vim_api_file(path):
 		('commands', keywordMap['commands'], KeywordAttr.Default),
 	]
 
+def parse_visual_basic_api_file(path):
+	return [
+		('keywords', [], KeywordAttr.MakeLower),
+		('type keyword', [], KeywordAttr.MakeLower),
+		('demoted keyword', [], KeywordAttr.MakeLower),
+		('preprocessor', [], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attribute', [], KeywordAttr.MakeLower),
+		('constant', [], KeywordAttr.MakeLower),
+	]
+
 def parse_wasm_lexer_keywords(path):
 	if not os.path.isfile(path):
 		AllKeywordAttrList['NP2LEX_WASM'] = [(3, KeywordAttr.NoLexer, 'full instruction')]
@@ -2098,26 +2168,20 @@ def parse_wasm_lexer_keywords(path):
 		('full instruction', keywordMap['full instruction'], KeywordAttr.NoLexer),
 	]
 
-# Style_UpdateLexerKeywordAttr()
-def update_lexer_keyword_attr(path, indexPath, lexerPath):
-	output = []
-	for rid, nonzero in sorted(AllKeywordAttrList.items()):
-		output.append(f'\tcase {rid}:')
-		tab_width = 4
-		max_width = 36
-		for index, attr, comment in nonzero:
-			expr = get_enum_flag_expr(attr)
-			line = f'attr[{index}] = {expr};'
-			if '|' in line:
-				padding = 1
-			else:
-				padding = (max_width - len(line) + tab_width - 1) // tab_width
-			padding = '\t'*padding
-			output.append(f'\t\t{line}{padding}// {comment}')
-		output.append('\t\tbreak;')
+def parse_xml_api_file(path):
+	return [
+		('tag', [], KeywordAttr.Default),
+		('JavaScript', [], KeywordAttr.Default),
+		('VBScript', [], KeywordAttr.Default),
+		('Python', [], KeywordAttr.Default),
+		('PHP', [], KeywordAttr.Default),
+		('SGML', [], KeywordAttr.Default),
+		('attribute', [], KeywordAttr.NoLexer),
+		('event handler', [], KeywordAttr.Default),
+		('value', [], KeywordAttr.NoLexer),
+	]
 
-	Regenerate(path, '//', output)
-
+def update_lexer_keyword_attr(indexPath, lexerPath):
 	#print(SinglyWordMap)
 	output = []
 	if AllKeywordAttrList:

@@ -17,6 +17,7 @@ lexerList = [
 	('NP2LEX_BATCH', 'stlBatch.c', 'LexBatch.cxx', 'Batch.bat', 0, parse_batch_api_file),
 
 	('NP2LEX_CMAKE', 'stlCMake.c', 'LexCMake.cxx', 'CMake.cmake', 0, parse_cmake_api_file),
+	('NP2LEX_CPP', 'stlCPP.c', 'LexCPP.cxx', ['CPP.cpp', 'C.c', 'POSIX.c'], 1, parse_cpp_api_file),
 	('NP2LEX_CSHARP', 'stlCSharp.c', 'LexCSharp.cxx', 'CSharp.cs', 1, parse_csharp_api_file),
 	('NP2LEX_CONF', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 
@@ -31,7 +32,7 @@ lexerList = [
 	('NP2LEX_GO', 'stlGO.c', 'LexGo.cxx', 'Go.go', 0, parse_go_api_file),
 
 	('NP2LEX_HAXE', 'stlHaxe.c', 'LexHaxe.cxx', 'Haxe.hx', 1, parse_haxe_api_file),
-	('NP2LEX_HTML', 'stlHTML.c', 'LexHTML.cxx', 'html.html', 1, None),
+	('NP2LEX_HTML', 'stlHTML.c', 'LexHTML.cxx', 'html.html', 1, parse_html_api_file),
 
 	('NP2LEX_INI', 'stlDefault.c', 'LexProps.cxx', '', (0, 'Ini'), None),
 	('NP2LEX_INNO', 'stlInno.c', 'LexInno.cxx', 'InnoSetup.iss', 0, parse_inno_setup_api_file),
@@ -59,11 +60,12 @@ lexerList = [
 	('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
 
 	('NP2LEX_R', 'stlR.c', 'LexR.cxx', 'R.r', 0, parse_r_api_file),
+	('NP2LEX_RC', 'stlResource.c', 'LexCPP.cxx', '', 0, parse_resource_script_api_file),
 	('NP2LEX_REBOL', 'stlRebol.c', 'LexRebol.cxx', ['Rebol.r', 'Red.red'], 1, parse_rebol_api_file),
 	('NP2LEX_RUBY', 'stlRuby.c', 'LexRuby.cxx', 'Ruby.rb', 0, parse_ruby_api_file),
 	('NP2LEX_RUST', 'stlRust.c', 'LexRust.cxx', 'Rust.rs', 0, parse_rust_api_file),
 
-	('NP2LEX_SMALI', 'stlSmali.c', 'LexSmali.cxx', '', 0, None),
+	('NP2LEX_SMALI', 'stlSmali.c', 'LexSmali.cxx', '', 0, parse_smali_api_file),
 	# TODO: SQL Dialect, https://github.com/zufuliu/notepad2/issues/31
 	('NP2LEX_SQL', 'stlSQL.c', 'LexSQL.cxx', [
 							'MySQL.sql',
@@ -78,13 +80,13 @@ lexerList = [
 	('NP2LEX_TEXINFO', 'stlTexinfo.c', 'LexTexinfo.cxx', '', 0, None),
 	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, None),
 
-	('NP2LEX_VB', 'stlVB.c', 'LexVB.cxx', '', 0, None),
-	('NP2LEX_VBS', 'stlVBS.c', 'LexVB.cxx', '', 0, None),
+	('NP2LEX_VB', 'stlVB.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
+	('NP2LEX_VBS', 'stlVBS.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
 	('NP2LEX_VIM', 'stlVim.c', 'LexVim.cxx', 'Vim.vim', 0, parse_vim_api_file),
 
 	# https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt
 	('NP2LEX_WASM', 'stlWASM.c', 'LexWASM.cxx', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),
-
+	('NP2LEX_XML', 'stlXML.c', 'LexHTML.cxx', '', 0, parse_xml_api_file),
 	('NP2LEX_YAML', 'stlYAML.c', 'LexYAML.cxx', '', 0, None),
 ]
 
@@ -118,7 +120,7 @@ def update_all_keyword():
 	missing = set(LexerConfigMap.keys()) - handled
 	if missing:
 		print('missing lexer config:', ', '.join(sorted(missing)))
-	update_lexer_keyword_attr('../src/Styles.c', '../src/EditAutoC.c', '../scintilla/lexers/')
+	update_lexer_keyword_attr('../src/EditAutoC.c', '../scintilla/lexers/')
 
 update_all_keyword()
 UpdateLexerEnumFile('../src/EditLexer.h')

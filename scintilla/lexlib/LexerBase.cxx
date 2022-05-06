@@ -72,9 +72,9 @@ const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
 	return "";
 }
 
-Sci_Position SCI_METHOD LexerBase::WordListSet(int n, bool toLower, const char *wl) {
+Sci_Position SCI_METHOD LexerBase::WordListSet(int n, int attribute, const char *wl) {
 	if (n < KEYWORDSET_MAX) {
-		if (keywordLists[n]->Set(wl, toLower)) {
+		if (keywordLists[n]->Set(wl, static_cast<WordList::KeywordAttr>(attribute))) {
 			return 0;
 		}
 	}

@@ -37,7 +37,6 @@ extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern BOOL bUse2ndGlobalStyle;
 extern int np2StyleTheme;
-extern uint8_t currentLexKeywordAttr[KEYWORDSET_MAX + 1];
 
 void	Style_ReleaseResources(void);
 void	Style_Load(void);
@@ -63,7 +62,6 @@ int		Style_GetMatchLexerIndex(int rid);
 
 int		Style_GetDocTypeLanguage(void);
 void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);
-void	Style_UpdateLexerKeywordAttr(LPCEDITLEXER pLexNew);
 LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName);
 void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);

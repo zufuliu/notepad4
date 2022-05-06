@@ -596,7 +596,7 @@ public:
 	void SetLexer(int language); //! removed in Scintilla 5
 
 	const char *DescribeWordListSets() const noexcept;
-	void SetWordList(int n, bool toLower, const char *wl);
+	void SetWordList(int n, int attribute, const char *wl);
 
 	int GetIdentifier() const noexcept;
 	const char *GetName() const noexcept;
@@ -661,9 +661,9 @@ const char *LexState::DescribeWordListSets() const noexcept {
 	}
 }
 
-void LexState::SetWordList(int n, bool toLower, const char *wl) {
+void LexState::SetWordList(int n, int attribute, const char *wl) {
 	if (instance) {
-		const Sci_Position firstModification = instance->WordListSet(n, toLower, wl);
+		const Sci_Position firstModification = instance->WordListSet(n, attribute, wl);
 		if (firstModification >= 0) {
 			pdoc->ModifiedAt(firstModification);
 		}
@@ -1123,8 +1123,8 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return DocumentLexState()->PropGetInt(ConstCharPtrFromUPtr(wParam), static_cast<int>(lParam));
 
 	case Message::SetKeyWords:
-		DocumentLexState()->SetWordList(static_cast<int>(wParam & KEYWORDSET_INDEXMASK),
-			(wParam & KEYWORDSET_TOLOWER) != 0, ConstCharPtrFromSPtr(lParam));
+		DocumentLexState()->SetWordList(wParam & 0xff,
+			static_cast<int>(wParam >> 8), ConstCharPtrFromSPtr(lParam));
 		break;
 
 	case Message::GetLexerLanguage:

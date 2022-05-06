@@ -1,6 +1,6 @@
 from enum import IntFlag
 
-def get_enum_flag_expr(flag, separator='_'):
+def get_enum_flag_expr(flag, merge=True, separator='_'):
 	cls = flag.__class__
 	prefix = cls.__name__ + separator
 	if flag.name:
@@ -11,17 +11,17 @@ def get_enum_flag_expr(flag, separator='_'):
 	for value in values:
 		if flag & value:
 			comb.append(prefix + value.name)
-	return ' | '.join(comb)
+	return ' | '.join(comb) if merge else comb
 
-def dump_enum_flag(cls, indent='', max_value=None, separator='_'):
+def dump_enum_flag(cls, indent='', max_value=None, as_shift=False, separator='_'):
 	prefix = cls.__name__ + separator
 	values = cls.__members__.values()
 	output = [f'{indent}enum {{']
 	for flag in values:
 		value = int(flag)
 		if not max_value or value < max_value:
-			if value:
-				assert value.bit_count() == 1
+			if value and as_shift:
+				assert value.bit_count() == 1, flag
 				value = f'1 << {value.bit_length() - 1}'
 			output.append(f'{indent}\t{prefix}{flag.name} = {value},')
 	output.append(f'{indent}}};')
@@ -35,6 +35,14 @@ class LexerAttr(IntFlag):
 	NoBlockComment = 1 << 3
 	IndentBasedFolding = 1 << 4
 	IndentLookForward = 1 << 5
+
+class KeywordAttr(IntFlag):
+	Default = 0
+	MakeLower = 1
+	PreSorted = 2
+	NoLexer = 4
+	NoAutoComp = 8
+	Special = 256
 
 TabSettings_Default = {
 	'tab_width': 4,
@@ -177,9 +185,9 @@ LexerConfigMap = {
 	},
 }
 
-def BuildLexerConfigContent(rid):
+def BuildLexerConfigContent(rid, keywordAttr):
 	config = LexerConfigMap.get(rid, {})
-	if rid and not config:
+	if rid and not (config or keywordAttr):
 		return []
 
 	tab_settings = config.get('tab_settings', TabSettings_Default)
@@ -201,11 +209,27 @@ def BuildLexerConfigContent(rid):
 	output = ['\t{']
 	indent = '\t\t'
 
-	expr = get_enum_flag_expr(flag)
-	output.append(f'{indent}{expr},')
+	expr = get_enum_flag_expr(flag, merge=False)
+	if isinstance(expr, str):
+		output.append(f'{indent}{expr},')
+	else:
+		output.extend(f'{indent}{item} |' for item in expr)
+		output[-1] = output[-1][:-2] + ','
+
 	output.append(f"{indent}TAB_WIDTH_{tab_settings['tab_width']}, INDENT_WIDTH_{tab_settings['indent_width']},")
 
-	output[-1] = output[-1][:-1] # remove extra comma
+	if keywordAttr:
+		output[-1] = output[-1][:-1] # remove extra comma
+		prefix = ','
+		for index, attr, comment in keywordAttr:
+			expr = get_enum_flag_expr(attr)
+			bit = 64 if index > 7 else 32
+			output.append(f'{indent}{prefix} KeywordAttr{bit}({index}, {expr}) // {comment}')
+			prefix = '|'
+	else:
+		expr = get_enum_flag_expr(KeywordAttr.Default)
+		output.append(indent + expr)
+
 	if rid:
 		output.append('\t},')
 	else:
