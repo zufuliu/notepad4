@@ -1360,6 +1360,12 @@ def parse_javascript_api_file(path):
 		('JSDoc', keywordMap['jsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
+def parse_json_api_file(path):
+	keywords = 'Infinity NaN false null true'.split()
+	return [
+		('keywords', keywords, KeywordAttr.Default),
+	]
+
 def parse_julia_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}

@@ -51,7 +51,9 @@ EDITLEXER lexCoffeeScript = {
 	{
 		LexerAttr_IndentBasedFolding |
 		LexerAttr_IndentLookForward,
-		TAB_WIDTH_4, INDENT_WIDTH_4
+		TAB_WIDTH_4, INDENT_WIDTH_4,
+		(1 << 1) | (1 << 2), // class, function
+		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // reserved words
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // directive

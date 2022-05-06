@@ -79,6 +79,8 @@ typedef struct EDITLEXER {
 		const uint8_t lexerAttr;
 		const uint8_t defaultTabWidth;
 		const uint8_t defaultIndentWidth;
+		const uint8_t defaultFoldLevelMask;
+		const uint8_t defaultFoldIgnoreInner;
 		const uint64_t keywordAttr;
 	};
 	struct {

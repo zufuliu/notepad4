@@ -17,9 +17,9 @@ lexerList = [
 	('NP2LEX_BATCH', 'stlBatch.c', 'LexBatch.cxx', 'Batch.bat', 0, parse_batch_api_file),
 
 	('NP2LEX_CMAKE', 'stlCMake.c', 'LexCMake.cxx', 'CMake.cmake', 0, parse_cmake_api_file),
+	('NP2LEX_CONF', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 	('NP2LEX_CPP', 'stlCPP.c', 'LexCPP.cxx', ['CPP.cpp', 'C.c', 'POSIX.c'], 1, parse_cpp_api_file),
 	('NP2LEX_CSHARP', 'stlCSharp.c', 'LexCSharp.cxx', 'CSharp.cs', 1, parse_csharp_api_file),
-	('NP2LEX_CONF', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 
 	('NP2LEX_D', 'stlD.c', 'LexD.cxx', 'D.d', 1, parse_dlang_api_file),
 	('NP2LEX_DART', 'stlDart.c', 'LexDart.cxx', 'Dart.dart', 0, parse_dart_api_file),
@@ -45,6 +45,7 @@ lexerList = [
 	('NP2LEX_JAVASCRIPT', 'stlJavaScript.c', 'LexJavaScript.cxx', 'JavaScript.js', 1, parse_javascript_api_file),
 		('NP2LEX_COFFEESCRIPT', 'stlCoffeeScript.c', 'LexCoffeeScript.cxx', 'CoffeeScript.coffee', 0, parse_coffeescript_api_file),
 		('NP2LEX_TYPESCRIPT', 'stlTypeScript.c', 'LexJavaScript.cxx', 'TypeScript.ts', 1, parse_typescript_api_file),
+	('NP2LEX_JSON', 'stlJSON.c', 'LexJSON.cxx', '', 0, parse_json_api_file),
 	('NP2LEX_JULIA', 'stlJulia.c', 'LexJulia.cxx', 'Julia.jl', 0, parse_julia_api_file),
 
 	('NP2LEX_LLVM', 'stlLLVM.c', 'LexLLVM.cxx', 'LLVM.ll', 0, parse_llvm_api_file),
@@ -65,6 +66,7 @@ lexerList = [
 	('NP2LEX_RUBY', 'stlRuby.c', 'LexRuby.cxx', 'Ruby.rb', 0, parse_ruby_api_file),
 	('NP2LEX_RUST', 'stlRust.c', 'LexRust.cxx', 'Rust.rs', 0, parse_rust_api_file),
 
+	('NP2LEX_SCALA', 'stlScala.c', 'LexCPP.cxx', '', 1, None),
 	('NP2LEX_SMALI', 'stlSmali.c', 'LexSmali.cxx', '', 0, parse_smali_api_file),
 	# TODO: SQL Dialect, https://github.com/zufuliu/notepad2/issues/31
 	('NP2LEX_SQL', 'stlSQL.c', 'LexSQL.cxx', [
@@ -117,9 +119,11 @@ def update_all_keyword():
 		UpdateKeywordFile(rid, output, lexer, keywordList, numKeyword - num, suffix)
 
 	UpdateKeywordFile('', '../src/EditLexers/EditStyleX.h', '', [], numKeyword, 'Scheme Default')
-	missing = set(LexerConfigMap.keys()) - handled
-	if missing:
+	config = set(LexerConfigMap.keys())
+	if missing := config - handled:
 		print('missing lexer config:', ', '.join(sorted(missing)))
+	if missing := handled - config:
+		print('default lexer config:', ', '.join(sorted(missing)))
 	update_lexer_keyword_attr('../src/EditAutoC.c', '../scintilla/lexers/')
 
 update_all_keyword()

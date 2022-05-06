@@ -7836,109 +7836,6 @@ static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
 	++levelStack->levelCount;
 }
 
-static UINT Style_GetDefaultFoldLevel(int iLexer, int rid, int *ignoreInner) {
-	switch (iLexer) {
-	case SCLEX_NULL:
-	case SCLEX_COFFEESCRIPT: // class, function
-		return (1 << 1) | (1 << 2);
-
-	case SCLEX_ASYMPTOTE: // struct, function
-		*ignoreInner = SCE_ASY_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_AWK: // namespace, function
-		*ignoreInner = SCE_AWK_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_CPP:
-		switch (rid) {
-		case NP2LEX_CPP: // preprocessor, namespace, class, method
-			return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
-
-		case NP2LEX_SCALA: // class, inner class, method
-			return (1 << 0) | (1 << 1) | (1 << 2);
-		}
-		break;
-
-	case SCLEX_CSHARP: // namespace, class, method
-		*ignoreInner = SCE_CSHARP_FUNCTION_DEFINITION;
-		return (1 << 0) | (1 << 1) | (1 << 2);
-
-	case SCLEX_D: // class, function
-		*ignoreInner = SCE_D_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_DART: // class, method
-		*ignoreInner = SCE_DART_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_DIFF: // file, diff in file
-		return (1 << 0) | (1 << 2);
-
-	case SCLEX_GO: // struct, function
-		*ignoreInner = SCE_GO_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_GROOVY: // class, method
-		*ignoreInner = SCE_GROOVY_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_HAXE: // class, method
-		*ignoreInner = SCE_HAXE_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_HTML:
-	case SCLEX_JSON:
-	case SCLEX_XML:
-		return (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
-
-	case SCLEX_JAVA: // class, inner class, method
-		*ignoreInner = SCE_JAVA_FUNCTION_DEFINITION;
-		return (1 << 0) | (1 << 1) | (1 << 2);
-
-	case SCLEX_JAVASCRIPT: // object, anonymous object, function
-		*ignoreInner = SCE_JS_FUNCTION_DEFINITION;
-		return (1 << 0) | (1 << 1) | (1 << 2);
-
-	case SCLEX_JULIA: // struct, function
-		*ignoreInner = SCE_JULIA_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_KOTLIN: // class, inner class, method
-		*ignoreInner = SCE_KOTLIN_FUNCTION_DEFINITION;
-		return (1 << 0) | (1 << 1) | (1 << 2);
-
-	case SCLEX_PROPERTIES: // section
-	case SCLEX_TOML: // table
-		return (1 << 0);
-
-	case SCLEX_PHPSCRIPT: // php tag, class, function
-		*ignoreInner = SCE_PHP_FUNCTION_DEFINITION;
-		return (1 << 1) | (1 << 2);
-
-	case SCLEX_PYTHON: // class, function
-		*ignoreInner = SCE_PY_FUNCTION_DEFINITION;
-		return (1 << 1) | (1 << 2);
-
-	case SCLEX_RUBY: // module, class, method
-		*ignoreInner = SCE_RB_DEF_NAME;
-		return (1 << 0) | (1 << 1) | (1 << 2);
-
-	case SCLEX_RUST: // struct, function
-		*ignoreInner = SCE_RUST_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_SWIFT: // class, function
-		*ignoreInner = SCE_SWIFT_FUNCTION_DEFINITION;
-		break;
-
-	case SCLEX_YAML:
-		return (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4);
-	}
-
-	return (1 << 0) | (1 << 1);
-}
-
 static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) {
 	const BOOL fExpanded = SciCall_GetFoldExpanded(line);
 	FOLD_ACTION action = *pAction;
@@ -8109,8 +8006,8 @@ void FoldToggleCurrentLevel(FOLD_ACTION action) {
 
 void FoldToggleDefault(FOLD_ACTION action) {
 	SciCall_ColouriseAll();
-	int ignoreInner = 0;
-	const UINT levelMask = Style_GetDefaultFoldLevel(pLexCurrent->iLexer, pLexCurrent->rid, &ignoreInner);
+	const int ignoreInner = pLexCurrent->defaultFoldIgnoreInner;
+	const UINT levelMask = pLexCurrent->defaultFoldLevelMask;
 	const int maxLevel = np2_bsr(levelMask);
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
