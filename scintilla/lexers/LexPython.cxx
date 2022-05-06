@@ -380,6 +380,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	KeywordType kwType = KeywordType::None;
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int operatorBefore = 0;
 	int prevIndentCount = 0;
 	int indentCount = 0;
 	int parenCount = 0;
@@ -529,7 +530,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						if (!nestedState.empty() && nestedState.back().state == sc.state) {
 							nestedState.pop_back();
 						}
-						if ((sc.state == SCE_PY_STRING_SQ || sc.state == SCE_PY_STRING_DQ)) {
+						if (operatorBefore != '=' && (sc.state == SCE_PY_STRING_SQ || sc.state == SCE_PY_STRING_DQ)) {
 							// dict string key
 							const int chNext = sc.GetLineNextChar();
 							if (chNext == ':') {
@@ -779,6 +780,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_PY_OPERATOR);
 				}
 			} else if (isoperator(sc.ch)) {
+				operatorBefore = sc.ch;
 				const bool interpolating = !nestedState.empty();
 				int braceCount = 0;
 				if (sc.ch == '{' || sc.ch == '[' || sc.ch == '(') {
