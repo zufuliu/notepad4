@@ -147,6 +147,7 @@ static EDITSTYLE Styles_JS[] = {
 	{ MULTI_STYLE(SCE_JS_STRING_SQ, SCE_JS_STRING_DQ, SCE_JSX_STRING_SQ, SCE_JSX_STRING_DQ), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_JS_STRING_BT, NP2StyleX_TemplateLiteral, L"fore:#F08000" },
 	{ SCE_JS_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_JS_KEY, NP2StyleX_Property, L"fore:#A46000" },
 	{ SCE_JS_REGEX, NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8" },
 	{ SCE_JSX_TAG, NP2StyleX_XMLTag, L"fore:#648000" },
 	{ MULTI_STYLE(SCE_JSX_ATTRIBUTE, SCE_JSX_ATTRIBUTE_AT, 0, 0), NP2StyleX_XMLAttribute, L"fore:#FF4000" },

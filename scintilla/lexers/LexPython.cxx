@@ -529,6 +529,13 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						if (!nestedState.empty() && nestedState.back().state == sc.state) {
 							nestedState.pop_back();
 						}
+						if ((sc.state == SCE_PY_STRING_SQ || sc.state == SCE_PY_STRING_DQ)) {
+							// dict string key
+							const int chNext = sc.GetLineNextChar();
+							if (chNext == ':') {
+								sc.ChangeState(SCE_PY_KEY);
+							}
+						}
 						sc.SetState(SCE_PY_DEFAULT);
 					}
 				}

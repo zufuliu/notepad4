@@ -288,7 +288,15 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if ((sc.ch == '\'' && (sc.state == SCE_JS_STRING_SQ || sc.state == SCE_JSX_STRING_SQ))
 				|| (sc.ch == '"' && (sc.state == SCE_JS_STRING_DQ || sc.state == SCE_JSX_STRING_DQ))) {
 				sc.Forward();
-				sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+				const bool jsx = (sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ);
+				if (!jsx) {
+					// json key
+					const int chNext = sc.GetLineNextChar();
+					if (chNext == ':') {
+						sc.ChangeState(SCE_JS_KEY);
+					}
+				}
+				sc.SetState(jsx ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
 				continue;
 			}
 			break;

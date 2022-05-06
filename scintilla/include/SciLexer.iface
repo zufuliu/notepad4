@@ -197,6 +197,7 @@ val SCE_PY_ESCAPECHAR=19
 val SCE_PY_FORMAT_SPECIFIER=20
 val SCE_PY_PLACEHOLDER=21
 val SCE_PY_DOLLAR_PLACEHOLDER=22
+val SCE_PY_KEY=
 # string and bytes: even=single quoted, odd=double quoted
 # triple: (state % 4)>=2, raw: (state % 8)>=4
 val SCE_PY_STRING_SQ=40
@@ -2789,7 +2790,8 @@ val SCE_JS_CLASS=40
 val SCE_JS_INTERFACE=41
 val SCE_JS_ENUM=42
 val SCE_JS_CONSTANT=43
-val SCE_JS_LABEL=44
+val SCE_JS_KEY=
+val SCE_JS_LABEL=
 # Lexical states for SCLEX_JAVA
 lex Java=SCLEX_JAVA SCE_JAVA_
 val SCE_JAVA_DEFAULT=0

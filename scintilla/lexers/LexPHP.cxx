@@ -733,7 +733,13 @@ void PHPLexer::HighlightJsInnerString() {
 				sc.SetState(js_style(SCE_JS_DEFAULT));
 			}
 		} else if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
-			sc.ForwardSetState(js_style(SCE_JS_DEFAULT));
+			sc.Forward();
+			// json key
+			const int chNext = sc.GetLineNextChar();
+			if (chNext == ':') {
+				sc.ChangeState(js_style(SCE_JS_KEY));
+			}
+			sc.SetState(js_style(SCE_JS_DEFAULT));
 		}
 	}
 }
