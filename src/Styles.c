@@ -651,25 +651,24 @@ static inline void SaveLexTabSettings(IniSectionOnSave *pIniSection, PEDITLEXER 
 }
 
 static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIniSectionBuf, int cchIniSection) {
+	pLex->iStyleTheme = (uint8_t)np2StyleTheme;
 	LPCWSTR themePath = GetStyleThemeFilePath();
 	GetPrivateProfileSection(pLex->pszName, pIniSectionBuf, cchIniSection, themePath);
 
 	const UINT iStyleCount = pLex->iStyleCount;
-	LPWSTR szStyleBuf = pLex->szStyleBuf;
-	if (szStyleBuf == NULL) {
-		szStyleBuf = (LPWSTR)NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
-		pLex->szStyleBuf = szStyleBuf;
+	LPWSTR szValue = pLex->szStyleBuf;
+	if (szValue == NULL) {
+		szValue = (LPWSTR)NP2HeapAlloc(EDITSTYLE_BufferSize(iStyleCount));
+		pLex->szStyleBuf = szValue;
 	}
 	if (!IniSectionParse(pIniSection, pIniSectionBuf)) {
-		for (UINT i = 0; i < iStyleCount; i++) {
-			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
+		for (UINT i = 0; i < iStyleCount; szValue += MAX_EDITSTYLE_VALUE_SIZE, i++) {
 			pLex->Styles[i].szValue = szValue;
 			lstrcpy(szValue, pLex->Styles[i].pszDefault);
 		}
 	} else {
 		pLex->bUseDefaultCodeStyle = (uint8_t)IniSectionGetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
-		for (UINT i = 0; i < iStyleCount; i++) {
-			LPWSTR szValue = szStyleBuf + (i * MAX_EDITSTYLE_VALUE_SIZE);
+		for (UINT i = 0; i < iStyleCount; szValue += MAX_EDITSTYLE_VALUE_SIZE, i++) {
 			pLex->Styles[i].szValue = szValue;
 			LPCWSTR value = IniSectionGetValueImpl(pIniSection, pLex->Styles[i].pszName, pLex->Styles[i].iNameLen);
 			if (value != NULL) {
@@ -679,8 +678,6 @@ static void Style_LoadOneEx(PEDITLEXER pLex, IniSection *pIniSection, WCHAR *pIn
 			}
 		}
 	}
-
-	pLex->iStyleTheme = (uint8_t)np2StyleTheme;
 }
 
 void Style_SetFavoriteSchemes(void) {
