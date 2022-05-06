@@ -137,11 +137,11 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		# keyword index for smart auto-completion
 		if attr & KeywordAttr.Special:
 			attr &= ~KeywordAttr.Special
-			indexName = prefix + indexName
-			if indexName in SpecialKeywordIndexList:
-				assert index == SpecialKeywordIndexList[indexName], (rid, lexer, comment)
+			group = SpecialKeywordIndexList.setdefault(prefix, {})
+			if indexName in group:
+				assert index == group[indexName], (rid, lexer, comment)
 			else:
-				SpecialKeywordIndexList[indexName] = index
+				group[indexName] = index
 		# keyword attribute for lexer
 		if lines and not (attr & KeywordAttr.NoLexer):
 			attr |= KeywordAttr.PreSorted
@@ -2192,7 +2192,9 @@ def update_lexer_keyword_attr(indexPath, lexerPath):
 	output = []
 	if AllKeywordAttrList:
 		output.append('enum {')
-		output.extend(f'\t{key} = {value},' for key, value in sorted(SpecialKeywordIndexList.items()))
+		for prefix, group in sorted(SpecialKeywordIndexList.items()):
+			items = sorted(group.items(), key=lambda m: m[1])
+			output.extend(f'\t{prefix}{key} = {value},' for key, value in items)
 		output.append('};')
 	Regenerate(indexPath, '//KeywordIndex', output)
 
