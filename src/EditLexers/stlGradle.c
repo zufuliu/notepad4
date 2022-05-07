@@ -146,7 +146,7 @@ EDITLEXER lexGradle = {
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // class
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // interface
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // enumeration
-		| KeywordAttr32(7, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // annotation
+		| KeywordAttr64(7, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // annotation
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // function
 		| KeywordAttr64(9, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // GroovyDoc
 	},

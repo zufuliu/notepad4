@@ -449,7 +449,7 @@ EDITLEXER lexPHP = {
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // predefined variable
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // magic constant
 		| KeywordAttr32(6, KeywordAttr_MakeLower) // magic method
-		| KeywordAttr32(7, KeywordAttr_NoLexer) // constant
+		| KeywordAttr64(7, KeywordAttr_NoLexer) // constant
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // function
 		| KeywordAttr64(9, KeywordAttr_NoLexer) // misc
 		| KeywordAttr64(10, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // JavaScript

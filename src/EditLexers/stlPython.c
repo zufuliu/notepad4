@@ -375,7 +375,7 @@ EDITLEXER lexPython = {
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // attribute
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // special method
 		| KeywordAttr32(6, KeywordAttr_PreSorted) // class
-		| KeywordAttr32(7, KeywordAttr_NoLexer) // decorator
+		| KeywordAttr64(7, KeywordAttr_NoLexer) // decorator
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // module
 		| KeywordAttr64(9, KeywordAttr_NoLexer) // function
 		| KeywordAttr64(10, KeywordAttr_NoLexer) // field

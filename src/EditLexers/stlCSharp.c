@@ -144,7 +144,7 @@ EDITLEXER lexCSharp = {
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // attributes
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // class
 		| KeywordAttr32(6, KeywordAttr_PreSorted) // struct
-		| KeywordAttr32(7, KeywordAttr_PreSorted) // interface
+		| KeywordAttr64(7, KeywordAttr_PreSorted) // interface
 		| KeywordAttr64(8, KeywordAttr_PreSorted) // enumeration
 		| KeywordAttr64(10, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // comment tag
 	},

@@ -259,7 +259,7 @@ EDITLEXER lexRust = {
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // trait
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // enumeration
 		| KeywordAttr32(6, KeywordAttr_PreSorted) // union
-		| KeywordAttr32(7, KeywordAttr_PreSorted) // constant
+		| KeywordAttr64(7, KeywordAttr_PreSorted) // constant
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // attribute
 		| KeywordAttr64(9, KeywordAttr_NoLexer) // macro
 		| KeywordAttr64(10, KeywordAttr_NoLexer) // module

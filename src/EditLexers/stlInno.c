@@ -291,7 +291,7 @@ EDITLEXER lexINNO = {
 		| KeywordAttr32(4, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // directives
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // types
 		| KeywordAttr32(6, KeywordAttr_MakeLower) // predefined variables
-		| KeywordAttr32(7, KeywordAttr_NoLexer) // functions
+		| KeywordAttr64(7, KeywordAttr_NoLexer) // functions
 		| KeywordAttr64(8, KeywordAttr_PreSorted) // pascal keywords
 		| KeywordAttr64(9, KeywordAttr_MakeLower) // pascal types
 		| KeywordAttr64(10, KeywordAttr_NoLexer) // pascal functions

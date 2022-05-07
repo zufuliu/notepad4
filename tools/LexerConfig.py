@@ -222,6 +222,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_MARKDOWN': {
 		'has_line_comment': False,
+		'default_fold_level': ['header1', 'header2'],
 	},
 
 	'NP2LEX_NSIS': {
@@ -316,14 +317,14 @@ def get_enum_flag_expr(flag, merge=True, separator='_'):
 	if flag.name:
 		return prefix + flag.name
 
-	comb = []
+	result = []
 	values = cls.__members__.values()
 	for value in values:
 		if flag & value:
-			comb.append(prefix + value.name)
+			result.append(prefix + value.name)
 	if merge:
-		return ' | '.join(comb)
-	return comb
+		return ' | '.join(result)
+	return result
 
 def dump_enum_flag(cls, indent='', anonymous=True, as_shift=False, max_value=None, separator='_'):
 	prefix = cls.__name__ + separator
@@ -398,7 +399,7 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		prefix = ','
 		for index, attr, comment in keywordAttr:
 			expr = get_enum_flag_expr(attr)
-			bit = 64 if index > 7 else 32
+			bit = 64 if index >= 7 else 32
 			output.append(f'{indent}{prefix} KeywordAttr{bit}({index}, {expr}) // {comment}')
 			prefix = '|'
 	else:

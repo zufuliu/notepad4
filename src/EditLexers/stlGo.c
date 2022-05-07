@@ -127,7 +127,7 @@ EDITLEXER lexGo = {
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // struct
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // interface
 		| KeywordAttr32(6, KeywordAttr_PreSorted) // constant
-		| KeywordAttr32(7, KeywordAttr_NoLexer) // variables
+		| KeywordAttr64(7, KeywordAttr_NoLexer) // variables
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // function
 		| KeywordAttr64(9, KeywordAttr_NoLexer) // package
 	},
