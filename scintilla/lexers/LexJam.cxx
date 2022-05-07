@@ -326,4 +326,4 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmJam(SCLEX_JAM, ColouriseJamDoc, "jam", FoldJamDoc);
+LexerModule lmJamfile(SCLEX_JAMFILE, ColouriseJamDoc, "jam", FoldJamDoc);

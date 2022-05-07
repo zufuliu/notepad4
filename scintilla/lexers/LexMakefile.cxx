@@ -301,4 +301,4 @@ void FoldMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 
 }
 
-LexerModule lmMake(SCLEX_MAKEFILE, ColouriseMakeDoc, "makefile", FoldMakeDoc);
+LexerModule lmMakefile(SCLEX_MAKEFILE, ColouriseMakeDoc, "makefile", FoldMakeDoc);

@@ -93,9 +93,6 @@ LexerConfigMap = {
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
 	},
-	'NP2LEX_AHK': {
-		'default_fold_level': ['class', 'function'],
-	},
 	'NP2LEX_APDL': {
 		'has_block_comment': False,
 	},
@@ -103,7 +100,10 @@ LexerConfigMap = {
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_ASY_FUNCTION_DEFINITION',
 	},
-	'NP2LEX_AVS': {
+	'NP2LEX_AUTOHOTKEY': {
+		'default_fold_level': ['class', 'function'],
+	},
+	'NP2LEX_AVISYNTH': {
 		'default_fold_level': ['function'],
 	},
 	'NP2LEX_AWK': {
@@ -127,7 +127,7 @@ LexerConfigMap = {
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['class', 'function'],
 	},
-	'NP2LEX_CONF': {
+	'NP2LEX_CONFIG': {
 		'has_block_comment': False,
 	},
 	'NP2LEX_CPP': {
@@ -138,7 +138,7 @@ LexerConfigMap = {
 		'default_fold_ignore_inner': 'SCE_CSHARP_FUNCTION_DEFINITION',
 	},
 
-	'NP2LEX_D': {
+	'NP2LEX_DLANG': {
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_D_FUNCTION_DEFINITION',
 	},
@@ -184,7 +184,7 @@ LexerConfigMap = {
 		'has_block_comment': False,
 		'default_fold_level': ['section', 'comment'],
 	},
-	'NP2LEX_INNO': {
+	'NP2LEX_INNOSETUP': {
 		'default_fold_level': ['section', 'code'],
 	},
 
@@ -216,7 +216,7 @@ LexerConfigMap = {
 		'default_fold_level': ['class', 'function'],
 	},
 
-	'NP2LEX_MAKE': {
+	'NP2LEX_MAKEFILE': {
 		'tab_settings': TabSettings_Tab4,
 		'has_block_comment': False,
 	},
@@ -244,10 +244,10 @@ LexerConfigMap = {
 		'default_fold_ignore_inner': 'SCE_PY_FUNCTION_DEFINITION',
 	},
 
-	'NP2LEX_R': {
+	'NP2LEX_RLANG': {
 		'default_fold_level': ['function'],
 	},
-	'NP2LEX_RC': {
+	'NP2LEX_RESOURCESCRIPT': {
 		'default_fold_level': ['preprocessor', 'resource'],
 	},
 	'NP2LEX_RUBY': {
@@ -287,16 +287,16 @@ LexerConfigMap = {
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
 	},
 
-	'NP2LEX_VB': {
-		'has_block_comment': False,
-		'default_fold_level': ['class', 'function'],
-	},
-	'NP2LEX_VBS': {
+	'NP2LEX_VBSCRIPT': {
 		'has_block_comment': False,
 		'default_fold_level': ['function'],
 	},
 	'NP2LEX_VIM': {
 		'has_block_comment': False,
+	},
+	'NP2LEX_VISUALBASIC': {
+		'has_block_comment': False,
+		'default_fold_level': ['class', 'function'],
 	},
 
 	'NP2LEX_XML': {

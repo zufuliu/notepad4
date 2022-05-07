@@ -332,4 +332,4 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 
 }
 
-LexerModule lmR(SCLEX_R, ColouriseRDoc, "r", FoldSimpleDoc);
+LexerModule lmRLang(SCLEX_RLANG, ColouriseRDoc, "r", FoldSimpleDoc);

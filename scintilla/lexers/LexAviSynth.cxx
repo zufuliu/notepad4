@@ -355,4 +355,4 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmAVS(SCLEX_AVS, ColouriseAvsDoc, "avs", FoldAvsDoc);
+LexerModule lmAviSynth(SCLEX_AVISYNTH, ColouriseAvsDoc, "avs", FoldAvsDoc);

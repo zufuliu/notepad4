@@ -767,4 +767,4 @@ void FoldDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Lex
 
 }
 
-LexerModule lmD(SCLEX_D, ColouriseDDoc, "d", FoldDDoc);
+LexerModule lmDLang(SCLEX_DLANG, ColouriseDDoc, "d", FoldDDoc);

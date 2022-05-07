@@ -529,14 +529,14 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_ASM:
 	case NP2LEX_FORTRAN:
 		return (ch == '#' || ch == '%');
-	case NP2LEX_AU3:
+	case NP2LEX_AUTOIT3:
 		return (ch == '#' || ch == '$' || ch == '@');
 
 	case NP2LEX_BASH:
 	case NP2LEX_BATCH:
 	case NP2LEX_HTML:
 	case NP2LEX_GN:
-	case NP2LEX_PS1:
+	case NP2LEX_POWERSHELL:
 		return (ch == '-' || ch == '$');
 
 	case NP2LEX_CIL:
@@ -554,10 +554,10 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_CSS:
 		return (ch == '-' || ch == '$' || ch == '@');
 
-	case NP2LEX_D:
+	case NP2LEX_DLANG:
 	case NP2LEX_FSHARP:
-	case NP2LEX_INNO:
-	case NP2LEX_VB:
+	case NP2LEX_INNOSETUP:
+	case NP2LEX_VISUALBASIC:
 		return (ch == '#');
 
 	case NP2LEX_AWK:
@@ -585,7 +585,7 @@ BOOL IsDocWordChar(int ch) {
 	case NP2LEX_WASM:
 		return (ch == '@' || ch == '%' || ch == '$' || ch == '-');
 
-	case NP2LEX_MAKE:
+	case NP2LEX_MAKEFILE:
 	case NP2LEX_NSIS:
 		return (ch == '-' || ch == '$' || ch == '!');
 
@@ -657,7 +657,7 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 		return FALSE;
 	}
 	switch (pLexCurrent->iLexer) {
-	case SCLEX_AHK:
+	case SCLEX_AUTOHOTKEY:
 		return style != SCE_AHK_OPERATOR;
 	case SCLEX_AWK:
 		return style != SCE_AWK_OPERATOR;
@@ -665,7 +665,7 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 	case SCLEX_CPP:
 		return style != SCE_C_OPERATOR;
 
-	case SCLEX_D:
+	case SCLEX_DLANG:
 		return style != SCE_D_OPERATOR;
 
 	case SCLEX_FSHARP:
@@ -692,7 +692,7 @@ static inline BOOL IsStringFormatChar(int ch, int style) {
 	case SCLEX_PYTHON:
 		return style != SCE_PY_OPERATOR && style != SCE_PY_OPERATOR2;
 
-	case SCLEX_R:
+	case SCLEX_RLANG:
 		return style != SCE_R_OPERATOR;
 	case SCLEX_RUBY:
 		return style != SCE_RB_OPERATOR;
@@ -712,7 +712,7 @@ static inline BOOL IsEscapeCharEx(int ch, int style) {
 	switch (pLexCurrent->iLexer) {
 	case SCLEX_NULL:
 	case SCLEX_BATCH:
-	case SCLEX_CONF:
+	case SCLEX_CONFIG:
 	case SCLEX_DIFF:
 	case SCLEX_MAKEFILE:
 	case SCLEX_PROPERTIES:
@@ -723,7 +723,7 @@ static inline BOOL IsEscapeCharEx(int ch, int style) {
 	case SCLEX_CPP:
 		return style != SCE_C_STRINGRAW && style != SCE_C_COMMENTDOC_TAG;
 
-	case SCLEX_D:
+	case SCLEX_DLANG:
 		return style != SCE_D_RAWSTRING && style == SCE_D_STRING_BT;
 	case SCLEX_DART:
 		return style != SCE_DART_RAWSTRING_SQ && style != SCE_DART_RAWSTRING_DQ
@@ -809,15 +809,15 @@ extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexJulia;
 extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
-extern EDITLEXER lexVBS;
+extern EDITLEXER lexVBScript;
 extern HANDLE idleTaskTimer;
 
 typedef enum HtmlTextBlock {
 	HtmlTextBlock_Tag,
 	HtmlTextBlock_CDATA,
 	HtmlTextBlock_SGML,
-	HtmlTextBlock_JS,
-	HtmlTextBlock_VBS,
+	HtmlTextBlock_JavaScript,
+	HtmlTextBlock_VBScript,
 	HtmlTextBlock_Python,
 	HtmlTextBlock_PHP,
 	HtmlTextBlock_CSS,
@@ -832,7 +832,7 @@ static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) {
 			return HtmlTextBlock_CSS;
 		}
 		if (iCurrentStyle >= js_style(SCE_JS_DEFAULT)) {
-			return HtmlTextBlock_JS;
+			return HtmlTextBlock_JavaScript;
 		}
 		if (iCurrentStyle >= SCE_PHP_DEFAULT) {
 			return HtmlTextBlock_PHP;
@@ -843,11 +843,11 @@ static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) {
 	}
 	if ((iCurrentStyle >= SCE_HJ_START && iCurrentStyle <= SCE_HJ_TEMPLATELITERAL)
 		|| (iCurrentStyle >= SCE_HJA_START && iCurrentStyle <= SCE_HJA_TEMPLATELITERAL)) {
-		return HtmlTextBlock_JS;
+		return HtmlTextBlock_JavaScript;
 	}
 	if ((iCurrentStyle >= SCE_HB_START && iCurrentStyle <= SCE_HB_OPERATOR)
 		|| (iCurrentStyle >= SCE_HBA_START && iCurrentStyle <= SCE_HBA_OPERATOR)) {
-		return HtmlTextBlock_VBS;
+		return HtmlTextBlock_VBScript;
 	}
 	if ((iCurrentStyle >= SCE_H_SGML_DEFAULT && iCurrentStyle <= SCE_H_SGML_BLOCK_DEFAULT)) {
 		return HtmlTextBlock_SGML;
@@ -1093,11 +1093,11 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	if (iLexer == SCLEX_HTML || iLexer == SCLEX_PHPSCRIPT) {
 		const int block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 		switch (block) {
-		case HtmlTextBlock_JS:
+		case HtmlTextBlock_JavaScript:
 			pLex = &lexJavaScript;
 			break;
-		case HtmlTextBlock_VBS:
-			pLex = &lexVBS;
+		case HtmlTextBlock_VBScript:
+			pLex = &lexVBScript;
 			break;
 		case HtmlTextBlock_Python:
 			pLex = &lexPython;
@@ -1168,7 +1168,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle
 	}
 
 	switch (iLexer) {
-	case SCLEX_AHK:
+	case SCLEX_AUTOHOTKEY:
 		if (ch == '#' && iCurrentStyle == SCE_AHK_DEFAULT) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoHotkeyKeywordIndex_Directive]);
 			return AutoC_AddSpecWord_Finish;
@@ -1250,7 +1250,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle
 		}
 		break;
 
-	case SCLEX_CONF:
+	case SCLEX_CONFIG:
 	case SCLEX_HTML:
 	case SCLEX_XML:
 		if (ch == '<' || (chPrev == '<' && ch == '/')) {
@@ -1271,7 +1271,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle
 		}
 		break;
 
-	case SCLEX_D:
+	case SCLEX_DLANG:
 		if ((ch == '#' || ch == '@') && iCurrentStyle == SCE_D_DEFAULT) {
 			const int index = (ch == '#') ? DKeywordIndex_Preprocessor : DKeywordIndex_Attribute;
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[index]);
@@ -1411,7 +1411,7 @@ INT AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle
 		}
 		break;
 
-	case SCLEX_VB:
+	case SCLEX_VISUALBASIC:
 		if (ch == '#' && iCurrentStyle == SCE_B_DEFAULT) {
 			const char *pKeywords = pLex->pKeyWords->pszKeyWords[VBKeywordIndex_Preprocessor];
 			if (StrNotEmptyA(pKeywords)) {
@@ -1711,7 +1711,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
 		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
 		|| (iLexer == SCLEX_PERL && iCurrentStyle == SCE_PL_OPERATOR && chPrev == '&') // SCE_PL_IDENTIFIER
-		|| ((iLexer == SCLEX_VB || iLexer == SCLEX_VBSCRIPT) && (iCurrentStyle == SCE_B_DEFAULT || iCurrentStyle == SCE_B_COMMENT))
+		|| ((iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) && (iCurrentStyle == SCE_B_DEFAULT || iCurrentStyle == SCE_B_COMMENT))
 		|| (iLexer == SCLEX_VERILOG && (iCurrentStyle == SCE_V_NUMBER || iCurrentStyle == SCE_V_DEFAULT))
 		|| (iLexer == SCLEX_TEXINFO && iCurrentStyle == SCE_L_DEFAULT && chPrev == '@') // SCE_L_SPECIAL
 	) {
@@ -1721,7 +1721,7 @@ static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	// someone's, don't
 	if (IsAlphaNumeric(chPrev)) {
 		// character prefix
-		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RC || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL || iLexer == SCLEX_RUST) {
+		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RESOURCESCRIPT || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL || iLexer == SCLEX_RUST) {
 			const int lower = chPrev | 0x20;
 			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
 			const BOOL bSubWord = chPrev2 >= 0x80 || IsAlphaNumeric(chPrev2);
@@ -2069,7 +2069,7 @@ void EditAutoCloseXMLTag(void) {
 
 BOOL IsIndentKeywordStyle(int style) {
 	switch (pLexCurrent->iLexer) {
-	//case SCLEX_AU3:
+	//case SCLEX_AUTOIT3:
 	//	return style == SCE_AU3_KEYWORD;
 	case SCLEX_BASH:
 		return style == SCE_BAT_WORD;
@@ -2096,7 +2096,7 @@ BOOL IsIndentKeywordStyle(int style) {
 	case SCLEX_SQL:
 		return style == SCE_SQL_WORD;
 
-	//case SCLEX_VB:
+	//case SCLEX_VISUALBASIC:
 	//case SCLEX_VBSCRIPT:
 	//	return style == SCE_B_KEYWORD;
 	//case SCLEX_VERILOG:
@@ -2126,7 +2126,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	}
 
 	switch (pLexCurrent->iLexer) {
-	//case SCLEX_AU3:
+	//case SCLEX_AUTOIT3:
 	case SCLEX_BASH:
 		if (np2LexLangIndex == IDM_LEXER_CSHELL) {
 			if (StrEqualExA(word, "if")) {
@@ -2268,7 +2268,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 		}
 		break;
 
-	//case SCLEX_VB:
+	//case SCLEX_VISUALBASIC:
 	//case SCLEX_VBSCRIPT:
 	//case SCLEX_VERILOG:
 	//case SCLEX_VHDL:
@@ -2477,8 +2477,8 @@ void EditToggleCommentLine(void) {
 	}
 	break;
 
-	case SCLEX_AHK:
-	case SCLEX_AU3:
+	case SCLEX_AUTOHOTKEY:
+	case SCLEX_AUTOIT3:
 	case SCLEX_LISP:
 	case SCLEX_LLVM:
 	case SCLEX_PROPERTIES:
@@ -2499,7 +2499,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_CPP:
 	case SCLEX_CSHARP:
 	case SCLEX_CSS: // for SCSS, LESS, HSS
-	case SCLEX_D:
+	case SCLEX_DLANG:
 	case SCLEX_DART:
 	case SCLEX_FSHARP:
 	case SCLEX_GO:
@@ -2517,20 +2517,20 @@ void EditToggleCommentLine(void) {
 		EditToggleLineComments(L"//", FALSE);
 		break;
 
-	case SCLEX_AVS:
+	case SCLEX_AVISYNTH:
 	case SCLEX_AWK:
 	case SCLEX_CMAKE:
 	case SCLEX_COFFEESCRIPT:
-	case SCLEX_CONF:
+	case SCLEX_CONFIG:
 	case SCLEX_GN:
-	case SCLEX_JAM:
+	case SCLEX_JAMFILE:
 	case SCLEX_JULIA:
 	case SCLEX_MAKEFILE:
 	case SCLEX_NSIS:
 	case SCLEX_PERL:
 	case SCLEX_POWERSHELL:
 	case SCLEX_PYTHON:
-	case SCLEX_R:
+	case SCLEX_RLANG:
 	case SCLEX_RUBY:
 	case SCLEX_SMALI:
 	case SCLEX_TCL:
@@ -2548,7 +2548,7 @@ void EditToggleCommentLine(void) {
 	case SCLEX_XML: {
 		const int block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
 		switch (block) {
-		case HtmlTextBlock_VBS:
+		case HtmlTextBlock_VBScript:
 			EditToggleLineComments(L"'", FALSE);
 			break;
 
@@ -2557,7 +2557,7 @@ void EditToggleCommentLine(void) {
 			break;
 
 		case HtmlTextBlock_CDATA:
-		case HtmlTextBlock_JS:
+		case HtmlTextBlock_JavaScript:
 		case HtmlTextBlock_PHP:
 			EditToggleLineComments(L"//", FALSE);
 			break;
@@ -2603,7 +2603,7 @@ void EditToggleCommentLine(void) {
 		EditToggleLineComments(L"@c ", FALSE);
 		break;
 
-	case SCLEX_VB:
+	case SCLEX_VISUALBASIC:
 	case SCLEX_VBSCRIPT:
 		EditToggleLineComments(L"'", FALSE);
 		break;
@@ -2644,15 +2644,15 @@ void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 
 void EditToggleCommentBlock(void) {
 	switch (pLexCurrent->iLexer) {
-	case SCLEX_AHK:
+	case SCLEX_AUTOHOTKEY:
 	case SCLEX_ASM:
 	case SCLEX_ASYMPTOTE:
-	case SCLEX_AVS:
+	case SCLEX_AVISYNTH:
 	case SCLEX_CIL:
 	case SCLEX_CPP:
 	case SCLEX_CSHARP:
 	case SCLEX_CSS:
-	case SCLEX_D:
+	case SCLEX_DLANG:
 	case SCLEX_DART:
 	case SCLEX_GO:
 	case SCLEX_GROOVY:
@@ -2670,7 +2670,7 @@ void EditToggleCommentBlock(void) {
 		EditEncloseSelection(L"/*", L"*/");
 		break;
 
-	case SCLEX_AU3:
+	case SCLEX_AUTOIT3:
 		EditEncloseSelectionNewLine(L"#cs", L"#ce");
 		break;
 
@@ -2709,7 +2709,7 @@ void EditToggleCommentBlock(void) {
 			break;
 
 		case HtmlTextBlock_CDATA:
-		case HtmlTextBlock_JS:
+		case HtmlTextBlock_JavaScript:
 		case HtmlTextBlock_PHP:
 		case HtmlTextBlock_CSS:
 			EditEncloseSelection(L"/*", L"*/");
@@ -2741,7 +2741,7 @@ void EditToggleCommentBlock(void) {
 		EditEncloseSelection(L"{", L"}");
 		break;
 
-	case SCLEX_JAM:
+	case SCLEX_JAMFILE:
 	case SCLEX_LISP:
 		EditEncloseSelection(L"#|", L"|#");
 		break;
@@ -2774,7 +2774,7 @@ void EditToggleCommentBlock(void) {
 		EditEncloseSelection(L"<#", L"#>");
 		break;
 
-	case SCLEX_R:
+	case SCLEX_RLANG:
 		EditEncloseSelectionNewLine(L"if (FALSE) {", L"}");
 		break;
 

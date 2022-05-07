@@ -566,4 +566,4 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 }
 
-LexerModule lmInno(SCLEX_INNOSETUP, ColouriseInnoDoc, "inno", FoldInnoDoc);
+LexerModule lmInnoSetup(SCLEX_INNOSETUP, ColouriseInnoDoc, "inno", FoldInnoDoc);

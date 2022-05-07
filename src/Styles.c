@@ -65,8 +65,8 @@ extern EDITLEXER lexAPDL;
 extern EDITLEXER lexASM;
 extern EDITLEXER lexAsymptote;
 extern EDITLEXER lexAutoHotkey;
-extern EDITLEXER lexAU3;
-extern EDITLEXER lexAVS;
+extern EDITLEXER lexAutoIt3;
+extern EDITLEXER lexAviSynth;
 extern EDITLEXER lexAwk;
 
 extern EDITLEXER lexBatch;
@@ -75,11 +75,11 @@ extern EDITLEXER lexBlockdiag;
 extern EDITLEXER lexCIL;
 extern EDITLEXER lexCMake;
 extern EDITLEXER lexCoffeeScript;
-extern EDITLEXER lexCONF;
+extern EDITLEXER lexConfig;
 
-extern EDITLEXER lexD;
+extern EDITLEXER lexDLang;
 extern EDITLEXER lexDart;
-extern EDITLEXER lexDIFF;
+extern EDITLEXER lexDiff;
 
 extern EDITLEXER lexFSharp;
 extern EDITLEXER lexFortran;
@@ -93,9 +93,9 @@ extern EDITLEXER lexGroovy;
 extern EDITLEXER lexHaxe;
 
 extern EDITLEXER lexINI;
-extern EDITLEXER lexINNO;
+extern EDITLEXER lexInnoSetup;
 
-extern EDITLEXER lexJam;
+extern EDITLEXER lexJamfile;
 extern EDITLEXER lexJulia;
 
 extern EDITLEXER lexKotlin;
@@ -105,7 +105,7 @@ extern EDITLEXER lexLisp;
 extern EDITLEXER lexLLVM;
 extern EDITLEXER lexLua;
 
-extern EDITLEXER lexMake;
+extern EDITLEXER lexMakefile;
 extern EDITLEXER lexMarkdown;
 extern EDITLEXER lexMatlab;
 
@@ -113,11 +113,11 @@ extern EDITLEXER lexNsis;
 
 extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
-extern EDITLEXER lexPS1;
+extern EDITLEXER lexPowerShell;
 
-extern EDITLEXER lexR;
+extern EDITLEXER lexRLang;
 extern EDITLEXER lexRebol;
-extern EDITLEXER lexRC;
+extern EDITLEXER lexResourceScript;
 extern EDITLEXER lexRust;
 
 extern EDITLEXER lexScala;
@@ -129,11 +129,11 @@ extern EDITLEXER lexTexinfo;
 extern EDITLEXER lexTOML;
 extern EDITLEXER lexTypeScript;
 
-extern EDITLEXER lexVBS;
+extern EDITLEXER lexVBScript;
 extern EDITLEXER lexVerilog;
 extern EDITLEXER lexVHDL;
 extern EDITLEXER lexVim;
-extern EDITLEXER lexVB;
+extern EDITLEXER lexVisualBasic;
 
 extern EDITLEXER lexWASM;
 
@@ -168,8 +168,8 @@ static PEDITLEXER pLexArray[] = {
 	&lexASM,
 	&lexAsymptote,
 	&lexAutoHotkey,
-	&lexAU3,
-	&lexAVS,
+	&lexAutoIt3,
+	&lexAviSynth,
 	&lexAwk,
 
 	&lexBatch,
@@ -178,11 +178,11 @@ static PEDITLEXER pLexArray[] = {
 	&lexCIL,
 	&lexCMake,
 	&lexCoffeeScript,
-	&lexCONF,
+	&lexConfig,
 
-	&lexD,
+	&lexDLang,
 	&lexDart,
-	&lexDIFF,
+	&lexDiff,
 
 	&lexFSharp,
 	&lexFortran,
@@ -196,9 +196,9 @@ static PEDITLEXER pLexArray[] = {
 	&lexHaxe,
 
 	&lexINI,
-	&lexINNO,
+	&lexInnoSetup,
 
-	&lexJam,
+	&lexJamfile,
 	&lexJulia,
 
 	&lexKotlin,
@@ -208,7 +208,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexLLVM,
 	&lexLua,
 
-	&lexMake,
+	&lexMakefile,
 	&lexMarkdown,
 	&lexMatlab,
 
@@ -216,11 +216,11 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexPascal,
 	&lexPerl,
-	&lexPS1,
+	&lexPowerShell,
 
-	&lexR,
+	&lexRLang,
 	&lexRebol,
-	&lexRC,
+	&lexResourceScript,
 	&lexRust,
 
 	&lexScala,
@@ -232,11 +232,11 @@ static PEDITLEXER pLexArray[] = {
 	&lexTOML,
 	&lexTypeScript,
 
-	&lexVBS,
+	&lexVBScript,
 	&lexVerilog,
 	&lexVHDL,
 	&lexVim,
-	&lexVB,
+	&lexVisualBasic,
 
 	&lexWASM,
 
@@ -2269,7 +2269,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 		return &lexCPP;
 	}
 	if (sharpCount) {
-		return shebang ? &lexBash : &lexCONF;
+		return shebang ? &lexBash : &lexConfig;
 	}
 	if (maybeJson && !notJson) {
 		return &lexJSON;
@@ -2278,7 +2278,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 		return &lexINI;
 	}
 	if (bDotFile) {
-		return &lexCONF;
+		return &lexConfig;
 	}
 	if (maybeJson) {
 		// for braces and brackets
@@ -2335,7 +2335,7 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 		}
 		break;
 
-	case NP2LEX_CONF:
+	case NP2LEX_CONFIG:
 		if (StrHasPrefixCase(lpszName, L"httpd") || StrCaseEqual(lpszExt, L"htaccess")) {
 			np2LexLangIndex = IDM_LEXER_APACHE;
 		}
@@ -2523,7 +2523,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 
 		// MySQL ini/cnf
 		if (!bFound && StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
-			pLexNew = &lexCONF;
+			pLexNew = &lexConfig;
 			bFound = TRUE;
 		}
 		if (!bFound && StrCaseEqual(lpszName, L"web.config")) {
@@ -2558,7 +2558,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			bFound = TRUE;
 		}
 		if (!bFound && (StrHasPrefixCase(lpszName, L"Makefile") || StrHasPrefixCase(lpszName, L"Kbuild"))) {
-			pLexNew = &lexMake;
+			pLexNew = &lexMakefile;
 			bFound = TRUE;
 		}
 		if (!bFound && StrCaseEqual(lpszName, L"Cakefile")) {
@@ -2575,11 +2575,11 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 		}
 		// Boost build
 		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrHasPrefixCase(lpszName, L"Jamfile"))) {
-			pLexNew = &lexJam;
+			pLexNew = &lexJamfile;
 			bFound = TRUE;
 		}
 		if (!bFound && (StrHasPrefixCase(lpszName, L"Kconfig") || StrHasPrefixCase(lpszName, L"Doxyfile"))) {
-			pLexNew = &lexCONF;
+			pLexNew = &lexConfig;
 			bFound = TRUE;
 		}
 	}
@@ -2606,7 +2606,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	}
 
 	// xml/html
-	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_CONF))) {
+	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_CONFIG))) {
 		char tchText[256] = "";
 		SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 		const char *p = tchText;
@@ -2690,7 +2690,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 				bFound = TRUE;
 			}
 		} else {
-			pLexNew = &lexCONF;
+			pLexNew = &lexConfig;
 			bFound = TRUE;
 		}
 	}
@@ -2829,7 +2829,7 @@ void Style_SetLexerByLangIndex(int lang) {
 		break;
 
 	case IDM_LEXER_APACHE:
-		pLex = &lexCONF;
+		pLex = &lexConfig;
 		break;
 
 	// Web Source Code

@@ -880,4 +880,4 @@ void FoldAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 }
 
-LexerModule lmAHK(SCLEX_AHK, ColouriseAHKDoc, "ahk", FoldAHKDoc);
+LexerModule lmAutoHotkey(SCLEX_AUTOHOTKEY, ColouriseAHKDoc, "ahk", FoldAHKDoc);

@@ -455,7 +455,7 @@ void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
 		np2_LexKeyword = &kwJavaDoc;
 		return;
 	case NP2LEX_FSHARP: // .NET Platform
-		//case NP2LEX_VB:
+		//case NP2LEX_VISUALBASIC:
 		np2_LexKeyword = &kwNETDoc;
 		return;
 	case NP2LEX_CPP:

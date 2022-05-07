@@ -111,9 +111,9 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_JAVA			63002	// SCLEX_JAVA		Java Source
 #define NP2LEX_CSHARP		63003	// SCLEX_CSHARP		C# Source
 #define NP2LEX_JAVASCRIPT	63004	// SCLEX_JAVASCRIPT	JavaScript
-#define NP2LEX_RC			63005	// SCLEX_CPP		Resource Script
+#define NP2LEX_RESOURCESCRIPT		63005	// SCLEX_CPP		Resource Script
 //#define NP2LEX_IDL		63006	// SCLEX_CPP		Interface Definition Language
-#define NP2LEX_D			63007	// SCLEX_D			D Source
+#define NP2LEX_DLANG		63007	// SCLEX_DLANG		D Source
 #define NP2LEX_ASYMPTOTE	63008	// SCLEX_ASYMPTOTE	Asymptote Code
 #define NP2LEX_CIL			63009	// SCLEX_CIL		CIL Assembly
 //#define NP2LEX_OBJC		63010	// SCLEX_CPP		Objective C/C++
@@ -124,7 +124,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_GO			63015	// SCLEX_GO			Go Source
 #define NP2LEX_GRADLE		63016	// SCLEX_GROOVY		Gradle Build Script
 
-#define NP2LEX_VB			63021	// SCLEX_VB			Visual Basic
+#define NP2LEX_VISUALBASIC	63021	// SCLEX_VISUALBASIC	Visual Basic
 #define NP2LEX_FSHARP		63022	// SCLEX_FSHARP		F# Source
 #define NP2LEX_ASM			63023	// SCLEX_ASM		Assembler Source
 #define NP2LEX_PASCAL		63024	// SCLEX_PASCAL		Pascal Source
@@ -133,7 +133,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_CSS			63027	// SCLEX_CSS		CSS Style Sheet
 #define NP2LEX_SQL			63028	// SCLEX_SQL		SQL Query
 #define NP2LEX_PHP			63029	// SCLEX_PHPSCRIPT	PHP Script
-#define NP2LEX_VBS			63030	// SCLEX_VBSCRIPT	VBScript
+#define NP2LEX_VBSCRIPT		63030	// SCLEX_VBSCRIPT	VBScript
 #define NP2LEX_PERL			63031	// SCLEX_PERL		Perl Script
 #define NP2LEX_PYTHON		63032	// SCLEX_PYTHON		Python Script
 #define NP2LEX_RUBY			63033	// SCLEX_RUBY		Ruby Script
@@ -141,21 +141,21 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_TCL			63035	// SCLEX_TCL		Tcl Script
 #define NP2LEX_BATCH		63036	// SCLEX_BATCH		Batch File
 #define NP2LEX_BASH			63037	// SCLEX_BASH		Shell Script
-#define NP2LEX_PS1			63038	// SCLEX_POWERSHELL	PowerShell Script
-#define NP2LEX_AU3			63039	// SCLEX_AU3		AutoIt3 Script
+#define NP2LEX_POWERSHELL	63038	// SCLEX_POWERSHELL	PowerShell Script
+#define NP2LEX_AUTOIT3		63039	// SCLEX_AUTOIT3	AutoIt3 Script
 #define NP2LEX_MATLAB		63040	// SCLEX_MATLAB		MATLAB Code
 #define NP2LEX_FORTRAN		63041	// SCLEX_FORTRAN	Fortran Source
 #define NP2LEX_LATEX		63042	// SCLEX_LATEX		LaTeX File
 #define NP2LEX_VHDL			63043	// SCLEX_VHDL		VHDL Source
 #define NP2LEX_VERILOG		63044	// SCLEX_VERILOG	Verilog HDL Source
-#define NP2LEX_MAKE			63045	// SCLEX_MAKEFILE	Makefile
+#define NP2LEX_MAKEFILE		63045	// SCLEX_MAKEFILE	Makefile
 #define NP2LEX_CMAKE		63046	// SCLEX_CMAKE		CMake Script
-#define NP2LEX_INNO			63047	// SCLEX_INNOSETUP	Inno Setup Script
+#define NP2LEX_INNOSETUP	63047	// SCLEX_INNOSETUP	Inno Setup Script
 #define NP2LEX_INI			63048	// SCLEX_PROPERTIES	Ini Config File
-#define NP2LEX_CONF			63049	// SCLEX_CONF		Config File
+#define NP2LEX_CONFIG		63049	// SCLEX_CONFIG		Config File
 #define NP2LEX_DIFF			63050	// SCLEX_DIFF		Diff/Patch
 #define NP2LEX_AWK			63051	// SCLEX_AWK		Awk Script
-#define NP2LEX_JAM			63052	// SCLEX_JAM		Jamfile
+#define NP2LEX_JAMFILE		63052	// SCLEX_JAMFILE	Jamfile
 #define NP2LEX_GRAPHVIZ		63053	// SCLEX_GRAPHVIZ	GraphViz Dot
 #define NP2LEX_JSON			63054	// SCLEX_JSON		JSON Document
 #define NP2LEX_SMALI		63055	// SCLEX_SMALI		Android Smali
@@ -166,7 +166,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_LLVM			63060	// SCLEX_LLVM		LLVM IR
 #define NP2LEX_OCTAVE		63061	// SCLEX_MATLAB		Octave Code
 #define NP2LEX_SCILAB		63062	// SCLEX_MATLAB		SciLab Code
-#define NP2LEX_R			63063	// SCLEX_R			R Code
+#define NP2LEX_RLANG		63063	// SCLEX_RLANG		R Code
 
 #define NP2LEX_JULIA		63066	// SCLEX_JULIA		Julia Script
 #define NP2LEX_RUST			63067	// SCLEX_RUST		Rust Source
@@ -183,15 +183,15 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_ABAQUS		63078	// SCLEX_APDL		ABAQUS
 #define NP2LEX_BLOCKDIAG	63079	// SCLEX_GRAPHVIZ	blockdiag
 
-#define NP2LEX_AVS			63087	// SCLEX_AVS		AviSynth Script
-#define NP2LEX_TEHEX		63088	// SCLEX_TEHEX		Tektronix extended HEX
-#define NP2LEX_IHEX			63089	// SCLEX_IHEX		Intel HEX
-#define NP2LEX_SREC			63090	// SCLEX_SREC		Motorola S-Record
+#define NP2LEX_AVISYNTH		63087	// SCLEX_AVISYNTH	AviSynth Script
+#define NP2LEX_TEKEXTHEX	63088	// SCLEX_TEKEXTHEX	Tektronix extended HEX
+#define NP2LEX_INTELHEX		63089	// SCLEX_INTELHEX	Intel HEX
+#define NP2LEX_SRECORD		63090	// SCLEX_SRECORD	Motorola S-Record
 #define NP2LEX_SRT			63091	// SCLEX_SRT		Srt Subtitle
 #define NP2LEX_MARKDOWN		63092	// SCLEX_MARKDOWN	Markdown
 #define NP2LEX_REGISTRY		63093	// SCLEX_REGISTRY	Registry File
 #define NP2LEX_COFFEESCRIPT	63094	// SCLEX_COFFEESCRIPT	CoffeeScript
-#define NP2LEX_AHK			63095	// SCLEX_AHK		AutoHotkey Script
+#define NP2LEX_AUTOHOTKEY	63095	// SCLEX_AUTOHOTKEY	AutoHotkey Script
 
 // special lexers
 #define NP2LEX_ANSI			63096	// SCLEX_NULL		ANSI Art

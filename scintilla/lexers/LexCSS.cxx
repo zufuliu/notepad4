@@ -382,4 +382,4 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 }
 
-LexerModule lmCss(SCLEX_CSS, ColouriseCssDoc, "css");
+LexerModule lmCSS(SCLEX_CSS, ColouriseCssDoc, "css");

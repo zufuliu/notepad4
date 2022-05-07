@@ -770,4 +770,4 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 
 }
 
-LexerModule lmAU3(SCLEX_AU3, ColouriseAU3Doc, "au3", FoldAU3Doc);
+LexerModule lmAutoIt3(SCLEX_AUTOIT3, ColouriseAU3Doc, "au3", FoldAU3Doc);

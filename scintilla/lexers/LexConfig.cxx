@@ -279,4 +279,4 @@ void FoldConfDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 
 }
 
-LexerModule lmConf(SCLEX_CONF, ColouriseConfDoc, "conf", FoldConfDoc);
+LexerModule lmConfig(SCLEX_CONFIG, ColouriseConfDoc, "conf", FoldConfDoc);

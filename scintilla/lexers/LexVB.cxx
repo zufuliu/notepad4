@@ -493,5 +493,5 @@ void ColouriseVBScriptDoc(Sci_PositionU startPos, Sci_Position length, int initS
 
 }
 
-LexerModule lmVB(SCLEX_VB, ColouriseVBNetDoc, "vb", FoldVBDoc);
+LexerModule lmVisualBasic(SCLEX_VISUALBASIC, ColouriseVBNetDoc, "vb", FoldVBDoc);
 LexerModule lmVBScript(SCLEX_VBSCRIPT, ColouriseVBScriptDoc, "vbscript", FoldVBDoc);
