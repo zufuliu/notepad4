@@ -261,9 +261,13 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 				s[k] = '\0';
 
 				if (kwFold.InList(s)) {
-					if (StrEqualsAny(s, "architecture", "case", "generate", "loop", "block", "package", "process", "record", "then", "units")) {
+					if (StrEqualsAny(s, "architecture", "case", "block", "loop", "package", "process", "protected", "record", "then", "units")) {
 						if (!StrEqual(prevWord, "end")) {
 							levelNext++;
+						}
+					} else if (StrEqual(s, "generate")) {
+						if (!StrEqualsAny(prevWord, "end", "else", "case")) {
+							levelNext++; // vhdl08 else generate, case generate
 						}
 					} else if (StrEqualsAny(s, "component", "entity", "configuration")) {
 						if (!StrEqual(prevWord, "end")) {
@@ -316,9 +320,9 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 
 					} else if (StrEqual(s, "end")) {
 						levelNext--;
-					} else if (StrEqual(s, "elsif")) { // elsif is followed by then so folding occurs correctly
+					} else if (StrEqual(s, "elsif")) { // elsif is followed by then or generate so folding occurs correctly
 						levelNext--;
-					} else if (StrEqual(s, "begin") && StrEqualsAny(prevWord, "architecture", "function", "procedure")) {
+					} else if (StrEqual(s, "begin") && StrEqualsAny(prevWord, "architecture", "function", "procedure", "generate")) {
 						levelMinCurrentBegin = levelNext - 1;
 					}
 					strcpy(prevWord, s);

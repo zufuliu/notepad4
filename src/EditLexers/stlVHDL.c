@@ -38,7 +38,8 @@ NULL
 NULL
 
 , // 8 Fold
-"architecture begin case component else elsif end entity generate loop package process record then procedure function when"
+"architecture begin block case component else elsif end entity for generate loop package process record then "
+"procedure protected function when units"
 
 , NULL, NULL, NULL, NULL, NULL, NULL, NULL
 }};

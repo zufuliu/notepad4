@@ -23,6 +23,7 @@ class KeyModifiers {
 public:
 	Scintilla::Keys key;
 	Scintilla::KeyMod modifiers;
+	constexpr KeyModifiers() noexcept : key{}, modifiers(KeyMod::Norm) {};
 	constexpr KeyModifiers(Scintilla::Keys key_, Scintilla::KeyMod modifiers_) noexcept : key(key_), modifiers(modifiers_) {}
 	constexpr bool operator<(const KeyModifiers &other) const noexcept {
 		if (key == other.key)

@@ -777,6 +777,9 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 			const HRESULT hr = pD2DFactory->CreateDCRenderTarget(&drtp, &pDCRT);
 			if (SUCCEEDED(hr)) {
 				pRenderTarget = pDCRT;
+				//D2D1::Matrix3x2F invertX = D2D1::Matrix3x2F(-1, 0, 0, 1, 0, 0);
+				//D2D1::Matrix3x2F moveX = D2D1::Matrix3x2F::Translation(rc.right - rc.left, 0);
+				//pRenderTarget->SetTransform(invertX * moveX);
 			} else {
 				//Platform::DebugPrintf("Failed CreateDCRenderTarget 0x%lx\n", hr);
 				pRenderTarget = nullptr;
@@ -1038,6 +1041,7 @@ bool ScintillaWin::PaintDC(HDC hdc) {
 			surfaceWindow->Release();
 		}
 	} else {
+		//SetLayout(hdc, LAYOUT_BITMAPORIENTATIONPRESERVED);
 		EnsureRenderTarget(hdc);
 		if (pRenderTarget) {
 			AutoSurface surfaceWindow(pRenderTarget, this);

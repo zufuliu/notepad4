@@ -153,6 +153,7 @@ BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT 
 
 namespace Scintilla::Internal {
 
+//#pragma comment(lib, "D2D1.lib")
 IDWriteFactory *pIDWriteFactory = nullptr;
 ID2D1Factory *pD2DFactory = nullptr;
 IDWriteGdiInterop *gdiInterop = nullptr;
@@ -2446,6 +2447,7 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 			const D2D1_RECT_F rcClip = RectangleFromPRectangle(rc);
 			pRenderTarget->PushAxisAlignedClip(rcClip, D2D1_ANTIALIAS_MODE_ALIASED);
 		}
+		//pfm->pTextFormat->SetReadingDirection(mode.bidiR2L ? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT : DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
 
 		// Explicitly creating a text layout appears a little faster
 		IDWriteTextLayout *pTextLayout = nullptr;
@@ -2456,8 +2458,18 @@ void SurfaceD2D::DrawTextCommon(PRectangle rc, const Font *font_, XYPOSITION yba
 			&pTextLayout);
 		if (SUCCEEDED(hr)) {
 			const D2D1_POINT_2F origin = DPointFromPoint(Point(rc.left, ybase - pfm->yAscent));
+			//DWRITE_TEXT_METRICS textMetrics{};
+			//pTextLayout->GetMetrics(&textMetrics);
+			//const FLOAT width = textMetrics.widthIncludingTrailingWhitespace + 24.0f;
+			//const FLOAT width = static_cast<FLOAT>(rc.Width());
+			//D2D1::Matrix3x2F invertX = D2D1::Matrix3x2F(-1, 0, 0, 1, 0, 0);
+			//D2D1::Matrix3x2F moveX = D2D1::Matrix3x2F::Translation(width, 0);
+			//pRenderTarget->SetTransform(invertX * moveX);
+			//pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(180.0f, DPointFromPoint(rc.Centre())));
+			//pRenderTarget->SetTransform(D2D1::Matrix3x2F::Rotation(180.0f, origin));
 			pRenderTarget->DrawTextLayout(origin, pTextLayout, pBrush, d2dDrawTextOptions);
 			ReleaseUnknown(pTextLayout);
+			//pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 		}
 
 		if (fuOptions & ETO_CLIPPED) {
