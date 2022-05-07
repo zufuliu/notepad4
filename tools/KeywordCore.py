@@ -173,11 +173,14 @@ def UpdateKeywordFile(rid, path, lexer, keywordList, keywordCount=16, suffix='')
 		suffix = (suffix + ' Settings').strip()
 		Regenerate(path, '//' + suffix, output)
 
-def UpdateLexerEnumFile(path):
+def UpdateLexerEnumFile(path, lexerPath):
 	output = dump_enum_flag(LexerAttr, as_shift=True)
 	output.append('')
-	output.extend(dump_enum_flag(KeywordAttr, max_value=256))
+	output.extend(dump_enum_flag(KeywordAttr, max_value=KeywordAttr.Special))
 	Regenerate(path, '//Lexer Enum', output)
+
+	output = dump_enum_flag(KeywordAttr, indent='\t', anonymous=False, max_value=KeywordAttr.NoLexer)
+	Regenerate(lexerPath, '//', output)
 
 
 def split_api_section(doc, comment, commentKind=0):
@@ -2187,7 +2190,7 @@ def parse_xml_api_file(path):
 		('value', [], KeywordAttr.NoLexer),
 	]
 
-def update_lexer_keyword_attr(indexPath, lexerPath):
+def UpdateLexerKeywordAttr(indexPath, lexerPath):
 	#print(SinglyWordMap)
 	output = []
 	if AllKeywordAttrList:

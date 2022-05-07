@@ -29,7 +29,7 @@ lexerList = [
 	('NP2LEX_GRAPHVIZ', 'stlGraphViz.c', 'LexGraphViz.cxx', 'GraphViz.dot', 0, parse_graphviz_api_file),
 		('NP2LEX_BLOCKDIAG', 'stlBlockdiag.c', 'LexGraphViz.cxx', 'blockdiag.diag', 0, parse_graphviz_api_file),
 		('NP2LEX_CSS', 'stlCSS.c', 'LexCSS.cxx', ['CSS.css', 'SCSS.scss', 'Less.less', 'HSS.hss'], 0, parse_css_api_file),
-	('NP2LEX_GO', 'stlGO.c', 'LexGo.cxx', 'Go.go', 0, parse_go_api_file),
+	('NP2LEX_GO', 'stlGo.c', 'LexGo.cxx', 'Go.go', 0, parse_go_api_file),
 
 	('NP2LEX_HAXE', 'stlHaxe.c', 'LexHaxe.cxx', 'Haxe.hx', 1, parse_haxe_api_file),
 	('NP2LEX_HTML', 'stlHTML.c', 'LexHTML.cxx', 'html.html', 1, parse_html_api_file),
@@ -124,7 +124,7 @@ def update_all_keyword():
 		print('missing lexer config:', ', '.join(sorted(missing)))
 	if missing := handled - config:
 		print('default lexer config:', ', '.join(sorted(missing)))
-	update_lexer_keyword_attr('../src/EditAutoC.c', '../scintilla/lexers/')
+	UpdateLexerKeywordAttr('../src/EditAutoC.c', '../scintilla/lexers/')
 
 update_all_keyword()
-UpdateLexerEnumFile('../src/EditLexer.h')
+UpdateLexerEnumFile('../src/EditLexer.h', '../scintilla/lexlib/WordList.h')

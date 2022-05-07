@@ -1892,7 +1892,7 @@ void EditAutoCloseBraceQuote(int ch) {
 	const int charStyle = GetCharacterStyle(pLexCurrent->iLexer);
 	if (charStyle != 0) {
 		// within char
-		if (iPrevStyle == charStyle && iNextStyle == charStyle && pLexCurrent->rid != NP2LEX_PHP) {
+		if (iPrevStyle == charStyle && iNextStyle == charStyle) {
 			return;
 		}
 	}

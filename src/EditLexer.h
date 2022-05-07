@@ -76,11 +76,12 @@ typedef struct EDITLEXER {
 	const int rid;
 	// default settings for this scheme.
 	struct {
-		const uint8_t lexerAttr;
+		const uint32_t lexerAttr;
 		const uint8_t defaultTabWidth;
 		const uint8_t defaultIndentWidth;
 		const uint8_t defaultFoldLevelMask;
 		const uint8_t defaultFoldIgnoreInner;
+
 		const uint64_t keywordAttr;
 	};
 	struct {
@@ -88,6 +89,7 @@ typedef struct EDITLEXER {
 		uint8_t bStyleChanged;
 		uint8_t bUseDefaultCodeStyle;
 		int iFavoriteOrder;
+
 		const unsigned int iStyleCount;
 		const int iNameLen;
 		const wchar_t * const pszName;
