@@ -84,7 +84,7 @@ namespace {
 
 // all interpolated styles are different from their parent styles by a constant difference
 // we also assume SCE_PL_STRING_VAR is the interpolated style with the smallest value
-#define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING)
+#define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING_DQ)
 
 bool isPerlKeyword(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
@@ -305,7 +305,7 @@ bool styleCheckSubPrototype(LexAccessor &styler, Sci_PositionU bk) {
 
 int actualNumStyle(int numberStyle) noexcept {
 	if (numberStyle == PERLNUM_VECTOR || numberStyle == PERLNUM_V_VECTOR) {
-		return SCE_PL_STRING;
+		return SCE_PL_STRING_DQ;
 	} else if (numberStyle == PERLNUM_BAD) {
 		return SCE_PL_ERROR;
 	}
@@ -596,7 +596,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		startPos = styler.LineStart(styler.GetLine(startPos));
 		initStyle = styler.StyleAt(startPos - 1);
 	}
-	if (initStyle == SCE_PL_STRING
+	if (initStyle == SCE_PL_STRING_DQ
 		|| initStyle == SCE_PL_STRING_QQ
 		|| initStyle == SCE_PL_BACKTICKS
 		|| initStyle == SCE_PL_STRING_QX
@@ -624,7 +624,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	} else if (initStyle == SCE_PL_STRING_Q
 		|| initStyle == SCE_PL_STRING_QW
 		|| initStyle == SCE_PL_XLAT
-		|| initStyle == SCE_PL_CHARACTER
+		|| initStyle == SCE_PL_STRING_SQ
 		|| initStyle == SCE_PL_NUMBER
 		|| initStyle == SCE_PL_IDENTIFIER
 		|| initStyle == SCE_PL_ERROR
@@ -1069,8 +1069,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		case SCE_PL_STRING_QQ:
 		case SCE_PL_STRING_QX:
 		case SCE_PL_STRING_QW:
-		case SCE_PL_STRING:
-		case SCE_PL_CHARACTER:
+		case SCE_PL_STRING_DQ:
+		case SCE_PL_STRING_SQ:
 		case SCE_PL_BACKTICKS:
 			if (!Quote.Down && !IsASpace(sc.ch)) {
 				Quote.Open(sc.ch);
@@ -1095,7 +1095,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				if (sLen > 0) {	// process non-empty segments
 					switch (sc.state) {
-					case SCE_PL_STRING:
+					case SCE_PL_STRING_DQ:
 					case SCE_PL_STRING_QQ:
 					case SCE_PL_BACKTICKS:
 						InterpolateSegment(sc, sLen);
@@ -1300,7 +1300,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			} else if (sc.ch == '#') {
 				sc.SetState(SCE_PL_COMMENTLINE);
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_PL_STRING);
+				sc.SetState(SCE_PL_STRING_DQ);
 				Quote.New();
 				Quote.Open(sc.ch);
 				backFlag = BACK_NONE;
@@ -1309,7 +1309,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					// Archaic call
 					sc.SetState(SCE_PL_IDENTIFIER);
 				} else {
-					sc.SetState(SCE_PL_CHARACTER);
+					sc.SetState(SCE_PL_STRING_SQ);
 					Quote.New();
 					Quote.Open(sc.ch);
 				}

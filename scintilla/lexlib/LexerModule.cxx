@@ -74,7 +74,7 @@ extern LexerModule lmPHPScript;
 extern LexerModule lmPowerShell;
 extern LexerModule lmProps;
 extern LexerModule lmPython;
-extern LexerModule lmREBOL;
+extern LexerModule lmRebol;
 extern LexerModule lmRLang;
 extern LexerModule lmRuby;
 extern LexerModule lmRust;
@@ -149,7 +149,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmPowerShell,
 	&lmProps,
 	&lmPython,
-	&lmREBOL,
+	&lmRebol,
 	&lmRLang,
 	&lmRuby,
 	&lmRust,

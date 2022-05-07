@@ -742,8 +742,14 @@ static inline BOOL IsEscapeCharEx(int ch, int style) {
 		// not in raw string
 		return !(style >= SCE_PY_STRING_SQ && (style & 7) > 3);
 
+	case SCLEX_RUBY:
+		return style != SCE_RB_STRING_SQ;
+
 	case SCLEX_RUST:
 		return style != SCE_RUST_RAW_STRING && style != SCE_RUST_RAW_BYTESTRING;
+
+	case SCLEX_VIM:
+		return style != SCE_VIM_STRING_SQ;
 	}
 	return TRUE;
 }

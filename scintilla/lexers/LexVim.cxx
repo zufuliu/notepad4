@@ -127,7 +127,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 			break;
 
-		case SCE_VIM_STRING:
+		case SCE_VIM_STRING_DQ:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_VIM_DEFAULT);
 			} else if (sc.ch == '\\') {
@@ -142,19 +142,19 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_VIM_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
-				sc.SetState(SCE_VIM_STRING);
+				sc.SetState(SCE_VIM_STRING_DQ);
 				continue;
 			}
 			break;
 
-		case SCE_VIM_CHARACTER:
+		case SCE_VIM_STRING_SQ:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_VIM_DEFAULT);
 			} else if (sc.ch == '\'') {
 				if (sc.chNext == '\'') {
 					sc.SetState(SCE_VIM_ESCAPECHAR);
 					sc.Forward();
-					sc.ForwardSetState(SCE_VIM_CHARACTER);
+					sc.ForwardSetState(SCE_VIM_STRING_SQ);
 					continue;
 				}
 				sc.ForwardSetState(SCE_VIM_DEFAULT);
@@ -184,12 +184,12 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		if (sc.state == SCE_VIM_DEFAULT) {
 			if (sc.ch == '\"') {
-				sc.SetState((visibleChars == 0) ? SCE_VIM_COMMENTLINE : SCE_VIM_STRING);
+				sc.SetState((visibleChars == 0) ? SCE_VIM_COMMENTLINE : SCE_VIM_STRING_DQ);
 				if (actuallyVisibleChars == 0) {
 					lineStateLineComment = VimLineStateMaskLineComment;
 				}
 			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_VIM_CHARACTER);
+				sc.SetState(SCE_VIM_STRING_SQ);
 			} else if (sc.ch == '0' && (sc.chNext == 'z' || sc.chNext == 'Z')) {
 				sc.SetState(SCE_VIM_BLOB_HEX);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {

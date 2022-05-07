@@ -22,7 +22,7 @@ static EDITSTYLE Styles_VIM[] = {
 	{ SCE_VIM_COMMANDS, NP2StyleX_Command, L"fore:#FF8000" },
 	{ SCE_VIM_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_VIM_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_VIM_STRING, SCE_VIM_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_VIM_STRING_DQ, SCE_VIM_STRING_SQ, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_VIM_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	//{ SCE_VIM_HEREDOC, NP2StyleX_HeredocString, L"fore:#648000" },
 	{ SCE_VIM_BLOB_HEX, NP2StyleX_HexString, L"fore:#C08000" },

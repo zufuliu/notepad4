@@ -39,7 +39,7 @@ static EDITSTYLE Styles_Perl[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_PL_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_PL_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_PL_STRING, SCE_PL_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_PL_STRING_DQ, SCE_PL_STRING_SQ, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_PL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_PL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_PL_SCALAR, SCE_PL_STRING_VAR, 0, 0), NP2StyleX_ScalarVar, L"fore:#0000FF" },

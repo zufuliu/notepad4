@@ -125,8 +125,8 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_JSON_STRING:
-		case SCE_JSON_CHARACTER:
+		case SCE_JSON_STRING_DQ:
+		case SCE_JSON_STRING_SQ:
 			if (i == lineEndPos) { // atLineEnd
 				if (lineContinuation) {
 					lineContinuation = false;
@@ -158,7 +158,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					styler.ColorTo(i + 1, SCE_JSON_ESCAPESEQUENCE);
 					continue;
 				}
-			} else if ((state == SCE_JSON_STRING && ch == '\"') || (state == SCE_JSON_CHARACTER && ch == '\'')) {
+			} else if ((state == SCE_JSON_STRING_DQ && ch == '\"') || (state == SCE_JSON_STRING_SQ && ch == '\'')) {
 				if (chNext == ':' || LexGetNextChar(styler, i + 1) == ':') {
 					styler.ColorTo(i + 1, SCE_JSON_PROPERTYNAME);
 				} else {

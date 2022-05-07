@@ -84,7 +84,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	int sepCount = 0;
 	int stringWs = 0;
 	if (initStyle == SCE_LUA_LITERALSTRING || initStyle == SCE_LUA_COMMENT ||
-		initStyle == SCE_LUA_STRING || initStyle == SCE_LUA_CHARACTER) {
+		initStyle == SCE_LUA_STRING_DQ || initStyle == SCE_LUA_STRING_SQ) {
 		const int lineState = styler.GetLineState(currentLine - 1);
 		sepCount = lineState & 0xFF;
 		stringWs = lineState & 0x100;
@@ -107,8 +107,8 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			switch (sc.state) {
 			case SCE_LUA_LITERALSTRING:
 			case SCE_LUA_COMMENT:
-			case SCE_LUA_STRING:
-			case SCE_LUA_CHARACTER:
+			case SCE_LUA_STRING_DQ:
+			case SCE_LUA_STRING_SQ:
 				// Inside a literal string, block comment or string, we set the line state
 				styler.SetLineState(currentLine, stringWs | sepCount);
 				break;
@@ -118,13 +118,13 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				break;
 			}
 		}
-		if (sc.atLineStart && (sc.state == SCE_LUA_STRING)) {
+		if (sc.atLineStart && (sc.state == SCE_LUA_STRING_DQ)) {
 			// Prevent SCE_LUA_STRINGEOL from leaking back to previous line
-			sc.SetState(SCE_LUA_STRING);
+			sc.SetState(SCE_LUA_STRING_DQ);
 		}
 
 		// Handle string line continuation
-		if ((sc.state == SCE_LUA_STRING || sc.state == SCE_LUA_CHARACTER) &&
+		if ((sc.state == SCE_LUA_STRING_DQ || sc.state == SCE_LUA_STRING_SQ) &&
 			sc.ch == '\\') {
 			if (sc.chNext == '\n' || sc.chNext == '\r') {
 				sc.Forward();
@@ -226,7 +226,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			if (sc.atLineStart) {
 				sc.SetState(SCE_LUA_DEFAULT);
 			}
-		} else if (sc.state == SCE_LUA_STRING) {
+		} else if (sc.state == SCE_LUA_STRING_DQ) {
 			if (stringWs) {
 				if (!IsASpace(sc.ch))
 					stringWs = 0;
@@ -244,7 +244,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.ChangeState(SCE_LUA_STRINGEOL);
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
-		} else if (sc.state == SCE_LUA_CHARACTER) {
+		} else if (sc.state == SCE_LUA_STRING_SQ) {
 			if (stringWs) {
 				if (!IsASpace(sc.ch))
 					stringWs = 0;
@@ -280,10 +280,10 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_LUA_IDENTIFIER);
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_LUA_STRING);
+				sc.SetState(SCE_LUA_STRING_DQ);
 				stringWs = 0;
 			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_LUA_CHARACTER);
+				sc.SetState(SCE_LUA_STRING_SQ);
 				stringWs = 0;
 			} else if (sc.ch == '[') {
 				sepCount = LongDelimCheck(sc);

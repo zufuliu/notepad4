@@ -57,13 +57,13 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, int ini
 				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
 			}
 			break;
-		case SCE_POWERSHELL_STRING:
+		case SCE_POWERSHELL_STRING_DQ:
 			// This is a doubles quotes string
 			if (sc.ch == '\"') {
 				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
 			}
 			break;
-		case SCE_POWERSHELL_CHARACTER:
+		case SCE_POWERSHELL_STRING_SQ:
 			// This is a single quote string
 			if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
@@ -112,9 +112,9 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position length, int ini
 			} else if (sc.ch == '<' && sc.chNext == '#') {
 				sc.SetState(SCE_POWERSHELL_COMMENTSTREAM);
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_POWERSHELL_STRING);
+				sc.SetState(SCE_POWERSHELL_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_POWERSHELL_CHARACTER);
+				sc.SetState(SCE_POWERSHELL_STRING_SQ);
 			} else if (sc.ch == '$') {
 				sc.SetState(SCE_POWERSHELL_VARIABLE);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {

@@ -93,7 +93,7 @@ static EDITSTYLE Styles_Ruby[] = {
 	{ SCE_RB_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_RB_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_RB_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
-	{ MULTI_STYLE(SCE_RB_STRING, SCE_RB_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_RB_STRING_DQ, SCE_RB_STRING_SQ, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_RB_POD, NP2StyleX_POD, L"fore:#004000; back:#C0FFC0; eolfilled" },
 	{ SCE_RB_BACKTICKS, NP2StyleX_Backticks, L"fore:#FF0080" },
 	{ SCE_RB_REGEX, NP2StyleX_Regex, L"back:#A0FFA0" },

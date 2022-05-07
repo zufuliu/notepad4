@@ -157,7 +157,7 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 				sc.SetState(SCE_PAS_DEFAULT);
 			}
 			break;
-		case SCE_PAS_STRING:
+		case SCE_PAS_STRING_DQ:
 			if (sc.atLineEnd) {
 				sc.ChangeState(SCE_PAS_STRINGEOL);
 			} else if (sc.ch == '\'' && sc.chNext == '\'') {
@@ -219,7 +219,7 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			} else if (sc.Match('/', '/')) {
 				sc.SetState(SCE_PAS_COMMENTLINE);
 			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_PAS_STRING);
+				sc.SetState(SCE_PAS_STRING_DQ);
 			} else if (sc.ch == '#') {
 				if (curLineState & stateInAsm) {
 					sc.SetState(SCE_PAS_HEXNUMBER);

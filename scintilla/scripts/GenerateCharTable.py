@@ -144,8 +144,8 @@ def GenerateJsonCharClass():
 	SCE_JSON_NUMBER = 2
 	SCE_JSON_MAYBE_KEYWORD = 3
 	SCE_JSON_IDENTIFIER = 4
-	SCE_JSON_STRING = 5
-	SCE_JSON_CHARACTER = 6
+	SCE_JSON_STRING_DQ = 5
+	SCE_JSON_STRING_SQ = 6
 
 	JsonChar_None = 0
 	JsonChar_BraceOpen = 1
@@ -176,9 +176,9 @@ def GenerateJsonCharClass():
 					# SignedInteger in ExponentPart
 					mask = JsonMask_Number
 		elif ch == '\"':
-			state = SCE_JSON_STRING
+			state = SCE_JSON_STRING_DQ
 		elif ch == '\'':
-			state = SCE_JSON_CHARACTER
+			state = SCE_JSON_STRING_SQ
 		elif ch == '/':
 			charClass = JsonChar_Slash
 		elif ch == '.':

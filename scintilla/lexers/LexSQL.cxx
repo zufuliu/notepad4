@@ -169,24 +169,24 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.SetState(SCE_SQL_DEFAULT);
 			}
 			break;
-		case SCE_SQL_CHARACTER:
+		case SCE_SQL_STRING_SQ:
 			if ((sqlBackslashEscapes && sc.ch == '\\') || (sc.ch == '\'' && sc.chNext == '\'')) {
 				// Escape sequence
 				sc.SetState(SCE_SQL_ESCAPECHAR);
 				sc.Forward();
-				sc.ForwardSetState(SCE_SQL_CHARACTER);
+				sc.ForwardSetState(SCE_SQL_STRING_SQ);
 				continue;
 			}
 			if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_SQL_DEFAULT);
 			}
 			break;
-		case SCE_SQL_STRING:
+		case SCE_SQL_STRING_DQ:
 			if ((sqlBackslashEscapes && sc.ch == '\\') || (sc.ch == '\"' && sc.chNext == '\"')) {
 				// Escape sequence
 				sc.SetState(SCE_SQL_ESCAPECHAR);
 				sc.Forward();
-				sc.ForwardSetState(SCE_SQL_STRING);
+				sc.ForwardSetState(SCE_SQL_STRING_DQ);
 				continue;
 			}
 			if (sc.ch == '\"') {
@@ -263,9 +263,9 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			} else if (sc.ch == '#' && sqlNumbersignComment) {
 				sc.SetState(SCE_SQL_COMMENTLINEDOC);
 			} else if (sc.ch == '\'') {
-				sc.SetState(SCE_SQL_CHARACTER);
+				sc.SetState(SCE_SQL_STRING_SQ);
 			} else if (sc.ch == '\"') {
-				sc.SetState(SCE_SQL_STRING);
+				sc.SetState(SCE_SQL_STRING_DQ);
 			} else if (isoperator(sc.ch)) {
 				sc.SetState(SCE_SQL_OPERATOR);
 			}

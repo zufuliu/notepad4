@@ -810,12 +810,12 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 			} else if (ch == '"') {
 				styler.ColorTo(i, state);
-				state = SCE_RB_STRING;
+				state = SCE_RB_STRING_DQ;
 				Quote.New();
 				Quote.Open(ch);
 			} else if (ch == '\'') {
 				styler.ColorTo(i, state);
-				state = SCE_RB_CHARACTER;
+				state = SCE_RB_STRING_SQ;
 				Quote.New();
 				Quote.Open(ch);
 			} else if (ch == '`') {
@@ -1427,7 +1427,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			// Quotes of all kinds...
 		} else if (state == SCE_RB_STRING_Q || state == SCE_RB_STRING_QQ ||
 				state == SCE_RB_STRING_QX || state == SCE_RB_STRING_QW ||
-				state == SCE_RB_STRING || state == SCE_RB_CHARACTER ||
+				state == SCE_RB_STRING_DQ || state == SCE_RB_STRING_SQ ||
 				state == SCE_RB_BACKTICKS) {
 			if (!Quote.Down && !isspacechar(ch)) {
 				Quote.Open(ch);
@@ -1445,7 +1445,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				Quote.Count++;
 			} else if (ch == '#' && chNext == '{'
 					&& inner_string_count < INNER_STRINGS_MAX_COUNT
-					&& state != SCE_RB_CHARACTER
+					&& state != SCE_RB_STRING_SQ
 					&& state != SCE_RB_STRING_Q) {
 				// process #{ ... }
 				styler.ColorTo(i, state);
