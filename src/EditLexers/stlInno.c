@@ -285,7 +285,8 @@ EDITLEXER lexInnoSetup = {
 		(1 << 0) | (1 << 1), // section, code
 		0,
 		0, '\0', 0,
-		0
+		0,
+		SCE_INNO_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_NoLexer) // section
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // parameters
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // constants

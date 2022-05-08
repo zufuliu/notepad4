@@ -520,7 +520,8 @@ EDITLEXER lexSQL = {
 		(1 << 0), // function
 		0,
 		0, '\\', SCE_SQL_ESCAPECHAR,
-		0
+		0,
+		SCE_SQL_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // data types
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // functions

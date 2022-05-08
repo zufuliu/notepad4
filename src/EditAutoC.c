@@ -1746,34 +1746,6 @@ static inline int GetCharacterStyle(int iLexer) {
 	}
 }
 
-static inline int GetGenericOperatorStyle(int iLexer) {
-	switch (iLexer) {
-	case SCLEX_CPP:
-		return SCE_C_OPERATOR;
-	case SCLEX_CSHARP:
-		return SCE_CSHARP_OPERATOR;
-	case SCLEX_DART:
-		return SCE_DART_OPERATOR;
-	case SCLEX_GROOVY:
-		return SCE_GROOVY_OPERATOR;
-	case SCLEX_HAXE:
-		return SCE_HAXE_OPERATOR;
-	case SCLEX_JAVA:
-		return SCE_JAVA_OPERATOR;
-	case SCLEX_JAVASCRIPT:
-		return SCE_JS_OPERATOR;
-	case SCLEX_KOTLIN:
-		return SCE_KOTLIN_OPERATOR;
-	case SCLEX_RUST:
-		return SCE_RUST_CHARACTER;
-	case SCLEX_SWIFT:
-		return SCE_SWIFT_OPERATOR;
-	default:
-		// '<>' is not generic or template
-		return 0;
-	}
-}
-
 static inline BOOL IsGenericTypeStyle(int iLexer, int style) {
 	switch (iLexer) {
 	case SCLEX_CPP:
@@ -1950,10 +1922,9 @@ void EditAutoCloseXMLTag(void) {
 	BOOL shouldAutoClose = iSize >= 3 && autoCompletionConfig.bCloseTags;
 	BOOL autoClosed = FALSE;
 
-	const int ignoreStyle = GetGenericOperatorStyle(pLexCurrent->iLexer);
-	if (shouldAutoClose && ignoreStyle != 0) {
+	if (shouldAutoClose && (pLexCurrent->lexerAttr & LexerAttr_AngleBracketGeneric)) {
 		int iCurrentStyle = SciCall_GetStyleAt(iCurPos);
-		if (iCurrentStyle == 0 || iCurrentStyle == ignoreStyle) {
+		if (iCurrentStyle == 0 || iCurrentStyle == pLexCurrent->operatorStyle || iCurrentStyle == pLexCurrent->operatorStyle2) {
 			shouldAutoClose = FALSE;
 		} else if (pLexCurrent->iLexer == SCLEX_CPP) {
 			const Sci_Line iLine = SciCall_LineFromPosition(iCurPos);

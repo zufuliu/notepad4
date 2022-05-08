@@ -630,7 +630,7 @@ def parse_cmake_api_file(path):
 		('long variables', [], KeywordAttr.NoLexer),
 	]
 
-def parse_cpp_api_file(path):
+def parse_cpp_api_file(pathList):
 	return [
 		('keywords', [], KeywordAttr.Default),
 		('type keyword', [], KeywordAttr.Default),
@@ -1751,7 +1751,7 @@ def parse_python_api_file(path):
 		('comment tag', keywordMap['comment'], KeywordAttr.NoLexer),
 	]
 
-def parse_r_api_file(path):
+def parse_rlang_api_file(path):
 	sections = read_api_file(path, '#')
 	keywordMap = {}
 	for key, doc in sections:
@@ -1962,7 +1962,7 @@ def parse_smali_api_file(path):
 		('instruction', [], KeywordAttr.Default),
 	]
 
-def parse_sql_api_files(pathList):
+def parse_sql_api_file(pathList):
 	keywordMap = {}
 	for path in pathList:
 		sections = read_api_file(path, '--')
@@ -2126,8 +2126,13 @@ def parse_visual_basic_api_file(path):
 
 def parse_wasm_lexer_keywords(path):
 	if not os.path.isfile(path):
-		AllKeywordAttrList['NP2LEX_WASM'] = [(3, KeywordAttr.NoLexer, 'full instruction')]
-		return []
+		print('missing file:', path)
+		return [
+			('keywords', [], KeywordAttr.Default),
+			('type', [], KeywordAttr.Default),
+			('instruction', [], KeywordAttr.Default),
+			('full instruction',[], KeywordAttr.NoLexer),
+		]
 
 	keywordMap = {
 		'keywords': [],

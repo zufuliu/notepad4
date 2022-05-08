@@ -75,7 +75,8 @@ EDITLEXER lexAsymptote = {
 		(1 << 0) | (1 << 1), // struct, function
 		SCE_ASY_FUNCTION_DEFINITION,
 		0, '\\', SCE_ASY_ESCAPECHAR,
-		0
+		0,
+		SCE_ASY_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // structs

@@ -76,7 +76,8 @@ EDITLEXER lexVBScript = {
 		(1 << 0), // function
 		0,
 		0, '\0', 0,
-		0
+		0,
+		SCE_B_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_MakeLower) // keywords
 		| KeywordAttr32(1, KeywordAttr_MakeLower) // type keyword
 		| KeywordAttr32(2, KeywordAttr_MakeLower) // demoted keyword

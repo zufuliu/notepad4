@@ -121,7 +121,8 @@ EDITLEXER lexGo = {
 		(1 << 0) | (1 << 1), // struct, function
 		SCE_GO_FUNCTION_DEFINITION,
 		SCE_GO_FORMAT_SPECIFIER, '\\', SCE_GO_ESCAPECHAR,
-		SCE_GO_RAW_STRING
+		SCE_GO_RAW_STRING,
+		SCE_GO_OPERATOR, SCE_GO_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // primitive types
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // builtin functions

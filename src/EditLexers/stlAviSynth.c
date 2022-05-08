@@ -176,7 +176,8 @@ EDITLEXER lexAviSynth = {
 		(1 << 0), // function
 		0,
 		0, '\\', SCE_AVS_ESCAPECHAR,
-		0
+		0,
+		SCE_AVS_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_MakeLower) // internal functions
 		| KeywordAttr32(2, KeywordAttr_MakeLower) // internal filters

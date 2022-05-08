@@ -90,7 +90,8 @@ EDITLEXER lexNsis = {
 		(1 << 0) | (1 << 1), // section, function
 		0,
 		0, '\\', SCE_NSIS_ESCAPECHAR,
-		0
+		0,
+		SCE_NSIS_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_MakeLower) // keywords
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // preprocessor
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // instruction

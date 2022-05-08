@@ -36,6 +36,7 @@ enum {
 	LexerAttr_IndentBasedFolding = 1 << 4,
 	LexerAttr_IndentLookForward = 1 << 5,
 	LexerAttr_PrintfFormatSpecifier = 1 << 6,
+	LexerAttr_AngleBracketGeneric = 1 << 7,
 };
 
 enum {
@@ -54,6 +55,7 @@ enum {
 
 typedef struct EDITSTYLE {
 	const int iStyle;
+	// set with EDITSTYLE_HOLE() or EDITSTYLE_HOLEX()
 	struct {
 		const int rid;
 		const int iNameLen;
@@ -87,9 +89,12 @@ typedef struct EDITLEXER {
 		const uint8_t escapeCharacterStart;
 		const uint8_t escapeCharacterStyle;
 		const uint8_t rawStringStyle;
+		const uint8_t operatorStyle;
+		const uint8_t operatorStyle2;
 
 		const uint64_t keywordAttr;
 	};
+	// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
 	struct {
 		uint8_t iStyleTheme;
 		uint8_t bStyleChanged;

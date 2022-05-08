@@ -72,7 +72,8 @@ EDITLEXER lexBlockdiag = {
 		(1 << 0) | (1 << 1), // graph, subgraph
 		0,
 		0, '\\', SCE_GRAPHVIZ_ESCAPECHAR,
-		0
+		0,
+		SCE_GRAPHVIZ_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // html labels
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // attributes

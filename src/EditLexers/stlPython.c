@@ -370,7 +370,8 @@ EDITLEXER lexPython = {
 		(1 << 1) | (1 << 2), // class, function
 		SCE_PY_FUNCTION_DEFINITION,
 		SCE_PY_FORMAT_SPECIFIER, '\\', SCE_PY_ESCAPECHAR,
-		SCE_PY_RAWSTRING_SQ
+		SCE_PY_RAWSTRING_SQ,
+		SCE_PY_OPERATOR, SCE_PY_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // type
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // built-in constant

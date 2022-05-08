@@ -132,7 +132,8 @@ EDITLEXER lexBatch = {
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
 		0, '^', SCE_BAT_ESCAPECHAR,
-		0
+		0,
+		SCE_BAT_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // internal commands
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // system commands

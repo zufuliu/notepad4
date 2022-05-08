@@ -8,14 +8,17 @@ lexerList = [
 	('NP2LEX_ABAQUS', 'stlABAQUS.c', 'LexAPDL.cxx', 'ABAQUS.inp', 0, parse_apdl_api_file),
 	('NP2LEX_ACTIONSCRIPT', 'stlActionScript.c', 'LexJavaScript.cxx', 'ActionScript.as', 1, parse_actionscript_api_file),
 	('NP2LEX_APDL', 'stlAPDL.c', 'LexAPDL.cxx', 'APDL.cdb', 0, parse_apdl_api_file),
+	('NP2LEX_ASM', 'stlAsm.c', 'LexAsm.cxx', '', 0, None),
 	('NP2LEX_ASYMPTOTE', 'stlAsymptote.c', 'LexAsymptote.cxx', 'Asymptote.asy', 1, parse_asymptote_api_file),
 	('NP2LEX_AUTOHOTKEY', 'stlAutoHotkey.c', 'LexAutoHotkey.cxx', ['AutoHotkey_L.ahk', 'AutoHotkey_H.ahk'], 0, parse_autohotkey_api_file),
+	('NP2LEX_AUTOIT3', 'stlAutoIt3.c', 'LexAutoIt3.cxx', '', 0, None),
 	('NP2LEX_AVISYNTH', 'stlAviSynth.c', 'LexAviSynth.cxx', 'AviSynth.avs', 0, parse_avisynth_api_file),
 	('NP2LEX_AWK', 'stlAwk.c', 'LexAwk.cxx', 'Awk.awk', 1, parse_awk_api_file),
 
 	('NP2LEX_BASH', 'stlBash.c', 'LexBash.cxx', '', 0, None),
 	('NP2LEX_BATCH', 'stlBatch.c', 'LexBatch.cxx', 'Batch.bat', 0, parse_batch_api_file),
 
+	('NP2LEX_CIL', 'stlCIL.c', 'LexCIL.cxx', '', 0, None),
 	('NP2LEX_CMAKE', 'stlCMake.c', 'LexCMake.cxx', 'CMake.cmake', 0, parse_cmake_api_file),
 	('NP2LEX_CONFIG', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 	('NP2LEX_CPP', 'stlCPP.c', 'LexCPP.cxx', ['CPP.cpp', 'C.c', 'POSIX.c'], 1, parse_cpp_api_file),
@@ -24,6 +27,9 @@ lexerList = [
 	('NP2LEX_DLANG', 'stlD.c', 'LexD.cxx', 'D.d', 1, parse_dlang_api_file),
 	('NP2LEX_DART', 'stlDart.c', 'LexDart.cxx', 'Dart.dart', 0, parse_dart_api_file),
 	('NP2LEX_DIFF', 'stlDefault.c', 'LexDiff.cxx', '', (0, 'Diff'), None),
+
+	('NP2LEX_FORTRAN', 'stlFortran.c', 'LexFortran.cxx', '', 0, None),
+	('NP2LEX_FSHARP', 'stlFSharp.c', 'LexFSharp.cxx', '', 0, None),
 
 	('NP2LEX_GN', 'stlGN.c', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),
 	('NP2LEX_GRAPHVIZ', 'stlGraphViz.c', 'LexGraphViz.cxx', 'GraphViz.dot', 0, parse_graphviz_api_file),
@@ -49,6 +55,7 @@ lexerList = [
 	('NP2LEX_JULIA', 'stlJulia.c', 'LexJulia.cxx', 'Julia.jl', 0, parse_julia_api_file),
 
 	('NP2LEX_LATEX', 'stlLaTeX.c', 'LexLaTeX.cxx', '', 0, None),
+	('NP2LEX_LISP', 'stlLisp.c', 'LexLisp.cxx', '', 0, None),
 	('NP2LEX_LLVM', 'stlLLVM.c', 'LexLLVM.cxx', 'LLVM.ll', 0, parse_llvm_api_file),
 	('NP2LEX_LUA', 'stlLua.c', 'LexLua.cxx', 'Lua.lua', 0, parse_lua_api_file),
 
@@ -58,12 +65,13 @@ lexerList = [
 
 	('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
 
+	('NP2LEX_PASCAL', 'stlPascal.c', 'LexPascal.cxx', '', 0, None),
 	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', '', 0, None),
 	('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
 	('NP2LEX_POWERSHELL', 'stlPowerShell.c', 'LexPowerShell.cxx', '', 0, None),
 	('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
 
-	('NP2LEX_RLANG', 'stlR.c', 'LexR.cxx', 'R.r', 0, parse_r_api_file),
+	('NP2LEX_RLANG', 'stlR.c', 'LexR.cxx', 'R.r', 0, parse_rlang_api_file),
 	('NP2LEX_REBOL', 'stlRebol.c', 'LexRebol.cxx', ['Rebol.r', 'Red.red'], 1, parse_rebol_api_file),
 	('NP2LEX_RESOURCESCRIPT', 'stlResource.c', 'LexCPP.cxx', '', 0, parse_resource_script_api_file),
 	('NP2LEX_RUBY', 'stlRuby.c', 'LexRuby.cxx', 'Ruby.rb', 0, parse_ruby_api_file),
@@ -79,7 +87,7 @@ lexerList = [
 							'SQL.sql',
 							'SQLite3.sql',
 							'Transact-SQL.sql',
-							], 0, parse_sql_api_files),
+							], 0, parse_sql_api_file),
 	('NP2LEX_SWIFT', 'stlSwift.c', 'LexSwift.cxx', 'Swift.swift', 0, parse_swift_api_file),
 
 	('NP2LEX_TCL', 'stlTcl.c', 'LexTCL.cxx', '', 0, None),
@@ -87,6 +95,8 @@ lexerList = [
 	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, parse_toml_api_file),
 
 	('NP2LEX_VBSCRIPT', 'stlVBS.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
+	('NP2LEX_VERILOG', 'stlVerilog.c', 'LexVerilog.cxx', '', 0, None),
+	('NP2LEX_VHDL', 'stlVHDL.c', 'LexVHDL.cxx', '', 0, None),
 	('NP2LEX_VIM', 'stlVim.c', 'LexVim.cxx', 'Vim.vim', 0, parse_vim_api_file),
 	('NP2LEX_VISUALBASIC', 'stlVB.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
 

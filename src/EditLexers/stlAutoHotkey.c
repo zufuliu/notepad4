@@ -162,7 +162,8 @@ EDITLEXER lexAutoHotkey = {
 		(1 << 0) | (1 << 1), // class, function
 		0,
 		SCE_AHK_FORMAT_SPECIFIER, '`', SCE_AHK_ESCAPECHAR,
-		0
+		0,
+		SCE_AHK_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_MakeLower) // keywords
 		| KeywordAttr32(1, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // directives
 		| KeywordAttr32(2, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // compiler directives
