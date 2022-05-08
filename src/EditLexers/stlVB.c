@@ -91,6 +91,8 @@ EDITLEXER lexVisualBasic = {
 		LexerAttr_NoBlockComment,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // class, function
+		0,
+		0, '\0', 0,
 		0
 		, KeywordAttr32(0, KeywordAttr_MakeLower) // keywords
 		| KeywordAttr32(1, KeywordAttr_MakeLower) // type keyword

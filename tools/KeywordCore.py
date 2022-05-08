@@ -129,7 +129,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 
 		indexName = build_enum_name(comment)
 		# keyword index for lexer
-		if not (attr & KeywordAttr.NoLexer) and comment != 'unused':
+		if (attr & KeywordAttr.NoLexer) == 0 and comment != 'unused':
 			if indexName in indexList:
 				assert index == indexList[indexName][0], (rid, lexer, comment)
 			else:
@@ -143,7 +143,7 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 			else:
 				group[indexName] = index
 		# keyword attribute for lexer
-		if lines and not (attr & KeywordAttr.NoLexer):
+		if lines and (attr & KeywordAttr.NoLexer) == 0:
 			attr |= KeywordAttr.PreSorted
 			if attr & KeywordAttr.MakeLower:
 				result = sorted(to_lower(items))
@@ -2058,6 +2058,12 @@ def parse_swift_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
+def parse_toml_api_file(path):
+	keywords = 'false inf nan true'.split()
+	return [
+		('keywords', keywords, KeywordAttr.Default),
+	]
+
 def parse_typescript_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}
@@ -2188,6 +2194,12 @@ def parse_xml_api_file(path):
 		('attribute', [], KeywordAttr.NoLexer),
 		('event handler', [], KeywordAttr.Default),
 		('value', [], KeywordAttr.NoLexer),
+	]
+
+def parse_yaml_api_file(path):
+	keywords = '.inf .nan Inf NaN None false inf nan no none null off on true yes'.split()
+	return [
+		('keywords', keywords, KeywordAttr.Default),
 	]
 
 def UpdateLexerKeywordAttr(indexPath, lexerPath):

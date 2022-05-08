@@ -364,10 +364,13 @@ EDITLEXER lexPython = {
 	{
 		LexerAttr_NoBlockComment |
 		LexerAttr_IndentBasedFolding |
-		LexerAttr_IndentLookForward,
+		LexerAttr_IndentLookForward |
+		LexerAttr_PrintfFormatSpecifier,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 1) | (1 << 2), // class, function
-		SCE_PY_FUNCTION_DEFINITION
+		SCE_PY_FUNCTION_DEFINITION,
+		SCE_PY_FORMAT_SPECIFIER, '\\', SCE_PY_ESCAPECHAR,
+		SCE_PY_RAWSTRING_SQ
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // type
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // built-in constant

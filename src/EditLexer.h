@@ -35,6 +35,7 @@ enum {
 	LexerAttr_NoBlockComment = 1 << 3,
 	LexerAttr_IndentBasedFolding = 1 << 4,
 	LexerAttr_IndentLookForward = 1 << 5,
+	LexerAttr_PrintfFormatSpecifier = 1 << 6,
 };
 
 enum {
@@ -74,13 +75,18 @@ typedef struct KEYWORDLIST {
 typedef struct EDITLEXER {
 	const int iLexer;
 	const int rid;
-	// default settings for this scheme.
+	// default settings for this scheme, auto generated from LexerConfig.py
 	struct {
 		const uint32_t lexerAttr;
 		const uint8_t defaultTabWidth;
 		const uint8_t defaultIndentWidth;
 		const uint8_t defaultFoldLevelMask;
 		const uint8_t defaultFoldIgnoreInner;
+
+		const uint8_t formatSpecifierStyle;
+		const uint8_t escapeCharacterStart;
+		const uint8_t escapeCharacterStyle;
+		const uint8_t rawStringStyle;
 
 		const uint64_t keywordAttr;
 	};

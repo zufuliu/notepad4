@@ -251,7 +251,9 @@ EDITLEXER lexRust = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // struct, function
-		SCE_RUST_FUNCTION_DEFINITION
+		SCE_RUST_FUNCTION_DEFINITION,
+		SCE_RUST_FORMAT_SPECIFIER, '\\', SCE_RUST_ESCAPECHAR,
+		SCE_RUST_RAW_STRING
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // reserved keywords
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // primitive types

@@ -535,7 +535,7 @@ bool PHPLexer::HighlightInnerString() {
 			}
 		}
 		if (handled) {
-			sc.SetState(SCE_PHP_ESCAPE_CHAR);
+			sc.SetState(SCE_PHP_ESCAPECHAR);
 			sc.Forward();
 		}
 	} else if (sc.ch == '%') {
@@ -876,7 +876,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 			break;
 
-		case SCE_PHP_ESCAPE_CHAR:
+		case SCE_PHP_ESCAPECHAR:
 		case js_style(SCE_JS_ESCAPECHAR):
 		case css_style(SCE_CSS_ESCAPECHAR):
 			if (escSeq.atEscapeEnd(sc.ch)) {

@@ -72,7 +72,9 @@ EDITLEXER lexHaxe = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // class, method
-		SCE_HAXE_FUNCTION_DEFINITION
+		SCE_HAXE_FUNCTION_DEFINITION,
+		0, '\\', SCE_HAXE_ESCAPECHAR,
+		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // preprocessor
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // class

@@ -283,6 +283,8 @@ EDITLEXER lexInnoSetup = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // section, code
+		0,
+		0, '\0', 0,
 		0
 		, KeywordAttr32(0, KeywordAttr_NoLexer) // section
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // parameters

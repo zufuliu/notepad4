@@ -18,6 +18,12 @@ default_fold_level: level list for toggle default code folding.
 default_fold_ignore_inner: inner style to be ignored for toggle default code folding.
 				normally this is function definition style.
 
+printf_format_specifier: has C printf like format specifier, default is False.
+format_specifier_style: style for format specifier, default is zero.
+escape_char_start: character used to escape special characters, default is backslash.
+escape_char_style: style for escape character, default is zero.
+raw_string_style: styles where backslash is treated literally, default are zeros.
+
 """
 
 from enum import IntFlag
@@ -30,6 +36,7 @@ class LexerAttr(IntFlag):
 	NoBlockComment = 1 << 3			# has_block_comment
 	IndentBasedFolding = 1 << 4		# indent_based_folding
 	IndentLookForward = 1 << 5		# indent_guide_style
+	PrintfFormatSpecifier = 1 << 6	# printf_format_specifier
 
 class KeywordAttr(IntFlag):
 	Default = 0
@@ -72,18 +79,21 @@ LexerConfigMap = {
 		'has_block_comment': False,
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
+		'escape_char_start': '\0',
 	},
 	'NP2LEX_2NDTEXTFILE': {
 		'has_line_comment': False,
 		'has_block_comment': False,
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
+		'escape_char_start': '\0',
 	},
 	'NP2LEX_ANSI': {
 		'has_line_comment': False,
 		'has_block_comment': False,
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
+		'escape_char_start': '\0',
 	},
 
 	'NP2LEX_ABAQUS': {
@@ -92,6 +102,7 @@ LexerConfigMap = {
 	'NP2LEX_ACTIONSCRIPT': {
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_JS_ESCAPECHAR',
 	},
 	'NP2LEX_APDL': {
 		'has_block_comment': False,
@@ -99,142 +110,228 @@ LexerConfigMap = {
 	'NP2LEX_ASYMPTOTE': {
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_ASY_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_ASY_ESCAPECHAR',
 	},
 	'NP2LEX_AUTOHOTKEY': {
 		'default_fold_level': ['class', 'function'],
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_AHK_FORMAT_SPECIFIER',
+		'escape_char_start': '`',
+		'escape_char_style': 'SCE_AHK_ESCAPECHAR',
 	},
 	'NP2LEX_AVISYNTH': {
 		'default_fold_level': ['function'],
+		'escape_char_style': 'SCE_AVS_ESCAPECHAR',
 	},
 	'NP2LEX_AWK': {
 		'has_block_comment': False,
 		'default_fold_level': ['namespace', 'function'],
 		'default_fold_ignore_inner': 'SCE_AWK_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_AWK_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_AWK_ESCAPECHAR',
 	},
 
 	'NP2LEX_BASH': {
 		'has_block_comment': False,
+		'raw_string_style': ['SCE_SH_STRING_SQ'],
 	},
 	'NP2LEX_BATCH': {
 		'has_block_comment': False,
+		'escape_char_start': '^',
+		'escape_char_style': 'SCE_BAT_ESCAPECHAR',
 	},
 	'NP2LEX_BLOCKDIAG': {
 		'default_fold_level': ['graph', 'subgraph'],
+		'escape_char_style': 'SCE_GRAPHVIZ_ESCAPECHAR',
 	},
 
+	'NP2LEX_CMAKE': {
+		'escape_char_style': 'SCE_CMAKE_ESCAPECHAR',
+	},
 	'NP2LEX_COFFEESCRIPT': {
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['class', 'function'],
+		'escape_char_style': 'SCE_COFFEESCRIPT_ESCAPECHAR',
 	},
 	'NP2LEX_CONFIG': {
 		'has_block_comment': False,
 	},
 	'NP2LEX_CPP': {
 		'default_fold_level': ['preprocessor', 'namespace', 'class', 'method'],
+		'printf_format_specifier': True,
+		'raw_string_style': ['SCE_C_STRINGRAW'],
 	},
 	'NP2LEX_CSHARP': {
 		'default_fold_level': ['namespace', 'class', 'method'],
 		'default_fold_ignore_inner': 'SCE_CSHARP_FUNCTION_DEFINITION',
+		'format_specifier_style': 'SCE_CSHARP_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_CSHARP_ESCAPECHAR',
+		'raw_string_style': ['SCE_CSHARP_VERBATIM_STRING', 'SCE_CSHARP_INTERPOLATED_VERBATIM_STRING',
+			'SCE_CSHARP_RAWSTRING_SL', 'SCE_CSHARP_INTERPOLATED_RAWSTRING_SL',
+			'SCE_CSHARP_RAWSTRING_ML', 'SCE_CSHARP_INTERPOLATED_RAWSTRING_ML',
+		],
+	},
+	'NP2LEX_CSS': {
+		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
 	},
 
 	'NP2LEX_DLANG': {
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_D_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_D_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_D_ESCAPECHAR',
+		'raw_string_style': ['SCE_D_RAWSTRING', 'SCE_D_STRING_BT'],
 	},
 	'NP2LEX_DART': {
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_DART_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_DART_ESCAPECHAR',
+		'raw_string_style': ['SCE_DART_RAWSTRING_SQ', 'SCE_DART_RAWSTRING_DQ',
+			'SCE_DART_TRIPLE_RAWSTRING_SQ', 'SCE_DART_TRIPLE_RAWSTRING_DQ',
+		],
 	},
 	'NP2LEX_DIFF': {
 		'has_line_comment': False,
 		'has_block_comment': False,
 		'default_fold_level': ['command', '[file]', 'diff'],
+		'escape_char_start': '\0',
 	},
 
 	'NP2LEX_GN': {
 		'has_block_comment': False,
+		'escape_char_style': 'SCE_GN_ESCAPECHAR',
 	},
 	'NP2LEX_GO': {
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_GO_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_GO_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_GO_ESCAPECHAR',
+		'raw_string_style': ['SCE_GO_RAW_STRING'],
 	},
 	'NP2LEX_GRADLE': {
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_GROOVY_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_GROOVY_ESCAPECHAR',
 	},
 	'NP2LEX_GRAPHVIZ': {
 		'default_fold_level': ['graph', 'subgraph'],
+		'escape_char_style': 'SCE_GRAPHVIZ_ESCAPECHAR',
 	},
 	'NP2LEX_GROOVY': {
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_GROOVY_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_GROOVY_ESCAPECHAR',
 	},
 
 	'NP2LEX_HAXE': {
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_HAXE_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_HAXE_ESCAPECHAR',
 	},
 	'NP2LEX_HTML': {
 		'tab_settings': TabSettings_Space2,
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
+		#'escape_char_start': '\0', # backslash for embedded script or style
 	},
 
 	'NP2LEX_INI': {
 		'has_block_comment': False,
 		'default_fold_level': ['section', 'comment'],
+		'escape_char_start': '\0',
 	},
 	'NP2LEX_INNOSETUP': {
 		'default_fold_level': ['section', 'code'],
+		'escape_char_start': '\0',
 	},
 
+	'NP2LEX_JAMFILE': {
+		'escape_char_style': 'SCE_JAM_ESCAPECHAR',
+	},
 	'NP2LEX_JAVA': {
 		'default_fold_level': ['class', 'inner class', 'method'],
 		'default_fold_ignore_inner': 'SCE_JAVA_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_JAVA_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_JAVA_ESCAPECHAR',
 	},
 	'NP2LEX_JAVASCRIPT': {
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_JS_ESCAPECHAR',
 	},
 	'NP2LEX_JSON': {
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
+		'escape_char_style': 'SCE_JSON_ESCAPECHAR',
 	},
 	'NP2LEX_JULIA': {
 		'default_fold_level': ['struct', 'method'],
 		'default_fold_ignore_inner': 'SCE_JULIA_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_JULIA_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_JULIA_ESCAPECHAR',
+		'raw_string_style': ['SCE_JULIA_RAWSTRING', 'SCE_JULIA_TRIPLE_RAWSTRING'],
 	},
 
 	'NP2LEX_KOTLIN': {
 		'default_fold_level': ['class', 'inner class', 'method'],
 		'default_fold_ignore_inner': 'SCE_KOTLIN_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_KOTLIN_ESCAPECHAR',
+		'raw_string_style': ['SCE_KOTLIN_RAWSTRING'],
 	},
 
+	'NP2LEX_LATEX': {
+		'escape_char_start': '^',
+		'escape_char_style': 'SCE_L_SPECIAL',
+	},
 	'NP2LEX_LLVM': {
 		'has_block_comment': False,
+		'escape_char_style': 'SCE_LLVM_ESCAPECHAR',
 	},
 	'NP2LEX_LUA': {
 		'default_fold_level': ['class', 'function'],
+		'printf_format_specifier': True,
 	},
 
 	'NP2LEX_MAKEFILE': {
 		'tab_settings': TabSettings_Tab4,
 		'has_block_comment': False,
+		'escape_char_start': '\0',
 	},
 	'NP2LEX_MARKDOWN': {
 		'has_line_comment': False,
 		'default_fold_level': ['header1', 'header2'],
+		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
+	},
+	'NP2LEX_MATLAB': {
+		'printf_format_specifier': True,
+		#'escape_char_start': '\0', # backslash for Octave escape character
 	},
 
 	'NP2LEX_NSIS': {
 		'default_fold_level': ['section', 'function'],
+		'escape_char_style': 'SCE_NSIS_ESCAPECHAR',
 	},
 
 	'NP2LEX_PERL': {
 		'has_block_comment': False,
+		'printf_format_specifier': True,
+		'raw_string_style': ['SCE_PL_STRING_SQ'],
 	},
 	'NP2LEX_PHP': {
 		'default_fold_level': ['[php tag]', 'class', 'method'],
 		'default_fold_ignore_inner': 'SCE_PHP_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_PHP_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_PHP_ESCAPECHAR',
+		'raw_string_style': ['SCE_PHP_STRING_SQ', 'SCE_PHP_NOWDOC'],
+	},
+	'NP2LEX_POWERSHELL': {
+		'escape_char_start': '`',
+		'raw_string_style': ['SCE_POWERSHELL_STRING_SQ'],
 	},
 	'NP2LEX_PYTHON': {
 		'has_block_comment': False,
@@ -242,22 +339,45 @@ LexerConfigMap = {
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_PY_FUNCTION_DEFINITION',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_PY_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_PY_ESCAPECHAR',
+		'raw_string_style': ['SCE_PY_RAWSTRING_SQ', 'SCE_PY_RAWSTRING_DQ',
+			'SCE_PY_TRIPLE_RAWSTRING_SQ', 'SCE_PY_TRIPLE_RAWSTRING_DQ',
+			'SCE_PY_RAWFMTSTRING_SQ', 'SCE_PY_RAWFMTSTRING_DQ',
+			'SCE_PY_TRIPLE_RAWFMTSTRING_SQ', 'SCE_PY_TRIPLE_RAWFMTSTRING_DQ',
+			'SCE_PY_RAWBYTES_SQ', 'SCE_PY_RAWBYTES_DQ',
+			'SCE_PY_TRIPLE_RAWBYTES_SQ', 'SCE_PY_TRIPLE_RAWBYTES_DQ',
+		],
 	},
 
 	'NP2LEX_RLANG': {
 		'default_fold_level': ['function'],
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_R_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_R_ESCAPECHAR',
+	},
+	'NP2LEX_REBOL': {
+		'escape_char_start': '^',
+		'escape_char_style': 'SCE_REBOL_ESCAPECHAR',
 	},
 	'NP2LEX_RESOURCESCRIPT': {
 		'default_fold_level': ['preprocessor', 'resource'],
+		'printf_format_specifier': True,
 	},
 	'NP2LEX_RUBY': {
 		'has_block_comment': False,
 		'default_fold_level': ['module', 'class', 'method'],
 		'default_fold_ignore_inner': 'SCE_RB_DEF_NAME',
+		'printf_format_specifier': True,
+		'raw_string_style': ['SCE_RB_STRING_SQ'],
 	},
 	'NP2LEX_RUST': {
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_RUST_FUNCTION_DEFINITION',
+		'format_specifier_style': 'SCE_RUST_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_RUST_ESCAPECHAR',
+		'raw_string_style': ['SCE_RUST_RAW_STRING', 'SCE_RUST_RAW_BYTESTRING'],
 	},
 
 	'NP2LEX_SCALA': {
@@ -269,38 +389,55 @@ LexerConfigMap = {
 	},
 	'NP2LEX_SQL': {
 		'default_fold_level': ['function'],
+		'escape_char_style': 'SCE_SQL_ESCAPECHAR',
 	},
 	'NP2LEX_SWIFT': {
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_SWIFT_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_SWIFT_ESCAPECHAR',
 	},
 
+	'NP2LEX_TCL': {
+		'printf_format_specifier': True,
+	},
 	'NP2LEX_TEXINFO': {
 		'has_block_comment': False,
+		'escape_char_start': '@',
+		'escape_char_style': 'SCE_L_SPECIAL',
 	},
 	'NP2LEX_TOML': {
 		'has_block_comment': False,
 		'default_fold_level': ['table', 'comment'],
+		'escape_char_style': 'SCE_TOML_ESCAPECHAR',
 	},
 	'NP2LEX_TYPESCRIPT': {
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
+		'escape_char_style': 'SCE_JS_ESCAPECHAR',
 	},
 
 	'NP2LEX_VBSCRIPT': {
 		'has_block_comment': False,
 		'default_fold_level': ['function'],
+		'escape_char_start': '\0',
 	},
 	'NP2LEX_VIM': {
 		'has_block_comment': False,
+		'escape_char_style': 'SCE_YAML_ESCAPECHAR',
+		'raw_string_style': ['SCE_VIM_STRING_SQ'],
 	},
 	'NP2LEX_VISUALBASIC': {
 		'has_block_comment': False,
 		'default_fold_level': ['class', 'function'],
+		'escape_char_start': '\0',
 	},
 
+	'NP2LEX_WASM': {
+		'escape_char_style': 'SCE_WASM_ESCAPECHAR',
+	},
 	'NP2LEX_XML': {
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
+		'escape_char_start': '\0',
 	},
 	'NP2LEX_YAML': {
 		'tab_settings': TabSettings_Space2,
@@ -308,6 +445,7 @@ LexerConfigMap = {
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
+		'escape_char_style': 'SCE_YAML_ESCAPECHAR',
 	},
 }
 
@@ -341,6 +479,29 @@ def dump_enum_flag(cls, indent='', anonymous=True, as_shift=False, max_value=Non
 	output.append(f'{indent}}};')
 	return output
 
+CEscapeMap = {
+	'\0': r'\0',
+	'\a': r'\a',
+	'\b': r'\b',
+	'\n': r'\n',
+	'\r': r'\r',
+	'\f': r'\f',
+	'\v': r'\v',
+	'\\': r'\\',
+	'\'': r'\'',
+	'\"': r'\"',
+}
+
+def escape_c_char(ch):
+	if ch in CEscapeMap:
+		return CEscapeMap[ch]
+	if ch < ' ' or ord(ch) >= 127:
+		return f'\\x{ord(ch):02x}'
+	return ch
+
+def quote_c_char(ch):
+	return "'" + escape_c_char(ch) + "'"
+
 def BuildLexerConfigContent(rid, keywordAttr):
 	config = LexerConfigMap.get(rid, {})
 	if rid and not (config or keywordAttr):
@@ -366,8 +527,10 @@ def BuildLexerConfigContent(rid, keywordAttr):
 	if style == 'forward':
 		flag |= LexerAttr.IndentLookForward
 
-	prefix = '' if rid else '#define SCHEME_SETTINGS_DEFAULT'
-	output = [prefix + '\t{']
+	if config.get('printf_format_specifier', False):
+		flag |= LexerAttr.PrintfFormatSpecifier
+
+	output = ['\t{']
 	indent = '\t\t'
 	expr = get_enum_flag_expr(flag, merge=False)
 	if isinstance(expr, str):
@@ -393,6 +556,15 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		output.append(f'{indent}{expr}, /* {comment} */')
 	output.append(f"{indent}{config.get('default_fold_ignore_inner', '0')},")
 
+	# format specifier, escape character
+	start = config.get('escape_char_start', '\\')
+	style = config.get('escape_char_style', '0')
+	assert len(start) == 1, (rid, style, start)
+	output.append(f"{indent}{config.get('format_specifier_style', '0')}, '{escape_c_char(start)}', {style},")
+	# raw string styles
+	styles = config.get('raw_string_style', ['0'])
+	output.append(f"{indent}{styles[0]},")
+
 	# keyword attribute
 	if keywordAttr:
 		output[-1] = output[-1][:-1] # remove extra comma
@@ -409,18 +581,15 @@ def BuildLexerConfigContent(rid, keywordAttr):
 	suffix = '\t},'
 	if not rid:
 		# right align continuation backslash in multi-line macro
-		indent_width = len(indent)
-		max_width = max(len(line) for line in output) - indent_width
+		indent_count = len(indent)
+		max_width = max(len(line) for line in output) - indent_count
 		max_width = (max_width + 8) & ~3
-		result = []
+		result = ['#define SCHEME_SETTINGS_DEFAULT\t\\']
 		for index, line in enumerate(output):
-			width = len(line)
-			if index == 0:
-				width -= indent_width*4
-			else:
-				width -= indent_width
+			width = len(line) - indent_count
 			width = (width + 4) & ~3
 			padding = (max_width - width) // 4
+			padding += index == 0
 			result.append(line + '\t'*padding + '\\')
 		output = result
 		suffix = suffix[:-1]

@@ -136,7 +136,9 @@ EDITLEXER lexCSharp = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // namespace, class, method
-		SCE_CSHARP_FUNCTION_DEFINITION
+		SCE_CSHARP_FUNCTION_DEFINITION,
+		SCE_CSHARP_FORMAT_SPECIFIER, '\\', SCE_CSHARP_ESCAPECHAR,
+		SCE_CSHARP_VERBATIM_STRING
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types
 		| KeywordAttr32(2, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // vala types

@@ -155,7 +155,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 
 					chNext = styler.SafeGetCharAt(i + 1);
-					styler.ColorTo(i + 1, SCE_JSON_ESCAPESEQUENCE);
+					styler.ColorTo(i + 1, SCE_JSON_ESCAPECHAR);
 					continue;
 				}
 			} else if ((state == SCE_JSON_STRING_DQ && ch == '\"') || (state == SCE_JSON_STRING_SQ && ch == '\'')) {

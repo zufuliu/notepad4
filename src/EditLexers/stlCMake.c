@@ -142,7 +142,7 @@ static EDITSTYLE Styles_CMake[] = {
 	{ SCE_CMAKE_STRING, NP2StyleX_String, L"fore:#008080" },
 	{ SCE_CMAKE_BRACKET_ARGUMENT, NP2StyleX_BracketArgument, L"fore:#648000" },
 	{ MULTI_STYLE(SCE_CMAKE_VARIABLE, SCE_CMAKE_VARIABLE_DOLLAR, SCE_CMAKE_VARIABLE_AT, 0), NP2StyleX_Variable, L"fore:#9E4D2A" },
-	{ SCE_CMAKE_ESCAPE_SEQUENCE, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_CMAKE_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_CMAKE_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_CMAKE_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
@@ -154,6 +154,8 @@ EDITLEXER lexCMake = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
+		0,
+		0, '\\', SCE_CMAKE_ESCAPECHAR,
 		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // commands

@@ -462,13 +462,6 @@ void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, int wordLength, i
 }
 
 
-static inline BOOL IsEscapeChar(int ch) {
-	return ch == 't' || ch == 'n' || ch == 'r' || ch == 'a' || ch == 'b' || ch == 'v' || ch == 'f'
-		|| ch == '0'
-		|| ch == '$'; // PHP
-	// x u U
-}
-
 static inline BOOL IsCppCommentStyle(int style) {
 	return style == SCE_C_COMMENT
 		|| style == SCE_C_COMMENTLINE
@@ -651,107 +644,59 @@ static inline BOOL IsWordStyleToIgnore(int style) {
 	return FALSE;
 }
 
-// https://en.wikipedia.org/wiki/Printf_format_string
-static inline BOOL IsStringFormatChar(int ch, int style) {
-	if (!IsAlpha(ch)) {
-		return FALSE;
-	}
-	switch (pLexCurrent->iLexer) {
-	case SCLEX_AUTOHOTKEY:
-		return style != SCE_AHK_OPERATOR;
-	case SCLEX_AWK:
-		return style != SCE_AWK_OPERATOR;
-
-	case SCLEX_CPP:
-		return style != SCE_C_OPERATOR;
-
-	case SCLEX_DLANG:
-		return style != SCE_D_OPERATOR;
-
-	case SCLEX_FSHARP:
-		return style != SCE_FSHARP_OPERATOR;
-
-	case SCLEX_GO:
-		return style != SCE_GO_OPERATOR && style != SCE_GO_OPERATOR2;
-
-	case SCLEX_JAVA:
-		return style != SCE_JAVA_OPERATOR;
-	case SCLEX_JULIA:
-		return style != SCE_JULIA_OPERATOR && style != SCE_JULIA_OPERATOR2;
-
-	case SCLEX_LUA:
-		return style != SCE_LUA_OPERATOR;
-
-	case SCLEX_MATLAB:
-		return style != SCE_MAT_OPERATOR;
-
-	case SCLEX_PERL:
-		return style != SCE_PL_OPERATOR;
-	case SCLEX_PHPSCRIPT:
-		return style != SCE_PHP_OPERATOR && style != SCE_PHP_OPERATOR2;
-	case SCLEX_PYTHON:
-		return style != SCE_PY_OPERATOR && style != SCE_PY_OPERATOR2;
-
-	case SCLEX_RLANG:
-		return style != SCE_R_OPERATOR;
-	case SCLEX_RUBY:
-		return style != SCE_RB_OPERATOR;
-	case SCLEX_RUST:
-		return style != SCE_RUST_OPERATOR;
-
-	case SCLEX_TCL:
-		return style != SCE_TCL_OPERATOR;
-	}
-	return FALSE;
+static inline BOOL IsEscapeCharacter(int ch) {
+	return ch == '0'	// '\0'
+		|| ch == 'a'	// '\a'
+		|| ch == 'b'	// '\b'
+		|| ch == 'e'	// '\e', GNU extension
+		|| ch == 'f'	// '\f'
+		|| ch == 'n'	// '\n'
+		|| ch == 'r'	// '\r'
+		|| ch == 't'	// '\t'
+		|| ch == 'v'	// '\v'
+		|| ch == '$';	// PHP variable
+	// x u U ignored as they need to be followed with multiple hex digits.
 }
 
-static inline BOOL IsEscapeCharEx(int ch, int style) {
-	if (!IsEscapeChar(ch)) {
+// https://en.wikipedia.org/wiki/Printf_format_string
+static inline BOOL IsPrintfFormatSpecifier(int ch) {
+	return IsAlpha(ch);
+}
+
+static BOOL IsEscapeCharOrFormatSpecifierAt(Sci_Position before, int ch, int chPrev, int style) {
+	if (chPrev == '%') {
+		if (!IsPrintfFormatSpecifier(ch)) {
+			return FALSE;
+		}
+		if (pLexCurrent->formatSpecifierStyle) {
+			return style == pLexCurrent->formatSpecifierStyle;
+		}
+		// legacy lexer without format specifier highlighting
+		if (pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier) {
+			return style == SciCall_GetStyleAt(before);
+		}
+	}
+
+	if (!IsEscapeCharacter(ch)) {
 		return FALSE;
 	}
-	switch (pLexCurrent->iLexer) {
-	case SCLEX_NULL:
-	case SCLEX_BATCH:
-	case SCLEX_CONFIG:
-	case SCLEX_DIFF:
-	case SCLEX_MAKEFILE:
-	case SCLEX_PROPERTIES:
-		return FALSE;
-
-	case SCLEX_CSHARP:
-		return style < SCE_CSHARP_RAWSTRING_SL || style > SCE_CSHARP_INTERPOLATED_VERBATIM_STRING;
-	case SCLEX_CPP:
-		return style != SCE_C_STRINGRAW && style != SCE_C_COMMENTDOC_TAG;
-
-	case SCLEX_DLANG:
-		return style != SCE_D_RAWSTRING && style == SCE_D_STRING_BT;
-	case SCLEX_DART:
-		return style != SCE_DART_RAWSTRING_SQ && style != SCE_DART_RAWSTRING_DQ
-			&& style != SCE_DART_TRIPLE_RAWSTRING_SQ && style != SCE_DART_TRIPLE_RAWSTRING_DQ;
-
-	case SCLEX_GO:
-		return style != SCE_GO_RAW_STRING;
-
-	case SCLEX_JULIA:
-		return style != SCE_JULIA_RAWSTRING && style != SCE_JULIA_TRIPLE_RAWSTRING;
-
-	case SCLEX_KOTLIN:
-		return style != SCE_KOTLIN_RAWSTRING;
-
-	case SCLEX_PYTHON:
-		// not in raw string
-		return !(style >= SCE_PY_STRING_SQ && (style & 7) > 3);
-
-	case SCLEX_RUBY:
-		return style != SCE_RB_STRING_SQ;
-
-	case SCLEX_RUST:
-		return style != SCE_RUST_RAW_STRING && style != SCE_RUST_RAW_BYTESTRING;
-
-	case SCLEX_VIM:
-		return style != SCE_VIM_STRING_SQ;
+	if (pLexCurrent->escapeCharacterStyle) {
+		return style == pLexCurrent->escapeCharacterStyle;
 	}
-	return TRUE;
+
+	// legacy lexer without escape character highlighting
+	if (style != pLexCurrent->rawStringStyle
+		// C++ Doxygen comment tag
+		&& !(pLexCurrent->iLexer == SCLEX_CPP && style == SCE_C_COMMENTDOC_TAG)) {
+		int chPrev2 = 0;
+		const Sci_Position before2 = SciCall_PositionBefore(before);
+		if (before2 + 1 == before) {
+			chPrev2 = SciCall_GetCharAt(before2);
+		}
+		return chPrev != chPrev2 && style == SciCall_GetStyleAt(before);
+	}
+
+	return FALSE;
 }
 
 static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) {
@@ -985,19 +930,12 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 				struct Sci_TextRange tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRange(&tr);
 
-				Sci_Position before = SciCall_PositionBefore(iPosFind);
+				const Sci_Position before = SciCall_PositionBefore(iPosFind);
 				if (before + 1 == iPosFind) {
-					const int ch = SciCall_GetCharAt(before);
-					if (ch == '\\') { // word after escape char
-						before = SciCall_PositionBefore(before);
-						const int chPrev = (before + 2 == iPosFind) ? SciCall_GetCharAt(before) : 0;
-						if (chPrev != '\\' && IsEscapeCharEx(*pWord, SciCall_GetStyleAt(before))) {
-							pWord++;
-							--wordLength;
-							bChanged = TRUE;
-						}
-					} else if (ch == '%') { // word after format char
-						if (IsStringFormatChar(*pWord, SciCall_GetStyleAt(before))) {
+					const int chPrev = SciCall_GetCharAt(before);
+					// word after escape character or format specifier
+					if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
+						if (IsEscapeCharOrFormatSpecifierAt(before, *pWord, chPrev, style)) {
 							pWord++;
 							--wordLength;
 							bChanged = TRUE;
@@ -1499,19 +1437,21 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	int chPrev = '\0';
 	int chPrev2 = '\0';
 	if (ch < 0x80 && iStartWordPos > iLineStartPos) {
-		Sci_Position before = SciCall_PositionBefore(iStartWordPos);
+		const Sci_Position before = SciCall_PositionBefore(iStartWordPos);
 		if (before + 1 == iStartWordPos) {
 			chPrev = SciCall_GetCharAt(before);
 			const Sci_Position before2 = SciCall_PositionBefore(before);
 			if (before2 >= iLineStartPos && before2 + 1 == before) {
 				chPrev2 = SciCall_GetCharAt(before2);
 			}
-			if ((chPrev == '\\' && chPrev2 != '\\' && IsEscapeCharEx(ch, SciCall_GetStyleAt(before))) // word after escape char
-				// word after format char
-				|| (chPrev == '%' && IsStringFormatChar(ch, SciCall_GetStyleAt(before)))) {
-				++iStartWordPos;
-				ch = SciCall_GetCharAt(iStartWordPos);
-				chPrev = '\0';
+			// word after escape character or format specifier
+			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
+				const int style = SciCall_GetStyleAt(iStartWordPos);
+				if (IsEscapeCharOrFormatSpecifierAt(before, ch, chPrev, style)) {
+					++iStartWordPos;
+					ch = SciCall_GetCharAt(iStartWordPos);
+					chPrev = '\0';
+				}
 			}
 		}
 	}

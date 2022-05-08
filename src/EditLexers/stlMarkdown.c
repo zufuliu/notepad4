@@ -54,6 +54,8 @@ EDITLEXER lexMarkdown = {
 		LexerAttr_NoLineComment,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // header1, header2
+		0,
+		0, '\\', SCE_MARKDOWN_ESCAPECHAR,
 		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // html block tag
 	},

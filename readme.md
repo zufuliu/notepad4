@@ -36,7 +36,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* GNU Assembler
 		* [NASM](https://nasm.us/)
 	* [Asymptote Vector Graphics Language](tools/lang/Asymptote.asy), up to Asymptote 2.70.
-	* [AutoHotkey_L](tools/lang/AutoHotkey_L.ahk) and  [AutoHotkey_H](tools/lang/AutoHotkey_H.ahk) Script, up to v2.
+	* [AutoHotkey_L](tools/lang/AutoHotkey_L.ahk) and [AutoHotkey_H](tools/lang/AutoHotkey_H.ahk) Script, up to v2.
 	* AutoIt Script
 	* [AviSynth Script](tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
 	* [AWK](tools/lang/Awk.awk), up to GNU AWK 5.1.

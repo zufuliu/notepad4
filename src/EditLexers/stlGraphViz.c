@@ -95,6 +95,8 @@ EDITLEXER lexGraphViz = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // graph, subgraph
+		0,
+		0, '\\', SCE_GRAPHVIZ_ESCAPECHAR,
 		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // html labels

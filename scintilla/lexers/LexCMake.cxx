@@ -194,7 +194,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.SetState(SCE_CMAKE_LINE_CONTINUE);
 					sc.ForwardSetState(SCE_CMAKE_STRING);
 				} else if (IsCMakeEscapeChar(sc.chNext)) {
-					sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
+					sc.SetState(SCE_CMAKE_ESCAPECHAR);
 					sc.Forward();
 				}
 			} else if (sc.Match('$', '{')) {
@@ -212,7 +212,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 			break;
 
-		case SCE_CMAKE_ESCAPE_SEQUENCE:
+		case SCE_CMAKE_ESCAPECHAR:
 			sc.SetState(outerStyle);
 			continue;
 
@@ -300,7 +300,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '\\') {
 				if (IsCMakeEscapeChar(sc.chNext)) {
 					outerStyle = SCE_CMAKE_DEFAULT;
-					sc.SetState(SCE_CMAKE_ESCAPE_SEQUENCE);
+					sc.SetState(SCE_CMAKE_ESCAPECHAR);
 					sc.Forward();
 				}
 			} else if (IsIdentifierStart(sc.ch)) {

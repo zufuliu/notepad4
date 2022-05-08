@@ -41,7 +41,9 @@ EDITLEXER lexVim = {
 		LexerAttr_NoBlockComment,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
-		0
+		0,
+		0, '\\', SCE_YAML_ESCAPECHAR,
+		SCE_VIM_STRING_SQ
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // commands
 	},

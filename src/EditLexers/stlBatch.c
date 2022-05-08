@@ -130,6 +130,8 @@ EDITLEXER lexBatch = {
 		LexerAttr_NoBlockComment,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
+		0,
+		0, '^', SCE_BAT_ESCAPECHAR,
 		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // internal commands

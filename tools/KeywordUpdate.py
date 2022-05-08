@@ -48,16 +48,19 @@ lexerList = [
 	('NP2LEX_JSON', 'stlJSON.c', 'LexJSON.cxx', '', 0, parse_json_api_file),
 	('NP2LEX_JULIA', 'stlJulia.c', 'LexJulia.cxx', 'Julia.jl', 0, parse_julia_api_file),
 
+	('NP2LEX_LATEX', 'stlLaTeX.c', 'LexLaTeX.cxx', '', 0, None),
 	('NP2LEX_LLVM', 'stlLLVM.c', 'LexLLVM.cxx', 'LLVM.ll', 0, parse_llvm_api_file),
 	('NP2LEX_LUA', 'stlLua.c', 'LexLua.cxx', 'Lua.lua', 0, parse_lua_api_file),
 
 	('NP2LEX_MAKEFILE', 'stlMake.c', 'LexMakefile.cxx', '', 0, None),
+	('NP2LEX_MATLAB', 'stlMatlab.c', 'LexMatlab.cxx', '', 0, None),
 	('NP2LEX_MARKDOWN', 'stlMarkdown.c', 'LexMarkdown.cxx', '', 0, parse_markdown_api_file),
 
 	('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
 
 	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', '', 0, None),
 	('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
+	('NP2LEX_POWERSHELL', 'stlPowerShell.c', 'LexPowerShell.cxx', '', 0, None),
 	('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
 
 	('NP2LEX_RLANG', 'stlR.c', 'LexR.cxx', 'R.r', 0, parse_r_api_file),
@@ -79,8 +82,9 @@ lexerList = [
 							], 0, parse_sql_api_files),
 	('NP2LEX_SWIFT', 'stlSwift.c', 'LexSwift.cxx', 'Swift.swift', 0, parse_swift_api_file),
 
+	('NP2LEX_TCL', 'stlTcl.c', 'LexTCL.cxx', '', 0, None),
 	('NP2LEX_TEXINFO', 'stlTexinfo.c', 'LexTexinfo.cxx', '', 0, None),
-	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, None),
+	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, parse_toml_api_file),
 
 	('NP2LEX_VBSCRIPT', 'stlVBS.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
 	('NP2LEX_VIM', 'stlVim.c', 'LexVim.cxx', 'Vim.vim', 0, parse_vim_api_file),
@@ -89,7 +93,7 @@ lexerList = [
 	# https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt
 	('NP2LEX_WASM', 'stlWASM.c', 'LexWASM.cxx', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),
 	('NP2LEX_XML', 'stlXML.c', 'LexHTML.cxx', '', 0, parse_xml_api_file),
-	('NP2LEX_YAML', 'stlYAML.c', 'LexYAML.cxx', '', 0, None),
+	('NP2LEX_YAML', 'stlYAML.c', 'LexYAML.cxx', '', 0, parse_yaml_api_file),
 ]
 
 def update_all_keyword():

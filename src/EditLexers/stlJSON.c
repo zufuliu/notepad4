@@ -19,7 +19,7 @@ static EDITSTYLE Styles_JSON[] = {
 	{ SCE_JSON_PROPERTYNAME, NP2StyleX_Property, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_JSON_LINECOMMENT, SCE_JSON_BLOCKCOMMENT, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_JSON_STRING_DQ, SCE_JSON_STRING_SQ, 0, 0), NP2StyleX_String, L"fore:#008000" },
-	{ SCE_JSON_ESCAPESEQUENCE, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
+	{ SCE_JSON_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_JSON_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_JSON_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
@@ -31,6 +31,8 @@ EDITLEXER lexJSON = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
+		0,
+		0, '\\', SCE_JSON_ESCAPECHAR,
 		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 	},

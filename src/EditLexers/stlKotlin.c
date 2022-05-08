@@ -113,7 +113,9 @@ EDITLEXER lexKotlin = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, inner class, method
-		SCE_KOTLIN_FUNCTION_DEFINITION
+		SCE_KOTLIN_FUNCTION_DEFINITION,
+		0, '\\', SCE_KOTLIN_ESCAPECHAR,
+		SCE_KOTLIN_RAWSTRING
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // class
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // interface

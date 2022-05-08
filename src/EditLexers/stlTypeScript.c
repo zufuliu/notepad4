@@ -90,7 +90,9 @@ EDITLEXER lexTypeScript = {
 		LexerAttr_Default,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, anonymous object, method
-		SCE_JS_FUNCTION_DEFINITION
+		SCE_JS_FUNCTION_DEFINITION,
+		0, '\\', SCE_JS_ESCAPECHAR,
+		0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // directive
