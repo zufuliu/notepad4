@@ -130,8 +130,9 @@ EDITLEXER lexRLang = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0), // function
 		0,
-		SCE_R_FORMAT_SPECIFIER, '\\', SCE_R_ESCAPECHAR,
+		'\\', SCE_R_ESCAPECHAR, SCE_R_FORMAT_SPECIFIER,
 		0,
+		0, 0,
 		SCE_R_OPERATOR, SCE_R_INFIX
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // package

@@ -114,8 +114,9 @@ EDITLEXER lexKotlin = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, inner class, method
 		SCE_KOTLIN_FUNCTION_DEFINITION,
-		0, '\\', SCE_KOTLIN_ESCAPECHAR,
+		'\\', SCE_KOTLIN_ESCAPECHAR, 0,
 		SCE_KOTLIN_RAWSTRING,
+		SCE_KOTLIN_CHARACTER, 0,
 		SCE_KOTLIN_OPERATOR, SCE_KOTLIN_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // class

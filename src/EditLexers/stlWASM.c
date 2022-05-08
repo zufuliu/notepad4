@@ -104,8 +104,9 @@ EDITLEXER lexWASM = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
-		0, '\\', SCE_WASM_ESCAPECHAR,
+		'\\', SCE_WASM_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_WASM_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // type

@@ -44,8 +44,9 @@ EDITLEXER lexABAQUS = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		0,
+		0, 0,
 		SCE_APDL_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // code folding
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // star command

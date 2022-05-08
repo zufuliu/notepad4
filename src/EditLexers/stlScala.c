@@ -66,8 +66,9 @@ EDITLEXER lexScala = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, inner class, method
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		0,
+		SCE_C_CHARACTER, 0,
 		SCE_C_OPERATOR, 0,
 		KeywordAttr_Default
 	},

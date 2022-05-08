@@ -67,8 +67,9 @@ EDITLEXER lexDart = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // class, method
 		SCE_DART_FUNCTION_DEFINITION,
-		0, '\\', SCE_DART_ESCAPECHAR,
+		'\\', SCE_DART_ESCAPECHAR, 0,
 		SCE_DART_RAWSTRING_SQ,
+		0, 0,
 		SCE_DART_OPERATOR, SCE_DART_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types

@@ -23,6 +23,8 @@ format_specifier_style: style for format specifier, default is zero.
 escape_char_start: character used to escape special characters, default is backslash.
 escape_char_style: style for escape character, default is zero.
 raw_string_style: styles where backslash is treated literally, default are zeros.
+character_style: styles for character literal, default are zeros.
+none_quote_style: style for single quote not used for quotation, default is zero.
 
 angle_bracket_generic: has C++ like template or generic with angle bracket, default is False.
 operator_style:	styles for operator punctuation, default are zeros.
@@ -43,9 +45,9 @@ class LexerAttr(IntFlag):
 
 class KeywordAttr(IntFlag):
 	Default = 0
-	MakeLower = 1	# need convert to lower case.
+	MakeLower = 1	# need convert to lower case for lexer.
 	PreSorted = 2	# word list is presorted.
-	NoLexer = 4		# not used by Scintilla lexer, listed for auto completion.
+	NoLexer = 4		# not used by lexer, listed for auto-completion.
 	NoAutoComp = 8	# don't add to default auto-completion list.
 	Special = 256	# used by context based auto-completion.
 
@@ -75,6 +77,7 @@ TabSettings_Space2 = {
 }
 
 DefaultFoldLevel = ['level1', 'level2']
+NoEscapeCharacter = '\0'
 
 LexerConfigMap = {
 	'NP2LEX_TEXTFILE': {
@@ -82,21 +85,21 @@ LexerConfigMap = {
 		'has_block_comment': False,
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 	},
 	'NP2LEX_2NDTEXTFILE': {
 		'has_line_comment': False,
 		'has_block_comment': False,
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 	},
 	'NP2LEX_ANSI': {
 		'has_line_comment': False,
 		'has_block_comment': False,
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 	},
 
 	'NP2LEX_ABAQUS': {
@@ -189,6 +192,8 @@ LexerConfigMap = {
 		'default_fold_level': ['preprocessor', 'namespace', 'class', 'method'],
 		'printf_format_specifier': True,
 		'raw_string_style': ['SCE_C_STRINGRAW'],
+		'character_style': ['SCE_C_CHARACTER'],
+		'none_quote_style': 'SCE_C_NUMBER',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_C_OPERATOR'],
 	},
@@ -201,6 +206,7 @@ LexerConfigMap = {
 			'SCE_CSHARP_RAWSTRING_SL', 'SCE_CSHARP_INTERPOLATED_RAWSTRING_SL',
 			'SCE_CSHARP_RAWSTRING_ML', 'SCE_CSHARP_INTERPOLATED_RAWSTRING_ML',
 		],
+		'character_style': ['SCE_CSHARP_CHARACTER'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_CSHARP_OPERATOR', 'SCE_CSHARP_OPERATOR2'],
 	},
@@ -216,6 +222,7 @@ LexerConfigMap = {
 		'format_specifier_style': 'SCE_D_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_D_ESCAPECHAR',
 		'raw_string_style': ['SCE_D_RAWSTRING', 'SCE_D_STRING_BT'],
+		'character_style': ['SCE_D_CHARACTER'],
 		'operator_style': ['SCE_D_OPERATOR'],
 	},
 	'NP2LEX_DART': {
@@ -232,7 +239,7 @@ LexerConfigMap = {
 		'has_line_comment': False,
 		'has_block_comment': False,
 		'default_fold_level': ['command', '[file]', 'diff'],
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 	},
 
 	'NP2LEX_FORTRAN': {
@@ -254,6 +261,7 @@ LexerConfigMap = {
 		'format_specifier_style': 'SCE_GO_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_GO_ESCAPECHAR',
 		'raw_string_style': ['SCE_GO_RAW_STRING'],
+		'character_style': ['SCE_GO_CHARACTER'],
 		'operator_style': ['SCE_GO_OPERATOR', 'SCE_GO_OPERATOR2'],
 	},
 	'NP2LEX_GRADLE': {
@@ -286,17 +294,17 @@ LexerConfigMap = {
 	'NP2LEX_HTML': {
 		'tab_settings': TabSettings_Space2,
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
-		#'escape_char_start': '\0', # backslash for embedded script or style
+		#'escape_char_start': NoEscapeCharacter, # backslash for embedded script or style
 	},
 
 	'NP2LEX_INI': {
 		'has_block_comment': False,
 		'default_fold_level': ['section', 'comment'],
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 	},
 	'NP2LEX_INNOSETUP': {
 		'default_fold_level': ['section', 'code'],
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_INNO_OPERATOR'],
 	},
 
@@ -310,6 +318,7 @@ LexerConfigMap = {
 		'printf_format_specifier': True,
 		'format_specifier_style': 'SCE_JAVA_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_JAVA_ESCAPECHAR',
+		'character_style': ['SCE_JAVA_CHARACTER'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_JAVA_OPERATOR'],
 	},
@@ -331,6 +340,7 @@ LexerConfigMap = {
 		'format_specifier_style': 'SCE_JULIA_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_JULIA_ESCAPECHAR',
 		'raw_string_style': ['SCE_JULIA_RAWSTRING', 'SCE_JULIA_TRIPLE_RAWSTRING'],
+		'character_style': ['SCE_JULIA_CHARACTER'],
 		'operator_style': ['SCE_JULIA_OPERATOR', 'SCE_JULIA_OPERATOR2'],
 	},
 
@@ -339,6 +349,7 @@ LexerConfigMap = {
 		'default_fold_ignore_inner': 'SCE_KOTLIN_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_KOTLIN_ESCAPECHAR',
 		'raw_string_style': ['SCE_KOTLIN_RAWSTRING'],
+		'character_style': ['SCE_KOTLIN_CHARACTER'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_KOTLIN_OPERATOR', 'SCE_KOTLIN_OPERATOR2'],
 	},
@@ -365,7 +376,7 @@ LexerConfigMap = {
 	'NP2LEX_MAKEFILE': {
 		'tab_settings': TabSettings_Tab4,
 		'has_block_comment': False,
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_MAKE_OPERATOR'],
 	},
 	'NP2LEX_MARKDOWN': {
@@ -375,7 +386,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_MATLAB': {
 		'printf_format_specifier': True,
-		#'escape_char_start': '\0', # backslash for Octave escape character
+		#'escape_char_start': NoEscapeCharacter, # backslash for Octave escape character
 		'operator_style': ['SCE_MAT_OPERATOR'],
 	},
 
@@ -437,11 +448,14 @@ LexerConfigMap = {
 	'NP2LEX_REBOL': {
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_REBOL_ESCAPECHAR',
+		'none_quote_style': 'SCE_REBOL_SYMBOL',
 		'operator_style': ['SCE_REBOL_OPERATOR'],
 	},
 	'NP2LEX_RESOURCESCRIPT': {
 		'default_fold_level': ['preprocessor', 'resource'],
 		'printf_format_specifier': True,
+		'character_style': ['SCE_C_CHARACTER'],
+		'none_quote_style': 'SCE_C_NUMBER',
 		'operator_style': ['SCE_C_OPERATOR'],
 	},
 	'NP2LEX_RUBY': {
@@ -458,11 +472,14 @@ LexerConfigMap = {
 		'format_specifier_style': 'SCE_RUST_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_RUST_ESCAPECHAR',
 		'raw_string_style': ['SCE_RUST_RAW_STRING', 'SCE_RUST_RAW_BYTESTRING'],
+		'character_style': ['SCE_RUST_CHARACTER', 'SCE_RUST_BYTE_CHARACTER'],
+		'none_quote_style': 'SCE_RUST_LIFETIME',
 		'operator_style': ['SCE_RUST_OPERATOR'],
 	},
 
 	'NP2LEX_SCALA': {
 		'default_fold_level': ['class', 'inner class', 'method'],
+		'character_style': ['SCE_C_CHARACTER'],
 		'operator_style': ['SCE_C_OPERATOR'],
 	},
 	'NP2LEX_SMALI': {
@@ -510,10 +527,12 @@ LexerConfigMap = {
 	'NP2LEX_VBSCRIPT': {
 		'has_block_comment': False,
 		'default_fold_level': ['function'],
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
+		'none_quote_style': 'SCE_B_COMMENT',
 		'operator_style': ['SCE_B_OPERATOR'],
 	},
 	'NP2LEX_VERILOG': {
+		'none_quote_style': 'SCE_V_NUMBER',
 		'operator_style': ['SCE_V_OPERATOR'],
 	},
 	'NP2LEX_VHDL': {
@@ -528,7 +547,8 @@ LexerConfigMap = {
 	'NP2LEX_VISUALBASIC': {
 		'has_block_comment': False,
 		'default_fold_level': ['class', 'function'],
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
+		'none_quote_style': 'SCE_B_COMMENT',
 		'operator_style': ['SCE_B_OPERATOR'],
 	},
 
@@ -538,7 +558,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_XML': {
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
-		'escape_char_start': '\0',
+		'escape_char_start': NoEscapeCharacter,
 	},
 	'NP2LEX_YAML': {
 		'tab_settings': TabSettings_Space2,
@@ -660,14 +680,17 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		output.append(f'{indent}{expr}, /* {comment} */')
 	output.append(f"{indent}{config.get('default_fold_ignore_inner', '0')},")
 
-	# format specifier, escape character
+	# escape character, format specifier
 	start = config.get('escape_char_start', '\\')
 	style = config.get('escape_char_style', '0')
 	assert len(start) == 1, (rid, style, start)
-	output.append(f"{indent}{config.get('format_specifier_style', '0')}, '{escape_c_char(start)}', {style},")
+	output.append(f"{indent}'{escape_c_char(start)}', {style}, {config.get('format_specifier_style', '0')},")
 	# raw string styles
 	styles = config.get('raw_string_style', ['0'])
 	output.append(f"{indent}{styles[0]},")
+	# character style, none single quoted style
+	styles = config.get('character_style', ['0'])
+	output.append(f"{indent}{styles[0]}, {config.get('none_quote_style', '0')},")
 	# operator styles
 	styles = config.get('operator_style', []) + ['0', '0']
 	output.append(f"{indent}{styles[0]}, {styles[1]},")

@@ -21,7 +21,7 @@ def parse_key_value(line):
 	return items
 
 def find_color_in_file(path, color_map):
-	with open(path) as fd:
+	with open(path, encoding='utf-8') as fd:
 		lines = fd.readlines()
 	for line in lines:
 		items = parse_key_value(line)

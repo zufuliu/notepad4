@@ -108,8 +108,9 @@ EDITLEXER lexDLang = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // class, function
 		SCE_D_FUNCTION_DEFINITION,
-		SCE_D_FORMAT_SPECIFIER, '\\', SCE_D_ESCAPECHAR,
+		'\\', SCE_D_ESCAPECHAR, SCE_D_FORMAT_SPECIFIER,
 		SCE_D_RAWSTRING,
+		SCE_D_CHARACTER, 0,
 		SCE_D_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types

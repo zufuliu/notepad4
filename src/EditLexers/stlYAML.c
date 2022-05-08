@@ -41,8 +41,9 @@ EDITLEXER lexYAML = {
 		TAB_WIDTH_2, INDENT_WIDTH_2,
 		(1 << 1) | (1 << 2) | (1 << 3) | (1 << 4), // level1, level2, level13, level4
 		0,
-		0, '\\', SCE_YAML_ESCAPECHAR,
+		'\\', SCE_YAML_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_YAML_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 	},

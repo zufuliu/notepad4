@@ -54,8 +54,9 @@ EDITLEXER lexCoffeeScript = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 1) | (1 << 2), // class, function
 		0,
-		0, '\\', SCE_COFFEESCRIPT_ESCAPECHAR,
+		'\\', SCE_COFFEESCRIPT_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_COFFEESCRIPT_OPERATOR, SCE_COFFEESCRIPT_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // reserved words

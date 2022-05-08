@@ -34,8 +34,9 @@ EDITLEXER lexTOML = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // table, comment
 		0,
-		0, '\\', SCE_TOML_ESCAPECHAR,
+		'\\', SCE_TOML_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_TOML_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 	},

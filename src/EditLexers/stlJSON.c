@@ -32,8 +32,9 @@ EDITLEXER lexJSON = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
 		0,
-		0, '\\', SCE_JSON_ESCAPECHAR,
+		'\\', SCE_JSON_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_JSON_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 	},

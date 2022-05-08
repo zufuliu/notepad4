@@ -60,8 +60,9 @@ EDITLEXER lexResourceScript = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // preprocessor, resource
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		0,
+		SCE_C_CHARACTER, SCE_C_NUMBER,
 		SCE_C_OPERATOR, 0
 		, KeywordAttr32(2, KeywordAttr_NoAutoComp) // preprocessor
 	},

@@ -72,8 +72,9 @@ EDITLEXER lexSwift = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // class, function
 		SCE_SWIFT_FUNCTION_DEFINITION,
-		0, '\\', SCE_SWIFT_ESCAPECHAR,
+		'\\', SCE_SWIFT_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_SWIFT_OPERATOR, SCE_SWIFT_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // directive

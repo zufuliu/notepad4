@@ -214,8 +214,9 @@ EDITLEXER lexJulia = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // struct, method
 		SCE_JULIA_FUNCTION_DEFINITION,
-		SCE_JULIA_FORMAT_SPECIFIER, '\\', SCE_JULIA_ESCAPECHAR,
+		'\\', SCE_JULIA_ESCAPECHAR, SCE_JULIA_FORMAT_SPECIFIER,
 		SCE_JULIA_RAWSTRING,
+		SCE_JULIA_CHARACTER, 0,
 		SCE_JULIA_OPERATOR, SCE_JULIA_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // code folding

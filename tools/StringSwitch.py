@@ -69,7 +69,7 @@ def small_string_hash(buf, hash_size, switch_option):
 		value = value & mask
 	if switch_option == SwitchOption_HashAndLength:
 		value |= (len(buf) << hash_size)
-	return f'0x{value:X}U' % value
+	return f'0x{value:X}U'
 
 def _make_small_string_cmp(var_name, buf, length, index):
 	expr_list = []

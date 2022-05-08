@@ -63,8 +63,9 @@ EDITLEXER lexXML = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
 		0,
-		0, '\0', 0,
+		'\0', 0, 0,
 		0,
+		0, 0,
 		0, 0
 		, KeywordAttr32(6, KeywordAttr_NoLexer) // attribute
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // value

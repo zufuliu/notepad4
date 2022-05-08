@@ -519,8 +519,9 @@ EDITLEXER lexSQL = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0), // function
 		0,
-		0, '\\', SCE_SQL_ESCAPECHAR,
+		'\\', SCE_SQL_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_SQL_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // data types

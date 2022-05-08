@@ -62,8 +62,9 @@ EDITLEXER lexAwk = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // namespace, function
 		SCE_AWK_FUNCTION_DEFINITION,
-		SCE_AWK_FORMAT_SPECIFIER, '\\', SCE_AWK_ESCAPECHAR,
+		'\\', SCE_AWK_ESCAPECHAR, SCE_AWK_FORMAT_SPECIFIER,
 		0,
+		0, 0,
 		SCE_AWK_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // predefined variable

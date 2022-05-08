@@ -663,7 +663,7 @@ static inline BOOL IsPrintfFormatSpecifier(int ch) {
 	return IsAlpha(ch);
 }
 
-static BOOL IsEscapeCharOrFormatSpecifierAt(Sci_Position before, int ch, int chPrev, int style) {
+static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style) {
 	if (chPrev == '%') {
 		if (!IsPrintfFormatSpecifier(ch)) {
 			return FALSE;
@@ -673,7 +673,8 @@ static BOOL IsEscapeCharOrFormatSpecifierAt(Sci_Position before, int ch, int chP
 		}
 		// legacy lexer without format specifier highlighting
 		if (pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier) {
-			return style == SciCall_GetStyleAt(before);
+			const int stylePrev = SciCall_GetStyleAt(before);
+			return style == stylePrev;
 		}
 		return FALSE;
 	}
@@ -694,7 +695,10 @@ static BOOL IsEscapeCharOrFormatSpecifierAt(Sci_Position before, int ch, int chP
 		if (before2 + 1 == before) {
 			chPrev2 = SciCall_GetCharAt(before2);
 		}
-		return chPrev != chPrev2 && style == SciCall_GetStyleAt(before);
+		if (chPrev != chPrev2) {
+			const int stylePrev = SciCall_GetStyleAt(before);
+			return style == stylePrev;
+		}
 	}
 
 	return FALSE;
@@ -936,20 +940,20 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					const int chPrev = SciCall_GetCharAt(before);
 					// word after escape character or format specifier
 					if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-						if (IsEscapeCharOrFormatSpecifierAt(before, *pWord, chPrev, style)) {
+						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev, style)) {
 							pWord++;
 							--wordLength;
 							bChanged = TRUE;
 						}
 					}
 				}
-				if (prefix && prefix == *pWord) {
+				if (prefix && prefix == pWord[0]) {
 					pWord++;
 					--wordLength;
 					bChanged = TRUE;
 				}
 
-				//if (pLexCurrent->rid == NP2LEX_PHP && wordLength >= 2 && *pWord == '$' && pWord[1] == '$') {
+				//if (pLexCurrent->rid == NP2LEX_PHP && wordLength >= 2 && pWord[0] == '$' && pWord[1] == '$') {
 				//	pWord++;
 				//	--wordLength;
 				//	bChanged = TRUE;
@@ -1448,7 +1452,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 			// word after escape character or format specifier
 			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
 				const int style = SciCall_GetStyleAt(iStartWordPos);
-				if (IsEscapeCharOrFormatSpecifierAt(before, ch, chPrev, style)) {
+				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, style)) {
 					++iStartWordPos;
 					ch = SciCall_GetCharAt(iStartWordPos);
 					chPrev = '\0';
@@ -1726,26 +1730,6 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 	return FALSE;
 }
 
-static inline int GetCharacterStyle(int iLexer) {
-	switch (iLexer) {
-	case SCLEX_CPP:
-		return SCE_C_CHARACTER;
-	case SCLEX_CSHARP:
-		return SCE_CSHARP_CHARACTER;
-	case SCLEX_JAVA:
-		return SCE_JAVA_CHARACTER;
-	case SCLEX_GO:
-		return SCE_GO_CHARACTER;
-	case SCLEX_KOTLIN:
-		return SCE_KOTLIN_CHARACTER;
-	case SCLEX_RUST:
-		return SCE_RUST_CHARACTER;
-	default:
-		// single quoted string, not character literal
-		return 0;
-	}
-}
-
 static inline BOOL IsGenericTypeStyle(int iLexer, int style) {
 	switch (iLexer) {
 	case SCLEX_CPP:
@@ -1808,17 +1792,32 @@ void EditAutoCloseBraceQuote(int ch) {
 	const int iPrevStyle = SciCall_GetStyleAt(iCurPos - 2);
 	const int iNextStyle = SciCall_GetStyleAt(iCurPos);
 
-	const int charStyle = GetCharacterStyle(pLexCurrent->iLexer);
+	int charStyle = pLexCurrent->characterLiteralStyle;
 	if (charStyle != 0) {
-		// within char
+		// within character literal
 		if (iPrevStyle == charStyle && iNextStyle == charStyle) {
+			return;
+		}
+		if (pLexCurrent->iLexer == SCLEX_RUST && (iPrevStyle == SCE_RUST_BYTE_CHARACTER && iNextStyle == SCE_RUST_BYTE_CHARACTER)) {
 			return;
 		}
 	}
 
 	// escape sequence
-	if (ch != ',' && (chPrev == '\\' || (pLexCurrent->iLexer == SCLEX_BATCH && chPrev == '^'))) {
-		return;
+	if (ch != ',' && (chPrev != '\0' && chPrev == pLexCurrent->escapeCharacterStart)) {
+		charStyle = pLexCurrent->escapeCharacterStyle;
+		const int style = SciCall_GetStyleAt(iCurPos - 1);
+		// similar to IsEscapeCharOrFormatSpecifier()
+		if (charStyle) {
+			if (style == charStyle) {
+				return;
+			}
+		} else if (style == iPrevStyle) {
+			const int chPrev2 = SciCall_GetCharAt(iCurPos - 3);
+			if (chPrev != chPrev2) {
+				return;
+			}
+		}
 	}
 
 	const int mask = autoCompletionConfig.fAutoInsertMask;

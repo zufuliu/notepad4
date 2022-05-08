@@ -181,8 +181,9 @@ EDITLEXER lexASM = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		0,
+		0, 0,
 		SCE_ASM_OPERATOR, 0,
 		KeywordAttr_Default
 	},

@@ -75,8 +75,9 @@ EDITLEXER lexVBScript = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0), // function
 		0,
-		0, '\0', 0,
+		'\0', 0, 0,
 		0,
+		0, SCE_B_COMMENT,
 		SCE_B_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_MakeLower) // keywords
 		| KeywordAttr32(1, KeywordAttr_MakeLower) // type keyword

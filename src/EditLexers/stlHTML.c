@@ -178,8 +178,9 @@ EDITLEXER lexHTML = {
 		TAB_WIDTH_2, INDENT_WIDTH_2,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // level1, level2, level13, level4
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		0,
+		0, 0,
 		0, 0
 		, KeywordAttr32(1, KeywordAttr_NoAutoComp) // JavaScript
 		| KeywordAttr32(2, KeywordAttr_MakeLower | KeywordAttr_NoAutoComp) // VBScript

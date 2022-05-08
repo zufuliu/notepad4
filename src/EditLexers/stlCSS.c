@@ -298,8 +298,9 @@ EDITLEXER lexCSS = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
-		0, '\\', SCE_CSS_ESCAPECHAR,
+		'\\', SCE_CSS_ESCAPECHAR, 0,
 		0,
+		0, 0,
 		SCE_CSS_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // properties
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // at rules

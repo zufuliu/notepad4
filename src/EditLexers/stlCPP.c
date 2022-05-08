@@ -902,8 +902,9 @@ EDITLEXER lexCPP = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // preprocessor, namespace, class, method
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		SCE_C_STRINGRAW,
+		SCE_C_CHARACTER, SCE_C_NUMBER,
 		SCE_C_OPERATOR, 0
 		, KeywordAttr32(2, KeywordAttr_NoAutoComp) // preprocessor
 		| KeywordAttr32(3, KeywordAttr_NoAutoComp) // directive

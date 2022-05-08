@@ -121,8 +121,9 @@ EDITLEXER lexJava = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, inner class, method
 		SCE_JAVA_FUNCTION_DEFINITION,
-		SCE_JAVA_FORMAT_SPECIFIER, '\\', SCE_JAVA_ESCAPECHAR,
+		'\\', SCE_JAVA_ESCAPECHAR, SCE_JAVA_FORMAT_SPECIFIER,
 		0,
+		SCE_JAVA_CHARACTER, 0,
 		SCE_JAVA_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types

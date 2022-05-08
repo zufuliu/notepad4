@@ -142,8 +142,9 @@ EDITLEXER lexSmali = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // .method, .switch
 		0,
-		0, '\\', 0,
+		'\\', 0, 0,
 		0,
+		0, 0,
 		SCE_SMALI_OPERATOR, 0,
 		KeywordAttr_Default
 	},
