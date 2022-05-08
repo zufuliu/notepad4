@@ -202,12 +202,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	// if the current language is XML, I can fold any tag
 	// if the current language is HTML, I don't want to fold certain tags (input, meta, etc.)
 	//...to find it in the list of no-container-tags
-	tagDontFold = (!isXml) && (nullptr != strstr(
-		// void elements
-		" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-		// end tag may omittd
-		" p "
-		, withSpace));
+	tagDontFold = (!isXml) && (nullptr != strstr(htmlVoidTagList, withSpace));
 
 	//now we can remove the trailing space
 	withSpace[i] = '\0';

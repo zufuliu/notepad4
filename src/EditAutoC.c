@@ -675,6 +675,7 @@ static BOOL IsEscapeCharOrFormatSpecifierAt(Sci_Position before, int ch, int chP
 		if (pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier) {
 			return style == SciCall_GetStyleAt(before);
 		}
+		return FALSE;
 	}
 
 	if (!IsEscapeCharacter(ch)) {
@@ -1018,7 +1019,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		uint64_t attr = pLexCurrent->keywordAttr;
 		for (int i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
-			if (StrNotEmptyA(pKeywords) && !(attr & KeywordAttr_NoAutoComp)) {
+			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
 			}
 		}
@@ -1062,7 +1063,7 @@ void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 		uint64_t attr = pLex->keywordAttr;
 		for (int i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLex->pKeyWords->pszKeyWords[i];
-			if (StrNotEmptyA(pKeywords) && !(attr & KeywordAttr_NoAutoComp)) {
+			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
 			}
 		}
@@ -1931,10 +1932,12 @@ void EditAutoCloseBraceQuote(int ch) {
 }
 
 static inline BOOL IsHtmlVoidTag(const char *word, int length) {
-	// see classifyTagHTML() in LexHTML.cxx
+	// same as htmlVoidTagList in scintilla/lexlib/DocUtils.h
 	const char *p = StrStrIA(
 		// void elements
 		" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
+		// end tag may omittd
+		" p "
 		, word);
 	return p != NULL && p[-1] == ' ' && p[length] == ' ';
 }
@@ -2013,7 +2016,7 @@ void EditAutoCloseXMLTag(void) {
 	}
 }
 
-BOOL IsIndentKeywordStyle(int style) {
+static inline BOOL IsIndentKeywordStyle(int style) {
 	switch (pLexCurrent->iLexer) {
 	//case SCLEX_AUTOIT3:
 	//	return style == SCE_AU3_KEYWORD;

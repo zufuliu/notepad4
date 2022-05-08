@@ -231,17 +231,11 @@ void PHPLexer::ClassifyHtmlTag() {
 		} else  {
 			tagType = HtmlTagType::Normal;
 			const size_t length = sc.LengthCurrent();
-			constexpr size_t maxVoidTagLen = CStrLen("basefont");
-			if (length <= maxVoidTagLen + 2) {
+			if (length <= maxHtmlVoidTagLen + 2) {
 				s[length] = ' ';
 				--p;
 				*p = ' ';
-				if (nullptr != strstr(
-					// void elements
-					" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-					// end tag may omittd
-					" p "
-					, p)) {
+				if (nullptr != strstr(htmlVoidTagList, p)) {
 					tagType = HtmlTagType::Void;
 				}
 			}

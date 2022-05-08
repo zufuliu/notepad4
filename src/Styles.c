@@ -1456,11 +1456,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		uint64_t attr = pLexNew->keywordAttr;
 		for (int i = 0; i < KEYWORDSET_MAX; attr >>= 4, i++) {
 			const char *pKeywords = pLexNew->pKeyWords->pszKeyWords[i];
-			if (StrNotEmptyA(pKeywords)) {
-				if (!(attr & KeywordAttr_NoLexer)) {
-					const int attribute = attr & (KeywordAttr_NoLexer - 1);
-					SciCall_SetKeywords(i | (attribute << 8), pKeywords);
-				}
+			if (!(attr & KeywordAttr_NoLexer) && StrNotEmptyA(pKeywords)) {
+				const int attribute = attr & (KeywordAttr_NoLexer - 1);
+				SciCall_SetKeywords(i | (attribute << 8), pKeywords);
 			}
 		}
 
