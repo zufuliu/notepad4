@@ -34,6 +34,7 @@ none_quote_style: style for single quote not used for quotation, default is zero
 
 angle_bracket_generic: has C++ like template or generic with angle bracket, default is False.
 operator_style:	styles for operator punctuation, default are zeros.
+cpp_preprocessor: has C++ style #preprocessor, default is False.
 """
 
 from enum import IntFlag
@@ -48,6 +49,7 @@ class LexerAttr(IntFlag):
 	IndentLookForward = 1 << 5		# indent_guide_style
 	PrintfFormatSpecifier = 1 << 6	# printf_format_specifier
 	AngleBracketGeneric = 1 << 7	# angle_bracket_generic
+	CppPreprocessor = 1 << 8		# cpp_preprocessor
 
 class KeywordAttr(IntFlag):
 	Default = 0
@@ -124,6 +126,7 @@ LexerConfigMap = {
 		'line_comment_string': [';', '# ', '//', '@ '],
 		'block_comment_string': ('/*', '*/'),
 		'operator_style': ['SCE_ASM_OPERATOR'],
+		#'cpp_preprocessor': True,
 	},
 	'NP2LEX_ASYMPTOTE': {
 		'cpp_style_comment': True,
@@ -195,6 +198,7 @@ LexerConfigMap = {
 	'NP2LEX_CIL': {
 		'cpp_style_comment': True,
 		'operator_style': ['SCE_C_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_CMAKE': {
 		'line_comment_string': '#',
@@ -225,6 +229,7 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_C_NUMBER',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_C_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_CSHARP': {
 		'cpp_style_comment': True,
@@ -239,6 +244,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_CSHARP_CHARACTER'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_CSHARP_OPERATOR', 'SCE_CSHARP_OPERATOR2'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_CSS': {
 		'cpp_style_comment': True,
@@ -256,6 +262,7 @@ LexerConfigMap = {
 		'raw_string_style': ['SCE_D_RAWSTRING', 'SCE_D_STRING_BT'],
 		'character_style': ['SCE_D_CHARACTER'],
 		'operator_style': ['SCE_D_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_DART': {
 		'cpp_style_comment': True,
@@ -283,6 +290,7 @@ LexerConfigMap = {
 		'line_comment_string': '//',
 		'block_comment_string': ('(*', '*)'),
 		'operator_style': ['SCE_FSHARP_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 
 	'NP2LEX_GN': {
@@ -333,6 +341,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_HAXE_ESCAPECHAR',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_HAXE_OPERATOR', 'SCE_HAXE_OPERATOR2'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_HTML': {
 		'tab_settings': TabSettings_Space2,
@@ -353,6 +362,7 @@ LexerConfigMap = {
 		'default_fold_level': ['section', 'code'],
 		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_INNO_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 
 	'NP2LEX_JAMFILE': {
@@ -535,6 +545,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_REBOL_ESCAPECHAR',
 		'none_quote_style': 'SCE_REBOL_SYMBOL',
 		'operator_style': ['SCE_REBOL_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_RESOURCESCRIPT': {
 		'cpp_style_comment': True,
@@ -543,6 +554,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_C_CHARACTER'],
 		'none_quote_style': 'SCE_C_NUMBER',
 		'operator_style': ['SCE_C_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 	'NP2LEX_RUBY': {
 		'line_comment_string': '#',
@@ -592,6 +604,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_SWIFT_ESCAPECHAR',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_SWIFT_OPERATOR', 'SCE_SWIFT_OPERATOR2'],
+		'cpp_preprocessor': True,
 	},
 
 	'NP2LEX_TCL': {
@@ -652,6 +665,7 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'none_quote_style': 'SCE_B_COMMENT',
 		'operator_style': ['SCE_B_OPERATOR'],
+		'cpp_preprocessor': True,
 	},
 
 	'NP2LEX_WASM': {
@@ -764,9 +778,9 @@ def BuildLexerConfigContent(rid, keywordAttr):
 
 	# line comment, block comment
 	if not config.get('cpp_style_comment', False):
-		if not config.get('line_comment_string', ''):
+		if not config.get('line_comment_string', None):
 			flag |= LexerAttr.NoLineComment
-		if not config.get('block_comment_string', ''):
+		if not config.get('block_comment_string', None):
 			flag |= LexerAttr.NoBlockComment
 
 	# indentation guide
@@ -782,6 +796,8 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		flag |= LexerAttr.PrintfFormatSpecifier
 	if config.get('angle_bracket_generic', False):
 		flag |= LexerAttr.AngleBracketGeneric
+	if config.get('cpp_preprocessor', False):
+		flag |= LexerAttr.CppPreprocessor
 
 	output = ['\t{']
 	indent = '\t\t'

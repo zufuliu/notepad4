@@ -746,6 +746,7 @@ enum {
 	JavaKeywordIndex_Javadoc = 9,
 	JavaScriptKeywordIndex_Decorator = 7,
 	JavaScriptKeywordIndex_Jsdoc = 10,
+	JuliaKeywordIndex_CodeFolding = 1,
 	JuliaKeywordIndex_Macro = 6,
 	KotlinKeywordIndex_Annotation = 4,
 	KotlinKeywordIndex_Kdoc = 6,
@@ -762,7 +763,6 @@ enum {
 extern EDITLEXER lexCSS;
 extern EDITLEXER lexHTML;
 extern EDITLEXER lexJavaScript;
-extern EDITLEXER lexJulia;
 extern EDITLEXER lexPHP;
 extern EDITLEXER lexPython;
 extern EDITLEXER lexVBScript;
@@ -1482,7 +1482,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	}
 
 	// preprocessor like: # space preprocessor
-	if (pLexCurrent->rid == NP2LEX_CPP && (chPrev == '#' || IsASpaceOrTab(chPrev))) {
+	if ((pLexCurrent->lexerAttr & LexerAttr_CppPreprocessor) && (chPrev == '#' || IsASpaceOrTab(chPrev))) {
 		Sci_Position before = iStartWordPos - 1;
 		if (chPrev != '#') {
 			while (before >= iLineStartPos) {
@@ -1918,22 +1918,33 @@ void EditAutoCloseXMLTag(void) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const Sci_Position iStartPos = max_pos(0, iCurPos - (COUNTOF(tchBuf) - 1));
 	const Sci_Position iSize = iCurPos - iStartPos;
-	BOOL shouldAutoClose = iSize >= 3 && autoCompletionConfig.bCloseTags;
+	BOOL shouldAutoClose = FALSE;
 	BOOL autoClosed = FALSE;
 
-	if (shouldAutoClose && (pLexCurrent->lexerAttr & LexerAttr_AngleBracketGeneric)) {
+	if (iSize >= 3 && autoCompletionConfig.bCloseTags) {
+		shouldAutoClose = TRUE;
 		int iCurrentStyle = SciCall_GetStyleAt(iCurPos);
-		if (iCurrentStyle == 0 || iCurrentStyle == pLexCurrent->operatorStyle || iCurrentStyle == pLexCurrent->operatorStyle2) {
+		if ((pLexCurrent->lexerAttr & LexerAttr_AngleBracketGeneric)
+			&& (iCurrentStyle == 0 || iCurrentStyle == pLexCurrent->operatorStyle || iCurrentStyle == pLexCurrent->operatorStyle2)) {
 			shouldAutoClose = FALSE;
-		} else if (pLexCurrent->iLexer == SCLEX_CPP) {
+		} else if (pLexCurrent->iLexer == SCLEX_CPP || pLexCurrent->iLexer == SCLEX_INNOSETUP) {
+			// C++ like #include <path>
+			const int preprocessor = (pLexCurrent->iLexer == SCLEX_CPP) ? SCE_C_PREPROCESSOR : SCE_INNO_PREPROCESSOR;
 			const Sci_Line iLine = SciCall_LineFromPosition(iCurPos);
 			Sci_Position iCurrentLinePos = SciCall_PositionFromLine(iLine);
-			while (iCurrentLinePos < iCurPos && IsASpaceOrTab(SciCall_GetCharAt(iCurrentLinePos))) {
+			int ch = 0;
+			while (iCurrentLinePos < iCurPos) {
+				ch = SciCall_GetCharAt(iCurrentLinePos);
+				if (!IsASpaceOrTab(ch)) {
+					break;
+				}
 				iCurrentLinePos++;
 			}
-			iCurrentStyle = SciCall_GetStyleAt(iCurrentLinePos);
-			if (SciCall_GetCharAt(iCurrentLinePos) == '#' && iCurrentStyle == SCE_C_PREPROCESSOR) {
-				shouldAutoClose = FALSE;
+			if (ch == '#') {
+				iCurrentStyle = SciCall_GetStyleAt(iCurrentLinePos);
+				if (iCurrentStyle == preprocessor) {
+					shouldAutoClose = FALSE;
+				}
 			}
 		}
 	}
@@ -2095,7 +2106,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_INNOSETUP:
 
 	case SCLEX_JULIA: {
-		LPCSTR pKeywords = lexJulia.pKeyWords->pszKeyWords[1];
+		LPCSTR pKeywords = pLexCurrent->pKeyWords->pszKeyWords[JuliaKeywordIndex_CodeFolding];
 		LPCSTR p = strstr(pKeywords, word);
 		if (p == pKeywords || (p != NULL &&  p[-1] == ' ')) {
 			*indent = 2;

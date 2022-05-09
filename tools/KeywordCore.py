@@ -1411,7 +1411,7 @@ def parse_julia_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('code folding', folding, KeywordAttr.NoAutoComp),
+		('code folding', folding, KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('constant', keywordMap['constant'], KeywordAttr.Default),
 		('basic function', keywordMap['basic function'], KeywordAttr.Default),

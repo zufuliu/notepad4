@@ -37,6 +37,7 @@ enum {
 	LexerAttr_IndentLookForward = 1 << 5,
 	LexerAttr_PrintfFormatSpecifier = 1 << 6,
 	LexerAttr_AngleBracketGeneric = 1 << 7,
+	LexerAttr_CppPreprocessor = 1 << 8,
 };
 
 enum {
