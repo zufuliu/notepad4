@@ -2218,6 +2218,11 @@ def UpdateLexerKeywordAttr(indexPath, lexerPath):
 		output.append('};')
 	Regenerate(indexPath, '//KeywordIndex', output)
 
+	commentLine, commentBlock, scriptShebang = BuildLexerCommentString()
+	Regenerate(indexPath, '//CommentLine', commentLine)
+	Regenerate(indexPath, '//CommentBlock', commentBlock)
+	Regenerate(indexPath, '//ScriptShebang', scriptShebang)
+
 	for lexer, indexList in LexerKeywordIndexList.items():
 		output = []
 		if indexList:
