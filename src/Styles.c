@@ -1451,7 +1451,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			SciCall_SetProperty("lexer.lang", lang);
 		}
 
-		Style_UpdateLexerKeywords(pLexNew);
 		// Add keyword lists
 		uint64_t attr = pLexNew->keywordAttr;
 		for (int i = 0; i < KEYWORDSET_MAX; attr >>= 4, i++) {
@@ -1784,6 +1783,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		// Save current lexer
 		pLexCurrent = pLexNew;
+		Style_UpdateLexerKeywords(pLexNew);
 		UpdateStatusBarCache(STATUS_LEXER);
 		UpdateStatusbar();
 	}
@@ -2486,14 +2486,12 @@ extern BOOL fNoAutoDetection;
 static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWSTR *pszExt, BOOL *pDotFile) {
 	LPCWSTR lpszExt = PathFindExtension(lpszFile);
 	const LPCWSTR lpszName = PathFindFileName(lpszFile);
-	BOOL bFound = FALSE;
 	PEDITLEXER pLexNew = NULL;
 
 	if (StrNotEmpty(lpszExt)) {
 		lpszExt++;
 
 		if (StrCaseEqual(lpszExt, L"txt")) {
-			bFound = TRUE;
 			if (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt")) {
 				pLexNew = &lexCMake;
 			} else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
@@ -2501,41 +2499,37 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			} else {
 				pLexNew = &lexTextFile;
 			}
+			return pLexNew;
 		}
 
-		if (!bFound && bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
+		if (bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256] = "";
 			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 			pLexNew = Style_SniffShebang(tchText);
-			bFound = pLexNew != NULL;
 		}
 
 		// autoconf / automake
-		if (!bFound && StrCaseEqual(lpszExt, L"in") && pDotFile != NULL) {
+		if (!pLexNew && pDotFile != NULL && StrCaseEqual(lpszExt, L"in")) {
 			WCHAR tchCopy[MAX_PATH];
 			lstrcpyn(tchCopy, lpszFile, COUNTOF(tchCopy));
 			PathRemoveExtension(tchCopy);
 			pLexNew = Style_GetLexerFromFile(tchCopy, FALSE, NULL, NULL);
-			bFound = pLexNew != NULL;
 		}
 
 		// MySQL ini/cnf
-		if (!bFound && StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
+		if (!pLexNew && StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexConfig;
-			bFound = TRUE;
 		}
-		if (!bFound && StrCaseEqual(lpszName, L"web.config")) {
+		else if (StrCaseEqual(lpszName, L"web.config")) {
 			pLexNew = &lexXML;
-			bFound = TRUE;
 			np2LexLangIndex = IDM_LEXER_WEB_NET;
 		}
 
 		// check associated extensions
-		if (!bFound) {
+		if (!pLexNew) {
 			pLexNew = Style_MatchLexer(lpszExt, FALSE);
-			bFound = pLexNew != NULL;
 		}
-		if (bFound) {
+		if (pLexNew) {
 			Style_UpdateLexerLang(pLexNew, lpszExt, lpszName);
 		}
 		// dot file
@@ -2545,51 +2539,42 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, BOOL bCGIGuess, LPCWS
 			}
 			if (StrHasPrefix(lpszExt, L"bash") || StrEqualExW(lpszExt, L"profile")) { // .bash_history, .bash_logout, .bash_profile, .bashrc, .profile
 				pLexNew = &lexBash;
-				bFound = TRUE;
 			}
 		}
 	}
 
-	if (!bFound) {
+	if (!pLexNew) {
 		if (StrHasPrefixCase(lpszName, L"Readme")) {
 			pLexNew = &lexTextFile;
-			bFound = TRUE;
 		}
-		if (!bFound && (StrHasPrefixCase(lpszName, L"Makefile") || StrHasPrefixCase(lpszName, L"Kbuild"))) {
+		else if (StrHasPrefixCase(lpszName, L"Makefile") || StrHasPrefixCase(lpszName, L"Kbuild")) {
 			pLexNew = &lexMakefile;
-			bFound = TRUE;
 		}
-		if (!bFound && StrCaseEqual(lpszName, L"Cakefile")) {
+		else if (StrCaseEqual(lpszName, L"Cakefile")) {
 			pLexNew = &lexCoffeeScript;
-			bFound = TRUE;
 		}
-		if (!bFound && (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile"))) {
+		else if (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile")) {
 			pLexNew = &lexRuby;
-			bFound = TRUE;
 		}
-		if (!bFound && StrCaseEqual(lpszName, L"mozconfig")) {
+		else if (StrCaseEqual(lpszName, L"mozconfig")) {
 			pLexNew = &lexBash;
-			bFound = TRUE;
 		}
 		// Boost build
-		if (!bFound && (StrCaseEqual(lpszName, L"Jamroot") || StrHasPrefixCase(lpszName, L"Jamfile"))) {
+		else if (StrCaseEqual(lpszName, L"Jamroot") || StrHasPrefixCase(lpszName, L"Jamfile")) {
 			pLexNew = &lexJamfile;
-			bFound = TRUE;
 		}
-		if (!bFound && (StrHasPrefixCase(lpszName, L"Kconfig") || StrHasPrefixCase(lpszName, L"Doxyfile"))) {
+		else if (StrHasPrefixCase(lpszName, L"Kconfig") || StrHasPrefixCase(lpszName, L"Doxyfile")) {
 			pLexNew = &lexConfig;
-			bFound = TRUE;
 		}
 	}
 
-	if (!bFound && pszExt) {
+	if (!pLexNew && pszExt) {
 		*pszExt = lpszExt;
 	}
 	return pLexNew;
 }
 
 BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
-	BOOL bFound = TRUE;
 	BOOL bDotFile = FALSE;
 	LPCWSTR lpszExt = NULL;
 	PEDITLEXER pLexNew = NULL;
@@ -2598,13 +2583,9 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	if (bAutoSelect) {
 		pLexNew = Style_GetLexerFromFile(lpszFile, !fNoCGIGuess, &lpszExt, &bDotFile);
 	}
-	if (pLexNew == NULL) {
-		bFound = FALSE;
-		pLexNew = pLexArray[iDefaultLexerIndex];
-	}
 
 	// xml/html
-	if ((!bFound && bAutoSelect) || (bFound && (pLexNew->rid == NP2LEX_CONFIG))) {
+	if ((!pLexNew && bAutoSelect) || (pLexNew && (pLexNew->rid == NP2LEX_CONFIG))) {
 		char tchText[256] = "";
 		SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 		const char *p = tchText;
@@ -2615,7 +2596,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 			if (StrStartsWith(p, "<?xml")) {
 				// some conf/cfg file is xml
 				pLexNew = &lexXML;
-			} else if (!bFound) {
+			} else if (!pLexNew) {
 				if (StrStartsWithCase(p, "<!DOCTYPE")) {
 					p += CSTRLEN("<!DOCTYPE");
 					while (IsASpace(*p)) {
@@ -2632,8 +2613,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 					}
 				}
 			}
-			if (pLexNew->rid == NP2LEX_HTML || pLexNew->rid == NP2LEX_XML) {
-				bFound = TRUE;
+			if (pLexNew && (pLexNew->rid == NP2LEX_HTML || pLexNew->rid == NP2LEX_XML)) {
 				np2LexLangIndex = Style_GetDocTypeLanguage();
 				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
 					// xhtml: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html>
@@ -2642,12 +2622,11 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 			}
 		} else if ((p == tchText) && !fNoCGIGuess && (pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
 			pLexNew = pLexSniffed;
-			bFound = TRUE;
 		}
 	}
 
 	// file mode
-	if (!bFound && (fvCurFile.mask & FV_MODE) && fvCurFile.tchMode[0]) {
+	if (!pLexNew && (fvCurFile.mask & FV_MODE) && fvCurFile.tchMode[0]) {
 		WCHAR wchMode[32];
 		const UINT cpEdit = SciCall_GetCodePage();
 		MultiByteToWideChar(cpEdit, 0, fvCurFile.tchMode, -1, wchMode, COUNTOF(wchMode));
@@ -2661,38 +2640,38 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 					// Although .nfo and .diz were removed from the default lexer's
 					// default extensions list, they may still presist in the user's INI
 					pLexNew = pLexSniffed;
-					bFound = TRUE;
 				}
 			}
 		}
 		// file mode name/extension
-		if (!bFound) {
+		if (!pLexNew) {
 			PEDITLEXER pLexMode;
 			if ((pLexMode = Style_MatchLexer(wchMode, FALSE)) != NULL ||
 				(pLexMode = Style_MatchLexer(wchMode, TRUE)) != NULL) {
 				pLexNew = pLexMode;
-				bFound = TRUE;
 			}
 		}
 	}
 
-	if (!bFound && iCurrentEncoding == g_DOSEncoding) {
+	if (!pLexNew && iCurrentEncoding == g_DOSEncoding) {
 		pLexNew = &lexANSI;
-		bFound = TRUE;
 	}
 
-	if (!bFound && (!fNoAutoDetection || bDotFile)) {
+	if (!pLexNew && (!fNoAutoDetection || bDotFile)) {
 		if (!fNoAutoDetection) {
 			if ((pLexSniffed = Style_AutoDetect(bDotFile)) != NULL) {
 				pLexNew = pLexSniffed;
-				bFound = TRUE;
 			}
 		} else {
 			pLexNew = &lexConfig;
-			bFound = TRUE;
 		}
 	}
 
+	BOOL bFound =TRUE;
+	if (!pLexNew) {
+		bFound = FALSE;
+		pLexNew = pLexArray[iDefaultLexerIndex];
+	}
 	// Apply the new lexer
 	Style_SetLexer(pLexNew, TRUE);
 	return bFound;
