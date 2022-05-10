@@ -664,7 +664,7 @@ static inline BOOL IsPrintfFormatSpecifier(int ch) {
 	return IsAlpha(ch);
 }
 
-static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, BOOL punctuation) {
+static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style, BOOL punctuation) {
 	// style for chPrev, style for ch is zero on typing
 	const int stylePrev = SciCall_GetStyleAt(before);
 	if (stylePrev == 0) {
@@ -674,7 +674,7 @@ static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 		if (!IsPrintfFormatSpecifier(ch)) {
 			return FALSE;
 		}
-		if (pLexCurrent->formatSpecifierStyle) {
+		if (style != 0 && pLexCurrent->formatSpecifierStyle) {
 			return stylePrev == pLexCurrent->formatSpecifierStyle;
 		}
 		// legacy lexer without format specifier highlighting
@@ -684,7 +684,7 @@ static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 		return FALSE;
 	}
 
-	if (pLexCurrent->escapeCharacterStyle) {
+	if (style != 0 && pLexCurrent->escapeCharacterStyle) {
 		if (stylePrev != pLexCurrent->escapeCharacterStyle) {
 			return FALSE;
 		}
@@ -785,7 +785,7 @@ typedef enum HtmlTextBlock {
 	HtmlTextBlock_CSS,
 } HtmlTextBlock;
 
-// from LexPHP.cxx
+// from scintilla/lexlib/DocUtils.h
 #define js_style(style)		((style) + SCE_PHP_LABEL + 1)
 #define css_style(style)	((style) + SCE_PHP_LABEL + SCE_JS_LABEL + 2)
 static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) {
@@ -946,7 +946,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					const int chPrev = SciCall_GetCharAt(before);
 					// word after escape character or format specifier
 					if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev, FALSE)) {
+						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev, style, FALSE)) {
 							pWord++;
 							--wordLength;
 							bChanged = TRUE;
@@ -1457,7 +1457,8 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 			}
 			// word after escape character or format specifier
 			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, FALSE)) {
+				const int style = SciCall_GetStyleAt(iStartWordPos);
+				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, style, FALSE)) {
 					++iStartWordPos;
 					ch = SciCall_GetCharAt(iStartWordPos);
 					chPrev = '\0';
@@ -1824,7 +1825,8 @@ void EditAutoCloseBraceQuote(int ch) {
 
 		// escape sequence
 		if (ch != ',' && (chPrev != '\0' && chPrev == pLexCurrent->escapeCharacterStart)) {
-			if (IsEscapeCharOrFormatSpecifier(iCurPos - 2, ch, chPrev, TRUE)) {
+			const int style = SciCall_GetStyleAt(iCurPos - 1);
+			if (IsEscapeCharOrFormatSpecifier(iCurPos - 2, ch, chPrev, style, TRUE)) {
 				return;
 			}
 		}
