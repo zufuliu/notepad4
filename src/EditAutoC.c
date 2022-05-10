@@ -654,6 +654,15 @@ static inline BOOL IsEscapeCharacter(int ch) {
 		|| ch == 'r'	// '\r'
 		|| ch == 't'	// '\t'
 		|| ch == 'v'	// '\v'
+		// for EditAutoCloseBraceQuote()
+		|| ch == '('
+		|| ch == '{'
+		|| ch == '['
+		|| ch == '<'
+		|| ch == '\"'
+		|| ch == '\''
+		|| ch == '`'
+		// other
 		|| ch == '$';	// PHP variable
 	// x u U ignored as they need to be followed with multiple hex digits.
 }
@@ -663,42 +672,41 @@ static inline BOOL IsPrintfFormatSpecifier(int ch) {
 	return IsAlpha(ch);
 }
 
-static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style) {
+static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev) {
+	// style for chPrev, style for ch is zero on typing
+	const int stylePrev = SciCall_GetStyleAt(before);
 	if (chPrev == '%') {
 		if (!IsPrintfFormatSpecifier(ch)) {
 			return FALSE;
 		}
 		if (pLexCurrent->formatSpecifierStyle) {
-			return style == pLexCurrent->formatSpecifierStyle;
+			return stylePrev == pLexCurrent->formatSpecifierStyle;
 		}
 		// legacy lexer without format specifier highlighting
-		if (pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier) {
-			const int stylePrev = SciCall_GetStyleAt(before);
-			return style == stylePrev;
-		}
-		return FALSE;
+		return pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier;
 	}
 
-	if (!IsEscapeCharacter(ch)) {
-		return FALSE;
-	}
 	if (pLexCurrent->escapeCharacterStyle) {
-		return style == pLexCurrent->escapeCharacterStyle;
+		if (stylePrev != pLexCurrent->escapeCharacterStyle) {
+			return FALSE;
+		}
+	} else {
+		// legacy lexer without escape character highlighting
+		if (!IsEscapeCharacter(ch)) {
+			return FALSE;
+		}
 	}
 
-	// legacy lexer without escape character highlighting
-	if (style != pLexCurrent->rawStringStyle
+	if (stylePrev != pLexCurrent->rawStringStyle
 		// C++ Doxygen comment tag
-		&& !(pLexCurrent->iLexer == SCLEX_CPP && style == SCE_C_COMMENTDOC_TAG)) {
+		&& !(pLexCurrent->iLexer == SCLEX_CPP && stylePrev == SCE_C_COMMENTDOC_TAG)) {
 		int chPrev2 = 0;
 		const Sci_Position before2 = SciCall_PositionBefore(before);
 		if (before2 + 1 == before) {
 			chPrev2 = SciCall_GetCharAt(before2);
 		}
-		if (chPrev != chPrev2) {
-			const int stylePrev = SciCall_GetStyleAt(before);
-			return style == stylePrev;
-		}
+		// simply treat chPrev == chPrev2 as escape escapeCharacterStart self
+		return chPrev != chPrev2;
 	}
 
 	return FALSE;
@@ -940,7 +948,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					const int chPrev = SciCall_GetCharAt(before);
 					// word after escape character or format specifier
 					if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev, style)) {
+						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev)) {
 							pWord++;
 							--wordLength;
 							bChanged = TRUE;
@@ -1451,8 +1459,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 			}
 			// word after escape character or format specifier
 			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-				const int style = SciCall_GetStyleAt(iStartWordPos);
-				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, style)) {
+				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev)) {
 					++iStartWordPos;
 					ch = SciCall_GetCharAt(iStartWordPos);
 					chPrev = '\0';
@@ -1805,18 +1812,8 @@ void EditAutoCloseBraceQuote(int ch) {
 
 	// escape sequence
 	if (ch != ',' && (chPrev != '\0' && chPrev == pLexCurrent->escapeCharacterStart)) {
-		charStyle = pLexCurrent->escapeCharacterStyle;
-		const int style = SciCall_GetStyleAt(iCurPos - 1);
-		// similar to IsEscapeCharOrFormatSpecifier()
-		if (charStyle) {
-			if (style == charStyle) {
-				return;
-			}
-		} else if (style == iPrevStyle) {
-			const int chPrev2 = SciCall_GetCharAt(iCurPos - 3);
-			if (chPrev != chPrev2) {
-				return;
-			}
+		if (IsEscapeCharOrFormatSpecifier(iCurPos - 2, ch, chPrev)) {
+			return;
 		}
 	}
 
