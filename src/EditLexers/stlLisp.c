@@ -32,7 +32,7 @@ EDITLEXER lexLisp = {
 		0,
 		'\\', 0, 0,
 		0,
-		0, 0,
+		0, SCE_C_OPERATOR,
 		SCE_C_OPERATOR, 0,
 		KeywordAttr_Default
 	},

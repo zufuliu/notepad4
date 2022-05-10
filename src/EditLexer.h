@@ -38,6 +38,7 @@ enum {
 	LexerAttr_PrintfFormatSpecifier = 1 << 6,
 	LexerAttr_AngleBracketGeneric = 1 << 7,
 	LexerAttr_CppPreprocessor = 1 << 8,
+	LexerAttr_CharacterPrefix = 1 << 9,
 };
 
 enum {

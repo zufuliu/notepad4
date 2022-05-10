@@ -61,7 +61,7 @@ EDITLEXER lexMatlab = {
 		0,
 		'\\', 0, 0,
 		0,
-		0, 0,
+		0, SCE_MAT_OPERATOR,
 		SCE_MAT_OPERATOR, 0,
 		KeywordAttr_Default
 	},

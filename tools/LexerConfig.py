@@ -30,6 +30,7 @@ escape_char_start: character used to escape special characters, default is backs
 escape_char_style: style for escape character, default is zero.
 raw_string_style: styles where backslash is treated literally, default are zeros.
 character_style: styles for character literal, default are zeros.
+character_prefix: prefix for character literal or single quoted string, default is None.
 none_quote_style: style for single quote not used for quotation, default is zero.
 
 angle_bracket_generic: has C++ like template or generic with angle bracket, default is False.
@@ -50,6 +51,7 @@ class LexerAttr(IntFlag):
 	PrintfFormatSpecifier = 1 << 6	# printf_format_specifier
 	AngleBracketGeneric = 1 << 7	# angle_bracket_generic
 	CppPreprocessor = 1 << 8		# cpp_preprocessor
+	CharacterPrefix = 1 << 9		# character_prefix
 
 class KeywordAttr(IntFlag):
 	Default = 0
@@ -226,6 +228,7 @@ LexerConfigMap = {
 		'printf_format_specifier': True,
 		'raw_string_style': ['SCE_C_STRINGRAW'],
 		'character_style': ['SCE_C_CHARACTER'],
+		'character_prefix': ['L', 'u', 'U', 'u8'],
 		'none_quote_style': 'SCE_C_NUMBER',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_C_OPERATOR'],
@@ -272,6 +275,7 @@ LexerConfigMap = {
 		'raw_string_style': ['SCE_DART_RAWSTRING_SQ', 'SCE_DART_RAWSTRING_DQ',
 			'SCE_DART_TRIPLE_RAWSTRING_SQ', 'SCE_DART_TRIPLE_RAWSTRING_DQ',
 		],
+		'character_prefix': ['r'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_DART_OPERATOR', 'SCE_DART_OPERATOR2'],
 	},
@@ -406,6 +410,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_JULIA_ESCAPECHAR',
 		'raw_string_style': ['SCE_JULIA_RAWSTRING', 'SCE_JULIA_TRIPLE_RAWSTRING'],
 		'character_style': ['SCE_JULIA_CHARACTER'],
+		'none_quote_style': 'SCE_JULIA_OPERATOR',
 		'operator_style': ['SCE_JULIA_OPERATOR', 'SCE_JULIA_OPERATOR2'],
 	},
 
@@ -432,6 +437,7 @@ LexerConfigMap = {
 	'NP2LEX_LISP': {
 		'line_comment_string': ';',
 		'block_comment_string': ('#|',  '|#'),
+		'none_quote_style': 'SCE_C_OPERATOR',
 		'operator_style': ['SCE_C_OPERATOR'],
 	},
 	'NP2LEX_LLVM': {
@@ -465,6 +471,7 @@ LexerConfigMap = {
 		'block_comment_on_new_line': True,
 		'printf_format_specifier': True,
 		#'escape_char_start': NoEscapeCharacter, # backslash for Octave escape character
+		'none_quote_style': 'SCE_MAT_OPERATOR',
 		'operator_style': ['SCE_MAT_OPERATOR'],
 	},
 
@@ -486,6 +493,7 @@ LexerConfigMap = {
 		'shebang_exe_name': 'perl',
 		'printf_format_specifier': True,
 		'raw_string_style': ['SCE_PL_STRING_SQ'],
+		'none_quote_style': 'SCE_PL_OPERATOR',
 		'operator_style': ['SCE_PL_OPERATOR'],
 	},
 	'NP2LEX_PHP': {
@@ -517,6 +525,7 @@ LexerConfigMap = {
 		'printf_format_specifier': True,
 		'format_specifier_style': 'SCE_PY_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_PY_ESCAPECHAR',
+		'character_prefix': ['r', 'b', 'f', 'u', 'R', 'B', 'F', 'U'],
 		'raw_string_style': ['SCE_PY_RAWSTRING_SQ', 'SCE_PY_RAWSTRING_DQ',
 			'SCE_PY_TRIPLE_RAWSTRING_SQ', 'SCE_PY_TRIPLE_RAWSTRING_DQ',
 			'SCE_PY_RAWFMTSTRING_SQ', 'SCE_PY_RAWFMTSTRING_DQ',
@@ -552,6 +561,7 @@ LexerConfigMap = {
 		'default_fold_level': ['preprocessor', 'resource'],
 		'printf_format_specifier': True,
 		'character_style': ['SCE_C_CHARACTER'],
+		'character_prefix': ['L', 'u', 'U', 'u8'],
 		'none_quote_style': 'SCE_C_NUMBER',
 		'operator_style': ['SCE_C_OPERATOR'],
 		'cpp_preprocessor': True,
@@ -574,7 +584,9 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_RUST_ESCAPECHAR',
 		'raw_string_style': ['SCE_RUST_RAW_STRING', 'SCE_RUST_RAW_BYTESTRING'],
 		'character_style': ['SCE_RUST_CHARACTER', 'SCE_RUST_BYTE_CHARACTER'],
+		'character_prefix': ['b'],
 		'none_quote_style': 'SCE_RUST_LIFETIME',
+		'angle_bracket_generic': True,
 		'operator_style': ['SCE_RUST_OPERATOR'],
 	},
 
@@ -595,6 +607,7 @@ LexerConfigMap = {
 		'block_comment_string': ('/*', '*/'),
 		'default_fold_level': ['function'],
 		'escape_char_style': 'SCE_SQL_ESCAPECHAR',
+		'character_prefix': ['q', 'Q', 'x', 'X', 'b', 'B'],
 		'operator_style': ['SCE_SQL_OPERATOR'], # ignore q'{SCE_SQL_QOPERATOR}'
 	},
 	'NP2LEX_SWIFT': {
@@ -798,6 +811,8 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		flag |= LexerAttr.AngleBracketGeneric
 	if config.get('cpp_preprocessor', False):
 		flag |= LexerAttr.CppPreprocessor
+	if config.get('character_prefix', None):
+		flag |= LexerAttr.CharacterPrefix
 
 	output = ['\t{']
 	indent = '\t\t'

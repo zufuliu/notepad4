@@ -365,7 +365,8 @@ EDITLEXER lexPython = {
 		LexerAttr_NoBlockComment |
 		LexerAttr_IndentBasedFolding |
 		LexerAttr_IndentLookForward |
-		LexerAttr_PrintfFormatSpecifier,
+		LexerAttr_PrintfFormatSpecifier |
+		LexerAttr_CharacterPrefix,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 1) | (1 << 2), // class, function
 		SCE_PY_FUNCTION_DEFINITION,

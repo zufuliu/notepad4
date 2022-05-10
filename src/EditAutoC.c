@@ -654,14 +654,6 @@ static inline BOOL IsEscapeCharacter(int ch) {
 		|| ch == 'r'	// '\r'
 		|| ch == 't'	// '\t'
 		|| ch == 'v'	// '\v'
-		// for EditAutoCloseBraceQuote()
-		|| ch == '('
-		|| ch == '{'
-		|| ch == '['
-		|| ch == '<'
-		|| ch == '\"'
-		|| ch == '\''
-		|| ch == '`'
 		// other
 		|| ch == '$';	// PHP variable
 	// x u U ignored as they need to be followed with multiple hex digits.
@@ -672,9 +664,12 @@ static inline BOOL IsPrintfFormatSpecifier(int ch) {
 	return IsAlpha(ch);
 }
 
-static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev) {
+static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, BOOL punctuation) {
 	// style for chPrev, style for ch is zero on typing
 	const int stylePrev = SciCall_GetStyleAt(before);
+	if (stylePrev == 0) {
+		return FALSE;
+	}
 	if (chPrev == '%') {
 		if (!IsPrintfFormatSpecifier(ch)) {
 			return FALSE;
@@ -683,14 +678,17 @@ static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 			return stylePrev == pLexCurrent->formatSpecifierStyle;
 		}
 		// legacy lexer without format specifier highlighting
-		return pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier;
+		if (pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier) {
+			return !(stylePrev == pLexCurrent->operatorStyle || stylePrev == pLexCurrent->operatorStyle2);
+		}
+		return FALSE;
 	}
 
 	if (pLexCurrent->escapeCharacterStyle) {
 		if (stylePrev != pLexCurrent->escapeCharacterStyle) {
 			return FALSE;
 		}
-	} else {
+	} else if (!punctuation) {
 		// legacy lexer without escape character highlighting
 		if (!IsEscapeCharacter(ch)) {
 			return FALSE;
@@ -948,7 +946,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					const int chPrev = SciCall_GetCharAt(before);
 					// word after escape character or format specifier
 					if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev)) {
+						if (IsEscapeCharOrFormatSpecifier(before, (uint8_t)pWord[0], chPrev, FALSE)) {
 							pWord++;
 							--wordLength;
 							bChanged = TRUE;
@@ -1459,7 +1457,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 			}
 			// word after escape character or format specifier
 			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev)) {
+				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, FALSE)) {
 					++iStartWordPos;
 					ch = SciCall_GetCharAt(iStartWordPos);
 					chPrev = '\0';
@@ -1662,46 +1660,59 @@ void EditCompleteWord(int iCondition, BOOL autoInsert) {
 }
 
 static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
-	const int iLexer = pLexCurrent->iLexer;
-	if (chPrev >= 0x80	// someone's
-		|| (iLexer == SCLEX_CPP && iCurrentStyle == SCE_C_NUMBER)
-		|| (iLexer == SCLEX_JULIA && (iCurrentStyle == SCE_JULIA_OPERATOR || iCurrentStyle == SCE_JULIA_OPERATOR2)) // transpose operator
-		|| (iLexer == SCLEX_LISP && iCurrentStyle == SCE_C_OPERATOR)
-		|| (iLexer == SCLEX_MATLAB && iCurrentStyle == SCE_MAT_OPERATOR) // transpose operator
-		|| (iLexer == SCLEX_PERL && iCurrentStyle == SCE_PL_OPERATOR && chPrev == '&') // SCE_PL_IDENTIFIER
-		|| ((iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) && (iCurrentStyle == SCE_B_DEFAULT || iCurrentStyle == SCE_B_COMMENT))
-		|| (iLexer == SCLEX_VERILOG && (iCurrentStyle == SCE_V_NUMBER || iCurrentStyle == SCE_V_DEFAULT))
-		|| (iLexer == SCLEX_TEXINFO && iCurrentStyle == SCE_L_DEFAULT && chPrev == '@') // SCE_L_SPECIAL
-	) {
+	if (chPrev >= 0x80) { // someone's
 		return FALSE;
+	}
+
+	const int iLexer = pLexCurrent->iLexer;
+	if (iCurrentStyle == 0) {
+		if (iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) {
+			return FALSE; // comment
+		}
+	} else {
+		if (pLexCurrent->noneSingleQuotedStyle && iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
+			return FALSE;
+		}
 	}
 
 	// someone's, don't
 	if (IsAlphaNumeric(chPrev)) {
-		// character prefix
-		if (pLexCurrent->rid == NP2LEX_CPP || pLexCurrent->rid == NP2LEX_RESOURCESCRIPT || iLexer == SCLEX_PYTHON || iLexer == SCLEX_SQL || iLexer == SCLEX_RUST) {
-			const int lower = chPrev | 0x20;
+		// character or string prefix
+		if (pLexCurrent->lexerAttr & LexerAttr_CharacterPrefix) {
 			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
-			const BOOL bSubWord = chPrev2 >= 0x80 || IsAlphaNumeric(chPrev2);
+			const int lower = chPrev | 0x20;
+			if (chPrev2 >= 0x80 || IsAlphaNumeric(chPrev2)) {
+				if (iLexer == SCLEX_CPP) {
+					return chPrev2 == 'u' && chPrev == '8';
+				}
+				if (iLexer == SCLEX_PYTHON) {
+					if (lower == 'r' || lower == 'u' || lower == 'b' || lower == 'f') {
+						const int lower2 = chPrev2 | 0x20;
+						return lower != lower2 && (lower2 == 'r' || lower2 == 'u' || lower2 == 'b' || lower2 == 'f');
+					}
+				}
+			} else {
+				switch (iLexer) {
+				case SCLEX_CPP:
+					return lower == 'u' || chPrev == 'L';
 
-			switch (iLexer) {
-			case SCLEX_CPP:
-				return (lower == 'u' || chPrev == 'L') && !bSubWord;
+				case SCLEX_DART:
+					return chPrev == 'r';
 
-			case SCLEX_PYTHON: {
-				const int lower2 = chPrev2 | 0x20;
-				return (lower == 'r' || lower == 'u' || lower == 'b' || lower == 'f') && (!bSubWord || (lower != lower2 && (lower2 == 'r' || lower2 == 'u' || lower2 == 'b' || lower2 == 'f')));
-			}
+				case SCLEX_PYTHON:
+					return lower == 'r' || lower == 'u' || lower == 'b' || lower == 'f';
 
-			case SCLEX_SQL:
-				return (lower == 'q' || lower == 'x' || lower == 'b') && !bSubWord;
+				case SCLEX_RUST:
+					return chPrev == 'b';
 
-			case SCLEX_RUST:
-				return chPrev == 'b' && !bSubWord; // bytes
+				case SCLEX_SQL:
+					return lower == 'q' || lower == 'x' || lower == 'b';
+				}
 			}
 		}
 		return FALSE;
 	}
+
 	if (iLexer == SCLEX_RUST || iLexer == SCLEX_REBOL) {
 		// Rust lifetime, REBOL symbol
 		return FALSE;
@@ -1799,21 +1810,23 @@ void EditAutoCloseBraceQuote(int ch) {
 	const int iPrevStyle = SciCall_GetStyleAt(iCurPos - 2);
 	const int iNextStyle = SciCall_GetStyleAt(iCurPos);
 
-	int charStyle = pLexCurrent->characterLiteralStyle;
-	if (charStyle != 0) {
-		// within character literal
-		if (iPrevStyle == charStyle && iNextStyle == charStyle) {
-			return;
+	if (iPrevStyle != 0) {
+		int charStyle = pLexCurrent->characterLiteralStyle;
+		if (charStyle != 0) {
+			// within character literal
+			if (iPrevStyle == charStyle && iNextStyle == charStyle) {
+				return;
+			}
+			if (pLexCurrent->iLexer == SCLEX_RUST && (iPrevStyle == SCE_RUST_BYTE_CHARACTER && iNextStyle == SCE_RUST_BYTE_CHARACTER)) {
+				return;
+			}
 		}
-		if (pLexCurrent->iLexer == SCLEX_RUST && (iPrevStyle == SCE_RUST_BYTE_CHARACTER && iNextStyle == SCE_RUST_BYTE_CHARACTER)) {
-			return;
-		}
-	}
 
-	// escape sequence
-	if (ch != ',' && (chPrev != '\0' && chPrev == pLexCurrent->escapeCharacterStart)) {
-		if (IsEscapeCharOrFormatSpecifier(iCurPos - 2, ch, chPrev)) {
-			return;
+		// escape sequence
+		if (ch != ',' && (chPrev != '\0' && chPrev == pLexCurrent->escapeCharacterStart)) {
+			if (IsEscapeCharOrFormatSpecifier(iCurPos - 2, ch, chPrev, TRUE)) {
+				return;
+			}
 		}
 	}
 
@@ -1986,6 +1999,7 @@ void EditAutoCloseXMLTag(void) {
 			}
 		}
 	}
+
 	if (!autoClosed && autoCompletionConfig.bCompleteWord) {
 		const Sci_Position iPos = SciCall_GetCurrentPos();
 		if (SciCall_GetCharAt(iPos - 2) == '-') {

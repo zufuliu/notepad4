@@ -899,7 +899,8 @@ EDITLEXER lexCPP = {
 	{
 		LexerAttr_PrintfFormatSpecifier |
 		LexerAttr_AngleBracketGeneric |
-		LexerAttr_CppPreprocessor,
+		LexerAttr_CppPreprocessor |
+		LexerAttr_CharacterPrefix,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // preprocessor, namespace, class, method
 		0,
