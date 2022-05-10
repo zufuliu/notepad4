@@ -149,7 +149,8 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 				result = sorted(to_lower(items))
 				if set(result) == set(items):
 					attr &= ~KeywordAttr.MakeLower
-				if sorted(items) != sorted(result):
+				second = to_lower(sorted(items))
+				if second != result:
 					attr &= ~KeywordAttr.PreSorted
 		if attr != KeywordAttr.Default:
 			attrList.append((index, attr, comment))

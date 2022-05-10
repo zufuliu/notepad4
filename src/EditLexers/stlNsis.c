@@ -93,7 +93,7 @@ EDITLEXER lexNsis = {
 		0,
 		0, 0,
 		SCE_NSIS_OPERATOR, 0
-		, KeywordAttr32(0, KeywordAttr_MakeLower) // keywords
+		, KeywordAttr32(0, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_NoLexer) // preprocessor
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // instruction
 		| KeywordAttr32(3, KeywordAttr_NoLexer) // attribute

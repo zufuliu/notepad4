@@ -2002,7 +2002,7 @@ static inline BOOL IsIndentKeywordStyle(int style) {
 	//case SCLEX_AUTOIT3:
 	//	return style == SCE_AU3_KEYWORD;
 	case SCLEX_BASH:
-		return style == SCE_BAT_WORD;
+		return style == SCE_SH_WORD;
 
 	case SCLEX_CMAKE:
 		return style == SCE_CMAKE_WORD;

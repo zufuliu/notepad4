@@ -449,10 +449,10 @@ EDITLEXER lexPHP = {
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // type
 		| KeywordAttr32(2, KeywordAttr_MakeLower) // class
-		| KeywordAttr32(3, KeywordAttr_MakeLower) // interface
+		| KeywordAttr32(3, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // interface
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // predefined variable
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // magic constant
-		| KeywordAttr32(6, KeywordAttr_MakeLower) // magic method
+		| KeywordAttr32(6, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // magic method
 		| KeywordAttr64(7, KeywordAttr_NoLexer) // constant
 		| KeywordAttr64(8, KeywordAttr_NoLexer) // function
 		| KeywordAttr64(9, KeywordAttr_NoLexer) // misc
