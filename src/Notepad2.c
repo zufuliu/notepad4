@@ -2717,7 +2717,7 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	UpdateWindowTitle();
 }
 
-static inline uint8_t IsBraceMatchChar(uint32_t ch) {
+static inline bool IsBraceMatchChar(uint32_t ch) {
 #if 0
 	return ch == '(' || ch == ')'
 		|| ch == '[' || ch == ']'

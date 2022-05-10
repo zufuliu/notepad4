@@ -324,8 +324,8 @@ enum {
 
 // in EditAutoC.c
 void	EditCompleteUpdateConfig(void);
-BOOL	IsDocWordChar(int ch);
-BOOL	IsAutoCompletionWordCharacter(int ch);
+bool	IsDocWordChar(uint32_t ch);
+bool	IsAutoCompletionWordCharacter(uint32_t ch);
 void	EditCompleteWord(int iCondition, BOOL autoInsert);
 BOOL	EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos);
 void	EditAutoCloseBraceQuote(int ch);

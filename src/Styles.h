@@ -46,6 +46,7 @@ BOOL	Style_Export(HWND hwnd);
 void	Style_LoadTabSettings(PEDITLEXER pLex);
 void	Style_SaveTabSettings(PEDITLEXER pLex);
 void	EditApplyDefaultEncoding(PEDITLEXER pLex);
+void	InitAutoCompletionCache(LPCEDITLEXER pLex);
 
 void	Style_DetectBaseFontSize(HWND hwnd);
 HFONT	Style_CreateCodeFont(UINT dpi);
@@ -61,7 +62,6 @@ void	Style_SetLexerFromID(int rid);
 int		Style_GetMatchLexerIndex(int rid);
 
 int		Style_GetDocTypeLanguage(void);
-void	Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew);
 LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName);
 void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);

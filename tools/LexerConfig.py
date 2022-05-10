@@ -6,15 +6,15 @@ tab_settings: scheme default tab and indentation settings.
 	indent_width: indentation width, default is 4.
 	tab_as_spaces: insert tab as spaces, default is False.
 	use_global_tab_settings: use global tab settings, default is True.
-default_encoding: scheme default encoding, default is not set.
-default_line_ending: scheme default line ending, default is not set.
+default_encoding: scheme default encoding.
+default_line_ending: scheme default line ending.
 
-line_comment_string: line comment start string, default is None.
+line_comment_string: line comment start string.
 line_comment_at_line_start: put start string at line start, default is False.
-block_comment_string: block comment start and end string, default is None.
+block_comment_string: block comment start and end string.
 block_comment_on_new_line: put start and end string on new line, default is False.
 cpp_style_comment: shortcut to use C++ style line and block comment, default is False.
-shebang_exe_name: executable name for shebang, default is None.
+shebang_exe_name: executable name for shebang.
 
 indent_based_folding: code folding is indentation based, default is False.
 indent_guide_style: indentation guide view style, default is SC_IV_LOOKBOTH.
@@ -25,17 +25,20 @@ default_fold_ignore_inner: inner style to be ignored for toggle default code fol
 				normally this is function definition style.
 
 printf_format_specifier: has C printf like format specifier, default is False.
-format_specifier_style: style for format specifier, default is zero.
+format_specifier_style: style for format specifier.
 escape_char_start: character used to escape special characters, default is backslash.
-escape_char_style: style for escape character, default is zero.
-raw_string_style: styles where backslash is treated literally, default are zeros.
-character_style: styles for character literal, default are zeros.
-character_prefix: prefix for character literal or single quoted string, default is None.
-none_quote_style: style for single quote not used for quotation, default is zero.
+escape_char_style: style for escape character.
+raw_string_style: styles where backslash is treated literally.
+character_style: styles for character literal.
+character_prefix: prefix for character literal or single quoted string.
+none_quote_style: style for single quote not used for quotation.
 
 angle_bracket_generic: has C++ like template or generic with angle bracket, default is False.
-operator_style:	styles for operator punctuation, default are zeros.
+operator_style:	styles for operator punctuation.
 cpp_preprocessor: has C++ style #preprocessor, default is False.
+
+doc_extra_word_char: extra identifier characters excludes dot.
+autoc_extra_keyword: [deprecated] extra keyword for auto-completion.
 """
 
 from enum import IntFlag
@@ -94,11 +97,13 @@ LexerConfigMap = {
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'escape_char_start': NoEscapeCharacter,
+		'doc_extra_word_char': '-',
 	},
 	'NP2LEX_2NDTEXTFILE': {
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'escape_char_start': NoEscapeCharacter,
+		'doc_extra_word_char': '-',
 	},
 	'NP2LEX_ANSI': {
 		'default_encoding': 'DOS-437',
@@ -106,6 +111,7 @@ LexerConfigMap = {
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'escape_char_start': NoEscapeCharacter,
+		'doc_extra_word_char': '-',
 	},
 
 	'NP2LEX_ABAQUS': {
@@ -129,6 +135,7 @@ LexerConfigMap = {
 		'block_comment_string': ('/*', '*/'),
 		'operator_style': ['SCE_ASM_OPERATOR'],
 		#'cpp_preprocessor': True,
+		'doc_extra_word_char': '#%',
 	},
 	'NP2LEX_ASYMPTOTE': {
 		'cpp_style_comment': True,
@@ -153,6 +160,7 @@ LexerConfigMap = {
 		'block_comment_string': ('#cs', '#ce'),
 		'block_comment_on_new_line': True,
 		'operator_style': ['SCE_AU3_OPERATOR'],
+		'doc_extra_word_char': '#$@',
 	},
 	'NP2LEX_AVISYNTH': {
 		'line_comment_string': '#',
@@ -170,6 +178,7 @@ LexerConfigMap = {
 		'format_specifier_style': 'SCE_AWK_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_AWK_ESCAPECHAR',
 		'operator_style': ['SCE_AWK_OPERATOR'],
+		'doc_extra_word_char': '$@:',
 	},
 
 	'NP2LEX_BASH': {
@@ -179,6 +188,7 @@ LexerConfigMap = {
 		'shebang_exe_name': ['bash', 'm4', 'csh'],
 		'raw_string_style': ['SCE_SH_STRING_SQ'],
 		'operator_style': ['SCE_SH_OPERATOR'],
+		'doc_extra_word_char': '-$',
 	},
 	'NP2LEX_BATCH': {
 		'default_encoding': 'ANSI',
@@ -188,6 +198,7 @@ LexerConfigMap = {
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_BAT_ESCAPECHAR',
 		'operator_style': ['SCE_BAT_OPERATOR'],
+		'doc_extra_word_char': '-$',
 	},
 	'NP2LEX_BLOCKDIAG': {
 		'line_comment_string': '//',
@@ -195,12 +206,14 @@ LexerConfigMap = {
 		'default_fold_level': ['graph', 'subgraph'],
 		'escape_char_style': 'SCE_GRAPHVIZ_ESCAPECHAR',
 		'operator_style': ['SCE_GRAPHVIZ_OPERATOR'],
+		'doc_extra_word_char': '-',
 	},
 
 	'NP2LEX_CIL': {
 		'cpp_style_comment': True,
 		'operator_style': ['SCE_C_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '$',
 	},
 	'NP2LEX_CMAKE': {
 		'line_comment_string': '#',
@@ -233,6 +246,8 @@ LexerConfigMap = {
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_C_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#@:',
+		'autoc_extra_keyword': 'kwDoxyDoc',
 	},
 	'NP2LEX_CSHARP': {
 		'cpp_style_comment': True,
@@ -248,11 +263,13 @@ LexerConfigMap = {
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_CSHARP_OPERATOR', 'SCE_CSHARP_OPERATOR2'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#@',
 	},
 	'NP2LEX_CSS': {
 		'cpp_style_comment': True,
 		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
 		'operator_style': ['SCE_CSS_OPERATOR'],
+		'doc_extra_word_char': '-$@',
 	},
 
 	'NP2LEX_DLANG': {
@@ -266,6 +283,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_D_CHARACTER'],
 		'operator_style': ['SCE_D_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#',
 	},
 	'NP2LEX_DART': {
 		'cpp_style_comment': True,
@@ -278,6 +296,7 @@ LexerConfigMap = {
 		'character_prefix': ['r'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_DART_OPERATOR', 'SCE_DART_OPERATOR2'],
+		'doc_extra_word_char': '$@',
 	},
 	'NP2LEX_DIFF': {
 		'default_fold_level': ['command', '[file]', 'diff'],
@@ -289,18 +308,22 @@ LexerConfigMap = {
 		'block_comment_string': ('#if 0', '#endif'),
 		'block_comment_on_new_line': True,
 		'operator_style': ['SCE_F_OPERATOR', 'SCE_F_OPERATOR2'],
+		'doc_extra_word_char': '#%',
 	},
 	'NP2LEX_FSHARP': {
 		'line_comment_string': '//',
 		'block_comment_string': ('(*', '*)'),
 		'operator_style': ['SCE_FSHARP_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#',
+		'autoc_extra_keyword': 'kwNETDoc',
 	},
 
 	'NP2LEX_GN': {
 		'line_comment_string': '#',
 		'escape_char_style': 'SCE_GN_ESCAPECHAR',
 		'operator_style': ['SCE_GN_OPERATOR', 'SCE_GN_OPERATOR2'],
+		'doc_extra_word_char': '-$',
 	},
 	'NP2LEX_GO': {
 		'cpp_style_comment': True,
@@ -320,6 +343,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_GROOVY_ESCAPECHAR',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_GROOVY_OPERATOR', 'SCE_GROOVY_OPERATOR2', 'SCE_GROOVY_OPERATOR_PF'],
+		'doc_extra_word_char': '$@',
 	},
 	'NP2LEX_GRAPHVIZ': {
 		'line_comment_string': '//',
@@ -327,6 +351,7 @@ LexerConfigMap = {
 		'default_fold_level': ['graph', 'subgraph'],
 		'escape_char_style': 'SCE_GRAPHVIZ_ESCAPECHAR',
 		'operator_style': ['SCE_GRAPHVIZ_OPERATOR'],
+		'doc_extra_word_char': '-',
 	},
 	'NP2LEX_GROOVY': {
 		'cpp_style_comment': True,
@@ -336,6 +361,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_GROOVY_ESCAPECHAR',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_GROOVY_OPERATOR', 'SCE_GROOVY_OPERATOR2', 'SCE_GROOVY_OPERATOR_PF'],
+		'doc_extra_word_char': '$@',
 	},
 
 	'NP2LEX_HAXE': {
@@ -346,6 +372,7 @@ LexerConfigMap = {
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_HAXE_OPERATOR', 'SCE_HAXE_OPERATOR2'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#@',
 	},
 	'NP2LEX_HTML': {
 		'tab_settings': TabSettings_Space2,
@@ -353,6 +380,7 @@ LexerConfigMap = {
 		'block_comment_string': [('<!--', '-->'), ('/*', '*/'), ('--', '--')],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		#'escape_char_start': NoEscapeCharacter, # backslash for embedded script or style
+		'doc_extra_word_char': '-:$',
 	},
 
 	'NP2LEX_INI': {
@@ -367,6 +395,7 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_INNO_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#',
 	},
 
 	'NP2LEX_JAMFILE': {
@@ -385,6 +414,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_JAVA_CHARACTER'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_JAVA_OPERATOR'],
+		'doc_extra_word_char': '$@:',
 	},
 	'NP2LEX_JAVASCRIPT': {
 		'cpp_style_comment': True,
@@ -393,6 +423,7 @@ LexerConfigMap = {
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_JS_ESCAPECHAR',
 		'operator_style': ['SCE_JS_OPERATOR', 'SCE_JS_OPERATOR2', 'SCE_JS_OPERATOR_PF'],
+		'doc_extra_word_char': '$#@',
 	},
 	'NP2LEX_JSON': {
 		'cpp_style_comment': True,
@@ -412,6 +443,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_JULIA_CHARACTER'],
 		'none_quote_style': 'SCE_JULIA_OPERATOR',
 		'operator_style': ['SCE_JULIA_OPERATOR', 'SCE_JULIA_OPERATOR2'],
+		'doc_extra_word_char': '$@:',
 	},
 
 	'NP2LEX_KOTLIN': {
@@ -424,6 +456,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_KOTLIN_CHARACTER'],
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_KOTLIN_OPERATOR', 'SCE_KOTLIN_OPERATOR2'],
+		'doc_extra_word_char': '$@:',
 	},
 
 	'NP2LEX_LATEX': {
@@ -439,11 +472,13 @@ LexerConfigMap = {
 		'block_comment_string': ('#|',  '|#'),
 		'none_quote_style': 'SCE_C_OPERATOR',
 		'operator_style': ['SCE_C_OPERATOR'],
+		'doc_extra_word_char': '-',
 	},
 	'NP2LEX_LLVM': {
 		'line_comment_string': ';',
 		'escape_char_style': 'SCE_LLVM_ESCAPECHAR',
 		'operator_style': ['SCE_LLVM_OPERATOR'],
+		'doc_extra_word_char': '-@%$',
 	},
 	'NP2LEX_LUA': {
 		'line_comment_string': '--',
@@ -459,6 +494,7 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_MAKE_OPERATOR'],
+		'doc_extra_word_char': '-$!',
 	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
@@ -481,6 +517,7 @@ LexerConfigMap = {
 		'default_fold_level': ['section', 'function'],
 		'escape_char_style': 'SCE_NSIS_ESCAPECHAR',
 		'operator_style': ['SCE_NSIS_OPERATOR'],
+		'doc_extra_word_char': '-$!',
 	},
 
 	'NP2LEX_PASCAL': {
@@ -495,6 +532,7 @@ LexerConfigMap = {
 		'raw_string_style': ['SCE_PL_STRING_SQ'],
 		'none_quote_style': 'SCE_PL_OPERATOR',
 		'operator_style': ['SCE_PL_OPERATOR'],
+		'doc_extra_word_char': '$@',
 	},
 	'NP2LEX_PHP': {
 		'line_comment_string': ['//', '#'],
@@ -507,6 +545,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_PHP_ESCAPECHAR',
 		'raw_string_style': ['SCE_PHP_STRING_SQ', 'SCE_PHP_NOWDOC'],
 		'operator_style': ['SCE_PHP_OPERATOR', 'SCE_PHP_OPERATOR2'],
+		'doc_extra_word_char': '-$:',
 	},
 	'NP2LEX_POWERSHELL': {
 		'line_comment_string': '#',
@@ -514,6 +553,7 @@ LexerConfigMap = {
 		'escape_char_start': '`',
 		'raw_string_style': ['SCE_POWERSHELL_STRING_SQ'],
 		'operator_style': ['SCE_POWERSHELL_OPERATOR'],
+		'doc_extra_word_char': '-$',
 	},
 	'NP2LEX_PYTHON': {
 		'line_comment_string': '#',
@@ -534,6 +574,7 @@ LexerConfigMap = {
 			'SCE_PY_TRIPLE_RAWBYTES_SQ', 'SCE_PY_TRIPLE_RAWBYTES_DQ',
 		],
 		'operator_style': ['SCE_PY_OPERATOR', 'SCE_PY_OPERATOR2'],
+		'doc_extra_word_char': '$@',
 	},
 
 	'NP2LEX_RLANG': {
@@ -555,6 +596,8 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_REBOL_SYMBOL',
 		'operator_style': ['SCE_REBOL_OPERATOR'],
 		'cpp_preprocessor': True,
+		# http://www.rebol.com/r3/docs/guide/code-syntax.html#section-4
+		'doc_extra_word_char': '-!?~+&*=',
 	},
 	'NP2LEX_RESOURCESCRIPT': {
 		'cpp_style_comment': True,
@@ -565,6 +608,7 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_C_NUMBER',
 		'operator_style': ['SCE_C_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#',
 	},
 	'NP2LEX_RUBY': {
 		'line_comment_string': '#',
@@ -574,6 +618,7 @@ LexerConfigMap = {
 		'printf_format_specifier': True,
 		'raw_string_style': ['SCE_RB_STRING_SQ'],
 		'operator_style': ['SCE_RB_OPERATOR'],
+		'doc_extra_word_char': '$@?!',
 	},
 	'NP2LEX_RUST': {
 		'cpp_style_comment': True,
@@ -588,6 +633,7 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_RUST_LIFETIME',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_RUST_OPERATOR'],
+		'doc_extra_word_char': '$@:',
 	},
 
 	'NP2LEX_SCALA': {
@@ -596,11 +642,14 @@ LexerConfigMap = {
 		'default_fold_level': ['class', 'inner class', 'method'],
 		'character_style': ['SCE_C_CHARACTER'],
 		'operator_style': ['SCE_C_OPERATOR'],
+		'doc_extra_word_char': '$@',
+		'autoc_extra_keyword': 'kwJavaDoc',
 	},
 	'NP2LEX_SMALI': {
 		'line_comment_string': '#',
 		'default_fold_level': ['.method', '.switch'],
 		'operator_style': ['SCE_SMALI_OPERATOR'],
+		'doc_extra_word_char': '-',
 	},
 	'NP2LEX_SQL': {
 		'line_comment_string': '-- ', # extra space
@@ -609,6 +658,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_SQL_ESCAPECHAR',
 		'character_prefix': ['q', 'Q', 'x', 'X', 'b', 'B'],
 		'operator_style': ['SCE_SQL_OPERATOR'], # ignore q'{SCE_SQL_QOPERATOR}'
+		'doc_extra_word_char': '$@',
 	},
 	'NP2LEX_SWIFT': {
 		'cpp_style_comment': True,
@@ -618,6 +668,7 @@ LexerConfigMap = {
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_SWIFT_OPERATOR', 'SCE_SWIFT_OPERATOR2'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#@',
 	},
 
 	'NP2LEX_TCL': {
@@ -627,6 +678,7 @@ LexerConfigMap = {
 		'shebang_exe_name': 'wish',
 		'printf_format_specifier': True,
 		'operator_style': ['SCE_TCL_MODIFIER'],
+		'doc_extra_word_char': '$@',
 	},
 	'NP2LEX_TEXINFO': {
 		'line_comment_string': '@c ',
@@ -647,6 +699,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_JS_ESCAPECHAR',
 		'angle_bracket_generic': True,
 		'operator_style': ['SCE_JS_OPERATOR', 'SCE_JS_OPERATOR2', 'SCE_JS_OPERATOR_PF'],
+		'doc_extra_word_char': '$#@',
 	},
 
 	'NP2LEX_VBSCRIPT': {
@@ -660,6 +713,7 @@ LexerConfigMap = {
 		'cpp_style_comment': True,
 		'none_quote_style': 'SCE_V_NUMBER',
 		'operator_style': ['SCE_V_OPERATOR'],
+		'doc_extra_word_char': '$',
 	},
 	'NP2LEX_VHDL': {
 		'line_comment_string': '--',
@@ -679,6 +733,8 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_B_COMMENT',
 		'operator_style': ['SCE_B_OPERATOR'],
 		'cpp_preprocessor': True,
+		'doc_extra_word_char': '#',
+		#'autoc_extra_keyword': 'kwNETDoc',
 	},
 
 	'NP2LEX_WASM': {
@@ -686,12 +742,14 @@ LexerConfigMap = {
 		'block_comment_string': ('(;', ';)'),
 		'escape_char_style': 'SCE_WASM_ESCAPECHAR',
 		'operator_style': ['SCE_WASM_OPERATOR'],
+		'doc_extra_word_char': '-@%$',
 	},
 	'NP2LEX_XML': {
 		'line_comment_string': ['//', "'", '#'],
 		'block_comment_string': [('<!--', '-->'), ('/*', '*/'), ('--', '--')],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		'escape_char_start': NoEscapeCharacter,
+		'doc_extra_word_char': '-:',
 	},
 	'NP2LEX_YAML': {
 		'tab_settings': TabSettings_Space2,
@@ -771,7 +829,10 @@ def MergeSwitchCaseList(caseList):
 	output = []
 	indent = '\t'
 	for code, label in codeMap.items():
-		output.extend(f'{indent}case {key}:' for key in label)
+		if 'default' in label:
+			output.append(indent + 'default:')
+		else:
+			output.extend(f'{indent}case {key}:' for key in label)
 		output.extend(code)
 	return output
 
@@ -905,12 +966,14 @@ def BuildLexerCommentString():
 
 		if config.get('cpp_style_comment', False):
 			line_comment_string = '//'
-			block_comment_string = ('/*', '/*')
+			block_comment_string = ('/*', '*/')
 		else:
 			line_comment_string = config.get('line_comment_string', None)
 			block_comment_string = config.get('block_comment_string', None)
 
 		if line_comment_string:
+			if any(item == '\'' for item in line_comment_string):
+				print('single quote comment:', rid, line_comment_string)
 			if isinstance(line_comment_string, list) and len(line_comment_string) == 1:
 				line_comment_string = line_comment_string[0]
 			if isinstance(line_comment_string, str):
@@ -945,3 +1008,27 @@ def BuildLexerCommentString():
 	if complexShebang:
 		print('complex script shebang:', ', '.join(sorted(complexShebang)))
 	return commentLine, commentBlock, scriptShebang
+
+def BuildAutoCompletionCache():
+	cache = {}
+	indent = '\t\t'
+
+	for rid, config in LexerConfigMap.items():
+		output = []
+		if word := config.get('doc_extra_word_char', None):
+			assert '.' not in word, (rid, word)
+			for ch in sorted(word + '.'):
+				quoted = quote_c_char(ch)
+				output.append(f"{indent}CurrentWordCharSet[{quoted} >> 5] |= (1 << ({quoted} & 31));")
+
+		if word := config.get('autoc_extra_keyword', None):
+			output.append(f'{indent}np2_LexKeyword = &{word};')
+
+		if output:
+			output.append(indent + 'break;')
+			output.append('')
+			cache[rid] = tuple(output)
+
+	cache['default'] = (indent + "CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));", indent + 'break;', '')
+	output = MergeSwitchCaseList(cache)
+	return output

@@ -2223,6 +2223,8 @@ def UpdateLexerKeywordAttr(indexPath, lexerPath):
 	Regenerate(indexPath, '//CommentLine', commentLine)
 	Regenerate(indexPath, '//CommentBlock', commentBlock)
 	Regenerate(indexPath, '//ScriptShebang', scriptShebang)
+	cache = BuildAutoCompletionCache()
+	Regenerate(indexPath, '//Cache', cache)
 
 	for lexer, indexList in LexerKeywordIndexList.items():
 		output = []

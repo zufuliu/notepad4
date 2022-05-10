@@ -446,97 +446,81 @@ static NP2_KEYWORDS kwAndroidManifest = {
 
 static NP2_KEYWORDS *np2_LexKeyword;
 
-// NOLINTNEXTLINE(misc-definitions-in-headers)
-void Style_UpdateLexerKeywords(LPCEDITLEXER pLexNew) {
-	np2_LexKeyword = NULL;
-	// additional keywords
-	switch (pLexNew->rid) {
-	case NP2LEX_SCALA:
-		np2_LexKeyword = &kwJavaDoc;
-		return;
-	case NP2LEX_FSHARP: // .NET Platform
-		//case NP2LEX_VISUALBASIC:
-		np2_LexKeyword = &kwNETDoc;
-		return;
-	case NP2LEX_CPP:
-		np2_LexKeyword = &kwDoxyDoc;
-		return;
-	}
-
+static inline void UpdateLexerExtraKeywords() {
 	if (np2LexLangIndex == 0) {
 		return;
 	}
 	switch (np2LexLangIndex) {
 	case IDM_LEXER_XSD:
 		np2_LexKeyword = &kwXmlSchema;
-		return;
+		break;
 	case IDM_LEXER_XSLT:
 		np2_LexKeyword = &kwXmlStylesheet;
-		return;
+		break;
 
 	case IDM_LEXER_ANT_BUILD:
 		np2_LexKeyword = &kwAntBuild;
-		return;
+		break;
 	case IDM_LEXER_MAVEN_POM:
 		np2_LexKeyword = &kwMavenPOM;
-		return;
+		break;
 	case IDM_LEXER_MAVEN_SETTINGS:
 		np2_LexKeyword = &kwMavenSettings;
-		return;
+		break;
 	case IDM_LEXER_IVY_MODULE:
 		np2_LexKeyword = &kwIvyModule;
-		return;
+		break;
 	case IDM_LEXER_IVY_SETTINGS:
 		np2_LexKeyword = &kwIvySettings;
-		return;
+		break;
 	case IDM_LEXER_PMD_RULESET:
 		np2_LexKeyword = &kwPMDRuleset;
-		return;
+		break;
 	case IDM_LEXER_CHECKSTYLE:
 		np2_LexKeyword = &kwCheckstyle;
-		return;
+		break;
 
 	case IDM_LEXER_APACHE:
 		np2_LexKeyword = &kwApache;
-		return;
+		break;
 	case IDM_LEXER_TOMCAT:
 		np2_LexKeyword = &kwTomcat;
-		return;
+		break;
 	case IDM_LEXER_WEB_JAVA:
 		np2_LexKeyword = &kwJavaWebConfig;
-		return;
+		break;
 	case IDM_LEXER_STRUTS:
 		np2_LexKeyword = &kwStruts;
-		return;
+		break;
 	case IDM_LEXER_HIB_CFG:
 		np2_LexKeyword = &kwHibConfig;
-		return;
+		break;
 	case IDM_LEXER_HIB_MAP:
 		np2_LexKeyword = &kwHibMapping;
-		return;
+		break;
 	case IDM_LEXER_SPRING_BEANS:
 		np2_LexKeyword = &kwSpringBeans;
-		return;
+		break;
 	case IDM_LEXER_JBOSS:
-		return;
+		break;
 
 	//case IDM_LEXER_WEB_NET:
-	//	return;
+	//	break;
 	//case IDM_LEXER_RESX:
 	//	np2_LexKeyword = &kwXmlSchema;
-	//	return;
+	//	break;
 	//case IDM_LEXER_XAML:
-	//	return;
+	//	break;
 
 	case IDM_LEXER_PROPERTY_LIST:
 		np2_LexKeyword = &kwPList;
-		return;
+		break;
 	case IDM_LEXER_ANDROID_MANIFEST:
 		np2_LexKeyword = &kwAndroidManifest;
-		return;
+		break;
 	case IDM_LEXER_ANDROID_LAYOUT:
-		return;
+		break;
 		//case IDM_LEXER_SVG:
-		//	return;
+		//	break;
 	}
 }

@@ -5837,7 +5837,7 @@ BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark) {
 			const unsigned char ch = pszText[iSelStart];
 			if (dbcs && IsDBCSLeadByteEx(cpEdit, ch)) {
 				++iSelStart;
-			} else if (!(ch >= 0x80 || IsDocWordChar(ch))) {
+			} else if (!IsDocWordChar(ch)) {
 				NP2HeapFree(pszText);
 				EditMarkAll_Clear();
 				return FALSE;

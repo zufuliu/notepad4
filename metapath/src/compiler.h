@@ -5,6 +5,11 @@
 #if defined(__cplusplus)
 #undef NULL
 #define NULL	nullptr
+#else
+//#include <stdbool.h>
+typedef _Bool	bool;
+#define false	0
+#define true	1
 #endif
 
 #ifndef NP2_noexcept
