@@ -293,7 +293,7 @@ typedef struct UnicodeCaseSensitivityRange {
 		fd.write(r"""
 int IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31);
+		return BitTestEx(UnicodeCaseSensitivityMask, ch);
 	}
 	for (uint32_t index = 0; index < COUNTOF(UnicodeCaseSensitivityRangeList); index++) {
 		const UnicodeCaseSensitivityRange range = UnicodeCaseSensitivityRangeList[index];
@@ -303,7 +303,7 @@ int IsCharacterCaseSensitive(uint32_t ch) {
 			}
 			if (range.offset)  {
 				ch -= range.low;
-				return bittest(UnicodeCaseSensitivityMask + range.offset + (ch >> 5), ch & 31);
+				return BitTestEx(UnicodeCaseSensitivityMask + range.offset, ch);
 			}
 			return 1;
 		}
@@ -381,7 +381,7 @@ def updateCaseSensitivity(filename, test=False):
 
 int IsCharacterCaseSensitive(uint32_t ch)	{
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31);
+		return BitTestEx(UnicodeCaseSensitivityMask, ch);
 	}
 	if (ch > kUnicodeCaseSensitiveMax) {
 		return 0;
@@ -531,7 +531,7 @@ static inline int IsCharacterCaseSensitiveSecond(uint32_t ch) {{
 
 int IsCharacterCaseSensitive(uint32_t ch) {
 	if (ch < kUnicodeCaseSensitiveFirst) {
-		return bittest(UnicodeCaseSensitivityMask + (ch >> 5), ch & 31);
+		return BitTestEx(UnicodeCaseSensitivityMask, ch);
 	}
 	if (ch > kUnicodeCaseSensitiveMax) {
 		return 0;

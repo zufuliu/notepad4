@@ -269,6 +269,10 @@ static inline uint8_t bittest(const uint32_t *addr, uint32_t index) NP2_noexcept
 }
 #endif
 
+static inline uint8_t BitTestEx(const uint32_t *start, uint32_t value) NP2_noexcept {
+	return bittest(start + (value >> 5), value & 31);
+}
+
 #if defined(__cplusplus)
 namespace np2 {
 inline auto ctz(uint32_t x) noexcept { return np2_ctz(x); }

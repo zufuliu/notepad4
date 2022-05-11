@@ -508,11 +508,11 @@ static const uint32_t DefaultWordCharSet[8] = {
 static uint32_t CurrentWordCharSet[8];
 
 static inline bool IsDefaultWordChar(uint32_t ch) {
-	return bittest(DefaultWordCharSet + (ch >> 5), ch & 31);
+	return BitTestEx(DefaultWordCharSet, ch);
 }
 
 bool IsDocWordChar(uint32_t ch) {
-	return bittest(CurrentWordCharSet + (ch >> 5), ch & 31);
+	return BitTestEx(CurrentWordCharSet, ch);
 }
 
 bool IsAutoCompletionWordCharacter(uint32_t ch) {
@@ -2922,7 +2922,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['-' >> 5] |= (1 << ('-' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['=' >> 5] |= (1 << ('=' & 31));
-		CurrentWordCharSet['?' >> 5] |= (1 << ('?' & 31));
+		CurrentWordCharSet['?' >> 5] |= (1U << ('?' & 31));
 		CurrentWordCharSet['~' >> 5] |= (1 << ('~' & 31));
 		break;
 
@@ -2930,7 +2930,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['!' >> 5] |= (1 << ('!' & 31));
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
-		CurrentWordCharSet['?' >> 5] |= (1 << ('?' & 31));
+		CurrentWordCharSet['?' >> 5] |= (1U << ('?' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 

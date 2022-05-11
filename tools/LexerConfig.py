@@ -1013,13 +1013,17 @@ def BuildAutoCompletionCache():
 	cache = {}
 	indent = '\t\t'
 
+	def make_char_set(ch):
+		quoted = quote_c_char(ch)
+		suffix = 'U' if (ord(ch) & 31) == 31 else ''
+		return f"{indent}CurrentWordCharSet[{quoted} >> 5] |= (1{suffix} << ({quoted} & 31));"
+
 	for rid, config in LexerConfigMap.items():
 		output = []
 		if word := config.get('doc_extra_word_char', None):
 			assert '.' not in word, (rid, word)
 			for ch in sorted(word + '.'):
-				quoted = quote_c_char(ch)
-				output.append(f"{indent}CurrentWordCharSet[{quoted} >> 5] |= (1 << ({quoted} & 31));")
+				output.append(make_char_set(ch))
 
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')
@@ -1029,6 +1033,6 @@ def BuildAutoCompletionCache():
 			output.append('')
 			cache[rid] = tuple(output)
 
-	cache['default'] = (indent + "CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));", indent + 'break;', '')
+	cache['default'] = (make_char_set('.'), indent + 'break;', '')
 	output = MergeSwitchCaseList(cache)
 	return output

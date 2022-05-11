@@ -2726,7 +2726,7 @@ static inline bool IsBraceMatchChar(uint32_t ch) {
 #else
 	// tools/GenerateTable.py
 	static const uint32_t table[8] = { 0, 0x50000300, 0x28000000, 0x28000000 };
-	return bittest(table + (ch >> 5), ch & 31);
+	return BitTestEx(table, ch);
 #endif
 }
 
