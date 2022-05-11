@@ -506,6 +506,7 @@ static const uint32_t DefaultWordCharSet[8] = {
 };
 // word character set for pLexCurrent
 static uint32_t CurrentWordCharSet[8];
+static uint32_t CharacterPrefixMask[8];
 
 static inline bool IsDefaultWordChar(uint32_t ch) {
 	return BitTestEx(DefaultWordCharSet, ch);
@@ -1577,72 +1578,50 @@ void EditCompleteWord(int iCondition, BOOL autoInsert) {
 	}
 }
 
-static BOOL CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
-	if (chPrev >= 0x80) { // someone's
-		return FALSE;
-	}
-
+static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 	const int iLexer = pLexCurrent->iLexer;
 	if (iCurrentStyle == 0) {
 		if (iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) {
-			return FALSE; // comment
+			return false; // comment
 		}
 		if (iLexer == SCLEX_HTML) {
 			const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 			if (block == HtmlTextBlock_VBScript) {
-				return FALSE;
+				return false;
 			}
 		}
 	} else {
 		if (pLexCurrent->noneSingleQuotedStyle && iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
-			return FALSE;
+			return false;
 		}
 	}
 
 	// someone's, don't
-	if (IsAlphaNumeric(chPrev)) {
+	if (IsDefaultWordChar(chPrev)) {
 		// character or string prefix
 		if (pLexCurrent->lexerAttr & LexerAttr_CharacterPrefix) {
 			const int chPrev2 = SciCall_GetCharAt(SciCall_GetCurrentPos() - 3);
-			const int lower = chPrev | 0x20;
-			if (chPrev2 >= 0x80 || IsAlphaNumeric(chPrev2)) {
+			if (IsDefaultWordChar(chPrev2)) {
 				if (iLexer == SCLEX_CPP) {
 					return chPrev2 == 'u' && chPrev == '8';
 				}
-				if (iLexer == SCLEX_PYTHON) {
-					if (lower == 'r' || lower == 'u' || lower == 'b' || lower == 'f') {
-						const int lower2 = chPrev2 | 0x20;
-						return lower != lower2 && (lower2 == 'r' || lower2 == 'u' || lower2 == 'b' || lower2 == 'f');
-					}
+				if (iLexer == SCLEX_PYTHON && (chPrev | 0x20) != (chPrev2 | 0x20)) {
+					return BitTestEx(CharacterPrefixMask, chPrev)
+						&& BitTestEx(CharacterPrefixMask, chPrev2);
 				}
 			} else {
-				switch (iLexer) {
-				case SCLEX_CPP:
-					return lower == 'u' || chPrev == 'L';
-
-				case SCLEX_DART:
-					return chPrev == 'r';
-
-				case SCLEX_PYTHON:
-					return lower == 'r' || lower == 'u' || lower == 'b' || lower == 'f';
-
-				case SCLEX_RUST:
-					return chPrev == 'b';
-
-				case SCLEX_SQL:
-					return lower == 'q' || lower == 'x' || lower == 'b';
-				}
+				return BitTestEx(CharacterPrefixMask, chPrev);
 			}
 		}
-		return FALSE;
+		return false;
 	}
 
 	if (iLexer == SCLEX_RUST || iLexer == SCLEX_REBOL) {
-		// Rust lifetime, REBOL symbol
-		return FALSE;
+		// TODO: Rust lifetime, REBOL symbol
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
@@ -2782,6 +2761,7 @@ void EditShowCallTips(Sci_Position position) {
 
 void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	np2_LexKeyword = NULL;
+	memset(CharacterPrefixMask, 0, sizeof(CharacterPrefixMask));
 	memcpy(CurrentWordCharSet, DefaultWordCharSet, sizeof(DefaultWordCharSet));
 	//CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 
@@ -2818,7 +2798,6 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_JAVA:
 	case NP2LEX_JULIA:
 	case NP2LEX_KOTLIN:
-	case NP2LEX_RUST:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
@@ -2845,6 +2824,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		CharacterPrefixMask['L' >> 5] |= (1 << ('L' & 31));
+		CharacterPrefixMask['U' >> 5] |= (1 << ('U' & 31));
+		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
 		np2_LexKeyword = &kwDoxyDoc;
 		break;
 
@@ -2864,20 +2846,14 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		break;
 
 	case NP2LEX_DART:
-	case NP2LEX_GRADLE:
-	case NP2LEX_GROOVY:
-	case NP2LEX_PERL:
-	case NP2LEX_PYTHON:
-	case NP2LEX_SQL:
-	case NP2LEX_TCL:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		CharacterPrefixMask['r' >> 5] |= (1 << ('r' & 31));
 		break;
 
 	case NP2LEX_DLANG:
 	case NP2LEX_INNOSETUP:
-	case NP2LEX_RESOURCESCRIPT:
 	case NP2LEX_VISUALBASIC:
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
@@ -2887,6 +2863,15 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		np2_LexKeyword = &kwNETDoc;
+		break;
+
+	case NP2LEX_GRADLE:
+	case NP2LEX_GROOVY:
+	case NP2LEX_PERL:
+	case NP2LEX_TCL:
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 
 	case NP2LEX_HTML:
@@ -2914,6 +2899,20 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		break;
 
+	case NP2LEX_PYTHON:
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		CharacterPrefixMask['B' >> 5] |= (1 << ('B' & 31));
+		CharacterPrefixMask['F' >> 5] |= (1 << ('F' & 31));
+		CharacterPrefixMask['R' >> 5] |= (1 << ('R' & 31));
+		CharacterPrefixMask['U' >> 5] |= (1 << ('U' & 31));
+		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
+		CharacterPrefixMask['f' >> 5] |= (1 << ('f' & 31));
+		CharacterPrefixMask['r' >> 5] |= (1 << ('r' & 31));
+		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
+		break;
+
 	case NP2LEX_REBOL:
 		CurrentWordCharSet['!' >> 5] |= (1 << ('!' & 31));
 		CurrentWordCharSet['&' >> 5] |= (1 << ('&' & 31));
@@ -2926,6 +2925,14 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['~' >> 5] |= (1 << ('~' & 31));
 		break;
 
+	case NP2LEX_RESOURCESCRIPT:
+		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CharacterPrefixMask['L' >> 5] |= (1 << ('L' & 31));
+		CharacterPrefixMask['U' >> 5] |= (1 << ('U' & 31));
+		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
+		break;
+
 	case NP2LEX_RUBY:
 		CurrentWordCharSet['!' >> 5] |= (1 << ('!' & 31));
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
@@ -2934,11 +2941,31 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 
+	case NP2LEX_RUST:
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
+		break;
+
 	case NP2LEX_SCALA:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		np2_LexKeyword = &kwJavaDoc;
+		break;
+
+	case NP2LEX_SQL:
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		CharacterPrefixMask['B' >> 5] |= (1 << ('B' & 31));
+		CharacterPrefixMask['Q' >> 5] |= (1 << ('Q' & 31));
+		CharacterPrefixMask['X' >> 5] |= (1 << ('X' & 31));
+		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
+		CharacterPrefixMask['q' >> 5] |= (1 << ('q' & 31));
+		CharacterPrefixMask['x' >> 5] |= (1 << ('x' & 31));
 		break;
 
 	case NP2LEX_XML:

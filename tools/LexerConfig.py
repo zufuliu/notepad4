@@ -239,7 +239,7 @@ LexerConfigMap = {
 		'cpp_style_comment': True,
 		'default_fold_level': ['preprocessor', 'namespace', 'class', 'method'],
 		'printf_format_specifier': True,
-		'raw_string_style': ['SCE_C_STRINGRAW'],
+		'raw_string_style': ['SCE_C_STRINGRAW', 'SCE_C_COMMENTDOC_TAG'],
 		'character_style': ['SCE_C_CHARACTER'],
 		'character_prefix': ['L', 'u', 'U', 'u8'],
 		'none_quote_style': 'SCE_C_NUMBER',
@@ -603,6 +603,7 @@ LexerConfigMap = {
 		'cpp_style_comment': True,
 		'default_fold_level': ['preprocessor', 'resource'],
 		'printf_format_specifier': True,
+		'raw_string_style': ['SCE_C_STRINGRAW', 'SCE_C_COMMENTDOC_TAG'],
 		'character_style': ['SCE_C_CHARACTER'],
 		'character_prefix': ['L', 'u', 'U', 'u8'],
 		'none_quote_style': 'SCE_C_NUMBER',
@@ -1013,17 +1014,27 @@ def BuildAutoCompletionCache():
 	cache = {}
 	indent = '\t\t'
 
-	def make_char_set(ch):
+	def make_char_set(table, ch):
 		quoted = quote_c_char(ch)
 		suffix = 'U' if (ord(ch) & 31) == 31 else ''
-		return f"{indent}CurrentWordCharSet[{quoted} >> 5] |= (1{suffix} << ({quoted} & 31));"
+		return f"{indent}{table}[{quoted} >> 5] |= (1{suffix} << ({quoted} & 31));"
 
 	for rid, config in LexerConfigMap.items():
 		output = []
 		if word := config.get('doc_extra_word_char', None):
 			assert '.' not in word, (rid, word)
 			for ch in sorted(word + '.'):
-				output.append(make_char_set(ch))
+				output.append(make_char_set('CurrentWordCharSet', ch))
+
+		multiple = False
+		if word := config.get('character_prefix', None):
+			for ch in sorted(word):
+				if len(ch) > 1:
+					multiple = True
+				else:
+					output.append(make_char_set('CharacterPrefixMask', ch))
+		if multiple:
+			print('multiple character prefix:', rid)
 
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')
@@ -1033,6 +1044,6 @@ def BuildAutoCompletionCache():
 			output.append('')
 			cache[rid] = tuple(output)
 
-	cache['default'] = (make_char_set('.'), indent + 'break;', '')
+	cache['default'] = (make_char_set('CurrentWordCharSet', '.'), indent + 'break;', '')
 	output = MergeSwitchCaseList(cache)
 	return output
