@@ -79,6 +79,7 @@ uint32_t WordList_Order(const void *pWord, uint32_t len) {
 		high = (high << 8) | *ptr++;
 	}
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		NP2_assume(len != 0); // suppress [clang-analyzer-core.uninitialized.Assign]
 		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
 	}
 
@@ -106,6 +107,7 @@ uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
 		high = (high << 8) | ch;
 	}
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
+		NP2_assume(len != 0); // suppress [clang-analyzer-core.uninitialized.Assign]
 		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
 	}
 
@@ -880,7 +882,7 @@ void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char prefix) {
 					bChanged = TRUE;
 				}
 
-				//if (pLexCurrent->rid == NP2LEX_PHP && wordLength >= 2 && pWord[0] == '$' && pWord[1] == '$') {
+				//if (pLexCurrent->iLexer == SCLEX_PHPSCRIPT && wordLength >= 2 && pWord[0] == '$' && pWord[1] == '$') {
 				//	pWord++;
 				//	--wordLength;
 				//	bChanged = TRUE;
@@ -1457,7 +1459,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	StopWatch_Start(watch);
 #endif
 
-	BOOL bIgnore = iRootLen != 0 && (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
+	BOOL bIgnore = (pRoot[0] >= '0' && pRoot[0] <= '9'); // number
 	const BOOL bIgnoreCase = bIgnore || autoCompletionConfig.bIgnoreCase;
 	struct WordList *pWList = WordList_Alloc(pRoot, iRootLen, bIgnoreCase);
 	BOOL bIgnoreDoc = FALSE;

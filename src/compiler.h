@@ -26,6 +26,21 @@ typedef _Bool	bool;
 #define NP2_unreachable()	__assume(0)
 #endif
 
+#if defined(__clang__)
+#define NP2_assume(expr)	__builtin_assume(expr)
+#elif defined(_MSC_VER)
+#define NP2_assume(expr)	__assume(expr)
+#elif defined(__GNUC__)
+#define NP2_assume(expr)	__extension__({		\
+	if (!(expr)) {								\
+		__builtin_unreachable();				\
+	}											\
+	1;											\
+	})
+#else
+#define NP2_assume(expr)
+#endif
+
 #if defined(__cplusplus)
 #define NP2_static_assert(expr)		static_assert(expr)
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
