@@ -497,8 +497,8 @@ static inline BOOL Encoding_HasBOM(int iEncoding) {
 
 LPSTR RecodeAsUTF8(LPSTR lpData, DWORD *cbData, UINT codePage, DWORD flags);
 int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *encodingFlag);
-BOOL IsStringCaseSensitiveW(LPCWSTR pszTextW);
-BOOL IsStringCaseSensitiveA(LPCSTR pszText);
+bool IsStringCaseSensitiveW(LPCWSTR pszTextW);
+bool IsStringCaseSensitiveA(LPCSTR pszText);
 
 //void SciInitThemes(HWND hwnd);
 

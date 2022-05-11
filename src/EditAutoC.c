@@ -587,15 +587,15 @@ static inline BOOL IsPrintfFormatSpecifier(int ch) {
 	return IsAlpha(ch);
 }
 
-static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style, BOOL punctuation) {
+static bool IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style, bool punctuation) {
 	// style for chPrev, style for ch is zero on typing
 	const int stylePrev = SciCall_GetStyleAt(before);
 	if (stylePrev == 0) {
-		return FALSE;
+		return false;
 	}
 	if (chPrev == '%') {
 		if (!IsPrintfFormatSpecifier(ch)) {
-			return FALSE;
+			return false;
 		}
 		if (style != 0 && pLexCurrent->formatSpecifierStyle) {
 			return stylePrev == pLexCurrent->formatSpecifierStyle;
@@ -604,20 +604,20 @@ static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 		if (pLexCurrent->lexerAttr & LexerAttr_PrintfFormatSpecifier) {
 			return !(stylePrev == pLexCurrent->operatorStyle || stylePrev == pLexCurrent->operatorStyle2);
 		}
-		return FALSE;
+		return false;
 	}
 
 	if (style != 0 && pLexCurrent->escapeCharacterStyle) {
 		if (stylePrev != pLexCurrent->escapeCharacterStyle) {
 			if (pLexCurrent->iLexer != SCLEX_PHPSCRIPT
 				|| !(stylePrev == js_style(SCE_JS_ESCAPECHAR) || stylePrev == css_style(SCE_CSS_ESCAPECHAR))) {
-				return FALSE;
+				return false;
 			}
 		}
 	} else if (!punctuation) {
 		// legacy lexer without escape character highlighting
 		if (!IsEscapeCharacter(ch)) {
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -631,7 +631,7 @@ static BOOL IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPre
 		return chPrev != chPrev2;
 	}
 
-	return FALSE;
+	return false;
 }
 
 static inline BOOL NeedSpaceAfterKeyword(const char *word, Sci_Position length) {
