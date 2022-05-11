@@ -1019,6 +1019,9 @@ def BuildAutoCompletionCache():
 		suffix = 'U' if (ord(ch) & 31) == 31 else ''
 		return f"{indent}{table}[{quoted} >> 5] |= (1{suffix} << ({quoted} & 31));"
 
+	def make_bit_set(table, value):
+		return f"{indent}{table}[{value} >> 5] |= (1U << ({value} & 31));"
+
 	for rid, config in LexerConfigMap.items():
 		output = []
 		if word := config.get('doc_extra_word_char', None):
@@ -1026,6 +1029,8 @@ def BuildAutoCompletionCache():
 			for ch in sorted(word + '.'):
 				output.append(make_char_set('CurrentWordCharSet', ch))
 
+		charset = output
+		output = []
 		multiple = False
 		if word := config.get('character_prefix', None):
 			for ch in sorted(word):
@@ -1036,10 +1041,18 @@ def BuildAutoCompletionCache():
 		if multiple:
 			print('multiple character prefix:', rid)
 
+		if styles := config.get('raw_string_style', None):
+			for style in styles:
+				output.append(make_bit_set('RawStringStyleMask', style))
+
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')
 
-		if output:
+		if output or charset:
+			if not charset:
+				charset = [make_char_set('CurrentWordCharSet', '.')]
+			charset.extend(output)
+			output = charset
 			output.append(indent + 'break;')
 			output.append('')
 			cache[rid] = tuple(output)
