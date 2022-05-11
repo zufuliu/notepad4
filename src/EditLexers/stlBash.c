@@ -70,7 +70,7 @@ EDITLEXER lexBash = {
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
 		'\\', 0, 0,
-		SCE_SH_STRING_SQ,
+		SCE_SH_WORD,
 		0, 0,
 		SCE_SH_OPERATOR, 0,
 		KeywordAttr_Default

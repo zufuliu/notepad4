@@ -156,7 +156,7 @@ EDITLEXER lexCMake = {
 		(1 << 0) | (1 << 1), // level1, level2
 		0,
 		'\\', SCE_CMAKE_ESCAPECHAR, 0,
-		0,
+		SCE_CMAKE_WORD,
 		0, 0,
 		SCE_CMAKE_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords

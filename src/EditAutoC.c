@@ -1917,52 +1917,18 @@ void EditAutoCloseXMLTag(void) {
 	}
 }
 
-static inline BOOL IsIndentKeywordStyle(int style) {
-	switch (pLexCurrent->iLexer) {
-	//case SCLEX_AUTOIT3:
-	//	return style == SCE_AU3_KEYWORD;
-	case SCLEX_BASH:
-		return style == SCE_SH_WORD;
+typedef enum AutoIndentType {
+	AutoIndentType_None,
+	AutoIndentType_IndentOnly,
+	AutoIndentType_IndentAndClose,
+} AutoIndentType;
 
-	case SCLEX_CMAKE:
-		return style == SCE_CMAKE_WORD;
-	//case SCLEX_CPP:
-	//	return style == SCE_C_PREPROCESSOR;
-
-	case SCLEX_JULIA:
-		return style == SCE_JULIA_WORD;
-	case SCLEX_LUA:
-		return style == SCE_LUA_WORD;
-	case SCLEX_MAKEFILE:
-		return style == SCE_MAKE_PREPROCESSOR;
-	case SCLEX_MATLAB:
-		return style == SCE_MAT_KEYWORD;
-	//case SCLEX_NSIS:
-	//	return style == SCE_NSIS_WORD || style == SCE_NSIS_PREPROCESSOR;
-
-	//case SCLEX_PASCAL:
-	case SCLEX_RUBY:
-		return style == SCE_RB_WORD;
-	case SCLEX_SQL:
-		return style == SCE_SQL_WORD;
-
-	//case SCLEX_VISUALBASIC:
-	//case SCLEX_VBSCRIPT:
-	//	return style == SCE_B_KEYWORD;
-	//case SCLEX_VERILOG:
-	//	return style == SCE_V_WORD;
-	//case SCLEX_VHDL:
-	//	return style == SCE_VHDL_KEYWORD;
-	}
-	return FALSE;
-}
-
-const char *EditKeywordIndent(const char *head, int *indent) {
+static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIndentType *indent) {
 	char word[16] = "";
 	char word_low[16] = "";
 	int length = 0;
 	const char *endPart = NULL;
-	*indent = 0;
+	*indent = AutoIndentType_None;
 
 	while (*head && length < 15) {
 		const char lower = *head | 0x20;
@@ -1975,29 +1941,29 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 		++head;
 	}
 
-	switch (pLexCurrent->iLexer) {
+	switch (pLex->iLexer) {
 	//case SCLEX_AUTOIT3:
 	case SCLEX_BASH:
 		if (np2LexLangIndex == IDM_LEXER_CSHELL) {
 			if (StrEqualExA(word, "if")) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "endif";
 			} else if (StrEqualExA(word, "switch")) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "endsw";
 			} else if (StrEqualExA(word, "foreach") || StrEqualExA(word, "while")) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "end";
 			}
 		} else {
 			if (StrEqualExA(word, "if")) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "fi";
 			} else if (StrEqualExA(word, "case")) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "esac";
 			} else if (StrEqualExA(word, "do")) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "done";
 			}
 		}
@@ -2005,19 +1971,19 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 
 	case SCLEX_CMAKE:
 		if (StrEqualExA(word, "function")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endfunction()";
 		} else if (StrEqualExA(word, "macro")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endmacro()";
 		} else if (StrEqualExA(word, "if")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endif()";
 		} else if (StrEqualExA(word, "foreach")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endforeach()";
 		} else if (StrEqualExA(word, "while")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endwhile()";
 		}
 		break;
@@ -2026,40 +1992,40 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_INNOSETUP:
 
 	case SCLEX_JULIA: {
-		LPCSTR pKeywords = pLexCurrent->pKeyWords->pszKeyWords[JuliaKeywordIndex_CodeFolding];
+		LPCSTR pKeywords = pLex->pKeyWords->pszKeyWords[JuliaKeywordIndex_CodeFolding];
 		LPCSTR p = strstr(pKeywords, word);
 		if (p == pKeywords || (p != NULL &&  p[-1] == ' ')) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
 	} break;
 
 	case SCLEX_LUA:
 		if (StrEqualExA(word, "function") || StrEqualExA(word, "if") || StrEqualExA(word, "do")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
 		break;
 
 	case SCLEX_MAKEFILE:
 		if (StrEqualExA(word, "if")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endif";
 		} else if (StrEqualExA(word, "define")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endef";
 		} else if (StrEqualExA(word, "for")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "endfor";
 		}
 		break;
 	case SCLEX_MATLAB:
 		if (StrEqualExA(word, "function")) {
-			*indent = 1;
+			*indent = AutoIndentType_IndentOnly;
 			// 'end' is optional
 		} else if (StrEqualExA(word, "if") || StrEqualExA(word, "for") || StrEqualExA(word, "while") || StrEqualExA(word, "switch") || StrEqualExA(word, "try")) {
-			*indent = 2;
-			if (pLexCurrent->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LEXER_OCTAVE) {
+			*indent = AutoIndentType_IndentAndClose;
+			if (pLex->rid == NP2LEX_OCTAVE || np2LexLangIndex == IDM_LEXER_OCTAVE) {
 				if (StrEqualExA(word, "if")) {
 					endPart = "endif";
 				} else if (StrEqualExA(word, "for")) {
@@ -2082,29 +2048,29 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 	//case SCLEX_PASCAL:
 	case SCLEX_RUBY:
 		if (StrEqualExA(word, "if") || StrEqualExA(word, "do") || StrEqualExA(word, "while") || StrEqualExA(word, "for")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
 		break;
 
 	case SCLEX_SQL:
 		if (StrEqualExA(word_low, "if")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END IF;";
 		} else if (StrEqualExA(word_low, "while")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END WHILE;";
 		} else if (StrEqualExA(word_low, "repeat")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END REPEAT;";
 		} else if (StrEqualExA(word_low, "loop") || StrEqualExA(word_low, "for")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END LOOP;";
 		} else if (StrEqualExA(word_low, "case")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			endPart = "END CASE;";
 		} else if (StrEqualExA(word_low, "begin")) {
-			*indent = 2;
+			*indent = AutoIndentType_IndentAndClose;
 			if (StrStrIA(head, "transaction") != NULL) {
 				endPart = "COMMIT;";
 			} else {
@@ -2112,7 +2078,7 @@ const char *EditKeywordIndent(const char *head, int *indent) {
 			}
 		} else if (StrEqualExA(word_low, "start")) {
 			if (StrStrIA(head, "transaction") != NULL) {
-				*indent = 2;
+				*indent = AutoIndentType_IndentAndClose;
 				endPart = "COMMIT;";
 			}
 		}
@@ -2158,7 +2124,7 @@ void EditAutoIndent(void) {
 		}
 
 		const int iEOLMode = SciCall_GetEOLMode();
-		int indent = 0;
+		AutoIndentType indent = AutoIndentType_None;
 		Sci_Position iIndentLen = 0;
 		int commentStyle = 0;
 		SciCall_GetLine(iCurLine - 1, pLineBuf);
@@ -2170,13 +2136,13 @@ void EditAutoIndent(void) {
 			iIndentLen = 1;
 		}
 		if (ch == '{' || ch == '[' || ch == '(') {
-			indent = 2;
+			indent = AutoIndentType_IndentAndClose;
 		} else if (ch == ':') { // case label/Python
-			indent = 1;
+			indent = AutoIndentType_IndentOnly;
 		} else if (ch == '*' || ch == '!') { // indent block comment
 			iIndentLen = iPrevLineLength - (2 + iIndentLen);
 			if (iIndentLen >= 2 && pLineBuf[iIndentLen - 2] == '/' && pLineBuf[iIndentLen - 1] == '*') {
-				indent = 1;
+				indent = AutoIndentType_IndentOnly;
 				commentStyle = 1;
 			}
 		}
@@ -2184,21 +2150,21 @@ void EditAutoIndent(void) {
 		iIndentLen = 0;
 		ch = SciCall_GetCharAt(SciCall_PositionFromLine(iCurLine));
 		const BOOL closeBrace = (ch == '}' || ch == ']' || ch == ')');
-		if (indent == 2 && !closeBrace) {
-			indent = 1;
+		if (indent == AutoIndentType_IndentAndClose && !closeBrace) {
+			indent = AutoIndentType_IndentOnly;
 		}
 
 		char *pPos;
 		const char *endPart = NULL;
 		for (pPos = pLineBuf; *pPos; pPos++) {
-			if (*pPos != ' ' && *pPos != '\t') {
-				if (!indent && IsAlpha(*pPos)) { // indent on keywords
+			if (!IsASpaceOrTab(*pPos)) {
+				if (indent == AutoIndentType_None && IsAlpha(*pPos)) { // indent on keywords
 					const int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
-					if (IsIndentKeywordStyle(style)) {
-						endPart = EditKeywordIndent(pPos, &indent);
+					if (style != 0 && style == pLexCurrent->autoIdentWordStyle) {
+						endPart = EditKeywordIndent(pLexCurrent, pPos, &indent);
 					}
 				}
-				if (indent) {
+				if (indent != AutoIndentType_None) {
 					ZeroMemory(pPos, iPrevLineLength - iIndentLen);
 				}
 				*pPos = '\0';
@@ -2207,7 +2173,7 @@ void EditAutoIndent(void) {
 			iIndentLen += 1;
 		}
 
-		if (indent == 2 && endPart) {
+		if (indent == AutoIndentType_IndentAndClose && endPart) {
 			const int level = SciCall_GetFoldLevel(iCurLine);
 			if (!(level & SC_FOLDLEVELHEADERFLAG)) {
 				const Sci_Line parent = SciCall_GetFoldParent(iCurLine);
@@ -2215,16 +2181,16 @@ void EditAutoIndent(void) {
 					const Sci_Line child = SciCall_GetLastChild(parent);
 					// TODO: check endPart is on this line
 					if (SciCall_GetLineLength(child)) {
-						indent = 1;
+						indent = AutoIndentType_IndentOnly;
 					}
 				} else {
-					indent = 0;
+					indent = AutoIndentType_None;
 				}
 			}
 		}
 
 		Sci_Position iIndentPos = iCurPos;
-		if (indent) {
+		if (indent != AutoIndentType_None) {
 			int pad = fvCurFile.iIndentWidth;
 			iIndentPos += iIndentLen;
 			ch = ' ';
@@ -2247,7 +2213,7 @@ void EditAutoIndent(void) {
 					*pPos++ = (char)ch;
 				}
 			}
-			if (indent == 2) {
+			if (indent == AutoIndentType_IndentAndClose) {
 				switch (iEOLMode) {
 				default: // SC_EOL_CRLF
 					*pPos++ = '\r';
@@ -2274,7 +2240,7 @@ void EditAutoIndent(void) {
 		if (*pLineBuf) {
 			SciCall_BeginUndoAction();
 			SciCall_AddText(strlen(pLineBuf), pLineBuf);
-			if (indent) {
+			if (indent != AutoIndentType_None) {
 				SciCall_SetSel(iIndentPos, iIndentPos);
 			}
 			SciCall_EndUndoAction();

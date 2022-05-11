@@ -121,7 +121,7 @@ EDITLEXER lexRuby = {
 		(1 << 0) | (1 << 1) | (1 << 2), // module, class, method
 		SCE_RB_DEF_NAME,
 		'\\', 0, 0,
-		SCE_RB_STRING_SQ,
+		SCE_RB_WORD,
 		0, 0,
 		SCE_RB_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords

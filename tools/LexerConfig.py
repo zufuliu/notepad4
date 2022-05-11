@@ -39,6 +39,7 @@ cpp_preprocessor: has C++ style #preprocessor, default is False.
 
 doc_extra_word_char: extra identifier characters excludes dot.
 autoc_extra_keyword: [deprecated] extra keyword for auto-completion.
+auto_ident_word_style: word styles that supports auto ident.
 """
 
 from enum import IntFlag
@@ -161,6 +162,7 @@ LexerConfigMap = {
 		'block_comment_on_new_line': True,
 		'operator_style': ['SCE_AU3_OPERATOR'],
 		'doc_extra_word_char': '#$@',
+		#'auto_ident_word_style': ['SCE_AU3_KEYWORD'],
 	},
 	'NP2LEX_AVISYNTH': {
 		'line_comment_string': '#',
@@ -189,6 +191,7 @@ LexerConfigMap = {
 		'raw_string_style': ['SCE_SH_STRING_SQ'],
 		'operator_style': ['SCE_SH_OPERATOR'],
 		'doc_extra_word_char': '-$',
+		'auto_ident_word_style': ['SCE_SH_WORD'],
 	},
 	'NP2LEX_BATCH': {
 		'default_encoding': 'ANSI',
@@ -221,6 +224,7 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_CMAKE_ESCAPECHAR',
 		'angle_bracket_generic': True, # for bracket argument $<>
 		'operator_style': ['SCE_CMAKE_OPERATOR'],
+		'auto_ident_word_style': ['SCE_CMAKE_WORD'],
 	},
 	'NP2LEX_COFFEESCRIPT': {
 		'line_comment_string': '#',
@@ -248,6 +252,7 @@ LexerConfigMap = {
 		'cpp_preprocessor': True,
 		'doc_extra_word_char': '#@:',
 		'autoc_extra_keyword': 'kwDoxyDoc',
+		#'auto_ident_word_style': ['SCE_C_PREPROCESSOR'],
 	},
 	'NP2LEX_CSHARP': {
 		'cpp_style_comment': True,
@@ -396,6 +401,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_INNO_OPERATOR'],
 		'cpp_preprocessor': True,
 		'doc_extra_word_char': '#',
+		#'auto_ident_word_style': ['SCE_INNO_PREPROCESSOR_WORD'],
 	},
 
 	'NP2LEX_JAMFILE': {
@@ -444,6 +450,7 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_JULIA_OPERATOR',
 		'operator_style': ['SCE_JULIA_OPERATOR', 'SCE_JULIA_OPERATOR2'],
 		'doc_extra_word_char': '$@:',
+		'auto_ident_word_style': ['SCE_JULIA_WORD'],
 	},
 
 	'NP2LEX_KOTLIN': {
@@ -487,6 +494,7 @@ LexerConfigMap = {
 		'default_fold_level': ['class', 'function'],
 		'printf_format_specifier': True,
 		'operator_style': ['SCE_LUA_OPERATOR'],
+		'auto_ident_word_style': ['SCE_LUA_WORD'],
 	},
 
 	'NP2LEX_MAKEFILE': {
@@ -495,6 +503,7 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_MAKE_OPERATOR'],
 		'doc_extra_word_char': '-$!',
+		'auto_ident_word_style': ['SCE_MAKE_PREPROCESSOR'],
 	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
@@ -509,6 +518,7 @@ LexerConfigMap = {
 		#'escape_char_start': NoEscapeCharacter, # backslash for Octave escape character
 		'none_quote_style': 'SCE_MAT_OPERATOR',
 		'operator_style': ['SCE_MAT_OPERATOR'],
+		'auto_ident_word_style': ['SCE_MAT_KEYWORD'],
 	},
 
 	'NP2LEX_NSIS': {
@@ -518,12 +528,14 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_NSIS_ESCAPECHAR',
 		'operator_style': ['SCE_NSIS_OPERATOR'],
 		'doc_extra_word_char': '-$!',
+		#'auto_ident_word_style': ['SCE_NSIS_WORD', 'SCE_NSIS_PREPROCESSOR'],
 	},
 
 	'NP2LEX_PASCAL': {
 		'line_comment_string': '//',
 		'block_comment_string': [('{', '}')], # omited ('(*', '*)')
 		'operator_style': ['SCE_PAS_OPERATOR'],
+		#'auto_ident_word_style': ['SCE_PAS_PREPROCESSOR'],
 	},
 	'NP2LEX_PERL': {
 		'line_comment_string': '#',
@@ -610,6 +622,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_C_OPERATOR'],
 		'cpp_preprocessor': True,
 		'doc_extra_word_char': '#',
+		#'auto_ident_word_style': ['SCE_C_PREPROCESSOR'],
 	},
 	'NP2LEX_RUBY': {
 		'line_comment_string': '#',
@@ -620,6 +633,7 @@ LexerConfigMap = {
 		'raw_string_style': ['SCE_RB_STRING_SQ'],
 		'operator_style': ['SCE_RB_OPERATOR'],
 		'doc_extra_word_char': '$@?!',
+		'auto_ident_word_style': ['SCE_RB_WORD'],
 	},
 	'NP2LEX_RUST': {
 		'cpp_style_comment': True,
@@ -660,6 +674,7 @@ LexerConfigMap = {
 		'character_prefix': ['q', 'Q', 'x', 'X', 'b', 'B'],
 		'operator_style': ['SCE_SQL_OPERATOR'], # ignore q'{SCE_SQL_QOPERATOR}'
 		'doc_extra_word_char': '$@',
+		'auto_ident_word_style': ['SCE_SQL_WORD'],
 	},
 	'NP2LEX_SWIFT': {
 		'cpp_style_comment': True,
@@ -670,6 +685,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_SWIFT_OPERATOR', 'SCE_SWIFT_OPERATOR2'],
 		'cpp_preprocessor': True,
 		'doc_extra_word_char': '#@',
+		#'auto_ident_word_style': ['SCE_SWIFT_DIRECTIVE'],
 	},
 
 	'NP2LEX_TCL': {
@@ -709,17 +725,20 @@ LexerConfigMap = {
 		'escape_char_start': NoEscapeCharacter,
 		'none_quote_style': 'SCE_B_COMMENT',
 		'operator_style': ['SCE_B_OPERATOR'],
+		#'auto_ident_word_style': ['SCE_B_KEYWORD'],
 	},
 	'NP2LEX_VERILOG': {
 		'cpp_style_comment': True,
 		'none_quote_style': 'SCE_V_NUMBER',
 		'operator_style': ['SCE_V_OPERATOR'],
 		'doc_extra_word_char': '$',
+		#'auto_ident_word_style': ['SCE_V_WORD'],
 	},
 	'NP2LEX_VHDL': {
 		'line_comment_string': '--',
 		'block_comment_string': ('/*', '*/'),
 		'operator_style': ['SCE_VHDL_OPERATOR'],
+		#'auto_ident_word_style': ['SCE_VHDL_KEYWORD'],
 	},
 	'NP2LEX_VIM': {
 		'line_comment_string': '"',
@@ -736,6 +755,7 @@ LexerConfigMap = {
 		'cpp_preprocessor': True,
 		'doc_extra_word_char': '#',
 		#'autoc_extra_keyword': 'kwNETDoc',
+		#'auto_ident_word_style': ['SCE_B_KEYWORD', 'SCE_B_PREPROCESSOR'],
 	},
 
 	'NP2LEX_WASM': {
@@ -907,8 +927,8 @@ def BuildLexerConfigContent(rid, keywordAttr):
 	style = config.get('escape_char_style', '0')
 	assert len(start) == 1, (rid, style, start)
 	output.append(f"{indent}'{escape_c_char(start)}', {style}, {config.get('format_specifier_style', '0')},")
-	# raw string styles
-	styles = config.get('raw_string_style', ['0'])
+	# auto ident word style
+	styles = config.get('auto_ident_word_style', ['0'])
 	output.append(f"{indent}{styles[0]},")
 	# character style, none single quoted style
 	styles = config.get('character_style', ['0'])

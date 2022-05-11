@@ -139,7 +139,7 @@ EDITLEXER lexCSharp = {
 		(1 << 0) | (1 << 1) | (1 << 2), // namespace, class, method
 		SCE_CSHARP_FUNCTION_DEFINITION,
 		'\\', SCE_CSHARP_ESCAPECHAR, SCE_CSHARP_FORMAT_SPECIFIER,
-		SCE_CSHARP_VERBATIM_STRING,
+		0,
 		SCE_CSHARP_CHARACTER, 0,
 		SCE_CSHARP_OPERATOR, SCE_CSHARP_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords

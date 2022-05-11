@@ -443,7 +443,7 @@ EDITLEXER lexPHP = {
 		(1 << 1) | (1 << 2), // [php tag], class, method
 		SCE_PHP_FUNCTION_DEFINITION,
 		'\\', SCE_PHP_ESCAPECHAR, SCE_PHP_FORMAT_SPECIFIER,
-		SCE_PHP_STRING_SQ,
+		0,
 		0, 0,
 		SCE_PHP_OPERATOR, SCE_PHP_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords

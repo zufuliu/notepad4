@@ -520,7 +520,7 @@ EDITLEXER lexSQL = {
 		(1 << 0), // function
 		0,
 		'\\', SCE_SQL_ESCAPECHAR, 0,
-		0,
+		SCE_SQL_WORD,
 		0, 0,
 		SCE_SQL_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords

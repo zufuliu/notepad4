@@ -90,7 +90,7 @@ typedef struct EDITLEXER {
 		const uint8_t escapeCharacterStart;
 		const uint8_t escapeCharacterStyle;
 		const uint8_t formatSpecifierStyle;
-		const uint8_t rawStringStyle;
+		const uint8_t autoIdentWordStyle;
 		const uint8_t characterLiteralStyle;
 		const uint8_t noneSingleQuotedStyle;
 		const uint8_t operatorStyle;

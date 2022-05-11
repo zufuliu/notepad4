@@ -254,7 +254,7 @@ EDITLEXER lexRust = {
 		(1 << 0) | (1 << 1), // struct, function
 		SCE_RUST_FUNCTION_DEFINITION,
 		'\\', SCE_RUST_ESCAPECHAR, SCE_RUST_FORMAT_SPECIFIER,
-		SCE_RUST_RAW_STRING,
+		0,
 		SCE_RUST_CHARACTER, SCE_RUST_LIFETIME,
 		SCE_RUST_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
