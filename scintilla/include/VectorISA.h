@@ -260,16 +260,16 @@ static inline uint32_t bit_zero_high_u32(uint32_t x, uint32_t index) NP2_noexcep
 #endif
 
 #if NP2_TARGET_ARM
-static inline uint8_t bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
-	return (*addr >> index) & 1;
+static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
+	return (*addr >> index) & true;
 }
 #else
-static inline uint8_t bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
+static inline bool bittest(const uint32_t *addr, uint32_t index) NP2_noexcept {
 	return _bittest((const long *)addr, index);
 }
 #endif
 
-static inline uint8_t BitTestEx(const uint32_t *start, uint32_t value) NP2_noexcept {
+static inline bool BitTestEx(const uint32_t *start, uint32_t value) NP2_noexcept {
 	return bittest(start + (value >> 5), value & 31);
 }
 

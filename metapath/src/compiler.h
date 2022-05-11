@@ -10,6 +10,7 @@
 typedef _Bool	bool;
 #define false	0
 #define true	1
+#define nullptr	NULL
 #endif
 
 #ifndef NP2_noexcept
