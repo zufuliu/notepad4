@@ -183,6 +183,15 @@ def UpdateLexerEnumFile(path, lexerPath):
 	output = dump_enum_flag(KeywordAttr, indent='\t', anonymous=False, max_value=KeywordAttr.NoLexer)
 	Regenerate(lexerPath, '//', output)
 
+def UpdateAutoCompletionCache(path):
+	commentLine, commentBlock, scriptShebang = BuildLexerCommentString()
+	Regenerate(path, '//CommentLine', commentLine)
+	Regenerate(path, '//CommentBlock', commentBlock)
+	Regenerate(path, '//ScriptShebang', scriptShebang)
+
+	cache = BuildAutoCompletionCache()
+	Regenerate(path, '//Cache', cache)
+
 
 def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
@@ -2218,13 +2227,6 @@ def UpdateLexerKeywordAttr(indexPath, lexerPath):
 			output.extend(f'\t{prefix}{key} = {value},' for key, value in items)
 		output.append('};')
 	Regenerate(indexPath, '//KeywordIndex', output)
-
-	commentLine, commentBlock, scriptShebang = BuildLexerCommentString()
-	Regenerate(indexPath, '//CommentLine', commentLine)
-	Regenerate(indexPath, '//CommentBlock', commentBlock)
-	Regenerate(indexPath, '//ScriptShebang', scriptShebang)
-	cache = BuildAutoCompletionCache()
-	Regenerate(indexPath, '//Cache', cache)
 
 	for lexer, indexList in LexerKeywordIndexList.items():
 		output = []

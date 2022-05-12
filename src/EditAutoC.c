@@ -510,6 +510,8 @@ static const uint32_t DefaultWordCharSet[8] = {
 static uint32_t CurrentWordCharSet[8];
 static uint32_t CharacterPrefixMask[8];
 static uint32_t RawStringStyleMask[8];
+static uint32_t GenericTypeStyleMask[8];
+static uint32_t IgnoreWordStyleMask[8];
 
 // from scintilla/lexlib/DocUtils.h
 #define js_style(style)		((style) + SCE_PHP_LABEL + 1)
@@ -531,50 +533,20 @@ static inline bool IsRawStringStyle(int style) {
 	return BitTestEx(RawStringStyleMask, style);
 }
 
+static inline bool IsGenericTypeStyle(int style) {
+	return BitTestEx(GenericTypeStyleMask, style);
+}
+
+static inline bool IsWordStyleToIgnore(int style) {
+	return BitTestEx(IgnoreWordStyleMask, style);
+}
+
 bool IsAutoCompletionWordCharacter(uint32_t ch) {
 	if (ch < 0x80) {
 		return IsDocWordChar(ch);
 	}
 	const CharacterClass cc = SciCall_GetCharacterClass(ch);
 	return cc == CharacterClass_Word;
-}
-
-static inline BOOL IsWordStyleToIgnore(int style) {
-	switch (pLexCurrent->iLexer) {
-	case SCLEX_CPP:
-		return style == SCE_C_WORD
-			|| style == SCE_C_WORD2
-			|| style == SCE_C_PREPROCESSOR;
-
-	case SCLEX_GO:
-		return style == SCE_GO_WORD
-			|| style == SCE_GO_WORD2
-			|| style == SCE_GO_BUILTIN_FUNC
-			|| style == SCE_GO_FORMAT_SPECIFIER;
-
-	case SCLEX_JSON:
-		return style == SCE_JSON_KEYWORD;
-
-	case SCLEX_PYTHON:
-		return style == SCE_PY_WORD
-			|| style == SCE_PY_WORD2
-			|| style == SCE_PY_BUILTIN_CONSTANT
-			|| style == SCE_PY_BUILTIN_FUNCTION
-			|| style == SCE_PY_ATTRIBUTE
-			|| style == SCE_PY_OBJECT_FUNCTION;
-
-	case SCLEX_SMALI:
-		return style == SCE_SMALI_WORD
-			|| style == SCE_SMALI_DIRECTIVE
-			|| style == SCE_SMALI_INSTRUCTION;
-	case SCLEX_SQL:
-		return style == SCE_SQL_WORD
-			|| style == SCE_SQL_WORD2
-			|| style == SCE_SQL_USER1
-			|| style == SCE_SQL_HEX			// BLOB Hex
-			|| style == SCE_SQL_HEX2;		// BLOB Hex
-	}
-	return FALSE;
 }
 
 static inline BOOL IsEscapeCharacter(int ch) {
@@ -1674,61 +1646,6 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 	return FALSE;
 }
 
-static inline BOOL IsGenericTypeStyle(int iLexer, int style) {
-	switch (iLexer) {
-	case SCLEX_CPP:
-		return style == SCE_C_CLASS
-			|| style == SCE_C_INTERFACE
-			|| style == SCE_C_STRUCT
-			|| style == SCE_C_WORD2;
-	case SCLEX_CSHARP:
-		return style == SCE_CSHARP_CLASS
-			|| style == SCE_CSHARP_INTERFACE
-			|| style == SCE_CSHARP_STRUCT
-			|| style == SCE_CSHARP_ENUM
-			|| style == SCE_CSHARP_WORD2;
-	case SCLEX_DART:
-		return style == SCE_DART_CLASS
-			|| style == SCE_DART_ENUM
-			|| style == SCE_DART_WORD2;
-	case SCLEX_GROOVY:
-		return style == SCE_GROOVY_CLASS
-			|| style == SCE_GROOVY_INTERFACE
-			|| style == SCE_GROOVY_TRAIT
-			|| style == SCE_GROOVY_ENUM;
-	case SCLEX_HAXE:
-		return style == SCE_HAXE_CLASS
-			|| style == SCE_HAXE_INTERFACE
-			|| style == SCE_HAXE_ENUM;
-	case SCLEX_JAVA:
-		return style == SCE_JAVA_CLASS
-			|| style == SCE_JAVA_INTERFACE
-			|| style == SCE_JAVA_ENUM;
-	case SCLEX_JAVASCRIPT:
-		return style == SCE_JS_CLASS
-			|| style == SCE_JS_INTERFACE
-			|| style == SCE_JS_ENUM
-			|| style == SCE_JS_WORD2;
-	case SCLEX_KOTLIN:
-		return style == SCE_KOTLIN_CLASS
-			|| style == SCE_KOTLIN_INTERFACE
-			|| style == SCE_KOTLIN_ENUM;
-	case SCLEX_RUST:
-		return style == SCE_RUST_TYPE
-			|| style == SCE_RUST_STRUCT
-			|| style == SCE_RUST_TRAIT
-			|| style == SCE_RUST_ENUMERATION
-			|| style == SCE_RUST_UNION;
-	case SCLEX_SWIFT:
-		return style == SCE_SWIFT_CLASS
-			|| style == SCE_SWIFT_STRUCT
-			|| style == SCE_SWIFT_PROTOCOL
-			|| style == SCE_SWIFT_ENUM;
-	default:
-		return FALSE;
-	}
-}
-
 void EditAutoCloseBraceQuote(int ch) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
@@ -1780,7 +1697,7 @@ void EditAutoCloseBraceQuote(int ch) {
 		}
 		break;
 	case '<':
-		if ((mask & AutoInsertAngleBracket) && IsGenericTypeStyle(pLexCurrent->iLexer, iPrevStyle)) {
+		if ((mask & AutoInsertAngleBracket) && IsGenericTypeStyle(iPrevStyle)) {
 			// geriatric type, template
 			fillChar = '>';
 		}
@@ -2753,6 +2670,8 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	np2_LexKeyword = NULL;
 	memset(CharacterPrefixMask, 0, sizeof(CharacterPrefixMask));
 	memset(RawStringStyleMask, 0, sizeof(RawStringStyleMask));
+	memset(GenericTypeStyleMask, 0, sizeof(GenericTypeStyleMask));
+	memset(IgnoreWordStyleMask, 0, sizeof(IgnoreWordStyleMask));
 	memcpy(CurrentWordCharSet, DefaultWordCharSet, sizeof(DefaultWordCharSet));
 	//CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 
@@ -2769,6 +2688,18 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		break;
 
+	case NP2LEX_ACTIONSCRIPT:
+	case NP2LEX_TYPESCRIPT:
+		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		GenericTypeStyleMask[SCE_JS_CLASS >> 5] |= (1U << (SCE_JS_CLASS & 31));
+		GenericTypeStyleMask[SCE_JS_INTERFACE >> 5] |= (1U << (SCE_JS_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_JS_ENUM >> 5] |= (1U << (SCE_JS_ENUM & 31));
+		GenericTypeStyleMask[SCE_JS_WORD2 >> 5] |= (1U << (SCE_JS_WORD2 & 31));
+		break;
+
 	case NP2LEX_ASM:
 	case NP2LEX_FORTRAN:
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
@@ -2778,7 +2709,6 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 
 	case NP2LEX_AUTOIT3:
 	case NP2LEX_JAVASCRIPT:
-	case NP2LEX_TYPESCRIPT:
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
@@ -2786,7 +2716,6 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		break;
 
 	case NP2LEX_AWK:
-	case NP2LEX_JAVA:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
@@ -2823,6 +2752,15 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
 		RawStringStyleMask[SCE_C_STRINGRAW >> 5] |= (1U << (SCE_C_STRINGRAW & 31));
 		RawStringStyleMask[SCE_C_COMMENTDOC_TAG >> 5] |= (1U << (SCE_C_COMMENTDOC_TAG & 31));
+		GenericTypeStyleMask[SCE_C_CLASS >> 5] |= (1U << (SCE_C_CLASS & 31));
+		GenericTypeStyleMask[SCE_C_INTERFACE >> 5] |= (1U << (SCE_C_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_C_STRUCT >> 5] |= (1U << (SCE_C_STRUCT & 31));
+		GenericTypeStyleMask[SCE_C_WORD2 >> 5] |= (1U << (SCE_C_WORD2 & 31));
+		IgnoreWordStyleMask[SCE_C_WORD >> 5] |= (1U << (SCE_C_WORD & 31));
+		IgnoreWordStyleMask[SCE_C_WORD2 >> 5] |= (1U << (SCE_C_WORD2 & 31));
+		IgnoreWordStyleMask[SCE_C_PREPROCESSOR >> 5] |= (1U << (SCE_C_PREPROCESSOR & 31));
+		IgnoreWordStyleMask[SCE_C_ASM_REGISTER >> 5] |= (1U << (SCE_C_ASM_REGISTER & 31));
+		IgnoreWordStyleMask[SCE_C_ASM_INSTRUCTION >> 5] |= (1U << (SCE_C_ASM_INSTRUCTION & 31));
 		np2_LexKeyword = &kwDoxyDoc;
 		break;
 
@@ -2836,6 +2774,11 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		RawStringStyleMask[SCE_CSHARP_INTERPOLATED_RAWSTRING_SL >> 5] |= (1U << (SCE_CSHARP_INTERPOLATED_RAWSTRING_SL & 31));
 		RawStringStyleMask[SCE_CSHARP_RAWSTRING_ML >> 5] |= (1U << (SCE_CSHARP_RAWSTRING_ML & 31));
 		RawStringStyleMask[SCE_CSHARP_INTERPOLATED_RAWSTRING_ML >> 5] |= (1U << (SCE_CSHARP_INTERPOLATED_RAWSTRING_ML & 31));
+		GenericTypeStyleMask[SCE_CSHARP_CLASS >> 5] |= (1U << (SCE_CSHARP_CLASS & 31));
+		GenericTypeStyleMask[SCE_CSHARP_INTERFACE >> 5] |= (1U << (SCE_CSHARP_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_CSHARP_STRUCT >> 5] |= (1U << (SCE_CSHARP_STRUCT & 31));
+		GenericTypeStyleMask[SCE_CSHARP_ENUM >> 5] |= (1U << (SCE_CSHARP_ENUM & 31));
+		GenericTypeStyleMask[SCE_CSHARP_WORD2 >> 5] |= (1U << (SCE_CSHARP_WORD2 & 31));
 		break;
 
 	case NP2LEX_CSS:
@@ -2854,6 +2797,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		RawStringStyleMask[SCE_DART_RAWSTRING_DQ >> 5] |= (1U << (SCE_DART_RAWSTRING_DQ & 31));
 		RawStringStyleMask[SCE_DART_TRIPLE_RAWSTRING_SQ >> 5] |= (1U << (SCE_DART_TRIPLE_RAWSTRING_SQ & 31));
 		RawStringStyleMask[SCE_DART_TRIPLE_RAWSTRING_DQ >> 5] |= (1U << (SCE_DART_TRIPLE_RAWSTRING_DQ & 31));
+		GenericTypeStyleMask[SCE_DART_CLASS >> 5] |= (1U << (SCE_DART_CLASS & 31));
+		GenericTypeStyleMask[SCE_DART_ENUM >> 5] |= (1U << (SCE_DART_ENUM & 31));
+		GenericTypeStyleMask[SCE_DART_WORD2 >> 5] |= (1U << (SCE_DART_WORD2 & 31));
 		break;
 
 	case NP2LEX_DLANG:
@@ -2876,17 +2822,22 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 
 	case NP2LEX_GRADLE:
 	case NP2LEX_GROOVY:
-	case NP2LEX_TCL:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		GenericTypeStyleMask[SCE_GROOVY_CLASS >> 5] |= (1U << (SCE_GROOVY_CLASS & 31));
+		GenericTypeStyleMask[SCE_GROOVY_INTERFACE >> 5] |= (1U << (SCE_GROOVY_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_GROOVY_TRAIT >> 5] |= (1U << (SCE_GROOVY_TRAIT & 31));
+		GenericTypeStyleMask[SCE_GROOVY_ENUM >> 5] |= (1U << (SCE_GROOVY_ENUM & 31));
 		break;
 
 	case NP2LEX_HAXE:
-	case NP2LEX_SWIFT:
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		GenericTypeStyleMask[SCE_HAXE_CLASS >> 5] |= (1U << (SCE_HAXE_CLASS & 31));
+		GenericTypeStyleMask[SCE_HAXE_INTERFACE >> 5] |= (1U << (SCE_HAXE_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_HAXE_ENUM >> 5] |= (1U << (SCE_HAXE_ENUM & 31));
 		break;
 
 	case NP2LEX_HTML:
@@ -2900,6 +2851,16 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_VISUALBASIC:
 		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		break;
+
+	case NP2LEX_JAVA:
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		GenericTypeStyleMask[SCE_JAVA_CLASS >> 5] |= (1U << (SCE_JAVA_CLASS & 31));
+		GenericTypeStyleMask[SCE_JAVA_INTERFACE >> 5] |= (1U << (SCE_JAVA_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_JAVA_ENUM >> 5] |= (1U << (SCE_JAVA_ENUM & 31));
 		break;
 
 	case NP2LEX_JULIA:
@@ -2917,6 +2878,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		RawStringStyleMask[SCE_KOTLIN_RAWSTRING >> 5] |= (1U << (SCE_KOTLIN_RAWSTRING & 31));
+		GenericTypeStyleMask[SCE_KOTLIN_CLASS >> 5] |= (1U << (SCE_KOTLIN_CLASS & 31));
+		GenericTypeStyleMask[SCE_KOTLIN_INTERFACE >> 5] |= (1U << (SCE_KOTLIN_INTERFACE & 31));
+		GenericTypeStyleMask[SCE_KOTLIN_ENUM >> 5] |= (1U << (SCE_KOTLIN_ENUM & 31));
 		break;
 
 	case NP2LEX_LLVM:
@@ -2983,6 +2947,12 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		RawStringStyleMask[SCE_PY_RAWBYTES_DQ >> 5] |= (1U << (SCE_PY_RAWBYTES_DQ & 31));
 		RawStringStyleMask[SCE_PY_TRIPLE_RAWBYTES_SQ >> 5] |= (1U << (SCE_PY_TRIPLE_RAWBYTES_SQ & 31));
 		RawStringStyleMask[SCE_PY_TRIPLE_RAWBYTES_DQ >> 5] |= (1U << (SCE_PY_TRIPLE_RAWBYTES_DQ & 31));
+		IgnoreWordStyleMask[SCE_PY_WORD >> 5] |= (1U << (SCE_PY_WORD & 31));
+		IgnoreWordStyleMask[SCE_PY_WORD2 >> 5] |= (1U << (SCE_PY_WORD2 & 31));
+		IgnoreWordStyleMask[SCE_PY_BUILTIN_CONSTANT >> 5] |= (1U << (SCE_PY_BUILTIN_CONSTANT & 31));
+		IgnoreWordStyleMask[SCE_PY_BUILTIN_FUNCTION >> 5] |= (1U << (SCE_PY_BUILTIN_FUNCTION & 31));
+		IgnoreWordStyleMask[SCE_PY_ATTRIBUTE >> 5] |= (1U << (SCE_PY_ATTRIBUTE & 31));
+		IgnoreWordStyleMask[SCE_PY_OBJECT_FUNCTION >> 5] |= (1U << (SCE_PY_OBJECT_FUNCTION & 31));
 		break;
 
 	case NP2LEX_REBOL:
@@ -3005,6 +2975,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CharacterPrefixMask['u' >> 5] |= (1 << ('u' & 31));
 		RawStringStyleMask[SCE_C_STRINGRAW >> 5] |= (1U << (SCE_C_STRINGRAW & 31));
 		RawStringStyleMask[SCE_C_COMMENTDOC_TAG >> 5] |= (1U << (SCE_C_COMMENTDOC_TAG & 31));
+		IgnoreWordStyleMask[SCE_C_WORD >> 5] |= (1U << (SCE_C_WORD & 31));
+		IgnoreWordStyleMask[SCE_C_WORD2 >> 5] |= (1U << (SCE_C_WORD2 & 31));
+		IgnoreWordStyleMask[SCE_C_PREPROCESSOR >> 5] |= (1U << (SCE_C_PREPROCESSOR & 31));
 		break;
 
 	case NP2LEX_RUBY:
@@ -3024,6 +2997,11 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
 		RawStringStyleMask[SCE_RUST_RAW_STRING >> 5] |= (1U << (SCE_RUST_RAW_STRING & 31));
 		RawStringStyleMask[SCE_RUST_RAW_BYTESTRING >> 5] |= (1U << (SCE_RUST_RAW_BYTESTRING & 31));
+		GenericTypeStyleMask[SCE_RUST_TYPE >> 5] |= (1U << (SCE_RUST_TYPE & 31));
+		GenericTypeStyleMask[SCE_RUST_STRUCT >> 5] |= (1U << (SCE_RUST_STRUCT & 31));
+		GenericTypeStyleMask[SCE_RUST_TRAIT >> 5] |= (1U << (SCE_RUST_TRAIT & 31));
+		GenericTypeStyleMask[SCE_RUST_ENUMERATION >> 5] |= (1U << (SCE_RUST_ENUMERATION & 31));
+		GenericTypeStyleMask[SCE_RUST_UNION >> 5] |= (1U << (SCE_RUST_UNION & 31));
 		break;
 
 	case NP2LEX_SCALA:
@@ -3043,6 +3021,27 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CharacterPrefixMask['b' >> 5] |= (1 << ('b' & 31));
 		CharacterPrefixMask['q' >> 5] |= (1 << ('q' & 31));
 		CharacterPrefixMask['x' >> 5] |= (1 << ('x' & 31));
+		IgnoreWordStyleMask[SCE_SQL_WORD >> 5] |= (1U << (SCE_SQL_WORD & 31));
+		IgnoreWordStyleMask[SCE_SQL_WORD2 >> 5] |= (1U << (SCE_SQL_WORD2 & 31));
+		IgnoreWordStyleMask[SCE_SQL_USER1 >> 5] |= (1U << (SCE_SQL_USER1 & 31));
+		IgnoreWordStyleMask[SCE_SQL_HEX >> 5] |= (1U << (SCE_SQL_HEX & 31));
+		IgnoreWordStyleMask[SCE_SQL_HEX2 >> 5] |= (1U << (SCE_SQL_HEX2 & 31));
+		break;
+
+	case NP2LEX_SWIFT:
+		CurrentWordCharSet['#' >> 5] |= (1 << ('#' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		GenericTypeStyleMask[SCE_SWIFT_CLASS >> 5] |= (1U << (SCE_SWIFT_CLASS & 31));
+		GenericTypeStyleMask[SCE_SWIFT_STRUCT >> 5] |= (1U << (SCE_SWIFT_STRUCT & 31));
+		GenericTypeStyleMask[SCE_SWIFT_PROTOCOL >> 5] |= (1U << (SCE_SWIFT_PROTOCOL & 31));
+		GenericTypeStyleMask[SCE_SWIFT_ENUM >> 5] |= (1U << (SCE_SWIFT_ENUM & 31));
+		break;
+
+	case NP2LEX_TCL:
+		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 
 	case NP2LEX_VIM:

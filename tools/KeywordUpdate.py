@@ -142,3 +142,4 @@ def update_all_keyword():
 
 update_all_keyword()
 UpdateLexerEnumFile('../src/EditLexer.h', '../scintilla/lexlib/WordList.h')
+UpdateAutoCompletionCache('../src/EditAutoC.c')

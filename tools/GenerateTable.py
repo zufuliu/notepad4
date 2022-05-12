@@ -41,8 +41,10 @@ def GenerateDefaultWordCharSet():
 			# table[c // 32] |= (1 << (c % 32))
 			table[c >> 5] |= (1 << (c & 31))
 
-	line = ', '.join(f'0x{c:08x}U' for c in table)
-	print('DefaultWordCharSet:', line)
+	lines = [', '.join(f'0x{c:08x}U' for c in table[:4])]
+	lines.append(', '.join(f'0x{c:08x}U' for c in table[4:]))
+	print('DefaultWordCharSet:')
+	print('\n'.join(lines))
 
 if __name__ == '__main__':
 	GenerateBraceMatchTable()
