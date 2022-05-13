@@ -374,7 +374,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 					word[len++] = '(';
 					word[len++] = ')';
 				}
-				word[len] = 0;
+				word[len] = '\0';
 				if (ok || WordList_StartsWith(pWList, word)) {
 					WordList_AddWord(pWList, word, len);
 					ok = *sub == '.';

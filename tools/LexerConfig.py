@@ -1091,30 +1091,35 @@ def BuildAutoCompletionCache():
 	def make_bit_set(table, value):
 		return f"{indent}{table}[{value} >> 5] |= (1U << ({value} & 31));"
 
+	def make_all_char_set(output, table, string):
+		assert len(string) == len(set(string)), (table, string)
+		for ch in sorted(string):
+			output.append(make_char_set(table, ch))
+
+	def make_all_bit_set(output, table, values):
+		assert len(values) == len(set(values)), (table, values)
+		for value in values:
+			output.append(make_bit_set(table, value))
+
 	for rid, config in LexerConfigMap.items():
 		charset = []
 		if word := config.get('extra_word_char', None):
 			assert '.' not in word, (rid, word)
-			for ch in sorted(word + '.'):
-				charset.append(make_char_set('CurrentWordCharSet', ch))
+			make_all_char_set(charset, 'CurrentWordCharSet', word + '.')
 
 		output = []
 		if word := config.get('character_prefix', None):
 			prefix = [item for item in word if len(item) == 1]
 			if len(prefix) != len(word):
 				print('multiple character prefix:', rid)
-			for ch in sorted(prefix):
-				output.append(make_char_set('CharacterPrefixMask', ch))
+			make_all_char_set(output, 'CharacterPrefixMask', prefix)
 
 		if styles := config.get('raw_string_style', None):
-			for style in styles:
-				output.append(make_bit_set('RawStringStyleMask', style))
+			make_all_bit_set(output, 'RawStringStyleMask', styles)
 		if styles := config.get('generic_type_style', None):
-			for style in styles:
-				output.append(make_bit_set('GenericTypeStyleMask', style))
+			make_all_bit_set(output, 'GenericTypeStyleMask', styles)
 		if styles := config.get('ignore_word_style', None):
-			for style in styles:
-				output.append(make_bit_set('IgnoreWordStyleMask', style))
+			make_all_bit_set(output, 'IgnoreWordStyleMask', styles)
 
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')
