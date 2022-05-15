@@ -24,9 +24,9 @@ using namespace Lexilla;
 
 namespace {
 
-#define	LEX_MATLAB		40
-#define	LEX_OCTAVE		61
-#define	LEX_SCILAB		62
+#define	LEX_MATLAB		0
+#define	LEX_OCTAVE		1
+#define	LEX_SCILAB		2
 
 constexpr bool IsMatlabOctave(int lexType) noexcept {
 	return lexType == LEX_MATLAB || lexType == LEX_OCTAVE;

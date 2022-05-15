@@ -24,10 +24,10 @@ using namespace Lexilla;
 
 namespace {
 
-#define		LEX_CPP		1	// C/C++
-#define		LEX_RC		5	// Resouce Script
-#define		LEX_OBJC	10	// Objective C/C++
-#define		LEX_SCALA	14	// Scala Script
+#define		LEX_CPP		0	// C/C++
+#define		LEX_RC		1	// Resouce Script
+#define		LEX_OBJC	2	// Objective C/C++
+#define		LEX_SCALA	3	// Scala Script
 
 constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocessor
 	return lex == LEX_CPP || lex == LEX_RC || lex == LEX_OBJC;

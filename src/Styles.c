@@ -1375,8 +1375,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 
 	// Lexer
-	const int iLexer = pLexNew->iLexer;
-	int rid = pLexNew->rid;
+	const int rid = pLexNew->rid;
 
 	if (bLexerChanged) {
 		if ((fvCurFile.mask & FV_MaskHasFileTabSettings) != FV_MaskHasFileTabSettings) {
@@ -1389,21 +1388,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		if (SciCall_GetLength() == 0 && !(SciCall_CanUndo() || SciCall_CanRedo())) {
 			EditApplyDefaultEncoding(pLexNew);
 		}
-		SciCall_SetLexer(iLexer);
-
-		if (iLexer == SCLEX_CPP || iLexer == SCLEX_MATLAB) {
-			if (iLexer == NP2LEX_MATLAB) {
-				if (np2LexLangIndex == IDM_LEXER_OCTAVE) {
-					rid = NP2LEX_OCTAVE;
-				} else if (np2LexLangIndex == IDM_LEXER_SCILAB) {
-					rid = NP2LEX_SCILAB;
-				}
-			}
-
-			char msg[10];
-			_itoa(rid - NP2LEX_TEXTFILE, msg, 10);
-			SciCall_SetProperty("lexer.lang", msg);
-		}
+		SciCall_SetLexer(pLexNew->iLexer);
 
 		// Code folding
 		SciCall_SetProperty("fold", "1");
@@ -1413,12 +1398,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		int dialect = 0;
 		switch (rid) {
-		case NP2LEX_HTML:
-		case NP2LEX_XML:
-			//SciCall_SetProperty("fold.html", "1");
-			//SciCall_SetProperty("fold.hypertext.comment", "1");
-			//SciCall_SetProperty("fold.hypertext.heredoc", "1");
-			break;
+		//case NP2LEX_HTML:
+		//case NP2LEX_XML:
+		//	//SciCall_SetProperty("fold.html", "1");
+		//	//SciCall_SetProperty("fold.hypertext.comment", "1");
+		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
+		//	break;
 
 		case NP2LEX_CSS:
 			dialect = np2LexLangIndex - IDM_LEXER_CSS;
@@ -1440,9 +1425,21 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			dialect = np2LexLangIndex - IDM_LEXER_MARKDOWN_GITHUB;
 			break;
 
+		case NP2LEX_MATLAB:
+			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
+			break;
+
 		case NP2LEX_APDL:
 		case NP2LEX_ABAQUS:
 			dialect = rid == NP2LEX_APDL;
+			break;
+
+		// see LexCPP.cxx
+		case NP2LEX_RESOURCESCRIPT:
+			dialect = 1;
+			break;
+		case NP2LEX_SCALA:
+			dialect = 3;
 			break;
 		}
 		if (dialect > 0) {
@@ -1714,8 +1711,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 		Style_SetAllStyle(pLexNew, 0);
 
-		switch (iLexer) {
-		case SCLEX_PERL:
+		switch (rid) {
+		case NP2LEX_PERL:
 #if defined(_WIN64)
 			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE8(SCE_PL_REGEX_VAR, SCE_PL_REGSUBST_VAR, SCE_PL_BACKTICKS_VAR, SCE_PL_HERE_QQ_VAR,
 				SCE_PL_HERE_QX_VAR, SCE_PL_STRING_QQ_VAR, SCE_PL_STRING_QX_VAR, SCE_PL_STRING_QR_VAR));
@@ -1725,16 +1722,16 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 #endif
 			break;
 
-		case SCLEX_REBOL:
+		case NP2LEX_REBOL:
 			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0));
 			break;
 
-		case SCLEX_MARKDOWN:
-		case SCLEX_PHPSCRIPT:
+		case NP2LEX_MARKDOWN:
+		case NP2LEX_PHP:
 			if (!IsStyleLoaded(&lexHTML)) {
 				Style_LoadOne(&lexHTML);
 			}
-			if (iLexer == SCLEX_MARKDOWN) {
+			if (rid == NP2LEX_MARKDOWN) {
 				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
 			} else {
 				Style_SetAllStyle(&lexJavaScript, SCE_PHP_LABEL + 1);
@@ -2585,7 +2582,7 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 	}
 
 	// xml/html
-	if ((!pLexNew && bAutoSelect) || (pLexNew && (pLexNew->rid == NP2LEX_CONFIG))) {
+	if ((!pLexNew && bAutoSelect) || (pLexNew && (pLexNew->iLexer == SCLEX_CONFIG))) {
 		char tchText[256] = "";
 		SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 		const char *p = tchText;
@@ -2613,9 +2610,9 @@ BOOL Style_SetLexerFromFile(LPCWSTR lpszFile) {
 					}
 				}
 			}
-			if (pLexNew && (pLexNew->rid == NP2LEX_HTML || pLexNew->rid == NP2LEX_XML)) {
+			if (pLexNew && (pLexNew->iLexer == SCLEX_HTML || pLexNew->iLexer == SCLEX_XML)) {
 				np2LexLangIndex = Style_GetDocTypeLanguage();
-				if (pLexNew->rid == NP2LEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
+				if (pLexNew->iLexer == SCLEX_XML && np2LexLangIndex == IDM_LEXER_WEB) {
 					// xhtml: <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html>
 					pLexNew = &lexHTML;
 				}
