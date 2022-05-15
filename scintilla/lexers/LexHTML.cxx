@@ -1064,7 +1064,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_VALUE:
-			if (IsHtmlInvalidAttrChar(ch)) {
+			if (IsHtmlInvalidAttrCharEx(ch, chNext)) {
 				if (ch == '\"' && chPrev == '=') {
 					// Should really test for being first character
 					state = SCE_H_DOUBLESTRING;

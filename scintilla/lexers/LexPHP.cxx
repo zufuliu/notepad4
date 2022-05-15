@@ -977,7 +977,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_H_VALUE:
 		case SCE_H_SGML_1ST_PARAM:
-			if (IsHtmlInvalidAttrChar(sc.ch)) {
+			if (IsHtmlInvalidAttrCharEx(sc.ch, sc.chNext)) {
 				const int outer = (sc.state == SCE_H_VALUE) ? SCE_H_DEFAULT : SCE_H_SGML_DEFAULT;
 				sc.SetState(outer);
 				if (outer != SCE_H_DEFAULT) {
@@ -1196,6 +1196,11 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else {
 				if (sc.ch == '>' || sc.Match('/', '>') || (lexer.tagType == HtmlTagType::Question && sc.Match('?', '>'))) {
 					lexer.ClassifyHtmlTag();
+					continue;
+				}
+				if (sc.ch == '<') {
+					// html tag on typing
+					lexer.tagState = HtmlTagState::None;
 					continue;
 				}
 				if (sc.ch == '\'') {

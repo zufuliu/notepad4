@@ -2229,7 +2229,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		case SCE_H_VALUE:
 		case SCE_H_SGML_1ST_PARAM:
-			if (IsHtmlInvalidAttrChar(sc.ch)) {
+			if (IsHtmlInvalidAttrCharEx(sc.ch, sc.chNext)) {
 				const int outer = (sc.state == SCE_H_VALUE) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
 				sc.SetState(outer);
 				if (outer != SCE_MARKDOWN_DEFAULT) {
@@ -2385,6 +2385,11 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					sc.SetState(SCE_H_TAG);
 					sc.Forward((sc.ch == '/') ? 2 : 1);
 					sc.SetState(lexer.TryTakeOuterStyle());
+					continue;
+				}
+				if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
+					// html tag on typing, TODO: check other block start characters
+					lexer.tagState = HtmlTagState::None;
 					continue;
 				}
 				if (sc.ch == '\'') {

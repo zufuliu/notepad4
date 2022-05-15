@@ -33,6 +33,11 @@ constexpr bool IsHtmlInvalidAttrChar(int ch) noexcept {
 	return ch <= 32 || AnyOf(ch, '"', '\'', '\\', '`', '=', '<', '>', 127);
 }
 
+constexpr bool IsHtmlInvalidAttrCharEx(int ch, int chNext) noexcept {
+	return IsHtmlInvalidAttrChar(ch)
+		|| (chNext == '>' && (ch == '/' || ch == '?'));
+}
+
 inline bool IsHtmlCommentDelimiter(const StyleContext &sc) noexcept {
 	if (sc.Match('<', '!') || sc.Match('-', '-')) {
 		const int chNext = sc.GetRelative(2);

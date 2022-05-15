@@ -981,7 +981,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 			}
 		}
 	}
-	if (iLexer == SCLEX_PHPSCRIPT || iLexer == SCLEX_JAVASCRIPT) {
+	if (iLexer == SCLEX_PHPSCRIPT || iLexer == SCLEX_JAVASCRIPT || iLexer == SCLEX_MARKDOWN) {
 		WordList_AddListEx(pWList, lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_Tag]);
 		WordList_AddListEx(pWList, lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_Attribute]);
 		WordList_AddListEx(pWList, lexHTML.pKeyWords->pszKeyWords[HTMLKeywordIndex_EventHandler]);
