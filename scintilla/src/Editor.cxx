@@ -5603,12 +5603,14 @@ void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 }
 
 void Editor::FoldAll(FoldAction action) {
-	pdoc->EnsureStyledTo(pdoc->Length());
 	const Sci::Line maxLine = pdoc->LinesTotal();
 	bool expanding = action == FoldAction::Expand;
+	if (!expanding) {
+		pdoc->EnsureStyledTo(pdoc->Length());
+	}
 	if (action == FoldAction::Toggle) {
 		// Discover current state
-		for (int lineSeek = 0; lineSeek < maxLine; lineSeek++) {
+		for (Sci::Line lineSeek = 0; lineSeek < maxLine; lineSeek++) {
 			if (LevelIsHeader(pdoc->GetFoldLevel(lineSeek))) {
 				expanding = !pcs->GetExpanded(lineSeek);
 				break;
@@ -5617,9 +5619,8 @@ void Editor::FoldAll(FoldAction action) {
 	}
 	if (expanding) {
 		pcs->SetVisible(0, maxLine - 1, true);
-		for (int line = 0; line < maxLine; line++) {
-			const FoldLevel levelLine = pdoc->GetFoldLevel(line);
-			if (LevelIsHeader(levelLine)) {
+		for (Sci::Line line = 0; line < maxLine; line++) {
+			if (!pcs->GetExpanded(line)) {
 				SetFoldExpanded(line, true);
 			}
 		}
