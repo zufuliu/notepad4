@@ -174,6 +174,7 @@ struct PHPLexer {
 	int parenCount = 0;
 	VariableType variableType = VariableType::Normal;
 	int braceCount = 0;
+	int operatorBefore = 0;
 	bool insideUrl = false;
 
 	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
@@ -594,6 +595,7 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			}
 		}
 	} else if (block == HtmlTextBlock::Script) {
+		operatorBefore = sc.ch;
 		const bool interpolating = !nestedState.empty() && nestedState.back() > SCE_PHP_LABEL;
 		sc.SetState(interpolating ? js_style(SCE_JS_OPERATOR2) : js_style(SCE_JS_OPERATOR));
 		if (interpolating) {
@@ -728,10 +730,12 @@ void PHPLexer::HighlightJsInnerString() {
 			}
 		} else if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
 			sc.Forward();
-			// json key
-			const int chNext = sc.GetLineNextChar();
-			if (chNext == ':') {
-				sc.ChangeState(js_style(SCE_JS_KEY));
+			if (operatorBefore != '?') {
+				// json key
+				const int chNext = sc.GetLineNextChar();
+				if (chNext == ':') {
+					sc.ChangeState(js_style(SCE_JS_KEY));
+				}
 			}
 			sc.SetState(js_style(SCE_JS_DEFAULT));
 		}

@@ -130,6 +130,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int operatorBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_JS_DEFAULT;
 	DocTagState docTagState = DocTagState::None;
@@ -289,7 +290,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				|| (sc.ch == '"' && (sc.state == SCE_JS_STRING_DQ || sc.state == SCE_JSX_STRING_DQ))) {
 				sc.Forward();
 				const bool jsx = (sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ);
-				if (!jsx) {
+				if (!jsx && operatorBefore != '?') {
 					// json key
 					const int chNext = sc.GetLineNextChar();
 					if (chNext == ':') {
@@ -518,6 +519,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_JS_OPERATOR);
 				}
 			} else if (isoperator(sc.ch)) {
+				operatorBefore = sc.ch;
 				const bool interpolating = !nestedState.empty();
 				sc.SetState(interpolating ? SCE_JS_OPERATOR2 : SCE_JS_OPERATOR);
 				if (interpolating) {
