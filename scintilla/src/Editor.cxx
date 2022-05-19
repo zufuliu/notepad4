@@ -5775,7 +5775,7 @@ std::unique_ptr<Surface> Editor::CreateDrawingSurface(SurfaceID sid, bool printi
 		return {};
 	}
 	std::unique_ptr<Surface> surf = Surface::Allocate(printing ? Technology::Default : technology);
-	surf->Init(sid, wMain.GetID());
+	surf->Init(sid, wMain.GetID(), printing);
 	surf->SetMode(CurrentSurfaceMode());
 	return surf;
 }
