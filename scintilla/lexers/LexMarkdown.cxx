@@ -1474,7 +1474,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 		return indentParent == 0 && !IsEOLChar(chNext);
 
 	case '$':
-		return chNext == '$' && markdown == Markdown::Pandoc;
+		return chNext == '$' && markdown != Markdown::GitLab;
 	}
 
 	const OrderedListType listType = CheckOrderedList(sc.styler, pos, ch, chNext);
@@ -1557,7 +1557,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 		break;
 
 	case '$':
-		if (sc.chNext == '$' && markdown == Markdown::Pandoc) {
+		if (sc.chNext == '$' && markdown != Markdown::GitLab) {
 			sc.SetState(SCE_MARKDOWN_DISPLAY_MATH);
 			return 0;
 		}
@@ -1722,13 +1722,13 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	case '$':
-		if (markdown == Markdown::Pandoc) {
+		if (markdown != Markdown::GitLab) {
 			if (sc.chNext == '$') {
 				sc.SetState(SCE_MARKDOWN_INLINE_DISPLAY_MATH);
 			} else if (IsMathOpenDollar(sc.chNext)) {
 				sc.SetState(SCE_MARKDOWN_INLINE_MATH);
 			}
-		} else if (markdown == Markdown::GitLab && sc.chNext == '`') {
+		} else if (sc.chNext == '`') {
 			sc.SetState(SCE_MARKDOWN_MATH_SPAN);
 			sc.Forward();
 		}
