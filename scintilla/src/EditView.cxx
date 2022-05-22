@@ -2986,7 +2986,7 @@ static ColourRGBA InvertedLight(ColourRGBA orig) noexcept {
 	return ColourRGBA(std::min(r, 0xffu), std::min(g, 0xffu), std::min(b, 0xffu));
 }
 
-Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Rectangle rc, Surface *surface, Surface *surfaceMeasure,
+Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintilla::Rectangle rc, Surface *surface, Surface *surfaceMeasure,
 	const EditModel &model, const ViewStyle &vs) {
 	// Can't use measurements cached for screen
 	posCache.Clear();
