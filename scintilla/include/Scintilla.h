@@ -57,11 +57,11 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_CLEARDOCUMENTSTYLE 2005
 #define SCI_GETLENGTH 2006
 #define SCI_GETCHARAT 2007
-#define SCI_GETCHARACTERANDWIDTH 2038
-#define SCI_GETCHARACTERCLASS 2039
+#define SCI_GETCHARACTERANDWIDTH 2067
+#define SCI_GETCHARACTERCLASS 2068
 #define SCI_GETCURRENTPOS 2008
 #define SCI_GETANCHOR 2009
-#define SCI_GETSTYLEAT 2010
+#define SCI_GETSTYLEINDEXAT 2038
 #define SCI_REDO 2011
 #define SCI_SETUNDOCOLLECTION 2012
 #define SCI_SELECTALL 2013
@@ -465,8 +465,8 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCFIND_REGEXP 0x00200000
 #define SCFIND_POSIX 0x00400000
 #define SCFIND_CXX11REGEX 0x00800000
-#define SCI_FINDTEXT 2150
-#define SCI_FORMATRANGE 2151
+#define SCI_FINDTEXTFULL 2196
+#define SCI_FORMATRANGEFULL 2777
 #define SCI_GETFIRSTVISIBLELINE 2152
 #define SCI_GETLINE 2153
 #define SCI_GETLINECOUNT 2154
@@ -478,7 +478,7 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_GETMODIFY 2159
 #define SCI_SETSEL 2160
 #define SCI_GETSELTEXT 2161
-#define SCI_GETTEXTRANGE 2162
+#define SCI_GETTEXTRANGEFULL 2039
 #define SCI_HIDESELECTION 2163
 #define SCI_POINTXFROMPOSITION 2164
 #define SCI_POINTYFROMPOSITION 2165
@@ -1252,20 +1252,20 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
  * CHARRANGE, TEXTRANGE, FINDTEXTEX, FORMATRANGE, and NMHDR structs.
  * So older code that treats Scintilla as a RichEdit will work. */
 
-struct Sci_CharacterRange {
+struct Sci_CharacterRangeFull {
 	Sci_Position cpMin;
 	Sci_Position cpMax;
 };
 
-struct Sci_TextRange {
-	struct Sci_CharacterRange chrg;
+struct Sci_TextRangeFull {
+	struct Sci_CharacterRangeFull chrg;
 	char *lpstrText;
 };
 
-struct Sci_TextToFind {
-	struct Sci_CharacterRange chrg;
+struct Sci_TextToFindFull {
+	struct Sci_CharacterRangeFull chrg;
 	const char *lpstrText;
-	struct Sci_CharacterRange chrgText;
+	struct Sci_CharacterRangeFull chrgText;
 };
 
 typedef void *Sci_SurfaceID;
@@ -1280,12 +1280,12 @@ struct Sci_Rectangle {
 /* This structure is used in printing and requires some of the graphics types
  * from Platform.h.  Not needed by most client code. */
 
-struct Sci_RangeToFormat {
+struct Sci_RangeToFormatFull {
 	Sci_SurfaceID hdc;
 	Sci_SurfaceID hdcTarget;
 	struct Sci_Rectangle rc;
 	struct Sci_Rectangle rcPage;
-	struct Sci_CharacterRange chrg;
+	struct Sci_CharacterRangeFull chrg;
 };
 
 #ifndef __cplusplus

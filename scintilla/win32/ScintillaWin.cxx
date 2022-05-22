@@ -1974,8 +1974,8 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return -1;
 		} else {
 			const FINDTEXTA *pFT = reinterpret_cast<const FINDTEXTA *>(lParam);
-			TextToFind tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
-			return ScintillaBase::WndProc(Message::FindText, wParam, reinterpret_cast<sptr_t>(&tt));
+			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			return ScintillaBase::WndProc(Message::FindTextFull, wParam, reinterpret_cast<sptr_t>(&tt));
 		}
 
 	case EM_FINDTEXTEX:
@@ -1983,8 +1983,8 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return -1;
 		} else {
 			FINDTEXTEXA *pFT = reinterpret_cast<FINDTEXTEXA *>(lParam);
-			TextToFind tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
-			const Sci::Position pos =ScintillaBase::WndProc(Message::FindText, wParam, reinterpret_cast<sptr_t>(&tt));
+			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
+			const Sci::Position pos =ScintillaBase::WndProc(Message::FindTextFull, wParam, reinterpret_cast<sptr_t>(&tt));
 			pFT->chrgText.cpMin = (pos == -1)? -1 : static_cast<LONG>(tt.chrgText.cpMin);
 			pFT->chrgText.cpMax = (pos == -1)? -1 : static_cast<LONG>(tt.chrgText.cpMax);
 			return pos;
@@ -1993,20 +1993,20 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 	case EM_FORMATRANGE:
 		if (lParam) {
 			const FORMATRANGE *pFR = reinterpret_cast<const FORMATRANGE *>(lParam);
-			const RangeToFormat fr = { pFR->hdcTarget, pFR->hdc,
+			const RangeToFormatFull fr = { pFR->hdcTarget, pFR->hdc,
 				{ pFR->rc.left, pFR->rc.top, pFR->rc.right, pFR->rc.bottom },
 				{ pFR->rcPage.left, pFR->rcPage.top, pFR->rcPage.right, pFR->rcPage.bottom },
 				{ pFR->chrg.cpMin, pFR->chrg.cpMax },
 			};
-			return ScintillaBase::WndProc(Message::FormatRange, wParam, reinterpret_cast<sptr_t>(&fr));
+			return ScintillaBase::WndProc(Message::FormatRangeFull, wParam, reinterpret_cast<sptr_t>(&fr));
 		}
 		break;
 
 	case EM_GETTEXTRANGE:
 		if (lParam) {
 			TEXTRANGEA *pTR = reinterpret_cast<TEXTRANGEA *>(lParam);
-			TextRange tr = { { pTR->chrg.cpMin, pTR->chrg.cpMax }, pTR->lpstrText };
-			return ScintillaBase::WndProc(Message::GetTextRange, 0, reinterpret_cast<sptr_t>(&tr));
+			TextRangeFull tr = { { pTR->chrg.cpMin, pTR->chrg.cpMax }, pTR->lpstrText };
+			return ScintillaBase::WndProc(Message::GetTextRangeFull, 0, reinterpret_cast<sptr_t>(&tr));
 		}
 		break;
 

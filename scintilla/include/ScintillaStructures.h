@@ -10,20 +10,20 @@
 
 namespace Scintilla {
 
-struct CharacterRange final {
+struct CharacterRangeFull final {
 	Position cpMin;
 	Position cpMax;
 };
 
-struct TextRange final {
-	CharacterRange chrg;
+struct TextRangeFull final {
+	CharacterRangeFull chrg;
 	char *lpstrText;
 };
 
-struct TextToFind final {
-	CharacterRange chrg;
+struct TextToFindFull final {
+	CharacterRangeFull chrg;
 	const char *lpstrText;
-	CharacterRange chrgText;
+	CharacterRangeFull chrgText;
 };
 
 using SurfaceID = void *;
@@ -37,12 +37,12 @@ struct Rectangle final {
 
 /* This structure is used in printing. Not needed by most client code. */
 
-struct RangeToFormat final {
+struct RangeToFormatFull final {
 	SurfaceID hdc;
 	SurfaceID hdcTarget;
 	Rectangle rc;
 	Rectangle rcPage;
-	CharacterRange chrg;
+	CharacterRangeFull chrg;
 };
 
 struct NotifyHeader final {

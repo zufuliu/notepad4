@@ -101,8 +101,8 @@ NP2_inline BOOL SciCall_GetReadOnly(void) {
 	return (BOOL)SciCall(SCI_GETREADONLY, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_GetTextRange(struct Sci_TextRange *tr) {
-	return SciCall(SCI_GETTEXTRANGE, 0, (LPARAM)tr);
+NP2_inline Sci_Position SciCall_GetTextRangeFull(struct Sci_TextRangeFull *tr) {
+	return SciCall(SCI_GETTEXTRANGEFULL, 0, (LPARAM)tr);
 }
 
 NP2_inline void SciCall_AddText(Sci_Position length, const char *text) {
@@ -129,8 +129,8 @@ NP2_inline int SciCall_GetCharAt(Sci_Position position) {
 	return (int)SciCall(SCI_GETCHARAT, position, 0);
 }
 
-NP2_inline int SciCall_GetStyleAt(Sci_Position position) {
-	return (int)SciCall(SCI_GETSTYLEAT, position, 0);
+NP2_inline int SciCall_GetStyleIndexAt(Sci_Position position) {
+	return (int)SciCall(SCI_GETSTYLEINDEXAT, position, 0);
 }
 
 NP2_inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) {
@@ -192,8 +192,8 @@ NP2_inline Sci_Position SciCall_ReplaceTargetRE(Sci_Position length, const char 
 	return SciCall(SCI_REPLACETARGETRE, length, (LPARAM)text);
 }
 
-NP2_inline Sci_Position SciCall_FindText(int searchFlags, struct Sci_TextToFind *ft) {
-	return SciCall(SCI_FINDTEXT, searchFlags, (LPARAM)ft);
+NP2_inline Sci_Position SciCall_FindTextFull(int searchFlags, struct Sci_TextToFindFull *ft) {
+	return SciCall(SCI_FINDTEXTFULL, searchFlags, (LPARAM)ft);
 }
 
 NP2_inline Sci_Position SciCall_ReplaceTargetEx(BOOL regex, Sci_Position length, const char *text) {
@@ -432,7 +432,7 @@ NP2_inline Sci_Position SciCall_CountCharacters(Sci_Position start, Sci_Position
 	return SciCall(SCI_COUNTCHARACTERS, start, end);
 }
 
-NP2_inline void SciCall_CountCharactersAndColumns(struct Sci_TextToFind *ft) {
+NP2_inline void SciCall_CountCharactersAndColumns(struct Sci_TextToFindFull *ft) {
 	SciCall(SCI_COUNTCHARACTERSANDCOLUMNS, 0, (LPARAM)ft);
 }
 
@@ -1212,8 +1212,8 @@ NP2_inline void SciCall_UsePopUp(int popUpMode) {
 
 // Printing
 
-NP2_inline Sci_Position SciCall_FormatRange(BOOL draw, struct Sci_RangeToFormat *fr) {
-	return SciCall(SCI_FORMATRANGE, draw, (LPARAM)fr);
+NP2_inline Sci_Position SciCall_FormatRangeFull(BOOL draw, struct Sci_RangeToFormatFull *fr) {
+	return SciCall(SCI_FORMATRANGEFULL, draw, (LPARAM)fr);
 }
 
 NP2_inline void SciCall_SetPrintMagnification(int magnification) {

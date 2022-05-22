@@ -294,7 +294,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	}
 
 	// We must substract the physical margins from the printable area
-	struct Sci_RangeToFormat frPrint;
+	struct Sci_RangeToFormatFull frPrint;
 	frPrint.hdc = hdc;
 	frPrint.hdcTarget = hdc;
 	frPrint.rc.left		= rectMargins.left - rectPhysMargins.left;
@@ -382,7 +382,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		frPrint.chrg.cpMin = lengthPrinted;
 		frPrint.chrg.cpMax = lengthDoc;
 
-		lengthPrinted = SciCall_FormatRange(printPage, &frPrint);
+		lengthPrinted = SciCall_FormatRangeFull(printPage, &frPrint);
 
 		if (printPage) {
 			SetTextColor(hdc, RGB(0, 0, 0));
@@ -422,7 +422,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		}
 	}
 
-	SciCall_FormatRange(FALSE, nullptr);
+	SciCall_FormatRangeFull(FALSE, nullptr);
 
 	EndDoc(hdc);
 	DeleteDC(hdc);

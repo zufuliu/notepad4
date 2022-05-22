@@ -1867,14 +1867,18 @@ void Editor::Paint(Surface *surfaceWindow, PRectangle rcArea) {
 // This is mostly copied from the Paint method but with some things omitted
 // such as the margin markers, line numbers, selection and caret
 // Should be merged back into a combined Draw method.
-Sci::Position Editor::FormatRange(bool draw, const RangeToFormat *pfr) {
-	if (!pfr || !wMain.GetID()) {
+Sci::Position Editor::FormatRange([[maybe_unused]] Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) {
+	if (!lParam || !wMain.GetID()) {
 		return 0;
 	}
 
+	const bool draw = wParam != 0;
+	void *const ptr = PtrFromSPtr(lParam);
+	// FormatRangeFull
+	RangeToFormatFull *pfr = static_cast<RangeToFormatFull *>(ptr);
 	AutoSurface surface(pfr->hdc, this, true);
 	AutoSurface surfaceMeasure(pfr->hdcTarget, this, true);
-	return view.FormatRange(draw, pfr, surface, surfaceMeasure, *this, vs);
+	return view.FormatRange(draw, pfr->chrg, pfr->rc, surface, surfaceMeasure, *this, vs);
 }
 
 long Editor::TextWidth(uptr_t style, const char *text) {
@@ -4185,12 +4189,12 @@ std::unique_ptr<CaseFolder> Editor::CaseFolderForEncoding() {
  * Search of a text in the document, in the given range.
  * @return The position of the found text, -1 if not found.
  */
-Sci::Position Editor::FindText(
+Sci::Position Editor::FindTextFull(
 	uptr_t wParam,		///< Search modes : @c FindOption::MatchCase, @c FindOption::WholeWord,
 	///< @c FindOption::WordStart, @c FindOption::RegExp or @c FindOption::Posix.
-	sptr_t lParam) {	///< @c TextToFind structure: The text to search for in the given range.
+	sptr_t lParam) {	///< @c TextToFindFull structure: The text to search for in the given range.
 
-	TextToFind *ft = static_cast<TextToFind *>(PtrFromSPtr(lParam));
+	TextToFindFull *ft = static_cast<TextToFindFull *>(PtrFromSPtr(lParam));
 	Sci::Position lengthFound = strlen(ft->lpstrText);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
@@ -6327,18 +6331,19 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			return static_cast<int>(pt.y);
 		}
 
-	case Message::FindText:
-		return FindText(wParam, lParam);
+	case Message::FindTextFull:
+		return FindTextFull(wParam, lParam);
 
-	case Message::GetTextRange: {
+	case Message::GetTextRangeFull: {
 			if (lParam == 0)
 				return 0;
-			TextRange *tr = static_cast<TextRange *>(PtrFromSPtr(lParam));
+			TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam));
 			Sci::Position cpMax = tr->chrg.cpMax;
 			if (cpMax == -1)
 				cpMax = pdoc->Length();
 			PLATFORM_ASSERT(cpMax <= pdoc->Length());
 			Sci::Position len = cpMax - tr->chrg.cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
+			PLATFORM_ASSERT(len >= 0);
 			pdoc->GetCharRange(tr->lpstrText, tr->chrg.cpMin, len);
 			// Spec says copied text is terminated with a NUL
 			tr->lpstrText[len] = '\0';
@@ -6350,8 +6355,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		Redraw();
 		break;
 
-	case Message::FormatRange:
-		return FormatRange(wParam != 0, static_cast<RangeToFormat *>(PtrFromSPtr(lParam)));
+	case Message::FormatRangeFull:
+		return FormatRange(iMessage, wParam, lParam);
 
 	case Message::GetMarginLeft:
 		return vs.leftMarginWidth;
@@ -6574,11 +6579,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetPrintWrapMode:
 		return static_cast<sptr_t>(view.printParameters.wrapState);
 
-	case Message::GetStyleAt:
-		if (PositionFromUPtr(wParam) >= pdoc->Length())
-			return 0;
-		else
-			return pdoc->StyleIndexAt(PositionFromUPtr(wParam));
+	case Message::GetStyleIndexAt:
+		return pdoc->StyleIndexAt(PositionFromUPtr(wParam));
 
 	case Message::Redo:
 		Redo();
@@ -6595,7 +6597,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetStyledText: {
 			if (lParam == 0)
 				return 0;
-			TextRange *tr = static_cast<TextRange *>(PtrFromSPtr(lParam));
+			TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam));
 			Sci::Position iPlace = 0;
 			for (Sci::Position iChar = tr->chrg.cpMin; iChar < tr->chrg.cpMax; iChar++) {
 				tr->lpstrText[iPlace++] = pdoc->CharAt(iChar);

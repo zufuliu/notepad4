@@ -571,7 +571,7 @@ static inline BOOL IsPrintfFormatSpecifier(int ch) {
 
 static bool IsEscapeCharOrFormatSpecifier(Sci_Position before, int ch, int chPrev, int style, bool punctuation) {
 	// style for chPrev, style for ch is zero on typing
-	const int stylePrev = SciCall_GetStyleAt(before);
+	const int stylePrev = SciCall_GetStyleIndexAt(before);
 	if (stylePrev == 0) {
 		return false;
 	}
@@ -722,7 +722,7 @@ static HtmlTextBlock GetCurrentHtmlTextBlockEx(int iLexer, int iCurrentStyle) {
 
 static HtmlTextBlock GetCurrentHtmlTextBlock(int iLexer) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
+	const int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	return GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 }
 
@@ -782,15 +782,15 @@ static void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char pre
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
 	const Sci_Position iDocLen = SciCall_GetLength();
 	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX | (bIgnoreCase ? 0 : SCFIND_MATCHCASE);
-	struct Sci_TextToFind ft = { { 0, iDocLen }, pFind, { 0, 0 } };
+	struct Sci_TextToFindFull ft = { { 0, iDocLen }, pFind, { 0, 0 } };
 
-	Sci_Position iPosFind = SciCall_FindText(findFlag, &ft);
+	Sci_Position iPosFind = SciCall_FindTextFull(findFlag, &ft);
 	HANDLE timer = idleTaskTimer;
 	WaitableTimer_Set(timer, autoCompletionConfig.dwScanWordsTimeout);
 
 	while (iPosFind >= 0 && iPosFind < iDocLen && WaitableTimer_Continue(timer)) {
 		Sci_Position wordEnd = iPosFind + iRootLen;
-		const int style = SciCall_GetStyleAt(wordEnd - 1);
+		const int style = SciCall_GetStyleIndexAt(wordEnd - 1);
 		wordEnd = ft.chrgText.cpMax;
 		if (iPosFind != iCurrentPos && !IsWordStyleToIgnore(style)) {
 			// find all word after '::', '->', '.' and '-'
@@ -813,7 +813,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char pre
 					if (IsAutoCompletionWordCharacter(chNext)) {
 						wordEnd += 2;
 					}
-				} else if (ch == '.' || (ch == '-' && style == SciCall_GetStyleAt(wordEnd))) {
+				} else if (ch == '.' || (ch == '-' && style == SciCall_GetStyleIndexAt(wordEnd))) {
 					if (IsAutoCompletionWordCharacter(chNext)) {
 						++wordEnd;
 					}
@@ -841,8 +841,8 @@ static void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char pre
 			if (wordEnd - iPosFind >= iRootLen) {
 				char *pWord = pWList->wordBuf + NP2DefaultPointerAlignment;
 				BOOL bChanged = FALSE;
-				struct Sci_TextRange tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
-				int wordLength = (int)SciCall_GetTextRange(&tr);
+				struct Sci_TextRangeFull tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
+				int wordLength = (int)SciCall_GetTextRangeFull(&tr);
 
 				const Sci_Position before = SciCall_PositionBefore(iPosFind);
 				if (before + 1 == iPosFind) {
@@ -918,7 +918,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char pre
 		}
 
 		ft.chrg.cpMin = wordEnd;
-		iPosFind = SciCall_FindText(findFlag, &ft);
+		iPosFind = SciCall_FindTextFull(findFlag, &ft);
 	}
 
 	if (pFind != onStack) {
@@ -1320,7 +1320,7 @@ void EditCompleteUpdateConfig(void) {
 
 static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	const int iCurrentStyle = SciCall_GetStyleAt(iCurrentPos);
+	const int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
 
@@ -1370,7 +1370,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 			}
 			// word after escape character or format specifier
 			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
-				const int style = SciCall_GetStyleAt(iStartWordPos);
+				const int style = SciCall_GetStyleIndexAt(iStartWordPos);
 				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, style, FALSE)) {
 					++iStartWordPos;
 					ch = SciCall_GetCharAt(iStartWordPos);
@@ -1440,8 +1440,8 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 		pRoot = (char *)NP2HeapAlloc(iCurrentPos - iStartWordPos + 1);
 	}
 
-	struct Sci_TextRange tr = { { iStartWordPos, iCurrentPos }, pRoot };
-	SciCall_GetTextRange(&tr);
+	struct Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
+	SciCall_GetTextRangeFull(&tr);
 	iRootLen = (int)strlen(pRoot);
 
 #if 0
@@ -1459,7 +1459,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 		int iPrevStyle = 0;
 		if (ch == ':' && chPrev != ':') {
 			Sci_Position iPos = SciCall_WordStartPosition(iStartWordPos - 1, FALSE);
-			iPrevStyle = SciCall_GetStyleAt(iPos);
+			iPrevStyle = SciCall_GetStyleIndexAt(iPos);
 		}
 
 		const AddWordResult result = AutoC_AddSpecWord(pWList, iCurrentStyle, iPrevStyle, ch, chPrev);
@@ -1638,7 +1638,7 @@ BOOL EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 		SciCall_EnsureStyledTo(iPos + 1);
 #endif
 		// TODO: retry when style not matched
-		if (SciCall_GetStyleAt(pos) == SciCall_GetStyleAt(iPos)) {
+		if (SciCall_GetStyleIndexAt(pos) == SciCall_GetStyleIndexAt(iPos)) {
 			// check whether next close brace already matched
 			return pos == 0 || SciCall_BraceMatchNext(iPos, SciCall_PositionBefore(pos)) < 0;
 		}
@@ -1650,8 +1650,8 @@ void EditAutoCloseBraceQuote(int ch) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	const int chNext = SciCall_GetCharAt(iCurPos);
-	const int iPrevStyle = SciCall_GetStyleAt(iCurPos - 2);
-	const int iNextStyle = SciCall_GetStyleAt(iCurPos);
+	const int iPrevStyle = SciCall_GetStyleIndexAt(iCurPos - 2);
+	const int iNextStyle = SciCall_GetStyleIndexAt(iCurPos);
 
 	if (iPrevStyle != 0) {
 		int charStyle = pLexCurrent->characterLiteralStyle;
@@ -1667,7 +1667,7 @@ void EditAutoCloseBraceQuote(int ch) {
 
 		// escape sequence
 		if (ch != ',' && (chPrev != '\0' && chPrev == pLexCurrent->escapeCharacterStart)) {
-			const int style = SciCall_GetStyleAt(iCurPos - 1);
+			const int style = SciCall_GetStyleIndexAt(iCurPos - 1);
 			if (IsEscapeCharOrFormatSpecifier(iCurPos - 2, ch, chPrev, style, TRUE)) {
 				return;
 			}
@@ -1777,7 +1777,7 @@ void EditAutoCloseXMLTag(void) {
 
 	if (iSize >= 3 && autoCompletionConfig.bCloseTags) {
 		shouldAutoClose = TRUE;
-		int iCurrentStyle = SciCall_GetStyleAt(iCurPos);
+		int iCurrentStyle = SciCall_GetStyleIndexAt(iCurPos);
 		if ((pLexCurrent->lexerAttr & LexerAttr_AngleBracketGeneric)
 			&& (iCurrentStyle == 0 || iCurrentStyle == pLexCurrent->operatorStyle || iCurrentStyle == pLexCurrent->operatorStyle2)) {
 			shouldAutoClose = FALSE;
@@ -1795,7 +1795,7 @@ void EditAutoCloseXMLTag(void) {
 				iCurrentLinePos++;
 			}
 			if (ch == '#') {
-				iCurrentStyle = SciCall_GetStyleAt(iCurrentLinePos);
+				iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentLinePos);
 				if (iCurrentStyle == preprocessor) {
 					shouldAutoClose = FALSE;
 				}
@@ -1804,8 +1804,8 @@ void EditAutoCloseXMLTag(void) {
 	}
 
 	if (shouldAutoClose) {
-		struct Sci_TextRange tr = { { iStartPos, iCurPos }, tchBuf };
-		SciCall_GetTextRange(&tr);
+		struct Sci_TextRangeFull tr = { { iStartPos, iCurPos }, tchBuf };
+		SciCall_GetTextRangeFull(&tr);
 
 		if (tchBuf[iSize - 2] != '/') {
 			char tchIns[516] = "</";
@@ -2095,7 +2095,7 @@ void EditAutoIndent(void) {
 		for (pPos = pLineBuf; *pPos; pPos++) {
 			if (!IsASpaceOrTab(*pPos)) {
 				if (indent == AutoIndentType_None && IsAlpha(*pPos)) { // indent on keywords
-					const int style = SciCall_GetStyleAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
+					const int style = SciCall_GetStyleIndexAt(SciCall_PositionFromLine(iCurLine - 1) + iIndentLen);
 					if (style != 0 && style == pLexCurrent->autoIdentWordStyle) {
 						endPart = EditKeywordIndent(pLexCurrent, pPos, &indent);
 					}
