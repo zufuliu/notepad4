@@ -720,23 +720,25 @@ void ScintillaWin::Finalise() noexcept {
 
 bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
 	HMONITOR monitor = ::MonitorFromWindow(MainHWND(), MONITOR_DEFAULTTONEAREST);
-	if (!force && monitor == hCurrentMonitor && defaultRenderingParams) {
+	if (!force && monitor == hCurrentMonitor && (technology == Technology::Default || defaultRenderingParams)) {
 		return false;
 	}
 
 	IDWriteRenderingParams *monitorRenderingParams = nullptr;
 	IDWriteRenderingParams *customClearTypeRenderingParams = nullptr;
-	const HRESULT hr = pIDWriteFactory->CreateMonitorRenderingParams(monitor, &monitorRenderingParams);
-	UINT clearTypeContrast = 0;
-	if (SUCCEEDED(hr) && ::SystemParametersInfo(SPI_GETFONTSMOOTHINGCONTRAST, 0, &clearTypeContrast, 0) != 0) {
-		if (clearTypeContrast >= 1000 && clearTypeContrast <= 2200) {
-			const FLOAT gamma = static_cast<FLOAT>(clearTypeContrast) / 1000.0f;
-			pIDWriteFactory->CreateCustomRenderingParams(gamma,
-				monitorRenderingParams->GetEnhancedContrast(),
-				monitorRenderingParams->GetClearTypeLevel(),
-				monitorRenderingParams->GetPixelGeometry(),
-				monitorRenderingParams->GetRenderingMode(),
-				&customClearTypeRenderingParams);
+	if (technology != Technology::Default) {
+		const HRESULT hr = pIDWriteFactory->CreateMonitorRenderingParams(monitor, &monitorRenderingParams);
+		UINT clearTypeContrast = 0;
+		if (SUCCEEDED(hr) && ::SystemParametersInfo(SPI_GETFONTSMOOTHINGCONTRAST, 0, &clearTypeContrast, 0) != 0) {
+			if (clearTypeContrast >= 1000 && clearTypeContrast <= 2200) {
+				const FLOAT gamma = static_cast<FLOAT>(clearTypeContrast) / 1000.0f;
+				pIDWriteFactory->CreateCustomRenderingParams(gamma,
+					monitorRenderingParams->GetEnhancedContrast(),
+					monitorRenderingParams->GetClearTypeLevel(),
+					monitorRenderingParams->GetPixelGeometry(),
+					monitorRenderingParams->GetRenderingMode(),
+					&customClearTypeRenderingParams);
+			}
 		}
 	}
 
@@ -2173,10 +2175,10 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 						// Failed to load Direct2D or DirectWrite so no effect
 						return 0;
 					}
-					UpdateRenderingParams(true);
 				} else {
 					bidirectional = Bidirectional::Disabled;
 				}
+				UpdateRenderingParams(true);
 				DropRenderTarget();
 				view.bufferedDraw = technologyNew == Technology::Default;
 				technology = technologyNew;
@@ -2299,9 +2301,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_SETTINGCHANGE:
 			//printf("%s before %s\n", GetCurrentLogTime(), "WM_SETTINGCHANGE");
 			//Platform::DebugPrintf("Setting Changed\n");
-			if (technology != Technology::Default) {
-				UpdateRenderingParams(true);
-			}
+			UpdateRenderingParams(true);
 			UpdateBaseElements();
 			// Get Intellimouse scroll line parameters
 			GetIntelliMouseParameters();
@@ -2378,11 +2378,11 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
 		case WM_WINDOWPOSCHANGED:
-			if (technology != Technology::Default) {
-				if (UpdateRenderingParams(false)) {
-					DropGraphics();
-					Redraw();
-				}
+			if (UpdateRenderingParams(false)) {
+				DropGraphics();
+				Redraw();
+				// recreate toolbar after monitor changed
+				::SendMessage(::GetParent(MainHWND()), WM_THEMECHANGED, 0, 0);
 			}
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
