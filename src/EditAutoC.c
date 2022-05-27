@@ -1586,7 +1586,7 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 			}
 		}
 	} else {
-		if (pLexCurrent->noneSingleQuotedStyle && iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
+		if (iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
 			return false;
 		}
 	}

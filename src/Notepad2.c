@@ -317,6 +317,7 @@ enum StatusBarUpdateMask {
 	StatusBarUpdateMask_OVRMode = 8,
 	StatusBarUpdateMask_DocZoom = 16,
 	StatusBarUpdateMask_LineColumn = 32,
+	StatusBarUpdateMask_All = 63,
 };
 // rarely changed statusbar items
 struct CachedStatusItem {
@@ -1998,6 +1999,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
+	cachedStatusItem.updateMask = StatusBarUpdateMask_All;
 	GetString(IDS_DOCPOS, cachedStatusItem.tchDocPosFmt, COUNTOF(cachedStatusItem.tchDocPosFmt));
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
@@ -2037,7 +2039,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 }
 
 void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
-	cachedStatusItem.updateMask = UINT_MAX;
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 
 	DestroyWindow(hwndToolbar);
@@ -2082,6 +2083,10 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
+	if (!bInitDone) {
+		// ignore WM_THEMECHANGED send from WM_WINDOWPOSCHANGED
+		return;
+	}
 
 	HINSTANCE hInstance = GetWindowInstance(hwnd);
 
