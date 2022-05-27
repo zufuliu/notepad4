@@ -2178,12 +2178,12 @@ sptr_t ScintillaWin::SciMessage(Message iMessage, uptr_t wParam, sptr_t lParam) 
 				} else {
 					bidirectional = Bidirectional::Disabled;
 				}
-				UpdateRenderingParams(true);
 				DropRenderTarget();
 				view.bufferedDraw = technologyNew == Technology::Default;
 				technology = technologyNew;
 				// Invalidate all cached information including layout.
 				vs.fontsValid = false;
+				UpdateRenderingParams(true);
 				InvalidateStyleRedraw();
 			}
 		}
