@@ -1406,9 +1406,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		//	break;
 
 		case NP2LEX_CSS:
+#if defined(_MSC_VER) || !defined(__clang__)
 			NP2_static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
 			NP2_static_assert(IDM_LEXER_LESS - IDM_LEXER_CSS == 2);
 			NP2_static_assert(IDM_LEXER_HSS - IDM_LEXER_CSS == 3);
+#endif
 			dialect = np2LexLangIndex - IDM_LEXER_CSS;
 			break;
 
@@ -1425,14 +1427,18 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		} break;
 
 		case NP2LEX_MARKDOWN:
+#if defined(_MSC_VER) || !defined(__clang__)
 			NP2_static_assert(IDM_LEXER_MARKDOWN_GITLAB - IDM_LEXER_MARKDOWN_GITHUB == 1);
 			NP2_static_assert(IDM_LEXER_MARKDOWN_PANDOC - IDM_LEXER_MARKDOWN_GITHUB == 2);
+#endif
 			dialect = np2LexLangIndex - IDM_LEXER_MARKDOWN_GITHUB;
 			break;
 
 		case NP2LEX_MATLAB:
+#if defined(_MSC_VER) || !defined(__clang__)
 			NP2_static_assert(IDM_LEXER_OCTAVE - IDM_LEXER_MATLAB == 1);
 			NP2_static_assert(IDM_LEXER_SCILAB - IDM_LEXER_MATLAB == 2);
+#endif
 			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
 			break;
 
