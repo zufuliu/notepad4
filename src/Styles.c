@@ -1405,14 +1405,12 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
 		//	break;
 
-		case NP2LEX_CSS:
-#if defined(_MSC_VER) || !defined(__clang__)
+		case NP2LEX_CSS: {
 			NP2_static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
 			NP2_static_assert(IDM_LEXER_LESS - IDM_LEXER_CSS == 2);
 			NP2_static_assert(IDM_LEXER_HSS - IDM_LEXER_CSS == 3);
-#endif
 			dialect = np2LexLangIndex - IDM_LEXER_CSS;
-			break;
+		} break;
 
 		case NP2LEX_BASH:
 			dialect = np2LexLangIndex == IDM_LEXER_CSHELL;
@@ -1426,21 +1424,17 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			}
 		} break;
 
-		case NP2LEX_MARKDOWN:
-#if defined(_MSC_VER) || !defined(__clang__)
+		case NP2LEX_MARKDOWN: {
 			NP2_static_assert(IDM_LEXER_MARKDOWN_GITLAB - IDM_LEXER_MARKDOWN_GITHUB == 1);
 			NP2_static_assert(IDM_LEXER_MARKDOWN_PANDOC - IDM_LEXER_MARKDOWN_GITHUB == 2);
-#endif
 			dialect = np2LexLangIndex - IDM_LEXER_MARKDOWN_GITHUB;
-			break;
+		} break;
 
-		case NP2LEX_MATLAB:
-#if defined(_MSC_VER) || !defined(__clang__)
+		case NP2LEX_MATLAB: {
 			NP2_static_assert(IDM_LEXER_OCTAVE - IDM_LEXER_MATLAB == 1);
 			NP2_static_assert(IDM_LEXER_SCILAB - IDM_LEXER_MATLAB == 2);
-#endif
 			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
-			break;
+		} break;
 
 		case NP2LEX_APDL:
 		case NP2LEX_ABAQUS:
