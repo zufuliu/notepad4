@@ -37,6 +37,7 @@ typedef _Bool	bool;
 #define COUNTOF(ar)	_countof(ar)
 #define CSTRLEN(s)	(_countof(s) - 1)
 #endif
+#define STRSIZE(s)	(COUNTOF(s) * sizeof((s)[0]))
 
 // https://docs.microsoft.com/en-us/cpp/preprocessor/pragma-directives-and-the-pragma-keyword
 #if defined(__GNUC__) || defined(__clang__)

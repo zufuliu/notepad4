@@ -69,6 +69,9 @@ bool IsTOMLKey(StyleContext& sc, int braceCount, const WordList *kwList) {
 	if (sc.state == SCE_TOML_IDENTIFIER) {
 		char s[8];
 		sc.GetCurrentLowered(s, sizeof(s));
+#if defined(__clang__)
+		__builtin_assume(kwList != nullptr); // suppress [clang-analyzer-core.CallAndMessage]
+#endif
 		if (kwList->InList(s)) {
 			sc.ChangeState(SCE_TOML_KEYWORD);
 		}

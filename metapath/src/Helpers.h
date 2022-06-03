@@ -62,9 +62,9 @@ NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	return _wcsicmp(s1, s2) == 0;
 }
 
-#define StrCpyExW(s, t)						memcpy((s), (t), sizeof(WCHAR)*COUNTOF(t))
-#define StrEqualExW(s, t)					(memcmp((s), (t), sizeof(WCHAR)*COUNTOF(t)) == 0)
-#define StrHasPrefix(s, prefix)				(memcmp((s), (prefix), sizeof(WCHAR)*CSTRLEN(prefix)) == 0)
+#define StrCpyExW(s, t)						memcpy((s), (t), STRSIZE(t))
+#define StrEqualExW(s, t)					(memcmp((s), (t), STRSIZE(t)) == 0)
+#define StrHasPrefix(s, prefix)				(memcmp((s), (prefix), STRSIZE(prefix) - sizeof(WCHAR)) == 0)
 #define StrHasPrefixCase(s, prefix)			(_wcsnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
 #define StrHasPrefixCaseEx(s, prefix, len)	(_wcsnicmp((s), (prefix), (len)) == 0)
 

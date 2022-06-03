@@ -1,0 +1,1 @@
+@clang-tidy %1 -- --target=x86_64-w64-windows-gnu -x c++ -std=c++20 -ferror-limit=1000 -D_WIN64 -DNOMINMAX -DNDEBUG -DSTRICT_TYPED_ITEMIDS -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef -Wcomma 1>tidy.log

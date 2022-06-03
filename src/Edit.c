@@ -1308,6 +1308,18 @@ void EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) {
 	EditReplaceRange(SciCall_GetSelectionStart(), SciCall_GetSelectionEnd(), cchText, pszText);
 }
 
+static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPos) {
+	const Sci_Position len = iEndPos - iStartPos;
+	if (len <= 0) {
+		return NULL;
+	}
+
+	char *mszBuf = (char *)NP2HeapAlloc(len + 1);
+	struct Sci_TextRangeFull tr = { { iStartPos, iEndPos }, mszBuf };
+	SciCall_GetTextRangeFull(&tr);
+	return mszBuf;
+}
+
 //=============================================================================
 //
 // EditInvertCase()
@@ -7105,7 +7117,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 			++iLineEnd;
 		}
 
-		goto labelEnd;
+		return EditGetTextRange(iLineStart, iLineEnd);
 	}
 
 	struct Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
@@ -7159,16 +7171,8 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 		}
 		iStartPos = ft.chrgText.cpMax;
 	}
-	if (iLineStart >= iLineEnd) {
-		return NULL;
-	}
 
-labelEnd: {
-	char *mszSelection = (char *)NP2HeapAlloc(iLineEnd - iLineStart + 1);
-	struct Sci_TextRangeFull tr = { { iLineStart, iLineEnd }, mszSelection };
-	SciCall_GetTextRangeFull(&tr);
-	return mszSelection;
-}
+	return EditGetTextRange(iLineStart, iLineEnd);
 }
 
 extern BOOL bOpenFolderWithMetapath;
