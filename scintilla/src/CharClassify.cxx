@@ -30,14 +30,13 @@ void CharClassify::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	// Initialize all char classes to default values
 	for (int ch = 0; ch < 127; ch++) {
 		CharacterClass cc;
-		if (IsEOLChar(ch))
-			cc = CharacterClass::newLine;
-		else if (ch <= ' ')
-			cc = CharacterClass::space;
-		else if (includeWordClass && (IsAlphaNumeric(ch) || ch == '_'))
+		if (ch <= ' ') {
+			cc = IsEOLChar(ch) ? CharacterClass::newLine : CharacterClass::space;
+		} else if (includeWordClass && (IsAlphaNumeric(ch) || ch == '_')) {
 			cc = CharacterClass::word;
-		else
+		} else {
 			cc = CharacterClass::punctuation;
+		}
 		charClass[ch] = static_cast<uint8_t>(cc);
 	}
 
@@ -61,9 +60,14 @@ void CharClassify::SetCharClassesEx(const unsigned char *chars, size_t length) n
 		memset(charClass + 128, static_cast<int>(CharacterClass::word), 128);
 	} else {
 		assert(length == 32);
-		for (int i = 0; i < 128; i++) {
-			const unsigned char cc = (chars[i >> 2] >> (2 * (i & 3))) & 3;
-			charClass[i + 128] = cc;
+		uint8_t *ptr = charClass + 128;
+		for (size_t i = 0; i < length; i++) {
+			const uint8_t cc = chars[i];
+			ptr[0] = cc & 3;
+			ptr[1] = (cc >> 2) & 3;
+			ptr[2] = (cc >> 4) & 3;
+			ptr[3] = cc >> 6;
+			ptr += 4;
 		}
 	}
 }

@@ -32,12 +32,11 @@ typedef _Bool	bool;
 #elif defined(_MSC_VER)
 #define NP2_assume(expr)	__assume(expr)
 #elif defined(__GNUC__)
-#define NP2_assume(expr)	__extension__({		\
+#define NP2_assume(expr)	do {				\
 	if (!(expr)) {								\
 		__builtin_unreachable();				\
 	}											\
-	1;											\
-	})
+	} while (0)
 #else
 #define NP2_assume(expr)
 #endif
