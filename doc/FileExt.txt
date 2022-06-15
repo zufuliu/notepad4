@@ -63,6 +63,7 @@ JavaScript
 	jse				JScript Encoded File
 	jsm				JavaScript Module
 	jsx				JavaScript with JSX
+	cjs				CommonJS Module
 	mjs				ECMAScript Module
 	qs				Qt Installer Framework Script
 
@@ -515,6 +516,8 @@ TOML File
 TypeScript
 	ts
 	tsx		TypeScript with JSX
+	cts		cjs
+	mts		mjs
 
 
 VBScript

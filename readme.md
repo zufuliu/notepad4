@@ -60,7 +60,6 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [D](tools/lang/D.d), up to D language 2.0.
 	* [Dart](tools/lang/Dart.dart), up to Dart 2.12.
 	* Diff/Patch File
-	* Doxygen
 	* F#
 	* Fortran, GNU Fortran
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
