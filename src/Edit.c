@@ -5419,7 +5419,7 @@ int EditPrepareFind(char *szFind2, LPCEDITFINDREPLACE lpefr) {
 	} else if (!(searchFlags & (SCFIND_REGEXP | SCFIND_MATCHCASE))) {
 		const BOOL sensitive = IsStringCaseSensitiveA(szFind2);
 		//printf("%s sensitive=%d\n", __func__, sensitive);
-		searchFlags |= ((sensitive - 1) & SCFIND_MATCHCASE);
+		searchFlags |= ((sensitive - TRUE) & SCFIND_MATCHCASE);
 	}
 	return searchFlags;
 }
@@ -5857,9 +5857,9 @@ BOOL EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark) {
 		}
 	}
 	if (!matchCase) {
-		const BOOL sensitive = IsStringCaseSensitiveA(pszText);
+		const bool sensitive = IsStringCaseSensitiveA(pszText);
 		//printf("%s sensitive=%d\n", __func__, sensitive);
-		matchCase = sensitive ^ 1;
+		matchCase = !sensitive;
 	}
 
 	const int findFlag = (matchCase * SCFIND_MATCHCASE)

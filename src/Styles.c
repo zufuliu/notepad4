@@ -1405,16 +1405,20 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
 		//	break;
 
+		case NP2LEX_APDL:
+			dialect = 1;
+			break;
+
+		case NP2LEX_BASH:
+			dialect = np2LexLangIndex == IDM_LEXER_CSHELL;
+			break;
+
 		case NP2LEX_CSS: {
 			NP2_static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
 			NP2_static_assert(IDM_LEXER_LESS - IDM_LEXER_CSS == 2);
 			NP2_static_assert(IDM_LEXER_HSS - IDM_LEXER_CSS == 3);
 			dialect = np2LexLangIndex - IDM_LEXER_CSS;
 		} break;
-
-		case NP2LEX_BASH:
-			dialect = np2LexLangIndex == IDM_LEXER_CSHELL;
-			break;
 
 		case NP2LEX_JAVASCRIPT:
 		case NP2LEX_TYPESCRIPT: {
@@ -1435,11 +1439,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			NP2_static_assert(IDM_LEXER_SCILAB - IDM_LEXER_MATLAB == 2);
 			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
 		} break;
-
-		case NP2LEX_APDL:
-		case NP2LEX_ABAQUS:
-			dialect = rid == NP2LEX_APDL;
-			break;
 
 		// see LexCPP.cxx
 		case NP2LEX_RESOURCESCRIPT:

@@ -2487,7 +2487,7 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) {
 		// ASCII
 		ch |= 0x20; // convert to lower case
 		if (ch >= 'a' && ch <= 'z') {
-			return TRUE;
+			return true;
 		}
 		++ptr;
 	}
