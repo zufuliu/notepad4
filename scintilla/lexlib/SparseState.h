@@ -24,8 +24,9 @@ class SparseState {
 			return (position == other.position) && (value == other.value);
 		}
 	};
+
 	Sci_Position positionFirst;
-	typedef std::vector<State> stateVector;
+	using stateVector = std::vector<State>;
 	stateVector states;
 
 	typename stateVector::iterator Find(Sci_Position position) const {

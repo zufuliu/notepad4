@@ -583,8 +583,7 @@ class CaseConverter final : public ICaseConverter {
 		maxConversionLength = 6
 	};
 	struct ConversionString {
-		char conversion[maxConversionLength + 1];
-		ConversionString() noexcept : conversion{} {}
+		char conversion[maxConversionLength + 1]{};
 	};
 	// Conversions are initially store in a vector of structs but then decomposed into
 	// parallel arrays as that is about 10% faster to search.
@@ -608,7 +607,8 @@ class CaseConverter final : public ICaseConverter {
 			return character < other.character;
 		}
 	};
-	typedef std::vector<CharacterConversion> CharacterToConversion;
+
+	using CharacterToConversion = std::vector<CharacterConversion>;
 	CharacterToConversion characterToConversion;
 	// The parallel arrays
 	std::vector<int> characters;

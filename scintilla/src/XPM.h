@@ -75,7 +75,7 @@ public:
  * A collection of RGBAImage pixmaps indexed by integer id.
  */
 class RGBAImageSet final {
-	typedef std::map<int, std::unique_ptr<RGBAImage>> ImageMap;
+	using ImageMap = std::map<int, std::unique_ptr<RGBAImage>>;
 	ImageMap images;
 	mutable int height;	///< Memorize largest height of the set.
 	mutable int width;	///< Memorize largest width of the set.

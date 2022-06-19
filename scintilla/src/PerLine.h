@@ -144,7 +144,7 @@ public:
 	int Lines(Sci::Line line) const noexcept;
 };
 
-typedef std::vector<int> TabstopList;
+using TabstopList = std::vector<int>;
 
 class LineTabstops : public PerLine {
 	SplitVector<std::unique_ptr<TabstopList>> tabstops;
