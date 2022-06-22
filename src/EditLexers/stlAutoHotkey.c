@@ -136,8 +136,9 @@ static EDITSTYLE Styles_AHK[] = {
 	{ MULTI_STYLE(SCE_AHK_DIRECTIVE_SHARP, SCE_AHK_DIRECTIVE_AT, 0, 0), NP2StyleX_Directive, L"fore:#C65D09" },
 	{ SCE_AHK_CLASS, NP2StyleX_Class, L"bold; fore:#1E90FF" },
 	{ SCE_AHK_BUILTIN_FUNCTION, NP2StyleX_BuiltInFunction, L"fore:#0080C0" },
-	{ SCE_AHK_BUILTIN_VARIABLE, NP2StyleX_PredefinedVariable, L"fore:#B000B0" },
 	{ SCE_AHK_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
+	{ SCE_AHK_BUILTIN_VARIABLE, NP2StyleX_PredefinedVariable, L"fore:#B000B0" },
+	{ SCE_AHK_DYNAMIC_VARIABLE, NP2StyleX_Variable, L"fore:#808000" },
 	{ SCE_AHK_KEY, NP2StyleX_Key, L"fore:#007F7F" },
 	{ MULTI_STYLE(SCE_AHK_COMMENTLINE, SCE_AHK_COMMENTBLOCK, SCE_AHK_SECTION_COMMENT, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_AHK_STRING_SQ, SCE_AHK_STRING_DQ, SCE_AHK_HOTSTRING_VALUE, 0), NP2StyleX_String, L"fore:#008000" },
@@ -149,7 +150,6 @@ static EDITSTYLE Styles_AHK[] = {
 	{ SCE_AHK_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_AHK_LABEL, NP2StyleX_Label, L"fore:#C80000; back:#F4F4F4" },
 	{ SCE_AHK_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_AHK_DYNAMIC_VARIABLE, NP2StyleX_Variable, L"fore:#808000" },
 	{ SCE_AHK_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 

@@ -2,7 +2,6 @@ import sys
 import os.path
 import re
 #from collections import Counter
-from enum import IntFlag
 import string
 
 sys.path.append('../scintilla/scripts')
@@ -13,6 +12,7 @@ SinglyWordMap = {
 	'class': 'class',
 	'classes': 'class',
 	'properties': 'property',
+	'alias': 'alias',
 }
 
 AllKeywordAttrList = {}
@@ -1656,6 +1656,44 @@ def parse_php_api_file(path):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 		('JavaScript', JavaScriptKeywordMap['keywords'], KeywordAttr.NoAutoComp),
 		('phpdoc', keywordMap['phpdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
+def parse_powershell_api_file(path):
+	keywordMap = {'misc': []}
+	sections = read_api_file(path, '#')
+	for key, doc in sections:
+		if key in ('keywords', 'alias'):
+			keywordMap[key] = doc.split()
+		elif key == 'type':
+			items = re.findall(r'\w+', doc)
+			keywordMap[key] = items
+		elif key == 'cmdlet':
+			items = re.findall(r'^([\w\-]+)\s', doc, re.MULTILINE)
+			keywordMap[key] = items
+			# parameter
+			#items = re.findall(r'(-\w+)', doc)
+			#keywordMap['misc'].extend(items)
+		elif key == 'variables':
+			items = doc.split()
+			keywordMap[key] = [item[1:] for item in items]
+		elif key == 'misc':
+			items = re.findall(r'\w+', doc)
+			keywordMap[key].extend(items)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'type',
+		'cmdlet',
+		'alias',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('cmdlet', keywordMap['cmdlet'], KeywordAttr.MakeLower),
+		('alias', keywordMap['alias'], KeywordAttr.MakeLower),
+		('pre-defined variables', keywordMap['variables'], KeywordAttr.MakeLower | KeywordAttr.Special),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
 def parse_python_api_file(path):

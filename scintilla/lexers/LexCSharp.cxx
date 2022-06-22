@@ -140,6 +140,14 @@ constexpr bool IsCsIdentifierChar(int ch, int chNext) noexcept {
 	return IsIdentifierCharEx(ch) || IsUnicodeEscape(ch, chNext);
 }
 
+constexpr bool IsXmlCommentTagChar(int ch) noexcept {
+	return IsIdentifierChar(ch) || ch == '-' || ch ==':';
+}
+
+constexpr bool PreferArrayIndex(int ch) noexcept {
+	return ch == ')' || ch == ']' || IsIdentifierCharEx(ch);
+}
+
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_CSHARP_TASKMARKER;
 }
@@ -447,7 +455,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_CSHARP_COMMENTTAG_XML:
-			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-' || sc.ch == ':')) {
+			if (!IsXmlCommentTagChar(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 				continue;
 			}
@@ -734,7 +742,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 				} else {
 					if (kwType == KeywordType::None && sc.ch == '[') {
-						if (visibleChars == 0 || !(chPrevNonWhite == ')' || chPrevNonWhite == ']' || IsIdentifierCharEx(chPrevNonWhite))) {
+						if (visibleChars == 0 || !PreferArrayIndex(chPrevNonWhite)) {
 							kwType = KeywordType::Attribute;
 						}
 					} else if (kwType == KeywordType::Attribute && (sc.ch == '(' || sc.ch == ']')) {

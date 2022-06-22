@@ -68,7 +68,7 @@ lexerList = [
 	('NP2LEX_PASCAL', 'stlPascal.c', 'LexPascal.cxx', '', 0, None),
 	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', '', 0, None),
 	('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
-	('NP2LEX_POWERSHELL', 'stlPowerShell.c', 'LexPowerShell.cxx', '', 0, None),
+	('NP2LEX_POWERSHELL', 'stlPowerShell.c', 'LexPowerShell.cxx', 'PowerShell.ps1', 0, parse_powershell_api_file),
 	('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
 
 	('NP2LEX_RLANG', 'stlR.c', 'LexR.cxx', 'R.r', 0, parse_rlang_api_file),

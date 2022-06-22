@@ -135,6 +135,28 @@ def dump_all_css_properties(path, keyName, keyModule, keyUrl):
 	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write('\n'.join(output))
 
+def group_powershell_commands(path):
+	# group Get-Command output by module
+	commands = {}
+	with open(path, encoding='utf-8') as fd:
+		for line in fd.read().splitlines():
+			items = line.split()
+			if len(items) == 4:
+				category, name, _, module = items
+				item = category, name
+				if module in commands:
+					commands[module].append(item)
+				else:
+					commands[module] = [item]
+
+	path = os.path.splitext(path)[0] + '-sort.ps1'
+	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
+		for module, items in sorted(commands.items()):
+			fd.write(f'{{ # {module}\n')
+			for category, name in sorted(items):
+				fd.write(f'\t{category}\t\t{name}\n')
+			fd.write('}\n')
+
 #increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
 check_encoding_list('../src/EditEncoding.c')
 
