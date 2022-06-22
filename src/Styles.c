@@ -837,7 +837,7 @@ static void Style_LoadAll(BOOL bReload) {
 	if (bReload || iCustomColorLoaded != value) {
 		LPCWSTR themePath = GetStyleThemeFilePath();
 		iCustomColorLoaded = value;
-		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+		memcpy(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
 		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
 		IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
@@ -1107,7 +1107,7 @@ BOOL Style_Export(HWND hwnd) {
 
 static void Style_ResetAll(BOOL resetColor) {
 	if (resetColor) {
-		CopyMemory(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+		memcpy(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 	}
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		PEDITLEXER pLex = pLexArray[iLexer];
@@ -2317,7 +2317,7 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 		LPWSTR p = StrChr(lpszName, L'&');
 		if (p != NULL) {
 			const int len = lstrlen(p) - 1;
-			MoveMemory(p, p + 1, sizeof(WCHAR) * len);
+			memmove(p, p + 1, sizeof(WCHAR) * len);
 			p[len] = L'\0';
 		}
 #endif
@@ -3974,7 +3974,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 
 	// all general schemes
 	PEDITLEXER generalLex[GENERAL_LEXER_COUNT];
-	CopyMemory(generalLex, pLexArray + LEXER_INDEX_GENERAL, sizeof(generalLex));
+	memcpy(generalLex, pLexArray + LEXER_INDEX_GENERAL, sizeof(generalLex));
 	qsort(generalLex, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
 
 	iLexer = 0;
@@ -4661,15 +4661,15 @@ void Style_ConfigDlg(HWND hwnd) {
 	param.bApply = FALSE;
 	LPWSTR extBackup = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	param.extBackup = extBackup;
-	CopyMemory(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
-	CopyMemory(param.colorBackup, customColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+	memcpy(extBackup, g_AllFileExtensions, ALL_FILE_EXTENSIONS_BYTE_SIZE);
+	memcpy(param.colorBackup, customColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 	LPCWSTR backupGlobal = NULL;
 	LPCWSTR backupCurrent = NULL;
 	for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 		const LPCEDITLEXER pLex = pLexArray[iLexer];
 		const UINT iStyleBufSize = EDITSTYLE_BufferSize(pLex->iStyleCount);
 		LPWSTR szStyleBuf = (LPWSTR)NP2HeapAlloc(iStyleBufSize);
-		CopyMemory(szStyleBuf, pLex->szStyleBuf, iStyleBufSize);
+		memcpy(szStyleBuf, pLex->szStyleBuf, iStyleBufSize);
 		param.styleBackup[iLexer] = szStyleBuf;
 		if (pLex == pLexGlobal) {
 			backupGlobal = szStyleBuf;
@@ -4680,11 +4680,11 @@ void Style_ConfigDlg(HWND hwnd) {
 
 	if (IDCANCEL == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLECONFIG), GetParent(hwnd), Style_ConfigDlgProc, (LPARAM)(&param))) {
 		// Restore Styles
-		CopyMemory(g_AllFileExtensions, param.extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
-		CopyMemory(customColor, param.colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
+		memcpy(g_AllFileExtensions, param.extBackup, ALL_FILE_EXTENSIONS_BYTE_SIZE);
+		memcpy(customColor, param.colorBackup, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			PEDITLEXER pLex = pLexArray[iLexer];
-			CopyMemory(pLex->szStyleBuf, param.styleBackup[iLexer], EDITSTYLE_BufferSize(pLex->iStyleCount));
+			memcpy(pLex->szStyleBuf, param.styleBackup[iLexer], EDITSTYLE_BufferSize(pLex->iStyleCount));
 		}
 	} else {
 		if (!(fStylesModified & STYLESMODIFIED_FILE_EXT)) {

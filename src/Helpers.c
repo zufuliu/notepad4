@@ -2275,7 +2275,7 @@ void StripMnemonic(LPWSTR pszMenu) {
 			}
 
 			len -= offset;
-			MoveMemory(prev, p + offset, sizeof(WCHAR) * len);
+			memmove(prev, p + offset, sizeof(WCHAR) * len);
 			prev[len] = L'\0';
 			break;
 		}
@@ -2306,7 +2306,7 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 	lpNumberStr += 3;
 	do {
 		c -= 3;
-		MoveMemory(c + 1, c, sizeof(WCHAR) * (end - c + 1));
+		memmove(c + 1, c, sizeof(WCHAR) * (end - c + 1));
 		*c = sep;
 		++end;
 	} while (c > lpNumberStr);
@@ -2728,7 +2728,7 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 		return NULL;
 	}
 
-	CopyMemory((BYTE *)pTemplate, pRsrcMem, (size_t)dwTemplateSize);
+	memcpy((BYTE *)pTemplate, pRsrcMem, (size_t)dwTemplateSize);
 	FreeResource(hRsrcMem);
 
 	WCHAR wchFaceName[LF_FACESIZE];
@@ -2758,11 +2758,11 @@ DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hIns
 
 	const WORD nCtrl = bDialogEx ? (WORD)((DLGTEMPLATEEX *)pTemplate)->cDlgItems : (WORD)pTemplate->cdit;
 	if (cbNew != cbOld && nCtrl > 0) {
-		MoveMemory(pNewControls, pOldControls, (size_t)(dwTemplateSize - (pOldControls - (BYTE *)pTemplate)));
+		memmove(pNewControls, pOldControls, (size_t)(dwTemplateSize - (pOldControls - (BYTE *)pTemplate)));
 	}
 
 	*(WORD *)pb = wFontSize;
-	MoveMemory(pb + cbFontAttr, pbNew, (size_t)(cbNew - cbFontAttr));
+	memmove(pb + cbFontAttr, pbNew, (size_t)(cbNew - cbFontAttr));
 
 	return pTemplate;
 }

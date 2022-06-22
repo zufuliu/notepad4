@@ -189,7 +189,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 		node = pWList->nodeCache + pWList->cacheIndex++;
 		node->word = pWList->buffer + pWList->offset;
 
-		CopyMemory(node->word, pWord, len);
+		memcpy(node->word, pWord, len);
 #if NP2_AUTOC_USE_STRING_ORDER
 		node->order = order;
 #endif
@@ -235,7 +235,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 		struct WordNode *node = pWList->nodeCache + pWList->cacheIndex++;
 		node->word = pWList->buffer + pWList->offset;
 
-		CopyMemory(node->word, pWord, len);
+		memcpy(node->word, pWord, len);
 #if NP2_AUTOC_USE_STRING_ORDER
 		node->order = order;
 #endif
@@ -288,7 +288,7 @@ char* WordList_GetList(struct WordList *pWList) {
 			root = root->left;
 		} else {
 			root = path[--top];
-			CopyMemory(buf, root->word, root->len);
+			memcpy(buf, root->word, root->len);
 			buf += root->len;
 			*buf++ = '\n'; // the separator char
 			root = root->right;
@@ -874,7 +874,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char pre
 					pWord[wordLength] = '\0';
 				}
 				if (bChanged) {
-					CopyMemory(pWList->wordBuf, pWord, wordLength + 1);
+					memcpy(pWList->wordBuf, pWord, wordLength + 1);
 					pWord = pWList->wordBuf;
 				}
 

@@ -617,7 +617,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		if (pcds->dwData == DATA_METAPATH_PATHARG) {
 			LPWSTR lpsz = (LPWSTR)NP2HeapAlloc(pcds->cbData);
-			CopyMemory(lpsz, pcds->lpData, pcds->cbData);
+			memcpy(lpsz, pcds->lpData, pcds->cbData);
 
 			DisplayPath(lpsz, IDS_ERR_CMDLINE);
 
@@ -2202,7 +2202,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				WCHAR tch[256];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
-				CopyMemory(&lpTbNotify->tbButton, &tbbMainWnd[lpTbNotify->iItem], sizeof(TBBUTTON));
+				memcpy(&lpTbNotify->tbButton, &tbbMainWnd[lpTbNotify->iItem], sizeof(TBBUTTON));
 				return TRUE;
 			}
 		}
@@ -2536,7 +2536,7 @@ void LoadSettings(void) {
 
 	strValue = IniSectionGetValue(pIniSection, L"ToolbarButtons");
 	if (StrIsEmpty(strValue)) {
-		CopyMemory(tchToolbarButtons, DefaultToolbarButtons, sizeof(DefaultToolbarButtons));
+		memcpy(tchToolbarButtons, DefaultToolbarButtons, sizeof(DefaultToolbarButtons));
 	} else {
 		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}

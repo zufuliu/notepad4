@@ -1462,7 +1462,7 @@ typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
 			pszTextW = (LPCWSTR)bag.prgResultRanges[0].pData;
 			if (dwServicesCount != 0 && pszTextW[0] != L'\0') {
 				LPWSTR pszConvW = (LPWSTR)NP2HeapAlloc(dwDataSize + sizeof(WCHAR));
-				CopyMemory(pszConvW, pszTextW, dwDataSize);
+				memcpy(pszConvW, pszTextW, dwDataSize);
 				*pszMappedW = pszConvW;
 			}
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
@@ -3516,10 +3516,10 @@ void EditToggleLineComments(LPCWSTR pwszComment, BOOL bInsertAtStart) {
 					const int tabWidth = fvCurFile.iTabWidth;
 					if (!fvCurFile.bTabsAsSpaces && tabWidth > 0) {
 						tab = iCommentCol / tabWidth;
-						FillMemory(tchComment, tab, '\t');
+						memset(tchComment, '\t', tab);
 						count -= tab * tabWidth;
 					}
-					FillMemory(tchComment + tab, count, ' ');
+					memset(tchComment + tab, ' ', count);
 					strcat(tchComment, mszComment);
 					SciCall_InsertText(iCommentPos, tchComment);
 				}
@@ -3613,7 +3613,7 @@ void EditPadWithSpaces(BOOL bSkipEmpty, BOOL bNoUndoGroup) {
 
 	char *pmszPadStr = (char *)NP2HeapAlloc((iMaxColumn + 1) * sizeof(char));
 	if (pmszPadStr) {
-		FillMemory(pmszPadStr, NP2HeapSize(pmszPadStr), ' ');
+		memset(pmszPadStr, ' ', iMaxColumn);
 
 		if (!bNoUndoGroup) {
 			SciCall_BeginUndoAction();
@@ -4956,7 +4956,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		} else {
 			SetDlgPos(hwnd, xFindReplaceDlgSave, yFindReplaceDlgSave);
 			bSwitchedFindReplace = 0;
-			CopyMemory(lpefr, &efrSave, sizeof(EDITFINDREPLACE));
+			memcpy(lpefr, &efrSave, sizeof(EDITFINDREPLACE));
 		}
 
 		if (bFindReplaceTransparentMode) {
@@ -5267,7 +5267,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			bSwitchedFindReplace |= 2;
 			LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)GetWindowLongPtr(hwnd, DWLP_USER);
 			GetDlgPos(hwnd, &xFindReplaceDlgSave, &yFindReplaceDlgSave);
-			CopyMemory(&efrSave, lpefr, sizeof(EDITFINDREPLACE));
+			memcpy(&efrSave, lpefr, sizeof(EDITFINDREPLACE));
 			GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8));
 			if (!GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
 				strcpy(lpefr->szReplaceUTF8, "");

@@ -1293,11 +1293,11 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 
 	// Init new ITEMIDLIST
 	if (pidl1) {
-		CopyMemory((char *)pidl, (const char *)pidl1, cb1);
+		memcpy((char *)pidl, (const char *)pidl1, cb1);
 	}
 
 	// pidl2 can't be NULL here
-	CopyMemory((char *)pidl + cb1, (const char *)pidl2, cb2);
+	memcpy((char *)pidl + cb1, (const char *)pidl2, cb2);
 
 	return pidl;
 }
