@@ -2,6 +2,7 @@ import sys
 import os.path
 import re
 import json
+import unicodedata
 
 def increase_style_resource_id_value(path, delta=100):
 	with open(path, encoding='utf-8', newline='\n') as fd:
@@ -82,6 +83,39 @@ def check_encoding_list(path):
 		if len(lines) > 1:
 			print('same code page:', page, lines)
 
+def diff_iso_encoding(path):
+	# https://encoding.spec.whatwg.org/#names-and-labels
+	encodingList = [
+		('cp874', 'iso-8859-11'),
+		('cp1252', 'iso-8859-1'),
+		('cp1254', 'iso-8859-9'),
+	]
+
+	diffList = {}
+	for ansi, encoding in encodingList:
+		diff = []
+		for code in range(256):
+			src = bytes([code])
+			try:
+				ch1 = src.decode(ansi)
+			except UnicodeDecodeError:
+				ch1 = ''
+			try:
+				ch2 = src.decode(encoding)
+			except UnicodeDecodeError:
+				ch2 = ''
+			if ch1 != ch2:
+				diff.append((code, ch1, ch2))
+		diffList[(ansi, encoding)] = diff
+
+	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
+		for key, diff in diffList.items():
+			fd.write(f'{key[0]} {key[1]}\n')
+			for code, ch1, ch2 in diff:
+				cat1 = unicodedata.category(ch1) if ch1 else ''
+				cat2 = unicodedata.category(ch2) if ch2 else ''
+				fd.write(f'\t{code:02X} {ch1}/{cat1}\t\t\t{ch2}/{cat2}\n')
+
 def dump_all_css_properties(path, keyName, keyModule, keyUrl):
 	with open(path, encoding='utf-8') as fd:
 		properties = json.load(fd)
@@ -159,6 +193,7 @@ def group_powershell_commands(path):
 
 #increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
 check_encoding_list('../src/EditEncoding.c')
+#diff_iso_encoding('iso-8859.log')
 
 # https://www.w3.org/Style/CSS/all-properties.en.json
 #dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')

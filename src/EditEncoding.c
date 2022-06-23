@@ -45,9 +45,19 @@ typedef struct NP2EncodingGroup {
 // https://www.iana.org/assignments/character-sets/character-sets.xhtml
 // https://en.wikipedia.org/wiki/Windows_code_page
 // https://en.wikipedia.org/wiki/ISO/IEC_8859
-// https://encoding.spec.whatwg.org/#names-and-labels
 // https://dev.mysql.com/doc/refman/8.0/en/charset-charsets.html
 // https://docs.python.org/3/library/codecs.html#standard-encodings
+
+// https://encoding.spec.whatwg.org/#names-and-labels
+static inline UINT GetEncodingAlias(UINT codePage) {
+	// prefer Windows ANSI code page to corresponding ISO-8859 encoding
+	// as the former contains more graphic characters in [0x80, 0xff].
+	switch (codePage) {
+	case 28591:	return 1252; // ISO 8859-1
+	case 28599: return 1254; // ISO 8859-9
+	default: return codePage;
+	}
+}
 
 // encoding list, check with tools/Misc.py after make changes
 NP2ENCODING mEncoding[] = {
@@ -2328,6 +2338,11 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 			iEncoding = preferedEncoding;
 		} else if (sniffedEncoding >= CPI_FIRST) {
 			iEncoding = sniffedEncoding;
+			const UINT codePage = mEncoding[iEncoding].uCodePage;
+			const UINT page = GetEncodingAlias(codePage);
+			if (codePage != page) {
+				iEncoding = Encoding_GetIndex(page);
+			}
 		} else if (bLoadASCIIasUTF8) {
 			iEncoding = CPI_UTF8;
 		} else if (!Encoding_IsUnicode(iDefaultEncoding)) {
@@ -2363,6 +2378,12 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		if (iEncoding > CPI_DEFAULT && (mEncoding[iEncoding].uFlags & NCP_8BIT) != 0) {
 			const UINT codePage = mEncoding[iEncoding].uCodePage;
 			if (IsValidMultiByte(codePage, multiData, multiLen)) {
+				if (i == 2) {
+					const UINT page = GetEncodingAlias(codePage);
+					if (page != codePage && IsValidMultiByte(page, multiData, multiLen)) {
+						iEncoding = Encoding_GetIndex(page);
+					}
+				}
 				return iEncoding;
 			}
 		}
