@@ -88,7 +88,7 @@ static inline UINT GetLocaleMeasurement() noexcept {
 //
 extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	PRINTDLG pdlg;
-	ZeroMemory(&pdlg, sizeof(PRINTDLG));
+	memset(&pdlg, 0, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
 	pdlg.hwndOwner = GetParent(hwnd);
 	pdlg.hInstance = g_hInstance;
@@ -534,7 +534,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 	DLGTEMPLATE *pDlgTemplate = LoadThemedDialogTemplate(MAKEINTRESOURCE(IDD_PAGESETUP), g_hInstance);
 
 	PAGESETUPDLG pdlg;
-	ZeroMemory(&pdlg, sizeof(PAGESETUPDLG));
+	memset(&pdlg, 0, sizeof(PAGESETUPDLG));
 	pdlg.lStructSize = sizeof(PAGESETUPDLG);
 	pdlg.Flags = PSD_ENABLEPAGESETUPHOOK | PSD_ENABLEPAGESETUPTEMPLATEHANDLE;
 	pdlg.lpfnPageSetupHook = PageSetupHook;

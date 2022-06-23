@@ -837,7 +837,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	History_UpdateToolbar(&mHistory, hwndToolbar, IDT_HISTORY_BACK, IDT_HISTORY_FORWARD);
 	// ToolTip with Current Directory
 	TOOLINFO ti;
-	ZeroMemory(&ti, sizeof(TOOLINFO));
+	memset(&ti, 0, sizeof(TOOLINFO));
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_IDISHWND;
 	ti.hwnd = hwnd;
@@ -1256,7 +1256,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		SHELLEXECUTEINFO sei;
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
@@ -1297,7 +1297,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		StrCatBuff(szParam, szTmp, COUNTOF(szParam));
 
 		SHELLEXECUTEINFO sei;
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
@@ -1342,7 +1342,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		GetString(IDS_NEWFILE, szTitle, COUNTOF(szTitle));
 
 		OPENFILENAME ofn;
-		ZeroMemory(&ofn, sizeof(OPENFILENAME));
+		memset(&ofn, 0, sizeof(OPENFILENAME));
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFilter = szFilter;
@@ -1439,7 +1439,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		PrepareFilterStr(szFilter);
 
 		OPENFILENAME ofn;
-		ZeroMemory(&ofn, sizeof(OPENFILENAME));
+		memset(&ofn, 0, sizeof(OPENFILENAME));
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.hwndOwner = hwnd;
 		ofn.lpstrFilter = szFilter;
@@ -1507,11 +1507,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		}
 
 		WCHAR tch[512];
-		ZeroMemory(tch, sizeof(tch));
+		memset(tch, 0, sizeof(tch));
 		lstrcpy(tch, dli.szFileName);
 
 		SHFILEOPSTRUCT shfos;
-		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
+		memset(&shfos, 0, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = FO_DELETE;
 		shfos.pFrom = tch;
@@ -1680,7 +1680,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_EDITFAVORITES: {
 		SHELLEXECUTEINFO sei;
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
@@ -2729,7 +2729,7 @@ void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	if (pIniSectionBuf == NULL) {
 		pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	} else {
-		ZeroMemory(pIniSectionBuf, NP2HeapSize(pIniSectionBuf));
+		memset(pIniSectionBuf, 0, NP2HeapSize(pIniSectionBuf));
 	}
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
@@ -3487,7 +3487,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 	}
 
 	NOTIFYICONDATA nid;
-	ZeroMemory(&nid, sizeof(NOTIFYICONDATA));
+	memset(&nid, 0, sizeof(NOTIFYICONDATA));
 	nid.cbSize = sizeof(NOTIFYICONDATA);
 	nid.hWnd = hwnd;
 	nid.uID = 0;
@@ -3626,7 +3626,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 			PathAbsoluteFromApp(szTmp, szFile, TRUE);
 
 			SHELLEXECUTEINFO sei;
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = 0;
 			sei.hwnd = hwndMain;
@@ -3676,7 +3676,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		PathAbsoluteFromApp(szTmp, szFile, TRUE);
 
 		SHELLEXECUTEINFO sei;
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwndMain;

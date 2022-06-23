@@ -249,7 +249,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 			PrepareFilterStr(szFilter);
 
 			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
+			memset(&ofn, 0, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -306,7 +306,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					ExtractFirstArgument(arg1, arg1, arg2);
 
 					SHELLEXECUTEINFO sei;
-					ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+					memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 					sei.cbSize = sizeof(SHELLEXECUTEINFO);
 					sei.fMask = 0;
 					sei.hwnd = hwnd;
@@ -374,7 +374,7 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		// from WinUser.h: GetComboBoxInfo() since Windows Vista, but CB_GETCOMBOBOXINFO since Windows XP.
 		COMBOBOXINFO cbi;
-		ZeroMemory(&cbi, sizeof(COMBOBOXINFO));
+		memset(&cbi, 0, sizeof(COMBOBOXINFO));
 		cbi.cbSize = sizeof(COMBOBOXINFO);
 		if (SendMessage(hwndGoto, CB_GETCOMBOBOXINFO, 0, (LPARAM)(&cbi))) {
 			SHAutoComplete(cbi.hwndItem, SHACF_FILESYSTEM);
@@ -571,7 +571,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		case IDC_COPY_BUILD_INFO:
 			if (LOWORD(wParam) == IDC_COPY_BUILD_INFO) {
 				OSVERSIONINFOW version;
-				ZeroMemory(&version, sizeof(version));
+				memset(&version, 0, sizeof(version));
 				version.dwOSVersionInfoSize = sizeof(version);
 				NP2_COMPILER_WARNING_PUSH
 				NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
@@ -906,7 +906,7 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 			break;
 
 		case IDC_COLOR_PICK1:
-			ZeroMemory(&cc, sizeof(CHOOSECOLOR));
+			memset(&cc, 0, sizeof(CHOOSECOLOR));
 
 			cc.lStructSize = sizeof(CHOOSECOLOR);
 			cc.hwndOwner = hwnd;
@@ -924,7 +924,7 @@ static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARA
 			break;
 
 		case IDC_COLOR_PICK2:
-			ZeroMemory(&cc, sizeof(CHOOSECOLOR));
+			memset(&cc, 0, sizeof(CHOOSECOLOR));
 
 			cc.lStructSize = sizeof(CHOOSECOLOR);
 			cc.hwndOwner = hwnd;
@@ -1178,7 +1178,7 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 			PrepareFilterStr(szFilter);
 
 			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
+			memset(&ofn, 0, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -1288,8 +1288,8 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	PROPSHEETPAGE psp[4];
 	INT_PTR nResult;
 
-	ZeroMemory(&psh, sizeof(PROPSHEETHEADER));
-	ZeroMemory(psp, sizeof(psp));
+	memset(&psh, 0, sizeof(PROPSHEETHEADER));
+	memset(psp, 0, sizeof(psp));
 
 	psp[0].dwSize      = sizeof(PROPSHEETPAGE);
 	psp[0].dwFlags     = PSP_DLGINDIRECT;
@@ -1642,7 +1642,7 @@ BOOL RenameFileDlg(HWND hwnd) {
 		WCHAR tchDestination[MAX_PATH + 4];
 
 		SHFILEOPSTRUCT shfos;
-		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
+		memset(&shfos, 0, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = FO_RENAME;
 		shfos.pFrom = tchSource;
@@ -1655,8 +1655,8 @@ BOOL RenameFileDlg(HWND hwnd) {
 		lstrcat(szFullDestination, fod.szDestination);
 
 		// Double null terminated strings are essential!!!
-		ZeroMemory(tchSource, sizeof(tchSource));
-		ZeroMemory(tchDestination, sizeof(tchDestination));
+		memset(tchSource, 0, sizeof(tchSource));
+		memset(tchDestination, 0, sizeof(tchDestination));
 		lstrcpy(tchSource, dli.szFileName);
 		lstrcpy(tchDestination, szFullDestination);
 
@@ -1815,7 +1815,7 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		WCHAR tchDestination[MAX_PATH + 4];
 
 		SHFILEOPSTRUCT shfos;
-		ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
+		memset(&shfos, 0, sizeof(SHFILEOPSTRUCT));
 		shfos.hwnd = hwnd;
 		shfos.wFunc = fod.wFunc;
 		shfos.pFrom = tchSource;
@@ -1830,8 +1830,8 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		ExpandEnvironmentStringsEx(fod.szDestination, COUNTOF(fod.szDestination));
 
 		// Double null terminated strings are essential!!!
-		ZeroMemory(tchSource, sizeof(tchSource));
-		ZeroMemory(tchDestination, sizeof(tchDestination));
+		memset(tchSource, 0, sizeof(tchSource));
+		memset(tchDestination, 0, sizeof(tchDestination));
 		lstrcpy(tchSource, dli.szFileName);
 		lstrcpy(tchDestination, fod.szDestination);
 
@@ -2007,17 +2007,17 @@ BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
 		WCHAR szDestination[MAX_PATH + 4];
-		ZeroMemory(szDestination, sizeof(szDestination));
+		memset(szDestination, 0, sizeof(szDestination));
 		const BOOL link = PathGetLnkPath(dliOpenWith.szFileName, szDestination);
 		if (link && PathIsDirectory(szDestination)) {
 			WCHAR szSource[MAX_PATH + 4];
-			ZeroMemory(szSource, sizeof(szSource));
+			memset(szSource, 0, sizeof(szSource));
 			lstrcpy(szSource, lpdliParam->szFileName);
 
 			PathAppend(szDestination, PathFindFileName(szSource));
 
 			SHFILEOPSTRUCT shfos;
-			ZeroMemory(&shfos, sizeof(SHFILEOPSTRUCT));
+			memset(&shfos, 0, sizeof(SHFILEOPSTRUCT));
 			shfos.hwnd = hwnd;
 			shfos.wFunc = FO_COPY;
 			shfos.pFrom = szSource;
@@ -2037,7 +2037,7 @@ BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 		}
 		else {
 			SHELLEXECUTEINFO sei;
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = 0;
 			sei.hwnd = hwnd;
@@ -2322,7 +2322,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		HWND hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
 
 		TOOLINFO ti;
-		ZeroMemory(&ti, sizeof(TOOLINFO));
+		memset(&ti, 0, sizeof(TOOLINFO));
 		ti.cbSize   = sizeof(TOOLINFO);
 		ti.uFlags   = TTF_IDISHWND | TTF_SUBCLASS;
 		ti.hwnd     = hwnd;
@@ -2336,7 +2336,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 		// ToolTip for find window button
 		//hwndToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 0, 0, 0, 0, 0, hwnd, NULL, g_hInstance, NULL);
-		//ZeroMemory(&ti, sizeof(TOOLINFO));
+		//memset(&ti, 0, sizeof(TOOLINFO));
 		//ti.cbSize   = sizeof(TOOLINFO);
 		//ti.uFlags   = TTF_IDISHWND | TTF_SUBCLASS;
 		//ti.hwnd     = hwnd;
@@ -2439,7 +2439,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			PrepareFilterStr(szFilter);
 
 			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
+			memset(&ofn, 0, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner   = hwnd;
 			ofn.lpstrFilter = szFilter;

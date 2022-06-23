@@ -1246,7 +1246,7 @@ BOOL EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 				NP2HeapFree(lpData);
 				lpData = (char *)NP2HeapAlloc(NP2HeapSize(lpDataWide) * 2);
 			} else {
-				ZeroMemory(lpData, NP2HeapSize(lpData));
+				memset(lpData, 0, NP2HeapSize(lpData));
 				cbData = WideCharToMultiByte(uCodePage, WC_NO_BEST_FIT_CHARS, lpDataWide, cbDataWide, lpData, (int)NP2HeapSize(lpData), NULL, &bCancelDataLoss);
 			}
 
@@ -1437,7 +1437,7 @@ typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
 	PMAPPING_SERVICE_INFO prgServices = NULL;
 	DWORD dwServicesCount = 0;
 
-	ZeroMemory(&enumOptions, sizeof(MAPPING_ENUM_OPTIONS));
+	memset(&enumOptions, 0, sizeof(MAPPING_ENUM_OPTIONS));
 	enumOptions.Size = sizeof(MAPPING_ENUM_OPTIONS);
 	enumOptions.pGuid = (GUID *)pGuid;
 
@@ -1449,7 +1449,7 @@ typedef HRESULT (WINAPI *MappingFreePropertyBagSig)(PMAPPING_PROPERTY_BAG pBag);
 	dwServicesCount = 0;
 	if (SUCCEEDED(hr)) {
 		MAPPING_PROPERTY_BAG bag;
-		ZeroMemory(&bag, sizeof (MAPPING_PROPERTY_BAG));
+		memset(&bag, 0, sizeof(MAPPING_PROPERTY_BAG));
 		bag.Size = sizeof (MAPPING_PROPERTY_BAG);
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 		hr = pfnMappingRecognizeText(prgServices, pszTextW, cchTextW, 0, NULL, &bag);
@@ -7023,7 +7023,7 @@ void EditSelectionAction(int action) {
 	}
 
 	SHELLEXECUTEINFO sei;
-	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+	memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
 	sei.fMask = SEE_MASK_NOZONECHECKS;
 	sei.hwnd = NULL;
@@ -7071,7 +7071,7 @@ void TryBrowseFile(HWND hwnd, LPCWSTR pszFile, BOOL bWarn) {
 	}
 
 	SHELLEXECUTEINFO sei;
-	ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+	memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
 	sei.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOZONECHECKS;
@@ -7361,7 +7361,7 @@ void EditOpenSelection(OpenSelectionType type) {
 			}
 
 			SHELLEXECUTEINFO sei;
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = SEE_MASK_NOZONECHECKS;
 			sei.hwnd = hwndMain;
@@ -7435,7 +7435,7 @@ extern int iWordWrapMode;
 extern int iLongLinesLimitG;
 
 void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
-	ZeroMemory(lpfv, sizeof(FILEVARS));
+	memset(lpfv, 0, sizeof(FILEVARS));
 	// see FileVars_Apply() for other Tab settings.
 	tabSettings.schemeUseGlobalTabSettings = TRUE;
 	lpfv->bTabIndents = tabSettings.bTabIndents;

@@ -727,7 +727,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 	WCHAR wchBuf[256];
 	TVINSERTSTRUCT tvis;
-	ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
+	memset(&tvis, 0, sizeof(TVINSERTSTRUCT));
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
 	HTREEITEM hParent = TVI_FIRST;
@@ -826,7 +826,7 @@ BOOL Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet) {
 	HTREEITEM hTreeNode = TreeView_GetSelection(hwnd);
 	if (hTreeNode != NULL) {
 		TVITEM item;
-		ZeroMemory(&item, sizeof(item));
+		memset(&item, 0, sizeof(item));
 		item.mask = TVIF_PARAM;
 		item.hItem = hTreeNode;
 		TreeView_GetItem(hwnd, &item);
@@ -855,7 +855,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 	WCHAR wchBuf[256];
 	LVITEM lvi;
-	ZeroMemory(&lvi, sizeof(LVITEM));
+	memset(&lvi, 0, sizeof(LVITEM));
 	lvi.mask = LVIF_PARAM | LVIF_TEXT | LVIF_IMAGE;
 	lvi.pszText = wchBuf;
 
@@ -931,7 +931,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 	WCHAR wchBuf[256];
 	COMBOBOXEXITEM cbei;
-	ZeroMemory(&cbei, sizeof(COMBOBOXEXITEM));
+	memset(&cbei, 0, sizeof(COMBOBOXEXITEM));
 
 	cbei.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_LPARAM;
 	cbei.pszText = wchBuf;

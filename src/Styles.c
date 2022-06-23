@@ -893,7 +893,7 @@ void Style_Save(void) {
 
 	// file extensions
 	if (fStylesModified & STYLESMODIFIED_FILE_EXT) {
-		ZeroMemory(pIniSectionBuf, cbIniSection);
+		memset(pIniSectionBuf, 0, cbIniSection);
 		pIniSection->next = pIniSectionBuf;
 		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
@@ -921,7 +921,7 @@ void Style_Save(void) {
 
 	// Custom colors
 	if (fStylesModified & STYLESMODIFIED_COLOR) {
-		ZeroMemory(pIniSectionBuf, cbIniSection);
+		memset(pIniSectionBuf, 0, cbIniSection);
 		pIniSection->next = pIniSectionBuf;
 		for (unsigned int i = 0; i < MAX_CUSTOM_COLOR_COUNT; i++) {
 			const COLORREF color = customColor[i];
@@ -943,7 +943,7 @@ void Style_Save(void) {
 				continue;
 			}
 
-			ZeroMemory(pIniSectionBuf, cbIniSection);
+			memset(pIniSectionBuf, 0, cbIniSection);
 			pIniSection->next = pIniSectionBuf;
 			IniSectionSetBoolEx(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle, pLex->rid != NP2LEX_TEXTFILE);
 			const UINT iStyleCount = pLex->iStyleCount;
@@ -975,7 +975,7 @@ BOOL Style_Import(HWND hwnd) {
 	PrepareFilterStr(szFilter);
 
 	OPENFILENAME ofn;
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize	= sizeof(OPENFILENAME);
 	ofn.hwndOwner	= hwnd;
 	ofn.lpstrFilter	= szFilter;
@@ -1051,7 +1051,7 @@ BOOL Style_Export(HWND hwnd) {
 	PrepareFilterStr(szFilter);
 
 	OPENFILENAME ofn;
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner	= hwnd;
 	ofn.lpstrFilter = szFilter;
@@ -1084,7 +1084,7 @@ BOOL Style_Export(HWND hwnd) {
 
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
-			ZeroMemory(pIniSectionBuf, cchIniSection);
+			memset(pIniSectionBuf, 0, cchIniSection);
 			pIniSection->next = pIniSectionBuf;
 			IniSectionSetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 			const UINT iStyleCount = pLex->iStyleCount;
@@ -3450,8 +3450,8 @@ BOOL Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultSt
 	COLORREF rgb;
 	WCHAR tch[MAX_STYLE_VALUE_LENGTH];
 
-	ZeroMemory(&cf, sizeof(CHOOSEFONT));
-	ZeroMemory(&lf, sizeof(LOGFONT));
+	memset(&cf, 0, sizeof(CHOOSEFONT));
+	memset(&lf, 0, sizeof(LOGFONT));
 
 	// Map lpszStyle to LOGFONT
 	if (Style_StrGetFontEx(lpszStyle, tch, COUNTOF(tch), bDefaultStyle)) {
@@ -3564,7 +3564,7 @@ void Style_SetDefaultFont(HWND hwnd, BOOL bCode) {
 //
 BOOL Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle) {
 	CHOOSECOLOR cc;
-	ZeroMemory(&cc, sizeof(CHOOSECOLOR));
+	memset(&cc, 0, sizeof(CHOOSECOLOR));
 
 	COLORREF iRGBResult;
 	if (!Style_StrGetColor(bFore, lpszStyle, &iRGBResult)) {
@@ -3854,7 +3854,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, 
 #endif
 
 	TVINSERTSTRUCT tvis;
-	ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
+	memset(&tvis, 0, sizeof(TVINSERTSTRUCT));
 
 	tvis.hParent = hParent;
 	tvis.hInsertAfter = hInsertAfter;
@@ -3913,7 +3913,7 @@ void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags) {
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
 	LVITEM lvi;
-	ZeroMemory(&lvi, sizeof(LVITEM));
+	memset(&lvi, 0, sizeof(LVITEM));
 
 	lvi.mask = LVIF_IMAGE | LVIF_PARAM | LVIF_TEXT;
 	lvi.iItem = ListView_GetItemCount(hwnd);
@@ -4006,7 +4006,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 	WCHAR szTitle[128];
 
 	TVINSERTSTRUCT tvis;
-	ZeroMemory(&tvis, sizeof(TVINSERTSTRUCT));
+	memset(&tvis, 0, sizeof(TVINSERTSTRUCT));
 	tvis.item.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_STATE;
 	tvis.item.pszText = szTitle;
 	tvis.item.iImage = shfi.iIcon;
@@ -4018,7 +4018,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, BOOL withStyles, BOOL 
 
 	// remove checkbox for group folder and Text File
 	TVITEM item;
-	ZeroMemory(&item, sizeof(item));
+	memset(&item, 0, sizeof(item));
 	item.mask = TVIF_STATE;
 	item.state = 0;
 	item.stateMask = TVIS_STATEIMAGEMASK;
@@ -4256,7 +4256,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 					}
 				} else {
 					TVITEM item;
-					ZeroMemory(&item, sizeof(item));
+					memset(&item, 0, sizeof(item));
 					item.mask = TVIF_PARAM;
 					item.hItem = hParent;
 					TreeView_GetItem(hwndTV, &item);
@@ -4740,7 +4740,7 @@ static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) {
 	HTREEITEM hTreeNode = TreeView_GetSelection(hwndTV);
 	if (hTreeNode != NULL) {
 		TVITEM item;
-		ZeroMemory(&item, sizeof(item));
+		memset(&item, 0, sizeof(item));
 		item.mask = TVIF_PARAM;
 		item.hItem = hTreeNode;
 		TreeView_GetItem(hwndTV, &item);
@@ -4751,7 +4751,7 @@ static PEDITLEXER Lexer_GetFromTreeView(HWND hwndTV) {
 
 static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hTreeNode) {
 	TVITEM item;
-	ZeroMemory(&item, sizeof(item));
+	memset(&item, 0, sizeof(item));
 	item.mask = TVIF_PARAM;
 	item.hItem = hTreeNode;
 	TreeView_GetItem(hwndTV, &item);
@@ -4842,7 +4842,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 
 static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDraggingNode, HTREEITEM htiTarget) {
 	TVITEM item;
-	ZeroMemory(&item, sizeof(item));
+	memset(&item, 0, sizeof(item));
 	item.mask = TVIF_PARAM;
 	item.hItem = hDraggingNode;
 	TreeView_GetItem(hwndTV, &item);
@@ -4916,7 +4916,7 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 	int count = 0;
 
 	TVITEM item;
-	ZeroMemory(&item, sizeof(item));
+	memset(&item, 0, sizeof(item));
 	item.mask = TVIF_PARAM;
 
 	HTREEITEM hTreeNode = TreeView_GetChild(hwndTV, hFavoriteNode);

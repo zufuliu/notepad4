@@ -825,7 +825,7 @@ BOOL DirList_IsFileSelected(HWND hwnd) {
 //  Create a valid DL_FILTER structure
 //
 void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter) {
-	ZeroMemory(pdlf, sizeof(DL_FILTER));
+	memset(pdlf, 0, sizeof(DL_FILTER));
 	if (StrIsEmpty(lpszFileSpec) || StrEqualExW(lpszFileSpec, L"*.*")) {
 		return;
 	}
@@ -920,7 +920,7 @@ int DriveBox_Fill(HWND hwnd) {
 	ComboBox_ResetContent(hwnd);
 
 	COMBOBOXEXITEM cbei;
-	ZeroMemory(&cbei, sizeof(COMBOBOXEXITEM));
+	memset(&cbei, 0, sizeof(COMBOBOXEXITEM));
 	cbei.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_LPARAM;
 	cbei.pszText = LPSTR_TEXTCALLBACK;
 	cbei.cchTextMax = MAX_PATH;

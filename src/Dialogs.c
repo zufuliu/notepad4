@@ -359,7 +359,7 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 		case IDC_COPY_BUILD_INFO:
 			if (LOWORD(wParam) == IDC_COPY_BUILD_INFO) {
 				OSVERSIONINFOW version;
-				ZeroMemory(&version, sizeof(version));
+				memset(&version, 0, sizeof(version));
 				version.dwOSVersionInfoSize = sizeof(version);
 				NP2_COMPILER_WARNING_PUSH
 				NP2_IGNORE_WARNING_DEPRECATED_DECLARATIONS
@@ -455,7 +455,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			PrepareFilterStr(szFilter);
 
 			OPENFILENAME ofn;
-			ZeroMemory(&ofn, sizeof(OPENFILENAME));
+			memset(&ofn, 0, sizeof(OPENFILENAME));
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hwnd;
 			ofn.lpstrFilter = szFilter;
@@ -518,7 +518,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				}
 
 				SHELLEXECUTEINFO sei;
-				ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+				memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 				sei.cbSize = sizeof(SHELLEXECUTEINFO);
 				sei.fMask = 0;
 				sei.hwnd = hwnd;
@@ -716,7 +716,7 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 		}
 
 		SHELLEXECUTEINFO sei;
-		ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 		sei.cbSize = sizeof(SHELLEXECUTEINFO);
 		sei.fMask = 0;
 		sei.hwnd = hwnd;
@@ -999,7 +999,7 @@ static DWORD WINAPI FileMRUIconThread(LPVOID lpParam) {
 	int iItem = 0;
 
 	LV_ITEM lvi;
-	ZeroMemory(&lvi, sizeof(LV_ITEM));
+	memset(&lvi, 0, sizeof(LV_ITEM));
 
 	while (iItem < iMaxItem && BackgroundWorker_Continue(worker)) {
 		lvi.mask = LVIF_TEXT;
@@ -1152,7 +1152,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 					WCHAR tch[MAX_PATH];
 
 					LV_ITEM lvi;
-					ZeroMemory(&lvi, sizeof(LV_ITEM));
+					memset(&lvi, 0, sizeof(LV_ITEM));
 					lvi.mask = LVIF_TEXT;
 					lvi.pszText = tch;
 					lvi.cchTextMax = COUNTOF(tch);
@@ -1232,7 +1232,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			ListView_DeleteAllItems(hwndLV);
 
 			LV_ITEM lvi;
-			ZeroMemory(&lvi, sizeof(LV_ITEM));
+			memset(&lvi, 0, sizeof(LV_ITEM));
 			lvi.mask = LVIF_TEXT | LVIF_IMAGE;
 
 			SHFILEINFO shfi;
@@ -1265,7 +1265,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			if (ListView_GetSelectedCount(hwndLV)) {
 				LV_ITEM lvi;
-				ZeroMemory(&lvi, sizeof(LV_ITEM));
+				memset(&lvi, 0, sizeof(LV_ITEM));
 
 				lvi.mask = LVIF_TEXT;
 				lvi.pszText = tch;

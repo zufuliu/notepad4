@@ -755,7 +755,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, BOOL bIgnoreCase, char pre
 	char onStack[256];
 	char *pFind;
 	if (iRootLen * 2 + 32 < (int)sizeof(onStack)) {
-		ZeroMemory(onStack, sizeof(onStack));
+		memset(onStack, 0, sizeof(onStack));
 		pFind = onStack;
 	} else {
 		pFind = (char *)NP2HeapAlloc(iRootLen * 2 + 32);
@@ -1443,7 +1443,7 @@ static BOOL EditCompleteWordCore(int iCondition, BOOL autoInsert) {
 	char onStack[128];
 	char *pRoot;
 	if (iCurrentPos - iStartWordPos + 1 < (Sci_Position)sizeof(onStack)) {
-		ZeroMemory(onStack, sizeof(onStack));
+		memset(onStack, 0, sizeof(onStack));
 		pRoot = onStack;
 	} else {
 		pRoot = (char *)NP2HeapAlloc(iCurrentPos - iStartWordPos + 1);
@@ -2110,7 +2110,7 @@ void EditAutoIndent(void) {
 					}
 				}
 				if (indent != AutoIndentType_None) {
-					ZeroMemory(pPos, iPrevLineLength - iIndentLen);
+					memset(pPos, 0, iPrevLineLength - iIndentLen);
 				}
 				*pPos = '\0';
 				break;

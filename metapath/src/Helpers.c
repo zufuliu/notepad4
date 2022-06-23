@@ -1341,7 +1341,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect) {
 			hr = SHOpenFolderAndSelectItems(pidl, 1, (LPCITEMIDLIST *)(&pidl), 0);
 #else
 			SHELLEXECUTEINFO sei;
-			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
+			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			sei.fMask = SEE_MASK_IDLIST;
@@ -1679,7 +1679,7 @@ BOOL ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 //
 //
 void History_Init(PHISTORY ph) {
-	ZeroMemory(ph, sizeof(HISTORY));
+	memset(ph, 0, sizeof(HISTORY));
 	ph->iCurItem = -1;
 }
 
@@ -1799,7 +1799,7 @@ void MRU_Destroy(LPMRULIST pmru) {
 		}
 	}
 
-	ZeroMemory(pmru, sizeof(MRULIST));
+	memset(pmru, 0, sizeof(MRULIST));
 	NP2HeapFree(pmru);
 }
 
@@ -1995,7 +1995,7 @@ BOOL GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize) {
 
 	if (!bSucceed) {
 		NONCLIENTMETRICS ncm;
-		ZeroMemory(&ncm, sizeof(ncm));
+		memset(&ncm, 0, sizeof(ncm));
 		ncm.cbSize = sizeof(NONCLIENTMETRICS);
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		if (!IsVistaAndAbove()) {
