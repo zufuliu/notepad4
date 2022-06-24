@@ -1051,7 +1051,7 @@ def BuildLexerCommentString():
 				line_comment_string = line_comment_string[0]
 			if isinstance(line_comment_string, str):
 				start = config.get('line_comment_at_line_start', False)
-				argument = 'TRUE' if start else 'FALSE'
+				argument = 'true' if start else 'false'
 				start = escape_c_string(line_comment_string)
 				code = (f'{indent}EditToggleLineComments(L"{start}", {argument});', indent + 'break;', '')
 				commentLine[rid] = code

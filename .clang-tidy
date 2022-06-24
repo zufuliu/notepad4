@@ -29,6 +29,7 @@ Checks: >
     -readability-magic-numbers,
     -readability-suspicious-call-argument,
     -readability-uppercase-literal-suffix,
+    -misc-confusable-identifiers,
     -misc-non-private-member-variables-in-classes,
 
 WarningsAsErrors: ''

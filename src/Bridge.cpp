@@ -86,7 +86,7 @@ static inline UINT GetLocaleMeasurement() noexcept {
 //
 // EditPrint() - Code from SciTEWin::Print()
 //
-extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
+extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	PRINTDLG pdlg;
 	memset(&pdlg, 0, sizeof(PRINTDLG));
 	pdlg.lStructSize = sizeof(PRINTDLG);
@@ -117,7 +117,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	}
 #endif
 	if (!PrintDlg(&pdlg)) {
-		return TRUE; // False means error...
+		return true; // False means error...
 	}
 
 	hDevMode = pdlg.hDevMode;
@@ -252,7 +252,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		if (fontFooter) {
 			DeleteObject(fontFooter);
 		}
-		return FALSE;
+		return false;
 	}
 
 	// Get current date...
@@ -318,10 +318,10 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	// Show wait cursor...
 	BeginWaitCursor();
 
-	BOOL printEmpty = lengthPrinted == lengthDoc;
+	bool printEmpty = lengthPrinted == lengthDoc;
 	while (lengthPrinted < lengthDoc || printEmpty) {
-		printEmpty = FALSE;
-		const BOOL printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
+		printEmpty = false;
+		const bool printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
 		WCHAR tchNum[32];
 		_ltow(pageNum, tchNum, 10);
 		FormatNumberStr(tchNum);
@@ -422,7 +422,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		}
 	}
 
-	SciCall_FormatRangeFull(FALSE, nullptr);
+	SciCall_FormatRangeFull(false, nullptr);
 
 	EndDoc(hdc);
 	DeleteDC(hdc);
@@ -439,7 +439,7 @@ extern "C" BOOL EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	// Remove wait cursor...
 	EndWaitCursor();
 
-	return TRUE;
+	return true;
 }
 
 //=============================================================================

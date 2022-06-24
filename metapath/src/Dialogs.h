@@ -33,11 +33,11 @@ int MsgBox(UINT uType, UINT uIdMsg, ...);
 #define MsgBoxWarn(uType, uIdMsg, ...)		MsgBox(MB_ICONEXCLAMATION | (uType), (uIdMsg), ##__VA_ARGS__)
 #define MsgBoxAsk(uType, uIdMsg, ...)		MsgBox(MB_ICONQUESTION | (uType), (uIdMsg), ##__VA_ARGS__)
 
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase);
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase);
 #else
-BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase);
 #endif
 
 void RunDlg(HWND hwnd);
@@ -47,10 +47,10 @@ void OpenHelpLink(HWND hwnd, int cmd);
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance);
 
-BOOL GetFilterDlg(HWND hwnd);
-BOOL RenameFileDlg(HWND hwnd);
-BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc);
-BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
-BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
+bool GetFilterDlg(HWND hwnd);
+bool RenameFileDlg(HWND hwnd);
+bool CopyMoveDlg(HWND hwnd, UINT *wFunc);
+bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam);
+bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir);
 
 INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);

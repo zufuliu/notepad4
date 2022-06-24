@@ -234,7 +234,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 // GetDirectory()
 //
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	WCHAR szTitle[256];
 	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
@@ -260,10 +260,10 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -482,13 +482,13 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		break;
 
 		case IDC_COMMANDLINE: {
-			BOOL bEnableOK = FALSE;
+			bool bEnableOK = false;
 			WCHAR args[MAX_PATH];
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, args, MAX_PATH)) {
 				if (ExtractFirstArgument(args, args, NULL)) {
 					if (StrNotEmpty(args)) {
-						bEnableOK = TRUE;
+						bEnableOK = true;
 					}
 				}
 			}
@@ -500,7 +500,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		case IDOK: {
 			WCHAR arg1[MAX_PATH];
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, arg1, MAX_PATH)) {
-				BOOL bQuickExit = FALSE;
+				bool bQuickExit = false;
 				WCHAR arg2[MAX_PATH];
 
 				ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
@@ -508,7 +508,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 				if (StrCaseEqual(arg1, L"notepad2") || StrCaseEqual(arg1, L"notepad2.exe")) {
 					GetModuleFileName(NULL, arg1, COUNTOF(arg1));
-					bQuickExit = TRUE;
+					bQuickExit = true;
 				}
 
 				WCHAR wchDirectory[MAX_PATH] = L"";
@@ -702,7 +702,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 //
 // OpenWithDlg()
 //
-BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
+bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 	DLITEM dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
@@ -734,9 +734,9 @@ BOOL OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 
 		ShellExecuteEx(&sei);
 
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -879,16 +879,16 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //
 // FavoritesDlg()
 //
-BOOL FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
+bool FavoritesDlg(HWND hwnd, LPWSTR lpstrFile) {
 	DLITEM dliFavorite;
 	dliFavorite.mask = DLI_FILENAME;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FAVORITES), hwnd, FavoritesDlgProc, (LPARAM)&dliFavorite)) {
 		lstrcpyn(lpstrFile, dliFavorite.szFileName, MAX_PATH);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -961,7 +961,7 @@ static INT_PTR CALLBACK AddToFavDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 //
 // AddToFavDlg()
 //
-BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
+bool AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 	WCHAR pszName[MAX_PATH];
 	lstrcpy(pszName, lpszName);
 
@@ -970,12 +970,12 @@ BOOL AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 	if (iResult == IDOK) {
 		if (PathCreateFavLnk(pszName, lpszTarget, tchFavoritesDir)) {
 			MsgBoxInfo(MB_OK, IDS_FAV_SUCCESS);
-			return TRUE;
+			return true;
 		}
 		MsgBoxWarn(MB_OK, IDS_FAV_FAILURE);
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -1243,7 +1243,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			WCHAR tch[MAX_PATH];
 			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
 				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
-				PathAbsoluteFromApp(tch, tch, TRUE);
+				PathAbsoluteFromApp(tch, tch, true);
 				lvi.iItem = i;
 				lvi.pszText = tch;
 				ListView_InsertItem(hwndLV, &lvi);
@@ -1313,7 +1313,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 // FileMRUDlg()
 //
 //
-BOOL FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
+bool FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FILEMRU), hwnd, FileMRUDlgProc, (LPARAM)lpstrFile);
 	return iResult == IDOK;
 }
@@ -1369,7 +1369,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 //
 // ChangeNotifyDlg()
 //
-BOOL ChangeNotifyDlg(HWND hwnd) {
+bool ChangeNotifyDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_CHANGENOTIFY), hwnd, ChangeNotifyDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1425,7 +1425,7 @@ static INT_PTR CALLBACK ColumnWrapDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 //
 // ColumnWrapDlg()
 //
-BOOL ColumnWrapDlg(HWND hwnd) {
+bool ColumnWrapDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COLUMNWRAP), hwnd, ColumnWrapDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1521,7 +1521,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // WordWrapSettingsDlg()
 //
-BOOL WordWrapSettingsDlg(HWND hwnd) {
+bool WordWrapSettingsDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WORDWRAP), hwnd, WordWrapSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1586,7 +1586,7 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 //
 // LongLineSettingsDlg()
 //
-BOOL LongLineSettingsDlg(HWND hwnd) {
+bool LongLineSettingsDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_LONGLINES), hwnd, LongLineSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1597,7 +1597,7 @@ BOOL LongLineSettingsDlg(HWND hwnd) {
 //
 //
 static void SyncGlobalTabSettings(HWND hwnd) {
-	const BOOL useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
+	const bool useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
 	if (useGlobal) {
 		WCHAR wch[16];
 		GetDlgItemText(hwnd, IDC_GLOBAL_TAB_WIDTH, wch, COUNTOF(wch));
@@ -1616,7 +1616,7 @@ static void SyncGlobalTabSettings(HWND hwnd) {
 }
 
 static void SyncSchemeTabSettings(HWND hwnd) {
-	const BOOL useScheme = IsButtonChecked(hwnd, IDC_FILE_USE_SCHEME_TAB);
+	const bool useScheme = IsButtonChecked(hwnd, IDC_FILE_USE_SCHEME_TAB);
 	if (useScheme) {
 		WCHAR wch[16];
 		GetDlgItemText(hwnd, IDC_SCHEME_TAB_WIDTH, wch, COUNTOF(wch));
@@ -1730,7 +1730,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				break;
 			}
 
-			const BOOL useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
+			const bool useGlobal = IsButtonChecked(hwnd, IDC_SCHEME_USE_GLOBAL_TAB);
 			tabSettings.schemeUseGlobalTabSettings = useGlobal;
 			if (useGlobal) {
 				tabSettings.schemeTabWidth = tabSettings.globalTabWidth;
@@ -1818,7 +1818,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 //
 // TabSettingsDlg()
 //
-BOOL TabSettingsDlg(HWND hwnd) {
+bool TabSettingsDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_TABSETTINGS), hwnd, TabSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -1912,7 +1912,7 @@ static INT_PTR CALLBACK SelectDefEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 //
 // SelectDefEncodingDlg()
 //
-BOOL SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
+bool SelectDefEncodingDlg(HWND hwnd, int *pidREncoding) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFENCODING), hwnd, SelectDefEncodingDlgProc, (LPARAM)(pidREncoding));
 	return iResult == IDOK;
 }
@@ -1995,7 +1995,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			switch (lpnmh->code) {
 			case NM_DBLCLK: {
 				int temp = -1;
-				if (Encoding_GetFromTreeView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &temp, TRUE)) {
+				if (Encoding_GetFromTreeView(GetDlgItem(hwnd, IDC_ENCODINGLIST), &temp, true)) {
 					SendWMCommand(hwnd, IDOK);
 				}
 			}
@@ -2019,7 +2019,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		case IDOK: {
 			HWND hwndTV = GetDlgItem(hwnd, IDC_ENCODINGLIST);
 			PENCODEDLG pdd = (PENCODEDLG)GetWindowLongPtr(hwnd, DWLP_USER);
-			if (Encoding_GetFromTreeView(hwndTV, &pdd->idEncoding, FALSE)) {
+			if (Encoding_GetFromTreeView(hwndTV, &pdd->idEncoding, false)) {
 				EndDialog(hwnd, IDOK);
 			} else {
 				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)hwndTV, 1);
@@ -2045,7 +2045,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 extern int cxEncodingDlg;
 extern int cyEncodingDlg;
 
-BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
+bool SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
 	ENCODEDLG dd;
 
 	dd.bRecodeOnly = (uidLabel == IDS_SELRECT_RELOAD_ENCODING);
@@ -2061,9 +2061,9 @@ BOOL SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel) {
 
 	if (iResult == IDOK) {
 		*pidREncoding = dd.idEncoding;
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -2128,7 +2128,7 @@ static INT_PTR CALLBACK SelectDefLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM 
 //
 // SelectDefLineEndingDlg()
 //
-BOOL SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
+bool SelectDefLineEndingDlg(HWND hwnd, int *iOption) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_DEFEOLMODE), hwnd, SelectDefLineEndingDlgProc, (LPARAM)iOption);
 	return iResult == IDOK;
 }
@@ -2193,7 +2193,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	return FALSE;
 }
 
-BOOL WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
+bool WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status) {
 	MessageBeep(MB_ICONEXCLAMATION);
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_WARNLINEENDS), hwnd, WarnLineEndingDlgProc, (LPARAM)status);
 	return iResult == IDOK;
@@ -2226,7 +2226,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 	}
 }
 
-BOOL GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) {
+bool GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel) {
 	WCHAR tch[16];
 	GetDlgItemText(hwnd, nCtrId, tch, COUNTOF(tch));
 	return CRTStrToInt(tch, zoomLevel) && *zoomLevel >= SC_MIN_ZOOM_LEVEL && *zoomLevel <= SC_MAX_ZOOM_LEVEL;
@@ -2268,7 +2268,7 @@ static INT_PTR CALLBACK ZoomLevelDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 	return FALSE;
 }
 
-void ZoomLevelDlg(HWND hwnd, BOOL bBottom) {
+void ZoomLevelDlg(HWND hwnd, bool bBottom) {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_ZOOMLEVEL), hwnd, ZoomLevelDlgProc, bBottom);
 }
 
@@ -2448,7 +2448,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 	return FALSE;
 }
 
-BOOL AutoCompletionSettingsDlg(HWND hwnd) {
+bool AutoCompletionSettingsDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOCOMPLETION), hwnd, AutoCompletionSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -2511,7 +2511,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 
 		case IDC_AUTOSAVE_OPENFOLDER: {
 			LPCWSTR szFolder = AutoSave_GetDefaultFolder();
-			OpenContainingFolder(hwnd, szFolder, FALSE);
+			OpenContainingFolder(hwnd, szFolder, false);
 		} break;
 
 		case IDCANCEL:
@@ -2523,7 +2523,7 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	return FALSE;
 }
 
-BOOL AutoSaveSettingsDlg(HWND hwnd) {
+bool AutoSaveSettingsDlg(HWND hwnd) {
 	const INT_PTR iResult = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_AUTOSAVE), hwnd, AutoSaveSettingsDlgProc, 0);
 	return iResult == IDOK;
 }
@@ -2640,7 +2640,7 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execu
 	Debugger								REG_SZ		"Notepad2.exe" /z
 	UseFilter								REG_DWORD	0
 */
-extern BOOL fIsElevated;
+extern bool fIsElevated;
 extern int flagUseSystemMRU;
 extern WCHAR g_wchAppUserModelID[64];
 

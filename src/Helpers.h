@@ -95,71 +95,71 @@ NP2_inline void* align_ptr(const void *ptr) {
 
 #define unaligned_ptr(ptr, size)	(((uintptr_t)(ptr)) & ((size) - 1))
 
-NP2_inline BOOL StrIsEmptyA(LPCSTR s) {
+NP2_inline bool StrIsEmptyA(LPCSTR s) {
 	return s == NULL || *s == '\0';
 }
 
-NP2_inline BOOL StrIsEmpty(LPCWSTR s) {
+NP2_inline bool StrIsEmpty(LPCWSTR s) {
 	return s == NULL || *s == L'\0';
 }
 
-NP2_inline BOOL StrNotEmptyA(LPCSTR s) {
+NP2_inline bool StrNotEmptyA(LPCSTR s) {
 	return s != NULL && *s != '\0';
 }
 
-NP2_inline BOOL StrNotEmpty(LPCWSTR s) {
+NP2_inline bool StrNotEmpty(LPCWSTR s) {
 	return s != NULL && *s != L'\0';
 }
 
 // see scintilla/lexlib/CharacterSet.h
 
-NP2_inline BOOL IsEOLChar(int ch) {
+NP2_inline bool IsEOLChar(int ch) {
 	return ch == '\r' || ch == '\n';
 }
 
-NP2_inline BOOL IsASpace(int ch) {
+NP2_inline bool IsASpace(int ch) {
 	return ch == ' ' || (ch >= 0x09 && ch <= 0x0d);
 }
 
-NP2_inline BOOL IsASpaceOrTab(int ch) {
+NP2_inline bool IsASpaceOrTab(int ch) {
 	return ch == ' ' || ch == '\t';
 }
 
-NP2_inline BOOL IsOctalDigit(int ch) {
+NP2_inline bool IsOctalDigit(int ch) {
 	return ch >= '0' && ch <= '7';
 }
 
-NP2_inline BOOL IsLowerCase(int ch) {
+NP2_inline bool IsLowerCase(int ch) {
 	return ch >= 'a' && ch <= 'z';
 }
 
-NP2_inline BOOL IsUpperCase(int ch) {
+NP2_inline bool IsUpperCase(int ch) {
 	return ch >= 'A' && ch <= 'Z';
 }
 
-NP2_inline BOOL IsAlpha(int ch) {
+NP2_inline bool IsAlpha(int ch) {
 	return (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z');
 }
 
-NP2_inline BOOL IsAlphaNumeric(int ch) {
+NP2_inline bool IsAlphaNumeric(int ch) {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'a' && ch <= 'z')
 		|| (ch >= 'A' && ch <= 'Z');
 }
 
-NP2_inline BOOL IsPunctuation(int ch) {
+NP2_inline bool IsPunctuation(int ch) {
 	return (ch > 32 && ch < '0')
 		|| (ch > '9' && ch < 'A')
 		|| (ch > 'Z' && ch < 'a')
 		|| (ch > 'z' && ch < 127);
 }
 
-NP2_inline BOOL IsHtmlTagChar(int ch) {
+NP2_inline bool IsHtmlTagChar(int ch) {
 	return IsAlphaNumeric(ch) || ch == ':' || ch == '_' || ch == '-' || ch == '.';
 }
 
-NP2_inline BOOL IsSchemeNameChar(int ch) {
+NP2_inline bool IsSchemeNameChar(int ch) {
 	return IsAlphaNumeric(ch) || ch == '+' || ch == '-' || ch == '.';
 }
 
@@ -183,11 +183,11 @@ NP2_inline int GetHexDigit(int ch) {
 	return -1;
 }
 
-NP2_inline BOOL StrEqual(LPCWSTR s1, LPCWSTR s2) {
+NP2_inline bool StrEqual(LPCWSTR s1, LPCWSTR s2) {
 	return wcscmp(s1, s2) == 0;
 }
 
-NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
+NP2_inline bool StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 	return _wcsicmp(s1, s2) == 0;
 }
 
@@ -202,7 +202,7 @@ NP2_inline BOOL StrCaseEqual(LPCWSTR s1, LPCWSTR s2) {
 #define StrStartsWithCase(s, prefix)		(_strnicmp((s), (prefix), CSTRLEN(prefix)) == 0)
 #define StrStartsWithCaseEx(s, prefix, len)	(_strnicmp((s), (prefix), (len)) == 0)
 
-NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
+NP2_inline bool StrToFloat(LPCWSTR str, float *value) {
 	LPWSTR end;
 #if defined(__USE_MINGW_STRTOX)
 	// Fix GCC warning when defined __USE_MINGW_ANSI_STDIO as 1:
@@ -214,19 +214,19 @@ NP2_inline BOOL StrToFloat(LPCWSTR str, float *value) {
 	return str != end;
 }
 
-NP2_inline BOOL CRTStrToInt(LPCWSTR str, int *value) {
+NP2_inline bool CRTStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;
 	*value = (int)wcstol(str, &end, 10);
 	return str != end;
 }
 
-NP2_inline BOOL CRTStrToInt64(LPCWSTR str, int64_t *value) {
+NP2_inline bool CRTStrToInt64(LPCWSTR str, int64_t *value) {
 	LPWSTR end;
 	*value = _wcstoi64(str, &end, 10);
 	return str != end;
 }
 
-NP2_inline BOOL HexStrToInt(LPCWSTR str, int *value) {
+NP2_inline bool HexStrToInt(LPCWSTR str, int *value) {
 	LPWSTR end;
 	*value = (int)wcstol(str, &end, 16);
 	return str != end;
@@ -416,13 +416,13 @@ NP2_inline DWORD GetCurrentIconHandleFlags(void) {
 #define IniSetString(lpSection, lpName, lpString) \
 	WritePrivateProfileString(lpSection, lpName, lpString, szIniFile)
 
-void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, BOOL bDelete);
-#define IniClearSection(lpSection)			IniClearSectionEx((lpSection), szIniFile, FALSE)
-#define IniDeleteSection(lpSection) 		IniClearSectionEx((lpSection), szIniFile, TRUE)
+void IniClearSectionEx(LPCWSTR lpSection, LPCWSTR lpszIniFile, bool bDelete);
+#define IniClearSection(lpSection)			IniClearSectionEx((lpSection), szIniFile, false)
+#define IniDeleteSection(lpSection) 		IniClearSectionEx((lpSection), szIniFile, true)
 
-void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, BOOL bDelete);
-#define IniClearAllSection(lpszPrefix)		IniClearAllSectionEx((lpszPrefix), szIniFile, FALSE)
-#define IniDeleteAllSection(lpszPrefix)		IniClearAllSectionEx((lpszPrefix), szIniFile, TRUE)
+void IniClearAllSectionEx(LPCWSTR lpszPrefix, LPCWSTR lpszIniFile, bool bDelete);
+#define IniClearAllSection(lpszPrefix)		IniClearAllSectionEx((lpszPrefix), szIniFile, false)
+#define IniDeleteAllSection(lpszPrefix)		IniClearAllSectionEx((lpszPrefix), szIniFile, true)
 
 NP2_inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	WCHAR tch[16];
@@ -494,12 +494,12 @@ NP2_inline void IniSectionClear(IniSection *section) {
 	section->head = NULL;
 }
 
-NP2_inline BOOL IniSectionIsEmpty(const IniSection *section) {
+NP2_inline bool IniSectionIsEmpty(const IniSection *section) {
 	return section->count == 0;
 }
 
-BOOL IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL quoted);
-BOOL IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
+bool IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL quoted);
+bool IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection);
 LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen);
 
 NP2_inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int keyLen) {
@@ -607,7 +607,7 @@ NP2_inline int DStringW_GetDlgItemText(DStringW *s, HWND hwndDlg, int nCtlId) {
 	return DStringW_GetWindowText(s, GetDlgItem(hwndDlg, nCtlId));
 }
 
-NP2_inline BOOL KeyboardIsKeyDown(int key) {
+NP2_inline bool KeyboardIsKeyDown(int key) {
 	return (GetKeyState(key) & 0x8000) != 0;
 }
 
@@ -641,11 +641,11 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker);
 	(WaitForSingleObject((worker)->eventCancel, 0) != WAIT_OBJECT_0)
 
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
-BOOL IsElevated(void);
+bool IsElevated(void);
 
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
 
-BOOL FindUserResourcePath(LPCWSTR path, LPWSTR outPath);
+bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath);
 HBITMAP LoadBitmapFile(LPCWSTR path);
 HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi);
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height);
@@ -666,10 +666,10 @@ NP2_inline HBITMAP ResizeToolbarImageForCurrentDPI(HBITMAP hbmp) {
 	return ResizeImageForDPI(hbmp, g_uCurrentDPI, 16);
 }
 
-BOOL BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
-BOOL BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
-BOOL BitmapGrayScale(HBITMAP hbmp);
-BOOL VerifyContrast(COLORREF cr1, COLORREF cr2);
+bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
+bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
+bool BitmapGrayScale(HBITMAP hbmp);
+bool VerifyContrast(COLORREF cr1, COLORREF cr2);
 BOOL IsFontAvailable(LPCWSTR lpszFontName);
 
 void SetClipData(HWND hwnd, LPCWSTR pszData);
@@ -761,7 +761,7 @@ LRESULT SendWMSize(HWND hwnd);
 #define DisableCmd(hmenu, id, b)	EnableMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_GRAYED) : (MF_BYCOMMAND | MF_ENABLED))
 #define UncheckCmd(hmenu, id, b)	CheckMenuItem(hmenu, id, (b)? (MF_BYCOMMAND | MF_UNCHECKED) : (MF_BYCOMMAND | MF_CHECKED))
 
-BOOL IsCmdEnabled(HWND hwnd, UINT uId);
+bool IsCmdEnabled(HWND hwnd, UINT uId);
 #define IsButtonChecked(hwnd, uId)	(IsDlgButtonChecked(hwnd, (uId)) == BST_CHECKED)
 INT GetCheckedRadioButton(HWND hwnd, int nIDFirstButton, int nIDLastButton);
 
@@ -774,7 +774,7 @@ NP2_inline void SendWMCommandOrBeep(HWND hwnd, UINT id) {
 }
 
 HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName);
-NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
+NP2_inline bool IsChineseTraditionalSubLang(LANGID subLang) {
 	return subLang == SUBLANG_CHINESE_TRADITIONAL
 		|| subLang == SUBLANG_CHINESE_HONGKONG
 		|| subLang == SUBLANG_CHINESE_MACAU;
@@ -795,18 +795,18 @@ NP2_inline BOOL IsChineseTraditionalSubLang(LANGID subLang) {
 		wsprintf((lpOutput), (lpFormat), __VA_ARGS__);			\
 	} while (0)
 
-NP2_inline BOOL PathIsFile(LPCWSTR pszPath) {
+NP2_inline bool PathIsFile(LPCWSTR pszPath) {
 	// note: INVALID_FILE_ATTRIBUTES is -1.
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_DIRECTORY) == 0;
 }
 
-NP2_inline BOOL PathIsSymbolicLink(LPCWSTR pszPath) {
+NP2_inline bool PathIsSymbolicLink(LPCWSTR pszPath) {
 	// assume file exists, no check for INVALID_FILE_ATTRIBUTES.
 	return (GetFileAttributes(pszPath) & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 }
 
 // https://docs.microsoft.com/en-us/windows/win32/intl/handling-sorting-in-your-applications#sort-strings-ordinally
-NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
+NP2_inline bool PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	// the function maps case using the operating system uppercasing table
 	return CompareStringOrdinal(pszPath1, -1, pszPath2, -1, TRUE) == CSTR_EQUAL;
@@ -816,7 +816,7 @@ NP2_inline BOOL PathEqual(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 }
 
 // similar to realpath() and std::filesystem::canonical()
-BOOL PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest);
+bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest);
 NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) {
 	GetModuleFileName(NULL, tchModule, nSize);
 	// for symbolic link, module path is link's path not target's.
@@ -826,13 +826,13 @@ NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) {
 }
 
 // similar to std::filesystem::equivalent()
-BOOL PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, BOOL bUnexpandEnv, BOOL bUnexpandMyDocs);
-void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, BOOL bExpandEnv);
-BOOL PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
-BOOL PathCreateDeskLnk(LPCWSTR pszDocument);
-BOOL PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
-void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, BOOL bSelect);
+bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2);
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, BOOL bUnexpandMyDocs);
+void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv);
+bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
+bool PathCreateDeskLnk(LPCWSTR pszDocument);
+bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir);
+void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect);
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #if defined(__cplusplus)
@@ -852,12 +852,12 @@ NP2_inline void TrimString(LPWSTR lpString) {
 	StrTrim(lpString, L" ");
 }
 
-BOOL ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
+bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2);
 
 void PrepareFilterStr(LPWSTR lpFilter);
 
 void	StrTab2Space(LPWSTR lpsz);
-BOOL	PathFixBackslashes(LPWSTR lpsz);
+bool	PathFixBackslashes(LPWSTR lpsz);
 
 void	ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
@@ -896,19 +896,19 @@ typedef const MRULIST * LPCMRULIST;
 
 LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 void	MRU_Destroy(LPMRULIST pmru);
-BOOL	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
-BOOL	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
-BOOL	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs);
-BOOL	MRU_Delete(LPMRULIST pmru, int iIndex);
-BOOL	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
+bool	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
+bool	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
+bool	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs);
+bool	MRU_Delete(LPMRULIST pmru, int iIndex);
+bool	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
 void	MRU_Empty(LPMRULIST pmru);
 int 	MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
 NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
 	return MRU_Enum(pmru, 0, NULL, 0);
 }
-BOOL	MRU_Load(LPMRULIST pmru);
-BOOL	MRU_Save(LPCMRULIST pmru);
-BOOL	MRU_MergeSave(LPCMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs);
+bool	MRU_Load(LPMRULIST pmru);
+bool	MRU_Save(LPCMRULIST pmru);
+bool	MRU_MergeSave(LPCMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX
@@ -928,7 +928,7 @@ typedef struct {
 #pragma pack(pop)
 #endif
 
-BOOL	GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize);
+bool	GetThemedDialogFont(LPWSTR lpFaceName, WORD *wSize);
 DLGTEMPLATE *LoadThemedDialogTemplate(LPCWSTR lpDialogTemplateID, HINSTANCE hInstance);
 #define ThemedDialogBox(hInstance, lpTemplate, hWndParent, lpDialogFunc) \
 	ThemedDialogBoxParam(hInstance, lpTemplate, hWndParent, lpDialogFunc, 0)
@@ -940,11 +940,11 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 //==== UnSlash Functions ======================================================
 void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);
-BOOL AddBackslashA(char *pszOut, const char *pszInput);
-BOOL AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput);
+bool AddBackslashA(char *pszOut, const char *pszInput);
+bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput);
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
-BOOL GetDoAnimateMinimize(void);
+bool GetDoAnimateMinimize(void);
 void MinimizeWndToTray(HWND hwnd);
 void RestoreWndFromTray(HWND hwnd);

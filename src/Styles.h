@@ -41,8 +41,8 @@ extern int np2StyleTheme;
 void	Style_ReleaseResources(void);
 void	Style_Load(void);
 void	Style_Save(void);
-BOOL	Style_Import(HWND hwnd);
-BOOL	Style_Export(HWND hwnd);
+bool	Style_Import(HWND hwnd);
+bool	Style_Export(HWND hwnd);
 void	Style_LoadTabSettings(PEDITLEXER pLex);
 void	Style_SaveTabSettings(PEDITLEXER pLex);
 void	EditApplyDefaultEncoding(PEDITLEXER pLex);
@@ -53,11 +53,11 @@ HFONT	Style_CreateCodeFont(UINT dpi);
 void	Style_OnDPIChanged(PEDITLEXER pLex);
 void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor(void);
-void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged);
-BOOL	Style_SetLexerFromFile(LPCWSTR lpszFile);
+void	Style_SetLexer(PEDITLEXER pLexNew, bool bLexerChanged);
+bool	Style_SetLexerFromFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
-BOOL	Style_MaybeBinaryFile(LPCWSTR lpszFile);
-BOOL	Style_CanOpenFile(LPCWSTR lpszFile);
+bool	Style_MaybeBinaryFile(LPCWSTR lpszFile);
+bool	Style_CanOpenFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromID(int rid);
 int		Style_GetMatchLexerIndex(int rid);
 
@@ -66,7 +66,7 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName);
 void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);
 
-void	Style_SetDefaultFont(HWND hwnd, BOOL bCode);
+void	Style_SetDefaultFont(HWND hwnd, bool bCode);
 void	Style_SetIndentGuides(BOOL bShow);
 void	Style_SetBookmark(void);
 void	Style_UpdateCaret(void);
@@ -74,37 +74,37 @@ void	Style_SetLongLineColors(void);
 void	Style_HighlightCurrentLine(void);
 void	Style_ToggleUse2ndGlobalStyle(void);
 void	Style_ToggleUseDefaultCodeStyle(void);
-LPWSTR	Style_GetOpenDlgFilterStr(BOOL open, LPCWSTR lpszFile, int lexers[]);
+LPWSTR	Style_GetOpenDlgFilterStr(bool open, LPCWSTR lpszFile, int lexers[]);
 
-BOOL	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, BOOL bDefaultStyle);
-BOOL	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset);
+bool	Style_StrGetFontEx(LPCWSTR lpszStyle, LPWSTR lpszFont, int cchFont, bool bDefaultStyle);
+bool	Style_StrGetCharSet(LPCWSTR lpszStyle, int *charset);
 BOOL	Style_StrGetLocale(LPCWSTR lpszStyle, LPWSTR lpszLocale, int cchLocale);
-BOOL	Style_StrGetFontSize(LPCWSTR lpszStyle, int *size);
-BOOL	Style_StrGetSize(LPCWSTR lpszStyle, int *size);
-BOOL	Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight);
-BOOL	Style_StrGetColor(BOOL bFore, LPCWSTR lpszStyle, COLORREF *rgb);
+bool	Style_StrGetFontSize(LPCWSTR lpszStyle, int *size);
+bool	Style_StrGetSize(LPCWSTR lpszStyle, int *size);
+bool	Style_StrGetFontWeight(LPCWSTR lpszStyle, int *weight);
+bool	Style_StrGetColor(bool bFore, LPCWSTR lpszStyle, COLORREF *rgb);
 
-NP2_inline BOOL Style_StrGetForeColor(LPCWSTR lpszStyle, COLORREF *rgb) {
-	return Style_StrGetColor(TRUE, lpszStyle, rgb);
+NP2_inline bool Style_StrGetForeColor(LPCWSTR lpszStyle, COLORREF *rgb) {
+	return Style_StrGetColor(true, lpszStyle, rgb);
 }
 
-NP2_inline BOOL Style_StrGetBackColor(LPCWSTR lpszStyle, COLORREF *rgb) {
-	return Style_StrGetColor(FALSE, lpszStyle, rgb);
+NP2_inline bool Style_StrGetBackColor(LPCWSTR lpszStyle, COLORREF *rgb) {
+	return Style_StrGetColor(false, lpszStyle, rgb);
 }
 
-BOOL	Style_StrGetAlphaEx(BOOL outline, LPCWSTR lpszStyle, int *alpha);
-NP2_inline BOOL Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
-	return Style_StrGetAlphaEx(FALSE, lpszStyle, alpha);
+bool	Style_StrGetAlphaEx(bool outline, LPCWSTR lpszStyle, int *alpha);
+NP2_inline bool Style_StrGetAlpha(LPCWSTR lpszStyle, int *alpha) {
+	return Style_StrGetAlphaEx(false, lpszStyle, alpha);
 }
 
-NP2_inline BOOL Style_StrGetOutlineAlpha(LPCWSTR lpszStyle, int *alpha) {
-	return Style_StrGetAlphaEx(TRUE, lpszStyle, alpha);
+NP2_inline bool Style_StrGetOutlineAlpha(LPCWSTR lpszStyle, int *alpha) {
+	return Style_StrGetAlphaEx(true, lpszStyle, alpha);
 }
 
-BOOL	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, BOOL bDefaultStyle);
-BOOL	Style_SelectColor(HWND hwnd, BOOL bFore, LPWSTR lpszStyle, int cchStyle);
+bool	Style_SelectFont(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bDefaultStyle);
+bool	Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore);
 void	Style_SetStyles(int iStyle, LPCWSTR lpszStyle);
 
 int 	Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags);
 void	Style_ConfigDlg(HWND hwnd);
-void	Style_SelectLexerDlg(HWND hwnd, BOOL favorite);
+void	Style_SelectLexerDlg(HWND hwnd, bool favorite);

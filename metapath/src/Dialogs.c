@@ -95,7 +95,7 @@ static int CALLBACK BFFCallBack(HWND hwnd, UINT umsg, LPARAM lParam, LPARAM lpDa
 //
 // GetDirectory()
 //
-BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
+bool GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase) {
 	WCHAR szTitle[256];
 	StrCpyExW(szTitle, L"");
 	GetString(iTitle, szTitle, COUNTOF(szTitle));
@@ -121,10 +121,10 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 	if (pidl) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -132,9 +132,9 @@ BOOL GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase
 // GetDirectory2()
 //
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase)
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, REFKNOWNFOLDERID iBase)
 #else
-BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
+bool GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 #endif
 {
 	WCHAR szTitle[256];
@@ -148,7 +148,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 	if (S_OK != SHGetFolderLocation(hwndParent, iBase, NULL, SHGFP_TYPE_DEFAULT, &pidlRoot))
 #endif
 	{
-		return FALSE;
+		return false;
 	}
 
 	BROWSEINFO bi;
@@ -162,7 +162,7 @@ BOOL GetDirectory2(HWND hwndParent, int iTitle, LPWSTR pszFolder, int iBase)
 	bi.iImage = 0;
 
 	PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-	const BOOL fOk = pidl != NULL;
+	const bool fOk = pidl != NULL;
 	if (fOk) {
 		SHGetPathFromIDList(pidl, pszFolder);
 		CoTaskMemFree((LPVOID)pidl);
@@ -277,13 +277,13 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		break;
 
 		case IDC_COMMANDLINE: {
-			BOOL bEnableOK = FALSE;
+			bool bEnableOK = false;
 			WCHAR args[MAX_PATH];
 
 			if (GetDlgItemText(hwnd, IDC_COMMANDLINE, args, MAX_PATH)) {
 				if (ExtractFirstArgument(args, args, NULL)) {
 					if (StrNotEmpty(args)) {
-						bEnableOK = TRUE;
+						bEnableOK = true;
 					}
 				}
 			}
@@ -1445,7 +1445,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				if (*pszFilterValue) {
 					AppendMenu(hMenu, MF_ENABLED | MF_STRING, 1234 + dwIndex, node->key);
 					// Find description for current filter
-					const BOOL negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
+					const bool negFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 					if ((!negFilter || *pszFilterValue == L'-') && StrCaseEqual(pszFilterValue + negFilter, szTypedFilter)) {
 						dwCheck = dwIndex;
 					}
@@ -1521,7 +1521,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 //  GetFilterDlg()
 //
 //
-BOOL GetFilterDlg(HWND hwnd) {
+bool GetFilterDlg(HWND hwnd) {
 	WCHAR tchOldFilter[DL_FILTER_BUFSIZE];
 
 	lstrcpy(tchOldFilter, tchFilter);
@@ -1529,12 +1529,12 @@ BOOL GetFilterDlg(HWND hwnd) {
 
 	if (IDOK == ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_FILTER), hwnd, GetFilterDlgProc)) {
 		if (StrCaseEqual(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
-			return FALSE;    // Old and new filters are identical
+			return false;    // Old and new filters are identical
 		}
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Data structure used in file operation dialogs
@@ -1625,12 +1625,12 @@ INT_PTR CALLBACK RenameFileDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 //  RenameFileDlg()
 //
 //
-BOOL RenameFileDlg(HWND hwnd) {
+bool RenameFileDlg(HWND hwnd) {
 	DLITEM dli;
 
 	dli.mask = DLI_FILENAME;
 	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
-		return FALSE;
+		return false;
 	}
 
 	FILEOPDLGDATA fod;
@@ -1668,10 +1668,10 @@ BOOL RenameFileDlg(HWND hwnd) {
 			SHGetFileInfo(tchDestination, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 			DirList_SelectItem(hwndDirList, shfi.szDisplayName, tchDestination);
 		}
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -1798,12 +1798,12 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //  CopyMoveDlg()
 //
 //
-BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
+bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	DLITEM dli;
 
 	dli.mask = DLI_FILENAME;
 	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
-		return FALSE;
+		return false;
 	}
 
 	FILEOPDLGDATA fod;
@@ -1860,9 +1860,9 @@ BOOL CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		}
 
 		*wFunc = fod.wFunc; // save state for next call
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 extern WCHAR tchOpenWithDir[MAX_PATH];
@@ -2001,14 +2001,14 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 //  OpenWithDlg()
 //
 //
-BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
+bool OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 	DLITEM dliOpenWith;
 	dliOpenWith.mask = DLI_FILENAME;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_OPENWITH), hwnd, OpenWithDlgProc, (LPARAM)&dliOpenWith)) {
 		WCHAR szDestination[MAX_PATH + 4];
 		memset(szDestination, 0, sizeof(szDestination));
-		const BOOL link = PathGetLnkPath(dliOpenWith.szFileName, szDestination);
+		const bool link = PathGetLnkPath(dliOpenWith.szFileName, szDestination);
 		if (link && PathIsDirectory(szDestination)) {
 			WCHAR szSource[MAX_PATH + 4];
 			memset(szSource, 0, sizeof(szSource));
@@ -2055,10 +2055,10 @@ BOOL OpenWithDlg(HWND hwnd, LPCDLITEM lpdliParam) {
 			GetShortPathName(szDestination, szDestination, COUNTOF(szDestination));
 			ShellExecuteEx(&sei);
 		}
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -2126,14 +2126,14 @@ INT_PTR CALLBACK NewDirDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPara
 //  NewDirDlg()
 //
 //
-BOOL NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
+bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 	FILEOPDLGDATA fod;
 
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NEWDIR), hwnd, NewDirDlgProc, (LPARAM)&fod)) {
 		lstrcpy(pszNewDir, fod.szDestination);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -2149,7 +2149,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 	static HICON hIconCross1;
 	static HICON hIconCross2;
 	static HCURSOR hCursorCross;
-	static BOOL bHasCapture;
+	static bool bHasCapture;
 
 	switch (umsg) {
 	case WM_INITDIALOG:
@@ -2160,7 +2160,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		hIconCross2 = LoadIcon(g_hInstance, MAKEINTRESOURCE(IDI_CROSS2));
 		hCursorCross = LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_CROSSHAIR));
 		CenterDlgInParent(hwnd);
-		bHasCapture = FALSE;
+		bHasCapture = false;
 		return TRUE;
 
 	case WM_SIZE: {
@@ -2184,14 +2184,14 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 	case WM_CANCELMODE:
 		ReleaseCapture();
-		bHasCapture = FALSE;
+		bHasCapture = false;
 		break;
 
 	case WM_LBUTTONDOWN: {
 		const POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
 		if (GetDlgCtrlID((ChildWindowFromPoint(hwnd, pt))) == IDC_CROSSCURSOR) {
 			SetCapture(hwnd);
-			bHasCapture = TRUE;
+			bHasCapture = true;
 			SetCursor(hCursorCross);
 			SendDlgItemMessage(hwnd, IDC_CROSSCURSOR, STM_SETICON, (WPARAM)hIconCross2, 0);
 		}
@@ -2202,7 +2202,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		SendDlgItemMessage(hwnd, IDC_CROSSCURSOR, STM_SETICON, (WPARAM)hIconCross1, 0);
 		ReleaseCapture();
-		bHasCapture = FALSE;
+		bHasCapture = false;
 
 		HWND hwndOK = GetDlgItem(hwnd, IDOK);
 		WCHAR tch[256];
@@ -2259,7 +2259,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDOK: {
 			WCHAR tch[MAX_PATH] = L"";
 			if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
-				PathRelativeToApp(tch, tch, 0, TRUE, flagPortableMyDocs);
+				PathRelativeToApp(tch, tch, 0, true, flagPortableMyDocs);
 				PathQuoteSpaces(tch);
 				SetDlgItemText(GetParent(hwnd), IDC_TARGETPATH, tch);
 			}
@@ -2302,7 +2302,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 extern int iUseTargetApplication;
 extern int iTargetApplicationMode;
 extern int cxTargetApplicationDlg;
-extern BOOL bLoadLaunchSetingsLoaded;
+extern bool bLoadLaunchSetingsLoaded;
 extern WCHAR szTargetApplication[MAX_PATH];
 extern WCHAR szTargetApplicationParams[MAX_PATH];
 extern WCHAR szTargetApplicationWndClass[MAX_PATH];
@@ -2430,7 +2430,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			GetDlgItemText(hwnd, IDC_TARGETPATH, tchBuf, COUNTOF(tchBuf));
 			ExtractFirstArgument(tchBuf, szFile, szParams);
-			PathAbsoluteFromApp(szFile, szFile, TRUE);
+			PathAbsoluteFromApp(szFile, szFile, true);
 
 			WCHAR szTitle[32];
 			WCHAR szFilter[256];
@@ -2456,7 +2456,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			// execute file open dlg
 			if (GetOpenFileName(&ofn)) {
 				lstrcpy(tchBuf, szFile);
-				PathRelativeToApp(tchBuf, tchBuf, 0, TRUE, flagPortableMyDocs);
+				PathRelativeToApp(tchBuf, tchBuf, 0, true, flagPortableMyDocs);
 				PathQuoteSpaces(tchBuf);
 				if (StrNotEmpty(szParams)) {
 					StrCatBuff(tchBuf, L" ", COUNTOF(tchBuf));
@@ -2473,13 +2473,13 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		break;
 
 		//case IDC_COMMANDLINE: {
-		//	BOOL bEnableOK = FALSE;
+		//	bool bEnableOK = false;
 		//	WCHAR tchArgs[MAX_PATH * 2];
 		//
 		//	if (GetDlgItemText(hwnd, IDC_COMMANDLINE, tchArgs, COUNTOF(tchArgs))) {
 		//		if (ExtractFirstArgument(tchArgs, tchArgs, NULL)) {
 		//			if (StrNotEmpty(tchArgs)) {
-		//				bEnableOK = TRUE;
+		//				bEnableOK = true;
 		//			}
 		//		}
 		//	}

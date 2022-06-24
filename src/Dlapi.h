@@ -50,10 +50,10 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 DWORD WINAPI DirList_IconThread(LPVOID lpParam);
 
 //==== DlGetDispInfo() ========================================================
-BOOL DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden);
+bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden);
 
 //==== DlDeleteItem() =========================================================
-BOOL DirList_DeleteItem(HWND hwnd, LPARAM lParam);
+bool DirList_DeleteItem(HWND hwnd, LPARAM lParam);
 
 //==== DlSort() ===============================================================
 
@@ -88,13 +88,13 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli);
 int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd);
 
 //==== DlPropertyDlg() ========================================================
-BOOL DirList_PropertyDlg(HWND hwnd, int iItem);
+bool DirList_PropertyDlg(HWND hwnd, int iItem);
 
 //==== DlGetLongPathName() ====================================================
-BOOL DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath);
+bool DirList_GetLongPathName(HWND hwnd, LPWSTR lpszLongPath);
 
 //==== DlSelectItem() =========================================================
-BOOL DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath);
+bool DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath);
 
 //==== DlCreateFilter() and DlMatchFilter() ===================================
 
@@ -115,11 +115,11 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pd
 
 //==== DriveBox ===============================================================
 
-BOOL DriveBox_Init(HWND hwnd);
+bool DriveBox_Init(HWND hwnd);
 int  DriveBox_Fill(HWND hwnd);
-BOOL DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, BOOL fNoSlash);
-BOOL DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath);
-BOOL DriveBox_PropertyDlg(HWND hwnd);
+bool DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, bool fNoSlash);
+bool DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath);
+bool DriveBox_PropertyDlg(HWND hwnd);
 
 LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
 LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
@@ -138,4 +138,4 @@ LPITEMIDLIST IL_Create(LPCITEMIDLIST pidl1, UINT cb1, LPCITEMIDLIST pidl2, UINT 
 UINT IL_GetSize(LPCITEMIDLIST pidl);
 
 //==== IL_GetDisplayName() ====================================================
-BOOL IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);
+bool IL_GetDisplayName(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, DWORD dwFlags, LPWSTR lpszDisplayName, int nDisplayName);

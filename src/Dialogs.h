@@ -34,29 +34,29 @@ int 	MsgBox(UINT uType, UINT uIdMsg, ...);
 
 void	DisplayCmdLineHelp(HWND hwnd);
 void	OpenHelpLink(HWND hwnd, int cmd);
-BOOL	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
+bool	GetDirectory(HWND hwndParent, int iTitle, LPWSTR pszFolder, LPCWSTR pszBase);
 INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 void	RunDlg(HWND hwnd, LPCWSTR lpstrDefault);
-BOOL	OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile);
-BOOL	FavoritesDlg(HWND hwnd, LPWSTR lpstrFile);
-BOOL	AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget);
-BOOL	FileMRUDlg(HWND hwnd, LPWSTR lpstrFile);
-BOOL	ChangeNotifyDlg(HWND hwnd);
-BOOL	ColumnWrapDlg(HWND hwnd);
-BOOL	WordWrapSettingsDlg(HWND hwnd);
-BOOL	LongLineSettingsDlg(HWND hwnd);
-BOOL	TabSettingsDlg(HWND hwnd);
-BOOL	SelectDefEncodingDlg(HWND hwnd, int *pidREncoding);
-BOOL	SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel);
-BOOL	SelectDefLineEndingDlg(HWND hwnd, int *iOption);
+bool	OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile);
+bool	FavoritesDlg(HWND hwnd, LPWSTR lpstrFile);
+bool	AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget);
+bool	FileMRUDlg(HWND hwnd, LPWSTR lpstrFile);
+bool	ChangeNotifyDlg(HWND hwnd);
+bool	ColumnWrapDlg(HWND hwnd);
+bool	WordWrapSettingsDlg(HWND hwnd);
+bool	LongLineSettingsDlg(HWND hwnd);
+bool	TabSettingsDlg(HWND hwnd);
+bool	SelectDefEncodingDlg(HWND hwnd, int *pidREncoding);
+bool	SelectEncodingDlg(HWND hwnd, int *pidREncoding, UINT uidLabel);
+bool	SelectDefLineEndingDlg(HWND hwnd, int *iOption);
 
 struct EditFileIOStatus;
-BOOL	WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status);
+bool	WarnLineEndingDlg(HWND hwnd, struct EditFileIOStatus *status);
 void	InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel);
-BOOL	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
-void	ZoomLevelDlg(HWND hwnd, BOOL bBottom);
-BOOL	AutoCompletionSettingsDlg(HWND hwnd);
-BOOL	AutoSaveSettingsDlg(HWND hwnd);
+bool	GetZoomLevelComboBoxValue(HWND hwnd, int nCtrId, int *zoomLevel);
+void	ZoomLevelDlg(HWND hwnd, bool bBottom);
+bool	AutoCompletionSettingsDlg(HWND hwnd);
+bool	AutoSaveSettingsDlg(HWND hwnd);
 
 INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...);
 #define InfoBoxInfo(uType, lpstrSetting, uidMessage, ...)	InfoBox(MB_ICONINFORMATION | (uType), (lpstrSetting), (uidMessage), ##__VA_ARGS__)

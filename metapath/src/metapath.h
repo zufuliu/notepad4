@@ -108,31 +108,31 @@
 //==== Function Declarations ==================================================
 BOOL InitApplication(HINSTANCE hInstance);
 void InitInstance(HINSTANCE hInstance, int nCmdShow);
-BOOL ActivatePrevInst(void);
+bool ActivatePrevInst(void);
 void GetRelaunchParameters(LPWSTR szParameters);
-void ShowNotifyIcon(HWND hwnd, BOOL bAdd);
+void ShowNotifyIcon(HWND hwnd, bool bAdd);
 
-BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory);
+bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory);
 void SetUILanguage(int resID);
 void LoadSettings(void);
 void SaveSettingsNow(void);
-void SaveSettings(BOOL bSaveSettingsNow);
-void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf);
+void SaveSettings(bool bSaveSettingsNow);
+void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf);
 void ClearWindowPositionHistory(void);
 void ParseCommandLine(void);
 void LoadFlags(void);
 void LoadLaunchSetings(void);
 
-BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
-BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
-BOOL FindIniFile(void);
-BOOL TestIniFile(void);
-BOOL CreateIniFile(LPCWSTR lpszIniFile);
+bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule);
+bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule);
+bool FindIniFile(void);
+bool TestIniFile(void);
+bool CreateIniFile(LPCWSTR lpszIniFile);
 
-BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError);
-BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath);
+bool DisplayPath(LPCWSTR lpPath, UINT uIdError);
+bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath);
 
-void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew);
+void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew);
 void SnapToTarget(HWND hwnd);
 void SnapToDefaultPos(HWND hwnd);
 

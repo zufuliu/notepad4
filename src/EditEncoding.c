@@ -439,7 +439,7 @@ void Encoding_ReleaseResources(void) {
 	}
 }
 
-static inline BOOL IsValidEncoding(const NP2ENCODING *encoding) {
+static inline bool IsValidEncoding(const NP2ENCODING *encoding) {
 	return (encoding->uFlags & NCP_INTERNAL) || IsValidCodePage(encoding->uCodePage);
 }
 
@@ -447,37 +447,37 @@ static inline BOOL IsValidEncoding(const NP2ENCODING *encoding) {
 //
 // EditSetNewEncoding()
 //
-BOOL EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, BOOL bSetSavePoint) {
+bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint) {
 	if (iEncoding != iNewEncoding) {
 		if (iEncoding != CPI_DEFAULT && iNewEncoding != CPI_DEFAULT) {
-			return TRUE;
+			return true;
 		}
 
 		const UINT cpSrc = (mEncoding[iEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 		const UINT cpDest = (mEncoding[iNewEncoding].uFlags & NCP_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8;
 
 		if (SciCall_GetLength() == 0) {
-			const BOOL bIsEmptyUndoHistory = !(SciCall_CanUndo() || SciCall_CanRedo());
+			const bool bIsEmptyUndoHistory = !(SciCall_CanUndo() || SciCall_CanRedo());
 
 			if (bNoUI || bIsEmptyUndoHistory || InfoBoxWarn(MB_YESNO, L"MsgConv2", IDS_ASK_ENCODING2) == IDYES) {
 				EditConvertText(cpSrc, cpDest, bSetSavePoint);
-				return TRUE;
+				return true;
 			}
 		} else if (bNoUI || InfoBoxWarn(MB_YESNO, L"MsgConv1", IDS_ASK_ENCODING) == IDYES) {
 			BeginWaitCursor();
-			EditConvertText(cpSrc, cpDest, FALSE);
+			EditConvertText(cpSrc, cpDest, false);
 			EndWaitCursor();
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFINDREPLACE lpefr) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
-	const BOOL lastFind = StrNotEmptyA(lpefr->szFind); // need to convert last find & replace string.
+	const bool lastFind = StrNotEmptyA(lpefr->szFind); // need to convert last find & replace string.
 
 	if (oldCodePage == SC_CP_UTF8) {
 		if (lastFind) {
@@ -558,7 +558,7 @@ void Encoding_InitDefaults(void) {
 	}
 }
 
-int Encoding_MapIniSetting(BOOL bLoad, UINT iSetting) {
+int Encoding_MapIniSetting(bool bLoad, UINT iSetting) {
 	NP2_static_assert(CPI_UTF7 == 8);
 	if (iSetting == CPI_UTF7) {
 		return iSetting;
@@ -652,7 +652,7 @@ int Encoding_MatchA(LPCSTR pchTest) {
 	return CPI_NONE;
 }
 
-BOOL Encoding_IsValid(int iEncoding) {
+bool Encoding_IsValid(int iEncoding) {
 	return iEncoding >= CPI_FIRST && iEncoding < (int)COUNTOF(mEncoding)
 		&& IsValidEncoding(&mEncoding[iEncoding]);
 }
@@ -787,7 +787,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 		tvis.hParent = hParent;
 
 		HTREEITEM hTreeNode = TVI_FIRST;
-		BOOL expand = i < 2; // Unicode, Western European
+		bool expand = i < 2; // Unicode, Western European
 
 		for (UINT j = 0; j < COUNTOF(group->encodings); j++) {
 			const int id = group->encodings[j];
@@ -812,11 +812,11 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				if (idSel == id) {
 					hSelNode = hTreeNode;
 					hSelParent = hParent;
-					expand = TRUE;
+					expand = true;
 				} else if (!expand && (id == iDefaultCodePage || id == iCurrentEncoding
 					|| legacyACP == encoding->uCodePage)) {
 					// group contains default code, current code page, ANSI code page.
-					expand = TRUE;
+					expand = true;
 				}
 			}
 		}
@@ -832,7 +832,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	NP2HeapFree(pEE);
 }
 
-BOOL Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet) {
+bool Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) {
 	HTREEITEM hTreeNode = TreeView_GetSelection(hwnd);
 	if (hTreeNode != NULL) {
 		TVITEM item;
@@ -844,14 +844,14 @@ BOOL Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, BOOL bQuiet) {
 			const int id = (int)(item.lParam - 1);
 			if (Encoding_IsValid(id)) {
 				*pidEncoding = id;
-				return TRUE;
+				return true;
 			}
 			if (!bQuiet) {
 				MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
 			}
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 #if 0
@@ -913,7 +913,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	}
 }
 
-BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
+bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 	LVITEM lvi;
 
 	lvi.iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
@@ -923,12 +923,12 @@ BOOL Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 	if (ListView_GetItem(hwnd, &lvi)) {
 		if (Encoding_IsValid((int)lvi.lParam)) {
 			*pidEncoding = (int)lvi.lParam;
-			return TRUE;
+			return true;
 		}
 		MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
 	}
 
-	return FALSE;
+	return false;
 }
 
 void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
@@ -989,7 +989,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 	}
 }
 
-BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
+bool Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 	COMBOBOXEXITEM cbei;
 
 	cbei.iItem = ComboBox_GetCurSel(hwnd);
@@ -998,12 +998,12 @@ BOOL Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding) {
 	if (SendMessage(hwnd, CBEM_GETITEM, 0, (LPARAM)&cbei)) {
 		if (Encoding_IsValid((int)cbei.lParam)) {
 			*pidEncoding = (int)cbei.lParam;
-			return TRUE;
+			return true;
 		}
 		MsgBoxWarn(MB_OK, IDS_ERR_ENCODINGNA);
 	}
 
-	return FALSE;
+	return false;
 }
 #endif
 
@@ -1336,7 +1336,7 @@ static int DetectUTF16LatinExt(const char *pTest, DWORD nLength) {
 }
 
 #if 0
-BOOL IsUTF8(const char *pTest, DWORD nLength) {
+bool IsUTF8(const char *pTest, DWORD nLength) {
 	static const uint8_t byte_class_table[256] = {
 		/* 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F */
 		/* 00 */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1524,7 +1524,7 @@ __attribute__((__always_inline__)) static inline
 #else
 static __forceinline
 #endif
-int z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_cont) {
+bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_cont) {
 	// Error lookup tables for the first, second, and third nibbles
 	// Simple macro to make a vector lookup table for use with vpshufb. Since
 	// AVX2 is two 16-byte halves, we duplicate the input values.
@@ -1593,7 +1593,7 @@ int z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_con
 	// (which holds the carry mask in the upper half) to uint32_t, which
 	// zeroes out the upper bits
 	if (cont != (uint32_t)req) {
-		return 0;
+		return false;
 	}
 
 	// Look up error masks for three consecutive nibbles.
@@ -1604,15 +1604,15 @@ int z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_con
 
 	// Check if any bits are set in all three error masks
 	if (!_mm256_testz_si256(_mm256_and_si256(e_1, e_2), e_3)) {
-		return 0;
+		return false;
 	}
 
 	// Save continuation bits and input bytes for the next round
 	*last_cont = req >> sizeof(__m256i);
-	return 1;
+	return true;
 }
 
-static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
+static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) {
 	// Keep continuation bits from the previous iteration that carry over to
 	// each input chunk vector
 	uint32_t last_cont = 0;
@@ -1634,7 +1634,7 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 		for (; offset + sizeof(__m256i) < len; offset += sizeof(__m256i)) {
 			__m256i bytes = _mm256_loadu_si256((__m256i *)(data + offset));
 			if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
-				return 0;
+				return false;
 			}
 			shifted_bytes = _mm256_loadu_si256((__m256i *)(data + offset + sizeof(__m256i) - 1));
 		}
@@ -1655,7 +1655,7 @@ static inline int z_validate_utf8_avx2(const char *data, uint32_t len) {
 		__m256i shifted_bytes = _mm256_loadu_si256((__m256i *)buffer);
 		__m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
 		if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
-			return 0;
+			return false;
 		}
 	}
 
@@ -1674,7 +1674,7 @@ __attribute__((__target__("ssse3"), __always_inline__)) static inline
 #else
 static __forceinline
 #endif
-int z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_cont) {
+bool z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_cont) {
 	// Error lookup tables for the first, second, and third nibbles
 	const __m128i error_1 = _mm_setr_epi8(
 		0x00, 0x00, 0x00, 0x00,
@@ -1738,7 +1738,7 @@ int z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_con
 	// (which holds the carry mask in the upper half) to uint16_t, which
 	// zeroes out the upper bits
 	if (cont != (uint16_t)req) {
-		return 0;
+		return false;
 	}
 
 	// Look up error masks for three consecutive nibbles.
@@ -1750,25 +1750,25 @@ int z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_con
 	// Check if any bits are set in all three error masks
 #if defined(__SSE4_1__)
 	if (!_mm_testz_si128(_mm_and_si128(e_1, e_2), e_3)) {
-		return 0;
+		return false;
 	}
 #else
 	e_3 = _mm_and_si128(_mm_and_si128(e_1, e_2), e_3);
 	const int mask = _mm_movemask_epi8(_mm_cmpeq_epi8(e_3, _mm_setzero_si128()));
 	if (mask != 0xFFFF) {
-		return 0;
+		return false;
 	}
 #endif
 
 	// Save continuation bits and input bytes for the next round
 	*last_cont = req >> sizeof(__m128i);
-	return 1;
+	return true;
 }
 
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((__target__("ssse3")))
 #endif
-static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
+static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) {
 	// Keep continuation bits from the previous iteration that carry over to
 	// each input chunk vector
 	uint32_t last_cont = 0;
@@ -1789,7 +1789,7 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 		for (; offset + sizeof(__m128i) < len; offset += sizeof(__m128i)) {
 			__m128i bytes = _mm_loadu_si128((__m128i *)(data + offset));
 			if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
-				return 0;
+				return false;
 			}
 			shifted_bytes = _mm_loadu_si128((__m128i *)(data + offset + sizeof(__m128i) - 1));
 		}
@@ -1810,7 +1810,7 @@ static inline int z_validate_utf8_sse4(const char *data, uint32_t len) {
 		__m128i shifted_bytes = _mm_loadu_si128((__m128i *)(buffer));
 		__m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
 		if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
-			return 0;
+			return false;
 		}
 	}
 
@@ -1829,14 +1829,14 @@ static inline int did_cpu_supports_ssse3(void) {
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See https://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
-BOOL IsUTF8(const char *pTest, DWORD nLength) {
+bool IsUTF8(const char *pTest, DWORD nLength) {
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
 
 #if NP2_USE_AVX2
-	const BOOL result = z_validate_utf8_avx2(pTest, nLength);
+	const bool result = z_validate_utf8_avx2(pTest, nLength);
 #if 0
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "UTF8 time");
@@ -1847,7 +1847,7 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 
 #if NP2_USE_SSE2
 	if (did_cpu_supports_ssse3()) {
-		const BOOL result = z_validate_utf8_sse4(pTest, nLength);
+		const bool result = z_validate_utf8_sse4(pTest, nLength);
 #if 0
 		StopWatch_Stop(watch);
 		StopWatch_ShowLog(&watch, "UTF8 time");
@@ -1902,10 +1902,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
 			} while (temp < endPtr);
 			if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
-				return FALSE;
+				return false;
 			}
 		} else if (state != UTF8_ACCEPT) {
-			return FALSE;
+			return false;
 		}
 		pt += sizeof(__m256i);
 	}
@@ -1928,10 +1928,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 				state = utf8_dfa[256 + state + utf8_dfa[*temp++]];
 			} while (temp < endPtr);
 			if (state == UTF8_REJECT || (leading != 31 && state != UTF8_ACCEPT)) {
-				return FALSE;
+				return false;
 			}
 		} else if (state != UTF8_ACCEPT) {
-			return FALSE;
+			return false;
 		}
 		pt += 2*sizeof(__m128i);
 	}
@@ -1961,10 +1961,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			state = utf8_dfa[256 + state + utf8_dfa[val >> 56]];
 #endif
 			if (state == UTF8_REJECT) {
-				return FALSE;
+				return false;
 			}
 		} else if (state != UTF8_ACCEPT) {
-			return FALSE;
+			return false;
 		}
 		pt += sizeof(uint64_t);
 	}
@@ -1986,10 +1986,10 @@ BOOL IsUTF8(const char *pTest, DWORD nLength) {
 			state = utf8_dfa[256 + state + utf8_dfa[val >> 24]];
 #endif
 			if (state == UTF8_REJECT) {
-				return FALSE;
+				return false;
 			}
 		} else if (state != UTF8_ACCEPT) {
-			return FALSE;
+			return false;
 		}
 		pt += sizeof(uint32_t);
 	}
@@ -2268,14 +2268,14 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	const UINT bom = *((const uint16_t *)lpData);
 	if (cbData < MAX_NON_UTF8_SIZE && (Encoding_IsUnicode(iSrcEncoding) // reload as UTF-16
 		|| (iSrcEncoding < CPI_FIRST && (cbData & 1) == 0 && (bom == BOM_UTF16LE || bom == BOM_UTF16BE)))) {
-		BOOL bBOM = iSrcEncoding < CPI_FIRST;
-		BOOL bReverse = bom == BOM_UTF16BE;
+		bool bBOM = iSrcEncoding < CPI_FIRST;
+		bool bReverse = bom == BOM_UTF16BE;
 		if (iSrcEncoding == CPI_UNICODE) {
 			bBOM = bom == BOM_UTF16LE;
-			bReverse = FALSE;
+			bReverse = false;
 		} else if (iSrcEncoding == CPI_UNICODEBE) {
 			bBOM = bom == BOM_UTF16BE;
-			bReverse = TRUE;
+			bReverse = true;
 		}
 
 		NP2_static_assert(CPI_UNICODE + 1 == CPI_UNICODEBE);
@@ -2288,7 +2288,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 
 	FileVars_Init(lpData, cbData, &fvCurFile);
 	// check UTF-8 BOM
-	const BOOL utf8Sig = IsUTF8Signature(lpData);
+	const bool utf8Sig = IsUTF8Signature(lpData);
 	if (Encoding_IsUTF8(iSrcEncoding) // reload as UTF-8
 		|| (iSrcEncoding < CPI_FIRST && utf8Sig)) {
 		NP2_static_assert(CPI_UTF8 + 1 == CPI_UTF8SIGN);

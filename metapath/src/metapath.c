@@ -77,7 +77,7 @@ HISTORY	mHistory;
 WCHAR	szIniFile[MAX_PATH] = L"";
 WCHAR	szIniFile2[MAX_PATH] = L"";
 BOOL	bSaveSettings;
-static BOOL bHasQuickview = FALSE;
+static bool bHasQuickview = false;
 WCHAR	szQuickview[MAX_PATH];
 WCHAR	szQuickviewParams[MAX_PATH];
 WCHAR	tchFavoritesDir[MAX_PATH];
@@ -190,7 +190,7 @@ int			flagNoFadeHidden	= 0;
 static int	iOpacityLevel		= 75;
 static int	flagPosParam		= 0;
 
-static inline BOOL HasFilter(void) {
+static inline bool HasFilter(void) {
 	return !StrEqualExW(tchFilter, L"*.*") || bNegFilter;
 }
 
@@ -199,7 +199,7 @@ static inline BOOL HasFilter(void) {
 //  WinMain()
 //
 //
-static void CleanUpResources(BOOL initialized) {
+static void CleanUpResources(bool initialized) {
 	if (tchToolbarBitmap != NULL) {
 		LocalFree(tchToolbarBitmap);
 	}
@@ -222,7 +222,7 @@ static void CleanUpResources(BOOL initialized) {
 
 BOOL WINAPI ConsoleHandlerRoutine(DWORD dwCtrlType) {
 	if (dwCtrlType == CTRL_C_EVENT) {
-		ShowNotifyIcon(hwndMain, FALSE);
+		ShowNotifyIcon(hwndMain, false);
 		SendMessage(hwndMain, WM_CLOSE, 0, 0);
 		return TRUE;
 	}
@@ -309,7 +309,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	LoadSettings();
 
 	if (!InitApplication(hInstance)) {
-		CleanUpResources(FALSE);
+		CleanUpResources(false);
 		return FALSE;
 	}
 
@@ -325,7 +325,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		}
 	}
 
-	CleanUpResources(TRUE);
+	CleanUpResources(true);
 	return (int)(msg.wParam);
 }
 
@@ -358,7 +358,7 @@ BOOL InitApplication(HINSTANCE hInstance) {
 //
 //
 void InitInstance(HINSTANCE hInstance, int nCmdShow) {
-	const BOOL defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
+	const bool defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
 	if (defaultPos) {
@@ -439,7 +439,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		UpdateWindow(hwndMain);
 	} else {
 		ShowWindow(hwndMain, SW_HIDE);   // trick ShowWindow()
-		ShowNotifyIcon(hwndMain, TRUE);
+		ShowNotifyIcon(hwndMain, true);
 	}
 
 	// Pathname parameter
@@ -476,7 +476,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 //
 //
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static BOOL bShutdownOK;
+	static bool bShutdownOK;
 
 	switch (umsg) {
 	case WM_CREATE: {
@@ -509,9 +509,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			History_Uninit(&mHistory);
 
-			SaveSettings(FALSE);
+			SaveSettings(false);
 
-			bShutdownOK = TRUE;
+			bShutdownOK = true;
 		}
 		if (umsg == WM_DESTROY) {
 			PostQuitMessage(0);
@@ -687,7 +687,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				return DefWindowProc(hwnd, umsg, wParam, lParam);
 			}
 			MinimizeWndToTray(hwnd);
-			ShowNotifyIcon(hwnd, TRUE);
+			ShowNotifyIcon(hwnd, true);
 			break;
 
 		case SC_RESTORE: {
@@ -721,18 +721,18 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			DestroyMenu(hMenu);
 
 			if (iCmd == IDM_TRAY_RESTORE) {
-				ShowNotifyIcon(hwnd, FALSE);
+				ShowNotifyIcon(hwnd, false);
 				RestoreWndFromTray(hwnd);
 				ShowOwnedPopups(hwnd, TRUE);
 			} else if (iCmd == IDM_TRAY_EXIT) {
-				ShowNotifyIcon(hwnd, FALSE);
+				ShowNotifyIcon(hwnd, false);
 				SendMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 		}
 		return TRUE;
 
 		case WM_LBUTTONUP:
-			ShowNotifyIcon(hwnd, FALSE);
+			ShowNotifyIcon(hwnd, false);
 			RestoreWndFromTray(hwnd);
 			ShowOwnedPopups(hwnd, TRUE);
 			return TRUE;
@@ -753,7 +753,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	default:
 		if (umsg == msgTaskbarCreated) {
 			if (!IsWindowVisible(hwnd)) {
-				ShowNotifyIcon(hwnd, TRUE);
+				ShowNotifyIcon(hwnd, true);
 			}
 			return 0;
 		}
@@ -882,13 +882,13 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	// Add normal Toolbar Bitmap
 	HBITMAP hbmp = NULL;
 	HBITMAP hbmpCopy = NULL;
-	BOOL bExternalBitmap = FALSE;
+	bool bExternalBitmap = false;
 
 	if (tchToolbarBitmap != NULL) {
 		hbmp = LoadBitmapFile(tchToolbarBitmap);
 	}
 	if (hbmp != NULL) {
-		bExternalBitmap = TRUE;
+		bExternalBitmap = true;
 	} else {
 		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		hbmpCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
@@ -923,12 +923,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 			ImageList_AddMasked(himl, hbmp, CLR_DEFAULT);
 			DeleteObject(hbmp);
 			SendMessage(hwndToolbar, TB_SETDISABLEDIMAGELIST, 0, (LPARAM)himl);
-			bExternalBitmap = TRUE;
+			bExternalBitmap = true;
 		}
 	}
 
 	if (!bExternalBitmap) {
-		const BOOL fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
+		const bool fProcessed = BitmapAlphaBlend(hbmpCopy, GetSysColor(COLOR_3DFACE), 0x60);
 		if (fProcessed) {
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
 			ImageList_AddMasked(himl, hbmpCopy, CLR_DEFAULT);
@@ -1194,8 +1194,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case CBN_CLOSEUP: {
 			WCHAR tch[64];
 
-			if (DriveBox_GetSelDrive(hwndDriveBox, tch, COUNTOF(tch), TRUE) && !PathIsSameRoot(szCurDir, tch)) {
-				if (!ChangeDirectory(hwnd, tch, TRUE)) {
+			if (DriveBox_GetSelDrive(hwndDriveBox, tch, COUNTOF(tch), true) && !PathIsSameRoot(szCurDir, tch)) {
+				if (!ChangeDirectory(hwnd, tch, true)) {
 					MsgBoxWarn(MB_OK, IDS_ERR_CD);
 					DriveBox_SelectDrive(hwndDriveBox, szCurDir);
 				}
@@ -1213,13 +1213,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		switch (dli.ntype) {
 		case DLE_DIR:
-			if (!ChangeDirectory(hwnd, dli.szFileName, TRUE)) {
+			if (!ChangeDirectory(hwnd, dli.szFileName, true)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 			break;
 
 		case DLE_FILE: {
-			const BOOL bOpenNew = LOWORD(wParam) == IDM_FILE_OPENNEW;
+			const bool bOpenNew = LOWORD(wParam) == IDM_FILE_OPENNEW;
 			WCHAR tch[MAX_PATH];
 			BeginWaitCursor();
 			if (PathGetLnkPath(dli.szFileName, tch)) {
@@ -1561,7 +1561,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		WCHAR tch[MAX_PATH];
 
 		if (GetDirectory(hwnd, IDS_GETDIRECTORY, tch, NULL)) {
-			if (!ChangeDirectory(hwnd, tch, TRUE)) {
+			if (!ChangeDirectory(hwnd, tch, true)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		}
@@ -1577,9 +1577,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			DLITEM dli;
 			dli.mask = DLI_FILENAME;
 			DirList_GetItem(hwndDirList, -1, &dli);
-			OpenContainingFolder(hwnd, dli.szFileName, TRUE);
+			OpenContainingFolder(hwnd, dli.szFileName, true);
 		} else {
-			OpenContainingFolder(hwnd, szCurDir, FALSE);
+			OpenContainingFolder(hwnd, szCurDir, false);
 		}
 	}
 	break;
@@ -1670,7 +1670,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_UPDATE:
-		ChangeDirectory(hwnd, NULL, TRUE);
+		ChangeDirectory(hwnd, NULL, true);
 		break;
 
 	case IDM_VIEW_FAVORITES:
@@ -1868,7 +1868,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case ACC_FIRETARGET:
-		LaunchTarget(L"", TRUE);
+		LaunchTarget(L"", true);
 		break;
 
 	case ACC_SNAPTOTARGET:
@@ -1890,7 +1890,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (History_CanBack(&mHistory)) {
 			WCHAR tch[MAX_PATH];
 			History_Back(&mHistory, tch, COUNTOF(tch));
-			if (!ChangeDirectory(hwnd, tch, FALSE)) {
+			if (!ChangeDirectory(hwnd, tch, false)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
@@ -1903,7 +1903,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (History_CanForward(&mHistory)) {
 			WCHAR tch[MAX_PATH];
 			History_Forward(&mHistory, tch, COUNTOF(tch));
-			if (!ChangeDirectory(hwnd, tch, FALSE)) {
+			if (!ChangeDirectory(hwnd, tch, false)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
@@ -1914,7 +1914,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_UP_DIR: {
 		if (!PathIsRoot(szCurDir)) {
-			if (!ChangeDirectory(hwnd, L"..", TRUE)) {
+			if (!ChangeDirectory(hwnd, L"..", true)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
@@ -1925,7 +1925,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_ROOT_DIR: {
 		if (!PathIsRoot(szCurDir)) {
-			if (!ChangeDirectory(hwnd, L"\\", TRUE)) {
+			if (!ChangeDirectory(hwnd, L"\\", true)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_CD);
 			}
 		} else {
@@ -2238,12 +2238,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 //  ChangeDirectory()
 //
 //
-BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
+bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 	if (lpszNewDir && !SetCurrentDirectory(lpszNewDir)) {
-		return FALSE;
+		return false;
 	}
 
-	const BOOL fUpdate = lpszNewDir != NULL;
+	const bool fUpdate = lpszNewDir != NULL;
 	if (fUpdate) {
 		// Update call
 		WCHAR szTest[MAX_PATH];
@@ -2320,7 +2320,7 @@ BOOL ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, BOOL bUpdateHistory) {
 	}
 	EndWaitCursor();
 
-	return TRUE;
+	return true;
 }
 
 static void GetWindowPositionSectionName(WCHAR sectionName[96]) {
@@ -2469,7 +2469,7 @@ void LoadSettings(void) {
 		SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, SHGFP_TYPE_CURRENT, tchOpenWithDir);
 #endif
 	} else {
-		PathAbsoluteFromApp(strValue, tchOpenWithDir, TRUE);
+		PathAbsoluteFromApp(strValue, tchOpenWithDir, true);
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"Favorites");
@@ -2484,7 +2484,7 @@ void LoadSettings(void) {
 		SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, tchFavoritesDir);
 #endif
 	} else {
-		PathAbsoluteFromApp(strValue, tchFavoritesDir, TRUE);
+		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
 	}
 
 	strValue = IniSectionGetValue(pIniSection, L"Quikview.exe");
@@ -2493,7 +2493,7 @@ void LoadSettings(void) {
 		PathAddBackslash(szQuickview);
 		lstrcat(szQuickview, L"Viewers\\Quikview.exe");
 	} else {
-		PathAbsoluteFromApp(strValue, szQuickview, TRUE);
+		PathAbsoluteFromApp(strValue, szQuickview, true);
 	}
 
 	bHasQuickview = PathIsFile(szQuickview);
@@ -2614,7 +2614,7 @@ void LoadSettings(void) {
 }
 
 void SaveSettingsNow(void) {
-	BOOL bCreateFailure = FALSE;
+	bool bCreateFailure = false;
 
 	if (StrIsEmpty(szIniFile)) {
 		if (StrNotEmpty(szIniFile2)) {
@@ -2622,7 +2622,7 @@ void SaveSettingsNow(void) {
 				lstrcpy(szIniFile, szIniFile2);
 				StrCpyExW(szIniFile2, L"");
 			} else {
-				bCreateFailure = TRUE;
+				bCreateFailure = true;
 			}
 		} else {
 			return;
@@ -2633,9 +2633,9 @@ void SaveSettingsNow(void) {
 		if (WritePrivateProfileString(INI_SECTION_NAME_SETTINGS, L"WriteTest", L"ok", szIniFile)) {
 			BeginWaitCursor();
 			if (CreateIniFile(szIniFile)) {
-				SaveSettings(TRUE);
+				SaveSettings(true);
 			} else {
-				bCreateFailure = TRUE;
+				bCreateFailure = true;
 			}
 			EndWaitCursor();
 			if (!bCreateFailure) {
@@ -2655,7 +2655,7 @@ void SaveSettingsNow(void) {
 //  SaveSettings()
 //
 //
-void SaveSettings(BOOL bSaveSettingsNow) {
+void SaveSettings(bool bSaveSettingsNow) {
 	if (!CreateIniFile(szIniFile)) {
 		return;
 	}
@@ -2698,12 +2698,12 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	if (iStartupDir == 1) {
 		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
 	}
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
 	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, TRUE, flagPortableMyDocs);
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
 	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
@@ -2724,7 +2724,7 @@ void SaveSettings(BOOL bSaveSettingsNow) {
 	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
 }
 
-void SaveWindowPosition(BOOL bSaveSettingsNow, WCHAR *pIniSectionBuf) {
+void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	IniSectionOnSave section;
 	if (pIniSectionBuf == NULL) {
 		pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
@@ -3007,7 +3007,7 @@ void LoadFlags(void) {
 //  FindIniFile()
 //
 //
-BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
+bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tchFileExpanded[MAX_PATH];
 	ExpandEnvironmentStrings(lpszFile, tchFileExpanded, COUNTOF(tchFileExpanded));
 
@@ -3018,7 +3018,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		lstrcpy(PathFindFileName(tchBuild), tchFileExpanded);
 		if (PathIsFile(tchBuild)) {
 			lstrcpy(lpszFile, tchBuild);
-			return TRUE;
+			return true;
 		}
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -3040,7 +3040,7 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
-					return TRUE;
+					return true;
 				}
 			}
 		}
@@ -3064,20 +3064,20 @@ BOOL CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				PathAppend(tchBuild, tchFileExpanded);
 				if (PathIsFile(tchBuild)) {
 					lstrcpy(lpszFile, tchBuild);
-					return TRUE;
+					return true;
 				}
 			}
 		}
 #endif
 	} else if (PathIsFile(tchFileExpanded)) {
 		lstrcpy(lpszFile, tchFileExpanded);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
+bool CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 	WCHAR tch[MAX_PATH];
 	if (GetPrivateProfileString(INI_SECTION_NAME_METAPATH, L"metapath.ini", L"", tch, COUNTOF(tch), lpszFile)) {
 		if (CheckIniFile(tch, lpszModule)) {
@@ -3092,14 +3092,14 @@ BOOL CheckIniFileRedirect(LPWSTR lpszFile, LPCWSTR lpszModule) {
 				lstrcpy(lpszFile, tchFileExpanded);
 			}
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-BOOL FindIniFile(void) {
+bool FindIniFile(void) {
 	if (StrEqualExW(szIniFile, L"*?")) {
-		return FALSE;
+		return false;
 	}
 
 	WCHAR tchTest[MAX_PATH];
@@ -3116,12 +3116,12 @@ BOOL FindIniFile(void) {
 				lstrcpy(szIniFile, tchTest);
 			}
 		}
-		return TRUE;
+		return true;
 	}
 
 	lstrcpy(tchTest, PathFindFileName(tchModule));
 	PathRenameExtension(tchTest, L".ini");
-	BOOL bFound = CheckIniFile(tchTest, tchModule);
+	bool bFound = CheckIniFile(tchTest, tchModule);
 
 	if (!bFound) {
 		lstrcpy(tchTest, L"metapath.ini");
@@ -3139,19 +3139,19 @@ BOOL FindIniFile(void) {
 		PathRenameExtension(szIniFile, L".ini");
 	}
 
-	return TRUE;
+	return true;
 }
 
-BOOL TestIniFile(void) {
+bool TestIniFile(void) {
 	if (StrEqualExW(szIniFile, L"*?")) {
 		StrCpyExW(szIniFile2, L"");
 		StrCpyExW(szIniFile, L"");
-		return 0;
+		return false;
 	}
 
 	DWORD dwFileAttributes = GetFileAttributes(szIniFile);
 	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-		return TRUE;
+		return true;
 	}
 
 	if ((dwFileAttributes != INVALID_FILE_ATTRIBUTES) || (StrNotEmpty(szIniFile) && szIniFile[lstrlen(szIniFile) - 1] == L'\\')) {
@@ -3174,12 +3174,12 @@ BOOL TestIniFile(void) {
 	if ((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0) {
 		lstrcpy(szIniFile2, szIniFile);
 		StrCpyExW(szIniFile, L"");
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
-BOOL CreateIniFile(LPCWSTR lpszIniFile) {
+bool CreateIniFile(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
 		WCHAR *pwchTail;
 
@@ -3200,11 +3200,11 @@ BOOL CreateIniFile(LPCWSTR lpszIniFile) {
 				WriteFile(hFile, (LPCVOID)L"\xFEFF[metapath]\r\n", 26, &dw, NULL);
 			}
 			CloseHandle(hFile);
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -3212,9 +3212,9 @@ BOOL CreateIniFile(LPCWSTR lpszIniFile) {
 //  DisplayPath()
 //
 //
-BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
+bool DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 	if (StrIsEmpty(lpPath)) {
-		return FALSE;
+		return false;
 	}
 
 	WCHAR szTmp[MAX_PATH];
@@ -3236,11 +3236,11 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 		if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) {
 			if (!SetCurrentDirectory(szPath)) {
 				MsgBoxWarn(MB_OK, uIdError);
-				return FALSE;
+				return false;
 			}
 			PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
-			return TRUE;
+			return true;
 		}
 		{
 			// szPath will be modified...
@@ -3264,12 +3264,12 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 				ListView_EnsureVisible(hwndDirList, 0, FALSE);
 			}
 
-			return TRUE;
+			return true;
 		}
 	}
 
 	MsgBoxWarn(MB_OK, uIdError);
-	return FALSE;
+	return false;
 }
 
 //=============================================================================
@@ -3277,7 +3277,7 @@ BOOL DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 //  DisplayLnkFile()
 //
 //
-BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
+bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 	WCHAR szPath[MAX_PATH];
 	if (!SearchPathEx(pszResPath, COUNTOF(szPath), szPath)) {
 		lstrcpy(szPath, pszResPath);
@@ -3289,11 +3289,11 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 		if (dwAttr & FILE_ATTRIBUTE_DIRECTORY) {
 			if (!SetCurrentDirectory(szPath)) {
 				MsgBoxWarn(MB_OK, IDS_ERR_LNK_NOACCESS);
-				return FALSE;
+				return false;
 			}
 			PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
-			return TRUE;
+			return true;
 		}
 
 		// Current file is ShellLink, get dir and desc
@@ -3327,7 +3327,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 			ListView_EnsureVisible(hwndDirList, 0, FALSE);
 		}
 
-		return TRUE;
+		return true;
 	}
 
 	// GetFileAttributes() failed
@@ -3347,7 +3347,7 @@ BOOL DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 	}
 
 	MsgBoxWarn(MB_OK, IDS_ERR_LNK_NOACCESS);
-	return FALSE;
+	return false;
 }
 
 /******************************************************************************
@@ -3374,9 +3374,9 @@ static BOOL CALLBACK EnumWindProcReuseWindow(HWND hwnd, LPARAM lParam) {
 	return bContinue;
 }
 
-BOOL ActivatePrevInst(void) {
+bool ActivatePrevInst(void) {
 	if (flagNoReuseWindow || flagStartAsTrayIcon) {
-		return FALSE;
+		return false;
 	}
 
 	HWND hwnd = NULL;
@@ -3417,16 +3417,16 @@ BOOL ActivatePrevInst(void) {
 
 				GlobalFree(lpPathArg);
 			}
-			return TRUE;
+			return true;
 		}
 
 		if (MsgBoxAsk(MB_YESNO, IDS_ERR_PREVWINDISABLED) == IDYES) {
-			return FALSE;
+			return false;
 		}
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 void GetRelaunchParameters(LPWSTR szParameters) {
@@ -3478,7 +3478,7 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 //  ShowNotifyIcon()
 //
 //
-void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
+void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	static HICON hIcon;
 
 	if (!hIcon) {
@@ -3512,7 +3512,7 @@ void ShowNotifyIcon(HWND hwnd, BOOL bAdd) {
 //
 //
 WCHAR szGlobalWndClass[256] = L"";
-BOOL bLoadLaunchSetingsLoaded = FALSE;
+bool bLoadLaunchSetingsLoaded = false;
 
 static BOOL CALLBACK EnumWindProcTargetApplication(HWND hwnd, LPARAM lParam) {
 	BOOL bContinue = TRUE;
@@ -3563,10 +3563,10 @@ void LoadLaunchSetings(void) {
 	lstrcpy(szGlobalWndClass, szTargetApplicationWndClass);
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
-	bLoadLaunchSetingsLoaded = TRUE;
+	bLoadLaunchSetingsLoaded = true;
 }
 
-void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
+void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 	if (!bLoadLaunchSetingsLoaded) {
 		LoadLaunchSetings();
 	}
@@ -3623,7 +3623,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 
 			lstrcpy(szTmp, szTargetApplication);
 			WCHAR szFile[MAX_PATH];
-			PathAbsoluteFromApp(szTmp, szFile, TRUE);
+			PathAbsoluteFromApp(szTmp, szFile, true);
 
 			SHELLEXECUTEINFO sei;
 			memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
@@ -3673,7 +3673,7 @@ void LaunchTarget(LPCWSTR lpFileName, BOOL bOpenNew) {
 		ExpandEnvironmentStringsEx(szTmp, COUNTOF(szTmp));
 
 		WCHAR szFile[MAX_PATH];
-		PathAbsoluteFromApp(szTmp, szFile, TRUE);
+		PathAbsoluteFromApp(szTmp, szFile, true);
 
 		SHELLEXECUTEINFO sei;
 		memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
