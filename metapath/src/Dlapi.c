@@ -33,12 +33,12 @@
 typedef struct DLDATA { // dl
 	BackgroundWorker worker;	// where HWND is ListView Control
 	UINT cbidl;					// Size of pidl
+	bool bNoFadeHidden;			// Flag passed from GetDispInfo()
 	LPITEMIDLIST pidl;			// Directory Id
 	LPSHELLFOLDER lpsf;			// IShellFolder Interface to pidl
 	WCHAR szPath[MAX_PATH];		// Pathname to Directory Id
 	int iDefIconFolder;			// Default Folder Icon
 	int iDefIconFile;			// Default File Icon
-	BOOL bNoFadeHidden;			// Flag passed from GetDispInfo()
 	HANDLE hExitThread;			// Flag is set when Icon Thread should terminate
 	HANDLE hTerminatedThread;	// Flag is set when Icon Thread has terminated
 	HANDLE hIconThread;
@@ -135,7 +135,7 @@ void DirList_StartIconThread(HWND hwnd) {
 //
 //  Snapshots a directory and displays the items in the listview control
 //
-int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpec, BOOL bExcludeFilter, BOOL bNoFadeHidden, int iSortFlags, BOOL fSortRev) {
+int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpec, bool bExcludeFilter, bool bNoFadeHidden, int iSortFlags, bool fSortRev) {
 	LPDLDATA lpdl = (LPDLDATA)GetProp(hwnd, pDirListProp);
 	SHFILEINFO shfi;
 
@@ -410,7 +410,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 //  Must be called in response to a WM_NOTIFY/LVN_GETDISPINFO message from
 //  the listview control
 //
-bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden) {
+bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, bool bNoFadeHidden) {
 	UNREFERENCED_PARAMETER(hwnd);
 	UNREFERENCED_PARAMETER(bNoFadeHidden);
 
@@ -527,7 +527,7 @@ int CALLBACK DirList_CompareProcRw(LPARAM lp1, LPARAM lp2, LPARAM lFlags) {
 //
 //  Sorts the listview control by the specified order
 //
-BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev) {
+BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev) {
 	return ListView_SortItems(hwnd, (fRev? DirList_CompareProcRw : DirList_CompareProcFw), lFlags);
 }
 
@@ -824,7 +824,7 @@ bool DirList_IsFileSelected(HWND hwnd) {
 //
 //  Create a valid DL_FILTER structure
 //
-void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter) {
+void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, bool bExcludeFilter) {
 	memset(pdlf, 0, sizeof(DL_FILTER));
 	if (StrIsEmpty(lpszFileSpec) || StrEqualExW(lpszFileSpec, L"*.*")) {
 		return;
@@ -849,10 +849,10 @@ void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFi
 //
 //  Check if a specified item matches a given filter
 //
-BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf) {
+bool DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf) {
 	// Immediately return true if lpszFileSpec is *.* or NULL
 	if (pdlf->nCount == 0 && !pdlf->bExcludeFilter) {
-		return TRUE;
+		return true;
 	}
 
 	WIN32_FIND_DATA fd;
@@ -860,12 +860,12 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pd
 
 	// All the directories are added
 	if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-		return TRUE;
+		return true;
 	}
 
 	// Check if exclude *.* after directories have been added
 	if (pdlf->nCount == 0 && pdlf->bExcludeFilter) {
-		return FALSE;
+		return false;
 	}
 
 	for (int i = 0; i < pdlf->nCount; i++) {
@@ -873,9 +873,9 @@ BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pd
 			const BOOL bMatchSpec = PathMatchSpec(fd.cFileName, pdlf->pFilter[i]);
 			if (bMatchSpec) {
 				if (!pdlf->bExcludeFilter) {
-					return TRUE;
+					return true;
 				}
-				return FALSE;
+				return false;
 			}
 		}
 	}
@@ -1204,7 +1204,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 //
 //  DriveBox_DeleteItem
 //
-LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
+bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 	const NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
 	COMBOBOXEXITEM cbei;
 	cbei.iItem = lpnmcbe->ceItem.iItem;
@@ -1224,21 +1224,21 @@ LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam) {
 	// Free lpdcid itself
 	CoTaskMemFree(lpdcid);
 
-	return TRUE;
+	return true;
 }
 
 //=============================================================================
 //
 //  DriveBox_GetDispInfo
 //
-LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
+bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
 
 	NMCOMBOBOXEX *lpnmcbe = (NMCOMBOBOXEX *)lParam;
 	LPDC_ITEMDATA lpdcid = (LPDC_ITEMDATA)lpnmcbe->ceItem.lParam;
 
 	if (!lpdcid) {
-		return FALSE;
+		return false;
 	}
 
 	// Get Display Name
@@ -1259,7 +1259,7 @@ LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam) {
 	// Set values
 	lpnmcbe->ceItem.mask |= CBEIF_DI_SETITEM;
 
-	return TRUE;
+	return true;
 }
 
 //==== ItemID =================================================================

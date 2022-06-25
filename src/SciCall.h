@@ -93,12 +93,12 @@ NP2_inline void SciCall_ReplaceSel(const char *text) {
 	SciCall(SCI_REPLACESEL, 0, (LPARAM)text);
 }
 
-NP2_inline void SciCall_SetReadOnly(BOOL readOnly) {
+NP2_inline void SciCall_SetReadOnly(bool readOnly) {
 	SciCall(SCI_SETREADONLY, readOnly, 0);
 }
 
-NP2_inline BOOL SciCall_GetReadOnly(void) {
-	return (BOOL)SciCall(SCI_GETREADONLY, 0, 0);
+NP2_inline bool SciCall_GetReadOnly(void) {
+	return (bool)SciCall(SCI_GETREADONLY, 0, 0);
 }
 
 NP2_inline Sci_Position SciCall_GetTextRangeFull(struct Sci_TextRangeFull *tr) {
@@ -224,8 +224,8 @@ NP2_inline void SciCall_Clear(void) {
 	SciCall(SCI_CLEAR, 0, 0);
 }
 
-NP2_inline BOOL SciCall_CanPaste(void) {
-	return (BOOL)SciCall(SCI_CANPASTE, 0, 0);
+NP2_inline bool SciCall_CanPaste(void) {
+	return (bool)SciCall(SCI_CANPASTE, 0, 0);
 }
 
 NP2_inline void SciCall_CopyAllowLine(void) {
@@ -246,8 +246,8 @@ NP2_inline void SciCall_Undo(void) {
 	SciCall(SCI_UNDO, 0, 0);
 }
 
-NP2_inline BOOL SciCall_CanUndo(void) {
-	return (BOOL)SciCall(SCI_CANUNDO, 0, 0);
+NP2_inline bool SciCall_CanUndo(void) {
+	return (bool)SciCall(SCI_CANUNDO, 0, 0);
 }
 
 NP2_inline void SciCall_EmptyUndoBuffer(void) {
@@ -258,8 +258,8 @@ NP2_inline void SciCall_Redo(void) {
 	SciCall(SCI_REDO, 0, 0);
 }
 
-NP2_inline BOOL SciCall_CanRedo(void) {
-	return (BOOL)SciCall(SCI_CANREDO, 0, 0);
+NP2_inline bool SciCall_CanRedo(void) {
+	return (bool)SciCall(SCI_CANREDO, 0, 0);
 }
 
 NP2_inline void SciCall_SetUndoCollection(bool collectUndo) {
@@ -360,8 +360,8 @@ NP2_inline Sci_Position SciCall_GetSelText(char *buffer) {
 	return SciCall(SCI_GETSELTEXT, 0, (LPARAM)buffer);
 }
 
-NP2_inline BOOL SciCall_IsRectangleSelection(void) {
-	return (BOOL)SciCall(SCI_SELECTIONISRECTANGLE, 0, 0);
+NP2_inline bool SciCall_IsRectangleSelection(void) {
+	return (bool)SciCall(SCI_SELECTIONISRECTANGLE, 0, 0);
 }
 
 NP2_inline void SciCall_SetSelectionMode(int selectionMode) {
@@ -462,8 +462,8 @@ NP2_inline bool SciCall_IsMultipleSelection(void) {
 	return SciCall(SCI_GETSELECTIONS, 0, 0) > 1;
 }
 
-NP2_inline BOOL SciCall_IsSelectionEmpty(void) {
-	return (BOOL)SciCall(SCI_GETSELECTIONEMPTY, 0, 0);
+NP2_inline bool SciCall_IsSelectionEmpty(void) {
+	return (bool)SciCall(SCI_GETSELECTIONEMPTY, 0, 0);
 }
 
 NP2_inline void SciCall_ClearSelections(void) {
@@ -589,7 +589,7 @@ NP2_inline void SciCall_ConvertEOLs(int eolMode) {
 	SciCall(SCI_CONVERTEOLS, eolMode, 0);
 }
 
-NP2_inline void SciCall_SetViewEOL(BOOL visible) {
+NP2_inline void SciCall_SetViewEOL(bool visible) {
 	SciCall(SCI_SETVIEWEOL, visible, 0);
 }
 
@@ -699,8 +699,8 @@ NP2_inline void SciCall_StyleSetHotSpot(int style, bool hotspot) {
 	SciCall(SCI_STYLESETHOTSPOT, style, hotspot);
 }
 
-NP2_inline BOOL SciCall_StyleGetHotSpot(int style) {
-	return (BOOL)SciCall(SCI_STYLEGETHOTSPOT, style, 0);
+NP2_inline bool SciCall_StyleGetHotSpot(int style) {
+	return (bool)SciCall(SCI_STYLEGETHOTSPOT, style, 0);
 }
 
 NP2_inline void SciCall_StyleSetCheckMonospaced(int style, bool checkMonospaced) {
@@ -745,7 +745,7 @@ NP2_inline void SciCall_SetCaretLineVisibleAlways(bool alwaysVisible) {
 	SciCall(SCI_SETCARETLINEVISIBLEALWAYS, alwaysVisible, 0);
 }
 
-NP2_inline void SciCall_SetCaretLineHighlightSubLine(BOOL subLine) {
+NP2_inline void SciCall_SetCaretLineHighlightSubLine(bool subLine) {
 	SciCall(SCI_SETCARETLINEHIGHLIGHTSUBLINE, subLine, 0);
 }
 
@@ -892,7 +892,7 @@ NP2_inline void SciCall_SetTabMinimumWidth(int pixels) {
 	SciCall(SCI_SETTABMINIMUMWIDTH, pixels, 0);
 }
 
-NP2_inline void SciCall_SetUseTabs(BOOL useTabs) {
+NP2_inline void SciCall_SetUseTabs(bool useTabs) {
 	SciCall(SCI_SETUSETABS, useTabs, 0);
 }
 
@@ -900,11 +900,11 @@ NP2_inline void SciCall_SetIndent(int indentSize) {
 	SciCall(SCI_SETINDENT, indentSize, 0);
 }
 
-NP2_inline void SciCall_SetTabIndents(BOOL tabIndents) {
+NP2_inline void SciCall_SetTabIndents(bool tabIndents) {
 	SciCall(SCI_SETTABINDENTS, tabIndents, 0);
 }
 
-NP2_inline void SciCall_SetBackSpaceUnIndents(BOOL bsUnIndents) {
+NP2_inline void SciCall_SetBackSpaceUnIndents(bool bsUnIndents) {
 	SciCall(SCI_SETBACKSPACEUNINDENTS, bsUnIndents, 0);
 }
 
@@ -966,7 +966,7 @@ NP2_inline void SciCall_MarkerSetStrokeWidth(int markerNumber, int hundredths) {
 	SciCall(SCI_MARKERSETSTROKEWIDTH, markerNumber, hundredths);
 }
 
-NP2_inline void SciCall_MarkerEnableHighlight(BOOL enabled) {
+NP2_inline void SciCall_MarkerEnableHighlight(bool enabled) {
 	SciCall(SCI_MARKERENABLEHIGHLIGHT, enabled, 0);
 }
 
@@ -1042,8 +1042,8 @@ NP2_inline void SciCall_AutoCCancel(void) {
 	SciCall(SCI_AUTOCCANCEL, 0, 0);
 }
 
-NP2_inline BOOL SciCall_AutoCActive(void) {
-	return (BOOL)SciCall(SCI_AUTOCACTIVE, 0, 0);
+NP2_inline bool SciCall_AutoCActive(void) {
+	return (bool)SciCall(SCI_AUTOCACTIVE, 0, 0);
 }
 
 NP2_inline void SciCall_AutoCSetSeparator(char separatorCharacter) {
@@ -1058,7 +1058,7 @@ NP2_inline void SciCall_AutoCSetFillUps(const char *characterSet) {
 	SciCall(SCI_AUTOCSETFILLUPS, 0, (LPARAM)characterSet);
 }
 
-NP2_inline void SciCall_AutoCSetChooseSingle(BOOL chooseSingle) {
+NP2_inline void SciCall_AutoCSetChooseSingle(bool chooseSingle) {
 	SciCall(SCI_AUTOCSETCHOOSESINGLE, chooseSingle, 0);
 }
 
@@ -1096,8 +1096,8 @@ NP2_inline void SciCall_CallTipCancel(void) {
 	SciCall(SCI_CALLTIPCANCEL, 0, 0);
 }
 
-NP2_inline BOOL SciCall_CallTipActive(void) {
-	return (BOOL)SciCall(SCI_CALLTIPACTIVE, 0, 0);
+NP2_inline bool SciCall_CallTipActive(void) {
+	return (bool)SciCall(SCI_CALLTIPACTIVE, 0, 0);
 }
 
 NP2_inline void SciCall_CallTipUseStyle(int tabSize) {
@@ -1254,8 +1254,8 @@ NP2_inline Sci_Line SciCall_DocLineFromVisible(Sci_Line displayLine) {
 	return SciCall(SCI_DOCLINEFROMVISIBLE, displayLine, 0);
 }
 
-NP2_inline BOOL SciCall_GetLineVisible(Sci_Line line) {
-	return (BOOL)SciCall(SCI_GETLINEVISIBLE, line, 0);
+NP2_inline bool SciCall_GetLineVisible(Sci_Line line) {
+	return (bool)SciCall(SCI_GETLINEVISIBLE, line, 0);
 }
 
 NP2_inline int SciCall_GetFoldLevel(Sci_Line line) {

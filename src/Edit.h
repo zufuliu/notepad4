@@ -38,11 +38,11 @@ typedef struct EDITFINDREPLACE {
 	char	szReplaceUTF8[512 * kMaxMultiByteCount];
 	HWND	hwnd;
 	UINT	fuFlags;
-	BOOL	bTransformBS;
-	BOOL	bFindClose;
-	BOOL	bReplaceClose;
-	BOOL	bNoFindWrap;
-	BOOL	bWildcardSearch;
+	bool	bTransformBS;
+	bool	bFindClose;
+	bool	bReplaceClose;
+	bool	bNoFindWrap;
+	bool	bWildcardSearch;
 } EDITFINDREPLACE, *LPEDITFINDREPLACE;
 
 typedef const EDITFINDREPLACE * LPCEDITFINDREPLACE;
@@ -186,7 +186,7 @@ void	EditInsertTagDlg(HWND hwnd);
 void	EditInsertDateTime(bool bShort);
 void	EditUpdateTimestampMatchTemplate(HWND hwnd);
 void	EditInsertUnicodeControlCharacter(int menu);
-void	EditShowUnicodeControlCharacter(BOOL bShow);
+void	EditShowUnicodeControlCharacter(bool bShow);
 bool	EditSortDlg(HWND hwnd, EditSortFlag *piSortFlags);
 bool	EditAlignDlg(HWND hwnd, EditAlignMode *piAlignMode);
 void	EditSelectionAction(int action);
@@ -230,9 +230,9 @@ enum {
 };
 
 typedef struct EditMarkAllStatus {
-	BOOL pending;
-	BOOL ignoreSelectionUpdate;
-	BOOL bookmarkForFindAll;
+	bool pending;
+	bool ignoreSelectionUpdate;
+	bool bookmarkForFindAll;
 	int findFlag;
 	int incrementSize;			// increment search size
 	Sci_Position iSelCount;		// length for pszText
@@ -251,7 +251,7 @@ NP2_inline void EditMarkAll_Clear(void) {
 }
 bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
 bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
-bool EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark);
+bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark);
 void EditToggleBookmarkAt(Sci_Position iPos);
 void EditBookmarkSelectAll(void);
 
@@ -297,14 +297,14 @@ enum {
 #define MIN_AUTO_COMPLETION_NUMBER_LENGTH		0
 
 typedef struct EditAutoCompletionConfig {
-	BOOL bIndentText;
-	BOOL bCloseTags;
-	BOOL bCompleteWord;
-	BOOL bScanWordsInDocument;
+	bool bIndentText;
+	bool bCloseTags;
+	bool bCompleteWord;
+	bool bScanWordsInDocument;
 	UINT dwScanWordsTimeout;
-	BOOL bEnglistIMEModeOnly;
-	BOOL bIgnoreCase;
-	BOOL bLaTeXInputMethod;
+	bool bEnglistIMEModeOnly;
+	bool bIgnoreCase;
+	bool bLaTeXInputMethod;
 	UINT iVisibleItemCount;
 	int iMinWordLength;
 	int iMinNumberLength;
@@ -458,7 +458,7 @@ static inline bool Encoding_IsUTF8(int iEncoding) {
 
 void	Encoding_ReleaseResources(void);
 bool	EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSavePoint);
-void	EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFINDREPLACE lpefr);
+void	EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr);
 const char* GetFoldDisplayEllipsis(UINT cpEdit, UINT acp);
 void	Encoding_InitDefaults(void);
 int 	Encoding_MapIniSetting(bool bLoad, UINT iSetting);
@@ -468,12 +468,12 @@ int 	Encoding_MatchA(LPCSTR pchTest);
 bool	Encoding_IsValid(int iEncoding);
 int		Encoding_GetIndex(UINT codePage);
 int		Encoding_GetAnsiIndex(void);
-void	Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly);
+void	Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly);
 bool	Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet);
 #if 0
-void	Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly);
+void	Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly);
 bool	Encoding_GetFromListView(HWND hwnd, int *pidEncoding);
-void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly);
+void	Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly);
 bool	Encoding_GetFromComboboxEx(HWND hwnd, int *pidEncoding);
 #endif
 
@@ -516,24 +516,24 @@ bool IsStringCaseSensitiveA(LPCSTR pszText);
 typedef struct EditTabSettings {
 	int 	globalTabWidth;
 	int 	globalIndentWidth;
-	BOOL	globalTabsAsSpaces;
-	BOOL	bTabIndents;
-	BOOL	bBackspaceUnindents;
-	BOOL	bDetectIndentation;
+	bool	globalTabsAsSpaces;
+	bool	bTabIndents;
+	bool	bBackspaceUnindents;
+	bool	bDetectIndentation;
 
 	int		schemeTabWidth;
 	int		schemeIndentWidth;
-	BOOL	schemeTabsAsSpaces;
-	BOOL	schemeUseGlobalTabSettings;
+	bool	schemeTabsAsSpaces;
+	bool	schemeUseGlobalTabSettings;
 } EditTabSettings;
 
 typedef struct FILEVARS {
 	int 	mask;
 	int 	iTabWidth;
 	int 	iIndentWidth;
-	BOOL	bTabsAsSpaces;
-	BOOL	bTabIndents;
-	BOOL	fWordWrap;
+	bool	bTabsAsSpaces;
+	bool	bTabIndents;
+	bool	fWordWrap;
 	int 	iLongLinesLimit;
 	int 	iEncoding;
 	char	tchEncoding[32];

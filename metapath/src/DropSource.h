@@ -30,7 +30,7 @@ public:
 	STDMETHODIMP_(ULONG)Release() noexcept override;
 
 	/* IDropSource methods */
-	STDMETHODIMP QueryContinueDrag(BOOL fEsc, DWORD grfKeyState) noexcept override;
+	STDMETHODIMP QueryContinueDrag(BOOL fEscapePressed, DWORD grfKeyState) noexcept override;
 	STDMETHODIMP GiveFeedback(DWORD /*dwEffect*/) noexcept override;
 
 private:

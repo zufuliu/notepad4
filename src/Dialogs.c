@@ -40,22 +40,22 @@
 extern HWND		hwndMain;
 extern DWORD	dwLastIOError;
 extern int		iCurrentEncoding;
-extern BOOL		bSkipUnicodeDetection;
-extern BOOL		bLoadANSIasUTF8;
-extern BOOL		bLoadASCIIasUTF8;
-extern BOOL		bLoadNFOasOEM;
-extern int		fNoFileVariables;
-extern BOOL		bNoEncodingTags;
-extern BOOL		bWarnLineEndings;
-extern BOOL		bFixLineEndings;
-extern BOOL		bAutoStripBlanks;
+extern bool		bSkipUnicodeDetection;
+extern bool		bLoadANSIasUTF8;
+extern bool		bLoadASCIIasUTF8;
+extern bool		bLoadNFOasOEM;
+extern bool		fNoFileVariables;
+extern bool		bNoEncodingTags;
+extern bool		bWarnLineEndings;
+extern bool		bFixLineEndings;
+extern bool		bAutoStripBlanks;
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 extern LANGID uiLanguage;
 #endif
 extern FILEVARS fvCurFile;
 extern EditTabSettings tabSettings;
 extern int iWrapColumn;
-extern BOOL bUseXPFileDialog;
+extern bool bUseXPFileDialog;
 
 static inline HWND GetMsgBoxParent(void) {
 	HWND hwnd = GetActiveWindow();
@@ -477,7 +477,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				SetDlgItemText(hwnd, IDC_COMMANDLINE, szFile);
 			}
 
-			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
+			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 		}
 		break;
 
@@ -536,7 +536,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					if (ShellExecuteEx(&sei)) {
 						EndDialog(hwnd, IDOK);
 					} else {
-						PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COMMANDLINE)), 1);
+						PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COMMANDLINE)), TRUE);
 					}
 				}
 			}
@@ -567,7 +567,7 @@ void RunDlg(HWND hwnd, LPCWSTR lpstrDefault) {
 // OpenWithDlgProc()
 //
 extern WCHAR tchOpenWithDir[MAX_PATH];
-extern int flagNoFadeHidden;
+extern bool flagNoFadeHidden;
 
 extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
@@ -669,7 +669,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), TRUE);
 		}
 		break;
 
@@ -744,7 +744,6 @@ bool OpenWithDlg(HWND hwnd, LPCWSTR lpstrFile) {
 // FavoritesDlgProc()
 //
 extern WCHAR tchFavoritesDir[MAX_PATH];
-//extern int flagNoFadeHidden;
 
 extern int cxFavoritesDlg;
 extern int cyFavoritesDlg;
@@ -846,7 +845,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), TRUE);
 		}
 		break;
 
@@ -984,7 +983,7 @@ bool AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 //
 //
 extern LPMRULIST pFileMRU;
-extern BOOL bSaveRecentFiles;
+extern bool bSaveRecentFiles;
 extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
 
@@ -1324,9 +1323,9 @@ bool FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
 //
 //
 extern int iFileWatchingMode;
-extern int iFileWatchingMethod;
-extern BOOL bFileWatchingKeepAtEnd;
-extern BOOL bResetFileWatching;
+extern bool iFileWatchingMethod;
+extern bool bFileWatchingKeepAtEnd;
+extern bool bResetFileWatching;
 
 static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
@@ -1435,13 +1434,13 @@ bool ColumnWrapDlg(HWND hwnd) {
 // WordWrapSettingsDlgProc()
 //
 //
-extern BOOL fWordWrapG;
+extern bool fWordWrapG;
 extern int iWordWrapMode;
 extern int iWordWrapIndent;
 extern int iWordWrapSymbols;
-extern BOOL bShowWordWrapSymbols;
-extern BOOL bWordWrapSelectSubLine;
-extern BOOL bHighlightCurrentSubLine;
+extern bool bShowWordWrapSymbols;
+extern bool bWordWrapSelectSubLine;
+extern bool bHighlightCurrentSubLine;
 
 static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
@@ -1486,11 +1485,11 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			iWordWrapIndent = (int)SendDlgItemMessage(hwnd, IDC_WRAP_INDENT, CB_GETCURSEL, 0, 0);
-			bShowWordWrapSymbols = FALSE;
+			bShowWordWrapSymbols = false;
 			int iSel = (int)SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_BEFORE, CB_GETCURSEL, 0, 0);
 			const int iSel2 = (int)SendDlgItemMessage(hwnd, IDC_WRAP_SYMBOL_AFTER, CB_GETCURSEL, 0, 0);
 			if (iSel > 0 || iSel2 > 0) {
-				bShowWordWrapSymbols = TRUE;
+				bShowWordWrapSymbols = true;
 				iWordWrapSymbols = iSel + iSel2 * 10;
 			}
 
@@ -1566,7 +1565,7 @@ static INT_PTR CALLBACK LongLineSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_LONGLINE_LIMIT)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_LONGLINE_LIMIT)), TRUE);
 			}
 		}
 		break;
@@ -1726,7 +1725,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 				tabSettings.globalIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 				tabSettings.globalTabsAsSpaces = IsButtonChecked(hwnd, IDC_GLOBAL_TAB_AS_SPACE);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_GLOBAL_INDENT_WIDTH : IDC_GLOBAL_TAB_WIDTH)), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_GLOBAL_INDENT_WIDTH : IDC_GLOBAL_TAB_WIDTH)), TRUE);
 				break;
 			}
 
@@ -1744,7 +1743,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 					tabSettings.schemeIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 					tabSettings.schemeTabsAsSpaces = IsButtonChecked(hwnd, IDC_SCHEME_TAB_AS_SPACE);
 				} else {
-					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_SCHEME_INDENT_WIDTH : IDC_SCHEME_TAB_WIDTH)), 1);
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_SCHEME_INDENT_WIDTH : IDC_SCHEME_TAB_WIDTH)), TRUE);
 					break;
 				}
 			}
@@ -1763,7 +1762,7 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 					fvCurFile.iIndentWidth = clamp_i(iNewIndentWidth, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 					fvCurFile.bTabsAsSpaces = IsButtonChecked(hwnd, IDC_FILE_TAB_AS_SPACE);
 				} else {
-					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_FILE_INDENT_WIDTH : IDC_FILE_TAB_WIDTH)), 1);
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, fTranslated1 ? IDC_FILE_INDENT_WIDTH : IDC_FILE_TAB_WIDTH)), TRUE);
 					break;
 				}
 			}
@@ -1829,7 +1828,7 @@ bool TabSettingsDlg(HWND hwnd) {
 //
 //
 typedef struct ENCODEDLG {
-	BOOL bRecodeOnly;
+	bool bRecodeOnly;
 	int  idEncoding;
 	int  cxDlg;
 	int  cyDlg;
@@ -2022,7 +2021,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 			if (Encoding_GetFromTreeView(hwndTV, &pdd->idEncoding, false)) {
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)hwndTV, 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)hwndTV, TRUE);
 			}
 		}
 		break;
@@ -2537,7 +2536,7 @@ typedef struct INFOBOX {
 	LPWSTR lpstrMessage;
 	LPCWSTR lpstrSetting;
 	LPCWSTR idiIcon;
-	BOOL   bDisableCheckBox;
+	bool   bDisableCheckBox;
 } INFOBOX, *LPINFOBOX;
 
 typedef const INFOBOX * LPCINFOBOX;
@@ -2577,7 +2576,7 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDNO: {
 			LPINFOBOX lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, 1);
+				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, true);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
 		}
@@ -2762,7 +2761,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 
 			if (flagUseSystemMRU != 2) {
 				flagUseSystemMRU = 2;
-				IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", 1, 1);
+				IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", true, true);
 			}
 		}
 	} else {

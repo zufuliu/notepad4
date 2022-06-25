@@ -204,12 +204,12 @@ int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefa
 	return iDefault;
 }
 
-BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault) {
+bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bDefault) {
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
 	if (value) {
 		const UINT t = *value - L'0';
-		if (t <= 1U) {
-			return t;
+		if (t <= true) {
+			return t & true;
 		}
 	}
 	return bDefault;
@@ -417,7 +417,7 @@ bool IsElevated(void) {
 //
 //  ExeNameFromWnd()
 //
-BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName) {
+bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName) {
 	DWORD dwProcessId;
 	GetWindowThreadProcessId(hwnd, &dwProcessId);
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
@@ -427,7 +427,7 @@ BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName) {
 	EnumProcessModules(hProcess, &hModule, sizeof(HMODULE), &cbNeeded);
 	GetModuleFileNameEx(hProcess, hModule, szExeName, cchExeName);
 	CloseHandle(hProcess);
-	return TRUE;
+	return true;
 }
 
 ////=============================================================================
@@ -865,7 +865,7 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) {
 //
 //  SetWindowTransparentMode()
 //
-void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
+void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel) {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/using-windows#using-layered-windows
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
@@ -878,7 +878,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLeve
 	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
-void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
+void SetWindowLayoutRTL(HWND hwnd, bool bRTL) {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#window-layout-and-mirroring
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bRTL ? (exStyle | WS_EX_LAYOUTRTL) : (exStyle & ~WS_EX_LAYOUTRTL);
@@ -1104,7 +1104,7 @@ bool PathGetRealPath(HANDLE hFile, LPCWSTR lpszSrc, LPWSTR lpszDest) {
 //
 //  PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, BOOL bUnexpandMyDocs) {
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) {
 	WCHAR wchPath[MAX_PATH];
 
 	if (!PathIsRelative(lpszSrc)) {
@@ -1743,7 +1743,7 @@ bool History_Back(PHISTORY ph, LPWSTR pszItem, int cItem) {
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 bool History_CanForward(LCPHISTORY ph) {
@@ -2224,7 +2224,7 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 // all current versions of the shell. If explorer isn't running, we try our
 // best to work with a 3rd party shell. If we still can't find anything, we
 // return a rect in the lower right hand corner of the screen
-static VOID GetTrayWndRect(LPRECT lpTrayRect) {
+static void GetTrayWndRect(LPRECT lpTrayRect) {
 	// First, we'll use a quick hack method. We know that the taskbar is a window
 	// of class Shell_TrayWnd, and the status tray is a child of this of class
 	// TrayNotifyWnd. This provides us a window rect to minimize to. Note, however,

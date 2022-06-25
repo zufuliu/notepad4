@@ -181,7 +181,7 @@ extern WCHAR szCurDir[MAX_PATH + 40];
 //
 extern HWND hwndDirList;
 extern int cxRunDlg;
-extern BOOL bUseXPFileDialog;
+extern bool bUseXPFileDialog;
 
 INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(lParam);
@@ -272,7 +272,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 				}
 				SetDlgItemText(hwnd, IDC_COMMANDLINE, szFile);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
+			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 		}
 		break;
 
@@ -319,7 +319,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 					if (ShellExecuteEx(&sei)) {
 						EndDialog(hwnd, IDOK);
 					} else {
-						PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hwnd, IDC_COMMANDLINE), 1);
+						PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(hwnd, IDC_COMMANDLINE), TRUE);
 					}
 				}
 			}
@@ -607,24 +607,24 @@ INT_PTR CALLBACK AboutDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam
 //  GeneralPageProc
 //
 //
-extern BOOL bSaveSettings;
+extern bool bSaveSettings;
 extern WCHAR szQuickview[MAX_PATH];
 extern WCHAR szQuickviewParams[MAX_PATH];
 extern WCHAR tchFavoritesDir[MAX_PATH];
-extern BOOL bClearReadOnly;
-extern BOOL bRenameOnCollision;
-extern BOOL bSingleClick;
-extern BOOL bOpenFileInSameWindow;
-extern BOOL bTrackSelect;
-extern BOOL bFullRowSelect;
-extern BOOL bFocusEdit;
-extern BOOL bAlwaysOnTop;
-extern BOOL bMinimizeToTray;
-extern BOOL fUseRecycleBin;
-extern BOOL fNoConfirmDelete;
+extern bool bClearReadOnly;
+extern bool bRenameOnCollision;
+extern bool bSingleClick;
+extern bool bOpenFileInSameWindow;
+extern bool bTrackSelect;
+extern bool bFullRowSelect;
+extern bool bFocusEdit;
+extern bool bAlwaysOnTop;
+extern bool bMinimizeToTray;
+extern bool fUseRecycleBin;
+extern bool fNoConfirmDelete;
 extern int  iStartupDir;
 extern int  iEscFunction;
-extern BOOL bReuseWindow;
+extern bool bReuseWindow;
 
 static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
@@ -701,7 +701,7 @@ static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			bAlwaysOnTop = IsButtonChecked(hwnd, IDC_ALWAYSONTOP);
 			bMinimizeToTray = IsButtonChecked(hwnd, IDC_MINIMIZETOTRAY);
 
-			IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW), 0);
+			IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ReuseWindow", IsButtonChecked(hwnd, IDC_REUSEWINDOW), false);
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
 			return TRUE;
 		}
@@ -819,8 +819,8 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 //  ItemsPageProc
 //
 //
-extern BOOL     bDefColorNoFilter;
-extern BOOL     bDefColorFilter;
+extern bool     bDefColorNoFilter;
+extern bool     bDefColorFilter;
 extern COLORREF colorNoFilter;
 extern COLORREF colorFilter;
 extern COLORREF colorCustom[16];
@@ -830,8 +830,8 @@ extern UINT		languageResID;
 extern WCHAR g_wchAppUserModelID[64];
 
 static INT_PTR CALLBACK ItemsPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-	static BOOL m_bDefColorNoFilter;
-	static BOOL m_bDefColorFilter;
+	static bool m_bDefColorNoFilter;
+	static bool m_bDefColorFilter;
 
 	static COLORREF m_colorNoFilter;
 	static COLORREF m_colorFilter;
@@ -1202,7 +1202,7 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				SetDlgItemText(hwnd, IDC_QUICKVIEW, tchBuf);
 			}
 
-			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
+			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 		}
 		break;
 
@@ -1216,7 +1216,7 @@ static INT_PTR CALLBACK ProgPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM
 				SetDlgItemText(hwnd, IDC_FAVORITES, tch);
 			}
 
-			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
+			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 		}
 		break;
 		}
@@ -1280,7 +1280,7 @@ extern HWND hwndStatus;
 extern int nIdFocus;
 
 extern WCHAR tchFilter[128];
-extern BOOL bNegFilter;
+extern bool bNegFilter;
 extern int cxFileFilterDlg;
 
 INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
@@ -1320,7 +1320,7 @@ INT_PTR OptionsPropSheet(HWND hwnd, HINSTANCE hInstance) {
 	psh.hwndParent  = hwnd;
 	psh.hInstance   = hInstance;
 	psh.pszCaption  = WC_METAPATH;
-	psh.nPages      = 4;
+	psh.nPages      = COUNTOF(psp);
 	psh.nStartPage  = 0;
 	psh.ppsp        = psp;
 
@@ -1492,7 +1492,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			}
 
 			DestroyMenu(hMenu);
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_FILTER)), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_FILTER)), TRUE);
 		}
 		break;
 
@@ -1501,7 +1501,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 				bNegFilter = IsButtonChecked(hwnd, IDC_NEGFILTER);
 			} else {
 				StrCpyExW(tchFilter, L"*.*");
-				bNegFilter = FALSE;
+				bNegFilter = false;
 			}
 			EndDialog(hwnd, IDOK);
 			break;
@@ -1525,7 +1525,7 @@ bool GetFilterDlg(HWND hwnd) {
 	WCHAR tchOldFilter[DL_FILTER_BUFSIZE];
 
 	lstrcpy(tchOldFilter, tchFilter);
-	const BOOL bOldNegFilter = bNegFilter;
+	const bool bOldNegFilter = bNegFilter;
 
 	if (IDOK == ThemedDialogBox(g_hInstance, MAKEINTRESOURCE(IDD_FILTER), hwnd, GetFilterDlgProc)) {
 		if (StrCaseEqual(tchFilter, tchOldFilter) && (bOldNegFilter == bNegFilter)) {
@@ -1766,7 +1766,7 @@ INT_PTR CALLBACK CopyMoveDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 			if (GetDirectory(hwnd, IDS_COPYMOVE, tch, tch)) {
 				SetDlgItemText(hwnd, IDC_DESTINATION, tch);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
+			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 		}
 		break;
 
@@ -1866,7 +1866,7 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 }
 
 extern WCHAR tchOpenWithDir[MAX_PATH];
-extern int flagNoFadeHidden;
+extern bool flagNoFadeHidden;
 
 extern int cxOpenWithDlg;
 extern int cyOpenWithDlg;
@@ -1968,7 +1968,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 			}
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndLV), TRUE);
 		}
 		break;
 
@@ -2142,7 +2142,7 @@ bool NewDirDlg(HWND hwnd, LPWSTR pszNewDir) {
 //
 //  Find target window helper dialog
 //
-extern int flagPortableMyDocs;
+extern bool flagPortableMyDocs;
 extern int cxFindWindowDlg;
 
 static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
@@ -2208,7 +2208,7 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		WCHAR tch[256];
 		EnableWindow(hwndOK, GetDlgItemText(hwnd, IDC_WINCLASS, tch, COUNTOF(tch)));
 		if (IsWindowEnabled(hwndOK)) {
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndOK), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(hwndOK), TRUE);
 		}
 
 		//if (GetDlgItemText(hwnd, IDC_WINMODULE, tch, COUNTOF(tch))) {
@@ -2466,7 +2466,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			}
 
 			// set focus to edit control
-			PostMessage(hwnd, WM_NEXTDLGCTL, 1, 0);
+			PostMessage(hwnd, WM_NEXTDLGCTL, TRUE, FALSE);
 
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_TARGET);
 		}
@@ -2549,23 +2549,15 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				IniSectionOnSave *pIniSection = &section;
 				pIniSection->next = pIniSectionBuf;
 
-				int i = IsButtonChecked(hwnd, IDC_LAUNCH);
-				iUseTargetApplication = !i;
-				IniSectionSetBool(pIniSection, L"UseTargetApplication", iUseTargetApplication);
-
-				if (iUseTargetApplication) {
-					GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch));
-					ExtractFirstArgument(tch, szTargetApplication, szTargetApplicationParams);
-				} else {
+				if (IsButtonChecked(hwnd, IDC_LAUNCH)) {
+					iUseTargetApplication = 0;
+					iTargetApplicationMode = 0;
 					StrCpyExW(szTargetApplication, L"");
 					StrCpyExW(szTargetApplicationParams, L"");
-				}
-				IniSectionSetString(pIniSection, L"TargetApplicationPath", szTargetApplication);
-				IniSectionSetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams);
-
-				if (!iUseTargetApplication) {
-					iTargetApplicationMode = 0;
 				} else {
+					iUseTargetApplication = 1;
+					GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch));
+					ExtractFirstArgument(tch, szTargetApplication, szTargetApplicationParams);
 					if (IsButtonChecked(hwnd, IDC_ALWAYSRUN)) {
 						iTargetApplicationMode = 0;
 					} else if (IsButtonChecked(hwnd, IDC_SENDDROPMSG)) {
@@ -2574,35 +2566,31 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 						iTargetApplicationMode = 2;
 					}
 				}
-				IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
 
-				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && !i) {
+				IniSectionSetBool(pIniSection, L"UseTargetApplication", iUseTargetApplication);
+				IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
+				IniSectionSetString(pIniSection, L"TargetApplicationPath", szTargetApplication);
+				IniSectionSetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams);
+
+				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && iUseTargetApplication) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 				} else {
 					StrCpyExW(szTargetApplicationWndClass, L"");
 				}
 				IniSectionSetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass);
 
-				i = IsButtonChecked(hwnd, IDC_USEDDE);
-				if (i) {
+				if (IsButtonChecked(hwnd, IDC_USEDDE)) {
 					GetDlgItemText(hwnd, IDC_DDEMSG, szDDEMsg, COUNTOF(szDDEMsg));
-				} else {
-					StrCpyExW(szDDEMsg, L"");
-				}
-				IniSectionSetString(pIniSection, L"DDEMessage", szDDEMsg);
-
-				if (i) {
 					GetDlgItemText(hwnd, IDC_DDEAPP, szDDEApp, COUNTOF(szDDEApp));
-				} else {
-					StrCpyExW(szDDEApp, L"");
-				}
-				IniSectionSetString(pIniSection, L"DDEApplication", szDDEApp);
-
-				if (i) {
 					GetDlgItemText(hwnd, IDC_DDETOPIC, szDDETopic, COUNTOF(szDDETopic));
 				} else {
+					StrCpyExW(szDDEMsg, L"");
+					StrCpyExW(szDDEApp, L"");
 					StrCpyExW(szDDETopic, L"");
 				}
+
+				IniSectionSetString(pIniSection, L"DDEMessage", szDDEMsg);
+				IniSectionSetString(pIniSection, L"DDEApplication", szDDEApp);
 				IniSectionSetString(pIniSection, L"DDETopic", szDDETopic);
 
 				SaveIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf);

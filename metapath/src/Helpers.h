@@ -86,27 +86,27 @@ extern DWORD g_uWinVer;
 // https://docs.microsoft.com/en-us/windows/win32/sysinfo/operating-system-version
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-#define IsVistaAndAbove()	TRUE
+#define IsVistaAndAbove()	true
 #else
 #define IsVistaAndAbove()	(g_uWinVer >= _WIN32_WINNT_VISTA)
 #endif
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN7
-#define IsWin7AndAbove()	TRUE
+#define IsWin7AndAbove()	true
 #else
 #define IsWin7AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN7)
 #endif
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN8
-#define IsWin8AndAbove()	TRUE
+#define IsWin8AndAbove()	true
 #else
 #define IsWin8AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN8)
 #endif
 #if _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
-#define IsWin8p1AndAbove()	TRUE
+#define IsWin8p1AndAbove()	true
 #else
 #define IsWin8p1AndAbove()	(g_uWinVer >= _WIN32_WINNT_WINBLUE)
 #endif
 #if _WIN32_WINNT >= _WIN32_WINNT_WIN10
-#define IsWin10AndAbove()	TRUE
+#define IsWin10AndAbove()	true
 #else
 #define IsWin10AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN10)
 #endif
@@ -171,7 +171,7 @@ NP2_inline void IniSetInt(LPCWSTR lpSection, LPCWSTR lpName, int i) {
 	IniSetString(lpSection, lpName, tch);
 }
 
-NP2_inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, BOOL b) {
+NP2_inline void IniSetBool(LPCWSTR lpSection, LPCWSTR lpName, bool b) {
 	IniSetString(lpSection, lpName, (b ? L"1" : L"0"));
 }
 
@@ -183,7 +183,7 @@ NP2_inline void IniSetIntEx(LPCWSTR lpSection, LPCWSTR lpName, int i, int iDefau
 	}
 }
 
-NP2_inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, BOOL b, BOOL bDefault) {
+NP2_inline void IniSetBoolEx(LPCWSTR lpSection, LPCWSTR lpName, bool b, bool bDefault) {
 	IniSetString(lpSection, lpName, (b == bDefault) ? NULL : (b ? L"1" : L"0"));
 }
 
@@ -249,7 +249,7 @@ NP2_inline LPCWSTR IniSectionGetValueImpl(IniSection *section, LPCWSTR key, int 
 
 void IniSectionGetStringImpl(IniSection *section, LPCWSTR key, int keyLen, LPCWSTR lpDefault, LPWSTR lpReturnedString, int cchReturnedString);
 int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefault);
-BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault);
+bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bDefault);
 
 #define IniSectionGetValue(section, key) \
 	IniSectionGetValueImpl(section, key, CSTRLEN(key))
@@ -268,7 +268,7 @@ NP2_inline int IniSectionGetIntEx(IniSection *section, LPCWSTR key, int iDefault
 	return IniSectionGetIntImpl(section, key, 0, iDefault);
 }
 
-NP2_inline BOOL IniSectionGetBoolEx(IniSection *section, LPCWSTR key, BOOL bDefault) {
+NP2_inline bool IniSectionGetBoolEx(IniSection *section, LPCWSTR key, bool bDefault) {
 	return IniSectionGetBoolImpl(section, key, 0, bDefault);
 }
 
@@ -288,7 +288,7 @@ NP2_inline void IniSectionSetInt(IniSectionOnSave *section, LPCWSTR key, int i) 
 	IniSectionSetString(section, key, tch);
 }
 
-NP2_inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, BOOL b) {
+NP2_inline void IniSectionSetBool(IniSectionOnSave *section, LPCWSTR key, bool b) {
 	IniSectionSetString(section, key, (b ? L"1" : L"0"));
 }
 
@@ -304,7 +304,7 @@ NP2_inline void IniSectionSetIntEx(IniSectionOnSave *section, LPCWSTR key, int i
 	}
 }
 
-NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, BOOL b, BOOL bDefault) {
+NP2_inline void IniSectionSetBoolEx(IniSectionOnSave *section, LPCWSTR key, bool b, bool bDefault) {
 	if (b != bDefault) {
 		IniSectionSetString(section, key, (b ? L"1" : L"0"));
 	}
@@ -353,7 +353,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker);
 
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 bool IsElevated(void);
-BOOL ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
+bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
 //bool Is32bitExe(LPCWSTR lpszExeName);
 
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
@@ -396,8 +396,8 @@ void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetClipData(HWND hwnd, LPCWSTR pszData);
-void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel);
-void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL);
+void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel);
+void SetWindowLayoutRTL(HWND hwnd, bool bRTL);
 
 #define SendWMCommandEx(hwnd, id, extra)	SendMessage(hwnd, WM_COMMAND, MAKEWPARAM((id), (extra)), 0)
 #define SendWMCommand(hwnd, id)				SendWMCommandEx(hwnd, (id), 1)
@@ -484,7 +484,7 @@ NP2_inline void GetProgramRealPath(LPWSTR tchModule, DWORD nSize) {
 	}
 }
 
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, BOOL bUnexpandMyDocs);
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs);
 void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv);
 bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath);
 bool PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath);

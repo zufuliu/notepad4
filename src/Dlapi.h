@@ -44,13 +44,13 @@ void DirList_StartIconThread(HWND hwnd);
 #define DL_INCLHIDDEN		128
 #define DL_ALLOBJECTS		(DL_FOLDERS | DL_NONFOLDERS | DL_INCLHIDDEN)
 int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpec,
-				 BOOL bExcludeFilter, BOOL bNoFadeHidden, int iSortFlags, BOOL fSortRev);
+				 bool bExcludeFilter, bool bNoFadeHidden, int iSortFlags, bool fSortRev);
 
 //==== DlIconThread() =========================================================
 DWORD WINAPI DirList_IconThread(LPVOID lpParam);
 
 //==== DlGetDispInfo() ========================================================
-bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, BOOL bNoFadeHidden);
+bool DirList_GetDispInfo(HWND hwnd, LPARAM lParam, bool bNoFadeHidden);
 
 //==== DlDeleteItem() =========================================================
 bool DirList_DeleteItem(HWND hwnd, LPARAM lParam);
@@ -62,7 +62,7 @@ bool DirList_DeleteItem(HWND hwnd, LPARAM lParam);
 #define DS_TYPE			2
 #define DS_LASTMOD		3
 
-BOOL DirList_Sort(HWND hwnd, int lFlags, BOOL fRev);
+BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev);
 
 //==== DlGetItem() ============================================================
 
@@ -102,16 +102,16 @@ bool DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 
 typedef struct DL_FILTER { //dlf
 	int nCount;
+	bool bExcludeFilter;
 	WCHAR tFilterBuf[DL_FILTER_BUFSIZE];
 	LPWSTR pFilter[DL_FILTER_BUFSIZE];
-	BOOL bExcludeFilter;
 } DL_FILTER, *PDL_FILTER;
 
 typedef const DL_FILTER * LPCDL_FILTER;
 
-void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, BOOL bExcludeFilter);
+void DirList_CreateFilter(PDL_FILTER pdlf, LPCWSTR lpszFileSpec, bool bExcludeFilter);
 
-BOOL DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf);
+bool DirList_MatchFilter(LPSHELLFOLDER lpsf, LPCITEMIDLIST pidl, LPCDL_FILTER pdlf);
 
 //==== DriveBox ===============================================================
 
@@ -121,8 +121,8 @@ bool DriveBox_GetSelDrive(HWND hwnd, LPWSTR lpszDrive, int nDrive, bool fNoSlash
 bool DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath);
 bool DriveBox_PropertyDlg(HWND hwnd);
 
-LRESULT DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
-LRESULT DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
+bool DriveBox_DeleteItem(HWND hwnd, LPARAM lParam);
+bool DriveBox_GetDispInfo(HWND hwnd, LPARAM lParam);
 
 //==== ItemID =================================================================
 

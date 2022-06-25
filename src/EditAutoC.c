@@ -1486,7 +1486,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	}
 
 	bool retry = false;
-	const BOOL bScanWordsInDocument = autoCompletionConfig.bScanWordsInDocument;
+	const bool bScanWordsInDocument = autoCompletionConfig.bScanWordsInDocument;
 	do {
 		if (!bIgnoreLexer) {
 			// keywords

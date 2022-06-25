@@ -35,7 +35,7 @@
 
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
-extern BOOL bUse2ndGlobalStyle;
+extern bool bUse2ndGlobalStyle;
 extern int np2StyleTheme;
 
 void	Style_ReleaseResources(void);
@@ -67,7 +67,7 @@ void	Style_SetLexerByLangIndex(int lang);
 void	Style_UpdateSchemeMenu(HMENU hmenu);
 
 void	Style_SetDefaultFont(HWND hwnd, bool bCode);
-void	Style_SetIndentGuides(BOOL bShow);
+void	Style_SetIndentGuides(bool bShow);
 void	Style_SetBookmark(void);
 void	Style_UpdateCaret(void);
 void	Style_SetLongLineColors(void);

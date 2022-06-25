@@ -15,12 +15,12 @@
 #include "Dialogs.h"
 #include "resource.h"
 
-extern BOOL bSkipUnicodeDetection;
+extern bool bSkipUnicodeDetection;
 extern int iDefaultEncoding;
 extern int iDefaultCodePage;
-extern BOOL bLoadANSIasUTF8;
-extern BOOL bLoadASCIIasUTF8;
-extern BOOL bLoadNFOasOEM;
+extern bool bLoadANSIasUTF8;
+extern bool bLoadASCIIasUTF8;
+extern bool bLoadNFOasOEM;
 extern int iDefaultCharSet;
 extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
@@ -35,7 +35,7 @@ static WCHAR wchOEM [16];
 static LPWSTR g_AllEncodingLabel = NULL;
 
 typedef struct NP2EncodingGroup {
-	BOOL bMapped;		// map code page to index in mEncoding array.
+	bool bMapped;		// map code page to index in mEncoding array.
 	const UINT idsName;	// resource id for group name
 	// presorted encoding list, code pages before been mapped to index.
 	int encodings[10];	// use fixed array to simplify code
@@ -233,7 +233,7 @@ NP2ENCODING mEncoding[] = {
 
 static NP2EncodingGroup sEncodingGroupList[] = {
 	// ANSI and OEM are root node
-	{ TRUE, IDS_ENCODINGGROUP_UNICODE, { // Unicode
+	{ true, IDS_ENCODINGGROUP_UNICODE, { // Unicode
 		CPI_UNICODEBOM,
 		CPI_UNICODEBEBOM,
 		CPI_UNICODE,
@@ -242,7 +242,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		CPI_UTF8SIGN,
 		CPI_UTF7,
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_WESTERNEURO, { // Western European
+	{ false, IDS_ENCODINGGROUP_WESTERNEURO, { // Western European
 		1252,		// Windows-1252
 		28591,		// Latin-1, ISO 8859-1
 		28605,		// Latin-9, ISO 8859-15
@@ -256,7 +256,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 	}},
 
 	// dynamic sorted groups
-	{ FALSE, IDS_ENCODINGGROUP_ARABIC, { // Arabic
+	{ false, IDS_ENCODINGGROUP_ARABIC, { // Arabic
 		1256,		// Windows-1256
 		28596,		// ISO 8859-6 Visual
 		38596,		// ISO 8859-6-I Logical
@@ -264,7 +264,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		864,		// OEM Arabic
 		10004,		// Mac (Arabic)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_NORTHERNEURO, { // Baltic, Northern European
+	{ false, IDS_ENCODINGGROUP_NORTHERNEURO, { // Baltic, Northern European
 		1257,		// Baltic Windows-1257
 		28594,		// Baltic Latin-4, ISO 8859-4
 		28603,		// Estonian Latin-7, ISO 8859-13
@@ -274,13 +274,13 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		865,		// OEM Nordic
 		10079,		// Mac (Icelandic)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_CENTRALEURO, { // Central and Eastern European
+	{ false, IDS_ENCODINGGROUP_CENTRALEURO, { // Central and Eastern European
 		1250,		// Windows-1250
 		28592,		// ISO 8859-2
 		852,		// OEM Latin-2
 		10029,		// Mac Latin-2
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_CHINESE, { // Chinese
+	{ false, IDS_ENCODINGGROUP_CHINESE, { // Chinese
 		// Simplified Chinese
 		936,		// GBK
 		54936,		// GB18030
@@ -293,7 +293,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		10002,		// Mac (Big5)
 		50229,		// ISO-2022-CN
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_CYRILLIC, { // Cyrillic
+	{ false, IDS_ENCODINGGROUP_CYRILLIC, { // Cyrillic
 		1251,		// Windows-1251
 		28595,		// ISO 8859-5
 		20866,		// KOI8-R
@@ -303,21 +303,21 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		10007,		// Mac (Cyrillic)
 		10017,		// Mac (Ukrainian)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_GREEK, { // Greek
+	{ false, IDS_ENCODINGGROUP_GREEK, { // Greek
 		1253,		// Windows-1253
 		28597,		// ISO 8859-7
 		737,		// OEM Greek
 		869,		// OEM Modern Greek
 		10006,		// Mac (Greek)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_HEBREW, { // Hebrew
+	{ false, IDS_ENCODINGGROUP_HEBREW, { // Hebrew
 		1255,		// Windows-1255
 		28598,		// ISO 8859-8 Visual
 		38598,		// ISO 8859-8-I Logical
 		862,		// OEM Hebrew
 		10005,		// Mac (Hebrew)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_JAPANESE, { // Japanese
+	{ false, IDS_ENCODINGGROUP_JAPANESE, { // Japanese
 		932,		// Shift-JIS
 		20932,		// EUC-JP
 		10001,		// Mac (Japanese)
@@ -325,14 +325,14 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		50221,		// CS ISO-2022-JP
 		50222,		// ISO-2022-JP SI/SO
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_KOREAN, { // Korean
+	{ false, IDS_ENCODINGGROUP_KOREAN, { // Korean
 		949,		// UHC
 		1361,		// Johab
 		51949,		// EUC-KR
 		10003,		// Mac (Korean)
 		50225,		// ISO-2022-KR
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_SOUTHEURO, { // South European
+	{ false, IDS_ENCODINGGROUP_SOUTHEURO, { // South European
 		// Southern European
 		28593,		// Latin-3, ISO 8859-3
 		10010,		// Mac (Romanian)
@@ -340,12 +340,12 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 		28606,		// Latin-10, ISO 8859-16
 		10082,		// Mac (Croatian)
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_SOUTHASIA, { // Southeast Asia
+	{ false, IDS_ENCODINGGROUP_SOUTHASIA, { // Southeast Asia
 		874,		// Thai TIS-620, ISO 8859-11
 		10021,		// Mac (Thai)
 		1258,		// Vietnamese Windows-1258
 	}},
-	{ FALSE, IDS_ENCODINGGROUP_TURKISH, { // Turkish
+	{ false, IDS_ENCODINGGROUP_TURKISH, { // Turkish
 		1254,		// Windows-1254
 		28599,		// Latin-5, ISO 8859-9
 		857,		// OEM Turkish
@@ -353,7 +353,7 @@ static NP2EncodingGroup sEncodingGroupList[] = {
 	}},
 
 	// last group
-	{ FALSE, IDS_ENCODINGGROUP_EBCDIC, { // IBM EBCDIC
+	{ false, IDS_ENCODINGGROUP_EBCDIC, { // IBM EBCDIC
 		37,			// US-Canada
 		1140,		// US-Canada + Euro
 		500,		// International
@@ -474,7 +474,7 @@ bool EditSetNewEncoding(int iEncoding, int iNewEncoding, BOOL bNoUI, bool bSetSa
 	return false;
 }
 
-void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFINDREPLACE lpefr) {
+void EditOnCodePageChanged(UINT oldCodePage, bool showControlCharacter, LPEDITFINDREPLACE lpefr) {
 	const UINT cpEdit = SciCall_GetCodePage();
 	const UINT acp = GetACP();
 	const bool lastFind = StrNotEmptyA(lpefr->szFind); // need to convert last find & replace string.
@@ -501,7 +501,7 @@ void EditOnCodePageChanged(UINT oldCodePage, BOOL showControlCharacter, LPEDITFI
 			strcpy(lpefr->szReplace, lpefr->szReplaceUTF8);
 		}
 		if (showControlCharacter) {
-			EditShowUnicodeControlCharacter(TRUE);
+			EditShowUnicodeControlCharacter(true);
 		}
 		if (oldCodePage == 0) {
 			// SBCS to UTF-8
@@ -686,7 +686,11 @@ int Encoding_GetAnsiIndex(void) {
 	return iEncoding;
 }
 
-void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
+static inline int GetEncodingImageIndex(const NP2ENCODING *encoding) {
+	return IsValidEncoding(encoding) ? 0 : 1;
+}
+
+void Encoding_AddToTreeView(HWND hwnd, int idSel, bool bRecodeOnly) {
 	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(sEncodingGroupList) * sizeof(ENCODINGENTRY));
 	for (int i = 0; i < (int)COUNTOF(sEncodingGroupList); i++) {
 		NP2EncodingGroup *group = &sEncodingGroupList[i];
@@ -702,7 +706,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 					break;
 				}
 			}
-			group->bMapped = TRUE;
+			group->bMapped = true;
 		}
 	}
 
@@ -760,7 +764,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 		tvis.hInsertAfter = hParent;
 		tvis.item.pszText = wchBuf;
-		tvis.item.iImage = IsValidEncoding(encoding) ? 0 : 1;
+		tvis.item.iImage = GetEncodingImageIndex(encoding);
 		tvis.item.iSelectedImage = tvis.item.iImage;
 		tvis.item.lParam = 1 + id;
 
@@ -804,7 +808,7 @@ void Encoding_AddToTreeView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 
 				tvis.hInsertAfter = hTreeNode;
 				tvis.item.pszText = wchBuf;
-				tvis.item.iImage = IsValidEncoding(encoding) ? 0 : 1;
+				tvis.item.iImage = GetEncodingImageIndex(encoding);
 				tvis.item.iSelectedImage = tvis.item.iImage;
 				tvis.item.lParam = 1 + id;
 
@@ -855,7 +859,7 @@ bool Encoding_GetFromTreeView(HWND hwnd, int *pidEncoding, bool bQuiet) {
 }
 
 #if 0
-void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
+void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) {
 	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
@@ -892,7 +896,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			lvi.iImage = IsValidEncoding(encoding) ? 0 : 1;
+			lvi.iImage = GetEncodingImageIndex(encoding);
 			lvi.lParam = (LPARAM)id;
 			ListView_InsertItem(hwnd, &lvi);
 
@@ -931,7 +935,7 @@ bool Encoding_GetFromListView(HWND hwnd, int *pidEncoding) {
 	return false;
 }
 
-void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
+void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) {
 	PENCODINGENTRY pEE = (PENCODINGENTRY)NP2HeapAlloc(COUNTOF(mEncoding) * sizeof(ENCODINGENTRY));
 	for (int i = 0; i < (int)COUNTOF(mEncoding); i++) {
 		pEE[i].id = i;
@@ -972,7 +976,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, BOOL bRecodeOnly) {
 				StrCatBuff(wchBuf, wchOEM, COUNTOF(wchBuf));
 			}
 
-			cbei.iImage = IsValidEncoding(encoding) ? 0 : 1;
+			cbei.iImage = GetEncodingImageIndex(encoding);
 			cbei.lParam = (LPARAM)id;
 			SendMessage(hwnd, CBEM_INSERTITEM, 0, (LPARAM)&cbei);
 
@@ -1030,7 +1034,7 @@ static inline BOOL IsValidWideChar(LPCWSTR lpWide, DWORD cchWide) {
 }
 #endif
 
-static int DetectUnicode(char *pTest, DWORD nLength, BOOL ascii) {
+static int DetectUnicode(char *pTest, DWORD nLength, bool ascii) {
 	if (ascii) {
 		// find ASCII inside first or last 4 KiB text
 		const DWORD size = 4096;

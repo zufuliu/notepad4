@@ -101,8 +101,8 @@ typedef struct EDITLEXER {
 	// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
 	struct {
 		uint8_t iStyleTheme;
-		uint8_t bStyleChanged;
-		uint8_t bUseDefaultCodeStyle;
+		bool bStyleChanged;
+		bool bUseDefaultCodeStyle;
 		int iFavoriteOrder;
 
 		const unsigned int iStyleCount;

@@ -76,7 +76,7 @@ HISTORY	mHistory;
 
 WCHAR	szIniFile[MAX_PATH] = L"";
 WCHAR	szIniFile2[MAX_PATH] = L"";
-BOOL	bSaveSettings;
+bool	bSaveSettings;
 static bool bHasQuickview = false;
 WCHAR	szQuickview[MAX_PATH];
 WCHAR	szQuickviewParams[MAX_PATH];
@@ -86,27 +86,27 @@ static WCHAR tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
 static LPWSTR tchToolbarBitmap = NULL;
 static LPWSTR tchToolbarBitmapHot = NULL;
 static LPWSTR tchToolbarBitmapDisabled = NULL;
-BOOL	bClearReadOnly;
-BOOL	bRenameOnCollision;
-BOOL	bSingleClick;
-BOOL	bOpenFileInSameWindow;
+bool	bClearReadOnly;
+bool	bRenameOnCollision;
+bool	bSingleClick;
+bool	bOpenFileInSameWindow;
 static int iDefaultOpenMenu;
 static int iShiftOpenMenu;
-BOOL	bTrackSelect;
-BOOL	bFullRowSelect;
+bool	bTrackSelect;
+bool	bFullRowSelect;
 int		iStartupDir;
 int		iEscFunction;
-BOOL	bFocusEdit;
-BOOL	bAlwaysOnTop;
-static BOOL bTransparentMode;
-BOOL bUseXPFileDialog;
-BOOL	bWindowLayoutRTL;
-BOOL	bMinimizeToTray;
-BOOL	fUseRecycleBin;
-BOOL	fNoConfirmDelete;
-static BOOL bShowToolbar;
-static BOOL bShowStatusbar;
-static BOOL bShowDriveBox;
+bool	bFocusEdit;
+bool	bAlwaysOnTop;
+static bool bTransparentMode;
+bool bUseXPFileDialog;
+bool	bWindowLayoutRTL;
+bool	bMinimizeToTray;
+bool	fUseRecycleBin;
+bool	fNoConfirmDelete;
+static bool bShowToolbar;
+static bool bShowStatusbar;
+static bool bShowDriveBox;
 int		cxRunDlg;
 int		cxGotoDlg;
 int		cxFileFilterDlg;
@@ -119,9 +119,9 @@ int		cxTargetApplicationDlg;
 int		cxFindWindowDlg;
 
 WCHAR		tchFilter[DL_FILTER_BUFSIZE];
-BOOL		bNegFilter;
-BOOL		bDefColorNoFilter;
-BOOL		bDefColorFilter;
+bool		bNegFilter;
+bool		bDefColorNoFilter;
+bool		bDefColorFilter;
 COLORREF	colorNoFilter;
 COLORREF	colorFilter;
 COLORREF	colorCustom[16];
@@ -145,7 +145,7 @@ WCHAR	szCurDir[MAX_PATH + 40];
 static WCHAR szMRUDirectory[MAX_PATH];
 static DWORD dwFillMask;
 static int nSortFlags;
-static BOOL fSortRev;
+static bool fSortRev;
 
 static LPWSTR lpPathArg = NULL;
 static LPWSTR lpFilterArg = NULL;
@@ -180,15 +180,15 @@ UINT languageResID;
 //
 // Flags
 //
-static int	flagNoReuseWindow	= 0;
-BOOL		bReuseWindow		= FALSE;
-static int	flagStartAsTrayIcon	= 0;
-int			flagPortableMyDocs	= 0;
-int			flagGotoFavorites	= 0;
+static bool	flagNoReuseWindow	= false;
+bool		bReuseWindow		= false;
+static bool	flagStartAsTrayIcon	= false;
+bool		flagPortableMyDocs	= false;
+bool		flagGotoFavorites	= false;
 static int	iAutoRefreshRate	= 0; // unit: 1/10 sec
-int			flagNoFadeHidden	= 0;
+bool		flagNoFadeHidden	= false;
 static int	iOpacityLevel		= 75;
-static int	flagPosParam		= 0;
+static bool	flagPosParam		= false;
 
 static inline bool HasFilter(void) {
 	return !StrEqualExW(tchFilter, L"*.*") || bNegFilter;
@@ -431,7 +431,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	if (bTransparentMode) {
-		SetWindowTransparentMode(hwndMain, TRUE, iOpacityLevel);
+		SetWindowTransparentMode(hwndMain, true, iOpacityLevel);
 	}
 
 	if (!flagStartAsTrayIcon) {
@@ -1650,7 +1650,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_FILTERALL:
 		if (HasFilter()) {
 			StrCpyExW(tchFilter, L"*.*");
-			bNegFilter = FALSE;
+			bNegFilter = false;
 
 			// Store information about currently selected item
 			DLITEM dli;
@@ -1732,7 +1732,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_OPTIONS: {
-		const BOOL back = bWindowLayoutRTL;
+		const bool back = bWindowLayoutRTL;
 		OptionsPropSheet(hwnd, g_hInstance);
 		if (back != bWindowLayoutRTL) {
 			SetWindowLayoutRTL(hwndDirList, bWindowLayoutRTL);
@@ -1828,7 +1828,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case ACC_SWITCHTRANSPARENCY:
-		bTransparentMode = bTransparentMode ? 0 : 1;
+		bTransparentMode = !bTransparentMode;
 		SetWindowTransparentMode(hwnd, bTransparentMode, iOpacityLevel);
 		break;
 
@@ -2041,8 +2041,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDT_FILE_DELETE_RECYCLE:
 		if (ListView_GetSelectedCount(hwndDirList)) {
-			const BOOL fUseRecycleBin2 = fUseRecycleBin;
-			fUseRecycleBin = 1;
+			const bool fUseRecycleBin2 = fUseRecycleBin;
+			fUseRecycleBin = true;
 			SendWMCommand(hwnd, IDM_FILE_DELETE);
 			fUseRecycleBin = fUseRecycleBin2;
 		} else {
@@ -2425,31 +2425,31 @@ void LoadSettings(void) {
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", 1);
-	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", 1);
-	bOpenFileInSameWindow = IniSectionGetBool(pIniSection, L"OpenFileInSameWindow", 0);
+	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", true);
+	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", true);
+	bOpenFileInSameWindow = IniSectionGetBool(pIniSection, L"OpenFileInSameWindow", false);
 	iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
 	iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
 
-	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", 1);
-	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", 0);
-	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", 1);
-	fNoConfirmDelete = IniSectionGetBool(pIniSection, L"NoConfirmDelete", 0);
-	bClearReadOnly = IniSectionGetBool(pIniSection, L"ClearReadOnly", 1);
-	bRenameOnCollision = IniSectionGetBool(pIniSection, L"RenameOnCollision", 0);
-	bFocusEdit = IniSectionGetBool(pIniSection, L"FocusEdit", 1);
-	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", 0);
-	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", 0);
-	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", 0);
-	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", 0);
+	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", true);
+	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", false);
+	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", true);
+	fNoConfirmDelete = IniSectionGetBool(pIniSection, L"NoConfirmDelete", false);
+	bClearReadOnly = IniSectionGetBool(pIniSection, L"ClearReadOnly", true);
+	bRenameOnCollision = IniSectionGetBool(pIniSection, L"RenameOnCollision", false);
+	bFocusEdit = IniSectionGetBool(pIniSection, L"FocusEdit", true);
+	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", false);
+	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", false);
+	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", false);
+	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", false);
 
 	int iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
 	iEscFunction = clamp_i(iValue, 0, 2);
 
 	if (IsVistaAndAbove()) {
-		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", 0);
+		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", false);
 	} else {
-		bUseXPFileDialog = TRUE;
+		bUseXPFileDialog = true;
 	}
 
 	iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
@@ -2508,7 +2508,7 @@ void LoadSettings(void) {
 	iValue = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
 	nSortFlags = clamp_i(iValue, 0, 3);
 
-	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", 0);
+	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", false);
 
 	if (!lpFilterArg) {
 		strValue = IniSectionGetValue(pIniSection, L"FileFilter");
@@ -2517,19 +2517,19 @@ void LoadSettings(void) {
 		} else {
 			lstrcpyn(tchFilter, strValue, COUNTOF(tchFilter));
 		}
-		bNegFilter = IniSectionGetBool(pIniSection, L"NegativeFilter", 0);
+		bNegFilter = IniSectionGetBool(pIniSection, L"NegativeFilter", false);
 	} else { // ignore filter if /m was specified
 		if (*lpFilterArg == L'-') {
-			bNegFilter = TRUE;
+			bNegFilter = true;
 			lstrcpyn(tchFilter, lpFilterArg + 1, COUNTOF(tchFilter));
 		} else {
-			bNegFilter = FALSE;
+			bNegFilter = false;
 			lstrcpyn(tchFilter, lpFilterArg, COUNTOF(tchFilter));
 		}
 	}
 
-	bDefColorNoFilter = IniSectionGetBool(pIniSection, L"DefColorNoFilter", 1);
-	bDefColorFilter = IniSectionGetBool(pIniSection, L"DefColorFilter", 1);
+	bDefColorNoFilter = IniSectionGetBool(pIniSection, L"DefColorNoFilter", true);
+	bDefColorFilter = IniSectionGetBool(pIniSection, L"DefColorFilter", true);
 
 	colorNoFilter = IniSectionGetInt(pIniSection, L"ColorNoFilter", GetSysColor(COLOR_WINDOWTEXT));
 	colorFilter = IniSectionGetInt(pIniSection, L"ColorFilter", GetSysColor(COLOR_HIGHLIGHT));
@@ -2541,9 +2541,9 @@ void LoadSettings(void) {
 		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}
 
-	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", 1);
-	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", 1);
-	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", 1);
+	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", true);
+	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", true);
+	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", true);
 
 	// toolbar image
 	{
@@ -2664,7 +2664,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 		if (iStartupDir == 1) {
 			IniSetString(INI_SECTION_NAME_SETTINGS, L"MRUDirectory", szCurDir);
 		}
-		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, 1);
+		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, true);
 		return;
 	}
 
@@ -2674,24 +2674,24 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionOnSave *pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
-	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, 1);
-	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, 1);
-	IniSectionSetBoolEx(pIniSection, L"OpenFileInSameWindow", bOpenFileInSameWindow, 0);
-	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, 1);
-	IniSectionSetBoolEx(pIniSection, L"FullRowSelect", bFullRowSelect, 0);
-	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, 1);
-	IniSectionSetBoolEx(pIniSection, L"NoConfirmDelete", fNoConfirmDelete, 0);
-	IniSectionSetBoolEx(pIniSection, L"ClearReadOnly", bClearReadOnly, 1);
-	IniSectionSetBoolEx(pIniSection, L"RenameOnCollision", bRenameOnCollision, 0);
-	IniSectionSetBoolEx(pIniSection, L"FocusEdit", bFocusEdit, 1);
-	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, 0);
-	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, 0);
-	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, 0);
-	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, 0);
-	IniSectionSetBoolEx(pIniSection, L"EscFunction", iEscFunction, 0);
+	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
+	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, true);
+	IniSectionSetBoolEx(pIniSection, L"OpenFileInSameWindow", bOpenFileInSameWindow, false);
+	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, true);
+	IniSectionSetBoolEx(pIniSection, L"FullRowSelect", bFullRowSelect, false);
+	IniSectionSetBoolEx(pIniSection, L"UseRecycleBin", fUseRecycleBin, true);
+	IniSectionSetBoolEx(pIniSection, L"NoConfirmDelete", fNoConfirmDelete, false);
+	IniSectionSetBoolEx(pIniSection, L"ClearReadOnly", bClearReadOnly, true);
+	IniSectionSetBoolEx(pIniSection, L"RenameOnCollision", bRenameOnCollision, false);
+	IniSectionSetBoolEx(pIniSection, L"FocusEdit", bFocusEdit, true);
+	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, false);
+	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, false);
+	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, false);
+	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, false);
+	IniSectionSetIntEx(pIniSection, L"EscFunction", iEscFunction, 0);
 
 	if (IsVistaAndAbove()) {
-		IniSectionSetBoolEx(pIniSection, L"UseXPFileDialog", bUseXPFileDialog, 0);
+		IniSectionSetBoolEx(pIniSection, L"UseXPFileDialog", bUseXPFileDialog, false);
 	}
 
 	IniSectionSetIntEx(pIniSection, L"StartupDirectory", iStartupDir, 1);
@@ -2706,19 +2706,21 @@ void SaveSettings(bool bSaveSettingsNow) {
 	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
+
 	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
-	IniSectionSetBoolEx(pIniSection, L"SortReverse", fSortRev, 0);
+	IniSectionSetBoolEx(pIniSection, L"SortReverse", fSortRev, false);
 	IniSectionSetStringEx(pIniSection, L"FileFilter", tchFilter, L"*.*");
-	IniSectionSetBoolEx(pIniSection, L"NegativeFilter", bNegFilter, 0);
-	IniSectionSetBoolEx(pIniSection, L"DefColorNoFilter", bDefColorNoFilter, 1);
-	IniSectionSetBoolEx(pIniSection, L"DefColorFilter", bDefColorFilter, 1);
+	IniSectionSetBoolEx(pIniSection, L"NegativeFilter", bNegFilter, false);
+	IniSectionSetBoolEx(pIniSection, L"DefColorNoFilter", bDefColorNoFilter, true);
+	IniSectionSetBoolEx(pIniSection, L"DefColorFilter", bDefColorFilter, true);
 	IniSectionSetIntEx(pIniSection, L"ColorNoFilter", colorNoFilter, GetSysColor(COLOR_WINDOWTEXT));
 	IniSectionSetIntEx(pIniSection, L"ColorFilter", colorFilter, GetSysColor(COLOR_HIGHLIGHT));
+
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
-	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, 1);
-	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, 1);
-	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, 1);
+	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, true);
+	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
+	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, true);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
@@ -2815,12 +2817,12 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			break;
 
 		case L'G':
-			flagGotoFavorites = 1;
+			flagGotoFavorites = true;
 			state = 1;
 			break;
 
 		case L'I':
-			flagStartAsTrayIcon = 1;
+			flagStartAsTrayIcon = true;
 			state = 1;
 			break;
 
@@ -2838,7 +2840,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			break;
 
 		case L'N':
-			flagNoReuseWindow = 1;
+			flagNoReuseWindow = true;
 			state = 1;
 			break;
 
@@ -2848,7 +2850,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 				int cord[4] = { 0 };
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok == 4) {
-					flagPosParam = 1;
+					flagPosParam = true;
 					state = 1;
 					wi.x = cord[0];
 					wi.y = cord[1];
@@ -2881,7 +2883,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			switch (chNext) {
 			case L'D':
 			case L'S':
-				flagPosParam = 1;
+				flagPosParam = true;
 				state = 1;
 				wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
 				break;
@@ -2974,17 +2976,17 @@ void LoadFlags(void) {
 	ValidateUILangauge();
 #endif
 
-	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", 0);
+	bReuseWindow = IniSectionGetBool(pIniSection, L"ReuseWindow", false);
 	if (!flagNoReuseWindow) {
 		flagNoReuseWindow = !bReuseWindow;
 	}
 
-	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", 1);
+	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", true);
 
 	int iValue = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 30);
 	iAutoRefreshRate = max_i(iValue, 0);
 
-	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", 0);
+	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", false);
 
 	iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
 	iOpacityLevel = validate_i(iValue, 0, 100, 75);

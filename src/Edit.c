@@ -52,12 +52,12 @@ extern int yFindReplaceDlg;
 extern int cxFindReplaceDlg;
 
 extern int iDefaultEOLMode;
-extern BOOL bFixLineEndings;
-extern BOOL bAutoStripBlanks;
+extern bool bFixLineEndings;
+extern bool bAutoStripBlanks;
 
 // Default Codepage and Character Set
 extern int iDefaultCodePage;
-extern BOOL bLoadANSIasUTF8;
+extern bool bLoadANSIasUTF8;
 extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
 extern int iCurrentEncoding;
@@ -109,9 +109,9 @@ static inline void NotifyRectangleSelection(void) {
 // EditSetNewText()
 //
 extern bool bFreezeAppTitle;
-extern BOOL bLockedForEditing;
+extern bool bLockedForEditing;
 #if defined(_WIN64)
-extern BOOL bLargeFileMode;
+extern bool bLargeFileMode;
 #endif
 extern FILEVARS fvCurFile;
 extern EditTabSettings tabSettings;
@@ -120,10 +120,10 @@ extern int iWordWrapIndent;
 
 void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	bFreezeAppTitle = true;
-	bLockedForEditing = FALSE;
+	bLockedForEditing = false;
 	iWrapColumn = 0;
 
-	SciCall_SetReadOnly(FALSE);
+	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
@@ -139,7 +139,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 		if ((options & mask) != mask) {
 			HANDLE pdoc = SciCall_CreateDocument(cbText + 1, options | mask);
 			EditReplaceDocument(pdoc);
-			bLargeFileMode = TRUE;
+			bLargeFileMode = true;
 		}
 	}
 #endif
@@ -198,8 +198,8 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) {
 		NP2HeapFree(pwchText);
 	}
 
-	bLockedForEditing = FALSE;
-	SciCall_SetReadOnly(FALSE);
+	bLockedForEditing = false;
+	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
@@ -244,8 +244,8 @@ void EditConvertToLargeMode(void) {
 		SciCall_GetText(length, pchText);
 	}
 
-	bLockedForEditing = FALSE;
-	SciCall_SetReadOnly(FALSE);
+	bLockedForEditing = false;
+	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetUndoCollection(false);
 	SciCall_EmptyUndoBuffer();
@@ -272,7 +272,7 @@ void EditConvertToLargeMode(void) {
 	SciCall_SetSavePoint();
 
 	Style_SetLexer(pLexCurrent, true);
-	bLargeFileMode = TRUE;
+	bLargeFileMode = true;
 }
 #endif
 
@@ -3566,7 +3566,7 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) {
 	Sci_Position iRcCurCol = 0;
 	Sci_Position iRcAnchorCol = 0;
 
-	const BOOL bIsRectangular = SciCall_IsRectangleSelection();
+	const bool bIsRectangular = SciCall_IsRectangleSelection();
 	if (!bIsRectangular ) {
 		iSelStart = SciCall_GetSelectionStart();
 		iSelEnd = SciCall_GetSelectionEnd();
@@ -4262,7 +4262,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	Sci_Line iLineEnd;
 	Sci_Position iSortColumn;
 
-	const BOOL bIsRectangular = SciCall_IsRectangleSelection();
+	const bool bIsRectangular = SciCall_IsRectangleSelection();
 	if (bIsRectangular) {
 		iRcCurLine = SciCall_LineFromPosition(iCurPos);
 		iRcAnchorLine = SciCall_LineFromPosition(iAnchorPos);
@@ -4763,12 +4763,12 @@ void AddBackslashComboBoxSetup(HWND hwndDlg, int nCtlId) {
 	}
 }
 
-extern BOOL bFindReplaceTransparentMode;
+extern bool bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
-extern BOOL bFindReplaceUseMonospacedFont;
-extern BOOL bFindReplaceFindAllBookmark;
+extern bool bFindReplaceUseMonospacedFont;
+extern bool bFindReplaceFindAllBookmark;
 
-static void FindReplaceSetFont(HWND hwnd, BOOL monospaced, HFONT *hFontFindReplaceEdit) {
+static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) {
 	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
 	HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 	HFONT font = NULL;
@@ -4890,7 +4890,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		}
 
 		// focus on replace box when selected text is not empty.
-		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), 1);
+		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), TRUE);
 
 		if (lpefr->fuFlags & SCFIND_MATCHCASE) {
 			CheckDlgButton(hwnd, IDC_FINDCASE, BST_CHECKED);
@@ -4981,7 +4981,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_CHECKED);
 		}
 		// focus on replace box when selected text is not empty.
-		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), 1);
+		PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)((hasFindText && hwndRepl)? hwndRepl : hwndFind), TRUE);
 	}
 	break;
 
@@ -5145,12 +5145,12 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				strcpy(lpefr->szReplaceUTF8, "");
 			}
 
-			BOOL bCloseDlg;
+			bool bCloseDlg;
 			if (bIsFindDlg) {
 				bCloseDlg = lpefr->bFindClose;
 			} else {
 				if (LOWORD(wParam) == IDOK) {
-					bCloseDlg = FALSE;
+					bCloseDlg = false;
 				} else {
 					bCloseDlg = lpefr->bReplaceClose;
 				}
@@ -5173,7 +5173,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
 
-			SendMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetFocus()), 1);
+			SendMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetFocus()), TRUE);
 
 			if (bCloseDlg) {
 				DestroyWindow(hwnd);
@@ -5255,7 +5255,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			CheckDlgButton(hwnd, IDC_FINDREGEXP, BST_UNCHECKED);
 			CheckDlgButton(hwnd, IDC_FINDTRANSFORMBS, BST_UNCHECKED);
-			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_FINDTEXT)), 1);
+			PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_FINDTEXT)), TRUE);
 		}
 		break;
 
@@ -5638,8 +5638,8 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 		NP2HeapFree(editMarkAllStatus.pszText);
 	}
 
-	editMarkAllStatus.pending = FALSE;
-	editMarkAllStatus.ignoreSelectionUpdate = FALSE;
+	editMarkAllStatus.pending = false;
+	editMarkAllStatus.ignoreSelectionUpdate = false;
 	editMarkAllStatus.findFlag = findFlag;
 	editMarkAllStatus.incrementSize = 1;
 	editMarkAllStatus.iSelCount= iSelCount;
@@ -5674,7 +5674,7 @@ bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 
 	//EditMarkAll_Runs = 0;
 	if (findFlag & NP2_MarkAllBookmark) {
-		editMarkAllStatus.bookmarkForFindAll = findFlag & NP2_FromFindAll;
+		editMarkAllStatus.bookmarkForFindAll = (findFlag & NP2_FromFindAll) != 0;
 		Style_SetBookmark();
 	}
 	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
@@ -5808,7 +5808,7 @@ bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	}
 
 	status->pending = pending;
-	status->ignoreSelectionUpdate = matchCount ? (findFlag & NP2_MarkAllSelectAll) : FALSE;
+	status->ignoreSelectionUpdate = matchCount && (findFlag & NP2_MarkAllSelectAll);
 	status->lastMatchPos = cpMin;
 	status->iStartPos = iStartPos;
 	status->bookmarkLine = bookmarkLine;
@@ -5820,7 +5820,7 @@ bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	return false;
 }
 
-bool EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark) {
+bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5858,9 +5858,9 @@ bool EditMarkAll(BOOL bChanged, BOOL matchCase, BOOL wholeWord, BOOL bookmark) {
 		matchCase = !sensitive;
 	}
 
-	const int findFlag = (matchCase * SCFIND_MATCHCASE)
-		| (wholeWord * SCFIND_WHOLEWORD)
-		| (bookmark * NP2_MarkAllBookmark);
+	const int findFlag = (((int)matchCase) * SCFIND_MATCHCASE)
+		| (((int)wholeWord) * SCFIND_WHOLEWORD)
+		| (((int)bookmark) * NP2_MarkAllBookmark);
 	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
@@ -5872,8 +5872,8 @@ void EditFindAll(LPCEDITFINDREPLACE lpefr, bool selectAll) {
 		return;
 	}
 
-	searchFlags |= (bFindReplaceFindAllBookmark * NP2_MarkAllBookmark)
-		| (selectAll * NP2_MarkAllSelectAll)
+	searchFlags |= (((int)bFindReplaceFindAllBookmark) * NP2_MarkAllBookmark)
+		| (((int)selectAll) * NP2_MarkAllSelectAll)
 		| NP2_FromFindAll;
 	// rewind start position when transform backslash is checked,
 	// all other searching doesn't across lines.
@@ -5902,7 +5902,7 @@ void EditToggleBookmarkAt(Sci_Position iPos) {
 void EditBookmarkSelectAll(void) {
 	Sci_Line line = SciCall_MarkerNext(0, MarkerBitmask_Bookmark);
 	if (line >= 0) {
-		editMarkAllStatus.ignoreSelectionUpdate = TRUE;
+		editMarkAllStatus.ignoreSelectionUpdate = true;
 		const Sci_Line iCurLine = SciCall_LineFromPosition(SciCall_GetCurrentPos());
 		SciCall_SetSelection(SciCall_PositionFromLine(line), SciCall_PositionFromLine(line + 1));
 		// set main selection near current line to ensure caret is visible after delete selected lines.
@@ -5943,7 +5943,7 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 	char *pszReplace2;
 	const int searchFlags = EditPrepareReplace(hwnd, szFind2, &pszReplace2, &bReplaceRE, lpefr);
 	if (searchFlags == NP2_InvalidSearchFlags) {
-		return FALSE;
+		return false;
 	}
 
 	// Show wait cursor...
@@ -6185,13 +6185,13 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 					SciCall_ChooseCaretX();
 					EndDialog(hwnd, IDOK);
 				} else {
-					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COLNUM)), 1);
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, IDC_COLNUM)), TRUE);
 				}
 			} else if (iNewLine > 0 && iNewLine <= iMaxLine) {
 				EditJumpTo(iNewLine, iNewCol);
 				EndDialog(hwnd, IDOK);
 			} else {
-				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, ((iNewCol > 0) ? IDC_LINENUM : IDC_COLNUM))), 1);
+				PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetDlgItem(hwnd, ((iNewCol > 0) ? IDC_LINENUM : IDC_COLNUM))), TRUE);
 			}
 		}
 		break;
@@ -6385,7 +6385,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 					GetDlgItemText(hwnd, id_capture, wch, COUNTOF(wch));
 					SendDlgItemMessage(hwnd, id_focus, EM_SETSEL, 0, -1);
 					SendDlgItemMessage(hwnd, id_focus, EM_REPLACESEL, TRUE, (LPARAM)wch);
-					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetFocus()), 1);
+					PostMessage(hwnd, WM_NEXTDLGCTL, (WPARAM)(GetFocus()), TRUE);
 				}
 			}
 			id_capture = 0;
@@ -6823,7 +6823,7 @@ void EditInsertUnicodeControlCharacter(int menu) {
 	SciCall_ReplaceSel(ucc.uccUTF8);
 }
 
-void EditShowUnicodeControlCharacter(BOOL bShow) {
+void EditShowUnicodeControlCharacter(bool bShow) {
 	for (UINT i = 0; i < COUNTOF(kUnicodeControlCharacterTable); i++) {
 		const UnicodeControlCharacter ucc = kUnicodeControlCharacterTable[i];
 		if (StrIsEmptyA(ucc.representation)) {
@@ -7171,7 +7171,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	return EditGetTextRange(iLineStart, iLineEnd);
 }
 
-extern BOOL bOpenFolderWithMetapath;
+extern bool bOpenFolderWithMetapath;
 
 static DWORD EditOpenSelectionCheckFile(LPCWSTR link, LPWSTR path, int cchFilePath, LPWSTR wchDirectory) {
 	if (StrHasPrefix(link, L"//")) {
@@ -7424,9 +7424,9 @@ void EditOpenSelection(OpenSelectionType type) {
 // FileVars_Init()
 //
 
-extern BOOL bNoEncodingTags;
-extern int fNoFileVariables;
-extern BOOL fWordWrapG;
+extern bool bNoEncodingTags;
+extern bool fNoFileVariables;
+extern bool fWordWrapG;
 extern int iWordWrapMode;
 extern int iLongLinesLimitG;
 

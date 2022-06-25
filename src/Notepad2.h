@@ -26,12 +26,12 @@
 //==== Data Type for WM_COPYDATA ==============================================
 #define DATA_NOTEPAD2_PARAMS 0xFB10
 typedef struct NP2PARAMS {
-	int		flagFileSpecified;
+	bool	flagFileSpecified;
+	bool	flagLexerSpecified;
+	bool	flagQuietCreate;
+	bool	flagJumpTo;
 	int		flagChangeNotify;
-	int		flagLexerSpecified;
 	int		iInitialLexer;
-	int		flagQuietCreate;
-	int		flagJumpTo;
 	Sci_Line		iInitialLine;
 	Sci_Position	iInitialColumn;
 	int		iSrcEncoding;

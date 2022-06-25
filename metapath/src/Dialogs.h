@@ -21,10 +21,10 @@
 
 #include "compiler.h"
 
-extern BOOL bWindowLayoutRTL;
+extern bool bWindowLayoutRTL;
 NP2_inline void InitWindowCommon(HWND hwnd) {
 	if (bWindowLayoutRTL) {
-		SetWindowLayoutRTL(hwnd, TRUE);
+		SetWindowLayoutRTL(hwnd, true);
 	}
 }
 

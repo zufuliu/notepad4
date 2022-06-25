@@ -243,12 +243,12 @@ int IniSectionGetIntImpl(IniSection *section, LPCWSTR key, int keyLen, int iDefa
 	return iDefault;
 }
 
-BOOL IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, BOOL bDefault) {
+bool IniSectionGetBoolImpl(IniSection *section, LPCWSTR key, int keyLen, bool bDefault) {
 	LPCWSTR value = IniSectionGetValueImpl(section, key, keyLen);
 	if (value) {
 		const UINT t = *value - L'0';
-		if (t <= 1U) {
-			return t;
+		if (t <= true) {
+			return t & true;
 		}
 	}
 	return bDefault;
@@ -819,10 +819,10 @@ void SetClipData(HWND hwnd, LPCWSTR pszData) {
 //
 bool bFreezeAppTitle = false;
 
-BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitled,
-					LPCWSTR lpszFile, int iFormat, BOOL bModified,
-					UINT uIDReadOnly, BOOL bReadOnly,
-					UINT uIDLocked, BOOL bLocked,
+BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, bool bIsElevated, UINT uIDUntitled,
+					LPCWSTR lpszFile, int iFormat, bool bModified,
+					UINT uIDReadOnly, bool bReadOnly,
+					UINT uIDLocked, bool bLocked,
 					LPCWSTR lpszExcerpt) {
 
 	static WCHAR szCachedFile[MAX_PATH] = L"";
@@ -906,7 +906,7 @@ BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, BOOL bIsElevated, UINT uIDUntitl
 //
 // SetWindowTransparentMode()
 //
-void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLevel) {
+void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel) {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/using-windows#using-layered-windows
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bTransparentMode ? (exStyle | WS_EX_LAYERED) : (exStyle & ~WS_EX_LAYERED);
@@ -919,7 +919,7 @@ void SetWindowTransparentMode(HWND hwnd, BOOL bTransparentMode, int iOpacityLeve
 	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
-void SetWindowLayoutRTL(HWND hwnd, BOOL bRTL) {
+void SetWindowLayoutRTL(HWND hwnd, bool bRTL) {
 	// https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#window-layout-and-mirroring
 	DWORD exStyle = GetWindowExStyle(hwnd);
 	exStyle = bRTL ? (exStyle | WS_EX_LAYOUTRTL) : (exStyle & ~WS_EX_LAYOUTRTL);
@@ -1746,7 +1746,7 @@ bool PathEquivalent(LPCWSTR pszPath1, LPCWSTR pszPath2) {
 //
 // PathRelativeToApp()
 //
-void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, BOOL bUnexpandMyDocs) {
+void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bUnexpandEnv, bool bUnexpandMyDocs) {
 	WCHAR wchPath[MAX_PATH];
 
 	if (!PathIsRelative(lpszSrc)) {
@@ -2423,7 +2423,7 @@ bool MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew) {
 	return true;
 }
 
-bool MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
+bool MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, bool bRelativePath, bool bUnexpandMyDocs) {
 	int i;
 	for (i = 0; i < pmru->iSize; i++) {
 		WCHAR * const item = pmru->pszItems[i];
@@ -2582,7 +2582,7 @@ bool MRU_Save(LPCMRULIST pmru) {
 	return true;
 }
 
-bool MRU_MergeSave(LPCMRULIST pmru, BOOL bAddFiles, BOOL bRelativePath, BOOL bUnexpandMyDocs) {
+bool MRU_MergeSave(LPCMRULIST pmru, bool bAddFiles, bool bRelativePath, bool bUnexpandMyDocs) {
 	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruBase);
 
@@ -3140,7 +3140,7 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
 // all current versions of the shell. If explorer isn't running, we try our
 // best to work with a 3rd party shell. If we still can't find anything, we
 // return a rect in the lower right hand corner of the screen
-static VOID GetTrayWndRect(LPRECT lpTrayRect) {
+static void GetTrayWndRect(LPRECT lpTrayRect) {
 	// First, we'll use a quick hack method. We know that the taskbar is a window
 	// of class Shell_TrayWnd, and the status tray is a child of this of class
 	// TrayNotifyWnd. This provides us a window rect to minimize to. Note, however,
