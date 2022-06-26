@@ -53,7 +53,7 @@ HFONT	Style_CreateCodeFont(UINT dpi);
 void	Style_OnDPIChanged(PEDITLEXER pLex);
 void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor(void);
-void	Style_SetLexer(PEDITLEXER pLexNew, bool bLexerChanged);
+void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged);
 bool	Style_SetLexerFromFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
 bool	Style_MaybeBinaryFile(LPCWSTR lpszFile);

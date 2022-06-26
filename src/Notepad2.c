@@ -1024,7 +1024,7 @@ static inline void ExitApplication(HWND hwnd) {
 
 void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 	// Reset Change Notify
-	//bPendingChangeNotify = FALSE;
+	//bPendingChangeNotify = false;
 	if (IsIconic(hwnd)) {
 		ShowWindow(hwnd, SW_RESTORE);
 	}
@@ -1252,7 +1252,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
 
 		// Reset Change Notify
-		//bPendingChangeNotify = FALSE;
+		//bPendingChangeNotify = false;
 
 		SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
@@ -1445,7 +1445,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	//// This message is posted before Notepad2 reactivates itself
 	//case APPM_CHANGENOTIFYCLEAR:
-	//	bPendingChangeNotify = FALSE;
+	//	bPendingChangeNotify = false;
 	//	break;
 
 	case WM_DRAWCLIPBOARD:

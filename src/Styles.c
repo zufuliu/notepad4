@@ -272,6 +272,8 @@ static PEDITLEXER pLexGlobal = &lexGlobal;
 PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
 
+#define LexerChanged_Override		2
+
 #define STYLESMODIFIED_NONE			0
 #define STYLESMODIFIED_SOME_STYLE	1
 #define STYLESMODIFIED_ALL_STYLE	2
@@ -1359,7 +1361,7 @@ void Style_DefineIndicator(int index, int indicator, int indicatorStyle) {
 // set current lexer
 // Style_SetLexer()
 //
-void Style_SetLexer(PEDITLEXER pLexNew, bool bLexerChanged) {
+void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	int iValue;
 
 	// Select default if NULL is specified
@@ -1464,8 +1466,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, bool bLexerChanged) {
 			}
 		}
 
-		// Clear
-		SciCall_ClearDocumentStyle();
+		// clear document style when manually set to a different lexer,
+		// otherwise document was previously empty.
+		if (bLexerChanged & LexerChanged_Override) {
+			SciCall_ClearDocumentStyle();
+		}
 	}
 
 	// Font quality setup
@@ -5183,7 +5188,7 @@ void Style_SelectLexerDlg(HWND hwnd, bool favorite) {
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
 		const bool bLexerChanged = !favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex);
 		if (bLexerChanged) {
-			Style_SetLexer(pLexCurrent, true);
+			Style_SetLexer(pLexCurrent, true | LexerChanged_Override);
 		}
 	} else {
 		if (favorite) {
