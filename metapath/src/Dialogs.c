@@ -1889,7 +1889,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
-		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
@@ -1963,7 +1963,7 @@ INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lPa
 		case IDC_GETOPENWITHDIR: {
 			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
 				DirList_StartIconThread(hwndLV);
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);

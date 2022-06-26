@@ -643,7 +643,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	hAccFindReplace = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCFINDREPLACE));
 	MSG msg;
 
-	while (TRUE) {
+	while (true) {
 		if (editMarkAllStatus.pending) {
 			WaitableTimer_Set(timer, WaitableTimer_IdleTaskDelayTime);
 			while (editMarkAllStatus.pending && WaitableTimer_Continue(timer)) {
@@ -1130,8 +1130,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					MRU_Save(mruFind);
 					MRU_Save(mruReplace);
 				} else {
-					MRU_MergeSave(mruFind, FALSE, FALSE, FALSE);
-					MRU_MergeSave(mruReplace, FALSE, FALSE, FALSE);
+					MRU_MergeSave(mruFind, false, false, false);
+					MRU_MergeSave(mruReplace, false, false, false);
 				}
 				MRU_Destroy(mruFind);
 				MRU_Destroy(mruReplace);

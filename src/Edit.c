@@ -6770,7 +6770,7 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 	if (!SciCall_IsSelectionEmpty()) {
 		EditReplaceAllInSelection(hwnd, &efrTS, true);
 	} else {
-		EditReplaceAll(hwnd, &efrTS, TRUE);
+		EditReplaceAll(hwnd, &efrTS, true);
 	}
 }
 
@@ -7433,7 +7433,7 @@ extern int iLongLinesLimitG;
 void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	memset(lpfv, 0, sizeof(FILEVARS));
 	// see FileVars_Apply() for other Tab settings.
-	tabSettings.schemeUseGlobalTabSettings = TRUE;
+	tabSettings.schemeUseGlobalTabSettings = true;
 	lpfv->bTabIndents = tabSettings.bTabIndents;
 	lpfv->fWordWrap = fWordWrapG;
 	lpfv->iLongLinesLimit = iLongLinesLimitG;

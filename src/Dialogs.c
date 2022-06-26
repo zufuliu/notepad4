@@ -590,7 +590,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
-		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+		DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
@@ -664,7 +664,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		case IDC_GETOPENWITHDIR: {
 			HWND hwndLV = GetDlgItem(hwnd, IDC_OPENWITHDIR);
 			if (GetDirectory(hwnd, IDS_OPENWITH, tchOpenWithDir, tchOpenWithDir)) {
-				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+				DirList_Fill(hwndLV, tchOpenWithDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
 				DirList_StartIconThread(hwndLV);
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
@@ -766,7 +766,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		};
 		ListView_InsertColumn(hwndLV, 0, &lvc);
 		DirList_Init(hwndLV, NULL);
-		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+		DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
@@ -840,7 +840,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		case IDC_GETFAVORITESDIR: {
 			HWND hwndLV = GetDlgItem(hwnd, IDC_FAVORITESDIR);
 			if (GetDirectory(hwnd, IDS_FAVORITES, tchFavoritesDir, tchFavoritesDir)) {
-				DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, FALSE, flagNoFadeHidden, DS_NAME, FALSE);
+				DirList_Fill(hwndLV, tchFavoritesDir, DL_ALLOBJECTS, NULL, false, flagNoFadeHidden, DS_NAME, false);
 				DirList_StartIconThread(hwndLV);
 				ListView_EnsureVisible(hwndLV, 0, FALSE);
 				ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);

@@ -152,7 +152,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	IniKeyValueNode *prev = NULL;
 #if IniSectionImplUseSentinelNode
 	section->sentinel->hash = hash;
-	while (TRUE) {
+	while (true) {
 		if (node->hash == hash) {
 			if (node == section->sentinel) {
 				return NULL;
@@ -923,7 +923,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 
 	LPCWSTR p = lpszButtons;
 	--ctbb;
-	while (TRUE) {
+	while (true) {
 		LPWSTR end;
 		int iCmd = (int)wcstol(p, &end, 10);
 		if (p != end) {
@@ -1385,7 +1385,7 @@ void OpenContainingFolder(HWND hwnd, LPCWSTR pszFile, bool bSelect) {
 //  ExtractFirstArgument()
 //
 bool ExtractFirstArgument(LPCWSTR lpArgs, LPWSTR lpArg1, LPWSTR lpArg2) {
-	bool bQuoted = FALSE;
+	bool bQuoted = false;
 
 	lstrcpy(lpArg1, lpArgs);
 	if (lpArg2) {

@@ -191,7 +191,7 @@ LPCWSTR IniSectionUnsafeGetValue(IniSection *section, LPCWSTR key, int keyLen) {
 	IniKeyValueNode *prev = NULL;
 #if IniSectionImplUseSentinelNode
 	section->sentinel->hash = hash;
-	while (TRUE) {
+	while (true) {
 		if (node->hash == hash) {
 			if (node == section->sentinel) {
 				return NULL;
@@ -1490,7 +1490,7 @@ int Toolbar_SetButtons(HWND hwnd, LPCWSTR lpszButtons, LPCTBBUTTON ptbb, int ctb
 
 	LPCWSTR p = lpszButtons;
 	--ctbb;
-	while (TRUE) {
+	while (true) {
 		LPWSTR end;
 		int iCmd = (int)wcstol(p, &end, 10);
 		if (p != end) {
@@ -2279,7 +2279,7 @@ void StripMnemonic(LPWSTR pszMenu) {
 			prev[len] = L'\0';
 			break;
 		}
-	} while (TRUE);
+	} while (true);
 }
 
 //=============================================================================

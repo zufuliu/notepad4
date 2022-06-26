@@ -4797,7 +4797,7 @@ static void Lexer_OnCheckStateChanged(HWND hwndTV, HTREEITEM hFavoriteNode, HTRE
 		if (!found) {
 			const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
 			hTreeNode = TreeView_GetLastVisible(hwndTV);
-			hParent = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, FALSE);
+			hParent = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, false);
 			TreeView_SetCheckState(hwndTV, hParent, TRUE);
 			// prevent auto scroll
 			TreeView_EnsureVisible(hwndTV, hTreeNode);
@@ -4910,7 +4910,7 @@ static void Lexer_OnDragDrop(HWND hwndTV, HTREEITEM hFavoriteNode, HTREEITEM hDr
 	PEDITLEXER pLex = (PEDITLEXER)lParam;
 
 	const DWORD iconFlags = SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX;
-	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, FALSE);
+	hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hFavoriteNode, hInsertAfter, false);
 	TreeView_SetCheckState(hwndTV, hTreeNode, TRUE);
 	if (expanded) {
 		TreeView_Select(hwndTV, hTreeNode, TVGN_CARET);
