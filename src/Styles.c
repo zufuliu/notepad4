@@ -1468,7 +1468,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 
 		// clear document style when manually set to a different lexer,
 		// otherwise document was previously empty.
-		if (bLexerChanged & LexerChanged_Override) {
+		if (bLexerChanged == LexerChanged_Override) {
 			SciCall_ClearDocumentStyle();
 		}
 	}
@@ -5188,7 +5188,7 @@ void Style_SelectLexerDlg(HWND hwnd, bool favorite) {
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
 		const bool bLexerChanged = !favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex);
 		if (bLexerChanged) {
-			Style_SetLexer(pLexCurrent, true | LexerChanged_Override);
+			Style_SetLexer(pLexCurrent, LexerChanged_Override);
 		}
 	} else {
 		if (favorite) {

@@ -1,7 +1,8 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar
 // 2020 11.0 https://www.ecma-international.org/publications/standards/Ecma-262.htm
 // 2021 https://tc39.es/ecma262/2021/
-// 2022 https://tc39.es/ecma262/
+// 2022 https://tc39.es/ecma262/2022/
+// 2023 https://tc39.es/ecma262/
 
 //! keywords
 async await
@@ -158,6 +159,7 @@ Object([value]) {
 	getOwnPropertyNames(O)
 	getOwnPropertySymbols(O)
 	getPrototypeOf(O)
+	hasOwn(O, P) // 2022
 	is(value1, value2)
 	isExtensible(O)
 	isFrozen(O)
@@ -215,6 +217,7 @@ Symbol([description]) {
 }
 
 Error(message) {
+	cause // 2022
 	message
 	name
 
@@ -361,6 +364,7 @@ String(value) {
 	raw(template, ...substitutions)
 	length
 	prototype:
+		at(index) // 2022
 		charAt(pos)
 		charCodeAt(pos)
 		codePointAt(pos)
@@ -434,6 +438,7 @@ Array(...items) {
 	of(...items)
 	length
 	prototype:
+		at(index) // 2022
 		concat(...arguments)
 		copyWithin(target, start [, end])
 		entries()
