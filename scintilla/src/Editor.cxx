@@ -6713,7 +6713,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::SetStyling:
-		if (PositionFromUPtr(PositionFromUPtr(wParam)) < 0)
+		if (PositionFromUPtr(wParam) < 0)
 			errorStatus = Status::Failure;
 		else
 			pdoc->SetStyleFor(PositionFromUPtr(wParam), static_cast<unsigned char>(lParam));

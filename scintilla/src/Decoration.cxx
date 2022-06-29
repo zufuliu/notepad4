@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <cassert>
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>

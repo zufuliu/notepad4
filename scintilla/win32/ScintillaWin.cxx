@@ -3259,7 +3259,7 @@ void ScintillaWin::ImeStartComposition() {
 			// The negative is to allow for leading
 			lf.lfHeight = -::MulDiv(sizeZoomed, dpi, 72*FontSizeMultiplier);
 			lf.lfWeight = static_cast<LONG>(vs.styles[styleHere].weight);
-			lf.lfItalic = vs.styles[styleHere].italic ? TRUE : FALSE;
+			lf.lfItalic = vs.styles[styleHere].italic;
 			lf.lfCharSet = DEFAULT_CHARSET;
 			lf.lfQuality = Win32MapFontQuality(vs.extraFontFlag);
 #if 1
