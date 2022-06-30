@@ -1095,11 +1095,11 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::Colourise:
 		// from Editor::FoldAll()
-		pdoc->EnsureStyledTo((lParam == -1) ? pdoc->Length() : lParam);
+		pdoc->EnsureStyledTo((lParam == -1) ? pdoc->LengthNoExcept() : lParam);
 #if 0
 		if (DocumentLexState()->UseContainerLexing()) {
 			pdoc->ModifiedAt(PositionFromUPtr(wParam));
-			NotifyStyleToNeeded((lParam == -1) ? pdoc->Length() : lParam);
+			NotifyStyleToNeeded((lParam == -1) ? pdoc->LengthNoExcept() : lParam);
 		} else {
 			DocumentLexState()->Colourise(PositionFromUPtr(wParam), lParam);
 		}

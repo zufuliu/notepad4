@@ -1086,7 +1086,7 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 		return SelectionPosition(Sci::invalidPosition);
 	if (lineDoc >= model.pdoc->LinesTotal())
 		return SelectionPosition(canReturnInvalid ? Sci::invalidPosition :
-			model.pdoc->Length());
+			model.pdoc->LengthNoExcept());
 	const Sci::Position posLineStart = model.pdoc->LineStart(lineDoc);
 	if (surface) {
 		LineLayout * const ll = RetrieveLineLayout(lineDoc, model);
@@ -2025,7 +2025,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 
 				const ViewStyle::CaretShape caretShape = vsDraw.CaretShapeForMode(model.inOverstrike, mainCaret, drawDrag, drawOverstrikeCaret, imeCaretBlockOverride);
 				if (caretShape != ViewStyle::CaretShape::line) {
-					if (posCaret.Position() == model.pdoc->Length()) {   // At end of document
+					if (posCaret.Position() == model.pdoc->LengthNoExcept()) {   // At end of document
 						canDrawBlockCaret = false;
 						widthOverstrikeCaret = vsDraw.aveCharWidth;
 					} else if ((posCaret.Position() - posLineStart) >= ll->numCharsInLine) {	// At end of line
@@ -2938,7 +2938,7 @@ void EditView::PaintText(Surface *surfaceWindow, const EditModel &model, PRectan
 		if (clipping)
 			surfaceWindow->PopClip();
 
-		//Platform::DebugPrintf("start display %d, offset = %d\n", model.pdoc->Length(), model.xOffset);
+		//Platform::DebugPrintf("start display %d, offset = %d\n", model.pdoc->LengthNoExcept(), model.xOffset);
 #if defined(TIME_PAINTING)
 		Platform::DebugPrintf(
 			"Layout:%9.6g    Paint:%9.6g    Ratio:%9.6g   Copy:%9.6g   Total:%9.6g\n",
@@ -3070,7 +3070,7 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 	//Platform::DebugPrintf("Formatting lines=[%0d,%0d,%0d] top=%0d bottom=%0d line=%0d %.0f\n",
 	//      linePrintStart, linePrintLast, linePrintMax, rc.top, rc.bottom, vsPrint.lineHeight,
 	//      surfaceMeasure->Height(vsPrint.styles[StyleLineNumber].font));
-	Sci::Position endPosPrint = model.pdoc->Length();
+	Sci::Position endPosPrint = model.pdoc->LengthNoExcept();
 	if (linePrintLast < model.pdoc->LinesTotal())
 		endPosPrint = model.pdoc->LineStart(linePrintLast + 1);
 

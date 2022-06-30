@@ -695,9 +695,6 @@ const char *CellBuffer::InsertString(Sci::Position position, const char *s, Sci:
 }
 
 bool CellBuffer::SetStyleAt(Sci::Position position, char styleValue) noexcept {
-	if (!hasStyles) {
-		return false;
-	}
 	const char curVal = style.ValueAt(position);
 	if (curVal != styleValue) {
 		style.SetValueAt(position, styleValue);
@@ -708,9 +705,6 @@ bool CellBuffer::SetStyleAt(Sci::Position position, char styleValue) noexcept {
 }
 
 bool CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept {
-	if (!hasStyles) {
-		return false;
-	}
 	bool changed = false;
 	PLATFORM_ASSERT(lengthStyle == 0 ||
 		(lengthStyle > 0 && lengthStyle + position <= style.Length()));
@@ -743,10 +737,6 @@ const char *CellBuffer::DeleteChars(Sci::Position position, Sci::Position delete
 	return data;
 }
 
-Sci::Position CellBuffer::Length() const noexcept {
-	return substance.Length();
-}
-
 void CellBuffer::Allocate(Sci::Position newSize) {
 	substance.ReAllocate(newSize);
 	if (hasStyles) {
@@ -765,10 +755,6 @@ bool CellBuffer::EnsureStyleBuffer(bool hasStyles_) {
 		return true;
 	}
 	return false;
-}
-
-void CellBuffer::SetUTF8Substance(bool utf8Substance_) noexcept {
-	utf8Substance = utf8Substance_;
 }
 
 void CellBuffer::SetLineEndTypes(LineEndType utf8LineEnds_) {
@@ -847,22 +833,6 @@ Sci::Position CellBuffer::IndexLineStart(Sci::Line line, LineCharacterIndexType 
 
 Sci::Line CellBuffer::LineFromPositionIndex(Sci::Position pos, LineCharacterIndexType lineCharacterIndex) const noexcept {
 	return plv->LineFromPositionIndex(pos, lineCharacterIndex);
-}
-
-bool CellBuffer::IsReadOnly() const noexcept {
-	return readOnly;
-}
-
-void CellBuffer::SetReadOnly(bool set) noexcept {
-	readOnly = set;
-}
-
-bool CellBuffer::IsLarge() const noexcept {
-	return largeDocument;
-}
-
-bool CellBuffer::HasStyles() const noexcept {
-	return hasStyles;
 }
 
 void CellBuffer::SetSavePoint() noexcept {
@@ -1540,10 +1510,6 @@ void CellBuffer::BasicDeleteChars(const Sci::Position position, const Sci::Posit
 bool CellBuffer::SetUndoCollection(bool collectUndo) noexcept {
 	collectingUndo = collectUndo;
 	uh.DropUndoSequence();
-	return collectingUndo;
-}
-
-bool CellBuffer::IsCollectingUndo() const noexcept {
 	return collectingUndo;
 }
 

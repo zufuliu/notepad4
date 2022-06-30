@@ -1573,18 +1573,18 @@ std::string ScintillaWin::EncodeWString(std::wstring_view wsv) {
 }
 
 sptr_t ScintillaWin::GetTextLength() const noexcept {
-	return pdoc->CountUTF16(0, pdoc->Length());
+	return pdoc->CountUTF16(0, pdoc->LengthNoExcept());
 }
 
 sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) const {
 	if (lParam == 0) {
-		return pdoc->CountUTF16(0, pdoc->Length());
+		return pdoc->CountUTF16(0, pdoc->LengthNoExcept());
 	}
 	if (wParam == 0) {
 		return 0;
 	}
 	wchar_t *ptr = static_cast<wchar_t *>(PtrFromSPtr(lParam));
-	if (pdoc->Length() == 0) {
+	if (pdoc->LengthNoExcept() == 0) {
 		*ptr = L'\0';
 		return 0;
 	}
@@ -1592,7 +1592,7 @@ sptr_t ScintillaWin::GetText(uptr_t wParam, sptr_t lParam) const {
 	Sci::Position sizeRequestedRange = pdoc->GetRelativePositionUTF16(0, lengthWanted);
 	if (sizeRequestedRange < 0) {
 		// Requested more text than there is in the document.
-		sizeRequestedRange = pdoc->Length();
+		sizeRequestedRange = pdoc->LengthNoExcept();
 	}
 	std::string docBytes(sizeRequestedRange, '\0');
 	pdoc->GetCharRange(docBytes.data(), 0, sizeRequestedRange);
@@ -2016,10 +2016,10 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 		if (PositionFromUPtr(wParam) < 0) {
 			wParam = SelectionStart().Position();
 		}
-		return pdoc->LineFromPosition(wParam);
+		return pdoc->SciLineFromPosition(wParam);
 
 	case EM_EXLINEFROMCHAR:
-		return pdoc->LineFromPosition(lParam);
+		return pdoc->SciLineFromPosition(lParam);
 
 	case EM_GETSEL:
 		if (wParam) {
@@ -2044,7 +2044,7 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 		Sci::Position nStart = wParam;
 		Sci::Position nEnd = lParam;
 		if (nStart == 0 && nEnd == -1) {
-			nEnd = pdoc->Length();
+			nEnd = pdoc->LengthNoExcept();
 		}
 		if (nStart == -1) {
 			nStart = nEnd;	// Remove selection
@@ -2061,16 +2061,16 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 		const CHARRANGE *pCR = reinterpret_cast<const CHARRANGE *>(lParam);
 		sel.selType = Selection::SelTypes::stream;
 		if (pCR->cpMin == 0 && pCR->cpMax == -1) {
-			SetSelection(pCR->cpMin, pdoc->Length());
+			SetSelection(pCR->cpMin, pdoc->LengthNoExcept());
 		} else {
 			SetSelection(pCR->cpMin, pCR->cpMax);
 		}
 		EnsureCaretVisible();
-		return pdoc->LineFromPosition(SelectionStart().Position());
+		return pdoc->SciLineFromPosition(SelectionStart().Position());
 	}
 
 	case EM_LINELENGTH:
-		return ScintillaBase::WndProc(Message::LineLength, pdoc->LineFromPosition(wParam), lParam);
+		return ScintillaBase::WndProc(Message::LineLength, pdoc->SciLineFromPosition(wParam), lParam);
 
 	case EM_POSFROMCHAR:
 		if (wParam) {
@@ -3294,7 +3294,7 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 	const Sci::Position mainStart = sel.RangeMain().Start().Position();
 	const Sci::Position mainEnd = sel.RangeMain().End().Position();
 	const Sci::Line curLine = pdoc->SciLineFromPosition(mainStart);
-	if (curLine != pdoc->LineFromPosition(mainEnd))
+	if (curLine != pdoc->SciLineFromPosition(mainEnd))
 		return 0;
 	const Sci::Position baseStart = pdoc->LineStart(curLine);
 	const Sci::Position baseEnd = pdoc->LineEnd(curLine);
@@ -3357,7 +3357,7 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 		} else {
 			// Ensure docCompStart+docCompLen be not beyond lineEnd.
 			// since docCompLen by byte might break eol.
-			const Sci::Position lineEnd = pdoc->LineEnd(pdoc->LineFromPosition(rBase));
+			const Sci::Position lineEnd = pdoc->LineEnd(pdoc->SciLineFromPosition(rBase));
 			const Sci::Position overflow = (docCompStart + docCompLen) - lineEnd;
 			if (overflow > 0) {
 				pdoc->DeleteChars(docCompStart, docCompLen - overflow);

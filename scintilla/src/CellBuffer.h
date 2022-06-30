@@ -172,10 +172,14 @@ public:
 	Sci::Position GapPosition() const noexcept;
 	SplitView AllView() const noexcept;
 
-	Sci::Position Length() const noexcept;
+	Sci::Position Length() const noexcept {
+		return substance.Length();
+	}
 	void Allocate(Sci::Position newSize);
 	bool EnsureStyleBuffer(bool hasStyles_);
-	void SetUTF8Substance(bool utf8Substance_) noexcept;
+	void SetUTF8Substance(bool utf8Substance_) noexcept {
+		utf8Substance = utf8Substance_;
+	}
 	Scintilla::LineEndType GetLineEndTypes() const noexcept {
 		return utf8LineEnds;
 	}
@@ -202,10 +206,18 @@ public:
 
 	const char *DeleteChars(Sci::Position position, Sci::Position deleteLength, bool &startSequence);
 
-	bool IsReadOnly() const noexcept;
-	void SetReadOnly(bool set) noexcept;
-	bool IsLarge() const noexcept;
-	bool HasStyles() const noexcept;
+	bool IsReadOnly() const noexcept {
+		return readOnly;
+	}
+	void SetReadOnly(bool set) noexcept {
+		readOnly = set;
+	}
+	bool IsLarge() const noexcept {
+		return largeDocument;
+	}
+	bool HasStyles() const noexcept {
+		return hasStyles;
+	}
 
 	/// The save point is a marker in the undo stack where the container has stated that
 	/// the buffer was saved. Undo and redo can move over the save point.
@@ -218,7 +230,9 @@ public:
 	int TentativeSteps() noexcept;
 
 	bool SetUndoCollection(bool collectUndo) noexcept;
-	bool IsCollectingUndo() const noexcept;
+	bool IsCollectingUndo() const noexcept {
+		return collectingUndo;
+	}
 	void BeginUndoAction();
 	void EndUndoAction();
 	void AddUndoAction(Sci::Position token, bool mayCoalesce);

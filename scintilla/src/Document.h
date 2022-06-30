@@ -90,7 +90,7 @@ class RegexSearchBase {
 public:
 	virtual ~RegexSearchBase() = default;
 
-	virtual Sci::Position FindText(Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
+	virtual Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
 		bool caseSensitive, Scintilla::FindOption flags, Sci::Position *length) = 0;
 
 	///@return String with the substitutions, must remain valid until the next call or destruction
@@ -100,7 +100,7 @@ public:
 };
 
 /// Factory function for RegexSearchBase
-extern RegexSearchBase *CreateRegexSearch(CharClassify *charClassTable);
+extern RegexSearchBase *CreateRegexSearch(const CharClassify *charClassTable);
 
 struct StyledText {
 	size_t length;
@@ -344,7 +344,7 @@ public:
 		return cb.ContainsLineEnd(s, length);
 	}
 	bool IsCrLf(Sci::Position pos) const noexcept;
-	int LenChar(Sci::Position pos, bool *invalid = nullptr) noexcept;
+	int LenChar(Sci::Position pos, bool *invalid = nullptr) const noexcept;
 	bool InGoodUTF8(Sci::Position pos, Sci::Position &start, Sci::Position &end) const noexcept;
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir, bool checkLineEnd = true) const noexcept;
 	Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept;
@@ -434,11 +434,11 @@ public:
 	int SCI_METHOD GetLineIndentation(Sci_Line line) const noexcept override;
 	Sci::Position SetLineIndentation(Sci::Line line, Sci::Position indent);
 	Sci::Position GetLineIndentPosition(Sci::Line line) const noexcept;
-	Sci::Position GetColumn(Sci::Position pos) noexcept;
+	Sci::Position GetColumn(Sci::Position pos) const noexcept;
 	Sci::Position CountCharacters(Sci::Position startPos, Sci::Position endPos) const noexcept;
 	void CountCharactersAndColumns(Scintilla::sptr_t lParam) const noexcept;
 	Sci::Position CountUTF16(Sci::Position startPos, Sci::Position endPos) const noexcept;
-	Sci::Position FindColumn(Sci::Line line, Sci::Position column) noexcept;
+	Sci::Position FindColumn(Sci::Line line, Sci::Position column) const noexcept;
 	void Indent(bool forwards, Sci::Line lineBottom, Sci::Line lineTop);
 	static std::string TransformLineEnds(const char *s, size_t len, Scintilla::EndOfLine eolModeWanted);
 	void ConvertLineEnds(Scintilla::EndOfLine eolModeSet);
@@ -509,6 +509,9 @@ public:
 	Sci_Position SCI_METHOD Length() const noexcept override {
 		return cb.Length();
 	}
+	Sci::Position LengthNoExcept() const noexcept {
+		return cb.Length();
+	}
 	void Allocate(Sci::Position newSize) {
 		cb.Allocate(newSize);
 	}
@@ -527,7 +530,9 @@ public:
 	Scintilla::LineCharacterIndexType LineCharacterIndex() const noexcept;
 	void AllocateLineCharacterIndex(Scintilla::LineCharacterIndexType lineCharacterIndex);
 	void ReleaseLineCharacterIndex(Scintilla::LineCharacterIndexType lineCharacterIndex);
-	Sci::Line LinesTotal() const noexcept;
+	Sci::Line LinesTotal() const noexcept {
+		return cb.Lines();
+	}
 	void AllocateLines(Sci::Line lines);
 
 	void SetDefaultCharClasses(bool includeWordClass) noexcept;
@@ -588,7 +593,7 @@ public:
 	bool IsWordPartSeparator(unsigned int ch) const noexcept;
 	Sci::Position WordPartLeft(Sci::Position pos) const noexcept;
 	Sci::Position WordPartRight(Sci::Position pos) const noexcept;
-	Sci::Position ExtendStyleRange(Sci::Position pos, int delta, bool singleLine = false) noexcept;
+	Sci::Position ExtendStyleRange(Sci::Position pos, int delta, bool singleLine = false) const noexcept;
 	bool IsWhiteLine(Sci::Line line) const noexcept;
 	Sci::Position ParaUp(Sci::Position pos) const noexcept;
 	Sci::Position ParaDown(Sci::Position pos) const noexcept;
