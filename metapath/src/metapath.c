@@ -2233,6 +2233,21 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
+void SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile) {
+	WCHAR szTitle[MAX_PATH] = L"";
+	if (StrNotEmpty(lpszFile)) {
+		if (!PathIsRoot(lpszFile)) {
+			SHFILEINFO shfi;
+			SHGetFileInfo(lpszFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
+			lstrcpy(szTitle, shfi.szDisplayName);
+		} else {
+			lstrcpy(szTitle, lpszFile);
+		}
+	}
+
+	SetWindowText(hwnd, szTitle);
+}
+
 //=============================================================================
 //
 //  ChangeDirectory()

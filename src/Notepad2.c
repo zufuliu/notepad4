@@ -278,6 +278,7 @@ static int iInitialLexer;
 static bool bLastCopyFromMe = false;
 static DWORD dwLastCopyTime;
 
+bool bFreezeAppTitle = false;
 static UINT uidsAppTitle = IDS_APPTITLE;
 static WCHAR szTitleExcerpt[128] = L"";
 static int fKeepTitleExcerpt = 0;
@@ -1561,11 +1562,83 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 }
 
 void UpdateWindowTitle(void) {
-	SetWindowTitle(hwndMain, uidsAppTitle, fIsElevated, IDS_UNTITLED, szCurFile,
-				iPathNameFormat, IsDocumentModified(),
-				IDS_READONLY, bReadOnly,
-				IDS_LOCKED, bLockedForEditing,
-				szTitleExcerpt);
+	static WCHAR szCachedFile[MAX_PATH] = L"";
+	static WCHAR szCachedDisplayName[MAX_PATH] = L"";
+
+	if (bFreezeAppTitle) {
+		return;
+	}
+
+	WCHAR szAppName[128];
+	GetString(uidsAppTitle, szAppName, COUNTOF(szAppName));
+
+	if (fIsElevated) {
+		WCHAR szElevatedAppName[128];
+		WCHAR fmt[64];
+		FormatString(szElevatedAppName, fmt, IDS_APPTITLE_ELEVATED, szAppName);
+		lstrcpyn(szAppName, szElevatedAppName, COUNTOF(szAppName));
+	}
+
+	WCHAR szTitle[512];
+	if (IsDocumentModified()) {
+		StrCpyExW(szTitle, L"* ");
+	} else {
+		szTitle[0] = L'\0';
+	}
+
+	if (StrNotEmpty(szTitleExcerpt)) {
+		WCHAR szExcerptQuote[256];
+		WCHAR szExcerptFmt[32];
+		FormatString(szExcerptQuote, szExcerptFmt, IDS_TITLEEXCERPT, szTitleExcerpt);
+		lstrcat(szTitle, szExcerptQuote);
+	} else if (StrNotEmpty(szCurFile)) {
+		if (iPathNameFormat < 2 && !PathIsRoot(szCurFile)) {
+			if (!StrEqual(szCachedFile, szCurFile)) {
+				SHFILEINFO shfi;
+				lstrcpy(szCachedFile, szCurFile);
+				if (SHGetFileInfo2(szCurFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME)) {
+					lstrcpy(szCachedDisplayName, shfi.szDisplayName);
+				} else {
+					lstrcpy(szCachedDisplayName, PathFindFileName(szCurFile));
+				}
+			}
+			lstrcat(szTitle, szCachedDisplayName);
+			if (iPathNameFormat == 1) {
+				WCHAR tchPath[MAX_PATH];
+				lstrcpyn(tchPath, szCurFile, COUNTOF(tchPath));
+				PathRemoveFileSpec(tchPath);
+				lstrcat(szTitle, L" [");
+				lstrcat(szTitle, tchPath);
+				lstrcat(szTitle, L"]");
+			}
+		} else {
+			lstrcat(szTitle, szCurFile);
+		}
+	} else {
+		StrCpyExW(szCachedFile, L"");
+		StrCpyExW(szCachedDisplayName, L"");
+		WCHAR szUntitled[128];
+		GetString(IDS_UNTITLED, szUntitled, COUNTOF(szUntitled));
+		lstrcat(szTitle, szUntitled);
+	}
+
+	if (bReadOnly) {
+		WCHAR szReadOnly[32];
+		GetString(IDS_READONLY, szReadOnly, COUNTOF(szReadOnly));
+		lstrcat(szTitle, L" ");
+		lstrcat(szTitle, szReadOnly);
+	}
+	if (bLockedForEditing) {
+		WCHAR szLocked[32];
+		GetString(IDS_LOCKED, szLocked, COUNTOF(szLocked));
+		lstrcat(szTitle, L" ");
+		lstrcat(szTitle, szLocked);
+	}
+
+	lstrcat(szTitle, L" - ");
+	lstrcat(szTitle, szAppName);
+
+	SetWindowText(hwndMain, szTitle);
 }
 
 static inline void UpdateDocumentModificationStatus(void) {

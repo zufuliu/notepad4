@@ -673,11 +673,6 @@ bool VerifyContrast(COLORREF cr1, COLORREF cr2);
 BOOL IsFontAvailable(LPCWSTR lpszFontName);
 
 void SetClipData(HWND hwnd, LPCWSTR pszData);
-BOOL SetWindowTitle(HWND hwnd, UINT uIDAppName, bool bIsElevated, UINT uIDUntitled,
-					LPCWSTR lpszFile, int iFormat, bool bModified,
-					UINT uIDReadOnly, bool bReadOnly,
-					UINT uIDLocked, bool bLocked,
-					LPCWSTR lpszExcerpt);
 void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel);
 void SetWindowLayoutRTL(HWND hwnd, bool bRTL);
 

@@ -365,7 +365,6 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 bool BitmapGrayScale(HBITMAP hbmp);
 
-BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile);
 void CenterDlgInParentEx(HWND hDlg, HWND hParent);
 NP2_inline void CenterDlgInParent(HWND hDlg) {
 	CenterDlgInParentEx(hDlg, GetParent(hDlg));

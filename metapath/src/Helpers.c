@@ -558,25 +558,6 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 
 //=============================================================================
 //
-//  SetWindowPathTitle()
-//
-BOOL SetWindowPathTitle(HWND hwnd, LPCWSTR lpszFile) {
-	WCHAR szTitle[MAX_PATH] = L"";
-	if (StrNotEmpty(lpszFile)) {
-		if (!PathIsRoot(lpszFile)) {
-			SHFILEINFO shfi;
-			SHGetFileInfo(lpszFile, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
-			lstrcpy(szTitle, shfi.szDisplayName);
-		} else {
-			lstrcpy(szTitle, lpszFile);
-		}
-	}
-
-	return SetWindowText(hwnd, szTitle);
-}
-
-//=============================================================================
-//
 //  CenterDlgInParentEx()
 //
 void CenterDlgInParentEx(HWND hDlg, HWND hParent) {
