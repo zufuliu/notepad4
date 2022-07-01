@@ -80,8 +80,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "文件模式(&M)"
 		BEGIN
-			MENUITEM "只读模式(&R)",				IDM_FILE_READONLY
-			MENUITEM "锁定编辑(&C)",				IDM_FILE_LOCK_EDITING
+			MENUITEM "只读文件(&F)",				IDM_FILE_READONLY_FILE
+			MENUITEM "只读模式(&R)\tF10",			IDM_FILE_READONLY_MODE
 #if defined(_WIN64)
 			MENUITEM "大文件模式(&L)",				IDM_FILE_LARGE_FILE_MODE
 #endif
@@ -889,6 +889,7 @@ BEGIN
     VK_ESCAPE,      CMD_SHIFTESC,               VIRTKEY, SHIFT, NOINVERT
     VK_INSERT,      IDM_EDIT_COPY,              VIRTKEY, CONTROL, NOINVERT
     VK_F1,          IDM_HELP_ABOUT,             VIRTKEY, NOINVERT
+    VK_F10,         IDM_FILE_READONLY_MODE,     VIRTKEY, NOINVERT
     VK_F11,         IDM_VIEW_TOGGLE_FULLSCREEN, VIRTKEY, NOINVERT
     VK_F11,         IDM_VIEW_TOOLBAR,           VIRTKEY, CONTROL, NOINVERT
     VK_F11,         IDM_VIEW_FULLSCREEN_HIDE_MENU,VIRTKEY, ALT, NOINVERT
@@ -1844,8 +1845,8 @@ BEGIN
     IDS_APPTITLE_PASTEBOARD "Notepad2: 粘贴板"
     IDS_UNTITLED            "未命名"
     IDS_TITLEEXCERPT        "“%s”"
-    IDS_READONLY            "(只读)"
-    IDS_LOCKED              "(已锁定编辑)"
+    IDS_READONLY_FILE       "(只读文件)"
+    IDS_READONLY_MODE       "(只读模式)"
     IDS_DOCPOS              "行 %s / %s  列 %s / %s  字符 %s / %s  选中 %s / %s  选中行 %s  找到 %s"
     IDS_LOADFILE            "正在载入“%s”..."
     IDS_SAVEFILE            "正在保存“%s”..."
@@ -1960,7 +1961,7 @@ BEGIN
     IDS_ASK_ENCODING2       "您即将更改一个空文件的编码，从 ANSI 到非 ANSI。请注意，这将清除编辑历史，因历史记录无法与新的编码同步。要继续吗？"
     IDS_ERR_ENCODINGNA      "您的系统上没有所选编码的代码页转换表。"
     IDS_ERR_UNICODE         "转换该 Unicode 文件时出错。\n如果保存该文件，数据将会丢失！"
-    IDS_BINARY_FILE_LOCKED  "这不太像是一个文本文件，已被锁定编辑，以防止意外的编辑造成文件损坏。"
+    IDS_BINARY_FILE_OPENED  "这不太像是一个文本文件，因此以只读模式打开，\n以防止意外的编辑造成文件损坏。"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
     IDS_CHANGE_LANG_RESTART "更改界面语言需要重新启动 Notepad2，现在就重新启动吗？"
 #endif
@@ -1980,6 +1981,7 @@ BEGIN
 /m 文本\t匹配文本 (/m- 向上查找, /mr 正则表达式, /mb 反斜线转义)。\n\
 /l[o|p]\t自动重载修改的文件。\n\
 /q\t强制创建新文件而不提示。\n\
+/ro\t以只读模式打开文件。\n\
 /s 名称\t选择指定的文件类型。\n\
 /d\t指定为 文本文件。\n\
 /h\t指定为 Web 源代码。\n\

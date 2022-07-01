@@ -109,7 +109,7 @@ static inline void NotifyRectangleSelection(void) {
 // EditSetNewText()
 //
 extern bool bFreezeAppTitle;
-extern bool bLockedForEditing;
+extern bool bReadOnlyMode;
 #if defined(_WIN64)
 extern bool bLargeFileMode;
 #endif
@@ -120,7 +120,7 @@ extern int iWordWrapIndent;
 
 void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 	bFreezeAppTitle = true;
-	bLockedForEditing = false;
+	bReadOnlyMode = false;
 	iWrapColumn = 0;
 
 	SciCall_SetReadOnly(false);
@@ -198,7 +198,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) {
 		NP2HeapFree(pwchText);
 	}
 
-	bLockedForEditing = false;
+	bReadOnlyMode = false;
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetUndoCollection(false);
@@ -244,7 +244,7 @@ void EditConvertToLargeMode(void) {
 		SciCall_GetText(length, pchText);
 	}
 
-	bLockedForEditing = false;
+	bReadOnlyMode = false;
 	SciCall_SetReadOnly(false);
 	SciCall_Cancel();
 	SciCall_SetUndoCollection(false);

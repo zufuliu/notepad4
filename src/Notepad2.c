@@ -256,8 +256,8 @@ DWORD	dwLastIOError;
 WCHAR	szCurFile[MAX_PATH + 40];
 FILEVARS	fvCurFile;
 static bool bDocumentModified = false;
-static bool bReadOnly = false;
-bool bLockedForEditing = false; // save call to SciCall_GetReadOnly()
+static bool bReadOnlyFile = false;
+bool bReadOnlyMode = false; // save call to SciCall_GetReadOnly()
 
 // AutoSave
 int iAutoSaveOption;
@@ -1621,15 +1621,15 @@ void UpdateWindowTitle(void) {
 		lstrcat(szTitle, szUntitled);
 	}
 
-	if (bReadOnly) {
+	if (bReadOnlyFile) {
 		WCHAR szReadOnly[32];
-		GetString(IDS_READONLY, szReadOnly, COUNTOF(szReadOnly));
+		GetString(IDS_READONLY_FILE, szReadOnly, COUNTOF(szReadOnly));
 		lstrcat(szTitle, L" ");
 		lstrcat(szTitle, szReadOnly);
 	}
-	if (bLockedForEditing) {
+	if (bReadOnlyMode) {
 		WCHAR szLocked[32];
-		GetString(IDS_LOCKED, szLocked, COUNTOF(szLocked));
+		GetString(IDS_READONLY_MODE, szLocked, COUNTOF(szLocked));
 		lstrcat(szTitle, L" ");
 		lstrcat(szTitle, szLocked);
 	}
@@ -2442,9 +2442,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_FILE_RELAUNCH_ELEVATED, IsVistaAndAbove() && !fIsElevated);
 	EnableCmd(hmenu, IDM_FILE_OPEN_CONTAINING_FOLDER, i);
-	EnableCmd(hmenu, IDM_FILE_READONLY, i);
-	CheckCmd(hmenu, IDM_FILE_READONLY, bReadOnly);
-	CheckCmd(hmenu, IDM_FILE_LOCK_EDITING, bLockedForEditing);
+	EnableCmd(hmenu, IDM_FILE_READONLY_FILE, i);
+	CheckCmd(hmenu, IDM_FILE_READONLY_FILE, bReadOnlyFile);
+	CheckCmd(hmenu, IDM_FILE_READONLY_MODE, bReadOnlyMode);
 
 	EnableCmd(hmenu, IDM_RECODE_SELECT, i);
 
@@ -2819,11 +2819,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy));
 		break;
 
-	case IDM_FILE_READONLY:
+	case IDM_FILE_READONLY_FILE:
 		if (StrNotEmpty(szCurFile)) {
 			DWORD dwFileAttributes = GetFileAttributes(szCurFile);
 			if (dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
-				if (bReadOnly) {
+				if (bReadOnlyFile) {
 					dwFileAttributes = (dwFileAttributes & ~FILE_ATTRIBUTE_READONLY);
 				} else {
 					dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
@@ -2836,14 +2836,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			dwFileAttributes = GetFileAttributes(szCurFile);
-			bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
+			bReadOnlyFile = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 			UpdateWindowTitle();
 		}
 		break;
 
-	case IDM_FILE_LOCK_EDITING:
-		bLockedForEditing = !bLockedForEditing;
-		SciCall_SetReadOnly(bLockedForEditing);
+	case IDM_FILE_READONLY_MODE:
+		bReadOnlyMode = !bReadOnlyMode;
+		SciCall_SetReadOnly(bReadOnlyMode);
 		UpdateWindowTitle();
 		break;
 
@@ -7341,7 +7341,7 @@ bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status) {
 	}
 
 	const DWORD dwFileAttributes = GetFileAttributes(pszFile);
-	bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
+	bReadOnlyFile = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
 
 	StatusSetSimple(hwndStatus, FALSE);
 	EndWaitCursor();
@@ -7400,7 +7400,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		FileVars_Init(NULL, 0, &fvCurFile);
 		EditSetEmptyText();
 		bDocumentModified = false;
-		bReadOnly = false;
+		bReadOnlyFile = false;
 		iCurrentEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 		SciCall_SetEOLMode(iCurrentEOLMode);
 		iCurrentEncoding = iDefaultEncoding;
@@ -7476,7 +7476,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 				iOriginalEncoding = iCurrentEncoding;
 				SciCall_SetCodePage((iCurrentEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 				Style_SetLexer(NULL, true);
-				bReadOnly = false;
+				bReadOnlyFile = false;
 			}
 		} else if (result == IDCANCEL) {
 			PostWMCommand(hwndMain, IDM_FILE_EXIT);
@@ -7551,7 +7551,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		}
 		// lock binary file for editing
 		if (binary) {
-			bLockedForEditing = true;
+			bReadOnlyMode = true;
 			SciCall_SetReadOnly(true);
 		} else {
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -7591,9 +7591,9 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		if (status.bUnicodeErr) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
 		}
-		// notify binary file been locked for editing
+		// notify binary file opened in read only mode
 		if (binary) {
-			ShowNotificationMessage(SC_NOTIFICATIONPOSITION_BOTTOMRIGHT, IDS_BINARY_FILE_LOCKED);
+			ShowNotificationMessage(SC_NOTIFICATIONPOSITION_BOTTOMRIGHT, IDS_BINARY_FILE_OPENED);
 			return fSuccess;
 		}
 		// Show inconsistent line endings warning
@@ -7676,8 +7676,8 @@ bool FileSave(FileSaveFlag saveFlag) {
 	// Read only...
 	if (!(saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) && !Untitled) {
 		const DWORD dwFileAttributes = GetFileAttributes(szCurFile);
-		bReadOnly = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
-		if (bReadOnly) {
+		bReadOnlyFile = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
+		if (bReadOnlyFile) {
 			UpdateWindowTitle();
 			if (MsgBoxWarn(MB_YESNO, IDS_READONLY_SAVE, szCurFile) == IDYES) {
 				saveFlag = (FileSaveFlag)(saveFlag | FileSaveFlag_SaveAs);
