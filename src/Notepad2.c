@@ -279,9 +279,8 @@ static bool bLastCopyFromMe = false;
 static DWORD dwLastCopyTime;
 
 bool bFreezeAppTitle = false;
-static UINT uidsAppTitle = IDS_APPTITLE;
 static WCHAR szTitleExcerpt[128] = L"";
-static int fKeepTitleExcerpt = 0;
+static bool fKeepTitleExcerpt = false;
 
 static HANDLE hChangeHandle = NULL;
 static bool bRunningWatch = false;
@@ -884,7 +883,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// reset
 	iSrcEncoding = CPI_NONE;
 	flagQuietCreate = false;
-	fKeepTitleExcerpt = 0;
+	fKeepTitleExcerpt = false;
 
 	// Check for /c [if no file is specified] -- even if a file is specified
 	/*else */
@@ -954,7 +953,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (flagPasteBoard) {
 		bLastCopyFromMe = true;
 		hwndNextCBChain = SetClipboardViewer(hwndMain);
-		uidsAppTitle = IDS_APPTITLE_PASTEBOARD;
 		UpdateWindowTitle();
 		bLastCopyFromMe = false;
 		dwLastCopyTime = 0;
@@ -1570,7 +1568,8 @@ void UpdateWindowTitle(void) {
 	}
 
 	WCHAR szAppName[128];
-	GetString(uidsAppTitle, szAppName, COUNTOF(szAppName));
+	NP2_static_assert(IDS_APPTITLE + 1 == IDS_APPTITLE_PASTEBOARD);
+	GetString(IDS_APPTITLE + (UINT)flagPasteBoard, szAppName, COUNTOF(szAppName));
 
 	if (fIsElevated) {
 		WCHAR szElevatedAppName[128];
@@ -6266,7 +6265,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			state = 2;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				lstrcpyn(szTitleExcerpt, lp1, COUNTOF(szTitleExcerpt));
-				fKeepTitleExcerpt = 1;
+				fKeepTitleExcerpt = true;
 				state = 1;
 			}
 			break;
@@ -7366,7 +7365,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	Sci_Line iVisTopLine = 0;
 	Sci_Line iDocTopLine = 0;
 	int iXOffset = 0;
-	int keepTitleExcerpt = fKeepTitleExcerpt;
+	bool keepTitleExcerpt = fKeepTitleExcerpt;
 	bool keepCurrentLexer = false;
 
 	if (!(loadFlag & FileLoadFlag_New) && StrNotEmpty(lpszFile)) {
@@ -7380,7 +7379,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			iXOffset = SciCall_GetXOffset();
 			bRestoreView = true;
-			keepTitleExcerpt = 1;
+			keepTitleExcerpt = true;
 			keepCurrentLexer = true;
 		}
 		fSuccess = true;

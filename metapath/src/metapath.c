@@ -1208,7 +1208,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_OPENSAME:
 	case IDM_FILE_OPENNEW: {
-		DLITEM dli = { DLI_ALL, L"", L"", DLE_NONE };
+		DLITEM dli = { DLI_ALL, DLE_NONE, L"", L"" };
 		DirList_GetItem(hwndDirList, -1, &dli);
 
 		switch (dli.ntype) {
@@ -1833,7 +1833,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case ACC_GOTOTARGET: {
-		DLITEM dli = { DLI_ALL, L"", L"", DLE_NONE };
+		DLITEM dli = { DLI_ALL, DLE_NONE, L"", L"" };
 		DirList_GetItem(hwndDirList, -1, &dli);
 
 		if (dli.ntype == DLE_FILE) {
@@ -3656,9 +3656,8 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 			ShellExecuteEx(&sei);
 		}
 	} else {
-		if (iUseTargetApplication &&
-				iTargetApplicationMode == 2 &&
-				ExecDDECommand(lpFileName, szDDEMsg, szDDEApp, szDDETopic)) {
+		if (iUseTargetApplication && iTargetApplicationMode == 2
+			&& ExecDDECommand(lpFileName, szDDEMsg, szDDEApp, szDDETopic)) {
 			return;
 		}
 

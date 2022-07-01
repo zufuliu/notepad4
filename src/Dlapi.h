@@ -77,9 +77,9 @@ BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev);
 
 typedef struct DLITEM {	// dli
 	UINT mask;
+	int ntype;
 	WCHAR szFileName[MAX_PATH];
 	WCHAR szDisplayName[MAX_PATH];
-	int ntype;
 } DLITEM, *LPDLITEM;
 
 int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli);

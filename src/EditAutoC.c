@@ -20,6 +20,7 @@
 #define NP2_AUTOC_USE_STRING_ORDER	1
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
 #define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1 - 16)	// SP + '(' + ')' + '\0'
+#define NP2_AUTOC_WORD_BUF_LENGTH	1024
 #define NP2_AUTOC_INIT_BUF_SIZE		(4096)
 #define NP2_AUTOC_MAX_BUF_COUNT		20
 #define NP2_AUTOC_INIT_CACHE_BYTES	(4096)
@@ -36,7 +37,6 @@ x86: sum(i//24 for i in a) => 44739063 nodes
 
 struct WordNode;
 struct WordList {
-	char wordBuf[1024];
 	int (__cdecl *WL_strcmp)(LPCSTR, LPCSTR);
 	int (__cdecl *WL_strncmp)(LPCSTR, LPCSTR, size_t);
 #if NP2_AUTOC_USE_STRING_ORDER
@@ -358,7 +358,8 @@ static inline bool WordList_StartsWith(const struct WordList *pWList, LPCSTR pWo
 void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	//StopWatch watch;
 	//StopWatch_Start(watch);
-	char *word = pWList->wordBuf;
+	char wordBuf[NP2_AUTOC_WORD_BUF_LENGTH];
+	char *word = wordBuf;
 	const int iStartLen = pWList->iStartLen;
 	int len = 0;
 	bool ok = false;
@@ -841,7 +842,8 @@ static void AutoC_AddDocWord(struct WordList *pWList, bool bIgnoreCase, char pre
 			}
 
 			if (wordEnd - iPosFind >= iRootLen) {
-				char *pWord = pWList->wordBuf + NP2DefaultPointerAlignment;
+				char wordBuf[NP2_AUTOC_WORD_BUF_LENGTH];
+				char *pWord = wordBuf + NP2DefaultPointerAlignment;
 				bool bChanged = false;
 				struct Sci_TextRangeFull tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRangeFull(&tr);
@@ -874,8 +876,8 @@ static void AutoC_AddDocWord(struct WordList *pWList, bool bIgnoreCase, char pre
 					pWord[wordLength] = '\0';
 				}
 				if (bChanged) {
-					memcpy(pWList->wordBuf, pWord, wordLength + 1);
-					pWord = pWList->wordBuf;
+					memcpy(wordBuf, pWord, wordLength + 1);
+					pWord = wordBuf;
 				}
 
 				bChanged = wordLength >= iRootLen && WordList_StartsWith(pWList, pWord);
