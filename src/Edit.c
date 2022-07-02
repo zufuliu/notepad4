@@ -4482,9 +4482,6 @@ void EditJumpTo(Sci_Line iNewLine, Sci_Position iNewCol) {
 	// Jumpt to end with line set to -1
 	if (iNewLine < 0 || iNewLine > SciCall_GetLineCount()) {
 		iNewCol = SciCall_GetLength();
-		if (iNewCol != 0) {
-			--iNewCol;
-		}
 	} else {
 		--iNewLine;
 		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iNewLine);
