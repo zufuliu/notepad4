@@ -367,6 +367,7 @@ static bool	flagReuseWindow			= false;
 static bool bSingleFileInstance		= true;
 static bool bReuseWindow			= false;
 static bool bStickyWindowPosition	= false;
+static int flagReadOnlyMode			= 0;
 static int	flagMultiFileArg		= 0;
 static bool	flagSingleFileInstance	= true;
 static bool	flagStartAsTrayIcon		= false;
@@ -1259,10 +1260,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			LPNP2PARAMS params = (LPNP2PARAMS)NP2HeapAlloc(pcds->cbData);
 			memcpy(params, pcds->lpData, pcds->cbData);
 
+			if (params->flagReadOnlyMode) {
+				flagReadOnlyMode |= 1;
+			}
 			if (params->flagLexerSpecified) {
 				flagLexerSpecified = true;
 			}
-
 			if (params->flagQuietCreate) {
 				flagQuietCreate = true;
 			}
@@ -1331,6 +1334,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			flagLexerSpecified = false;
 			flagQuietCreate = false;
+			flagReadOnlyMode &= 2;
 
 			NP2HeapFree(params);
 
@@ -6355,6 +6359,9 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				flagNoReuseWindow = false;
 				flagSingleFileInstance = true;
 				state = 1;
+			} else if (chNext == L'O') {
+				flagReadOnlyMode = 1;
+				state = 1;
 			}
 			break;
 
@@ -6763,7 +6770,9 @@ void LoadFlags(void) {
 		flagNoReuseWindow = !bReuseWindow;
 		flagSingleFileInstance = bSingleFileInstance;
 	}
-
+	if (IniSectionGetBool(pIniSection, L"ReadOnlyMode", false)) {
+		flagReadOnlyMode |= 2;
+	}
 	if (flagMultiFileArg == 0) {
 		if (IniSectionGetBool(pIniSection, L"MultiFileArg", false)) {
 			flagMultiFileArg = 2;
@@ -7381,6 +7390,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			bRestoreView = true;
 			keepTitleExcerpt = true;
 			keepCurrentLexer = true;
+			flagReadOnlyMode |= bReadOnlyMode;
 		}
 		fSuccess = true;
 	}
@@ -7549,9 +7559,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 				FileVars_Apply(&fvCurFile);
 			}
 		}
-		// lock binary file for editing
-		if (binary) {
+		// open file in read only mode
+		if (binary || flagReadOnlyMode || bReadOnlyFile) {
 			bReadOnlyMode = true;
+			flagReadOnlyMode &= 2;
 			SciCall_SetReadOnly(true);
 		} else {
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -8024,8 +8035,10 @@ bool ActivatePrevInst(void) {
 
 				LPNP2PARAMS params = (LPNP2PARAMS)GlobalAlloc(GPTR, cb);
 				params->flagFileSpecified = false;
+				params->flagReadOnlyMode = flagReadOnlyMode & true;
 				params->flagLexerSpecified = flagLexerSpecified;
 				params->flagQuietCreate = false;
+				params->flagTitleExcerpt = false;
 				params->flagJumpTo = flagJumpTo;
 				params->flagChangeNotify = 0;
 				if (flagLexerSpecified && lpSchemeArg) {
@@ -8040,7 +8053,6 @@ bool ActivatePrevInst(void) {
 				params->iSrcEncoding = lpEncodingArg ? Encoding_Match(lpEncodingArg) : CPI_NONE;
 				params->flagSetEncoding = flagSetEncoding;
 				params->flagSetEOLMode = flagSetEOLMode;
-				params->flagTitleExcerpt = 0;
 
 				COPYDATASTRUCT cds;
 				cds.dwData = DATA_NOTEPAD2_PARAMS;
@@ -8110,6 +8122,7 @@ bool ActivatePrevInst(void) {
 				LPNP2PARAMS params = (LPNP2PARAMS)GlobalAlloc(GPTR, cb);
 				lstrcpy(&params->wchData, lpFileArg);
 				params->flagFileSpecified = true;
+				params->flagReadOnlyMode = flagReadOnlyMode & true;
 				params->flagLexerSpecified = flagLexerSpecified;
 				params->flagQuietCreate = flagQuietCreate;
 				params->flagJumpTo = flagJumpTo;
@@ -8129,9 +8142,9 @@ bool ActivatePrevInst(void) {
 
 				if (cchTitleExcerpt) {
 					lstrcpy(StrEnd(&params->wchData) + 1, szTitleExcerpt);
-					params->flagTitleExcerpt = 1;
+					params->flagTitleExcerpt = true;
 				} else {
-					params->flagTitleExcerpt = 0;
+					params->flagTitleExcerpt = false;
 				}
 
 				COPYDATASTRUCT cds;
@@ -8258,6 +8271,11 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 	lstrcat(szParameters, tch);
 
 	if (!emptyWind && StrNotEmpty(lpszFile)) {
+		// read only mode
+		if (bReadOnlyMode) {
+			lstrcat(szParameters, L" -ro");
+		}
+
 		// file encoding
 		switch (iCurrentEncoding) {
 		case CPI_DEFAULT:

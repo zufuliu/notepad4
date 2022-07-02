@@ -27,8 +27,10 @@
 #define DATA_NOTEPAD2_PARAMS 0xFB10
 typedef struct NP2PARAMS {
 	bool	flagFileSpecified;
+	bool	flagReadOnlyMode;
 	bool	flagLexerSpecified;
 	bool	flagQuietCreate;
+	bool	flagTitleExcerpt;
 	bool	flagJumpTo;
 	int		flagChangeNotify;
 	int		iInitialLexer;
@@ -37,7 +39,6 @@ typedef struct NP2PARAMS {
 	int		iSrcEncoding;
 	int		flagSetEncoding;
 	int		flagSetEOLMode;
-	int		flagTitleExcerpt;
 	WCHAR wchData;
 } NP2PARAMS, *LPNP2PARAMS;
 
