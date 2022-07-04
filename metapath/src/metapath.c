@@ -1251,7 +1251,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
-		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
 		}
 
@@ -1278,7 +1278,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
-		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
 		}
 
@@ -1319,7 +1319,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
-		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
 		}
 
@@ -1407,7 +1407,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
-		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
 		}
 
@@ -1427,7 +1427,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		DLITEM dli;
 		dli.mask = DLI_ALL;
-		if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+		if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 			break;
 		}
 
@@ -1502,7 +1502,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		int iItem;
 
 		dli.mask = DLI_ALL;
-		if ((iItem = DirList_GetItem(hwndDirList, -1, &dli)) == -1) {
+		if ((iItem = DirList_GetItem(hwndDirList, -1, &dli)) < 0) {
 			break;
 		}
 
@@ -3336,7 +3336,7 @@ bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 		const int i = ListView_FindItem(hwndDirList, -1, &lvfi);
 
 		// found item that is currently displayed
-		if (i != -1) {
+		if (i >= 0) {
 			ListView_SetItemState(hwndDirList, i, LVIS_SELECTED | LVIS_FOCUSED,
 								  LVIS_SELECTED | LVIS_FOCUSED);
 			ListView_EnsureVisible(hwndDirList, i, FALSE);

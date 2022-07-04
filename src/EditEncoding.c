@@ -908,7 +908,7 @@ void Encoding_AddToListView(HWND hwnd, int idSel, bool bRecodeOnly) {
 
 	NP2HeapFree(pEE);
 
-	if (iSelItem != -1) {
+	if (iSelItem >= 0) {
 		ListView_SetItemState(hwnd, iSelItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 		ListView_EnsureVisible(hwnd, iSelItem, FALSE);
 	} else {
@@ -988,7 +988,7 @@ void Encoding_AddToComboboxEx(HWND hwnd, int idSel, bool bRecodeOnly) {
 
 	NP2HeapFree(pEE);
 
-	if (iSelItem != -1) {
+	if (iSelItem >= 0) {
 		ComboBox_SetCurSel(hwnd, iSelItem);
 	}
 }

@@ -2391,7 +2391,7 @@ bool MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruStore);
 
-	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) != -1) {
+	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) >= 0) {
 		PathAbsoluteFromApp(wchItem, wchItem, true);
 		if (PathEqual(wchItem, pszFile)) {
 			MRU_Delete(pmruStore, i);

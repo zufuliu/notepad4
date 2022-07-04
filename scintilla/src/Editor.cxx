@@ -517,7 +517,7 @@ void Editor::RedrawSelMargin(Sci::Line line, bool allAfter) noexcept {
 		rcMarkers.right = rcMarkers.left + vs.fixedColumnWidth;
 	}
 	const PRectangle rcMarkersFull = rcMarkers;
-	if (line != -1) {
+	if (line >= 0) {
 		PRectangle rcLine = RectangleFromRange(Range(pdoc->LineStart(line)), 0);
 
 		// Inflate line rectangle if there are image markers with height larger than line height
@@ -4206,7 +4206,7 @@ Sci::Position Editor::FindTextFull(
 			ft->lpstrText,
 			static_cast<FindOption>(wParam),
 			&lengthFound);
-		if (pos != -1) {
+		if (pos >= 0) {
 			ft->chrgText.cpMin = pos;
 			ft->chrgText.cpMax = pos + lengthFound;
 		}
@@ -4299,7 +4299,7 @@ Sci::Position Editor::SearchInTarget(const char *text, Sci::Position length) {
 		const Sci::Position pos = pdoc->FindText(targetRange.start.Position(), targetRange.end.Position(), text,
 			searchFlags,
 			&lengthFound);
-		if (pos != -1) {
+		if (pos >= 0) {
 			targetRange.start.SetPosition(pos);
 			targetRange.end.SetPosition(pos + lengthFound);
 		}
@@ -5742,7 +5742,7 @@ Sci::Position Editor::GetTag(char *tagValue, int tagNumber) {
 
 Sci::Position Editor::ReplaceTarget(bool replacePatterns, const char *text, Sci::Position length) {
 	UndoGroup ug(pdoc);
-	if (length == -1)
+	if (length < 0)
 		length = strlen(text);
 	if (replacePatterns) {
 		text = pdoc->SubstituteByPosition(text, &length);
@@ -6353,7 +6353,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 				return 0;
 			TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam));
 			Sci::Position cpMax = tr->chrg.cpMax;
-			if (cpMax == -1)
+			if (cpMax < 0)
 				cpMax = pdoc->LengthNoExcept();
 			PLATFORM_ASSERT(cpMax <= pdoc->LengthNoExcept());
 			Sci::Position len = cpMax - tr->chrg.cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
@@ -6409,7 +6409,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			if (lParam == 0)
 				return 0;
 			Sci::Position insertPos = PositionFromUPtr(wParam);
-			if (insertPos == -1)
+			if (insertPos < 0)
 				insertPos = CurrentPosition();
 			Sci::Position newCurrent = CurrentPosition();
 			const char *sz = ConstCharPtrFromSPtr(lParam);

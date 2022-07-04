@@ -1987,8 +1987,8 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			FINDTEXTEXA *pFT = reinterpret_cast<FINDTEXTEXA *>(lParam);
 			TextToFindFull tt = { { pFT->chrg.cpMin, pFT->chrg.cpMax }, pFT->lpstrText, {} };
 			const Sci::Position pos =ScintillaBase::WndProc(Message::FindTextFull, wParam, reinterpret_cast<sptr_t>(&tt));
-			pFT->chrgText.cpMin = (pos == -1)? -1 : static_cast<LONG>(tt.chrgText.cpMin);
-			pFT->chrgText.cpMax = (pos == -1)? -1 : static_cast<LONG>(tt.chrgText.cpMax);
+			pFT->chrgText.cpMin = (pos < 0)? -1 : static_cast<LONG>(tt.chrgText.cpMin);
+			pFT->chrgText.cpMax = (pos < 0)? -1 : static_cast<LONG>(tt.chrgText.cpMax);
 			return pos;
 		}
 
@@ -2043,10 +2043,10 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 	case EM_SETSEL: {
 		Sci::Position nStart = wParam;
 		Sci::Position nEnd = lParam;
-		if (nStart == 0 && nEnd == -1) {
+		if (nStart == 0 && nEnd < 0) {
 			nEnd = pdoc->LengthNoExcept();
 		}
-		if (nStart == -1) {
+		if (nStart < 0) {
 			nStart = nEnd;	// Remove selection
 		}
 		SetSelection(nEnd, nStart);
@@ -2059,12 +2059,9 @@ sptr_t ScintillaWin::EditMessage(unsigned int iMessage, uptr_t wParam, sptr_t lP
 			return 0;
 		}
 		const CHARRANGE *pCR = reinterpret_cast<const CHARRANGE *>(lParam);
+		const Sci::Position cpMax = (pCR->cpMax < 0) ? pdoc->LengthNoExcept() : pCR->cpMax;
 		sel.selType = Selection::SelTypes::stream;
-		if (pCR->cpMin == 0 && pCR->cpMax == -1) {
-			SetSelection(pCR->cpMin, pdoc->LengthNoExcept());
-		} else {
-			SetSelection(pCR->cpMin, pCR->cpMax);
-		}
+		SetSelection(pCR->cpMin, cpMax);
 		EnsureCaretVisible();
 		return pdoc->SciLineFromPosition(SelectionStart().Position());
 	}

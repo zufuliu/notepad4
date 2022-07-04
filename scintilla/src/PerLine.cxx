@@ -195,7 +195,7 @@ int LineMarkers::AddMark(Sci::Line line, int markerNum, Sci::Line lines) {
 bool LineMarkers::DeleteMark(Sci::Line line, int markerNum, bool all) {
 	bool someChanges = false;
 	if (IsValidIndex(line, markers.Length()) && markers[line]) {
-		if (markerNum == -1) {
+		if (markerNum < 0) {
 			someChanges = true;
 			markers[line].reset();
 		} else {

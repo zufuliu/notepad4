@@ -194,7 +194,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
-		if (DirList_GetItem(hwndDirList, -1, &dli) != -1) {
+		if (DirList_GetItem(hwndDirList, -1, &dli) >= 0) {
 			LPWSTR psz = (LPWSTR)PathFindFileName(dli.szFileName);
 			PathQuoteSpaces(psz);
 			Edit_SetText(hwndCtl, psz);
@@ -1629,7 +1629,7 @@ bool RenameFileDlg(HWND hwnd) {
 	DLITEM dli;
 
 	dli.mask = DLI_FILENAME;
-	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+	if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 		return false;
 	}
 
@@ -1802,7 +1802,7 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	DLITEM dli;
 
 	dli.mask = DLI_FILENAME;
-	if (DirList_GetItem(hwndDirList, -1, &dli) == -1) {
+	if (DirList_GetItem(hwndDirList, -1, &dli) < 0) {
 		return false;
 	}
 

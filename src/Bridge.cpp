@@ -572,7 +572,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 // EditPrintInit() - Setup default page margin if no values from registry
 //
 static void EditPrintInit() noexcept {
-	if (pageSetupMargin.left == -1 || pageSetupMargin.top == -1 || pageSetupMargin.right == -1 || pageSetupMargin.bottom == -1) {
+	if ((pageSetupMargin.left | pageSetupMargin.top | pageSetupMargin.right | pageSetupMargin.bottom) < 0) {
 		const UINT measurement = GetLocaleMeasurement();
 		if (measurement == MeasurementInternational) {
 			pageSetupMargin.left = 2000;

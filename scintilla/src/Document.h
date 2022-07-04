@@ -142,7 +142,7 @@ public:
 	}
 
 	bool IsFoldBlockHighlighted(Sci::Line line) const noexcept {
-		return isEnabled && beginFoldBlock != -1 && beginFoldBlock <= line && line <= endFoldBlock;
+		return isEnabled && InRangeInclusive(beginFoldBlock, line) && line <= endFoldBlock;
 	}
 
 	bool IsHeadOfFoldBlock(Sci::Line line) const noexcept {
@@ -150,11 +150,11 @@ public:
 	}
 
 	bool IsBodyOfFoldBlock(Sci::Line line) const noexcept {
-		return beginFoldBlock != -1 && beginFoldBlock < line && line < endFoldBlock;
+		return IsValidIndex(beginFoldBlock, line) && line < endFoldBlock;
 	}
 
 	bool IsTailOfFoldBlock(Sci::Line line) const noexcept {
-		return beginFoldBlock != -1 && beginFoldBlock < line && line == endFoldBlock;
+		return IsValidIndex(beginFoldBlock, line) && line == endFoldBlock;
 	}
 
 	Sci::Line beginFoldBlock;	// Begin of current fold block

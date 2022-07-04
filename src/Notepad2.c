@@ -6715,7 +6715,7 @@ void ParseCommandLine(void) {
 			PathFixBackslashes(lpFileArg);
 			StrTrim(lpFileArg, L" \"");
 
-			if (!PathIsRelative(lpFileArg) && !PathIsUNC(lpFileArg) && PathGetDriveNumber(lpFileArg) == -1) {
+			if (!PathIsRelative(lpFileArg) && !PathIsUNC(lpFileArg) && PathGetDriveNumber(lpFileArg) < 0) {
 				WCHAR wchPath[MAX_PATH];
 				lstrcpy(wchPath, g_wchWorkingDirectory);
 				PathStripToRoot(wchPath);

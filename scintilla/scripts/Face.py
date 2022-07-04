@@ -5,8 +5,9 @@
 def sanitiseLine(line):
 	if line[-1:] == '\n':
 		line = line[:-1]
-	if line.find("##") != -1:
-		line = line[:line.find("##")]
+	index = line.find("##")
+	if index >= 0:
+		line = line[:index]
 	line = line.strip()
 	return line
 

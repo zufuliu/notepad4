@@ -538,7 +538,7 @@ BOOL DirList_Sort(HWND hwnd, int lFlags, bool fRev) {
 //  Copies the data of the specified item in the listview control to a buffer
 //
 int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli) {
-	if (iItem == -1) {
+	if (iItem < 0) {
 		if (ListView_GetSelectedCount(hwnd)) {
 			iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
 		} else {
@@ -592,7 +592,7 @@ int DirList_GetItem(HWND hwnd, int iItem, LPDLITEM lpdli) {
 //  Retrieves extended infomration on a dirlist item
 //
 int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
-	if (iItem == -1) {
+	if (iItem < 0) {
 		if (ListView_GetSelectedCount(hwnd)) {
 			iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
 		} else {
@@ -625,7 +625,7 @@ int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
 bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 	static const char *lpVerb = "properties";
 
-	if (iItem == -1) {
+	if (iItem < 0) {
 		if (ListView_GetSelectedCount(hwnd)) {
 			iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
 		} else {
@@ -787,7 +787,7 @@ bool DirList_SelectItem(HWND hwnd, LPCWSTR lpszDisplayName, LPCWSTR lpszFullPath
 	dli.mask = DLI_ALL;
 
 	int i = -1;
-	while ((i = ListView_FindItem(hwnd, i, &lvfi)) != -1) {
+	while ((i = ListView_FindItem(hwnd, i, &lvfi)) >= 0) {
 		DirList_GetItem(hwnd, i, &dli);
 		GetShortPathName(dli.szFileName, dli.szFileName, MAX_PATH);
 

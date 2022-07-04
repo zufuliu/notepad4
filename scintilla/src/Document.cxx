@@ -69,18 +69,19 @@ void LexInterface::Colourise(Sci::Position start, Sci::Position end) {
 		performingStyle = true;
 
 		const Sci::Position lengthDoc = pdoc->LengthNoExcept();
-		if (end == -1)
+		if (end < 0) {
 			end = lengthDoc;
+		}
 		const Sci::Position len = end - start;
 
 		PLATFORM_ASSERT(len >= 0);
 		PLATFORM_ASSERT(start + len <= lengthDoc);
 
-		int styleStart = 0;
-		if (start > 0)
-			styleStart = pdoc->StyleIndexAt(start - 1);
-
 		if (len > 0) {
+			int styleStart = 0;
+			if (start > 0) {
+				styleStart = pdoc->StyleIndexAt(start - 1);
+			}
 			instance->Lex(start, len, styleStart, pdoc);
 			instance->Fold(start, len, styleStart, pdoc);
 		}
@@ -607,7 +608,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 	}
 
 	Sci::Line beginFoldBlock = LevelIsHeader(lookLineLevel) ? lookLine : GetFoldParent(lookLine);
-	if (beginFoldBlock == -1) {
+	if (beginFoldBlock < 0) {
 		highlightDelimiter.Clear();
 		return;
 	}
@@ -632,7 +633,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 			lookLineLevelNum = LevelNumberPart(lookLineLevel);
 		}
 	}
-	if (firstChangeableLineBefore == -1) {
+	if (firstChangeableLineBefore < 0) {
 		for (lookLine = line - 1, lookLineLevel = GetFoldLevel(lookLine), lookLineLevelNum = LevelNumberPart(lookLineLevel);
 			lookLine >= beginFoldBlock;
 			lookLineLevel = GetFoldLevel(--lookLine), lookLineLevelNum = LevelNumberPart(lookLineLevel)) {
@@ -642,7 +643,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 			}
 		}
 	}
-	if (firstChangeableLineBefore == -1)
+	if (firstChangeableLineBefore < 0)
 		firstChangeableLineBefore = beginFoldBlock - 1;
 
 	Sci::Line firstChangeableLineAfter = -1;
@@ -654,7 +655,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 			break;
 		}
 	}
-	if (firstChangeableLineAfter == -1)
+	if (firstChangeableLineAfter < 0)
 		firstChangeableLineAfter = endFoldBlock + 1;
 
 	highlightDelimiter.beginFoldBlock = beginFoldBlock;
@@ -829,7 +830,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 
 	if (dbcsCodePage) {
 		if (CpUtf8 == dbcsCodePage) {
-			if (increment == 1) {
+			if (moveDir > 0) {
 				// Simple forward movement case so can avoid some checks
 				const unsigned char leadByte = cb.UCharAt(pos);
 				if (UTF8IsAscii(leadByte)) {
@@ -2898,7 +2899,7 @@ public:
 	}
 	Range LineRange(Sci::Line line) const noexcept {
 		Range range(doc->LineStart(line), doc->LineEnd(line));
-		if (increment == 1) {
+		if (increment > 0) {
 			if (line == lineRangeStart)
 				range.start = startPos;
 			if (line == lineRangeEnd)
@@ -3192,7 +3193,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 		matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 		// Check for the last match on this line.
 		if (matched) {
-			if (resr.increment == -1) {
+			if (resr.increment < 0) {
 				while (matched) {
 					Iterator itNext(doc, match[0].second.PosRoundUp());
 					flagsMatch = MatchFlags(doc, itNext.Pos(), lineRange.end);
@@ -3305,7 +3306,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 	for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
 		Sci::Position startOfLine = doc->LineStart(line);
 		Sci::Position endOfLine = doc->LineEnd(line);
-		if (resr.increment == 1) {
+		if (resr.increment > 0) {
 			if (line == resr.lineRangeStart) {
 				if ((resr.startPos != startOfLine) && searchforLineStart)
 					continue;	// Can't match start of line if start position after start of line
@@ -3337,7 +3338,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 			search.eopat[0] = doc->MovePositionOutsideChar(search.eopat[0], 1, false);
 			lenRet = search.eopat[0] - search.bopat[0];
 			// There can be only one start of a line, so no need to look for last match in line
-			if ((resr.increment == -1) && !searchforLineStart) {
+			if ((resr.increment < 0) && !searchforLineStart) {
 				// Check for the last match on this line.
 				int repetitions = 1000;	// Break out of infinite loop
 				while (success && (search.eopat[0] <= endOfLine) && (repetitions--)) {

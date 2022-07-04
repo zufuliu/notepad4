@@ -2219,7 +2219,7 @@ void InitZoomLevelComboBox(HWND hwnd, int nCtlId, int zoomLevel) {
 
 	ComboBox_SetExtendedUI(hwndCtl, TRUE);
 	ComboBox_SetCurSel(hwndCtl, selIndex);
-	if (selIndex == -1) {
+	if (selIndex < 0) {
 		wsprintf(tch, L"%d%%", zoomLevel);
 		SetWindowText(hwndCtl, tch);
 	}

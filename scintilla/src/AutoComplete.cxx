@@ -243,7 +243,7 @@ void AutoComplete::Select(const char *word) {
 	int location = -1;
 	int start = 0; // lower bound of the api array block to search
 	int end = lb->Length() - 1; // upper bound of the api array block to search
-	while ((start <= end) && (location == -1)) { // Binary searching loop
+	while ((start <= end) && (location < 0)) { // Binary searching loop
 		int pivot = (start + end) / 2;
 		std::string item = lb->GetValue(sortMatrix[pivot]);
 		int cond;
@@ -283,7 +283,7 @@ void AutoComplete::Select(const char *word) {
 			start = pivot + 1;
 		}
 	}
-	if (location == -1) {
+	if (location < 0) {
 		if (autoHide)
 			Cancel();
 		else
