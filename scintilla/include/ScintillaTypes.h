@@ -722,11 +722,11 @@ constexpr int LevelNumber(FoldLevel level) noexcept {
 }
 
 constexpr bool LevelIsHeader(FoldLevel level) noexcept {
-	return (level & FoldLevel::HeaderFlag) == FoldLevel::HeaderFlag;
+	return (level & FoldLevel::HeaderFlag) != FoldLevel::None;
 }
 
 constexpr bool LevelIsWhitespace(FoldLevel level) noexcept {
-	return (level & FoldLevel::WhiteFlag) == FoldLevel::WhiteFlag;
+	return (level & FoldLevel::WhiteFlag) != FoldLevel::None;
 }
 
 // Functions to manipulate fields from a FoldFlag

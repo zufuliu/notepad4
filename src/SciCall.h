@@ -1282,8 +1282,12 @@ NP2_inline BOOL SciCall_GetFoldExpanded(Sci_Line line) {
 	return (BOOL)SciCall(SCI_GETFOLDEXPANDED, line, 0);
 }
 
-NP2_inline void SciCall_ToggleFold(Sci_Line line) {
-	SciCall(SCI_TOGGLEFOLD, line, 0);
+NP2_inline void SciCall_FoldLine(Sci_Line line, int action) {
+	SciCall(SCI_FOLDLINE, line, action);
+}
+
+NP2_inline void SciCall_FoldAll(int action) {
+	SciCall(SCI_FOLDALL, action, 0);
 }
 
 NP2_inline void SciCall_ToggleFoldShowText(Sci_Line line, const char *text) {

@@ -16,6 +16,7 @@ Checks: >
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-narrowing-conversions,
+    -bugprone-unchecked-optional-access,
     -modernize-avoid-c-arrays,
     -modernize-macro-to-enum,
     -modernize-redundant-void-arg,

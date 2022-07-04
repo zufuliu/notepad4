@@ -7832,26 +7832,34 @@ static void FoldLevelStack_Push(struct FoldLevelStack *levelStack, int level) {
 	++levelStack->levelCount;
 }
 
-static void FoldToggleNode(Sci_Line line, FOLD_ACTION *pAction, BOOL *fToggled) {
+static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) {
 	const BOOL fExpanded = SciCall_GetFoldExpanded(line);
-	FOLD_ACTION action = *pAction;
+	FOLD_ACTION action = expanding;
 	if (action == FOLD_ACTION_SNIFF) {
 		action = fExpanded ? FOLD_ACTION_FOLD : FOLD_ACTION_EXPAND;
 	}
 
-	if ((BOOL)action != fExpanded) {
-		SciCall_ToggleFold(line);
-		if (*fToggled == FALSE || *pAction == FOLD_ACTION_SNIFF) {
+	if ((int)action != fExpanded) {
+		SciCall_FoldLine(line, (int)action);
+		if (expanding == FOLD_ACTION_SNIFF) {
 			// empty INI section not changed after toggle (issue #48).
 			const BOOL after = SciCall_GetFoldExpanded(line);
 			if (fExpanded != after) {
-				*fToggled = TRUE;
-				if (*pAction == FOLD_ACTION_SNIFF) {
-					*pAction = action;
-				}
+				expanding = action;
 			}
 		}
 	}
+	return expanding;
+}
+
+static void FinishBatchFold(void) {
+	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
+	SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
+	SciCall_ScrollCaret();
+	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
+	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
+	RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
 
 bool EditIsLineContainsStyle(Sci_Line line, int style) {
@@ -7878,34 +7886,24 @@ void FoldExpandRange(Sci_Line lineStart, Sci_Line lineEnd) {
 }
 
 void FoldToggleAll(FOLD_ACTION action) {
-	SciCall_ColouriseAll();
-	const Sci_Line lineCount = SciCall_GetLineCount();
-	BOOL fToggled = FALSE;
-
+	//SciCall_ColouriseAll();
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
-	for (Sci_Line line = 0; line < lineCount; ++line) {
-		const int level = SciCall_GetFoldLevel(line);
-		if (level & SC_FOLDLEVELHEADERFLAG) {
-			FoldToggleNode(line, &action, &fToggled);
-		}
-	}
-
-	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-	if (fToggled) {
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-		SciCall_ScrollCaret();
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-	}
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
+	SciCall_FoldAll((int)action);
+#if 0
+	StopWatch_Stop(watch);
+	StopWatch_ShowLog(&watch, __func__);
+#endif
+	FinishBatchFold();
 }
 
 void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	SciCall_ColouriseAll();
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
-	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
@@ -7917,7 +7915,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				FoldLevelStack_Push(&levelStack, level);
 				if (lev == levelStack.levelCount) {
-					FoldToggleNode(line, &action, &fToggled);
+					action = FoldToggleNode(line, action);
 					line = SciCall_GetLastChildEx(line, level);
 				}
 			}
@@ -7930,7 +7928,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 			if (level & SC_FOLDLEVELHEADERFLAG) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				if (lev == level) {
-					FoldToggleNode(line, &action, &fToggled);
+					action = FoldToggleNode(line, action);
 					line = SciCall_GetLastChildEx(line, level);
 				}
 			}
@@ -7938,15 +7936,7 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		}
 	}
 
-	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-	if (fToggled) {
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-		SciCall_ScrollCaret();
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-	}
+	FinishBatchFold();
 }
 
 void FoldToggleCurrentBlock(FOLD_ACTION action) {
@@ -7960,15 +7950,7 @@ void FoldToggleCurrentBlock(FOLD_ACTION action) {
 		}
 	}
 
-	BOOL fToggled = FALSE;
-	FoldToggleNode(line, &action, &fToggled);
-	if (fToggled) {
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-		SciCall_ScrollCaret();
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-	}
+	FoldToggleNode(line, action);
 }
 
 void FoldToggleCurrentLevel(FOLD_ACTION action) {
@@ -8007,7 +7989,6 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	const int maxLevel = np2_bsr(levelMask);
 	const Sci_Line lineCount = SciCall_GetLineCount();
 	Sci_Line line = 0;
-	BOOL fToggled = FALSE;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
@@ -8019,7 +8000,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 				FoldLevelStack_Push(&levelStack, level);
 				const int lev = levelStack.levelCount;
 				if ((levelMask >> lev) & 1) {
-					FoldToggleNode(line, &action, &fToggled);
+					action = FoldToggleNode(line, action);
 					if (lev == maxLevel || (ignoreInner && EditIsLineContainsStyle(line, ignoreInner))) {
 						line = SciCall_GetLastChildEx(line, level);
 					}
@@ -8034,7 +8015,7 @@ void FoldToggleDefault(FOLD_ACTION action) {
 				level &= SC_FOLDLEVELNUMBERMASK;
 				const int lev = level - SC_FOLDLEVELBASE;
 				if ((levelMask >> lev) & 1) {
-					FoldToggleNode(line, &action, &fToggled);
+					action = FoldToggleNode(line, action);
 					if (lev == maxLevel || (ignoreInner && EditIsLineContainsStyle(line, ignoreInner))) {
 						line = SciCall_GetLastChildEx(line, level);
 					}
@@ -8044,19 +8025,10 @@ void FoldToggleDefault(FOLD_ACTION action) {
 		}
 	}
 
-	SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-	if (fToggled) {
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_SLOP | CARET_STRICT | CARET_EVEN, 5);
-		SciCall_ScrollCaret();
-		SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
-		SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
-	}
+	FinishBatchFold();
 }
 
 static void FoldPerformAction(Sci_Line ln, int mode, FOLD_ACTION action) {
-	BOOL fToggled = FALSE;
 	if (mode & (FOLD_CHILDREN | FOLD_SIBLINGS)) {
 		// ln/lvNode: line and level of the source of this fold action
 		const Sci_Line lnNode = ln;
@@ -8080,11 +8052,11 @@ static void FoldPerformAction(Sci_Line ln, int mode, FOLD_ACTION action) {
 				return;
 			}
 			if (fHeader && (lv == lvNode || (lv > lvNode && (mode & FOLD_CHILDREN)))) {
-				FoldToggleNode(ln, &action, &fToggled);
+				action = FoldToggleNode(ln, action);
 			}
 		}
 	} else {
-		FoldToggleNode(ln, &action, &fToggled);
+		FoldToggleNode(ln, action);
 	}
 }
 

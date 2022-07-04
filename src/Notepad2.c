@@ -1632,10 +1632,10 @@ void UpdateWindowTitle(void) {
 		lstrcat(szTitle, szReadOnly);
 	}
 	if (bReadOnlyMode) {
-		WCHAR szLocked[32];
-		GetString(IDS_READONLY_MODE, szLocked, COUNTOF(szLocked));
+		WCHAR szReadOnly[32];
+		GetString(IDS_READONLY_MODE, szReadOnly, COUNTOF(szReadOnly));
 		lstrcat(szTitle, L" ");
-		lstrcat(szTitle, szLocked);
+		lstrcat(szTitle, szReadOnly);
 	}
 
 	lstrcat(szTitle, L" - ");

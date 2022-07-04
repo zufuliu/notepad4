@@ -2780,7 +2780,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 				endNeedShown = mh.position + mh.length;
 				Sci::Line lineLast = pdoc->SciLineFromPosition(mh.position + mh.length);
 				for (Sci::Line line = lineOfPos + 1; line <= lineLast; line++) {
-					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, {}, -1);
+					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
 					if (lineLast < lineMaxSubord) {
 						lineLast = lineMaxSubord;
 						endNeedShown = pdoc->LineEnd(lineLast);
@@ -5450,17 +5450,17 @@ void Editor::SetEOLAnnotationVisible(EOLAnnotationVisible visible) noexcept {
 /**
  * Recursively expand a fold, making lines visible except where they have an unexpanded parent.
  */
-Sci::Line Editor::ExpandLine(Sci::Line line) {
-	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
+Sci::Line Editor::ExpandLine(Sci::Line line, FoldLevel level) {
+	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
 	line++;
 	while (line <= lineMaxSubord) {
 		pcs->SetVisible(line, line, true);
-		const FoldLevel level = pdoc->GetFoldLevel(line);
+		level = pdoc->GetFoldLevel(line);
 		if (LevelIsHeader(level)) {
 			if (pcs->GetExpanded(line)) {
-				line = ExpandLine(line);
+				line = ExpandLine(line, level);
 			} else {
-				line = pdoc->GetLastChild(line);
+				line = pdoc->GetLastChild(line, level);
 			}
 		}
 		line++;
@@ -5476,39 +5476,44 @@ void Editor::SetFoldExpanded(Sci::Line lineDoc, bool expanded) {
 
 void Editor::FoldLine(Sci::Line line, FoldAction action) {
 	if (line >= 0) {
+		FoldLevel level = pdoc->GetFoldLevel(line);
 		if (action == FoldAction::Toggle) {
-			if (!LevelIsHeader(pdoc->GetFoldLevel(line))) {
+			if (!LevelIsHeader(level)) {
 				line = pdoc->GetFoldParent(line);
-				if (line < 0)
+				if (line < 0) {
 					return;
+				}
+				level = pdoc->GetFoldLevel(line);
 			}
-			action = (pcs->GetExpanded(line)) ? FoldAction::Contract : FoldAction::Expand;
+			action = pcs->GetExpanded(line) ? FoldAction::Contract : FoldAction::Expand;
 		}
 
+		const bool visible = pcs->GetVisible(line);
 		if (action == FoldAction::Contract) {
-			const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
+			const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
 			if (lineMaxSubord > line) {
 				pcs->SetExpanded(line, false);
-				pcs->SetVisible(line + 1, lineMaxSubord, false);
+				if (visible) {
+					pcs->SetVisible(line + 1, lineMaxSubord, false);
+				}
 
-				const Sci::Line lineCurrent =
-					pdoc->SciLineFromPosition(sel.MainCaret());
+				const Sci::Line lineCurrent = pdoc->SciLineFromPosition(sel.MainCaret());
 				if (lineCurrent > line && lineCurrent <= lineMaxSubord) {
 					// This does not re-expand the fold
 					EnsureCaretVisible();
 				}
 			}
-
 		} else {
-			if (!(pcs->GetVisible(line))) {
+			if (!visible) {
 				EnsureLineVisible(line, false);
 				GoToLine(line);
 			}
 			pcs->SetExpanded(line, true);
-			ExpandLine(line);
+			ExpandLine(line, level);
 		}
 
 		SetScrollBars();
+		RedrawSelMargin();
 		Redraw();
 	}
 }
@@ -5520,12 +5525,13 @@ void Editor::FoldExpand(Sci::Line line, FoldAction action, FoldLevel level) {
 	}
 	// Ensure child lines lexed and fold information extracted before
 	// flipping the state.
-	pdoc->GetLastChild(line, LevelNumberPart(level));
+	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
 	SetFoldExpanded(line, expanding);
-	if (expanding && (pcs->HiddenLines() == 0))
+	if (expanding && (pcs->HiddenLines() == 0)) {
 		// Nothing to do
 		return;
-	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, LevelNumberPart(level));
+	}
+
 	line++;
 	pcs->SetVisible(line, lineMaxSubord, expanding);
 	while (line <= lineMaxSubord) {
@@ -5579,8 +5585,7 @@ void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 		if (lineParent >= 0) {
 			if (lineDoc != lineParent)
 				EnsureLineVisible(lineParent, enforcePolicy);
-			if (!pcs->GetExpanded(lineParent)) {
-				pcs->SetExpanded(lineParent, true);
+			if (pcs->SetExpanded(lineParent, true)) {
 				ExpandLine(lineParent);
 			}
 		}
@@ -5616,36 +5621,51 @@ void Editor::FoldAll(FoldAction action) {
 	if (!expanding) {
 		pdoc->EnsureStyledTo(pdoc->LengthNoExcept());
 	}
+
+	Sci::Line line = 0;
 	if (action == FoldAction::Toggle) {
 		// Discover current state
-		for (Sci::Line lineSeek = 0; lineSeek < maxLine; lineSeek++) {
-			if (LevelIsHeader(pdoc->GetFoldLevel(lineSeek))) {
-				expanding = !pcs->GetExpanded(lineSeek);
-				break;
+		for (; line < maxLine; line++) {
+			const FoldLevel level = pdoc->GetFoldLevel(line);
+			if (LevelIsHeader(level)) {
+				const FoldLevel levelNext = pdoc->GetFoldLevel(line + 1);
+				if (LevelNumber(level) < LevelNumber(levelNext)) {
+					expanding = !pcs->GetExpanded(line);
+					break;
+				}
 			}
 		}
 	}
 	if (expanding) {
 		pcs->SetVisible(0, maxLine - 1, true);
-		for (Sci::Line line = 0; line < maxLine; line++) {
-			if (!pcs->GetExpanded(line)) {
-				SetFoldExpanded(line, true);
+		for (; line < maxLine; line++) {
+			const FoldLevel level = pdoc->GetFoldLevel(line);
+			if (LevelIsHeader(level)) {
+				pcs->SetExpanded(line, true);
 			}
 		}
 	} else {
-		for (Sci::Line line = 0; line < maxLine; line++) {
+		for (; line < maxLine; line++) {
 			const FoldLevel level = pdoc->GetFoldLevel(line);
-			if (LevelIsHeader(level) &&
-				(FoldLevel::Base == LevelNumberPart(level))) {
-				SetFoldExpanded(line, false);
-				const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
-				if (lineMaxSubord > line) {
-					pcs->SetVisible(line + 1, lineMaxSubord, false);
+			if (LevelIsHeader(level)) {
+				if (FoldLevel::Base == LevelNumberPart(level)) {
+					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
+					if (lineMaxSubord > line) {
+						pcs->SetExpanded(line, false);
+						pcs->SetVisible(line + 1, lineMaxSubord, false);
+					}
+				} else {
+					const FoldLevel levelNext = pdoc->GetFoldLevel(line + 1);
+					if (LevelNumber(level) < LevelNumber(levelNext)) {
+						pcs->SetExpanded(line, false);
+					}
 				}
 			}
 		}
 	}
+
 	SetScrollBars();
+	RedrawSelMargin();
 	Redraw();
 }
 
@@ -5653,9 +5673,7 @@ void Editor::FoldChanged(Sci::Line line, FoldLevel levelNow, FoldLevel levelPrev
 	if (LevelIsHeader(levelNow)) {
 		if (!LevelIsHeader(levelPrev)) {
 			// Adding a fold point.
-			if (pcs->SetExpanded(line, true)) {
-				RedrawSelMargin();
-			}
+			SetFoldExpanded(line, true);
 			FoldExpand(line, FoldAction::Expand, levelPrev);
 		}
 	} else if (LevelIsHeader(levelPrev)) {
@@ -5669,9 +5687,7 @@ void Editor::FoldChanged(Sci::Line line, FoldLevel levelNow, FoldLevel levelPrev
 		if (!pcs->GetExpanded(line)) {
 			// Removing the fold from one that has been contracted so should expand
 			// otherwise lines are left invisible with no way to make them visible
-			if (pcs->SetExpanded(line, true)) {
-				RedrawSelMargin();
-			}
+			SetFoldExpanded(line, true);
 			// Combining two blocks where the second one is collapsed (e.g. by adding characters in the line which separates the two blocks)
 			FoldExpand(line, FoldAction::Expand, levelPrev);
 		}
@@ -7439,7 +7455,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->GetLevel(LineFromUPtr(wParam));
 
 	case Message::GetLastChild:
-		return pdoc->GetLastChild(LineFromUPtr(wParam), OptionalFoldLevel(lParam));
+		return pdoc->GetLastChild(LineFromUPtr(wParam), static_cast<FoldLevel>(lParam));
 
 	case Message::GetFoldParent:
 		return pdoc->GetFoldParent(LineFromUPtr(wParam));

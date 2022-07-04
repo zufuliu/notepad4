@@ -536,23 +536,32 @@ void Document::ClearLevels() {
 	Levels()->ClearLevels();
 }
 
-static bool IsSubordinate(FoldLevel levelStart, FoldLevel levelTry) noexcept {
+static constexpr bool IsSubordinate(FoldLevel levelStart, FoldLevel levelTry) noexcept {
 	if (LevelIsWhitespace(levelTry))
 		return true;
 	else
 		return LevelNumber(levelStart) < LevelNumber(levelTry);
 }
 
-Sci::Line Document::GetLastChild(Sci::Line lineParent, std::optional<FoldLevel> level, Sci::Line lastLine) {
-	const FoldLevel levelStart = LevelNumberPart(level ? *level : GetFoldLevel(lineParent));
-	const Sci::Line maxLine = LinesTotal();
-	const Sci::Line lookLastLine = (lastLine != -1) ? std::min(maxLine - 1, lastLine) : -1;
+Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Line lastLine) {
+	if (level <= FoldLevel::None) {
+		level = GetFoldLevel(lineParent);
+	}
+	const FoldLevel levelStart = LevelNumberPart(level);
+	const Sci::Line maxLine = LinesTotal() - 1;
+	if (lastLine < 0 || lastLine > maxLine) {
+		lastLine = maxLine;
+	}
+	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled());
 	Sci::Line lineMaxSubord = lineParent;
-	while (lineMaxSubord < maxLine - 1) {
-		EnsureStyledTo(LineStart(lineMaxSubord + 2));
+	while (lineMaxSubord < maxLine) {
+		if (lineMaxSubord >= lineEndStyled) {
+			EnsureStyledTo(LineStart(lineMaxSubord + 2));
+			lineEndStyled = SciLineFromPosition(GetEndStyled());
+		}
 		if (!IsSubordinate(levelStart, GetFoldLevel(lineMaxSubord + 1)))
 			break;
-		if ((lookLastLine != -1) && (lineMaxSubord >= lookLastLine) && !LevelIsWhitespace(GetFoldLevel(lineMaxSubord)))
+		if ((lineMaxSubord >= lastLine) && !LevelIsWhitespace(GetFoldLevel(lineMaxSubord)))
 			break;
 		lineMaxSubord++;
 	}
@@ -611,7 +620,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 		lookLineLevelNum = LevelNumberPart(lookLineLevel);
 		while ((lookLine >= 0) && (lookLineLevelNum >= FoldLevel::Base)) {
 			if (LevelIsHeader(lookLineLevel)) {
-				if (GetLastChild(lookLine, {}, lookLastLine) == line) {
+				if (GetLastChild(lookLine, lookLineLevel, lookLastLine) == line) {
 					beginFoldBlock = lookLine;
 					endFoldBlock = line;
 					firstChangeableLineBefore = line - 1;

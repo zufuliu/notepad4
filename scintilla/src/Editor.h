@@ -599,7 +599,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetAnnotationVisible(Scintilla::AnnotationVisible visible);
 	void SetEOLAnnotationVisible(Scintilla::EOLAnnotationVisible visible) noexcept;
 
-	Sci::Line ExpandLine(Sci::Line line);
+	Sci::Line ExpandLine(Sci::Line line, Scintilla::FoldLevel level = Scintilla::FoldLevel::None);
 	void SetFoldExpanded(Sci::Line lineDoc, bool expanded);
 	void FoldLine(Sci::Line line, Scintilla::FoldAction action);
 	void FoldExpand(Sci::Line line, Scintilla::FoldAction action, Scintilla::FoldLevel level);
@@ -672,13 +672,6 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 	Point PointFromParameters(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) const noexcept {
 		return Point(static_cast<XYPOSITION>(wParam) - vs.ExternalMarginWidth(), static_cast<XYPOSITION>(lParam));
-	}
-
-	static constexpr std::optional<FoldLevel> OptionalFoldLevel(Scintilla::sptr_t lParam) {
-		if (lParam >= 0) {
-			return static_cast<FoldLevel>(lParam);
-		}
-		return std::nullopt;
 	}
 
 	static Scintilla::sptr_t StringResult(Scintilla::sptr_t lParam, const char *val) noexcept;
