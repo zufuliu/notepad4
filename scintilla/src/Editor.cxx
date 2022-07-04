@@ -5638,27 +5638,22 @@ void Editor::FoldAll(FoldAction action) {
 	}
 	if (expanding) {
 		pcs->SetVisible(0, maxLine - 1, true);
-		for (; line < maxLine; line++) {
-			const FoldLevel level = pdoc->GetFoldLevel(line);
-			if (LevelIsHeader(level)) {
+	}
+	for (; line < maxLine; line++) {
+		const FoldLevel level = pdoc->GetFoldLevel(line);
+		if (LevelIsHeader(level)) {
+			if (expanding) {
 				pcs->SetExpanded(line, true);
-			}
-		}
-	} else {
-		for (; line < maxLine; line++) {
-			const FoldLevel level = pdoc->GetFoldLevel(line);
-			if (LevelIsHeader(level)) {
-				if (FoldLevel::Base == LevelNumberPart(level)) {
-					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
-					if (lineMaxSubord > line) {
-						pcs->SetExpanded(line, false);
-						pcs->SetVisible(line + 1, lineMaxSubord, false);
-					}
-				} else {
-					const FoldLevel levelNext = pdoc->GetFoldLevel(line + 1);
-					if (LevelNumber(level) < LevelNumber(levelNext)) {
-						pcs->SetExpanded(line, false);
-					}
+			} else if (FoldLevel::Base == LevelNumberPart(level)) {
+				const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
+				if (lineMaxSubord > line) {
+					pcs->SetExpanded(line, false);
+					pcs->SetVisible(line + 1, lineMaxSubord, false);
+				}
+			} else {
+				const FoldLevel levelNext = pdoc->GetFoldLevel(line + 1);
+				if (LevelNumber(level) < LevelNumber(levelNext)) {
+					pcs->SetExpanded(line, false);
 				}
 			}
 		}
