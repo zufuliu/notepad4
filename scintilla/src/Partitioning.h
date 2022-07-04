@@ -65,7 +65,7 @@ private:
 			body->RangeAddDelta(stepPartition + 1, partitionUpTo + 1, stepLength);
 		}
 		stepPartition = partitionUpTo;
-		if (stepPartition >= body->Length() - 1) {
+		if (stepPartition >= Partitions()) {
 			stepPartition = Partitions();
 			stepLength = 0;
 		}
@@ -111,7 +111,16 @@ public:
 	}
 
 	T Length() const noexcept {
-		return PositionFromPartition(Partitions());
+		//return PositionFromPartition(Partitions());
+		if (body->Length()) {
+			const ptrdiff_t partition = body->Length() - 1;
+			T pos = (*body)[partition];
+			if (partition > stepPartition) {
+				pos += stepLength;
+			}
+			return pos;
+		}
+		return 0;
 	}
 
 	void InsertPartition(T partition, T pos) {
@@ -144,7 +153,7 @@ public:
 
 	void SetPartitionStartPosition(T partition, T pos) noexcept {
 		ApplyStep(partition + 1);
-		if ((partition < 0) || (partition > body->Length())) {
+		if (!IsValidIndex(partition, body->Length())) {
 			return;
 		}
 		body->SetValueAt(partition, pos);
@@ -186,7 +195,7 @@ public:
 		PLATFORM_ASSERT(partition >= 0);
 		PLATFORM_ASSERT(partition < body->Length());
 		const ptrdiff_t lengthBody = body->Length();
-		if ((partition < 0) || (partition >= lengthBody)) {
+		if (!IsValidIndex(partition, lengthBody)) {
 			return 0;
 		}
 		T pos = body->ValueAt(partition);
@@ -199,10 +208,22 @@ public:
 	T PartitionFromPosition(T pos) const noexcept {
 		if (body->Length() <= 1)
 			return 0;
-		if (pos >= Length())
-			return Partitions() - 1;
+		//if (pos >= Length())
+		//	return Partitions() - 1;
+		const T partition = Partitions();
+		{
+			T posMax = (*body)[partition];
+			if (partition > stepPartition) {
+				posMax += stepLength;
+			}
+			if (pos >= posMax) {
+				return partition - 1;
+			}
+		}
+
 		T lower = 0;
-		T upper = Partitions();
+		//T upper = Partitions();
+		T upper = partition;
 		do {
 			const T middle = (upper + lower + 1) / 2; 	// Round high
 			T posMiddle = body->ValueAt(middle);

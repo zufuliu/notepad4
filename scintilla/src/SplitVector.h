@@ -18,15 +18,22 @@
 
 namespace Scintilla::Internal {
 
+constexpr bool InRangeInclusive(size_t index, size_t length) noexcept {
+	return index <= length;
+}
+
+constexpr bool IsValidIndex(size_t index, size_t length) noexcept {
+	return index < length;
+}
+
 template <typename T>
 class SplitVector {
 protected:
 	std::vector<T> body;
-	T empty;	/// Returned as the result of out-of-bounds access.
-	ptrdiff_t lengthBody;
-	ptrdiff_t part1Length;
-	ptrdiff_t gapLength;	/// invariant: gapLength == body.size() - lengthBody
-	ptrdiff_t growSize;
+	ptrdiff_t lengthBody = 0;
+	ptrdiff_t part1Length = 0;
+	ptrdiff_t gapLength = 0;	/// invariant: gapLength == body.size() - lengthBody
+	ptrdiff_t growSize = 8;
 
 	/// Move the gap to a particular position so that insertion and
 	/// deletion at that point will not require much copying and
@@ -81,8 +88,7 @@ protected:
 
 public:
 	/// Construct a split buffer.
-	SplitVector() noexcept : empty(), lengthBody(0), part1Length(0), gapLength(0), growSize(8) {
-	}
+	SplitVector() noexcept = default;
 
 	// Deleted so SplitVector objects can not be copied.
 	SplitVector(const SplitVector &) = delete;
@@ -134,20 +140,24 @@ public:
 
 	/// Retrieve the element at a particular position.
 	/// Retrieving positions outside the range of the buffer returns empty or 0.
-	const T& ValueAt(ptrdiff_t position) const noexcept {
-		if (position < part1Length) {
-			if (position < 0) {
-				return empty;
-			} else {
-				return body[position];
-			}
-		} else {
-			if (position >= lengthBody) {
-				return empty;
-			} else {
-				return body[gapLength + position];
-			}
+	T ValueAt(ptrdiff_t position) const noexcept {
+		if (IsValidIndex(position, part1Length)) {
+			return body[position];
 		}
+		if (IsValidIndex(position, lengthBody)) {
+			return body[gapLength + position];
+		}
+		return {};
+	}
+
+	const T& ValueOr(ptrdiff_t position, const T& empty) const noexcept {
+		if (IsValidIndex(position, part1Length)) {
+			return body[position];
+		}
+		if (IsValidIndex(position, lengthBody)) {
+			return body[gapLength + position];
+		}
+		return empty;
 	}
 
 	/// Set the element at a particular position.
@@ -155,21 +165,35 @@ public:
 	/// but asserts in debug builds.
 	template <typename ParamType>
 	void SetValueAt(ptrdiff_t position, ParamType&& v) noexcept {
-		if (position < part1Length) {
-			PLATFORM_ASSERT(position >= 0);
-			if (position < 0) {
-				;
-			} else {
-				body[position] = std::forward<ParamType>(v);
-			}
-		} else {
-			PLATFORM_ASSERT(position < lengthBody);
-			if (position >= lengthBody) {
-				;
-			} else {
-				body[gapLength + position] = std::forward<ParamType>(v);
+		PLATFORM_ASSERT(position >= 0 && position < lengthBody);
+		if (IsValidIndex(position, part1Length)) {
+			body[position] = std::forward<ParamType>(v);
+		} else if (IsValidIndex(position, lengthBody)) {
+			body[gapLength + position] = std::forward<ParamType>(v);
+		}
+	}
+
+	template <typename ParamType>
+	bool UpdateValueAt(ptrdiff_t position, ParamType&& v) noexcept {
+		PLATFORM_ASSERT(position >= 0 && position < lengthBody);
+		if (IsValidIndex(position, lengthBody)) {
+			T * const data = ElementPointer(position);
+			const T current = std::forward<ParamType>(v);
+			if (current != *data) {
+				*data = current;
+				return true;
 			}
 		}
+		return false;
+	}
+
+	template <typename ParamType>
+	T ReplaceValueAt(ptrdiff_t position, ParamType&& v) noexcept {
+		PLATFORM_ASSERT(position >= 0 && position < lengthBody);
+		T * const data = ElementPointer(position);
+		const T previous = *data;
+		*data = std::forward<ParamType>(v);
+		return previous;
 	}
 
 	/// Retrieve the element at a particular position.
@@ -204,7 +228,7 @@ public:
 	/// Inserting at positions outside the current range fails.
 	void Insert(ptrdiff_t position, T v) {
 		PLATFORM_ASSERT((position >= 0) && (position <= lengthBody));
-		if ((position < 0) || (position > lengthBody)) {
+		if (!InRangeInclusive(position, lengthBody)) {
 			return;
 		}
 		RoomFor(1);
@@ -220,7 +244,7 @@ public:
 	void InsertValue(ptrdiff_t position, ptrdiff_t insertLength, T v) {
 		PLATFORM_ASSERT((position >= 0) && (position <= lengthBody));
 		if (insertLength > 0) {
-			if ((position < 0) || (position > lengthBody)) {
+			if (!InRangeInclusive(position, lengthBody)) {
 				return;
 			}
 			RoomFor(insertLength);
@@ -239,7 +263,7 @@ public:
 	T *InsertEmpty(ptrdiff_t position, ptrdiff_t insertLength) {
 		PLATFORM_ASSERT((position >= 0) && (position <= lengthBody));
 		if (insertLength > 0) {
-			if ((position < 0) || (position > lengthBody)) {
+			if (!InRangeInclusive(position, lengthBody)) {
 				return nullptr;
 			}
 			RoomFor(insertLength);
@@ -267,7 +291,7 @@ public:
 	void InsertFromArray(ptrdiff_t positionToInsert, const T s[], ptrdiff_t positionFrom, ptrdiff_t insertLength) {
 		PLATFORM_ASSERT((positionToInsert >= 0) && (positionToInsert <= lengthBody));
 		if (insertLength > 0) {
-			if ((positionToInsert < 0) || (positionToInsert > lengthBody)) {
+			if (!InRangeInclusive(positionToInsert, lengthBody)) {
 				return;
 			}
 			RoomFor(insertLength);
@@ -290,13 +314,10 @@ public:
 	/// Cannot be noexcept as vector::shrink_to_fit may be called and it may throw.
 	void DeleteRange(ptrdiff_t position, ptrdiff_t deleteLength) {
 		PLATFORM_ASSERT((position >= 0) && (position + deleteLength <= lengthBody));
-		if ((position < 0) || ((position + deleteLength) > lengthBody)) {
-			return;
-		}
 		if ((position == 0) && (deleteLength == lengthBody)) {
 			// Full deallocation returns storage and is faster
 			Init();
-		} else if (deleteLength > 0) {
+		} else if (position >= 0 && deleteLength > 0 && (position + deleteLength) <= lengthBody) {
 			GapTo(position);
 			lengthBody -= deleteLength;
 			gapLength += deleteLength;
@@ -344,6 +365,14 @@ public:
 				data += gapLength;
 			}
 		} else {
+			data += gapLength;
+		}
+		return data;
+	}
+
+	T *ElementPointer(ptrdiff_t position) noexcept {
+		T *data = body.data() + position;
+		if (position >= part1Length) {
 			data += gapLength;
 		}
 		return data;

@@ -334,7 +334,7 @@ bool ContractionState<LINE>::SetVisible(Sci::Line lineDocStart, Sci::Line lineDo
 		EnsureData();
 		Sci::Line delta = 0;
 		Check();
-		if ((lineDocStart <= lineDocEnd) && (lineDocStart >= 0) && (lineDocEnd < LinesInDoc())) {
+		if (InRangeInclusive(lineDocStart, lineDocEnd) && (lineDocEnd < LinesInDoc())) {
 			for (Sci::Line line = lineDocStart; line <= lineDocEnd; line++) {
 				if (GetVisible(line) != isVisible) {
 					const int heightLine = heights->ValueAt(static_cast<LINE>(line));
@@ -365,13 +365,15 @@ bool ContractionState<LINE>::HiddenLines() const noexcept {
 template <typename LINE>
 const char *ContractionState<LINE>::GetFoldDisplayText(Sci::Line lineDoc) const noexcept {
 	Check();
-	return foldDisplayTexts->ValueAt(lineDoc).get();
+	const UniqueString empty{};
+	return foldDisplayTexts->ValueOr(lineDoc, empty).get();
 }
 
 template <typename LINE>
 bool ContractionState<LINE>::SetFoldDisplayText(Sci::Line lineDoc, const char *text) {
 	EnsureData();
-	const char *foldText = foldDisplayTexts->ValueAt(lineDoc).get();
+	const UniqueString empty{};
+	const char *foldText = foldDisplayTexts->ValueOr(lineDoc, empty).get();
 	if (!foldText || !text || 0 != strcmp(text, foldText)) {
 		UniqueString uns = UniqueStringCopy(text);
 		foldDisplayTexts->SetValueAt(lineDoc, std::move(uns));

@@ -79,6 +79,10 @@ constexpr ColourRGBA ColourFromHex(const char *val) noexcept {
 	return ColourRGBA(r, g, b);
 }
 
+constexpr bool IsPixelIndex(unsigned index, unsigned dimension) noexcept {
+	return index < dimension;
+}
+
 }
 
 
@@ -184,7 +188,7 @@ void XPM::Draw(Surface *surface, PRectangle rc) {
 }
 
 ColourRGBA XPM::PixelAt(int x, int y) const noexcept {
-	if (pixels.empty() || (x < 0) || (x >= width) || (y < 0) || (y >= height)) {
+	if (pixels.empty() || !IsPixelIndex(x, width) || !IsPixelIndex(y, height)) {
 		// Out of bounds -> transparent black
 		return ColourRGBA(0, 0, 0, 0);
 	}

@@ -154,10 +154,10 @@ public:
 template <typename POS>
 class LineVector final : public ILineVector {
 	Partitioning<POS> starts;
-	PerLine *perLine;
+	PerLine *perLine = nullptr;
 	LineStartIndex<POS> startsUTF16;
 	LineStartIndex<POS> startsUTF32;
-	LineCharacterIndexType activeIndices;
+	LineCharacterIndexType activeIndices = LineCharacterIndexType::None;
 
 	void SetActiveIndices() noexcept {
 		activeIndices = (startsUTF32.Active() ? LineCharacterIndexType::Utf32 : LineCharacterIndexType::None)
@@ -165,7 +165,7 @@ class LineVector final : public ILineVector {
 	}
 
 public:
-	LineVector() : starts(256), perLine(nullptr), activeIndices(LineCharacterIndexType::None) {
+	LineVector() : starts(256) {
 	}
 	// Deleted so LineVector objects can not be copied.
 	LineVector(const LineVector &) = delete;
@@ -621,10 +621,9 @@ unsigned char CellBuffer::UCharAt(Sci::Position position) const noexcept {
 }
 
 void CellBuffer::GetCharRange(char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
-	if (lengthRetrieve <= 0)
+	if ((position | lengthRetrieve) <= 0) {
 		return;
-	if (position < 0)
-		return;
+	}
 	if ((position + lengthRetrieve) > substance.Length()) {
 		//Platform::DebugPrintf("Bad GetCharRange %.0f for %.0f of %.0f\n",
 		//					static_cast<double>(position),
@@ -640,10 +639,9 @@ char CellBuffer::StyleAt(Sci::Position position) const noexcept {
 }
 
 void CellBuffer::GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
-	if (lengthRetrieve < 0)
+	if ((position | lengthRetrieve) <= 0) {
 		return;
-	if (position < 0)
-		return;
+	}
 	if (!hasStyles) {
 		std::fill_n(buffer, lengthRetrieve, static_cast<unsigned char>(0));
 		return;
@@ -695,13 +693,7 @@ const char *CellBuffer::InsertString(Sci::Position position, const char *s, Sci:
 }
 
 bool CellBuffer::SetStyleAt(Sci::Position position, char styleValue) noexcept {
-	const char curVal = style.ValueAt(position);
-	if (curVal != styleValue) {
-		style.SetValueAt(position, styleValue);
-		return true;
-	} else {
-		return false;
-	}
+	return style.UpdateValueAt(position, styleValue);
 }
 
 bool CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, char styleValue) noexcept {
@@ -709,9 +701,7 @@ bool CellBuffer::SetStyleFor(Sci::Position position, Sci::Position lengthStyle, 
 	PLATFORM_ASSERT(lengthStyle == 0 ||
 		(lengthStyle > 0 && lengthStyle + position <= style.Length()));
 	while (lengthStyle--) {
-		const char curVal = style.ValueAt(position);
-		if (curVal != styleValue) {
-			style.SetValueAt(position, styleValue);
+		if (style.UpdateValueAt(position, styleValue)) {
 			changed = true;
 		}
 		position++;

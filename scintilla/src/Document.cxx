@@ -355,8 +355,9 @@ Sci::Line Document::MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexc
 }
 
 int Document::AddMark(Sci::Line line, int markerNum) {
-	if (line >= 0 && line <= LinesTotal()) {
-		const int prev = Markers()->AddMark(line, markerNum, LinesTotal());
+	const Sci::Line lines = LinesTotal();
+	if (IsValidIndex(line, lines)) {
+		const int prev = Markers()->AddMark(line, markerNum, lines);
 		const DocModification mh(ModificationFlags::ChangeMarker, LineStart(line), 0, 0, nullptr, line);
 		NotifyModified(mh);
 		return prev;
@@ -366,13 +367,14 @@ int Document::AddMark(Sci::Line line, int markerNum) {
 }
 
 void Document::AddMarkSet(Sci::Line line, MarkerMask valueSet) {
-	if (line < 0 || line > LinesTotal()) {
+	const Sci::Line lines = LinesTotal();
+	if (!IsValidIndex(line, lines)) {
 		return;
 	}
 	MarkerMask m = valueSet;
 	for (int i = 0; m; i++, m >>= 1) {
 		if (m & 1)
-			Markers()->AddMark(line, i, LinesTotal());
+			Markers()->AddMark(line, i, lines);
 	}
 	const DocModification mh(ModificationFlags::ChangeMarker, LineStart(line), 0, 0, nullptr, line);
 	NotifyModified(mh);
@@ -393,7 +395,8 @@ void Document::DeleteMarkFromHandle(int markerHandle) {
 
 void Document::DeleteAllMarks(int markerNum) {
 	bool someChanges = false;
-	for (Sci::Line line = 0; line < LinesTotal(); line++) {
+	const Sci::Line lines = LinesTotal();
+	for (Sci::Line line = 0; line < lines; line++) {
 		if (Markers()->DeleteMark(line, markerNum, true))
 			someChanges = true;
 	}
@@ -656,21 +659,22 @@ Sci::Position Document::ClampPositionIntoDocument(Sci::Position pos) const noexc
 }
 
 bool Document::IsCrLf(Sci::Position pos) const noexcept {
-	if (pos < 0)
+	if (!IsValidIndex(pos, LengthNoExcept())) {
 		return false;
-	if (pos >= (Length() - 1))
-		return false;
+	}
 	return (cb.CharAt(pos) == '\r') && (cb.CharAt(pos + 1) == '\n');
 }
 
 int Document::LenChar(Sci::Position pos, bool *invalid) const noexcept {
-	if (pos < 0 || pos >= Length()) {
+	if (!IsValidIndex(pos, LengthNoExcept())) {
+		// Returning 1 instead of 0 to defend against hanging with a loop that goes (or starts) out of bounds.
 		return 1;
-	} else if (IsCrLf(pos)) {
-		return 2;
 	}
 
 	const unsigned char leadByte = cb.UCharAt(pos);
+	if (leadByte == '\r' && cb.CharAt(pos + 1) == '\n') {
+		return 2;
+	}
 	if (UTF8IsAscii(leadByte) || !dbcsCodePage) {
 		// Common case: ASCII character
 		return 1;
@@ -997,7 +1001,7 @@ Sci_Position SCI_METHOD Document::GetRelativePosition(Sci_Position positionStart
 		}
 	} else {
 		pos = positionStart + characterOffset;
-		if ((pos < 0) || (pos > Length()))
+		if (!IsValidIndex(pos, LengthNoExcept()))
 			return Sci::invalidPosition;
 	}
 	return pos;
@@ -1018,7 +1022,7 @@ Sci::Position Document::GetRelativePositionUTF16(Sci::Position positionStart, Sc
 		}
 	} else {
 		pos = positionStart + characterOffset;
-		if ((pos < 0) || (pos > Length()))
+		if (!IsValidIndex(pos, LengthNoExcept()))
 			return Sci::invalidPosition;
 	}
 	return pos;
@@ -1528,7 +1532,7 @@ static std::string CreateIndentation(Sci::Position indent, int tabSize, bool ins
 
 int SCI_METHOD Document::GetLineIndentation(Sci_Line line) const noexcept {
 	int indent = 0;
-	if ((line >= 0) && (line < LinesTotal())) {
+	if (IsValidIndex(line, LinesTotal())) {
 		const Sci::Position lineStart = LineStart(line);
 		const Sci::Position length = LengthNoExcept();
 		for (Sci::Position i = lineStart; i < length; i++) {
@@ -1574,7 +1578,7 @@ Sci::Position Document::GetLineIndentPosition(Sci::Line line) const noexcept {
 Sci::Position Document::GetColumn(Sci::Position pos) const noexcept {
 	Sci::Position column = 0;
 	const Sci::Line line = SciLineFromPosition(pos);
-	if ((line >= 0) && (line < LinesTotal())) {
+	if (IsValidIndex(line, LinesTotal())) {
 		for (Sci::Position i = LineStart(line); i < pos;) {
 			const char ch = cb.CharAt(i);
 			if (ch == '\t') {
@@ -1654,7 +1658,7 @@ Sci::Position Document::CountUTF16(Sci::Position startPos, Sci::Position endPos)
 
 Sci::Position Document::FindColumn(Sci::Line line, Sci::Position column) const noexcept {
 	Sci::Position position = LineStart(line);
-	if ((line >= 0) && (line < LinesTotal())) {
+	if (IsValidIndex(line, LinesTotal())) {
 		Sci::Position columnCurrent = 0;
 		while ((columnCurrent < column) && (position < LengthNoExcept())) {
 			const char ch = cb.CharAt(position);
@@ -2506,7 +2510,7 @@ StyledText Document::AnnotationStyledText(Sci::Line line) const noexcept {
 }
 
 void Document::AnnotationSetText(Sci::Line line, const char *text) {
-	if (line >= 0 && line < LinesTotal()) {
+	if (IsValidIndex(line, LinesTotal())) {
 		const Sci::Line linesBefore = AnnotationLines(line);
 		Annotations()->SetText(line, text);
 		const int linesAfter = AnnotationLines(line);
@@ -2518,7 +2522,7 @@ void Document::AnnotationSetText(Sci::Line line, const char *text) {
 }
 
 void Document::AnnotationSetStyle(Sci::Line line, int style) {
-	if (line >= 0 && line < LinesTotal()) {
+	if (IsValidIndex(line, LinesTotal())) {
 		Annotations()->SetStyle(line, style);
 		const DocModification mh(ModificationFlags::ChangeAnnotation, LineStart(line),
 			0, 0, nullptr, line);
@@ -2527,7 +2531,7 @@ void Document::AnnotationSetStyle(Sci::Line line, int style) {
 }
 
 void Document::AnnotationSetStyles(Sci::Line line, const unsigned char *styles) {
-	if (line >= 0 && line < LinesTotal()) {
+	if (IsValidIndex(line, LinesTotal())) {
 		Annotations()->SetStyles(line, styles);
 	}
 }
@@ -2555,7 +2559,7 @@ StyledText Document::EOLAnnotationStyledText(Sci::Line line) const noexcept {
 }
 
 void Document::EOLAnnotationSetText(Sci::Line line, const char *text) {
-	if (line >= 0 && line < LinesTotal()) {
+	if (IsValidIndex(line, LinesTotal())) {
 		EOLAnnotations()->SetText(line, text);
 		const DocModification mh(ModificationFlags::ChangeEOLAnnotation, LineStart(line),
 			0, 0, nullptr, line);
@@ -2564,7 +2568,7 @@ void Document::EOLAnnotationSetText(Sci::Line line, const char *text) {
 }
 
 void Document::EOLAnnotationSetStyle(Sci::Line line, int style) {
-	if (line >= 0 && line < LinesTotal()) {
+	if (IsValidIndex(line, LinesTotal())) {
 		EOLAnnotations()->SetStyle(line, style);
 		const DocModification mh(ModificationFlags::ChangeEOLAnnotation, LineStart(line),
 			0, 0, nullptr, line);
@@ -2816,7 +2820,8 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	const int direction = (chBrace < chSeek) ? 1 : -1;
 	int depth = 1;
 	position = useStartPos ? startPos : NextPosition(position, direction);
-	while ((position >= 0) && (position < Length())) {
+	const Sci::Position length = LengthNoExcept();
+	while (IsValidIndex(position, length)) {
 		const char chAtPos = CharAt(position);
 		const int styAtPos = StyleIndexAt(position);
 		if ((position > GetEndStyled()) || (styAtPos == styBrace)) {
@@ -2915,10 +2920,10 @@ public:
 	~DocumentIndexer() override = default;
 
 	char CharAt(Sci::Position index) const noexcept override {
-		if (index < 0 || index >= end)
-			return '\0';
-		else
+		if (IsValidIndex(index, end))
 			return pdoc->CharAt(index);
+		else
+			return '\0';
 	}
 
 	bool IsWordStartAt(Sci::Position pos) const noexcept override {

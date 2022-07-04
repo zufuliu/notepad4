@@ -19,14 +19,13 @@ class SparseVector {
 private:
 	std::unique_ptr<Partitioning<Sci::Position>> starts;
 	std::unique_ptr<SplitVector<T>> values;
-	T empty;	// Return from ValueAt when no element at a position.
 
 	void ClearValue(Sci::Position partition) noexcept {
 		values->SetValueAt(partition, T());
 	}
 
 public:
-	SparseVector() : empty() {
+	SparseVector() {
 		starts = std::make_unique<Partitioning<Sci::Position>>(8);
 		values = std::make_unique<SplitVector<T>>();
 		values->InsertEmpty(0, 2);
@@ -67,15 +66,25 @@ public:
 		}
 	}
 
-	const T& ValueAt(Sci::Position position) const noexcept {
+	T ValueAt(Sci::Position position) const noexcept {
 		assert(position <= Length());
 		const Sci::Position partition = ElementFromPosition(position);
 		const Sci::Position startPartition = starts->PositionFromPartition(partition);
 		if (startPartition == position) {
 			return values->ValueAt(partition);
 		} else {
-			return empty;
+			return {};
 		}
+	}
+
+	const T& ValueOr(Sci::Position position, const T& empty) const noexcept {
+		assert(position <= Length());
+		const Sci::Position partition = ElementFromPosition(position);
+		const Sci::Position startPartition = starts->PositionFromPartition(partition);
+		if (startPartition == position) {
+			return values->ValueOr(position, empty);
+		}
+		return empty;
 	}
 
 	template <typename ParamType>
@@ -112,7 +121,8 @@ public:
 		const Sci::Position partition = starts->PartitionFromPosition(position);
 		const Sci::Position startPartition = starts->PositionFromPartition(partition);
 		if (startPartition == position) {
-			const bool positionOccupied = values->ValueAt(partition) != T();
+			const T empty{};
+			const bool positionOccupied = values->ValueOr(partition, empty) != empty;
 			// Inserting at start of run so make previous longer
 			if (partition == 0) {
 				// Inserting at start of document so ensure start empty
