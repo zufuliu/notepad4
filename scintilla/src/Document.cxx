@@ -545,7 +545,7 @@ static constexpr bool IsSubordinate(FoldLevel levelStart, FoldLevel levelTry) no
 }
 
 Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Line lastLine) {
-	if (level <= FoldLevel::None) {
+	if (level == FoldLevel::None) {
 		level = GetFoldLevel(lineParent);
 	}
 	const FoldLevel levelStart = LevelNumberPart(level);

@@ -46,7 +46,7 @@ DISTANCE RunStyles<DISTANCE, STYLE>::SplitRun(DISTANCE position) {
 	DISTANCE run = RunFromPosition(position);
 	const DISTANCE posRun = starts->PositionFromPartition(run);
 	if (posRun < position) {
-		STYLE runStyle = ValueAt(position);
+		const STYLE runStyle = ValueAt(position);
 		run++;
 		starts->InsertPartition(run, position);
 		styles->InsertValue(run, 1, runStyle);
@@ -187,9 +187,9 @@ void RunStyles<DISTANCE, STYLE>::SetValueAt(DISTANCE position, STYLE value) {
 
 template <typename DISTANCE, typename STYLE>
 void RunStyles<DISTANCE, STYLE>::InsertSpace(DISTANCE position, DISTANCE insertLength) {
-	DISTANCE runStart = RunFromPosition(position);
+	const DISTANCE runStart = RunFromPosition(position);
 	if (starts->PositionFromPartition(runStart) == position) {
-		STYLE runStyle = ValueAt(position);
+		const STYLE runStyle = ValueAt(position);
 		// Inserting at start of run so make previous longer
 		if (runStart == 0) {
 			// Inserting at start of document so ensure 0
@@ -223,7 +223,7 @@ void RunStyles<DISTANCE, STYLE>::DeleteAll() {
 
 template <typename DISTANCE, typename STYLE>
 void RunStyles<DISTANCE, STYLE>::DeleteRange(DISTANCE position, DISTANCE deleteLength) {
-	DISTANCE end = position + deleteLength;
+	const DISTANCE end = position + deleteLength;
 	DISTANCE runStart = RunFromPosition(position);
 	DISTANCE runEnd = RunFromPosition(end);
 	if (runStart == runEnd) {

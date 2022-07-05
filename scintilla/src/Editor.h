@@ -599,7 +599,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetAnnotationVisible(Scintilla::AnnotationVisible visible);
 	void SetEOLAnnotationVisible(Scintilla::EOLAnnotationVisible visible) noexcept;
 
-	Sci::Line ExpandLine(Sci::Line line, Scintilla::FoldLevel level = Scintilla::FoldLevel::None);
+	Sci::Line ExpandLine(Sci::Line line, Scintilla::FoldLevel level = Scintilla::FoldLevel::None, Sci::Line *parentLine = nullptr);
 	void SetFoldExpanded(Sci::Line lineDoc, bool expanded);
 	void FoldLine(Sci::Line line, Scintilla::FoldAction action);
 	void FoldExpand(Sci::Line line, Scintilla::FoldAction action, Scintilla::FoldLevel level);

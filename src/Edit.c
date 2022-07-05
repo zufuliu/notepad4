@@ -7906,6 +7906,10 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 	Sci_Line line = 0;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
 		struct FoldLevelStack levelStack = { 0, { 0 }};
 		++lev;
@@ -7936,6 +7940,10 @@ void FoldToggleLevel(int lev, FOLD_ACTION action) {
 		}
 	}
 
+#if 0
+	StopWatch_Stop(watch);
+	StopWatch_ShowLog(&watch, __func__);
+#endif
 	FinishBatchFold();
 }
 
@@ -7991,6 +7999,10 @@ void FoldToggleDefault(FOLD_ACTION action) {
 	Sci_Line line = 0;
 
 	SendMessage(hwndEdit, WM_SETREDRAW, FALSE, 0);
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
 	if (pLexCurrent->lexerAttr & LexerAttr_IndentBasedFolding) {
 		struct FoldLevelStack levelStack = { 0, { 0 }};
 		while (line < lineCount) {
@@ -8025,6 +8037,10 @@ void FoldToggleDefault(FOLD_ACTION action) {
 		}
 	}
 
+#if 0
+	StopWatch_Stop(watch);
+	StopWatch_ShowLog(&watch, __func__);
+#endif
 	FinishBatchFold();
 }
 
