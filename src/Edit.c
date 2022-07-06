@@ -7815,7 +7815,8 @@ LRESULT CALLBACK SciThemedWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 //
 #define FOLD_CHILDREN SCMOD_CTRL
 #define FOLD_SIBLINGS SCMOD_SHIFT
-
+// max position to find function definition style on a line.
+#define MAX_FUNCTION_DEFINITION_POSITION	64
 // max level for Toggle Folds -> Current Level for indentation based lexers.
 #define MAX_EDIT_TOGGLE_FOLD_LEVEL		63
 struct FoldLevelStack {
@@ -7864,7 +7865,8 @@ static void FinishBatchFold(void) {
 
 bool EditIsLineContainsStyle(Sci_Line line, int style) {
 	Sci_Position lineStart = SciCall_PositionFromLine(line);
-	const Sci_Position lineEnd = SciCall_PositionFromLine(line + 1);
+	Sci_Position lineEnd = SciCall_PositionFromLine(line + 1);
+	lineEnd = min_pos(lineEnd, lineStart + MAX_FUNCTION_DEFINITION_POSITION);
 	do {
 		const int value = SciCall_GetStyleIndexAt(lineStart);
 		if (value == style) {
