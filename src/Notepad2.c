@@ -975,6 +975,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// If start as tray icon, set current filename as tooltip
 	if (flagStartAsTrayIcon) {
 		SetNotifyIconTitle(hwndMain);
+		EditEnsureSelectionVisible();
 	}
 
 	if (!bInitDone) {
