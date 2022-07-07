@@ -975,7 +975,6 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// If start as tray icon, set current filename as tooltip
 	if (flagStartAsTrayIcon) {
 		SetNotifyIconTitle(hwndMain);
-		EditEnsureSelectionVisible();
 	}
 
 	if (!bInitDone) {
@@ -1002,6 +1001,10 @@ static inline void NP2MinimizeWind(HWND hwnd) {
 static inline void NP2RestoreWind(HWND hwnd) {
 	ShowNotifyIcon(hwnd, false);
 	RestoreWndFromTray(hwnd);
+	if (flagJumpTo) {
+		// scroll caret to view for `Notepad2.exe /i /g -1`
+		EditEnsureSelectionVisible();
+	}
 	ShowOwnedPopups(hwnd, TRUE);
 }
 
@@ -1414,6 +1417,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 		case SC_RESTORE: {
 			const LRESULT lrv = DefWindowProc(hwnd, umsg, wParam, lParam);
+			if (flagJumpTo) {
+				// scroll caret to view for `start /min Notepad2.exe /g -1`
+				EditEnsureSelectionVisible();
+			}
 			ShowOwnedPopups(hwnd, TRUE);
 			return lrv;
 		}
