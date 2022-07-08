@@ -5651,6 +5651,7 @@ void Editor::FoldAll(FoldAction action) {
 		for (; line < maxLine; line++) {
 			const FoldLevel level = pdoc->GetFoldLevel(line);
 			if (LevelIsHeader(level)) {
+#if 1
 				if (FoldLevel::Base == LevelNumberPart(level)) {
 					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
 					if (lineMaxSubord > line) {
@@ -5663,6 +5664,16 @@ void Editor::FoldAll(FoldAction action) {
 						pcs->SetExpanded(line, false);
 					}
 				}
+#else
+				// measure performance for GetLastChild()
+				const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
+				if (lineMaxSubord > line) {
+					pcs->SetExpanded(line, false);
+					if (FoldLevel::Base == LevelNumberPart(level)) {
+						pcs->SetVisible(line + 1, lineMaxSubord, false);
+					}
+				}
+#endif
 			}
 		}
 	}

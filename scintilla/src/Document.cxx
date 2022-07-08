@@ -553,12 +553,12 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 	if (lastLine < 0 || lastLine > maxLine) {
 		lastLine = maxLine;
 	}
-	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled());
+	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
 	Sci::Line lineMaxSubord = lineParent;
 	while (lineMaxSubord < maxLine) {
 		if (lineMaxSubord >= lineEndStyled) {
 			EnsureStyledTo(LineStart(lineMaxSubord + 2));
-			lineEndStyled = SciLineFromPosition(GetEndStyled());
+			lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
 		}
 		if (!IsSubordinate(levelStart, GetFoldLevel(lineMaxSubord + 1)))
 			break;
@@ -579,19 +579,13 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 
 Sci::Line Document::GetFoldParent(Sci::Line line) const noexcept {
 	const FoldLevel level = LevelNumberPart(GetFoldLevel(line));
-	Sci::Line lineLook = line - 1;
-	while ((lineLook > 0) && (
-		(!LevelIsHeader(GetFoldLevel(lineLook))) ||
-		(LevelNumberPart(GetFoldLevel(lineLook)) >= level))
-		) {
-		lineLook--;
+	for (Sci::Line lineLook = line - 1; lineLook >= 0; lineLook--) {
+		const FoldLevel levelTry = GetFoldLevel(lineLook);
+		if (LevelIsHeader(levelTry) && LevelNumberPart(levelTry) < level) {
+			return lineLook;
+		}
 	}
-	if (LevelIsHeader(GetFoldLevel(lineLook)) &&
-		(LevelNumberPart(GetFoldLevel(lineLook)) < level)) {
-		return lineLook;
-	} else {
-		return -1;
-	}
+	return -1;
 }
 
 void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sci::Line line, Sci::Line lastLine) {
