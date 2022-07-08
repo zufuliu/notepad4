@@ -553,12 +553,13 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 	if (lastLine < 0 || lastLine > maxLine) {
 		lastLine = maxLine;
 	}
-	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
+	Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled()) - 2;
 	Sci::Line lineMaxSubord = lineParent;
 	while (lineMaxSubord < maxLine) {
 		if (lineMaxSubord >= lineEndStyled) {
-			EnsureStyledTo(LineStart(lineMaxSubord + 2));
-			lineEndStyled = SciLineFromPosition(GetEndStyled()) - 1;
+			// two or more lines are required to make stable fold for most lexer
+			EnsureStyledTo(LineStart(lineMaxSubord + 2 + 1));
+			lineEndStyled = SciLineFromPosition(GetEndStyled()) - 2;
 		}
 		if (!IsSubordinate(levelStart, GetFoldLevel(lineMaxSubord + 1)))
 			break;

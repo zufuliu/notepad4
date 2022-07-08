@@ -5532,14 +5532,14 @@ void Editor::FoldExpand(Sci::Line line, FoldAction action, FoldLevel level) {
 	}
 	// Ensure child lines lexed and fold information extracted before
 	// flipping the state.
-	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
+	pdoc->GetLastChild(line, level);
 	SetFoldExpanded(line, expanding);
 	if (expanding && (pcs->HiddenLines() == 0)) {
 		// Nothing to do
 		return;
 	}
 
-	//const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
+	const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
 	line++;
 	pcs->SetVisible(line, lineMaxSubord, expanding);
 	while (line <= lineMaxSubord) {
