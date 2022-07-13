@@ -1094,8 +1094,7 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return DocumentLexState()->GetIdentifier();
 
 	case Message::Colourise:
-		// from Editor::FoldAll()
-		pdoc->EnsureStyledTo((lParam < 0) ? pdoc->LengthNoExcept() : lParam);
+		pdoc->EnsureStyledTo((lParam < 0) ? pdoc->LengthNoExcept() : pdoc->LineStart(pdoc->SciLineFromPosition(lParam - 1) + 1));
 #if 0
 		if (DocumentLexState()->UseContainerLexing()) {
 			pdoc->ModifiedAt(PositionFromUPtr(wParam));
@@ -1103,8 +1102,8 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		} else {
 			DocumentLexState()->Colourise(PositionFromUPtr(wParam), lParam);
 		}
-#endif
 		Redraw();
+#endif
 		break;
 
 	case Message::SetProperty:

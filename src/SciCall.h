@@ -1394,16 +1394,12 @@ NP2_inline void SciCall_SetLexer(int lexer) { //! removed in Scintilla 5
 	SciCall(SCI_SETLEXER, lexer, 0);
 }
 
-NP2_inline void SciCall_Colourise(Sci_Position start, Sci_Position end) {
-	SciCall(SCI_COLOURISE, start, end);
-}
-
 NP2_inline void SciCall_ColouriseAll(void) {
-	SciCall_Colourise(0, -1);
+	SciCall(SCI_COLOURISE, 0, -1);
 }
 
 NP2_inline void SciCall_EnsureStyledTo(Sci_Position end) {
-	SciCall_Colourise(0, end);
+	SciCall(SCI_COLOURISE, 0, end);
 }
 
 NP2_inline void SciCall_SetProperty(const char *key, const char *value) {
