@@ -116,7 +116,7 @@ static KEYWORDLIST Keywords_AU3 = {{
 static EDITSTYLE Styles_AU3[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_AU3_KEYWORD, NP2StyleX_Keyword, L"fore:#0000FF" },
-	{ SCE_AU3_FUNCTION, NP2StyleX_Function, L"fore:#0000FF" },
+	{ SCE_AU3_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_AU3_MACRO, NP2StyleX_Macro, L"fore:#0080FF" },
 	{ MULTI_STYLE(SCE_AU3_COMMENT, SCE_AU3_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_AU3_STRING, NP2StyleX_String, L"fore:#008080" },
