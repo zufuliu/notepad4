@@ -1166,14 +1166,25 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 	// get text
 	DWORD cbData = (DWORD)SciCall_GetLength();
 	char *lpData = NULL;
+	int iEncoding = status->iEncoding;
+	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	if (cbData == 0) {
 		bWriteSuccess = SetEndOfFile(hFile);
+		// write encoding BOM
+		DWORD dwBytesWritten;
+		if (uFlags & NCP_UNICODE_BOM) {
+			if (uFlags & NCP_UNICODE_REVERSE) {
+				bWriteSuccess = WriteFile(hFile, (LPCVOID)"\xFE\xFF", 2, &dwBytesWritten, NULL);
+			} else {
+				bWriteSuccess = WriteFile(hFile, (LPCVOID)"\xFF\xFE", 2, &dwBytesWritten, NULL);
+			}
+		} else if (uFlags & NCP_UTF8_SIGN) {
+			bWriteSuccess = WriteFile(hFile, (LPCVOID)"\xEF\xBB\xBF", 3, &dwBytesWritten, NULL);
+		}
 		dwLastIOError = GetLastError();
 	} else {
 		DWORD dwBytesWritten;
-		int iEncoding = status->iEncoding;
-		UINT uFlags = mEncoding[iEncoding].uFlags;
 		if (cbData >= MAX_NON_UTF8_SIZE) {
 			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
