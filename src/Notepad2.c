@@ -7821,6 +7821,12 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex) {
 		SciCall_SetEOLMode(iEOLMode);
 		UpdateStatusBarCache(STATUS_EOLMODE);
 	}
+
+	const UINT uFlags = mEncoding[iCurrentEncoding].uFlags;
+	if (uFlags & (NCP_UNICODE_BOM | NCP_UTF8_SIGN)) {
+		// retain encoding BOM for empty file
+		return;
+	}
 	if (iEncoding == CPI_DEFAULT) {
 		iEncoding = Encoding_GetAnsiIndex();
 	}
