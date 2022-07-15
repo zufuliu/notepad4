@@ -7791,7 +7791,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 	return fSuccess;
 }
 
-void EditApplyDefaultEncoding(PEDITLEXER pLex) {
+void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
 	int iEncoding;
 	int iEOLMode;
 	switch (pLex->rid) {
@@ -7812,7 +7812,11 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex) {
 
 	default:
 		// default encoding for empty file.
-		iEncoding = bLoadASCIIasUTF8 ? CPI_UTF8 : iDefaultEncoding;
+		if (bLexerChanged) {
+			iEncoding = bLoadASCIIasUTF8 ? CPI_UTF8 : iDefaultEncoding;
+		} else {
+			iEncoding = iCurrentEncoding;
+		}
 		iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 		break;
 	}
