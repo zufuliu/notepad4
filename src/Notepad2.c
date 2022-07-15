@@ -7811,7 +7811,8 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex) {
 		break;
 
 	default:
-		iEncoding = iDefaultEncoding;
+		// default encoding for empty file.
+		iEncoding = bLoadASCIIasUTF8 ? CPI_UTF8 : iDefaultEncoding;
 		iEOLMode = GetScintillaEOLMode(iDefaultEOLMode);
 		break;
 	}
