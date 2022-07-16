@@ -7966,6 +7966,7 @@ void FoldToggleCurrentBlock(FOLD_ACTION action) {
 	}
 
 	FoldToggleNode(line, action);
+	FinishBatchFold();
 }
 
 void FoldToggleCurrentLevel(FOLD_ACTION action) {
