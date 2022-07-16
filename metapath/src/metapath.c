@@ -1499,10 +1499,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_FILE_DELETE2:
 	case IDM_FILE_DELETE3: {
 		DLITEM dli;
-		int iItem;
-
 		dli.mask = DLI_ALL;
-		if ((iItem = DirList_GetItem(hwndDirList, -1, &dli)) < 0) {
+
+		int iItem = DirList_GetItem(hwndDirList, -1, &dli);
+		if (iItem < 0) {
 			break;
 		}
 
@@ -1843,12 +1843,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (PathGetLnkPath(dli.szFileName, szFullPath)) {
 				if (GetFileAttributes(szFullPath) != INVALID_FILE_ATTRIBUTES) {
 					WCHAR szDir[MAX_PATH];
-					WCHAR *p;
 					lstrcpy(szDir, szFullPath);
-					if ((p = StrRChr(szDir, NULL, L'\\')) != NULL) {
-						*(p + 1) = 0;
+					WCHAR *p = StrRChr(szDir, NULL, L'\\');
+					if (p != NULL) {
+						p[1] = L'\0';
 						if (!PathIsRoot(szDir)) {
-							*p = 0;
+							*p = L'\0';
 						}
 
 						SetCurrentDirectory(szDir);
@@ -3198,10 +3198,10 @@ bool TestIniFile(void) {
 
 bool CreateIniFile(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
-		WCHAR *pwchTail;
+		WCHAR *pwchTail = StrRChr(lpszIniFile, NULL, L'\\');
 
-		if ((pwchTail = StrRChr(lpszIniFile, NULL, L'\\')) != NULL) {
-			*pwchTail = 0;
+		if (pwchTail != NULL) {
+			*pwchTail = L'\0';
 			SHCreateDirectoryEx(NULL, lpszIniFile, NULL);
 			*pwchTail = L'\\';
 		}
@@ -3266,11 +3266,11 @@ bool DisplayPath(LPCWSTR lpPath, UINT uIdError) {
 			SHFILEINFO shfi;
 			SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-			WCHAR *p;
-			if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
-				*(p + 1) = 0;
+			WCHAR *p = StrRChr(szPath, NULL, L'\\');
+			if (p != NULL) {
+				p[1] = L'\0';
 				if (!PathIsRoot(szPath)) {
-					*p = 0;
+					*p = L'\0';
 				}
 				SetCurrentDirectory(szPath);
 			}
@@ -3319,11 +3319,11 @@ bool DisplayLnkFile(LPCWSTR pszLnkFile, LPCWSTR pszResPath) {
 		SHFILEINFO shfi;
 		SHGetFileInfo(szPath, 0, &shfi, sizeof(SHFILEINFO), SHGFI_DISPLAYNAME);
 
-		WCHAR *p;
-		if ((p = StrRChr(szPath, NULL, L'\\')) != NULL) {
-			*(p + 1) = 0;
+		WCHAR *p = StrRChr(szPath, NULL, L'\\');
+		if (p != NULL) {
+			p[1] = L'\0';
 			if (!PathIsRoot(szPath)) {
-				*p = 0;
+				*p = L'\0';
 			}
 			SetCurrentDirectory(szPath);
 		}

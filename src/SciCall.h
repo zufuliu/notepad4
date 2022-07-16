@@ -16,8 +16,8 @@
 ******************************************************************************/
 #pragma once
 
-#include "compiler.h"
 #include "Scintilla.h"
+#include "compiler.h"
 
 #if defined(__cplusplus) && !NP2_FORCE_COMPILE_C_AS_CPP
 extern "C" HANDLE g_hScintilla;

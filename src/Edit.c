@@ -6240,8 +6240,6 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 	static DWORD id_hover;
 	static DWORD id_capture;
 	static HFONT hFontHover;
-	static HCURSOR hCursorNormal;
-	static HCURSOR hCursorHover;
 
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -6259,11 +6257,6 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		GetObject(hFontNormal, sizeof(LOGFONT), &lf);
 		lf.lfUnderline = TRUE;
 		hFontHover = CreateFontIndirect(&lf);
-
-		hCursorNormal = LoadCursor(NULL, IDC_ARROW);
-		if ((hCursorHover = LoadCursor(NULL, IDC_HAND)) == NULL) {
-			hCursorHover = LoadCursor(g_hInstance, IDC_ARROW);
-		}
 
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_PREFIX);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixLines.buffer);
@@ -6359,7 +6352,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				id_hover = 0;
 				//InvalidateRect(GetDlgItem(hwnd, _id_hover), NULL, FALSE);
 			}
-			SetCursor(id_hover != 0 ? hCursorHover : hCursorNormal);
+			SetCursor(LoadCursor(NULL, (id_hover ? IDC_HAND : IDC_ARROW)));
 		}
 	}
 	break;
@@ -6375,7 +6368,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			id_capture = dwId;
 			//InvalidateRect(GetDlgItem(hwnd, dwId), NULL, FALSE);
 		}
-		SetCursor(id_hover != 0 ? hCursorHover : hCursorNormal);
+		SetCursor(LoadCursor(NULL, (id_hover ? IDC_HAND : IDC_ARROW)));
 	}
 	break;
 
@@ -6398,7 +6391,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 			id_capture = 0;
 		}
-		SetCursor(id_hover != 0 ? hCursorHover : hCursorNormal);
+		SetCursor(LoadCursor(NULL, (id_hover ? IDC_HAND : IDC_ARROW)));
 	}
 	break;
 
@@ -6407,7 +6400,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			ReleaseCapture();
 			id_hover = 0;
 			id_capture = 0;
-			SetCursor(hCursorNormal);
+			SetCursor(LoadCursor(NULL, IDC_ARROW));
 		}
 		break;
 
@@ -7281,7 +7274,8 @@ void EditOpenSelection(OpenSelectionType type) {
 		}
 
 		// link or full path, ignore any character before scheme name
-		if ((p = StrChr(link, L':')) != NULL) {
+		p = StrChr(link, L':');
+		if (p != NULL) {
 			--p;
 			while (p != link && IsSchemeNameChar(*p)) {
 				--p;

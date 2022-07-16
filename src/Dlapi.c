@@ -638,8 +638,6 @@ int DirList_GetItemEx(HWND hwnd, int iItem, LPWIN32_FIND_DATA pfd) {
 // Shows standard Win95 Property Dlg for selected Item
 //
 bool DirList_PropertyDlg(HWND hwnd, int iItem) {
-	static const char *lpVerb = "properties";
-
 	if (iItem < 0) {
 		if (ListView_GetSelectedCount(hwnd)) {
 			iItem = ListView_GetNextItem(hwnd, -1, LVNI_ALL | LVNI_SELECTED);
@@ -667,7 +665,7 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
 		cmi.hwnd = GetParent(hwnd);
-		cmi.lpVerb = lpVerb;
+		cmi.lpVerb = "properties";
 		cmi.lpParameters = nullptr;
 		cmi.lpDirectory = nullptr;
 		cmi.nShow = SW_SHOWNORMAL;
@@ -688,7 +686,7 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
 		cmi.hwnd = GetParent(hwnd);
-		cmi.lpVerb = lpVerb;
+		cmi.lpVerb = "properties";
 		cmi.lpParameters = NULL;
 		cmi.lpDirectory = NULL;
 		cmi.nShow = SW_SHOWNORMAL;
@@ -1094,8 +1092,6 @@ bool DriveBox_SelectDrive(HWND hwnd, LPCWSTR lpszPath) {
 // Shows standard Win95 Property Dlg for selected Drive
 //
 bool DriveBox_PropertyDlg(HWND hwnd) {
-	static const char *lpVerb = "properties";
-
 	const int iItem = ComboBox_GetCurSel(hwnd);
 	if (iItem == CB_ERR) {
 		return false;
@@ -1115,7 +1111,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
 		cmi.hwnd = GetParent(hwnd);
-		cmi.lpVerb = lpVerb;
+		cmi.lpVerb = "properties";
 		cmi.lpParameters = nullptr;
 		cmi.lpDirectory = nullptr;
 		cmi.nShow = SW_SHOWNORMAL;
@@ -1136,7 +1132,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
 		cmi.hwnd = GetParent(hwnd);
-		cmi.lpVerb = lpVerb;
+		cmi.lpVerb = "properties";
 		cmi.lpParameters = NULL;
 		cmi.lpDirectory = NULL;
 		cmi.nShow = SW_SHOWNORMAL;

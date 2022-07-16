@@ -1618,11 +1618,11 @@ bool ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 
 	bool bSuccess = true;
 	WCHAR lpszDDEMsgBuf[256];
-	WCHAR *pSubst;
 
 	lstrcpyn(lpszDDEMsgBuf, lpszDDEMsg, COUNTOF(lpszDDEMsgBuf));
-	if ((pSubst = StrStr(lpszDDEMsgBuf, L"%1")) != NULL) {
-		*(pSubst + 1) = L's';
+	WCHAR *pSubst = StrStr(lpszDDEMsgBuf, L"%1");
+	if (pSubst != NULL) {
+		pSubst[1] = L's';
 	}
 
 	WCHAR lpszURLExec[512];

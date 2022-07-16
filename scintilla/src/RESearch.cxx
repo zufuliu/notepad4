@@ -1042,9 +1042,9 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			llp = lp;
 			e = NOTFOUND;
 			while (llp >= are) {
-				Sci::Position q;
 				Sci::Position qoff = -1;
-				if ((q = PMatch(ci, llp, endp, ap, -1, &qoff)) != NOTFOUND) {
+				const Sci::Position q = PMatch(ci, llp, endp, ap, -1, &qoff);
+				if (q != NOTFOUND) {
 					e = q;
 					lp = llp;
 					if (op != LCLO) return e;

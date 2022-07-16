@@ -1973,44 +1973,51 @@ int Style_GetDocTypeLanguage(void) {
 	//	return IDM_LEXER_PHP;
 	//}
 	// check Language
-	if ((p = strstr(tchText, "<%@")) != NULL && (p = StrStrIA(p + CSTRLEN("<%@"), "Language")) != NULL) {
-		p += CSTRLEN("Language") + 1;
-		while (*p == ' ' || *p == '=' || *p == '\"') {
-			p++;
-		}
-		if (StrStartsWithCase(p, "C#")) {
-			return IDM_LEXER_ASPX_CS;
-		}
-		if (StrStartsWithCase(p, "VBScript")) {
-			return IDM_LEXER_ASP_VBS;
-		}
-		if (StrStartsWithCase(p, "VB")) {
-			return IDM_LEXER_ASPX_VB;
-		}
-		if (StrStartsWithCase(p, "JScript")) {
-			return IDM_LEXER_ASP_JS;
-		}
-		if (StrStartsWithCase(p, "Java")) {
-			return IDM_LEXER_JSP;
+	p = strstr(tchText, "<%@");
+	if (p != NULL) {
+		p = StrStrIA(p + CSTRLEN("<%@"), "Language");
+		if (p != NULL) {
+			p += CSTRLEN("Language") + 1;
+			while (*p == ' ' || *p == '=' || *p == '\"') {
+				p++;
+			}
+			if (StrStartsWithCase(p, "C#")) {
+				return IDM_LEXER_ASPX_CS;
+			}
+			if (StrStartsWithCase(p, "VBScript")) {
+				return IDM_LEXER_ASP_VBS;
+			}
+			if (StrStartsWithCase(p, "VB")) {
+				return IDM_LEXER_ASPX_VB;
+			}
+			if (StrStartsWithCase(p, "JScript")) {
+				return IDM_LEXER_ASP_JS;
+			}
+			if (StrStartsWithCase(p, "Java")) {
+				return IDM_LEXER_JSP;
+			}
 		}
 	}
 
 	// find root tag
 	p = tchText;
 	while (p - tchText < (ptrdiff_t)COUNTOF(tchText)) {
-		if ((p = strchr(p, '<')) == NULL) {
+		p = strchr(p, '<');
+		if (p == NULL) {
 			return 0;
 		}
 		if (StrStartsWith(p, "<!--")) {
 			p += CSTRLEN("<!--");
-			if ((p = strstr(p, "-->")) != NULL) {
+			p = strstr(p, "-->");
+			if (p != NULL) {
 				p += CSTRLEN("-->");
 			} else {
 				return 0;
 			}
 		} else if (StrStartsWith(p, "<?") || StrStartsWith(p, "<!")) {
 			p += CSTRLEN("<?");
-			if ((p = strchr(p, '>')) != NULL) {
+			p = strchr(p, '>');
+			if (p != NULL) {
 				p++;
 			} else {
 				return 0;
@@ -2096,10 +2103,8 @@ int Style_GetDocTypeLanguage(void) {
 	//	return IDM_LEXER_ANDROID_MANIFEST;
 	//if (StrStartsWith(p, "svg"))
 	//	return IDM_LEXER_SVG;
-	const char * const pb = p;
-	if (((p = strstr(pb, "Layout")) != NULL && strstr(p + CSTRLEN("Layout"), "xmlns:android")) ||
-			((p = strstr(pb, "View")) != NULL && strstr(p + CSTRLEN("View"), "xmlns:android")) ||
-			((p = strstr(pb, "menu")) != NULL && strstr(p + CSTRLEN("menu"), "xmlns:android"))) {
+	if (strstr(p, "xmlns:android") != NULL
+		&& (strstr(p, "Layout") != NULL || strstr(p, "View") != NULL || strstr(p, "menu") != NULL)) {
 		return IDM_LEXER_ANDROID_LAYOUT;
 	}
 
@@ -2628,8 +2633,11 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 					pLexNew = &lexHTML;
 				}
 			}
-		} else if ((p == tchText) && !fNoCGIGuess && (pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
-			pLexNew = pLexSniffed;
+		} else if ((p == tchText) && !fNoCGIGuess) {
+			pLexSniffed = Style_SniffShebang(tchText);
+			if (pLexSniffed != NULL) {
+				pLexNew = pLexSniffed;
+			}
 		}
 	}
 
@@ -2642,9 +2650,10 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		if (!fNoCGIGuess && (StrCaseEqual(wchMode, L"cgi") || StrCaseEqual(wchMode, L"fcgi"))) {
 			char tchText[256] = "";
 			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
-			if ((pLexSniffed = Style_SniffShebang(tchText)) != NULL) {
+			pLexSniffed = Style_SniffShebang(tchText);
+			if (pLexSniffed != NULL) {
 				if (iCurrentEncoding != g_DOSEncoding || pLexSniffed != &lexTextFile
-						|| !(StrCaseEqual(lpszExt, L"nfo") || StrCaseEqual(lpszExt, L"diz"))) {
+					|| !(StrCaseEqual(lpszExt, L"nfo") || StrCaseEqual(lpszExt, L"diz"))) {
 					// Although .nfo and .diz were removed from the default lexer's
 					// default extensions list, they may still presist in the user's INI
 					pLexNew = pLexSniffed;
@@ -2653,10 +2662,12 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 		}
 		// file mode name/extension
 		if (!pLexNew) {
-			PEDITLEXER pLexMode;
-			if ((pLexMode = Style_MatchLexer(wchMode, false)) != NULL ||
-				(pLexMode = Style_MatchLexer(wchMode, true)) != NULL) {
-				pLexNew = pLexMode;
+			pLexSniffed = Style_MatchLexer(wchMode, false);
+			if (pLexSniffed == NULL) {
+				pLexSniffed = Style_MatchLexer(wchMode, true);
+			}
+			if (pLexSniffed != NULL) {
+				pLexNew = pLexSniffed;
 			}
 		}
 	}
@@ -2667,7 +2678,8 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 
 	if (!pLexNew && (!fNoAutoDetection || bDotFile)) {
 		if (!fNoAutoDetection) {
-			if ((pLexSniffed = Style_AutoDetect(bDotFile)) != NULL) {
+			pLexSniffed = Style_AutoDetect(bDotFile);
+			if (pLexSniffed != NULL) {
 				pLexNew = pLexSniffed;
 			}
 		} else {
@@ -2690,9 +2702,11 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 // Style_SetLexerFromName()
 //
 void Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName) {
-	PEDITLEXER pLexNew;
-	if ((pLexNew = Style_MatchLexer(lpszName, false)) != NULL ||
-		(pLexNew = Style_MatchLexer(lpszName, true)) != NULL) {
+	PEDITLEXER pLexNew = Style_MatchLexer(lpszName, false);
+	if (pLexNew == NULL) {
+		pLexNew = Style_MatchLexer(lpszName, true);
+	}
+	if (pLexNew != NULL) {
 		Style_SetLexer(pLexNew, true);
 	} else {
 		Style_SetLexerFromFile(lpszFile);

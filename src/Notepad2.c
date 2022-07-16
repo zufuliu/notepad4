@@ -3601,8 +3601,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			char msz[64];
 			bool done = false;
 			strncpy(msz, mEncoding[iCurrentEncoding].pszParseNames, COUNTOF(msz) - 1);
-			char *p;
-			if ((p = strchr(msz, ',')) != NULL) {
+			char *p = strchr(msz, ',');
+			if (p != NULL) {
 				*p = '\0';
 			}
 			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
@@ -7037,10 +7037,10 @@ void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectK
 
 bool CreateIniFile(LPCWSTR lpszIniFile) {
 	if (StrNotEmpty(lpszIniFile)) {
-		WCHAR *pwchTail;
+		WCHAR *pwchTail = StrRChr(lpszIniFile, NULL, L'\\');
 
-		if ((pwchTail = StrRChr(lpszIniFile, NULL, L'\\')) != NULL) {
-			*pwchTail = 0;
+		if (pwchTail != NULL) {
+			*pwchTail = L'\0';
 			SHCreateDirectoryEx(NULL, lpszIniFile, NULL);
 			*pwchTail = L'\\';
 		}
@@ -7473,8 +7473,8 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 
 	// Ask to create a new file...
 	if (!(loadFlag & FileLoadFlag_Reload) && !PathIsFile(szFileName)) {
-		int result = IDCANCEL;
-		if (flagQuietCreate || (result = MsgBoxWarn(MB_YESNOCANCEL, IDS_ASK_CREATE, szFileName)) == IDYES) {
+		const int result = flagQuietCreate ? IDYES : MsgBoxWarn(MB_YESNOCANCEL, IDS_ASK_CREATE, szFileName);
+		if (result == IDYES) {
 			HANDLE hFile = CreateFile(szFileName,
 									  GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
 									  NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
