@@ -80,8 +80,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "파일 모드(&M)"
 		BEGIN
-			MENUITEM "Read Only &File",				IDM_FILE_READONLY_FILE
-			MENUITEM "&Read Only Mode\tF10",		IDM_FILE_READONLY_MODE
+			MENUITEM "읽기 전용 파일(&F)",				IDM_FILE_READONLY_FILE
+			MENUITEM "읽기 전용 모드(&R)\tF10",		IDM_FILE_READONLY_MODE
 #if defined(_WIN64)
 			MENUITEM "큰 파일 모드(&L)",			IDM_FILE_LARGE_FILE_MODE
 #endif
@@ -401,8 +401,8 @@ BEGIN
 			MENUITEM "이전 형제 블록으로 이동(&R)\tCtrl+Alt+쉼표(<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
 			MENUITEM "다음 형제 블록으로 이동(&E)\tCtrl+Alt+마침표(>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "선택영역 시작으로 이동(&S)\tCtrl+Shift+콤마(,)",CMD_JUMP2SELSTART
-			MENUITEM "선택영역 끝으로 이동(&T)\tCtrl+Shift+점(.)",	CMD_JUMP2SELEND
+			MENUITEM "선택 영역 시작으로 이동(&S)\tCtrl+Shift+콤마(,)",CMD_JUMP2SELSTART
+			MENUITEM "선택 영역 끝으로 이동(&T)\tCtrl+Shift+점(.)",	CMD_JUMP2SELEND
 		END
 	END
 	POPUP "보기(&V)"
@@ -1845,8 +1845,8 @@ BEGIN
     IDS_APPTITLE_PASTEBOARD "Notepad2: 보드 붙여넣기"
     IDS_UNTITLED            "제목 없음"
     IDS_TITLEEXCERPT        """%s"""
-    IDS_READONLY_FILE       "(Read Only File)"
-    IDS_READONLY_MODE       "(Read Only Mode)"
+    IDS_READONLY_FILE       "(읽기 전용 파일)"
+    IDS_READONLY_MODE       "(읽기 전용 모드)"
     IDS_DOCPOS              "행 %s / %s  열 %s / %s  글자 %s / %s  선택 %s / %s  선택행 %s  일치 %s"
     IDS_LOADFILE            """%s"" 불러오는 중..."
     IDS_SAVEFILE            """%s"" 저장 중..."
@@ -1961,7 +1961,7 @@ BEGIN
     IDS_ASK_ENCODING2       "빈 파일의 인코딩을 ANSI에서 비 ANSI로 변경하려고합니다. 새 인코딩과 동기화할 수 없으므로 실행 취소 기록이 지워집니다. 계속하시셌습니까?"
     IDS_ERR_ENCODINGNA      "선택한 인코딩에 대한 코드 페이지 변환표는 시스템에서 사용할 수 없습니다."
     IDS_ERR_UNICODE         "이 유니코드 파일을 변환하는 동안 오류가 발생했습니다.\n파일을 저장하면 데이터가 손실됩니다!"
-    IDS_BINARY_FILE_OPENED  "This is most likely not a text file, so it is opened in read only mode\nto prevent accidental editing cause file corruption."
+    IDS_BINARY_FILE_OPENED  "이 파일은 텍스트 파일이 아닐 가능성이 높으므로 실수로 파일을 편집하여 파일이 손상되지 않도록 읽기 전용 모드로 열립니다."
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
     IDS_CHANGE_LANG_RESTART "UI 언어를 변경하려면 Notepad2를 다시 시작해야 합니다. 지금 다시 시작하시겠습니까?"
 #endif
@@ -1981,7 +1981,7 @@ BEGIN
 /m 텍스트\t지정된 텍스트와 일치합니다 (/m- 마지막, /mr 정규식, /mb 백슬래시).\n\
 /l[o|p]\t수정된 파일을 자동으로 다시 불러옵니다.\n\
 /q\t프롬프트없이 새 파일을 강제로 생성합니다.\n\
-/ro\tOpen file in read only mode.\n\
+/ro\t파일을 읽기 전용 모드로 엽니다.\n\
 /s 이름\t지정된 구문 체계를 선택합니다.\n\
 /d\t텍스트 파일 구성표를 선택합니다.\n\
 /h\t웹 소스 코드 체계를 선택합니다.\n\
