@@ -1322,7 +1322,7 @@ bool FileMRUDlg(HWND hwnd, LPWSTR lpstrFile) {
 // ChangeNotifyDlgProc()
 //
 //
-extern int iFileWatchingMode;
+extern FileWatchingMode iFileWatchingMode;
 extern bool iFileWatchingMethod;
 extern bool bFileWatchingKeepAtEnd;
 extern bool bResetFileWatching;
@@ -1332,7 +1332,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 	switch (umsg) {
 	case WM_INITDIALOG:
-		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD, IDC_CHANGENOTIFY_NONE + iFileWatchingMode);
+		CheckRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD, IDC_CHANGENOTIFY_NONE + (int)iFileWatchingMode);
 		if (iFileWatchingMethod) {
 			CheckDlgButton(hwnd, IDC_CHANGENOTIFY_USE_POLLING, BST_CHECKED);
 		}
@@ -1348,7 +1348,7 @@ static INT_PTR CALLBACK ChangeNotifyDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			iFileWatchingMode = GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE;
+			iFileWatchingMode = (FileWatchingMode)(GetCheckedRadioButton(hwnd, IDC_CHANGENOTIFY_NONE, IDC_CHANGENOTIFY_AUTO_RELOAD) - IDC_CHANGENOTIFY_NONE);
 			iFileWatchingMethod = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_USE_POLLING);
 			bFileWatchingKeepAtEnd = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_KEEP_AT_END);
 			bResetFileWatching = IsButtonChecked(hwnd, IDC_CHANGENOTIFY_RESET_WATCH);
@@ -2541,6 +2541,12 @@ typedef struct INFOBOX {
 
 typedef const INFOBOX * LPCINFOBOX;
 
+typedef enum SuppressMmessage {
+	SuppressMmessage_None = 0,
+	SuppressMmessage_Suppress,
+	SuppressMmessage_Never,
+} SuppressMmessage;
+
 static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	switch (umsg) {
 	case WM_INITDIALOG: {
@@ -2573,14 +2579,13 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 		case IDOK:
 		case IDCANCEL:
 		case IDYES:
-		case IDNO: {
-			LPINFOBOX lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
+		case IDNO:
 			if (IsButtonChecked(hwnd, IDC_INFOBOXCHECK)) {
-				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, true);
+				LPINFOBOX lpib = (LPINFOBOX)GetWindowLongPtr(hwnd, DWLP_USER);
+				IniSetBool(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpib->lpstrSetting, SuppressMmessage_Suppress);
 			}
 			EndDialog(hwnd, LOWORD(wParam));
-		}
-		break;
+			break;
 		}
 		return TRUE;
 	}
@@ -2595,8 +2600,8 @@ static INT_PTR CALLBACK InfoBoxDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 	const UINT icon = uType & MB_ICONMASK;
 	uType &= MB_TYPEMASK;
-	const int iMode = IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, 0);
-	if (StrNotEmpty(lpstrSetting) && iMode == 1) {
+	const SuppressMmessage iMode = (SuppressMmessage)IniGetInt(INI_SECTION_NAME_SUPPRESSED_MESSAGES, lpstrSetting, SuppressMmessage_None);
+	if (StrNotEmpty(lpstrSetting) && iMode == SuppressMmessage_Suppress) {
 		return (uType == MB_YESNO) ? IDYES : IDOK;
 	}
 
@@ -2613,7 +2618,7 @@ INT_PTR InfoBox(UINT uType, LPCWSTR lpstrSetting, UINT uidMessage, ...) {
 
 	ib.lpstrSetting = lpstrSetting;
 	ib.idiIcon = (icon == MB_ICONINFORMATION) ? IDI_INFORMATION : ((icon == MB_ICONQUESTION) ? IDI_QUESTION : IDI_EXCLAMATION);
-	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == 2;
+	ib.bDisableCheckBox = StrIsEmpty(szIniFile) || StrIsEmpty(lpstrSetting) || iMode == SuppressMmessage_Never;
 
 	const WORD idDlg = (uType == MB_YESNO) ? IDD_INFOBOX_YESNO : ((uType == MB_OKCANCEL) ? IDD_INFOBOX_OKCANCEL : IDD_INFOBOX_OK);
 	HWND hwnd = GetMsgBoxParent();
@@ -2640,7 +2645,7 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execu
 	UseFilter								REG_DWORD	0
 */
 extern bool fIsElevated;
-extern int flagUseSystemMRU;
+extern TripleBoolean flagUseSystemMRU;
 extern WCHAR g_wchAppUserModelID[64];
 
 enum {
@@ -2759,8 +2764,8 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			RegCloseKey(hKey);
 			RegCloseKey(hSubKey);
 
-			if (flagUseSystemMRU != 2) {
-				flagUseSystemMRU = 2;
+			if (flagUseSystemMRU != TripleBoolean_True) {
+				flagUseSystemMRU = TripleBoolean_True;
 				IniSetBoolEx(INI_SECTION_NAME_FLAGS, L"ShellUseSystemMRU", true, true);
 			}
 		}

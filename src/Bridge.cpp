@@ -42,16 +42,16 @@ extern "C" {
 
 // Global settings...
 #if NP2_FORCE_COMPILE_C_AS_CPP
-extern int iPrintHeader;
-extern int iPrintFooter;
+extern PrintHeaderOption iPrintHeader;
+extern PrintFooterOption iPrintFooter;
 extern int iPrintColor;
 extern int iPrintZoom;
 extern RECT pageSetupMargin;
 extern HWND hwndStatus;
 extern WCHAR defaultTextFontName[LF_FACESIZE];
 #else
-extern "C" int iPrintHeader;
-extern "C" int iPrintFooter;
+extern "C" PrintHeaderOption iPrintHeader;
+extern "C" PrintFooterOption iPrintFooter;
 extern "C" int iPrintColor;
 extern "C" int iPrintZoom;
 extern "C" RECT pageSetupMargin;
@@ -220,7 +220,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	GetTextMetrics(hdc, &tm);
 	headerLineHeight = tm.tmHeight + tm.tmExternalLeading;
 
-	if (iPrintHeader == 3) {
+	if (iPrintHeader == PrintHeaderOption_LeaveBlank) {
 		headerLineHeight = 0;
 	}
 
@@ -239,7 +239,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	GetTextMetrics(hdc, &tm);
 	footerLineHeight = tm.tmHeight + tm.tmExternalLeading;
 
-	if (iPrintFooter == 1) {
+	if (iPrintFooter == PrintFooterOption_LeaveBlank) {
 		footerLineHeight = 0;
 	}
 
@@ -262,7 +262,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, dateString, 256);
 
 	// Get current time...
-	if (iPrintHeader == 0) {
+	if (iPrintHeader == PrintHeaderOption_FilenameAndDateTime) {
 		WCHAR timeString[128];
 		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, timeString, 128);
 		lstrcat(dateString, L" ");
@@ -350,14 +350,14 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 				frPrint.rc.right, frPrint.rc.top - headerLineHeight / 2
 			};
 
-			if (iPrintHeader < 3) {
+			if (iPrintHeader != PrintHeaderOption_LeaveBlank) {
 				ExtTextOut(hdc, rcw.left + 5, rcw.bottom,
 						   ETO_OPAQUE, &rcw, pszDocTitle,
 						   lstrlen(pszDocTitle), nullptr);
 			}
 
 			// Print date in header
-			if (iPrintHeader == 0 || iPrintHeader == 1) {
+			if (iPrintHeader == PrintHeaderOption_FilenameAndDateTime || iPrintHeader == PrintHeaderOption_FilenameAndDate) {
 				SIZE sizeInfo;
 				const int len = lstrlen(dateString);
 				SelectObject(hdc, fontFooter);
@@ -369,7 +369,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			}
 
 			SetTextAlign(hdc, ta);
-			if (iPrintHeader < 3) {
+			if (iPrintHeader != PrintHeaderOption_LeaveBlank) {
 				HPEN pen = CreatePen(0, 1, RGB(0, 0, 0));
 				HPEN penOld = (HPEN)SelectObject(hdc, pen);
 				MoveToEx(hdc, frPrint.rc.left, frPrint.rc.top - headerLineHeight / 4, nullptr);
@@ -388,7 +388,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			SetTextColor(hdc, RGB(0, 0, 0));
 			SetBkColor(hdc, RGB(255, 255, 255));
 
-			if (iPrintFooter == 0) {
+			if (iPrintFooter == PrintFooterOption_PageNumber) {
 				SelectObject(hdc, fontFooter);
 				const UINT ta = SetTextAlign(hdc, TA_TOP);
 				RECT rcw = {
@@ -467,7 +467,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		ComboBox_SetCurSel(hwndCtl, iPrintHeader);
+		ComboBox_SetCurSel(hwndCtl, (int)iPrintHeader);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set footer options
@@ -483,7 +483,7 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 			p1 = p2;
 		}
 
-		ComboBox_SetCurSel(hwndCtl, iPrintFooter);
+		ComboBox_SetCurSel(hwndCtl, (int)iPrintFooter);
 		ComboBox_SetExtendedUI(hwndCtl, TRUE);
 
 		// Set color options
@@ -517,8 +517,8 @@ static UINT_PTR CALLBACK PageSetupHook(HWND hwnd, UINT uiMsg, WPARAM wParam, LPA
 				iPrintZoom = 100;
 			}
 
-			iPrintHeader = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0);
-			iPrintFooter = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0);
+			iPrintHeader = (PrintHeaderOption)SendDlgItemMessage(hwnd, IDC_PAGESETUP_HEADER_LIST, CB_GETCURSEL, 0, 0);
+			iPrintFooter = (PrintFooterOption)SendDlgItemMessage(hwnd, IDC_PAGESETUP_FOOTER_LIST, CB_GETCURSEL, 0, 0);
 			iPrintColor	 = (int)SendDlgItemMessage(hwnd, IDC_PAGESETUP_COLOR_MODE_LIST, CB_GETCURSEL, 0, 0);
 		}
 		break;

@@ -122,7 +122,7 @@ static bool bMatchBraces;
 static bool bShowIndentGuides;
 static bool bHighlightCurrentBlock;
 bool	bHighlightCurrentSubLine;
-int		iHighlightCurrentLine;
+LineHighlightMode iHighlightCurrentLine;
 EditTabSettings tabSettings;
 static bool bMarkLongLines;
 int		iLongLinesLimitG;
@@ -168,14 +168,14 @@ static int iCurrentEOLMode;
 bool	bWarnLineEndings;
 bool	bFixLineEndings;
 bool	bAutoStripBlanks;
-int		iPrintHeader;
-int		iPrintFooter;
+PrintHeaderOption iPrintHeader;
+PrintFooterOption iPrintFooter;
 int		iPrintColor;
 int		iPrintZoom = 100;
 RECT	pageSetupMargin;
 static bool bSaveBeforeRunningTools;
 bool bOpenFolderWithMetapath;
-int		iFileWatchingMode;
+FileWatchingMode iFileWatchingMode;
 bool	iFileWatchingMethod;
 bool	bFileWatchingKeepAtEnd;
 bool	bResetFileWatching;
@@ -302,8 +302,8 @@ HANDLE idleTaskTimer;
 static EditSortFlag iSortOptions = EditSortFlag_Ascending;
 static EditAlignMode iAlignMode	= EditAlignMode_Left;
 extern int iFontQuality;
-extern int iCaretStyle;
-extern int iOvrCaretStyle;
+extern CaretStyle iCaretStyle;
+extern bool bBlockCaretForOVRMode;
 extern bool bBlockCaretOutSelection;
 extern int iCaretBlinkPeriod;
 
@@ -367,8 +367,8 @@ static bool	flagReuseWindow			= false;
 static bool bSingleFileInstance		= true;
 static bool bReuseWindow			= false;
 static bool bStickyWindowPosition	= false;
-static int flagReadOnlyMode			= 0;
-static int	flagMultiFileArg		= 0;
+static int flagReadOnlyMode			= ReadOnlyMode_None;
+static TripleBoolean flagMultiFileArg = TripleBoolean_NotSet;
 static bool	flagSingleFileInstance	= true;
 static bool	flagStartAsTrayIcon		= false;
 static int	flagAlwaysOnTop			= 0;
@@ -393,7 +393,7 @@ static int	flagMatchText			= 0;
 static int	flagChangeNotify		= 0;
 static bool	flagLexerSpecified		= false;
 static bool	flagQuietCreate			= false;
-int			flagUseSystemMRU		= 0;
+TripleBoolean flagUseSystemMRU		= TripleBoolean_NotSet;
 static int	flagRelaunchElevated	= 0;
 static bool	flagDisplayHelp			= false;
 
@@ -855,11 +855,11 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 		if (bOpened) {
 			if (flagChangeNotify == 1) {
-				iFileWatchingMode = 0;
+				iFileWatchingMode = FileWatchingMode_None;
 				bResetFileWatching = true;
 				InstallFileWatching(false);
 			} else if (flagChangeNotify == 2) {
-				iFileWatchingMode = 2;
+				iFileWatchingMode = FileWatchingMode_AutoReload;
 				bResetFileWatching = true;
 				InstallFileWatching(false);
 			}
@@ -1265,7 +1265,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			memcpy(params, pcds->lpData, pcds->cbData);
 
 			if (params->flagReadOnlyMode) {
-				flagReadOnlyMode |= 1;
+				flagReadOnlyMode |= ReadOnlyMode_Current;
 			}
 			if (params->flagLexerSpecified) {
 				flagLexerSpecified = true;
@@ -1289,11 +1289,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 				if (bOpened) {
 					if (params->flagChangeNotify == 1) {
-						iFileWatchingMode = 0;
+						iFileWatchingMode = FileWatchingMode_None;
 						bResetFileWatching = true;
 						InstallFileWatching(false);
 					} else if (params->flagChangeNotify == 2) {
-						iFileWatchingMode = 2;
+						iFileWatchingMode = FileWatchingMode_AutoReload;
 						bResetFileWatching = true;
 						InstallFileWatching(false);
 					}
@@ -1338,7 +1338,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			flagLexerSpecified = false;
 			flagQuietCreate = false;
-			flagReadOnlyMode &= 2;
+			flagReadOnlyMode &= ReadOnlyMode_AllFile;
 
 			NP2HeapFree(params);
 
@@ -1428,13 +1428,15 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 
 	case APPM_CHANGENOTIFY:
-		if (iFileWatchingMode == 1 || IsDocumentModified()) {
+		if (iFileWatchingMode == FileWatchingMode_ShowMessage || IsDocumentModified()) {
 			SetForegroundWindow(hwnd);
 		}
 
 		if (PathIsFile(szCurFile)) {
-			if ((iFileWatchingMode == 2 && !IsDocumentModified()) || MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY) == IDYES) {
-				const bool bIsTail = (iFileWatchingMode == 2) && (bFileWatchingKeepAtEnd || (SciCall_LineFromPosition(SciCall_GetCurrentPos()) + 1 == SciCall_GetLineCount()));
+			if ((iFileWatchingMode == FileWatchingMode_AutoReload && !IsDocumentModified())
+				|| MsgBoxWarn(MB_YESNO, IDS_FILECHANGENOTIFY) == IDYES) {
+				const bool bIsTail = (iFileWatchingMode == FileWatchingMode_AutoReload)
+					&& (bFileWatchingKeepAtEnd || (SciCall_LineFromPosition(SciCall_GetCurrentPos()) + 1 == SciCall_GetLineCount()));
 
 				iWeakSrcEncoding = iCurrentEncoding;
 				if (FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_Reload), szCurFile)) {
@@ -2637,8 +2639,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAP, fvCurFile.fWordWrap);
 	i = IDM_VIEW_FONTQUALITY_DEFAULT + iFontQuality;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_FONTQUALITY_DEFAULT, IDM_VIEW_FONTQUALITY_CLEARTYPE, i, MF_BYCOMMAND);
-	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_BLOCK_OVR, iOvrCaretStyle);
-	i = IDM_VIEW_CARET_STYLE_BLOCK + iCaretStyle;
+	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_BLOCK_OVR, bBlockCaretForOVRMode);
+	i = IDM_VIEW_CARET_STYLE_BLOCK + (int)iCaretStyle;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_CARET_STYLE_BLOCK, IDM_VIEW_CARET_STYLE_WIDTH3, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_CARET_STYLE_NOBLINK, iCaretBlinkPeriod == 0);
 	UncheckCmd(hmenu, IDM_VIEW_CARET_STYLE_SELECTION, bBlockCaretOutSelection);
@@ -2682,7 +2684,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENT_BLOCK, bHighlightCurrentBlock);
-	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + iHighlightCurrentLine;
+	i = IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE + (int)iHighlightCurrentLine;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE, IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME, i, MF_BYCOMMAND);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE, bHighlightCurrentSubLine);
 
@@ -2721,7 +2723,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	CheckCmd(hmenu, IDM_VIEW_SAVEBEFORERUNNINGTOOLS, bSaveBeforeRunningTools);
 	CheckCmd(hmenu, IDM_SET_OPEN_FOLDER_METAPATH, bOpenFolderWithMetapath);
 
-	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, iFileWatchingMode);
+	CheckCmd(hmenu, IDM_VIEW_CHANGENOTIFY, (iFileWatchingMode != FileWatchingMode_None));
 	CheckCmd(hmenu, IDM_SET_FILE_AUTOSAVE, (iAutoSaveOption & AutoSaveOption_Periodic) && dwAutoSavePeriod != 0);
 
 	EnableCmd(hmenu, IDM_SET_USE_XP_FILE_DIALOG, IsVistaAndAbove());
@@ -4259,7 +4261,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE:
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK:
 	case IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME:
-		iHighlightCurrentLine = LOWORD(wParam) - IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE;
+		iHighlightCurrentLine = (LineHighlightMode)(LOWORD(wParam) - IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE);
 		Style_HighlightCurrentLine();
 		break;
 
@@ -4426,7 +4428,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_CARET_STYLE_BLOCK_OVR:
-		iOvrCaretStyle = !iOvrCaretStyle;
+		bBlockCaretForOVRMode = !bBlockCaretForOVRMode;
 		Style_UpdateCaret();
 		break;
 
@@ -4434,7 +4436,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_CARET_STYLE_WIDTH1:
 	case IDM_VIEW_CARET_STYLE_WIDTH2:
 	case IDM_VIEW_CARET_STYLE_WIDTH3:
-		iCaretStyle = LOWORD(wParam) - IDM_VIEW_CARET_STYLE_BLOCK;
+		iCaretStyle = (CaretStyle)(LOWORD(wParam) - IDM_VIEW_CARET_STYLE_BLOCK);
 		Style_UpdateCaret();
 		break;
 
@@ -5545,9 +5547,9 @@ void LoadSettings(void) {
 
 	bMatchBraces = IniSectionGetBool(pIniSection, L"MatchBraces", true);
 	bHighlightCurrentBlock = IniSectionGetBool(pIniSection, L"HighlightCurrentBlock", true);
-	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 12);
-	bHighlightCurrentSubLine = iValue > 10;
-	iHighlightCurrentLine = clamp_i(iValue % 10, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"HighlightCurrentLine", 10 + LineHighlightMode_OutlineFrame);
+	bHighlightCurrentSubLine = (iValue >= 10);
+	iHighlightCurrentLine = (LineHighlightMode)clamp_i(iValue % 10, LineHighlightMode_None, LineHighlightMode_OutlineFrame);
 	bShowIndentGuides = IniSectionGetBool(pIniSection, L"ShowIndentGuides", false);
 
 	autoCompletionConfig.bIndentText = IniSectionGetBool(pIniSection, L"AutoIndent", true);
@@ -5638,11 +5640,11 @@ void LoadSettings(void) {
 	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", true);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", false);
 
-	iValue = IniSectionGetInt(pIniSection, L"PrintHeader", 1);
-	iPrintHeader = clamp_i(iValue, 0, 3);
+	iValue = IniSectionGetInt(pIniSection, L"PrintHeader", PrintHeaderOption_FilenameAndDate);
+	iPrintHeader = (PrintHeaderOption)clamp_i(iValue, PrintHeaderOption_FilenameAndDateTime, PrintHeaderOption_LeaveBlank);
 
-	iValue = IniSectionGetInt(pIniSection, L"PrintFooter", 0);
-	iPrintFooter = clamp_i(iValue, 0, 1);
+	iValue = IniSectionGetInt(pIniSection, L"PrintFooter", PrintFooterOption_PageNumber);
+	iPrintFooter = (PrintFooterOption)clamp_i(iValue, PrintFooterOption_PageNumber, PrintFooterOption_LeaveBlank);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintColorMode", SC_PRINT_COLOURONWHITE);
 	iPrintColor = clamp_i(iValue, SC_PRINT_NORMAL, SC_PRINT_SCREENCOLOURS);
@@ -5665,8 +5667,8 @@ void LoadSettings(void) {
 	bSaveBeforeRunningTools = IniSectionGetBool(pIniSection, L"SaveBeforeRunningTools", false);
 	bOpenFolderWithMetapath = IniSectionGetBool(pIniSection, L"OpenFolderWithMetapath", true);
 
-	iValue = IniSectionGetInt(pIniSection, L"FileWatchingMode", 2);
-	iFileWatchingMode = clamp_i(iValue, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"FileWatchingMode", FileWatchingMode_AutoReload);
+	iFileWatchingMode = (FileWatchingMode)clamp_i(iValue, FileWatchingMode_None, FileWatchingMode_AutoReload);
 	iFileWatchingMethod = IniSectionGetBool(pIniSection, L"FileWatchingMethod", false);
 	bFileWatchingKeepAtEnd = IniSectionGetBool(pIniSection, L"FileWatchingKeepAtEnd", false);
 	bResetFileWatching = IniSectionGetBool(pIniSection, L"ResetFileWatching", false);
@@ -5695,11 +5697,11 @@ void LoadSettings(void) {
 	iValue = IniSectionGetInt(pIniSection, L"FontQuality", SC_EFF_QUALITY_LCD_OPTIMIZED);
 	iFontQuality = clamp_i(iValue, SC_EFF_QUALITY_DEFAULT, SC_EFF_QUALITY_LCD_OPTIMIZED);
 
-	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", 1);
+	iValue = IniSectionGetInt(pIniSection, L"CaretStyle", CaretStyle_LineWidth1);
 	bBlockCaretOutSelection = (iValue >= 100);
 	iValue %= 100;
-	iOvrCaretStyle = (iValue / 10) & 1;
-	iCaretStyle = clamp_i(iValue % 10, 0, 3);
+	bBlockCaretForOVRMode = (iValue >= 10);
+	iCaretStyle = (CaretStyle)clamp_i(iValue % 10, CaretStyle_Block, CaretStyle_LineWidth3);
 	iCaretBlinkPeriod = IniSectionGetInt(pIniSection, L"CaretBlinkPeriod", -1);
 	bUseInlineIME = IniSectionGetBool(pIniSection, L"UseInlineIME", false);
 
@@ -5893,7 +5895,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, false);
 	IniSectionSetBoolEx(pIniSection, L"MatchBraces", bMatchBraces, true);
 	IniSectionSetBoolEx(pIniSection, L"HighlightCurrentBlock", bHighlightCurrentBlock, true);
-	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iHighlightCurrentLine + (bHighlightCurrentSubLine ? 10 : 0), 12);
+	int iValue = (int)iHighlightCurrentLine + ((int)bHighlightCurrentSubLine*10);
+	IniSectionSetIntEx(pIniSection, L"HighlightCurrentLine", iValue, 10 + LineHighlightMode_OutlineFrame);
 	IniSectionSetBoolEx(pIniSection, L"ShowIndentGuides", bShowIndentGuides, false);
 
 	IniSectionSetBoolEx(pIniSection, L"AutoIndent", autoCompletionConfig.bIndentText, true);
@@ -5948,8 +5951,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, true);
 	IniSectionSetBoolEx(pIniSection, L"FixTrailingBlanks", bAutoStripBlanks, false);
 
-	IniSectionSetIntEx(pIniSection, L"PrintHeader", iPrintHeader, 1);
-	IniSectionSetIntEx(pIniSection, L"PrintFooter", iPrintFooter, 0);
+	IniSectionSetIntEx(pIniSection, L"PrintHeader", (int)iPrintHeader, PrintHeaderOption_FilenameAndDate);
+	IniSectionSetIntEx(pIniSection, L"PrintFooter", (int)iPrintFooter, PrintFooterOption_PageNumber);
 	IniSectionSetIntEx(pIniSection, L"PrintColorMode", iPrintColor, SC_PRINT_COLOURONWHITE);
 	IniSectionSetIntEx(pIniSection, L"PrintZoom", iPrintZoom, 100);
 	IniSectionSetIntEx(pIniSection, L"PrintMarginLeft", pageSetupMargin.left, -1);
@@ -5960,7 +5963,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"SaveBeforeRunningTools", bSaveBeforeRunningTools, false);
 	IniSectionSetBoolEx(pIniSection, L"OpenFolderWithMetapath", bOpenFolderWithMetapath, true);
 
-	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, 2);
+	IniSectionSetIntEx(pIniSection, L"FileWatchingMode", iFileWatchingMode, FileWatchingMode_AutoReload);
 	IniSectionSetBoolEx(pIniSection, L"FileWatchingMethod", iFileWatchingMethod, false);
 	IniSectionSetBoolEx(pIniSection, L"FileWatchingKeepAtEnd", bFileWatchingKeepAtEnd, false);
 	IniSectionSetBoolEx(pIniSection, L"ResetFileWatching", bResetFileWatching, false);
@@ -5977,7 +5980,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"RenderingTechnology", iRenderingTechnology, GetDefualtRenderingTechnology());
 	IniSectionSetIntEx(pIniSection, L"Bidirectional", iBidirectional, SC_BIDIRECTIONAL_DISABLED);
 	IniSectionSetIntEx(pIniSection, L"FontQuality", iFontQuality, SC_EFF_QUALITY_LCD_OPTIMIZED);
-	IniSectionSetIntEx(pIniSection, L"CaretStyle", iCaretStyle + iOvrCaretStyle*10 + ((int)bBlockCaretOutSelection)*100, 1);
+	iValue = (int)iCaretStyle + ((int)bBlockCaretForOVRMode)*10 + ((int)bBlockCaretOutSelection)*100;
+	IniSectionSetIntEx(pIniSection, L"CaretStyle", iValue, CaretStyle_LineWidth1);
 	IniSectionSetIntEx(pIniSection, L"CaretBlinkPeriod", iCaretBlinkPeriod, -1);
 	IniSectionSetBoolEx(pIniSection, L"UseInlineIME", bUseInlineIME, false);
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
@@ -6295,7 +6299,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 
 		case L'Z':
 			ExtractFirstArgument(lp2, lp1, lp2);
-			flagMultiFileArg = 1;
+			flagMultiFileArg = TripleBoolean_False;
 			*bIsNotepadReplacement = TRUE;
 			state = CommandParseState_Consumed;
 			break;
@@ -6359,7 +6363,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 				flagSingleFileInstance = true;
 				state = CommandParseState_Consumed;
 			} else if (chNext == L'O') {
-				flagReadOnlyMode = 1;
+				flagReadOnlyMode = ReadOnlyMode_Current;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6509,7 +6513,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			flagPosParam = true;
 			flagDefaultPos = 0;
 			state = CommandParseState_Consumed;
-			while (*p && state == 1) {
+			while (*p && state == CommandParseState_Consumed) {
 				switch (ToUpperA(*p++)) {
 				case L'F':
 					flagDefaultPos &= ~(4 | 8 | 16 | 32);
@@ -6586,16 +6590,10 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 		if (StrHasPrefixCase(opt, L"sysmru=")) {
 			opt += CSTRLEN(L"sysmru=");
 			if (opt[1] == L'\0') {
-				switch (*opt) {
-				case L'0':
-					flagUseSystemMRU = 1;
+				const UINT value = opt[0] - L'0';
+				if (value < TripleBoolean_NotSet) {
+					flagUseSystemMRU = (TripleBoolean)value;
 					state = CommandParseState_Consumed;
-					break;
-
-				case L'1':
-					flagUseSystemMRU = 2;
-					state = CommandParseState_Consumed;
-					break;
 				}
 			}
 		}
@@ -6671,13 +6669,13 @@ void ParseCommandLine(void) {
 			if (lp1[1] == L'\0') {
 				switch (*lp1) {
 				case L'+':
-					flagMultiFileArg = 2;
+					flagMultiFileArg = TripleBoolean_True;
 					bIsFileArg = true;
 					state = CommandParseState_Consumed;
 					break;
 
 				case L'-':
-					flagMultiFileArg = 1;
+					flagMultiFileArg = TripleBoolean_False;
 					bIsFileArg = true;
 					state = CommandParseState_Consumed;
 					break;
@@ -6690,7 +6688,7 @@ void ParseCommandLine(void) {
 				lstrcpy(lp3, lp2);
 				continue;
 			}
-			if (state == CommandParseState_Argument && flagMultiFileArg == 2) {
+			if (state == CommandParseState_Argument && flagMultiFileArg == TripleBoolean_True) {
 				ExtractFirstArgument(lp3, lp1, lp2);
 			}
 		}
@@ -6704,7 +6702,7 @@ void ParseCommandLine(void) {
 			}
 
 			lpFileArg = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (MAX_PATH + 2)); // changed for ActivatePrevInst() needs
-			if (flagMultiFileArg == 2) {
+			if (flagMultiFileArg == TripleBoolean_True) {
 				// multiple file arguments with quoted spaces
 				lstrcpyn(lpFileArg, lp1, MAX_PATH);
 			} else {
@@ -6722,7 +6720,7 @@ void ParseCommandLine(void) {
 				lstrcpy(lpFileArg, wchPath);
 			}
 
-			if (flagMultiFileArg == 2) {
+			if (flagMultiFileArg == TripleBoolean_True) {
 				cchiFileList = lstrlen(lpCmdLine) - lstrlen(lp3);
 
 				while (cFileList < 32 && ExtractFirstArgument(lp3, lpFileBuf, lp3)) {
@@ -6770,11 +6768,11 @@ void LoadFlags(void) {
 		flagSingleFileInstance = bSingleFileInstance;
 	}
 	if (IniSectionGetBool(pIniSection, L"ReadOnlyMode", false)) {
-		flagReadOnlyMode |= 2;
+		flagReadOnlyMode |= ReadOnlyMode_AllFile;
 	}
-	if (flagMultiFileArg == 0) {
+	if (flagMultiFileArg == TripleBoolean_NotSet) {
 		if (IniSectionGetBool(pIniSection, L"MultiFileArg", false)) {
-			flagMultiFileArg = 2;
+			flagMultiFileArg = TripleBoolean_True;
 		}
 	}
 
@@ -6815,9 +6813,9 @@ void LoadFlags(void) {
 		}
 	}
 
-	if (flagUseSystemMRU == 0) {
+	if (flagUseSystemMRU == TripleBoolean_NotSet) {
 		if (IniSectionGetBool(pIniSection, L"ShellUseSystemMRU", true)) {
-			flagUseSystemMRU = 2;
+			flagUseSystemMRU = TripleBoolean_True;
 		}
 	}
 
@@ -7424,7 +7422,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		AutoSave_Stop(TRUE);
 		// Terminate file watching
 		if (bResetFileWatching) {
-			iFileWatchingMode = 0;
+			iFileWatchingMode = FileWatchingMode_None;
 		}
 		InstallFileWatching(true);
 
@@ -7537,14 +7535,14 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		}
 
 		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
-		if (flagUseSystemMRU == 2) {
+		if (flagUseSystemMRU == TripleBoolean_True) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
 
 		AutoSave_Stop(!(loadFlag & FileLoadFlag_Reload));
 		// Install watching of the current file
 		if (!(loadFlag & FileLoadFlag_Reload) && bResetFileWatching) {
-			iFileWatchingMode = 0;
+			iFileWatchingMode = FileWatchingMode_None;
 		}
 		InstallFileWatching(false);
 
@@ -7559,9 +7557,9 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			}
 		}
 		// open file in read only mode
-		if (binary || flagReadOnlyMode || bReadOnlyFile) {
+		if (binary || flagReadOnlyMode != ReadOnlyMode_None || bReadOnlyFile) {
 			bReadOnlyMode = true;
-			flagReadOnlyMode &= 2;
+			flagReadOnlyMode &= ReadOnlyMode_AllFile;
 			SciCall_SetReadOnly(true);
 		} else {
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -7754,7 +7752,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 			bDocumentModified = false;
 			iOriginalEncoding = iCurrentEncoding;
 			MRU_AddFile(pFileMRU, szCurFile, flagRelativeFileMRU, flagPortableMyDocs);
-			if (flagUseSystemMRU == 2) {
+			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
 			if (flagRelaunchElevated == 2 && (saveFlag & FileSaveFlag_SaveAs) && iPathNameFormat == TitlePathNameFormat_NameOnly) {
@@ -7764,7 +7762,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 
 			// Install watching of the current file
 			if ((saveFlag & FileSaveFlag_SaveAs) && bResetFileWatching) {
-				iFileWatchingMode = 0;
+				iFileWatchingMode = FileWatchingMode_None;
 			}
 			InstallFileWatching(false);
 		}
@@ -8045,7 +8043,7 @@ bool ActivatePrevInst(void) {
 
 				LPNP2PARAMS params = (LPNP2PARAMS)GlobalAlloc(GPTR, cb);
 				params->flagFileSpecified = false;
-				params->flagReadOnlyMode = flagReadOnlyMode & true;
+				params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;
 				params->flagLexerSpecified = flagLexerSpecified;
 				params->flagQuietCreate = false;
 				params->flagTitleExcerpt = false;
@@ -8132,7 +8130,7 @@ bool ActivatePrevInst(void) {
 				LPNP2PARAMS params = (LPNP2PARAMS)GlobalAlloc(GPTR, cb);
 				lstrcpy(&params->wchData, lpFileArg);
 				params->flagFileSpecified = true;
-				params->flagReadOnlyMode = flagReadOnlyMode & true;
+				params->flagReadOnlyMode = flagReadOnlyMode & ReadOnlyMode_Current;
 				params->flagLexerSpecified = flagLexerSpecified;
 				params->flagQuietCreate = flagQuietCreate;
 				params->flagJumpTo = flagJumpTo;
@@ -8184,7 +8182,7 @@ bool ActivatePrevInst(void) {
 //
 //
 bool RelaunchMultiInst(void) {
-	if (flagMultiFileArg == 2 && cFileList > 1) {
+	if (flagMultiFileArg == TripleBoolean_True && cFileList > 1) {
 		LPWSTR lpCmdLineNew = StrDup(GetCommandLine());
 		const size_t cmdSize = sizeof(WCHAR) * (lstrlen(lpCmdLineNew) + 1);
 		LPWSTR lp1 = (LPWSTR)NP2HeapAlloc(cmdSize);
@@ -8239,7 +8237,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 	wsprintf(tch, L"-appid=\"%s\"", g_wchAppUserModelID);
 	lstrcpy(szParameters, tch);
 
-	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == 2));
+	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU & TripleBoolean_True));
 	lstrcat(szParameters, tch);
 
 	lstrcat(szParameters, L" -f");
@@ -8570,7 +8568,7 @@ void ShowNotificationMessage(int notifyPos, UINT uidMessage, ...) {
 //
 //
 void InstallFileWatching(bool terminate) {
-	terminate = terminate || !iFileWatchingMode || StrIsEmpty(szCurFile);
+	terminate = terminate || iFileWatchingMode == FileWatchingMode_None || StrIsEmpty(szCurFile);
 	// Terminate
 	if (bRunningWatch) {
 		if (hChangeHandle) {
@@ -8629,7 +8627,7 @@ static void CheckCurrentFileChangedOutsideApp(void) {
 			FindCloseChangeNotification(hChangeHandle);
 			hChangeHandle = NULL;
 		}
-		if (iFileWatchingMode == 2) {
+		if (iFileWatchingMode == FileWatchingMode_AutoReload) {
 			bRunningWatch = true;
 			dwChangeNotifyTime = GetTickCount();
 		} else {

@@ -33,6 +33,19 @@
 
 #define MAX_INI_SECTION_SIZE_STYLES			(8 * 1024)
 
+typedef enum LineHighlightMode {
+	LineHighlightMode_None = 0,
+	LineHighlightMode_BackgroundColor,
+	LineHighlightMode_OutlineFrame,
+} LineHighlightMode;
+
+typedef enum CaretStyle {
+	CaretStyle_Block = 0,
+	CaretStyle_LineWidth1,
+	CaretStyle_LineWidth2,
+	CaretStyle_LineWidth3,
+} CaretStyle;
+
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern bool bUse2ndGlobalStyle;

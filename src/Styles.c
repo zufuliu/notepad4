@@ -317,8 +317,8 @@ static bool fWarnedNoIniFile = false;
 static int	defaultBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER; // 11 pt
 static int iBaseFontSize = 11*SC_FONT_SIZE_MULTIPLIER;
 int		iFontQuality = SC_EFF_QUALITY_LCD_OPTIMIZED;
-int		iCaretStyle = 1; // width 1, 0 for block
-int		iOvrCaretStyle = 0; // 0 for bar, 1 for block
+CaretStyle iCaretStyle = CaretStyle_LineWidth1;
+bool bBlockCaretForOVRMode = false;
 bool bBlockCaretOutSelection = false;
 int		iCaretBlinkPeriod = -1; // system default, 0 for noblink
 static bool bBookmarkColorUpdated;
@@ -338,7 +338,7 @@ extern int	iCurrentEncoding;
 extern int	g_DOSEncoding;
 extern int	iDefaultCodePage;
 extern int	iDefaultCharSet;
-extern INT	iHighlightCurrentLine;
+extern LineHighlightMode iHighlightCurrentLine;
 extern bool	bShowBookmarkMargin;
 extern int	iZoomLevel;
 
@@ -1206,10 +1206,10 @@ void Style_OnStyleThemeChanged(int theme) {
 }
 
 void Style_UpdateCaret(void) {
-	int iValue = iCaretStyle;
+	int iValue = (int)iCaretStyle;
 	// caret style and width
 	const int style = (iValue ? CARETSTYLE_LINE : CARETSTYLE_BLOCK)
-		| (iOvrCaretStyle ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR)
+		| (bBlockCaretForOVRMode ? CARETSTYLE_OVERSTRIKE_BLOCK : CARETSTYLE_OVERSTRIKE_BAR)
 		| (bBlockCaretOutSelection ? CARETSTYLE_BLOCK_AFTER : 0);
 	SciCall_SetCaretStyle(style);
 	// caret width
@@ -3032,10 +3032,9 @@ void Style_SetLongLineColors(void) {
 // Style_HighlightCurrentLine()
 //
 void Style_HighlightCurrentLine(void) {
-	if (iHighlightCurrentLine != 0) {
+	if (iHighlightCurrentLine != LineHighlightMode_None) {
 		LPCWSTR szValue = pLexGlobal->Styles[GlobalStyleIndex_CurrentLine].szValue;
-		// 1: background color, 2: outline frame
-		const bool outline = iHighlightCurrentLine == 2;
+		const bool outline = iHighlightCurrentLine == LineHighlightMode_OutlineFrame;
 		COLORREF rgb;
 		if (Style_StrGetColor(outline, szValue, &rgb)) {
 			int size = 0;
