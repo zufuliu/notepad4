@@ -185,7 +185,7 @@ bool		bReuseWindow		= false;
 static bool	flagStartAsTrayIcon	= false;
 bool		flagPortableMyDocs	= false;
 bool		flagGotoFavorites	= false;
-static int	iAutoRefreshRate	= 0; // unit: 1/10 sec
+static DWORD iAutoRefreshRate	= 0;
 bool		flagNoFadeHidden	= false;
 static int	iOpacityLevel		= 75;
 static bool	flagPosParam		= false;
@@ -482,7 +482,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE: {
 		// Init directory watching
 		if (iAutoRefreshRate) {
-			SetTimer(hwnd, ID_TIMER, (iAutoRefreshRate * 100), NULL);
+			SetTimer(hwnd, ID_TIMER, iAutoRefreshRate, NULL);
 		}
 		return MsgCreate(hwnd, wParam, lParam);
 	}
@@ -1753,22 +1753,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_SORT_NAME:
-		nSortFlags = DS_NAME;
-		DirList_Sort(hwndDirList, nSortFlags, fSortRev);
-		break;
-
 	case IDM_SORT_SIZE:
-		nSortFlags = DS_SIZE;
-		DirList_Sort(hwndDirList, nSortFlags, fSortRev);
-		break;
-
 	case IDM_SORT_TYPE:
-		nSortFlags = DS_TYPE;
-		DirList_Sort(hwndDirList, nSortFlags, fSortRev);
-		break;
-
 	case IDM_SORT_DATE:
-		nSortFlags = DS_LASTMOD;
+		nSortFlags = LOWORD(wParam) - IDM_SORT_NAME;
 		DirList_Sort(hwndDirList, nSortFlags, fSortRev);
 		break;
 
@@ -3003,13 +2991,10 @@ void LoadFlags(void) {
 	}
 
 	flagPortableMyDocs = IniSectionGetBool(pIniSection, L"PortableMyDocs", true);
-
-	int iValue = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 30);
-	iAutoRefreshRate = max_i(iValue, 0);
-
+	iAutoRefreshRate = IniSectionGetInt(pIniSection, L"AutoRefreshRate", 3000);
 	flagNoFadeHidden = IniSectionGetBool(pIniSection, L"NoFadeHidden", false);
 
-	iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
+	const int iValue = IniSectionGetInt(pIniSection, L"OpacityLevel", 75);
 	iOpacityLevel = validate_i(iValue, 0, 100, 75);
 
 	if (StrIsEmpty(g_wchAppUserModelID)) {
