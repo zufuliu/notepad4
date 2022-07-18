@@ -1184,7 +1184,6 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 		}
 		dwLastIOError = GetLastError();
 	} else {
-		DWORD dwBytesWritten;
 		if (cbData >= MAX_NON_UTF8_SIZE) {
 			// save as UTF-8 or ANSI
 			if (!(uFlags & (NCP_DEFAULT | NCP_UTF8))) {
@@ -1215,6 +1214,8 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 			}
 		}
 #endif
+
+		DWORD dwBytesWritten;
 		if (uFlags & NCP_UNICODE) {
 			SetEndOfFile(hFile);
 

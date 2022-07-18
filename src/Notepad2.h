@@ -104,6 +104,18 @@ NP2SettingsVersion_V1 = 1,
 NP2SettingsVersion_Current = NP2SettingsVersion_V1,
 };
 
+typedef enum EscFunction {
+	EscFunction_None = 0,
+	EscFunction_Minimize,
+	EscFunction_Exit,
+} EscFunction;
+
+typedef enum TitlePathNameFormat {
+	TitlePathNameFormat_NameOnly = 0,
+	TitlePathNameFormat_NameFirst,
+	TitlePathNameFormat_FullPath,
+} TitlePathNameFormat;
+
 #define INI_SECTION_NAME_NOTEPAD2				L"Notepad2"
 #define INI_SECTION_NAME_SETTINGS				L"Settings"
 #define INI_SECTION_NAME_FLAGS					L"Settings2"

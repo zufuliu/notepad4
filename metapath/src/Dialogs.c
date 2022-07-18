@@ -622,8 +622,8 @@ extern bool bAlwaysOnTop;
 extern bool bMinimizeToTray;
 extern bool fUseRecycleBin;
 extern bool fNoConfirmDelete;
-extern int  iStartupDir;
-extern int  iEscFunction;
+extern StartupDirectory iStartupDir;
+extern EscFunction iEscFunction;
 extern bool bReuseWindow;
 
 static INT_PTR CALLBACK GeneralPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
@@ -738,9 +738,9 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			CheckDlgButton(hwnd, IDC_NOCONFIRMDELETE, BST_CHECKED);
 		}
 
-		if (iStartupDir) {
+		if (iStartupDir != StartupDirectory_None) {
 			CheckDlgButton(hwnd, IDC_STARTUPDIR, BST_CHECKED);
-			if (iStartupDir == 1) {
+			if (iStartupDir == StartupDirectory_MRU) {
 				CheckRadioButton(hwnd, IDC_GOTOMRU, IDC_GOTOFAV, IDC_GOTOMRU);
 			} else {
 				CheckRadioButton(hwnd, IDC_GOTOMRU, IDC_GOTOFAV, IDC_GOTOFAV);
@@ -751,9 +751,9 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			EnableWindow(GetDlgItem(hwnd, IDC_GOTOFAV), FALSE);
 		}
 
-		if (iEscFunction) {
+		if (iEscFunction != EscFunction_None) {
 			CheckDlgButton(hwnd, IDC_ESCFUNCTION, BST_CHECKED);
-			if (iEscFunction == 1) {
+			if (iEscFunction == EscFunction_Minimize) {
 				CheckRadioButton(hwnd, IDC_ESCMIN, IDC_ESCEXIT, IDC_ESCMIN);
 			} else {
 				CheckRadioButton(hwnd, IDC_ESCMIN, IDC_ESCEXIT, IDC_ESCEXIT);
@@ -795,15 +795,15 @@ static INT_PTR CALLBACK AdvancedPageProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 			fNoConfirmDelete = IsButtonChecked(hwnd, IDC_NOCONFIRMDELETE);
 
 			if (IsButtonChecked(hwnd, IDC_STARTUPDIR)) {
-				iStartupDir = IsButtonChecked(hwnd, IDC_GOTOMRU) ? 1 : 2;
+				iStartupDir = IsButtonChecked(hwnd, IDC_GOTOMRU) ? StartupDirectory_MRU : StartupDirectory_Favorite;
 			} else {
-				iStartupDir = 0;
+				iStartupDir = StartupDirectory_None;
 			}
 
 			if (IsButtonChecked(hwnd, IDC_ESCFUNCTION)) {
-				iEscFunction = IsButtonChecked(hwnd, IDC_ESCMIN) ? 1 : 2;
+				iEscFunction = IsButtonChecked(hwnd, IDC_ESCMIN) ? EscFunction_Minimize : EscFunction_Exit;
 			} else {
-				iEscFunction = 0;
+				iEscFunction = EscFunction_None;
 			}
 
 			SetWindowLongPtr(hwnd, DWLP_MSGRESULT, PSNRET_NOERROR);
@@ -2299,8 +2299,8 @@ static INT_PTR CALLBACK FindWinDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 //
 //  Select metapath target application
 //
-extern int iUseTargetApplication;
-extern int iTargetApplicationMode;
+extern UseTargetApplication iUseTargetApplication;
+extern TargetApplicationMode iTargetApplicationMode;
 extern int cxTargetApplicationDlg;
 extern bool bLoadLaunchSetingsLoaded;
 extern WCHAR szTargetApplication[MAX_PATH];
@@ -2364,8 +2364,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		if (!bLoadLaunchSetingsLoaded) {
 			LoadLaunchSetings();
 		}
-		if (iUseTargetApplication) {
+		if (iUseTargetApplication != UseTargetApplication_None) {
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_TARGET);
+			CheckRadioButton(hwnd, IDC_ALWAYSRUN, IDC_USEDDE, IDC_ALWAYSRUN + (int)iTargetApplicationMode);
 		} else {
 			CheckRadioButton(hwnd, IDC_LAUNCH, IDC_TARGET, IDC_LAUNCH);
 		}
@@ -2378,14 +2379,7 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			StrCatBuff(wch, szTargetApplicationParams, COUNTOF(wch));
 		}
 		SetDlgItemText(hwnd, IDC_TARGETPATH, wch);
-
-		if (iUseTargetApplication) {
-			const int i = clamp_i(iTargetApplicationMode, 0, 2);
-			CheckRadioButton(hwnd, IDC_ALWAYSRUN, IDC_USEDDE, IDC_ALWAYSRUN + i);
-		}
-
 		lstrcpy(szTargetWndClass, szTargetApplicationWndClass);
-
 		SetDlgItemText(hwnd, IDC_DDEMSG, szDDEMsg);
 		SetDlgItemText(hwnd, IDC_DDEAPP, szDDEApp);
 		SetDlgItemText(hwnd, IDC_DDETOPIC, szDDETopic);
@@ -2548,31 +2542,32 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 				IniSectionOnSave *pIniSection = &section;
 				pIniSection->next = pIniSectionBuf;
+				const bool useTarget = IsButtonChecked(hwnd, IDC_LAUNCH);
 
-				if (IsButtonChecked(hwnd, IDC_LAUNCH)) {
-					iUseTargetApplication = 0;
-					iTargetApplicationMode = 0;
+				if (useTarget) {
+					iUseTargetApplication = UseTargetApplication_None;
+					iTargetApplicationMode = TargetApplicationMode_None;
 					StrCpyExW(szTargetApplication, L"");
 					StrCpyExW(szTargetApplicationParams, L"");
 				} else {
-					iUseTargetApplication = 1;
+					iUseTargetApplication = UseTargetApplication_Use;
 					GetDlgItemText(hwnd, IDC_TARGETPATH, tch, COUNTOF(tch));
 					ExtractFirstArgument(tch, szTargetApplication, szTargetApplicationParams);
 					if (IsButtonChecked(hwnd, IDC_ALWAYSRUN)) {
-						iTargetApplicationMode = 0;
+						iTargetApplicationMode = TargetApplicationMode_None;
 					} else if (IsButtonChecked(hwnd, IDC_SENDDROPMSG)) {
-						iTargetApplicationMode = 1;
+						iTargetApplicationMode = TargetApplicationMode_SendMsg;
 					} else {
-						iTargetApplicationMode = 2;
+						iTargetApplicationMode = TargetApplicationMode_UseDDE;
 					}
 				}
 
-				IniSectionSetBool(pIniSection, L"UseTargetApplication", iUseTargetApplication);
-				IniSectionSetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
+				IniSectionSetBool(pIniSection, L"UseTargetApplication", useTarget);
+				IniSectionSetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);
 				IniSectionSetString(pIniSection, L"TargetApplicationPath", szTargetApplication);
 				IniSectionSetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams);
 
-				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && iUseTargetApplication) {
+				if (IsButtonChecked(hwnd, IDC_SENDDROPMSG) && useTarget) {
 					lstrcpy(szTargetApplicationWndClass, szTargetWndClass);
 				} else {
 					StrCpyExW(szTargetApplicationWndClass, L"");

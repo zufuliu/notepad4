@@ -28,8 +28,8 @@
 #include "Dlapi.h"
 
 //==== DirList ================================================================
-//==== DLDATA Structure =======================================================
 
+//==== DLDATA Structure =======================================================
 typedef struct DLDATA { // dl
 	BackgroundWorker worker;	// where HWND is ListView Control
 	UINT cbidl;					// Size of pidl

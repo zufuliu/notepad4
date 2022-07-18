@@ -94,8 +94,8 @@ static int iDefaultOpenMenu;
 static int iShiftOpenMenu;
 bool	bTrackSelect;
 bool	bFullRowSelect;
-int		iStartupDir;
-int		iEscFunction;
+StartupDirectory iStartupDir;
+EscFunction iEscFunction;
 bool	bFocusEdit;
 bool	bAlwaysOnTop;
 static bool bTransparentMode;
@@ -154,8 +154,8 @@ static UINT wFuncCopyMove = FO_COPY;
 
 static UINT msgTaskbarCreated = 0;
 
-int		iUseTargetApplication = 4;
-int		iTargetApplicationMode = 0;
+UseTargetApplication iUseTargetApplication = UseTargetApplication_NotSet;
+TargetApplicationMode iTargetApplicationMode = TargetApplicationMode_None;
 WCHAR	szTargetApplication[MAX_PATH] = L"";
 WCHAR	szTargetApplicationParams[MAX_PATH] = L"";
 WCHAR	szTargetApplicationWndClass[MAX_PATH] = L"";
@@ -446,9 +446,9 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (lpPathArg) {
 		DisplayPath(lpPathArg, IDS_ERR_CMDLINE);
 		GlobalFree(lpPathArg);
-	} else if (iStartupDir) {
+	} else if (iStartupDir != StartupDirectory_None) {
 		// Use a startup directory
-		if (iStartupDir == 1) {
+		if (iStartupDir == StartupDirectory_MRU) {
 			if (!StrIsEmpty(szMRUDirectory)) {
 				GetModuleFileName(NULL, szMRUDirectory, COUNTOF(szMRUDirectory));
 				PathRemoveFileSpec(szMRUDirectory);
@@ -1794,9 +1794,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case ACC_ESCAPE:
 		if (ComboBox_GetDroppedState(hwndDriveBox)) {
 			ComboBox_ShowDropdown(hwndDriveBox, FALSE);
-		} else if (iEscFunction == 1) {
+		} else if (iEscFunction == EscFunction_Minimize) {
 			SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
-		} else if (iEscFunction == 2) {
+		} else if (iEscFunction == EscFunction_Exit) {
 			SendMessage(hwnd, WM_CLOSE, 0, 0);
 		}
 		break;
@@ -2458,8 +2458,8 @@ void LoadSettings(void) {
 	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", false);
 	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", false);
 
-	int iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
-	iEscFunction = clamp_i(iValue, 0, 2);
+	int iValue = IniSectionGetInt(pIniSection, L"EscFunction", EscFunction_None);
+	iEscFunction = (EscFunction)clamp_i(iValue, EscFunction_None, EscFunction_Exit);
 
 	if (IsVistaAndAbove()) {
 		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", false);
@@ -2467,8 +2467,8 @@ void LoadSettings(void) {
 		bUseXPFileDialog = true;
 	}
 
-	iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", 1);
-	iStartupDir = clamp_i(iValue, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", StartupDirectory_MRU);
+	iStartupDir = (StartupDirectory)clamp_i(iValue, StartupDirectory_None, StartupDirectory_Favorite);
 
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
@@ -2521,7 +2521,7 @@ void LoadSettings(void) {
 	}
 
 	iValue = IniSectionGetInt(pIniSection, L"SortOptions", DS_NAME);
-	nSortFlags = clamp_i(iValue, 0, 3);
+	nSortFlags = clamp_i(iValue, DS_NAME, DS_LASTMOD);
 
 	fSortRev = IniSectionGetBool(pIniSection, L"SortReverse", false);
 
@@ -2676,7 +2676,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	}
 
 	if (!bSaveSettings && !bSaveSettingsNow) {
-		if (iStartupDir == 1) {
+		if (iStartupDir == StartupDirectory_MRU) {
 			IniSetString(INI_SECTION_NAME_SETTINGS, L"MRUDirectory", szCurDir);
 		}
 		IniSetBoolEx(INI_SECTION_NAME_SETTINGS, L"SaveSettings", bSaveSettings, true);
@@ -2703,14 +2703,14 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, false);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, false);
 	IniSectionSetBoolEx(pIniSection, L"WindowLayoutRTL", bWindowLayoutRTL, false);
-	IniSectionSetIntEx(pIniSection, L"EscFunction", iEscFunction, 0);
+	IniSectionSetIntEx(pIniSection, L"EscFunction", (int)iEscFunction, EscFunction_None);
 
 	if (IsVistaAndAbove()) {
 		IniSectionSetBoolEx(pIniSection, L"UseXPFileDialog", bUseXPFileDialog, false);
 	}
 
-	IniSectionSetIntEx(pIniSection, L"StartupDirectory", iStartupDir, 1);
-	if (iStartupDir == 1) {
+	IniSectionSetIntEx(pIniSection, L"StartupDirectory", (int)iStartupDir, StartupDirectory_MRU);
+	if (iStartupDir == StartupDirectory_MRU) {
 		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
 	}
 	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
@@ -2806,43 +2806,49 @@ void ClearWindowPositionHistory(void) {
 //  ParseCommandLine()
 //
 //
-int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
+typedef enum CommandParseState {
+	CommandParseState_None,
+	CommandParseState_Consumed,
+	CommandParseState_Argument,
+} CommandParseState;
+
+CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 	LPWSTR opt = lp1 + 1;
 	// only accept /opt, -opt, --opt
 	if (*opt == L'-') {
 		++opt;
 	}
 	if (*opt == L'\0') {
-		return 0;
+		return CommandParseState_None;
 	}
 
-	int state = 0;
+	CommandParseState state = CommandParseState_None;
 	const int ch = ToUpperA(*opt);
 
 	if (opt[1] == L'\0') {
 		switch (ch) {
 		case L'F':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				lstrcpyn(szIniFile, lp1, COUNTOF(szIniFile));
 				TrimString(szIniFile);
 				PathUnquoteSpaces(szIniFile);
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'G':
 			flagGotoFavorites = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'I':
 			flagStartAsTrayIcon = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'M':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				if (lpFilterArg) {
 					NP2HeapFree(lpFilterArg);
@@ -2850,23 +2856,23 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 
 				lpFilterArg = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (lstrlen(lp1) + 1));
 				lstrcpy(lpFilterArg, lp1);
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'N':
 			flagNoReuseWindow = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'P':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				int cord[4] = { 0 };
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok == 4) {
 					flagPosParam = true;
-					state = 1;
+					state = CommandParseState_Consumed;
 					wi.x = cord[0];
 					wi.y = cord[1];
 					wi.cx = cord[2];
@@ -2890,7 +2896,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 		case L'F':
 			if (chNext == L'0' || chNext == L'O') {
 				StrCpyExW(szIniFile, L"*?");
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
@@ -2899,7 +2905,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2) {
 			case L'D':
 			case L'S':
 				flagPosParam = true;
-				state = 1;
+				state = CommandParseState_Consumed;
 				wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
 				break;
 			}
@@ -2945,8 +2951,8 @@ void ParseCommandLine(void) {
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (*lp1 == L'/' || *lp1 == L'-') {
-			const int state = ParseCommandLineOption(lp1, lp2);
-			if (state == 1) {
+			const CommandParseState state = ParseCommandLineOption(lp1, lp2);
+			if (state == CommandParseState_Consumed) {
 				lstrcpy(lp3, lp2);
 				continue;
 			}
@@ -3557,18 +3563,20 @@ void LoadLaunchSetings(void) {
 	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cchIniSection);
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
-	iUseTargetApplication = IniSectionGetInt(pIniSection, L"UseTargetApplication", 0xFB);
-	if (iUseTargetApplication != 0xFB) {
+	int iValue = IniSectionGetInt(pIniSection, L"UseTargetApplication", UseTargetApplication_Magic);
+	iUseTargetApplication = (UseTargetApplication)iValue;
+	if (iUseTargetApplication != UseTargetApplication_Magic) {
 		IniSectionGetString(pIniSection, L"TargetApplicationPath", szTargetApplication, szTargetApplication, COUNTOF(szTargetApplication));
 		IniSectionGetString(pIniSection, L"TargetApplicationParams", szTargetApplicationParams, szTargetApplicationParams, COUNTOF(szTargetApplicationParams));
-		iTargetApplicationMode = IniSectionGetInt(pIniSection, L"TargetApplicationMode", iTargetApplicationMode);
+		iValue = IniSectionGetInt(pIniSection, L"TargetApplicationMode", (int)iTargetApplicationMode);
+		iTargetApplicationMode = (TargetApplicationMode)clamp_i(iValue, TargetApplicationMode_None, TargetApplicationMode_UseDDE);
 		IniSectionGetString(pIniSection, L"TargetApplicationWndClass", szTargetApplicationWndClass, szTargetApplicationWndClass, COUNTOF(szTargetApplicationWndClass));
 		IniSectionGetString(pIniSection, L"DDEMessage", szDDEMsg, szDDEMsg, COUNTOF(szDDEMsg));
 		IniSectionGetString(pIniSection, L"DDEApplication", szDDEApp, szDDEApp, COUNTOF(szDDEApp));
 		IniSectionGetString(pIniSection, L"DDETopic", szDDETopic, szDDETopic, COUNTOF(szDDETopic));
-	} else if (iUseTargetApplication && StrIsEmpty(szTargetApplication)) {
-		iUseTargetApplication = 1;
-		iTargetApplicationMode = 1;
+	} else if (iUseTargetApplication != UseTargetApplication_None && StrIsEmpty(szTargetApplication)) {
+		iUseTargetApplication = UseTargetApplication_Use;
+		iTargetApplicationMode = TargetApplicationMode_SendMsg;
 		lstrcpy(szTargetApplication, L"Notepad2.exe");
 		StrCpyExW(szTargetApplicationParams, L"");
 		lstrcpy(szTargetApplicationWndClass, WC_NOTEPAD2);
@@ -3587,12 +3595,13 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 	if (!bLoadLaunchSetingsLoaded) {
 		LoadLaunchSetings();
 	}
-	if (iUseTargetApplication == 4 || (iUseTargetApplication && StrIsEmpty(szTargetApplication))) {
+	if (iUseTargetApplication == UseTargetApplication_NotSet
+		|| (iUseTargetApplication != UseTargetApplication_None && StrIsEmpty(szTargetApplication))) {
 		ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_FINDTARGET), hwndMain, FindTargetDlgProc, 0);
 		return;
 	}
 
-	if (iUseTargetApplication && iTargetApplicationMode == 1) {
+	if (iUseTargetApplication != UseTargetApplication_None && iTargetApplicationMode == TargetApplicationMode_SendMsg) {
 		HWND hwnd = NULL;
 		if (!bOpenNew) { // hwnd == NULL
 			EnumWindows(EnumWindProcTargetApplication, (LPARAM)&hwnd);
@@ -3656,12 +3665,13 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 			ShellExecuteEx(&sei);
 		}
 	} else {
-		if (iUseTargetApplication && iTargetApplicationMode == 2
+		if (iUseTargetApplication != UseTargetApplication_None
+			&& iTargetApplicationMode == TargetApplicationMode_UseDDE
 			&& ExecDDECommand(lpFileName, szDDEMsg, szDDEApp, szDDETopic)) {
 			return;
 		}
 
-		if (!iUseTargetApplication && StrIsEmpty(lpFileName)) {
+		if (iUseTargetApplication == UseTargetApplication_None && StrIsEmpty(lpFileName)) {
 			return;
 		}
 
@@ -3697,7 +3707,7 @@ void LaunchTarget(LPCWSTR lpFileName, bool bOpenNew) {
 		sei.fMask = 0;
 		sei.hwnd = hwndMain;
 		sei.lpVerb = NULL;
-		if (iUseTargetApplication) {
+		if (iUseTargetApplication != UseTargetApplication_None) {
 			sei.lpFile = szFile;
 			sei.lpParameters = szParam;
 		} else {

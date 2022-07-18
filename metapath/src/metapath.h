@@ -88,6 +88,31 @@
 #define APPM_CENTER_MESSAGE_BOX		(WM_APP + 1)
 #define APPM_TRAYMESSAGE			(WM_APP + 4) // Callback Message from System Tray
 
+typedef enum EscFunction {
+	EscFunction_None = 0,
+	EscFunction_Minimize,
+	EscFunction_Exit,
+} EscFunction;
+
+typedef enum StartupDirectory {
+	StartupDirectory_None = 0,
+	StartupDirectory_MRU,
+	StartupDirectory_Favorite,
+} StartupDirectory;
+
+typedef enum UseTargetApplication {
+	UseTargetApplication_None = 0,
+	UseTargetApplication_Use,
+	UseTargetApplication_NotSet = 4,
+	UseTargetApplication_Magic,
+} UseTargetApplication;
+
+typedef enum TargetApplicationMode {
+	TargetApplicationMode_None = 0,
+	TargetApplicationMode_SendMsg,
+	TargetApplicationMode_UseDDE,
+} TargetApplicationMode;
+
 #define INI_SECTION_NAME_METAPATH			L"metapath"
 #define INI_SECTION_NAME_SETTINGS			L"Settings"
 #define INI_SECTION_NAME_FLAGS				L"Settings2"

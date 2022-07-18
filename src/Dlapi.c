@@ -30,7 +30,6 @@
 //==== DirList ================================================================
 
 //==== DLDATA Structure =======================================================
-
 typedef struct DLDATA { // dl
 	BackgroundWorker worker;	// where HWND is ListView Control
 	UINT cbidl;					// Size of pidl

@@ -110,7 +110,7 @@ static WCHAR tchToolbarButtons[MAX_TOOLBAR_BUTTON_CONFIG_BUFFER_SIZE];
 static LPWSTR tchToolbarBitmap = NULL;
 static LPWSTR tchToolbarBitmapHot = NULL;
 static LPWSTR tchToolbarBitmapDisabled = NULL;
-static int iPathNameFormat;
+static TitlePathNameFormat iPathNameFormat;
 bool	fWordWrapG;
 int		iWordWrapMode;
 int		iWordWrapIndent;
@@ -182,7 +182,7 @@ bool	bResetFileWatching;
 static DWORD dwFileCheckInterval;
 static DWORD dwAutoReloadTimeout;
 bool bUseXPFileDialog;
-static int iEscFunction;
+static EscFunction iEscFunction;
 static bool bAlwaysOnTop;
 static bool bMinimizeToTray;
 static bool bTransparentMode;
@@ -1603,7 +1603,7 @@ void UpdateWindowTitle(void) {
 		FormatString(szExcerptQuote, szExcerptFmt, IDS_TITLEEXCERPT, szTitleExcerpt);
 		lstrcat(szTitle, szExcerptQuote);
 	} else if (StrNotEmpty(szCurFile)) {
-		if (iPathNameFormat < 2 && !PathIsRoot(szCurFile)) {
+		if (iPathNameFormat != TitlePathNameFormat_FullPath && !PathIsRoot(szCurFile)) {
 			if (!StrEqual(szCachedFile, szCurFile)) {
 				SHFILEINFO shfi;
 				lstrcpy(szCachedFile, szCurFile);
@@ -1614,7 +1614,7 @@ void UpdateWindowTitle(void) {
 				}
 			}
 			lstrcat(szTitle, szCachedDisplayName);
-			if (iPathNameFormat == 1) {
+			if (iPathNameFormat == TitlePathNameFormat_NameFirst) {
 				WCHAR tchPath[MAX_PATH];
 				lstrcpyn(tchPath, szCurFile, COUNTOF(tchPath));
 				PathRemoveFileSpec(tchPath);
@@ -2729,22 +2729,12 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	if (StrNotEmpty(szTitleExcerpt)) {
 		i = IDM_VIEW_SHOWEXCERPT;
-	} else if (iPathNameFormat == 0) {
-		i = IDM_VIEW_SHOWFILENAMEONLY;
-	} else if (iPathNameFormat == 1) {
-		i = IDM_VIEW_SHOWFILENAMEFIRST;
 	} else {
-		i = IDM_VIEW_SHOWFULLPATH;
+		i = IDM_VIEW_SHOWFILENAMEONLY + (int)iPathNameFormat;
 	}
 	CheckMenuRadioItem(hmenu, IDM_VIEW_SHOWFILENAMEONLY, IDM_VIEW_SHOWEXCERPT, i, MF_BYCOMMAND);
 
-	if (iEscFunction == 1) {
-		i = IDM_VIEW_ESCMINIMIZE;
-	} else if (iEscFunction == 2) {
-		i = IDM_VIEW_ESCEXIT;
-	} else {
-		i = IDM_VIEW_NOESCFUNC;
-	}
+	i = IDM_VIEW_NOESCFUNC + (int)iEscFunction;
 	CheckMenuRadioItem(hmenu, IDM_VIEW_NOESCFUNC, IDM_VIEW_ESCEXIT, i, MF_BYCOMMAND);
 
 	i = StrNotEmpty(szIniFile);
@@ -4461,7 +4451,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_SHOWFILENAMEONLY:
 	case IDM_VIEW_SHOWFILENAMEFIRST:
 	case IDM_VIEW_SHOWFULLPATH:
-		iPathNameFormat = LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY;
+		iPathNameFormat = (TitlePathNameFormat)(LOWORD(wParam) - IDM_VIEW_SHOWFILENAMEONLY);
 		StrCpyExW(szTitleExcerpt, L"");
 		UpdateWindowTitle();
 		break;
@@ -4505,15 +4495,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	} break;
 
 	case IDM_VIEW_NOESCFUNC:
-		iEscFunction = 0;
-		break;
-
 	case IDM_VIEW_ESCMINIMIZE:
-		iEscFunction = 1;
-		break;
-
 	case IDM_VIEW_ESCEXIT:
-		iEscFunction = 2;
+		iEscFunction = (EscFunction)(LOWORD(wParam) - IDM_VIEW_NOESCFUNC);
 		break;
 
 	case IDM_VIEW_SAVESETTINGS:
@@ -4566,9 +4550,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		} else if (bInFullScreenMode) {
 			bInFullScreenMode = false;
 			ToggleFullScreenMode();
-		} else if (iEscFunction == 1) {
+		} else if (iEscFunction == EscFunction_Minimize) {
 			SendMessage(hwnd, WM_SYSCOMMAND, SC_MINIMIZE, 0);
-		} else if (iEscFunction == 2) {
+		} else if (iEscFunction == EscFunction_Exit) {
 			ExitApplication(hwnd);
 		}
 		break;
@@ -5540,8 +5524,8 @@ void LoadSettings(void) {
 		PathAbsoluteFromApp(strValue, tchFavoritesDir, true);
 	}
 
-	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", 1);
-	iPathNameFormat = clamp_i(iValue, 0, 2);
+	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", TitlePathNameFormat_NameFirst);
+	iPathNameFormat = (TitlePathNameFormat)clamp_i(iValue, TitlePathNameFormat_NameOnly, TitlePathNameFormat_FullPath);
 
 	fWordWrapG = IniSectionGetBool(pIniSection, L"WordWrap", true);
 
@@ -5690,8 +5674,8 @@ void LoadSettings(void) {
 	iAutoSaveOption = IniSectionGetInt(pIniSection, L"AutoSaveOption", AutoSaveOption_Default);
 	dwAutoSavePeriod = IniSectionGetInt(pIniSection, L"AutoSavePeriod", AutoSaveDefaultPeriod);
 
-	iValue = IniSectionGetInt(pIniSection, L"EscFunction", 0);
-	iEscFunction = clamp_i(iValue, 0, 2);
+	iValue = IniSectionGetInt(pIniSection, L"EscFunction", EscFunction_None);
+	iEscFunction = (EscFunction)clamp_i(iValue, EscFunction_None, EscFunction_Exit);
 
 	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", false);
 	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", false);
@@ -5898,7 +5882,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
 	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
 	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	IniSectionSetIntEx(pIniSection, L"PathNameFormat", iPathNameFormat, 1);
+	IniSectionSetIntEx(pIniSection, L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
 
 	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, true);
 	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
@@ -5983,7 +5967,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoSaveOption", iAutoSaveOption, AutoSaveOption_Default);
 	IniSectionSetIntEx(pIniSection, L"AutoSavePeriod", dwAutoSavePeriod, AutoSaveDefaultPeriod);
 
-	IniSectionSetIntEx(pIniSection, L"EscFunction", iEscFunction, 0);
+	IniSectionSetIntEx(pIniSection, L"EscFunction", (int)iEscFunction, EscFunction_None);
 	IniSectionSetBoolEx(pIniSection, L"AlwaysOnTop", bAlwaysOnTop, false);
 	IniSectionSetBoolEx(pIniSection, L"MinimizeToTray", bMinimizeToTray, false);
 	IniSectionSetBoolEx(pIniSection, L"TransparentMode", bTransparentMode, false);
@@ -6112,59 +6096,66 @@ void ClearWindowPositionHistory(void) {
 // ParseCommandLine()
 //
 //
-int ParseCommandLineEncoding(LPCWSTR opt, int idmLE, int idmBE) {
-	int flag = idmLE;
+typedef enum CommandParseState {
+	CommandParseState_None,
+	CommandParseState_Consumed,
+	CommandParseState_Argument,
+	CommandParseState_Unknown,
+} CommandParseState;
+
+CommandParseState ParseCommandLineEncoding(LPCWSTR opt) {
+	int flag = IDM_ENCODING_UNICODE;
 	if (*opt == '-') {
 		++opt;
 	}
 	if (StrHasPrefixCase(opt, L"LE")){
-		flag = idmLE;
+		flag = IDM_ENCODING_UNICODE;
 		opt += CSTRLEN(L"LE");
 		if (*opt == '-') {
 			++opt;
 		}
 	} else if (StrHasPrefixCase(opt, L"BE")) {
-		flag = idmBE;
+		flag = IDM_ENCODING_UNICODEREV;
 		opt += CSTRLEN(L"BE");
 		if (*opt == '-') {
 			++opt;
 		}
 	}
-	if (*opt == 0 || StrCaseEqual(opt, L"BOM") || StrCaseEqual(opt, L"SIG") || StrCaseEqual(opt, L"SIGNATURE")) {
+	if (*opt == L'\0' || StrCaseEqual(opt, L"BOM") || StrCaseEqual(opt, L"SIG") || StrCaseEqual(opt, L"SIGNATURE")) {
 		flagSetEncoding = flag - IDM_ENCODING_ANSI + 1;
-		return 1;
+		return CommandParseState_Consumed;
 	}
-	return 0;
+	return CommandParseState_None;
 }
 
-int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) {
+CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) {
 	LPWSTR opt = lp1 + 1;
 	// only accept /opt, -opt, --opt
 	if (*opt == L'-') {
 		++opt;
 	}
 	if (*opt == L'\0') {
-		return 0;
+		return CommandParseState_None;
 	}
 
-	int state = 0;
+	CommandParseState state = CommandParseState_None;
 	const int ch = ToUpperA(*opt);
 
 	if (opt[1] == L'\0') {
 		switch (ch) {
 		case L'A':
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'B':
 			flagPasteBoard = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'C':
 			flagNewFromClipboard = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'D':
@@ -6174,32 +6165,32 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			}
 			iInitialLexer = NP2LEX_TEXTFILE;
 			flagLexerSpecified = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'E':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				if (lpEncodingArg) {
 					LocalFree(lpEncodingArg);
 				}
 				lpEncodingArg = StrDup(lp1);
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'F':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				lstrcpyn(szIniFile, lp1, COUNTOF(szIniFile));
 				TrimString(szIniFile);
 				PathUnquoteSpaces(szIniFile);
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'G':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 #if defined(_WIN64)
 				int64_t cord[2] = { 0 };
@@ -6210,7 +6201,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 #endif
 				if (itok != 0) {
 					flagJumpTo = true;
-					state = 1;
+					state = CommandParseState_Consumed;
 					iInitialLine = cord[0];
 					iInitialColumn = cord[1];
 				}
@@ -6224,72 +6215,72 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			}
 			iInitialLexer = NP2LEX_HTML;
 			flagLexerSpecified = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'I':
 			flagStartAsTrayIcon = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'L':
 			flagChangeNotify = 2;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'N':
 			flagReuseWindow = false;
 			flagNoReuseWindow = true;
 			flagSingleFileInstance = false;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'O':
 			flagAlwaysOnTop = 2;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'Q':
 			flagQuietCreate = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'R':
 			flagReuseWindow = true;
 			flagNoReuseWindow = false;
 			flagSingleFileInstance = false;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'S':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				if (lpSchemeArg) {
 					LocalFree(lpSchemeArg);
 				}
 				lpSchemeArg = StrDup(lp1);
 				flagLexerSpecified = true;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'T':
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				lstrcpyn(szTitleExcerpt, lp1, COUNTOF(szTitleExcerpt));
 				fKeepTitleExcerpt = true;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'U':
 			flagRelaunchElevated = 1;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'W':
 			flagSetEncoding = IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'X':
@@ -6299,23 +6290,23 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			}
 			iInitialLexer = NP2LEX_XML;
 			flagLexerSpecified = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'Z':
 			ExtractFirstArgument(lp2, lp1, lp2);
 			flagMultiFileArg = 1;
 			*bIsNotepadReplacement = TRUE;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		case L'?':
 			flagDisplayHelp = true;
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 
 		default:
-			state = 3;
+			state = CommandParseState_Unknown;
 			break;
 		}
 	} else if (opt[2] == L'\0') {
@@ -6324,24 +6315,24 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		case L'C':
 			if (chNext == L'R') {
 				flagSetEOLMode = IDM_LINEENDINGS_CR - IDM_LINEENDINGS_CRLF + 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'F':
 			if (chNext == L'0' || chNext == L'O') {
 				StrCpyExW(szIniFile, L"*?");
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'L':
 			if (chNext == L'F') {
 				flagSetEOLMode = IDM_LINEENDINGS_LF - IDM_LINEENDINGS_CRLF + 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			} else if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
 				flagChangeNotify = 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
@@ -6350,14 +6341,14 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				flagReuseWindow = false;
 				flagNoReuseWindow = true;
 				flagSingleFileInstance = true;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		case L'O':
 			if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
 				flagAlwaysOnTop = 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
@@ -6366,31 +6357,31 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				flagReuseWindow = true;
 				flagNoReuseWindow = false;
 				flagSingleFileInstance = true;
-				state = 1;
+				state = CommandParseState_Consumed;
 			} else if (chNext == L'O') {
 				flagReadOnlyMode = 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
 		default:
-			state = 3;
+			state = CommandParseState_Unknown;
 			break;
 		}
 	} else {
-		state = 3;
+		state = CommandParseState_Unknown;
 	}
 
-	if (state != 3) {
+	if (state != CommandParseState_Unknown) {
 		return state;
 	}
 
-	state = 0;
+	state = CommandParseState_None;
 	switch (ch) {
 	case L'A':
 		if (StrCaseEqual(opt, L"ANSI")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
-			state = 1;
+			state = CommandParseState_Consumed;
 		} else if (StrHasPrefixCase(opt, L"appid=")) {
 			// Shell integration
 			opt += CSTRLEN(L"appid=");
@@ -6399,7 +6390,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			if (StrIsEmpty(g_wchAppUserModelID)) {
 				lstrcpy(g_wchAppUserModelID, MY_APPUSERMODELID);
 			}
-			state = 1;
+			state = CommandParseState_Consumed;
 		}
 		break;
 
@@ -6411,7 +6402,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			}
 			if (opt[2] == L'\0' && (*opt == L'L' || *opt == L'l') && (opt[1] == L'F' || opt[1] == L'f')) {
 				flagSetEOLMode = IDM_LINEENDINGS_CRLF - IDM_LINEENDINGS_CRLF + 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 		}
 		break;
@@ -6419,7 +6410,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 	case L'M':
 		if (StrCaseEqual(opt, L"MBCS")) {
 			flagSetEncoding = IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1;
-			state = 1;
+			state = CommandParseState_Consumed;
 		} else {
 			bool bFindUp = false;
 			bool bRegex = false;
@@ -6446,7 +6437,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				break;
 			}
 
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				if (lpMatchArg) {
 					LocalFree(lpMatchArg);
@@ -6454,7 +6445,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 
 				lpMatchArg = StrDup(lp1);
 				flagMatchText = 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 
 				if (bFindUp) {
 					flagMatchText |= 2;
@@ -6476,7 +6467,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			if (opt[1] == L'T' || opt[1] == L't') {
 				ExtractFirstArgument(lp2, lp1, lp2);
 			}
-			state = 1;
+			state = CommandParseState_Consumed;
 			break;
 		}
 
@@ -6495,7 +6486,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			if (opt[1] == L'\0') {
 				flagPosParam = true;
 				flagDefaultPos = 1;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
@@ -6504,7 +6495,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			if (opt[1] == L'\0' || (opt[2] == L'\0' && (opt[1] == L'L' || opt[1] == L'l'))) {
 				flagPosParam = true;
 				flagDefaultPos = (opt[1] == L'\0')? 2 : 3;
-				state = 1;
+				state = CommandParseState_Consumed;
 			}
 			break;
 
@@ -6517,7 +6508,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 			LPCWSTR p = opt;
 			flagPosParam = true;
 			flagDefaultPos = 0;
-			state = 1;
+			state = CommandParseState_Consumed;
 			while (*p && state == 1) {
 				switch (ToUpperA(*p++)) {
 				case L'F':
@@ -6553,7 +6544,7 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 					break;
 
 				default:
-					state = 0;
+					state = CommandParseState_None;
 					break;
 				}
 			}
@@ -6561,14 +6552,14 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 		break;
 
 		default:
-			state = 2;
+			state = CommandParseState_Argument;
 			if (ExtractFirstArgument(lp2, lp1, lp2)) {
 				int cord[5] = { 0 };
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok >= 4) {
 					flagPosParam = true;
 					flagDefaultPos = 0;
-					state = 1;
+					state = CommandParseState_Consumed;
 					wi.x = cord[0];
 					wi.y = cord[1];
 					wi.cx = cord[2];
@@ -6598,12 +6589,12 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				switch (*opt) {
 				case L'0':
 					flagUseSystemMRU = 1;
-					state = 1;
+					state = CommandParseState_Consumed;
 					break;
 
 				case L'1':
 					flagUseSystemMRU = 2;
-					state = 1;
+					state = CommandParseState_Consumed;
 					break;
 				}
 			}
@@ -6623,18 +6614,18 @@ int ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepadReplacement) 
 				}
 				if (*opt == L'\0') {
 					flagSetEncoding = IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1;
-					state = 1;
+					state = CommandParseState_Consumed;
 				} else if (StrCaseEqual(opt, L"BOM") || StrCaseEqual(opt, L"SIG") || StrCaseEqual(opt, L"SIGNATURE")) {
 					flagSetEncoding = IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1;
-					state = 1;
+					state = CommandParseState_Consumed;
 				}
 			} else if (*opt == L'1' && opt[1] == L'6') {
 				opt += 2;
-				state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
+				state = ParseCommandLineEncoding(opt);
 			}
 		} else if (StrHasPrefixCase(opt, L"UNICODE")) {
 			opt += CSTRLEN(L"UNICODE");
-			state = ParseCommandLineEncoding(opt, IDM_ENCODING_UNICODE, IDM_ENCODING_UNICODEREV);
+			state = ParseCommandLineEncoding(opt);
 		}
 		break;
 	}
@@ -6676,30 +6667,30 @@ void ParseCommandLine(void) {
 	while (ExtractFirstArgument(lp3, lp1, lp2)) {
 		// options
 		if (!bIsFileArg) {
-			int state = 0;
-			if (lp1[1] == 0) {
+			CommandParseState state = CommandParseState_None;
+			if (lp1[1] == L'\0') {
 				switch (*lp1) {
 				case L'+':
 					flagMultiFileArg = 2;
 					bIsFileArg = true;
-					state = 1;
+					state = CommandParseState_Consumed;
 					break;
 
 				case L'-':
 					flagMultiFileArg = 1;
 					bIsFileArg = true;
-					state = 1;
+					state = CommandParseState_Consumed;
 					break;
 				}
 			} else if (*lp1 == L'/' || *lp1 == L'-') {
 				state = ParseCommandLineOption(lp1, lp2, &bIsNotepadReplacement);
 			}
 
-			if (state == 1) {
+			if (state == CommandParseState_Consumed) {
 				lstrcpy(lp3, lp2);
 				continue;
 			}
-			if (state == 2 && flagMultiFileArg == 2) {
+			if (state == CommandParseState_Argument && flagMultiFileArg == 2) {
 				ExtractFirstArgument(lp3, lp1, lp2);
 			}
 		}
@@ -7766,8 +7757,8 @@ bool FileSave(FileSaveFlag saveFlag) {
 			if (flagUseSystemMRU == 2) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
-			if (flagRelaunchElevated == 2 && (saveFlag & FileSaveFlag_SaveAs) && iPathNameFormat == 0) {
-				iPathNameFormat = 1;
+			if (flagRelaunchElevated == 2 && (saveFlag & FileSaveFlag_SaveAs) && iPathNameFormat == TitlePathNameFormat_NameOnly) {
+				iPathNameFormat = TitlePathNameFormat_NameFirst;
 			}
 			UpdateDocumentModificationStatus();
 
