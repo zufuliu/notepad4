@@ -585,11 +585,14 @@ int Encoding_MapIniSetting(bool bLoad, UINT iSetting) {
 	}
 
 	if (bLoad) {
+		if ((int)iSetting < 0) {
+			return CPI_GLOBAL_DEFAULT; // default encoding
+		}
 		if (IsValidCodePage(iSetting)) {
 			iSetting = Encoding_GetIndex(iSetting);
 			return max_i(iSetting, CPI_FIRST);
 		}
-		return CPI_DEFAULT;
+		return CPI_DEFAULT; // unknown encoding
 	}
 	return mEncoding[iSetting].uCodePage;
 }

@@ -5619,14 +5619,8 @@ void LoadSettings(void) {
 	bViewWhiteSpace = IniSectionGetBool(pIniSection, L"ViewWhiteSpace", false);
 	bViewEOLs = IniSectionGetBool(pIniSection, L"ViewEOLs", false);
 
-	iValue = Encoding_MapIniSetting(false, CPI_UTF8);
-	iValue = IniSectionGetInt(pIniSection, L"DefaultEncoding", iValue);
-	iValue = Encoding_MapIniSetting(true, iValue);
-	if (!Encoding_IsValid(iValue)) {
-		iValue = CPI_UTF8;
-	}
-	iDefaultEncoding = iValue;
-
+	iValue = IniSectionGetInt(pIniSection, L"DefaultEncoding", -1);
+	iDefaultEncoding = Encoding_MapIniSetting(true, iValue);
 	bSkipUnicodeDetection = IniSectionGetBool(pIniSection, L"SkipUnicodeDetection", true);
 	bLoadANSIasUTF8 = IniSectionGetBool(pIniSection, L"LoadANSIasUTF8", true);
 	bLoadASCIIasUTF8 = IniSectionGetBool(pIniSection, L"LoadASCIIasUTF8", true);
@@ -5939,7 +5933,10 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ViewWhiteSpace", bViewWhiteSpace, false);
 	IniSectionSetBoolEx(pIniSection, L"ViewEOLs", bViewEOLs, false);
 
-	IniSectionSetIntEx(pIniSection, L"DefaultEncoding", Encoding_MapIniSetting(false, iDefaultEncoding), Encoding_MapIniSetting(false, CPI_UTF8));
+	if (iDefaultEncoding != CPI_GLOBAL_DEFAULT) {
+		iValue = Encoding_MapIniSetting(false, iDefaultEncoding);
+		IniSectionSetInt(pIniSection, L"DefaultEncoding", iValue);
+	}
 	IniSectionSetBoolEx(pIniSection, L"SkipUnicodeDetection", bSkipUnicodeDetection, true);
 	IniSectionSetBoolEx(pIniSection, L"LoadANSIasUTF8", bLoadANSIasUTF8, true);
 	IniSectionSetBoolEx(pIniSection, L"LoadASCIIasUTF8", bLoadASCIIasUTF8, true);

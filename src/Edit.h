@@ -357,6 +357,8 @@ void	EditShowCallTips(Sci_Position position);
 #define CPI_UTF8					6
 #define CPI_UTF8SIGN				7
 #define CPI_UTF7					8
+// global default encoding
+#define CPI_GLOBAL_DEFAULT			CPI_UTF8
 
 #define MAX_ENCODING_LABEL_SIZE		32
 // MultiByteToWideChar() and WideCharToMultiByte() uses int as length.
