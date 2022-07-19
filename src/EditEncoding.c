@@ -656,7 +656,7 @@ int Encoding_MatchA(LPCSTR pchTest) {
 }
 
 bool Encoding_IsValid(int iEncoding) {
-	return iEncoding >= CPI_FIRST && iEncoding < (int)COUNTOF(mEncoding)
+	return (UINT)iEncoding < COUNTOF(mEncoding)
 		&& IsValidEncoding(&mEncoding[iEncoding]);
 }
 

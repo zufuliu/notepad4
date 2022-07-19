@@ -2722,6 +2722,15 @@ bool Style_CanOpenFile(LPCWSTR lpszFile) {
 	return pLexNew != NULL || StrIsEmpty(lpszExt) || bDotFile || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
 }
 
+static inline bool IsC0ControlChar(uint8_t ch) {
+#if 1
+	return ch < 32 && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
+#else
+	// exclude whitespace and separator
+	return ch < 0x1c && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
+#endif
+}
+
 bool Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 #if 1
 	UNREFERENCED_PARAMETER(lpszFile);
@@ -2731,8 +2740,6 @@ bool Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	Treat the file as binary when we find two adjacent C0 control characters
 	(very common in file header) or some (currently set to 8) C0 control characters. */
 
-	// see tools/GenerateTable.py for this mask.
-	const UINT C0Mask = 0x0FFFC1FFU;
 	const Sci_Position headerLen = min_pos(1023, SciCall_GetLength() - 1);
 	const uint8_t *ptr = (const uint8_t *)SciCall_GetRangePointer(0, headerLen + 1);
 	if (ptr == NULL || headerLen <= 0) {
@@ -2743,10 +2750,10 @@ bool Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 	UINT count = 0;
 	while (ptr < end) {
 		uint8_t ch = *ptr++;
-		if (ch < 32 && ((C0Mask >> ch) & 1)) {
+		if (IsC0ControlChar(ch)) {
 			++count;
 			ch = *ptr++;
-			if ((count >= 8) || (ch < 32 && ((C0Mask >> ch) & 1))) {
+			if ((count >= 8) || IsC0ControlChar(ch)) {
 				return true;
 			}
 		}
