@@ -2137,8 +2137,7 @@ static INT_PTR CALLBACK WarnLineEndingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 	case WM_INITDIALOG: {
 		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		const EditFileIOStatus * const status = (EditFileIOStatus *)lParam;
-		int iEOLMode = status->iEOLMode;
-		iEOLMode = (iEOLMode == SC_EOL_CRLF) ? 0 : (iEOLMode == SC_EOL_LF) ? 1 : 2;
+		const int iEOLMode = GetSettingsEOLMode(status->iEOLMode);
 
 		// Load options
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_EOLMODELIST);

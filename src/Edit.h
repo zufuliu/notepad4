@@ -118,7 +118,11 @@ char*	EditGetClipboardText(HWND hwnd); // LocalFree()
 bool	EditCopyAppend(HWND hwnd);
 
 static inline int GetScintillaEOLMode(int mode) {
-	const int mask = SC_EOL_CRLF | (SC_EOL_LF << 2) | (SC_EOL_CR << 4);
+	const UINT mask = (SC_EOL_CRLF << 2*0) | (SC_EOL_LF << 2*1) | (SC_EOL_CR << 2*2);
+	return (mask >> (mode << 1)) & 3;
+}
+static inline int GetSettingsEOLMode(int mode) {
+	const UINT mask = (0 << 2*SC_EOL_CRLF) | (1 << 2*SC_EOL_LF) | (2 << 2*SC_EOL_CR);
 	return (mask >> (mode << 1)) & 3;
 }
 

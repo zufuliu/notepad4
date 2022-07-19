@@ -917,7 +917,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// EOL mode
 	if (0 != flagSetEOLMode) {
-		SendWMCommand(hwndMain, IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1);
+		SendWMCommand(hwndMain, IDM_LINEENDINGS_CRLF - 1 + flagSetEOLMode);
 		flagSetEOLMode = 0;
 	}
 
@@ -1306,7 +1306,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 					if (0 != params->flagSetEOLMode) {
 						flagSetEOLMode = params->flagSetEOLMode;
-						SendWMCommand(hwnd, IDM_LINEENDINGS_CRLF + flagSetEOLMode - 1);
+						SendWMCommand(hwnd, IDM_LINEENDINGS_CRLF - 1 + flagSetEOLMode);
 						flagSetEOLMode = 0;
 					}
 
@@ -2478,14 +2478,8 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 	CheckMenuRadioItem(hmenu, IDM_ENCODING_ANSI, IDM_ENCODING_UTF8SIGN, i, MF_BYCOMMAND);
 
-	if (iCurrentEOLMode == SC_EOL_CRLF) {
-		i = IDM_LINEENDINGS_CRLF;
-	} else if (iCurrentEOLMode == SC_EOL_LF) {
-		i = IDM_LINEENDINGS_LF;
-	} else {
-		i = IDM_LINEENDINGS_CR;
-	}
-	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_CR, i, MF_BYCOMMAND);
+	i = IDM_LINEENDINGS_CRLF + iCurrentEOLMode;
+	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_LF, i, MF_BYCOMMAND);
 
 	EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_GetCount(pFileMRU) > 0));
 
@@ -3151,7 +3145,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LINEENDINGS_CRLF:
 	case IDM_LINEENDINGS_LF:
 	case IDM_LINEENDINGS_CR: {
-		const int iNewEOLMode = GetScintillaEOLMode(LOWORD(wParam) - IDM_LINEENDINGS_CRLF);
+		const int iNewEOLMode = LOWORD(wParam) - IDM_LINEENDINGS_CRLF;
 		ConvertLineEndings(iNewEOLMode);
 	}
 	break;
@@ -5390,16 +5384,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				SendWMCommand(hwnd, IDM_ENCODING_SELECT);
 				return TRUE;
 
-			case STATUS_EOLMODE:
-				if (iCurrentEOLMode == SC_EOL_CRLF) {
-					iCurrentEOLMode = SC_EOL_LF;
-				} else if (iCurrentEOLMode == SC_EOL_LF) {
-					iCurrentEOLMode = SC_EOL_CR;
-				} else {
-					iCurrentEOLMode = SC_EOL_CRLF;
-				}
+			case STATUS_EOLMODE: {
+				const UINT mask = (SC_EOL_LF << 2*SC_EOL_CRLF) | (SC_EOL_CR << 2*SC_EOL_LF) | (SC_EOL_CRLF << 2*SC_EOL_CR);
+				iCurrentEOLMode = (mask >> (iCurrentEOLMode << 1)) & 3;
 				ConvertLineEndings(iCurrentEOLMode);
 				return TRUE;
+			}
 
 			case STATUS_LEXER:
 				SendWMCommand(hwnd, IDM_VIEW_SCHEME);
