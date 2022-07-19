@@ -245,7 +245,6 @@ public:
 	int WhitespaceSize();
 	void SetLineState(Line line, int state);
 	int LineState(Line line);
-	int MaxLineState();
 	int CaretLineFrame();
 	void SetCaretLineFrame(int width);
 	void StyleSetChangeable(int style, bool changeable);

@@ -381,7 +381,6 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_GETWHITESPACESIZE 2087
 #define SCI_SETLINESTATE 2092
 #define SCI_GETLINESTATE 2093
-#define SCI_GETMAXLINESTATE 2094
 #define SCI_GETCARETLINEFRAME 2704
 #define SCI_SETCARETLINEFRAME 2705
 #define SCI_STYLESETCHANGEABLE 2099

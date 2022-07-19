@@ -181,7 +181,6 @@ enum class Message {
 	GetWhitespaceSize = 2087,
 	SetLineState = 2092,
 	GetLineState = 2093,
-	GetMaxLineState = 2094,
 	GetCaretLineFrame = 2704,
 	SetCaretLineFrame = 2705,
 	StyleSetChangeable = 2099,

@@ -822,10 +822,6 @@ int ScintillaCall::LineState(Line line) {
 	return static_cast<int>(Call(Message::GetLineState, line));
 }
 
-int ScintillaCall::MaxLineState() {
-	return static_cast<int>(Call(Message::GetMaxLineState));
-}
-
 int ScintillaCall::CaretLineFrame() {
 	return static_cast<int>(Call(Message::GetCaretLineFrame));
 }

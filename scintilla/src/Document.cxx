@@ -2464,10 +2464,6 @@ int SCI_METHOD Document::GetLineState(Sci_Line line) const noexcept {
 	return States()->GetLineState(line);
 }
 
-Sci::Line Document::GetMaxLineState() const noexcept {
-	return States()->GetMaxLineState();
-}
-
 void SCI_METHOD Document::ChangeLexerState(Sci_Position start, Sci_Position end) {
 	const DocModification mh(ModificationFlags::LexerState, start,
 		end - start, 0, nullptr, 0);

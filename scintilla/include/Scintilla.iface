@@ -965,7 +965,7 @@ set void SetLineState=2092(line line, int state)
 get int GetLineState=2093(line line,)
 
 # Retrieve the last line number that has line state.
-get int GetMaxLineState=2094(,)
+#get int GetMaxLineState=2094(,)
 
 # Is the background of the line containing the caret in a different colour?
 #get bool GetCaretLineVisible=2095(,)

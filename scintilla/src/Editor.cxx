@@ -7412,9 +7412,6 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::GetLineState:
 		return pdoc->GetLineState(LineFromUPtr(wParam));
 
-	case Message::GetMaxLineState:
-		return pdoc->GetMaxLineState();
-
 	case Message::GetCaretLineVisibleAlways:
 		return vs.caretLine.alwaysShow;
 	case Message::SetCaretLineVisibleAlways:

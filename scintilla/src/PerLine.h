@@ -111,7 +111,6 @@ public:
 
 	int SetLineState(Sci::Line line, int state, Sci::Line lines);
 	int GetLineState(Sci::Line line) const noexcept;
-	Sci::Line GetMaxLineState() const noexcept;
 };
 
 class LineAnnotation : public PerLine {

@@ -563,7 +563,6 @@ public:
 
 	int SCI_METHOD SetLineState(Sci_Line line, int state) override;
 	int SCI_METHOD GetLineState(Sci_Line line) const noexcept override;
-	Sci::Line GetMaxLineState() const noexcept;
 	void SCI_METHOD ChangeLexerState(Sci_Position start, Sci_Position end) override;
 
 	StyledText MarginStyledText(Sci::Line line) const noexcept;

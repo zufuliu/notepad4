@@ -326,10 +326,6 @@ int LineState::GetLineState(Sci::Line line) const noexcept {
 	return 0;
 }
 
-Sci::Line LineState::GetMaxLineState() const noexcept {
-	return lineStates.Length();
-}
-
 // Each allocated LineAnnotation is a char array which starts with an AnnotationHeader
 // and then has text and optional styles.
 
