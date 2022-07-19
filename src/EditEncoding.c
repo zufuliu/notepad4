@@ -564,24 +564,24 @@ int Encoding_MapIniSetting(bool bLoad, UINT iSetting) {
 		return iSetting;
 	}
 	if (iSetting < 8) {
-		const UINT maskLoad = (CPI_DEFAULT << 3*0)
-			| (CPI_UNICODEBOM << 3*1)
-			| (CPI_UNICODEBEBOM << 3*2)
-			| (CPI_UTF8 << 3*3)
-			| (CPI_UTF8SIGN << 3*4)
-			| (CPI_OEM << 3*5)
-			| (CPI_UNICODE << 3*6)
-			| (CPI_UNICODEBE << 3*7);
-		const UINT maskStore = (0 << CPI_DEFAULT*3)
-			| (1 << CPI_UNICODEBOM*3)
-			| (2 << CPI_UNICODEBEBOM*3)
-			| (3 << CPI_UTF8*3)
-			| (4 << CPI_UTF8SIGN*3)
-			| (5 << CPI_OEM*3)
-			| (6 << CPI_UNICODE*3)
-			| (7 << CPI_UNICODEBE*3);
+		const UINT maskLoad = (CPI_DEFAULT << 4*0)
+			| (CPI_UNICODEBOM << 4*1)
+			| (CPI_UNICODEBEBOM << 4*2)
+			| (CPI_UTF8 << 4*3)
+			| (CPI_UTF8SIGN << 4*4)
+			| (CPI_OEM << 4*5)
+			| (CPI_UNICODE << 4*6)
+			| (CPI_UNICODEBE << 4*7);
+		const UINT maskStore = (0 << CPI_DEFAULT*4)
+			| (1 << CPI_UNICODEBOM*4)
+			| (2 << CPI_UNICODEBEBOM*4)
+			| (3 << CPI_UTF8*4)
+			| (4 << CPI_UTF8SIGN*4)
+			| (5 << CPI_OEM*4)
+			| (6 << CPI_UNICODE*4)
+			| (7 << CPI_UNICODEBE*4);
 		const UINT mask = bLoad ? maskLoad : maskStore;
-		return (mask >> (iSetting*3)) & 7;
+		return (mask >> (iSetting*4)) & 15;
 	}
 
 	if (bLoad) {

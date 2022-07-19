@@ -911,7 +911,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Encoding
 	if (0 != flagSetEncoding) {
-		SendWMCommand(hwndMain, IDM_ENCODING_ANSI + flagSetEncoding - 1);
+		SendWMCommand(hwndMain, IDM_ENCODING_ANSI - 1 + flagSetEncoding);
 		flagSetEncoding = 0;
 	}
 
@@ -1300,7 +1300,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 					if (0 != params->flagSetEncoding) {
 						flagSetEncoding = params->flagSetEncoding;
-						SendWMCommand(hwnd, IDM_ENCODING_ANSI + flagSetEncoding - 1);
+						SendWMCommand(hwnd, IDM_ENCODING_ANSI - 1 + flagSetEncoding);
 						flagSetEncoding = 0;
 					}
 
@@ -2462,19 +2462,14 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_RECODE_SELECT, i);
 
-	const UINT uFlags = mEncoding[iCurrentEncoding].uFlags;
-	if (uFlags & NCP_UNICODE_REVERSE) {
-		i = IDM_ENCODING_UNICODEREV;
-	} else if (uFlags & NCP_UNICODE) {
-		i = IDM_ENCODING_UNICODE;
-	} else if (uFlags & NCP_UTF8_SIGN) {
-		i = IDM_ENCODING_UTF8SIGN;
-	} else if (uFlags & NCP_UTF8) {
-		i = IDM_ENCODING_UTF8;
-	} else if (uFlags & NCP_DEFAULT) {
-		i = IDM_ENCODING_ANSI;
-	} else {
-		i = -1;
+	i = IDM_ENCODING_ANSI - 1;
+	if (iCurrentEncoding <= CPI_UTF8SIGN) {
+		const UINT mask = ((IDM_ENCODING_ANSI - IDM_ENCODING_ANSI + 1) << CPI_DEFAULT*4)
+			| ((IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI + 1) << CPI_UNICODEBOM*4)
+			| ((IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI + 1) << CPI_UNICODEBEBOM*4)
+			| ((IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI + 1) << CPI_UTF8*4)
+			| ((IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI + 1) << CPI_UTF8SIGN*4);
+		i += (mask >> (iCurrentEncoding*4)) & 15;
 	}
 	CheckMenuRadioItem(hmenu, IDM_ENCODING_ANSI, IDM_ENCODING_UTF8SIGN, i, MF_BYCOMMAND);
 
@@ -3063,26 +3058,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_ENCODING_UTF8SIGN:
 	case IDM_ENCODING_SELECT: {
 		int iNewEncoding = iCurrentEncoding;
-		if (LOWORD(wParam) == IDM_ENCODING_SELECT && !SelectEncodingDlg(hwnd, &iNewEncoding, IDS_SELRECT_CURRENT_ENCODING)) {
-			break;
-		}
-
-		switch (LOWORD(wParam)) {
-		case IDM_ENCODING_UNICODE:
-			iNewEncoding = CPI_UNICODEBOM;
-			break;
-		case IDM_ENCODING_UNICODEREV:
-			iNewEncoding = CPI_UNICODEBEBOM;
-			break;
-		case IDM_ENCODING_UTF8:
-			iNewEncoding = CPI_UTF8;
-			break;
-		case IDM_ENCODING_UTF8SIGN:
-			iNewEncoding = CPI_UTF8SIGN;
-			break;
-		case IDM_ENCODING_ANSI:
-			iNewEncoding = CPI_DEFAULT;
-			break;
+		if (LOWORD(wParam) == IDM_ENCODING_SELECT) {
+			if (!SelectEncodingDlg(hwnd, &iNewEncoding, IDS_SELRECT_CURRENT_ENCODING)) {
+				break;
+			}
+		} else {
+			const UINT mask = (CPI_DEFAULT << 4*(IDM_ENCODING_ANSI - IDM_ENCODING_ANSI))
+				| (CPI_UNICODEBOM << 4*(IDM_ENCODING_UNICODE - IDM_ENCODING_ANSI))
+				| (CPI_UNICODEBEBOM << 4*(IDM_ENCODING_UNICODEREV - IDM_ENCODING_ANSI))
+				| (CPI_UTF8 << 4*(IDM_ENCODING_UTF8 - IDM_ENCODING_ANSI))
+				| (CPI_UTF8SIGN << 4*(IDM_ENCODING_UTF8SIGN - IDM_ENCODING_ANSI));
+			iNewEncoding = (mask >> (4*(LOWORD(wParam) - IDM_ENCODING_ANSI))) & 15;
 		}
 
 		if (EditSetNewEncoding(iCurrentEncoding, iNewEncoding, flagSetEncoding, StrIsEmpty(szCurFile))) {
