@@ -362,6 +362,20 @@ static UINT languageMenu;
 //
 // Flags
 //
+enum {
+	DefaultPositionFlag_None = 0,
+	DefaultPositionFlag_SystemDefault = 1,
+	DefaultPositionFlag_DefaultLeft = 2,
+	DefaultPositionFlag_DefaultRight = 3,
+	DefaultPositionFlag_Custom = 4,
+	DefaultPositionFlag_AlignLeft = 4,
+	DefaultPositionFlag_AlignRight = 8,
+	DefaultPositionFlag_AlignTop = 16,
+	DefaultPositionFlag_AlignBottom = 32,
+	DefaultPositionFlag_FullArea = 64,
+	DefaultPositionFlag_Margin = 128,
+};
+
 typedef enum MatchTextFlag {
 	MatchTextFlag_None = 0,
 	MatchTextFlag_Default = 1,
@@ -397,7 +411,7 @@ bool 		fNoCGIGuess				= false;
 bool 		fNoAutoDetection		= false;
 bool		fNoFileVariables		= false;
 static bool	flagPosParam			= false;
-static int	flagDefaultPos			= 0;
+static int	flagDefaultPos			= DefaultPositionFlag_None;
 static bool	flagNewFromClipboard	= false;
 static bool	flagPasteBoard			= false;
 static int	flagSetEncoding			= 0;
@@ -718,48 +732,50 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	const bool defaultPos = (wi.x == CW_USEDEFAULT || wi.y == CW_USEDEFAULT || wi.cx == CW_USEDEFAULT || wi.cy == CW_USEDEFAULT);
 	RECT rc = { wi.x, wi.y, (defaultPos ? CW_USEDEFAULT : (wi.x + wi.cx)), (defaultPos ? CW_USEDEFAULT : (wi.y + wi.cy)) };
 
-	if (flagDefaultPos == 1) {
+	if (flagDefaultPos == DefaultPositionFlag_SystemDefault) {
 		wi.x = wi.y = wi.cx = wi.cy = CW_USEDEFAULT;
 		wi.max = 0;
-	} else if (flagDefaultPos >= 4) {
+	} else if (flagDefaultPos >= DefaultPositionFlag_Custom) {
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
-		if (flagDefaultPos & 8) {
-			wi.x = (rc.right - rc.left) / 2;
+		const int width = rc.right - rc.left;
+		const int height = rc.bottom - rc.top;
+		if (flagDefaultPos & DefaultPositionFlag_AlignRight) {
+			wi.x = width / 2;
 		} else {
 			wi.x = rc.left;
 		}
-		wi.cx = rc.right - rc.left;
-		if (flagDefaultPos & (4 | 8)) {
-			wi.cx /= 2;
+		wi.cx = width;
+		if (flagDefaultPos & (DefaultPositionFlag_AlignLeft | DefaultPositionFlag_AlignRight)) {
+			wi.cx = width / 2;
 		}
-		if (flagDefaultPos & 32) {
-			wi.y = (rc.bottom - rc.top) / 2;
+		if (flagDefaultPos & DefaultPositionFlag_AlignBottom) {
+			wi.y = height / 2;
 		} else {
 			wi.y = rc.top;
 		}
-		wi.cy = rc.bottom - rc.top;
-		if (flagDefaultPos & (16 | 32)) {
-			wi.cy /= 2;
+		wi.cy = height;
+		if (flagDefaultPos & (DefaultPositionFlag_AlignTop | DefaultPositionFlag_AlignBottom)) {
+			wi.cy = height / 2;
 		}
-		if (flagDefaultPos & 64) {
+		if (flagDefaultPos & DefaultPositionFlag_FullArea) {
 			wi.x = rc.left;
 			wi.y = rc.top;
-			wi.cx = rc.right - rc.left;
-			wi.cy = rc.bottom - rc.top;
+			wi.cx = width;
+			wi.cy = height;
 		}
-		if (flagDefaultPos & 128) {
-			wi.x += (flagDefaultPos & 8) ? 4 : 8;
-			wi.cx -= (flagDefaultPos & (4 | 8)) ? 12 : 16;
-			wi.y += (flagDefaultPos & 32) ? 4 : 8;
-			wi.cy -= (flagDefaultPos & (16 | 32)) ? 12 : 16;
+		if (flagDefaultPos & DefaultPositionFlag_Margin) {
+			wi.x += (flagDefaultPos & DefaultPositionFlag_AlignRight) ? 4 : 8;
+			wi.cx -= (flagDefaultPos & (DefaultPositionFlag_AlignLeft | DefaultPositionFlag_AlignRight)) ? 12 : 16;
+			wi.y += (flagDefaultPos & DefaultPositionFlag_AlignBottom) ? 4 : 8;
+			wi.cy -= (flagDefaultPos & (DefaultPositionFlag_AlignTop | DefaultPositionFlag_AlignBottom)) ? 12 : 16;
 		}
-	} else if (flagDefaultPos == 2 || flagDefaultPos == 3 || defaultPos) {
+	} else if (flagDefaultPos == DefaultPositionFlag_DefaultLeft || flagDefaultPos == DefaultPositionFlag_DefaultRight || defaultPos) {
 		// default window position
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
 		wi.y = rc.top + 16;
 		wi.cy = rc.bottom - rc.top - 32;
 		wi.cx = min_i(rc.right - rc.left - 32, wi.cy);
-		wi.x = (flagDefaultPos == 3) ? rc.left + 16 : rc.right - wi.cx - 16;
+		wi.x = (flagDefaultPos == DefaultPositionFlag_DefaultLeft) ? rc.left + 16 : rc.right - wi.cx - 16;
 	} else {
 		// fit window into working area of current monitor
 		HMONITOR hMonitor = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
@@ -6467,7 +6483,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 		case L'O':
 			if (opt[1] == L'\0') {
 				flagPosParam = true;
-				flagDefaultPos = 1;
+				flagDefaultPos = DefaultPositionFlag_SystemDefault;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6476,7 +6492,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 		case L'S':
 			if (opt[1] == L'\0' || (opt[2] == L'\0' && UnsafeUpper(opt[1]) == L'L')) {
 				flagPosParam = true;
-				flagDefaultPos = (opt[1] == L'\0')? 2 : 3;
+				flagDefaultPos = (opt[1] == L'\0')? DefaultPositionFlag_DefaultRight : DefaultPositionFlag_DefaultLeft;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6489,40 +6505,40 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 		case L'M': {
 			LPCWSTR p = opt;
 			flagPosParam = true;
-			flagDefaultPos = 0;
+			flagDefaultPos = DefaultPositionFlag_None;
 			state = CommandParseState_Consumed;
 			while (*p && state == CommandParseState_Consumed) {
 				switch (UnsafeUpper(*p++)) {
 				case L'F':
-					flagDefaultPos &= ~(4 | 8 | 16 | 32);
-					flagDefaultPos |= 64;
+					flagDefaultPos &= ~(DefaultPositionFlag_AlignLeft | DefaultPositionFlag_AlignRight | DefaultPositionFlag_AlignTop | DefaultPositionFlag_AlignBottom);
+					flagDefaultPos |= DefaultPositionFlag_FullArea;
 					break;
 
 				case L'L':
-					flagDefaultPos &= ~(8 | 64);
-					flagDefaultPos |= 4;
+					flagDefaultPos &= ~(DefaultPositionFlag_AlignRight | DefaultPositionFlag_FullArea);
+					flagDefaultPos |= DefaultPositionFlag_AlignLeft;
 					break;
 
 				case L'R':
-					flagDefaultPos &= ~(4 | 64);
-					flagDefaultPos |= 8;
+					flagDefaultPos &= ~(DefaultPositionFlag_AlignLeft | DefaultPositionFlag_FullArea);
+					flagDefaultPos |= DefaultPositionFlag_AlignRight;
 					break;
 
 				case L'T':
-					flagDefaultPos &= ~(32 | 64);
-					flagDefaultPos |= 16;
+					flagDefaultPos &= ~(DefaultPositionFlag_AlignBottom | DefaultPositionFlag_FullArea);
+					flagDefaultPos |= DefaultPositionFlag_AlignTop;
 					break;
 
 				case L'B':
-					flagDefaultPos &= ~(16 | 64);
-					flagDefaultPos |= 32;
+					flagDefaultPos &= ~(DefaultPositionFlag_AlignTop | DefaultPositionFlag_FullArea);
+					flagDefaultPos |= DefaultPositionFlag_AlignBottom;
 					break;
 
 				case L'M':
-					if (flagDefaultPos == 0) {
-						flagDefaultPos |= 64;
+					if (flagDefaultPos == DefaultPositionFlag_None) {
+						flagDefaultPos |= DefaultPositionFlag_FullArea;
 					}
-					flagDefaultPos |= 128;
+					flagDefaultPos |= DefaultPositionFlag_Margin;
 					break;
 
 				default:
@@ -6540,7 +6556,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 				const int itok = ParseCommaList(lp1, cord, COUNTOF(cord));
 				if (itok >= 4) {
 					flagPosParam = true;
-					flagDefaultPos = 0;
+					flagDefaultPos = DefaultPositionFlag_None;
 					state = CommandParseState_Consumed;
 					wi.x = cord[0];
 					wi.y = cord[1];
