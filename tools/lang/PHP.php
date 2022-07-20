@@ -1,6 +1,7 @@
 <?php
-// 8.1.5 https://www.php.net/
+// 8.2 https://www.php.net/
 // https://wiki.php.net/rfc
+// https://php.watch/versions
 
 //! keywords			=======================================================
 // https://www.php.net/manual/en/reserved.keywords.php
@@ -423,9 +424,11 @@ ini_alter()
 ini_get_all(?string $extension = null, bool $details = true): array|false
 ini_get(string $option): string|false
 ini_restore(string $option): void
+ini_parse_quantity(string $shorthand): int
 ini_set(string $option, string|int|float|bool|null $value): string|false
 memory_get_peak_usage(bool $real_usage = false): int
 memory_get_usage(bool $real_usage = false): int
+memory_reset_peak_usage(): void
 php_ini_loaded_file(): string|false
 php_ini_scanned_files(): string|false
 php_sapi_name(): string|false
@@ -762,6 +765,7 @@ class mysqli {
 	public connect(string $hostname =, string $username =, string $password =, string $database = "", int $port =, string $socket =): void
 	public debug(string $options): bool
 	public dump_debug_info(): bool
+	public execute_query(string $query, ?array $params = null): mysqli_result|bool
 	public get_charset(): ?object
 	public get_client_info(): string
 	public get_connection_stats(): array

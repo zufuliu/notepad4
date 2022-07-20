@@ -276,7 +276,8 @@ bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 		return true;
 	}
 
-	if (UnsafeLower(sc.GetRelative(2)) == 's') {
+	const char *tag = (block == HtmlTextBlock::Script) ? "script" : "style";
+	if (sc.styler.MatchLowerCase(sc.currentPos + 2, tag)) {
 		kwType = KeywordType::None;
 		tagType = HtmlTagType::None;
 		tagState = HtmlTagState::None;
@@ -895,7 +896,14 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_PHP_COMMENTLINE:
 		case js_style(SCE_JS_COMMENTLINE):
-			if (sc.atLineStart || (sc.state == SCE_PHP_COMMENTLINE && sc.Match('?', '>'))) {
+			if (sc.state == SCE_PHP_COMMENTLINE && sc.Match('?', '>')) {
+				lexer.HandleBlockEnd(HtmlTextBlock::PHP);
+				continue;
+			}
+			if (sc.state != SCE_PHP_COMMENTLINE && sc.Match('<', '/') && lexer.HandleBlockEnd(HtmlTextBlock::Script)) {
+				continue;// nop
+			}
+			if (sc.atLineStart) {
 				sc.SetState(GetDefaultStyle(sc.state));
 			} else {
 				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, GetTaskMarkerStyle(sc.state));

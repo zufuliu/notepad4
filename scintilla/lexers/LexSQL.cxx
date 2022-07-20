@@ -609,6 +609,7 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			for (; j < MAX_KW_LEN + 1; j++) {
 				const char lower = UnsafeLower(styler[i + j]);
 				if (!IsLowerCase(lower)) {
+					j = MAX_KW_LEN + 1;
 					break;
 				}
 				s[j] = lower;
