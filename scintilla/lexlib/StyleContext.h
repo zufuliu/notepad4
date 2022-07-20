@@ -206,6 +206,7 @@ public:
 		return true;
 	}
 	bool MatchIgnoreCase(const char *s) const noexcept;
+	bool MatchLowerCase(const char *s) const noexcept;
 
 	void GetCurrent(char *s, Sci_PositionU len) const noexcept {
 		styler.GetRange(styler.GetStartSegment(), currentPos, s, len);

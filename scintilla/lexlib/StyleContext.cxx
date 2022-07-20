@@ -56,6 +56,23 @@ bool StyleContext::MatchIgnoreCase(const char *s) const noexcept {
 	return true;
 }
 
+bool StyleContext::MatchLowerCase(const char *s) const noexcept {
+	if (UnsafeLower(ch) != static_cast<unsigned char>(*s)) {
+		return false;
+	}
+	s++;
+	if (UnsafeLower(chNext) != static_cast<unsigned char>(*s)) {
+		return false;
+	}
+	s++;
+	for (Sci_PositionU pos = currentPos + 2; *s; s++, pos++) {
+		if (*s != UnsafeLower(styler.SafeGetCharAt(pos))) {
+			return false;
+		}
+	}
+	return true;
+}
+
 namespace {
 
 constexpr bool IsTaskMarkerPrev(int chPrev) noexcept {

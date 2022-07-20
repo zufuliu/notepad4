@@ -239,6 +239,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 			if (!isSelfClose)
 				chAttr = SCE_H_SCRIPT;
 		} else if (!isXml && StrEqual(tag, "comment")) {
+			// IE only comment tag
 			chAttr = SCE_H_COMMENT;
 		}
 	}
@@ -559,15 +560,12 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				break;
 			default :
 				// check if the closing tag is a script tag
-				if (const char *tag =
-						(state == SCE_HJ_COMMENTLINE || isXml) ? "script" :
-						((state == SCE_H_COMMENT) ? "comment" : nullptr)) {
-					Sci_Position j = i + 2;
-					char chr;
-					do {
-						chr = *tag++;
-					} while (chr != 0 && chr == UnsafeLower(styler.SafeGetCharAt(j++)));
-					if (chr != 0) break;
+				{
+					const bool match = (state == SCE_HJ_COMMENTLINE || isXml) ? styler.MatchLowerCase(i + 2, "script")
+						: ((state == SCE_H_COMMENT) ? styler.MatchLowerCase(i + 2, "comment") : true);
+					if (!match) {
+						break;
+					}
 				}
 				// closing tag of the script (it's a closing HTML tag anyway)
 				styler.ColorTo(i, StateToPrint);

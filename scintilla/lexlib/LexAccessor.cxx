@@ -26,6 +26,15 @@ bool LexAccessor::MatchIgnoreCase(Sci_Position pos, const char *s) noexcept {
 	return true;
 }
 
+bool LexAccessor::MatchLowerCase(Sci_Position pos, const char *s) noexcept {
+	for (; *s; s++, pos++) {
+		if (*s != UnsafeLower(SafeGetCharAt(pos))) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void LexAccessor::GetRange(Sci_PositionU startPos_, Sci_PositionU endPos_, char *s, Sci_PositionU len) noexcept {
 	assert(s != nullptr);
 	assert(startPos_ <= endPos_ && len != 0);

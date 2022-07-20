@@ -281,7 +281,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_BAT_IDENTIFIER:
 			if (sc.ch == '.') {
-				if (sc.LengthCurrent() == 4 && styler.MatchIgnoreCase(styler.GetStartSegment(), "echo")) {
+				if (sc.LengthCurrent() == 4 && styler.MatchLowerCase(styler.GetStartSegment(), "echo")) {
 					parenBefore = parenCount;
 					command = Command::Echo;
 					sc.ChangeState(SCE_BAT_WORD);
@@ -558,7 +558,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				case '@':
 					if (logicalVisibleChars == 0 && IsFileNameChar(sc.chNext)) {
 						sc.Forward();
-						if (sc.MatchIgnoreCase("rem") && !IsGraphic(sc.GetRelative(3))) {
+						if (sc.MatchLowerCase("rem") && !IsGraphic(sc.GetRelative(3))) {
 							sc.ChangeState(SCE_BAT_COMMENT);
 						} else {
 							sc.SetState(SCE_BAT_IDENTIFIER);
