@@ -50,7 +50,7 @@ typedef struct NP2PARAMS {
 	bool	flagQuietCreate;
 	bool	flagTitleExcerpt;
 	bool	flagJumpTo;
-	int		flagChangeNotify;
+	TripleBoolean	flagChangeNotify;
 	int		iInitialLexer;
 	Sci_Line		iInitialLine;
 	Sci_Position	iInitialColumn;

@@ -362,6 +362,20 @@ static UINT languageMenu;
 //
 // Flags
 //
+typedef enum MatchTextFlag {
+	MatchTextFlag_None = 0,
+	MatchTextFlag_Default = 1,
+	MatchTextFlag_FindUp = 2,
+	MatchTextFlag_Regex = 4,
+	MatchTextFlag_TransformBS = 8,
+} MatchTextFlag;
+
+typedef enum RelaunchElevatedFlag {
+	RelaunchElevatedFlag_None = 0,
+	RelaunchElevatedFlag_Startup,
+	RelaunchElevatedFlag_Manual,
+} RelaunchElevatedFlag;
+
 static bool	flagNoReuseWindow		= false;
 static bool	flagReuseWindow			= false;
 static bool bSingleFileInstance		= true;
@@ -371,7 +385,7 @@ static int flagReadOnlyMode			= ReadOnlyMode_None;
 static TripleBoolean flagMultiFileArg = TripleBoolean_NotSet;
 static bool	flagSingleFileInstance	= true;
 static bool	flagStartAsTrayIcon		= false;
-static int	flagAlwaysOnTop			= 0;
+static TripleBoolean flagAlwaysOnTop= TripleBoolean_NotSet;
 static bool	flagRelativeFileMRU		= false;
 static bool	flagPortableMyDocs		= false;
 bool		flagNoFadeHidden		= false;
@@ -389,12 +403,12 @@ static bool	flagPasteBoard			= false;
 static int	flagSetEncoding			= 0;
 static int	flagSetEOLMode			= 0;
 static bool	flagJumpTo				= false;
-static int	flagMatchText			= 0;
-static int	flagChangeNotify		= 0;
+static MatchTextFlag flagMatchText	= MatchTextFlag_None;
+static TripleBoolean flagChangeNotify = TripleBoolean_NotSet;
 static bool	flagLexerSpecified		= false;
 static bool	flagQuietCreate			= false;
 TripleBoolean flagUseSystemMRU		= TripleBoolean_NotSet;
-static int	flagRelaunchElevated	= 0;
+static RelaunchElevatedFlag flagRelaunchElevated = RelaunchElevatedFlag_None;
 static bool	flagDisplayHelp			= false;
 
 static inline bool IsDocumentModified(void) {
@@ -402,7 +416,7 @@ static inline bool IsDocumentModified(void) {
 }
 
 static inline bool IsTopMost(void) {
-	return (bAlwaysOnTop || flagAlwaysOnTop == 2) && flagAlwaysOnTop != 1;
+	return (bAlwaysOnTop || flagAlwaysOnTop == TripleBoolean_True) && flagAlwaysOnTop != TripleBoolean_False;
 }
 
 static inline void ToggleFullScreenModeConfig(int config) {
@@ -854,11 +868,11 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		NP2HeapFree(lpFileArg);
 
 		if (bOpened) {
-			if (flagChangeNotify == 1) {
+			if (flagChangeNotify == TripleBoolean_False) {
 				iFileWatchingMode = FileWatchingMode_None;
 				bResetFileWatching = true;
 				InstallFileWatching(false);
-			} else if (flagChangeNotify == 2) {
+			} else if (flagChangeNotify == TripleBoolean_True) {
 				iFileWatchingMode = FileWatchingMode_AutoReload;
 				bResetFileWatching = true;
 				InstallFileWatching(false);
@@ -922,19 +936,19 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	// Match Text
-	if (flagMatchText && lpMatchArg) {
+	if (flagMatchText != MatchTextFlag_None && lpMatchArg) {
 		if (StrNotEmpty(lpMatchArg) && SciCall_GetLength()) {
 			const UINT cpEdit = SciCall_GetCodePage();
 			WideCharToMultiByte(cpEdit, 0, lpMatchArg, -1, efrData.szFind, COUNTOF(efrData.szFind), NULL, NULL);
 			WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), NULL, NULL);
 
-			if (flagMatchText & 4) {
+			if (flagMatchText & MatchTextFlag_Regex) {
 				efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
-			} else if (flagMatchText & 8) {
+			} else if (flagMatchText & MatchTextFlag_TransformBS) {
 				efrData.bTransformBS = true;
 			}
 
-			if (flagMatchText & 2) {
+			if (flagMatchText & MatchTextFlag_FindUp) {
 				if (!flagJumpTo) {
 					SciCall_DocumentEnd();
 				}
@@ -1288,11 +1302,11 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				}
 
 				if (bOpened) {
-					if (params->flagChangeNotify == 1) {
+					if (params->flagChangeNotify == TripleBoolean_False) {
 						iFileWatchingMode = FileWatchingMode_None;
 						bResetFileWatching = true;
 						InstallFileWatching(false);
-					} else if (params->flagChangeNotify == 2) {
+					} else if (params->flagChangeNotify == TripleBoolean_True) {
 						iFileWatchingMode = FileWatchingMode_AutoReload;
 						bResetFileWatching = true;
 						InstallFileWatching(false);
@@ -2877,7 +2891,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RELAUNCH_ELEVATED:
-		flagRelaunchElevated = 2;
+		flagRelaunchElevated = RelaunchElevatedFlag_Manual;
 		if (RelaunchElevated()) {
 			DestroyWindow(hwnd);
 		}
@@ -4329,11 +4343,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_VIEW_ALWAYSONTOP:
 		if (IsTopMost()) {
 			bAlwaysOnTop = false;
-			flagAlwaysOnTop = 0;
+			flagAlwaysOnTop = TripleBoolean_NotSet;
 			SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		} else {
 			bAlwaysOnTop = true;
-			flagAlwaysOnTop = 0;
+			flagAlwaysOnTop = TripleBoolean_NotSet;
 			SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}
 		UpdateToolbar();
@@ -6201,7 +6215,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			break;
 
 		case L'L':
-			flagChangeNotify = 2;
+			flagChangeNotify = TripleBoolean_True;
 			state = CommandParseState_Consumed;
 			break;
 
@@ -6213,7 +6227,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			break;
 
 		case L'O':
-			flagAlwaysOnTop = 2;
+			flagAlwaysOnTop = TripleBoolean_True;
 			state = CommandParseState_Consumed;
 			break;
 
@@ -6251,7 +6265,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			break;
 
 		case L'U':
-			flagRelaunchElevated = 1;
+			flagRelaunchElevated = RelaunchElevatedFlag_Startup;
 			state = CommandParseState_Consumed;
 			break;
 
@@ -6308,7 +6322,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 				flagSetEOLMode = IDM_LINEENDINGS_LF - IDM_LINEENDINGS_CRLF + 1;
 				state = CommandParseState_Consumed;
 			} else if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
-				flagChangeNotify = 1;
+				flagChangeNotify = TripleBoolean_False;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6324,7 +6338,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 
 		case L'O':
 			if (chNext == L'0' || chNext == L'-' || chNext == L'O') {
-				flagAlwaysOnTop = 1;
+				flagAlwaysOnTop = TripleBoolean_False;
 				state = CommandParseState_Consumed;
 			}
 			break;
@@ -6421,20 +6435,11 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 				}
 
 				lpMatchArg = StrDup(lp1);
-				flagMatchText = 1;
+				flagMatchText = (MatchTextFlag)(MatchTextFlag_Default
+					| ((int)bFindUp * MatchTextFlag_FindUp)
+					| ((int)bRegex * MatchTextFlag_Regex)
+					| ((int)bTransBS * MatchTextFlag_TransformBS));
 				state = CommandParseState_Consumed;
-
-				if (bFindUp) {
-					flagMatchText |= 2;
-				}
-				if (bRegex) {
-					flagMatchText &= ~8;
-					flagMatchText |= 4;
-				}
-				if (bTransBS) {
-					flagMatchText &= ~4;
-					flagMatchText |= 8;
-				}
 			}
 		}
 		break;
@@ -6564,7 +6569,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			opt += CSTRLEN(L"sysmru=");
 			if (opt[1] == L'\0') {
 				const UINT value = opt[0] - L'0';
-				if (value < TripleBoolean_NotSet) {
+				if (value <= true) {
 					flagUseSystemMRU = (TripleBoolean)value;
 					state = CommandParseState_Consumed;
 				}
@@ -7728,7 +7733,8 @@ bool FileSave(FileSaveFlag saveFlag) {
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
-			if (flagRelaunchElevated == 2 && (saveFlag & FileSaveFlag_SaveAs) && iPathNameFormat == TitlePathNameFormat_NameOnly) {
+			if (flagRelaunchElevated == RelaunchElevatedFlag_Manual && (saveFlag & FileSaveFlag_SaveAs)
+				&& iPathNameFormat == TitlePathNameFormat_NameOnly) {
 				iPathNameFormat = TitlePathNameFormat_NameFirst;
 			}
 			UpdateDocumentModificationStatus();
@@ -8021,7 +8027,7 @@ bool ActivatePrevInst(void) {
 				params->flagQuietCreate = false;
 				params->flagTitleExcerpt = false;
 				params->flagJumpTo = flagJumpTo;
-				params->flagChangeNotify = 0;
+				params->flagChangeNotify = TripleBoolean_NotSet;
 				if (flagLexerSpecified && lpSchemeArg) {
 					lstrcpy(StrEnd(&params->wchData) + 1, lpSchemeArg);
 					params->iInitialLexer = 0;
@@ -8210,7 +8216,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 	wsprintf(tch, L"-appid=\"%s\"", g_wchAppUserModelID);
 	lstrcpy(szParameters, tch);
 
-	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU & TripleBoolean_True));
+	wsprintf(tch, L" -sysmru=%i", (flagUseSystemMRU == TripleBoolean_True));
 	lstrcat(szParameters, tch);
 
 	lstrcat(szParameters, L" -f");
@@ -8344,7 +8350,7 @@ void GetRelaunchParameters(LPWSTR szParameters, LPCWSTR lpszFile, bool newWind, 
 //
 //
 bool RelaunchElevated(void) {
-	if (!IsVistaAndAbove() || fIsElevated || !flagRelaunchElevated || flagDisplayHelp) {
+	if (!IsVistaAndAbove() || fIsElevated || flagRelaunchElevated == RelaunchElevatedFlag_None || flagDisplayHelp) {
 		return false;
 	}
 	{
@@ -8352,7 +8358,7 @@ bool RelaunchElevated(void) {
 		LPWSTR lpArg2;
 		bool exit = true;
 
-		if (flagRelaunchElevated == 2) {
+		if (flagRelaunchElevated == RelaunchElevatedFlag_Manual) {
 			WCHAR tchFile[MAX_PATH];
 			lstrcpy(tchFile, szCurFile);
 			if (!FileSave(FileSaveFlag_Ask)) {
