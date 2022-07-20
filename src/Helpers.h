@@ -112,6 +112,8 @@ NP2_inline bool StrNotEmpty(LPCWSTR s) {
 }
 
 // see scintilla/lexlib/CharacterSet.h
+#define UnsafeLower(ch)		((ch) | 0x20)
+#define UnsafeUpper(ch)		((ch) & ~0x20)
 
 NP2_inline bool IsEOLChar(int ch) {
 	return ch == '\r' || ch == '\n';
@@ -176,7 +178,7 @@ NP2_inline int GetHexDigit(int ch) {
 	if (diff < 10) {
 		return diff;
 	}
-	diff = (ch | 0x20) - 'a';
+	diff = UnsafeLower(ch) - 'a';
 	if (diff < 6) {
 		return diff + 10;
 	}

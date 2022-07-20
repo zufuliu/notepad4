@@ -141,7 +141,7 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 		char *p = list;
 		while (*p) {
 			if (*p >= 'A' && *p <= 'Z') {
-				*p += 'a' - 'A';
+				*p |= 'a' - 'A';
 			}
 			++p;
 		}

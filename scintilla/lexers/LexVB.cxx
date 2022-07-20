@@ -217,8 +217,8 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_B_STRING);
 			} else if (sc.ch == '#') {
-				const int chNUp = MakeUpperCase(sc.chNext);
-				if (chNUp == 'E' || chNUp == 'I' || chNUp == 'R' || chNUp == 'C')
+				const int chNext = UnsafeLower(sc.chNext);
+				if (chNext == 'e' || chNext == 'i' || chNext == 'r' || chNext == 'c')
 					sc.SetState(SCE_B_IDENTIFIER);
 				else
 					sc.SetState(SCE_B_FILENUMBER);

@@ -607,10 +607,11 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			char s[MAX_KW_LEN + 2];
 			unsigned int j = 0;
 			for (; j < MAX_KW_LEN + 1; j++) {
-				if (!iswordchar(styler[i + j])) {
+				const char lower = UnsafeLower(styler[i + j]);
+				if (!IsLowerCase(lower)) {
 					break;
 				}
-				s[j] = MakeLowerCase(styler[i + j]);
+				s[j] = lower;
 			}
 			if (j == MAX_KW_LEN + 1) {
 				// Keyword too long, don't test it

@@ -631,7 +631,7 @@ int Encoding_MatchA(LPCSTR pchTest) {
 	char ch;
 	while ((ch = *pchSrc) != '\0') {
 		if (ch >= 'A' && ch <= 'Z') {
-			*pchDst++ = (char)(ch + 'a' - 'A');
+			*pchDst++ = UnsafeLower(ch);
 		} else if (!(ch == '-' || ch == '_')) {
 			// ignore hyphen and underscore
 			*pchDst++ = ch;
@@ -2513,7 +2513,7 @@ bool IsStringCaseSensitiveA(LPCSTR pszText) {
 		}
 
 		// ASCII
-		ch |= 0x20; // convert to lower case
+		ch = UnsafeLower(ch);
 		if (ch >= 'a' && ch <= 'z') {
 			return true;
 		}

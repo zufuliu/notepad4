@@ -115,6 +115,22 @@ constexpr void AnyOf([[maybe_unused]] T *t, [[maybe_unused]] Args... args) noexc
 template <typename T, typename... Args>
 constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args) noexcept {}
 
+template <typename T>
+constexpr T UnsafeLower(T ch) noexcept {
+	// [(ch, chr(ch | 0x20)) for ch in range(0, 32) if chr(ch | 0x20) != chr(ch).lower()]
+	// [(chr(ch), chr(ch | 0x20)) for ch in range(32, 128) if chr(ch | 0x20) != chr(ch).lower()]
+	// [('@', '`'), ('[', '{'), ('\\', '|'), (']', '}'), ('^', '~'), ('_', '\x7f')]
+	return ch | 0x20;
+}
+
+template <typename T>
+constexpr T UnsafeUpper(T ch) noexcept {
+	// [(chr(ch), ch & ~0x20) for ch in range(0, 64) if chr(ch & ~0x20) != chr(ch).upper()]
+	// [(chr(ch), chr(ch & ~0x20)) for ch in range(64, 128) if chr(ch & ~0x20) != chr(ch).upper()]
+	// [('`', '@'), ('{', '['), ('|', '\\'), ('}', ']'), ('~', '^'), ('\x7f', '_')]
+	return ch & ~0x20;
+}
+
 constexpr bool Between(int value, int lower, int high) noexcept {
 	return value >= lower && value <= high;
 }
@@ -195,7 +211,7 @@ constexpr bool IsADigit(int ch, int base) noexcept {
 		return (ch >= '0' && ch < '0' + base);
 	}
 	return (ch >= '0' && ch <= '9')
-		|| Between(ch | 0x20, 'a', 'a' + base - 10);
+		|| Between(UnsafeLower(ch), 'a', 'a' + base - 10);
 }
 
 constexpr bool IsNumberStart(int ch, int chNext) noexcept {
@@ -386,7 +402,7 @@ constexpr T MakeLowerCase(T ch) noexcept {
 inline void ToLowerCase(char *s) noexcept {
 	while (*s) {
 		if (*s >= 'A' && *s <= 'Z') {
-			*s += 'a' - 'A';
+			*s |= 'a' - 'A';
 		}
 		++s;
 	}

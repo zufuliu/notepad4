@@ -179,8 +179,9 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		// **********************************************
 		// save the total current word for eof processing
 		if (IsAu3WordChar(sc.ch) || sc.ch == '}') {
-			strcpy(s_save, s);
-			const size_t tp = strlen(s_save);
+			const size_t tp = strlen(s);
+			memcpy(s_save, s, tp);
+			s_save[tp] = '\0';
 			if (tp < 127) {
 				s_save[tp] = static_cast<char>(MakeLowerCase(sc.ch));
 				s_save[tp + 1] = '\0';
@@ -624,7 +625,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 				szKeyword[szKeywordlen] = '\0';
 			} else {
 				if (szKeywordlen < 10) {
-					szKeyword[szKeywordlen++] = static_cast<char>(MakeLowerCase(ch));
+					szKeyword[szKeywordlen++] = static_cast<char>(UnsafeLower(ch));
 				}
 			}
 		}
@@ -632,7 +633,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 		if (!(FirstWordStart)) {
 			if (IsAu3WordChar(ch) || IsAu3WordStart(ch) || ch == ';') {
 				FirstWordStart = true;
-				szKeyword[szKeywordlen++] = static_cast<char>(MakeLowerCase(ch));
+				szKeyword[szKeywordlen++] = static_cast<char>(UnsafeLower(ch));
 			}
 		}
 		// only process this logic when not in comment section
@@ -648,12 +649,12 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 					szThen[0] = szThen[1];
 					szThen[1] = szThen[2];
 					szThen[2] = szThen[3];
-					szThen[3] = static_cast<char>(MakeLowerCase(ch));
+					szThen[3] = static_cast<char>(UnsafeLower(ch));
 					if (StrEqual(szThen, "then")) {
 						ThenFoundLast = true;
 					}
 				} else {
-					szThen[szThenlen++] = static_cast<char>(MakeLowerCase(ch));
+					szThen[szThenlen++] = static_cast<char>(UnsafeLower(ch));
 					if (szThenlen == 5) {
 						szThen[4] = '\0';
 					}

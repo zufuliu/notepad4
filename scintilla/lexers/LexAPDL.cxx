@@ -217,7 +217,7 @@ void FoldAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 
 		if (style == SCE_APDL_WORD) {
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = MakeLowerCase(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[i]);
 			}
 			if (styleNext != SCE_APDL_WORD) {
 				buf[wordLen] = '\0';

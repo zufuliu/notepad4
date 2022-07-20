@@ -566,7 +566,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					char chr;
 					do {
 						chr = *tag++;
-					} while (chr != 0 && chr == MakeLowerCase(styler.SafeGetCharAt(j++)));
+					} while (chr != 0 && chr == UnsafeLower(styler.SafeGetCharAt(j++)));
 					if (chr != 0) break;
 				}
 				// closing tag of the script (it's a closing HTML tag anyway)

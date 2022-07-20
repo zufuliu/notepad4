@@ -674,7 +674,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						lineStateLineComment = AHKLineStateMaskLineComment;
 					}
 					sc.SetState(SCE_AHK_COMMENTLINE);
-					if (visibleChars == 0 && sc.chNext == '@' && (sc.GetRelative(2) | 0x20) == 'a') {
+					if (visibleChars == 0 && sc.chNext == '@' && UnsafeLower(sc.GetRelative(2)) == 'a') {
 						outerStyle = SCE_AHK_COMMENTLINE;
 						sc.ForwardSetState(SCE_AHK_DIRECTIVE_AT);
 					}
@@ -682,7 +682,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.Match('/', '*') && visibleChars == 0) {
 				sc.SetState(SCE_AHK_COMMENTBLOCK);
 				sc.Forward();
-				if (sc.chNext == '@' && (sc.GetRelative(2) | 0x20) == 'a') {
+				if (sc.chNext == '@' && UnsafeLower(sc.GetRelative(2)) == 'a') {
 					outerStyle = SCE_AHK_COMMENTBLOCK;
 					sc.ForwardSetState(SCE_AHK_DIRECTIVE_AT);
 				}

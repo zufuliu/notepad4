@@ -129,7 +129,7 @@ enum class KeywordType {
 };
 
 constexpr bool IsUnicodeEscape(int ch, int chNext) noexcept {
-	return ch == '\\' && (chNext | 0x20) == 'u';
+	return ch == '\\' && UnsafeLower(chNext) == 'u';
 }
 
 constexpr bool IsCsIdentifierStart(int ch, int chNext) noexcept {
@@ -515,7 +515,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						}
 					}
 					if (handled) {
-						if (sc.chNext == '8' && (sc.ch | 0x20) == 'u') {
+						if (sc.chNext == '8' && UnsafeLower(sc.ch) == 'u') {
 							sc.Forward(2); // C# 11 UTF-8 string literal
 						}
 						sc.SetState(SCE_CSHARP_DEFAULT);
@@ -873,7 +873,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_CSHARP_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = MakeLowerCase(styler[i]);
+				buf[wordLen++] = styler[i];
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';

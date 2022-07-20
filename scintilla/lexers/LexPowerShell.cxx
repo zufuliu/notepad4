@@ -301,7 +301,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 				sc.SetState(SCE_POWERSHELL_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineType = SimpleLineStateMaskLineComment;
-					const int chNext = sc.chNext | 0x20;
+					const int chNext = UnsafeLower(sc.chNext);
 					if (chNext == 'r' || chNext == 'e') {
 						sc.ChangeState(SCE_POWERSHELL_DIRECTIVE);
 					}

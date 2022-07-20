@@ -233,7 +233,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 						lastPPDefineWord = 0;
 				} else if ((lineState & LEX_BLOCK_MASK_ASM) && kwAsmInstruction.InList(s)) {
 					sc.ChangeState(SCE_C_ASM_INSTRUCTION);
-					lastWordWasGoto = MakeLowerCase(s[0]) == 'j';
+					lastWordWasGoto = UnsafeLower(s[0]) == 'j';
 				} else if ((lineState & LEX_BLOCK_MASK_ASM) && kwAsmRegister.InList(s)) {
 					sc.ChangeState(SCE_C_ASM_REGISTER);
 				} else if (((s[0] == '#' || s[0] == '!') && keywords3.InList(s + 1))

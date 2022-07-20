@@ -6386,12 +6386,12 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 		break;
 
 	case L'C':
-		if (opt[1] == L'R' || opt[1] == L'r') {
+		if (UnsafeUpper(opt[1]) == L'R') {
 			opt += 2;
 			if (*opt == L'-') {
 				++opt;
 			}
-			if (opt[2] == L'\0' && (*opt == L'L' || *opt == L'l') && (opt[1] == L'F' || opt[1] == L'f')) {
+			if (opt[2] == L'\0' && UnsafeUpper(*opt) == L'L' && UnsafeUpper(opt[1]) == L'F') {
 				flagSetEOLMode = IDM_LINEENDINGS_CRLF - IDM_LINEENDINGS_CRLF + 1;
 				state = CommandParseState_Consumed;
 			}
@@ -6408,7 +6408,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			bool bTransBS = false;
 
 			++opt;
-			switch (ToUpperA(*opt)) {
+			switch (UnsafeUpper(*opt)) {
 			case L'R':
 				bRegex = true;
 				++opt;
@@ -6446,7 +6446,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 
 	case L'P': {
 		if (*bIsNotepadReplacement) {
-			if (opt[1] == L'T' || opt[1] == L't') {
+			if (UnsafeUpper(opt[1]) == L'T') {
 				ExtractFirstArgument(lp2, lp1, lp2);
 			}
 			state = CommandParseState_Consumed;
@@ -6474,7 +6474,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 
 		case L'D':
 		case L'S':
-			if (opt[1] == L'\0' || (opt[2] == L'\0' && (opt[1] == L'L' || opt[1] == L'l'))) {
+			if (opt[1] == L'\0' || (opt[2] == L'\0' && UnsafeUpper(opt[1]) == L'L')) {
 				flagPosParam = true;
 				flagDefaultPos = (opt[1] == L'\0')? 2 : 3;
 				state = CommandParseState_Consumed;
@@ -6492,7 +6492,7 @@ CommandParseState ParseCommandLineOption(LPWSTR lp1, LPWSTR lp2, BOOL *bIsNotepa
 			flagDefaultPos = 0;
 			state = CommandParseState_Consumed;
 			while (*p && state == CommandParseState_Consumed) {
-				switch (ToUpperA(*p++)) {
+				switch (UnsafeUpper(*p++)) {
 				case L'F':
 					flagDefaultPos &= ~(4 | 8 | 16 | 32);
 					flagDefaultPos |= 64;

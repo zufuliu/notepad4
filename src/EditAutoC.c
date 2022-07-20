@@ -1400,7 +1400,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		iRootLen = autoCompletionConfig.iMinNumberLength;
 		if (ch == '0') {
 			// number prefix
-			const int chNext = SciCall_GetCharAt(iStartWordPos + 1) | 0x20;
+			const int chNext = UnsafeLower(SciCall_GetCharAt(iStartWordPos + 1));
 			if (chNext == 'x' || chNext == 'b' || chNext == 'o') {
 				iRootLen += 2;
 			}
@@ -1611,7 +1611,7 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 				if (iLexer == SCLEX_CPP) {
 					return chPrev2 == 'u' && chPrev == '8';
 				}
-				if (iLexer == SCLEX_PYTHON && (chPrev | 0x20) != (chPrev2 | 0x20)) {
+				if (iLexer == SCLEX_PYTHON && UnsafeLower(chPrev) != UnsafeLower(chPrev2)) {
 					return IsCharacterPrefix(chPrev)
 						&& IsCharacterPrefix(chPrev2);
 				}
@@ -1870,7 +1870,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	*indent = AutoIndentType_None;
 
 	while (*head && length < 15) {
-		const char lower = *head | 0x20;
+		const char lower = UnsafeLower(*head);
 		if (lower < 'a' || lower > 'z') {
 			break;
 		}

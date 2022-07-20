@@ -1832,14 +1832,13 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 			}
 		}
 
-		*pch = 0;
+		*pch = '\0';
 		len = pch - name;
 		pch = name;
 		while (*pch) {
-			// to lower
-			*pch |= 32;
+			*pch = UnsafeLower(*pch);
 			if (*pch < 'a' || *pch > 'z') {
-				*pch = 0;
+				*pch = '\0';
 				len = pch - name;
 				break;
 			}
@@ -2439,7 +2438,7 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, bool bCheckNames) {
 	if (!bCheckNames) {
 		if (bAutoSelect && lpszMatch[1] == L'\0') {
-			const WCHAR suffix = *lpszMatch | 0x20;
+			const WCHAR suffix = UnsafeLower(*lpszMatch);
 			if (suffix == L'm') {
 				PEDITLEXER lex = Style_DetectObjCAndMatlab();
 				if (lex != NULL) {

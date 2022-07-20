@@ -283,7 +283,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsNumberStart(sc.ch, sc.chNext)
 				|| (sc.ch == '#' && (propertyValue || parenCount) && IsHexDigit(sc.chNext))) {
 				sc.SetState(SCE_CSS_NUMBER);
-			} else if (sc.chNext == '+' && (sc.ch | 0x20) == 'u'
+			} else if (sc.chNext == '+' && UnsafeLower(sc.ch) == 'u'
 				&& propertyValue && (chPrevNonWhite == ':' || chPrevNonWhite == ',')
 				&& IsCssUnicodeRangeChar(sc.GetRelative(2))) {
 				escSeq.digitsLeft = 7;

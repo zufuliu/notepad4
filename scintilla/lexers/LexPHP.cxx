@@ -276,7 +276,7 @@ bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 		return true;
 	}
 
-	if ((sc.GetRelative(2) | 0x20) == 's') {
+	if (UnsafeLower(sc.GetRelative(2)) == 's') {
 		kwType = KeywordType::None;
 		tagType = HtmlTagType::None;
 		tagState = HtmlTagState::None;
@@ -1360,7 +1360,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				|| (sc.ch == '#' && (lexer.propertyValue || lexer.parenCount) && IsHexDigit(sc.chNext))) {
 				escSeq.outerState = css_style(SCE_CSS_DEFAULT);
 				sc.SetState(css_style(SCE_CSS_NUMBER));
-			} else if (sc.chNext == '+' && (sc.ch | 0x20) == 'u'
+			} else if (sc.chNext == '+' && UnsafeLower(sc.ch) == 'u'
 				&& lexer.propertyValue && (chPrevNonWhite == ':' || chPrevNonWhite == ',')
 				&& IsCssUnicodeRangeChar(sc.GetRelative(2))) {
 				escSeq.digitsLeft = 7;

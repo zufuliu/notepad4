@@ -390,7 +390,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 		case SCE_CMAKE_WORD:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = MakeLowerCase(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[i]);
 			}
 			if (styleNext != SCE_CMAKE_WORD) {
 				buf[wordLen] = '\0';

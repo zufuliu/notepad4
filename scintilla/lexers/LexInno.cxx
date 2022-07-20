@@ -140,7 +140,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_INNO_OPERATOR);
 				sc.ForwardSetState(SCE_INNO_PARAMETER);
 			} else if (sc.ch == '=' || sc.ch == ':' || IsASpaceOrTab(sc.ch)) {
-				if ((chBeforeIdentifier | 0x20) == 'c') {
+				if (UnsafeLower(chBeforeIdentifier) == 'c') {
 					char s[12];
 					sc.GetCurrentLowered(s, sizeof(s));
 					if (StrEqualsAny(s, "check", "components")) {
@@ -494,7 +494,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		case SCE_INNO_PASCAL_KEYWORD:
 		case SCE_INNO_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = MakeLowerCase(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[i]);
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';

@@ -94,9 +94,9 @@ constexpr bool IsPyStringPrefix(int ch) noexcept {
 }
 
 inline void EnterPyStringState(StyleContext &sc) {
-	int ch = sc.ch | 0x20;
+	int ch = UnsafeLower(sc.ch);
 	int chNext = sc.chNext;
-	const int next = chNext | 0x20;
+	const int next = UnsafeLower(chNext);
 	int state = SCE_PY_IDENTIFIER;
 	int offset = 1;
 	if (ch == 'r') {

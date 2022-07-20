@@ -238,7 +238,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		case SCE_NSIS_WORD:
 		case SCE_NSIS_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = MakeLowerCase(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[i]);
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';

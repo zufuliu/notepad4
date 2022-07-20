@@ -2127,7 +2127,7 @@ void EditHex2Char(void) {
 	bool changed = false;
 	while (*p) {
 		UINT wc = *p++;
-		if ((wc == L'\\' && (*p == L'x' || *p == 'u' || *p == 'U')) || (wc == L'U' && *p == L'+')) {
+		if ((wc == L'\\' && (*p == L'x' || UnsafeLower(*p) == 'u')) || (wc == L'U' && *p == L'+')) {
 			const int digitCount = (wc == L'U' || *p == L'U') ? MAX_UNICODE_HEX_DIGIT : BMP_UNICODE_HEX_DIGIT;
 			UINT value = 0;
 			int ucc = 1;
@@ -2287,7 +2287,8 @@ void EditConvertNumRadix(int radix) {
 		if (*p == '0') {
 			value = 0;
 			p++;
-			if ((*p == 'x' || *p == 'X') && radix != 16) {
+			const char prefix = UnsafeLower(*p);
+			if (prefix == 'x' && radix != 16) {
 				p++;
 				while (*p) {
 					if (*p == '_') {
@@ -2302,7 +2303,7 @@ void EditConvertNumRadix(int radix) {
 					}
 				}
 				cch += ConvertNumRadix(tch + cch, value, radix);
-			} else if ((*p == 'o' || *p == 'O') && radix != 8) {
+			} else if (prefix == 'o' && radix != 8) {
 				p++;
 				while (*p) {
 					if (*p >= '0' && *p <= '7') {
@@ -2315,7 +2316,7 @@ void EditConvertNumRadix(int radix) {
 					}
 				}
 				cch += ConvertNumRadix(tch + cch, value, radix);
-			} else if ((*p == 'b' || *p == 'B') && radix != 2) {
+			} else if (prefix == 'b' && radix != 2) {
 				p++;
 				while (*p) {
 					if (*p == '0') {
