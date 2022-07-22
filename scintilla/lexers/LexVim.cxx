@@ -190,7 +190,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				}
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_VIM_STRING_SQ);
-			} else if (sc.ch == '0' && (sc.chNext == 'z' || sc.chNext == 'Z')) {
+			} else if (sc.ch == '0' && UnsafeLower(sc.chNext) == 'z') {
 				sc.SetState(SCE_VIM_BLOB_HEX);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_VIM_NUMBER);

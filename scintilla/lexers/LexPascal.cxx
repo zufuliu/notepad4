@@ -204,7 +204,7 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			} else if (sc.ch == '$') {
 				sc.SetState(SCE_PAS_HEXNUMBER);
 				if (curLineState & stateInAsm) {
-					if (sc.chNext == '0' && styler.MatchAny(sc.currentPos + 2, 'x', 'X'))
+					if (sc.chNext == '0' && styler.MatchLower(sc.currentPos + 2, 'x'))
 						sc.Advance(2);
 				}
 			} else if (sc.Match('{', '$')) {
@@ -223,7 +223,7 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			} else if (sc.ch == '#') {
 				if (curLineState & stateInAsm) {
 					sc.SetState(SCE_PAS_HEXNUMBER);
-					if (sc.chNext == '0' && styler.MatchAny(sc.currentPos + 2, 'x', 'X'))
+					if (sc.chNext == '0' && styler.MatchLower(sc.currentPos + 2, 'x'))
 						sc.Advance(2);
 				} else
 					sc.SetState(SCE_PAS_CHARACTER);

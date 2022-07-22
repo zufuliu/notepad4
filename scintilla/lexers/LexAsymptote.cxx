@@ -39,7 +39,7 @@ struct EscapeSequence {
 		if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
 			numBase = 8;
-		} else if (chNext == 'x' || chNext == 'X') {
+		} else if (UnsafeLower(chNext) == 'x') {
 			digitsLeft = 3;
 			numBase = 16;
 		}

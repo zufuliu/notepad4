@@ -1524,14 +1524,13 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 	case '~':
 		if (sc.ch == sc.chNext) {
 			Sci_PositionU pos = sc.currentPos;
-			int chNext = GetCharAfterDelimiter(sc.styler, pos, sc.ch);
+			const int chNext = GetCharAfterDelimiter(sc.styler, pos, sc.ch);
 			const int count = static_cast<int>(pos - sc.currentPos);
 			if (count >= 3) {
 				delimiterCount = count;
 				int style = (sc.ch == '`') ? SCE_MARKDOWN_BACKTICK_BLOCK : SCE_MARKDOWN_TILDE_BLOCK;
 				// check info string
-				chNext = UnsafeLower(chNext);
-				if (chNext == 'm' || chNext == 'l')  {
+				if (AnyOf<'L', 'l', 'M', 'm'>(chNext)) {
 					char info[8]{};
 					sc.styler.GetRangeLowered(pos, sc.lineStartNext, info, sizeof(info));
 					if (StrStartsWith(info, "math") || StrStartsWith(info, "latex")) {

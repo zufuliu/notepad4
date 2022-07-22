@@ -118,9 +118,9 @@ public:
 		return encodingType;
 	}
 
-	bool MatchAny(Sci_Position pos, char ch0, char ch1) noexcept {
+	bool MatchLower(Sci_Position pos, char ch0) noexcept {
 		const char ch = SafeGetCharAt(pos);
-		return ch == ch0 || ch == ch1;
+		return (ch | 0x20) == ch0;
 	}
 
 	bool Match(Sci_Position pos, const char *s) noexcept {

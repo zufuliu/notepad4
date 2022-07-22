@@ -109,7 +109,7 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 				if (IsFloatExponent(sc.ch, sc.chNext)) {
 					sc.Forward();
 				} else if (!(sc.ch == '.' && sc.chPrev != '.')) {
-					if (sc.ch == 'i' || sc.ch == 'j' || sc.ch == 'I' || sc.ch == 'J') {
+					if (AnyOf<'I', 'i', 'J', 'j'>(sc.ch)) {
 						// complex, 'I','J' in Octave
 						sc.Forward();
 					}
@@ -252,7 +252,7 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 				sc.SetState(SCE_MAT_STRING);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_MAT_DOUBLEQUOTESTRING);
-			} else if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
+			} else if (sc.ch == '0' && UnsafeLower(sc.chNext) == 'x') {
 				isTransposeOperator = true;
 				sc.SetState(SCE_MAT_HEXNUM);
 				sc.Forward();

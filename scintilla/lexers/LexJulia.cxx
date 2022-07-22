@@ -78,7 +78,7 @@ enum class KeywordType {
 };
 
 constexpr bool IsJuliaExponent(int base, int ch, int chNext) noexcept {
-	return ((base == 10 && (ch == 'e' || ch == 'E' || ch == 'f' || ch == 'F'))
+	return ((base == 10 && AnyOf<'E', 'e', 'F', 'f'>(ch))
 		|| (base == 16 && (ch == 'p' || ch == 'P')))
 		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
 }
@@ -472,11 +472,12 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				escSeq.numBase = 10;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_NUMBER);
-				if (sc.chNext == 'x' || sc.chNext == 'X') {
+				const int chNext = UnsafeLower(sc.chNext);
+				if (chNext == 'x') {
 					escSeq.numBase = 16;
-				} else if (sc.chNext == 'b' || sc.chNext == 'B') {
+				} else if (chNext == 'b') {
 					escSeq.numBase = 2;
-				} else if (sc.chNext == 'o' || sc.chNext == 'O') {
+				} else if (chNext == 'o') {
 					escSeq.numBase = 8;
 				}
 				if (escSeq.numBase != 10) {

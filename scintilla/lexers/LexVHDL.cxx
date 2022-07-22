@@ -307,7 +307,7 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 									(!IsCommentLine(styleAtPos)) &&
 									(styleAtPos != SCE_VHDL_STRING) &&
 									!iswordchar(styler.SafeGetCharAt(pos - 1)) &&
-									(chAtPos == 'i' || chAtPos == 'I') && styler.MatchAny(pos + 1, 's', 'S') &&
+									(chAtPos == 'i' || chAtPos == 'I') && styler.MatchLower(pos + 1, 's') &&
 									!iswordchar(styler.SafeGetCharAt(pos + 2))) {
 									levelNext++;
 									break;

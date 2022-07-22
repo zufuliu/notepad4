@@ -274,7 +274,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		if (sc.state == SCE_LUA_DEFAULT) {
 			if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_LUA_NUMBER);
-				if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
+				if (sc.ch == '0' && UnsafeLower(sc.chNext) == 'x') {
 					sc.Forward();
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {

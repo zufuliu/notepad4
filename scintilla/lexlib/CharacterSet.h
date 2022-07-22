@@ -116,6 +116,29 @@ template <typename T, typename... Args>
 constexpr void AnyOf([[maybe_unused]] const T *t, [[maybe_unused]] Args... args) noexcept {}
 
 template <typename T>
+constexpr bool IsPowerOfTwo(T value) noexcept {
+	return (value & (value - 1)) == 0;
+}
+
+template <char ch0, char ch1, typename T>
+constexpr bool AnyOf(T ch) noexcept {
+	// [chr(ch) for ch in range(256) if ((ch - ord('E')) & ~0x20) == 0] ['E', 'e']
+	static_assert(IsPowerOfTwo(ch1 - ch0));
+	if constexpr ((ch1 - ch0) <= 1) {
+		return ch >= ch0 && ch <= ch1;
+	} else {
+		return ((ch - ch0) & ~(ch1 - ch0)) == 0;
+	}
+}
+
+template <char ch0, char ch1, char ch2, char ch3, typename T>
+constexpr bool AnyOf(T ch) noexcept {
+	// [chr(ch) for ch in range(256) if ((ch - ord('E')) & ~0x21) == 0] ['E', 'F', 'e', 'f']
+	static_assert(IsPowerOfTwo(ch1 - ch0) && IsPowerOfTwo(ch2 - ch0) && (ch1 - ch0) == (ch3 - ch2));
+	return ((ch - ch0) & ~((ch1 - ch0) | (ch2 - ch0))) == 0;
+}
+
+template <typename T>
 constexpr T UnsafeLower(T ch) noexcept {
 	// [(ch, chr(ch | 0x20)) for ch in range(0, 32) if chr(ch | 0x20) != chr(ch).lower()]
 	// [(chr(ch), chr(ch | 0x20)) for ch in range(32, 128) if chr(ch | 0x20) != chr(ch).lower()]

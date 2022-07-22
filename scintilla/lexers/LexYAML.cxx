@@ -45,7 +45,7 @@ struct EscapeSequence {
 
 constexpr bool IsYAMLFlowIndicator(int ch) noexcept {
 	// c-flow-indicator
-	return ch == ',' || ch == '[' || ch == ']' || ch == '{' || ch == '}';
+	return ch == ',' || AnyOf<'[', ']', '{', '}'>(ch);
 }
 
 constexpr bool IsYAMLOperator(int ch, int braceCount) noexcept {
