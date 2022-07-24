@@ -527,6 +527,8 @@ VBScript
 Verilog HDL Source
 	v
 	vl
+	sv				SystemVerilog
+	svh				SystemVerilog Header File
 
 VHDL Source
 	vhd
@@ -555,6 +557,7 @@ YAML Document
 	yaml
 	clang-format	clang-format Configuration File
 	clang-tidy		clang-tidy Configuration File
+	clangd			clangd Configuration File
 	mir				LLVM Machine IR, https://llvm.org/docs/MIRLangRef.html
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
