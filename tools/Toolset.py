@@ -51,10 +51,9 @@ def build_compile_commands(commands, folder, cflags, cxxflags, includes):
 		for entry in it:
 			if not entry.is_file():
 				continue
-			name = entry.name
-			ext = os.path.splitext(name)[1]
+			ext = os.path.splitext(entry.name)[1]
 			if ext in ('.c', '.cpp', '.cxx'):
-				path = os.path.join(folder, name)
+				path = entry.path
 				arguments = cflags[:] if ext == '.c' else cxxflags[:]
 				arguments.extend(includes)
 				arguments.append(path)
