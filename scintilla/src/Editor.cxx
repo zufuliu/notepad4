@@ -5520,7 +5520,6 @@ void Editor::FoldLine(Sci::Line line, FoldAction action) {
 		}
 
 		SetScrollBars();
-		RedrawSelMargin();
 		Redraw();
 	}
 }
@@ -5648,12 +5647,14 @@ void Editor::FoldAll(FoldAction action) {
 		pcs->SetVisible(0, maxLine - 1, true);
 		pcs->ExpandAll();
 	} else {
+		Sci::Line lineMaxSubord = -1;
 		for (; line < maxLine; line++) {
 			const FoldLevel level = pdoc->GetFoldLevel(line);
 			if (LevelIsHeader(level)) {
-#if 1
-				if (FoldLevel::Base == LevelNumberPart(level)) {
-					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
+				if (FoldLevel::Base == LevelNumberPart(level)
+					// top level fold without parent in indentation based folding
+					|| (line > lineMaxSubord && pdoc->GetFoldParent(line) < 0)) {
+					lineMaxSubord = pdoc->GetLastChild(line, level);
 					if (lineMaxSubord > line) {
 						pcs->SetExpanded(line, false);
 						pcs->SetVisible(line + 1, lineMaxSubord, false);
@@ -5664,22 +5665,11 @@ void Editor::FoldAll(FoldAction action) {
 						pcs->SetExpanded(line, false);
 					}
 				}
-#else
-				// measure performance for GetLastChild()
-				const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
-				if (lineMaxSubord > line) {
-					pcs->SetExpanded(line, false);
-					if (FoldLevel::Base == LevelNumberPart(level)) {
-						pcs->SetVisible(line + 1, lineMaxSubord, false);
-					}
-				}
-#endif
 			}
 		}
 	}
 
 	SetScrollBars();
-	RedrawSelMargin();
 	Redraw();
 }
 
