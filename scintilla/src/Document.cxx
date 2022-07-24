@@ -3230,6 +3230,10 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 		if (!caseSensitive)
 			flagsRe = flagsRe | std::regex::icase;
 
+#if defined(REGEX_MULTILINE)
+		flagsRe = flagsRe | std::regex::multiline;
+#endif
+
 		// Clear the RESearch so can fill in matches
 		search.Clear();
 

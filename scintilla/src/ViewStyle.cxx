@@ -182,6 +182,8 @@ ViewStyle::ViewStyle(size_t stylesSize_):
 	lastSegItalicsOffset = 2;
 
 	localeName = localeNameDefault;
+	maxFontAscent = 1;
+	maxFontDescent = 1;
 }
 
 // Copy constructor only called when printing copies the screen ViewStyle so it can be
@@ -311,6 +313,7 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 			style.Copy(fr->font, fr->measurements);
 		}
 
+		FindMaxAscentDescent();
 		aveCharWidth = styles[StyleDefault].aveCharWidth;
 		spaceWidth = styles[StyleDefault].spaceWidth;
 	}
@@ -331,9 +334,8 @@ void ViewStyle::Refresh(Surface &surface, int tabInChars) {
 	indicatorsDynamic = flagDynamic;
 	indicatorsSetFore = flagSetFore;
 
-	maxAscent = 1;
-	maxDescent = 1;
-	FindMaxAscentDescent();
+	maxAscent = maxFontAscent;
+	maxDescent = maxFontDescent;
 	// Ensure reasonable values: lines less than 1 pixel high will not work
 	maxAscent = std::max(1.0, maxAscent + extraAscent);
 	maxDescent = std::max(0.0, maxDescent + extraDescent);
@@ -746,12 +748,20 @@ FontRealised *ViewStyle::Find(const FontSpecification &fs) const {
 }
 
 void ViewStyle::FindMaxAscentDescent() noexcept {
-	auto ascent = maxAscent;
-	auto descent = maxDescent;
-	for (const auto &font : fonts) {
-		ascent = std::max(ascent, font.second->measurements.ascent);
-		descent = std::max(descent, font.second->measurements.descent);
+	XYPOSITION ascent = 1;
+	XYPOSITION descent = 1;
+	int index = 0;
+	for (const Style &style : styles) {
+		if (index != StyleCallTip) {
+			if (ascent < style.ascent) {
+				ascent = style.ascent;
+			}
+			if (descent < style.descent) {
+				descent = style.descent;
+			}
+		}
+		index++;
 	}
-	maxAscent = ascent;
-	maxDescent = descent;
+	maxFontAscent = ascent;
+	maxFontDescent = descent;
 }

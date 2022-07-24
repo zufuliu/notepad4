@@ -345,7 +345,7 @@ Sci::Line Editor::MaxScrollPos() const noexcept {
 	//Platform::DebugPrintf("Lines %d screen = %d maxScroll = %d\n",
 	//pdoc->LinesTotal(), linesOnScreen, pdoc->LinesTotal() - linesOnScreen + 1);
 	switch (endAtLastLine) {
-	case 0:
+	default:
 		retVal--;
 		break;
 	case 1:
@@ -355,10 +355,10 @@ Sci::Line Editor::MaxScrollPos() const noexcept {
 		retVal -= linesOnScreen/2;
 		break;
 	case 3:
-		retVal -= linesOnScreen - linesOnScreen/3;
+		retVal -= 2*linesOnScreen/3;
 		break;
 	case 4:
-		retVal -= linesOnScreen - linesOnScreen/4;
+		retVal -= 3*linesOnScreen/4;
 		break;
 	}
 	return std::max<Sci::Line>(retVal, 0);
@@ -6384,8 +6384,12 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 
 	case Message::HideSelection:
-		view.hideSelection = wParam != 0;
+		vs.selection.visible = wParam != 0;
 		Redraw();
+		break;
+
+	case Message::GetSelectionHidden:
+		return !vs.selection.visible;
 		break;
 
 	case Message::FormatRangeFull:

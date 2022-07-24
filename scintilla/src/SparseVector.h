@@ -37,14 +37,7 @@ public:
 	void operator=(const SparseVector &) = delete;
 	void operator=(SparseVector &&) = delete;
 
-	~SparseVector() {
-		starts.reset();
-		// starts dead here but not used by ClearValue.
-		for (Sci::Position part = 0; part < values->Length(); part++) {
-			ClearValue(part);
-		}
-		values.reset();
-	}
+	~SparseVector() noexcept = default;
 
 	Sci::Position Length() const noexcept {
 		return starts->Length();
@@ -94,7 +87,7 @@ public:
 		const Sci::Position startPartition = starts->PositionFromPartition(partition);
 		if (value == T()) {
 			// Setting the empty value is equivalent to deleting the position
-			if (position == 0) {
+			if (position == 0 || position == Length()) {
 				ClearValue(partition);
 			} else if (position == startPartition) {
 				// Currently an element at this position, so remove
@@ -175,6 +168,12 @@ public:
 		Check();
 	}
 
+	void DeleteAll() {
+		starts = std::make_unique<Partitioning<Sci::Position>>(8);
+		values = std::make_unique<SplitVector<T>>();
+		values->InsertEmpty(0, 2);
+	}
+
 	void DeleteRange(Sci::Position position, Sci::Position deleteLength) {
 		// For now, delete elements in range - may want to leave value at start
 		// or combine onto position.
@@ -211,6 +210,14 @@ public:
 			starts->InsertText(partition - (atPartitionStart ? 1 : 0), -deleteLength);
 		}
 		Check();
+	}
+
+	Sci::Position PositionNext(Sci::Position start) const noexcept {
+		const Sci::Position element = ElementFromPosition(start);
+		if (element < Elements()) {
+			return PositionOfElement(element + 1);
+		}
+		return Length() + 1;	// Out of bounds to terminate
 	}
 
 	Sci::Position IndexAfter(Sci::Position position) const noexcept {

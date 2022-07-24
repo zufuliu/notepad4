@@ -12,17 +12,17 @@ def findHoles(asc):
 
 def readIFace(path):
 	with open(path, encoding='utf-8') as fd:
-		ifaceDoc = fd.read()
+		doc = fd.read()
 	# remove comment
-	ifaceDoc = re.sub(r'\s+#.+', '', ifaceDoc)
+	ifaceDoc = re.sub(r'\s+#.+', '', doc)
 	# ignore deprecated category
 	index = ifaceDoc.find('cat Deprecated')
 	if index > 0:
 		ifaceDoc = ifaceDoc[:index]
-	return ifaceDoc
+	return ifaceDoc, doc
 
 def findAPIHoles():
-	ifaceDoc = readIFace('../include/Scintilla.iface')
+	ifaceDoc, backup = readIFace('../include/Scintilla.iface')
 
 	# find unused or duplicate API message number
 	valList = {} # {value: [name]}
@@ -38,10 +38,32 @@ def findAPIHoles():
 	allVals = sorted(valList.keys())
 	print('all values:', allVals)
 	allVals = [item for item in allVals if item < 3000]
-	print('min, max and holes:', allVals[0], allVals[-1], findHoles(allVals))
+	holes = findHoles(allVals)
+	print('min, max and holes:', allVals[0], allVals[-1], holes)
+
+	if holes:
+		values = []
+		def print_holes(tag, regex, doc):
+			result = re.findall(regex, doc)
+			output = []
+			for item in result:
+				value = int(item[3])
+				if value in holes:
+					name = item[2]
+					values.append(value)
+					output.append(f'{value} {name}')
+			print(tag, ', '.join(sorted(output)))
+
+		ifaceDoc = backup
+		print_holes('used:', r'#\s*(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
+		index = ifaceDoc.find('cat Deprecated')
+		if index > 0:
+			ifaceDoc = ifaceDoc[index:]
+			print_holes('deprecated:', r'(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
+		print('unused:', sorted(set(holes) - set(values)))
 
 def checkLexerDefinition():
-	ifaceDoc = readIFace('../include/SciLexer.iface')
+	ifaceDoc, _ = readIFace('../include/SciLexer.iface')
 
 	# ensure SCLEX_ is unique
 	valList = {} # {value: [name]}

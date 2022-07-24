@@ -1299,6 +1299,9 @@ fun position GetTextRangeFull=2039(, textrangefull tr)
 # Draw the selection either highlighted or in normal (non-highlighted) style.
 fun void HideSelection=2163(bool hide,)
 
+#Is the selection visible or hidden?
+get bool GetSelectionHidden=2088(,)
+
 # Retrieve the x value of the point in the window where a position is displayed.
 fun int PointXFromPosition=2164(, position pos)
 
@@ -1489,7 +1492,7 @@ val SC_NOTIFICATIONPOSITION_BOTTOMRIGHT=0
 val SC_NOTIFICATIONPOSITION_CENTER=1
 
 # show notification
-fun void ShowNotification=2088(int notifyPos, string definition)
+fun void ShowNotification=2091(int notifyPos, string definition)
 
 # Find the display line of a document line taking hidden lines into account.
 fun line VisibleFromDocLine=2220(line docLine,)

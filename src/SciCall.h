@@ -1262,7 +1262,7 @@ NP2_inline int SciCall_GetFoldLevel(Sci_Line line) {
 	return (int)SciCall(SCI_GETFOLDLEVEL, line, 0);
 }
 
-NP2_inline void SciCall_SetFoldFlags(Sci_Line flags) {
+NP2_inline void SciCall_SetFoldFlags(int flags) {
 	SciCall(SCI_SETFOLDFLAGS, flags, 0);
 }
 

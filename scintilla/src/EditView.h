@@ -37,6 +37,7 @@ enum class LayoutLineOption {
 	AutoUpdate,
 	ManualUpdate,
 	KeepPosition,
+	Printing,
 };
 
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept;
@@ -60,7 +61,6 @@ public:
 	std::unique_ptr<LineTabstops> ldTabstops;
 	int tabWidthMinimumPixels;
 
-	bool hideSelection;
 	bool drawOverstrikeCaret; // used by the curses platform
 
 	/** In bufferedDraw mode, graphics operations are drawn to a pixmap and then copied to
@@ -144,9 +144,9 @@ public:
 		Sci::Line line, int xStart, PRectangle rcLine, int subLine, DrawPhase phase);
 	void SCICALL DrawCarets(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line lineDoc,
 		int xStart, PRectangle rcLine, int subLine) const;
-	void SCICALL DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
+	static void SCICALL DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, PRectangle rcLine,
 		Range lineRange, Sci::Position posLineStart, int xStart,
-		int subLine, std::optional<ColourRGBA> background) const;
+		int subLine, std::optional<ColourRGBA> background);
 	void SCICALL DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll, Sci::Line lineVisible,
 		PRectangle rcLine, Range lineRange, Sci::Position posLineStart, int xStart,
 		int subLine, std::optional<ColourRGBA> background) const;
@@ -156,8 +156,8 @@ public:
 		Sci::Line lineVisible, int xStart, PRectangle rcLine, int subLine, DrawPhase phase);
 	void SCICALL PaintText(Surface *surfaceWindow, const EditModel &model, PRectangle rcArea, PRectangle rcClient,
 		const ViewStyle &vsDraw);
-	void SCICALL FillLineRemainder(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-		Sci::Line line, PRectangle rcArea, int subLine) const;
+	static void SCICALL FillLineRemainder(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
+		Sci::Line line, PRectangle rcArea, int subLine);
 	Sci::Position SCICALL FormatRange(bool draw, CharacterRangeFull chrg, Scintilla::Rectangle rc, Surface *surface, Surface *surfaceMeasure,
 		const EditModel &model, const ViewStyle &vs);
 };

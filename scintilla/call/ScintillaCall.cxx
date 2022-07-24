@@ -1146,6 +1146,10 @@ void ScintillaCall::HideSelection(bool hide) {
 	Call(Message::HideSelection, hide);
 }
 
+bool ScintillaCall::SelectionHidden() {
+	return Call(Message::GetSelectionHidden);
+}
+
 int ScintillaCall::PointXFromPosition(Position pos) {
 	return static_cast<int>(Call(Message::PointXFromPosition, 0, pos));
 }

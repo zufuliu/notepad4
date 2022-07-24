@@ -49,6 +49,8 @@ constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam)
 struct SelectionAppearance {
 	// Whether to draw on base layer or over text
 	Scintilla::Layer layer = Layer::Base;
+	// Is the selection visible?
+	bool visible = true;
 	// Draw selection past line end characters up to right border
 	bool eolFilled = false;
 	int eolSelectedWidth = 100;
@@ -248,6 +250,8 @@ public:
 	bool ZoomOut() noexcept;
 
 private:
+	XYPOSITION maxFontAscent;
+	XYPOSITION maxFontDescent;
 	void CreateAndAddFont(const FontSpecification &fs);
 	FontRealised *Find(const FontSpecification &fs) const;
 	void FindMaxAscentDescent() noexcept;
