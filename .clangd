@@ -1,0 +1,4 @@
+---
+# https://clangd.llvm.org/config
+Diagnostics:
+  UnusedIncludes: Strict

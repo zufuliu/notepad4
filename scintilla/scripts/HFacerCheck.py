@@ -25,8 +25,9 @@ def findAPIHoles():
 	ifaceDoc, backup = readIFace('../include/Scintilla.iface')
 
 	# find unused or duplicate API message number
+	pattern = r'(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)'
 	valList = {} # {value: [name]}
-	result = re.findall(r'(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
+	result = re.findall(pattern, ifaceDoc)
 	for item in result:
 		name = item[2]
 		value = int(item[3])
@@ -55,11 +56,11 @@ def findAPIHoles():
 			print(tag, ', '.join(sorted(output)))
 
 		ifaceDoc = backup
-		print_holes('used:', r'#\s*(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
+		print_holes('used:', r'#\s*' + pattern, ifaceDoc)
 		index = ifaceDoc.find('cat Deprecated')
 		if index > 0:
 			ifaceDoc = ifaceDoc[index:]
-			print_holes('deprecated:', r'(fun|get|set)\s+(?P<type>\w+)\s+(?P<name>\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
+			print_holes('deprecated:', pattern, ifaceDoc)
 		print('unused:', sorted(set(holes) - set(values)))
 
 def checkLexerDefinition():
