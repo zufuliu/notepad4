@@ -2610,18 +2610,18 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 				pLexNew = &lexXML;
 			} else if (!pLexNew) {
 				if (StrStartsWithCase(p, "<!DOCTYPE")) {
-					p += CSTRLEN("<!DOCTYPE");
-					while (IsASpace(*p)) {
-						++p;
-					}
-				}
-				if (StrStartsWithCase(p, "<html")) {
+					pLexNew = &lexXML;
+				} else if (StrStartsWithCase(p, "<html")) {
 					pLexNew = &lexHTML;
 				} else if (!fNoHTMLGuess) {
 					if (StrStrIA(p, "<html")) {
 						pLexNew = &lexHTML;
 					} else {
-						pLexNew = &lexXML;
+						const uint8_t start = p[1];
+						if ((signed char)start < 0 || start == '!' || start == '?' || IsHtmlTagChar(start) || start == '/') {
+							// <!-- comment -->, <!CDATA[[]]>, <?instruction?>, <tag></tag>
+							pLexNew = &lexXML;
+						}
 					}
 				}
 			}
