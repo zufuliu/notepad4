@@ -5647,21 +5647,21 @@ void Editor::FoldAll(FoldAction action) {
 		pcs->SetVisible(0, maxLine - 1, true);
 		pcs->ExpandAll();
 	} else {
-		Sci::Line lineMaxSubord = -1;
+		FoldLevel topLevel = FoldLevel::NumberMask;
 		for (; line < maxLine; line++) {
 			const FoldLevel level = pdoc->GetFoldLevel(line);
 			if (LevelIsHeader(level)) {
-				if (FoldLevel::Base == LevelNumberPart(level)
-					// top level fold without parent in indentation based folding
-					|| (line > lineMaxSubord && pdoc->GetFoldParent(line) < 0)) {
-					lineMaxSubord = pdoc->GetLastChild(line, level);
+				const FoldLevel levelLine = LevelNumberPart(level);
+				if (topLevel >= levelLine) {
+					topLevel = levelLine; // top level fold with parent
+					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line, level);
 					if (lineMaxSubord > line) {
 						pcs->SetExpanded(line, false);
 						pcs->SetVisible(line + 1, lineMaxSubord, false);
 					}
 				} else {
 					const FoldLevel levelNext = pdoc->GetFoldLevel(line + 1);
-					if (LevelNumber(level) < LevelNumber(levelNext)) {
+					if (levelLine < LevelNumberPart(levelNext)) {
 						pcs->SetExpanded(line, false);
 					}
 				}
