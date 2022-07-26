@@ -369,36 +369,37 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 
 	int prevLevel = SC_FOLDLEVELBASE;
-	bool prevComment = false;
-	bool prev2Comment = false;
+	TOMLLineType prevType = TOMLLineType::None;
+	TOMLLineType prev2Type = TOMLLineType::None;
 	if (lineCurrent > 0) {
 		prevLevel = styler.LevelAt(lineCurrent - 1);
-		prevComment = GetLineType(styler.GetLineState(lineCurrent - 1)) == TOMLLineType::CommentLine;
-		prev2Comment = lineCurrent > 1 && GetLineType(styler.GetLineState(lineCurrent - 2)) == TOMLLineType::CommentLine;
+		prevType = GetLineType(styler.GetLineState(lineCurrent - 1));
+		prev2Type = GetLineType(styler.GetLineState(lineCurrent - 2));
 	}
 
-	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
+	bool commentHead = (prevType == TOMLLineType::CommentLine) && (prevLevel & SC_FOLDLEVELHEADERFLAG);
 	while (lineCurrent <= maxLines) {
 		int nextLevel;
 		const int lineState = styler.GetLineState(lineCurrent);
 		const TOMLLineType lineType = GetLineType(lineState);
 
-		const bool currentComment = lineType == TOMLLineType::CommentLine;
-		if (currentComment) {
-			commentHead = !prevComment;
+		if (lineType == TOMLLineType::CommentLine) {
 			if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
 				nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
 			} else {
 				nextLevel = prevLevel;
 			}
+			commentHead = prevType != TOMLLineType::CommentLine;
 			nextLevel |= commentHead ? SC_FOLDLEVELHEADERFLAG : 0;
 		} else {
 			if (lineType == TOMLLineType::Table) {
 				nextLevel = SC_FOLDLEVELBASE + GetTableLevel(lineState);
-				if (prevComment && prevLevel <= nextLevel) {
+				if ((prevType == TOMLLineType::CommentLine) && prevLevel <= nextLevel) {
 					// comment above nested table
-					commentHead = false;
-					styler.SetLevel(lineCurrent - 1, prevLevel - 1);
+					commentHead = true;
+					prevLevel = nextLevel - 1;
+				} else if ((prevType == TOMLLineType::Table) && (prevLevel & SC_FOLDLEVELNUMBERMASK) >= nextLevel) {
+					commentHead = true; // empty table
 				}
 				nextLevel |= SC_FOLDLEVELHEADERFLAG;
 			} else {
@@ -406,7 +407,7 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 					nextLevel = prevLevel & SC_FOLDLEVELNUMBERMASK;
 				} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
 					nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
-				} else if (prevComment && prev2Comment) {
+				} else if ((prevType == TOMLLineType::CommentLine) && (prev2Type == TOMLLineType::CommentLine)) {
 					nextLevel = prevLevel - 1;
 				} else {
 					nextLevel = prevLevel;
@@ -424,8 +425,8 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 		}
 
 		prevLevel = nextLevel;
-		prev2Comment = prevComment;
-		prevComment = currentComment;
+		prev2Type = prevType;
+		prevType = lineType;
 		lineCurrent++;
 	}
 }
