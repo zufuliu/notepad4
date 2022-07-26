@@ -120,6 +120,10 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			int nextLevel;
 			if (initStyle == SCE_PROPS_SECTION) {
 				nextLevel = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
+				if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
+					// empty section
+					styler.SetLevel(lineCurrent - 1, SC_FOLDLEVELBASE);
+				}
 			} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
 				nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
 			} else {
@@ -145,37 +149,39 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 
 	int prevLevel = SC_FOLDLEVELBASE;
-	bool prevComment = false;
-	bool prev2Comment = false;
+	int prevState = 0;
+	int prev2State = 0;
 	if (lineCurrent > 0) {
 		prevLevel = styler.LevelAt(lineCurrent - 1);
-		prevComment = styler.GetLineState(lineCurrent - 1) == SCE_PROPS_COMMENT;
-		prev2Comment = lineCurrent > 1 && styler.GetLineState(lineCurrent - 2) == SCE_PROPS_COMMENT;
+		prevState = styler.GetLineState(lineCurrent - 1);
+		prev2State = styler.GetLineState(lineCurrent - 2);
 	}
 
-	bool commentHead = prevComment && (prevLevel & SC_FOLDLEVELHEADERFLAG);
+	bool commentHead = (prevState == SCE_PROPS_COMMENT) && (prevLevel & SC_FOLDLEVELHEADERFLAG);
 	while (lineCurrent <= maxLines) {
 		int nextLevel;
 		const int initStyle = styler.GetLineState(lineCurrent);
 
-		const bool currentComment = initStyle == SCE_PROPS_COMMENT;
-		if (currentComment) {
-			commentHead = !prevComment;
+		if (initStyle == SCE_PROPS_COMMENT) {
 			if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
 				nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
 			} else {
 				nextLevel = prevLevel;
 			}
+			commentHead = prevState != SCE_PROPS_COMMENT;
 			nextLevel |= commentHead ? SC_FOLDLEVELHEADERFLAG : 0;
 		} else {
 			if (initStyle == SCE_PROPS_SECTION) {
 				nextLevel = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
+				if (prevState == SCE_PROPS_SECTION) {
+					commentHead = true; // empty section
+				}
 			} else {
 				if (commentHead) {
 					nextLevel = prevLevel & SC_FOLDLEVELNUMBERMASK;
 				} else if (prevLevel & SC_FOLDLEVELHEADERFLAG) {
 					nextLevel = (prevLevel & SC_FOLDLEVELNUMBERMASK) + 1;
-				} else if (prevComment && prev2Comment) {
+				} else if ((prevState == SCE_PROPS_COMMENT) && (prev2State == SCE_PROPS_COMMENT)) {
 					nextLevel = prevLevel - 1;
 				} else {
 					nextLevel = prevLevel;
@@ -193,8 +199,8 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 		}
 
 		prevLevel = nextLevel;
-		prev2Comment = prevComment;
-		prevComment = currentComment;
+		prev2State = prevState;
+		prevState = initStyle;
 		lineCurrent++;
 	}
 }
