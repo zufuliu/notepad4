@@ -579,8 +579,14 @@ Sci::Line Document::GetLastChild(Sci::Line lineParent, FoldLevel level, Sci::Lin
 	return lineMaxSubord;
 }
 
-Sci::Line Document::GetFoldParent(Sci::Line line) const noexcept {
-	const FoldLevel level = LevelNumberPart(GetFoldLevel(line));
+Sci::Line Document::GetFoldParent(Sci::Line line, FoldLevel level) const noexcept {
+	if (level == FoldLevel::None) {
+		level = GetFoldLevel(line);
+	}
+	level = LevelNumberPart(level);
+	if (level == FoldLevel::Base) {
+		return -1;
+	}
 	for (Sci::Line lineLook = line - 1; lineLook >= 0; lineLook--) {
 		const FoldLevel levelTry = GetFoldLevel(lineLook);
 		if (LevelIsHeader(levelTry) && LevelNumberPart(levelTry) < level) {
@@ -603,7 +609,7 @@ void Document::GetHighlightDelimiters(HighlightDelimiter &highlightDelimiter, Sc
 		lookLineLevelNum = LevelNumberPart(lookLineLevel);
 	}
 
-	Sci::Line beginFoldBlock = LevelIsHeader(lookLineLevel) ? lookLine : GetFoldParent(lookLine);
+	Sci::Line beginFoldBlock = LevelIsHeader(lookLineLevel) ? lookLine : GetFoldParent(lookLine, lookLineLevel);
 	if (beginFoldBlock < 0) {
 		highlightDelimiter.Clear();
 		return;
