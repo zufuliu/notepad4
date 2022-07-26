@@ -2597,8 +2597,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DisableCmd(hmenu, IDM_EDIT_LINECOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoLineComment));
 	DisableCmd(hmenu, IDM_EDIT_STREAMCOMMENT, (pLexCurrent->lexerAttr & LexerAttr_NoBlockComment));
 
-	EnableCmd(hmenu, IDM_EDIT_INSERT_ENCODING, *mEncoding[iCurrentEncoding].pszParseNames);
-
 	i = nonEmpty;
 	EnableCmd(hmenu, IDM_EDIT_FIND, i);
 	EnableCmd(hmenu, IDM_EDIT_SAVEFIND, i);
@@ -3599,29 +3597,26 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_INSERT_ENCODING: {
-		if (*mEncoding[iCurrentEncoding].pszParseNames) {
-			char msz[64];
-			bool done = false;
-			strncpy(msz, mEncoding[iCurrentEncoding].pszParseNames, COUNTOF(msz) - 1);
-			char *p = strchr(msz, ',');
-			if (p != NULL) {
-				*p = '\0';
-			}
-			if (pLexCurrent->iLexer == SCLEX_PYTHON) {
-				const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-				const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
-				const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
-				if (iCurLine < 2 && iCurrentLinePos == 0) {
-					char cmsz[128];
-					sprintf(cmsz, "#-*- coding: %s -*-", msz);
-					SciCall_ReplaceSel(cmsz);
-					done = true;
-				}
-			}
-			if (!done) {
-				SciCall_ReplaceSel(msz);
+		char msz[64];
+		const char *enc = mEncoding[iCurrentEncoding].pszParseNames;
+		const char *sep = strchr(enc, ',');
+		if (sep != NULL) {
+			strncpy(msz, enc, (sep - enc));
+		} else {
+			WideCharToMultiByte(CP_UTF8, 0, mEncoding[iCurrentEncoding].wchLabel, -1, msz, COUNTOF(msz), NULL, NULL);
+		}
+		if (pLexCurrent->iLexer == SCLEX_PYTHON) {
+			const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
+			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
+			const Sci_Position iCurrentLinePos = iCurrentPos - SciCall_PositionFromLine(iCurLine);
+			if (iCurLine < 2 && iCurrentLinePos == 0) {
+				char cmsz[128];
+				sprintf(cmsz, "#-*- coding: %s -*-", msz);
+				SciCall_ReplaceSel(cmsz);
+				break;
 			}
 		}
+		SciCall_ReplaceSel(msz);
 	}
 	break;
 
