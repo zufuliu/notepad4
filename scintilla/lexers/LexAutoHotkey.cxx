@@ -423,14 +423,15 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_AHK_STRING_SQ:
 		case SCE_AHK_STRING_DQ:
-			if (sc.ch == '`' && !IsEOLChar(sc.chNext)) {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_AHK_DEFAULT);
+			} else if (sc.ch == '`' && !IsEOLChar(sc.chNext)) {
 				const int state = sc.state;
 				sc.SetState(SCE_AHK_ESCAPECHAR);
 				sc.Forward();
 				sc.ForwardSetState(state);
 				continue;
-			}
-			if (sc.ch == '%' && IsIdentifierCharEx(sc.chNext)) {
+			} else if (sc.ch == '%' && IsIdentifierCharEx(sc.chNext)) {
 				outerStyle = sc.state;
 				sc.SetState(SCE_AHK_DYNAMIC_VARIABLE);
 			} else if (sc.ch == '{' || sc.ch == '}') {
@@ -446,8 +447,6 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					continue;
 				}
 				sc.ForwardSetState(SCE_AHK_DEFAULT);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_AHK_DEFAULT);
 			}
 			break;
 
@@ -495,13 +494,14 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_AHK_HOTSTRING_VALUE:
-			if (sc.ch == '`' && !IsEOLChar(sc.chNext)) {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_AHK_DEFAULT);
+			} else if (sc.ch == '`' && !IsEOLChar(sc.chNext)) {
 				sc.SetState(SCE_AHK_ESCAPECHAR);
 				sc.Forward();
 				sc.ForwardSetState(SCE_AHK_HOTSTRING_VALUE);
 				continue;
-			}
-			if (sc.ch == '{' || sc.ch == '}') {
+			} else if (sc.ch == '{' || sc.ch == '}') {
 				if (HighlightBrace(sc, outerStyle)) {
 					continue;
 				}
@@ -510,8 +510,6 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (chNext == ';' || chNext == '\0') {
 					sc.SetState(SCE_AHK_DEFAULT);
 				}
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_AHK_DEFAULT);
 			}
 			break;
 
@@ -633,6 +631,10 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_AHK_SECTION_COMMENT:
+			if (sc.atLineStart) {
+				sc.SetState(outerStyle);
+				continue;
+			}
 			if (sectionState == AHKSectionState::InitQuote) {
 				if (sc.ch == '`') {
 					sc.Forward();
@@ -643,10 +645,6 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.ChangeState((stringQuoteChar == '\'') ? SCE_AHK_STRING_SQ : SCE_AHK_STRING_DQ);
 					break;
 				}
-			}
-			if (sc.atLineStart) {
-				sc.SetState(outerStyle);
-				continue;
 			}
 			break;
 

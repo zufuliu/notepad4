@@ -462,14 +462,14 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_D_CHARACTER:
-			if (sc.ch == '\'') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_D_DEFAULT);
+			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_D_DEFAULT);
 			} else if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_D_ESCAPECHAR);
 				sc.Forward();
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_D_DEFAULT);
 			}
 			break;
 

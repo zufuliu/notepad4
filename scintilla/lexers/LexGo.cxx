@@ -395,7 +395,9 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_GO_STRING:
 		case SCE_GO_RAW_STRING:
-			if (sc.state == SCE_GO_STRING && sc.ch == '\\') {
+			if (sc.state == SCE_GO_STRING && sc.atLineStart) {
+				sc.SetState(SCE_GO_DEFAULT);
+			} else if (sc.state == SCE_GO_STRING && sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_GO_ESCAPECHAR);
 				sc.Forward();
@@ -410,8 +412,6 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 			} else if ((sc.state == SCE_GO_STRING && sc.ch == '\"') || (sc.state == SCE_GO_RAW_STRING && sc.ch == '`')) {
 				sc.ForwardSetState(SCE_GO_DEFAULT);
-			} else if (sc.state == SCE_GO_STRING && sc.atLineStart) {
-				sc.SetState(SCE_GO_DEFAULT);
 			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
 				insideUrl = true;
 			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
@@ -420,14 +420,14 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			break;
 
 		case SCE_GO_CHARACTER:
-			if (sc.ch == '\\') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_GO_DEFAULT);
+			} else if (sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_GO_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_GO_DEFAULT);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_GO_DEFAULT);
 			}
 			break;
 

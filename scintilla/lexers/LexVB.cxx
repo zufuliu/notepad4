@@ -159,7 +159,9 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		case SCE_B_STRING:
 			// VB doubles quotes to preserve them, so just end this string
 			// state now as a following quote will start again
-			if (sc.ch == '\"') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_B_DEFAULT);
+			} else if (sc.ch == '\"') {
 				if (sc.chNext == '\"') {
 					sc.Forward();
 				} else {
@@ -168,8 +170,6 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					}
 					sc.ForwardSetState(SCE_B_DEFAULT);
 				}
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_B_DEFAULT);
 			}
 			break;
 
@@ -203,10 +203,10 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			break;
 
 		case SCE_B_DATE:
-			if (sc.ch == '#') {
-				sc.ForwardSetState(SCE_B_DEFAULT);
-			} else if (sc.atLineStart) {
+			if (sc.atLineStart) {
 				sc.SetState(SCE_B_DEFAULT);
+			} else if (sc.ch == '#') {
+				sc.ForwardSetState(SCE_B_DEFAULT);
 			}
 			break;
 		}

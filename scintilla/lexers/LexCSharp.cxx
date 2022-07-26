@@ -417,15 +417,6 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_CSHARP_COMMENTLINEDOC:
 		case SCE_CSHARP_COMMENTBLOCKDOC:
-			if (docTagState != DocTagState::None) {
-				if (sc.Match('/', '>') || sc.ch == '>') {
-					docTagState = DocTagState::None;
-					const int state = sc.state;
-					sc.SetState(SCE_CSHARP_COMMENTTAG_XML);
-					sc.Forward((sc.ch == '/') ? 2 : 1);
-					sc.SetState(state);
-				}
-			}
 			if (sc.state == SCE_CSHARP_COMMENTLINEDOC) {
 				if (sc.atLineStart) {
 					sc.SetState(SCE_CSHARP_DEFAULT);
@@ -435,6 +426,15 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.Forward();
 				sc.ForwardSetState(SCE_CSHARP_DEFAULT);
 				break;
+			}
+			if (docTagState != DocTagState::None) {
+				if (sc.Match('/', '>') || sc.ch == '>') {
+					docTagState = DocTagState::None;
+					const int state = sc.state;
+					sc.SetState(SCE_CSHARP_COMMENTTAG_XML);
+					sc.Forward((sc.ch == '/') ? 2 : 1);
+					sc.SetState(state);
+				}
 			}
 			if (docTagState == DocTagState::None) {
 				if (sc.ch == '<') {

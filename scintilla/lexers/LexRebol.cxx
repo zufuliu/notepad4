@@ -254,15 +254,15 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_REBOL_QUOTEDSTRING:
 		case SCE_REBOL_QUOTEDFILE:
 		case SCE_REBOL_TAG_VALUE:
-			if (sc.ch == '^') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_REBOL_DEFAULT);
+			} else if (sc.ch == '^') {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_REBOL_ESCAPECHAR);
 					sc.Forward();
 				}
 			} else if (sc.ch == '\"') {
 				sc.ForwardSetState(SCE_REBOL_DEFAULT);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_REBOL_DEFAULT);
 			}
 			break;
 

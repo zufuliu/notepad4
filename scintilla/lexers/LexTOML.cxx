@@ -257,13 +257,13 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_TOML_ERROR:
-			if (sc.ch == '#') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_TOML_DEFAULT);
+			} else if (sc.ch == '#') {
 				sc.SetState(SCE_TOML_COMMENT);
 			} else if (sc.ch == ',') {
 				sc.SetState(SCE_TOML_OPERATOR);
 				sc.ForwardSetState(SCE_TOML_ERROR);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_TOML_DEFAULT);
 			}
 			break;
 

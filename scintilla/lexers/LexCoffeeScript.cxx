@@ -256,7 +256,9 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 
 		case SCE_COFFEESCRIPT_REGEX:
 		case SCE_COFFEESCRIPT_TRIPLE_REGEX:
-			if (sc.ch == '\\') {
+			if (sc.atLineStart && sc.state == SCE_COFFEESCRIPT_REGEX) {
+				sc.SetState(SCE_COFFEESCRIPT_DEFAULT);
+			} else if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
 				insideRegexRange = sc.ch == '[';
@@ -278,8 +280,6 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				while (IsLowerCase(sc.ch)) {
 					sc.Forward();
 				}
-				sc.SetState(SCE_COFFEESCRIPT_DEFAULT);
-			} else if (sc.atLineStart && sc.state == SCE_COFFEESCRIPT_REGEX) {
 				sc.SetState(SCE_COFFEESCRIPT_DEFAULT);
 			}
 			break;

@@ -112,15 +112,15 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_GRAPHVIZ_STRING:
-			if (sc.ch == '\\') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
+			} else if (sc.ch == '\\') {
 				if (IsEscapeSequence(sc.chNext)) {
 					sc.SetState(SCE_GRAPHVIZ_ESCAPECHAR);
 				}
 				sc.Forward();
 			} else if (sc.ch == '\"') {
 				sc.ForwardSetState(SCE_GRAPHVIZ_DEFAULT);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_GRAPHVIZ_DEFAULT);
 			}
 			break;
 

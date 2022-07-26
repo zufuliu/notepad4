@@ -91,19 +91,21 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_SECTION:
-			if (sc.ch == ']') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_INNO_DEFAULT);
+			} else if (sc.ch == ']') {
 				char s[8];
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (StrEqual(s + 1, "code")) {
 					lineState |= InnoLineStateCodeSection;
 				}
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_INNO_DEFAULT);
 			}
 			break;
 
 		case SCE_INNO_STRING_DQ:
-			if (ppKind == PreprocessorKind::Include) {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_INNO_DEFAULT);
+			} else if (ppKind == PreprocessorKind::Include) {
 				if (sc.ch == '\"') {
 					ppKind = PreprocessorKind::None;
 					sc.ForwardSetState(SCE_INNO_DEFAULT);
@@ -126,8 +128,6 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_INNO_PLACEHOLDER);
 					sc.Forward();
 				}
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_INNO_DEFAULT);
 			}
 			break;
 
@@ -162,6 +162,10 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_INLINE_EXPANSION:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_INNO_DEFAULT);
+				break;
+			}
 			switch (sc.ch) {
 			case '{':
 				++expansionLevel;
@@ -190,9 +194,6 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					continue;
 				}
 				break;
-			}
-			if (sc.atLineStart) {
-				sc.SetState(SCE_INNO_DEFAULT);
 			}
 			break;
 
@@ -270,7 +271,9 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_STRING_SQ:
-			if (sc.ch == '\'' || sc.ch == '{') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_INNO_DEFAULT);
+			} else if (sc.ch == '\'' || sc.ch == '{') {
 				if (sc.ch == sc.chNext) {
 					sc.Forward();
 				} else if (sc.ch == '\'') {
@@ -280,16 +283,14 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					outerState = SCE_INNO_STRING_SQ;
 					sc.SetState(SCE_INNO_INLINE_EXPANSION);
 				}
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_INNO_DEFAULT);
 			}
 			break;
 
 		case SCE_INNO_STRING_ANGLE:
-			if (sc.ch == '>') {
-				sc.ForwardSetState(SCE_INNO_DEFAULT);
-			} else if (sc.atLineStart) {
+			if (sc.atLineStart) {
 				sc.SetState(SCE_INNO_DEFAULT);
+			} else if (sc.ch == '>') {
+				sc.ForwardSetState(SCE_INNO_DEFAULT);
 			}
 			break;
 

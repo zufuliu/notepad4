@@ -154,9 +154,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_LLVM_QUOTED_VARIABLE:
 		case SCE_LLVM_QUOTED_GLOBAL_VARIABLE:
-			if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
-				sc.Forward();
-			} else if (sc.ch == '\"' || sc.atLineStart) {
+			if (sc.ch == '\"' || sc.atLineStart) {
 				if (sc.ch == '\"') {
 					sc.Forward();
 				}
@@ -165,6 +163,8 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.ChangeState(state);
 				sc.SetState(SCE_LLVM_DEFAULT);
 				kwType = KeywordType::None;
+			} else if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
+				sc.Forward();
 			}
 			break;
 

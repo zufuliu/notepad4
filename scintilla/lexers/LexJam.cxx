@@ -154,20 +154,19 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_JAM_STRING:
-			if (sc.ch == '\\' && IsJamEscapeChar(sc.chNext)) {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_JAM_DEFAULT);
+			} else if (sc.ch == '\\' && IsJamEscapeChar(sc.chNext)) {
 				sc.SetState(SCE_JAM_ESCAPECHAR);
 				sc.Forward();
 				sc.ForwardSetState(SCE_JAM_STRING);
 				continue;
-			}
-			if (sc.Match('$', '(')) {
+			} else if (sc.Match('$', '(')) {
 				nestedState.push_back(SCE_JAM_STRING);
 				sc.SetState(SCE_JAM_OPERATOR);
 				sc.Forward();
 			} else if (sc.ch == '"') {
 				sc.ForwardSetState(SCE_JAM_DEFAULT);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_JAM_DEFAULT);
 			}
 			break;
 		}

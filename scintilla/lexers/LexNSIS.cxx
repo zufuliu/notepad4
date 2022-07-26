@@ -101,7 +101,9 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_NSIS_STRINGSQ:
 		case SCE_NSIS_STRINGDQ:
 		case SCE_NSIS_STRINGBT:
-			if (sc.ch == '$') {
+			if (sc.atLineStart && !lineContinuation) {
+				sc.SetState(SCE_NSIS_DEFAULT);
+			} else if (sc.ch == '$') {
 				if (sc.chNext == '$' || (sc.chNext == '\\' && IsEscapeChar(sc.GetRelative(2)))) {
 					const int state = sc.state;
 					sc.SetState(SCE_NSIS_ESCAPECHAR);
@@ -115,10 +117,6 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				} else if (IsIdentifierChar(sc.chNext)) {
 					variableOuter = sc.state;
 					sc.SetState(SCE_NSIS_VARIABLE);
-				}
-			} else if (sc.atLineStart) {
-				if (!lineContinuation) {
-					sc.SetState(SCE_NSIS_DEFAULT);
 				}
 			} else if ((sc.state == SCE_NSIS_STRINGSQ && sc.ch == '\'')
 				|| (sc.state == SCE_NSIS_STRINGDQ && sc.ch == '"')
@@ -144,10 +142,8 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_NSIS_COMMENTLINE:
-			if (sc.atLineStart) {
-				if (!lineContinuation) {
-					sc.SetState(SCE_NSIS_DEFAULT);
-				}
+			if (sc.atLineStart && !lineContinuation) {
+				sc.SetState(SCE_NSIS_DEFAULT);
 			}
 			break;
 

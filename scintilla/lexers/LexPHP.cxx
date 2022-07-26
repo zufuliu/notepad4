@@ -707,6 +707,14 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists, int visibleChars) {
 }
 
 void PHPLexer::HighlightJsInnerString() {
+	if (sc.atLineStart) {
+		if (lineContinuation) {
+			lineContinuation = 0;
+		} else {
+			sc.SetState(js_style(SCE_JS_DEFAULT));
+			return;
+		}
+	}
 	if (sc.ch == '\\') {
 		if (IsEOLChar(sc.chNext)) {
 			lineContinuation = JsLineStateLineContinuation;
@@ -723,13 +731,7 @@ void PHPLexer::HighlightJsInnerString() {
 			sc.ForwardSetState(js_style(SCE_JS_DEFAULT));
 		}
 	} else {
-		if (sc.atLineStart) {
-			if (lineContinuation) {
-				lineContinuation = 0;
-			} else {
-				sc.SetState(js_style(SCE_JS_DEFAULT));
-			}
-		} else if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
+		if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
 			sc.Forward();
 			if (operatorBefore != '?') {
 				// json key
@@ -1096,7 +1098,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case js_style(SCE_JS_REGEX):
-			if (sc.ch == '\\') {
+			if (sc.atLineStart) {
+				sc.SetState(js_style(SCE_JS_DEFAULT));
+			} else if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == '[' || sc.ch == ']') {
 				insideRegexRange = sc.ch == '[';
@@ -1106,8 +1110,6 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				while (IsLowerCase(sc.ch)) {
 					sc.Forward();
 				}
-				sc.SetState(js_style(SCE_JS_DEFAULT));
-			} else if (sc.atLineStart) {
 				sc.SetState(js_style(SCE_JS_DEFAULT));
 			}
 			break;

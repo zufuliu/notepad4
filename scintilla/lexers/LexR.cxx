@@ -141,10 +141,10 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_R_INFIX:
-			if (sc.ch == '%') {
-				sc.ForwardSetState(SCE_R_DEFAULT);
-			} else if (sc.atLineStart) {
+			if (sc.atLineStart) {
 				sc.SetState(SCE_R_DEFAULT);
+			} else if (sc.ch == '%') {
+				sc.ForwardSetState(SCE_R_DEFAULT);
 			}
 			break;
 
@@ -183,7 +183,9 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_R_STRING:
 		case SCE_R_STRING2:
-			if (sc.ch == '\\') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_R_DEFAULT);
+			} else if (sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_R_ESCAPECHAR);
 				sc.Forward();
@@ -199,8 +201,6 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			} else if ((sc.state == SCE_R_STRING && sc.ch == '\'')
 				|| (sc.state == SCE_R_STRING2 && sc.ch == '\"')) {
 				sc.ForwardSetState(SCE_R_DEFAULT);
-			} else if (sc.atLineStart) {
-				sc.SetState(SCE_R_DEFAULT);
 			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
 				insideUrl = true;
 			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
@@ -216,10 +216,10 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_R_BACKTICKS:
-			if (sc.ch == '`') {
-				sc.ForwardSetState(SCE_R_DEFAULT);
-			} else if (sc.atLineStart) {
+			if (sc.atLineStart) {
 				sc.SetState(SCE_R_DEFAULT);
+			} else if (sc.ch == '`') {
+				sc.ForwardSetState(SCE_R_DEFAULT);
 			}
 			break;
 		}

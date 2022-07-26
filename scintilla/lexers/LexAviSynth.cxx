@@ -146,14 +146,16 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_AVS_COMMENTLINE:
-			if (sc.ch == '\\' && IsEOLChar(sc.chNext)) {
-				lineContinuation = AviSynthLineStateMaskLineContinuation;
-			} else if (sc.atLineStart) {
+			if (sc.atLineStart) {
 				if (lineContinuation) {
 					lineContinuation = 0;
 				} else {
 					sc.SetState(SCE_AVS_DEFAULT);
+					break;
 				}
+			}
+			if (sc.ch == '\\' && IsEOLChar(sc.chNext)) {
+				lineContinuation = AviSynthLineStateMaskLineContinuation;
 			} else {
 				HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_AVS_TASKMARKER);
 			}
