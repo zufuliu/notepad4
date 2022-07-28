@@ -7851,7 +7851,7 @@ static FOLD_ACTION FoldToggleNode(Sci_Line line, FOLD_ACTION expanding) {
 	if ((int)action != fExpanded) {
 		SciCall_FoldLine(line, (int)action);
 		if (expanding == FOLD_ACTION_SNIFF) {
-			// empty INI section not changed after toggle (issue #48).
+			// header without children not changed after toggle (issue #48).
 			const BOOL after = SciCall_GetFoldExpanded(line);
 			if (fExpanded != after) {
 				expanding = action;
