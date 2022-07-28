@@ -38,7 +38,7 @@ static EDITSTYLE Styles_FSharp[] = {
 	{ MULTI_STYLE(SCE_FSHARP_COMMENT, SCE_FSHARP_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_FSHARP_STRING, SCE_FSHARP_STRINGEOL, SCE_FSHARP_CHARACTER, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_FSHARP_VERBATIM, NP2StyleX_VerbatimString, L"fore:#008080" },
-	{ SCE_FSHARP_QUOTATION, NP2StyleX_CodeQuotation, L"fore:#006633; back:#FFF1A8" },
+	{ SCE_FSHARP_QUOTATION, NP2StyleX_CodeQuotation, L"fore:#006633; back:#FFF1A8; eolfilled" },
 	{ SCE_FSHARP_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_FSHARP_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
