@@ -929,9 +929,6 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 			} while (lineState & PyLineStateMaskTripleQuote);
 			lineCurrent++;
 			stateCurrent = FoldLineState(styler.GetLineState(lineCurrent));
-			if (stateCurrent.Empty()) {
-				stateCurrent.indentCount = statePrev.indentCount;
-			}
 			continue;
 		}
 
@@ -946,7 +943,12 @@ void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/
 		}
 
 		int levelAfterBlank = stateNext.indentCount;
-		if (!stateCurrent.Empty()) {
+		if (stateCurrent.Empty()) {
+			if (statePrev.TripleQuoted()) {
+				stateCurrent.indentCount = statePrev.indentCount;
+				lev = levelAfterBlank + SC_FOLDLEVELBASE;
+			}
+		} else{
 			if (stateNext.CloseBrace() && levelAfterBlank < stateCurrent.indentCount) {
 				levelAfterBlank = stateCurrent.indentCount;
 			}
