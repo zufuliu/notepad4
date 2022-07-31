@@ -2775,7 +2775,7 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 	// replace Windows Notepad
 	if (mask & SystemIntegration_ReplaceNotepad) {
 		HKEY hKey;
-		LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
+		const LSTATUS status = Registry_CreateKey(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, &hKey);
 		if (status == ERROR_SUCCESS) {
 			wsprintf(command, L"\"%s\" /z", tchModule);
 			Registry_SetDefaultString(hKey, tchModule);

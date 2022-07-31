@@ -115,8 +115,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	int numSBrace = (curLineState >> 13) & 0x1F;
 	int numRBrace = (curLineState >> 8) & 0x1F;
 	int curNcLevel = (curLineState >> 4) & 0x0F;
-	int numDTSBrace = (curLineState) & 0x0F;
-#define MakeState() ((lineState << 24)|(numCBrace << 18)|(numSBrace << 13)|(numRBrace << 8)|(curNcLevel << 4)|numDTSBrace)
+#define MakeState() ((lineState << 24)|(numCBrace << 18)|(numSBrace << 13)|(numRBrace << 8)|(curNcLevel << 4))
 #define UpdateLineState()	styler.SetLineState(lineCurrent, MakeState())
 #define UpdateCurLineState() lineCurrent = styler.GetLine(sc.currentPos); \
 								styler.SetLineState(lineCurrent, MakeState())

@@ -246,7 +246,7 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 	DWORD len = lstrlen(lpszText);
 	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
-	LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
+	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
 	return status;
 }
 

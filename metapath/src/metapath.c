@@ -3030,7 +3030,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		}
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		const KNOWNFOLDERID *rfidList[] = {
+		const KNOWNFOLDERID * const rfidList[] = {
 			&FOLDERID_LocalAppData,
 			&FOLDERID_RoamingAppData,
 			&FOLDERID_Profile,

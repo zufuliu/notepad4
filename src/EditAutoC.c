@@ -1470,7 +1470,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	if (!bIgnoreLexer && IsSpecialStartChar(ch, chPrev)) {
 		int iPrevStyle = 0;
 		if (ch == ':' && chPrev != ':') {
-			Sci_Position iPos = SciCall_WordStartPosition(iStartWordPos - 1, false);
+			const Sci_Position iPos = SciCall_WordStartPosition(iStartWordPos - 1, false);
 			iPrevStyle = SciCall_GetStyleIndexAt(iPos);
 		}
 
@@ -1659,7 +1659,7 @@ void EditAutoCloseBraceQuote(int ch) {
 	const int iNextStyle = SciCall_GetStyleIndexAt(iCurPos);
 
 	if (iPrevStyle != 0) {
-		int charStyle = pLexCurrent->characterLiteralStyle;
+		const int charStyle = pLexCurrent->characterLiteralStyle;
 		if (charStyle != 0) {
 			// within character literal
 			if (iPrevStyle == charStyle && iNextStyle == charStyle) {
@@ -2036,7 +2036,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 extern FILEVARS fvCurFile;
 
 void EditAutoIndent(void) {
-	Sci_Position iCurPos = SciCall_GetCurrentPos();
+	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	//const Sci_Position iAnchorPos = SciCall_GetAnchor();
 	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
 	//const Sci_Position iLineLength = SciCall_GetLineLength(iCurLine);

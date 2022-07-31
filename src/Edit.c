@@ -3776,13 +3776,13 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangleSelection()) {
 #if NP2_USE_DESIGNATED_INITIALIZER
-			EDITFINDREPLACE efrTrim = {
+			const EDITFINDREPLACE efrTrim = {
 				.szFind = "[ \t]+$",
 				.hwnd = hwnd,
 				.fuFlags = SCFIND_REGEXP,
 			};
 #else
-			EDITFINDREPLACE efrTrim = { "[ \t]+$", "", "", "", hwnd, SCFIND_REGEXP };
+			const EDITFINDREPLACE efrTrim = { "[ \t]+$", "", "", "", hwnd, SCFIND_REGEXP };
 #endif
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
 				return;
@@ -3819,13 +3819,13 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangleSelection()) {
 #if NP2_USE_DESIGNATED_INITIALIZER
-			EDITFINDREPLACE efrTrim = {
+			const EDITFINDREPLACE efrTrim = {
 				.szFind = "^[ \t]+",
 				.hwnd = hwnd,
 				.fuFlags = SCFIND_REGEXP,
 			};
 #else
-			EDITFINDREPLACE efrTrim = { "^[ \t]+", "", "", "", hwnd, SCFIND_REGEXP };
+			const EDITFINDREPLACE efrTrim = { "^[ \t]+", "", "", "", hwnd, SCFIND_REGEXP };
 #endif
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
 				return;

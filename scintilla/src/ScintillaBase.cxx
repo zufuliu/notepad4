@@ -229,7 +229,7 @@ void ScintillaBase::ListNotify(ListBoxEvent *plbe) {
 }
 
 void ScintillaBase::AutoCompleteInsert(Sci::Position startPos, Sci::Position removeLen, const char *text, Sci::Position textLen) {
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	if (multiAutoCMode == MultiAutoComplete::Once) {
 		pdoc->DeleteChars(startPos, removeLen);
 		const Sci::Position lengthInserted = pdoc->InsertString(startPos, text, textLen);
@@ -364,7 +364,7 @@ void ScintillaBase::AutoCompleteMove(int delta) {
 }
 
 void ScintillaBase::AutoCompleteMoveToCurrentWord() {
-	std::string wordCurrent = RangeText(ac.posStart - ac.startLen, sel.MainCaret());
+	const std::string wordCurrent = RangeText(ac.posStart - ac.startLen, sel.MainCaret());
 	ac.Select(wordCurrent.c_str());
 }
 
@@ -492,7 +492,7 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	if (wMargin.Created()) {
 		pt = pt + GetVisibleOriginInMain();
 	}
-	AutoSurface surfaceMeasure(this);
+	const AutoSurface surfaceMeasure(this);
 	PRectangle rc = ct.CallTipStart(sel.MainCaret(), pt,
 		vs.lineHeight,
 		defn,

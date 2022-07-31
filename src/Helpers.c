@@ -296,12 +296,12 @@ LPWSTR Registry_GetString(HKEY hKey, LPCWSTR valueName) {
 LSTATUS Registry_SetString(HKEY hKey, LPCWSTR valueName, LPCWSTR lpszText) {
 	DWORD len = lstrlen(lpszText);
 	len = len ? ((len + 1)*sizeof(WCHAR)) : 0;
-	LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
+	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_SZ, (const BYTE *)lpszText, len);
 	return status;
 }
 
 LSTATUS Registry_SetInt(HKEY hKey, LPCWSTR valueName, DWORD value) {
-	LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_DWORD, (const BYTE *)(&value), sizeof(DWORD));
+	const LSTATUS status = RegSetValueEx(hKey, valueName, 0, REG_DWORD, (const BYTE *)(&value), sizeof(DWORD));
 	return status;
 }
 
@@ -558,7 +558,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 			const __m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
 				__m128i i16x8Fore = unpack_color_epi16_sse4_ptr64(prgba);
-				__m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Fore, 0xff), 0xff);
+				const __m128i i16x8Alpha = _mm_shufflehi_epi16(_mm_shufflelo_epi16(i16x8Fore, 0xff), 0xff);
 				i16x8Fore = mm_alpha_blend_epi16(i16x8Fore, i16x8Back, i16x8Alpha);
 				const uint64_t color = pack_color_epi16_sse2_si64(i16x8Fore);
 				*prgba = color | UINT64_C(0xff000000ff000000);
@@ -572,7 +572,7 @@ bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest) {
 			const __m128i i16x4Back = rgba_to_bgra_epi16_sse2_si32(crDest);
 			for (ULONG x = 0; x < count; x++, prgba++) {
 				__m128i i16x4Fore = unpack_color_epi16_sse2_ptr32(prgba);
-				__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, 0xff);
+				const __m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, 0xff);
 				i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
 				const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 				*prgba = color | 0xff000000U;

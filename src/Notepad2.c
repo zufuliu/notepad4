@@ -6832,7 +6832,7 @@ bool CheckIniFile(LPWSTR lpszFile, LPCWSTR lpszModule) {
 		}
 
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		const KNOWNFOLDERID *rfidList[] = {
+		const KNOWNFOLDERID * const rfidList[] = {
 			&FOLDERID_LocalAppData,
 			&FOLDERID_RoamingAppData,
 			&FOLDERID_Profile,
@@ -8761,7 +8761,7 @@ LPCWSTR AutoSave_GetDefaultFolder(void) {
 		PathAppend(szFolder, L"AutoSave");
 	}
 
-	DWORD dwFileAttributes = GetFileAttributes(szFolder);
+	const DWORD dwFileAttributes = GetFileAttributes(szFolder);
 	if (dwFileAttributes == INVALID_FILE_ATTRIBUTES) {
 		SHCreateDirectoryEx(NULL, szFolder, NULL);
 	}

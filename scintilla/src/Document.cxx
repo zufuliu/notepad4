@@ -915,7 +915,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 
 bool Document::NextCharacter(Sci::Position &pos, int moveDir) const noexcept {
 	// Returns true if pos changed
-	Sci::Position posNext = NextPosition(pos, moveDir);
+	const Sci::Position posNext = NextPosition(pos, moveDir);
 	if (posNext == pos) {
 		return false;
 	} else {
@@ -1564,10 +1564,10 @@ Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent)
 	const int indentOfLine = GetLineIndentation(line);
 	indent = std::max<Sci::Position>(indent, 0);
 	if (indent != indentOfLine) {
-		std::string linebuf = CreateIndentation(indent, tabInChars, !useTabs);
+		const std::string linebuf = CreateIndentation(indent, tabInChars, !useTabs);
 		const Sci::Position thisLineStart = LineStart(line);
 		const Sci::Position indentPos = GetLineIndentPosition(line);
-		UndoGroup ug(this);
+		const UndoGroup ug(this);
 		DeleteChars(thisLineStart, indentPos - thisLineStart);
 		return thisLineStart + InsertString(thisLineStart, linebuf.c_str(),
 			linebuf.length());
@@ -1734,7 +1734,7 @@ std::string Document::TransformLineEnds(const char *s, size_t len, EndOfLine eol
 }
 
 void Document::ConvertLineEnds(EndOfLine eolModeSet) {
-	UndoGroup ug(this);
+	const UndoGroup ug(this);
 
 	for (Sci::Position pos = 0; pos < LengthNoExcept(); pos++) {
 		if (cb.CharAt(pos) == '\r') {

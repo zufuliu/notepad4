@@ -1513,9 +1513,6 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 		return keywordDoStartsLoop(pos, styler);
 	}
 
-	char ch;
-	char chPrev;
-	char chPrev2;
 	int style = SCE_RB_DEFAULT;
 	Sci_Line lineStart = styler.GetLine(pos);
 	Sci_Position lineStartPosn = styler.LineStart(lineStart);
@@ -1523,15 +1520,13 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 	// position. But first move lineStartPosn back behind any
 	// continuations immediately above word.
 	while (lineStartPosn > 0) {
-		ch = styler[lineStartPosn - 1];
+		const char ch = styler[lineStartPosn - 1];
 		if (ch == '\n' || ch == '\r') {
-			chPrev = styler.SafeGetCharAt(lineStartPosn - 2);
-			chPrev2 = styler.SafeGetCharAt(lineStartPosn - 3);
-			lineStart = styler.GetLine(lineStartPosn - 1);
+			const char chPrev = styler.SafeGetCharAt(lineStartPosn - 2);
+			const char chPrev2 = styler.SafeGetCharAt(lineStartPosn - 3);
 			// If we find a continuation line, include it in our analysis.
-			if (chPrev == '\\') {
-				lineStartPosn = styler.LineStart(lineStart);
-			} else if (ch == '\n' && chPrev == '\r' && chPrev2 == '\\') {
+			if (chPrev == '\\' || (ch == '\n' && chPrev == '\r' && chPrev2 == '\\')) {
+				lineStart = styler.GetLine(lineStartPosn - 1);
 				lineStartPosn = styler.LineStart(lineStart);
 			} else {
 				break;
@@ -1545,7 +1540,8 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 	while (--pos >= lineStartPosn) {
 		style = styler.StyleAt(pos);
 		if (style == SCE_RB_DEFAULT) {
-			if (IsASpaceOrTab(ch = styler[pos])) {
+			const char ch = styler[pos];
+			if (IsASpaceOrTab(ch)) {
 				//continue
 			} else if (ch == '\r' || ch == '\n') {
 				// Scintilla's LineStart() and GetLine() routines aren't
@@ -1554,8 +1550,8 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 
 				// Also, lineStartPosn may have been moved to more than one
 				// line above word's line while pushing past continuations.
-				chPrev = styler.SafeGetCharAt(pos - 1);
-				chPrev2 = styler.SafeGetCharAt(pos - 2);
+				const char chPrev = styler.SafeGetCharAt(pos - 1);
+				const char chPrev2 = styler.SafeGetCharAt(pos - 2);
 				if (chPrev == '\\') {
 					pos -= 1;	 // gloss over the "\\"
 					//continue
@@ -1602,7 +1598,7 @@ bool keywordIsModifier(const char *word, Sci_Position pos, Accessor &styler) {
 	// usually it's a block assignment, like
 	// a << if x then y else z
 
-	ch = styler[pos];
+	const char ch = styler[pos];
 	switch (ch) {
 	case ')':
 	case ']':
@@ -1627,8 +1623,8 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 	while (--pos >= lineStartPosn) {
 		const int style = styler.StyleAt(pos);
 		if (style == SCE_RB_DEFAULT) {
-			char ch;
-			if ((ch = styler[pos]) == '\r' || ch == '\n') {
+			const char ch = styler[pos];
+			if (ch == '\r' || ch == '\n') {
 				// Scintilla's LineStart() and GetLine() routines aren't
 				// platform-independent, so if we have text prepared with
 				// a different system we can't rely on it.

@@ -87,8 +87,8 @@ namespace Scintilla::Internal {
 #if NP2_USE_AVX2
 inline ColourRGBA MixAlpha(ColourRGBA colour, ColourRGBA other) noexcept {
 	__m128i i16x4Fore = unpack_color_epi16_sse4_si32(other.AsInteger());
-	__m128i i16x4Back = unpack_color_epi16_sse4_si32(colour.AsInteger());
-	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, _MM_SHUFFLE(3, 3, 3, 3));
+	const __m128i i16x4Back = unpack_color_epi16_sse4_si32(colour.AsInteger());
+	const __m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, _MM_SHUFFLE(3, 3, 3, 3));
 	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
 	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 	return ColourRGBA(color);
@@ -96,8 +96,8 @@ inline ColourRGBA MixAlpha(ColourRGBA colour, ColourRGBA other) noexcept {
 
 inline ColourRGBA AlphaBlend(ColourRGBA fore, ColourRGBA back, unsigned int alpha) noexcept {
 	__m128i i16x4Fore = unpack_color_epi16_sse4_si32(fore.AsInteger());
-	__m128i i16x4Back = unpack_color_epi16_sse4_si32(back.AsInteger());
-	__m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
+	const __m128i i16x4Back = unpack_color_epi16_sse4_si32(back.AsInteger());
+	const __m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
 	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
 	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 	return ColourRGBA(color);
@@ -106,8 +106,8 @@ inline ColourRGBA AlphaBlend(ColourRGBA fore, ColourRGBA back, unsigned int alph
 #elif NP2_USE_SSE2
 inline ColourRGBA MixAlpha(ColourRGBA colour, ColourRGBA other) noexcept {
 	__m128i i16x4Fore = unpack_color_epi16_sse2_si32(other.AsInteger());
-	__m128i i16x4Back = unpack_color_epi16_sse2_si32(colour.AsInteger());
-	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, _MM_SHUFFLE(3, 3, 3, 3));
+	const __m128i i16x4Back = unpack_color_epi16_sse2_si32(colour.AsInteger());
+	const __m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Fore, _MM_SHUFFLE(3, 3, 3, 3));
 	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
 	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 	return ColourRGBA(color);
@@ -115,8 +115,8 @@ inline ColourRGBA MixAlpha(ColourRGBA colour, ColourRGBA other) noexcept {
 
 inline ColourRGBA AlphaBlend(ColourRGBA fore, ColourRGBA back, unsigned int alpha) noexcept {
 	__m128i i16x4Fore = unpack_color_epi16_sse2_si32(fore.AsInteger());
-	__m128i i16x4Back = unpack_color_epi16_sse2_si32(back.AsInteger());
-	__m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
+	const __m128i i16x4Back = unpack_color_epi16_sse2_si32(back.AsInteger());
+	const __m128i i16x4Alpha = mm_setlo_alpha_epi16(alpha);
 	i16x4Fore = mm_alpha_blend_epi16(i16x4Fore, i16x4Back, i16x4Alpha);
 	const uint32_t color = pack_color_epi16_sse2_si32(i16x4Fore);
 	return ColourRGBA(color);
@@ -1030,7 +1030,7 @@ Point EditView::LocationFromPosition(Surface *surface, const EditModel &model, S
 
 			// Get the point from current position
 			const ScreenLine screenLine(ll, subLine, vs, rcClient.right, tabWidthMinimumPixels);
-			std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
+			const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
 			pt.x = slLayout->XFromPosition(caretPosition);
 
 			pt.x += vs.textStart - model.xOffset;
@@ -1102,7 +1102,7 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 				UpdateBidiData(model, vs, ll);
 
 				const ScreenLine screenLine(ll, subLine, vs, rcClient.right, tabWidthMinimumPixels);
-				std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
+				const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
 				positionInLine = slLayout->PositionFromX(static_cast<XYPOSITION>(pt.x), charPosition) +
 					rangeSubLine.start;
 			} else {
@@ -1535,8 +1535,8 @@ static void DrawIndicator(int indicNum, Sci::Position startPos, Sci::Position en
 		ScreenLine screenLine(ll, subLine, vsDraw, rcLine.right - xStart, tabWidthMinimumPixels);
 		const Range lineRange = ll->SubLineRange(subLine, LineLayout::Scope::visibleOnly);
 
-		std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
-		std::vector<Interval> intervals = slLayout->FindRangeIntervals(
+		const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
+		const std::vector<Interval> intervals = slLayout->FindRangeIntervals(
 			startPos - lineRange.start, endPos - lineRange.start);
 		for (const Interval &interval : intervals) {
 			PRectangle rcInterval = rcIndic;
@@ -2001,7 +2001,7 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 
 				const int caretPosition = offset - lineStart;
 
-				std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
+				const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
 				const XYPOSITION caretLeft = slLayout->XFromPosition(caretPosition);
 
 				// In case of start of line, the cursor should be at the right

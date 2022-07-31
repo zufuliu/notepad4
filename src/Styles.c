@@ -748,7 +748,7 @@ static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) {
 	// TODO: sort by localized name
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 #endif
-	int cmp = StrCmpIW(pLex1->pszName, pLex2->pszName);
+	const int cmp = StrCmpIW(pLex1->pszName, pLex2->pszName);
 	return cmp;
 }
 
@@ -5050,7 +5050,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 			case NM_CLICK: {
 				// https://support.microsoft.com/en-us/help/261289/how-to-know-when-the-user-clicks-a-check-box-in-a-treeview-control
 				TVHITTESTINFO tvht = { { 0, 0 }, 0, NULL };
-				DWORD dwpos = GetMessagePos();
+				const DWORD dwpos = GetMessagePos();
 				tvht.pt.x = GET_X_LPARAM(dwpos);
 				tvht.pt.y = GET_Y_LPARAM(dwpos);
 				MapWindowPoints(HWND_DESKTOP, hwndTV, &tvht.pt, 1);

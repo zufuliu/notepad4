@@ -803,7 +803,7 @@ namespace {
 #if NP2_USE_AVX2
 inline DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 	__m128i i16x4Color = rgba_to_bgra_epi16_sse4_si32(colour.AsInteger());
-	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0xff);
+	const __m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0xff);
 	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
 	i16x4Color = mm_div_epu16_by_255(i16x4Color);
 	i16x4Color = _mm_blend_epi16(i16x4Alpha, i16x4Color, 7);
@@ -814,7 +814,7 @@ inline DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 inline DWORD RGBQuadMultiplied(ColourRGBA colour) noexcept {
 	const uint32_t rgba = bswap32(colour.AsInteger());
 	__m128i i16x4Color = unpack_color_epi16_sse2_si32(rgba);
-	__m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
+	const __m128i i16x4Alpha = _mm_shufflelo_epi16(i16x4Color, 0);
 	i16x4Color = _mm_mullo_epi16(i16x4Color, i16x4Alpha);
 	i16x4Color = mm_div_epu16_by_255(i16x4Color);
 
@@ -931,13 +931,13 @@ void DIBSection::SetSymmetric(LONG x, LONG y, DWORD value) noexcept {
 #if NP2_USE_AVX2
 inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	__m128i i32x4Fore = rgba_to_abgr_epi32_sse4_si32(a.AsInteger());
-	__m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
+	const __m128i i32x4Back = rgba_to_abgr_epi32_sse4_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
 	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
-	__m128 f32x4Alpha = _mm_broadcastss_ps(f32x4Fore);
+	const __m128 f32x4Alpha = _mm_broadcastss_ps(f32x4Fore);
 	f32x4Fore = _mm_mul_ps(f32x4Fore, f32x4Alpha);
 	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
 	f32x4Fore = mm_alignr_ps(f32x4Alpha, f32x4Fore, 1);
@@ -949,14 +949,14 @@ inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 #elif NP2_USE_SSE2
 inline DWORD Proportional(ColourRGBA a, ColourRGBA b, XYPOSITION t) noexcept {
 	__m128i i32x4Fore = rgba_to_abgr_epi32_sse2_si32(a.AsInteger());
-	__m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
+	const __m128i i32x4Back = rgba_to_abgr_epi32_sse2_si32(b.AsInteger());
 	// a + t * (b - a)
 	__m128 f32x4Fore = _mm_cvtepi32_ps(_mm_sub_epi32(i32x4Back, i32x4Fore));
 	f32x4Fore = _mm_mul_ps(f32x4Fore, _mm_set1_ps((float)t));
 	f32x4Fore = _mm_add_ps(f32x4Fore, _mm_cvtepi32_ps(i32x4Fore));
 	// component * alpha / 255
 	const uint32_t alpha = _mm_cvttss_si32(f32x4Fore);
-	__m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0);
+	const __m128 f32x4Alpha = _mm_shuffle_ps(f32x4Fore, f32x4Fore, 0);
 	f32x4Fore = _mm_mul_ps(f32x4Fore, f32x4Alpha);
 	f32x4Fore = _mm_div_ps(f32x4Fore, _mm_set1_ps(255.0f));
 
@@ -1087,7 +1087,7 @@ void SurfaceGDI::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 		rc.bottom = rc.top + height;
 
 		const SIZE size{ width, height };
-		DIBSection section(hdc, size);
+		const DIBSection section(hdc, size);
 		if (section) {
 			RGBAImage::BGRAFromRGBA(section.Bytes(), pixelsImage, width * height);
 			GdiAlphaBlend(hdc, static_cast<int>(rc.left), static_cast<int>(rc.top),
@@ -1360,8 +1360,8 @@ static_assert(sizeof(D2D1_RECT_F) == sizeof(__m128));
 
 inline D2D1_RECT_F RectangleFromPRectangleEx(PRectangle prc) noexcept {
 	D2D1_RECT_F rc;
-	__m256d f64x4 = _mm256_load_pd((double *)(&prc));
-	__m128 f32x4 = _mm256_cvtpd_ps(f64x4);
+	const __m256d f64x4 = _mm256_load_pd((double *)(&prc));
+	const __m128 f32x4 = _mm256_cvtpd_ps(f64x4);
 	_mm_storeu_ps((float *)(&rc), f32x4);
 	return rc;
 }
@@ -1382,8 +1382,8 @@ static_assert(sizeof(D2D1_POINT_2F) == sizeof(__m64));
 
 inline D2D1_POINT_2F DPointFromPointEx(Point point) noexcept {
 	D2D1_POINT_2F pt;
-	__m128d f64x2 = _mm_load_pd((double *)(&point));
-	__m128 f32x2 = _mm_cvtpd_ps(f64x2);
+	const __m128d f64x2 = _mm_load_pd((double *)(&point));
+	const __m128 f32x2 = _mm_cvtpd_ps(f64x2);
 	_mm_storel_pi((__m64 *)(&pt), f32x2);
 	return pt;
 }
@@ -1406,9 +1406,9 @@ static_assert(sizeof(D2D_COLOR_F) == sizeof(__m128));
 
 inline D2D_COLOR_F ColorFromColourAlpha(ColourRGBA colour) noexcept {
 #if NP2_USE_AVX2
-	__m128i i32x4 = unpack_color_epi32_sse4_si32(colour.AsInteger());
+	const __m128i i32x4 = unpack_color_epi32_sse4_si32(colour.AsInteger());
 #else
-	__m128i i32x4 = unpack_color_epi32_sse2_si32(colour.AsInteger());
+	const __m128i i32x4 = unpack_color_epi32_sse2_si32(colour.AsInteger());
 #endif
 	__m128 f32x4 = _mm_cvtepi32_ps(i32x4);
 	f32x4 = _mm_div_ps(f32x4, _mm_set1_ps(255.0f));
@@ -1808,13 +1808,13 @@ void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
 
 void SurfaceD2D::RoundedRectangle(PRectangle rc, FillStroke fillStroke) {
 	if (pRenderTarget) {
-		D2D1_ROUNDED_RECT roundedRectFill = {
+		const D2D1_ROUNDED_RECT roundedRectFill = {
 			RectangleFromPRectangle(rc.Inset(1.0)),
 			4, 4 };
 		D2DPenColourAlpha(fillStroke.fill.colour);
 		pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
 
-		D2D1_ROUNDED_RECT roundedRect = {
+		const D2D1_ROUNDED_RECT roundedRect = {
 			RectangleFromPRectangle(rc.Inset(0.5)),
 			4, 4 };
 		D2DPenColourAlpha(fillStroke.stroke.colour);
@@ -1837,12 +1837,12 @@ void SurfaceD2D::AlphaRectangle(PRectangle rc, XYPOSITION cornerSize, FillStroke
 			pRenderTarget->DrawRectangle(rectOutline, pBrush, fillStroke.stroke.WidthF());
 		} else {
 			const float cornerSizeF = static_cast<float>(cornerSize);
-			D2D1_ROUNDED_RECT roundedRectFill = {
+			const D2D1_ROUNDED_RECT roundedRectFill = {
 				rectFill, cornerSizeF - 1.0f, cornerSizeF - 1.0f };
 			D2DPenColourAlpha(fillStroke.fill.colour);
 			pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
 
-			D2D1_ROUNDED_RECT roundedRect = { rectOutline, cornerSizeF, cornerSizeF };
+			const D2D1_ROUNDED_RECT roundedRect = { rectOutline, cornerSizeF, cornerSizeF };
 			D2DPenColourAlpha(fillStroke.stroke.colour);
 			pRenderTarget->DrawRoundedRectangle(roundedRect, pBrush, fillStroke.stroke.WidthF());
 		}
@@ -1901,7 +1901,7 @@ void SurfaceD2D::DrawRGBAImage(PRectangle rc, int width, int height, const unsig
 
 		ID2D1Bitmap *bitmap = nullptr;
 		const D2D1_SIZE_U size = D2D1::SizeU(width, height);
-		D2D1_BITMAP_PROPERTIES props = { {DXGI_FORMAT_B8G8R8A8_UNORM,
+		constexpr D2D1_BITMAP_PROPERTIES props = { {DXGI_FORMAT_B8G8R8A8_UNORM,
 			D2D1_ALPHA_MODE_PREMULTIPLIED}, 72.0, 72.0 };
 		const HRESULT hr = pRenderTarget->CreateBitmap(size, image.data(),
 			width * 4, &props, &bitmap);
@@ -1944,12 +1944,12 @@ void SurfaceD2D::Stadium(PRectangle rc, FillStroke fillStroke, Ends ends) {
 	const FLOAT halfStroke = fillStroke.stroke.WidthF() / 2.0f;
 	if (ends == Surface::Ends::semiCircles) {
 		const D2D1_RECT_F rect = RectangleFromPRectangle(rc);
-		D2D1_ROUNDED_RECT roundedRectFill = { RectangleInset(rect, fillStroke.stroke.WidthF()),
+		const D2D1_ROUNDED_RECT roundedRectFill = { RectangleInset(rect, fillStroke.stroke.WidthF()),
 			radiusFill, radiusFill };
 		D2DPenColourAlpha(fillStroke.fill.colour);
 		pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
 
-		D2D1_ROUNDED_RECT roundedRect = { RectangleInset(rect, halfStroke),
+		const D2D1_ROUNDED_RECT roundedRect = { RectangleInset(rect, halfStroke),
 			radius, radius };
 		D2DPenColourAlpha(fillStroke.stroke.colour);
 		pRenderTarget->DrawRoundedRectangle(roundedRect, pBrush, fillStroke.stroke.WidthF());
@@ -2957,7 +2957,7 @@ void Window::SetCursor(Cursor curs) noexcept {
    coordinates */
 PRectangle Window::GetMonitorRect(Point pt) const noexcept {
 	const PRectangle rcPosition = GetPosition();
-	POINT ptDesktop = { static_cast<LONG>(pt.x + rcPosition.left),
+	const POINT ptDesktop = { static_cast<LONG>(pt.x + rcPosition.left),
 		static_cast<LONG>(pt.y + rcPosition.top) };
 	HMONITOR hMonitor = MonitorFromPoint(ptDesktop, MONITOR_DEFAULTTONEAREST);
 
@@ -3003,7 +3003,7 @@ public:
 	}
 
 	void AllocItem(const char *text, int pixId) {
-		ListItemData lid = { text, pixId };
+		const ListItemData lid = { text, pixId };
 		data.push_back(lid);
 	}
 
@@ -3258,7 +3258,7 @@ std::string ListBoxX::GetValue(int n) const {
 }
 
 void ListBoxX::RegisterImage(int type, const char *xpm_data) {
-	XPM xpmImage(xpm_data);
+	const XPM xpmImage(xpm_data);
 	images.AddImage(type, std::make_unique<RGBAImage>(xpmImage));
 }
 
@@ -3324,7 +3324,7 @@ void ListBoxX::Draw(const DRAWITEMSTRUCT *pDrawItem) {
 		// Draw the image, if any
 		const RGBAImage *pimage = images.Get(pixId);
 		if (pimage) {
-			std::unique_ptr<Surface> surfaceItem(Surface::Allocate(technology));
+			const std::unique_ptr<Surface> surfaceItem(Surface::Allocate(technology));
 			if (technology == Technology::Default) {
 				surfaceItem->Init(pDrawItem->hDC, pDrawItem->hwndItem);
 				const long left = pDrawItem->rcItem.left + static_cast<int>(ItemInset.x + ImageInset.x);

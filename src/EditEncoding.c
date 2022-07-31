@@ -680,7 +680,7 @@ int Encoding_GetIndex(UINT codePage) {
 
 int Encoding_GetAnsiIndex(void) {
 	int iEncoding = CPI_DEFAULT;
-	UINT acp = GetACP();
+	const UINT acp = GetACP();
 	if (acp == CP_UTF8) {
 		iEncoding = CPI_UTF8;
 	} else if (bLoadANSIasUTF8 || bLoadASCIIasUTF8) {
@@ -1605,9 +1605,9 @@ bool z_validate_vec_avx2(__m256i bytes, __m256i shifted_bytes, uint32_t *last_co
 
 	// Look up error masks for three consecutive nibbles.
 	const __m256i nibbles = _mm256_set1_epi8(0x0F);
-	__m256i e_1 = _mm256_shuffle_epi8(error_1, _mm256_and_si256(_mm256_srli_epi16(shifted_bytes, 4), nibbles));
-	__m256i e_2 = _mm256_shuffle_epi8(error_2, _mm256_and_si256(shifted_bytes, nibbles));
-	__m256i e_3 = _mm256_shuffle_epi8(error_3, _mm256_and_si256(_mm256_srli_epi16(bytes, 4), nibbles));
+	const __m256i e_1 = _mm256_shuffle_epi8(error_1, _mm256_and_si256(_mm256_srli_epi16(shifted_bytes, 4), nibbles));
+	const __m256i e_2 = _mm256_shuffle_epi8(error_2, _mm256_and_si256(shifted_bytes, nibbles));
+	const __m256i e_3 = _mm256_shuffle_epi8(error_3, _mm256_and_si256(_mm256_srli_epi16(bytes, 4), nibbles));
 
 	// Check if any bits are set in all three error masks
 	if (!_mm256_testz_si256(_mm256_and_si256(e_1, e_2), e_3)) {
@@ -1639,7 +1639,7 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) {
 		// Loop over input in sizeof(__m256i)-byte chunks, as long as we can safely read
 		// that far into memory
 		for (; offset + sizeof(__m256i) < len; offset += sizeof(__m256i)) {
-			__m256i bytes = _mm256_loadu_si256((__m256i *)(data + offset));
+			const __m256i bytes = _mm256_loadu_si256((__m256i *)(data + offset));
 			if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 				return false;
 			}
@@ -1659,8 +1659,8 @@ static inline bool z_validate_utf8_avx2(const char *data, uint32_t len) {
 		}
 		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
 
-		__m256i shifted_bytes = _mm256_loadu_si256((__m256i *)buffer);
-		__m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
+		const __m256i shifted_bytes = _mm256_loadu_si256((__m256i *)buffer);
+		const __m256i bytes = _mm256_loadu_si256((__m256i *)(buffer + 1));
 		if (!z_validate_vec_avx2(bytes, shifted_bytes, &last_cont)) {
 			return false;
 		}
@@ -1750,8 +1750,8 @@ bool z_validate_vec_sse4(__m128i bytes, __m128i shifted_bytes, uint32_t *last_co
 
 	// Look up error masks for three consecutive nibbles.
 	const __m128i nibbles = _mm_set1_epi8(0x0F);
-	__m128i e_1 = _mm_shuffle_epi8(error_1, _mm_and_si128(_mm_srli_epi16(shifted_bytes, 4), nibbles));
-	__m128i e_2 = _mm_shuffle_epi8(error_2, _mm_and_si128(shifted_bytes, nibbles));
+	const __m128i e_1 = _mm_shuffle_epi8(error_1, _mm_and_si128(_mm_srli_epi16(shifted_bytes, 4), nibbles));
+	const __m128i e_2 = _mm_shuffle_epi8(error_2, _mm_and_si128(shifted_bytes, nibbles));
 	__m128i e_3 = _mm_shuffle_epi8(error_3, _mm_and_si128(_mm_srli_epi16(bytes, 4), nibbles));
 
 	// Check if any bits are set in all three error masks
@@ -1794,7 +1794,7 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) {
 		// Loop over input in sizeof(__m128i)-byte chunks, as long as we can safely read
 		// that far into memory
 		for (; offset + sizeof(__m128i) < len; offset += sizeof(__m128i)) {
-			__m128i bytes = _mm_loadu_si128((__m128i *)(data + offset));
+			const __m128i bytes = _mm_loadu_si128((__m128i *)(data + offset));
 			if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 				return false;
 			}
@@ -1814,8 +1814,8 @@ static inline bool z_validate_utf8_sse4(const char *data, uint32_t len) {
 		}
 		__movsb(buffer + 1, (const uint8_t *)(data + offset), len - offset);
 
-		__m128i shifted_bytes = _mm_loadu_si128((__m128i *)(buffer));
-		__m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
+		const __m128i shifted_bytes = _mm_loadu_si128((__m128i *)(buffer));
+		const __m128i bytes = _mm_loadu_si128((__m128i *)(buffer + 1));
 		if (!z_validate_vec_sse4(bytes, shifted_bytes, &last_cont)) {
 			return false;
 		}

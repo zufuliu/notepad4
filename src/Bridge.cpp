@@ -243,7 +243,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		footerLineHeight = 0;
 	}
 
-	DOCINFO di = {sizeof(DOCINFO), pszDocTitle, nullptr, nullptr, 0};
+	const DOCINFO di = {sizeof(DOCINFO), pszDocTitle, nullptr, nullptr, 0};
 	if (StartDoc(hdc, &di) < 0) {
 		DeleteDC(hdc);
 		if (fontHeader) {
@@ -391,7 +391,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 			if (iPrintFooter == PrintFooterOption_PageNumber) {
 				SelectObject(hdc, fontFooter);
 				const UINT ta = SetTextAlign(hdc, TA_TOP);
-				RECT rcw = {
+				const RECT rcw = {
 					frPrint.rc.left, frPrint.rc.bottom + footerLineHeight / 2,
 					frPrint.rc.right, frPrint.rc.bottom + footerLineHeight + footerLineHeight / 2
 				};

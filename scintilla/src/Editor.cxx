@@ -276,7 +276,7 @@ void Editor::InvalidateStyleRedraw() {
 void Editor::RefreshStyleData() {
 	if (!stylesValid) {
 		stylesValid = true;
-		AutoSurface surface(this);
+		const AutoSurface surface(this);
 		if (surface) {
 			vs.Refresh(*surface, pdoc->tabInChars);
 		}
@@ -380,7 +380,7 @@ SelectionPosition Editor::ClampPositionIntoDocument(SelectionPosition sp) const 
 Point Editor::LocationFromPosition(SelectionPosition pos, PointEnd pe) {
 	const PRectangle rcClient = GetTextRectangle();
 	RefreshStyleData();
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	return view.LocationFromPosition(surface, *this, pos, topLine, vs, pe, rcClient);
 }
 
@@ -395,7 +395,7 @@ int Editor::XFromPosition(SelectionPosition sp) {
 
 SelectionPosition Editor::SPositionFromLocation(Point pt, bool canReturnInvalid, bool charPosition, bool virtualSpace) {
 	RefreshStyleData();
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 
 	PRectangle rcClient = GetTextRectangle();
 	// May be in scroll view coordinates so translate back to main view
@@ -429,7 +429,7 @@ SelectionPosition Editor::SPositionFromLineX(Sci::Line lineDoc, int x) {
 	if (lineDoc >= pdoc->LinesTotal())
 		return SelectionPosition(pdoc->LengthNoExcept());
 	//Platform::DebugPrintf("Position of (%d) line = %d top=%d\n", x, lineDoc, topLine);
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	return view.SPositionFromLineX(surface, *this, lineDoc, x, vs);
 }
 
@@ -598,7 +598,7 @@ void Editor::SetRectangularRange() {
 		const Sci::Line lineCaret =
 			pdoc->SciLineFromPosition(sel.Rectangular().caret.Position());
 		const int increment = (lineCaret > lineAnchorRect) ? 1 : -1;
-		AutoSurface surface(this);
+		const AutoSurface surface(this);
 		for (Sci::Line line = lineAnchorRect; line != lineCaret + increment; line += increment) {
 			SelectionRange range(
 				view.SPositionFromLineX(surface, *this, line, xCaret, vs),
@@ -722,7 +722,7 @@ void Editor::SetSelection(SelectionPosition currentPos_) {
 
 void Editor::SetEmptySelection(SelectionPosition currentPos_) {
 	const Sci::Line currentLine = pdoc->SciLineFromPosition(currentPos_.Position());
-	SelectionRange rangeNew(ClampPositionIntoDocument(currentPos_));
+	const SelectionRange rangeNew(ClampPositionIntoDocument(currentPos_));
 	if (sel.Count() > 1 || !(sel.RangeMain() == rangeNew)) {
 		InvalidateSelection(rangeNew);
 	}
@@ -898,7 +898,7 @@ void Editor::MovePositionTo(SelectionPosition newPos, Selection::SelTypes selt, 
 	if (!sel.IsRectangular() && (selt == Selection::SelTypes::rectangle)) {
 		// Switching to rectangular
 		InvalidateSelection(sel.RangeMain(), false);
-		SelectionRange rangeMain = sel.RangeMain();
+		const SelectionRange rangeMain = sel.RangeMain();
 		sel.Clear();
 		sel.Rectangular() = rangeMain;
 	}
@@ -1047,7 +1047,7 @@ void Editor::MoveSelectedLines(int lineDelta) {
 		return;
 	}
 
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 
 	if (lineDelta > 0 && selectionEnd == pdoc->LineStart(pdoc->LinesTotal() - 1)) {
 		SetSelection(pdoc->MovePositionOutsideChar(selectionEnd - 1, -1), selectionEnd);
@@ -1105,7 +1105,7 @@ void Editor::MoveCaretInsideView(bool ensureVisible) {
 }
 
 Sci::Line Editor::DisplayFromPosition(Sci::Position pos) {
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	return view.DisplayFromPosition(surface, *this, pos, vs);
 }
 
@@ -1595,7 +1595,7 @@ bool Editor::WrapLines(WrapScope ws) {
 			rcTextArea.right -= vs.rightMarginWidth;
 			wrapWidth = static_cast<int>(rcTextArea.Width());
 			RefreshStyleData();
-			AutoSurface surface(this);
+			const AutoSurface surface(this);
 			if (surface) {
 				//Platform::DebugPrintf("Wraplines: scope=%0d need=%0d..%0d perform=%0d..%0d\n", ws, wrapPending.start, wrapPending.end, lineToWrap, lineToWrapEnd);
 				const ElapsedPeriod epWrapping;
@@ -1655,7 +1655,7 @@ bool Editor::WrapLines(WrapScope ws) {
 
 void Editor::LinesJoin() {
 	if (!RangeContainsProtected(targetRange.start.Position(), targetRange.end.Position())) {
-		UndoGroup ug(pdoc);
+		const UndoGroup ug(pdoc);
 		bool prevNonWS = true;
 		for (Sci::Position pos = targetRange.start.Position(); pos < targetRange.end.Position(); pos++) {
 			if (pdoc->IsPositionInLineEnd(pos)) {
@@ -1692,9 +1692,9 @@ void Editor::LinesSplit(int pixelWidth) {
 		const Sci::Line lineStart = pdoc->SciLineFromPosition(targetRange.start.Position());
 		Sci::Line lineEnd = pdoc->SciLineFromPosition(targetRange.end.Position());
 		const char *eol = StringFromEOLMode(pdoc->eolMode);
-		UndoGroup ug(pdoc);
+		const UndoGroup ug(pdoc);
 		for (Sci::Line line = lineStart; line <= lineEnd; line++) {
-			AutoSurface surface(this);
+			const AutoSurface surface(this);
 			if (surface) {
 				const Sci::Position posLineStart = pdoc->LineStart(line);
 				LineLayout * const ll = view.RetrieveLineLayout(line, *this);
@@ -1877,14 +1877,14 @@ Sci::Position Editor::FormatRange([[maybe_unused]] Scintilla::Message iMessage, 
 	void *const ptr = PtrFromSPtr(lParam);
 	// FormatRangeFull
 	RangeToFormatFull *pfr = static_cast<RangeToFormatFull *>(ptr);
-	AutoSurface surface(pfr->hdc, this, true);
-	AutoSurface surfaceMeasure(pfr->hdcTarget, this, true);
+	const AutoSurface surface(pfr->hdc, this, true);
+	const AutoSurface surfaceMeasure(pfr->hdcTarget, this, true);
 	return view.FormatRange(draw, pfr->chrg, pfr->rc, surface, surfaceMeasure, *this, vs);
 }
 
 long Editor::TextWidth(uptr_t style, const char *text) {
 	RefreshStyleData();
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	if (surface) {
 		return std::lround(surface->WidthText(vs.styles[style].font.get(), text));
 	} else {
@@ -1940,7 +1940,7 @@ Sci::Position Editor::RealizeVirtualSpace(Sci::Position position, Sci::Position 
 		if (indent == position) {
 			return pdoc->SetLineIndentation(line, pdoc->GetLineIndentation(line) + virtualSpace);
 		} else {
-			std::string spaceText(virtualSpace, ' ');
+			const std::string spaceText(virtualSpace, ' ');
 			const Sci::Position lengthInserted = pdoc->InsertString(position, spaceText.c_str(), virtualSpace);
 			position += lengthInserted;
 		}
@@ -1993,7 +1993,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	bool handled = false;
 	bool wrapOccurred = false;
 	{
-		UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
+		const UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
 		// enclose selection on typing punctuation, empty selection will be handled in Notification::CharAdded.
 		const char encloseCh = (charSource != CharacterSource::DirectInput || sv.length() != 1
 			|| sel.IsRectangular() || sel.Empty()) ? '\0' : EncloseSelectionCharacter(sv[0]);
@@ -2062,7 +2062,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 				currentSel->ClearVirtualSpace();
 				// If in wrap mode rewrap current line so EnsureCaretVisible has accurate information
 				if (Wrapping()) {
-					AutoSurface surface(this);
+					const AutoSurface surface(this);
 					if (surface) {
 						if (WrapOneLine(surface, positionInsert)) {
 							wrapOccurred = true;
@@ -2119,7 +2119,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 void Editor::ClearBeforeTentativeStart() {
 	// Make positions for the first composition string.
 	FilterSelections();
-	UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
+	const UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (!RangeContainsProtected(sel.Range(r).Start().Position(),
 			sel.Range(r).End().Position())) {
@@ -2207,7 +2207,7 @@ void Editor::InsertPasteShape(const char *text, Sci::Position len, PasteShape sh
 void Editor::ClearSelection(bool retainMultipleSelections) {
 	if (!sel.IsRectangular() && !retainMultipleSelections)
 		FilterSelections();
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (!sel.Range(r).Empty()) {
 			SelectionRange rangeNew = sel.Range(r);
@@ -2231,7 +2231,7 @@ void Editor::ClearSelection(bool retainMultipleSelections) {
 
 void Editor::ClearAll() {
 	{
-		UndoGroup ug(pdoc);
+		const UndoGroup ug(pdoc);
 		if (0 != pdoc->LengthNoExcept()) {
 			pdoc->DeleteChars(0, pdoc->LengthNoExcept());
 		}
@@ -2286,7 +2286,7 @@ void Editor::PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Posit
 	sel.Clear();
 	sel.RangeMain() = SelectionRange(pos);
 	Sci::Line line = pdoc->SciLineFromPosition(sel.MainCaret());
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	sel.RangeMain().caret = RealizeVirtualSpace(sel.RangeMain().caret);
 	const int xInsert = XFromPosition(sel.RangeMain().caret);
 	bool prevCr = false;
@@ -2335,7 +2335,7 @@ void Editor::Clear() {
 			sel.RangeMain().Start().VirtualSpace()) {
 			singleVirtual = true;
 		}
-		UndoGroup ug(pdoc, (sel.Count() > 1) || singleVirtual);
+		const UndoGroup ug(pdoc, (sel.Count() > 1) || singleVirtual);
 		for (size_t r = 0; r < sel.Count(); r++) {
 			const Sci::Position caretPosition = sel.Range(r).caret.Position();
 			if (!RangeContainsProtected(caretPosition, caretPosition + 1)) {
@@ -2400,7 +2400,7 @@ bool Editor::BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caret
 			indentationChange = indentationStep;
 		}
 		if (column <= indentation && pdoc->backspaceUnindents) {
-			//UndoGroup ugInner(pdoc, !ug.Needed());
+			//const UndoGroup ugInner(pdoc, !ug.Needed());
 			*posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationChange);
 			return true;
 		}
@@ -2427,7 +2427,7 @@ void Editor::DelCharBack(bool allowLineStartDeletion) {
 		FilterSelections();
 	if (sel.IsRectangular())
 		allowLineStartDeletion = false;
-	UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty());
+	const UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty());
 	if (sel.Empty()) {
 		for (size_t r = 0; r < sel.Count(); r++) {
 			const Sci::Position caretPosition = sel.Range(r).caret.Position();
@@ -3083,7 +3083,7 @@ void Editor::PageMove(int direction, Selection::SelTypes selt, bool stuttered) {
 }
 
 void Editor::ChangeCaseOfSelection(CaseMapping caseMapping) {
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		SelectionRange current = sel.Range(r);
 		SelectionRange currentNoVS = current;
@@ -3131,7 +3131,7 @@ void Editor::ChangeCaseOfSelection(CaseMapping caseMapping) {
 void Editor::LineTranspose() {
 	const Sci::Line line = pdoc->SciLineFromPosition(sel.MainCaret());
 	if (line > 0) {
-		UndoGroup ug(pdoc);
+		const UndoGroup ug(pdoc);
 
 		const Sci::Position startPrevious = pdoc->LineStart(line - 1);
 		const std::string linePrevious = RangeText(startPrevious, pdoc->LineEnd(line - 1));
@@ -3160,7 +3160,7 @@ void Editor::LineReverse() {
 	const Sci::Line lineDiff = lineEnd - lineStart;
 	if (lineDiff <= 0)
 		return;
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	for (Sci::Line i = (lineDiff + 1) / 2 - 1; i >= 0; --i) {
 		const Sci::Line lineNum2 = lineEnd - i;
 		const Sci::Line lineNum1 = lineStart + i;
@@ -3185,7 +3185,7 @@ void Editor::Duplicate(bool forLine) {
 	if (sel.Empty()) {
 		forLine = true;
 	}
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	const char *eol = "";
 	Sci::Position eolLen = 0;
 	if (forLine) {
@@ -3200,7 +3200,7 @@ void Editor::Duplicate(bool forLine) {
 			start = SelectionPosition(pdoc->LineStart(line));
 			end = SelectionPosition(pdoc->LineEnd(line));
 		}
-		std::string text = RangeText(start.Position(), end.Position());
+		const std::string text = RangeText(start.Position(), end.Position());
 		Sci::Position lengthInserted = eolLen;
 		if (forLine)
 			lengthInserted = pdoc->InsertString(end.Position(), eol, eolLen);
@@ -3232,7 +3232,7 @@ void Editor::NewLine() {
 		sel.DropAdditionalRanges();
 	}
 
-	UndoGroup ug(pdoc, !sel.Empty() || (sel.Count() > 1));
+	const UndoGroup ug(pdoc, !sel.Empty() || (sel.Count() > 1));
 
 	// Clear each range
 	if (!sel.Empty()) {
@@ -3396,13 +3396,13 @@ void Editor::ParaUpOrDown(int direction, Selection::SelTypes selt) {
 
 Range Editor::RangeDisplayLine(Sci::Line lineVisible) {
 	RefreshStyleData();
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	return view.RangeDisplayLine(surface, *this, lineVisible, vs);
 }
 
 Sci::Position Editor::StartEndDisplayLine(Sci::Position pos, bool start) {
 	RefreshStyleData();
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	const Sci::Position posRet = view.StartEndDisplayLine(surface, *this, pos, start, vs);
 	if (posRet == Sci::invalidPosition) {
 		return pos;
@@ -3760,7 +3760,7 @@ int Editor::HorizontalMove(Message iMessage) {
 			case Message::LineEndExtend:
 			case Message::LineEndDisplayExtend:
 			case Message::LineEndWrapExtend: {
-				SelectionRange rangeNew = SelectionRange(spCaret, sel.Range(r).anchor);
+				const SelectionRange rangeNew = SelectionRange(spCaret, sel.Range(r).anchor);
 				sel.TrimOtherSelections(r, SelectionRange(rangeNew));
 				sel.Range(r) = rangeNew;
 			}
@@ -3797,7 +3797,7 @@ int Editor::DelWordOrLine(Message iMessage) {
 		sel.DropAdditionalRanges();
 	}
 
-	UndoGroup ug0(pdoc, (sel.Count() > 1) || !leftwards);
+	const UndoGroup ug0(pdoc, (sel.Count() > 1) || !leftwards);
 
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (leftwards) {
@@ -4102,7 +4102,7 @@ int Editor::KeyDownWithModifiers(Keys key, KeyMod modifiers, bool *consumed) {
 }
 
 void Editor::Indent(bool forwards) {
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		const Sci::Line lineOfAnchor =
 			pdoc->SciLineFromPosition(sel.Range(r).anchor.Position());
@@ -4343,7 +4343,7 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 			const Sci::Position start = pdoc->LineStart(currentLine);
 			const Sci::Position end = pdoc->LineStart(currentLine + 1);
 
-			std::string text = RangeText(start, end);
+			const std::string text = RangeText(start, end);
 			ss->Copy(text, pdoc->dbcsCodePage, false, true);
 		}
 	} else {
@@ -4368,7 +4368,7 @@ void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool l
 	start = pdoc->ClampPositionIntoDocument(start);
 	end = pdoc->ClampPositionIntoDocument(end);
 	SelectionText selectedText;
-	std::string text = RangeText(start, end);
+	const std::string text = RangeText(start, end);
 	selectedText.Copy(text, pdoc->dbcsCodePage, false, lineCopy);
 	CopyToClipboard(selectedText);
 }
@@ -4436,7 +4436,7 @@ void Editor::DropAt(SelectionPosition position, const char *value, size_t length
 		const SelectionPosition selStart = SelectionStart();
 		const SelectionPosition selEnd = SelectionEnd();
 
-		UndoGroup ug(pdoc);
+		const UndoGroup ug(pdoc);
 
 		SelectionPosition positionAfterDeletion = position;
 		if ((inDragDrop == DragDrop::dragging) && moving) {
@@ -4460,7 +4460,7 @@ void Editor::DropAt(SelectionPosition position, const char *value, size_t length
 		}
 		position = positionAfterDeletion;
 
-		std::string convertedText = Document::TransformLineEnds(value, lengthValue, pdoc->eolMode);
+		const std::string convertedText = Document::TransformLineEnds(value, lengthValue, pdoc->eolMode);
 
 		if (rectangular) {
 			PasteRectangular(position, convertedText.c_str(), convertedText.length());
@@ -5295,7 +5295,7 @@ void Editor::QueueIdleWork(WorkItems items, Sci::Position upTo) noexcept {
 }
 
 bool Editor::SupportsFeature(Supports feature) const {
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 	return surface->SupportsFeature(feature);
 }
 
@@ -5363,7 +5363,7 @@ void Editor::SetAnnotationHeights(Sci::Line start, Sci::Line end) {
 		for (Sci::Line line = start; line < end; line++) {
 			int linesWrapped = 1;
 			if (Wrapping()) {
-				AutoSurface surface(this);
+				const AutoSurface surface(this);
 				if (surface) {
 					LineLayout * const ll = view.RetrieveLineLayout(line, *this);
 					view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
@@ -5750,7 +5750,7 @@ Sci::Position Editor::GetTag(char *tagValue, int tagNumber) {
 }
 
 Sci::Position Editor::ReplaceTarget(bool replacePatterns, const char *text, Sci::Position length) {
-	UndoGroup ug(pdoc);
+	const UndoGroup ug(pdoc);
 	if (length < 0)
 		length = strlen(text);
 	if (replacePatterns) {
@@ -5809,7 +5809,7 @@ std::unique_ptr<Surface> Editor::CreateDrawingSurface(SurfaceID sid, bool printi
 }
 
 Sci::Line Editor::WrapCount(Sci::Line line) {
-	AutoSurface surface(this);
+	const AutoSurface surface(this);
 
 	if (surface) {
 		LineLayout * const ll = view.RetrieveLineLayout(line, *this);
@@ -6040,7 +6040,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::SetText: {
 			if (lParam == 0)
 				return 0;
-			UndoGroup ug(pdoc);
+			const UndoGroup ug(pdoc);
 			pdoc->DeleteChars(0, pdoc->LengthNoExcept());
 			SetEmptySelection(0);
 			const char *text = ConstCharPtrFromSPtr(lParam);
@@ -6093,7 +6093,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::ReplaceRectangular: {
-		UndoGroup ug(pdoc);
+		const UndoGroup ug(pdoc);
 		if (!sel.Empty()) {
 			ClearSelection(); // want to replace rectangular selection contents
 		}
@@ -6207,7 +6207,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::ReplaceSel: {
 			if (lParam == 0)
 				return 0;
-			UndoGroup ug(pdoc);
+			const UndoGroup ug(pdoc);
 			ClearSelection();
 			const char *replacement = ConstCharPtrFromSPtr(lParam);
 			const Sci::Position lengthInserted = pdoc->InsertString(
@@ -6262,7 +6262,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetTargetText: {
-			std::string text = RangeText(targetRange.start.Position(), targetRange.end.Position());
+			const std::string text = RangeText(targetRange.start.Position(), targetRange.end.Position());
 			return BytesResult(lParam, reinterpret_cast<const unsigned char *>(text.c_str()), text.length());
 		}
 
@@ -6365,7 +6365,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			if (cpMax < 0)
 				cpMax = pdoc->LengthNoExcept();
 			PLATFORM_ASSERT(cpMax <= pdoc->LengthNoExcept());
-			Sci::Position len = cpMax - tr->chrg.cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
+			const Sci::Position len = cpMax - tr->chrg.cpMin; 	// No -1 as cpMin and cpMax are referring to inter character positions
 			PLATFORM_ASSERT(len >= 0);
 			pdoc->GetCharRange(tr->lpstrText, tr->chrg.cpMin, len);
 			// Spec says copied text is terminated with a NUL

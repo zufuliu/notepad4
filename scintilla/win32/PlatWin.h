@@ -104,16 +104,16 @@ static_assert(sizeof(RECT) == sizeof(__m128i));
 
 inline PRectangle PRectangleFromRectEx(RECT rc) noexcept {
 	PRectangle prc;
-	__m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
-	__m256d f64x4 = _mm256_cvtepi32_pd(i32x4);
+	const __m128i i32x4 = _mm_load_si128((__m128i *)(&rc));
+	const __m256d f64x4 = _mm256_cvtepi32_pd(i32x4);
 	_mm256_storeu_pd((double *)(&prc), f64x4);
 	return prc;
 }
 
 inline RECT RectFromPRectangleEx(PRectangle prc) noexcept {
 	RECT rc;
-	__m256d f64x4 = _mm256_load_pd((double *)(&prc));
-	__m128i i32x4 = _mm256_cvttpd_epi32(f64x4);
+	const __m256d f64x4 = _mm256_load_pd((double *)(&prc));
+	const __m128i i32x4 = _mm256_cvttpd_epi32(f64x4);
 	_mm_storeu_si128((__m128i *)(&rc), i32x4);
 	return rc;
 }
@@ -142,16 +142,16 @@ static_assert(sizeof(POINT) == sizeof(__int64));
 
 inline POINT POINTFromPointEx(Point point) noexcept {
 	POINT pt;
-	__m128d f64x2 = _mm_load_pd((double *)(&point));
-	__m128i i32x2 = _mm_cvttpd_epi32(f64x2);
+	const __m128d f64x2 = _mm_load_pd((double *)(&point));
+	const __m128i i32x2 = _mm_cvttpd_epi32(f64x2);
 	_mm_storeu_si64(&pt, i32x2);
 	return pt;
 }
 
 inline Point PointFromPOINTEx(POINT point) noexcept {
 	Point pt;
-	__m128i i32x2 = _mm_loadu_si64(&point);
-	__m128d f64x2 = _mm_cvtepi32_pd(i32x2);
+	const __m128i i32x2 = _mm_loadu_si64(&point);
+	const __m128d f64x2 = _mm_cvtepi32_pd(i32x2);
 	_mm_storeu_pd((double *)(&pt), f64x2);
 	return pt;
 }
