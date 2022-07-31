@@ -71,12 +71,6 @@ class ContractionState final : public IContractionState {
 
 public:
 	ContractionState() noexcept;
-	// Deleted so ContractionState objects can not be copied.
-	ContractionState(const ContractionState &) = delete;
-	void operator=(const ContractionState &) = delete;
-	ContractionState(ContractionState &&) = delete;
-	void operator=(ContractionState &&) = delete;
-	~ContractionState() noexcept override;
 
 	void Clear() noexcept override;
 
@@ -117,9 +111,6 @@ public:
 
 template <typename LINE>
 ContractionState<LINE>::ContractionState() noexcept = default;
-
-template <typename LINE>
-ContractionState<LINE>::~ContractionState() noexcept = default;
 
 template <typename LINE>
 void ContractionState<LINE>::EnsureData() {

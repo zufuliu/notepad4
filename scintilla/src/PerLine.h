@@ -26,12 +26,6 @@ class MarkerHandleSet {
 
 public:
 	MarkerHandleSet() noexcept;
-	// Deleted so MarkerHandleSet objects can not be copied.
-	MarkerHandleSet(const MarkerHandleSet &) = delete;
-	MarkerHandleSet(MarkerHandleSet &&) = delete;
-	void operator=(const MarkerHandleSet &) = delete;
-	void operator=(MarkerHandleSet &&) = delete;
-	~MarkerHandleSet();
 	bool Empty() const noexcept;
 	MarkerMask MarkValue() const noexcept;	///< Bit set of marker numbers.
 	bool Contains(int handle) const noexcept;
@@ -48,12 +42,6 @@ class LineMarkers final : public PerLine {
 	int handleCurrent;
 public:
 	LineMarkers() noexcept : handleCurrent(0) {}
-	// Deleted so LineMarkers objects can not be copied.
-	LineMarkers(const LineMarkers &) = delete;
-	LineMarkers(LineMarkers &&) = delete;
-	void operator=(const LineMarkers &) = delete;
-	void operator=(LineMarkers &&) = delete;
-	~LineMarkers() override;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -75,12 +63,6 @@ class LineLevels final : public PerLine {
 	SplitVector<int> levels;
 public:
 	LineLevels() = default;
-	// Deleted so LineLevels objects can not be copied.
-	LineLevels(const LineLevels &) = delete;
-	LineLevels(LineLevels &&) = delete;
-	void operator=(const LineLevels &) = delete;
-	void operator=(LineLevels &&) = delete;
-	~LineLevels() override;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -97,12 +79,6 @@ class LineState final : public PerLine {
 	SplitVector<int> lineStates;
 public:
 	LineState() = default;
-	// Deleted so LineState objects can not be copied.
-	LineState(const LineState &) = delete;
-	LineState(LineState &&) = delete;
-	void operator=(const LineState &) = delete;
-	void operator=(LineState &&) = delete;
-	~LineState() override;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;
@@ -117,12 +93,6 @@ class LineAnnotation : public PerLine {
 	SplitVector<std::unique_ptr<char[]>> annotations;
 public:
 	LineAnnotation() = default;
-	// Deleted so LineAnnotation objects can not be copied.
-	LineAnnotation(const LineAnnotation &) = delete;
-	LineAnnotation(LineAnnotation &&) = delete;
-	void operator=(const LineAnnotation &) = delete;
-	void operator=(LineAnnotation &&) = delete;
-	~LineAnnotation() override;
 
 	[[nodiscard]] bool Empty() const noexcept;
 	void Init() override;
@@ -149,12 +119,6 @@ class LineTabstops : public PerLine {
 	SplitVector<std::unique_ptr<TabstopList>> tabstops;
 public:
 	LineTabstops() noexcept = default;
-	// Deleted so LineTabstops objects can not be copied.
-	LineTabstops(const LineTabstops &) = delete;
-	LineTabstops(LineTabstops &&) = delete;
-	void operator=(const LineTabstops &) = delete;
-	void operator=(LineTabstops &&) = delete;
-	~LineTabstops() override;
 	void Init() override;
 	bool IsActive() const noexcept override;
 	void InsertLine(Sci::Line line) override;

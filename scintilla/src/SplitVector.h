@@ -37,7 +37,7 @@ protected:
 	ptrdiff_t lengthBody = 0;
 	ptrdiff_t part1Length = 0;
 	ptrdiff_t gapLength = 0;	/// invariant: gapLength == body.size() - lengthBody
-	ptrdiff_t growSize = 8;
+	size_t growSize;
 
 	/// Move the gap to a particular position so that insertion and
 	/// deletion at that point will not require much copying and
@@ -72,8 +72,8 @@ protected:
 	/// reallocating if more space needed.
 	void RoomFor(ptrdiff_t insertionLength) {
 		if (gapLength < insertionLength) {
-			const ptrdiff_t size = static_cast<ptrdiff_t>(body.size());
-			const ptrdiff_t upper = size / 6;
+			const size_t size = body.size();
+			const size_t upper = size / 6;
 			while (growSize < upper) {
 				growSize *= 2;
 			}
@@ -92,38 +92,25 @@ protected:
 
 public:
 	/// Construct a split buffer.
-	SplitVector() noexcept = default;
+	SplitVector(size_t growSize_ = 8) noexcept : growSize{growSize_} {}
 
-	// Deleted so SplitVector objects can not be copied.
-	SplitVector(const SplitVector &) = delete;
-	SplitVector(SplitVector &&) = delete;
-	void operator=(const SplitVector &) = delete;
-	void operator=(SplitVector &&) = delete;
-
-	~SplitVector() = default;
-
-	ptrdiff_t GetGrowSize() const noexcept {
+	size_t GetGrowSize() const noexcept {
 		return growSize;
 	}
 
-	void SetGrowSize(ptrdiff_t growSize_) noexcept {
+	void SetGrowSize(size_t growSize_) noexcept {
 		growSize = growSize_;
 	}
 
 	/// Reallocate the storage for the buffer to be newSize and
 	/// copy existing contents to the new buffer.
 	/// Must not be used to decrease the size of the buffer.
-	void ReAllocate(ptrdiff_t newSize) {
-		if (newSize < 0)
-			throw std::runtime_error("SplitVector::ReAllocate: negative size.");
-
-		const ptrdiff_t size = static_cast<ptrdiff_t>(body.size());
+	void ReAllocate(size_t newSize) {
+		const size_t size = body.size();
 		if (newSize > size) {
 #if ENABLE_SHOW_DEBUG_INFO
-			printf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
-				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
-			Platform::DebugPrintf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
-				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
+			printf("before %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%zu\n",
+				__func__, newSize, size, part1Length, gapLength, lengthBody, growSize);
 #endif
 			// Move the gap to the end
 			GapTo(lengthBody);
@@ -134,10 +121,8 @@ public:
 			body.reserve(newSize);
 			body.resize(newSize);
 #if ENABLE_SHOW_DEBUG_INFO
-			printf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
-				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
-			Platform::DebugPrintf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%td\n",
-				__func__, newSize, body.size(), part1Length, gapLength, lengthBody, growSize);
+			printf("after %s(%td, %zu) part1Length=%td, gapLength=%td, lengthBody=%td, growSize=%zu\n",
+				__func__, newSize, size, part1Length, gapLength, lengthBody, growSize);
 #endif
 		}
 	}

@@ -40,13 +40,6 @@ public:
 	bool mayCoalesce;
 
 	Action() noexcept;
-	// Deleted so Action objects can not be copied.
-	Action(const Action &other) = delete;
-	Action &operator=(const Action &other) = delete;
-	Action &operator=(const Action &&other) = delete;
-	// Move constructor allows vector to be resized without reallocating.
-	Action(Action &&other) noexcept = default;
-	~Action();
 	void Create(ActionType at_, Sci::Position position_ = 0, const char *data_ = nullptr, Sci::Position lenData_ = 0, bool mayCoalesce_ = true);
 	void Clear() noexcept;
 };
@@ -66,12 +59,6 @@ class UndoHistory {
 
 public:
 	UndoHistory();
-	// Deleted so UndoHistory objects can not be copied.
-	UndoHistory(const UndoHistory &) = delete;
-	UndoHistory(UndoHistory &&) = delete;
-	void operator=(const UndoHistory &) = delete;
-	void operator=(UndoHistory &&) = delete;
-	~UndoHistory();
 
 	const char *AppendAction(ActionType at, Sci::Position position, const char *data, Sci::Position lengthData, bool &startSequence, bool mayCoalesce = true);
 
@@ -158,7 +145,7 @@ public:
 	CellBuffer(CellBuffer &&) = delete;
 	void operator=(const CellBuffer &) = delete;
 	void operator=(CellBuffer &&) = delete;
-	~CellBuffer();
+	~CellBuffer() noexcept;
 
 	/// Retrieving positions outside the range of the buffer works and returns 0
 	char CharAt(Sci::Position position) const noexcept;

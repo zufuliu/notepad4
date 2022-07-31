@@ -33,10 +33,6 @@ using namespace Scintilla::Internal;
 
 MarkerHandleSet::MarkerHandleSet() noexcept = default;
 
-MarkerHandleSet::~MarkerHandleSet() {
-	mhList.clear();
-}
-
 bool MarkerHandleSet::Empty() const noexcept {
 	return mhList.empty();
 }
@@ -91,8 +87,6 @@ bool MarkerHandleSet::RemoveNumber(int markerNum, bool all) {
 void MarkerHandleSet::CombineWith(MarkerHandleSet *other) noexcept {
 	mhList.splice_after(mhList.before_begin(), other->mhList);
 }
-
-LineMarkers::~LineMarkers() = default;
 
 void LineMarkers::Init() {
 	markers.DeleteAll();
@@ -218,8 +212,6 @@ void LineMarkers::DeleteMarkFromHandle(int markerHandle) {
 	}
 }
 
-LineLevels::~LineLevels() = default;
-
 void LineLevels::Init() {
 	levels.DeleteAll();
 }
@@ -246,7 +238,7 @@ void LineLevels::RemoveLine(Sci::Line line) {
 	if (levels.Length()) {
 		// Move up following lines but merge header flag from this line
 		// to line before to avoid a temporary disappearance causing expansion.
-		int firstHeader = levels[line] & static_cast<int>(Scintilla::FoldLevel::HeaderFlag);
+		const int firstHeader = levels[line] & static_cast<int>(Scintilla::FoldLevel::HeaderFlag);
 		levels.Delete(line);
 		if (line == levels.Length() - 1) // Last line loses the header flag
 			levels[line - 1] &= ~static_cast<int>(Scintilla::FoldLevel::HeaderFlag);
@@ -280,8 +272,6 @@ int LineLevels::GetLevel(Sci::Line line) const noexcept {
 		return static_cast<int>(Scintilla::FoldLevel::Base);
 	}
 }
-
-LineState::~LineState() = default;
 
 void LineState::Init() {
 	lineStates.DeleteAll();
@@ -349,8 +339,6 @@ std::unique_ptr<char[]>AllocateAnnotation(size_t length, int style) {
 }
 
 }
-
-LineAnnotation::~LineAnnotation() = default;
 
 bool LineAnnotation::Empty() const noexcept {
 	return annotations.Length() == 0;
@@ -481,8 +469,6 @@ int LineAnnotation::Lines(Sci::Line line) const noexcept {
 	else
 		return 0;
 }
-
-LineTabstops::~LineTabstops() = default;
 
 void LineTabstops::Init() {
 	tabstops.DeleteAll();
