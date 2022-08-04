@@ -85,7 +85,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 1.6.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
-	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 12.
+	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 15.
 	* [Lua Script](tools/lang/Lua.lua), up to Lua 5.4.
 	* Makefile, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#makefile)
 		* nmake

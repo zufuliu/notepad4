@@ -1,4 +1,4 @@
-; LLVM 12 https://llvm.org/docs/LangRef.html
+; LLVM 15 https://llvm.org/docs/LangRef.html
 
 ;! Keywords			===========================================================
 ; Linkage Types
@@ -20,6 +20,7 @@ external
 global
 constant
 section
+partition
 ; align
 comdat
 
@@ -28,18 +29,13 @@ comdat
 define
 section
 comdat
+declare
 ; Garbage Collector Strategy Names
 ; https://llvm.org/docs/LangRef.html#garbage-collector-strategy-names
 gc
 ; Prefix Data
 ; https://llvm.org/docs/LangRef.html#prefix-data
 prefix
-; Prologue Data
-; https://llvm.org/docs/LangRef.html#prologue-data
-prologue
-; Personality Function
-; https://llvm.org/docs/LangRef.html#personality-function
-personality
 
 ; Aliases
 ; https://llvm.org/docs/LangRef.html#aliases
@@ -47,9 +43,6 @@ alias
 ; IFuncs
 ; https://llvm.org/docs/LangRef.html#ifuncs
 ifunc
-; Parameter Attributes
-; https://llvm.org/docs/LangRef.html#parameter-attributes
-declare
 ; Attribute Groups
 ; https://llvm.org/docs/LangRef.html#attribute-groups
 attributes
@@ -75,6 +68,7 @@ true false
 null none
 global
 undef
+poison
 
 ; Metadata
 ; https://llvm.org/docs/LangRef.html#metadata
@@ -92,6 +86,7 @@ fp128
 x86_fp80
 ppc_fp128
 x86_mmx
+ptr				; Pointer Type
 vscale 			; Vector Type
 label			; Label Type
 token			; Token Type
@@ -111,6 +106,7 @@ preserve_mostcc
 preserve_allcc
 cxx_fast_tlscc
 swiftcc
+swifttailcc
 tailcc
 cfguard_checkcc
 
@@ -141,6 +137,9 @@ dso_local
 ; https://llvm.org/docs/LangRef.html#global-variables
 unnamed_addr
 local_unnamed_addr
+no_sanitize_address
+no_sanitize_hwaddress
+sanitize_address_dyninit
 
 ; Comdats
 ; https://llvm.org/docs/LangRef.html#comdats
@@ -171,20 +170,35 @@ nonnull
 dereferenceable(<n>)
 dereferenceable_or_null(<n>)
 swiftself
+swiftasync
 swifterror
 immarg
 noundef
 alignstack(<n>)
+allocalign
+allocptr
+
+; Prologue Data
+; https://llvm.org/docs/LangRef.html#prologue-data
+prologue
+; Personality Function
+; https://llvm.org/docs/LangRef.html#personality-function
+personality
 
 ; Function Attributes
 ; https://llvm.org/docs/LangRef.html#function-attributes
 alignstack(<n>)
+allockind("KIND")
 allocsize(<EltSizeParam>[, <NumEltsParam>])
 alwaysinline
 builtin
 cold
 convergent
+disable_sanitizer_instrumentation
+dontcall-error
+dontcall-warn
 frame-pointer
+fn_ret_thunk_extern
 hot
 inaccessiblememonly
 inaccessiblemem_or_argmemonly
@@ -208,7 +222,9 @@ norecurse
 willreturn
 nosync
 nounwind
-null-pointer-is-valid
+nosanitize_bounds
+nosanitize_coverage
+null_pointer_is_valid
 optforfuzzing
 optnone
 optsize
@@ -240,12 +256,21 @@ uwtable
 nocf_check
 shadowcallstack
 mustprogress
+warn-stack-size
 vscale_range(<min>[, <max>])
+min-legal-vector-width
 
 ; Call Site Attributes
 ; https://llvm.org/docs/LangRef.html#call-site-attributes
 vector-function-abi-variant
 preallocated(<ty>)
+
+; Global Attributes
+; https://llvm.org/docs/LangRef.html#global-attributes
+no_sanitize_address
+no_sanitize_hwaddress
+sanitize_memtag
+sanitize_address_dyninit
 
 ; Atomic Memory Ordering Constraints
 ; https://llvm.org/docs/LangRef.html#atomic-memory-ordering-constraints
@@ -274,6 +299,7 @@ addrspace()
 zeroinitializer
 blockaddress(@function, %block)
 dso_local_equivalent
+no_cfi @func
 
 ; Inline Assembler Expressions
 ; https://llvm.org/docs/LangRef.html#inline-assembler-expressions
@@ -372,16 +398,19 @@ insertvalue <aggregate type> <val>, <ty> <elt>, <idx>{, <idx>}*
 ; Memory Access and Addressing Operations
 ; https://llvm.org/docs/LangRef.html#memory-access-and-addressing-operations
 alloca [inalloca] <type> [, <ty> <NumElements>] [, align <alignment>] [, addrspace(<num>)]
-load [volatile] <ty>, <ty>* <pointer>[, align <alignment>][, !nontemporal !<index>][, !invariant.load !<index>][, !invariant.group !<index>][, !nonnull 	!<index>][, !dereferenceable !<deref_bytes_node>][, !dereferenceable_or_null !<deref_bytes_node>][, !align !<align_node>]
-load atomic [volatile] <ty>, <ty>* <pointer> [syncscope("<target-scope>")] <ordering>, align <alignment> [, !invariant.group !<index>]
-	!<index> = !{ i32 1 }
-	!<deref_bytes_node> = !{i64 <dereferenceable_bytes>}
+load [volatile] <ty>, ptr <pointer>[, align <alignment>][, !nontemporal !<nontemp_node>][, !invariant.load !<empty_node>][, !invariant.group !<empty_node>][, !nonnull !<empty_node>][, !dereferenceable !<deref_bytes_node>][, !dereferenceable_or_null !<deref_bytes_node>][, !align !<align_node>][, !noundef !<empty_node>]
+load atomic [volatile] <ty>, ptr <pointer> [syncscope("<target-scope>")] <ordering>, align <alignment> [, !invariant.group !<empty_node>]
+	!<nontemp_node> = !{ i32 1 }
+	!<empty_node> = !{}
+	!<deref_bytes_node> = !{ i64 <dereferenceable_bytes> }
 	!<align_node> = !{ i64 <value_alignment> }
-store [volatile] <ty> <value>, <ty>* <pointer>[, align <alignment>][, !nontemporal !<index>][, !invariant.group !<index>]
-store atomic [volatile] <ty> <value>, <ty>* <pointer> [syncscope("<target-scope>")] <ordering>, align <alignment> [, !invariant.group !<index>]
+store [volatile] <ty> <value>, ptr <pointer>[, align <alignment>][, !nontemporal !<nontemp_node>][, !invariant.group !<empty_node>]
+store atomic [volatile] <ty> <value>, ptr <pointer> [syncscope("<target-scope>")] <ordering>, align <alignment> [, !invariant.group !<empty_node>]
+	!<nontemp_node> = !{ i32 1 }
+	!<empty_node> = !{}
 fence [syncscope("<target-scope>")] <ordering>
-cmpxchg [weak] [volatile] <ty>* <pointer>, <ty> <cmp>, <ty> <new> [syncscope("<target-scope>")] <success ordering> <failure ordering>
-atomicrmw [volatile] <operation> <ty>* <pointer>, <ty> <value> [syncscope("<target-scope>")] <ordering>
+cmpxchg [weak] [volatile] ptr <pointer>, <ty> <cmp>, <ty> <new> [syncscope("<target-scope>")] <success ordering> <failure ordering>[, align <alignment>]
+atomicrmw [volatile] <operation> ptr <pointer>, <ty> <value> [syncscope("<target-scope>")] <ordering>[, align <alignment>]
 	xchg
 	add
 	sub
@@ -395,10 +424,11 @@ atomicrmw [volatile] <operation> <ty>* <pointer>, <ty> <value> [syncscope("<targ
 	umin
 	fadd
 	fsub
-getelementptr <ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*
-getelementptr inbounds <ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*
-getelementptr <ty>, <ptr vector> <ptrval>, [inrange] <vector index type> <idx>
-; Conversion Operations
+	fmax
+	fmin
+getelementptr <ty>, ptr <ptrval>{, [inrange] <ty> <idx>}*
+getelementptr inbounds <ty>, ptr <ptrval>{, [inrange] <ty> <idx>}*
+getelementptr <ty>, <N x ptr> <ptrval>, [inrange] <vector index type> <idx>; Conversion Operations
 ; https://llvm.org/docs/LangRef.html#conversion-operations
 trunc <ty> <value>
 	to <ty2>
