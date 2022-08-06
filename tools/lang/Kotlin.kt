@@ -1,7 +1,7 @@
-// Kotlin 1.6 https://kotlinlang.org/docs/reference/
+// Kotlin 1.7 https://kotlinlang.org/docs/home.html
 
 //! Keywords		===========================================================
-// https://kotlinlang.org/docs/reference/keyword-reference.html
+// https://kotlinlang.org/docs/keyword-reference.html
 // Hard Keywords
 as
 break
@@ -53,9 +53,9 @@ vararg
 
 //! Library			===========================================================
 // Kotlin Standard Library
-// https://kotlinlang.org/api/latest/jvm/stdlib/index.html
+// https://kotlinlang.org/api/latest/jvm/stdlib/
 // Basic Types
-// https://kotlinlang.org/docs/reference/basic-types.html
+// https://kotlinlang.org/docs/basic-types.html
 
 package kotlin {
 	// Types
@@ -190,7 +190,7 @@ package kotlin.text {
 }
 
 //! KDoc			===========================================================
-// https://kotlinlang.org/docs/reference/kotlin-doc.html
+// https://kotlinlang.org/docs/kotlin-doc.html
 /**
  * @param <name>
  * @return
