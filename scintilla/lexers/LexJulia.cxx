@@ -499,13 +499,15 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					isTransposeOperator = true;
 				}
 
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_JULIA_OPERATOR2 : SCE_JULIA_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_JULIA_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '(') {
 						nestedState.push_back(SCE_JULIA_DEFAULT);
 					} else if (sc.ch == ')') {
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_JULIA_DEFAULT) {
+							sc.ChangeState(SCE_JULIA_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

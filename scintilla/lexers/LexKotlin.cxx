@@ -346,13 +346,15 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 				sc.SetState(SCE_KOTLIN_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_KOTLIN_OPERATOR2 : SCE_KOTLIN_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_KOTLIN_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_KOTLIN_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_KOTLIN_DEFAULT) {
+							sc.ChangeState(SCE_KOTLIN_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

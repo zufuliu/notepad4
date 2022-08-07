@@ -522,13 +522,15 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						: ((sc.chNext == 'i') ? SCE_GROOVY_IDENTIFIER : SCE_GROOVY_ANNOTATION));
 				sc.SetState(state);
 			} else if (isoperator(sc.ch)) {
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_GROOVY_OPERATOR2 : SCE_GROOVY_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_GROOVY_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_GROOVY_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_GROOVY_DEFAULT) {
+							sc.ChangeState(SCE_GROOVY_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

@@ -314,13 +314,15 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_HAXE_VARIABLE);
 			} else if (isoperator(sc.ch)) {
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_HAXE_OPERATOR2 : SCE_HAXE_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_HAXE_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_HAXE_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_HAXE_DEFAULT) {
+							sc.ChangeState(SCE_HAXE_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

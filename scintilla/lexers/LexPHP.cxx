@@ -597,13 +597,16 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 		}
 	} else if (block == HtmlTextBlock::Script) {
 		operatorBefore = sc.ch;
-		const bool interpolating = !nestedState.empty() && nestedState.back() > SCE_PHP_LABEL;
-		sc.SetState(interpolating ? js_style(SCE_JS_OPERATOR2) : js_style(SCE_JS_OPERATOR));
-		if (interpolating) {
+		sc.SetState(js_style(SCE_JS_OPERATOR));
+		if (!nestedState.empty() && nestedState.back() > SCE_PHP_LABEL) {
 			if (sc.ch == '{') {
 				SaveOuterStyle(js_style(SCE_JS_DEFAULT));
 			} else if (sc.ch == '}') {
-				sc.ForwardSetState(TakeOuterStyle());
+				const int outerState = TakeOuterStyle();
+				if (outerState != js_style(SCE_JS_DEFAULT)) {
+					sc.ChangeState(js_style(SCE_JS_OPERATOR2));
+				}
+				sc.ForwardSetState(outerState);
 				return true;
 			}
 		}

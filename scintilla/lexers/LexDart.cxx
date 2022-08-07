@@ -371,13 +371,15 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 				sc.SetState(SCE_DART_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_DART_OPERATOR2 : SCE_DART_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_DART_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_DART_DEFAULT);
 					} else if (sc.ch == '}') {
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_DART_DEFAULT) {
+							sc.ChangeState(SCE_DART_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

@@ -813,7 +813,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						continue;
 					}
 				}
-				sc.SetState(interpolating ? SCE_PY_OPERATOR2 : SCE_PY_OPERATOR);
+				sc.SetState(SCE_PY_OPERATOR);
 				kwType = KeywordType::None;
 			}
 		}

@@ -440,13 +440,15 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.SetState(SCE_SWIFT_OPERATOR);
 				}
 			} else if (isoperator(sc.ch) || sc.ch == '\\') {
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_SWIFT_OPERATOR2 : SCE_SWIFT_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_SWIFT_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '(') {
 						nestedState.push_back(SCE_SWIFT_DEFAULT);
 					} else if (sc.ch == ')') {
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_SWIFT_DEFAULT) {
+							sc.ChangeState(SCE_SWIFT_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

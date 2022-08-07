@@ -521,9 +521,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 			} else if (isoperator(sc.ch)) {
 				operatorBefore = sc.ch;
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_JS_OPERATOR2 : SCE_JS_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_JS_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '{') {
 						nestedState.push_back(SCE_JS_DEFAULT);
 						if (enableJsx) {
@@ -535,6 +534,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							jsxTagLevel = TryTakeAndPop(jsxTagLevels);
 						}
 						const int outerState = TakeAndPop(nestedState);
+						if (outerState != SCE_JS_DEFAULT) {
+							sc.ChangeState(SCE_JS_OPERATOR2);
+						}
 						sc.ForwardSetState(outerState);
 						continue;
 					}

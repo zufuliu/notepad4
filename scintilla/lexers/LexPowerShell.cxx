@@ -341,13 +341,15 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_POWERSHELL_IDENTIFIER);
 			} else if (isoperator(sc.ch)) {
-				const bool interpolating = !nestedState.empty();
-				sc.SetState(interpolating ? SCE_POWERSHELL_OPERATOR2 : SCE_POWERSHELL_OPERATOR);
-				if (interpolating) {
+				sc.SetState(SCE_POWERSHELL_OPERATOR);
+				if (!nestedState.empty()) {
 					if (sc.ch == '(') {
 						nestedState.push_back(SCE_POWERSHELL_DEFAULT);
 					} else if (sc.ch == ')') {
 						outerStyle = TakeAndPop(nestedState);
+						if (outerStyle != SCE_POWERSHELL_DEFAULT) {
+							sc.ChangeState(SCE_POWERSHELL_OPERATOR2);
+						}
 						sc.ForwardSetState(outerStyle);
 						continue;
 					}
