@@ -7902,7 +7902,7 @@ void FoldToggleAll(FOLD_ACTION action) {
 	StopWatch watch;
 	StopWatch_Start(watch);
 #endif
-	SciCall_FoldAll((int)action);
+	SciCall_FoldAll((int)action | SC_FOLDACTION_CONTRACT_EVERY_LEVEL);
 #if 0
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, __func__);

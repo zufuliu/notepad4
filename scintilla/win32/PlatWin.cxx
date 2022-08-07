@@ -1608,9 +1608,9 @@ void SurfaceD2D::SetMode(SurfaceMode mode_) noexcept {
 	mode = mode_;
 }
 
-void SurfaceD2D::SetRenderingParams(void *defaultRP, void *customRP) noexcept {
-	defaultRenderingParams = static_cast<IDWriteRenderingParams *>(defaultRP);
-	customRenderingParams = static_cast<IDWriteRenderingParams *>(customRP);
+void SurfaceD2D::SetRenderingParams(void *defaultRenderingParams_, void *customRenderingParams_) noexcept {
+	defaultRenderingParams = static_cast<IDWriteRenderingParams *>(defaultRenderingParams_);
+	customRenderingParams = static_cast<IDWriteRenderingParams *>(customRenderingParams_);
 }
 
 HRESULT SurfaceD2D::GetBitmap(ID2D1Bitmap **ppBitmap) {
@@ -1808,17 +1808,27 @@ void SurfaceD2D::FillRectangle(PRectangle rc, Surface &surfacePattern) {
 
 void SurfaceD2D::RoundedRectangle(PRectangle rc, FillStroke fillStroke) {
 	if (pRenderTarget) {
-		const D2D1_ROUNDED_RECT roundedRectFill = {
-			RectangleFromPRectangle(rc.Inset(1.0)),
-			4, 4 };
-		D2DPenColourAlpha(fillStroke.fill.colour);
-		pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
+		const FLOAT minDimension = static_cast<FLOAT>(std::min(rc.Width(), rc.Height())) / 2.0f;
+		const FLOAT radius = std::min(4.0f, minDimension);
+		if (fillStroke.fill.colour == fillStroke.stroke.colour) {
+			const D2D1_ROUNDED_RECT roundedRectFill = {
+				RectangleFromPRectangle(rc),
+				radius, radius };
+			D2DPenColourAlpha(fillStroke.fill.colour);
+			pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
+		} else {
+			const D2D1_ROUNDED_RECT roundedRectFill = {
+				RectangleFromPRectangle(rc.Inset(1.0)),
+				radius-1, radius-1 };
+			D2DPenColourAlpha(fillStroke.fill.colour);
+			pRenderTarget->FillRoundedRectangle(roundedRectFill, pBrush);
 
-		const D2D1_ROUNDED_RECT roundedRect = {
-			RectangleFromPRectangle(rc.Inset(0.5)),
-			4, 4 };
-		D2DPenColourAlpha(fillStroke.stroke.colour);
-		pRenderTarget->DrawRoundedRectangle(roundedRect, pBrush, fillStroke.stroke.WidthF());
+			const D2D1_ROUNDED_RECT roundedRect = {
+				RectangleFromPRectangle(rc.Inset(0.5)),
+				radius, radius };
+			D2DPenColourAlpha(fillStroke.stroke.colour);
+			pRenderTarget->DrawRoundedRectangle(roundedRect, pBrush, fillStroke.stroke.WidthF());
+		}
 	}
 }
 
@@ -2511,25 +2521,30 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 	}
 }
 
-void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
-	if (!pfm->pTextFormat) {
-		return;
+namespace {
+
+HRESULT MeasurePositions(TextPositions &poses, const TextWide &tbuf, IDWriteTextFormat *pTextFormat) {
+	if (!pTextFormat) {
+		// Unexpected failure like no access to DirectWrite so give up.
+		return E_FAIL;
 	}
-	const TextWide tbuf(text, mode.codePage);
-	TextPositions poses(tbuf.length());
+
 	// Create a layout
 	IDWriteTextLayout *pTextLayout = nullptr;
-	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pfm->pTextFormat, 10000.0, 1000.0, &pTextLayout);
-	if (!SUCCEEDED(hrCreate) || !pTextLayout) {
-		return;
+	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pTextFormat, 10000.0, 1000.0, &pTextLayout);
+	if (!SUCCEEDED(hrCreate)) {
+		return hrCreate;
 	}
+	if (!pTextLayout) {
+		return E_FAIL;
+	}
+
 	VarBuffer<DWRITE_CLUSTER_METRICS, stackBufferLength> clusterMetrics(tbuf.length());
 	UINT32 count = 0;
 	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics.data(), tbuf.length(), &count);
 	ReleaseUnknown(pTextLayout);
 	if (!SUCCEEDED(hrGetCluster)) {
-		return;
+		return hrGetCluster;
 	}
 	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
 	XYPOSITION position = 0.0;
@@ -2543,6 +2558,18 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 		position += width;
 	}
 	PLATFORM_ASSERT(ti == tbuf.length());
+	return S_OK;
+}
+
+}
+
+void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) {
+	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
+	const TextWide tbuf(text, mode.codePage);
+	TextPositions poses(tbuf.length());
+	if (FAILED(MeasurePositions(poses, tbuf, pfm->pTextFormat))) {
+		return;
+	}
 	if (mode.codePage == CpUtf8) {
 		// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 		size_t i = 0;
@@ -2638,37 +2665,11 @@ void SurfaceD2D::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOS
 
 void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) {
 	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
-	if (!pfm->pTextFormat) {
-		return;
-	}
-
 	const TextWide tbuf(text, CpUtf8);
 	TextPositions poses(tbuf.length());
-	// Create a layout
-	IDWriteTextLayout *pTextLayout = nullptr;
-	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pfm->pTextFormat, 10000.0, 1000.0, &pTextLayout);
-	if (!SUCCEEDED(hrCreate) || !pTextLayout) {
+	if (FAILED(MeasurePositions(poses, tbuf, pfm->pTextFormat))) {
 		return;
 	}
-	VarBuffer<DWRITE_CLUSTER_METRICS, stackBufferLength> clusterMetrics(tbuf.length());
-	UINT32 count = 0;
-	const HRESULT hrGetCluster = pTextLayout->GetClusterMetrics(clusterMetrics.data(), tbuf.length(), &count);
-	ReleaseUnknown(pTextLayout);
-	if (!SUCCEEDED(hrGetCluster)) {
-		return;
-	}
-	// A cluster may be more than one WCHAR, such as for "ffi" which is a ligature in the Candara font
-	XYPOSITION position = 0.0f;
-	UINT ti = 0;
-	for (UINT32 ci = 0; ci < count; ci++) {
-		const int length = clusterMetrics[ci].length;
-		const XYPOSITION width = clusterMetrics[ci].width;
-		for (int inCluster = 0; inCluster < length; inCluster++) {
-			poses[ti++] = position + width * (inCluster + 1) / length;
-		}
-		position += width;
-	}
-	PLATFORM_ASSERT(ti == tbuf.length());
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string
 	size_t i = 0;
 	for (UINT ui = 0; ui < tbuf.length(); ui++) {
@@ -2676,12 +2677,11 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		const unsigned int byteCount = UTF8BytesOfLead(uch);
 		if (byteCount == 4) {	// Non-BMP
 			ui++;
-			PLATFORM_ASSERT(ui < ti);
+			PLATFORM_ASSERT(ui < tbuf.tlen);
 		}
-		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()); bytePos++) {
+		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.length()); bytePos++) {
 			positions[i++] = poses[ui];
 		}
-
 	}
 	const XYPOSITION lastPos = (i > 0) ? positions[i - 1] : 0.0;
 	while (i < text.length()) {

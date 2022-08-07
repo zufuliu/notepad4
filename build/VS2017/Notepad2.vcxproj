@@ -1074,6 +1074,7 @@
     <ClCompile Include="..\..\scintilla\src\CaseConvert.cxx" />
     <ClCompile Include="..\..\scintilla\src\CaseFolder.cxx" />
     <ClCompile Include="..\..\scintilla\src\CellBuffer.cxx" />
+    <ClCompile Include="..\..\scintilla\src\ChangeHistory.cxx" />
     <ClCompile Include="..\..\scintilla\src\CharClassify.cxx" />
     <ClCompile Include="..\..\scintilla\src\ContractionState.cxx" />
     <ClCompile Include="..\..\scintilla\src\Decoration.cxx" />
@@ -1216,6 +1217,7 @@
     <ClInclude Include="..\..\scintilla\src\CaseConvert.h" />
     <ClInclude Include="..\..\scintilla\src\CaseFolder.h" />
     <ClInclude Include="..\..\scintilla\src\CellBuffer.h" />
+    <ClInclude Include="..\..\scintilla\src\ChangeHistory.h" />
     <ClInclude Include="..\..\scintilla\src\CharClassify.h" />
     <ClInclude Include="..\..\scintilla\src\ContractionState.h" />
     <ClInclude Include="..\..\scintilla\src\Decoration.h" />

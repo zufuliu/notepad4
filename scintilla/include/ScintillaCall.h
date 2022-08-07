@@ -311,6 +311,8 @@ public:
 	Scintilla::PrintOption PrintColourMode();
 	Position FindTextFull(Scintilla::FindOption searchFlags, void *ft);
 	Position FormatRangeFull(bool draw, void *fr);
+	void SetChangeHistory(Scintilla::ChangeHistoryOption changeHistory);
+	Scintilla::ChangeHistoryOption ChangeHistory();
 	Line FirstVisibleLine();
 	Position GetLine(Line line, char *text);
 	std::string GetLine(Line line);

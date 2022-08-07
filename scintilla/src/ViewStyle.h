@@ -16,10 +16,13 @@ public:
 	ColourRGBA back;
 	int width;
 	MarkerMask mask;
-	bool sensitive;
-	Scintilla::CursorShape cursor;
-	MarginStyle(Scintilla::MarginType style_ = Scintilla::MarginType::Symbol, int width_ = 0, MarkerMask mask_ = 0) noexcept;
-	bool ShowsFolding() const noexcept;
+	bool sensitive = false;
+	Scintilla::CursorShape cursor = Scintilla::CursorShape::ReverseArrow;
+	constexpr MarginStyle(Scintilla::MarginType style_ = Scintilla::MarginType::Symbol, int width_ = 0, MarkerMask mask_ = 0) noexcept:
+		style(style_), width(width_), mask(mask_) {}
+	constexpr bool ShowsFolding() const noexcept {
+		return (mask & Scintilla::MaskFolders) != 0;
+	}
 };
 
 /**
@@ -144,6 +147,7 @@ public:
 	int rightMarginWidth;	///< Spacing margin on right of text
 	MarkerMask maskInLine = 0;	///< Mask for markers to be put into text because there is nowhere for them to go in margin
 	MarkerMask maskDrawInText = 0;///< Mask for markers that always draw in text
+	MarkerMask maskDrawWrapped = 0;	///< Mask for markers that draw on wrapped lines
 	std::vector<MarginStyle> ms;
 	int fixedColumnWidth = 0;	///< Total width of margins
 	int textStart;	///< Starting x position of text within the view

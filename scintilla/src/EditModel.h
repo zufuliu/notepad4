@@ -48,6 +48,8 @@ public:
 	bool hotspotSingleLine;
 	Sci::Position hoverIndicatorPos;
 
+	Scintilla::ChangeHistoryOption changeHistoryOption = Scintilla::ChangeHistoryOption::Disabled;
+
 	// Wrapping support
 	int wrapWidth;
 	uint32_t hardwareConcurrency;
@@ -79,6 +81,7 @@ public:
 	const char *GetDefaultFoldDisplayText() const noexcept;
 	const char *GetFoldDisplayText(Sci::Line lineDoc, bool partialLine) const noexcept;
 	InSelection LineEndInSelection(Sci::Line lineDoc) const noexcept;
+	[[nodiscard]] MarkerMask GetMark(Sci::Line line) const noexcept;
 	void SetIdleTaskTime(uint32_t milliseconds) const noexcept;
 	bool IdleTaskTimeExpired() const noexcept;
 	void UpdateParallelLayoutThreshold() noexcept;

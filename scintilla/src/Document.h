@@ -418,6 +418,22 @@ public:
 		return cb.TentativeActive();
 	}
 
+	void ChangeHistorySet(bool enable) {
+		cb.ChangeHistorySet(enable);
+	}
+	[[nodiscard]] int EditionAt(Sci::Position pos) const noexcept {
+		return cb.EditionAt(pos);
+	}
+	[[nodiscard]] Sci::Position EditionEndRun(Sci::Position pos) const noexcept {
+		return cb.EditionEndRun(pos);
+	}
+	[[nodiscard]] unsigned int EditionDeletesAt(Sci::Position pos) const noexcept {
+		return cb.EditionDeletesAt(pos);
+	}
+	[[nodiscard]] Sci::Position EditionNextDelete(Sci::Position pos) const noexcept {
+		return cb.EditionNextDelete(pos);
+	}
+
 	const char * SCI_METHOD BufferPointer() override {
 		return cb.BufferPointer();
 	}
@@ -474,7 +490,7 @@ public:
 	void GetStyleRange(unsigned char *buffer, Sci::Position position, Sci::Position lengthRetrieve) const noexcept {
 		cb.GetStyleRange(buffer, position, lengthRetrieve);
 	}
-	MarkerMask GetMark(Sci::Line line) const noexcept;
+	MarkerMask GetMark(Sci::Line line, bool includeChangeHistory) const noexcept;
 	Sci::Line MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept;
 	int AddMark(Sci::Line line, int markerNum);
 	void AddMarkSet(Sci::Line line, MarkerMask valueSet);

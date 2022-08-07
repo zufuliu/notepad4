@@ -84,10 +84,15 @@ enum class MarkerSymbol {
 	RgbaImage = 30,
 	Bookmark = 31,
 	VerticalBookmark = 32,
+	Bar = 33,
 	Character = 10000,
 };
 
 enum class MarkerOutline {
+	HistoryRevertedToOrigin = 21,
+	HistorySaved = 22,
+	HistoryModified = 23,
+	HistoryRevertedToModified = 24,
 	FolderEnd = 25,
 	FolderOpenMid = 26,
 	FolderMidTail = 27,
@@ -213,13 +218,22 @@ enum class IndicatorStyle {
 	PointCharacter = 19,
 	Gradient = 20,
 	GradientCentre = 21,
+	PointTop = 22,
 };
 
 enum class IndicatorNumbers {
 	Container = 8,
 	Ime = 32,
 	ImeMax = 35,
-	Max = 35,
+	HistoryRevertedToOriginInsertion = 36,
+	HistoryRevertedToOriginDeletion = 37,
+	HistorySavedInsertion = 38,
+	HistorySavedDeletion = 39,
+	HistoryModifiedInsertion = 40,
+	HistoryModifiedDeletion = 41,
+	HistoryRevertedToModifiedInsertion = 42,
+	HistoryRevertedToModifiedDeletion = 43,
+	Max = 43,
 };
 
 enum class IndicValue {
@@ -263,6 +277,13 @@ enum class FindOption {
 	Cxx11RegEx = 0x00800000,
 };
 
+enum class ChangeHistoryOption {
+	Disabled = 0,
+	Enabled = 1,
+	Markers = 2,
+	Indicators = 4,
+};
+
 enum class NotificationPosition {
 	Bottomright = 0,
 	Center = 1,
@@ -286,6 +307,7 @@ enum class FoldAction {
 	Contract = 0,
 	Expand = 1,
 	Toggle = 2,
+	ContractEveryLevel = 4,
 };
 
 enum class AutomaticFold {

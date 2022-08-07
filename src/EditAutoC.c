@@ -1623,8 +1623,8 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		return false;
 	}
 
-	if (iLexer == SCLEX_RUST || iLexer == SCLEX_REBOL) {
-		// TODO: Rust lifetime, REBOL symbol
+	if (iLexer == SCLEX_RUST || iLexer == SCLEX_REBOL || iLexer == SCLEX_VERILOG) {
+		// TODO: Rust lifetime, REBOL symbol, Verilog literal
 		return false;
 	}
 

@@ -122,6 +122,8 @@
       <File Name="../../scintilla/src/CaseFolder.h"/>
       <File Name="../../scintilla/src/CellBuffer.cxx"/>
       <File Name="../../scintilla/src/CellBuffer.h"/>
+      <File Name="../../scintilla/src/ChangeHistory.cxx"/>
+      <File Name="../../scintilla/src/ChangeHistory.h"/>
       <File Name="../../scintilla/src/CharClassify.cxx"/>
       <File Name="../../scintilla/src/CharClassify.h"/>
       <File Name="../../scintilla/src/ContractionState.cxx"/>

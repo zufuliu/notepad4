@@ -11,8 +11,8 @@ namespace Scintilla::Internal {
 struct StyleAndColour {
 	Scintilla::IndicatorStyle style;
 	ColourRGBA fore;
-	StyleAndColour() noexcept : style(Scintilla::IndicatorStyle::Plain), fore(0, 0, 0) {}
-	StyleAndColour(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = ColourRGBA(0, 0, 0)) noexcept : style(style_), fore(fore_) {}
+	constexpr StyleAndColour() noexcept : style(Scintilla::IndicatorStyle::Plain), fore(0, 0, 0) {}
+	constexpr StyleAndColour(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = ColourRGBA(0, 0, 0)) noexcept : style(style_), fore(fore_) {}
 	bool operator==(const StyleAndColour &other) const noexcept {
 		return (style == other.style) && (fore == other.fore);
 	}
@@ -32,8 +32,8 @@ public:
 	int outlineAlpha;
 	Scintilla::IndicFlag attributes;
 	XYPOSITION strokeWidth = 1.0f;
-	Indicator() noexcept : under(false), fillAlpha(30), outlineAlpha(50), attributes(Scintilla::IndicFlag::None) {}
-	Indicator(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = ColourRGBA(0, 0, 0), bool under_ = false, int fillAlpha_ = 30, int outlineAlpha_ = 50) noexcept :
+	constexpr Indicator() noexcept : under(false), fillAlpha(30), outlineAlpha(50), attributes(Scintilla::IndicFlag::None) {}
+	constexpr Indicator(Scintilla::IndicatorStyle style_, ColourRGBA fore_ = ColourRGBA(0, 0, 0), bool under_ = false, int fillAlpha_ = 30, int outlineAlpha_ = 50) noexcept :
 		sacNormal(style_, fore_), sacHover(style_, fore_), under(under_), fillAlpha(fillAlpha_), outlineAlpha(outlineAlpha_), attributes(Scintilla::IndicFlag::None) {}
 	void SCICALL Draw(Surface *surface, PRectangle rc, PRectangle rcLine, PRectangle rcCharacter, State state, int value) const;
 	bool IsDynamic() const noexcept {

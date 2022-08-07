@@ -347,8 +347,31 @@ void Document::TentativeUndo(bool pendingUpdate) {
 	}
 }
 
-MarkerMask Document::GetMark(Sci::Line line) const noexcept {
-	return Markers()->MarkValue(line);
+MarkerMask Document::GetMark(Sci::Line line, bool includeChangeHistory) const noexcept {
+	MarkerMask marksHistory = 0;
+	if (includeChangeHistory) {
+		MarkerMask marksEdition = 0;
+
+		const Sci::Position start = LineStart(line);
+		const Sci::Position lineNext = LineStart(line + 1);
+		for (Sci::Position position = start; position < lineNext;) {
+			const int edition = EditionAt(position);
+			if (edition) {
+				marksEdition |= 1U << (edition - 1);
+			}
+			position = EditionEndRun(position);
+		}
+		const Sci::Position lineEnd = LineEnd(line);
+		for (Sci::Position position = start; position <= lineEnd;) {
+			marksEdition |= EditionDeletesAt(position);
+			position = EditionNextDelete(position);
+		}
+
+		/* Bits: RevertedToOrigin, Saved, Modified, RevertedToModified */
+		constexpr unsigned int editionShift = static_cast<unsigned int>(MarkerOutline::HistoryRevertedToOrigin);
+		marksHistory = marksEdition << editionShift;
+	}
+	return marksHistory | Markers()->MarkValue(line);
 }
 
 Sci::Line Document::MarkerNext(Sci::Line lineStart, MarkerMask mask) const noexcept {

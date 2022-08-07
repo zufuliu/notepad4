@@ -1608,6 +1608,45 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 			}
 		}
 	}
+
+	if (FlagSet(model.changeHistoryOption, ChangeHistoryOption::Indicators)) {
+		// Draw editions
+		const int indexHistory = static_cast<int>(IndicatorNumbers::HistoryRevertedToOriginInsertion);
+		{
+			// Draw insertions
+			Sci::Position startPos = posLineStart + lineStart;
+			while (startPos < posLineEnd) {
+				const Range rangeRun(startPos, model.pdoc->EditionEndRun(startPos));
+				const Sci::Position endPos = std::min(rangeRun.end, posLineEnd);
+				const int edition = model.pdoc->EditionAt(startPos);
+				if (edition != 0) {
+					const int indicator = (edition - 1) * 2 + indexHistory;
+					const Sci::Position posSecond = model.pdoc->MovePositionOutsideChar(rangeRun.First() + 1, 1);
+					DrawIndicator(indicator, startPos - posLineStart, endPos - posLineStart,
+						surface, vsDraw, ll, xStart, rcLine, posSecond - posLineStart, subLine, Indicator::State::normal,
+						1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
+				}
+				startPos = endPos;
+			}
+		}
+		{
+			// Draw deletions
+			Sci::Position startPos = posLineStart + lineStart;
+			while (startPos <= posLineEnd) {
+				const unsigned int editions = model.pdoc->EditionDeletesAt(startPos);
+				const Sci::Position posSecond = model.pdoc->MovePositionOutsideChar(startPos + 1, 1);
+				for (unsigned int edition = 0; edition < 4; edition++) {
+					if (editions & (1 << edition)) {
+						const int indicator = edition * 2 + indexHistory + 1;
+						DrawIndicator(indicator, startPos - posLineStart, posSecond - posLineStart,
+							surface, vsDraw, ll, xStart, rcLine, posSecond - posLineStart, subLine, Indicator::State::normal,
+							1, model.BidirectionalEnabled(), tabWidthMinimumPixels);
+					}
+				}
+				startPos = model.pdoc->EditionNextDelete(startPos);
+			}
+		}
+	}
 }
 
 void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
@@ -1637,7 +1676,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	rcSegment.left = xStart + static_cast<XYPOSITION>(ll->positions[ll->numCharsInLine] - subLineStart) + virtualSpace + vsDraw.aveCharWidth;
 	rcSegment.right = rcSegment.left + widthFoldDisplayText + margin*2;
 
-	const std::optional<ColourRGBA> background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
+	const std::optional<ColourRGBA> background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
 	const std::optional<ColourRGBA> selectionFore = SelectionForeground(model, vsDraw, eolInSelection);
 	const ColourRGBA textFore = selectionFore.value_or(vsDraw.styles[StyleFoldDisplayText].fore);
 	const ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, eolInSelection,
@@ -1768,7 +1807,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 	}
 	rcSegment.right = rcSegment.left + widthEOLAnnotationText;
 
-	const std::optional<ColourRGBA> background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
+	const std::optional<ColourRGBA> background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
 	const ColourRGBA textFore = vsDraw.styles[style].fore;
 	const ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, InSelection::inNone,
 											false, static_cast<int>(style), -1);
@@ -2220,7 +2259,7 @@ static void DrawEdgeLine(Surface *surface, const ViewStyle &vsDraw, const LineLa
 // Draw underline mark as part of background if on base layer
 static void DrawMarkUnderline(Surface *surface, const EditModel &model, const ViewStyle &vsDraw,
 	Sci::Line line, PRectangle rcLine) {
-	MarkerMask marks = model.pdoc->GetMark(line);
+	MarkerMask marks = model.GetMark(line);
 	for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
 		if ((marks & 1) && (vsDraw.markers[markBit].markType == MarkerSymbol::Underline) &&
 			(vsDraw.markers[markBit].layer == Layer::Base)) {
@@ -2307,7 +2346,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 		}
 	}
 
-	const MarkerMask marksOfLine = model.pdoc->GetMark(line);
+	const MarkerMask marksOfLine = model.GetMark(line);
 	MarkerMask marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
 	for (int markBit = 0; (markBit < MarkerBitCount) && marksDrawnInText; markBit++) {
 		if ((marksDrawnInText & 1) && (vsDraw.markers[markBit].layer == layer)) {
@@ -2610,7 +2649,7 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 	}
 
 	// See if something overrides the line background colour.
-	const std::optional<ColourRGBA> background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
+	const std::optional<ColourRGBA> background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
 
 	const Sci::Position posLineStart = model.pdoc->LineStart(line);
 
@@ -2942,7 +2981,7 @@ void EditView::FillLineRemainder(Surface *surface, const EditModel &model, const
 		eolInSelection = model.LineEndInSelection(line);
 	}
 
-	const std::optional<ColourRGBA> background = vsDraw.Background(model.pdoc->GetMark(line), model.caret.active, ll->containsCaret);
+	const std::optional<ColourRGBA> background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
 	const bool drawEOLSelection = eolInSelection && vsDraw.selection.eolFilled && (line < model.pdoc->LinesTotal() - 1);
 
 	if (drawEOLSelection && (vsDraw.selection.layer == Layer::Base)) {

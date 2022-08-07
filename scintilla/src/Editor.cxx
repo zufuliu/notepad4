@@ -2501,6 +2501,9 @@ void Editor::NotifySavePoint(bool isSavePoint) noexcept {
 	NotificationData scn = {};
 	if (isSavePoint) {
 		scn.nmhdr.code = Notification::SavePointReached;
+		if (changeHistoryOption != ChangeHistoryOption::Disabled) {
+			Redraw();
+		}
 	} else {
 		scn.nmhdr.code = Notification::SavePointLeft;
 	}
@@ -2839,6 +2842,9 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 					QueueIdleWork(WorkItems::style, mh.position + mh.length);
 				}
 				InvalidateRange(mh.position, mh.position + mh.length);
+				if (FlagSet(changeHistoryOption, ChangeHistoryOption::Markers)) {
+					RedrawSelMargin(pdoc->SciLineFromPosition(mh.position));
+				}
 			}
 		}
 	}
@@ -5624,6 +5630,8 @@ void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 
 void Editor::FoldAll(FoldAction action) {
 	const Sci::Line maxLine = pdoc->LinesTotal();
+	const bool contractAll = FlagSet(action, FoldAction::ContractEveryLevel);
+	action = static_cast<FoldAction>(static_cast<int>(action) & ~static_cast<int>(FoldAction::ContractEveryLevel));
 	bool expanding = action == FoldAction::Expand;
 	if (!expanding) {
 		pdoc->EnsureStyledTo(pdoc->LengthNoExcept());
@@ -5658,8 +5666,11 @@ void Editor::FoldAll(FoldAction action) {
 					if (lineMaxSubord > line) {
 						pcs->SetExpanded(line, false);
 						pcs->SetVisible(line + 1, lineMaxSubord, false);
+						if (!contractAll) {
+							line = lineMaxSubord;
+						}
 					}
-				} else {
+				} else if (contractAll) {
 					const FoldLevel levelNext = pdoc->GetFoldLevel(line + 1);
 					if (levelNum < LevelNumberPart(levelNext)) {
 						pcs->SetExpanded(line, false);
@@ -7182,14 +7193,14 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::MarkerGet:
-		return pdoc->GetMark(LineFromUPtr(wParam));
+		return GetMark(LineFromUPtr(wParam));
 
 	case Message::MarkerNext:
 		return pdoc->MarkerNext(LineFromUPtr(wParam), static_cast<MarkerMask>(lParam));
 
 	case Message::MarkerPrevious: {
 			for (Sci::Line iLine = LineFromUPtr(wParam); iLine >= 0; iLine--) {
-				if ((pdoc->GetMark(iLine) & lParam) != 0)
+				if ((GetMark(iLine) & lParam) != 0)
 					return iLine;
 			}
 		}
@@ -8253,6 +8264,14 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetGapPosition:
 		return pdoc->GapPosition();
+
+	case Message::SetChangeHistory:
+		changeHistoryOption = static_cast<ChangeHistoryOption>(wParam);
+		pdoc->ChangeHistorySet(wParam & static_cast<int>(ChangeHistoryOption::Enabled));
+		break;
+
+	case Message::GetChangeHistory:
+		return static_cast<sptr_t>(changeHistoryOption);
 
 	case Message::SetExtraAscent:
 		vs.extraAscent = static_cast<int>(wParam);

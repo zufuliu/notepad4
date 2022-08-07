@@ -132,6 +132,10 @@ InSelection EditModel::LineEndInSelection(Sci::Line lineDoc) const noexcept {
 	return sel.InSelectionForEOL(posAfterLineEnd);
 }
 
+MarkerMask EditModel::GetMark(Sci::Line line) const noexcept {
+	return pdoc->GetMark(line, FlagSet(changeHistoryOption, ChangeHistoryOption::Markers));
+}
+
 void EditModel::SetIdleTaskTime(uint32_t milliseconds) const noexcept {
 	LARGE_INTEGER dueTime;
 	dueTime.QuadPart = -INT64_C(10*1000)*milliseconds; // convert to 100ns

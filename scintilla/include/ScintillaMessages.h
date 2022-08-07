@@ -247,6 +247,8 @@ enum class Message {
 	GetPrintColourMode = 2149,
 	FindTextFull = 2196,
 	FormatRangeFull = 2777,
+	SetChangeHistory = 2780,
+	GetChangeHistory = 2781,
 	GetFirstVisibleLine = 2152,
 	GetLine = 2153,
 	GetLineCount = 2154,

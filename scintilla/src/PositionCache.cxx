@@ -98,11 +98,12 @@ LineLayout::~LineLayout() {
 void LineLayout::Resize(int maxLineLength_) {
 	if (maxLineLength_ > maxLineLength) {
 		Free();
-		chars = std::make_unique<char[]>(maxLineLength_ + 1);
-		styles = std::make_unique<unsigned char[]>(maxLineLength_ + 1);
+		const size_t lineAllocation = maxLineLength_ + 1;
+		chars = std::make_unique<char[]>(lineAllocation);
+		styles = std::make_unique<unsigned char[]>(lineAllocation);
 		// Extra position allocated as sometimes the Windows
 		// GetTextExtentExPoint API writes an extra element.
-		positions = std::make_unique<XYPOSITION[]>(maxLineLength_ + 1 + 1);
+		positions = std::make_unique<XYPOSITION[]>(lineAllocation + 1);
 		if (bidiData) {
 			bidiData->Resize(maxLineLength_);
 		}

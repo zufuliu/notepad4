@@ -371,7 +371,6 @@ int RESearch::GetBackslashExpression(
 	// I choose to interpret unexpected syntax in a logical way instead
 	// of reporting errors. Otherwise, we can stick on, eg., PCRE behaviour.
 	incr = 0;	// Most of the time, will skip the char "naturally".
-	int c;
 	int result = -1;
 	const unsigned char bsc = *pattern;
 	if (!bsc) {
@@ -404,12 +403,12 @@ int RESearch::GetBackslashExpression(
 	}
 	break;
 	case 'd':
-		for (c = '0'; c <= '9'; c++) {
+		for (int c = '0'; c <= '9'; c++) {
 			ChSet(static_cast<unsigned char>(c));
 		}
 		break;
 	case 'D':
-		for (c = 0; c < MAXCHR; c++) {
+		for (int c = 0; c < MAXCHR; c++) {
 			if (c < '0' || c > '9') {
 				ChSet(static_cast<unsigned char>(c));
 			}
@@ -424,21 +423,21 @@ int RESearch::GetBackslashExpression(
 		ChSet('\v');
 		break;
 	case 'S':
-		for (c = 0; c < MAXCHR; c++) {
+		for (int c = 0; c < MAXCHR; c++) {
 			if (c != ' ' && !(c >= 0x09 && c <= 0x0D)) {
 				ChSet(static_cast<unsigned char>(c));
 			}
 		}
 		break;
 	case 'w':
-		for (c = 0; c < MAXCHR; c++) {
+		for (int c = 0; c < MAXCHR; c++) {
 			if (iswordc(static_cast<unsigned char>(c))) {
 				ChSet(static_cast<unsigned char>(c));
 			}
 		}
 		break;
 	case 'W':
-		for (c = 0; c < MAXCHR; c++) {
+		for (int c = 0; c < MAXCHR; c++) {
 			if (!iswordc(static_cast<unsigned char>(c))) {
 				ChSet(static_cast<unsigned char>(c));
 			}
@@ -473,18 +472,11 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 
 const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept {
 	char *mp = nfa;          /* nfa pointer       */
-	char *lp;              /* saved pointer     */
 	char *sp = nfa;          /* another one       */
 	const char *mpMax = mp + MAXNFA - BITBLK - 10;
 
 	int tagi = 0;          /* tag stack index   */
 	int tagc = 1;          /* actual tag count  */
-
-	int n;
-	char mask;             /* xor mask -CCL/NCL */
-	int c1;
-	int c2;
-	int prevChar;
 
 	if (pattern == nullptr || length == 0) {
 		if (sta)
@@ -498,7 +490,7 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 	for (int i = 0; i < length; i++, p++) {
 		if (mp > mpMax)
 			return badpat("Pattern too long");
-		lp = mp;
+		char *lp = mp;			/* saved pointer     */
 		switch (*p) {
 
 		case '.':               /* match any char  */
@@ -523,17 +515,16 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 			}
 			break;
 
-		case '[':               /* match char class */
+		case '[': {               /* match char class */
 			*mp++ = CCL;
-			prevChar = 0;
+			int prevChar = 0;
+			char mask = 0;          /* xor mask -CCL/NCL */
 
 			i++;
 			if (*++p == '^') {
 				mask = '\377';
 				i++;
 				p++;
-			} else {
-				mask = 0;
 			}
 
 			if (*p == '-') {	/* real dash */
@@ -556,9 +547,9 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 						ChSet('-');
 					} else if (*(p + 1)) {
 						if (*(p + 1) != ']') {
-							c1 = prevChar + 1;
+							int c1 = prevChar + 1;
 							i++;
-							c2 = static_cast<unsigned char>(*++p);
+							int c2 = static_cast<unsigned char>(*++p);
 							if (c2 == '\\') {
 								if (!*(p + 1)) {	// End of RE
 									return badpat("Missing ]");
@@ -622,10 +613,10 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 			if (!*p)
 				return badpat("Missing ]");
 
-			for (n = 0; n < BITBLK; bittab[n++] = 0) {
+			for (int n = 0; n < BITBLK; bittab[n++] = 0) {
 				*mp++ = static_cast<char>(mask ^ bittab[n]);
 			}
-			break;
+		} break;
 
 		case '*':               /* match 0 or more... */
 		case '+':               /* match 1 or more... */
@@ -702,8 +693,8 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 			case '6':
 			case '7':
 			case '8':
-			case '9':
-				n = *p - '0';
+			case '9': {
+				const int n = *p - '0';
 				if (tagi > 0 && tagstk[tagi] == n)
 					return badpat("Cyclical reference");
 				if (tagc > n) {
@@ -712,7 +703,7 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 				} else {
 					return badpat("Undetermined reference");
 				}
-				break;
+			} break;
 			default:
 				if (!posix && *p == '(') {
 					if (tagc < MAXTAG) {
@@ -741,8 +732,8 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 						*mp++ = static_cast<char>(c);
 					} else {
 						*mp++ = CCL;
-						mask = 0;
-						for (n = 0; n < BITBLK; bittab[n++] = 0) {
+						constexpr char mask = 0;
+						for (int n = 0; n < BITBLK; bittab[n++] = 0) {
 							*mp++ = static_cast<char>(mask ^ bittab[n]);
 						}
 					}
@@ -777,9 +768,9 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 					*mp++ = static_cast<char>(c);
 				} else {
 					*mp++ = CCL;
-					mask = 0;
 					ChSetWithCase(c, false);
-					for (n = 0; n < BITBLK; bittab[n++] = 0) {
+					constexpr char mask = 0;
+					for (int n = 0; n < BITBLK; bittab[n++] = 0) {
 						*mp++ = static_cast<char>(mask ^ bittab[n]);
 					}
 				}
@@ -817,7 +808,6 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
  *
  */
 int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp) {
-	unsigned char c;
 	Sci::Position ep = NOTFOUND;
 	char *ap = nfa;
 
@@ -839,14 +829,15 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 		} else {
 			return 0;
 		}
-	case CHR:			/* ordinary char: locate it fast */
-		c = *(ap + 1);
+	case CHR: {			/* ordinary char: locate it fast */
+		const unsigned char c = *(ap + 1);
 		while ((lp < endp) && (static_cast<unsigned char>(ci.CharAt(lp)) != c)) {
 			lp++;
 		}
 		if (lp >= endp)	/* if EOS, fail, else fall through. */
 			return 0;
 		[[fallthrough]];
+	}
 	default:			/* regular matching all the way. */
 		while (lp < endp) {
 			Sci::Position offset = 1;
@@ -908,12 +899,6 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 
 Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap, int moveDir, Sci::Position *offset) {
 	uint8_t op;
-	uint8_t n;
-	Sci::Position e;		/* extra pointer for CLO  */
-	Sci::Position bp;		/* beginning of subpat... */
-	Sci::Position ep;		/* ending of subpat...    */
-	Sci::Position are;	/* to save the line ptr.  */
-	Sci::Position llp;	/* lazy lp for LCLO       */
 
 	while ((op = *ap++) != END) {
 		switch (op) {
@@ -960,7 +945,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 		case EXP_MATCH_WORD_START:
 			if (!ci.IsWordStartAt(lp)) {
 				if (offset) {
-					e = ci.MovePositionOutsideChar(lp, moveDir);
+					Sci::Position e = ci.MovePositionOutsideChar(lp, moveDir);
 					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
 					*offset = (e == 0) ? moveDir : e;
 				}
@@ -970,7 +955,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 		case EXP_MATCH_WORD_END:
 			if (lp == bol || !ci.IsWordEndAt(lp)) {
 				if (offset) {
-					e = ci.MovePositionOutsideChar(lp, moveDir);
+					Sci::Position e = ci.MovePositionOutsideChar(lp, moveDir);
 					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
 					*offset = (e == 0) ? moveDir : e;
 				}
@@ -979,7 +964,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			break;
 		case EXP_MATCH_TO_WORD_END:
 		case EXP_MATCH_TO_WORD_END_OPT: {
-			e = ci.ExtendWordSelect(lp, moveDir);
+			Sci::Position e = ci.ExtendWordSelect(lp, moveDir);
 			if ((e == lp && op != EXP_MATCH_TO_WORD_END_OPT) || !ci.IsWordEndAt(e)) {
 				if (offset) {
 					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
@@ -990,19 +975,20 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			lp = e;
 		}
 		break;
-		case REF:
-			n = *ap++;
-			bp = bopat[n];
-			ep = eopat[n];
+		case REF: {
+			const int n = static_cast<uint8_t>(*ap++);
+			Sci::Position bp = bopat[n];	/* beginning of subpat... */
+			const Sci::Position ep = eopat[n];	/* ending of subpat...    */
 			while (bp < ep) {
 				if (ci.CharAt(bp++) != ci.CharAt(lp++))
 					return NOTFOUND;
 			}
-			break;
+		} break;
 		case LCLO:
 		case CLQ:
-		case CLO:
-			are = lp;
+		case CLO: {
+			int n = 0;
+			const Sci::Position are = lp;	/* to save the line ptr.  */
 			switch (*ap) {
 
 			case ANY:
@@ -1039,8 +1025,8 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			}
 			ap += n;
 
-			llp = lp;
-			e = NOTFOUND;
+			Sci::Position llp = lp;	/* lazy lp for LCLO       */
+			Sci::Position e = NOTFOUND; /* extra pointer for CLO  */
 			while (llp >= are) {
 				Sci::Position qoff = -1;
 				const Sci::Position q = PMatch(ci, llp, endp, ap, -1, &qoff);
@@ -1055,6 +1041,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			if (*ap == EOT)
 				PMatch(ci, lp, endp, ap);
 			return e;
+		}
 		default:
 			//re_fail("RESearch::Execute: bad nfa.", static_cast<char>(op));
 			return NOTFOUND;

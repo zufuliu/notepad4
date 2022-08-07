@@ -255,11 +255,11 @@ void DecorationList<POS>::SetView() {
 
 template <typename POS>
 int DecorationList<POS>::AllOnFor(Sci::Position position) const noexcept {
-	int mask = 0;
+	unsigned int mask = 0;
 	for (const auto &deco : decorationList) {
 		if (deco->rs.ValueAt(static_cast<POS>(position))) {
 			if (deco->Indicator() < static_cast<int>(Scintilla::IndicatorNumbers::Ime)) {
-				mask |= 1u << deco->Indicator();
+				mask |= 1U << deco->Indicator();
 			}
 		}
 	}

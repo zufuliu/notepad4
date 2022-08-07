@@ -283,7 +283,11 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 		const bool firstSubLine = visibleLine == firstVisibleLine;
 		const bool lastSubLine = visibleLine == lastVisibleLine;
 
-		MarkerMask marks = firstSubLine ? model.pdoc->GetMark(lineDoc) : 0;
+		MarkerMask marks = model.GetMark(lineDoc);
+		if (!firstSubLine) {
+			// Mask off non-continuing marks
+			marks = marks & vs.maskDrawWrapped;
+		}
 
 		bool headWithTail = false;
 
@@ -410,6 +414,24 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 							}
 						} else if (highlightDelimiter.IsTailOfFoldBlock(lineDoc)) {
 							part = LineMarker::FoldPart::tail;
+						}
+					}
+					if (vs.markers[markBit].markType == MarkerSymbol::Bar) {
+						const MarkerMask mask = 1U << markBit;
+						const bool markBefore = firstSubLine ? (model.GetMark(lineDoc - 1) & mask) : true;
+						const bool markAfter = lastSubLine ? (model.GetMark(lineDoc + 1) & mask) : true;
+						if (markBefore) {
+							if (markAfter) {
+								part = LineMarker::FoldPart::body;
+							} else {
+								part = LineMarker::FoldPart::tail;
+							}
+						} else {
+							if (markAfter) {
+								part = LineMarker::FoldPart::head;
+							} else {
+								part = LineMarker::FoldPart::headWithTail;
+							}
 						}
 					}
 					vs.markers[markBit].Draw(surface, rcMarker, lineNumberStyle.font.get(), part, marginStyle.style);

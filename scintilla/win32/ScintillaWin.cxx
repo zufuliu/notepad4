@@ -149,9 +149,12 @@ inline bool KeyboardIsKeyDown(int key) noexcept {
 	return (::GetKeyState(key) & 0x8000) != 0;
 }
 
+// Bit 24 is the extended keyboard flag and the numeric keypad is non-extended
+constexpr sptr_t extendedKeyboard = 1 << 24;
+
 constexpr bool KeyboardIsNumericKeypadFunction(Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept {
 	// Bit 24 is the extended keyboard flag and the numeric keypad is non-extended
-	if ((lParam & (1 << 24)) != 0) {
+	if ((lParam & extendedKeyboard) != 0) {
 		// Not from the numeric keypad
 		return false;
 	}

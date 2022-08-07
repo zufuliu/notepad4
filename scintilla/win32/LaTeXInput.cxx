@@ -17,9 +17,9 @@ struct InputSequence {
 	uint32_t character;
 };
 
-template <typename T, uint32_t N>
+template <typename T, size_t N>
 constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
-	return N;
+	return static_cast<uint32_t>(N);
 }
 
 }
