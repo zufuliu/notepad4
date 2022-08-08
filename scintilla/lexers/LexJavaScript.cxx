@@ -290,15 +290,14 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if ((sc.ch == '\'' && (sc.state == SCE_JS_STRING_SQ || sc.state == SCE_JSX_STRING_SQ))
 				|| (sc.ch == '"' && (sc.state == SCE_JS_STRING_DQ || sc.state == SCE_JSX_STRING_DQ))) {
 				sc.Forward();
-				const bool jsx = (sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ);
-				if (!jsx && operatorBefore != '?') {
+				if (operatorBefore == ',' || operatorBefore == '{') {
 					// json key
 					const int chNext = sc.GetLineNextChar();
 					if (chNext == ':') {
 						sc.ChangeState(SCE_JS_KEY);
 					}
 				}
-				sc.SetState(jsx ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+				sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
 				continue;
 			}
 			break;
@@ -434,7 +433,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.ForwardSetState(SCE_JSX_TEXT);
 				continue;
-			} else if ((sc.ch == '\'' || sc.ch == '"') && insideJsxTag) {
+			} else if ((sc.ch == '\'' || sc.ch == '\"') && insideJsxTag) {
+				operatorBefore = 0;
 				sc.SetState((sc.ch == '\'') ? SCE_JSX_STRING_SQ : SCE_JSX_STRING_DQ);
 			} else if (insideJsxTag && (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u'))) {
 				sc.SetState(SCE_JSX_ATTRIBUTE);
@@ -481,10 +481,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_JS_OPERATOR);
 				}
 			}
-			else if (sc.ch == '\'') {
-				sc.SetState(SCE_JS_STRING_SQ);
-			} else if (sc.ch == '"') {
-				sc.SetState(SCE_JS_STRING_DQ);
+			else if (sc.ch == '\'' || sc.ch == '\"') {
+				operatorBefore = (stylePrevNonWhite == SCE_JS_OPERATOR) ? chPrevNonWhite : 0;
+				sc.SetState((sc.ch == '\'') ? SCE_JS_STRING_SQ : SCE_JS_STRING_DQ);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_JS_STRING_BT);
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
@@ -520,7 +519,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState(SCE_JS_OPERATOR);
 				}
 			} else if (isoperator(sc.ch)) {
-				operatorBefore = sc.ch;
 				sc.SetState(SCE_JS_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '{') {

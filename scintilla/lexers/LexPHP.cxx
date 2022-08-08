@@ -596,7 +596,6 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			}
 		}
 	} else if (block == HtmlTextBlock::Script) {
-		operatorBefore = sc.ch;
 		sc.SetState(js_style(SCE_JS_OPERATOR));
 		if (!nestedState.empty() && nestedState.back() > SCE_PHP_LABEL) {
 			if (sc.ch == '{') {
@@ -736,7 +735,7 @@ void PHPLexer::HighlightJsInnerString() {
 	} else {
 		if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
 			sc.Forward();
-			if (operatorBefore != '?') {
+			if (operatorBefore == ',' || operatorBefore == '{') {
 				// json key
 				const int chNext = sc.GetLineNextChar();
 				if (chNext == ':') {
@@ -1330,10 +1329,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				} else {
 					sc.SetState(js_style(SCE_JS_OPERATOR));
 				}
-			} else if (sc.ch == '\'') {
-				sc.SetState(js_style(SCE_JS_STRING_SQ));
-			} else if (sc.ch == '\"') {
-				sc.SetState(js_style(SCE_JS_STRING_DQ));
+			} else if (sc.ch == '\'' || sc.ch == '\"') {
+				lexer.operatorBefore = (stylePrevNonWhite == js_style(SCE_JS_OPERATOR)) ? chPrevNonWhite : 0;
+				sc.SetState((sc.ch == '\'') ? js_style(SCE_JS_STRING_SQ) : js_style(SCE_JS_STRING_DQ));
 			} else if (sc.ch == '`') {
 				sc.SetState(js_style(SCE_JS_STRING_BT));
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
