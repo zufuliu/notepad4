@@ -1,2 +1,5 @@
+# run `git add --renormalize .` after change this file
+# see https://www.git-scm.com/docs/gitattributes
 *.sh	text eol=lf
 *.bat	text eol=crlf
+*.ini	text working-tree-encoding=UTF-16LE-BOM eol=CRLF
