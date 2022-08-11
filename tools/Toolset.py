@@ -44,7 +44,7 @@ def update_all_project_toolset():
 		update_project_toolset(path)
 
 
-def build_compile_commands(commands, folder, cflags, cxxflags, includes):
+def build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx=False):
 	# https://clang.llvm.org/docs/JSONCompilationDatabase.html
 	folder = os.path.abspath(folder)
 	with os.scandir(folder) as it:
@@ -54,7 +54,7 @@ def build_compile_commands(commands, folder, cflags, cxxflags, includes):
 			ext = os.path.splitext(entry.name)[1]
 			if ext in ('.c', '.cpp', '.cxx'):
 				path = entry.path
-				arguments = cflags[:] if ext == '.c' else cxxflags[:]
+				arguments = cxxflags[:] if cxx or ext != '.c' else cflags[:]
 				arguments.extend(includes)
 				arguments.append(path)
 				commands.append({
@@ -63,7 +63,7 @@ def build_compile_commands(commands, folder, cflags, cxxflags, includes):
 					'file': path,
 				})
 
-def generate_compile_commands(target, avx2=False):
+def generate_compile_commands(target, avx2=False, cxx=False):
 	cflags = []
 	cxxflags = []
 	# flags to run clang-tidy via vscode-clangd plugin, see https://clangd.llvm.org/
@@ -83,6 +83,8 @@ def generate_compile_commands(target, avx2=False):
 		cflags.extend(['clang.exe', target_flag, '-municode', '-c', '-std=gnu17', '-O2'])
 		cxxflags.extend(['clang++.exe', target_flag, '-municode', '-c', '-std=gnu++20', '-O2'])
 		warnings.insert(0, '-Wall')
+	if cxx:
+		cxxflags.insert(1, '/TP' if msvc else 'x c++')
 
 	arch = target[:target.index('-')]
 	if arch == 'x86_64':
@@ -111,7 +113,7 @@ def generate_compile_commands(target, avx2=False):
 		('../scintilla/lexers', ['../include', '../lexlib']),
 		('../scintilla/lexlib', ['../include']),
 		('../scintilla/src', ['../include', '../lexlib']),
-		('../scintilla/win32', ['../include']),
+		('../scintilla/win32', ['../include', '../src']),
 		('../metapath/src', []),
 	]
 
@@ -119,7 +121,7 @@ def generate_compile_commands(target, avx2=False):
 	prefix = prefix[0] + 'I'
 	for folder, includes in config:
 		includes = [prefix + path for path in includes]
-		build_compile_commands(commands, folder, cflags, cxxflags, includes)
+		build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx)
 
 	path = '../compile_commands.json'
 	print('write:', path)
@@ -127,5 +129,6 @@ def generate_compile_commands(target, avx2=False):
 		fd.write(json.dumps(commands, indent='\t'))
 
 #update_all_project_toolset()
-generate_compile_commands('x86_64-pc-windows-msvc')
+generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
+#run-clang-tidy -quiet -j4 1>tidy.log
