@@ -76,12 +76,12 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	if msvc:
 		prefix = '/D'
 		cflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c17', '/O2'])
-		cxxflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c++20', '/O2', '/EHsc'])
+		cxxflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c++20', '/O2', '/EHsc', '/GR-'])
 		warnings.insert(0, '/W4')
 	else:
 		prefix = '-D'
 		cflags.extend(['clang.exe', target_flag, '-municode', '-c', '-std=gnu17', '-O2'])
-		cxxflags.extend(['clang++.exe', target_flag, '-municode', '-c', '-std=gnu++20', '-O2'])
+		cxxflags.extend(['clang++.exe', target_flag, '-municode', '-c', '-std=gnu++20', '-O2', '-fno-rtti'])
 		warnings.insert(0, '-Wall')
 	if cxx:
 		cxxflags.insert(1, '/TP' if msvc else 'x c++')
