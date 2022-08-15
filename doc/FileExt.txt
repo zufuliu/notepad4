@@ -526,7 +526,7 @@ VBScript
 
 Verilog HDL Source
 	v
-	vl
+	vh
 	sv				SystemVerilog
 	svh				SystemVerilog Header File
 

@@ -782,9 +782,12 @@ LexerConfigMap = {
 	'NP2LEX_VERILOG': {
 		'cpp_style_comment': True,
 		'none_quote_style': 'SCE_V_NUMBER',
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_V_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_V_ESCAPECHAR',
 		'operator_style': ['SCE_V_OPERATOR'],
-		'extra_word_char': '$',
-		#'auto_ident_word_style': ['SCE_V_WORD'],
+		'extra_word_char': '$`:',
+		#'auto_ident_word_style': ['SCE_V_FOLDING_KEYWORD'],
 	},
 	'NP2LEX_VHDL': {
 		'line_comment_string': '--',

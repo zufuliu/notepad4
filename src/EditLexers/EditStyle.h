@@ -183,7 +183,7 @@
 #define NP2STYLE_HotKey					63594
 
 #define NP2STYLE_PascalKeyword 			63601
-
+#define NP2STYLE_Event					63602
 #define NP2STYLE_Parameter				63603
 #define NP2STYLE_InlineExpansion		63604
 

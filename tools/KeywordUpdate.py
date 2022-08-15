@@ -95,7 +95,7 @@ lexerList = [
 	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, parse_toml_api_file),
 
 	('NP2LEX_VBSCRIPT', 'stlVBS.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),
-	('NP2LEX_VERILOG', 'stlVerilog.c', 'LexVerilog.cxx', '', 0, None),
+	('NP2LEX_VERILOG', 'stlVerilog.c', 'LexVerilog.cxx', ['Verilog.v', 'SystemVerilog.sv'], 0, parse_verilog_api_file),
 	('NP2LEX_VHDL', 'stlVHDL.c', 'LexVHDL.cxx', '', 0, None),
 	('NP2LEX_VIM', 'stlVim.c', 'LexVim.cxx', 'Vim.vim', 0, parse_vim_api_file),
 	('NP2LEX_VISUALBASIC', 'stlVB.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),

@@ -132,7 +132,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* VHDL
-	* Verilog HDL
+	* Verilog HDL, up to [Verilog](tools/lang/Verilog.v) 2005 and [SystemVerilog](tools/lang/SystemVerilog.sv) 2012.
 	* [Vim Script](tools/lang/Vim.vim)
 	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)

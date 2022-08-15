@@ -2172,6 +2172,47 @@ def parse_visual_basic_api_file(path):
 		('constant', [], KeywordAttr.MakeLower),
 	]
 
+def parse_verilog_api_file(pathList):
+	keywordMap = {}
+	for path in pathList:
+		sections = read_api_file(path, '//')
+		for key, doc in sections:
+			items = []
+			if key in ('keywords', 'data types', 'misc'):
+				items = doc.split()
+			elif key == 'directives':
+				items = re.findall(r'`(\w+)', doc)
+			elif key == 'code folding':
+				lines = [line.strip() for line in doc.splitlines()]
+				items = [line.split()[0] for line in lines if line]
+			elif key == 'system task and function':
+				items = re.findall(r'\W\$([\$\w+]+\(?)', doc)
+			elif key == 'api':
+				items = re.findall(r'\W\$([\$\w+]+\(?)', doc)
+				keywordMap.setdefault('system task and function', []).extend(items)
+				items = re.findall(r'\Wclass\s+(\w+)', doc)
+				keywordMap.setdefault('misc', []).extend(items)
+				items = re.findall(r'\s+(\w+\()', doc)
+				keywordMap.setdefault('misc', []).extend(items)
+				items = []
+			if items:
+				keywordMap.setdefault(key, []).extend(items)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'code folding',
+		'data types',
+		'keywords',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('code folding', keywordMap['code folding'], KeywordAttr.Default),
+		('data types', keywordMap['data types'], KeywordAttr.Default),
+		('directives', keywordMap['directives'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('system task and function', keywordMap['system task and function'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
 def parse_wasm_lexer_keywords(path):
 	if not os.path.isfile(path):
 		print('missing file:', path)

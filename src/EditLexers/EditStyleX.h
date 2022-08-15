@@ -206,7 +206,7 @@
 #define NP2StyleX_HotKey				EDITSTYLE_HOLE(HotKey, L"HotKey")
 
 #define NP2StyleX_PascalKeyword			EDITSTYLE_HOLE(PascalKeyword, L"Pascal Keyword")
-
+#define NP2StyleX_Event					EDITSTYLE_HOLE(Event, L"Event")
 #define NP2StyleX_Parameter				EDITSTYLE_HOLE(Parameter, L"Parameter")
 #define NP2StyleX_InlineExpansion		EDITSTYLE_HOLE(InlineExpansion, L"Inline Expansion")
 
