@@ -1,4 +1,4 @@
-// SystemVerilog 2012
+// SystemVerilog 2017
 
 //! keywords			=======================================================
 accept_on alias always always_comb always_ff always_latch assert assign assume automatic
@@ -50,8 +50,6 @@ endclass
 disable fork;
 wait fork;
 bind + function float faddif(int, float); // Operator overloading
-assert property(property_spec);
-cover sequence(sequence_expr)
 default clocking clocking_identifier;
 rand join // Random sequence generation
 export "DPI-C" function f;
@@ -190,6 +188,18 @@ or()
 xor()
 int_or_index_type index(int dimension = 1);
 
+class process;
+	static process self();
+	state status();
+	void kill();
+	/*task*/ await();
+	void suspend();
+	void resume();
+	void srandom(int seed);
+	string get_randstate();
+	void set_randstate(string state);
+endclass
+
 class semaphore
 	new(int keyCount = 0);
 	void put(int keyCount = 1);
@@ -208,16 +218,25 @@ class mailbox
 	int try_peek(ref singular message);
 endclass
 
+wait_order(hierarchical_identifier {, hierarchical_identifier}) action_block
+assert(expression) action_block
+assume(expression) action_block
+cover(expression) statement_or_null
+assert property(property_spec);
+cover sequence(sequence_expr) statement_or_null
+
 first_match(sequence_expr {, sequence_match_item})
 accept_on(expression_or_dist) property_expr
 reject_on(expression_or_dist) property_expr
 sync_accept_on(expression_or_dist) property_expr
 sync_reject_on(expression_or_dist) property_expr
+expect(property_spec) action_block
 
 // Randomization methods
 int randomize();
 void pre_randomize();
 void post_randomize();
+rand_mode(bit on_off);
 constraint_mode(bit on_off);
 $urandom
 $urandom(int seed)
@@ -225,6 +244,16 @@ int unsigned $urandom_range(int unsigned maxval, int unsigned minval = 0);
 void srandom(int seed);
 string get_randstate();
 void set_randstate(string state);
+
+// Predefined coverage methods
+void sample()
+real get_coverage()
+real get_coverage(ref int, ref int)
+real get_inst_coverage()
+real get_inst_coverage(ref int, ref int)
+void set_inst_name(string)
+void start()
+void stop()
 
 //! System task and function		===========================================
 // Simulation control tasks
