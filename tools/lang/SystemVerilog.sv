@@ -47,6 +47,7 @@ tran rtran
 interface class PutImp#(type PUT_T = logic);
 	pure virtual function void put(PUT_T a);
 endclass
+virtual interface interface_identifier;
 disable fork;
 wait fork;
 bind + function float faddif(int, float); // Operator overloading

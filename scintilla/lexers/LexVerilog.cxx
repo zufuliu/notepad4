@@ -67,6 +67,7 @@ enum {
 enum class KeywordType {
 	None,
 	Interface,		// interface class
+	Virtual,		// virtual interface
 	DisableWait,	// disable fork, wait fork
 	Rand,			// rand join
 	Scope,			// $scope scope_type $end
@@ -328,17 +329,25 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 								&& !(chBeforeIdentifier == '.' || chBeforeIdentifier == ':')) {
 								fold = true;
 								if (StrEqual(s, "fork")) {
+									// IEEE 1800 A.6.5 Timing control statements
 									fold = prevWord != KeywordType::DisableWait;
 								} else if (StrEqual(s, "join")) {
+									// IEEE 1800 A.6.12 Randsequence
 									fold = prevWord != KeywordType::Rand;
 								} else if (StrEqual(s, "class")) {
 									fold = prevWord != KeywordType::Interface;
 								} else if (StrEqual(s, "clocking")) {
 									fold = chNext == '@' || FindClockingEvent(styler, sc.currentPos, sc.lineStartNext);
 								} else if (StrEqualsAny(s, "property", "sequence")) {
+									// IEEE 1800 A.2.10 Assertion declarations
 									fold = chNext != '(';
 								} else if (StrEqual(s, "interface")) {
+									// IEEE 1800 A.1.3 Module parameters and ports
+									// interface_port_header ::= interface [.modport_identifier]
+									// IEEE 1800 A.2.2 Declaration data types
+									// data_type ::= virtual [interface] interface_identifier [parameter_value_assignment] [.modport_identifier]
 									kwType = KeywordType::Interface;
+									fold = chNext != '.' && prevWord != KeywordType::Virtual;
 								} else if (StrEqualsAny(s, "module", "macromodule")) {
 									kwType = KeywordType::Module;
 								}
@@ -351,6 +360,8 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 									kwType = KeywordType::Rand;
 								} else if (StrEqualsAny(s, "wait", "disable")) {
 									kwType = KeywordType::DisableWait;
+								} else if (StrEqual(s, "virtual")) {
+									kwType = KeywordType::Virtual;
 								} else if (StrEqualsAny(s, "pure", "bind", "extern", "typedef", "import", "export")) {
 									lineState |= VerilogLineStateMaskDeclaration;
 								}
