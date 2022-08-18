@@ -1,6 +1,6 @@
 // C99 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
 // C11 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf
-// C23 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2731.pdf
+// C23 https://open-std.org/JTC1/SC22/WG14/www/docs/n3047.pdf
 // https://en.cppreference.com/w/c
 // https://en.cppreference.com/w/c/header
 // https://en.cppreference.com/w/c/links
@@ -13,21 +13,21 @@ _Noreturn noreturn
 _Static_assert static_assert
 _Thread_local thread_local
 break
-case const continue
+case const constexpr continue
 default do
 else enum extern
-for
+false for
 goto
-if
-inline
+if inline
+nullptr
 register restrict return
 sizeof static struct switch
-typedef
+true typedef typeof typeof_unqual
 union
 void volatile
 while
 
-_Bool bool _Complex complex _Imaginary imaginary
+_BitInt _Bool bool _Complex complex _Imaginary imaginary
 _Decimal128 _Decimal32 _Decimal64 // C2x
 auto char double float int long short signed unsigned
 
@@ -50,10 +50,13 @@ defined
 #define
 #undef
 #include
+#embed
 #line
 #error
 #pragma
 _Pragma()
+__has_include(header)
+__has_embed(header-name embed-parameter-sequenceopt)
 __has_c_attribute(pp-tokens)
 
 // Argument substitution

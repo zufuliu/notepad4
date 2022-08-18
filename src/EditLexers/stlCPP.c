@@ -14,7 +14,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "private protected public reinterpret_cast static_assert static_cast template "
 "this thread_local throw true try typeid typename using virtual "
 "override final "
-"_Pragma defined __has_include __has_include_next __has_attribute __has_c_attribute __has_cpp_attribute "
+"_Pragma defined __has_include __has_include_next __has_embed __has_attribute __has_c_attribute __has_cpp_attribute "
 "and and_eq bitand bitor compl not not_eq or or_eq xor xor_eq "
 "concept requires audit axiom "
 "import module " "co_await co_return co_yield "
@@ -25,7 +25,7 @@ static KEYWORDLIST Keywords_CPP = {{
 // COM
 "interface "
 // GCC
-"typeof __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __inline__ __extension__ "
+"typeof typeof_unqual __typeof__ __alignof__ __label__ __asm__ __thread __attribute__ __volatile__ __restrict__ __inline__ __extension__ "
 // clang Objective-C/C++
 "__nonnull __nullable __covariant __kindof nullable nonnull "
 // Intel
@@ -40,7 +40,7 @@ static KEYWORDLIST Keywords_CPP = {{
 , // 1 Type Keyword
 "__auto_type auto char double float int long short signed unsigned void "
 "bool char8_t char16_t char32_t wchar_t nullptr_t nothrow_t "
-"_Bool complex _Complex _Imaginary imaginary "
+"_BitInt _Bool complex _Complex _Imaginary imaginary "
 "__w64 __wchar_t __int8 __int16 __int32 __int64 __m64 __m128 __m128d __m128i __m256 __m256d __m256i __m512 __m512d __m512i __mmask8 __mmask16 __mmask32 __mmask64 __int3264 __ptr32 __ptr64 __sptr __uptr "
 "__int128 __float80 __float128 __fp16 __complex__ __real__ __imag__ __complex128 _Decimal32 _Decimal64 _Decimal128 decimal32 decimal64 decimal128 "
 "int128 qfloat "
@@ -84,7 +84,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "byte "
 
 , // 2 Preprocessor
-" if elif else endif ifdef elifdef ifndef elifndef define undef include include_next import using pragma line error warning warn message "
+" if elif else endif ifdef elifdef ifndef elifndef define undef embed include include_next import using pragma line error warning warn message "
 "region endregion sccs ident assert unassert "
 
 , // 3 Directive: Objective C/C++
@@ -819,7 +819,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "NSLog() "
 
 , // 15 Code Snippet
-"_Pragma() defined() comment() __has_include() __has_include_next() __has_attribute() "
+"_Pragma() defined() comment() __has_include() __has_include_next() __has_embed() __has_attribute() __has_c_attribute() __has_cpp_attribute() "
 "sizeof() for^() if^() switch^() while^() catch^() else^if^() else^{} "
 "alignas() alignof() delete[] decltype() noexcept() typeid() typeof() static_assert() requires() "
 "static_cast<> const_cast<> dynamic_cast<> reinterpret_cast<> "

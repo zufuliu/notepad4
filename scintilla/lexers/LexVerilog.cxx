@@ -506,7 +506,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
 
-	char buf[20]; // begin_keywords
+	char buf[16]; // celldefine
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
@@ -539,7 +539,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				buf[wordLen] = '\0';
 				wordLen = 0;
 				if (style == SCE_V_DIRECTIVE) {
-					if (StrEqualsAny(buf, "`ifdef", "`ifndef", "`celldefine", "`begin_keywords")) {
+					if (StrEqualsAny(buf, "`ifdef", "`ifndef", "`celldefine") || StrStartsWith(buf, "`begin")) {
 						levelNext++;
 					} else if (StrStartsWith(buf, "`end")) {
 						levelNext--;

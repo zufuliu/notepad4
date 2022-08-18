@@ -245,7 +245,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 						if (s[0] == '#')
 							ppw = s + 1;
 						isPragmaPreprocessor = StrEqualsAny(ppw, "pragma", "line");
-						isIncludePreprocessor = StrStartsWith(ppw, "include") || StrEqualsAny(ppw, "import", "using");
+						isIncludePreprocessor = StrStartsWith(ppw, "include") || StrEqualsAny(ppw, "import", "using", "embed");
 						isMessagePreprocessor = StrEqualsAny(ppw, "error", "warning", "message", "region", "endregion");
 						if (StrEqual(ppw, "define")) {
 							lineState |= LEX_BLOCK_MASK_DEFINE;
