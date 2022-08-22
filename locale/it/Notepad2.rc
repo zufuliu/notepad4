@@ -72,209 +72,209 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "&File"
 	BEGIN
-		MENUITEM "&New\tCtrl+N",					IDM_FILE_NEW
-		MENUITEM "&Open...\tCtrl+O",				IDM_FILE_OPEN
-		MENUITEM "&Save\tCtrl+S",					IDM_FILE_SAVE
-		MENUITEM "Save &As...\tF6",					IDM_FILE_SAVEAS
-		MENUITEM "Save Cop&y...\tCtrl+F6",			IDM_FILE_SAVECOPY
+		MENUITEM "Nuovo\tCtrl+N",					IDM_FILE_NEW
+		MENUITEM "Apri...\tCtrl+O",				IDM_FILE_OPEN
+		MENUITEM "Salva\tCtrl+S",					IDM_FILE_SAVE
+		MENUITEM "Salva &Come...\tF6",					IDM_FILE_SAVEAS
+		MENUITEM "Salva Copia...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
-		POPUP "File &Mode"
+		POPUP "Modalità File"
 		BEGIN
-			MENUITEM "Read Only &File",				IDM_FILE_READONLY_FILE
-			MENUITEM "&Read Only Mode\tF10",		IDM_FILE_READONLY_MODE
+			MENUITEM "File Sola Lettura",				IDM_FILE_READONLY_FILE
+			MENUITEM "Modalità Sola Lettura\tF10",		IDM_FILE_READONLY_MODE
 #if defined(_WIN64)
-			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE
+			MENUITEM "Modalità file di grandi dimensioni",			IDM_FILE_LARGE_FILE_MODE
 #endif
 		END
-		MENUITEM "Re&vert\tF5",						IDM_FILE_REVERT
-		POPUP "Reloa&d"
+		MENUITEM "Ripristina\tF5",						IDM_FILE_REVERT
+		POPUP "Ricarica"
 		BEGIN
-			MENUITEM "As UTF-&8\tShift+F8",			CMD_RELOADUTF8
-			MENUITEM "As &ANSI\tCtrl+Shift+A",		CMD_RELOADANSI
-			MENUITEM "As &OEM\tCtrl+Shift+O",		CMD_RELOADOEM
+			MENUITEM "Come UTF-&8\tShift+F8",			CMD_RELOADUTF8
+			MENUITEM "Come &ANSI\tCtrl+Shift+A",		CMD_RELOADANSI
+			MENUITEM "Come &OEM\tCtrl+Shift+O",		CMD_RELOADOEM
 			MENUITEM SEPARATOR
-			MENUITEM "&Default Encoding\tCtrl+Alt+F",CMD_RECODEDEFAULT
-			MENUITEM "&With Encoding...\tF8",		IDM_RECODE_SELECT
+			MENUITEM "Codifica di Default\tCtrl+Alt+F",CMD_RECODEDEFAULT
+			MENUITEM "Con Codifica...\tF8",		IDM_RECODE_SELECT
 			MENUITEM SEPARATOR
-			MENUITEM "&No File Variables\tAlt+F8",	CMD_RELOADNOFILEVARS
+			MENUITEM "Nessuna variabile di file\tAlt+F8",	CMD_RELOADNOFILEVARS
 #if defined(_WIN64)
-			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE_RELOAD
+			MENUITEM "Modalità file di grandi dimensioni",			IDM_FILE_LARGE_FILE_MODE_RELOAD
 #endif
 		END
-		POPUP "&Launch"
+		POPUP "Avvia"
 		BEGIN
-			MENUITEM "Open Containing &Folder",		IDM_FILE_OPEN_CONTAINING_FOLDER
-			MENUITEM "Open As &Administrator",		IDM_FILE_RELAUNCH_ELEVATED
+			MENUITEM "Apri la cartella contenente",		IDM_FILE_OPEN_CONTAINING_FOLDER
+			MENUITEM "Apri come Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
 			MENUITEM SEPARATOR
-			MENUITEM "&New Window\tAlt+N",			IDM_FILE_NEWWINDOW
-			MENUITEM "&Empty Window\tAlt+0",		IDM_FILE_NEWWINDOW2
-			MENUITEM "&Restart",					IDM_FILE_RESTART
+			MENUITEM "Nuova Finestra\tAlt+N",			IDM_FILE_NEWWINDOW
+			MENUITEM "Finestra vuota\tAlt+0",		IDM_FILE_NEWWINDOW2
+			MENUITEM "Riavvia",					IDM_FILE_RESTART
 			MENUITEM SEPARATOR
-			MENUITEM "Execute &Document\tCtrl+L",	IDM_FILE_LAUNCH
-			MENUITEM "Open &With...",				IDM_FILE_OPENWITH
-			MENUITEM "&Command...\tCtrl+R",			IDM_FILE_RUN
+			MENUITEM "Esegui Documento\tCtrl+L",	IDM_FILE_LAUNCH
+			MENUITEM "Apri Con...",				IDM_FILE_OPENWITH
+			MENUITEM "Comando...\tCtrl+R",			IDM_FILE_RUN
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Encoding"
+		POPUP "Codifica"
 		BEGIN
 			MENUITEM "&ANSI",						IDM_ENCODING_ANSI
 			MENUITEM "UTF-&8",						IDM_ENCODING_UTF8
 			MENUITEM "UTF-8 B&OM",					IDM_ENCODING_UTF8SIGN
 			MENUITEM "UTF-16&LE BOM",				IDM_ENCODING_UNICODE
 			MENUITEM "UTF-16&BE BOM",				IDM_ENCODING_UNICODEREV
-			MENUITEM "&More...\tF9",				IDM_ENCODING_SELECT
+			MENUITEM "Altro...\tF9",				IDM_ENCODING_SELECT
 			MENUITEM SEPARATOR
-			MENUITEM "&Default...",					IDM_ENCODING_SETDEFAULT
+			MENUITEM "Default...",					IDM_ENCODING_SETDEFAULT
 		END
-		POPUP "Line Endin&gs"
+		POPUP "Terminazioni di riga"
 		BEGIN
 			MENUITEM "&Windows (CR+LF)",			IDM_LINEENDINGS_CRLF
 			MENUITEM "&Unix/macOS (LF)",			IDM_LINEENDINGS_LF
-			MENUITEM "Classic &Mac OS (CR)",		IDM_LINEENDINGS_CR
+			MENUITEM "&Mac OS Classico (CR)",		IDM_LINEENDINGS_CR
 			MENUITEM SEPARATOR
 			MENUITEM "&Default...",					IDM_LINEENDINGS_SETDEFAULT
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Page Se&tup...",					IDM_FILE_PAGESETUP
-		MENUITEM "&Print...\tCtrl+P",				IDM_FILE_PRINT
+		MENUITEM "Impostazione Pagina...",					IDM_FILE_PAGESETUP
+		MENUITEM "Stampa...\tCtrl+P",				IDM_FILE_PRINT
 		MENUITEM SEPARATOR
-		MENUITEM "Propert&ies...",					IDM_FILE_PROPERTIES
-		MENUITEM "Create Desktop Lin&k",			IDM_FILE_CREATELINK
+		MENUITEM "Proprietà...",					IDM_FILE_PROPERTIES
+		MENUITEM "Crea collegamento sul desktop",			IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
-		MENUITEM "&Browse...\tCtrl+M",				IDM_FILE_BROWSE
-		POPUP "&Favorites"
+		MENUITEM "Naviga...\tCtrl+M",				IDM_FILE_BROWSE
+		POPUP "Preferiti"
 		BEGIN
-			MENUITEM "&Open Favorites...\tAlt+I",	IDM_FILE_OPENFAV
-			MENUITEM "&Add Current File...\tAlt+K",	IDM_FILE_ADDTOFAV
-			MENUITEM "&Manage...\tAlt+F9",			IDM_FILE_MANAGEFAV
+			MENUITEM "Apri Preferiti...\tAlt+I",	IDM_FILE_OPENFAV
+			MENUITEM "&Aggiungi questo File...\tAlt+K",	IDM_FILE_ADDTOFAV
+			MENUITEM "&Gestisci...\tAlt+F9",			IDM_FILE_MANAGEFAV
 		END
-		MENUITEM "Recent (&History)...\tAlt+H",		IDM_FILE_RECENT
+		MENUITEM "Recenti (Cronologia)...\tAlt+H",		IDM_FILE_RECENT
 		MENUITEM SEPARATOR
-		MENUITEM "E&xit\tAlt+F4",					IDM_FILE_EXIT
+		MENUITEM "E&sci\tAlt+F4",					IDM_FILE_EXIT
 	END
-	POPUP "&Edit"
+	POPUP "Modifica"
 	BEGIN
 		MENUITEM "&Undo\tCtrl+Z",						IDM_EDIT_UNDO
 		MENUITEM "&Redo\tCtrl+Y",						IDM_EDIT_REDO
 		MENUITEM SEPARATOR
-		MENUITEM "Cu&t\tCtrl+X",						IDM_EDIT_CUT
-		MENUITEM "&Copy\tCtrl+C",						IDM_EDIT_COPY
-		MENUITEM "&Paste\tCtrl+V",						IDM_EDIT_PASTE
-		MENUITEM "&Delete\tDelete",						IDM_EDIT_DELETE
-		MENUITEM "Select &All\tCtrl+A",					IDM_EDIT_SELECTALL
-		MENUITEM "S&wap\tCtrl+K",						IDM_EDIT_SWAP
+		MENUITEM "Taglia\tCtrl+X",						IDM_EDIT_CUT
+		MENUITEM "&Copia\tCtrl+C",						IDM_EDIT_COPY
+		MENUITEM "&Incolla\tCtrl+V",						IDM_EDIT_PASTE
+		MENUITEM "&Elimina\tDelete",						IDM_EDIT_DELETE
+		MENUITEM "Seleziona &Tutto\tCtrl+A",					IDM_EDIT_SELECTALL
+		MENUITEM "Scambia\tCtrl+K",						IDM_EDIT_SWAP
 		MENUITEM SEPARATOR
-		MENUITEM "Clear Docu&ment",						IDM_EDIT_CLEARDOCUMENT
-		MENUITEM "Clear Clip&board",					IDM_EDIT_CLEARCLIPBOARD
-		POPUP "Cop&y to Clipboard"
+		MENUITEM "Cancella Docu&mento",						IDM_EDIT_CLEARDOCUMENT
+		MENUITEM "Svuota Clip&board",					IDM_EDIT_CLEARCLIPBOARD
+		POPUP "Copia nella Clipboard"
 		BEGIN
-			MENUITEM "&File Name",						CMD_COPYFILENAME_NOEXT
-			MENUITEM "File Name and &Ext.\tShift+F9",	CMD_COPYFILENAME
-			MENUITEM "Full &Path Name\tAlt+Shift+F9",	CMD_COPYPATHNAME
+			MENUITEM "Nome File",						CMD_COPYFILENAME_NOEXT
+			MENUITEM "Nome File ed &Esci.\tShift+F9",	CMD_COPYFILENAME
+			MENUITEM "Nome percorso completo\tAlt+Shift+F9",	CMD_COPYPATHNAME
 			MENUITEM SEPARATOR
-			MENUITEM "Copy &All\tAlt+A",				IDM_EDIT_COPYALL
-			MENUITEM "Copy A&dd\tCtrl+E",				IDM_EDIT_COPYADD
-			MENUITEM "Copy As &RTF",					IDM_EDIT_COPYRTF
+			MENUITEM "Copia Tutto\tAlt+A",				IDM_EDIT_COPYALL
+			MENUITEM "Copia Aggiungi\tCtrl+E",				IDM_EDIT_COPYADD
+			MENUITEM "Copia Come &RTF",					IDM_EDIT_COPYRTF
 			//MENUITEM SEPARATOR
 			//MENUITEM "&Copy As Binary",					IDM_EDIT_COPY_BINARY
 			//MENUITEM "Cu&t As Binary",					IDM_EDIT_CUT_BINARY
 			//MENUITEM "&Paste As Binary",				IDM_EDIT_PASTE_BINARY
 			MENUITEM SEPARATOR
-			MENUITEM "&Window Position\tCtrl+Shift+K",	CMD_COPYWINPOS
+			MENUITEM "Posizione Finestra\tCtrl+Shift+K",	CMD_COPYWINPOS
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Selection"
+		POPUP "&Selezione"
 		BEGIN
-			MENUITEM "&Duplicate\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
+			MENUITEM "&Dupplica\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
-			MENUITEM "T&oggle Line Comment\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Block &Comment\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
-			MENUITEM "&Indent\tTab",					IDM_EDIT_INDENT
-			MENUITEM "&Unindent\tShift+Tab",			IDM_EDIT_UNINDENT
+			MENUITEM "Rimuovi linea commento\tCtrl+/",	IDM_EDIT_LINECOMMENT
+			MENUITEM "Commenta blocco\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
+			MENUITEM "&Indenta\tTab",					IDM_EDIT_INDENT
+			MENUITEM "Rimuovi Indentazione\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
-			MENUITEM "Strip &Trailing Blanks\tAlt+T",	IDM_EDIT_TRIMLINES
-			MENUITEM "Strip &First Character\tAlt+Z",	IDM_EDIT_STRIP1STCHAR
-			MENUITEM "Strip &Last Character\tAlt+L",	IDM_EDIT_STRIPLASTCHAR
-			MENUITEM "Strip Leading Blan&ks",			IDM_EDIT_TRIMLEAD
+			MENUITEM "Rimuovi Spazi vuoti finali\tAlt+T",	IDM_EDIT_TRIMLINES
+			MENUITEM "Rimuovi Primo Carattere\tAlt+Z",	IDM_EDIT_STRIP1STCHAR
+			MENUITEM "Rimuovi Ultimo Carattere\tAlt+L",	IDM_EDIT_STRIPLASTCHAR
+			MENUITEM "Rimuovi Spazi vuoti iniziali",			IDM_EDIT_TRIMLEAD
 			MENUITEM SEPARATOR
-			MENUITEM "Merge &Blank Lines\tAlt+B",		IDM_EDIT_MERGEBLANKLINES
-			MENUITEM "&Remove Blank Lines\tAlt+R",		IDM_EDIT_REMOVEBLANKLINES
-			MENUITEM "&Pad With Spaces\tAlt+P",			IDM_EDIT_PADWITHSPACES
-			MENUITEM "Compress &Whitespace\tAlt+W",		IDM_EDIT_COMPRESSWS
+			MENUITEM "Unisci linee vuote\tAlt+B",		IDM_EDIT_MERGEBLANKLINES
+			MENUITEM "&Rimuovi linee vuote\tAlt+R",		IDM_EDIT_REMOVEBLANKLINES
+			MENUITEM "Riempi il blocco con spazi\tAlt+P",			IDM_EDIT_PADWITHSPACES
+			MENUITEM "Comprimi Spazi bianchi\tAlt+W",		IDM_EDIT_COMPRESSWS
 		END
-		POPUP "&Enclose Selection"
+		POPUP "Racchiudi selezione"
 		BEGIN
-			MENUITEM "&With...\tAlt+Q",					IDM_EDIT_ENCLOSESELECTION
-			MENUITEM "&HTML/XML Tag...\tAlt+X",			IDM_EDIT_INSERT_XMLTAG
+			MENUITEM "&Con...\tAlt+Q",					IDM_EDIT_ENCLOSESELECTION
+			MENUITEM "Tag &HTML/XML...\tAlt+X",			IDM_EDIT_INSERT_XMLTAG
 			MENUITEM SEPARATOR
-			MENUITEM "Triple &Single Quotes\tCtrl+3",	CMD_ENCLOSE_TRIPLE_SQ
-			MENUITEM "Triple &Double Quotes\tCtrl+6",	CMD_ENCLOSE_TRIPLE_DQ
-			MENUITEM "Triple &Backticks\tCtrl+9",		CMD_ENCLOSE_TRIPLE_BT
+			MENUITEM "Triplo Apostrofo\tCtrl+3",	CMD_ENCLOSE_TRIPLE_SQ
+			MENUITEM "Tripla Virgoletta\tCtrl+6",	CMD_ENCLOSE_TRIPLE_DQ
+			MENUITEM "Triplo &Backticks\tCtrl+9",		CMD_ENCLOSE_TRIPLE_BT
 		END
-		POPUP "&Lines"
+		POPUP "&Linee"
 		BEGIN
-			MENUITEM "Move &Up\tAlt+Up",				IDM_EDIT_MOVELINEUP
-			MENUITEM "Mo&ve Down\tAlt+Down",			IDM_EDIT_MOVELINEDOWN
-			MENUITEM "T&ranspose\tAlt+S",				IDM_EDIT_LINETRANSPOSE
+			MENUITEM "Sposta &Su\tAlt+Up",				IDM_EDIT_MOVELINEUP
+			MENUITEM "Sposta Giù\tAlt+Down",			IDM_EDIT_MOVELINEDOWN
+			MENUITEM "Transponi\tAlt+S",				IDM_EDIT_LINETRANSPOSE
 			MENUITEM SEPARATOR
-			MENUITEM "S&ort Lines...\tAlt+O",			IDM_EDIT_SORTLINES
-			MENUITEM "&Modify Lines...\tAlt+M",			IDM_EDIT_MODIFYLINES
-			MENUITEM "Alig&n Lines...\tAlt+J",			IDM_EDIT_ALIGN
+			MENUITEM "Ordina Linee...\tAlt+O",			IDM_EDIT_SORTLINES
+			MENUITEM "Modifica Linee...\tAlt+M",			IDM_EDIT_MODIFYLINES
+			MENUITEM "Allinea Linee...\tAlt+J",			IDM_EDIT_ALIGN
 			MENUITEM SEPARATOR
-			MENUITEM "&Duplicate Line\tCtrl+D",			IDM_EDIT_DUPLICATELINE
-			MENUITEM "Cu&t Line\tCtrl+Shift+X",			IDM_EDIT_CUTLINE
-			MENUITEM "&Copy Line\tCtrl+Shift+C",		IDM_EDIT_COPYLINE
-			MENUITEM "D&elete Line\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
+			MENUITEM "Dupplica Linea\tCtrl+D",			IDM_EDIT_DUPLICATELINE
+			MENUITEM "Taglia Linea\tCtrl+Shift+X",			IDM_EDIT_CUTLINE
+			MENUITEM "&Copia Linea\tCtrl+Shift+C",		IDM_EDIT_COPYLINE
+			MENUITEM "Elimina Linea\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
-			MENUITEM "&Join Lines\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "Column &Wrap...\tCtrl+Shift+W",	IDM_EDIT_COLUMNWRAP
-			MENUITEM "&Split Lines\tCtrl+I",			IDM_EDIT_SPLITLINES
-			MENUITEM "Join &Paragraphs\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
+			MENUITEM "Unisci Linee\tCtrl+J",				IDM_EDIT_JOINLINES
+			MENUITEM "Colonnea a Capo...\tCtrl+Shift+W",	IDM_EDIT_COLUMNWRAP
+			MENUITEM "Dividi Linee\tCtrl+I",			IDM_EDIT_SPLITLINES
+			MENUITEM "Unisci Paragrafi\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
-		POPUP "Con&vert"
+		POPUP "Con&verti"
 		BEGIN
-			MENUITEM "&Upper Case\tCtrl+Shift+U",		IDM_EDIT_CONVERTUPPERCASE
-			MENUITEM "&Lower Case\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
-			MENUITEM "In&vert Case\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
-			MENUITEM "Title &Case\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
-			MENUITEM "&Sentence Case\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
-			POPUP "Oth&er Conversions"
+			MENUITEM "&Maiuscolo\tCtrl+Shift+U",		IDM_EDIT_CONVERTUPPERCASE
+			MENUITEM "&Minuscolo\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
+			MENUITEM "In&verti Maiuscole e Minuscole\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
+			MENUITEM "Prima lettera maiuscola\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
+			MENUITEM "Prima lettera maiuscola in gruppo\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
+			POPUP "Altre Conversioni"
 			BEGIN
-				MENUITEM "Halfwidth Form to Full&width",		IDM_EDIT_MAP_FULLWIDTH
-				MENUITEM "Fullwidth Form to H&alfwidth",		IDM_EDIT_MAP_HALFWIDTH
+				MENUITEM "Da metà larghezza a larghezza intera",		IDM_EDIT_MAP_FULLWIDTH
+				MENUITEM "Da larghezza intera a metà larghezza",		IDM_EDIT_MAP_HALFWIDTH
 				MENUITEM SEPARATOR
-				MENUITEM "Chinese Traditional to &Simplified",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-				MENUITEM "Chinese Simplified to &Traditional",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
+				MENUITEM "Cinese Tradizionale a &Semplificato",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+				MENUITEM "Cinese Semplificato a &Tradizionale",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
 				MENUITEM SEPARATOR
-				MENUITEM "Japanese Katakana to &Hiragana",		IDM_EDIT_MAP_HIRAGANA
-				MENUITEM "Japanese Hiragana to &Katakana",		IDM_EDIT_MAP_KATAKANA
+				MENUITEM "Giapponese Katakana a &Hiragana",		IDM_EDIT_MAP_HIRAGANA
+				MENUITEM "Giapponese Hiragana a &Katakana",		IDM_EDIT_MAP_KATAKANA
 				MENUITEM SEPARATOR
-				MENUITEM "Korean Han&ja to Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
-				MENUITEM "Korean Han&gul Decomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
+				MENUITEM "Coreano Han&ja a Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
+				MENUITEM "Coreano Han&gul Decomposizione",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
 				MENUITEM SEPARATOR
-				MENUITEM "&Bengali to Latin",					IDM_EDIT_MAP_BENGALI_LATIN
-				MENUITEM "C&yrillic to Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
-				MENUITEM "&Devanagari to Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-				MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
+				MENUITEM "&Bengali a Latino",					IDM_EDIT_MAP_BENGALI_LATIN
+				MENUITEM "C&irillico a Latino",					IDM_EDIT_MAP_CYRILLIC_LATIN
+				MENUITEM "&Devanagari a Latino",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+				MENUITEM "&Malayalam a Latino",					IDM_EDIT_MAP_MALAYALAM_LATIN
 			END
 			MENUITEM SEPARATOR
-			MENUITEM "&Tabify Selection\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
-			MENUITEM "U&ntabify Selection\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
-			MENUITEM "Tabify &Indent\tCtrl+Alt+T",			IDM_EDIT_CONVERTSPACES2
-			MENUITEM "Untabi&fy Indent\tCtrl+Alt+S",		IDM_EDIT_CONVERTTABS2
+			MENUITEM "Spazi in Tab nella Selezione\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
+			MENUITEM "Tab in Spazi nella Selezione\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
+			MENUITEM "Indenta con Tab\tCtrl+Alt+T",			IDM_EDIT_CONVERTSPACES2
+			MENUITEM "Indenta con Spazi\tCtrl+Alt+S",		IDM_EDIT_CONVERTTABS2
 			MENUITEM SEPARATOR
-			MENUITEM "To &Hexadecimal\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
-			MENUITEM "To &Decimal\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
-			MENUITEM "To &Binary\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
-			MENUITEM "To &Octet",							IDM_EDIT_NUM2OCT
+			MENUITEM "In Esadecimale\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
+			MENUITEM "In Decimale\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
+			MENUITEM "In &Binario\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
+			MENUITEM "In &Ottetto",							IDM_EDIT_NUM2OCT
 		END
-		POPUP "I&nsert"
+		POPUP "I&nserisci"
 		BEGIN
-			MENUITEM "Complete &Word\tAlt+/",				IDM_EDIT_COMPLETEWORD
+			MENUITEM "Completa parola\tAlt+/",				IDM_EDIT_COMPLETEWORD
 			MENUITEM SEPARATOR
-			MENUITEM "&HTML/XML Tag...\tAlt+X",				IDM_EDIT_INSERT_XMLTAG
-			MENUITEM "New &GUID",							IDM_EDIT_INSERT_GUID
-			POPUP "Unicode &Control Character"
+			MENUITEM "Tag &HTML/XML...\tAlt+X",				IDM_EDIT_INSERT_XMLTAG
+			MENUITEM "Nuovo &GUID",							IDM_EDIT_INSERT_GUID
+			POPUP "Carattere di controllo Unicode"
 			BEGIN
 				MENUITEM "WJ\t&Word joiner",						IDM_INSERT_UNICODE_WJ
 				MENUITEM "ZWJ\tZero width &joiner",					IDM_INSERT_UNICODE_ZWJ
@@ -304,215 +304,215 @@ BEGIN
 				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
 			END
 			MENUITEM SEPARATOR
-			MENUITEM "&File Name",								CMD_INSERTFILENAME_NOEXT
-			MENUITEM "File Name and E&xtension\tCtrl+F9",		IDM_EDIT_INSERT_FILENAME
-			MENUITEM "Full &Path Name\tCtrl+Shift+F9",			IDM_EDIT_INSERT_PATHNAME
+			MENUITEM "&Nome File",								CMD_INSERTFILENAME_NOEXT
+			MENUITEM "Nome File ed Estensione\tCtrl+F9",		IDM_EDIT_INSERT_FILENAME
+			MENUITEM "Nome percorso completo\tCtrl+Shift+F9",			IDM_EDIT_INSERT_PATHNAME
 			MENUITEM SEPARATOR
-			MENUITEM "Current &Date",							IDM_EDIT_INSERT_LOC_DATE
-			MENUITEM "Current Date &Time",						IDM_EDIT_INSERT_LOC_DATETIME
-			MENUITEM "&UTC Date Time",							IDM_EDIT_INSERT_UTC_DATETIME
-			MENUITEM "Unix Timesta&mp",							IDM_EDIT_INSERT_TIMESTAMP
-			POPUP "&Other Timestamps"
+			MENUITEM "Data corrente",							IDM_EDIT_INSERT_LOC_DATE
+			MENUITEM "Data e ora correnti",						IDM_EDIT_INSERT_LOC_DATETIME
+			MENUITEM "Data e ora &UTC",							IDM_EDIT_INSERT_UTC_DATETIME
+			MENUITEM "Orario Unix",							IDM_EDIT_INSERT_TIMESTAMP
+			POPUP "Altri orari"
 			BEGIN
-				MENUITEM "&Millisecond (ms)",					IDM_EDIT_INSERT_TIMESTAMP_MS
-				MENUITEM "Micro&second (us)",					IDM_EDIT_INSERT_TIMESTAMP_US
-				MENUITEM "&Nanosecond (ns)",					IDM_EDIT_INSERT_TIMESTAMP_NS
+				MENUITEM "&Millisecondi (ms)",					IDM_EDIT_INSERT_TIMESTAMP_MS
+				MENUITEM "Micro&secondi (us)",					IDM_EDIT_INSERT_TIMESTAMP_US
+				MENUITEM "&Nanosecondi (ns)",					IDM_EDIT_INSERT_TIMESTAMP_NS
 			END
-			MENUITEM "Time/Date (&Short Form)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
-			MENUITEM "Time/Date (&Long Form)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
+			MENUITEM "Ora/Data (Formato breve)\tCtrl+F5",		IDM_EDIT_INSERT_SHORTDATE
+			MENUITEM "Ora/Data (Formato esteso)\tCtrl+Shift+F5",	IDM_EDIT_INSERT_LONGDATE
 			MENUITEM SEPARATOR
-			MENUITEM "&Encoding Identifier\tCtrl+F8",			IDM_EDIT_INSERT_ENCODING
-			MENUITEM "Script She&bang Line",					IDM_EDIT_INSERT_SHEBANG
+			MENUITEM "Identificatore di codifica\tCtrl+F8",			IDM_EDIT_INSERT_ENCODING
+			MENUITEM "Script linea Shebang",					IDM_EDIT_INSERT_SHEBANG
 		END
-		POPUP "Spec&ial"
+		POPUP "Spec&iali"
 		BEGIN
-			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
-			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
-			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
-			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
+			MENUITEM "Carattere in Esadecimale\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
+			MENUITEM "Esadecimale in Carattere\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "Caratteri Escape C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
+			MENUITEM "Rimuovi Caratteri Escape C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
+			MENUITEM "Mostra codice esadecimale",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
-			MENUITEM "URL &Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "URL &Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
-			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
-			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
+			MENUITEM "Codifica URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+			MENUITEM "Decodifica URL\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+			MENUITEM "Caratteri Escape HT&ML/XML\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
+			MENUITEM "Rimuovi Caratteri Escape HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
-			MENUITEM "Delete &Line Left\tCtrl+Shift+Back",		IDM_EDIT_DELETELINELEFT
-			MENUITEM "Delete Li&ne Right\tCtrl+Shift+Del",		IDM_EDIT_DELETELINERIGHT
-			MENUITEM "Delete Word Le&ft\tCtrl+Back",			CMD_CTRLBACK
-			MENUITEM "Delete Word Ri&ght\tCtrl+Del",			CMD_CTRLDEL
+			MENUITEM "Elimina Linea Sinistra\tCtrl+Shift+Back",		IDM_EDIT_DELETELINELEFT
+			MENUITEM "Elimina Linea Destra\tCtrl+Shift+Del",		IDM_EDIT_DELETELINERIGHT
+			MENUITEM "Elimina Parola a Sinistra\tCtrl+Back",			CMD_CTRLBACK
+			MENUITEM "Elimina Parola a Destra\tCtrl+Del",			CMD_CTRLDEL
 			MENUITEM SEPARATOR
-			MENUITEM "Update &Timestamps\tShift+F5",			CMD_TIMESTAMPS
+			MENUITEM "Aggiorna stampa orario\tShift+F5",			CMD_TIMESTAMPS
 		END
-		POPUP "Action &on Selection"
+		POPUP "Azioni sulla Selezione"
 		BEGIN
-			MENUITEM "&Open File, Folder, Link, etc.",		CMD_OPEN_PATH_OR_LINK
-			MENUITEM "Open Containing &Folder",				CMD_OPEN_CONTAINING_FOLDER
+			MENUITEM "&Apri File, Cartella, Link, ecc...",		CMD_OPEN_PATH_OR_LINK
+			MENUITEM "Apri cartella contenente",				CMD_OPEN_CONTAINING_FOLDER
 			MENUITEM SEPARATOR
-			MENUITEM "Search with &Google",					CMD_ONLINE_SEARCH_GOOGLE
-			MENUITEM "Search with &Bing",					CMD_ONLINE_SEARCH_BING
-			MENUITEM "Search on &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
+			MENUITEM "Cerca con &Google",					CMD_ONLINE_SEARCH_GOOGLE
+			MENUITEM "Cerca con &Bing",					CMD_ONLINE_SEARCH_BING
+			MENUITEM "Cerca su &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
 			MENUITEM SEPARATOR
-			MENUITEM "Custom Action &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
-			MENUITEM "Custom Action &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
+			MENUITEM "Azione personalizzata &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
+			MENUITEM "Azione personalizzata &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Find and Replace"
+		POPUP "Trova e Sostituisci"
 		BEGIN
-			MENUITEM "&Find...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "Sa&ve Find Text\tAlt+F3",			IDM_EDIT_SAVEFIND
-			MENUITEM "Find &Next\tF3",					IDM_EDIT_FINDNEXT
-			MENUITEM "Find &Previous\tShift+F3",		IDM_EDIT_FINDPREV
-			MENUITEM "R&eplace...\tCtrl+H",				IDM_EDIT_REPLACE
-			MENUITEM "Repl&ace Next\tF4",				IDM_EDIT_REPLACENEXT
+			MENUITEM "Trova...\tCtrl+F",				IDM_EDIT_FIND
+			MENUITEM "Salva testo trova\tAlt+F3",			IDM_EDIT_SAVEFIND
+			MENUITEM "Trova il prossimo\tF3",					IDM_EDIT_FINDNEXT
+			MENUITEM "Trova il precedente\tShift+F3",		IDM_EDIT_FINDPREV
+			MENUITEM "Sostituisci...\tCtrl+H",				IDM_EDIT_REPLACE
+			MENUITEM "Sostituisci il prossimo\tF4",				IDM_EDIT_REPLACENEXT
 			MENUITEM SEPARATOR
-			MENUITEM "Find Matching &Brace\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
-			MENUITEM "Select to Matching B&race\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
-			MENUITEM "Select &Word\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Select &Lines (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
-			MENUITEM "Select Lines in &Current Block\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
+			MENUITEM "Trova parentesi corrispondente\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
+			MENUITEM "Seleziona sino alla parentesi corrispondente\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
+			MENUITEM "Seleziona parola\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
+			MENUITEM "Seleziona Linee (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+			MENUITEM "Seleziona le linee del blocco corrente\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Select to Document Star&t",					IDM_EDIT_SELTODOCSTART
-			MENUITEM "Select to Document En&d",						IDM_EDIT_SELTODOCEND
-			MENUITEM "Select to Ne&xt\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
-			MENUITEM "Select to Previou&s\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
+			MENUITEM "Seleziona dall'inizio del documento",					IDM_EDIT_SELTODOCSTART
+			MENUITEM "Seleziona sino alla fine del documento",						IDM_EDIT_SELTODOCEND
+			MENUITEM "Seleziona sino al prossimo\tCtrl+Alt+F2",				IDM_EDIT_SELTONEXT
+			MENUITEM "Seleziona dal precedente\tCtrl+Alt+Shift+F2",		IDM_EDIT_SELTOPREV
 		END
-		POPUP "Boo&kmarks"
+		POPUP "Segnalibri"
 		BEGIN
-			MENUITEM "&Toggle\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE
+			MENUITEM "Aggiungi\Rimuovi\tCtrl+F2",			BME_EDIT_BOOKMARKTOGGLE
 			MENUITEM SEPARATOR
-			MENUITEM "Goto &Next\tF2",				BME_EDIT_BOOKMARKNEXT
-			MENUITEM "Goto &Previous\tShift+F2",	BME_EDIT_BOOKMARKPREV
+			MENUITEM "Vai al prossimo\tF2",				BME_EDIT_BOOKMARKNEXT
+			MENUITEM "Vai al precedente\tShift+F2",	BME_EDIT_BOOKMARKPREV
 			MENUITEM SEPARATOR
-			MENUITEM "&Select All\tAlt+F6",			BME_EDIT_BOOKMARKSELECT
-			MENUITEM "&Clear All\tAlt+F2",			BME_EDIT_BOOKMARKCLEAR
+			MENUITEM "Seleziona tutto\tAlt+F6",			BME_EDIT_BOOKMARKSELECT
+			MENUITEM "Elimina tutto\tAlt+F2",			BME_EDIT_BOOKMARKCLEAR
 		END
-		POPUP "&Goto"
+		POPUP "Vai a"
 		BEGIN
-			MENUITEM "&Goto Line...\tCtrl+G",			IDM_EDIT_GOTOLINE
+			MENUITEM "Vai alla Linea...\tCtrl+G",			IDM_EDIT_GOTOLINE
 			//MENUITEM SEPARATOR
 			//MENUITEM "Navigate &Backward\tAlt+Left",	IDM_EDIT_NAVIGATE_BACKWARD
 			//MENUITEM "Navigate &Forward\tAlt+Right",	IDM_EDIT_NAVIGATE_FORWARD
 			MENUITEM SEPARATOR
-			MENUITEM "Goto Blo&ck Start\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
-			MENUITEM "Goto Bloc&k End\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
-			MENUITEM "Goto &Previous Block\tAlt+Comma (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
-			MENUITEM "Goto &Next Block\tAlt+Period (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "Goto P&revious Sibling Block\tCtrl+Alt+Comma (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "Goto N&ext Sibling Block\tCtrl+Alt+Period (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "Vai all'inizio del Blocco\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
+			MENUITEM "Vai alla fine del Blocco\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
+			MENUITEM "Vai al Blocco precedente\tAlt+Comma (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
+			MENUITEM "Vai al Blocco successivo\tAlt+Period (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
+			MENUITEM "Vai al Blocco fratello precedente\tCtrl+Alt+Comma (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "Vai al Blocco fratello successivo\tCtrl+Alt+Period (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Goto &Selection Start\tCtrl+Shift+Comma (<,)",CMD_JUMP2SELSTART
-			MENUITEM "Goto Selec&tion End\tCtrl+Shift+Period (>.)",	CMD_JUMP2SELEND
+			MENUITEM "Vai all'inizio della selezione\tCtrl+Shift+Comma (<,)",CMD_JUMP2SELSTART
+			MENUITEM "Vai alla fine della selezione\tCtrl+Shift+Period (>.)",	CMD_JUMP2SELEND
 		END
 	END
-	POPUP "&View"
+	POPUP "&Visualizza"
 	BEGIN
-		MENUITEM "Default &Code Font...\tAlt+F12",	IDM_VIEW_DEFAULT_CODE_FONT
-		MENUITEM "&Default Text Font...",			IDM_VIEW_DEFAULT_TEXT_FONT
-		POPUP "C&aret Style"
+		MENUITEM "Font Predefinito Codice...\tAlt+F12",	IDM_VIEW_DEFAULT_CODE_FONT
+		MENUITEM "Font Predefinito Testo...",			IDM_VIEW_DEFAULT_TEXT_FONT
+		POPUP "Stile del cursore"
 		BEGIN
-			MENUITEM "Block (&OVR Mode)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
+			MENUITEM "Blocco (Modalità &OVR)",			IDM_VIEW_CARET_STYLE_BLOCK_OVR
 			MENUITEM SEPARATOR
-			MENUITEM "Block (&INS Mode)",			IDM_VIEW_CARET_STYLE_BLOCK
-			MENUITEM "Line Width &1",				IDM_VIEW_CARET_STYLE_WIDTH1
-			MENUITEM "Line Width &2",				IDM_VIEW_CARET_STYLE_WIDTH2
-			MENUITEM "Line Width &3",				IDM_VIEW_CARET_STYLE_WIDTH3
+			MENUITEM "Blocco (Modalità &INS)",			IDM_VIEW_CARET_STYLE_BLOCK
+			MENUITEM "Larghezza Linea &1",				IDM_VIEW_CARET_STYLE_WIDTH1
+			MENUITEM "Larghezza Linea &2",				IDM_VIEW_CARET_STYLE_WIDTH2
+			MENUITEM "Larghezza Linea &3",				IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
-			MENUITEM "&No Blink",					IDM_VIEW_CARET_STYLE_NOBLINK
-			MENUITEM "Draw Block Caret In &Selection",		IDM_VIEW_CARET_STYLE_SELECTION
+			MENUITEM "Non lampeggiante",					IDM_VIEW_CARET_STYLE_NOBLINK
+			MENUITEM "Disegna il blocco del cursore nella selezione",		IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Word W&rap\tCtrl+W",						IDM_VIEW_WORDWRAP
-		MENUITEM "&Long Line Marker\tCtrl+Shift+L",			IDM_VIEW_LONGLINEMARKER
-		MENUITEM "Indentation &Guides\tCtrl+Shift+G",		IDM_VIEW_SHOWINDENTGUIDES
+		MENUITEM "Testo a capo\tCtrl+W",						IDM_VIEW_WORDWRAP
+		MENUITEM "Indicatore di linea lunga\tCtrl+Shift+L",			IDM_VIEW_LONGLINEMARKER
+		MENUITEM "Guide indentazione\tCtrl+Shift+G",		IDM_VIEW_SHOWINDENTGUIDES
 		MENUITEM SEPARATOR
-		MENUITEM "Show &Whitespace\tCtrl+Shift+8",			IDM_VIEW_SHOWWHITESPACE
-		MENUITEM "Show Line &Endings\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
-		MENUITEM "Show Wrap S&ymbols\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
-		MENUITEM "Un&icode Control Character",				IDM_VIEW_UNICODE_CONTROL_CHAR
+		MENUITEM "Mostra Spazi bianchi\tCtrl+Shift+8",			IDM_VIEW_SHOWWHITESPACE
+		MENUITEM "Mostra Terminazioni di linea\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
+		MENUITEM "Mostra simboli a capo\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
+		MENUITEM "Carattere di controllo Unicode",				IDM_VIEW_UNICODE_CONTROL_CHAR
 		//MENUITEM "S&how CallTips",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
-		MENUITEM "&Visual Brace Matching\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
-		MENUITEM "Highlight Current &Block",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
-		POPUP "Highlight C&urrent Line"
+		MENUITEM "Corrispondenza visiva delle parentesi\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
+		MENUITEM "Evidenzia blocco corrente",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
+		POPUP "Evidenzia Linea corrente"
 		BEGIN
-			MENUITEM "&No Highlight",						IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE
-			MENUITEM "Background &Color\tCtrl+Shift+I",		IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
-			MENUITEM "Outline &Frame\tCtrl+Shift+F",		IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
+			MENUITEM "Nessuna evidenziazione",						IDM_VIEW_HIGHLIGHTCURRENTLINE_NONE
+			MENUITEM "Colore di sfondo\tCtrl+Shift+I",		IDM_VIEW_HIGHLIGHTCURRENTLINE_BACK
+			MENUITEM "Contornato da bordo\tCtrl+Shift+F",		IDM_VIEW_HIGHLIGHTCURRENTLINE_FRAME
 			MENUITEM SEPARATOR
-			MENUITEM "Highlight &Subline",					IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
+			MENUITEM "Evidenzia sottolinea",					IDM_VIEW_HIGHLIGHTCURRENTLINE_SUBLINE
 		END
-		POPUP "Mar&k Occurrences"
+		POPUP "Segna Occorrenze"
 		BEGIN
-			MENUITEM "&Off",						IDM_VIEW_MARKOCCURRENCES_OFF
-			MENUITEM "Match &Case",					IDM_VIEW_MARKOCCURRENCES_CASE
-			MENUITEM "Match &Whole Word Only",		IDM_VIEW_MARKOCCURRENCES_WORD
-			MENUITEM "Bookmark &Matched Line",		IDM_VIEW_MARKOCCURRENCES_BOOKMARK
+			MENUITEM "Disattivo",						IDM_VIEW_MARKOCCURRENCES_OFF
+			MENUITEM "Segna Maiuscole\\Minuscole",					IDM_VIEW_MARKOCCURRENCES_CASE
+			MENUITEM "Segna solo parola intera",		IDM_VIEW_MARKOCCURRENCES_WORD
+			MENUITEM "Segnalibro e linea abbinata",		IDM_VIEW_MARKOCCURRENCES_BOOKMARK
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "Line &Numbers\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
-		MENUITEM "Bookmark &Margin\tCtrl+Shift+M",	IDM_VIEW_MARGIN
+		MENUITEM "Numeri linee\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
+		MENUITEM "Margine Segnalibri\tCtrl+Shift+M",	IDM_VIEW_MARGIN
 		MENUITEM SEPARATOR
-		MENUITEM "Show Code &Folding\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
-		POPUP "&Toggle Folds"
+		MENUITEM "Mostra Code &Folding\tCtrl+Shift+Alt+F",IDM_VIEW_SHOW_FOLDING
+		POPUP "Chiudi Folds"
 		BEGIN
-			MENUITEM "&Default Levels\tShift+Alt+D",IDM_VIEW_FOLD_DEFAULT
-			MENUITEM "&All Levels\tShift+Alt+A",	IDM_VIEW_FOLD_ALL
-			MENUITEM "&Current Block\tAlt+C",		IDM_VIEW_FOLD_CURRENT_BLOCK
-			MENUITEM "Current &Level",				IDM_VIEW_FOLD_CURRENT_LEVEL
+			MENUITEM "Livelli predefiniti\tShift+Alt+D",IDM_VIEW_FOLD_DEFAULT
+			MENUITEM "Tutti i Livelli\tShift+Alt+A",	IDM_VIEW_FOLD_ALL
+			MENUITEM "Blocco corrente\tAlt+C",		IDM_VIEW_FOLD_CURRENT_BLOCK
+			MENUITEM "Livello corrente",				IDM_VIEW_FOLD_CURRENT_LEVEL
 			MENUITEM SEPARATOR
-			MENUITEM "Level &1\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
-			MENUITEM "Level &2\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
-			MENUITEM "Level &3\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
-			MENUITEM "Level &4\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
-			MENUITEM "Level &5\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
-			MENUITEM "Level &6\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
-			MENUITEM "Level &7\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
-			MENUITEM "Level &8\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
-			MENUITEM "Level &9\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
-			MENUITEM "Level 1&0",					IDM_VIEW_FOLD_LEVEL10
+			MENUITEM "Livello &1\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
+			MENUITEM "Livello &2\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
+			MENUITEM "Livello &3\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
+			MENUITEM "Livello &4\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
+			MENUITEM "Livello &5\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
+			MENUITEM "Livello &6\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
+			MENUITEM "Livello &7\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
+			MENUITEM "Livello &8\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
+			MENUITEM "Livello &9\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
+			MENUITEM "Livello 1&0",					IDM_VIEW_FOLD_LEVEL10
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Zoom"
 		BEGIN
-			MENUITEM "Zoom &In\tCtrl++",			IDM_VIEW_ZOOMIN
-			MENUITEM "Zoom &Out\tCtrl+-",			IDM_VIEW_ZOOMOUT
-			MENUITEM "Zoom &Level...",				IDM_VIEW_ZOOM_LEVEL
-			MENUITEM "&Reset Zoom\tCtrl+\\",		IDM_VIEW_RESETZOOM
+			MENUITEM "Aumenta Zoom\tCtrl++",			IDM_VIEW_ZOOMIN
+			MENUITEM "Riduci Zoom\tCtrl+-",			IDM_VIEW_ZOOMOUT
+			MENUITEM "Livello Zoom...",				IDM_VIEW_ZOOM_LEVEL
+			MENUITEM "&Resetta Zoom\tCtrl+\\",		IDM_VIEW_RESETZOOM
 		END
-		MENUITEM "Toggle Full &Screen\tF11 [Esc]",	IDM_VIEW_TOGGLE_FULLSCREEN
+		MENUITEM "Attiva\\Disattiva Schermo intero\tF11 [Esc]",	IDM_VIEW_TOGGLE_FULLSCREEN
 	END
-	POPUP "Sche&me"
+	POPUP "Sche&ma"
 	BEGIN
-		MENUITEM "&Syntax Scheme...\tF12",			IDM_VIEW_SCHEME
-		MENUITEM "&Customize Schemes...\tCtrl+F12",	IDM_VIEW_SCHEME_CONFIG
-		MENUITEM "&Favorite Schemes...",			IDM_VIEW_SCHEME_FAVORITE
+		MENUITEM "Schema sintattico...\tF12",			IDM_VIEW_SCHEME
+		MENUITEM "Personalizza schemi...\tCtrl+F12",	IDM_VIEW_SCHEME_CONFIG
+		MENUITEM "Schemi preferiti...",			IDM_VIEW_SCHEME_FAVORITE
 		MENUITEM SEPARATOR
-		MENUITEM "Use &2nd Global Styles\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
-		MENUITEM "&Use Default Code Style",			IDM_VIEW_USEDEFAULT_CODESTYLE
-		POPUP "St&yle Theme"
+		MENUITEM "Usa il 2° stile globale\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
+		MENUITEM "Usa lo stile predefinito per il codice",			IDM_VIEW_USEDEFAULT_CODESTYLE
+		POPUP "Tema stile"
 		BEGIN
-			MENUITEM "&Default",					IDM_VIEW_STYLE_THEME_DEFAULT
-			MENUITEM "Dar&k",						IDM_VIEW_STYLE_THEME_DARK
+			MENUITEM "Predefinito",					IDM_VIEW_STYLE_THEME_DEFAULT
+			MENUITEM "Scuro",						IDM_VIEW_STYLE_THEME_DARK
 		END
 		MENUITEM SEPARATOR
-		POPUP "&Text File"
+		POPUP "File di testo"
 		BEGIN
-			MENUITEM "&Text File",					IDM_LEXER_TEXTFILE
-			MENUITEM "&2nd Text File",				IDM_LEXER_2NDTEXTFILE
+			MENUITEM "File di testo",					IDM_LEXER_TEXTFILE
+			MENUITEM "2° File di testo",				IDM_LEXER_2NDTEXTFILE
 		END
-		POPUP "CSS Style S&heet"
+		POPUP "CSS Foglio di stile"
 		BEGIN
-			MENUITEM "&CSS Style Sheet",			IDM_LEXER_CSS
-			MENUITEM "&SCSS Style Sheet",			IDM_LEXER_SCSS
-			MENUITEM "&Less Style Sheet",			IDM_LEXER_LESS
-			MENUITEM "&HSS Style Sheet",			IDM_LEXER_HSS
+			MENUITEM "&CSS Foglio di stile",			IDM_LEXER_CSS
+			MENUITEM "&SCSS Foglio di stile",			IDM_LEXER_SCSS
+			MENUITEM "&Less Foglio di stile",			IDM_LEXER_LESS
+			MENUITEM "&HSS Foglio di stile",			IDM_LEXER_HSS
 		END
-		POPUP "&Web Source Code"
+		POPUP "Codice Sorgente Web"
 		BEGIN
-			MENUITEM "&Web Source Code",			IDM_LEXER_WEB
-			MENUITEM "&PHP Page",					IDM_LEXER_PHP
-			MENUITEM "&JSP Page",					IDM_LEXER_JSP
+			MENUITEM "Codice Sorgente Web",			IDM_LEXER_WEB
+			MENUITEM "Pagina PHP",					IDM_LEXER_PHP
+			MENUITEM "Pagina JSP",					IDM_LEXER_JSP
 			MENUITEM "ASP.NET (&C#)",				IDM_LEXER_ASPX_CS
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
@@ -537,9 +537,9 @@ BEGIN
 			MENUITEM "&M4 Macro",					IDM_LEXER_M4
 		END
 		//POPUP "S&QL Dialect"
-		POPUP "&XML Document"
+		POPUP "Documento XML"
 		BEGIN
-			MENUITEM "&XML Document",				IDM_LEXER_XML
+			MENUITEM "Documento XML",				IDM_LEXER_XML
 			MENUITEM "XML &Schema",					IDM_LEXER_XSD
 			MENUITEM "XSL&T Stylesheet",			IDM_LEXER_XSLT
 			MENUITEM "XML &DTD",					IDM_LEXER_DTD
@@ -579,43 +579,43 @@ BEGIN
 			//MENUITEM "SV&G Document",				IDM_LEXER_SVG
 		END
 	END
-	POPUP "&Settings"
+	POPUP "Impostazioni"
 	BEGIN
-		MENUITEM "Insert Tabs as &Spaces",			IDM_VIEW_TABSASSPACES
-		MENUITEM "&Tab Settings...\tCtrl+T",		IDM_VIEW_TABSETTINGS
-		MENUITEM "Word &Wrap Settings...",			IDM_VIEW_WORDWRAPSETTINGS
-		MENUITEM "&Long Line Settings...",			IDM_VIEW_LONGLINESETTINGS
-		MENUITEM "&Auto Completion Settings...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
-		MENUITEM "Auto Completion I&gnore Case",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
-		MENUITEM "Enable LaTe&X Input Method",		IDM_SET_LATEX_INPUT_METHOD
-		POPUP "Line Selection &Mode"
+		MENUITEM "Inserisci Tab come spazi",			IDM_VIEW_TABSASSPACES
+		MENUITEM "Impostazioni Tab...\tCtrl+T",		IDM_VIEW_TABSETTINGS
+		MENUITEM "Impostazioni A capo...",			IDM_VIEW_WORDWRAPSETTINGS
+		MENUITEM "Impostazioni Linee lunghe...",			IDM_VIEW_LONGLINESETTINGS
+		MENUITEM "Impostazioni Auto Completamento...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
+		MENUITEM "Auto Completamento ignora Maiuscole\\Minuscole",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
+		MENUITEM "Abilita metodo di inserimento LaTe&X",		IDM_SET_LATEX_INPUT_METHOD
+		POPUP "Modalità selezione linea"
 		BEGIN
-			MENUITEM "&None",						IDM_LINE_SELECTION_MODE_NONE
+			MENUITEM "Nessuna",						IDM_LINE_SELECTION_MODE_NONE
 			MENUITEM "&Visual Studio",				IDM_LINE_SELECTION_MODE_VS
-			MENUITEM "Nor&mal",						IDM_LINE_SELECTION_MODE_NORMAL
+			MENUITEM "Nor&male",						IDM_LINE_SELECTION_MODE_NORMAL
 		END
 		MENUITEM SEPARATOR
-		POPUP "Appearanc&e"
+		POPUP "Aspetto"
 		BEGIN
-			MENUITEM "S&how Toolbar\tCtrl+F11",		IDM_VIEW_TOOLBAR
-			MENUITEM "Customi&ze Toolbar...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
-			MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
-			MENUITEM "Show Stat&usbar\tShift+F11",	IDM_VIEW_STATUSBAR
+			MENUITEM "Mostra barra degli strumenti\tCtrl+F11",		IDM_VIEW_TOOLBAR
+			MENUITEM "Personalizza barra degli strumenti...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
+			MENUITEM "&Auto scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+			MENUITEM "Mostra barra di stato\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
-			MENUITEM "Transparent &Mode\tCtrl+0",	IDM_VIEW_TRANSPARENT
-			POPUP "Scroll &Past Last Line"
+			MENUITEM "Modalità trasparente\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			POPUP "Scorri e oltre l'ultima riga"
 			BEGIN
 				MENUITEM "&No",						IDM_VIEW_SCROLLPASTLASTLINE_NO
-				MENUITEM "&One Page",				IDM_VIEW_SCROLLPASTLASTLINE_ONE
-				MENUITEM "&Half Page",				IDM_VIEW_SCROLLPASTLASTLINE_HALF
-				MENUITEM "1/&3 Page",				IDM_VIEW_SCROLLPASTLASTLINE_THIRD
-				MENUITEM "1/&4 Page",				IDM_VIEW_SCROLLPASTLASTLINE_QUARTER
+				MENUITEM "&Una Pagina",				IDM_VIEW_SCROLLPASTLASTLINE_ONE
+				MENUITEM "&Mezza Pagina",				IDM_VIEW_SCROLLPASTLASTLINE_HALF
+				MENUITEM "1/&3 Pagina",				IDM_VIEW_SCROLLPASTLASTLINE_THIRD
+				MENUITEM "1/&4 Pagina",				IDM_VIEW_SCROLLPASTLASTLINE_QUARTER
 			END
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 			MENUITEM SEPARATOR
-			POPUP "&Language"
+			POPUP "&Lingua"
 			BEGIN
-				MENUITEM "&System Language",		IDM_LANG_USER_DEFAULT
+				MENUITEM "&Lingua del sistema",		IDM_LANG_USER_DEFAULT
 				MENUITEM "Deutsch",					IDM_LANG_GERMAN
 				MENUITEM "English",					IDM_LANG_ENGLISH_US
 				MENUITEM "Italiano",				IDM_LANG_ITALIAN
@@ -626,96 +626,96 @@ BEGIN
 			END
 #endif
 		END
-		POPUP "Full Scree&n Mode"
+		POPUP "Modalità schermo intero"
 		BEGIN
-			MENUITEM "On &Startup",					IDM_VIEW_FULLSCREEN_ON_START
+			MENUITEM "All'avvio",					IDM_VIEW_FULLSCREEN_ON_START
 			MENUITEM SEPARATOR
-			MENUITEM "Hide &Title",					IDM_VIEW_FULLSCREEN_HIDE_TITLE
-			MENUITEM "Hide &Menu\tAlt+F11",			IDM_VIEW_FULLSCREEN_HIDE_MENU
+			MENUITEM "Nascondi &Titolo",					IDM_VIEW_FULLSCREEN_HIDE_TITLE
+			MENUITEM "Nascondi &menu\tAlt+F11",			IDM_VIEW_FULLSCREEN_HIDE_MENU
 		END
-		POPUP "Window O&ptions"
+		POPUP "Opzioni Finestra"
 		BEGIN
-			MENUITEM "Always On &Top\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
-			MENUITEM "Minimi&ze to Tray",			IDM_VIEW_MINTOTRAY
+			MENUITEM "Sempre in cima\tAlt+Shift+T",	IDM_VIEW_ALWAYSONTOP
+			MENUITEM "Minimizza nell'area di notifica",			IDM_VIEW_MINTOTRAY
 			MENUITEM SEPARATOR
-			MENUITEM "&Reuse Window",				IDM_VIEW_REUSEWINDOW
-			MENUITEM "&Sticky Window Position",		IDM_VIEW_STICKY_WINDOW_POSITION
-			MENUITEM "Clear Position &History",		IDM_VIEW_CLEARWINPOS
+			MENUITEM "Riutilizza finestra",				IDM_VIEW_REUSEWINDOW
+			MENUITEM "Fissa posizione finestra",		IDM_VIEW_STICKY_WINDOW_POSITION
+			MENUITEM "Svuota cronologia posizioni",		IDM_VIEW_CLEARWINPOS
 		END
-		POPUP "Window Title Displa&y"
+		POPUP "Titolo finestra visualizzato"
 		BEGIN
-			MENUITEM "&File Name Only",				IDM_VIEW_SHOWFILENAMEONLY
-			MENUITEM "File Name and &Directory",	IDM_VIEW_SHOWFILENAMEFIRST
-			MENUITEM "Full &Path Name",				IDM_VIEW_SHOWFULLPATH
-			MENUITEM "&Text Excerpt",				IDM_VIEW_SHOWEXCERPT
+			MENUITEM "Solo nome file",				IDM_VIEW_SHOWFILENAMEONLY
+			MENUITEM "Nome file e cartella",	IDM_VIEW_SHOWFILENAMEFIRST
+			MENUITEM "Nome percorso completo",				IDM_VIEW_SHOWFULLPATH
+			MENUITEM "Estratto di testo",				IDM_VIEW_SHOWEXCERPT
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "Single &File Instance",			IDM_VIEW_SINGLEFILEINSTANCE
-		MENUITEM "File &Change Notification...\tAlt+F5",	IDM_VIEW_CHANGENOTIFY
-		MENUITEM "A&utoSave Settings...",			IDM_SET_FILE_AUTOSAVE
-		POPUP "Extra Esc &Key Function"
+		MENUITEM "Notifica variazioni file...\tAlt+F5",	IDM_VIEW_CHANGENOTIFY
+		MENUITEM "Impostazioni Autosalvataggio...",			IDM_SET_FILE_AUTOSAVE
+		POPUP "Funzioni Extra Tasto Esc"
 		BEGIN
-			MENUITEM "&None",						IDM_VIEW_NOESCFUNC
-			MENUITEM "&Minimize Notepad2",			IDM_VIEW_ESCMINIMIZE
-			MENUITEM "E&xit Notepad2",				IDM_VIEW_ESCEXIT
+			MENUITEM "Nessuna",						IDM_VIEW_NOESCFUNC
+			MENUITEM "&Minimizza Notepad2",			IDM_VIEW_ESCMINIMIZE
+			MENUITEM "Esci da Notepad2",				IDM_VIEW_ESCEXIT
 		END
-		POPUP "Other Sett&ings"
+		POPUP "Altre Impostazioni"
 		BEGIN
-			MENUITEM "Remember Recent &Files",		IDM_VIEW_NOSAVERECENT
-			MENUITEM "Remember &Search Options",	IDM_VIEW_NOSAVEFINDREPL
-			MENUITEM "Sa&ve Before Running Tools",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+			MENUITEM "Ricorda File recenti",		IDM_VIEW_NOSAVERECENT
+			MENUITEM "Ricorda Opzioni di ricerca",	IDM_VIEW_NOSAVEFINDREPL
+			MENUITEM "Salva prima di eseguire gli strumenti",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
 			MENUITEM SEPARATOR
-			MENUITEM "&Use XP Style Open/Save Dialog",	IDM_SET_USE_XP_FILE_DIALOG
-			MENUITEM "Use &metapath to Open Folder",IDM_SET_OPEN_FOLDER_METAPATH
+			MENUITEM "Usa la finestra di dialogo Apri/Salva stile XP",	IDM_SET_USE_XP_FILE_DIALOG
+			MENUITEM "Usa &metapath per aprire cartelle",IDM_SET_OPEN_FOLDER_METAPATH
 		END
 		MENUITEM SEPARATOR
-		POPUP "A&dvanced Settings"
+		POPUP "Impostazioni Avanzate"
 		BEGIN
-			POPUP "Ren&dering Technology"
+			POPUP "Tecnologia di Ren&dering"
 			BEGIN
 				MENUITEM "&Legacy GDI",				IDM_SET_RENDER_TECH_GDI
 				MENUITEM "&Direct2D",				IDM_SET_RENDER_TECH_D2D
 				MENUITEM "Direct2D &Retain",		IDM_SET_RENDER_TECH_D2DRETAIN
 				MENUITEM "Direct2D &GDI DC",		IDM_SET_RENDER_TECH_D2DDC
 			END
-			POPUP "Font &Quality"
+			POPUP "Qualità Font"
 			BEGIN
-				MENUITEM "&Default",				IDM_VIEW_FONTQUALITY_DEFAULT
-				MENUITEM "&None",					IDM_VIEW_FONTQUALITY_NONE
+				MENUITEM "Predefinita",				IDM_VIEW_FONTQUALITY_DEFAULT
+				MENUITEM "Nessuna",					IDM_VIEW_FONTQUALITY_NONE
 				MENUITEM "&Standard",				IDM_VIEW_FONTQUALITY_STANDARD
 				MENUITEM "&ClearType",				IDM_VIEW_FONTQUALITY_CLEARTYPE
 			END
-			POPUP "&RTL Layout (GDI)"
+			POPUP "Layout RTL (GDI)"
 			BEGIN
-				MENUITEM "&Edit Window",			IDM_SET_RTL_LAYOUT_EDIT
-				MENUITEM "&Other Window",			IDM_SET_RTL_LAYOUT_OTHER
+				MENUITEM "Modifica Finestra",			IDM_SET_RTL_LAYOUT_EDIT
+				MENUITEM "Altra Finestra",			IDM_SET_RTL_LAYOUT_OTHER
 			END
-			POPUP "&Bidirectional (Direct2D)"
+			POPUP "&Bidirezionale (Direct2D)"
 			BEGIN
-				MENUITEM "&None",					IDM_SET_BIDIRECTIONAL_NONE
-				MENUITEM "&Left to Right",			IDM_SET_BIDIRECTIONAL_L2R
-				MENUITEM "&Right to Left",			IDM_SET_BIDIRECTIONAL_R2L
+				MENUITEM "Nessuno",					IDM_SET_BIDIRECTIONAL_NONE
+				MENUITEM "Da sinistra a destra",			IDM_SET_BIDIRECTIONAL_L2R
+				MENUITEM "Da destra a sinistra",			IDM_SET_BIDIRECTIONAL_R2L
 			END
-			MENUITEM "Use &Inline Mode IME",		IDM_SET_USE_INLINE_IME
+			MENUITEM "Usa la modalità in linea IME",		IDM_SET_USE_INLINE_IME
 			MENUITEM SEPARATOR
-			MENUITEM "&System Integration...",		IDM_SET_SYSTEM_INTEGRATION
-			MENUITEM "&Open Notepad2.ini\tCtrl+F7",	CMD_OPENINIFILE
+			MENUITEM "Integrazione col sistema...",		IDM_SET_SYSTEM_INTEGRATION
+			MENUITEM "Apri Notepad2.ini\tCtrl+F7",	CMD_OPENINIFILE
 		END
-		MENUITEM "Save Settings &On Exit",			IDM_VIEW_SAVESETTINGS
-		MENUITEM "Sa&ve Settings Now\tF7",			IDM_VIEW_SAVESETTINGSNOW
+		MENUITEM "Salva impostazioni all'uscita",			IDM_VIEW_SAVESETTINGS
+		MENUITEM "Salva impostazioni ora\tF7",			IDM_VIEW_SAVESETTINGSNOW
 	END
-	POPUP "&Help"
+	POPUP "Aiuto"
 	BEGIN
-		MENUITEM "Project &Home",				IDM_HELP_PROJECT_HOME
-		MENUITEM "Latest &Release",				IDM_HELP_LATEST_RELEASE
-		MENUITEM "Latest &Build",				IDM_HELP_LATEST_BUILD
-		MENUITEM "Report &Issue",				IDM_HELP_REPORT_ISSUE
-		MENUITEM "&Feature Request",			IDM_HELP_FEATURE_REQUEST
+		MENUITEM "&Home Progetto",				IDM_HELP_PROJECT_HOME
+		MENUITEM "Ultima &Release",				IDM_HELP_LATEST_RELEASE
+		MENUITEM "Ultima &Build",				IDM_HELP_LATEST_BUILD
+		MENUITEM "Segnala un problema",				IDM_HELP_REPORT_ISSUE
+		MENUITEM "Richiedi funzionalità",			IDM_HELP_FEATURE_REQUEST
 		MENUITEM SEPARATOR
-		MENUITEM "Online &Wiki",				IDM_HELP_ONLINE_WIKI
-		MENUITEM "&Command Line Help",			IDM_CMDLINE_HELP
+		MENUITEM "&Wiki Online",				IDM_HELP_ONLINE_WIKI
+		MENUITEM "Aiuto Linea di comando",			IDM_CMDLINE_HELP
 		MENUITEM SEPARATOR
-		MENUITEM "&About Notepad2\tF1",			IDM_HELP_ABOUT
+		MENUITEM "&Riguardo Notepad2\tF1",			IDM_HELP_ABOUT
 	END
 END
 
@@ -726,47 +726,47 @@ BEGIN
 		MENUITEM "&Undo",						IDM_EDIT_UNDO
 		MENUITEM "&Redo",						IDM_EDIT_REDO
 		MENUITEM SEPARATOR
-		MENUITEM "Cu&t",						IDM_EDIT_CUT
-		MENUITEM "&Copy",						IDM_EDIT_COPY
-		MENUITEM "&Paste",						IDM_EDIT_PASTE
-		MENUITEM "&Delete",						IDM_EDIT_DELETE
+		MENUITEM "Taglia",						IDM_EDIT_CUT
+		MENUITEM "&Copia",						IDM_EDIT_COPY
+		MENUITEM "&Incolla",						IDM_EDIT_PASTE
+		MENUITEM "&Elimina",						IDM_EDIT_DELETE
 		MENUITEM SEPARATOR
-		MENUITEM "Select &All",					IDM_EDIT_SELECTALL
+		MENUITEM "Seleziona tutto",					IDM_EDIT_SELECTALL
 		MENUITEM SEPARATOR
-		MENUITEM "Toggle &Fold",				IDM_VIEW_FOLD_CURRENT_BLOCK
+		MENUITEM "Chiudi &Fold",				IDM_VIEW_FOLD_CURRENT_BLOCK
 		MENUITEM SEPARATOR
-		MENUITEM "&Open",						CMD_OPEN_PATH_OR_LINK
+		MENUITEM "Apri",						CMD_OPEN_PATH_OR_LINK
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
-		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
-		MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
-		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
+		MENUITEM "Mostra barra degli strumenti",				IDM_VIEW_TOOLBAR
+		MENUITEM "Personalizza barra degli strumenti...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
+		MENUITEM "&Auto Scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
+		MENUITEM "Mostra barra di stato",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Open Notepad2",				IDM_TRAY_RESTORE
+		MENUITEM "&Apri Notepad2",				IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "E&xit Notepad2",				IDM_TRAY_EXIT
+		MENUITEM "Esci da Notepad2",				IDM_TRAY_EXIT
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "&Default Levels",				IDM_VIEW_FOLD_DEFAULT
-		MENUITEM "&All Levels",					IDM_VIEW_FOLD_ALL
-		MENUITEM "&Current Block",				IDM_VIEW_FOLD_CURRENT_BLOCK
-		MENUITEM "Current &Level",				IDM_VIEW_FOLD_CURRENT_LEVEL
+		MENUITEM "Livelli predefiniti",				IDM_VIEW_FOLD_DEFAULT
+		MENUITEM "Tutti i livelli",					IDM_VIEW_FOLD_ALL
+		MENUITEM "Blocco corrente",				IDM_VIEW_FOLD_CURRENT_BLOCK
+		MENUITEM "Livello Corrente",				IDM_VIEW_FOLD_CURRENT_LEVEL
 		MENUITEM SEPARATOR
-		MENUITEM "Level &1",					IDM_VIEW_FOLD_LEVEL1
-		MENUITEM "Level &2",					IDM_VIEW_FOLD_LEVEL2
-		MENUITEM "Level &3",					IDM_VIEW_FOLD_LEVEL3
-		MENUITEM "Level &4",					IDM_VIEW_FOLD_LEVEL4
-		MENUITEM "Level &5",					IDM_VIEW_FOLD_LEVEL5
-		MENUITEM "Level &6",					IDM_VIEW_FOLD_LEVEL6
-		MENUITEM "Level &7",					IDM_VIEW_FOLD_LEVEL7
-		MENUITEM "Level &8",					IDM_VIEW_FOLD_LEVEL8
-		MENUITEM "Level &9",					IDM_VIEW_FOLD_LEVEL9
-		MENUITEM "Level 1&0",					IDM_VIEW_FOLD_LEVEL10
+		MENUITEM "Livello &1",					IDM_VIEW_FOLD_LEVEL1
+		MENUITEM "Livello &2",					IDM_VIEW_FOLD_LEVEL2
+		MENUITEM "Livello &3",					IDM_VIEW_FOLD_LEVEL3
+		MENUITEM "Livello &4",					IDM_VIEW_FOLD_LEVEL4
+		MENUITEM "Livello &5",					IDM_VIEW_FOLD_LEVEL5
+		MENUITEM "Livello &6",					IDM_VIEW_FOLD_LEVEL6
+		MENUITEM "Livello &7",					IDM_VIEW_FOLD_LEVEL7
+		MENUITEM "Livello &8",					IDM_VIEW_FOLD_LEVEL8
+		MENUITEM "Livello &9",					IDM_VIEW_FOLD_LEVEL9
+		MENUITEM "Livello 1&0",					IDM_VIEW_FOLD_LEVEL10
 	END
 END
 
@@ -997,322 +997,322 @@ CAPTION "Notepad2"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,142,123,50,14
-    PUSHBUTTON      "Copy",IDC_COPY_BUILD_INFO,198,123,50,14
+    PUSHBUTTON      "Copia",IDC_COPY_BUILD_INFO,198,123,50,14
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,16
     LTEXT           "Copyright © 2004-2012 Florian Balmer.",IDC_STATIC,45,38,200,8
     LTEXT           "",IDC_WEBPAGE_TEXT,45,48,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,48,200,10
-    LTEXT           "Copyright © 2010-2017 XhmikosR and all contributors.",IDC_STATIC,45,60,200,8
+    LTEXT           "Copyright © 2010-2017 XhmikosR e tutti i contributori.",IDC_STATIC,45,60,200,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "Copyright © 2011-2022 Zufu Liu and all contributors.",IDC_STATIC,45,80,200,8
+    LTEXT           "Copyright © 2011-2022 Zufu Liu e tutti i contributori.",IDC_STATIC,45,80,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,80,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
-    LTEXT           "Contact Florian Balmer:",IDC_STATIC,45,100,94,8
+    LTEXT           "Contatta Florian Balmer:",IDC_STATIC,45,100,94,8
     LTEXT           "",IDC_EMAIL_TEXT,45,108,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,108,94,10
-    LTEXT           "Visit Scintilla's website:",IDC_STATIC,45,120,94,8
+    LTEXT           "Visita sito web Scintilla's:",IDC_STATIC,45,120,94,8
     LTEXT           "",IDC_SCI_PAGE_TEXT,45,128,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
 
 IDD_FIND DIALOGEX 0, 0, 290, 112
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Find Text"
+CAPTION "Trova Testo"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Search Strin&g:",IDC_STATIC,7,7,67,8
+    LTEXT           "Testo ricercato:",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Match &case",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
-    AUTOCHECKBOX    "C&lose after find",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
-    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "Find &Next",IDOK,223,7,60,14
-    PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "&Find All",IDC_FINDALL,223,41,60,14
-    PUSHBUTTON      "&Select All",IDC_REPLACEALL,223,58,60,14
+    AUTOCHECKBOX    "Trova Maiuscole/Minuscole",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
+    AUTOCHECKBOX    "Trova solo parole intere",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
+    AUTOCHECKBOX    "Trova solo inizio di parola",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ricerca con espressioni regolari",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Trasforma con backslashes",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non andare a capo",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
+    AUTOCHECKBOX    "Chiudi dopo ricerca",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ricerca con caratteri jolly",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
+    DEFPUSHBUTTON   "Trova successivo",IDOK,223,7,60,14
+    PUSHBUTTON      "Trova precedente",IDC_FINDPREV,223,24,60,14
+    PUSHBUTTON      "Trova tutti",IDC_FINDALL,223,41,60,14
+    PUSHBUTTON      "Seleziona tutto",IDC_REPLACEALL,223,58,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
-    AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Boo&kmark matched line",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use &monospaced font",IDC_USEMONOSPACEDFONT,132,85,90,10,WS_TABSTOP
-    CONTROL         "<a>Goto Replace (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,97,80,10
-    CONTROL         "<a>Save Position</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
-    CONTROL         "<a>Reset Position</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
+    AUTOCHECKBOX    "Modalità trasparente se inattiva",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Segna la linea abbinata al segnalibro",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Usa font monospaziato",IDC_USEMONOSPACEDFONT,132,85,90,10,WS_TABSTOP
+    CONTROL         "<a>Vai a sostituisci (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,97,80,10
+    CONTROL         "<a>Salava Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
+    CONTROL         "<a>Resetta Posizione</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
 END
 
 IDD_REPLACE DIALOGEX 0, 0, 290, 142
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Replace Text"
+CAPTION "Sostituisci Testo"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Search Strin&g:",IDC_STATIC,7,7,65,8
+    LTEXT           "Testo ricercato:",IDC_STATIC,7,7,65,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Replace Wit&h:",IDC_STATIC,7,35,64,8
+    LTEXT           "Sostituisci con:",IDC_STATIC,7,35,64,8
     COMBOBOX        IDC_REPLACETEXT,7,46,209,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Match &case",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &whole word only",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
-    AUTOCHECKBOX    "Match &beginning of word only",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Regular &expression search",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Transform backslashes",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Don't wrap around",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
-    AUTOCHECKBOX    "C&lose after replace",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "W&ildcard search",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
-    DEFPUSHBUTTON   "Find &Next",IDOK,223,7,60,14
-    PUSHBUTTON      "Find &Previous",IDC_FINDPREV,223,24,60,14
-    PUSHBUTTON      "&Find All",IDC_FINDALL,223,41,60,14
-    PUSHBUTTON      "&Replace",IDC_REPLACE,223,58,60,14
-    PUSHBUTTON      "Replace &All",IDC_REPLACEALL,223,75,60,14
-    PUSHBUTTON      "In &Selection",IDC_REPLACEINSEL,223,92,60,14
+    AUTOCHECKBOX    "Trova Maiuscole/Minuscole",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
+    AUTOCHECKBOX    "Trova solo parole intere",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
+    AUTOCHECKBOX    "Trova solo inizio di parola",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ricerca con espressioni regolari",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Trasforma con backslashes",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non andare a capo",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
+    AUTOCHECKBOX    "Chiudi dopo la sostituzione",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ricerca con caratteri jolly",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
+    DEFPUSHBUTTON   "Trova successivo",IDOK,223,7,60,14
+    PUSHBUTTON      "Trova precedente",IDC_FINDPREV,223,24,60,14
+    PUSHBUTTON      "Trova tutto",IDC_FINDALL,223,41,60,14
+    PUSHBUTTON      "Sostituisci",IDC_REPLACE,223,58,60,14
+    PUSHBUTTON      "Sostituisci tutto",IDC_REPLACEALL,223,75,60,14
+    PUSHBUTTON      "Nella selezione",IDC_REPLACEINSEL,223,92,60,14
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,12,10
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
-    CONTROL         "<a>Clear History</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
-    AUTOCHECKBOX    "Transparent mode on losing focus",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Boo&kmark matched line",IDC_FINDALLBOOKMARK,132,102,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use &monospaced font",IDC_USEMONOSPACEDFONT,132,114,90,10,WS_TABSTOP
-    CONTROL         "<a>Goto Find (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,127,80,10
-    CONTROL         "<a>Save Position</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
-    CONTROL         "<a>Reset Position</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
+    AUTOCHECKBOX    "Modalità trasparente se inattiva",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
+    AUTOCHECKBOX    "Segna la linea abbinata al segnalibro",IDC_FINDALLBOOKMARK,132,102,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Usa font monospaziato",IDC_USEMONOSPACEDFONT,132,114,90,10,WS_TABSTOP
+    CONTROL         "<a>Vai a Trova (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,127,80,10
+    CONTROL         "<a>Salva Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
+    CONTROL         "<a>Resetta Posizione</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,126,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,126,10,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Run"
+CAPTION "Esegui"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,21,20
-    LTEXT           "Enter the name of an executable program file, a folder or a document to open.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "Immettere il nome di un file eseguibile, una cartella o un documento da aprire.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
     DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,177,65,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,65,10,10
 END
 
 IDD_OPENWITH DIALOGEX 0, 0, 228, 206
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Open with..."
+CAPTION "Apri con..."
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,214,149
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,162,13,13
-    LTEXT           "Click here to specify the directory with links to your favorite applications.",IDC_OPENWITHDESCR,26,162,195,20
+    LTEXT           "Fare clic qui per specificare la cartella con i collegamenti alle applicazioni preferite.",IDC_OPENWITHDESCR,26,162,195,20
     DEFPUSHBUTTON   "OK",IDOK,115,185,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,171,185,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,171,185,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,189,10,10
 END
 
 IDD_SYSTEM_INTEGRATION DIALOGEX 0, 0, 232, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "System Integration"
+CAPTION "Integrazione col sistema"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,7,218,84
-    AUTOCHECKBOX    "Add Notepad2 to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,20,204,10,WS_TABSTOP
-    LTEXT           "Context menu text:",IDC_STATIC,28,35,70,8
+    GROUPBOX        "Integrazione col sistema (richiede privilegi da Amministratore)",IDC_GROUP_SYSTEM_INTEGRATION,7,7,218,84
+    AUTOCHECKBOX    "Aggiungi Notepad2 al menu contestuale di Esplora risorse.",IDC_ENABLE_CONTEXT_MENU,14,20,204,10,WS_TABSTOP
+    LTEXT           "Testo menu contestuale:",IDC_STATIC,28,35,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,32,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,48,204,10,WS_TABSTOP
-    LTEXT           "Application name:",IDC_STATIC,28,63,70,8
+    AUTOCHECKBOX    "Abilita Jump List nella barra delle applicazioni.",IDC_ENABLE_JUMP_LIST,14,48,204,10,WS_TABSTOP
+    LTEXT           "Nome applicazione:",IDC_STATIC,28,63,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,60,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Replace Windows Notepad via registry.",IDC_REPLACE_WINDOWS_NOTEPAD,14,76,204,10,WS_TABSTOP
+    AUTOCHECKBOX    "Sostituisci Blocco Note di Windows via registro.",IDC_REPLACE_WINDOWS_NOTEPAD,14,76,204,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,97,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,175,97,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,175,97,50,14
 END
 
 IDD_DEFENCODING DIALOGEX 0, 0, 209, 129
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Encoding"
+CAPTION "Codifica"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Default encoding:",IDC_STATIC,7,7,195,8
+    LTEXT           "Codifica predefinita:",IDC_STATIC,7,7,195,8
     EDITTEXT        IDC_ENCODING_LABEL,7,20,195,14,ES_READONLY | ES_AUTOHSCROLL | WS_TABSTOP
-    CONTROL         "<a>Click here to &select default encoding.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
-    AUTOCHECKBOX    "Skip statistical &Unicode (UTF-16) detection.",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Open 7-bit &ASCII files in UTF-8 mode.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Open ANSI (unknown encoding) files in UTF-&8 mode.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Open ANSI Art (*.&nfo, *.diz) files in DOS-437 mode.",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Don't parse encoding &tags.",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
+    CONTROL         "<a>Clicca qui per selezionare la codifica predefinita.</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
+    AUTOCHECKBOX    "Salta il rilevamento statistico e Unicode (UTF-16).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Apri file ASCII a 7 bit in modalità UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Apri i file ANSI (codifica sconosciuta) in modalità UTF-8.",IDC_ANSIASUTF8,7,72,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Apri i file ANSI Art (*.&nfo, *.diz) in modalità DOS-437.",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non analizzare i tag di codifica.",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,96,108,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,152,108,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,152,108,50,14
 END
 
 IDD_DEFEOLMODE DIALOGEX 0, 0, 196, 80
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Line Endings"
+CAPTION "Terminazioni di riga"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "&Default line ending mode:",IDC_STATIC,7,7,116,8
+    LTEXT           "Modalità di fine riga predefinita:",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Show inconsistent line endings warning on loading.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Ensure consistent line endings when saving.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Strip trailing blanks when saving.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
+    AUTOCHECKBOX    "Mostra l'avviso di fine riga incoerente durante il caricamento.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "Garantire terminazioni di riga coerenti durante il salvataggio.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
+    AUTOCHECKBOX    "Elimina gli spazi finali durante il salvataggio.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,139,24,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,139,24,50,14
 END
 
 IDD_WARNLINEENDS DIALOGEX 0, 0, 196, 100
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Inconsistent Line Endings"
+CAPTION "Terminazioni di riga incoerenti"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "The line endings in this file is not consistent:",IDC_STATIC,7,7,180,8
+    LTEXT           "Le terminazioni di riga in questo file non sono coerenti:",IDC_STATIC,7,7,180,8
     LTEXT           "CR+LF:",IDC_STATIC,10,18,34,8,SS_RIGHT
     LTEXT           "LF:",IDC_STATIC,10,28,34,8,SS_RIGHT
     LTEXT           "CR:",IDC_STATIC,10,38,34,8,SS_RIGHT
-    LTEXT           "%s line(s).",IDC_EOL_SUM_CRLF,48,18,136,8
-    LTEXT           "%s line(s).",IDC_EOL_SUM_LF,48,28,136,8
-    LTEXT           "%s line(s).",IDC_EOL_SUM_CR,48,38,136,8
-    LTEXT           "&Do you want to normalize the line endings?",IDC_STATIC,7,52,180,8
+    LTEXT           "%s linea(e).",IDC_EOL_SUM_CRLF,48,18,136,8
+    LTEXT           "%s linea(e).",IDC_EOL_SUM_LF,48,28,136,8
+    LTEXT           "%s linea(e).",IDC_EOL_SUM_CR,48,38,136,8
+    LTEXT           "Vuoi normalizzare le terminazioni di riga?",IDC_STATIC,7,52,180,8
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "&Yes",IDOK,138,63,50,14
-    PUSHBUTTON      "&No",IDCANCEL,138,80,50,14
-    AUTOCHECKBOX    "&Always show this dialog.",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
+    PUSHBUTTON      "Sì",IDOK,138,63,50,14
+    PUSHBUTTON      "No",IDCANCEL,138,80,50,14
+    AUTOCHECKBOX    "Mostra sempre questa finestra di dialogo.",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
 END
 
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Goto"
+CAPTION "Vai a"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Line (empty or 1 - %s):",IDC_LINE_RANGE,7,7,150,8
+    LTEXT           "Linea (vuota o 1 - %s):",IDC_LINE_RANGE,7,7,150,8
     EDITTEXT        IDC_LINENUM,7,18,90,14,ES_AUTOHSCROLL
-    LTEXT           "&Column (empty or 1 - %s):",IDC_COLUMN_RANGE,7,37,150,8
+    LTEXT           "Colonna (vuota o 1 - %s):",IDC_COLUMN_RANGE,7,37,150,8
     EDITTEXT        IDC_COLNUM,7,48,90,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,109,18,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,109,48,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,109,48,50,14
 END
 
 IDD_FILEMRU DIALOGEX 0, 0, 226, 204
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Open Recent File"
+CAPTION "Apri file recente"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
-    AUTOCHECKBOX    "&Remember recent files on exit.",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
-    CONTROL         "<a>Clear History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
+    AUTOCHECKBOX    "Ricorda file recenti all'uscita.",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
     DEFPUSHBUTTON   "OK",IDOK,113,183,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,169,183,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,169,183,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,187,10,10
 END
 
 IDD_CHANGENOTIFY DIALOGEX 0, 0, 196, 89
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "File Change Notification"
+CAPTION "Notifica di modifica del file"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "&None.",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Show message.",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
-    AUTORADIOBUTTON "&Auto-reload (unmodified).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
-    AUTOCHECKBOX    "Detect file change by &polling instead of notification.",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Keep at document end after reloading.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Reset if a new file is opened.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
+    AUTORADIOBUTTON "Nessuna.",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Mostra messaggio.",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
+    AUTORADIOBUTTON "Ricarica automatica (non modificata).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rileva la modifica del file tramite polling anziché notifica.",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "Resta alla fine del documento dopo il ricaricamento.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "Reimposta se viene aperto un nuovo file.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,139,24,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,139,24,50,14
 END
 
 IDD_STYLESELECT DIALOGEX 0, 0, 165, 217
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select Scheme"
+CAPTION "Seleziona Schema"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,151,162
-    AUTOCHECKBOX    "Set selected scheme as &default.",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Auto-select by filename extension.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "Imposta lo schema selezionato come predefinito.",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
+    AUTOCHECKBOX    "Selezione automatica in base all'estensione del nome file.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,52,196,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,108,196,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,108,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
 END
 
 IDD_STYLECONFIG DIALOGEX 0, 0, 468, 238
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Customize Schemes"
+CAPTION "Personalizza Schema"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_FULLROWSELECT | TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,164,224
     LTEXT           "",IDC_STYLELABEL,181,132,280,8
     EDITTEXT        IDC_STYLEEDIT,181,142,280,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
-    PUSHBUTTON      "For&e...",IDC_STYLEFORE,181,195,46,14
-    PUSHBUTTON      "&Back...",IDC_STYLEBACK,232,195,46,14
+    PUSHBUTTON      "Colore...",IDC_STYLEFORE,181,195,46,14
+    PUSHBUTTON      "Sfondo...",IDC_STYLEBACK,232,195,46,14
     PUSHBUTTON      "&Font...",IDC_STYLEFONT,283,195,42,14
-    PUSHBUTTON      "&Preview",IDC_PREVIEW,330,195,42,14
-    PUSHBUTTON      "&Reset",IDC_STYLEDEFAULT,377,195,42,14
+    PUSHBUTTON      "Anteprima",IDC_PREVIEW,330,195,42,14
+    PUSHBUTTON      "Reimposta",IDC_STYLEDEFAULT,377,195,42,14
     PUSHBUTTON      "",IDC_PREVSTYLE,426,195,15,14
     PUSHBUTTON      "",IDC_NEXTSTYLE,446,195,15,14
-    PUSHBUTTON      "&Import...",IDC_IMPORT,181,217,50,14
-    PUSHBUTTON      "E&xport...",IDC_EXPORT,237,217,50,14
-    PUSHBUTTON      "Reset All",IDC_RESETALL,293,217,50,14
+    PUSHBUTTON      "Importa...",IDC_IMPORT,181,217,50,14
+    PUSHBUTTON      "Esporta...",IDC_EXPORT,237,217,50,14
+    PUSHBUTTON      "Reimposta tutto",IDC_RESETALL,293,217,50,14
     DEFPUSHBUTTON   "OK",IDOK,355,217,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,411,217,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,411,217,50,14
     GROUPBOX        "Info",IDC_INFO_GROUPBOX,181,7,280,122
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
-    LTEXT           "Customize Schemes",IDC_TITLE,220,25,200,12
+    LTEXT           "Personalizza Schemi",IDC_TITLE,220,25,200,12
     EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "Associated file&name extensions:|Style &settings:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
-    LTEXT           "Built-in default value:",IDC_STYLELABEL_DEFAULT,181,162,160,8
+    LTEXT           "Estensioni di nomi di file associate: |Impostazioni di stile:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
+    LTEXT           "Valore predefinito integrato:",IDC_STYLELABEL_DEFAULT,181,162,160,8
     EDITTEXT        IDC_STYLEVALUE_DEFAULT,181,172,280,18,ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
     SCROLLBAR       IDC_RESIZEGRIP3,7,217,10,10
 END
 
 IDD_TABSETTINGS DIALOGEX 0, 0, 232, 197
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Tab Settings"
+CAPTION "Impostazioni Tab"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-	GROUPBOX		"Global",IDC_STATIC,7,7,218,38
-    LTEXT           "&Tabulator width:",IDC_STATIC,14,17,67,8
+	GROUPBOX		"Globali",IDC_STATIC,7,7,218,38
+    LTEXT           "Larghezza Tabulazione:",IDC_STATIC,14,17,67,8
     EDITTEXT        IDC_GLOBAL_TAB_WIDTH,78,15,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "&Indentation size:",IDC_STATIC,14,32,69,8
+    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,32,69,8
     EDITTEXT        IDC_GLOBAL_INDENT_WIDTH,78,29,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Insert tabs as &spaces.",IDC_GLOBAL_TAB_AS_SPACE,118,16,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_GLOBAL_TAB_AS_SPACE,118,16,101,10,WS_TABSTOP
 	GROUPBOX		"",IDC_SCHEME_TAB_GROUPBOX,7,49,218,38
-    LTEXT           "Tabu&lator width:",IDC_STATIC,14,59,67,8
+    LTEXT           "Larghezza Tabulazione:",IDC_STATIC,14,59,67,8
     EDITTEXT        IDC_SCHEME_TAB_WIDTH,78,57,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "I&ndentation size:",IDC_STATIC,14,73,69,8
+    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,73,69,8
     EDITTEXT        IDC_SCHEME_INDENT_WIDTH,78,71,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Insert tabs as s&paces.",IDC_SCHEME_TAB_AS_SPACE,118,58,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use &global settings.",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_SCHEME_TAB_AS_SPACE,118,58,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Usa impostazioni globali.",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
 	GROUPBOX		"",IDC_FILE_TAB_GROUPBOX,7,91,218,38
-    LTEXT           "Tabulator &width:",IDC_STATIC,14,101,67,8
+    LTEXT           "Larghezza Tabulazione:",IDC_STATIC,14,101,67,8
     EDITTEXT        IDC_FILE_TAB_WIDTH,78,99,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "In&dentation size:",IDC_STATIC,14,115,69,8
+    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,115,69,8
     EDITTEXT        IDC_FILE_INDENT_WIDTH,78,113,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Insert tabs as sp&aces.",IDC_FILE_TAB_AS_SPACE,118,100,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Use sche&me settings.",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Tab &key reformats indentation.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Backspace key reformats indentation.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Auto dete&ct Tab and indentation settings.",IDC_DETECT_INDENTATION,7,159,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_FILE_TAB_AS_SPACE,118,100,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Usa impostazioni schema.",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
+    AUTOCHECKBOX    "Tasto Tab riformatta indentazione.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Tasto Backspace riformatta indentazione.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rileva automaticamente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,159,160,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,176,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,175,176,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,175,176,50,14
 END
 
 IDD_LONGLINES DIALOGEX 0, 0, 184, 55
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Long Lines Settings"
+CAPTION "Impostazioni Linne Lunghe"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Limit for long lines:",IDC_STATIC,7,10,85,8
+    LTEXT           "Limite per le linee lunghe:",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    AUTORADIOBUTTON "Show &edge line.",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Change &background color.",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
+    AUTORADIOBUTTON "Mostra la linea del bordo.",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Cambia colore di sfondo.",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,127,24,50,14
 END
 
 IDD_WORDWRAP DIALOGEX 0, 0, 250, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Word Wrap Settings"
+CAPTION "Impostazioni Testo a capo"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_WRAP_INDENT,7,7,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1320,53 +1320,53 @@ BEGIN
     COMBOBOX        IDC_WRAP_SYMBOL_AFTER,7,41,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,137,118,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,193,118,50,14
-    LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
-    GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
-    AUTOCHECKBOX    "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
-    AUTOCHECKBOX    "Only highlight subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
+    PUSHBUTTON      "Annulla",IDCANCEL,193,118,50,14
+    LTEXT           "Nessun rientro a capo|Rientro a capo di 1 carattere|Rientro a capo di 2 caratteri|Rientro a capo di 1 livello|Rientro a capo di 2 livelli|Rientro a capo come prima sottolinea|Rientro a capo di 1 livello più rispetto alla prima sottolinea|Rientro a capo di 2 livelli rispetto alla prima sottolinea",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
+    LTEXT           "Nessun indicatore visivo prima del ritorno a capo|Mostra indicatori visivi prima del ritorno a capo (vicino al testo)|Mostra indicatori visivi prima del ritorno a capo (vicino ai bordi)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
+    LTEXT           "Nessun indicatore visivo dopo il ritorno a capo|Mostra indicatori visivi dopo il ritorno a capo (vicino al testo)|Mostra indicatori visivi dopo il ritorno a capo (vicino ai bordi)|Mostra indicatori visivi dopo il ritorno a capo (nel margine del numero riga)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
+    LTEXT           "Nessun ritorno a capo|Ritorno a capo del testo tra le parole|Ritorno a capo del testo tra qualsiasi carattere|Ritorno a capo del testo in uno spazio bianco|Ritorno a capo automatico delle parole",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
+    GROUPBOX        "Per linee rimandate a capo",IDC_STATIC,7,74,235,38
+    AUTOCHECKBOX    "Seleziona la riga secondaria solo quando si seleziona la riga dal margine sinistro.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
+    AUTOCHECKBOX    "Evidenzia la riga secondaria solo quando si evidenzia la riga corrente.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Page Setup"
+CAPTION "Imposta Pagina"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Paper",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
-    LTEXT           "Si&ze:",IDC_PAGESETUP_SIZE,16,24,36,8
+    GROUPBOX        "Foglio",IDC_PAGESETUP_PAGER_BOX,8,8,224,56,WS_GROUP
+    LTEXT           "Dimensione:",IDC_PAGESETUP_SIZE,16,24,36,8
     COMBOBOX        IDC_PAGESETUP_SOURCE_LIST,64,23,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "&Source:",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
+    LTEXT           "Vassoio:",IDC_PAGESETUP_SOURCE_LABEL,16,45,36,8
     COMBOBOX        IDC_PAGESETUP_ORIENTATION_LIST,64,42,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Orientation",IDC_PAGESETUP_ORIENTATION_BOX,8,69,64,56,WS_GROUP
-    AUTORADIOBUTTON "P&ortrait",IDC_PAGESETUP_PORTRAIT,16,82,52,12,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "L&andscape",IDC_PAGESETUP_LANDSCAPE,16,103,52,12,WS_TABSTOP
-    GROUPBOX        "Margins",IDC_PAGESETUP_MARGIN_BOX,80,69,152,56,WS_GROUP
-    LTEXT           "&Left:",IDC_PAGESETUP_MARGIN_LEFT_LABEL,88,85,32,8
+    GROUPBOX        "Orientamento",IDC_PAGESETUP_ORIENTATION_BOX,8,69,64,56,WS_GROUP
+    AUTORADIOBUTTON "Verticale",IDC_PAGESETUP_PORTRAIT,16,82,52,12,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Orizzontale",IDC_PAGESETUP_LANDSCAPE,16,103,52,12,WS_TABSTOP
+    GROUPBOX        "Margini",IDC_PAGESETUP_MARGIN_BOX,80,69,152,56,WS_GROUP
+    LTEXT           "Sinistro:",IDC_PAGESETUP_MARGIN_LEFT_LABEL,88,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_LEFT,120,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "&Top:",IDC_PAGESETUP_MARGIN_TOP_LABEL,88,104,32,8
+    LTEXT           "Superiore:",IDC_PAGESETUP_MARGIN_TOP_LABEL,88,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_RIGHT,120,103,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "&Right:",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
+    LTEXT           "Destro:",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_TOP,196,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "&Bottom:",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
+    LTEXT           "Posteriore:",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_BOOTOM,196,103,28,12,ES_NUMBER | WS_GROUP
-    GROUPBOX        "Headers and Footers",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
-    LTEXT           "&Header:",IDC_STATIC,16,146,36,8
+    GROUPBOX        "Intestazioni e piè di pagina",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
+    LTEXT           "Intestazione:",IDC_STATIC,16,146,36,8
     COMBOBOX        IDC_PAGESETUP_HEADER_LIST,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "&Footer:",IDC_STATIC,16,167,36,8
+    LTEXT           "Piè di pagina:",IDC_STATIC,16,167,36,8
     COMBOBOX        IDC_PAGESETUP_FOOTER_LIST,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "Print Colors",IDC_PAGESETUP_PRINT_COLOR_BOX,8,191,224,37,WS_GROUP
-    LTEXT           "Mo&de:",IDC_STATIC,16,207,36,8
+    GROUPBOX        "Colori di stampa",IDC_PAGESETUP_PRINT_COLOR_BOX,8,191,224,37,WS_GROUP
+    LTEXT           "Modalità:",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Zoom",IDC_STATIC,240,170,108,58,WS_GROUP
-    LTEXT           "Print zoo&m (10% to 500%):",IDC_STATIC,248,188,94,8
+    LTEXT           "Stampa con Zoom (da 10% a 500%):",IDC_STATIC,248,188,94,8
     COMBOBOX        IDC_PAGESETUP_ZOOMLEVEL,290,206,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,187,239,50,14,WS_GROUP
-    PUSHBUTTON      "Cancel",IDCANCEL,243,239,50,14
-    PUSHBUTTON      "&Printer...",IDC_PAGESETUP_PRINTER,299,239,50,14
-    GROUPBOX        "Preview",IDC_STATIC,240,8,108,157
+    PUSHBUTTON      "Annulla",IDCANCEL,243,239,50,14
+    PUSHBUTTON      "Stampante...",IDC_PAGESETUP_PRINTER,299,239,50,14
+    GROUPBOX        "Anteprima",IDC_STATIC,240,8,108,157
     CONTROL         "",IDC_PAGESETUP_PREVIEW_WHITE_RECT,"Static",SS_WHITERECT,254,47,80,80
     CONTROL         "",IDC_PAGESETUP_PREVIEW_VERT_RECT,"Static",SS_GRAYRECT,334,51,4,80
     CONTROL         "",IDC_PAGESETUP_PREVIEW_HOR_RECT,"Static",SS_GRAYRECT,262,123,80,4
@@ -1374,88 +1374,88 @@ END
 
 IDD_FAVORITES DIALOGEX 0, 0, 244, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Favorites"
+CAPTION "Preferiti"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FAVORITESDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,230,106
     PUSHBUTTON      "",IDC_GETFAVORITESDIR,7,118,13,13
-    LTEXT           "Click here to specify the directory with links to your favorite files.",IDC_FAVORITESDESCR,22,118,214,20
+    LTEXT           "Fare clic qui per specificare la cartella con i collegamenti ai file preferiti.",IDC_FAVORITESDESCR,22,118,214,20
     DEFPUSHBUTTON   "OK",IDOK,131,145,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,187,145,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,187,145,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,145,10,10
 END
 
 IDD_ADDTOFAV DIALOGEX 0, 0, 254, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Add to Favorites"
+CAPTION "Aggiungi ai preferiti"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Enter the name for the new favorites item:",IDC_FAVORITESDESCR,7,7,240,8
+    LTEXT           "Inserisci il nome del nuovo elemento dei preferiti:",IDC_FAVORITESDESCR,7,7,240,8
     EDITTEXT        IDC_FAVORITESFILE,7,22,240,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,141,45,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,197,45,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,197,45,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,45,10,10
 END
 
 IDD_COLUMNWRAP DIALOGEX 0, 0, 130, 47
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Column Wrap"
+CAPTION "Colonna a capo"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Boundary:",IDC_STATIC,7,7,34,8
+    LTEXT           "Limite:",IDC_STATIC,7,7,34,8
     EDITTEXT        IDC_COLUMNWRAP,7,24,54,14,ES_NUMBER | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,73,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,73,24,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,73,24,50,14
 END
 
 IDD_MODIFYLINES DIALOGEX 0, 0, 260, 129
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Modify Lines"
+CAPTION "Modifica Linee"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Prefix text to lines:",IDC_STATIC,7,6,96,8
+    LTEXT           "Prefisso delle linee:",IDC_STATIC,7,6,96,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "&Append text to lines:",IDC_MODIFY_LINE_TIP2,7,41,97,8
+    LTEXT           "Aggiungi testo alle linee:",IDC_MODIFY_LINE_TIP2,7,41,97,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,147,108,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,203,108,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,203,108,50,14
     LTEXT           "$(L)",IDC_MODIFY_LINE_DLN_NP,7,76,21,8
     LTEXT           "$(0L)",IDC_MODIFY_LINE_DLN_ZP,27,76,27,8
-    LTEXT           "Document line number.",IDC_MODIFY_LINE_TIP_DLN,51,76,118,8
+    LTEXT           "Numero di riga del documento.",IDC_MODIFY_LINE_TIP_DLN,51,76,118,8
     LTEXT           "$(N)",IDC_MODIFY_LINE_CN_NP,7,86,22,8
     LTEXT           "$(0N)",IDC_MODIFY_LINE_CN_ZP,27,86,25,8
-    LTEXT           "Continuous number.",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
+    LTEXT           "Numero continuo.",IDC_MODIFY_LINE_TIP_CN,51,86,107,8
     LTEXT           "$(I)",IDC_MODIFY_LINE_ZCN_NP,7,96,21,8
     LTEXT           "$(0I)",IDC_MODIFY_LINE_ZCN_ZP,27,96,25,8
-    LTEXT           "Continuous number (zero-based).",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
+    LTEXT           "Numero continuo (base 0).",IDC_MODIFY_LINE_TIP_ZCN,51,96,125,8
     SCROLLBAR       IDC_RESIZEGRIP2,7,108,10,10
 END
 
 IDD_INSERTTAG DIALOGEX 0, 0, 264, 98
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Insert HTML/XML Tag"
+CAPTION "Inserisc Tag HTML/XML"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "&Opening tag (with attributes):",IDC_STATIC,7,7,130,8
+    LTEXT           "Tag di apertura (con attributi):",IDC_STATIC,7,7,130,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "&Closing tag (can be edited):",IDC_MODIFY_LINE_TIP2,7,41,118,8
+    LTEXT           "Tag di chiusura (può essere editato):",IDC_MODIFY_LINE_TIP2,7,41,118,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,250,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,151,77,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,207,77,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,207,77,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,77,10,10
 END
 
 IDD_ENCLOSESELECTION DIALOGEX 0, 0, 248, 98
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Enclose Selection"
+CAPTION "Racchiudi selezione"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Insert &before selection:",IDC_STATIC,7,7,114,8
+    LTEXT           "Inserisci prima della selezione:",IDC_STATIC,7,7,114,8
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    LTEXT           "Insert &after selection:",IDC_MODIFY_LINE_TIP2,7,41,116,8
+    LTEXT           "Inserisci dopo la selezione:",IDC_MODIFY_LINE_TIP2,7,41,116,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,234,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     DEFPUSHBUTTON   "OK",IDOK,135,77,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,191,77,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,191,77,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,77,10,10
 END
 
@@ -1468,7 +1468,7 @@ BEGIN
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,187,53,50,14
-    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non mostrare ancora questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_INFOBOX_YESNO DIALOGEX 0, 0, 244, 74
@@ -1479,28 +1479,28 @@ BEGIN
     LTEXT           "",IDC_INFOBOXRECT,0,0,244,49
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
-    PUSHBUTTON      "&Yes",IDYES,131,54,50,14
+    PUSHBUTTON      "&Sì",IDYES,131,54,50,14
     PUSHBUTTON      "&No",IDNO,187,54,50,14
-    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non mostrare ancora questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SORT DIALOGEX 0, 0, 184, 152
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Sort Lines"
+CAPTION "Ordina Linee"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "Sort &ascending.",IDC_SORT_ASC,7,7,85,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Sort &descending.",IDC_SORT_DESC,7,19,84,10,WS_TABSTOP
-    AUTORADIOBUTTON "Shu&ffle lines.",IDC_SORT_SHUFFLE,7,31,70,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Merge duplicate lines.",IDC_SORT_MERGE_DUP,7,50,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Remove duplicate lines.",IDC_SORT_REMOVE_DUP,7,62,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Remove &unique lines.",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Case insensitive.",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
-    AUTOCHECKBOX    "Logical &number comparison.",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
-    AUTOCHECKBOX    "Group by file &type.",IDC_SORT_GROUPBY_FILE_TYPE,7,116,130,10,WS_TABSTOP
-    AUTOCHECKBOX    "Column &sort (rectangular selection).",IDC_SORT_COLUMN,7,135,150,10,WS_TABSTOP
+    AUTORADIOBUTTON "Ordine crescente.",IDC_SORT_ASC,7,7,85,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Ordine decrescente.",IDC_SORT_DESC,7,19,84,10,WS_TABSTOP
+    AUTORADIOBUTTON "Linee casuali.",IDC_SORT_SHUFFLE,7,31,70,10,WS_TABSTOP
+    AUTOCHECKBOX    "Unisci linee doppie.",IDC_SORT_MERGE_DUP,7,50,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rimuovi linee doppie.",IDC_SORT_REMOVE_DUP,7,62,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rimuovi le linee univoche.",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Senza distinzione tra maiuscole e minuscole.",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
+    AUTOCHECKBOX    "Confronto di numeri logici.",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
+    AUTOCHECKBOX    "Raggruppa per tipo di file.",IDC_SORT_GROUPBY_FILE_TYPE,7,116,130,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ordina colonne (selezione rettangolare).",IDC_SORT_COLUMN,7,135,150,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,127,24,50,14
 END
 
 IDD_INFOBOX_OKCANCEL DIALOGEX 0, 0, 244, 74
@@ -1512,104 +1512,104 @@ BEGIN
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,131,53,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,187,53,50,14
-    AUTOCHECKBOX    "&Don't show this message again.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    PUSHBUTTON      "Annulla",IDCANCEL,187,53,50,14
+    AUTOCHECKBOX    "Non mostrare ancora questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SELECT_ENCODING DIALOGEX 0, 0, 187, 238
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select Encoding"
+CAPTION "Seleziona Codifica"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "",IDC_ENCODING_LABEL,7,7,173,8
     CONTROL         "",IDC_ENCODINGLIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_TABSTOP,7,19,173,190
     DEFPUSHBUTTON   "OK",IDOK,74,217,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,130,217,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,130,217,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,221,10,10
 END
 
 IDD_ALIGN DIALOGEX 0, 0, 184, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Align Lines"
+CAPTION "Allinea Linee"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "&Left.",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "&Right.",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
-    AUTORADIOBUTTON "&Center.",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
-    AUTORADIOBUTTON "&Justify.",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
-    AUTORADIOBUTTON "Justify (&Paragraph mode).",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
+    AUTORADIOBUTTON "Sinistra.",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Destra.",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
+    AUTORADIOBUTTON "Centro.",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
+    AUTORADIOBUTTON "Giustifica.",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
+    AUTORADIOBUTTON "Giustifica (Modalità paragrafo).",IDC_ALIGN_JUSTIFY_PAR,7,55,124,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,24,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,127,24,50,14
 END
 
 IDD_ZOOMLEVEL DIALOGEX 0, 0, 120, 64
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Zoom Level"
+CAPTION "Livello Zoom"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Zoom level (10% to 500%):",IDC_STATIC,7,7,106,8
+    LTEXT           "Livello Zoom (da 10% a 500%):",IDC_STATIC,7,7,106,8
     COMBOBOX        IDC_ZOOMLEVEL,7,19,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Apply",IDYES,63,18,50,14
+    PUSHBUTTON      "Applica",IDYES,63,18,50,14
     DEFPUSHBUTTON   "OK",IDOK,7,43,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,63,43,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,63,43,50,14
 END
 
 IDD_AUTOCOMPLETION DIALOGEX 0, 0, 456, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Auto Completion Settings"
+CAPTION "Impostazioni di completamento automatico"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,7,218,98
-    AUTOCHECKBOX    "Auto complete word while typing.",IDC_AUTO_COMPLETE_WORD,14,6,122,10,WS_TABSTOP
-    LTEXT           "Visible item count in auto completion list:",IDC_STATIC,14,18,148,10,SS_RIGHT
+    AUTOCHECKBOX    "Completamento automatico parola durante la digitazione.",IDC_AUTO_COMPLETE_WORD,14,6,122,10,WS_TABSTOP
+    LTEXT           "Conteggio elementi visibili nell'elenco di completamento automatico:",IDC_STATIC,14,18,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,16,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Minimum length for word:",IDC_STATIC,14,34,148,10,SS_RIGHT
+    LTEXT           "Lunghezza minima della parola:",IDC_STATIC,14,34,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,32,50,12,ES_NUMBER | WS_TABSTOP
-    LTEXT           "Minimum length for number (without prefix):",IDC_STATIC,14,50,148,10,SS_RIGHT
+    LTEXT           "Lunghezza minima del numero (senza prefisso):",IDC_STATIC,14,50,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "Scanning words in current document for",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "Scansione delle parole nel documento corrente per",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "Only trigger auto completion in English IME mode.",IDC_AUTOC_ENGLISH_IME_ONLY,14,80,180,10,WS_TABSTOP
-    AUTOCHECKBOX    "Auto completion is case insensitive.",IDC_AUTOC_CASE_INSENSITIVE,14,92,180,10,WS_TABSTOP
-    GROUPBOX        "Keys used to finish auto completion (use Esc to cancel)",IDC_STATIC,7,111,218,44
-    AUTOCHECKBOX    "Enter",IDC_AUTOC_FILLUP_ENTER,14,123,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "Attiva il completamento automatico solo in modalità IME inglese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,80,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "Il completamento automatico non fa distinzione tra maiuscole e minuscole.",IDC_AUTOC_CASE_INSENSITIVE,14,92,180,10,WS_TABSTOP
+    GROUPBOX        "Tasti utilizzati per applicare il completamento automatico (usa Esc per annullare)",IDC_STATIC,7,111,218,44
+    AUTOCHECKBOX    "Invio",IDC_AUTOC_FILLUP_ENTER,14,123,35,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,66,123,35,10,WS_TABSTOP
-    AUTOCHECKBOX    "Space",IDC_AUTOC_FILLUP_SPACE,118,123,35,10,WS_TABSTOP
-    AUTOCHECKBOX    "Punctuation:",IDC_AUTOC_FILLUP_PUNCTUATION,14,140,50,10,WS_TABSTOP
+    AUTOCHECKBOX    "Spazio",IDC_AUTOC_FILLUP_SPACE,118,123,35,10,WS_TABSTOP
+    AUTOCHECKBOX    "Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,140,50,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,138,150,12,WS_TABSTOP
-    AUTOCHECKBOX    "Auto indent text.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Auto close HTML and XML tags.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Auto insert space after typing comma (,) when appropriate.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
-    GROUPBOX        "Auto complete braces and quotes",IDC_STATIC,231,44,218,61
+    AUTOCHECKBOX    "Indenta automaticamente testo.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Chiudi automaticamente i tag HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci automaticamente lo spazio dopo aver digitato la virgola (,) quando appropriato.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
+    GROUPBOX        "Auto completa parentesi graffe e virgolette",IDC_STATIC,231,44,218,61
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,56,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,56,40,10,WS_TABSTOP
     AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,56,40,10,WS_TABSTOP
     AUTOCHECKBOX    "< >",IDC_AUTO_INSERT_ANGLE_BRACKET,394,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "Double quotes ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,68,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Single quotes ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,238,80,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Virgolette ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,68,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Apostrofi ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,238,80,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Backticks (``).",IDC_AUTO_INSERT_BACKTICK,238,92,100,10,WS_TABSTOP
-    GROUPBOX        "Characters used to toggle line comment for Assembler source",IDC_STATIC,231,111,218,26
-    AUTORADIOBUTTON "Semicolon (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,123,60,10,WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Caratteri utilizzati per alternare il commento di riga per il sorgente Assembler",IDC_STATIC,231,111,218,26
+    AUTORADIOBUTTON "Punto e virgola (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,123,60,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,316,123,22,10,WS_TABSTOP
     AUTORADIOBUTTON "//",IDC_ASM_LINE_COMMENT_SLASH,362,123,22,10,WS_TABSTOP
     AUTORADIOBUTTON "@",IDC_ASM_LINE_COMMENT_AT,408,123,22,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,343,145,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,399,145,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,399,145,50,14
 END
 
 IDD_AUTOSAVE DIALOGEX 0, 0, 184, 81
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "AutoSave Settings"
+CAPTION "Impostazioni Salvataggio automatico"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTOCHECKBOX    "Enable AutoSave.",IDC_AUTOSAVE_ENABLE,7,7,170,10,WS_GROUP | WS_TABSTOP
-    LTEXT           "AutoSave period (in second):",IDC_STATIC,14,19,120,10,SS_RIGHT
+    AUTOCHECKBOX    "Abilita salvataggio automatico.",IDC_AUTOSAVE_ENABLE,7,7,170,10,WS_GROUP | WS_TABSTOP
+    LTEXT           "Periodo di salvataggio automatico (in secondi):",IDC_STATIC,14,19,120,10,SS_RIGHT
     EDITTEXT        IDC_AUTOSAVE_PERIOD,140,17,30,12,ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Save backup on system suspend.",IDC_AUTOSAVE_SUSPEND,7,31,170,10,WS_GROUP | WS_TABSTOP
-    AUTOCHECKBOX    "Save backup on system shutdown.",IDC_AUTOSAVE_SHUTDOWN,7,43,170,10,WS_TABSTOP
-    PUSHBUTTON      "Open Folder",IDC_AUTOSAVE_OPENFOLDER,7,60,60,14
+    AUTOCHECKBOX    "Salva backup in caso di sospensione del sistema.",IDC_AUTOSAVE_SUSPEND,7,31,170,10,WS_GROUP | WS_TABSTOP
+    AUTOCHECKBOX    "Salva backup in caso di spegnimento del sistema.",IDC_AUTOSAVE_SHUTDOWN,7,43,170,10,WS_TABSTOP
+    PUSHBUTTON      "Apri cartella",IDC_AUTOSAVE_OPENFOLDER,7,60,60,14
     DEFPUSHBUTTON   "OK",IDOK,71,60,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,127,60,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,127,60,50,14
 END
 
 
@@ -1841,193 +1841,193 @@ END
 STRINGTABLE
 BEGIN
     IDS_APPTITLE            "Notepad2"
-    IDS_APPTITLE_ELEVATED   "%s (Administrator)"
+    IDS_APPTITLE_ELEVATED   "%s (Amministratore)"
     IDS_APPTITLE_PASTEBOARD "Notepad2: Paste Board"
-    IDS_UNTITLED            "Untitled"
+    IDS_UNTITLED            "Senza Nome"
     IDS_TITLEEXCERPT        """%s"""
-    IDS_READONLY_FILE       "(Read Only File)"
-    IDS_READONLY_MODE       "(Read Only Mode)"
+    IDS_READONLY_FILE       "(File Sola Lettura)"
+    IDS_READONLY_MODE       "(Modalità Sola Lettura)"
     IDS_DOCPOS              "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s  SelLn %s  Fnd %s"
-    IDS_LOADFILE            "Loading ""%s""..."
-    IDS_SAVEFILE            "Saving ""%s""..."
-    IDS_PRINTFILE           "Printing page %s..."
-    IDS_SAVINGSETTINGS      "Saving settings..."
-    IDS_LINKDESCRIPTION     "Edit with Notepad&2"
-    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
-    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|All Files (*.*)|*.*|"
+    IDS_LOADFILE            "Caricamento ""%s""..."
+    IDS_SAVEFILE            "Salvataggio ""%s""..."
+    IDS_PRINTFILE           "Stampa pagina %s..."
+    IDS_SAVINGSETTINGS      "Salvataggio impostazioni..."
+    IDS_LINKDESCRIPTION     "Modifica con Notepad&2"
+    IDS_FILTER_ALL          "Tutti i file (*.*)|*.*|"
+    IDS_FILTER_EXE          "File Eseguibili (*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif)|*.exe;*.com;*.bat;*.cmd;*.lnk;*.pif|All Files (*.*)|*.*|"
 END
 
 STRINGTABLE
 BEGIN
-	IDS_BACKSLASHHELP		"Backslash Transformations\n\n\
+	IDS_BACKSLASHHELP		"Trasformazioi Backslash\n\n\
 \\a\tAlert (BEL, ASCII 7)\n\
 \\b\tBackspace (BS, ASCII 8)\n\
 \\e\tEscape (ESC, ASCII 27 / 1B)\n\
 \\f\tFormfeed (FF, ASCII 12 / 0C)\n\
-\\n\tNewline (LF, ASCII 10 / 0A)\n\
-\\r\tCarriage return (CR, ASCII 13 / 0D)\n\
-\\t\tHorizontal Tab (HT, ASCII 9)\n\
-\\v\tVertical Tab (VT, ASCII 11 / 0B)\n\
-\\ooo\tOctal Value\n\
-\\uHHHH\tHexadecimal Value\n\
-\\xHH\tHexadecimal Value\n\
+\\n\tNuova linea (LF, ASCII 10 / 0A)\n\
+\\r\tRitorno a capo (CR, ASCII 13 / 0D)\n\
+\\t\tTab Orizzontale (HT, ASCII 9)\n\
+\\v\tTab Verticale (VT, ASCII 11 / 0B)\n\
+\\ooo\tValore ottale\n\
+\\uHHHH\tValore esadecimale\n\
+\\xHH\tHValore esadecimale\n\
 \\\\\tBackslash"
 
-	IDS_REGEXPHELP			"RegExp Syntax (Single Lines Only)\n\n\
-.\tAny character\n\
-^\tStart of a line\n\
-$\tEnd of a line\n\
-\\<\tStart of a word\n\
-\\>\tEnd of a word\n\
-[...]\tA set of characters ([abc]) or a range ([a-z])\n\
-[^...]\tCharacters NOT in the set or range\n\
-\\d\tAny decimal digit\n\
-\\D\tAny non-digit character\n\
-\\s\tAny whitespace character\n\
-\\S\tAny non-whitespace character\n\
-\\w\tAny ""word"" character\n\
-\\W\tAny ""non-word"" character\n\
-\\x\tEscape character with otherwise special meaning\n\
-\\xHH\tCharacter with hexadecimal code HH\n\
-?\tMatches preceding 0 or 1 times\n*\tMatches preceding 0 or more times\n\
-+\tMatches preceding 1 or more times\n\
-*? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
-(\tStart of a region\n\
-)\tEnd of a region\n\
-\\n\tRefers to a region when replacing (n is 1-9)\n\n\
-Experimental Syntax:\n\
-\\h\tStart of a word, according to IsWordStartAt()\n\
-\\H\tEnd of a word, according to IsWordEndAt()\n\
-\\i\tMatches 1 or more characters to the end of a word\n\
-\\i?\tMatches 0 or more characters to the end of a word"
+	IDS_REGEXPHELP			"Sintassi RegExp (Solo righe singole)\n\n\
+.\tQualsiasi carattere\n\
+^\tInizio di una linea\n\
+$\tFine di una linea\n\
+\\<\tInizio di una parola\n\
+\\>\tFine di una parola\n\
+[...]\tUn insieme di caratteri ([abc]) o un intervallo ([a-z])\n\
+[^...]\tCaratteri NON nell'insieme o nell'intervallo\n\
+\\d\tQualsiasi carattere numerico\n\
+\\D\tQualsiasi carattere non numerico\n\
+\\s\tQualsiasi carattere spazio\n\
+\\S\tQualsiasi carattere diverso da spazi\n\
+\\w\tQualsiasi carattere ""parola"".\n\
+\\W\tQualsiasi carattere diverso da ""parola"".\n\
+\\x\tCarattere di escape con un significato altrimenti speciale\n\
+\\xHH\tCarattere con codice esadecimale HH\n\
+?\tDa 0 o 1 Corrispondenze\n*\t0 o più Corrispondenze\n\
++\tUna o più corrispondenze\n\
+*? o +?\tCorrispondenza non avida di quantificatori ""?"" e ""+""\n\
+(\tInizio di una regione\n\
+)\tFine di una regione\n\
+\\n\tRefers to a region when replacing (n è 1-9)\n\n\
+Sintassi sperimentale:\n\
+\\h\tInizio di una parola, secondo IsWordStartAt()\n\
+\\H\tFine di una parola, secondo IsWordEndAt()\n\
+\\i\tCorrisponde a 1 o più caratteri alla fine di una parola\n\
+\\i?\tCorrisponde a 0 o più caratteri alla fine di una parola"
 
-	IDS_WILDCARDHELP		"Wildcard Search\n\n\
-*\tMatches zero or more characters.\n\
-?\tMatches exactly one character. "
+	IDS_WILDCARDHELP		"Ricerca con caratteri jolly\n\n\
+*\tCorrisponde a zero o più caratteri.\n\
+?\tCorrisponde esattamente a un carattere. "
 END
 
 STRINGTABLE
 BEGIN
-    IDS_FILTER_INI          "Configuration Files (*.ini)|*.ini|All Files (*.*)|*.*|"
-    IDS_OPENWITH            "Select the directory with links to your favorite applications."
-    IDS_FAVORITES           "Select the directory with links to your favorite files."
+    IDS_FILTER_INI          "File di configurazione (*.ini)|*.ini|All Files (*.*)|*.*|"
+    IDS_OPENWITH            "Seleziona la directory con i link ai tue applicazioni preferiti."
+    IDS_FAVORITES           "Seleziona la directory con i link ai tuoi files preferiti."
 END
 
 STRINGTABLE
 BEGIN
-    IDT_FILE_NEW            "New"
-    IDT_FILE_OPEN           "Open"
-    IDT_FILE_BROWSE         "Browse"
-    IDT_FILE_SAVE           "Save"
+    IDT_FILE_NEW            "Nuovo"
+    IDT_FILE_OPEN           "Apri"
+    IDT_FILE_BROWSE         "Naviga"
+    IDT_FILE_SAVE           "Salva"
     IDT_EDIT_UNDO           "Undo"
     IDT_EDIT_REDO           "Redo"
-    IDT_EDIT_CUT            "Cut"
-    IDT_EDIT_COPY           "Copy"
-    IDT_EDIT_PASTE          "Paste"
-    IDT_EDIT_FIND           "Find"
-    IDT_EDIT_REPLACE        "Replace"
-    IDT_VIEW_WORDWRAP       "Word Wrap"
-    IDT_VIEW_ZOOMIN         "Zoom In"
-    IDT_VIEW_ZOOMOUT        "Zoom Out"
-    IDT_VIEW_SCHEME         "Select Scheme"
-    IDT_VIEW_SCHEMECONFIG   "Customize Schemes"
-    IDT_FILE_EXIT           "Exit"
-    IDT_FILE_SAVEAS         "Save As"
-    IDT_FILE_SAVECOPY       "Save Copy"
-    IDT_EDIT_DELETE         "Delete"
-    IDT_FILE_PRINT          "Print"
-    IDT_FILE_OPENFAV        "Favorites"
-    IDT_FILE_ADDTOFAV       "Add to Favorites"
-    IDT_VIEW_TOGGLEFOLDS    "Toggle Folds"
-    IDT_FILE_LAUNCH         "Execute Document"
-    IDT_VIEW_ALWAYSONTOP    "Always On Top"
+    IDT_EDIT_CUT            "Taglia"
+    IDT_EDIT_COPY           "Copia"
+    IDT_EDIT_PASTE          "Incolla"
+    IDT_EDIT_FIND           "Trova"
+    IDT_EDIT_REPLACE        "Sostituisci"
+    IDT_VIEW_WORDWRAP       "Testo a capo"
+    IDT_VIEW_ZOOMIN         "Aumenta Zoom"
+    IDT_VIEW_ZOOMOUT        "Riduci Zoom"
+    IDT_VIEW_SCHEME         "Seleziona schema"
+    IDT_VIEW_SCHEMECONFIG   "Personalizza Schema"
+    IDT_FILE_EXIT           "Esci"
+    IDT_FILE_SAVEAS         "Salva come"
+    IDT_FILE_SAVECOPY       "Salva Copia"
+    IDT_EDIT_DELETE         "Elimina"
+    IDT_FILE_PRINT          "Stampa"
+    IDT_FILE_OPENFAV        "Preferiti"
+    IDT_FILE_ADDTOFAV       "Aggiungi ai preferiti"
+    IDT_VIEW_TOGGLEFOLDS    "Chiudi Folds"
+    IDT_FILE_LAUNCH         "Esegui documento"
+    IDT_VIEW_ALWAYSONTOP    "Sempre in cima"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_LOADFILE        "Error loading ""%s""."
-    IDS_ERR_SAVEFILE        "Error saving ""%s""."
-    IDS_ERR_BROWSE          "No file browser plugin was found.\nThe metapath file browser plugin can be downloaded from\nhttps://github.com/zufuliu/notepad2/releases.\n\nOpen download page?"
-    IDS_ERR_MRUDLG          "No access to the selected file!\nWould you like to remove it from the list?"
-    IDS_ERR_CREATELINK      "Error creating the Desktop link."
-    IDS_ERR_PREVWINDISABLED "Existing Notepad2 window is busy or has an active dialog box.\nWould you like to open another Notepad2 window?"
-    IDS_SELRECT             "This operation can't be perfomed within a rectangular selection."
-    IDS_BUFFERTOOSMALL      "This operation can't be performed (lines too long)."
-    IDS_FIND_WRAPFW         "Reached the end of the document, restarting search at the beginning."
-    IDS_FIND_WRAPRE         "Reached the beginning of the document, restarting search at the end."
-    IDS_NOTFOUND            "The specified text was not found."
-    IDS_REPLCOUNT           "%s occurrences of the specified text have been replaced."
-    IDS_ASK_ENCODING        "Switching the file encoding from ANSI to non-ANSI (and vice versa) may replace unsupported text with default characters, and the undo history will be cleared. Continue?"
-    IDS_ASK_ENCODING2       "You are about to change the encoding of an empty file from ANSI to non-ANSI. Note that this will clear the undo history, as it can't be synchronized with the new encoding. Continue?"
-    IDS_ERR_ENCODINGNA      "Code page conversion tables for the selected encoding are not available on your system."
-    IDS_ERR_UNICODE         "Error converting this Unicode file.\nData will be lost if the file is saved!"
-    IDS_BINARY_FILE_OPENED  "This is most likely not a text file, so it is opened in read only mode\nto prevent accidental editing cause file corruption."
+    IDS_ERR_LOADFILE        "Errore nel caricamento ""%s""."
+    IDS_ERR_SAVEFILE        "Errore nel salvataggio ""%s""."
+    IDS_ERR_BROWSE          "Non è stato trovato alcun plug-in del browser file.\nIl plug-in metapath può essere scaricato da\nhttps://github.com/zufuliu/notepad2/releases.\n\nApri pagina di download?"
+    IDS_ERR_MRUDLG          "Nessun accesso al file selezionato!\nVuoi rimuoverlo dall'elenco?"
+    IDS_ERR_CREATELINK      "Errore durante la creazione del collegamento desktop."
+    IDS_ERR_PREVWINDISABLED "La finestra di Notepad2 esistente è occupata o ha una finestra di dialogo attiva.\nVuoi aprire un'altra finestra di Notepad2?"
+    IDS_SELRECT             "Questa operazione non può essere eseguita all'interno di una selezione rettangolare."
+    IDS_BUFFERTOOSMALL      "Questa operazione non può essere eseguita (linee troppo lunghe)."
+    IDS_FIND_WRAPFW         "Raggiunta la fine del documento, riavvio la ricerca dall'inizio."
+    IDS_FIND_WRAPRE         "Raggiunto l'inizio del documento, riavvio la ricerca dalla fine."
+    IDS_NOTFOUND            "Il testo specificato non è stato trovato."
+    IDS_REPLCOUNT           "%s occorrenze del testo specificato sono state sostituite."
+    IDS_ASK_ENCODING        "Il passaggio della codifica del file da ANSI a non ANSI (e viceversa) potrebbe sostituire il testo non supportato con caratteri predefiniti e la cronologia degli annullamenti verrà cancellata. Continuare?"
+    IDS_ASK_ENCODING2       "Stai per modificare la codifica di un file vuoto da ANSI a non ANSI. Nota che questo cancellerà la cronologia degli annullamenti, poiché non può essere sincronizzata con la nuova codifica. Continuare?"
+    IDS_ERR_ENCODINGNA      "Le tabelle di conversione delle pagine di codice per la codifica selezionata non sono disponibili sul sistema."
+    IDS_ERR_UNICODE         "Errore nella conversione di questo file Unicode.\nI dati andranno persi se il file viene salvato!"
+    IDS_BINARY_FILE_OPENED  "Molto probabilmente non si tratta di un file di testo, quindi viene aperto in modalità di sola lettura\nper evitare che una modifica accidentale provochi la corruzione del file."
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-    IDS_CHANGE_LANG_RESTART "Changing the UI language requires a restart of Notepad2, restart now?"
+    IDS_CHANGE_LANG_RESTART "La modifica della lingua dell'interfaccia utente richiede il riavvio di Notepad2, riavviare ora?"
 #endif
 END
 
 STRINGTABLE
 BEGIN
-	IDS_CMDLINEHELP			"Command Line Help\n\n\
-file\tMust be the last argument, no quoted spaces by default.\n\
-+\tAccept multiple file arguments (with quoted spaces).\n\
--\tAccept single file argument (without quoted spaces).\n\
+	IDS_CMDLINEHELP			"Aiuto riga di comando\n\n\
+file\tDeve essere l'ultimo argomento, senza spazi quotati per impostazione predefinita.\n\
++\tAccetta argomenti di file multipli (con spazi quotati).\n\
+-\tAccetta argomenti per un singolo file (senza spazi quotati).\n\
 …\tEncoding (/ansi, /unicode, /unicodele, /unicodebe,\n\
 …\t/utf8, /utf8sig, /utf8bom, /utf16, /utf16le, /utf16be).\n\
-…\tLine ending mode (/crlf, /lf, /cr).\n\
-/e encoding\tFile source encoding.\n\
-/g line[,column]\tJump to specified position (/g -1 end of file).\n\
-/m text\tMatch specified text (/m- last, /mr regex, /mb backslash).\n\
-/l[o|p]\tAuto-reload modified files.\n\
-/q\tForce creation of new files without prompt.\n\
-/ro\tOpen file in read only mode.\n\
-/s name\tSelect specified syntax scheme.\n\
-/d\tSelect Text File scheme.\n\
-/h\tSelect Web Source Code scheme.\n\
-/x\tSelect XML Document scheme.\n\
-/c\tOpen new window and paste clipboard contents.\n\
-/b\tOpen new paste board to collect clipboard entries.\n\
-/n\tAlways open a new window (/ns single file instance).\n\
-/r\tReuse window (/rs single file instance).\n\
-/p\tSet window position and size (/p0, /ps, /pf,l,t,r,b,m).\n\
-/t title\tSet window title.\n\
-/i\tStart as tray icon.\n\
-/o\tKeep window on top.\n\
-/f path\tSpecify ini-file (/f0 no ini-file).\n\
-/u\tLaunch with elevated privileges (run as Administrator).\n\
-/z\tSkip next (usable for registry-based Notepad replacement)."
+…\tmodalità di terminazione della riga (/crlf, /lf, /cr).\n\
+/e codifica\tCodifica file sorgente.\n\
+/g riga[,colonna]\tSalta alla posizione specificata (/g -1 fine del file).\n\
+/m Testo\tTrova il testo specificato (/m- last, /mr regex, /mb backslash).\n\
+/l[o|p]\tCarica automaticamente i file modificati.\n\
+/q\tForza la creazione di nuovi file senza richieste.\n\
+/ro\tAprire un file in modalità di sola lettura.\n\
+/s Nome\tSeleziona lo schema sintattico specificato.\n\
+/d\tSeleziona schema File di testo.\n\
+/h\tSeleziona schema Codice sorgente Web.\n\
+/x\tSeleziona schema Documento XML.\n\
+/c\tAprire una nuova finestra e incollare il contenuto degli appunti.\n\
+/b\tAprire un nuovo pannello di incollaggio per raccogliere le voci degli appunti.\n\
+/n\tAprire sempre una nuova finestra (/ns istanza di un singolo file).\n\
+/r\tRiutilizza la finestra (/rs istanza di file singolo).\n\
+/p\tImposta la posizione e la dimensione della finestra (/p0, /ps, /pf,l,t,r,b,m).\n\
+/t title\tImposta il titolo della finestra..\n\
+/i\tAvvia come icona della barra delle applicazioni.\n\
+/o\tMantiene la finestra sempre in cima.\n\
+/f Percorso\tSpecifica il file ini (/f0 no ini-file).\n\
+/u\tAvvia con privilegi elevati (esegui come amministratore).\n\
+/z\tSalta successivo (utilizzabile per la sostituzione di Notepad basata sul registro)."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_UNICODE2        "Certain characters in the current text are not supported by the selected encoding, and may be replaced by default placeholders when saving. It's recommended to choose another file encoding. Continue?"
-    IDS_WARNLOADBIGFILE     "Loading file: %s\n\nThis file is too large (%s, %s bytes) to open.\nCurrently maximum loadable file size is %s (%s bytes)."
+    IDS_ERR_UNICODE2        "Alcuni caratteri del testo corrente non sono supportati dalla codifica selezionata e potrebbero essere sostituiti da segnaposto predefiniti durante il salvataggio. Si consiglia di scegliere un'altra codifica di file. Continuare?"
+    IDS_WARNLOADBIGFILE     "Caricamento del file: %s\n\nIl file è troppo grande (%s, %s bytes) per essere aperto.\nAttualmente la dimensione massima del file caricabile è %s (%s bytes)."
     //IDS_ERR_DROP            "Only one file can be dropped at the same time!"
-    IDS_ASK_SAVE            "Save changes to ""%s""?"
-    IDS_ASK_REVERT          "Revert file to last saved state? Your changes will be lost!"
-    IDS_ASK_RECODE          "Recoding requires reloading file from disk, unsaved changes will be lost!"
-    IDS_ASK_CREATE          """%s"" not found.\nWould you like to create this file?"
-    IDS_PRINT_HEADER        "Filename, Current Date and Time|Filename, Current Date|Filename|Leave blank"
-    IDS_PRINT_FOOTER        "Page Number|Leave blank"
-    IDS_PRINT_COLOR         "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)|Current screen color (WYSIWYG)"
-    IDS_PRINT_PAGENUM       "Page %s"
-    IDS_PRINT_ERROR         "Error printing ""%s""!"
-    IDS_FAV_SUCCESS         "A shortcut to the current file has been created in the favorites directory."
-    IDS_FAV_FAILURE         "The shortcut to the current file could not be created.\nMake sure there's no other file with the same name."
-    IDS_READONLY_MODIFY     "The attributes of ""%s"" could not be modified."
+    IDS_ASK_SAVE            "Salvare le modifiche a ""%s""?"
+    IDS_ASK_REVERT          "Riportare il file all'ultimo stato salvato? Le modifiche andranno perse!"
+    IDS_ASK_RECODE          "La ricodifica richiede di ricaricare il file dal disco; le modifiche non salvate andranno perse!"
+    IDS_ASK_CREATE          """%s"" non trovato.\nVolete creare questo file?"
+    IDS_PRINT_HEADER        "Nome file, Data e ora corrente|Nome file, Data corrente|Nome file|Lasciare vuoto"
+    IDS_PRINT_FOOTER        "Numero Pagina|Lasciare in bianco"
+    IDS_PRINT_COLOR         "Normale|Invertire la luce (sfondo scuro)|Nero su bianco|Colore su bianco|Colore su bianco (eccetto i numeri di riga)|Colore attuale dello schermo (WYSIWYG)"
+    IDS_PRINT_PAGENUM       "Pagina %s"
+    IDS_PRINT_ERROR         "Errore di stampa ""%s""!"
+    IDS_FAV_SUCCESS         "È stato creato un collegamento al file corrente nella directory dei preferiti."
+    IDS_FAV_FAILURE         "Non è stato possibile creare il collegamento al file corrente.\nAssicurarsi che non vi siano altri file con lo stesso nome."
+    IDS_READONLY_MODIFY     "Gli attributi di ""%s"" non possono essere modificati."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_READONLY_SAVE       """%s"" is read only. Save to a different file?"
-    IDS_FILECHANGENOTIFY    "The current file has been modified by an external program. Reload?"
-    IDS_FILECHANGENOTIFY2   "The current file has been deleted. Save now?"
-    IDS_SAVEDSETTINGS       "The current program settings have been saved."
-    IDS_CREATEINI_FAIL      "Error creating configuration file."
-    IDS_WRITEINI_FAIL       "Error writing settings to configuration file."
-    IDS_SETTINGSNOTSAVED    "No existing configuration file was found.\nTo keep your style modifications, save settings now (F7) or go back to scheme configuration (Ctrl+F12) and export your styles."
-    IDS_EXPORT_FAIL         "Error exporting style settings to ""%s""."
+    IDS_READONLY_SAVE       """%s"" è di sola lettura. Salvare in un altro file?"
+    IDS_FILECHANGENOTIFY    "Il file corrente è stato modificato da un programma esterno. Ricaricare?"
+    IDS_FILECHANGENOTIFY2   "Il file corrente è stato cancellato. Salvare ora?"
+    IDS_SAVEDSETTINGS       "Le impostazioni correnti del programma sono state salvate."
+    IDS_CREATEINI_FAIL      "Errore nella creazione del file di configurazione."
+    IDS_WRITEINI_FAIL       "Errore nella scrittura delle impostazioni nel file di configurazione."
+    IDS_SETTINGSNOTSAVED    "Non è stato trovato alcun file di configurazione esistente.\nPer mantenere le modifiche allo stile, salvare subito le impostazioni (F7) o tornare alla configurazione dello schema (Ctrl+F12) ed esportare gli stili."
+    IDS_EXPORT_FAIL         "Errore nell'esportazione delle impostazioni di stile in ""%s""."
 END
 
 STRINGTABLE
@@ -2049,108 +2049,108 @@ BEGIN
 	IDS_ENCODING_UTF8				"UTF-8;UTF-8"
 	IDS_ENCODING_UTF8BOM			"UTF-8 with BOM;UTF-8 BOM"
 	IDS_ENCODING_UTF7				"UTF-7;UTF-7"
-	IDS_ENCODING_DOS720				"Transparent ASMO (DOS-720);DOS-720"					// Arabic
-	IDS_ENCODING_ISO8859_6			"ISO 8859-6 (Visual Order);ISO 8859-6"					// Arabic
-	IDS_ENCODING_ISO8859_6I			"ISO 8859-6-I (Logical Order);ISO 8859-6-I"				// Arabic
+	IDS_ENCODING_DOS720				"Trasparente ASMO (DOS-720);DOS-720"					// Arabic
+	IDS_ENCODING_ISO8859_6			"ISO 8859-6 (Ordine visivo);ISO 8859-6"					// Arabic
+	IDS_ENCODING_ISO8859_6I			"ISO 8859-6-I (Ordine logico);ISO 8859-6-I"				// Arabic
 	IDS_ENCODING_WINDOWS1256		"Windows-1256;Windows-1256"								// Arabic
-	IDS_ENCODING_DOS775				"OEM Baltic (DOS-775);DOS-775"							// Baltic Northern European
-	IDS_ENCODING_ISO8859_4			"Baltic (Latin-4, ISO 8859-4);ISO 8859-4"				// Baltic Northern European
-	IDS_ENCODING_WINDOWS1257		"ANSI Baltic (Windows-1257);Windows-1257"				// Baltic Northern European
-	IDS_ENCODING_DOS852				"OEM Latin-2 (DOS-852);DOS-852"							// Central European
-	IDS_ENCODING_ISO8859_2			"Latin-2 (ISO 8859-2);ISO 8859-2"						// Central European
-	IDS_ENCODING_MAC_LATIN2			"Mac Latin-2;Mac Latin-2"								// Central European
-	IDS_ENCODING_WINDOWS1250		"Latin-2 (Windows-1250);Windows-1250"					// Central European
-	IDS_ENCODING_GBK				"Simplified Chinese (GBK, GB2312);GBK"					// Chinese
-	IDS_ENCODING_GB18030			"Simplified Chinese (GB18030);GB18030"					// Chinese
-	IDS_ENCODING_BIG5				"Traditional Chinese (Big5, Big5-HKSCS);Big5"			// Chinese
-	IDS_ENCODING_MAC_CROATIAN		"Mac Croatian;Mac Croatian"								// Southeast European
-	IDS_ENCODING_DOS866				"OEM Russian (DOS-866);DOS-866"							// Cyrillic
+	IDS_ENCODING_DOS775				"OEM Baltico (DOS-775);DOS-775"							// Baltic Northern European
+	IDS_ENCODING_ISO8859_4			"Baltico (Latin-4, ISO 8859-4);ISO 8859-4"				// Baltic Northern European
+	IDS_ENCODING_WINDOWS1257		"ANSI Baltico (Windows-1257);Windows-1257"				// Baltic Northern European
+	IDS_ENCODING_DOS852				"OEM Latino-2 (DOS-852);DOS-852"							// Central European
+	IDS_ENCODING_ISO8859_2			"Latino-2 (ISO 8859-2);ISO 8859-2"						// Central European
+	IDS_ENCODING_MAC_LATIN2			"Mac Latino-2;Mac Latino-2"								// Central European
+	IDS_ENCODING_WINDOWS1250		"Latino-2 (Windows-1250);Windows-1250"					// Central European
+	IDS_ENCODING_GBK				"Cinese Semplificato (GBK, GB2312);GBK"					// Chinese
+	IDS_ENCODING_GB18030			"Cinese Semplificato (GB18030);GB18030"					// Chinese
+	IDS_ENCODING_BIG5				"Cinese Tradizionale (Big5, Big5-HKSCS);Big5"			// Chinese
+	IDS_ENCODING_MAC_CROATIAN		"Mac Croato;Mac Croato"								// Southeast European
+	IDS_ENCODING_DOS866				"OEM Russo (DOS-866);DOS-866"							// Cyrillic
 	IDS_ENCODING_ISO8859_5			"ISO 8859-5;ISO 8859-5"									// Cyrillic
-	IDS_ENCODING_KOI8_R				"Russian (KOI8-R);KOI8-R"								// Cyrillic
-	IDS_ENCODING_KOI8_U				"Ukrainian (KOI8-U);KOI8-U"								// Cyrillic
-	IDS_ENCODING_MAC_CYRILLIC		"Mac Cyrillic;Mac Cyrillic"								// Cyrillic
+	IDS_ENCODING_KOI8_R				"Russo (KOI8-R);KOI8-R"								// Cyrillic
+	IDS_ENCODING_KOI8_U				"Ucraino (KOI8-U);KOI8-U"								// Cyrillic
+	IDS_ENCODING_MAC_CYRILLIC		"Mac Cirillico;Mac Cyrillic"								// Cyrillic
 	IDS_ENCODING_WINDOWS1251		"Windows-1251;Windows-1251"								// Cyrillic
-	IDS_ENCODING_ISO8859_13			"Estonian (Baltic Rim, Latin-7, ISO 8859-13);ISO 8859-13"// Northern European
-	IDS_ENCODING_DOS863				"OEM French Canadian (DOS-863);DOS-863"					// Western European
-	IDS_ENCODING_DOS737				"OEM Greek (DOS-737);DOS-737"							// Greek
+	IDS_ENCODING_ISO8859_13			"Estone (Baltico Rim, Latin-7, ISO 8859-13);ISO 8859-13"// Northern European
+	IDS_ENCODING_DOS863				"OEM Francese canadese (DOS-863);DOS-863"					// Western European
+	IDS_ENCODING_DOS737				"OEM Greco (DOS-737);DOS-737"							// Greek
 	IDS_ENCODING_ISO8859_7			"ISO 8859-7;ISO 8859-7"									// Greek
-	IDS_ENCODING_MAC_GREEK			"Mac Greek;Mac Greek"									// Greek
+	IDS_ENCODING_MAC_GREEK			"Mac Greco;Mac Greco"									// Greek
 	IDS_ENCODING_WINDOWS1253		"Windows-1253;Windows-1253"								// Greek
-	IDS_ENCODING_DOS869				"OEM Modern Greek (DOS-869);DOS-869"					// Greek
-	IDS_ENCODING_DOS862				"OEM Hebrew (DOS-862);DOS-862"							// Hebrew
-	IDS_ENCODING_ISO8859_8I			"ISO 8859-8-I (Logical Order);ISO 8859-8-I"				// Hebrew
-	IDS_ENCODING_ISO8859_8			"ISO 8859-8 (Visual Order);ISO 8859-8"					// Hebrew
-	IDS_ENCODING_MAC_HEBREW			"Mac Hebrew;Mac Hebrew"									// Hebrew
+	IDS_ENCODING_DOS869				"OEM Greco Moderno (DOS-869);DOS-869"					// Greek
+	IDS_ENCODING_DOS862				"OEM Ebreo (DOS-862);DOS-862"							// Hebrew
+	IDS_ENCODING_ISO8859_8I			"ISO 8859-8-I (Ordine logico);ISO 8859-8-I"				// Hebrew
+	IDS_ENCODING_ISO8859_8			"ISO 8859-8 (Ordine visivo);ISO 8859-8"					// Hebrew
+	IDS_ENCODING_MAC_HEBREW			"Mac Ebraico;Mac Ebraico"									// Hebrew
 	IDS_ENCODING_WINDOWS1255		"Windows-1255;Windows-1255"								// Hebrew
-	IDS_ENCODING_DOS861				"OEM Icelandic (DOS-861);DOS-861"						// Northern European
-	IDS_ENCODING_MAC_ICELANDIC		"Mac Icelandic;Mac Icelandic"							// Northern European
+	IDS_ENCODING_DOS861				"OEM Islandese (DOS-861);DOS-861"						// Northern European
+	IDS_ENCODING_MAC_ICELANDIC		"Mac Islandese;Mac Islandese"							// Northern European
 	IDS_ENCODING_ISO2022_JP			"ISO 2022 (no halfwidth Katakana);ISO-2022-JP"			// Japanese
 	IDS_ENCODING_SHIFT_JIS			"Shift-JIS;Shift-JIS"									// Japanese
 	IDS_ENCODING_JOHAB				"Johab;Johab"											// Korean
-	IDS_ENCODING_UHC				"Unified Hangul Code;UHC"								// Korean
-	IDS_ENCODING_ISO8859_3			"Southern European (Latin-3, ISO 8859-3);ISO 8859-3"	// Southern European
-	IDS_ENCODING_ISO8859_15			"Latin-9 (ISO 8859-15);ISO 8859-15"						// Western European
-	IDS_ENCODING_ISO8859_10			"Nordic (Latin-6, ISO 8859-10);ISO 8859-10"				// Northern European
-	IDS_ENCODING_EUC_JP				"EUC Japanese;EUC-JP"									// Japanese
-	IDS_ENCODING_EUC_KR				"EUC Korean;EUC-KR"										// Korean
-	IDS_ENCODING_ISO8859_16			"South-Eastern European (Latin-10, ISO 8859-16);ISO 8859-16"// South-Eastern European
-	IDS_ENCODING_ISO8859_14			"Celtic (Latin-8, ISO 8859-14);ISO 8859-14"				// Western European
+	IDS_ENCODING_UHC				"Codice Hangul Unificato;UHC"								// Korean
+	IDS_ENCODING_ISO8859_3			"Europa meridionale (Latin-3, ISO 8859-3);ISO 8859-3"	// Southern European
+	IDS_ENCODING_ISO8859_15			"Latino-9 (ISO 8859-15);ISO 8859-15"						// Western European
+	IDS_ENCODING_ISO8859_10			"Nordico (Latin-6, ISO 8859-10);ISO 8859-10"				// Northern European
+	IDS_ENCODING_EUC_JP				"EUC Giapponese;EUC-JP"									// Japanese
+	IDS_ENCODING_EUC_KR				"EUC Coreano;EUC-KR"										// Korean
+	IDS_ENCODING_ISO8859_16			"Europa sudorientale (Latin-10, ISO 8859-16);ISO 8859-16"// South-Eastern European
+	IDS_ENCODING_ISO8859_14			"Celtico (Latin-8, ISO 8859-14);ISO 8859-14"				// Western European
 	IDS_ENCODING_MAC_THAI			"Mac Thai;Mac Thai"										// Southeast Asia
 	IDS_ENCODING_TIS620				"Thai (TIS-620, Windows-874, ISO 8859-11);TIS-620"		// Southeast Asia
-	IDS_ENCODING_DOS857				"OEM Turkish (DOS-857);DOS-857"							// Turkish
-	IDS_ENCODING_ISO8859_9			"Latin-5 (ISO 8859-9);ISO 8859-9"						// Turkish
-	IDS_ENCODING_MAC_TURKISH		"Mac Turkish;Mac Turkish"								// Turkish
+	IDS_ENCODING_DOS857				"OEM Turco (DOS-857);DOS-857"							// Turkish
+	IDS_ENCODING_ISO8859_9			"Latino-5 (ISO 8859-9);ISO 8859-9"						// Turkish
+	IDS_ENCODING_MAC_TURKISH		"Mac Turco;Mac Turco"								// Turkish
 	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"								// Turkish
-	IDS_ENCODING_MAC_UKRAINIAN		"Mac Ukrainian;Mac Ukrainian"							// Cyrillic
-	IDS_ENCODING_WINDOWS1258		"Vietnamese (Windows-1258);Windows-1258"				// Southeast Asia
-	IDS_ENCODING_DOS850				"OEM Latin-1 (DOS-850);DOS-850"							// Western European
-	IDS_ENCODING_ISO8859_1			"Latin-1 (ISO 8859-1);ISO 8859-1"						// Western European
-	IDS_ENCODING_MAC_ROMAN			"Mac Roman;Mac Roman"									// Western European
-	IDS_ENCODING_WINDOWS1252		"Latin-1 (Windows-1252);Windows-1252"					// Western European
+	IDS_ENCODING_MAC_UKRAINIAN		"Mac Ucraino; Mac Ucraino"							// Cyrillic
+	IDS_ENCODING_WINDOWS1258		"Vietnamita (Windows-1258);Windows-1258"				// Southeast Asia
+	IDS_ENCODING_DOS850				"OEM Latino-1 (DOS-850);DOS-850"							// Western European
+	IDS_ENCODING_ISO8859_1			"Latino-1 (ISO 8859-1);ISO 8859-1"						// Western European
+	IDS_ENCODING_MAC_ROMAN			"Mac Romano;Mac Romano"									// Western European
+	IDS_ENCODING_WINDOWS1252		"Latino-1 (Windows-1252);Windows-1252"					// Western European
 	IDS_ENCODING_IBM037				"US-Canada (IBM037);EBCDIC (US-Canada)"					// EBCDIC
 	IDS_ENCODING_IBM1140			"US-Canada + Euro Symbol (IBM1140);EBCDIC (US-Canada Euro)"// EBCDIC
-	IDS_ENCODING_IBM500				"International (IBM500);EBCDIC (Intl.)"					// EBCDIC
-	IDS_ENCODING_IBM870				"Latin-2 (IBM870);EBCDIC (Latin-2)"						// EBCDIC
-	IDS_ENCODING_CP875				"Greek Modern (CP875);EBCDIC (Greek)"					// EBCDIC
-	IDS_ENCODING_IBM1026			"Turkish (Latin-5) (IBM1026);EBCDIC (Latin-5)"			// EBCDIC
-	IDS_ENCODING_DOS437				"OEM United States (DOS-437);DOS-437"					// Western European
-	IDS_ENCODING_DOS858				"OEM Latin-1 + Euro Symbol (DOS-858);DOS-858"			// Western European
-	IDS_ENCODING_DOS860				"OEM Portuguese (DOS-860);DOS-860"						// Western European
-	IDS_ENCODING_MAC_ARABIC			"Mac Arabic;Mac Arabic"									// Arabic
-	IDS_ENCODING_DOS864				"OEM Arabic (DOS-864);OEM Arabic"						// Arabic
-	IDS_ENCODING_MAC_ROMANIAN		"Mac Romanian;Mac Romanian"								// South European
-	IDS_ENCODING_DOS865				"OEM Nordic (DOS-865);DOS-865"							// Northern European
-	IDS_ENCODING_IBM855				"OEM Cyrillic (primarily Russian) (IBM855);OEM Cyrillic"// Cyrillic
-	IDS_ENCODING_MAC_JAPANESE		"Mac Japanese;Mac Japanese"								// Japanese
+	IDS_ENCODING_IBM500				"Internazionale (IBM500);EBCDIC (Intl.)"					// EBCDIC
+	IDS_ENCODING_IBM870				"Latino-2 (IBM870);EBCDIC (Latino-2)"						// EBCDIC
+	IDS_ENCODING_CP875				"Greco Moderno (CP875);EBCDIC (Greco)"					// EBCDIC
+	IDS_ENCODING_IBM1026			"Turco (Latino-5) (IBM1026);EBCDIC (Latino-5)"			// EBCDIC
+	IDS_ENCODING_DOS437				"OEM Stati Uniti (DOS-437);DOS-437"					// Western European
+	IDS_ENCODING_DOS858				"OEM Latino-1 + Euro Simboli (DOS-858);DOS-858"			// Western European
+	IDS_ENCODING_DOS860				"OEM Portoghese (DOS-860);DOS-860"						// Western European
+	IDS_ENCODING_MAC_ARABIC			"Mac Arabo;Mac Arabo"									// Arabic
+	IDS_ENCODING_DOS864				"OEM Arabo (DOS-864);OEM Arabo"						// Arabic
+	IDS_ENCODING_MAC_ROMANIAN		"Mac Rumeno;Mac Rumeno"								// South European
+	IDS_ENCODING_DOS865				"OEM Nordico (DOS-865);DOS-865"							// Northern European
+	IDS_ENCODING_IBM855				"OEM Cirillico (principalmente russo) (IBM855);OEM Cyrillic"// Cyrillic
+	IDS_ENCODING_MAC_JAPANESE		"Mac Giapponese;Mac Giapponese"								// Japanese
 	IDS_ENCODING_CS_ISO2022_JP		"ISO 2022 (allow 1 byte Kana);CS ISO-2022-JP"			// Japanese
 	IDS_ENCODING_ISO2022_JP_SOSI	"ISO 2022 (allow 1 byte Kana - SO/SI);ISO-2022-JP SO/SI"// Japanese
-	IDS_ENCODING_MAC_KOREAN			"Mac Korean;Mac Korean"									// Korean
-	IDS_ENCODING_ISO2022_KR			"ISO 2022 Korean;ISO-2022-KR"							// Korean
-	IDS_ENCODING_MAC_GB2312			"Simplified Chinese (Mac);Mac GB-2312"					// Chinese
-	IDS_ENCODING_HZ_GB2312			"Simplified Chinese (HZ-GB2312);HZ-GB2312"				// Chinese
-	IDS_ENCODING_ISO2022_CNS		"Simplified Chinese (ISO 2022);ISO-2022-CN(S)"			// Chinese
-	IDS_ENCODING_MAC_BIG5			"Traditional Chinese (Mac);Mac Big5"					// Chinese
-	IDS_ENCODING_ISO2022_CNT		"Traditional Chinese (ISO 2022);ISO-2022-CN(T)"			// Chinese
-	IDS_ENCODING_CNS				"Traditional Chinese (CNS);CNS"							// Chinese
+	IDS_ENCODING_MAC_KOREAN			"Mac Coreano;Mac Coreano"									// Korean
+	IDS_ENCODING_ISO2022_KR			"ISO 2022 Coreano;ISO-2022-KR"							// Korean
+	IDS_ENCODING_MAC_GB2312			"Cinese Semplificato (Mac);Mac GB-2312"					// Chinese
+	IDS_ENCODING_HZ_GB2312			"Cinese Semplificato (HZ-GB2312);HZ-GB2312"				// Chinese
+	IDS_ENCODING_ISO2022_CNS		"Cinese Semplificato (ISO 2022);ISO-2022-CN(S)"			// Chinese
+	IDS_ENCODING_MAC_BIG5			"Cinese Tradizionale (Mac);Mac Big5"					// Chinese
+	IDS_ENCODING_ISO2022_CNT		"Cinese Tradizionale (ISO 2022);ISO-2022-CN(T)"			// Chinese
+	IDS_ENCODING_CNS				"Cinese Tradizionale (CNS);CNS"							// Chinese
 
-	IDS_SELRECT_CURRENT_ENCODING	"Select current file &encoding:"
-	IDS_SELRECT_RELOAD_ENCODING		"Select source &encoding to reload file:"
-	IDS_SELRECT_DEFAULT_ENCODING	"Select default &encoding for new file:"
+	IDS_SELRECT_CURRENT_ENCODING	"Selezionare la codifica del file corrente:"
+	IDS_SELRECT_RELOAD_ENCODING		"Selezionare la codifica di origine per ricaricare il file:"
+	IDS_SELRECT_DEFAULT_ENCODING	"Selezionare la codifica predefinita per il nuovo file:"
 
 	IDS_ENCODINGGROUP_UNICODE		"Unicode"
-	IDS_ENCODINGGROUP_WESTERNEURO	"Western European"
-	IDS_ENCODINGGROUP_ARABIC		"Arabic"
-	IDS_ENCODINGGROUP_NORTHERNEURO	"Baltic and Northern European"
-	IDS_ENCODINGGROUP_CENTRALEURO	"Central and Eastern European"
-	IDS_ENCODINGGROUP_CHINESE		"Chinese"
-	IDS_ENCODINGGROUP_CYRILLIC		"Cyrillic"
-	IDS_ENCODINGGROUP_GREEK			"Greek"
-	IDS_ENCODINGGROUP_HEBREW		"Hebrew"
-	IDS_ENCODINGGROUP_JAPANESE		"Japanese"
-	IDS_ENCODINGGROUP_KOREAN		"Korean"
-	IDS_ENCODINGGROUP_SOUTHEURO		"South European"
-	IDS_ENCODINGGROUP_SOUTHASIA		"Southeast Asia"
-	IDS_ENCODINGGROUP_TURKISH		"Turkish"
+	IDS_ENCODINGGROUP_WESTERNEURO	"Europa occidentale"
+	IDS_ENCODINGGROUP_ARABIC		"Arabo"
+	IDS_ENCODINGGROUP_NORTHERNEURO	"Baltico e Nord Europa"
+	IDS_ENCODINGGROUP_CENTRALEURO	"Europa centrale e orientale"
+	IDS_ENCODINGGROUP_CHINESE		"Cinese"
+	IDS_ENCODINGGROUP_CYRILLIC		"Cirillico"
+	IDS_ENCODINGGROUP_GREEK			"Greco"
+	IDS_ENCODINGGROUP_HEBREW		"Ebraico"
+	IDS_ENCODINGGROUP_JAPANESE		"Giapponese"
+	IDS_ENCODINGGROUP_KOREAN		"Coreano"
+	IDS_ENCODINGGROUP_SOUTHEURO		"Sud Europa"
+	IDS_ENCODINGGROUP_SOUTHASIA		"Sud-est asiatico"
+	IDS_ENCODINGGROUP_TURKISH		"Turco"
 	IDS_ENCODINGGROUP_EBCDIC		"IBM EBCDIC"
 END
 
@@ -2158,21 +2158,21 @@ STRINGTABLE
 BEGIN
 	IDS_EOLMODENAME_CRLF			"Windows (CR+LF)"
 	IDS_EOLMODENAME_LF				"Unix/macOS (LF)"
-	IDS_EOLMODENAME_CR				"Classic Mac OS (CR)"
+	IDS_EOLMODENAME_CR				"Mac OS Classico (CR)"
 
-	IDS_CONFIG_THEME_TITLE_DEFAULT	"Customize Schemes - Default Theme"
-	IDS_CONFIG_THEME_TITLE_DARK		"Customize Schemes - Dark Theme"
-	IDS_FAVORITE_SCHEMES_TITLE		"Favorite Schemes"
-	IDS_CUSTOMIZE_SCHEMES_HELP		"Filename extensions must be separated by semicolon (;)\r\n\
+	IDS_CONFIG_THEME_TITLE_DEFAULT	"Personalizza schemi - Tema predefinito"
+	IDS_CONFIG_THEME_TITLE_DARK		"Personalizzazione schemi - Tema scuro"
+	IDS_FAVORITE_SCHEMES_TITLE		"Schemi preferiti"
+	IDS_CUSTOMIZE_SCHEMES_HELP		"Le estensioni dei nomi dei file devono essere separate da un punto e virgola (;)\r\n\
 \r\n\
-Style format:\r\n\
-\tfont:Name; size:[+|-]nn.mm; weight:nnn; bold; italic;\r\n\
-\tunderline; strike; overline; charset:dd; locale:Name;\r\n\
-\tfore:#RRGGBB; back:#RRGGBB; alpha:aa; outline:aa; eolfilled;\r\n\
+Formato dello stile:\r\n\
+\tfont:Nome; dimensione:[+|-]nn.mm; peso:nnn; grassetto; corsivo;\r\n\
+\tsottolineato; barrato; linea superiore; set di caratteri:dd; locale:Nome;\r\n\
+\tcolore:#RRGGBB; sfondo:#RRGGBB; alfa:aa; contorno:aa; riempito con eol;\r\n\
 \r\n\
-Style properties can be copied using copy and paste or drag and drop.\r\n\
+Le proprietà di stile possono essere copiate utilizzando il copia e incolla o il trascinamento.\r\n\
 \r\n\
-The ""Preview"" button will not apply any changes."
+Il pulsante ""Anteprima"" non applicherà alcuna modifica."
 
 END
 
@@ -2180,11 +2180,11 @@ END
 // string table for lexers, see EditLexer.h
 STRINGTABLE
 BEGIN
-	NP2LEX_TEXTFILE					"Text File"
+	NP2LEX_TEXTFILE					"File di Testo"
 
-	NP2LEX_2NDTEXTFILE				"2nd Text File"
-	NP2LEX_2NDGLOBAL				"2nd Global Styles"
-	NP2LEX_GLOBAL					"Global Styles"
+	NP2LEX_2NDTEXTFILE				"2° file di testo"
+	NP2LEX_2NDGLOBAL				"2° Stili Globali"
+	NP2LEX_GLOBAL					"Stili globali"
 END
 #endif // NP2_ENABLE_LOCALIZE_LEXER_NAME
 
@@ -2192,29 +2192,29 @@ END
 // string table for styles, see EditLexers/EditStyleX.h
 STRINGTABLE
 BEGIN
-	NP2STYLE_MarginLineNumber		"Margin and Line Number"
-	NP2STYLE_MatchingBrace			"Matching Brace"
-	NP2STYLE_MatchingBraceError		"Matching Brace Error"
-	NP2STYLE_ControlCharacter		"Control Character"
-	NP2STYLE_IndentationGuide		"Indentation Guide"
-	NP2STYLE_SelectedText			"Selected Text"
-	NP2STYLE_Whitespace				"Whitespace"
-	NP2STYLE_CurrentLine			"Current Line"
-	NP2STYLE_Caret					"Caret"
-	NP2STYLE_LongLineMarker			"Long Line Marker"
-	NP2STYLE_ExtraLineSpacing		"Extra Line Spacing"
-	NP2STYLE_FoldingMarker			"Folding Marker"
-	NP2STYLE_MarkOccurrences		"Mark Occurrences"
-	NP2STYLE_DefaultCodeStyle		"Default Code Style"
-	NP2STYLE_DefaultTextStyle		"Default Text Style"
-	NP2STYLE_FoldEllipsis			"Fold Ellipsis"
-	NP2STYLE_IMEIndicator			"IME Indicator"
-	NP2STYLE_Bookmark				"Bookmark"
-	NP2STYLE_CallTip				"CallTip"
+	NP2STYLE_MarginLineNumber		"Margine e Numeri Linea"
+	NP2STYLE_MatchingBrace			"Corrispondenza parentesi"
+	NP2STYLE_MatchingBraceError		"Errore di Corrispondenza parentesi"
+	NP2STYLE_ControlCharacter		"Carattere di controllo"
+	NP2STYLE_IndentationGuide		"Guida all'indentazione"
+	NP2STYLE_SelectedText			"Testo Selezionato"
+	NP2STYLE_Whitespace				"Spazi vuoti"
+	NP2STYLE_CurrentLine			"Linea corrente"
+	NP2STYLE_Caret					"Cursore"
+	NP2STYLE_LongLineMarker			"Marcatore di riga lunga"
+	NP2STYLE_ExtraLineSpacing		"Interlinea extra"
+	NP2STYLE_FoldingMarker			"Marcatore Folding"
+	NP2STYLE_MarkOccurrences		"Segna le occorrenze"
+	NP2STYLE_DefaultCodeStyle		"Stile di codice predefinito"
+	NP2STYLE_DefaultTextStyle		"Stile di testo predefinito"
+	NP2STYLE_FoldEllipsis			"Fold Ellissi"
+	NP2STYLE_IMEIndicator			"Indicatore IME"
+	NP2STYLE_Bookmark				"Segnalibro"
+	NP2STYLE_CallTip				"Suggerimento"
 	NP2STYLE_CodeFolding			"Code Folding"
-	NP2STYLE_Link					"Link"
+	NP2STYLE_Link					"Collegamento"
 
-	NP2STYLE_Default				"Default"
+	NP2STYLE_Default				"Predefinito"
 END
 #endif // NP2_ENABLE_LOCALIZE_STYLE_NAME
 
