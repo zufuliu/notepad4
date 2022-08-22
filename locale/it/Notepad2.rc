@@ -276,32 +276,32 @@ BEGIN
 			MENUITEM "Nuovo &GUID",							IDM_EDIT_INSERT_GUID
 			POPUP "Carattere di controllo Unicode"
 			BEGIN
-				MENUITEM "WJ\t&Word joiner",						IDM_INSERT_UNICODE_WJ
-				MENUITEM "ZWJ\tZero width &joiner",					IDM_INSERT_UNICODE_ZWJ
-				MENUITEM "ZWNJ\tZero width &non-joiner",			IDM_INSERT_UNICODE_ZWNJ
-				MENUITEM "LRM\t&Left-to-right mark",				IDM_INSERT_UNICODE_LRM
-				MENUITEM "RLM\t&Right-to-left mark",				IDM_INSERT_UNICODE_RLM
-				MENUITEM "LRE\tStart of left-to-right &embedding",	IDM_INSERT_UNICODE_LRE
-				MENUITEM "RLE\tStart of right-to-left e&mbedding",	IDM_INSERT_UNICODE_RLE
-				MENUITEM "LRO\tStart of left-to-right &override",	IDM_INSERT_UNICODE_LRO
-				MENUITEM "RLO\tStart of right-to-left o&verride",	IDM_INSERT_UNICODE_RLO
-				MENUITEM "LRI\tLeft-to-&right isolate",				IDM_INSERT_UNICODE_LRI
-				MENUITEM "RLI\tRight-to-&left isolate",				IDM_INSERT_UNICODE_RLI
-				MENUITEM "FSI\t&First strong isolate",				IDM_INSERT_UNICODE_FSI
-				MENUITEM "PDI\tPo&p directional isolate",			IDM_INSERT_UNICODE_PDI
-				MENUITEM "PDF\t&Pop directional formatting",		IDM_INSERT_UNICODE_PDF
-				MENUITEM "NADS\tN&ational digit shapes substitution",IDM_INSERT_UNICODE_NADS
-				MENUITEM "NODS\tNominal (European) &digit shapes",	IDM_INSERT_UNICODE_NODS
-				MENUITEM "ASS\tActivate &symmetric swapping",		IDM_INSERT_UNICODE_ASS
-				MENUITEM "ISS\tInhibit s&ymmetric swapping",		IDM_INSERT_UNICODE_ISS
-				MENUITEM "AAFS\tActivate Arabic &form shaping",		IDM_INSERT_UNICODE_AAFS
-				MENUITEM "IAFS\tInhibit Arabic form s&haping",		IDM_INSERT_UNICODE_IAFS
-				MENUITEM "ALM\t&Arabic letter mark",		        IDM_INSERT_UNICODE_ALM
-				MENUITEM "RS\tRecord Separator (&Block separator)", IDM_INSERT_UNICODE_RS
-				MENUITEM "US\tUnit Separator (&Segment separator)", IDM_INSERT_UNICODE_US
-				MENUITEM "LS\tL&ine Separator",						IDM_INSERT_UNICODE_LS
-				MENUITEM "PS\tPara&graph Separator",				IDM_INSERT_UNICODE_PS
-				MENUITEM "ZWSP\t&Zero width space",					IDM_INSERT_UNICODE_ZWSP
+				MENUITEM "WJ\tUnisci parole",						IDM_INSERT_UNICODE_WJ
+				MENUITEM "ZWJ\tUnisci a larghezza zero",					IDM_INSERT_UNICODE_ZWJ
+				MENUITEM "ZWNJ\tNon-giunto a larghezza zero",			IDM_INSERT_UNICODE_ZWNJ
+				MENUITEM "LRM\tContrassegno da sinistra a destra",				IDM_INSERT_UNICODE_LRM
+				MENUITEM "RLM\tContrassegno da destra a sinistra",				IDM_INSERT_UNICODE_RLM
+				MENUITEM "LRE\tInizio dell'incorporazione da sinistra a destra",	IDM_INSERT_UNICODE_LRE
+				MENUITEM "RLE\tInizio dell'incorporazione da destra a sinistra",	IDM_INSERT_UNICODE_RLE
+				MENUITEM "LRO\tInizio dell'esclusione da sinistra a destra",	IDM_INSERT_UNICODE_LRO
+				MENUITEM "RLO\tInizio dell'esclusione da destra a sinistra",	IDM_INSERT_UNICODE_RLO
+				MENUITEM "LRI\tIsolamento da sinistra a destra",				IDM_INSERT_UNICODE_LRI
+				MENUITEM "RLI\tIsolamento da destra a sinistra",				IDM_INSERT_UNICODE_RLI
+				MENUITEM "FSI\tPrimo forte isolato",				IDM_INSERT_UNICODE_FSI
+				MENUITEM "PDI\tIsolamento direzionale pop",			IDM_INSERT_UNICODE_PDI
+				MENUITEM "PDF\tFormattazione direzionale pop",		IDM_INSERT_UNICODE_PDF
+				MENUITEM "NADS\tSostituzione delle forme delle cifre nazionali",IDM_INSERT_UNICODE_NADS
+				MENUITEM "NODS\tForme di cifre nominali (europee)",	IDM_INSERT_UNICODE_NODS
+				MENUITEM "ASS\tAttivare lo swapping simmetrico",		IDM_INSERT_UNICODE_ASS
+				MENUITEM "ISS\tInibire  lo swapping simmetrico",		IDM_INSERT_UNICODE_ISS
+				MENUITEM "AAFS\tAttivare la modellazione della forma araba",		IDM_INSERT_UNICODE_AAFS
+				MENUITEM "IAFS\tInibire la modellazione della forma araba",		IDM_INSERT_UNICODE_IAFS
+				MENUITEM "ALM\tSegno di lettera araba",		        IDM_INSERT_UNICODE_ALM
+				MENUITEM "RS\tSeparatore di record (separatore di blocco)", IDM_INSERT_UNICODE_RS
+				MENUITEM "US\tSeparatore di unità (separatore di segmento)", IDM_INSERT_UNICODE_US
+				MENUITEM "LS\tSeparatore di Linea",						IDM_INSERT_UNICODE_LS
+				MENUITEM "PS\tSeparatore di Paragrafo",				IDM_INSERT_UNICODE_PS
+				MENUITEM "ZWSP\tSpazio a larghezza zero",					IDM_INSERT_UNICODE_ZWSP
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Nome File",								CMD_INSERTFILENAME_NOEXT
