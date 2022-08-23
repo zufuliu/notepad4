@@ -161,7 +161,7 @@ EDITLEXER lexVHDL = {
 		'\0', 0, 0,
 		0,
 		0, 0,
-		SCE_VHDL_OPERATOR, SCE_VHDL_OPERATOR
+		SCE_VHDL_OPERATOR, SCE_VHDL_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // code folding
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // types

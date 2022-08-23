@@ -1,10 +1,9 @@
-// Java SE 17 https://docs.oracle.com/en/java/javase/index.html
+// Java SE 18 https://docs.oracle.com/en/java/javase/index.html
 // JDK http://openjdk.java.net/projects/
 // https://docs.oracle.com/javase/specs/index.html
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
 
 //! keywords		===========================================================
-// https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.9
 abstract assert
 break
 case catch
@@ -26,19 +25,14 @@ while
 false true null
 
 // Class Modifiers
-// https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.1.1
-sealed non-sealed
+abstract static final sealed non-sealed strictfp
 // Permitted Direct Subclasses
-// https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.1.6
 permits
 // Record Classes
-// https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.10
 record
 // Local Variable Declarations
-// https://docs.oracle.com/javase/specs/jls/se17/html/jls-14.html#jls-14.4
 var
 // The yield Statement
-// https://docs.oracle.com/javase/specs/jls/se17/html/jls-14.html#jls-14.21
 yield
 
 // Android IDL
@@ -59,7 +53,7 @@ provides with
 transitive static
 
 //! API				===========================================================
-// https://docs.oracle.com/en/java/javase/17/docs/api/index.html
+// https://docs.oracle.com/en/java/javase/18/docs/api/index.html
 
 module java.base {
 
@@ -290,9 +284,9 @@ package java.util {
 	public interface Formattable
 	public interface Iterator<E>
 		public interface ListIterator<E>
-	public interface Map<K,​V>
-		public interface SortedMap<K,​V>
-			public interface NavigableMap<K,​V>
+	public interface Map<K,V>
+		public interface SortedMap<K,V>
+			public interface NavigableMap<K,V>
 	public interface RandomAccess
 	public interface Spliterator<T>
 
@@ -312,12 +306,12 @@ package java.util {
 				public class LinkedHashSet<E>
 			public class TreeSet<E> implements NavigableSet<E>, Cloneable, Serializable
 		public class ArrayDeque<E> implements Deque<E>, Cloneable, Serializable
-	public abstract class AbstractMap<K,​V> implements Map<K,​V>
-		public class EnumMap<K extends Enum<K>,​V> implements Serializable, Cloneable
-		public class HashMap<K,​V> implements Map<K,​V>, Cloneable, Serializable
-			public class LinkedHashMap<K,​V>
-		public class TreeMap<K,​V> implements NavigableMap<K,​V>, Cloneable, Serializable
-		public class WeakHashMap<K,​V>
+	public abstract class AbstractMap<K,V> implements Map<K,V>
+		public class EnumMap<K extends Enum<K>,V> implements Serializable, Cloneable
+		public class HashMap<K,V> implements Map<K,V>, Cloneable, Serializable
+			public class LinkedHashMap<K,V>
+		public class TreeMap<K,V> implements NavigableMap<K,V>, Cloneable, Serializable
+		public class WeakHashMap<K,V>
 	public class Arrays
 	public class Base64
 	public class BitSet implements Cloneable, Serializable
@@ -325,8 +319,8 @@ package java.util {
 	public class Collections
 	public final class Currency implements Serializable
 	public class Date implements Serializable, Cloneable, Comparable<Date>
-	public abstract class Dictionary<K,​V>
-		public class Hashtable<K,​V> implements Map<K,​V>, Cloneable, Serializable
+	public abstract class Dictionary<K,V>
+		public class Hashtable<K,V> implements Map<K,V>, Cloneable, Serializable
 			public class Properties
 	public class EventObject implements Serializable
 	public final class Formatter implements Closeable, Flushable
@@ -350,8 +344,8 @@ package java.util.concurrent {
 		public class ArrayBlockingQueue<E> extends AbstractQueue<E> implements Serializable
 	@FunctionalInterface
 	public interface Callable<V>
-	public interface ConcurrentMap<K,​V> extends Map<K,​V>
-		public class ConcurrentHashMap<K,​V> extends AbstractMap<K,​V> implements Serializable
+	public interface ConcurrentMap<K,V> extends Map<K,V>
+		public class ConcurrentHashMap<K,V> extends AbstractMap<K,V> implements Serializable
 	public interface Executor
 	public interface Future<V>
 	public class ConcurrentLinkedDeque<E> extends AbstractCollection<E> implements Deque<E>, Serializable
@@ -377,7 +371,7 @@ package java.util.concurrent.locks {
 
 package java.util.function {
 	@FunctionalInterface
-	public interface Function<T,​R>
+	public interface Function<T,R>
 	@FunctionalInterface
 	public interface Predicate<T>
 }
@@ -397,12 +391,12 @@ package java.util.regex {
 }
 
 package java.util.stream {
-	public interface BaseStream<T,​S extends BaseStream<T,​S>> extends AutoCloseable
+	public interface BaseStream<T,S extends BaseStream<T,S>> extends AutoCloseable
 		public interface Stream<T>
 		public interface DoubleStream
 		public interface IntStream
 		public interface LongStream
-	public interface Collector<T,​A,​R>
+	public interface Collector<T,A,R>
 	public final class Collectors
 }
 
@@ -594,7 +588,7 @@ module gradle {
 }
 
 //! Javadoc			===========================================================
-// https://docs.oracle.com/en/java/javase/17/docs/specs/javadoc/doc-comment-spec.html
+// https://docs.oracle.com/en/java/javase/18/docs/specs/javadoc/doc-comment-spec.html
 /**
  * @author name-text
  * {@code text}
@@ -620,6 +614,8 @@ module gradle {
  * @serialData data-description
  * @serialField field-name field-type field-description
  * @since since-text
+ * {@snippet attributes }									JDK 18
+ * {@snippet attributes: body }								JDK 18
  * {@summary text }											JDK 10
  * {@systemProperty property-name }							JDK 12
  * @throws class-name description
