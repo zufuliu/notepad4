@@ -7789,6 +7789,11 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
 		iEOLMode = SC_EOL_CRLF;
 		break;
 
+	case NP2LEX_VHDL:
+		iEncoding = Encoding_GetIndex(1252); // ISO-8859-1
+		iEOLMode = iCurrentEOLMode;
+		break;
+
 	default:
 		// default encoding for empty file.
 		if (bLexerChanged) {

@@ -790,10 +790,14 @@ LexerConfigMap = {
 		#'auto_ident_word_style': ['SCE_V_FOLDING_KEYWORD'],
 	},
 	'NP2LEX_VHDL': {
+		'default_encoding': 'iso-8859-1',
 		'line_comment_string': '--',
 		'block_comment_string': ('/*', '*/'),
-		'operator_style': ['SCE_VHDL_OPERATOR'],
-		#'auto_ident_word_style': ['SCE_VHDL_KEYWORD'],
+		'escape_char_start': NoEscapeCharacter,
+		'raw_string_style': ['SCE_VHDL_STRING'],
+		'operator_style': ['SCE_VHDL_OPERATOR', 'SCE_VHDL_OPERATOR'],
+		'extra_word_char': '`',
+		#'auto_ident_word_style': ['SCE_VHDL_FOLDING_KEYWORD'],
 	},
 	'NP2LEX_VIM': {
 		'line_comment_string': '"',

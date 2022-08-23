@@ -258,11 +258,11 @@
 #define NP2STYLE_ListCode				63678
 #define NP2STYLE_Chapter				63679
 #define NP2STYLE_Document				63680
-#define NP2STYLE_StdPackage				63681
-#define NP2STYLE_StdOperator			63682
-#define NP2STYLE_StdFunction			63683
-#define NP2STYLE_StdType				63684
-#define NP2STYLE_UserDefine				63685
+#define NP2STYLE_Package				63681
+
+#define NP2STYLE_StandardFunction		63683
+#define NP2STYLE_StandardType			63684
+
 #define NP2STYLE_SystemTaskFunction		63686
 #define NP2STYLE_Intrinsic				63687
 #define NP2STYLE_Metadata				63688

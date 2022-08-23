@@ -180,7 +180,7 @@ inline bool FindClockingEvent(LexAccessor &styler, Sci_PositionU startPos, Sci_P
 
 void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineState = 0;
-	int parentCount = 0;
+	int parenCount = 0;
 
 	bool insideUrl = false;
 	bool angleQuote = false; // `include <path>
@@ -198,9 +198,9 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 		/*
 		8: lineState
 		4: kwType
-		20: parentCount
+		20: parenCount
 		*/
-		parentCount = lineState >> 12;
+		parenCount = lineState >> 12;
 		kwType = static_cast<KeywordType>((lineState >> 8) & 15);
 		lineState &= VerilogLineStateMaskDeclaration | VerilogLineStateMaskAttribute | VerilogLineStateLineContinuation;
 	}
@@ -325,7 +325,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 							sc.ChangeState(SCE_V_DATATYPE);
 						} else if (keywordLists[KeywordIndex_CodeFolding]->InList(s)) {
 							bool fold = false;
-							if (parentCount == 0 && lineState == 0 && prevWord != KeywordType::Scope
+							if (parenCount == 0 && lineState == 0 && prevWord != KeywordType::Scope
 								&& !(chBeforeIdentifier == '.' || chBeforeIdentifier == ':')) {
 								fold = true;
 								if (StrEqual(s, "fork")) {
@@ -355,7 +355,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 							sc.ChangeState(fold ? SCE_V_FOLDING_KEYWORD : SCE_V_KEYWORD);
 						} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
 							sc.ChangeState(SCE_V_KEYWORD);
-							if (parentCount == 0 && !(chBeforeIdentifier == '.' || chBeforeIdentifier == ':')) {
+							if (parenCount == 0 && !(chBeforeIdentifier == '.' || chBeforeIdentifier == ':')) {
 								if (StrEqual(s, "rand")) {
 									kwType = KeywordType::Rand;
 								} else if (StrEqualsAny(s, "wait", "disable")) {
@@ -369,7 +369,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 						}
 					}
 					if (sc.state == SCE_V_IDENTIFIER || sc.state == SCE_V_ESCAPE_IDENTIFIER) {
-						if (parentCount == 0 && sc.ch == ':' && sc.chNext != ':' && visibleChars == sc.LengthCurrent()) {
+						if (parenCount == 0 && sc.ch == ':' && sc.chNext != ':' && visibleChars == sc.LengthCurrent()) {
 							sc.ChangeState(SCE_V_LABEL);
 						} else if (lineState & VerilogLineStateMaskAttribute) {
 							if (chBeforeIdentifier != '=') {
@@ -458,15 +458,15 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				if (sc.ch == ';') {
 					lineState &= ~VerilogLineStateMaskDeclaration;
 				} else if (sc.Match('(', '*')) {
-					++parentCount;
+					++parenCount;
 					lineState |= VerilogLineStateMaskAttribute;
 					sc.Forward();
 				} else if (sc.Match('*', ')')) {
 					lineState &= ~VerilogLineStateMaskAttribute;
 				} else if (sc.ch == '(' || sc.ch == '[' || sc.ch == '{') {
-					++parentCount;
+					++parenCount;
 				} else if (sc.ch == ')' || sc.ch == ']' || sc.ch == '}') {
-					--parentCount;
+					--parenCount;
 				}
 			}
 		}
@@ -479,7 +479,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 			}
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, lineState | (static_cast<int>(kwType) << 8) | (parentCount << 12));
+			styler.SetLineState(sc.currentLine, lineState | (static_cast<int>(kwType) << 8) | (parenCount << 12));
 		}
 		sc.Forward();
 	}

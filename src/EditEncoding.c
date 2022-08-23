@@ -2250,6 +2250,9 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 	} else if (StrEqual(pszExt, L".sh") || StrStartsWith(lpData, "#!/")) {
 		// shell script: #!/bin/sh[LF]
 		preferedEncoding = CPI_UTF8;
+	} else if (StrCaseEqual(pszExt, L".vhd") || StrCaseEqual(pszExt, L".vhdl")) {
+		// VHDL should use ISO-8859-1 8-bit encoding
+		preferedEncoding = Encoding_GetIndex(1252);
 	}
 
 	int iEncoding = CPI_DEFAULT;

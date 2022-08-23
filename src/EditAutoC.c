@@ -488,7 +488,8 @@ static inline bool IsSpecialStartChar(int ch, int chPrev) {
 		|| (ch == '\\')// Doxygen Doc Tag, LaTeX Command
 		|| (ch == ':') // CSS pseudo class
 		|| (ch == '$') // variable
-		|| (ch == '`') // Verilog directive
+		|| (ch == '`') // VHDL, Verilog directive
+		|| (ch == '\'')// VHDL attribute
 		|| (chPrev == '\\' && (ch == '^' || ch == ':'))// LaTeX input, Emoji input
 		// TODO: show emoji list after typing ':'.
 		|| (chPrev == '<' && ch == '/')	// HTML/XML Close Tag
@@ -674,6 +675,8 @@ enum {
 	SwiftKeywordIndex_Directive = 1,
 	SwiftKeywordIndex_Attribute = 2,
 	VBKeywordIndex_Preprocessor = 3,
+	VHDLKeywordIndex_Directive = 3,
+	VHDLKeywordIndex_Attribute = 4,
 	VerilogKeywordIndex_Directive = 3,
 	VerilogKeywordIndex_SystemTaskAndFunction = 4,
 };
@@ -1294,6 +1297,17 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		}
 		break;
 
+	case NP2LEX_VHDL:
+		if (ch == '`' && iCurrentStyle == SCE_VHDL_DEFAULT) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[VHDLKeywordIndex_Directive]);
+			return AddWordResult_IgnoreLexer;
+		}
+		if (ch == '\'' && iCurrentStyle == SCE_VHDL_OPERATOR) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[VHDLKeywordIndex_Attribute]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
 	case NP2LEX_VERILOG:
 		if ((ch == '$' || ch == '`') && iCurrentStyle == SCE_V_DEFAULT) {
 			const int index = (ch == '`') ? VerilogKeywordIndex_Directive : VerilogKeywordIndex_SystemTaskAndFunction;
@@ -1738,7 +1752,7 @@ void EditAutoCloseBraceQuote(int ch) {
 		//} else if (0) {
 		//	fillChar = '\'';
 		//}
-		if ((mask & AutoInsertBacktick) && pLexCurrent->iLexer != SCLEX_VERILOG) {
+		if ((mask & AutoInsertBacktick) && pLexCurrent->iLexer != SCLEX_VERILOG && pLexCurrent->iLexer != SCLEX_VHDL) {
 			fillChar = '`';
 		}
 		break;
@@ -3069,6 +3083,12 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
 		CurrentWordCharSet['`' >> 5] |= (1 << ('`' & 31));
+		break;
+
+	case NP2LEX_VHDL:
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CurrentWordCharSet['`' >> 5] |= (1 << ('`' & 31));
+		RawStringStyleMask[SCE_VHDL_STRING >> 5] |= (1U << (SCE_VHDL_STRING & 31));
 		break;
 
 	case NP2LEX_VIM:

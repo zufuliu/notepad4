@@ -100,7 +100,7 @@ static KEYWORDLIST Keywords_CPP = {{
 "aligned alloc_size returns_twice noinline noclone always_inline flatten pure nothrow sentinel format format_arg no_instrument_function no_split_stack section constructor destructor used unused deprecated weak malloc alias ifunc warn_unused_result nonnull gnu_inline externally_visible hot cold artificial error warning cleanup common nocommon mode packed shared tls_model vector_size const "
 "__aligned__ __alloc_size__ __noreturn__ __returns_twice__ __noinline__ __noclone__ __always_inline__ __flatten__ __pure__ __nothrow__ __sentinel__ __format__ __format_arg__ __no_instrument_function__ __no_split_stack__ __section__ __constructor__ __destructor__ __used__ __unused__ __deprecated__ __weak__ __malloc__ __alias__ __ifunc__ __warn_unused_result__ __nonnull__ __gnu_inline__ __externally_visible__ __hot__ __cold__ __artificial__ __error__ __warning__ __cleanup__ __common__ __nocommon__ __mode__ __packed__ __shared__ __tls_model__ __vector_size__ __const__ "
 "cdecl stdcall __cdecl__ __stdcall__ __deprecated__ __dllexport__ __dllimport__ __naked__ __noinline__ __noreturn__ __nothrow__ __selectany__ "
-"may_alias __may_alias__ visibility __visibility__"
+"may_alias __may_alias__ visibility __visibility__ "
 // C++11, 14, 17, 20
 "assert carries_dependency fallthrough ensures expects maybe_unused likely unlikely no_unique_address nodiscard optimize_for_synchronized "
 

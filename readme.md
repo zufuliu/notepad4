@@ -131,7 +131,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 4.7.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
-	* VHDL
+	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
 	* Verilog HDL, up to [Verilog](tools/lang/Verilog.v) 2005 and [SystemVerilog](tools/lang/SystemVerilog.sv) 2017.
 	* [Vim Script](tools/lang/Vim.vim)
 	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.

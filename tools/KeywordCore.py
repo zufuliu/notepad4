@@ -2146,6 +2146,68 @@ def parse_typescript_api_file(path):
 		('TSDoc', keywordMap['tsdoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp),
 	]
 
+def parse_vhdl_api_file(path):
+	sections = read_api_file(path, '--')
+	keywordMap = {}
+	misc = []
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'code folding':
+			items = [line.split()[0] for line in doc.splitlines() if line]
+			keywordMap[key] = items
+		elif key == 'directives':
+			keywordMap[key] = re.findall(r'`(\w+)', doc)
+		elif key == 'api':
+			items = re.findall(r"'(\w\w+\(?)", doc) + re.findall(r'attribute\s+(\w+\(?)', doc)
+			keywordMap['attributes'] = items + [item.lower() for item in items]
+			functions = re.findall(r'function\s+(\w+\(?)', doc) + re.findall(r'procedure\s+(\w+\(?)', doc)
+			types = re.findall(r'type\s+(\w+)', doc)
+			alias = re.findall(r'alias\s+(\w+)\s+is\s+\w+\s*(\W)', doc)
+			for item, kind in alias:
+				if kind == ';':
+					types.append(item)
+				else:
+					functions.append(item)
+			misc.extend(functions)
+			misc.extend(types)
+			keywordMap['functions'] = [item.lower() for item in functions]
+			keywordMap['types'] = [item.lower() for item in types]
+			constant = []
+			items = re.findall(r'type\s+\w+\s+is\s*\(([\w\,\s]+)\)', doc)
+			for item in items:
+				constant.extend(item.replace(',', ' ').split())
+			items = re.findall(r'constant\s+(\w+)', doc)
+			constant.extend(items + ['INPUT', 'OUTPUT'])
+			misc.extend(constant)
+			keywordMap['constants'] = [item.lower() for item in constant]
+			packages = re.findall(r'package\s+(\w+)', doc)
+			misc.extend(packages)
+			keywordMap['packages'] = [item.lower() for item in packages] + ['ieee', 'std', 'work']
+			misc.extend(re.findall(r'context\s+(\w+)', doc))
+
+	keywordMap['misc'] = misc
+	RemoveDuplicateKeyword(keywordMap, [
+		'code folding',
+		'keywords',
+		'types',
+		'functions',
+		'constants',
+		'packages',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('code folding', keywordMap['code folding'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('directives', keywordMap['directives'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attributes', keywordMap['attributes'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('functions', keywordMap['functions'], KeywordAttr.Default),
+		('constants', keywordMap['constants'], KeywordAttr.Default),
+		('packages', keywordMap['packages'], KeywordAttr.Default),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
 def parse_vim_api_file(path):
 	sections = read_api_file(path, '"')
 	keywordMap = {}

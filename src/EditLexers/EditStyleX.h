@@ -281,11 +281,11 @@
 #define NP2StyleX_ListCode				EDITSTYLE_HOLE(ListCode, L"List Code")
 #define NP2StyleX_Chapter				EDITSTYLE_HOLE(Chapter, L"Chapter")
 #define NP2StyleX_Document				EDITSTYLE_HOLE(Document, L"Document")
-#define NP2StyleX_StdPackage			EDITSTYLE_HOLE(StdPackage, L"STD Package")
-#define NP2StyleX_StdOperator			EDITSTYLE_HOLE(StdOperator, L"STD Operator")
-#define NP2StyleX_StdFunction			EDITSTYLE_HOLE(StdFunction, L"STD Function")
-#define NP2StyleX_StdType				EDITSTYLE_HOLE(StdType, L"STD Type")
-#define NP2StyleX_UserDefine			EDITSTYLE_HOLE(UserDefine, L"User Define")
+#define NP2StyleX_Package				EDITSTYLE_HOLE(Package, L"Package")
+
+#define NP2StyleX_StandardFunction		EDITSTYLE_HOLE(StandardFunction, L"Standard Function")
+#define NP2StyleX_StandardType			EDITSTYLE_HOLE(StandardType, L"Standard Type")
+
 #define NP2StyleX_SystemTaskFunction	EDITSTYLE_HOLE(SystemTaskFunction, L"System Task and Function")
 #define NP2StyleX_Intrinsic				EDITSTYLE_HOLE(Intrinsic, L"Intrinsic")
 #define NP2StyleX_Metadata				EDITSTYLE_HOLE(Metadata, L"Metadata")
