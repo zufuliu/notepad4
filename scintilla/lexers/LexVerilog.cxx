@@ -302,13 +302,15 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 
 				case SCE_V_DIRECTIVE:
 					lineState |= VerilogLineStateMaskDirective;
-					if (StrEqual(s, "`include")) {
+					if (StrEqual(s + 1, "include")) {
 						angleQuote = chNext == '<';
-					} else if (StrEqualsAny(s, "`define", "`undef", "`ifdef", "`ifndef")) {
+					} else if (StrEqualsAny(s + 1, "define", "undef", "ifdef", "ifndef")) {
 						kwType = KeywordType::Macro;
 					} else if (!keywordLists[KeywordIndex_Directive]->InList(s + 1)) {
 						lineState &= ~VerilogLineStateMaskDirective;
 						sc.ChangeState(SCE_V_MACRO);
+					} else if (StrStartsWith(s + 1, "__")) { // __FILE__, __LINE__
+						lineState &= ~VerilogLineStateMaskDirective;
 					}
 					break;
 
@@ -539,9 +541,9 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				buf[wordLen] = '\0';
 				wordLen = 0;
 				if (style == SCE_V_DIRECTIVE) {
-					if (StrEqualsAny(buf, "`ifdef", "`ifndef", "`celldefine") || StrStartsWith(buf, "`begin")) {
+					if (StrEqualsAny(buf + 1, "ifdef", "ifndef", "celldefine") || StrStartsWith(buf + 1, "begin")) {
 						levelNext++;
-					} else if (StrStartsWith(buf, "`end")) {
+					} else if (StrStartsWith(buf + 1, "end")) {
 						levelNext--;
 					}
 				} else {
