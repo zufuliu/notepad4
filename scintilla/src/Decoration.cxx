@@ -35,6 +35,13 @@ namespace {
 template <typename POS>
 class Decoration : public IDecoration {
 	int indicator;
+
+	// pos_cast(): cast Sci::Position to either 32-bit or 64-bit value
+	// This avoids warnings from Visual C++ Code Analysis and shortens code
+	static constexpr POS pos_cast(Sci::Position pos) noexcept {
+		return static_cast<POS>(pos);
+	}
+
 public:
 	RunStyles<POS, int> rs;
 
@@ -50,19 +57,19 @@ public:
 		return rs.Length();
 	}
 	int ValueAt(Sci::Position position) const noexcept override {
-		return rs.ValueAt(static_cast<POS>(position));
+		return rs.ValueAt(pos_cast(position));
 	}
 	Sci::Position StartRun(Sci::Position position) const noexcept override {
-		return rs.StartRun(static_cast<POS>(position));
+		return rs.StartRun(pos_cast(position));
 	}
 	Sci::Position EndRun(Sci::Position position) const noexcept override {
-		return rs.EndRun(static_cast<POS>(position));
+		return rs.EndRun(pos_cast(position));
 	}
 	void SetValueAt(Sci::Position position, int value) override {
-		rs.SetValueAt(static_cast<POS>(position), value);
+		rs.SetValueAt(pos_cast(position), value);
 	}
 	void InsertSpace(Sci::Position position, Sci::Position insertLength) override {
-		rs.InsertSpace(static_cast<POS>(position), static_cast<POS>(insertLength));
+		rs.InsertSpace(pos_cast(position), pos_cast(insertLength));
 	}
 	Sci::Position Runs() const noexcept override {
 		return rs.Runs();
@@ -85,6 +92,13 @@ class DecorationList : public IDecorationList {
 	void Delete(int indicator);
 	void DeleteAnyEmpty();
 	void SetView();
+
+	// pos_cast(): cast Sci::Position to either 32-bit or 64-bit value
+	// This avoids warnings from Visual C++ Code Analysis and shortens code
+	static constexpr POS pos_cast(Sci::Position pos) noexcept {
+		return static_cast<POS>(pos);
+	}
+
 public:
 
 	DecorationList() noexcept;
@@ -143,7 +157,7 @@ template <typename POS>
 Decoration<POS> *DecorationList<POS>::Create(int indicator, Sci::Position length) {
 	currentIndicator = indicator;
 	auto decoNew = std::make_unique<Decoration<POS>>(indicator);
-	decoNew->rs.InsertSpace(0, static_cast<POS>(length));
+	decoNew->rs.InsertSpace(0, pos_cast(length));
 
 	auto it = std::lower_bound(
 		decorationList.begin(), decorationList.end(), decoNew,
@@ -188,7 +202,7 @@ FillResult<Sci::Position> DecorationList<POS>::FillRange(Sci::Position position,
 		}
 	}
 	// Converting result from POS to Sci::Position as callers not polymorphic.
-	const FillResult<POS> frInPOS = current->rs.FillRange(static_cast<POS>(position), value, static_cast<POS>(fillLength));
+	const FillResult<POS> frInPOS = current->rs.FillRange(pos_cast(position), value, pos_cast(fillLength));
 	const FillResult<Sci::Position> fr{ frInPOS.changed, frInPOS.position, frInPOS.fillLength };
 	if (current->Empty()) {
 		Delete(currentIndicator);
@@ -201,9 +215,9 @@ void DecorationList<POS>::InsertSpace(Sci::Position position, Sci::Position inse
 	const bool atEnd = position == lengthDocument;
 	lengthDocument += insertLength;
 	for (const auto &deco : decorationList) {
-		deco->rs.InsertSpace(static_cast<POS>(position), static_cast<POS>(insertLength));
+		deco->rs.InsertSpace(pos_cast(position), pos_cast(insertLength));
 		if (atEnd) {
-			deco->rs.FillRange(static_cast<POS>(position), 0, static_cast<POS>(insertLength));
+			deco->rs.FillRange(pos_cast(position), 0, pos_cast(insertLength));
 		}
 	}
 }
@@ -212,7 +226,7 @@ template <typename POS>
 void DecorationList<POS>::DeleteRange(Sci::Position position, Sci::Position deleteLength) {
 	lengthDocument -= deleteLength;
 	for (const auto &deco : decorationList) {
-		deco->rs.DeleteRange(static_cast<POS>(position), static_cast<POS>(deleteLength));
+		deco->rs.DeleteRange(pos_cast(position), pos_cast(deleteLength));
 	}
 	DeleteAnyEmpty();
 	if (decorationList.size() != decorationView.size()) {
@@ -257,7 +271,7 @@ template <typename POS>
 int DecorationList<POS>::AllOnFor(Sci::Position position) const noexcept {
 	unsigned int mask = 0;
 	for (const auto &deco : decorationList) {
-		if (deco->rs.ValueAt(static_cast<POS>(position))) {
+		if (deco->rs.ValueAt(pos_cast(position))) {
 			if (deco->Indicator() < static_cast<int>(Scintilla::IndicatorNumbers::Ime)) {
 				mask |= 1U << deco->Indicator();
 			}
@@ -270,7 +284,7 @@ template <typename POS>
 int DecorationList<POS>::ValueAt(int indicator, Sci::Position position) noexcept {
 	const auto *deco = DecorationFromIndicator(indicator);
 	if (deco) {
-		return deco->rs.ValueAt(static_cast<POS>(position));
+		return deco->rs.ValueAt(pos_cast(position));
 	}
 	return 0;
 }
@@ -279,7 +293,7 @@ template <typename POS>
 Sci::Position DecorationList<POS>::Start(int indicator, Sci::Position position) noexcept {
 	const auto *deco = DecorationFromIndicator(indicator);
 	if (deco) {
-		return deco->rs.StartRun(static_cast<POS>(position));
+		return deco->rs.StartRun(pos_cast(position));
 	}
 	return 0;
 }
@@ -288,7 +302,7 @@ template <typename POS>
 Sci::Position DecorationList<POS>::End(int indicator, Sci::Position position) noexcept {
 	const auto *deco = DecorationFromIndicator(indicator);
 	if (deco) {
-		return deco->rs.EndRun(static_cast<POS>(position));
+		return deco->rs.EndRun(pos_cast(position));
 	}
 	return 0;
 }

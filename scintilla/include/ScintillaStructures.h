@@ -54,6 +54,8 @@ struct NotifyHeader final {
 	Notification code;
 };
 
+enum class Message;	// Declare in case ScintillaMessages.h not included
+
 struct NotificationData final {
 	NotifyHeader nmhdr;
 	Position position;

@@ -834,6 +834,15 @@ constexpr KeyMod operator&(KeyMod a, KeyMod b) noexcept {
 	return static_cast<KeyMod>(static_cast<int>(a) & static_cast<int>(b));
 }
 
+constexpr KeyMod ModifierFlags(bool shift, bool ctrl, bool alt, bool meta = false, bool super = false) noexcept {
+	return
+		(shift ? KeyMod::Shift : KeyMod::Norm) |
+		(ctrl ? KeyMod::Ctrl : KeyMod::Norm) |
+		(alt ? KeyMod::Alt : KeyMod::Norm) |
+		(meta ? KeyMod::Meta : KeyMod::Norm) |
+		(super ? KeyMod::Super : KeyMod::Norm);
+}
+
 // Test if an enum class value has some bit flag(s) of test set.
 template <typename T>
 constexpr bool FlagSet(T value, T test) noexcept {

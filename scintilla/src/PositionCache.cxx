@@ -127,6 +127,10 @@ void LineLayout::Free() noexcept {
 	bidiData.reset();
 }
 
+void LineLayout::ClearPositions() const {
+	std::fill_n(&positions[0], maxLineLength + 2, 0.0f);
+}
+
 void LineLayout::Invalidate(ValidLevel validity_) noexcept {
 	if (validity > validity_)
 		validity = validity_;
@@ -197,9 +201,10 @@ int LineLayout::SubLineFromPosition(int posInLine, PointEnd pe) const noexcept {
 	return lines - 1;
 }
 
-void LineLayout::SetLineStart(int line, int start) {
-	if ((line >= lenLineStarts) && (line != 0)) {
-		const int newMaxLines = line + 20;
+void LineLayout::AddLineStart(Sci::Position start) {
+	lines++;
+	if (lines >= lenLineStarts) {
+		const int newMaxLines = lines + 20;
 		std::unique_ptr<int[]> newLineStarts = std::make_unique<int[]>(newMaxLines);
 		if (lenLineStarts) {
 			std::copy(lineStarts.get(), lineStarts.get() + lenLineStarts, newLineStarts.get());
@@ -207,7 +212,7 @@ void LineLayout::SetLineStart(int line, int start) {
 		lineStarts = std::move(newLineStarts);
 		lenLineStarts = newMaxLines;
 	}
-	lineStarts[line] = start;
+	lineStarts[lines] = static_cast<int>(start);
 }
 
 void LineLayout::SetBracesHighlight(Range rangeLine, const Sci::Position braces[],
@@ -307,6 +312,15 @@ Point LineLayout::PointFromPosition(int posInLine, int lineHeight, PointEnd pe) 
 		}
 	}
 	return pt;
+}
+
+XYPOSITION LineLayout::XInLine(Sci::Position index) const noexcept {
+	// For positions inside line return value from positions
+	// For positions after line return last position + 1.0
+	if (index <= numCharsInLine) {
+		return positions[index];
+	}
+	return positions[numCharsInLine] + 1.0;
 }
 
 int LineLayout::EndLineStyle() const noexcept {

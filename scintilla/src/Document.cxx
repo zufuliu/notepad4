@@ -349,7 +349,7 @@ void Document::TentativeUndo(bool pendingUpdate) {
 
 MarkerMask Document::GetMark(Sci::Line line, bool includeChangeHistory) const noexcept {
 	MarkerMask marksHistory = 0;
-	if (includeChangeHistory) {
+	if (includeChangeHistory && (line < LinesTotal())) {
 		MarkerMask marksEdition = 0;
 
 		const Sci::Position start = LineStart(line);

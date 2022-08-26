@@ -2677,7 +2677,7 @@ void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYP
 		const unsigned int byteCount = UTF8BytesOfLead(uch);
 		if (byteCount == 4) {	// Non-BMP
 			ui++;
-			PLATFORM_ASSERT(ui < tbuf.tlen);
+			PLATFORM_ASSERT(ui < tbuf.length());
 		}
 		for (unsigned int bytePos = 0; (bytePos < byteCount) && (i < text.length()) && (ui < tbuf.length()); bytePos++) {
 			positions[i++] = poses[ui];

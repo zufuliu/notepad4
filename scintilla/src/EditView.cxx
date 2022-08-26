@@ -730,7 +730,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 
 		// Layout the line, determining the position of each character,
 		// with an extra element at the end for the end of the line.
-		std::fill(&ll->positions[0], &ll->positions[lineLength + 1], 0.0f);
+		ll->ClearPositions();
 		ll->lastSegmentEnd = 0;
 		ll->numCharsInLine = numCharsInLine;
 		ll->numCharsBeforeEOL = numCharsBeforeEOL;
@@ -947,8 +947,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 						}
 					}
 					lastLineStart = lastGoodBreak;
-					ll->lines++;
-					ll->SetLineStart(ll->lines, static_cast<int>(lastLineStart));
+					ll->AddLineStart(lastLineStart);
 					startOffset = ll->positions[lastLineStart];
 					// take into account the space for start wrap mark and indent
 					startOffset += width - wrapIndent;
@@ -1522,14 +1521,13 @@ static void DrawIndicator(int indicNum, Sci::Position startPos, Sci::Position en
 	int value, bool bidiEnabled, int tabWidthMinimumPixels) {
 
 	const XYPOSITION subLineStart = ll->positions[ll->LineStart(subLine)];
+	const XYPOSITION horizontalOffset = xStart - subLineStart;
 
 	std::vector<PRectangle> rectangles;
 
-	const PRectangle rcIndic(
-		ll->positions[startPos] + xStart - subLineStart,
-		rcLine.top + vsDraw.maxAscent,
-		ll->positions[endPos] + xStart - subLineStart,
-		rcLine.top + vsDraw.maxAscent + 3);
+	const XYPOSITION left = ll->XInLine(startPos) + horizontalOffset;
+	const XYPOSITION right = ll->XInLine(endPos) + horizontalOffset;
+	const PRectangle rcIndic(left, rcLine.top + vsDraw.maxAscent, right, rcLine.top + vsDraw.maxAscent + 3);
 
 	if (bidiEnabled) {
 		ScreenLine screenLine(ll, subLine, vsDraw, rcLine.right - xStart, tabWidthMinimumPixels);
@@ -1553,7 +1551,7 @@ static void DrawIndicator(int indicNum, Sci::Position startPos, Sci::Position en
 		// Allow full descent space for character indicators
 		rcFirstCharacter.bottom = rcLine.top + vsDraw.maxAscent + vsDraw.maxDescent;
 		if (secondCharacter >= 0) {
-			rcFirstCharacter.right = ll->positions[secondCharacter] + xStart - subLineStart;
+			rcFirstCharacter.right = ll->XInLine(secondCharacter) + horizontalOffset;
 		} else {
 			// Indicator continued from earlier line so make an empty box and don't draw
 			rcFirstCharacter.right = rcFirstCharacter.left;
@@ -1611,7 +1609,7 @@ static void DrawIndicators(Surface *surface, const EditModel &model, const ViewS
 
 	if (FlagSet(model.changeHistoryOption, ChangeHistoryOption::Indicators)) {
 		// Draw editions
-		const int indexHistory = static_cast<int>(IndicatorNumbers::HistoryRevertedToOriginInsertion);
+		constexpr int indexHistory = static_cast<int>(IndicatorNumbers::HistoryRevertedToOriginInsertion);
 		{
 			// Draw insertions
 			Sci::Position startPos = posLineStart + lineStart;
@@ -2106,7 +2104,9 @@ void EditView::DrawCarets(Surface *surface, const EditModel &model, const ViewSt
 	}
 }
 
-static void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, const LineLayout *ll,
+namespace {
+
+void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, const LineLayout *ll,
 	int xStart, PRectangle rcLine, std::optional<ColourRGBA> background, DrawWrapMarkerFn customDrawWrapMarker,
 	bool caretActive) {
 	// default background here..
@@ -2146,13 +2146,15 @@ static void DrawWrapIndentAndMarker(Surface *surface, const ViewStyle &vsDraw, c
 // such that, if the caret is inside the main selection, the beginning or end of that selection
 // is at the end of a text segment.
 // This function should only be called if iDoc is within the main selection.
-static InSelection CharacterInCursesSelection(Sci::Position iDoc, const EditModel &model, const ViewStyle &vsDraw) noexcept {
+InSelection CharacterInCursesSelection(Sci::Position iDoc, const EditModel &model, const ViewStyle &vsDraw) noexcept {
 	const SelectionPosition &posCaret = model.sel.RangeMain().caret;
 	const bool caretAtStart = posCaret < model.sel.RangeMain().anchor && posCaret.Position() == iDoc;
 	const bool caretAtEnd = posCaret > model.sel.RangeMain().anchor &&
 		vsDraw.DrawCaretInsideSelection(false, false) &&
 		model.pdoc->MovePositionOutsideChar(posCaret.Position() - 1, -1) == iDoc;
 	return (caretAtStart || caretAtEnd) ? InSelection::inNone : InSelection::inMain;
+}
+
 }
 
 void EditView::DrawBackground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
