@@ -326,10 +326,14 @@ LexerConfigMap = {
 	},
 
 	'NP2LEX_FORTRAN': {
+		'default_fold_ignore_inner': 'SCE_F_FUNCTION_DEFINITION',
 		'line_comment_string': ['!'], # omited '*'
 		'block_comment_string': ('#if 0', '#endif'),
 		'block_comment_on_new_line': True,
+		'escape_char_style': 'SCE_F_ESCAPECHAR',
+		'character_prefix': ['b', 'B', 'o', 'O', 'z', 'Z'],
 		'operator_style': ['SCE_F_OPERATOR', 'SCE_F_OPERATOR2'],
+		'cpp_preprocessor': True,
 		'extra_word_char': '#%',
 	},
 	'NP2LEX_FSHARP': {

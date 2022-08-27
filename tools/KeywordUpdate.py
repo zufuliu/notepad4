@@ -28,7 +28,7 @@ lexerList = [
 	('NP2LEX_DART', 'stlDart.c', 'LexDart.cxx', 'Dart.dart', 0, parse_dart_api_file),
 	('NP2LEX_DIFF', 'stlDefault.c', 'LexDiff.cxx', '', (0, 'Diff'), None),
 
-	('NP2LEX_FORTRAN', 'stlFortran.c', 'LexFortran.cxx', '', 0, None),
+	('NP2LEX_FORTRAN', 'stlFortran.c', 'LexFortran.cxx', 'Fortran.f', 0, parse_fortran_api_file),
 	('NP2LEX_FSHARP', 'stlFSharp.c', 'LexFSharp.cxx', '', 0, None),
 
 	('NP2LEX_GN', 'stlGN.c', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),

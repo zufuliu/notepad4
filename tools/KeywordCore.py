@@ -385,7 +385,7 @@ def parse_avisynth_api_file(path):
 	for key, doc in sections:
 		if key == 'keywords':
 			items = doc.split()
-			items.extend([item.lower() for item in items])
+			items.extend(to_lower(items))
 			keywordMap[key] = items
 		elif key == 'functions':
 			items = re.findall(r'^(\w+\s+)?(\w+\()', doc, re.MULTILINE)
@@ -467,7 +467,7 @@ def parse_batch_api_file(path):
 		if key in ('keywords', 'internal command'):
 			items = doc.split()
 			keywordMap['upper case keywords'].extend(items)
-			keywordMap[key] = [item.lower() for item in items]
+			keywordMap[key] = to_lower(items)
 		elif key == 'external command':
 			uppercase = keywordMap['upper case keywords']
 			options = keywordMap['options']
@@ -840,6 +840,44 @@ def parse_dart_api_file(path):
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('metadata', keywordMap['metadata'], KeywordAttr.NoLexer | KeywordAttr.Special),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+
+def parse_fortran_api_file(path):
+	sections = read_api_file(path, '!', commentKind=1)
+	keywordMap = {}
+	misc = []
+	for key, doc in sections:
+		if key in ('keywords', 'attribute', 'type', 'misc'):
+			items = doc.split()
+			misc.extend(items)
+			if key != 'misc':
+				keywordMap[key] = to_lower(items)
+		elif key == 'code folding':
+			items = [line.split()[0] for line in doc.splitlines() if line]
+			items.extend(['TEAM', 'ENDTEAM'])
+			misc.extend(items)
+			keywordMap[key] = to_lower(items)
+		elif key == 'function':
+			items = re.findall(r'(\w+\()', doc)
+			misc.extend(items)
+			keywordMap[key] = to_lower(items)
+
+	keywordMap['misc'] = misc
+	RemoveDuplicateKeyword(keywordMap, [
+		'code folding',
+		'keywords',
+		'type',
+		'attribute',
+		'function',
+		'misc',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('code folding', keywordMap['code folding'], KeywordAttr.Default),
+		('type', keywordMap['type'], KeywordAttr.Default),
+		('attribute', keywordMap['attribute'], KeywordAttr.Default),
+		('function', keywordMap['function'], KeywordAttr.Default),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
 def parse_gn_api_file(path):
@@ -2160,7 +2198,7 @@ def parse_vhdl_api_file(path):
 			keywordMap[key] = re.findall(r'`(\w+)', doc)
 		elif key == 'api':
 			items = re.findall(r"'(\w\w+\(?)", doc) + re.findall(r'attribute\s+(\w+\(?)', doc)
-			keywordMap['attributes'] = items + [item.lower() for item in items]
+			keywordMap['attributes'] = items + to_lower(items)
 			functions = re.findall(r'function\s+(\w+\(?)', doc) + re.findall(r'procedure\s+(\w+\(?)', doc)
 			types = re.findall(r'type\s+(\w+)', doc)
 			alias = re.findall(r'alias\s+(\w+)\s+is\s+\w+\s*(\W)', doc)
@@ -2171,8 +2209,8 @@ def parse_vhdl_api_file(path):
 					functions.append(item)
 			misc.extend(functions)
 			misc.extend(types)
-			keywordMap['functions'] = [item.lower() for item in functions]
-			keywordMap['types'] = [item.lower() for item in types]
+			keywordMap['functions'] = to_lower(functions)
+			keywordMap['types'] = to_lower(types)
 			constant = []
 			items = re.findall(r'type\s+\w+\s+is\s*\(([\w\,\s]+)\)', doc)
 			for item in items:
@@ -2180,10 +2218,10 @@ def parse_vhdl_api_file(path):
 			items = re.findall(r'constant\s+(\w+)', doc)
 			constant.extend(items + ['INPUT', 'OUTPUT'])
 			misc.extend(constant)
-			keywordMap['constants'] = [item.lower() for item in constant]
+			keywordMap['constants'] = to_lower(constant)
 			packages = re.findall(r'package\s+(\w+)', doc)
 			misc.extend(packages)
-			keywordMap['packages'] = [item.lower() for item in packages] + ['ieee', 'std', 'work']
+			keywordMap['packages'] = to_lower(packages) + ['ieee', 'std', 'work']
 			misc.extend(re.findall(r'context\s+(\w+)', doc))
 
 	keywordMap['misc'] = misc

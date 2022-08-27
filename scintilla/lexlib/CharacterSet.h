@@ -260,10 +260,15 @@ constexpr bool IsFloatExponent(int ch, int chNext) noexcept {
 		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
 }
 
-constexpr bool IsFloatExponent(int base, int ch, int chNext) noexcept {
+constexpr bool IsFloatExponentEx(int base, int ch, int chNext) noexcept {
 	return ((base == 10 && (ch == 'e' || ch == 'E'))
 		|| (base == 16 && (ch == 'p' || ch == 'P')))
 		&& (chNext == '+' || chNext == '-' || IsADigit(chNext));
+}
+
+constexpr bool IsFloatExponent(int chPrev, int ch, int chNext) noexcept {
+	return (chPrev == 'e' || chPrev == 'E')
+		&& (ch == '+' || ch == '-') && IsADigit(chNext);
 }
 
 //[[deprecated]]
