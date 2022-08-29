@@ -2377,14 +2377,18 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_WINDOWPOSCHANGING:
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
-		case WM_WINDOWPOSCHANGED:
+		case WM_WINDOWPOSCHANGED: {
+			HMONITOR current = hCurrentMonitor;
 			if (UpdateRenderingParams(false)) {
 				DropGraphics();
 				Redraw();
-				// recreate toolbar after monitor changed
-				::SendMessage(::GetParent(MainHWND()), WM_THEMECHANGED, 0, 0);
+				if (current) {
+					// recreate toolbar after monitor changed
+					::PostMessage(::GetParent(MainHWND()), WM_THEMECHANGED, 0, 0);
+				}
 			}
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
+		}
 
 		case WM_GETTEXTLENGTH:
 			return GetTextLength();

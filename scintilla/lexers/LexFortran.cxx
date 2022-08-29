@@ -67,10 +67,10 @@ enum class KeywordType {
 	None,
 	Change,		// change team
 	Select,		// select type
-	Module,		// module function, module subroutine
 	Else,		// else if
-	Type,
+	Module,		// module function, module subroutine
 	End,
+	Type,
 	Call = SCE_F_FUNCTION,
 	Function = SCE_F_FUNCTION_DEFINITION,
 };

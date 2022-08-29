@@ -2200,10 +2200,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
-	if (!bInitDone) {
-		// ignore WM_THEMECHANGED send from WM_WINDOWPOSCHANGED
-		return;
-	}
 
 	HINSTANCE hInstance = GetWindowInstance(hwnd);
 
