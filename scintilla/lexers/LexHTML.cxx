@@ -590,7 +590,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		         (chNext == '?') &&
 				 !IsScriptCommentState(state)) {
  			beforeLanguage = scriptLanguage;
-			scriptLanguage = segIsScriptingIndicator(styler, i + 2, i + 7, isXml ? eScriptXML : eScriptNone);
+			scriptLanguage = segIsScriptingIndicator(styler, i + 2, i + 7, eScriptXML);
 			if ((isStringState(state) || (state==SCE_H_COMMENT))) continue;
 			styler.ColorTo(i, StateToPrint);
 			beforePreProc = state;
