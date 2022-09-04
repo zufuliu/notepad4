@@ -8,7 +8,7 @@
 # https://wiki.gnome.org/Projects/Genie
 
 #! keywords			===========================================================
-# https://docs.python.org/3.10/reference/lexical_analysis.html#identifiers
+# https://docs.python.org/3/reference/lexical_analysis.html#identifiers
 and as assert async await
 break
 class continue
@@ -31,12 +31,13 @@ case match
 exec print
 
 #! Built-in Constants	===========================================================
+# https://docs.python.org/3/library/constants.html
 False None True NotImplemented Ellipsis
 __debug__ __main__
 self
 
 #! Built-in Functions	===========================================================
-# https://docs.python.org/3.10/library/functions.html
+# https://docs.python.org/3/library/functions.html
 __builtins__
 builtins
 	abs(x)
@@ -143,7 +144,7 @@ builtins
 	coerce(x, y)
 	intern(string)
 
-# https://docs.python.org/3.10/library/constants.html#constants-added-by-the-site-module
+# https://docs.python.org/3/library/constants.html#constants-added-by-the-site-module
 site
 	quit(code=None)
 	exit(code=None)
@@ -152,7 +153,7 @@ site
 	credits
 
 #! attributes			===========================================================
-# https://docs.python.org/3.10/reference/datamodel.html#the-standard-type-hierarchy
+# https://docs.python.org/3/reference/datamodel.html#the-standard-type-hierarchy
 # Callable types
 __doc__
 __name__
@@ -183,7 +184,7 @@ __bases__
 __doc__
 __annotations__
 # Special Attributes
-# https://docs.python.org/3.10/library/stdtypes.html#special-attributes
+# https://docs.python.org/3/library/stdtypes.html#special-attributes
 __dict__
 __class__
 __bases__
@@ -194,7 +195,7 @@ __name__
 __qualname__
 
 # module attributes
-# https://docs.python.org/3.10/reference/import.html#import-related-module-attributes
+# https://docs.python.org/3/reference/import.html#import-related-module-attributes
 __name__
 __loader__
 __package__
@@ -204,7 +205,7 @@ __file__
 __cached__
 
 #! special method	===========================================================
-# https://docs.python.org/3.10/reference/datamodel.html#special-method-names
+# https://docs.python.org/3/reference/datamodel.html#special-method-names
 object:
 	# Basic customization
 	__new__(cls[, ...])
@@ -228,14 +229,15 @@ object:
 	__setattr__(self, name, value)
 	__delattr__(self, name)
 	__dir__(self)
+	# Implementing Descriptors
 	__get__(self, instance, owner=None)
 	__set__(self, instance, value)
 	__delete__(self, instance)
-	__set_name__(self, owner, name)
 	__slots__
 	__weakref__
 	# Customizing class creation
 	__init_subclass__(cls)
+	__set_name__(self, owner, name)
 	# Emulating generic types
 	__class_getitem__(cls, key)
 	# Emulating callable objects
@@ -347,12 +349,11 @@ class:
 
 #! exceptions		===========================================================
 BaseException
-	SystemExit
-	KeyboardInterrupt
+	BaseExceptionGroup
 	GeneratorExit
+	KeyboardInterrupt
+	SystemExit
 	Exception
-		StopIteration
-		StopAsyncIteration
 		ArithmeticError
 			FloatingPointError
 			OverflowError
@@ -361,6 +362,7 @@ BaseException
 		AttributeError
 		BufferError
 		EOFError
+		ExceptionGroup
 		ImportError
 			ModuleNotFoundError
 		LookupError
@@ -389,6 +391,8 @@ BaseException
 		RuntimeError
 			NotImplementedError
 			RecursionError
+		StopAsyncIteration
+		StopIteration
 		SyntaxError
 			IndentationError
 				TabError
@@ -400,22 +404,22 @@ BaseException
 				UnicodeEncodeError
 				UnicodeTranslateError
 		Warning
+			BytesWarning
 			DeprecationWarning
-			PendingDeprecationWarning
-			RuntimeWarning
-			SyntaxWarning
-			UserWarning
+			EncodingWarning
 			FutureWarning
 			ImportWarning
-			UnicodeWarning
-			BytesWarning
-			EncodingWarning
+			PendingDeprecationWarning
 			ResourceWarning
+			RuntimeWarning
+			SyntaxWarning
+			UnicodeWarning
+			UserWarning
 
 #! API				===========================================================
-# https://docs.python.org/3.10/library/index.html
+# https://docs.python.org/3/library/index.html
 # Built-in Types
-# https://docs.python.org/3.10/library/stdtypes.html
+# https://docs.python.org/3/library/stdtypes.html
 int:
 	bit_length()
 	bit_count()
@@ -502,6 +506,7 @@ bytes:
 	endswith(suffix[, start[, end]])
 	find(sub[, start[, end]])
 	index(sub[, start[, end]])
+	join(iterable)
 	maketrans(from, to)
 	partition(sep)
 	replace(old, new[, count])
@@ -596,7 +601,9 @@ slice:
 exception BaseException:
 	__traceback__
 	args
-	 with_traceback(tb)
+	with_traceback(tb)
+	add_note(note)
+	__notes__
 exception OSError([arg])
 exception OSError(errno, strerror[, filename[, winerror[, filename2]]]):
 	errno
@@ -621,9 +628,15 @@ exception UnicodeError:
 	end
 exception BlockingIOError:
 	characters_written
+exception BaseExceptionGroup(msg, excs):
+	message
+	exceptions
+	subgroup(condition)
+	split(condition)
+	derive(excs)
 
 # Text Processing Services
-# https://docs.python.org/3.10/library/text.html
+# https://docs.python.org/3/library/text.html
 string
 	ascii_letters
 	ascii_lowercase
@@ -646,10 +659,12 @@ string
 	class Template(template):
 		substitute(mapping={}, /, **kwds)
 		safe_substitute(mapping={}, /, **kwds)
+		is_valid()
+		get_identifiers()
 		template
 	capwords(s, sep=None)
 re
-	compile(pattern, flags=0)
+	class RegexFlag
 	ASCII
 	DEBUG
 	IGNORECASE
@@ -657,6 +672,7 @@ re
 	MULTILINE
 	DOTALL
 	VERBOSE
+	compile(pattern, flags=0)
 	search(pattern, string, flags=0)
 	match(pattern, string, flags=0)
 	fullmatch(pattern, string, flags=0)
@@ -739,7 +755,7 @@ unicodedata
 	ucd_3_2_0
 
 # Binary Data Services
-# https://docs.python.org/3.10/library/binary.html
+# https://docs.python.org/3/library/binary.html
 struct
 	exception error(msg)
 	pack(format, v1, v2, ...)
@@ -814,10 +830,11 @@ codecs
 	class StreamRecoder(stream, encode, decode, Reader, Writer, errors='strict')
 
 # Data Types
-# https://docs.python.org/3.10/library/datatypes.html
+# https://docs.python.org/3/library/datatypes.html
 datetime
 	MINYEAR
 	MAXYEAR
+	UTC
 	class timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0):
 		min
 		max
@@ -960,17 +977,21 @@ collections
 		data
 collections.abc
 	class Container:
-		__iter__()
-	class Hashable
-	class Sized
-	class Callable
+		__contains__()
+	class Hashable:
+		__hash__()
+	class Sized:
+		__len__()
+	class Callable:
+		__call__()
 	class Iterable
+		__iter__()
 	class Collection
 	class Iterator:
 		__iter__()
 		__next__()
 	class Reversible
-	# https://docs.python.org/3.10/reference/expressions.html#generator-iterator-methods
+	# https://docs.python.org/3/reference/expressions.html#generator-iterator-methods
 	class Generator:
 		__next__()
 		send(value)
@@ -987,15 +1008,19 @@ collections.abc
 	class ItemsView
 	class KeysView
 	class ValuesView
-	# https://docs.python.org/3.10/reference/datamodel.html#coroutine-objects
+	# https://docs.python.org/3/reference/datamodel.html#coroutine-objects
 	class Awaitable:
+		__await__()
 		send(value)
 		throw(type[, value[, traceback]])
 		close()
 	class Coroutine
-	class AsyncIterable
-	class AsyncIterator
-	# https://docs.python.org/3.10/reference/expressions.html#asynchronous-generator-iterator-methods
+	class AsyncIterable:
+		 __aiter__()
+	class AsyncIterator:
+		 __aiter__()
+		__anext__()
+	# https://docs.python.org/3/reference/expressions.html#asynchronous-generator-iterator-methods
 	class AsyncGenerator:
 		__anext__()
 		asend(value)
@@ -1045,6 +1070,7 @@ types
 		__origin__
 		__args__
 		__parameters__
+		__unpacked__
 copy
 	__copy__()
 	__deepcopy__()
@@ -1054,20 +1080,19 @@ copy
 enum
 	class Enum:
 		__members__
-		_name_
-		_value_
-		_missing_
-		_ignore_
-		_order_
-		_generate_next_value_
 	class IntEnum
-	class IntFlag
+	class StrEnum
 	class Flag
-	@unique
+	class IntFlag
 	auto()
+	@unique
+	@property
+	@verify
+	@member
+	@nonmember
 
 # Numeric and Mathematical Modules
-# https://docs.python.org/3.10/library/numeric.html
+# https://docs.python.org/3/library/numeric.html
 numbers
 	class Number
 	class Complex
@@ -1106,7 +1131,9 @@ math
 	trunc(x)
 	ulp(x)
 	# Power and logarithmic functions
+	cbrt(x)
 	exp(x)
+	exp2(x)
 	expm1(x)
 	log(x[, base])
 	log1p(x)
@@ -1124,8 +1151,10 @@ math
 	hypot(*coordinates)
 	sin(x)
 	tan(x)
+	# Angular conversion
 	degrees(x)
 	radians(x)
+	# Hyperbolic functions
 	acosh(x)
 	asinh(x)
 	atanh(x)
@@ -1408,7 +1437,7 @@ statistics
 		zscore(x)
 
 # Functional Programming Modules
-# https://docs.python.org/3.10/library/functional.html
+# https://docs.python.org/3/library/functional.html
 itertools
 	accumulate(iterable[, func, *, initial=None])
 	chain(*iterables)
@@ -1451,7 +1480,7 @@ functools
 		keywords
 
 # File and Directory Access
-# https://docs.python.org/3.10/library/filesys.html
+# https://docs.python.org/3/library/filesys.html
 pathlib
 	class PurePath(*pathsegments):
 		parts
@@ -1586,7 +1615,7 @@ shutil
 	get_terminal_size(fallback=columns, lines)
 
 # Data Persistence
-# https://docs.python.org/3.10/library/persistence.html
+# https://docs.python.org/3/library/persistence.html
 pickle:
 	dump(obj, file, protocol=None, *, fix_imports=True, buffer_callback=None)
 	dumps(obj, protocol=None, *, fix_imports=True, buffer_callback=None)
@@ -1602,21 +1631,31 @@ pickle:
 		__reduce__()
 		__reduce_ex__(protocol)
 sqlite3
-	version
-	version_info
-	sqlite_version
-	sqlite_version_info
 	PARSE_DECLTYPES
 	PARSE_COLNAMES
+	SQLITE_OK
+	SQLITE_DENY
+	SQLITE_IGNORE
+	apilevel
+	paramstyle
+	sqlite_version
+	sqlite_version_info
+	threadsafety
+	version
+	version_info
 	connect(database[, timeout, detect_types, isolation_level, check_same_thread, factory, cached_statements, uri])
-	register_converter(typename, callable)
-	register_adapter(type, callable)
 	complete_statement(sql)
 	enable_callback_tracebacks(flag)
+	register_converter(typename, callable)
+	register_adapter(type, callable)
 	class Connection:
 		isolation_level
 		in_transaction
+		row_factory
+		text_factory
+		total_changes
 		cursor(factory=Cursor)
+		blobopen(table, column, row, /, \*, readonly=False, name="main")
 		commit()
 		rollback()
 		close()
@@ -1624,6 +1663,7 @@ sqlite3
 		executemany(sql[, parameters])
 		executescript(sql_script)
 		create_function(name, num_params, func, *, deterministic=False)
+		create_window_function(name, num_params, aggregate_class, /)
 		create_aggregate(name, num_params, aggregate_class)
 		create_collation(name, callable)
 		interrupt()
@@ -1632,11 +1672,12 @@ sqlite3
 		set_trace_callback(trace_callback)
 		enable_load_extension(enabled)
 		load_extension(path)
-		row_factory
-		text_factory
-		total_changes
 		iterdump()
 		backup(target, *, pages=- 1, progress=None, name='main', sleep=0.25)
+		getlimit(category, /)
+		setlimit(category, limit, /)
+		serialize(\*, name="main")
+		deserialize(data, /, \*, name="main")
 	class Cursor:
 		execute(sql[, parameters])
 		executemany(sql, seq_of_parameters)
@@ -1645,6 +1686,8 @@ sqlite3
 		fetchmany(size=cursor.arraysize)
 		fetchall()
 		close()
+		setinputsizes(sizes, /)
+		setoutputsize(size, column=None, /)
 		rowcount
 		lastrowid
 		arraysize
@@ -1652,16 +1695,28 @@ sqlite3
 		connection
 	class Row
 		keys()
+	class Blob
+		close()
+		read(length=- 1, /)
+		write(data, /)
+		tell()
+		seek(offset, origin=os.SEEK_SET, /)
+	class PrepareProtocol
 	exception Warning
-	exception Error
+	exception Error:
+		sqlite_errorcode
+		sqlite_errorname
+	exception InterfaceError
 	exception DatabaseError
-	exception IntegrityError
-	exception ProgrammingError
+	exception DataError
 	exception OperationalError
+	exception IntegrityError
+	exception InternalError
+	exception ProgrammingError
 	exception NotSupportedError
 
 # Generic Operating System Services
-# https://docs.python.org/3.10/library/allos.html
+# https://docs.python.org/3/library/allos.html
 os
 	exception error
 	name
@@ -2316,7 +2371,7 @@ logging
 	captureWarnings(capture)
 
 # Concurrent Execution
-# https://docs.python.org/3.10/library/concurrency.html
+# https://docs.python.org/3/library/concurrency.html
 subprocess
 	run(args, *, stdin=None, input=None, stdout=None, stderr=None, capture_output=False, shell=False, cwd=None, timeout=None, check=False, encoding=None, errors=None, text=None, env=None, universal_newlines=None, **other_popen_kwargs)
 	class CompletedProcess:
@@ -2372,14 +2427,25 @@ contextvars
 	 	get(var[, default])
 
 # Networking and Interprocess Communication
-# https://docs.python.org/3.10/library/ipc.html
+# https://docs.python.org/3/library/ipc.html
 asyncio
-	# Coroutines and Tasks
+	# Runners
 	run(coro, *, debug=False)
+	class Runner(*, debug=None, loop_factory=None):
+		run(coro, *, context=None)
+		close()
+		get_loop()
+	# Coroutines and Tasks
 	create_task(coro, *, name=None)
+	class TaskGroup:
+		create_task(coro, *, name=None, context=None)
 	sleep(delay, result=None)
-	gather(*aws, return_exceptions=False)
-	shield(aw)
+	timeout(delay)
+	class Timeout:
+		when()
+		reschedule(when: float | None)
+		expired()
+	timeout_at(when)
 	wait_for(aw, timeout)
 	wait(aws, *, timeout=None, return_when=ALL_COMPLETED)
 	as_completed(aws, *, timeout=None)
@@ -2420,6 +2486,7 @@ asyncio
 		transport
 		get_extra_info(name, default=None)
 		drain()
+		start_tls(sslcontext, \*, server_hostname=None, ssl_handshake_timeout=None)
 		is_closing()
 		wait_closed()
 	# Synchronization Primitives
@@ -2445,9 +2512,31 @@ asyncio
 		locked()
 		release()
 	class BoundedSemaphore(value=1)
+	class Barrier(parties):
+		wait()
+		reset()
+		abort()
+		parties
+		n_waiting
+		broken
+	exception BrokenBarrierError
 	# Subprocesses
 	create_subprocess_exec(program, *args, stdin=None, stdout=None, stderr=None, limit=None, **kwds)
 	create_subprocess_shell(cmd, stdin=None, stdout=None, stderr=None, limit=None, **kwds)
+	PIPE
+	STDOUT
+	DEVNULL
+	class Process:
+		wait()
+		communicate(input=None)
+		send_signal(signal)
+		terminate()
+		kill()
+		stdin
+		stdout
+		stderr
+		pid
+		returncode
 	# Queues
 	class Queue(maxsize=0):
 		maxsize
@@ -2480,7 +2569,7 @@ asyncio
 	# Policies
 
 # Internet Data Handling
-# https://docs.python.org/3.10/library/netdata.html
+# https://docs.python.org/3/library/netdata.html
 json
 	dump(obj, fp, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)
 	dumps(obj, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)
@@ -2518,7 +2607,7 @@ base64
 	b85decode(b)
 
 # Internet Protocols and Support
-# https://docs.python.org/3.10/library/internet.html
+# https://docs.python.org/3/library/internet.html
 urllib.parse
 	urlparse(urlstring, scheme='', allow_fragments=True)
 		scheme
@@ -2587,7 +2676,7 @@ uuid
 	NAMESPACE_X500
 
 # Python Runtime Services
-# https://docs.python.org/3.10/library/python.html
+# https://docs.python.org/3/library/python.html
 sys
 	abiflags
 	addaudithook(hook)
@@ -2626,6 +2715,7 @@ sys
 	getdlopenflags()
 	getfilesystemencoding()
 	getfilesystemencodeerrors()
+	get_int_max_str_digits()
 	getrefcount(object)
 	getrecursionlimit()
 	getsizeof(object[, default])
@@ -2660,6 +2750,7 @@ sys
 	ps1
 	ps2
 	setdlopenflags(n)
+	set_int_max_str_digits(n)
 	setprofile(profilefunc)
 	setrecursionlimit(limit)
 	setswitchinterval(interval)
@@ -2691,15 +2782,15 @@ warnings
 	filterwarnings(action, message='', category=Warning, module='', lineno=0, append=False)
 	simplefilter(action, category=Warning, lineno=0, append=False)
 	resetwarnings()
-	class catch_warnings(*, record=False, module=None)
+	class catch_warnings(*, record=False, module=None, action=None, category=Warning, lineno=0, append=False)
 dataclasses
-	@dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False)
+	@dataclassdataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
 	field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING)
 	class Field
 	fields(class_or_instance)
 	asdict(instance, *, dict_factory=dict)
 	astuple(instance, *, tuple_factory=tuple)
-	make_dataclass(cls_name, fields, *, bases=(), namespace=None, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False)
+	make_dataclass(cls_name, fields, *, bases=(), namespace=None, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
 	replace(instance, /, **changes)
 	is_dataclass(class_or_instance)
 	MISSING
@@ -2718,6 +2809,7 @@ contextlib
 	suppress(*exceptions)
 	redirect_stdout(new_target)
 	redirect_stderr(new_target)
+	chdir(path)
 	class ContextDecorator
 	class AsyncContextDecorator
 	class ExitStack:
@@ -2737,6 +2829,9 @@ abc
 		register(subclass)
 		__subclasshook__(subclass)
 	@abstractmethod
+	@abstractclassmethod
+	@abstractstaticmethod
+	@abstractproperty
 	get_cache_token()
 	update_abstractmethods(cls)
 atexit
@@ -2764,6 +2859,7 @@ traceback
 		__cause__
 		__context__
 		__suppress_context__
+		__notes__
 		stack
 		exc_type
 		filename
