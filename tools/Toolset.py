@@ -84,7 +84,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		cxxflags.extend(['clang++.exe', target_flag, '-municode', '-c', '-std=gnu++20', '-O2', '-fno-rtti'])
 		warnings.insert(0, '-Wall')
 	if cxx:
-		cxxflags.insert(1, '/TP' if msvc else 'x c++')
+		cxxflags.insert(2, '/TP' if msvc else 'x c++')
 
 	arch = target[:target.index('-')]
 	if arch == 'x86_64':

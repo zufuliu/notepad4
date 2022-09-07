@@ -434,7 +434,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
-	int lineStartVisibleChars = 0;
 
 	int chPrev = ' ';
 	int ch = ' ';
@@ -471,10 +470,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			chPrev = ' ';
 			i += 1;
 			continue;
-		}
-
-		if (!IsASpace(ch)) {
-			lineStartVisibleChars++;
 		}
 
 		// decide what is the current state to print (depending of the script tag)
@@ -535,7 +530,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			                    ((beforePreProc & 0xFF) << 12) |
 			                    ((isLanguageType ? 1 : 0) << 20));
 			lineCurrent++;
-			lineStartVisibleChars = 0;
 		}
 
 		// generic end of script processing
