@@ -59,6 +59,7 @@ def build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx=Fal
 				arguments.append(path)
 				commands.append({
 					'directory': folder,
+					#'arguments': arguments,
 					'command': ' '.join(arguments),
 					'file': path,
 				})
@@ -74,12 +75,10 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	target_flag = '--target=' + target
 	msvc = 'msvc' in target
 	if msvc:
-		prefix = '/D'
 		cflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c17', '/O2'])
 		cxxflags.extend(['clang-cl.exe', target_flag, '/c', '/std:c++20', '/O2', '/EHsc', '/GR-'])
 		warnings.insert(0, '/W4')
 	else:
-		prefix = '-D'
 		cflags.extend(['clang.exe', target_flag, '-municode', '-c', '-std=gnu17', '-O2'])
 		cxxflags.extend(['clang++.exe', target_flag, '-municode', '-c', '-std=gnu++20', '-O2', '-fno-rtti'])
 		warnings.insert(0, '-Wall')
@@ -102,7 +101,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	elif arch.startswith('arm'):
 		defines.extend(['WIN32', '_WIN32_WINNT=0x0602', 'WINVER=0x0602'])	# 8
 
-	defines = [prefix + item for item in defines]
+	defines = ['-D' + item for item in defines]
 	cflags.extend(defines)
 	cxxflags.extend(defines)
 	cflags.extend(warnings)
@@ -117,10 +116,13 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		('../metapath/src', []),
 	]
 
+	def include_path(folder, path):
+		path = os.path.abspath(os.path.join(folder, path))
+		return f'"{path}"' if ' ' in path else path
+
 	commands = []
-	prefix = prefix[0] + 'I'
 	for folder, includes in config:
-		includes = [prefix + path for path in includes]
+		includes = ['-I' + include_path(folder, path) for path in includes]
 		build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx)
 
 	path = '../compile_commands.json'
