@@ -249,6 +249,9 @@ def to_lower_conditional(items):
 			result.append(item.lower())
 	return result
 
+def first_word_on_each_line(doc):
+	return re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
+
 
 def parse_actionscript_api_file(path):
 	sections = read_api_file(path, '//')
@@ -292,7 +295,7 @@ def parse_autohotkey_api_file(pathList):
 				items = doc.split()
 			elif key == 'flow of control':
 				key = 'keywords'
-				items = re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
+				items = first_word_on_each_line(doc)
 			elif key == 'directives':
 				items = re.findall(r'#(\w+)', doc)
 			elif key == 'script compiler directives':
@@ -391,7 +394,7 @@ def parse_avisynth_api_file(path):
 			items = re.findall(r'^(\w+\s+)?(\w+\()', doc, re.MULTILINE)
 			functions = [item[1] for item in items if 'global' not in item[0]]
 			keywordMap['functions'] = functions
-			items = re.findall(r'^global\s+(\w+\(?)', doc, re.MULTILINE)
+			items = re.findall(r'global\s+(\w+\(?)', doc)
 			keywordMap['options'] = items
 		elif key == 'properties':
 			items = re.findall(r'clip\.(\w+\(?)', doc)
@@ -816,8 +819,8 @@ def parse_dart_api_file(path):
 			items = re.findall(r'(class|typedef)\s+(\w+)', doc)
 			keywordMap['class'] = [item[1] for item in items]
 
-			items = re.findall(r'(enum)\s+(\w+)', doc)
-			keywordMap['enumeration'] = [item[1] for item in items]
+			items = re.findall(r'enum\s+(\w+)', doc)
+			keywordMap['enumeration'] = items
 
 			items = re.findall(r'@(\w+\(?)', doc)
 			keywordMap['metadata'] = items
@@ -853,7 +856,7 @@ def parse_fortran_api_file(path):
 			if key != 'misc':
 				keywordMap[key] = to_lower(items)
 		elif key == 'code folding':
-			items = [line.split()[0] for line in doc.splitlines() if line]
+			items = first_word_on_each_line(doc)
 			items.extend(['TEAM', 'ENDTEAM'])
 			misc.extend(items)
 			keywordMap[key] = to_lower(items)
@@ -942,16 +945,14 @@ def parse_go_api_file(path):
 			constant = set(items)
 			items = re.findall(r'const\s+\((?P<def>[^()]+)\)', doc, re.MULTILINE)
 			for item in items:
-				items = re.findall(r'^\s+(\w+)', item, re.MULTILINE)
-				constant.update(items)
+				constant.update(first_word_on_each_line(item))
 			keywordMap['constant'] = constant
 
 			items = re.findall(r'var\s+(\w+)', doc)
 			variables = set(items)
 			items = re.findall(r'var\s+\((?P<def>[^()]+)\)', doc, re.MULTILINE)
 			for item in items:
-				items = re.findall(r'^\s+(\w+)', item, re.MULTILINE)
-				variables.update(items)
+				variables.update(first_word_on_each_line(item))
 			keywordMap['variables'] = variables
 
 			items = re.findall(r'package\s+([/\w]+)', doc)
@@ -1202,7 +1203,7 @@ def parse_inno_setup_api_file(path):
 				elif key == 'constants':
 					items = doc.replace(',', ' ').split()
 				elif key in ('event', 'functions', 'classes'):
-					items = re.findall(r'^\s*(function|procedure|constructor|property)\s+(\w+\(?)', doc, re.MULTILINE | re.IGNORECASE)
+					items = re.findall(r'(function|procedure|constructor|property)\s+(\w+\(?)', doc, re.IGNORECASE)
 					functions = []
 					properties = []
 					for kind, name in items:
@@ -1422,13 +1423,13 @@ def parse_julia_api_file(path):
 	keywordMap = {}
 	for key, doc in sections:
 		if key in ('core', 'modules'):
-			items = re.findall(r'^\s*module\s+([\w.]+)', doc, re.MULTILINE)
+			items = re.findall(r'module\s+([\w.]+)', doc)
 			modules = []
 			for item in items:
 				modules.extend(item.split('.'))
 			keywordMap.setdefault('module', set()).update(modules)
 
-			items = re.findall(r'^\s+const\s+(\w+)', doc, re.MULTILINE)
+			items = re.findall(r'const\s+(\w+)', doc)
 			keywordMap.setdefault('constant', set()).update(items)
 
 			items = re.findall(r'^\s+([A-Z]\w+)', doc, re.MULTILINE)
@@ -1584,7 +1585,7 @@ def parse_llvm_api_file(path):
 			items = re.findall(r'^\s*([\w\-]+\(?)', doc, re.MULTILINE)
 			keywordMap[key] = items
 		elif key == 'instruction':
-			items = re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
+			items = first_word_on_each_line(doc)
 			keywordMap[key] = items
 
 	RemoveDuplicateKeyword(keywordMap, [
@@ -1657,13 +1658,13 @@ def parse_php_api_file(path):
 			items = re.findall(r'\w+\(', doc)
 			keywordMap['magic method'] = [item for item in items if item.startswith('__')]
 			keywordMap['function'] = items
-			keywordMap['class'] = re.findall(r'\Wclass\s+(\w+)', doc)
-			keywordMap['interface'] = re.findall(r'\Winterface\s+(\w+)', doc)
+			keywordMap['class'] = re.findall(r'class\s+(\w+)', doc)
+			keywordMap['interface'] = re.findall(r'interface\s+(\w+)', doc)
 			items = re.findall(r'^\s*([_A-Z0-9]+)\s*$', doc, re.MULTILINE)
 			keywordMap['magic constant'] = [item for item in items if item.startswith('__')]
 			keywordMap['constant'] = items
 			# field
-			items = re.findall(r'\Wconst\s+\w+\s+([_A-Z0-9]+)', doc)
+			items = re.findall(r'const\s+\w+\s+([_A-Z0-9]+)', doc)
 			keywordMap['constant'].extend(items)
 			items = re.findall(r'(public|protected)\s+[\w\?\|]+\s+\$(\w+)', doc)
 			keywordMap['misc'].extend(item[1] for item in items)
@@ -2000,7 +2001,7 @@ def parse_rust_api_file(path):
 			keywordMap['enumeration'] = enums
 			keywordMap['union'] = unions
 
-			items = re.findall(r'^\s*const\s+(\w+)\s*:', doc, re.MULTILINE)
+			items = re.findall(r'const\s+(\w+)\s*:', doc)
 			keywordMap['constant'] = set(items)
 
 			items = re.findall(r'fn\s+(\w+)', doc)
@@ -2192,7 +2193,7 @@ def parse_vhdl_api_file(path):
 		if key == 'keywords':
 			keywordMap[key] = doc.split()
 		elif key == 'code folding':
-			items = [line.split()[0] for line in doc.splitlines() if line]
+			items = first_word_on_each_line(doc)
 			keywordMap[key] = items
 		elif key == 'directives':
 			keywordMap[key] = re.findall(r'`(\w+)', doc)
@@ -2283,8 +2284,7 @@ def parse_verilog_api_file(pathList):
 			elif key == 'directives':
 				items = re.findall(r'`(\w+)', doc)
 			elif key == 'code folding':
-				lines = [line.strip() for line in doc.splitlines()]
-				items = [line.split()[0] for line in lines if line]
+				items = first_word_on_each_line(doc)
 			elif key == 'system task and function':
 				items = re.findall(r'\W\$([\$\w+]+\(?)', doc)
 			elif key == 'api':

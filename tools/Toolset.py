@@ -131,7 +131,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	path = '../compile_commands.json'
 	print('write:', path)
 	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
-		fd.write(json.dumps(commands, indent='\t'))
+		fd.write(json.dumps(commands, indent='\t', ensure_ascii=False))
 
 #update_all_project_toolset()
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
