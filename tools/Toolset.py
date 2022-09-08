@@ -44,6 +44,9 @@ def update_all_project_toolset():
 		update_project_toolset(path)
 
 
+def quote_path(path):
+	return f'"{path}"' if ' ' in path else path
+
 def build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx=False):
 	# https://clang.llvm.org/docs/JSONCompilationDatabase.html
 	folder = os.path.abspath(folder)
@@ -56,7 +59,7 @@ def build_compile_commands(commands, folder, cflags, cxxflags, includes, cxx=Fal
 				path = entry.path
 				arguments = cxxflags[:] if cxx or ext != '.c' else cflags[:]
 				arguments.extend(includes)
-				arguments.append(path)
+				arguments.append(quote_path(path))
 				commands.append({
 					'directory': folder,
 					#'arguments': arguments,
@@ -118,7 +121,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 
 	def include_path(folder, path):
 		path = os.path.abspath(os.path.join(folder, path))
-		return f'"{path}"' if ' ' in path else path
+		return quote_path(path)
 
 	commands = []
 	for folder, includes in config:
