@@ -1,4 +1,4 @@
-// C++11 https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf
+// C++11 https://open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3337.pdf
 // C++14 https://github.com/cplusplus/draft/blob/main/papers/n4140.pdf
 // C++17 https://open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf
 // C++20 https://open-std.org/jtc1/sc22/wg21/docs/papers/2020/n4868.pdf
