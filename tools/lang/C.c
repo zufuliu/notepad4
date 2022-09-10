@@ -1,6 +1,7 @@
-// C99 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
-// C11 http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf
-// C23 https://open-std.org/JTC1/SC22/WG14/www/docs/n3047.pdf
+// C99 https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
+// C11 https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf
+// C17 https://files.lhmouse.com/standards/ISO%20C%20N2176.pdf
+// C23 https://open-std.org/JTC1/SC22/WG14/www/docs/n3054.pdf
 // https://en.cppreference.com/w/c
 // https://en.cppreference.com/w/c/header
 // https://en.cppreference.com/w/c/links
