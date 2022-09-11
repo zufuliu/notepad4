@@ -6,7 +6,7 @@ static KEYWORDLIST Keywords_TS = {{
 "abstract as assert asserts async await break case catch class const constructor continue "
 "debugger declare default delete do else enum extends false finally for function get global "
 "if implements in infer instanceof interface intrinsic is keyof let new null of out override "
-"package private protected public readonly return set static super switch this throw true try type typeof "
+"package private protected public readonly return satisfies set static super switch this throw true try type typeof "
 "undefined unique var while with yield "
 
 , // 1 types

@@ -1,8 +1,8 @@
-// 4.7 https://www.typescriptlang.org/docs/
+// 4.9 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
-// https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts
+// textToKeywordObj https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts
 abstract as assert asserts async await
 break
 case catch class const constructor continue
@@ -17,7 +17,7 @@ new null
 of out override
 package private protected public
 readonly return
-set static super switch
+satisfies set static super switch
 this throw true try type typeof
 undefined unique
 var
