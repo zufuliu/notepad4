@@ -3037,6 +3037,14 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		IgnoreWordStyleMask[SCE_C_PREPROCESSOR >> 5] |= (1U << (SCE_C_PREPROCESSOR & 31));
 		break;
 
+	case NP2LEX_RLANG:
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CharacterPrefixMask['R' >> 5] |= (1 << ('R' & 31));
+		CharacterPrefixMask['r' >> 5] |= (1 << ('r' & 31));
+		RawStringStyleMask[SCE_R_RAWSTRING_SQ >> 5] |= (1U << (SCE_R_RAWSTRING_SQ & 31));
+		RawStringStyleMask[SCE_R_RAWSTRING_DQ >> 5] |= (1U << (SCE_R_RAWSTRING_DQ & 31));
+		break;
+
 	case NP2LEX_RUBY:
 		CurrentWordCharSet['!' >> 5] |= (1 << ('!' & 31));
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));

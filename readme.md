@@ -108,7 +108,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Python](tools/lang/Python.py), up to Python 3.11. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
 	* [PHP Script](tools/lang/PHP.php), up to PHP 8.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 	* Windows Rescouce Script
-	* [R](tools/lang/R.r), up to R 4.0.3.
+	* [R](tools/lang/R.r), up to R 4.2.
 	* [REBOL](tools/lang/Rebol.r) 3 and [Red](tools/lang/Red.red)
 	* [Ruby](tools/lang/Ruby.rb), up to Ruby 3.1. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#ruby)
 	* [Rust](tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)

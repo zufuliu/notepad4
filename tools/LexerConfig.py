@@ -641,6 +641,8 @@ LexerConfigMap = {
 		'printf_format_specifier': True,
 		'format_specifier_style': 'SCE_R_FORMAT_SPECIFIER',
 		'escape_char_style': 'SCE_R_ESCAPECHAR',
+		'character_prefix': ['r', 'R'],
+		'raw_string_style': ['SCE_R_RAWSTRING_SQ', 'SCE_R_RAWSTRING_DQ'],
 		'operator_style': ['SCE_R_OPERATOR', 'SCE_R_INFIX'],
 		#'ignore_word_style': ['SCE_R_KEYWORD'],
 	},
