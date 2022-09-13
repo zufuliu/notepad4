@@ -493,6 +493,9 @@ Shell Script
 	.profile
 	mozconfig		Firefox Build Configuration
 
+	APKBUILD		Alpine Linux packaging script
+	PKGBUILD		Arch Linux packaging script
+
 Swift Source
 	swift
 

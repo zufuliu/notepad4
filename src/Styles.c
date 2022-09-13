@@ -2568,7 +2568,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		else if (StrCaseEqual(lpszName, L"Rakefile") || StrCaseEqual(lpszName, L"Podfile")) {
 			pLexNew = &lexRuby;
 		}
-		else if (StrCaseEqual(lpszName, L"mozconfig")) {
+		else if (StrCaseEqual(lpszName, L"mozconfig") || StrCaseEqual(lpszName, L"APKBUILD") || StrCaseEqual(lpszName, L"PKGBUILD")) {
 			pLexNew = &lexBash;
 		}
 		// Boost build
