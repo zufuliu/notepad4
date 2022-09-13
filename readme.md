@@ -101,7 +101,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Octave
 		* Scilab
 		* Gnuplot
-	* [Nullsoft Scriptable Install System](tools/lang/NSIS.nsi), up to NSIS 3.06.
+	* [Nullsoft Scriptable Install System](tools/lang/NSIS.nsi), up to NSIS 3.09.
 	* Pascal, Delphi
 	* Perl, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.

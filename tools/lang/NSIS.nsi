@@ -1,4 +1,4 @@
-; 3.06 https://nsis.sourceforge.io/Main_Page
+; 3.09 https://nsis.sourceforge.io/Main_Page
 ; https://nsis.sourceforge.io/Docs/
 
 ;! keywords			===========================================================
@@ -27,10 +27,12 @@ Return
 !delfile
 !echo
 !error
+!assert
 !execute
 !makensis
 !packhdr
 !finalize
+!uninstfinalize
 !system
 !tempfile
 !getdllversion
@@ -108,6 +110,7 @@ CallInstDLL
 CopyFiles
 CreateDirectory
 CreateShortcut
+GetWinVer
 GetDLLVersion
 GetDLLVersionLocal
 GetFileTime

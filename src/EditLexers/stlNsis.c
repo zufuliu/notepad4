@@ -6,9 +6,10 @@ static KEYWORDLIST Keywords_NSIS = {{
 "Function FunctionEnd Goto Page PageEx PageExEnd Return Section SectionEnd SectionGroup SectionGroupEnd UninstPage Var "
 
 , // 1 preprocessor
-"addincludedir addplugindir appendfile cd define delfile echo else endif error execute finalize "
+"addincludedir addplugindir appendfile assert cd define delfile echo else endif error execute finalize "
 "getdllversion gettlbversion if ifdef ifmacrodef ifmacrondef ifndef include insertmacro "
-"macro macroend macroundef makensis packhdr pragma searchparse searchreplace system tempfile undef verbose warning "
+"macro macroend macroundef makensis packhdr pragma searchparse searchreplace system tempfile undef uninstfinalize "
+"verbose warning "
 
 , // 2 instruction
 "Abort AddSize BringToFront Call CallInstDLL ClearErrors CopyFiles CreateDirectory CreateFont CreateShortcut "
@@ -18,7 +19,7 @@ static KEYWORDLIST Keywords_NSIS = {{
 "FileWrite FileWriteByte FileWriteUTF16LE FileWriteWord FindClose FindFirst FindNext FindWindow FlushINI "
 "GetCurInstType GetCurrentAddress GetDLLVersion GetDLLVersionLocal GetDlgItem GetErrorLevel "
 "GetFileTime GetFileTimeLocal GetFullPathName GetFunctionAddress GetInstDirError GetKnownFolderPath GetLabelAddress "
-"GetTempFileName "
+"GetTempFileName GetWinVer "
 "HideWindow "
 "IfAbort IfErrors IfFileExists IfRebootFlag IfRtlLanguage IfShellVarContextAll IfSilent InitPluginsDir "
 "InstType InstTypeGetText InstTypeSetText "
