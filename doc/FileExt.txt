@@ -366,6 +366,7 @@ LaTeX File
 	ins
 	toc
 	info
+	rd				R documentation
 
 Lisp Script
 	lisp

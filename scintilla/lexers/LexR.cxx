@@ -217,9 +217,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		case SCE_R_STRING_DQ:
 		case SCE_R_RAWSTRING_SQ:
 		case SCE_R_RAWSTRING_DQ:
-			if (!IsRawString(sc.state) && sc.atLineStart) {
-				sc.SetState(SCE_R_DEFAULT);
-			} else if (!IsRawString(sc.state) && sc.ch == '\\') {
+			if (!IsRawString(sc.state) && sc.ch == '\\') {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_R_ESCAPECHAR);
 				sc.Forward();

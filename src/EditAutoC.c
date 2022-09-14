@@ -2661,6 +2661,10 @@ void EditInsertScriptShebangLine(void) {
 		name = "python3";
 		break;
 
+	case NP2LEX_RLANG:
+		name = "Rscript";
+		break;
+
 	case NP2LEX_RUBY:
 		name = "ruby";
 		break;

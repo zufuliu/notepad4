@@ -637,6 +637,7 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'block_comment_string': ('if (FALSE) {', '}'),
 		'block_comment_on_new_line': True,
+		'shebang_exe_name': 'Rscript',
 		'default_fold_level': ['function'],
 		'printf_format_specifier': True,
 		'format_specifier_style': 'SCE_R_FORMAT_SPECIFIER',

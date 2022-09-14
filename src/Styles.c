@@ -1856,6 +1856,9 @@ PEDITLEXER Style_SniffShebang(char *pchText) {
 				if (StrStartsWith(name, "scala")) {
 					return &lexScala;
 				}
+				if (StrStartsWith(name, "Rscript")) {
+					return &lexRLang;
+				}
 			}
 
 			if (StrStartsWith(name, "bash") || StrStartsWith(name, "dash")) {
