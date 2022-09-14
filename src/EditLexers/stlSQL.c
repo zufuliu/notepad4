@@ -230,7 +230,7 @@ static KEYWORDLIST Keywords_SQL = {{
 "st_within( st_x( st_y( startpoint( statement_digest( statement_digest_text( std( stddev( str_to_date( strcmp( strftime( "
 "subdate( substr( substring_index( subtime( sysdate( "
 "time_format( time_to_sec( timediff( to_base64( to_days( to_seconds( total( total_changes( touches( typeof( "
-"ucase( uncompress( uncompressed_length( unhex( unix_timestamp( unlikely( updatexml( uuid_short( uuid_to_bin( "
+"ucase( uncompress( uncompressed_length( unhex( unix_timestamp( unixepoch( unlikely( updatexml( uuid_short( uuid_to_bin( "
 "validate_password_strength( variance( "
 "wait_for_executed_gtid_set( wait_until_sql_thread_after_gtids( weekday( weekofyear( yearweek( zeroblob( "
 
@@ -472,7 +472,7 @@ static KEYWORDLIST Keywords_SQL = {{
 "ST_Within( ST_X( ST_Y( SUBDATE( SUBSTR( SUBSTRING( SUBSTRING_INDEX( SUBTIME( SUM( SYSDATE( SYSTEM_USER( StartPoint( "
 "TAN( TIME( TIMEDIFF( TIMESTAMP( TIMESTAMPADD( TIMESTAMPDIFF( TIME_FORMAT( TIME_TO_SEC( "
 "TOTAL( TOTAL_CHANGES( TO_BASE64( TO_DAYS( TO_SECONDS( TRIM( TRUNCATE( TYPEOF( Touches( "
-"UCASE( UNCOMPRESS( UNCOMPRESSED_LENGTH( UNHEX( UNICODE( UNIX_TIMESTAMP( UNLIKELY( UPPER( USER( "
+"UCASE( UNCOMPRESS( UNCOMPRESSED_LENGTH( UNHEX( UNICODE( UNIXEPOCH( UNIX_TIMESTAMP( UNLIKELY( UPPER( USER( "
 "UTC_DATE( UTC_TIME( UTC_TIMESTAMP( UUID( UUID_SHORT( UUID_TO_BIN( UpdateXML( "
 "VALIDATE_PASSWORD_STRENGTH( VALUE( VALUES( VARIANCE( VAR_POP( VAR_SAMP( VERSION( "
 "WAIT_FOR_EXECUTED_GTID_SET( WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS( WEEK( WEEKDAY( WEEKOFYEAR( WEIGHT_STRING( Within( "

@@ -1,4 +1,4 @@
--- 3.33.0 https://sqlite.org/lang.html
+-- 3.39 https://sqlite.org/lang.html
 --! keywords		===========================================================
 -- https://sqlite.org/lang_keywords.html
 ABORT
@@ -7,6 +7,7 @@ ADD
 AFTER
 ALL
 ALTER
+ALWAYS
 ANALYZE
 AND
 AS
@@ -30,6 +31,7 @@ CONFLICT
 CONSTRAINT
 CREATE
 CROSS
+CURRENT
 CURRENT_DATE
 CURRENT_TIME
 CURRENT_TIMESTAMP
@@ -54,6 +56,7 @@ EXISTS
 EXPLAIN
 FAIL
 FILTER
+FIRST
 FOLLOWING
 FOR
 FOREIGN
@@ -80,10 +83,12 @@ IS
 ISNULL
 JOIN
 KEY
+LAST
 LEFT
 LIKE
 LIMIT
 MATCH
+MATERIALIZED
 NATURAL
 NO
 NOT
@@ -115,6 +120,7 @@ RELEASE
 RENAME
 REPLACE
 RESTRICT
+RETURNING
 RIGHT
 ROLLBACK
 ROW
@@ -201,10 +207,11 @@ total(X)
 -- date and time functions
 -- https://sqlite.org/lang_datefunc.html
 date(timestring, modifier, modifier, ...)
+time(timestring, modifier, modifier, ...)
 datetime(timestring, modifier, modifier, ...)
 julianday(timestring, modifier, modifier, ...)
+unixepoch(time-value, modifier, modifier, ...)
 strftime(format, timestring, modifier, modifier, ...)
-time(timestring, modifier, modifier, ...)
 -- Built-in Window Functions
 -- https://sqlite.org/windowfunctions.html#biwinfunc
 row_number()
@@ -228,6 +235,7 @@ abs(X)
 changes()
 char(X1, X2, ..., XN)
 coalesce(X, Y, ...)
+format(FORMAT,...)
 glob(X, Y)
 hex(X)
 ifnull(X, Y)
@@ -264,9 +272,11 @@ sqlite_source_id()
 sqlite_version()
 substr(X, Y)
 substr(X, Y, Z)
+substring(X, Y)
+substring(X, Y, Z)
 total_changes()
 trim(X)
-trim(X,Y)
+trim(X, Y)
 typeof(X)
 unicode(X)
 unlikely(X)
