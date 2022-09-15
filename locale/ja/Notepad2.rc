@@ -80,8 +80,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "編集モード(&M)"
 		BEGIN
-			MENUITEM "Read Only &File",				IDM_FILE_READONLY_FILE
-			MENUITEM "&Read Only Mode\tF10",		IDM_FILE_READONLY_MODE
+			MENUITEM "読み取り専用ファイル(&F)",				IDM_FILE_READONLY_FILE
+			MENUITEM "読み取り専用モード(&R)\tF10",		IDM_FILE_READONLY_MODE
 #if defined(_WIN64)
 			MENUITEM "巨大ファイル(&L)",			IDM_FILE_LARGE_FILE_MODE
 #endif
@@ -1156,8 +1156,8 @@ BEGIN
     LTEXT           "デフォルトの改行コード(&D):",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     AUTOCHECKBOX    "読込時に一貫性のない改行コードを警告(&I)",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
-    AUTOCHECKBOX    "保存時に改行コードを統一する(&E)",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
-    AUTOCHECKBOX    "保存時に末尾の空白を削除する(&S)",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
+    AUTOCHECKBOX    "保存時に改行コードを統一(&E)",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
+    AUTOCHECKBOX    "保存時に末尾の空白を削除(&S)",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
     PUSHBUTTON     "キャンセル",IDCANCEL,139,24,50,14
 END
@@ -1845,8 +1845,8 @@ BEGIN
     IDS_APPTITLE_PASTEBOARD "Notepad2: クリップボード履歴"
     IDS_UNTITLED            "無題"
     IDS_TITLEEXCERPT        """%s"""
-    IDS_READONLY_FILE       "(Read Only File)"
-    IDS_READONLY_MODE       "(Read Only Mode)"
+    IDS_READONLY_FILE       "(読み取り専用ファイル)"
+    IDS_READONLY_MODE       "(読み取り専用モード)"
     IDS_DOCPOS              "行 %s / %s  列 %s / %s  字 %s / %s  選 %s / %s  選行 %s  見 %s"
     IDS_LOADFILE            "読込中 ""%s"" ..."
     IDS_SAVEFILE            "保存中 ""%s"" ..."
@@ -1961,7 +1961,7 @@ BEGIN
     IDS_ASK_ENCODING2       "空のファイルの文字コードを ANSI から 非ANCI へと変更しようとしています。引き継げないので「元に戻す」の履歴が消去されます。\n続行しますか？"
     IDS_ERR_ENCODINGNA      "このパソコンでは、選択した文字コード用のコードページ変換テーブルが利用できません。"
     IDS_ERR_UNICODE         "Unicode への変換中にエラーが発生しました。\nファイルを保存するとデータが失われます！"
-    IDS_BINARY_FILE_OPENED  "This is most likely not a text file, so it is opened in read only mode\nto prevent accidental editing cause file corruption."
+    IDS_BINARY_FILE_OPENED  "テキストファイルではない可能性が高いため、読み取り専用モードで開きました。\n誤って編集し、ファイルが破損することを防ぎます。"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
     IDS_CHANGE_LANG_RESTART "表示言語の変更には Notepad2 の再起動が必要です。\n今すぐ再起動しますか？"
 #endif
@@ -1981,7 +1981,7 @@ BEGIN
 /m 文字列\t文字列一致 (/m- 最後, /mr 正規表現, /mb バックスラッシュ変換)\n\
 /l[o|p]\tファイル変更時に自動で最新内容に再読み込み\n\
 /q\tファイルがない場合、問い合わせずファイル作成\n\
-/ro\tOpen file in read only mode.\n\
+/ro\tファイルを読み取り専用モードで開く\n\
 /s 設定名\t配色設定を指定 [/s ext]\n\
 /d\tテキストファイルの配色を指定\n\
 /h\tWEBソースコードの配色を指定\n\
