@@ -1,9 +1,9 @@
 --! keywords		===========================================================
--- 8.0.22 https://dev.mysql.com/doc/refman/8.0/en/keywords.html
--- 5.7.11 https://dev.mysql.com/doc/refman/5.7/en/keywords.html
--- 5.6.8 https://dev.mysql.com/doc/refman/5.6/en/keywords.html
+-- 8.0.32 https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+-- 5.7.40 https://dev.mysql.com/doc/refman/5.7/en/keywords.html
+-- 5.6.51 https://dev.mysql.com/doc/refman/5.6/en/keywords.html
 -- 5.5.8 https://dev.mysql.com/doc/refman/5.5/en/keywords.html
--- 2020-09-19 https://mariadb.com/kb/en/library/reserved-words/
+-- 2022-09-15 10.9.2 https://mariadb.com/kb/en/library/reserved-words/
 -- A
 ACCESSIBLE (R)
 ACCOUNT					-- added in 5.7.6 (nonreserved)
@@ -22,13 +22,14 @@ ANALYSE					-- added in 5.6.6 (nonreserved); removed in 8.0.1
 ANALYZE (R)
 AND (R)
 ANY
-ARRAY (R)				-- added in 8.0.17 (reserved)
+ARRAY (R)				-- added in 8.0.17 (reserved); became nonreserved in 8.0.19
 AS (R)
 ASC (R)
 ASCII
 ASENSITIVE (R)
 AT
 ATTRIBUTE				-- added in 8.0.21 (nonreserved)
+AUTHENTICATION			-- added in 8.0.27 (nonreserved)
 AUTHORS					-- removed in 5.6.8
 AUTOEXTEND_SIZE
 AUTO_INCREMENT
@@ -62,6 +63,7 @@ CASE (R)
 END CASE;
 CATALOG_NAME
 CHAIN
+CHALLENGE_RESPONSE		-- added in 8.0.27 (nonreserved)
 CHANGE (R)
 CHANGED
 CHANNEL					-- added in 5.7.6 (nonreserved)
@@ -140,6 +142,7 @@ DEFINITION				-- added in 8.0.4 (nonreserved)
 DELAYED (R)
 DELAY_KEY_WRITE
 DELETE (R)
+DELETE_DOMAIN_ID		-- added in MariaDB
 DENSE_RANK (R)			-- added in 8.0.2 (reserved)
 DESC (R)
 DESCRIBE (R)
@@ -175,6 +178,7 @@ ENDS
 ENFORCED				-- added in 8.0.16 (nonreserved)
 ENGINE
 ENGINES
+ENGINE_ATTRIBUTE		-- added in 8.0.21 (nonreserved)
 ENUM
 ERROR					-- added in 5.5.3 (nonreserved)
 ERRORS
@@ -196,6 +200,7 @@ EXPORT					-- added in 5.6.6 (nonreserved)
 EXTENDED
 EXTENT_SIZE
 -- F
+FACTOR					-- added in 8.0.27 (nonreserved)
 FAILED_LOGIN_ATTEMPTS	-- added in 8.0.19 (nonreserved)
 FALSE (R)
 FAST
@@ -205,6 +210,7 @@ FIELDS
 FILE
 FILE_BLOCK_SIZE			-- added in 5.7.6 (nonreserved)
 FILTER					-- added in 5.7.3 (nonreserved)
+FINISH					-- added in 8.0.27 (nonreserved)
 FIRST
 FIRST_VALUE (R)			-- added in 8.0.2 (reserved)
 FIXED
@@ -233,6 +239,7 @@ GEOMETRYCOLLECTION
 GET (R)					-- added in 5.6.4 (reserved)
 GET_FORMAT
 GET_MASTER_PUBLIC_KEY	-- added in 8.0.4 (reserved); became nonreserved in 8.0.11
+GET_SOURCE_PUBLIC_KEY	-- added in 8.0.23 (nonreserved)
 GLOBAL
 GRANT (R)
 GRANTS
@@ -240,6 +247,7 @@ GROUP (R)
 GROUPING (R)			-- added in 8.0.1 (reserved)
 GROUPS (R)				-- added in 8.0.2 (reserved)
 GROUP_REPLICATION		-- added in 5.7.6 (nonreserved)
+GTID_ONLY				-- added in 8.0.27 (nonreserved)
 -- H
 HANDLER
 HASH
@@ -266,7 +274,9 @@ INACTIVE				-- added in 8.0.14 (nonreserved)
 INDEX (R)
 INDEXES
 INFILE (R)
+INITIAL					-- added in 8.0.27 (nonreserved)
 INITIAL_SIZE
+INITIATE				-- added in 8.0.27 (nonreserved)
 INNER (R)
 INNOBASE				-- removed in 5.5.3
 INNODB					-- removed in 5.5.3
@@ -283,7 +293,7 @@ INT3 (R)
 INT4 (R)
 INT8 (R)
 INTEGER (R)
-INTERSECT (M)			-- added in MariaDB 10.3.0
+INTERSECT (R)			-- added in 8.0.31 (reserved); added in MariaDB 10.3.0
 INTERVAL (R)
 INTO (R)
 INVOKER
@@ -304,6 +314,7 @@ JSON_VALUE				-- added in 8.0.21 (nonreserved)
 -- K
 KEY (R)
 KEYS (R)
+KEYRING					-- added in 8.0.24 (nonreserved)
 KEY_BLOCK_SIZE
 KILL (R)
 -- L
@@ -355,7 +366,7 @@ MASTER_PASSWORD
 MASTER_PORT
 MASTER_PUBLIC_KEY_PATH		-- added in 8.0.4 (nonreserved)
 MASTER_RETRY_COUNT			-- added in 5.6.1 (nonreserved)
-MASTER_SERVER_ID
+MASTER_SERVER_ID			-- removed in 8.0.23
 MASTER_SSL
 MASTER_SSL_CA
 MASTER_SSL_CAPATH
@@ -365,6 +376,7 @@ MASTER_SSL_CRL				-- added in 5.6.3 (nonreserved)
 MASTER_SSL_CRLPATH			-- added in 5.6.3 (nonreserved)
 MASTER_SSL_KEY
 MASTER_SSL_VERIFY_SERVER_CERT (R)
+MASTER_TLS_CIPHERSUITES		-- added in 8.0.19 (nonreserved)
 MASTER_TLS_VERSION			-- added in 5.7.10 (nonreserved)
 MASTER_USER
 MASTER_ZSTD_COMPRESSION_LEVEL	-- added in 8.0.18 (nonreserved)
@@ -381,7 +393,7 @@ MEDIUM
 MEDIUMBLOB (R)
 MEDIUMINT (R)
 MEDIUMTEXT (R)
-MEMBER (R)					-- added in 8.0.17 (reserved)
+MEMBER 						-- added in 8.0.17 (reserved); became nonreserved in 8.0.19
 MEMORY
 MERGE;
 MESSAGE_TEXT
@@ -461,6 +473,7 @@ OWNER
 -- P
 PACK_KEYS
 PAGE
+PAGE_CHECKSUM
 PARSER
 PARSE_GCOL_EXPR			-- added in 5.7.6 (reserved); became nonreserved in 5.7.8; removed in 8.0
 PARTIAL
@@ -517,9 +530,10 @@ REDOFILE				-- removed in 8.0.3
 REDO_BUFFER_SIZE
 REDUNDANT
 REF_SYSTEM_ID			-- added in MariaDB 10.1.2
-REFERENCE				-- added in 8.0.11 (nonreserved)
+REFERENCE				-- added in 8.0.4 (nonreserved)
 REFERENCES (R)
 REGEXP (R)
+REGISTRATION			-- added in 8.0.27 (nonreserved)
 RELAY					-- added in 5.5.3 (nonreserved)
 RELAYLOG
 RELAY_LOG_FILE
@@ -557,7 +571,7 @@ RESTRICT (R)
 RESUME
 RETURN (R)
 RETURNED_SQLSTATE		-- added in 5.6.4 (nonreserved)
-RETURNING (M)			-- added in MariaDB 10.0.5
+RETURNING (M)			-- added in 8.0.21 (nonreserved); added in MariaDB 10.0.5
 RETURNS
 REUSE					-- added in 8.0.3 (nonreserved)
 REVERSE
@@ -570,7 +584,7 @@ ROLLUP
 ROTATE					-- added in 5.7.11 (nonreserved)
 ROUTINE
 ROW (R)					-- became reserved in 8.0.2
-ROWS (R)				-- became reserved in 8.0.2, added in MariaDB 10.2.4
+ROWS (R)				-- became reserved in 8.0.2; added in MariaDB 10.2.4
 ROW_COUNT				-- added in 5.6.4 (nonreserved)
 ROW_FORMAT
 ROW_NUMBER (R)			-- added in 8.0.2 (reserved)
@@ -613,6 +627,32 @@ SOME
 SONAME
 SOUNDS
 SOURCE
+SOURCE_AUTO_POSITION			-- added in 8.0.23 (nonreserved)
+SOURCE_BIND						-- added in 8.0.23 (nonreserved)
+SOURCE_COMPRESSION_ALGORITHMS	-- added in 8.0.23 (nonreserved)
+SOURCE_CONNECT_RETRY			-- added in 8.0.23 (nonreserved)
+SOURCE_DELAY					-- added in 8.0.23 (nonreserved)
+SOURCE_HEARTBEAT_PERIOD			-- added in 8.0.23 (nonreserved)
+SOURCE_HOST						-- added in 8.0.23 (nonreserved)
+SOURCE_LOG_FILE					-- added in 8.0.23 (nonreserved)
+SOURCE_LOG_POS					-- added in 8.0.23 (nonreserved)
+SOURCE_PASSWORD					-- added in 8.0.23 (nonreserved)
+SOURCE_PORT						-- added in 8.0.23 (nonreserved)
+SOURCE_PUBLIC_KEY_PATH			-- added in 8.0.23 (nonreserved)
+SOURCE_RETRY_COUNT				-- added in 8.0.23 (nonreserved)
+SOURCE_SSL						-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_CA					-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_CAPATH				-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_CERT					-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_CIPHER				-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_CRL					-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_CRLPATH				-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_KEY					-- added in 8.0.23 (nonreserved)
+SOURCE_SSL_VERIFY_SERVER_CERT	-- added in 8.0.23 (nonreserved)
+SOURCE_TLS_CIPHERSUITES			-- added in 8.0.23 (nonreserved)
+SOURCE_TLS_VERSION				-- added in 8.0.23 (nonreserved)
+SOURCE_USER						-- added in 8.0.23 (nonreserved)
+SOURCE_ZSTD_COMPRESSION_LEVEL	-- added in 8.0.23 (nonreserved)
 SPATIAL (R)
 SPECIFIC (R)
 SQL (R)
@@ -709,6 +749,7 @@ UNION (R)
 UNIQUE (R)
 UNKNOWN
 UNLOCK (R)
+UNREGISTER				-- added in 8.0.27 (nonreserved)
 UNSIGNED (R)
 UNTIL
 UPDATE (R)
@@ -771,10 +812,14 @@ BODY
 ELSIF
 GOTO
 HISTORY					-- <= MariaDB 10.3.6 only
+MINUS					-- From MariaDB 10.6.1
+OTHERS
 PACKAGE
 PERIOD					-- <= MariaDB 10.3.6 only
 RAISE
+ROWNUM					-- From MariaDB 10.6.1
 ROWTYPE
+SYSDATE					-- From MariaDB 10.6.1
 SYSTEM					-- <= MariaDB 10.3.6 only
 SYSTEM_TIME				-- <= MariaDB 10.3.6 only
 VERSIONING				-- <= MariaDB 10.3.6 only
@@ -1054,8 +1099,14 @@ CREATE_ASYMMETRIC_PRIV_KEY(algorithm, {key_len | dh_secret})
 CREATE_ASYMMETRIC_PUB_KEY(algorithm, priv_key_str)
 CREATE_DH_PARAMETERS(key_len)
 CREATE_DIGEST(digest_type, str)
+-- Locking Functions
+GET_LOCK(str,timeout)
+IS_FREE_LOCK(str)
+IS_USED_LOCK(str)
+RELEASE_ALL_LOCKS()
+RELEASE_LOCK(str)
 -- Information Functions
-analyse([max_elements [,max_memory]])
+ANALYSE([max_elements [,max_memory]])
 BENCHMARK(count, expr)
 BINLOG_GTID_POS(binlog_filename, binlog_offset)		-- added in MariaDB 10.0.2
 CHARSET(str)
@@ -1312,10 +1363,16 @@ PERCENTILE_CONT(expr)			-- added in MariaDB 10.3.3
 PERCENTILE_DISC(expr)			-- added in MariaDB 10.3.3
 RANK() over_clause
 ROW_NUMBER() over_clause
+-- Performance Schema Functions
+FORMAT_BYTES(count)
+FORMAT_PICO_TIME(time_val)
+PS_CURRENT_THREAD_ID()
+PS_THREAD_ID(connection_id)
 -- Internal Functions
 CAN_ACCESS_COLUMN(ARGS)
 CAN_ACCESS_DATABASE(ARGS)
 CAN_ACCESS_TABLE(ARGS)
+CAN_ACCESS_USER(ARGS)
 CAN_ACCESS_VIEW(ARGS)
 GET_DD_COLUMN_PRIVILEGES(ARGS)
 GET_DD_CREATE_OPTIONS(ARGS)
@@ -1328,9 +1385,13 @@ INTERNAL_DATA_FREE(ARGS)
 INTERNAL_DATA_LENGTH(ARGS)
 INTERNAL_DD_CHAR_LENGTH(ARGS)
 INTERNAL_GET_COMMENT_OR_ERROR(ARGS)
+INTERNAL_GET_ENABLED_ROLE_JSON(ARGS)
+INTERNAL_GET_HOSTNAME(ARGS)
+INTERNAL_GET_USERNAME(ARGS)
 INTERNAL_GET_VIEW_WARNING_OR_ERROR(ARGS)
 INTERNAL_INDEX_COLUMN_CARDINALITY(ARGS)
 INTERNAL_INDEX_LENGTH(ARGS)
+INTERNAL_IS_MANDATORY_ROLE(ARGS)
 INTERNAL_KEYS_DISABLED(ARGS)
 INTERNAL_MAX_DATA_LENGTH(ARGS)
 INTERNAL_TABLE_ROWS(ARGS)
@@ -1342,25 +1403,20 @@ BIN_TO_UUID(binary_uuid)
 BIN_TO_UUID(binary_uuid, swap_flag)
 DEFAULT(col_name)
 FORMAT(X, D)
-GET_LOCK(str, timeout)
 GROUPING(expr [, expr] ...)
 INET_ATON(expr)
 INET_NTOA(expr)
 INET6_ATON(expr)
 INET6_NTOA(expr)
-IS_FREE_LOCK(str)
 IS_IPV4(expr)
 IS_IPV4_COMPAT(expr)
 IS_IPV4_MAPPED(expr)
 IS_IPV6(expr)
-IS_USED_LOCK(str)
 IS_UUID(string_uuid)
 MASTER_GTID_WAIT(gtid-list [, timeout)	-- added in MariaDB 10.0.9
 MASTER_POS_WAIT(log_name, log_pos [, timeout] [, channel])
 NAME_CONST(name, value)
 RAND()
-RELEASE_ALL_LOCKS()
-RELEASE_LOCK(str)
 SLEEP(duration)
 UUID()
 UUID_SHORT()
@@ -1388,8 +1444,11 @@ COLUMN_LIST(dyncol_blob)
 -- JSON Functions
 JSON_COMPACT(json_doc)					-- added in MariaDB 10.2.4
 JSON_DETAILED(json_doc [, tab_size])	-- added in MariaDB 10.2.4
+JSON_EQUALS(json1, json2)				-- added in MariaDB 10.7.0
 JSON_EXISTS(json_doc, path)				-- added in MariaDB 10.2.3
 JSON_LOOSE(json_doc)					-- added in MariaDB 10.2.4
+JSON_NORMALIZE(json)					-- added in MariaDB 10.7.0
+JSON_OVERLAPS(json_doc1, json_doc2)		-- added in MariaDB 10.9.0
 JSON_QUERY(json_doc, path)				-- added in MariaDB 10.2.3
 JSON_VALUE(json_doc, path)				-- added in MariaDB 10.2.3
 -- Spider Functions

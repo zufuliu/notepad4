@@ -119,9 +119,9 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* M4 Macro, limited support
 	* SQL Query
 		* [SQL Standard](tools/lang/SQL.sql), up to SQL:2016.
-		* [MySQL](tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.3.
+		* [MySQL](tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.9.
 		* [SQLite3](tools/lang/SQLite3.sql), up to 3.39.
-		* [PostgreSQL](tools/lang/PostgreSQL.sql), PostgreSQL 13.
+		* [PostgreSQL](tools/lang/PostgreSQL.sql), PostgreSQL 14.
 		* [Transact-SQL](tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.
 	* [Swift](tools/lang/Swift.swift), up to Swift 5.7.

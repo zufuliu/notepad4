@@ -1,4 +1,4 @@
--- PostgreSQL 13
+-- PostgreSQL 14
 --! Data Types
 -- https://www.postgresql.org/docs/current/datatype.html
 bigint int8
