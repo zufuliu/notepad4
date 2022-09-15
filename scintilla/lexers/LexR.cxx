@@ -46,7 +46,7 @@ struct EscapeSequence {
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsHexDigit(ch);
+		return digitsLeft <= 0 || !IsADigit(ch, numBase);
 	}
 };
 
@@ -213,6 +213,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			}
 			break;
 
+		case SCE_R_BACKTICKS:
 		case SCE_R_STRING_SQ:
 		case SCE_R_STRING_DQ:
 		case SCE_R_RAWSTRING_SQ:
@@ -221,7 +222,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_R_ESCAPECHAR);
 				sc.Forward();
-			} else if (sc.ch == '%') {
+			} else if (sc.ch == '%' && sc.state != SCE_R_BACKTICKS) {
 				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 				if (length != 0) {
 					const int state = sc.state;
@@ -231,7 +232,8 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					continue;
 				}
 			} else if ((sc.state == SCE_R_STRING_SQ && sc.ch == '\'')
-				|| (sc.state == SCE_R_STRING_DQ && sc.ch == '\"')) {
+				|| (sc.state == SCE_R_STRING_DQ && sc.ch == '\"')
+				|| (sc.state == SCE_R_BACKTICKS && sc.ch == '`')) {
 				sc.ForwardSetState(SCE_R_DEFAULT);
 			} else if (IsRawString(sc.state) && sc.ch == matchingDelimiter) {
 				insideUrl = insideUrl && sc.ch != '}';
@@ -259,14 +261,6 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			if (escSeq.atEscapeEnd(sc.ch)) {
 				sc.SetState(escSeq.outerState);
 				continue;
-			}
-			break;
-
-		case SCE_R_BACKTICKS:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_R_DEFAULT);
-			} else if (sc.ch == '`') {
-				sc.ForwardSetState(SCE_R_DEFAULT);
 			}
 			break;
 		}
