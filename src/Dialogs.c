@@ -1450,7 +1450,7 @@ static INT_PTR CALLBACK WordWrapSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		WCHAR tch[512];
 		for (int i = 0; i < 4; i++) {
 			HWND hwndCtl = GetDlgItem(hwnd, IDC_WRAP_INDENT + i);
-			GetDlgItemText(hwnd, IDC_WRAP_INDENT_OPTIONS + i, tch, COUNTOF(tch));
+			GetString(IDS_WRAP_INDENT_OPTIONS + i, tch, COUNTOF(tch));
 			lstrcat(tch, L"|");
 			LPWSTR p1 = tch;
 			LPWSTR p2;

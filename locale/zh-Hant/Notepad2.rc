@@ -1321,10 +1321,6 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "確定",IDOK,137,118,50,14
     PUSHBUTTON      "取消",IDCANCEL,193,118,50,14
-    LTEXT           "無換行縮排|換行縮排 1 個字元|換行縮排 2 個字元|換行縮排 1 層|換行縮排 2 層|換行縮進同首個子行|換行縮進比第一個子行多 1 層|換行縮進比第一個子行多 2 層",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "換行前無換行子|換行前顯示換行子(文字附近)|換行前顯示換行子(邊緣附近)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "換行後無換行子|換行後顯示換行子(文字附近)|換行後顯示換行子(邊緣附近)|換行後顯示換行子(在列號列)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "無換行|單詞之間換行|任何字元之間換行|空白字元處換行|自動單詞換行",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "換行的文字",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "從左邊界選擇行時只選取子行",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
     AUTOCHECKBOX    "高亮目前行時只高亮子行",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
@@ -2173,6 +2169,11 @@ BEGIN
 樣式屬性可以用複製並貼上或拖放來複製。\r\n\
 \r\n\
 “预览”按钮将不会应用任何更改。"
+
+	IDS_WRAP_INDENT_OPTIONS			"無換行縮排|換行縮排 1 個字元|換行縮排 2 個字元|換行縮排 1 層|換行縮排 2 層|換行縮進同首個子行|換行縮進比第一個子行多 1 層|換行縮進比第一個子行多 2 層"
+	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"換行前無換行子|換行前顯示換行子(文字附近)|換行前顯示換行子(邊緣附近)"
+	IDS_WRAP_SYMBOL_AFTER_OPTIONS	"換行後無換行子|換行後顯示換行子(文字附近)|換行後顯示換行子(邊緣附近)|換行後顯示換行子(在列號列)"
+	IDS_WRAP_MODE_OPTIONS			"無換行|單詞之間換行|任何字元之間換行|空白字元處換行|自動單詞換行"
 END
 
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME

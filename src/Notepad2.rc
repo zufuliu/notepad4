@@ -1321,10 +1321,6 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,137,118,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,193,118,50,14
-    LTEXT           "No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "For wrapped line",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "Only select subline when selecting line from left margin.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
     AUTOCHECKBOX    "Only highlight subline when highlighting current line.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
@@ -2174,6 +2170,10 @@ Style properties can be copied using copy and paste or drag and drop.\r\n\
 \r\n\
 The ""Preview"" button will not apply any changes."
 
+	IDS_WRAP_INDENT_OPTIONS			"No wrap indent|Wrap indent by 1 character|Wrap indent by 2 characters|Wrap indent by 1 level|Wrap indent by 2 levels|Wrap indent same as first subline|Wrap indent 1 level more than first subline|Wrap indent 2 levels more than first subline"
+	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"No visual indicators before wrap|Show visual indicators before wrap (near text)|Show visual indicators before wrap (near borders)"
+	IDS_WRAP_SYMBOL_AFTER_OPTIONS	"No visual indicators after wrap|Show visual indicators after wrap (near text)|Show visual indicators after wrap (near borders)|Show visual indicators after wrap (in line number margin)"
+	IDS_WRAP_MODE_OPTIONS			"No wrap|Wrap text between words|Wrap text between any characters|Wrap text on whitespace|Automatic word wrap"
 END
 
 #if 0//NP2_ENABLE_LOCALIZE_LEXER_NAME

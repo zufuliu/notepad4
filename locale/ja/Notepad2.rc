@@ -1321,10 +1321,6 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,137,118,50,14
     PUSHBUTTON     "キャンセル",IDCANCEL,193,118,50,14
-    LTEXT           "折り返し箇所をインデントしない|折り返し箇所を1字インデント|折り返し箇所を2字インデント|折り返し箇所を1段階インデント|折り返し箇所を2段階インデント| 折り返し箇所の最初の行を目安にインデント|折り返し箇所の最初の行を目安に1段階インデント|折り返し箇所の最初の行を目安に2段階インデント",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "折り返し前のマークは非表示|折り返し前のマークは文字列の近くに表示|折り返し前のマークは端に表示",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "折り返し後のマークは非表示|折り返し後のマークは文字列の近くに表示|折り返し後のマークは端に表示|折り返し後のマークは行番号に表示",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "文章中に折り返さない|半角単語の間で折り返す|どんな文字の間でも折り返す|空白で折り返す|自動",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "折り返された行は…",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "行番号から行を選択した際に該当の折り返し行を選択(&S)",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
     AUTOCHECKBOX    "現在の行を強調表示した際に該当の折り返し行を強調表示(&H)",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
@@ -2174,6 +2170,10 @@ BEGIN
 \r\n\
 プレビューでの反映では、まだ設定は保存されません。"
 
+	IDS_WRAP_INDENT_OPTIONS			"折り返し箇所をインデントしない|折り返し箇所を1字インデント|折り返し箇所を2字インデント|折り返し箇所を1段階インデント|折り返し箇所を2段階インデント| 折り返し箇所の最初の行を目安にインデント|折り返し箇所の最初の行を目安に1段階インデント|折り返し箇所の最初の行を目安に2段階インデント"
+	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"折り返し前のマークは非表示|折り返し前のマークは文字列の近くに表示|折り返し前のマークは端に表示"
+	IDS_WRAP_SYMBOL_AFTER_OPTIONS	"折り返し後のマークは非表示|折り返し後のマークは文字列の近くに表示|折り返し後のマークは端に表示|折り返し後のマークは行番号に表示"
+	IDS_WRAP_MODE_OPTIONS			"文章中に折り返さない|半角単語の間で折り返す|どんな文字の間でも折り返す|空白で折り返す|自動"
 END
 
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME

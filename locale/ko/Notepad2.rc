@@ -1321,10 +1321,6 @@ BEGIN
     COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "확인",IDOK,137,118,50,14
     PUSHBUTTON      "취소",IDCANCEL,193,118,50,14
-    LTEXT           "들여쓰기 줄바꿈 안함|한 글자 들여쓰기 줄바꿈|두 글자 들여쓰기 줄바꿈|한 단계 들여쓰기 줄바꿈|두 단계 들여쓰기 줄바꿈|첫 번째 하위 줄과 동일하게 들여쓰기 줄바꿈|첫 번째 하위 줄보다 한 단계 더 들여쓰기 줄바꿈|첫 번째 하위 줄보다 두 단계 더 들여쓰기 줄바꿈",IDC_WRAP_INDENT_OPTIONS,0,0,615,8,NOT WS_VISIBLE
-    LTEXT           "줄바꿈 전에 시각적 표시기 안함|줄바꿈 전에 시각적 표시기 표시 (텍스트 근처)|줄바꿈 전에 시각적 표시기 표시 (테두리 근처)",IDC_WRAP_SYMBOL_BEFORE_OPTIONS,0,0,418,8,NOT WS_VISIBLE
-    LTEXT           "줄바꿈 후에 시각적 표시기 안함|줄바꿈 후에 시각적 표시기 표시 (텍스트 근처)|줄바꿈 후에 시각적 표시기 표시 (테두리 근처)|줄바꿈 후에 시각적 표시기 표시 (줄 번호 여백)",IDC_WRAP_SYMBOL_AFTER_OPTIONS,0,0,402,8,NOT WS_VISIBLE
-    LTEXT           "줄바꿈 안함|단어 사이에 텍스트 줄바꿈|문자 사이에 텍스트 줄바꿈|공백에 텍스트 줄바꿈|자동 줄바꿈|",IDC_WRAP_MODE_OPTIONS,0,0,187,8,NOT WS_VISIBLE
     GROUPBOX        "줄바꿈된 줄의 경우",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "왼쪽 여백에서 줄 선택 시 하위 줄만 선택",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
     AUTOCHECKBOX    "현재 줄을 강조 표시할 때 하위 줄만 강조 표시",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
@@ -2174,6 +2170,10 @@ BEGIN
 \r\n\
 ""미리보기"" 버튼은 어떠한 변경사항도 저장하지 않습니다."
 
+	IDS_WRAP_INDENT_OPTIONS			"들여쓰기 줄바꿈 안함|한 글자 들여쓰기 줄바꿈|두 글자 들여쓰기 줄바꿈|한 단계 들여쓰기 줄바꿈|두 단계 들여쓰기 줄바꿈|첫 번째 하위 줄과 동일하게 들여쓰기 줄바꿈|첫 번째 하위 줄보다 한 단계 더 들여쓰기 줄바꿈|첫 번째 하위 줄보다 두 단계 더 들여쓰기 줄바꿈"
+	IDS_WRAP_SYMBOL_BEFORE_OPTIONS	"줄바꿈 전에 시각적 표시기 안함|줄바꿈 전에 시각적 표시기 표시 (텍스트 근처)|줄바꿈 전에 시각적 표시기 표시 (테두리 근처)"
+	IDS_WRAP_SYMBOL_AFTER_OPTIONS	"줄바꿈 후에 시각적 표시기 안함|줄바꿈 후에 시각적 표시기 표시 (텍스트 근처)|줄바꿈 후에 시각적 표시기 표시 (테두리 근처)|줄바꿈 후에 시각적 표시기 표시 (줄 번호 여백)"
+	IDS_WRAP_MODE_OPTIONS			"줄바꿈 안함|단어 사이에 텍스트 줄바꿈|문자 사이에 텍스트 줄바꿈|공백에 텍스트 줄바꿈|자동 줄바꿈|"
 END
 
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
