@@ -2854,6 +2854,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 			dwFileAttributes = GetFileAttributes(szCurFile);
 			bReadOnlyFile = (dwFileAttributes != INVALID_FILE_ATTRIBUTES) && (dwFileAttributes & FILE_ATTRIBUTE_READONLY);
+			if (!bReadOnlyFile && bReadOnlyMode) {
+				bReadOnlyMode = false;
+				SciCall_SetReadOnly(false);
+			}
 			UpdateWindowTitle();
 		}
 		break;
