@@ -36,6 +36,7 @@ symbol
 weakref
 
 # The R Base Package
+# https://search.r-project.org/CRAN/doc/html/packages.html
 .Autoloaded
 .AutoloadEnv
 .BaseNamespaceEnv

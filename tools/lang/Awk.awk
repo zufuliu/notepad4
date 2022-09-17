@@ -1,4 +1,4 @@
-# 5.1 https://www.gnu.org/software/gawk/manual/
+# 5.2 https://www.gnu.org/software/gawk/manual/
 
 #! keywords			===========================================================
 # https://www.gnu.org/software/gawk/manual/html_node/BEGIN_002fEND.html#BEGIN_002fEND
@@ -33,6 +33,7 @@ ARGC ARGV ARGIND ENVIRON ERRNO FILENAME FNR NF FUNCTAB NR PROCINFO RLENGTH RSTAR
 
 #! Built-in Functions	=======================================================
 # https://www.gnu.org/software/gawk/manual/html_node/Built_002din.html#Built_002din
+mkbool(expression)
 # Numeric Functions
 # https://www.gnu.org/software/gawk/manual/html_node/Numeric-Functions.html
 atan2(y, x)
@@ -109,6 +110,7 @@ function join(array, start, end, sep, result, i)
 function getlocaltime(time, ret, now, i)
 function readfile(file, tmp, save_rs)
 function shell_quote(s, SINGLE, QSINGLE, i, X, n, ret)
+function isnumeric(x, f)
 
 # Data file Management
 # https://www.gnu.org/software/gawk/manual/html_node/Data-File-Management.html

@@ -12,14 +12,14 @@ static KEYWORDLIST Keywords_Awk = {{
 
 , // 2 built-in function
 "and( asort( asorti( atan2( bindtextdomain( close( compl( cos( dcgettext( dcngettext( exp( fflush( gensub( gsub( "
-"index( int( isarray( length( log( lshift( match( mktime( or( patsplit( rand( rshift( "
+"index( int( isarray( length( log( lshift( match( mkbool( mktime( or( patsplit( rand( rshift( "
 "sin( split( sprintf( sqrt( srand( strftime( strtonum( sub( substr( system( systime( tolower( toupper( typeof( xor( "
 
 , // 3 library function
 "adequate_math_precision( assert( beginfile( bits2str( chr( cliff_rand( ctime( disable_assigns( "
 "endfile( endgrent( endpwent( "
-"getgrent( getgrgid( getgrnam( getgruser( getlocaltime( getopt( getpwent( getpwnam( getpwuid( intdiv0( join( ord( "
-"process_array( quicksort( quicksort_swap( readfile( rewind( round( shell_quote( walk_array( zerofile( "
+"getgrent( getgrgid( getgrnam( getgruser( getlocaltime( getopt( getpwent( getpwnam( getpwuid( intdiv0( isnumeric( join( "
+"ord( process_array( quicksort( quicksort_swap( readfile( rewind( round( shell_quote( walk_array( zerofile( "
 
 , // 4 misc
 "AWKBUFSIZE AWKLIBPATH AWKPATH AWKREADFUNC AWK_HASH "
