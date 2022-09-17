@@ -30,12 +30,12 @@ constexpr bool IsVimEscapeChar(int ch) noexcept {
 
 struct EscapeSequence {
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	bool resetEscapeState(int chNext) noexcept {
 		// https://vimhelp.org/eval.txt.html#string
 		digitsLeft = 0;
-		numBase = 16;
+		hex = true;
 		if (chNext == 'x' || chNext == 'X') {
 			digitsLeft = 3;
 		} else if (chNext == 'u') {
@@ -44,7 +44,7 @@ struct EscapeSequence {
 			digitsLeft = 9;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		} else if (IsVimEscapeChar(chNext)) {
 			digitsLeft = 1;
 		}
@@ -52,7 +52,7 @@ struct EscapeSequence {
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 

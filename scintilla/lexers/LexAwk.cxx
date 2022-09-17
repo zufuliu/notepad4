@@ -26,23 +26,23 @@ namespace {
 
 struct EscapeSequence {
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	// highlight any character as escape sequence.
 	// https://www.gnu.org/software/gawk/manual/html_node/Escape-Sequences.html
 	void resetEscapeState(int chNext) noexcept {
 		digitsLeft = 1;
-		numBase = 16;
 		if (chNext == 'x') {
 			digitsLeft = 3;
+			hex = true;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		}
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 

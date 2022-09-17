@@ -26,22 +26,22 @@ namespace {
 
 struct EscapeSequence {
 	int digitsLeft = 0;
-	int numBase = 16;
+	bool hex = false;
 
 	bool resetEscapeState(int chNext) noexcept {
 		digitsLeft = 1;
-		numBase = 16;
 		if (chNext == 'x') {
 			digitsLeft = 3;
+			hex = true;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		}
 		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 

@@ -52,18 +52,18 @@ constexpr bool IsPyStringStyle(int state) noexcept {
 struct EscapeSequence {
 	int outerState = SCE_PY_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 16;
+	bool hex = false;
 
 	// no highlight for name in '\N{name}'.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 0;
-		numBase = 16;
+		hex = true;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		} else if (AnyOf(chNext, '\\', '\'', '"', 'a', 'b', 'f', 'n', 'r', 't', 'v')) {
 			digitsLeft = 1;
 		} else if (IsPyString(state)) {
@@ -79,7 +79,7 @@ struct EscapeSequence {
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 

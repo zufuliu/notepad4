@@ -27,13 +27,13 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_GO_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	// highlight any character as escape sequence.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
-		numBase = 16;
+		hex = true;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (chNext == 'u') {
@@ -42,12 +42,12 @@ struct EscapeSequence {
 			digitsLeft = 9;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		}
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 

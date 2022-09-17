@@ -27,7 +27,7 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_ASY_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
@@ -38,16 +38,16 @@ struct EscapeSequence {
 		digitsLeft = 1;
 		if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		} else if (UnsafeLower(chNext) == 'x') {
 			digitsLeft = 3;
-			numBase = 16;
+			hex = true;
 		}
 		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 

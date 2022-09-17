@@ -229,7 +229,12 @@ constexpr bool IsOctalDigit(int ch) noexcept {
 	return ch >= '0' && ch <= '7';
 }
 
-constexpr bool IsADigit(int ch, int base) noexcept {
+constexpr bool IsOctalOrHex(int ch, bool hex) noexcept {
+	const unsigned diff = ch - '0';
+	return diff < 8 || (hex && (diff < 10 || Between(UnsafeLower(ch), 'a', 'f')));
+}
+
+constexpr bool IsADigitEx(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0' && ch < '0' + base);
 	}

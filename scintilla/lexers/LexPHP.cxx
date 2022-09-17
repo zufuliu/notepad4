@@ -130,27 +130,26 @@ constexpr bool ExpandVariable(int state) noexcept {
 struct EscapeSequence {
 	int outerState = SCE_PHP_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	// highlight any character as escape sequence, no highlight for hex in '\u{hex}'.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
+		hex = true;
 		if (chNext == 'x') {
 			digitsLeft = 3;
-			numBase = 16;
-		} else if (IsADigit(chNext) && state < SCE_PHP_LABEL) {
+		} else if (IsOctalDigit(chNext) && state < SCE_PHP_LABEL) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		} else if (chNext == 'u' && state > SCE_PHP_LABEL) {
 			digitsLeft = 5;
-			numBase = 16;
 		}
 		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 	bool atUnicodeRangeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -1150,7 +1149,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (sc.ch == '\\') {
 				if (!IsEOLChar(sc.chNext)) {
 					escSeq.outerState = sc.state;
-					escSeq.numBase = 16;
+					escSeq.hex = true;
 					escSeq.digitsLeft = IsHexDigit(sc.chNext) ? 6 : 1;
 					sc.SetState(css_style(SCE_CSS_ESCAPECHAR));
 					sc.Forward();

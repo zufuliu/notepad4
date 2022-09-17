@@ -26,13 +26,13 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_R_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	// highlight any character as escape sequence, no highlight for hex in '\u{hex}' or '\U{hex}'.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
-		numBase = 16;
+		hex = true;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (chNext == 'u') {
@@ -41,12 +41,12 @@ struct EscapeSequence {
 			digitsLeft = 9;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		}
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 
@@ -310,7 +310,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			visibleChars = 1;
 		}
 		if (sc.atLineEnd) {
-			const int lineState = lineStateLineComment | (static_cast<int>(matchingDelimiter) << 1) | (dashCount << 8);
+			const int lineState = lineStateLineComment | (matchingDelimiter << 1) | (dashCount << 8);
 			styler.SetLineState(sc.currentLine, lineState);
 			lineStateLineComment = 0;
 			visibleChars = 0;

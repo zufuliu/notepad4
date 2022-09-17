@@ -29,18 +29,18 @@ namespace {
 struct EscapeSequence {
 	int outerState = SCE_JULIA_DEFAULT;
 	int digitsLeft = 0;
-	int numBase = 0;
+	bool hex = false;
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
-		numBase = 16;
 		if (state == SCE_JULIA_RAWSTRING || state == SCE_JULIA_TRIPLE_RAWSTRING) {
 			// TODO: only when backslash followed by double quote
 			return chNext == '\\' || chNext == '\"';
 		}
 
+		hex = true;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (chNext == 'u') {
@@ -49,13 +49,13 @@ struct EscapeSequence {
 			digitsLeft = 9;
 		} else if (IsOctalDigit(chNext)) {
 			digitsLeft = 3;
-			numBase = 8;
+			hex = false;
 		}
 		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
-		return digitsLeft <= 0 || !IsADigit(ch, numBase);
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
 	}
 };
 
@@ -189,6 +189,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
 	EscapeSequence escSeq;
+	int numBase = 0;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (sc.currentLine > 0) {
@@ -217,10 +218,10 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_JULIA_NUMBER:
 			// strict to avoid color multiply expression as number
-			if (!(IsADigit(sc.ch, escSeq.numBase) || sc.ch == '_')) {
-				if (IsJuliaExponent(escSeq.numBase, sc.ch, sc.chNext)) {
+			if (!(IsADigitEx(sc.ch, numBase) || sc.ch == '_')) {
+				if (IsJuliaExponent(numBase, sc.ch, sc.chNext)) {
 					sc.Forward();
-				} else if (!(escSeq.numBase == 10 && sc.ch == '.' && sc.chPrev != '.')) {
+				} else if (!(numBase == 10 && sc.ch == '.' && sc.chPrev != '.')) {
 					sc.SetState(SCE_JULIA_DEFAULT);
 				}
 			}
@@ -469,22 +470,22 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_VARIABLE);
 			} else if (sc.ch == '0') {
-				escSeq.numBase = 10;
+				numBase = 10;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_NUMBER);
 				const int chNext = UnsafeLower(sc.chNext);
 				if (chNext == 'x') {
-					escSeq.numBase = 16;
+					numBase = 16;
 				} else if (chNext == 'b') {
-					escSeq.numBase = 2;
+					numBase = 2;
 				} else if (chNext == 'o') {
-					escSeq.numBase = 8;
+					numBase = 8;
 				}
-				if (escSeq.numBase != 10) {
+				if (numBase != 10) {
 					sc.Forward();
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
-				escSeq.numBase = 10;
+				numBase = 10;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
