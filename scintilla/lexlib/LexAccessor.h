@@ -93,6 +93,7 @@ public:
 			Fill(position);
 			if (position < startPos || position >= endPos) {
 				// Position is outside range of document
+				//! different from official Lexilla which returns space.
 				return '\0';
 			}
 		}

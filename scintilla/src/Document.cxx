@@ -2463,13 +2463,9 @@ void Document::StyleToAdjustingLineDuration(Sci::Position pos) {
 	durationStyleOneUnit.AddSample(bytesBeingStyled, epStyling.Duration());
 }
 
-void Document::LexerChanged(bool hasStyles_) {
+void Document::LexerChanged(bool hasStyles_) { //! removed in Scintilla 5.3
 	if (cb.EnsureStyleBuffer(hasStyles_)) {
 		endStyled = 0;
-	}
-	// Tell the watchers the lexer has changed.
-	for (const auto &watcher : watchers) {
-		watcher.watcher->NotifyLexerChanged(this, watcher.userData);
 	}
 }
 
