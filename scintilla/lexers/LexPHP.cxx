@@ -359,12 +359,14 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 		return false;
 	}
 	const VariableType variableType = GetVariableType();
-	if (variableType == VariableType::Simple) {
+	if (variableType == VariableType::Simple && nestedExpansion.back().braceCount == 0) {
 		// avoid highlighting object property to simplify code folding
 		if (sc.state != SCE_PHP_VARIABLE2) {
 			sc.ChangeState(SCE_PHP_IDENTIFIER2);
 		}
-		if (!(sc.ch == '['|| sc.Match('-', '>'))) {
+		if (sc.ch == '[') {
+			nestedExpansion.back().braceCount = 1;
+		} else if (!sc.Match('-', '>')) {
 			kwType = KeywordType::None;
 			ExitExpansion();
 			sc.SetState(TakeOuterStyle());
