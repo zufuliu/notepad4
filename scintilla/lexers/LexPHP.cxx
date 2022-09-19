@@ -132,22 +132,25 @@ constexpr bool ExpandVariable(int state) noexcept {
 	return state == SCE_PHP_STRING_DQ || state == SCE_PHP_HEREDOC || state == SCE_PHP_STRING_BT;
 }
 
+// https://www.php.net/manual/en/language.types.string.php
 struct EscapeSequence {
 	int outerState = SCE_PHP_DEFAULT;
 	int digitsLeft = 0;
 	bool hex = false;
+	bool brace = false;
 
-	// highlight any character as escape sequence, no highlight for hex in '\u{hex}'.
+	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
+		brace = false;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (IsOctalDigit(chNext) && state < SCE_PHP_LABEL) {
 			digitsLeft = 3;
 			hex = false;
-		} else if (chNext == 'u' && state > SCE_PHP_LABEL) {
+		} else if (chNext == 'u') {
 			digitsLeft = 5;
 		}
 		return true;
@@ -547,6 +550,11 @@ bool PHPLexer::HighlightInnerString() {
 		if (handled) {
 			sc.SetState(SCE_PHP_ESCAPECHAR);
 			sc.Forward();
+			if (sc.Match('u', '{')) {
+				escSeq.brace = true;
+				escSeq.digitsLeft = 9; // Unicode code point
+				sc.Forward();
+			}
 		}
 	} else if (sc.ch == '%') {
 		if (sc.state != SCE_PHP_STRING_BT) {
@@ -737,6 +745,11 @@ void PHPLexer::HighlightJsInnerString() {
 		} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 			sc.SetState(js_style(SCE_JS_ESCAPECHAR));
 			sc.Forward();
+			if (sc.Match('u', '{')) {
+				escSeq.brace = true;
+				escSeq.digitsLeft = 9; // Unicode code point
+				sc.Forward();
+			}
 		}
 	} else if (sc.state == js_style(SCE_JS_STRING_BT)) {
 		if (sc.Match('$', '{')) {
@@ -897,6 +910,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case js_style(SCE_JS_ESCAPECHAR):
 		case css_style(SCE_CSS_ESCAPECHAR):
 			if (escSeq.atEscapeEnd(sc.ch)) {
+				if (escSeq.brace && sc.ch == '}') {
+					sc.Forward();
+				}
 				sc.SetState(escSeq.outerState);
 				continue;
 			}

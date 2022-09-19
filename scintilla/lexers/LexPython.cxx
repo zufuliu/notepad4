@@ -49,6 +49,7 @@ constexpr bool IsPyStringStyle(int state) noexcept {
 	return state >= SCE_PY_STRING_SQ;
 }
 
+// https://docs.python.org/3/reference/lexical_analysis.html#literals
 struct EscapeSequence {
 	int outerState = SCE_PY_DEFAULT;
 	int digitsLeft = 0;

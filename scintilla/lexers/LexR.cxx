@@ -23,16 +23,19 @@ using namespace Lexilla;
 
 namespace {
 
+// https://search.r-project.org/R/refmans/base/html/Quotes.html
 struct EscapeSequence {
 	int outerState = SCE_R_DEFAULT;
 	int digitsLeft = 0;
 	bool hex = false;
+	bool brace = false;
 
-	// highlight any character as escape sequence, no highlight for hex in '\u{hex}' or '\U{hex}'.
+	// highlight any character as escape sequence.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
+		brace = false;
 		if (chNext == 'x') {
 			digitsLeft = 3;
 		} else if (chNext == 'u') {
@@ -60,7 +63,6 @@ constexpr bool IsRawString(int state) noexcept {
 	return state >= SCE_R_RAWSTRING_SQ;
 }
 
-// https://search.r-project.org/R/refmans/base/html/Quotes.html
 inline int CheckRawString(const StyleContext &sc, int &dashCount) noexcept {
 	Sci_PositionU pos = sc.currentPos + 2;
 	dashCount = 0;
@@ -222,6 +224,10 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_R_ESCAPECHAR);
 				sc.Forward();
+				if (sc.chNext == '{' && escSeq.digitsLeft > 4) {
+					escSeq.brace = true;
+					sc.Forward();
+				}
 			} else if (sc.ch == '%' && sc.state != SCE_R_BACKTICKS) {
 				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 				if (length != 0) {
@@ -259,6 +265,9 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_R_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
+				if (escSeq.brace && sc.ch == '}') {
+					sc.Forward();
+				}
 				sc.SetState(escSeq.outerState);
 				continue;
 			}

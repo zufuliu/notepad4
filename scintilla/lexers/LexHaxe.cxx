@@ -26,16 +26,19 @@ using namespace Lexilla;
 
 namespace {
 
+// https://haxe.org/manual/std-String-literals.html
 struct EscapeSequence {
 	int outerState = SCE_HAXE_DEFAULT;
 	int digitsLeft = 0;
 	bool hex = false;
+	bool brace = false;
 
-	// highlight any character as escape sequence, no highlight for hex in '\u{hex}'.
+	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
+		brace = false;
 		if (chNext == 'u') {
 			digitsLeft = 5;
 		} else if (chNext == 'x') {
@@ -210,6 +213,11 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_HAXE_ESCAPECHAR);
 					sc.Forward();
+					if (sc.Match('u', '{')) {
+						escSeq.brace = true;
+						escSeq.digitsLeft = 7; // Unicode escape
+						sc.Forward();
+					}
 				}
 			} else if (sc.state == SCE_HAXE_STRINGSQ && sc.ch == '$') {
 				if (sc.chNext == '{') {
@@ -228,6 +236,9 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_HAXE_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
+				if (escSeq.brace && sc.ch == '}') {
+					sc.Forward();
+				}
 				sc.SetState(escSeq.outerState);
 				continue;
 			}

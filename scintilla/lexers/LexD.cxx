@@ -24,6 +24,7 @@ using namespace Lexilla;
 
 namespace {
 
+// https://dlang.org/spec/lex.html#string_literals
 struct EscapeSequence {
 	int outerState = SCE_D_DEFAULT;
 	int digitsLeft = 0;

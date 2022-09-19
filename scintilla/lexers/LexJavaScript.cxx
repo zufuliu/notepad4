@@ -27,11 +27,13 @@ using namespace Lexilla;
 
 namespace {
 
+// https://tc39.es/ecma262/#prod-StringLiteral
 struct EscapeSequence {
 	int outerState = SCE_JS_DEFAULT;
 	int digitsLeft = 0;
+	bool brace = false;
 
-	// highlight any character as escape sequence, no highlight for hex in '\u{hex}'.
+	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = (chNext == 'x')? 3 : ((chNext == 'u') ? 5 : 1);
@@ -286,6 +288,11 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_JS_ESCAPECHAR);
 					sc.Forward();
+					if (sc.Match('u', '{')) {
+						escSeq.brace = true;
+						escSeq.digitsLeft = 9; // Unicode code point
+						sc.Forward();
+					}
 				}
 			} else if ((sc.ch == '\'' && (sc.state == SCE_JS_STRING_SQ || sc.state == SCE_JSX_STRING_SQ))
 				|| (sc.ch == '"' && (sc.state == SCE_JS_STRING_DQ || sc.state == SCE_JSX_STRING_DQ))) {
@@ -307,6 +314,11 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_JS_ESCAPECHAR);
 					sc.Forward();
+					if (sc.Match('u', '{')) {
+						escSeq.brace = true;
+						escSeq.digitsLeft = 9; // Unicode code point
+						sc.Forward();
+					}
 				}
 			} else if (sc.Match('$', '{')) {
 				nestedState.push_back(sc.state);
@@ -319,6 +331,9 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_JS_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
+				if (escSeq.brace && sc.ch == '}') {
+					sc.Forward();
+				}
 				sc.SetState(escSeq.outerState);
 				continue;
 			}
