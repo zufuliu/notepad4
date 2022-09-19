@@ -123,6 +123,11 @@ enum class VariableType {
 	Complex,	// ${variable}, {$variable}
 };
 
+struct VariableExpansion {
+	VariableType type;
+	int braceCount;
+};
+
 constexpr bool ExpandVariable(int state) noexcept {
 	return state == SCE_PHP_STRING_DQ || state == SCE_PHP_HEREDOC || state == SCE_PHP_STRING_BT;
 }
@@ -160,21 +165,20 @@ struct EscapeSequence {
 struct PHPLexer {
 	StyleContext sc;
 	std::vector<int> nestedState;
+	std::vector<VariableExpansion> nestedExpansion;
 	std::string hereDocId;
 
 	HtmlTagState tagState = HtmlTagState::None;
 	HtmlTagType tagType = HtmlTagType::None;
 	KeywordType kwType = KeywordType::None;
 	EscapeSequence escSeq;
+	bool insideUrl = false;
 	int lineStateLineType = 0;
 	int lineStateAttribute = 0;
 	int lineContinuation = 0;
 	int propertyValue = 0;
 	int parenCount = 0;
-	VariableType variableType = VariableType::Normal;
-	int braceCount = 0;
 	int operatorBefore = 0;
-	bool insideUrl = false;
 
 	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
 		sc(startPos, lengthDoc, initStyle, styler) {}
@@ -187,6 +191,15 @@ struct PHPLexer {
 	}
 	int TryTakeOuterStyle() {
 		return TryTakeAndPop(nestedState);
+	}
+	void EnterExpansion(VariableType type, int braceCount) {
+		nestedExpansion.push_back({type, braceCount});
+	}
+	void ExitExpansion() {
+		nestedExpansion.pop_back();
+	}
+	VariableType GetVariableType() const noexcept {
+		return nestedExpansion.empty() ? VariableType::Normal : nestedExpansion.back().type;
 	}
 
 	int LineState() const noexcept {
@@ -269,6 +282,7 @@ bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
 		const int outer = TryTakeOuterStyle();
 		lineStateLineType = nestedState.empty() ? 0 : LineStateNestedStateLine;
 		nestedState.clear();
+		nestedExpansion.clear();
 		sc.SetState(GetPHPTagStyle(outer));
 		sc.Forward();
 		sc.ForwardSetState(outer);
@@ -344,16 +358,15 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 		}
 		return false;
 	}
-	if (variableType == VariableType::Simple && braceCount == 0) {
+	const VariableType variableType = GetVariableType();
+	if (variableType == VariableType::Simple) {
 		// avoid highlighting object property to simplify code folding
 		if (sc.state != SCE_PHP_VARIABLE2) {
 			sc.ChangeState(SCE_PHP_IDENTIFIER2);
 		}
-		if (sc.ch == '[') {
-			braceCount = 1;
-		} else if (!sc.Match('-', '>')) {
+		if (!(sc.ch == '['|| sc.Match('-', '>'))) {
 			kwType = KeywordType::None;
-			variableType = VariableType::Normal;
+			ExitExpansion();
 			sc.SetState(TakeOuterStyle());
 			return true;
 		}
@@ -548,18 +561,16 @@ bool PHPLexer::HighlightInnerString() {
 		// ${} was deprecated since PHP 8.2 and removed in PHP 9.0
 		// see https://wiki.php.net/rfc/deprecate_dollar_brace_string_interpolation
 		if (ExpandVariable(sc.state) && IsIdentifierStartEx(sc.chNext)) {
-			SaveOuterStyle(sc.state);
 			insideUrl = false;
-			braceCount = 0;
-			variableType = VariableType::Simple;
+			SaveOuterStyle(sc.state);
+			EnterExpansion(VariableType::Simple, 0);
 			sc.SetState(SCE_PHP_VARIABLE2);
 		}
 	} else if (sc.Match('{', '$')) {
 		insideUrl = false;
 		if (ExpandVariable(sc.state)) {
 			SaveOuterStyle(sc.state);
-			braceCount = 1;
-			variableType = VariableType::Complex;
+			EnterExpansion(VariableType::Complex, 1);
 			sc.SetState(SCE_PHP_OPERATOR2);
 		}
 	} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
@@ -573,22 +584,24 @@ bool PHPLexer::HighlightInnerString() {
 bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 	kwType = KeywordType::None;
 	if (block == HtmlTextBlock::PHP) {
+		const VariableType variableType = GetVariableType();
 		sc.SetState((variableType == VariableType::Normal) ? SCE_PHP_OPERATOR : SCE_PHP_OPERATOR2);
 		if (sc.ch == ']') {
 			if (lineStateAttribute) {
 				lineStateAttribute = 0;
 			} else if (variableType == VariableType::Simple) {
-				variableType = VariableType::Normal;
+				ExitExpansion();
 				sc.ForwardSetState(TakeOuterStyle());
 				return true;
 			}
 		} else if (variableType == VariableType::Complex) {
+			VariableExpansion &expansion = nestedExpansion.back();
 			if (sc.ch == '{') {
-				++braceCount;
+				++expansion.braceCount;
 			} else if (sc.ch == '}') {
-				--braceCount;
-				if (braceCount == 0) {
-					variableType = VariableType::Normal;
+				--expansion.braceCount;
+				if (expansion.braceCount == 0) {
+					ExitExpansion();
 					sc.ForwardSetState(TakeOuterStyle());
 					return true;
 				}
