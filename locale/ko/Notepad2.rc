@@ -31,7 +31,7 @@ LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 // RT_MANIFEST
 //
 
-IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\Notepad2.exe.manifest"
+IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\res\\Notepad2.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
