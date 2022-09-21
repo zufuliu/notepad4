@@ -2509,8 +2509,10 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		if (StrCaseEqual(lpszExt, L"txt")) {
 			if (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt")) {
 				pLexNew = &lexCMake;
+#if 0 // LLVMBuild.txt were removed from LLVM project
 			} else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
 				pLexNew = &lexINI;
+#endif
 			} else {
 				pLexNew = &lexTextFile;
 			}

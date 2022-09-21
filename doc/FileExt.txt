@@ -37,7 +37,7 @@ C/C++ Source
 
 	*.h.in
 
-	[ ] rs			Android RenderScript
+	[x] rs			Android RenderScript
 
 C# Source
 	cs
@@ -331,7 +331,7 @@ Ini Config File
 	clw
 	abnf			ABNF, https://www.ietf.org/rfc/rfc5234.txt
 
-	LLVMBuild.txt
+	[x] LLVMBuild.txt
 
 Inno Setup Script
 	iss
