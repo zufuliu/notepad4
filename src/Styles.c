@@ -1407,6 +1407,10 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		//	//SciCall_SetProperty("fold.hypertext.heredoc", "1");
 		//	break;
 
+		case NP2LEX_ACTIONSCRIPT:
+			dialect = 1; // enable ECMAScript For XML
+			break;
+
 		case NP2LEX_APDL:
 			dialect = 1;
 			break;
