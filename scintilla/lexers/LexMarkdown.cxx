@@ -2168,7 +2168,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_SHORT_SUPERSCRIPT:
 		case SCE_MARKDOWN_SHORT_SUBSCRIPT:
 			if (!IsAlphaNumeric(sc.ch)) {
-				sc.SetState( lexer.TakeOuterStyle());
+				sc.SetState(lexer.TakeOuterStyle());
 				continue;
 			}
 			break;

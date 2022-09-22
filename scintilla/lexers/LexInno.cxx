@@ -278,7 +278,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (sc.ch == sc.chNext) {
 					sc.Forward();
 				} else if (sc.ch == '\'') {
-					sc.ForwardSetState( SCE_INNO_DEFAULT);
+					sc.ForwardSetState(SCE_INNO_DEFAULT);
 				} else if (IsExpansionStartChar(sc.chNext)) {
 					++expansionLevel;
 					outerState = SCE_INNO_STRING_SQ;
