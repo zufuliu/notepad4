@@ -1924,10 +1924,12 @@ void EditView::DrawAnnotation(Surface *surface, const EditModel &model, const Vi
 			}
 		}
 	} else {
+#ifndef NDEBUG
 		// No annotation to draw so show bug with bugColour
 		if (FlagSet(phase, DrawPhase::back)) {
 			surface->FillRectangle(rcSegment, bugColour.Opaque());
 		}
+#endif
 	}
 }
 
