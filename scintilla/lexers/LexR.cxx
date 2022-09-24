@@ -30,7 +30,7 @@ struct EscapeSequence {
 	bool hex = false;
 	bool brace = false;
 
-	// highlight any character as escape sequence.
+	// highlight any character as escape sequence, unrecognized escape sequence is syntax error.
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
@@ -227,6 +227,10 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				if (sc.chNext == '{' && escSeq.digitsLeft > 4) {
 					escSeq.brace = true;
 					sc.Forward();
+				} else if (sc.MatchLineEnd()) {
+					// don't highlight line ending as escape sequence:
+					// escapeSeq.outerState is lost when editing on next line.
+					sc.SetState(escSeq.outerState);
 				}
 			} else if (sc.ch == '%' && sc.state != SCE_R_BACKTICKS) {
 				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);

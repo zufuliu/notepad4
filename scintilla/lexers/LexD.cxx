@@ -31,7 +31,10 @@ struct EscapeSequence {
 	bool hex = false;
 
 	// highlight any character as escape sequence, no highlight for '\&NamedCharacterEntity;'.
-	void resetEscapeState(int state, int chNext) noexcept {
+	bool resetEscapeState(int state, int chNext) noexcept {
+		if (IsEOLChar(chNext)) {
+			return false;
+		}
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
@@ -45,6 +48,7 @@ struct EscapeSequence {
 			digitsLeft = 3;
 			hex = false;
 		}
+		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -247,9 +251,10 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 bool HandleInnerStringStyle(StyleContext &sc, EscapeSequence &escSeq, bool &insideUrl) {
 	if (sc.ch == '\\') {
 		if (!(sc.state == SCE_D_RAWSTRING || sc.state == SCE_D_STRING_BT)) {
-			escSeq.resetEscapeState(sc.state, sc.chNext);
-			sc.SetState(SCE_D_ESCAPECHAR);
-			sc.Forward();
+			if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+				sc.SetState(SCE_D_ESCAPECHAR);
+				sc.Forward();
+			}
 		}
 	} else if (sc.ch == '%') {
 		const Sci_Position length = CheckFormatSpecifier(sc, sc.styler, insideUrl);
@@ -467,10 +472,11 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				sc.SetState(SCE_D_DEFAULT);
 			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_D_DEFAULT);
-			} else if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
-				escSeq.resetEscapeState(sc.state, sc.chNext);
-				sc.SetState(SCE_D_ESCAPECHAR);
-				sc.Forward();
+			} else if (sc.ch == '\\') {
+				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_D_ESCAPECHAR);
+					sc.Forward();
+				}
 			}
 			break;
 

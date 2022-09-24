@@ -161,7 +161,7 @@ public:
 	}
 	bool MatchLineEnd() const noexcept {
 		//return currentPos == lineEnd;
-		return atLineEnd;
+		return ch == '\n' || ch == '\r'; //! Unicode line ending not supported
 	}
 #if 0
 	[[deprecated]]

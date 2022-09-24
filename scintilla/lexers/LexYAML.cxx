@@ -294,7 +294,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_YAML_STRING_DQ:
-			if (sc.ch == '\\') {
+			if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
 				escSeq.resetEscapeState(sc.chNext);
 				sc.SetState(SCE_YAML_ESCAPECHAR);
 				sc.Forward();

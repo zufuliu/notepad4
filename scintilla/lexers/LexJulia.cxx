@@ -33,6 +33,9 @@ struct EscapeSequence {
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
+		if (IsEOLChar(chNext)) {
+			return false;
+		}
 		outerState = state;
 		digitsLeft = 1;
 		if (state == SCE_JULIA_RAWSTRING || state == SCE_JULIA_TRIPLE_RAWSTRING) {

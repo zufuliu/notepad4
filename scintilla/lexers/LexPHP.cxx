@@ -140,7 +140,7 @@ struct EscapeSequence {
 	bool brace = false;
 
 	// highlight any character as escape sequence.
-	bool resetEscapeState(int state, int chNext) noexcept {
+	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
@@ -153,7 +153,6 @@ struct EscapeSequence {
 		} else if (chNext == 'u') {
 			digitsLeft = 5;
 		}
-		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -539,7 +538,10 @@ bool PHPLexer::HighlightInnerString() {
 	if (sc.ch == '\\') {
 		bool handled = false;
 		if (sc.state == SCE_PHP_STRING_DQ || sc.state == SCE_PHP_HEREDOC) {
-			handled = escSeq.resetEscapeState(sc.state, sc.chNext);
+			if (!IsEOLChar(sc.chNext)) {
+				handled = true;
+				escSeq.resetEscapeState(sc.state, sc.chNext);
+			}
 		} else if (sc.state != SCE_PHP_NOWDOC) {
 			if (sc.chNext == '\\' || sc.chNext == GetPHPStringQuote(sc.state)) {
 				handled = true;
@@ -742,7 +744,8 @@ void PHPLexer::HighlightJsInnerString() {
 	if (sc.ch == '\\') {
 		if (IsEOLChar(sc.chNext)) {
 			lineContinuation = JsLineStateLineContinuation;
-		} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+		} else {
+			escSeq.resetEscapeState(sc.state, sc.chNext);
 			sc.SetState(js_style(SCE_JS_ESCAPECHAR));
 			sc.Forward();
 			if (sc.Match('u', '{')) {

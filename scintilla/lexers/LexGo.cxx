@@ -30,7 +30,10 @@ struct EscapeSequence {
 	bool hex = false;
 
 	// highlight any character as escape sequence.
-	void resetEscapeState(int state, int chNext) noexcept {
+	bool resetEscapeState(int state, int chNext) noexcept {
+		if (IsEOLChar(chNext)) {
+			return false;
+		}
 		outerState = state;
 		digitsLeft = 1;
 		hex = true;
@@ -44,6 +47,7 @@ struct EscapeSequence {
 			digitsLeft = 3;
 			hex = false;
 		}
+		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -398,9 +402,10 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.state == SCE_GO_STRING && sc.atLineStart) {
 				sc.SetState(SCE_GO_DEFAULT);
 			} else if (sc.state == SCE_GO_STRING && sc.ch == '\\') {
-				escSeq.resetEscapeState(sc.state, sc.chNext);
-				sc.SetState(SCE_GO_ESCAPECHAR);
-				sc.Forward();
+				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_GO_ESCAPECHAR);
+					sc.Forward();
+				}
 			} else if (sc.ch == '%') {
 				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 				if (length != 0) {
@@ -423,9 +428,10 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.atLineStart) {
 				sc.SetState(SCE_GO_DEFAULT);
 			} else if (sc.ch == '\\') {
-				escSeq.resetEscapeState(sc.state, sc.chNext);
-				sc.SetState(SCE_GO_ESCAPECHAR);
-				sc.Forward();
+				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_GO_ESCAPECHAR);
+					sc.Forward();
+				}
 			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_GO_DEFAULT);
 			}

@@ -121,7 +121,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_WASM_STRING:
-			if (sc.ch == '\\') {
+			if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
 				escSeq.resetEscapeState(sc.chNext);
 				sc.SetState(SCE_WASM_ESCAPECHAR);
 				sc.Forward();

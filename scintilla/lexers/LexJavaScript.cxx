@@ -34,10 +34,9 @@ struct EscapeSequence {
 	bool brace = false;
 
 	// highlight any character as escape sequence.
-	bool resetEscapeState(int state, int chNext) noexcept {
+	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = (chNext == 'x')? 3 : ((chNext == 'u') ? 5 : 1);
-		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -285,7 +284,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (sc.ch == '\\') {
 				if (IsEOLChar(sc.chNext)) {
 					lineContinuation = JsLineStateLineContinuation;
-				} else if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+				} else {
+					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_JS_ESCAPECHAR);
 					sc.Forward();
 					if (sc.Match('u', '{')) {
@@ -311,7 +311,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		case SCE_JS_STRING_BT:
 			if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+				if (!IsEOLChar(sc.chNext)) {
+					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_JS_ESCAPECHAR);
 					sc.Forward();
 					if (sc.Match('u', '{')) {

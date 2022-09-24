@@ -28,7 +28,10 @@ struct EscapeSequence {
 	int digitsLeft = 0;
 
 	// highlight any character as escape sequence.
-	void resetEscapeState(int state, int chNext) noexcept {
+	bool resetEscapeState(int state, int chNext) noexcept {
+		if (IsEOLChar(chNext)) {
+			return false;
+		}
 		outerState = state;
 		digitsLeft = 1;
 		if (chNext == 'x') {
@@ -38,6 +41,7 @@ struct EscapeSequence {
 		} else if (chNext == 'U') {
 			digitsLeft = 9;
 		}
+		return true;
 	}
 	bool atEscapeEnd(int ch) noexcept {
 		--digitsLeft;
@@ -219,9 +223,10 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.atLineStart) {
 				sc.SetState(SCE_TOML_DEFAULT);
 			} else if (sc.ch == '\\') {
-				escSeq.resetEscapeState(sc.state, sc.chNext);
-				sc.SetState(SCE_TOML_ESCAPECHAR);
-				sc.Forward();
+				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_TOML_ESCAPECHAR);
+					sc.Forward();
+				}
 			} else if (sc.ch == '\"') {
 				sc.Forward();
 				if (IsTOMLKey(sc, braceCount, nullptr)) {
@@ -240,9 +245,10 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_TRIPLE_STRING_DQ:
 			if (sc.ch == '\\') {
-				escSeq.resetEscapeState(sc.state, sc.chNext);
-				sc.SetState(SCE_TOML_ESCAPECHAR);
-				sc.Forward();
+				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
+					sc.SetState(SCE_TOML_ESCAPECHAR);
+					sc.Forward();
+				}
 			} else if (sc.Match('"', '"', '"')) {
 				sc.Advance(2);
 				sc.ForwardSetState(SCE_TOML_DEFAULT);
