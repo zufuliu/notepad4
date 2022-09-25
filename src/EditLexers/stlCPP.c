@@ -887,6 +887,7 @@ static EDITSTYLE Styles_CPP[] = {
 	{ SCE_C_COMMENTDOC_TAG, NP2StyleX_DocCommentTag, L"fore:#408080" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_C_STRINGRAW, NP2StyleX_RawString, L"fore:#E24000" },
+	{ SCE_C_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_C_LABEL, NP2StyleX_Label, L"back:#FFC040" },
 	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
@@ -905,7 +906,7 @@ EDITLEXER lexCPP = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2) | (1 << 3), // preprocessor, namespace, class, method
 		0,
-		'\\', 0, 0,
+		'\\', SCE_C_ESCAPECHAR, 0,
 		0,
 		SCE_C_CHARACTER, SCE_C_NUMBER,
 		SCE_C_OPERATOR, 0

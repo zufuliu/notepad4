@@ -48,6 +48,7 @@ static EDITSTYLE Styles_RC[] = {
 	{ SCE_C_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
 	{ MULTI_STYLE(SCE_C_COMMENT, SCE_C_COMMENTLINE, SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
+	{ SCE_C_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
@@ -62,7 +63,7 @@ EDITLEXER lexResourceScript = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1), // preprocessor, resource
 		0,
-		'\\', 0, 0,
+		'\\', SCE_C_ESCAPECHAR, 0,
 		0,
 		SCE_C_CHARACTER, SCE_C_NUMBER,
 		SCE_C_OPERATOR, 0

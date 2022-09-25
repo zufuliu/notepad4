@@ -29,6 +29,33 @@ namespace {
 #define		LEX_OBJC	2	// Objective C/C++
 #define		LEX_SCALA	3	// Scala Script
 
+struct EscapeSequence {
+	int outerState = SCE_C_DEFAULT;
+	int digitsLeft = 0;
+	bool hex = false;
+	bool brace = false;
+
+	// highlight any character as escape sequence.
+	void resetEscapeState(int state, int chNext) noexcept {
+		outerState = state;
+		digitsLeft = 1;
+		hex = true;
+		brace = false;
+		if (chNext == 'x' || chNext == 'u') {
+			digitsLeft = 5;
+		} else if (chNext == 'U') {
+			digitsLeft = 9;
+		} else if (IsOctalDigit(chNext)) {
+			digitsLeft = 3;
+			hex = false;
+		}
+	}
+	bool atEscapeEnd(int ch) noexcept {
+		--digitsLeft;
+		return digitsLeft <= 0 || !IsOctalOrHex(ch, hex);
+	}
+};
+
 constexpr bool HasPreprocessor(int lex) noexcept { // #[space]preprocessor
 	return lex == LEX_CPP || lex == LEX_RC || lex == LEX_OBJC;
 }
@@ -54,9 +81,6 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	// including SCE_C_DEFAULT, SCE_C_COMMENT, SCE_C_COMMENTLINE
 	// SCE_C_COMMENTDOC, SCE_C_COMMENTLINEDOC, SCE_C_COMMENTDOC_TAG, SCE_C_COMMENTDOC_TAG_XML
 	return (state < SCE_C_IDENTIFIER);
-}
-constexpr bool IsEscapeChar(int ch) noexcept {
-	return ch == '\\' || ch == '\'' || ch == '\"';
 }
 
 /*const char* const cppWordLists[] = {
@@ -136,6 +160,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	bool isIncludePreprocessor = false;
 	bool isMessagePreprocessor = false;
 	bool isAssignStmt = false;
+	EscapeSequence escSeq;
 
 	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
 		// Set continuationLine if last character of previous line is '\'
@@ -482,8 +507,16 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		case SCE_C_CHARACTER:
 			if (sc.atLineEnd) {
 				sc.ChangeState(SCE_C_STRINGEOL);
-			} else if (sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
-				sc.Forward();
+			} else if (sc.ch == '\\') {
+				if (!IsEOLChar(sc.chNext)) {
+					escSeq.resetEscapeState(sc.state, sc.chNext);
+					sc.SetState(SCE_C_ESCAPECHAR);
+					sc.Forward();
+					if (sc.chNext == '{' && AnyOf(sc.ch, 'o', 'x', 'u')) {
+						escSeq.brace = true;
+						escSeq.digitsLeft = 9;
+					}
+				}
 			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_C_DEFAULT);
 			}
@@ -504,11 +537,36 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			} else if (isMessagePreprocessor && sc.atLineEnd) {
 				sc.ChangeState(SCE_C_STRINGEOL);
 				isMessagePreprocessor = false;
-			} else if (sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
-				sc.Forward();
+			} else if (sc.ch == '\\') {
+				if (isIncludePreprocessor) {
+					sc.Forward();
+				} else if (!IsEOLChar(sc.chNext)) {
+					escSeq.resetEscapeState(sc.state, sc.chNext);
+					sc.SetState(SCE_C_ESCAPECHAR);
+					sc.Forward();
+					if (sc.chNext == '{' && AnyOf(sc.ch, 'o', 'x', 'u')) {
+						escSeq.brace = true;
+						escSeq.digitsLeft = 9;
+					}
+				}
 			} else if (sc.ch == '\"') {
-				outerStyle = SCE_C_DEFAULT;
-				sc.ForwardSetState(SCE_C_DEFAULT);
+				if (lexType == LEX_RC && sc.chNext == '\"') {
+					escSeq.resetEscapeState(sc.state, sc.chNext);
+					sc.SetState(SCE_C_ESCAPECHAR);
+					sc.Forward();
+				} else {
+					outerStyle = SCE_C_DEFAULT;
+					sc.ForwardSetState(SCE_C_DEFAULT);
+				}
+			}
+			break;
+		case SCE_C_ESCAPECHAR:
+			if (escSeq.atEscapeEnd(sc.ch)) {
+				if (escSeq.brace && sc.ch == '}') {
+					sc.Forward();
+				}
+				sc.SetState(escSeq.outerState);
+				continue;
 			}
 			break;
 		case SCE_C_STRINGRAW:
@@ -535,7 +593,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			break;
 
 		case SCE_C_TRIPLEVERBATIM:
-			if (sc.ch == '\\' && IsEscapeChar(sc.chNext)) {
+			if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.Match('"', '"', '"')) {
 				sc.Advance(2);

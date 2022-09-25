@@ -51,6 +51,7 @@ static EDITSTYLE Styles_Scala[] = {
 	{ SCE_C_COMMENTDOC_TAG, NP2StyleX_DocCommentTag, L"fore:#408080" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, SCE_C_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_C_TRIPLEVERBATIM, NP2StyleX_TripleQuotedString, L"fore:#F08000" },
+	{ SCE_C_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_C_XML_TAG, SCE_C_XML_ASSIGN, 0, 0), NP2StyleX_XMLTag, L"fore:#648000" },
@@ -66,7 +67,7 @@ EDITLEXER lexScala = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // class, inner class, method
 		0,
-		'\\', 0, 0,
+		'\\', SCE_C_ESCAPECHAR, 0,
 		0,
 		SCE_C_CHARACTER, 0,
 		SCE_C_OPERATOR, 0,
