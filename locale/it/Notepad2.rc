@@ -169,7 +169,7 @@ BEGIN
 		POPUP "Copia nella Clipboard"
 		BEGIN
 			MENUITEM "Nome File",						CMD_COPYFILENAME_NOEXT
-			MENUITEM "Nome File ed &Esci.\tShift+F9",	CMD_COPYFILENAME
+			MENUITEM "Nome File ed Esci\tShift+F9",	CMD_COPYFILENAME
 			MENUITEM "Nome percorso completo\tAlt+Shift+F9",	CMD_COPYPATHNAME
 			MENUITEM SEPARATOR
 			MENUITEM "Copia Tutto\tAlt+A",				IDM_EDIT_COPYALL
@@ -185,7 +185,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "&Selezione"
 		BEGIN
-			MENUITEM "&Dupplica\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
+			MENUITEM "&Duplica\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
 			MENUITEM "Rimuovi linea commento\tCtrl+/",	IDM_EDIT_LINECOMMENT
 			MENUITEM "Commenta blocco\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
@@ -208,7 +208,7 @@ BEGIN
 			MENUITEM "Tag &HTML/XML...\tAlt+X",			IDM_EDIT_INSERT_XMLTAG
 			MENUITEM SEPARATOR
 			MENUITEM "Triplo Apostrofo\tCtrl+3",	CMD_ENCLOSE_TRIPLE_SQ
-			MENUITEM "Tripla Virgoletta\tCtrl+6",	CMD_ENCLOSE_TRIPLE_DQ
+			MENUITEM "Triple Virgolette\tCtrl+6",	CMD_ENCLOSE_TRIPLE_DQ
 			MENUITEM "Triplo &Backticks\tCtrl+9",		CMD_ENCLOSE_TRIPLE_BT
 		END
 		POPUP "&Linee"
@@ -221,13 +221,13 @@ BEGIN
 			MENUITEM "Modifica Linee...\tAlt+M",			IDM_EDIT_MODIFYLINES
 			MENUITEM "Allinea Linee...\tAlt+J",			IDM_EDIT_ALIGN
 			MENUITEM SEPARATOR
-			MENUITEM "Dupplica Linea\tCtrl+D",			IDM_EDIT_DUPLICATELINE
+			MENUITEM "Duplica Linea\tCtrl+D",			IDM_EDIT_DUPLICATELINE
 			MENUITEM "Taglia Linea\tCtrl+Shift+X",			IDM_EDIT_CUTLINE
 			MENUITEM "&Copia Linea\tCtrl+Shift+C",		IDM_EDIT_COPYLINE
 			MENUITEM "Elimina Linea\tCtrl+Shift+D",		IDM_EDIT_DELETELINE
 			MENUITEM SEPARATOR
 			MENUITEM "Unisci Linee\tCtrl+J",				IDM_EDIT_JOINLINES
-			MENUITEM "Colonnea a Capo...\tCtrl+Shift+W",	IDM_EDIT_COLUMNWRAP
+			MENUITEM "Colonne a Capo...\tCtrl+Shift+W",	IDM_EDIT_COLUMNWRAP
 			MENUITEM "Dividi Linee\tCtrl+I",			IDM_EDIT_SPLITLINES
 			MENUITEM "Unisci Paragrafi\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
@@ -351,7 +351,7 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Cerca con &Google",					CMD_ONLINE_SEARCH_GOOGLE
 			MENUITEM "Cerca con &Bing",					CMD_ONLINE_SEARCH_BING
-			MENUITEM "Cerca su &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
+			MENUITEM "Cerca con &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
 			MENUITEM SEPARATOR
 			MENUITEM "Azione personalizzata &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
 			MENUITEM "Azione personalizzata &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
@@ -360,7 +360,7 @@ BEGIN
 		POPUP "Trova e Sostituisci"
 		BEGIN
 			MENUITEM "Trova...\tCtrl+F",				IDM_EDIT_FIND
-			MENUITEM "Salva testo trova\tAlt+F3",			IDM_EDIT_SAVEFIND
+			MENUITEM "Salva testo trovato\tAlt+F3",			IDM_EDIT_SAVEFIND
 			MENUITEM "Trova il prossimo\tF3",					IDM_EDIT_FINDNEXT
 			MENUITEM "Trova il precedente\tShift+F3",		IDM_EDIT_FINDPREV
 			MENUITEM "Sostituisci...\tCtrl+H",				IDM_EDIT_REPLACE
@@ -369,7 +369,7 @@ BEGIN
 			MENUITEM "Trova parentesi corrispondente\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
 			MENUITEM "Seleziona sino alla parentesi corrispondente\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
 			MENUITEM "Seleziona parola\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Seleziona Linee (Expand Selection)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+			MENUITEM "Seleziona Linee (Espandi Selezione)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
 			MENUITEM "Seleziona le linee del blocco corrente\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
 			MENUITEM SEPARATOR
 			MENUITEM "Seleziona dall'inizio del documento",					IDM_EDIT_SELTODOCSTART
@@ -490,7 +490,7 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Usa il 2° stile globale\tShift+F12",IDM_VIEW_USE2NDGLOBALSTYLE
 		MENUITEM "Usa lo stile predefinito per il codice",			IDM_VIEW_USEDEFAULT_CODESTYLE
-		POPUP "Tema stile"
+		POPUP "Stile Tema"
 		BEGIN
 			MENUITEM "Predefinito",					IDM_VIEW_STYLE_THEME_DEFAULT
 			MENUITEM "Scuro",						IDM_VIEW_STYLE_THEME_DARK
@@ -707,7 +707,7 @@ BEGIN
 	POPUP "Aiuto"
 	BEGIN
 		MENUITEM "&Home Progetto",				IDM_HELP_PROJECT_HOME
-		MENUITEM "Ultima &Release",				IDM_HELP_LATEST_RELEASE
+		MENUITEM "Ultima Versione",				IDM_HELP_LATEST_RELEASE
 		MENUITEM "Ultima &Build",				IDM_HELP_LATEST_BUILD
 		MENUITEM "Segnala un problema",				IDM_HELP_REPORT_ISSUE
 		MENUITEM "Richiedi funzionalità",			IDM_HELP_FEATURE_REQUEST
@@ -1013,7 +1013,7 @@ BEGIN
     LTEXT           "Contatta Florian Balmer:",IDC_STATIC,45,100,94,8
     LTEXT           "",IDC_EMAIL_TEXT,45,108,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,108,94,10
-    LTEXT           "Visita sito web Scintilla's:",IDC_STATIC,45,120,94,8
+    LTEXT           "Visita il sito web Scintilla:",IDC_STATIC,45,120,94,8
     LTEXT           "",IDC_SCI_PAGE_TEXT,45,128,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_SCI_PAGE_LINK,"SysLink",WS_TABSTOP,45,128,94,10
 END
@@ -1029,7 +1029,7 @@ BEGIN
     AUTOCHECKBOX    "Trova solo parole intere",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
     AUTOCHECKBOX    "Trova solo inizio di parola",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Ricerca con espressioni regolari",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Trasforma con backslashes",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Trasforma con backslash",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
     AUTOCHECKBOX    "Non andare a capo",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
     AUTOCHECKBOX    "Chiudi dopo ricerca",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
     AUTOCHECKBOX    "Ricerca con caratteri jolly",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
@@ -1045,7 +1045,7 @@ BEGIN
     AUTOCHECKBOX    "Segna la linea abbinata al segnalibro",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa font monospaziato",IDC_USEMONOSPACEDFONT,132,85,90,10,WS_TABSTOP
     CONTROL         "<a>Vai a sostituisci (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,97,80,10
-    CONTROL         "<a>Salava Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
+    CONTROL         "<a>Salva Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
     CONTROL         "<a>Resetta Posizione</a>",IDC_RESETPOSITION,"SysLink",WS_TABSTOP,223,96,60,10
     SCROLLBAR       IDC_RESIZEGRIP2,230,96,10,10
 END
@@ -1346,7 +1346,7 @@ BEGIN
     EDITTEXT        IDC_PAGESETUP_MARGIN_RIGHT,120,103,28,12,ES_NUMBER | WS_GROUP
     LTEXT           "Destro:",IDC_PAGESETUP_MARGIN_RIGHT_LABEL,164,85,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_TOP,196,82,28,12,ES_NUMBER | WS_GROUP
-    LTEXT           "Posteriore:",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
+    LTEXT           "Inferiore:",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_BOOTOM,196,103,28,12,ES_NUMBER | WS_GROUP
     GROUPBOX        "Intestazioni e piè di pagina",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
     LTEXT           "Intestazione:",IDC_STATIC,16,146,36,8
