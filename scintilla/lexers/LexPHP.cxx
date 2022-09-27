@@ -1038,7 +1038,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_H_SINGLESTRING:
 		case SCE_H_SGML_SIMPLESTRING:
 			if (sc.ch == '\'') {
-				const int outer = (sc.state == SCE_H_DOUBLESTRING) ? SCE_H_DEFAULT : SCE_H_SGML_DEFAULT;
+				const int outer = (sc.state == SCE_H_SINGLESTRING) ? SCE_H_DEFAULT : SCE_H_SGML_DEFAULT;
 				sc.ForwardSetState(outer);
 				if (outer != SCE_H_DEFAULT) {
 					continue;
