@@ -365,9 +365,7 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 		HFONT hfont = ::CreateFontIndirectW(&lf);
 		return std::make_shared<FontGDI>(lf, hfont, fp.extraFontFlag);
 	} else {
-		IDWriteTextFormat *pTextFormat = nullptr;
 		std::wstring wsFamily;
-		const FLOAT fHeight = static_cast<FLOAT>(fp.size);
 		DWRITE_FONT_WEIGHT weight = static_cast<DWRITE_FONT_WEIGHT>(fp.weight);
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		DWRITE_FONT_STRETCH stretch = DWRITE_FONT_STRETCH_NORMAL;
@@ -376,6 +374,8 @@ std::shared_ptr<Font> Font::Allocate(const FontParameters &fp) {
 		}
 
 		const std::wstring wsLocale = WStringFromUTF8(fp.localeName);
+		const FLOAT fHeight = static_cast<FLOAT>(fp.size);
+		IDWriteTextFormat *pTextFormat = nullptr;
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wsFamily.c_str(), nullptr,
 			weight, style, stretch, fHeight, wsLocale.c_str(), &pTextFormat);
 		if (hr == E_INVALIDARG) {

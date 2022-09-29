@@ -105,6 +105,9 @@ Used by VSCode, Atom etc.
 #ifndef WM_DPICHANGED_AFTERPARENT
 #define WM_DPICHANGED_AFTERPARENT	0x02E3
 #endif
+#ifndef WM_MOUSEHWHEEL
+#define WM_MOUSEHWHEEL				0x020E
+#endif
 #ifndef SPI_GETWHEELSCROLLCHARS
 #define SPI_GETWHEELSCROLLCHARS		0x006C
 #endif
@@ -383,6 +386,25 @@ public:
 	}
 };
 
+class MouseWheelDelta {
+	int wheelDelta = 0;
+public:
+	bool Accumulate(WPARAM wParam) noexcept {
+		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
+		return std::abs(wheelDelta) >= WHEEL_DELTA;
+	}
+	int Actions() noexcept {
+		const int actions = wheelDelta / WHEEL_DELTA;
+		wheelDelta = wheelDelta % WHEEL_DELTA;
+		return actions;
+	}
+};
+
+struct HorizontalScrollRange {
+	int pageWidth;
+	int documentWidth;
+};
+
 }
 
 namespace Scintilla::Internal {
@@ -405,7 +427,8 @@ class ScintillaWin final :
 
 	UINT linesPerScroll = 0;	///< Intellimouse support
 	UINT charsPerScroll = 0;	///< Intellimouse support
-	int wheelDelta = 0; ///< Wheel delta from roll
+	MouseWheelDelta verticalWheelDelta;
+	MouseWheelDelta horizontalWheelDelta;
 
 	UINT dpi = USER_DEFAULT_SCREEN_DPI;
 	ReverseArrowCursor reverseArrowCursor;
@@ -536,6 +559,8 @@ class ScintillaWin final :
 	void UpdateSystemCaret() override;
 	void SetVerticalScrollPos() override;
 	void SetHorizontalScrollPos() override;
+	void HorizontalScrollToClamped(int xPos);
+	HorizontalScrollRange GetHorizontalScrollRange() const noexcept;
 	bool ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) override;
 	void NotifyChange() noexcept override;
 	void NotifyFocus(bool focus) override;
@@ -1715,6 +1740,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 		return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 
 	case WM_MOUSEWHEEL:
+	case WM_MOUSEHWHEEL:
 		if (!mouseWheelCaptures) {
 			// if the mouse wheel is not captured, test if the mouse
 			// pointer is over the editor window and if not, don't
@@ -1734,49 +1760,29 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 			break;
 		}
 
-		// Don't handle datazoom.
-		// (A good idea for datazoom would be to "fold" or "unfold" details.
-		// i.e. if datazoomed out only class structures are visible, when datazooming in the control
-		// structures appear, then eventually the individual statements...)
-		if (wParam & MK_SHIFT) {
+		// Treat Shift+WM_MOUSEWHEEL as horizontal scrolling, not data-zoom.
+		if (iMessage == WM_MOUSEHWHEEL || (wParam & MK_SHIFT)) {
 			if (vs.wrap.state != Wrap::None || charsPerScroll == 0) {
 				return ::DefWindowProc(MainHWND(), iMessage, wParam, lParam);
 			}
+
+			MouseWheelDelta &wheelDelta = (iMessage == WM_MOUSEHWHEEL) ? horizontalWheelDelta : verticalWheelDelta;
+			if (wheelDelta.Accumulate(wParam)) {
+				const int charsToScroll = charsPerScroll * wheelDelta.Actions();
+				const int widthToScroll = static_cast<int>(std::lround(charsToScroll * vs.aveCharWidth));
+				HorizontalScrollToClamped(xOffset + widthToScroll);
+			}
+			return 0;
 		}
 
 		// Either SCROLL or ZOOM. We handle the wheel steppings calculation
-		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
-		if (std::abs(wheelDelta) < WHEEL_DELTA) {
-			return 0;
-		}
-		if (wParam & MK_SHIFT) {
-			int charsToScroll = charsPerScroll;
-			if (charsPerScroll == WHEEL_PAGESCROLL) {
-				const PRectangle rcText = GetTextRectangle();
-				const int pageWidth = static_cast<int>(rcText.Width() * 2 / 3);
-				charsToScroll = pageWidth;
-			} else {
-				charsToScroll = 1 + static_cast<int>(std::max(charsToScroll, 1) * vs.aveCharWidth);
-			}
-			charsToScroll *= (wheelDelta / WHEEL_DELTA);
-			if (wheelDelta >= 0) {
-				wheelDelta = wheelDelta % WHEEL_DELTA;
-			} else {
-				wheelDelta = -(-wheelDelta % WHEEL_DELTA);
-			}
-			HorizontalScrollTo(xOffset + charsToScroll);
-		} else if (linesPerScroll > 0) {
+		if (linesPerScroll != 0 && verticalWheelDelta.Accumulate(wParam)) {
 			Sci::Line linesToScroll = linesPerScroll;
 			if (linesPerScroll == WHEEL_PAGESCROLL) {
 				linesToScroll = LinesOnScreen() - 1;
 			}
 			linesToScroll = std::max<Sci::Line>(linesToScroll, 1);
-			linesToScroll *= (wheelDelta / WHEEL_DELTA);
-			if (wheelDelta >= 0) {
-				wheelDelta = wheelDelta % WHEEL_DELTA;
-			} else {
-				wheelDelta = -(-wheelDelta % WHEEL_DELTA);
-			}
+			linesToScroll *= verticalWheelDelta.Actions();
 
 			if (wParam & MK_CONTROL) {
 				// Zoom! We play with the font sizes in the styles.
@@ -2277,6 +2283,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_MOUSEMOVE:
 		case WM_MOUSELEAVE:
 		case WM_MOUSEWHEEL:
+		case WM_MOUSEHWHEEL:
 			return MouseMessage(msg, wParam, lParam);
 
 		case WM_SETCURSOR:
@@ -2681,6 +2688,21 @@ bool ScintillaWin::ChangeScrollRange(int nBar, int nMin, int nMax, UINT nPage) c
 	return false;
 }
 
+void ScintillaWin::HorizontalScrollToClamped(int xPos) {
+	const HorizontalScrollRange range = GetHorizontalScrollRange();
+	HorizontalScrollTo(std::clamp(xPos, 0, range.documentWidth - range.pageWidth + 1));
+}
+
+HorizontalScrollRange ScintillaWin::GetHorizontalScrollRange() const noexcept {
+	const PRectangle rcText = GetTextRectangle();
+	int pageWidth = static_cast<int>(rcText.Width());
+	const int horizEndPreferred = std::max({ scrollWidth, pageWidth - 1, 0 });
+	if (!horizontalScrollBarVisible || Wrapping()) {
+		pageWidth = horizEndPreferred + 1;
+	}
+	return { pageWidth, horizEndPreferred };
+}
+
 bool ScintillaWin::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) {
 	if (!IsVisible()) {
 		return false;
@@ -2692,15 +2714,10 @@ bool ScintillaWin::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage) {
 	}
 
 	bool modified = ChangeScrollRange(SB_VERT, 0, static_cast<int>(vertEndPreferred), static_cast<unsigned int>(nPage));
-	const PRectangle rcText = GetTextRectangle();
-	int pageWidth = static_cast<int>(rcText.Width());
-	const int horizEndPreferred = std::max(scrollWidth, pageWidth - 1);
-	if (!horizontalScrollBarVisible || Wrapping()) {
-		pageWidth = horizEndPreferred + 1;
-	}
-	if (ChangeScrollRange(SB_HORZ, 0, horizEndPreferred, pageWidth)) {
+	const HorizontalScrollRange range = GetHorizontalScrollRange();
+	if (ChangeScrollRange(SB_HORZ, 0, range.documentWidth, range.pageWidth)) {
 		modified = true;
-		if (scrollWidth < pageWidth) {
+		if (scrollWidth < range.pageWidth) {
 			HorizontalScrollTo(0);
 		}
 	}
@@ -3376,7 +3393,10 @@ LRESULT ScintillaWin::ImeOnReconvert(LPARAM lParam) {
 void ScintillaWin::GetIntelliMouseParameters() noexcept {
 	// This retrieves the number of lines per scroll as configured in the Mouse Properties sheet in Control Panel
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);
-	::SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &charsPerScroll, 0);
+	if (!::SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &charsPerScroll, 0)) {
+		// no horizontal scrolling configuration on Windows XP
+		charsPerScroll = (linesPerScroll == WHEEL_PAGESCROLL) ? 3 : linesPerScroll;
+	}
 }
 
 void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) {
@@ -3479,7 +3499,8 @@ void ScintillaWin::ScrollMessage(WPARAM wParam) {
 		topLineNew += 1;
 		break;
 	case SB_PAGEUP:
-		topLineNew -= LinesToScroll(); break;
+		topLineNew -= LinesToScroll();
+		break;
 	case SB_PAGEDOWN:
 		topLineNew += LinesToScroll();
 		break;
@@ -3517,9 +3538,6 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 		break;
 	case SB_PAGEDOWN:
 		xPos += pageWidth;
-		if (xPos > scrollWidth - rcText.Width()) {	// Hit the end exactly
-			xPos = scrollWidth - static_cast<int>(rcText.Width());
-		}
 		break;
 	case SB_TOP:
 		xPos = 0;
@@ -3541,7 +3559,7 @@ void ScintillaWin::HorizontalScrollMessage(WPARAM wParam) {
 	default:
 		break;
 	}
-	HorizontalScrollTo(xPos);
+	HorizontalScrollToClamped(xPos);
 }
 
 /**

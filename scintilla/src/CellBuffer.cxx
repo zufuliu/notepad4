@@ -1627,7 +1627,7 @@ void CellBuffer::PerformRedoStep() {
 
 void CellBuffer::ChangeHistorySet(bool enable) {
 	if (enable) {
-		if (!changeHistory) {
+		if (!changeHistory && !uh.CanUndo()) {
 			changeHistory = std::make_unique<ChangeHistory>(Length());
 		}
 	} else {

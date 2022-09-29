@@ -1526,7 +1526,8 @@ static void DrawIndicator(int indicNum, Sci::Position startPos, Sci::Position en
 
 	const XYPOSITION left = ll->XInLine(startPos) + horizontalOffset;
 	const XYPOSITION right = ll->XInLine(endPos) + horizontalOffset;
-	const PRectangle rcIndic(left, rcLine.top + vsDraw.maxAscent, right, rcLine.top + vsDraw.maxAscent + 3);
+	const PRectangle rcIndic(left, rcLine.top + vsDraw.maxAscent, right,
+		std::max(rcLine.top + vsDraw.maxAscent + 3, rcLine.bottom));
 
 	if (bidiEnabled) {
 		ScreenLine screenLine(ll, subLine, vsDraw, rcLine.right - xStart, tabWidthMinimumPixels);
@@ -2656,6 +2657,11 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 		return; // No further drawing
 	}
 
+	const bool clipLine = !bufferedDraw && !LinesOverlap();
+	if (clipLine) {
+		surface->SetClip(rcLine);
+	}
+
 	// See if something overrides the line background colour.
 	const std::optional<ColourRGBA> background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
 
@@ -2732,6 +2738,10 @@ void EditView::DrawLine(Surface *surface, const EditModel &model, const ViewStyl
 
 	if (FlagSet(phase, DrawPhase::lineTranslucent)) {
 		DrawTranslucentLineState(surface, model, vsDraw, ll, line, rcLine, subLine, Layer::OverText);
+	}
+
+	if (clipLine) {
+		surface->PopClip();
 	}
 }
 
