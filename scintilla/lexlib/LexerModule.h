@@ -65,6 +65,16 @@ constexpr int SimpleLineStateMaskLineComment = 1;
 
 // code folding for braces, brackets, parentheses and consecutive line comments.
 void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler);
+
+enum {
+	PyLineStateMaskEmptyLine = 1 << 0,
+	PyLineStateMaskCommentLine = 1 << 1,
+	PyLineStateMaskTripleQuote = 1 << 2,
+	PyLineStateMaskCloseBrace = 1 << 3,
+	PyLineStateLineContinuation = 1 << 4,
+	PyLineStateStringInterpolation = 1 << 5,
+};
+// Python like indentation based folding.
 void FoldPyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler);
 
 }
