@@ -238,6 +238,9 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					state = IsIdentifierStartEx(sc.chNext) ? SCE_VHDL_ATTRIBUTE : SCE_VHDL_OPERATOR;
 				}
 				sc.SetState(state);
+				if (state == SCE_VHDL_CHARACTER) {
+					sc.Forward(); // to fix '''
+				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VHDL_STRING);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
