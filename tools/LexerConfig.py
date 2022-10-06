@@ -708,6 +708,8 @@ LexerConfigMap = {
 	'NP2LEX_SCALA': {
 		'cpp_style_comment': True,
 		'shebang_exe_name': 'scala',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
 		'default_fold_level': ['class', 'inner class', 'method'],
 		'default_fold_ignore_inner': 'SCE_SCALA_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_SCALA_ESCAPECHAR',
