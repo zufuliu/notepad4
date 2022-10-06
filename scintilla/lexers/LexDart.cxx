@@ -114,8 +114,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (lineState) {
 			UnpackLineState(lineState, nestedState);
 		}
-	}
-	if (startPos == 0 && sc.Match('#', '!')) {
+	} else if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_DART_COMMENTLINE);
 		sc.Forward();

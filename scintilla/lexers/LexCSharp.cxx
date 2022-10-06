@@ -229,8 +229,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		stringDelimiterCount = (lineState >> 4) & 0xff;
 		stringInterpolatorCount = (lineState >> 12) & 0xff;
 		parenCount = lineState >> 20;
-	}
-	if (startPos == 0 && sc.Match('#', '!')) {
+	} else if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_CSHARP_COMMENTLINE);
 		sc.Forward();

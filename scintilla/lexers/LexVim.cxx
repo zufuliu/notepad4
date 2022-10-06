@@ -88,8 +88,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	if (sc.currentLine > 0) {
 		lineState = styler.GetLineState(sc.currentLine - 1);
 		lineState &= VimLineStateMaskAutoCommand | VimLineStateMaskVim9Script;
-	}
-	if (startPos == 0 && sc.Match('#', '!')) {
+	} else if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_VIM_COMMENTLINE);
 		sc.Forward();

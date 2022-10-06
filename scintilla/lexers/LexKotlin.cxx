@@ -105,8 +105,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		if (lineState) {
 			UnpackLineState(lineState, nestedState);
 		}
-	}
-	if (startPos == 0 && sc.Match('#', '!')) {
+	} else if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_KOTLIN_COMMENTLINE);
 		sc.Forward();

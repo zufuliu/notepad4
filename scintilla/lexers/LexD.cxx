@@ -311,8 +311,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		*/
 		asmState = static_cast<InlineAssembler>((lineState >> 3) & 3);
 		nestedLevel = (lineState >> 8) & 0xff;
-	}
-	if (startPos == 0 && sc.Match('#', '!')) {
+	} else if (startPos == 0 && sc.Match('#', '!')) {
 		// Shell Shebang at beginning of file
 		sc.SetState(SCE_D_COMMENTLINE);
 		sc.Forward();
