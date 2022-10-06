@@ -13,35 +13,30 @@ def printLexHFile(f):
 	STYLE_LASTPREDEFINED = 39
 
 	out = []
-	lex = set()
 	autoValue = 0
 	valueMap = {}
 	for name in f.order:
 		v = f.features[name]
 		featureType = v["FeatureType"]
-		if featureType == "lex":
+		if featureType in ("lex", "enu"):
 			autoValue = 0
 			valueMap.clear()
 		elif featureType == "val":
-			if "SCE_" in name or "SCLEX_" in name:
+			if name.startswith("SCE_") or name.startswith("SCLEX_"):
 				value = v["Value"]
-				if "SCLEX_" in name:
-					val = int(value)
-					if val in lex:
-						raise Exception(f"Duplicate Lexer Value: {name} = {val}")
-					lex.add(val)
+				if value == "auto":
+					val = autoValue
+					value = str(val)
 				else:
-					if value == 'auto':
-						val = autoValue
-						value = str(val)
-					else:
-						val = int(value)
-					autoValue = val + 1
+					val = int(value)
+				autoValue = val + 1
+				if val in valueMap:
+					kind = "Style" if name.startswith("SCE_") else "Lexer"
+					raise Exception(f"Duplicate {kind} Value: {name} = {val}, {valueMap[val]}")
+				valueMap[val] = name
+				if name.startswith("SCE_"):
 					if autoValue == STYLE_FIRSTPREDEFINED:
 						autoValue = STYLE_LASTPREDEFINED + 1
-					if val in valueMap:
-						raise Exception(f"Duplicate Style Value: {name} = {val}, {valueMap[val]}")
-					valueMap[val] = name
 					if val >= STYLE_FIRSTPREDEFINED and val <= STYLE_LASTPREDEFINED:
 						raise Exception(f"Invalid Style Value: {name} = {val}")
 				out.append(f"#define {name} {value}")
