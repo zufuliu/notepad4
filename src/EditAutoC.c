@@ -671,6 +671,8 @@ enum {
 	PowerShellKeywordIndex_PredefinedVariable = 4,
 	PythonKeywordIndex_Decorator = 7,
 	RebolKeywordIndex_Directive = 1,
+	ScalaKeywordIndex_Annotation = 3,
+	ScalaKeywordIndex_Scaladoc = 5,
 	SmaliKeywordIndex_Directive = 9,
 	SwiftKeywordIndex_Directive = 1,
 	SwiftKeywordIndex_Attribute = 2,
@@ -1081,11 +1083,8 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 
 	case NP2LEX_CPP:
 	case NP2LEX_RESOURCESCRIPT:
-	case NP2LEX_SCALA:
 		if (IsCppCommentStyle(iCurrentStyle) && np2_LexKeyword) {
-			if ((ch == '@' && (np2_LexKeyword == &kwJavaDoc || np2_LexKeyword == &kwDoxyDoc))
-					|| (ch == '\\' && np2_LexKeyword == &kwDoxyDoc)
-					|| ((ch == '<' || chPrev == '<') && np2_LexKeyword == &kwNETDoc)) {
+			if ((ch == '@' || ch == '\\') && (np2_LexKeyword == &kwDoxyDoc)) {
 				WordList_AddList(pWList, (*np2_LexKeyword)[0]);
 				WordList_AddList(pWList, (*np2_LexKeyword)[1]);
 				WordList_AddList(pWList, (*np2_LexKeyword)[2]);
@@ -1287,6 +1286,19 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		if (ch == '#' && iCurrentStyle == SCE_REBOL_DEFAULT) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[RebolKeywordIndex_Directive]);
 			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
+	case NP2LEX_SCALA:
+		if (ch == '@') {
+			if (iCurrentStyle == SCE_SCALA_DEFAULT) {
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[ScalaKeywordIndex_Annotation]);
+				return AddWordResult_IgnoreLexer;
+			}
+			if (iCurrentStyle >= SCE_SCALA_COMMENTLINE && iCurrentStyle <= SCE_SCALA_TASKMARKER) {
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[ScalaKeywordIndex_Scaladoc]);
+				return AddWordResult_Finish;
+			}
 		}
 		break;
 
@@ -3074,10 +3086,10 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		break;
 
 	case NP2LEX_SCALA:
+	case NP2LEX_TCL:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
-		np2_LexKeyword = &kwJavaDoc;
 		break;
 
 	case NP2LEX_SQL:
@@ -3105,12 +3117,6 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		GenericTypeStyleMask[SCE_SWIFT_STRUCT >> 5] |= (1U << (SCE_SWIFT_STRUCT & 31));
 		GenericTypeStyleMask[SCE_SWIFT_PROTOCOL >> 5] |= (1U << (SCE_SWIFT_PROTOCOL & 31));
 		GenericTypeStyleMask[SCE_SWIFT_ENUM >> 5] |= (1U << (SCE_SWIFT_ENUM & 31));
-		break;
-
-	case NP2LEX_TCL:
-		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
-		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
-		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 
 	case NP2LEX_VERILOG:

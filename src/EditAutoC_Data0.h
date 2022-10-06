@@ -1,13 +1,5 @@
 typedef const char * const NP2_KEYWORDS[4];
 
-// JavaDoc
-static NP2_KEYWORDS kwJavaDoc = {
-"author code docRoot deprecated exception inheritDoc link linkplain literal param "
-"return see serial serialData serialField since throws value version "
-"hide "
-, NULL, NULL, NULL
-};
-
 // C# Doc
 static NP2_KEYWORDS kwNETDoc = {
 "code example exception include inheritdoc list para param paramref permission remarks returns "

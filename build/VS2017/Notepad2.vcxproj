@@ -1048,6 +1048,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRebol.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRuby.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexScala.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSmali.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSQL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexSwift.cxx" />

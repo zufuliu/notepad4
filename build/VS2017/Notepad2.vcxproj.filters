@@ -195,6 +195,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexRust.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexScala.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexSmali.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>

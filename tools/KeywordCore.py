@@ -2034,6 +2034,36 @@ def parse_rust_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
+def parse_scala_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+		elif key == 'api':
+			items = re.findall(r'(class|object|type)\s+(\w+)', doc)
+			keywordMap['class'] = [item[1] for item in items]
+			keywordMap['trait'] = re.findall(r'trait\s+(\w+)', doc)
+			keywordMap['annotation'] = re.findall(r'@(\w+)', doc)
+			items = re.findall(r'def\s+(\w+)', doc)
+			keywordMap['function'] = [item + '()' for item in items]
+		elif key == 'scaladoc':
+			keywordMap[key] = re.findall(r'@(\w+)', doc)
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'class',
+		'trait',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+		('trait', keywordMap['trait'], KeywordAttr.Default),
+		('annotation', keywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('function', keywordMap['function'], KeywordAttr.NoLexer),
+		('scaladoc', keywordMap['scaladoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
 def parse_smali_api_file(path):
 	return [
 		('keywords', [], KeywordAttr.Default),

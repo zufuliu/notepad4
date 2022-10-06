@@ -481,6 +481,7 @@ Rust Source
 
 Scala Script
 	scala
+	sbt				Scala Build Tool
 
 Shell Script
 	sh

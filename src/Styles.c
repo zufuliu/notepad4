@@ -1450,9 +1450,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		case NP2LEX_RESOURCESCRIPT:
 			dialect = 1;
 			break;
-		case NP2LEX_SCALA:
-			dialect = 3;
-			break;
 		}
 		if (dialect > 0) {
 			char lang[2] = "";

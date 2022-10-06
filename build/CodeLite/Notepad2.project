@@ -70,6 +70,7 @@
       <File Name="../../scintilla/lexers/LexRebol.cxx"/>
       <File Name="../../scintilla/lexers/LexRuby.cxx"/>
       <File Name="../../scintilla/lexers/LexRust.cxx"/>
+      <File Name="../../scintilla/lexers/LexScala.cxx"/>
       <File Name="../../scintilla/lexers/LexSmali.cxx"/>
       <File Name="../../scintilla/lexers/LexSQL.cxx"/>
       <File Name="../../scintilla/lexers/LexSwift.cxx"/>
