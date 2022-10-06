@@ -106,6 +106,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 	int indentCount = 0;
 	bool prevLineContinuation = false;
 	bool lineContinuation = false;
+	bool singleLineComment = false;
 	int lineState = 0;
 
 	int chPrevNonWhite = 0;
@@ -230,6 +231,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				}
 				sc.Forward();
 				sc.SetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_DQ) ? SCE_COFFEESCRIPT_XML_TEXT : SCE_COFFEESCRIPT_DEFAULT);
+				continue;
 			} else if (sc.Match('#', '{')) {
 				nestedState.push_back(sc.state);
 				sc.ForwardSetState(SCE_COFFEESCRIPT_OPERATOR2);
@@ -313,6 +315,9 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			if (sc.Match('#', '#', '#')) {
 				sc.Advance(2);
 				sc.ForwardSetState(SCE_COFFEESCRIPT_DEFAULT);
+				if (singleLineComment && sc.GetLineNextChar() == '\0') {
+					lineState |= PyLineStateMaskCommentLine;
+				}
 			}
 			break;
 
@@ -361,6 +366,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 		if (sc.state == SCE_COFFEESCRIPT_DEFAULT) {
 			if (sc.ch == '#') {
 				if (sc.MatchNext('#', '#')) {
+					singleLineComment = visibleChars == 0;
 					sc.SetState(SCE_COFFEESCRIPT_COMMENTBLOCK);
 					sc.Advance(2);
 				} else {
@@ -492,6 +498,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			styler.SetLineState(sc.currentLine, lineState);
 			lineState = 0;
 			insideRegexRange = false;
+			singleLineComment = false;
 			visibleChars = 0;
 			indentCount = 0;
 		}
