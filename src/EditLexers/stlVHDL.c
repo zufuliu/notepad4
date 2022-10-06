@@ -144,7 +144,7 @@ static EDITSTYLE Styles_VHDL[] = {
 	{ SCE_VHDL_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ MULTI_STYLE(SCE_VHDL_COMMENTLINE, SCE_VHDL_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_VHDL_COMMENTLINEDOC, SCE_VHDL_COMMENTBLOCKDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },
-	{ SCE_VHDL_STRING, NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_VHDL_STRING, SCE_VHDL_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_VHDL_LABEL, NP2StyleX_Label, L"back:#FFC040" },
 	{ SCE_VHDL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_VHDL_OPERATOR, SCE_VHDL_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
@@ -160,7 +160,7 @@ EDITLEXER lexVHDL = {
 		0,
 		'\0', 0, 0,
 		0,
-		0, 0,
+		SCE_VHDL_CHARACTER, 0,
 		SCE_VHDL_OPERATOR, SCE_VHDL_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // code folding

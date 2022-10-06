@@ -804,6 +804,7 @@ LexerConfigMap = {
 		'line_comment_string': '--',
 		'block_comment_string': ('/*', '*/'),
 		'escape_char_start': NoEscapeCharacter,
+		'character_style': ['SCE_VHDL_CHARACTER'],
 		'raw_string_style': ['SCE_VHDL_STRING'],
 		'operator_style': ['SCE_VHDL_OPERATOR', 'SCE_VHDL_OPERATOR2'],
 		'extra_word_char': '`',

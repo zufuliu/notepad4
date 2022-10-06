@@ -195,6 +195,14 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
+		case SCE_VHDL_CHARACTER:
+			if (sc.atLineStart) {
+				sc.SetState(SCE_VHDL_DEFAULT);
+			} else if (sc.ch == '\'') {
+				sc.ForwardSetState(SCE_VHDL_DEFAULT);
+			}
+			break;
+
 		case SCE_VHDL_COMMENTLINE:
 		case SCE_VHDL_COMMENTLINEDOC:
 			if (sc.atLineStart) {
@@ -224,24 +232,12 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.Forward();
 				}
 			} else if (sc.ch == '\'' && !IsEOLChar(sc.chNext)) {
-				Sci_Position width = sc.widthNext;
-				Sci_Position pos = sc.currentPos + 1;
-				if (sc.chNext >= 0x80 && styler.Encoding() == EncodingType::unicode) {
-					styler.GetCharacterAndWidth(pos, &width);
+				int state = SCE_VHDL_CHARACTER;
+				const int after = sc.GetCharAfterNext();
+				if (after != '\'') {
+					state = IsIdentifierStartEx(sc.chNext) ? SCE_VHDL_ATTRIBUTE : SCE_VHDL_OPERATOR;
 				}
-				pos += width;
-				const char chNext = styler.SafeGetCharAt(pos);
-				if (chNext == '\'') {
-					sc.SetState(SCE_VHDL_STRING);
-					sc.Advance(width + 1);
-					sc.ForwardSetState(SCE_VHDL_DEFAULT);
-					continue;
-				}
-				if (IsIdentifierStartEx(sc.chNext)) {
-					sc.SetState(SCE_VHDL_ATTRIBUTE);
-				} else {
-					sc.SetState(SCE_VHDL_OPERATOR);
-				}
+				sc.SetState(state);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_VHDL_STRING);
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {

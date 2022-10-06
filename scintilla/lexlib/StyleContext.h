@@ -263,6 +263,16 @@ public:
 			|| (chPrev == '\r' && ch == '\n' && currentPos >= 2 && ch0 == styler[currentPos - 2]);
 	}
 
+	int GetCharAfterNext() const noexcept {
+		//return GetRelativeCharacter(2);
+		const Sci_Position pos = currentPos + 1; // currentPos + width
+		Sci_Position widthNext_ = widthNext;
+		if (chNext >= 0x80 && styler.Encoding() == EncodingType::unicode) {
+			styler.GetCharacterAndWidth(pos, &widthNext_);
+		}
+		return static_cast<unsigned char>(styler.SafeGetCharAt(pos + widthNext_));
+	}
+
 	int GetLineLastChar() const noexcept {
 		if (chPrev == '\r' && ch == '\n' && currentPos >= 2) {
 			return static_cast<unsigned char>(styler[currentPos - 2]);
