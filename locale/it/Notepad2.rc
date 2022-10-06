@@ -126,7 +126,7 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Default...",					IDM_ENCODING_SETDEFAULT
 		END
-		POPUP "Terminazioni di riga"
+		POPUP "Terminazioni di linea"
 		BEGIN
 			MENUITEM "&Windows (CR+LF)",			IDM_LINEENDINGS_CRLF
 			MENUITEM "&Unix/macOS (LF)",			IDM_LINEENDINGS_LF
@@ -581,12 +581,12 @@ BEGIN
 	END
 	POPUP "Impostazioni"
 	BEGIN
-		MENUITEM "Inserisci Tab come spazi",			IDM_VIEW_TABSASSPACES
+		MENUITEM "Inserisci Tab come Spazi",			IDM_VIEW_TABSASSPACES
 		MENUITEM "Impostazioni Tab...\tCtrl+T",		IDM_VIEW_TABSETTINGS
-		MENUITEM "Impostazioni A capo...",			IDM_VIEW_WORDWRAPSETTINGS
+		MENUITEM "Impostazioni Testo a capo...",			IDM_VIEW_WORDWRAPSETTINGS
 		MENUITEM "Impostazioni Linee lunghe...",			IDM_VIEW_LONGLINESETTINGS
-		MENUITEM "Impostazioni Auto Completamento...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
-		MENUITEM "Auto Completamento ignora Maiuscole\\Minuscole",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
+		MENUITEM "Impostazioni Autocompletamento...",	IDM_VIEW_AUTOCOMPLETION_SETTINGS
+		MENUITEM "Autocompletamento ignora Maiuscole\\Minuscole",	IDM_VIEW_AUTOCOMPLETION_IGNORECASE
 		MENUITEM "Abilita metodo di inserimento LaTe&X",		IDM_SET_LATEX_INPUT_METHOD
 		POPUP "Modalità selezione linea"
 		BEGIN
@@ -1025,14 +1025,14 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Testo ricercato:",IDC_STATIC,7,7,67,8
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Trova Maiuscole/Minuscole",IDC_FINDCASE,7,37,73,10,WS_TABSTOP
+    AUTOCHECKBOX    "Trova Maiuscole/Minuscole",IDC_FINDCASE,7,37,93,10,WS_TABSTOP
     AUTOCHECKBOX    "Trova solo parole intere",IDC_FINDWORD,7,49,110,10,WS_TABSTOP
     AUTOCHECKBOX    "Trova solo inizio di parola",IDC_FINDSTART,7,61,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Ricerca con espressioni regolari",IDC_FINDREGEXP,7,73,112,10,WS_TABSTOP
     AUTOCHECKBOX    "&Trasforma con backslash",IDC_FINDTRANSFORMBS,7,85,95,10,WS_TABSTOP
     AUTOCHECKBOX    "Non andare a capo",IDC_NOWRAP,132,37,79,10,WS_TABSTOP
     AUTOCHECKBOX    "Chiudi dopo ricerca",IDC_FINDCLOSE,132,49,77,10,WS_TABSTOP
-    AUTOCHECKBOX    "Ricerca con caratteri jolly",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ricerca con Jolly",IDC_WILDCARDSEARCH,132,61,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "Trova successivo",IDOK,223,7,60,14
     PUSHBUTTON      "Trova precedente",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "Trova tutti",IDC_FINDALL,223,41,60,14
@@ -1040,9 +1040,9 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,73,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,85,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,61,12,10
-    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,7,48,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,157,7,64,10
     AUTOCHECKBOX    "Modalità trasparente se inattiva",IDC_TRANSPARENT,7,96,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Segna la linea abbinata al segnalibro",IDC_FINDALLBOOKMARK,132,73,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Segnalibro abbinato a linea",IDC_FINDALLBOOKMARK,132,73,91,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa font monospaziato",IDC_USEMONOSPACEDFONT,132,85,90,10,WS_TABSTOP
     CONTROL         "<a>Vai a sostituisci (Ctrl+H)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,97,80,10
     CONTROL         "<a>Salva Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,85,60,10
@@ -1059,14 +1059,14 @@ BEGIN
     COMBOBOX        IDC_FINDTEXT,7,17,210,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Sostituisci con:",IDC_STATIC,7,35,64,8
     COMBOBOX        IDC_REPLACETEXT,7,46,209,116,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Trova Maiuscole/Minuscole",IDC_FINDCASE,7,66,53,10,WS_TABSTOP
+    AUTOCHECKBOX    "Trova Maiuscole/Minuscole",IDC_FINDCASE,7,66,93,10,WS_TABSTOP
     AUTOCHECKBOX    "Trova solo parole intere",IDC_FINDWORD,7,78,105,10,WS_TABSTOP
     AUTOCHECKBOX    "Trova solo inizio di parola",IDC_FINDSTART,7,90,124,10,WS_TABSTOP
     AUTOCHECKBOX    "Ricerca con espressioni regolari",IDC_FINDREGEXP,7,102,112,10,WS_TABSTOP
     AUTOCHECKBOX    "&Trasforma con backslashes",IDC_FINDTRANSFORMBS,7,114,97,10,WS_TABSTOP
     AUTOCHECKBOX    "Non andare a capo",IDC_NOWRAP,132,66,79,10,WS_TABSTOP
-    AUTOCHECKBOX    "Chiudi dopo la sostituzione",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
-    AUTOCHECKBOX    "Ricerca con caratteri jolly",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
+    AUTOCHECKBOX    "Chiudi dopo sostituzione",IDC_FINDCLOSE,132,78,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ricerca con Jolly",IDC_WILDCARDSEARCH,132,90,74,10,WS_TABSTOP
     DEFPUSHBUTTON   "Trova successivo",IDOK,223,7,60,14
     PUSHBUTTON      "Trova precedente",IDC_FINDPREV,223,24,60,14
     PUSHBUTTON      "Trova tutto",IDC_FINDALL,223,41,60,14
@@ -1076,10 +1076,10 @@ BEGIN
     CONTROL         "<a>(?)</a>",IDC_REGEXPHELP,"SysLink",0x0,118,102,12,10
     CONTROL         "<a>(?)</a>",IDC_BACKSLASHHELP,"SysLink",0x0,118,114,12,10
     CONTROL         "<a>(?)</a>",IDC_WILDCARDHELP,"SysLink",0x0,208,90,12,10
-    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,173,6,48,10
-    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,173,35,48,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_FIND,"SysLink",WS_TABSTOP,157,6,64,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_CLEAR_REPLACE,"SysLink",WS_TABSTOP,157,35,64,10
     AUTOCHECKBOX    "Modalità trasparente se inattiva",IDC_TRANSPARENT,7,126,124,10,WS_TABSTOP
-    AUTOCHECKBOX    "Segna la linea abbinata al segnalibro",IDC_FINDALLBOOKMARK,132,102,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Segnalibro abbinato a linea",IDC_FINDALLBOOKMARK,132,102,91,10,WS_TABSTOP
     AUTOCHECKBOX    "Usa font monospaziato",IDC_USEMONOSPACEDFONT,132,114,90,10,WS_TABSTOP
     CONTROL         "<a>Vai a Trova (Ctrl+F)</a>",IDC_TOGGLEFINDREPLACE, "SysLink",WS_TABSTOP,140,127,80,10
     CONTROL         "<a>Salva Posizione</a>",IDC_SAVEPOSITION,"SysLink",WS_TABSTOP,223,114,60,10
@@ -1150,13 +1150,13 @@ END
 
 IDD_DEFEOLMODE DIALOGEX 0, 0, 196, 80
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Terminazioni di riga"
+CAPTION "Terminazioni di linea"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Modalità di fine riga predefinita:",IDC_STATIC,7,7,116,8
+    LTEXT           "Modalità di fine linea predefinita:",IDC_STATIC,7,7,116,8
     COMBOBOX        IDC_EOLMODELIST,7,20,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "Mostra l'avviso di fine riga incoerente durante il caricamento.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
-    AUTOCHECKBOX    "Garantire terminazioni di riga coerenti durante il salvataggio.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
+    AUTOCHECKBOX    "Mostra l'avviso di fine linea incoerente nel caricamento.",IDC_WARNINCONSISTENTEOLS,7,40,186,10,WS_TABSTOP
+    AUTOCHECKBOX    "Garantire terminazioni di linea coerenti nel salvataggio.",IDC_CONSISTENTEOLS,7,52,182,10,WS_TABSTOP
     AUTOCHECKBOX    "Elimina gli spazi finali durante il salvataggio.",IDC_AUTOSTRIPBLANKS,7,64,173,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,139,24,50,14
@@ -1164,21 +1164,21 @@ END
 
 IDD_WARNLINEENDS DIALOGEX 0, 0, 196, 100
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Terminazioni di riga incoerenti"
+CAPTION "Terminazioni di linea incoerenti"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Le terminazioni di riga in questo file non sono coerenti:",IDC_STATIC,7,7,180,8
+    LTEXT           "Le terminazioni di linea in questo file non sono coerenti:",IDC_STATIC,7,7,180,8
     LTEXT           "CR+LF:",IDC_STATIC,10,18,34,8,SS_RIGHT
     LTEXT           "LF:",IDC_STATIC,10,28,34,8,SS_RIGHT
     LTEXT           "CR:",IDC_STATIC,10,38,34,8,SS_RIGHT
     LTEXT           "%s linea(e).",IDC_EOL_SUM_CRLF,48,18,136,8
     LTEXT           "%s linea(e).",IDC_EOL_SUM_LF,48,28,136,8
     LTEXT           "%s linea(e).",IDC_EOL_SUM_CR,48,38,136,8
-    LTEXT           "Vuoi normalizzare le terminazioni di riga?",IDC_STATIC,7,52,180,8
+    LTEXT           "Vuoi normalizzare le terminazioni di linea?",IDC_STATIC,7,52,180,8
     COMBOBOX        IDC_EOLMODELIST,7,64,118,81,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Sì",IDOK,138,63,50,14
     PUSHBUTTON      "No",IDCANCEL,138,80,50,14
-    AUTOCHECKBOX    "Mostra sempre questa finestra di dialogo.",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
+    AUTOCHECKBOX    "Mostra sempre questa finestra.",IDC_WARNINCONSISTENTEOLS,7,82,118,10,WS_TABSTOP
 END
 
 IDD_LINENUM DIALOGEX 0, 0, 166, 70
@@ -1186,9 +1186,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Vai a"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Linea (vuota o 1 - %s):",IDC_LINE_RANGE,7,7,150,8
+    LTEXT           "Linea (vuota o da 1 - %s):",IDC_LINE_RANGE,7,7,150,8
     EDITTEXT        IDC_LINENUM,7,18,90,14,ES_AUTOHSCROLL
-    LTEXT           "Colonna (vuota o 1 - %s):",IDC_COLUMN_RANGE,7,37,150,8
+    LTEXT           "Colonna (vuota o da 1 - %s):",IDC_COLUMN_RANGE,7,37,150,8
     EDITTEXT        IDC_COLNUM,7,48,90,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,109,18,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,109,48,50,14
@@ -1201,7 +1201,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_FILEMRU,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,212,158
     AUTOCHECKBOX    "Ricorda file recenti all'uscita.",IDC_SAVEMRU,7,169,114,10,WS_TABSTOP
-    CONTROL         "<a>Elimina Cronologia</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,172,169,48,10
+    CONTROL         "<a>Elimina Cronologia</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,157,169,64,10
     DEFPUSHBUTTON   "OK",IDOK,113,183,50,14,WS_DISABLED
     PUSHBUTTON      "Annulla",IDCANCEL,169,183,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,187,10,10
@@ -1212,9 +1212,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Notifica di modifica del file"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "Nessuna.",IDC_CHANGENOTIFY_NONE,7,7,35,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Nessuna.",IDC_CHANGENOTIFY_NONE,7,7,37,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Mostra messaggio.",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
-    AUTORADIOBUTTON "Ricarica automatica (non modificata).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,114,10,WS_TABSTOP
+    AUTORADIOBUTTON "Ricarica automatica (non modificata).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,125,10,WS_TABSTOP
     AUTOCHECKBOX    "Rileva la modifica del file tramite polling anziché notifica.",IDC_CHANGENOTIFY_USE_POLLING,7,48,184,10,WS_TABSTOP
     AUTOCHECKBOX    "Resta alla fine del documento dopo il ricaricamento.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "Reimposta se viene aperto un nuovo file.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
@@ -1222,16 +1222,16 @@ BEGIN
     PUSHBUTTON      "Annulla",IDCANCEL,139,24,50,14
 END
 
-IDD_STYLESELECT DIALOGEX 0, 0, 165, 217
+IDD_STYLESELECT DIALOGEX 0, 0, 180, 217
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Seleziona Schema"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,151,162
-    AUTOCHECKBOX    "Imposta lo schema selezionato come predefinito.",IDC_DEFAULTSCHEME,7,171,151,10,WS_TABSTOP
-    AUTOCHECKBOX    "Selezione automatica in base all'estensione del nome file.",IDC_AUTOSELECT,7,182,151,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,52,196,50,14
-    PUSHBUTTON      "Annulla",IDCANCEL,108,196,50,14
+    CONTROL         "",IDC_STYLELIST,"SysTreeView32",TVS_SHOWSELALWAYS | TVS_HASBUTTONS | TVS_LINESATROOT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,7,166,162
+    AUTOCHECKBOX    "Imposta lo schema selezionato come predefinito.",IDC_DEFAULTSCHEME,7,171,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Selezione automatica in base all'estensione del file.",IDC_AUTOSELECT,7,182,162,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,67,196,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,123,196,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,198,10,10
 END
 
@@ -1252,13 +1252,13 @@ BEGIN
     PUSHBUTTON      "",IDC_NEXTSTYLE,446,195,15,14
     PUSHBUTTON      "Importa...",IDC_IMPORT,181,217,50,14
     PUSHBUTTON      "Esporta...",IDC_EXPORT,237,217,50,14
-    PUSHBUTTON      "Reimposta tutto",IDC_RESETALL,293,217,50,14
+    PUSHBUTTON      "Reimposta tutto",IDC_RESETALL,293,217,55,14
     DEFPUSHBUTTON   "OK",IDOK,355,217,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,411,217,50,14
     GROUPBOX        "Info",IDC_INFO_GROUPBOX,181,7,280,122
     ICON            IDI_STYLES,IDC_STATIC,189,19,20,20
     LTEXT           "Personalizza Schemi",IDC_TITLE,220,25,200,12
-    EDITTEXT        IDC_STYLEEDIT_HELP,186,40,272,86,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
+    EDITTEXT        IDC_STYLEEDIT_HELP,186,37,272,90,ES_READONLY | ES_MULTILINE | NOT WS_BORDER | NOT WS_TABSTOP
     LTEXT           "Estensioni di nomi di file associate: |Impostazioni di stile:",IDC_STYLELABELS,315,230,152,8,NOT WS_VISIBLE
     LTEXT           "Valore predefinito integrato:",IDC_STYLELABEL_DEFAULT,181,162,160,8
     EDITTEXT        IDC_STYLEVALUE_DEFAULT,181,172,280,18,ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
@@ -1271,58 +1271,58 @@ CAPTION "Impostazioni Tab"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
 	GROUPBOX		"Globali",IDC_STATIC,7,7,218,38
-    LTEXT           "Larghezza Tabulazione:",IDC_STATIC,14,17,67,8
-    EDITTEXT        IDC_GLOBAL_TAB_WIDTH,78,15,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,32,69,8
-    EDITTEXT        IDC_GLOBAL_INDENT_WIDTH,78,29,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_GLOBAL_TAB_AS_SPACE,118,16,101,10,WS_TABSTOP
+    LTEXT           "Larghezza Tab:",IDC_STATIC,14,17,97,8
+    EDITTEXT        IDC_GLOBAL_TAB_WIDTH,98,15,30,12,ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,32,90,8
+    EDITTEXT        IDC_GLOBAL_INDENT_WIDTH,98,29,30,12,ES_NUMBER | ES_AUTOHSCROLL
+    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_GLOBAL_TAB_AS_SPACE,133,16,90,10,WS_TABSTOP
 	GROUPBOX		"",IDC_SCHEME_TAB_GROUPBOX,7,49,218,38
-    LTEXT           "Larghezza Tabulazione:",IDC_STATIC,14,59,67,8
-    EDITTEXT        IDC_SCHEME_TAB_WIDTH,78,57,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,73,69,8
-    EDITTEXT        IDC_SCHEME_INDENT_WIDTH,78,71,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_SCHEME_TAB_AS_SPACE,118,58,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Usa impostazioni globali.",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
+    LTEXT           "Larghezza Tab:",IDC_STATIC,14,59,67,8
+    EDITTEXT        IDC_SCHEME_TAB_WIDTH,98,57,30,12,ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,73,90,8
+    EDITTEXT        IDC_SCHEME_INDENT_WIDTH,98,71,30,12,ES_NUMBER | ES_AUTOHSCROLL
+    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_SCHEME_TAB_AS_SPACE,133,58,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Usa impostazioni globali.",IDC_SCHEME_USE_GLOBAL_TAB,133,72,90,10,WS_TABSTOP
 	GROUPBOX		"",IDC_FILE_TAB_GROUPBOX,7,91,218,38
-    LTEXT           "Larghezza Tabulazione:",IDC_STATIC,14,101,67,8
-    EDITTEXT        IDC_FILE_TAB_WIDTH,78,99,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,115,69,8
-    EDITTEXT        IDC_FILE_INDENT_WIDTH,78,113,30,12,ES_NUMBER | ES_AUTOHSCROLL
-    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_FILE_TAB_AS_SPACE,118,100,101,10,WS_TABSTOP
-    AUTOCHECKBOX    "Usa impostazioni schema.",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
+    LTEXT           "Larghezza Tab:",IDC_STATIC,14,101,67,8
+    EDITTEXT        IDC_FILE_TAB_WIDTH,98,99,30,12,ES_NUMBER | ES_AUTOHSCROLL
+    LTEXT           "Dimensione Indentazione:",IDC_STATIC,14,115,90,8
+    EDITTEXT        IDC_FILE_INDENT_WIDTH,98,113,30,12,ES_NUMBER | ES_AUTOHSCROLL
+    AUTOCHECKBOX    "Inserisci Tab come spazi.",IDC_FILE_TAB_AS_SPACE,133,100,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Usa impostazioni schema.",IDC_FILE_USE_SCHEME_TAB,133,114,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Tasto Tab riformatta indentazione.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
     AUTOCHECKBOX    "Tasto Backspace riformatta indentazione.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Rileva automaticamente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,159,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rileva automaticamente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,159,218,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,176,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,175,176,50,14
 END
 
 IDD_LONGLINES DIALOGEX 0, 0, 184, 55
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Impostazioni Linne Lunghe"
+CAPTION "Impostazioni Linee Lunghe"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Limite per le linee lunghe:",IDC_STATIC,7,10,85,8
     EDITTEXT        IDC_LONGLINE_LIMIT,91,7,30,14,ES_NUMBER | ES_AUTOHSCROLL
-    AUTORADIOBUTTON "Mostra la linea del bordo.",IDC_LONGLINE_EDGE_LINE,7,27,75,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Mostra la linea del bordo.",IDC_LONGLINE_EDGE_LINE,7,27,105,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Cambia colore di sfondo.",IDC_LONGLINE_BACK_COLOR,7,38,114,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,127,7,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,127,24,50,14
 END
 
-IDD_WORDWRAP DIALOGEX 0, 0, 250, 139
+IDD_WORDWRAP DIALOGEX 0, 0, 280, 139
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Impostazioni Testo a capo"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    COMBOBOX        IDC_WRAP_INDENT,7,7,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_WRAP_SYMBOL_BEFORE,7,24,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_WRAP_SYMBOL_AFTER,7,41,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_WRAP_MODE,7,58,236,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,137,118,50,14
-    PUSHBUTTON      "Annulla",IDCANCEL,193,118,50,14
-    GROUPBOX        "Per linee rimandate a capo",IDC_STATIC,7,74,235,38
-    AUTOCHECKBOX    "Seleziona la riga secondaria solo quando si seleziona la riga dal margine sinistro.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
+    COMBOBOX        IDC_WRAP_INDENT,7,7,266,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WRAP_SYMBOL_BEFORE,7,24,266,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WRAP_SYMBOL_AFTER,7,41,266,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WRAP_MODE,7,58,266,196,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,167,118,50,14
+    PUSHBUTTON      "Annulla",IDCANCEL,223,118,50,14
+    GROUPBOX        "Per linee rimandate a capo",IDC_STATIC,7,74,265,38
+    AUTOCHECKBOX    "Seleziona la riga secondaria solo quando si seleziona la riga dal margine sinistro.",IDC_WRAP_SELECT_SUBLINE,14,84,250,10,WS_TABSTOP
     AUTOCHECKBOX    "Evidenzia la riga secondaria solo quando si evidenzia la riga corrente.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,96,220,10,WS_TABSTOP
 END
 
@@ -1349,15 +1349,15 @@ BEGIN
     LTEXT           "Inferiore:",IDC_PAGESETUP_MARGIN_BOTTOM_LABEL,164,104,32,8
     EDITTEXT        IDC_PAGESETUP_MARGIN_BOOTOM,196,103,28,12,ES_NUMBER | WS_GROUP
     GROUPBOX        "Intestazioni e piè di pagina",IDC_PAGESETUP_HEADER_FOOTER_BOX,8,130,224,56,WS_GROUP
-    LTEXT           "Intestazione:",IDC_STATIC,16,146,36,8
+    LTEXT           "Intestazione:",IDC_STATIC,16,146,38,8
     COMBOBOX        IDC_PAGESETUP_HEADER_LIST,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    LTEXT           "Piè di pagina:",IDC_STATIC,16,167,36,8
+    LTEXT           "Piè di pagina:",IDC_STATIC,16,167,44,8
     COMBOBOX        IDC_PAGESETUP_FOOTER_LIST,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Colori di stampa",IDC_PAGESETUP_PRINT_COLOR_BOX,8,191,224,37,WS_GROUP
     LTEXT           "Modalità:",IDC_STATIC,16,207,36,8
     COMBOBOX        IDC_PAGESETUP_COLOR_MODE_LIST,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Zoom",IDC_STATIC,240,170,108,58,WS_GROUP
-    LTEXT           "Stampa con Zoom (da 10% a 500%):",IDC_STATIC,248,188,94,8
+    LTEXT           "Stampa con Zoom                                   (da 10% a 500%):",IDC_STATIC,248,185,94,16
     COMBOBOX        IDC_PAGESETUP_ZOOMLEVEL,290,206,50,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,187,239,50,14,WS_GROUP
     PUSHBUTTON      "Annulla",IDCANCEL,243,239,50,14
@@ -1464,7 +1464,7 @@ BEGIN
     ICON            IDR_MAINWND,IDC_INFOBOXICON,7,7,20,20
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,187,53,50,14
-    AUTOCHECKBOX    "Non mostrare ancora questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non mostrare questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_INFOBOX_YESNO DIALOGEX 0, 0, 244, 74
@@ -1477,7 +1477,7 @@ BEGIN
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     PUSHBUTTON      "&Sì",IDYES,131,54,50,14
     PUSHBUTTON      "&No",IDNO,187,54,50,14
-    AUTOCHECKBOX    "Non mostrare ancora questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non mostrare questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SORT DIALOGEX 0, 0, 184, 152
@@ -1491,7 +1491,7 @@ BEGIN
     AUTOCHECKBOX    "Unisci linee doppie.",IDC_SORT_MERGE_DUP,7,50,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Rimuovi linee doppie.",IDC_SORT_REMOVE_DUP,7,62,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Rimuovi le linee univoche.",IDC_SORT_REMOVE_UNIQUE,7,74,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Senza distinzione tra maiuscole e minuscole.",IDC_SORT_IGNORE_CASE,7,92,81,10,WS_TABSTOP
+    AUTOCHECKBOX    "Senza distinzione tra maiuscole e minuscole.",IDC_SORT_IGNORE_CASE,7,92,150,10,WS_TABSTOP
     AUTOCHECKBOX    "Confronto di numeri logici.",IDC_SORT_LOGICAL_NUMBER,7,104,130,10,WS_TABSTOP
     AUTOCHECKBOX    "Raggruppa per tipo di file.",IDC_SORT_GROUPBY_FILE_TYPE,7,116,130,10,WS_TABSTOP
     AUTOCHECKBOX    "Ordina colonne (selezione rettangolare).",IDC_SORT_COLUMN,7,135,150,10,WS_TABSTOP
@@ -1509,7 +1509,7 @@ BEGIN
     LTEXT           "",IDC_INFOBOXTEXT,35,7,202,42
     DEFPUSHBUTTON   "OK",IDOK,131,53,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,187,53,50,14
-    AUTOCHECKBOX    "Non mostrare ancora questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Non mostrare questo messaggio.",IDC_INFOBOXCHECK,7,55,120,10,WS_TABSTOP
 END
 
 IDD_SELECT_ENCODING DIALOGEX 0, 0, 187, 238
@@ -1529,7 +1529,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Allinea Linee"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    AUTORADIOBUTTON "Sinistra.",IDC_ALIGN_LEFT,7,7,31,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Sinistra.",IDC_ALIGN_LEFT,7,7,35,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "Destra.",IDC_ALIGN_RIGHT,7,19,35,10,WS_TABSTOP
     AUTORADIOBUTTON "Centro.",IDC_ALIGN_CENTER,7,31,41,10,WS_TABSTOP
     AUTORADIOBUTTON "Giustifica.",IDC_ALIGN_JUSTIFY,7,43,40,10,WS_TABSTOP
@@ -1552,31 +1552,31 @@ END
 
 IDD_AUTOCOMPLETION DIALOGEX 0, 0, 456, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Impostazioni di completamento automatico"
+CAPTION "Impostazioni Autocompletamento"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,7,218,98
-    AUTOCHECKBOX    "Completamento automatico parola durante la digitazione.",IDC_AUTO_COMPLETE_WORD,14,6,122,10,WS_TABSTOP
-    LTEXT           "Conteggio elementi visibili nell'elenco di completamento automatico:",IDC_STATIC,14,18,148,10,SS_RIGHT
+    AUTOCHECKBOX    "Autocompletamento parola durante la digitazione",IDC_AUTO_COMPLETE_WORD,14,6,160,10,WS_TABSTOP
+    LTEXT           "Elementi visibili nell'elenco di completamento:",IDC_STATIC,14,18,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_VISIBLE_ITEM_COUNT,166,16,50,12,ES_NUMBER | WS_TABSTOP
     LTEXT           "Lunghezza minima della parola:",IDC_STATIC,14,34,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_WORD_LENGTH,166,32,50,12,ES_NUMBER | WS_TABSTOP
     LTEXT           "Lunghezza minima del numero (senza prefisso):",IDC_STATIC,14,50,148,10,SS_RIGHT
     EDITTEXT        IDC_AUTOC_MIN_NUMBER_LENGTH,166,48,50,12,ES_NUMBER | WS_TABSTOP
-    AUTOCHECKBOX    "Scansione delle parole nel documento corrente per",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "Scansione delle parole nel documento ogni:",IDC_AUTOC_SCAN_DOCUMENT_WORDS,14,68,150,10,WS_TABSTOP
     EDITTEXT        IDC_AUTOC_SCAN_WORDS_TIMEOUT,166,64,50,12,WS_TABSTOP
-    AUTOCHECKBOX    "Attiva il completamento automatico solo in modalità IME inglese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,80,180,10,WS_TABSTOP
-    AUTOCHECKBOX    "Il completamento automatico non fa distinzione tra maiuscole e minuscole.",IDC_AUTOC_CASE_INSENSITIVE,14,92,180,10,WS_TABSTOP
-    GROUPBOX        "Tasti utilizzati per applicare il completamento automatico (usa Esc per annullare)",IDC_STATIC,7,111,218,44
+    AUTOCHECKBOX    "Attiva il completamento solo in modalità IME inglese.",IDC_AUTOC_ENGLISH_IME_ONLY,14,80,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "Il completamento non fa distinzione tra maiuscole e minuscole.",IDC_AUTOC_CASE_INSENSITIVE,14,92,200,10,WS_TABSTOP
+    GROUPBOX        "Tasti per applicare l'autocompletamento (usa Esc per annullare)",IDC_STATIC,7,111,218,44
     AUTOCHECKBOX    "Invio",IDC_AUTOC_FILLUP_ENTER,14,123,35,10,WS_TABSTOP
     AUTOCHECKBOX    "Tab",IDC_AUTOC_FILLUP_TAB,66,123,35,10,WS_TABSTOP
     AUTOCHECKBOX    "Spazio",IDC_AUTOC_FILLUP_SPACE,118,123,35,10,WS_TABSTOP
-    AUTOCHECKBOX    "Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,140,50,10,WS_TABSTOP
-    EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,66,138,150,12,WS_TABSTOP
+    AUTOCHECKBOX    "Punteggiatura:",IDC_AUTOC_FILLUP_PUNCTUATION,14,140,55,10,WS_TABSTOP
+    EDITTEXT        IDC_AUTOC_FILLUP_PUNCTUATION_LIST,71,138,145,12,WS_TABSTOP
     AUTOCHECKBOX    "Indenta automaticamente testo.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Chiudi automaticamente i tag HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "Inserisci automaticamente lo spazio dopo aver digitato la virgola (,) quando appropriato.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
-    GROUPBOX        "Auto completa parentesi graffe e virgolette",IDC_STATIC,231,44,218,61
+    AUTOCHECKBOX    "Inserisci automaticamente uno spazio dopo la virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
+    GROUPBOX        "Chiudi automaticamente parentesi graffe e virgolette",IDC_STATIC,231,44,218,61
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,56,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,56,40,10,WS_TABSTOP
     AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,56,40,10,WS_TABSTOP
@@ -1584,8 +1584,8 @@ BEGIN
     AUTOCHECKBOX    "Virgolette ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,68,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Apostrofi ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,238,80,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Backticks (``).",IDC_AUTO_INSERT_BACKTICK,238,92,100,10,WS_TABSTOP
-    GROUPBOX        "Caratteri utilizzati per alternare il commento di riga per il sorgente Assembler",IDC_STATIC,231,111,218,26
-    AUTORADIOBUTTON "Punto e virgola (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,123,60,10,WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Caratteri utilizzati per alternare il commento di riga per l'Assembler",IDC_STATIC,231,111,218,26
+    AUTORADIOBUTTON "Punto e virgola (;)",IDC_ASM_LINE_COMMENT_SEMICOLON,238,123,65,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "#",IDC_ASM_LINE_COMMENT_SHARP,316,123,22,10,WS_TABSTOP
     AUTORADIOBUTTON "//",IDC_ASM_LINE_COMMENT_SLASH,362,123,22,10,WS_TABSTOP
     AUTORADIOBUTTON "@",IDC_ASM_LINE_COMMENT_AT,408,123,22,10,WS_TABSTOP
@@ -1599,7 +1599,7 @@ CAPTION "Impostazioni Salvataggio automatico"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTOCHECKBOX    "Abilita salvataggio automatico.",IDC_AUTOSAVE_ENABLE,7,7,170,10,WS_GROUP | WS_TABSTOP
-    LTEXT           "Periodo di salvataggio automatico (in secondi):",IDC_STATIC,14,19,120,10,SS_RIGHT
+    LTEXT           "Periodo di salvataggio automatico (in Sec):",IDC_STATIC,7,19,140,10,SS_LEFT
     EDITTEXT        IDC_AUTOSAVE_PERIOD,140,17,30,12,ES_AUTOHSCROLL
     AUTOCHECKBOX    "Salva backup in caso di sospensione del sistema.",IDC_AUTOSAVE_SUSPEND,7,31,170,10,WS_GROUP | WS_TABSTOP
     AUTOCHECKBOX    "Salva backup in caso di spegnimento del sistema.",IDC_AUTOSAVE_SHUTDOWN,7,43,170,10,WS_TABSTOP
@@ -1843,7 +1843,7 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY_FILE       "(File Sola Lettura)"
     IDS_READONLY_MODE       "(Modalità Sola Lettura)"
-    IDS_DOCPOS              "Ln %s / %s  Col %s / %s  Ch %s / %s  Sel %s / %s  SelLn %s  Fnd %s"
+    IDS_DOCPOS              "Ln %s / %s  Col %s / %s  Cr %s / %s  Sel %s / %s  LnSel %s  Trv %s"
     IDS_LOADFILE            "Caricamento ""%s""..."
     IDS_SAVEFILE            "Salvataggio ""%s""..."
     IDS_PRINTFILE           "Stampa pagina %s..."
@@ -1855,7 +1855,7 @@ END
 
 STRINGTABLE
 BEGIN
-	IDS_BACKSLASHHELP		"Trasformazioi Backslash\n\n\
+	IDS_BACKSLASHHELP		"Trasformazioni Backslash\n\n\
 \\a\tAlert (BEL, ASCII 7)\n\
 \\b\tBackspace (BS, ASCII 8)\n\
 \\e\tEscape (ESC, ASCII 27 / 1B)\n\
@@ -1897,7 +1897,7 @@ Sintassi sperimentale:\n\
 \\i\tCorrisponde a 1 o più caratteri alla fine di una parola\n\
 \\i?\tCorrisponde a 0 o più caratteri alla fine di una parola"
 
-	IDS_WILDCARDHELP		"Ricerca con caratteri jolly\n\n\
+	IDS_WILDCARDHELP		"Ricerca con caratteri Jolly\n\n\
 *\tCorrisponde a zero o più caratteri.\n\
 ?\tCorrisponde esattamente a un carattere. "
 END
