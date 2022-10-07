@@ -19,9 +19,9 @@ class PropSetSimple;
 typedef bool (*PFNIsCommentLeader)(Accessor &styler, Sci_Position pos, Sci_Position len);
 
 class Accessor final : public LexAccessor {
-	const PropSetSimple * const pprops;
+	const PropSetSimple &props;
 public:
-	Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple *pprops_) noexcept;
+	Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple &props_) noexcept;
 	int GetPropertyInt(const char *key, size_t keyLen, int defaultValue = 0) const;
 
 	template <size_t N>

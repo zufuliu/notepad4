@@ -8,7 +8,9 @@
 #include <cstdlib>
 #include <cassert>
 
+#include <string>
 #include <string_view>
+#include <map>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -82,7 +84,7 @@ Sci_Position SCI_METHOD LexerBase::WordListSet(int n, int attribute, const char 
 }
 
 void SCI_METHOD LexerBase::Lex(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Scintilla::IDocument *pAccess) {
-	Accessor styler(pAccess, &props);
+	Accessor styler(pAccess, props);
 	lexer.fnLexer(startPos, lengthDoc, initStyle, keywordLists, styler);
 	styler.Flush();
 }
@@ -102,7 +104,7 @@ void SCI_METHOD LexerBase::Fold(Sci_PositionU startPos, Sci_Position lengthDoc, 
 			}
 		}
 
-		Accessor styler(pAccess, &props);
+		Accessor styler(pAccess, props);
 		lexer.fnFolder(startPos, lengthDoc, initStyle, keywordLists, styler);
 	}
 }

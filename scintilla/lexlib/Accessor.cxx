@@ -10,6 +10,7 @@
 
 #include <string>
 #include <string_view>
+#include <map>
 
 #include "ILexer.h"
 #include "Scintilla.h"
@@ -22,11 +23,11 @@
 
 using namespace Lexilla;
 
-Accessor::Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple *pprops_) noexcept : LexAccessor(pAccess_), pprops(pprops_) {
+Accessor::Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple &props_) noexcept : LexAccessor(pAccess_), props(props_) {
 }
 
 int Accessor::GetPropertyInt(const char *key, size_t keyLen, int defaultValue) const {
-	return pprops->GetInt(key, keyLen, defaultValue);
+	return props.GetInt(key, keyLen, defaultValue);
 }
 
 int Accessor::IndentAmount(Sci_Line line) noexcept {

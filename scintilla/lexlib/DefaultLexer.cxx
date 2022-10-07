@@ -5,20 +5,9 @@
 // Copyright 2017 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstdlib>
-#include <cassert>
-
-#include <string_view>
-
 #include "ILexer.h"
 #include "Scintilla.h"
-#include "SciLexer.h"
 
-#include "PropSetSimple.h"
-#include "WordList.h"
-#include "LexAccessor.h"
-#include "Accessor.h"
-#include "LexerModule.h"
 #include "DefaultLexer.h"
 
 using namespace Lexilla;

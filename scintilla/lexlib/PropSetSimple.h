@@ -9,16 +9,8 @@
 namespace Lexilla {
 
 class PropSetSimple final {
-	void *impl;
+	std::map<std::string, std::string, std::less<>> props;
 public:
-	PropSetSimple();
-	// Deleted so PropSetSimple objects can not be copied.
-	PropSetSimple(const PropSetSimple&) = delete;
-	PropSetSimple(PropSetSimple&&) = delete;
-	PropSetSimple &operator=(const PropSetSimple&) = delete;
-	PropSetSimple &operator=(PropSetSimple&&) = delete;
-	~PropSetSimple();
-
 	bool Set(std::string_view key, std::string_view val);
 	const char *Get(std::string_view key) const;
 	int GetInt(const char *key, size_t keyLen, int defaultValue = 0) const;

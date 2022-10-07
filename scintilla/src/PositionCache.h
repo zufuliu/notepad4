@@ -213,11 +213,6 @@ class SpecialRepresentations {
 	unsigned int maxKey = 0;
 	bool crlf = false;
 public:
-#if !defined(_MSC_VER) || (_MSC_VER >= 1920)
-	SpecialRepresentations() noexcept = default;
-#else
-	SpecialRepresentations() noexcept {} // for Visual C++ 2017
-#endif
 	void SetRepresentation(std::string_view charBytes, std::string_view value);
 	void SetRepresentationAppearance(std::string_view charBytes, RepresentationAppearance appearance);
 	void SetRepresentationColour(std::string_view charBytes, ColourRGBA colour);
