@@ -3929,8 +3929,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				DestroyWindow(hDlgFindReplace);
 				hDlgFindReplace = EditFindReplaceDlg(hwndEdit, &efrData, bReplace);
 			} else {
-				SendMessage(hDlgFindReplace, WM_COPYDATA, 0, 0);
 				SetForegroundWindow(hDlgFindReplace);
+				SendMessage(hDlgFindReplace, APPM_COPYDATA, 0, 0);
 			}
 		}
 	}

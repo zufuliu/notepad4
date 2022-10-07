@@ -103,6 +103,9 @@ typedef struct NP2PARAMS {
 //#define APPM_CHANGENOTIFYCLEAR	(WM_APP + 3)
 #define APPM_TRAYMESSAGE			(WM_APP + 4)	// callback message from system tray
 #define APPM_POST_HOTSPOTCLICK		(WM_APP + 5)
+// TODO: WM_COPYDATA is blocked by the User Interface Privilege Isolation
+// https://www.codeproject.com/tips/1017834/how-to-send-data-from-one-process-to-another-in-cs
+#define APPM_COPYDATA				(WM_APP + 6)
 
 #define ID_WATCHTIMER				0xA000	// file watch timer
 #define ID_PASTEBOARDTIMER			0xA001	// paste board timer
