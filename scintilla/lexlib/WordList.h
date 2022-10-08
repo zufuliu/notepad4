@@ -23,24 +23,36 @@ public:
 
 private:
 	// Each word contains at least one character - a empty word acts as sentinel at the end.
-	char **words;
-	char *list;
-	range_t len;
-	range_t ranges[128];	// only ASCII, most word starts with character in '_a-zA-Z'
+	char **words = nullptr;
+	char *list = nullptr;
+	//range_t len = 0;
+	// ASCII graphic character only, most word starts with character in '_a-zA-Z'
+	static constexpr unsigned char MinIndexChar = ' ' + 1;
+	range_t ranges[0x7f - MinIndexChar];
 public:
-	explicit WordList() noexcept;
+	WordList() noexcept {
+		// Prevent warnings by static analyzers about uninitialized ranges.
+		ranges[0] = {};
+	}
 	// Deleted so WordList objects can not be copied.
 	WordList(const WordList &) = delete;
 	WordList(WordList &&) = delete;
 	WordList &operator=(const WordList &) = delete;
 	WordList &operator=(WordList &&) = delete;
 	~WordList();
-	operator bool() const noexcept;
+	operator bool() const noexcept {
+		//return len != 0;
+		return words != nullptr;
+	}
+#if 0
 	bool operator!=(const WordList &other) const noexcept;
 	bool operator==(const WordList &other) const noexcept {
 		return !(*this != other);
 	}
-	range_t Length() const noexcept;
+	range_t Length() const noexcept {
+		return len;
+	}
+#endif
 	void Clear() noexcept;
 	bool Set(const char *s, KeywordAttr attribute = KeywordAttr_Default);
 	bool InList(const char *s) const noexcept;

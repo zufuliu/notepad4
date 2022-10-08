@@ -88,20 +88,11 @@ struct Range {
 
 }
 
-WordList::WordList() noexcept :
-	words(nullptr), list(nullptr), len(0) {
-	// Prevent warnings by static analyzers about uninitialized ranges.
-	ranges[0] = {};
-}
-
 WordList::~WordList() {
 	Clear();
 }
 
-WordList::operator bool() const noexcept {
-	return len != 0;
-}
-
+#if 0
 bool WordList::operator!=(const WordList &other) const noexcept {
 	if (len != other.len) {
 		return true;
@@ -113,10 +104,7 @@ bool WordList::operator!=(const WordList &other) const noexcept {
 	}
 	return false;
 }
-
-range_t WordList::Length() const noexcept {
-	return len;
-}
+#endif
 
 void WordList::Clear() noexcept {
 	if (words) {
@@ -125,7 +113,7 @@ void WordList::Clear() noexcept {
 	}
 	words = nullptr;
 	list = nullptr;
-	len = 0;
+	//len = 0;
 }
 
 bool WordList::Set(const char *s, KeywordAttr attribute) {
@@ -147,6 +135,7 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 		}
 	}
 
+	range_t len = 0;
 	words = ArrayFromWordList(list, lenS - 1, &len);
 	if (!(attribute & KeywordAttr_PreSorted)) {
 		std::sort(words, words + len, [](const char *a, const char *b) noexcept {
@@ -161,7 +150,7 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 		while (static_cast<unsigned char>(*words[i]) == indexChar) {
 			++i;
 		}
-		ranges[indexChar] = start | (i << 16);
+		ranges[indexChar - MinIndexChar] = start | (i << 16);
 	}
 	return true;
 }
@@ -175,11 +164,11 @@ bool WordList::InList(const char *s) const noexcept {
 	if (nullptr == words) {
 		return false;
 	}
-	const unsigned char firstChar = s[0];
-	if (firstChar & 0x80) {
+	const unsigned index = static_cast<unsigned char>(s[0]) - MinIndexChar;
+	if (index > std::size(ranges) - 1) {
 		return false;
 	}
-	range_t end = ranges[firstChar];
+	range_t end = ranges[index];
 	if (end) {
 		Range range(end);
 		range_t count = range.Length();
@@ -219,7 +208,7 @@ bool WordList::InList(const char *s) const noexcept {
 		}
 	}
 
-	end = ranges[static_cast<unsigned char>('^')];
+	end = ranges[static_cast<unsigned char>('^') - MinIndexChar];
 	if (end) {
 		Range range(end);
 		do {
@@ -247,11 +236,11 @@ bool WordList::InListPrefixed(const char *s, const char marker) const noexcept {
 	if (nullptr == words) {
 		return false;
 	}
-	const unsigned char firstChar = s[0];
-	if (firstChar & 0x80) {
+	const unsigned index = static_cast<unsigned char>(s[0]) - MinIndexChar;
+	if (index > std::size(ranges) - 1) {
 		return false;
 	}
-	range_t end = ranges[firstChar];
+	range_t end = ranges[index];
 	if (end) {
 		Range range(end);
 		range_t count = range.Length();
@@ -291,7 +280,7 @@ bool WordList::InListPrefixed(const char *s, const char marker) const noexcept {
 		}
 	}
 
-	end = ranges[static_cast<unsigned char>('^')];
+	end = ranges[static_cast<unsigned char>('^') - MinIndexChar];
 	if (end) {
 		Range range(end);
 		do {
@@ -318,11 +307,11 @@ bool WordList::InListAbbreviated(const char *s, const char marker) const noexcep
 	if (nullptr == words) {
 		return false;
 	}
-	const unsigned char firstChar = s[0];
-	if (firstChar & 0x80) {
+	const unsigned index = static_cast<unsigned char>(s[0]) - MinIndexChar;
+	if (index > std::size(ranges) - 1) {
 		return false;
 	}
-	range_t end = ranges[firstChar];
+	range_t end = ranges[index];
 	if (end) {
 		Range range(end);
 		do {
@@ -347,7 +336,7 @@ bool WordList::InListAbbreviated(const char *s, const char marker) const noexcep
 		} while (range.Next());
 	}
 
-	end = ranges[static_cast<unsigned char>('^')];
+	end = ranges[static_cast<unsigned char>('^') - MinIndexChar];
 	if (end) {
 		Range range(end);
 		do {
@@ -376,11 +365,11 @@ bool WordList::InListAbridged(const char *s, const char marker) const noexcept {
 	if (nullptr == words) {
 		return false;
 	}
-	const unsigned char firstChar = s[0];
-	if (firstChar & 0x80) {
+	unsigned index = static_cast<unsigned char>(s[0]) - MinIndexChar;
+	if (index > std::size(ranges) - 1) {
 		return false;
 	}
-	range_t end = ranges[firstChar];
+	range_t end = ranges[index];
 	if (end) {
 		Range range(end);
 		do {
@@ -405,7 +394,11 @@ bool WordList::InListAbridged(const char *s, const char marker) const noexcept {
 		} while (range.Next());
 	}
 
-	end = ranges[static_cast<unsigned char>(marker)];
+	index = static_cast<unsigned char>(marker) - MinIndexChar;
+	if (index > std::size(ranges) - 1) {
+		return false;
+	}
+	end = ranges[index];
 	if (end) {
 		Range range(end);
 		do {
