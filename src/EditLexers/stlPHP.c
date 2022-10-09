@@ -15,16 +15,18 @@ static KEYWORDLIST Keywords_PHP = {{
 "self string unset void "
 
 , // 2 class
-"AppendIterator ArgumentCountError ArithmeticError ArrayIterator ArrayObject AssertionError "
+"__PHP_Incomplete_Class AppendIterator ArgumentCountError ArithmeticError ArrayIterator ArrayObject AssertionError "
 "BadFunctionCallException BadMethodCallException "
-"CURLFile CURLStringFile CachingIterator CallbackFilterIterator Closure CompileError "
-"CurlHandle CurlMultiHandle CurlShareHandle "
+"CachingIterator CallbackFilterIterator Closure CompileError "
+"CURLFile CurlHandle CurlMultiHandle CurlShareHandle CURLStringFile "
 "DateInterval DatePeriod DateTime DateTimeImmutable DateTimeZone Directory DirectoryIterator DivisionByZeroError "
 "DomainException "
 "EmptyIterator Error ErrorException Exception Fiber FiberError FilesystemIterator FilterIterator "
-"GMP Generator GlobIterator HashContext InfiniteIterator InvalidArgumentException IteratorIterator JsonException "
-"LengthException LimitIterator LogicException MultipleIterator NoRewindIterator "
-"OutOfBoundsException OutOfRangeException OverflowException PDO PDOException PDOStatement ParentIterator ParseError "
+"Generator GlobIterator GMP HashContext InfiniteIterator InvalidArgumentException IteratorIterator JsonException "
+"LengthException LimitIterator LogicException "
+"MultipleIterator mysqli mysqli_driver mysqli_result mysqli_sql_exception mysqli_stmt mysqli_warning NoRewindIterator "
+"OutOfBoundsException OutOfRangeException OverflowException "
+"ParentIterator ParseError PDO PDOException PDOStatement php_user_filter "
 "RangeException RecursiveArrayIterator RecursiveCachingIterator RecursiveCallbackFilterIterator "
 "RecursiveDirectoryIterator RecursiveFilterIterator RecursiveIteratorIterator RecursiveRegexIterator "
 "RecursiveTreeIterator Reflection ReflectionAttribute ReflectionClass ReflectionClassConstant "
@@ -32,12 +34,10 @@ static KEYWORDLIST Keywords_PHP = {{
 "ReflectionFiber ReflectionFunction ReflectionFunctionAbstract ReflectionGenerator ReflectionIntersectionType "
 "ReflectionMethod ReflectionNamedType ReflectionObject ReflectionParameter ReflectionProperty ReflectionReference "
 "ReflectionType ReflectionUnionType ReflectionZendExtension RegexIterator RuntimeException "
-"SQLite3 SQLite3Result SQLite3Stmt SessionHandler SimpleXMLElement SimpleXMLIterator SplDoublyLinkedList "
-"SplFileInfo SplFileObject SplFixedArray SplHeap SplMaxHeap SplMinHeap SplObjectStorage SplPriorityQueue SplQueue "
-"SplStack SplTempFileObject "
+"SessionHandler SimpleXMLElement SimpleXMLIterator SplDoublyLinkedList SplFileInfo SplFileObject SplFixedArray SplHeap "
+"SplMaxHeap SplMinHeap SplObjectStorage SplPriorityQueue SplQueue SplStack SplTempFileObject "
+"SQLite3 SQLite3Result SQLite3Stmt stdClass "
 "TypeError UnderflowException UnexpectedValueException UnhandledMatchError ValueError WeakMap WeakReference "
-"__PHP_Incomplete_Class mysqli mysqli_driver mysqli_result mysqli_sql_exception mysqli_stmt mysqli_warning "
-"php_user_filter stdClass "
 
 , // 3 interface
 "ArrayAccess BackedEnum Countable DateTimeInterface Iterator IteratorAggregate JsonSerializable OuterIterator "
@@ -449,7 +449,7 @@ EDITLEXER lexPHP = {
 		SCE_PHP_OPERATOR, SCE_PHP_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // type
-		| KeywordAttr32(2, KeywordAttr_MakeLower) // class
+		| KeywordAttr32(2, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // class
 		| KeywordAttr32(3, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // interface
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // predefined variable
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // magic constant

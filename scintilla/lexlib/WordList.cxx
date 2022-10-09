@@ -5,12 +5,10 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstdlib>
 #include <cassert>
 #include <cstring>
 
 #include <algorithm>
-#include <iterator>
 
 #include "WordList.h"
 
@@ -150,6 +148,7 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 		while (static_cast<unsigned char>(*words[i]) == indexChar) {
 			++i;
 		}
+		assert(static_cast<unsigned>(index - MinIndexChar) < std::size(ranges));
 		ranges[indexChar - MinIndexChar] = start | (i << 16);
 	}
 	return true;

@@ -72,21 +72,17 @@ static KEYWORDLIST Keywords_INNO = {{
 "any func int str void "
 
 , // 6 predefined variables
-"COMPANY_NAME CompilerPath "
-"FILE_DESCRIPTION FILE_VERSION "
+"__COUNTER__ __FILE__ __INCLUDE__ __LINE__ __OPT_X__ __WIN32__ COMPANY_NAME CompilerPath "
+"faAnyFile faArchive faDirectory faHidden False faReadOnly faSymLink faSysFile faVolumeID FILE_DESCRIPTION FILE_VERSION "
 "FIND_AND FIND_BEGINS FIND_CASESENSITIVE FIND_CONTAINS FIND_ENDS FIND_MATCH FIND_NOT FIND_OR FIND_SENSITIVE FIND_TRIM "
-"False "
 "HKCC HKCC64 HKCR HKCR64 HKCU HKCU64 HKEY_CLASSES_ROOT HKEY_CLASSES_ROOT_64 "
 "HKEY_CURRENT_CONFIG HKEY_CURRENT_CONFIG_64 HKEY_CURRENT_USER HKEY_CURRENT_USER_64 "
 "HKEY_LOCAL_MACHINE HKEY_LOCAL_MACHINE_64 HKEY_USERS HKEY_USERS_64 HKLM HKLM64 HKU HKU64 "
-"INTERNAL_NAME ISPPCC_INVOKED ISPP_INVOKED LEGAL_COPYRIGHT MaxInt MinInt NULL NewLine No ORIGINAL_FILENAME "
+"INTERNAL_NAME ISPP_INVOKED ISPPCC_INVOKED LEGAL_COPYRIGHT MaxInt MinInt NewLine No NULL ORIGINAL_FILENAME "
 "PREPROCVER PRODUCT_NAME PRODUCT_VERSION "
-"SW_HIDE SW_MAX SW_MAXIMIZE SW_MINIMIZE SW_NORMAL SW_RESTORE "
+"SourcePath SW_HIDE SW_MAX SW_MAXIMIZE SW_MINIMIZE SW_NORMAL SW_RESTORE "
 "SW_SHOW SW_SHOWDEFAULT SW_SHOWMAXIMIZED SW_SHOWMINIMIZED SW_SHOWMINNOACTIVE SW_SHOWNA SW_SHOWNOACTIVATE SW_SHOWNORMAL "
-"SourcePath "
-"TYPE_ARRAY TYPE_ERROR TYPE_FUNC TYPE_INTEGER TYPE_MACRO TYPE_NULL TYPE_STRING Tab True UNICODE Ver WINDOWS Yes "
-"__COUNTER__ __FILE__ __INCLUDE__ __LINE__ __OPT_X__ __WIN32__ "
-"faAnyFile faArchive faDirectory faHidden faReadOnly faSymLink faSysFile faVolumeID "
+"Tab True TYPE_ARRAY TYPE_ERROR TYPE_FUNC TYPE_INTEGER TYPE_MACRO TYPE_NULL TYPE_STRING UNICODE Ver WINDOWS Yes "
 
 , // 7 functions
 "AddBackslash( ChangeFileExt( ComparePackedVersion( Copy( CopyFile( "
@@ -113,13 +109,13 @@ static KEYWORDLIST Keywords_INNO = {{
 "if interface not of or procedure property read record repeat then to try type until uses var while with write "
 
 , // 9 pascal types
-"AnsiString Boolean Byte Char Directory HBITMAP IDispatch IUnknown Int64 Integer Longint String "
+"AnsiString Boolean Byte Char Directory HBITMAP IDispatch Int64 Integer IUnknown Longint String "
 "TAlign TAlignment TAlphaFormat TAnchorKind TAnchors TBevel TBevelKind TBevelShape TBevelStyle TBevelWidth "
 "TBitmap TBitmapImage TBorderIcon TBorderIcons TBorderStyle TBorderWidth TBrush TBrushStyle TButton TButtonControl "
 "TCanvas TCheckBox TCheckBoxState TCheckItemOperation TCloseAction TCloseEvent TCloseQueryEvent "
 "TColor TComboBox TComboBoxStyle TComponent TConstraintSize TControl TCustomCheckBox TCustomComboBox TCustomControl "
 "TCustomEdit TCustomFolderTreeView TCustomLabel TCustomListBox TCustomMemo TCustomPanel TDownloadWizardPage TDuplicates "
-"TEShiftState TEdit TEditCharCase "
+"TEdit TEditCharCase TEShiftState "
 "TFileStream TFolderRenameEvent TFolderTreeView TFont TFontStyle TFontStyles TForm TFormBorderStyle TFormStyle "
 "TGraphic TGraphicControl TGraphicsObject THandleStream "
 "TInputDirWizardPage TInputFileWizardPage TInputOptionWizardPage TInputQueryWizardPage TKeyEvent TKeyPressEvent "
@@ -128,8 +124,8 @@ static KEYWORDLIST Keywords_INNO = {{
 "TNewRadioButton TNewStaticText TNotebook TNotifyEvent "
 "TObject TOutputMarqueeProgressWizardPage TOutputMsgMemoWizardPage TOutputMsgWizardPage TOutputProgressWizardPage "
 "TPanel TPanelBevel TPasswordEdit TPen TPenMode TPenStyle TPersistent TPosition TRadioButton TRichEditViewer "
-"TScrollBarInc TScrollBarKind TScrollStyle TScrollingWinControl TSetupForm TSetupStep TShiftState TSizeConstraints "
-"TStartMenuFolderTreeView TStream TStringList TStringStream TStrings TUIStateForm TUninstallProgressForm TUninstallStep "
+"TScrollBarInc TScrollBarKind TScrollingWinControl TScrollStyle TSetupForm TSetupStep TShiftState TSizeConstraints "
+"TStartMenuFolderTreeView TStream TStringList TStrings TStringStream TUIStateForm TUninstallProgressForm TUninstallStep "
 "TWinControl "
 "TWizardForm TWizardPage TWizardPageButtonEvent TWizardPageCancelEvent TWizardPageNotifyEvent TWizardPageShouldSkipEvent "
 "Word "
@@ -180,20 +176,19 @@ static KEYWORDLIST Keywords_INNO = {{
 "WizardSelectComponents( WizardSelectTasks( WizardSelectedComponents( WizardSelectedTasks( WizardSetupType( WizardSilent "
 
 , // 11 pascal constants
-"HKA HKA32 HKA64 HKCC32 HKCR32 HKCU32 HKEY_AUTO HKEY_AUTO_32 HKEY_AUTO_64 "
-"HKEY_CLASSES_ROOT_32 HKEY_CURRENT_CONFIG_32 HKEY_CURRENT_USER_32 HKEY_DYN_DATA HKEY_LOCAL_MACHINE_32 "
-"HKEY_PERFORMANCE_DATA HKEY_USERS_32 HKLM32 HKU32 "
-"IDABORT IDCANCEL IDIGNORE IDNO IDOK IDRETRY IDYES "
-"MB_ABORTRETRYIGNORE MB_DEFBUTTON1 MB_DEFBUTTON2 MB_DEFBUTTON3 MB_OK MB_OKCANCEL MB_RETRYCANCEL MB_SETFOREGROUND "
-"MB_YESNO MB_YESNOCANCEL "
 "afDefined afIgnored afPremultiplied akBottom akLeft akRight akTop alBottom alClient alLeft alNone alRight alTop "
 "biHelp biMaximize biMinimize biSystemMenu bkFlat bkNone bkSoft bkTile bsBDiagonal bsBottomLine bsBox bsClear bsCross "
 "bsDiagCross bsDialog bsFDiagonal bsFrame bsHorizontal bsLeftLine bsLowered bsNone bsRaised bsRightLine "
-"bsSingle bsSizeToolWin bsSizeable bsSolid bsSpacer bsToolWindow bsTopLine bsVertical bvLowered bvNone bvRaised bvSpace "
+"bsSingle bsSizeable bsSizeToolWin bsSolid bsSpacer bsToolWindow bsTopLine bsVertical bvLowered bvNone bvRaised bvSpace "
 "caFree caHide caMinimize caNone cbChecked cbGrayed cbUnchecked coCheck coCheckWithChildren coUncheck "
 "csDropDown csDropDownList csOwnerDrawFixed csOwnerDrawVariable csSimple "
 "ecLowerCase ecNormal ecUpperCase fsBold fsItalic fsStrikeOut fsUnderline "
-"lbOwnerDrawFixed lbOwnerDrawVariable lbStandard mbConfirmation mbCriticalError mbError mbInformation "
+"HKA HKA32 HKA64 HKCC32 HKCR32 HKCU32 HKEY_AUTO HKEY_AUTO_32 HKEY_AUTO_64 "
+"HKEY_CLASSES_ROOT_32 HKEY_CURRENT_CONFIG_32 HKEY_CURRENT_USER_32 HKEY_DYN_DATA HKEY_LOCAL_MACHINE_32 "
+"HKEY_PERFORMANCE_DATA HKEY_USERS_32 HKLM32 HKU32 "
+"IDABORT IDCANCEL IDIGNORE IDNO IDOK IDRETRY IDYES lbOwnerDrawFixed lbOwnerDrawVariable lbStandard "
+"MB_ABORTRETRYIGNORE MB_DEFBUTTON1 MB_DEFBUTTON2 MB_DEFBUTTON3 MB_OK MB_OKCANCEL MB_RETRYCANCEL MB_SETFOREGROUND "
+"MB_YESNO MB_YESNOCANCEL mbConfirmation mbCriticalError mbError mbInformation "
 "npbsError npbsNormal npbsPaused npbstMarquee npbstNormal "
 "pmBlack pmCopy pmMask pmMaskNotPen pmMaskPenNot pmMerge pmMergeNotPen pmMergePenNot "
 "pmNop pmNot pmNotCopy pmNotMask pmNotMerge pmNotXor pmWhite pmXor "
@@ -294,12 +289,12 @@ EDITLEXER lexInnoSetup = {
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(4, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // directives
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // types
-		| KeywordAttr32(6, KeywordAttr_MakeLower) // predefined variables
+		| KeywordAttr32(6, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // predefined variables
 		| KeywordAttr64(7, KeywordAttr_NoLexer) // functions
 		| KeywordAttr64(8, KeywordAttr_PreSorted) // pascal keywords
-		| KeywordAttr64(9, KeywordAttr_MakeLower) // pascal types
+		| KeywordAttr64(9, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // pascal types
 		| KeywordAttr64(10, KeywordAttr_NoLexer) // pascal functions
-		| KeywordAttr64(11, KeywordAttr_MakeLower) // pascal constants
+		| KeywordAttr64(11, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // pascal constants
 		| KeywordAttr64(12, KeywordAttr_NoLexer) // misc
 	},
 //Settings--Autogenerated -- end of section automatically generated

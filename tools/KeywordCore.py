@@ -25,8 +25,7 @@ JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
 GroovyKeyword = []
 
-def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
-	items = sorted(items)
+def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1, makeLower=False):
 	groups = {}
 	for item in items:
 		if item.endswith('()'):
@@ -35,6 +34,8 @@ def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
 			# 2. ')' is auto added in WordList_AddListEx()
 			item = item[:-1]
 		key = item[:prefixLen]
+		if makeLower:
+			key = key.lower()
 		if key in groups:
 			groups[key]['items'].append(item)
 			groups[key]['len'] += len(item) + 1
@@ -47,7 +48,7 @@ def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
 		for key, group in groups.items():
 			if group['len'] > maxLineLength:
 				removed.append(key)
-				sub = MakeKeywordGroups(group['items'], maxLineLength, prefixLen + 1)
+				sub = MakeKeywordGroups(group['items'], maxLineLength, prefixLen + 1, makeLower)
 				subs.append(sub)
 		for key in removed:
 			del groups[key]
@@ -56,10 +57,10 @@ def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1):
 		groups = dict(sorted(groups.items()))
 	return groups
 
-def MakeKeywordLines(items, maxLineLength=120, prefixLen=1):
+def MakeKeywordLines(items, maxLineLength=120, prefixLen=1, makeLower=False):
 	if not items:
 		return []
-	groups = MakeKeywordGroups(items, maxLineLength, prefixLen)
+	groups = MakeKeywordGroups(items, maxLineLength, prefixLen, makeLower)
 	groups = list(groups.values())
 	count = len(groups)
 	lines = []
@@ -70,7 +71,7 @@ def MakeKeywordLines(items, maxLineLength=120, prefixLen=1):
 		lineLen = group['len']
 		items = group['items']
 		if lineLen > maxLineLength and prefixLen == 1:
-			sub = MakeKeywordLines(items, maxLineLength, 2)
+			sub = MakeKeywordLines(items, maxLineLength, 2, makeLower)
 			lines.extend(sub)
 		else:
 			while index < count:
@@ -117,7 +118,20 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	prefix = lexer[3:-4] + 'KeywordIndex_'
 	for index, item in enumerate(keywordList):
 		comment, items, attr = item
-		lines = MakeKeywordLines(set(items))
+		lines = None
+		if items:
+			items = set(items)
+			makeLower = False
+			if attr & KeywordAttr.MakeLower:
+				result = to_lower(items)
+				if set(result) == items:
+					attr &= ~KeywordAttr.MakeLower
+				else:
+					makeLower = True
+					items = [item[1] for item in sorted(zip(result, items))]
+			if not makeLower:
+				items = sorted(items)
+			lines = MakeKeywordLines(items, makeLower=makeLower)
 		if index != 0:
 			output.append(f", // {index} {comment}")
 		if lines:
@@ -145,13 +159,6 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		# keyword attribute for lexer
 		if lines and (attr & KeywordAttr.NoLexer) == 0:
 			attr |= KeywordAttr.PreSorted
-			if attr & KeywordAttr.MakeLower:
-				result = sorted(to_lower(items))
-				if set(result) == set(items):
-					attr &= ~KeywordAttr.MakeLower
-				second = to_lower(sorted(items))
-				if second != result:
-					attr &= ~KeywordAttr.PreSorted
 		if attr != KeywordAttr.Default:
 			attrList.append((index, attr, comment))
 
