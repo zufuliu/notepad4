@@ -201,12 +201,12 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (sc.state == SCE_JS_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Directive]->InList(s)) {
+					if (keywordLists[KeywordIndex_Directive].InList(s)) {
 						sc.ChangeState(SCE_JS_DIRECTIVE);
 						if (StrEqualsAny(s, "import", "require")) {
 							lineStateLineType = JsLineStateMaskImport;
 						}
-					} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_JS_WORD);
 						if (StrEqualsAny(s, "class", "extends","new", "type", "as", "is")) {
 							kwType = KeywordType::Class;
@@ -225,15 +225,15 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 								kwType = KeywordType::None;
 							}
 						}
-					} else if (keywordLists[KeywordIndex_FutureReservedWord]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_FutureReservedWord].InList(s)) {
 						sc.ChangeState(SCE_JS_WORD2);
-					} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 						sc.ChangeState(SCE_JS_CLASS);
-					} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 						sc.ChangeState(SCE_JS_INTERFACE);
-					} else if (keywordLists[KeywordIndex_Enumeration]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_JS_ENUM);
-					} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_JS_CONSTANT);
 					} else if (sc.ch == ':') {
 						if (visibleChars == sc.LengthCurrent()) {

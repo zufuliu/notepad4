@@ -199,7 +199,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
 					const int chNext = sc.GetLineNextChar();
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						if (chNext == '{' && StrEqual(s, "comment")) {
 							sc.ChangeState(SCE_REBOL_COMMENTBLOCK);
 							if (sc.ch == '{') {
@@ -229,7 +229,7 @@ void ColouriseRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
 					const char *p = s + 1;
-					if (keywordLists[KeywordIndex_Directive]->InList(p)) {
+					if (keywordLists[KeywordIndex_Directive].InList(p)) {
 						sc.ChangeState(SCE_REBOL_DIRECTIVE);
 						if (StrEqual(p, "include")) {
 							lineStateLineType = RebolLineTypeInclude;

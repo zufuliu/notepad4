@@ -35,10 +35,10 @@ constexpr bool IsFSOperator(int ch) noexcept {
 };*/
 
 void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-	const WordList &keywords3 = *keywordLists[2];
-	const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords = keywordLists[0];
+	const WordList &keywords2 = keywordLists[1];
+	const WordList &keywords3 = keywordLists[2];
+	const WordList &keywords4 = keywordLists[3];
 
 	int visibleChars = 0;
 	StyleContext sc(startPos, length, initStyle, styler);

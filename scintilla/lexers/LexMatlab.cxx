@@ -84,11 +84,11 @@ constexpr bool IsInvalidFileName(int ch) noexcept {
 }
 
 void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &attributes = *keywordLists[1];
-	const WordList &commands = *keywordLists[2];
-	const WordList &function1 = *keywordLists[3];
-	const WordList &function2 = *keywordLists[4];
+	const WordList &keywords = keywordLists[0];
+	const WordList &attributes = keywordLists[1];
+	const WordList &commands = keywordLists[2];
+	const WordList &function1 = keywordLists[3];
+	const WordList &function2 = keywordLists[4];
 
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_MATLAB);
 

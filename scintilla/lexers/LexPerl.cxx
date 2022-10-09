@@ -515,9 +515,9 @@ constexpr bool IsPerlFormatChar(int ch) noexcept {
 }
 
 void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords = keywordLists[0];
 	// keywords that forces /PATTERN/ at all times; should track vim's behaviour
-	const WordList &reWords = *keywordLists[1];
+	const WordList &reWords = keywordLists[1];
 
 	// Lexer for perl often has to backtrack to start of current style to determine
 	// which characters are being used as quotes, how deeply nested is the

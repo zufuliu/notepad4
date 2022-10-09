@@ -427,24 +427,24 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			if (!IsIdentifierCharEx(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_PY_WORD);
 					if (StrEqual(s, "def")) {
 						kwType = KeywordType::Function;
 					} else if (StrEqualsAny(s, "class", "raise", "except")) {
 						kwType = KeywordType::Class;
 					}
-				} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 					sc.ChangeState(SCE_PY_WORD2);
-				} else if (keywordLists[KeywordIndex_BuiltinConstant]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_BuiltinConstant].InList(s)) {
 					sc.ChangeState(SCE_PY_BUILTIN_CONSTANT);
-				} else if (keywordLists[KeywordIndex_BuiltinFunction]->InListPrefixed(s, '(')) {
+				} else if (keywordLists[KeywordIndex_BuiltinFunction].InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_PY_BUILTIN_FUNCTION);
-				} else if (keywordLists[KeywordIndex_Attribute]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Attribute].InList(s)) {
 					sc.ChangeState(SCE_PY_ATTRIBUTE);
-				} else if (keywordLists[KeywordIndex_SpecialMethod]->InListPrefixed(s, '(')) {
+				} else if (keywordLists[KeywordIndex_SpecialMethod].InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_PY_OBJECT_FUNCTION);
-				} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 					sc.ChangeState(SCE_PY_CLASS);
 				} else if (kwType != KeywordType::None) {
 					sc.ChangeState(static_cast<int>(kwType));

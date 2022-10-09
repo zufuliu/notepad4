@@ -284,7 +284,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
 				const KeywordType kwPrev = kwType;
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_GO_WORD);
 					if (StrEqual(s, "func")) {
 						funcState = (visibleChars == 4)? GoFunction::Define : GoFunction::Param;
@@ -303,20 +303,20 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = KeywordType::None;
 						}
 					}
-				} else if (keywordLists[KeywordIndex_PrimitiveType]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_PrimitiveType].InList(s)) {
 					sc.ChangeState(SCE_GO_WORD2);
-				} else if (keywordLists[KeywordIndex_BuiltinFunction]->InListPrefixed(s, '(')) {
+				} else if (keywordLists[KeywordIndex_BuiltinFunction].InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_GO_BUILTIN_FUNC);
 					if (sc.ch == '(' && StrEqual(s, "new")) {
 						kwType = KeywordType::Identifier;
 					}
-				} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 					sc.ChangeState(SCE_GO_TYPE);
-				} else if (keywordLists[KeywordIndex_Struct]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Struct].InList(s)) {
 					sc.ChangeState(SCE_GO_STRUCT);
-				} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 					sc.ChangeState(SCE_GO_INTERFACE);
-				} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 					sc.ChangeState(SCE_GO_CONSTANT);
 				} else {
 					const bool ignoreCurrent = sc.ch == ':' && visibleChars == sc.LengthCurrent();

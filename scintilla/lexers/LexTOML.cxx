@@ -142,7 +142,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
-				if (IsTOMLKey(sc, braceCount, keywordLists[0])) {
+				if (IsTOMLKey(sc, braceCount, &keywordLists[0])) {
 					continue;
 				}
 			}

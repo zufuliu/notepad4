@@ -156,13 +156,13 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				if (sc.state == SCE_COFFEESCRIPT_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_COFFEESCRIPT_WORD);
-					} else if (keywordLists[KeywordIndex_ReservedWord]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_ReservedWord].InList(s)) {
 						sc.ChangeState(SCE_COFFEESCRIPT_WORD2);
-					} else if (keywordLists[KeywordIndex_Directive]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Directive].InList(s)) {
 						sc.ChangeState(SCE_COFFEESCRIPT_DIRECTIVE);
-					} else if (sc.Match(':', ':') || keywordLists[KeywordIndex_Class]->InList(s)) {
+					} else if (sc.Match(':', ':') || keywordLists[KeywordIndex_Class].InList(s)) {
 						sc.ChangeState(SCE_COFFEESCRIPT_CLASS);
 					} else {
 						const int chNext = sc.GetLineNextChar();

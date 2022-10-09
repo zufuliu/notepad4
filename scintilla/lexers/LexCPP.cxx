@@ -97,21 +97,21 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 #define DOC_TAG_CLOSE_XML	4	/// </param>
 
 void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-	const WordList &keywords3 = *keywordLists[2];
-	const WordList &keywords4 = *keywordLists[3];
+	const WordList &keywords = keywordLists[0];
+	const WordList &keywords2 = keywordLists[1];
+	const WordList &keywords3 = keywordLists[2];
+	const WordList &keywords4 = keywordLists[3];
 	// global
-	const WordList &kwAttribute = *keywordLists[4];
-	const WordList &kwClass = *keywordLists[5];
-	const WordList &kwInterface = *keywordLists[6];
-	const WordList &kwEnumeration = *keywordLists[7];
-	const WordList &kwConstant = *keywordLists[8];
+	const WordList &kwAttribute = keywordLists[4];
+	const WordList &kwClass = keywordLists[5];
+	const WordList &kwInterface = keywordLists[6];
+	const WordList &kwEnumeration = keywordLists[7];
+	const WordList &kwConstant = keywordLists[8];
 	// 2nd
-	const WordList &kw2ndKeyword = *keywordLists[9];
-	const WordList &kw2ndKeyword2 = *keywordLists[10];
-	const WordList &kwAsmInstruction = *keywordLists[11];
-	const WordList &kwAsmRegister = *keywordLists[12];
+	const WordList &kw2ndKeyword = keywordLists[9];
+	const WordList &kw2ndKeyword2 = keywordLists[10];
+	const WordList &kwAsmInstruction = keywordLists[11];
+	const WordList &kwAsmRegister = keywordLists[12];
 
 	static bool isObjCSource = false;
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_CPP);

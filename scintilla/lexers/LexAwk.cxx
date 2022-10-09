@@ -239,7 +239,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				if (sc.state == SCE_AWK_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_AWK_WORD);
 						if (visibleChars == sc.LengthCurrent()) {
 							if (StrEqual(s, "@include")) {
@@ -248,9 +248,9 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 								kwType = KeywordType::Function;
 							}
 						}
-					} else if (keywordLists[KeywordIndex_PredefinedVariable]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_PredefinedVariable].InList(s)) {
 						sc.ChangeState(SCE_AWK_BUILTIN_VARIABLE);
-					} else if (keywordLists[KeywordIndex_BuiltinFunction]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_BuiltinFunction].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_AWK_BUILTIN_FUNCTION);
 					} else {
 						const int chNext = sc.GetLineNextChar();

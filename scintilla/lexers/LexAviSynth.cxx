@@ -97,22 +97,22 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				char s[128];
 				sc.GetCurrentLowered(s, sizeof(s));
 				scriptEval = ScriptEvalState::None;
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_AVS_KEYWORD);
 				} else if (sc.GetLineNextChar() == '(') {
 					int state = SCE_AVS_USERDFN;
-					if (keywordLists[KeywordIndex_InternalFunction]->InListPrefixed(s, '(')) {
+					if (keywordLists[KeywordIndex_InternalFunction].InListPrefixed(s, '(')) {
 						state = SCE_AVS_FUNCTION;
 						if (!insideScript && StrEqualsAny(s, "eval", "gscript", "geval")) {
 							scriptEval = ScriptEvalState::Name;
 						}
-					} else if (keywordLists[KeywordIndex_InternalFilter]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_InternalFilter].InListPrefixed(s, '(')) {
 						state = SCE_AVS_FILTER;
-					} else if (keywordLists[KeywordIndex_ExternalFilter]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_ExternalFilter].InListPrefixed(s, '(')) {
 						state = SCE_AVS_PLUGIN;
 					}
 					sc.ChangeState(state);
-				} else if (keywordLists[KeywordIndex_Property]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Property].InList(s)) {
 					sc.ChangeState(SCE_AVS_CLIPPROP);
 				}
 				sc.SetState(SCE_AVS_DEFAULT);

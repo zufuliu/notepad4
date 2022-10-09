@@ -146,7 +146,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				case SCE_KOTLIN_IDENTIFIER: {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_WORD);
 						if (StrEqual(s, "import")) {
 							if (visibleChars == sc.LengthCurrent()) {
@@ -176,11 +176,11 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					} else if (sc.ch == '@') {
 						sc.ChangeState(SCE_KOTLIN_LABEL);
 						sc.Forward();
-					} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_CLASS);
-					} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_INTERFACE);
-					} else if (keywordLists[KeywordIndex_Enumeration]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_KOTLIN_ENUM);
 					} else if (sc.ch != '.') {
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {

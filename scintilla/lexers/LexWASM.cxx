@@ -97,15 +97,15 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsInvalidIdChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_WASM_KEYWORD);
-				} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 					sc.ChangeState(SCE_WASM_TYPE);
-				} else if (keywordLists[KeywordIndex_Instruction]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Instruction].InList(s)) {
 					sc.ChangeState(SCE_WASM_INSTRUCTION);
 				} else if (prefixLen != 0 && prefixLen < sizeof(s)) {
 					s[prefixLen] = '\0';
-					if (keywordLists[KeywordIndex_Type]->InList(s)) {
+					if (keywordLists[KeywordIndex_Type].InList(s)) {
 						// instructions with type prefix
 						sc.ChangeState(SCE_WASM_INSTRUCTION);
 					}

@@ -211,7 +211,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else {
 						char s[128];
 						sc.GetCurrent(s, sizeof(s));
-						if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_RUST_WORD);
 							if (StrEqual(s, "struct")) {
 								kwType = KeywordType::Struct;
@@ -237,19 +237,19 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							if ((visibleChars == 3 || visibleChars == 6) && StrEqual(s, "use")) {
 								lineStateLineType = RustLineStateMaskPubUse;
 							}
-						} else if (keywordLists[KeywordIndex_ReservedKeyword]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_ReservedKeyword].InList(s)) {
 							sc.ChangeState(SCE_RUST_WORD2);
-						} else if (keywordLists[KeywordIndex_PrimitiveType]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_PrimitiveType].InList(s)) {
 							sc.ChangeState(SCE_RUST_TYPE);
-						} else if (keywordLists[KeywordIndex_Struct]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Struct].InList(s)) {
 							sc.ChangeState(SCE_RUST_STRUCT);
-						} else if (keywordLists[KeywordIndex_Trait]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Trait].InList(s)) {
 							sc.ChangeState(SCE_RUST_TRAIT);
-						} else if (keywordLists[KeywordIndex_Enumeration]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 							sc.ChangeState(SCE_RUST_ENUMERATION);
-						} else if (keywordLists[KeywordIndex_Union]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Union].InList(s)) {
 							sc.ChangeState(SCE_RUST_UNION);
-						} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 							sc.ChangeState(SCE_RUST_CONSTANT);
 						} else if (sc.ch != '.') {
 							const int chNext = sc.GetDocNextChar();

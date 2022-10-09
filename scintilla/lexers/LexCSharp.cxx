@@ -257,7 +257,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				switch (ppKind) {
 				case PreprocessorKind::None:
 					if (s[0] != '@') {
-						if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_WORD);
 							if (StrEqual(s, "using")) {
 								if (visibleChars == sc.LengthCurrent()) {
@@ -288,19 +288,19 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 									kwType = KeywordType::None;
 								}
 							}
-						} else if (keywordLists[KeywordIndex_Type]->InList(s) || keywordLists[KeywordIndex_ValaType]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Type].InList(s) || keywordLists[KeywordIndex_ValaType].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_WORD2);
-						} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_CLASS);
-						} else if (keywordLists[KeywordIndex_Struct]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Struct].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_STRUCT);
-						} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_INTERFACE);
-						} else if (keywordLists[KeywordIndex_Enumeration]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_ENUM);
-						} else if (keywordLists[KeywordIndex_Attribute]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Attribute].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_ATTRIBUTE);
-						} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 							sc.ChangeState(SCE_CSHARP_CONSTANT);
 						}
 					}

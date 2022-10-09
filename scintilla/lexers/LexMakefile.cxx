@@ -38,9 +38,9 @@ constexpr bool IsMakeOp(int ch, int chNext) noexcept {
 
 #define MAX_WORD_LENGTH	15
 void ColouriseMakeDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywordsGP = *keywordLists[0];		// gnu make Preprocessor
-	const WordList &keywordsDP2 = *keywordLists[6];		// bmake
-	const WordList &keywordsNinja = *keywordLists[7];	// ninja
+	const WordList &keywordsGP = keywordLists[0];		// gnu make Preprocessor
+	const WordList &keywordsDP2 = keywordLists[6];		// bmake
+	const WordList &keywordsNinja = keywordLists[7];	// ninja
 
 	int state = initStyle;
 	int ch = 0;

@@ -57,16 +57,16 @@ constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 
 
 void ColouriseAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &cpuInstruction = *keywordLists[0];
-	const WordList &mathInstruction = *keywordLists[1];
-	const WordList &registers = *keywordLists[2];
-	const WordList &directive = *keywordLists[3];
-	const WordList &directiveOperand = *keywordLists[4];
-	const WordList &extInstruction = *keywordLists[5];
-	//const WordList &directives4foldstart= *keywordLists[6];
-	//const WordList &directives4foldend= *keywordLists[7];
-	const WordList &GNUdirective = *keywordLists[8];
-	const WordList &kwProprocessor = *keywordLists[9];
+	const WordList &cpuInstruction = keywordLists[0];
+	const WordList &mathInstruction = keywordLists[1];
+	const WordList &registers = keywordLists[2];
+	const WordList &directive = keywordLists[3];
+	const WordList &directiveOperand = keywordLists[4];
+	const WordList &extInstruction = keywordLists[5];
+	//const WordList &directives4foldstart= keywordLists[6];
+	//const WordList &directives4foldend= keywordLists[7];
+	const WordList &GNUdirective = keywordLists[8];
+	const WordList &kwProprocessor = keywordLists[9];
 	constexpr std::string_view delimiters;
 	// Do not leak onto next line
 	if (initStyle == SCE_ASM_STRINGEOL)
@@ -360,8 +360,8 @@ bool IsAsmDefineLine(LexAccessor &styler, Sci_Line line) noexcept {
 
 #define MAX_ASM_WORD_LEN	15
 void FoldAsmDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &directives4foldstart = *keywordLists[6];
-	const WordList &directives4foldend = *keywordLists[7];
+	const WordList &directives4foldstart = keywordLists[6];
+	const WordList &directives4foldend = keywordLists[7];
 
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);

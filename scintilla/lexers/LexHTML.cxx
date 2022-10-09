@@ -344,12 +344,12 @@ constexpr bool IsOKBeforeJSRE(int ch) noexcept {
 
 void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
                                   Accessor &styler, bool isXml) {
-	const WordList &keywordsTag = *keywordLists[0];
-	const WordList &keywordsJS = *keywordLists[1];
-	const WordList &keywordsVBS = *keywordLists[2];
-	const WordList &keywordsSGML = *keywordLists[5]; // SGML (DTD)
-	const WordList &keywordsAttr = *keywordLists[6];
-	const WordList &keywordsEvent = *keywordLists[7];
+	const WordList &keywordsTag = keywordLists[0];
+	const WordList &keywordsJS = keywordLists[1];
+	const WordList &keywordsVBS = keywordLists[2];
+	const WordList &keywordsSGML = keywordLists[5]; // SGML (DTD)
+	const WordList &keywordsAttr = keywordLists[6];
+	const WordList &keywordsEvent = keywordLists[7];
 
 	styler.StartAt(startPos);
 	int StateToPrint = initStyle;

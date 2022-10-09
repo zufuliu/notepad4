@@ -285,7 +285,7 @@ struct MarkdownLexer {
 	MarkdownLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler):
 		sc(startPos, lengthDoc, initStyle, styler),
 		markdown{static_cast<Markdown>(styler.GetPropertyInt("lexer.lang"))},
-		blockTagList{*keywordLists[KeywordIndex_HtmlBlockTag]} {}
+		blockTagList{keywordLists[KeywordIndex_HtmlBlockTag]} {}
 
 	void SaveOuterStyle(int style) {
 		nestedState.push_back(style);

@@ -234,7 +234,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_IDENTIFIER:
 			if (!IsAlpha(sc.ch)) {
-				if (IsYAMLText(sc, braceCount, keywordLists[0])) {
+				if (IsYAMLText(sc, braceCount, &keywordLists[0])) {
 					continue;
 				}
 			}

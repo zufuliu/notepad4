@@ -48,10 +48,10 @@ enum {
 };*/
 
 void ClassifyPascalWord(LexerWordList keywordLists, StyleContext &sc, int &curLineState, bool bSmartHighlighting) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &typewords = *keywordLists[1];
-	const WordList &funwords = *keywordLists[2];
-	const WordList &prcwords = *keywordLists[3];
+	const WordList &keywords = keywordLists[0];
+	const WordList &typewords = keywordLists[1];
+	const WordList &funwords = keywordLists[2];
+	const WordList &prcwords = keywordLists[3];
 	char s[128];
 	sc.GetCurrentLowered(s, sizeof(s));
 	if (typewords.InList(s)) {

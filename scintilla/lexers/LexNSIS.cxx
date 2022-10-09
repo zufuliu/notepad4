@@ -86,7 +86,7 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						lineStateLineType = NsisLineTypeDefine;
 					}
 				} else if (visibleChars == sc.LengthCurrent()) {
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_NSIS_WORD);
 					} else if (sc.ch == ':' && sc.chNext != ':') {
 						sc.ChangeState(SCE_NSIS_LABEL);

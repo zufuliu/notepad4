@@ -172,7 +172,7 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					if (escSeq.outerState == SCE_SCALA_DEFAULT) {
 						char s[128];
 						sc.GetCurrent(s, sizeof(s));
-						if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_SCALA_WORD);
 							kwType = KeywordType::None;
 							if (StrEqualsAny(s, "class", "new", "extends", "throws", "object")) {
@@ -194,9 +194,9 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 									kwType = KeywordType::None;
 								}
 							}
-						} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 							sc.ChangeState(SCE_SCALA_CLASS);
-						} else if (keywordLists[KeywordIndex_Trait]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Trait].InList(s)) {
 							sc.ChangeState(SCE_SCALA_TRAIT);
 						} else if (sc.ch != '.') {
 							if (kwType > KeywordType::None && kwType < KeywordType::Return) {

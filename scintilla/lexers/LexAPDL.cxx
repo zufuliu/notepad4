@@ -82,7 +82,7 @@ void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
 					if (sc.state == SCE_APDL_STARCOMMAND) {
-						if (keywordLists[KeywordIndex_CodeFolding]->InList(s + 1)) {
+						if (keywordLists[KeywordIndex_CodeFolding].InList(s + 1)) {
 							// for code folding
 							sc.ChangeState(SCE_APDL_WORD);
 							if (StrEqual(s, "*end")) {
@@ -96,9 +96,9 @@ void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (commandValue == 2) {
 						sc.ChangeState(SCE_APDL_WORD);
 						commandValue = 0;
-					} else if (keywordLists[KeywordIndex_Argument]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Argument].InList(s)) {
 						sc.ChangeState(SCE_APDL_ARGUMENT);
-					} else if (chNext == '(' && keywordLists[KeywordIndex_Function]->InListPrefixed(s, '(')) {
+					} else if (chNext == '(' && keywordLists[KeywordIndex_Function].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_APDL_FUNCTION);
 					}
 				}
@@ -226,7 +226,7 @@ void FoldAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 					levelNext--;
 				} else if (buf[0] == '*') {
 					if ((apdl && (StrEqual(buf, "*if") || StrStartsWith(buf, "*do")))
-						|| (!apdl && keywordLists[KeywordIndex_CodeFolding]->InList(buf + 1))) {
+						|| (!apdl && keywordLists[KeywordIndex_CodeFolding].InList(buf + 1))) {
 						levelNext++;
 					}
 				}

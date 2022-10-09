@@ -245,24 +245,24 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						ppKind = PreprocessorKind::None;
 						sc.ChangeState(SCE_INNO_PREPROCESSOR_WORD);
 					} else if (lineState & InnoLineStateCodeSection) {
-						if (keywordLists[KeywordIndex_PascalKeyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_PascalKeyword].InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_KEYWORD);
-						} else if (chBeforeIdentifier == ':' || keywordLists[KeywordIndex_PascalType]->InList(s)) {
+						} else if (chBeforeIdentifier == ':' || keywordLists[KeywordIndex_PascalType].InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_TYPE);
-						} else if (keywordLists[KeywordIndex_PascalConstant]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_PascalConstant].InList(s)) {
 							sc.ChangeState(SCE_INNO_CONSTANT);
 						}
 					} else {
-						if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_INNO_KEYWORD);
-						} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 							sc.ChangeState(SCE_INNO_PASCAL_TYPE);
 						}
 					}
 					if (sc.state == SCE_INNO_IDENTIFIER) {
 						if (sc.ch == '(') {
 							sc.ChangeState(SCE_INNO_FUNCTION);
-						} else if (keywordLists[KeywordIndex_PredefinedVariable]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_PredefinedVariable].InList(s)) {
 							sc.ChangeState(SCE_INNO_CONSTANT);
 						}
 					}

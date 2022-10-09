@@ -132,16 +132,16 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					kwType = KeywordType::None;
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						state = SCE_LLVM_WORD;
-					} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 						state = SCE_LLVM_WORD2;
 						if (StrEqual(s, "label")) {
 							kwType = KeywordType::Label;
 						}
-					} else if (keywordLists[KeywordIndex_Attribute]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_Attribute].InListPrefixed(s, '(')) {
 						state = SCE_LLVM_ATTRIBUTE;
-					} else if (keywordLists[KeywordIndex_Instruction]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Instruction].InList(s)) {
 						state = SCE_LLVM_INSTRUCTION;
 					} else if (sc.ch == ':' && visibleChars == sc.LengthCurrent()) {
 						state = SCE_LLVM_LABEL;

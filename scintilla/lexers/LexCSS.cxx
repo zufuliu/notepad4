@@ -189,7 +189,7 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 							} else if (chNext == ':' && (chBefore == ';' || chBefore == '{')) {
 								// {property: value;}
 								propertyValue = true;
-								if (keywordLists[KeywordIndex_Property]->InList(s)) {
+								if (keywordLists[KeywordIndex_Property].InList(s)) {
 									sc.ChangeState(SCE_CSS_PROPERTY);
 								} else {
 									sc.ChangeState(SCE_CSS_UNKNOWN_PROPERTY);
@@ -201,19 +201,19 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					} break;
 
 					case SCE_CSS_AT_RULE:
-						if (propertyValue || !keywordLists[KeywordIndex_AtRule]->InList(s + 1)) {
+						if (propertyValue || !keywordLists[KeywordIndex_AtRule].InList(s + 1)) {
 							sc.ChangeState(SCE_CSS_VARIABLE);
 						}
 						break;
 
 					case SCE_CSS_PSEUDOCLASS:
-						if (!keywordLists[KeywordIndex_PseudoClass]->InListPrefixed(s + 1, '(')) {
+						if (!keywordLists[KeywordIndex_PseudoClass].InListPrefixed(s + 1, '(')) {
 							sc.ChangeState(SCE_CSS_UNKNOWN_PSEUDOCLASS);
 						}
 						break;
 
 					case SCE_CSS_PSEUDOELEMENT:
-						if (!keywordLists[KeywordIndex_PseudoElement]->InListPrefixed(s + 2, '(')) {
+						if (!keywordLists[KeywordIndex_PseudoElement].InListPrefixed(s + 2, '(')) {
 							sc.ChangeState(SCE_CSS_UNKNOWN_PSEUDOELEMENT);
 						}
 						break;

@@ -138,14 +138,14 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
 					kwType = KeywordType::None;
-					if (keywordLists[KeywordIndex_Keyword]->InListPrefixed(s, '(')) {
+					if (keywordLists[KeywordIndex_Keyword].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_WORD);
 						if (StrEqual(s, "function")) {
 							kwType = KeywordType::Function;
 						} else if (StrEqual(s, "macro")) {
 							kwType = KeywordType::Macro;
 						}
-					} else if (keywordLists[KeywordIndex_Command]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_Command].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_CMAKE_COMMANDS);
 					} else {
 						sc.ChangeState(SCE_CMAKE_FUNCATION);
@@ -157,13 +157,13 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					// case sensitive
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Parameter]->InList(s)) {
+					if (keywordLists[KeywordIndex_Parameter].InList(s)) {
 						sc.ChangeState(SCE_CMAKE_PARAMETERS);
-					} else if (keywordLists[KeywordIndex_Property]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Property].InList(s)) {
 						sc.ChangeState(SCE_CMAKE_PROPERTIES);
-					} else if (keywordLists[KeywordIndex_Variable]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Variable].InList(s)) {
 						sc.ChangeState(SCE_CMAKE_VARIABLE);
-					} else if (keywordLists[KeywordIndex_Value]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Value].InList(s)) {
 						sc.ChangeState(SCE_CMAKE_VALUES);
 					}
 				}

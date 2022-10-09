@@ -105,7 +105,7 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					kwType = KeywordType::None;
 					const bool demoted = parenCount != 0 || chBeforeIdentifier == '.'
 						|| (lineState & (VHDLLineStateMaskDirective | VHDLLineStateMaskAttribute)) != 0;
-					if (keywordLists[KeywordIndex_CodeFolding]->InList(s)) {
+					if (keywordLists[KeywordIndex_CodeFolding].InList(s)) {
 						if (!demoted) {
 							if (StrEqual(s, "end")) {
 								kwType = KeywordType::End;
@@ -121,7 +121,7 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							}
 						}
 						sc.ChangeState((demoted || prevWord == KeywordType::End) ? SCE_VHDL_KEYWORD_DEMOTED : SCE_VHDL_FOLDING_KEYWORD);
-					} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						if (!demoted) {
 							if (StrEqual(s, "begin")) {
 								lineState &= ~VHDLLineStateMaskCodeFolding;
@@ -141,13 +141,13 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							kwType = KeywordType::Type;
 						}
 						sc.ChangeState(demoted ? SCE_VHDL_KEYWORD_DEMOTED : SCE_VHDL_KEYWORD);
-					} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 						sc.ChangeState(SCE_VHDL_STDTYPE);
-					} else if (keywordLists[KeywordIndex_Function]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_Function].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_VHDL_STDFUNCTION);
-					} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_VHDL_CONSTANT);
-					} else if (keywordLists[KeywordIndex_Package]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Package].InList(s)) {
 						sc.ChangeState(SCE_VHDL_PACKAGE);
 					} else if (prevWord > KeywordType::End) {
 						sc.ChangeState(static_cast<int>(prevWord));

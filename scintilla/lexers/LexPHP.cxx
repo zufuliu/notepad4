@@ -379,16 +379,16 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 		sc.GetCurrent(s, sizeof(s));
 		// variable, constant and enum name is case-sensitive
 		if (sc.state == SCE_PHP_VARIABLE) {
-			if (keywordLists[KeywordIndex_PredefinedVariable]->InList(s)) {
+			if (keywordLists[KeywordIndex_PredefinedVariable].InList(s)) {
 				sc.ChangeState(SCE_PHP_PREDEFINED_VARIABLE);
 			}
-		} else if (keywordLists[KeywordIndex_MagicConstant]->InList(s)) {
+		} else if (keywordLists[KeywordIndex_MagicConstant].InList(s)) {
 			sc.ChangeState(SCE_PHP_MAGIC_CONSTANT);
 		} else {
 			char origin[sizeof(s)];
 			memcpy(origin, s, sizeof(s));
 			ToLowerCase(s);
-			if (keywordLists[KeywordIndex_Keyword]->InListPrefixed(s, '(')) {
+			if (keywordLists[KeywordIndex_Keyword].InListPrefixed(s, '(')) {
 				sc.ChangeState(SCE_PHP_WORD);
 				if (visibleChars == 3 && StrEqual(s, "use")) {
 					lineStateLineType = LineStateUseNamespace;
@@ -413,11 +413,11 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 						kwType = KeywordType::None;
 					}
 				}
-			} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+			} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 				sc.ChangeState(SCE_PHP_WORD2);
-			} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+			} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 				sc.ChangeState(SCE_PHP_INTERFACE);
-			} else if (sc.Match(':', ':') || keywordLists[KeywordIndex_Class]->InList(s)) {
+			} else if (sc.Match(':', ':') || keywordLists[KeywordIndex_Class].InList(s)) {
 				// Name::class
 				sc.ChangeState(SCE_PHP_CLASS);
 			} else {
@@ -425,7 +425,7 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 				if (lineStateAttribute && (chNext == '(' || chNext == ']')) {
 					sc.ChangeState(SCE_PHP_ATTRIBUTE);
 				} else if (chNext == '(') {
-					if (keywordLists[KeywordIndex_MagicMethod]->InListPrefixed(s, '(')) {
+					if (keywordLists[KeywordIndex_MagicMethod].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_PHP_MAGIC_METHOD);
 					} else {
 						sc.ChangeState((kwType == KeywordType::Function) ? static_cast<int>(kwType) : SCE_PHP_FUNCTION);
@@ -701,7 +701,7 @@ constexpr int GetCommentTagStyle(int state) noexcept {
 int PHPLexer::ClassifyJSWord(LexerWordList keywordLists, int visibleChars) {
 	char s[16];
 	sc.GetCurrent(s, sizeof(s));
-	if (keywordLists[KeywordIndex_Javascript]->InList(s)) {
+	if (keywordLists[KeywordIndex_Javascript].InList(s)) {
 		sc.ChangeState(js_style(SCE_JS_WORD));
 		kwType = KeywordType::None;
 		if (StrEqual(s, "function")) {

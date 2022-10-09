@@ -73,12 +73,12 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool vbScriptSyntax) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-	const WordList &keywords3 = *keywordLists[2];
-	const WordList &keywords4 = *keywordLists[3];
-	const WordList &keywords5 = *keywordLists[4];
-	const WordList &keywords6 = *keywordLists[5];
+	const WordList &keywords = keywordLists[0];
+	const WordList &keywords2 = keywordLists[1];
+	const WordList &keywords3 = keywordLists[2];
+	const WordList &keywords4 = keywordLists[3];
+	const WordList &keywords5 = keywordLists[4];
+	const WordList &keywords6 = keywordLists[5];
 
 	int fileNbDigits = 0;
 	int visibleChars = 0;

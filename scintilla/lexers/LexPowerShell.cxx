@@ -190,7 +190,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 					if (p[0] == '$' || p[0] == '@') {
 						++p;
 					}
-					if (keywordLists[KeywordIndex_PredefinedVariable]->InList(p)) {
+					if (keywordLists[KeywordIndex_PredefinedVariable].InList(p)) {
 						sc.ChangeState(SCE_POWERSHELL_BUILTIN_VARIABLE);
 					}
 				}
@@ -217,7 +217,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 				if (sc.state == SCE_POWERSHELL_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrentLowered(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_POWERSHELL_KEYWORD);
 						if (StrEqual(s, "class")) {
 							kwType = KeywordType::Class;
@@ -228,14 +228,14 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 						} else if (StrEqualsAny(s, "function", "filter")) {
 							kwType = KeywordType::Function;
 						}
-					} else if (keywordLists[KeywordIndex_Cmdlet]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Cmdlet].InList(s)) {
 						sc.ChangeState(SCE_POWERSHELL_CMDLET);
-					} else if (keywordLists[KeywordIndex_Alias]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Alias].InList(s)) {
 						sc.ChangeState(SCE_POWERSHELL_ALIAS);
 					} else if (sc.ch != '.' && sc.ch != ':') {
 						const int chNext = sc.GetLineNextChar();
 						if (kwType == KeywordType::Attribute) {
-							if (chBefore != '.' && keywordLists[KeywordIndex_Type]->InList(s)) {
+							if (chBefore != '.' && keywordLists[KeywordIndex_Type].InList(s)) {
 								sc.ChangeState(SCE_POWERSHELL_TYPE);
 							} else if (chNext == '(') {
 								sc.ChangeState(SCE_POWERSHELL_ATTRIBUTE);

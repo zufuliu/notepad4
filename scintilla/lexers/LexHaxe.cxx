@@ -151,10 +151,10 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
 					if (s[0] == '#') {
-						if (keywordLists[KeywordIndex_Preprocessor]->InList(s + 1)) {
+						if (keywordLists[KeywordIndex_Preprocessor].InList(s + 1)) {
 							sc.ChangeState(SCE_HAXE_PREPROCESSOR);
 						}
-					} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_HAXE_WORD);
 						if (StrEqual(s, "import")) {
 							if (visibleChars == sc.LengthCurrent()) {
@@ -177,13 +177,13 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								kwType = KeywordType::None;
 							}
 						}
-					} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 						sc.ChangeState(SCE_HAXE_CLASS);
-					} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 						sc.ChangeState(SCE_HAXE_INTERFACE);
-					} else if (keywordLists[KeywordIndex_Enumeration]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_HAXE_ENUM);
-					} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_HAXE_CONSTANT);
 					} else if (sc.ch != '.') {
 						if (kwType != KeywordType::None) {

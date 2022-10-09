@@ -140,7 +140,7 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 				style = SCE_RB_IDENTIFIER;
 			}
 		}
-	} else if (keywordLists[KeywordIndex_Keyword]->InList(s) && ((start == 0) || !followsDot(start - 1, styler))) {
+	} else if (keywordLists[KeywordIndex_Keyword].InList(s) && ((start == 0) || !followsDot(start - 1, styler))) {
 		if (keywordIsAmbiguous(s) && keywordIsModifier(s, start, styler)) {
 
 			// Demoted keywords are colored as keywords,
@@ -160,17 +160,17 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 		}
 	} else {
 		if (IsUpperCase(s[0])) {
-			if (keywordLists[KeywordIndex_PredefinedConstant]->InList(s)) {
+			if (keywordLists[KeywordIndex_PredefinedConstant].InList(s)) {
 				chAttr = SCE_RB_BUILTIN_CONSTANT;
-			} else if ((ch == ':' && chNext == ':') || keywordLists[KeywordIndex_Module]->InList(s)) {
+			} else if ((ch == ':' && chNext == ':') || keywordLists[KeywordIndex_Module].InList(s)) {
 				// module::class::name
 				chAttr = SCE_RB_LIKE_MODULE;
-			} else if ((ch == '.' && chNext == 'n') || keywordLists[KeywordIndex_Class]->InList(s)) {
+			} else if ((ch == '.' && chNext == 'n') || keywordLists[KeywordIndex_Class].InList(s)) {
 				// Class.new
 				chAttr = SCE_RB_LIKE_CLASS;
 			}
 		} else if (IsLowerCase(s[0]) || s[0] == '_') {
-			if (keywordLists[KeywordIndex_BuiltinFunction]->InList(s)) {
+			if (keywordLists[KeywordIndex_BuiltinFunction].InList(s)) {
 				chAttr = SCE_RB_BUILTIN_FUNCTION;
 			}
 		}
@@ -1144,7 +1144,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					switch (word_style) {
 					case SCE_RB_WORD:
 						afterDef = StrEqual(prevWord, "def");
-						preferRE = !IsLowerCase(prevWord[0]) || keywordLists[KeywordIndex_Regex]->InList(prevWord);
+						preferRE = !IsLowerCase(prevWord[0]) || keywordLists[KeywordIndex_Regex].InList(prevWord);
 						break;
 
 					case SCE_RB_WORD_DEMOTED:
@@ -1778,7 +1778,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			} else if (StrEqual(prevWord, "def")) {
 				levelCurrent++;
 				method_definition = MethodDefinition::Define;
-			} else if (keywordLists[KeywordIndex_CodeFolding]->InList(prevWord)) {
+			} else if (keywordLists[KeywordIndex_CodeFolding].InList(prevWord)) {
 				levelCurrent++;
 			}
 		} else if (style == SCE_RB_HERE_DELIM) {

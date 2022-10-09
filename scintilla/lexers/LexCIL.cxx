@@ -32,9 +32,9 @@ constexpr bool IsCILWordChar(int ch) noexcept {
 
 #define MAX_WORD_LENGTH	31
 void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &keywords2 = *keywordLists[1];
-	const WordList &kwInstruction = *keywordLists[10];
+	const WordList &keywords = keywordLists[0];
+	const WordList &keywords2 = keywordLists[1];
+	const WordList &kwInstruction = keywordLists[10];
 
 	int state = initStyle;
 	int ch = 0;

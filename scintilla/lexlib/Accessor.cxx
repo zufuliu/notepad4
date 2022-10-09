@@ -5,7 +5,6 @@
 // Copyright 1998-2002 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
 
-#include <cstdlib>
 #include <cassert>
 
 #include <string>
@@ -14,10 +13,8 @@
 
 #include "ILexer.h"
 #include "Scintilla.h"
-#include "SciLexer.h"
 
 #include "PropSetSimple.h"
-#include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
 

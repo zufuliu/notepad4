@@ -12,7 +12,7 @@ namespace Lexilla {
 class LexerBase final : public Scintilla::ILexer5 {
 	const LexerModule lexer;
 	PropSetSimple props;
-	WordList *keywordLists[KEYWORDSET_MAX];
+	WordList keywordLists[KEYWORDSET_MAX];
 public:
 	explicit LexerBase(const LexerModule *module_);
 	virtual ~LexerBase();

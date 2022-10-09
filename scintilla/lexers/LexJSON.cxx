@@ -103,7 +103,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_JSON_MAYBE_KEYWORD:
 			if (!(kJsonCharClass[ch] & JsonMask_Identifier)) {
 				buf[wordLen] = '\0';
-				if (keywordLists[0]->InList(buf)) {
+				if (keywordLists[0].InList(buf)) {
 					styler.ColorTo(i, SCE_JSON_KEYWORD);
 				} else if (ch == ':' || chNext == ':' || LexGetNextChar(styler, i + 1) == ':') {
 					styler.ColorTo(i, SCE_JSON_PROPERTYNAME);

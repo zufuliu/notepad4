@@ -103,7 +103,7 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (!IsIdentifierChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_ASY_WORD);
 					if (StrEqualsAny(s, "import", "include")) {
 						lineStateLineType = AsymptoteLineStateMaskImport;
@@ -112,11 +112,11 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					} else if (StrEqual(s, "return")) {
 						kwType = KeywordType::Return;
 					}
-				} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 					sc.ChangeState(SCE_ASY_TYPE);
-				} else if (kwType == KeywordType::Struct || keywordLists[KeywordIndex_Struct]->InList(s)) {
+				} else if (kwType == KeywordType::Struct || keywordLists[KeywordIndex_Struct].InList(s)) {
 					sc.ChangeState(SCE_ASY_STRUCT);
-				} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 					sc.ChangeState(SCE_ASY_CONSTANT);
 				} else if (sc.ch != '.') {
 					const int chNext = sc.GetDocNextChar();

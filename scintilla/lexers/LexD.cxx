@@ -337,7 +337,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				if (sc.state == SCE_D_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_D_WORD);
 						if (asmState == InlineAssembler::None) {
 							if (StrEqual(s, "import")) {
@@ -368,26 +368,26 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 								}
 							}
 						}
-					} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 						sc.ChangeState(SCE_D_WORD2);
-					} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 						sc.ChangeState(SCE_D_CLASS);
-					} else if (keywordLists[KeywordIndex_Struct]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Struct].InList(s)) {
 						sc.ChangeState(SCE_D_STRUCT);
-					} else if (keywordLists[KeywordIndex_Union]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Union].InList(s)) {
 						sc.ChangeState(SCE_D_UNION);
-					} else if (keywordLists[KeywordIndex_Interface]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Interface].InList(s)) {
 						sc.ChangeState(SCE_D_INTERFACE);
-					} else if (sc.ch == '!' && keywordLists[KeywordIndex_Trait]->InList(s)) {
+					} else if (sc.ch == '!' && keywordLists[KeywordIndex_Trait].InList(s)) {
 						sc.ChangeState(SCE_D_TRAIT);
-					} else if (keywordLists[KeywordIndex_Enumeration]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_D_ENUM);
-					} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_D_CONSTANT);
 					} else if (asmState == InlineAssembler::X86) {
-						if (keywordLists[KeywordIndex_AsmKeyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_AsmKeyword].InList(s)) {
 							sc.ChangeState(SCE_D_WORD);
-						} else if (keywordLists[KeywordIndex_AsmRegister]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_AsmRegister].InList(s)) {
 							sc.ChangeState(SCE_D_ASM_REGISTER);
 						} else if (visibleChars == sc.LengthCurrent() || AnyOf(chBefore, ';', ':', '{')) {
 							sc.ChangeState((sc.ch == ':')? SCE_D_LABEL : SCE_D_ASM_INSTRUCTION);

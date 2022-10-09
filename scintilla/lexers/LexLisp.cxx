@@ -34,7 +34,7 @@ constexpr bool IsLispOp(int ch) noexcept {
 
 #define MAX_WORD_LENGTH	15
 void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
+	const WordList &keywords = keywordLists[0];
 
 	int state = initStyle;
 	int ch = 0;

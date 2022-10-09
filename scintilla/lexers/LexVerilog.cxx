@@ -306,7 +306,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 						angleQuote = chNext == '<';
 					} else if (StrEqualsAny(s + 1, "define", "undef", "ifdef", "ifndef")) {
 						kwType = KeywordType::Macro;
-					} else if (!keywordLists[KeywordIndex_Directive]->InList(s + 1)) {
+					} else if (!keywordLists[KeywordIndex_Directive].InList(s + 1)) {
 						lineState &= ~VerilogLineStateMaskDirective;
 						sc.ChangeState(SCE_V_MACRO);
 					} else if (StrStartsWith(s + 1, "__")) { // __FILE__, __LINE__
@@ -323,9 +323,9 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 						sc.ChangeState(SCE_V_MACRO);
 					} else if (sc.state == SCE_V_IDENTIFIER && chBeforeIdentifier != '#') {
 						// # delay, ## delay
-						if (keywordLists[KeywordIndex_DataType]->InList(s)) {
+						if (keywordLists[KeywordIndex_DataType].InList(s)) {
 							sc.ChangeState(SCE_V_DATATYPE);
-						} else if (keywordLists[KeywordIndex_CodeFolding]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_CodeFolding].InList(s)) {
 							bool fold = false;
 							if (parenCount == 0 && lineState == 0 && prevWord != KeywordType::Scope
 								&& !(chBeforeIdentifier == '.' || chBeforeIdentifier == ':')) {
@@ -355,7 +355,7 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 								}
 							}
 							sc.ChangeState(fold ? SCE_V_FOLDING_KEYWORD : SCE_V_KEYWORD);
-						} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+						} else if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_V_KEYWORD);
 							if (parenCount == 0 && !(chBeforeIdentifier == '.' || chBeforeIdentifier == ':')) {
 								if (StrEqual(s, "rand")) {

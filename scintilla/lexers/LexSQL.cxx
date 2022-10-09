@@ -61,11 +61,11 @@ constexpr bool IsANumberChar(int ch, int chPrev) noexcept {
 };*/
 
 void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	//const WordList &kw_pldoc = *keywordLists[2];
-	//const WordList &kw_sqlplus = *keywordLists[3];
-	//const WordList &kw_user2 = *keywordLists[5];
-	//const WordList &kw_user3 = *keywordLists[6];
-	//const WordList &kw_user4 = *keywordLists[7];
+	//const WordList &kw_pldoc = keywordLists[2];
+	//const WordList &kw_sqlplus = keywordLists[3];
+	//const WordList &kw_user2 = keywordLists[5];
+	//const WordList &kw_user3 = keywordLists[6];
+	//const WordList &kw_user4 = keywordLists[7];
 
 	const bool sqlBackticksIdentifier = styler.GetPropertyBool("lexer.sql.backticks.identifier", true);
 	const bool sqlNumbersignComment = styler.GetPropertyBool("lexer.sql.numbersign.comment", true);
@@ -118,15 +118,15 @@ void ColouriseSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				char s[128];
 				const int chNext = sc.GetDocNextChar();
 				sc.GetCurrentLowered(s, sizeof(s));
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					if (chNext == '(' && StrEqual(s, "repeat")) {
 						sc.ChangeState(SCE_SQL_USER1);
 					} else {
 						sc.ChangeState(SCE_SQL_WORD);
 					}
-				} else if (keywordLists[KeywordIndex_DataType]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_DataType].InList(s)) {
 					sc.ChangeState(SCE_SQL_WORD2);
-				} else if (chNext == '(' && keywordLists[KeywordIndex_Function]->InListPrefixed(s, '(')) {
+				} else if (chNext == '(' && keywordLists[KeywordIndex_Function].InListPrefixed(s, '(')) {
 					sc.ChangeState(SCE_SQL_USER1);
 				}
 				//} else if (kw_sqlplus.InListAbbreviated(s, '~')) {

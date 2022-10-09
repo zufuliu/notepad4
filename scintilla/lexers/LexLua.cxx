@@ -67,14 +67,14 @@ constexpr bool IsEscapeSkip(int ch) noexcept {
 }
 
 void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[KeywordIndex_Keyword];
-	const WordList &keywords2 = *keywordLists[KeywordIndex_BasicFunction];
-	const WordList &keywords3 = *keywordLists[KeywordIndex_Metamethod];
-	const WordList &keywords4 = *keywordLists[3];
-	const WordList &keywords5 = *keywordLists[4];
-	const WordList &keywords6 = *keywordLists[5];
-	const WordList &keywords7 = *keywordLists[6];
-	const WordList &keywords8 = *keywordLists[7];
+	const WordList &keywords = keywordLists[KeywordIndex_Keyword];
+	const WordList &keywords2 = keywordLists[KeywordIndex_BasicFunction];
+	const WordList &keywords3 = keywordLists[KeywordIndex_Metamethod];
+	const WordList &keywords4 = keywordLists[3];
+	const WordList &keywords5 = keywordLists[4];
+	const WordList &keywords6 = keywordLists[5];
+	const WordList &keywords7 = keywordLists[6];
+	const WordList &keywords8 = keywordLists[7];
 
 	Sci_Line currentLine = styler.GetLine(startPos);
 	// Initialize long string [[ ... ]] or block comment --[[ ... ]],

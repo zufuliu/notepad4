@@ -343,7 +343,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.GetCurrentLowered(s, sizeof(s));
 				if (sc.state == SCE_AHK_IDENTIFIER) {
 					const int chNext = sc.GetLineNextChar();
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)
+					if (keywordLists[KeywordIndex_Keyword].InList(s)
 						|| (kwType == KeywordType::Keyword && StrEqualsAny(s, "files", "parse", "read", "reg"))) {
 						sc.ChangeState(SCE_AHK_KEYWORD);
 						kwType = KeywordType::None;
@@ -356,15 +356,15 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 								kwType = KeywordType::Class;
 							}
 						}
-					} else if (kwType == KeywordType::Class || keywordLists[KeywordIndex_Object]->InList(s)) {
+					} else if (kwType == KeywordType::Class || keywordLists[KeywordIndex_Object].InList(s)) {
 						sc.ChangeState(SCE_AHK_CLASS);
-					} else if (keywordLists[KeywordIndex_BuiltinVariable]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_BuiltinVariable].InList(s)) {
 						sc.ChangeState(SCE_AHK_BUILTIN_VARIABLE);
-					} else if (keywordLists[KeywordIndex_Function]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_Function].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_AHK_BUILTIN_FUNCTION);
 					} else if (chNext == '(') {
 						sc.ChangeState(SCE_AHK_FUNCTION);
-					} else if (keywordLists[KeywordIndex_Key]->InList(s) || IsSpecialKey(s, sc.LengthCurrent())) {
+					} else if (keywordLists[KeywordIndex_Key].InList(s) || IsSpecialKey(s, sc.LengthCurrent())) {
 						sc.ChangeState(SCE_AHK_KEY);
 					} else if (sc.ch == ':') {
 						if (sc.chNext != '=' && visibleChars == sc.LengthCurrent()) {

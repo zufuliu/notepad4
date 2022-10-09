@@ -102,7 +102,7 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 					} else {
 						char s[16];
 						sc.GetCurrent(s, sizeof(s));
-						if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+						if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 							sc.ChangeState(SCE_GRAPHVIZ_WORD);
 						}
 					}

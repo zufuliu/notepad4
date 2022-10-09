@@ -26,18 +26,9 @@
 using namespace Lexilla;
 
 LexerBase::LexerBase(const LexerModule *module_) : lexer(*module_) {
-	auto *iter = keywordLists;
-	for (int wl = KEYWORDSET_MAX; wl; wl--) {
-		*iter++ = new WordList;
-	}
 }
 
-LexerBase::~LexerBase() {
-	auto *iter = keywordLists;
-	for (int wl = KEYWORDSET_MAX; wl; wl--) {
-		delete *iter++;
-	}
-}
+LexerBase::~LexerBase() = default;
 
 void SCI_METHOD LexerBase::Release() noexcept {
 	delete this;
@@ -76,7 +67,7 @@ const char * SCI_METHOD LexerBase::DescribeWordListSets() const noexcept {
 
 Sci_Position SCI_METHOD LexerBase::WordListSet(int n, int attribute, const char *wl) {
 	if (n < KEYWORDSET_MAX) {
-		if (keywordLists[n]->Set(wl, static_cast<WordList::KeywordAttr>(attribute))) {
+		if (keywordLists[n].Set(wl, static_cast<WordList::KeywordAttr>(attribute))) {
 			return 0;
 		}
 	}

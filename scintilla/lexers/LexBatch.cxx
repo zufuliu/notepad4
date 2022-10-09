@@ -307,7 +307,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (StrEqual(s, "rem")) {
 					sc.ChangeState(SCE_BAT_COMMENT);
 				} else {
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						command = Command::Keyword;
 						parenBefore = parenCount;
 						sc.ChangeState(SCE_BAT_WORD);
@@ -331,7 +331,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						} else if (StrEqual(s, "for")) {
 							command = Command::For;
 						}
-					} else if (keywordLists[KeywordIndex_InternalCommand]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_InternalCommand].InList(s)) {
 						command = Command::Argument;
 						parenBefore = parenCount;
 						sc.ChangeState(SCE_BAT_WORD);

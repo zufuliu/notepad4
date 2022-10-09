@@ -129,15 +129,15 @@ void ColouriseFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				kwType = KeywordType::None;
 				int state = SCE_F_IDENTIFIER;
 
-				if (keywordLists[KeywordIndex_CodeFolding]->InList(s)) {
+				if (keywordLists[KeywordIndex_CodeFolding].InList(s)) {
 					state = SCE_F_FOLDING_WORD;
-				} else if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					state = SCE_F_WORD;
-				} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 					state = SCE_F_TYPE;
-				} else if (keywordLists[KeywordIndex_Attribute]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Attribute].InList(s)) {
 					state = SCE_F_ATTRIBUTE;
-				} else if (keywordLists[KeywordIndex_Function]->InListPrefixed(s, '(')) {
+				} else if (keywordLists[KeywordIndex_Function].InListPrefixed(s, '(')) {
 					state = SCE_F_INTRINSIC;
 				} else if (prevWord == KeywordType::Function || prevWord == KeywordType::Call) {
 					state = static_cast<int>(prevWord);

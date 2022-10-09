@@ -113,7 +113,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.GetCurrent(s, sizeof(s));
 				const KeywordType kwPrev = kwType;
 				kwType = KeywordType::None;
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					if (!(lineState & VimLineStateMaskAutoCommand) && logicalVisibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_VIM_WORD);
 						if (StrEqualsAny(s, "au", "autocmd")) {
@@ -128,7 +128,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 							sc.ChangeState(SCE_VIM_WORD_DEMOTED);
 						}
 					}
-				} else if (keywordLists[KeywordIndex_Command]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Command].InList(s)) {
 					sc.ChangeState(SCE_VIM_COMMANDS);
 					if (lineVisibleChars == sc.LengthCurrent()) {
 						if (StrEqualsAny(s, "syn", "syntax")) {

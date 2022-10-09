@@ -243,7 +243,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.state == SCE_JULIA_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						if (StrEqual(s, "type")) {
 							// only in `abstract type` or `primitive type`
 							if (kwType == KeywordType::Keyword) {
@@ -265,11 +265,11 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 								kwType = KeywordType::Keyword;
 							}
 						}
-					} else if (keywordLists[KeywordIndex_Type]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Type].InList(s)) {
 						sc.ChangeState(SCE_JULIA_TYPE);
-					} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_JULIA_CONSTANT);
-					} else if (keywordLists[KeywordIndex_BasicFunction]->InListPrefixed(s, '(')) {
+					} else if (keywordLists[KeywordIndex_BasicFunction].InListPrefixed(s, '(')) {
 						sc.ChangeState(SCE_JULIA_BASIC_FUNCTION);
 					} else if (kwType != KeywordType::None && kwType != KeywordType::Keyword) {
 						sc.ChangeState(static_cast<int>(kwType));
@@ -615,7 +615,7 @@ void FoldJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				wordLen = 0;
 				if (StrEqual(buf, "end")) {
 					levelNext--;
-				} else if (keywordLists[KeywordIndex_CodeFolding]->InList(buf)) {
+				} else if (keywordLists[KeywordIndex_CodeFolding].InList(buf)) {
 					levelNext++;
 				}
 			}

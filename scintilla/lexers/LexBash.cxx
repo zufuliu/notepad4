@@ -174,8 +174,8 @@ constexpr bool IsBashCmdDelimiter(int ch, int chNext) noexcept {
 }
 
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	const WordList &keywords = *keywordLists[0];
-	const WordList &bashStruct = *keywordLists[1];
+	const WordList &keywords = keywordLists[0];
+	const WordList &bashStruct = keywordLists[1];
 
 	class HereDocCls {	// Class to manage HERE document elements
 	public:

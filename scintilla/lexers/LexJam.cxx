@@ -90,7 +90,7 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (!IsJamIdentifierChar(sc.ch)) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
-				if (keywordLists[KeywordIndex_Keyword]->InList(s)) {
+				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_JAM_WORD);
 					if (StrEqualsAny(s, "import", "using", "include")) {
 						if (visibleChars == sc.LengthCurrent()) {
@@ -109,13 +109,13 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 							kwType = KeywordType::None;
 						}
 					}
-				} else if (keywordLists[KeywordIndex_Module]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Module].InList(s)) {
 					sc.ChangeState(SCE_JAM_MODULE);
-				} else if (keywordLists[KeywordIndex_Class]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Class].InList(s)) {
 					sc.ChangeState(SCE_JAM_CLASS);
-				} else if (keywordLists[KeywordIndex_BuiltinRule]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_BuiltinRule].InList(s)) {
 					sc.ChangeState(SCE_JAM_RULE);
-				} else if (keywordLists[KeywordIndex_Constant]->InList(s)) {
+				} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 					sc.ChangeState(SCE_JAM_CONSTANT);
 				} else if (kwType != KeywordType::None) {
 					sc.ChangeState(static_cast<int>(kwType));

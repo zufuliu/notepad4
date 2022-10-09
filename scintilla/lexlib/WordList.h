@@ -26,9 +26,14 @@ private:
 	char **words = nullptr;
 	char *list = nullptr;
 	//range_t len = 0;
+#if 1
 	// ASCII graphic character only, most word starts with character in '_a-zA-Z'
 	static constexpr unsigned char MinIndexChar = ' ' + 1;
 	range_t ranges[0x7f - MinIndexChar];
+#else
+	static constexpr unsigned char MinIndexChar = '@';
+	range_t ranges[64 - 2*sizeof(char *)/4]; // make sizeof(WordList) == 256
+#endif
 public:
 	WordList() noexcept {
 		// Prevent warnings by static analyzers about uninitialized ranges.
