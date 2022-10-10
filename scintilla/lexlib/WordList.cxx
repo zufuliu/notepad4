@@ -9,6 +9,7 @@
 #include <cstring>
 
 #include <algorithm>
+#include <iterator>
 
 #include "WordList.h"
 
@@ -106,12 +107,12 @@ bool WordList::operator!=(const WordList &other) const noexcept {
 
 void WordList::Clear() noexcept {
 	if (words) {
-		delete[]list;
 		delete[]words;
+		delete[]list;
+		words = nullptr;
+		list = nullptr;
+		//len = 0;
 	}
-	words = nullptr;
-	list = nullptr;
-	//len = 0;
 }
 
 bool WordList::Set(const char *s, KeywordAttr attribute) {
@@ -148,7 +149,7 @@ bool WordList::Set(const char *s, KeywordAttr attribute) {
 		while (static_cast<unsigned char>(*words[i]) == indexChar) {
 			++i;
 		}
-		assert(static_cast<unsigned>(index - MinIndexChar) < std::size(ranges));
+		assert(static_cast<unsigned>(indexChar - MinIndexChar) < std::size(ranges));
 		ranges[indexChar - MinIndexChar] = start | (i << 16);
 	}
 	return true;
