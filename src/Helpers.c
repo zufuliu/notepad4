@@ -1696,7 +1696,16 @@ void PathRelativeToApp(LPCWSTR lpszSrc, LPWSTR lpszDest, DWORD dwAttrTo, bool bU
 		}
 	}
 
-	if (!bUnexpandEnv || !PathUnExpandEnvStrings(lpszSrc, lpszDest, MAX_PATH)) {
+	if (bUnexpandEnv) {
+		if (lpszSrc == lpszDest) {
+			lstrcpyn(wchPath, lpszSrc, COUNTOF(wchPath));
+			lpszSrc = wchPath;
+		}
+		if (PathUnExpandEnvStrings(lpszSrc, lpszDest, MAX_PATH)) {
+			return;
+		}
+	}
+	if (lpszSrc != lpszDest) {
 		lstrcpy(lpszDest, lpszSrc);
 	}
 }
