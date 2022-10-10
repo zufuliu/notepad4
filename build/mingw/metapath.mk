@@ -4,7 +4,7 @@ PROJ = metapath
 NAME = $(PROJ).exe
 OBJDIR = $(BINFOLDER)/obj/$(PROJ)
 SRCDIR = ../../$(PROJ)/src
-
+# for Win32 XP build
 LDLIBS += -lpsapi
 
 c_src = $(wildcard $(SRCDIR)/*.c)

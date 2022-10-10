@@ -353,7 +353,7 @@ void BackgroundWorker_Destroy(BackgroundWorker *worker);
 
 HRESULT PrivateSetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
 bool IsElevated(void);
-bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, int cchExeName);
+bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName);
 //bool Is32bitExe(LPCWSTR lpszExeName);
 
 #define SetExplorerTheme(hwnd)		SetWindowTheme((hwnd), L"Explorer", NULL)
