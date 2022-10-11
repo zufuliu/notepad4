@@ -42,26 +42,27 @@ struct WordList {
 #if NP2_AUTOC_USE_STRING_ORDER
 	uint32_t (*WL_OrderFunc)(const void *, uint32_t);
 #endif
+
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
-
-	char *bufferList[NP2_AUTOC_MAX_BUF_COUNT];
-	char *buffer;
-	int bufferCount;
-	UINT offset;
-	UINT capacity;
-
 	UINT nWordCount;
 	UINT nTotalLen;
 	UINT orderStart;
-	int iStartLen;
+	UINT iStartLen;
 
-	struct WordNode *nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
+	char *buffer;
+	UINT bufferCount;
+	UINT offset;
+	UINT capacity;
+
 	struct WordNode *nodeCache;
-	int cacheCount;
+	UINT cacheCount;
 	UINT cacheIndex;
 	UINT cacheCapacity;
 	UINT cacheBytes;
+
+	char *bufferList[NP2_AUTOC_MAX_BUF_COUNT];
+	struct WordNode *nodeCacheList[NP2_AUTOC_MAX_CACHE_COUNT];
 };
 
 // TODO: replace _stricmp() and _strnicmp() with other functions
@@ -136,8 +137,8 @@ struct WordNode {
 #if NP2_AUTOC_USE_STRING_ORDER
 	UINT order;
 #endif
-	int len;
-	int level;
+	UINT len;
+	UINT level;
 };
 
 #define NP2_TREE_HEIGHT_LIMIT	32
@@ -179,7 +180,7 @@ static inline void WordList_AddCache(struct WordList *pWList) {
 	pWList->cacheCapacity = pWList->cacheBytes / (sizeof(struct WordNode));
 }
 
-void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
+void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 	struct WordNode *root = pWList->pListHead;
 #if NP2_AUTOC_USE_STRING_ORDER
 	const UINT order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
@@ -267,10 +268,10 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, int len) {
 }
 
 void WordList_Free(struct WordList *pWList) {
-	for (int i = 0; i < pWList->cacheCount; i++) {
+	for (UINT i = 0; i < pWList->cacheCount; i++) {
 		NP2HeapFree(pWList->nodeCacheList[i]);
 	}
-	for (int i = 0; i < pWList->bufferCount; i++) {
+	for (UINT i = 0; i < pWList->bufferCount; i++) {
 		NP2HeapFree(pWList->bufferList[i]);
 	}
 }
@@ -301,7 +302,7 @@ char* WordList_GetList(struct WordList *pWList) {
 	return pList;
 }
 
-struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, bool bIgnoreCase) {
+struct WordList *WordList_Alloc(LPCSTR pRoot, UINT iRootLen, bool bIgnoreCase) {
 	struct WordList *pWList = (struct WordList *)NP2HeapAlloc(sizeof(struct WordList));
 	pWList->pListHead = NULL;
 	pWList->pWordStart = pRoot;
@@ -333,7 +334,7 @@ struct WordList *WordList_Alloc(LPCSTR pRoot, int iRootLen, bool bIgnoreCase) {
 	return pWList;
 }
 
-static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, int iRootLen) {
+static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen) {
 	pWList->pWordStart = pRoot;
 	pWList->iStartLen = iRootLen;
 #if NP2_AUTOC_USE_STRING_ORDER
@@ -360,14 +361,14 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	//StopWatch_Start(watch);
 	char wordBuf[NP2_AUTOC_WORD_BUF_LENGTH];
 	char *word = wordBuf;
-	const int iStartLen = pWList->iStartLen;
-	int len = 0;
+	const UINT iStartLen = pWList->iStartLen;
+	UINT len = 0;
 	bool ok = false;
 	do {
 		const char *sub = strpbrk(pList, " \t.,();^\n\r");
 		if (sub) {
-			int lenSub = (int)(sub - pList);
-			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+			UINT lenSub = (UINT)(sub - pList);
+			lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			memcpy(word + len, pList, lenSub);
 			len += lenSub;
 			if (len >= iStartLen) {
@@ -390,8 +391,8 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 			}
 			pList = ++sub;
 		} else {
-			int lenSub = (int)strlen(pList);
-			lenSub = min_i(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+			UINT lenSub = (UINT)strlen(pList);
+			lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 			if (len) {
 				memcpy(word + len, pList, lenSub);
 				len += lenSub;
@@ -420,7 +421,7 @@ static inline void WordList_AddList(struct WordList *pWList, LPCSTR pList) {
 	}
 }
 
-void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, int wordLength, int iRootLen) {
+void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, UINT wordLength, UINT iRootLen) {
 	/*
 	when pRoot is 'b', split 'bugprone-branch-clone' as following:
 	1. first hyphen: 'bugprone-branch-clone' => 'bugprone', 'branch-clone'.
@@ -428,17 +429,17 @@ void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, int wordLength, i
 	*/
 
 	LPCSTR words[8];
-	int starts[8];
+	UINT starts[8];
 	UINT count = 0;
 
-	for (int i = 0; i < wordLength - 1; i++) {
+	for (UINT i = 0; i < wordLength - 1; i++) {
 		const char ch = pWord[i];
 		if (ch == '.' || ch == '-' || ch == ':') {
 			if (i >= iRootLen) {
 				pWord[i] = '\0';
 				WordList_AddWord(pWList, pWord, i);
 				for (UINT j = 0; j < count; j++) {
-					const int subLen = i - starts[j];
+					const UINT subLen = i - starts[j];
 					if (subLen >= iRootLen) {
 						WordList_AddWord(pWList, words[j], subLen);
 					}
@@ -449,7 +450,7 @@ void WordList_AddSubWord(struct WordList *pWList, LPSTR pWord, int wordLength, i
 				++i;
 			}
 
-			const int subLen = wordLength - (i + 1);
+			const UINT subLen = wordLength - (i + 1);
 			LPCSTR pSubRoot = pWord + i + 1;
 			if (subLen >= iRootLen && WordList_StartsWith(pWList, pSubRoot)) {
 				WordList_AddWord(pWList, pSubRoot, subLen);
@@ -944,7 +945,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	const int iLexer = pLexCurrent->iLexer;
 	if (iLexer != SCLEX_PHPSCRIPT) {
 		uint64_t attr = pLexCurrent->keywordAttr;
-		for (int i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
+		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLexCurrent->pKeyWords->pszKeyWords[i];
 			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
@@ -988,7 +989,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	}
 	if (pLex != NULL) {
 		uint64_t attr = pLex->keywordAttr;
-		for (int i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
+		for (UINT i = 0; i < KEYWORDSET_MAX + 1; attr >>= 4, i++) {
 			const char *pKeywords = pLex->pKeyWords->pszKeyWords[i];
 			if (!(attr & KeywordAttr_NoAutoComp) && StrNotEmptyA(pKeywords)) {
 				WordList_AddListEx(pWList, pKeywords);
