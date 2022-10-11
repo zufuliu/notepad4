@@ -99,6 +99,16 @@ def RemoveDuplicateKeyword(keywordMap, orderedKeys):
 def to_lower(items):
 	return [item.lower() for item in items]
 
+def find_duplicate_lower(items):
+	unique = {}
+	for item in items:
+		key = item.lower()
+		if key in unique:
+			unique[key].append(item)
+		else:
+			unique[key] = [item]
+	return [sorted(item, reverse=True) for item in unique.values() if len(item) > 1]
+
 def build_enum_name(comment):
 	items = [item.replace('-', '') for item in comment.split()]
 	item = items[-1]
@@ -123,12 +133,16 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 			items = set(items)
 			makeLower = False
 			if attr & KeywordAttr.MakeLower:
-				result = to_lower(items)
-				if set(result) == items:
+				lowercase = to_lower(items)
+				unique = set(lowercase)
+				if unique == items:
 					attr &= ~KeywordAttr.MakeLower
 				else:
+					if len(items) != len(unique):
+						duplicate = find_duplicate_lower(items)
+						print(rid, comment, 'duplicate words:', duplicate)
 					makeLower = True
-					items = [item[1] for item in sorted(zip(result, items))]
+					items = [item[1] for item in sorted(zip(lowercase, items))]
 			if not makeLower:
 				items = sorted(items)
 			lines = MakeKeywordLines(items, makeLower=makeLower)
@@ -256,6 +270,13 @@ def to_lower_conditional(items):
 			result.append(item.lower())
 	return result
 
+def remove_duplicate_lower(keywords, duplicate):
+	items = find_duplicate_lower(keywords)
+	for item in items:
+		for word in item[1:]:
+			duplicate.append(word)
+			keywords.remove(word)
+
 def first_word_on_each_line(doc):
 	return re.findall(r'^\s*(\w+)', doc, re.MULTILINE)
 
@@ -320,7 +341,9 @@ def parse_autohotkey_api_file(pathList):
 				items = doc.replace('.', ' ').split()
 			keywordMap.setdefault(key, []).extend(items)
 
-	keywordMap['keywords'].extend(to_lower_conditional(keywordMap['keywords']))
+	keywords = keywordMap['keywords']
+	keywords.extend(to_lower_conditional(keywords))
+	remove_duplicate_lower(keywords, keywordMap['misc'])
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
 		'objects',

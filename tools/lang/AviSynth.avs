@@ -916,7 +916,7 @@ salFPS3(clip input, float FPS, int mode, int protection, int protection2, int it
 SickJumps(clip c, int first_frame, int last_frame, float start_multiplier, float full_multiplier, float up_seconds, float down_seconds, string script_variable, float end_multiplier)
 TimecodeFPS(clip, string timecodes, int fpsnum, int fpsden, bool report, float threshone, float threshmore, bool start)
 VFRtoCFR(clip, string times, int numfps, int denfps, bool dropped)
-VfrToCfr(clip, string timecodes, int fpsnum, int fpsden, bool debug)
+#VfrToCfr(clip, string timecodes, int fpsnum, int fpsden, bool debug)
 YFRC(clip clp_Input, int BlockH, int BlockV, int OverlayType, int MaskExpand)
 # Frame Replacement/Range Processing
 ApplyEvery(clip c, int period, string thunk)

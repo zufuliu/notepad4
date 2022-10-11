@@ -128,7 +128,7 @@ static KEYWORDLIST Keywords_AVS = {{
 "TextSub( TextSubMod( TextSubModSwapUV( TextSubSwapUV( TimecodeFPS( TIsophote( TMaskCleaner( TMM( TMM2( TNLMeans( "
 "Toon( ToonLite( Transition( TTempSmooth( TTempSmoothF( TUnsharp( TurnsTile( TweakColor( TweakHist( "
 "UnDot( UnFilter( Unpremultiply( Unsharp( UnsharpHQ( uu_mt_blend( "
-"VagueDenoiser( VerticalCleaner( VFRtoCFR( VfrToCfr( VideoScope( ViewAudio( Vinverse( Vinverse2( VMAF( vmToon( VobSub( "
+"VagueDenoiser( VerticalCleaner( VFRtoCFR( VideoScope( ViewAudio( Vinverse( Vinverse2( VMAF( vmToon( VobSub( "
 "vsDeblockPP7( VSEval( VShear( VSImport( vsMSharpen( vsMSmooth( vsTTempSmooth( "
 "WarpedResize( Watermark2( Waveform( WavGainLimiter( WhileEval( WhiteBalance( xaa( "
 "Yadif( yadifmod( yadifmod2( YAHR( YARK( YFRC( YV12To422( "
