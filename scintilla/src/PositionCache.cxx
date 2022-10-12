@@ -1002,7 +1002,7 @@ namespace {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 SRWLOCK cacheLock = SRWLOCK_INIT;
 struct CacheWriteLock {
-	CacheWriteLock() noexcept  {
+	CacheWriteLock() noexcept {
 		AcquireSRWLockExclusive(&cacheLock);
 	}
 	~CacheWriteLock() {
@@ -1013,7 +1013,7 @@ struct CacheWriteLock {
 // https://stackoverflow.com/questions/13206414/why-slim-reader-writer-exclusive-lock-outperformance-the-shared-one
 #if 0
 struct CacheReadLock {
-	CacheReadLock() noexcept  {
+	CacheReadLock() noexcept {
 		AcquireSRWLockShared(&cacheLock);
 	}
 	~CacheReadLock() {

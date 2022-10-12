@@ -517,6 +517,16 @@ struct LayoutWorker {
 						std::string_view(&ll->chars[ts.start], ts.length), &ll->positions[ts.start + 1]);
 				}
 			}
+		} else if (style.invisibleRepresentationLength) {
+			const std::string_view text = style.GetInvisibleRepresentation();
+			XYPOSITION positionsRepr[maxInvisibleStyleRepresentationLength + 1];
+			// invisibleRepresentation is UTF-8 which only matches cache if document is UTF-8
+			// or it only contains ASCII which is a subset of all currently supported encodings.
+			posCache.MeasureWidths(surface, style, ll->styles[ts.start], text, positionsRepr);
+			const XYPOSITION representationWidth = positionsRepr[text.length() - 1];
+			for (int ii = 0; ii < ts.length; ii++) {
+				ll->positions[ts.start + 1 + ii] = representationWidth;
+			}
 		}
 	}
 
@@ -2521,6 +2531,15 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						surface->DrawTextNoClip(rcSegment, textFont,
 							rcSegment.top + vsDraw.maxAscent, text, textFore, textBack);
 					}
+				} else if (vsDraw.styles[styleMain].invisibleRepresentationLength) {
+					const std::string_view text = vsDraw.styles[styleMain].GetInvisibleRepresentation();
+  					if (phasesDraw != PhasesDraw::One) {
+						surface->DrawTextTransparentUTF8(rcSegment, textFont,
+							rcSegment.top + vsDraw.maxAscent, text, textFore);
+					} else {
+						surface->DrawTextNoClipUTF8(rcSegment, textFont,
+							rcSegment.top + vsDraw.maxAscent, text, textFore, textBack);
+					}
 				}
 				if (vsDraw.viewWhitespace != WhiteSpace::Invisible ||
 					(inIndentation && vsDraw.viewIndentationGuides != IndentView::None)) {
@@ -3102,6 +3121,14 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 		vsPrint.ms[lineNumberIndex].width = lineNumberWidth;
 		vsPrint.Refresh(*surfaceMeasure, model.pdoc->tabInChars);	// Recalculate fixedColumnWidth
 	}
+
+	// Turn off change history marker backgrounds
+	constexpr unsigned int changeMarkers =
+		1u << static_cast<unsigned int>(MarkerOutline::HistoryRevertedToOrigin) |
+		1u << static_cast<unsigned int>(MarkerOutline::HistorySaved) |
+		1u << static_cast<unsigned int>(MarkerOutline::HistoryModified) |
+		1u << static_cast<unsigned int>(MarkerOutline::HistoryRevertedToModified);
+	vsPrint.maskInLine &= ~changeMarkers;
 
 	const Sci::Line linePrintStart = model.pdoc->SciLineFromPosition(chrg.cpMin);
 	const Sci::Line linePrintMax = model.pdoc->SciLineFromPosition(chrg.cpMax);

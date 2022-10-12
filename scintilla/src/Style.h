@@ -34,6 +34,8 @@ struct FontMeasurements {
 	int sizeZoomed = 2;
 };
 
+constexpr size_t maxInvisibleStyleRepresentationLength = 6;
+
 // used to optimize style copy.
 struct StylePod {
 	ColourRGBA fore = ColourRGBA(0, 0, 0);
@@ -49,6 +51,9 @@ struct StylePod {
 	bool visible = true;
 	bool changeable = true;
 	bool hotspot = false;
+
+	char invisibleRepresentation[maxInvisibleStyleRepresentationLength + 1]{};
+	uint8_t invisibleRepresentationLength = 0;
 };
 
 /**
@@ -62,6 +67,9 @@ public:
 	void Copy(std::shared_ptr<Font> font_, const FontMeasurements &fm_) noexcept;
 	bool IsProtected() const noexcept {
 		return !(changeable && visible);
+	}
+	std::string_view GetInvisibleRepresentation() const noexcept {
+		return {invisibleRepresentation, invisibleRepresentationLength};
 	}
 };
 

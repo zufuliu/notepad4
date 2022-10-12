@@ -5911,6 +5911,13 @@ void Editor::StyleSetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetChangeable:
 		vs.styles[wParam].changeable = lParam != 0;
 		break;
+	case Message::StyleSetInvisibleRepresentation: {
+		const char *utf8 = ConstCharPtrFromSPtr(lParam);
+		const size_t len = strlen(utf8);
+		memcpy(vs.styles[wParam].invisibleRepresentation, utf8, len + 1);
+		vs.styles[wParam].invisibleRepresentationLength = static_cast<uint8_t>(len);
+		break;
+	}
 	case Message::StyleSetHotSpot:
 		vs.styles[wParam].hotspot = lParam != 0;
 		break;
@@ -5954,6 +5961,8 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return vs.styles[wParam].visible ? 1 : 0;
 	case Message::StyleGetChangeable:
 		return vs.styles[wParam].changeable ? 1 : 0;
+	case Message::StyleGetInvisibleRepresentation:
+		return StringResult(lParam, vs.styles[wParam].invisibleRepresentation);
 	case Message::StyleGetHotSpot:
 		return vs.styles[wParam].hotspot ? 1 : 0;
 	case Message::StyleGetCheckMonospaced:
@@ -7350,6 +7359,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleSetCharacterSet:
 	case Message::StyleSetVisible:
 	case Message::StyleSetChangeable:
+	case Message::StyleSetInvisibleRepresentation:
 	case Message::StyleSetHotSpot:
 	case Message::StyleSetCheckMonospaced:
 		StyleSetMessage(iMessage, wParam, lParam);
@@ -7369,6 +7379,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetCharacterSet:
 	case Message::StyleGetVisible:
 	case Message::StyleGetChangeable:
+	case Message::StyleGetInvisibleRepresentation:
 	case Message::StyleGetHotSpot:
 	case Message::StyleGetCheckMonospaced:
 		return StyleGetMessage(iMessage, wParam, lParam);
