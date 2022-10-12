@@ -78,23 +78,6 @@ NP2_inline int validate_i(int x, int lower, int upper, int defaultValue) {
 	return (x < lower || x > upper) ? defaultValue : x;
 }
 
-// required for SSE2
-#define NP2DefaultPointerAlignment		16
-
-NP2_inline unsigned int align_up(unsigned int value) {
-	return (value + NP2DefaultPointerAlignment - 1) & (~(NP2DefaultPointerAlignment - 1));
-}
-
-NP2_inline void* align_ptr_ex(const void *ptr, size_t align) {
-	return (void *)(((uintptr_t)(ptr) + align - 1) & (~(align - 1)));
-}
-
-NP2_inline void* align_ptr(const void *ptr) {
-	return align_ptr_ex(ptr, NP2DefaultPointerAlignment);
-}
-
-#define unaligned_ptr(ptr, size)	(((uintptr_t)(ptr)) & ((size) - 1))
-
 NP2_inline bool StrIsEmptyA(LPCSTR s) {
 	return s == NULL || *s == '\0';
 }

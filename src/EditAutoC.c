@@ -264,7 +264,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 	pWList->pListHead = root;
 	pWList->nWordCount++;
 	pWList->nTotalLen += len + 1;
-	pWList->offset += align_up(len + 1);
+	pWList->offset += NP2_align_up(len + 1, NP2DefaultPointerAlignment);
 }
 
 void WordList_Free(struct WordList *pWList) {

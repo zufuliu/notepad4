@@ -20,6 +20,28 @@
 #define NP2_alignas(n)		_Alignas(n)
 #endif
 
+#if defined(__cplusplus)
+#define NP2_alignof(t)		alignof(t)
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define NP2_alignof(t)		_Alignof(t)
+#else
+#define NP2_alignof(t)		__alignof(t)
+#endif
+
+#define NP2DefaultPointerAlignment		16	// alignof(max_align_t)
+
+#if defined(__clang__)
+#define NP2_align_up(value, alignment)		__builtin_align_up(value, alignment)
+#define NP2_align_ptr(ptr, alignment)		__builtin_align_up(ptr, alignment)
+#define NP2_is_aligned(value, alignment)	__builtin_is_aligned(value, alignment)
+#define NP2_is_aligned_ptr(ptr, alignment)	__builtin_is_aligned(ptr, alignment)
+#else
+#define NP2_align_up(value, alignment)		(((value) + (alignment) - 1) & ~((alignment) - 1))
+#define NP2_align_ptr(ptr, alignment)		((void *)NP2_align_up((uintptr_t)(ptr), alignment))
+#define NP2_is_aligned(value, alignment)	(((value) & ((alignment) - 1)) == 0)
+#define NP2_is_aligned_ptr(ptr, alignment)	NP2_is_aligned((uintptr_t)(ptr), alignment)
+#endif
+
 // https://docs.microsoft.com/en-us/cpp/intrinsics/compiler-intrinsics
 // https://software.intel.com/sites/landingpage/IntrinsicsGuide/
 // https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
