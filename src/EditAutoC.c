@@ -356,59 +356,74 @@ static inline bool WordList_StartsWith(const struct WordList *pWList, LPCSTR pWo
 #endif
 }
 
+static inline bool WordList_IsSeparator(uint8_t ch) {
+#if defined(_WIN64)
+	// directly complied into bit test
+	return ch <= ' '
+		|| ch == '('
+		|| ch == ')'
+		|| ch == ','
+		|| ch == '.'
+		//|| ch == ':'
+		|| ch == ';'
+		|| ch == '^';
+#else
+	if (ch <= ' ') {
+		return true;
+	}
+	ch -= '(';
+	if (ch > ';' - '(') {
+		return ch == '^' - '(';
+	}
+	const UINT mask = (1 << ('(' - '('))
+		| (1 << (')' - '('))
+		| (1 << (',' - '('))
+		| (1 << ('.' - '('))
+		//| (1 << (':' - '('))
+		| (1 << (';' - '('));
+	return (mask >> ch) & true;
+#endif
+}
+
 void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	//StopWatch watch;
 	//StopWatch_Start(watch);
-	char wordBuf[NP2_AUTOC_WORD_BUF_LENGTH];
-	char *word = wordBuf;
+	char word[NP2_AUTOC_WORD_BUF_LENGTH];
 	const UINT iStartLen = pWList->iStartLen;
 	UINT len = 0;
 	bool ok = false;
-	do {
-		const char *sub = strpbrk(pList, " \t.,();^\n\r");
-		if (sub) {
-			UINT lenSub = (UINT)(sub - pList);
-			lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
-			memcpy(word + len, pList, lenSub);
-			len += lenSub;
-			if (len >= iStartLen) {
-				if (*sub == '(') {
-					word[len++] = '(';
-					word[len++] = ')';
-				}
-				word[len] = '\0';
-				if (ok || WordList_StartsWith(pWList, word)) {
-					WordList_AddWord(pWList, word, len);
-					ok = *sub == '.';
-				}
+	LPCSTR sub = pList;
+	while (true) {
+		while (!WordList_IsSeparator(*sub)) {
+			++sub;
+		}
+		UINT lenSub = (UINT)(sub - pList);
+		lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
+		memcpy(word + len, pList, lenSub);
+		len += lenSub;
+		if (len >= iStartLen) {
+			if (*sub == '(') {
+				word[len++] = '(';
+				word[len++] = ')';
 			}
-			if (*sub == '^') {
-				word[len++] = ' ';
-			} else if (!ok && *sub != '.') {
-				len = 0;
-			} else {
-				word[len++] = '.';
+			word[len] = '\0';
+			if (ok || WordList_StartsWith(pWList, word)) {
+				WordList_AddWord(pWList, word, len);
+				ok = *sub == '.';
 			}
-			pList = ++sub;
-		} else {
-			UINT lenSub = (UINT)strlen(pList);
-			lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
-			if (len) {
-				memcpy(word + len, pList, lenSub);
-				len += lenSub;
-				word[len] = '\0';
-				pList = word;
-			} else {
-				len = lenSub;
-			}
-			if (len >= iStartLen) {
-				if (ok || WordList_StartsWith(pWList, pList)) {
-					WordList_AddWord(pWList, pList, len);
-				}
-			}
+		}
+		if (*sub == '\0') {
 			break;
 		}
-	} while (*pList);
+		if (*sub == '^') {
+			word[len++] = ' ';
+		} else if (!ok && *sub != '.') {
+			len = 0;
+		} else {
+			word[len++] = '.';
+		}
+		pList = ++sub;
+	}
 
 	//StopWatch_Stop(watch);
 	//const double duration = StopWatch_Get(&watch);
