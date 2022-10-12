@@ -1671,7 +1671,7 @@ void UpdateWindowTitle(void) {
 		lstrcat(szTitle, L" ");
 		lstrcat(szTitle, szReadOnly);
 	}
-	if (bReadOnlyMode) {
+	else if (bReadOnlyMode) {
 		WCHAR szReadOnly[32];
 		GetString(IDS_READONLY_MODE, szReadOnly, COUNTOF(szReadOnly));
 		lstrcat(szTitle, L" ");
