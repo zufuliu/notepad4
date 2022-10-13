@@ -40,10 +40,12 @@ struct WordList {
 
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
+	UINT iStartLen;
+#if NP2_AUTOC_USE_STRING_ORDER
+	UINT orderStart;
+#endif
 	UINT nWordCount;
 	UINT nTotalLen;
-	UINT iStartLen;
-	UINT orderStart;
 
 	UINT offset;
 	UINT capacity;
@@ -332,6 +334,20 @@ static inline bool WordList_StartsWith(const struct WordList *pWList, LPCSTR pWo
 static inline bool WordList_IsSeparator(uint8_t ch) {
 #if defined(_WIN64)
 	// directly complied into bit test
+#if defined(__clang__) || defined(__GNUC__)
+	if (ch > ';') {
+		return ch == '^';
+	}
+	const uint64_t mask = UINT32_MAX
+		| (UINT64_C(1) << ' ')
+		| (UINT64_C(1) << '(')
+		| (UINT64_C(1) << ')')
+		| (UINT64_C(1) << ',')
+		| (UINT64_C(1) << '.')
+		//| (UINT64_C(1) << ':')
+		| (UINT64_C(1) << ';');
+	return (mask >> ch) & true;
+#else
 	return ch <= ' '
 		|| ch == '('
 		|| ch == ')'
@@ -340,6 +356,7 @@ static inline bool WordList_IsSeparator(uint8_t ch) {
 		//|| ch == ':'
 		|| ch == ';'
 		|| ch == '^';
+#endif
 #else
 	if (ch <= ' ') {
 		return true;
@@ -348,7 +365,7 @@ static inline bool WordList_IsSeparator(uint8_t ch) {
 	if (ch > ';' - '(') {
 		return ch == '^' - '(';
 	}
-	const UINT mask = (1 << ('(' - '('))
+	const uint32_t mask = (1 << ('(' - '('))
 		| (1 << (')' - '('))
 		| (1 << (',' - '('))
 		| (1 << ('.' - '('))
