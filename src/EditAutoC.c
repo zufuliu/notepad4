@@ -382,37 +382,39 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 	const UINT iStartLen = pWList->iStartLen;
 	UINT len = 0;
 	bool ok = false;
-	LPCSTR sub = pList;
 	while (true) {
-		while (!WordList_IsSeparator(*sub)) {
-			++sub;
-		}
-		UINT lenSub = (UINT)(sub - pList);
+		uint8_t ch;
+		LPCSTR sub = pList;
+		do {
+			ch = *sub++;
+		} while (!WordList_IsSeparator(ch));
+
+		UINT lenSub = (UINT)(sub - pList - 1);
 		lenSub = min_u(NP2_AUTOC_MAX_WORD_LENGTH - len, lenSub);
 		memcpy(word + len, pList, lenSub);
 		len += lenSub;
+		pList = sub;
 		if (len >= iStartLen) {
-			if (*sub == '(') {
+			if (ch == '(') {
 				word[len++] = '(';
 				word[len++] = ')';
 			}
 			word[len] = '\0';
 			if (ok || WordList_StartsWith(pWList, word)) {
 				WordList_AddWord(pWList, word, len);
-				ok = *sub == '.';
+				ok = ch == '.';
 			}
 		}
-		if (*sub == '\0') {
+		if (ch == '\0') {
 			break;
 		}
-		if (*sub == '^') {
+		if (ch == '^') {
 			word[len++] = ' ';
-		} else if (!ok && *sub != '.') {
+		} else if (!ok && ch != '.') {
 			len = 0;
 		} else {
 			word[len++] = '.';
 		}
-		pList = ++sub;
 	}
 
 	//StopWatch_Stop(watch);
