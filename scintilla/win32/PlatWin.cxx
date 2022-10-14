@@ -39,6 +39,7 @@
 #include "Debugging.h"
 #include "Geometry.h"
 #include "Platform.h"
+#include "UniqueString.h"
 #include "VectorISA.h"
 #include "GraphicUtils.h"
 #include "XPM.h"
@@ -2980,13 +2981,12 @@ struct ListItemData {
 };
 
 class LineToItem {
-	std::vector<char> words;
-
+	std::unique_ptr<char[]> words;
 	std::vector<ListItemData> data;
 
 public:
 	void Clear() noexcept {
-		words.clear();
+		words.reset();
 		data.clear();
 	}
 
@@ -3008,8 +3008,8 @@ public:
 	}
 
 	char *SetWords(const char *s, size_t length) {
-		words = std::vector<char>(s, s + length + 1);
-		return words.data();
+		words = UniqueCopy(s, length + 1);
+		return words.get();
 	}
 };
 
