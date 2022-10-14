@@ -34,8 +34,8 @@ using namespace Scintilla::Internal;
 
 AutoComplete::AutoComplete() :
 	active(false),
-	separator(' '),
-	typesep('?'),
+	separator('\n'),
+	typesep('\t'),
 	ignoreCase(false),
 	chooseSingle(false),
 	options(AutoCompleteOption::Normal),

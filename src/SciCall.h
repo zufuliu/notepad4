@@ -1050,6 +1050,10 @@ NP2_inline void SciCall_AutoCSetSeparator(char separatorCharacter) {
 	SciCall(SCI_AUTOCSETSEPARATOR, separatorCharacter, 0);
 }
 
+NP2_inline void SciCall_AutoCSetTypeSeparator(char separatorCharacter) {
+	SciCall(SCI_AUTOCSETTYPESEPARATOR, separatorCharacter, 0);
+}
+
 NP2_inline void SciCall_AutoCSetCancelAtStart(bool cancel) {
 	SciCall(SCI_AUTOCSETCANCELATSTART, cancel, 0);
 }

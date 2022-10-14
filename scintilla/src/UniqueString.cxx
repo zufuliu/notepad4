@@ -20,7 +20,7 @@ UniqueString UniqueStringCopy(const char *text) {
 	if (IsNullOrEmpty(text)) {
 		return {};
 	}
-	return UniqueCopy(text, __builtin_strlen(text) + 1);
+	return UniqueCopy(text, std::char_traits<char>::length(text) + 1);
 }
 
 // A set of strings that always returns the same pointer for each string.

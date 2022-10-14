@@ -1600,7 +1600,8 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		//if (bIgnoreCase) {
 		//	SciCall_AutoCSetCaseInsensitiveBehaviour(SC_CASEINSENSITIVEBEHAVIOUR_IGNORECASE);
 		//}
-		SciCall_AutoCSetSeparator('\n');
+		//SciCall_AutoCSetSeparator('\n');
+		//SciCall_AutoCSetTypeSeparator('\t');
 		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
 		//SciCall_AutoCSetDropRestOfWord(true); // delete orginal text: pRoot
 		SciCall_AutoCSetMaxHeight(min_u(pWList.nWordCount, autoCompletionConfig.iVisibleItemCount)); // visible rows
