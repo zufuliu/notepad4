@@ -15,6 +15,13 @@ constexpr bool IsNullOrEmpty(const char *text) noexcept {
 	return text == nullptr || *text == '\0';
 }
 
+template <typename T>
+inline std::unique_ptr<T[]> UniqueCopy(const T *data, size_t length) {
+	std::unique_ptr<T[]> copy(new T[length]); // std::make_unique_for_overwrite<T[]>(length)
+	memcpy(copy.get(), data, length * sizeof(T));
+	return copy;
+}
+
 using UniqueString = std::unique_ptr<const char[]>;
 
 /// Equivalent to strdup but produces a std::unique_ptr<const char[]> allocation to go

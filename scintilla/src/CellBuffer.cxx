@@ -27,6 +27,7 @@
 #include "VectorISA.h"
 
 #include "Position.h"
+#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -344,8 +345,7 @@ void Action::Create(ActionType at_, Sci::Position position_, const char *data_, 
 	position = position_;
 	at = at_;
 	if (lenData_) {
-		data = std::make_unique<char[]>(lenData_);
-		memcpy(data.get(), data_, lenData_);
+		data = UniqueCopy(data_, lenData_);
 	}
 	lenData = lenData_;
 	mayCoalesce = mayCoalesce_;

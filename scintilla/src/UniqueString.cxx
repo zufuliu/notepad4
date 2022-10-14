@@ -20,10 +20,7 @@ UniqueString UniqueStringCopy(const char *text) {
 	if (IsNullOrEmpty(text)) {
 		return {};
 	}
-	const std::string_view sv(text);
-	std::unique_ptr<char[]> upcNew = std::make_unique<char[]>(sv.length() + 1);
-	sv.copy(upcNew.get(), sv.length());
-	return UniqueString(upcNew.release());
+	return UniqueCopy(text, __builtin_strlen(text) + 1);
 }
 
 // A set of strings that always returns the same pointer for each string.
@@ -46,9 +43,7 @@ const char *UniqueStringSet::Save(const char *text) {
 		}
 	}
 
-	std::unique_ptr<char[]> upcNew = std::make_unique<char[]>(sv.length() + 1);
-	sv.copy(upcNew.get(), sv.length());
-	strings.push_back(UniqueString(upcNew.release()));
+	strings.push_back(UniqueCopy(sv.data(), sv.length() + 1));
 	return strings.back().get();
 }
 
