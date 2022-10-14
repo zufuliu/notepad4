@@ -333,7 +333,7 @@ inline size_t NumberLines(std::string_view sv) {
 	return std::count(sv.begin(), sv.end(), '\n') + 1;
 }
 
-std::unique_ptr<char[]>AllocateAnnotation(size_t length, int style) {
+std::unique_ptr<char[]> AllocateAnnotation(size_t length, int style) {
 	const size_t len = sizeof(AnnotationHeader) + length + ((style == IndividualStyles) ? length : 0);
 	return std::make_unique<char[]>(len);
 }
@@ -442,7 +442,7 @@ void LineAnnotation::SetStyles(Sci::Line line, const unsigned char *styles) {
 		} else {
 			const AnnotationHeader *pahSource = reinterpret_cast<AnnotationHeader *>(annotations[line].get());
 			if (pahSource->style != IndividualStyles) {
-				std::unique_ptr<char[]>allocation = AllocateAnnotation(pahSource->length, IndividualStyles);
+				std::unique_ptr<char[]> allocation = AllocateAnnotation(pahSource->length, IndividualStyles);
 				AnnotationHeader *pahAlloc = reinterpret_cast<AnnotationHeader *>(allocation.get());
 				pahAlloc->length = pahSource->length;
 				pahAlloc->lines = pahSource->lines;
