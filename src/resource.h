@@ -325,7 +325,6 @@
 #define IDS_UNTITLED					10003
 #define IDS_TITLEEXCERPT				10004
 #define IDS_READONLY_FILE				10005
-#define IDS_DOCPOS						10006
 #define IDS_LOADFILE					10009
 #define IDS_SAVEFILE					10010
 #define IDS_PRINTFILE					10011
@@ -339,6 +338,12 @@
 #define IDS_BACKSLASHHELP				10019
 #define IDS_REGEXPHELP					10020
 #define IDS_WILDCARDHELP				10021
+#define IDS_LN							10022
+#define IDS_COL							10023
+#define IDS_CH							10024
+#define IDS_SEL							10025
+#define IDS_SELLN						10026
+#define IDS_FND							10027
 
 #define CMD_ESCAPE						20000	// Esc					None/Min To Tray/Exit
 #define CMD_SHIFTESC					20001	// Shift+Esc			Exit

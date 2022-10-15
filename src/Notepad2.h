@@ -86,13 +86,19 @@ typedef struct NP2PARAMS {
 #define IDP_POPUP_SUBMENU_FOLD	3
 
 //==== Statusbar ==============================================================
-#define STATUS_DOCPOS		0
-#define STATUS_LEXER		1
-#define STATUS_CODEPAGE		2
-#define STATUS_EOLMODE		3
-#define STATUS_OVRMODE		4
-#define STATUS_DOCZOOM		5
-#define STATUS_DOCSIZE		6
+#define STATUS_DOCLN		0
+#define STATUS_DOCCOL		1
+#define STATUS_DOCCH		2
+#define STATUS_DOCSEL		3
+#define STATUS_DOCLNSEL		4
+#define STATUS_DOCFND		5
+#define STATUS_EMPTY		6
+#define STATUS_LEXER		7
+#define STATUS_CODEPAGE		8
+#define STATUS_EOLMODE		9
+#define STATUS_OVRMODE		10
+#define STATUS_DOCZOOM		11
+#define STATUS_DOCSIZE		12
 #define STATUS_HELP			(255 | SBT_NOBORDERS)
 
 /**
