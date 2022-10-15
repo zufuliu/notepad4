@@ -53,43 +53,6 @@ static inline uint32_t ColorToARGBHex(uint32_t color) NP2_noexcept {
 // we can process 4 pixels at a time for all our bitmap (even after DPI scaling).
 
 #if NP2_USE_SSE2
-static inline __m128i mm_setlo_epi32(uint32_t value) NP2_noexcept {
-#if defined(__GNUC__) || defined(__clang__)
-	// Visual C++ 2017 compiles this into pinsrd instead of movq for AVX2 target.
-	// _mm_loadu_si32() requires GCC 11, https://gcc.gnu.org/bugzilla/show_bug.cgi?id=99754
-	return _mm_setr_epi32(value, 0, 0, 0);
-#else
-	return _mm_loadu_si32(&value);
-#endif
-}
-
-static inline __m128i mm_loadu_si32(const uint32_t *value) NP2_noexcept {
-#if defined(__GNUC__)
-	return _mm_setr_epi32(*value, 0, 0, 0);
-#else
-	return _mm_loadu_si32(value);
-#endif
-}
-
-static inline void mm_storeu_si32(uint32_t *mem_addr, __m128i a) NP2_noexcept {
-#if defined(__GNUC__)
-	*mem_addr = _mm_cvtsi128_si32(a);
-#else
-	_mm_storeu_si32(mem_addr, a);
-#endif
-}
-
-static inline __m128i mm_setlo_epi64(uint64_t value) NP2_noexcept {
-#if defined(__GNUC__) || defined(__clang__)
-	// Visual C++ 2017 compiles this into pinsrd instead of movq for AVX2 target.
-	// _mm_loadu_si64() requires GCC 9, https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78782
-	return _mm_set_epi64x(0, value);
-#else
-	return _mm_loadl_epi64((__m128i *)(&value));
-#endif
-}
-
-
 static inline __m128i mm_div_epu16_by_255(__m128i i16x8) NP2_noexcept {
 	// uint16_t value / 255  => (value * 0x8081) >> (16 + 7)
 	i16x8 = _mm_mulhi_epu16(i16x8, _mm_set1_epi16(-0x8000 | 0x81));
@@ -103,7 +66,7 @@ static inline __m128i mm_divlo_epu16_by_255(__m128i i32x4) NP2_noexcept {
 }
 
 static inline __m128i mm_setlo_alpha_epi16(uint32_t alpha) NP2_noexcept {
-	return _mm_shufflelo_epi16(mm_setlo_epi32(alpha), 0);
+	return _mm_shufflelo_epi16(_mm_cvtsi32_si128(alpha), 0);
 }
 
 static inline __m128i mm_xor_alpha_epi16(__m128i alpha) NP2_noexcept {
@@ -142,15 +105,15 @@ static inline __m128i unpackhi_color_epi16_sse2_si128(__m128i i32x4) NP2_noexcep
 }
 
 static inline __m128i unpack_color_epi16_sse2_si32(uint32_t color) NP2_noexcept {
-	return _mm_unpacklo_epi8(mm_setlo_epi32(color), _mm_setzero_si128());
+	return _mm_unpacklo_epi8(_mm_cvtsi32_si128(color), _mm_setzero_si128());
 }
 
 static inline __m128i unpack_color_epi16_sse2_ptr32(const uint32_t *color) NP2_noexcept {
-	return _mm_unpacklo_epi8(mm_loadu_si32(color), _mm_setzero_si128());
+	return _mm_unpacklo_epi8(_mm_cvtsi32_si128(*color), _mm_setzero_si128());
 }
 
 static inline __m128i unpack_color_epi32_sse2_si32(uint32_t color) NP2_noexcept {
-	__m128i i32x4 = mm_setlo_epi32(color);
+	__m128i i32x4 = _mm_cvtsi32_si128(color);
 	i32x4 = _mm_unpacklo_epi8(i32x4, _mm_setzero_si128());
 	i32x4 = _mm_unpacklo_epi8(i32x4, _mm_setzero_si128());
 	return i32x4;
@@ -231,7 +194,7 @@ static inline int mm_hadd_epi32_si32(__m128i i32x4) NP2_noexcept {
 
 
 static inline __m128i unpack_color_epi16_sse4_si32(uint32_t color) NP2_noexcept {
-	return _mm_cvtepu8_epi16(mm_setlo_epi32(color));
+	return _mm_cvtepu8_epi16(_mm_cvtsi32_si128(color));
 }
 
 static inline __m128i unpack_color_epi16_sse4_ptr32(const uint32_t *color) NP2_noexcept {
@@ -243,7 +206,7 @@ static inline __m128i unpack_color_epi16_sse4_ptr64(const uint64_t *color) NP2_n
 }
 
 static inline __m128i unpack_color_epi32_sse4_si32(uint32_t color) NP2_noexcept {
-	return _mm_cvtepu8_epi32(mm_setlo_epi32(color));
+	return _mm_cvtepu8_epi32(_mm_cvtsi32_si128(color));
 }
 
 
@@ -260,7 +223,7 @@ static inline __m128i rgba_to_bgra_epi16_sse4_si32(uint32_t color) NP2_noexcept 
 	const __m128i i16x4 = unpack_color_epi16_sse4_si32(color);
 	return _mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2));
 #else
-	const __m128i i16x4 = mm_setlo_epi32(color);
+	const __m128i i16x4 = _mm_cvtsi32_si128(color);
 	return _mm_shuffle_epi8(i16x4, _mm_setr_epi16(pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3), pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3)));
 #endif
 }
@@ -271,7 +234,7 @@ static inline __m128i rgba_to_bgra_epi16x8_sse4_si32(uint32_t color) NP2_noexcep
 	//return _mm_shuffle_epi32(_mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2)), 0x44);
 	return _mm_broadcastq_epi64(_mm_shufflelo_epi16(i16x4, _MM_SHUFFLE(3, 0, 1, 2)));
 #else
-	const __m128i i16x4 = mm_setlo_epi32(color);
+	const __m128i i16x4 = _mm_cvtsi32_si128(color);
 	return _mm_shuffle_epi8(i16x4, _mm_setr_epi16(pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3), pshufb_1to2(2), pshufb_1to2(1), pshufb_1to2(0), pshufb_1to2(3)));
 #endif
 }
@@ -281,7 +244,7 @@ static inline __m128i rgba_to_bgra_epi32_sse4_si32(uint32_t color) NP2_noexcept 
 	const __m128i i32x4 = unpack_color_epi32_sse4_si32(color);
 	return _mm_shuffle_epi32(i32x4, _MM_SHUFFLE(3, 0, 1, 2));
 #else
-	const __m128i i32x4 = mm_setlo_epi32(color);
+	const __m128i i32x4 = _mm_cvtsi32_si128(color);
 	return _mm_shuffle_epi8(i32x4, _mm_setr_epi32(pshufb_1to4(2), pshufb_1to4(1), pshufb_1to4(0), pshufb_1to4(3)));
 #endif
 }

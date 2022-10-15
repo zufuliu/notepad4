@@ -315,7 +315,7 @@ void BGRAFromRGBA_sse4_align32(void *pixelsBGRA, const void *pixelsRGBA, size_t 
 		i32x4Color = _mm_alignr_epi8(i32x4Alpha, i32x4Color, 4);
 
 		i32x4Color = pack_color_epi32_sse2_si128(i32x4Color);
-		mm_storeu_si32(pbgra, i32x4Color);
+		*pbgra = _mm_cvtsi128_si32(i32x4Color);
 	}
 }
 #endif
@@ -485,7 +485,7 @@ uint64_t BitmapAlphaBlend_sse4_x2(const uint64_t *fore, COLORREF back, BYTE alph
 	const __m128i origin = unpack_color_epi16_sse4_ptr64(fore);
 	__m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(back);
 	//__m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
-	__m128i i16x8Alpha = _mm_broadcastw_epi16(mm_setlo_epi32(alpha));
+	__m128i i16x8Alpha = _mm_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 	__m128i i16x8Fore = mm_alpha_blend_epi16(origin, i16x8Back, i16x8Alpha);
 	i16x8Fore = _mm_blend_epi16(origin, i16x8Fore, 0x77);
 	return pack_color_epi16_sse2_si64(i16x8Fore);
@@ -609,7 +609,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 			i32x4Fore = mm_div_epu16_by_255(i32x4Fore);
 			i32x4Fore = _mm_blend_epi16(origin, i32x4Fore, 7);
 			i32x4Fore = pack_color_epi16_sse2_si128(i32x4Fore);
-			mm_storeu_si32(dest, i32x4Fore);
+			*dest = _mm_cvtsi128_si32(i32x4Fore);
 		}
 		for (size_t x = 0; x < pixelCount; x++) {
 			if (scalar[x] != xmm[x]) {
@@ -625,7 +625,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		uint64_t *dest = (uint64_t *)xmm.data();
 
 		//__m128i i16x8Alpha = _mm_shuffle_epi32(mm_setlo_alpha_epi16(alpha), 0x44);
-		__m128i i16x8Alpha = _mm_broadcastw_epi16(mm_setlo_epi32(alpha));
+		__m128i i16x8Alpha = _mm_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 		__m128i i16x8Back = rgba_to_bgra_epi16x8_sse4_si32(crDest);
 		i16x8Back = _mm_mullo_epi16(i16x8Back, mm_xor_alpha_epi16(i16x8Alpha));
 		for (size_t x = 0; x < pixelCount; x += 2, prgba++, dest++) {
@@ -650,7 +650,7 @@ void TestBitmapAlphaBlend(const char *path, const uint32_t crDest, const BYTE al
 		const __m128i *prgba = (__m128i *)data.data();
 		__m128i *dest = (__m128i *)xmm.data();
 
-		const __m256i i16x16Alpha = _mm256_broadcastw_epi16(mm_setlo_epi32(alpha));
+		const __m256i i16x16Alpha = _mm256_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 		const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
 		const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
 		for (size_t x = 0; x < pixelCount; x += 4, prgba++, dest++) {

@@ -471,7 +471,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 4;
 			__m128i *prgba = (__m128i *)bmp.bmBits;
 
-			const __m256i i16x16Alpha = _mm256_broadcastw_epi16(mm_setlo_epi32(alpha));
+			const __m256i i16x16Alpha = _mm256_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 			const __m256i i16x16Back = _mm256_broadcastq_epi64(_mm_mullo_epi16(rgba_to_bgra_epi16_sse4_si32(crDest), mm_xor_alpha_epi16(_mm256_castsi256_si128(i16x16Alpha))));
 			const __m256i i16x16_0x8081 = _mm256_broadcastsi128_si256(_mm_set1_epi16(-0x8000 | 0x81));
 			for (ULONG x = 0; x < count; x++, prgba++) {
@@ -489,7 +489,7 @@ bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha) {
 			const ULONG count = (bmp.bmHeight * bmp.bmWidth) / 2;
 			uint64_t *prgba = (uint64_t *)bmp.bmBits;
 
-			const __m128i i16x8Alpha = _mm_broadcastw_epi16(mm_setlo_epi32(alpha));
+			const __m128i i16x8Alpha = _mm_broadcastw_epi16(_mm_cvtsi32_si128(alpha));
 			const __m128i i16x8Back = _mm_mullo_epi16(rgba_to_bgra_epi16x8_sse4_si32(crDest), mm_xor_alpha_epi16(i16x8Alpha));
 			for (ULONG x = 0; x < count; x++, prgba++) {
 				const __m128i origin = unpack_color_epi16_sse4_ptr64(prgba);
