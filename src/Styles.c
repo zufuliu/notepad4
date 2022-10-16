@@ -1793,7 +1793,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		// Save current lexer
 		pLexCurrent = pLexNew;
 		InitAutoCompletionCache(pLexNew);
-		UpdateStatusBarCache(STATUS_LEXER);
+		UpdateStatusBarCache(StatusItem_Lexer);
 		UpdateStatusbar();
 	}
 

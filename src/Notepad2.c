@@ -328,6 +328,13 @@ struct CachedStatusItem {
 	Sci_Position iLineChar;
 	Sci_Position iLineColumn;
 
+	int aWidth[13];
+	WCHAR tchFmtLine[32];
+	WCHAR tchFmtColumn[32];
+	WCHAR tchFmtCharacter[32];
+	WCHAR tchFmtSelection[32];
+	WCHAR tchFmtSelectedLine[32];
+	WCHAR tchFmtFind[32];
 	LPCWSTR pszLexerName;
 	LPCWSTR pszEOLMode;
 	LPCWSTR pszOvrMode;
@@ -859,7 +866,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	UpdateStatusBarCache_OVRMode(TRUE);
-	UpdateStatusBarCache(STATUS_DOCZOOM);
+	UpdateStatusBarCache(StatusItem_Zoom);
 	bool bOpened = false;
 	bool bFileLoadCalled = false;
 	// Pathname parameter
@@ -906,8 +913,8 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		bOpened = FileLoad((FileLoadFlag)(FileLoadFlag_DontSave | FileLoadFlag_New), L"");
 	}
 	if (!bOpened) {
-		UpdateStatusBarCache(STATUS_CODEPAGE);
-		UpdateStatusBarCache(STATUS_EOLMODE);
+		UpdateStatusBarCache(StatusItem_Encoding);
+		UpdateStatusBarCache(StatusItem_EolMode);
 		UpdateStatusBarCacheLineColumn();
 	}
 
@@ -2117,7 +2124,12 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
 	cachedStatusItem.updateMask = StatusBarUpdateMask_All;
-	GetString(IDS_DOCPOS, cachedStatusItem.tchDocPosFmt, COUNTOF(cachedStatusItem.tchDocPosFmt));
+	GetString(IDS_STATUSITEM_LINE, cachedStatusItem.tchFmtLine, COUNTOF(cachedStatusItem.tchFmtLine));
+	GetString(IDS_STATUSITEM_COLUMN, cachedStatusItem.tchFmtColumn, COUNTOF(cachedStatusItem.tchFmtColumn));
+	GetString(IDS_STATUSITEM_CHARACTER, cachedStatusItem.tchFmtCharacter, COUNTOF(cachedStatusItem.tchFmtCharacter));
+	GetString(IDS_STATUSITEM_SELECTION, cachedStatusItem.tchFmtSelection, COUNTOF(cachedStatusItem.tchFmtSelection));
+	GetString(IDS_STATUSITEM_SELECTEDLINE, cachedStatusItem.tchFmtSelectedLine, COUNTOF(cachedStatusItem.tchFmtSelectedLine));
+	GetString(IDS_STATUSITEM_FIND, cachedStatusItem.tchFmtFind, COUNTOF(cachedStatusItem.tchFmtFind));
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
 
@@ -2180,7 +2192,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SetWindowPos(hwnd, NULL, rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
 
 	Style_DetectBaseFontSize(hwnd);
-	UpdateStatusBarWidth();
 	Style_OnDPIChanged(pLexCurrent);
 	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
 	UpdateLineNumberWidth();
@@ -2277,30 +2288,30 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EndDeferWindowPos(hdwp);
 
-	// Statusbar width
-	UpdateStatusBarWidth();
+	// Update Statusbar
+	UpdateStatusbar();
 }
 
 void UpdateStatusBarCache(int item) {
 	switch (item) {
-	case STATUS_LEXER:
+	case StatusItem_Lexer:
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName(cachedStatusItem.tchLexerName, MAX_EDITLEXER_NAME_SIZE);
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_Lexer;
 		UpdateStatusBarWidth();
 		break;
 
-	case STATUS_CODEPAGE:
+	case StatusItem_Encoding:
 		Encoding_GetLabel(iCurrentEncoding);
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_CodePage;
 		UpdateStatusBarWidth();
 		break;
 
-	case STATUS_EOLMODE:
+	case StatusItem_EolMode:
 		cachedStatusItem.pszEOLMode = (iCurrentEOLMode == SC_EOL_LF) ? L"LF" : ((iCurrentEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_EOLMode;
 		break;
 
-	case STATUS_DOCZOOM:
+	case StatusItem_Zoom:
 		wsprintf(cachedStatusItem.tchZoom, L"%i%%", iZoomLevel);
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_DocZoom;
 		break;
@@ -2311,30 +2322,27 @@ void UpdateStatusBarWidth(void) {
 	if (!bInitDone) {
 		return;
 	}
-	int aWidth[7];
-
 	RECT rc;
 	GetClientRect(hwndMain, &rc);
 	const int cx = rc.right - rc.left;
 	const Sci_Position iBytes = SciCall_GetLength();
-
-	aWidth[1] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 4;
-	aWidth[2] = StatusCalcPaneWidth(hwndStatus, mEncoding[iCurrentEncoding].wchLabel) + 4;
-	aWidth[3] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
-	aWidth[4] = StatusCalcPaneWidth(hwndStatus, L"OVR");
-	aWidth[5] = StatusCalcPaneWidth(hwndStatus, L"500%");
-	aWidth[6] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB"))
-		+ SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
-
-	aWidth[0] = max_i(120, cx - (aWidth[1] + aWidth[2] + aWidth[3] + aWidth[4] + aWidth[5] + aWidth[6]));
-	aWidth[1] += aWidth[0];
-	aWidth[2] += aWidth[1];
-	aWidth[3] += aWidth[2];
-	aWidth[4] += aWidth[3];
-	aWidth[5] += aWidth[4];
-	aWidth[6] = -1;
-
-	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
+	cachedStatusItem.aWidth[7] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 4;
+	cachedStatusItem.aWidth[8] = StatusCalcPaneWidth(hwndStatus, mEncoding[iCurrentEncoding].wchLabel) + 4;
+	cachedStatusItem.aWidth[9] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
+	cachedStatusItem.aWidth[10] = StatusCalcPaneWidth(hwndStatus, L"OVR");
+	cachedStatusItem.aWidth[11] = StatusCalcPaneWidth(hwndStatus, L"500%");
+	cachedStatusItem.aWidth[12] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB")) + SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
+	int totalWidth = 0;
+	for(int i = 0; i < 13; i++){
+		totalWidth += cachedStatusItem.aWidth[i];
+	}
+	for(int i = 0; i < 12; i++){
+		cachedStatusItem.aWidth[i + 1] += cachedStatusItem.aWidth[i];
+		if(i == 5){
+			cachedStatusItem.aWidth[i+1] += cx-totalWidth;
+		}
+	}
+	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(cachedStatusItem.aWidth), (LPARAM)cachedStatusItem.aWidth);
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -2443,7 +2451,7 @@ void MsgNotifyZoom(void) {
 	// set minimum visual tab width to 1 when font size smaller than 3.5pt.
 	SciCall_SetTabMinimumWidth((iZoomLevel < 40)? 1 : 2);
 
-	UpdateStatusBarCache(STATUS_DOCZOOM);
+	UpdateStatusBarCache(StatusItem_Zoom);
 	Style_OnDPIChanged(pLexCurrent);
 	UpdateLineNumberWidth();
 	UpdateBookmarkMarginWidth();
@@ -2773,7 +2781,7 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	iCurrentEOLMode = iNewEOLMode;
 	SciCall_SetEOLMode(iNewEOLMode);
 	EditEnsureConsistentLineEndings();
-	UpdateStatusBarCache(STATUS_EOLMODE);
+	UpdateStatusBarCache(StatusItem_EolMode);
 	UpdateToolbar();
 	UpdateStatusbar();
 	UpdateWindowTitle();
@@ -3112,7 +3120,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				iCurrentEncoding = iNewEncoding;
 			}
 
-			UpdateStatusBarCache(STATUS_CODEPAGE);
+			UpdateStatusBarCache(StatusItem_Encoding);
 			UpdateToolbar();
 			UpdateStatusbar();
 			UpdateWindowTitle();
@@ -5375,11 +5383,11 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case NM_CLICK: {
 			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
 			switch (pnmm->dwItemSpec) {
-			case STATUS_EOLMODE:
+			case StatusItem_EolMode:
 				EditEnsureConsistentLineEndings();
 				return TRUE;
 
-			case STATUS_DOCZOOM:
+			case StatusItem_Zoom:
 				ZoomLevelDlg(hwnd, true);
 				return TRUE;
 
@@ -5391,22 +5399,30 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case NM_DBLCLK: {
 			LPNMMOUSE pnmm = (LPNMMOUSE)lParam;
 			switch (pnmm->dwItemSpec) {
-			case STATUS_CODEPAGE:
+			case StatusItem_Line:
+				EditLineNumDlg(hwndEdit);
+				return TRUE;
+
+			case StatusItem_Find:
+				SendWMCommand(hwnd, IDM_EDIT_FIND);
+				return TRUE;
+
+			case StatusItem_Encoding:
 				SendWMCommand(hwnd, IDM_ENCODING_SELECT);
 				return TRUE;
 
-			case STATUS_EOLMODE: {
+			case StatusItem_EolMode: {
 				const UINT mask = (SC_EOL_LF << 2*SC_EOL_CRLF) | (SC_EOL_CR << 2*SC_EOL_LF) | (SC_EOL_CRLF << 2*SC_EOL_CR);
 				iCurrentEOLMode = (mask >> (iCurrentEOLMode << 1)) & 3;
 				ConvertLineEndings(iCurrentEOLMode);
 				return TRUE;
 			}
 
-			case STATUS_LEXER:
+			case StatusItem_Lexer:
 				SendWMCommand(hwnd, IDM_VIEW_SCHEME);
 				return TRUE;
 
-			case STATUS_OVRMODE:
+			case StatusItem_OvrMode:
 				SciCall_EditToggleOvertype();
 				return TRUE;
 
@@ -7184,34 +7200,46 @@ void UpdateStatusbar(void) {
 	if (editMarkAllStatus.pending) {
 		lstrcat(tchMatchesCount, L" ...");
 	}
-
-	WCHAR tchDocPos[256];
-	wsprintf(tchDocPos, cachedStatusItem.tchDocPosFmt, tchCurLine, tchDocLine,
-				 tchCurColumn, tchLineColumn, tchCurChar, tchLineChar,
-				 tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
-
+	WCHAR tempTxt[128];
+	wsprintf(tempTxt, cachedStatusItem.tchFmtLine, tchCurLine, tchDocLine);
+	StatusSetText(hwndStatus, StatusItem_Line, tempTxt);
+	cachedStatusItem.aWidth[0] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	wsprintf(tempTxt, cachedStatusItem.tchFmtColumn, tchCurColumn, tchLineColumn);
+	StatusSetText(hwndStatus, StatusItem_Column, tempTxt);
+	cachedStatusItem.aWidth[1] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	wsprintf(tempTxt, cachedStatusItem.tchFmtCharacter, tchCurChar, tchLineChar);
+	StatusSetText(hwndStatus, StatusItem_Character, tempTxt);
+	cachedStatusItem.aWidth[2] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	wsprintf(tempTxt, cachedStatusItem.tchFmtSelection, tchSelChar, tchSelByte);
+	StatusSetText(hwndStatus, StatusItem_Selection, tempTxt);
+	cachedStatusItem.aWidth[3] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	wsprintf(tempTxt, cachedStatusItem.tchFmtSelectedLine, tchLinesSelected);
+	StatusSetText(hwndStatus, StatusItem_SelectedLine, tempTxt);
+	cachedStatusItem.aWidth[4] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	wsprintf(tempTxt, cachedStatusItem.tchFmtFind, tchMatchesCount);
+	StatusSetText(hwndStatus, StatusItem_Find, tempTxt);
+	cachedStatusItem.aWidth[5] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
 	WCHAR tchDocSize[32];
 	const Sci_Position iBytes = SciCall_GetLength();
 	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
-
-	StatusSetText(hwndStatus, STATUS_DOCPOS, tchDocPos);
-	StatusSetText(hwndStatus, STATUS_DOCSIZE, tchDocSize);
+	StatusSetText(hwndStatus, StatusItem_DocSize, tchDocSize);
 	if (updateMask & StatusBarUpdateMask_Lexer) {
-		StatusSetText(hwndStatus, STATUS_LEXER, cachedStatusItem.pszLexerName);
+		StatusSetText(hwndStatus, StatusItem_Lexer, cachedStatusItem.pszLexerName);
 	}
 	if (updateMask & StatusBarUpdateMask_CodePage) {
-		StatusSetText(hwndStatus, STATUS_CODEPAGE, mEncoding[iCurrentEncoding].wchLabel);
+		StatusSetText(hwndStatus, StatusItem_Encoding, mEncoding[iCurrentEncoding].wchLabel);
 	}
 	if (updateMask & StatusBarUpdateMask_EOLMode) {
-		StatusSetText(hwndStatus, STATUS_EOLMODE, cachedStatusItem.pszEOLMode);
+		StatusSetText(hwndStatus, StatusItem_EolMode, cachedStatusItem.pszEOLMode);
 	}
 	if (updateMask & StatusBarUpdateMask_OVRMode) {
-		StatusSetText(hwndStatus, STATUS_OVRMODE, cachedStatusItem.pszOvrMode);
+		StatusSetText(hwndStatus, StatusItem_OvrMode, cachedStatusItem.pszOvrMode);
 	}
 	if (updateMask & StatusBarUpdateMask_DocZoom) {
-		StatusSetText(hwndStatus, STATUS_DOCZOOM, cachedStatusItem.tchZoom);
+		StatusSetText(hwndStatus, StatusItem_Zoom, cachedStatusItem.tchZoom);
 	}
 	cachedStatusItem.updateMask = 0;
+	UpdateStatusBarWidth();
 }
 
 //=============================================================================
@@ -7403,8 +7431,8 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		iOriginalEncoding = iCurrentEncoding;
 		SciCall_SetCodePage((iCurrentEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
 		Style_SetLexer(NULL, true);
-		UpdateStatusBarCache(STATUS_CODEPAGE);
-		UpdateStatusBarCache(STATUS_EOLMODE);
+		UpdateStatusBarCache(StatusItem_Encoding);
+		UpdateStatusBarCache(StatusItem_EolMode);
 		UpdateStatusBarCacheLineColumn();
 		UpdateDocumentModificationStatus();
 
@@ -7498,8 +7526,8 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		iOriginalEncoding = iCurrentEncoding;
 		bDocumentModified = false;
 		SciCall_SetEOLMode(iCurrentEOLMode);
-		UpdateStatusBarCache(STATUS_CODEPAGE);
-		UpdateStatusBarCache(STATUS_EOLMODE);
+		UpdateStatusBarCache(StatusItem_Encoding);
+		UpdateStatusBarCache(StatusItem_EolMode);
 		UpdateStatusBarCacheLineColumn();
 
 		bool bUnknownFile = false;
@@ -7808,7 +7836,7 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
 	if (iEOLMode != iCurrentEOLMode) {
 		iCurrentEOLMode = iEOLMode;
 		SciCall_SetEOLMode(iEOLMode);
-		UpdateStatusBarCache(STATUS_EOLMODE);
+		UpdateStatusBarCache(StatusItem_EolMode);
 	}
 
 	const UINT uFlags = mEncoding[iCurrentEncoding].uFlags;
@@ -7823,7 +7851,7 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
 		iCurrentEncoding = iEncoding;
 		iOriginalEncoding = iEncoding;
 		SciCall_SetCodePage((iEncoding == CPI_DEFAULT) ? iDefaultCodePage : SC_CP_UTF8);
-		UpdateStatusBarCache(STATUS_CODEPAGE);
+		UpdateStatusBarCache(StatusItem_Encoding);
 	}
 }
 
