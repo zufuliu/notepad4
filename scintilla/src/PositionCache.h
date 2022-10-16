@@ -180,9 +180,9 @@ class PositionCacheEntry {
 	uint16_t styleNumber = 0;
 	uint16_t clock = 0;
 	uint32_t len = 0;
-	std::unique_ptr<XYPOSITION[]> positions;
+	std::unique_ptr<char[]> positions;
 public:
-	void Set(uint16_t styleNumber_, size_t length, std::unique_ptr<XYPOSITION[]> &positions_, uint32_t clock_) noexcept;
+	void Set(uint16_t styleNumber_, size_t length, std::unique_ptr<char[]> &positions_, uint32_t clock_) noexcept;
 	void Clear() noexcept;
 	bool Retrieve(uint16_t styleNumber_, std::string_view sv, XYPOSITION *positions_) const noexcept;
 	static size_t Hash(uint16_t styleNumber_, std::string_view sv) noexcept;
