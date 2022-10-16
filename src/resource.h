@@ -338,12 +338,13 @@
 #define IDS_BACKSLASHHELP				10019
 #define IDS_REGEXPHELP					10020
 #define IDS_WILDCARDHELP				10021
-#define IDS_LN							10022
-#define IDS_COL							10023
-#define IDS_CH							10024
-#define IDS_SEL							10025
-#define IDS_SELLN						10026
-#define IDS_FND							10027
+// Statusbar
+#define IDS_STATUSITEM_LINE						10022
+#define IDS_STATUSITEM_COLUMN					10023
+#define IDS_STATUSITEM_CHARACTER			10024
+#define IDS_STATUSITEM_SELECTION			10025
+#define IDS_STATUSITEM_SELECTEDLINE		10026
+#define IDS_STATUSITEM_FIND						10027
 
 #define CMD_ESCAPE						20000	// Esc					None/Min To Tray/Exit
 #define CMD_SHIFTESC					20001	// Shift+Esc			Exit
