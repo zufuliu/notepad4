@@ -88,7 +88,7 @@ public:
 	void Resize(int maxLineLength_);
 	void EnsureBidiData();
 	void Free() noexcept;
-	void ClearPositions() const;
+	void ClearPositions() const noexcept;
 	void Invalidate(ValidLevel validity_) noexcept;
 	Sci::Line LineNumber() const noexcept {
 		return lineNumber;

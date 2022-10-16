@@ -427,8 +427,8 @@ class VarBuffer {
 public:
 	explicit VarBuffer(size_t length) :
 		buffer {(length > lengthStandard) ? new T[length] : bufferStandard} {
-		const T empty{};
-		std::fill_n(buffer, length, empty);
+		static_assert(__is_standard_layout(T));
+		memset(buffer, 0, length*sizeof(T));
 	}
 	const T *data() const noexcept {
 		return buffer;

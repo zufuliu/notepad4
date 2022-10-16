@@ -126,8 +126,9 @@ void LineLayout::Free() noexcept {
 	bidiData.reset();
 }
 
-void LineLayout::ClearPositions() const {
-	std::fill_n(&positions[0], maxLineLength + 2, 0.0f);
+void LineLayout::ClearPositions() const noexcept {
+	//std::fill_n(positions.get(), maxLineLength + 2, 0.0f);
+	memset(positions.get(), 0, (maxLineLength + 2) * sizeof(XYPOSITION));
 }
 
 void LineLayout::Invalidate(ValidLevel validity_) noexcept {

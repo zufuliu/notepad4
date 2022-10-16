@@ -35,6 +35,7 @@
 #include "ILexer.h"
 
 #include "Debugging.h"
+//#include "VectorISA.h"
 
 #include "CharacterSet.h"
 //#include "CharacterCategory.h"
@@ -2009,7 +2010,7 @@ public:
 		memset(buffer, 0, size);
 	}
 	~SearchThing() noexcept {
-		if (buffer != reinterpret_cast<char *>(shiftTable)) {
+		if (length > sizeof(shiftTable)) {
 			delete[] buffer;
 		}
 	}
@@ -2170,7 +2171,12 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			if (lengthFind != 1) {
 				Sci::Position shift = lengthFind;
 				const Sci::Position value = (shift + 1) * increment;
-				std::fill_n(shiftTable, std::size(shiftTable), value);
+				//std::fill_n(shiftTable, std::size(shiftTable), value);
+				//__stosq((uint64_t *)(&shiftTable[0]), value, 256);
+				//__stosd((uint32_t *)(&shiftTable[0]), value, 256);
+				for (auto &it : shiftTable) {
+					it = value;
+				}
 				if (direction >= 0) {
 					const unsigned char *ptr = searchData;
 					while (*ptr != 0) {
