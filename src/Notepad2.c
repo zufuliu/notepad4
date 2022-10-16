@@ -312,9 +312,9 @@ static WCHAR wchWndClass[16] = WC_NOTEPAD2;
 
 enum StatusBarUpdateMask {
 	StatusBarUpdateMask_Lexer = 1,
-	StatusBarUpdateMask_CodePage = 2,
-	StatusBarUpdateMask_EOLMode = 4,
-	StatusBarUpdateMask_OVRMode = 8,
+	StatusBarUpdateMask_Encoding = 2,
+	StatusBarUpdateMask_EolMode = 4,
+	StatusBarUpdateMask_OvrMode = 8,
 	StatusBarUpdateMask_DocZoom = 16,
 	StatusBarUpdateMask_LineColumn = 32,
 	StatusBarUpdateMask_All = 63,
@@ -328,7 +328,6 @@ struct CachedStatusItem {
 	Sci_Position iLineChar;
 	Sci_Position iLineColumn;
 
-	int aWidth[13];
 	WCHAR tchFmtLine[32];
 	WCHAR tchFmtColumn[32];
 	WCHAR tchFmtCharacter[32];
@@ -341,8 +340,8 @@ struct CachedStatusItem {
 	WCHAR tchZoom[8];
 
 	WCHAR tchLexerName[MAX_EDITLEXER_NAME_SIZE];
-	WCHAR tchDocPosFmt[96];
-} cachedStatusItem;
+};
+static struct CachedStatusItem cachedStatusItem;
 
 #define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= StatusBarUpdateMask_LineColumn
 
@@ -456,7 +455,7 @@ static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
 	if (force || overType != cachedStatusItem.overType) {
 		cachedStatusItem.overType = overType;
 		cachedStatusItem.pszOvrMode = overType ? L"OVR" : L"INS";
-		cachedStatusItem.updateMask |= StatusBarUpdateMask_OVRMode;
+		cachedStatusItem.updateMask |= StatusBarUpdateMask_OvrMode;
 	}
 }
 
@@ -1014,10 +1013,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		SetNotifyIconTitle(hwndMain);
 	}
 
-	if (!bInitDone) {
-		bInitDone = true;
-		UpdateStatusBarWidth();
-	}
+	bInitDone = true;
 	if (SciCall_GetLength() == 0) {
 		UpdateToolbar();
 		UpdateStatusbar();
@@ -2132,6 +2128,8 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	GetString(IDS_STATUSITEM_FIND, cachedStatusItem.tchFmtFind, COUNTOF(cachedStatusItem.tchFmtFind));
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
+	const int aWidth[StatusItem_ItemCount] = {0};
+	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 
 	// Create ReBar and add Toolbar
 	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
@@ -2163,7 +2161,6 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SetWindowPos(hwndReBar, NULL, 0, 0, 0, 0, SWP_NOZORDER);
 	GetWindowRect(hwndReBar, &rc);
 	cyReBar = rc.bottom - rc.top;
-
 	cyReBarFrame = bIsAppThemed ? 0 : 2;
 }
 
@@ -2297,18 +2294,16 @@ void UpdateStatusBarCache(int item) {
 	case StatusItem_Lexer:
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName(cachedStatusItem.tchLexerName, MAX_EDITLEXER_NAME_SIZE);
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_Lexer;
-		UpdateStatusBarWidth();
 		break;
 
 	case StatusItem_Encoding:
 		Encoding_GetLabel(iCurrentEncoding);
-		cachedStatusItem.updateMask |= StatusBarUpdateMask_CodePage;
-		UpdateStatusBarWidth();
+		cachedStatusItem.updateMask |= StatusBarUpdateMask_Encoding;
 		break;
 
 	case StatusItem_EolMode:
 		cachedStatusItem.pszEOLMode = (iCurrentEOLMode == SC_EOL_LF) ? L"LF" : ((iCurrentEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
-		cachedStatusItem.updateMask |= StatusBarUpdateMask_EOLMode;
+		cachedStatusItem.updateMask |= StatusBarUpdateMask_EolMode;
 		break;
 
 	case StatusItem_Zoom:
@@ -2316,33 +2311,6 @@ void UpdateStatusBarCache(int item) {
 		cachedStatusItem.updateMask |= StatusBarUpdateMask_DocZoom;
 		break;
 	}
-}
-
-void UpdateStatusBarWidth(void) {
-	if (!bInitDone) {
-		return;
-	}
-	RECT rc;
-	GetClientRect(hwndMain, &rc);
-	const int cx = rc.right - rc.left;
-	const Sci_Position iBytes = SciCall_GetLength();
-	cachedStatusItem.aWidth[7] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 4;
-	cachedStatusItem.aWidth[8] = StatusCalcPaneWidth(hwndStatus, mEncoding[iCurrentEncoding].wchLabel) + 4;
-	cachedStatusItem.aWidth[9] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
-	cachedStatusItem.aWidth[10] = StatusCalcPaneWidth(hwndStatus, L"OVR");
-	cachedStatusItem.aWidth[11] = StatusCalcPaneWidth(hwndStatus, L"500%");
-	cachedStatusItem.aWidth[12] = StatusCalcPaneWidth(hwndStatus, ((iBytes < 1024)? L"1,023 Bytes" : L"99.9 MiB")) + SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
-	int totalWidth = 0;
-	for(int i = 0; i < 13; i++){
-		totalWidth += cachedStatusItem.aWidth[i];
-	}
-	for(int i = 0; i < 12; i++){
-		cachedStatusItem.aWidth[i + 1] += cachedStatusItem.aWidth[i];
-		if(i == 5){
-			cachedStatusItem.aWidth[i+1] += cx-totalWidth;
-		}
-	}
-	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(cachedStatusItem.aWidth), (LPARAM)cachedStatusItem.aWidth);
 }
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
@@ -7119,6 +7087,7 @@ void UpdateStatusbar(void) {
 	Sci_Position iLineColumn;
 
 	const UINT updateMask = cachedStatusItem.updateMask;
+	cachedStatusItem.updateMask = 0;
 	if ((updateMask & StatusBarUpdateMask_LineColumn) || (iLine != cachedStatusItem.iLine)) {
 		ft.chrg.cpMin = ft.chrg.cpMax;
 		ft.chrg.cpMax = SciCall_GetLineEndPosition(iLine);
@@ -7200,46 +7169,71 @@ void UpdateStatusbar(void) {
 	if (editMarkAllStatus.pending) {
 		lstrcat(tchMatchesCount, L" ...");
 	}
+
 	WCHAR tempTxt[128];
+	int aWidth[StatusItem_ItemCount];
 	wsprintf(tempTxt, cachedStatusItem.tchFmtLine, tchCurLine, tchDocLine);
 	StatusSetText(hwndStatus, StatusItem_Line, tempTxt);
-	cachedStatusItem.aWidth[0] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	aWidth[StatusItem_Line] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
 	wsprintf(tempTxt, cachedStatusItem.tchFmtColumn, tchCurColumn, tchLineColumn);
 	StatusSetText(hwndStatus, StatusItem_Column, tempTxt);
-	cachedStatusItem.aWidth[1] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	aWidth[StatusItem_Column] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
 	wsprintf(tempTxt, cachedStatusItem.tchFmtCharacter, tchCurChar, tchLineChar);
 	StatusSetText(hwndStatus, StatusItem_Character, tempTxt);
-	cachedStatusItem.aWidth[2] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	aWidth[StatusItem_Character] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
 	wsprintf(tempTxt, cachedStatusItem.tchFmtSelection, tchSelChar, tchSelByte);
 	StatusSetText(hwndStatus, StatusItem_Selection, tempTxt);
-	cachedStatusItem.aWidth[3] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	aWidth[StatusItem_Selection] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
 	wsprintf(tempTxt, cachedStatusItem.tchFmtSelectedLine, tchLinesSelected);
 	StatusSetText(hwndStatus, StatusItem_SelectedLine, tempTxt);
-	cachedStatusItem.aWidth[4] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+	aWidth[StatusItem_SelectedLine] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
 	wsprintf(tempTxt, cachedStatusItem.tchFmtFind, tchMatchesCount);
 	StatusSetText(hwndStatus, StatusItem_Find, tempTxt);
-	cachedStatusItem.aWidth[5] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
-	WCHAR tchDocSize[32];
-	const Sci_Position iBytes = SciCall_GetLength();
-	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
-	StatusSetText(hwndStatus, StatusItem_DocSize, tchDocSize);
+	aWidth[StatusItem_Find] = StatusCalcPaneWidth(hwndStatus, tempTxt) + 2;
+
 	if (updateMask & StatusBarUpdateMask_Lexer) {
 		StatusSetText(hwndStatus, StatusItem_Lexer, cachedStatusItem.pszLexerName);
 	}
-	if (updateMask & StatusBarUpdateMask_CodePage) {
-		StatusSetText(hwndStatus, StatusItem_Encoding, mEncoding[iCurrentEncoding].wchLabel);
+	LPCWSTR wchLabel = mEncoding[iCurrentEncoding].wchLabel;
+	if (updateMask & StatusBarUpdateMask_Encoding) {
+		StatusSetText(hwndStatus, StatusItem_Encoding, wchLabel);
 	}
-	if (updateMask & StatusBarUpdateMask_EOLMode) {
+	if (updateMask & StatusBarUpdateMask_EolMode) {
 		StatusSetText(hwndStatus, StatusItem_EolMode, cachedStatusItem.pszEOLMode);
 	}
-	if (updateMask & StatusBarUpdateMask_OVRMode) {
+	if (updateMask & StatusBarUpdateMask_OvrMode) {
 		StatusSetText(hwndStatus, StatusItem_OvrMode, cachedStatusItem.pszOvrMode);
 	}
 	if (updateMask & StatusBarUpdateMask_DocZoom) {
 		StatusSetText(hwndStatus, StatusItem_Zoom, cachedStatusItem.tchZoom);
 	}
-	cachedStatusItem.updateMask = 0;
-	UpdateStatusBarWidth();
+	WCHAR tchDocSize[32];
+	const Sci_Position iBytes = SciCall_GetLength();
+	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
+	StatusSetText(hwndStatus, StatusItem_DocSize, tchDocSize);
+
+	aWidth[StatusItem_Empty] = 0;
+	aWidth[StatusItem_Lexer] = StatusCalcPaneWidth(hwndStatus, cachedStatusItem.pszLexerName) + 2;
+	aWidth[StatusItem_Encoding] = StatusCalcPaneWidth(hwndStatus, wchLabel) + 2;
+	aWidth[StatusItem_EolMode] = StatusCalcPaneWidth(hwndStatus, L"CR+LF");
+	aWidth[StatusItem_OvrMode] = StatusCalcPaneWidth(hwndStatus, L"OVR");
+	aWidth[StatusItem_Zoom] = StatusCalcPaneWidth(hwndStatus, L"500%");
+	aWidth[StatusItem_DocSize] = StatusCalcPaneWidth(hwndStatus, tchDocSize) + SystemMetricsForDpi(SM_CXHTHUMB, g_uCurrentDPI);
+
+	RECT rc;
+	GetClientRect(hwndMain, &rc);
+	const int cx = rc.right - rc.left;
+	int totalWidth = 0;
+	for(int i = 0; i < StatusItem_ItemCount; i++) {
+		totalWidth += aWidth[i];
+	}
+	for(int i = 0; i < StatusItem_ItemCount - 1; i++) {
+		aWidth[i + 1] += aWidth[i];
+		if(i == StatusItem_Empty - 1) {
+			aWidth[StatusItem_Empty] += cx - totalWidth;
+		}
+	}
+	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 }
 
 //=============================================================================
@@ -7606,10 +7600,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			}
 		}
 
-		if (!bInitDone) {
-			bInitDone = true;
-			UpdateStatusBarWidth();
-		}
+		bInitDone = true;
 		UpdateStatusbar();
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI

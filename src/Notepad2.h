@@ -100,6 +100,7 @@ enum {
 	StatusItem_OvrMode,
 	StatusItem_Zoom,
 	StatusItem_DocSize,
+	StatusItem_ItemCount,
 };
 #define STATUS_HELP			(255 | SBT_NOBORDERS)
 
@@ -215,7 +216,6 @@ void FindExtraIniFile(LPWSTR lpszIniFile, LPCWSTR defaultName, LPCWSTR redirectK
 void UpdateWindowTitle(void);
 void UpdateStatusbar(void);
 void UpdateStatusBarCache(int item);
-void UpdateStatusBarWidth(void);
 void UpdateToolbar(void);
 void UpdateFoldMarginWidth(void);
 void UpdateLineNumberWidth(void);
