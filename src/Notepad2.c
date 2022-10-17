@@ -7183,7 +7183,7 @@ void UpdateStatusbar(void) {
 	items[StatusItem_DocSize] = tchDocSize;
 
 	updateMask &= ~(1 << StatusItem_Empty);
-	updateMask |= (1 << StatusItem_Empty) - 1;
+	updateMask |= ((1 << StatusItem_Empty) - 1) | (1 << StatusItem_DocSize);
 	HWND hwnd = hwndStatus;
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
