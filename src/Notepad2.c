@@ -2318,6 +2318,9 @@ void ValidateUILangauge(void) {
 	case LANG_KOREAN:
 		languageMenu = IDM_LANG_KOREAN;
 		break;
+	case LANG_PORTUGUESE:
+		languageMenu = IDM_LANG_PORTUGUESE_BRAZIL;
+		break;
 	case LANG_NEUTRAL:
 	default:
 		languageMenu = IDM_LANG_USER_DEFAULT;
@@ -2352,6 +2355,9 @@ void SetUILanguage(int menu) {
 		break;
 	case IDM_LANG_KOREAN:
 		lang = MAKELANGID(LANG_KOREAN, SUBLANG_DEFAULT);
+		break;
+	case IDM_LANG_PORTUGUESE_BRAZIL:
+		lang = MAKELANGID(LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN);
 		break;
 	}
 

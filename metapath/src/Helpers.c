@@ -974,6 +974,9 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	case LANG_KOREAN:
 		folder = L"ko";
 		break;
+	case LANG_PORTUGUESE:
+		folder = "pt-BR";
+		break;
 	}
 
 	if (folder == NULL) {
