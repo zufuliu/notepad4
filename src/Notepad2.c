@@ -7158,7 +7158,7 @@ void UpdateStatusbar(void) {
 		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
-	memset(&items[0], 0, StatusItem_Lexer * sizeof(LPCWSTR));
+	memset((void *)(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {
@@ -7174,7 +7174,7 @@ void UpdateStatusbar(void) {
 	}
 
 	items[index] = start;
-	memcpy(&items[StatusItem_Lexer], &cachedStatusItem.pszLexerName, (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
+	memcpy((void *)(&items[StatusItem_Lexer]), &cachedStatusItem.pszLexerName, (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
 	items[StatusItem_Zoom] = cachedStatusItem.tchZoom;
 	items[StatusItem_DocSize] = tchDocSize;
 
