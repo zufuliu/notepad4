@@ -511,7 +511,7 @@ void StrTab2Space(LPWSTR lpsz);
 bool PathFixBackslashes(LPWSTR lpsz);
 void ExpandEnvironmentStringsEx(LPWSTR lpSrc, DWORD dwSrc);
 bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer);
-void FormatNumberStr(LPWSTR lpNumberStr);
+void FormatNumber(LPWSTR lpNumberStr, int value);
 
 void GetDefaultFavoritesDir(LPWSTR lpFavDir, int cchFavDir);
 void GetDefaultOpenWithDir(LPWSTR lpOpenWithDir, int cchOpenWithDir);

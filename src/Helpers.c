@@ -2209,6 +2209,7 @@ void StripMnemonic(LPWSTR pszMenu) {
 //
 // FormatNumberStr()
 //
+#ifndef _WIN64
 void FormatNumberStr(LPWSTR lpNumberStr) {
 	const int i = lstrlen(lpNumberStr);
 	if (i <= 3) {
@@ -2234,18 +2235,35 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 		++end;
 	} while (c > lpNumberStr);
 }
+#endif
 
-//=============================================================================
-//
-// SetDlgItemIntEx()
-//
-BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
-	WCHAR szBuf[32];
+void FormatNumber(LPWSTR lpNumberStr, ptrdiff_t value) {
+#ifdef _WIN64
+	_i64tow(value, lpNumberStr, 10);
+	if (value < 1000) {
+		return;
+	}
 
-	_ultow(uValue, szBuf, 10);
-	FormatNumberStr(szBuf);
+	WCHAR szSep[4];
+	const WCHAR sep = GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
 
-	return SetDlgItemText(hwnd, nIdItem, szBuf);
+	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
+	WCHAR *end = c;
+	lpNumberStr += 3;
+	do {
+		c -= 3;
+		memmove(c + 1, c, sizeof(WCHAR) * (end - c + 1));
+		*c = sep;
+		++end;
+	} while (c > lpNumberStr);
+
+#else
+	_ltow(value, lpNumberStr, 10);
+	if (value < 1000) {
+		return;
+	}
+	FormatNumberStr(lpNumberStr);
+#endif
 }
 
 //=============================================================================

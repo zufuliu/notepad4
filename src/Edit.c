@@ -1014,10 +1014,15 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		WCHAR tchMaxBytes[32];
 		StrFormatByteSize(fileSize.QuadPart, tchDocSize, COUNTOF(tchDocSize));
 		StrFormatByteSize(maxFileSize, tchMaxSize, COUNTOF(tchMaxSize));
+#ifdef _WIN64
+		FormatNumber(tchDocBytes, fileSize.QuadPart);
+		FormatNumber(tchMaxBytes, maxFileSize);
+#else
 		_i64tow(fileSize.QuadPart, tchDocBytes, 10);
 		_i64tow(maxFileSize, tchMaxBytes, 10);
 		FormatNumberStr(tchDocBytes);
 		FormatNumberStr(tchMaxBytes);
+#endif
 		MsgBoxWarn(MB_OK, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchDocBytes, tchMaxSize, tchMaxBytes);
 		return false;
 	}
@@ -5935,8 +5940,7 @@ void EditBookmarkSelectAll(void) {
 static void ShwowReplaceCount(Sci_Position iCount) {
 	if (iCount > 0) {
 		WCHAR tchNum[32];
-		PosToStrW(iCount, tchNum);
-		FormatNumberStr(tchNum);
+		FormatNumber(tchNum, iCount);
 		InfoBoxInfo(MB_OK, L"MsgReplaceCount", IDS_REPLCOUNT, tchNum);
 	} else {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
@@ -6131,14 +6135,12 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		PosToStrW(iCurLine, tchLn);
 		SetDlgItemText(hwnd, IDC_LINENUM, tchLn);
 
-		PosToStrW(iMaxLine, tchLn);
-		FormatNumberStr(tchLn);
+		FormatNumber(tchLn, iMaxLine);
 		GetDlgItemText(hwnd, IDC_LINE_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_LINE_RANGE, tchLines);
 
-		PosToStrW(iLength, tchLn);
-		FormatNumberStr(tchLn);
+		FormatNumber(tchLn, iLength);
 		GetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchLines);

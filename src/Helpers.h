@@ -847,7 +847,7 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
 void	StripMnemonic(LPWSTR pszMenu);
 
 void	FormatNumberStr(LPWSTR lpNumberStr);
-BOOL	SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue);
+void	FormatNumber(LPWSTR lpNumberStr, ptrdiff_t Value);
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
 void	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);

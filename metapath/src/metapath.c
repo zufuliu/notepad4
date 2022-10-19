@@ -2126,8 +2126,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				} else {
 					WCHAR tchnum[64];
 					WCHAR fmt[64];
-					_ltow(ListView_GetItemCount(hwndDirList), tchnum, 10);
-					FormatNumberStr(tchnum);
+					FormatNumber(tchnum, ListView_GetItemCount(hwndDirList));
 					FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 				}
 
@@ -2309,8 +2308,7 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 
 		WCHAR tch[256];
 		WCHAR tchnum[64];
-		_ltow(cItems, tchnum, 10);
-		FormatNumberStr(tchnum);
+		FormatNumber(tchnum, cItems);
 		WCHAR fmt[64];
 		FormatString(tch, fmt, HasFilter() ? IDS_NUMFILES_FILTER : IDS_NUMFILES, tchnum);
 		StatusSetText(hwndStatus, ID_FILEINFO, tch);

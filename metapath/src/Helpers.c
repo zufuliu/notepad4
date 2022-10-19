@@ -1508,11 +1508,11 @@ bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
 
 //=============================================================================
 //
-//  FormatNumberStr()
+//  FormatNumber()
 //
-void FormatNumberStr(LPWSTR lpNumberStr) {
-	const int i = lstrlen(lpNumberStr);
-	if (i <= 3) {
+void FormatNumber(LPWSTR lpNumberStr, int value) {
+	_ltow(value, lpNumberStr, 10);
+	if (value < 1000) {
 		return;
 	}
 
@@ -1525,7 +1525,7 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 	const WCHAR sep = GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
 #endif
 
-	WCHAR *c = lpNumberStr + i;
+	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
 	WCHAR *end = c;
 	lpNumberStr += 3;
 	do {

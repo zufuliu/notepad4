@@ -7096,24 +7096,18 @@ void UpdateStatusbar(void) {
 
 	WCHAR tchCurLine[32];
 	WCHAR tchDocLine[32];
-	PosToStrW(iLine + 1, tchCurLine);
-	PosToStrW(iLines, tchDocLine);
-	FormatNumberStr(tchCurLine);
-	FormatNumberStr(tchDocLine);
+	FormatNumber(tchCurLine, iLine + 1);
+	FormatNumber(tchDocLine, iLines);
 
 	WCHAR tchCurColumn[32];
 	WCHAR tchLineColumn[32];
-	PosToStrW(iCol + 1, tchCurColumn);
-	PosToStrW(iLineColumn, tchLineColumn);
-	FormatNumberStr(tchCurColumn);
-	FormatNumberStr(tchLineColumn);
+	FormatNumber(tchCurColumn, iCol + 1);
+	FormatNumber(tchLineColumn, iLineColumn);
 
 	WCHAR tchCurChar[32];
 	WCHAR tchLineChar[32];
-	PosToStrW(iChar + 1, tchCurChar);
-	PosToStrW(iLineChar, tchLineChar);
-	FormatNumberStr(tchCurChar);
-	FormatNumberStr(tchLineChar);
+	FormatNumber(tchCurChar, iChar + 1);
+	FormatNumber(tchLineChar, iLineChar);
 
 	WCHAR tchSelByte[32];
 	WCHAR tchSelChar[32];
@@ -7124,11 +7118,9 @@ void UpdateStatusbar(void) {
 		StrCpyExW(tchSelChar, L"0");
 	} else if (!SciCall_IsRectangleSelection()) {
 		Sci_Position iSel = SciCall_GetSelTextLength();
-		PosToStrW(iSel, tchSelByte);
-		FormatNumberStr(tchSelByte);
+		FormatNumber(tchSelByte, iSel);
 		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
-		PosToStrW(iSel, tchSelChar);
-		FormatNumberStr(tchSelChar);
+		FormatNumber(tchSelChar, iSel);
 	} else {
 		StrCpyExW(tchSelByte, L"--");
 		StrCpyExW(tchSelChar, L"--");
@@ -7147,13 +7139,11 @@ void UpdateStatusbar(void) {
 		if (iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}
-		PosToStrW(iLinesSelected, tchLinesSelected);
-		FormatNumberStr(tchLinesSelected);
+		FormatNumber(tchLinesSelected, iLinesSelected);
 	}
 
 	// find all and mark occurrences
-	PosToStrW(editMarkAllStatus.matchCount, tchMatchesCount);
-	FormatNumberStr(tchMatchesCount);
+	FormatNumber(tchMatchesCount, editMarkAllStatus.matchCount);
 	if (editMarkAllStatus.pending) {
 		lstrcat(tchMatchesCount, L" ...");
 	}
