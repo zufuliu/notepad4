@@ -161,7 +161,6 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 #endif
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 
 	SciCall_SetUndoCollection(true);
@@ -213,7 +212,6 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) {
 		SciCall_AppendText(cbText, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -261,7 +259,6 @@ void EditConvertToLargeMode(void) {
 		SciCall_AppendText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -6004,7 +6001,7 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 	if (iCount) {
 		EditEnsureSelectionVisible();
 		SciCall_EndUndoAction();
-		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+		InvalidateRect(hwnd, NULL, TRUE);
 	}
 
 	// Remove wait cursor
@@ -6098,7 +6095,7 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 		}
 
 		SciCall_EndUndoAction();
-		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+		InvalidateRect(hwnd, NULL, TRUE);
 	}
 
 	// Remove wait cursor
@@ -7870,7 +7867,7 @@ static void FinishBatchFold(void) {
 	SciCall_ScrollCaret();
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-	RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	InvalidateRect(hwndEdit, NULL, TRUE);
 }
 
 bool EditIsLineContainsStyle(Sci_Line line, int style) {
