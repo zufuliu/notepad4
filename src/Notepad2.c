@@ -7609,6 +7609,8 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		//! statusbar will be updated twice: here and after received SC_UPDATE_SELECTION.
 		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount);
 		UpdateStatusbar();
+		//! fix statusbar blink on second update from SC_UPDATE_SELECTION.
+		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount);
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {
