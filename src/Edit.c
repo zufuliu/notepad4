@@ -5638,6 +5638,7 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
+		UpdateStatusBarCache(StatusItem_Find);
 	}
 	if (editMarkAllStatus.bookmarkLine >= 0 || editMarkAllStatus.bookmarkForFindAll) {
 		if ((findFlag | editMarkAllStatus.findFlag) & NP2_MarkAllBookmark) {
@@ -5679,6 +5680,7 @@ bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 		if (ch == '^' || ch == '$') {
 			const Sci_Line lineCount = SciCall_GetLineCount();
 			editMarkAllStatus.matchCount = lineCount - (ch == '^');
+			UpdateStatusBarCache(StatusItem_Find);
 			UpdateStatusbar();
 			return true;
 		}
@@ -5826,6 +5828,7 @@ bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	status->bookmarkLine = bookmarkLine;
 	if (!pending || matchCount != status->matchCount) {
 		status->matchCount = matchCount;
+		UpdateStatusBarCache(StatusItem_Find);
 		UpdateStatusbar();
 		return true;
 	}

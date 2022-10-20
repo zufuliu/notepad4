@@ -2554,6 +2554,7 @@ bool Editor::NotifyUpdateUI() noexcept {
 		NotificationData scn = {};
 		scn.nmhdr.code = Notification::UpdateUI;
 		scn.updated = needUpdateUI;
+		scn.listType = inOverstrike;
 		NotifyParent(scn);
 		needUpdateUI = Update::None;
 		return true;

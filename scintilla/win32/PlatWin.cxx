@@ -3917,16 +3917,12 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 			const int nRows = GetVisibleRows();
 			int linesToScroll = std::clamp(nRows - 1, 1, 3);
 			linesToScroll *= (wheelDelta / WHEEL_DELTA);
+			wheelDelta %= WHEEL_DELTA;
 			int top = ListBox_GetTopIndex(lb) + linesToScroll;
 			if (top < 0) {
 				top = 0;
 			}
 			ListBox_SetTopIndex(lb, top);
-			// update wheel delta residue
-			if (wheelDelta >= 0)
-				wheelDelta = wheelDelta % WHEEL_DELTA;
-			else
-				wheelDelta = -(-wheelDelta % WHEEL_DELTA);
 		}
 		break;
 
