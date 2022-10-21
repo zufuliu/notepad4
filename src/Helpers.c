@@ -2468,7 +2468,7 @@ bool MRU_Load(LPMRULIST pmru) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	MRU_Empty(pmru);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
@@ -2501,10 +2501,9 @@ bool MRU_Save(LPCMRULIST pmru) {
 	}
 
 	WCHAR tchName[16];
-	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 	const BOOL quoted = pmru->iFlags & MRUFlags_QuoteValue;
 
 	for (int i = 0; i < pmru->iSize; i++) {

@@ -944,7 +944,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cchIniSection = (int)NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR);
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
@@ -2426,7 +2426,7 @@ void LoadSettings(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	IniSectionInit(pIniSection, 128);
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
@@ -2676,10 +2676,9 @@ void SaveSettings(bool bSaveSettingsNow) {
 	}
 
 	WCHAR wchTmp[MAX_PATH];
-	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
 	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, true);
@@ -2731,17 +2730,13 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+	NP2HeapFree(pIniSectionBuf);
 }
 
 void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
-	IniSectionOnSave section;
-	if (pIniSectionBuf == NULL) {
-		pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	} else {
-		memset(pIniSectionBuf, 0, NP2HeapSize(pIniSectionBuf));
-	}
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 
 	WCHAR sectionName[96];
 	GetWindowPositionSectionName(sectionName);
@@ -2775,7 +2770,6 @@ void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	IniSectionSetIntEx(pIniSection, L"FindWindowDlgSizeX", cxFindWindowDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
-	NP2HeapFree(pIniSectionBuf);
 }
 
 void ClearWindowPositionHistory(void) {
@@ -2978,7 +2972,7 @@ void LoadFlags(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
@@ -3546,7 +3540,7 @@ void LoadLaunchSetings(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	IniSectionInit(pIniSection, 16);
 	LoadIniSection(INI_SECTION_NAME_TARGET_APPLICATION, pIniSectionBuf, cchIniSection);

@@ -1431,7 +1431,7 @@ INT_PTR CALLBACK GetFilterDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lP
 			IniSection section;
 			WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FILTERS);
 			const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-			IniSection *pIniSection = &section;
+			IniSection * const pIniSection = &section;
 			IniSectionInit(pIniSection, 128);
 
 			LoadIniSection(INI_SECTION_NAME_FILTERS, pIniSectionBuf, cchIniSection);
@@ -2538,10 +2538,9 @@ INT_PTR CALLBACK FindTargetDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 					  GetDlgItemText(hwnd, IDC_DDETOPIC, tch, COUNTOF(tch)) == 0))) {
 				MsgBoxInfo(MB_OK, IDS_ERR_INVALIDTARGET);
 			} else {
-				IniSectionOnSave section;
 				WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TARGET_APPLICATION);
-				IniSectionOnSave *pIniSection = &section;
-				pIniSection->next = pIniSectionBuf;
+				IniSectionOnSave section = { pIniSectionBuf };
+				IniSectionOnSave * const pIniSection = &section;
 				const bool useTarget = IsButtonChecked(hwnd, IDC_LAUNCH);
 
 				if (useTarget) {
