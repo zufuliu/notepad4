@@ -494,16 +494,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			KillTimer(hwnd, ID_TIMER);
 			FindCloseChangeNotification(hChangeHandle);
 
-			// GetWindowPlacement
-			WINDOWPLACEMENT wndpl;
-			wndpl.length = sizeof(WINDOWPLACEMENT);
-			GetWindowPlacement(hwnd, &wndpl);
-
-			wi.x = wndpl.rcNormalPosition.left;
-			wi.y = wndpl.rcNormalPosition.top;
-			wi.cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-			wi.cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-
 			DirList_Destroy(hwndDirList);
 			DragAcceptFiles(hwnd, FALSE);
 
@@ -2729,11 +2719,11 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, true);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-	SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+	SaveWindowPosition(pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
 }
 
-void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
+void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave * const pIniSection = &section;
@@ -2742,7 +2732,7 @@ void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	GetWindowPositionSectionName(sectionName);
 
 	// query window dimensions when window is not minimized
-	if (bSaveSettingsNow && !IsIconic(hwndMain)) {
+	if (!IsIconic(hwndMain)) {
 		WINDOWPLACEMENT wndpl;
 		wndpl.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(hwndMain, &wndpl);

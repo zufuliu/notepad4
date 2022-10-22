@@ -142,7 +142,7 @@ void SetUILanguage(int resID);
 void LoadSettings(void);
 void SaveSettingsNow(void);
 void SaveSettings(bool bSaveSettingsNow);
-void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf);
+void SaveWindowPosition(WCHAR *pIniSectionBuf);
 void ClearWindowPositionHistory(void);
 void ParseCommandLine(void);
 void LoadFlags(void);

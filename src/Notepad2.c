@@ -1095,23 +1095,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 	case WM_ENDSESSION:
 		if (!bShutdownOK) {
-			WINDOWPLACEMENT wndpl;
-
 			EditMarkAll_Stop();
 			AutoSave_Stop(TRUE);
 			// Terminate file watching
 			InstallFileWatching(true);
-
-			// GetWindowPlacement
-			wndpl.length = sizeof(WINDOWPLACEMENT);
-			GetWindowPlacement(hwnd, &wndpl);
-
-			wi.x = wndpl.rcNormalPosition.left;
-			wi.y = wndpl.rcNormalPosition.top;
-			wi.cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-			wi.cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-			wi.max = (IsZoomed(hwnd) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
-
 			DragAcceptFiles(hwnd, FALSE);
 
 			// Terminate clipboard watching
@@ -5966,14 +5953,14 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	if (!bStickyWindowPosition) {
-		SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+		SaveWindowPosition(pIniSectionBuf);
 	}
 	NP2HeapFree(pIniSectionBuf);
 	// Scintilla Styles
 	Style_Save();
 }
 
-void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
+void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave *const pIniSection = &section;
@@ -5982,7 +5969,7 @@ void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	GetWindowPositionSectionName(sectionName);
 
 	// query window dimensions when window is not minimized
-	if (bSaveSettingsNow && !IsIconic(hwndMain)) {
+	if (!IsIconic(hwndMain)) {
 		WINDOWPLACEMENT wndpl;
 		wndpl.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(hwndMain, &wndpl);
