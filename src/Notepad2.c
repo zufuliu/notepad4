@@ -330,7 +330,7 @@ struct CachedStatusItem {
 };
 static struct CachedStatusItem cachedStatusItem;
 
-#define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= (1 << StatusItem_Line)
+#define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= ((1 << StatusItem_Line) | (1 << StatusItem_DocSize))
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
@@ -434,15 +434,6 @@ static inline void ToggleFullScreenModeConfig(int config) {
 	}
 	if (bInFullScreenMode && config != FullScreenMode_OnStartup) {
 		ToggleFullScreenMode();
-	}
-}
-
-static inline void UpdateStatusBarCache_OVRMode(BOOL force) {
-	const BOOL overType = SciCall_GetOvertype();
-	if (force || overType != cachedStatusItem.overType) {
-		cachedStatusItem.updateMask |= (1 << StatusItem_OvrMode);
-		cachedStatusItem.overType = overType;
-		cachedStatusItem.pszOvrMode = overType ? L"OVR" : L"INS";
 	}
 }
 
@@ -851,7 +842,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		iSrcEncoding = Encoding_Match(lpEncodingArg);
 	}
 
-	UpdateStatusBarCache_OVRMode(TRUE);
+	UpdateStatusBarCache(StatusItem_OvrMode);
 	UpdateStatusBarCache(StatusItem_Zoom);
 	bool bOpened = false;
 	bool bFileLoadCalled = false;
@@ -1104,23 +1095,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 	case WM_ENDSESSION:
 		if (!bShutdownOK) {
-			WINDOWPLACEMENT wndpl;
-
 			EditMarkAll_Stop();
 			AutoSave_Stop(TRUE);
 			// Terminate file watching
 			InstallFileWatching(true);
-
-			// GetWindowPlacement
-			wndpl.length = sizeof(WINDOWPLACEMENT);
-			GetWindowPlacement(hwnd, &wndpl);
-
-			wi.x = wndpl.rcNormalPosition.left;
-			wi.y = wndpl.rcNormalPosition.top;
-			wi.cx = wndpl.rcNormalPosition.right - wndpl.rcNormalPosition.left;
-			wi.cy = wndpl.rcNormalPosition.bottom - wndpl.rcNormalPosition.top;
-			wi.max = (IsZoomed(hwnd) || (wndpl.flags & WPF_RESTORETOMAXIMIZED));
-
 			DragAcceptFiles(hwnd, FALSE);
 
 			// Terminate clipboard watching
@@ -2068,7 +2046,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_TOOLBAR_LABELS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
@@ -2106,12 +2084,10 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
 	//SendMessage(hwndToolbar, TB_SETINDENT, 2, 0);
 
-	cachedStatusItem.updateMask = (1 << StatusItem_ItemCount) - 1;
+	cachedStatusItem.updateMask = ((1 << StatusItem_ItemCount) - 1) ^ (1 << StatusItem_Empty);
 	GetString(IDS_STATUSITEM_FORMAT, cachedStatusItem.tchItemFormat, COUNTOF(cachedStatusItem.tchItemFormat));
 	const DWORD dwStatusbarStyle = bShowStatusbar ? (WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE) : (WS_CHILD | WS_CLIPSIBLINGS);
 	hwndStatus = CreateStatusWindow(dwStatusbarStyle, NULL, hwnd, IDC_STATUSBAR);
-	const int aWidth[StatusItem_ItemCount] = {0};
-	SendMessage(hwndStatus, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
 
 	// Create ReBar and add Toolbar
 	const DWORD dwReBarStyle = bShowToolbar ? (WS_REBAR | WS_VISIBLE) : WS_REBAR;
@@ -2272,25 +2248,28 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 }
 
 void UpdateStatusBarCache(int item) {
+	cachedStatusItem.updateMask |= (1 << item);
 	switch (item) {
 	case StatusItem_Lexer:
-		cachedStatusItem.updateMask |= (1 << StatusItem_Lexer);
 		cachedStatusItem.pszLexerName = Style_GetCurrentLexerName(cachedStatusItem.tchLexerName, MAX_EDITLEXER_NAME_SIZE);
 		break;
 
 	case StatusItem_Encoding:
 		Encoding_GetLabel(iCurrentEncoding);
-		cachedStatusItem.updateMask |= (1 << StatusItem_Encoding);
 		cachedStatusItem.pszEncoding = mEncoding[iCurrentEncoding].wchLabel;
 		break;
 
 	case StatusItem_EolMode:
-		cachedStatusItem.updateMask |= (1 << StatusItem_EolMode);
 		cachedStatusItem.pszEolMode = (iCurrentEOLMode == SC_EOL_LF) ? L"LF" : ((iCurrentEOLMode == SC_EOL_CR) ? L"CR" : L"CR+LF");
 		break;
 
+	case StatusItem_OvrMode: {
+		const BOOL overType = SciCall_GetOvertype();
+		cachedStatusItem.overType = overType;
+		cachedStatusItem.pszOvrMode = overType ? L"OVR" : L"INS";
+	} break;
+
 	case StatusItem_Zoom:
-		cachedStatusItem.updateMask |= (1 << StatusItem_Zoom);
 		wsprintf(cachedStatusItem.tchZoom, L"%i%%", iZoomLevel);
 		break;
 	}
@@ -2318,6 +2297,9 @@ void ValidateUILangauge(void) {
 	case LANG_KOREAN:
 		languageMenu = IDM_LANG_KOREAN;
 		break;
+	case LANG_PORTUGUESE:
+		languageMenu = IDM_LANG_PORTUGUESE_BRAZIL;
+		break;
 	case LANG_NEUTRAL:
 	default:
 		languageMenu = IDM_LANG_USER_DEFAULT;
@@ -2341,7 +2323,7 @@ void SetUILanguage(int menu) {
 	case IDM_LANG_CHINESE_TRADITIONAL:
 		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
 		break;
-	case LANG_GERMAN:
+	case IDM_LANG_GERMAN:
 		lang = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
 		break;
 	case IDM_LANG_ITALIAN:
@@ -2352,6 +2334,9 @@ void SetUILanguage(int menu) {
 		break;
 	case IDM_LANG_KOREAN:
 		lang = MAKELANGID(LANG_KOREAN, SUBLANG_DEFAULT);
+		break;
+	case IDM_LANG_PORTUGUESE_BRAZIL:
+		lang = MAKELANGID(LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN);
 		break;
 	}
 
@@ -4656,6 +4641,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_CHINESE_SIMPLIFIED:
 	case IDM_LANG_CHINESE_TRADITIONAL:
 	case IDM_LANG_JAPANESE:
+	case IDM_LANG_GERMAN:
+	case IDM_LANG_ITALIAN:
+	case IDM_LANG_KOREAN:
+	case IDM_LANG_PORTUGUESE_BRAZIL:
 		SetUILanguage(LOWORD(wParam));
 		break;
 #endif
@@ -5009,8 +4998,16 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				UpdateToolbar();
 
 				bool updated = false;
-				if (scn->updated & (SC_UPDATE_SELECTION)) {
-					UpdateStatusBarCache_OVRMode(FALSE);
+				if (scn->updated & SC_UPDATE_SELECTION) {
+					const int overType = scn->listType;
+					cachedStatusItem.updateMask |= (1 << StatusItem_Character) | (1 << StatusItem_Column)
+						| (1 << StatusItem_Selection) | (1 << StatusItem_SelectedLine);
+					if (overType != cachedStatusItem.overType) {
+						cachedStatusItem.updateMask |= (1 << StatusItem_OvrMode);
+						cachedStatusItem.overType = overType;
+						cachedStatusItem.pszOvrMode = overType ? L"OVR" : L"INS";
+					}
+
 					// mark occurrences of text currently selected
 					if (editMarkAllStatus.ignoreSelectionUpdate) {
 						editMarkAllStatus.ignoreSelectionUpdate = false;
@@ -5023,7 +5020,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 							updated = EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 						}
 					}
-				} else if (scn->updated & (SC_UPDATE_CONTENT)) {
+				} else if (scn->updated & SC_UPDATE_CONTENT) {
 					if (editMarkAllStatus.matchCount) {
 						updated = EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 					}
@@ -5427,7 +5424,7 @@ void LoadSettings(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
 	LoadIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf, cchIniSection);
@@ -5816,10 +5813,9 @@ void SaveSettings(bool bSaveSettingsNow) {
 	}
 
 	WCHAR wchTmp[MAX_PATH];
-	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 
 	//IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
@@ -5957,27 +5953,23 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	if (!bStickyWindowPosition) {
-		SaveWindowPosition(bSaveSettingsNow, pIniSectionBuf);
+		SaveWindowPosition(pIniSectionBuf);
 	}
+	NP2HeapFree(pIniSectionBuf);
 	// Scintilla Styles
 	Style_Save();
 }
 
-void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
-	IniSectionOnSave section;
-	if (pIniSectionBuf == NULL) {
-		pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
-	} else {
-		memset(pIniSectionBuf, 0, NP2HeapSize(pIniSectionBuf));
-	}
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+void SaveWindowPosition(WCHAR *pIniSectionBuf) {
+	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave *const pIniSection = &section;
 
 	WCHAR sectionName[96];
 	GetWindowPositionSectionName(sectionName);
 
 	// query window dimensions when window is not minimized
-	if (bSaveSettingsNow && !IsIconic(hwndMain)) {
+	if (!IsIconic(hwndMain)) {
 		WINDOWPLACEMENT wndpl;
 		wndpl.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(hwndMain, &wndpl);
@@ -6024,7 +6016,6 @@ void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf) {
 	IniSectionSetIntEx(pIniSection, L"StyleCustomizeDlgSizeY", cyStyleCustomizeDlg, 0);
 
 	SaveIniSection(sectionName, pIniSectionBuf);
-	NP2HeapFree(pIniSectionBuf);
 }
 
 void ClearWindowPositionHistory(void) {
@@ -6703,7 +6694,7 @@ void LoadFlags(void) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_FLAGS);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 	IniSectionInit(pIniSection, 64);
 
 	LoadIniSection(INI_SECTION_NAME_FLAGS, pIniSectionBuf, cchIniSection);
@@ -7063,14 +7054,15 @@ void UpdateStatusbar(void) {
 #endif
 	struct Sci_TextToFindFull ft = { { SciCall_PositionFromLine(iLine), iPos }, NULL, { 0, 0 } };
 	SciCall_CountCharactersAndColumns(&ft);
-	const Sci_Position iChar = ft.chrgText.cpMin;
-	const Sci_Position iCol = ft.chrgText.cpMax;
+	const Sci_Position iChar = ft.chrgText.cpMin + 1;
+	const Sci_Position iCol = ft.chrgText.cpMax + 1;
 	Sci_Position iLineChar;
 	Sci_Position iLineColumn;
 
 	UINT updateMask = cachedStatusItem.updateMask;
 	cachedStatusItem.updateMask = 0;
 	if ((updateMask & (1 << StatusItem_Line)) || (iLine != cachedStatusItem.iLine)) {
+		updateMask |= (1 << StatusItem_Line);
 		ft.chrg.cpMin = ft.chrg.cpMax;
 		ft.chrg.cpMax = SciCall_GetLineEndPosition(iLine);
 		SciCall_CountCharactersAndColumns(&ft);
@@ -7090,50 +7082,47 @@ void UpdateStatusbar(void) {
 
 	WCHAR tchCurLine[32];
 	WCHAR tchDocLine[32];
-	PosToStrW(iLine + 1, tchCurLine);
-	PosToStrW(iLines, tchDocLine);
-	FormatNumberStr(tchCurLine);
-	FormatNumberStr(tchDocLine);
+	FormatNumber(tchCurLine, iLine + 1);
+	FormatNumber(tchDocLine, iLines);
 
 	WCHAR tchCurColumn[32];
 	WCHAR tchLineColumn[32];
-	PosToStrW(iCol + 1, tchCurColumn);
-	PosToStrW(iLineColumn, tchLineColumn);
-	FormatNumberStr(tchCurColumn);
-	FormatNumberStr(tchLineColumn);
+	FormatNumber(tchCurColumn, iCol);
+	FormatNumber(tchLineColumn, iLineColumn);
 
 	WCHAR tchCurChar[32];
 	WCHAR tchLineChar[32];
-	PosToStrW(iChar + 1, tchCurChar);
-	PosToStrW(iLineChar, tchLineChar);
-	FormatNumberStr(tchCurChar);
-	FormatNumberStr(tchLineChar);
+	FormatNumber(tchCurChar, iChar);
+	FormatNumber(tchLineChar, iLineChar);
 
 	WCHAR tchSelByte[32];
 	WCHAR tchSelChar[32];
+	WCHAR tchLinesSelected[32];
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	if (iSelStart == iSelEnd) {
-		StrCpyExW(tchSelByte, L"0");
-		StrCpyExW(tchSelChar, L"0");
-	} else if (!SciCall_IsRectangleSelection()) {
-		Sci_Position iSel = SciCall_GetSelTextLength();
-		PosToStrW(iSel, tchSelByte);
-		FormatNumberStr(tchSelByte);
-		iSel = SciCall_CountCharacters(iSelStart, iSelEnd);
-		PosToStrW(iSel, tchSelChar);
-		FormatNumberStr(tchSelChar);
+		tchSelByte[0] = L'0';
+		tchSelByte[1] = L'\0';
+		tchSelChar[0] = L'0';
+		tchSelChar[1] = L'\0';
+		tchLinesSelected[0] = L'0';
+		tchLinesSelected[1] = L'\0';
 	} else {
-		StrCpyExW(tchSelByte, L"--");
-		StrCpyExW(tchSelChar, L"--");
-	}
+		if (!SciCall_IsRectangleSelection()) {
+			const Sci_Position iSelByte = SciCall_GetSelTextLength();
+			const Sci_Position iSelChar = SciCall_CountCharacters(iSelStart, iSelEnd);
+			FormatNumber(tchSelByte, iSelByte);
+			FormatNumber(tchSelChar, iSelChar);
+		} else {
+			tchSelByte[0] = L'-';
+			tchSelByte[1] = L'-';
+			tchSelByte[2] = L'\0';
+			tchSelChar[0] = L'-';
+			tchSelChar[1] = L'-';
+			tchSelChar[2] = L'\0';
+		}
 
-	// Print number of selected lines in statusbar
-	WCHAR tchLinesSelected[32];
-	WCHAR tchMatchesCount[32];
-	if (iSelStart == iSelEnd) {
-		StrCpyExW(tchLinesSelected, L"0");
-	} else {
+		// Print number of selected lines in statusbar
 		const Sci_Line iStartLine = SciCall_LineFromPosition(iSelStart);
 		const Sci_Line iEndLine = SciCall_LineFromPosition(iSelEnd);
 		const Sci_Position iStartOfLinePos = SciCall_PositionFromLine(iEndLine);
@@ -7141,20 +7130,21 @@ void UpdateStatusbar(void) {
 		if (iStartOfLinePos != iSelEnd) {
 			iLinesSelected += 1;
 		}
-		PosToStrW(iLinesSelected, tchLinesSelected);
-		FormatNumberStr(tchLinesSelected);
+		FormatNumber(tchLinesSelected, iLinesSelected);
 	}
 
 	// find all and mark occurrences
-	PosToStrW(editMarkAllStatus.matchCount, tchMatchesCount);
-	FormatNumberStr(tchMatchesCount);
+	WCHAR tchMatchesCount[32];
+	FormatNumber(tchMatchesCount, editMarkAllStatus.matchCount);
 	if (editMarkAllStatus.pending) {
 		lstrcat(tchMatchesCount, L" ...");
 	}
 
 	WCHAR tchDocSize[32];
-	const Sci_Position iBytes = SciCall_GetLength();
-	StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
+	if (updateMask & (1 << StatusItem_DocSize)) {
+		const Sci_Position iBytes = SciCall_GetLength();
+		StrFormatByteSize(iBytes, tchDocSize, COUNTOF(tchDocSize));
+	}
 
 	WCHAR itemText[256];
 	const int len = wsprintf(itemText, cachedStatusItem.tchItemFormat, tchCurLine, tchDocLine,
@@ -7162,7 +7152,7 @@ void UpdateStatusbar(void) {
 		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
-	memset(&items[0], 0, StatusItem_Lexer * sizeof(LPCWSTR));
+	memset((void *)(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {
@@ -7178,28 +7168,30 @@ void UpdateStatusbar(void) {
 	}
 
 	items[index] = start;
-	memcpy(&items[StatusItem_Lexer], &cachedStatusItem.pszLexerName, (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
+	memcpy((void *)(&items[StatusItem_Lexer]), &cachedStatusItem.pszLexerName, (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
 	items[StatusItem_Zoom] = cachedStatusItem.tchZoom;
 	items[StatusItem_DocSize] = tchDocSize;
 
-	updateMask &= ~(1 << StatusItem_Empty);
-	updateMask |= (1 << StatusItem_Empty) - 1;
-	HWND hwnd = hwndStatus;
-	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
-	for (int i = 0; i < StatusItem_ItemCount; i++) {
-		if (updateMask & 1) {
-			StatusSetText(hwnd, i, items[i]);
-		}
-		updateMask >>= 1;
-	}
-
+	static int cachedWidth[StatusItem_ItemCount];
 	int aWidth[StatusItem_ItemCount];
+	HWND hwnd = hwndStatus;
 	HDC hdc = GetDC(hwnd);
 	int totalWidth = 0;
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
-		SIZE size;
-		GetTextExtentPoint32(hdc, items[i], lstrlen(items[i]), &size);
-		const int width = size.cx + 9;
+		int width;
+		if (updateMask & 1) {
+			SIZE size;
+			LPCWSTR lpsz = items[i];
+			//GetTextExtentPoint32(hdc, lpsz, lstrlen(lpsz), &size);
+			GetTextExtentExPoint(hdc, lpsz, lstrlen(lpsz), 0, NULL, NULL, &size);
+			//width = size.cx + 9;
+			width = NP2_align_up(size.cx + 4, 16);
+			cachedWidth[i] = width;
+		} else {
+			width = cachedWidth[i];
+			items[i] = NULL;
+		}
+		updateMask >>= 1;
 		totalWidth += width;
 		aWidth[i] = width;
 	}
@@ -7211,14 +7203,26 @@ void UpdateStatusbar(void) {
 
 	totalWidth += thumb;
 	totalWidth -= aWidth[StatusItem_Empty];
-	aWidth[StatusItem_Empty] = rc.right - rc.left - totalWidth;
+	aWidth[StatusItem_Empty] = NP2_align_up(rc.right - rc.left, 8) - totalWidth;
 	aWidth[StatusItem_DocSize] += thumb;
 	for(int i = 1; i < StatusItem_ItemCount; i++) {
 		aWidth[i] += aWidth[i - 1];
 	}
+
+	if (updateMask == 0) {
+		SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
+	}
 	SendMessage(hwnd, SB_SETPARTS, COUNTOF(aWidth), (LPARAM)aWidth);
-	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
-	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	for (int i = 0; i < StatusItem_ItemCount; i++) {
+		LPCWSTR lpsz = items[i];
+		if (lpsz) {
+			StatusSetText(hwnd, i, lpsz);
+		}
+	}
+	if (updateMask == 0) {
+		SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
+		InvalidateRect(hwnd, NULL, TRUE);
+	}
 }
 
 //=============================================================================
@@ -7586,7 +7590,12 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		}
 
 		bInitDone = true;
-		//UpdateStatusbar();
+		//! workaround for blank statusbar after loading large file.
+		//! statusbar will be updated twice: here and after received SC_UPDATE_SELECTION.
+		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount);
+		UpdateStatusbar();
+		//! fix statusbar blink on second update from SC_UPDATE_SELECTION.
+		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount);
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {
@@ -8525,10 +8534,8 @@ void SetNotifyIconTitle(HWND hwnd) {
 
 	if (IsDocumentModified()) {
 		StrCpyExW(nid.szTip, L"* ");
-	} else {
-		StrCpyExW(nid.szTip, L"");
 	}
-	lstrcat(nid.szTip, tchTitle);
+	StrCatBuff(nid.szTip, tchTitle, COUNTOF(nid.szTip));
 
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
