@@ -2209,7 +2209,7 @@ void StripMnemonic(LPWSTR pszMenu) {
 //
 // FormatNumberStr()
 //
-#ifndef _WIN64
+#ifdef _WIN64
 void FormatNumberStr(LPWSTR lpNumberStr) {
 	const int i = lstrlen(lpNumberStr);
 	if (i <= 3) {
