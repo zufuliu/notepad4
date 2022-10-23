@@ -7187,7 +7187,9 @@ void UpdateStatusbar(void) {
 	HWND hwnd = hwndStatus;
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
-		StatusSetText(hwnd, i, items[i]);
+		if (updateMask & 1) {
+			StatusSetText(hwnd, i, items[i]);
+		}
 		updateMask >>= 1;
 	}
 
@@ -7197,7 +7199,7 @@ void UpdateStatusbar(void) {
 	for (int i = 0; i < StatusItem_ItemCount; i++) {
 		SIZE size;
 		GetTextExtentPoint32(hdc, items[i], lstrlen(items[i]), &size);
-		const int width = size.cx + 2;
+		const int width = size.cx + 9;
 		totalWidth += width;
 		aWidth[i] = width;
 	}
