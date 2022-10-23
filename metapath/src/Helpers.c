@@ -974,6 +974,9 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	case LANG_KOREAN:
 		folder = L"ko";
 		break;
+	case LANG_PORTUGUESE:
+		folder = L"pt-BR";
+		break;
 	}
 
 	if (folder == NULL) {
@@ -1505,11 +1508,11 @@ bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
 
 //=============================================================================
 //
-//  FormatNumberStr()
+//  FormatNumber()
 //
-void FormatNumberStr(LPWSTR lpNumberStr) {
-	const int i = lstrlen(lpNumberStr);
-	if (i <= 3) {
+void FormatNumber(LPWSTR lpNumberStr, int value) {
+	_ltow(value, lpNumberStr, 10);
+	if (value < 1000) {
 		return;
 	}
 
@@ -1522,7 +1525,7 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 	const WCHAR sep = GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
 #endif
 
-	WCHAR *c = lpNumberStr + i;
+	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
 	WCHAR *end = c;
 	lpNumberStr += 3;
 	do {
@@ -1870,7 +1873,7 @@ bool MRU_Load(LPMRULIST pmru) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	MRU_Empty(pmru);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
@@ -1903,10 +1906,9 @@ bool MRU_Save(LPCMRULIST pmru) {
 	}
 
 	WCHAR tchName[16];
-	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (StrNotEmpty(pmru->pszItems[i])) {

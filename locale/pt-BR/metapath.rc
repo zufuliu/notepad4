@@ -18,10 +18,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Korean (Korea) resources
+// Portuguese (Brazil) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
-LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_PTB)
+LANGUAGE LANG_PORTUGUESE, SUBLANG_PORTUGUESE_BRAZILIAN
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -72,78 +72,78 @@ IDR_MAINWND MENU
 BEGIN
 	POPUP "+"
 	BEGIN
-		MENUITEM "열기 (동일한 창)(&O)",			IDM_FILE_OPENSAME
-		MENUITEM "열기 (새 창)(&E)",			IDM_FILE_OPENNEW
-		MENUITEM "실행(&R)...",						IDM_FILE_RUN
-		MENUITEM "실행(&L)",						IDM_FILE_LAUNCH
-		MENUITEM "빠른 보기(&Q)",					IDM_FILE_QUICKVIEW
-		MENUITEM "다음으로 열기(&W)...",				IDM_FILE_OPENWITH
-		MENUITEM "파일 이름 복사(&C)",					IDM_POP_COPY_FILENAME
-		MENUITEM "경로 이름 복사(&T)",				IDM_POP_COPY_PATHNAME
+		MENUITEM "&Open (Same Window)",			IDM_FILE_OPENSAME
+		MENUITEM "Open (N&ew Window)",			IDM_FILE_OPENNEW
+		MENUITEM "&Run...",						IDM_FILE_RUN
+		MENUITEM "&Launch",						IDM_FILE_LAUNCH
+		MENUITEM "&Quickview",					IDM_FILE_QUICKVIEW
+		MENUITEM "Open &with...",				IDM_FILE_OPENWITH
+		MENUITEM "&Copy File Name",				IDM_POP_COPY_FILENAME
+		MENUITEM "Copy Pa&th Name",				IDM_POP_COPY_PATHNAME
 		MENUITEM SEPARATOR
-		MENUITEM "탐색기에서 보기(&E)",			IDM_FILE_EXPLORER
-		MENUITEM "링크 만들기(&K)...",				IDM_FILE_CREATELINK
-		MENUITEM "다른 이름으로 저장(&S)...",					IDM_FILE_SAVEAS
-		MENUITEM "복사/이동(&M)...",				IDM_FILE_COPYMOVE
-		MENUITEM "삭제(D&)...",					IDM_FILE_DELETE
-		MENUITEM "이름 바꾸기(&N)...",					IDM_FILE_RENAME
+		MENUITEM "Show in E&xplorer",			IDM_FILE_EXPLORER
+		MENUITEM "Create Lin&k...",				IDM_FILE_CREATELINK
+		MENUITEM "&Save As...",					IDM_FILE_SAVEAS
+		MENUITEM "Copy/&Move...",				IDM_FILE_COPYMOVE
+		MENUITEM "&Delete...",					IDM_FILE_DELETE
+		MENUITEM "Re&name...",					IDM_FILE_RENAME
 		MENUITEM SEPARATOR
-		MENUITEM "속성(&P)",					IDM_FILE_PROPERTIES
+		MENUITEM "&Properties",					IDM_FILE_PROPERTIES
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "새 파일(&N)...",				IDM_FILE_NEW
-		MENUITEM "새 디렉토리(&W)...",			IDM_FILE_NEWDIR
+		MENUITEM "&New File...",				IDM_FILE_NEW
+		MENUITEM "Ne&w Directory...",			IDM_FILE_NEWDIR
 		MENUITEM SEPARATOR
-		MENUITEM "파일 필터(&L)...",				IDM_VIEW_FILTER
-		MENUITEM "필터 초기화(&R)",				IDM_VIEW_FILTERALL
-		POPUP "보기(&S)"
+		MENUITEM "File Fi&lter...",				IDM_VIEW_FILTER
+		MENUITEM "&Reset Filter",				IDM_VIEW_FILTERALL
+		POPUP "&Show"
 		BEGIN
-			MENUITEM "디렉토리(&D)",			IDM_VIEW_FOLDERS
-			MENUITEM "파일(&F)",					IDM_VIEW_FILES
-			MENUITEM "시스템 개체(&S)",			IDM_VIEW_HIDDEN
+			MENUITEM "&Directories",			IDM_VIEW_FOLDERS
+			MENUITEM "&Files",					IDM_VIEW_FILES
+			MENUITEM "&System Objects",			IDM_VIEW_HIDDEN
 		END
-		POPUP "정렬(&T)"
+		POPUP "Sor&t"
 		BEGIN
-			MENUITEM "이름순(&N)",				IDM_SORT_NAME
-			MENUITEM "크기순(&S)",				IDM_SORT_SIZE
-			MENUITEM "종류순(&T)",				IDM_SORT_TYPE
-			MENUITEM "날짜순(&D)",				IDM_SORT_DATE
+			MENUITEM "by &Name",				IDM_SORT_NAME
+			MENUITEM "by &Size",				IDM_SORT_SIZE
+			MENUITEM "by &Type",				IDM_SORT_TYPE
+			MENUITEM "by &Date",				IDM_SORT_DATE
 			MENUITEM SEPARATOR
-			MENUITEM "역순(&R)",				IDM_SORT_REVERSE
+			MENUITEM "&Reverse",				IDM_SORT_REVERSE
 		END
 		MENUITEM SEPARATOR
-		MENUITEM "탐색기에서 열기(&E)",			IDM_FILE_EXPLORER
-		MENUITEM "즐겨찾기로 이동(&F)",				IDM_VIEW_FAVORITES
-		MENUITEM "즐겨찾기 편집(&O)",				IDM_VIEW_EDITFAVORITES
-		MENUITEM "디렉토리(&D)...",				IDM_FILE_CHANGEDIR
-		MENUITEM "이동(&G)...",					IDM_FILE_GOTO
+		MENUITEM "Open in &Explorer",			IDM_FILE_EXPLORER
+		MENUITEM "Goto &Favorites",				IDM_VIEW_FAVORITES
+		MENUITEM "&Open Favorites",				IDM_VIEW_EDITFAVORITES
+		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
+		MENUITEM "&Goto...",					IDM_FILE_GOTO
 		MENUITEM SEPARATOR
-		MENUITEM "드라이브 보이기(&V)",				IDM_VIEW_DRIVEBOX
-		MENUITEM "맨 위에 유지(&K)",				IDM_VIEW_ALWAYSONTOP
+		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
+		MENUITEM "&Keep on Top",				IDM_VIEW_ALWAYSONTOP
 		MENUITEM SEPARATOR
-		MENUITEM "설정 저장(&I)",				IDM_VIEW_SAVESETTINGS
-		MENUITEM "대상 지정(&U)...",			IDM_VIEW_FINDTARGET
-		MENUITEM "옵션(&P)...",					IDM_VIEW_OPTIONS
+		MENUITEM "Save Sett&ings",				IDM_VIEW_SAVESETTINGS
+		MENUITEM "Set&up Target...",			IDM_VIEW_FINDTARGET
+		MENUITEM "O&ptions...",					IDM_VIEW_OPTIONS
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "디렉토리(&D)...",				IDM_FILE_CHANGEDIR
-		MENUITEM "드라이브 속성(&P)",			IDM_FILE_DRIVEPROP
+		MENUITEM "&Directory...",				IDM_FILE_CHANGEDIR
+		MENUITEM "Drive &Properties",			IDM_FILE_DRIVEPROP
 		MENUITEM SEPARATOR
-		MENUITEM "드라이브 보이기(&V)",				IDM_VIEW_DRIVEBOX
+		MENUITEM "Show Dri&ves",				IDM_VIEW_DRIVEBOX
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "도구 모음 보이기(&T)",				IDM_VIEW_TOOLBAR
-		MENUITEM "도구 모음 편집(&E)...",		IDM_VIEW_CUSTOMIZETB
-		MENUITEM "상태 표시줄 보이기(&S)",				IDM_VIEW_STATUSBAR
+		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
+		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
 	BEGIN
-		MENUITEM "Metapath 열기(&O)",				IDM_TRAY_RESTORE
+		MENUITEM "&Open metapath",				IDM_TRAY_RESTORE
 		MENUITEM SEPARATOR
-		MENUITEM "Metapath 종료(&X)",				IDM_TRAY_EXIT
+		MENUITEM "E&xit metapath",				IDM_TRAY_EXIT
 	END
 END
 
@@ -223,8 +223,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_NOFAILCREATE | WS_POPUP | WS
 CAPTION "metapath"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "확인",IDOK,142,75,50,14
-    PUSHBUTTON      "복사",IDC_COPY_BUILD_INFO,198,75,50,14
+    DEFPUSHBUTTON   "OK",IDOK,142,75,50,14
+    PUSHBUTTON      "Copy",IDC_COPY_BUILD_INFO,198,75,50,14
     ICON            IDR_MAINWND,IDC_STATIC,7,7,20,20
     LTEXT           "",IDC_VERSION,45,7,200,8
     LTEXT           "",IDC_BUILD_INFO,45,18,200,8
@@ -234,238 +234,238 @@ BEGIN
     LTEXT           "Copyright © 2011-2022 Zufu Liu and all contributors.",IDC_STATIC,45,52,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,60,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,60,200,10
-    LTEXT           "Florian Balmer에게 연락:",IDC_STATIC,45,72,94,8
+    LTEXT           "Contact Florian Balmer:",IDC_STATIC,45,72,94,8
     LTEXT           "",IDC_EMAIL_TEXT,45,80,94,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_EMAIL_LINK,"SysLink",WS_TABSTOP,45,80,94,10
 END
 
 IDD_RUN DIALOGEX 0, 0, 234, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "실행"
+CAPTION "Run"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_RUN,IDC_STATIC,7,7,20,20
-    LTEXT           "실행할 실행 프로그램 파일, 폴더 또는 문서의 이름을 입력합니다.",IDC_RUNDESC,35,7,188,17
+    LTEXT           "Enter the name of an executable program file, a folder or a document to open.",IDC_RUNDESC,35,7,188,17
     EDITTEXT        IDC_COMMANDLINE,7,35,203,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_SEARCHEXE,215,35,14,14
-    DEFPUSHBUTTON   "확인",IDOK,121,65,50,14
-    PUSHBUTTON      "취소",IDCANCEL,177,65,50,14
+    DEFPUSHBUTTON   "OK",IDOK,121,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,177,65,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,65,10,10
 END
 
 IDD_OPENWITH DIALOGEX 0, 0, 165, 128
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "다음으로 열기..."
+CAPTION "Open with..."
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "",IDC_OPENWITHDIR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,7,151,69
     PUSHBUTTON      "",IDC_GETOPENWITHDIR,7,83,13,13
-    LTEXT           "즐겨 찾는 응용프로그램에 대한 링크가 있는 디렉토리를 지정하려면 여기를 클릭하십시오.",IDC_OPENWITHDESCR,26,83,132,18
-    DEFPUSHBUTTON   "확인",IDOK,52,107,50,14
-    PUSHBUTTON      "취소",IDCANCEL,108,107,50,14
+    LTEXT           "Click here to specify the directory with links to your favorite applications.",IDC_OPENWITHDESCR,26,83,132,18
+    DEFPUSHBUTTON   "OK",IDOK,52,107,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,108,107,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,112,10,10
 END
 
 IDD_GOTO DIALOGEX 0, 0, 224, 87
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "이동"
+CAPTION "Goto"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_GOTO,IDC_STATIC,7,7,20,20
-    LTEXT           "열려는 파일 또는 디렉토리의 이름을 입력하거나 목록에서 최근에 방문한 디렉토리를 선택하십시오.",IDC_GOTODESC,35,7,182,17
+    LTEXT           "Enter the name of a file or directory to open, or select a recently visited directory from the list.",IDC_GOTODESC,35,7,182,17
     COMBOBOX        IDC_GOTO,7,35,210,126,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "확인",IDOK,111,66,50,14,WS_DISABLED
-    PUSHBUTTON      "취소",IDCANCEL,167,66,50,14
+    DEFPUSHBUTTON   "OK",IDOK,111,66,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,167,66,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,70,10,10
 END
 
 IDD_FILTER DIALOGEX 0, 0, 204, 79
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "파일 필터"
+CAPTION "File Filter"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "새 파일 필터를 지정하십시오. 여러 필터를 ;로 분리(&F)",IDC_STATIC,7,7,190,8
+    LTEXT           "Specify a new file &filter. Separate multiple filters by ;",IDC_STATIC,7,7,190,8
     EDITTEXT        IDC_FILTER,7,22,171,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSEFILTER,183,22,14,14
-    AUTOCHECKBOX    "필터와 일치하는 파일을 제외(&E).",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
-    DEFPUSHBUTTON   "확인",IDOK,91,58,50,14
-    PUSHBUTTON      "취소",IDCANCEL,147,58,50,14
+    AUTOCHECKBOX    "&Exclude files matching the filter.",IDC_NEGFILTER,7,40,170,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,91,58,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,147,58,50,14
     SCROLLBAR       IDC_RESIZEGRIP3,7,58,10,10
 END
 
-IDD_RENAME DIALOGEX 0, 0, 190, 74
+IDD_RENAME DIALOGEX 0, 0, 172, 74
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "이름 바꾸기"
+CAPTION "Rename"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "현재:",IDC_STATIC,3,9,50,8,SS_RIGHT
-    EDITTEXT        IDC_OLDNAME,55,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "새 이름(&N):",IDC_STATIC,3,27,50,8,SS_RIGHT
-    EDITTEXT        IDC_NEWNAME,55,26,126,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "확인",IDOK,59,53,50,14,WS_DISABLED
-    PUSHBUTTON      "취소",IDCANCEL,115,53,50,14
+    LTEXT           "Current:",IDC_STATIC,7,9,28,8,SS_RIGHT
+    EDITTEXT        IDC_OLDNAME,39,7,126,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "&New:",IDC_STATIC,7,27,28,8,SS_RIGHT
+    EDITTEXT        IDC_NEWNAME,39,26,126,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,59,53,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,115,53,50,14
     SCROLLBAR       IDC_RESIZEGRIP2,7,53,10,10
 END
 
 IDD_NEWDIR DIALOGEX 0, 0, 172, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "새 디렉토리"
+CAPTION "New Directory"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "새 디렉토리의 이름 입력:",IDC_STATIC,7,7,158,8
+    LTEXT           "Enter the name for the new directory:",IDC_STATIC,7,7,158,8
     EDITTEXT        IDC_NEWDIR,7,22,158,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "확인",IDOK,59,45,50,14,WS_DISABLED
-    PUSHBUTTON      "취소",IDCANCEL,115,45,50,14
+    DEFPUSHBUTTON   "OK",IDOK,59,45,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,115,45,50,14
     SCROLLBAR       IDC_RESIZEGRIP,7,45,10,10
 END
 
 IDD_COPYMOVE DIALOGEX 0, 0, 230, 95
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "복사/이동"
+CAPTION "Copy/Move"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "원본:",IDC_STATIC,7,7,26,8
+    LTEXT           "Source:",IDC_STATIC,7,7,26,8
     EDITTEXT        IDC_SOURCE,7,18,216,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "대상(&D):",IDC_STATIC,7,37,40,8
+    LTEXT           "&Destination:",IDC_STATIC,7,37,40,8
     COMBOBOX        IDC_DESTINATION,7,48,199,105,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "",IDC_BROWSEDESTINATION,210,48,13,13
-    CONTROL         "<a>최근 기록 지우기</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
-    LTEXT           "동작:",IDC_STATIC,7,72,24,8
-    AUTORADIOBUTTON "복사(&C)",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "이동(&M)",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
-    DEFPUSHBUTTON   "확인",IDOK,117,74,50,14,WS_DISABLED
-    PUSHBUTTON      "취소",IDCANCEL,173,74,50,14
+    CONTROL         "<a>Clear Recent History</a>",IDC_EMPTY_MRU,"SysLink",WS_TABSTOP,154,37,70,10
+    LTEXT           "Action:",IDC_STATIC,7,72,24,8
+    AUTORADIOBUTTON "&Copy",IDC_FUNCCOPY,35,71,33,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "&Move",IDC_FUNCMOVE,68,71,33,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,117,74,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,173,74,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,78,10,10
 END
 
 IDPP_GENERAL DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "일반"
+CAPTION "General"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS,IDC_STATIC,10,10,20,20
-    LTEXT           "metapath에 대한 일반 프로그램 설정 지정.",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "동일한 대상 응용 프로그램 창에서 파일 열기.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "한 번의 마우스 클릭으로 개체 열기 허용(&A).",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
-    AUTOCHECKBOX    "추적 선택을 사용(&E).",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "전체 행 선택을 사용(&F).",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
-    AUTOCHECKBOX    "파일이 열릴 때 항상 대상 창 사용(&C).",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
+    LTEXT           "Specify general program settings for metapath.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "Open file in same target application window.",IDC_OPENFILE_SAME_WINDOW,10,34,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Allow single mouse-click to open objects.",IDC_SINGLECLICK,10,46,190,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Enable track selection.",IDC_TRACKSELECT,10,58,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Enable &full row selection.",IDC_FULLROWSELECT,10,70,120,10,WS_TABSTOP
+    AUTOCHECKBOX    "Always a&ctivate target window when a file is opened.",IDC_FOCUSEDIT,10,82,220,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,100,205,1
-    AUTOCHECKBOX    "metapath 창을 항상 맨 위에 유지(&K).",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
-    AUTOCHECKBOX    "시스템 트레이로 최소화 (재활성화하려면 클릭)(&M).",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
-    AUTOCHECKBOX    "metapath가 시작될 때 기존 창을 다시 사용(&T).",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
-    CONTROL         "<a>창 위치 기록 지우기</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
+    AUTOCHECKBOX    "&Keep metapath window always on top.",IDC_ALWAYSONTOP,10,109,150,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Minimize to system tray (click to reactivate).",IDC_MINIMIZETOTRAY,10,121,200,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Try to reuse existing window when metapath is started.",IDC_REUSEWINDOW,10,133,220,10,WS_TABSTOP
+    CONTROL         "<a>Clear window position history</a>",IDC_CLEARWINPOS,"SysLink",WS_TABSTOP,20,145,103,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,161,205,1
-    AUTOCHECKBOX    "종료시 설정 저장(&S).",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
-    CONTROL         "<a>metapath 정보</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
+    AUTOCHECKBOX    "&Save settings on exit.",IDC_SAVESETTINGS,10,170,100,10,WS_TABSTOP
+    CONTROL         "<a>About metapath</a>",IDC_ABOUT,"SysLink",WS_TABSTOP,130,170,80,12
 END
 
 IDPP_ADVANCED DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "고급"
+CAPTION "Advanced"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_OPTIONS2,IDC_STATIC,10,10,20,20
-    AUTOCHECKBOX    "오른쪽에서 왼쪽 레이아웃을 사용(&R).",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
-    LTEXT           "metapath에 대한 고급 프로그램 설정을 지정.",IDC_STATIC,40,15,200,8
-    AUTOCHECKBOX    "시작 디렉토리 사용(&U):",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "가장 최근 사용(&R).",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON """즐겨 찾기"" 폴더(&F).",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
+    AUTOCHECKBOX    "Use &RTL Layout.",IDC_RTL_LAYOUT,10,34,190,10,WS_TABSTOP
+    LTEXT           "Specify advanced program settings for metapath.",IDC_STATIC,40,15,200,8
+    AUTOCHECKBOX    "&Use startup directory:",IDC_STARTUPDIR,10,46,104,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Most &recently used.",IDC_GOTOMRU,114,46,90,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON """&Favorites"" folder.",IDC_GOTOFAV,114,58,90,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,76,205,1
-    AUTOCHECKBOX    "저장된 파일의 읽기 전용 속성을 지우기&C).",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
-    AUTOCHECKBOX    "이름 충돌시 복사된 파일의 이름을 바꾸기(&N).",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
-    AUTOCHECKBOX    "삭제된 파일을 휴지통으로 이동(&M).",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "파일 삭제를 확인하지 않음 (권장하지 않음)(&D).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Clear read-only attribute of saved files.",IDC_CLEARREADONLY,10,85,172,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rename copied files on &name collisions.",IDC_RENAMEONCOLLISION,10,97,164,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Move deleted files to the recycle bin.",IDC_USERECYCLEBIN,10,109,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Don't confirm file delete (not recommended).",IDC_NOCONFIRMDELETE,10,121,184,10,WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,139,205,1
-    AUTOCHECKBOX    """Esc"" 키 사용(&E)...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "창 최소화(&W).",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "Metapath 종료(&X).",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
+    AUTOCHECKBOX    "Enable ""&Esc"" key to...",IDC_ESCFUNCTION,10,148,104,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Minimize &window.",IDC_ESCMIN,114,148,74,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "E&xit metapath.",IDC_ESCEXIT,114,160,66,10,WS_TABSTOP
 END
 
 IDPP_ITEMS DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "외형"
+CAPTION "Appearance"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_ITEMS,IDC_STATIC,10,10,21,20
-    LTEXT           "metapath 외형",IDC_STATIC,40,15,160,8
-    GROUPBOX        "디렉토리 목록에 있는 항목의 외형",IDC_STATIC,10,41,205,109
-    LTEXT           "필터 없음이 설정된 경우 이 텍스트 색상을 사용:",IDC_STATIC,20,54,170,8
-    AUTORADIOBUTTON "Windows 기본 색상(&W).",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "사용자 지정 색상(&C):",IDC_COLOR_CUST1,20,82,75,10,WS_TABSTOP
-    EDITTEXT        IDC_COLOR_SAMP1,97,80,18,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "색상 선택...",IDC_COLOR_PICK1,120,80,60,14
-    LTEXT           "FILTER가 활성일 때 이 텍스트 색상을 사용:",IDC_STATIC,20,105,180,8
-    AUTORADIOBUTTON "Windows 기본 색상(&E).",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "사용자 지정 색상(&U):",IDC_COLOR_CUST2,20,133,75,10,WS_TABSTOP
-    EDITTEXT        IDC_COLOR_SAMP2,97,130,18,14,ES_AUTOHSCROLL | WS_DISABLED
-    PUSHBUTTON      "색상 선택...",IDC_COLOR_PICK2,120,130,60,14
+    LTEXT           "Appearance of metapath.",IDC_STATIC,40,15,160,8
+    GROUPBOX        "Appearance of items in directory list",IDC_STATIC,10,41,205,109
+    LTEXT           "Use this text color when NO FILTER is SET:",IDC_STATIC,20,54,170,8
+    AUTORADIOBUTTON "Default &windows color.",IDC_COLOR_DEF1,20,68,96,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Custom &color:",IDC_COLOR_CUST1,20,82,60,10,WS_TABSTOP
+    EDITTEXT        IDC_COLOR_SAMP1,85,80,30,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK1,120,80,60,14
+    LTEXT           "Use this text color when a FILTER is ACTIVE:",IDC_STATIC,20,105,180,8
+    AUTORADIOBUTTON "D&efault windows color.",IDC_COLOR_DEF2,20,120,95,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "C&ustom color:",IDC_COLOR_CUST2,20,133,60,10,WS_TABSTOP
+    EDITTEXT        IDC_COLOR_SAMP2,86,130,30,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Pick Color...",IDC_COLOR_PICK2,120,130,60,14
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-    LTEXT           "언어:",IDC_STATIC,10,157,38,10
+    LTEXT           "Language:",IDC_STATIC,10,157,38,10
     COMBOBOX        IDC_LANGUAGE_LIST,50,154,82,100,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
 #endif
-    AUTOCHECKBOX    "XP 스타일 열기/저장 대화 상자 사용(&X).",IDC_USE_XP_FILE_DIALOG,10,171,170,10,WS_TABSTOP
+    AUTOCHECKBOX    "Use &XP Style Open/Save Dialog.",IDC_USE_XP_FILE_DIALOG,10,171,170,10,WS_TABSTOP
 END
 
 IDPP_PROG DIALOGEX 0, 0, 232, 185
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "위치"
+CAPTION "Locations"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     ICON            IDI_PROGS,IDC_STATIC,10,10,20,20
-    LTEXT           "외부 프로그램 및 경로 지정.",IDC_STATIC,40,15,180,8
-    LTEXT           "기본 ""빠른 보기"" 프로그램 (Ctrl+Q)(&D):",IDC_STATIC,10,41,180,8
+    LTEXT           "Specify external programs and paths.",IDC_STATIC,40,15,180,8
+    LTEXT           "&Default ""Quick View"" program (Ctrl+Q):",IDC_STATIC,10,41,180,8
     EDITTEXT        IDC_QUICKVIEW,10,52,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_Q,204,52,14,14,BS_BITMAP
-    LTEXT           "즐겨 찾는 폴더 (F11)(&F):",IDC_STATIC,10,76,120,8
+    LTEXT           "&Favorites Folder (F11):",IDC_STATIC,10,76,120,8
     EDITTEXT        IDC_FAVORITES,10,87,191,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE_F,204,87,14,14,BS_BITMAP
-    GROUPBOX        "시스템 통합 (관리자 권한 필요)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
-    AUTOCHECKBOX    "Windows 탐색기 상황에 맞는 메뉴에 metapath추가.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
-    LTEXT           "상황에 맞는 메뉴 항목:",IDC_STATIC,28,139,70,8
+    GROUPBOX        "System Integration (requires Administrator privileges)",IDC_GROUP_SYSTEM_INTEGRATION,7,111,218,72
+    AUTOCHECKBOX    "Add metapath to Windows Explorer's context menu.",IDC_ENABLE_CONTEXT_MENU,14,124,204,10,WS_TABSTOP
+    LTEXT           "Context menu text:",IDC_STATIC,28,139,70,8
     EDITTEXT        IDC_CONTEXT_MENU_TEXT,100,136,118,14,ES_AUTOHSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "작업표시줄 점프 목록 활성화.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
-    LTEXT           "응용프로그램 이름:",IDC_STATIC,28,167,70,8
+    AUTOCHECKBOX    "Enable Taskbar Jump List.",IDC_ENABLE_JUMP_LIST,14,152,204,10,WS_TABSTOP
+    LTEXT           "Application name:",IDC_STATIC,28,167,70,8
     EDITTEXT        IDC_APPLICATION_NAME,100,164,118,14,ES_AUTOHSCROLL | WS_TABSTOP
 END
 
 IDD_FINDTARGET DIALOGEX 0, 0, 272, 210
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "대상 응용 프로그램"
+CAPTION "Target Application"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    AUTORADIOBUTTON "특정 대상 응용 프로그램 사용 안 함, 선택한 파일만 실행.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "다음 대상 응용 프로그램을 사용:",IDC_TARGET,7,21,160,10,WS_TABSTOP
-    LTEXT           "대상 응용 프로그램이 이미 실행 중인 경우 다음 작업을 지정",IDC_STATIC,7,64,260,8
+    AUTORADIOBUTTON "Don't use any specific target application, simply launch the selected file.",IDC_LAUNCH,7,7,260,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Use the following target application:",IDC_TARGET,7,21,160,10,WS_TABSTOP
+    LTEXT           "Specify the action if the target applicatoin is already running:",IDC_STATIC,7,64,260,8
     EDITTEXT        IDC_TARGETPATH,20,35,226,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_BROWSE,251,35,14,14,BS_BITMAP
-    AUTORADIOBUTTON "없음, 파일이 열릴 때마다 대상 응용 프로그램 실행",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
-    AUTORADIOBUTTON "파일 열기 메시지를 대상 응용 프로그램 창으로 보내기:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
-    AUTORADIOBUTTON "다음의 DDE 명령 실행:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
-    PUSHBUTTON      "창 찾기...",IDC_FINDWIN,204,91,60,14
-    LTEXT           "메시지:",IDC_STATIC,19,124,42,8,SS_RIGHT
-    LTEXT           "응용 프로그램:",IDC_STATIC,19,145,42,8,SS_RIGHT
-    LTEXT           "주제:",IDC_STATIC,19,165,42,8,SS_RIGHT
+    AUTORADIOBUTTON "None, run target application each time a file is opened.",IDC_ALWAYSRUN,7,78,240,10,WS_GROUP | WS_TABSTOP
+    AUTORADIOBUTTON "Send a file open message to target application window:",IDC_SENDDROPMSG,7,92,194,10,WS_TABSTOP
+    AUTORADIOBUTTON "Execute the following DDE command:",IDC_USEDDE,7,106,160,10,WS_TABSTOP
+    PUSHBUTTON      "Find Window...",IDC_FINDWIN,204,91,60,14
+    LTEXT           "Message:",IDC_STATIC,19,124,42,8,SS_RIGHT
+    LTEXT           "Application:",IDC_STATIC,19,145,42,8,SS_RIGHT
+    LTEXT           "Topic:",IDC_STATIC,19,165,42,8,SS_RIGHT
     EDITTEXT        IDC_DDEMSG,65,122,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDEAPP,65,142,200,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_DDETOPIC,65,162,200,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "확인",IDOK,159,189,50,14
-    PUSHBUTTON      "취소",IDCANCEL,215,189,50,14
+    DEFPUSHBUTTON   "OK",IDOK,159,189,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,215,189,50,14
     SCROLLBAR       IDC_RESIZEGRIP4,7,189,10,10
 END
 
 IDD_FINDWIN DIALOGEX 0, 0, 210, 85
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "창 찾기"
+CAPTION "Find Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     ICON            IDI_CROSS1,IDC_CROSSCURSOR,7,7,21,20,SS_CENTERIMAGE
-    LTEXT           "새 대상으로 선택하려는 창 위로 십자선을 끌거나 취소하려면 Esc 키를 누릅니다.",IDC_FINDWINDESC,35,7,168,22
+    LTEXT           "Drag the crosshair over the window you would like to select as the new target, or press Esc to cancel.",IDC_FINDWINDESC,35,7,168,22
     EDITTEXT        IDC_WINTITLE,7,35,196,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
-    LTEXT           "창 클래스",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
-    LTEXT           "창 모듈",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
-    DEFPUSHBUTTON   "확인",IDOK,97,64,50,14,WS_DISABLED
-    PUSHBUTTON      "취소",IDCANCEL,153,64,50,14
+    LTEXT           "Window Class",IDC_WINCLASS,7,60,45,8,NOT WS_VISIBLE
+    LTEXT           "Window Module",IDC_WINMODULE,7,70,51,8,NOT WS_VISIBLE
+    DEFPUSHBUTTON   "OK",IDOK,97,64,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,153,64,50,14
     SCROLLBAR       IDC_RESIZEGRIP5,7,64,10,10
 END
 
@@ -601,87 +601,87 @@ END
 
 STRINGTABLE
 BEGIN
-	IDT_HISTORY_BACK		"뒤로"
-	IDT_HISTORY_FORWARD		"앞으로"
-	IDT_UP_DIR				"상위 디렉토리"
-	IDT_ROOT_DIR			"루트 디렉토리"
-	IDT_VIEW_FAVORITES		"즐겨찾기"
-	IDT_FILE_PREV			"이전 파일"
-	IDT_FILE_NEXT			"다음 파일"
-	IDT_FILE_RUN			"실행"
-	IDT_FILE_QUICKVIEW		"빠른 보기"
-	IDT_FILE_SAVEAS			"다른 이름으로 저장"
-	IDT_FILE_COPYMOVE		"복사/이동"
-	IDT_FILE_DELETE_RECYCLE		"삭제 (휴지통)"
-	IDT_FILE_DELETE_PERM		"삭제 (영구적)"
-	IDT_VIEW_FILTER			"필터"
+	IDT_HISTORY_BACK		"Back"
+	IDT_HISTORY_FORWARD		"Forward"
+	IDT_UP_DIR				"Upper Directory"
+	IDT_ROOT_DIR			"Root Directory"
+	IDT_VIEW_FAVORITES		"Favorites"
+	IDT_FILE_PREV			"Previous File"
+	IDT_FILE_NEXT			"Next File"
+	IDT_FILE_RUN			"Run"
+	IDT_FILE_QUICKVIEW		"Quickview"
+	IDT_FILE_SAVEAS			"Save As"
+	IDT_FILE_COPYMOVE		"Copy/Move"
+	IDT_FILE_DELETE_RECYCLE	"Delete (RecycleBin)"
+	IDT_FILE_DELETE_PERM	"Delete (Permanently)"
+	IDT_VIEW_FILTER			"Filter"
 END
 
 STRINGTABLE
 BEGIN
-	IDS_APPTITLE			"Metapath"
-	IDS_NUMFILES			"%s 개체"
-	IDS_NUMFILES_FILTER		"%s 개체 | 필터"
-	IDS_SAVEFILE			"""%s"" 저장 중..."
-    IDS_LINKDESCRIPTION     "Metapath에서 열기"
+	IDS_APPTITLE			"metapath"
+	IDS_NUMFILES			"%s Object(s)"
+	IDS_NUMFILES_FILTER		"%s Object(s) | Filter"
+	IDS_SAVEFILE			"Saving ""%s""..."
+    IDS_LINKDESCRIPTION     "Open in metapath"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_CD              "지정된 디렉토리에 액세스할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_FILE            """%s""에 액세스할 수 없습니다.\n다른 응용 프로그램에서 파일을 사용할 수 있습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_NEW             "파일을 생성할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_NEWDIR          "디렉토리를 생성할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_SAVEAS1         """%s"" 저장 중 오류입니다.\이미 존재하는 파일이 쓰기 금지되어 있을 수 있습니다."
-    IDS_ERR_SAVEAS2         "저장된 파일의 읽기 전용 속성을 제거하는 동안 오류가 발생했습니다."
-    IDS_ERR_CMDLINE         "명령 줄에 지정된 파일 또는 디렉터리에 액세스하는 동안 오류가 발생했습니다."
-    IDS_ERR_STARTUPDIR      "시작 디렉토리에 액세스할 수 없습니다."
-    IDS_ERR_DROP1           "끌어온 파일 또는 디렉토리에 액세스할 수 없습니다."
-    //IDS_ERR_DROP2           "한 번에 하나의 파일 또는 디렉토리만 삭제할 수 있습니다."
-    IDS_ERR_FAVORITES       """즐겨찾기"" 폴더에 액세스할 수 없습니다.\n""옵션"" 대화 상자에서 유효한 디렉토리를 지정하십시오."
-    //IDS_ERR_LNK_GETPATH     "링크된 개체에 사용할 수 있는 유효한 파일 시스템 경로가 없습니다.\n링크가 파일이나 디렉토리를 참조하지 않는 것 같습니다."
-    IDS_ERR_LNK_NOACCESS    "링크된 개체의 파일 시스템 경로에 액세스할 수 없습니다.\n디스크 또는 네트워크 연결을 확인하십시오."
-    IDS_ERR_CREATELINK      "지정된 링크를 생성하는 동안 오류가 발생했습니다.\n대상 디렉토리가 쓰기 금지되어 있을 수 있습니다."
-    IDS_ERR_FILTER          "추가 필터를 지정하지 않았습니다.\n자세한 내용은 metapath readme 파일을 참조하십시오."
-    IDS_ERR_PREVWINDISABLED "기존 metapath창이 사용 중이거나 활성 대화 상자가 있습니다.\n다른 metapath 창을 여시겠습니까?"
+    IDS_ERR_CD              "No access to specified directory.\nCheck the disk or the network connection."
+    IDS_ERR_FILE            "No access to ""%s"".\nThe file may be used by another application.\nCheck the disk or the network connection."
+    IDS_ERR_NEW             "File could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_NEWDIR          "Directory could not be created.\nCheck the disk or the network connection."
+    IDS_ERR_SAVEAS1         "Error saving ""%s"".\nProbably an already existing file is write-protected."
+    IDS_ERR_SAVEAS2         "Error removing read-only attribute of saved file."
+    IDS_ERR_CMDLINE         "Error accessing file or directory specified in command line."
+    IDS_ERR_STARTUPDIR      "No access to startup directory."
+    IDS_ERR_DROP1           "No access to dropped file or directory."
+    //IDS_ERR_DROP2           "Only a single file or directory can be dropped at a time."
+    IDS_ERR_FAVORITES       "No access to ""Favorites"" folder.\nSpecify a valid directory in the ""Options"" dialog box."
+    //IDS_ERR_LNK_GETPATH     "No valid filesystem-path available for linked object.\nProbably the link doesn't refer to a file or directory."
+    IDS_ERR_LNK_NOACCESS    "No access to filesystem-path of linked object.\nCheck the disk or the network connection."
+    IDS_ERR_CREATELINK      "Error creating the specified link.\nProbably the destination directory is write-protected."
+    IDS_ERR_FILTER          "No additional filters specified.\nPlease refer to the metapath readme file for more information."
+    IDS_ERR_PREVWINDISABLED "Existing metapath window is busy or has an active dialog box.\nDo you want to open another metapath window?"
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
-	IDS_CHANGE_LANG_RESTART	"UI 언어를 변경하려면 metapath를 다시 시작해야합니다. 지금 다시 시작하시겠습니까?"
+	IDS_CHANGE_LANG_RESTART	"Changing the UI language requires a restart of metapath, restart now?"
 #endif
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ERR_TARGETDISABLED  "기존 대상 창이 사용 중이거나 활성 대화 상자가 있습니다.\n새 창을 여시겠습니까?"
-    IDS_ERR_INVALIDTARGET   "모든 필수 필드를 작성했는지 확인하십시오.\n적절한 옵션이 활성화된 경우 대상 창도 찾아야 합니다."
-    IDS_ERR_INIOPEN         "metapath 구성 파일에 액세스할 수 없습니다."
-    IDS_ERR_INICREATE       "구성 파일을 만드는 동안 오류가 발생했습니다."
-    IDS_ERR_INIWRITE        "설정이 저장되지 않았습니다!\n구성 파일에 대한 쓰기 액세스 권한이 없습니다."
+    IDS_ERR_TARGETDISABLED  "Existing target window is busy or has an active dialog box.\nWould you like to open a new window?"
+    IDS_ERR_INVALIDTARGET   "Please make sure all the required fields are completed.\nYou will also have to find a target window if the appropriate option is enabled."
+    IDS_ERR_INIOPEN         "No access to metapath configuration file."
+    IDS_ERR_INICREATE       "Error creating configuration file."
+    IDS_ERR_INIWRITE        "Settings not saved!\nNo write access to configuration file."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SEARCHEXE           "실행 파일 찾기"
-    IDS_GETQUICKVIEWER      "빠른 보기 찾기"
-    IDS_GETTARGET           "편집기 찾기"
-    IDS_NEWFILE             "새 파일"
-    IDS_FILTER_ALL          "모든 파일 (*.*)|*.*|"
-    IDS_FILTER_EXE          "실행 파일 (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|모든 파일 (*.*)|*.*|"
-    IDS_GETDIRECTORY        "새 디렉토리 선택."
-    IDS_FAVORITES           """즐겨찾기"" 디렉토리 지정."
+    IDS_SEARCHEXE           "Find Executable"
+    IDS_GETQUICKVIEWER      "Find Quickview"
+    IDS_GETTARGET           "Find Editor"
+    IDS_NEWFILE             "New File"
+    IDS_FILTER_ALL          "All Files (*.*)|*.*|"
+    IDS_FILTER_EXE          "Executable Files (*.exe;*.com;*.bat;*.lnk;*.pif)|*.exe;*.com;*.bat;*.lnk;*.pif|All Files (*.*)|*.*|"
+    IDS_GETDIRECTORY        "Select a new directory."
+    IDS_FAVORITES           "Specify the ""Favorites"" directory."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OPENWITH            "즐겨 찾는 응용 프로그램에 대한 링크가 있는 디렉토리를 선택하십시오."
-    IDS_COPYMOVE            "대상 디렉토리를 선택하십시오."
-    IDS_CREATELINK          "새 링크의 대상 디렉토리를 선택하십시오."
-    IDS_SAVESETTINGS        "현재 프로그램 설정이 저장되었습니다."
+    IDS_OPENWITH            "Select the directory with links to your favorite applications."
+    IDS_COPYMOVE            "Select a destination directory."
+    IDS_CREATELINK          "Select a destination directory for the new link."
+    IDS_SAVESETTINGS        "The current program settings have been saved."
 END
 
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 STRINGTABLE
 BEGIN
-	IDS_LANG_USER_DEFAULT		"시스템 언어"
+	IDS_LANG_USER_DEFAULT			"System Language"
 	IDS_LANG_ENGLISH_US				"English"
 	IDS_LANG_CHINESE_SIMPLIFIED		"简体中文"
 	IDS_LANG_CHINESE_TRADITIONAL	"繁體中文"
@@ -717,7 +717,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Korean (Korea) resources
+#endif    // Portuguese (Brazil) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

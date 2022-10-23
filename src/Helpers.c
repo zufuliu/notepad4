@@ -1470,6 +1470,9 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	case LANG_KOREAN:
 		folder = L"ko";
 		break;
+	case LANG_PORTUGUESE:
+		folder = L"pt-BR";
+		break;
 	}
 
 	if (folder == NULL) {
@@ -2206,6 +2209,7 @@ void StripMnemonic(LPWSTR pszMenu) {
 //
 // FormatNumberStr()
 //
+#ifndef _WIN64
 void FormatNumberStr(LPWSTR lpNumberStr) {
 	const int i = lstrlen(lpNumberStr);
 	if (i <= 3) {
@@ -2231,18 +2235,35 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 		++end;
 	} while (c > lpNumberStr);
 }
+#endif
 
-//=============================================================================
-//
-// SetDlgItemIntEx()
-//
-BOOL SetDlgItemIntEx(HWND hwnd, int nIdItem, UINT uValue) {
-	WCHAR szBuf[32];
+void FormatNumber(LPWSTR lpNumberStr, ptrdiff_t value) {
+#ifdef _WIN64
+	_i64tow(value, lpNumberStr, 10);
+	if (value < 1000) {
+		return;
+	}
 
-	_ultow(uValue, szBuf, 10);
-	FormatNumberStr(szBuf);
+	WCHAR szSep[4];
+	const WCHAR sep = GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
 
-	return SetDlgItemText(hwnd, nIdItem, szBuf);
+	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
+	WCHAR *end = c;
+	lpNumberStr += 3;
+	do {
+		c -= 3;
+		memmove(c + 1, c, sizeof(WCHAR) * (end - c + 1));
+		*c = sep;
+		++end;
+	} while (c > lpNumberStr);
+
+#else
+	_ltow(value, lpNumberStr, 10);
+	if (value < 1000) {
+		return;
+	}
+	FormatNumberStr(lpNumberStr);
+#endif
 }
 
 //=============================================================================
@@ -2447,7 +2468,7 @@ bool MRU_Load(LPMRULIST pmru) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 
 	MRU_Empty(pmru);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
@@ -2480,10 +2501,9 @@ bool MRU_Save(LPCMRULIST pmru) {
 	}
 
 	WCHAR tchName[16];
-	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
-	IniSectionOnSave *pIniSection = &section;
-	pIniSection->next = pIniSectionBuf;
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 	const BOOL quoted = pmru->iFlags & MRUFlags_QuoteValue;
 
 	for (int i = 0; i < pmru->iSize; i++) {

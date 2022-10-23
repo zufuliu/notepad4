@@ -690,6 +690,7 @@ BEGIN
 	IDS_LANG_KOREAN					"한국어"
 	IDS_LANG_GERMAN					"Deutsch"
 	IDS_LANG_ITALIAN				"Italiano"
+	IDS_LANG_PORTUGUESE_BRAZIL		"Português (Brasil)"
 END
 #endif
 

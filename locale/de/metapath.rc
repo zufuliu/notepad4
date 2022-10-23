@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // German (Germany) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(65001)
 
@@ -689,6 +689,7 @@ BEGIN
 	IDS_LANG_KOREAN					"한국어"
 	IDS_LANG_GERMAN					"Deutsch"
 	IDS_LANG_ITALIAN				"Italiano"
+	IDS_LANG_PORTUGUESE_BRAZIL		"Português (Brasil)"
 END
 #endif
 

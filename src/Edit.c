@@ -161,7 +161,6 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 #endif
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 
 	SciCall_SetUndoCollection(true);
@@ -213,7 +212,6 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) {
 		SciCall_AppendText(cbText, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -261,7 +259,6 @@ void EditConvertToLargeMode(void) {
 		SciCall_AppendText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
-		RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -1014,10 +1011,15 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		WCHAR tchMaxBytes[32];
 		StrFormatByteSize(fileSize.QuadPart, tchDocSize, COUNTOF(tchDocSize));
 		StrFormatByteSize(maxFileSize, tchMaxSize, COUNTOF(tchMaxSize));
+#ifdef _WIN64
+		FormatNumber(tchDocBytes, fileSize.QuadPart);
+		FormatNumber(tchMaxBytes, maxFileSize);
+#else
 		_i64tow(fileSize.QuadPart, tchDocBytes, 10);
 		_i64tow(maxFileSize, tchMaxBytes, 10);
 		FormatNumberStr(tchDocBytes);
 		FormatNumberStr(tchMaxBytes);
+#endif
 		MsgBoxWarn(MB_OK, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchDocBytes, tchMaxSize, tchMaxBytes);
 		return false;
 	}
@@ -5636,6 +5638,7 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 		// clear existing indicator
 		SciCall_SetIndicatorCurrent(IndicatorNumber_MarkOccurrence);
 		SciCall_IndicatorClearRange(0, SciCall_GetLength());
+		UpdateStatusBarCache(StatusItem_Find);
 	}
 	if (editMarkAllStatus.bookmarkLine >= 0 || editMarkAllStatus.bookmarkForFindAll) {
 		if ((findFlag | editMarkAllStatus.findFlag) & NP2_MarkAllBookmark) {
@@ -5677,6 +5680,7 @@ bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 		if (ch == '^' || ch == '$') {
 			const Sci_Line lineCount = SciCall_GetLineCount();
 			editMarkAllStatus.matchCount = lineCount - (ch == '^');
+			UpdateStatusBarCache(StatusItem_Find);
 			UpdateStatusbar();
 			return true;
 		}
@@ -5824,6 +5828,7 @@ bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	status->bookmarkLine = bookmarkLine;
 	if (!pending || matchCount != status->matchCount) {
 		status->matchCount = matchCount;
+		UpdateStatusBarCache(StatusItem_Find);
 		UpdateStatusbar();
 		return true;
 	}
@@ -5935,8 +5940,7 @@ void EditBookmarkSelectAll(void) {
 static void ShwowReplaceCount(Sci_Position iCount) {
 	if (iCount > 0) {
 		WCHAR tchNum[32];
-		PosToStrW(iCount, tchNum);
-		FormatNumberStr(tchNum);
+		FormatNumber(tchNum, iCount);
 		InfoBoxInfo(MB_OK, L"MsgReplaceCount", IDS_REPLCOUNT, tchNum);
 	} else {
 		InfoBoxWarn(MB_OK, L"MsgNotFound", IDS_NOTFOUND);
@@ -6000,7 +6004,7 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 	if (iCount) {
 		EditEnsureSelectionVisible();
 		SciCall_EndUndoAction();
-		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+		InvalidateRect(hwnd, NULL, TRUE);
 	}
 
 	// Remove wait cursor
@@ -6094,7 +6098,7 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 		}
 
 		SciCall_EndUndoAction();
-		RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+		InvalidateRect(hwnd, NULL, TRUE);
 	}
 
 	// Remove wait cursor
@@ -6131,14 +6135,12 @@ static INT_PTR CALLBACK EditLineNumDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 		PosToStrW(iCurLine, tchLn);
 		SetDlgItemText(hwnd, IDC_LINENUM, tchLn);
 
-		PosToStrW(iMaxLine, tchLn);
-		FormatNumberStr(tchLn);
+		FormatNumber(tchLn, iMaxLine);
 		GetDlgItemText(hwnd, IDC_LINE_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_LINE_RANGE, tchLines);
 
-		PosToStrW(iLength, tchLn);
-		FormatNumberStr(tchLn);
+		FormatNumber(tchLn, iLength);
 		GetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchFmt, COUNTOF(tchFmt));
 		wsprintf(tchLines, tchFmt, tchLn);
 		SetDlgItemText(hwnd, IDC_COLUMN_RANGE, tchLines);
@@ -7868,7 +7870,7 @@ static void FinishBatchFold(void) {
 	SciCall_ScrollCaret();
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-	RedrawWindow(hwndEdit, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+	InvalidateRect(hwndEdit, NULL, TRUE);
 }
 
 bool EditIsLineContainsStyle(Sci_Line line, int style) {

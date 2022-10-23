@@ -323,8 +323,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 		printEmpty = false;
 		const bool printPage = !(pdlg.Flags & PD_PAGENUMS) || (pageNum >= pdlg.nFromPage && pageNum <= pdlg.nToPage);
 		WCHAR tchNum[32];
-		_ltow(pageNum, tchNum, 10);
-		FormatNumberStr(tchNum);
+		FormatNumber(tchNum, pageNum);
 		WCHAR pageString[128];
 		wsprintf(pageString, tchPageFormat, tchNum);
 

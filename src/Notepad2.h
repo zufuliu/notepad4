@@ -201,7 +201,7 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 void LoadSettings(void);
 void SaveSettingsNow(bool bOnlySaveStyle, bool bQuiet);
 void SaveSettings(bool bSaveSettingsNow);
-void SaveWindowPosition(bool bSaveSettingsNow, WCHAR *pIniSectionBuf);
+void SaveWindowPosition(WCHAR *pIniSectionBuf);
 void ClearWindowPositionHistory(void);
 void ParseCommandLine(void);
 void LoadFlags(void);

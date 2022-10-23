@@ -761,7 +761,7 @@ void Style_Load(void) {
 	g_AllFileExtensions = (LPWSTR)NP2HeapAlloc(ALL_FILE_EXTENSIONS_BYTE_SIZE);
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
 	LoadIniSection(INI_SECTION_NAME_STYLES, pIniSectionBuf, cchIniSection);
@@ -820,7 +820,7 @@ static void Style_LoadOne(PEDITLEXER pLex) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 	Style_LoadOneEx(pLex, pIniSection, pIniSectionBuf, cchIniSection);
 	IniSectionFree(pIniSection);
@@ -831,7 +831,7 @@ static void Style_LoadAll(bool bReload) {
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-	IniSection *pIniSection = &section;
+	IniSection * const pIniSection = &section;
 	IniSectionInit(pIniSection, 128);
 
 	// Custom colors
@@ -874,10 +874,9 @@ static void Style_LoadAll(bool bReload) {
 //	Style_Save()
 //
 void Style_Save(void) {
-	IniSectionOnSave section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-	const SIZE_T cbIniSection = NP2HeapSize(pIniSectionBuf);
-	IniSectionOnSave *pIniSection = &section;
+	IniSectionOnSave section = { pIniSectionBuf };
+	IniSectionOnSave * const pIniSection = &section;
 	pIniSection->next = pIniSectionBuf;
 
 	// 2nd default
@@ -895,7 +894,7 @@ void Style_Save(void) {
 
 	// file extensions
 	if (fStylesModified & STYLESMODIFIED_FILE_EXT) {
-		memset(pIniSectionBuf, 0, cbIniSection);
+		memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 		pIniSection->next = pIniSectionBuf;
 		for (UINT iLexer = LEXER_INDEX_MATCH; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
@@ -923,7 +922,7 @@ void Style_Save(void) {
 
 	// Custom colors
 	if (fStylesModified & STYLESMODIFIED_COLOR) {
-		memset(pIniSectionBuf, 0, cbIniSection);
+		memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 		pIniSection->next = pIniSectionBuf;
 		for (unsigned int i = 0; i < MAX_CUSTOM_COLOR_COUNT; i++) {
 			const COLORREF color = customColor[i];
@@ -945,7 +944,7 @@ void Style_Save(void) {
 				continue;
 			}
 
-			memset(pIniSectionBuf, 0, cbIniSection);
+			memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 			pIniSection->next = pIniSectionBuf;
 			IniSectionSetBoolEx(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle, pLex->rid != NP2LEX_TEXTFILE);
 			const UINT iStyleCount = pLex->iStyleCount;
@@ -995,7 +994,7 @@ bool Style_Import(HWND hwnd) {
 		IniSection section;
 		WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
 		const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-		IniSection *pIniSection = &section;
+		IniSection * const pIniSection = &section;
 
 		IniSectionInit(pIniSection, 128);
 		// file extensions
@@ -1069,10 +1068,9 @@ bool Style_Export(HWND hwnd) {
 
 	if (GetSaveFileName(&ofn)) {
 		DWORD dwError = ERROR_SUCCESS;
-		IniSectionOnSave section;
 		WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_STYLES);
-		const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
-		IniSectionOnSave *pIniSection = &section;
+		IniSectionOnSave section = { pIniSectionBuf };
+		IniSectionOnSave * const pIniSection = &section;
 
 		// file extensions
 		pIniSection->next = pIniSectionBuf;
@@ -1086,7 +1084,7 @@ bool Style_Export(HWND hwnd) {
 
 		for (UINT iLexer = 0; iLexer < ALL_LEXER_COUNT; iLexer++) {
 			const LPCEDITLEXER pLex = pLexArray[iLexer];
-			memset(pIniSectionBuf, 0, cchIniSection);
+			memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 			pIniSection->next = pIniSectionBuf;
 			IniSectionSetBool(pIniSection, L"UseDefaultCodeStyle", pLex->bUseDefaultCodeStyle);
 			const UINT iStyleCount = pLex->iStyleCount;
