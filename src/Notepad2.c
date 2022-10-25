@@ -330,7 +330,7 @@ struct CachedStatusItem {
 };
 static struct CachedStatusItem cachedStatusItem;
 
-#define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= ((1 << StatusItem_Line) | (1 << StatusItem_DocSize))
+#define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= (((1 << StatusItem_Find) - 1) | (1 << StatusItem_DocSize))
 #define DisableDelayedStatusBarRedraw()		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount)
 
 HINSTANCE	g_hInstance;
@@ -5023,6 +5023,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 						}
 					}
 				} else if (scn->updated & SC_UPDATE_CONTENT) {
+					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
+					// SCN_MODIFIED is not fired after loading file, thus saved the time to update statusbar.
 					if (editMarkAllStatus.matchCount) {
 						updated = EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 					}
@@ -7593,10 +7595,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 
 		bInitDone = true;
 		//! workaround for blank statusbar after loading large file.
-		//! statusbar will be updated twice: here and after received SC_UPDATE_SELECTION.
+		//! statusbar will be updated twice: here and after received SC_UPDATE_CONTENT.
 		DisableDelayedStatusBarRedraw();
 		UpdateStatusbar();
-		//! fix statusbar blink on second update from SC_UPDATE_SELECTION.
+		//! fix statusbar blink on second update from SC_UPDATE_CONTENT.
 		DisableDelayedStatusBarRedraw();
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
