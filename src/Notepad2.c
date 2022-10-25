@@ -331,6 +331,7 @@ struct CachedStatusItem {
 static struct CachedStatusItem cachedStatusItem;
 
 #define UpdateStatusBarCacheLineColumn()	cachedStatusItem.updateMask |= ((1 << StatusItem_Line) | (1 << StatusItem_DocSize))
+#define DisableDelayedStatusBarRedraw()		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount)
 
 HINSTANCE	g_hInstance;
 HANDLE		g_hDefaultHeap;
@@ -2228,6 +2229,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	if (bShowStatusbar) {
+		DisableDelayedStatusBarRedraw();
 		SendMessage(hwndStatus, WM_SIZE, 0, 0);
 		RECT rc;
 		GetWindowRect(hwndStatus, &rc);
@@ -7592,10 +7594,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		bInitDone = true;
 		//! workaround for blank statusbar after loading large file.
 		//! statusbar will be updated twice: here and after received SC_UPDATE_SELECTION.
-		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount);
+		DisableDelayedStatusBarRedraw();
 		UpdateStatusbar();
 		//! fix statusbar blink on second update from SC_UPDATE_SELECTION.
-		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount);
+		DisableDelayedStatusBarRedraw();
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {
