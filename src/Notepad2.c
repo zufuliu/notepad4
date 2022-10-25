@@ -4999,7 +4999,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (scn->updated & ~(SC_UPDATE_V_SCROLL | SC_UPDATE_H_SCROLL)) {
 				UpdateToolbar();
 
-				bool updated = false;
 				if (scn->updated & SC_UPDATE_SELECTION) {
 					const int overType = scn->listType;
 					cachedStatusItem.updateMask |= (1 << StatusItem_Character) | (1 << StatusItem_Column)
@@ -5019,17 +5018,17 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 								EditMarkAll_Clear();
 							}
 						} else {
-							updated = EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+							EditMarkAll((scn->updated & SC_UPDATE_CONTENT), bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 						}
 					}
 				} else if (scn->updated & SC_UPDATE_CONTENT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
 					// SCN_MODIFIED is not fired after loading file, thus saved the time to update statusbar.
 					if (editMarkAllStatus.matchCount) {
-						updated = EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
+						EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 					}
 				}
-				if (!updated) {
+				if (cachedStatusItem.updateMask) {
 					UpdateStatusbar();
 				}
 
@@ -7595,11 +7594,8 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 
 		bInitDone = true;
 		//! workaround for blank statusbar after loading large file.
-		//! statusbar will be updated twice: here and after received SC_UPDATE_CONTENT.
 		DisableDelayedStatusBarRedraw();
 		UpdateStatusbar();
-		//! fix statusbar blink on second update from SC_UPDATE_CONTENT.
-		DisableDelayedStatusBarRedraw();
 		UpdateDocumentModificationStatus();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {

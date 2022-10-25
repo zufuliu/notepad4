@@ -5665,13 +5665,13 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 	editMarkAllStatus.bookmarkLine = -1;
 }
 
-bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText) {
+void EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText) {
 	if (!bChanged && (findFlag == editMarkAllStatus.findFlag
 		&& iSelCount == editMarkAllStatus.iSelCount
 		// _stricmp() is not safe for DBCS string.
 		&& memcmp(pszText, editMarkAllStatus.pszText, iSelCount) == 0)) {
 		NP2HeapFree(pszText);
-		return false;
+		return;
 	}
 
 	EditMarkAll_ClearEx(findFlag, iSelCount, pszText);
@@ -5682,7 +5682,7 @@ bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 			editMarkAllStatus.matchCount = lineCount - (ch == '^');
 			UpdateStatusBarCache(StatusItem_Find);
 			UpdateStatusbar();
-			return true;
+			return;
 		}
 	}
 
@@ -5691,7 +5691,7 @@ bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPST
 		editMarkAllStatus.bookmarkForFindAll = (findFlag & NP2_FromFindAll) != 0;
 		Style_SetBookmark();
 	}
-	return EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
+	EditMarkAll_Continue(&editMarkAllStatus, idleTaskTimer);
 }
 
 static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *ranges, UINT index, int findFlag, Sci_Position matchCount) {
@@ -5735,7 +5735,7 @@ static Sci_Line EditMarkAll_Bookmark(Sci_Line bookmarkLine, const Sci_Position *
 	return bookmarkLine;
 }
 
-bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
+void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 	// use increment search to ensure FindText() terminated in expected time.
 	//++EditMarkAll_Runs;
 	//printf("match %3u %s\n", EditMarkAll_Runs, GetCurrentLogTime());
@@ -5830,12 +5830,10 @@ bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer) {
 		status->matchCount = matchCount;
 		UpdateStatusBarCache(StatusItem_Find);
 		UpdateStatusbar();
-		return true;
 	}
-	return false;
 }
 
-bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
+void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 	// get current selection
 	Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
@@ -5844,7 +5842,7 @@ bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 	// if nothing selected or multiple lines are selected exit
 	if (iSelCount == 0 || SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
 		EditMarkAll_Clear();
-		return false;
+		return;
 	}
 
 	iSelCount = SciCall_GetSelTextLength();
@@ -5863,7 +5861,7 @@ bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 			} else if (!IsDocWordChar(ch)) {
 				NP2HeapFree(pszText);
 				EditMarkAll_Clear();
-				return false;
+				return;
 			}
 		}
 	}
@@ -5876,7 +5874,7 @@ bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark) {
 	const int findFlag = (((int)matchCase) * SCFIND_MATCHCASE)
 		| (((int)wholeWord) * SCFIND_WHOLEWORD)
 		| (((int)bookmark) * NP2_MarkAllBookmark);
-	return EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
+	EditMarkAll_Start(bChanged, findFlag, iSelCount, pszText);
 }
 
 void EditFindAll(LPCEDITFINDREPLACE lpefr, bool selectAll) {

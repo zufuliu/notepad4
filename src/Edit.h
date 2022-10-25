@@ -253,9 +253,9 @@ void EditMarkAll_ClearEx(int findFlag, Sci_Position iSelCount, LPSTR pszText);
 NP2_inline void EditMarkAll_Clear(void) {
 	EditMarkAll_ClearEx(0, 0, NULL);
 }
-bool EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
-bool EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
-bool EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark);
+void EditMarkAll_Start(BOOL bChanged, int findFlag, Sci_Position iSelCount, LPSTR pszText);
+void EditMarkAll_Continue(EditMarkAllStatus *status, HANDLE timer);
+void EditMarkAll(BOOL bChanged, bool matchCase, bool wholeWord, bool bookmark);
 void EditToggleBookmarkAt(Sci_Position iPos);
 void EditBookmarkSelectAll(void);
 
