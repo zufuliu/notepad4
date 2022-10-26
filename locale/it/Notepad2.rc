@@ -160,7 +160,7 @@ BEGIN
 		MENUITEM "Taglia\tCtrl+X",						IDM_EDIT_CUT
 		MENUITEM "&Copia\tCtrl+C",						IDM_EDIT_COPY
 		MENUITEM "&Incolla\tCtrl+V",						IDM_EDIT_PASTE
-		MENUITEM "&Elimina\tDelete",						IDM_EDIT_DELETE
+		MENUITEM "&Elimina\tCanc",						IDM_EDIT_DELETE
 		MENUITEM "Seleziona &Tutto\tCtrl+A",					IDM_EDIT_SELECTALL
 		MENUITEM "Scambia\tCtrl+K",						IDM_EDIT_SWAP
 		MENUITEM SEPARATOR
@@ -213,8 +213,8 @@ BEGIN
 		END
 		POPUP "&Linee"
 		BEGIN
-			MENUITEM "Sposta &Su\tAlt+Up",				IDM_EDIT_MOVELINEUP
-			MENUITEM "Sposta Giù\tAlt+Down",			IDM_EDIT_MOVELINEDOWN
+			MENUITEM "Sposta &Su\tAlt+Su",				IDM_EDIT_MOVELINEUP
+			MENUITEM "Sposta Giù\tAlt+Giù",			IDM_EDIT_MOVELINEDOWN
 			MENUITEM "Transponi\tAlt+S",				IDM_EDIT_LINETRANSPOSE
 			MENUITEM SEPARATOR
 			MENUITEM "Ordina Linee...\tAlt+O",			IDM_EDIT_SORTLINES
@@ -338,9 +338,9 @@ BEGIN
 			MENUITEM "Rimuovi Caratteri Escape HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
 			MENUITEM "Elimina Linea Sinistra\tCtrl+Shift+Back",		IDM_EDIT_DELETELINELEFT
-			MENUITEM "Elimina Linea Destra\tCtrl+Shift+Del",		IDM_EDIT_DELETELINERIGHT
+			MENUITEM "Elimina Linea Destra\tCtrl+Shift+Canc",		IDM_EDIT_DELETELINERIGHT
 			MENUITEM "Elimina Parola a Sinistra\tCtrl+Back",			CMD_CTRLBACK
-			MENUITEM "Elimina Parola a Destra\tCtrl+Del",			CMD_CTRLDEL
+			MENUITEM "Elimina Parola a Destra\tCtrl+Canc",			CMD_CTRLDEL
 			MENUITEM SEPARATOR
 			MENUITEM "Aggiorna stampa orario\tShift+F5",			CMD_TIMESTAMPS
 		END
@@ -369,7 +369,7 @@ BEGIN
 			MENUITEM "Trova parentesi corrispondente\tCtrl+B",				IDM_EDIT_FINDMATCHINGBRACE
 			MENUITEM "Seleziona sino alla parentesi corrispondente\tCtrl+Shift+B",		IDM_EDIT_SELTOMATCHINGBRACE
 			MENUITEM "Seleziona parola\tCtrl+Alt+Space",				IDM_EDIT_SELECTWORD
-			MENUITEM "Seleziona Linee (Espandi Selezione)\tCtrl+Shift+Space",	IDM_EDIT_SELECTLINE
+			MENUITEM "Seleziona Linee (Espandi Selezione)\tCtrl+Shift+Spazio",	IDM_EDIT_SELECTLINE
 			MENUITEM "Seleziona le linee del blocco corrente\tAlt+Shift+]",	IDM_EDIT_SELECTLINE_BLOCK
 			MENUITEM SEPARATOR
 			MENUITEM "Seleziona dall'inizio del documento",					IDM_EDIT_SELTODOCSTART
@@ -541,16 +541,16 @@ BEGIN
 		BEGIN
 			MENUITEM "Documento XML",				IDM_LEXER_XML
 			MENUITEM "XML &Schema",					IDM_LEXER_XSD
-			MENUITEM "XSL&T Stylesheet",			IDM_LEXER_XSLT
+			MENUITEM "Foglio di stile XSL&T",	IDM_LEXER_XSLT
 			MENUITEM "XML &DTD",					IDM_LEXER_DTD
 		END
 		POPUP "XML (&Java)"
 		BEGIN
 			MENUITEM "Ant &Build",					IDM_LEXER_ANT_BUILD
 			MENUITEM "Maven &POM",					IDM_LEXER_MAVEN_POM
-			MENUITEM "&Maven Settings",				IDM_LEXER_MAVEN_SETTINGS
+			MENUITEM "Impostazioni &Maven",	IDM_LEXER_MAVEN_SETTINGS
 			MENUITEM "I&vy Module",					IDM_LEXER_IVY_MODULE
-			MENUITEM "&Ivy Settings",				IDM_LEXER_IVY_SETTINGS
+			MENUITEM "Impostazioni &Ivy",		IDM_LEXER_IVY_SETTINGS
 			MENUITEM "PMD &Ruleset",				IDM_LEXER_PMD_RULESET
 			MENUITEM "&Checkstyle",					IDM_LEXER_CHECKSTYLE
 		END
@@ -938,7 +938,7 @@ BEGIN
     VK_OEM_1,       IDM_EDIT_GOTO_BLOCK_START,  VIRTKEY, ALT, NOINVERT
     VK_OEM_5,       IDM_VIEW_RESETZOOM,         VIRTKEY, CONTROL, NOINVERT
     VK_OEM_PLUS,    IDM_EDIT_GOTO_BLOCK_END,    VIRTKEY, ALT, NOINVERT
-    VK_OEM_6,       IDM_EDIT_SELECTLINE_BLOCK,  VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_OEM_PLUS,    IDM_EDIT_SELECTLINE_BLOCK,  VIRTKEY, SHIFT, ALT, NOINVERT
     VK_OEM_COMMA,   IDM_EDIT_GOTO_PREVIOUS_BLOCK,VIRTKEY, ALT, NOINVERT
     VK_OEM_COMMA,   IDM_EDIT_GOTO_PREV_SIBLING_BLOCK,VIRTKEY, CONTROL, ALT, NOINVERT
     VK_OEM_COMMA,   CMD_JUMP2SELSTART,          VIRTKEY, CONTROL, SHIFT, NOINVERT
