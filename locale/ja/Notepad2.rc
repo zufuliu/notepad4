@@ -76,6 +76,7 @@ BEGIN
 		MENUITEM "開く(&O)...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "上書き保存(&S)\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "名前を付けて保存(&A)...\tF6",					IDM_FILE_SAVEAS
+		MENUITEM "Save Backup(&U)",					    IDM_FILE_SAVEBACKUP
 		MENUITEM "コピーして保存(&Y)...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
 		POPUP "編集モード(&M)"

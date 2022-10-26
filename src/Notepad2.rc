@@ -76,6 +76,7 @@ BEGIN
 		MENUITEM "&Open...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "&Save\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "Save &As...\tF6",					IDM_FILE_SAVEAS
+		MENUITEM "Save Back&up",					IDM_FILE_SAVEBACKUP
 		MENUITEM "Save Cop&y...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
 		POPUP "File &Mode"

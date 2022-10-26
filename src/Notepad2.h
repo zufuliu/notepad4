@@ -279,7 +279,7 @@ enum {
 
 void	AutoSave_Start(bool reset);
 void	AutoSave_Stop(BOOL keepBackup);
-void	AutoSave_DoWork(bool keepBackup);
+void	AutoSave_DoWork(FileSaveFlag saveFlag);
 LPCWSTR AutoSave_GetDefaultFolder(void);
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);

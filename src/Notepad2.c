@@ -1161,7 +1161,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_QUERYENDSESSION:
 		// we only have 5 seconds to save current file
 		if (iAutoSaveOption & AutoSaveOption_Shutdown) {
-			AutoSave_DoWork(TRUE);
+			AutoSave_DoWork(FileSaveFlag_SaveCopy);
 		}
 		if (FileSave((FileSaveFlag)(FileSaveFlag_Ask | FileSaveFlag_EndSession))) {
 			return TRUE;
@@ -1172,7 +1172,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		if (wParam == PBT_APMSUSPEND) {
 			// we only have 2 seconds to save current file
 			if (iAutoSaveOption & AutoSaveOption_Suspend) {
-				AutoSave_DoWork(TRUE);
+				AutoSave_DoWork(FileSaveFlag_SaveCopy);
 			}
 		}
 		break;
@@ -1201,7 +1201,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_TIMER:
 		if (wParam == ID_AUTOSAVETIMER) {
-			AutoSave_DoWork(FALSE);
+			AutoSave_DoWork(FileSaveFlag_Default);
 		}
 		break;
 
@@ -2768,6 +2768,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_FILE_SAVEAS:
 		FileSave((FileSaveFlag)(FileSaveFlag_SaveAlways | FileSaveFlag_SaveAs));
+		break;
+
+	case IDM_FILE_SAVEBACKUP:
+		AutoSave_DoWork(FileSaveFlag_SaveAlways);
 		break;
 
 	case IDM_FILE_SAVECOPY:
@@ -5011,7 +5015,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					}
 				} else if (scn->updated & SC_UPDATE_CONTENT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
-					// SCN_MODIFIED is suppressed on loading file, thus avoided second statusbar update.
 					if (editMarkAllStatus.matchCount) {
 						EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 					}
@@ -8772,8 +8775,8 @@ LPCWSTR AutoSave_GetDefaultFolder(void) {
 	return szFolder;
 }
 
-void AutoSave_DoWork(bool keepBackup) {
-	if (!IsDocumentModified() || dwCurrentDocReversion == dwLastSavedDocReversion) {
+void AutoSave_DoWork(FileSaveFlag saveFlag) {
+	if (!(saveFlag & FileSaveFlag_SaveAlways) && (!IsDocumentModified() || dwCurrentDocReversion == dwLastSavedDocReversion)) {
 		return;
 	}
 
@@ -8869,7 +8872,7 @@ void AutoSave_DoWork(bool keepBackup) {
 	NP2HeapFree(lpData);
 
 	if (bWriteSuccess) {
-		if (!keepBackup && autoSaveCount == MaxAutoSaveCount) {
+		if (!(saveFlag & FileSaveFlag_SaveCopy) && autoSaveCount == MaxAutoSaveCount) {
 			// delete oldest backup
 			LPWSTR old = autoSavePathList[0];
 			if (old) {

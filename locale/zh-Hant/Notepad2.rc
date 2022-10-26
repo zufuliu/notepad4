@@ -76,6 +76,7 @@ BEGIN
 		MENUITEM "開啟(&O)...\tCtrl+O",			IDM_FILE_OPEN
 		MENUITEM "儲存(&S)\tCtrl+S",				IDM_FILE_SAVE
 		MENUITEM "另存為(&A)...\tF6",			IDM_FILE_SAVEAS
+		MENUITEM "保存備份(&U)",					IDM_FILE_SAVEBACKUP
 		MENUITEM "儲存複本(&Y)...\tCtrl+F6",		IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
 		POPUP "檔案模式(&M)"
