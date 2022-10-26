@@ -316,18 +316,16 @@ void EditView::DropGraphics() noexcept {
 	pixmapIndentGuideHighlight.reset();
 }
 
-static const char *ControlCharacterString(unsigned char ch) noexcept {
-	static const char * const reps[] = {
+static std::string_view ControlCharacterString(unsigned char ch) noexcept {
+	// C0 control set, same as Editor::SetRepresentations()
+	static constexpr char reps[][4] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
 		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
 		"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
-		"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US"
+		"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "BAD"
 	};
-	if (ch < std::size(reps)) {
-		return reps[ch];
-	} else {
-		return "BAD";
-	}
+	const char *rep = reps[std::min(ch, static_cast<unsigned char>(std::size(reps) - 1))];
+	return std::string_view(rep, (rep[2] == '\0') ? 2 : 3);
 }
 
 static void DrawTabArrow(Surface *surface, PRectangle rcTab, int ymid,
@@ -1425,7 +1423,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 					hexits[1] = "0123456789ABCDEF"[chEOL >> 4];
 					hexits[2] = "0123456789ABCDEF"[chEOL & 15];
 					hexits[3] = '\0';
-					ctrlChar = hexits;
+					ctrlChar = std::string_view(hexits, 3);
 				}
 			}
 
@@ -1852,21 +1850,34 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 
 	// Draw any box or stadium shape
 	if (FlagSet(phase, DrawPhase::indicatorsBack)) {
-		if (vsDraw.eolAnnotationVisible >= EOLAnnotationVisible::Boxed) {
-			PRectangle rcBox = rcSegment;
-			rcBox.left = std::round(rcBox.left);
-			rcBox.right = std::round(rcBox.right);
-			if (vsDraw.eolAnnotationVisible == EOLAnnotationVisible::Boxed) {
+		const PRectangle rcBox = PixelAlign(rcSegment, 1);
+
+		switch (vsDraw.eolAnnotationVisible) {
+		case EOLAnnotationVisible::Standard:
+			if (phasesDraw != PhasesDraw::One) {
+				surface->FillRectangle(rcBox, textBack);
+			}
+			break;
+
+		case EOLAnnotationVisible::Boxed:
+			if (phasesDraw == PhasesDraw::One) {
+				// Draw a rectangular outline around the text
 				surface->RectangleFrame(rcBox, Stroke(textFore));
 			} else {
-				if (phasesDraw == PhasesDraw::One) {
-					// Draw an outline around the text
-					surface->Stadium(rcBox, FillStroke(ColourRGBA(textBack, 0), textFore, 1.0), ends);
-				} else {
-					// Draw with a fill to fill the edges of the shape.
-					surface->Stadium(rcBox, FillStroke(textBack, textFore, 1.0), ends);
-				}
+				// Draw with a fill to fill the edges of the rectangle.
+				surface->RectangleDraw(rcBox, FillStroke(textBack, textFore));
 			}
+			break;
+
+		default:
+			if (phasesDraw == PhasesDraw::One) {
+				// Draw an outline around the text
+				surface->Stadium(rcBox, FillStroke(ColourRGBA(textBack, 0), textFore), ends);
+			} else {
+				// Draw with a fill to fill the edges of the shape.
+				surface->Stadium(rcBox, FillStroke(textBack, textFore), ends);
+			}
+			break;
 		}
 	}
 

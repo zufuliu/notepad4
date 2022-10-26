@@ -6779,8 +6779,8 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 }
 
 typedef struct UnicodeControlCharacter {
-	LPCSTR uccUTF8;
-	LPCSTR representation;
+	char uccUTF8[4];
+	char representation[5];
 } UnicodeControlCharacter;
 
 // https://en.wikipedia.org/wiki/Unicode_control_characters
@@ -6803,10 +6803,10 @@ static const UnicodeControlCharacter kUnicodeControlCharacterTable[] = {
 	{ "\xe2\x81\xad", "AAFS" },	// U+206D	AAFS	Activate Arabic form shaping
 	{ "\xe2\x81\xac", "IAFS" },	// U+206C	IAFS	Inhibit Arabic form shaping
 	// Scintilla built-in, Editor::SetRepresentations()
-	{ "\x1e", NULL },			// U+001E	RS		Record Separator (Block separator)
-	{ "\x1f", NULL },			// U+001F	US		Unit Separator (Segment separator)
-	{ "\xe2\x80\xa8", NULL },	// U+2028	LS		Line Separator
-	{ "\xe2\x80\xa9", NULL },	// U+2029	PS		Paragraph Separator
+	{ "\x1e", "" },			// U+001E	RS		Record Separator (Block separator)
+	{ "\x1f", "" },			// U+001F	US		Unit Separator (Segment separator)
+	{ "\xe2\x80\xa8", "" },	// U+2028	LS		Line Separator
+	{ "\xe2\x80\xa9", "" },	// U+2029	PS		Paragraph Separator
 	// Other
 	{ "\xe2\x80\x8b", "ZWSP" },	// U+200B	ZWSP	Zero width space
 	{ "\xe2\x81\xa0", "WJ" },	// U+2060	WJ		Word joiner

@@ -211,24 +211,35 @@ void Editor::Finalise() noexcept {
 void Editor::SetRepresentations() {
 	reprs.Clear();
 
-	// C0 control set
-	static const char * const reps[] = {
+	// C0 control set, same as ControlCharacterString()
+	static constexpr char reps[][4] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
 		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
 		"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
-		"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US"
+		"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "BAD"
 	};
-	for (size_t j = 0; j < std::size(reps); j++) {
+	for (size_t j = 0; j < std::size(reps) - 1; j++) {
 		const char c[2] = { static_cast<char>(j), '\0' };
-		reprs.SetRepresentation(std::string_view(c, 1), reps[j]);
+		const char *rep = reps[j];
+		reprs.SetRepresentation(std::string_view(c, 1), std::string_view(rep, (rep[2] == '\0') ? 2 : 3));
 	}
-	reprs.SetRepresentation("\x7f", "DEL");
+
+	struct CharacterRepresentation {
+		char code[4];
+		char rep[4];
+	};
+	static constexpr CharacterRepresentation repsMisc[] = {
+		{ "\x7f", "DEL" },
+		{ "\xe2\x80\xa8", "LS" },
+		{ "\xe2\x80\xa9", "PS" },
+	};
+	reprs.SetRepresentation(std::string_view(repsMisc[0].code, 1), std::string_view(repsMisc[0].rep, 3));
 
 	const int dbcsCodePage = pdoc->dbcsCodePage;
 	// C1 control set
 	// As well as Unicode mode, ISO-8859-1 should use these
 	if (CpUtf8 == dbcsCodePage) {
-		static const char * const repsC1[] = {
+		static constexpr char repsC1[][5] = {
 			"PAD", "HOP", "BPH", "NBH", "IND", "NEL", "SSA", "ESA",
 			"HTS", "HTJ", "VTS", "PLD", "PLU", "RI", "SS2", "SS3",
 			"DCS", "PU1", "PU2", "STS", "CCH", "MW", "SPA", "EPA",
@@ -236,10 +247,12 @@ void Editor::SetRepresentations() {
 		};
 		for (size_t j = 0; j < std::size(repsC1); j++) {
 			const char c1[3] = { '\xc2',  static_cast<char>(0x80 + j), '\0' };
-			reprs.SetRepresentation(c1, repsC1[j]);
+			const char *rep = repsC1[j];
+			const size_t len = (rep[2] == '\0') ? 2 : ((rep[3] == '\0') ? 3 : 4);
+			reprs.SetRepresentation(std::string_view(c1, 2), std::string_view(rep, len));
 		}
-		reprs.SetRepresentation("\xe2\x80\xa8", "LS");
-		reprs.SetRepresentation("\xe2\x80\xa9", "PS");
+		reprs.SetRepresentation(std::string_view(repsMisc[1].code, 3), std::string_view(repsMisc[1].rep, 2));
+		reprs.SetRepresentation(std::string_view(repsMisc[2].code, 3), std::string_view(repsMisc[2].rep, 2));
 	}
 	if (dbcsCodePage) {
 		// UTF-8 invalid bytes or DBCS invalid single bytes.
@@ -247,7 +260,7 @@ void Editor::SetRepresentations() {
 			if (!IsDBCSValidSingleByte(dbcsCodePage, k)) {
 				const char hiByte[2] = { static_cast<char>(k), '\0' };
 				const char hexits[4] = { 'x', "0123456789ABCDEF"[k >> 4], "0123456789ABCDEF"[k & 15], '\0' };
-				reprs.SetRepresentation(hiByte, hexits);
+				reprs.SetRepresentation(std::string_view(hiByte, 1), std::string_view(hexits, 3));
 			}
 		}
 	}
