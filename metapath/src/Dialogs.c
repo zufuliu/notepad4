@@ -13,7 +13,7 @@
 *
 *                                              (c) Florian Balmer 1996-2011
 *                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
+*                                              https://www.flos-freeware.ch
 *
 *
 ******************************************************************************/
@@ -457,7 +457,7 @@ void OpenHelpLink(HWND hwnd, int cmd) {
 	LPCWSTR link = NULL;
 	switch (cmd) {
 	case IDC_WEBPAGE_LINK:
-		link = L"http://www.flos-freeware.ch";
+		link = L"https://www.flos-freeware.ch";
 		break;
 	case IDC_EMAIL_LINK:
 		link = L"mailto:florian.balmer@gmail.com";

@@ -13,7 +13,7 @@
 *
 *                                              (c) Florian Balmer 1996-2011
 *                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
+*                                              https://www.flos-freeware.ch
 *
 *
 ******************************************************************************/
@@ -33,7 +33,7 @@
 									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
 #define VERSION_LEGALCOPYRIGHT		L"\xA9 1996-2022 Florian Balmer and all contributors"
 #define VERSION_COMPANYNAME			L"Florian Balmer et al."
-#define VERSION_WEBPAGE_DISPLAY		L"flo's freeware - http://www.flos-freeware.ch"
+#define VERSION_WEBPAGE_DISPLAY		L"flo's freeware - https://www.flos-freeware.ch"
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"
 #define VERSION_NEWPAGE_DISPLAY		L"https://github.com/zufuliu/notepad2"
 

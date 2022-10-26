@@ -13,7 +13,7 @@
 *
 *                                              (c) Florian Balmer 1996-2011
 *                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
+*                                              https://www.flos-freeware.ch
 *
 *
 ******************************************************************************/
@@ -1340,8 +1340,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			flagReadOnlyMode &= ReadOnlyMode_AllFile;
 
 			NP2HeapFree(params);
-
-			UpdateStatusbar();
 		}
 	}
 	return TRUE;
@@ -2197,7 +2195,6 @@ static void OnStyleThemeChanged(int theme) {
 //
 void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(hwnd);
-
 	if (wParam == SIZE_MINIMIZED) {
 		return;
 	}
@@ -2237,15 +2234,12 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	}
 
 	HDWP hdwp = BeginDeferWindowPos(2);
-
 	DeferWindowPos(hdwp, hwndEditFrame, NULL, x, y, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
-
 	DeferWindowPos(hdwp, hwndEdit, NULL, x + cxEditFrame, y + cyEditFrame,
 				   cx - 2 * cxEditFrame, cy - 2 * cyEditFrame, SWP_NOZORDER | SWP_NOACTIVATE);
-
 	EndDeferWindowPos(hdwp);
 
-	// Update Statusbar
+	// resize Statusbar items
 	UpdateStatusbar();
 }
 
@@ -2720,8 +2714,6 @@ static void ConvertLineEndings(int iNewEOLMode) {
 	SciCall_SetEOLMode(iNewEOLMode);
 	EditEnsureConsistentLineEndings();
 	UpdateStatusBarCache(StatusItem_EolMode);
-	UpdateToolbar();
-	UpdateStatusbar();
 	UpdateWindowTitle();
 }
 
@@ -3059,8 +3051,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			UpdateStatusBarCache(StatusItem_Encoding);
-			UpdateToolbar();
-			UpdateStatusbar();
 			UpdateWindowTitle();
 		}
 	}
@@ -3229,7 +3219,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (CountClipboardFormats() > 0) {
 				EmptyClipboard();
 				UpdateToolbar();
-				UpdateStatusbar();
 			}
 			CloseClipboard();
 		}
@@ -4791,7 +4780,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 			fvCurFile.iLongLinesLimit = iLongLinesLimitG = clamp_i(iLongLinesLimitG, 0, NP2_LONG_LINE_LIMIT);
 			SciCall_SetEdgeColumn(fvCurFile.iLongLinesLimit);
-			UpdateStatusbar();
 		}
 		break;
 
@@ -5023,7 +5011,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					}
 				} else if (scn->updated & SC_UPDATE_CONTENT) {
 					// cachedStatusItem.updateMask is already set in SCN_MODIFIED.
-					// SCN_MODIFIED is not fired after loading file, thus saved the time to update statusbar.
+					// SCN_MODIFIED is suppressed on loading file, thus avoided second statusbar update.
 					if (editMarkAllStatus.matchCount) {
 						EditMarkAll(TRUE, bMarkOccurrencesMatchCase, bMarkOccurrencesMatchWords, bMarkOccurrencesBookmark);
 					}
@@ -7593,10 +7581,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		}
 
 		bInitDone = true;
-		//! workaround for blank statusbar after loading large file.
-		DisableDelayedStatusBarRedraw();
+		//! workaround for blank statusbar after loading large file: SCN_UPDATEUI is fired after Scintilla become idle.
+		//DisableDelayedStatusBarRedraw(); // already set in MsgSize()
 		UpdateStatusbar();
-		UpdateDocumentModificationStatus();
+		UpdateWindowTitle();
 		// Show warning: Unicode file loaded as ANSI
 		if (status.bUnicodeErr) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);

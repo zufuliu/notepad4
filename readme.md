@@ -1,6 +1,6 @@
 # Notepad2 and metapath
 
-> *Notepad2-zufuliu* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](http://www.flos-freeware.ch/archive.html).
+> *Notepad2-zufuliu* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](https://www.flos-freeware.ch/archive.html).
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad2/total.svg)](https://github.com/zufuliu/notepad2/releases)
 
@@ -14,7 +14,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
 ![v4.20.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.20.04.png)
 
-## Changes compared to the official [Notepad2](http://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
+## Changes compared to the official [Notepad2](https://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
 * Support for bookmarks
 * Option to mark all occurrences of a word or selection, and show matched count
@@ -28,7 +28,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [ActionScript](tools/lang/ActionScript.as) for ActionScript 3 and 4.
 	* Android Smali, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#android-smali)
 		* [javap](https://docs.oracle.com/en/java/javase/17/docs/specs/man/javap.html)
-		* [Jasmin](http://jasmin.sourceforge.net/)
+		* [Jasmin](https://jasmin.sourceforge.net/)
 	* ANSI Art
 	* [ANSYS](tools/lang/APDL.cdb) Parametric Design Language
 	* Assembler, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#assembler)
@@ -166,7 +166,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Per-Monitor DPI-Aware, improved high DPI display
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support font ligature with font like [FiraCode](https://github.com/tonsky/FiraCode) in Direct2D mode
-* Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](http://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
+* Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](https://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
 * Support full screen mode
@@ -193,7 +193,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Everyone else on [GitHub](https://github.com/zufuliu/notepad2/graphs/contributors) and on Notepad2-mod's [Contributor List](https://github.com/XhmikosR/notepad2-mod/graphs/contributors)
 
 ## More information:
-* [Official Notepad2 website](http://www.flos-freeware.ch/notepad2.html)
+* [Official Notepad2 website](https://www.flos-freeware.ch/notepad2.html)
 * [Official Notepad2-mod website](https://xhmikosr.github.io/notepad2-mod/)
 * [Scintilla's website](https://www.scintilla.org/)
 * [Build Notepad2 and metapath](https://github.com/zufuliu/notepad2/wiki/Build-Notepad2)

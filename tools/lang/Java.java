@@ -1,5 +1,5 @@
 // Java SE 18 https://docs.oracle.com/en/java/javase/index.html
-// JDK http://openjdk.java.net/projects/
+// JDK https://openjdk.java.net/projects/
 // https://docs.oracle.com/javase/specs/index.html
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
 
