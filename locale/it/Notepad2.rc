@@ -396,13 +396,13 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Vai all'inizio del Blocco\tAlt+[",					IDM_EDIT_GOTO_BLOCK_START
 			MENUITEM "Vai alla fine del Blocco\tAlt+]",						IDM_EDIT_GOTO_BLOCK_END
-			MENUITEM "Vai al Blocco precedente\tAlt+Comma (<,)",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
-			MENUITEM "Vai al Blocco successivo\tAlt+Period (>.)",			IDM_EDIT_GOTO_NEXT_BLOCK
-			MENUITEM "Vai al Blocco fratello precedente\tCtrl+Alt+Comma (<,)",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
-			MENUITEM "Vai al Blocco fratello successivo\tCtrl+Alt+Period (>.)",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
+			MENUITEM "Vai al Blocco precedente\tAlt+,",		IDM_EDIT_GOTO_PREVIOUS_BLOCK
+			MENUITEM "Vai al Blocco successivo\tAlt+.",			IDM_EDIT_GOTO_NEXT_BLOCK
+			MENUITEM "Vai al Blocco fratello precedente\tCtrl+Alt+,",IDM_EDIT_GOTO_PREV_SIBLING_BLOCK
+			MENUITEM "Vai al Blocco fratello successivo\tCtrl+Alt+.",	IDM_EDIT_GOTO_NEXT_SIBLING_BLOCK
 			MENUITEM SEPARATOR
-			MENUITEM "Vai all'inizio della selezione\tCtrl+Shift+Comma (<,)",CMD_JUMP2SELSTART
-			MENUITEM "Vai alla fine della selezione\tCtrl+Shift+Period (>.)",	CMD_JUMP2SELEND
+			MENUITEM "Vai all'inizio della selezione\tCtrl+Shift+,",CMD_JUMP2SELSTART
+			MENUITEM "Vai alla fine della selezione\tCtrl+Shift+.",	CMD_JUMP2SELEND
 		END
 	END
 	POPUP "&Visualizza"
@@ -935,9 +935,9 @@ BEGIN
     //VK_LEFT,        IDM_EDIT_NAVIGATE_BACKWARD, VIRTKEY, ALT, NOINVERT
     VK_OEM_2,       IDM_EDIT_LINECOMMENT,       VIRTKEY, CONTROL, NOINVERT
     VK_OEM_2,       IDM_EDIT_COMPLETEWORD,      VIRTKEY, ALT, NOINVERT
-    VK_OEM_4,       IDM_EDIT_GOTO_BLOCK_START,  VIRTKEY, ALT, NOINVERT
+    VK_OEM_1,       IDM_EDIT_GOTO_BLOCK_START,  VIRTKEY, ALT, NOINVERT
     VK_OEM_5,       IDM_VIEW_RESETZOOM,         VIRTKEY, CONTROL, NOINVERT
-    VK_OEM_6,       IDM_EDIT_GOTO_BLOCK_END,    VIRTKEY, ALT, NOINVERT
+    VK_OEM_PLUS,    IDM_EDIT_GOTO_BLOCK_END,    VIRTKEY, ALT, NOINVERT
     VK_OEM_6,       IDM_EDIT_SELECTLINE_BLOCK,  VIRTKEY, SHIFT, ALT, NOINVERT
     VK_OEM_COMMA,   IDM_EDIT_GOTO_PREVIOUS_BLOCK,VIRTKEY, ALT, NOINVERT
     VK_OEM_COMMA,   IDM_EDIT_GOTO_PREV_SIBLING_BLOCK,VIRTKEY, CONTROL, ALT, NOINVERT
