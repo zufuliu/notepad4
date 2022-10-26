@@ -13,7 +13,7 @@
 *
 *                                              (c) Florian Balmer 1996-2011
 *                                                  florian.balmer@gmail.com
-*                                               http://www.flos-freeware.ch
+*                                              https://www.flos-freeware.ch
 *
 *
 ******************************************************************************/

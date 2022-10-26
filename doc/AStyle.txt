@@ -1,4 +1,4 @@
-http://astyle.sourceforge.net/
+https://astyle.sourceforge.net/
 
 A2		--style=java
 A3		--style=kr

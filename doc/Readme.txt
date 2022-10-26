@@ -7,7 +7,7 @@
 =                                                                     =
 =                                                   Notepad2 4.2.25   =
 =                                      (c) Florian Balmer 2004-2011   =
-=                                       http://www.flos-freeware.ch   =
+=                                       https://www.flos-freeware.ch   =
 =                                                                     =
 =                                                                     =
 =======================================================================
@@ -70,6 +70,6 @@ Copyright
   florian.balmer@gmail.com
 
   (c) Florian Balmer 2004-2011
-  http://www.flos-freeware.ch
+  https://www.flos-freeware.ch
 
 ###

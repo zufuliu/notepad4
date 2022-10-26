@@ -2,7 +2,7 @@
 Notepad2, metapath and Notepad2-mod are licensed under the BSD 3-Clause License
 ================================================================================
 
-http://www.flos-freeware.ch
+https://www.flos-freeware.ch
 https://xhmikosr.github.io/notepad2-mod/
 
 metapath Copyright © 1996-2012 Florian Balmer, 2011-2022 Zufu Liu and All contributors.
@@ -188,7 +188,7 @@ https://github.com/zwegner/faster-utf8-validator
 Visual Studio 2017 Image Library
 
 https://www.microsoft.com/en-us/download/details.aspx?id=35825
-http://download.microsoft.com/download/0/6/0/0607D8EA-9BB7-440B-A36A-A24EB8C9C67E/Visual%20Studio%202017%20Image%20Library%20EULA.RTF
+https://download.microsoft.com/download/0/6/0/0607D8EA-9BB7-440B-A36A-A24EB8C9C67E/Visual%20Studio%202017%20Image%20Library%20EULA.RTF
 
 
 ================================================================================

@@ -1,10 +1,10 @@
 -- https://modern-sql.com/standard
--- http://jakewheat.github.io/sql-overview/
+-- https://jakewheat.github.io/sql-overview/
 -- https://ronsavage.github.io/SQL/
 
 -- SQL-92			===========================================================
 -- https://ronsavage.github.io/SQL/sql-92.bnf
--- http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
+-- https://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
 -- https://jakewheat.github.io/sql-overview/sql-92-grammar.html
 --! Data Types		===========================================================
 -- character string type
