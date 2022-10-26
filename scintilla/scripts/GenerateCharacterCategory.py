@@ -92,7 +92,7 @@ def isPrivateChar(c):
 # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs
 # https://en.wikipedia.org/wiki/Katakana
 # https://en.wikipedia.org/wiki/Hangul
-# Chapter 18 East Asia http://www.unicode.org/versions/Unicode13.0.0/UnicodeStandard-13.0.pdf
+# Chapter 18 East Asia https://www.unicode.org/versions/Unicode15.0.0/UnicodeStandard-15.0.pdf
 # Unicode Han Database (Unihan) https://unicode.org/reports/tr38/#BlockListing
 CJKBlockList = [
 	# Table 18-1. Blocks Containing Han Ideographs
@@ -107,6 +107,7 @@ CJKBlockList = [
 	(0x2CEB0, 0x2EBEF), # U+2CEB0..U+2EBEF CJK Unified Ideographs Extension F
 	(0x2F800, 0x2FA1F), # U+2F800..U+2FA1F CJK Compatibility Ideographs Supplement
 	(0x30000, 0x3134F), # U+30000..U+3134F CJK Unified Ideographs Extension G
+	(0x31350, 0x323AF), # U+31350..U+323AF CJK Unified Ideographs Extension H
 
 	(0x2E80, 0x2EFF), # U+2E80..U+2EFF CJK Radicals Supplement
 	(0x2F00, 0x2FDF), # U+2F00..U+2FDF Kangxi Radicals
