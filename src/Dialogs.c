@@ -2780,6 +2780,9 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 			Registry_SetDefaultString(hKey, tchModule);
 			Registry_SetString(hKey, L"Debugger", command);
 			Registry_SetInt(hKey, L"UseFilter", 0);
+			RegDeleteValue(hKey, L"AppExecutionAliasRedirectPackages");
+			RegDeleteValue(hKey, L"AppExecutionAliasRedirect");
+#if 0
 			WCHAR num[2] = { L'0', L'\0' };
 			for (int index = 0; index < 3; index++, num[0]++) {
 #if 1
@@ -2795,19 +2798,23 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 				}
 #endif
 			}
+#endif
 			RegCloseKey(hKey);
 		}
 	} else if (mask & SystemIntegration_RestoreNotepad) {
-#if 1
+#if 0
 		Registry_DeleteTree(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad);
 #else
 		// on Windows 11, all keys were created by the system, we should not delete them.
 		HKEY hKey;
-		LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE, &hKey);
+		const LSTATUS status = RegOpenKeyEx(HKEY_LOCAL_MACHINE, NP2RegSubKey_ReplaceNotepad, 0, KEY_WRITE, &hKey);
 		if (status == ERROR_SUCCESS) {
 			RegDeleteValue(hKey, NULL);
 			RegDeleteValue(hKey, L"Debugger");
-			RegDeleteValue(hKey, L"UseFilter");
+			Registry_SetInt(hKey, L"UseFilter", 1);
+			Registry_SetInt(hKey, L"AppExecutionAliasRedirect", 1);
+			Registry_SetString(hKey, L"AppExecutionAliasRedirectPackages", L"*");
+#if 0
 			GetWindowsDirectory(tchModule, COUNTOF(tchModule));
 			LPCWSTR const suffix[] = {
 				L"System32\\notepad.exe",
@@ -2820,10 +2827,13 @@ void UpdateSystemIntegrationStatus(int mask, LPCWSTR lpszText, LPCWSTR lpszName)
 				status = RegOpenKeyEx(hKey, num, 0, KEY_WRITE, &hSubKey);
 				if (status == ERROR_SUCCESS) {
 					PathCombine(command, tchModule, suffix[index]);
+					Registry_SetInt(hSubKey, L"AppExecutionAliasRedirect", 1);
+					Registry_SetString(hSubKey, L"AppExecutionAliasRedirectPackages", L"*");
 					Registry_SetString(hSubKey, L"FilterFullPath", command);
 					RegCloseKey(hSubKey);
 				}
 			}
+#endif
 			RegCloseKey(hKey);
 		}
 #endif
