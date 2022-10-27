@@ -746,7 +746,10 @@ void ScintillaWin::Finalise() noexcept {
 }
 
 bool ScintillaWin::UpdateRenderingParams(bool force) noexcept {
-	HMONITOR monitor = ::MonitorFromWindow(MainHWND(), MONITOR_DEFAULTTONEAREST);
+	// see https://sourceforge.net/p/scintilla/bugs/2344/?page=2
+	//HWND topLevel = ::GetAncestor(MainHWND(), GA_ROOT);
+	HWND topLevel = ::GetParent(MainHWND()); // our main window
+	HMONITOR monitor = ::MonitorFromWindow(topLevel, MONITOR_DEFAULTTONEAREST);
 	if (!force && monitor == hCurrentMonitor && (technology == Technology::Default || defaultRenderingParams)) {
 		return false;
 	}
