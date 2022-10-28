@@ -1845,7 +1845,7 @@ BEGIN
     IDS_TITLEEXCERPT        """%s"""
     IDS_READONLY_FILE       "(Read Only File)"
     IDS_READONLY_MODE       "(Read Only Mode)"
-    IDS_STATUSITEM_FORMAT   "Ln %s / %s\nCol %s / %s\nCh %s / %s\nSel %s / %s\nSelLn %s\nFnd %s"
+    IDS_STATUSITEM_FORMAT   "Ln %s / %s \nCol %s / %s \nCh %s / %s \nSel %s / %s \nSelLn %s \nFnd %s "
     IDS_LOADFILE            "Loading ""%s""..."
     IDS_SAVEFILE            "Saving ""%s""..."
     IDS_PRINTFILE           "Printing page %s..."
