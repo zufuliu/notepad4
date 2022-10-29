@@ -76,8 +76,8 @@ BEGIN
 		MENUITEM "열기(&O)...\tCtrl+O",				IDM_FILE_OPEN
 		MENUITEM "저장(&S)\tCtrl+S",					IDM_FILE_SAVE
 		MENUITEM "다른 이름으로 저장(&A)...\tF6",					IDM_FILE_SAVEAS
-		MENUITEM "Save Backup(&U)",					    IDM_FILE_SAVEBACKUP
-		MENUITEM "복사본 저장(&Y)...\tCtrl+F6",			IDM_FILE_SAVECOPY
+		MENUITEM "백업 저장(&U)",					    IDM_FILE_SAVEBACKUP
+		MENUITEM "사본 저장(&Y)...\tCtrl+F6",			IDM_FILE_SAVECOPY
 		MENUITEM SEPARATOR
 		POPUP "파일 모드(&M)"
 		BEGIN
