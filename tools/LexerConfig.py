@@ -858,8 +858,12 @@ LexerConfigMap = {
 def get_enum_flag_expr(flag, merge=True, separator='_'):
 	cls = flag.__class__
 	prefix = cls.__name__ + separator
-	if flag.name:
-		return prefix + flag.name
+	if name := flag.name:
+		if '|' in name:
+			# Python 3.11
+			result = [prefix + item.strip() for item in name.split('|')]
+			return ' | '.join(result) if merge else result
+		return prefix + name
 
 	result = []
 	values = cls.__members__.values()
