@@ -11,14 +11,14 @@ static KEYWORDLIST Keywords_VB = {{
 "Declare Default Delegate Dim DirectCast Do Each Else ElseIf End Enum Erase Error Event Exit "
 "False Finally For Friend Function Get GetType GetXMLNamespace Global Goto Handles If Implements "
 "Imports In Inherits Interface Is IsNot Let Lib Like Loop Me Mod Module MustInherit MustOverride "
-"My MyBase MyClass Namespace Narrowing New Next Not Nothing NotInheritable NotOverridable Of On "
+"My MyBase MyClass NameOf Namespace Narrowing New Next Not Nothing NotInheritable NotOverridable Of On "
 "Operator Option Optional Or OrElse Out Overloads Overridable Overrides ParamArray Partial Private "
 "Property Protected Public RaiseEvent Readonly ReDim Rem RemoveHandler Resume Return Select Set "
 "Shadows Shared Static Step Stop Structure Sub SyncLock Then Throw To True Try TryCast TypeOf Using "
 "When While Widening With WithEvents WriteOnly Xor "
 // Unreserved Keyword
 "Aggregate Ansi Assembly Async Attribute Auto Await Binary By Compare Custom Distinct Equals Explicit "
-"From Group Into IsFalse IsTrue Join Key Mid Off Order Preserve Skip Strict Take Text Unicode Until Where Yield "
+"From Group Into IsFalse IsTrue Iterator Join Key Mid Off Order Preserve Skip Strict Take Text Unicode Until Where Yield "
 
 "Array Any Count GroupBy OrderBy "
 // VB6
