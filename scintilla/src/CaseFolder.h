@@ -32,7 +32,7 @@ public:
 class ICaseConverter;
 
 class CaseFolderUnicode final : public CaseFolderTable {
-	ICaseConverter *converter;
+	const ICaseConverter *converter;
 public:
 	CaseFolderUnicode();
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override;

@@ -18,10 +18,10 @@ enum class CaseConversion {
 
 class ICaseConverter {
 public:
-	virtual size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixed, size_t lenMixed) = 0;
+	virtual size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixed, size_t lenMixed) const = 0;
 };
 
-ICaseConverter *ConverterFor(CaseConversion conversion);
+const ICaseConverter *ConverterFor(CaseConversion conversion);
 
 // Returns a UTF-8 string. Empty when no conversion
 const char *CaseConvert(int character, CaseConversion conversion);
