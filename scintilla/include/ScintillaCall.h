@@ -92,7 +92,7 @@ public:
 	void SetUndoCollection(bool collectUndo);
 	void SelectAll();
 	void SetSavePoint();
-	Position GetStyledText(void *tr);
+	Position GetStyledTextFull(void *tr);
 	bool CanRedo();
 	Line MarkerLineFromHandle(int markerHandle);
 	void MarkerDeleteHandle(int markerHandle);

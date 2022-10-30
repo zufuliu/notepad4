@@ -210,8 +210,8 @@ void ScintillaCall::SetSavePoint() {
 	Call(Message::SetSavePoint);
 }
 
-Position ScintillaCall::GetStyledText(void *tr) {
-	return CallPointer(Message::GetStyledText, 0, tr);
+Position ScintillaCall::GetStyledTextFull(void *tr) {
+	return CallPointer(Message::GetStyledTextFull, 0, tr);
 }
 
 bool ScintillaCall::CanRedo() {

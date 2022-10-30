@@ -373,6 +373,7 @@ public:
 	void CheckReadOnly() noexcept;
 	bool DeleteChars(Sci::Position pos, Sci::Position len);
 	Sci::Position InsertString(Sci::Position position, const char *s, Sci::Position insertLength);
+	Sci::Position InsertString(Sci::Position position, std::string_view sv);
 	void ChangeInsertion(const char *s, Sci::Position length);
 	int SCI_METHOD AddData(const char *data, Sci_Position length) override;
 	void * SCI_METHOD ConvertToDocument() noexcept override;

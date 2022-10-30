@@ -32,7 +32,7 @@ def printHFile(f):
 		out.append("#endif")
 	return out
 
-def RegenerateAll(root, showMaxID):
+def RegenerateAll(root, showMaxID, showUnused = False):
 	f = Face.Face()
 	f.ReadFromFile(root / "include/Scintilla.iface")
 	FileGenerator.Regenerate(root / "include/Scintilla.h", "/* ", printHFile(f))
@@ -40,18 +40,19 @@ def RegenerateAll(root, showMaxID):
 		valueSet = set(int(x) for x in f.values if int(x) < 3000)
 		maximumID = max(valueSet)
 		print("Maximum ID is", maximumID)
-		#~ valuesUnused = sorted(x for x in range(2001, maximumID) if x not in valueSet)
-		#~ print("\nUnused values")
-		#~ valueToName = {}
-		#~ for name, feature in f.features.items():
-			#~ try:
-				#~ value = int(feature["Value"])
-				#~ valueToName[value] = name
-			#~ except ValueError:
-				#~ pass
-		#~ for v in valuesUnused:
-			#~ prev = valueToName.get(v-1, "")
-			#~ print(v, prev)
+		if showUnused:
+			valuesUnused = sorted(x for x in range(2001, maximumID) if x not in valueSet)
+			print("\nUnused values")
+			valueToName = {}
+			for name, feature in f.features.items():
+				try:
+					value = int(feature["Value"])
+					valueToName[value] = name
+				except ValueError:
+					pass
+			for v in valuesUnused:
+				prev = valueToName.get(v - 1, "")
+				print(v, prev)
 
 if __name__ == "__main__":
 	RegenerateAll(pathlib.Path(__file__).resolve().parent.parent, True)

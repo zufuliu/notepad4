@@ -3042,7 +3042,7 @@ class ListBoxX final : public ListBox {
 	PRectangle rcPreSize;
 	Point dragOffset;
 	Point location;	// Caret location at which the list is opened
-	int wheelDelta = 0; // mouse wheel residue
+	MouseWheelDelta wheelDelta;
 	DWORD frameStyle = WS_THICKFRAME;
 
 	HWND GetHWND() const noexcept;
@@ -3912,12 +3912,10 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		return ::DefWindowProc(hWnd, iMessage, wParam, lParam);
 
 	case WM_MOUSEWHEEL:
-		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
-		if (std::abs(wheelDelta) >= WHEEL_DELTA) {
+		if (wheelDelta.Accumulate(wParam)) {
 			const int nRows = GetVisibleRows();
 			int linesToScroll = std::clamp(nRows - 1, 1, 3);
-			linesToScroll *= (wheelDelta / WHEEL_DELTA);
-			wheelDelta %= WHEEL_DELTA;
+			linesToScroll *= wheelDelta.Actions();
 			int top = ListBox_GetTopIndex(lb) + linesToScroll;
 			if (top < 0) {
 				top = 0;

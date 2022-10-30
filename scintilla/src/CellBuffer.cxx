@@ -333,22 +333,15 @@ public:
 	}
 };
 
-Action::Action() noexcept {
-	at = ActionType::start;
-	position = 0;
-	lenData = 0;
-	mayCoalesce = false;
-}
-
 void Action::Create(ActionType at_, Sci::Position position_, const char *data_, Sci::Position lenData_, bool mayCoalesce_) {
-	data = nullptr;
 	position = position_;
 	at = at_;
+	mayCoalesce = mayCoalesce_;
+	lenData = lenData_;
+	data = nullptr;
 	if (lenData_) {
 		data = UniqueCopy(data_, lenData_);
 	}
-	lenData = lenData_;
-	mayCoalesce = mayCoalesce_;
 }
 
 void Action::Clear() noexcept {

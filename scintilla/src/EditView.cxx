@@ -316,7 +316,7 @@ void EditView::DropGraphics() noexcept {
 	pixmapIndentGuideHighlight.reset();
 }
 
-static std::string_view ControlCharacterString(unsigned char ch) noexcept {
+static inline std::string_view ControlCharacterString(unsigned char ch) noexcept {
 	// C0 control set, same as Editor::SetRepresentations()
 	static constexpr char reps[][4] = {
 		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",

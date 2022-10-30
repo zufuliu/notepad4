@@ -1364,6 +1364,10 @@ Sci::Position Document::InsertString(Sci::Position position, const char *s, Sci:
 	return insertLength;
 }
 
+Sci::Position Document::InsertString(Sci::Position position, std::string_view sv) {
+	return InsertString(position, sv.data(), sv.length());
+}
+
 void Document::ChangeInsertion(const char *s, Sci::Position length) {
 	insertionSet = true;
 	insertion.assign(s, length);
@@ -2164,8 +2168,8 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 			const unsigned char charStartSearch = searchData[0];
 			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((direction >= 0 || CpUtf8 == dbcsCodePage) ? safeCharASCII : dbcsCharClass->MinTrailByte());
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
-			// http://www-igm.univ-mlv.fr/~lecroq/string/index.html
-			// http://www-igm.univ-mlv.fr/~lecroq/string/node19.html
+			// https://www-igm.univ-mlv.fr/~lecroq/string/index.html
+			// https://www-igm.univ-mlv.fr/~lecroq/string/node19.html
 			// https://www.inf.hs-flensburg.de/lang/algorithmen/pattern/sundayen.htm
 			auto& shiftTable = searchThing.shiftTable;
 			if (lengthFind != 1) {

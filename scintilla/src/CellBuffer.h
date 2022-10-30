@@ -27,20 +27,20 @@ class ChangeHistory;
  */
 class ILineVector;
 
-enum class ActionType { insert, remove, start, container };
+enum class ActionType : uint8_t { insert, remove, start, container };
 
 /**
  * Actions are used to store all the information required to perform one undo/redo step.
  */
 class Action {
 public:
-	ActionType at;
-	Sci::Position position;
+	ActionType at = ActionType::insert;
+	bool mayCoalesce = false;
+	Sci::Position position = 0;
 	std::unique_ptr<char[]> data;
-	Sci::Position lenData;
-	bool mayCoalesce;
+	Sci::Position lenData = 0;
 
-	Action() noexcept;
+	Action() noexcept = default;
 	void Create(ActionType at_, Sci::Position position_ = 0, const char *data_ = nullptr, Sci::Position lenData_ = 0, bool mayCoalesce_ = true);
 	void Clear() noexcept;
 };

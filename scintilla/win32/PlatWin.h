@@ -188,6 +188,20 @@ inline UINT DpiForWindow(WindowID wid) noexcept {
 
 HCURSOR LoadReverseArrowCursor(UINT dpi) noexcept;
 
+class MouseWheelDelta {
+	int wheelDelta = 0;
+public:
+	bool Accumulate(WPARAM wParam) noexcept {
+		wheelDelta -= GET_WHEEL_DELTA_WPARAM(wParam);
+		return std::abs(wheelDelta) >= WHEEL_DELTA;
+	}
+	int Actions() noexcept {
+		const int actions = wheelDelta / WHEEL_DELTA;
+		wheelDelta = wheelDelta % WHEEL_DELTA;
+		return actions;
+	}
+};
+
 constexpr BYTE Win32MapFontQuality(FontQuality extraFontFlag) noexcept {
 	constexpr UINT mask = (DEFAULT_QUALITY << static_cast<int>(FontQuality::QualityDefault))
 		| (NONANTIALIASED_QUALITY << (4 *static_cast<int>(FontQuality::QualityNonAntialiased)))
