@@ -11,7 +11,7 @@ lexerList = [
 	('NP2LEX_ASM', 'stlAsm.c', 'LexAsm.cxx', '', 0, None),
 	('NP2LEX_ASYMPTOTE', 'stlAsymptote.c', 'LexAsymptote.cxx', 'Asymptote.asy', 1, parse_asymptote_api_file),
 	('NP2LEX_AUTOHOTKEY', 'stlAutoHotkey.c', 'LexAutoHotkey.cxx', ['AutoHotkey_L.ahk', 'AutoHotkey_H.ahk'], 0, parse_autohotkey_api_file),
-	('NP2LEX_AUTOIT3', 'stlAutoIt3.c', 'LexAutoIt3.cxx', '', 0, None),
+	('NP2LEX_AUTOIT3', 'stlAutoIt3.c', 'LexAutoIt3.cxx', 'AutoIt3.au3', 0, parse_autoit3_api_file),
 	('NP2LEX_AVISYNTH', 'stlAviSynth.c', 'LexAviSynth.cxx', 'AviSynth.avs', 0, parse_avisynth_api_file),
 	('NP2LEX_AWK', 'stlAwk.c', 'LexAwk.cxx', 'Awk.awk', 1, parse_awk_api_file),
 
