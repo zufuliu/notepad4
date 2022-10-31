@@ -37,7 +37,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [NASM](https://nasm.us/)
 	* [Asymptote Vector Graphics Language](tools/lang/Asymptote.asy), up to Asymptote 2.70.
 	* [AutoHotkey_L](tools/lang/AutoHotkey_L.ahk) and [AutoHotkey_H](tools/lang/AutoHotkey_H.ahk) Script, up to v2.
-	* AutoIt Script
+	* [AutoIt3](tools/lang/AutoIt3.au3) Script, up to 3.3.16.0
 	* [AviSynth Script](tools/lang/AviSynth.avs), up to AviSynth 2.6, AviSynth+ 3.6, GScript 1.1.
 	* [AWK](tools/lang/Awk.awk), up to GNU AWK 5.2.
 	* [Batch Script](tools/lang/Batch.bat), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#batch)
