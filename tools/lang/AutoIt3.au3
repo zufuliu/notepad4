@@ -48,409 +48,588 @@ Wend
 While 
 
 ;! functions			===========================================================
-Abs
-ACos
-AdlibRegister
-AdlibUnRegister
-Asc
-AscW
-ASin
-Assign
-ATan
-AutoItSetOption
-AutoItWinGetTitle
-AutoItWinSetTitle
-Beep
-Binary
-BinaryLen
-BinaryMid
-BinaryToString
-BitAND
-BitNOT
-BitOR
-BitRotate
-BitShift
-BitXOR
-BlockInput
-Break
-Call
-CDTray
-Ceiling
-Chr
-ChrW
-ClipGet
-ClipPut
-ConsoleRead
-ConsoleWrite
-ConsoleWriteError
-ControlClick
-ControlCommand
-ControlDisable
-ControlEnable
-ControlFocus
-ControlGetFocus
-ControlGetHandle
-ControlGetPos
-ControlGetText
-ControlHide
-ControlListView
-ControlMove
-ControlSend
-ControlSetText
-ControlShow
-ControlTreeView
-Cos
-Dec
-DirCopy
-DirCreate
-DirGetSize
-DirMove
-DirRemove
-DllCall
-DllCallAddress
-DllCallbackFree
-DllCallbackGetPtr
-DllCallbackRegister
-DllClose
-DllOpen
-DllStructCreate
-DllStructGetData
-DllStructGetPtr
-DllStructGetSize
-DllStructSetData
-DriveGetDrive
-DriveGetFileSystem
-DriveGetLabel
-DriveGetSerial
-DriveGetType
-DriveMapAdd
-DriveMapDel
-DriveMapGet
-DriveSetLabel
-DriveSpaceFree
-DriveSpaceTotal
-DriveStatus
-EnvGet
-EnvSet
-EnvUpdate
-Eval
-Execute
-Exp
-FileChangeDir
-FileClose
-FileCopy
-FileCreateNTFSLink
-FileCreateShortcut
-FileDelete
-FileExists
-FileFindFirstFile
-FileFindNextFile
-FileFlush
-FileGetAttrib
-FileGetEncoding
-FileGetLongName
-FileGetPos
-FileGetShortcut
-FileGetShortName
-FileGetSize
-FileGetTime
-FileGetVersion
-FileInstall
-FileMove
-FileOpen
-FileOpenDialog
-FileRead
-FileReadLine
-FileReadToArray
-FileRecycle
-FileRecycleEmpty
-FileSaveDialog
-FileSelectFolder
-FileSetAttrib
-FileSetEnd
-FileSetPos
-FileSetTime
-FileWrite
-FileWriteLine
-Floor
-FtpSetProxy
-FuncName
-GUICreate
-GUICtrlCreateAvi
-GUICtrlCreateButton
-GUICtrlCreateCheckbox
-GUICtrlCreateCombo
-GUICtrlCreateContextMenu
-GUICtrlCreateDate
-GUICtrlCreateDummy
-GUICtrlCreateEdit
-GUICtrlCreateGraphic
-GUICtrlCreateGroup
-GUICtrlCreateIcon
-GUICtrlCreateInput
-GUICtrlCreateLabel
-GUICtrlCreateList
-GUICtrlCreateListView
-GUICtrlCreateListViewItem
-GUICtrlCreateMenu
-GUICtrlCreateMenuItem
-GUICtrlCreateMonthCal
-GUICtrlCreateObj
-GUICtrlCreatePic
-GUICtrlCreateProgress
-GUICtrlCreateRadio
-GUICtrlCreateSlider
-GUICtrlCreateTab
-GUICtrlCreateTabItem
-GUICtrlCreateTreeView
-GUICtrlCreateTreeViewItem
-GUICtrlCreateUpdown
-GUICtrlDelete
-GUICtrlGetHandle
-GUICtrlGetState
-GUICtrlRead
-GUICtrlRecvMsg
-GUICtrlRegisterListViewSort
-GUICtrlSendMsg
-GUICtrlSendToDummy
-GUICtrlSetBkColor
-GUICtrlSetColor
-GUICtrlSetCursor
-GUICtrlSetData
-GUICtrlSetDefBkColor
-GUICtrlSetDefColor
-GUICtrlSetFont
-GUICtrlSetGraphic
-GUICtrlSetImage
-GUICtrlSetLimit
-GUICtrlSetOnEvent
-GUICtrlSetPos
-GUICtrlSetResizing
-GUICtrlSetState
-GUICtrlSetStyle
-GUICtrlSetTip
-GUIDelete
-GUIGetCursorInfo
-GUIGetMsg
-GUIGetStyle
-GUIRegisterMsg
-GUISetAccelerators
-GUISetBkColor
-GUISetCoord
-GUISetCursor
-GUISetFont
-GUISetHelp
-GUISetIcon
-GUISetOnEvent
-GUISetState
-GUISetStyle
-GUIStartGroup
-GUISwitch
-Hex
-HotKeySet
-HttpSetProxy
-HttpSetUserAgent
-HWnd
-InetClose
-InetGet
-InetGetInfo
-InetGetSize
-InetRead
-IniDelete
-IniRead
-IniReadSection
-IniReadSectionNames
-IniRenameSection
-IniWrite
-IniWriteSection
-InputBox
-Int
-IsAdmin
-IsArray
-IsBinary
-IsBool
-IsDeclared
-IsDllStruct
-IsFloat
-IsFunc
-IsHWnd
-IsInt
-IsKeyword
-IsMap
-IsNumber
-IsObj
-IsPtr
-IsString
-Log
-MapAppend
-MapExists
-MapKeys
-MapRemove
-MemGetStats
-Mod
-MouseClick
-MouseClickDrag
-MouseDown
-MouseGetCursor
-MouseGetPos
-MouseMove
-MouseUp
-MouseWheel
-MsgBox
-Number
-ObjCreate
-ObjCreateInterface
-ObjEvent
-ObjGet
-ObjName
-OnAutoItExitRegister
-OnAutoItExitUnRegister
-Ping
-PixelChecksum
-PixelGetColor
-PixelSearch
-ProcessClose
-ProcessExists
-ProcessGetStats
-ProcessList
-ProcessSetPriority
-ProcessWait
-ProcessWaitClose
-ProgressOff
-ProgressOn
-ProgressSet
-Ptr
-Random
-RegDelete
-RegEnumKey
-RegEnumVal
-RegRead
-RegWrite
-Round
-Run
-RunAs
-RunAsWait
-RunWait
-Send
-SendKeepActive
-SetError
-SetExtended
-ShellExecute
-ShellExecuteWait
-Shutdown
-Sin
-Sleep
-SoundPlay
-SoundSetWaveVolume
-SplashImageOn
-SplashOff
-SplashTextOn
-Sqrt
-SRandom
-StatusbarGetText
-StderrRead
-StdinWrite
-StdioClose
-StdoutRead
-String
-StringAddCR
-StringCompare
-StringFormat
-StringFromASCIIArray
-StringInStr
-StringIsAlNum
-StringIsAlpha
-StringIsASCII
-StringIsDigit
-StringIsFloat
-StringIsInt
-StringIsLower
-StringIsSpace
-StringIsUpper
-StringIsXDigit
-StringLeft
-StringLen
-StringLower
-StringMid
-StringRegExp
-StringRegExpReplace
-StringReplace
-StringReverse
-StringRight
-StringSplit
-StringStripCR
-StringStripWS
-StringToASCIIArray
-StringToBinary
-StringTrimLeft
-StringTrimRight
-StringUpper
-Tan
-TCPAccept
-TCPCloseSocket
-TCPConnect
-TCPListen
-TCPNameToIP
-TCPRecv
-TCPSend
-TCPShutdown
-TCPStartup
-TimerDiff
-TimerInit
-ToolTip
-TrayCreateItem
-TrayCreateMenu
-TrayGetMsg
-TrayItemDelete
-TrayItemGetHandle
-TrayItemGetState
-TrayItemGetText
-TrayItemSetOnEvent
-TrayItemSetState
-TrayItemSetText
-TraySetClick
-TraySetIcon
-TraySetOnEvent
-TraySetPauseIcon
-TraySetState
-TraySetToolTip
-TrayTip
-UBound
-UDPBind
-UDPCloseSocket
-UDPOpen
-UDPRecv
-UDPSend
-VarGetType
-WinActivate
-WinActive
-WinClose
-WinExists
-WinFlash
-WinGetCaretPos
-WinGetClassList
-WinGetClientSize
-WinGetHandle
-WinGetPos
-WinGetProcess
-WinGetState
-WinGetText
-WinGetTitle
-WinKill
-WinList
-WinMenuSelectItem
-WinMinimizeAll
-WinMinimizeAllUndo
-WinMove
-WinSetOnTop
-WinSetState
-WinSetTitle
-WinSetTrans
-WinWait
-WinWaitActive
-WinWaitClose
-WinWaitNotActive
-; UDFS Function
+Abs(expression)
+ACos(expression)
+AdlibRegister(function, time)
+AdlibUnRegister(function)
+Asc(char)
+AscW(char)
+ASin(expression)
+Assign(varname, data, flag)
+ATan(expression)
+AutoItSetOption(option, param)
+AutoItWinGetTitle()
+AutoItWinSetTitle(new_title)
+Beep(Frequency, Duration)
+Binary(expression)
+BinaryLen(binary)
+BinaryMid(binary, start, count)
+BinaryToString(expression, flag)
+BitAND(value1, value2, value n)
+BitNOT(value)
+BitOR(value1, value2, value n)
+BitRotate(value, shift, size)
+BitShift(value, shift)
+BitXOR(value1, value2, value n)
+BlockInput(flag)
+Break(mode)
+Call(function, param_1, param_2)
+CDTray(drive, status)
+Ceiling(expression)
+Chr(ASCIIcode)
+ChrW(UNICODEcode)
+ClipGet()
+ClipPut(value)
+ConsoleRead(peek, binary)
+ConsoleWrite(data)
+ConsoleWriteError(data)
+ControlClick(title, text, controlID, button, clicks, x, y)
+ControlCommand(title, text, controlID, command, option)
+ControlDisable(title, text, controlID)
+ControlEnable(title, text, controlID)
+ControlFocus(title, text, controlID)
+ControlGetFocus(title, text)
+ControlGetHandle(title, text, controlID)
+ControlGetPos(title, text, controlID)
+ControlGetText(title, text, controlID)
+ControlHide(title, text, controlID)
+ControlListView(title, text, controlID, command, option1, option2)
+ControlMove(title, text, controlID, x, y, width, height)
+ControlSend(title, text, controlID, string, flag)
+ControlSetText(title, text, controlID, new_text, flag)
+ControlShow(title, text, controlID)
+ControlTreeView(title, text, controlID, command, option1)
+Cos(expression)
+Dec(hex, flag)
+DirCopy( source_dir, dest_dir, flag)
+DirCreate(path)
+DirGetSize(path, flag)
+DirMove(source_dir, dest_dir, flag)
+DirRemove(path, recurse)
+DllCall(dll, return_type, function, type1, param1, type n, param n)
+DllCallAddress(return_type, address, type1, param1, type n, param n)
+DllCallbackFree(handle)
+DllCallbackGetPtr(handle)
+DllCallbackRegister(function, return_type, params)
+DllClose(dllhandle)
+DllOpen(filename)
+DllStructCreate(Struct, Pointer)
+DllStructGetData(Struct, Element, index)
+DllStructGetPtr(Struct, Element)
+DllStructGetSize(Struct)
+DllStructSetData(Struct, Element, value, index)
+DriveGetDrive(type)
+DriveGetFileSystem(path)
+DriveGetLabel(path)
+DriveGetSerial(path)
+DriveGetType(path, operation)
+DriveMapAdd(device, remote_share, flags, user, password)
+DriveMapDel(drive)
+DriveMapGet(device)
+DriveSetLabel(path, label)
+DriveSpaceFree(path)
+DriveSpaceTotal(path)
+DriveStatus(path)
+EnvGet(envvariable)
+EnvSet(envvariable, value)
+EnvUpdate()
+Eval(string)
+Execute(string)
+Exp(expression)
+FileChangeDir(path)
+FileClose(filehandle)
+FileCopy( source, dest, flag)
+FileCreateNTFSLink( source, hardlink, flag)
+FileCreateShortcut(file, lnk, workdir, args, desc, icon, hotkey, icon_number, state)
+FileDelete(filename)
+FileExists(path)
+FileFindFirstFile(filename)
+FileFindNextFile(search, flag)
+FileFlush(filehandle)
+FileGetAttrib(filename)
+FileGetEncoding(filehandle/filename, mode)
+FileGetLongName(filename, flag)
+FileGetPos(filehandle)
+FileGetShortcut(lnk)
+FileGetShortName(filename, flag)
+FileGetSize(filename)
+FileGetTime(filename, option, format)
+FileGetVersion(filename, stringname)
+FileInstall(source, dest, flag)
+FileMove(source, dest, flag)
+FileOpen(filename, mode)
+FileOpenDialog(title, init dir, filter, options, default name, hwnd)
+FileRead(filehandle/filename, count)
+FileReadLine(filehandle/filename, line)
+FileReadToArray(filehandle/filename)
+FileRecycle(source)
+FileRecycleEmpty(source)
+FileSaveDialog(title, init dir, filter, options, default name, hwnd)
+FileSelectFolder(dialog text, root dir, flag, initial dir, hwnd)
+FileSetAttrib(file pattern, RASHNOT, recurse)
+FileSetEnd(filehandle)
+FileSetPos(filehandle, offset, origin)
+FileSetTime(file pattern, time, type, recurse)
+FileWrite(filehandle/filename, text/data)
+FileWriteLine(filehandle/filename, line)
+Floor(expression)
+FtpSetProxy(mode, proxy:port, username, password)
+FuncName(Functionvariable)
+GUICreate(title, width, height, left, top, style, exStyle, parent)
+GUICtrlCreateAvi(filename, subfileid, left, top, width, height, style, exStyle)
+GUICtrlCreateButton(text, left, top, width, height, style, exStyle)
+GUICtrlCreateCheckbox(text, left, top, width, height, style, exStyle)
+GUICtrlCreateCombo(text, left, top, width, height, style, exStyle)
+GUICtrlCreateContextMenu(controlID)
+GUICtrlCreateDate(text, left, top, width, height, style, exStyle)
+GUICtrlCreateDummy()
+GUICtrlCreateEdit(text, left, top, width, height, style, exStyle)
+GUICtrlCreateGraphic(left, top, width, height, style)
+GUICtrlCreateGroup(text, left, top, width, height, style, exStyle)
+GUICtrlCreateIcon(filename, iconName, left, top, width, height, style, exStyle)
+GUICtrlCreateInput(text, left, top, width, height, style, exStyle)
+GUICtrlCreateLabel(text, left, top, width, height, style, exStyle)
+GUICtrlCreateList(text, left, top, width, height, style, exStyle)
+GUICtrlCreateListView(text, left, top, width, height, style, exStyle)
+GUICtrlCreateListViewItem(text, listviewID)
+GUICtrlCreateMenu(submenutext, menuID, menuentry)
+GUICtrlCreateMenuItem(text, menuID, menuentry, menuradioitem)
+GUICtrlCreateMonthCal(text, left, top, width, height, style, exStyle)
+GUICtrlCreateObj(ObjectVar, left, top, width, height)
+GUICtrlCreatePic(filename, left, top, width, height, style, exStyle)
+GUICtrlCreateProgress(left, top, width, height, style, exStyle)
+GUICtrlCreateRadio(text, left, top, width, height, style, exStyle)
+GUICtrlCreateSlider(left, top, width, height, style, exStyle)
+GUICtrlCreateTab(left, top, width, height, style, exStyle)
+GUICtrlCreateTabItem(text)
+GUICtrlCreateTreeView(left, top, width, height, style, exStyle)
+GUICtrlCreateTreeViewItem(text, treeviewID)
+GUICtrlCreateUpdown(inputcontrolID, style)
+GUICtrlDelete(controlID)
+GUICtrlGetHandle(controlID)
+GUICtrlGetState(controlID)
+GUICtrlRead(controlID, advanced)
+GUICtrlRecvMsg(controlID, msg, wParam, lParamType)
+GUICtrlRegisterListViewSort(controlID, function)
+GUICtrlSendMsg(controlID, msg, wParam, lParam)
+GUICtrlSendToDummy(controlID, state)
+GUICtrlSetBkColor(controlID, backgroundcolor)
+GUICtrlSetColor(controlID, textcolor)
+GUICtrlSetCursor(controlID, cursorID)
+GUICtrlSetData(controlID, data, default)
+GUICtrlSetDefBkColor(defbkcolor, winhandle)
+GUICtrlSetDefColor(deftextcolor, winhandle)
+GUICtrlSetFont(controlID, size, weight, attribute, fontname, quality)
+GUICtrlSetGraphic(controlID, type, par1, ... par6)
+GUICtrlSetImage(controlID, filename, iconname, icontype)
+GUICtrlSetLimit(controlID, max, min)
+GUICtrlSetOnEvent(controlID, function)
+GUICtrlSetPos(controlID, left, top, width, height)
+GUICtrlSetResizing(controlID, resizing)
+GUICtrlSetState(controlID, state)
+GUICtrlSetStyle(controlID, style, exStyle)
+GUICtrlSetTip(controlID, tiptext, title, icon, options)
+GUIDelete(winhandle)
+GUIGetCursorInfo(winhandle)
+GUIGetMsg(advanced)
+GUIGetStyle(winhandle)
+GUIRegisterMsg(msgID, function)
+GUISetAccelerators(accelerators, winhandle)
+GUISetBkColor(background, winhandle)
+GUISetCoord(left, top, width, height, winhandle)
+GUISetCursor(cursorID, override, winhandle)
+GUISetFont(size, weight, attribute, fontname, winhandle, quality)
+GUISetHelp(helpfile, winhandle)
+GUISetIcon(iconfile, iconID, winhandle)
+GUISetOnEvent(specialID, function, winhandle)
+GUISetState(flag, winhandle)
+GUISetStyle(Style, ExStyle, winhandle)
+GUIStartGroup(winhandle)
+GUISwitch(winhandle, tabitemID)
+Hex(expression, length)
+HotKeySet(key, function)
+HttpSetProxy(mode, proxy:port, username, password)
+HttpSetUserAgent(user agent)
+HWnd(expression)
+InetClose(handle)
+InetGet(URL, filename, options, background)
+InetGetInfo(handle, index)
+InetGetSize(URL, options)
+InetRead(URL, options)
+IniDelete(filename, section, key)
+IniRead(filename, section, key, default)
+IniReadSection(filename, section)
+IniReadSectionNames(filename)
+IniRenameSection(filename, section, new section, flag)
+IniWrite(filename, section, key, value)
+IniWriteSection(filename, section, data, index)
+InputBox(title, prompt, default, password char, width, height, left, top, timeout, hwnd)
+Int(expression, flag)
+IsAdmin()
+IsArray(variable)
+IsBinary(expression)
+IsBool(variable)
+IsDeclared(expression)
+IsDllStruct(variable)
+IsFloat(variable)
+IsFunc(expression)
+IsHWnd(variable)
+IsInt(variable)
+IsKeyword(variable)
+IsMap(variable)
+IsNumber(variable)
+IsObj(variable)
+IsPtr(variable)
+IsString(variable)
+Log(expression)
+MapAppend(map, value)
+MapExists(map, key)
+MapKeys(map)
+MapRemove(map, key)
+MemGetStats()
+Mod(value1, value2)
+MouseClick(button, x, y, clicks, speed)
+MouseClickDrag(button, x1, y1, x2, y2, speed)
+MouseDown(button)
+MouseGetCursor()
+MouseGetPos(dimension)
+MouseMove(x, y, speed)
+MouseUp(button)
+MouseWheel(direction, clicks)
+MsgBox(flag, title, text, timeout, hwnd)
+Number(expression, flag)
+Opt(option, param)
+ObjCreate(classname, servername, username, password)
+ObjCreateInterface(CLSID, IID, interface_description,flag)
+ObjEvent($ObjectVar, functionprefix, interface name)
+ObjGet(filename, classname, instance)
+ObjName($Objectvariable, Flag)
+OnAutoItExitRegister(function)
+OnAutoItExitUnRegister(function)
+Ping(address/hostname, timeout)
+PixelChecksum(left, top, right, bottom, step, hwnd, mode)
+PixelGetColor(x, y, hwnd)
+PixelSearch(left, top, right, bottom, color, shade-variation, step, hwnd)
+ProcessClose(process)
+ProcessExists(process)
+ProcessGetStats(process, type)
+ProcessList(name)
+ProcessSetPriority(process, priority)
+ProcessWait(process, timeout)
+ProcessWaitClose(process, timeout)
+ProgressOff()
+ProgressOn(title, maintext, subtext, x, y, opt)
+ProgressSet(percent, subtext, maintext)
+Ptr(expression)
+Random(Min, Max, Flag)
+RegDelete(keyname, valuename)
+RegEnumKey(keyname, instance)
+RegEnumVal(keyname, instance)
+RegRead(keyname, valuename)
+RegWrite(keyname, valuename, type, value)
+Round(expression, decimalplaces)
+Run(program, workingdir, show_flag, opt_flag)
+RunAs(username, domain, password, logon_flag, program, workingdir, show_flag, opt_flag)
+RunAsWait(username, domain, password, logon_flag, program, workingdir, show_flag, opt_flag)
+RunWait(program, workingdir, show_flag, opt_flag)
+Send(keys, flag)
+SendKeepActive(title, text)
+SetError(code, extended, return value)
+SetExtended(code, return value)
+ShellExecute(filename, parameters, workingdir, verb, showflag)
+ShellExecuteWait(filename, parameters, workingdir, verb, showflag)
+Shutdown(code)
+Sin(expression)
+Sleep(delay)
+SoundPlay(filename, wait)
+SoundSetWaveVolume(percent)
+SplashImageOn(title, file, width, height, x, y, opt)
+SplashOff()
+SplashTextOn(title, text, w, h, x, y, opt, fontname, fontsz2, fontwt)
+Sqrt(expression)
+SRandom(Seed)
+StatusbarGetText(title, text, part)
+StderrRead(process_id, peek, binary)
+StdinWrite(process_id, data)
+StdioClose(process_id)
+StdoutRead(process_id, peek, binary)
+String(expression)
+StringAddCR(string)
+StringCompare(string1, string2, casesense)
+StringFormat(format control, var1, ... var32)
+StringFromASCIIArray(array,start, end, encoding)
+StringInStr(string, substring, casesense, occurrence, start, count)
+StringIsAlNum(string)
+StringIsAlpha(string)
+StringIsASCII(string)
+StringIsDigit(string)
+StringIsFloat(string)
+StringIsInt(string)
+StringIsLower(string)
+StringIsSpace(string)
+StringIsUpper(string)
+StringIsXDigit(string)
+StringLeft(string, count)
+StringLen(string)
+StringLower(string)
+StringMid(string, start, count)
+StringRegExp(test, pattern, flag, offset)
+StringRegExpReplace(test, pattern, replace, count)
+StringReplace(string, searchstring/start, replacestring, occurrence, casesense)
+StringReverse(string, flag)
+StringRight(string, count)
+StringSplit(string, delimiters, flag)
+StringStripCR(string)
+StringStripWS(string, flag)
+StringToASCIIArray(string,start, end, encoding)
+StringToBinary(expression, flag)
+StringTrimLeft(string, count)
+StringTrimRight(string, count)
+StringUpper(string)
+Tan(expression)
+TCPAccept(mainsocket)
+TCPCloseSocket(socket)
+TCPConnect(IPAddr, port)
+TCPListen(IPAddr, port, MaxPendingConnection)
+TCPNameToIP(name)
+TCPRecv(mainsocket, maxlen, flag)
+TCPSend(mainsocket, data)
+TCPShutdown()
+TCPStartup()
+TimerDiff(handle)
+TimerInit()
+ToolTip(text, x, y, title, icon, options)
+TrayCreateItem(text, menuID, menuentry, menuradioitem)
+TrayCreateMenu(sub/menutext, menuID, menuentry)
+TrayGetMsg()
+TrayItemDelete(controlID)
+TrayItemGetHandle(controlID)
+TrayItemGetState(controlID)
+TrayItemGetText(controlID)
+TrayItemSetOnEvent(itemID, function)
+TrayItemSetState(controlID, state)
+TrayItemSetText(controlID, text)
+TraySetClick(flag)
+TraySetIcon(filename, iconID)
+TraySetOnEvent(specialID, function)
+TraySetPauseIcon(filename, iconID)
+TraySetState(flag)
+TraySetToolTip(text)
+TrayTip(title, text, timeout, option)
+UBound(Variable, Dimension)
+UDPBind(IPAddr, port)
+UDPCloseSocket(socketarray)
+UDPOpen(IPAddr, port, flag)
+UDPRecv(socketarray, maxlen, flag)
+UDPSend(socketarray, data)
+UDPShutdown()
+UDPStartup()
+VarGetType(expression)
+WinActivate(title, text)
+WinActive(title, text)
+WinClose(title, text)
+WinExists(title, text)
+WinFlash(title, text, flashes, delay)
+WinGetCaretPos()
+WinGetClassList(title, text)
+WinGetClientSize(title, text)
+WinGetHandle(title, text)
+WinGetPos(title, text)
+WinGetProcess(title, text)
+WinGetState(title, text)
+WinGetText(title, text)
+WinGetTitle(title, text)
+WinKill(title, text)
+WinList(title, text)
+WinMenuSelectItem(title, text, item, item, item, item, item, item, item)
+WinMinimizeAll()
+WinMinimizeAllUndo()
+WinMove(title, text, x, y, width, height, speed)
+WinSetOnTop(title, text, flag)
+WinSetState(title, text, flag)
+WinSetTitle(title, text, newtitle)
+WinSetTrans(title, text, transparency)
+WinWait(title, text, timeout)
+WinWaitActive(title, text, timeout)
+WinWaitClose(title, text, timeout)
+WinWaitNotActive(title, text, timeout)
+
+;! macros			===========================================================
+@AppDataCommonDir
+@AppDataDir
+@AutoItExe
+@AutoItPID
+@AutoItVersion
+@AutoItX64
+@COM_EventObj
+@CommonFilesDir
+@Compiled
+@ComputerName
+@ComSpec
+@CPUArch
+@CR
+@CRLF
+@DesktopCommonDir
+@DesktopDepth
+@DesktopDir
+@DesktopHeight
+@DesktopRefresh
+@DesktopWidth
+@DocumentsCommonDir
+@error
+@exitCode
+@exitMethod
+@extended
+@FavoritesCommonDir
+@FavoritesDir
+@GUI_CtrlHandle
+@GUI_CtrlId
+@GUI_DragFile
+@GUI_DragId
+@GUI_DropId
+@GUI_WinHandle
+@HomeDrive
+@HomePath
+@HomeShare
+@HotKeyPressed
+@HOUR
+@IPAddress1
+@IPAddress2
+@IPAddress3
+@IPAddress4
+@KBLayout
+@LF
+@LocalAppDataDir
+@LogonDNSDomain
+@LogonDomain
+@LogonServer
+@MDAY
+@MIN
+@MON
+@MSEC
+@MUILang
+@MyDocumentsDir
+@NumParams
+@OSArch
+@OSBuild
+@OSLang
+@OSServicePack
+@OSType
+@OSVersion
+@ProgramFilesDir
+@ProgramsCommonDir
+@ProgramsDir
+@ScriptDir
+@ScriptFullPath
+@ScriptLineNumber
+@ScriptName
+@SEC
+@StartMenuCommonDir
+@StartMenuDir
+@StartupCommonDir
+@StartupDir
+@SW_DISABLE
+@SW_ENABLE
+@SW_HIDE
+@SW_LOCK
+@SW_MAXIMIZE
+@SW_MINIMIZE
+@SW_RESTORE
+@SW_SHOW
+@SW_SHOWDEFAULT
+@SW_SHOWMAXIMIZED
+@SW_SHOWMINIMIZED
+@SW_SHOWMINNOACTIVE
+@SW_SHOWNA
+@SW_SHOWNOACTIVATE
+@SW_SHOWNORMAL
+@SW_UNLOCK
+@SystemDir
+@TAB
+@TempDir
+@TRAY_ID
+@TrayIconFlashing
+@TrayIconVisible
+@UserName
+@UserProfileDir
+@WDAY
+@WindowsDir
+@WorkingDir
+@YDAY
+@YEAR
+
+;! Sent-keys			===========================================================
+{!} {#} {^} {{} {}} {+} {alt} {altdown} {altup} {appskey}
+{asc} {backspace} {break} {browser_back} {browser_favorites} {browser_forward} {browser_home}
+{browser_refresh} {browser_search} {browser_stop} {bs} {capslock} {ctrldown} {ctrlup}
+{del} {delete} {down} {end} {enter} {esc} {escape} {f1} {f10} {f11} {f12} {f2} {f3}
+{f4} {f5} {f6} {f7} {f8} {f9} {home} {ins} {insert} {lalt} {launch_app1} {launch_app2}
+{launch_mail} {launch_media} {lctrl} {left} {lshift} {lwin} {lwindown} {lwinup} {media_next}
+{media_play_pause} {media_prev} {media_stop} {numlock} {numpad0} {numpad1} {numpad2}
+{numpad3} {numpad4} {numpad5} {numpad6} {numpad7} {numpad8} {numpad9} {numpadadd}
+{numpaddiv} {numpaddot} {numpadenter} {numpadmult} {numpadsub} {oem_102} {pause}
+{pgdn} {pgup} {printscreen} {ralt} {rctrl} {right} {rshift} {rwin} {rwindown} {rwinup}
+{scrolllock} {shiftdown} {shiftup} {sleep} {space} {tab} {up} {volume_down} {volume_mute}
+{volume_up} 
+
+;! Pre-processors			===========================================================
+#ce
+#comments-end
+#comments-start
+#cs
+#include
+#include-once
+#NoTrayIcon
+#OnAutoItStartRegister
+#RequireAdmin
+
+;! Special			===========================================================
+#Autoit3Wrapper_Au3Check_Parameters
+#Autoit3Wrapper_Au3check_Stop_OnWarning
+#Autoit3Wrapper_Change2Cui
+#Autoit3Wrapper_Compression
+#Autoit3Wrapper_CvsWrapper_Parameters
+#Autoit3Wrapper_Icon
+#Autoit3Wrapper_OutFile
+#Autoit3Wrapper_OutFile_Type
+#Autoit3Wrapper_Plugin_Funcs
+#Autoit3Wrapper_Res_Comment
+#Autoit3Wrapper_Res_Description
+#Autoit3Wrapper_Res_Field
+#Autoit3Wrapper_Res_File_Add
+#Autoit3Wrapper_Res_FileVersion
+#Autoit3Wrapper_Res_FileVersion_Autoincrement
+#Autoit3Wrapper_Res_Icon_Add
+#Autoit3Wrapper_Res_Language
+#Autoit3Wrapper_Res_LegalCopyright
+#Autoit3Wrapper_Res_RequestedExecutionLevel
+#Autoit3Wrapper_Res_SaveSource
+#Autoit3Wrapper_Run_After
+#Autoit3Wrapper_Run_Au3Check
+#Autoit3Wrapper_Run_Before
+#Autoit3Wrapper_Run_CvsWrapper
+#Autoit3Wrapper_Run_Debug_Mode
+#Autoit3Wrapper_Run_Obfuscator
+#Autoit3Wrapper_Run_Tidy
+#Autoit3Wrapper_Tidy_Stop_OnError
+#Autoit3Wrapper_UseAnsi
+#Autoit3Wrapper_UseUpx
+#Autoit3Wrapper_Usex64
+#Autoit3Wrapper_Version
+#EndRegion
+#forcedef
+#forceref
+#ignorefunc
+#Obfuscator_Ignore_Funcs
+#Obfuscator_Ignore_Variables
+#Obfuscator_Parameters
+#pragma
+#Region
+#Tidy_Parameters
+
+;! Expand			===========================================================
+
+;! UDFS			===========================================================
 ;Array_Management
 _Array1DToHistogram
 _Array2DCreate
@@ -3593,176 +3772,3 @@ _Word_DocSaveAs
 _Word_DocTableRead
 _Word_DocTableWrite
 _Word_Quit
-
-;! macros			===========================================================
-@AppDataCommonDir
-@AppDataDir
-@AutoItExe
-@AutoItPID
-@AutoItVersion
-@AutoItX64
-@COM_EventObj
-@CommonFilesDir
-@Compiled
-@ComputerName
-@ComSpec
-@CPUArch
-@CR
-@CRLF
-@DesktopCommonDir
-@DesktopDepth
-@DesktopDir
-@DesktopHeight
-@DesktopRefresh
-@DesktopWidth
-@DocumentsCommonDir
-@error
-@exitCode
-@exitMethod
-@extended
-@FavoritesCommonDir
-@FavoritesDir
-@GUI_CtrlHandle
-@GUI_CtrlId
-@GUI_DragFile
-@GUI_DragId
-@GUI_DropId
-@GUI_WinHandle
-@HomeDrive
-@HomePath
-@HomeShare
-@HotKeyPressed
-@HOUR
-@IPAddress1
-@IPAddress2
-@IPAddress3
-@IPAddress4
-@KBLayout
-@LF
-@LocalAppDataDir
-@LogonDNSDomain
-@LogonDomain
-@LogonServer
-@MDAY
-@MIN
-@MON
-@MSEC
-@MUILang
-@MyDocumentsDir
-@NumParams
-@OSArch
-@OSBuild
-@OSLang
-@OSServicePack
-@OSType
-@OSVersion
-@ProgramFilesDir
-@ProgramsCommonDir
-@ProgramsDir
-@ScriptDir
-@ScriptFullPath
-@ScriptLineNumber
-@ScriptName
-@SEC
-@StartMenuCommonDir
-@StartMenuDir
-@StartupCommonDir
-@StartupDir
-@SW_DISABLE
-@SW_ENABLE
-@SW_HIDE
-@SW_LOCK
-@SW_MAXIMIZE
-@SW_MINIMIZE
-@SW_RESTORE
-@SW_SHOW
-@SW_SHOWDEFAULT
-@SW_SHOWMAXIMIZED
-@SW_SHOWMINIMIZED
-@SW_SHOWMINNOACTIVE
-@SW_SHOWNA
-@SW_SHOWNOACTIVATE
-@SW_SHOWNORMAL
-@SW_UNLOCK
-@SystemDir
-@TAB
-@TempDir
-@TRAY_ID
-@TrayIconFlashing
-@TrayIconVisible
-@UserName
-@UserProfileDir
-@WDAY
-@WindowsDir
-@WorkingDir
-@YDAY
-@YEAR
-
-;! Sent-keys			===========================================================
-{!} {#} {^} {{} {}} {+} {alt} {altdown} {altup} {appskey}
-{asc} {backspace} {break} {browser_back} {browser_favorites} {browser_forward} {browser_home}
-{browser_refresh} {browser_search} {browser_stop} {bs} {capslock} {ctrldown} {ctrlup}
-{del} {delete} {down} {end} {enter} {esc} {escape} {f1} {f10} {f11} {f12} {f2} {f3}
-{f4} {f5} {f6} {f7} {f8} {f9} {home} {ins} {insert} {lalt} {launch_app1} {launch_app2}
-{launch_mail} {launch_media} {lctrl} {left} {lshift} {lwin} {lwindown} {lwinup} {media_next}
-{media_play_pause} {media_prev} {media_stop} {numlock} {numpad0} {numpad1} {numpad2}
-{numpad3} {numpad4} {numpad5} {numpad6} {numpad7} {numpad8} {numpad9} {numpadadd}
-{numpaddiv} {numpaddot} {numpadenter} {numpadmult} {numpadsub} {oem_102} {pause}
-{pgdn} {pgup} {printscreen} {ralt} {rctrl} {right} {rshift} {rwin} {rwindown} {rwinup}
-{scrolllock} {shiftdown} {shiftup} {sleep} {space} {tab} {up} {volume_down} {volume_mute}
-{volume_up} 
-
-;! Pre-processors			===========================================================
-#ce
-#comments-end
-#comments-start
-#cs
-#include
-#include-once
-#NoTrayIcon
-#OnAutoItStartRegister
-#RequireAdmin
-
-;! Special			===========================================================
-#Autoit3Wrapper_Au3Check_Parameters
-#Autoit3Wrapper_Au3check_Stop_OnWarning
-#Autoit3Wrapper_Change2Cui
-#Autoit3Wrapper_Compression
-#Autoit3Wrapper_CvsWrapper_Parameters
-#Autoit3Wrapper_Icon
-#Autoit3Wrapper_OutFile
-#Autoit3Wrapper_OutFile_Type
-#Autoit3Wrapper_Plugin_Funcs
-#Autoit3Wrapper_Res_Comment
-#Autoit3Wrapper_Res_Description
-#Autoit3Wrapper_Res_Field
-#Autoit3Wrapper_Res_File_Add
-#Autoit3Wrapper_Res_FileVersion
-#Autoit3Wrapper_Res_FileVersion_Autoincrement
-#Autoit3Wrapper_Res_Icon_Add
-#Autoit3Wrapper_Res_Language
-#Autoit3Wrapper_Res_LegalCopyright
-#Autoit3Wrapper_Res_RequestedExecutionLevel
-#Autoit3Wrapper_Res_SaveSource
-#Autoit3Wrapper_Run_After
-#Autoit3Wrapper_Run_Au3Check
-#Autoit3Wrapper_Run_Before
-#Autoit3Wrapper_Run_CvsWrapper
-#Autoit3Wrapper_Run_Debug_Mode
-#Autoit3Wrapper_Run_Obfuscator
-#Autoit3Wrapper_Run_Tidy
-#Autoit3Wrapper_Tidy_Stop_OnError
-#Autoit3Wrapper_UseAnsi
-#Autoit3Wrapper_UseUpx
-#Autoit3Wrapper_Usex64
-#Autoit3Wrapper_Version
-#EndRegion
-#forcedef
-#forceref
-#ignorefunc
-#Obfuscator_Ignore_Funcs
-#Obfuscator_Ignore_Variables
-#Obfuscator_Parameters
-#pragma
-#Region
-#Tidy_Parameters
