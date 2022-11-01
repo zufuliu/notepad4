@@ -1079,13 +1079,13 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		//cy -= (rc.bottom - rc.top);
 
 		//SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
-		SetWindowPos(hwndReBar, NULL, 0, 0, LOWORD(lParam), cyReBar, SWP_NOZORDER);
+		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
 		// the ReBar automatically sets the correct height
 		// calling SetWindowPos() with the height of one toolbar button
 		// causes the control not to temporarily use the whole client area
 		// and prevents flickering
 
-		GetWindowRect(hwndReBar, &rc);
+		//GetWindowRect(hwndReBar, &rc);
 		y = cyReBar + cyReBarFrame;    // define
 		cy -= cyReBar + cyReBarFrame;  // border
 	}

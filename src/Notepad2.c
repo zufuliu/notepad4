@@ -2156,7 +2156,14 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
-	SetWindowPos(hwnd, NULL, rc->left, rc->top, rc->right - rc->left, rc->bottom - rc->top, SWP_NOZORDER | SWP_NOACTIVATE);
+	const int cx = rc->right - rc->left;
+	const int cy = rc->bottom - rc->top;
+	SetWindowPos(hwnd, NULL, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
+	if (bShowToolbar) {
+		// on Window 8.1 when move Notepad2 to another monitor with same scaling settings
+		// WM_DPICHANGED is sent with same DPI, and WM_SIZE is sent after WM_DPICHANGED.
+		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
+	}
 
 	Style_DetectBaseFontSize(hwnd);
 	Style_OnDPIChanged(pLexCurrent);
@@ -2227,7 +2234,7 @@ void MsgSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		*/
 
 		//SendMessage(hwndToolbar, TB_GETITEMRECT, 0, (LPARAM)&rc);
-		SetWindowPos(hwndReBar, NULL, 0, 0, LOWORD(lParam), cyReBar, SWP_NOZORDER);
+		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
 		// the ReBar automatically sets the correct height
 		// calling SetWindowPos() with the height of one toolbar button
 		// causes the control not to temporarily use the whole client area
