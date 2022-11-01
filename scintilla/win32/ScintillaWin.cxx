@@ -2370,20 +2370,17 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_NCLBUTTONDOWN:
 		case WM_SYSCOMMAND:
 		case WM_WINDOWPOSCHANGING:
+		case WM_WINDOWPOSCHANGED:
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
 
-		case WM_WINDOWPOSCHANGED: {
-			HMONITOR current = hCurrentMonitor;
+#if 0 // we don't use Scintilla as top level window
+		case WM_WINDOWPOSCHANGED:
 			if (UpdateRenderingParams(false)) {
 				DropGraphics();
 				Redraw();
-				if (current) {
-					// recreate toolbar after monitor changed
-					::PostMessage(::GetParent(MainHWND()), WM_THEMECHANGED, 0, 0);
-				}
 			}
 			return ::DefWindowProc(MainHWND(), msg, wParam, lParam);
-		}
+#endif
 
 		case WM_GETTEXTLENGTH:
 			return GetTextLength();

@@ -53,6 +53,7 @@
 HWND	hwndStatus;
 static HWND hwndToolbar;
 static HWND hwndReBar;
+static HMONITOR hCurrentMonitor = NULL;
 HWND	hwndEdit;
 static HWND hwndEditFrame;
 HWND	hwndMain;
@@ -1087,8 +1088,20 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCMOUSEMOVE:
 	case WM_NCLBUTTONDOWN:
 	case WM_WINDOWPOSCHANGING:
-	case WM_WINDOWPOSCHANGED:
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
+
+	case WM_WINDOWPOSCHANGED: {
+		HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+		if (monitor != hCurrentMonitor) {
+			HMONITOR previous = hCurrentMonitor;
+			hCurrentMonitor = monitor;
+			if (previous) {
+				// Direct2D: render Scintilla window with parameters for current monitor
+				SendMessage(hwndEdit, WM_SETTINGCHANGE, 0, 0);
+			}
+		}
+		return DefWindowProc(hwnd, umsg, wParam, lParam);
+	}
 
 	case WM_CREATE:
 		return MsgCreate(hwnd, wParam, lParam);
