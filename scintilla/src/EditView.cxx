@@ -1393,8 +1393,12 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	// Draw the [CR], [LF], or [CR][LF] blobs if visible line ends are on
 	XYPOSITION blobsWidth = 0;
 	if (lastSubLine) {
+		int styleEol = -1;
 		for (Sci::Position eolPos = ll->numCharsBeforeEOL; eolPos<ll->numCharsInLine;) {
-			const int styleMain = ll->styles[eolPos];
+			const int style = ll->styles[eolPos];
+			// detect bug in lexer that don't highlight EOL with same style.
+			const int styleMain = (styleEol < 0 || styleEol == style) ? StyleControlChar : style;
+			styleEol = style;
 			const std::optional<ColourRGBA> selectionFore = SelectionForeground(model, vsDraw, eolInSelection);
 			ColourRGBA textFore = selectionFore.value_or(vsDraw.styles[styleMain].fore);
 			char hexits[4];
@@ -1430,7 +1434,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 			rcSegment.left = xStart + ll->positions[eolPos] - static_cast<XYPOSITION>(subLineStart) + virtualSpace;
 			rcSegment.right = xStart + ll->positions[eolPos + widthBytes] - static_cast<XYPOSITION>(subLineStart) + virtualSpace;
 			blobsWidth += rcSegment.Width();
-			const ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, eolInSelection, false, styleMain, eolPos);
+			const ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, eolInSelection, false, styleEol, eolPos);
 			if (drawEOLSelection) {
 				if (vsDraw.selection.layer == Layer::Base) {
 					surface->FillRectangleAligned(rcSegment, Fill(selectionBack.Opaque()));
@@ -2521,6 +2525,8 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						const std::string_view stringRep = ts.representation->GetStringRep();
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Colour)) {
 							textFore = ts.representation->colour;
+						} else {
+							textFore = vsDraw.styles[StyleControlChar].fore;
 						}
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
 							DrawTextBlob(surface, vsDraw, rcSegment, stringRep,

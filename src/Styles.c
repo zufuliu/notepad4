@@ -486,7 +486,7 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 	case NP2LEX_2NDGLOBAL:
 		switch (index) {
 		case GlobalStyleIndex_ControlCharacter:
-			return StyleControl_Font;
+			return StyleControl_Font | StyleControl_Fore;
 		case GlobalStyleIndex_IndentationGuide:
 		case GlobalStyleIndex_Whitespace:
 		case GlobalStyleIndex_CurrentLine:
