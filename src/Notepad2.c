@@ -2161,7 +2161,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SetWindowPos(hwnd, NULL, rc->left, rc->top, cx, cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	if (bShowToolbar) {
 		// on Window 8.1 when move Notepad2 to another monitor with same scaling settings
-		// WM_DPICHANGED is sent with same DPI, and WM_SIZE is sent after WM_DPICHANGED.
+		// WM_DPICHANGED is sent with same DPI, and WM_SIZE is not sent after WM_DPICHANGED.
 		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
 	}
 

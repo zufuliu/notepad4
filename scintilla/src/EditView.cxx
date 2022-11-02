@@ -1396,7 +1396,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 		int styleEol = -1;
 		for (Sci::Position eolPos = ll->numCharsBeforeEOL; eolPos<ll->numCharsInLine;) {
 			const int style = ll->styles[eolPos];
-			// detect bug in lexer that don't highlight EOL with same style.
+			// detect bug in lexer that don't highlight EOL with same styles.
 			const int styleMain = (styleEol < 0 || styleEol == style) ? StyleControlChar : style;
 			styleEol = style;
 			const std::optional<ColourRGBA> selectionFore = SelectionForeground(model, vsDraw, eolInSelection);

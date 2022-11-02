@@ -43,7 +43,7 @@ NULL
 // Date Format
 "vbGeneralDate vbLongDate vbShortDate vbLongTime vbShortTime "
 // Tristate
-"vbUseDefault vbTrue vbFalse"
+"vbUseDefault vbTrue vbFalse "
 // VarType
 "vbEmpty vbNull vbInteger vbLong vbSingle vbDouble vbCurrency vbDate vbString "
 "vbObject vbError vbBoolean vbVariant vbDataObject vbDecimal vbByte vbArray "

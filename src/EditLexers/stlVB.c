@@ -62,7 +62,7 @@ static KEYWORDLIST Keywords_VB = {{
 "vbObjectError vbArchive vbBack vbGet vbHidden vbHide vbLet vbLinguisticCasing "
 "vbLowerCase vbMaximizedFocus vbMethod vbMinimizedFocus vbMinimizedNoFocus "
 "vbNarrow vbNormal vbNormalFocus vbNormalNoFocus vbProperCase vbReadOnly vbSet "
-"vbSystem vbUpperCase vbUserDefinedType vbUseSystem vbVolume vbWide"
+"vbSystem vbUpperCase vbUserDefinedType vbUseSystem vbVolume vbWide "
 "vbHiragana vbKatakana vbSimplifiedChinese vbTraditionalChinese "
 
 , NULL, NULL, NULL
