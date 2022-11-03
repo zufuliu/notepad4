@@ -7273,70 +7273,76 @@ void ToggleFullScreenMode(void) {
 	static bool bSaved;
 	static WINDOWPLACEMENT wndpl;
 	static RECT rcWorkArea;
-	static DWORD exStyle;
+	static DWORD mainStyle;
 
 	HWND wTaskBar = FindWindow(L"Shell_TrayWnd", L"");
 	HWND wStartButton = FindWindow(L"Button", NULL);
-
+	HWND hwnd = hwndMain;
 	if (bInFullScreenMode) {
 		if (!bSaved) {
 			bSaved = true;
 			SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, 0);
 			wndpl.length = sizeof(WINDOWPLACEMENT);
-			GetWindowPlacement(hwndMain, &wndpl);
-			exStyle = GetWindowExStyle(hwndEdit);
+			GetWindowPlacement(hwnd, &wndpl);
+			mainStyle = GetWindowStyle(hwnd);
 		}
 
-		HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+		HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		MONITORINFO mi;
 		mi.cbSize = sizeof(mi);
 		GetMonitorInfo(hMonitor, &mi);
 
-		const int x = mi.rcMonitor.left;
-		const int y = mi.rcMonitor.top;
-		const int w = mi.rcMonitor.right - x;
-		const int h = mi.rcMonitor.bottom - y;
-		const int cx = SystemMetricsForDpi(SM_CXSIZEFRAME, g_uCurrentDPI);
-		const int cy = SystemMetricsForDpi(SM_CYSIZEFRAME, g_uCurrentDPI);
-
-		int top = cy;
-		if (iFullScreenMode & (FullScreenMode_HideCaption | FullScreenMode_HideMenu)) {
-			top += SystemMetricsForDpi(SM_CYCAPTION, g_uCurrentDPI);
-		}
+		int cx = 0;
+		int cy = 0;
+		int style = mainStyle;
+		const UINT dpi = g_uCurrentDPI;
+		int top = SystemMetricsForDpi(SM_CYCAPTION, dpi);
 		if (iFullScreenMode & FullScreenMode_HideMenu) {
-			top += SystemMetricsForDpi(SM_CYMENU, g_uCurrentDPI);
+			style &= ~WS_OVERLAPPEDWINDOW;
+		} else {
+			cx = SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
+			cy = SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
+			if (iFullScreenMode & FullScreenMode_HideCaption) {
+				top += cy;
+			} else {
+				top = cy;
+			}
 		}
+
+		style &= ~WS_THICKFRAME;
+		const int x = mi.rcMonitor.left - cx;
+		const int y = mi.rcMonitor.top - top;
+		const int w = mi.rcMonitor.right - x + cx;
+		const int h = mi.rcMonitor.bottom - y + cy;
 
 		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);
-
 		if (wStartButton) {
 			ShowWindow(wStartButton, SW_HIDE);
 		}
 		ShowWindow(wTaskBar, SW_HIDE);
-
-		SetWindowExStyle(hwndEdit, 0);
-		SetWindowPos(hwndMain, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x - cx, y - top, x + w + 2 * cx , y + h + top + cy, 0);
+		SetWindowStyle(hwnd, style);
+		SetWindowPos(hwnd, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x, y, w , h, 0);
 	} else {
 		bSaved = false;
 		ShowWindow(wTaskBar, SW_SHOW);
 		if (wStartButton) {
 			ShowWindow(wStartButton, SW_SHOW);
 		}
-		SetWindowExStyle(hwndEdit, exStyle);
+		SetWindowStyle(hwnd, mainStyle);
 		if (!IsTopMost()) {
-			SetWindowPos(hwndMain, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+			SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}
 		if (wndpl.length) {
 			SystemParametersInfo(SPI_SETWORKAREA, 0, &rcWorkArea, 0);
 			if (wndpl.showCmd == SW_SHOWMAXIMIZED) {
-				ShowWindow(hwndMain, SW_RESTORE);
-				ShowWindow(hwndMain, SW_SHOWMAXIMIZED);
+				ShowWindow(hwnd, SW_RESTORE);
+				ShowWindow(hwnd, SW_SHOWMAXIMIZED);
 			} else {
-				SetWindowPlacement(hwndMain, &wndpl);
+				SetWindowPlacement(hwnd, &wndpl);
 			}
 		}
 	}
-	SetForegroundWindow(hwndMain);
+	SetForegroundWindow(hwnd);
 }
 
 //=============================================================================
