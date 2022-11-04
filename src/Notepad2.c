@@ -1098,6 +1098,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			if (previous) {
 				// Direct2D: render Scintilla window with parameters for current monitor
 				SendMessage(hwndEdit, WM_SETTINGCHANGE, 0, 0);
+				Style_SetLexer(pLexCurrent, false); // override base elements
 			}
 		}
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
@@ -1202,14 +1203,13 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_SETTINGCHANGE:
 		// TODO: detect system theme and high contrast mode changes
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
-		Style_SetLexer(pLexCurrent, false);
+		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
 
 	case WM_SYSCOLORCHANGE:
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
-		// update Scintilla colors
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
-		Style_SetLexer(pLexCurrent, false);
+		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
 
 	case WM_TIMER:
@@ -7300,6 +7300,7 @@ void ToggleFullScreenMode(void) {
 		if (iFullScreenMode & FullScreenMode_HideMenu) {
 			style &= ~WS_OVERLAPPEDWINDOW;
 		} else {
+			style &= ~WS_THICKFRAME;
 			cx = SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
 			cy = SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
 			if (iFullScreenMode & FullScreenMode_HideCaption) {
@@ -7309,7 +7310,6 @@ void ToggleFullScreenMode(void) {
 			}
 		}
 
-		style &= ~WS_THICKFRAME;
 		const int x = mi.rcMonitor.left - cx;
 		const int y = mi.rcMonitor.top - top;
 		const int w = mi.rcMonitor.right - x + cx;
