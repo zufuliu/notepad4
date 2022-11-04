@@ -119,10 +119,6 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				if (skipType) {
 					s[len - 1] = '\0';
 				}
-				if (visibleChars == len && sc.GetLineNextChar() == ':') {
-					sc.ChangeState(SCE_B_LABEL);
-					sc.SetState(SCE_B_DEFAULT);
-				} else
 					if (StrEqual(s, "rem")) {
 						sc.ChangeState(SCE_B_COMMENT);
 					} else {
@@ -133,6 +129,8 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 							sc.ChangeState(SCE_B_KEYWORD);
 						} else if (keywords2.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD2);
+						} else if (visibleChars == len && sc.GetLineNextChar() == ':') {
+							sc.ChangeState(SCE_B_LABEL);
 						} else if (keywords3.InList(s)) {
 							sc.ChangeState(SCE_B_KEYWORD3);
 						} else if (!vbScriptSyntax && s[0] == '#' && keywords4.InList(s + 1)) {
