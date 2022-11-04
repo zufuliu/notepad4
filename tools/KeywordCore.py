@@ -362,6 +362,36 @@ def parse_autohotkey_api_file(pathList):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
+def parse_autoit3_api_file(path):
+	sections = read_api_file(path, ';')
+	keywordMap = {}
+	for key, doc in sections:
+		if key == 'functions':
+			items = re.findall(r'(\w+\()', doc)
+		else:
+			items = doc.split()
+		keywordMap[key] = items
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'functions',
+		'macros',
+		'sent-keys',
+		'pre-processors',
+		'special',
+		'expand',
+		'udfs',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('functions', keywordMap['functions'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('macros', keywordMap['macros'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('sent-keys', keywordMap['sent-keys'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('pre-processors', keywordMap['pre-processors'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('special', keywordMap['special'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('expand', keywordMap['expand'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('udfs', keywordMap['udfs'], KeywordAttr.Default | KeywordAttr.MakeLower),
+	]
+
 def parse_apdl_api_file(path):
 	ext = os.path.splitext(path)[1].lower()
 	comment = '!' if ext == '.cdb' else '**'
