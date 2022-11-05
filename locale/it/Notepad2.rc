@@ -1868,7 +1868,7 @@ BEGIN
 \\v\tTab Verticale (VT, ASCII 11 / 0B)\n\
 \\ooo\tValore ottale\n\
 \\uHHHH\tValore esadecimale\n\
-\\xHH\tHValore esadecimale\n\
+\\xHH\tValore esadecimale\n\
 \\\\\tBackslash"
 
 	IDS_REGEXPHELP			"Sintassi RegExp (Solo righe singole)\n\n\
@@ -1877,27 +1877,27 @@ BEGIN
 $\tFine di una linea\n\
 \\<\tInizio di una parola\n\
 \\>\tFine di una parola\n\
-[...]\tUn insieme di caratteri ([abc]) o un intervallo ([a-z])\n\
+[...]\tInsieme ([abc]) o intervallo ([a-z]) di caratteri\n\
 [^...]\tCaratteri NON nell'insieme o nell'intervallo\n\
-\\d\tQualsiasi carattere numerico\n\
-\\D\tQualsiasi carattere non numerico\n\
-\\s\tQualsiasi carattere spazio\n\
-\\S\tQualsiasi carattere diverso da spazi\n\
-\\w\tQualsiasi carattere ""parola"".\n\
-\\W\tQualsiasi carattere diverso da ""parola"".\n\
+\\d\tOgni carattere numerico\n\
+\\D\tOgni carattere non numerico\n\
+\\s\tOgni carattere spazio\n\
+\\S\tOgni carattere diverso da spazi\n\
+\\w\tOgni carattere ""parola"".\n\
+\\W\tOgni carattere diverso da ""parola"".\n\
 \\x\tCarattere di escape con un significato altrimenti speciale\n\
 \\xHH\tCarattere con codice esadecimale HH\n\
-?\tDa 0 o 1 Corrispondenze\n*\t0 o più Corrispondenze\n\
-+\tUna o più corrispondenze\n\
-*? o +?\tCorrispondenza non avida di quantificatori ""?"" e ""+""\n\
-(\tInizio di una regione\n\
-)\tFine di una regione\n\
-\\n\tRefers to a region when replacing (n è 1-9)\n\n\
+?\t0 o 1 Corrispondenze\n*\t0 o più Corrispondenze\n\
++\t1 o più corrispondenze\n\
+*? o +?\tCorrispondenza inaccurata di quantificatori ""?"" e ""+""\n\
+(\tInizio di un'area\n\
+)\tFine di un'area\n\
+\\n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
 Sintassi sperimentale:\n\
 \\h\tInizio di una parola, secondo IsWordStartAt()\n\
 \\H\tFine di una parola, secondo IsWordEndAt()\n\
-\\i\tCorrisponde a 1 o più caratteri alla fine di una parola\n\
-\\i?\tCorrisponde a 0 o più caratteri alla fine di una parola"
+\\i\tCorrisponde a 1 o più caratteri alla fine di una \t\tparola\n\
+\\i?\tCorrisponde a 0 o più caratteri alla fine di una \t\tparola"
 
 	IDS_WILDCARDHELP		"Ricerca con caratteri Jolly\n\n\
 *\tCorrisponde a zero o più caratteri.\n\
