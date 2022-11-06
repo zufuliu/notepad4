@@ -149,6 +149,9 @@ def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 		if index != 0:
 			output.append(f", // {index} {comment}")
 		if lines:
+			length = len(lines) + sum(len(line) for line in lines)
+			if length >= 0xffff:
+				print(rid, comment, 'string exceeds 64 KiB:', length)
 			output.extend('"' + line + ' "' for line in lines)
 		else:
 			output.append('NULL')
@@ -366,30 +369,51 @@ def parse_autoit3_api_file(path):
 	sections = read_api_file(path, ';')
 	keywordMap = {}
 	for key, doc in sections:
-		if key == 'functions':
+		if key in ('functions', 'user defined functions'):
 			items = re.findall(r'(\w+\()', doc)
+			if key == 'user defined functions':
+				prefixList = ['_GDIPlus_', '_GUICtrl']
+				items = set(items)
+				result = [item for item in items if item.startswith('_WinAPI_')]
+				keywordMap['user defined functions 3'] = result
+				items -= set(result)
+				result = [item for item in items if any(item.startswith(prefix) for prefix in prefixList)]
+				keywordMap['user defined functions 2'] = result
+				items -= set(result)
+				prefixList.append('_WinAPI_')
+				items |= set('^' + prefix for prefix in prefixList)
+		elif key in ('directives', 'special'):
+			items = re.findall(r'#([\w\-]+)', doc)
+		elif key == 'macros':
+			items = re.findall(r'@(\w+)', doc)
 		else:
 			items = doc.split()
 		keywordMap[key] = items
+
 	RemoveDuplicateKeyword(keywordMap, [
 		'keywords',
 		'functions',
-		'macros',
-		'sent-keys',
-		'pre-processors',
+		'user defined functions',
+		'user defined functions 2',
+		'user defined functions 3',
+		'sent keys',
+	])
+	RemoveDuplicateKeyword(keywordMap, [
+		'directives',
 		'special',
-		'expand',
-		'udfs',
 	])
 	return [
-		('keywords', keywordMap['keywords'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('functions', keywordMap['functions'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('macros', keywordMap['macros'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('sent-keys', keywordMap['sent-keys'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('pre-processors', keywordMap['pre-processors'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('special', keywordMap['special'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('expand', keywordMap['expand'], KeywordAttr.Default | KeywordAttr.MakeLower),
-		('udfs', keywordMap['udfs'], KeywordAttr.Default | KeywordAttr.MakeLower),
+		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
+		('functions', keywordMap['functions'], KeywordAttr.MakeLower),
+		('macros', keywordMap['macros'], KeywordAttr.MakeLower | KeywordAttr.Special),
+		('sent keys', keywordMap['sent keys'], KeywordAttr.MakeLower),
+		('directives', keywordMap['directives'], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('special', keywordMap['special'], KeywordAttr.MakeLower | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('user defined functions', keywordMap['user defined functions'], KeywordAttr.MakeLower),
+		#('user defined functions 2', keywordMap['user defined functions 2'], KeywordAttr.NoLexer),
+		('user defined functions 2', [], KeywordAttr.NoLexer),
+		#('user defined functions 3', keywordMap['user defined functions 3'], KeywordAttr.NoLexer),
+		('user defined functions 3', [], KeywordAttr.NoLexer),
 	]
 
 def parse_apdl_api_file(path):
@@ -1769,9 +1793,8 @@ def parse_powershell_api_file(path):
 		elif key == 'cmdlet':
 			items = re.findall(r'^([\w\-]+)\s', doc, re.MULTILINE)
 			keywordMap[key] = items
-			# parameter
-			#items = re.findall(r'(-\w+)', doc)
-			#keywordMap['misc'].extend(items)
+			items = re.findall(r'\W(-\w+)', doc)
+			keywordMap['parameters'] = items
 		elif key == 'variables':
 			items = doc.split()
 			keywordMap[key] = [item[1:] for item in items]
@@ -1784,6 +1807,7 @@ def parse_powershell_api_file(path):
 		'type',
 		'cmdlet',
 		'alias',
+		'parameters',
 		'misc',
 	])
 	return [
@@ -1792,6 +1816,8 @@ def parse_powershell_api_file(path):
 		('cmdlet', keywordMap['cmdlet'], KeywordAttr.MakeLower),
 		('alias', keywordMap['alias'], KeywordAttr.MakeLower),
 		('pre-defined variables', keywordMap['variables'], KeywordAttr.MakeLower | KeywordAttr.Special),
+		#('parameters', keywordMap['parameters'], KeywordAttr.NoLexer),
+		('parameters', [], KeywordAttr.NoLexer),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 

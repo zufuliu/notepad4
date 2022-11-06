@@ -1,270 +1,416 @@
-;https://www.autoitscript.com/site/autoit/
-;AutoIt3 Version 3.3.16.0
+; 3.3.16.1 https://www.autoitscript.com/site/autoit/
+; https://www.autoitscript.com/autoit3/docs/
 
 ;! keywords			===========================================================
+; https://www.autoitscript.com/autoit3/docs/keywords.htm
 And
 ByRef
-Case
-Const
-ContinueCase
-ContinueLoop
-Default
-Dim
+Const ContinueCase ContinueLoop
+Default Dim
 Do
-Else
-ElseIf
-EndFunc
-EndIf
-EndSelect
-EndSwitch
-EndWith
-Enum
-Exit
-ExitLoop
-False
-For
-Func
-Global
-If
-In
-Local
-Next
-Not
-Null
-Or
-ReDim
-Return
-Select
-Static
-Step
-Switch
-Then
-To
-True
 Until
+If Then
+	ElseIf Then
+	Else
+EndIf
+Enum Exit ExitLoop
+False
+For In Step
+Next
+Func
+EndFunc
+Global
+Local
+Not Null
+Or
+ReDim Return
+Select
+	Case
+EndSelect
+Static
+Switch
+	Case To
+	Case Else
+EndSwitch
+True
 Volatile
 With
+EndWith
+While
 Wend
-While 
 
-;! functions			===========================================================
-Abs(expression)
-ACos(expression)
-AdlibRegister(function, time)
-AdlibUnRegister(function)
-Asc(char)
-AscW(char)
-ASin(expression)
-Assign(varname, data, flag)
-ATan(expression)
-AutoItSetOption(option, param)
-AutoItWinGetTitle()
-AutoItWinSetTitle(new_title)
-Beep(Frequency, Duration)
-Binary(expression)
-BinaryLen(binary)
-BinaryMid(binary, start, count)
-BinaryToString(expression, flag)
-BitAND(value1, value2, value n)
-BitNOT(value)
-BitOR(value1, value2, value n)
-BitRotate(value, shift, size)
-BitShift(value, shift)
-BitXOR(value1, value2, value n)
-BlockInput(flag)
-Break(mode)
-Call(function, param_1, param_2)
-CDTray(drive, status)
-Ceiling(expression)
-Chr(ASCIIcode)
-ChrW(UNICODEcode)
+;! functions		===========================================================
+; Environment
 ClipGet()
-ClipPut(value)
-ConsoleRead(peek, binary)
-ConsoleWrite(data)
-ConsoleWriteError(data)
-ControlClick(title, text, controlID, button, clicks, x, y)
-ControlCommand(title, text, controlID, command, option)
-ControlDisable(title, text, controlID)
-ControlEnable(title, text, controlID)
-ControlFocus(title, text, controlID)
-ControlGetFocus(title, text)
-ControlGetHandle(title, text, controlID)
-ControlGetPos(title, text, controlID)
-ControlGetText(title, text, controlID)
-ControlHide(title, text, controlID)
-ControlListView(title, text, controlID, command, option1, option2)
-ControlMove(title, text, controlID, x, y, width, height)
-ControlSend(title, text, controlID, string, flag)
-ControlSetText(title, text, controlID, new_text, flag)
-ControlShow(title, text, controlID)
-ControlTreeView(title, text, controlID, command, option1)
-Cos(expression)
-Dec(hex, flag)
-DirCopy( source_dir, dest_dir, flag)
-DirCreate(path)
-DirGetSize(path, flag)
-DirMove(source_dir, dest_dir, flag)
-DirRemove(path, recurse)
-DllCall(dll, return_type, function, type1, param1, type n, param n)
-DllCallAddress(return_type, address, type1, param1, type n, param n)
-DllCallbackFree(handle)
-DllCallbackGetPtr(handle)
-DllCallbackRegister(function, return_type, params)
-DllClose(dllhandle)
-DllOpen(filename)
-DllStructCreate(Struct, Pointer)
-DllStructGetData(Struct, Element, index)
-DllStructGetPtr(Struct, Element)
-DllStructGetSize(Struct)
-DllStructSetData(Struct, Element, value, index)
-DriveGetDrive(type)
-DriveGetFileSystem(path)
-DriveGetLabel(path)
-DriveGetSerial(path)
-DriveGetType(path, operation)
-DriveMapAdd(device, remote_share, flags, user, password)
-DriveMapDel(drive)
-DriveMapGet(device)
-DriveSetLabel(path, label)
-DriveSpaceFree(path)
-DriveSpaceTotal(path)
-DriveStatus(path)
-EnvGet(envvariable)
-EnvSet(envvariable, value)
+ClipPut("value")
+EnvGet("envvariable")
+EnvSet("envvariable" [, "value"])
 EnvUpdate()
-Eval(string)
-Execute(string)
-Exp(expression)
-FileChangeDir(path)
-FileClose(filehandle)
-FileCopy( source, dest, flag)
-FileCreateNTFSLink( source, hardlink, flag)
-FileCreateShortcut(file, lnk, workdir, args, desc, icon, hotkey, icon_number, state)
-FileDelete(filename)
-FileExists(path)
-FileFindFirstFile(filename)
-FileFindNextFile(search, flag)
-FileFlush(filehandle)
-FileGetAttrib(filename)
-FileGetEncoding(filehandle/filename, mode)
-FileGetLongName(filename, flag)
-FileGetPos(filehandle)
-FileGetShortcut(lnk)
-FileGetShortName(filename, flag)
-FileGetSize(filename)
-FileGetTime(filename, option, format)
-FileGetVersion(filename, stringname)
-FileInstall(source, dest, flag)
-FileMove(source, dest, flag)
-FileOpen(filename, mode)
-FileOpenDialog(title, init dir, filter, options, default name, hwnd)
-FileRead(filehandle/filename, count)
-FileReadLine(filehandle/filename, line)
-FileReadToArray(filehandle/filename)
-FileRecycle(source)
-FileRecycleEmpty(source)
-FileSaveDialog(title, init dir, filter, options, default name, hwnd)
-FileSelectFolder(dialog text, root dir, flag, initial dir, hwnd)
-FileSetAttrib(file pattern, RASHNOT, recurse)
-FileSetEnd(filehandle)
-FileSetPos(filehandle, offset, origin)
-FileSetTime(file pattern, time, type, recurse)
-FileWrite(filehandle/filename, text/data)
-FileWriteLine(filehandle/filename, line)
-Floor(expression)
-FtpSetProxy(mode, proxy:port, username, password)
-FuncName(Functionvariable)
-GUICreate(title, width, height, left, top, style, exStyle, parent)
-GUICtrlCreateAvi(filename, subfileid, left, top, width, height, style, exStyle)
-GUICtrlCreateButton(text, left, top, width, height, style, exStyle)
-GUICtrlCreateCheckbox(text, left, top, width, height, style, exStyle)
-GUICtrlCreateCombo(text, left, top, width, height, style, exStyle)
-GUICtrlCreateContextMenu(controlID)
-GUICtrlCreateDate(text, left, top, width, height, style, exStyle)
+MemGetStats()
+#Region ; File, Directory and Disk
+ConsoleRead([peek = False [, binary = False]])
+ConsoleWrite("data")
+ConsoleWriteError("data")
+DirCopy("source dir", "dest dir" [, flag = 0])
+DirCreate("path")
+DirGetSize("path" [, flag = 0])
+DirMove("source dir", "dest dir" [, flag = 0])
+DirRemove("path" [, recurse = 0])
+DriveGetDrive("type")
+DriveGetFileSystem("path")
+DriveGetLabel("path")
+DriveGetSerial("path")
+DriveGetType("path" [, operation = 1])
+DriveMapAdd("device", "remote share" [, flags = 0 [, "user" [, "password"]]])
+DriveMapDel("drive")
+DriveMapGet("device")
+DriveSetLabel("path", "label")
+DriveSpaceFree("path")
+DriveSpaceTotal("path")
+DriveStatus("path")
+FileChangeDir("path")
+FileClose("filehandle")
+FileCopy("source", "dest" [, flag = 0])
+FileCreateNTFSLink("source", "hardlink" [, flag = 0])
+FileCreateShortcut("file", "lnk" [, "workdir" [, "args" [, "desc" [, "icon" [, "hotkey" [, icon number [, state]]]]]]])
+FileDelete("filename")
+FileExists("path")
+FileFindFirstFile("filename")
+FileFindNextFile(search [, flag = 0])
+FileFlush("filehandle")
+FileGetAttrib("filename")
+FileGetEncoding("filehandle/filename" [, mode = 1])
+FileGetLongName("filename" [, flag = 0])
+FileGetPos("filehandle")
+FileGetShortcut("lnk")
+FileGetShortName("filename" [, flag = 0])
+FileGetSize("filename")
+FileGetTime("filename" [, option = 0 [, format = 0]])
+FileGetVersion("filename" [, "stringname"])
+FileInstall("source", "dest" [, flag = 0])
+FileMove("source", "dest" [, flag = 0])
+FileOpen("filename" [, mode = 0])
+FileOpenDialog("title", "init dir", "filter" [, options = 0 [, "default name" [, hwnd]]])
+FileRead("filehandle/filename" [, count])
+FileReadLine("filehandle/filename" [, line = 1])
+FileReadToArray("filehandle/filename")
+FileRecycle("source")
+FileRecycleEmpty(["source"])
+FileSaveDialog("title", "init dir", "filter" [, options = 0 [, "default name" [, hwnd]]])
+FileSelectFolder("dialog text", "root dir" [, flag = 0 [, "initial dir" [, hwnd]]])
+FileSetAttrib("file pattern", "+-RASHNOT" [, recurse = 0])
+FileSetEnd("filehandle")
+FileSetPos("filehandle", offset, origin)
+FileSetTime("file pattern", "time" [, type = 0 [, recurse = 0]])
+FileWrite("filehandle/filename", "text/data")
+FileWriteLine("filehandle/filename", "line")
+IniDelete("filename", "section" [, "key"])
+IniRead("filename", "section", "key", "default")
+IniReadSection("filename", "section")
+IniReadSectionNames("filename")
+IniRenameSection("filename", "section", "new section" [, flag = 0])
+IniWrite("filename", "section", "key", "value")
+IniWriteSection("filename", "section", "data" [, index = 1])
+#EndRegion
+; Graphic and Sound
+Beep([Frequency = 500 [, Duration = 1000]])
+PixelChecksum(left, top, right, bottom [, step = 1 [, hwnd [, mode = 0]]])
+PixelGetColor(x, y [, hwnd])
+PixelSearch(left, top, right, bottom, color [, shade-variation = 0 [, step = 1 [, hwnd]]])
+SoundPlay("filename" [, wait = 0])
+SoundSetWaveVolume(percent)
+#Region ; GUI
+GUICreate("title" [, width [, height [, left = -1 [, top = -1 [, style = -1 [, exStyle = -1 [, parent = 0]]]]]]])
+; GUI Control creation
+GUICtrlCreateAvi(filename, subfileid, left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateButton("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateCheckbox("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateCombo("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateContextMenu([controlID])
+GUICtrlCreateDate("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
 GUICtrlCreateDummy()
-GUICtrlCreateEdit(text, left, top, width, height, style, exStyle)
-GUICtrlCreateGraphic(left, top, width, height, style)
-GUICtrlCreateGroup(text, left, top, width, height, style, exStyle)
-GUICtrlCreateIcon(filename, iconName, left, top, width, height, style, exStyle)
-GUICtrlCreateInput(text, left, top, width, height, style, exStyle)
-GUICtrlCreateLabel(text, left, top, width, height, style, exStyle)
-GUICtrlCreateList(text, left, top, width, height, style, exStyle)
-GUICtrlCreateListView(text, left, top, width, height, style, exStyle)
-GUICtrlCreateListViewItem(text, listviewID)
-GUICtrlCreateMenu(submenutext, menuID, menuentry)
-GUICtrlCreateMenuItem(text, menuID, menuentry, menuradioitem)
-GUICtrlCreateMonthCal(text, left, top, width, height, style, exStyle)
-GUICtrlCreateObj(ObjectVar, left, top, width, height)
-GUICtrlCreatePic(filename, left, top, width, height, style, exStyle)
-GUICtrlCreateProgress(left, top, width, height, style, exStyle)
-GUICtrlCreateRadio(text, left, top, width, height, style, exStyle)
-GUICtrlCreateSlider(left, top, width, height, style, exStyle)
-GUICtrlCreateTab(left, top, width, height, style, exStyle)
-GUICtrlCreateTabItem(text)
-GUICtrlCreateTreeView(left, top, width, height, style, exStyle)
-GUICtrlCreateTreeViewItem(text, treeviewID)
-GUICtrlCreateUpdown(inputcontrolID, style)
+GUICtrlCreateEdit("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateGraphic(left, top [, width [, height [, style]]])
+GUICtrlCreateGroup("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateIcon(filename, iconName, left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateInput("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateLabel("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateList("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateListView("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateListViewItem("text", listviewID)
+GUICtrlCreateMenu("submenutext" [, menuID = -1 [, menuentry = -1]])
+GUICtrlCreateMenuItem("text", menuID [, menuentry = -1 [, menuradioitem = 0]])
+GUICtrlCreateMonthCal("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateObj(ObjectVar, left, top [, width [, height]])
+GUICtrlCreatePic(filename, left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateProgress(left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateRadio("text", left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateSlider(left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateTab(left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateTabItem("text")
+GUICtrlCreateTreeView(left, top [, width [, height [, style = -1 [, exStyle = -1]]]])
+GUICtrlCreateTreeViewItem("text", treeviewID)
+GUICtrlCreateUpdown(inputcontrolID [, style = -1])
 GUICtrlDelete(controlID)
-GUICtrlGetHandle(controlID)
-GUICtrlGetState(controlID)
-GUICtrlRead(controlID, advanced)
-GUICtrlRecvMsg(controlID, msg, wParam, lParamType)
-GUICtrlRegisterListViewSort(controlID, function)
-GUICtrlSendMsg(controlID, msg, wParam, lParam)
-GUICtrlSendToDummy(controlID, state)
+; GUI Control update
+GUICtrlRegisterListViewSort(controlID, "function")
 GUICtrlSetBkColor(controlID, backgroundcolor)
 GUICtrlSetColor(controlID, textcolor)
 GUICtrlSetCursor(controlID, cursorID)
-GUICtrlSetData(controlID, data, default)
-GUICtrlSetDefBkColor(defbkcolor, winhandle)
-GUICtrlSetDefColor(deftextcolor, winhandle)
-GUICtrlSetFont(controlID, size, weight, attribute, fontname, quality)
-GUICtrlSetGraphic(controlID, type, par1, ... par6)
-GUICtrlSetImage(controlID, filename, iconname, icontype)
-GUICtrlSetLimit(controlID, max, min)
-GUICtrlSetOnEvent(controlID, function)
-GUICtrlSetPos(controlID, left, top, width, height)
+GUICtrlSetData(controlID, data [, default])
+GUICtrlSetDefBkColor(defbkcolor [, winhandle])
+GUICtrlSetDefColor(deftextcolor [, winhandle])
+GUICtrlSetFont(controlID, size [, weight [, attribute [, fontname [, quality]]]])
+GUICtrlSetGraphic(controlID, type [, par1 [, ... par6]])
+GUICtrlSetImage(controlID, filename [, iconname [, icontype]])
+GUICtrlSetLimit(controlID, max [, min = 0])
+GUICtrlSetOnEvent(controlID, "function")
+GUICtrlSetPos(controlID, left [, top [, width [, height]]])
 GUICtrlSetResizing(controlID, resizing)
 GUICtrlSetState(controlID, state)
-GUICtrlSetStyle(controlID, style, exStyle)
-GUICtrlSetTip(controlID, tiptext, title, icon, options)
-GUIDelete(winhandle)
-GUIGetCursorInfo(winhandle)
-GUIGetMsg(advanced)
-GUIGetStyle(winhandle)
-GUIRegisterMsg(msgID, function)
-GUISetAccelerators(accelerators, winhandle)
-GUISetBkColor(background, winhandle)
-GUISetCoord(left, top, width, height, winhandle)
-GUISetCursor(cursorID, override, winhandle)
-GUISetFont(size, weight, attribute, fontname, winhandle, quality)
-GUISetHelp(helpfile, winhandle)
-GUISetIcon(iconfile, iconID, winhandle)
-GUISetOnEvent(specialID, function, winhandle)
-GUISetState(flag, winhandle)
-GUISetStyle(Style, ExStyle, winhandle)
-GUIStartGroup(winhandle)
-GUISwitch(winhandle, tabitemID)
-Hex(expression, length)
-HotKeySet(key, function)
-HttpSetProxy(mode, proxy:port, username, password)
-HttpSetUserAgent(user agent)
-HWnd(expression)
+GUICtrlSetStyle(controlID, style [, exStyle])
+GUICtrlSetTip(controlID, tiptext [, "title" [, icon [, options]]])
+; GUI set parameters
+GUISetAccelerators(accelerators [, winhandle])
+GUISetBkColor(background [, winhandle])
+GUISetCoord(left, top [, width [, height [, winhandle]]])
+GUISetCursor([cursorID [, override = 0 [, winhandle]]])
+GUISetFont(size [, weight [, attribute [, fontname [, winhandle [, quality]]]]])
+GUISetHelp(helpfile [, winhandle])
+GUISetIcon(iconfile [, iconID [, winhandle]])
+GUISetOnEvent(specialID, "function" [, winhandle])
+GUISetState([flag [, winhandle]])
+GUISetStyle(Style [, ExStyle [, winhandle]])
+
+GUICtrlGetHandle(controlID)
+GUICtrlGetState(controlID)
+GUICtrlRead(controlID [, advanced = 0])
+GUICtrlRecvMsg(controlID , msg [, wParam [, lParamType]])
+GUICtrlSendMsg(controlID, msg, wParam, lParam)
+GUICtrlSendToDummy(controlID [, state])
+GUIDelete([winhandle])
+GUIGetCursorInfo([winhandle])
+GUIGetMsg([advanced = 0])
+GUIGetStyle([winhandle])
+GUIRegisterMsg(msgID, "function")
+GUIStartGroup([winhandle])
+GUISwitch(winhandle [, tabitemID])
+#EndRegion
+; Keyboard
+HotKeySet("key" [, "function"])
+Send("keys" [, flag = 0])
+SendKeepActive("title" [, "text"])
+; Map
+MapAppend(map, value)
+MapExists(map, key)
+MapKeys(map)
+MapRemove(map, key)
+#Region ; Math
+Abs(expression)
+ACos(expression)
+ASin(expression)
+ATan(expression)
+BitAND(value1, value2 [, value n])
+BitNOT(value)
+BitOR(value1, value2 [, value n])
+BitRotate(value [, shift = 1 [, size = "W"]])
+BitShift(value, shift)
+BitXOR(value1, value2 [, value n])
+Ceiling(expression)
+Cos(expression)
+Exp(expression)
+Floor(expression)
+Log(expression)
+Mod(value1, value2)
+Random([Min = 0 [, Max = 1 [, Flag = 0]]])
+Round(expression [, decimalplaces])
+Sin(expression)
+Sqrt(expression)
+SRandom(Seed)
+Tan(expression)
+#EndRegion
+#Region ; Message Boxes and Dialogs
+InputBox("title", "prompt" [, "default" [, "password char" [, width = -1 [, height = -1 [, left = Default [, top = Default [, timeout = 0 [, hwnd]]]]]]]])
+MsgBox(flag, "title", "text" [, timeout = 0 [, hwnd]])
+ProgressOff()
+ProgressOn("title", "maintext" [, "subtext" [, x pos [, y pos [, opt]]]])
+ProgressSet(percent [, "subtext" [, "maintext"]])
+SplashImageOn("title", "file" [, width [, height [, x pos [, y pos [, opt]]]]])
+SplashOff()
+SplashTextOn("title", "text" [, w = 500 [, h = 400 [, x pos [, y pos [, opt = 0 [, "fontname" [, fontsz = 12 [, fontwt]]]]]]]])
+ToolTip("text" [, x [, y [, "title" [, icon = 0 [, options]]]]])
+#EndRegion
+#Region ; Misc
+AdlibRegister("function" [, time = 250])
+AdlibUnRegister(["function"])
+AutoItSetOption("option" [, param])
+AutoItWinGetTitle()
+AutoItWinSetTitle("newtitle")
+BlockInput(flag)
+Break(mode)
+Call("function" [, param_1 [, param_2 [, param_N]]])
+CDTray("drive", "status")
+Execute(string)
+OnAutoItExitRegister("function")
+OnAutoItExitUnRegister("function")
+Opt("option" [, param])
+SetError(code [, extended = 0 [, return value]])
+SetExtended(code [, return value])
+VarGetType(expression)
+#EndRegion
+; Mouse
+MouseClick("button" [, x, y [, clicks = 1 [, speed = 10]]])
+MouseClickDrag("button", x1, y1, x2, y2 [, speed = 10])
+MouseDown("button")
+MouseGetCursor()
+MouseGetPos([dimension])
+MouseMove(x, y [, speed = 10])
+MouseUp("button")
+MouseWheel("direction" [, clicks = 1])
+#Region ; Network
+FtpSetProxy(mode = 0 [, "proxy:port" [, "username" [, "password"]]])
+HttpSetProxy(mode = 0 [, "proxy:port" [, "username" [, "password"]]])
+HttpSetUserAgent("user agent")
 InetClose(handle)
-InetGet(URL, filename, options, background)
-InetGetInfo(handle, index)
-InetGetSize(URL, options)
-InetRead(URL, options)
-IniDelete(filename, section, key)
-IniRead(filename, section, key, default)
-IniReadSection(filename, section)
-IniReadSectionNames(filename)
-IniRenameSection(filename, section, new section, flag)
-IniWrite(filename, section, key, value)
-IniWriteSection(filename, section, data, index)
-InputBox(title, prompt, default, password char, width, height, left, top, timeout, hwnd)
-Int(expression, flag)
+InetGet("URL", "filename" [, options = 0 [, background = 0]])
+InetGetInfo([handle [, index = -1]])
+InetGetSize("URL" [, options = 0])
+InetRead("URL" [, options = 0])
+Ping("address/hostname" [, timeout = 4000])
+TCPAccept(mainsocket)
+TCPCloseSocket(socket)
+TCPConnect(IPAddr, port)
+TCPListen(IPAddr, port [, MaxPendingConnection])
+TCPNameToIP(name)
+TCPRecv(mainsocket, maxlen [, flag = 0])
+TCPSend(mainsocket, data)
+TCPShutdown()
+UDPShutdown()
+TCPStartup()
+UDPStartup()
+UDPBind(IPAddr, port)
+UDPCloseSocket(socketarray)
+UDPOpen(IPAddr, port [, flag = 0])
+UDPRecv(socketarray, maxlen [, flag = 0])
+UDPSend(socketarray, data)
+#EndRegion
+; Obj/COM
+ObjCreate("classname" [, "servername" [, "username" [, "password"]]])
+ObjCreateInterface("CLSID" , "IID" [, "interface_description",[flag = True]])
+ObjEvent($ObjectVar, "functionprefix" [, "interface name"])
+ObjEvent("AutoIt.Error" [, "function"])
+ObjGet("filename" [, "classname" [, instance]])
+ObjName($Objectvariable [, Flag = 1])
+#Region ; Process
+DllCall("dll", "return type", "function" [, type1, param1 [, type n, param n]])
+DllCallAddress("return type", address [, type1, param1 [, type n, param n]])
+DllCallbackFree(handle)
+DllCallbackGetPtr(handle)
+DllCallbackRegister("function", "return type", "params")
+DllClose(dllhandle)
+DllOpen(filename)
+DllStructCreate(Struct [, Pointer])
+DllStructGetData(Struct, Element [, index = Default])
+DllStructGetPtr(Struct [, Element])
+DllStructGetSize(Struct)
+DllStructSetData(Struct, Element, value [, index])
+ProcessClose("process")
+ProcessExists("process")
+ProcessGetStats(["process" [, type = 0]])
+ProcessList(["name"])
+ProcessSetPriority("process", priority)
+ProcessWait("process" [, timeout = 0])
+ProcessWaitClose("process" [, timeout = 0])
+Run("program" [, "workingdir" [, show_flag [, opt_flag]]])
+RunAs("username", "domain", "password", logon_flag, "program" [, "workingdir" [, show_flag [, opt_flag]]])
+RunAsWait("username", "domain", "password", logon_flag, "program" [, "workingdir" [, show_flag [, opt_flag]]])
+RunWait("program" [, "workingdir" [, show_flag [, opt_flag]]])
+ShellExecute("filename" [, "parameters" [, "workingdir" [, "verb" [, showflag]]]])
+ShellExecuteWait("filename" [, "parameters" [, "workingdir" [, "verb" [, showflag]]]])
+Shutdown(code)
+StderrRead(process_id [, peek = False [, binary = False]])
+StdinWrite(process_id [, data])
+StdioClose(process_id)
+StdoutRead(process_id [, peek = False [, binary = False]])
+#EndRegion
+; Registry
+RegDelete("keyname" [, "valuename"])
+RegEnumKey("keyname", instance)
+RegEnumVal("keyname", instance)
+RegRead("keyname" [, "valuename"])
+RegWrite("keyname" [, "valuename", "type", value])
+#Region ; String
+StringAddCR("string")
+StringCompare("string1", "string2" [, casesense = 0])
+StringFormat("format control" [, var1 [, ... var32]])
+StringFromASCIIArray(array,[start = 0 [, end = -1 [, encoding = 0]]])
+StringInStr("string", "substring" [, casesense = 0 [, occurrence = 1 [, start = 1 [, count]]]])
+StringIsAlNum("string")
+StringIsAlpha("string")
+StringIsASCII("string")
+StringIsDigit("string")
+StringIsFloat("string")
+StringIsInt("string")
+StringIsLower("string")
+StringIsSpace("string")
+StringIsUpper("string")
+StringIsXDigit("string")
+StringLeft("string", count)
+StringLen("string")
+StringLower("string")
+StringMid("string", start [, count = -1])
+StringRegExp("test", "pattern" [, flag = 0 [, offset = 1]])
+StringRegExpReplace("test", "pattern", "replace" [, count = 0])
+StringReplace("string", "searchstring/start", "replacestring" [, occurrence = 0 [, casesense = 0]])
+StringReverse("string" [, flag = 0])
+StringRight("string", count)
+StringSplit("string", "delimiters" [, flag = 0])
+StringStripCR("string")
+StringStripWS("string", flag)
+StringToASCIIArray("string",[start = 0 [, end [, encoding = 0]]])
+StringTrimLeft("string", count)
+StringTrimRight("string", count)
+StringUpper("string")
+#EndRegion
+; Timer and Delay
+Sleep(delay)
+TimerDiff(handle)
+TimerInit()
+#Region ; Tray
+TrayCreateItem("text" [, menuID = -1 [, menuentry = -1 [, menuradioitem = 0]]])
+TrayCreateMenu("sub/menutext" [, menuID = -1 [, menuentry = -1]])
+TrayGetMsg()
+TrayItemDelete(controlID)
+TrayItemGetHandle(controlID)
+TrayItemGetState([controlID])
+TrayItemGetText(controlID)
+TrayItemSetOnEvent(itemID, "function")
+TrayItemSetState(controlID, state)
+TrayItemSetText(controlID, text)
+TraySetClick(flag)
+TraySetIcon([filename [, iconID]])
+TraySetOnEvent(specialID, "function")
+TraySetPauseIcon([filename [, iconID]])
+TraySetState([flag = 1])
+TraySetToolTip([text])
+TrayTip("title", "text", timeout [, option = 0])
+#EndRegion
+#Region ; Variables and Conversions
+Asc("char")
+AscW("char")
+Chr(ASCIIcode)
+ChrW(UNICODEcode)
+Assign("varname", "data" [, flag = 0])
+Binary(expression)
+BinaryLen(binary)
+BinaryMid(binary, start [, count])
+BinaryToString(expression [, flag = 1])
+Dec("hex" [, flag = 0])
+Eval(string)
+FuncName($Functionvariable)
+Hex(expression [, length])
+HWnd(expression)
+Int(expression [, flag = 0])
 IsAdmin()
 IsArray(variable)
 IsBinary(expression)
@@ -281,253 +427,89 @@ IsNumber(variable)
 IsObj(variable)
 IsPtr(variable)
 IsString(variable)
-Log(expression)
-MapAppend(map, value)
-MapExists(map, key)
-MapKeys(map)
-MapRemove(map, key)
-MemGetStats()
-Mod(value1, value2)
-MouseClick(button, x, y, clicks, speed)
-MouseClickDrag(button, x1, y1, x2, y2, speed)
-MouseDown(button)
-MouseGetCursor()
-MouseGetPos(dimension)
-MouseMove(x, y, speed)
-MouseUp(button)
-MouseWheel(direction, clicks)
-MsgBox(flag, title, text, timeout, hwnd)
-Number(expression, flag)
-Opt(option, param)
-ObjCreate(classname, servername, username, password)
-ObjCreateInterface(CLSID, IID, interface_description,flag)
-ObjEvent($ObjectVar, functionprefix, interface name)
-ObjGet(filename, classname, instance)
-ObjName($Objectvariable, Flag)
-OnAutoItExitRegister(function)
-OnAutoItExitUnRegister(function)
-Ping(address/hostname, timeout)
-PixelChecksum(left, top, right, bottom, step, hwnd, mode)
-PixelGetColor(x, y, hwnd)
-PixelSearch(left, top, right, bottom, color, shade-variation, step, hwnd)
-ProcessClose(process)
-ProcessExists(process)
-ProcessGetStats(process, type)
-ProcessList(name)
-ProcessSetPriority(process, priority)
-ProcessWait(process, timeout)
-ProcessWaitClose(process, timeout)
-ProgressOff()
-ProgressOn(title, maintext, subtext, x, y, opt)
-ProgressSet(percent, subtext, maintext)
+Number(expression [, flag = 0])
 Ptr(expression)
-Random(Min, Max, Flag)
-RegDelete(keyname, valuename)
-RegEnumKey(keyname, instance)
-RegEnumVal(keyname, instance)
-RegRead(keyname, valuename)
-RegWrite(keyname, valuename, type, value)
-Round(expression, decimalplaces)
-Run(program, workingdir, show_flag, opt_flag)
-RunAs(username, domain, password, logon_flag, program, workingdir, show_flag, opt_flag)
-RunAsWait(username, domain, password, logon_flag, program, workingdir, show_flag, opt_flag)
-RunWait(program, workingdir, show_flag, opt_flag)
-Send(keys, flag)
-SendKeepActive(title, text)
-SetError(code, extended, return value)
-SetExtended(code, return value)
-ShellExecute(filename, parameters, workingdir, verb, showflag)
-ShellExecuteWait(filename, parameters, workingdir, verb, showflag)
-Shutdown(code)
-Sin(expression)
-Sleep(delay)
-SoundPlay(filename, wait)
-SoundSetWaveVolume(percent)
-SplashImageOn(title, file, width, height, x, y, opt)
-SplashOff()
-SplashTextOn(title, text, w, h, x, y, opt, fontname, fontsz2, fontwt)
-Sqrt(expression)
-SRandom(Seed)
-StatusbarGetText(title, text, part)
-StderrRead(process_id, peek, binary)
-StdinWrite(process_id, data)
-StdioClose(process_id)
-StdoutRead(process_id, peek, binary)
 String(expression)
-StringAddCR(string)
-StringCompare(string1, string2, casesense)
-StringFormat(format control, var1, ... var32)
-StringFromASCIIArray(array,start, end, encoding)
-StringInStr(string, substring, casesense, occurrence, start, count)
-StringIsAlNum(string)
-StringIsAlpha(string)
-StringIsASCII(string)
-StringIsDigit(string)
-StringIsFloat(string)
-StringIsInt(string)
-StringIsLower(string)
-StringIsSpace(string)
-StringIsUpper(string)
-StringIsXDigit(string)
-StringLeft(string, count)
-StringLen(string)
-StringLower(string)
-StringMid(string, start, count)
-StringRegExp(test, pattern, flag, offset)
-StringRegExpReplace(test, pattern, replace, count)
-StringReplace(string, searchstring/start, replacestring, occurrence, casesense)
-StringReverse(string, flag)
-StringRight(string, count)
-StringSplit(string, delimiters, flag)
-StringStripCR(string)
-StringStripWS(string, flag)
-StringToASCIIArray(string,start, end, encoding)
-StringToBinary(expression, flag)
-StringTrimLeft(string, count)
-StringTrimRight(string, count)
-StringUpper(string)
-Tan(expression)
-TCPAccept(mainsocket)
-TCPCloseSocket(socket)
-TCPConnect(IPAddr, port)
-TCPListen(IPAddr, port, MaxPendingConnection)
-TCPNameToIP(name)
-TCPRecv(mainsocket, maxlen, flag)
-TCPSend(mainsocket, data)
-TCPShutdown()
-TCPStartup()
-TimerDiff(handle)
-TimerInit()
-ToolTip(text, x, y, title, icon, options)
-TrayCreateItem(text, menuID, menuentry, menuradioitem)
-TrayCreateMenu(sub/menutext, menuID, menuentry)
-TrayGetMsg()
-TrayItemDelete(controlID)
-TrayItemGetHandle(controlID)
-TrayItemGetState(controlID)
-TrayItemGetText(controlID)
-TrayItemSetOnEvent(itemID, function)
-TrayItemSetState(controlID, state)
-TrayItemSetText(controlID, text)
-TraySetClick(flag)
-TraySetIcon(filename, iconID)
-TraySetOnEvent(specialID, function)
-TraySetPauseIcon(filename, iconID)
-TraySetState(flag)
-TraySetToolTip(text)
-TrayTip(title, text, timeout, option)
-UBound(Variable, Dimension)
-UDPBind(IPAddr, port)
-UDPCloseSocket(socketarray)
-UDPOpen(IPAddr, port, flag)
-UDPRecv(socketarray, maxlen, flag)
-UDPSend(socketarray, data)
-UDPShutdown()
-UDPStartup()
-VarGetType(expression)
-WinActivate(title, text)
-WinActive(title, text)
-WinClose(title, text)
-WinExists(title, text)
-WinFlash(title, text, flashes, delay)
+StringToBinary(expression [, flag = 1])
+UBound(Variable [, Dimension = 1])
+#EndRegion
+#Region ; Window
+; Controls
+ControlClick("title", "text", controlID [, button = "left" [, clicks = 1 [, x [, y]]]])
+ControlCommand("title", "text", controlID, "command" [, "option"])
+ControlDisable("title", "text", controlID)
+ControlEnable("title", "text", controlID)
+ControlFocus("title", "text", controlID)
+ControlGetFocus("title" [, "text"])
+ControlGetHandle("title", "text", controlID)
+ControlGetPos("title", "text", controlID)
+ControlGetText("title", "text", controlID)
+ControlHide("title", "text", controlID)
+ControlListView("title", "text", controlID, "command" [, option1 [, option2]])
+ControlMove("title", "text", controlID, x, y [, width [, height]])
+ControlSend("title", "text", controlID, "string" [, flag = 0])
+ControlSetText("title", "text", controlID, "new text" [, flag = 0])
+ControlShow("title", "text", controlID)
+ControlTreeView("title", "text", controlID, "command" [, option1])
+StatusbarGetText("title" [, "text" [, part = 1]])
+
+WinActivate("title" [, "text"])
+WinActive("title" [, "text"])
+WinClose("title" [, "text"])
+WinExists("title" [, "text"])
+WinFlash("title" [, "text" [, flashes = 4 [, delay = 500]]])
 WinGetCaretPos()
-WinGetClassList(title, text)
-WinGetClientSize(title, text)
-WinGetHandle(title, text)
-WinGetPos(title, text)
-WinGetProcess(title, text)
-WinGetState(title, text)
-WinGetText(title, text)
-WinGetTitle(title, text)
-WinKill(title, text)
-WinList(title, text)
-WinMenuSelectItem(title, text, item, item, item, item, item, item, item)
+WinGetClassList("title" [, "text"])
+WinGetClientSize("title" [, "text"])
+WinGetHandle("title" [, "text"])
+WinGetPos("title" [, "text"])
+WinGetProcess("title" [, "text"])
+WinGetState("title" [, "text"])
+WinGetText("title" [, "text"])
+WinGetTitle("title" [, "text"])
+WinKill("title" [, "text"])
+WinList("title" [, "text"])
+WinMenuSelectItem("title", "text", "item" [, "item" [, "item" [, "item" [, "item" [, "item" [, "item"]]]]]])
 WinMinimizeAll()
 WinMinimizeAllUndo()
-WinMove(title, text, x, y, width, height, speed)
-WinSetOnTop(title, text, flag)
-WinSetState(title, text, flag)
-WinSetTitle(title, text, newtitle)
-WinSetTrans(title, text, transparency)
-WinWait(title, text, timeout)
-WinWaitActive(title, text, timeout)
-WinWaitClose(title, text, timeout)
-WinWaitNotActive(title, text, timeout)
+WinMove("title", "text", x, y [, width [, height [, speed]]])
+WinSetOnTop("title", "text", flag)
+WinSetState("title", "text", flag)
+WinSetTitle("title", "text", "newtitle")
+WinSetTrans("title", "text", transparency)
+WinWait("title" [, "text" [, timeout = 0]])
+WinWaitActive("title" [, "text" [, timeout = 0]])
+WinWaitClose("title" [, "text" [, timeout = 0]])
+WinWaitNotActive("title" [, "text" [, timeout = 0]])
+#EndRegion
 
 ;! macros			===========================================================
-@AppDataCommonDir
-@AppDataDir
+; https://www.autoitscript.com/autoit3/docs/macros.htm
+#Region ; AutoIt Related
+@Compiled
+@error
+@exitCode
+@exitMethod
+@extended
+@NumParams
+@ScriptName
+@ScriptDir
+@ScriptFullPath
+@ScriptLineNumber
+@WorkingDir
 @AutoItExe
 @AutoItPID
 @AutoItVersion
 @AutoItX64
 @COM_EventObj
-@CommonFilesDir
-@Compiled
-@ComputerName
-@ComSpec
-@CPUArch
-@CR
-@CRLF
-@DesktopCommonDir
-@DesktopDepth
-@DesktopDir
-@DesktopHeight
-@DesktopRefresh
-@DesktopWidth
-@DocumentsCommonDir
-@error
-@exitCode
-@exitMethod
-@extended
-@FavoritesCommonDir
-@FavoritesDir
-@GUI_CtrlHandle
 @GUI_CtrlId
-@GUI_DragFile
+@GUI_CtrlHandle
 @GUI_DragId
+@GUI_DragFile
 @GUI_DropId
 @GUI_WinHandle
-@HomeDrive
-@HomePath
-@HomeShare
 @HotKeyPressed
-@HOUR
-@IPAddress1
-@IPAddress2
-@IPAddress3
-@IPAddress4
-@KBLayout
-@LF
-@LocalAppDataDir
-@LogonDNSDomain
-@LogonDomain
-@LogonServer
-@MDAY
-@MIN
-@MON
-@MSEC
-@MUILang
-@MyDocumentsDir
-@NumParams
-@OSArch
-@OSBuild
-@OSLang
-@OSServicePack
-@OSType
-@OSVersion
-@ProgramFilesDir
-@ProgramsCommonDir
-@ProgramsDir
-@ScriptDir
-@ScriptFullPath
-@ScriptLineNumber
-@ScriptName
-@SEC
-@StartMenuCommonDir
-@StartMenuDir
-@StartupCommonDir
-@StartupDir
+
 @SW_DISABLE
 @SW_ENABLE
 @SW_HIDE
@@ -544,21 +526,83 @@ WinWaitNotActive(title, text, timeout)
 @SW_SHOWNOACTIVATE
 @SW_SHOWNORMAL
 @SW_UNLOCK
-@SystemDir
-@TAB
-@TempDir
+
 @TRAY_ID
 @TrayIconFlashing
 @TrayIconVisible
-@UserName
-@UserProfileDir
-@WDAY
-@WindowsDir
-@WorkingDir
-@YDAY
-@YEAR
 
-;! Sent-keys			===========================================================
+@CR
+@CRLF
+@LF
+@TAB
+#EndRegion
+#Region ; Directory
+; Macros for "All Users" data
+@AppDataCommonDir
+@DesktopCommonDir
+@DocumentsCommonDir
+@FavoritesCommonDir
+@ProgramsCommonDir
+@StartMenuCommonDir
+@StartupCommonDir
+; Macros for Current User data
+@AppDataDir
+@LocalAppDataDir
+@DesktopDir
+@MyDocumentsDir
+@FavoritesDir
+@ProgramsDir
+@StartMenuDir
+@StartupDir
+@UserProfileDir
+; Other macros for the computer system
+@HomeDrive
+@HomePath
+@HomeShare
+@LogonDNSDomain
+@LogonDomain
+@LogonServer
+@ProgramFilesDir
+@CommonFilesDir
+@WindowsDir
+@SystemDir
+@TempDir
+@ComSpec
+#EndRegion
+#Region ; System Info
+@CPUArch
+@KBLayout
+@MUILang
+@OSArch
+@OSLang
+@OSType
+@OSVersion
+@OSBuild
+@OSServicePack
+@ComputerName
+@UserName
+@IPAddress1
+@IPAddress2
+@IPAddress3
+@IPAddress4
+@DesktopHeight
+@DesktopWidth
+@DesktopDepth
+@DesktopRefresh
+#EndRegion
+; Time And Date
+@MSEC
+@SEC
+@MIN
+@HOUR
+@MDAY
+@MON
+@YEAR
+@WDAY
+@YDAY
+
+;! Sent keys		===========================================================
+; https://www.autoitscript.com/autoit3/docs/appendix/SendKeys.htm
 {!} {#} {^} {{} {}} {+} {alt} {altdown} {altup} {appskey}
 {asc} {backspace} {break} {browser_back} {browser_favorites} {browser_forward} {browser_home}
 {browser_refresh} {browser_search} {browser_stop} {bs} {capslock} {ctrldown} {ctrlup}
@@ -570,13 +614,14 @@ WinWaitNotActive(title, text, timeout)
 {numpaddiv} {numpaddot} {numpadenter} {numpadmult} {numpadsub} {oem_102} {pause}
 {pgdn} {pgup} {printscreen} {ralt} {rctrl} {right} {rshift} {rwin} {rwindown} {rwinup}
 {scrolllock} {shiftdown} {shiftup} {sleep} {space} {tab} {up} {volume_down} {volume_mute}
-{volume_up} 
+{volume_up}
 
-;! Pre-processors			===========================================================
-#ce
-#comments-end
+;! directives		===========================================================
+; https://www.autoitscript.com/autoit3/docs/intro/lang_directives.htm
 #comments-start
+#comments-end
 #cs
+#ce
 #include
 #include-once
 #NoTrayIcon
@@ -584,3191 +629,3525 @@ WinWaitNotActive(title, text, timeout)
 #RequireAdmin
 
 ;! Special			===========================================================
-#Autoit3Wrapper_Au3Check_Parameters
-#Autoit3Wrapper_Au3check_Stop_OnWarning
-#Autoit3Wrapper_Change2Cui
-#Autoit3Wrapper_Compression
-#Autoit3Wrapper_CvsWrapper_Parameters
-#Autoit3Wrapper_Icon
-#Autoit3Wrapper_OutFile
-#Autoit3Wrapper_OutFile_Type
-#Autoit3Wrapper_Plugin_Funcs
-#Autoit3Wrapper_Res_Comment
-#Autoit3Wrapper_Res_Description
-#Autoit3Wrapper_Res_Field
-#Autoit3Wrapper_Res_File_Add
-#Autoit3Wrapper_Res_FileVersion
-#Autoit3Wrapper_Res_FileVersion_Autoincrement
-#Autoit3Wrapper_Res_Icon_Add
-#Autoit3Wrapper_Res_Language
-#Autoit3Wrapper_Res_LegalCopyright
-#Autoit3Wrapper_Res_RequestedExecutionLevel
-#Autoit3Wrapper_Res_SaveSource
-#Autoit3Wrapper_Run_After
-#Autoit3Wrapper_Run_Au3Check
-#Autoit3Wrapper_Run_Before
-#Autoit3Wrapper_Run_CvsWrapper
-#Autoit3Wrapper_Run_Debug_Mode
-#Autoit3Wrapper_Run_Obfuscator
-#Autoit3Wrapper_Run_Tidy
-#Autoit3Wrapper_Tidy_Stop_OnError
-#Autoit3Wrapper_UseAnsi
-#Autoit3Wrapper_UseUpx
-#Autoit3Wrapper_Usex64
-#Autoit3Wrapper_Version
-#EndRegion
-#forcedef
-#forceref
-#ignorefunc
+; https://www.autoitscript.com/wiki/AutoIt3Wrapper_Directives
+#Region ; AutoIt3Wrapper
+; AutoIt3
+#AutoIt3Wrapper_Testing
+#AutoIt3Wrapper_UseX64
+#AutoIt3Wrapper_Version
+#AutoIt3Wrapper_Run_Debug_Mode
+#AutoIt3Wrapper_Autoit3Dir
+#AutoIt3Wrapper_Run_SciTE_Minimized
+#AutoIt3Wrapper_Run_SciTE_OutputPane_Minimized
+#AutoIt3Wrapper_Aut2exe
+#AutoIt3Wrapper_AutoIt3
+#AutoIt3Wrapper_Add_Constants
+; Aut2exe
+#AutoIt3Wrapper_Icon
+#AutoIt3Wrapper_OutFile
+#AutoIt3Wrapper_OutFile_Type
+#AutoIt3Wrapper_OutFile_X64
+#AutoIt3Wrapper_Compression
+#AutoIt3Wrapper_UseUpx
+#AutoIt3Wrapper_UPX_Parameters
+#AutoIt3Wrapper_Change2CUI
+#AutoIt3Wrapper_Compile_both
+; Target Program Resource Info
+#AutoIt3Wrapper_Res_Comment
+#AutoIt3Wrapper_Res_Description
+#AutoIt3Wrapper_Res_FileVersion
+#AutoIt3Wrapper_Res_FileVersion_AutoIncrement
+#AutoIt3Wrapper_Res_ProductVersion
+#AutoIt3Wrapper_Res_Language
+#AutoIt3Wrapper_Res_LegalCopyright
+#AutoIt3Wrapper_Res_RequestedExecutionLevel
+#AutoIt3Wrapper_Res_Compatibility
+#AutoIt3Wrapper_Res_SaveSource
+#AutoIt3Wrapper_Res_Field
+#AutoIt3Wrapper_Res_Icon_Add
+#AutoIt3Wrapper_Res_File_Add
+; Tidy
+#AutoIt3Wrapper_Run_Tidy
+#AutoIt3Wrapper_Tidy_Stop_OnError
+#Tidy_Parameters
+; Au3Stripper
+#AutoIt3Wrapper_Run_Au3Stripper
+#Au3Stripper_Parameters
+#Au3Stripper_Off
+#Au3Stripper_On
+#Au3Stripper_Ignore_Funcs
+#Au3Stripper_Ignore_Variables
+; Au3Check
+#AutoIt3Wrapper_Run_Au3Check
+#AutoIt3Wrapper_Au3Check_Parameters
+#AutoIt3Wrapper_Au3check_Stop_OnWarning
+#AutoIt3Wrapper_Plugin_Funcs
+; Versioning
+#AutoIt3Wrapper_Versioning
+#AutoIt3Wrapper_Versioning_Parameters
+; Run Before And After Directives
+#AutoIt3Wrapper_Run_After
+#AutoIt3Wrapper_Run_Before
+; Conditional Directives
+#AutoIt3Wrapper_Jump_To_First_Error
+#AutoIt3Wrapper_If_Run
+#AutoIt3Wrapper_If_Compile
+#AutoIt3Wrapper_EndIf
+
+#AutoIt3Wrapper_UseAnsi
+#AutoIt3Wrapper_Run_CvsWrapper
+#AutoIt3Wrapper_CvsWrapper_Parameters
+#AutoIt3Wrapper_Run_Obfuscator
 #Obfuscator_Ignore_Funcs
 #Obfuscator_Ignore_Variables
 #Obfuscator_Parameters
+#EndRegion
+
 #pragma
-#Region
-#Tidy_Parameters
+#forcedef
+#forceref
+#ignorefunc
 
-;! Expand			===========================================================
-
-;! UDFS			===========================================================
-;Array_Management
-_Array1DToHistogram
-_Array2DCreate
-_ArrayAdd
-_ArrayBinarySearch
-_ArrayColDelete
-_ArrayColInsert
-_ArrayCombinations
-_ArrayConcatenate
-_ArrayDelete
-_ArrayDisplay
-_ArrayExtract
-_ArrayFindAll
-_ArrayFromString
-_ArrayInsert
-_ArrayMax
-_ArrayMaxIndex
-_ArrayMin
-_ArrayMinIndex
-_ArrayPermute
-_ArrayPop
-_ArrayPush
-_ArrayReverse
-_ArraySearch
-_ArrayShuffle
-_ArraySort
-_ArraySwap
-_ArrayToClip
-_ArrayToString
-_ArrayTranspose
-_ArrayTrim
-_ArrayUnique
-;Clipboard_Management
-_ClipBoard_ChangeChain
-_ClipBoard_Close
-_ClipBoard_CountFormats
-_ClipBoard_Empty
-_ClipBoard_EnumFormats
-_ClipBoard_FormatStr
-_ClipBoard_GetData
-_ClipBoard_GetDataEx
-_ClipBoard_GetFormatName
-_ClipBoard_GetOpenWindow
-_ClipBoard_GetOwner
-_ClipBoard_GetPriorityFormat
-_ClipBoard_GetSequenceNumber
-_ClipBoard_GetViewer
-_ClipBoard_IsFormatAvailable
-_ClipBoard_Open
-_ClipBoard_RegisterFormat
-_ClipBoard_SetData
-_ClipBoard_SetDataEx
-_ClipBoard_SetViewer
-;Color_Management
-_ColorConvertHSLtoRGB
-_ColorConvertRGBtoHSL
-_ColorGetBlue
-_ColorGetCOLORREF
-_ColorGetGreen
-_ColorGetRed
-_ColorGetRGB
-_ColorSetCOLORREF
-_ColorSetRGB
-;Crypt_Management
-_Crypt_DecryptData
-_Crypt_DecryptFile
-_Crypt_DeriveKey
-_Crypt_DestroyKey
-_Crypt_EncryptData
-_Crypt_EncryptFile
-_Crypt_GenRandom
-_Crypt_HashData
-_Crypt_HashFile
-_Crypt_Shutdown
-_Crypt_Startup
-;Date_Management
-_Date_Time_CompareFileTime
-_Date_Time_DOSDateTimeToArray
-_Date_Time_DOSDateTimeToFileTime
-_Date_Time_DOSDateTimeToStr
-_Date_Time_DOSDateToArray
-_Date_Time_DOSDateToStr
-_Date_Time_DOSTimeToArray
-_Date_Time_DOSTimeToStr
-_Date_Time_EncodeFileTime
-_Date_Time_EncodeSystemTime
-_Date_Time_FileTimeToArray
-_Date_Time_FileTimeToDOSDateTime
-_Date_Time_FileTimeToLocalFileTime
-_Date_Time_FileTimeToStr
-_Date_Time_FileTimeToSystemTime
-_Date_Time_GetFileTime
-_Date_Time_GetLocalTime
-_Date_Time_GetSystemTime
-_Date_Time_GetSystemTimeAdjustment
-_Date_Time_GetSystemTimeAsFileTime
-_Date_Time_GetSystemTimes
-_Date_Time_GetTickCount
-_Date_Time_GetTimeZoneInformation
-_Date_Time_LocalFileTimeToFileTime
-_Date_Time_SetFileTime
-_Date_Time_SetLocalTime
-_Date_Time_SetSystemTime
-_Date_Time_SetSystemTimeAdjustment
-_Date_Time_SetTimeZoneInformation
-_Date_Time_SystemTimeToArray
-_Date_Time_SystemTimeToDateStr
-_Date_Time_SystemTimeToDateTimeStr
-_Date_Time_SystemTimeToFileTime
-_Date_Time_SystemTimeToTimeStr
-_Date_Time_SystemTimeToTzSpecificLocalTime
-_Date_Time_TzSpecificLocalTimeToSystemTime
-_DateAdd
-_DateDayOfWeek
-_DateDaysInMonth
-_DateDiff
-_DateIsLeapYear
-_DateIsValid
-_DateTimeFormat
-_DateTimeSplit
-_DateToDayOfWeek
-_DateToDayOfWeekISO
-_DateToDayValue
-_DateToMonth
-_DayValueToDate
-_Now
-_NowCalc
-_NowCalcDate
-_NowDate
-_NowTime
-_SetDate
-_SetTime
-_TicksToTime
-_TimeToTicks
-_WeekNumberISO
-;Debug_Managment
-_Assert
-_DebugArrayDisplay
-_DebugBugReportEnv
-_DebugCOMError
-_DebugOut
-_DebugReport
-_DebugReportEx
-_DebugReportVar
-_DebugSetup
-;EventLog_Managment
-_EventLog__Backup
-_EventLog__Clear
-_EventLog__Close
-_EventLog__Count
-_EventLog__DeregisterSource
-_EventLog__Full
-_EventLog__Notify
-_EventLog__Oldest
-_EventLog__Open
-_EventLog__OpenBackup
-_EventLog__Read
-_EventLog__RegisterSource
-_EventLog__Report
-;Excel_Managment
-_Excel_BookAttach
-_Excel_BookClose
-_Excel_BookList
-_Excel_BookNew
-_Excel_BookOpen
-_Excel_BookOpenText
-_Excel_BookSave
-_Excel_BookSaveAs
-_Excel_Close
-_Excel_ColumnToLetter
-_Excel_ColumnToNumber
-_Excel_ConvertFormula
-_Excel_Export
-_Excel_FilterGet
-_Excel_FilterSet
-_Excel_Open
-_Excel_PictureAdd
-_Excel_Print
-_Excel_RangeCopyPaste
-_Excel_RangeDelete
-_Excel_RangeFind
-_Excel_RangeInsert
-_Excel_RangeLinkAddRemove
-_Excel_RangeRead
-_Excel_RangeReplace
-_Excel_RangeSort
-_Excel_RangeValidate
-_Excel_RangeWrite
-_Excel_SheetAdd
-_Excel_SheetCopyMove
-_Excel_SheetDelete
-_Excel_SheetList
-;File_Managment
-_FileCountLines
-_FileCreate
-_FileListToArray
-_FileListToArrayRec
-_FilePrint
-_FileReadToArray
-_FileWriteFromArray
-_FileWriteLog
-_FileWriteToLine
-_PathFull
-_PathGetRelative
-_PathMake
-_PathSplit
-_ReplaceStringInFile
-_TempFile
-;FTPEx_Managment
-_FTP_Close
-_FTP_Command
-_FTP_Connect
-_FTP_DecodeInternetStatus
-_FTP_DirCreate
-_FTP_DirDelete
-_FTP_DirGetCurrent
-_FTP_DirPutContents
-_FTP_DirSetCurrent
-_FTP_FileClose
-_FTP_FileDelete
-_FTP_FileGet
-_FTP_FileGetSize
-_FTP_FileOpen
-_FTP_FilePut
-_FTP_FileRead
-_FTP_FileRename
-_FTP_FileTimeLoHiToStr
-_FTP_FindFileClose
-_FTP_FindFileFirst
-_FTP_FindFileNext
-_FTP_GetLastResponseInfo
-_FTP_ListToArray
-_FTP_ListToArray2D
-_FTP_ListToArrayEx
-_FTP_Open
-_FTP_ProgressDownload
-_FTP_ProgressUpload
-_FTP_SetStatusCallback
-;GDIPlus_Reference
-_GDIPlus_RectFCreate
-_GDIPlus_Shutdown
-_GDIPlus_Startup
-_GDIPlus_ArrowCapCreate
-_GDIPlus_ArrowCapDispose
-_GDIPlus_ArrowCapGetFillState
-_GDIPlus_ArrowCapGetHeight
-_GDIPlus_ArrowCapGetMiddleInset
-_GDIPlus_ArrowCapGetWidth
-_GDIPlus_ArrowCapSetFillState
-_GDIPlus_ArrowCapSetHeight
-_GDIPlus_ArrowCapSetMiddleInset
-_GDIPlus_ArrowCapSetWidth
-_GDIPlus_CustomLineCapClone
-_GDIPlus_CustomLineCapCreate
-_GDIPlus_CustomLineCapDispose
-_GDIPlus_CustomLineCapGetStrokeCaps
-_GDIPlus_CustomLineCapSetStrokeCaps
-_GDIPlus_BitmapApplyEffect
-_GDIPlus_BitmapApplyEffectEx
-_GDIPlus_BitmapCloneArea
-_GDIPlus_BitmapConvertFormat
-_GDIPlus_BitmapCreateApplyEffect
-_GDIPlus_BitmapCreateApplyEffectEx
-_GDIPlus_BitmapCreateDIBFromBitmap
-_GDIPlus_BitmapCreateFromFile
-_GDIPlus_BitmapCreateFromGraphics
-_GDIPlus_BitmapCreateFromHBITMAP
-_GDIPlus_BitmapCreateFromHICON
-_GDIPlus_BitmapCreateFromHICON32
-_GDIPlus_BitmapCreateFromMemory
-_GDIPlus_BitmapCreateFromResource
-_GDIPlus_BitmapCreateFromScan0
-_GDIPlus_BitmapCreateFromStream
-_GDIPlus_BitmapCreateHBITMAPFromBitmap
-_GDIPlus_BitmapDispose
-_GDIPlus_BitmapGetHistogram
-_GDIPlus_BitmapGetHistogramEx
-_GDIPlus_BitmapGetHistogramSize
-_GDIPlus_BitmapGetPixel
-_GDIPlus_BitmapLockBits
-_GDIPlus_BitmapSetPixel
-_GDIPlus_BitmapSetResolution
-_GDIPlus_BitmapUnlockBits
-_GDIPlus_HICONCreateFromBitmap
-_GDIPlus_PaletteInitialize
-_GDIPlus_BrushClone
-_GDIPlus_BrushDispose
-_GDIPlus_BrushGetType
-_GDIPlus_HatchBrushCreate
-_GDIPlus_LineBrushCreate
-_GDIPlus_LineBrushCreateFromRect
-_GDIPlus_LineBrushCreateFromRectWithAngle
-_GDIPlus_LineBrushGetColors
-_GDIPlus_LineBrushGetRect
-_GDIPlus_LineBrushMultiplyTransform
-_GDIPlus_LineBrushResetTransform
-_GDIPlus_LineBrushSetBlend
-_GDIPlus_LineBrushSetColors
-_GDIPlus_LineBrushSetGammaCorrection
-_GDIPlus_LineBrushSetLinearBlend
-_GDIPlus_LineBrushSetPresetBlend
-_GDIPlus_LineBrushSetSigmaBlend
-_GDIPlus_LineBrushSetTransform
-_GDIPlus_BrushCreateSolid
-_GDIPlus_BrushGetSolidColor
-_GDIPlus_BrushSetSolidColor
-_GDIPlus_TextureCreate
-_GDIPlus_TextureCreate2
-_GDIPlus_TextureCreateIA
-_GDIPlus_EffectCreate
-_GDIPlus_EffectCreateBlur
-_GDIPlus_EffectCreateBrightnessContrast
-_GDIPlus_EffectCreateColorBalance
-_GDIPlus_EffectCreateColorCurve
-_GDIPlus_EffectCreateColorLUT
-_GDIPlus_EffectCreateColorMatrix
-_GDIPlus_EffectCreateHueSaturationLightness
-_GDIPlus_EffectCreateLevels
-_GDIPlus_EffectCreateRedEyeCorrection
-_GDIPlus_EffectCreateSharpen
-_GDIPlus_EffectCreateTint
-_GDIPlus_EffectDispose
-_GDIPlus_EffectGetParameters
-_GDIPlus_EffectSetParameters
-_GDIPlus_FontCreate
-_GDIPlus_FontDispose
-_GDIPlus_FontGetHeight
-_GDIPlus_FontPrivateAddFont
-_GDIPlus_FontPrivateAddMemoryFont
-_GDIPlus_FontPrivateCollectionDispose
-_GDIPlus_FontPrivateCreateCollection
-_GDIPlus_FontFamilyCreate
-_GDIPlus_FontFamilyCreateFromCollection
-_GDIPlus_FontFamilyDispose
-_GDIPlus_FontFamilyGetCellAscent
-_GDIPlus_FontFamilyGetCellDescent
-_GDIPlus_FontFamilyGetEmHeight
-_GDIPlus_FontFamilyGetLineSpacing
-_GDIPlus_GraphicsClear
-_GDIPlus_GraphicsCreateFromHDC
-_GDIPlus_GraphicsCreateFromHWND
-_GDIPlus_GraphicsDispose
-_GDIPlus_GraphicsDrawArc
-_GDIPlus_GraphicsDrawBezier
-_GDIPlus_GraphicsDrawClosedCurve
-_GDIPlus_GraphicsDrawClosedCurve2
-_GDIPlus_GraphicsDrawCurve
-_GDIPlus_GraphicsDrawCurve2
-_GDIPlus_GraphicsDrawEllipse
-_GDIPlus_GraphicsDrawImage
-_GDIPlus_GraphicsDrawImagePointsRect
-_GDIPlus_GraphicsDrawImageRect
-_GDIPlus_GraphicsDrawImageRectRect
-_GDIPlus_GraphicsDrawLine
-_GDIPlus_GraphicsDrawPath
-_GDIPlus_GraphicsDrawPie
-_GDIPlus_GraphicsDrawPolygon
-_GDIPlus_GraphicsDrawRect
-_GDIPlus_GraphicsFillClosedCurve
-_GDIPlus_GraphicsFillClosedCurve2
-_GDIPlus_GraphicsFillEllipse
-_GDIPlus_GraphicsFillPath
-_GDIPlus_GraphicsFillPie
-_GDIPlus_GraphicsFillPolygon
-_GDIPlus_GraphicsFillRect
-_GDIPlus_GraphicsFillRegion
-_GDIPlus_GraphicsGetCompositingMode
-_GDIPlus_GraphicsGetCompositingQuality
-_GDIPlus_GraphicsGetDC
-_GDIPlus_GraphicsGetInterpolationMode
-_GDIPlus_GraphicsGetSmoothingMode
-_GDIPlus_GraphicsGetTransform
-_GDIPlus_GraphicsReleaseDC
-_GDIPlus_GraphicsResetClip
-_GDIPlus_GraphicsResetTransform
-_GDIPlus_GraphicsRestore
-_GDIPlus_GraphicsRotateTransform
-_GDIPlus_GraphicsSave
-_GDIPlus_GraphicsScaleTransform
-_GDIPlus_GraphicsSetClipPath
-_GDIPlus_GraphicsSetClipRect
-_GDIPlus_GraphicsSetClipRegion
-_GDIPlus_GraphicsSetCompositingMode
-_GDIPlus_GraphicsSetCompositingQuality
-_GDIPlus_GraphicsSetInterpolationMode
-_GDIPlus_GraphicsSetPixelOffsetMode
-_GDIPlus_GraphicsSetSmoothingMode
-_GDIPlus_GraphicsSetTextRenderingHint
-_GDIPlus_GraphicsSetTransform
-_GDIPlus_GraphicsTransformPoints
-_GDIPlus_GraphicsTranslateTransform
-_GDIPlus_Decoders
-_GDIPlus_DecodersGetCount
-_GDIPlus_DecodersGetSize
-_GDIPlus_Encoders
-_GDIPlus_EncodersGetCLSID
-_GDIPlus_EncodersGetCount
-_GDIPlus_EncodersGetParamList
-_GDIPlus_EncodersGetParamListSize
-_GDIPlus_EncodersGetSize
-_GDIPlus_ParamAdd
-_GDIPlus_ParamInit
-_GDIPlus_ParamSize
-_GDIPlus_PathAddArc
-_GDIPlus_PathAddBezier
-_GDIPlus_PathAddClosedCurve
-_GDIPlus_PathAddClosedCurve2
-_GDIPlus_PathAddCurve
-_GDIPlus_PathAddCurve2
-_GDIPlus_PathAddCurve3
-_GDIPlus_PathAddEllipse
-_GDIPlus_PathAddLine
-_GDIPlus_PathAddLine2
-_GDIPlus_PathAddPath
-_GDIPlus_PathAddPie
-_GDIPlus_PathAddPolygon
-_GDIPlus_PathAddRectangle
-_GDIPlus_PathAddString
-_GDIPlus_PathClone
-_GDIPlus_PathCloseFigure
-_GDIPlus_PathCreate
-_GDIPlus_PathCreate2
-_GDIPlus_PathDispose
-_GDIPlus_PathFlatten
-_GDIPlus_PathGetData
-_GDIPlus_PathGetFillMode
-_GDIPlus_PathGetLastPoint
-_GDIPlus_PathGetPointCount
-_GDIPlus_PathGetPoints
-_GDIPlus_PathGetWorldBounds
-_GDIPlus_PathIsOutlineVisiblePoint
-_GDIPlus_PathIsVisiblePoint
-_GDIPlus_PathReset
-_GDIPlus_PathReverse
-_GDIPlus_PathSetFillMode
-_GDIPlus_PathSetMarker
-_GDIPlus_PathStartFigure
-_GDIPlus_PathTransform
-_GDIPlus_PathWarp
-_GDIPlus_PathWiden
-_GDIPlus_PathWindingModeOutline
-_GDIPlus_DrawImageFX
-_GDIPlus_DrawImageFXEx
-_GDIPlus_DrawImagePoints
-_GDIPlus_ImageClone
-_GDIPlus_ImageDispose
-_GDIPlus_ImageGetDimension
-_GDIPlus_ImageGetFlags
-_GDIPlus_ImageGetFrameCount
-_GDIPlus_ImageGetGraphicsContext
-_GDIPlus_ImageGetHeight
-_GDIPlus_ImageGetHorizontalResolution
-_GDIPlus_ImageGetPixelFormat
-_GDIPlus_ImageGetPropertyIdList
-_GDIPlus_ImageGetPropertyItem
-_GDIPlus_ImageGetRawFormat
-_GDIPlus_ImageGetThumbnail
-_GDIPlus_ImageGetType
-_GDIPlus_ImageGetVerticalResolution
-_GDIPlus_ImageGetWidth
-_GDIPlus_ImageLoadFromFile
-_GDIPlus_ImageLoadFromStream
-_GDIPlus_ImageResize
-_GDIPlus_ImageRotateFlip
-_GDIPlus_ImageSaveAdd
-_GDIPlus_ImageSaveAddImage
-_GDIPlus_ImageSaveToFile
-_GDIPlus_ImageSaveToFileEx
-_GDIPlus_ImageSaveToStream
-_GDIPlus_ImageScale
-_GDIPlus_ImageSelectActiveFrame
-_GDIPlus_ImageAttributesCreate
-_GDIPlus_ImageAttributesDispose
-_GDIPlus_ImageAttributesSetColorKeys
-_GDIPlus_ImageAttributesSetColorMatrix
-_GDIPlus_ImageAttributesSetRemapTable
-_GDIPlus_ImageAttributesSetThreshold
-_GDIPlus_MatrixClone
-_GDIPlus_MatrixCreate
-_GDIPlus_MatrixCreate2
-_GDIPlus_MatrixDispose
-_GDIPlus_MatrixGetElements
-_GDIPlus_MatrixInvert
-_GDIPlus_MatrixMultiply
-_GDIPlus_MatrixRotate
-_GDIPlus_MatrixScale
-_GDIPlus_MatrixSetElements
-_GDIPlus_MatrixShear
-_GDIPlus_MatrixTransformPoints
-_GDIPlus_MatrixTranslate
-_GDIPlus_ColorMatrixCreate
-_GDIPlus_ColorMatrixCreateGrayScale
-_GDIPlus_ColorMatrixCreateNegative
-_GDIPlus_ColorMatrixCreateSaturation
-_GDIPlus_ColorMatrixCreateScale
-_GDIPlus_ColorMatrixCreateTranslate
-_GDIPlus_PathBrushCreate
-_GDIPlus_PathBrushCreateFromPath
-_GDIPlus_PathBrushGetCenterPoint
-_GDIPlus_PathBrushGetFocusScales
-_GDIPlus_PathBrushGetPointCount
-_GDIPlus_PathBrushGetRect
-_GDIPlus_PathBrushGetWrapMode
-_GDIPlus_PathBrushMultiplyTransform
-_GDIPlus_PathBrushResetTransform
-_GDIPlus_PathBrushSetBlend
-_GDIPlus_PathBrushSetCenterColor
-_GDIPlus_PathBrushSetCenterPoint
-_GDIPlus_PathBrushSetFocusScales
-_GDIPlus_PathBrushSetGammaCorrection
-_GDIPlus_PathBrushSetLinearBlend
-_GDIPlus_PathBrushSetPresetBlend
-_GDIPlus_PathBrushSetSigmaBlend
-_GDIPlus_PathBrushSetSurroundColor
-_GDIPlus_PathBrushSetSurroundColorsWithCount
-_GDIPlus_PathBrushSetTransform
-_GDIPlus_PathBrushSetWrapMode
-_GDIPlus_PathIterCreate
-_GDIPlus_PathIterDispose
-_GDIPlus_PathIterGetSubpathCount
-_GDIPlus_PathIterNextMarkerPath
-_GDIPlus_PathIterNextSubpathPath
-_GDIPlus_PathIterRewind
-_GDIPlus_PenCreate
-_GDIPlus_PenCreate2
-_GDIPlus_PenDispose
-_GDIPlus_PenGetAlignment
-_GDIPlus_PenGetColor
-_GDIPlus_PenGetCustomEndCap
-_GDIPlus_PenGetDashCap
-_GDIPlus_PenGetDashStyle
-_GDIPlus_PenGetEndCap
-_GDIPlus_PenGetMiterLimit
-_GDIPlus_PenGetWidth
-_GDIPlus_PenResetTransform
-_GDIPlus_PenRotateTransform
-_GDIPlus_PenScaleTransform
-_GDIPlus_PenSetAlignment
-_GDIPlus_PenSetColor
-_GDIPlus_PenSetCompound
-_GDIPlus_PenSetCustomEndCap
-_GDIPlus_PenSetDashCap
-_GDIPlus_PenSetDashStyle
-_GDIPlus_PenSetEndCap
-_GDIPlus_PenSetLineCap
-_GDIPlus_PenSetLineJoin
-_GDIPlus_PenSetMiterLimit
-_GDIPlus_PenSetStartCap
-_GDIPlus_PenSetTransform
-_GDIPlus_PenSetWidth
-_GDIPlus_RegionClone
-_GDIPlus_RegionCombinePath
-_GDIPlus_RegionCombineRect
-_GDIPlus_RegionCombineRegion
-_GDIPlus_RegionCreate
-_GDIPlus_RegionCreateFromPath
-_GDIPlus_RegionCreateFromRect
-_GDIPlus_RegionDispose
-_GDIPlus_RegionGetBounds
-_GDIPlus_RegionGetHRgn
-_GDIPlus_RegionSetEmpty
-_GDIPlus_RegionSetInfinite
-_GDIPlus_RegionTransform
-_GDIPlus_RegionTranslate
-_GDIPlus_StringFormatCreate
-_GDIPlus_StringFormatDispose
-_GDIPlus_StringFormatGetMeasurableCharacterRangeCount
-_GDIPlus_StringFormatSetAlign
-_GDIPlus_StringFormatSetLineAlign
-_GDIPlus_StringFormatSetMeasurableCharacterRanges
-_GDIPlus_GraphicsDrawString
-_GDIPlus_GraphicsDrawStringEx
-_GDIPlus_GraphicsMeasureCharacterRanges
-_GDIPlus_GraphicsMeasureString
-;GUI_Reference
-_GUICtrlAVI_Close
-_GUICtrlAVI_Create
-_GUICtrlAVI_Destroy
-_GUICtrlAVI_IsPlaying
-_GUICtrlAVI_Open
-_GUICtrlAVI_OpenEx
-_GUICtrlAVI_Play
-_GUICtrlAVI_Seek
-_GUICtrlAVI_Show
-_GUICtrlAVI_Stop
-_GUICtrlButton_Click
-_GUICtrlButton_Create
-_GUICtrlButton_Destroy
-_GUICtrlButton_Enable
-_GUICtrlButton_GetCheck
-_GUICtrlButton_GetFocus
-_GUICtrlButton_GetIdealSize
-_GUICtrlButton_GetImage
-_GUICtrlButton_GetImageList
-_GUICtrlButton_GetNote
-_GUICtrlButton_GetNoteLength
-_GUICtrlButton_GetSplitInfo
-_GUICtrlButton_GetState
-_GUICtrlButton_GetText
-_GUICtrlButton_GetTextMargin
-_GUICtrlButton_SetCheck
-_GUICtrlButton_SetDontClick
-_GUICtrlButton_SetFocus
-_GUICtrlButton_SetImage
-_GUICtrlButton_SetImageList
-_GUICtrlButton_SetNote
-_GUICtrlButton_SetShield
-_GUICtrlButton_SetSize
-_GUICtrlButton_SetSplitInfo
-_GUICtrlButton_SetState
-_GUICtrlButton_SetStyle
-_GUICtrlButton_SetText
-_GUICtrlButton_SetTextMargin
-_GUICtrlButton_Show
-_GUICtrlComboBox_AddDir
-_GUICtrlComboBox_AddString
-_GUICtrlComboBox_AutoComplete
-_GUICtrlComboBox_BeginUpdate
-_GUICtrlComboBox_Create
-_GUICtrlComboBox_DeleteString
-_GUICtrlComboBox_Destroy
-_GUICtrlComboBox_EndUpdate
-_GUICtrlComboBox_FindString
-_GUICtrlComboBox_FindStringExact
-_GUICtrlComboBox_GetComboBoxInfo
-_GUICtrlComboBox_GetCount
-_GUICtrlComboBox_GetCueBanner
-_GUICtrlComboBox_GetCurSel
-_GUICtrlComboBox_GetDroppedControlRect
-_GUICtrlComboBox_GetDroppedControlRectEx
-_GUICtrlComboBox_GetDroppedState
-_GUICtrlComboBox_GetDroppedWidth
-_GUICtrlComboBox_GetEditSel
-_GUICtrlComboBox_GetEditText
-_GUICtrlComboBox_GetExtendedUI
-_GUICtrlComboBox_GetHorizontalExtent
-_GUICtrlComboBox_GetItemHeight
-_GUICtrlComboBox_GetLBText
-_GUICtrlComboBox_GetLBTextLen
-_GUICtrlComboBox_GetList
-_GUICtrlComboBox_GetListArray
-_GUICtrlComboBox_GetLocale
-_GUICtrlComboBox_GetLocaleCountry
-_GUICtrlComboBox_GetLocaleLang
-_GUICtrlComboBox_GetLocalePrimLang
-_GUICtrlComboBox_GetLocaleSubLang
-_GUICtrlComboBox_GetMinVisible
-_GUICtrlComboBox_GetTopIndex
-_GUICtrlComboBox_InitStorage
-_GUICtrlComboBox_InsertString
-_GUICtrlComboBox_LimitText
-_GUICtrlComboBox_ReplaceEditSel
-_GUICtrlComboBox_ResetContent
-_GUICtrlComboBox_SelectString
-_GUICtrlComboBox_SetCueBanner
-_GUICtrlComboBox_SetCurSel
-_GUICtrlComboBox_SetDroppedWidth
-_GUICtrlComboBox_SetEditSel
-_GUICtrlComboBox_SetEditText
-_GUICtrlComboBox_SetExtendedUI
-_GUICtrlComboBox_SetHorizontalExtent
-_GUICtrlComboBox_SetItemHeight
-_GUICtrlComboBox_SetMinVisible
-_GUICtrlComboBox_SetTopIndex
-_GUICtrlComboBox_ShowDropDown
-_GUICtrlComboBoxEx_AddDir
-_GUICtrlComboBoxEx_AddString
-_GUICtrlComboBoxEx_BeginUpdate
-_GUICtrlComboBoxEx_Create
-_GUICtrlComboBoxEx_CreateSolidBitMap
-_GUICtrlComboBoxEx_DeleteString
-_GUICtrlComboBoxEx_Destroy
-_GUICtrlComboBoxEx_EndUpdate
-_GUICtrlComboBoxEx_FindStringExact
-_GUICtrlComboBoxEx_GetComboBoxInfo
-_GUICtrlComboBoxEx_GetComboControl
-_GUICtrlComboBoxEx_GetCount
-_GUICtrlComboBoxEx_GetCurSel
-_GUICtrlComboBoxEx_GetDroppedControlRect
-_GUICtrlComboBoxEx_GetDroppedControlRectEx
-_GUICtrlComboBoxEx_GetDroppedState
-_GUICtrlComboBoxEx_GetDroppedWidth
-_GUICtrlComboBoxEx_GetEditControl
-_GUICtrlComboBoxEx_GetEditSel
-_GUICtrlComboBoxEx_GetEditText
-_GUICtrlComboBoxEx_GetExtendedStyle
-_GUICtrlComboBoxEx_GetExtendedUI
-_GUICtrlComboBoxEx_GetImageList
-_GUICtrlComboBoxEx_GetItem
-_GUICtrlComboBoxEx_GetItemEx
-_GUICtrlComboBoxEx_GetItemHeight
-_GUICtrlComboBoxEx_GetItemImage
-_GUICtrlComboBoxEx_GetItemIndent
-_GUICtrlComboBoxEx_GetItemOverlayImage
-_GUICtrlComboBoxEx_GetItemParam
-_GUICtrlComboBoxEx_GetItemSelectedImage
-_GUICtrlComboBoxEx_GetItemText
-_GUICtrlComboBoxEx_GetItemTextLen
-_GUICtrlComboBoxEx_GetList
-_GUICtrlComboBoxEx_GetListArray
-_GUICtrlComboBoxEx_GetLocale
-_GUICtrlComboBoxEx_GetLocaleCountry
-_GUICtrlComboBoxEx_GetLocaleLang
-_GUICtrlComboBoxEx_GetLocalePrimLang
-_GUICtrlComboBoxEx_GetLocaleSubLang
-_GUICtrlComboBoxEx_GetMinVisible
-_GUICtrlComboBoxEx_GetTopIndex
-_GUICtrlComboBoxEx_GetUnicode
-_GUICtrlComboBoxEx_InitStorage
-_GUICtrlComboBoxEx_InsertString
-_GUICtrlComboBoxEx_LimitText
-_GUICtrlComboBoxEx_ReplaceEditSel
-_GUICtrlComboBoxEx_ResetContent
-_GUICtrlComboBoxEx_SetCurSel
-_GUICtrlComboBoxEx_SetDroppedWidth
-_GUICtrlComboBoxEx_SetEditSel
-_GUICtrlComboBoxEx_SetEditText
-_GUICtrlComboBoxEx_SetExtendedStyle
-_GUICtrlComboBoxEx_SetExtendedUI
-_GUICtrlComboBoxEx_SetImageList
-_GUICtrlComboBoxEx_SetItem
-_GUICtrlComboBoxEx_SetItemEx
-_GUICtrlComboBoxEx_SetItemHeight
-_GUICtrlComboBoxEx_SetItemImage
-_GUICtrlComboBoxEx_SetItemIndent
-_GUICtrlComboBoxEx_SetItemOverlayImage
-_GUICtrlComboBoxEx_SetItemParam
-_GUICtrlComboBoxEx_SetItemSelectedImage
-_GUICtrlComboBoxEx_SetMinVisible
-_GUICtrlComboBoxEx_SetTopIndex
-_GUICtrlComboBoxEx_SetUnicode
-_GUICtrlComboBoxEx_ShowDropDown
-_GUICtrlDTP_Create
-_GUICtrlDTP_Destroy
-_GUICtrlDTP_GetMCColor
-_GUICtrlDTP_GetMCFont
-_GUICtrlDTP_GetMonthCal
-_GUICtrlDTP_GetRange
-_GUICtrlDTP_GetRangeEx
-_GUICtrlDTP_GetSystemTime
-_GUICtrlDTP_GetSystemTimeEx
-_GUICtrlDTP_SetFormat
-_GUICtrlDTP_SetMCColor
-_GUICtrlDTP_SetMCFont
-_GUICtrlDTP_SetRange
-_GUICtrlDTP_SetRangeEx
-_GUICtrlDTP_SetSystemTime
-_GUICtrlDTP_SetSystemTimeEx
-_GUICtrlEdit_AppendText
-_GUICtrlEdit_BeginUpdate
-_GUICtrlEdit_CanUndo
-_GUICtrlEdit_CharFromPos
-_GUICtrlEdit_Create
-_GUICtrlEdit_Destroy
-_GUICtrlEdit_EmptyUndoBuffer
-_GUICtrlEdit_EndUpdate
-_GUICtrlEdit_Find
-_GUICtrlEdit_FmtLines
-_GUICtrlEdit_GetCueBanner
-_GUICtrlEdit_GetFirstVisibleLine
-_GUICtrlEdit_GetLimitText
-_GUICtrlEdit_GetLine
-_GUICtrlEdit_GetLineCount
-_GUICtrlEdit_GetMargins
-_GUICtrlEdit_GetModify
-_GUICtrlEdit_GetPasswordChar
-_GUICtrlEdit_GetRECT
-_GUICtrlEdit_GetRECTEx
-_GUICtrlEdit_GetSel
-_GUICtrlEdit_GetText
-_GUICtrlEdit_GetTextLen
-_GUICtrlEdit_HideBalloonTip
-_GUICtrlEdit_InsertText
-_GUICtrlEdit_LineFromChar
-_GUICtrlEdit_LineIndex
-_GUICtrlEdit_LineLength
-_GUICtrlEdit_LineScroll
-_GUICtrlEdit_PosFromChar
-_GUICtrlEdit_ReplaceSel
-_GUICtrlEdit_Scroll
-_GUICtrlEdit_SetCueBanner
-_GUICtrlEdit_SetLimitText
-_GUICtrlEdit_SetMargins
-_GUICtrlEdit_SetModify
-_GUICtrlEdit_SetPasswordChar
-_GUICtrlEdit_SetReadOnly
-_GUICtrlEdit_SetRECT
-_GUICtrlEdit_SetRECTEx
-_GUICtrlEdit_SetRECTNP
-_GUICtrlEdit_SetRectNPEx
-_GUICtrlEdit_SetSel
-_GUICtrlEdit_SetTabStops
-_GUICtrlEdit_SetText
-_GUICtrlEdit_ShowBalloonTip
-_GUICtrlEdit_Undo
-_GUICtrlHeader_AddItem
-_GUICtrlHeader_ClearFilter
-_GUICtrlHeader_ClearFilterAll
-_GUICtrlHeader_Create
-_GUICtrlHeader_CreateDragImage
-_GUICtrlHeader_DeleteItem
-_GUICtrlHeader_Destroy
-_GUICtrlHeader_EditFilter
-_GUICtrlHeader_GetBitmapMargin
-_GUICtrlHeader_GetFilterText
-_GUICtrlHeader_GetImageList
-_GUICtrlHeader_GetItem
-_GUICtrlHeader_GetItemAlign
-_GUICtrlHeader_GetItemBitmap
-_GUICtrlHeader_GetItemCount
-_GUICtrlHeader_GetItemDisplay
-_GUICtrlHeader_GetItemFlags
-_GUICtrlHeader_GetItemFormat
-_GUICtrlHeader_GetItemImage
-_GUICtrlHeader_GetItemOrder
-_GUICtrlHeader_GetItemParam
-_GUICtrlHeader_GetItemRect
-_GUICtrlHeader_GetItemRectEx
-_GUICtrlHeader_GetItemText
-_GUICtrlHeader_GetItemWidth
-_GUICtrlHeader_GetOrderArray
-_GUICtrlHeader_GetUnicodeFormat
-_GUICtrlHeader_HitTest
-_GUICtrlHeader_InsertItem
-_GUICtrlHeader_Layout
-_GUICtrlHeader_OrderToIndex
-_GUICtrlHeader_SetBitmapMargin
-_GUICtrlHeader_SetFilterChangeTimeout
-_GUICtrlHeader_SetHotDivider
-_GUICtrlHeader_SetImageList
-_GUICtrlHeader_SetItem
-_GUICtrlHeader_SetItemAlign
-_GUICtrlHeader_SetItemBitmap
-_GUICtrlHeader_SetItemDisplay
-_GUICtrlHeader_SetItemFlags
-_GUICtrlHeader_SetItemFormat
-_GUICtrlHeader_SetItemImage
-_GUICtrlHeader_SetItemOrder
-_GUICtrlHeader_SetItemParam
-_GUICtrlHeader_SetItemText
-_GUICtrlHeader_SetItemWidth
-_GUICtrlHeader_SetOrderArray
-_GUICtrlHeader_SetUnicodeFormat
-_GUIImageList_Add
-_GUIImageList_AddBitmap
-_GUIImageList_AddIcon
-_GUIImageList_AddMasked
-_GUIImageList_BeginDrag
-_GUIImageList_Copy
-_GUIImageList_Create
-_GUIImageList_Destroy
-_GUIImageList_DestroyIcon
-_GUIImageList_DragEnter
-_GUIImageList_DragLeave
-_GUIImageList_DragMove
-_GUIImageList_Draw
-_GUIImageList_DrawEx
-_GUIImageList_Duplicate
-_GUIImageList_EndDrag
-_GUIImageList_GetBkColor
-_GUIImageList_GetIcon
-_GUIImageList_GetIconHeight
-_GUIImageList_GetIconSize
-_GUIImageList_GetIconSizeEx
-_GUIImageList_GetIconWidth
-_GUIImageList_GetImageCount
-_GUIImageList_GetImageInfoEx
-_GUIImageList_Remove
-_GUIImageList_ReplaceIcon
-_GUIImageList_SetBkColor
-_GUIImageList_SetIconSize
-_GUIImageList_SetImageCount
-_GUIImageList_Swap
-_GUICtrlIpAddress_ClearAddress
-_GUICtrlIpAddress_Create
-_GUICtrlIpAddress_Destroy
-_GUICtrlIpAddress_Get
-_GUICtrlIpAddress_GetArray
-_GUICtrlIpAddress_GetEx
-_GUICtrlIpAddress_IsBlank
-_GUICtrlIpAddress_Set
-_GUICtrlIpAddress_SetArray
-_GUICtrlIpAddress_SetEx
-_GUICtrlIpAddress_SetFocus
-_GUICtrlIpAddress_SetFont
-_GUICtrlIpAddress_SetRange
-_GUICtrlIpAddress_ShowHide
-_GUICtrlListBox_AddFile
-_GUICtrlListBox_AddString
-_GUICtrlListBox_BeginUpdate
-_GUICtrlListBox_ClickItem
-_GUICtrlListBox_Create
-_GUICtrlListBox_DeleteString
-_GUICtrlListBox_Destroy
-_GUICtrlListBox_Dir
-_GUICtrlListBox_EndUpdate
-_GUICtrlListBox_FindInText
-_GUICtrlListBox_FindString
-_GUICtrlListBox_GetAnchorIndex
-_GUICtrlListBox_GetCaretIndex
-_GUICtrlListBox_GetCount
-_GUICtrlListBox_GetCurSel
-_GUICtrlListBox_GetHorizontalExtent
-_GUICtrlListBox_GetItemData
-_GUICtrlListBox_GetItemHeight
-_GUICtrlListBox_GetItemRect
-_GUICtrlListBox_GetItemRectEx
-_GUICtrlListBox_GetListBoxInfo
-_GUICtrlListBox_GetLocale
-_GUICtrlListBox_GetLocaleCountry
-_GUICtrlListBox_GetLocaleLang
-_GUICtrlListBox_GetLocalePrimLang
-_GUICtrlListBox_GetLocaleSubLang
-_GUICtrlListBox_GetSel
-_GUICtrlListBox_GetSelCount
-_GUICtrlListBox_GetSelItems
-_GUICtrlListBox_GetSelItemsText
-_GUICtrlListBox_GetText
-_GUICtrlListBox_GetTextLen
-_GUICtrlListBox_GetTopIndex
-_GUICtrlListBox_InitStorage
-_GUICtrlListBox_InsertString
-_GUICtrlListBox_ItemFromPoint
-_GUICtrlListBox_ReplaceString
-_GUICtrlListBox_ResetContent
-_GUICtrlListBox_SelectString
-_GUICtrlListBox_SelItemRange
-_GUICtrlListBox_SelItemRangeEx
-_GUICtrlListBox_SetAnchorIndex
-_GUICtrlListBox_SetCaretIndex
-_GUICtrlListBox_SetColumnWidth
-_GUICtrlListBox_SetCurSel
-_GUICtrlListBox_SetHorizontalExtent
-_GUICtrlListBox_SetItemData
-_GUICtrlListBox_SetItemHeight
-_GUICtrlListBox_SetLocale
-_GUICtrlListBox_SetSel
-_GUICtrlListBox_SetTabStops
-_GUICtrlListBox_SetTopIndex
-_GUICtrlListBox_Sort
-_GUICtrlListBox_SwapString
-_GUICtrlListBox_UpdateHScroll
-_GUICtrlListView_AddArray
-_GUICtrlListView_AddColumn
-_GUICtrlListView_AddItem
-_GUICtrlListView_AddSubItem
-_GUICtrlListView_ApproximateViewHeight
-_GUICtrlListView_ApproximateViewRect
-_GUICtrlListView_ApproximateViewWidth
-_GUICtrlListView_Arrange
-_GUICtrlListView_BeginUpdate
-_GUICtrlListView_CancelEditLabel
-_GUICtrlListView_ClickItem
-_GUICtrlListView_CopyItems
-_GUICtrlListView_Create
-_GUICtrlListView_CreateDragImage
-_GUICtrlListView_CreateSolidBitMap
-_GUICtrlListView_DeleteAllItems
-_GUICtrlListView_DeleteColumn
-_GUICtrlListView_DeleteItem
-_GUICtrlListView_DeleteItemsSelected
-_GUICtrlListView_Destroy
-_GUICtrlListView_DrawDragImage
-_GUICtrlListView_EditLabel
-_GUICtrlListView_EnableGroupView
-_GUICtrlListView_EndUpdate
-_GUICtrlListView_EnsureVisible
-_GUICtrlListView_FindInText
-_GUICtrlListView_FindItem
-_GUICtrlListView_FindNearest
-_GUICtrlListView_FindParam
-_GUICtrlListView_FindText
-_GUICtrlListView_GetBkColor
-_GUICtrlListView_GetBkImage
-_GUICtrlListView_GetCallbackMask
-_GUICtrlListView_GetColumn
-_GUICtrlListView_GetColumnCount
-_GUICtrlListView_GetColumnOrder
-_GUICtrlListView_GetColumnOrderArray
-_GUICtrlListView_GetColumnWidth
-_GUICtrlListView_GetCounterPage
-_GUICtrlListView_GetEditControl
-_GUICtrlListView_GetExtendedListViewStyle
-_GUICtrlListView_GetFocusedGroup
-_GUICtrlListView_GetGroupCount
-_GUICtrlListView_GetGroupInfo
-_GUICtrlListView_GetGroupInfoByIndex
-_GUICtrlListView_GetGroupRect
-_GUICtrlListView_GetGroupViewEnabled
-_GUICtrlListView_GetHeader
-_GUICtrlListView_GetHotCursor
-_GUICtrlListView_GetHotItem
-_GUICtrlListView_GetHoverTime
-_GUICtrlListView_GetImageList
-_GUICtrlListView_GetISearchString
-_GUICtrlListView_GetItem
-_GUICtrlListView_GetItemChecked
-_GUICtrlListView_GetItemCount
-_GUICtrlListView_GetItemCut
-_GUICtrlListView_GetItemDropHilited
-_GUICtrlListView_GetItemEx
-_GUICtrlListView_GetItemFocused
-_GUICtrlListView_GetItemGroupID
-_GUICtrlListView_GetItemImage
-_GUICtrlListView_GetItemIndent
-_GUICtrlListView_GetItemParam
-_GUICtrlListView_GetItemPosition
-_GUICtrlListView_GetItemPositionX
-_GUICtrlListView_GetItemPositionY
-_GUICtrlListView_GetItemRect
-_GUICtrlListView_GetItemRectEx
-_GUICtrlListView_GetItemSelected
-_GUICtrlListView_GetItemSpacing
-_GUICtrlListView_GetItemSpacingX
-_GUICtrlListView_GetItemSpacingY
-_GUICtrlListView_GetItemState
-_GUICtrlListView_GetItemStateImage
-_GUICtrlListView_GetItemText
-_GUICtrlListView_GetItemTextArray
-_GUICtrlListView_GetItemTextString
-_GUICtrlListView_GetNextItem
-_GUICtrlListView_GetNumberOfWorkAreas
-_GUICtrlListView_GetOrigin
-_GUICtrlListView_GetOriginX
-_GUICtrlListView_GetOriginY
-_GUICtrlListView_GetOutlineColor
-_GUICtrlListView_GetSelectedColumn
-_GUICtrlListView_GetSelectedCount
-_GUICtrlListView_GetSelectedIndices
-_GUICtrlListView_GetSelectionMark
-_GUICtrlListView_GetStringWidth
-_GUICtrlListView_GetSubItemRect
-_GUICtrlListView_GetTextBkColor
-_GUICtrlListView_GetTextColor
-_GUICtrlListView_GetToolTips
-_GUICtrlListView_GetTopIndex
-_GUICtrlListView_GetUnicodeFormat
-_GUICtrlListView_GetView
-_GUICtrlListView_GetViewDetails
-_GUICtrlListView_GetViewLarge
-_GUICtrlListView_GetViewList
-_GUICtrlListView_GetViewRect
-_GUICtrlListView_GetViewSmall
-_GUICtrlListView_GetViewTile
-_GUICtrlListView_HideColumn
-_GUICtrlListView_HitTest
-_GUICtrlListView_InsertColumn
-_GUICtrlListView_InsertGroup
-_GUICtrlListView_InsertItem
-_GUICtrlListView_JustifyColumn
-_GUICtrlListView_MapIDToIndex
-_GUICtrlListView_MapIndexToID
-_GUICtrlListView_RedrawItems
-_GUICtrlListView_RegisterSortCallBack
-_GUICtrlListView_RemoveAllGroups
-_GUICtrlListView_RemoveGroup
-_GUICtrlListView_Scroll
-_GUICtrlListView_SetBkColor
-_GUICtrlListView_SetBkHBITMAP
-_GUICtrlListView_SetBkImage
-_GUICtrlListView_SetCallBackMask
-_GUICtrlListView_SetColumn
-_GUICtrlListView_SetColumnOrder
-_GUICtrlListView_SetColumnOrderArray
-_GUICtrlListView_SetColumnWidth
-_GUICtrlListView_SetExtendedListViewStyle
-_GUICtrlListView_SetGroupInfo
-_GUICtrlListView_SetHotItem
-_GUICtrlListView_SetHoverTime
-_GUICtrlListView_SetIconSpacing
-_GUICtrlListView_SetImageList
-_GUICtrlListView_SetItem
-_GUICtrlListView_SetItemChecked
-_GUICtrlListView_SetItemCount
-_GUICtrlListView_SetItemCut
-_GUICtrlListView_SetItemDropHilited
-_GUICtrlListView_SetItemEx
-_GUICtrlListView_SetItemFocused
-_GUICtrlListView_SetItemGroupID
-_GUICtrlListView_SetItemImage
-_GUICtrlListView_SetItemIndent
-_GUICtrlListView_SetItemParam
-_GUICtrlListView_SetItemPosition
-_GUICtrlListView_SetItemPosition32
-_GUICtrlListView_SetItemSelected
-_GUICtrlListView_SetItemState
-_GUICtrlListView_SetItemStateImage
-_GUICtrlListView_SetItemText
-_GUICtrlListView_SetOutlineColor
-_GUICtrlListView_SetSelectedColumn
-_GUICtrlListView_SetSelectionMark
-_GUICtrlListView_SetTextBkColor
-_GUICtrlListView_SetTextColor
-_GUICtrlListView_SetToolTips
-_GUICtrlListView_SetUnicodeFormat
-_GUICtrlListView_SetView
-_GUICtrlListView_SetWorkAreas
-_GUICtrlListView_SimpleSort
-_GUICtrlListView_SortItems
-_GUICtrlListView_SubItemHitTest
-_GUICtrlListView_UnRegisterSortCallBack
-_GUICtrlMenu_AddMenuItem
-_GUICtrlMenu_AppendMenu
-_GUICtrlMenu_CalculatePopupWindowPosition
-_GUICtrlMenu_CheckMenuItem
-_GUICtrlMenu_CheckRadioItem
-_GUICtrlMenu_CreateMenu
-_GUICtrlMenu_CreatePopup
-_GUICtrlMenu_DeleteMenu
-_GUICtrlMenu_DestroyMenu
-_GUICtrlMenu_DrawMenuBar
-_GUICtrlMenu_EnableMenuItem
-_GUICtrlMenu_FindItem
-_GUICtrlMenu_FindParent
-_GUICtrlMenu_GetItemBmp
-_GUICtrlMenu_GetItemBmpChecked
-_GUICtrlMenu_GetItemBmpUnchecked
-_GUICtrlMenu_GetItemChecked
-_GUICtrlMenu_GetItemCount
-_GUICtrlMenu_GetItemData
-_GUICtrlMenu_GetItemDefault
-_GUICtrlMenu_GetItemDisabled
-_GUICtrlMenu_GetItemEnabled
-_GUICtrlMenu_GetItemGrayed
-_GUICtrlMenu_GetItemHighlighted
-_GUICtrlMenu_GetItemID
-_GUICtrlMenu_GetItemInfo
-_GUICtrlMenu_GetItemRect
-_GUICtrlMenu_GetItemRectEx
-_GUICtrlMenu_GetItemState
-_GUICtrlMenu_GetItemStateEx
-_GUICtrlMenu_GetItemSubMenu
-_GUICtrlMenu_GetItemText
-_GUICtrlMenu_GetItemType
-_GUICtrlMenu_GetMenu
-_GUICtrlMenu_GetMenuBackground
-_GUICtrlMenu_GetMenuBarInfo
-_GUICtrlMenu_GetMenuContextHelpID
-_GUICtrlMenu_GetMenuData
-_GUICtrlMenu_GetMenuDefaultItem
-_GUICtrlMenu_GetMenuHeight
-_GUICtrlMenu_GetMenuInfo
-_GUICtrlMenu_GetMenuStyle
-_GUICtrlMenu_GetSystemMenu
-_GUICtrlMenu_InsertMenuItem
-_GUICtrlMenu_InsertMenuItemEx
-_GUICtrlMenu_IsMenu
-_GUICtrlMenu_LoadMenu
-_GUICtrlMenu_MapAccelerator
-_GUICtrlMenu_MenuItemFromPoint
-_GUICtrlMenu_RemoveMenu
-_GUICtrlMenu_SetItemBitmaps
-_GUICtrlMenu_SetItemBmp
-_GUICtrlMenu_SetItemBmpChecked
-_GUICtrlMenu_SetItemBmpUnchecked
-_GUICtrlMenu_SetItemChecked
-_GUICtrlMenu_SetItemData
-_GUICtrlMenu_SetItemDefault
-_GUICtrlMenu_SetItemDisabled
-_GUICtrlMenu_SetItemEnabled
-_GUICtrlMenu_SetItemGrayed
-_GUICtrlMenu_SetItemHighlighted
-_GUICtrlMenu_SetItemID
-_GUICtrlMenu_SetItemInfo
-_GUICtrlMenu_SetItemState
-_GUICtrlMenu_SetItemSubMenu
-_GUICtrlMenu_SetItemText
-_GUICtrlMenu_SetItemType
-_GUICtrlMenu_SetMenu
-_GUICtrlMenu_SetMenuBackground
-_GUICtrlMenu_SetMenuContextHelpID
-_GUICtrlMenu_SetMenuData
-_GUICtrlMenu_SetMenuDefaultItem
-_GUICtrlMenu_SetMenuHeight
-_GUICtrlMenu_SetMenuInfo
-_GUICtrlMenu_SetMenuStyle
-_GUICtrlMenu_TrackPopupMenu
-_GUICtrlMonthCal_Create
-_GUICtrlMonthCal_Destroy
-_GUICtrlMonthCal_GetCalendarBorder
-_GUICtrlMonthCal_GetCalendarCount
-_GUICtrlMonthCal_GetColor
-_GUICtrlMonthCal_GetColorArray
-_GUICtrlMonthCal_GetCurSel
-_GUICtrlMonthCal_GetCurSelStr
-_GUICtrlMonthCal_GetFirstDOW
-_GUICtrlMonthCal_GetFirstDOWStr
-_GUICtrlMonthCal_GetMaxSelCount
-_GUICtrlMonthCal_GetMaxTodayWidth
-_GUICtrlMonthCal_GetMinReqHeight
-_GUICtrlMonthCal_GetMinReqRect
-_GUICtrlMonthCal_GetMinReqRectArray
-_GUICtrlMonthCal_GetMinReqWidth
-_GUICtrlMonthCal_GetMonthDelta
-_GUICtrlMonthCal_GetMonthRange
-_GUICtrlMonthCal_GetMonthRangeMax
-_GUICtrlMonthCal_GetMonthRangeMaxStr
-_GUICtrlMonthCal_GetMonthRangeMin
-_GUICtrlMonthCal_GetMonthRangeMinStr
-_GUICtrlMonthCal_GetMonthRangeSpan
-_GUICtrlMonthCal_GetRange
-_GUICtrlMonthCal_GetRangeMax
-_GUICtrlMonthCal_GetRangeMaxStr
-_GUICtrlMonthCal_GetRangeMin
-_GUICtrlMonthCal_GetRangeMinStr
-_GUICtrlMonthCal_GetSelRange
-_GUICtrlMonthCal_GetSelRangeMax
-_GUICtrlMonthCal_GetSelRangeMaxStr
-_GUICtrlMonthCal_GetSelRangeMin
-_GUICtrlMonthCal_GetSelRangeMinStr
-_GUICtrlMonthCal_GetToday
-_GUICtrlMonthCal_GetTodayStr
-_GUICtrlMonthCal_GetUnicodeFormat
-_GUICtrlMonthCal_HitTest
-_GUICtrlMonthCal_SetCalendarBorder
-_GUICtrlMonthCal_SetColor
-_GUICtrlMonthCal_SetCurSel
-_GUICtrlMonthCal_SetDayState
-_GUICtrlMonthCal_SetFirstDOW
-_GUICtrlMonthCal_SetMaxSelCount
-_GUICtrlMonthCal_SetMonthDelta
-_GUICtrlMonthCal_SetRange
-_GUICtrlMonthCal_SetSelRange
-_GUICtrlMonthCal_SetToday
-_GUICtrlMonthCal_SetUnicodeFormat
-_GUICtrlRebar_AddBand
-_GUICtrlRebar_AddToolBarBand
-_GUICtrlRebar_BeginDrag
-_GUICtrlRebar_Create
-_GUICtrlRebar_DeleteBand
-_GUICtrlRebar_Destroy
-_GUICtrlRebar_DragMove
-_GUICtrlRebar_EndDrag
-_GUICtrlRebar_GetBandBackColor
-_GUICtrlRebar_GetBandBorders
-_GUICtrlRebar_GetBandBordersEx
-_GUICtrlRebar_GetBandChildHandle
-_GUICtrlRebar_GetBandChildSize
-_GUICtrlRebar_GetBandCount
-_GUICtrlRebar_GetBandForeColor
-_GUICtrlRebar_GetBandHeaderSize
-_GUICtrlRebar_GetBandID
-_GUICtrlRebar_GetBandIdealSize
-_GUICtrlRebar_GetBandLength
-_GUICtrlRebar_GetBandLParam
-_GUICtrlRebar_GetBandMargins
-_GUICtrlRebar_GetBandMarginsEx
-_GUICtrlRebar_GetBandRect
-_GUICtrlRebar_GetBandRectEx
-_GUICtrlRebar_GetBandStyle
-_GUICtrlRebar_GetBandStyleBreak
-_GUICtrlRebar_GetBandStyleChildEdge
-_GUICtrlRebar_GetBandStyleFixedBMP
-_GUICtrlRebar_GetBandStyleFixedSize
-_GUICtrlRebar_GetBandStyleGripperAlways
-_GUICtrlRebar_GetBandStyleHidden
-_GUICtrlRebar_GetBandStyleHideTitle
-_GUICtrlRebar_GetBandStyleNoGripper
-_GUICtrlRebar_GetBandStyleTopAlign
-_GUICtrlRebar_GetBandStyleUseChevron
-_GUICtrlRebar_GetBandStyleVariableHeight
-_GUICtrlRebar_GetBandText
-_GUICtrlRebar_GetBarHeight
-_GUICtrlRebar_GetBarInfo
-_GUICtrlRebar_GetBKColor
-_GUICtrlRebar_GetColorScheme
-_GUICtrlRebar_GetRowCount
-_GUICtrlRebar_GetRowHeight
-_GUICtrlRebar_GetTextColor
-_GUICtrlRebar_GetToolTips
-_GUICtrlRebar_GetUnicodeFormat
-_GUICtrlRebar_HitTest
-_GUICtrlRebar_IDToIndex
-_GUICtrlRebar_MaximizeBand
-_GUICtrlRebar_MinimizeBand
-_GUICtrlRebar_MoveBand
-_GUICtrlRebar_SetBandBackColor
-_GUICtrlRebar_SetBandForeColor
-_GUICtrlRebar_SetBandHeaderSize
-_GUICtrlRebar_SetBandID
-_GUICtrlRebar_SetBandIdealSize
-_GUICtrlRebar_SetBandLength
-_GUICtrlRebar_SetBandLParam
-_GUICtrlRebar_SetBandStyle
-_GUICtrlRebar_SetBandStyleBreak
-_GUICtrlRebar_SetBandStyleChildEdge
-_GUICtrlRebar_SetBandStyleFixedBMP
-_GUICtrlRebar_SetBandStyleFixedSize
-_GUICtrlRebar_SetBandStyleGripperAlways
-_GUICtrlRebar_SetBandStyleHidden
-_GUICtrlRebar_SetBandStyleHideTitle
-_GUICtrlRebar_SetBandStyleNoGripper
-_GUICtrlRebar_SetBandStyleTopAlign
-_GUICtrlRebar_SetBandStyleUseChevron
-_GUICtrlRebar_SetBandStyleVariableHeight
-_GUICtrlRebar_SetBandText
-_GUICtrlRebar_SetBarInfo
-_GUICtrlRebar_SetBKColor
-_GUICtrlRebar_SetColorScheme
-_GUICtrlRebar_SetTextColor
-_GUICtrlRebar_SetToolTips
-_GUICtrlRebar_SetUnicodeFormat
-_GUICtrlRebar_ShowBand
-_GUICtrlRichEdit_AppendText
-_GUICtrlRichEdit_AutoDetectURL
-_GUICtrlRichEdit_CanPaste
-_GUICtrlRichEdit_CanPasteSpecial
-_GUICtrlRichEdit_CanRedo
-_GUICtrlRichEdit_CanUndo
-_GUICtrlRichEdit_ChangeFontSize
-_GUICtrlRichEdit_Copy
-_GUICtrlRichEdit_Create
-_GUICtrlRichEdit_Cut
-_GUICtrlRichEdit_Deselect
-_GUICtrlRichEdit_Destroy
-_GUICtrlRichEdit_EmptyUndoBuffer
-_GUICtrlRichEdit_FindText
-_GUICtrlRichEdit_FindTextInRange
-_GUICtrlRichEdit_GetBkColor
-_GUICtrlRichEdit_GetCharAttributes
-_GUICtrlRichEdit_GetCharBkColor
-_GUICtrlRichEdit_GetCharColor
-_GUICtrlRichEdit_GetCharPosFromXY
-_GUICtrlRichEdit_GetCharPosOfNextWord
-_GUICtrlRichEdit_GetCharPosOfPreviousWord
-_GUICtrlRichEdit_GetCharWordBreakInfo
-_GUICtrlRichEdit_GetFirstCharPosOnLine
-_GUICtrlRichEdit_GetFont
-_GUICtrlRichEdit_GetLineCount
-_GUICtrlRichEdit_GetLineLength
-_GUICtrlRichEdit_GetLineNumberFromCharPos
-_GUICtrlRichEdit_GetNextRedo
-_GUICtrlRichEdit_GetNextUndo
-_GUICtrlRichEdit_GetNumberOfFirstVisibleLine
-_GUICtrlRichEdit_GetParaAlignment
-_GUICtrlRichEdit_GetParaAttributes
-_GUICtrlRichEdit_GetParaBorder
-_GUICtrlRichEdit_GetParaIndents
-_GUICtrlRichEdit_GetParaNumbering
-_GUICtrlRichEdit_GetParaShading
-_GUICtrlRichEdit_GetParaSpacing
-_GUICtrlRichEdit_GetParaTabStops
-_GUICtrlRichEdit_GetPasswordChar
-_GUICtrlRichEdit_GetRECT
-_GUICtrlRichEdit_GetScrollPos
-_GUICtrlRichEdit_GetSel
-_GUICtrlRichEdit_GetSelAA
-_GUICtrlRichEdit_GetSelText
-_GUICtrlRichEdit_GetSpaceUnit
-_GUICtrlRichEdit_GetText
-_GUICtrlRichEdit_GetTextInLine
-_GUICtrlRichEdit_GetTextInRange
-_GUICtrlRichEdit_GetTextLength
-_GUICtrlRichEdit_GetVersion
-_GUICtrlRichEdit_GetXYFromCharPos
-_GUICtrlRichEdit_GetZoom
-_GUICtrlRichEdit_GotoCharPos
-_GUICtrlRichEdit_HideSelection
-_GUICtrlRichEdit_InsertText
-_GUICtrlRichEdit_IsModified
-_GUICtrlRichEdit_IsTextSelected
-_GUICtrlRichEdit_Paste
-_GUICtrlRichEdit_PasteSpecial
-_GUICtrlRichEdit_PauseRedraw
-_GUICtrlRichEdit_Redo
-_GUICtrlRichEdit_ReplaceText
-_GUICtrlRichEdit_ResumeRedraw
-_GUICtrlRichEdit_ScrollLineOrPage
-_GUICtrlRichEdit_ScrollLines
-_GUICtrlRichEdit_ScrollToCaret
-_GUICtrlRichEdit_SetBkColor
-_GUICtrlRichEdit_SetCharAttributes
-_GUICtrlRichEdit_SetCharBkColor
-_GUICtrlRichEdit_SetCharColor
-_GUICtrlRichEdit_SetEventMask
-_GUICtrlRichEdit_SetFont
-_GUICtrlRichEdit_SetLimitOnText
-_GUICtrlRichEdit_SetModified
-_GUICtrlRichEdit_SetParaAlignment
-_GUICtrlRichEdit_SetParaAttributes
-_GUICtrlRichEdit_SetParaBorder
-_GUICtrlRichEdit_SetParaIndents
-_GUICtrlRichEdit_SetParaNumbering
-_GUICtrlRichEdit_SetParaShading
-_GUICtrlRichEdit_SetParaSpacing
-_GUICtrlRichEdit_SetParaTabStops
-_GUICtrlRichEdit_SetPasswordChar
-_GUICtrlRichEdit_SetReadOnly
-_GUICtrlRichEdit_SetRECT
-_GUICtrlRichEdit_SetScrollPos
-_GUICtrlRichEdit_SetSel
-_GUICtrlRichEdit_SetSpaceUnit
-_GUICtrlRichEdit_SetTabStops
-_GUICtrlRichEdit_SetText
-_GUICtrlRichEdit_SetUndoLimit
-_GUICtrlRichEdit_SetZoom
-_GUICtrlRichEdit_StreamFromFile
-_GUICtrlRichEdit_StreamFromVar
-_GUICtrlRichEdit_StreamToFile
-_GUICtrlRichEdit_StreamToVar
-_GUICtrlRichEdit_Undo
-_GUIScrollBars_EnableScrollBar
-_GUIScrollBars_GetScrollBarInfoEx
-_GUIScrollBars_GetScrollBarRect
-_GUIScrollBars_GetScrollBarRGState
-_GUIScrollBars_GetScrollBarXYLineButton
-_GUIScrollBars_GetScrollBarXYThumbBottom
-_GUIScrollBars_GetScrollBarXYThumbTop
-_GUIScrollBars_GetScrollInfo
-_GUIScrollBars_GetScrollInfoEx
-_GUIScrollBars_GetScrollInfoMax
-_GUIScrollBars_GetScrollInfoMin
-_GUIScrollBars_GetScrollInfoPage
-_GUIScrollBars_GetScrollInfoPos
-_GUIScrollBars_GetScrollInfoTrackPos
-_GUIScrollBars_GetScrollPos
-_GUIScrollBars_GetScrollRange
-_GUIScrollBars_Init
-_GUIScrollBars_ScrollWindow
-_GUIScrollBars_SetScrollInfo
-_GUIScrollBars_SetScrollInfoMax
-_GUIScrollBars_SetScrollInfoMin
-_GUIScrollBars_SetScrollInfoPage
-_GUIScrollBars_SetScrollInfoPos
-_GUIScrollBars_SetScrollRange
-_GUIScrollBars_ShowScrollBar
-_GUICtrlSlider_ClearSel
-_GUICtrlSlider_ClearTics
-_GUICtrlSlider_Create
-_GUICtrlSlider_Destroy
-_GUICtrlSlider_GetBuddy
-_GUICtrlSlider_GetChannelRect
-_GUICtrlSlider_GetChannelRectEx
-_GUICtrlSlider_GetLineSize
-_GUICtrlSlider_GetLogicalTics
-_GUICtrlSlider_GetNumTics
-_GUICtrlSlider_GetPageSize
-_GUICtrlSlider_GetPos
-_GUICtrlSlider_GetRange
-_GUICtrlSlider_GetRangeMax
-_GUICtrlSlider_GetRangeMin
-_GUICtrlSlider_GetSel
-_GUICtrlSlider_GetSelEnd
-_GUICtrlSlider_GetSelStart
-_GUICtrlSlider_GetThumbLength
-_GUICtrlSlider_GetThumbRect
-_GUICtrlSlider_GetThumbRectEx
-_GUICtrlSlider_GetTic
-_GUICtrlSlider_GetTicPos
-_GUICtrlSlider_GetToolTips
-_GUICtrlSlider_GetUnicodeFormat
-_GUICtrlSlider_SetBuddy
-_GUICtrlSlider_SetLineSize
-_GUICtrlSlider_SetPageSize
-_GUICtrlSlider_SetPos
-_GUICtrlSlider_SetRange
-_GUICtrlSlider_SetRangeMax
-_GUICtrlSlider_SetRangeMin
-_GUICtrlSlider_SetSel
-_GUICtrlSlider_SetSelEnd
-_GUICtrlSlider_SetSelStart
-_GUICtrlSlider_SetThumbLength
-_GUICtrlSlider_SetTic
-_GUICtrlSlider_SetTicFreq
-_GUICtrlSlider_SetTipSide
-_GUICtrlSlider_SetToolTips
-_GUICtrlSlider_SetUnicodeFormat
-_GUICtrlStatusBar_Create
-_GUICtrlStatusBar_Destroy
-_GUICtrlStatusBar_EmbedControl
-_GUICtrlStatusBar_GetBorders
-_GUICtrlStatusBar_GetBordersHorz
-_GUICtrlStatusBar_GetBordersRect
-_GUICtrlStatusBar_GetBordersVert
-_GUICtrlStatusBar_GetCount
-_GUICtrlStatusBar_GetHeight
-_GUICtrlStatusBar_GetIcon
-_GUICtrlStatusBar_GetParts
-_GUICtrlStatusBar_GetRect
-_GUICtrlStatusBar_GetRectEx
-_GUICtrlStatusBar_GetText
-_GUICtrlStatusBar_GetTextFlags
-_GUICtrlStatusBar_GetTextLength
-_GUICtrlStatusBar_GetTextLengthEx
-_GUICtrlStatusBar_GetTipText
-_GUICtrlStatusBar_GetUnicodeFormat
-_GUICtrlStatusBar_GetWidth
-_GUICtrlStatusBar_IsSimple
-_GUICtrlStatusBar_Resize
-_GUICtrlStatusBar_SetBkColor
-_GUICtrlStatusBar_SetIcon
-_GUICtrlStatusBar_SetMinHeight
-_GUICtrlStatusBar_SetParts
-_GUICtrlStatusBar_SetSimple
-_GUICtrlStatusBar_SetText
-_GUICtrlStatusBar_SetTipText
-_GUICtrlStatusBar_SetUnicodeFormat
-_GUICtrlStatusBar_ShowHide
-_GUICtrlTab_ActivateTab
-_GUICtrlTab_ClickTab
-_GUICtrlTab_Create
-_GUICtrlTab_DeleteAllItems
-_GUICtrlTab_DeleteItem
-_GUICtrlTab_DeselectAll
-_GUICtrlTab_Destroy
-_GUICtrlTab_FindTab
-_GUICtrlTab_GetCurFocus
-_GUICtrlTab_GetCurSel
-_GUICtrlTab_GetDisplayRect
-_GUICtrlTab_GetDisplayRectEx
-_GUICtrlTab_GetExtendedStyle
-_GUICtrlTab_GetImageList
-_GUICtrlTab_GetItem
-_GUICtrlTab_GetItemCount
-_GUICtrlTab_GetItemImage
-_GUICtrlTab_GetItemParam
-_GUICtrlTab_GetItemRect
-_GUICtrlTab_GetItemRectEx
-_GUICtrlTab_GetItemState
-_GUICtrlTab_GetItemText
-_GUICtrlTab_GetRowCount
-_GUICtrlTab_GetToolTips
-_GUICtrlTab_GetUnicodeFormat
-_GUICtrlTab_HighlightItem
-_GUICtrlTab_HitTest
-_GUICtrlTab_InsertItem
-_GUICtrlTab_RemoveImage
-_GUICtrlTab_SetCurFocus
-_GUICtrlTab_SetCurSel
-_GUICtrlTab_SetExtendedStyle
-_GUICtrlTab_SetImageList
-_GUICtrlTab_SetItem
-_GUICtrlTab_SetItemImage
-_GUICtrlTab_SetItemParam
-_GUICtrlTab_SetItemSize
-_GUICtrlTab_SetItemState
-_GUICtrlTab_SetItemText
-_GUICtrlTab_SetMinTabWidth
-_GUICtrlTab_SetPadding
-_GUICtrlTab_SetToolTips
-_GUICtrlTab_SetUnicodeFormat
-_GUICtrlToolbar_AddBitmap
-_GUICtrlToolbar_AddButton
-_GUICtrlToolbar_AddButtonSep
-_GUICtrlToolbar_AddString
-_GUICtrlToolbar_ButtonCount
-_GUICtrlToolbar_CheckButton
-_GUICtrlToolbar_ClickAccel
-_GUICtrlToolbar_ClickButton
-_GUICtrlToolbar_ClickIndex
-_GUICtrlToolbar_CommandToIndex
-_GUICtrlToolbar_Create
-_GUICtrlToolbar_Customize
-_GUICtrlToolbar_DeleteButton
-_GUICtrlToolbar_Destroy
-_GUICtrlToolbar_EnableButton
-_GUICtrlToolbar_FindToolbar
-_GUICtrlToolbar_GetAnchorHighlight
-_GUICtrlToolbar_GetBitmapFlags
-_GUICtrlToolbar_GetButtonBitmap
-_GUICtrlToolbar_GetButtonInfo
-_GUICtrlToolbar_GetButtonInfoEx
-_GUICtrlToolbar_GetButtonParam
-_GUICtrlToolbar_GetButtonRect
-_GUICtrlToolbar_GetButtonRectEx
-_GUICtrlToolbar_GetButtonSize
-_GUICtrlToolbar_GetButtonState
-_GUICtrlToolbar_GetButtonStyle
-_GUICtrlToolbar_GetButtonText
-_GUICtrlToolbar_GetColorScheme
-_GUICtrlToolbar_GetDisabledImageList
-_GUICtrlToolbar_GetExtendedStyle
-_GUICtrlToolbar_GetHotImageList
-_GUICtrlToolbar_GetHotItem
-_GUICtrlToolbar_GetImageList
-_GUICtrlToolbar_GetInsertMark
-_GUICtrlToolbar_GetInsertMarkColor
-_GUICtrlToolbar_GetMaxSize
-_GUICtrlToolbar_GetMetrics
-_GUICtrlToolbar_GetPadding
-_GUICtrlToolbar_GetRows
-_GUICtrlToolbar_GetString
-_GUICtrlToolbar_GetStyle
-_GUICtrlToolbar_GetStyleAltDrag
-_GUICtrlToolbar_GetStyleCustomErase
-_GUICtrlToolbar_GetStyleFlat
-_GUICtrlToolbar_GetStyleList
-_GUICtrlToolbar_GetStyleRegisterDrop
-_GUICtrlToolbar_GetStyleToolTips
-_GUICtrlToolbar_GetStyleTransparent
-_GUICtrlToolbar_GetStyleWrapable
-_GUICtrlToolbar_GetTextRows
-_GUICtrlToolbar_GetToolTips
-_GUICtrlToolbar_GetUnicodeFormat
-_GUICtrlToolbar_HideButton
-_GUICtrlToolbar_HighlightButton
-_GUICtrlToolbar_HitTest
-_GUICtrlToolbar_IndexToCommand
-_GUICtrlToolbar_InsertButton
-_GUICtrlToolbar_InsertMarkHitTest
-_GUICtrlToolbar_IsButtonChecked
-_GUICtrlToolbar_IsButtonEnabled
-_GUICtrlToolbar_IsButtonHidden
-_GUICtrlToolbar_IsButtonHighlighted
-_GUICtrlToolbar_IsButtonIndeterminate
-_GUICtrlToolbar_IsButtonPressed
-_GUICtrlToolbar_LoadBitmap
-_GUICtrlToolbar_LoadImages
-_GUICtrlToolbar_MapAccelerator
-_GUICtrlToolbar_MoveButton
-_GUICtrlToolbar_PressButton
-_GUICtrlToolbar_SetAnchorHighlight
-_GUICtrlToolbar_SetBitmapSize
-_GUICtrlToolbar_SetButtonBitMap
-_GUICtrlToolbar_SetButtonInfo
-_GUICtrlToolbar_SetButtonInfoEx
-_GUICtrlToolbar_SetButtonParam
-_GUICtrlToolbar_SetButtonSize
-_GUICtrlToolbar_SetButtonState
-_GUICtrlToolbar_SetButtonStyle
-_GUICtrlToolbar_SetButtonText
-_GUICtrlToolbar_SetButtonWidth
-_GUICtrlToolbar_SetCmdID
-_GUICtrlToolbar_SetColorScheme
-_GUICtrlToolbar_SetDisabledImageList
-_GUICtrlToolbar_SetDrawTextFlags
-_GUICtrlToolbar_SetExtendedStyle
-_GUICtrlToolbar_SetHotImageList
-_GUICtrlToolbar_SetHotItem
-_GUICtrlToolbar_SetImageList
-_GUICtrlToolbar_SetIndent
-_GUICtrlToolbar_SetIndeterminate
-_GUICtrlToolbar_SetInsertMark
-_GUICtrlToolbar_SetInsertMarkColor
-_GUICtrlToolbar_SetMaxTextRows
-_GUICtrlToolbar_SetMetrics
-_GUICtrlToolbar_SetPadding
-_GUICtrlToolbar_SetParent
-_GUICtrlToolbar_SetRows
-_GUICtrlToolbar_SetStyle
-_GUICtrlToolbar_SetStyleAltDrag
-_GUICtrlToolbar_SetStyleCustomErase
-_GUICtrlToolbar_SetStyleFlat
-_GUICtrlToolbar_SetStyleList
-_GUICtrlToolbar_SetStyleRegisterDrop
-_GUICtrlToolbar_SetStyleToolTips
-_GUICtrlToolbar_SetStyleTransparent
-_GUICtrlToolbar_SetStyleWrapable
-_GUICtrlToolbar_SetToolTips
-_GUICtrlToolbar_SetUnicodeFormat
-_GUICtrlToolbar_SetWindowTheme
-_GUIToolTip_Activate
-_GUIToolTip_AddTool
-_GUIToolTip_AdjustRect
-_GUIToolTip_BitsToTTF
-_GUIToolTip_Create
-_GUIToolTip_Deactivate
-_GUIToolTip_DelTool
-_GUIToolTip_Destroy
-_GUIToolTip_EnumTools
-_GUIToolTip_GetBubbleHeight
-_GUIToolTip_GetBubbleSize
-_GUIToolTip_GetBubbleWidth
-_GUIToolTip_GetCurrentTool
-_GUIToolTip_GetDelayTime
-_GUIToolTip_GetMargin
-_GUIToolTip_GetMarginEx
-_GUIToolTip_GetMaxTipWidth
-_GUIToolTip_GetText
-_GUIToolTip_GetTipBkColor
-_GUIToolTip_GetTipTextColor
-_GUIToolTip_GetTitleBitMap
-_GUIToolTip_GetTitleText
-_GUIToolTip_GetToolCount
-_GUIToolTip_GetToolInfo
-_GUIToolTip_HitTest
-_GUIToolTip_NewToolRect
-_GUIToolTip_Pop
-_GUIToolTip_PopUp
-_GUIToolTip_SetDelayTime
-_GUIToolTip_SetMargin
-_GUIToolTip_SetMaxTipWidth
-_GUIToolTip_SetTipBkColor
-_GUIToolTip_SetTipTextColor
-_GUIToolTip_SetTitle
-_GUIToolTip_SetToolInfo
-_GUIToolTip_SetWindowTheme
-_GUIToolTip_ToolExists
-_GUIToolTip_ToolToArray
-_GUIToolTip_TrackActivate
-_GUIToolTip_TrackPosition
-_GUIToolTip_Update
-_GUIToolTip_UpdateTipText
-_GUICtrlTreeView_Add
-_GUICtrlTreeView_AddChild
-_GUICtrlTreeView_AddChildFirst
-_GUICtrlTreeView_AddFirst
-_GUICtrlTreeView_BeginUpdate
-_GUICtrlTreeView_ClickItem
-_GUICtrlTreeView_Create
-_GUICtrlTreeView_CreateDragImage
-_GUICtrlTreeView_CreateSolidBitMap
-_GUICtrlTreeView_Delete
-_GUICtrlTreeView_DeleteAll
-_GUICtrlTreeView_DeleteChildren
-_GUICtrlTreeView_Destroy
-_GUICtrlTreeView_DisplayRect
-_GUICtrlTreeView_DisplayRectEx
-_GUICtrlTreeView_EditText
-_GUICtrlTreeView_EndEdit
-_GUICtrlTreeView_EndUpdate
-_GUICtrlTreeView_EnsureVisible
-_GUICtrlTreeView_Expand
-_GUICtrlTreeView_ExpandedOnce
-_GUICtrlTreeView_FindItem
-_GUICtrlTreeView_FindItemEx
-_GUICtrlTreeView_GetBkColor
-_GUICtrlTreeView_GetBold
-_GUICtrlTreeView_GetChecked
-_GUICtrlTreeView_GetChildCount
-_GUICtrlTreeView_GetChildren
-_GUICtrlTreeView_GetCount
-_GUICtrlTreeView_GetCut
-_GUICtrlTreeView_GetDropTarget
-_GUICtrlTreeView_GetEditControl
-_GUICtrlTreeView_GetExpanded
-_GUICtrlTreeView_GetFirstChild
-_GUICtrlTreeView_GetFirstItem
-_GUICtrlTreeView_GetFirstVisible
-_GUICtrlTreeView_GetFocused
-_GUICtrlTreeView_GetHeight
-_GUICtrlTreeView_GetImageIndex
-_GUICtrlTreeView_GetImageListIconHandle
-_GUICtrlTreeView_GetIndent
-_GUICtrlTreeView_GetInsertMarkColor
-_GUICtrlTreeView_GetISearchString
-_GUICtrlTreeView_GetItemByIndex
-_GUICtrlTreeView_GetItemHandle
-_GUICtrlTreeView_GetItemParam
-_GUICtrlTreeView_GetLastChild
-_GUICtrlTreeView_GetLastItem
-_GUICtrlTreeView_GetLineColor
-_GUICtrlTreeView_GetNext
-_GUICtrlTreeView_GetNextChild
-_GUICtrlTreeView_GetNextSibling
-_GUICtrlTreeView_GetNextVisible
-_GUICtrlTreeView_GetNormalImageList
-_GUICtrlTreeView_GetParentHandle
-_GUICtrlTreeView_GetParentParam
-_GUICtrlTreeView_GetPrev
-_GUICtrlTreeView_GetPrevChild
-_GUICtrlTreeView_GetPrevSibling
-_GUICtrlTreeView_GetPrevVisible
-_GUICtrlTreeView_GetScrollTime
-_GUICtrlTreeView_GetSelected
-_GUICtrlTreeView_GetSelectedImageIndex
-_GUICtrlTreeView_GetSelection
-_GUICtrlTreeView_GetSiblingCount
-_GUICtrlTreeView_GetState
-_GUICtrlTreeView_GetStateImageIndex
-_GUICtrlTreeView_GetStateImageList
-_GUICtrlTreeView_GetText
-_GUICtrlTreeView_GetTextColor
-_GUICtrlTreeView_GetToolTips
-_GUICtrlTreeView_GetTree
-_GUICtrlTreeView_GetUnicodeFormat
-_GUICtrlTreeView_GetVisible
-_GUICtrlTreeView_GetVisibleCount
-_GUICtrlTreeView_HitTest
-_GUICtrlTreeView_HitTestEx
-_GUICtrlTreeView_HitTestItem
-_GUICtrlTreeView_Index
-_GUICtrlTreeView_InsertItem
-_GUICtrlTreeView_IsFirstItem
-_GUICtrlTreeView_IsParent
-_GUICtrlTreeView_Level
-_GUICtrlTreeView_SelectItem
-_GUICtrlTreeView_SelectItemByIndex
-_GUICtrlTreeView_SetBkColor
-_GUICtrlTreeView_SetBold
-_GUICtrlTreeView_SetChecked
-_GUICtrlTreeView_SetCheckedByIndex
-_GUICtrlTreeView_SetChildren
-_GUICtrlTreeView_SetCut
-_GUICtrlTreeView_SetDropTarget
-_GUICtrlTreeView_SetFocused
-_GUICtrlTreeView_SetHeight
-_GUICtrlTreeView_SetIcon
-_GUICtrlTreeView_SetImageIndex
-_GUICtrlTreeView_SetIndent
-_GUICtrlTreeView_SetInsertMark
-_GUICtrlTreeView_SetInsertMarkColor
-_GUICtrlTreeView_SetItemHeight
-_GUICtrlTreeView_SetItemParam
-_GUICtrlTreeView_SetLineColor
-_GUICtrlTreeView_SetNormalImageList
-_GUICtrlTreeView_SetScrollTime
-_GUICtrlTreeView_SetSelected
-_GUICtrlTreeView_SetSelectedImageIndex
-_GUICtrlTreeView_SetState
-_GUICtrlTreeView_SetStateImageIndex
-_GUICtrlTreeView_SetStateImageList
-_GUICtrlTreeView_SetText
-_GUICtrlTreeView_SetTextColor
-_GUICtrlTreeView_SetToolTips
-_GUICtrlTreeView_SetUnicodeFormat
-_GUICtrlTreeView_Sort
-;IE_Management
-_IE_Example
-_IE_Introduction
-_IE_VersionInfo
-_IEAction
-_IEAttach
-_IEBodyReadHTML
-_IEBodyReadText
-_IEBodyWriteHTML
-_IECreate
-_IECreateEmbedded
-_IEDocGetObj
-_IEDocInsertHTML
-_IEDocInsertText
-_IEDocReadHTML
-_IEDocWriteHTML
-_IEErrorNotify
-_IEFormElementCheckBoxSelect
-_IEFormElementGetCollection
-_IEFormElementGetObjByName
-_IEFormElementGetValue
-_IEFormElementOptionSelect
-_IEFormElementRadioSelect
-_IEFormElementSetValue
-_IEFormGetCollection
-_IEFormGetObjByName
-_IEFormImageClick
-_IEFormReset
-_IEFormSubmit
-_IEFrameGetCollection
-_IEFrameGetObjByName
-_IEGetObjById
-_IEGetObjByName
-_IEHeadInsertEventScript
-_IEImgClick
-_IEImgGetCollection
-_IEIsFrameSet
-_IELinkClickByIndex
-_IELinkClickByText
-_IELinkGetCollection
-_IELoadWait
-_IELoadWaitTimeout
-_IENavigate
-_IEPropertyGet
-_IEPropertySet
-_IEQuit
-_IETableGetCollection
-_IETableWriteToArray
-_IETagNameAllGetCollection
-_IETagNameGetCollection
-;Inet_Management
-_GetIP
-_INetExplorerCapable
-_INetGetSource
-_INetMail
-_INetSmtpMail
-_TCPIpToName
-;Math_Management
-_Degree
-_Max
-_Min
-_Radian
-;Memory_Management
-_MemGlobalAlloc
-_MemGlobalFree
-_MemGlobalLock
-_MemGlobalReAlloc
-_MemGlobalSize
-_MemGlobalUnlock
-_MemMoveMemory
-_MemVirtualAlloc
-_MemVirtualAllocEx
-_MemVirtualFree
-_MemVirtualFreeEx
-;Misc_Management
-_ChooseColor
-_ChooseFont
-_ClipPutFile
-_FormatAutoItExitCode
-_FormatAutoItExitMethod
-_IsPressed
-_MouseTrap
-_Singleton
-_VersionCompare
-;NamedPipes_Management
-_NamedPipes_CallNamedPipe
-_NamedPipes_ConnectNamedPipe
-_NamedPipes_CreateNamedPipe
-_NamedPipes_CreatePipe
-_NamedPipes_DisconnectNamedPipe
-_NamedPipes_GetNamedPipeHandleState
-_NamedPipes_GetNamedPipeInfo
-_NamedPipes_PeekNamedPipe
-_NamedPipes_SetNamedPipeHandleState
-_NamedPipes_TransactNamedPipe
-_NamedPipes_WaitNamedPipe
-;NetShare_Management
-_Net_Share_ConnectionEnum
-_Net_Share_FileClose
-_Net_Share_FileEnum
-_Net_Share_FileGetInfo
-_Net_Share_PermStr
-_Net_Share_ResourceStr
-_Net_Share_SessionDel
-_Net_Share_SessionEnum
-_Net_Share_SessionGetInfo
-_Net_Share_ShareAdd
-_Net_Share_ShareCheck
-_Net_Share_ShareDel
-_Net_Share_ShareEnum
-_Net_Share_ShareGetInfo
-_Net_Share_ShareSetInfo
-_Net_Share_StatisticsGetSvr
-_Net_Share_StatisticsGetWrk
-;Process_Management
-_ProcessGetName
-_ProcessGetPriority
-_RunDos
-;ScreenCapture_Management
-_ScreenCapture_Capture
-_ScreenCapture_CaptureWnd
-_ScreenCapture_SaveImage
-_ScreenCapture_SetBMPFormat
-_ScreenCapture_SetJPGQuality
-_ScreenCapture_SetTIFColorDepth
-_ScreenCapture_SetTIFCompression
-;Security_Management
-_Security__AdjustTokenPrivileges
-_Security__CreateProcessWithToken
-_Security__DuplicateTokenEx
-_Security__GetAccountSid
-_Security__GetLengthSid
-_Security__GetTokenInformation
-_Security__ImpersonateSelf
-_Security__IsValidSid
-_Security__LookupAccountName
-_Security__LookupAccountSid
-_Security__LookupPrivilegeValue
-_Security__OpenProcessToken
-_Security__OpenThreadToken
-_Security__OpenThreadTokenEx
-_Security__SetPrivilege
-_Security__SetTokenInformation
-_Security__SidToStringSid
-_Security__SidTypeStr
-_Security__StringSidToSid
-;SendMessage_Management
-_SendMessage
-_SendMessageA
-;Sound_Management
-_SoundClose
-_SoundLength
-_SoundOpen
-_SoundPause
-_SoundPlay
-_SoundPos
-_SoundResume
-_SoundSeek
-_SoundStatus
-_SoundStop
-;SQLite_Management
-_SQLite_Changes
-_SQLite_Close
-_SQLite_Display2DResult
-_SQLite_Encode
-_SQLite_ErrCode
-_SQLite_ErrMsg
-_SQLite_Escape
-_SQLite_Exec
-_SQLite_FastEncode
-_SQLite_FastEscape
-_SQLite_FetchData
-_SQLite_FetchNames
-_SQLite_GetTable
-_SQLite_GetTable2D
-_SQLite_GetTableData2D
-_SQLite_LastInsertRowID
-_SQLite_LibVersion
-_SQLite_Open
-_SQLite_Query
-_SQLite_QueryFinalize
-_SQLite_QueryReset
-_SQLite_QuerySingleRow
-_SQLite_SafeMode
-_SQLite_SetTimeout
-_SQLite_Shutdown
-_SQLite_SQLiteExe
-_SQLite_Startup
-_SQLite_TotalChanges
-;String_Management
-_HexToString
-_StringBetween
-_StringExplode
-_StringInsert
-_StringProper
-_StringRepeat
-_StringTitleCase
-_StringToHex
-;Timers_Management
-_Timer_Diff
-_Timer_GetIdleTime
-_Timer_GetTimerID
-_Timer_Init
-_Timer_KillAllTimers
-_Timer_KillTimer
-_Timer_SetTimer
-;Visa_Management
-_viClose
-_viExecCommand
-_viFindGpib
-_viGpibBusReset
-_viGTL
-_viInteractiveControl
-_viOpen
-_viSetAttribute
-_viSetTimeout
-;WinAPIEx_Reference
-_WinAPI_CLSIDFromProgID
-_WinAPI_CoInitialize
-_WinAPI_CoTaskMemAlloc
-_WinAPI_CoTaskMemFree
-_WinAPI_CoTaskMemRealloc
-_WinAPI_CoUninitialize
-_WinAPI_CreateGUID
-_WinAPI_CreateStreamOnHGlobal
-_WinAPI_GetHGlobalFromStream
-_WinAPI_ProgIDFromCLSID
-_WinAPI_ReleaseStream
-_WinAPI_CharToOem
-_WinAPI_ClientToScreen
-_WinAPI_DWordToFloat
-_WinAPI_DWordToInt
-_WinAPI_FloatToDWord
-_WinAPI_FloatToInt
-_WinAPI_GetXYFromPoint
-_WinAPI_GUIDFromString
-_WinAPI_GUIDFromStringEx
-_WinAPI_HashData
-_WinAPI_HashString
-_WinAPI_HiByte
-_WinAPI_HiDWord
-_WinAPI_HiWord
-_WinAPI_IntToDWord
-_WinAPI_IntToFloat
-_WinAPI_LoByte
-_WinAPI_LoDWord
-_WinAPI_LongMid
-_WinAPI_LoWord
-_WinAPI_MAKELANGID
-_WinAPI_MAKELCID
-_WinAPI_MakeLong
-_WinAPI_MakeQWord
-_WinAPI_MakeWord
-_WinAPI_MultiByteToWideChar
-_WinAPI_MultiByteToWideCharEx
-_WinAPI_OemToChar
-_WinAPI_PointFromRect
-_WinAPI_PrimaryLangId
-_WinAPI_ScreenToClient
-_WinAPI_ShortToWord
-_WinAPI_StrFormatByteSize
-_WinAPI_StrFormatByteSizeEx
-_WinAPI_StrFormatKBSize
-_WinAPI_StrFromTimeInterval
-_WinAPI_StringFromGUID
-_WinAPI_SubLangId
-_WinAPI_SwapDWord
-_WinAPI_SwapQWord
-_WinAPI_SwapWord
-_WinAPI_WideCharToMultiByte
-_WinAPI_WordToShort
-_WinAPI_DisplayStruct
-_WinAPI_EnumDllProc
-_WinAPI_FatalExit
-_WinAPI_GetApplicationRestartSettings
-_WinAPI_GetErrorMode
-_WinAPI_IsInternetConnected
-_WinAPI_IsNetworkAlive
-_WinAPI_NtStatusToDosError
-_WinAPI_RegisterApplicationRestart
-_WinAPI_SetErrorMode
-_WinAPI_UniqueHardwareID
-_WinAPI_UnregisterApplicationRestart
-_WinAPI_BrowseForFolderDlg
-_WinAPI_CommDlgExtendedError
-_WinAPI_CommDlgExtendedErrorEx
-_WinAPI_ConfirmCredentials
-_WinAPI_FindTextDlg
-_WinAPI_FlushFRBuffer
-_WinAPI_FormatDriveDlg
-_WinAPI_GetConnectedDlg
-_WinAPI_GetDlgCtrlID
-_WinAPI_GetFRBuffer
-_WinAPI_GetOpenFileName
-_WinAPI_GetSaveFileName
-_WinAPI_MessageBoxCheck
-_WinAPI_MessageBoxIndirect
-_WinAPI_OpenFileDlg
-_WinAPI_PageSetupDlg
-_WinAPI_PickIconDlg
-_WinAPI_PrintDlg
-_WinAPI_PrintDlgEx
-_WinAPI_ReplaceTextDlg
-_WinAPI_RestartDlg
-_WinAPI_SaveFileDlg
-_WinAPI_SetFRBuffer
-_WinAPI_ShellAboutDlg
-_WinAPI_ShellOpenWithDlg
-_WinAPI_ShellStartNetConnectionDlg
-_WinAPI_ShellUserAuthenticationDlg
-_WinAPI_ShellUserAuthenticationDlgEx
-_WinAPI_Beep
-_WinAPI_FormatMessage
-_WinAPI_GetErrorMessage
-_WinAPI_GetLastError
-_WinAPI_GetLastErrorMessage
-_WinAPI_MessageBeep
-_WinAPI_MsgBox
-_WinAPI_SetLastError
-_WinAPI_ShowError
-_WinAPI_ShowLastError
-_WinAPI_ShowMsg
-_WinAPI_BackupRead
-_WinAPI_BackupReadAbort
-_WinAPI_BackupSeek
-_WinAPI_BackupWrite
-_WinAPI_BackupWriteAbort
-_WinAPI_DefineDosDevice
-_WinAPI_GetDriveType
-_WinAPI_GetLogicalDrives
-_WinAPI_GetPEType
-_WinAPI_QueryDosDevice
-_WinAPI_Wow64EnableWow64FsRedirection
-_WinAPI_CreateObjectID
-_WinAPI_DeleteObjectID
-_WinAPI_DeviceIoControl
-_WinAPI_EjectMedia
-_WinAPI_GetCDType
-_WinAPI_GetDriveBusType
-_WinAPI_GetDriveGeometryEx
-_WinAPI_GetDriveNumber
-_WinAPI_GetObjectID
-_WinAPI_GetOverlappedResult
-_WinAPI_IOCTL
-_WinAPI_IsDoorOpen
-_WinAPI_IsWritable
-_WinAPI_LoadMedia
-_WinAPI_CopyFileEx
-_WinAPI_CreateDirectory
-_WinAPI_CreateDirectoryEx
-_WinAPI_CreateFile
-_WinAPI_CreateFileEx
-_WinAPI_CreateFileMapping
-_WinAPI_CreateHardLink
-_WinAPI_CreateSymbolicLink
-_WinAPI_DecryptFile
-_WinAPI_DeleteFile
-_WinAPI_DeleteVolumeMountPoint
-_WinAPI_DuplicateEncryptionInfoFile
-_WinAPI_EncryptFile
-_WinAPI_EncryptionDisable
-_WinAPI_EnumFiles
-_WinAPI_EnumFileStreams
-_WinAPI_EnumHardLinks
-_WinAPI_FileEncryptionStatus
-_WinAPI_FileExists
-_WinAPI_FileInUse
-_WinAPI_FindClose
-_WinAPI_FindCloseChangeNotification
-_WinAPI_FindFirstChangeNotification
-_WinAPI_FindFirstFile
-_WinAPI_FindFirstFileName
-_WinAPI_FindFirstStream
-_WinAPI_FindNextChangeNotification
-_WinAPI_FindNextFile
-_WinAPI_FindNextFileName
-_WinAPI_FindNextStream
-_WinAPI_FlushFileBuffers
-_WinAPI_FlushViewOfFile
-_WinAPI_GetBinaryType
-_WinAPI_GetCompressedFileSize
-_WinAPI_GetCompression
-_WinAPI_GetCurrentDirectory
-_WinAPI_GetDiskFreeSpaceEx
-_WinAPI_GetFileAttributes
-_WinAPI_GetFileID
-_WinAPI_GetFileInformationByHandle
-_WinAPI_GetFileInformationByHandleEx
-_WinAPI_GetFilePointerEx
-_WinAPI_GetFileSizeEx
-_WinAPI_GetFileSizeOnDisk
-_WinAPI_GetFileTitle
-_WinAPI_GetFileType
-_WinAPI_GetFinalPathNameByHandle
-_WinAPI_GetFinalPathNameByHandleEx
-_WinAPI_GetFullPathName
-_WinAPI_GetProfilesDirectory
-_WinAPI_GetTempFileName
-_WinAPI_GetVolumeInformation
-_WinAPI_GetVolumeInformationByHandle
-_WinAPI_GetVolumeNameForVolumeMountPoint
-_WinAPI_IsPathShared
-_WinAPI_LockDevice
-_WinAPI_LockFile
-_WinAPI_MapViewOfFile
-_WinAPI_MoveFileEx
-_WinAPI_OpenFileById
-_WinAPI_OpenFileMapping
-_WinAPI_PathIsDirectory
-_WinAPI_PathIsDirectoryEmpty
-_WinAPI_ReadDirectoryChanges
-_WinAPI_ReadFile
-_WinAPI_RemoveDirectory
-_WinAPI_ReOpenFile
-_WinAPI_ReplaceFile
-_WinAPI_SearchPath
-_WinAPI_SetCompression
-_WinAPI_SetCurrentDirectory
-_WinAPI_SetEndOfFile
-_WinAPI_SetFileAttributes
-_WinAPI_SetFileInformationByHandleEx
-_WinAPI_SetFilePointer
-_WinAPI_SetFilePointerEx
-_WinAPI_SetFileShortName
-_WinAPI_SetFileValidData
-_WinAPI_SetSearchPathMode
-_WinAPI_SetVolumeMountPoint
-_WinAPI_SfcIsFileProtected
-_WinAPI_UnlockFile
-_WinAPI_UnmapViewOfFile
-_WinAPI_WriteFile
-_WinAPI_EnumDisplaySettings
-_WinAPI_AddIconOverlay
-_WinAPI_AdjustBitmap
-_WinAPI_AlphaBlend
-_WinAPI_BitBlt
-_WinAPI_CompressBitmapBits
-_WinAPI_CopyBitmap
-_WinAPI_CopyImage
-_WinAPI_Create32BitHBITMAP
-_WinAPI_CreateANDBitmap
-_WinAPI_CreateBitmap
-_WinAPI_CreateBitmapIndirect
-_WinAPI_CreateCompatibleBitmap
-_WinAPI_CreateCompatibleBitmapEx
-_WinAPI_CreateDIB
-_WinAPI_CreateDIBColorTable
-_WinAPI_CreateDIBitmap
-_WinAPI_CreateDIBSection
-_WinAPI_CreateSolidBitmap
-_WinAPI_DrawBitmap
-_WinAPI_ExtFloodFill
-_WinAPI_GetBitmapBits
-_WinAPI_GetBitmapDimension
-_WinAPI_GetBitmapDimensionEx
-_WinAPI_GetDIBColorTable
-_WinAPI_GetDIBits
-_WinAPI_GetPixel
-_WinAPI_GetStretchBltMode
-_WinAPI_GradientFill
-_WinAPI_InvertANDBitmap
-_WinAPI_IsAlphaBitmap
-_WinAPI_MaskBlt
-_WinAPI_PlgBlt
-_WinAPI_RadialGradientFill
-_WinAPI_SaveHBITMAPToFile
-_WinAPI_SaveHICONToFile
-_WinAPI_SetBitmapBits
-_WinAPI_SetBitmapDimensionEx
-_WinAPI_SetDIBColorTable
-_WinAPI_SetDIBits
-_WinAPI_SetDIBitsToDevice
-_WinAPI_SetPixel
-_WinAPI_SetStretchBltMode
-_WinAPI_StretchBlt
-_WinAPI_StretchDIBits
-_WinAPI_TransparentBlt
-_WinAPI_CreateBrushIndirect
-_WinAPI_CreatePen
-_WinAPI_CreateSolidBrush
-_WinAPI_ExtCreatePen
-_WinAPI_GetBrushOrg
-_WinAPI_GetSysColorBrush
-_WinAPI_PatBlt
-_WinAPI_SetBrushOrg
-_WinAPI_SetDCBrushColor
-_WinAPI_SetDCPenColor
-_WinAPI_ExcludeClipRect
-_WinAPI_ExtSelectClipRgn
-_WinAPI_GetClipBox
-_WinAPI_GetClipRgn
-_WinAPI_IntersectClipRect
-_WinAPI_OffsetClipRgn
-_WinAPI_PtVisible
-_WinAPI_RectVisible
-_WinAPI_SelectClipPath
-_WinAPI_SelectClipRgn
-_WinAPI_ColorAdjustLuma
-_WinAPI_ColorHLSToRGB
-_WinAPI_ColorRGBToHLS
-_WinAPI_CreateColorAdjustment
-_WinAPI_GetBValue
-_WinAPI_GetColorAdjustment
-_WinAPI_GetDeviceGammaRamp
-_WinAPI_GetGValue
-_WinAPI_GetRValue
-_WinAPI_GetUDFColorMode
-_WinAPI_InvertColor
-_WinAPI_RGB
-_WinAPI_SetColorAdjustment
-_WinAPI_SetDeviceGammaRamp
-_WinAPI_SetUDFColorMode
-_WinAPI_SwitchColor
-_WinAPI_CombineTransform
-_WinAPI_CreateTransform
-_WinAPI_DPtoLP
-_WinAPI_GetCurrentPosition
-_WinAPI_GetGraphicsMode
-_WinAPI_GetMapMode
-_WinAPI_GetPosFromRect
-_WinAPI_GetWorldTransform
-_WinAPI_LPtoDP
-_WinAPI_ModifyWorldTransform
-_WinAPI_OffsetPoints
-_WinAPI_OffsetWindowOrg
-_WinAPI_RotatePoints
-_WinAPI_ScaleWindowExt
-_WinAPI_SetGraphicsMode
-_WinAPI_SetMapMode
-_WinAPI_SetWindowExt
-_WinAPI_SetWindowOrg
-_WinAPI_SetWorldTransform
-_WinAPI_DwmDefWindowProc
-_WinAPI_DwmEnableBlurBehindWindow
-_WinAPI_DwmEnableComposition
-_WinAPI_DwmExtendFrameIntoClientArea
-_WinAPI_DwmGetColorizationColor
-_WinAPI_DwmGetColorizationParameters
-_WinAPI_DwmGetWindowAttribute
-_WinAPI_DwmInvalidateIconicBitmaps
-_WinAPI_DwmIsCompositionEnabled
-_WinAPI_DwmQueryThumbnailSourceSize
-_WinAPI_DwmRegisterThumbnail
-_WinAPI_DwmSetColorizationParameters
-_WinAPI_DwmSetIconicLivePreviewBitmap
-_WinAPI_DwmSetIconicThumbnail
-_WinAPI_DwmSetWindowAttribute
-_WinAPI_DwmUnregisterThumbnail
-_WinAPI_DwmUpdateThumbnailProperties
-_WinAPI_CreateCompatibleDC
-_WinAPI_DeleteDC
-_WinAPI_DrawEdge
-_WinAPI_DrawFrameControl
-_WinAPI_DrawIcon
-_WinAPI_DrawIconEx
-_WinAPI_DrawText
-_WinAPI_EnumDisplayDevices
-_WinAPI_FillRect
-_WinAPI_FrameRect
-_WinAPI_GetBkColor
-_WinAPI_GetBkMode
-_WinAPI_GetDC
-_WinAPI_GetDCEx
-_WinAPI_GetDeviceCaps
-_WinAPI_GetTextColor
-_WinAPI_PrintWindow
-_WinAPI_ReleaseDC
-_WinAPI_RestoreDC
-_WinAPI_SaveDC
-_WinAPI_SetBkColor
-_WinAPI_SetBkMode
-_WinAPI_SetTextColor
-_WinAPI_TwipsPerPixelX
-_WinAPI_TwipsPerPixelY
-_WinAPI_AddFontMemResourceEx
-_WinAPI_AddFontResourceEx
-_WinAPI_CreateFont
-_WinAPI_CreateFontEx
-_WinAPI_CreateFontIndirect
-_WinAPI_EnumFontFamilies
-_WinAPI_GetFontMemoryResourceInfo
-_WinAPI_GetFontName
-_WinAPI_GetFontResourceInfo
-_WinAPI_GetGlyphOutline
-_WinAPI_GetOutlineTextMetrics
-_WinAPI_GetTabbedTextExtent
-_WinAPI_GetTextAlign
-_WinAPI_GetTextCharacterExtra
-_WinAPI_GetTextExtentPoint32
-_WinAPI_GetTextFace
-_WinAPI_GetTextMetrics
-_WinAPI_RemoveFontMemResourceEx
-_WinAPI_RemoveFontResourceEx
-_WinAPI_SetTextAlign
-_WinAPI_SetTextCharacterExtra
-_WinAPI_SetTextJustification
-_WinAPI_TabbedTextOut
-_WinAPI_TextOut
-_WinAPI_AngleArc
-_WinAPI_Arc
-_WinAPI_ArcTo
-_WinAPI_DrawLine
-_WinAPI_GetArcDirection
-_WinAPI_LineDDA
-_WinAPI_LineTo
-_WinAPI_MoveTo
-_WinAPI_MoveToEx
-_WinAPI_PolyBezier
-_WinAPI_PolyBezierTo
-_WinAPI_PolyDraw
-_WinAPI_SetArcDirection
-_WinAPI_CloseEnhMetaFile
-_WinAPI_CopyEnhMetaFile
-_WinAPI_CreateEnhMetaFile
-_WinAPI_DeleteEnhMetaFile
-_WinAPI_GdiComment
-_WinAPI_GetEnhMetaFile
-_WinAPI_GetEnhMetaFileBits
-_WinAPI_GetEnhMetaFileDescription
-_WinAPI_GetEnhMetaFileDimension
-_WinAPI_GetEnhMetaFileHeader
-_WinAPI_PlayEnhMetaFile
-_WinAPI_SetEnhMetaFileBits
-_WinAPI_EnumDisplayMonitors
-_WinAPI_GetMonitorInfo
-_WinAPI_MonitorFromPoint
-_WinAPI_MonitorFromRect
-_WinAPI_MonitorFromWindow
-_WinAPI_BeginPaint
-_WinAPI_DrawAnimatedRects
-_WinAPI_DrawShadowText
-_WinAPI_EndPaint
-_WinAPI_GetBoundsRect
-_WinAPI_GetROP2
-_WinAPI_GetUpdateRect
-_WinAPI_GetUpdateRgn
-_WinAPI_GetWindowRgnBox
-_WinAPI_InvalidateRgn
-_WinAPI_LockWindowUpdate
-_WinAPI_PaintDesktop
-_WinAPI_SetBoundsRect
-_WinAPI_SetROP2
-_WinAPI_ValidateRect
-_WinAPI_ValidateRgn
-_WinAPI_WindowFromDC
-_WinAPI_AbortPath
-_WinAPI_BeginPath
-_WinAPI_CloseFigure
-_WinAPI_EndPath
-_WinAPI_FillPath
-_WinAPI_FlattenPath
-_WinAPI_PathToRegion
-_WinAPI_StrokeAndFillPath
-_WinAPI_StrokePath
-_WinAPI_WidenPath
-_WinAPI_CopyRect
-_WinAPI_DrawFocusRect
-_WinAPI_EqualRect
-_WinAPI_InflateRect
-_WinAPI_IntersectRect
-_WinAPI_IsRectEmpty
-_WinAPI_OffsetRect
-_WinAPI_PtInRect
-_WinAPI_PtInRectEx
-_WinAPI_RectIsEmpty
-_WinAPI_SubtractRect
-_WinAPI_UnionRect
-_WinAPI_CombineRgn
-_WinAPI_CreateEllipticRgn
-_WinAPI_CreateNullRgn
-_WinAPI_CreatePolygonRgn
-_WinAPI_CreateRectRgn
-_WinAPI_CreateRectRgnIndirect
-_WinAPI_CreateRoundRectRgn
-_WinAPI_EqualRgn
-_WinAPI_ExtCreateRegion
-_WinAPI_FillRgn
-_WinAPI_FrameRgn
-_WinAPI_GetPolyFillMode
-_WinAPI_GetRegionData
-_WinAPI_GetRgnBox
-_WinAPI_GetWindowRgn
-_WinAPI_InvertRgn
-_WinAPI_OffsetRgn
-_WinAPI_PaintRgn
-_WinAPI_PtInRegion
-_WinAPI_RectInRegion
-_WinAPI_RedrawWindow
-_WinAPI_SetPolyFillMode
-_WinAPI_SetRectRgn
-_WinAPI_SetWindowRgn
-_WinAPI_Ellipse
-_WinAPI_InvertRect
-_WinAPI_Polygon
-_WinAPI_Rectangle
-_WinAPI_RoundRect
-_WinAPI_CloseHandle
-_WinAPI_DeleteObject
-_WinAPI_DuplicateHandle
-_WinAPI_GetCurrentObject
-_WinAPI_GetCurrentProcess
-_WinAPI_GetObject
-_WinAPI_GetObjectInfoByHandle
-_WinAPI_GetObjectNameByHandle
-_WinAPI_GetObjectType
-_WinAPI_GetStdHandle
-_WinAPI_GetStockObject
-_WinAPI_SelectObject
-_WinAPI_SetHandleInformation
-_WinAPI_CompareString
-_WinAPI_CreateNumberFormatInfo
-_WinAPI_EnumSystemGeoID
-_WinAPI_EnumSystemLocales
-_WinAPI_EnumUILanguages
-_WinAPI_GetDateFormat
-_WinAPI_GetDurationFormat
-_WinAPI_GetGeoInfo
-_WinAPI_GetLocaleInfo
-_WinAPI_GetNumberFormat
-_WinAPI_GetSystemDefaultLangID
-_WinAPI_GetSystemDefaultLCID
-_WinAPI_GetSystemDefaultUILanguage
-_WinAPI_GetThreadLocale
-_WinAPI_GetThreadUILanguage
-_WinAPI_GetTimeFormat
-_WinAPI_GetUserDefaultLangID
-_WinAPI_GetUserDefaultLCID
-_WinAPI_GetUserDefaultUILanguage
-_WinAPI_GetUserGeoID
-_WinAPI_IsValidLocale
-_WinAPI_SetLocaleInfo
-_WinAPI_SetThreadLocale
-_WinAPI_SetThreadUILanguage
-_WinAPI_SetUserGeoID
-_WinAPI_CreateCaret
-_WinAPI_DestroyCaret
-_WinAPI_GetCaretBlinkTime
-_WinAPI_GetCaretPos
-_WinAPI_HideCaret
-_WinAPI_SetCaretBlinkTime
-_WinAPI_SetCaretPos
-_WinAPI_ShowCaret
-_WinAPI_ClipCursor
-_WinAPI_CopyCursor
-_WinAPI_DestroyCursor
-_WinAPI_GetClipCursor
-_WinAPI_GetCursor
-_WinAPI_GetCursorInfo
-_WinAPI_LoadCursor
-_WinAPI_LoadCursorFromFile
-_WinAPI_SetCursor
-_WinAPI_SetSystemCursor
-_WinAPI_ShowCursor
-_WinAPI_AddIconTransparency
-_WinAPI_CopyIcon
-_WinAPI_Create32BitHICON
-_WinAPI_CreateEmptyIcon
-_WinAPI_CreateIcon
-_WinAPI_CreateIconFromResourceEx
-_WinAPI_CreateIconIndirect
-_WinAPI_DestroyIcon
-_WinAPI_ExtractIcon
-_WinAPI_ExtractIconEx
-_WinAPI_FileIconInit
-_WinAPI_GetIconDimension
-_WinAPI_GetIconInfo
-_WinAPI_GetIconInfoEx
-_WinAPI_LoadIcon
-_WinAPI_LoadIconMetric
-_WinAPI_LoadIconWithScaleDown
-_WinAPI_LoadShell32Icon
-_WinAPI_LookupIconIdFromDirectoryEx
-_WinAPI_MirrorIcon
-_WinAPI_BeginUpdateResource
-_WinAPI_EndUpdateResource
-_WinAPI_EnumResourceLanguages
-_WinAPI_EnumResourceNames
-_WinAPI_EnumResourceTypes
-_WinAPI_FindResource
-_WinAPI_FindResourceEx
-_WinAPI_FreeLibrary
-_WinAPI_FreeResource
-_WinAPI_GetFileVersionInfo
-_WinAPI_LoadBitmap
-_WinAPI_LoadImage
-_WinAPI_LoadIndirectString
-_WinAPI_LoadLibrary
-_WinAPI_LoadLibraryEx
-_WinAPI_LoadResource
-_WinAPI_LoadString
-_WinAPI_LoadStringEx
-_WinAPI_LockResource
-_WinAPI_SizeOfResource
-_WinAPI_UpdateResource
-_WinAPI_VerQueryRoot
-_WinAPI_VerQueryValue
-_WinAPI_VerQueryValueEx
-_WinAPI_MulDiv
-_WinAPI_StringLenA
-_WinAPI_StringLenW
-_WinAPI_GetExtended
-_WinAPI_GetString
-_WinAPI_StrLen
-_WinAPI_AdjustTokenPrivileges
-_WinAPI_AssignProcessToJobObject
-_WinAPI_AttachConsole
-_WinAPI_AttachThreadInput
-_WinAPI_CreateJobObject
-_WinAPI_CreateProcess
-_WinAPI_CreateProcessWithToken
-_WinAPI_DuplicateTokenEx
-_WinAPI_EmptyWorkingSet
-_WinAPI_EnumChildProcess
-_WinAPI_EnumDeviceDrivers
-_WinAPI_EnumProcessHandles
-_WinAPI_EnumProcessModules
-_WinAPI_EnumProcessThreads
-_WinAPI_EnumProcessWindows
-_WinAPI_FatalAppExit
-_WinAPI_GetCurrentProcessExplicitAppUserModelID
-_WinAPI_GetCurrentProcessID
-_WinAPI_GetCurrentThread
-_WinAPI_GetCurrentThreadId
-_WinAPI_GetDeviceDriverBaseName
-_WinAPI_GetDeviceDriverFileName
-_WinAPI_GetExitCodeProcess
-_WinAPI_GetGuiResources
-_WinAPI_GetModuleFileNameEx
-_WinAPI_GetModuleInformation
-_WinAPI_GetPriorityClass
-_WinAPI_GetProcessAffinityMask
-_WinAPI_GetProcessCommandLine
-_WinAPI_GetProcessFileName
-_WinAPI_GetProcessHandleCount
-_WinAPI_GetProcessID
-_WinAPI_GetProcessIoCounters
-_WinAPI_GetProcessMemoryInfo
-_WinAPI_GetProcessName
-_WinAPI_GetProcessTimes
-_WinAPI_GetProcessUser
-_WinAPI_GetProcessWorkingDirectory
-_WinAPI_GetThreadDesktop
-_WinAPI_GetThreadErrorMode
-_WinAPI_IsElevated
-_WinAPI_IsProcessInJob
-_WinAPI_IsWow64Process
-_WinAPI_OpenJobObject
-_WinAPI_OpenProcess
-_WinAPI_OpenProcessToken
-_WinAPI_QueryInformationJobObject
-_WinAPI_SetInformationJobObject
-_WinAPI_SetPriorityClass
-_WinAPI_SetProcessAffinityMask
-_WinAPI_SetThreadDesktop
-_WinAPI_SetThreadErrorMode
-_WinAPI_SetThreadExecutionState
-_WinAPI_TerminateJobObject
-_WinAPI_TerminateProcess
-_WinAPI_UserHandleGrantAccess
-_WinAPI_WriteConsole
-_WinAPI_CreateEvent
-_WinAPI_CreateMutex
-_WinAPI_CreateSemaphore
-_WinAPI_OpenMutex
-_WinAPI_OpenSemaphore
-_WinAPI_ReleaseMutex
-_WinAPI_ReleaseSemaphore
-_WinAPI_ResetEvent
-_WinAPI_SetEvent
-_WinAPI_WaitForInputIdle
-_WinAPI_WaitForMultipleObjects
-_WinAPI_WaitForSingleObject
-_WinAPI_AddMRUString
-_WinAPI_AssocGetPerceivedType
-_WinAPI_AssocQueryString
-_WinAPI_CreateMRUList
-_WinAPI_DllInstall
-_WinAPI_DllUninstall
-_WinAPI_EnumMRUList
-_WinAPI_FreeMRUList
-_WinAPI_GetRegKeyNameByHandle
-_WinAPI_RegCloseKey
-_WinAPI_RegConnectRegistry
-_WinAPI_RegCopyTree
-_WinAPI_RegCopyTreeEx
-_WinAPI_RegCreateKey
-_WinAPI_RegDeleteEmptyKey
-_WinAPI_RegDeleteKey
-_WinAPI_RegDeleteKeyValue
-_WinAPI_RegDeleteTree
-_WinAPI_RegDeleteTreeEx
-_WinAPI_RegDeleteValue
-_WinAPI_RegDisableReflectionKey
-_WinAPI_RegDuplicateHKey
-_WinAPI_RegEnableReflectionKey
-_WinAPI_RegEnumKey
-_WinAPI_RegEnumValue
-_WinAPI_RegFlushKey
-_WinAPI_RegLoadMUIString
-_WinAPI_RegNotifyChangeKeyValue
-_WinAPI_RegOpenKey
-_WinAPI_RegQueryInfoKey
-_WinAPI_RegQueryLastWriteTime
-_WinAPI_RegQueryMultipleValues
-_WinAPI_RegQueryReflectionKey
-_WinAPI_RegQueryValue
-_WinAPI_RegRestoreKey
-_WinAPI_RegSaveKey
-_WinAPI_RegSetValue
-_WinAPI_SfcIsKeyProtected
-_WinAPI_DefSubclassProc
-_WinAPI_DllGetVersion
-_WinAPI_FindExecutable
-_WinAPI_GetAllUsersProfileDirectory
-_WinAPI_GetDefaultUserProfileDirectory
-_WinAPI_GetWindowSubclass
-_WinAPI_RemoveWindowSubclass
-_WinAPI_SetCurrentProcessExplicitAppUserModelID
-_WinAPI_SetWindowSubclass
-_WinAPI_ShellAddToRecentDocs
-_WinAPI_ShellChangeNotify
-_WinAPI_ShellChangeNotifyDeregister
-_WinAPI_ShellChangeNotifyRegister
-_WinAPI_ShellCreateDirectory
-_WinAPI_ShellEmptyRecycleBin
-_WinAPI_ShellExecute
-_WinAPI_ShellExecuteEx
-_WinAPI_ShellExtractAssociatedIcon
-_WinAPI_ShellExtractIcon
-_WinAPI_ShellFileOperation
-_WinAPI_ShellFlushSFCache
-_WinAPI_ShellGetFileInfo
-_WinAPI_ShellGetIconOverlayIndex
-_WinAPI_ShellGetKnownFolderIDList
-_WinAPI_ShellGetKnownFolderPath
-_WinAPI_ShellGetLocalizedName
-_WinAPI_ShellGetPathFromIDList
-_WinAPI_ShellGetSetFolderCustomSettings
-_WinAPI_ShellGetSettings
-_WinAPI_ShellGetSpecialFolderLocation
-_WinAPI_ShellGetSpecialFolderPath
-_WinAPI_ShellGetStockIconInfo
-_WinAPI_ShellILCreateFromPath
-_WinAPI_ShellNotifyIcon
-_WinAPI_ShellNotifyIconGetRect
-_WinAPI_ShellObjectProperties
-_WinAPI_ShellOpenFolderAndSelectItems
-_WinAPI_ShellQueryRecycleBin
-_WinAPI_ShellQueryUserNotificationState
-_WinAPI_ShellRemoveLocalizedName
-_WinAPI_ShellRestricted
-_WinAPI_ShellSetKnownFolderPath
-_WinAPI_ShellSetLocalizedName
-_WinAPI_ShellSetSettings
-_WinAPI_ShellUpdateImage
-_WinAPI_CommandLineToArgv
-_WinAPI_IsNameInExpression
-_WinAPI_ParseURL
-_WinAPI_ParseUserName
-_WinAPI_PathAddBackslash
-_WinAPI_PathAddExtension
-_WinAPI_PathAppend
-_WinAPI_PathBuildRoot
-_WinAPI_PathCanonicalize
-_WinAPI_PathCommonPrefix
-_WinAPI_PathCompactPath
-_WinAPI_PathCompactPathEx
-_WinAPI_PathCreateFromUrl
-_WinAPI_PathFindExtension
-_WinAPI_PathFindFileName
-_WinAPI_PathFindNextComponent
-_WinAPI_PathFindOnPath
-_WinAPI_PathGetArgs
-_WinAPI_PathGetCharType
-_WinAPI_PathGetDriveNumber
-_WinAPI_PathIsContentType
-_WinAPI_PathIsExe
-_WinAPI_PathIsFileSpec
-_WinAPI_PathIsLFNFileSpec
-_WinAPI_PathIsRelative
-_WinAPI_PathIsRoot
-_WinAPI_PathIsSameRoot
-_WinAPI_PathIsSystemFolder
-_WinAPI_PathIsUNC
-_WinAPI_PathIsUNCServer
-_WinAPI_PathIsUNCServerShare
-_WinAPI_PathMakeSystemFolder
-_WinAPI_PathMatchSpec
-_WinAPI_PathParseIconLocation
-_WinAPI_PathRelativePathTo
-_WinAPI_PathRemoveArgs
-_WinAPI_PathRemoveBackslash
-_WinAPI_PathRemoveExtension
-_WinAPI_PathRemoveFileSpec
-_WinAPI_PathRenameExtension
-_WinAPI_PathSearchAndQualify
-_WinAPI_PathSkipRoot
-_WinAPI_PathStripPath
-_WinAPI_PathStripToRoot
-_WinAPI_PathUndecorate
-_WinAPI_PathUnExpandEnvStrings
-_WinAPI_PathUnmakeSystemFolder
-_WinAPI_PathUnquoteSpaces
-_WinAPI_PathYetAnotherMakeUniqueName
-_WinAPI_ShellGetImageList
-_WinAPI_UrlApplyScheme
-_WinAPI_UrlCanonicalize
-_WinAPI_UrlCombine
-_WinAPI_UrlCompare
-_WinAPI_UrlCreateFromPath
-_WinAPI_UrlFixup
-_WinAPI_UrlGetPart
-_WinAPI_UrlHash
-_WinAPI_UrlIs
-_WinAPI_LockWorkStation
-_WinAPI_ShutdownBlockReasonCreate
-_WinAPI_ShutdownBlockReasonDestroy
-_WinAPI_ShutdownBlockReasonQuery
-_WinAPI_CallNextHookEx
-_WinAPI_SetWindowsHookEx
-_WinAPI_SetWinEventHook
-_WinAPI_UnhookWindowsHookEx
-_WinAPI_UnhookWinEvent
-_WinAPI_CompressBuffer
-_WinAPI_ComputeCrc32
-_WinAPI_DecompressBuffer
-_WinAPI_AddClipboardFormatListener
-_WinAPI_GetClipboardSequenceNumber
-_WinAPI_RemoveClipboardFormatListener
-_WinAPI_GetEffectiveClientRect
-_WinAPI_GetMUILanguage
-_WinAPI_InitMUILanguage
-_WinAPI_GetDllDirectory
-_WinAPI_GetModuleHandle
-_WinAPI_GetModuleHandleEx
-_WinAPI_GetProcAddress
-_WinAPI_SetDllDirectory
-_WinAPI_CreateBuffer
-_WinAPI_CreateBufferFromStruct
-_WinAPI_CreateString
-_WinAPI_EqualMemory
-_WinAPI_FillMemory
-_WinAPI_FreeMemory
-_WinAPI_GetMemorySize
-_WinAPI_GlobalMemoryStatus
-_WinAPI_IsBadCodePtr
-_WinAPI_IsBadReadPtr
-_WinAPI_IsBadStringPtr
-_WinAPI_IsBadWritePtr
-_WinAPI_IsMemory
-_WinAPI_LocalFree
-_WinAPI_MoveMemory
-_WinAPI_ReadProcessMemory
-_WinAPI_WriteProcessMemory
-_WinAPI_ZeroMemory
-_WinAPI_GetDefaultPrinter
-_WinAPI_GetPwrCapabilities
-_WinAPI_GetSystemPowerStatus
-_WinAPI_RegisterPowerSettingNotification
-_WinAPI_SetDefaultPrinter
-_WinAPI_UnregisterPowerSettingNotification
-_WinAPI_CloseDesktop
-_WinAPI_CloseWindowStation
-_WinAPI_CreateDesktop
-_WinAPI_CreateWindowStation
-_WinAPI_EnumDesktops
-_WinAPI_EnumDesktopWindows
-_WinAPI_EnumWindowStations
-_WinAPI_GetProcessWindowStation
-_WinAPI_GetUserObjectInformation
-_WinAPI_OpenDesktop
-_WinAPI_OpenInputDesktop
-_WinAPI_OpenWindowStation
-_WinAPI_SetProcessWindowStation
-_WinAPI_SetUserObjectInformation
-_WinAPI_SwitchDesktop
-_WinAPI_EnumPageFiles
-_WinAPI_ExpandEnvironmentStrings
-_WinAPI_GetCurrentHwProfile
-_WinAPI_GetHandleInformation
-_WinAPI_GetPerformanceInfo
-_WinAPI_GetPhysicallyInstalledSystemMemory
-_WinAPI_GetProcessShutdownParameters
-_WinAPI_GetStartupInfo
-_WinAPI_GetSystemDEPPolicy
-_WinAPI_GetSystemInfo
-_WinAPI_GetSystemMetrics
-_WinAPI_GetSystemTimes
-_WinAPI_GetSystemWow64Directory
-_WinAPI_GetTickCount
-_WinAPI_GetTickCount64
-_WinAPI_GetVersion
-_WinAPI_GetVersionEx
-_WinAPI_GetWorkArea
-_WinAPI_IsProcessorFeaturePresent
-_WinAPI_QueryPerformanceCounter
-_WinAPI_QueryPerformanceFrequency
-_WinAPI_SetProcessShutdownParameters
-_WinAPI_SystemParametersInfo
-_WinAPI_ActivateKeyboardLayout
-_WinAPI_EnableWindow
-_WinAPI_GetActiveWindow
-_WinAPI_GetAsyncKeyState
-_WinAPI_GetIdleTime
-_WinAPI_GetKeyboardLayout
-_WinAPI_GetKeyboardLayoutList
-_WinAPI_GetKeyboardState
-_WinAPI_GetKeyboardType
-_WinAPI_GetKeyNameText
-_WinAPI_GetKeyState
-_WinAPI_IsLoadKBLayout
-_WinAPI_Keybd_Event
-_WinAPI_LoadKeyboardLayout
-_WinAPI_MapVirtualKey
-_WinAPI_RegisterHotKey
-_WinAPI_SetActiveWindow
-_WinAPI_SetKeyboardLayout
-_WinAPI_SetKeyboardState
-_WinAPI_TrackMouseEvent
-_WinAPI_UnloadKeyboardLayout
-_WinAPI_UnregisterHotKey
-_WinAPI_Mouse_Event
-_WinAPI_ReleaseCapture
-_WinAPI_SetCapture
-_WinAPI_DefRawInputProc
-_WinAPI_EnumRawInputDevices
-_WinAPI_GetRawInputBuffer
-_WinAPI_GetRawInputBufferLength
-_WinAPI_GetRawInputData
-_WinAPI_GetRawInputDeviceInfo
-_WinAPI_GetRegisteredRawInputDevices
-_WinAPI_RegisterRawInputDevices
-_WinAPI_AdjustWindowRectEx
-_WinAPI_AnimateWindow
-_WinAPI_BeginDeferWindowPos
-_WinAPI_BringWindowToTop
-_WinAPI_BroadcastSystemMessage
-_WinAPI_CallWindowProc
-_WinAPI_CallWindowProcW
-_WinAPI_CascadeWindows
-_WinAPI_ChangeWindowMessageFilterEx
-_WinAPI_ChildWindowFromPointEx
-_WinAPI_CloseWindow
-_WinAPI_CreateWindowEx
-_WinAPI_DeferWindowPos
-_WinAPI_DefWindowProc
-_WinAPI_DefWindowProcW
-_WinAPI_DeregisterShellHookWindow
-_WinAPI_DestroyWindow
-_WinAPI_DragAcceptFiles
-_WinAPI_DragFinish
-_WinAPI_DragQueryFileEx
-_WinAPI_DragQueryPoint
-_WinAPI_EndDeferWindowPos
-_WinAPI_EnumChildWindows
-_WinAPI_EnumWindows
-_WinAPI_EnumWindowsPopup
-_WinAPI_EnumWindowsTop
-_WinAPI_FindWindow
-_WinAPI_FlashWindow
-_WinAPI_FlashWindowEx
-_WinAPI_GetAncestor
-_WinAPI_GetClassInfoEx
-_WinAPI_GetClassLongEx
-_WinAPI_GetClassName
-_WinAPI_GetClientHeight
-_WinAPI_GetClientRect
-_WinAPI_GetClientWidth
-_WinAPI_GetDesktopWindow
-_WinAPI_GetDlgItem
-_WinAPI_GetFocus
-_WinAPI_GetForegroundWindow
-_WinAPI_GetGUIThreadInfo
-_WinAPI_GetLastActivePopup
-_WinAPI_GetLayeredWindowAttributes
-_WinAPI_GetMessageExtraInfo
-_WinAPI_GetParent
-_WinAPI_GetParentProcess
-_WinAPI_GetShellWindow
-_WinAPI_GetSysColor
-_WinAPI_GetTopWindow
-_WinAPI_GetWindow
-_WinAPI_GetWindowDC
-_WinAPI_GetWindowDisplayAffinity
-_WinAPI_GetWindowExt
-_WinAPI_GetWindowFileName
-_WinAPI_GetWindowHeight
-_WinAPI_GetWindowInfo
-_WinAPI_GetWindowLong
-_WinAPI_GetWindowOrg
-_WinAPI_GetWindowPlacement
-_WinAPI_GetWindowRect
-_WinAPI_GetWindowText
-_WinAPI_GetWindowThreadProcessId
-_WinAPI_GetWindowWidth
-_WinAPI_InProcess
-_WinAPI_InvalidateRect
-_WinAPI_IsChild
-_WinAPI_IsClassName
-_WinAPI_IsHungAppWindow
-_WinAPI_IsIconic
-_WinAPI_IsWindow
-_WinAPI_IsWindowEnabled
-_WinAPI_IsWindowUnicode
-_WinAPI_IsWindowVisible
-_WinAPI_IsZoomed
-_WinAPI_KillTimer
-_WinAPI_MoveWindow
-_WinAPI_OpenIcon
-_WinAPI_PostMessage
-_WinAPI_RegisterClass
-_WinAPI_RegisterClassEx
-_WinAPI_RegisterShellHookWindow
-_WinAPI_RegisterWindowMessage
-_WinAPI_SendMessageTimeout
-_WinAPI_SetClassLongEx
-_WinAPI_SetFocus
-_WinAPI_SetFont
-_WinAPI_SetForegroundWindow
-_WinAPI_SetLayeredWindowAttributes
-_WinAPI_SetMessageExtraInfo
-_WinAPI_SetParent
-_WinAPI_SetSysColors
-_WinAPI_SetTimer
-_WinAPI_SetWindowDisplayAffinity
-_WinAPI_SetWindowLong
-_WinAPI_SetWindowPlacement
-_WinAPI_SetWindowPos
-_WinAPI_SetWindowText
-_WinAPI_ShowOwnedPopups
-_WinAPI_ShowWindow
-_WinAPI_SwitchToThisWindow
-_WinAPI_TileWindows
-_WinAPI_UnregisterClass
-_WinAPI_UpdateLayeredWindow
-_WinAPI_UpdateLayeredWindowEx
-_WinAPI_UpdateLayeredWindowIndirect
-_WinAPI_UpdateWindow
-_WinAPI_WindowFromPoint
-_WinAPI_BeginBufferedPaint
-_WinAPI_BufferedPaintClear
-_WinAPI_BufferedPaintInit
-_WinAPI_BufferedPaintSetAlpha
-_WinAPI_BufferedPaintUnInit
-_WinAPI_CloseThemeData
-_WinAPI_DrawThemeBackground
-_WinAPI_DrawThemeEdge
-_WinAPI_DrawThemeIcon
-_WinAPI_DrawThemeParentBackground
-_WinAPI_DrawThemeText
-_WinAPI_DrawThemeTextEx
-_WinAPI_EndBufferedPaint
-_WinAPI_GetBufferedPaintBits
-_WinAPI_GetBufferedPaintDC
-_WinAPI_GetBufferedPaintTargetDC
-_WinAPI_GetBufferedPaintTargetRect
-_WinAPI_GetCurrentThemeName
-_WinAPI_GetThemeAppProperties
-_WinAPI_GetThemeBackgroundContentRect
-_WinAPI_GetThemeBackgroundExtent
-_WinAPI_GetThemeBackgroundRegion
-_WinAPI_GetThemeBitmap
-_WinAPI_GetThemeBool
-_WinAPI_GetThemeColor
-_WinAPI_GetThemeDocumentationProperty
-_WinAPI_GetThemeEnumValue
-_WinAPI_GetThemeFilename
-_WinAPI_GetThemeFont
-_WinAPI_GetThemeInt
-_WinAPI_GetThemeMargins
-_WinAPI_GetThemeMetric
-_WinAPI_GetThemePartSize
-_WinAPI_GetThemePosition
-_WinAPI_GetThemePropertyOrigin
-_WinAPI_GetThemeRect
-_WinAPI_GetThemeString
-_WinAPI_GetThemeSysBool
-_WinAPI_GetThemeSysColor
-_WinAPI_GetThemeSysColorBrush
-_WinAPI_GetThemeSysFont
-_WinAPI_GetThemeSysInt
-_WinAPI_GetThemeSysSize
-_WinAPI_GetThemeSysString
-_WinAPI_GetThemeTextExtent
-_WinAPI_GetThemeTextMetrics
-_WinAPI_GetThemeTransitionDuration
-_WinAPI_GetWindowTheme
-_WinAPI_IsThemeActive
-_WinAPI_IsThemeBackgroundPartiallyTransparent
-_WinAPI_IsThemePartDefined
-_WinAPI_OpenThemeData
-_WinAPI_SetThemeAppProperties
-_WinAPI_SetWindowTheme
-_WinNet_AddConnection
-_WinNet_AddConnection2
-_WinNet_AddConnection3
-_WinNet_CancelConnection
-_WinNet_CancelConnection2
-_WinNet_CloseEnum
-_WinNet_ConnectionDialog
-_WinNet_ConnectionDialog1
-_WinNet_DisconnectDialog
-_WinNet_DisconnectDialog1
-_WinNet_EnumResource
-_WinNet_GetConnection
-_WinNet_GetConnectionPerformance
-_WinNet_GetLastError
-_WinNet_GetNetworkInformation
-_WinNet_GetProviderName
-_WinNet_GetResourceInformation
-_WinNet_GetResourceParent
-_WinNet_GetUniversalName
-_WinNet_GetUser
-_WinNet_OpenEnum
-_WinNet_RestoreConnection
-_WinNet_UseConnection
-_Word_Create
-_Word_DocAdd
-_Word_DocAttach
-_Word_DocClose
-_Word_DocExport
-_Word_DocFind
-_Word_DocFindReplace
-_Word_DocGet
-_Word_DocLinkAdd
-_Word_DocLinkGet
-_Word_DocOpen
-_Word_DocPictureAdd
-_Word_DocPrint
-_Word_DocRangeSet
-_Word_DocSave
-_Word_DocSaveAs
-_Word_DocTableRead
-_Word_DocTableWrite
-_Word_Quit
+;! user defined functions	===================================================
+; https://www.autoitscript.com/autoit3/docs/libfunctions.htm
+#Region ; Array
+#include <Array.au3>
+_Array1DToHistogram($aArray [, $iSizing = 100])
+_Array2DCreate($aArray1, $aArray2)
+_ArrayAdd(ByRef $aArray, $vValue [, $iStart = 0 [, $sDelim_Item = "|" [, $sDelim_Row = @CRLF [, $iForce = $ARRAYFILL_FORCE_DEFAULT]]]])
+_ArrayBinarySearch(Const ByRef $aArray, $vValue [, $iStart = 0 [, $iEnd = 0 [, $iColumn = 0]]])
+_ArrayColDelete(ByRef $aArray, $iColumn [, $bConvert = False])
+_ArrayColInsert(ByRef $aArray, $iColumn)
+_ArrayCombinations(Const ByRef $aArray, $iSet [, $sDelimiter = ""])
+_ArrayConcatenate(ByRef $aArrayTarget, Const ByRef $aArraySource [, $iStart = 0])
+_ArrayDelete(ByRef $aArray, $vRange)
+_ArrayDisplay(Const ByRef $aArray [, $sTitle = "ArrayDisplay" [, $sArrayRange = "" [, $iFlags = 0 [, $vUser_Separator = Default [, $sHeader = Default [, $iDesired_Colwidth = Default]]]]]])
+_ArrayExtract(Const ByRef $aArray [, $iStart_Row = -1 [, $iEnd_Row = -1 [, $iStart_Col = -1 [, $iEnd_Col = -1]]]])
+_ArrayFindAll(Const ByRef $aArray, $vValue [, $iStart = 0 [, $iEnd = 0 [, $iCase = 0 [, $iCompare = 0 [, $iSubItem = 0 [, $bRow = False]]]]]])
+_ArrayFromString($sArrayStr [, $sDelim_Col = "|" [, $sDelim_Row = @CRLF [, $bForce2D = False [, $iStripWS = $STR_STRIPLEADING + $STR_STRIPTRAILING]]]])
+_ArrayInsert(ByRef $aArray, $vRange [, $vValue = "" [, $iStart = 0 [, $sDelim_Item = "|" [, $sDelim_Row = @CRLF [, $iForce = $ARRAYFILL_FORCE_DEFAULT]]]]])
+_ArrayMax(Const ByRef $aArray [, $iCompNumeric = 0 [, $iStart = -1 [, $iEnd = -1 [, $iSubItem = 0]]]])
+_ArrayMaxIndex(Const ByRef $aArray [, $iCompNumeric = 0 [, $iStart = -1 [, $iEnd = -1 [, $iSubItem = 0]]]])
+_ArrayMin(Const ByRef $aArray [, $iCompNumeric = 0 [, $iStart = -1 [, $iEnd = -1 [, $iSubItem = 0]]]])
+_ArrayMinIndex(Const ByRef $aArray [, $iCompNumeric = 0 [, $iStart = -1 [, $iEnd = -1 [, $iSubItem = 0]]]])
+_ArrayPermute(ByRef $aArray [, $sDelimiter = ""])
+_ArrayPop(ByRef $aArray)
+_ArrayPush(ByRef $aArray, $vValue [, $iDirection = 0])
+_ArrayReverse(ByRef $aArray [, $iStart = 0 [, $iEnd = 0]])
+_ArraySearch(Const ByRef $aArray, $vValue [, $iStart = 0 [, $iEnd = 0 [, $iCase = 0 [, $iCompare = 0 [, $iForward = 1 [, $iSubItem = -1 [, $bRow = False]]]]]]])
+_ArrayShuffle(ByRef $aArray [, $iStart_Row = 0 [, $iEnd_Row = 0 [, $iCol = -1]]])
+_ArraySort(ByRef $aArray [, $iDescending = 0 [, $iStart = 0 [, $iEnd = 0 [, $iSubItem = 0 [, $iPivot = 0]]]]])
+_ArraySwap(Const ByRef $aArray [, $sDelim_Col = "|" [, $iStart_Row = -1 [, $iEnd_Row = -1 [, $sDelim_Row = @CRLF [, $iStart_Col = -1 [, $iEnd_Col = -1]]]]]])
+_ArrayToClip(Const ByRef $aArray [, $sDelim_Col = "|" [, $iStart_Row = Default [, $iEnd_Row = Default [, $sDelim_Row = @CRLF [, $iStart_Col = Default [, $iEnd_Col = Default]]]]]])
+_ArrayToString(Const ByRef $aArray [, $sDelim_Col = "|" [, $iStart_Row = Default [, $iEnd_Row = Default [, $sDelim_Row = @CRLF [, $iStart_Col = Default [, $iEnd_Col = Default]]]]]])
+_ArrayTranspose(ByRef $aArray [, $bForce1D = False])
+_ArrayTrim(ByRef $aArray, $iTrimNum [, $iDirection = 0 [, $iStart = 0 [, $iEnd = 0 [, $iSubItem = 0]]]])
+_ArrayUnique(Const ByRef $aArray [, $iColumn = 0 [, $iBase = 0 [, $iCase = 0 [, $iCount = $ARRAYUNIQUE_COUNT [, $iIntType = $ARRAYUNIQUE_AUTO]]]]])
+#EndRegion
+#Region ; Clipboard
+#include <Clipboard.au3>
+_ClipBoard_ChangeChain($hRemove, $hNewNext)
+_ClipBoard_Close()
+_ClipBoard_CountFormats()
+_ClipBoard_Empty()
+_ClipBoard_EnumFormats($iFormat)
+_ClipBoard_FormatStr($iFormat)
+_ClipBoard_GetData([$iFormat = 1])
+_ClipBoard_GetDataEx([$iFormat = 1])
+_ClipBoard_GetFormatName($iFormat)
+_ClipBoard_GetOpenWindow()
+_ClipBoard_GetOwner()
+_ClipBoard_GetPriorityFormat($aFormats)
+_ClipBoard_GetSequenceNumber()
+_ClipBoard_GetViewer()
+_ClipBoard_IsFormatAvailable($iFormat)
+_ClipBoard_Open($hOwner)
+_ClipBoard_RegisterFormat($sFormat)
+_ClipBoard_SetData($vData [, $iFormat = 1])
+_ClipBoard_SetDataEx(ByRef $hMemory [, $iFormat = 1])
+_ClipBoard_SetViewer($hViewer)
+#EndRegion
+#Region ; Color
+#include <Color.au3>
+_ColorConvertHSLtoRGB($aArray)
+_ColorConvertRGBtoHSL($aArray)
+_ColorGetBlue($iColor)
+_ColorGetCOLORREF($iColor)
+_ColorGetGreen($iColor)
+_ColorGetRed($iColor)
+_ColorGetRGB($iColor)
+_ColorSetCOLORREF($aColor)
+_ColorSetRGB($aColor)
+#EndRegion
+#Region ; Crypt
+#include <Crypt.au3>
+_Crypt_DecryptData($vData, $vCryptKey, $iAlgID [, $bFinal = True])
+_Crypt_DecryptFile($sSourceFile, $sDestinationFile, $vCryptKey, $iAlgID)
+_Crypt_DeriveKey($vPassword, $iAlgID [, $iHashPasswordID = $CALG_MD5])
+_Crypt_DestroyKey($hCryptKey)
+_Crypt_EncryptData($vData, $vCryptKey, $iAlgID [, $bFinal = True])
+_Crypt_EncryptFile($sSourceFile, $sDestinationFile, $vCryptKey, $iAlgID)
+_Crypt_GenRandom($pBuffer, $iSize)
+_Crypt_HashData($vData, $iAlgID [, $bFinal = True [, $hCryptHash = 0]])
+_Crypt_HashFile($sFilePath, $iAlgID)
+_Crypt_Shutdown()
+_Crypt_Startup()
+#EndRegion
+#Region ; Date
+#include <Date.au3>
+_Date_Time_CompareFileTime($tFileTime1, $tFileTime2)
+_Date_Time_DOSDateTimeToArray($iDosDate, $iDosTime)
+_Date_Time_DOSDateTimeToFileTime($iFatDate, $iFatTime)
+_Date_Time_DOSDateTimeToStr($iDosDate, $iDosTime)
+_Date_Time_DOSDateToArray($iDosDate)
+_Date_Time_DOSDateToStr($iDosDate)
+_Date_Time_DOSTimeToArray($iDosTime)
+_Date_Time_DOSTimeToStr($iDosTime)
+_Date_Time_EncodeFileTime($iMonth, $iDay, $iYear [, $iHour = 0 [, $iMinute = 0 [, $iSecond = 0 [, $iMSeconds = 0]]]])
+_Date_Time_EncodeSystemTime($iMonth, $iDay, $iYear [, $iHour = 0 [, $iMinute = 0 [, $iSecond = 0 [, $iMSeconds = 0]]]])
+_Date_Time_FileTimeToArray(ByRef $tFileTime)
+_Date_Time_FileTimeToDOSDateTime($tFileTime)
+_Date_Time_FileTimeToLocalFileTime($tFileTime)
+_Date_Time_FileTimeToStr(ByRef $tFileTime [, $iFmt = 0])
+_Date_Time_FileTimeToSystemTime($tFileTime)
+_Date_Time_GetFileTime($hFile)
+_Date_Time_GetLocalTime()
+_Date_Time_GetSystemTime()
+_Date_Time_GetSystemTimeAdjustment()
+_Date_Time_GetSystemTimeAsFileTime()
+_Date_Time_GetSystemTimes()
+_Date_Time_GetTickCount()
+_Date_Time_GetTimeZoneInformation()
+_Date_Time_LocalFileTimeToFileTime($tLocalTime)
+_Date_Time_SetFileTime($hFile, $tCreateTime, $tLastAccess, $tLastWrite)
+_Date_Time_SetLocalTime($tSYSTEMTIME)
+_Date_Time_SetSystemTime($tSYSTEMTIME)
+_Date_Time_SetSystemTimeAdjustment($iAdjustment, $bDisabled)
+_Date_Time_SetTimeZoneInformation($iBias, $sStdName, $tStdDate, $iStdBias, $sDayName, $tDayDate, $iDayBias)
+_Date_Time_SystemTimeToArray(ByRef $tSYSTEMTIME)
+_Date_Time_SystemTimeToDateStr(ByRef $tSYSTEMTIME [, $iFmt = 0])
+_Date_Time_SystemTimeToDateTimeStr(ByRef $tSYSTEMTIME [, $iFmt = 0 [, $iType = 0]])
+_Date_Time_SystemTimeToFileTime($tSYSTEMTIME)
+_Date_Time_SystemTimeToTimeStr(ByRef $tSYSTEMTIME)
+_Date_Time_SystemTimeToTzSpecificLocalTime($tUTC [, $tTimeZone = 0])
+_Date_Time_TzSpecificLocalTimeToSystemTime($tLocalTime [, $tTimeZone = 0])
+_DateAdd($sType, $iNumber, $sDate)
+_DateDayOfWeek($iDayNum [, $iFormat = 0])
+_DateDaysInMonth($iYear, $iMonthNum)
+_DateDiff($sType, $sStartDate, $sEndDate)
+_DateIsLeapYear($iYear)
+_DateIsValid($sDate)
+_DateTimeFormat($sDate, $sType)
+_DateTimeSplit($sDate, ByRef $aDatePart, ByRef $aTimePart)
+_DateToDayOfWeek($iYear, $iMonth, $iDay)
+_DateToDayOfWeekISO($iYear, $iMonth, $iDay)
+_DateToDayValue($iYear, $iMonth, $iDay)
+_DateToMonth($iMonNum [, $iFormat = 0])
+_DayValueToDate($iJulianDate, ByRef $iYear, ByRef $iMonth, ByRef $iDay)
+_Now()
+_NowCalc()
+_NowCalcDate()
+_NowDate()
+_NowTime([$sType = 3])
+_SetDate($iDay [, $iMonth = 0 [, $iYear = 0]])
+_SetTime($iHour, $iMinute [, $iSecond = 0 [, $iMSeconds = 0]])
+_TicksToTime($iTicks, ByRef $iHours, ByRef $iMins, ByRef $iSecs)
+_TimeToTicks([$iHours = @HOUR [, $iMins = @MIN [, $iSecs = @SEC]]])
+_WeekNumberISO([$iYear = @YEAR [, $iMonth = @MON [, $iDay = @MDAY]]])
+#EndRegion
+#Region ; Debug
+#include <Debug.au3>
+_Assert($sCondition [, $bExit = True [, $iCode = 0x7FFFFFFF [, $sLine = @ScriptLineNumber]]])
+_DebugArrayDisplay(Const ByRef $aArray [, $sTitle = "DebugArray" [, $sArrayRange = "" [, $iFlags = 0 [, $vUser_Separator = Default [, $sHeader = Default [, $iDesired_Colwidth = Default [, $hUser_Function = ""]]]]]]])
+_DebugBugReportEnv([$iComDebug = 1 [, $bExit = False]])
+_DebugCOMError([$iComDebug = 1 [, $bExit = False]])
+_DebugOut($sOutput)
+_DebugReport($sData [, $bLastError = False [, $bExit = False]])
+_DebugReportEx($sData [, $bLastError = False [, $bExit = False]])
+_DebugReportVar($sVarName, $vVar [, $bErrExt = False [, $iDebugLineNumber = @ScriptLineNumber]])
+_DebugSetup([$sTitle = Default [, $bBugReportInfos = False [, $vReportType = 1 [, $sLogFile = "" [, $bTimeStamp = False]]]]])
+#EndRegion
+#Region ; EventLog
+#include <EventLog.au3>
+_EventLog__Backup($hEventLog, $sFileName)
+_EventLog__Clear($hEventLog, $sFileName)
+_EventLog__Close($hEventLog)
+_EventLog__Count($hEventLog)
+_EventLog__DeregisterSource($hEventLog)
+_EventLog__Full($hEventLog)
+_EventLog__Notify($hEventLog, $hEvent)
+_EventLog__Oldest($hEventLog)
+_EventLog__Open($sServerName, $sSourceName)
+_EventLog__OpenBackup($sServerName, $sFileName)
+_EventLog__Read($hEventLog [, $bRead = True [, $bForward = True [, $iOffset = 0]]])
+_EventLog__RegisterSource($sServerName, $sSourceName)
+_EventLog__Report($hEventLog, $iType, $iCategory, $iEventID, $sUserName, $sDesc, $aData)
+#EndRegion
+#Region ; Excel
+#include <Excel.au3>
+_Excel_BookAttach($sString [, $sMode = "FilePath" [, $oInstance = Default]])
+_Excel_BookClose($oWorkbook [, $bSave = True])
+_Excel_BookList([$oExcel = Default])
+_Excel_BookNew($oExcel [, $iSheets = Default])
+_Excel_BookOpen($oExcel, $sFilePath [, $bReadOnly = False [, $bVisible = True [, $sPassword = Default [, $sWritePassword = Default [, $bUpdateLinks = Default]]]]])
+_Excel_BookOpenText($oExcel, $sFilePath [, $iStartRow = 1 [, $iDataType = Default [, $sTextQualifier = $xlTextQualifierDoubleQuote [, $bConsecutiveDelimiter = False [, $sDelimiter = "," [, $aFieldInfo = "" [, $sDecimalSeparator = Default [, $sThousandsSeparator = Default [, $bTrailingMinusNumbers = True [, $iOrigin = Default]]]]]]]]]])
+_Excel_BookSave($oWorkbook)
+_Excel_BookSaveAs($oWorkbook, $sFilePath [, $iFormat = $xlWorkbookDefault [, $bOverWrite = False [, $sPassword = Default [, $sWritePassword = Default [, $bReadOnlyRecommended = False]]]]])
+_Excel_Close($oExcel [, $bSaveChanges = True [, $bForceClose = False]])
+_Excel_ColumnToLetter($iColumn)
+_Excel_ColumnToNumber($sColumn)
+_Excel_ConvertFormula($oExcel, $sFormula, $iFromStyle [, $iToStyle = Default [, $iToAbsolute = Default [, $vRelativeTo = Default]]])
+_Excel_Export($oExcel, $vObject, $sFileName [, $iType = $xlTypePDF [, $iQuality = $xlQualityStandard [, $bIncludeProperties = True [, $iFrom = Default [, $iTo = Default [, $bOpenAfterPublish = Default]]]]]])
+_Excel_FilterGet($oWorkbook [, $vWorksheet = Default])
+_Excel_FilterSet($oWorkbook, $vWorksheet, $vRange, $iField [, $sCriteria1 = Default [, $iOperator = Default [, $sCriteria2 = Default]]])
+_Excel_Open([$bVisible = True [, $bDisplayAlerts = False [, $bScreenUpdating = True [, $bInteractive = True [, $bForceNew = False]]]]])
+_Excel_PictureAdd($oWorkbook, $vWorksheet, $sFile, $vRangeOrLeft [, $iTop = Default [, $iWidth = Default [, $iHeight = Default [, $bKeepRatio = True]]]])
+_Excel_Print($oExcel, $vObject [, $iCopies = Default [, $sPrinter = Default [, $bPreview = Default [, $iFrom = Default [, $iTo = Default [, $bPrintToFile = Default [, $bCollate = Default [, $sPrToFileName = ""]]]]]]]])
+_Excel_RangeCopyPaste($oWorksheet, $vSourceRange [, $vTargetRange = Default [, $bCut = False [, $iPaste = Default [, $iOperation = Default [, $bSkipBlanks = False [, $bTranspose = False]]]]]])
+_Excel_RangeDelete($oWorksheet, $vRange [, $iShift = Default [, $iEntireRowCol = Default]])
+_Excel_RangeFind($oWorkbook, $sSearch [, $vRange = Default [, $iLookIn = $xlValues [, $iLookAt = $xlPart [, $bMatchcase = False]]]])
+_Excel_RangeInsert($oWorksheet, $vRange [, $iShift = Default [, $iCopyOrigin = Default]])
+_Excel_RangeLinkAddRemove($oWorkbook, $vWorksheet, $vRange, $sAddress [, $sSubAddress = Default [, $sScreenTip = Default [, $sTextToDisplay = Default]]])
+_Excel_RangeRead($oWorkbook [, $vWorksheet = Default [, $vRange = Default [, $iReturn = 1 [, $bForceFunc = False]]]])
+_Excel_RangeReplace($oWorkbook, $vWorksheet, $vRange, $sSearch, $sReplace [, $iLookAt = $xlPart [, $bMatchcase = False]])
+_Excel_RangeSort($oWorkbook, $vWorksheet, $vRange, $vKey1 [, $iOrder1 = $xlAscending [, $iSortText = $xlSortNormal [, $iHeader = $xlNo [, $bMatchcase = False [, $iOrientation = $xlSortRows [, $vKey2 = Default [, $iOrder2 = Default [, $vKey3 = Default [, $iOrder3 = Default]]]]]]]]])
+_Excel_RangeValidate($oWorkbook, $vWorksheet, $vRange, $iType, $sFormula1 [, $iOperator = Default [, $sFormula2 = Default [, $bIgnoreBlank = True [, $iAlertStyle = $xlValidAlertStop [, $sErrorMessage = Default [, $sInputMessage = Default]]]]]])
+_Excel_RangeWrite($oWorkbook, $vWorksheet, $vValue [, $vRange = "A1" [, $bValue = True [, $bForceFunc = False]]])
+_Excel_SheetAdd($oWorkbook [, $vSheet = Default [, $bBefore = True [, $iCount = 1 [, $sName = ""]]]])
+_Excel_SheetCopyMove($oSourceBook [, $vSourceSheet = Default [, $oTargetBook = $oSourceBook [, $vTargetSheet = 1 [, $bBefore = True [, $bCopy = True]]]]])
+_Excel_SheetDelete($oWorkbook [, $vSheet = Default])
+_Excel_SheetList($oWorkbook)
+#EndRegion
+#Region ; File
+#include <File.au3>
+_FileCountLines($sFilePath)
+_FileCreate($sFilePath)
+_FileListToArray($sFilePath [, $sFilter = "*" [, $iFlag = $FLTA_FILESFOLDERS [, $bReturnPath = False]]])
+_FileListToArrayRec($sFilePath [, $sMask = "*" [, $iReturn = $FLTAR_FILESFOLDERS [, $iRecur = $FLTAR_NORECUR [, $iSort = $FLTAR_NOSORT [, $iReturnPath = $FLTAR_RELPATH]]]]])
+_FilePrint($sFilePath [, $iShow = @SW_HIDE])
+_FileReadToArray($sFilePath, ByRef $vReturn [, $iFlags = $FRTA_COUNT [, $sDelimiter = ""]])
+_FileWriteFromArray($sFilePath, Const ByRef $aArray [, $iBase = Default [, $iUBound = Default [, $sDelimiter = "|"]]])
+_FileWriteLog($sLogPath, $sLogMsg [, $iFlag = -1])
+_FileWriteToLine($sFilePath, $iLine, $sText [, $bOverWrite = False [, $bFill = False]])
+_PathFull($sRelativePath [, $sBasePath = @WorkingDir])
+_PathGetRelative($sFrom, $sTo)
+_PathMake($sDrive, $sDir, $sFileName, $sExtension)
+_PathSplit($sFilePath, ByRef $sDrive, ByRef $sDir, ByRef $sFileName, ByRef $sExtension)
+_ReplaceStringInFile($sFilePath, $sSearchString, $sReplaceString [, $iCaseSensitive = 0 [, $iOccurance = 1]])
+_TempFile([$sDirectoryName = @TempDir [, $sFilePrefix = "~" [, $sFileExtension = ".tmp" [, $iRandomLength = 7]]]])
+#EndRegion
+#Region ; FTPEx
+#include <FTPEx.au3>
+_FTP_Close($hSession)
+_FTP_Command($hFTPSession, $sFTPCommand [, $iFlags = $FTP_TRANSFER_TYPE_ASCII [, $iExpectResponse = 0 [, $iContext = 0]]])
+_FTP_Connect($hInternetSession, $sServerName, $sUsername, $sPassword [, $iPassive = 0 [, $iServerPort = 0 [, $iService = $INTERNET_SERVICE_FTP [, $iFlags = $INTERNET_FLAG_DEFAULT [, $fuContext = 0]]]]])
+_FTP_DecodeInternetStatus($iInternetStatus)
+_FTP_DirCreate($hFTPSession, $sRemote)
+_FTP_DirDelete($hFTPSession, $sRemote)
+_FTP_DirGetCurrent($hFTPSession)
+_FTP_DirPutContents($hFTPSession, $sLocalFolder, $sRemoteFolder, $bRecursivePut [, $iContext = 0])
+_FTP_DirSetCurrent($hFTPSession, $sRemote)
+_FTP_FileClose($hFTPFile)
+_FTP_FileDelete($hFTPSession, $sRemoteFile)
+_FTP_FileGet($hFTPSession, $sRemoteFile, $sLocalFile [, $bFailIfExists = False [, $iFlagsAndAttributes = 0 [, $iFlags = $FTP_TRANSFER_TYPE_UNKNOWN [, $iContext = 0]]]])
+_FTP_FileGetSize($hFTPSession, $sFileName)
+_FTP_FileOpen($hConnect, $sFileName [, $iAccess = $GENERIC_READ [, $iFlags = $INTERNET_FLAG_TRANSFER_BINARY [, $iContext = 0]]])
+_FTP_FilePut($hFTPSession, $sLocalFile, $sRemoteFile [, $iFlags = 0 [, $iContext = 0]])
+_FTP_FileRead($hFTPFile, $iNumberOfBytesToRead)
+_FTP_FileRename($hFTPSession, $sExisting, $sNew)
+_FTP_FileTimeLoHiToStr($iLoDWORD, $iHiDWORD [, $iFmt = 0])
+_FTP_FindFileClose($hFTPFind)
+_FTP_FindFileFirst($hFTPSession, $sRemotePath, ByRef $hFTPFind [, $iFlags = 0 [, $iContext = 0]])
+_FTP_FindFileNext($hFTPFind)
+_FTP_GetLastResponseInfo(ByRef $iError, ByRef $sMessage)
+_FTP_ListToArray($hFTPSession [, $iReturnType = 0 [, $iFlags = $INTERNET_FLAG_NO_CACHE_WRITE [, $iContext = 0]]])
+_FTP_ListToArray2D($hFTPSession [, $iReturnType = 0 [, $iFlags = $INTERNET_FLAG_NO_CACHE_WRITE [, $iContext = 0]]])
+_FTP_ListToArrayEx($hFTPSession [, $iReturnType = 0 [, $iFlags = $INTERNET_FLAG_NO_CACHE_WRITE [, $iFmt = 1 [, $iContext = 0]]]])
+_FTP_Open($sAgent [, $iAccessType = $INTERNET_OPEN_TYPE_DIRECT [, $sProxyName = '' [, $sProxyBypass = '' [, $iFlags = 0]]]])
+_FTP_ProgressDownload($hFTPSession, $sLocalFile, $sRemoteFile [, $hFunctionToCall = 0])
+_FTP_ProgressUpload($hFTPSession, $sLocalFile, $sRemoteFile [, $hFunctionToCall = 0])
+_FTP_SetStatusCallback($hInternetSession, $sFunctionName)
+#EndRegion
+#Region ; GDIPlus
+#include <GDIPlus.au3>
+; Activation
+_GDIPlus_RectFCreate([$nX = 0 [, $nY = 0 [, $nWidth = 0 [, $nHeight = 0]]]])
+_GDIPlus_Shutdown()
+_GDIPlus_Startup([$sGDIPDLL = Default [, $bRetDllHandle = False]])
+; ArrowCap
+_GDIPlus_ArrowCapCreate($fHeight, $fWidth [, $bFilled = True])
+_GDIPlus_ArrowCapDispose($hCap)
+_GDIPlus_ArrowCapGetFillState($hArrowCap)
+_GDIPlus_ArrowCapGetHeight($hArrowCap)
+_GDIPlus_ArrowCapGetMiddleInset($hArrowCap)
+_GDIPlus_ArrowCapGetWidth($hArrowCap)
+_GDIPlus_ArrowCapSetFillState($hArrowCap [, $bFilled = True])
+_GDIPlus_ArrowCapSetHeight($hArrowCap, $fHeight)
+_GDIPlus_ArrowCapSetMiddleInset($hArrowCap, $fInset)
+_GDIPlus_ArrowCapSetWidth($hArrowCap, $fWidth)
+; CustomLineCap
+_GDIPlus_CustomLineCapClone($hCustomLineCap)
+_GDIPlus_CustomLineCapCreate($hPathFill, $hPathStroke [, $iLineCap = 0 [, $nBaseInset = 0]])
+_GDIPlus_CustomLineCapDispose($hCap)
+_GDIPlus_CustomLineCapGetStrokeCaps($hCustomLineCap)
+_GDIPlus_CustomLineCapSetStrokeCaps($hCustomLineCap, $iStartCap, $iEndCap)
+#Region ; Bitmap
+_GDIPlus_BitmapApplyEffect($hBitmap, $hEffect [, $tRECT = Null])
+_GDIPlus_BitmapApplyEffectEx($hBitmap, $hEffect [, $iX = 0 [, $iY = 0 [, $iW = 0 [, $iH = 0]]]])
+_GDIPlus_BitmapCloneArea($hBitmap, $nLeft, $nTop, $nWidth, $nHeight [, $iFormat = 0x00021808])
+_GDIPlus_BitmapConvertFormat($hBitmap, $iPixelFormat, $iDitherType, $iPaletteType, $tPalette [, $fAlphaThresholdPercent = 0.0])
+_GDIPlus_BitmapCreateApplyEffect($hBitmap, $hEffect [, $tRECT = Null [, $tOutRECT = Null]])
+_GDIPlus_BitmapCreateApplyEffectEx($hBitmap, $hEffect [, $iX = 0 [, $iY = 0 [, $iW = 0 [, $iH = 0]]]])
+_GDIPlus_BitmapCreateDIBFromBitmap($hBitmap)
+_GDIPlus_BitmapCreateFromFile($sFileName)
+_GDIPlus_BitmapCreateFromGraphics($iWidth, $iHeight, $hGraphics)
+_GDIPlus_BitmapCreateFromHBITMAP($hBitmap [, $hPal = 0])
+_GDIPlus_BitmapCreateFromHICON($hIcon)
+_GDIPlus_BitmapCreateFromHICON32($hIcon)
+_GDIPlus_BitmapCreateFromMemory($dImage [, $bHBITMAP = False])
+_GDIPlus_BitmapCreateFromResource($hInst, $vResourceName)
+_GDIPlus_BitmapCreateFromScan0($iWidth, $iHeight [, $iPixelFormat = $GDIP_PXF32ARGB [, $iStride = 0 [, $pScan0 = 0]]])
+_GDIPlus_BitmapCreateFromStream($pStream)
+_GDIPlus_BitmapCreateHBITMAPFromBitmap($hBitmap [, $iARGB = 0xFF000000])
+_GDIPlus_BitmapDispose($hBitmap)
+_GDIPlus_BitmapGetHistogram($hBitmap, $iHistogramFormat, $iHistogramSize, $tChannel_0 [, $tChannel_1 = 0 [, $tChannel_2 = 0 [, $tChannel_3 = 0]]])
+_GDIPlus_BitmapGetHistogramEx($hBitmap)
+_GDIPlus_BitmapGetHistogramSize($iFormat)
+_GDIPlus_BitmapGetPixel($hBitmap, $iX, $iY)
+_GDIPlus_BitmapLockBits($hBitmap, $iLeft, $iTop, $iWidth, $iHeight [, $iFlags = $GDIP_ILMREAD [, $iFormat = $GDIP_PXF32RGB]])
+_GDIPlus_BitmapSetPixel($hBitmap, $iX, $iY, $iARGB)
+_GDIPlus_BitmapSetResolution($hBitmap, $fDpiX, $fDpiY)
+_GDIPlus_BitmapUnlockBits($hBitmap, $tBitmapData)
+_GDIPlus_HICONCreateFromBitmap($hBitmap)
+_GDIPlus_PaletteInitialize($iEntries [, $iPaletteType = $GDIP_PaletteTypeOptimal [, $iOptimalColors = 0 [, $bUseTransparentColor = True [, $hBitmap = Null]]]])
+#EndRegion
+; Brush
+_GDIPlus_BrushClone($hBrush)
+_GDIPlus_BrushDispose($hBrush)
+_GDIPlus_BrushGetType($hBrush)
+; HashBrush
+_GDIPlus_HatchBrushCreate([$iHatchStyle = 0 [, $iARGBForeground = 0xFFFFFFFF [, $iARGBBackground = 0xFFFFFFFF]]])
+#Region ; LineBrush
+_GDIPlus_LineBrushCreate($nX1, $nY1, $nX2, $nY2, $iARGBClr1, $iARGBClr2 [, $iWrapMode = 0])
+_GDIPlus_LineBrushCreateFromRect($tRECTF, $iARGBClr1, $iARGBClr2 [, $iGradientMode = 0 [, $iWrapMode = 0]])
+_GDIPlus_LineBrushCreateFromRectWithAngle($tRECTF, $iARGBClr1, $iARGBClr2, $fAngle [, $bIsAngleScalable = True [, $iWrapMode = 0]])
+_GDIPlus_LineBrushGetColors($hLineGradientBrush)
+_GDIPlus_LineBrushGetRect($hLineGradientBrush)
+_GDIPlus_LineBrushMultiplyTransform($hLineGradientBrush, $hMatrix [, $iOrder = 0])
+_GDIPlus_LineBrushResetTransform($hLineGradientBrush)
+_GDIPlus_LineBrushSetBlend($hLineGradientBrush, $aBlends)
+_GDIPlus_LineBrushSetColors($hLineGradientBrush, $iARGBStart, $iARGBEnd)
+_GDIPlus_LineBrushSetGammaCorrection($hLineGradientBrush [, $bUseGammaCorrection = True])
+_GDIPlus_LineBrushSetLinearBlend($hLineGradientBrush, $fFocus [, $fScale = 1])
+_GDIPlus_LineBrushSetPresetBlend($hLineGradientBrush, $aInterpolations)
+_GDIPlus_LineBrushSetSigmaBlend($hLineGradientBrush, $fFocus [, $fScale = 1])
+_GDIPlus_LineBrushSetTransform($hLineGradientBrush, $hMatrix)
+#EndRegion
+; SolidBrush
+_GDIPlus_BrushCreateSolid([$iARGB = 0xFF000000])
+_GDIPlus_BrushGetSolidColor($hBrush)
+_GDIPlus_BrushSetSolidColor($hBrush [, $iARGB = 0xFF000000])
+; TextureBrush
+_GDIPlus_TextureCreate($hImage [, $iWrapMode = 0])
+_GDIPlus_TextureCreate2($hImage, $nX, $nY, $nWidth, $nHeight [, $iWrapMode = 0])
+_GDIPlus_TextureCreateIA($hImage, $nX, $nY, $nWidth, $nHeight [, $pImageAttributes = 0])
+#Region ; Effect
+_GDIPlus_EffectCreate($sEffectGUID)
+_GDIPlus_EffectCreateBlur([$fRadius = 10.0 [, $bExpandEdge = False]])
+_GDIPlus_EffectCreateBrightnessContrast([$iBrightnessLevel = 0 [, $iContrastLevel = 0]])
+_GDIPlus_EffectCreateColorBalance([$iCyanRed = 0 [, $iMagentaGreen = 0 [, $iYellowBlue = 0]]])
+_GDIPlus_EffectCreateColorCurve($iAdjustment, $iChannel, $iAdjustValue)
+_GDIPlus_EffectCreateColorLUT($aColorLUT)
+_GDIPlus_EffectCreateColorMatrix($tColorMatrix)
+_GDIPlus_EffectCreateHueSaturationLightness([$iHueLevel = 0 [, $iSaturationLevel = 0 [, $iLightnessLevel = 0]]])
+_GDIPlus_EffectCreateLevels([$iHighlight = 100 [, $iMidtone = 0 [, $iShadow = 0]]])
+_GDIPlus_EffectCreateRedEyeCorrection($aAreas)
+_GDIPlus_EffectCreateSharpen([$fRadius = 10.0 [, $fAmount = 50.0]])
+_GDIPlus_EffectCreateTint([$iHue = 0 [, $iAmount = 0]])
+_GDIPlus_EffectDispose($hEffect)
+_GDIPlus_EffectGetParameters($hEffect, $tEffectParameters)
+_GDIPlus_EffectSetParameters($hEffect, $tEffectParameters [, $iSizeAdjust = 1])
+#EndRegion
+; Font
+_GDIPlus_FontCreate($hFamily, $fSize [, $iStyle = 0 [, $iUnit = 3]])
+_GDIPlus_FontDispose($hFont)
+_GDIPlus_FontGetHeight($hFont, $hGraphics)
+; FontPrivate
+_GDIPlus_FontPrivateAddFont($hFontCollection, $sFontFile)
+_GDIPlus_FontPrivateAddMemoryFont($hFontCollection, $tFont)
+_GDIPlus_FontPrivateCollectionDispose($hFontCollection)
+_GDIPlus_FontPrivateCreateCollection()
+; FontFamily
+_GDIPlus_FontFamilyCreate($sFamily [, $pCollection = 0])
+_GDIPlus_FontFamilyCreateFromCollection($sFontName, $hFontCollection)
+_GDIPlus_FontFamilyDispose($hFamily)
+_GDIPlus_FontFamilyGetCellAscent($hFontFamily [, $iStyle = 0])
+_GDIPlus_FontFamilyGetCellDescent($hFontFamily [, $iStyle = 0])
+_GDIPlus_FontFamilyGetEmHeight($hFontFamily [, $iStyle = 0])
+_GDIPlus_FontFamilyGetLineSpacing($hFontFamily [, $iStyle = 0])
+#Region ; Graphics
+_GDIPlus_GraphicsClear($hGraphics [, $iARGB = 0xFF000000])
+_GDIPlus_GraphicsCreateFromHDC($hDC)
+_GDIPlus_GraphicsCreateFromHWND($hWnd)
+_GDIPlus_GraphicsDispose($hGraphics)
+_GDIPlus_GraphicsDrawArc($hGraphics, $nX, $nY, $nWidth, $nHeight, $fStartAngle, $fSweepAngle [, $hPen = 0])
+_GDIPlus_GraphicsDrawBezier($hGraphics, $nX1, $nY1, $nX2, $nY2, $nX3, $nY3, $nX4, $nY4 [, $hPen = 0])
+_GDIPlus_GraphicsDrawClosedCurve($hGraphics, $aPoints [, $hPen = 0])
+_GDIPlus_GraphicsDrawClosedCurve2($hGraphics, $aPoints, $nTension [, $hPen = 0])
+_GDIPlus_GraphicsDrawCurve($hGraphics, $aPoints [, $hPen = 0])
+_GDIPlus_GraphicsDrawCurve2($hGraphics, $aPoints, $nTension [, $hPen = 0])
+_GDIPlus_GraphicsDrawEllipse($hGraphics, $nX, $nY, $nWidth, $nHeight [, $hPen = 0])
+_GDIPlus_GraphicsDrawImage($hGraphics, $hImage, $nX, $nY)
+_GDIPlus_GraphicsDrawImagePointsRect($hGraphics, $hImage, $nULX, $nULY, $nURX, $nURY, $nLLX, $nLLY, $nSrcX, $nSrcY, $nSrcWidth, $nSrcHeight [, $hImageAttributes = 0 [, $iUnit = 2]])
+_GDIPlus_GraphicsDrawImageRect($hGraphics, $hImage, $nX, $nY, $nW, $nH)
+_GDIPlus_GraphicsDrawImageRectRect($hGraphics, $hImage, $nSrcX, $nSrcY, $nSrcWidth, $nSrcHeight, $nDstX, $nDstY, $nDstWidth, $nDstHeight [, $pAttributes = 0 [, $iUnit = 2]])
+_GDIPlus_GraphicsDrawLine($hGraphics, $nX1, $nY1, $nX2, $nY2 [, $hPen = 0])
+_GDIPlus_GraphicsDrawPath($hGraphics, $hPath [, $hPen = 0])
+_GDIPlus_GraphicsDrawPie($hGraphics, $nX, $nY, $nWidth, $nHeight, $fStartAngle, $fSweepAngle [, $hPen = 0])
+_GDIPlus_GraphicsDrawPolygon($hGraphics, $aPoints [, $hPen = 0])
+_GDIPlus_GraphicsDrawRect($hGraphics, $nX, $nY, $nWidth, $nHeight [, $hPen = 0])
+_GDIPlus_GraphicsFillClosedCurve($hGraphics, $aPoints [, $hBrush = 0])
+_GDIPlus_GraphicsFillClosedCurve2($hGraphics, $aPoints, $nTension [, $hBrush = 0 [, $iFillMode = 0]])
+_GDIPlus_GraphicsFillEllipse($hGraphics, $nX, $nY, $nWidth, $nHeight [, $hBrush = 0])
+_GDIPlus_GraphicsFillPath($hGraphics, $hPath [, $hBrush = 0])
+_GDIPlus_GraphicsFillPie($hGraphics, $nX, $nY, $nWidth, $nHeight, $fStartAngle, $fSweepAngle [, $hBrush = 0])
+_GDIPlus_GraphicsFillPolygon($hGraphics, $aPoints [, $hBrush = 0])
+_GDIPlus_GraphicsFillRect($hGraphics, $nX, $nY, $nWidth, $nHeight [, $hBrush = 0])
+_GDIPlus_GraphicsFillRegion($hGraphics, $hRegion [, $hBrush = 0])
+_GDIPlus_GraphicsGetCompositingMode($hGraphics)
+_GDIPlus_GraphicsGetCompositingQuality($hGraphics)
+_GDIPlus_GraphicsGetDC($hGraphics)
+_GDIPlus_GraphicsGetInterpolationMode($hGraphics)
+_GDIPlus_GraphicsGetSmoothingMode($hGraphics)
+_GDIPlus_GraphicsGetTransform($hGraphics, $hMatrix)
+_GDIPlus_GraphicsReleaseDC($hGraphics, $hDC)
+_GDIPlus_GraphicsResetClip($hGraphics)
+_GDIPlus_GraphicsResetTransform($hGraphics)
+_GDIPlus_GraphicsRestore($hGraphics, $iState)
+_GDIPlus_GraphicsRotateTransform($hGraphics, $fAngle [, $iOrder = 0])
+_GDIPlus_GraphicsSave($hGraphics)
+_GDIPlus_GraphicsScaleTransform($hGraphics, $fScaleX, $fScaleY [, $iOrder = 0])
+_GDIPlus_GraphicsSetClipPath($hGraphics, $hPath [, $iCombineMode = 0])
+_GDIPlus_GraphicsSetClipRect($hGraphics, $nX, $nY, $nWidth, $nHeight [, $iCombineMode = 0])
+_GDIPlus_GraphicsSetClipRegion($hGraphics, $hRegion [, $iCombineMode = 0])
+_GDIPlus_GraphicsSetCompositingMode($hGraphics, $iCompositionMode)
+_GDIPlus_GraphicsSetCompositingQuality($hGraphics, $iCompositionQuality)
+_GDIPlus_GraphicsSetInterpolationMode($hGraphics, $iInterpolationMode)
+_GDIPlus_GraphicsSetPixelOffsetMode($hGraphics, $iPixelOffsetMode)
+_GDIPlus_GraphicsSetSmoothingMode($hGraphics, $iSmooth)
+_GDIPlus_GraphicsSetTextRenderingHint($hGraphics, $iTextRenderingHint)
+_GDIPlus_GraphicsSetTransform($hGraphics, $hMatrix)
+_GDIPlus_GraphicsTransformPoints($hGraphics, ByRef $aPoints [, $iCoordSpaceTo = 0 [, $iCoordSpaceFrom = 1]])
+_GDIPlus_GraphicsTranslateTransform($hGraphics, $nDX, $nDY [, $iOrder = 0])
+#EndRegion
+#Region ; GraphicsCoders
+_GDIPlus_Decoders()
+_GDIPlus_DecodersGetCount()
+_GDIPlus_DecodersGetSize()
+_GDIPlus_Encoders()
+_GDIPlus_EncodersGetCLSID($sFileExtension)
+_GDIPlus_EncodersGetCount()
+_GDIPlus_EncodersGetParamList($hImage, $sEncoder)
+_GDIPlus_EncodersGetParamListSize($hImage, $sEncoder)
+_GDIPlus_EncodersGetSize()
+_GDIPlus_ParamAdd(ByRef $tParams, $sGUID, $iNbOfValues, $iType, $pValues)
+_GDIPlus_ParamInit($iCount)
+_GDIPlus_ParamSize()
+#EndRegion
+#Region ; GraphicsPath
+_GDIPlus_PathAddArc($hPath, $nX, $nY, $nWidth, $nHeight, $fStartAngle, $fSweepAngle)
+_GDIPlus_PathAddBezier($hPath, $nX1, $nY1, $nX2, $nY2, $nX3, $nY3, $nX4, $nY4)
+_GDIPlus_PathAddClosedCurve($hPath, $aPoints)
+_GDIPlus_PathAddClosedCurve2($hPath, $aPoints [, $nTension = 0.5])
+_GDIPlus_PathAddCurve($hPath, $aPoints)
+_GDIPlus_PathAddCurve2($hPath, $aPoints [, $nTension = 0.5])
+_GDIPlus_PathAddCurve3($hPath, $aPoints, $iOffset, $iNumOfSegments [, $nTension = 0.5])
+_GDIPlus_PathAddEllipse($hPath, $nX, $nY, $nWidth, $nHeight)
+_GDIPlus_PathAddLine($hPath, $nX1, $nY1, $nX2, $nY2)
+_GDIPlus_PathAddLine2($hPath, $aPoints)
+_GDIPlus_PathAddPath($hPath1, $hPath2 [, $bConnect = True])
+_GDIPlus_PathAddPie($hPath, $nX, $nY, $nWidth, $nHeight, $fStartAngle, $fSweepAngle)
+_GDIPlus_PathAddPolygon($hPath, $aPoints)
+_GDIPlus_PathAddRectangle($hPath, $nX, $nY, $nWidth, $nHeight)
+_GDIPlus_PathAddString($hPath, $sString, $tLayout, $hFamily [, $iStyle = 0 [, $fSize = 8.5 [, $hFormat = 0]]])
+_GDIPlus_PathClone($hPath)
+_GDIPlus_PathCloseFigure($hPath)
+_GDIPlus_PathCreate([$iFillMode = 0])
+_GDIPlus_PathCreate2($aPathData [, $iFillMode = 0])
+_GDIPlus_PathDispose($hPath)
+_GDIPlus_PathFlatten($hPath [, $fFlatness = 0.25 [, $hMatrix = 0]])
+_GDIPlus_PathGetData($hPath)
+_GDIPlus_PathGetFillMode($hPath)
+_GDIPlus_PathGetLastPoint($hPath)
+_GDIPlus_PathGetPointCount($hPath)
+_GDIPlus_PathGetPoints($hPath)
+_GDIPlus_PathGetWorldBounds($hPath [, $hMatrix = 0 [, $hPen = 0]])
+_GDIPlus_PathIsOutlineVisiblePoint($hPath, $nX, $nY [, $hPen = 0 [, $hGraphics = 0]])
+_GDIPlus_PathIsVisiblePoint($hPath, $nX, $nY [, $hGraphics = 0])
+_GDIPlus_PathReset($hPath)
+_GDIPlus_PathReverse($hPath)
+_GDIPlus_PathSetFillMode($hPath, $iFillMode)
+_GDIPlus_PathSetMarker($hPath)
+_GDIPlus_PathStartFigure($hPath)
+_GDIPlus_PathTransform($hPath, $hMatrix)
+_GDIPlus_PathWarp($hPath, $hMatrix, $aPoints, $nX, $nY, $nWidth, $nHeight [, $iWarpMode = 0 [, $fFlatness = 0.25]])
+_GDIPlus_PathWiden($hPath, $hPen [, $hMatrix = 0 [, $fFlatness = 0.25]])
+_GDIPlus_PathWindingModeOutline($hPath [, $hMatrix = 0 [, $fFlatness = 0.25]])
+#EndRegion
+#Region ; Image
+_GDIPlus_DrawImageFX($hGraphics, $hImage, $hEffect [, $tRECTF = 0 [, $hMatrix = 0 [, $hImgAttributes = 0 [, $iUnit = 2]]]])
+_GDIPlus_DrawImageFXEx($hGraphics, $hImage, $hEffect [, $nX = 0 [, $nY = 0 [, $nW = 0 [, $nH = 0 [, $hMatrix = 0 [, $hImgAttributes = 0 [, $iUnit = 2]]]]]]])
+_GDIPlus_DrawImagePoints($hGraphic, $hImage, $nULX, $nULY, $nURX, $nURY, $nLLX, $nLLY [, $iCount = 3])
+_GDIPlus_ImageClone($hImage)
+_GDIPlus_ImageDispose($hImage)
+_GDIPlus_ImageGetDimension($hImage)
+_GDIPlus_ImageGetFlags($hImage)
+_GDIPlus_ImageGetFrameCount($hImage, $sDimensionID)
+_GDIPlus_ImageGetGraphicsContext($hImage)
+_GDIPlus_ImageGetHeight($hImage)
+_GDIPlus_ImageGetHorizontalResolution($hImage)
+_GDIPlus_ImageGetPixelFormat($hImage)
+_GDIPlus_ImageGetPropertyIdList($hImage)
+_GDIPlus_ImageGetPropertyItem($hImage, $iPropID)
+_GDIPlus_ImageGetRawFormat($hImage)
+_GDIPlus_ImageGetThumbnail($hImage [, $iWidth = 0 [, $iHeight = 0 [, $bKeepRatio = True [, $hCallback = Null [, $hCallbackData = Null]]]]])
+_GDIPlus_ImageGetType($hImage)
+_GDIPlus_ImageGetVerticalResolution($hImage)
+_GDIPlus_ImageGetWidth($hImage)
+_GDIPlus_ImageLoadFromFile($sFileName)
+_GDIPlus_ImageLoadFromStream($pStream)
+_GDIPlus_ImageResize($hImage, $iNewWidth, $iNewHeight [, $iInterpolationMode = $GDIP_INTERPOLATIONMODE_HIGHQUALITYBICUBIC])
+_GDIPlus_ImageRotateFlip($hImage, $iRotateFlipType)
+_GDIPlus_ImageSaveAdd($hImage, $tParams)
+_GDIPlus_ImageSaveAddImage($hImage, $hImageNew, $tParams)
+_GDIPlus_ImageSaveToFile($hImage, $sFileName)
+_GDIPlus_ImageSaveToFileEx($hImage, $sFileName, $sEncoder [, $tParams = 0])
+_GDIPlus_ImageSaveToStream($hImage, $pStream, $tEncoder [, $tParams = 0])
+_GDIPlus_ImageScale($hImage, $iScaleW, $iScaleH [, $iInterpolationMode = $GDIP_INTERPOLATIONMODE_HIGHQUALITYBICUBIC])
+_GDIPlus_ImageSelectActiveFrame($hImage, $sDimensionID, $iFrameIndex)
+#EndRegion
+; ImageAttributes
+_GDIPlus_ImageAttributesCreate()
+_GDIPlus_ImageAttributesDispose($hImageAttributes)
+_GDIPlus_ImageAttributesSetColorKeys($hImageAttributes [, $iColorAdjustType = 0 [, $bEnable = False [, $iARGBLow = 0 [, $iARGBHigh = 0]]]])
+_GDIPlus_ImageAttributesSetColorMatrix($hImageAttributes [, $iColorAdjustType = 0 [, $bEnable = False [, $tClrMatrix = 0 [, $tGrayMatrix = 0 [, $iColorMatrixFlags = 0]]]]])
+_GDIPlus_ImageAttributesSetRemapTable($hImageAttributes [, $aColorMap = 0 [, $iColorAdjustType = 0 [, $bEnable = True]]])
+_GDIPlus_ImageAttributesSetThreshold($hImageAttributes, $fThreshold [, $iColorAdjustType = $GDIP_COLORADJUSTTYPE_DEFAULT [, $bEnable = True]])
+#Region ; Matrix
+_GDIPlus_MatrixClone($hMatrix)
+_GDIPlus_MatrixCreate()
+_GDIPlus_MatrixCreate2([$nM11 = 1 [, $nM12 = 1 [, $nM21 = 1 [, $nM22 = 1 [, $nDX = 0 [, $nDY = 0]]]]]])
+_GDIPlus_MatrixDispose($hMatrix)
+_GDIPlus_MatrixGetElements($hMatrix)
+_GDIPlus_MatrixInvert($hMatrix)
+_GDIPlus_MatrixMultiply($hMatrix1, $hMatrix2 [, $iOrder = 0])
+_GDIPlus_MatrixRotate($hMatrix, $fAngle [, $bAppend = False])
+_GDIPlus_MatrixScale($hMatrix, $fScaleX, $fScaleY [, $bOrder = False])
+_GDIPlus_MatrixSetElements($hMatrix [, $nM11 = 1 [, $nM12 = 0 [, $nM21 = 0 [, $nM22 = 1 [, $nDX = 0 [, $nDY = 0]]]]]])
+_GDIPlus_MatrixShear($hMatrix, $fShearX, $fShearY [, $iOrder = 0])
+_GDIPlus_MatrixTransformPoints($hMatrix, ByRef $aPoints)
+_GDIPlus_MatrixTranslate($hMatrix, $fOffsetX, $fOffsetY [, $bAppend = False])
+#EndRegion
+; ColorMatrix
+_GDIPlus_ColorMatrixCreate()
+_GDIPlus_ColorMatrixCreateGrayScale()
+_GDIPlus_ColorMatrixCreateNegative()
+_GDIPlus_ColorMatrixCreateSaturation($fSat)
+_GDIPlus_ColorMatrixCreateScale($fRed, $fGreen, $fBlue [, $fAlpha = 1])
+_GDIPlus_ColorMatrixCreateTranslate($fRed, $fGreen, $fBlue [, $fAlpha = 0])
+#Region ; PathGradientBrush
+_GDIPlus_PathBrushCreate($aPoints [, $iWrapMode = 0])
+_GDIPlus_PathBrushCreateFromPath($hPath)
+_GDIPlus_PathBrushGetCenterPoint($hPathGradientBrush)
+_GDIPlus_PathBrushGetFocusScales($hPathGradientBrush)
+_GDIPlus_PathBrushGetPointCount($hPathGradientBrush)
+_GDIPlus_PathBrushGetRect($hPathGradientBrush)
+_GDIPlus_PathBrushGetWrapMode($hPathGradientBrush)
+_GDIPlus_PathBrushMultiplyTransform($hPathGradientBrush, $hMatrix [, $iOrder = 0])
+_GDIPlus_PathBrushResetTransform($hPathGradientBrush)
+_GDIPlus_PathBrushSetBlend($hPathGradientBrush, $aBlends)
+_GDIPlus_PathBrushSetCenterColor($hPathGradientBrush, $iARGB)
+_GDIPlus_PathBrushSetCenterPoint($hPathGradientBrush, $nX, $nY)
+_GDIPlus_PathBrushSetFocusScales($hPathGradientBrush, $fScaleX, $fScaleY)
+_GDIPlus_PathBrushSetGammaCorrection($hPathGradientBrush, $bUseGammaCorrection)
+_GDIPlus_PathBrushSetLinearBlend($hPathGradientBrush, $fFocus [, $fScale = 1])
+_GDIPlus_PathBrushSetPresetBlend($hPathGradientBrush, $aInterpolations)
+_GDIPlus_PathBrushSetSigmaBlend($hPathGradientBrush, $fFocus [, $fScale = 1])
+_GDIPlus_PathBrushSetSurroundColor($hPathGradientBrush, $iARGB)
+_GDIPlus_PathBrushSetSurroundColorsWithCount($hPathGradientBrush, $aColors)
+_GDIPlus_PathBrushSetTransform($hPathGradientBrush, $hMatrix)
+_GDIPlus_PathBrushSetWrapMode($hPathGradientBrush, $iWrapMode)
+#EndRegion
+; PathIterator
+_GDIPlus_PathIterCreate($hPath)
+_GDIPlus_PathIterDispose($hPathIter)
+_GDIPlus_PathIterGetSubpathCount($hPathIter)
+_GDIPlus_PathIterNextMarkerPath($hPathIter, $hPath)
+_GDIPlus_PathIterNextSubpathPath($hPathIter, $hPath)
+_GDIPlus_PathIterRewind($hPathIter)
+#Region ; Pen
+_GDIPlus_PenCreate([$iARGB = 0xFF000000 [, $nWidth = 1 [, $iUnit = 2]]])
+_GDIPlus_PenCreate2($hBrush [, $nWidth = 1 [, $iUnit = 2]])
+_GDIPlus_PenDispose($hPen)
+_GDIPlus_PenGetAlignment($hPen)
+_GDIPlus_PenGetColor($hPen)
+_GDIPlus_PenGetCustomEndCap($hPen)
+_GDIPlus_PenGetDashCap($hPen)
+_GDIPlus_PenGetDashStyle($hPen)
+_GDIPlus_PenGetEndCap($hPen)
+_GDIPlus_PenGetMiterLimit($hPen)
+_GDIPlus_PenGetWidth($hPen)
+_GDIPlus_PenResetTransform($hPen)
+_GDIPlus_PenRotateTransform($hPen, $fAngle [, $iOrder = 0])
+_GDIPlus_PenScaleTransform($hPen, $fScaleX, $fScaleY [, $iOrder = 0])
+_GDIPlus_PenSetAlignment($hPen [, $iAlignment = 0])
+_GDIPlus_PenSetColor($hPen, $iARGB)
+_GDIPlus_PenSetCompound($hPen, $aCompounds)
+_GDIPlus_PenSetCustomEndCap($hPen, $hEndCap)
+_GDIPlus_PenSetDashCap($hPen [, $iDash = 0])
+_GDIPlus_PenSetDashStyle($hPen [, $iStyle = 0])
+_GDIPlus_PenSetEndCap($hPen, $iEndCap)
+_GDIPlus_PenSetLineCap($hPen, $iStartCap, $iEndCap, $iDashCap)
+_GDIPlus_PenSetLineJoin($hPen, $iLineJoin)
+_GDIPlus_PenSetMiterLimit($hPen, $fMiterLimit)
+_GDIPlus_PenSetStartCap($hPen, $iLineCap)
+_GDIPlus_PenSetTransform($hPen, $hMatrix)
+_GDIPlus_PenSetWidth($hPen, $fWidth)
+#EndRegion
+#Region ; Region
+_GDIPlus_RegionClone($hRegion)
+_GDIPlus_RegionCombinePath($hRegion, $hPath [, $iCombineMode = 2])
+_GDIPlus_RegionCombineRect($hRegion, $nX, $nY, $nWidth, $nHeight [, $iCombineMode = 2])
+_GDIPlus_RegionCombineRegion($hRegionDst, $hRegionSrc [, $iCombineMode = 2])
+_GDIPlus_RegionCreate()
+_GDIPlus_RegionCreateFromPath($hPath)
+_GDIPlus_RegionCreateFromRect($nX, $nY, $nWidth, $nHeight)
+_GDIPlus_RegionDispose($hRegion)
+_GDIPlus_RegionGetBounds($hRegion, $hGraphics)
+_GDIPlus_RegionGetHRgn($hRegion [, $hGraphics = 0])
+_GDIPlus_RegionSetEmpty($hRegion)
+_GDIPlus_RegionSetInfinite($hRegion)
+_GDIPlus_RegionTransform($hRegion, $hMatrix)
+_GDIPlus_RegionTranslate($hRegion, $nDX, $nDY)
+#EndRegion
+; StringFormat
+_GDIPlus_StringFormatCreate([$iFormat = 0 [, $iLangID = 0]])
+_GDIPlus_StringFormatDispose($hFormat)
+_GDIPlus_StringFormatGetMeasurableCharacterRangeCount($hFormat)
+_GDIPlus_StringFormatSetAlign($hStringFormat, $iFlag)
+_GDIPlus_StringFormatSetLineAlign($hStringFormat, $iStringAlign)
+_GDIPlus_StringFormatSetMeasurableCharacterRanges($hStringFormat, $aRanges)
+; Text
+_GDIPlus_GraphicsDrawString($hGraphics, $sString, $nX, $nY [, $sFont = Default [, $fSize = Default [, $iFormat = Default [, $iARGB = Default]]]])
+_GDIPlus_GraphicsDrawStringEx($hGraphics, $sString, $hFont, $tLayout, $hFormat, $hBrush)
+_GDIPlus_GraphicsMeasureCharacterRanges($hGraphics, $sString, $hFont, $tLayout, $hStringFormat)
+_GDIPlus_GraphicsMeasureString($hGraphics, $sString, $hFont, $tLayout, $hFormat)
+#EndRegion
+#Region ; GUI
+#Region ; GuiAVI
+#include <GuiAVI.au3>
+_GUICtrlAVI_Close(GuiAVI)
+_GUICtrlAVI_Create($hWnd [, $sFilePath = "" [, $iSubFileID = -1 [, $iX = 0 [, $iY = 0 [, $iWidth = 0 [, $iHeight = 0 [, $iStyle = 0x00000006 [, $iExStyle = 0x00000000]]]]]]]])
+_GUICtrlAVI_Destroy(ByRef $hWnd)
+_GUICtrlAVI_IsPlaying($hWnd)
+_GUICtrlAVI_Open($hWnd, $sFileName)
+_GUICtrlAVI_OpenEx($hWnd, $sFileName, $iResourceID)
+_GUICtrlAVI_Play($hWnd [, $iFrom = 0 [, $iTo = -1 [, $iRepeat = -1]]])
+_GUICtrlAVI_Seek($hWnd, $iFrame)
+_GUICtrlAVI_Show($hWnd, $iState)
+_GUICtrlAVI_Stop($hWnd)
+#EndRegion
+#Region ; GuiButton
+#include <GuiButton.au3>
+_GUICtrlButton_Click($hWnd)
+_GUICtrlButton_Create($hWnd, $sText, $iX, $iY, $iWidth, $iHeight [, $iStyle = -1 [, $iExStyle = -1]])
+_GUICtrlButton_Destroy(ByRef $hWnd)
+_GUICtrlButton_Enable($hWnd [, $bEnable = True])
+_GUICtrlButton_GetCheck($hWnd)
+_GUICtrlButton_GetFocus($hWnd)
+_GUICtrlButton_GetIdealSize($hWnd)
+_GUICtrlButton_GetImage($hWnd)
+_GUICtrlButton_GetImageList($hWnd)
+_GUICtrlButton_GetNote($hWnd)
+_GUICtrlButton_GetNoteLength($hWnd)
+_GUICtrlButton_GetSplitInfo($hWnd)
+_GUICtrlButton_GetState($hWnd)
+_GUICtrlButton_GetText($hWnd)
+_GUICtrlButton_GetTextMargin($hWnd)
+_GUICtrlButton_SetCheck($hWnd [, $iState = $BST_CHECKED])
+_GUICtrlButton_SetDontClick($hWnd [, $bState = True])
+_GUICtrlButton_SetFocus($hWnd [, $bFocus = True])
+_GUICtrlButton_SetImage($hWnd, $sImageFile [, $iIconID = -1 [, $bLarge = False]])
+_GUICtrlButton_SetImageList($hWnd, $hImage [, $iAlign = 0 [, $iLeft = 1 [, $iTop = 1 [, $iRight = 1 [, $iBottom = 1]]]]])
+_GUICtrlButton_SetNote($hWnd, $sNote)
+_GUICtrlButton_SetShield($hWnd [, $bRequired = True])
+_GUICtrlButton_SetSize($hWnd, $iWidth, $iHeight)
+_GUICtrlButton_SetSplitInfo($hWnd [, $hImlGlyph = -1 [, $iSplitStyle = $BCSS_ALIGNLEFT [, $iWidth = 0 [, $iHeight = 0]]]])
+_GUICtrlButton_SetState($hWnd [, $bHighlighted = True])
+_GUICtrlButton_SetStyle($hWnd, $iStyle)
+_GUICtrlButton_SetText($hWnd, $sText)
+_GUICtrlButton_SetTextMargin($hWnd [, $iLeft = 1 [, $iTop = 1 [, $iRight = 1 [, $iBottom = 1]]]])
+_GUICtrlButton_Show($hWnd [, $bShow = True])
+#EndRegion
+#Region ; GuiComboBox
+#include <GuiComboBox.au3>
+_GUICtrlComboBox_AddDir($hWnd, $sFilePath [, $iAttributes = 0 [, $bBrackets = True]])
+_GUICtrlComboBox_AddString($hWnd, $sText)
+_GUICtrlComboBox_AutoComplete($hWnd)
+_GUICtrlComboBox_BeginUpdate($hWnd)
+_GUICtrlComboBox_Create($hWnd, $sText, $iX, $iY [, $iWidth = 100 [, $iHeight = 120 [, $iStyle = 0x00200042 [, $iExStyle = 0x00000000]]]])
+_GUICtrlComboBox_DeleteString($hWnd, $iIndex)
+_GUICtrlComboBox_Destroy(ByRef $hWnd)
+_GUICtrlComboBox_EndUpdate($hWnd)
+_GUICtrlComboBox_FindString($hWnd, $sText [, $iIndex = -1])
+_GUICtrlComboBox_FindStringExact($hWnd, $sText [, $iIndex = -1])
+_GUICtrlComboBox_GetComboBoxInfo($hWnd, ByRef $tInfo)
+_GUICtrlComboBox_GetCount($hWnd)
+_GUICtrlComboBox_GetCueBanner($hWnd)
+_GUICtrlComboBox_GetCurSel($hWnd)
+_GUICtrlComboBox_GetDroppedControlRect($hWnd)
+_GUICtrlComboBox_GetDroppedControlRectEx($hWnd)
+_GUICtrlComboBox_GetDroppedState($hWnd)
+_GUICtrlComboBox_GetDroppedWidth($hWnd)
+_GUICtrlComboBox_GetEditSel($hWnd)
+_GUICtrlComboBox_GetEditText($hWnd)
+_GUICtrlComboBox_GetExtendedUI($hWnd)
+_GUICtrlComboBox_GetHorizontalExtent($hWnd)
+_GUICtrlComboBox_GetItemHeight($hWnd [, $iIndex = -1])
+_GUICtrlComboBox_GetLBText($hWnd, $iIndex, ByRef $sText)
+_GUICtrlComboBox_GetLBTextLen($hWnd, $iIndex)
+_GUICtrlComboBox_GetList($hWnd)
+_GUICtrlComboBox_GetListArray($hWnd)
+_GUICtrlComboBox_GetLocale($hWnd)
+_GUICtrlComboBox_GetLocaleCountry($hWnd)
+_GUICtrlComboBox_GetLocaleLang($hWnd)
+_GUICtrlComboBox_GetLocalePrimLang($hWnd)
+_GUICtrlComboBox_GetLocaleSubLang($hWnd)
+_GUICtrlComboBox_GetMinVisible($hWnd)
+_GUICtrlComboBox_GetTopIndex($hWnd)
+_GUICtrlComboBox_InitStorage($hWnd, $iNum, $iBytes)
+_GUICtrlComboBox_InsertString($hWnd, $sText [, $iIndex = -1])
+_GUICtrlComboBox_LimitText($hWnd [, $iLimit = 0])
+_GUICtrlComboBox_ReplaceEditSel($hWnd, $sText)
+_GUICtrlComboBox_ResetContent($hWnd)
+_GUICtrlComboBox_SelectString($hWnd, $sText [, $iIndex = -1])
+_GUICtrlComboBox_SetCueBanner($hWnd, $sText)
+_GUICtrlComboBox_SetCurSel($hWnd [, $iIndex = -1])
+_GUICtrlComboBox_SetDroppedWidth($hWnd, $iWidth)
+_GUICtrlComboBox_SetEditSel($hWnd, $iStart, $iStop)
+_GUICtrlComboBox_SetEditText($hWnd, $sText)
+_GUICtrlComboBox_SetExtendedUI($hWnd [, $bExtended = False])
+_GUICtrlComboBox_SetHorizontalExtent($hWnd, $iWidth)
+_GUICtrlComboBox_SetItemHeight($hWnd, $iHeight [, $iComponent = -1])
+_GUICtrlComboBox_SetMinVisible($hWnd, $iMinimum)
+_GUICtrlComboBox_SetTopIndex($hWnd, $iIndex)
+_GUICtrlComboBox_ShowDropDown($hWnd [, $bShow = False])
+#EndRegion
+#Region ; GuiComboBoxEx
+#include <GuiComboBoxEx.au3>
+_GUICtrlComboBoxEx_AddDir($hWnd, $sFilePath [, $iAttributes = 0 [, $bBrackets = True]])
+_GUICtrlComboBoxEx_AddString($hWnd, $sText [, $iImage = -1 [, $iSelectedImage = -1 [, $iOverlayImage = -1 [, $iIndent = -1 [, $iParam = -1]]]]])
+_GUICtrlComboBoxEx_BeginUpdate($hWnd)
+_GUICtrlComboBoxEx_Create($hWnd, $sText, $iX, $iY [, $iWidth = 100 [, $iHeight = 200 [, $iStyle = 0x00200002 [, $iExStyle = 0x00000000]]]])
+_GUICtrlComboBoxEx_CreateSolidBitMap($hWnd, $iColor, $iWidth, $iHeight)
+_GUICtrlComboBoxEx_DeleteString($hWnd, $iIndex)
+_GUICtrlComboBoxEx_Destroy(ByRef $hWnd)
+_GUICtrlComboBoxEx_EndUpdate($hWnd, $sText [, $iIndex = -1])
+_GUICtrlComboBoxEx_FindStringExact($hWnd, $sText [, $iIndex = -1])
+_GUICtrlComboBoxEx_GetComboBoxInfo($hWnd, ByRef $tInfo)
+_GUICtrlComboBoxEx_GetComboControl($hWnd)
+_GUICtrlComboBoxEx_GetCount($hWnd)
+_GUICtrlComboBoxEx_GetCurSel($hWnd)
+_GUICtrlComboBoxEx_GetDroppedControlRect($hWnd)
+_GUICtrlComboBoxEx_GetDroppedControlRectEx($hWnd)
+_GUICtrlComboBoxEx_GetDroppedState($hWnd)
+_GUICtrlComboBoxEx_GetDroppedWidth($hWnd)
+_GUICtrlComboBoxEx_GetEditControl($hWnd)
+_GUICtrlComboBoxEx_GetEditSel($hWnd)
+_GUICtrlComboBoxEx_GetEditText($hWnd)
+_GUICtrlComboBoxEx_GetExtendedStyle($hWnd)
+_GUICtrlComboBoxEx_GetExtendedUI($hWnd)
+_GUICtrlComboBoxEx_GetImageList($hWnd)
+_GUICtrlComboBoxEx_GetItem($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetItemEx($hWnd, ByRef $tItem)
+_GUICtrlComboBoxEx_GetItemHeight($hWnd [, $iComponent = -1])
+_GUICtrlComboBoxEx_GetItemImage($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetItemIndent($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetItemOverlayImage($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetItemParam($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetItemSelectedImage($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetItemText($hWnd, $iIndex, ByRef $sText)
+_GUICtrlComboBoxEx_GetItemTextLen($hWnd, $iIndex)
+_GUICtrlComboBoxEx_GetList($hWnd)
+_GUICtrlComboBoxEx_GetListArray($hWnd)
+_GUICtrlComboBoxEx_GetLocale($hWnd)
+_GUICtrlComboBoxEx_GetLocaleCountry($hWnd)
+_GUICtrlComboBoxEx_GetLocaleLang($hWnd)
+_GUICtrlComboBoxEx_GetLocalePrimLang($hWnd)
+_GUICtrlComboBoxEx_GetLocaleSubLang($hWnd)
+_GUICtrlComboBoxEx_GetMinVisible($hWnd)
+_GUICtrlComboBoxEx_GetTopIndex($hWnd)
+_GUICtrlComboBoxEx_GetUnicode($hWnd)
+_GUICtrlComboBoxEx_InitStorage($hWnd, $iNum, $iBytes)
+_GUICtrlComboBoxEx_InsertString($hWnd, $sText [, $iIndex = -1 [, $iImage = -1 [, $iSelectedImage = -1 [, $iOverlayImage = -1 [, $iIndent = -1 [, $iParam = -1]]]]]])
+_GUICtrlComboBoxEx_LimitText($hWnd [, $iLimit = 0])
+_GUICtrlComboBoxEx_ReplaceEditSel($hWnd, $sText)
+_GUICtrlComboBoxEx_ResetContent($hWnd)
+_GUICtrlComboBoxEx_SetCurSel($hWnd [, $iIndex = -1])
+_GUICtrlComboBoxEx_SetDroppedWidth($hWnd, $iWidth)
+_GUICtrlComboBoxEx_SetEditSel($hWnd, $iStart, $iStop)
+_GUICtrlComboBoxEx_SetEditText($hWnd, $sText)
+_GUICtrlComboBoxEx_SetExtendedStyle($hWnd, $iExStyle [, $iExMask = 0])
+_GUICtrlComboBoxEx_SetExtendedUI($hWnd [, $bExtended = False])
+_GUICtrlComboBoxEx_SetImageList($hWnd, $hHandle)
+_GUICtrlComboBoxEx_SetItem($hWnd, $sText [, $iIndex = 0 [, $iImage = -1 [, $iSelectedImage = -1 [, $iOverlayImage = -1 [, $iIndent = -1 [, $iParam = -1]]]]]])
+_GUICtrlComboBoxEx_SetItemEx($hWnd, ByRef $tItem [, $tBuffer = 0])
+_GUICtrlComboBoxEx_SetItemHeight($hWnd, $iComponent, $iHeight)
+_GUICtrlComboBoxEx_SetItemImage($hWnd, $iIndex, $iImage)
+_GUICtrlComboBoxEx_SetItemIndent($hWnd, $iIndex, $iIndent)
+_GUICtrlComboBoxEx_SetItemOverlayImage($hWnd, $iIndex, $iImage)
+_GUICtrlComboBoxEx_SetItemParam($hWnd, $iIndex, $iParam)
+_GUICtrlComboBoxEx_SetItemSelectedImage($hWnd, $iIndex, $iImage)
+_GUICtrlComboBoxEx_SetMinVisible($hWnd, $iMinimum)
+_GUICtrlComboBoxEx_SetTopIndex($hWnd, $iIndex)
+_GUICtrlComboBoxEx_SetUnicode($hWnd [, $bUnicode = True])
+_GUICtrlComboBoxEx_ShowDropDown($hWnd [, $bShow = False])
+#EndRegion
+#Region ; GuiDateTimePicker
+#include <GuiDateTimePicker.au3>
+_GUICtrlDTP_Create($hWnd, $iX, $iY [, $iWidth = 120 [, $iHeight = 21 [, $iStyle = 0x00000000 [, $iExStyle = 0x00000000]]]])
+_GUICtrlDTP_Destroy(ByRef $hWnd)
+_GUICtrlDTP_GetMCColor($hWnd, $iIndex)
+_GUICtrlDTP_GetMCFont($hWnd)
+_GUICtrlDTP_GetMonthCal($hWnd)
+_GUICtrlDTP_GetRange($hWnd)
+_GUICtrlDTP_GetRangeEx($hWnd)
+_GUICtrlDTP_GetSystemTime($hWnd)
+_GUICtrlDTP_GetSystemTimeEx($hWnd)
+_GUICtrlDTP_SetFormat($hWnd, $sFormat)
+_GUICtrlDTP_SetMCColor($hWnd, $iIndex, $iColor)
+_GUICtrlDTP_SetMCFont($hWnd, $hFont [, $bRedraw = True])
+_GUICtrlDTP_SetRange($hWnd, ByRef $aRange)
+_GUICtrlDTP_SetRangeEx($hWnd, ByRef $tRange)
+_GUICtrlDTP_SetSystemTime($hWnd, ByRef $aDate)
+_GUICtrlDTP_SetSystemTimeEx($hWnd, ByRef $tDate [, $bFlag = False])
+#EndRegion
+#Region ; GuiEdit
+#include <GuiEdit.au3>
+_GUICtrlEdit_AppendText($hWnd, $sText)
+_GUICtrlEdit_BeginUpdate($hWnd)
+_GUICtrlEdit_CanUndo($hWnd)
+_GUICtrlEdit_CharFromPos($hWnd, $iX, $iY)
+_GUICtrlEdit_Create($hWnd, $sText, $iX, $iY [, $iWidth = 150 [, $iHeight = 150 [, $iStyle = 0x003010C4 [, $iExStyle = 0x00000200]]]])
+_GUICtrlEdit_Destroy(ByRef $hWnd)
+_GUICtrlEdit_EmptyUndoBuffer($hWnd)
+_GUICtrlEdit_EndUpdate($hWnd)
+_GUICtrlEdit_Find($hWnd [, $bReplace = False])
+_GUICtrlEdit_FmtLines($hWnd [, $bSoftBreak = False])
+_GUICtrlEdit_GetCueBanner($hWnd)
+_GUICtrlEdit_GetFirstVisibleLine($hWnd)
+_GUICtrlEdit_GetLimitText($hWnd)
+_GUICtrlEdit_GetLine($hWnd, $iLine)
+_GUICtrlEdit_GetLineCount($hWnd)
+_GUICtrlEdit_GetMargins($hWnd)
+_GUICtrlEdit_GetModify($hWnd)
+_GUICtrlEdit_GetPasswordChar($hWnd)
+_GUICtrlEdit_GetRECT($hWnd)
+_GUICtrlEdit_GetRECTEx($hWnd)
+_GUICtrlEdit_GetSel($hWnd)
+_GUICtrlEdit_GetText($hWnd)
+_GUICtrlEdit_GetTextLen($hWnd)
+_GUICtrlEdit_HideBalloonTip($hWnd)
+_GUICtrlEdit_InsertText($hWnd, $sText [, $iIndex = -1])
+_GUICtrlEdit_LineFromChar($hWnd [, $iIndex = -1])
+_GUICtrlEdit_LineIndex($hWnd [, $iIndex = -1])
+_GUICtrlEdit_LineLength($hWnd [, $iIndex = -1])
+_GUICtrlEdit_LineScroll($hWnd, $iHoriz, $iVert)
+_GUICtrlEdit_PosFromChar($hWnd, $iIndex)
+_GUICtrlEdit_ReplaceSel($hWnd, $sText [, $bUndo = True])
+_GUICtrlEdit_Scroll($hWnd, $iDirection)
+_GUICtrlEdit_SetCueBanner($hWnd, $sText [, $bOnFocus = False])
+_GUICtrlEdit_SetLimitText($hWnd, $iLimit)
+_GUICtrlEdit_SetMargins($hWnd [, $iMargin = 0x1 [, $iLeft = 0xFFFF [, $iRight = 0xFFFF]]])
+_GUICtrlEdit_SetModify($hWnd, $bModified)
+_GUICtrlEdit_SetPadding($hWnd, $iCX, $iCY)
+_GUICtrlEdit_SetPasswordChar($hWnd [, $sDisplayChar = "0"])
+_GUICtrlEdit_SetReadOnly($hWnd, $bReadOnly)
+_GUICtrlEdit_SetRECT($hWnd, $aRect)
+_GUICtrlEdit_SetRECTEx($hWnd, $tRECT)
+_GUICtrlEdit_SetRECTNP($hWnd, $aRect)
+_GUICtrlEdit_SetRectNPEx($hWnd, $tRECT)
+_GUICtrlEdit_SetSel($hWnd, $iStart, $iEnd)
+_GUICtrlEdit_SetTabStops($hWnd, $aTabStops)
+_GUICtrlEdit_SetText($hWnd, $sText)
+_GUICtrlEdit_ShowBalloonTip($hWnd, $sTitle, $sText, $iIcon)
+_GUICtrlEdit_Undo($hWnd)
+#EndRegion
+#Region ; GuiHeader
+#include <GuiHeader.au3>
+_GUICtrlHeader_AddItem($hWnd, $sText [, $iWidth = 50 [, $iAlign = 0 [, $iImage = -1 [, $bOnRight = False]]]])
+_GUICtrlHeader_ClearFilter($hWnd, $iIndex)
+_GUICtrlHeader_ClearFilterAll($hWnd)
+_GUICtrlHeader_Create($hWnd [, $iStyle = 0x00000046])
+_GUICtrlHeader_CreateDragImage($hWnd, $iIndex)
+_GUICtrlHeader_DeleteItem($hWnd, $iIndex)
+_GUICtrlHeader_Destroy(ByRef $hWnd)
+_GUICtrlHeader_EditFilter($hWnd, $iIndex [, $bDiscard = True])
+_GUICtrlHeader_GetBitmapMargin($hWnd)
+_GUICtrlHeader_GetFilterText($hWnd, $iIndex)
+_GUICtrlHeader_GetImageList($hWnd)
+_GUICtrlHeader_GetItem($hWnd, $iIndex, ByRef $tItem)
+_GUICtrlHeader_GetItemAlign($hWnd, $iIndex)
+_GUICtrlHeader_GetItemBitmap($hWnd, $iIndex)
+_GUICtrlHeader_GetItemCount($hWnd)
+_GUICtrlHeader_GetItemDisplay($hWnd, $iIndex)
+_GUICtrlHeader_GetItemFlags($hWnd, $iIndex)
+_GUICtrlHeader_GetItemFormat($hWnd, $iIndex)
+_GUICtrlHeader_GetItemImage($hWnd, $iIndex)
+_GUICtrlHeader_GetItemOrder($hWnd, $iIndex)
+_GUICtrlHeader_GetItemParam($hWnd, $iIndex)
+_GUICtrlHeader_GetItemRect($hWnd, $iIndex)
+_GUICtrlHeader_GetItemRectEx($hWnd, $iIndex)
+_GUICtrlHeader_GetItemText($hWnd, $iIndex)
+_GUICtrlHeader_GetItemWidth($hWnd, $iIndex)
+_GUICtrlHeader_GetOrderArray($hWnd)
+_GUICtrlHeader_GetUnicodeFormat($hWnd)
+_GUICtrlHeader_HitTest($hWnd, $iX, $iY)
+_GUICtrlHeader_InsertItem($hWnd, $iIndex, $sText [, $iWidth = 50 [, $iAlign = 0 [, $iImage = -1 [, $bOnRight = False]]]])
+_GUICtrlHeader_Layout($hWnd, ByRef $tRECT)
+_GUICtrlHeader_OrderToIndex($hWnd, $iOrder)
+_GUICtrlHeader_SetBitmapMargin($hWnd, $iWidth)
+_GUICtrlHeader_SetFilterChangeTimeout($hWnd, $iTimeOut)
+_GUICtrlHeader_SetHotDivider($hWnd, $iFlag, $iInputValue)
+_GUICtrlHeader_SetImageList($hWnd, $hImage)
+_GUICtrlHeader_SetItem($hWnd, $iIndex, ByRef $tItem)
+_GUICtrlHeader_SetItemAlign($hWnd, $iIndex, $iAlign)
+_GUICtrlHeader_SetItemBitmap($hWnd, $iIndex, $hBitmap)
+_GUICtrlHeader_SetItemDisplay($hWnd, $iIndex, $iDisplay)
+_GUICtrlHeader_SetItemFlags($hWnd, $iIndex, $iFlags)
+_GUICtrlHeader_SetItemFormat($hWnd, $iIndex, $iFormat)
+_GUICtrlHeader_SetItemImage($hWnd, $iIndex, $iImage)
+_GUICtrlHeader_SetItemOrder($hWnd, $iIndex, $iOrder)
+_GUICtrlHeader_SetItemParam($hWnd, $iIndex, $iParam)
+_GUICtrlHeader_SetItemText($hWnd, $iIndex, $sText)
+_GUICtrlHeader_SetItemWidth($hWnd, $iIndex, $iWidth)
+_GUICtrlHeader_SetOrderArray($hWnd, ByRef $aOrder)
+_GUICtrlHeader_SetUnicodeFormat($hWnd, $bUnicode)
+#EndRegion
+#Region ; GuiImageList
+#include <GuiImageList.au3>
+_GUIImageList_Add($hWnd, $hImage [, $hMask = 0])
+_GUIImageList_AddBitmap($hWnd, $sImage [, $sMask = ""])
+_GUIImageList_AddIcon($hWnd, $sFilePath [, $iIndex = 0 [, $bLarge = False]])
+_GUIImageList_AddMasked($hWnd, $hImage [, $iMask = 0])
+_GUIImageList_BeginDrag($hWnd, $iTrack, $iXHotSpot, $iYHotSpot)
+_GUIImageList_Copy($hWnd, $iSource, $iDestination)
+_GUIImageList_Create([$iCX = 16 [, $iCY = 16 [, $iColor = 4 [, $iOptions = 0 [, $iInitial = 4 [, $iGrow = 4]]]]]])
+_GUIImageList_Destroy($hWnd)
+_GUIImageList_DestroyIcon($hIcon)
+_GUIImageList_DragEnter($hWnd, $iX, $iY)
+_GUIImageList_DragLeave($hWnd)
+_GUIImageList_DragMove($iX, $iY)
+_GUIImageList_Draw($hWnd, $iIndex, $hDC, $iX, $iY [, $iStyle = 0])
+_GUIImageList_DrawEx($hWnd, $iIndex, $hDC, $iX, $iY [, $iDX = 0 [, $iDY = 0 [, $iRGBBk = 0xFFFFFFFF [, $iRGBFg = 0xFFFFFFFF [, $iStyle = 0]]]]])
+_GUIImageList_Duplicate($hWnd)
+_GUIImageList_EndDrag()
+_GUIImageList_GetBkColor($hWnd)
+_GUIImageList_GetIcon($hWnd, $iIndex [, $iStyle = 0])
+_GUIImageList_GetIconHeight($hWnd)
+_GUIImageList_GetIconSize($hWnd)
+_GUIImageList_GetIconSizeEx($hWnd)
+_GUIImageList_GetIconWidth($hWnd)
+_GUIImageList_GetImageCount($hWnd)
+_GUIImageList_GetImageInfoEx($hWnd, $iIndex)
+_GUIImageList_Remove($hWnd [, $iIndex = -1])
+_GUIImageList_ReplaceIcon($hWnd, $iIndex, $hIcon)
+_GUIImageList_SetBkColor($hWnd, $iClrBk)
+_GUIImageList_SetIconSize($hWnd, $iCX, $iCY)
+_GUIImageList_SetImageCount($hWnd, $iNewCount)
+_GUIImageList_Swap($hWnd, $iSource, $iDestination)
+#EndRegion
+#Region ; GuiIPAddress
+#include <GuiIPAddress.au3>
+_GUICtrlIpAddress_ClearAddress($hWnd)
+_GUICtrlIpAddress_Create($hWnd, $iX, $iY [, $iWidth = 125 [, $iHeight = 25 [, $iStyles = 0x00000000 [, $iExstyles = 0x00000000]]]])
+_GUICtrlIpAddress_Destroy(ByRef $hWnd)
+_GUICtrlIpAddress_Get($hWnd)
+_GUICtrlIpAddress_GetArray($hWnd)
+_GUICtrlIpAddress_GetEx($hWnd)
+_GUICtrlIpAddress_IsBlank($hWnd)
+_GUICtrlIpAddress_Set($hWnd, $sAddress)
+_GUICtrlIpAddress_SetArray($hWnd, $aAddress)
+_GUICtrlIpAddress_SetEx($hWnd, $tIP)
+_GUICtrlIpAddress_SetFocus($hWnd, $iIndex)
+_GUICtrlIpAddress_SetFont($hWnd [, $sFaceName = "Arial" [, $iFontSize = 12 [, $iFontWeight = 400 [, $bFontItalic = False]]]])
+_GUICtrlIpAddress_SetRange($hWnd, $iIndex [, $iLowRange = 0 [, $iHighRange = 255]])
+_GUICtrlIpAddress_ShowHide($hWnd, $iState)
+#EndRegion
+#Region ; GuiListBox
+#include <GuiListBox.au3>
+_GUICtrlListBox_AddFile($hWnd, $sFilePath)
+_GUICtrlListBox_AddString($hWnd, $sText)
+_GUICtrlListBox_BeginUpdate($hWnd)
+_GUICtrlListBox_ClickItem($hWnd, $iIndex [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 0]]]])
+_GUICtrlListBox_Create($hWnd, $sText, $iX, $iY [, $iWidth = 100 [, $iHeight = 200 [, $iStyle = 0x00B00002 [, $iExStyle = 0x00000200]]]])
+_GUICtrlListBox_DeleteString($hWnd, $iIndex)
+_GUICtrlListBox_Destroy(ByRef $hWnd)
+_GUICtrlListBox_Dir($hWnd, $sFilePath [, $iAttributes = 0 [, $bBrackets = True]])
+_GUICtrlListBox_EndUpdate($hWnd)
+_GUICtrlListBox_FindInText($hWnd, $sText [, $iStart = -1 [, $bWrapOK = True]])
+_GUICtrlListBox_FindString($hWnd, $sText [, $bExact = False])
+_GUICtrlListBox_GetAnchorIndex($hWnd)
+_GUICtrlListBox_GetCaretIndex($hWnd)
+_GUICtrlListBox_GetCount($hWnd)
+_GUICtrlListBox_GetCurSel($hWnd)
+_GUICtrlListBox_GetHorizontalExtent($hWnd)
+_GUICtrlListBox_GetItemData($hWnd, $iIndex)
+_GUICtrlListBox_GetItemHeight($hWnd)
+_GUICtrlListBox_GetItemRect($hWnd, $iIndex)
+_GUICtrlListBox_GetItemRectEx($hWnd, $iIndex)
+_GUICtrlListBox_GetListBoxInfo($hWnd)
+_GUICtrlListBox_GetLocale($hWnd)
+_GUICtrlListBox_GetLocaleCountry($hWnd)
+_GUICtrlListBox_GetLocaleLang($hWnd)
+_GUICtrlListBox_GetLocalePrimLang($hWnd)
+_GUICtrlListBox_GetLocaleSubLang($hWnd)
+_GUICtrlListBox_GetSel($hWnd, $iIndex)
+_GUICtrlListBox_GetSelCount($hWnd)
+_GUICtrlListBox_GetSelItems($hWnd)
+_GUICtrlListBox_GetSelItemsText($hWnd)
+_GUICtrlListBox_GetText($hWnd, $iIndex)
+_GUICtrlListBox_GetTextLen($hWnd, $iIndex)
+_GUICtrlListBox_GetTopIndex($hWnd)
+_GUICtrlListBox_InitStorage($hWnd, $iItems, $iBytes)
+_GUICtrlListBox_InsertString($hWnd, $sText [, $iIndex = -1])
+_GUICtrlListBox_ItemFromPoint($hWnd, $iX, $iY)
+_GUICtrlListBox_ReplaceString($hWnd, $iIndex, $sText)
+_GUICtrlListBox_ResetContent($hWnd)
+_GUICtrlListBox_SelectString($hWnd, $sText [, $iIndex = -1])
+_GUICtrlListBox_SelItemRange($hWnd, $iFirst, $iLast [, $bSelect = True])
+_GUICtrlListBox_SelItemRangeEx($hWnd, $iFirst, $iLast)
+_GUICtrlListBox_SetAnchorIndex($hWnd, $iIndex)
+_GUICtrlListBox_SetCaretIndex($hWnd, $iIndex [, $bPartial = False])
+_GUICtrlListBox_SetColumnWidth($hWnd, $iWidth)
+_GUICtrlListBox_SetCurSel($hWnd, $iIndex)
+_GUICtrlListBox_SetHorizontalExtent($hWnd, $iWidth)
+_GUICtrlListBox_SetItemData($hWnd, $iIndex, $iValue)
+_GUICtrlListBox_SetItemHeight($hWnd, $iHeight [, $iIndex = 0])
+_GUICtrlListBox_SetLocale($hWnd, $iLocal)
+_GUICtrlListBox_SetSel($hWnd [, $iIndex = -1 [, $iSelect = -1]])
+_GUICtrlListBox_SetTabStops($hWnd, $aTabStops)
+_GUICtrlListBox_SetTopIndex($hWnd, $iIndex)
+_GUICtrlListBox_Sort($hWnd)
+_GUICtrlListBox_SwapString($hWnd, $iIndexA, $iIndexB)
+_GUICtrlListBox_UpdateHScroll($hWnd)
+#EndRegion
+#Region ; GuiListView
+#include <GuiListView.au3>
+_GUICtrlListView_AddArray($hWnd, ByRef $aItems)
+_GUICtrlListView_AddColumn($hWnd, $sText [, $iWidth = 50 [, $iAlign = -1 [, $iImage = -1 [, $bOnRight = False]]]])
+_GUICtrlListView_AddItem($hWnd, $sText [, $iImage = -1 [, $iParam = 0]])
+_GUICtrlListView_AddSubItem($hWnd, $iIndex, $sText, $iSubItem [, $iImage = -1])
+_GUICtrlListView_ApproximateViewHeight($hWnd [, $iCount = -1 [, $iCX = -1 [, $iCY = -1]]])
+_GUICtrlListView_ApproximateViewRect($hWnd [, $iCount = -1 [, $iCX = -1 [, $iCY = -1]]])
+_GUICtrlListView_ApproximateViewWidth($hWnd [, $iCount = -1 [, $iCX = -1 [, $iCY = -1]]])
+_GUICtrlListView_Arrange($hWnd [, $iArrange = 0])
+_GUICtrlListView_BeginUpdate($hWnd)
+_GUICtrlListView_CancelEditLabel($hWnd)
+_GUICtrlListView_ClickItem($hWnd, $iIndex [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 1]]]])
+_GUICtrlListView_CopyItems($hWnd_Source, $hWnd_Destination [, $bDelFlag = False])
+_GUICtrlListView_Create($hWnd, $sHeaderText, $iX, $iY [, $iWidth = 150 [, $iHeight = 150 [, $iStyle = 0x0000000D [, $iExStyle = 0x00000000 [, $bCoInit = False]]]]])
+_GUICtrlListView_CreateDragImage($hWnd, $iIndex)
+_GUICtrlListView_CreateSolidBitMap($hWnd, $iColor, $iWidth, $iHeight)
+_GUICtrlListView_DeleteAllItems($hWnd)
+_GUICtrlListView_DeleteColumn($hWnd, $iCol)
+_GUICtrlListView_DeleteItem($hWnd, $iIndex)
+_GUICtrlListView_DeleteItemsSelected($hWnd)
+_GUICtrlListView_Destroy(ByRef $hWnd)
+_GUICtrlListView_DrawDragImage(ByRef $hWnd, ByRef $aDrag)
+_GUICtrlListView_EditLabel($hWnd, $iIndex)
+_GUICtrlListView_EnableGroupView($hWnd [, $bEnable = True])
+_GUICtrlListView_EndUpdate($hWnd)
+_GUICtrlListView_EnsureVisible($hWnd, $iIndex [, $bPartialOK = False])
+_GUICtrlListView_FindInText($hWnd, $sText [, $iStart = -1 [, $bWrapOK = True [, $bReverse = False]]])
+_GUICtrlListView_FindItem($hWnd, $iStart, ByRef $tFindInfo [, $sText = ""])
+_GUICtrlListView_FindNearest($hWnd, $iX, $iY [, $iDir = 0 [, $iStart = -1 [, $bWrapOK = True]]])
+_GUICtrlListView_FindParam($hWnd, $iParam [, $iStart = -1])
+_GUICtrlListView_FindText($hWnd, $sText [, $iStart = -1 [, $bPartialOK = True [, $bWrapOK = True]]])
+_GUICtrlListView_GetBkColor($hWnd)
+_GUICtrlListView_GetBkImage($hWnd)
+_GUICtrlListView_GetCallbackMask($hWnd)
+_GUICtrlListView_GetColumn($hWnd, $iIndex)
+_GUICtrlListView_GetColumnCount($hWnd)
+_GUICtrlListView_GetColumnOrder($hWnd)
+_GUICtrlListView_GetColumnOrderArray($hWnd)
+_GUICtrlListView_GetColumnWidth($hWnd, $iCol)
+_GUICtrlListView_GetCounterPage($hWnd)
+_GUICtrlListView_GetEditControl($hWnd)
+_GUICtrlListView_GetExtendedListViewStyle($hWnd)
+_GUICtrlListView_GetFocusedGroup($hWnd)
+_GUICtrlListView_GetGroupCount($hWnd)
+_GUICtrlListView_GetGroupInfo($hWnd, $iGroupID)
+_GUICtrlListView_GetGroupInfoByIndex($hWnd, $iIndex)
+_GUICtrlListView_GetGroupRect($hWnd, $iGroupID [, $iGet = $LVGGR_GROUP])
+_GUICtrlListView_GetGroupViewEnabled($hWnd)
+_GUICtrlListView_GetHeader($hWnd)
+_GUICtrlListView_GetHotCursor($hWnd)
+_GUICtrlListView_GetHotItem($hWnd)
+_GUICtrlListView_GetHoverTime($hWnd)
+_GUICtrlListView_GetImageList($hWnd, $iImageList)
+_GUICtrlListView_GetISearchString($hWnd)
+_GUICtrlListView_GetItem($hWnd, $iIndex [, $iSubItem = 0])
+_GUICtrlListView_GetItemChecked($hWnd, $iIndex)
+_GUICtrlListView_GetItemCount($hWnd)
+_GUICtrlListView_GetItemCut($hWnd, $iIndex)
+_GUICtrlListView_GetItemDropHilited($hWnd, $iIndex)
+_GUICtrlListView_GetItemEx($hWnd, ByRef $tItem)
+_GUICtrlListView_GetItemFocused($hWnd, $iIndex)
+_GUICtrlListView_GetItemGroupID($hWnd, $iIndex)
+_GUICtrlListView_GetItemImage($hWnd, $iIndex [, $iSubItem = 0])
+_GUICtrlListView_GetItemIndent($hWnd, $iIndex)
+_GUICtrlListView_GetItemParam($hWnd, $iIndex)
+_GUICtrlListView_GetItemPosition($hWnd, $iIndex)
+_GUICtrlListView_GetItemPositionX($hWnd, $iIndex)
+_GUICtrlListView_GetItemPositionY($hWnd, $iIndex)
+_GUICtrlListView_GetItemRect($hWnd, $iIndex [, $iPart = 3])
+_GUICtrlListView_GetItemRectEx($hWnd, $iIndex [, $iPart = 3])
+_GUICtrlListView_GetItemSelected($hWnd, $iIndex)
+_GUICtrlListView_GetItemSpacing($hWnd [, $bSmall = False])
+_GUICtrlListView_GetItemSpacingX($hWnd [, $bSmall = False])
+_GUICtrlListView_GetItemSpacingY($hWnd [, $bSmall = False])
+_GUICtrlListView_GetItemState($hWnd, $iIndex, $iMask)
+_GUICtrlListView_GetItemStateImage($hWnd, $iIndex)
+_GUICtrlListView_GetItemText($hWnd, $iIndex [, $iSubItem = 0])
+_GUICtrlListView_GetItemTextArray($hWnd [, $iItem = -1])
+_GUICtrlListView_GetItemTextString($hWnd [, $iItem = -1])
+_GUICtrlListView_GetNextItem($hWnd [, $iStart = -1 [, $iSearch = 0 [, $iState = 8]]])
+_GUICtrlListView_GetNumberOfWorkAreas($hWnd)
+_GUICtrlListView_GetOrigin($hWnd)
+_GUICtrlListView_GetOriginX($hWnd)
+_GUICtrlListView_GetOriginY($hWnd)
+_GUICtrlListView_GetOutlineColor($hWnd)
+_GUICtrlListView_GetSelectedColumn($hWnd)
+_GUICtrlListView_GetSelectedCount($hWnd)
+_GUICtrlListView_GetSelectedIndices($hWnd [, $bArray = False])
+_GUICtrlListView_GetSelectionMark($hWnd)
+_GUICtrlListView_GetStringWidth($hWnd, $sString)
+_GUICtrlListView_GetSubItemRect($hWnd, $iIndex, $iSubItem [, $iPart = 0])
+_GUICtrlListView_GetTextBkColor($hWnd)
+_GUICtrlListView_GetTextColor($hWnd)
+_GUICtrlListView_GetToolTips($hWnd)
+_GUICtrlListView_GetTopIndex($hWnd)
+_GUICtrlListView_GetUnicodeFormat($hWnd)
+_GUICtrlListView_GetView($hWnd)
+_GUICtrlListView_GetViewDetails($hWnd)
+_GUICtrlListView_GetViewLarge($hWnd)
+_GUICtrlListView_GetViewList($hWnd)
+_GUICtrlListView_GetViewRect($hWnd)
+_GUICtrlListView_GetViewSmall($hWnd)
+_GUICtrlListView_GetViewTile($hWnd)
+_GUICtrlListView_HideColumn($hWnd, $iCol)
+_GUICtrlListView_HitTest($hWnd [, $iX = -1 [, $iY = -1]])
+_GUICtrlListView_InsertColumn($hWnd, $iIndex, $sText [, $iWidth = 50 [, $iAlign = -1 [, $iImage = -1 [, $bOnRight = False]]]])
+_GUICtrlListView_InsertGroup($hWnd, $iIndex, $iGroupID, $sHeader [, $iAlign = 0])
+_GUICtrlListView_InsertItem($hWnd, $sText [, $iIndex = -1 [, $iImage = -1 [, $iParam = 0]]])
+_GUICtrlListView_JustifyColumn($hWnd, $iIndex [, $iAlign = -1])
+_GUICtrlListView_MapIDToIndex($hWnd, $iID)
+_GUICtrlListView_MapIndexToID($hWnd, $iIndex)
+_GUICtrlListView_RedrawItems($hWnd, $iFirst, $iLast)
+_GUICtrlListView_RegisterSortCallBack($hWnd [, $vCompareType = 1 [, $bArrows = True [, $sPrivateCallBack = "__GUICtrlListView_Sort"]]])
+_GUICtrlListView_RemoveAllGroups($hWnd)
+_GUICtrlListView_RemoveGroup($hWnd, $iGroupID)
+_GUICtrlListView_Scroll($hWnd, $iDX, $iDY)
+_GUICtrlListView_SetBkColor($hWnd, $iColor)
+_GUICtrlListView_SetBkHBITMAP($hWnd, $hBitmap [, $iStyle = 0 [, $iXOffset = 0 [, $iYOffset = 0 [, $bDeleteBitmap = False]]]])
+_GUICtrlListView_SetBkImage($hWnd [, $sURL = "" [, $iStyle = 0 [, $iXOffset = 0 [, $iYOffset = 0]]]])
+_GUICtrlListView_SetCallBackMask($hWnd, $iMask)
+_GUICtrlListView_SetColumn($hWnd, $iIndex, $sText [, $iWidth = -1 [, $iAlign = -1 [, $iImage = -1 [, $bOnRight = False]]]])
+_GUICtrlListView_SetColumnOrder($hWnd, $sOrder)
+_GUICtrlListView_SetColumnOrderArray($hWnd, $aOrder)
+_GUICtrlListView_SetColumnWidth($hWnd, $iCol, $iWidth)
+_GUICtrlListView_SetExtendedListViewStyle($hWnd, $iExStyle [, $iExMask = 0])
+_GUICtrlListView_SetGroupInfo($hWnd, $iGroupID, $sHeader [, $iAlign = 0 [, $iState = $LVGS_NORMAL]])
+_GUICtrlListView_SetHotItem($hWnd, $iIndex)
+_GUICtrlListView_SetHoverTime($hWnd, $iTime)
+_GUICtrlListView_SetIconSpacing($hWnd, $iCX, $iCY)
+_GUICtrlListView_SetImageList($hWnd, $hHandle [, $iType = 0])
+_GUICtrlListView_SetItem($hWnd, $sText [, $iIndex = 0 [, $iSubItem = 0 [, $iImage = -1 [, $iParam = -1 [, $iIndent = -1]]]]])
+_GUICtrlListView_SetItemChecked($hWnd, $iIndex [, $bCheck = True])
+_GUICtrlListView_SetItemCount($hWnd, $iItems)
+_GUICtrlListView_SetItemCut($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlListView_SetItemDropHilited($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlListView_SetItemEx($hWnd, ByRef $tItem [, $iNested = 0])
+_GUICtrlListView_SetItemFocused($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlListView_SetItemGroupID($hWnd, $iIndex, $iGroupID)
+_GUICtrlListView_SetItemImage($hWnd, $iIndex, $iImage [, $iSubItem = 0])
+_GUICtrlListView_SetItemIndent($hWnd, $iIndex, $iIndent)
+_GUICtrlListView_SetItemParam($hWnd, $iIndex, $iParam)
+_GUICtrlListView_SetItemPosition($hWnd, $iIndex, $iCX, $iCY)
+_GUICtrlListView_SetItemPosition32($hWnd, $iIndex, $iCX, $iCY)
+_GUICtrlListView_SetItemSelected($hWnd, $iIndex [, $bSelected = True [, $bFocused = False]])
+_GUICtrlListView_SetItemState($hWnd, $iIndex, $iState, $iStateMask)
+_GUICtrlListView_SetItemStateImage($hWnd, $iIndex, $iImage)
+_GUICtrlListView_SetItemText($hWnd, $iIndex, $sText [, $iSubItem = 0])
+_GUICtrlListView_SetOutlineColor($hWnd, $iColor)
+_GUICtrlListView_SetSelectedColumn($hWnd, $iCol)
+_GUICtrlListView_SetSelectionMark($hWnd, $iIndex)
+_GUICtrlListView_SetTextBkColor($hWnd, $iColor)
+_GUICtrlListView_SetTextColor($hWnd, $iColor)
+_GUICtrlListView_SetToolTips($hWnd, $hToolTip)
+_GUICtrlListView_SetUnicodeFormat($hWnd, $bUnicode)
+_GUICtrlListView_SetView($hWnd, $iView)
+_GUICtrlListView_SetWorkAreas($hWnd, $iLeft, $iTop, $iRight, $iBottom)
+_GUICtrlListView_SimpleSort($hWnd, ByRef $vSortSense, $iCol [, $bToggleSense = True])
+_GUICtrlListView_SortItems($hWnd, $iCol)
+_GUICtrlListView_SubItemHitTest($hWnd [, $iX = -1 [, $iY = -1]])
+_GUICtrlListView_UnRegisterSortCallBack($hWnd)
+#EndRegion
+#Region ; GuiMenu
+#include <GuiMenu.au3>
+_GUICtrlMenu_AddMenuItem($hMenu, $sText [, $iCmdID = 0 [, $hSubMenu = 0]])
+_GUICtrlMenu_AppendMenu($hMenu, $iFlags, $iNewItem, $vNewItem)
+_GUICtrlMenu_CalculatePopupWindowPosition($iX, $iY, $iWidth, $iHeight [, $iFlags = 0 [, $tExclude = 0]])
+_GUICtrlMenu_CheckMenuItem($hMenu, $iItem [, $bCheck = True [, $bByPos = True]])
+_GUICtrlMenu_CheckRadioItem($hMenu, $iFirst, $iLast, $iCheck [, $bByPos = True])
+_GUICtrlMenu_CreateMenu([$iStyle = $MNS_CHECKORBMP])
+_GUICtrlMenu_CreatePopup([$iStyle = $MNS_CHECKORBMP])
+_GUICtrlMenu_DeleteMenu($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_DestroyMenu($hMenu)
+_GUICtrlMenu_DrawMenuBar($hWnd)
+_GUICtrlMenu_EnableMenuItem($hMenu, $iItem [, $iState = 0 [, $bByPos = True]])
+_GUICtrlMenu_FindItem($hMenu, $sText [, $bInStr = False [, $iStart = 0]])
+_GUICtrlMenu_FindParent($hMenu)
+_GUICtrlMenu_GetItemBmp($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemBmpChecked($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemBmpUnchecked($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemChecked($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemCount($hMenu)
+_GUICtrlMenu_GetItemData($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemDefault($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemDisabled($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemEnabled($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemGrayed($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemHighlighted($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemID($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemInfo($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemRect($hWnd, $hMenu, $iItem)
+_GUICtrlMenu_GetItemRectEx($hWnd, $hMenu, $iItem)
+_GUICtrlMenu_GetItemState($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemStateEx($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemSubMenu($hMenu, $iItem)
+_GUICtrlMenu_GetItemText($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetItemType($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_GetMenu($hWnd)
+_GUICtrlMenu_GetMenuBackground($hWnd)
+_GUICtrlMenu_GetMenuBarInfo($hWnd [, $iItem = 0 [, $iObject = 1]])
+_GUICtrlMenu_GetMenuContextHelpID($hMenu)
+_GUICtrlMenu_GetMenuData($hMenu)
+_GUICtrlMenu_GetMenuDefaultItem($hMenu [, $bByPos = True [, $iFlags = 0]])
+_GUICtrlMenu_GetMenuHeight($hMenu)
+_GUICtrlMenu_GetMenuInfo($hMenu)
+_GUICtrlMenu_GetMenuStyle($hMenu)
+_GUICtrlMenu_GetSystemMenu($hWnd [, $bRevert = False])
+_GUICtrlMenu_InsertMenuItem($hMenu, $iIndex, $sText [, $iCmdID = 0 [, $hSubMenu = 0]])
+_GUICtrlMenu_InsertMenuItemEx($hMenu, $iIndex, ByRef $tMenu [, $bByPos = True])
+_GUICtrlMenu_IsMenu($hMenu)
+_GUICtrlMenu_LoadMenu($hInst, $sMenuName)
+_GUICtrlMenu_MapAccelerator($hMenu, $sAccelKey)
+_GUICtrlMenu_MenuItemFromPoint($hWnd, $hMenu [, $iX = -1 [, $iY = -1]])
+_GUICtrlMenu_RemoveMenu($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_SetItemBitmaps($hMenu, $iItem, $hChecked, $hUnChecked [, $bByPos = True])
+_GUICtrlMenu_SetItemBmp($hMenu, $iItem, $hBitmap [, $bByPos = True])
+_GUICtrlMenu_SetItemBmpChecked($hMenu, $iItem, $hBitmap [, $bByPos = True])
+_GUICtrlMenu_SetItemBmpUnchecked($hMenu, $iItem, $hBitmap [, $bByPos = True])
+_GUICtrlMenu_SetItemChecked($hMenu, $iItem [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemData($hMenu, $iItem, $iData [, $bByPos = True])
+_GUICtrlMenu_SetItemDefault($hMenu, $iItem [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemDisabled($hMenu, $iItem [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemEnabled($hMenu, $iItem [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemGrayed($hMenu, $iItem [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemHighlighted($hMenu, $iItem [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemID($hMenu, $iItem, $iID [, $bByPos = True])
+_GUICtrlMenu_SetItemInfo($hMenu, $iItem, ByRef $tInfo [, $bByPos = True])
+_GUICtrlMenu_SetItemState($hMenu, $iItem, $iState [, $bState = True [, $bByPos = True]])
+_GUICtrlMenu_SetItemSubMenu($hMenu, $iItem, $hSubMenu [, $bByPos = True])
+_GUICtrlMenu_SetItemText($hMenu, $iItem, $sText [, $bByPos = True])
+_GUICtrlMenu_SetItemType($hMenu, $iItem, $iType [, $bByPos = True])
+_GUICtrlMenu_SetMenu($hWnd, $hMenu)
+_GUICtrlMenu_SetMenuBackground($hMenu, $hBrush)
+_GUICtrlMenu_SetMenuContextHelpID($hMenu, $iHelpID)
+_GUICtrlMenu_SetMenuData($hMenu, $iData)
+_GUICtrlMenu_SetMenuDefaultItem($hMenu, $iItem [, $bByPos = True])
+_GUICtrlMenu_SetMenuHeight($hMenu, $iHeight)
+_GUICtrlMenu_SetMenuInfo($hMenu, ByRef $tInfo)
+_GUICtrlMenu_SetMenuStyle($hMenu, $iStyle)
+_GUICtrlMenu_TrackPopupMenu($hMenu, $hWnd [, $iX = -1 [, $iY = -1 [, $iAlignX = 1 [, $iAlignY = 1 [, $iNotify = 0 [, $iButtons = 0]]]]]])
+#EndRegion
+#Region ; GuiMonthCal
+#include <GuiMonthCal.au3>
+_GUICtrlMonthCal_Create($hWnd, $iX, $iY [, $iStyle = 0x00000000 [, $iExStyle = 0x00000000]])
+_GUICtrlMonthCal_Destroy(ByRef $hWnd)
+_GUICtrlMonthCal_GetCalendarBorder($hWnd)
+_GUICtrlMonthCal_GetCalendarCount($hWnd)
+_GUICtrlMonthCal_GetColor($hWnd, $iIndex)
+_GUICtrlMonthCal_GetColorArray($hWnd, $iColor)
+_GUICtrlMonthCal_GetCurSel($hWnd)
+_GUICtrlMonthCal_GetCurSelStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetFirstDOW($hWnd)
+_GUICtrlMonthCal_GetFirstDOWStr($hWnd)
+_GUICtrlMonthCal_GetMaxSelCount($hWnd)
+_GUICtrlMonthCal_GetMaxTodayWidth($hWnd)
+_GUICtrlMonthCal_GetMinReqHeight($hWnd)
+_GUICtrlMonthCal_GetMinReqRect($hWnd)
+_GUICtrlMonthCal_GetMinReqRectArray($hWnd)
+_GUICtrlMonthCal_GetMinReqWidth($hWnd)
+_GUICtrlMonthCal_GetMonthDelta($hWnd)
+_GUICtrlMonthCal_GetMonthRange($hWnd [, $bPartial = False])
+_GUICtrlMonthCal_GetMonthRangeMax($hWnd [, $bPartial = False])
+_GUICtrlMonthCal_GetMonthRangeMaxStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetMonthRangeMin($hWnd [, $bPartial = False])
+_GUICtrlMonthCal_GetMonthRangeMinStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetMonthRangeSpan($hWnd [, $bPartial = False])
+_GUICtrlMonthCal_GetRange($hWnd)
+_GUICtrlMonthCal_GetRangeMax($hWnd)
+_GUICtrlMonthCal_GetRangeMaxStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetRangeMin($hWnd)
+_GUICtrlMonthCal_GetRangeMinStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetSelRange($hWnd)
+_GUICtrlMonthCal_GetSelRangeMax($hWnd)
+_GUICtrlMonthCal_GetSelRangeMaxStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetSelRangeMin($hWnd)
+_GUICtrlMonthCal_GetSelRangeMinStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetToday($hWnd)
+_GUICtrlMonthCal_GetTodayStr($hWnd [, $sFormat = "%02d/%02d/%04d"])
+_GUICtrlMonthCal_GetUnicodeFormat($hWnd)
+_GUICtrlMonthCal_HitTest($hWnd, $iX, $iY)
+_GUICtrlMonthCal_SetCalendarBorder($hWnd [, $iBorderSize = 4 [, $bSetBorder = True]])
+_GUICtrlMonthCal_SetColor($hWnd, $iIndex, $iColor)
+_GUICtrlMonthCal_SetCurSel($hWnd, $iYear, $iMonth, $iDay)
+_GUICtrlMonthCal_SetDayState($hWnd, $aMasks)
+_GUICtrlMonthCal_SetFirstDOW($hWnd, $sDay)
+_GUICtrlMonthCal_SetMaxSelCount($hWnd, $iMaxSel)
+_GUICtrlMonthCal_SetMonthDelta($hWnd, $iDelta)
+_GUICtrlMonthCal_SetRange($hWnd, $iMinYear, $iMinMonth, $iMinDay, $iMaxYear, $iMaxMonth, $iMaxDay)
+_GUICtrlMonthCal_SetSelRange($hWnd, $iMinYear, $iMinMonth, $iMinDay, $iMaxYear, $iMaxMonth, $iMaxDay)
+_GUICtrlMonthCal_SetToday($hWnd, $iYear, $iMonth, $iDay)
+_GUICtrlMonthCal_SetUnicodeFormat($hWnd [, $bUnicode = False])
+#EndRegion
+#Region ; GuiReBar
+#include <GuiReBar.au3>
+_GUICtrlRebar_AddBand($hWndRebar, $hWndChild [, $iMinWidth = 100 [, $iDefaultWidth = 100 [, $sText = "" [, $iIndex = -1 [, $iStyle = -1]]]]])
+_GUICtrlRebar_AddToolBarBand($hWndRebar, $hWndToolbar [, $sText = "" [, $iIndex = -1 [, $iStyle = -1]]])
+_GUICtrlRebar_BeginDrag($hWnd, $iIndex [, $iPos = -1])
+_GUICtrlRebar_Create($hWnd [, $iStyles = 0x513])
+_GUICtrlRebar_DeleteBand($hWnd, $iIndex)
+_GUICtrlRebar_Destroy(ByRef $hWnd)
+_GUICtrlRebar_DragMove($hWnd [, $iPos = -1])
+_GUICtrlRebar_EndDrag($hWnd)
+_GUICtrlRebar_GetBandBackColor($hWnd, $iIndex)
+_GUICtrlRebar_GetBandBorders($hWnd, $iIndex)
+_GUICtrlRebar_GetBandBordersEx($hWnd, $iIndex)
+_GUICtrlRebar_GetBandChildHandle($hWnd, $iIndex)
+_GUICtrlRebar_GetBandChildSize($hWnd, $iIndex)
+_GUICtrlRebar_GetBandCount($hWnd)
+_GUICtrlRebar_GetBandForeColor($hWnd, $iIndex)
+_GUICtrlRebar_GetBandHeaderSize($hWnd, $iIndex)
+_GUICtrlRebar_GetBandID($hWnd, $iIndex)
+_GUICtrlRebar_GetBandIdealSize($hWnd, $iIndex)
+_GUICtrlRebar_GetBandLength($hWnd, $iIndex)
+_GUICtrlRebar_GetBandLParam($hWnd, $iIndex)
+_GUICtrlRebar_GetBandMargins($hWnd)
+_GUICtrlRebar_GetBandMarginsEx($hWnd)
+_GUICtrlRebar_GetBandRect($hWnd, $iIndex)
+_GUICtrlRebar_GetBandRectEx($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyle($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleBreak($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleChildEdge($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleFixedBMP($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleFixedSize($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleGripperAlways($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleHidden($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleHideTitle($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleNoGripper($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleTopAlign($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleUseChevron($hWnd, $iIndex)
+_GUICtrlRebar_GetBandStyleVariableHeight($hWnd, $iIndex)
+_GUICtrlRebar_GetBandText($hWnd, $iIndex)
+_GUICtrlRebar_GetBarHeight($hWnd)
+_GUICtrlRebar_GetBarInfo($hWnd)
+_GUICtrlRebar_GetBKColor($hWnd)
+_GUICtrlRebar_GetColorScheme($hWnd)
+_GUICtrlRebar_GetRowCount($hWnd)
+_GUICtrlRebar_GetRowHeight($hWnd, $iIndex)
+_GUICtrlRebar_GetTextColor($hWnd)
+_GUICtrlRebar_GetToolTips($hWnd)
+_GUICtrlRebar_GetUnicodeFormat($hWnd)
+_GUICtrlRebar_HitTest($hWnd [, $iX = -1 [, $iY = -1]])
+_GUICtrlRebar_IDToIndex($hWnd, $iID)
+_GUICtrlRebar_MaximizeBand($hWnd, $iIndex [, $bIdeal = True])
+_GUICtrlRebar_MinimizeBand($hWnd, $iIndex)
+_GUICtrlRebar_MoveBand($hWnd, $iIndexFrom, $iIndexTo)
+_GUICtrlRebar_SetBandBackColor($hWnd, $iIndex, $iColor)
+_GUICtrlRebar_SetBandForeColor($hWnd, $iIndex, $iColor)
+_GUICtrlRebar_SetBandHeaderSize($hWnd, $iIndex, $iNewSize)
+_GUICtrlRebar_SetBandID($hWnd, $iIndex, $iID)
+_GUICtrlRebar_SetBandIdealSize($hWnd, $iIndex, $iNewSize)
+_GUICtrlRebar_SetBandLength($hWnd, $iIndex, $iLength)
+_GUICtrlRebar_SetBandLParam($hWnd, $iIndex, $lParam)
+_GUICtrlRebar_SetBandStyle($hWnd, $iIndex, $iStyle)
+_GUICtrlRebar_SetBandStyleBreak($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleChildEdge($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleFixedBMP($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleFixedSize($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleGripperAlways($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleHidden($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleHideTitle($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleNoGripper($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleTopAlign($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleUseChevron($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandStyleVariableHeight($hWnd, $iIndex [, $bEnabled = True])
+_GUICtrlRebar_SetBandText($hWnd, $iIndex, $sText)
+_GUICtrlRebar_SetBarInfo($hWnd, $hIml)
+_GUICtrlRebar_SetBKColor($hWnd, $iColor)
+_GUICtrlRebar_SetColorScheme($hWnd, $iBtnHighlight, $iBtnShadow)
+_GUICtrlRebar_SetTextColor($hWnd, $iColor)
+_GUICtrlRebar_SetToolTips($hWnd, $hToolTip)
+_GUICtrlRebar_SetUnicodeFormat($hWnd [, $bUnicode = True])
+_GUICtrlRebar_ShowBand($hWnd, $iIndex [, $bShow = True])
+#EndRegion
+#Region ; GuiRichEdit
+#include <GuiRichEdit.au3>
+_GUICtrlRichEdit_AppendText($hWnd, $sText)
+_GUICtrlRichEdit_AutoDetectURL($hWnd, $bState)
+_GUICtrlRichEdit_CanPaste($hWnd)
+_GUICtrlRichEdit_CanPasteSpecial($hWnd)
+_GUICtrlRichEdit_CanRedo($hWnd)
+_GUICtrlRichEdit_CanUndo($hWnd)
+_GUICtrlRichEdit_ChangeFontSize($hWnd, $iIncrement)
+_GUICtrlRichEdit_Copy($hWnd)
+_GUICtrlRichEdit_Create($hWnd, $sText, $iLeft, $iTop [, $iWidth = 150 [, $iHeight = 150 [, $iStyle = -1 [, $iExStyle = -1]]]])
+_GUICtrlRichEdit_Cut($hWnd)
+_GUICtrlRichEdit_Deselect($hWnd)
+_GUICtrlRichEdit_Destroy(ByRef $hWnd)
+_GUICtrlRichEdit_EmptyUndoBuffer($hWnd)
+_GUICtrlRichEdit_FindText($hWnd, $sText [, $bForward = True [, $bMatchCase = False [, $bWholeWord = False [, $iBehavior = 0]]]])
+_GUICtrlRichEdit_FindTextInRange($hWnd, $sText [, $iStart = 0 [, $iEnd = -1 [, $bMatchCase = False [, $bWholeWord = False [, $iBehavior = 0]]]]])
+_GUICtrlRichEdit_GetBkColor($hWnd)
+_GUICtrlRichEdit_GetCharAttributes($hWnd)
+_GUICtrlRichEdit_GetCharBkColor($hWnd)
+_GUICtrlRichEdit_GetCharColor($hWnd)
+_GUICtrlRichEdit_GetCharPosFromXY($hWnd, $iX, $iY)
+_GUICtrlRichEdit_GetCharPosOfNextWord($hWnd, $iCpStart)
+_GUICtrlRichEdit_GetCharPosOfPreviousWord($hWnd, $iCpStart)
+_GUICtrlRichEdit_GetCharWordBreakInfo($hWnd, $iCp)
+_GUICtrlRichEdit_GetFirstCharPosOnLine($hWnd [, $iLine = -1])
+_GUICtrlRichEdit_GetFont($hWnd)
+_GUICtrlRichEdit_GetLineCount($hWnd)
+_GUICtrlRichEdit_GetLineLength($hWnd, $iLine)
+_GUICtrlRichEdit_GetLineNumberFromCharPos($hWnd, $iCharPos)
+_GUICtrlRichEdit_GetNextRedo($hWnd [, $bName = True])
+_GUICtrlRichEdit_GetNextUndo($hWnd [, $bName = True])
+_GUICtrlRichEdit_GetNumberOfFirstVisibleLine($hWnd)
+_GUICtrlRichEdit_GetParaAlignment($hWnd)
+_GUICtrlRichEdit_GetParaAttributes($hWnd)
+_GUICtrlRichEdit_GetParaBorder($hWnd)
+_GUICtrlRichEdit_GetParaIndents($hWnd)
+_GUICtrlRichEdit_GetParaNumbering($hWnd)
+_GUICtrlRichEdit_GetParaShading($hWnd)
+_GUICtrlRichEdit_GetParaSpacing($hWnd)
+_GUICtrlRichEdit_GetParaTabStops($hWnd)
+_GUICtrlRichEdit_GetPasswordChar($hWnd)
+_GUICtrlRichEdit_GetRECT($hWnd)
+_GUICtrlRichEdit_GetScrollPos($hWnd)
+_GUICtrlRichEdit_GetSel($hWnd)
+_GUICtrlRichEdit_GetSelAA($hWnd)
+_GUICtrlRichEdit_GetSelText($hWnd)
+_GUICtrlRichEdit_GetSpaceUnit()
+_GUICtrlRichEdit_GetText($hWnd [, $bCrToCrLf = False [, $iCodePage = 0 [, $sReplChar = ""]]])
+_GUICtrlRichEdit_GetTextInLine($hWnd, $iLine)
+_GUICtrlRichEdit_GetTextInRange($hWnd, $iStart, $iEnd)
+_GUICtrlRichEdit_GetTextLength($hWnd [, $bExact = True [, $bChars = False [, $iUseCrLf = 1]]])
+_GUICtrlRichEdit_GetVersion()
+_GUICtrlRichEdit_GetXYFromCharPos($hWnd, $iCharPos)
+_GUICtrlRichEdit_GetZoom($hWnd)
+_GUICtrlRichEdit_GotoCharPos($hWnd, $iCharPos)
+_GUICtrlRichEdit_HideSelection($hWnd [, $bHide = True])
+_GUICtrlRichEdit_InsertText($hWnd, $sText)
+_GUICtrlRichEdit_IsModified($hWnd)
+_GUICtrlRichEdit_IsTextSelected($hWnd)
+_GUICtrlRichEdit_Paste($hWnd)
+_GUICtrlRichEdit_PasteSpecial($hWnd [, $bAndObjects = True])
+_GUICtrlRichEdit_PauseRedraw($hWnd)
+_GUICtrlRichEdit_Redo($hWnd)
+_GUICtrlRichEdit_ReplaceText($hWnd, $sText [, $bCanUndo = True])
+_GUICtrlRichEdit_ResumeRedraw($hWnd)
+_GUICtrlRichEdit_ScrollLineOrPage($hWnd, $sAction)
+_GUICtrlRichEdit_ScrollLines($hWnd, $iQlines)
+_GUICtrlRichEdit_ScrollToCaret($hWnd)
+_GUICtrlRichEdit_SetBkColor($hWnd [, $iBngColor = Default])
+_GUICtrlRichEdit_SetCharAttributes($hWnd, $sStatesAndEffects [, $bWord = False])
+_GUICtrlRichEdit_SetCharBkColor($hWnd [, $iBkColor = Default])
+_GUICtrlRichEdit_SetCharColor($hWnd [, $iColor = Default])
+_GUICtrlRichEdit_SetEventMask($hWnd, $iEventMask)
+_GUICtrlRichEdit_SetFont($hWnd [, $iPoints = Default [, $sName = Default [, $iCharset = Default [, $iLcid = Default]]]])
+_GUICtrlRichEdit_SetLimitOnText($hWnd, $iNewLimit)
+_GUICtrlRichEdit_SetModified($hWnd [, $bState = True])
+_GUICtrlRichEdit_SetParaAlignment($hWnd, $sAlignment)
+_GUICtrlRichEdit_SetParaAttributes($hWnd, $sStatesAndAtts)
+_GUICtrlRichEdit_SetParaBorder($hWnd [, $sLocation = Default [, $vLineStyle = Default [, $sColor = Default [, $iSpace = Default]]]])
+_GUICtrlRichEdit_SetParaIndents($hWnd [, $vLeft = Default [, $iRight = Default [, $iFirstLine = Default]]])
+_GUICtrlRichEdit_SetParaNumbering($hWnd, $sStyle [, $iTextToNbrSpace = Default [, $bForceRoman = False]])
+_GUICtrlRichEdit_SetParaShading($hWnd [, $iWeight = Default [, $sStyle = Default [, $sForeColor = Default [, $sBackColor = Default]]]])
+_GUICtrlRichEdit_SetParaSpacing($hWnd [, $vInter = Default [, $iBefore = Default [, $iAfter = Default]]])
+_GUICtrlRichEdit_SetParaTabStops($hWnd, $sTabStops)
+_GUICtrlRichEdit_SetPasswordChar($hWnd [, $sDisplayChar = "*"])
+_GUICtrlRichEdit_SetReadOnly($hWnd [, $bState = True])
+_GUICtrlRichEdit_SetRECT($hWnd [, $iLeft = Default [, $iTop = Default [, $iRight = Default [, $iBottom = Default [, $bRedraw = True]]]]])
+_GUICtrlRichEdit_SetScrollPos($hWnd, $iX, $iY)
+_GUICtrlRichEdit_SetSel($hWnd, $iAnchor, $iActive [, $bHideSel = False])
+_GUICtrlRichEdit_SetSpaceUnit($sUnit)
+_GUICtrlRichEdit_SetTabStops($hWnd, $vTabStops [, $bRedraw = True])
+_GUICtrlRichEdit_SetText($hWnd, $sText)
+_GUICtrlRichEdit_SetUndoLimit($hWnd, $iLimit)
+_GUICtrlRichEdit_SetZoom($hWnd, $iPercent)
+_GUICtrlRichEdit_StreamFromFile($hWnd, $sFileSpec [, $iFileEncoding = Default])
+_GUICtrlRichEdit_StreamFromVar($hWnd, $sVar)
+_GUICtrlRichEdit_StreamToFile($hWnd, $sFileSpec [, $bIncludeCOM = True [, $iOpts = 0 [, $iCodePage = 0 [, $iFileEncoding = Default]]]])
+_GUICtrlRichEdit_StreamToVar($hWnd [, $bRtf = True [, $bIncludeCOM = True [, $iOpts = 0 [, $iCodePage = 0]]]])
+_GUICtrlRichEdit_Undo($hWnd)
+#EndRegion
+#Region ; GuiScrollBars
+#include <GuiScrollBars.au3>
+_GUIScrollBars_EnableScrollBar($hWnd [, $iSBflags = $SB_BOTH [, $iArrows = $ESB_ENABLE_BOTH]])
+_GUIScrollBars_GetScrollBarInfoEx($hWnd, $iObject)
+_GUIScrollBars_GetScrollBarRect($hWnd, $iObject)
+_GUIScrollBars_GetScrollBarRGState($hWnd, $iObject)
+_GUIScrollBars_GetScrollBarXYLineButton($hWnd, $iObject)
+_GUIScrollBars_GetScrollBarXYThumbBottom($hWnd, $iObject)
+_GUIScrollBars_GetScrollBarXYThumbTop($hWnd, $iObject)
+_GUIScrollBars_GetScrollInfo($hWnd, $iBar, ByRef $tSCROLLINFO)
+_GUIScrollBars_GetScrollInfoEx($hWnd, $iBar)
+_GUIScrollBars_GetScrollInfoMax($hWnd, $iBar)
+_GUIScrollBars_GetScrollInfoMin($hWnd, $iBar)
+_GUIScrollBars_GetScrollInfoPage($hWnd, $iBar)
+_GUIScrollBars_GetScrollInfoPos($hWnd, $iBar)
+_GUIScrollBars_GetScrollInfoTrackPos($hWnd, $iBar)
+_GUIScrollBars_GetScrollPos($hWnd, $iBar)
+_GUIScrollBars_GetScrollRange($hWnd, $iBar)
+_GUIScrollBars_Init($hWnd [, $iMaxH = -1 [, $iMaxV = -1]])
+_GUIScrollBars_ScrollWindow($hWnd, $iXAmount, $iYAmount)
+_GUIScrollBars_SetScrollInfo($hWnd, $iBar, $tSCROLLINFO [, $bRedraw = True])
+_GUIScrollBars_SetScrollInfoMax($hWnd, $iBar, $iMax)
+_GUIScrollBars_SetScrollInfoMin($hWnd, $iBar, $iMin)
+_GUIScrollBars_SetScrollInfoPage($hWnd, $iBar, $iPage)
+_GUIScrollBars_SetScrollInfoPos($hWnd, $iBar, $iPos)
+_GUIScrollBars_SetScrollRange($hWnd, $iBar, $iMinPos, $iMaxPos)
+_GUIScrollBars_ShowScrollBar($hWnd, $iBar [, $bShow = True])
+#EndRegion
+#Region ; GuiSlider
+#include <GuiSlider.au3>
+_GUICtrlSlider_ClearSel($hWnd)
+_GUICtrlSlider_ClearTics($hWnd)
+_GUICtrlSlider_Create($hWnd, $iX, $iY [, $iWidth = 100 [, $iHeight = 20 [, $iStyle = $TBS_AUTOTICKS [, $iExStyle = 0x00000000]]]])
+_GUICtrlSlider_Destroy(ByRef $hWnd)
+_GUICtrlSlider_GetBuddy($hWnd, $bLocation)
+_GUICtrlSlider_GetChannelRect($hWnd)
+_GUICtrlSlider_GetChannelRectEx($hWnd)
+_GUICtrlSlider_GetLineSize($hWnd)
+_GUICtrlSlider_GetLogicalTics($hWnd)
+_GUICtrlSlider_GetNumTics($hWnd)
+_GUICtrlSlider_GetPageSize($hWnd)
+_GUICtrlSlider_GetPos($hWnd)
+_GUICtrlSlider_GetRange($hWnd)
+_GUICtrlSlider_GetRangeMax($hWnd)
+_GUICtrlSlider_GetRangeMin($hWnd)
+_GUICtrlSlider_GetSel($hWnd)
+_GUICtrlSlider_GetSelEnd($hWnd)
+_GUICtrlSlider_GetSelStart($hWnd)
+_GUICtrlSlider_GetThumbLength($hWnd)
+_GUICtrlSlider_GetThumbRect($hWnd)
+_GUICtrlSlider_GetThumbRectEx($hWnd)
+_GUICtrlSlider_GetTic($hWnd, $iTic)
+_GUICtrlSlider_GetTicPos($hWnd, $iTic)
+_GUICtrlSlider_GetToolTips($hWnd)
+_GUICtrlSlider_GetUnicodeFormat($hWnd)
+_GUICtrlSlider_SetBuddy($hWnd, $bLocation, $hBuddy)
+_GUICtrlSlider_SetLineSize($hWnd, $iLineSize)
+_GUICtrlSlider_SetPageSize($hWnd, $iPageSize)
+_GUICtrlSlider_SetPos($hWnd, $iPosition)
+_GUICtrlSlider_SetRange($hWnd, $iMinimum, $iMaximum)
+_GUICtrlSlider_SetRangeMax($hWnd, $iMaximum)
+_GUICtrlSlider_SetRangeMin($hWnd, $iMinimum)
+_GUICtrlSlider_SetSel($hWnd, $iMinimum, $iMaximum)
+_GUICtrlSlider_SetSelEnd($hWnd, $iMaximum)
+_GUICtrlSlider_SetSelStart($hWnd, $iMinimum)
+_GUICtrlSlider_SetThumbLength($hWnd, $iLength)
+_GUICtrlSlider_SetTic($hWnd, $iPosition)
+_GUICtrlSlider_SetTicFreq($hWnd, $iFreg)
+_GUICtrlSlider_SetTipSide($hWnd, $iLocation)
+_GUICtrlSlider_SetToolTips($hWnd, $hWndTT)
+_GUICtrlSlider_SetUnicodeFormat($hWnd, $bUnicode)
+#EndRegion
+#Region ; GuiStatusBar
+#include <GuiStatusBar.au3>
+_GUICtrlStatusBar_Create($hWnd [, $vPartEdge = -1 [, $vPartText = "" [, $iStyles = -1 [, $iExStyles = 0x00000000]]]])
+_GUICtrlStatusBar_Destroy(ByRef $hWnd)
+_GUICtrlStatusBar_EmbedControl($hWnd, $iPart, $hControl [, $iFit = 4])
+_GUICtrlStatusBar_GetBorders($hWnd)
+_GUICtrlStatusBar_GetBordersHorz($hWnd)
+_GUICtrlStatusBar_GetBordersRect($hWnd)
+_GUICtrlStatusBar_GetBordersVert($hWnd)
+_GUICtrlStatusBar_GetCount($hWnd)
+_GUICtrlStatusBar_GetHeight($hWnd)
+_GUICtrlStatusBar_GetIcon($hWnd [, $iIndex = 0])
+_GUICtrlStatusBar_GetParts($hWnd)
+_GUICtrlStatusBar_GetRect($hWnd, $iPart)
+_GUICtrlStatusBar_GetRectEx($hWnd, $iPart)
+_GUICtrlStatusBar_GetText($hWnd, $iPart)
+_GUICtrlStatusBar_GetTextFlags($hWnd, $iPart)
+_GUICtrlStatusBar_GetTextLength($hWnd, $iPart)
+_GUICtrlStatusBar_GetTextLengthEx($hWnd, $iPart)
+_GUICtrlStatusBar_GetTipText($hWnd, $iPart)
+_GUICtrlStatusBar_GetUnicodeFormat($hWnd)
+_GUICtrlStatusBar_GetWidth($hWnd, $iPart)
+_GUICtrlStatusBar_IsSimple($hWnd)
+_GUICtrlStatusBar_Resize($hWnd)
+_GUICtrlStatusBar_SetBkColor($hWnd, $iColor)
+_GUICtrlStatusBar_SetIcon($hWnd, $iPart [, $hIcon = -1 [, $sIconFile = ""]])
+_GUICtrlStatusBar_SetMinHeight($hWnd, $iMinHeight)
+_GUICtrlStatusBar_SetParts($hWnd [, $vPartEdge = -1 [, $vPartWidth = 25]])
+_GUICtrlStatusBar_SetSimple($hWnd [, $bSimple = True])
+_GUICtrlStatusBar_SetText($hWnd [, $sText = "" [, $iPart = 0 [, $iUFlag = 0]]])
+_GUICtrlStatusBar_SetTipText($hWnd, $iPart, $sText)
+_GUICtrlStatusBar_SetUnicodeFormat($hWnd [, $bUnicode = True])
+_GUICtrlStatusBar_ShowHide($hWnd, $iState)
+#EndRegion
+#Region ; GuiTab
+#include <GuiTab.au3>
+_GUICtrlTab_ActivateTab($hWnd, $iIndex)
+_GUICtrlTab_ClickTab($hWnd, $iIndex [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 1]]]])
+_GUICtrlTab_Create($hWnd, $iX, $iY [, $iWidth = 150 [, $iHeight = 150 [, $iStyle = 0x00000040 [, $iExStyle = 0x00000000]]]])
+_GUICtrlTab_DeleteAllItems($hWnd)
+_GUICtrlTab_DeleteItem($hWnd, $iIndex)
+_GUICtrlTab_DeselectAll($hWnd [, $bExclude = True])
+_GUICtrlTab_Destroy(ByRef $hWnd)
+_GUICtrlTab_FindTab($hWnd, $sText [, $bInStr = False [, $iStart = 0]])
+_GUICtrlTab_GetCurFocus($hWnd)
+_GUICtrlTab_GetCurSel($hWnd)
+_GUICtrlTab_GetDisplayRect($hWnd)
+_GUICtrlTab_GetDisplayRectEx($hWnd)
+_GUICtrlTab_GetExtendedStyle($hWnd)
+_GUICtrlTab_GetImageList($hWnd)
+_GUICtrlTab_GetItem($hWnd, $iIndex)
+_GUICtrlTab_GetItemCount($hWnd)
+_GUICtrlTab_GetItemImage($hWnd, $iIndex)
+_GUICtrlTab_GetItemParam($hWnd, $iIndex)
+_GUICtrlTab_GetItemRect($hWnd, $iIndex)
+_GUICtrlTab_GetItemRectEx($hWnd, $iIndex)
+_GUICtrlTab_GetItemState($hWnd, $iIndex)
+_GUICtrlTab_GetItemText($hWnd, $iIndex)
+_GUICtrlTab_GetRowCount($hWnd)
+_GUICtrlTab_GetToolTips($hWnd)
+_GUICtrlTab_GetUnicodeFormat($hWnd)
+_GUICtrlTab_HighlightItem($hWnd, $iIndex [, $bHighlight = True])
+_GUICtrlTab_HitTest($hWnd, $iX, $iY)
+_GUICtrlTab_InsertItem($hWnd, $iIndex, $sText [, $iImage = -1 [, $iParam = 0]])
+_GUICtrlTab_RemoveImage($hWnd, $iIndex)
+_GUICtrlTab_SetCurFocus($hWnd, $iIndex)
+_GUICtrlTab_SetCurSel($hWnd, $iIndex)
+_GUICtrlTab_SetExtendedStyle($hWnd, $iStyle)
+_GUICtrlTab_SetImageList($hWnd, $hImage)
+_GUICtrlTab_SetItem($hWnd, $iIndex [, $sText = -1 [, $iState = -1 [, $iImage = -1 [, $iParam = -1]]]])
+_GUICtrlTab_SetItemImage($hWnd, $iIndex, $iImage)
+_GUICtrlTab_SetItemParam($hWnd, $iIndex, $iParam)
+_GUICtrlTab_SetItemSize($hWnd, $iWidth, $iHeight)
+_GUICtrlTab_SetItemState($hWnd, $iIndex, $iState)
+_GUICtrlTab_SetItemText($hWnd, $iIndex, $sText)
+_GUICtrlTab_SetMinTabWidth($hWnd, $iMinWidth)
+_GUICtrlTab_SetPadding($hWnd, $iHorz, $iVert)
+_GUICtrlTab_SetToolTips($hWnd, $hToolTip)
+_GUICtrlTab_SetUnicodeFormat($hWnd, $bUnicode)
+#EndRegion
+#Region ; GuiToolbar
+#include <GuiToolbar.au3>
+_GUICtrlToolbar_AddBitmap($hWnd, $iButtons, $hInst, $iID)
+_GUICtrlToolbar_AddButton($hWnd, $iID, $iImage [, $iString = 0 [, $iStyle = 0 [, $iState = 4 [, $iParam = 0]]]])
+_GUICtrlToolbar_AddButtonSep($hWnd [, $iWidth = 6])
+_GUICtrlToolbar_AddString($hWnd, $sString)
+_GUICtrlToolbar_ButtonCount($hWnd)
+_GUICtrlToolbar_CheckButton($hWnd, $iCommandID [, $bCheck = True])
+_GUICtrlToolbar_ClickAccel($hWnd, $sAccelKey [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 1]]]])
+_GUICtrlToolbar_ClickButton($hWnd, $iCommandID [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 1]]]])
+_GUICtrlToolbar_ClickIndex($hWnd, $iIndex [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 1]]]])
+_GUICtrlToolbar_CommandToIndex($hWnd, $iCommandID)
+_GUICtrlToolbar_Create($hWnd [, $iStyle = 0x00000800 [, $iExStyle = 0x00000000]])
+_GUICtrlToolbar_Customize($hWnd)
+_GUICtrlToolbar_DeleteButton($hWnd, $iCommandID)
+_GUICtrlToolbar_Destroy(ByRef $hWnd)
+_GUICtrlToolbar_EnableButton($hWnd, $iCommandID [, $bEnable = True])
+_GUICtrlToolbar_FindToolbar($hWnd, $sText)
+_GUICtrlToolbar_GetAnchorHighlight($hWnd)
+_GUICtrlToolbar_GetBitmapFlags($hWnd)
+_GUICtrlToolbar_GetButtonBitmap($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonInfo($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonInfoEx($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonParam($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonRect($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonRectEx($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonSize($hWnd)
+_GUICtrlToolbar_GetButtonState($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonStyle($hWnd, $iCommandID)
+_GUICtrlToolbar_GetButtonText($hWnd, $iCommandID)
+_GUICtrlToolbar_GetColorScheme($hWnd)
+_GUICtrlToolbar_GetDisabledImageList($hWnd)
+_GUICtrlToolbar_GetExtendedStyle($hWnd)
+_GUICtrlToolbar_GetHotImageList($hWnd)
+_GUICtrlToolbar_GetHotItem($hWnd)
+_GUICtrlToolbar_GetImageList($hWnd)
+_GUICtrlToolbar_GetInsertMark($hWnd)
+_GUICtrlToolbar_GetInsertMarkColor($hWnd)
+_GUICtrlToolbar_GetMaxSize($hWnd)
+_GUICtrlToolbar_GetMetrics($hWnd)
+_GUICtrlToolbar_GetPadding($hWnd)
+_GUICtrlToolbar_GetRows($hWnd)
+_GUICtrlToolbar_GetString($hWnd, $iIndex)
+_GUICtrlToolbar_GetStyle($hWnd)
+_GUICtrlToolbar_GetStyleAltDrag($hWnd)
+_GUICtrlToolbar_GetStyleCustomErase($hWnd)
+_GUICtrlToolbar_GetStyleFlat($hWnd)
+_GUICtrlToolbar_GetStyleList($hWnd)
+_GUICtrlToolbar_GetStyleRegisterDrop($hWnd)
+_GUICtrlToolbar_GetStyleToolTips($hWnd)
+_GUICtrlToolbar_GetStyleTransparent($hWnd)
+_GUICtrlToolbar_GetStyleWrapable($hWnd)
+_GUICtrlToolbar_GetTextRows($hWnd)
+_GUICtrlToolbar_GetToolTips($hWnd)
+_GUICtrlToolbar_GetUnicodeFormat($hWnd)
+_GUICtrlToolbar_HideButton($hWnd, $iCommandID [, $bHide = True])
+_GUICtrlToolbar_HighlightButton($hWnd, $iCommandID [, $bHighlight = True])
+_GUICtrlToolbar_HitTest($hWnd, $iX, $iY)
+_GUICtrlToolbar_IndexToCommand($hWnd, $iIndex)
+_GUICtrlToolbar_InsertButton($hWnd, $iIndex, $iID, $iImage [, $sText = "" [, $iStyle = 0 [, $iState = 4 [, $iParam = 0]]]])
+_GUICtrlToolbar_InsertMarkHitTest($hWnd, $iX, $iY)
+_GUICtrlToolbar_IsButtonChecked($hWnd, $iCommandID)
+_GUICtrlToolbar_IsButtonEnabled($hWnd, $iCommandID)
+_GUICtrlToolbar_IsButtonHidden($hWnd, $iCommandID)
+_GUICtrlToolbar_IsButtonHighlighted($hWnd, $iCommandID)
+_GUICtrlToolbar_IsButtonIndeterminate($hWnd, $iCommandID)
+_GUICtrlToolbar_IsButtonPressed($hWnd, $iCommandID)
+_GUICtrlToolbar_LoadBitmap($hWnd, $sFileName)
+_GUICtrlToolbar_LoadImages($hWnd, $iBitMapID)
+_GUICtrlToolbar_MapAccelerator($hWnd, $sAccelKey)
+_GUICtrlToolbar_MoveButton($hWnd, $iOldPos, $iNewPos)
+_GUICtrlToolbar_PressButton($hWnd, $iCommandID [, $bPress = True])
+_GUICtrlToolbar_SetAnchorHighlight($hWnd, $bAnchor)
+_GUICtrlToolbar_SetBitmapSize($hWnd, $iWidth, $iHeight)
+_GUICtrlToolbar_SetButtonBitMap($hWnd, $iCommandID, $iIndex)
+_GUICtrlToolbar_SetButtonInfo($hWnd, $iCommandID [, $iImage = -3 [, $iState = -1 [, $iStyle = -1 [, $iWidth = -1 [, $iParam = -1]]]]])
+_GUICtrlToolbar_SetButtonInfoEx($hWnd, $iCommandID, $tButton)
+_GUICtrlToolbar_SetButtonParam($hWnd, $iCommandID, $iParam)
+_GUICtrlToolbar_SetButtonSize($hWnd, $iHeight, $iWidth)
+_GUICtrlToolbar_SetButtonState($hWnd, $iCommandID, $iState)
+_GUICtrlToolbar_SetButtonStyle($hWnd, $iCommandID, $iStyle)
+_GUICtrlToolbar_SetButtonText($hWnd, $iCommandID, $sText)
+_GUICtrlToolbar_SetButtonWidth($hWnd, $iMin, $iMax)
+_GUICtrlToolbar_SetCmdID($hWnd, $iIndex, $iCommandID)
+_GUICtrlToolbar_SetColorScheme($hWnd, $iHighlight, $iShadow)
+_GUICtrlToolbar_SetDisabledImageList($hWnd, $hImageList)
+_GUICtrlToolbar_SetDrawTextFlags($hWnd, $iMask, $iDTFlags)
+_GUICtrlToolbar_SetExtendedStyle($hWnd, $iStyle)
+_GUICtrlToolbar_SetHotImageList($hWnd, $hImageList)
+_GUICtrlToolbar_SetHotItem($hWnd, $iIndex)
+_GUICtrlToolbar_SetImageList($hWnd, $hImageList)
+_GUICtrlToolbar_SetIndent($hWnd, $iIndent)
+_GUICtrlToolbar_SetIndeterminate($hWnd, $iCommandID [, $bState = True])
+_GUICtrlToolbar_SetInsertMark($hWnd, $iButton [, $iFlags = 0])
+_GUICtrlToolbar_SetInsertMarkColor($hWnd, $iColor)
+_GUICtrlToolbar_SetMaxTextRows($hWnd, $iMaxRows)
+_GUICtrlToolbar_SetMetrics($hWnd, $iXPad, $iYPad, $iXSpacing, $iYSpacing)
+_GUICtrlToolbar_SetPadding($hWnd, $iCX, $iCY)
+_GUICtrlToolbar_SetParent($hWnd, $hParent)
+_GUICtrlToolbar_SetRows($hWnd, $iRows [, $bLarger = True])
+_GUICtrlToolbar_SetStyle($hWnd, $iStyle)
+_GUICtrlToolbar_SetStyleAltDrag($hWnd [, $bState = True])
+_GUICtrlToolbar_SetStyleCustomErase($hWnd [, $bState = True])
+_GUICtrlToolbar_SetStyleFlat($hWnd, $bState)
+_GUICtrlToolbar_SetStyleList($hWnd, $bState)
+_GUICtrlToolbar_SetStyleRegisterDrop($hWnd, $bState)
+_GUICtrlToolbar_SetStyleToolTips($hWnd, $bState)
+_GUICtrlToolbar_SetStyleTransparent($hWnd, $bState)
+_GUICtrlToolbar_SetStyleWrapable($hWnd, $bState)
+_GUICtrlToolbar_SetToolTips($hWnd, $hToolTip)
+_GUICtrlToolbar_SetUnicodeFormat($hWnd [, $bUnicode = False])
+_GUICtrlToolbar_SetWindowTheme($hWnd, $sTheme)
+#EndRegion
+#Region ; GuiToolTip
+#include <GuiToolTip.au3>
+_GUIToolTip_Activate($hWnd)
+_GUIToolTip_AddTool($hTool, $hWnd, $sText [, $iID = 0 [, $iLeft = 0 [, $iTop = 0 [, $iRight = 0 [, $iBottom = 0 [, $iFlags = Default [, $iParam = 0]]]]]]])
+_GUIToolTip_AdjustRect($hWnd, ByRef $tRECT [, $bLarger = True])
+_GUIToolTip_BitsToTTF($iFlags)
+_GUIToolTip_Create($hWnd [, $iStyle = $_TT_ghTTDefaultStyle])
+_GUIToolTip_Deactivate($hWnd)
+_GUIToolTip_DelTool($hWnd, $hTool [, $iID = 0])
+_GUIToolTip_Destroy(ByRef $hWnd)
+_GUIToolTip_EnumTools($hWnd, $iIndex)
+_GUIToolTip_GetBubbleHeight($hWnd, $hTool, $iID [, $iFlags = 0x00000001 + 0x00000010])
+_GUIToolTip_GetBubbleSize($hWnd, $hTool, $iID [, $iFlags = 0x00000001 + 0x00000010])
+_GUIToolTip_GetBubbleWidth($hWnd, $hTool, $iID [, $iFlags = 0x00000001 + 0x00000010])
+_GUIToolTip_GetCurrentTool($hWnd)
+_GUIToolTip_GetDelayTime($hWnd, $iDuration)
+_GUIToolTip_GetMargin($hWnd)
+_GUIToolTip_GetMarginEx($hWnd)
+_GUIToolTip_GetMaxTipWidth($hWnd)
+_GUIToolTip_GetText($hWnd, $hTool, $iID)
+_GUIToolTip_GetTipBkColor($hWnd)
+_GUIToolTip_GetTipTextColor($hWnd)
+_GUIToolTip_GetTitleBitMap($hWnd)
+_GUIToolTip_GetTitleText($hWnd)
+_GUIToolTip_GetToolCount($hWnd)
+_GUIToolTip_GetToolInfo($hWnd, $hTool, $iID)
+_GUIToolTip_HitTest($hWnd, $hTool, $iX, $iY)
+_GUIToolTip_NewToolRect($hWnd, $hTool, $iID, $iLeft, $iTop, $iRight, $iBottom)
+_GUIToolTip_Pop($hWnd)
+_GUIToolTip_PopUp($hWnd)
+_GUIToolTip_SetDelayTime($hWnd, $iDuration, $iTime)
+_GUIToolTip_SetMargin($hWnd, $iLeft, $iTop, $iRight, $iBottom)
+_GUIToolTip_SetMaxTipWidth($hWnd, $iWidth)
+_GUIToolTip_SetTipBkColor($hWnd, $iColor)
+_GUIToolTip_SetTipTextColor($hWnd, $iColor)
+_GUIToolTip_SetTitle($hWnd, $sTitle [, $iIcon = 0])
+_GUIToolTip_SetToolInfo($hWnd, $sText [, $iID = 0 [, $iLeft = 0 [, $iTop = 0 [, $iRight = 0 [, $iBottom = 0 [, $iFlags = Default [, $iParam = 0]]]]]]])
+_GUIToolTip_SetWindowTheme($hWnd, $sStyle)
+_GUIToolTip_ToolExists($hWnd)
+_GUIToolTip_ToolToArray($hWnd, ByRef $tToolInfo, $iError)
+_GUIToolTip_TrackActivate($hWnd [, $bActivate = True [, $hTool = 0 [, $iID = 0]]])
+_GUIToolTip_TrackPosition($hWnd, $iX, $iY)
+_GUIToolTip_Update($hWnd)
+_GUIToolTip_UpdateTipText($hWnd, $hTool, $iID, $sText)
+#EndRegion
+#Region ; GuiTreeView
+#include <GuiTreeView.au3>
+_GUICtrlTreeView_Add($hWnd, $hSibling, $sText [, $iImage = -1 [, $iSelImage = -1]])
+_GUICtrlTreeView_AddChild($hWnd, $hParent, $sText [, $iImage = -1 [, $iSelImage = -1]])
+_GUICtrlTreeView_AddChildFirst($hWnd, $hParent, $sText [, $iImage = -1 [, $iSelImage = -1]])
+_GUICtrlTreeView_AddFirst($hWnd, $hSibling, $sText [, $iImage = -1 [, $iSelImage = -1]])
+_GUICtrlTreeView_BeginUpdate($hWnd)
+_GUICtrlTreeView_ClickItem($hWnd, $hItem [, $sButton = "left" [, $bMove = False [, $iClicks = 1 [, $iSpeed = 0]]]])
+_GUICtrlTreeView_Create($hWnd, $iX, $iY [, $iWidth = 150 [, $iHeight = 150 [, $iStyle = 0x00000037 [, $iExStyle = 0x00000000]]]])
+_GUICtrlTreeView_CreateDragImage($hWnd, $hItem)
+_GUICtrlTreeView_CreateSolidBitMap($hWnd, $iColor, $iWidth, $iHeight)
+_GUICtrlTreeView_Delete($hWnd [, $hItem = Null])
+_GUICtrlTreeView_DeleteAll($hWnd)
+_GUICtrlTreeView_DeleteChildren($hWnd, $hItem)
+_GUICtrlTreeView_Destroy(ByRef $hWnd)
+_GUICtrlTreeView_DisplayRect($hWnd, $hItem [, $bTextOnly = False])
+_GUICtrlTreeView_DisplayRectEx($hWnd, $hItem [, $bTextOnly = False])
+_GUICtrlTreeView_EditText($hWnd, $hItem)
+_GUICtrlTreeView_EndEdit($hWnd [, $bCancel = False])
+_GUICtrlTreeView_EndUpdate($hWnd)
+_GUICtrlTreeView_EnsureVisible($hWnd, $hItem)
+_GUICtrlTreeView_Expand($hWnd [, $hItem = Null [, $bExpand = True]])
+_GUICtrlTreeView_ExpandedOnce($hWnd, $hItem)
+_GUICtrlTreeView_FindItem($hWnd, $sText [, $bInStr = False [, $hStart = 0]])
+_GUICtrlTreeView_FindItemEx($hWnd, $sTreePath [, $hStart = 0])
+_GUICtrlTreeView_GetBkColor($hWnd)
+_GUICtrlTreeView_GetBold($hWnd, $hItem)
+_GUICtrlTreeView_GetChecked($hWnd, $hItem)
+_GUICtrlTreeView_GetChildCount($hWnd, $hItem)
+_GUICtrlTreeView_GetChildren($hWnd, $hItem)
+_GUICtrlTreeView_GetCount($hWnd)
+_GUICtrlTreeView_GetCut($hWnd, $hItem)
+_GUICtrlTreeView_GetDropTarget($hWnd, $hItem)
+_GUICtrlTreeView_GetEditControl($hWnd)
+_GUICtrlTreeView_GetExpanded($hWnd, $hItem)
+_GUICtrlTreeView_GetFirstChild($hWnd, $hItem)
+_GUICtrlTreeView_GetFirstItem($hWnd)
+_GUICtrlTreeView_GetFirstVisible($hWnd)
+_GUICtrlTreeView_GetFocused($hWnd, $hItem)
+_GUICtrlTreeView_GetHeight($hWnd)
+_GUICtrlTreeView_GetImageIndex($hWnd, $hItem)
+_GUICtrlTreeView_GetImageListIconHandle($hWnd, $iIndex)
+_GUICtrlTreeView_GetIndent($hWnd)
+_GUICtrlTreeView_GetInsertMarkColor($hWnd)
+_GUICtrlTreeView_GetISearchString($hWnd)
+_GUICtrlTreeView_GetItemByIndex($hWnd, $hItem, $iIndex)
+_GUICtrlTreeView_GetItemHandle($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetItemParam($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetLastChild($hWnd, $hItem)
+_GUICtrlTreeView_GetLastItem($hWnd)
+_GUICtrlTreeView_GetLineColor($hWnd)
+_GUICtrlTreeView_GetNext($hWnd, $hItem)
+_GUICtrlTreeView_GetNextChild($hWnd, $hItem)
+_GUICtrlTreeView_GetNextSibling($hWnd, $hItem)
+_GUICtrlTreeView_GetNextVisible($hWnd, $hItem)
+_GUICtrlTreeView_GetNormalImageList($hWnd)
+_GUICtrlTreeView_GetParentHandle($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetParentParam($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetPrev($hWnd, $hItem)
+_GUICtrlTreeView_GetPrevChild($hWnd, $hItem)
+_GUICtrlTreeView_GetPrevSibling($hWnd, $hItem)
+_GUICtrlTreeView_GetPrevVisible($hWnd, $hItem)
+_GUICtrlTreeView_GetScrollTime($hWnd)
+_GUICtrlTreeView_GetSelected($hWnd, $hItem)
+_GUICtrlTreeView_GetSelectedImageIndex($hWnd, $hItem)
+_GUICtrlTreeView_GetSelection($hWnd)
+_GUICtrlTreeView_GetSiblingCount($hWnd, $hItem)
+_GUICtrlTreeView_GetState($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetStateImageIndex($hWnd, $hItem)
+_GUICtrlTreeView_GetStateImageList($hWnd)
+_GUICtrlTreeView_GetText($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetTextColor($hWnd)
+_GUICtrlTreeView_GetToolTips($hWnd)
+_GUICtrlTreeView_GetTree($hWnd [, $hItem = Null])
+_GUICtrlTreeView_GetUnicodeFormat($hWnd)
+_GUICtrlTreeView_GetVisible($hWnd, $hItem)
+_GUICtrlTreeView_GetVisibleCount($hWnd)
+_GUICtrlTreeView_HitTest($hWnd, $iX, $iY)
+_GUICtrlTreeView_HitTestEx($hWnd, $iX, $iY)
+_GUICtrlTreeView_HitTestItem($hWnd, $iX, $iY)
+_GUICtrlTreeView_Index($hWnd, $hItem)
+_GUICtrlTreeView_InsertItem($hWnd, $sItem_Text [, $hItem_Parent = 0 [, $hItem_After = 0 [, $iImage = -1 [, $iSelImage = -1]]]])
+_GUICtrlTreeView_IsFirstItem($hWnd, $hItem)
+_GUICtrlTreeView_IsParent($hWnd, $hParent, $hItem)
+_GUICtrlTreeView_Level($hWnd, $hItem)
+_GUICtrlTreeView_SelectItem($hWnd, $hItem [, $iFlag = 0])
+_GUICtrlTreeView_SelectItemByIndex($hWnd, $hItem, $iIndex)
+_GUICtrlTreeView_SetBkColor($hWnd, $vRGBColor)
+_GUICtrlTreeView_SetBold($hWnd, $hItem [, $bFlag = True])
+_GUICtrlTreeView_SetChecked($hWnd, $hItem [, $bCheck = True])
+_GUICtrlTreeView_SetCheckedByIndex($hWnd, $hItem, $iIndex [, $bCheck = True])
+_GUICtrlTreeView_SetChildren($hWnd, $hItem [, $bFlag = True])
+_GUICtrlTreeView_SetCut($hWnd, $hItem [, $bFlag = True])
+_GUICtrlTreeView_SetDropTarget($hWnd, $hItem [, $bFlag = True])
+_GUICtrlTreeView_SetFocused($hWnd, $hItem [, $bFlag = True])
+_GUICtrlTreeView_SetHeight($hWnd, $iHeight)
+_GUICtrlTreeView_SetIcon($hWnd [, $hItem = Null [, $sIconFile = "" [, $iIconID = 0 [, $iImageMode = 6]]]])
+_GUICtrlTreeView_SetImageIndex($hWnd, $hItem, $iIndex)
+_GUICtrlTreeView_SetIndent($hWnd, $iIndent)
+_GUICtrlTreeView_SetInsertMark($hWnd, $hItem [, $bAfter = True])
+_GUICtrlTreeView_SetInsertMarkColor($hWnd, $iColor)
+_GUICtrlTreeView_SetItemHeight($hWnd, $hItem, $iIntegral)
+_GUICtrlTreeView_SetItemParam($hWnd, $hItem, $iParam)
+_GUICtrlTreeView_SetLineColor($hWnd, $vRGBColor)
+_GUICtrlTreeView_SetNormalImageList($hWnd, $hImageList)
+_GUICtrlTreeView_SetScrollTime($hWnd, $iTime)
+_GUICtrlTreeView_SetSelected($hWnd, $hItem [, $bFlag = True])
+_GUICtrlTreeView_SetSelectedImageIndex($hWnd, $hItem, $iIndex)
+_GUICtrlTreeView_SetState($hWnd, $hItem [, $iState = 0 [, $bSetState = True]])
+_GUICtrlTreeView_SetStateImageIndex($hWnd, $hItem, $iIndex)
+_GUICtrlTreeView_SetStateImageList($hWnd, $hImageList)
+_GUICtrlTreeView_SetText($hWnd [, $hItem = Null [, $sText = ""]])
+_GUICtrlTreeView_SetTextColor($hWnd, $vRGBColor)
+_GUICtrlTreeView_SetToolTips($hWnd, $hToolTip)
+_GUICtrlTreeView_SetUnicodeFormat($hWnd [, $bFormat = True])
+_GUICtrlTreeView_Sort($hWnd)
+#EndRegion
+#EndRegion
+#Region ; IE
+#include <IE.au3>
+_IE_Example([$sModule = "basic"])
+_IE_Introduction([$sModule = "basic"])
+_IE_VersionInfo()
+_IEAction(ByRef $oObject, $sAction)
+_IEAttach($sString [, $sMode = "title" [, $iInstance = 1]])
+_IEBodyReadHTML(ByRef $oObject)
+_IEBodyReadText(ByRef $oObject)
+_IEBodyWriteHTML(ByRef $oObject, $sHTML)
+_IECreate([$sUrl = "about:blank" [, $iTryAttach = 0 [, $iVisible = 1 [, $iWait = 1 [, $iTakeFocus = 1]]]]])
+_IECreateEmbedded()
+_IEDocGetObj(ByRef $oObject)
+_IEDocInsertHTML(ByRef $oObject, $sString [, $sWhere = "beforeend"])
+_IEDocInsertText(ByRef $oObject, $sString [, $sWhere = "beforeend"])
+_IEDocReadHTML(ByRef $oObject)
+_IEDocWriteHTML(ByRef $oObject, $sHTML)
+_IEErrorNotify([$vNotify = Default])
+_IEFormElementCheckBoxSelect(ByRef $oObject, $sString [, $sName = "" [, $iSelect = 1 [, $sMode = "byValue" [, $iFireEvent = 1]]]])
+_IEFormElementGetCollection(ByRef $oObject [, $iIndex = -1])
+_IEFormElementGetObjByName(ByRef $oObject, $sName [, $iIndex = 0])
+_IEFormElementGetValue(ByRef $oObject)
+_IEFormElementOptionSelect(ByRef $oObject, $sString [, $iSelect = 1 [, $sMode = "byValue" [, $iFireEvent = 1]]])
+_IEFormElementRadioSelect(ByRef $oObject, $sString, $sName [, $iSelect = 1 [, $sMode = "byValue" [, $iFireEvent = 1]]])
+_IEFormElementSetValue(ByRef $oObject, $sNewValue [, $iFireEvent = 1])
+_IEFormGetCollection(ByRef $oObject [, $iIndex = -1])
+_IEFormGetObjByName(ByRef $oObject, $sName [, $iIndex = 0])
+_IEFormImageClick(ByRef $oObject, $sLinkText [, $sMode = "src" [, $iIndex = 0 [, $iWait = 1]]])
+_IEFormReset(ByRef $oObject)
+_IEFormSubmit(ByRef $oObject [, $iWait = 1])
+_IEFrameGetCollection(ByRef $oObject [, $iIndex = -1])
+_IEFrameGetObjByName(ByRef $oObject, $sName)
+_IEGetObjById(ByRef $oObject, $sID)
+_IEGetObjByName(ByRef $oObject, $sName [, $iIndex = 0])
+_IEHeadInsertEventScript(ByRef $oObject, $sHTMLFor, $sEvent, $sScript)
+_IEImgClick(ByRef $oObject, $sLinkText [, $sMode = "src" [, $iIndex = 0 [, $iWait = 1]]])
+_IEImgGetCollection(ByRef $oObject [, $iIndex = -1])
+_IEIsFrameSet(ByRef $oObject)
+_IELinkClickByIndex(ByRef $oObject, $iIndex [, $iWait = 1])
+_IELinkClickByText(ByRef $oObject, $sLinkText [, $iIndex = 0 [, $iWait = 1]])
+_IELinkGetCollection(ByRef $oObject [, $iIndex = -1])
+_IELoadWait(ByRef $oObject [, $iDelay = 0 [, $iTimeout = -1]])
+_IELoadWaitTimeout([$iTimeout = -1])
+_IENavigate(ByRef $oObject, $sUrl [, $iWait = 1])
+_IEPropertyGet(ByRef $oObject, $sProperty)
+_IEPropertySet(ByRef $oObject, $sProperty, $vValue)
+_IEQuit(ByRef $oObject)
+_IETableGetCollection(ByRef $oObject [, $iIndex = -1])
+_IETableWriteToArray(ByRef $oObject [, $bTranspose = False])
+_IETagNameAllGetCollection(ByRef $oObject [, $iIndex = -1])
+_IETagNameGetCollection(ByRef $oObject, $sTagName [, $iIndex = -1])
+#EndRegion
+#Region ; Inet
+#include <Inet.au3>
+_GetIP()
+_INetExplorerCapable($sIEString)
+_INetGetSource($sURL [, $bString = True])
+_INetMail($sMailTo, $sMailSubject, $sMailBody)
+_INetSmtpMail($sSMTPServer, $sFromName, $sFromAddress, $sToAddress [, $sSubject = "" [, $aBody = "" [, $sEHLO = "" [, $sFirst = " " [, $bTrace = 0]]]]])
+_TCPIpToName($sIp [, $iOption = 0 [, $hDll = "Ws2_32.dll"]])
+#EndRegion
+#include <Math.au3>
+_Degree($iRadians)
+_Max($iNum1, $iNum2)
+_Min($iNum1, $iNum2)
+_Radian($iDegrees)
+#Region ; Memory
+#include <Memory.au3>
+_MemGlobalAlloc($iBytes [, $iFlags = 0])
+_MemGlobalFree($hMemory)
+_MemGlobalLock($hMemory)
+_MemGlobalReAlloc($hMemory, $iBytes [, $iFlags = 0])
+_MemGlobalSize($hMemory)
+_MemGlobalUnlock($hMemory)
+_MemMoveMemory($pSource, $pDest, $iLength)
+_MemVirtualAlloc($pAddress, $iSize, $iAllocation, $iProtect)
+_MemVirtualAllocEx($hProcess, $pAddress, $iSize, $iAllocation, $iProtect)
+_MemVirtualFree($pAddress, $iSize, $iFreeType)
+_MemVirtualFreeEx($hProcess, $pAddress, $iSize, $iFreeType)
+#EndRegion
+#Region ; Misc
+#include <Misc.au3>
+_ChooseColor([$vReturnType = 0 [, $iColorRef = 0 [, $iRefType = 0 [, $hWndOwnder = 0]]]])
+_ChooseFont([$sFontName = "Courier New" [, $iPointSize = 10 [, $iFontColorRef = 0 [, $iFontWeight = 0 [, $bItalic = False [, $bUnderline = False [, $bStrikethru = False [, $hWndOwner = 0]]]]]]]])
+_ClipPutFile($sFilePath [, $sDelimiter = "|"])
+_FormatAutoItExitCode()
+_FormatAutoItExitMethod()
+_IsPressed($sHexKey [, $vDLL = "user32.dll"])
+_MouseTrap([$iLeft = 0 [, $iTop = 0 [, $iRight = 0 [, $iBottom = 0]]]])
+_Singleton($sOccurrenceName [, $iFlag = 0])
+_VersionCompare($sVersion1, $sVersion2)
+#EndRegion
+#Region ; NamedPipes
+#include <NamedPipes.au3>
+_NamedPipes_CallNamedPipe($sPipeName, $pInpBuf, $iInpSize, $pOutBuf, $iOutSize, ByRef $iRead [, $iTimeOut = 0])
+_NamedPipes_ConnectNamedPipe($hNamedPipe [, $tOverlapped = 0])
+_NamedPipes_CreateNamedPipe($sName [, $iAccess = 2 [, $iFlags = 2 [, $iACL = 0 [, $iType = 1 [, $iRead = 1 [, $iWait = 0 [, $iMaxInst = 25 [, $iOutBufSize = 4096 [, $iInpBufSize = 4096 [, $iDefaultTimeout = 5000 [, $tSecurity = 0]]]]]]]]]]])
+_NamedPipes_CreatePipe(ByRef $hReadPipe, ByRef $hWritePipe [, $tSecurity = 0 [, $iSize = 0]])
+_NamedPipes_DisconnectNamedPipe($hNamedPipe)
+_NamedPipes_GetNamedPipeHandleState($hNamedPipe)
+_NamedPipes_GetNamedPipeInfo($hNamedPipe)
+_NamedPipes_PeekNamedPipe($hNamedPipe)
+_NamedPipes_SetNamedPipeHandleState($hNamedPipe, $iRead, $iWait [, $iBytes = 0 [, $iTimeOut = 0]])
+_NamedPipes_TransactNamedPipe($hNamedPipe, $pInpBuf, $iInpSize, $pOutBuf, $iOutSize [, $tOverlapped = 0])
+_NamedPipes_WaitNamedPipe($sPipeName [, $iTimeOut = 0])
+#EndRegion
+#Region ; NetShare
+#include <NetShare.au3>
+_Net_Share_ConnectionEnum($sServer, $sQualifier)
+_Net_Share_FileClose($sServer, $iFileID)
+_Net_Share_FileEnum([$sServer = "" [, $sBaseName = "" [, $sUserName = ""]]])
+_Net_Share_FileGetInfo($sServer, $iFileID)
+_Net_Share_PermStr($iPerm)
+_Net_Share_ResourceStr($iResource)
+_Net_Share_SessionDel([$sServer = "" [, $sClientName = "" [, $sUserName = ""]]])
+_Net_Share_SessionEnum([$sServer = "" [, $sClientName = "" [, $sUserName = ""]]])
+_Net_Share_SessionGetInfo($sServer, $sClientName, $sUserName)
+_Net_Share_ShareAdd($sServer, $sShare, $iType, $sResourcePath [, $sComment = "" [, $iMaxUses = -1]])
+_Net_Share_ShareCheck($sServer, $sResourcePath)
+_Net_Share_ShareDel($sServer, $sShare)
+_Net_Share_ShareEnum([$sServer = ""])
+_Net_Share_ShareGetInfo($sServer, $sShare)
+_Net_Share_ShareSetInfo($sServer, $sShare, $sComment, $iMaxUses)
+_Net_Share_StatisticsGetSvr([$sServer = ""])
+_Net_Share_StatisticsGetWrk([$sWorkStation = ""])
+#EndRegion
+#include <Process.au3>
+_ProcessGetName($iPID)
+_ProcessGetPriority($vProcess)
+_RunDos($sCommand)
+#Region ; ScreenCapture
+#include <ScreenCapture.au3>
+_ScreenCapture_Capture([$sFileName = "" [, $iLeft = 0 [, $iTop = 0 [, $iRight = -1 [, $iBottom = -1 [, $bCursor = True]]]]]])
+_ScreenCapture_CaptureWnd($sFileName, $hWnd [, $iLeft = 0 [, $iTop = 0 [, $iRight = -1 [, $iBottom = -1 [, $bCursor = True]]]]])
+_ScreenCapture_SaveImage($sFileName, $hBitmap [, $bFreeBmp = True])
+_ScreenCapture_SetBMPFormat($iFormat)
+_ScreenCapture_SetJPGQuality($iQuality)
+_ScreenCapture_SetTIFColorDepth($iDepth)
+_ScreenCapture_SetTIFCompression($iCompress)
+#EndRegion
+#Region ; Security
+#include <Security.au3>
+_Security__AdjustTokenPrivileges($hToken, $bDisableAll, $tNewState, $iBufferLen [, $tPrevState = 0 [, $pRequired = 0]])
+_Security__CreateProcessWithToken($hToken, $iLogonFlags, $sCommandLine, $iCreationFlags, $sCurDir, $tSTARTUPINFO, $tPROCESS_INFORMATION)
+_Security__DuplicateTokenEx($hExistingToken, $iDesiredAccess, $iImpersonationLevel, $iTokenType)
+_Security__GetAccountSid($sAccount [, $sSystem = ""])
+_Security__GetLengthSid($pSID)
+_Security__GetTokenInformation($hToken, $iClass)
+_Security__ImpersonateSelf([$iLevel = $SECURITYIMPERSONATION])
+_Security__IsValidSid($pSID)
+_Security__LookupAccountName($sAccount [, $sSystem = ""])
+_Security__LookupAccountSid($vSID [, $sSystem = ""])
+_Security__LookupPrivilegeValue($sSystem, $sName)
+_Security__OpenProcessToken($hProcess, $iAccess)
+_Security__OpenThreadToken($iAccess [, $hThread = 0 [, $bOpenAsSelf = False]])
+_Security__OpenThreadTokenEx($iAccess [, $hThread = 0 [, $bOpenAsSelf = False]])
+_Security__SetPrivilege($hToken, $sPrivilege, $bEnable)
+_Security__SetTokenInformation($hToken, $iTokenInformation, $vTokenInformation, $iTokenInformationLength)
+_Security__SidToStringSid($pSID)
+_Security__SidTypeStr($iType)
+_Security__StringSidToSid($sSID)
+#EndRegion
+#include <SendMessage.au3>
+_SendMessage($hWnd, $iMsg [, $wParam = 0 [, $lParam = 0 [, $iReturn = 0 [, $wParamType = "wparam" [, $lParamType = "lparam" [, $sReturnType = "lresult"]]]]]])
+_SendMessageA($hWnd, $iMsg [, $wParam = 0 [, $lParam = 0 [, $iReturn = 0 [, $wParamType = "wparam" [, $lParamType = "lparam" [, $sReturnType = "lresult"]]]]]])
+#Region ; Sound
+#include <Sound.au3>
+_SoundClose($aSndID)
+_SoundLength($aSndID [, $iMode = 1])
+_SoundOpen($sFilePath)
+_SoundPause($aSndID)
+_SoundPlay($aSndID [, $iWait = 0])
+_SoundPos($aSndID [, $iMode = 1])
+_SoundResume($aSndID)
+_SoundSeek(ByRef $aSndID, $iHour, $iMin, $iSec)
+_SoundStatus($aSndID)
+_SoundStop(ByRef $aSndID)
+#EndRegion
+#Region ; SQLite
+#include <SQLite.au3>
+_SQLite_Changes([$hDB = -1])
+_SQLite_Close([$hDB = -1])
+_SQLite_Display2DResult($aResult [, $iCellWidth = 0 [, $bReturn = False [, $sDelim_Col = "" [, $sDelim_Row = @CRLF]]]])
+_SQLite_Encode($vData)
+_SQLite_ErrCode([$hDB = -1])
+_SQLite_ErrMsg([$hDB = -1])
+_SQLite_Escape($sString [, $iBuffSize = Default])
+_SQLite_Exec($hDB, $sSQL [, $sCallBack = ""])
+_SQLite_FastEncode($vData)
+_SQLite_FastEscape($sString)
+_SQLite_FetchData($hQuery, ByRef $aRow [, $bBinary = False [, $bDoNotFinalize = False [, $iColumns = 0 [, $bAutoItTypeConversion = False]]]])
+_SQLite_FetchNames($hQuery, ByRef $aNames)
+_SQLite_GetTable($hDB, $sSQL, ByRef $aResult, ByRef $iRows, ByRef $iColumns [, $iCharSize = -1])
+_SQLite_GetTable2D($hDB, $sSQL, ByRef $aResult, ByRef $iRows, ByRef $iColumns [, $iCharSize = -1 [, $bSwichDimensions = False]])
+_SQLite_GetTableData2D($hDB, $sSQL, ByRef $aResult, ByRef $iRows, ByRef $aNames)
+_SQLite_LastInsertRowID([$hDB = -1])
+_SQLite_LibVersion()
+_SQLite_Open([$sDatabase_Filename = ":memory:" [, $iAccessMode = Default [, $iEncoding = $SQLITE_ENCODING_UTF8]]])
+_SQLite_Query($hDB, $sSQL, ByRef $hQuery)
+_SQLite_QueryFinalize($hQuery)
+_SQLite_QueryReset($hQuery)
+_SQLite_QuerySingleRow($hDB, $sSQL, ByRef $aRow)
+_SQLite_SafeMode($bSafeModeState)
+_SQLite_SetTimeout([$hDB = -1 [, $iTimeout = 1000]])
+_SQLite_Shutdown()
+_SQLite_SQLiteExe($sDatabaseFile, $sInput, ByRef $sOutput [, $sSQLiteExeFilename = "sqlite3.exe" [, $bDebug = False]])
+_SQLite_Startup([$sDll_Filename = "" [, $bUTF8ErrorMsg = False [, $iForceLocal = 0 [, $hPrintCallback = $__g_hPrintCallback_SQLite [, $bAutoItTypeConversion = False]]]]])
+_SQLite_TotalChanges([$hDB = -1])
+#EndRegion
+#Region ; String
+#include <String.au3>
+_HexToString($sHex)
+_StringBetween($sString, $sStart, $sEnd [, $iMode = $STR_ENDISSTART [, $bCase = False]])
+_StringExplode($sString, $sDelimiter [, $iLimit = 0])
+_StringInsert($sString, $sInsertion, $iPosition)
+_StringProper($sString)
+_StringRepeat($sString, $iRepeatCount)
+_StringTitleCase($sString)
+_StringToHex($sString)
+#EndRegion
+#Region ; Timers
+#include <Timers.au3>
+_Timer_Diff($iTimeStamp)
+_Timer_GetIdleTime()
+_Timer_GetTimerID($wParam)
+_Timer_Init()
+_Timer_KillAllTimers($hWnd)
+_Timer_KillTimer($hWnd, $iTimerID)
+_Timer_SetTimer($hWnd [, $iElapse = 250 [, $sTimerFunc = "" [, $iTimerID = -1]]])
+#EndRegion
+#Region ; Visa
+#include <Visa.au3>
+_viClose($hSession)
+_viExecCommand($hSession, $sCommand [, $iTimeoutMS = -1 [, $sMode = @LF]])
+_viFindGpib(ByRef $aDescriptorList, ByRef $aIDNList [, $iShow_Search_Results = 0])
+_viGpibBusReset()
+_viGTL($hSession)
+_viInteractiveControl([$sCommand_Save_FilePath = ""])
+_viOpen($sVisa_Address [, $sVisa_Secondary_Address = 0])
+_viSetAttribute($hSession, $iAttribute, $iValue)
+_viSetTimeout($hSession, $iTimeoutMS)
+#EndRegion
+#Region ; WinAPIEx
+#Region ; COM
+#include <WinAPICom.au3>
+_WinAPI_CLSIDFromProgID($sProgID)
+_WinAPI_CoInitialize([$iFlags = 0])
+_WinAPI_CoTaskMemAlloc($iSize)
+_WinAPI_CoTaskMemFree($pMemory)
+_WinAPI_CoTaskMemRealloc($pMemory, $iSize)
+_WinAPI_CoUninitialize()
+_WinAPI_CreateGUID()
+_WinAPI_CreateStreamOnHGlobal([$hGlobal = 0 [, $bDeleteOnRelease = True]])
+_WinAPI_GetHGlobalFromStream($pStream)
+_WinAPI_ProgIDFromCLSID($sCLSID)
+_WinAPI_ReleaseStream($pStream)
+#EndRegion
+#Region ; Conversion
+#include <WinAPIConv.au3>
+_WinAPI_CharToOem($sStr)
+_WinAPI_ClientToScreen($hWnd, ByRef $tPoint)
+_WinAPI_DWordToFloat($iValue)
+_WinAPI_DWordToInt($iValue)
+_WinAPI_FloatToDWord($iValue)
+_WinAPI_FloatToInt($nFloat)
+_WinAPI_GetXYFromPoint(ByRef $tPoint, ByRef $iX, ByRef $iY)
+_WinAPI_GUIDFromString($sGUID)
+_WinAPI_GUIDFromStringEx($sGUID, $tGUID)
+_WinAPI_HashData($pMemory, $iSize [, $iLength = 32])
+_WinAPI_HashString($sString [, $bCaseSensitive = True [, $iLength = 32]])
+_WinAPI_HiByte($iValue)
+_WinAPI_HiDWord($iValue)
+_WinAPI_HiWord($iValue)
+_WinAPI_IntToDWord($iValue)
+_WinAPI_IntToFloat($iInt)
+_WinAPI_LoByte($iValue)
+_WinAPI_LoDWord($iValue)
+_WinAPI_LongMid($iValue, $iStart, $iCount)
+_WinAPI_LoWord($iLong)
+_WinAPI_MAKELANGID($iLngIDPrimary, $iLngIDSub)
+_WinAPI_MAKELCID($iLngID, $iSortID)
+_WinAPI_MakeLong($iLo, $iHi)
+_WinAPI_MakeQWord($iLoDWORD, $iHiDWORD)
+_WinAPI_MakeWord($iLo, $iHi)
+_WinAPI_MultiByteToWideChar($vText [, $iCodePage = 0 [, $iFlags = 0 [, $bRetString = False]]])
+_WinAPI_MultiByteToWideCharEx($sText, $pText [, $iCodePage = 0 [, $iFlags = 0]])
+_WinAPI_OemToChar($sStr)
+_WinAPI_PointFromRect(ByRef $tRECT [, $bCenter = True])
+_WinAPI_PrimaryLangId($iLngID)
+_WinAPI_ScreenToClient($hWnd, ByRef $tPoint)
+_WinAPI_ShortToWord($iValue)
+_WinAPI_StrFormatByteSize($iSize)
+_WinAPI_StrFormatByteSizeEx($iSize)
+_WinAPI_StrFormatKBSize($iSize)
+_WinAPI_StrFromTimeInterval($iTime [, $iDigits = 7])
+_WinAPI_StringFromGUID($tGUID)
+_WinAPI_SubLangId($iLngID)
+_WinAPI_SwapDWord($iValue)
+_WinAPI_SwapQWord($iValue)
+_WinAPI_SwapWord($iValue)
+_WinAPI_WideCharToMultiByte($vUnicode [, $iCodePage = 0 [, $bRetNoStruct = True [, $bRetBinary = False]]])
+_WinAPI_WordToShort($iValue)
+#EndRegion
+#Region ; Diagnostic
+#include <WinAPIDiag.au3>
+_WinAPI_DisplayStruct($tStruct [, $sStruct = '' [, $sTitle = '' [, $iItem = 0 [, $iSubItem = 0 [, $iFlags = 0 [, $bTop = True [, $hParent = 0]]]]]]])
+_WinAPI_EnumDllProc($sFilePath [, $sMask = '' [, $iFlags = 0]])
+_WinAPI_FatalExit($iCode)
+_WinAPI_GetApplicationRestartSettings([$iPID = 0])
+_WinAPI_GetErrorMode()
+_WinAPI_IsInternetConnected()
+_WinAPI_IsNetworkAlive()
+_WinAPI_NtStatusToDosError($iStatus)
+_WinAPI_RegisterApplicationRestart([$iFlags = 0 [, $sCmd = '']])
+_WinAPI_SetErrorMode($iMode)
+_WinAPI_UniqueHardwareID([$iFlags = 0])
+_WinAPI_UnregisterApplicationRestart()
+#EndRegion
+#Region ; Dialog
+#include <WinAPIDlg.au3>
+_WinAPI_BrowseForFolderDlg([$sRoot = '' [, $sText = '' [, $iFlags = 0 [, $pBrowseProc = 0 [, $lParam = 0 [, $hParent = 0]]]]]])
+_WinAPI_CommDlgExtendedError()
+_WinAPI_CommDlgExtendedErrorEx()
+_WinAPI_ConfirmCredentials($sTarget, $bConfirm)
+_WinAPI_FindTextDlg($hOwner [, $sFindWhat = '' [, $iFlags = 0 [, $pFindProc = 0 [, $lParam = 0]]]])
+_WinAPI_FlushFRBuffer()
+_WinAPI_FormatDriveDlg($sDrive [, $iOption = 0 [, $hParent = 0]])
+_WinAPI_GetConnectedDlg($iDlg [, $iFlags = 0 [, $hParent = 0]])
+_WinAPI_GetDlgCtrlID($hWnd)
+_WinAPI_GetFRBuffer()
+_WinAPI_GetOpenFileName([$sTitle = "" [, $sFilter = "All files (*.*)" [, $sInitalDir = "." [, $sDefaultFile = "" [, $sDefaultExt = "" [, $iFilterIndex = 1 [, $iFlags = 0 [, $iFlagsEx = 0 [, $hWndOwner = 0]]]]]]]]])
+_WinAPI_GetSaveFileName([$sTitle = "" [, $sFilter = "All files (*.*)" [, $sInitalDir = "." [, $sDefaultFile = "" [, $sDefaultExt = "" [, $iFilterIndex = 1 [, $iFlags = 0 [, $iFlagsEx = 0 [, $hWndOwner = 0]]]]]]]]])
+_WinAPI_MessageBoxCheck($iType, $sTitle, $sText, $sRegVal [, $iDefault = -1 [, $hParent = 0]])
+_WinAPI_MessageBoxIndirect($tMSGBOXPARAMS)
+_WinAPI_OpenFileDlg([$sTitle = '' [, $sInitDir = '' [, $sFilters = '' [, $iDefaultFilter = 0 [, $sDefaultFilePath = '' [, $sDefaultExt = '' [, $iFlags = 0 [, $iFlagsEx = 0 [, $pOFNProc = 0 [, $pData = 0 [, $hParent = 0]]]]]]]]]]])
+_WinAPI_PageSetupDlg(ByRef $tPAGESETUPDLG)
+_WinAPI_PickIconDlg([$sIcon = '' [, $iIndex = 0 [, $hParent = 0]]])
+_WinAPI_PrintDlg(ByRef $tPRINTDLG)
+_WinAPI_PrintDlgEx(ByRef $tPRINTDLGEX)
+_WinAPI_ReplaceTextDlg($hOwner [, $sFindWhat = '' [, $sReplaceWith = '' [, $iFlags = 0 [, $pReplaceProc = 0 [, $lParam = 0]]]]])
+_WinAPI_RestartDlg([$sText = '' [, $iFlags = 2 [, $hParent = 0]]])
+_WinAPI_SaveFileDlg([$sTitle = "" [, $sInitDir = "" [, $sFilters = "" [, $iDefaultFilter = 0 [, $sDefaultFilePath = "" [, $sDefaultExt = "" [, $iFlags = 0 [, $iFlagsEx = 0 [, $pOFNProc = 0 [, $pData = 0 [, $hParent = 0]]]]]]]]]]])
+_WinAPI_SetFRBuffer($iChars)
+_WinAPI_ShellAboutDlg($sTitle, $sName, $sText [, $hIcon = 0 [, $hParent = 0]])
+_WinAPI_ShellOpenWithDlg($sFilePath [, $iFlags = 0 [, $hParent = 0]])
+_WinAPI_ShellStartNetConnectionDlg([$sRemote = '' [, $iFlags = 0 [, $hParent = 0]]])
+_WinAPI_ShellUserAuthenticationDlg($sCaption, $sMessage, $sUser, $sPassword, $sTarget [, $iFlags = 0 [, $iError = 0 [, $bSave = False [, $hBitmap = 0 [, $hParent = 0]]]]])
+_WinAPI_ShellUserAuthenticationDlgEx($sCaption, $sMessage, $sUser, $sPassword [, $iFlags = 0 [, $iAuthError = 0 [, $bSave = False [, $iPackage = 0 [, $hParent = 0]]]]])
+#EndRegion
+#Region ; Error
+#include <WinAPIError.au3>
+_WinAPI_Beep([$iFreq = 500 [, $iDuration = 1000]])
+_WinAPI_FormatMessage($iFlags, $pSource, $iMessageID, $iLanguageID, ByRef $pBuffer, $iSize, $vArguments)
+_WinAPI_GetErrorMessage($iCode [, $iLanguage = 0])
+_WinAPI_GetLastError()
+_WinAPI_GetLastErrorMessage()
+_WinAPI_MessageBeep([$iType = 1])
+_WinAPI_MsgBox($iFlags, $sTitle, $sText)
+_WinAPI_SetLastError($iErrorCode)
+_WinAPI_ShowError($sText [, $bExit = True])
+_WinAPI_ShowLastError([$sText = '' [, $bAbort = False [, $iLanguage = 0]]])
+_WinAPI_ShowMsg($sText)
+#EndRegion
+#Region ; Files & Devices
+#include <WinAPIFiles.au3>
+#Region ; DataAccess & Storage
+_WinAPI_BackupRead($hFile, $pBuffer, $iLength, ByRef $iBytes, ByRef $pContext [, $bSecurity = False])
+_WinAPI_BackupReadAbort(ByRef $pContext)
+_WinAPI_BackupSeek($hFile, $iSeek, ByRef $iBytes, ByRef $pContext)
+_WinAPI_BackupWrite($hFile, $pBuffer, $iLength, ByRef $iBytes, ByRef $pContext [, $bSecurity = False])
+_WinAPI_BackupWriteAbort(ByRef $pContext)
+_WinAPI_DefineDosDevice($sDevice, $iFlags [, $sFilePath = ''])
+_WinAPI_GetDriveType([$sDrive = ''])
+_WinAPI_GetLogicalDrives()
+_WinAPI_GetPEType($sFilePath)
+_WinAPI_QueryDosDevice($sDevice)
+_WinAPI_Wow64EnableWow64FsRedirection($bEnable)
+#EndRegion
+#Region ; DevicesIoCtl
+_WinAPI_CreateObjectID($sFilePath)
+_WinAPI_DeleteObjectID($sFilePath)
+_WinAPI_DeviceIoControl($hDevice, $iControlCode [, $pInBuffer = 0 [, $iInBufferSize = 0 [, $pOutBuffer = 0 [, $iOutBufferSize = 0]]]])
+_WinAPI_EjectMedia($sDrive)
+_WinAPI_GetCDType($sDrive)
+_WinAPI_GetDriveBusType($sDrive)
+_WinAPI_GetDriveGeometryEx($iDrive)
+_WinAPI_GetDriveNumber($sDrive)
+_WinAPI_GetObjectID($sFilePath)
+_WinAPI_GetOverlappedResult($hFile, $tOverlapped, ByRef $iBytes [, $bWait = False])
+_WinAPI_IOCTL($iDeviceType, $iFunction, $iMethod, $iAccess)
+_WinAPI_IsDoorOpen($sDrive)
+_WinAPI_IsWritable($sDrive)
+_WinAPI_LoadMedia($sDrive)
+#EndRegion
+#Region ; Files
+_WinAPI_CopyFileEx($sExistingFile, $sNewFile [, $iFlags = 0 [, $pProgressProc = 0 [, $pData = 0]]])
+_WinAPI_CreateDirectory($sDir [, $tSecurity = 0])
+_WinAPI_CreateDirectoryEx($sNewDir, $sTemplateDir [, $tSecurity = 0])
+_WinAPI_CreateFile($sFileName, $iCreation [, $iAccess = 4 [, $iShare = 0 [, $iAttributes = 0 [, $tSecurity = 0]]]])
+_WinAPI_CreateFileEx($sFilePath, $iCreation [, $iAccess = 0 [, $iShare = 0 [, $iFlagsAndAttributes = 0 [, $tSecurity = 0 [, $hTemplate = 0]]]]])
+_WinAPI_CreateFileMapping($hFile [, $iSize = 0 [, $sName = '' [, $iProtect = 0x0004 [, $tSecurity = 0]]]])
+_WinAPI_CreateHardLink($sNewFile, $sExistingFile)
+_WinAPI_CreateSymbolicLink($sSymlink, $sTarget [, $bDirectory = False])
+_WinAPI_DecryptFile($sFilePath)
+_WinAPI_DeleteFile($sFilePath)
+_WinAPI_DeleteVolumeMountPoint($sMountedPath)
+_WinAPI_DuplicateEncryptionInfoFile($sSrcFilePath, $sDestFilePath [, $iCreation = 2 [, $iAttributes = 0 [, $tSecurity = 0]]])
+_WinAPI_EncryptFile($sFilePath)
+_WinAPI_EncryptionDisable($sDir, $bDisable)
+_WinAPI_EnumFiles($sDir [, $iFlag = 0 [, $sTemplate = '' [, $bExclude = False]]])
+_WinAPI_EnumFileStreams($sFilePath)
+_WinAPI_EnumHardLinks($sFilePath)
+_WinAPI_FileEncryptionStatus($sFilePath)
+_WinAPI_FileExists($sFilePath)
+_WinAPI_FileInUse($sFilePath)
+_WinAPI_FindClose($hSearch)
+_WinAPI_FindCloseChangeNotification($hChange)
+_WinAPI_FindFirstChangeNotification($sDirectory, $iFlags [, $bSubtree = False])
+_WinAPI_FindFirstFile($sFilePath, $tData)
+_WinAPI_FindFirstFileName($sFilePath, ByRef $sLink)
+_WinAPI_FindFirstStream($sFilePath, $tData)
+_WinAPI_FindNextChangeNotification($hChange)
+_WinAPI_FindNextFile($hSearch, $tData)
+_WinAPI_FindNextFileName($hSearch, ByRef $sLink)
+_WinAPI_FindNextStream($hSearch, $tData)
+_WinAPI_FlushFileBuffers($hFile)
+_WinAPI_FlushViewOfFile($pAddress [, $iBytes = 0])
+_WinAPI_GetBinaryType($sFilePath)
+_WinAPI_GetCompressedFileSize($sFilePath)
+_WinAPI_GetCompression($sFilePath)
+_WinAPI_GetCurrentDirectory()
+_WinAPI_GetDiskFreeSpaceEx($sDrive)
+_WinAPI_GetFileAttributes($sFilePath)
+_WinAPI_GetFileID($hFile)
+_WinAPI_GetFileInformationByHandle($hFile)
+_WinAPI_GetFileInformationByHandleEx($hFile)
+_WinAPI_GetFilePointerEx($hFile)
+_WinAPI_GetFileSizeEx($hFile)
+_WinAPI_GetFileSizeOnDisk($hFile)
+_WinAPI_GetFileTitle($sFilePath)
+_WinAPI_GetFileType($hFile)
+_WinAPI_GetFinalPathNameByHandle($hFile)
+_WinAPI_GetFinalPathNameByHandleEx($hFile [, $iFlags = 0])
+_WinAPI_GetFullPathName($sFilePath)
+_WinAPI_GetProfilesDirectory()
+_WinAPI_GetTempFileName($sFilePath [, $sPrefix = ''])
+_WinAPI_GetVolumeInformation([$sRoot = ''])
+_WinAPI_GetVolumeInformationByHandle($hFile)
+_WinAPI_GetVolumeNameForVolumeMountPoint($sMountedPath)
+_WinAPI_IsPathShared($sFilePath)
+_WinAPI_LockDevice($sDrive, $bLock)
+_WinAPI_LockFile($hFile, $iOffset, $iLength)
+_WinAPI_MapViewOfFile($hMapping [, $iOffset = 0 [, $iBytes = 0 [, $iAccess = 0x0006]]])
+_WinAPI_MoveFileEx($sExistingFile, $sNewFile [, $iFlags = 0 [, $pProgressProc = 0 [, $pData = 0]]])
+_WinAPI_OpenFileById($hFile, $vID [, $iAccess = 0 [, $iShare = 0 [, $iFlags = 0]]])
+_WinAPI_OpenFileMapping($sName [, $iAccess = 0x0006 [, $bInherit = False]])
+_WinAPI_PathIsDirectory($sFilePath)
+_WinAPI_PathIsDirectoryEmpty($sFilePath)
+_WinAPI_ReadDirectoryChanges($hDirectory, $iFilter, $pBuffer, $iLength [, $bSubtree = 0])
+_WinAPI_ReadFile($hFile, $pBuffer, $iToRead, ByRef $iRead [, $tOverlapped = 0])
+_WinAPI_RemoveDirectory($sDirPath)
+_WinAPI_ReOpenFile($hFile, $iAccess, $iShare [, $iFlags = 0])
+_WinAPI_ReplaceFile($sReplacedFile, $sReplacementFile [, $sBackupFile = '' [, $iFlags = 0]])
+_WinAPI_SearchPath($sFilePath [, $sSearchPath = ''])
+_WinAPI_SetCompression($sFilePath, $iCompression)
+_WinAPI_SetCurrentDirectory($sDir)
+_WinAPI_SetEndOfFile($hFile)
+_WinAPI_SetFileAttributes($sFilePath, $iAttributes)
+_WinAPI_SetFileInformationByHandleEx($hFile, $tFILEINFO)
+_WinAPI_SetFilePointer($hFile, $iPos [, $iMethod = 0])
+_WinAPI_SetFilePointerEx($hFile, $iPos [, $iMethod = 0])
+_WinAPI_SetFileShortName($hFile, $sShortName)
+_WinAPI_SetFileValidData($hFile, $iLength)
+_WinAPI_SetSearchPathMode($iFlags)
+_WinAPI_SetVolumeMountPoint($sFilePath, $sGUID)
+_WinAPI_SfcIsFileProtected($sFilePath)
+_WinAPI_UnlockFile($hFile, $iOffset, $iLength)
+_WinAPI_UnmapViewOfFile($pAddress)
+_WinAPI_WriteFile($hFile, $pBuffer, $iToWrite, ByRef $iWritten [, $tOverlapped = 0])
+#EndRegion
+#EndRegion
+#Region ; GDI
+#include <WinAPIGdi.au3>
+_WinAPI_EnumDisplaySettings($sDevice, $iMode)
+#Region ; Bitmap
+_WinAPI_AddIconOverlay($hIcon, $hOverlay)
+_WinAPI_AdjustBitmap($hBitmap, $iWidth, $iHeight [, $iMode = 3 [, $tAdjustment = 0]])
+_WinAPI_AlphaBlend($hDestDC, $iXDest, $iYDest, $iWidthDest, $iHeightDest, $hSrcDC, $iXSrc, $iYSrc, $iWidthSrc, $iHeightSrc, $iAlpha [, $bAlpha = False])
+_WinAPI_BitBlt($hDestDC, $iXDest, $iYDest, $iWidth, $iHeight, $hSrcDC, $iXSrc, $iYSrc, $iROP)
+_WinAPI_CompressBitmapBits($hBitmap, ByRef $pBuffer [, $iCompression = 0 [, $iQuality = 100]])
+_WinAPI_CopyBitmap($hBitmap)
+_WinAPI_CopyImage($hImage [, $iType = 0 [, $iXDesiredPixels = 0 [, $iYDesiredPixels = 0 [, $iFlags = 0]]]])
+_WinAPI_Create32BitHBITMAP($hIcon [, $bDib = False [, $bDelete = False]])
+_WinAPI_CreateANDBitmap($hBitmap)
+_WinAPI_CreateBitmap($iWidth, $iHeight [, $iPlanes = 1 [, $iBitsPerPel = 1 [, $pBits = 0]]])
+_WinAPI_CreateBitmapIndirect($tBITMAP)
+_WinAPI_CreateCompatibleBitmap($hDC, $iWidth, $iHeight)
+_WinAPI_CreateCompatibleBitmapEx($hDC, $iWidth, $iHeight, $iRGB)
+_WinAPI_CreateDIB($iWidth, $iHeight [, $iBitsPerPel = 32 [, $tColorTable = 0 [, $iColorCount = 0]]])
+_WinAPI_CreateDIBColorTable(Const ByRef $aColorTable [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_CreateDIBitmap($hDC, $tBITMAPINFO, $iUsage [, $pBits = 0])
+_WinAPI_CreateDIBSection($hDC, $tBITMAPINFO, $iUsage, ByRef $pBits [, $hSection = 0 [, $iOffset = 0]])
+_WinAPI_CreateSolidBitmap($hWnd, $iColor, $iWidth, $iHeight [, $bRGB = 1])
+_WinAPI_DrawBitmap($hDC, $iX, $iY, $hBitmap [, $iRop = 0x00CC0020])
+_WinAPI_ExtFloodFill($hDC, $iX, $iY, $iRGB [, $iType = 0])
+_WinAPI_GetBitmapBits($hBitmap, $iSize, $pBits)
+_WinAPI_GetBitmapDimension($hBitmap)
+_WinAPI_GetBitmapDimensionEx($hBitmap)
+_WinAPI_GetDIBColorTable($hBitmap)
+_WinAPI_GetDIBits($hDC, $hBitmap, $iStartScan, $iScanLines, $pBits, $tBI, $iUsage)
+_WinAPI_GetPixel($hDC, $iX, $iY)
+_WinAPI_GetStretchBltMode($hDC)
+_WinAPI_GradientFill($hDC, Const ByRef $aVertex [, $iStart = 0 [, $iEnd = -1 [, $bRotate = False]]])
+_WinAPI_InvertANDBitmap($hBitmap [, $bDelete = False])
+_WinAPI_IsAlphaBitmap($hBitmap)
+_WinAPI_MaskBlt($hDestDC, $iXDest, $iYDest, $iWidth, $iHeight, $hSrcDC, $iXSrc, $iYSrc, $hMask, $iXMask, $iYMask, $iRop)
+_WinAPI_PlgBlt($hDestDC, Const ByRef $aPoint, $hSrcDC, $iXSrc, $iYSrc, $iWidth, $iHeight [, $hMask = 0 [, $iXMask = 0 [, $iYMask = 0]]])
+_WinAPI_RadialGradientFill($hDC, $iX, $iY, $iRadius, $iRGB1, $iRGB2 [, $fAngleStart = 0 [, $fAngleEnd = 360 [, $fStep = 5]]])
+_WinAPI_SaveHBITMAPToFile($sFilePath, $hBitmap [, $iXPelsPerMeter = Default [, $iYPelsPerMeter = Default]])
+_WinAPI_SaveHICONToFile($sFilePath, Const ByRef $vIcon [, $bCompress = 0 [, $iStart = 0 [, $iEnd = -1]]])
+_WinAPI_SetBitmapBits($hBitmap, $iSize, $pBits)
+_WinAPI_SetBitmapDimensionEx($hBitmap, $iWidth, $iHeight)
+_WinAPI_SetDIBColorTable($hBitmap, $tColorTable, $iColorCount)
+_WinAPI_SetDIBits($hDC, $hBitmap, $iStartScan, $iScanLines, $pBits, $tBMI [, $iColorUse = 0])
+_WinAPI_SetDIBitsToDevice($hDC, $iXDest, $iYDest, $iWidth, $iHeight, $iXSrc, $iYSrc, $iStartScan, $iScanLines, $tBITMAPINFO, $iUsage, $pBits)
+_WinAPI_SetPixel($hDC, $iX, $iY, $iRGB)
+_WinAPI_SetStretchBltMode($hDC, $iMode)
+_WinAPI_StretchBlt($hDestDC, $iXDest, $iYDest, $iWidthDest, $iHeightDest, $hSrcDC, $iXSrc, $iYSrc, $iWidthSrc, $iHeightSrc, $iRop)
+_WinAPI_StretchDIBits($hDestDC, $iXDest, $iYDest, $iWidthDest, $iHeightDest, $iXSrc, $iYSrc, $iWidthSrc, $iHeightSrc, $tBITMAPINFO, $iUsage, $pBits, $iRop)
+_WinAPI_TransparentBlt($hDestDC, $iXDest, $iYDest, $iWidthDest, $iHeightDest, $hSrcDC, $iXSrc, $iYSrc, $iWidthSrc, $iHeightSrc, $iRGB)
+#EndRegion
+#Region ; Brush & Pen
+_WinAPI_CreateBrushIndirect($iStyle, $iRGB [, $iHatch = 0])
+_WinAPI_CreatePen($iPenStyle, $iWidth, $iColor)
+_WinAPI_CreateSolidBrush( $iColor)
+_WinAPI_ExtCreatePen($iPenStyle, $iWidth, $iBrushStyle, $iRGB [, $iHatch = 0 [, $aUserStyle = 0 [, $iStart = 0 [, $iEnd = -1]]]])
+_WinAPI_GetBrushOrg($hDC)
+_WinAPI_GetSysColorBrush($iIndex)
+_WinAPI_PatBlt($hDC, $iX, $iY, $iWidth, $iHeight, $iRop)
+_WinAPI_SetBrushOrg($hDC, $iX, $iY)
+_WinAPI_SetDCBrushColor($hDC, $iRGB)
+_WinAPI_SetDCPenColor($hDC, $iRGB)
+#EndRegion
+#Region ; Clipping
+_WinAPI_ExcludeClipRect($hDC, $tRECT)
+_WinAPI_ExtSelectClipRgn($hDC, $hRgn [, $iMode = 5])
+_WinAPI_GetClipBox($hDC, ByRef $tRECT)
+_WinAPI_GetClipRgn($hDC)
+_WinAPI_IntersectClipRect($hDC, $tRECT)
+_WinAPI_OffsetClipRgn($hDC, $iXOffset, $iYOffset)
+_WinAPI_PtVisible($hDC, $iX, $iY)
+_WinAPI_RectVisible($hDC, $tRECT)
+_WinAPI_SelectClipPath($hDC [, $iMode = 5])
+_WinAPI_SelectClipRgn($hDC, $hRgn)
+#EndRegion
+#Region ; Colors
+_WinAPI_ColorAdjustLuma($iRGB, $iPercent [, $bScale = True])
+_WinAPI_ColorHLSToRGB($iHue, $iLuminance, $iSaturation)
+_WinAPI_ColorRGBToHLS($iRGB, ByRef $iHue, ByRef $iLuminance, ByRef $iSaturation)
+_WinAPI_CreateColorAdjustment([$iFlags = 0 [, $iIlluminant = 0 [, $iGammaR = 10000 [, $iGammaG = 10000 [, $iGammaB = 10000 [, $iBlack = 0 [, $iWhite = 10000 [, $iContrast = 0 [, $iBrightness = 0 [, $iColorfulness = 0 [, $iTint = 0]]]]]]]]]]])
+_WinAPI_GetBValue($iRGB)
+_WinAPI_GetColorAdjustment($hDC)
+_WinAPI_GetDeviceGammaRamp($hDC, ByRef $aRamp)
+_WinAPI_GetGValue($iRGB)
+_WinAPI_GetRValue($iRGB)
+_WinAPI_GetUDFColorMode()
+_WinAPI_InvertColor($iRGB)
+_WinAPI_RGB($iRed, $iGreen, $iBlue)
+_WinAPI_SetColorAdjustment($hDC, $tAdjustment)
+_WinAPI_SetDeviceGammaRamp($hDC, Const ByRef $aRamp)
+_WinAPI_SetUDFColorMode($iMode)
+_WinAPI_SwitchColor($iMode)
+#EndRegion
+#Region ; Coordinate & Transform
+_WinAPI_CombineTransform($tXFORM1, $tXFORM2)
+_WinAPI_CreateTransform([$nM11 = 1 [, $nM12 = 0 [, $nM21 = 0 [, $nM22 = 1 [, $nDX = 0 [, $nDY = 0]]]]]])
+_WinAPI_DPtoLP($hDC, ByRef $tPOINT [, $iCount = 1])
+_WinAPI_GetCurrentPosition($hDC)
+_WinAPI_GetGraphicsMode($hDC)
+_WinAPI_GetMapMode($hDC)
+_WinAPI_GetPosFromRect($tRECT)
+_WinAPI_GetWorldTransform($hDC)
+_WinAPI_LPtoDP($hDC, ByRef $tPOINT [, $iCount = 1])
+_WinAPI_ModifyWorldTransform($hDC, $tXFORM, $iMode)
+_WinAPI_OffsetPoints(ByRef $aPoint, $iXOffset, $iYOffset [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_OffsetWindowOrg($hDC, $iXOffset, $iYOffset)
+_WinAPI_RotatePoints(ByRef $aPoint, $iXC, $iYC, $fAngle [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_ScaleWindowExt($hDC, $iXNum, $iXDenom, $iYNum, $iYDenom)
+_WinAPI_SetGraphicsMode($hDC, $iMode)
+_WinAPI_SetMapMode($hDC, $iMode)
+_WinAPI_SetWindowExt($hDC, $iXExtent, $iYExtent)
+_WinAPI_SetWindowOrg($hDC, $iX, $iY)
+_WinAPI_SetWorldTransform($hDC, $tXFORM)
+#EndRegion
+#Region ; Desktop Window Manager
+_WinAPI_DwmDefWindowProc($hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_DwmEnableBlurBehindWindow($hWnd [, $bEnable = True [, $bTransition = False [, $hRgn = 0]]])
+_WinAPI_DwmEnableComposition($bEnable)
+_WinAPI_DwmExtendFrameIntoClientArea($hWnd [, $tMARGINS = 0])
+_WinAPI_DwmGetColorizationColor()
+_WinAPI_DwmGetColorizationParameters()
+_WinAPI_DwmGetWindowAttribute($hWnd, $iAttribute)
+_WinAPI_DwmInvalidateIconicBitmaps($hWnd)
+_WinAPI_DwmIsCompositionEnabled()
+_WinAPI_DwmQueryThumbnailSourceSize($hThumbnail)
+_WinAPI_DwmRegisterThumbnail($hDestination, $hSource)
+_WinAPI_DwmSetColorizationParameters($tDWMCP)
+_WinAPI_DwmSetIconicLivePreviewBitmap($hWnd, $hBitmap [, $bFrame = False [, $tClient = 0]])
+_WinAPI_DwmSetIconicThumbnail($hWnd, $hBitmap [, $bFrame = False])
+_WinAPI_DwmSetWindowAttribute($hWnd, $iAttribute, $iData)
+_WinAPI_DwmUnregisterThumbnail($hThumbnail)
+_WinAPI_DwmUpdateThumbnailProperties($hThumbnail [, $bVisible = True [, $bClientAreaOnly = False [, $iOpacity = 255 [, $tRectDest = 0 [, $tRectSrc = 0]]]]])
+#EndRegion
+#Region ; DeviceContext
+#include <WinAPIGdiDC.au3>
+_WinAPI_CreateCompatibleDC($hDC)
+_WinAPI_DeleteDC($hDC)
+_WinAPI_DrawEdge($hDC, $tRECT, $iEdgeType, $iFlags)
+_WinAPI_DrawFrameControl($hDC, $tRECT, $iType, $iState)
+_WinAPI_DrawIcon($hDC, $iX, $iY, $hIcon)
+_WinAPI_DrawIconEx($hDC, $iX, $iY, $hIcon [, $iWidth = 0 [, $iHeight = 0 [, $iStep = 0 [, $hBrush = 0 [, $iFlags = 3]]]]])
+_WinAPI_DrawText($hDC, $sText, ByRef $tRECT, $iFlags)
+_WinAPI_EnumDisplayDevices($sDevice, $iDevNum)
+_WinAPI_FillRect($hDC, $tRECT, $hBrush)
+_WinAPI_FrameRect($hDC, $tRECT, $hBrush)
+_WinAPI_GetBkColor($hDC)
+_WinAPI_GetBkMode($hDC)
+_WinAPI_GetDC($hWnd)
+_WinAPI_GetDCEx($hWnd, $hRgn, $iFlags)
+_WinAPI_GetDeviceCaps($hDC, $iIndex)
+_WinAPI_GetTextColor($hDC)
+_WinAPI_PrintWindow($hWnd, $hDC [, $bClient = False])
+_WinAPI_ReleaseDC($hWnd, $hDC)
+_WinAPI_RestoreDC($hDC, $iID)
+_WinAPI_SaveDC($hDC)
+_WinAPI_SetBkColor($hDC, $iColor)
+_WinAPI_SetBkMode($hDC, $iBkMode)
+_WinAPI_SetTextColor($hDC, $iColor)
+_WinAPI_TwipsPerPixelX()
+_WinAPI_TwipsPerPixelY()
+#EndRegion
+#Region ; Font & Text
+_WinAPI_AddFontMemResourceEx($pData, $iSize)
+_WinAPI_AddFontResourceEx($sFont [, $iFlag = 0 [, $bNotify = False]])
+_WinAPI_CreateFont($iHeight, $iWidth [, $iEscape = 0 [, $iOrientn = 0 [, $iWeight = $FW_NORMAL [, $bItalic = False [, $bUnderline = False [, $bStrikeout = False [, $iCharset = $DEFAULT_CHARSET [, $iOutputPrec = $OUT_DEFAULT_PRECIS [, $iClipPrec = $CLIP_DEFAULT_PRECIS [, $iQuality = $DEFAULT_QUALITY [, $iPitch = 0 [, $sFace = 'Arial']]]]]]]]]]]])
+_WinAPI_CreateFontEx($iHeight [, $iWidth = 0 [, $iEscapement = 0 [, $iOrientation = 0 [, $iWeight = 400 [, $bItalic = False [, $bUnderline = False [, $bStrikeOut = False [, $iCharSet = 1 [, $iOutPrecision = 0 [, $iClipPrecision = 0 [, $iQuality = 0 [, $iPitchAndFamily = 0 [, $sFaceName = '' [, $iStyle = 0]]]]]]]]]]]]]])
+_WinAPI_CreateFontIndirect($tLogFont)
+_WinAPI_EnumFontFamilies([$hDC = 0 [, $sFaceName = '' [, $iCharSet = 1 [, $iFontType = 0x07 [, $sPattern = '' [, $bExclude = False]]]]]])
+_WinAPI_GetFontMemoryResourceInfo($pMemory [, $iFlag = 1])
+_WinAPI_GetFontName($sFaceName [, $iStyle = 0 [, $iCharSet = 1]])
+_WinAPI_GetFontResourceInfo($sFont [, $bForce = False [, $iFlag = Default]])
+_WinAPI_GetGlyphOutline($hDC, $sChar, $iFormat, ByRef $pBuffer [, $tMAT2 = 0])
+_WinAPI_GetOutlineTextMetrics($hDC)
+_WinAPI_GetTabbedTextExtent($hDC, $sText [, $aTab = 0 [, $iStart = 0 [, $iEnd = -1]]])
+_WinAPI_GetTextAlign($hDC)
+_WinAPI_GetTextCharacterExtra($hDC)
+_WinAPI_GetTextExtentPoint32($hDC, $sText)
+_WinAPI_GetTextFace($hDC)
+_WinAPI_GetTextMetrics($hDC)
+_WinAPI_RemoveFontMemResourceEx($hFont)
+_WinAPI_RemoveFontResourceEx($sFont [, $iFlag = 0 [, $bNotify = False]])
+_WinAPI_SetTextAlign($hDC [, $iMode = 0])
+_WinAPI_SetTextCharacterExtra($hDC, $iCharExtra)
+_WinAPI_SetTextJustification($hDC, $iBreakExtra, $iBreakCount)
+_WinAPI_TabbedTextOut($hDC, $iX, $iY, $sText [, $aTab = 0 [, $iStart = 0 [, $iEnd = -1 [, $iOrigin = 0]]]])
+_WinAPI_TextOut($hDC, $iX, $iY, $sText)
+#EndRegion
+#Region ; Line & Curve
+_WinAPI_AngleArc($hDC, $iX, $iY, $iRadius, $nStartAngle, $nSweepAngle)
+_WinAPI_Arc($hDC, $tRECT, $iXStartArc, $iYStartArc, $iXEndArc, $iYEndArc)
+_WinAPI_ArcTo($hDC, $tRECT, $iXRadial1, $iYRadial1, $iXRadial2, $iYRadial2)
+_WinAPI_DrawLine($hDC, $iX1, $iY1, $iX2, $iY2)
+_WinAPI_GetArcDirection($hDC)
+_WinAPI_LineDDA($iX1, $iY1, $iX2, $iY2, $pLineProc [, $pData = 0])
+_WinAPI_LineTo($hDC, $iX, $iY)
+_WinAPI_MoveTo($hDC, $iX, $iY)
+_WinAPI_MoveToEx($hDC, $iX, $iY)
+_WinAPI_PolyBezier($hDC, Const ByRef $aPoint [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_PolyBezierTo($hDC, Const ByRef $aPoint [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_PolyDraw($hDC, Const ByRef $aPoint [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_SetArcDirection($hDC, $iDirection)
+#EndRegion
+#Region ; MetaFiles
+_WinAPI_CloseEnhMetaFile($hDC)
+_WinAPI_CopyEnhMetaFile($hEmf [, $sFilePath = ''])
+_WinAPI_CreateEnhMetaFile([$hDC = 0 [, $tRECT = 0 [, $bPixels = False [, $sFilePath = '' [, $sDescription = '']]]]])
+_WinAPI_DeleteEnhMetaFile($hEmf)
+_WinAPI_GdiComment($hDC, $pBuffer, $iSize)
+_WinAPI_GetEnhMetaFile($sFilePath)
+_WinAPI_GetEnhMetaFileBits($hEmf, ByRef $pBuffer)
+_WinAPI_GetEnhMetaFileDescription($hEmf)
+_WinAPI_GetEnhMetaFileDimension($hEmf)
+_WinAPI_GetEnhMetaFileHeader($hEmf)
+_WinAPI_PlayEnhMetaFile($hDC, $hEmf, $tRECT)
+_WinAPI_SetEnhMetaFileBits($pData, $iLength)
+#EndRegion
+#Region ; Monitors
+_WinAPI_EnumDisplayMonitors([$hDC = 0 [, $tRECT = 0]])
+_WinAPI_GetMonitorInfo($hMonitor)
+_WinAPI_MonitorFromPoint($tPOINT [, $iFlag = 1])
+_WinAPI_MonitorFromRect($tRECT [, $iFlag = 1])
+_WinAPI_MonitorFromWindow($hWnd [, $iFlag = 1])
+#EndRegion
+#Region ; Paint & Draw
+_WinAPI_BeginPaint($hWnd, ByRef $tPAINTSTRUCT)
+_WinAPI_DrawAnimatedRects($hWnd, $tRectFrom, $tRectTo)
+_WinAPI_DrawShadowText($hDC, $sText, $iRGBText, $iRGBShadow [, $iXOffset = 0 [, $iYOffset = 0 [, $tRECT = 0 [, $iFlags = 0]]]])
+_WinAPI_EndPaint($hWnd, ByRef $tPAINTSTRUCT)
+_WinAPI_GetBoundsRect($hDC [, $iFlags = 0])
+_WinAPI_GetROP2($hDC)
+_WinAPI_GetUpdateRect($hWnd [, $bErase = True])
+_WinAPI_GetUpdateRgn($hWnd, $hRgn [, $bErase = True])
+_WinAPI_GetWindowRgnBox($hWnd, ByRef $tRECT)
+_WinAPI_InvalidateRgn($hWnd [, $hRgn = 0 [, $bErase = True]])
+_WinAPI_LockWindowUpdate($hWnd)
+_WinAPI_PaintDesktop($hDC)
+_WinAPI_SetBoundsRect($hDC, $iFlags [, $tRECT = 0])
+_WinAPI_SetROP2($hDC, $iMode)
+_WinAPI_ValidateRect($hWnd [, $tRECT = 0])
+_WinAPI_ValidateRgn($hWnd [, $hRgn = 0])
+_WinAPI_WindowFromDC($hDC)
+#EndRegion
+#Region ; Path
+_WinAPI_AbortPath($hDC)
+_WinAPI_BeginPath($hDC)
+_WinAPI_CloseFigure($hDC)
+_WinAPI_EndPath($hDC)
+_WinAPI_FillPath($hDC)
+_WinAPI_FlattenPath($hDC)
+_WinAPI_PathToRegion($hDC)
+_WinAPI_StrokeAndFillPath($hDC)
+_WinAPI_StrokePath($hDC)
+_WinAPI_WidenPath($hDC)
+#EndRegion
+#Region ; Rectangle
+_WinAPI_CopyRect($tRECT)
+_WinAPI_DrawFocusRect($hDC, $tRECT)
+_WinAPI_EqualRect($tRECT1, $tRECT2)
+_WinAPI_InflateRect(ByRef $tRECT, $iDX, $iDY)
+_WinAPI_IntersectRect($tRECT1, $tRECT2)
+_WinAPI_IsRectEmpty($tRECT)
+_WinAPI_OffsetRect(ByRef $tRECT, $iDX, $iDY)
+_WinAPI_PtInRect(ByRef $tRECT, ByRef $tPoint)
+_WinAPI_PtInRectEx($iX, $iY, $iLeft, $iTop, $iRight, $iBottom)
+_WinAPI_RectIsEmpty(ByRef $tRECT)
+_WinAPI_SubtractRect($tRECT1, $tRECT2)
+_WinAPI_UnionRect($tRECT1, $tRECT2)
+#EndRegion
+#Region ; Regions
+_WinAPI_CombineRgn($hRgnDest, $hRgnSrc1, $hRgnSrc2, $iCombineMode)
+_WinAPI_CreateEllipticRgn($tRECT)
+_WinAPI_CreateNullRgn()
+_WinAPI_CreatePolygonRgn(Const ByRef $aPoint [, $iStart = 0 [, $iEnd = -1 [, $iMode = 1]]])
+_WinAPI_CreateRectRgn($iLeftRect, $iTopRect, $iRightRect, $iBottomRect)
+_WinAPI_CreateRectRgnIndirect($tRECT)
+_WinAPI_CreateRoundRectRgn($iLeftRect, $iTopRect, $iRightRect, $iBottomRect, $iWidthEllipse, $iHeightEllipse)
+_WinAPI_EqualRgn($hRgn1, $hRgn2)
+_WinAPI_ExtCreateRegion($tRGNDATA [, $tXFORM = 0])
+_WinAPI_FillRgn($hDC, $hRgn, $hBrush)
+_WinAPI_FrameRgn($hDC, $hRgn, $hBrush, $iWidth, $iHeight)
+_WinAPI_GetPolyFillMode($hDC)
+_WinAPI_GetRegionData($hRgn, ByRef $tRGNDATA)
+_WinAPI_GetRgnBox($hRgn, ByRef $tRECT)
+_WinAPI_GetWindowRgn($hWnd, $hRgn)
+_WinAPI_InvertRgn($hDC, $hRgn)
+_WinAPI_OffsetRgn($hRgn, $iXOffset, $iYOffset)
+_WinAPI_PaintRgn($hDC, $hRgn)
+_WinAPI_PtInRegion($hRgn, $iX, $iY)
+_WinAPI_RectInRegion($hRgn, $tRECT)
+_WinAPI_RedrawWindow($hWnd [, $tRECT = 0 [, $hRegion = 0 [, $iFlags = 5]]])
+_WinAPI_SetPolyFillMode($hDC [, $iMode = 1])
+_WinAPI_SetRectRgn($hRgn, $tRECT)
+_WinAPI_SetWindowRgn($hWnd, $hRgn [, $bRedraw = True])
+#EndRegion
+; Shape
+_WinAPI_Ellipse($hDC, $tRECT)
+_WinAPI_InvertRect($hDC, $tRECT)
+_WinAPI_Polygon($hDC, Const ByRef $aPoint [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_Rectangle($hDC, $tRECT)
+_WinAPI_RoundRect($hDC, $tRECT, $iWidth, $iHeight)
+#EndRegion
+#Region ; Handle & Object
+#include <WinAPIHObj.au3>
+_WinAPI_CloseHandle($hObject)
+_WinAPI_DeleteObject($hObject)
+_WinAPI_DuplicateHandle($hSourceProcessHandle, $hSourceHandle, $hTargetProcessHandle, $iDesiredAccess, $iInheritHandle, $iOptions)
+_WinAPI_GetCurrentObject($hDC, $iType)
+_WinAPI_GetCurrentProcess()
+_WinAPI_GetObject($hObject, $iSize, $pObject)
+_WinAPI_GetObjectInfoByHandle($hObject)
+_WinAPI_GetObjectNameByHandle($hObject)
+_WinAPI_GetObjectType($hObject)
+_WinAPI_GetStdHandle($iStdHandle)
+_WinAPI_GetStockObject($iObject)
+_WinAPI_SelectObject($hDC, $hGDIObj)
+_WinAPI_SetHandleInformation($hObject, $iMask, $iFlags)
+#EndRegion
+#Region ; Internationalization
+#include <WinAPILocale.au3>
+_WinAPI_CompareString($iLCID, $sString1, $sString2 [, $iFlags = 0])
+_WinAPI_CreateNumberFormatInfo($iNumDigits, $iLeadingZero, $iGrouping, $sDecimalSep, $sThousandSep, $iNegativeOrder)
+_WinAPI_EnumSystemGeoID()
+_WinAPI_EnumSystemLocales($iFlag)
+_WinAPI_EnumUILanguages([$iFlag = 0])
+_WinAPI_GetDateFormat([$iLCID = 0 [, $tSYSTEMTIME = 0 [, $iFlags = 0 [, $sFormat = '']]]])
+_WinAPI_GetDurationFormat($iLCID, $iDuration [, $sFormat = ''])
+_WinAPI_GetGeoInfo($iGEOID, $iType [, $iLanguage = 0])
+_WinAPI_GetLocaleInfo($iLCID, $iType)
+_WinAPI_GetNumberFormat($iLCID, $sNumber [, $tNUMBERFMT = 0])
+_WinAPI_GetSystemDefaultLangID()
+_WinAPI_GetSystemDefaultLCID()
+_WinAPI_GetSystemDefaultUILanguage()
+_WinAPI_GetThreadLocale()
+_WinAPI_GetThreadUILanguage()
+_WinAPI_GetTimeFormat([$iLCID = 0 [, $tSYSTEMTIME = 0 [, $iFlags = 0 [, $sFormat = '']]]])
+_WinAPI_GetUserDefaultLangID()
+_WinAPI_GetUserDefaultLCID()
+_WinAPI_GetUserDefaultUILanguage()
+_WinAPI_GetUserGeoID()
+_WinAPI_IsValidLocale($iLCID [, $iFlag = 0])
+_WinAPI_SetLocaleInfo($iLCID, $iType, $sData)
+_WinAPI_SetThreadLocale($iLCID)
+_WinAPI_SetThreadUILanguage($iLanguage)
+_WinAPI_SetUserGeoID($iGEOID)
+#EndRegion
+#Region ; Menus & Resources
+#include <WinAPIRes.au3>
+#Region ; Carets
+_WinAPI_CreateCaret($hWnd, $hBitmap [, $iWidth = 0 [, $iHeight = 0]])
+_WinAPI_DestroyCaret()
+_WinAPI_GetCaretBlinkTime()
+_WinAPI_GetCaretPos()
+_WinAPI_HideCaret($hWnd)
+_WinAPI_SetCaretBlinkTime($iDuration)
+_WinAPI_SetCaretPos($iX, $iY)
+_WinAPI_ShowCaret($hWnd)
+#EndRegion
+#Region ; Cursors
+_WinAPI_ClipCursor($tRECT)
+_WinAPI_CopyCursor($hCursor)
+_WinAPI_DestroyCursor($hCursor)
+_WinAPI_GetClipCursor()
+_WinAPI_GetCursor()
+_WinAPI_GetCursorInfo()
+_WinAPI_LoadCursor($hInstance, $sName)
+_WinAPI_LoadCursorFromFile($sFilePath)
+_WinAPI_SetCursor($hCursor)
+_WinAPI_SetSystemCursor($hCursor, $iID [, $bCopy = False])
+_WinAPI_ShowCursor($bShow)
+#EndRegion
+#Region ; Icons
+#include <WinAPIIcons.au3>
+_WinAPI_AddIconTransparency($hIcon [, $iPercent = 50 [, $bDelete = False]])
+_WinAPI_CopyIcon($hIcon)
+_WinAPI_Create32BitHICON($hIcon [, $bDelete = False])
+_WinAPI_CreateEmptyIcon($iWidth, $iHeight [, $iBitsPerPel = 32])
+_WinAPI_CreateIcon($hInstance, $iWidth, $iHeight, $iPlanes, $iBitsPixel, $pANDBits, $pXORBits)
+_WinAPI_CreateIconFromResourceEx($pData, $iSize [, $bIcon = True [, $iXDesiredPixels = 0 [, $iYDesiredPixels = 0 [, $iFlags = 0]]]])
+_WinAPI_CreateIconIndirect($hBitmap, $hMask [, $iXHotspot = 0 [, $iYHotspot = 0 [, $bIcon = True]]])
+_WinAPI_DestroyIcon($hIcon)
+_WinAPI_ExtractIcon($sIcon, $iIndex [, $bSmall = False])
+_WinAPI_ExtractIconEx($sFilePath, $iIndex, $paLarge, $paSmall, $iIcons)
+_WinAPI_FileIconInit([$bRestore = True])
+_WinAPI_GetIconDimension( $hIcon)
+_WinAPI_GetIconInfo($hIcon)
+_WinAPI_GetIconInfoEx($hIcon)
+_WinAPI_LoadIcon($hInstance, $sName)
+_WinAPI_LoadIconMetric($hInstance, $sName, $iMetric)
+_WinAPI_LoadIconWithScaleDown($hInstance, $sName, $iWidth, $iHeight)
+_WinAPI_LoadShell32Icon($iIconID)
+_WinAPI_LookupIconIdFromDirectoryEx($pData [, $bIcon = True [, $iXDesiredPixels = 0 [, $iYDesiredPixels = 0 [, $iFlags = 0]]]])
+_WinAPI_MirrorIcon($hIcon [, $bDelete = False])
+#EndRegion
+#Region ; Resources
+_WinAPI_BeginUpdateResource($sFilePath [, $bDelete = False])
+_WinAPI_EndUpdateResource($hUpdate [, $bDiscard = False])
+_WinAPI_EnumResourceLanguages($hModule, $sType, $sName)
+_WinAPI_EnumResourceNames($hModule, $sType)
+_WinAPI_EnumResourceTypes($hModule)
+_WinAPI_FindResource($hInstance, $sType, $sName)
+_WinAPI_FindResourceEx($hInstance, $sType, $sName, $iLanguage)
+_WinAPI_FreeLibrary($hModule)
+_WinAPI_FreeResource($hData)
+_WinAPI_GetFileVersionInfo($sFilePath, ByRef $pBuffer [, $iFlags = 0])
+_WinAPI_LoadBitmap($hInstance, $sBitmap)
+_WinAPI_LoadImage($hInstance, $sImage, $iType, $iXDesired, $iYDesired, $iLoad)
+_WinAPI_LoadIndirectString($sStrIn)
+_WinAPI_LoadLibrary($sFileName)
+_WinAPI_LoadLibraryEx($sFileName [, $iFlags = 0])
+_WinAPI_LoadResource($hInstance, $hResource)
+_WinAPI_LoadString($hInstance, $iStringID)
+_WinAPI_LoadStringEx($hModule, $iID [, $iLanguage = $LOCALE_USER_DEFAULT])
+_WinAPI_LockResource($hData)
+_WinAPI_SizeOfResource($hInstance, $hResource)
+_WinAPI_UpdateResource($hUpdate, $sType, $sName, $iLanguage, $pData, $iSize)
+_WinAPI_VerQueryRoot($pData)
+_WinAPI_VerQueryValue($pData [, $sValues = ''])
+_WinAPI_VerQueryValueEx($hModule [, $sValues = '' [, $iLanguage = 0x0400]])
+#EndRegion
+#EndRegion
+#Region ; Miscellaneous
+#include <WinAPIMisc.au3>
+_WinAPI_MulDiv($iNumber, $iNumerator, $iDenominator)
+_WinAPI_StringLenA(Const ByRef $tString)
+_WinAPI_StringLenW(Const ByRef $tString)
+_WinAPI_GetExtended()
+_WinAPI_GetString($pString [, $bUnicode = True])
+_WinAPI_StrLen($pString [, $bUnicode = True])
+; Audio
+_WinAPI_PlaySound($sSound [, $iFlags = $SND_SYSTEM_NOSTOP [, $hInstance = 0]])
+; Mouse
+_WinAPI_GetMousePos([$bToClient = False [, $hWnd = 0]])
+_WinAPI_GetMousePosX([$bToClient = False [, $hWnd = 0]])
+_WinAPI_GetMousePosY([$bToClient = False [, $hWnd = 0]])
+; Struct
+_WinAPI_ArrayToStruct(Const ByRef $aData [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_CopyStruct($tStruct [, $sStruct = ''])
+_WinAPI_CreateMargins($iLeftWidth, $iRightWidth, $iTopHeight, $iBottomHeight)
+_WinAPI_CreatePoint($iX, $iY)
+_WinAPI_CreateRect($iLeft, $iTop, $iRight, $iBottom)
+_WinAPI_CreateRectEx($iX, $iY, $iWidth, $iHeight)
+_WinAPI_CreateSize($iWidth, $iHeight)
+_WinAPI_StructToArray($tStruct [, $iItems = 0])
+_WinAPI_UnionStruct($tStruct1, $tStruct2 [, $sStruct = ''])
+#EndRegion
+#Region ; Processes & Synchronization
+#include <WinAPIProc.au3>
+#Region ; Processes
+_WinAPI_AdjustTokenPrivileges($hToken, $aPrivileges, $iAttributes, ByRef $aAdjust)
+_WinAPI_AssignProcessToJobObject($hJob, $hProcess)
+_WinAPI_AttachConsole([$iPID = -1])
+_WinAPI_AttachThreadInput($iAttach, $iAttachTo, $bAttach)
+_WinAPI_CreateJobObject([$sName = '' [, $tSecurity = 0]])
+_WinAPI_CreateProcess($sAppName, $sCommand, $tSecurity, $tThread, $bInherit, $iFlags, $pEnviron, $sDir, $tStartupInfo, $tProcess)
+_WinAPI_CreateProcessWithToken($sApp, $sCmd, $iFlags, $tStartupInfo, $tProcessInfo, $hToken [, $iLogon = 0 [, $pEnvironment = 0 [, $sDir = '']]])
+_WinAPI_DuplicateTokenEx($hToken, $iAccess, $iLevel [, $iType = 1 [, $tSecurity = 0]])
+_WinAPI_EmptyWorkingSet([$iPID = 0])
+_WinAPI_EnumChildProcess([$iPID = 0])
+_WinAPI_EnumDeviceDrivers()
+_WinAPI_EnumProcessHandles([$iPID = 0 [, $iType = 0]])
+_WinAPI_EnumProcessModules([$iPID = 0 [, $iFlag = 0]])
+_WinAPI_EnumProcessThreads([$iPID = 0)
+_WinAPI_EnumProcessWindows([$iPID = 0 [, $bVisible = True]])
+_WinAPI_FatalAppExit($sMessage)
+_WinAPI_GetCurrentProcessExplicitAppUserModelID()
+_WinAPI_GetCurrentProcessID()
+_WinAPI_GetCurrentThread()
+_WinAPI_GetCurrentThreadId()
+_WinAPI_GetDeviceDriverBaseName($pDriver)
+_WinAPI_GetDeviceDriverFileName($pDriver)
+_WinAPI_GetExitCodeProcess($hProcess)
+_WinAPI_GetGuiResources([$iFlag = 0 [, $hProcess = -1]])
+_WinAPI_GetModuleFileNameEx($hProcess [, $hModule = 0])
+_WinAPI_GetModuleInformation($hProcess [, $hModule = 0])
+_WinAPI_GetPriorityClass([$iPID = 0])
+_WinAPI_GetProcessAffinityMask($hProcess)
+_WinAPI_GetProcessCommandLine([$iPID = 0])
+_WinAPI_GetProcessFileName([$iPID = 0])
+_WinAPI_GetProcessHandleCount([$iPID = 0])
+_WinAPI_GetProcessID($hProcess)
+_WinAPI_GetProcessIoCounters([$iPID = 0])
+_WinAPI_GetProcessMemoryInfo([$iPID = 0])
+_WinAPI_GetProcessName([$iPID = 0])
+_WinAPI_GetProcessTimes([$iPID = 0])
+_WinAPI_GetProcessUser([$iPID = 0])
+_WinAPI_GetProcessWorkingDirectory([$iPID = 0])
+_WinAPI_GetThreadDesktop($iThreadId)
+_WinAPI_GetThreadErrorMode()
+_WinAPI_IsElevated()
+_WinAPI_IsProcessInJob($hProcess [, $hJob = 0])
+_WinAPI_IsWow64Process([$iPID = 0])
+_WinAPI_OpenJobObject($sName [, $iAccess = $JOB_OBJECT_ALL_ACCESS [, $bInherit = False]])
+_WinAPI_OpenProcess($iAccess, $bInherit, $iPID [, $bDebugPriv = False])
+_WinAPI_OpenProcessToken($iAccess [, $hProcess = 0])
+_WinAPI_QueryInformationJobObject($hJob, $iJobObjectInfoClass, ByRef $tJobObjectInfo)
+_WinAPI_SetInformationJobObject($hJob, $iJobObjectInfoClass, $tJobObjectInfo)
+_WinAPI_SetPriorityClass($iPriority [, $iPID = 0])
+_WinAPI_SetProcessAffinityMask($hProcess, $iMask)
+_WinAPI_SetThreadDesktop($hDesktop)
+_WinAPI_SetThreadErrorMode($iMode)
+_WinAPI_SetThreadExecutionState($iFlags)
+_WinAPI_TerminateJobObject($hJob [, $iExitCode = 0])
+_WinAPI_TerminateProcess($hProcess [, $iExitCode = 0])
+_WinAPI_UserHandleGrantAccess($hObject, $hJob, $bGrant)
+_WinAPI_WriteConsole($hConsole, $sText)
+#EndRegion
+#Region ; Synchronization
+_WinAPI_CreateEvent([$tAttributes = 0 [, $bManualReset = True [, $bInitialState = True [, $sName = ""]]]])
+_WinAPI_CreateMutex($sMutex [, $bInitial = True [, $tSecurity = 0]])
+_WinAPI_CreateSemaphore($sSemaphore, $iInitial, $iMaximum [, $tSecurity = 0])
+_WinAPI_OpenMutex($sMutex [, $iAccess = $MUTEX_ALL_ACCESS [, $bInherit = False]])
+_WinAPI_OpenSemaphore($sSemaphore [, $iAccess = 0x001F0003 [, $bInherit = False]])
+_WinAPI_ReleaseMutex($hMutex)
+_WinAPI_ReleaseSemaphore($hSemaphore [, $iIncrease = 1])
+_WinAPI_ResetEvent($hEvent)
+_WinAPI_SetEvent($hEvent)
+_WinAPI_WaitForInputIdle($hProcess [, $iTimeout = -1])
+_WinAPI_WaitForMultipleObjects($iCount, $paHandles [, $bWaitAll = False [, $iTimeout = -1]])
+_WinAPI_WaitForSingleObject($hHandle [, $iTimeout = -1])
+#EndRegion
+#EndRegion
+#Region ; Registry
+#include <WinAPIReg.au3>
+_WinAPI_AddMRUString($hMRU, $sStr)
+_WinAPI_AssocGetPerceivedType($sExt)
+_WinAPI_AssocQueryString($sAssoc, $iType [, $iFlags = 0 [, $sExtra = '']])
+_WinAPI_CreateMRUList($hKey, $sSubKey [, $iMax = 26])
+_WinAPI_DllInstall($sFilePath)
+_WinAPI_DllUninstall($sFilePath)
+_WinAPI_EnumMRUList($hMRU, $iItem)
+_WinAPI_FreeMRUList($hMRU)
+_WinAPI_GetRegKeyNameByHandle($hKey)
+_WinAPI_RegCloseKey($hKey [, $bFlush = False])
+_WinAPI_RegConnectRegistry($sComputer, $hKey)
+_WinAPI_RegCopyTree($hSrcKey, $sSrcSubKey, $hDestKey)
+_WinAPI_RegCopyTreeEx($hSrcKey, $sSrcSubKey, $hDestKey)
+_WinAPI_RegCreateKey($vKey [, $sSubKey = '' [, $iAccess = $KEY_ALL_ACCESS [, $iOptions = 0 [, $tSecurity = 0]]]])
+_WinAPI_RegDeleteEmptyKey($hKey, $sSubKey, $sValueName)
+_WinAPI_RegDeleteKey($vKey [, $sSubKey = '' [, $iSamDesired = Default]])
+_WinAPI_RegDeleteKeyValue($hKey, $sSubKey, $sValueName)
+_WinAPI_RegDeleteTree($hKey [, $sSubKey = ''])
+_WinAPI_RegDeleteTreeEx($hKey [, $sSubKey = 0])
+_WinAPI_RegDeleteValue($hKey, $sValueName)
+_WinAPI_RegDisableReflectionKey($hKey)
+_WinAPI_RegDuplicateHKey($hKey)
+_WinAPI_RegEnableReflectionKey($hKey)
+_WinAPI_RegEnumKey($hKey, $iIndex)
+_WinAPI_RegEnumValue($hKey, $iIndex)
+_WinAPI_RegFlushKey($hKey)
+_WinAPI_RegLoadMUIString($hKey, $sValueName [, $sDirectory = ''])
+_WinAPI_RegNotifyChangeKeyValue($hKey, $iFilter [, $bSubtree = False [, $bAsync = False [, $hEvent = 0]]])
+_WinAPI_RegOpenKey($vKey [, $sSubKey = '' [, $iAccess = $KEY_ALL_ACCESS]])
+_WinAPI_RegQueryInfoKey($hKey)
+_WinAPI_RegQueryLastWriteTime($hKey)
+_WinAPI_RegQueryMultipleValues($hKey, ByRef $aValent, ByRef $pBuffer [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_RegQueryReflectionKey($hKey)
+_WinAPI_RegQueryValue($hKey, $sValueName, ByRef $tValueData)
+_WinAPI_RegRestoreKey($hKey, $sFilePath)
+_WinAPI_RegSaveKey($hKey, $sFilePath [, $bReplace = False [, $tSecurity = 0]])
+_WinAPI_RegSetValue($hKey, $sValueName, $iType, $tValueData, $iBytes)
+_WinAPI_SfcIsKeyProtected($hKey [, $sSubKey = Default [, $iFlag = 0]])
+#EndRegion
+#Region ; ShellEx
+#include <WinAPIShellEx.au3>
+_WinAPI_DefSubclassProc($hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_DllGetVersion($sFilePath)
+_WinAPI_FindExecutable($sFileName [, $sDirectory = ""])
+_WinAPI_GetAllUsersProfileDirectory()
+_WinAPI_GetDefaultUserProfileDirectory()
+_WinAPI_GetWindowSubclass($hWnd, $pSubclassProc, $idSubClass)
+_WinAPI_RemoveWindowSubclass($hWnd, $pSubclassProc, $idSubClass)
+_WinAPI_SetCurrentProcessExplicitAppUserModelID($sAppID)
+_WinAPI_SetWindowSubclass($hWnd, $pSubclassProc, $idSubClass [, $pData = 0])
+_WinAPI_ShellAddToRecentDocs($sFilePath)
+_WinAPI_ShellChangeNotify($iEvent, $iFlags [, $iItem1 = 0 [, $iItem2 = 0]])
+_WinAPI_ShellChangeNotifyDeregister($iID)
+_WinAPI_ShellChangeNotifyRegister($hWnd, $iMsg, $iEvents, $iSources, $aPaths [, $bRecursive = False])
+_WinAPI_ShellCreateDirectory($sFilePath [, $hParent = 0 [, $tSecurity = 0]])
+_WinAPI_ShellEmptyRecycleBin([$sRoot = '' [, $iFlags = 0 [, $hParent = 0]]])
+_WinAPI_ShellExecute($sFilePath [, $sArgs = '' [, $sDir = '' [, $sVerb = '' [, $iShow = 1 [, $hParent = 0]]]]])
+_WinAPI_ShellExecuteEx(ByRef $tSHEXINFO)
+_WinAPI_ShellExtractAssociatedIcon($sFilePath [, $bSmall = False])
+_WinAPI_ShellExtractIcon($sIcon, $iIndex, $iWidth, $iHeight)
+_WinAPI_ShellFileOperation($sFrom, $sTo, $iFunc, $iFlags [, $sTitle = '' [, $hParent = 0]])
+_WinAPI_ShellFlushSFCache()
+_WinAPI_ShellGetFileInfo($sFilePath, $iFlags, $iAttributes, ByRef $tSHFILEINFO)
+_WinAPI_ShellGetIconOverlayIndex($sIcon, $iIndex)
+_WinAPI_ShellGetKnownFolderIDList($sGUID [, $iFlags = 0 [, $hToken = 0]])
+_WinAPI_ShellGetKnownFolderPath($sGUID [, $iFlags = 0 [, $hToken = 0]])
+_WinAPI_ShellGetLocalizedName($sFilePath)
+_WinAPI_ShellGetPathFromIDList($pPIDL)
+_WinAPI_ShellGetSetFolderCustomSettings($sFilePath, $iFlag, ByRef $tSHFCS)
+_WinAPI_ShellGetSettings($iFlags)
+_WinAPI_ShellGetSpecialFolderLocation($iCSIDL)
+_WinAPI_ShellGetSpecialFolderPath($iCSIDL [, $bCreate = False])
+_WinAPI_ShellGetStockIconInfo($iSIID, $iFlags)
+_WinAPI_ShellILCreateFromPath($sFilePath)
+_WinAPI_ShellNotifyIcon($iMessage, $tNOTIFYICONDATA)
+_WinAPI_ShellNotifyIconGetRect($hWnd, $iID [, $tGUID = 0])
+_WinAPI_ShellObjectProperties($sFilePath [, $iType = 2 [, $sProperty = '' [, $hParent = 0]]])
+_WinAPI_ShellOpenFolderAndSelectItems($sFilePath [, $aNames = 0 [, $iStart = 0 [, $iEnd = -1 [, $iFlags = 0]]]])
+_WinAPI_ShellQueryRecycleBin([$sRoot = ''])
+_WinAPI_ShellQueryUserNotificationState()
+_WinAPI_ShellRemoveLocalizedName($sFilePath)
+_WinAPI_ShellRestricted($iRestriction)
+_WinAPI_ShellSetKnownFolderPath($sGUID, $sFilePath [, $iFlags = 0 [, $hToken = 0]])
+_WinAPI_ShellSetLocalizedName($sFilePath, $sModule, $iResID)
+_WinAPI_ShellSetSettings($iFlags, $bSet)
+_WinAPI_ShellUpdateImage($sIcon, $iIndex, $iImage [, $iFlags = 0])
+#EndRegion
+#Region ; ShellPath
+#include <WinAPIShPath.au3>
+_WinAPI_CommandLineToArgv($sCmd)
+_WinAPI_IsNameInExpression($sString, $sPattern [, $bCaseSensitive = False])
+_WinAPI_ParseURL($sUrl)
+_WinAPI_ParseUserName($sUser)
+_WinAPI_PathAddBackslash($sFilePath)
+_WinAPI_PathAddExtension($sFilePath [, $sExt = ''])
+_WinAPI_PathAppend($sFilePath, $sMore)
+_WinAPI_PathBuildRoot($iDrive)
+_WinAPI_PathCanonicalize($sFilePath)
+_WinAPI_PathCommonPrefix($sPath1, $sPath2)
+_WinAPI_PathCompactPath($hWnd, $sFilePath [, $iWidth = 0])
+_WinAPI_PathCompactPathEx($sFilePath, $iMax)
+_WinAPI_PathCreateFromUrl($sUrl)
+_WinAPI_PathFindExtension($sFilePath)
+_WinAPI_PathFindFileName($sFilePath)
+_WinAPI_PathFindNextComponent($sFilePath)
+_WinAPI_PathFindOnPath($sFilePath [, $aExtraPaths = "" [, $sPathDelimiter = @LF]])
+_WinAPI_PathGetArgs($sFilePath)
+_WinAPI_PathGetCharType($sChar)
+_WinAPI_PathGetDriveNumber($sFilePath)
+_WinAPI_PathIsContentType($sFilePath, $sType)
+_WinAPI_PathIsExe($sFilePath)
+_WinAPI_PathIsFileSpec($sFilePath)
+_WinAPI_PathIsLFNFileSpec($sFilePath)
+_WinAPI_PathIsRelative($sFilePath)
+_WinAPI_PathIsRoot($sFilePath)
+_WinAPI_PathIsSameRoot($sPath1, $sPath2)
+_WinAPI_PathIsSystemFolder($sFilePath)
+_WinAPI_PathIsUNC($sFilePath)
+_WinAPI_PathIsUNCServer($sFilePath)
+_WinAPI_PathIsUNCServerShare($sFilePath)
+_WinAPI_PathMakeSystemFolder($sFilePath)
+_WinAPI_PathMatchSpec($sFilePath, $sSpec)
+_WinAPI_PathParseIconLocation($sFilePath)
+_WinAPI_PathRelativePathTo($sPathFrom, $bDirFrom, $sPathTo, $bDirTo)
+_WinAPI_PathRemoveArgs($sFilePath)
+_WinAPI_PathRemoveBackslash($sFilePath)
+_WinAPI_PathRemoveExtension($sFilePath)
+_WinAPI_PathRemoveFileSpec($sFilePath)
+_WinAPI_PathRenameExtension($sFilePath, $sExt)
+_WinAPI_PathSearchAndQualify($sFilePath [, $bExists = False])
+_WinAPI_PathSkipRoot($sFilePath)
+_WinAPI_PathStripPath($sFilePath)
+_WinAPI_PathStripToRoot($sFilePath)
+_WinAPI_PathUndecorate($sFilePath)
+_WinAPI_PathUnExpandEnvStrings($sFilePath)
+_WinAPI_PathUnmakeSystemFolder($sFilePath)
+_WinAPI_PathUnquoteSpaces($sFilePath)
+_WinAPI_PathYetAnotherMakeUniqueName($sFilePath)
+_WinAPI_ShellGetImageList([$bSmall = False])
+_WinAPI_UrlApplyScheme($sUrl [, $iFlags = 1])
+_WinAPI_UrlCanonicalize($sUrl, $iFlags)
+_WinAPI_UrlCombine($sUrl, $sPart [, $iFlags = 0])
+_WinAPI_UrlCompare($sUrl1, $sUrl2 [, $bIgnoreSlash = False])
+_WinAPI_UrlCreateFromPath($sFilePath)
+_WinAPI_UrlFixup($sUrl)
+_WinAPI_UrlGetPart($sUrl, $iPart)
+_WinAPI_UrlHash($sUrl [, $iLength = 32])
+_WinAPI_UrlIs($sUrl [, $iType = 0])
+#EndRegion
+#Region ; System
+#include <WinAPISys.au3>
+; Administration
+_WinAPI_LockWorkStation()
+_WinAPI_ShutdownBlockReasonCreate($hWnd, $sText)
+_WinAPI_ShutdownBlockReasonDestroy($hWnd)
+_WinAPI_ShutdownBlockReasonQuery($hWnd)
+; Automation
+_WinAPI_CallNextHookEx($hHook, $iCode, $wParam, $lParam)
+_WinAPI_SetWindowsHookEx($iEventMin, $iEventMax, $pEventProc [, $iPID = 0 [, $iThreadId = 0 [, $iFlags = 0]]])
+_WinAPI_SetWinEventHook($iHook, $pProc, $hDll [, $iThreadId = 0])
+_WinAPI_UnhookWindowsHookEx($hHook)
+_WinAPI_UnhookWinEvent($hEventHook)
+; Buffer
+_WinAPI_CompressBuffer($pUncompressedBuffer, $iUncompressedSize, $pCompressedBuffer, $iCompressedSize [, $iFormatAndEngine = 0x0002])
+_WinAPI_ComputeCrc32($pMemory, $iLength)
+_WinAPI_DecompressBuffer($pUncompressedBuffer, $iUncompressedSize, $pCompressedBuffer, $iCompressedSize [, $iFormat = 0x0002])
+; Clipboards
+_WinAPI_AddClipboardFormatListener($hWnd)
+_WinAPI_GetClipboardSequenceNumber()
+_WinAPI_RemoveClipboardFormatListener($hWnd)
+; Controls
+_WinAPI_GetEffectiveClientRect($hWnd, $aCtrl [, $iStart = 0 [, $iEnd = -1]])
+_WinAPI_GetMUILanguage()
+_WinAPI_InitMUILanguage($iLanguage)
+; DLLLib
+_WinAPI_GetDllDirectory()
+_WinAPI_GetModuleHandle($sModuleName)
+_WinAPI_GetModuleHandleEx($sModule [, $iFlags = 0])
+_WinAPI_GetProcAddress($hModule, $vName)
+_WinAPI_SetDllDirectory([$sDirPath = Default])
+#Region ; Heap
+#include <WinAPIMem.au3>
+_WinAPI_CreateBuffer($iLength [, $pBuffer = 0 [, $bAbort = True]])
+_WinAPI_CreateBufferFromStruct($tStruct [, $pBuffer = 0 [, $bAbort = True]])
+_WinAPI_CreateString($sString [, $pString = 0 [, $iLength = -1 [, $bUnicode = True [, $bAbort = True]]]])
+_WinAPI_EqualMemory($pSource1, $pSource2, $iLength)
+_WinAPI_FillMemory($pMemory, $iLength [, $iValue = 0])
+_WinAPI_FreeMemory($pMemory)
+_WinAPI_GetMemorySize($pMemory)
+_WinAPI_GlobalMemoryStatus()
+_WinAPI_IsBadCodePtr($pAddress)
+_WinAPI_IsBadReadPtr($pAddress, $iLength)
+_WinAPI_IsBadStringPtr($pAddress, $iLength)
+_WinAPI_IsBadWritePtr($pAddress, $iLength)
+_WinAPI_IsMemory($pMemory)
+_WinAPI_LocalFree($hMemory)
+_WinAPI_MoveMemory($pDestination, $pSource, $iLength)
+_WinAPI_ReadProcessMemory($hProcess, $pBaseAddress, $pBuffer, $iSize, ByRef $iRead)
+_WinAPI_WriteProcessMemory($hProcess, $pBaseAddress, $pBuffer, $iSize, ByRef $iWritten [, $sBufferType = "ptr"])
+_WinAPI_ZeroMemory($pMemory, $iLength)
+#EndRegion
+; Power
+_WinAPI_GetDefaultPrinter()
+_WinAPI_GetPwrCapabilities()
+_WinAPI_GetSystemPowerStatus()
+_WinAPI_RegisterPowerSettingNotification($hWnd, $sGUID)
+_WinAPI_SetDefaultPrinter($sPrinter)
+_WinAPI_UnregisterPowerSettingNotification($hNotify)
+#Region ; Station & Desktop
+_WinAPI_CloseDesktop($hDesktop)
+_WinAPI_CloseWindowStation($hStation)
+_WinAPI_CreateDesktop($sName [, $iAccess = 0x0002 [, $iFlags = 0 [, $iHeap = 0 [, $tSecurity = 0]]]])
+_WinAPI_CreateWindowStation([$sName = '' [, $iAccess = 0 [, $iFlags = 0 [, $tSecurity = 0]]]])
+_WinAPI_EnumDesktops($hStation)
+_WinAPI_EnumDesktopWindows($hDesktop [, $bVisible = True])
+_WinAPI_EnumWindowStations()
+_WinAPI_GetProcessWindowStation()
+_WinAPI_GetUserObjectInformation($hObject, $iIndex)
+_WinAPI_OpenDesktop($sName [, $iAccess = 0 [, $iFlags = 0 [, $bInherit = False]]])
+_WinAPI_OpenInputDesktop([$iAccess = 0 [, $iFlags = 0 [, $bInherit = False]]])
+_WinAPI_OpenWindowStation($sName [, $iAccess = 0 [, $bInherit = False]])
+_WinAPI_SetProcessWindowStation($hStation)
+_WinAPI_SetUserObjectInformation($hObject, $iIndex, $tData)
+_WinAPI_SwitchDesktop($hDesktop)
+#EndRegion
+#Region ; SysInfo
+_WinAPI_EnumPageFiles()
+_WinAPI_ExpandEnvironmentStrings($sString)
+_WinAPI_GetCurrentHwProfile()
+_WinAPI_GetHandleInformation($hObject)
+_WinAPI_GetPerformanceInfo()
+_WinAPI_GetPhysicallyInstalledSystemMemory()
+_WinAPI_GetProcessShutdownParameters()
+_WinAPI_GetStartupInfo()
+_WinAPI_GetSystemDEPPolicy()
+_WinAPI_GetSystemInfo()
+_WinAPI_GetSystemMetrics($iIndex)
+_WinAPI_GetSystemTimes()
+_WinAPI_GetSystemWow64Directory()
+_WinAPI_GetTickCount()
+_WinAPI_GetTickCount64()
+_WinAPI_GetVersion()
+_WinAPI_GetVersionEx()
+_WinAPI_GetWorkArea()
+_WinAPI_IsProcessorFeaturePresent($iFeature)
+_WinAPI_QueryPerformanceCounter()
+_WinAPI_QueryPerformanceFrequency()
+_WinAPI_SetProcessShutdownParameters($iLevel [, $bDialog = False])
+_WinAPI_SystemParametersInfo($iAction [, $iParam = 0 [, $vParam = 0 [, $iWinIni = 0]]])
+#EndRegion
+#Region ; User Keyboard Input
+_WinAPI_ActivateKeyboardLayout($hLocale [, $iFlag = 0])
+_WinAPI_EnableWindow($hWnd [, $bEnable = True])
+_WinAPI_GetActiveWindow()
+_WinAPI_GetAsyncKeyState($iKey)
+_WinAPI_GetIdleTime()
+_WinAPI_GetKeyboardLayout($hWnd)
+_WinAPI_GetKeyboardLayoutList()
+_WinAPI_GetKeyboardState()
+_WinAPI_GetKeyboardType($iType)
+_WinAPI_GetKeyNameText($lParam)
+_WinAPI_GetKeyState($vKey)
+_WinAPI_IsLoadKBLayout($iLanguage)
+_WinAPI_Keybd_Event($vKey, $iFlags [, $iScanCode = 0 [, $iExtraInfo = 0]])
+_WinAPI_LoadKeyboardLayout($iLanguage [, $iFlag = 0)
+_WinAPI_MapVirtualKey($iCode, $iType [, $hLocale = 0])
+_WinAPI_RegisterHotKey($hWnd, $iID, $iModifiers, $vKey)
+_WinAPI_SetActiveWindow($hWnd)
+_WinAPI_SetKeyboardLayout($hWnd, $iLanguage [, $iFlags = 0])
+_WinAPI_SetKeyboardState($tState)
+_WinAPI_TrackMouseEvent($hWnd, $iFlags [, $iTime = -1])
+_WinAPI_UnloadKeyboardLayout($hLocale)
+_WinAPI_UnregisterHotKey($hWnd, $iID)
+#EndRegion
+; User Mouse Input
+_WinAPI_Mouse_Event($iFlags [, $iX = 0 [, $iY = 0 [, $iData = 0 [, $iExtraInfo = 0]]]])
+_WinAPI_ReleaseCapture()
+_WinAPI_SetCapture($hWnd)
+; User Raw Input
+_WinAPI_DefRawInputProc($paRawInput, $iInput)
+_WinAPI_EnumRawInputDevices()
+_WinAPI_GetRawInputBuffer($pBuffer, $iLength)
+_WinAPI_GetRawInputBufferLength()
+_WinAPI_GetRawInputData($hRawInput, $pBuffer, $iLength, $iFlag)
+_WinAPI_GetRawInputDeviceInfo($hDevice, $pBuffer, $iLength, $iFlag)
+_WinAPI_GetRegisteredRawInputDevices($pBuffer, $iLength)
+_WinAPI_RegisterRawInputDevices($paDevice [, $iCount = 1])
+#Region ; Windows
+#include <WinAPISysWin.au3>
+_WinAPI_AdjustWindowRectEx(ByRef $tRECT, $iStyle [, $iExStyle = 0 [, $bMenu = False]])
+_WinAPI_AnimateWindow($hWnd, $iFlags [, $iDuration = 1000])
+_WinAPI_BeginDeferWindowPos([$iAmount = 1])
+_WinAPI_BringWindowToTop($hWnd)
+_WinAPI_BroadcastSystemMessage($iMsg [, $wParam = 0 [, $lParam = 0 [, $iFlags = 0 [, $iRecipients = 0]]]])
+_WinAPI_CallWindowProc($pPrevWndFunc, $hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_CallWindowProcW($pPrevWndProc, $hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_CascadeWindows($aWnds [, $tRECT = 0 [, $hParent = 0 [, $iFlags = 0 [, $iStart = 0 [, $iEnd = -1]]]]])
+_WinAPI_ChangeWindowMessageFilterEx($hWnd, $iMsg, $iAction)
+_WinAPI_ChildWindowFromPointEx($hWnd, $tPOINT [, $iFlags = 0])
+_WinAPI_CloseWindow($hWnd)
+_WinAPI_CreateWindowEx($iExStyle, $sClass, $sName, $iStyle, $iX, $iY, $iWidth, $iHeight, $hParent [, $hMenu = 0 [, $hInstance = 0 [, $pParam = 0]]])
+_WinAPI_DeferWindowPos($hInfo, $hWnd, $hAfter, $iX, $iY, $iWidth, $iHeight, $iFlags)
+_WinAPI_DefWindowProc($hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_DefWindowProcW($hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_DeregisterShellHookWindow($hWnd)
+_WinAPI_DestroyWindow($hWnd)
+_WinAPI_DragAcceptFiles($hWnd [, $bAccept = True])
+_WinAPI_DragFinish($hDrop)
+_WinAPI_DragQueryFileEx($hDrop [, $iFlag = 0])
+_WinAPI_DragQueryPoint($hDrop)
+_WinAPI_EndDeferWindowPos($hInfo)
+_WinAPI_EnumChildWindows($hWnd [, $bVisible = True])
+_WinAPI_EnumWindows([$bVisible = True [, $hWnd = Default]])
+_WinAPI_EnumWindowsPopup()
+_WinAPI_EnumWindowsTop()
+_WinAPI_FindWindow($sClassName, $sWindowName)
+_WinAPI_FlashWindow($hWnd [, $bInvert = True])
+_WinAPI_FlashWindowEx($hWnd [, $iFlags = 3 [, $iCount = 3 [, $iTimeout = 0]]])
+_WinAPI_GetAncestor($hWnd [, $iFlags = 1])
+_WinAPI_GetClassInfoEx($sClass [, $hInstance = 0])
+_WinAPI_GetClassLongEx($hWnd, $iIndex)
+_WinAPI_GetClassName($hWnd)
+_WinAPI_GetClientHeight($hWnd)
+_WinAPI_GetClientRect($hWnd)
+_WinAPI_GetClientWidth($hWnd)
+_WinAPI_GetDesktopWindow()
+_WinAPI_GetDlgItem($hWnd, $iItemID)
+_WinAPI_GetFocus()
+_WinAPI_GetForegroundWindow()
+_WinAPI_GetGUIThreadInfo($iThreadId)
+_WinAPI_GetLastActivePopup($hWnd )
+_WinAPI_GetLayeredWindowAttributes($hWnd, ByRef $iTransColor, ByRef $iTransGUI [, $bColorRef = False])
+_WinAPI_GetMessageExtraInfo()
+_WinAPI_GetParent($hWnd)
+_WinAPI_GetParentProcess([$iPID = 0])
+_WinAPI_GetShellWindow()
+_WinAPI_GetSysColor($iIndex)
+_WinAPI_GetTopWindow($hWnd)
+_WinAPI_GetWindow($hWnd, $iCmd)
+_WinAPI_GetWindowDC($hWnd)
+_WinAPI_GetWindowDisplayAffinity($hWnd)
+_WinAPI_GetWindowExt($hDC)
+_WinAPI_GetWindowFileName($hWnd)
+_WinAPI_GetWindowHeight($hWnd)
+_WinAPI_GetWindowInfo($hWnd)
+_WinAPI_GetWindowLong($hWnd, $iIndex)
+_WinAPI_GetWindowOrg($hDC)
+_WinAPI_GetWindowPlacement($hWnd)
+_WinAPI_GetWindowRect($hWnd)
+_WinAPI_GetWindowText($hWnd)
+_WinAPI_GetWindowThreadProcessId($hWnd, ByRef $iPID)
+_WinAPI_GetWindowWidth($hWnd)
+_WinAPI_InProcess($hWnd, ByRef $hLastWnd)
+_WinAPI_InvalidateRect($hWnd [, $tRECT = 0 [, $bErase = True]])
+_WinAPI_IsChild($hWnd, $hWndParent)
+_WinAPI_IsClassName($hWnd, $sClassName)
+_WinAPI_IsHungAppWindow($hWnd)
+_WinAPI_IsIconic($hWnd)
+_WinAPI_IsWindow($hWnd)
+_WinAPI_IsWindowEnabled($hWnd)
+_WinAPI_IsWindowUnicode($hWnd)
+_WinAPI_IsWindowVisible($hWnd)
+_WinAPI_IsZoomed($hWnd)
+_WinAPI_KillTimer($hWnd, $iTimerID)
+_WinAPI_MoveWindow($hWnd, $iX, $iY, $iWidth, $iHeight [, $bRepaint = True])
+_WinAPI_OpenIcon($hWnd)
+_WinAPI_PostMessage($hWnd, $iMsg, $wParam, $lParam)
+_WinAPI_RegisterClass($tWNDCLASS)
+_WinAPI_RegisterClassEx($tWNDCLASSEX)
+_WinAPI_RegisterShellHookWindow($hWnd)
+_WinAPI_RegisterWindowMessage($sMessage)
+_WinAPI_SendMessageTimeout($hWnd, $iMsg [, $wParam = 0 [, $lParam = 0 [, $iTimeout = 1000 [, $iFlags = 0]]]])
+_WinAPI_SetClassLongEx($hWnd, $iIndex, $iNewLong)
+_WinAPI_SetFocus($hWnd)
+_WinAPI_SetFont($hWnd, $hFont [, $bRedraw = True])
+_WinAPI_SetForegroundWindow($hWnd)
+_WinAPI_SetLayeredWindowAttributes($hWnd, $iTransColor [, $iTransGUI = 255 [, $iFlags = 0x03 [, $bColorRef = False]]])
+_WinAPI_SetMessageExtraInfo($lParam)
+_WinAPI_SetParent($hWndChild, $hWndParent)
+_WinAPI_SetSysColors($vElements, $vColors)
+_WinAPI_SetTimer($hWnd, $iTimerID, $iElapse, $pTimerFunc)
+_WinAPI_SetWindowDisplayAffinity($hWnd, $iAffinity)
+_WinAPI_SetWindowLong($hWnd, $iIndex, $iValue)
+_WinAPI_SetWindowPlacement($hWnd, $tWindowPlacement)
+_WinAPI_SetWindowPos($hWnd, $hAfter, $iX, $iY, $iCX, $iCY, $iFlags)
+_WinAPI_SetWindowText($hWnd, $sText)
+_WinAPI_ShowOwnedPopups($hWnd, $bShow)
+_WinAPI_ShowWindow($hWnd [, $iCmdShow = 5])
+_WinAPI_SwitchToThisWindow($hWnd [, $bAltTab = False])
+_WinAPI_TileWindows($aWnds [, $tRECT = 0 [, $hParent = 0 [, $iFlags = 0 [, $iStart = 0 [, $iEnd = -1]]]]])
+_WinAPI_UnregisterClass($sClass [, $hInstance = 0])
+_WinAPI_UpdateLayeredWindow($hWnd, $hDestDC, $tPTDest, $tSize, $hSrcDC, $tPTSrce, $iRGB, $tBlend, $iFlags)
+_WinAPI_UpdateLayeredWindowEx($hWnd, $iX, $iY, $hBitmap [, $iOpacity = 255 [, $bDelete = False]])
+_WinAPI_UpdateLayeredWindowIndirect($hWnd, $tULWINFO)
+_WinAPI_UpdateWindow($hWnd)
+_WinAPI_WindowFromPoint(ByRef $tPOINT)
+#EndRegion
+#EndRegion
+#Region ; Theme
+#include <WinAPITheme.au3>
+_WinAPI_BeginBufferedPaint($hDC, $tTarget, ByRef $hNewDC [, $iFormat = 0 [, $iFlags = 0 [, $tExclude = 0 [, $iAlpha = -1]]]])
+_WinAPI_BufferedPaintClear($hBP [, $tRECT = 0])
+_WinAPI_BufferedPaintInit()
+_WinAPI_BufferedPaintSetAlpha($hBP [, $iAlpha = 255 [, $tRECT = 0]])
+_WinAPI_BufferedPaintUnInit()
+_WinAPI_CloseThemeData($hTheme)
+_WinAPI_DrawThemeBackground($hTheme, $iPartID, $iStateID, $hDC, $tRECT [, $tCLIP = 0])
+_WinAPI_DrawThemeEdge($hTheme, $iPartID, $iStateID, $hDC, $tRECT, $iEdge, $iFlags [, $tAREA = 0])
+_WinAPI_DrawThemeIcon($hTheme, $iPartID, $iStateID, $hDC, $tRECT, $hIL, $iIndex)
+_WinAPI_DrawThemeParentBackground($hWnd, $hDC [, $tRECT = 0])
+_WinAPI_DrawThemeText($hTheme, $iPartID, $iStateID, $hDC, $sText, $tRECT, $iFlags)
+_WinAPI_DrawThemeTextEx($hTheme, $iPartID, $iStateID, $hDC, $sText, $tRECT, $iFlags, $tDTTOPTS)
+_WinAPI_EndBufferedPaint($hBP [, $bUpdate = True])
+_WinAPI_GetBufferedPaintBits($hBP)
+_WinAPI_GetBufferedPaintDC($hBP)
+_WinAPI_GetBufferedPaintTargetDC($hBP)
+_WinAPI_GetBufferedPaintTargetRect($hBP)
+_WinAPI_GetCurrentThemeName()
+_WinAPI_GetThemeAppProperties()
+_WinAPI_GetThemeBackgroundContentRect($hTheme, $iPartID, $iStateID, $hDC, $tRECT)
+_WinAPI_GetThemeBackgroundExtent($hTheme, $iPartID, $iStateID, $hDC, $tRECT)
+_WinAPI_GetThemeBackgroundRegion($hTheme, $iPartID, $iStateID, $hDC, $tRECT)
+_WinAPI_GetThemeBitmap($hTheme, $iPartID, $iStateID, $iPropID [, $iFlag = 0x01])
+_WinAPI_GetThemeBool($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeColor($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeDocumentationProperty($sFilePath, $sProperty)
+_WinAPI_GetThemeEnumValue($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeFilename($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeFont($hTheme, $iPartID, $iStateID, $iPropID [, $hDC = 0])
+_WinAPI_GetThemeInt($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeMargins($hTheme, $iPartID, $iStateID, $iPropID, $hDC, $tRECT)
+_WinAPI_GetThemeMetric($hTheme, $iPartID, $iStateID, $iPropID [, $hDC = 0])
+_WinAPI_GetThemePartSize($hTheme, $iPartID, $iStateID, $hDC, $tRECT, $iType)
+_WinAPI_GetThemePosition($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemePropertyOrigin($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeRect($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeString($hTheme, $iPartID, $iStateID, $iPropID)
+_WinAPI_GetThemeSysBool($hTheme, $iBoolID)
+_WinAPI_GetThemeSysColor($hTheme, $iColorID)
+_WinAPI_GetThemeSysColorBrush($hTheme, $iColorID)
+_WinAPI_GetThemeSysFont($hTheme, $iFontID)
+_WinAPI_GetThemeSysInt($hTheme, $iIntID)
+_WinAPI_GetThemeSysSize($hTheme, $iSizeID)
+_WinAPI_GetThemeSysString($hTheme, $iStringID)
+_WinAPI_GetThemeTextExtent($hTheme, $iPartID, $iStateID, $hDC, $sText, $tRECT, $iFlags)
+_WinAPI_GetThemeTextMetrics($hTheme, $iPartID, $iStateID [, $hDC = 0])
+_WinAPI_GetThemeTransitionDuration($hTheme, $iPartID, $iStateIDFrom, $iStateIDTo, $iPropID)
+_WinAPI_GetWindowTheme($hWnd)
+_WinAPI_IsThemeActive()
+_WinAPI_IsThemeBackgroundPartiallyTransparent($hTheme, $iPartID, $iStateID)
+_WinAPI_IsThemePartDefined($hTheme, $iPartID)
+_WinAPI_OpenThemeData($hWnd, $sClass)
+_WinAPI_SetThemeAppProperties($iFlags)
+_WinAPI_SetWindowTheme($hWnd [, $sName = Default [, $sList = Default]])
+#EndRegion
+#EndRegion
+#Region ; WinNet
+#include <WinNet.au3>
+_WinNet_AddConnection($sLocalName, $sRemoteName [, $sPassword = 0])
+_WinNet_AddConnection2($sLocalName, $sRemoteName [, $sUserName = 0 [, $sPassword = 0 [, $iType = 1 [, $iOptions = 1]]]])
+_WinNet_AddConnection3($hWnd, $sLocalName, $sRemoteName [, $sUserName = 0 [, $sPassword = 0 [, $iType = 1 [, $iOptions = 1]]]])
+_WinNet_CancelConnection($sName [, $bForce = True])
+_WinNet_CancelConnection2($sName [, $bUpdate = True [, $bForce = True]])
+_WinNet_CloseEnum($hEnum)
+_WinNet_ConnectionDialog($hWnd)
+_WinNet_ConnectionDialog1($hWnd [, $sRemoteName = "" [, $iFlags = 2]])
+_WinNet_DisconnectDialog($hWnd)
+_WinNet_DisconnectDialog1($hWnd, $sLocalName [, $sRemoteName = "" [, $iFlags = 1]])
+_WinNet_EnumResource($hEnum, ByRef $iCount, $pBuffer, ByRef $iBufSize)
+_WinNet_GetConnection($sLocalName)
+_WinNet_GetConnectionPerformance($sLocalName, $sRemoteName)
+_WinNet_GetLastError(ByRef $iError, ByRef $sError, ByRef $sName)
+_WinNet_GetNetworkInformation($sName)
+_WinNet_GetProviderName($iType)
+_WinNet_GetResourceInformation($sRemoteName [, $sProvider = "" [, $iType = 0]])
+_WinNet_GetResourceParent($sRemoteName, $sProvider [, $iType = 0])
+_WinNet_GetUniversalName($sLocalPath)
+_WinNet_GetUser($sName)
+_WinNet_OpenEnum($iScope, $iType, $iUsage, $tResource, ByRef $hEnum)
+_WinNet_RestoreConnection([$sDevice = "" [, $hWnd = 0 [, $bUseUI = True]]])
+_WinNet_UseConnection($hWnd, $sLocalName, $sRemoteName [, $sUserName = 0 [, $sPassword = 0 [, $iType = 1 [, $iOptions = 1]]]])
+#EndRegion
+#Region ; Word
+#include <Word.au3>
+_Word_Create([$bVisible = True [, $bForceNew = False]])
+_Word_DocAdd($oAppl [, $iDocumentType = $WdNewBlankDocument [, $sDocumentTemplate = "" [, $bNewTemplate = False]]])
+_Word_DocAttach($oAppl, $sString [, $sMode = "FilePath" [, $iCase = 0]])
+_Word_DocClose($oDoc [, $iSaveChanges = $WdDoNotSaveChanges [, $iOriginalFormat = $WdOriginalDocumentFormat]])
+_Word_DocExport($oDoc, $sFileName [, $iFormat = $WdExportFormatPDF [, $iRange = $WdExportAllDocument [, $iFrom = Default [, $iTo = Default [, $bOpenAfterExport = False [, $bIncludeProperties = True [, $iCreateBookmarks = Default [, $bUseISO19005 = False]]]]]]]])
+_Word_DocFind($oDoc [, $sFindText = "" [, $vSearchRange = 0 [, $oFindRange = Default [, $bForward = True [, $bMatchCase = False [, $bMatchWholeWord = False [, $bMatchWildcards = False [, $bMatchSoundsLike = False [, $bMatchAllWordForms = False [, $bFormat = False]]]]]]]]]])
+_Word_DocFindReplace($oDoc [, $sFindText = "" [, $sReplaceWith = "" [, $iReplace = $WdReplaceAll [, $vSearchRange = 0 [, $bMatchCase = False [, $bMatchWholeWord = False [, $bMatchWildcards = False [, $bMatchSoundsLike = False [, $bMatchAllWordForms = False [, $bForward = True [, $iWrap = $WdFindContinue [, $bFormat = False]]]]]]]]]]]])
+_Word_DocGet($oAppl [, $vIndex = -1])
+_Word_DocLinkAdd($oDoc [, $oAnchor = Default [, $sAddress = Default [, $sSubAddress = Default [, $sScreenTip = Default [, $sTextToDisplay = Default [, $sTarget = Default]]]]]])
+_Word_DocLinkGet($oDoc [, $iIndex = Default])
+_Word_DocOpen($oAppl, $sFilePath [, $bConfirmConversions = False [, $iFormat = $WdOpenFormatAuto [, $bReadOnly = False [, $bRevert = False [, $bAddToRecentFiles = False [, $sOpenPassword = "" [, $sWritePassword = ""]]]]]]])
+_Word_DocPictureAdd($oDoc, $sFilePath [, $bLinkToFile = False [, $bSaveWithDocument = False [, $oRange = 0]]])
+_Word_DocPrint($oDoc [, $bBackground = False [, $iCopies = 1 [, $iOrientation = -1 [, $bCollate = True [, $sPrinter = "" [, $iRange = $WdPrintAllDocument [, $vFrom = 0 [, $vTo = 0 [, $sPages = "" [, $iPageType = $WdPrintAllPages [, $iItem = $WdPrintDocumentContent]]]]]]]]]]])
+_Word_DocRangeSet($oDoc, $vRange [, $iStartUnit = Default [, $iStartCount = Default [, $iEndUnit = Default [, $iEndCount = Default]]]])
+_Word_DocSave($oDoc)
+_Word_DocSaveAs($oDoc [, $sFileName = Default [, $iFileFormat = $WdFormatDocument [, $bReadOnlyRecommended = False [, $bAddToRecentFiles = True [, $sPassword = "" [, $sWritePassword = ""]]]]]])
+_Word_DocTableRead($oDoc, $vTable [, $iIndexBase = Default [, $sDelimiter = Default]])
+_Word_DocTableWrite($oRange, ByRef $aArray [, $iIndexBase = Default [, $sDelimiter = Default]])
+_Word_Quit($oAppl [, $iSaveChanges = $WdDoNotSaveChanges [, $iOriginalFormat = $WdWordDocument [, $bForceClose = False]]])
+#EndRegion

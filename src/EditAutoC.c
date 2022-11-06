@@ -647,6 +647,9 @@ enum {
 	APDLKeywordIndex_StarCommand = 3,
 	AutoHotkeyKeywordIndex_Directive = 1,
 	AutoHotkeyKeywordIndex_CompilerDirective = 2,
+	AutoIt3KeywordIndex_Macro = 2,
+	AutoIt3KeywordIndex_Directive = 4,
+	AutoIt3KeywordIndex_Special = 5,
 	CPPKeywordIndex_Preprocessor = 2,
 	CPPKeywordIndex_Directive = 3,
 	CSSKeywordIndex_AtRule = 1,
@@ -1059,6 +1062,18 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		}
 		if (ch == '@' && (iCurrentStyle == SCE_AHK_COMMENTLINE || iCurrentStyle == SCE_AHK_COMMENTBLOCK)) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoHotkeyKeywordIndex_CompilerDirective]);
+			return AddWordResult_Finish;
+		}
+		break;
+
+	case NP2LEX_AUTOIT3:
+		if (ch == '#' && iCurrentStyle == SCE_AU3_DEFAULT) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoIt3KeywordIndex_Directive]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoIt3KeywordIndex_Special]);
+			return AddWordResult_Finish;
+		}
+		if (ch == '@' && iCurrentStyle == SCE_AU3_DEFAULT) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[AutoIt3KeywordIndex_Macro]);
 			return AddWordResult_Finish;
 		}
 		break;
