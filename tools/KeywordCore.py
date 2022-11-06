@@ -398,7 +398,6 @@ def parse_autoit3_api_file(path):
 		'user defined functions',
 		'user defined functions 2',
 		'user defined functions 3',
-		'sent keys',
 		'misc',
 	])
 	RemoveDuplicateKeyword(keywordMap, [

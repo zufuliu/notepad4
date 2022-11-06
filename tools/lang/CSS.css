@@ -109,8 +109,8 @@ from to
 	input-security: auto | none;
 }
 
-// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 21 April 2020
-// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 22 December 2020
+// CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 3 November 2022
+// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 3 November 2022
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
 	margin-top: auto;
@@ -118,7 +118,7 @@ from to
 	margin-right: auto;
 	margin-left: auto;
 	margin: inherit;
-	margin-trim: none | in-flow | all;
+	margin-trim: none | block | inline | block-start | inline-start | block-end | inline-end;
 
 	padding-top: inherit;
 	padding-right: inherit;
@@ -190,8 +190,8 @@ initial inherit unset revert revert-layer
 @scope {}
 :scope
 
-// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 28 April 2022
-// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 28 April 2022
+// CSS Color Module Level 5 https://www.w3.org/TR/css-color-5/ 28 June 2022
+// CSS Color Module Level 4 https://www.w3.org/TR/css-color-4/ 1 November 2022
 // CSS Color Module Level 3 https://www.w3.org/TR/css-color-3/ 18 January 2022
 // Colors and Backgrounds https://www.w3.org/TR/CSS22/colors.html
 {
@@ -205,7 +205,7 @@ initial inherit unset revert revert-layer
 	components:;
 }
 
-// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 10 February 2022
+// CSS Color Adjustment Module Level 1 https://www.w3.org/TR/css-color-adjust-1/ 14 June 2022
 {
 	color-scheme: normal | light | dark | only;
 	forced-color-adjust: auto | none | preserve-parent-color;
@@ -236,12 +236,12 @@ font-format()
 media()
 supports()
 
-// CSS Containment Module Level 3 https://www.w3.org/TR/css-contain-3/ 21 December 2021
-// CSS Containment Module Level 2 https://www.w3.org/TR/css-contain-2/ 16 December 2020
-// CSS Containment Module Level 1 https://www.w3.org/TR/css-contain-1/ 22 December 2020
+// CSS Containment Module Level 3 https://www.w3.org/TR/css-contain-3/ 18 August 2022
+// CSS Containment Module Level 2 https://www.w3.org/TR/css-contain-2/ 17 September 2022
+// CSS Containment Module Level 1 https://www.w3.org/TR/css-contain-1/ 25 October 2022
 {
 	contain: none | strict | content | size | inline-size | layout | style | paint;
-	container-type: none | style | state | size | inline-size | block-size;
+	container-type: normal | style | state | size | inline-size | block-size;
 	container-name: none;
 	container:;
 	content-visibility: visible | auto | hidden;
@@ -262,7 +262,7 @@ style()
 // CSS Custom Highlight API Module Level 1 https://www.w3.org/TR/css-highlight-api-1/ 15 December 2021
 ::highlight()
 
-// CSS Custom Properties for Cascading Variables Module Level 1 https://www.w3.org/TR/css-variables-1/ 11 November 2021
+// CSS Custom Properties for Cascading Variables Module Level 1 https://www.w3.org/TR/css-variables-1/ 16 June 2022
 var()
 
 // CSS Counter Styles Level 3 https://www.w3.org/TR/css-counter-styles-3/ 27 July 2021
@@ -820,7 +820,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
-// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 16 December 2021
+// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 1 September 2022
 {
 	position: static | relative | absolute | sticky | fixed;
 	top: auto;
@@ -956,17 +956,39 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	scrollbar-width: auto | thin | none;
 }
 
-// Selectors Level 4 https://www.w3.org/TR/selectors-4/ 21 November 2018
+// Scroll-linked Animations https://www.w3.org/TR/scroll-animations-1/ 25 October 2022
+{
+	scroll-timeline-name: none;
+	scroll-timeline-axis: block | inline | vertical | horizontal;
+	scroll-timeline:;
+
+	view-timeline-name: none;
+	view-timeline-axis: block | inline | vertical | horizontal;
+	view-timeline-inset: auto;
+	view-timeline:;
+
+	animation-delay:;
+	animation-range:;
+	animation-delay-start:;
+	animation-delay-end:;
+}
+scroll()
+block inline vertical horizontal
+root nearest
+
+// Selectors Level 4 https://www.w3.org/TR/selectors-4/ 7 May 2022
 // Selectors Level 3 https://www.w3.org/TR/selectors-3/ 6 November 2018
 // pseudo-class
+// Logical Combinations
 :not()
 :is()
 :where()
 :has()
-
+:defined
+// Linguistic
 :dir()
 :lang()
-
+// Location
 :any-link
 :link
 :visited
@@ -974,35 +996,49 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 :target
 :target-within
 :scope
-
+// Time-dimensional
 :current
 :current()
 :past
 :future
-
+// User Action
 :active
 :hover
 :focus
 :focus-within
 :focus-visible
-
+// Resource State
+:playing
+:paused
+:seeking
+:buffering
+:stalled
+:muted
+:volume-locked
+// Element Display State
+:modal
+:fullscreen
+:picture-in-picture
+// Input
 :enabled
 :disabled
 :read-write
 :read-only
 :placeholder-shown
+:autofill
 :default
 :checked
 :indeterminate
+:blank
 :valid
 :invalid
 :in-range
 :out-of-range
 :required
 :optional
-:blank
+:user-valid
 :user-invalid
-
+// Tree-Structural
 :root
 :empty
 :nth-child()
@@ -1015,7 +1051,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 :first-of-type
 :last-of-type
 :only-of-type
-
+// Grid-Structural
 :nth-col()
 :nth-last-col()
 
@@ -1089,8 +1125,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 18 March 2022
-// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 22 April 2021
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 5 May 2022
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 5 May 2022
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
@@ -1127,8 +1163,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	hanging-punctuation: none | first | force-end | allow-end | last;
 }
 
-// CSS Text Decoration Module Level 4 https://www.w3.org/TR/css-text-decor-4/ 6 May 2020
-// CSS Text Decoration Module Level 3 https://www.w3.org/TR/css-text-decor-3/ 13 August 2019
+// CSS Text Decoration Module Level 4 https://www.w3.org/TR/css-text-decor-4/ 4 May 2022
+// CSS Text Decoration Module Level 3 https://www.w3.org/TR/css-text-decor-3/ 5 May 2022
 {
 	text-decoration-line: none | underline | overline | line-through | blink | spelling-error | grammar-error;
 	text-decoration-style: solid | double | dotted | dashed | wavy;
@@ -1177,7 +1213,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	transition:;
 }
 
-// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 16 December 2021
+// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 19 October 2022
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 6 June 2019
 initial nherit unset
 mix()
@@ -1189,6 +1225,11 @@ sin() cos() tan() asin() acos() atan() atan2()
 pow() sqrt() hypot() log() exp()
 abs() sign()
 pi infinity NaN
+
+// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 25 October 2022
+{
+	page-transition-tag: none;
+}
 
 // Visual formatting model https://www.w3.org/TR/CSS22/visuren.html
 {
@@ -1225,7 +1266,7 @@ pi infinity NaN
 	clip: rect() | auto;
 }
 
-// CSS Will Change Module Level 1 https://www.w3.org/TR/css-will-change-1/ 3 December 2015
+// CSS Will Change Module Level 1 https://www.w3.org/TR/css-will-change-1/ 5 May 2022
 {
 	will-change: auto | scroll-position | contents;
 }
