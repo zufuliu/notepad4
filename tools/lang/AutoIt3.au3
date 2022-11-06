@@ -603,18 +603,26 @@ WinWaitNotActive("title" [, "text" [, timeout = 0]])
 
 ;! Sent keys		===========================================================
 ; https://www.autoitscript.com/autoit3/docs/appendix/SendKeys.htm
-{!} {#} {^} {{} {}} {+} {alt} {altdown} {altup} {appskey}
-{asc} {backspace} {break} {browser_back} {browser_favorites} {browser_forward} {browser_home}
-{browser_refresh} {browser_search} {browser_stop} {bs} {capslock} {ctrldown} {ctrlup}
-{del} {delete} {down} {end} {enter} {esc} {escape} {f1} {f10} {f11} {f12} {f2} {f3}
-{f4} {f5} {f6} {f7} {f8} {f9} {home} {ins} {insert} {lalt} {launch_app1} {launch_app2}
-{launch_mail} {launch_media} {lctrl} {left} {lshift} {lwin} {lwindown} {lwinup} {media_next}
-{media_play_pause} {media_prev} {media_stop} {numlock} {numpad0} {numpad1} {numpad2}
-{numpad3} {numpad4} {numpad5} {numpad6} {numpad7} {numpad8} {numpad9} {numpadadd}
-{numpaddiv} {numpaddot} {numpadenter} {numpadmult} {numpadsub} {oem_102} {pause}
-{pgdn} {pgup} {printscreen} {ralt} {rctrl} {right} {rshift} {rwin} {rwindown} {rwinup}
-{scrolllock} {shiftdown} {shiftup} {sleep} {space} {tab} {up} {volume_down} {volume_mute}
-{volume_up}
+"{!} {#} {^} {+} {{} {}}"
+"{Alt} {AltDown} {AltUp} {AppsKey} {Asc}"
+"{Backspace} {Break} {Browser_Back} {Browser_Favorites} {Browser_Forward} {Browser_Home} {Browser_Refresh} {Browser_Search} {Browser_Stop} {BS}"
+"{CapsLock} {CtrlDown} {CtrlUp}"
+"{Del} {Delete} {Down}"
+"{End} {Enter} {Esc} {Escape}"
+"{F1} {F10} {F11} {F12} {F2} {F3} {F4} {F5} {F6} {F7} {F8} {F9}"
+"{Home}"
+"{Ins} {Insert}"
+"{LAlt} {Launch_App1} {Launch_App2} {Launch_Mail} {Launch_Media} {LCtrl} {Left} {LShift} {LWin} {LWinDown} {LWinUp} "
+"{Media_Next} {Media_Play_Pause} {Media_Prev} {Media_Stop}"
+"{NumLock} {Numpad0} {Numpad1} {Numpad2} {Numpad3} {Numpad4} {Numpad5} {Numpad6} {Numpad7} {Numpad8} {Numpad9}"
+"{NumpadAdd} {NumpadDiv} {NumpadDot} {NumpadEnter} {NumpadMult} {NumpadSub}"
+"{OEM_102} "
+"{Pause} {PgDn} {PgUp} {PrintScreen}"
+"{RAlt} {RCtrl} {Right} {RShift} {RWin} {RWinDown} {RWinUp}"
+"{ScrollLock} {ShiftDown} {ShiftUp} {Sleep} {Space}"
+"{Tab}"
+"{Up}"
+"{Volume_Down} {Volume_Mute}{Volume_Up}"
 
 ;! directives		===========================================================
 ; https://www.autoitscript.com/autoit3/docs/intro/lang_directives.htm
@@ -624,9 +632,15 @@ WinWaitNotActive("title" [, "text" [, timeout = 0]])
 #ce
 #include
 #include-once
+#pragma
 #NoTrayIcon
 #OnAutoItStartRegister
 #RequireAdmin
+; AutoIt Syntax Checker (Au3Check)
+; https://www.autoitscript.com/autoit3/docs/intro/au3check.htm
+#forcedef
+#forceref
+#ignorefunc
 
 ;! Special			===========================================================
 ; https://www.autoitscript.com/wiki/AutoIt3Wrapper_Directives
@@ -702,11 +716,6 @@ WinWaitNotActive("title" [, "text" [, timeout = 0]])
 #Obfuscator_Ignore_Variables
 #Obfuscator_Parameters
 #EndRegion
-
-#pragma
-#forcedef
-#forceref
-#ignorefunc
 
 ;! user defined functions	===================================================
 ; https://www.autoitscript.com/autoit3/docs/libfunctions.htm
@@ -4151,3 +4160,37 @@ _Word_DocTableRead($oDoc, $vTable [, $iIndexBase = Default [, $sDelimiter = Defa
 _Word_DocTableWrite($oRange, ByRef $aArray [, $iIndexBase = Default [, $sDelimiter = Default]])
 _Word_Quit($oAppl [, $iSaveChanges = $WdDoNotSaveChanges [, $iOriginalFormat = $WdWordDocument [, $bForceClose = False]]])
 #EndRegion
+
+;! misc				===========================================================
+; AutoItSetOption()
+CaretCoordMode
+ExpandEnvStrings
+ExpandVarStrings
+GUICloseOnESC
+GUICoordMode
+GUIDataSeparatorChar
+GUIOnEventMode
+GUIResizeMode
+GUIEventOptions
+MouseClickDelay
+MouseClickDownDelay
+MouseClickDragDelay
+MouseCoordMode
+MustDeclareVars
+PixelCoordMode
+SendAttachMode
+SendCapslockMode
+SendKeyDelay
+SendKeyDownDelay
+SetExitCode
+TCPTimeout
+TrayAutoPause
+TrayIconDebug
+TrayIconHide
+TrayMenuMode
+TrayOnEventMode
+WinDetectHiddenText
+WinSearchChildren
+WinTextMatchMode
+WinTitleMatchMode
+WinWaitDelay

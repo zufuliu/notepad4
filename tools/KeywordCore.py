@@ -382,6 +382,8 @@ def parse_autoit3_api_file(path):
 				items -= set(result)
 				prefixList.append('_WinAPI_')
 				items |= set('^' + prefix for prefix in prefixList)
+		elif key == 'sent keys':
+			items = re.findall(r'\{(\w+)\}', doc)
 		elif key in ('directives', 'special'):
 			items = re.findall(r'#([\w\-]+)', doc)
 		elif key == 'macros':
@@ -397,6 +399,7 @@ def parse_autoit3_api_file(path):
 		'user defined functions 2',
 		'user defined functions 3',
 		'sent keys',
+		'misc',
 	])
 	RemoveDuplicateKeyword(keywordMap, [
 		'directives',
@@ -414,6 +417,7 @@ def parse_autoit3_api_file(path):
 		('user defined functions 2', [], KeywordAttr.NoLexer),
 		#('user defined functions 3', keywordMap['user defined functions 3'], KeywordAttr.NoLexer),
 		('user defined functions 3', [], KeywordAttr.NoLexer),
+		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
 def parse_apdl_api_file(path):

@@ -44,6 +44,7 @@ enum {
 constexpr bool IsAu3TypeCharacter(int ch) noexcept {
 	return ch == '$';
 }
+
 constexpr bool IsAu3WordChar(int ch) noexcept {
 	return IsAlphaNumeric(ch) || ch == '_';
 }
@@ -63,63 +64,60 @@ constexpr bool IsAu3Operator(int ch) noexcept {
 // and return the first portion to be looked-up in the table
 // also check if the second portion is valid... (up, down.on.off, toggle or a number)
 ///////////////////////////////////////////////////////////////////////////////
-
-int GetSendKey(const char *szLine, char *szKey) noexcept {
-	int nFlag = 0;
-	int nStartFound = 0;
-	int nKeyPos = 0;
-	int nSpecPos = 0;
-	int nSpecNum = 1;
-	int nPos = 0;
+bool GetSendKey(const char *szLine, char *szKey) noexcept {
+	bool nFlag = false;
+	bool nStartFound = false;
+	unsigned nKeyPos = 0;
+	unsigned nSpecPos = 0;
+	bool nSpecNum = true;
+	unsigned nPos = 0;
 	char cTemp;
 	char szSpecial[128];
 
 	// split the portion of the sendkey in the part before and after the spaces
-	while ((cTemp = szLine[nPos]) != '\0') {
+	while ((cTemp = szLine[nPos++]) != '\0') {
 		// skip leading Ctrl/Shift/Alt state
 		if (cTemp == '{') {
-			nStartFound = 1;
+			nStartFound = true;
 		}
-		//
-		if (nStartFound == 1) {
-			if ((cTemp == ' ') && (nFlag == 0)) { // get the stuff till first space
-				nFlag = 1;
+		if (nStartFound) {
+			if ((cTemp == ' ') && !nFlag) { // get the stuff till first space
+				nFlag = true;
 				// Add } to the end of the first bit for table lookup later.
 				szKey[nKeyPos++] = '}';
 			} else if (cTemp == ' ') {
 				// skip other spaces
-			} else if (nFlag == 0) {
+			} else if (!nFlag) {
 				// save first portion into var till space or } is hit
 				szKey[nKeyPos++] = cTemp;
-			} else if ((nFlag == 1) && (cTemp != '}')) {
+			} else if (nFlag && (cTemp != '}')) {
 				// Save second portion into var...
 				szSpecial[nSpecPos++] = cTemp;
 				// check if Second portion is all numbers for repeat fuction
 				if (!IsADigit(cTemp)) {
-					nSpecNum = 0;
+					nSpecNum = false;
 				}
 			}
 		}
-		nPos++; // skip to next char
-
 	}
 
-
 	// Check if the second portion is either a number or one of these keywords
-	szKey[nKeyPos] = '\0';
 	szSpecial[nSpecPos] = '\0';
-	if (nSpecNum == 1 || StrEqualsAny(szSpecial, "down", "up", "on", "off", "toggle")) {
-		nFlag = 0;
-	} else {
-		nFlag = 1;
+	nFlag = true;
+	if (nSpecNum || StrEqualsAny(szSpecial, "down", "up", "on", "off", "toggle")) {
+		nFlag = false;
+		if (nKeyPos > 2) {
+			// remove {}
+			nKeyPos -= 2;
+			memmove(szKey, szKey + 1, nKeyPos);
+			szKey[nKeyPos] = '\0';
+		}
 	}
 	return nFlag;  // 1 is bad, 0 is good
 
 }
 
-//
 // Routine to check the last "none comment" character on a line to see if its a continuation
-//
 bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 	const Sci_Position nsPos = styler.LineStart(szLine);
 	Sci_Position nePos = styler.LineStart(szLine + 1) - 2;
@@ -137,18 +135,6 @@ bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 	}
 	return false;
 }
-
-/*const char * const AU3WordLists[] = {
-	"#autoit keywords",
-	"#autoit functions",
-	"#autoit macros",
-	"#autoit Sent keys",
-	"#autoit Pre-processors",
-	"#autoit Special",
-	"#autoit Expand",
-	"#autoit UDF",
-	0
-};*/
 
 // syntax highlighting logic
 void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
@@ -400,7 +386,7 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 					sc.ChangeState(SCE_AU3_STRING);
 				}
 				// if single char between {?} then its ok as sendkey for a single character
-				else if (strlen(sk) == 3) {
+				else if (sk[0] != '\0' && sk[1] == '\0') {
 					sc.ChangeState(SCE_AU3_SENT);
 				}
 				// if sendkey {111} is in table then ok as sendkey
@@ -419,13 +405,13 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 					if (cTemp == '{' && nState == 1) {
 						nState = 2;
 					}
-					if (nState == 1 && !(cTemp == '+' || cTemp == '!' || cTemp == '^' || cTemp == '#')) {
+					if (nState == 1 && !AnyOf(cTemp, '+', '!', '^', '#')) {
 						nState = 0;
 					}
 					nPos++;
 				}
 				//Verify characters infront of { ... if not assume  regular string
-				if (nState == 1 && (!(sc.ch == '{' || sc.ch == '+' || sc.ch == '!' || sc.ch == '^' || sc.ch == '#'))) {
+				if (nState == 1 && !AnyOf(sc.ch, '{', '+', '!', '^', '#')) {
 					sc.ChangeState(SCE_AU3_STRING);
 					sc.SetState(SCE_AU3_STRING);
 				}
@@ -538,7 +524,7 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 				sc.ChangeState(SCE_AU3_STRING);
 			}
 			// if single char between {?} then its ok as sendkey for a single character
-			else if (strlen(sk) == 3) {
+			else if (sk[0] != '\0' && sk[1] == '\0') {
 				sc.ChangeState(SCE_AU3_SENT);
 			}
 			// if sendkey {111} is in table then ok as sendkey
@@ -559,12 +545,10 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	sc.Complete();
 }
 
-//
 constexpr bool IsStreamCommentStyle(int style) noexcept {
 	return style == SCE_AU3_COMMENT || style == SCE_AU3_COMMENTBLOCK;
 }
 
-//
 // Routine to find first none space on the current line and return its Style
 // needed for comment lines not starting on pos 1
 int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
@@ -578,8 +562,6 @@ int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
 
 }
 
-
-//
 void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
 	const Sci_Position endPos = startPos + length;
 	constexpr bool foldInComment = false;
