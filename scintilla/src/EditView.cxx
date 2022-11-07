@@ -1393,14 +1393,20 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	// Draw the [CR], [LF], or [CR][LF] blobs if visible line ends are on
 	XYPOSITION blobsWidth = 0;
 	if (lastSubLine) {
-		int styleEol = -1;
+		int stylePrev = -1;
 		for (Sci::Position eolPos = ll->numCharsBeforeEOL; eolPos<ll->numCharsInLine;) {
-			const int style = ll->styles[eolPos];
-			// detect bug in lexer that don't highlight EOL with same styles.
-			const int styleMain = (styleEol < 0 || styleEol == style) ? StyleControlChar : style;
-			styleEol = style;
+			const int styleMain = ll->styles[eolPos];
 			const std::optional<ColourRGBA> selectionFore = SelectionForeground(model, vsDraw, eolInSelection);
-			ColourRGBA textFore = selectionFore.value_or(vsDraw.styles[styleMain].fore);
+			ColourRGBA textFore;
+			if (selectionFore) {
+				textFore = *selectionFore;
+			} else {
+				// detect bug in lexer that don't highlight EOL with same style.
+				const int styleUse = (stylePrev < 0 || stylePrev == styleMain) ? StyleControlChar : styleMain;
+				stylePrev = styleMain;
+				textFore = vsDraw.styles[styleUse].fore;
+			}
+
 			char hexits[4];
 			std::string_view ctrlChar;
 			Sci::Position widthBytes = 1;
@@ -1434,7 +1440,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 			rcSegment.left = xStart + ll->positions[eolPos] - static_cast<XYPOSITION>(subLineStart) + virtualSpace;
 			rcSegment.right = xStart + ll->positions[eolPos + widthBytes] - static_cast<XYPOSITION>(subLineStart) + virtualSpace;
 			blobsWidth += rcSegment.Width();
-			const ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, eolInSelection, false, styleEol, eolPos);
+			const ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, eolInSelection, false, styleMain, eolPos);
 			if (drawEOLSelection) {
 				if (vsDraw.selection.layer == Layer::Base) {
 					surface->FillRectangleAligned(rcSegment, Fill(selectionBack.Opaque()));
@@ -2526,7 +2532,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Colour)) {
 							textFore = ts.representation->colour;
 						} else {
-							textFore = vsDraw.styles[StyleControlChar].fore;
+							textFore = vsDraw.styles[StyleControlChar].back;
 						}
 						if (FlagSet(ts.representation->appearance, RepresentationAppearance::Blob)) {
 							DrawTextBlob(surface, vsDraw, rcSegment, stringRep,

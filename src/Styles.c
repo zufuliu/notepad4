@@ -485,8 +485,6 @@ static inline UINT GetLexerStyleControlMask(int rid, int index) {
 	case NP2LEX_GLOBAL:
 	case NP2LEX_2NDGLOBAL:
 		switch (index) {
-		case GlobalStyleIndex_ControlCharacter:
-			return StyleControl_Font | StyleControl_Fore;
 		case GlobalStyleIndex_IndentationGuide:
 		case GlobalStyleIndex_Whitespace:
 		case GlobalStyleIndex_CurrentLine:
@@ -1717,8 +1715,8 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 	}
 
 	// other lexer styles
+	Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 	if (rid != NP2LEX_ANSI) {
-		Style_SetDefaultStyle(GlobalStyleIndex_ControlCharacter);
 		Style_SetAllStyle(pLexNew, 0);
 
 		switch (rid) {
