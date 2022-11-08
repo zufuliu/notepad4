@@ -3278,11 +3278,15 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_REMOVEDUPLICATELINE:
+		BeginWaitCursor();
 		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | EditSortFlag_RemoveDuplicate));
+		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_MERGEDUPLICATELINE:
+		BeginWaitCursor();
 		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | EditSortFlag_MergeDuplicate));
+		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_CUTLINE:
@@ -3411,12 +3415,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_SORTLINES:
 		if (EditSortDlg(hwnd, &iSortOptions)) {
 			BeginWaitCursor();
-			StatusSetText(hwndStatus, STATUS_HELP, L"...");
-			StatusSetSimple(hwndStatus, TRUE);
-			InvalidateRect(hwndStatus, NULL, TRUE);
-			UpdateWindow(hwndStatus);
 			EditSortLines(iSortOptions);
-			StatusSetSimple(hwndStatus, FALSE);
 			EndWaitCursor();
 		}
 		break;

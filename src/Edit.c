@@ -4304,8 +4304,8 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	Sci_Position iTargetStart = SciCall_PositionFromLine(iLineStart);
 	Sci_Position iTargetEnd = SciCall_PositionFromLine(iLineEnd + 1);
 	const size_t cbPmszBuf = iTargetEnd - iTargetStart + 2*iLineCount + 1; // 2 for CR LF
-	SORTLINE * const pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
 	char * const pmszBuf = (char *)NP2HeapAlloc(cbPmszBuf);
+	SORTLINE * const pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
 	WCHAR * const pszTextW = (WCHAR *)NP2HeapAlloc(cbPmszBuf*sizeof(WCHAR) + iLineCount*NP2_alignof(WCHAR *));
 	size_t cchTotal = NP2_alignof(WCHAR *)/sizeof(WCHAR); // first pointer reserved for empty line
 
