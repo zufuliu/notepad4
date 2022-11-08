@@ -4447,6 +4447,11 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	}
 	NP2HeapFree(pLines);
 
+	SciCall_SetTargetRange(SciCall_PositionFromLine(iLineStart), SciCall_PositionFromLine(iLineEnd + 1));
+	SciCall_ReplaceTarget(cchTotal, pmszBuf);
+	SciCall_EndUndoAction();
+	NP2HeapFree(pmszBuf);
+
 	if (!bIsRectangular) {
 		if (iAnchorPos > iCurPos) {
 			iCurPos = iSelStart;
@@ -4455,14 +4460,6 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			iAnchorPos = iSelStart;
 			iCurPos = iSelStart + cchTotal;
 		}
-	}
-
-	SciCall_SetTargetRange(SciCall_PositionFromLine(iLineStart), SciCall_PositionFromLine(iLineEnd + 1));
-	SciCall_ReplaceTarget(cchTotal, pmszBuf);
-	SciCall_EndUndoAction();
-	NP2HeapFree(pmszBuf);
-
-	if (!bIsRectangular) {
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	} else {
 		const Sci_Position iTargetStart = SciCall_GetTargetStart();
@@ -4470,12 +4467,14 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		SciCall_ClearSelections();
 		if (iTargetStart != iTargetEnd) {
 			iTargetEnd -= (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
+			iLineStart = SciCall_LineFromPosition(iTargetStart);
+			iLineEnd = SciCall_LineFromPosition(iTargetEnd);
 			if (iRcAnchorLine > iRcCurLine) {
-				iCurPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetStart), iRcCurCol);
-				iAnchorPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetEnd), iRcAnchorCol);
+				iCurPos = SciCall_FindColumn(iLineStart, iRcCurCol);
+				iAnchorPos = SciCall_FindColumn(iLineEnd, iRcAnchorCol);
 			} else {
-				iCurPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetEnd), iRcCurCol);
-				iAnchorPos = SciCall_FindColumn(SciCall_LineFromPosition(iTargetStart), iRcAnchorCol);
+				iCurPos = SciCall_FindColumn(iLineEnd, iRcCurCol);
+				iAnchorPos = SciCall_FindColumn(iLineStart, iRcAnchorCol);
 			}
 			if (iCurPos != iAnchorPos) {
 				SciCall_SetRectangularSelectionCaret(iCurPos);
