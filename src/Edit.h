@@ -62,6 +62,7 @@ typedef enum EditSortFlag {
 	EditSortFlag_LogicalNumber = 4,
 	EditSortFlag_ColumnSort = 8,
 	EditSortFlag_GroupByFileType = 16,
+	EditSortFlag_DontSort = 32,
 	EditSortFlag_Shuffle = 64,
 	EditSortFlag_MergeDuplicate = 128,
 	EditSortFlag_RemoveDuplicate = 256,

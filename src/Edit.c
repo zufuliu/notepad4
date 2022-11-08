@@ -4239,6 +4239,12 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 	return cmp;
 }
 
+static int __cdecl DontSortLine(const void *p1, const void *p2) {
+	const SORTLINE *s1 = (const SORTLINE *)p1;
+	const SORTLINE *s2 = (const SORTLINE *)p2;
+	return (int)(s1->iLine - s2->iLine);
+}
+
 void EditSortLines(EditSortFlag iSortFlags) {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
@@ -4360,7 +4366,6 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	}
 
 	if (iSortFlags & EditSortFlag_Shuffle) {
-		iSortFlags = (EditSortFlag)(iSortFlags & ~(EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate | EditSortFlag_RemoveUnique));
 		srand(GetTickCount());
 		for (Sci_Line i = iLineCount - 1; i > 0; i--) {
 			const Sci_Line j = rand() % i;
@@ -4370,45 +4375,49 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		}
 	} else {
 		qsort(pLines, iLineCount, sizeof(SORTLINE), CmpSortLine);
-	}
-
-	cchTotal = 0;
-	FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
-	const int iEOLMode = SciCall_GetEOLMode();
-
-	char *pszOut = pmszBuf;
-	bool bLastDup = false;
-	for (Sci_Line i = 0; i < iLineCount; i++) {
-		LPCWSTR pwszLine = pLines[i].pwszLine;
-		if (pwszLine && ((iSortFlags & EditSortFlag_Shuffle) || StrNotEmpty(pwszLine))) {
-			BOOL bDropLine = FALSE;
-			if (iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate | EditSortFlag_RemoveUnique)) {
-				if (i + 1 < iLineCount && pfnStrCmp(pwszLine, pLines[i + 1].pwszLine) == 0) {
+		if (iSortFlags > EditSortFlag_Shuffle) {
+			FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
+			bool bLastDup = false;
+			for (Sci_Line i = 0; i < iLineCount; i++) {
+				BOOL bDropLine;
+				if (i + 1 < iLineCount && pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
 					bLastDup = true;
-					bDropLine = iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate);
+					bDropLine = EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate;
 				} else {
-					bDropLine = iSortFlags & (bLastDup ? EditSortFlag_RemoveDuplicate : EditSortFlag_RemoveUnique);
+					bDropLine = bLastDup ? EditSortFlag_RemoveDuplicate : EditSortFlag_RemoveUnique;
 					bLastDup = false;
 				}
-			}
-
-			if (!bDropLine) {
-				const UINT cbLine = WideCharToMultiByte(cpEdit, 0, pwszLine, -1, pszOut, (int)cbPmszBuf, NULL, NULL);
-				cchTotal += cbLine;
-				pszOut += cbLine - 1;
-				switch (iEOLMode) {
-				default: // SC_EOL_CRLF
-					++cchTotal;
-					*pszOut++ = '\r';
-					*pszOut++ = '\n';
-					break;
-				case SC_EOL_LF:
-					*pszOut++ = '\n';
-					break;
-				case SC_EOL_CR:
-					*pszOut++ = '\r';
-					break;
+				if (iSortFlags & bDropLine) {
+					pLines[i].pwszLine = NULL;
 				}
+			}
+		}
+		if (iSortFlags & EditSortFlag_DontSort) {
+			qsort(pLines, iLineCount, sizeof(SORTLINE), DontSortLine);
+		}
+	}
+
+	const int iEOLMode = SciCall_GetEOLMode();
+	char *pszOut = pmszBuf;
+	cchTotal = 0;
+	for (Sci_Line i = 0; i < iLineCount; i++) {
+		LPCWSTR pwszLine = pLines[i].pwszLine;
+		if (pwszLine) {
+			const UINT cbLine = WideCharToMultiByte(cpEdit, 0, pwszLine, -1, pszOut, (int)cbPmszBuf, NULL, NULL);
+			cchTotal += cbLine;
+			pszOut += cbLine - 1;
+			switch (iEOLMode) {
+			default: // SC_EOL_CRLF
+				++cchTotal;
+				*pszOut++ = '\r';
+				*pszOut++ = '\n';
+				break;
+			case SC_EOL_LF:
+				*pszOut++ = '\n';
+				break;
+			case SC_EOL_CR:
+				*pszOut++ = '\r';
+				break;
 			}
 		}
 	}
