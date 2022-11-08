@@ -4203,8 +4203,8 @@ void EditJoinLinesEx(void) {
 // EditSortLines()
 //
 typedef struct SORTLINE {
-	WCHAR *pwszLine;
-	WCHAR *pwszSortEntry;
+	LPCWSTR pwszLine;
+	LPCWSTR pwszSortEntry;
 	Sci_Line iLine;
 	EditSortFlag iSortFlags;
 } SORTLINE;
@@ -4295,18 +4295,17 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	}
 
 	const UINT cpEdit = SciCall_GetCodePage();
-	SORTLINE *pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
-	size_t cchTotal = 0;
-	size_t cbPmszBuf = 4096;
-	char *pmszBuf = (char *)NP2HeapAlloc(cbPmszBuf);
+	Sci_Position iTargetStart = SciCall_PositionFromLine(iLineStart);
+	Sci_Position iTargetEnd = SciCall_PositionFromLine(iLineEnd + 1);
+	const size_t cbPmszBuf = iTargetEnd - iTargetStart + 2*iLineCount + 1; // 2 for CR LF
+	SORTLINE * const pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
+	char * const pmszBuf = (char *)NP2HeapAlloc(cbPmszBuf);
+	WCHAR * const pszTextW = (WCHAR *)NP2HeapAlloc(cbPmszBuf*sizeof(WCHAR) + iLineCount*NP2_alignof(WCHAR *));
+	size_t cchTotal = NP2_alignof(WCHAR *)/sizeof(WCHAR); // first pointer reserved for empty line
+
 	for (Sci_Line i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
-		const size_t cbLine = SciCall_GetLineLength(iLine);
-		cchTotal += cbLine;
-		if (cbLine >= cbPmszBuf) {
-			cbPmszBuf <<= 1;
-			pmszBuf = (char *)NP2HeapReAlloc(pmszBuf, cbPmszBuf);
-		}
 		SciCall_GetLine(iLine, pmszBuf);
+		const Sci_Position cbLine = SciCall_GetLineLength(iLine);
 
 		// remove EOL
 		char *p = pmszBuf + cbLine - 1;
@@ -4317,10 +4316,10 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			*p-- = '\0';
 		}
 
-		const int cchw = MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, NULL, 0) - 1;
-		if (cchw > 0) {
-			LPWSTR pwszLine = (LPWSTR)LocalAlloc(LPTR, sizeof(WCHAR) * (cchw + 1));
-			MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, pwszLine, (int)(LocalSize(pwszLine) / sizeof(WCHAR)));
+		if (p >= pmszBuf) {
+			LPWSTR pwszLine = pszTextW + cchTotal;
+			const UINT cchLine = MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, pwszLine, (int)cbPmszBuf);
+			cchTotal += NP2_align_up(cchLine, NP2_alignof(WCHAR *)/sizeof(WCHAR));
 			pLines[i].pwszLine = pwszLine;
 
 			if (iSortFlags & EditSortFlag_ColumnSort) {
@@ -4353,9 +4352,8 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			pLines[i].iLine = iLine;
 			pLines[i].iSortFlags = iSortFlags;
 		} else {
-			LPWSTR pwszLine = StrDup(L"");
-			pLines[i].pwszLine = pwszLine;
-			pLines[i].pwszSortEntry = pwszLine;
+			pLines[i].pwszLine = pszTextW;
+			pLines[i].pwszSortEntry = pszTextW;
 			pLines[i].iLine = iLine;
 			pLines[i].iSortFlags = iSortFlags;
 		}
@@ -4374,8 +4372,6 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		qsort(pLines, iLineCount, sizeof(SORTLINE), CmpSortLine);
 	}
 
-	cchTotal += 2 * iLineCount + 1;
-	pmszBuf = (char *)NP2HeapReAlloc(pmszBuf, cchTotal);
 	cchTotal = 0;
 	FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
 	const int iEOLMode = SciCall_GetEOLMode();
@@ -4383,7 +4379,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	char *pszOut = pmszBuf;
 	bool bLastDup = false;
 	for (Sci_Line i = 0; i < iLineCount; i++) {
-		LPWSTR pwszLine = pLines[i].pwszLine;
+		LPCWSTR pwszLine = pLines[i].pwszLine;
 		if (pwszLine && ((iSortFlags & EditSortFlag_Shuffle) || StrNotEmpty(pwszLine))) {
 			BOOL bDropLine = FALSE;
 			if (iSortFlags & (EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate | EditSortFlag_RemoveUnique)) {
@@ -4415,11 +4411,11 @@ void EditSortLines(EditSortFlag iSortFlags) {
 				}
 			}
 		}
-		LocalFree(pwszLine);
 	}
-	NP2HeapFree(pLines);
 
-	SciCall_SetTargetRange(SciCall_PositionFromLine(iLineStart), SciCall_PositionFromLine(iLineEnd + 1));
+	NP2HeapFree(pLines);
+	NP2HeapFree(pszTextW);
+	SciCall_SetTargetRange(iTargetStart, iTargetEnd);
 	SciCall_ReplaceTarget(cchTotal, pmszBuf);
 	SciCall_EndUndoAction();
 	NP2HeapFree(pmszBuf);
@@ -4434,8 +4430,8 @@ void EditSortLines(EditSortFlag iSortFlags) {
 		}
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	} else {
-		const Sci_Position iTargetStart = SciCall_GetTargetStart();
-		Sci_Position iTargetEnd = SciCall_GetTargetEnd();
+		iTargetStart = SciCall_GetTargetStart();
+		iTargetEnd = SciCall_GetTargetEnd();
 		SciCall_ClearSelections();
 		if (iTargetStart != iTargetEnd) {
 			iTargetEnd -= (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
