@@ -6830,10 +6830,8 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		int *piSortFlags = (int *)lParam;
 		const int iSortFlags = *piSortFlags;
 
-		if (iSortFlags & EditSortFlag_Descending) {
-			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_DESC);
-		} else if (iSortFlags & EditSortFlag_Shuffle) {
-			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_SHUFFLE);
+		if (iSortFlags & EditSortFlag_Shuffle) {
+			CheckRadioButton(hwnd, IDC_SORT_NONE, IDC_SORT_SHUFFLE, IDC_SORT_SHUFFLE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_DUP), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_REMOVE_UNIQUE), FALSE);
@@ -6841,7 +6839,8 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_LOGICAL_NUMBER), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_GROUPBY_FILE_TYPE), FALSE);
 		} else {
-			CheckRadioButton(hwnd, IDC_SORT_ASC, IDC_SORT_SHUFFLE, IDC_SORT_ASC);
+			const int button = (iSortFlags & EditSortFlag_DontSort) ? IDC_SORT_NONE : (IDC_SORT_ASC + (iSortFlags & EditSortFlag_Descending));
+			CheckRadioButton(hwnd, IDC_SORT_NONE, IDC_SORT_SHUFFLE, button);
 		}
 
 		if (iSortFlags & EditSortFlag_MergeDuplicate) {
@@ -6884,6 +6883,9 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		case IDOK: {
 			int *piSortFlags = (int *)GetWindowLongPtr(hwnd, DWLP_USER);
 			int iSortFlags = EditSortFlag_Ascending;
+			if (IsButtonChecked(hwnd, IDC_SORT_NONE)) {
+				iSortFlags |= EditSortFlag_DontSort;
+			}
 			if (IsButtonChecked(hwnd, IDC_SORT_DESC)) {
 				iSortFlags |= EditSortFlag_Descending;
 			}
@@ -6920,6 +6922,7 @@ static INT_PTR CALLBACK EditSortDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 			EndDialog(hwnd, IDCANCEL);
 			break;
 
+		case IDC_SORT_NONE:
 		case IDC_SORT_ASC:
 		case IDC_SORT_DESC:
 			EnableWindow(GetDlgItem(hwnd, IDC_SORT_MERGE_DUP), !IsButtonChecked(hwnd, IDC_SORT_REMOVE_UNIQUE));
