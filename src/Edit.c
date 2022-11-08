@@ -4205,59 +4205,38 @@ void EditJoinLinesEx(void) {
 typedef struct SORTLINE {
 	WCHAR *pwszLine;
 	WCHAR *pwszSortEntry;
+	Sci_Line iLine;
+	EditSortFlag iSortFlags;
 } SORTLINE;
 
 typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
-typedef int (__cdecl *QSortCmp)(const void *, const void *);
 
-static int __cdecl CmpStdAesc(const void *p1, const void *p2) {
+static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
-	const int cmp = StrCmpW(s1->pwszSortEntry, s2->pwszSortEntry);
-	return cmp ? cmp : StrCmpW(s1->pwszLine, s2->pwszLine);
-}
-
-static int __cdecl CmpIStdAesc(const void *p1, const void *p2) {
-	const SORTLINE *s1 = (const SORTLINE *)p1;
-	const SORTLINE *s2 = (const SORTLINE *)p2;
-	const int cmp = StrCmpIW(s1->pwszSortEntry, s2->pwszSortEntry);
-	return cmp ? cmp : StrCmpIW(s1->pwszLine, s2->pwszLine);
-}
-
-static int __cdecl CmpStdDesc(const void *p1, const void *p2) {
-	return CmpStdAesc(p2, p1);
-}
-
-static int __cdecl CmpIStdDesc(const void *p1, const void *p2) {
-	return CmpIStdAesc(p2, p1);
-}
-
-static int __cdecl CmpLogicalAesc(const void *p1, const void *p2) {
-	const SORTLINE *s1 = (const SORTLINE *)p1;
-	const SORTLINE *s2 = (const SORTLINE *)p2;
-	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
-	if (cmp == 0) {
-		cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
+	const EditSortFlag iSortFlags = s1->iSortFlags;
+	int cmp = 0;
+	if (iSortFlags & EditSortFlag_LogicalNumber) {
+		cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
+		if (cmp == 0 && (iSortFlags & (EditSortFlag_ColumnSort | EditSortFlag_GroupByFileType))) {
+			cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
+		}
 	}
-	return cmp ? cmp : CmpStdAesc(p1, p2);
-}
-
-static int __cdecl CmpILogicalAesc(const void *p1, const void *p2) {
-	const SORTLINE *s1 = (const SORTLINE *)p1;
-	const SORTLINE *s2 = (const SORTLINE *)p2;
-	int cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
 	if (cmp == 0) {
-		cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
+		FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
+		cmp = pfnStrCmp(s1->pwszSortEntry, s2->pwszSortEntry);
+		if (cmp == 0 && (iSortFlags & (EditSortFlag_ColumnSort | EditSortFlag_GroupByFileType))) {
+			cmp = pfnStrCmp(s1->pwszLine, s2->pwszLine);
+		}
+		if (cmp == 0) {
+			// stable sort
+			cmp = (int)(s1->iLine - s2->iLine);
+		}
 	}
-	return cmp ? cmp : CmpIStdAesc(p1, p2);
-}
-
-static int __cdecl CmpLogicalDesc(const void *p1, const void *p2) {
-	return CmpLogicalAesc(p2, p1);
-}
-
-static int __cdecl CmpILogicalDesc(const void *p1, const void *p2) {
-	return CmpILogicalAesc(p2, p1);
+	if (iSortFlags & EditSortFlag_Descending) {
+		cmp = -cmp;
+	}
+	return cmp;
 }
 
 void EditSortLines(EditSortFlag iSortFlags) {
@@ -4371,10 +4350,14 @@ void EditSortLines(EditSortFlag iSortFlags) {
 				pwszLine = PathFindExtension(pwszLine);
 			}
 			pLines[i].pwszSortEntry = pwszLine;
+			pLines[i].iLine = iLine;
+			pLines[i].iSortFlags = iSortFlags;
 		} else {
 			LPWSTR pwszLine = StrDup(L"");
 			pLines[i].pwszLine = pwszLine;
 			pLines[i].pwszSortEntry = pwszLine;
+			pLines[i].iLine = iLine;
+			pLines[i].iSortFlags = iSortFlags;
 		}
 	}
 
@@ -4388,18 +4371,7 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			pLines[j] = sLine;
 		}
 	} else {
-		static QSortCmp const cmpFuncList[] = {
-			CmpStdAesc,		// EditSortFlag_Ascending
-			CmpStdDesc,		// EditSortFlag_Descending
-			CmpIStdAesc,	// EditSortFlag_Ascending	EditSortFlag_IgnoreCase
-			CmpIStdDesc,	// EditSortFlag_Descending	EditSortFlag_IgnoreCase
-			CmpLogicalAesc,	// EditSortFlag_Ascending								EditSortFlag_LogicalNumber
-			CmpLogicalDesc,	// EditSortFlag_Descending								EditSortFlag_LogicalNumber
-			CmpILogicalAesc,// EditSortFlag_Ascending	EditSortFlag_IgnoreCase		EditSortFlag_LogicalNumber
-			CmpILogicalDesc,// EditSortFlag_Descending	EditSortFlag_IgnoreCase		EditSortFlag_LogicalNumber
-		};
-		QSortCmp cmpFunc = cmpFuncList[iSortFlags & (EditSortFlag_Descending | EditSortFlag_IgnoreCase | EditSortFlag_LogicalNumber)];
-		qsort(pLines, iLineCount, sizeof(SORTLINE), cmpFunc);
+		qsort(pLines, iLineCount, sizeof(SORTLINE), CmpSortLine);
 	}
 
 	cchTotal += 2 * iLineCount + 1;
