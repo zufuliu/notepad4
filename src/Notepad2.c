@@ -3281,6 +3281,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | EditSortFlag_RemoveDuplicate));
 		break;
 
+	case IDM_EDIT_MERGEDUPLICATELINE:
+		EditSortLines((EditSortFlag)(EditSortFlag_DontSort | EditSortFlag_MergeDuplicate));
+		break;
+
 	case IDM_EDIT_CUTLINE:
 		if (flagPasteBoard) {
 			bLastCopyFromMe = true;
