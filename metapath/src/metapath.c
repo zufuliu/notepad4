@@ -2106,11 +2106,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, tchdate, COUNTOF(tchdate));
 					GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchdate));
 
-					WCHAR tchattr[64];
-					lstrcpy(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) ? L"A" : L"-");
-					lstrcat(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_READONLY) ? L"R" : L"-");
-					lstrcat(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ? L"H" : L"-");
-					lstrcat(tchattr, (fd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) ? L"S" : L"-");
+					WCHAR tchattr[6];
+					tchattr[0] = (fd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) ? L'A' : L'-';
+					tchattr[1] = (fd.dwFileAttributes & FILE_ATTRIBUTE_READONLY) ? L'R' : L'-';
+					tchattr[2] = (fd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ? L'H' : L'-';
+					tchattr[3] = (fd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) ? L'S' : L'-';
+					tchattr[4] = L'\0';
 
 					wsprintf(tch, L"%s | %s %s | %s", tchsize, tchdate, tchtime, tchattr);
 				} else {

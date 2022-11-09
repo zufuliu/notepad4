@@ -2186,11 +2186,9 @@ void EditShowHex(void) {
 	char *t = cch;
 	*t++ = '[';
 	while (*p) {
-		int c = *p++;
-		int v = c >> 4;
-		*t++ = (char)((v >= 10) ? v - 10 + 'a' : v + '0');
-		v = c & 0x0f;
-		*t++ = (char)((v >= 10) ? v - 10 + 'a' : v + '0');
+		const uint8_t c = *p++;
+		*t++ = "0123456789ABCDEF"[c >> 4];
+		*t++ = "0123456789ABCDEF"[c & 15];
 		*t++ = ' ';
 	}
 	*--t = ']';
