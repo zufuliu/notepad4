@@ -3075,6 +3075,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			UpdateStatusBarCache(StatusItem_Encoding);
+			// no Scintilla notification when internal encoding is still UTF-8
+			UpdateToolbar();
+			UpdateStatusbar();
 			UpdateWindowTitle();
 		}
 	}
