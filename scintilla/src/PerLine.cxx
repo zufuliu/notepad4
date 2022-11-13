@@ -64,7 +64,7 @@ MarkerHandleNumber const *MarkerHandleSet::GetMarkerHandleNumber(int which) cons
 }
 
 bool MarkerHandleSet::InsertHandle(int handle, int markerNum) {
-	mhList.push_front(MarkerHandleNumber(handle, markerNum));
+	mhList.emplace_front(handle, markerNum);
 	return true;
 }
 

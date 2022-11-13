@@ -578,7 +578,7 @@ const char *complexCaseConversions =
 ;
 
 // Maximum length of a case conversion result is 6 bytes in UTF-8
-// use 7 to remove padding bytes on ConversionString structure
+// use 7 to make sizeof(ConversionString)==8 and simplify CharacterConversion's constructor
 constexpr size_t maxConversionLength = 7;
 
 class CaseConverter final : public ICaseConverter {
@@ -590,7 +590,7 @@ class CaseConverter final : public ICaseConverter {
 	struct CharacterConversion {
 		int character = 0;
 		ConversionString conversion;
-		CharacterConversion() noexcept = default;
+		constexpr CharacterConversion() noexcept = default;
 		CharacterConversion(int character_, const char *conversion_) noexcept : character(character_) {
 			memcpy(conversion.conversion, conversion_, maxConversionLength + 1);
 		}
@@ -718,33 +718,33 @@ void CaseConverter::SetupConversions(CaseConversion conversion) {
 	// Add the complex cases
 	const char *sComplex = complexCaseConversions;
 	while (*sComplex) {
-		// Longest ligature is 3 character so 5 for safety
-		constexpr size_t lenUTF8 = 5 * UTF8MaxBytes + 1;
-		unsigned char originUTF8[lenUTF8]{};
-		char foldedUTF8[lenUTF8]{};
-		char lowerUTF8[lenUTF8]{};
-		char upperUTF8[lenUTF8]{};
+		struct ComplexCaseConversion {
+			unsigned char originUTF8[maxConversionLength + 1]{};
+			char foldedUTF8[maxConversionLength + 1]{};
+			char lowerUTF8[maxConversionLength + 1]{};
+			char upperUTF8[maxConversionLength + 1]{};
+		} complexConversion;
 		size_t i = 0;
 		while (*sComplex && *sComplex != '|') {
-			originUTF8[i++] = *sComplex;
+			complexConversion.originUTF8[i++] = *sComplex;
 			sComplex++;
 		}
 		sComplex++;
 		i = 0;
 		while (*sComplex && *sComplex != '|') {
-			foldedUTF8[i++] = *sComplex;
+			complexConversion.foldedUTF8[i++] = *sComplex;
 			sComplex++;
 		}
 		sComplex++;
 		i = 0;
 		while (*sComplex && *sComplex != '|') {
-			upperUTF8[i++] = *sComplex;
+			complexConversion.upperUTF8[i++] = *sComplex;
 			sComplex++;
 		}
 		sComplex++;
 		i = 0;
 		while (*sComplex && *sComplex != '|') {
-			lowerUTF8[i++] = *sComplex;
+			complexConversion.lowerUTF8[i++] = *sComplex;
 			sComplex++;
 		}
 		sComplex++;
@@ -752,18 +752,18 @@ void CaseConverter::SetupConversions(CaseConversion conversion) {
 		const char *converted;
 		switch (conversion) {
 		case CaseConversion::fold:
-			converted = foldedUTF8;
+			converted = complexConversion.foldedUTF8;
 			break;
 		case CaseConversion::upper:
-			converted = upperUTF8;
+			converted = complexConversion.upperUTF8;
 			break;
 		case CaseConversion::lower:
 		default:
-			converted = lowerUTF8;
+			converted = complexConversion.lowerUTF8;
 			break;
 		}
 		if (converted[0]) {
-			const int character = UnicodeFromUTF8(originUTF8);
+			const int character = UnicodeFromUTF8(complexConversion.originUTF8);
 			Add(character, converted);
 		}
 	}
@@ -811,8 +811,7 @@ size_t CaseConvertString(char *converted, size_t sizeConverted, const char *mixe
 
 std::string CaseConvertString(const std::string &s, CaseConversion conversion) {
 	std::string retMapped(s.length() * maxExpansionCaseConversion, 0);
-	const size_t lenMapped = CaseConvertString(retMapped.data(), retMapped.length(), s.c_str(), s.length(),
-		conversion);
+	const size_t lenMapped = CaseConvertString(retMapped.data(), retMapped.length(), s.c_str(), s.length(), conversion);
 	retMapped.resize(lenMapped);
 	return retMapped;
 }
