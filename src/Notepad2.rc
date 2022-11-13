@@ -234,18 +234,20 @@ BEGIN
 			MENUITEM "&Split Lines\tCtrl+I",			IDM_EDIT_SPLITLINES
 			MENUITEM "Join &Paragraphs\tCtrl+Shift+J",	IDM_EDIT_JOINLINESEX
 		END
-		POPUP "Con&vert"
+		POPUP "Con&versions"
 		BEGIN
-			MENUITEM "&Upper Case\tCtrl+Shift+U",		IDM_EDIT_CONVERTUPPERCASE
-			MENUITEM "&Lower Case\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
-			MENUITEM "In&vert Case\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
-			MENUITEM "Title &Case\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
-			MENUITEM "&Sentence Case\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
-			POPUP "Oth&er Conversions"
+			POPUP "Textual"
 			BEGIN
+				MENUITEM "&Upper Case\tCtrl+Shift+U",		IDM_EDIT_CONVERTUPPERCASE
+				MENUITEM "&Lower Case\tCtrl+U",				IDM_EDIT_CONVERTLOWERCASE
+				MENUITEM "In&vert Case\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
+				MENUITEM "Title &Case\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
+				MENUITEM "&Sentence Case\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
 				MENUITEM "Halfwidth Form to Full&width",		IDM_EDIT_MAP_FULLWIDTH
 				MENUITEM "Fullwidth Form to H&alfwidth",		IDM_EDIT_MAP_HALFWIDTH
-				MENUITEM SEPARATOR
+			END
+			POPUP "Linguistic"
+			BEGIN
 				MENUITEM "Chinese Traditional to &Simplified",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
 				MENUITEM "Chinese Simplified to &Traditional",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
 				MENUITEM SEPARATOR
@@ -260,16 +262,31 @@ BEGIN
 				MENUITEM "&Devanagari to Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
 				MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
 			END
-			MENUITEM SEPARATOR
-			MENUITEM "&Tabify Selection\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
-			MENUITEM "U&ntabify Selection\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
-			MENUITEM "Tabify &Indent\tCtrl+Alt+T",			IDM_EDIT_CONVERTSPACES2
-			MENUITEM "Untabi&fy Indent\tCtrl+Alt+S",		IDM_EDIT_CONVERTTABS2
-			MENUITEM SEPARATOR
-			MENUITEM "To &Hexadecimal\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
-			MENUITEM "To &Decimal\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
-			MENUITEM "To &Binary\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
-			MENUITEM "To &Octet",							IDM_EDIT_NUM2OCT
+			POPUP "Tabs and Spaces"
+			BEGIN
+				MENUITEM "&Tabify Selection\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
+				MENUITEM "U&ntabify Selection\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
+				MENUITEM "Tabify &Indent\tCtrl+Alt+T",			IDM_EDIT_CONVERTSPACES2
+				MENUITEM "Untabi&fy Indent\tCtrl+Alt+S",		IDM_EDIT_CONVERTTABS2
+			END
+			POPUP "Numerical"
+			BEGIN
+				MENUITEM "To &Hexadecimal\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
+				MENUITEM "To &Decimal\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
+				MENUITEM "To &Binary\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
+				MENUITEM "To &Octet",							IDM_EDIT_NUM2OCT
+			END
+			POPUP "Char and Hex"
+			BEGIN
+				MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
+				MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+				MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
+			END
+			POPUP "URL"
+			BEGIN
+				MENUITEM "URL &Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+				MENUITEM "URL &Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
+			END
 		END
 		POPUP "I&nsert"
 		BEGIN
@@ -329,14 +346,9 @@ BEGIN
 		END
 		POPUP "Spec&ial"
 		BEGIN
-			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
-			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
-			MENUITEM "URL &Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "URL &Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
