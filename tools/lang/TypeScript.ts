@@ -3,7 +3,7 @@
 
 //! keywords		===========================================================
 // textToKeywordObj https://github.com/microsoft/TypeScript/tree/main/src/compiler/scanner.ts
-abstract as assert asserts async await
+abstract accessor as assert asserts async await
 break
 case catch class const constructor continue
 debugger declare default delete do
