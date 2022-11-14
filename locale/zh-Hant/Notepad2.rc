@@ -331,9 +331,9 @@ BEGIN
 		BEGIN
 			MENUITEM "字元轉 &Hex",							IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex 轉字元(&A)\tCtrl+Alt+C",			IDM_EDIT_HEX2CHAR
+			MENUITEM "顯示十六進位代碼(&S)",					IDM_EDIT_SHOW_HEX
 			MENUITEM "轉義 C 字元(&P)\tCtrl+Alt+E",			IDM_EDIT_ESCAPECCHARS
 			MENUITEM "反转义 C 字元(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "顯示十六進位代碼(&S)",					IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "URL 編碼(&E)\tCtrl+Shift+E",			IDM_EDIT_URLENCODE
 			MENUITEM "URL 解碼(&D)\tCtrl+Shift+R",			IDM_EDIT_URLDECODE

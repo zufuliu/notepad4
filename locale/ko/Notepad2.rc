@@ -331,9 +331,9 @@ BEGIN
 		BEGIN
 			MENUITEM "문자를 16진수로(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "16진수를 문자로(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "16진수 코드 표시(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM "C 문자 이스케이프 (&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "C 문자 이스케이프 해제(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "16진수 코드 표시(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "URL 인코드(&E)\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "URL 디코드(&D)\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
