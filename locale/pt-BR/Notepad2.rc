@@ -331,9 +331,9 @@ BEGIN
 		BEGIN
 			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
 			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "URL &Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "URL &Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE

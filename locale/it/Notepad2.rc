@@ -331,9 +331,9 @@ BEGIN
 		BEGIN
 			MENUITEM "Carattere in Esadecimale\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Esadecimale in Carattere\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "Mostra codice esadecimale",							IDM_EDIT_SHOW_HEX
 			MENUITEM "Caratteri Escape C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "Rimuovi Caratteri Escape C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "Mostra codice esadecimale",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "Codifica URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "Decodifica URL\tCtrl+Shift+R",				IDM_EDIT_URLDECODE

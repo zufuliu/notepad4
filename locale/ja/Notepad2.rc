@@ -331,9 +331,9 @@ BEGIN
 		BEGIN
 			MENUITEM "16進数表記へ(&H)\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "16進数表記を文字へ(&R)\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
+			MENUITEM "16進コードを表示(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM "文字列型中のエスケープ文字変換(&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "文字列型中の上記アンエスケープ(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM "16進コードを表示(&S)",							IDM_EDIT_SHOW_HEX
 			MENUITEM SEPARATOR
 			MENUITEM "URLエンコード(&E)\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "URLデコード(&D)\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
