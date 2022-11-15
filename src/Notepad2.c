@@ -266,7 +266,7 @@ DWORD dwAutoSavePeriod;
 static DWORD dwCurrentDocReversion = 0;
 static DWORD dwLastSavedDocReversion = 0;
 static bool bAutoSaveTimerSet = false;
-#define MaxAutoSaveCount	2	// normal
+#define MaxAutoSaveCount	6	// normal
 #define AllAutoSaveCount	(MaxAutoSaveCount + 2) // suspend, shutdown
 static LPWSTR autoSavePathList[AllAutoSaveCount];
 static int autoSaveCount = 0;
@@ -8913,6 +8913,9 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) {
 	NP2HeapFree(lpData);
 
 	if (bWriteSuccess) {
+		if (saveFlag & FileSaveFlag_SaveAlways) {
+			return; // treat Save Backup as Save As with generated file name
+		}
 		if (!(saveFlag & FileSaveFlag_SaveCopy) && autoSaveCount == MaxAutoSaveCount) {
 			// delete oldest backup
 			LPWSTR old = autoSavePathList[0];
