@@ -1600,7 +1600,7 @@ END
 
 IDD_AUTOSAVE DIALOGEX 0, 0, 184, 93
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Impostazioni Salvataggio automatico"
+CAPTION "Impostazioni Autosalvataggio"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     AUTOCHECKBOX    "Abilita salvataggio automatico.",IDC_AUTOSAVE_ENABLE,7,7,170,10,WS_GROUP | WS_TABSTOP
