@@ -2467,6 +2467,9 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		if (iAutoSaveOption & AutoSaveOption_Shutdown) {
 			CheckDlgButton(hwnd, IDC_AUTOSAVE_SHUTDOWN, BST_CHECKED);
 		}
+		if (iAutoSaveOption & AutoSaveOption_ManuallyDelete) {
+			CheckDlgButton(hwnd, IDC_AUTOSAVE_MANUALLYDELETE, BST_CHECKED);
+		}
 
 		WCHAR tch[32];
 		const UINT seconds = dwAutoSavePeriod / 1000;
@@ -2494,6 +2497,9 @@ static INT_PTR CALLBACK AutoSaveSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			}
 			if (IsButtonChecked(hwnd, IDC_AUTOSAVE_SHUTDOWN)) {
 				option |= AutoSaveOption_Shutdown;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTOSAVE_MANUALLYDELETE)) {
+				option |= AutoSaveOption_ManuallyDelete;
 			}
 			iAutoSaveOption = option;
 

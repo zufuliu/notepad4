@@ -8768,6 +8768,7 @@ void AutoSave_Stop(BOOL keepBackup) {
 		KillTimer(hwndMain, ID_AUTOSAVETIMER);
 	}
 	if (autoSaveCount) {
+		keepBackup |= iAutoSaveOption & AutoSaveOption_ManuallyDelete;
 		for (int i = 0; i < autoSaveCount; i++) {
 			LPWSTR path = autoSavePathList[i];
 			if (path) {
@@ -8920,7 +8921,9 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) {
 			// delete oldest backup
 			LPWSTR old = autoSavePathList[0];
 			if (old) {
-				DeleteFile(old);
+				if (!(iAutoSaveOption & AutoSaveOption_ManuallyDelete)) {
+					DeleteFile(old);
+				}
 				LocalFree(old);
 			}
 			memmove(autoSavePathList, autoSavePathList + 1, (AllAutoSaveCount - 1) * sizeof(LPWSTR));
