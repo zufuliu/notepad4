@@ -8915,7 +8915,8 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) {
 
 	if (bWriteSuccess) {
 		if (saveFlag & FileSaveFlag_SaveAlways) {
-			return; // treat Save Backup as Save As with generated file name
+			dwLastSavedDocReversion = dwCurrentDocReversion;
+			return; // treat "Save Backup" as "Save As" with generated file name
 		}
 		if (!(saveFlag & FileSaveFlag_SaveCopy) && autoSaveCount == MaxAutoSaveCount) {
 			// delete oldest backup
