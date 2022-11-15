@@ -85,6 +85,7 @@ JSON Document
 
 PHP Script
 	php
+	phps			PHP Source
 	phpt			PHP Test Script
 	phtml			PHP Web Page
 	php_cs			PHP-CS-Fixer

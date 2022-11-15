@@ -2611,7 +2611,9 @@ bool Style_SetLexerFromFile(LPCWSTR lpszFile) {
 				// some conf/cfg file is xml
 				pLexNew = &lexXML;
 			} else if (!pLexNew) {
-				if (StrStartsWithCase(p, "<!DOCTYPE")) {
+				if (StrStartsWith(p, "<?php")) {
+					pLexNew = &lexPHP;
+				} else if (StrStartsWithCase(p, "<!DOCTYPE")) {
 					pLexNew = &lexXML;
 				} else if (StrStartsWithCase(p, "<html")) {
 					pLexNew = &lexHTML;
