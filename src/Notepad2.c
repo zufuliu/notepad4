@@ -39,6 +39,10 @@
 #include "Dialogs.h"
 #include "resource.h"
 
+#ifndef SM_CXPADDEDBORDER
+#define SM_CXPADDEDBORDER	92
+#endif
+
 //! show fold level
 #define NP2_DEBUG_FOLD_LEVEL		0
 
@@ -1231,12 +1235,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 			const int w = mi.rcMonitor.right - mi.rcMonitor.left;
 			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
+			const UINT dpi = g_uCurrentDPI;
 
 			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
-			pmmi->ptMaxSize.x = w + 2 * SystemMetricsForDpi(SM_CXSIZEFRAME, g_uCurrentDPI);
-			pmmi->ptMaxSize.y = h + SystemMetricsForDpi(SM_CYCAPTION, g_uCurrentDPI)
-				+ SystemMetricsForDpi(SM_CYMENU, g_uCurrentDPI)
-				+ 2 * SystemMetricsForDpi(SM_CYSIZEFRAME, g_uCurrentDPI);
+			const int padding = SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+			pmmi->ptMaxSize.x = w + 2*padding + 2*SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
+			pmmi->ptMaxSize.y = h + padding + SystemMetricsForDpi(SM_CYCAPTION, dpi)
+				+ SystemMetricsForDpi(SM_CYMENU, dpi)
+				+ 2*SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
 			pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
 			pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
 			return 0;
@@ -7304,6 +7310,7 @@ void ToggleFullScreenMode(void) {
 
 		int cx = 0;
 		int cy = 0;
+		int padding = 0;
 		int style = mainStyle;
 		const UINT dpi = g_uCurrentDPI;
 		int top = SystemMetricsForDpi(SM_CYCAPTION, dpi);
@@ -7311,7 +7318,8 @@ void ToggleFullScreenMode(void) {
 			style &= ~WS_OVERLAPPEDWINDOW;
 		} else {
 			style &= ~WS_THICKFRAME;
-			cx = SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
+			padding = SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+			cx = SystemMetricsForDpi(SM_CXSIZEFRAME, dpi) + padding;
 			cy = SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
 			if (iFullScreenMode & FullScreenMode_HideCaption) {
 				top += cy;
@@ -7323,7 +7331,7 @@ void ToggleFullScreenMode(void) {
 		const int x = mi.rcMonitor.left - cx;
 		const int y = mi.rcMonitor.top - top;
 		const int w = mi.rcMonitor.right - x + cx;
-		const int h = mi.rcMonitor.bottom - y + cy;
+		const int h = mi.rcMonitor.bottom - y + cy + padding;
 
 		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);
 		if (wStartButton) {
@@ -7331,7 +7339,7 @@ void ToggleFullScreenMode(void) {
 		}
 		ShowWindow(wTaskBar, SW_HIDE);
 		SetWindowStyle(hwnd, style);
-		SetWindowPos(hwnd, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x, y, w , h, 0);
+		SetWindowPos(hwnd, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x, y, w, h, 0);
 	} else {
 		bSaved = false;
 		ShowWindow(wTaskBar, SW_SHOW);
