@@ -600,12 +600,18 @@ BEGIN
 		MENUITEM SEPARATOR
 		POPUP "Aspetto"
 		BEGIN
+			MENUITEM "Show &Menu\tAlt+F11",			IDM_VIEW_MENU
 			MENUITEM "Mostra barra degli strumenti\tCtrl+F11",		IDM_VIEW_TOOLBAR
 			MENUITEM "Personalizza barra degli strumenti...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 			MENUITEM "&Auto scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 			MENUITEM "Mostra barra di stato\tShift+F11",	IDM_VIEW_STATUSBAR
 			MENUITEM SEPARATOR
 			MENUITEM "Modalità trasparente\tCtrl+0",	IDM_VIEW_TRANSPARENT
+			POPUP "Modalità schermo intero"
+			BEGIN
+				MENUITEM "All'avvio",					IDM_VIEW_FULLSCREEN_ON_START
+				MENUITEM "Nascondi &Titolo",			IDM_VIEW_FULLSCREEN_HIDE_TITLE
+			END
 			POPUP "Scorri e oltre l'ultima riga"
 			BEGIN
 				MENUITEM "&No",						IDM_VIEW_SCROLLPASTLASTLINE_NO
@@ -629,13 +635,6 @@ BEGIN
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
-		END
-		POPUP "Modalità schermo intero"
-		BEGIN
-			MENUITEM "All'avvio",					IDM_VIEW_FULLSCREEN_ON_START
-			MENUITEM SEPARATOR
-			MENUITEM "Nascondi &Titolo",					IDM_VIEW_FULLSCREEN_HIDE_TITLE
-			MENUITEM "Nascondi &menu\tAlt+F11",			IDM_VIEW_FULLSCREEN_HIDE_MENU
 		END
 		POPUP "Opzioni Finestra"
 		BEGIN
@@ -743,6 +742,7 @@ BEGIN
 	END
 	POPUP "+"
 	BEGIN
+		MENUITEM "Show &Menu",					IDM_VIEW_MENU
 		MENUITEM "Mostra barra degli strumenti",				IDM_VIEW_TOOLBAR
 		MENUITEM "Personalizza barra degli strumenti...",		IDM_VIEW_CUSTOMIZE_TOOLBAR
 		MENUITEM "&Auto Scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
@@ -896,7 +896,7 @@ BEGIN
     VK_F10,         IDM_FILE_READONLY_MODE,     VIRTKEY, NOINVERT
     VK_F11,         IDM_VIEW_TOGGLE_FULLSCREEN, VIRTKEY, NOINVERT
     VK_F11,         IDM_VIEW_TOOLBAR,           VIRTKEY, CONTROL, NOINVERT
-    VK_F11,         IDM_VIEW_FULLSCREEN_HIDE_MENU,VIRTKEY, ALT, NOINVERT
+    VK_F11,         IDM_VIEW_MENU,              VIRTKEY, ALT, NOINVERT
     VK_F11,         IDM_VIEW_STATUSBAR,         VIRTKEY, SHIFT, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME,            VIRTKEY, NOINVERT
     VK_F12,         IDM_VIEW_SCHEME_CONFIG,     VIRTKEY, CONTROL, NOINVERT

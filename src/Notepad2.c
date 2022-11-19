@@ -61,6 +61,7 @@ static HMONITOR hCurrentMonitor = NULL;
 HWND	hwndEdit;
 static HWND hwndEditFrame;
 HWND	hwndMain;
+static HMENU hmenuMain;
 static HWND hwndNextCBChain = NULL;
 HWND	hDlgFindReplace = NULL;
 static bool bInitDone = false;
@@ -200,6 +201,7 @@ bool	bWindowLayoutRTL;
 static int iRenderingTechnology;
 static bool bUseInlineIME;
 static int iBidirectional;
+static bool bShowMenu;
 static bool bShowToolbar;
 static bool bAutoScaleToolbar;
 static bool bShowStatusbar;
@@ -834,7 +836,10 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	if (bTransparentMode) {
 		SetWindowTransparentMode(hwndMain, true, iOpacityLevel);
 	}
-
+	if (!bShowMenu) {
+		hmenuMain = GetMenu(hwndMain);
+		SetMenu(hwndMain, NULL);
+	}
 	if (!flagStartAsTrayIcon) {
 		ShowWindow(hwndMain, nCmdShow);
 		UpdateWindow(hwndMain);
@@ -1238,8 +1243,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			const UINT dpi = g_uCurrentDPI;
 
 			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
-			const int padding = SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
-			pmmi->ptMaxSize.x = w + 2*padding + 2*SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
+			const int padding = 2*SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+			pmmi->ptMaxSize.x = w + padding + 2*SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
 			pmmi->ptMaxSize.y = h + padding + SystemMetricsForDpi(SM_CYCAPTION, dpi)
 				+ SystemMetricsForDpi(SM_CYMENU, dpi)
 				+ 2*SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
@@ -2650,6 +2655,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #if NP2_ENABLE_SHOW_CALLTIPS
 	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
 #endif
+	CheckCmd(hmenu, IDM_VIEW_MENU, bShowMenu);
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZE_TOOLBAR, bShowToolbar);
 	CheckCmd(hmenu, IDM_VIEW_AUTO_SCALE_TOOLBAR, bAutoScaleToolbar);
@@ -2659,7 +2665,6 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_ON_START, iFullScreenMode & FullScreenMode_OnStartup);
 	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_TITLE, iFullScreenMode & FullScreenMode_HideCaption);
-	CheckCmd(hmenu, IDM_VIEW_FULLSCREEN_HIDE_MENU, iFullScreenMode & FullScreenMode_HideMenu);
 
 	CheckCmd(hmenu, IDM_VIEW_MATCHBRACES, bMatchBraces);
 	CheckCmd(hmenu, IDM_VIEW_HIGHLIGHTCURRENT_BLOCK, bHighlightCurrentBlock);
@@ -4266,6 +4271,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SciCall_SetZoom(100);
 		break;
 
+	case IDM_VIEW_MENU:
+		bShowMenu = !bShowMenu;
+		if (bShowMenu) {
+			SetMenu(hwnd, hmenuMain);
+		} else {
+			hmenuMain = GetMenu(hwnd);
+			SetMenu(hwnd, NULL);
+		}
+		SendWMSize(hwnd);
+		break;
+
 	case IDM_VIEW_TOOLBAR:
 		bShowToolbar = !bShowToolbar;
 		if (bShowToolbar) {
@@ -4517,10 +4533,6 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_FULLSCREEN_HIDE_TITLE:
 		ToggleFullScreenModeConfig(FullScreenMode_HideCaption);
-		break;
-
-	case IDM_VIEW_FULLSCREEN_HIDE_MENU:
-		ToggleFullScreenModeConfig(FullScreenMode_HideMenu);
 		break;
 
 	case CMD_ESCAPE:
@@ -5700,6 +5712,7 @@ void LoadSettings(void) {
 		lstrcpyn(tchToolbarButtons, strValue, COUNTOF(tchToolbarButtons));
 	}
 
+	bShowMenu = IniSectionGetBool(pIniSection, L"ShowMenu", true);
 	bShowToolbar = IniSectionGetBool(pIniSection, L"ShowToolbar", true);
 	bAutoScaleToolbar = IniSectionGetBool(pIniSection, L"AutoScaleToolbar", true);
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", true);
@@ -5976,6 +5989,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"UseInlineIME", bUseInlineIME, false);
 	Toolbar_GetButtons(hwndToolbar, TOOLBAR_COMMAND_BASE, tchToolbarButtons, COUNTOF(tchToolbarButtons));
 	IniSectionSetStringEx(pIniSection, L"ToolbarButtons", tchToolbarButtons, DefaultToolbarButtons);
+	IniSectionSetBoolEx(pIniSection, L"ShowMenu", bShowMenu, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowToolbar", bShowToolbar, true);
 	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
@@ -7308,37 +7322,26 @@ void ToggleFullScreenMode(void) {
 		mi.cbSize = sizeof(mi);
 		GetMonitorInfo(hMonitor, &mi);
 
-		int cx = 0;
-		int cy = 0;
-		int padding = 0;
-		int style = mainStyle;
 		const UINT dpi = g_uCurrentDPI;
-		int top = SystemMetricsForDpi(SM_CYCAPTION, dpi);
-		if (iFullScreenMode & FullScreenMode_HideMenu) {
-			style &= ~WS_OVERLAPPEDWINDOW;
-		} else {
-			style &= ~WS_THICKFRAME;
-			padding = SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
-			cx = SystemMetricsForDpi(SM_CXSIZEFRAME, dpi) + padding;
-			cy = SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
-			if (iFullScreenMode & FullScreenMode_HideCaption) {
-				top += cy;
-			} else {
-				top = cy;
-			}
+		const int padding = SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
+		const int cx = SystemMetricsForDpi(SM_CXSIZEFRAME, dpi) + padding;
+		const int cy = SystemMetricsForDpi(SM_CYSIZEFRAME, dpi) + padding;
+		int top = cy;
+		if (iFullScreenMode & FullScreenMode_HideCaption) {
+			top += SystemMetricsForDpi(SM_CYCAPTION, dpi);
 		}
 
 		const int x = mi.rcMonitor.left - cx;
 		const int y = mi.rcMonitor.top - top;
 		const int w = mi.rcMonitor.right - x + cx;
-		const int h = mi.rcMonitor.bottom - y + cy + padding;
+		const int h = mi.rcMonitor.bottom - y + cy;
 
 		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);
 		if (wStartButton) {
 			ShowWindow(wStartButton, SW_HIDE);
 		}
 		ShowWindow(wTaskBar, SW_HIDE);
-		SetWindowStyle(hwnd, style);
+		SetWindowStyle(hwnd, mainStyle & ~WS_THICKFRAME);
 		SetWindowPos(hwnd, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x, y, w, h, 0);
 	} else {
 		bSaved = false;
