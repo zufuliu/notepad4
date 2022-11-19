@@ -397,7 +397,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 				wordLen = 0;
 				if (StrStartsWith(buf, "end")) {
 					levelNext--;
-				} else if (StrEqualsAny(buf, "if", "function", "macro", "foreach", "while")) {
+				} else if (StrEqualsAny(buf, "if", "function", "macro", "foreach", "while", "block")) {
 					levelNext++;
 				}
 			}

@@ -664,6 +664,8 @@ def parse_cmake_api_file(path):
 		elif key == 'generator expressions':
 			items = re.findall(r'\$\<(?P<name>[\w\-]+)[:>]', doc, re.MULTILINE)
 			parameters.update(items)
+			items = re.findall(r'\<[A-Z]\w+:([A-Z]\w+)\W', doc)
+			parameters.update(items)
 		elif key == 'values':
 			keywordMap[key] = doc.split()
 		else:
