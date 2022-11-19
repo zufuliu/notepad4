@@ -142,6 +142,7 @@ static bool bMarkOccurrencesMatchCase;
 static bool bMarkOccurrencesMatchWords;
 static bool bMarkOccurrencesBookmark;
 EditAutoCompletionConfig autoCompletionConfig;
+int iSelectOption;
 static int iLineSelectionMode;
 static bool bShowCodeFolding;
 #if NP2_ENABLE_SHOW_CALLTIPS
@@ -432,17 +433,6 @@ static inline bool IsDocumentModified(void) {
 
 static inline bool IsTopMost(void) {
 	return (bAlwaysOnTop || flagAlwaysOnTop == TripleBoolean_True) && flagAlwaysOnTop != TripleBoolean_False;
-}
-
-static inline void ToggleFullScreenModeConfig(int config) {
-	if (iFullScreenMode & config) {
-		iFullScreenMode &= ~config;
-	} else {
-		iFullScreenMode |= config;
-	}
-	if (bInFullScreenMode && config != FullScreenMode_OnStartup) {
-		ToggleFullScreenMode();
-	}
 }
 
 // temporary fix for https://github.com/zufuliu/notepad2/issues/77: force InvalidateStyleRedraw().
@@ -1792,7 +1782,7 @@ HWND EditCreate(HWND hwndParent) {
 	SciCall_SetCaretSticky(SC_CARETSTICKY_OFF);
 	SciCall_SetXCaretPolicy(CARET_SLOP | CARET_EVEN, 50);
 	SciCall_SetYCaretPolicy(CARET_EVEN, 0);
-	SciCall_SetMultipleSelection(true);
+	SciCall_SetMultipleSelection(iSelectOption & SelectOption_EnableMultipleSelection);
 	SciCall_SetAdditionalSelectionTyping(true);
 	SciCall_SetMultiPaste(SC_MULTIPASTE_EACH);
 	SciCall_SetVirtualSpaceOptions(SCVS_RECTANGULARSELECTION);
@@ -2636,6 +2626,9 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_COMPLETEWORD, i);
 	CheckCmd(hmenu, IDM_VIEW_AUTOCOMPLETION_IGNORECASE, autoCompletionConfig.bIgnoreCase);
 	CheckCmd(hmenu, IDM_SET_LATEX_INPUT_METHOD, autoCompletionConfig.bLaTeXInputMethod);
+	CheckCmd(hmenu, IDM_SET_MULTIPLE_SELECTION, iSelectOption & SelectOption_EnableMultipleSelection);
+	CheckCmd(hmenu, IDM_SET_SELECTIONASFINDTEXT, iSelectOption & SelectOption_CopySelectionAsFindText);
+	CheckCmd(hmenu, IDM_SET_PASTEBUFFERASFINDTEXT, iSelectOption & SelectOption_CopyPasteBufferAsFindText);
 	i = IDM_LINE_SELECTION_MODE_NONE + iLineSelectionMode;
 	CheckMenuRadioItem(hmenu, IDM_LINE_SELECTION_MODE_NONE, IDM_LINE_SELECTION_MODE_NORMAL, i, MF_BYCOMMAND);
 
@@ -4112,6 +4105,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		autoCompletionConfig.bLaTeXInputMethod = !autoCompletionConfig.bLaTeXInputMethod;
 		break;
 
+	case IDM_SET_MULTIPLE_SELECTION:
+	case IDM_SET_SELECTIONASFINDTEXT:
+	case IDM_SET_PASTEBUFFERASFINDTEXT: {
+		const int option = 1 << (LOWORD(wParam) - IDM_SET_MULTIPLE_SELECTION);
+		if (iSelectOption & option) {
+			iSelectOption &= ~option;
+		} else {
+			iSelectOption |= option;
+		}
+		if (option == SelectOption_EnableMultipleSelection) {
+			SciCall_SetMultipleSelection(iSelectOption & SelectOption_EnableMultipleSelection);
+		}
+	} break;
+
 	case IDM_LINE_SELECTION_MODE_NONE:
 	case IDM_LINE_SELECTION_MODE_VS:
 	case IDM_LINE_SELECTION_MODE_NORMAL:
@@ -4528,12 +4535,17 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_VIEW_FULLSCREEN_ON_START:
-		ToggleFullScreenModeConfig(FullScreenMode_OnStartup);
-		break;
-
-	case IDM_VIEW_FULLSCREEN_HIDE_TITLE:
-		ToggleFullScreenModeConfig(FullScreenMode_HideCaption);
-		break;
+	case IDM_VIEW_FULLSCREEN_HIDE_TITLE: {
+		const int config = 1 << (LOWORD(wParam) - IDM_VIEW_FULLSCREEN_ON_START);
+		if (iFullScreenMode & config) {
+			iFullScreenMode &= ~config;
+		} else {
+			iFullScreenMode |= config;
+		}
+		if (config != FullScreenMode_OnStartup && bInFullScreenMode) {
+			ToggleFullScreenMode();
+		}
+	} break;
 
 	case CMD_ESCAPE:
 		if (SciCall_AutoCActive()) {
@@ -5301,7 +5313,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case SCN_HOTSPOTCLICK:
-			if (scn->modifiers & SCMOD_CTRL) {
+			if ((scn->modifiers & SCMOD_CTRL) && (iSelectOption & SelectOption_EnableMultipleSelection)) {
 				// disable multiple selection to avoid two carets after Ctrl + click
 				SciCall_SetMultipleSelection(false);
 				SciCall_SetSel(scn->position, scn->position);
@@ -5585,6 +5597,7 @@ void LoadSettings(void) {
 	}
 	EditCompleteUpdateConfig();
 
+	iSelectOption = IniSectionGetInt(pIniSection, L"SelectOption", SelectOption_Default);
 	iLineSelectionMode = IniSectionGetInt(pIniSection, L"LineSelection", LineSelectionMode_VisualStudio);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", true);
@@ -5914,6 +5927,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
 	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
+	IniSectionSetIntEx(pIniSection, L"SelectOption", iSelectOption, SelectOption_Default);
 	IniSectionSetIntEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
 #if NP2_ENABLE_SHOW_CALLTIPS
 	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, true);

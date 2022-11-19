@@ -4753,6 +4753,7 @@ extern bool bFindReplaceTransparentMode;
 extern int iFindReplaceOpacityLevel;
 extern bool bFindReplaceUseMonospacedFont;
 extern bool bFindReplaceFindAllBookmark;
+extern int iSelectOption;
 
 static void FindReplaceSetFont(HWND hwnd, bool monospaced, HFONT *hFontFindReplaceEdit) {
 	HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
@@ -4778,7 +4779,7 @@ static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFi
 	const Sci_Position cchSelection = SciCall_GetSelTextLength();
 	char *lpszSelection = NULL;
 
-	if (cchSelection != 0 && cchSelection <= NP2_FIND_REPLACE_LIMIT) {
+	if (cchSelection != 0 && cchSelection <= NP2_FIND_REPLACE_LIMIT && (iSelectOption & SelectOption_CopySelectionAsFindText)) {
 		lpszSelection = (char *)NP2HeapAlloc(cchSelection + 1);
 		SciCall_GetSelText(lpszSelection);
 	}
@@ -4788,7 +4789,7 @@ static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFi
 
 	// First time you bring up find/replace dialog,
 	// copy content from clipboard to find box when nothing is selected in the editor.
-	if (!hasFindText && bFirstTime) {
+	if (!hasFindText && bFirstTime && (iSelectOption & SelectOption_CopyPasteBufferAsFindText)) {
 		char *pClip = EditGetClipboardText(hwnd);
 		if (pClip != NULL) {
 			const size_t len = strlen(pClip);
