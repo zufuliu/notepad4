@@ -1235,11 +1235,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			LPMINMAXINFO pmmi = (LPMINMAXINFO)lParam;
 			const int padding = 2*SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
 			pmmi->ptMaxSize.x = w + padding + 2*SystemMetricsForDpi(SM_CXSIZEFRAME, dpi);
-			pmmi->ptMaxSize.y = h + padding + SystemMetricsForDpi(SM_CYCAPTION, dpi)
-				+ SystemMetricsForDpi(SM_CYMENU, dpi)
-				+ 2*SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
-			pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
-			pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
+			pmmi->ptMaxSize.y = h + padding + SystemMetricsForDpi(SM_CYCAPTION, dpi) + 2*SystemMetricsForDpi(SM_CYSIZEFRAME, dpi);
+			pmmi->ptMaxTrackSize = pmmi->ptMaxSize;
 			return 0;
 		}
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
