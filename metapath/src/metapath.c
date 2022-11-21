@@ -412,7 +412,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		}
 	}
 
-	hwndMain = CreateWindowEx(
+	HWND hwnd = CreateWindowEx(
 				   0,
 				   WC_METAPATH,
 				   WC_METAPATH,
@@ -425,21 +425,18 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				   NULL,
 				   hInstance,
 				   NULL);
-
 	if (bAlwaysOnTop) {
-		SetWindowPos(hwndMain, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
-
 	if (bTransparentMode) {
-		SetWindowTransparentMode(hwndMain, true, iOpacityLevel);
+		SetWindowTransparentMode(hwnd, true, iOpacityLevel);
 	}
-
 	if (!flagStartAsTrayIcon) {
-		ShowWindow(hwndMain, nCmdShow);
-		UpdateWindow(hwndMain);
+		ShowWindow(hwnd, nCmdShow);
+		UpdateWindow(hwnd);
 	} else {
-		ShowWindow(hwndMain, SW_HIDE);   // trick ShowWindow()
-		ShowNotifyIcon(hwndMain, true);
+		ShowWindow(hwnd, SW_HIDE);   // trick ShowWindow()
+		ShowNotifyIcon(hwnd, true);
 	}
 
 	// Pathname parameter
@@ -464,7 +461,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Update Dirlist
 	if (!ListView_GetItemCount(hwndDirList)) {
-		PostWMCommand(hwndMain, IDM_VIEW_UPDATE);
+		PostWMCommand(hwnd, IDM_VIEW_UPDATE);
 	}
 }
 
@@ -759,9 +756,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 //
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
-
+	hwndMain = hwnd;
 	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-
 	hwndDirList = CreateWindowEx(
 					  WS_EX_CLIENTEDGE,
 					  WC_LISTVIEW,
@@ -851,7 +847,6 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	GetMenuItemInfo(hmenu, SC_MINIMIZE, FALSE, &mii);
 	mii.wID = SC_MINIMIZE | 0x02;
 	SetMenuItemInfo(hmenu, SC_MINIMIZE, FALSE, &mii);
-
 	return 0;
 }
 
@@ -3477,10 +3472,8 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	static HICON hIcon;
-
 	if (!hIcon) {
-		hIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND),
-						  IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+		hIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	}
 
 	NOTIFYICONDATA nid;
@@ -3492,12 +3485,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	nid.uCallbackMessage = APPM_TRAYMESSAGE;
 	nid.hIcon = hIcon;
 	lstrcpy(nid.szTip, WC_METAPATH);
-
-	if (bAdd) {
-		Shell_NotifyIcon(NIM_ADD, &nid);
-	} else {
-		Shell_NotifyIcon(NIM_DELETE, &nid);
-	}
+	Shell_NotifyIcon(bAdd ? NIM_ADD : NIM_DELETE, &nid);
 }
 
 //=============================================================================

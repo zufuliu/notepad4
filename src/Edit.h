@@ -104,7 +104,7 @@ enum {
 };
 
 void	Edit_ReleaseResources(void);
-HWND	EditCreate(HWND hwndParent);
+void	EditCreate(HWND hwndParent);
 void	EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount);
 
 static inline void EditSetEmptyText(void) {

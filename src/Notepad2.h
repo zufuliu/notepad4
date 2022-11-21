@@ -264,8 +264,8 @@ typedef enum FileSaveFlag {
 bool FileIO(bool fLoad, LPWSTR pszFile, int flag, EditFileIOStatus *status);
 bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile);
 bool FileSave(FileSaveFlag saveFlag);
-BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
-BOOL SaveFileDlg(HWND hwnd, bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
+BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
+BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir);
 
 enum {
 	AutoSaveOption_None = 0,

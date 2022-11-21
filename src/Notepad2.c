@@ -801,7 +801,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		}
 	}
 
-	hwndMain = CreateWindowEx(
+	HWND hwnd = CreateWindowEx(
 				   0,
 				   wchWndClass,
 				   WC_NOTEPAD2,
@@ -814,28 +814,21 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 				   NULL,
 				   hInstance,
 				   NULL);
-
-	if (wi.max) {
-		nCmdShow = SW_SHOWMAXIMIZED;
-	}
-
 	if (IsTopMost()) {
-		SetWindowPos(hwndMain, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	}
-
 	if (bTransparentMode) {
-		SetWindowTransparentMode(hwndMain, true, iOpacityLevel);
+		SetWindowTransparentMode(hwnd, true, iOpacityLevel);
 	}
 	if (!bShowMenu) {
-		hmenuMain = GetMenu(hwndMain);
-		SetMenu(hwndMain, NULL);
+		SetMenu(hwnd, NULL);
 	}
 	if (!flagStartAsTrayIcon) {
-		ShowWindow(hwndMain, nCmdShow);
-		UpdateWindow(hwndMain);
+		ShowWindow(hwnd, wi.max ? SW_SHOWMAXIMIZED : nCmdShow);
+		UpdateWindow(hwnd);
 	} else {
-		ShowWindow(hwndMain, SW_HIDE); // trick ShowWindow()
-		ShowNotifyIcon(hwndMain, true);
+		ShowWindow(hwnd, SW_HIDE); // trick ShowWindow()
+		ShowNotifyIcon(hwnd, true);
 	}
 
 	// Source Encoding
@@ -853,7 +846,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		// Open from Directory
 		if (PathIsDirectory(lpFileArg)) {
 			WCHAR tchFile[MAX_PATH];
-			if (OpenFileDlg(hwndMain, tchFile, COUNTOF(tchFile), lpFileArg)) {
+			if (OpenFileDlg(tchFile, COUNTOF(tchFile), lpFileArg)) {
 				bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 				bFileLoadCalled = true;
 			}
@@ -926,13 +919,13 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// Encoding
 	if (0 != flagSetEncoding) {
-		SendWMCommand(hwndMain, IDM_ENCODING_ANSI - 1 + flagSetEncoding);
+		SendWMCommand(hwnd, IDM_ENCODING_ANSI - 1 + flagSetEncoding);
 		flagSetEncoding = 0;
 	}
 
 	// EOL mode
 	if (0 != flagSetEOLMode) {
-		SendWMCommand(hwndMain, IDM_LINEENDINGS_CRLF - 1 + flagSetEOLMode);
+		SendWMCommand(hwnd, IDM_LINEENDINGS_CRLF - 1 + flagSetEOLMode);
 		flagSetEOLMode = 0;
 	}
 
@@ -968,11 +961,11 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Check for Paste Board option -- after loading files
 	if (flagPasteBoard) {
 		bLastCopyFromMe = true;
-		hwndNextCBChain = SetClipboardViewer(hwndMain);
+		hwndNextCBChain = SetClipboardViewer(hwnd);
 		UpdateWindowTitle();
 		bLastCopyFromMe = false;
 		dwLastCopyTime = 0;
-		SetTimer(hwndMain, ID_PASTEBOARDTIMER, 100, PasteBoardTimer);
+		SetTimer(hwnd, ID_PASTEBOARDTIMER, 100, PasteBoardTimer);
 	}
 
 	// check if a lexer was specified from the command line
@@ -989,7 +982,9 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
 	// If start as tray icon, set current filename as tooltip
 	if (flagStartAsTrayIcon) {
-		SetNotifyIconTitle(hwndMain);
+		SetNotifyIconTitle(hwnd);
+	} else if (bInFullScreenMode) {
+		ToggleFullScreenMode();
 	}
 
 	bInitDone = true;
@@ -1047,7 +1042,7 @@ void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
 	//SetForegroundWindow(hwnd);
 	if (PathIsDirectory(szBuf)) {
 		WCHAR tchFile[MAX_PATH];
-		if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), szBuf)) {
+		if (OpenFileDlg(tchFile, COUNTOF(tchFile), szBuf)) {
 			FileLoad(FileLoadFlag_Default, tchFile);
 		}
 	} else {
@@ -1290,7 +1285,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 				if (PathIsDirectory(&params->wchData)) {
 					WCHAR tchFile[MAX_PATH];
-					if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), &params->wchData)) {
+					if (OpenFileDlg(tchFile, COUNTOF(tchFile), &params->wchData)) {
 						bOpened = FileLoad(FileLoadFlag_Default, tchFile);
 					}
 				} else {
@@ -1750,7 +1745,7 @@ static void EditFrameOnThemeChanged(void) {
 //
 // EditCreate()
 //
-HWND EditCreate(HWND hwndParent) {
+void EditCreate(HWND hwndParent) {
 	HWND hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,
 						  L"Scintilla",
 						  NULL,
@@ -1760,12 +1755,14 @@ HWND EditCreate(HWND hwndParent) {
 						  (HMENU)IDC_EDIT,
 						  g_hInstance,
 						  NULL);
+	hwndEdit = hwnd;
+	efrData.hwnd = hwnd;
+	InitScintillaHandle(hwnd);
 	//SciInitThemes(hwnd);
 	if (bEditLayoutRTL) {
 		SetWindowLayoutRTL(hwnd, true);
 	}
 
-	InitScintillaHandle(hwnd);
 	Style_InitDefaultColor();
 	SciCall_SetTechnology(iRenderingTechnology);
 	SciCall_SetBidirectional(iBidirectional);
@@ -1872,8 +1869,6 @@ HWND EditCreate(HWND hwndParent) {
 	// Nonprinting characters
 	SciCall_SetViewWS((bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
 	SciCall_SetViewEOL(bViewEOLs);
-
-	return hwnd;
 }
 
 void EditReplaceDocument(HANDLE pdoc) {
@@ -1892,17 +1887,17 @@ void EditReplaceDocument(HANDLE pdoc) {
 //
 LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
-
-	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
+	hwndMain = hwnd;
 	g_uCurrentDPI = GetWindowDPI(hwnd);
+	hmenuMain = GetMenu(hwnd);
 	Style_DetectBaseFontSize(hwnd);
 
 	// Setup edit control
 	// create edit control and frame with zero size to avoid
 	// a white/black window fades out on startup when using Direct2D.
-	hwndEdit = EditCreate(hwnd);
-	efrData.hwnd = hwndEdit;
+	EditCreate(hwnd);
 
+	HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
 	hwndEditFrame = CreateWindowEx(
 						WS_EX_CLIENTEDGE,
 						WC_LISTVIEW,
@@ -1945,26 +1940,16 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
-	// Menu
-	//SetMenuDefaultItem(GetSubMenu(GetMenu(hwnd), 0), 0);
-
 	// Drag & Drop
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
 	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRUFlags_FilePath, MRU_MAX_RECENT_FILES);
 	MRU_Load(pFileMRU);
-
 	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue, MRU_MAX_RECENT_FIND);
 	MRU_Load(mruFind);
-
 	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue, MRU_MAX_RECENT_REPLACE);
 	MRU_Load(mruReplace);
-
-	if (bInFullScreenMode) {
-		bInFullScreenMode = false;
-		PostWMCommand(hwnd, IDM_VIEW_TOGGLE_FULLSCREEN);
-	}
 	return 0;
 }
 
@@ -2184,12 +2169,11 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
 
-	HINSTANCE hInstance = GetWindowInstance(hwnd);
-
 	// reinitialize edit frame
 	EditFrameOnThemeChanged();
 
 	// recreate toolbar and statusbar
+	HINSTANCE hInstance = GetWindowInstance(hwnd);
 	RecreateBars(hwnd, hInstance);
 
 	RECT rc;
@@ -2199,7 +2183,7 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusbar();
 }
 
-static void OnStyleThemeChanged(int theme) {
+static inline void OnStyleThemeChanged(int theme) {
 	if (theme == np2StyleTheme) {
 		return;
 	}
@@ -2991,7 +2975,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				if (PathIsDirectory(tchSelItem)) {
 					WCHAR tchFile[MAX_PATH];
 
-					if (OpenFileDlg(hwnd, tchFile, COUNTOF(tchFile), tchSelItem)) {
+					if (OpenFileDlg(tchFile, COUNTOF(tchFile), tchSelItem)) {
 						FileLoad(FileLoadFlag_DontSave, tchFile);
 					}
 				} else {
@@ -4277,12 +4261,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_MENU:
 		bShowMenu = !bShowMenu;
-		if (bShowMenu) {
-			SetMenu(hwnd, hmenuMain);
-		} else {
-			hmenuMain = GetMenu(hwnd);
-			SetMenu(hwnd, NULL);
-		}
+		SetMenu(hwnd, bShowMenu ? hmenuMain : NULL);
 		break;
 
 	case IDM_VIEW_TOOLBAR:
@@ -7486,7 +7465,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	}
 
 	if (!fSuccess) {
-		if (!OpenFileDlg(hwndMain, tch, COUNTOF(tch), NULL)) {
+		if (!OpenFileDlg(tch, COUNTOF(tch), NULL)) {
 			return false;
 		}
 	}
@@ -7766,7 +7745,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 			lstrcpy(tchFile, szCurFile);
 		}
 
-		if (SaveFileDlg(hwndMain, Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
+		if (SaveFileDlg(Untitled, tchFile, COUNTOF(tchFile), tchInitialDir)) {
 			fSuccess = FileIO(false, tchFile, saveFlag & (FileSaveFlag_SaveCopy | FileSaveFlag_EndSession), &status);
 			if (fSuccess) {
 				if (!(saveFlag & FileSaveFlag_SaveCopy)) {
@@ -7898,7 +7877,7 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
 // OpenFileDlg()
 //
 //
-BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	WCHAR tchInitialDir[MAX_PATH] = L"";
 	if (!lpstrInitialDir) {
 		if (StrNotEmpty(szCurFile)) {
@@ -7926,7 +7905,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 	OPENFILENAME ofn;
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = hwnd;
+	ofn.hwndOwner = hwndMain;
 	ofn.lpstrFilter = szFilter;
 	ofn.lpstrFile = szFile;
 	ofn.lpstrInitialDir = (lpstrInitialDir) ? lpstrInitialDir : tchInitialDir;
@@ -7956,7 +7935,7 @@ BOOL OpenFileDlg(HWND hwnd, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialD
 // SaveFileDlg()
 //
 //
-BOOL SaveFileDlg(HWND hwnd, bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	WCHAR tchInitialDir[MAX_PATH] = L"";
 	if (StrNotEmpty(lpstrInitialDir)) {
 		lstrcpy(tchInitialDir, lpstrInitialDir);
@@ -7984,7 +7963,7 @@ BOOL SaveFileDlg(HWND hwnd, bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWST
 	OPENFILENAME ofn;
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = hwnd;
+	ofn.hwndOwner = hwndMain;
 	ofn.lpstrFilter = szFilter;
 	ofn.lpstrFile = szNewFile;
 	ofn.lpstrInitialDir = tchInitialDir;
@@ -8538,7 +8517,6 @@ void SnapToDefaultPos(HWND hwnd) {
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	static HICON hIcon;
-
 	if (!hIcon) {
 		hIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	}
@@ -8552,12 +8530,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	nid.uCallbackMessage = APPM_TRAYMESSAGE;
 	nid.hIcon = hIcon;
 	lstrcpy(nid.szTip, WC_NOTEPAD2);
-
-	if (bAdd) {
-		Shell_NotifyIcon(NIM_ADD, &nid);
-	} else {
-		Shell_NotifyIcon(NIM_DELETE, &nid);
-	}
+	Shell_NotifyIcon(bAdd ? NIM_ADD : NIM_DELETE, &nid);
 }
 
 //=============================================================================
@@ -8589,7 +8562,6 @@ void SetNotifyIconTitle(HWND hwnd) {
 		StrCpyExW(nid.szTip, L"* ");
 	}
 	StrCatBuff(nid.szTip, tchTitle, COUNTOF(nid.szTip));
-
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 }
 
