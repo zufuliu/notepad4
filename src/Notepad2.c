@@ -1024,11 +1024,6 @@ static inline void EditMarkAll_Stop(void) {
 
 static inline void ExitApplication(HWND hwnd) {
 	if (FileSave(FileSaveFlag_Ask)) {
-		if (bInFullScreenMode) {
-			bInFullScreenMode = false;
-			ToggleFullScreenMode();
-		}
-		EditMarkAll_Stop();
 		DestroyWindow(hwnd);
 	}
 }
@@ -5999,7 +5994,7 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	GetWindowPositionSectionName(hCurrentMonitor, sectionName);
 
 	// query window dimensions when window is not minimized
-	if (!IsIconic(hwndMain)) {
+	if (!bInFullScreenMode && !IsIconic(hwndMain)) {
 		WINDOWPLACEMENT wndpl;
 		wndpl.length = sizeof(WINDOWPLACEMENT);
 		GetWindowPlacement(hwndMain, &wndpl);
@@ -7288,16 +7283,12 @@ void UpdateLineNumberWidth(void) {
 void ToggleFullScreenMode(void) {
 	static bool bSaved;
 	static WINDOWPLACEMENT wndpl;
-	static RECT rcWorkArea;
 	static DWORD mainStyle;
 
-	HWND wTaskBar = FindWindow(L"Shell_TrayWnd", L"");
-	HWND wStartButton = FindWindow(L"Button", NULL);
 	HWND hwnd = hwndMain;
 	if (bInFullScreenMode) {
 		if (!bSaved) {
 			bSaved = true;
-			SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, 0);
 			wndpl.length = sizeof(WINDOWPLACEMENT);
 			GetWindowPlacement(hwnd, &wndpl);
 			mainStyle = GetWindowStyle(hwnd);
@@ -7321,25 +7312,15 @@ void ToggleFullScreenMode(void) {
 		const int w = mi.rcMonitor.right - x + cx;
 		const int h = mi.rcMonitor.bottom - y + cy;
 
-		SystemParametersInfo(SPI_SETWORKAREA, 0, NULL, SPIF_SENDCHANGE);
-		if (wStartButton) {
-			ShowWindow(wStartButton, SW_HIDE);
-		}
-		ShowWindow(wTaskBar, SW_HIDE);
 		SetWindowStyle(hwnd, mainStyle & ~WS_THICKFRAME);
 		SetWindowPos(hwnd, (IsTopMost() ? HWND_TOPMOST : HWND_TOP), x, y, w, h, 0);
 	} else {
 		bSaved = false;
-		ShowWindow(wTaskBar, SW_SHOW);
-		if (wStartButton) {
-			ShowWindow(wStartButton, SW_SHOW);
-		}
 		SetWindowStyle(hwnd, mainStyle);
 		if (!IsTopMost()) {
 			SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 		}
 		if (wndpl.length) {
-			SystemParametersInfo(SPI_SETWORKAREA, 0, &rcWorkArea, 0);
 			if (wndpl.showCmd == SW_SHOWMAXIMIZED) {
 				ShowWindow(hwnd, SW_RESTORE);
 				ShowWindow(hwnd, SW_SHOWMAXIMIZED);
