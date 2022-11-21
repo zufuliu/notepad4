@@ -1087,13 +1087,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_WINDOWPOSCHANGED: {
 		HMONITOR monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		if (monitor != hCurrentMonitor) {
-			HMONITOR previous = hCurrentMonitor;
 			hCurrentMonitor = monitor;
-			if (previous) {
-				// Direct2D: render Scintilla window with parameters for current monitor
-				SendMessage(hwndEdit, WM_SETTINGCHANGE, 0, 0);
-				Style_SetLexer(pLexCurrent, false); // override base elements
-			}
+			// Direct2D: render Scintilla window with parameters for current monitor
+			SendMessage(hwndEdit, WM_SETTINGCHANGE, 0, 0);
+			Style_SetLexer(pLexCurrent, false); // override base elements
 		}
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
@@ -1218,10 +1215,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_GETMINMAXINFO:
 		if (bInFullScreenMode) {
-			HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 			MONITORINFO mi;
 			mi.cbSize = sizeof(mi);
-			GetMonitorInfo(hMonitor, &mi);
+			GetMonitorInfo(hCurrentMonitor, &mi);
 
 			const int w = mi.rcMonitor.right - mi.rcMonitor.left;
 			const int h = mi.rcMonitor.bottom - mi.rcMonitor.top;
@@ -1890,7 +1886,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	hwndMain = hwnd;
 	g_uCurrentDPI = GetWindowDPI(hwnd);
 	hmenuMain = GetMenu(hwnd);
-	Style_DetectBaseFontSize(hwnd);
+	hCurrentMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	Style_DetectBaseFontSize(hCurrentMonitor);
 
 	// Setup edit control
 	// create edit control and frame with zero size to avoid
@@ -2148,7 +2145,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		SetWindowPos(hwndReBar, NULL, 0, 0, cx, cyReBar, SWP_NOZORDER);
 	}
 
-	Style_DetectBaseFontSize(hwnd);
+	Style_DetectBaseFontSize(hCurrentMonitor);
 	Style_OnDPIChanged(pLexCurrent);
 	SendMessage(hwndEdit, WM_DPICHANGED, wParam, lParam);
 	UpdateLineNumberWidth();
@@ -5432,8 +5429,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	return 0;
 }
 
-static void GetWindowPositionSectionName(WCHAR sectionName[96]) {
-	HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR sectionName[96]) {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
@@ -5731,7 +5727,8 @@ void LoadSettings(void) {
 	// window position section
 	{
 		WCHAR sectionName[96];
-		GetWindowPositionSectionName(sectionName);
+		HMONITOR hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTONEAREST);
+		GetWindowPositionSectionName(hMonitor, sectionName);
 		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
 
@@ -5999,7 +5996,7 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	IniSectionOnSave *const pIniSection = &section;
 
 	WCHAR sectionName[96];
-	GetWindowPositionSectionName(sectionName);
+	GetWindowPositionSectionName(hCurrentMonitor, sectionName);
 
 	// query window dimensions when window is not minimized
 	if (!IsIconic(hwndMain)) {
@@ -7306,10 +7303,9 @@ void ToggleFullScreenMode(void) {
 			mainStyle = GetWindowStyle(hwnd);
 		}
 
-		HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 		MONITORINFO mi;
 		mi.cbSize = sizeof(mi);
-		GetMonitorInfo(hMonitor, &mi);
+		GetMonitorInfo(hCurrentMonitor, &mi);
 
 		const UINT dpi = g_uCurrentDPI;
 		const int padding = SystemMetricsForDpi(SM_CXPADDEDBORDER, dpi);
@@ -8476,10 +8472,9 @@ void SnapToDefaultPos(HWND hwnd) {
 	RECT rcOld;
 	GetWindowRect(hwnd, &rcOld);
 
-	HMONITOR hMonitor = MonitorFromRect(&rcOld, MONITOR_DEFAULTTONEAREST);
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
-	GetMonitorInfo(hMonitor, &mi);
+	GetMonitorInfo(hCurrentMonitor, &mi);
 
 	const int y = mi.rcWork.top + 16;
 	const int cy = mi.rcWork.bottom - mi.rcWork.top - 32;

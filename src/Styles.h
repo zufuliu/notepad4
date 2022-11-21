@@ -61,7 +61,7 @@ void	Style_SaveTabSettings(PEDITLEXER pLex);
 void	EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged);
 void	InitAutoCompletionCache(LPCEDITLEXER pLex);
 
-void	Style_DetectBaseFontSize(HWND hwnd);
+void	Style_DetectBaseFontSize(HMONITOR hMonitor);
 HFONT	Style_CreateCodeFont(UINT dpi);
 void	Style_OnDPIChanged(PEDITLEXER pLex);
 void	Style_OnStyleThemeChanged(int theme);

@@ -542,8 +542,7 @@ static inline void FindSystemDefaultTextFont(void) {
 	GetThemedDialogFont(systemTextFontName, &wSize);
 }
 
-void Style_DetectBaseFontSize(HWND hwnd) {
-	HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+void Style_DetectBaseFontSize(HMONITOR hMonitor) {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
