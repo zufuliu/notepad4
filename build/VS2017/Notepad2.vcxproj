@@ -1011,6 +1011,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexCPP.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCSharp.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexCSS.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexCSV.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexD.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexDart.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexDiff.cxx" />
@@ -1130,6 +1131,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlCPP.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCSharp.c" />
     <ClCompile Include="..\..\src\EditLexers\stlCSS.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlCSV.c" />
     <ClCompile Include="..\..\src\EditLexers\stlD.c" />
     <ClCompile Include="..\..\src\EditLexers\stlDart.c" />
     <ClCompile Include="..\..\src\EditLexers\stlDefault.c" />

@@ -697,6 +697,7 @@ enum {
 
 extern EDITLEXER lexCPP;
 extern EDITLEXER lexCSS;
+extern EDITLEXER lexCSV;
 extern EDITLEXER lexHTML;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexPHP;

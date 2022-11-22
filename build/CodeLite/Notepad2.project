@@ -33,6 +33,7 @@
       <File Name="../../scintilla/lexers/LexCPP.cxx"/>
       <File Name="../../scintilla/lexers/LexCSharp.cxx"/>
       <File Name="../../scintilla/lexers/LexCSS.cxx"/>
+      <File Name="../../scintilla/lexers/LexCSV.cxx"/>
       <File Name="../../scintilla/lexers/LexD.cxx"/>
       <File Name="../../scintilla/lexers/LexDart.cxx"/>
       <File Name="../../scintilla/lexers/LexDiff.cxx"/>
@@ -208,6 +209,7 @@
       <File Name="../../src/EditLexers/stlCPP.c"/>
       <File Name="../../src/EditLexers/stlCSharp.c"/>
       <File Name="../../src/EditLexers/stlCSS.c"/>
+      <File Name="../../src/EditLexers/stlCSV.c"/>
       <File Name="../../src/EditLexers/stlD.c"/>
       <File Name="../../src/EditLexers/stlDart.c"/>
       <File Name="../../src/EditLexers/stlDefault.c"/>

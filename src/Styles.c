@@ -47,6 +47,7 @@ extern EDITLEXER lex2ndTextFile;
 extern EDITLEXER lexCPP;
 extern EDITLEXER lexCSharp;
 extern EDITLEXER lexCSS;
+extern EDITLEXER lexCSV;
 extern EDITLEXER lexJava;
 extern EDITLEXER lexJavaScript;
 extern EDITLEXER lexJSON;
@@ -150,6 +151,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexCPP,
 	&lexCSharp,
 	&lexCSS,
+	&lexCSV,
 	&lexJava,
 	&lexJavaScript,
 	&lexJSON,
