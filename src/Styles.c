@@ -76,6 +76,7 @@ extern EDITLEXER lexCIL;
 extern EDITLEXER lexCMake;
 extern EDITLEXER lexCoffeeScript;
 extern EDITLEXER lexConfig;
+extern EDITLEXER lexCSV;
 
 extern EDITLEXER lexDLang;
 extern EDITLEXER lexDart;
@@ -179,6 +180,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexCMake,
 	&lexCoffeeScript,
 	&lexConfig,
+	&lexCSV,
 
 	&lexDLang,
 	&lexDart,

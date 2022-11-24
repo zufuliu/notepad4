@@ -176,11 +176,20 @@
 
 #define NP2STYLE_Cmdlet					63581
 #define NP2STYLE_Alias					63582
-
+#define NP2STYLE_Column1				63583
+#define NP2STYLE_Column2				63584
+#define NP2STYLE_Column3				63585
+#define NP2STYLE_Column4				63586
+#define NP2STYLE_Column5				63587
+#define NP2STYLE_Column6				63588
+#define NP2STYLE_Column7				63589
+#define NP2STYLE_Column8				63590
 #define NP2STYLE_SendKey				63591
 #define NP2STYLE_Special				63592
 #define NP2STYLE_HotString				63593
 #define NP2STYLE_HotKey					63594
+#define NP2STYLE_Column9				63595
+#define NP2STYLE_Column10				63596
 
 #define NP2STYLE_PascalKeyword 			63601
 #define NP2STYLE_Event					63602

@@ -199,11 +199,20 @@
 
 #define NP2StyleX_Cmdlet				EDITSTYLE_HOLE(Cmdlet, L"Cmdlet")
 #define NP2StyleX_Alias					EDITSTYLE_HOLE(Alias, L"Alias")
-
+#define NP2StyleX_Column1				EDITSTYLE_HOLE(Column1, L"Column 1")
+#define NP2StyleX_Column2				EDITSTYLE_HOLE(Column2, L"Column 2")
+#define NP2StyleX_Column3				EDITSTYLE_HOLE(Column3, L"Column 3")
+#define NP2StyleX_Column4				EDITSTYLE_HOLE(Column4, L"Column 4")
+#define NP2StyleX_Column5				EDITSTYLE_HOLE(Column5, L"Column 5")
+#define NP2StyleX_Column6				EDITSTYLE_HOLE(Column6, L"Column 6")
+#define NP2StyleX_Column7				EDITSTYLE_HOLE(Column8, L"Column 7")
+#define NP2StyleX_Column8				EDITSTYLE_HOLE(Column8, L"Column 8")
 #define NP2StyleX_SendKey				EDITSTYLE_HOLE(SendKey, L"Send Key")
 #define NP2StyleX_Special				EDITSTYLE_HOLE(Special, L"Special")
 #define NP2StyleX_HotString				EDITSTYLE_HOLE(HotString, L"HotString")
 #define NP2StyleX_HotKey				EDITSTYLE_HOLE(HotKey, L"HotKey")
+#define NP2StyleX_Column9				EDITSTYLE_HOLE(Column8, L"Column 9")
+#define NP2StyleX_Column10				EDITSTYLE_HOLE(Column8, L"Column 10")
 
 #define NP2StyleX_PascalKeyword			EDITSTYLE_HOLE(PascalKeyword, L"Pascal Keyword")
 #define NP2StyleX_Event					EDITSTYLE_HOLE(Event, L"Event")

@@ -23,6 +23,7 @@ lexerList = [
 	('NP2LEX_CONFIG', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 	('NP2LEX_CPP', 'stlCPP.c', 'LexCPP.cxx', ['CPP.cpp', 'C.c', 'POSIX.c'], 1, parse_cpp_api_file),
 	('NP2LEX_CSHARP', 'stlCSharp.c', 'LexCSharp.cxx', 'CSharp.cs', 1, parse_csharp_api_file),
+	('NP2LEX_CSV', 'stlDefault.c', 'LexCSV.cxx', '', (0, 'CSV'), None),
 
 	('NP2LEX_DLANG', 'stlD.c', 'LexD.cxx', 'D.d', 1, parse_dlang_api_file),
 	('NP2LEX_DART', 'stlDart.c', 'LexDart.cxx', 'Dart.dart', 0, parse_dart_api_file),

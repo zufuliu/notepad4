@@ -248,6 +248,10 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'operator_style': ['SCE_CONF_OPERATOR'],
 	},
+	'NP2LEX_CSV': {
+		'escape_char_start': NoEscapeCharacter,
+		'extra_word_char': '-',
+	},
 	'NP2LEX_CPP': {
 		'cpp_style_comment': True,
 		'default_fold_level': ['preprocessor', 'namespace', 'class', 'method'],

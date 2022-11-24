@@ -2763,6 +2763,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_2NDTEXTFILE:
 	case NP2LEX_ANSI:
 	case NP2LEX_BLOCKDIAG:
+	case NP2LEX_CSV:
 	case NP2LEX_GRAPHVIZ:
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
