@@ -208,7 +208,7 @@ static EDITSTYLE Styles_CSV[] = {
 	{ SCE_CSV_COLUMN_6, NP2StyleX_Column7, L"fore:#7C5AF3" },
 	{ SCE_CSV_COLUMN_7, NP2StyleX_Column8, L"fore:#A46000" },
 	{ SCE_CSV_COLUMN_8, NP2StyleX_Column9, L"fore:#648000" },
-	{ SCE_CSV_COLUMN_9, NP2StyleX_Column10, L"fore:#0070C0" },
+	{ SCE_CSV_COLUMN_9, NP2StyleX_Column10, L"fore:#408080" },
 	{ SCE_CSV_DELIMITER, NP2StyleX_Delimiter, L"fore:#608060" },
 };
 

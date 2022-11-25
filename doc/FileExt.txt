@@ -254,6 +254,9 @@ Config File
 	Doxyfile		Doxygen Configuration
 	.*				dot-file
 
+CSV File
+	csv
+
 
 D Source
 	d
