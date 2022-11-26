@@ -1455,7 +1455,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		}
 		if (dialect > 0) {
 			char lang[4] = "";
-			if (dialect < 9) {
+			if (dialect < 10) {
 				lang[0] = (char)(dialect + '0');
 			} else {
 				lang[0] = (char)(dialect & 0xff);

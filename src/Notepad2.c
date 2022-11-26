@@ -5388,7 +5388,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			}
 
 			case StatusItem_Lexer:
-				SendWMCommand(hwnd, IDM_VIEW_SCHEME);
+				SendWMCommand(hwnd, (pLexCurrent->rid == NP2LEX_CSV) ? IDM_LEXER_CSV : IDM_VIEW_SCHEME);
 				return TRUE;
 
 			case StatusItem_OvrMode:
