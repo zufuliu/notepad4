@@ -506,7 +506,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char buf[16]; // celldefine
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
@@ -515,11 +515,11 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = styler[i];
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		const char ch = styler[startPos++];
+		styleNext = styler.StyleAt(startPos);
 
 		switch (style) {
 		case SCE_V_COMMENTBLOCK:
@@ -565,7 +565,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			break;
 		}
 
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -582,7 +582,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

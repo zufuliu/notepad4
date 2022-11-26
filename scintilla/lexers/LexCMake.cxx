@@ -355,7 +355,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
@@ -364,10 +364,10 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		styleNext = styler.StyleAt(startPos + 1);
 
 		switch (style) {
 		case SCE_CMAKE_BLOCK_COMMENT:
@@ -380,7 +380,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			break;
 
 		case SCE_CMAKE_OPERATOR: {
-			const char ch = styler[i];
+			const char ch = styler[startPos];
 			if (ch == '(') {
 				levelNext++;
 			} else if (ch == ')') {
@@ -390,7 +390,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 		case SCE_CMAKE_WORD:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = UnsafeLower(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[startPos]);
 			}
 			if (styleNext != SCE_CMAKE_WORD) {
 				buf[wordLen] = '\0';
@@ -404,7 +404,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 			break;
 		}
 
-		if (i == lineEndPos) {
+		if (++startPos == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -421,7 +421,7 @@ void FoldCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

@@ -1490,19 +1490,19 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		chNext = styler[++startPos];
+		styleNext = styler.StyleAt(startPos);
 
 		switch (style) {
 		case SCE_PHP_COMMENTBLOCK:
@@ -1513,9 +1513,9 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 			const int level = (ch == '/' && chNext == '*') ? 1 : ((ch == '*' && chNext == '/') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
-				i++;
-				chNext = styler.SafeGetCharAt(i + 1);
-				styleNext = styler.StyleAt(i + 1);
+				startPos++;
+				chNext = styler[startPos];
+				styleNext = styler.StyleAt(startPos);
 			}
 		} break;
 
@@ -1583,7 +1583,7 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
@@ -1599,9 +1599,9 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				}
 				if (bracePos) {
 					levelNext++;
-					i = bracePos; // skip the brace
+					startPos = bracePos + 1; // skip the brace
 					style = (block == HtmlTextBlock::PHP) ? SCE_PHP_OPERATOR : js_style(SCE_JS_OPERATOR);
-					styleNext = styler.StyleAt(i + 1);
+					styleNext = styler.StyleAt(startPos);
 				}
 			}
 
@@ -1616,7 +1616,7 @@ void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

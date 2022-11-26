@@ -274,28 +274,28 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		chNext = styler[++startPos];
+		styleNext = styler.StyleAt(startPos);
 
 		switch (style) {
 		case SCE_AVS_COMMENTBLOCKN: {
 			const int level = (ch == '[' && chNext == '*') ? 1 : ((ch == '*' && chNext == ']') ? -1 : 0);
 			if (level != 0) {
 				levelNext += level;
-				i++;
-				chNext = styler.SafeGetCharAt(i + 1);
-				styleNext = styler.StyleAt(i + 1);
+				startPos++;
+				chNext = styler[startPos];
+				styleNext = styler.StyleAt(startPos);
 			}
 		} break;
 
@@ -320,7 +320,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -328,10 +328,10 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_AVS_OPERATOR, SCE_AVS_TASKMARKER);
 				if (bracePos) {
 					levelNext++;
-					i = bracePos; // skip the brace
+					startPos = bracePos + 1; // skip the brace
 					style = SCE_AVS_OPERATOR;
-					chNext = styler.SafeGetCharAt(i + 1);
-					styleNext = styler.StyleAt(i + 1);
+					chNext = styler[startPos];
+					styleNext = styler.StyleAt(startPos);
 				}
 			}
 
@@ -346,7 +346,7 @@ void FoldAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

@@ -357,13 +357,13 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int style = styler.StyleAt(i);
+	while (startPos < endPos) {
+		const int style = styler.StyleAt(startPos);
 
 		if (style == SCE_SIMPLE_OPERATOR) {
-			const char ch = styler[i];
+			const char ch = styler[startPos];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
@@ -371,7 +371,7 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 			}
 		}
 
-		if (i == lineEndPos) {
+		if (++startPos == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -388,7 +388,7 @@ void FoldSimpleDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSty
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

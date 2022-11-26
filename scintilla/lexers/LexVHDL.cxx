@@ -320,7 +320,7 @@ bool FindCodeFolding(LexAccessor &styler, CodeFolding folding, Sci_PositionU sta
 			ch = UnsafeLower(ch);
 			switch (folding) {
 			case CodeFolding::Is:
-				if (ch == 'i' && UnsafeLower(styler.SafeGetCharAt(startPos + 1)) == 's') {
+				if (ch == 'i' && UnsafeLower(styler[startPos + 1]) == 's') {
 					for (Sci_PositionU pos = startPos + 2; pos < endPos; pos++) {
 						const int styleNext = styler.StyleAt(pos);
 						if (!IsSpaceEquiv(styleNext)) {
@@ -369,7 +369,7 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char buf[16]; // configuration
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
@@ -378,11 +378,11 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = styler[i];
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		const char ch = styler[startPos++];
+		styleNext = styler.StyleAt(startPos);
 
 		switch (style) {
 		case SCE_VHDL_COMMENTBLOCK:
@@ -430,7 +430,7 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 						} else if (StrEqual(buf, "units")) {
 							folding = CodeFolding::Units;
 						}
-						if (folding == CodeFolding::Normal || FindCodeFolding(styler, folding, i + 1)) {
+						if (folding == CodeFolding::Normal || FindCodeFolding(styler, folding, startPos)) {
 							levelNext++;
 						}
 					}
@@ -439,7 +439,7 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			break;
 		}
 
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -456,7 +456,7 @@ void FoldVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

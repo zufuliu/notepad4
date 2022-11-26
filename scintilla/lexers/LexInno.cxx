@@ -479,7 +479,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int levelNext = levelCurrent;
 	int lineState = styler.GetLineState(lineCurrent);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char buf[12]; // interface
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
@@ -488,16 +488,16 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		styleNext = styler.StyleAt(++startPos);
 
 		switch (style) {
 		case SCE_INNO_PASCAL_KEYWORD:
 		case SCE_INNO_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = UnsafeLower(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[startPos - 1]);
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';
@@ -532,7 +532,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			break;
 		}
 
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const int lineStateNext = styler.GetLineState(lineCurrent + 1);
 			if (lineState & InnoLineStateSectionHeader) {
 				levelCurrent = SC_FOLDLEVELBASE;
@@ -559,7 +559,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineStatePrev = lineState;
 			lineState = lineStateNext;

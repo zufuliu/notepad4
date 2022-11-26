@@ -613,16 +613,16 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		styleNext = styler.StyleAt(++startPos);
 
 		switch (style) {
 		case SCE_GROOVY_COMMENTBLOCK:
@@ -646,7 +646,7 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_GROOVY_OPERATOR: {
-			const char ch = styler[i];
+			const char ch = styler[startPos - 1];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
@@ -658,7 +658,7 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
@@ -668,9 +668,9 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_GROOVY_OPERATOR, SCE_GROOVY_TASKMARKER);
 				if (bracePos) {
 					levelNext++;
-					i = bracePos; // skip the brace
+					startPos = bracePos + 1; // skip the brace
 					style = SCE_GROOVY_OPERATOR;
-					styleNext = styler.StyleAt(i + 1);
+					styleNext = styler.StyleAt(startPos);
 				}
 			}
 
@@ -685,7 +685,7 @@ void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

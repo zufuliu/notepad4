@@ -405,19 +405,19 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
 	int visibleChars = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		chNext = styler[++startPos];
+		styleNext = styler.StyleAt(startPos);
 
 		switch (style) {
 		case SCE_HAXE_COMMENTBLOCK:
@@ -456,9 +456,9 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		case SCE_HAXE_PREPROCESSOR:
 			if (ch == '#') {
-				if (chNext == 'i' && styler.SafeGetCharAt(i + 2) == 'f') {
+				if (chNext == 'i' && styler[startPos + 1] == 'f') {
 					levelNext++;
-				} else if (chNext == 'e' && styler.Match(i + 1, "end")) {
+				} else if (chNext == 'e' && styler.Match(startPos, "end")) {
 					levelNext--;
 				}
 			}
@@ -468,7 +468,7 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
@@ -478,10 +478,10 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_HAXE_OPERATOR, SCE_HAXE_TASKMARKER, SCE_HAXE_PREPROCESSOR);
 				if (bracePos) {
 					levelNext++;
-					i = bracePos; // skip the brace
+					startPos = bracePos + 1; // skip the brace
 					style = SCE_HAXE_OPERATOR;
-					chNext = styler.SafeGetCharAt(i + 1);
-					styleNext = styler.StyleAt(i + 1);
+					chNext = styler[startPos];
+					styleNext = styler.StyleAt(startPos);
 				}
 			}
 
@@ -496,7 +496,7 @@ void FoldHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

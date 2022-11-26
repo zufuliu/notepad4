@@ -216,7 +216,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int levelNext = levelCurrent;
 	int lineTypeCurrent = styler.GetLineState(lineCurrent) & NsisLineTypeMask;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
@@ -225,16 +225,16 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 	int wordLen = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		styleNext = styler.StyleAt(++startPos);
 
 		switch (style) {
 		case SCE_NSIS_WORD:
 		case SCE_NSIS_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = UnsafeLower(styler[i]);
+				buf[wordLen++] = UnsafeLower(styler[startPos - 1]);
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';
@@ -264,7 +264,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			break;
 		}
 
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const int lineTypeNext = styler.GetLineState(lineCurrent + 1) & NsisLineTypeMask;
 			if (lineTypeCurrent) {
 				levelNext += (lineTypeNext == lineTypeCurrent) - (lineTypePrev == lineTypeCurrent);
@@ -281,7 +281,7 @@ void FoldNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineTypePrev = lineTypeCurrent;
 			lineTypeCurrent = lineTypeNext;

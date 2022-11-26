@@ -64,11 +64,11 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					initStyle = SCE_CSV_COLUMN_0;
 				}
 			} else if (chPrevNonWhite == delimiter) {
-				if (ch == quoteChar || (ch == '=' && static_cast<uint8_t>(styler[startPos]) == quoteChar)) {
+				if (ch == quoteChar) {
 					quoted = true;
-					if (ch == '=') {
-						startPos++;
-					}
+				} else if (ch == '=' && static_cast<uint8_t>(styler[startPos]) == quoteChar) {
+					quoted = true;
+					startPos++;
 				}
 			}
 		}

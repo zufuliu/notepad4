@@ -254,16 +254,16 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
-	int styleNext = styler.StyleAt(startPos);
-	int style = initStyle;
 	int visibleChars = 0;
+	int style = initStyle;
+	int styleNext = styler.StyleAt(startPos);
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		styleNext = styler.StyleAt(++startPos);
 
 		switch (style) {
 		case SCE_JAM_COMMENTBLOCK:
@@ -275,7 +275,7 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 			break;
 
 		case SCE_JAM_OPERATOR: {
-			const char ch = styler[i];
+			const char ch = styler[startPos - 1];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
@@ -287,7 +287,7 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (i == lineEndPos) {
+		if (startPos == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
@@ -297,9 +297,9 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_JAM_OPERATOR, SCE_JAM_TASKMARKER);
 				if (bracePos) {
 					levelNext++;
-					i = bracePos; // skip the brace
+					startPos = bracePos + 1; // skip the brace
 					style = SCE_JAM_OPERATOR;
-					styleNext = styler.StyleAt(i + 1);
+					styleNext = styler.StyleAt(startPos);
 				}
 			}
 
@@ -314,7 +314,7 @@ void FoldJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

@@ -417,11 +417,11 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 	int levelNext = levelCurrent;
 	int lineTypeCurrent = styler.GetLineState(lineCurrent) & RebolLineTypeMask;
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const int style = styler.StyleAt(i);
-		const char ch = styler[i];
+	while (startPos < endPos) {
+		const int style = styler.StyleAt(startPos);
+		const char ch = styler[startPos];
 
 		switch (style) {
 		case SCE_REBOL_OPERATOR:
@@ -443,7 +443,7 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 			break;
 		}
 
-		if (i == lineEndPos) {
+		if (++startPos == lineEndPos) {
 			const int lineTypeNext = styler.GetLineState(lineCurrent + 1) & RebolLineTypeMask;
 			if (lineTypeCurrent) {
 				levelNext += (lineTypeNext == lineTypeCurrent) - (lineTypePrev == lineTypeCurrent);
@@ -460,7 +460,7 @@ void FoldRebolDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineTypePrev = lineTypeCurrent;
 			lineTypeCurrent = lineTypeNext;

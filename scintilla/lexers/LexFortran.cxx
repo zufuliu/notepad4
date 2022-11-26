@@ -347,31 +347,31 @@ void FoldFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSt
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	int style = SCE_F_DEFAULT;
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
-		style = styler.StyleAt(i);
+		style = styler.StyleAt(startPos);
 
 		if (style == SCE_F_FOLDING_WORD && stylePrev != SCE_F_FOLDING_WORD) {
 			levelNext++;
-			char ch = styler[i++];
+			char ch = styler[startPos++];
 			if (AnyOf<'C', 'E', 'c', 'e'>(ch)) {
 				char buf[10] = {UnsafeLower(ch)}; // continue
 				constexpr int MaxFoldWordLength = sizeof(buf) - 1;
 				int wordLen = 1;
 				while (wordLen < MaxFoldWordLength) {
-					ch = styler[i];
+					ch = styler[startPos];
 					if (!IsAlpha(ch)) {
 						break;
 					}
 					buf[wordLen] = UnsafeLower(ch);
-					i++;
+					startPos++;
 					wordLen++;
 				}
 
-				i--;
+				startPos--;
 				buf[wordLen] = '\0';
 				if (StrStartsWith(buf, "end") || StrEqual(buf, "continue")) {
 					levelNext -= 2;
@@ -379,7 +379,7 @@ void FoldFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSt
 			}
 		}
 
-		if (i == lineEndPos) {
+		if (++startPos == lineEndPos) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -396,7 +396,7 @@ void FoldFortranDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initSt
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

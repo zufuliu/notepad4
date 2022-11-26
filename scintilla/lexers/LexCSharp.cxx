@@ -825,7 +825,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos) - 1;
+	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
 	char buf[12]; // endregion
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
@@ -835,10 +835,10 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 	int style = initStyle;
 	int visibleChars = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
+		styleNext = styler.StyleAt(startPos + 1);
 
 		switch (style) {
 		case SCE_CSHARP_COMMENTBLOCK:
@@ -862,7 +862,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_CSHARP_OPERATOR: {
-			const char ch = styler[i];
+			const char ch = styler[startPos];
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {
@@ -872,7 +872,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 		case SCE_CSHARP_PREPROCESSOR:
 			if (wordLen < MaxFoldWordLength) {
-				buf[wordLen++] = styler[i];
+				buf[wordLen++] = styler[startPos];
 			}
 			if (styleNext != style) {
 				buf[wordLen] = '\0';
@@ -893,7 +893,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (i == lineEndPos) {
+		if (++startPos == lineEndPos) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
@@ -903,9 +903,9 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				const Sci_PositionU bracePos = CheckBraceOnNextLine(styler, lineCurrent, SCE_CSHARP_OPERATOR, SCE_CSHARP_TASKMARKER, SCE_CSHARP_PREPROCESSOR);
 				if (bracePos) {
 					levelNext++;
-					i = bracePos; // skip the brace
+					startPos = bracePos + 1; // skip the brace
 					style = SCE_CSHARP_OPERATOR;
-					styleNext = styler.StyleAt(i + 1);
+					styleNext = styler.StyleAt(startPos);
 				}
 			}
 
@@ -920,7 +920,7 @@ void FoldCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos) - 1;
+			lineEndPos = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;
