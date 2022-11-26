@@ -2941,7 +2941,7 @@ void Style_SetLexerByLangIndex(int lang) {
 	}
 	if (pLex != NULL) {
 		if (bLexerChanged || pLex != pLexCurrent || langIndex != np2LexLangIndex) {
-			Style_SetLexer(pLex, true);
+			Style_SetLexer(pLex, (pLex != pLexCurrent) + true);
 		}
 	}
 }
@@ -5228,12 +5228,11 @@ void Style_SelectLexerDlg(HWND hwnd, bool favorite) {
 	const LPCEDITLEXER pLex = pLexCurrent;
 	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
-		const bool bLexerChanged = !favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex);
-		if (bLexerChanged) {
+		if (!favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex)) {
 			if (pLexCurrent->rid == NP2LEX_CSV) {
 				SelectCSVOptionsDlg();
 			}
-			Style_SetLexer(pLexCurrent, LexerChanged_Override);
+			Style_SetLexer(pLexCurrent, (pLex != pLexCurrent) + true);
 		}
 	} else {
 		if (favorite) {
