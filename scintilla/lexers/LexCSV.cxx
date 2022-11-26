@@ -23,8 +23,9 @@ using namespace Lexilla;
 namespace {
 
 void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
-	constexpr uint8_t delimiter = ',';
-	constexpr uint8_t quoteChar = '\"';
+	const char * const option = styler.GetProperty("lexer.lang");
+	const uint8_t delimiter = option[0];
+	const uint8_t quoteChar = option[1];
 
 	bool quoted = false;
 	initStyle = SCE_CSV_COLUMN_0;

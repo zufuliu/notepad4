@@ -23,6 +23,10 @@ using namespace Lexilla;
 Accessor::Accessor(Scintilla::IDocument *pAccess_, const PropSetSimple &props_) noexcept : LexAccessor(pAccess_), props(props_) {
 }
 
+const char *Accessor::GetProperty(const char *key, size_t keyLen) const {
+	return props.Get(std::string_view(key, keyLen));
+}
+
 int Accessor::GetPropertyInt(const char *key, size_t keyLen, int defaultValue) const {
 	return props.GetInt(key, keyLen, defaultValue);
 }

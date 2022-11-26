@@ -4674,6 +4674,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	// Text File
 	case IDM_LEXER_TEXTFILE:
 	case IDM_LEXER_2NDTEXTFILE:
+	case IDM_LEXER_CSV:
 	case IDM_LEXER_APACHE:
 	// Web Source Code
 	case IDM_LEXER_WEB:
