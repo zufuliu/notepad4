@@ -308,10 +308,10 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 		if (ch & 0x80) {
 			styler.GetCharacterAndWidth(pos, &width);
 		}
-		const char chNext = styler.SafeGetCharAt(pos + width);
+		const char chNext = styler[pos + width];
 		if (AnyOf(ch, '<', '>', '=', '^') || AnyOf(chNext, '<', '>', '=', '^')) {
 			pos += 1 + width;
-			ch = styler.SafeGetCharAt(pos);
+			ch = styler[pos];
 		}
 	}
 	// [sign][z][#]

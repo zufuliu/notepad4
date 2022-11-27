@@ -668,7 +668,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						} else if (sc.chNext == '$') {
 							interpolatorCount = GetMatchedDelimiterCount(styler, pos + 1, '$') + 1;
 							pos += interpolatorCount;
-							chNext = static_cast<uint8_t>(styler.SafeGetCharAt(pos));
+							chNext = static_cast<uint8_t>(styler[pos]);
 						}
 					}
 					if (chNext == '\"') {

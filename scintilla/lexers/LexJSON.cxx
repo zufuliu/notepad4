@@ -35,6 +35,25 @@ enum {
 	JsonMask_Identifier = 1 << 4,
 };
 
+bool IsJsonProperty(LexAccessor &styler, Sci_PositionU startPos, uint8_t chNext) noexcept {
+	if (chNext == ':') {
+		return true;
+	}
+	if (chNext <= ' ') {
+		const Sci_PositionU endPos = styler.Length();
+		while (startPos < endPos) {
+			chNext = styler[++startPos];
+			if (chNext == ':') {
+				return true;
+			}
+			if (chNext > ' ') {
+				break;
+			}
+		}
+	}
+	return false;
+}
+
 void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	const bool fold = styler.GetPropertyBool("fold");
 
@@ -106,7 +125,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				buf[wordLen] = '\0';
 				if (keywordLists[0].InList(buf)) {
 					styler.ColorTo(currentPos, SCE_JSON_KEYWORD);
-				} else if (ch == ':' || chNext == ':' || LexGetNextChar(styler, startPos) == ':') {
+				} else if (ch == ':' || (ch <= ' ' && IsJsonProperty(styler, startPos, chNext))) {
 					styler.ColorTo(currentPos, SCE_JSON_PROPERTYNAME);
 				}
 				state = SCE_JSON_DEFAULT;
@@ -119,7 +138,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_JSON_IDENTIFIER:
 			if (!(kJsonCharClass[ch] & JsonMask_Identifier)) {
-				if (ch == ':' || chNext == ':' || LexGetNextChar(styler, startPos) == ':') {
+				if (ch == ':' || (ch <= ' ' && IsJsonProperty(styler, startPos, chNext))) {
 					styler.ColorTo(currentPos, SCE_JSON_PROPERTYNAME);
 				}
 				state = SCE_JSON_DEFAULT;
@@ -160,11 +179,10 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					continue;
 				}
 			} else if ((state == SCE_JSON_STRING_DQ && ch == '\"') || (state == SCE_JSON_STRING_SQ && ch == '\'')) {
-				if (chNext == ':' || LexGetNextChar(styler, startPos) == ':') {
-					styler.ColorTo(startPos, SCE_JSON_PROPERTYNAME);
-				} else {
-					styler.ColorTo(startPos, state);
+				if (chNext == ':' || IsJsonProperty(styler, startPos, chNext)) {
+					state = SCE_JSON_PROPERTYNAME;
 				}
+				styler.ColorTo(startPos, state);
 				state = SCE_JSON_DEFAULT;
 				continue;
 			}

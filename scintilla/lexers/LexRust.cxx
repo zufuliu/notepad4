@@ -106,10 +106,10 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) n
 		if (ch & 0x80) {
 			styler.GetCharacterAndWidth(pos, &width);
 		}
-		const char chNext = styler.SafeGetCharAt(pos + width);
+		const char chNext = styler[pos + width];
 		if (AnyOf(ch, '<', '^', '>') || AnyOf(chNext, '<', '^', '>')) {
 			pos += 1 + width;
-			ch = styler.SafeGetCharAt(pos);
+			ch = styler[pos];
 		}
 	}
 	// [sign]['#']['0']
