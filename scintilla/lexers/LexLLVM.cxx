@@ -66,10 +66,10 @@ bool IsLLVMTypeVar(LexAccessor &styler, Sci_Position pos) noexcept {
 		++pos;
 	}
 	++pos;
-	while (isspacechar(styler.SafeGetCharAt(pos))) {
+	while (isspacechar(styler[pos])) {
 		++pos;
 	}
-	return styler.Match(pos, "type") && isspacechar(styler.SafeGetCharAt(pos + 4));
+	return styler.Match(pos, "type") && isspacechar(styler[pos + 4]);
 }
 
 int CheckLLVMVarType(StyleContext &sc, KeywordType kwType) noexcept {

@@ -135,31 +135,31 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, b
 	if (sc.chNext == '<') {
 		++pos;
 	}
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '$' && IsADigit(sc.chNext)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [flags]
 	while (AnyOf(ch, ' ', '+', '-', '#', '0', '(', ',')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [width]
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [.precision]
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// conversion
 	if (ch == 't' || ch == 'T') {
-		const char chNext = styler.SafeGetCharAt(pos + 1);
+		const char chNext = styler[pos + 1];
 		if (IsDateTimeFormatSpecifier(chNext)) {
 			return pos - sc.currentPos + 2;
 		}

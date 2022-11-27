@@ -165,35 +165,35 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// index
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == ':') {
 		// Flags
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (AnyOf(ch, '-', '+', '0', ' ', '#')) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		// Width
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		// .Precision
 		if (ch == '.') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 		// ULT
 		if (AnyOf(ch, 'U', 'L', 'T', 'l', 't')) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		// Type
 		if (IsFormatSpecifier(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	if (ch == '}') {

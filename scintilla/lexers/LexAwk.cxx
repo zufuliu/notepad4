@@ -121,7 +121,7 @@ constexpr bool IsTimeFormatSpecifier(int ch, char chNext) noexcept {
 		|| (ch == 'O' && AnyOf(chNext, 'd', 'e', 'H', 'I', 'm', 'M', 'S', 'u', 'U', 'V', 'w', 'W', 'y'));
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -139,41 +139,41 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 
 	Sci_PositionU pos = sc.currentPos + 1;
 	if (sc.chNext == 'E' || sc.chNext == 'O') {
-		const char ch = styler.SafeGetCharAt(pos + 2);
+		const char ch = styler[pos + 2];
 		if (IsTimeFormatSpecifier(sc.chNext, ch)) {
 			return 3;
 		}
 	}
 
 	// https://www.gnu.org/software/gawk/manual/html_node/Format-Modifiers.html
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// positional specifier
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '$') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// modifiers
 	while (AnyOf(ch, ' ', '+', '-', '#', '0', '\'')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// width
 	if (ch == '*') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	} else {
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// .precision
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 	}

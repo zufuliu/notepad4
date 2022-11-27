@@ -59,10 +59,10 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 		} else {
 			if (ch == delimiter) {
-				chPrevNonWhite = delimiter;
+				chPrevNonWhite = ch;
 				styler.ColorTo(startPos - 1, initStyle);
 				styler.ColorTo(startPos, SCE_CSV_DELIMITER);
-				if (!mergeDelimiter || chPrev != delimiter) {
+				if (!mergeDelimiter || ch != chPrev) {
 					++initStyle;
 					if (initStyle == SCE_CSV_DELIMITER) {
 						initStyle = SCE_CSV_COLUMN_0;

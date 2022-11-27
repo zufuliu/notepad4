@@ -155,28 +155,28 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 // https://docs.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting
 constexpr bool IsInvalidFormatSpecifier(int ch) noexcept {
 	// Custom format strings allows any characters
-	return AnyOf(ch, '\r', '\n', '\"', '}', '{');
+	return (ch >= '\0' && ch < ' ') || ch == '\"' || ch == '}' || ch == '{';
 }
 
 inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
 	Sci_PositionU pos = sc.currentPos;
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// [,alignment]
 	if (ch == ',') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		if (ch == '-') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// [:formatString]
 	if (ch == ':') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		const Sci_PositionU endPos = pos + 32;
 		while (pos < endPos && !IsInvalidFormatSpecifier(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	if (ch == '}') {

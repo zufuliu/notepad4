@@ -103,7 +103,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 }
 
 // https://search.r-project.org/R/refmans/base/html/sprintf.html
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -118,33 +118,33 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 
 	// similar to LexAwk
 	Sci_PositionU pos = sc.currentPos + 1;
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// argument
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '$') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// flags
 	while (AnyOf(ch, '-', '+', ' ', '#', '0')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	for (int i = 0; i < 2; i++) {
 		// width
 		const bool argument = ch == '*';
 		if (argument) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (argument && ch == '$') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		// precision
 		if (i == 0 && ch == '.') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			break;
 		}

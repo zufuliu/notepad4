@@ -163,7 +163,7 @@ inline uint8_t GetCharAfterSpace(LexAccessor &styler, Sci_PositionU &startPos, i
 	uint8_t ch = styler.SafeGetCharAt(pos);
 	while (ch == ' ' && count != 0) {
 		--count;
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	startPos = pos;
 	return ch;
@@ -173,7 +173,7 @@ inline uint8_t GetCharAfterDelimiter(LexAccessor &styler, Sci_PositionU &startPo
 	Sci_PositionU pos = startPos;
 	uint8_t ch;
 	do {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	} while (ch == delimiter);
 	startPos = pos;
 	return ch;
@@ -349,7 +349,7 @@ struct MarkdownLexer {
 bool CheckThematicBreak(LexAccessor &styler, Sci_PositionU pos, int delimiter) noexcept {
 	int count = 1;
 	while (true) {
-		const uint8_t ch = styler.SafeGetCharAt(++pos);
+		const uint8_t ch = styler[++pos];
 		if (ch == delimiter) {
 			++count;
 		} else if (!IsSpaceOrTab(ch)) {
@@ -366,7 +366,7 @@ bool CheckThematicBreak(LexAccessor &styler, Sci_PositionU pos, int delimiter) n
 int CheckATXHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 	int level = 1;
 	while (true) {
-		const uint8_t ch = styler.SafeGetCharAt(++pos);
+		const uint8_t ch = styler[++pos];
 		if (ch == '#') {
 			++level;
 		} else {
@@ -385,10 +385,10 @@ int CheckSetextHeading(LexAccessor &styler, Sci_PositionU pos) noexcept {
 	if (marker == '=' || marker == '-') {
 		uint8_t ch;
 		do {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} while (ch == marker);
 		while (IsSpaceOrTab(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (IsEOLChar(ch)) {
 			return (marker == '=') ? 1 : 2;
@@ -431,7 +431,7 @@ void MarkdownLexer::HighlightDelimiterRow() {
 	bool equal = false;
 	Sci_PositionU pos = sc.currentPos;
 	while (pos < sc.lineStartNext) {
-		const uint8_t ch = sc.styler.SafeGetCharAt(pos++);
+		const uint8_t ch = sc.styler[pos++];
 		switch (ch) {
 		case '|':
 			pipe = true;
@@ -480,7 +480,7 @@ void MarkdownLexer::HighlightDelimiterRow() {
 OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int current, int chNext) noexcept {
 	if (current == '#') { // Pandoc
 		if (chNext == '.') {
-			const uint8_t after = styler.SafeGetCharAt(pos + 2);
+			const uint8_t after = styler[pos + 2];
 			if (IsMarkdownSpace(after)) {
 				return OrderedListType::NumberSign;
 			}
@@ -492,7 +492,7 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 	if (marker == '(') { // Pandoc
 		marker = chNext;
 		++pos;
-		chNext = static_cast<uint8_t>(styler.SafeGetCharAt(pos + 1));
+		chNext = static_cast<uint8_t>(styler[pos + 1]);
 	}
 
 	// only support (1) single uppercase or lowercase letter.
@@ -524,7 +524,7 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 	++pos; // move to chNext
 	if (count == 2) {
 		while (true) {
-			chNext = static_cast<uint8_t>(styler.SafeGetCharAt(++pos));
+			chNext = static_cast<uint8_t>(styler[++pos]);
 			const bool handled = (type == OrderedListType::Decimal) ? IsADigit(chNext)
 				: ((type == OrderedListType::LowerRoman) ? IsLowerRoman(chNext) : IsUpperRoman(chNext));
 			if (handled) {
@@ -539,12 +539,12 @@ OrderedListType CheckOrderedList(LexAccessor &styler, Sci_PositionU pos, int cur
 	}
 
 	if ((chNext == '.' && current != '(') || chNext == ')') {
-		const uint8_t after = styler.SafeGetCharAt(++pos);
+		const uint8_t after = styler[++pos];
 		if (IsMarkdownSpace(after)) {
 			if (type == OrderedListType::UpperAlpha && chNext == '.' && count == 1) {
 				// single uppercase letter ended with period requires at least two spaces.
 				// see https://pandoc.org/MANUAL.html#fn1
-				if (!(IsSpaceOrTab(after) && IsMarkdownSpace(styler.SafeGetCharAt(pos + 1)))) {
+				if (!(IsSpaceOrTab(after) && IsMarkdownSpace(styler[pos + 1]))) {
 					return OrderedListType::None;
 				}
 			}
@@ -637,7 +637,7 @@ bool MarkdownLexer::IsIndentedBlockEnd() const noexcept {
 	Sci_PositionU pos = sc.lineStartNext;
 	const Sci_PositionU endPos = sc.styler.Length();
 	while (true) {
-		const uint8_t ch = sc.styler.SafeGetCharAt(pos++);
+		const uint8_t ch = sc.styler[pos++];
 		if (ch == ' ') {
 			++indentCount;
 		} else if (ch == '\t') {
@@ -666,7 +666,7 @@ int MarkdownLexer::GetListChildIndentCount(int indentCurrent) const noexcept {
 	} else if (sc.ch == ' ') {
 		int count = 1;
 		while (count < 4) {
-			const uint8_t ch = sc.styler.SafeGetCharAt(++pos);
+			const uint8_t ch = sc.styler[++pos];
 			if (ch != ' ') {
 				break;
 			}
@@ -1079,17 +1079,17 @@ bool MarkdownLexer::DetectAutoLink() {
 	switch (sc.ch) {
 	case 'w':
 		if (sc.chNext == 'w' && !IsIdentifierChar(sc.chPrev)
-			&& sc.styler.SafeGetCharAt(pos + 2) == 'w'
-			&& sc.styler.SafeGetCharAt(pos + 3) == '.'
-			&& IsDomainNameChar(sc.styler.SafeGetCharAt(pos + 4))) {
+			&& sc.styler[pos + 2] == 'w'
+			&& sc.styler[pos + 3] == '.'
+			&& IsDomainNameChar(sc.styler[pos + 4])) {
 			offset = 3;
 			result = AutoLink::Domain;
 		}
 		break;
 
 	case ':':
-		if (sc.chNext == '/' && pos >= 2 && IsSchemeNameChar(sc.chPrev) && sc.styler.SafeGetCharAt(pos + 2) == '/'
-			&& !IsInvalidUrlChar(sc.styler.SafeGetCharAt(pos + 3))) {
+		if (sc.chNext == '/' && pos >= 2 && IsSchemeNameChar(sc.chPrev) && sc.styler[pos + 2] == '/'
+			&& !IsInvalidUrlChar(sc.styler[pos + 3])) {
 			// backtrack to find scheme name before `://`, this is more efficient than forward check every word
 			constexpr int kMinSchemeNameLength = 2;
 			constexpr int kMaxSchemeNameLength = 32;
@@ -1111,7 +1111,7 @@ bool MarkdownLexer::DetectAutoLink() {
 			uint8_t chPrev = '\0';
 			while (pos < endPos && !IsAlpha(ch)) {
 				chPrev = ch;
-				ch = sc.styler.SafeGetCharAt(++pos);
+				ch = sc.styler[++pos];
 			}
 
 			offset = static_cast<int>(endPos - pos);
@@ -1275,7 +1275,7 @@ HtmlTagType MarkdownLexer::CheckHtmlBlockTag(Sci_PositionU pos, Sci_PositionU en
 			while (true) {
 				ch = sc.styler.SafeGetCharAt(pos++);
 				if (!IsHtmlTagChar(ch)) {
-					complete = (ch == '>') || (chNext != '/' && (IsASpace(ch) || (ch == '/' && sc.styler.SafeGetCharAt(pos) == '>')));
+					complete = (ch == '>') || (chNext != '/' && (IsASpace(ch) || (ch == '/' && sc.styler[pos] == '>')));
 					break;
 				}
 			}
@@ -1393,7 +1393,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 		} else {
 			indentCount -= 4;
 		}
-		ch = sc.styler.SafeGetCharAt(++pos);
+		ch = sc.styler[++pos];
 	}
 
 	const uint8_t chNext = sc.styler.SafeGetCharAt(pos + 1);
@@ -1411,7 +1411,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 		}
 		// TODO: check indented code block
 		while (IsSpaceOrTab(ch)) {
-			ch = sc.styler.SafeGetCharAt(++pos);
+			ch = sc.styler[++pos];
 		}
 		return IsEOLChar(ch); // empty line
 	}
@@ -1436,10 +1436,10 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 			return true;
 		}
 		if (chNext == '!') {
-			ch = sc.styler.SafeGetCharAt(pos + 2);
+			ch = sc.styler[pos + 2];
 			switch (ch) {
 			case '-':
-				return sc.styler.SafeGetCharAt(pos + 3) == '-';
+				return sc.styler[pos + 3] == '-';
 			case '[':
 				return sc.styler.Match(pos + 3, "CDATA[");
 			default:
@@ -1466,7 +1466,7 @@ bool MarkdownLexer::IsParagraphEnd(Sci_PositionU pos, uint32_t lineState) const 
 	case '~': // definition list
 	case ':': // definition list
 		if (ch != ':' && ch == chNext) { // fenced code block
-			return static_cast<uint8_t>(sc.styler.SafeGetCharAt(pos + 2)) == chNext;
+			return static_cast<uint8_t>(sc.styler[pos + 2]) == chNext;
 		}
 		return markdown == Markdown::Pandoc && ch != '`' && IsSpaceOrTab(chNext) && CheckDefinitionList(pos, lineState);
 

@@ -157,7 +157,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 }
 
 // https://dlang.org/phobos/std_format.html
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%' || sc.chNext == '(' || sc.chNext == '|' || sc.chNext == ')') {
 		return 2;
 	}
@@ -172,53 +172,53 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 
 	Sci_PositionU pos = sc.currentPos + 1;
 	// compound indicator
-	if (sc.chNext == '-' && styler.SafeGetCharAt(pos + 1) == '(') {
+	if (sc.chNext == '-' && styler[pos + 1] == '(') {
 		return 3;
 	}
 	// Parameters
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// Position
 	if (IsADigit(ch)) {
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (ch == ':') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 		if (ch == '$') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// Flags
 	while (AnyOf(ch, '-', '+', ' ', '0', '#', '=')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// Width
 	for (int i = 0; i < 2; i++) {
 		// OptionalPositionalInteger
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (ch == '$') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		// Precision
 		if (i == 0) {
 			if (ch == '.') {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			} else {
 				break;
 			}
@@ -227,16 +227,16 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	// Separator
 	if (ch == ',') {
 		// OptionalInteger
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 		if (ch == '?') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// FormatIndicator
