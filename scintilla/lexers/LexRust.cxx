@@ -45,7 +45,7 @@ struct EscapeSequence {
 bool IsRustRawString(LexAccessor &styler, Sci_PositionU pos, bool start, int &hashCount) noexcept {
 	int count = 0;
 	char ch;
-	while ((ch = styler.SafeGetCharAt(pos)) == '#') {
+	while ((ch = styler[pos]) == '#') {
 		++count;
 		++pos;
 	}
@@ -114,32 +114,32 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) n
 	}
 	// [sign]['#']['0']
 	if (ch == '+' || ch == '-') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '#') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '0') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [width]['.' precision]type
 	for (int i = 0; i < 3; i++) {
 		if (i < 2 && ch == '.') {
 			i = 1;
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 			if (ch == '*') {
 				i = 2;
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 		while (IsIdentifierCharEx(static_cast<uint8_t>(ch))) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (i < 2 && ch == '$') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (ch == '?') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 			break;
 		}
 	}

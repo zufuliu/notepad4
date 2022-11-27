@@ -61,8 +61,10 @@ public:
 		encodingType(EncodingTypeForCodePage(pAccess->CodePage())),
 		lenDoc(pAccess->Length()) {
 		// Prevent warnings by static analyzers about uninitialized buf and styleBuf.
-		buf[0] = 0;
-		styleBuf[0] = 0;
+		// zero unused padding to prevent potential out of bounds bug.
+		memset(buf, 0, 4);
+		memset(buf + bufferSize, 0, 4);
+		memset(styleBuf, 0, 4);
 	}
 	char operator[](Sci_Position position) noexcept {
 		if (position < startPos || position >= endPos) {

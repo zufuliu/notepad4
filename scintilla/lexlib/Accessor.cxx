@@ -6,6 +6,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <cassert>
+#include <cstring>
 
 #include <string>
 #include <string_view>

@@ -107,7 +107,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 
 // https://docs.julialang.org/en/v1/stdlib/Printf/#Printf.@sprintf
 // https://en.cppreference.com/w/c/io/fprintf
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -121,27 +121,27 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// flags
 	while (AnyOf(ch, '-', '+', ' ', '#', '0')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// width
 	if (ch == '*') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	} else {
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// precision
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 	}

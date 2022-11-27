@@ -208,15 +208,15 @@ Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// 2. (optional) Mapping key
 	if (ch == '(') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (!IsInvalidMappingKey(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (ch == ')') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 			keyLen = pos - sc.currentPos;
 		} else {
 			return 0;
@@ -224,30 +224,30 @@ Sci_Position CheckPercentFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	}
 	// 3. (optional) Conversion flags
 	while (AnyOf(ch, '#', '0', '-', ' ', '+')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// 4. (optional) Minimum field width
 	if (ch == '*') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	} else {
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// 5. (optional) Precision
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 	}
 	// 6. (optional) Length modifier
 	if (ch == 'h' || ch == 'l' || ch == 'L') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// 7. Conversion type
 	if (IsPercentFormatSpecifier(ch)) {
@@ -290,14 +290,14 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 		pos += 2;
 	}
 	// [":" format_spec]
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	if (ch != ':') {
 		return pos - sc.currentPos;
 	}
 
-	ch = styler.SafeGetCharAt(++pos);
+	ch = styler[++pos];
 	if (ch == '%') {
-		const char chNext = styler.SafeGetCharAt(pos + 1);
+		const char chNext = styler[pos + 1];
 		if (IsDateTimeFormatSpecifier(chNext)) {
 			return pos + 2 - sc.currentPos;
 		}
@@ -316,27 +316,27 @@ Sci_Position CheckBraceFormatSpecifier(const StyleContext &sc, LexAccessor &styl
 	}
 	// [sign][z][#]
 	if (ch == '+' || ch == '-' || ch == ' ') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == 'z') { // PEP 682
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '#') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [0][width]
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [grouping_option]
 	if (ch == '_' || ch == ',') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// [.precision]
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// [type]

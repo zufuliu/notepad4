@@ -109,7 +109,7 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 					'x', 'X');
 }
 
-inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
+Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, bool insideUrl) noexcept {
 	if (sc.chNext == '%') {
 		return 2;
 	}
@@ -124,58 +124,58 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 
 	Sci_PositionU pos = sc.currentPos + 1;
 	// flags
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	while (AnyOf(ch, ' ', '+', '-', '#', '0')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// argument index
 	if (ch == '[') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (ch == ']') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			return 0;
 		}
 	}
 	// width
 	if (ch == '*') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	} else if (ch == '[') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 		if (ch == ']') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else {
 			return 0;
 		}
 	} else {
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// precision
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		if (ch == '*') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		} else if (ch == '[') {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 			if (ch == ']') {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			} else {
 				return 0;
 			}
 		} else {
 			while (IsADigit(ch)) {
-				ch = styler.SafeGetCharAt(++pos);
+				ch = styler[++pos];
 			}
 		}
 	}

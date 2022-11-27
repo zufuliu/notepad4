@@ -88,7 +88,7 @@ DelimiterResult CheckSwiftStringDelimiter(LexAccessor &styler, Sci_PositionU pos
 	++pos; // first '#'
 	int count = 1;
 	char ch;
-	while ((ch = styler.SafeGetCharAt(pos)) == '#') {
+	while ((ch = styler[pos]) == '#') {
 		++count;
 		++pos;
 	}

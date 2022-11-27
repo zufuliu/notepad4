@@ -491,40 +491,40 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 	}
 
 	Sci_PositionU pos = sc.currentPos + 1;
-	char ch = styler.SafeGetCharAt(pos);
+	char ch = styler[pos];
 	// argnum$
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '$') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// flags
 	while (AnyOf(ch, ' ', '+', '-', '0')) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	if (ch == '\'') {
 		if (sc.state == SCE_PHP_STRING_SQ) {
 			return 0;
 		}
-		ch = styler.SafeGetCharAt(++pos); // pad character
+		ch = styler[++pos]; // pad character
 		if (static_cast<signed char>(ch) < ' ' || (ch == '\"' && sc.state == SCE_PHP_STRING_DQ)) {
 			return 0;
 		}
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (AnyOf(ch, ' ', '+', '-', '0')) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// width
 	while (IsADigit(ch)) {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 	}
 	// .precision
 	if (ch == '.') {
-		ch = styler.SafeGetCharAt(++pos);
+		ch = styler[++pos];
 		while (IsADigit(ch)) {
-			ch = styler.SafeGetCharAt(++pos);
+			ch = styler[++pos];
 		}
 	}
 	// specifier

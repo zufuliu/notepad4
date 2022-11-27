@@ -69,7 +69,7 @@ bool IsBracketArgument(LexAccessor &styler, Sci_PositionU pos, bool start, int &
 	int offset = 0;
 	char ch;
 	++pos; // bracket
-	while ((ch = styler.SafeGetCharAt(pos)) == '=') {
+	while ((ch = styler[pos]) == '=') {
 		++offset;
 		++pos;
 	}

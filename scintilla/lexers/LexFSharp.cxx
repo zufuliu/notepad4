@@ -3,6 +3,7 @@
 //! Lexer for F#
 
 #include <cassert>
+#include <cstring>
 
 #include <string>
 #include <string_view>
