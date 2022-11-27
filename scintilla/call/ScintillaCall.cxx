@@ -1346,6 +1346,10 @@ Position ScintillaCall::ReplaceTargetRE(Position length, const char *text) {
 	return CallString(Message::ReplaceTargetRE, length, text);
 }
 
+Position ScintillaCall::ReplaceTargetMinimal(Position length, const char *text) {
+	return CallString(Message::ReplaceTargetMinimal, length, text);
+}
+
 Position ScintillaCall::SearchInTarget(Position length, const char *text) {
 	return CallString(Message::SearchInTarget, length, text);
 }

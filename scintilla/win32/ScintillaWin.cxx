@@ -770,17 +770,9 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 		renderTargetValid = true;
 	}
 	if (!pRenderTarget) {
-		HWND hw = MainHWND();
-		RECT rc;
-		::GetClientRect(hw, &rc);
-
-		const D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
-
 		// Create a Direct2D render target.
 		D2D1_RENDER_TARGET_PROPERTIES drtp {};
 		drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
-		drtp.pixelFormat.format = DXGI_FORMAT_UNKNOWN;
-		drtp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_UNKNOWN;
 		drtp.dpiX = 96.0;
 		drtp.dpiY = 96.0;
 		drtp.usage = D2D1_RENDER_TARGET_USAGE_NONE;
@@ -788,8 +780,7 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 
 		if (technology == Technology::DirectWriteDC) {
 			// Explicit pixel format needed.
-			drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM,
-				D2D1_ALPHA_MODE_IGNORE);
+			drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE);
 
 			ID2D1DCRenderTarget *pDCRT = nullptr;
 			const HRESULT hr = pD2DFactory->CreateDCRenderTarget(&drtp, &pDCRT);
@@ -802,11 +793,15 @@ void ScintillaWin::EnsureRenderTarget(HDC hdc) noexcept {
 				//Platform::DebugPrintf("Failed CreateDCRenderTarget 0x%lx\n", hr);
 				pRenderTarget = nullptr;
 			}
-
 		} else {
+			drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_UNKNOWN);
+
+			HWND hw = MainHWND();
+			RECT rc;
+			::GetClientRect(hw, &rc);
 			D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp {};
 			dhrtp.hwnd = hw;
-			dhrtp.pixelSize = size;
+			dhrtp.pixelSize = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
 			dhrtp.presentOptions = (technology == Technology::DirectWriteRetain) ?
 				D2D1_PRESENT_OPTIONS_RETAIN_CONTENTS : D2D1_PRESENT_OPTIONS_NONE;
 
@@ -1431,7 +1426,7 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 
 	targetRange.start.SetPosition(pos);
 	targetRange.end.SetPosition(main);
-	ReplaceTarget(false, buffer, len);
+	ReplaceTarget(ReplaceType::basic, std::string_view(buffer, len));
 	// move caret after character
 	SetEmptySelection(pos + len);
 	return true;
@@ -4045,11 +4040,11 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 				::BeginPaint(hWnd, &ps);
 				const std::unique_ptr<Surface> surfaceWindow(Surface::Allocate(sciThis->technology));
 				ID2D1HwndRenderTarget *pCTRenderTarget = nullptr;
-				RECT rc;
-				GetClientRect(hWnd, &rc);
 				if (sciThis->technology == Technology::Default) {
 					surfaceWindow->Init(ps.hdc, hWnd);
 				} else {
+					RECT rc;
+					GetClientRect(hWnd, &rc);
 					// Create a Direct2D render target.
 					D2D1_HWND_RENDER_TARGET_PROPERTIES dhrtp {};
 					dhrtp.hwnd = hWnd;
@@ -4059,8 +4054,7 @@ LRESULT CALLBACK ScintillaWin::CTWndProc(HWND hWnd, UINT iMessage, WPARAM wParam
 
 					D2D1_RENDER_TARGET_PROPERTIES drtp {};
 					drtp.type = D2D1_RENDER_TARGET_TYPE_DEFAULT;
-					drtp.pixelFormat.format = DXGI_FORMAT_UNKNOWN;
-					drtp.pixelFormat.alphaMode = D2D1_ALPHA_MODE_UNKNOWN;
+					drtp.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_UNKNOWN);
 					drtp.dpiX = 96.0;
 					drtp.dpiY = 96.0;
 					drtp.usage = D2D1_RENDER_TARGET_USAGE_NONE;

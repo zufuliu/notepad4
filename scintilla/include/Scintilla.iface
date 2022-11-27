@@ -1478,6 +1478,10 @@ fun position ReplaceTarget=2194(position length, string text)
 # caused by processing the \d patterns.
 fun position ReplaceTargetRE=2195(position length, string text)
 
+# Replace the target text with the argument text but ignore prefix and suffix that
+# are the same as current.
+fun position ReplaceTargetMinimal=2779(position length, string text)
+
 # Search for a counted string in the target and set the target to the found
 # range. Text is counted so it can contain NULs.
 # Returns start of found range or -1 for failure in which case target is not moved.

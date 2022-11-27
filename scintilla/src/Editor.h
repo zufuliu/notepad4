@@ -601,7 +601,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void FoldAll(Scintilla::FoldAction action);
 
 	Sci::Position GetTag(char *tagValue, int tagNumber);
-	Sci::Position ReplaceTarget(bool replacePatterns, const char *text, Sci::Position length = -1);
+	enum class ReplaceType {basic, patterns, minimal};
+	Sci::Position ReplaceTarget(ReplaceType replaceType, std::string_view text);
 
 	bool PositionIsHotspot(Sci::Position position) const noexcept;
 	bool SCICALL PointIsHotspot(Point pt);
@@ -646,6 +647,12 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	}
 	static unsigned char *UCharPtrFromSPtr(Scintilla::sptr_t lParam) noexcept {
 		return static_cast<unsigned char *>(PtrFromSPtr(lParam));
+	}
+	static std::string_view ViewFromParams(Scintilla::sptr_t lParam, Scintilla::uptr_t wParam) noexcept {
+		if (SPtrFromUPtr(wParam) < 0) {
+			return std::string_view(CharPtrFromSPtr(lParam));
+		}
+		return std::string_view(CharPtrFromSPtr(lParam), wParam);
 	}
 	static void *PtrFromUPtr(Scintilla::uptr_t wParam) noexcept {
 		return reinterpret_cast<void *>(wParam);
