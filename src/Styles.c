@@ -2935,6 +2935,7 @@ void Style_SetLexerByLangIndex(int lang) {
 		break;
 
 	case IDM_LEXER_CSV:
+		np2LexLangIndex = 0;
 		pLex = &lexCSV;
 		bLexerChanged = SelectCSVOptionsDlg();
 		break;
@@ -2949,12 +2950,15 @@ void Style_SetLexerByLangIndex(int lang) {
 void Style_UpdateSchemeMenu(HMENU hmenu) {
 	int lang = np2LexLangIndex;
 	if (lang == 0) {
+		bool update = true;
 		switch (pLexCurrent->rid) {
 		// Text File
 		case NP2LEX_TEXTFILE:
+			update = false;
 			lang = IDM_LEXER_TEXTFILE;
 			break;
 		case NP2LEX_2NDTEXTFILE:
+			update = false;
 			lang = IDM_LEXER_2NDTEXTFILE;
 			break;
 		// Web Source Code
@@ -2988,13 +2992,13 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			lang = IDM_LEXER_CSS;
 			break;
 		case NP2LEX_CSV:
+			update = false;
 			lang = IDM_LEXER_CSV;
 			break;
 		}
-		np2LexLangIndex = lang;
-	}
-	if (lang == IDM_LEXER_TEXTFILE || lang == NP2LEX_2NDTEXTFILE) {
-		np2LexLangIndex = 0;
+		if (update) {
+			np2LexLangIndex = lang;
+		}
 	}
 	for (int i = IDM_LEXER_TEXTFILE; i < IDM_LEXER_LAST_LEXER; i++) {
 		CheckCmd(hmenu, i, FALSE);
