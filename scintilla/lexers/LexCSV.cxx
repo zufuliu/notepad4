@@ -26,6 +26,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	const char * const option = styler.GetProperty("lexer.lang");
 	const uint8_t delimiter = option[0];
 	const uint8_t quoteChar = option[1];
+	const bool mergeDelimiter = option[2] & true;
 
 	bool quoted = false;
 	initStyle = SCE_CSV_COLUMN_0;
@@ -44,6 +45,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
 
+	uint8_t chPrev = 0;
 	uint8_t chPrevNonWhite = delimiter;
 	while (startPos < endPos) {
 		const uint8_t ch = styler[startPos++];
@@ -60,9 +62,11 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				chPrevNonWhite = delimiter;
 				styler.ColorTo(startPos - 1, initStyle);
 				styler.ColorTo(startPos, SCE_CSV_DELIMITER);
-				++initStyle;
-				if (initStyle == SCE_CSV_DELIMITER) {
-					initStyle = SCE_CSV_COLUMN_0;
+				if (!mergeDelimiter || chPrev != delimiter) {
+					++initStyle;
+					if (initStyle == SCE_CSV_DELIMITER) {
+						initStyle = SCE_CSV_COLUMN_0;
+					}
 				}
 			} else if (chPrevNonWhite == delimiter) {
 				if (ch == quoteChar) {
@@ -74,6 +78,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 		}
 
+		chPrev = ch;
 		if (ch > ' ') {
 			chPrevNonWhite = ch;
 			if (styler.IsLeadByte(ch)) {
@@ -83,6 +88,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		}
 
 		if (startPos == lineEndPos) {
+			chPrev = 0;
 			chPrevNonWhite = delimiter;
 			styler.ColorTo(startPos, initStyle);
 			int lineState = 0;

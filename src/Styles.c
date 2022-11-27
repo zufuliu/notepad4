@@ -275,6 +275,7 @@ PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
 static int iCsvOption = ('\"' << 8) | ',';
 
+#define CsvOption_MergeDelimiter	(1 << 16)
 #define LexerChanged_Override		2
 
 #define STYLESMODIFIED_NONE			0
@@ -1458,8 +1459,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			if (dialect < 10) {
 				lang[0] = (char)(dialect + '0');
 			} else {
-				lang[0] = (char)(dialect & 0xff);
-				lang[1] = (char)((dialect >> 8) & 0xff);
+				memcpy(lang, &dialect, 4);
 			}
 			SciCall_SetProperty("lexer.lang", lang);
 		}
@@ -5229,7 +5229,7 @@ void Style_SelectLexerDlg(HWND hwnd, bool favorite) {
 	const int langIndex = np2LexLangIndex;
 	if (IDOK == ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_STYLESELECT), GetParent(hwnd), Style_SelectLexerDlgProc, favorite)) {
 		if (!favorite && (pLex != pLexCurrent || langIndex != np2LexLangIndex)) {
-			if (pLexCurrent->rid == NP2LEX_CSV) {
+			if (pLexCurrent->iLexer == SCLEX_CSV) {
 				SelectCSVOptionsDlg();
 			}
 			Style_SetLexer(pLexCurrent, (pLex != pLexCurrent) + true);
@@ -5245,8 +5245,9 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	UNREFERENCED_PARAMETER(lParam);
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		const uint8_t delimiter = iCsvOption & 0xff;
-		const uint8_t qualifier = (iCsvOption >> 8) & 0xff;
+		const int option = iCsvOption;
+		const uint8_t delimiter = option & 0xff;
+		const uint8_t qualifier = (option >> 8) & 0xff;
 		int index;
 		switch (delimiter) {
 		case ',':
@@ -5271,6 +5272,9 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		CheckRadioButton(hwnd, IDC_CSV_DELIMITER_COMMA, IDC_CSV_DELIMITER_OTHER, index);
 		index = (qualifier == '\"') ? IDC_CSV_QUALIFIER_DOUBLE : IDC_CSV_QUALIFIER_SINGLE;
 		CheckRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE, index);
+		if (option & CsvOption_MergeDelimiter) {
+			CheckDlgButton(hwnd, IDC_CSV_DELIMITER_MERGE, BST_CHECKED);
+		}
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -5296,7 +5300,7 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 				WCHAR tch[2] = L"";
 				GetDlgItemText(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT, tch, COUNTOF(tch));
 				const WCHAR ch = tch[0];
-				if (ch != 0 && ch < 0x7f) {
+				if (ch > 0 && ch < 0x7f) {
 					delimiter = (uint8_t)ch;
 				}
 			} break;
@@ -5304,9 +5308,13 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 
 			index = GetCheckedRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE);
 			const uint8_t qualifier = (index == IDC_CSV_QUALIFIER_DOUBLE) ? '\"' : '\'';
+			int option = delimiter | (qualifier << 8);
+			if (IsButtonChecked(hwnd, IDC_CSV_DELIMITER_MERGE)) {
+				option |= CsvOption_MergeDelimiter;
+			}
 			index = iCsvOption;
-			iCsvOption = delimiter | (qualifier << 8);
-			EndDialog(hwnd, (index == iCsvOption) ? IDCANCEL : IDOK);
+			iCsvOption = option;
+			EndDialog(hwnd, (index == option) ? IDCANCEL : IDOK);
 		} break;
 
 		case IDCANCEL:
