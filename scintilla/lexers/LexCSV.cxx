@@ -39,6 +39,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		}
 	}
 
+	assert(startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent)));
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);

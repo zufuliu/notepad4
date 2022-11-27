@@ -209,6 +209,10 @@ constexpr bool IsADigit(int ch) noexcept {
 	return ch >= '0' && ch <= '9';
 }
 
+constexpr bool IsXDigit(int ch) noexcept {
+	return (ch >= '0' && ch <= '9') || Between(UnsafeLower(ch), 'a', 'f');
+}
+
 constexpr bool IsHexDigit(int ch) noexcept {
 	return (ch >= '0' && ch <= '9')
 		|| (ch >= 'A' && ch <= 'F')

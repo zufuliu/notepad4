@@ -140,11 +140,11 @@ def GenerateJsonCharClass():
 	operator = "{}[]:,+-"
 
 	SCE_JSON_DEFAULT = 0
-	SCE_JSON_OPERATOR = 1
-	SCE_JSON_NUMBER = 2
-	SCE_JSON_MAYBE_KEYWORD = 3
-	SCE_JSON_IDENTIFIER = 4
-	SCE_JSON_STRING_DQ = 5
+	SCE_JSON_STRING_DQ = 1
+	SCE_JSON_OPERATOR = 2
+	SCE_JSON_NUMBER = 3
+	SCE_JSON_MAYBE_KEYWORD = 4
+	SCE_JSON_IDENTIFIER = 5
 	SCE_JSON_STRING_SQ = 6
 
 	JsonChar_None = 0
@@ -159,6 +159,7 @@ def GenerateJsonCharClass():
 	JsonMask_Identifier = 1 << 4
 
 	table = [0] * 128
+	assert SCE_JSON_STRING_SQ - SCE_JSON_STRING_DQ == abs(ord('\'') - ord('\"'))
 	# https://www.ecma-international.org/ecma-262/#sec-ecmascript-language-lexical-grammar
 	for i in range(0x21, 0x80):
 		ch = chr(i)
