@@ -4675,7 +4675,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_TEXTFILE:
 	case IDM_LEXER_2NDTEXTFILE:
 	case IDM_LEXER_CSV:
-	case IDM_LEXER_APACHE:
+	// CSS Style Sheet
+	case IDM_LEXER_CSS:
+	case IDM_LEXER_SCSS:
+	case IDM_LEXER_LESS:
+	case IDM_LEXER_HSS:
 	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_PHP:
@@ -4684,6 +4688,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_ASPX_VB:
 	case IDM_LEXER_ASP_VBS:
 	case IDM_LEXER_ASP_JS:
+	// Markdown
+	case IDM_LEXER_MARKDOWN_GITHUB:
+	case IDM_LEXER_MARKDOWN_GITLAB:
+	case IDM_LEXER_MARKDOWN_PANDOC:
+	// Math
+	case IDM_LEXER_MATLAB:
+	case IDM_LEXER_OCTAVE:
+	case IDM_LEXER_SCILAB:
+	// Shell Script
+	case IDM_LEXER_BASH:
+	case IDM_LEXER_CSHELL:
+	case IDM_LEXER_M4:
 	// XML Document
 	case IDM_LEXER_XML:
 	case IDM_LEXER_XSD:
@@ -4710,23 +4726,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_ANDROID_MANIFEST:
 	case IDM_LEXER_ANDROID_LAYOUT:
 	case IDM_LEXER_SVG:
-	// Shell Script
-	case IDM_LEXER_BASH:
-	case IDM_LEXER_CSHELL:
-	case IDM_LEXER_M4:
-	// Markdown
-	case IDM_LEXER_MARKDOWN_GITHUB:
-	case IDM_LEXER_MARKDOWN_GITLAB:
-	case IDM_LEXER_MARKDOWN_PANDOC:
-	// Math
-	case IDM_LEXER_MATLAB:
-	case IDM_LEXER_OCTAVE:
-	case IDM_LEXER_SCILAB:
-	// CSS Style Sheet
-	case IDM_LEXER_CSS:
-	case IDM_LEXER_SCSS:
-	case IDM_LEXER_LESS:
-	case IDM_LEXER_HSS:
+	case IDM_LEXER_APACHE:
 		Style_SetLexerByLangIndex(LOWORD(wParam));
 		break;
 

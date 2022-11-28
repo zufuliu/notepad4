@@ -739,7 +739,9 @@ static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) {
 	// TODO: sort by localized name
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 #endif
-	cmp = cmp ? cmp : StrCmpIW(pLex1->pszName, pLex2->pszName);
+	if (cmp == 0) {
+		cmp = StrCmpIW(pLex1->pszName, pLex2->pszName);
+	}
 	return cmp;
 }
 
@@ -1418,16 +1420,16 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			dialect = np2LexLangIndex == IDM_LEXER_CSHELL;
 			break;
 
-		case NP2LEX_CSV:
-			dialect = iCsvOption;
-			break;
-
 		case NP2LEX_CSS: {
 			NP2_static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
 			NP2_static_assert(IDM_LEXER_LESS - IDM_LEXER_CSS == 2);
 			NP2_static_assert(IDM_LEXER_HSS - IDM_LEXER_CSS == 3);
 			dialect = np2LexLangIndex - IDM_LEXER_CSS;
 		} break;
+
+		case NP2LEX_CSV:
+			dialect = iCsvOption;
+			break;
 
 		case NP2LEX_JAVASCRIPT:
 		case NP2LEX_TYPESCRIPT: {
@@ -1459,7 +1461,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			if (dialect < 10) {
 				lang[0] = (char)(dialect + '0');
 			} else {
-				memcpy(lang, &dialect, 4);
+				memcpy(lang, &dialect, sizeof(int));
 			}
 			SciCall_SetProperty("lexer.lang", lang);
 		}
@@ -2843,14 +2845,23 @@ void Style_SetLexerByLangIndex(int lang) {
 		np2LexLangIndex = 0;
 		pLex = &lexTextFile;
 		break;
-
 	case IDM_LEXER_2NDTEXTFILE:
 		np2LexLangIndex = 0;
 		pLex = &lex2ndTextFile;
 		break;
 
-	case IDM_LEXER_APACHE:
-		pLex = &lexConfig;
+	case IDM_LEXER_CSV:
+		np2LexLangIndex = 0;
+		pLex = &lexCSV;
+		bLexerChanged = SelectCSVOptionsDlg();
+		break;
+
+	// CSS Style Sheet
+	case IDM_LEXER_CSS:
+	case IDM_LEXER_SCSS:
+	case IDM_LEXER_LESS:
+	case IDM_LEXER_HSS:
+		pLex = &lexCSS;
 		break;
 
 	// Web Source Code
@@ -2867,6 +2878,27 @@ void Style_SetLexerByLangIndex(int lang) {
 		break;
 	case IDM_LEXER_PHP:
 		pLex = &lexPHP;
+		break;
+
+	// Markdown
+	case IDM_LEXER_MARKDOWN_GITHUB:
+	case IDM_LEXER_MARKDOWN_GITLAB:
+	case IDM_LEXER_MARKDOWN_PANDOC:
+		pLex = &lexMarkdown;
+		break;
+
+	// Math
+	case IDM_LEXER_MATLAB:
+	case IDM_LEXER_OCTAVE:
+	case IDM_LEXER_SCILAB:
+		pLex = &lexMatlab;
+		break;
+
+	// Shell Script
+	case IDM_LEXER_BASH:
+	case IDM_LEXER_CSHELL:
+	case IDM_LEXER_M4:
+		pLex = &lexBash;
 		break;
 
 	// XML Document
@@ -2905,39 +2937,8 @@ void Style_SetLexerByLangIndex(int lang) {
 		pLex = &lexXML;
 		break;
 
-	// Shell Script
-	case IDM_LEXER_BASH:
-	case IDM_LEXER_CSHELL:
-	case IDM_LEXER_M4:
-		pLex = &lexBash;
-		break;
-
-	// Markdown
-	case IDM_LEXER_MARKDOWN_GITHUB:
-	case IDM_LEXER_MARKDOWN_GITLAB:
-	case IDM_LEXER_MARKDOWN_PANDOC:
-		pLex = &lexMarkdown;
-		break;
-
-	// Math
-	case IDM_LEXER_MATLAB:
-	case IDM_LEXER_OCTAVE:
-	case IDM_LEXER_SCILAB:
-		pLex = &lexMatlab;
-		break;
-
-	// CSS Style Sheet
-	case IDM_LEXER_CSS:
-	case IDM_LEXER_SCSS:
-	case IDM_LEXER_LESS:
-	case IDM_LEXER_HSS:
-		pLex = &lexCSS;
-		break;
-
-	case IDM_LEXER_CSV:
-		np2LexLangIndex = 0;
-		pLex = &lexCSV;
-		bLexerChanged = SelectCSVOptionsDlg();
+	case IDM_LEXER_APACHE:
+		pLex = &lexConfig;
 		break;
 	}
 	if (pLex != NULL) {
@@ -2961,17 +2962,17 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			update = false;
 			lang = IDM_LEXER_2NDTEXTFILE;
 			break;
+		case NP2LEX_CSV:
+			update = false;
+			lang = IDM_LEXER_CSV;
+			break;
+		// CSS Style Sheet
+		case NP2LEX_CSS:
+			lang = IDM_LEXER_CSS;
+			break;
 		// Web Source Code
 		case NP2LEX_HTML:
 			lang = IDM_LEXER_WEB;
-			break;
-		// XML Document
-		case NP2LEX_XML:
-			lang = IDM_LEXER_XML;
-			break;
-		// Shell Script
-		case NP2LEX_BASH:
-			lang = IDM_LEXER_BASH;
 			break;
 		// Markdown
 		case NP2LEX_MARKDOWN:
@@ -2987,13 +2988,13 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 		case NP2LEX_SCILAB:
 			lang = IDM_LEXER_SCILAB;
 			break;
-		// CSS Style Sheet
-		case NP2LEX_CSS:
-			lang = IDM_LEXER_CSS;
+		// Shell Script
+		case NP2LEX_BASH:
+			lang = IDM_LEXER_BASH;
 			break;
-		case NP2LEX_CSV:
-			update = false;
-			lang = IDM_LEXER_CSV;
+		// XML Document
+		case NP2LEX_XML:
+			lang = IDM_LEXER_XML;
 			break;
 		}
 		if (update) {

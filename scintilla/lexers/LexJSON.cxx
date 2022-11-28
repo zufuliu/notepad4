@@ -45,15 +45,12 @@ bool IsJsonProperty(LexAccessor &styler, Sci_PositionU startPos, uint8_t chNext)
 		return true;
 	}
 	if (chNext > '\0' && chNext <= ' ') {
-		while (true) {
+		do {
 			chNext = styler[++startPos];
 			if (chNext == ':') {
 				return true;
 			}
-			if (!(chNext > '\0' && chNext <= ' ')) {
-				break;
-			}
-		}
+		} while (chNext > '\0' && chNext <= ' ');
 	}
 	return false;
 }
@@ -79,7 +76,8 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	// JSON5 line continuation
 	bool lineContinuation = false;
-	bool atLineStart = startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent));
+	bool atLineStart = true;
+	assert(startPos == static_cast<Sci_PositionU>(styler.LineStart(lineCurrent)));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
@@ -151,7 +149,7 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_JSON_STRING_DQ:
 		case SCE_JSON_STRING_SQ:
-			if (startPos == lineEndPos) { // atLineEnd
+			if (atLineStart) {
 				if (lineContinuation) {
 					lineContinuation = false;
 				} else {
