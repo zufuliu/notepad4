@@ -276,6 +276,7 @@ int np2LexLangIndex = 0;
 static int iCsvOption = ('\"' << 8) | ',';
 
 #define CsvOption_MergeDelimiter	(1 << 16)
+#define CsvOption_BackslashEscape	(1 << 17)
 #define LexerChanged_Override		2
 
 #define STYLESMODIFIED_NONE			0
@@ -5267,6 +5268,9 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		case ';':
 			index = IDC_CSV_DELIMITER_SEMICOLON;
 			break;
+		case '|':
+			index = IDC_CSV_DELIMITER_PIPE;
+			break;
 		default: {
 			index = IDC_CSV_DELIMITER_OTHER;
 			const WCHAR tch[2] = {delimiter, L'\0'};
@@ -5278,7 +5282,10 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		index = (qualifier == '\"') ? IDC_CSV_QUALIFIER_DOUBLE : IDC_CSV_QUALIFIER_SINGLE;
 		CheckRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE, index);
 		if (option & CsvOption_MergeDelimiter) {
-			CheckDlgButton(hwnd, IDC_CSV_DELIMITER_MERGE, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_CSV_MERGE_DELIMITER, BST_CHECKED);
+		}
+		if (option & CsvOption_BackslashEscape) {
+			CheckDlgButton(hwnd, IDC_CSV_BACKSLASH_ESCAPE, BST_CHECKED);
 		}
 		CenterDlgInParent(hwnd);
 	}
@@ -5301,11 +5308,14 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			case IDC_CSV_DELIMITER_SEMICOLON:
 				delimiter = ';';
 				break;
+			case IDC_CSV_DELIMITER_PIPE:
+				delimiter = '|';
+				break;
 			case IDC_CSV_DELIMITER_OTHER: {
 				WCHAR tch[2] = L"";
 				GetDlgItemText(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT, tch, COUNTOF(tch));
 				const WCHAR ch = tch[0];
-				if (ch > 0 && ch < 0x7f) {
+				if (ch > ' ' && ch < 0x7f) {
 					delimiter = (uint8_t)ch;
 				}
 			} break;
@@ -5314,8 +5324,11 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			index = GetCheckedRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE);
 			const uint8_t qualifier = (index == IDC_CSV_QUALIFIER_DOUBLE) ? '\"' : '\'';
 			int option = delimiter | (qualifier << 8);
-			if (IsButtonChecked(hwnd, IDC_CSV_DELIMITER_MERGE)) {
+			if (IsButtonChecked(hwnd, IDC_CSV_MERGE_DELIMITER)) {
 				option |= CsvOption_MergeDelimiter;
+			}
+			if (IsButtonChecked(hwnd, IDC_CSV_BACKSLASH_ESCAPE)) {
+				option |= CsvOption_BackslashEscape;
 			}
 			index = iCsvOption;
 			iCsvOption = option;

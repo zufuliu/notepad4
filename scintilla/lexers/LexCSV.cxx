@@ -22,11 +22,23 @@ using namespace Lexilla;
 
 namespace {
 
+// https://www.rfc-editor.org/rfc/rfc4180
+// https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html
+
+enum {
+	CsvOption_MergeDelimiter = 1 << 16,
+	CsvOption_BackslashEscape = 1 << 17,
+};
+
+constexpr uint32_t asU4(const char *s) noexcept {
+	return *(const uint32_t *)s;
+}
+
 void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const char * const option = styler.GetProperty("lexer.lang");
-	const uint8_t delimiter = option[0];
-	const uint8_t quoteChar = option[1];
-	const bool mergeDelimiter = option[2] & true;
+	const uint32_t csvOption = asU4(option);
+	const uint8_t delimiter = csvOption & 0xff;
+	const uint8_t quoteChar = (csvOption >> 8) & 0xff;
 
 	bool quoted = false;
 	initStyle = SCE_CSV_COLUMN_0;
@@ -63,7 +75,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				chPrevNonWhite = ch;
 				styler.ColorTo(startPos - 1, initStyle);
 				styler.ColorTo(startPos, SCE_CSV_DELIMITER);
-				if (!mergeDelimiter || ch != chPrev) {
+				if (ch != chPrev || (csvOption & CsvOption_MergeDelimiter) == 0) {
 					++initStyle;
 					if (initStyle == SCE_CSV_DELIMITER) {
 						initStyle = SCE_CSV_COLUMN_0;
@@ -82,6 +94,9 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		chPrev = ch;
 		if (ch > ' ') {
 			chPrevNonWhite = ch;
+			if (ch == '\\' && (csvOption & CsvOption_BackslashEscape) != 0) {
+				startPos++;
+			}
 			if (styler.IsLeadByte(ch)) {
 				// ignore trail byte in DBCS character
 				startPos++;
