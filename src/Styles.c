@@ -5276,13 +5276,13 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 
 		CheckRadioButton(hwnd, IDC_CSV_DELIMITER_COMMA, IDC_CSV_DELIMITER_OTHER, index);
 		SendWMCommand(hwnd, index);
-		index = (qualifier == '\"') ? IDC_CSV_QUALIFIER_DOUBLE : IDC_CSV_QUALIFIER_SINGLE;
-		CheckRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE, index);
+		index = (qualifier == 0) ? IDC_CSV_QUALIFIER_NONE : (IDC_CSV_QUALIFIER_DOUBLE + (qualifier & 1));
+		if (qualifier == 0 || (option & CsvOption_BackslashEscape) != 0) {
+			CheckDlgButton(hwnd, IDC_CSV_BACKSLASH_ESCAPE, BST_CHECKED);
+		}
+		CheckRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_NONE, index);
 		if (option & CsvOption_MergeDelimiter) {
 			CheckDlgButton(hwnd, IDC_CSV_MERGE_DELIMITER, BST_CHECKED);
-		}
-		if (option & CsvOption_BackslashEscape) {
-			CheckDlgButton(hwnd, IDC_CSV_BACKSLASH_ESCAPE, BST_CHECKED);
 		}
 		CenterDlgInParent(hwnd);
 	}
@@ -5308,14 +5308,15 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 				option = (mask >> ((index - IDC_CSV_DELIMITER_TAB)*8)) & 0xff;
 			}
 
-			index = GetCheckedRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE);
-			const uint8_t qualifier = (index == IDC_CSV_QUALIFIER_DOUBLE) ? '\"' : '\'';
-			option |= (qualifier << 8);
+			index = GetCheckedRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_NONE);
+			uint32_t qualifier = ('\"' | ('\'' << 8)) << 8;
+			qualifier = (qualifier >> (index - IDC_CSV_QUALIFIER_DOUBLE)*8) & 0xff00;
+			option |= qualifier;
+			if (qualifier == 0 || IsButtonChecked(hwnd, IDC_CSV_BACKSLASH_ESCAPE)) {
+				option |= CsvOption_BackslashEscape;
+			}
 			if (IsButtonChecked(hwnd, IDC_CSV_MERGE_DELIMITER)) {
 				option |= CsvOption_MergeDelimiter;
-			}
-			if (IsButtonChecked(hwnd, IDC_CSV_BACKSLASH_ESCAPE)) {
-				option |= CsvOption_BackslashEscape;
 			}
 			index = iCsvOption;
 			iCsvOption = option;
@@ -5327,7 +5328,9 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			break;
 
 		default:
-			if (LOWORD(wParam) >= IDC_CSV_DELIMITER_COMMA && LOWORD(wParam) <= IDC_CSV_DELIMITER_OTHER) {
+			if (LOWORD(wParam) == IDC_CSV_QUALIFIER_NONE) {
+				CheckDlgButton(hwnd, IDC_CSV_BACKSLASH_ESCAPE, BST_CHECKED);
+			} else if (LOWORD(wParam) >= IDC_CSV_DELIMITER_COMMA && LOWORD(wParam) <= IDC_CSV_DELIMITER_OTHER) {
 				EnableWindow(GetDlgItem(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT), IsButtonChecked(hwnd, IDC_CSV_DELIMITER_OTHER));
 			}
 			break;
