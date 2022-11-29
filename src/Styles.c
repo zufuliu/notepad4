@@ -5251,34 +5251,31 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	UNREFERENCED_PARAMETER(lParam);
 	switch (umsg) {
 	case WM_INITDIALOG: {
-		const int option = iCsvOption;
+		const uint32_t option = iCsvOption;
 		const uint8_t delimiter = option & 0xff;
 		const uint8_t qualifier = (option >> 8) & 0xff;
-		int index;
-		switch (delimiter) {
-		case ',':
-			index = IDC_CSV_DELIMITER_COMMA;
-			break;
-		case '\t':
-			index = IDC_CSV_DELIMITER_TAB;
-			break;
-		case ' ':
-			index = IDC_CSV_DELIMITER_SPACE;
-			break;
-		case ';':
-			index = IDC_CSV_DELIMITER_SEMICOLON;
-			break;
-		case '|':
-			index = IDC_CSV_DELIMITER_PIPE;
-			break;
-		default: {
-			index = IDC_CSV_DELIMITER_OTHER;
-			const WCHAR tch[2] = {delimiter, L'\0'};
-			SetDlgItemText(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT, tch);
-		} break;
+		int index = IDC_CSV_DELIMITER_COMMA;
+		if (delimiter != ',') {
+			uint32_t mask = '\t'
+				| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_TAB)*8))
+				| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_TAB)*8))
+				| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_TAB)*8));
+			do {
+				++index;
+				if ((mask & 0xff) == delimiter) {
+					break;
+				}
+				mask >>= 8;
+			} while (mask);
+			if (mask == 0) {
+				++index;
+				const WCHAR tch[2] = {delimiter, L'\0'};
+				SetDlgItemText(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT, tch);
+			}
 		}
 
 		CheckRadioButton(hwnd, IDC_CSV_DELIMITER_COMMA, IDC_CSV_DELIMITER_OTHER, index);
+		SendWMCommand(hwnd, index);
 		index = (qualifier == '\"') ? IDC_CSV_QUALIFIER_DOUBLE : IDC_CSV_QUALIFIER_SINGLE;
 		CheckRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE, index);
 		if (option & CsvOption_MergeDelimiter) {
@@ -5295,35 +5292,25 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 		switch (LOWORD(wParam)) {
 		case IDOK: {
 			int index = GetCheckedRadioButton(hwnd, IDC_CSV_DELIMITER_COMMA, IDC_CSV_DELIMITER_OTHER);
-			uint8_t delimiter = ',';
-			switch (index) {
-			case IDC_CSV_DELIMITER_COMMA:
-				break;
-			case IDC_CSV_DELIMITER_TAB:
-				delimiter = '\t';
-				break;
-			case IDC_CSV_DELIMITER_SPACE:
-				delimiter = ' ';
-				break;
-			case IDC_CSV_DELIMITER_SEMICOLON:
-				delimiter = ';';
-				break;
-			case IDC_CSV_DELIMITER_PIPE:
-				delimiter = '|';
-				break;
-			case IDC_CSV_DELIMITER_OTHER: {
+			int option = ',';
+			if (index == IDC_CSV_DELIMITER_OTHER) {
 				WCHAR tch[2] = L"";
 				GetDlgItemText(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT, tch, COUNTOF(tch));
 				const WCHAR ch = tch[0];
 				if (ch > ' ' && ch < 0x7f) {
-					delimiter = (uint8_t)ch;
+					option = ch;
 				}
-			} break;
+			} else if (index > IDC_CSV_DELIMITER_COMMA) {
+				const uint32_t mask = '\t'
+					| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_TAB)*8))
+					| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_TAB)*8))
+					| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_TAB)*8));
+				option = (mask >> ((index - IDC_CSV_DELIMITER_TAB)*8)) & 0xff;
 			}
 
 			index = GetCheckedRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_SINGLE);
 			const uint8_t qualifier = (index == IDC_CSV_QUALIFIER_DOUBLE) ? '\"' : '\'';
-			int option = delimiter | (qualifier << 8);
+			option |= (qualifier << 8);
 			if (IsButtonChecked(hwnd, IDC_CSV_MERGE_DELIMITER)) {
 				option |= CsvOption_MergeDelimiter;
 			}
@@ -5337,6 +5324,12 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
+			break;
+
+		default:
+			if (LOWORD(wParam) >= IDC_CSV_DELIMITER_COMMA && LOWORD(wParam) <= IDC_CSV_DELIMITER_OTHER) {
+				EnableWindow(GetDlgItem(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT), IsButtonChecked(hwnd, IDC_CSV_DELIMITER_OTHER));
+			}
 			break;
 		}
 		return TRUE;
