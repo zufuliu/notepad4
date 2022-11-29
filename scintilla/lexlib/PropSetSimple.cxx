@@ -41,7 +41,7 @@ const char *PropSetSimple::Get(std::string_view key) const {
 
 int PropSetSimple::GetInt(const char *key, size_t keyLen, int defaultValue) const {
 	const auto it = props.find(std::string_view(key, keyLen));
-	if (it != props.end() && !it->second.empty()) {
+	if (it != props.end()) {
 		defaultValue = atoi(it->second.c_str());
 	}
 	return defaultValue;

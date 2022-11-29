@@ -479,7 +479,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 	int levelNext = levelCurrent;
 	int lineState = styler.GetLineState(lineCurrent);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char buf[12]; // interface
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
@@ -532,7 +532,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 			break;
 		}
 
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			const int lineStateNext = styler.GetLineState(lineCurrent + 1);
 			if (lineState & InnoLineStateSectionHeader) {
 				levelCurrent = SC_FOLDLEVELBASE;
@@ -559,7 +559,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineStatePrev = lineState;
 			lineState = lineStateNext;

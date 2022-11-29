@@ -259,7 +259,7 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 	int levelNext = levelCurrent;
 	FoldLineState foldCurrent(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
@@ -301,7 +301,7 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			const FoldLineState foldNext(styler.GetLineState(lineCurrent + 1));
 			if (foldCurrent.lineComment) {
 				levelNext += foldNext.lineComment - foldPrev.lineComment;
@@ -328,7 +328,7 @@ void FoldAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, L
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			foldPrev = foldCurrent;
 			foldCurrent = foldNext;

@@ -426,7 +426,7 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
@@ -477,7 +477,7 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -502,7 +502,7 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

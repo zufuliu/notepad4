@@ -559,7 +559,7 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
@@ -600,7 +600,7 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 		if (visibleChars == 0 && !IsSpaceEquiv(style)) {
 			++visibleChars;
 		}
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -625,7 +625,7 @@ void FoldGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, Le
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

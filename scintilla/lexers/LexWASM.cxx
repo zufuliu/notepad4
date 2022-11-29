@@ -220,7 +220,7 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
@@ -251,7 +251,7 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			break;
 		}
 
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -268,7 +268,7 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

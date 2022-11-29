@@ -506,7 +506,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int levelNext = levelCurrent;
 	int lineCommentCurrent = GetLineCommentState(styler.GetLineState(lineCurrent));
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	char buf[16]; // celldefine
 	constexpr int MaxFoldWordLength = sizeof(buf) - 1;
@@ -565,7 +565,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			break;
 		}
 
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
@@ -582,7 +582,7 @@ void FoldVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelCurrent = levelNext;
 			lineCommentPrev = lineCommentCurrent;
 			lineCommentCurrent = lineCommentNext;

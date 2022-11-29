@@ -56,7 +56,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	styler.StartSegment(startPos);
 	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
 	const Sci_PositionU endPos = startPos + lengthDoc;
-	Sci_PositionU lineEndPos = sci::min(lineStartNext, endPos);
+	lineStartNext = sci::min(lineStartNext, endPos);
 
 	uint8_t chPrev = 0;
 	uint8_t chPrevNonWhite = delimiter;
@@ -103,7 +103,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			}
 		}
 
-		if (startPos == lineEndPos) {
+		if (startPos == lineStartNext) {
 			chPrev = 0;
 			chPrevNonWhite = delimiter;
 			styler.ColorTo(startPos, initStyle);
@@ -116,7 +116,7 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			styler.SetLineState(lineCurrent, lineState);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
-			lineEndPos = sci::min(lineStartNext, endPos);
+			lineStartNext = sci::min(lineStartNext, endPos);
 		}
 	}
 

@@ -58,10 +58,10 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 #endif
 
 	while (lineCurrent <= maxLines) {
-		const Sci_PositionU lineEndPos = lineStartNext - 1;
 		Sci_PositionU i = lineStartCurrent;
 		unsigned char ch = styler[i];
 		if (allowInitialSpaces) {
+			const Sci_PositionU lineEndPos = lineStartNext - 1;
 			while (i < lineEndPos && isspacechar(ch)) {
 				ch = styler[++i];
 			}
