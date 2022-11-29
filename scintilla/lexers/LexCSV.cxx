@@ -26,8 +26,8 @@ namespace {
 // https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html
 
 enum {
-	CsvOption_MergeDelimiter = 1 << 16,
-	CsvOption_BackslashEscape = 1 << 17,
+	CsvOption_MergeDelimiter = 1 << 14,
+	CsvOption_BackslashEscape = 1 << 15,
 };
 
 constexpr uint32_t asU4(const char *s) noexcept {
@@ -38,16 +38,16 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 	const char * const option = styler.GetProperty("lexer.lang");
 	const uint32_t csvOption = asU4(option);
 	const uint8_t delimiter = csvOption & 0xff;
-	const uint8_t quoteChar = (csvOption >> 8) & 0xff;
+	const uint8_t quoteChar = (csvOption >> 8) & 0x3f;
 
 	bool quoted = false;
 	initStyle = SCE_CSV_COLUMN_0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	if (lineCurrent > 0) {
 		const int lineState = styler.GetLineState(lineCurrent - 1);
-		if (lineState & 1) {
+		if (lineState) {
 			quoted = true;
-			initStyle = lineState >> 1;
+			initStyle = lineState;
 		}
 	}
 
@@ -107,12 +107,8 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			chPrev = 0;
 			chPrevNonWhite = delimiter;
 			styler.ColorTo(startPos, initStyle);
-			int lineState = 0;
-			if (quoted) {
-				lineState = 1 | (initStyle << 1);
-			} else {
-				initStyle = SCE_CSV_COLUMN_0;
-			}
+			const int lineState = quoted ? initStyle : 0;
+			initStyle = quoted ? initStyle : SCE_CSV_COLUMN_0;
 			styler.SetLineState(lineCurrent, lineState);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);

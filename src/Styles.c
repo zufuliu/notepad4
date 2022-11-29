@@ -275,8 +275,8 @@ PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
 static int iCsvOption = ('\"' << 8) | ',';
 
-#define CsvOption_MergeDelimiter	(1 << 16)
-#define CsvOption_BackslashEscape	(1 << 17)
+#define CsvOption_MergeDelimiter	(1 << 14)
+#define CsvOption_BackslashEscape	(1 << 15)
 #define LexerChanged_Override		2
 
 #define STYLESMODIFIED_NONE			0
@@ -5253,13 +5253,13 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	case WM_INITDIALOG: {
 		const uint32_t option = iCsvOption;
 		const uint8_t delimiter = option & 0xff;
-		const uint8_t qualifier = (option >> 8) & 0xff;
+		const uint8_t qualifier = (option >> 8) & 0x3f;
 		int index = IDC_CSV_DELIMITER_COMMA;
 		if (delimiter != ',') {
-			uint32_t mask = '\t'
-				| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_TAB)*8))
-				| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_TAB)*8))
-				| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_TAB)*8));
+			uint32_t mask = ('\t' << ((IDC_CSV_DELIMITER_TAB - IDC_CSV_DELIMITER_COMMA - 1)*8))
+				| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_COMMA - 1)*8))
+				| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_COMMA - 1)*8))
+				| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_COMMA - 1)*8));
 			do {
 				++index;
 				if ((mask & 0xff) == delimiter) {
@@ -5301,11 +5301,11 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 					option = ch;
 				}
 			} else if (index > IDC_CSV_DELIMITER_COMMA) {
-				const uint32_t mask = '\t'
-					| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_TAB)*8))
-					| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_TAB)*8))
-					| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_TAB)*8));
-				option = (mask >> ((index - IDC_CSV_DELIMITER_TAB)*8)) & 0xff;
+				const uint32_t mask = ('\t' << ((IDC_CSV_DELIMITER_TAB - IDC_CSV_DELIMITER_COMMA - 1)*8))
+					| (' ' << ((IDC_CSV_DELIMITER_SPACE - IDC_CSV_DELIMITER_COMMA - 1)*8))
+					| (';' << ((IDC_CSV_DELIMITER_SEMICOLON - IDC_CSV_DELIMITER_COMMA - 1)*8))
+					| ('|' << ((IDC_CSV_DELIMITER_PIPE - IDC_CSV_DELIMITER_COMMA - 1)*8));
+				option = (mask >> ((index - IDC_CSV_DELIMITER_COMMA - 1)*8)) & 0xff;
 			}
 
 			index = GetCheckedRadioButton(hwnd, IDC_CSV_QUALIFIER_DOUBLE, IDC_CSV_QUALIFIER_NONE);
