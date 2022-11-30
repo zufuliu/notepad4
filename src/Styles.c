@@ -275,8 +275,8 @@ PEDITLEXER pLexCurrent = &lexTextFile;
 int np2LexLangIndex = 0;
 static int iCsvOption = ('\"' << 8) | ',';
 
-#define CsvOption_MergeDelimiter	(1 << 14)
 #define CsvOption_BackslashEscape	(1 << 15)
+#define CsvOption_MergeDelimiter	(1 << 16)
 #define LexerChanged_Override		2
 
 #define STYLESMODIFIED_NONE			0
@@ -5253,7 +5253,7 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 	case WM_INITDIALOG: {
 		const uint32_t option = iCsvOption;
 		const uint8_t delimiter = option & 0xff;
-		const uint8_t qualifier = (option >> 8) & 0x3f;
+		const uint8_t qualifier = (option >> 8) & 0x7f;
 		int index = IDC_CSV_DELIMITER_COMMA;
 		if (delimiter != ',') {
 			uint32_t mask = ('\t' << ((IDC_CSV_DELIMITER_TAB - IDC_CSV_DELIMITER_COMMA - 1)*8))
@@ -5331,7 +5331,7 @@ static INT_PTR CALLBACK SelectCSVOptionsDlgProc(HWND hwnd, UINT umsg, WPARAM wPa
 			if (LOWORD(wParam) == IDC_CSV_QUALIFIER_NONE) {
 				CheckDlgButton(hwnd, IDC_CSV_BACKSLASH_ESCAPE, BST_CHECKED);
 			} else if (LOWORD(wParam) >= IDC_CSV_DELIMITER_COMMA && LOWORD(wParam) <= IDC_CSV_DELIMITER_OTHER) {
-				EnableWindow(GetDlgItem(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT), IsButtonChecked(hwnd, IDC_CSV_DELIMITER_OTHER));
+				EnableWindow(GetDlgItem(hwnd, IDC_CSV_DELIMITER_OTHER_TEXT), (LOWORD(wParam) == IDC_CSV_DELIMITER_OTHER));
 			}
 			break;
 		}
