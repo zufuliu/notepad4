@@ -276,6 +276,9 @@ void PHPLexer::ClassifyHtmlTag() {
 		sc.Forward((sc.ch == '>') ? 1 : 2);
 	}
 	sc.SetState(state);
+	if (sc.Match('<', '?')) {
+		HandlePHPTag();
+	}
 }
 
 bool PHPLexer::HandleBlockEnd(HtmlTextBlock block) {
