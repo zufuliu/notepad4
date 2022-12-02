@@ -335,6 +335,14 @@ BEGIN
 			MENUITEM "C 문자 이스케이프 (&P)\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "C 문자 이스케이프 해제(&U)\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
 			MENUITEM SEPARATOR
+			POPUP "Base64"
+			BEGIN
+				MENUITEM "Standard Encode\t",							IDM_EDIT_BASE64_ENCODE
+				MENUITEM "URL Safe Encode\t",							IDM_EDIT_BASE64_SAFE_ENCODE
+				MENUITEM "Decode\t",											IDM_EDIT_BASE64_DECODE
+				MENUITEM "Decode as Hex\t",								IDM_EDIT_BASE64_DECODE_AS_HEX
+			END
+			MENUITEM SEPARATOR
 			MENUITEM "URL 인코드(&E)\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "URL 디코드(&D)\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 			MENUITEM "HTML/XML 문자 이스케이프(&M)\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR

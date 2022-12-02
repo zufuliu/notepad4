@@ -2201,6 +2201,173 @@ void EditShowHex(void) {
 
 //=============================================================================
 //
+// EditBase64Encode()
+//
+static char EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+static int Blk0( int a ) {
+	int const index = a >> 2u;
+	return EncodingTable[index];
+}
+
+static int Blk1( int a, int b ) {
+	int const indexA = ( a & 3 ) << 4u;
+	int const indexB = b >> 4u;
+	int const index  = indexA | indexB;
+	return EncodingTable[index];
+}
+
+static unsigned int Blk2( unsigned int b, unsigned int c ) {
+	int const indexB = ( b & 15 ) << 2u;
+	int const indexC = c >> 6u;
+	int const index  = indexB | indexC;
+	return EncodingTable[index];
+}
+
+static int Blk3( int c ) {
+	int const index = c & 0x3f;
+	return EncodingTable[index];
+}
+
+static char* BinToBase64( char* dest, void const* src, size_t size ) {
+	typedef struct { unsigned char a; unsigned char b; unsigned char c; } block_t;
+	block_t const* block = (block_t*)src;
+	for( ; size >= sizeof( block_t ); size -= sizeof( block_t ), ++block ) {
+		*dest++ = Blk0( block->a );
+		*dest++ = Blk1( block->a, block->b );
+		*dest++ = Blk2( block->b, block->c );
+		*dest++ = Blk3( block->c );
+	}
+	if ( !size ) goto final;
+	*dest++ = Blk0( block->a );
+	if ( !--size ) {
+		*dest++ = Blk1( block->a, 0 );
+		*dest++ = '=';
+		*dest++ = '=';
+		goto final;
+	}
+	*dest++ = Blk1( block->a, block->b );
+	*dest++ = Blk2( block->b, 0 );
+	*dest++ = '=';
+final:
+	*dest = '\0';
+	return dest;
+}
+
+void EditBase64Encode(bool UrlSafeEncode){
+	if (SciCall_IsRectangleSelection()){
+		NotifyRectangleSelection();
+		return;
+	}
+	EncodingTable[62] = (UrlSafeEncode) ? '-' : '+';
+	EncodingTable[63] = (UrlSafeEncode) ? '_' : '/';
+	size_t len = SciCall_GetSelTextLength();
+	size_t olen = 1 + ((len + ( (len % 3 > 0) ? 3 - (len % 3) : 0 ) / 3 ) * 4);
+	char *in = (char *)NP2HeapAlloc(len+1);
+	SciCall_GetSelText(in);
+	char *out = (char *)NP2HeapAlloc(olen);
+	BinToBase64(out, in, len);
+	EditReplaceMainSelection(strlen(out),out);
+	NP2HeapFree(in);
+	NP2HeapFree(out);
+}
+
+//=============================================================================
+//
+// EditBase64Decode()
+//
+
+//Added '-_' characters in DecodingTable to correctly interpret the 'URL Safe Encode'
+static char const DecodingTable[] = {
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 62, 64, 63,
+	52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 65, 64, 64,
+	64,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+	15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 63,
+	64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+	41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+	64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
+};
+
+static void* Base64ToBin( void* dest, char const* src) {
+	unsigned char const* s = (unsigned char*)src;
+	char* p = dest;
+	for(;;) {
+		int const a = DecodingTable[ *s ];
+		if ( a == 64 || a == 65 ) return p;
+		int const b = DecodingTable[ *++s ];
+		if ( b == 64 || b == 65 ) return 0;
+		*p++ = ( a << 2u ) | ( b >> 4u );
+		int const c = DecodingTable[ *++s ];
+		if ( c == 64 ) return 0;
+		int const d = DecodingTable[ *++s ];
+		if ( d == 64 ) return 0;
+		if ( c == 65 ) {
+			if ( d != 65 ) return 0;
+				return p;
+		}
+		*p++ = ( b << 4u ) | ( c >> 2u );
+		if ( d == 65 ) return p;
+		*p++ = ( c << 6u ) | ( d >> 0u );
+		++s;
+	}
+	return p;
+}
+
+void EditBase64Decode(bool DecodeAsHex){
+	if (SciCall_IsRectangleSelection()){
+		NotifyRectangleSelection();
+		return;
+	}
+	size_t len = SciCall_GetSelTextLength();
+	char *in = (char *)NP2HeapAlloc(len+1);
+	SciCall_GetSelText(in);
+	size_t olen = len / 4 * 3;
+	for (int i=len; i-->0; ) {
+		if (in[i] == '=') {
+			olen--;
+		} else {
+			break;
+		}
+	}
+	char *out = (char *)NP2HeapAlloc(olen);
+	Base64ToBin(out, in);
+	if(DecodeAsHex){
+		char *cch = (char *)NP2HeapAlloc((len * 3) + 4 + (floor(len / 16) * 1));
+		const uint8_t *p = (const uint8_t *)out;
+		unsigned int i = 0;
+		char *t = cch;
+		*t++ = '[';
+		*t++ = '\n';
+		while (*p) {
+			const uint8_t c = *p++;
+			*t++ = "0123456789ABCDEF"[c >> 4];
+			*t++ = "0123456789ABCDEF"[c & 15];
+			*t++ = ' ';
+			i++;
+			if(i % 16 == 0) *t++ = '\n';
+		}
+		*t++ = '\n';
+		*t++ = ']';
+		EditReplaceMainSelection(strlen(cch),cch);
+		NP2HeapFree(cch);
+	} else {
+		EditReplaceMainSelection(strlen(out),out);
+	}
+	NP2HeapFree(in);
+	NP2HeapFree(out);
+}
+
+//=============================================================================
+//
 // EditConvertNumRadix()
 //
 static int ConvertNumRadix(char *tch, uint64_t num, int radix) {

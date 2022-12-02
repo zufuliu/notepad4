@@ -335,6 +335,14 @@ BEGIN
 			MENUITEM "Caratteri Esca&pe C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Rimuovi Caratteri Escape C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
 			MENUITEM SEPARATOR
+			POPUP "Base64"
+			BEGIN
+				MENUITEM "Standard Encode\t",							IDM_EDIT_BASE64_ENCODE
+				MENUITEM "URL Safe Encode\t",							IDM_EDIT_BASE64_SAFE_ENCODE
+				MENUITEM "Decode\t",											IDM_EDIT_BASE64_DECODE
+				MENUITEM "Decode as Hex\t",								IDM_EDIT_BASE64_DECODE_AS_HEX
+			END
+			MENUITEM SEPARATOR
 			MENUITEM "Codi&fica URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
 			MENUITEM "Decodifica &URL\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 			MENUITEM "Caratteri Escape &HTML/XML\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
