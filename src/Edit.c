@@ -2205,29 +2205,13 @@ void EditShowHex(void) {
 //
 static char EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static int Blk0( int a ) {
-	int const index = a >> 2u;
-	return EncodingTable[index];
-}
+static int Blk0( int a ) { int const index = a >> 2u; return EncodingTable[index]; }
 
-static int Blk1( int a, int b ) {
-	int const indexA = ( a & 3 ) << 4u;
-	int const indexB = b >> 4u;
-	int const index  = indexA | indexB;
-	return EncodingTable[index];
-}
+static int Blk1( int a, int b ) { int const indexA = ( a & 3 ) << 4u; int const indexB = b >> 4u; int const index  = indexA | indexB; return EncodingTable[index]; }
 
-static unsigned int Blk2( unsigned int b, unsigned int c ) {
-	int const indexB = ( b & 15 ) << 2u;
-	int const indexC = c >> 6u;
-	int const index  = indexB | indexC;
-	return EncodingTable[index];
-}
+static unsigned int Blk2( unsigned int b, unsigned int c ) { int const indexB = ( b & 15 ) << 2u; int const indexC = c >> 6u; int const index  = indexB | indexC; return EncodingTable[index]; }
 
-static int Blk3( int c ) {
-	int const index = c & 0x3f;
-	return EncodingTable[index];
-}
+static int Blk3( int c ) { 	int const index = c & 0x3f; return EncodingTable[index]; }
 
 static char* BinToBase64( char* dest, void const* src, size_t size ) {
 	typedef struct { unsigned char a; unsigned char b; unsigned char c; } block_t;
@@ -2341,7 +2325,8 @@ void EditBase64Decode(bool DecodeAsHex){
 	char *out = (char *)NP2HeapAlloc(olen);
 	Base64ToBin(out, in);
 	if(DecodeAsHex){
-		char *cch = (char *)NP2HeapAlloc((len * 3) + 4 + (floor(len / 16) * 1));
+		//char *cch = (char *)NP2HeapAlloc((len * 3) + 4 + (floor(len / 16) * 1));
+		char *cch = (char *)NP2HeapAlloc(len*3 + 2*(len/16 + 1) + 1);
 		const uint8_t *p = (const uint8_t *)out;
 		unsigned int i = 0;
 		char *t = cch;
