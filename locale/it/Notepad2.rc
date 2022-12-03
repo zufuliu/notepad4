@@ -337,10 +337,10 @@ BEGIN
 			MENUITEM SEPARATOR
 			POPUP "Base&64"
 			BEGIN
-				MENUITEM "Standard &Encode",							IDM_EDIT_BASE64_ENCODE
-				MENUITEM "URL &Safe Encode",							IDM_EDIT_BASE64_SAFE_ENCODE
-				MENUITEM "&Decode",										IDM_EDIT_BASE64_DECODE
-				MENUITEM "Decode as &Hex",								IDM_EDIT_BASE64_DECODE_AS_HEX
+				MENUITEM "&Codifica standard",							IDM_EDIT_BASE64_ENCODE
+				MENUITEM "Codifica &sicura URL",							IDM_EDIT_BASE64_SAFE_ENCODE
+				MENUITEM "&Decodifica",										IDM_EDIT_BASE64_DECODE
+				MENUITEM "Decodifica come &Esadecimale",								IDM_EDIT_BASE64_DECODE_AS_HEX
 			END
 			MENUITEM SEPARATOR
 			MENUITEM "Codi&fica URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
