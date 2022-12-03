@@ -1,3 +1,5 @@
+import string
+
 def GenerateBraceMatchTable():
 	# used in IsBraceMatchChar()
 	table = [0] * 8
@@ -22,6 +24,24 @@ def GenerateDefaultWordCharSet():
 	print('DefaultWordCharSet:')
 	print('\n'.join(lines))
 
+def GenerateBase64Table():
+	encoding = string.ascii_uppercase + string.ascii_lowercase + string.digits + '+/'
+	print('base64 encoding:', encoding)
+	decoding = [128]*128
+	for index, ch in enumerate(encoding):
+		decoding[ord(ch)] = index
+	# url safe
+	decoding[ord('-')] = encoding.index('+')
+	decoding[ord('_')] = encoding.index('/')
+	output = []
+	for i in range(0, len(decoding), 16):
+		line = ', '.join('%3d' % ch for ch in decoding[i:i+16])
+		output.append(line + ',')
+	print('base64 decoding:')
+	print('\n'.join(output))
+
 if __name__ == '__main__':
 	GenerateBraceMatchTable()
 	GenerateDefaultWordCharSet()
+	GenerateBase64Table()
+

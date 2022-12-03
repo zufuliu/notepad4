@@ -923,6 +923,8 @@ void TransformBackslashes(char *pszInput, BOOL bRegEx, UINT cpEdit);
 bool AddBackslashA(char *pszOut, const char *pszInput);
 bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput);
 void EscapeRegex(LPSTR pszOut, LPCSTR pszIn);
+size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSafe);
+size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length);
 
 //==== MinimizeToTray Functions - see comments in Helpers.c ===================
 bool GetDoAnimateMinimize(void);

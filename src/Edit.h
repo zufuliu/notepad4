@@ -145,8 +145,8 @@ void	EditUnescapeXHTMLChars(HWND hwnd);
 void	EditChar2Hex(void);
 void	EditHex2Char(void);
 void	EditShowHex(void);
-void	EditBase64Encode(bool UrlSafeEncode);
-void	EditBase64Decode(bool DecodeAsHex);
+void	EditBase64Encode(bool urlSafe);
+void	EditBase64Decode(bool decodeAsHex);
 void	EditConvertNumRadix(int radix);
 void	EditModifyNumber(bool bIncrease);
 

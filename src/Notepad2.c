@@ -2513,7 +2513,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_EDIT_CHAR2HEX, i);
 	EnableCmd(hmenu, IDM_EDIT_HEX2CHAR, i);
 	EnableCmd(hmenu, IDM_EDIT_SHOW_HEX, i);
-	
+
 	EnableCmd(hmenu, IDM_EDIT_BASE64_ENCODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_SAFE_ENCODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE, i);
@@ -3743,26 +3743,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_BASE64_ENCODE:
-		BeginWaitCursor();
-		EditBase64Encode(false);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_BASE64_SAFE_ENCODE:
 		BeginWaitCursor();
-		EditBase64Encode(true);
+		EditBase64Encode(LOWORD(wParam) == IDM_EDIT_BASE64_SAFE_ENCODE);
 		EndWaitCursor();
 		break;
 
 	case IDM_EDIT_BASE64_DECODE:
-		BeginWaitCursor();
-		EditBase64Decode(false);
-		EndWaitCursor();
-		break;
-
 	case IDM_EDIT_BASE64_DECODE_AS_HEX:
 		BeginWaitCursor();
-		EditBase64Decode(true);
+		EditBase64Decode(LOWORD(wParam) == IDM_EDIT_BASE64_DECODE_AS_HEX);
 		EndWaitCursor();
 		break;
 
