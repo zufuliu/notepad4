@@ -149,7 +149,7 @@ BEGIN
 			MENUITEM "現在のファイルを追加(&A)...\tAlt+K",	IDM_FILE_ADDTOFAV
 			MENUITEM "エクスプローラーで開く(&M)...\tAlt+F9",			IDM_FILE_MANAGEFAV
 		END
-		MENUITEM "最近開いたファイル(&H)...\tAlt+H",		IDM_FILE_RECENT
+		MENUITEM "最近使ったファイル(&H)...\tAlt+H",		IDM_FILE_RECENT
 		MENUITEM SEPARATOR
 		MENUITEM "終了(&X)\tAlt+F4",					IDM_FILE_EXIT
 	END
@@ -1820,7 +1820,7 @@ BEGIN
 /c\t新規ウインドウを開きクリップボードの内容を貼り付け\n\
 /b\tクリップボード履歴表示モードで開く\n\
 /n\t新規ウィンドウで開く (/ns ファイルは単一のインスタンス)\n\
-/r\tひとつウインドウを再利用 (/rs 同じく単一のインスタンス\n\
+/r\tウインドウを再利用 (/rs 同じく単一のインスタンス\n\
 /p\tウィンドウの位置とサイズを指定  (/p0, /ps, /pf,l,t,r,b,m).\n\
 /t タイトル\tタイトルバーの文字列を指定 [/t text]\n\
 /i\tシステムトレイ内に起動\n\
