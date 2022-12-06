@@ -155,7 +155,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 // https://docs.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting
 constexpr bool IsInvalidFormatSpecifier(int ch) noexcept {
 	// Custom format strings allows any characters
-	return (ch >= '\0' && ch < ' ') || ch == '\"' || ch == '}' || ch == '{';
+	return (ch >= '\0' && ch < ' ') || ch == '\"' || ch == '{' || ch == '}';
 }
 
 inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler) noexcept {
