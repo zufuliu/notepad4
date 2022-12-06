@@ -327,8 +327,8 @@ public:
 	int MarginRight();
 	bool Modify();
 	void SetSel(Position anchor, Position caret);
-	Position GetSelText(char *text);
-	std::string GetSelText();
+	Position GetSelText(bool asBinary, char *text);
+	std::string GetSelText(bool asBinary);
 	Position GetTextRangeFull(void *tr);
 	void HideSelection(bool hide);
 	bool SelectionHidden();

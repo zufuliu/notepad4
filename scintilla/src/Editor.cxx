@@ -1073,7 +1073,8 @@ void Editor::MoveSelectedLines(int lineDelta) {
 	SetSelection(selectionStart, selectionEnd);
 
 	SelectionText selectedText;
-	CopySelectionRange(&selectedText);
+	selectedText.asBinary = true;
+	CopySelectionRange(selectedText);
 
 	const Point currentLocation = LocationFromPosition(CurrentPosition());
 	const Sci::Line currentLine = LineFromLocation(currentLocation);
@@ -2279,7 +2280,7 @@ void Editor::ClearDocumentStyle() {
 
 void Editor::CopyAllowLine() {
 	SelectionText selectedText;
-	CopySelectionRange(&selectedText, true);
+	CopySelectionRange(selectedText, true);
 	CopyToClipboard(selectedText);
 }
 
@@ -4356,7 +4357,7 @@ std::string Editor::RangeText(Sci::Position start, Sci::Position end) const {
 	return {};
 }
 
-void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
+void Editor::CopySelectionRange(SelectionText &ss, bool allowLineCopy) {
 	if (sel.Empty()) {
 		if (allowLineCopy) {
 			const Sci::Line currentLine = pdoc->SciLineFromPosition(sel.MainCaret());
@@ -4364,7 +4365,7 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 			const Sci::Position end = pdoc->LineStart(currentLine + 1);
 
 			const std::string text = RangeText(start, end);
-			ss->Copy(text, pdoc->dbcsCodePage, false, true);
+			ss.Copy(text, pdoc->dbcsCodePage, false, true);
 		}
 	} else {
 		std::string text;
@@ -4380,7 +4381,7 @@ void Editor::CopySelectionRange(SelectionText *ss, bool allowLineCopy) {
 					text.push_back('\n');
 			}
 		}
-		ss->Copy(text, pdoc->dbcsCodePage, sel.IsRectangular(), sel.selType == Selection::SelTypes::lines);
+		ss.Copy(text, pdoc->dbcsCodePage, sel.IsRectangular(), sel.selType == Selection::SelTypes::lines);
 	}
 }
 
@@ -4922,7 +4923,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, KeyMod modifiers) {
 			SetMouseCapture(false);
 			FineTickerCancel(TickReason::scroll);
 			SetDragPosition(movePos);
-			CopySelectionRange(&drag);
+			CopySelectionRange(drag);
 			StartDrag();
 		}
 		return;
@@ -6238,7 +6239,8 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 	case Message::GetSelText: {
 			SelectionText selectedText;
-			CopySelectionRange(&selectedText);
+			selectedText.asBinary = wParam != 0;
+			CopySelectionRange(selectedText);
 			const size_t iChar = selectedText.Length();
 			if (lParam) {
 				char *ptr = CharPtrFromSPtr(lParam);

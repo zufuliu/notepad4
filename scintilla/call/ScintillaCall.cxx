@@ -1150,12 +1150,12 @@ void ScintillaCall::SetSel(Position anchor, Position caret) {
 	Call(Message::SetSel, anchor, caret);
 }
 
-Position ScintillaCall::GetSelText(char *text) {
-	return CallPointer(Message::GetSelText, 0, text);
+Position ScintillaCall::GetSelText(bool asBinary, char *text) {
+	return CallPointer(Message::GetSelText, asBinary, text);
 }
 
-std::string ScintillaCall::GetSelText() {
-	return CallReturnString(Message::GetSelText, 0);
+std::string ScintillaCall::GetSelText(bool asBinary) {
+	return CallReturnString(Message::GetSelText, asBinary);
 }
 
 Position ScintillaCall::GetTextRangeFull(void *tr) {

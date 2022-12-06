@@ -357,7 +357,11 @@ NP2_inline Sci_Position SciCall_GetSelTextLength(void) {
 }
 
 NP2_inline Sci_Position SciCall_GetSelText(char *buffer) {
-	return SciCall(SCI_GETSELTEXT, 0, (LPARAM)buffer);
+	return SciCall(SCI_GETSELTEXT, FALSE, (LPARAM)buffer);
+}
+
+NP2_inline Sci_Position SciCall_GetSelBytes(char *buffer) {
+	return SciCall(SCI_GETSELTEXT, TRUE, (LPARAM)buffer);
 }
 
 NP2_inline bool SciCall_IsRectangleSelection(void) {

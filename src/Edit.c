@@ -2169,7 +2169,6 @@ void EditHex2Char(void) {
 }
 
 void EditShowHex(void) {
-	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	const Sci_Position count = SciCall_GetSelTextLength();
 	if (count == 0) {
 		return;
@@ -2181,20 +2180,22 @@ void EditShowHex(void) {
 
 	char *ch = (char *)NP2HeapAlloc(count + 1);
 	char *cch = (char *)NP2HeapAlloc(count * 3 + 3);
-	SciCall_GetSelText(ch);
+	SciCall_GetSelBytes(ch);
 	const uint8_t *p = (const uint8_t *)ch;
+	const uint8_t * const end = p + count;
 	char *t = cch;
 	*t++ = '[';
-	while (*p) {
+	do {
 		const uint8_t c = *p++;
 		*t++ = "0123456789ABCDEF"[c >> 4];
 		*t++ = "0123456789ABCDEF"[c & 15];
 		*t++ = ' ';
-	}
+	} while (p < end);
 	*--t = ']';
 
+	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	SciCall_InsertText(iSelEnd, cch);
-	SciCall_SetSel(iSelEnd, iSelEnd + strlen(cch));
+	SciCall_SetSel(iSelEnd, iSelEnd + (t - cch));
 	NP2HeapFree(ch);
 	NP2HeapFree(cch);
 }
@@ -2210,7 +2211,7 @@ void EditBase64Encode(bool urlSafe){
 	}
 
 	char *input = (char *)NP2HeapAlloc(len + 1);
-	SciCall_GetSelText(input);
+	SciCall_GetSelBytes(input);
 	size_t outLen = (len*4)/3 + 4;
 	char *output = (char *)NP2HeapAlloc(outLen);
 	outLen = Base64Encode(output, (const uint8_t *)input, len, urlSafe);

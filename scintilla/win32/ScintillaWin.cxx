@@ -2883,7 +2883,7 @@ void ScintillaWin::Copy(bool asBinary) {
 	if (!sel.Empty()) {
 		SelectionText selectedText;
 		selectedText.asBinary = asBinary;
-		CopySelectionRange(&selectedText);
+		CopySelectionRange(selectedText);
 		CopyToClipboard(selectedText);
 	}
 }

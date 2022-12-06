@@ -3035,9 +3035,6 @@ size_t Base64Encode(char *output, const uint8_t *src, size_t length, bool urlSaf
 	if (urlSafe) {
 		table[62] = '-';
 		table[63] = '_';
-	} else {
-		table[62] = '+';
-		table[63] = '/';
 	}
 
 	char *p = output;
@@ -3089,7 +3086,7 @@ size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) {
 		if ((signed char)(ch) < 0) {
 			break;
 		}
-		value = (value << 6) | (ch & 0x3f);
+		value = (value << 6) | ch;
 		++src;
 		i++;
 		if ((i & 3) == 0) {
@@ -3102,11 +3099,11 @@ size_t Base64Decode(uint8_t *output, const uint8_t *src, size_t length) {
 	i &= 3;
 	if (i != 0) {
 		if (i == 3) {
-			value <<= 6;
-			*p++ = (uint8_t)(value >> 16);
+			value >>= (8 - 6);
 			*p++ = (uint8_t)(value >> 8);
+			*p++ = (uint8_t)(value);
 		} else {
-			*p++ = (uint8_t)(value >> 4);
+			*p++ = (uint8_t)(value >> (16 - 12));
 		}
 	}
 	return p - output;

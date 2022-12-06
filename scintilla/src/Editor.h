@@ -526,7 +526,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	virtual void CopyToClipboard(const SelectionText &selectedText) = 0;
 	std::string RangeText(Sci::Position start, Sci::Position end) const;
-	void CopySelectionRange(SelectionText *ss, bool allowLineCopy = false);
+	void CopySelectionRange(SelectionText &ss, bool allowLineCopy = false);
 	void CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool lineCopy = false);
 	void CopyText(size_t length, const char *text);
 	void SetDragPosition(SelectionPosition newPos);

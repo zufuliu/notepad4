@@ -1322,7 +1322,7 @@ fun void SetSel=2160(position anchor, position caret)
 # Retrieve the selected text.
 # Return the length of the text.
 # Result is NUL-terminated.
-fun position GetSelText=2161(, stringresult text)
+fun position GetSelText=2161(bool asBinary, stringresult text)
 
 # Retrieve a range of text.
 # Return the length of the text.

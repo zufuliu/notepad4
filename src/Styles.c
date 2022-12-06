@@ -1458,12 +1458,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			break;
 		}
 		if (dialect > 0) {
-			char lang[4] = "";
+			char lang[4];
 			if (dialect < 10) {
-				lang[0] = (char)(dialect + '0');
-			} else {
-				memcpy(lang, &dialect, sizeof(int));
+				dialect += '0';
 			}
+			memcpy(lang, &dialect, sizeof(int));
 			SciCall_SetProperty("lexer.lang", lang);
 		}
 
