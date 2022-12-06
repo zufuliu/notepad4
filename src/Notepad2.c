@@ -5636,7 +5636,7 @@ void LoadSettings(void) {
 	iDefaultEOLMode = clamp_i(iValue, SC_EOL_CRLF, SC_EOL_LF);
 
 	bWarnLineEndings = IniSectionGetBool(pIniSection, L"WarnLineEndings", true);
-	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", true);
+	bFixLineEndings = IniSectionGetBool(pIniSection, L"FixLineEndings", false);
 	bAutoStripBlanks = IniSectionGetBool(pIniSection, L"FixTrailingBlanks", false);
 
 	iValue = IniSectionGetInt(pIniSection, L"PrintHeader", PrintHeaderOption_FilenameAndDate);

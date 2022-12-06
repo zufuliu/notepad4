@@ -1152,7 +1152,7 @@ bool EditSaveFile(HWND hwnd, LPCWSTR pszFile, int saveFlag, EditFileIOStatus *st
 		return false;
 	}
 
-	if (!(saveFlag & FileSaveFlag_EndSession)) {
+	if (!(saveFlag & FileSaveFlag_EndSession) && !bReadOnlyMode) {
 		// ensure consistent line endings
 		if (bFixLineEndings) {
 			EditEnsureConsistentLineEndings();
