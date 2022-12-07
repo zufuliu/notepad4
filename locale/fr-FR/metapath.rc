@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource.h"
-#include "config.h"
+#include "../../metapath/src/resource.h"
+#include "../../metapath/src/config.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -18,10 +18,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// French (France) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // RT_MANIFEST
 //
 
-IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\metapath.exe.manifest"
+IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\metapath\\res\\metapath.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -38,30 +38,30 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\metapath.exe.manifest"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINWND             ICON                    "..\\res\\metapath.ico"
-IDI_RUN                 ICON                    "..\\res\\Run.ico"
-IDI_PROGS               ICON                    "..\\res\\Progs.ico"
-IDI_OPTIONS             ICON                    "..\\res\\Options.ico"
-IDI_OPTIONS2            ICON                    "..\\res\\Options2.ico"
-IDI_GOTO                ICON                    "..\\res\\Goto.ico"
-IDI_ITEMS               ICON                    "..\\res\\Items.ico"
-IDI_CROSS1              ICON                    "..\\res\\cross1.ico"
-IDI_CROSS2              ICON                    "..\\res\\cross2.ico"
+IDR_MAINWND             ICON                    "..\\..\\metapath\\res\\metapath.ico"
+IDI_RUN                 ICON                    "..\\..\\metapath\\res\\Run.ico"
+IDI_PROGS               ICON                    "..\\..\\metapath\\res\\Progs.ico"
+IDI_OPTIONS             ICON                    "..\\..\\metapath\\res\\Options.ico"
+IDI_OPTIONS2            ICON                    "..\\..\\metapath\\res\\Options2.ico"
+IDI_GOTO                ICON                    "..\\..\\metapath\\res\\Goto.ico"
+IDI_ITEMS               ICON                    "..\\..\\metapath\\res\\Items.ico"
+IDI_CROSS1              ICON                    "..\\..\\metapath\\res\\cross1.ico"
+IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\cross2.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
-IDR_MAINWND             BITMAP                  "..\\res\\Toolbar.bmp"
-IDB_OPEN_FOLDER         BITMAP                  "..\\res\\OpenFolder.bmp"
+IDR_MAINWND             BITMAP                  "..\\..\\metapath\\res\\Toolbar.bmp"
+IDB_OPEN_FOLDER         BITMAP                  "..\\..\\metapath\\res\\OpenFolder.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Cursor
 //
 
-IDC_CROSSHAIR           CURSOR                  "..\\res\\crosshair.cur"
+IDC_CROSSHAIR           CURSOR                  "..\\..\\metapath\\res\\crosshair.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -606,7 +606,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
+#endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -616,7 +616,7 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-#include "metapath.ver"
+#include "../../metapath/src/metapath.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

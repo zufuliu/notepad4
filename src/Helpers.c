@@ -1458,6 +1458,9 @@ HMODULE LoadLocalizedResourceDLL(LANGID lang, LPCWSTR dllName) {
 	case LANG_CHINESE:
 		folder = IsChineseTraditionalSubLang(subLang) ? L"zh-Hant" : L"zh-Hans";
 		break;
+	case LANG_FRENCH:
+		folder = L"fr-FR";
+		break;
 	case LANG_GERMAN:
 		folder = L"de";
 		break;

@@ -2275,6 +2275,9 @@ void ValidateUILangauge(void) {
 	case LANG_CHINESE:
 		languageMenu = IsChineseTraditionalSubLang(subLang)? IDM_LANG_CHINESE_TRADITIONAL : IDM_LANG_CHINESE_SIMPLIFIED;
 		break;
+	case LANG_FRENCH:
+		languageMenu = IDM_LANG_FRENCH_FRANCE;
+		break;
 	case LANG_GERMAN:
 		languageMenu = IDM_LANG_GERMAN;
 		break;
@@ -2312,6 +2315,9 @@ void SetUILanguage(int menu) {
 		break;
 	case IDM_LANG_CHINESE_TRADITIONAL:
 		lang = MAKELANGID(LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL);
+		break;
+	case IDM_LANG_FRENCH_FRANCE:
+		lang = MAKELANGID(LANG_FRENCH, SUBLANG_FRENCH);
 		break;
 	case IDM_LANG_GERMAN:
 		lang = MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN);
@@ -4686,6 +4692,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LANG_ITALIAN:
 	case IDM_LANG_KOREAN:
 	case IDM_LANG_PORTUGUESE_BRAZIL:
+	case IDM_LANG_FRENCH_FRANCE:
 		SetUILanguage(LOWORD(wParam));
 		break;
 #endif
