@@ -239,3 +239,63 @@ def ReplaceREInFile(path, match, replace, count=1):
         contents = f.read()
     contents = re.sub(match, replace, contents, count)
     UpdateFile(path, contents)
+
+def MakeKeywordGroups(items, maxLineLength=120, prefixLen=1, makeLower=False):
+    groups = {}
+    for item in items:
+        if item.endswith('()'):
+            # ')' is not used by lexer or auto-completion:
+            # 1. use InListPrefixed(s, '(') in lexer to match the word
+            # 2. ')' is auto added in WordList_AddListEx()
+            item = item[:-1]
+        key = item[:prefixLen]
+        if makeLower:
+            key = key.lower()
+        if key in groups:
+            groups[key]['items'].append(item)
+            groups[key]['len'] += len(item) + 1
+        else:
+            groups[key] = {'items': [item], 'len': len(item) + 1}
+
+    if prefixLen > 1:
+        removed = []
+        subs = []
+        for key, group in groups.items():
+            if group['len'] > maxLineLength:
+                removed.append(key)
+                sub = MakeKeywordGroups(group['items'], maxLineLength, prefixLen + 1, makeLower)
+                subs.append(sub)
+        for key in removed:
+            del groups[key]
+        for sub in subs:
+            groups.update(sub)
+        groups = dict(sorted(groups.items()))
+    return groups
+
+def MakeKeywordLines(items, maxLineLength=120, prefixLen=1, makeLower=False):
+    if not items:
+        return []
+    groups = MakeKeywordGroups(items, maxLineLength, prefixLen, makeLower)
+    groups = list(groups.values())
+    count = len(groups)
+    lines = []
+    index = 0
+    while index < count:
+        group = groups[index]
+        index += 1
+        lineLen = group['len']
+        items = group['items']
+        if lineLen > maxLineLength and prefixLen == 1:
+            sub = MakeKeywordLines(items, maxLineLength, 2, makeLower)
+            lines.extend(sub)
+        else:
+            while index < count:
+                group = groups[index]
+                lineLen += group['len']
+                if lineLen > maxLineLength:
+                    break
+                index += 1
+                items.extend(group['items'])
+            lines.append(' '.join(items))
+
+    return lines

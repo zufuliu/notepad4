@@ -1412,7 +1412,10 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 	wclen = main - pos - 1;
 #endif
 
+	//const ElapsedPeriod elapsed;
 	const uint32_t wch = GetLaTeXInputUnicodeCharacter(ptr, wclen);
+	//const double duration = elapsed.Duration()*1e6;
+	//printf("LaTeXInput(%s) => %04X, %.3f\n", ptr, wch, duration);
 	if (wch == 0) {
 		return false;
 	}

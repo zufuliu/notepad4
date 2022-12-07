@@ -1,3 +1,4 @@
+import sys
 import os.path
 import re
 import string
@@ -5,7 +6,7 @@ import json
 from statistics import variance
 import time
 
-from FileGenerator import Regenerate
+from FileGenerator import Regenerate, MakeKeywordLines
 import UnicodeData
 
 header_path = '../include/LaTeXInput.h'
@@ -13,7 +14,7 @@ data_path = '../win32/LaTeXInputData.h'
 
 source_info = {
 	# data source at https://github.com/JuliaLang/julia/tree/master/stdlib/REPL/src
-	'latex_link': 'https://docs.julialang.org/en/v1.8-dev/manual/unicode-input/',
+	'latex_link': 'https://docs.julialang.org/en/v1.10-dev/manual/unicode-input/',
 	'emoji_link': 'https://github.com/iamcal/emoji-data/blob/master/emoji_pretty.json',
 }
 
@@ -73,7 +74,7 @@ def fast_counter(items):
 	return counter
 
 
-def prepare_input_data(input_map, path):
+def prepare_input_data_hash(input_map, path):
 	if not input_map:
 		input_map = json_load(path)
 	for key, info in input_map.items():
@@ -138,7 +139,7 @@ def find_hash_param(input_map, multiplier_list, max_hash_size):
 						hash_param[multiplier] = [item]
 	return hash_param
 
-def update_latex_input_data(input_name, input_map, multiplier, hash_size):
+def update_latex_input_data_hash(input_name, input_map, multiplier, hash_size):
 	hash_map = {}
 	for info in input_map.values():
 		hash_key = djb2_hash(info['hash_key'], multiplier) % hash_size
@@ -230,9 +231,9 @@ def update_latex_input_data(input_name, input_map, multiplier, hash_size):
 	print(input_name, 'count:', len(input_map), 'content:', string_size,
 		'map:', (hash_size, list_size, max_collision, max_comparison), 'total:', (size, size/1024))
 
-def update_all_latex_input_data(latex_map=None, emoji_map=None):
-	latex_map = prepare_input_data(latex_map, 'latex_map.json')
-	emoji_map = prepare_input_data(emoji_map, 'emoji_map.json')
+def update_all_latex_input_data_hash(latex_map=None, emoji_map=None):
+	latex_map = prepare_input_data_hash(latex_map, 'latex_map.json')
+	emoji_map = prepare_input_data_hash(emoji_map, 'emoji_map.json')
 
 	if True:
 		multiplier_list = [33]
@@ -254,9 +255,167 @@ def update_all_latex_input_data(latex_map=None, emoji_map=None):
 		print('hash multiplier:', multiplier_list)
 		dump_hash_param(latex_hash, multiplier_list, 'latex_hash.log')
 		dump_hash_param(emoji_hash, multiplier_list, 'emoji_hash.log')
+		assert any(item[1] == 290 for item in latex_hash[33])
+		assert any(item[1] == 160 for item in emoji_hash[33])
 
-	update_latex_input_data('LaTeX', latex_map, 33, 290)
-	update_latex_input_data('Emoji', emoji_map, 33, 164)
+	update_latex_input_data_hash('LaTeX', latex_map, 33, 290)
+	update_latex_input_data_hash('Emoji', emoji_map, 33, 160)
+
+
+def update_latex_input_data_linear(input_name, input_map, path, param):
+	if not input_map:
+		input_map = json_load(path)
+	input_list = sorted(input_map.items())
+	key_list = [item[0] for item in input_list]
+
+	singleChar = [item[1]['character'] for item in input_list if len(item[1]['character']) == 1]
+	doubleChar = sorted(item[1]['character'] for item in input_list if len(item[1]['character']) > 1)
+	minChar = min(singleChar)
+	maxChar = max(singleChar)
+	charBit = ord(maxChar).bit_length()
+
+	minKeyLen = min(len(key) for key in key_list)
+	maxKeyLen = max(len(key) for key in key_list)
+	keyLenBit = maxKeyLen.bit_length()
+	if 'keyLenBit' in param:
+		keyLenBit = max(keyLenBit, param['keyLenBit'])
+	hashBit = 32 - charBit
+	hashMask = (1 << hashBit) - 1
+
+	firstList = set(key[-1] for key in key_list if len(key) > 1)
+	if 'minFirst' in param:
+		minFirst = param['minFirst']
+	else:
+		minFirst = min(firstList)
+	maxFirst = max(firstList)
+	firstBit = (ord(maxFirst) - ord(minFirst)).bit_length() - 1
+	firstMask = (1 << firstBit) - 1
+
+	secondList = set(key[-2] for key in key_list if len(key) > 2)
+	if 'minSecond' in param:
+		minSecond = param['minSecond']
+	else:
+		minSecond = min(secondList)
+	maxSecond = max(secondList)
+	secondBit = hashBit - keyLenBit - firstBit
+	secondMask = (1 << secondBit) - 1
+
+	prefix = '\\'
+	suffix = ''
+	if input_name == 'Emoji':
+		prefix = '\\:'
+		suffix = ':'
+	group = {}
+	hashStat = {}
+	start = len(doubleChar)
+	doubleList = ['']*start
+	totalKeyLen = 0
+	output = []
+	for key, info in input_list:
+		initial = ord(key[0])
+		if initial in group:
+			group[initial]['count'] += 1
+		else:
+			group[initial] = {'start': start, 'count': 1, 'offset': totalKeyLen}
+
+		start += 1
+		keyLen = len(key)
+		totalKeyLen += keyLen + 1
+
+		magic = ((ord(key[-1]) - ord(minFirst)) & firstMask) << keyLenBit
+		if keyLen > 2:
+			second = (ord(key[-2]) - ord(minSecond)) & secondMask
+			magic = magic | (second << (keyLenBit + firstBit))
+
+		hash_key = magic | (keyLen + 1)
+		character = info['character']
+		sequence = prefix + info['sequence'] + suffix
+		name = info['name']
+		if len(character) > 1:
+			code = doubleChar.index(character)
+			info['index'] = code
+			line = f"0x{ord(character[1]):04X}'{ord(character[0]):04X}, // {character}, {sequence}, {name}"
+			doubleList[code] = line
+		else:
+			code = ord(character)
+		magic = (code << hashBit) | hash_key
+		line = f'0x{magic:08x}, // U+{code:05X} {character}, {sequence}, {name}'
+		output.append(line)
+
+		hash_key = (initial, hash_key)
+		if hash_key in hashStat:
+			hashStat[hash_key] += 1
+		else:
+			hashStat[hash_key] = 1
+
+	minInitial = min(group.keys())
+	maxInitial = max(group.keys())
+	groupCount = maxInitial - minInitial + 1
+	maxInitialCount = max(item['count'] for item in group.values())
+	collision = max(hashStat.values()), round(len(input_map)/len(hashStat), 4)
+	totalSize = (totalKeyLen + 2*groupCount + 4*(groupCount + len(input_map) + len(doubleChar)))/1024
+	print(f'''{input_name} {len(input_map)} {hex(ord(minChar)), hex(ord(maxChar))}, bit: {charBit}, double: {len(doubleChar)}, total: {totalSize}
+    group table: {chr(minInitial), chr(maxInitial)}, size: {groupCount}, max: {maxInitialCount}
+     key length: {minKeyLen, maxKeyLen}, bit: {maxKeyLen.bit_length()} / {keyLenBit}, total: {totalKeyLen/1024}
+       hash bit: {hashBit, hashBit - keyLenBit, firstBit, secondBit}, collision: {collision}
+     hash first: {min(firstList), maxFirst}: {minFirst}, bit: {firstBit}
+    hash second: {min(secondList), maxSecond}: {minSecond}, bit: {secondBit}''')
+
+	output = doubleList + output
+	Regenerate(data_path, f'//{input_name} list', output)
+
+	offsetList = [0]*groupCount
+	groupList = [0]*groupCount
+	for key, item in group.items():
+		key -= minInitial
+		start = item['start']
+		offsetList[key] = item['offset']
+		groupList[key] = start | ((start + item['count']) << 16)
+
+	output = []
+	output.extend(f"""#define {input_name}MinInitialCharacter\t{quote_c_char(chr(minInitial))}
+#define {input_name}MaxInitialCharacter\t{quote_c_char(chr(maxInitial))}
+""".splitlines())
+	if input_name == 'LaTeX':
+		output.extend(f"""#define {input_name}DoubleCharacterCount\t{len(doubleChar)}
+#define {input_name}HashBit\t\t{hashBit}
+#define {input_name}HashMask\t\t{hex(hashMask)}
+#define {input_name}LengthBit\t\t{keyLenBit}
+#define {input_name}LengthMask\t\t{(1 << keyLenBit) - 1}
+#define {input_name}FirstSubCharacter\t{quote_c_char(minFirst)}
+#define {input_name}FirstSubBit\t\t{firstBit}
+#define {input_name}FirstSubMask\t\t{firstMask}
+#define {input_name}SecondSubCharacter\t{quote_c_char(minSecond)}
+#define {input_name}SecondSubBit\t\t{secondBit}
+#define {input_name}SecondSubMask\t\t{secondMask}
+""".splitlines())
+	output.append('')
+	output.append(f"static const uint32_t {input_name}IndexTable[] = {{")
+	for i in range(0, groupCount, 10):
+		line = ', '.join(f'0x{value:08x}' for value in groupList[i:i+10])
+		output.append(line + ',')
+	output.append(f"}};")
+	output.append('')
+	output.append(f"static const uint16_t {input_name}OffsetTable[] = {{")
+	for i in range(0, groupCount, 10):
+		line = ', '.join(f'0x{value:04x}' for value in offsetList[i:i+10])
+		output.append(line + ',')
+	output.append(f"}};")
+	Regenerate(data_path, f'//{input_name} hash', output)
+
+	lines = MakeKeywordLines(key_list)
+	output = [f'"{line} "' for line in lines]
+	output[-1] += ';'
+	Regenerate(data_path, f'//{input_name} string', output)
+
+def update_all_latex_input_data_linear(latex_map=None, emoji_map=None):
+	param = {
+		'keyLenBit': 6,
+		'minFirst': '!',
+		'minSecond': '-',
+	}
+	update_latex_input_data_linear('LaTeX', latex_map, 'latex_map.json', param)
+	update_latex_input_data_linear('Emoji', emoji_map, 'emoji_map.json', param)
 
 
 def get_input_map_size_info(input_name, input_map):
@@ -476,7 +635,7 @@ def parse_iamcal_emoji_data_json(path):
 
 	return emoji_map, non_qualified
 
-def parse_all_data_source(update_data=True):
+def parse_all_data_source():
 	latex_map, emoji_map = parse_julia_unicode_input_html('Unicode Input.html')
 	with open('latex_map.json', 'w', encoding='utf-8', newline='\n') as fd:
 		fd.write(json_dump(latex_map))
@@ -491,8 +650,7 @@ def parse_all_data_source(update_data=True):
 		fd.write(json_dump(emoji_map))
 
 	update_latex_input_header(latex_map, emoji_map)
-	if update_data:
-		update_all_latex_input_data(latex_map, emoji_map)
 
-parse_all_data_source()
-#update_all_latex_input_data()
+#parse_all_data_source()
+#update_all_latex_input_data_hash()
+update_all_latex_input_data_linear()

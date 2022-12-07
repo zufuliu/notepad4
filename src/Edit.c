@@ -2191,7 +2191,7 @@ void EditShowHex(void) {
 		*t++ = "0123456789ABCDEF"[c & 15];
 		*t++ = ' ';
 	} while (p < end);
-	*--t = ']';
+	t[-1] = ']';
 
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	SciCall_InsertText(iSelEnd, cch);

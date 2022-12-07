@@ -2,11 +2,7 @@
 // See License.txt for details about distribution and modification.
 
 #include <cstdint>
-//#include <cstdio>
 
-//#include <chrono>
-
-//#include "ElapsedPeriod.h"
 #include "LaTeXInput.h"
 
 namespace {
@@ -26,6 +22,7 @@ constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
 
 #include "LaTeXInputData.h"
 
+#if 0
 uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 #if EnableLaTeXLikeEmojiInput
 	static_assert(LaTeXHashMultiplier == EmojiHashMultiplier);
@@ -51,7 +48,6 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	}
 #endif
 
-	//const Scintilla::Internal::ElapsedPeriod elapsed;
 #if EnableLaTeXLikeEmojiInput
 	const char *sequenceString;
 	const InputSequence *sequenceList;
@@ -109,7 +105,112 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 		} while (start < stop);
 	}
 
-	//const double duration = elapsed.Duration()*1e6;
-	//printf("LaTeXInput(%s) => %04X, %.3f\n", sequence, value, duration);
 	return value;
 }
+
+#else
+uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
+	uint8_t firstChar = sequence[0];
+#if EnableLaTeXLikeEmojiInput
+	uint32_t start;
+	uint32_t offset;
+	const char *sequenceString;
+	const uint32_t *sequenceList;
+	if (firstChar != ':') {
+		if (length < MinLaTeXInputSequenceLength || length > MaxLaTeXInputSequenceLength) {
+			return 0;
+		}
+		offset = firstChar - LaTeXMinInitialCharacter;
+		if (offset > LaTeXMaxInitialCharacter - LaTeXMinInitialCharacter) {
+			return 0;
+		}
+		start = LaTeXIndexTable[offset];
+		if (start == 0) {
+			return 0;
+		}
+
+		offset = LaTeXOffsetTable[offset];
+		sequenceList = LaTeXInputSequenceList;
+		sequenceString = LaTeXInputSequenceString;
+	} else {
+		if (length < MinEmojiInputSequenceLength || length > MaxEmojiInputSequenceLength) {
+			return 0;
+		}
+		length -= EmojiInputSequencePrefixLength;
+		sequence += EmojiInputSequencePrefixLength;
+		const char ch = sequence[length - EmojiInputSequenceSuffixLength];
+		if (ch == ':') {
+			length -= EmojiInputSequenceSuffixLength;
+		}
+
+		firstChar = sequence[0];
+		offset = firstChar - EmojiMinInitialCharacter;
+		if (offset > EmojiMaxInitialCharacter - EmojiMinInitialCharacter) {
+			return 0;
+		}
+		start = EmojiIndexTable[offset];
+		if (start == 0) {
+			return 0;
+		}
+
+		offset = EmojiOffsetTable[offset];
+		sequenceList = EmojiInputSequenceList;
+		sequenceString = EmojiInputSequenceString;
+	}
+#else
+	if (length < MinLaTeXInputSequenceLength || length > MaxLaTeXInputSequenceLength) {
+		return 0;
+	}
+	uint32_t offset = firstChar - LaTeXMinInitialCharacter;
+	if (offset > LaTeXMaxInitialCharacter - LaTeXMinInitialCharacter) {
+		return 0;
+	}
+	uint32_t start = LaTeXIndexTable[offset];
+	if (start == 0) {
+		return 0;
+	}
+
+	offset = LaTeXOffsetTable[offset];
+	const char * const sequenceString = LaTeXInputSequenceString;
+	const uint32_t * const sequenceList = LaTeXInputSequenceList;
+#endif
+
+	const char * const end = sequence + length;
+	uint32_t magic = static_cast<uint32_t>(length) + 1;
+	firstChar = end[-1];
+	magic |= ((firstChar - LaTeXFirstSubCharacter) & LaTeXFirstSubMask) << LaTeXLengthBit;
+	if (length > 2) {
+		firstChar = end[-2];
+		magic |= ((firstChar - LaTeXSecondSubCharacter) & LaTeXSecondSubMask) << (LaTeXLengthBit + LaTeXFirstSubBit);
+	}
+
+	const uint32_t stop = start >> 16;
+	start &= 0xffff;
+	do {
+		uint32_t value = sequenceList[start];
+		if ((value & LaTeXHashMask) == magic) {
+			const char *s = sequenceString + offset + 1;
+			const char *ptr = sequence + 1;
+			while (ptr < end && *ptr == *s) {
+				++ptr;
+				++s;
+			}
+			if (ptr == end) {
+				value >>= LaTeXHashBit;
+				if (value < LaTeXDoubleCharacterCount) {
+					value = sequenceList[value];
+				} else if (value > 0xffff) {
+					// UTF-32 to UTF-16
+					const uint32_t trail = 0xDC00 + (value & 0x3FF);
+					value = 0xD800 - (0x10000 >> 10) + (value >> 10);
+					value |= trail << 16;
+				}
+				return value;
+			}
+		}
+		offset += value & LaTeXLengthMask;
+		++start;
+	} while (start < stop);
+	return 0;
+}
+#endif
