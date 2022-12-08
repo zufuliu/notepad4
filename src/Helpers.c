@@ -446,8 +446,11 @@ HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) {
 
 HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height) {
 	BITMAP bmp;
-	if (dpi > USER_DEFAULT_SCREEN_DPI && GetObject(hbmp, sizeof(BITMAP), &bmp)) {
+	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		height = MulDiv(dpi, height, USER_DEFAULT_SCREEN_DPI);
+		if (height == bmp.bmHeight) {
+			return hbmp;
+		}
 		// keep aspect ratio
 		const int width = MulDiv(height, bmp.bmWidth, bmp.bmHeight);
 		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
