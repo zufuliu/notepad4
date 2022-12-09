@@ -179,7 +179,7 @@ def resize_toolbar_bitmap_each(path, percent, method=ResizeMethod.Bicubic, out_p
 
 resize_toolbar_bitmap = resize_toolbar_bitmap_whole
 
-def make_matapath_toolbar_bitmap():
+def make_metapath_toolbar_bitmap():
 	concat_horizontal([
 		'images/Previous_16x.png',				# IDT_HISTORY_BACK
 		'images/Next_16x.png',					# IDT_HISTORY_FORWARD
@@ -199,36 +199,37 @@ def make_matapath_toolbar_bitmap():
 	], 'Toolbar.bmp')
 
 def make_notepad2_toolbar_bitmap():
+	TB_Size=input("Insert toolbar size output in px: ")
 	concat_horizontal([
-		'images/.png',			# IDT_FILE_NEW
-		'images/.png',			# IDT_FILE_OPEN
-		'images/.png',			# IDT_FILE_BROWSE
-		'images/.png',			# IDT_FILE_SAVE
-		'images/.png',			# IDT_EDIT_UNDO
-		'images/.png',			# IDT_EDIT_REDO
-		'images/.png',			# IDT_EDIT_CUT
-		'images/.png',			# IDT_EDIT_COPY
-		'images/.png',			# IDT_EDIT_PASTE
-		'images/.png',			# IDT_EDIT_FIND
-		'images/.png',			# IDT_EDIT_REPLACE
-		'images/.png',			# IDT_VIEW_WORDWRAP
-		'images/.png',			# IDT_VIEW_ZOOMIN
-		'images/.png',			# IDT_VIEW_ZOOMOUT
-		'images/.png',			# IDT_VIEW_SCHEME
-		'images/.png',			# IDT_VIEW_SCHEMECONFIG
-		'images/.png',			# IDT_FILE_EXIT
-		'images/.png',			# IDT_FILE_SAVEAS
-		'images/.png',			# IDT_FILE_SAVECOPY
-		'images/.png',			# IDT_EDIT_DELETE
-		'images/.png',			# IDT_FILE_PRINT
-		'images/.png',			# IDT_FILE_OPENFAV
-		'images/.png',			# IDT_FILE_ADDTOFAV
-		'images/.png',			# IDT_VIEW_TOGGLEFOLDS
-		'images/.png',			# IDT_FILE_LAUNCH
-		'images/pin-angle-16x.png',				# IDT_VIEW_ALWAYSONTOP
-	], 'Toolbar.bmp')
+		'images/' + TB_Size + 'x' + TB_Size + '/New.png',			# IDT_FILE_NEW
+		'images/' + TB_Size + 'x' + TB_Size + '/Open.png',			# IDT_FILE_OPEN
+		'images/' + TB_Size + 'x' + TB_Size + '/Browse.png',			# IDT_FILE_BROWSE
+		'images/' + TB_Size + 'x' + TB_Size + '/Save.png',			# IDT_FILE_SAVE
+		'images/' + TB_Size + 'x' + TB_Size + '/Undo.png',			# IDT_EDIT_UNDO
+		'images/' + TB_Size + 'x' + TB_Size + '/Redo.png',			# IDT_EDIT_REDO
+		'images/' + TB_Size + 'x' + TB_Size + '/Cut.png',			# IDT_EDIT_CUT
+		'images/' + TB_Size + 'x' + TB_Size + '/Copy.png',			# IDT_EDIT_COPY
+		'images/' + TB_Size + 'x' + TB_Size + '/Paste.png',			# IDT_EDIT_PASTE
+		'images/' + TB_Size + 'x' + TB_Size + '/Find.png',			# IDT_EDIT_FIND
+		'images/' + TB_Size + 'x' + TB_Size + '/Replace.png',			# IDT_EDIT_REPLACE
+		'images/' + TB_Size + 'x' + TB_Size + '/Wordwrap.png',			# IDT_VIEW_WORDWRAP
+		'images/' + TB_Size + 'x' + TB_Size + '/Zoomin.png',			# IDT_VIEW_ZOOMIN
+		'images/' + TB_Size + 'x' + TB_Size + '/Zoomout.png',			# IDT_VIEW_ZOOMOUT
+		'images/' + TB_Size + 'x' + TB_Size + '/Scheme.png',			# IDT_VIEW_SCHEME
+		'images/' + TB_Size + 'x' + TB_Size + '/Schemeconfig.png',			# IDT_VIEW_SCHEMECONFIG
+		'images/' + TB_Size + 'x' + TB_Size + '/Exit.png',			# IDT_FILE_EXIT
+		'images/' + TB_Size + 'x' + TB_Size + '/Saveas.png',			# IDT_FILE_SAVEAS
+		'images/' + TB_Size + 'x' + TB_Size + '/Savecopy.png',			# IDT_FILE_SAVECOPY
+		'images/' + TB_Size + 'x' + TB_Size + '/Delete.png',			# IDT_EDIT_DELETE
+		'images/' + TB_Size + 'x' + TB_Size + '/Print.png',			# IDT_FILE_PRINT
+		'images/' + TB_Size + 'x' + TB_Size + '/Openfav.png',			# IDT_FILE_OPENFAV
+		'images/' + TB_Size + 'x' + TB_Size + '/Addtofav.png',			# IDT_FILE_ADDTOFAV
+		'images/' + TB_Size + 'x' + TB_Size + '/Togglefolds.png',			# IDT_VIEW_TOGGLEFOLDS
+		'images/' + TB_Size + 'x' + TB_Size + '/Launch.png',			# IDT_FILE_LAUNCH
+		'images/' + TB_Size + 'x' + TB_Size + '/Alwaysontop.png',				# IDT_VIEW_ALWAYSONTOP
+	], 'Toolbar' + TB_Size + '.bmp')
 
-#make_matapath_toolbar_bitmap()
+#make_metapath_toolbar_bitmap()
 #make_notepad2_toolbar_bitmap()
 #convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')
 #concat_horizontal(['../res/Toolbar.bmp', 'images/pin-angle-16x.png'], 'Toolbar.bmp')
