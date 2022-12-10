@@ -105,20 +105,7 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			sc.SetState(SCE_MAT_DEFAULT);
 			break;
 		case SCE_MAT_NUMBER:
-			if (!IsADigit(sc.ch)) {
-				if (IsFloatExponent(sc.ch, sc.chNext)) {
-					sc.Forward();
-				} else if (!(sc.ch == '.' && sc.chPrev != '.')) {
-					if (AnyOf<'I', 'i', 'J', 'j'>(sc.ch)) {
-						// complex, 'I','J' in Octave
-						sc.Forward();
-					}
-					sc.SetState(SCE_MAT_DEFAULT);
-				}
-			}
-			break;
-		case SCE_MAT_HEXNUM:
-			if (!IsHexDigit(sc.ch)) {
+			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_MAT_DEFAULT);
 			}
 			break;
@@ -166,7 +153,9 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			}
 			break;
 		case SCE_MAT_STRING:
-			if (sc.ch == '\'') {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_MAT_DEFAULT);
+			} else if (sc.ch == '\'') {
 				if (sc.chNext == '\'') {
 					sc.Forward();
 				} else {
@@ -175,7 +164,9 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			}
 			break;
 		case SCE_MAT_DOUBLEQUOTESTRING:
-			if (sc.ch == '\\' && lexType != LEX_MATLAB) {
+			if (sc.atLineStart) {
+				sc.SetState(SCE_MAT_DEFAULT);
+			} else if (sc.ch == '\\' && lexType != LEX_MATLAB) {
 				if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
 					sc.Forward();
 				}
@@ -252,10 +243,6 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 				sc.SetState(SCE_MAT_STRING);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_MAT_DOUBLEQUOTESTRING);
-			} else if (sc.ch == '0' && UnsafeLower(sc.chNext) == 'x') {
-				isTransposeOperator = true;
-				sc.SetState(SCE_MAT_HEXNUM);
-				sc.Forward();
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				isTransposeOperator = true;
 				sc.SetState(SCE_MAT_NUMBER);
