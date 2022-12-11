@@ -35,6 +35,7 @@ public:
 };
 
 using FontMap = std::map<FontSpecification, std::unique_ptr<FontRealised>>;
+using ColourOptional = std::optional<ColourRGBA>;
 
 constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	size = (size * zoomLevel + 50) / 100;
@@ -42,7 +43,7 @@ constexpr int GetFontSizeZoomed(int size, int zoomLevel) noexcept {
 	return std::max(size, Scintilla::FontSizeMultiplier);
 }
 
-constexpr std::optional<ColourRGBA> OptionalColour(uptr_t wParam, sptr_t lParam) {
+constexpr ColourOptional OptionalColour(uptr_t wParam, sptr_t lParam) {
 	if (wParam) {
 		return ColourRGBA::FromIpRGB(lParam);
 	}
@@ -138,8 +139,8 @@ public:
 	XYPOSITION controlCharWidth;
 	ColourRGBA selbar;
 	ColourRGBA selbarlight;
-	std::optional<ColourRGBA> foldmarginColour;
-	std::optional<ColourRGBA> foldmarginHighlightColour;
+	ColourOptional foldmarginColour;
+	ColourOptional foldmarginHighlightColour;
 	bool hotspotUnderline;
 	bool marginInside;	///< true: margin included in text view, false: separate views
 	/// Margins are ordered: Line Numbers, Selection Margin, Spacing Margin
@@ -186,7 +187,7 @@ public:
 	int ctrlCharPadding; // the padding around control character text blobs
 	int lastSegItalicsOffset; // the offset so as not to clip italic characters at EOLs
 
-	using ElementMap = std::map<Scintilla::Element, std::optional<ColourRGBA>>;
+	using ElementMap = std::map<Scintilla::Element, ColourOptional>;
 	ElementMap elementColours;
 	ElementMap elementBaseColours;
 
@@ -218,7 +219,7 @@ public:
 	void CalcLargestMarkerHeight() noexcept;
 	int GetFrameWidth() const noexcept;
 	bool IsLineFrameOpaque(bool caretActive, bool lineContainsCaret) const;
-	std::optional<ColourRGBA> Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
+	ColourOptional Background(MarkerMask marksOfLine, bool caretActive, bool lineContainsCaret) const;
 	bool SelectionTextDrawn() const;
 	bool SelectionBackgroundDrawn() const noexcept;
 	bool WhitespaceBackgroundDrawn() const;
@@ -226,7 +227,8 @@ public:
 
 	void AddMultiEdge(int column, ColourRGBA colour);
 
-	std::optional<ColourRGBA> ElementColour(Scintilla::Element element) const;
+	ColourOptional ElementColour(Scintilla::Element element) const;
+	ColourRGBA ElementColourForced(Scintilla::Element element) const;
 	static constexpr bool ElementAllowsTranslucent(Scintilla::Element element) noexcept {
 		return (element >= Scintilla::Element::SelectionText && element <= Scintilla::Element::WhiteSpace)
 			|| element == Scintilla::Element::HotSpotActive;
