@@ -92,12 +92,17 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 
 	const int lexType = styler.GetPropertyInt("lexer.lang", LEX_MATLAB);
 
-	int visibleChars = 0;
 	StyleContext sc(startPos, length, initStyle, styler);
-	int commentLevel = (sc.currentLine > 0) ? styler.GetLineState(sc.currentLine - 1) : 0;
+	int visibleChars = 0;
+	int commentLevel = 0;
+	bool lineContinuation = false;
 	bool isTransposeOperator = false;
-
 	bool hasTest = false; // Octave test/demo: %!demo %!test %testif %!assert %!error %!fail %!share %!function
+	if (sc.currentLine > 0) {
+		const int lineState = styler.GetLineState(sc.currentLine - 1);
+		lineContinuation = lineState & true;
+		commentLevel = lineState >> 1;
+	}
 
 	for (; sc.More(); sc.Forward()) {
 		switch (sc.state) {
@@ -156,25 +161,28 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			if (sc.atLineStart) {
 				sc.SetState(SCE_MAT_DEFAULT);
 			} else if (sc.ch == '\'') {
-				if (sc.chNext == '\'') {
-					sc.Forward();
-				} else {
-					sc.ForwardSetState(SCE_MAT_DEFAULT);
+				sc.Forward();
+				if (sc.ch != '\'') {
+					sc.SetState(SCE_MAT_DEFAULT);
 				}
 			}
 			break;
 		case SCE_MAT_DOUBLEQUOTESTRING:
 			if (sc.atLineStart) {
-				sc.SetState(SCE_MAT_DEFAULT);
+				if (lineContinuation) {
+					lineContinuation = false;
+				} else {
+					sc.SetState(SCE_MAT_DEFAULT);
+				}
 			} else if (sc.ch == '\\' && lexType != LEX_MATLAB) {
-				if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
-					sc.Forward();
+				sc.Forward();
+				if (sc.MatchLineEnd()) {
+					lineContinuation = true;
 				}
 			} else if (sc.ch == '\"') {
-				if (sc.chNext == '\"') {
-					sc.Forward();
-				} else {
-					sc.ForwardSetState(SCE_MAT_DEFAULT);
+				sc.Forward();
+				if (sc.ch != '\"') {
+					sc.SetState(SCE_MAT_DEFAULT);
 				}
 			}
 			break;
@@ -262,7 +270,8 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			styler.SetLineState(sc.currentLine, commentLevel);
+			const int lineState = (commentLevel << 1) | static_cast<int>(lineContinuation);
+			styler.SetLineState(sc.currentLine, lineState);
 			visibleChars = 0;
 		}
 	}
