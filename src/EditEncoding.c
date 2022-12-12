@@ -1027,6 +1027,38 @@ UINT CodePageFromCharSet(UINT uCharSet) {
 }
 
 
+static inline bool IsC0ControlChar(uint8_t ch) {
+#if 1
+	return ch < 32 && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
+#else
+	// exclude whitespace and separator
+	return ch < 0x1c && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
+#endif
+}
+
+bool MaybeBinaryFile(const uint8_t *ptr, DWORD length) {
+	/* Test C0 Control Character
+	These characters are not reused in most text encodings, and do not appear in normal text files.
+	Most binary files have reserved fields (mostly zeros) or small values in the header.
+	Treat the file as binary when we find two adjacent C0 control characters
+	(very common in file header) or some (currently set to 8) C0 control characters. */
+
+	length = min_u(length, 1024);
+	const uint8_t * const end = ptr + length;
+	UINT count = 0;
+	while (ptr < end) {
+		uint8_t ch = *ptr++;
+		if (IsC0ControlChar(ch)) {
+			++count;
+			ch = *ptr++;
+			if ((count >= 8) || IsC0ControlChar(ch)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 static inline BOOL IsValidMultiByte(UINT codePage, const char *lpData, DWORD cbData) {
 	return MultiByteToWideChar(codePage, MB_ERR_INVALID_CHARS, lpData, cbData, NULL, 0);
 }
@@ -2413,6 +2445,10 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 			}
 #endif
 		}
+	}
+	// detect binary file
+	if (iEncoding == CPI_DEFAULT && MaybeBinaryFile((const uint8_t *)lpData, cbData)) {
+		*encodingFlag = EncodingFlag_Binary;
 	}
 
 	// unknown encoding

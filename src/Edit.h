@@ -375,9 +375,10 @@ void	EditShowCallTips(Sci_Position position);
 
 enum {
 	EncodingFlag_None = 0,
-	EncodingFlag_Invalid = 1,
+	EncodingFlag_Binary = 1,
 	EncodingFlag_UTF7 = 2,
 	EncodingFlag_Reversed = 4,
+	EncodingFlag_Invalid = 8,
 };
 
 typedef struct NP2ENCODING {

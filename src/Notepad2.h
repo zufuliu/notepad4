@@ -241,6 +241,7 @@ typedef struct EditFileIOStatus {
 	// inconsistent line endings
 	bool bLineEndingsDefaultNo; // set default button to "No"
 	bool bInconsistent;	// load output
+	bool bBinaryFile;	// load output
 	Sci_Line totalLineCount; // load output, sum(linesCount) + 1
 	Sci_Line linesCount[3];	// load output: CR+LF, LF, CR
 } EditFileIOStatus;

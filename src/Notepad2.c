@@ -7585,9 +7585,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		}
 		InstallFileWatching(false);
 
-		// check for binary file (file with unknown encoding: ANSI)
-		const bool binary = (iCurrentEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
-		if (binary || pLexCurrent->iLexer == SCLEX_DIFF) {
+		if (status.bBinaryFile || pLexCurrent->iLexer == SCLEX_DIFF) {
 			// ignore auto "detected" Tab settings for binary file and diff file.
 			if (fvCurFile.mask & FV_MaskHasFileTabSettings) {
 				fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
@@ -7596,7 +7594,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			}
 		}
 		// open file in read only mode
-		if (binary || flagReadOnlyMode != ReadOnlyMode_None || bReadOnlyFile) {
+		if (status.bBinaryFile || flagReadOnlyMode != ReadOnlyMode_None || bReadOnlyFile) {
 			bReadOnlyMode = true;
 			flagReadOnlyMode &= ReadOnlyMode_AllFile;
 			SciCall_SetReadOnly(true);
@@ -7638,7 +7636,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
 		}
 		// notify binary file opened in read only mode
-		if (binary) {
+		if (status.bBinaryFile) {
 			ShowNotificationMessage(SC_NOTIFICATIONPOSITION_BOTTOMRIGHT, IDS_BINARY_FILE_OPENED);
 			return fSuccess;
 		}

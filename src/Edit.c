@@ -1045,6 +1045,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		iEncoding = Encoding_GetAnsiIndex();
 	}
 	status->iEncoding = iEncoding;
+	status->bBinaryFile = encodingFlag & EncodingFlag_Binary;
 	UINT uFlags = mEncoding[iEncoding].uFlags;
 
 	if (cbData == 0) {
@@ -1091,7 +1092,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 			NP2HeapFree(lpData);
 			lpData = lpDataUTF8;
 		}
-	} else if (cbData < MAX_NON_UTF8_SIZE && encodingFlag != EncodingFlag_Invalid
+	} else if (cbData < MAX_NON_UTF8_SIZE && (encodingFlag & (EncodingFlag_Binary | EncodingFlag_Invalid)) == 0
 		&& ((bLoadANSIasUTF8 && !(iSrcEncoding == CPI_DEFAULT || iWeakSrcEncoding == CPI_DEFAULT))
 		|| (GetACP() == CP_UTF8))) {
 		// try to load ANSI / unknown encoding as UTF-8
