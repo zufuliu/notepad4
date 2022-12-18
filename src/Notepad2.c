@@ -1972,7 +1972,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI) {
 			NP2_static_assert(IDB_TOOLBAR48 - IDB_TOOLBAR16 == 6 - 2);
 			int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/2 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
-			scale = max_i(scale, 6);
+			scale = min_i(scale, 6);
 			resource = IDB_TOOLBAR16 + scale - 2;
 		}
 		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
