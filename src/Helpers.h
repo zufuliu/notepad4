@@ -632,24 +632,7 @@ bool IsElevated(void);
 
 bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath);
 HBITMAP LoadBitmapFile(LPCWSTR path);
-HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi);
-HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height);
-
-NP2_inline HBITMAP EnlargeImageForCurrentDPI(HBITMAP hbmp) {
-	return EnlargeImageForDPI(hbmp, g_uCurrentDPI);
-}
-
-NP2_inline HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp, int height) {
-	return ResizeImageForDPI(hbmp, g_uCurrentDPI, height);
-}
-
-NP2_inline HBITMAP ResizeButtonImageForCurrentDPI(HBITMAP hbmp) {
-	return ResizeImageForDPI(hbmp, g_uCurrentDPI, 16);
-}
-
-NP2_inline HBITMAP ResizeToolbarImageForCurrentDPI(HBITMAP hbmp) {
-	return ResizeImageForDPI(hbmp, g_uCurrentDPI, 16);
-}
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);
 
 bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);

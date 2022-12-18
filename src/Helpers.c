@@ -444,10 +444,11 @@ HBITMAP EnlargeImageForDPI(HBITMAP hbmp, UINT dpi) {
 	return hbmp;
 }
 
-HBITMAP ResizeImageForDPI(HBITMAP hbmp, UINT dpi, int height) {
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 	BITMAP bmp;
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
-		height = MulDiv(dpi, height, USER_DEFAULT_SCREEN_DPI);
+		// assume 16x16 at 100% scaling
+		const int height = (g_uCurrentDPI*16) / USER_DEFAULT_SCREEN_DPI;
 		if (height == bmp.bmHeight) {
 			return hbmp;
 		}
@@ -1253,7 +1254,7 @@ void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
 void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	HBITMAP hBmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-	hBmp = ResizeButtonImageForCurrentDPI(hBmp);
+	hBmp = ResizeImageForCurrentDPI(hBmp);
 	BITMAP bmp;
 	GetObject(hBmp, sizeof(BITMAP), &bmp);
 	BUTTON_IMAGELIST bi;

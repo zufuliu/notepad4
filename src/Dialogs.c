@@ -1936,7 +1936,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		// we need to determine icon size first, then resize the encoding mask bitmap accordingly.
 
 		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
-		hbmp = ResizeImageForCurrentDPI(hbmp, 16); // 32x16
+		hbmp = ResizeImageForCurrentDPI(hbmp); // 32x16
 		BITMAP bmp;
 		GetObject(hbmp, sizeof(BITMAP), &bmp);
 		HIMAGELIST himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
