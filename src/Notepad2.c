@@ -3338,9 +3338,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELECTIONDUPLICATE:
-		SciCall_BeginUndoAction();
 		SciCall_SelectionDuplicate();
-		SciCall_EndUndoAction();
 		break;
 
 	case IDM_EDIT_PADWITHSPACES:

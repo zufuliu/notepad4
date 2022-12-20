@@ -1822,11 +1822,9 @@ void EditAutoCloseBraceQuote(int ch) {
 		//}
 
 		const char tchIns[4] = { fillChar };
-		SciCall_BeginUndoAction();
 		SciCall_ReplaceSel(tchIns);
 		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
 		SciCall_SetSel(iCurrentPos, iCurrentPos);
-		SciCall_EndUndoAction();
 		if (closeBrace) {
 			// fix brace matching
 			SciCall_EnsureStyledTo(iCurPos + 1);
@@ -1915,10 +1913,8 @@ void EditAutoCloseXMLTag(void) {
 			if (shouldAutoClose) {
 				tchIns[cchIns - 1] = '>';
 				autoClosed = true;
-				SciCall_BeginUndoAction();
 				SciCall_ReplaceSel(tchIns);
 				SciCall_SetSel(iCurPos, iCurPos);
-				SciCall_EndUndoAction();
 			}
 		}
 	}
@@ -2265,10 +2261,8 @@ void EditAutoIndent(void) {
 			//const Sci_Position iPrevLineIndentPos = SciCall_GetLineIndentPosition(iCurLine - 1);
 
 			//if (iPrevLineEndPos == iPrevLineIndentPos) {
-			//	SciCall_BeginUndoAction();
 			//	SciCall_SetTargetRange(iPrevLineStartPos, iPrevLineEndPos);
 			//	SciCall_ReplaceTarget(0, "");
-			//	SciCall_EndUndoAction();
 			//}
 		}
 

@@ -1312,11 +1312,9 @@ void EditReplaceRange(Sci_Position iSelStart, Sci_Position iSelEnd, Sci_Position
 		iCurPos = iSelStart + cchText;
 	}
 
-	SciCall_BeginUndoAction();
 	SciCall_SetTargetRange(iSelStart, iSelEnd);
 	SciCall_ReplaceTarget(cchText, pszText);
 	SciCall_SetSel(iAnchorPos, iCurPos);
-	SciCall_EndUndoAction();
 }
 
 void EditReplaceMainSelection(Sci_Position cchText, LPCSTR pszText) {
@@ -2683,11 +2681,9 @@ void EditMoveUp(void) {
 		//}
 
 		if (iCurLine > 0) {
-			SciCall_BeginUndoAction();
 			SciCall_LineTranspose();
 			SciCall_SetSel(SciCall_PositionFromLine(iAnchorLine - 1) + iLineAnchorPos, SciCall_PositionFromLine(iCurLine - 1) + iLineCurPos);
 			SciCall_ChooseCaretX();
-			SciCall_EndUndoAction();
 		}
 		return;
 	}
@@ -2768,12 +2764,10 @@ void EditMoveDown(void) {
 		//}
 
 		if (iCurLine < SciCall_GetLineCount() - 1) {
-			SciCall_BeginUndoAction();
 			SciCall_GotoLine(iCurLine + 1);
 			SciCall_LineTranspose();
 			SciCall_SetSel(SciCall_PositionFromLine(iAnchorLine + 1) + iLineAnchorPos, SciCall_PositionFromLine(iCurLine + 1) + iLineCurPos);
 			SciCall_ChooseCaretX();
-			SciCall_EndUndoAction();
 		}
 		return;
 	}
@@ -3999,7 +3993,6 @@ void EditCompressSpaces(void) {
 		} else {
 			SciCall_TargetWholeDocument();
 		}
-		SciCall_BeginUndoAction();
 		SciCall_ReplaceTarget(-1, pszOut);
 		if (iCurPos > iAnchorPos) {
 			iCurPos = SciCall_GetTargetEnd();
@@ -4009,7 +4002,6 @@ void EditCompressSpaces(void) {
 			iAnchorPos = SciCall_GetTargetEnd();
 		}
 		SciCall_SetSel(iAnchorPos, iCurPos);
-		SciCall_EndUndoAction();
 	}
 
 	NP2HeapFree(pszIn);
