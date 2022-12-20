@@ -2669,20 +2669,17 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) {
 void EditMoveUp(void) {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
-	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
-	const Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
+	Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
+	Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
 	if (iCurLine == iAnchorLine) {
-		const Sci_Position iLineCurPos = iCurPos - SciCall_PositionFromLine(iCurLine);
-		const Sci_Position iLineAnchorPos = iAnchorPos - SciCall_PositionFromLine(iAnchorLine);
-		//const Sci_Line iLineCur = SciCall_DocLineFromVisible(iCurLine);
-		//const Sci_Line iLineAnchor = SciCall_DocLineFromVisible(iAnchorLine);
-		//if (iLineCur == iLineAnchor) {
-		//}
-
 		if (iCurLine > 0) {
+			const Sci_Position iLineStart = SciCall_PositionFromLine(iCurLine);
+			const Sci_Position iLineCurPos = iCurPos - iLineStart;
+			const Sci_Position iLineAnchorPos = iAnchorPos - iLineStart;
 			SciCall_LineTranspose();
-			SciCall_SetSel(SciCall_PositionFromLine(iAnchorLine - 1) + iLineAnchorPos, SciCall_PositionFromLine(iCurLine - 1) + iLineCurPos);
+			const Sci_Position iLineDestStart = SciCall_PositionFromLine(iCurLine - 1);
+			SciCall_SetSel(iLineDestStart + iLineAnchorPos, iLineDestStart + iLineCurPos);
 			SciCall_ChooseCaretX();
 		}
 		return;
@@ -2694,11 +2691,6 @@ void EditMoveUp(void) {
 	}
 
 	const Sci_Line iLineSrc = min_pos(iCurLine, iAnchorLine) - 1;
-	//const Sci_Line iLineCur = SciCall_DocLineFromVisible(iCurLine);
-	//const Sci_Line iLineAnchor = SciCall_DocLineFromVisible(iAnchorLine);
-	//if (iLineCur == iLineAnchor) {
-	//}
-
 	if (iLineSrc >= 0) {
 		const Sci_Position cLine = SciCall_GetLineLength(iLineSrc);
 		char *pLine = (char *)NP2HeapAlloc(cLine + 1);
@@ -2709,9 +2701,7 @@ void EditMoveUp(void) {
 
 		Sci_Line iLineDest = max_pos(iCurLine, iAnchorLine);
 		if (max_pos(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineDest)) {
-			if (iLineDest >= 1) {
-				iLineDest--;
-			}
+			iLineDest--;
 		}
 
 		SciCall_BeginUndoAction();
@@ -2732,13 +2722,15 @@ void EditMoveUp(void) {
 		}
 
 		if (iCurPos < iAnchorPos) {
-			iCurPos = SciCall_PositionFromLine(iCurLine - 1);
-			iAnchorPos = SciCall_PositionFromLine(iLineDest);
+			iCurLine = iCurLine - 1;
+			iAnchorLine = iLineDest;
 		} else {
-			iAnchorPos = SciCall_PositionFromLine(iAnchorLine - 1);
-			iCurPos = SciCall_PositionFromLine(iLineDest);
+			iAnchorLine = iAnchorLine - 1;
+			iCurLine = iLineDest;
 		}
 
+		iAnchorPos = SciCall_PositionFromLine(iAnchorLine);
+		iCurPos = SciCall_PositionFromLine(iCurLine);
 		SciCall_SetSel(iAnchorPos, iCurPos);
 
 		SciCall_EndUndoAction();
@@ -2752,21 +2744,19 @@ void EditMoveUp(void) {
 void EditMoveDown(void) {
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	Sci_Position iAnchorPos = SciCall_GetAnchor();
-	const Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
-	const Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
+	Sci_Line iCurLine = SciCall_LineFromPosition(iCurPos);
+	Sci_Line iAnchorLine = SciCall_LineFromPosition(iAnchorPos);
 
 	if (iCurLine == iAnchorLine) {
-		const Sci_Position iLineCurPos = iCurPos - SciCall_PositionFromLine(iCurLine);
-		const Sci_Position iLineAnchorPos = iAnchorPos - SciCall_PositionFromLine(iAnchorLine);
-		//const Sci_Line iLineCur = SciCall_DocLineFromVisible(iCurLine);
-		//const Sci_Line iLineAnchor = SciCall_DocLineFromVisible(iAnchorLine);
-		//if (iLineCur == iLineAnchor) {
-		//}
-
-		if (iCurLine < SciCall_GetLineCount() - 1) {
-			SciCall_GotoLine(iCurLine + 1);
+		iCurLine += 1;
+		if (iCurLine < SciCall_GetLineCount()) {
+			const Sci_Position iLineStart = SciCall_PositionFromLine(iAnchorLine);
+			const Sci_Position iLineCurPos = iCurPos - iLineStart;
+			const Sci_Position iLineAnchorPos = iAnchorPos - iLineStart;
+			SciCall_GotoLine(iCurLine);
 			SciCall_LineTranspose();
-			SciCall_SetSel(SciCall_PositionFromLine(iAnchorLine + 1) + iLineAnchorPos, SciCall_PositionFromLine(iCurLine + 1) + iLineCurPos);
+			const Sci_Position iLineDestStart = SciCall_PositionFromLine(iCurLine);
+			SciCall_SetSel(iLineDestStart + iLineAnchorPos, iLineDestStart + iLineCurPos);
 			SciCall_ChooseCaretX();
 		}
 		return;
@@ -2778,19 +2768,13 @@ void EditMoveDown(void) {
 	}
 
 	Sci_Line iLineSrc = max_pos(iCurLine, iAnchorLine) + 1;
-	//const Sci_Line iLineCur = SciCall_DocLineFromVisible(iCurLine);
-	//const Sci_Line iLineAnchor = SciCall_DocLineFromVisible(iAnchorLine);
-	//if (iLineCur == iLineAnchor) {
-	//}
-
 	if (max_pos(iCurPos, iAnchorPos) <= SciCall_PositionFromLine(iLineSrc - 1)) {
-		if (iLineSrc >= 1) {
-			iLineSrc--;
-		}
+		iLineSrc--;
 	}
 
-	if (iLineSrc <= SciCall_GetLineCount() - 1) {
-		const bool bLastLine = (iLineSrc == SciCall_GetLineCount() - 1);
+	const Sci_Line iLineEnd = SciCall_GetLineCount() - 1;
+	if (iLineSrc <= iLineEnd) {
+		const bool bLastLine = (iLineSrc == iLineEnd);
 
 		if (bLastLine &&
 				(SciCall_GetLineEndPosition(iLineSrc) == SciCall_PositionFromLine(iLineSrc)) &&
@@ -2828,13 +2812,15 @@ void EditMoveDown(void) {
 		NP2HeapFree(pLine);
 
 		if (iCurPos < iAnchorPos) {
-			iCurPos = SciCall_PositionFromLine(iCurLine + 1);
-			iAnchorPos = SciCall_PositionFromLine(iLineSrc + 1);
+			iCurLine = iCurLine + 1;
+			iAnchorLine = iLineSrc + 1;
 		} else {
-			iAnchorPos = SciCall_PositionFromLine(iAnchorLine + 1);
-			iCurPos = SciCall_PositionFromLine(iLineSrc + 1);
+			iAnchorLine = iAnchorLine + 1;
+			iCurLine = iLineSrc + 1;
 		}
 
+		iAnchorPos = SciCall_PositionFromLine(iAnchorLine);
+		iCurPos = SciCall_PositionFromLine(iCurLine);
 		SciCall_SetSel(iAnchorPos, iCurPos);
 
 		SciCall_EndUndoAction();
