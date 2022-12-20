@@ -767,6 +767,10 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (IsPyStringPrefix(sc.ch)) {
 				insideUrl = false;
 				EnterPyStringState(sc);
+				if (IsPyFormattedString(sc.state) && !nestedState.empty()) {
+					// PEP 701 nested f-string
+					nestedState.push_back({sc.state, 1, 0});
+				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				sc.SetState(SCE_PY_IDENTIFIER);
 			} else if (sc.ch == '@') {
