@@ -3206,16 +3206,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (flagPasteBoard) {
 				bLastCopyFromMe = true;
 			}
-			const Sci_Position iPos = SciCall_GetCurrentPos();
-			const Sci_Position iAnchor = SciCall_GetAnchor();
+			Sci_Position iPos = SciCall_GetCurrentPos();
+			Sci_Position iAnchor = SciCall_GetAnchor();
 			SciCall_BeginUndoAction();
 			SciCall_Cut(false);
 			SciCall_ReplaceSel(pClip);
+			const size_t len = strlen(pClip);
 			if (iPos > iAnchor) {
-				SciCall_SetSel(iAnchor, iAnchor + strlen(pClip));
+				iPos = iAnchor + len;
 			} else {
-				SciCall_SetSel(iPos + strlen(pClip), iPos);
+				iAnchor = iPos + len;
 			}
+			SciCall_SetSel(iAnchor, iPos);
 			SciCall_EndUndoAction();
 			LocalFree(pClip);
 		}
@@ -3950,20 +3952,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELTODOCEND:
-	case IDM_EDIT_SELTODOCSTART: {
-		Sci_Position selStart;
-		Sci_Position selEnd;
-		if (LOWORD(wParam) == IDM_EDIT_SELTODOCEND) {
-			selStart = SciCall_GetSelectionStart();
-			selEnd = SciCall_GetLength();
-		} else {
-			selStart = 0;
-			selEnd = SciCall_GetSelectionEnd();
-		}
-		SciCall_SetSelectionStart(selStart);
-		SciCall_SetSelectionEnd(selEnd);
-	}
-	break;
+		SciCall_SetSelectionEnd(SciCall_GetLength());
+		break;
+	case IDM_EDIT_SELTODOCSTART:
+		SciCall_SetSelectionStart(0);
+		break;
 
 	case IDM_EDIT_COMPLETEWORD:
 		EditCompleteWord(AutoCompleteCondition_Normal, true);
