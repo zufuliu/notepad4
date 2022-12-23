@@ -2249,12 +2249,10 @@ void EditAutoIndent(void) {
 		}
 
 		if (*pLineBuf) {
-			SciCall_BeginUndoAction();
 			SciCall_AddText(strlen(pLineBuf), pLineBuf);
 			if (indent != AutoIndentType_None) {
 				SciCall_SetSel(iIndentPos, iIndentPos);
 			}
-			SciCall_EndUndoAction();
 
 			//const Sci_Position iPrevLineStartPos = SciCall_PositionFromLine(iCurLine - 1);
 			//const Sci_Position iPrevLineEndPos = SciCall_GetLineEndPosition(iCurLine - 1);

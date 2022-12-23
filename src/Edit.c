@@ -3134,10 +3134,12 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	//if (iSelStart != iSelEnd && SciCall_GetTargetEnd() > SciCall_GetSelectionEnd()) {
 	//	Sci_Position iCurPos = SciCall_GetCurrentPos();
 	//	Sci_Position iAnchorPos = SciCall_GetAnchor();
-	//	if (iCurPos > iAnchorPos)
-	//		iCurPos = SciCall_GetTargetEnd();
-	//	else
-	//		iAnchorPos = SciCall_GetTargetEnd();
+	//	Sci_Position iTargetEnd = SciCall_GetTargetEnd();
+	//	if (iCurPos > iAnchorPos) {
+	//		iCurPos = iTargetEnd;
+	//	} else {
+	//		iAnchorPos = iTargetEnd;
+	//	}
 	//	SciCall_SetSel(iAnchorPos, iCurPos);
 	//}
 
@@ -3147,12 +3149,14 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 		Sci_Position iCurPos = SciCall_GetCurrentPos();
 		Sci_Position iAnchorPos = SciCall_GetAnchor();
 		if (iCurPos < iAnchorPos) {
-			iCurPos = SciCall_PositionFromLine(iLineStart);
-			iAnchorPos = SciCall_PositionFromLine(iLineEnd + 1);
+			iCurPos = iLineStart;
+			iAnchorPos = iLineEnd + 1;
 		} else {
-			iAnchorPos = SciCall_PositionFromLine(iLineStart);
-			iCurPos = SciCall_PositionFromLine(iLineEnd + 1);
+			iAnchorPos = iLineStart;
+			iCurPos = iLineEnd + 1;
 		}
+		iAnchorPos = SciCall_PositionFromLine(iAnchorPos);
+		iCurPos = SciCall_PositionFromLine(iCurPos);
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	}
 
@@ -3392,12 +3396,14 @@ void EditAlignText(EditAlignMode nMode) {
 	}
 
 	if (iCurPos < iAnchorPos) {
-		iCurPos = SciCall_PositionFromLine(iLineStart);
-		iAnchorPos = SciCall_PositionFromLine(iLineEnd + 1);
+		iCurPos = iLineStart;
+		iAnchorPos = iLineEnd + 1;
 	} else {
-		iAnchorPos = SciCall_PositionFromLine(iLineStart);
-		iCurPos = SciCall_PositionFromLine(iLineEnd + 1);
+		iAnchorPos = iLineStart;
+		iCurPos = iLineEnd + 1;
 	}
+	iAnchorPos = SciCall_PositionFromLine(iAnchorPos);
+	iCurPos = SciCall_PositionFromLine(iCurPos);
 	SciCall_SetSel(iAnchorPos, iCurPos);
 }
 
@@ -3603,12 +3609,14 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 	if (iSelStart != iSelEnd) {
 		Sci_Position iAnchorPos;
 		if (iCurPos == iSelStart) {
-			iCurPos = SciCall_PositionFromLine(iLineStart);
-			iAnchorPos = SciCall_PositionFromLine(iLineEnd + 1);
+			iCurPos = iLineStart;
+			iAnchorPos = iLineEnd + 1;
 		} else {
-			iAnchorPos = SciCall_PositionFromLine(iLineStart);
-			iCurPos = SciCall_PositionFromLine(iLineEnd + 1);
+			iAnchorPos = iLineStart;
+			iCurPos = iLineEnd + 1;
 		}
+		iAnchorPos = SciCall_PositionFromLine(iAnchorPos);
+		iCurPos = SciCall_PositionFromLine(iCurPos);
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	}
 
@@ -3718,21 +3726,18 @@ void EditPadWithSpaces(bool bSkipEmpty, bool bNoUndoGroup) {
 	if (!bIsRectangular && SciCall_LineFromPosition(iSelStart) != SciCall_LineFromPosition(iSelEnd)) {
 		Sci_Position iCurPos = SciCall_GetCurrentPos();
 		Sci_Position iAnchorPos = SciCall_GetAnchor();
-
-		if (iCurPos < iAnchorPos) {
-			iCurPos = SciCall_PositionFromLine(iLineStart);
-			if (!bReducedSelection) {
-				iAnchorPos = SciCall_GetLineEndPosition(iLineEnd);
-			} else {
-				iAnchorPos = SciCall_PositionFromLine(iLineEnd + 1);
-			}
+		iRcCurCol = SciCall_PositionFromLine(iLineStart);
+		if (!bReducedSelection) {
+			iRcAnchorCol = SciCall_GetLineEndPosition(iLineEnd);
 		} else {
-			iAnchorPos = SciCall_PositionFromLine(iLineStart);
-			if (!bReducedSelection) {
-				iCurPos = SciCall_GetLineEndPosition(iLineEnd);
-			} else {
-				iCurPos = SciCall_PositionFromLine(iLineEnd + 1);
-			}
+			iRcAnchorCol = SciCall_PositionFromLine(iLineEnd + 1);
+		}
+		if (iCurPos < iAnchorPos) {
+			iCurPos = iRcCurCol;
+			iAnchorPos = iRcAnchorCol;
+		} else {
+			iAnchorPos = iRcCurCol;
+			iCurPos = iRcAnchorCol;
 		}
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	} else if (bIsRectangular) {
@@ -3980,12 +3985,14 @@ void EditCompressSpaces(void) {
 			SciCall_TargetWholeDocument();
 		}
 		SciCall_ReplaceTarget(-1, pszOut);
+		const Sci_Position iTargetStart = SciCall_GetTargetStart();
+		const Sci_Position iTargetEnd = SciCall_GetTargetStart();
 		if (iCurPos > iAnchorPos) {
-			iCurPos = SciCall_GetTargetEnd();
-			iAnchorPos = SciCall_GetTargetStart();
-		} else if (iCurPos < iAnchorPos) {
-			iCurPos = SciCall_GetTargetStart();
-			iAnchorPos = SciCall_GetTargetEnd();
+			iCurPos = iTargetEnd;
+			iAnchorPos = iTargetStart;
+		} else {
+			iCurPos = iTargetStart;
+			iAnchorPos = iTargetEnd;
 		}
 		SciCall_SetSel(iAnchorPos, iCurPos);
 	}
@@ -4745,13 +4752,13 @@ void EditSelectLines(bool currentBlock, bool lineSelection) {
 
 	const Sci_Line offset = lineSelection ? 0 : 1;
 	if (backward) {
-		iCurrentPos = SciCall_PositionFromLine(iLineCurPos);
-		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos + offset);
+		iLineAnchorPos = iLineAnchorPos + offset;
 	} else {
-		iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos);
-		iCurrentPos = SciCall_PositionFromLine(iLineCurPos + offset);
+		iLineCurPos = iLineCurPos + offset;
 	}
 
+	iAnchorPos = SciCall_PositionFromLine(iLineAnchorPos);
+	iCurrentPos = SciCall_PositionFromLine(iLineCurPos);
 	SciCall_SetSel(iAnchorPos, iCurrentPos);
 	if (lineSelection) {
 		SciCall_SetSelectionMode(SC_SEL_LINES);
