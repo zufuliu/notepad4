@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg3796"
+   sodipodi:docname="Print.svg"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   inkscape:export-filename="Print.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview3798"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="9.2476309"
+     inkscape:cx="36.225494"
+     inkscape:cy="-2.3789877"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3796">
+    <inkscape:grid
+       type="xygrid"
+       id="grid5006" />
+  </sodipodi:namedview>
+  <defs
+     id="defs3772">
+    <style
+       id="style3770">.canvas{fill: none; opacity: 0;}.light-defaultgrey-10{fill: #212121; opacity: 0.1;}.light-defaultgrey{fill: #212121; opacity: 1;}.light-teal{fill: #006758; opacity: 1;}.cls-1{opacity:0.75;}</style>
+  </defs>
+  <title
+     id="title3774">IconLightPrint</title>
+  <rect
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#595959;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+     id="rect8712"
+     width="9.000349"
+     height="6.0003495"
+     x="3.4998252"
+     y="0.49982521" />
+  <path
+     class="light-defaultgrey-10"
+     d="m 15.5,7.5 v 5 H 12 4 0.5 v -5 c 0,-0.5522847 0.44771525,-1 1,-1 h 13 c 0.552285,0 1,0.4477153 1,1 z"
+     id="path3789"
+     sodipodi:nodetypes="sccccssss" />
+  <path
+     class="light-defaultgrey"
+     d="M 16,7.5 V 13 h -4 v -1 h 3 V 7.5 C 15,7.2238576 14.776142,7 14.5,7 H 1.5 C 1.2238576,7 1,7.2238576 1,7.5 V 12 h 3 v 1 H 0 V 7.5 C 0,6.6715729 0.67157288,6 1.5,6 h 13 C 15.328427,6 16,6.6715729 16,7.5 Z"
+     id="path3791"
+     sodipodi:nodetypes="sccccssssccccssss"
+     style="fill:#00539c;fill-opacity:1" />
+  <path
+     class="light-teal"
+     d="M 4,8 V 9 H 3 V 8 Z"
+     id="path3793"
+     style="fill:#aa0000;fill-opacity:1" />
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke:#595959;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+     id="rect12465"
+     width="9.000349"
+     height="5.000093"
+     x="3.4998252"
+     y="10.5" />
+  <metadata
+     id="metadata13195">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>IconLightPrint</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
