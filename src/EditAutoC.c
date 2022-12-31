@@ -2259,8 +2259,7 @@ void EditAutoIndent(void) {
 			//const Sci_Position iPrevLineIndentPos = SciCall_GetLineIndentPosition(iCurLine - 1);
 
 			//if (iPrevLineEndPos == iPrevLineIndentPos) {
-			//	SciCall_SetTargetRange(iPrevLineStartPos, iPrevLineEndPos);
-			//	SciCall_ReplaceTarget(0, "");
+			//	SciCall_DeleteRange(iPrevLineStartPos, iPrevLineEndPos - iPrevLineStartPos);
 			//}
 		}
 

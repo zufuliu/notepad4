@@ -121,6 +121,10 @@ NP2_inline void SciCall_ClearAll(void) {
 	SciCall(SCI_CLEARALL, 0, 0);
 }
 
+NP2_inline void SciCall_DeleteRange(Sci_Position start, Sci_Position lengthDelete) {
+	SciCall(SCI_DELETERANGE, start, lengthDelete);
+}
+
 NP2_inline void SciCall_ClearDocumentStyle(void) {
 	SciCall(SCI_CLEARDOCUMENTSTYLE, 0, 0);
 }
