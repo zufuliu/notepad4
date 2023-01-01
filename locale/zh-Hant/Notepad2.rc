@@ -1027,7 +1027,7 @@ BEGIN
     LTEXT           "版權所有 © 2010-2017 XhmikosR 和所有貢獻者.",IDC_STATIC,45,60,200,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "版權所有 © 2011-2022 Zufu Liu 和所有貢獻者.",IDC_STATIC,45,80,200,8
+    LTEXT           "版權所有 © 2011-2023 Zufu Liu 和所有貢獻者.",IDC_STATIC,45,80,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,80,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
     LTEXT           "連絡 Florian Balmer:",IDC_STATIC,45,100,94,8
