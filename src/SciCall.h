@@ -428,6 +428,14 @@ NP2_inline void SciCall_ChooseCaretX(void) {
 	SciCall(SCI_CHOOSECARETX, 0, 0);
 }
 
+NP2_inline void SciCall_MoveSelectedLinesUp(void) {
+	SciCall(SCI_MOVESELECTEDLINESUP, 0, 0);
+}
+
+NP2_inline void SciCall_MoveSelectedLinesDown(void) {
+	SciCall(SCI_MOVESELECTEDLINESDOWN, 0, 0);
+}
+
 NP2_inline Sci_Line EditGetSelectedLineCount(void) {
 	const Sci_Line iLineStart = SciCall_LineFromPosition(SciCall_GetSelectionStart());
 	const Sci_Line iLineEnd = SciCall_LineFromPosition(SciCall_GetSelectionEnd());
