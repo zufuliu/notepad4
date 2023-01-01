@@ -2738,43 +2738,9 @@ bool Style_CanOpenFile(LPCWSTR lpszFile) {
 	return pLexNew != NULL || StrIsEmpty(lpszExt) || bDotFile || StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi");
 }
 
-static inline bool IsC0ControlChar(uint8_t ch) {
-#if 1
-	return ch < 32 && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
-#else
-	// exclude whitespace and separator
-	return ch < 0x1c && ((uint8_t)(ch - 0x09)) > (0x0d - 0x09);
-#endif
-}
 
+#if 0
 bool Style_MaybeBinaryFile(LPCWSTR lpszFile) {
-#if 1
-	UNREFERENCED_PARAMETER(lpszFile);
-	/* Test C0 Control Character
-	These characters are not reused in most text encodings, and do not appear in normal text files.
-	Most binary files have reserved fields (mostly zeros) or small values in the header.
-	Treat the file as binary when we find two adjacent C0 control characters
-	(very common in file header) or some (currently set to 8) C0 control characters. */
-
-	const Sci_Position headerLen = min_pos(1023, SciCall_GetLength() - 1);
-	const uint8_t *ptr = (const uint8_t *)SciCall_GetRangePointer(0, headerLen + 1);
-	if (ptr == NULL || headerLen <= 0) {
-		return false; // empty file
-	}
-
-	const uint8_t * const end = ptr + headerLen;
-	UINT count = 0;
-	while (ptr < end) {
-		uint8_t ch = *ptr++;
-		if (IsC0ControlChar(ch)) {
-			++count;
-			ch = *ptr++;
-			if ((count >= 8) || IsC0ControlChar(ch)) {
-				return true;
-			}
-		}
-	}
-#else
 	uint8_t buf[5] = {0}; // file magic
 	SciCall_GetText(COUNTOF(buf) - 1, buf);
 	const UINT magic2 = (buf[0] << 8) | buf[1];
@@ -2829,9 +2795,9 @@ bool Style_MaybeBinaryFile(LPCWSTR lpszFile) {
 			L" ", wch);
 		return lpszMatch != NULL;
 	}
-#endif
 	return false;
 }
+#endif
 
 void Style_SetLexerByLangIndex(int lang) {
 	const int langIndex = np2LexLangIndex;

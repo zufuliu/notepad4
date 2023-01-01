@@ -1978,7 +1978,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 	if (bAutoScaleToolbar) {
-		hbmp = ResizeToolbarImageForCurrentDPI(hbmp);
+		hbmp = ResizeImageForCurrentDPI(hbmp);
 	}
 	HBITMAP hbmpCopy = NULL;
 	if (!bExternalBitmap) {
@@ -1997,7 +1997,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapHot);
 		if (hbmp != NULL) {
 			if (bAutoScaleToolbar) {
-				hbmp = ResizeToolbarImageForCurrentDPI(hbmp);
+				hbmp = ResizeImageForCurrentDPI(hbmp);
 			}
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -2012,7 +2012,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		hbmp = LoadBitmapFile(tchToolbarBitmapDisabled);
 		if (hbmp != NULL) {
 			if (bAutoScaleToolbar) {
-				hbmp = ResizeToolbarImageForCurrentDPI(hbmp);
+				hbmp = ResizeImageForCurrentDPI(hbmp);
 			}
 			GetObject(hbmp, sizeof(BITMAP), &bmp);
 			himl = ImageList_Create(bmp.bmHeight, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 0, 0);
@@ -3213,16 +3213,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (flagPasteBoard) {
 				bLastCopyFromMe = true;
 			}
-			const Sci_Position iPos = SciCall_GetCurrentPos();
-			const Sci_Position iAnchor = SciCall_GetAnchor();
+			Sci_Position iPos = SciCall_GetCurrentPos();
+			Sci_Position iAnchor = SciCall_GetAnchor();
 			SciCall_BeginUndoAction();
 			SciCall_Cut(false);
 			SciCall_ReplaceSel(pClip);
+			const size_t len = strlen(pClip);
 			if (iPos > iAnchor) {
-				SciCall_SetSel(iAnchor, iAnchor + strlen(pClip));
+				iPos = iAnchor + len;
 			} else {
-				SciCall_SetSel(iPos + strlen(pClip), iPos);
+				iAnchor = iPos + len;
 			}
+			SciCall_SetSel(iAnchor, iPos);
 			SciCall_EndUndoAction();
 			LocalFree(pClip);
 		}
@@ -3345,9 +3347,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELECTIONDUPLICATE:
-		SciCall_BeginUndoAction();
 		SciCall_SelectionDuplicate();
-		SciCall_EndUndoAction();
 		break;
 
 	case IDM_EDIT_PADWITHSPACES:
@@ -3959,20 +3959,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_SELTODOCEND:
-	case IDM_EDIT_SELTODOCSTART: {
-		Sci_Position selStart;
-		Sci_Position selEnd;
-		if (LOWORD(wParam) == IDM_EDIT_SELTODOCEND) {
-			selStart = SciCall_GetSelectionStart();
-			selEnd = SciCall_GetLength();
-		} else {
-			selStart = 0;
-			selEnd = SciCall_GetSelectionEnd();
-		}
-		SciCall_SetSelectionStart(selStart);
-		SciCall_SetSelectionEnd(selEnd);
-	}
-	break;
+		SciCall_SetSelectionEnd(SciCall_GetLength());
+		break;
+	case IDM_EDIT_SELTODOCSTART:
+		SciCall_SetSelectionStart(0);
+		break;
 
 	case IDM_EDIT_COMPLETEWORD:
 		EditCompleteWord(AutoCompleteCondition_Normal, true);
@@ -4305,9 +4296,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_AUTO_SCALE_TOOLBAR:
 		bAutoScaleToolbar = !bAutoScaleToolbar;
-		if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI) {
-			MsgThemeChanged(hwnd, 0, 0);
-		}
+		MsgThemeChanged(hwnd, 0, 0);
 		break;
 
 	case IDM_VIEW_STATUSBAR:
@@ -7592,9 +7581,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 		}
 		InstallFileWatching(false);
 
-		// check for binary file (file with unknown encoding: ANSI)
-		const bool binary = (iCurrentEncoding == CPI_DEFAULT) && Style_MaybeBinaryFile(szCurFile);
-		if (binary || pLexCurrent->iLexer == SCLEX_DIFF) {
+		if (status.bBinaryFile || pLexCurrent->iLexer == SCLEX_DIFF) {
 			// ignore auto "detected" Tab settings for binary file and diff file.
 			if (fvCurFile.mask & FV_MaskHasFileTabSettings) {
 				fvCurFile.mask &= ~FV_MaskHasFileTabSettings;
@@ -7603,7 +7590,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			}
 		}
 		// open file in read only mode
-		if (binary || flagReadOnlyMode != ReadOnlyMode_None || bReadOnlyFile) {
+		if (status.bBinaryFile || flagReadOnlyMode != ReadOnlyMode_None || bReadOnlyFile) {
 			bReadOnlyMode = true;
 			flagReadOnlyMode &= ReadOnlyMode_AllFile;
 			SciCall_SetReadOnly(true);
@@ -7645,7 +7632,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			MsgBoxWarn(MB_OK, IDS_ERR_UNICODE);
 		}
 		// notify binary file opened in read only mode
-		if (binary) {
+		if (status.bBinaryFile) {
 			ShowNotificationMessage(SC_NOTIFICATIONPOSITION_BOTTOMRIGHT, IDS_BINARY_FILE_OPENED);
 			return fSuccess;
 		}

@@ -69,7 +69,6 @@ void	Style_InitDefaultColor(void);
 void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged);
 bool	Style_SetLexerFromFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromName(LPCWSTR lpszFile, LPCWSTR lpszName);
-bool	Style_MaybeBinaryFile(LPCWSTR lpszFile);
 bool	Style_CanOpenFile(LPCWSTR lpszFile);
 void	Style_SetLexerFromID(int rid);
 int		Style_GetMatchLexerIndex(int rid);

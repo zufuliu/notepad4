@@ -236,6 +236,7 @@ typedef struct EditFileIOStatus {
 
 	bool bFileTooBig;	// load output
 	bool bUnicodeErr;	// load output
+	bool bBinaryFile;	// load output
 	bool bCancelDataLoss;// save output
 
 	// inconsistent line endings

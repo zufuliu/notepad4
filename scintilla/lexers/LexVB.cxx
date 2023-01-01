@@ -251,11 +251,25 @@ bool VBMatchNextWord(LexAccessor &styler, Sci_Position startPos, Sci_Position en
 	return isspacechar(LexCharAt(pos + static_cast<int>(strlen(word))))
 		&& styler.MatchLowerCase(pos, word);
 }
-bool IsVBProperty(LexAccessor &styler, Sci_Line line, Sci_Position startPos) noexcept {
+int IsVBProperty(LexAccessor &styler, Sci_Line line, Sci_Position startPos) noexcept {
 	const Sci_Position endPos = styler.LineStart(line + 1) - 1;
+	bool visibleChars = false;
 	for (Sci_Position i = startPos; i < endPos; i++) {
-		if (styler.StyleAt(i) == SCE_B_OPERATOR && LexCharAt(i) == '(')
+		const uint8_t ch = UnsafeLower(styler[i]);
+		const int style = styler.StyleAt(i);
+		if (style == SCE_B_OPERATOR && ch == '(') {
 			return true;
+		}
+		if (style == SCE_B_KEYWORD && !visibleChars
+			&& (ch == 'g' || ch == 'l' || ch == 's')
+			&& UnsafeLower(styler[i + 1]) == 'e' 
+			&& UnsafeLower(styler[i + 2]) == 't'
+			&& isspacechar(styler[i + 3])) {
+			return 2;
+		}
+		if (ch > ' ') {
+			visibleChars = true;
+		}
 	}
 	return false;
 }
@@ -426,11 +440,9 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			} else if (!isInterface && VBMatch("property")) {
 				isProperty = true;
 				if (!(isEnd || isExit)) {
-					levelNext++;
-					if (!IsVBProperty(styler, lineCurrent, i + 8)) {
-						isProperty = false;
-						levelNext--;
-					}
+					const int result = IsVBProperty(styler, lineCurrent, i + 8);
+					levelNext += result != 0;
+					isProperty = result & true;
 				}
 				if (isEnd) {
 					isEnd = false; isProperty = false;

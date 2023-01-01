@@ -121,6 +121,10 @@ NP2_inline void SciCall_ClearAll(void) {
 	SciCall(SCI_CLEARALL, 0, 0);
 }
 
+NP2_inline void SciCall_DeleteRange(Sci_Position start, Sci_Position lengthDelete) {
+	SciCall(SCI_DELETERANGE, start, lengthDelete);
+}
+
 NP2_inline void SciCall_ClearDocumentStyle(void) {
 	SciCall(SCI_CLEARDOCUMENTSTYLE, 0, 0);
 }
@@ -422,6 +426,14 @@ NP2_inline int SciCall_PointYFromPosition(Sci_Position pos) {
 
 NP2_inline void SciCall_ChooseCaretX(void) {
 	SciCall(SCI_CHOOSECARETX, 0, 0);
+}
+
+NP2_inline void SciCall_MoveSelectedLinesUp(void) {
+	SciCall(SCI_MOVESELECTEDLINESUP, 0, 0);
+}
+
+NP2_inline void SciCall_MoveSelectedLinesDown(void) {
+	SciCall(SCI_MOVESELECTEDLINESDOWN, 0, 0);
 }
 
 NP2_inline Sci_Line EditGetSelectedLineCount(void) {
