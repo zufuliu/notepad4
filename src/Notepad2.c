@@ -3757,8 +3757,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case IDM_EDIT_BASE64_EMBED_IMG_HTML:
-		WCHAR prefix[35] = L"<img src=\"data:image/";
 		BeginWaitCursor();
+		static WCHAR prefix[35] = L"<img src=\"data:image/";
 		lstrcat(prefix, PathFindExtension(szCurFile));
 		lstrcat(prefix, L";base64,");
 		EditBase64Encode(LOWORD(wParam) == IDM_EDIT_BASE64_SAFE_ENCODE);
