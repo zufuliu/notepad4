@@ -2522,6 +2522,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_EDIT_BASE64_ENCODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_SAFE_ENCODE, i);
+	EnableCmd(hmenu, IDM_EDIT_BASE64_EMBED_IMG_HTML, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE_AS_HEX, i);
 
@@ -3752,6 +3753,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_EDIT_BASE64_SAFE_ENCODE:
 		BeginWaitCursor();
 		EditBase64Encode(LOWORD(wParam) == IDM_EDIT_BASE64_SAFE_ENCODE);
+		EndWaitCursor();
+		break;
+
+	case IDM_EDIT_BASE64_EMBED_IMG_HTML:
+		BeginWaitCursor();
+		static WCHAR prefix[35] = L"<img src=\"data:image/";
+		lstrcat(prefix, PathFindExtension(szCurFile));
+		lstrcat(prefix, L";base64,");
+		EditBase64Encode(LOWORD(wParam) == IDM_EDIT_BASE64_SAFE_ENCODE);
+		EditEncloseSelection(prefix, L"\" />");
 		EndWaitCursor();
 		break;
 
