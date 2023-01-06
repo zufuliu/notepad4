@@ -28,17 +28,18 @@ while
 add and alias ascending async await
 by descending
 equals
-from
+file from
 get global group
 init into
 join
 let
-nameof notnull
+managed
+nameof not notnull
 on or orderby
 partial
-record remove
-select set
-unmanaged managed
+record remove required
+scoped select set
+unmanaged
 value var
 when where with
 yield
