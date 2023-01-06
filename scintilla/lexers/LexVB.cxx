@@ -262,7 +262,7 @@ int IsVBProperty(LexAccessor &styler, Sci_Line line, Sci_Position startPos) noex
 		}
 		if (style == SCE_B_KEYWORD && !visibleChars
 			&& (ch == 'g' || ch == 'l' || ch == 's')
-			&& UnsafeLower(styler[i + 1]) == 'e' 
+			&& UnsafeLower(styler[i + 1]) == 'e'
 			&& UnsafeLower(styler[i + 2]) == 't'
 			&& isspacechar(styler[i + 3])) {
 			return 2;

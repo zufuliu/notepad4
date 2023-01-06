@@ -841,21 +841,17 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			lineState |= (indentCount << 16) | (parenCount << 8);
 			prevIndentCount = indentCount;
 			prevLineContinuation = lineContinuation;
+			lineContinuation = false;
 			if (sc.state != SCE_PY_COMMENTLINE && sc.LineEndsWith('\\')) {
 				lineContinuation = true;
 				lineState |= PyLineStateLineContinuation;
-			} else {
-				lineContinuation = false;
-				if (!nestedState.empty()) {
-					const int state = nestedState.back().state;
-					if (!IsPyTripleQuotedString(state)) {
-						nestedState.pop_back();
-						sc.SetState(state);
-					}
-				}
 			}
 			if (!nestedState.empty()) {
-				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
+				// PEP 701 allows new line in f-expression
+				lineState |= PyLineStateStringInterpolation;
+				if (IsPyTripleQuotedString(nestedState.front().state)) {
+					lineState |= PyLineStateMaskTripleQuote;
+				}
 			} else if (IsPyStringStyle(sc.state) && IsPyTripleQuotedString(sc.state)) {
 				lineState |= PyLineStateMaskTripleQuote;
 			} else if (visibleChars == 0) {
