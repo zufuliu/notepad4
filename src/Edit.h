@@ -145,7 +145,13 @@ void	EditUnescapeXHTMLChars(HWND hwnd);
 void	EditChar2Hex(void);
 void	EditHex2Char(void);
 void	EditShowHex(void);
-void	EditBase64Encode(bool urlSafe);
+
+typedef enum Base64EncodingFlag {
+	Base64EncodingFlag_Default,
+	Base64EncodingFlag_UrlSafe,
+	Base64EncodingFlag_HtmlEmbeddedImage,
+} Base64EncodingFlag;
+void	EditBase64Encode(Base64EncodingFlag encodingFlag);
 void	EditBase64Decode(bool decodeAsHex);
 void	EditConvertNumRadix(int radix);
 void	EditModifyNumber(bool bIncrease);

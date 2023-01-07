@@ -2095,7 +2095,6 @@ void EditChar2Hex(void) {
 	}
 
 	EditReplaceMainSelection(strlen(ch), ch);
-
 	NP2HeapFree(ch);
 	NP2HeapFree(wch);
 }
@@ -2199,7 +2198,7 @@ void EditShowHex(void) {
 	NP2HeapFree(cch);
 }
 
-void EditBase64Encode(bool urlSafe){
+void EditBase64Encode(Base64EncodingFlag encodingFlag){
 	const size_t len = SciCall_GetSelTextLength();
 	if (len == 0) {
 		return;
@@ -2211,11 +2210,31 @@ void EditBase64Encode(bool urlSafe){
 
 	char *input = (char *)NP2HeapAlloc(len + 1);
 	SciCall_GetSelBytes(input);
-	size_t outLen = (len*4)/3 + 4;
+	size_t outLen = (len*4)/3 + 4 + MAX_PATH*2;
 	char *output = (char *)NP2HeapAlloc(outLen);
-	outLen = Base64Encode(output, (const uint8_t *)input, len, urlSafe);
-	NP2HeapFree(input);
+	outLen = 0;
+	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
+		memcpy(output, "<img src=\"data:image/", CSTRLEN("<img src=\"data:image/"));
+		outLen += CSTRLEN("<img src=\"data:image/");
+		LPCWSTR suffix = PathFindExtension(szCurFile);
+		if (*suffix == L'.') {
+			// image file extension should be ASCII
+			++suffix;
+			while (*suffix) {
+				output[outLen++] = (char)(*suffix++);
+			}
+		}
+		memcpy(output + outLen, ";base64,", CSTRLEN(";base64,"));
+		outLen += CSTRLEN(";base64,");
+	}
+	outLen += Base64Encode(output + outLen, (const uint8_t *)input, len, encodingFlag == Base64EncodingFlag_UrlSafe);
+	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
+		memcpy(output + outLen, "\" />", CSTRLEN("\" />"));
+		outLen += CSTRLEN("\" />");
+	}
+
 	EditReplaceMainSelection(outLen, output);
+	NP2HeapFree(input);
 	NP2HeapFree(output);
 }
 
@@ -2448,7 +2467,6 @@ void EditConvertNumRadix(int radix) {
 	tch[cch] = '\0';
 
 	EditReplaceMainSelection(cch, tch);
-
 	NP2HeapFree(ch);
 	NP2HeapFree(tch);
 }

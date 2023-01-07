@@ -339,6 +339,7 @@ BEGIN
 			BEGIN
 				MENUITEM "普通のエンコード(&E)",							IDM_EDIT_BASE64_ENCODE
 				MENUITEM "URLに適したエンコード(&S)",							IDM_EDIT_BASE64_SAFE_ENCODE
+				MENUITEM "Encode as HTML Embedded &Image",				IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
 				MENUITEM "デコード(&D)",										IDM_EDIT_BASE64_DECODE
 				MENUITEM "16進数にデコード(&H)",								IDM_EDIT_BASE64_DECODE_AS_HEX
 			END

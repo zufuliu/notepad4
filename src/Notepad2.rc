@@ -339,7 +339,7 @@ BEGIN
 			BEGIN
 				MENUITEM "Standard &Encode",							IDM_EDIT_BASE64_ENCODE
 				MENUITEM "URL &Safe Encode",							IDM_EDIT_BASE64_SAFE_ENCODE
-				MENUITEM "Encode Img for HTML embedding",	IDM_EDIT_BASE64_EMBED_IMG_HTML
+				MENUITEM "Encode as HTML Embedded &Image",				IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
 				MENUITEM "&Decode",										IDM_EDIT_BASE64_DECODE
 				MENUITEM "Decode as &Hex",								IDM_EDIT_BASE64_DECODE_AS_HEX
 			END

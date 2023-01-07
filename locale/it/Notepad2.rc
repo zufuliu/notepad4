@@ -339,6 +339,7 @@ BEGIN
 			BEGIN
 				MENUITEM "&Codifica standard",							IDM_EDIT_BASE64_ENCODE
 				MENUITEM "Codifica &sicura URL",							IDM_EDIT_BASE64_SAFE_ENCODE
+				MENUITEM "Encode as HTML Embedded &Image",				IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
 				MENUITEM "&Decodifica",										IDM_EDIT_BASE64_DECODE
 				MENUITEM "Decodifica come &Esadecimale",								IDM_EDIT_BASE64_DECODE_AS_HEX
 			END
