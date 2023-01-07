@@ -7,6 +7,10 @@
 // in the "Toolbar Labels" (without quotes) section in Notepad2.ini
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
+//! Enable building with HiDPI toolbar images.
+// When disabled, only building with 16x16 Toolbar16.bmp
+#define NP2_ENABLE_HIDPI_TOOLBAR_IMAGE			1
+
 //! Enable the .LOG feature
 // When enabled and Notepad2 opens a file starts with ".LOG" (without quotes, in upper case),
 // Notepad2 will append current time to the file.
