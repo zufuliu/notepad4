@@ -513,7 +513,7 @@ BEGIN
 			MENUITEM "텍스트 파일(&T)",					IDM_LEXER_TEXTFILE
 			MENUITEM "두 번째 텍스트 파일(&2)",				IDM_LEXER_2NDTEXTFILE
 		END
-		MENUITEM "CSV File...",						IDM_LEXER_CSV
+		MENUITEM "CSV 파일...",						IDM_LEXER_CSV
 		POPUP "CSS 스타일 시트(&H)"
 		BEGIN
 			MENUITEM "CSS 스타일 시트(&C)",			IDM_LEXER_CSS
