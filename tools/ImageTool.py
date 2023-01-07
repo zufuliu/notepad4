@@ -211,22 +211,22 @@ def make_notepad2_toolbar_bitmap(size):
 		f'{images}/Copy.png',			# IDT_EDIT_COPY
 		f'{images}/Paste.png',			# IDT_EDIT_PASTE
 		f'{images}/Find.png',			# IDT_EDIT_FIND
-		f'{images}/Replace.png',			# IDT_EDIT_REPLACE
-		f'{images}/WordWrap.png',			# IDT_VIEW_WORDWRAP
+		f'{images}/Replace.png',		# IDT_EDIT_REPLACE
+		f'{images}/WordWrap.png',		# IDT_VIEW_WORDWRAP
 		f'{images}/ZoomIn.png',			# IDT_VIEW_ZOOMIN
-		f'{images}/ZoomOut.png',			# IDT_VIEW_ZOOMOUT
+		f'{images}/ZoomOut.png',		# IDT_VIEW_ZOOMOUT
 		f'{images}/Scheme.png',			# IDT_VIEW_SCHEME
-		f'{images}/SchemeConfig.png',			# IDT_VIEW_SCHEMECONFIG
+		f'{images}/SchemeConfig.png',	# IDT_VIEW_SCHEMECONFIG
 		f'{images}/Exit.png',			# IDT_FILE_EXIT
 		f'{images}/SaveAs.png',			# IDT_FILE_SAVEAS
-		f'{images}/SaveCopy.png',			# IDT_FILE_SAVECOPY
+		f'{images}/SaveCopy.png',		# IDT_FILE_SAVECOPY
 		f'{images}/Delete.png',			# IDT_EDIT_DELETE
 		f'{images}/Print.png',			# IDT_FILE_PRINT
-		f'{images}/OpenFav.png',			# IDT_FILE_OPENFAV
-		f'{images}/AddToFav.png',			# IDT_FILE_ADDTOFAV
-		f'{images}/ToggleFolds.png',			# IDT_VIEW_TOGGLEFOLDS
+		f'{images}/OpenFav.png',		# IDT_FILE_OPENFAV
+		f'{images}/AddToFav.png',		# IDT_FILE_ADDTOFAV
+		f'{images}/ToggleFolds.png',	# IDT_VIEW_TOGGLEFOLDS
 		f'{images}/Launch.png',			# IDT_FILE_LAUNCH
-		f'{images}/AlwaysOnTop.png',				# IDT_VIEW_ALWAYSONTOP
+		f'{images}/AlwaysOnTop.png',	# IDT_VIEW_ALWAYSONTOP
 	], f'Toolbar{size}.bmp')
 
 def make_all_notepad2_toolbar_bitmap():
@@ -234,7 +234,7 @@ def make_all_notepad2_toolbar_bitmap():
 		make_notepad2_toolbar_bitmap(size)
 
 #make_metapath_toolbar_bitmap()
-#make_notepad2_toolbar_bitmap()
+#make_all_notepad2_toolbar_bitmap()
 #convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')
 #concat_horizontal(['../res/Toolbar.bmp', 'images/pin-angle-16x.png'], 'Toolbar.bmp')
 
