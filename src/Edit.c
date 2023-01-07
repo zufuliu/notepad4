@@ -2215,13 +2215,13 @@ void EditBase64Encode(Base64EncodingFlag encodingFlag){
 	outLen = 0;
 	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
 		memcpy(output, "<img src=\"data:image/", CSTRLEN("<img src=\"data:image/"));
-		outLen += CSTRLEN("<img src=\"data:image/");
+		outLen = CSTRLEN("<img src=\"data:image/");
 		LPCWSTR suffix = PathFindExtension(szCurFile);
 		if (*suffix == L'.') {
 			// image file extension should be ASCII
 			++suffix;
 			while (*suffix) {
-				output[outLen++] = (char)(*suffix++);
+				output[outLen++] = (char)ToLowerA(*suffix++);
 			}
 		}
 		memcpy(output + outLen, ";base64,", CSTRLEN(";base64,"));
@@ -3493,9 +3493,13 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 		}
 	}
 
-	SciCall_BeginUndoAction();
-	int iAction = 0;
+	enum CommentAction {
+		CommentAction_None,
+		CommentAction_Add,
+		CommentAction_Delete,
+	} iAction = CommentAction_None;
 
+	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 		const Sci_Position iIndentPos = SciCall_GetLineIndentPosition(iLine);
 		bool bWhitespaceLine = false;
@@ -3513,11 +3517,11 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment)) {
 			int ch;
 			switch (iAction) {
-			case 0:
-				iAction = 2;
+			case CommentAction_None:
+				iAction = CommentAction_Delete;
 				FALLTHROUGH_ATTR;
 				// fall through
-			case 2:
+			case CommentAction_Delete:
 				iCommentPos = iIndentPos;
 				// a line with [space/tab] comment only
 				ch = SciCall_GetCharAt(iIndentPos + cchComment);
@@ -3526,7 +3530,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 				}
 				SciCall_DeleteRange(iCommentPos, iIndentPos + cchComment - iCommentPos);
 				break;
-			case 1:
+			case CommentAction_Add:
 				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
 				ch = SciCall_GetCharAt(iCommentPos);
 				if (ch == '\t' || ch == ' ') {
@@ -3536,11 +3540,11 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 			}
 		} else {
 			switch (iAction) {
-			case 0:
-				iAction = 1;
+			case CommentAction_None:
+				iAction = CommentAction_Add;
 				FALLTHROUGH_ATTR;
 				// fall through
-			case 1:
+			case CommentAction_Add:
 				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
 				if (!bWhitespaceLine || (iLineStart == iLineEnd)) {
 					SciCall_InsertText(iCommentPos, mszComment);
@@ -3559,14 +3563,13 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 					SciCall_InsertText(iCommentPos, tchComment);
 				}
 				break;
-			case 2:
+			case CommentAction_Delete:
 				break;
 			}
 		}
 	}
 
 	SciCall_EndUndoAction();
-
 	if (iSelStart != iSelEnd) {
 		Sci_Position iAnchorPos;
 		if (iCurPos == iSelStart) {
