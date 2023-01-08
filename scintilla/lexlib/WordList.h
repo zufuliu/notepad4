@@ -59,7 +59,7 @@ public:
 	}
 #endif
 	void Clear() noexcept;
-	bool Set(const char *s, KeywordAttr attribute = KeywordAttr_Default);
+	[[nodiscard]] bool Set(const char *s, KeywordAttr attribute = KeywordAttr_Default);
 	bool InList(const char *s) const noexcept;
 	bool InListPrefixed(const char *s, char marker) const noexcept;
 	bool InListAbbreviated(const char *s, char marker) const noexcept;
