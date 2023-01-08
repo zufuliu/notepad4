@@ -630,7 +630,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Scintilla::sptr_t StyleGetMessage(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
 	void SetSelectionNMessage(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept;
 
-	static const char *StringFromEOLMode(Scintilla::EndOfLine eolMode) noexcept;
+	static std::string_view StringFromEOLMode(Scintilla::EndOfLine eolMode) noexcept;
 
 	// Coercion functions for transforming WndProc parameters into pointers
 	static void *PtrFromSPtr(Scintilla::sptr_t lParam) noexcept {

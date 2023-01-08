@@ -522,7 +522,7 @@ Sci::Position Document::VCHomePosition(Sci::Position position) const noexcept {
 	const Sci::Position startPosition = LineStart(line);
 	const Sci::Position endLine = LineEnd(line);
 	Sci::Position startText = startPosition;
-	while (startText < endLine && (cb.CharAt(startText) == ' ' || cb.CharAt(startText) == '\t')) {
+	while (startText < endLine && IsSpaceOrTab(cb.CharAt(startText))) {
 		startText++;
 	}
 	if (position == startText)
@@ -1608,8 +1608,7 @@ Sci::Position Document::SetLineIndentation(Sci::Line line, Sci::Position indent)
 		const Sci::Position indentPos = GetLineIndentPosition(line);
 		const UndoGroup ug(this);
 		DeleteChars(thisLineStart, indentPos - thisLineStart);
-		return thisLineStart + InsertString(thisLineStart, linebuf.c_str(),
-			linebuf.length());
+		return thisLineStart + InsertString(thisLineStart, linebuf);
 	} else {
 		return GetLineIndentPosition(line);
 	}
@@ -1776,7 +1775,8 @@ void Document::ConvertLineEnds(EndOfLine eolModeSet) {
 	const UndoGroup ug(this);
 
 	for (Sci::Position pos = 0; pos < LengthNoExcept(); pos++) {
-		if (cb.CharAt(pos) == '\r') {
+		const char ch = cb.CharAt(pos);
+		if (ch == '\r') {
 			if (cb.CharAt(pos + 1) == '\n') {
 				// CRLF
 				if (eolModeSet == EndOfLine::Cr) {
@@ -1796,7 +1796,7 @@ void Document::ConvertLineEnds(EndOfLine eolModeSet) {
 					pos--;
 				}
 			}
-		} else if (cb.CharAt(pos) == '\n') {
+		} else if (ch == '\n') {
 			// LF
 			if (eolModeSet == EndOfLine::CrLf) {
 				pos += InsertString(pos, "\r", 1); // Insert CR
