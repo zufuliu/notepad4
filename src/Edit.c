@@ -4242,8 +4242,11 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 			cmp = pfnStrCmp(s1->pwszLine, s2->pwszLine);
 		}
 		if (cmp == 0) {
-			// stable sort
+			// stable sort for duplicate lines
 			cmp = (int)(s1->iLine - s2->iLine);
+			if (iSortFlags & EditSortFlag_MergeDuplicate) {
+				cmp = -cmp; // reverse order to keep first line
+			}
 		}
 	}
 	if (iSortFlags & EditSortFlag_Descending) {
