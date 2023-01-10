@@ -4437,6 +4437,13 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			}
 		}
 	}
+	if (cchTotal != 0) {
+		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLineEnd);
+		if (iLineEndPos == iTargetEnd) {
+			// no EOL on last line
+			cchTotal -= (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
+		}
+	}
 
 	NP2HeapFree(pLines);
 	NP2HeapFree(pszTextW);
