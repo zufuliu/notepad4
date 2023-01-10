@@ -875,7 +875,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	if (hbmp != NULL) {
 		bExternalBitmap = true;
 	} else {
-		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(IDB_TOOLBAR16), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		hbmpCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 

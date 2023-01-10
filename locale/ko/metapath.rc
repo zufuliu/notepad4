@@ -53,7 +53,7 @@ IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\cross2.i
 // Bitmap
 //
 
-IDR_MAINWND             BITMAP                  "..\\..\\metapath\\res\\Toolbar.bmp"
+IDB_TOOLBAR16           BITMAP                  "..\\..\\metapath\\res\\Toolbar16.bmp"
 IDB_OPEN_FOLDER         BITMAP                  "..\\..\\metapath\\res\\OpenFolder.bmp"
 
 /////////////////////////////////////////////////////////////////////////////

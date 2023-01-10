@@ -179,24 +179,29 @@ def resize_toolbar_bitmap_each(path, percent, method=ResizeMethod.Bicubic, out_p
 
 resize_toolbar_bitmap = resize_toolbar_bitmap_whole
 
-def make_metapath_toolbar_bitmap():
+def make_metapath_toolbar_bitmap(size):
+	images = f'images/metapath/{size}x{size}'
 	concat_horizontal([
-		'images/Previous_16x.png',				# IDT_HISTORY_BACK
-		'images/Next_16x.png',					# IDT_HISTORY_FORWARD
-		'images/Upload_16x.png',				# IDT_UP_DIR
-		'images/OneLevelUp_16x.png',			# IDT_ROOT_DIR
-		'images/Favorite_16x.png',				# IDT_VIEW_FAVORITES
-		'images/PreviousDocument_16x.png',		# IDT_FILE_PREV
-		'images/NextDocument_16x.png',			# IDT_FILE_NEXT
-		'images/Run_16x.png',					# IDT_FILE_RUN
-		'images/PrintPreview_16x.png',			# IDT_FILE_QUICKVIEW
-		'images/Save_16x.png',					# IDT_FILE_SAVEAS
-		'images/CopyItem_16x.png',				# IDT_FILE_COPYMOVE
-		'images/RecycleBin_16x.png',			# IDT_FILE_DELETE_RECYCLE
-		'images/RedCrossMark_16x.png',			# IDT_FILE_DELETE_PERM
-		'images/DeleteFilter_16x.png',			# IDT_VIEW_FILTER TB_DEL_FILTER_BMP
-		'images/AddFilter_16x.png',				# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
-	], 'Toolbar.bmp')
+		f'{images}/Previous.png',			# IDT_HISTORY_BACK
+		f'{images}/Next.png',				# IDT_HISTORY_FORWARD
+		f'{images}/Upload.png',				# IDT_UP_DIR
+		f'{images}/OneLevelUp.png',			# IDT_ROOT_DIR
+		f'{images}/Favorite.png',			# IDT_VIEW_FAVORITES
+		f'{images}/PreviousDocument.png',	# IDT_FILE_PREV
+		f'{images}/NextDocument.png',		# IDT_FILE_NEXT
+		f'{images}/Run.png',				# IDT_FILE_RUN
+		f'{images}/PrintPreview.png',		# IDT_FILE_QUICKVIEW
+		f'{images}/Save.png',				# IDT_FILE_SAVEAS
+		f'{images}/CopyItem.png',			# IDT_FILE_COPYMOVE
+		f'{images}/RecycleBin.png',			# IDT_FILE_DELETE_RECYCLE
+		f'{images}/RedCrossMark.png',		# IDT_FILE_DELETE_PERM
+		f'{images}/DeleteFilter.png',		# IDT_VIEW_FILTER TB_DEL_FILTER_BMP
+		f'{images}/AddFilter.png',			# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
+	], f'Toolbar{size}.bmp')
+
+def make_all_metapath_toolbar_bitmap():
+	for size in (16, 24, 32, 40, 48):
+		make_metapath_toolbar_bitmap(size)
 
 def make_notepad2_toolbar_bitmap(size):
 	images = f'images/{size}x{size}'
@@ -233,7 +238,7 @@ def make_all_notepad2_toolbar_bitmap():
 	for size in (16, 24, 32, 40, 48):
 		make_notepad2_toolbar_bitmap(size)
 
-#make_metapath_toolbar_bitmap()
+#make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()
 #convert_image('images/OpenFolder_16x.png', 'OpenFolder.bmp')
 #concat_horizontal(['../res/Toolbar.bmp', 'images/pin-angle-16x.png'], 'Toolbar.bmp')
