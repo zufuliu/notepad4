@@ -102,19 +102,6 @@ BEGIN
 			MENUITEM "Moda&lità file di grandi dimensioni",			IDM_FILE_LARGE_FILE_MODE_RELOAD
 #endif
 		END
-		POPUP "A&vvia"
-		BEGIN
-			MENUITEM "Apri la cartella con&tenente",		IDM_FILE_OPEN_CONTAINING_FOLDER
-			MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
-			MENUITEM SEPARATOR
-			MENUITEM "&Nuova finestra\tAlt+N",			IDM_FILE_NEWWINDOW
-			MENUITEM "Fin&estra vuota\tAlt+0",		IDM_FILE_NEWWINDOW2
-			MENUITEM "&Riavvia",					IDM_FILE_RESTART
-			MENUITEM SEPARATOR
-			MENUITEM "Esegui &documento\tCtrl+L",	IDM_FILE_LAUNCH
-			MENUITEM "A&pri con...",				IDM_FILE_OPENWITH
-			MENUITEM "&Comando...\tCtrl+R",			IDM_FILE_RUN
-		END
 		MENUITEM SEPARATOR
 		POPUP "Codi&fica"
 		BEGIN
@@ -140,6 +127,7 @@ BEGIN
 		MENUITEM "Stam&pa...\tCtrl+P",				IDM_FILE_PRINT
 		MENUITEM SEPARATOR
 		MENUITEM "Propriet&à...",					IDM_FILE_PROPERTIES
+		MENUITEM "Apri la cartella con&tenente",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Crea collegamento sul Des&ktop",			IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
 		MENUITEM "Navi&ga...\tCtrl+M",				IDM_FILE_BROWSE
@@ -177,9 +165,9 @@ BEGIN
 			MENUITEM "Copia &aggiungi\tCtrl+E",				IDM_EDIT_COPYADD
 			MENUITEM "Copia come &RTF",					IDM_EDIT_COPYRTF
 			//MENUITEM SEPARATOR
-			//MENUITEM "&Copy As Binary",					IDM_EDIT_COPY_BINARY
-			//MENUITEM "Cu&t As Binary",					IDM_EDIT_CUT_BINARY
-			//MENUITEM "&Paste As Binary",				IDM_EDIT_PASTE_BINARY
+			//MENUITEM "&Copy as Binary",					IDM_EDIT_COPY_BINARY
+			//MENUITEM "Cu&t as Binary",					IDM_EDIT_CUT_BINARY
+			//MENUITEM "&Paste as Binary",				IDM_EDIT_PASTE_BINARY
 			MENUITEM SEPARATOR
 			MENUITEM "Posizione &finestra\tCtrl+Shift+K",	CMD_COPYWINPOS
 		END
@@ -241,25 +229,6 @@ BEGIN
 			MENUITEM "In&verti maiuscole e minuscole\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
 			MENUITEM "Prima lettera maius&cola\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
 			MENUITEM "Prima lettera maiuscola nel paragra&fo\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
-			POPUP "Altre Conver&sioni"
-			BEGIN
-				MENUITEM "Da metà &larghezza a larghezza intera",		IDM_EDIT_MAP_FULLWIDTH
-				MENUITEM "D&a larghezza intera a metà larghezza",		IDM_EDIT_MAP_HALFWIDTH
-				MENUITEM SEPARATOR
-				MENUITEM "Cinese Tradizionale a &Semplificato",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-				MENUITEM "Cinese Semplificato a &Tradizionale",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
-				MENUITEM SEPARATOR
-				MENUITEM "Giapponese Katakana a &Hiragana",		IDM_EDIT_MAP_HIRAGANA
-				MENUITEM "Giapponese Hiragana a &Katakana",		IDM_EDIT_MAP_KATAKANA
-				MENUITEM SEPARATOR
-				MENUITEM "Coreano Han&ja a Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
-				MENUITEM "Coreano Han&gul Decomposizione",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
-				MENUITEM SEPARATOR
-				MENUITEM "&Bengali a Latino",					IDM_EDIT_MAP_BENGALI_LATIN
-				MENUITEM "C&irillico a Latino",					IDM_EDIT_MAP_CYRILLIC_LATIN
-				MENUITEM "&Devanagari a Latino",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-				MENUITEM "&Malayalam a Latino",					IDM_EDIT_MAP_MALAYALAM_LATIN
-			END
 			MENUITEM SEPARATOR
 			MENUITEM "Spazi in Ta&b nella selezione\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
 			MENUITEM "Tab in Spazi &nella selezione\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
@@ -335,17 +304,6 @@ BEGIN
 			MENUITEM "Caratteri Esca&pe C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Rimuovi Caratteri Escape C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
 			MENUITEM SEPARATOR
-			POPUP "Base&64"
-			BEGIN
-				MENUITEM "&Codifica standard",							IDM_EDIT_BASE64_ENCODE
-				MENUITEM "Codifica &sicura URL",							IDM_EDIT_BASE64_SAFE_ENCODE
-				MENUITEM "Codifica come &immagine incorporata HTML",				IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
-				MENUITEM "&Decodifica",										IDM_EDIT_BASE64_DECODE
-				MENUITEM "Decodifica come &Esadecimale",								IDM_EDIT_BASE64_DECODE_AS_HEX
-			END
-			MENUITEM SEPARATOR
-			MENUITEM "Codi&fica URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "Decodifica &URL\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 			MENUITEM "Caratteri Escape &HTML/XML\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Rimuovi Caratteri Escape HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
@@ -355,18 +313,6 @@ BEGIN
 			MENUITEM "Elimina par&ola a destra\tCtrl+Canc",			CMD_CTRLDEL
 			MENUITEM SEPARATOR
 			MENUITEM "Aggiorna s&tampa orario\tShift+F5",			CMD_TIMESTAMPS
-		END
-		POPUP "A&zioni sulla Selezione"
-		BEGIN
-			MENUITEM "&Apri File, Cartella, Link, ecc...",		CMD_OPEN_PATH_OR_LINK
-			MENUITEM "Apri &cartella contenente",				CMD_OPEN_CONTAINING_FOLDER
-			MENUITEM SEPARATOR
-			MENUITEM "Cerca con &Google",					CMD_ONLINE_SEARCH_GOOGLE
-			MENUITEM "Cerca con &Bing",					CMD_ONLINE_SEARCH_BING
-			MENUITEM "Cerca con &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
-			MENUITEM SEPARATOR
-			MENUITEM "Azione personalizzata &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
-			MENUITEM "Azione personalizzata &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Trova e Sostituisci"
@@ -652,6 +598,7 @@ BEGIN
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
+			MENUITEM "Usa la finestra di dialogo Apri/Salva stile &XP",	IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "Opzioni &finestra"
 		BEGIN
@@ -683,10 +630,6 @@ BEGIN
 		BEGIN
 			MENUITEM "Ricorda &file recenti",		IDM_VIEW_NOSAVERECENT
 			MENUITEM "&Ricorda opzioni di ricerca",	IDM_VIEW_NOSAVEFINDREPL
-			MENUITEM "&Salva prima di eseguire gli strumenti",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-			MENUITEM SEPARATOR
-			MENUITEM "&Usa la finestra di dialogo Apri/Salva stile XP",	IDM_SET_USE_XP_FILE_DIALOG
-			MENUITEM "Usa &metapath per aprire cartelle",IDM_SET_OPEN_FOLDER_METAPATH
 		END
 		MENUITEM SEPARATOR
 		POPUP "Imp&ostazioni avanzate"
@@ -723,6 +666,62 @@ BEGIN
 		END
 		MENUITEM "Salva impostazioni a&ll'uscita",			IDM_VIEW_SAVESETTINGS
 		MENUITEM "Salva imposta&zioni ora\tF7",			IDM_VIEW_SAVESETTINGSNOW
+	END
+	POPUP "&Tools"
+	BEGIN
+		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
+		MENUITEM "&Riavvia",					IDM_FILE_RESTART
+		MENUITEM SEPARATOR
+		MENUITEM "&Salva prima di eseguire gli strumenti",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+		MENUITEM "Usa &metapath per aprire cartelle",IDM_SET_OPEN_FOLDER_METAPATH
+		MENUITEM SEPARATOR
+		MENUITEM "&Nuova finestra\tAlt+N",			IDM_FILE_NEWWINDOW
+		MENUITEM "Fin&estra vuota\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM "Esegui &documento\tCtrl+L",	IDM_FILE_LAUNCH
+		MENUITEM "A&pri con...",				IDM_FILE_OPENWITH
+		MENUITEM "&Comando...\tCtrl+R",			IDM_FILE_RUN
+		MENUITEM SEPARATOR
+		POPUP "A&zioni sulla Selezione"
+		BEGIN
+			MENUITEM "&Apri File, Cartella, Link, ecc...",		CMD_OPEN_PATH_OR_LINK
+			MENUITEM "Apri &cartella contenente",				CMD_OPEN_CONTAINING_FOLDER
+			MENUITEM SEPARATOR
+			MENUITEM "Cerca con &Google",					CMD_ONLINE_SEARCH_GOOGLE
+			MENUITEM "Cerca con &Bing",					CMD_ONLINE_SEARCH_BING
+			MENUITEM "Cerca con &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
+			MENUITEM SEPARATOR
+			MENUITEM "Azione personalizzata &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
+			MENUITEM "Azione personalizzata &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
+		END
+		POPUP "&Base64"
+		BEGIN
+			MENUITEM "&Codifica standard",							IDM_EDIT_BASE64_ENCODE
+			MENUITEM "Codifica &sicura URL",							IDM_EDIT_BASE64_SAFE_ENCODE
+			MENUITEM "Codifica come &immagine incorporata HTML",				IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
+			MENUITEM "&Decodifica",										IDM_EDIT_BASE64_DECODE
+			MENUITEM "Decodifica come &Esadecimale",								IDM_EDIT_BASE64_DECODE_AS_HEX
+		END
+		POPUP "Text &Transliteration"
+		BEGIN
+			MENUITEM "Da metà &larghezza a larghezza intera",		IDM_EDIT_MAP_FULLWIDTH
+			MENUITEM "D&a larghezza intera a metà larghezza",		IDM_EDIT_MAP_HALFWIDTH
+			MENUITEM SEPARATOR
+			MENUITEM "Cinese Tradizionale a &Semplificato",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+			MENUITEM "Cinese Semplificato a &Tradizionale",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM SEPARATOR
+			MENUITEM "Giapponese Katakana a &Hiragana",		IDM_EDIT_MAP_HIRAGANA
+			MENUITEM "Giapponese Hiragana a &Katakana",		IDM_EDIT_MAP_KATAKANA
+			MENUITEM SEPARATOR
+			MENUITEM "Coreano Han&ja a Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
+			MENUITEM "Coreano Han&gul Decomposizione",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
+			MENUITEM SEPARATOR
+			MENUITEM "&Bengali a Latino",					IDM_EDIT_MAP_BENGALI_LATIN
+			MENUITEM "C&irillico a Latino",					IDM_EDIT_MAP_CYRILLIC_LATIN
+			MENUITEM "&Devanagari a Latino",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+			MENUITEM "&Malayalam a Latino",					IDM_EDIT_MAP_MALAYALAM_LATIN
+		END
+		MENUITEM "Codifica &URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+		MENUITEM "Decodifica UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 	END
 	POPUP "&Aiuto"
 	BEGIN

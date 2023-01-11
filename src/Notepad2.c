@@ -5950,7 +5950,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	IniSectionSetIntEx(pIniSection, L"DefaultEOLMode", iDefaultEOLMode, 0);
 	IniSectionSetBoolEx(pIniSection, L"WarnLineEndings", bWarnLineEndings, true);
-	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, true);
+	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, false);
 	IniSectionSetBoolEx(pIniSection, L"FixTrailingBlanks", bAutoStripBlanks, false);
 
 	IniSectionSetIntEx(pIniSection, L"PrintHeader", (int)iPrintHeader, PrintHeaderOption_FilenameAndDate);
