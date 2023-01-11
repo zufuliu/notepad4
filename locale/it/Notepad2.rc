@@ -669,14 +669,14 @@ BEGIN
 	END
 	POPUP "S&trumenti"
 	BEGIN
-		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
-		MENUITEM "&Riavvia",					IDM_FILE_RESTART
-		MENUITEM SEPARATOR
 		MENUITEM "&Salva prima di eseguire gli strumenti",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
 		MENUITEM "Usa &metapath per aprire cartelle",IDM_SET_OPEN_FOLDER_METAPATH
 		MENUITEM SEPARATOR
+		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
+		MENUITEM "&Riavvia",					IDM_FILE_RESTART
 		MENUITEM "&Nuova finestra\tAlt+N",			IDM_FILE_NEWWINDOW
 		MENUITEM "Fin&estra vuota\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM SEPARATOR
 		MENUITEM "Esegui &documento\tCtrl+L",	IDM_FILE_LAUNCH
 		MENUITEM "A&pri con...",				IDM_FILE_OPENWITH
 		MENUITEM "&Comando...\tCtrl+R",			IDM_FILE_RUN
