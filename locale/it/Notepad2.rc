@@ -301,9 +301,9 @@ BEGIN
 			MENUITEM "Carattere in &Esadecimale\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Esadecimale in &Carattere\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "Mostra cod&ice esadecimale",							IDM_EDIT_SHOW_HEX
+			MENUITEM SEPARATOR
 			MENUITEM "Caratteri Esca&pe C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Rimuovi Caratteri Escape C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM SEPARATOR
 			MENUITEM "Caratteri Escape &HTML/XML\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Rimuovi Caratteri Escape HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
