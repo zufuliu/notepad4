@@ -667,7 +667,7 @@ BEGIN
 		MENUITEM "Salva impostazioni a&ll'uscita",			IDM_VIEW_SAVESETTINGS
 		MENUITEM "Salva imposta&zioni ora\tF7",			IDM_VIEW_SAVESETTINGSNOW
 	END
-	POPUP "&Tools"
+	POPUP "S&trumenti"
 	BEGIN
 		MENUITEM "Apri come &Amministratore",		IDM_FILE_RELAUNCH_ELEVATED
 		MENUITEM "&Riavvia",					IDM_FILE_RESTART
@@ -701,7 +701,7 @@ BEGIN
 			MENUITEM "&Decodifica",										IDM_EDIT_BASE64_DECODE
 			MENUITEM "Decodifica come &Esadecimale",								IDM_EDIT_BASE64_DECODE_AS_HEX
 		END
-		POPUP "Text &Transliteration"
+		POPUP "&Traslitterazione del testo"
 		BEGIN
 			MENUITEM "Da metà &larghezza a larghezza intera",		IDM_EDIT_MAP_FULLWIDTH
 			MENUITEM "D&a larghezza intera a metà larghezza",		IDM_EDIT_MAP_HALFWIDTH
