@@ -4,7 +4,3 @@ images:
 
 	file			original name
 	RedCrossMark	TestCoveredFailing
-
-	Bootstrap Icons
-	https://github.com/twbs/icons
-		pin-angle.svg
