@@ -214,7 +214,7 @@ typedef enum OpenSelectionType {
 } OpenSelectionType;
 void EditOpenSelection(OpenSelectionType type);
 
-// in Print.cpp
+// in Bridge.cpp
 #ifdef __cplusplus
 extern "C" {
 #endif
