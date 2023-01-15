@@ -122,9 +122,20 @@ def build_all_release_artifact():
 	duration = round((endTime - startTime)/60, 2)
 	print('total build time:', duration)
 
-build_all_release_artifact()
-
 # https://cli.github.com/
 # gh auth login
 # gh release list -L 2
 # gh release upload <tag> <files>
+def upload_all_release_artifact(tag):
+	files = []
+	with os.scandir(scriptFolder) as it:
+		for entry in it:
+			name = entry.name
+			if entry.is_file() and name.endswith('.zip'):
+				files.append(name)
+	files = ' '.join(files)
+	command = f'gh release upload {tag} {files}'
+	run_command_in_folder(command, scriptFolder)
+
+build_all_release_artifact()
+#upload_all_release_artifact('')
