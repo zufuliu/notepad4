@@ -12,7 +12,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 | [![Build status](https://github.com/zufuliu/notepad2/workflows/CI/badge.svg)](https://github.com/zufuliu/notepad2/actions) | [![Build status](https://ci.appveyor.com/api/projects/status/github/zufuliu/notepad2?branch=main&svg=true)](https://ci.appveyor.com/project/zufuliu/notepad2) |
 
 ## [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots)
-![v4.20.04](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.20.04.png)
+![v4.23.01 HD](https://raw.githubusercontent.com/wiki/zufuliu/notepad2/screenshots/v4.23.01HD.png)
 
 ## Changes compared to the official [Notepad2](https://www.flos-freeware.ch/notepad2.html) or [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/):
 
@@ -175,14 +175,11 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
-* Windows XP, Vista, 7, 8, 8.1 and 10, both 32-bit and 64-bit
-* Windows Server 2003, 2008, 2012 and 2016, both 32-bit and 64-bit
+* Windows XP, Vista, 7, 8, 8.1, 10 and 11, both 32-bit and 64-bit
+* Windows Server 2003, 2008, 2012, 2016, 2019 and 2022, both 32-bit and 64-bit
 * Windows 10 on ARM64, Windows 8/8.1 on ARM32 (Windows RT)
 * Unix-like Operating Systems (Linux, macOS, BSD, etc.) using [Wine](https://www.winehq.org/)
 * [ReactOS](https://www.reactos.org/)
-
-## Notes:
-* If you find any bugs or have any suggestions feel free to **write proposals/issues** or **provide patches/pull requests**.
 
 ## Contributors:
 * [XhmikosR](https://xhmikosr.github.io/notepad2-mod/)
