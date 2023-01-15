@@ -123,3 +123,8 @@ def build_all_release_artifact():
 	print('total build time:', duration)
 
 build_all_release_artifact()
+
+# https://cli.github.com/
+# gh auth login
+# gh release list -L 2
+# gh release upload <tag> <files>
