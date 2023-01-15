@@ -2095,7 +2095,6 @@ void EditChar2Hex(void) {
 	}
 
 	EditReplaceMainSelection(strlen(ch), ch);
-
 	NP2HeapFree(ch);
 	NP2HeapFree(wch);
 }
@@ -2199,7 +2198,7 @@ void EditShowHex(void) {
 	NP2HeapFree(cch);
 }
 
-void EditBase64Encode(bool urlSafe){
+void EditBase64Encode(Base64EncodingFlag encodingFlag){
 	const size_t len = SciCall_GetSelTextLength();
 	if (len == 0) {
 		return;
@@ -2211,11 +2210,31 @@ void EditBase64Encode(bool urlSafe){
 
 	char *input = (char *)NP2HeapAlloc(len + 1);
 	SciCall_GetSelBytes(input);
-	size_t outLen = (len*4)/3 + 4;
+	size_t outLen = (len*4)/3 + 4 + MAX_PATH*2;
 	char *output = (char *)NP2HeapAlloc(outLen);
-	outLen = Base64Encode(output, (const uint8_t *)input, len, urlSafe);
-	NP2HeapFree(input);
+	outLen = 0;
+	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
+		memcpy(output, "<img src=\"data:image/", CSTRLEN("<img src=\"data:image/"));
+		outLen = CSTRLEN("<img src=\"data:image/");
+		LPCWSTR suffix = PathFindExtension(szCurFile);
+		if (*suffix == L'.') {
+			// image file extension should be ASCII
+			++suffix;
+			while (*suffix) {
+				output[outLen++] = (char)ToLowerA(*suffix++);
+			}
+		}
+		memcpy(output + outLen, ";base64,", CSTRLEN(";base64,"));
+		outLen += CSTRLEN(";base64,");
+	}
+	outLen += Base64Encode(output + outLen, (const uint8_t *)input, len, encodingFlag == Base64EncodingFlag_UrlSafe);
+	if (encodingFlag == Base64EncodingFlag_HtmlEmbeddedImage) {
+		memcpy(output + outLen, "\" />", CSTRLEN("\" />"));
+		outLen += CSTRLEN("\" />");
+	}
+
 	EditReplaceMainSelection(outLen, output);
+	NP2HeapFree(input);
 	NP2HeapFree(output);
 }
 
@@ -2448,7 +2467,6 @@ void EditConvertNumRadix(int radix) {
 	tch[cch] = '\0';
 
 	EditReplaceMainSelection(cch, tch);
-
 	NP2HeapFree(ch);
 	NP2HeapFree(tch);
 }
@@ -3475,9 +3493,13 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 		}
 	}
 
-	SciCall_BeginUndoAction();
-	int iAction = 0;
+	enum CommentAction {
+		CommentAction_None,
+		CommentAction_Add,
+		CommentAction_Delete,
+	} iAction = CommentAction_None;
 
+	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 		const Sci_Position iIndentPos = SciCall_GetLineIndentPosition(iLine);
 		bool bWhitespaceLine = false;
@@ -3495,11 +3517,11 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment)) {
 			int ch;
 			switch (iAction) {
-			case 0:
-				iAction = 2;
+			case CommentAction_None:
+				iAction = CommentAction_Delete;
 				FALLTHROUGH_ATTR;
 				// fall through
-			case 2:
+			case CommentAction_Delete:
 				iCommentPos = iIndentPos;
 				// a line with [space/tab] comment only
 				ch = SciCall_GetCharAt(iIndentPos + cchComment);
@@ -3508,7 +3530,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 				}
 				SciCall_DeleteRange(iCommentPos, iIndentPos + cchComment - iCommentPos);
 				break;
-			case 1:
+			case CommentAction_Add:
 				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
 				ch = SciCall_GetCharAt(iCommentPos);
 				if (ch == '\t' || ch == ' ') {
@@ -3518,11 +3540,11 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 			}
 		} else {
 			switch (iAction) {
-			case 0:
-				iAction = 1;
+			case CommentAction_None:
+				iAction = CommentAction_Add;
 				FALLTHROUGH_ATTR;
 				// fall through
-			case 1:
+			case CommentAction_Add:
 				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
 				if (!bWhitespaceLine || (iLineStart == iLineEnd)) {
 					SciCall_InsertText(iCommentPos, mszComment);
@@ -3541,14 +3563,13 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 					SciCall_InsertText(iCommentPos, tchComment);
 				}
 				break;
-			case 2:
+			case CommentAction_Delete:
 				break;
 			}
 		}
 	}
 
 	SciCall_EndUndoAction();
-
 	if (iSelStart != iSelEnd) {
 		Sci_Position iAnchorPos;
 		if (iCurPos == iSelStart) {
@@ -4221,8 +4242,11 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 			cmp = pfnStrCmp(s1->pwszLine, s2->pwszLine);
 		}
 		if (cmp == 0) {
-			// stable sort
+			// stable sort for duplicate lines
 			cmp = (int)(s1->iLine - s2->iLine);
+			if (iSortFlags & EditSortFlag_MergeDuplicate) {
+				cmp = -cmp; // reverse order to keep first line
+			}
 		}
 	}
 	if (iSortFlags & EditSortFlag_Descending) {
@@ -4411,6 +4435,13 @@ void EditSortLines(EditSortFlag iSortFlags) {
 				*pszOut++ = '\r';
 				break;
 			}
+		}
+	}
+	if (cchTotal != 0) {
+		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLineEnd);
+		if (iLineEndPos == iTargetEnd) {
+			// no EOL on last line
+			cchTotal -= (iEOLMode == SC_EOL_CRLF) ? 2 : 1;
 		}
 	}
 

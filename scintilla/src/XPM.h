@@ -60,10 +60,10 @@ public:
 		return scale;
 	}
 	float GetScaledHeight() const noexcept {
-		return height / scale;
+		return static_cast<float>(height) / scale;
 	}
 	float GetScaledWidth() const noexcept {
-		return width / scale;
+		return static_cast<float>(width) / scale;
 	}
 	int CountBytes() const noexcept;
 	const unsigned char *Pixels() const noexcept;

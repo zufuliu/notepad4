@@ -2531,6 +2531,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	EnableCmd(hmenu, IDM_EDIT_BASE64_ENCODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_SAFE_ENCODE, i);
+	EnableCmd(hmenu, IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE, i);
 	EnableCmd(hmenu, IDM_EDIT_BASE64_DECODE_AS_HEX, i);
 
@@ -3759,8 +3760,9 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_EDIT_BASE64_ENCODE:
 	case IDM_EDIT_BASE64_SAFE_ENCODE:
+	case IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE:
 		BeginWaitCursor();
-		EditBase64Encode(LOWORD(wParam) == IDM_EDIT_BASE64_SAFE_ENCODE);
+		EditBase64Encode((Base64EncodingFlag)(LOWORD(wParam) - IDM_EDIT_BASE64_ENCODE));
 		EndWaitCursor();
 		break;
 
@@ -5957,7 +5959,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	IniSectionSetIntEx(pIniSection, L"DefaultEOLMode", iDefaultEOLMode, 0);
 	IniSectionSetBoolEx(pIniSection, L"WarnLineEndings", bWarnLineEndings, true);
-	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, true);
+	IniSectionSetBoolEx(pIniSection, L"FixLineEndings", bFixLineEndings, false);
 	IniSectionSetBoolEx(pIniSection, L"FixTrailingBlanks", bAutoStripBlanks, false);
 
 	IniSectionSetIntEx(pIniSection, L"PrintHeader", (int)iPrintHeader, PrintHeaderOption_FilenameAndDate);

@@ -529,7 +529,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				if (prefixws > 0)
 					sc.SetState(SCE_SH_HERE_Q);
-				while (!sc.MatchLineEnd()) {
+				while (sc.More() && !sc.MatchLineEnd()) {
 					sc.Forward();
 				}
 				char s[HERE_DELIM_MAX];

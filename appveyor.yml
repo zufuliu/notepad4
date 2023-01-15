@@ -61,7 +61,7 @@ for:
 
     build_script:
       - cmd: |
-          CALL "build\install_llvm.bat" 1
+          CALL "build\install_llvm.bat" latest 1
           CALL "build\VS2017\build.bat" Build x64 LLVMRelease 1
           CALL "build\make_zip.bat" LLVM x64 Release 1
 

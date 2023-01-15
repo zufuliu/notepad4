@@ -109,19 +109,6 @@ BEGIN
 			MENUITEM "&Large File Mode",			IDM_FILE_LARGE_FILE_MODE_RELOAD
 #endif
 		END
-		POPUP "&Launch"
-		BEGIN
-			MENUITEM "Open Containing &Folder",		IDM_FILE_OPEN_CONTAINING_FOLDER
-			MENUITEM "Open As &Administrator",		IDM_FILE_RELAUNCH_ELEVATED
-			MENUITEM SEPARATOR
-			MENUITEM "&New Window\tAlt+N",			IDM_FILE_NEWWINDOW
-			MENUITEM "&Empty Window\tAlt+0",		IDM_FILE_NEWWINDOW2
-			MENUITEM "&Restart",					IDM_FILE_RESTART
-			MENUITEM SEPARATOR
-			MENUITEM "Execute &Document\tCtrl+L",	IDM_FILE_LAUNCH
-			MENUITEM "Open &With...",				IDM_FILE_OPENWITH
-			MENUITEM "&Command...\tCtrl+R",			IDM_FILE_RUN
-		END
 		MENUITEM SEPARATOR
 		POPUP "&Encoding"
 		BEGIN
@@ -147,6 +134,7 @@ BEGIN
 		MENUITEM "&Print...\tCtrl+P",				IDM_FILE_PRINT
 		MENUITEM SEPARATOR
 		MENUITEM "Propert&ies...",					IDM_FILE_PROPERTIES
+		MENUITEM "Open &Containing Folder",			IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Create Desktop Lin&k",			IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
 		MENUITEM "&Browse...\tCtrl+M",				IDM_FILE_BROWSE
@@ -182,11 +170,11 @@ BEGIN
 			MENUITEM SEPARATOR
 			MENUITEM "Copy &All\tAlt+A",				IDM_EDIT_COPYALL
 			MENUITEM "Copy A&dd\tCtrl+E",				IDM_EDIT_COPYADD
-			MENUITEM "Copy As &RTF",					IDM_EDIT_COPYRTF
+			MENUITEM "Copy as &RTF",					IDM_EDIT_COPYRTF
 			//MENUITEM SEPARATOR
-			//MENUITEM "&Copy As Binary",					IDM_EDIT_COPY_BINARY
-			//MENUITEM "Cu&t As Binary",					IDM_EDIT_CUT_BINARY
-			//MENUITEM "&Paste As Binary",				IDM_EDIT_PASTE_BINARY
+			//MENUITEM "&Copy as Binary",					IDM_EDIT_COPY_BINARY
+			//MENUITEM "Cu&t as Binary",					IDM_EDIT_CUT_BINARY
+			//MENUITEM "&Paste as Binary",				IDM_EDIT_PASTE_BINARY
 			MENUITEM SEPARATOR
 			MENUITEM "&Window Position\tCtrl+Shift+K",	CMD_COPYWINPOS
 		END
@@ -248,25 +236,6 @@ BEGIN
 			MENUITEM "In&vert Case\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
 			MENUITEM "Title &Case\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
 			MENUITEM "&Sentence Case\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
-			POPUP "Oth&er Conversions"
-			BEGIN
-				MENUITEM "Halfwidth Form to Full&width",		IDM_EDIT_MAP_FULLWIDTH
-				MENUITEM "Fullwidth Form to H&alfwidth",		IDM_EDIT_MAP_HALFWIDTH
-				MENUITEM SEPARATOR
-				MENUITEM "Chinese Traditional to &Simplified",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-				MENUITEM "Chinese Simplified to &Traditional",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
-				MENUITEM SEPARATOR
-				MENUITEM "Japanese Katakana to &Hiragana",		IDM_EDIT_MAP_HIRAGANA
-				MENUITEM "Japanese Hiragana to &Katakana",		IDM_EDIT_MAP_KATAKANA
-				MENUITEM SEPARATOR
-				MENUITEM "Korean Han&ja to Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
-				MENUITEM "Korean Han&gul Decomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
-				MENUITEM SEPARATOR
-				MENUITEM "&Bengali to Latin",					IDM_EDIT_MAP_BENGALI_LATIN
-				MENUITEM "C&yrillic to Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
-				MENUITEM "&Devanagari to Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-				MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
-			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Tabify Selection\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
 			MENUITEM "U&ntabify Selection\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
@@ -339,19 +308,9 @@ BEGIN
 			MENUITEM "C&har to Hex\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex to Cha&r\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Show Hex Code",							IDM_EDIT_SHOW_HEX
+			MENUITEM SEPARATOR
 			MENUITEM "Esca&pe C Chars\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Unescape C Chars\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM SEPARATOR
-			POPUP "Base&64"
-			BEGIN
-				MENUITEM "Standard &Encode",							IDM_EDIT_BASE64_ENCODE
-				MENUITEM "URL &Safe Encode",							IDM_EDIT_BASE64_SAFE_ENCODE
-				MENUITEM "&Decode",										IDM_EDIT_BASE64_DECODE
-				MENUITEM "Decode as &Hex",								IDM_EDIT_BASE64_DECODE_AS_HEX
-			END
-			MENUITEM SEPARATOR
-			MENUITEM "URL &Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "URL &Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 			MENUITEM "Escape HT&ML/XML Chars\tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Unescape HTML/&XML Chars\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
@@ -361,18 +320,6 @@ BEGIN
 			MENUITEM "Delete Word Ri&ght\tCtrl+Del",			CMD_CTRLDEL
 			MENUITEM SEPARATOR
 			MENUITEM "Update &Timestamps\tShift+F5",			CMD_TIMESTAMPS
-		END
-		POPUP "Action &on Selection"
-		BEGIN
-			MENUITEM "&Open File, Folder, Link, etc.",		CMD_OPEN_PATH_OR_LINK
-			MENUITEM "Open Containing &Folder",				CMD_OPEN_CONTAINING_FOLDER
-			MENUITEM SEPARATOR
-			MENUITEM "Search with &Google",					CMD_ONLINE_SEARCH_GOOGLE
-			MENUITEM "Search with &Bing",					CMD_ONLINE_SEARCH_BING
-			MENUITEM "Search on &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
-			MENUITEM SEPARATOR
-			MENUITEM "Custom Action &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
-			MENUITEM "Custom Action &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Find and Replace"
@@ -437,7 +384,7 @@ BEGIN
 			MENUITEM "Line Width &3",				IDM_VIEW_CARET_STYLE_WIDTH3
 			MENUITEM SEPARATOR
 			MENUITEM "&No Blink",					IDM_VIEW_CARET_STYLE_NOBLINK
-			MENUITEM "Draw Block Caret In &Selection",		IDM_VIEW_CARET_STYLE_SELECTION
+			MENUITEM "Draw Block Caret in &Selection",		IDM_VIEW_CARET_STYLE_SELECTION
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "Word W&rap\tCtrl+Shift+W",				IDM_VIEW_WORDWRAP
@@ -658,6 +605,7 @@ BEGIN
 				MENUITEM "中文(简体)",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
+			MENUITEM "Use &XP Style Open/Save Dialog",	IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "Window O&ptions"
 		BEGIN
@@ -689,10 +637,6 @@ BEGIN
 		BEGIN
 			MENUITEM "Remember Recent &Files",		IDM_VIEW_NOSAVERECENT
 			MENUITEM "Remember &Search Options",	IDM_VIEW_NOSAVEFINDREPL
-			MENUITEM "Sa&ve Before Running Tools",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-			MENUITEM SEPARATOR
-			MENUITEM "&Use XP Style Open/Save Dialog",	IDM_SET_USE_XP_FILE_DIALOG
-			MENUITEM "Use &metapath to Open Folder",IDM_SET_OPEN_FOLDER_METAPATH
 		END
 		MENUITEM SEPARATOR
 		POPUP "A&dvanced Settings"
@@ -729,6 +673,62 @@ BEGIN
 		END
 		MENUITEM "Save Settings &On Exit",			IDM_VIEW_SAVESETTINGS
 		MENUITEM "Sa&ve Settings Now\tF7",			IDM_VIEW_SAVESETTINGSNOW
+	END
+	POPUP "&Tools"
+	BEGIN
+		MENUITEM "Sa&ve Before Running Tools",		IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+		MENUITEM "Use &metapath to Open Folder",	IDM_SET_OPEN_FOLDER_METAPATH
+		MENUITEM SEPARATOR
+		MENUITEM "Run as &Administrator",			IDM_FILE_RELAUNCH_ELEVATED
+		MENUITEM "&Restart",						IDM_FILE_RESTART
+		MENUITEM "Launch &New Window\tAlt+N",		IDM_FILE_NEWWINDOW
+		MENUITEM "Launch &Empty Window\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM SEPARATOR
+		MENUITEM "Execute &Document\tCtrl+L",		IDM_FILE_LAUNCH
+		MENUITEM "Open Document &With...",			IDM_FILE_OPENWITH
+		MENUITEM "Run &Command...\tCtrl+R",			IDM_FILE_RUN
+		MENUITEM SEPARATOR
+		POPUP "Action &on Selection"
+		BEGIN
+			MENUITEM "&Open File, Folder, Link, etc.",		CMD_OPEN_PATH_OR_LINK
+			MENUITEM "Open Containing &Folder",				CMD_OPEN_CONTAINING_FOLDER
+			MENUITEM SEPARATOR
+			MENUITEM "Search with &Google",					CMD_ONLINE_SEARCH_GOOGLE
+			MENUITEM "Search with &Bing",					CMD_ONLINE_SEARCH_BING
+			MENUITEM "Search on &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
+			MENUITEM SEPARATOR
+			MENUITEM "Custom Action &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
+			MENUITEM "Custom Action &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
+		END
+		POPUP "&Base64"
+		BEGIN
+			MENUITEM "Standard &Encode",					IDM_EDIT_BASE64_ENCODE
+			MENUITEM "URL &Safe Encode",					IDM_EDIT_BASE64_SAFE_ENCODE
+			MENUITEM "Encode as HTML Embedded &Image",		IDM_EDIT_BASE64_HTML_EMBEDDED_IMAGE
+			MENUITEM "&Decode",								IDM_EDIT_BASE64_DECODE
+			MENUITEM "Decode as &Hex",						IDM_EDIT_BASE64_DECODE_AS_HEX
+		END
+		POPUP "Text &Transliteration"
+		BEGIN
+			MENUITEM "Halfwidth Form to Full&width",		IDM_EDIT_MAP_FULLWIDTH
+			MENUITEM "Fullwidth Form to H&alfwidth",		IDM_EDIT_MAP_HALFWIDTH
+			MENUITEM SEPARATOR
+			MENUITEM "Chinese Traditional to &Simplified",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+			MENUITEM "Chinese Simplified to &Traditional",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM SEPARATOR
+			MENUITEM "Japanese Katakana to &Hiragana",		IDM_EDIT_MAP_HIRAGANA
+			MENUITEM "Japanese Hiragana to &Katakana",		IDM_EDIT_MAP_KATAKANA
+			MENUITEM SEPARATOR
+			MENUITEM "Korean Han&ja to Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
+			MENUITEM "Korean Han&gul Decomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
+			MENUITEM SEPARATOR
+			MENUITEM "&Bengali to Latin",					IDM_EDIT_MAP_BENGALI_LATIN
+			MENUITEM "C&yrillic to Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
+			MENUITEM "&Devanagari to Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+			MENUITEM "&Malayalam to Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
+		END
+		MENUITEM "&URL Encode\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+		MENUITEM "UR&L Decode\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 	END
 	POPUP "&Help"
 	BEGIN
