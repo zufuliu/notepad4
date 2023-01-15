@@ -1807,7 +1807,16 @@ void Document::ConvertLineEnds(EndOfLine eolModeSet) {
 			}
 		}
 	}
+}
 
+std::string_view Document::EOLString() const noexcept {
+	if (eolMode == EndOfLine::CrLf) {
+		return "\r\n";
+	} else if (eolMode == EndOfLine::Cr) {
+		return "\r";
+	} else {
+		return "\n";
+	}
 }
 
 DocumentOption Document::Options() const noexcept {

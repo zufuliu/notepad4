@@ -83,6 +83,12 @@ constexpr bool IsPixelIndex(unsigned index, unsigned dimension) noexcept {
 	return index < dimension;
 }
 
+#if !(NP2_USE_AVX2 || NP2_USE_SSE2)
+constexpr unsigned char AlphaMultiplied(unsigned char value, unsigned char alpha) noexcept {
+	return (value * alpha) / UCHAR_MAX;
+}
+#endif
+
 }
 
 
@@ -309,9 +315,9 @@ void RGBAImage::BGRAFromRGBA(unsigned char *pixelsBGRA, const unsigned char *pix
 	for (size_t i = 0; i < count; i++) {
 		const unsigned char alpha = pixelsRGBA[3];
 		// Input is RGBA, output is BGRA with premultiplied alpha
-		pixelsBGRA[2] = pixelsRGBA[0] * alpha / UCHAR_MAX;
-		pixelsBGRA[1] = pixelsRGBA[1] * alpha / UCHAR_MAX;
-		pixelsBGRA[0] = pixelsRGBA[2] * alpha / UCHAR_MAX;
+		pixelsBGRA[2] = AlphaMultiplied(pixelsRGBA[0], alpha);
+		pixelsBGRA[1] = AlphaMultiplied(pixelsRGBA[1], alpha);
+		pixelsBGRA[0] = AlphaMultiplied(pixelsRGBA[2], alpha);
 		pixelsBGRA[3] = alpha;
 		pixelsRGBA += bytesPerPixel;
 		pixelsBGRA += bytesPerPixel;

@@ -815,9 +815,7 @@ void Editor::MultipleSelectAdd(AddNumber addNumber) {
 bool Editor::RangeContainsProtected(Sci::Position start, Sci::Position end) const noexcept {
 	if (vs.ProtectionActive()) {
 		if (start > end) {
-			const Sci::Position t = start;
-			start = end;
-			end = t;
+			std::swap(start, end);
 		}
 		for (Sci::Position pos = start; pos < end; pos++) {
 			if (vs.styles[pdoc->StyleIndexAt(pos)].IsProtected())
@@ -1081,7 +1079,7 @@ void Editor::MoveSelectedLines(int lineDelta) {
 		SetSelection(pdoc->MovePositionOutsideChar(selectionStart - 1, -1), selectionEnd);
 	ClearSelection();
 
-	const std::string_view eol = StringFromEOLMode(pdoc->eolMode);
+	const std::string_view eol = pdoc->EOLString();
 	if (currentLine + lineDelta >= pdoc->LinesTotal())
 		pdoc->InsertString(pdoc->LengthNoExcept(), eol);
 	GoToLine(currentLine + lineDelta);
@@ -1671,7 +1669,8 @@ bool Editor::WrapLines(WrapScope ws) {
 void Editor::LinesJoin() {
 	if (!RangeContainsProtected(targetRange.start.Position(), targetRange.end.Position())) {
 		const UndoGroup ug(pdoc);
-		for (Sci::Position pos = pdoc->LineEndPosition(targetRange.start.Position()); pos < targetRange.end.Position();) {
+		const Sci::Line line = pdoc->SciLineFromPosition(targetRange.start.Position());
+		for (Sci::Position pos = pdoc->LineEnd(line); pos < targetRange.end.Position(); pos = pdoc->LineEnd(line)) {
 			const char chPrev = pdoc->CharAt(pos - 1);
 			const Sci::Position widthChar = pdoc->LenChar(pos);
 			targetRange.end.Add(-widthChar);
@@ -1681,18 +1680,7 @@ void Editor::LinesJoin() {
 				const Sci::Position lengthInserted = pdoc->InsertString(pos, " ", 1);
 				targetRange.end.Add(lengthInserted);
 			}
-			pos = pdoc->LineEndPosition(pos);
 		}
-	}
-}
-
-std::string_view Editor::StringFromEOLMode(EndOfLine eolMode) noexcept {
-	if (eolMode == EndOfLine::CrLf) {
-		return "\r\n";
-	} else if (eolMode == EndOfLine::Cr) {
-		return "\r";
-	} else {
-		return "\n";
 	}
 }
 
@@ -1704,7 +1692,7 @@ void Editor::LinesSplit(int pixelWidth) {
 		}
 		const Sci::Line lineStart = pdoc->SciLineFromPosition(targetRange.start.Position());
 		Sci::Line lineEnd = pdoc->SciLineFromPosition(targetRange.end.Position());
-		const std::string_view eol = StringFromEOLMode(pdoc->eolMode);
+		const std::string_view eol = pdoc->EOLString();
 		const UndoGroup ug(pdoc);
 		for (Sci::Line line = lineStart; line <= lineEnd; line++) {
 			const AutoSurface surface(this);
@@ -2203,7 +2191,7 @@ void Editor::InsertPasteShape(const char *text, Sci::Position len, PasteShape sh
 			Sci::Position lengthInserted = pdoc->InsertString(insertPos, text, len);
 			// add the newline if necessary
 			if ((len > 0) && !IsEOLCharacter(text[len - 1])) {
-				const std::string_view endline = StringFromEOLMode(pdoc->eolMode);
+				const std::string_view endline = pdoc->EOLString();
 				lengthInserted += pdoc->InsertString(insertPos + lengthInserted, endline);
 			}
 			if (sel.MainCaret() == insertPos) {
@@ -2309,7 +2297,7 @@ void Editor::PasteRectangular(SelectionPosition pos, const char *ptr, Sci::Posit
 			if ((ptr[i] == '\r') || (!prevCr))
 				line++;
 			if (line >= pdoc->LinesTotal()) {
-				const std::string_view eol = StringFromEOLMode(pdoc->eolMode);
+				const std::string_view eol = pdoc->EOLString();
 				pdoc->InsertString(pdoc->LengthNoExcept(), eol);
 			}
 			// Pad the end of lines with spaces if required
@@ -3199,7 +3187,7 @@ void Editor::Duplicate(bool forLine) {
 	const UndoGroup ug(pdoc);
 	std::string_view eol;
 	if (forLine) {
-		eol = StringFromEOLMode(pdoc->eolMode);
+		eol = pdoc->EOLString();
 	}
 	for (size_t r = 0; r < sel.Count(); r++) {
 		SelectionPosition start = sel.Range(r).Start();
@@ -3250,7 +3238,7 @@ void Editor::NewLine() {
 
 	// Insert each line end
 	size_t countInsertions = 0;
-	const std::string_view eol = StringFromEOLMode(pdoc->eolMode);
+	const std::string_view eol = pdoc->EOLString();
 	for (size_t r = 0; r < sel.Count(); r++) {
 		sel.Range(r).ClearVirtualSpace();
 		const Sci::Position positionInsert = sel.Range(r).caret.Position();
@@ -5845,12 +5833,11 @@ void Editor::AddStyledText(const char *buffer, Sci::Position appendLength) {
 	// The buffer consists of alternating character bytes and style bytes
 	const Sci::Position textLength = appendLength / 2;
 	std::string text(textLength, '\0');
-	Sci::Position i;
-	for (i = 0; i < textLength; i++) {
+	for (Sci::Position i = 0; i < textLength; i++) {
 		text[i] = buffer[i * 2];
 	}
-	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), text.c_str(), textLength);
-	for (i = 0; i < textLength; i++) {
+	const Sci::Position lengthInserted = pdoc->InsertString(CurrentPosition(), text);
+	for (Sci::Position i = 0; i < textLength; i++) {
 		text[i] = buffer[i * 2 + 1];
 	}
 	pdoc->StartStyling(CurrentPosition());
