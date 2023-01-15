@@ -238,7 +238,7 @@ BEGIN
 			MENUITEM "16進数(&H)\tCtrl+Alt+H",			IDM_EDIT_NUM2HEX
 			MENUITEM "10進数(&D)\tCtrl+Alt+D",				IDM_EDIT_NUM2DEC
 			MENUITEM "バイナリ(&B)\tCtrl+Alt+B",				IDM_EDIT_NUM2BIN
-			MENUITEM "8ビット(octet)(&O)",							IDM_EDIT_NUM2OCT
+			MENUITEM "8ビット(オクテット)(&O)",							IDM_EDIT_NUM2OCT
 		END
 		POPUP "挿入(&N)"
 		BEGIN
@@ -667,7 +667,7 @@ BEGIN
 		MENUITEM "設定を保存/終了時(&O)",			IDM_VIEW_SAVESETTINGS
 		MENUITEM "設定の保存/今すぐ(&V)\tF7",			IDM_VIEW_SAVESETTINGSNOW
 	END
-	POPUP "&Tools"
+	POPUP "ツール(&T)"
 	BEGIN
 		MENUITEM "ツールを実行する前に保存(&V)",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
 		MENUITEM "フォルダを開くのにメタパスを使用(&M)",IDM_SET_OPEN_FOLDER_METAPATH
@@ -701,7 +701,7 @@ BEGIN
 			MENUITEM "デコード(&D)",										IDM_EDIT_BASE64_DECODE
 			MENUITEM "16進数にデコード(&H)",								IDM_EDIT_BASE64_DECODE_AS_HEX
 		END
-		POPUP "Text &Transliteration"
+		POPUP "文字列の変換(&T)"
 		BEGIN
 			MENUITEM "半角を全角に(&W)",		IDM_EDIT_MAP_FULLWIDTH
 			MENUITEM "全角を半角に(&A)",		IDM_EDIT_MAP_HALFWIDTH
