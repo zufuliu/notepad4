@@ -1,7 +1,11 @@
 import os.path
 import time
+import shutil
+import subprocess
 
-scriptFolder = os.getcwd()
+buildFolder = os.getcwd()
+buildEnv = {}
+
 notepad2ConfigPath = os.path.abspath('../src/config.h')
 metapathConfigPath = os.path.abspath('../metapath/src/config.h')
 
@@ -51,45 +55,144 @@ def update_config_file(override):
 	update_raw_file(metapathConfigPath, content)
 
 
+def format_duration(duration):
+	second = int(duration)
+	duration = round((duration - second)*1000)
+	hour, second = divmod(second, 60*60)
+	minute, second = divmod(second, 60)
+	return f'{hour}:{minute:02d}:{second:02d}.{duration:03d}'
+
 def run_command_in_folder(command, folder):
 	print(f'run: {command} @ {folder}')
 	os.chdir(folder)
 	os.system(command)
 
+def find_7z_path():
+	path = shutil.which('7z.exe')
+	if path:
+		return path
+
+	import winreg
+	for program in ['7-Zip', '7-Zip-Zstandard']:
+		try:
+			key = winreg.OpenKeyEx(winreg.HKEY_LOCAL_MACHINE, rf"SOFTWARE\{program}", access=winreg.KEY_READ)
+			path, rtype = winreg.QueryValueEx(key, 'Path')
+			if rtype == winreg.REG_SZ and os.path.isdir(path):
+				path = os.path.join(path, '7z.exe')
+				if os.path.isfile(path):
+					return path
+		except OSError:
+			pass
+	return '7z.exe'
+
+def zip_folder_inner(folder, output):
+	if os.path.exists(output):
+		os.remove(output)
+	os.chdir(folder)
+	program = buildEnv['7z_path']
+	with subprocess.Popen([program, 'a', '-tzip', '-mx=9', output], stdout=subprocess.DEVNULL) as proc:
+		retcode = proc.poll()
+		if retcode:
+			print('make zip fail:', retcode, os.path.basename(output))
+
+def get_app_version():
+	major, minor, build, reversion = ['']*4
+	path = os.path.join(buildFolder, '../src/Version.h')
+	with open(path, encoding='utf-8') as fd:
+		for line in fd.read().splitlines():
+			if line.startswith('#define VERSION_MAJOR'):
+				major = line.split()[2]
+				break
+
+	path = os.path.join(buildFolder, '../src/VersionRev.h')
+	with open(path, encoding='utf-8') as fd:
+		for line in fd.read().splitlines():
+			items = line.split()
+			if len(items) > 2:
+				key = items[1]
+				value = items[2]
+				if key == 'VERSION_MINOR':
+					minor = value
+				elif key == 'VERSION_BUILD':
+					build = value
+				elif key == 'VERSION_REV':
+					reversion = value
+	return f'v{major}.{minor}.{build}r{reversion}'
+
+def prepare_build_environment():
+	app_version = get_app_version()
+	buildEnv['app_version'] = app_version
+	print('app version:', app_version)
+
+	path = find_7z_path()
+	print('7z path:', path)
+	buildEnv['7z_path'] = path
+
+	# copy common zip files once
+	zipDir = os.path.join(buildFolder, 'temp_zip_dir')
+	buildEnv['temp_zip_dir'] = zipDir
+	if not os.path.exists(zipDir):
+		os.makedirs(zipDir)
+	for path in ['../License.txt',
+		'../doc/Notepad2.ini',
+		'../doc/Notepad2 DarkTheme.ini',
+		'../metapath/doc/metapath.ini']:
+		target = os.path.join(zipDir, os.path.basename(path))
+		if not os.path.exists(target):
+			src = os.path.join(buildFolder, path)
+			shutil.copyfile(src, target)
+
+def clean_build_temporary():
+	zipDir = buildEnv['temp_zip_dir']
+	if os.path.exists(zipDir):
+		try:
+			shutil.rmtree(zipDir)
+		except PermissionError:
+			pass
+
+
 def copy_back_local_resource(locale):
 	command = f'python Locale.py back {locale}'
-	folder = os.path.normpath(os.path.join(scriptFolder, '../locale'))
+	folder = os.path.normpath(os.path.join(buildFolder, '../locale'))
 	run_command_in_folder(command, folder)
 
 def build_main_project(arch):
 	command = f'call build.bat Build {arch} Release'
-	folder = os.path.join(scriptFolder, 'VS2017')
+	folder = os.path.join(buildFolder, 'VS2017')
 	run_command_in_folder(command, folder)
 
 def build_locale_project(arch):
 	command = f'call build.bat Build {arch} Release'
-	folder = os.path.normpath(os.path.join(scriptFolder, '../locale'))
+	folder = os.path.normpath(os.path.join(buildFolder, '../locale'))
 	run_command_in_folder(command, folder)
 
-def make_release_artifact(suffix, extra):
-	command = f'call make_zip.bat {extra} {suffix}'
-	run_command_in_folder(command, scriptFolder)
-
-def delete_unused_artifact():
-	unused = []
-	total = 0
-	with os.scandir(scriptFolder) as it:
-		for entry in it:
-			name = entry.name
-			if entry.is_file() and name.endswith('.zip'):
-				total += 1
-				# only keep 32-bit ARM artifact for i18n and en
-				if '_ARM_' in name and not ('_en_' in name or '_i18n_' in name):
-					unused.append(entry.path)
-	print('total artifact:', total - len(unused))
-	for path in unused:
-		print('delete:', path)
-		os.remove(path)
+def make_release_artifact(locale, suffix=''):
+	app_version = buildEnv['app_version']
+	zipDir = buildEnv['temp_zip_dir']
+	outDir = os.path.join(buildFolder, 'bin', 'Release')
+	for arch in ['ARM', 'ARM64', 'AVX2', 'Win32', 'x64']:
+		if arch == 'ARM' and locale not in ('i18n', 'en'):
+			# 32-bit ARM is only built for i18n and en
+			continue
+		folder = os.path.join(outDir, arch)
+		notepad2 = os.path.join(folder, 'Notepad2.exe')
+		metapath = os.path.join(folder, 'metapath.exe')
+		if os.path.isfile(notepad2) and os.path.isfile(metapath):
+			shutil.copyfile(notepad2, os.path.join(zipDir, 'Notepad2.exe'))
+			shutil.copyfile(metapath, os.path.join(zipDir, 'metapath.exe'))
+			target = os.path.join(zipDir, 'locale')
+			if os.path.exists(target):
+				shutil.rmtree(target)
+			if locale == 'i18n':
+				path = os.path.join(folder, 'locale')
+				if os.path.isdir(path):
+					shutil.copytree(path, target)
+			name = f'Notepad2_{suffix + locale}_{arch}_{app_version}.zip'
+			print('make:', name)
+			path = os.path.join(buildFolder, name)
+			zip_folder_inner(zipDir, path)
+		else:
+			print(f'{locale} {arch} build failure')
 
 def build_release_artifact(hd, suffix=''):
 	for locale in activeLocaleList:
@@ -103,24 +206,22 @@ def build_release_artifact(hd, suffix=''):
 				# 32-bit ARM is only built for i18n and en
 				build_main_project(arch)
 		# build locale DLL
-		extra = ''
 		if locale == 'i18n':
-			extra = 'Locale'
 			for arch in ['ARM', 'ARM64', 'AVX2', 'Win32']:
 				# x64 locale DLL already built after building AVX2
 				build_locale_project(arch)
-		make_release_artifact(suffix + locale, extra)
+		make_release_artifact(locale, suffix)
 	copy_back_local_resource('en')
 
 def build_all_release_artifact():
-	print('script folder:', scriptFolder)
+	print('build folder:', buildFolder)
 	startTime = time.perf_counter()
+	prepare_build_environment()
 	build_release_artifact(True, 'HD_')
 	build_release_artifact(False)
-	delete_unused_artifact()
+	clean_build_temporary()
 	endTime = time.perf_counter()
-	duration = round((endTime - startTime)/60, 2)
-	print('total build time:', duration)
+	print('total build time:', format_duration(endTime - startTime))
 
 # https://cli.github.com/
 # gh auth login
@@ -128,14 +229,15 @@ def build_all_release_artifact():
 # gh release upload <tag> <files>
 def upload_all_release_artifact(tag):
 	files = []
-	with os.scandir(scriptFolder) as it:
+	with os.scandir(buildFolder) as it:
 		for entry in it:
 			name = entry.name
 			if entry.is_file() and name.endswith('.zip'):
 				files.append(name)
+	print('total artifact:', len(files))
 	files = ' '.join(files)
 	command = f'gh release upload {tag} {files}'
-	run_command_in_folder(command, scriptFolder)
+	run_command_in_folder(command, buildFolder)
 
 build_all_release_artifact()
 #upload_all_release_artifact('')
