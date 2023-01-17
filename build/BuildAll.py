@@ -234,17 +234,14 @@ def build_release_artifact(hd, suffix=''):
 		print('build:', hd, locale)
 		override = get_locale_override_config(locale, hd)
 		update_config_file(override)
-		if locale not in ('i18n', 'en'):
+		if locale in ('i18n', 'en'):
+			build_main_project('all')
+			if locale == 'i18n':
+				build_locale_project('all')
+		else:
 			copy_back_localized_resources(locale)
-		for arch in ['ARM', 'ARM64', 'AVX2', 'Win32', 'x64']:
-			if arch != 'ARM' or locale in ('i18n', 'en'):
-				# 32-bit ARM is only built for i18n and en
-				build_main_project(arch)
-		# build locale DLL
-		if locale == 'i18n':
-			for arch in ['ARM', 'ARM64', 'AVX2', 'Win32']:
-				# x64 locale DLL already built after building AVX2
-				build_locale_project(arch)
+			# 32-bit ARM is only built for i18n and en
+			build_main_project('NoARM')
 		make_release_artifact(locale, suffix)
 	copy_back_localized_resources('en')
 
