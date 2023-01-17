@@ -241,8 +241,8 @@ def make_all_notepad2_toolbar_bitmap():
 
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()
-#convert_image('images/Open.png', 'OpenFolder.bmp')
-#concat_horizontal(['../res/Toolbar.bmp', 'images/AlwaysOnTop.png'], 'Toolbar.bmp')
+#convert_image('images/16x16/Open.png', 'OpenFolder.bmp')
+#concat_horizontal(['../res/Toolbar.bmp', 'images/16x16/AlwaysOnTop.png'], 'Toolbar.bmp')
 
 #split_horizontal('Toolbar.bmp', '16x40')
 
