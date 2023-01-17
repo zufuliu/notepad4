@@ -7,9 +7,9 @@ import uuid
 import subprocess
 
 app = os.path.basename(__file__)
-localeDir = '.'
-notepad2_src = '../src/Notepad2.rc'
-metapath_src = '../metapath/src/metapath.rc'
+localeDir = os.getcwd()
+notepad2_src = os.path.abspath('../src/Notepad2.rc')
+metapath_src = os.path.abspath('../metapath/src/metapath.rc')
 
 def get_available_locales():
 	result = []

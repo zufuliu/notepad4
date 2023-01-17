@@ -6,8 +6,12 @@ import subprocess
 buildFolder = os.getcwd()
 buildEnv = {}
 
-notepad2ConfigPath = os.path.abspath('../src/config.h')
-metapathConfigPath = os.path.abspath('../metapath/src/config.h')
+notepad2_config_h = os.path.abspath('../src/config.h')
+metapath_config_h = os.path.abspath('../metapath/src/config.h')
+projectDir = os.path.abspath('VS2017')
+localeDir = os.path.abspath('../locale')
+notepad2_rc = os.path.abspath('../src/Notepad2.rc')
+metapath_rc = os.path.abspath('../metapath/src/metapath.rc')
 
 activeLocaleList = ['i18n', 'en', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
 defaultConfig = {
@@ -51,8 +55,8 @@ def update_config_file(override):
 		output.append(f'#define {key}\t\t{value}')
 	output.append('')
 	content = '\n'.join(output).encode('utf-8')
-	update_raw_file(notepad2ConfigPath, content)
-	update_raw_file(metapathConfigPath, content)
+	update_raw_file(notepad2_config_h, content)
+	update_raw_file(metapath_config_h, content)
 
 
 def format_duration(duration):
@@ -142,7 +146,20 @@ def prepare_build_environment():
 			src = os.path.join(buildFolder, path)
 			shutil.copyfile(src, target)
 
+	# backup resource files once
+	backupDir = os.path.join(localeDir, 'en')
+	if not os.path.exists(backupDir):
+		os.makedirs(backupDir)
+		shutil.copyfile(metapath_rc, os.path.join(backupDir, 'metapath.rc'))
+		shutil.copyfile(notepad2_rc, os.path.join(backupDir, 'Notepad2.rc'))
+
 def clean_build_temporary():
+	backupDir = os.path.join(localeDir, 'en')
+	if os.path.exists(backupDir):
+		try:
+			shutil.rmtree(backupDir)
+		except PermissionError:
+			pass
 	zipDir = buildEnv['temp_zip_dir']
 	if os.path.exists(zipDir):
 		try:
@@ -150,21 +167,39 @@ def clean_build_temporary():
 		except PermissionError:
 			pass
 
+# copy from locale/Locale.py
+def restore_resource_include_path(path, metapath):
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
+	if metapath:
+		# include path
+		doc = doc.replace('../../metapath/src/', '')
+		# resource path
+		doc = doc.replace(r'..\\metapath\\', '')
+	else:
+		# include path
+		doc = doc.replace('../../src/', '')
+		# resource path
+		doc = doc.replace(r'..\\..\\res', r'..\\res')
 
-def copy_back_local_resource(locale):
-	command = f'python Locale.py back {locale}'
-	folder = os.path.normpath(os.path.join(buildFolder, '../locale'))
-	run_command_in_folder(command, folder)
+	with open(path, 'w', encoding='utf-8', newline='\n') as fd:
+		fd.write(doc)
+
+def copy_back_localized_resources(language):
+	print(f'Locale: copy back localized resources for {language}.')
+	folder = os.path.join(localeDir, language)
+	shutil.copyfile(os.path.join(folder, 'metapath.rc'), metapath_rc)
+	shutil.copyfile(os.path.join(folder, 'Notepad2.rc'), notepad2_rc)
+	restore_resource_include_path(metapath_rc, True)
+	restore_resource_include_path(notepad2_rc, False)
 
 def build_main_project(arch):
 	command = f'call build.bat Build {arch} Release'
-	folder = os.path.join(buildFolder, 'VS2017')
-	run_command_in_folder(command, folder)
+	run_command_in_folder(command, projectDir)
 
 def build_locale_project(arch):
 	command = f'call build.bat Build {arch} Release'
-	folder = os.path.normpath(os.path.join(buildFolder, '../locale'))
-	run_command_in_folder(command, folder)
+	run_command_in_folder(command, localeDir)
 
 def make_release_artifact(locale, suffix=''):
 	app_version = buildEnv['app_version']
@@ -175,18 +210,18 @@ def make_release_artifact(locale, suffix=''):
 			# 32-bit ARM is only built for i18n and en
 			continue
 		folder = os.path.join(outDir, arch)
-		notepad2 = os.path.join(folder, 'Notepad2.exe')
-		metapath = os.path.join(folder, 'metapath.exe')
-		if os.path.isfile(notepad2) and os.path.isfile(metapath):
-			shutil.copyfile(notepad2, os.path.join(zipDir, 'Notepad2.exe'))
-			shutil.copyfile(metapath, os.path.join(zipDir, 'metapath.exe'))
+		notepad2_exe = os.path.join(folder, 'Notepad2.exe')
+		metapath_exe = os.path.join(folder, 'metapath.exe')
+		if os.path.isfile(notepad2_exe) and os.path.isfile(metapath_exe):
+			shutil.copyfile(notepad2_exe, os.path.join(zipDir, 'Notepad2.exe'))
+			shutil.copyfile(metapath_exe, os.path.join(zipDir, 'metapath.exe'))
 			target = os.path.join(zipDir, 'locale')
 			if os.path.exists(target):
 				shutil.rmtree(target)
 			if locale == 'i18n':
 				path = os.path.join(folder, 'locale')
 				if os.path.isdir(path):
-					shutil.copytree(path, target)
+					shutil.copytree(path, target, copy_function=shutil.copyfile)
 			name = f'Notepad2_{suffix + locale}_{arch}_{app_version}.zip'
 			print('make:', name)
 			path = os.path.join(buildFolder, name)
@@ -200,7 +235,7 @@ def build_release_artifact(hd, suffix=''):
 		override = get_locale_override_config(locale, hd)
 		update_config_file(override)
 		if locale not in ('i18n', 'en'):
-			copy_back_local_resource(locale)
+			copy_back_localized_resources(locale)
 		for arch in ['ARM', 'ARM64', 'AVX2', 'Win32', 'x64']:
 			if arch != 'ARM' or locale in ('i18n', 'en'):
 				# 32-bit ARM is only built for i18n and en
@@ -211,10 +246,12 @@ def build_release_artifact(hd, suffix=''):
 				# x64 locale DLL already built after building AVX2
 				build_locale_project(arch)
 		make_release_artifact(locale, suffix)
-	copy_back_local_resource('en')
+	copy_back_localized_resources('en')
 
 def build_all_release_artifact():
+	print('project folder:', projectDir)
 	print('build folder:', buildFolder)
+	print('locale folder:', localeDir)
 	startTime = time.perf_counter()
 	prepare_build_environment()
 	build_release_artifact(True, 'HD_')
@@ -234,10 +271,14 @@ def upload_all_release_artifact(tag):
 			name = entry.name
 			if entry.is_file() and name.endswith('.zip'):
 				files.append(name)
+
 	print('total artifact:', len(files))
 	files = ' '.join(files)
 	command = f'gh release upload {tag} {files}'
+	startTime = time.perf_counter()
 	run_command_in_folder(command, buildFolder)
+	endTime = time.perf_counter()
+	print('total upload time:', format_duration(endTime - startTime))
 
 build_all_release_artifact()
 #upload_all_release_artifact('')
