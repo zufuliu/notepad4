@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg9097"
+   sodipodi:docname="Back.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:export-filename="48x48\Back.png"
+   inkscape:export-xdpi="288"
+   inkscape:export-ydpi="288"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9101" />
+  <sodipodi:namedview
+     id="namedview9099"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="36.990524"
+     inkscape:cx="5.2716204"
+     inkscape:cy="10.759512"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9097">
+    <inkscape:grid
+       type="xygrid"
+       id="grid9220" />
+  </sodipodi:namedview>
+  <style
+     id="style9090">.icon-canvas-transparent{opacity:0;fill:#f6f6f6} .icon-vs-out{fill:#f6f6f6} .icon-vs-action-blue{fill:#00539c}</style>
+  <g
+     id="iconBg">
+    <path
+       class="icon-vs-action-blue"
+       d="M 8.6105,3.207 4.8175,7 H 15 V 9 H 4.8175 l 3.793,3.793 -1.414,1.414 L 0.9895,8 7.1965,1.793 Z"
+       id="path9094"
+       sodipodi:nodetypes="cccccccccc" />
+  </g>
+</svg>

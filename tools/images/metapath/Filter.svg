@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   viewBox="0 0 16 16"
+   style="enable-background:new 0 0 16 16;"
+   id="svg11442"
+   sodipodi:docname="Filter.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:export-filename="16x16\Filter.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs11446" />
+  <sodipodi:namedview
+     id="namedview11444"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="true"
+     inkscape:zoom="18.495262"
+     inkscape:cx="1.9464445"
+     inkscape:cy="3.1359383"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg11442">
+    <inkscape:grid
+       type="xygrid"
+       id="grid11565" />
+  </sodipodi:namedview>
+  <style
+     type="text/css"
+     id="style11428"> .icon-canvas-transparent{opacity:0;fill:#F6F6F6;} .icon-vs-out{fill:#F6F6F6;} .icon-vs-bg{fill:#424242;} .icon-vs-action-green{fill:#388A34;}</style>
+  <g
+     id="iconBg">
+    <path
+       class="icon-vs-bg"
+       d="M 14,3 9,9.714 V 15 H 7 V 9.714 L 5.7225,8 h 0.277 L 6,6 H 8 V 3 Z"
+       id="path11436"
+       style="display:inline"
+       sodipodi:nodetypes="ccccccccccc" />
+  </g>
+  <g
+     id="colorAction">
+    <path
+       class="icon-vs-action-green"
+       d="M 7,5 H 5 V 7 H 3 V 5 H 1 V 3 H 3 V 1 h 2 v 2 h 2 z"
+       id="path11439"
+       sodipodi:nodetypes="ccccccccccccc" />
+  </g>
+</svg>
