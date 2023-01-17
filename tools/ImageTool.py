@@ -181,22 +181,22 @@ resize_toolbar_bitmap = resize_toolbar_bitmap_whole
 
 def make_metapath_toolbar_bitmap(size):
 	images = f'images/metapath/{size}x{size}'
-	images2 = f'images/{size}x{size}'
+	common = f'images/{size}x{size}'
 	concat_horizontal([
 		f'{images}/Back.png',			# IDT_HISTORY_BACK
-		f'{images}/Forward.png',				# IDT_HISTORY_FORWARD
-		f'{images}/UpperDirectory.png',				# IDT_UP_DIR
-		f'{images}/RootDirectory.png',			# IDT_ROOT_DIR
-		f'{images2}/OpenFav.png',			# IDT_VIEW_FAVORITES
+		f'{images}/Forward.png',		# IDT_HISTORY_FORWARD
+		f'{images}/UpperDirectory.png',	# IDT_UP_DIR
+		f'{images}/RootDirectory.png',	# IDT_ROOT_DIR
+		f'{common}/OpenFav.png',		# IDT_VIEW_FAVORITES
 		f'{images}/PreviousFile.png',	# IDT_FILE_PREV
 		f'{images}/NextFile.png',		# IDT_FILE_NEXT
-		f'{images2}/Launch.png',				# IDT_FILE_RUN
+		f'{common}/Launch.png',			# IDT_FILE_RUN
 		f'{images}/Quickview.png',		# IDT_FILE_QUICKVIEW
-		f'{images2}/SaveAs.png',				# IDT_FILE_SAVEAS
-		f'{images2}/Copy.png',			# IDT_FILE_COPYMOVE
-		f'{images}/DeleteRecycleBin.png',			# IDT_FILE_DELETE_RECYCLE
-		f'{images2}/Delete.png',		# IDT_FILE_DELETE_PERM
-		f'{images}/DeleteFilter.png',		# IDT_VIEW_FILTER TB_DEL_FILTER_BMP
+		f'{common}/SaveAs.png',			# IDT_FILE_SAVEAS
+		f'{common}/Copy.png',			# IDT_FILE_COPYMOVE
+		f'{images}/DeleteRecycleBin.png',# IDT_FILE_DELETE_RECYCLE
+		f'{common}/Delete.png',			# IDT_FILE_DELETE_PERM
+		f'{images}/DeleteFilter.png',	# IDT_VIEW_FILTER TB_DEL_FILTER_BMP
 		f'{images}/Filter.png',			# IDT_VIEW_FILTER TB_ADD_FILTER_BMP
 	], f'Toolbar{size}.bmp')
 

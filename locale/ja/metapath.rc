@@ -56,6 +56,13 @@ IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\cross2.i
 IDB_TOOLBAR16           BITMAP                  "..\\..\\metapath\\res\\Toolbar16.bmp"
 IDB_OPEN_FOLDER         BITMAP                  "..\\..\\metapath\\res\\OpenFolder.bmp"
 
+#if NP2_ENABLE_HIDPI_TOOLBAR_IMAGE
+IDB_TOOLBAR24           BITMAP                  "..\\..\\metapath\\res\\Toolbar24.bmp"
+IDB_TOOLBAR32           BITMAP                  "..\\..\\metapath\\res\\Toolbar32.bmp"
+IDB_TOOLBAR40           BITMAP                  "..\\..\\metapath\\res\\Toolbar40.bmp"
+IDB_TOOLBAR48           BITMAP                  "..\\..\\metapath\\res\\Toolbar48.bmp"
+#endif // NP2_ENABLE_HIDPI_TOOLBAR_IMAGE
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Cursor

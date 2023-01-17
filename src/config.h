@@ -7,8 +7,8 @@
 // in the "Toolbar Labels" (without quotes) section in Notepad2.ini
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
-//! Enable building with HiDPI toolbar images.
-// When disabled, only building with 16x16 Toolbar16.bmp
+//! Enable building with Hi-DPI toolbar images.
+// When disabled, only build with 16px Toolbar16.bmp
 #define NP2_ENABLE_HIDPI_TOOLBAR_IMAGE			1
 
 //! Enable the .LOG feature
