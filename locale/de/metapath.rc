@@ -144,6 +144,7 @@ BEGIN
 	BEGIN
 		MENUITEM "Show &Toolbar",				IDM_VIEW_TOOLBAR
 		MENUITEM "&Customize Toolbar...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "&Auto Scale Toolbar",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 		MENUITEM "Show &Statusbar",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"

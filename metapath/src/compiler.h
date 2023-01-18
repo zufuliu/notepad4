@@ -21,6 +21,14 @@ typedef _Bool	bool;
 	#endif
 #endif
 
+#if defined(__cplusplus)
+#define NP2_static_assert(expr)		static_assert(expr)
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#define NP2_static_assert(expr)		_Static_assert(expr, #expr)
+#else
+#define NP2_static_assert(expr)		_STATIC_ASSERT(expr)
+#endif
+
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
 // https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
 // trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.

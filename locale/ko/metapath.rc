@@ -144,6 +144,7 @@ BEGIN
 	BEGIN
 		MENUITEM "도구 모음 보이기(&T)",				IDM_VIEW_TOOLBAR
 		MENUITEM "도구 모음 편집(&E)...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "도구모음 자동 크기 조정(&A)",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 		MENUITEM "상태 표시줄 보이기(&S)",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"

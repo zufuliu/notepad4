@@ -111,6 +111,9 @@ extern DWORD g_uWinVer;
 #define IsWin10AndAbove()	(g_uWinVer >= _WIN32_WINNT_WIN10)
 #endif
 
+#ifndef LOAD_LIBRARY_SEARCH_SYSTEM32
+#define LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800
+#endif
 #ifndef LOAD_LIBRARY_AS_IMAGE_RESOURCE
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
@@ -136,12 +139,38 @@ extern DWORD g_uWinVer;
 #define DLLFunctionEx(funcSig, dllName, funcName)	(funcSig)GetProcAddress(GetModuleHandleW(dllName), (funcName))
 #endif
 
+// High DPI Reference
+// https://docs.microsoft.com/en-us/windows/desktop/hidpi/high-dpi-reference
+#ifndef WM_DPICHANGED
+#define WM_DPICHANGED	0x02E0				// _WIN32_WINNT >= _WIN32_WINNT_WIN7
+#endif
 #ifndef USER_DEFAULT_SCREEN_DPI
 #define USER_DEFAULT_SCREEN_DPI		96		// _WIN32_WINNT >= _WIN32_WINNT_VISTA
 #endif
 
+// use large icon when window DPI is greater than or equal to this value.
+#define NP2_LARGER_ICON_SIZE_DPI	192		// 200%
+
+// current DPI for main/editor window
+extern UINT g_uCurrentDPI;
 // system DPI, same for all monitor.
 extern UINT g_uSystemDPI;
+
+// since Windows 10, version 1607
+#if (defined(__aarch64__) || defined(_ARM64_) || defined(_M_ARM64)) && !defined(__MINGW32__)
+// 1709 was the first version for Windows 10 on ARM64.
+#define NP2_HAS_GETDPIFORWINDOW				1
+#define GetWindowDPI(hwnd)					GetDpiForWindow(hwnd)
+#define SystemMetricsForDpi(nIndex, dpi)	GetSystemMetricsForDpi((nIndex), (dpi))
+#define AdjustWindowRectForDpi(lpRect, dwStyle, dwExStyle, dpi) \
+		AdjustWindowRectExForDpi((lpRect), (dwStyle), FALSE, (dwExStyle), (dpi))
+
+#else
+#define NP2_HAS_GETDPIFORWINDOW				0
+extern UINT GetWindowDPI(HWND hwnd) NP2_noexcept;
+extern int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept;
+extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
+#endif
 
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
@@ -361,6 +390,8 @@ bool ExeNameFromWnd(HWND hwnd, LPWSTR szExeName, DWORD cchExeName);
 
 bool FindUserResourcePath(LPCWSTR path, LPWSTR outPath);
 HBITMAP LoadBitmapFile(LPCWSTR path);
+HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp);
+
 bool BitmapMergeAlpha(HBITMAP hbmp, COLORREF crDest);
 bool BitmapAlphaBlend(HBITMAP hbmp, COLORREF crDest, BYTE alpha);
 bool BitmapGrayScale(HBITMAP hbmp);

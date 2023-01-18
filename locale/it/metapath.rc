@@ -144,6 +144,7 @@ BEGIN
 	BEGIN
 		MENUITEM "Mostra Barra degli strumenti",				IDM_VIEW_TOOLBAR
 		MENUITEM "Personalizza Barra degli strumenti...",		IDM_VIEW_CUSTOMIZETB
+		MENUITEM "&Auto scala barra degli strumenti",			IDM_VIEW_AUTO_SCALE_TOOLBAR
 		MENUITEM "Mostra Barra di stato",				IDM_VIEW_STATUSBAR
 	END
 	POPUP "+"
