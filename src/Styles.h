@@ -46,6 +46,32 @@ typedef enum CaretStyle {
 	CaretStyle_LineWidth3,
 } CaretStyle;
 
+typedef enum StyleDefinitionMask {
+	StyleDefinitionMask_None = 0,
+	StyleDefinitionMask_FontFace = 1 << 0,
+	StyleDefinitionMask_FontSize = 1 << 1,
+	StyleDefinitionMask_ForeColor = 1 << 2,
+	StyleDefinitionMask_BackColor = 1 << 3,
+	StyleDefinitionMask_FontWeight = 1 << 4,
+	StyleDefinitionMask_Charset = 1 << 5,
+} StyleDefinitionMask;
+
+typedef struct StyleDefinition {
+	UINT mask;
+	int fontSize;
+	COLORREF foreColor;
+	COLORREF backColor;
+	int weight;
+	bool italic;
+	bool underline;
+	bool strike;
+	bool overline;
+	bool eolFilled;
+	int charset;
+	WCHAR fontWide[LF_FACESIZE];
+	char fontFace[LF_FACESIZE * 3 /*kMaxMultiByteCount*/];
+} StyleDefinition;
+
 extern PEDITLEXER pLexCurrent;
 extern int np2LexLangIndex;
 extern bool bUse2ndGlobalStyle;

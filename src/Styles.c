@@ -352,31 +352,8 @@ extern EditTabSettings tabSettings;
 
 extern bool bUseXPFileDialog;
 
-#define STYLE_MASK_FONT_FACE	(1 << 0)
-#define STYLE_MASK_FONT_SIZE	(1 << 1)
-#define STYLE_MASK_FORE_COLOR	(1 << 2)
-#define STYLE_MASK_BACK_COLOR	(1 << 3)
-#define STYLE_MASK_FONT_WEIGHT	(1 << 4)
-#define STYLE_MASK_CHARSET		(1 << 5)
-
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
 #define MAX_STYLE_VALUE_LENGTH	LOCALE_NAME_MAX_LENGTH
-
-struct DetailStyle {
-	UINT mask;
-	int fontSize;
-	COLORREF foreColor;
-	COLORREF backColor;
-	int weight;
-	bool italic;
-	bool underline;
-	bool strike;
-	bool overline;
-	bool eolFilled;
-	int charset;
-	WCHAR fontWide[LF_FACESIZE];
-	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
-};
 
 /*
 style in other lexers is inherited from it's lexer default (first) style and global default style.
@@ -3709,7 +3686,7 @@ void Style_SetStyles(int iStyle, LPCWSTR lpszStyle) {
 }
 
 #if 0
-void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
+void Style_Parse(StyleDefinition *style, LPCWSTR lpszStyle) {
 	UINT mask = 0;
 	int iValue;
 	COLORREF rgb;
@@ -3717,31 +3694,31 @@ void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	// Font
 	if (Style_StrGetFont(lpszStyle, style->fontWide, COUNTOF(style->fontWide))) {
 		WideCharToMultiByte(CP_UTF8, 0, style->fontWide, -1, style->fontFace, COUNTOF(style->fontFace), NULL, NULL);
-		mask |= STYLE_MASK_FONT_FACE;
+		mask |= StyleDefinitionMask_FontFace;
 	}
 
 	// Size
 	if (Style_StrGetFontSize(lpszStyle, &iValue)) {
 		style->fontSize = iValue;
-		mask |= STYLE_MASK_FONT_SIZE;
+		mask |= StyleDefinitionMask_FontSize;
 	}
 
 	// Fore
 	if (Style_StrGetForeColor(lpszStyle, &rgb)) {
 		style->foreColor = rgb;
-		mask |= STYLE_MASK_FORE_COLOR;
+		mask |= StyleDefinitionMask_ForeColor;
 	}
 
 	// Back
 	if (Style_StrGetBackColor(lpszStyle, &rgb)) {
 		style->backColor = rgb;
-		mask |= STYLE_MASK_BACK_COLOR;
+		mask |= StyleDefinitionMask_BackColor;
 	}
 
 	// Weight
 	if (Style_StrGetFontWeight(lpszStyle, &iValue)) {
 		style->weight = iValue;
-		mask |= STYLE_MASK_FONT_WEIGHT;
+		mask |= StyleDefinitionMask_FontWeight;
 	}
 
 	// Italic
@@ -3758,37 +3735,37 @@ void Style_Parse(struct DetailStyle *style, LPCWSTR lpszStyle) {
 	// Character Set
 	if (Style_StrGetCharSet(lpszStyle, &iValue)) {
 		style->charset = iValue;
-		mask |= STYLE_MASK_CHARSET;
+		mask |= StyleDefinitionMask_Charset;
 	}
 
 	style->mask = mask;
 }
 
-void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
+void Style_SetParsed(const StyleDefinition *style, int iStyle) {
 	const UINT mask = style->mask;
 
 	// Font
-	if (mask & STYLE_MASK_FONT_FACE) {
+	if (mask & StyleDefinitionMask_FontFace) {
 		SciCall_StyleSetFont(iStyle, style->fontFace);
 	}
 
 	// Size
-	if (mask & STYLE_MASK_FONT_SIZE) {
+	if (mask & StyleDefinitionMask_FontSize) {
 		SciCall_StyleSetSizeFractional(iStyle, style->fontSize);
 	}
 
 	// Fore
-	if (mask & STYLE_MASK_FORE_COLOR) {
+	if (mask & StyleDefinitionMask_ForeColor) {
 		SciCall_StyleSetFore(iStyle, style->foreColor);
 	}
 
 	// Back
-	if (mask & STYLE_MASK_BACK_COLOR) {
+	if (mask & StyleDefinitionMask_BackColor) {
 		SciCall_StyleSetBack(iStyle, style->backColor);
 	}
 
 	// Weight
-	if (mask & STYLE_MASK_FONT_WEIGHT) {
+	if (mask & StyleDefinitionMask_FontWeight) {
 		SciCall_StyleSetWeight(iStyle, style->weight);
 	}
 
@@ -3819,7 +3796,7 @@ void Style_SetParsed(const struct DetailStyle *style, int iStyle) {
 	}
 
 	// Character Set
-	if (mask & STYLE_MASK_CHARSET) {
+	if (mask & StyleDefinitionMask_Charset) {
 		SciCall_StyleSetCharacterSet(iStyle, style->charset);
 	}
 }

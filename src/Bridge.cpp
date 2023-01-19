@@ -34,6 +34,7 @@ extern "C" {
 #include "Helpers.h"
 #include "Dialogs.h"
 #include "Notepad2.h"
+#include "Styles.h"
 
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 }
@@ -59,18 +60,18 @@ extern "C" HWND hwndStatus;
 extern "C" WCHAR defaultTextFontName[LF_FACESIZE];
 #endif
 
-// Stored objects...
-static HGLOBAL hDevMode {};
-static HGLOBAL hDevNames {};
+namespace {
 
-static void EditPrintInit() noexcept;
+// Stored objects...
+HGLOBAL hDevMode {};
+HGLOBAL hDevNames {};
 
 // https://docs.microsoft.com/en-us/windows/win32/intl/locale-imeasure
 // This value is 0 if the metric system (Systéme International d'Units,
 // or S.I.) is used, and 1 if the United States system is used.
 #define MeasurementInternational	0
 #define MeasurementUnitedStates		1
-static inline UINT GetLocaleMeasurement() noexcept {
+inline UINT GetLocaleMeasurement() noexcept {
 	UINT measurement = MeasurementInternational;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 	GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IMEASURE | LOCALE_RETURN_NUMBER,
@@ -80,6 +81,29 @@ static inline UINT GetLocaleMeasurement() noexcept {
 		(LPWSTR)(&measurement), sizeof(UINT) / sizeof(WCHAR));
 #endif
 	return measurement;
+}
+
+//=============================================================================
+//
+// EditPrintInit() - Setup default page margin if no values from registry
+//
+void EditPrintInit() noexcept {
+	if ((pageSetupMargin.left | pageSetupMargin.top | pageSetupMargin.right | pageSetupMargin.bottom) < 0) {
+		const UINT measurement = GetLocaleMeasurement();
+		if (measurement == MeasurementInternational) {
+			pageSetupMargin.left = 2000;
+			pageSetupMargin.top = 2000;
+			pageSetupMargin.right = 2000;
+			pageSetupMargin.bottom = 2000;
+		} else {
+			pageSetupMargin.left = 1000;
+			pageSetupMargin.top = 1000;
+			pageSetupMargin.right = 1000;
+			pageSetupMargin.bottom = 1000;
+		}
+	}
+}
+
 }
 
 //=============================================================================
@@ -564,25 +588,4 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 	}
 
 	NP2HeapFree(pDlgTemplate);
-}
-
-//=============================================================================
-//
-// EditPrintInit() - Setup default page margin if no values from registry
-//
-static void EditPrintInit() noexcept {
-	if ((pageSetupMargin.left | pageSetupMargin.top | pageSetupMargin.right | pageSetupMargin.bottom) < 0) {
-		const UINT measurement = GetLocaleMeasurement();
-		if (measurement == MeasurementInternational) {
-			pageSetupMargin.left = 2000;
-			pageSetupMargin.top = 2000;
-			pageSetupMargin.right = 2000;
-			pageSetupMargin.bottom = 2000;
-		} else {
-			pageSetupMargin.left = 1000;
-			pageSetupMargin.top = 1000;
-			pageSetupMargin.right = 1000;
-			pageSetupMargin.bottom = 1000;
-		}
-	}
 }
