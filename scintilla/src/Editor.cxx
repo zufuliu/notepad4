@@ -1024,6 +1024,7 @@ void Editor::VerticalCentreCaret() noexcept {
 	const Sci::Line newTop = lineDisplay - (LinesOnScreen() / 2);
 	if (topLine != newTop) {
 		SetTopLine(newTop > 0 ? newTop : 0);
+		SetVerticalScrollPos();
 		RedrawRect(GetClientRectangle());
 	}
 }
@@ -5971,6 +5972,8 @@ sptr_t Editor::StyleGetMessage(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return StringResult(lParam, vs.styles[wParam].fontName);
 	case Message::StyleGetUnderline:
 		return vs.styles[wParam].underline ? 1 : 0;
+	case Message::StyleGetStrike:
+		return vs.styles[wParam].strike ? 1 : 0;
 	case Message::StyleGetCase:
 		return static_cast<sptr_t>(vs.styles[wParam].caseForce);
 	case Message::StyleGetCharacterSet:
@@ -7380,6 +7383,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::StyleGetSizeFractional:
 	case Message::StyleGetFont:
 	case Message::StyleGetUnderline:
+	case Message::StyleGetStrike:
 	case Message::StyleGetCase:
 	case Message::StyleGetCharacterSet:
 	case Message::StyleGetVisible:

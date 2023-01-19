@@ -221,6 +221,7 @@ extern "C" {
 
 bool	EditPrint(HWND hwnd, LPCWSTR pszDocTitle);
 void	EditPrintSetup(HWND hwnd);
+void	EditCopyAsRTF(HWND hwnd);
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,10 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #include <commdlg.h>
+#include <string>
+#include <string_view>
+#include <memory>
+
 #include "SciCall.h"
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 extern "C" {
@@ -588,4 +592,334 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 	}
 
 	NP2HeapFree(pDlgTemplate);
+}
+
+namespace {
+
+// simplified version of std::ostringstream
+struct OutputStringStream {
+	std::string str;
+
+	OutputStringStream& operator<<(char value) {
+		str.push_back(value);
+		return *this;
+	}
+	OutputStringStream& operator<<(int value) {
+		char fmt[16];
+		const int len = sprintf(fmt, "%d", value);
+		str.append(std::string_view(fmt, len));
+		return *this;
+	}
+	OutputStringStream& operator<<(std::string_view value) {
+		str.append(value);
+		return *this;
+	}
+};
+
+void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
+	// not use Style_Parse() here due to lexer combination and style inheritance.
+	definition.fontSize = SciCall_StyleGetSizeFractional(style);
+	definition.foreColor = SciCall_StyleGetFore(style);
+	definition.backColor = SciCall_StyleGetBack(style);
+	definition.weight = SciCall_StyleGetWeight(style);
+	definition.italic = SciCall_StyleGetItalic(style);
+	definition.underline = SciCall_StyleGetUnderline(style);
+	definition.strike = SciCall_StyleGetStrike(style);
+	definition.charset = SciCall_StyleGetCharacterSet(style);
+	SciCall_StyleGetFont(style, definition.fontFace);
+}
+
+int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) noexcept {
+	static_assert(STYLE_DEFAULT == 0);
+	static_assert(__is_standard_layout(StyleDefinition));
+	memset(styleMap, STYLE_DEFAULT, STYLE_MAX + 1);
+	memset(styleList, 0, (STYLE_MAX + 1)*sizeof(StyleDefinition));
+
+	int styleCount = 0;
+	for (int style = 0; style < STYLE_MAX + 1; style++) {
+		if (style > STYLE_FIRSTPREDEFINED && style <= STYLE_LASTPREDEFINED) {
+			continue;
+		}
+		StyleDefinition &definition = styleList[styleCount];
+		GetStyleDefinitionFor(style, definition);
+		int index = 0;
+		for (; index < styleCount; index++) {
+			// NOLINTNEXTLINE(bugprone-suspicious-memory-comparison)
+			if (memcmp(&definition, &styleList[index], sizeof(StyleDefinition)) == 0) {
+				break;
+			}
+		}
+		styleMap[style] = (uint8_t)index;
+		if (index == styleCount) {
+			styleCount++;
+		}
+	}
+	return styleCount;
+}
+
+// code based SciTE's ExportRTF.cxx
+
+#define RTF_HEADEROPEN "{\\rtf1\\ansi\\deff0\\deftab720"
+#define RTF_FONTDEFOPEN "{\\fonttbl"
+#define RTF_FONTDEFCLOSE "}"
+#define RTF_COLORDEFOPEN "{\\colortbl"
+#define RTF_COLORDEFCLOSE "}"
+#define RTF_HEADERCLOSE "\n"
+#define RTF_BODYOPEN ""
+#define RTF_BODYCLOSE "}"
+
+#define RTF_SETFONTFACE "\\f"
+#define RTF_SETFONTSIZE "\\fs"
+#define RTF_SETCOLOR "\\cf"
+#define RTF_SETBACKGROUND "\\highlight"
+#define RTF_BOLD_ON "\\b"
+#define RTF_BOLD_OFF "\\b0"
+#define RTF_ITALIC_ON "\\i"
+#define RTF_ITALIC_OFF "\\i0"
+#define RTF_UNDERLINE_ON "\\ul"
+#define RTF_UNDERLINE_OFF "\\ulnone"
+#define RTF_STRIKE_ON "\\strike"
+#define RTF_STRIKE_OFF "\\strike0"
+
+#define RTF_EOLN "\\par\n"
+#define RTF_TAB "\\tab "
+
+// font face, size, color, background, bold, italic, underline, strike
+#define RTF_MAX_STYLEPROP 8
+#define RTF_MAX_STYLEDEF 128
+#ifndef CF_RTF
+#define CF_RTF TEXT("Rich Text Format")
+#endif
+
+// extract the next RTF control word from *style
+void GetRTFNextControl(const char **style, char *control) noexcept {
+	const char *pos = *style;
+	*control = '\0';
+	if ('\0' == *pos) {
+		return;
+	}
+	pos++; // implicit skip over leading '\'
+	while ('\0' != *pos && '\\' != *pos) {
+		pos++;
+	}
+	const size_t len = pos - *style;
+	memcpy(control, *style, len);
+	*(control + len) = '\0';
+	*style = pos;
+}
+
+// extracts control words that are different between two styles
+std::string GetRTFStyleChange(const char *last, const char *current) { // \f0\fs20\cf0\highlight0\b0\i0
+	char lastControl[RTF_MAX_STYLEDEF] = "";
+	char currentControl[RTF_MAX_STYLEDEF] = "";
+	const char *lastPos = last;
+	const char *currentPos = current;
+	std::string delta;
+	for (int i = 0; i < RTF_MAX_STYLEPROP; i++) {
+		GetRTFNextControl(&lastPos, lastControl);
+		GetRTFNextControl(&currentPos, currentControl);
+		if (strcmp(lastControl, currentControl) != 0) {	// changed
+			delta += currentControl;
+		}
+	}
+	if (!delta.empty()) {
+		delta += ' ';
+	}
+	return delta;
+}
+
+constexpr int GetRTFFontSize(int size) noexcept {
+	return size / (SC_FONT_SIZE_MULTIPLIER / 2);
+}
+
+void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position endPos) {
+	SciCall_EnsureStyledTo(endPos);
+
+	uint8_t styleMap[STYLE_MAX + 1];
+	const std::unique_ptr<StyleDefinition[]> styleList(new StyleDefinition[STYLE_MAX + 1]);
+	const int styleCount = GetDocumentUniqueStyleList(styleMap, styleList.get());
+	const std::unique_ptr<std::string[]> styles = std::make_unique<std::string[]>(styleCount);
+	const std::unique_ptr<LPCWSTR[]> fontList(new LPCWSTR[styleCount]);
+	const std::unique_ptr<COLORREF[]> colorList(new COLORREF[2*styleCount]);
+
+	int fontCount = 0;
+	int colorCount = 0;
+	os << RTF_HEADEROPEN RTF_FONTDEFOPEN;
+	for (int styleIndex = 0; styleIndex < styleCount; styleIndex++) {
+		OutputStringStream osStyle;
+		StyleDefinition &definition = styleList[styleIndex];
+
+		MultiByteToWideChar(CP_UTF8, 0, definition.fontFace, -1, definition.fontWide, COUNTOF(definition.fontWide));
+		int iFont = -1;
+		for (int index = 0; index < fontCount; index++) {
+			if (StrCmpIW(fontList[index], definition.fontWide) == 0) {
+				iFont = index;
+				break;
+			}
+		}
+		if (iFont < 0) {
+			iFont = fontCount;
+			fontList[fontCount++] = definition.fontWide;
+			// convert fontFace to ANSI code page
+			WideCharToMultiByte(CP_ACP, 0, definition.fontWide, -1, definition.fontFace, COUNTOF(definition.fontFace), nullptr, nullptr);
+			os << "{\\f" << iFont << "\\fnil\\fcharset" << definition.charset << ' ' << definition.fontFace << ";}";
+		}
+		osStyle << RTF_SETFONTFACE << iFont;
+		osStyle << RTF_SETFONTSIZE << GetRTFFontSize(definition.fontSize);
+
+		int iFore = -1;
+		for (int index = 0; index < colorCount; index++) {
+			if (colorList[index] == definition.foreColor) {
+				iFore = index;
+				break;
+			}
+		}
+		if (iFore < 0)	 {
+			iFore = colorCount;
+			colorList[colorCount++] = definition.foreColor;
+		}
+		osStyle << RTF_SETCOLOR << iFore;
+
+		// PL: highlights doesn't seems to follow a distinct table, at least with WordPad and Word 97
+		// Perhaps it is different for Word 6?
+		int iBack = -1;
+		for (int index = 0; index < colorCount; index++) {
+			if (colorList[index] == definition.backColor) {
+				iBack = index;
+				break;
+			}
+		}
+		if (iBack < 0) {
+			iBack = colorCount;
+			colorList[colorCount++] = definition.backColor;
+		}
+		osStyle << RTF_SETBACKGROUND << iBack;
+
+		osStyle << ((definition.weight >= FW_SEMIBOLD) ? RTF_BOLD_ON : RTF_BOLD_OFF);
+		osStyle << (definition.italic ? RTF_ITALIC_ON : RTF_ITALIC_OFF);
+		osStyle << (definition.underline ? RTF_UNDERLINE_ON : RTF_UNDERLINE_OFF);
+		osStyle << (definition.strike ? RTF_STRIKE_ON : RTF_STRIKE_OFF);
+		styles[styleIndex] = std::move(osStyle.str);
+	}
+
+	os << RTF_FONTDEFCLOSE RTF_COLORDEFOPEN;
+	for (int i = 0; i < colorCount; i++) {
+		const COLORREF color = colorList[i];
+		os << "\\red" << static_cast<int>(color & 0xff)
+			<< "\\green" << static_cast<int>((color >> 8) & 0xff)
+			<< "\\blue" << static_cast<int>((color >> 16) & 0xff) << ";";
+	}
+	os << RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
+
+	const bool isUTF8 = SciCall_GetCodePage() == SC_CP_UTF8;
+	const bool useTabs = SciCall_GetUseTabs();
+	const int tabSize = SciCall_GetTabWidth();
+
+	const char *lastStyle = "";
+	bool prevCR = false;
+	int styleCurrent = -1;
+	int column = 0;
+	for (; startPos < endPos; startPos++) {
+		const int ch = SciCall_GetCharAt(startPos);
+		int style = SciCall_GetStyleIndexAt(startPos);
+		style = styleMap[style];
+		if (style != styleCurrent) {
+			styleCurrent = style;
+			const char *currentStyle = styles[style].c_str();
+			const std::string deltaStyle = GetRTFStyleChange(lastStyle, currentStyle);
+			lastStyle = currentStyle;
+			if (!deltaStyle.empty()) {
+				os << deltaStyle;
+			}
+		}
+
+		switch (ch) {
+		case '{':
+			os << "\\{";
+			break;
+
+		case '}':
+			os << "\\}";
+			break;
+
+		case '\\':
+			os << "\\\\";
+			break;
+
+		case '\t':
+			if (useTabs) {
+				os << RTF_TAB;
+			} else {
+				const int ts = tabSize - (column % tabSize);
+				for (int itab = 0; itab < ts; itab++) {
+					os << ' ';
+				}
+				column += ts - 1;
+			}
+			break;
+
+		case '\n':
+			if (!prevCR) {
+				os << RTF_EOLN;
+				column = -1;
+			}
+			break;
+
+		case '\r':
+			os << RTF_EOLN;
+			column = -1;
+			break;
+
+		default:
+			if (isUTF8 && ch > 0x7f) {
+				Sci_Position width = 0;
+				const unsigned int u32 = SciCall_GetCharacterAndWidth(startPos, &width);
+				startPos += width - 1;
+				if (u32 < 0x10000) {
+					os << "\\u" << static_cast<short>(u32) << "?";
+				} else {
+					os << "\\u" << static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800) << "?";
+					os << "\\u" << static_cast<short>((u32 & 0x3ff) + 0xDC00) << "?";
+				}
+			} else {
+				os << static_cast<char>(ch);
+			}
+			break;
+		}
+		column++;
+		prevCR = ch == '\r';
+	}
+
+	os << RTF_BODYCLOSE;
+}
+
+}
+
+// code from SciTEWin::CopyAsRTF()
+extern "C" void EditCopyAsRTF(HWND hwnd) {
+	const Sci_Position startPos = SciCall_GetSelectionStart();
+	const Sci_Position endPos = SciCall_GetSelectionEnd();
+	if (startPos == endPos) {
+		return;
+	}
+	try {
+		OutputStringStream os;
+		SaveToStreamRTF(os, startPos, endPos);
+		const std::string &rtf = os.str;
+		//printf("%s:\n%s\n", __func__, rtf.c_str());
+		const size_t len = rtf.length() + 1; // +1 for NUL
+		HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len);
+		if (handle) {
+			::OpenClipboard(hwnd);
+			::EmptyClipboard();
+			char *ptr = static_cast<char *>(::GlobalLock(handle));
+			if (ptr) {
+				memcpy(ptr, rtf.c_str(), len);
+				::GlobalUnlock(handle);
+			}
+			::SetClipboardData(::RegisterClipboardFormat(CF_RTF), handle);
+			::CloseClipboard();
+		}
+	} catch (...) {
+	}
 }

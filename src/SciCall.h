@@ -659,6 +659,10 @@ NP2_inline void SciCall_StyleSetFont(int style, const char *fontName) {
 	SciCall(SCI_STYLESETFONT, style, (LPARAM)fontName);
 }
 
+NP2_inline void SciCall_StyleGetFont(int style, char *fontName) {
+	SciCall(SCI_STYLEGETFONT, style, (LPARAM)fontName);
+}
+
 NP2_inline void SciCall_StyleSetSizeFractional(int style, int sizeHundredthPoints) {
 	SciCall(SCI_STYLESETSIZEFRACTIONAL, style, sizeHundredthPoints);
 }
@@ -671,16 +675,32 @@ NP2_inline void SciCall_StyleSetWeight(int style, int weight) {
 	SciCall(SCI_STYLESETWEIGHT, style, weight);
 }
 
+NP2_inline int SciCall_StyleGetWeight(int style) {
+	return (int)SciCall(SCI_STYLEGETWEIGHT, style, 0);
+}
+
 NP2_inline void SciCall_StyleSetItalic(int style, bool italic) {
 	SciCall(SCI_STYLESETITALIC, style, italic);
+}
+
+NP2_inline bool SciCall_StyleGetItalic(int style) {
+	return (bool)SciCall(SCI_STYLEGETITALIC, style, 0);
 }
 
 NP2_inline void SciCall_StyleSetUnderline(int style, bool underline) {
 	SciCall(SCI_STYLESETUNDERLINE, style, underline);
 }
 
+NP2_inline bool SciCall_StyleGetUnderline(int style) {
+	return (bool)SciCall(SCI_STYLEGETUNDERLINE, style, 0);
+}
+
 NP2_inline void SciCall_StyleSetStrike(int style, bool strike) {
 	SciCall(SCI_STYLESETSTRIKE, style, strike);
+}
+
+NP2_inline bool SciCall_StyleGetStrike(int style) {
+	return (bool)SciCall(SCI_STYLEGETSTRIKE, style, 0);
 }
 
 NP2_inline void SciCall_StyleSetOverline(int style, bool overline) {
@@ -709,6 +729,10 @@ NP2_inline void SciCall_StyleSetEOLFilled(int style, bool eolFilled) {
 
 NP2_inline void SciCall_StyleSetCharacterSet(int style, int characterSet) {
 	SciCall(SCI_STYLESETCHARACTERSET, style, characterSet);
+}
+
+NP2_inline int SciCall_StyleGetCharacterSet(int style) {
+	return (int)SciCall(SCI_STYLEGETCHARACTERSET, style, 0);
 }
 
 NP2_inline void SciCall_StyleSetHotSpot(int style, bool hotspot) {
@@ -910,6 +934,10 @@ NP2_inline void SciCall_SetTabMinimumWidth(int pixels) {
 
 NP2_inline void SciCall_SetUseTabs(bool useTabs) {
 	SciCall(SCI_SETUSETABS, useTabs, 0);
+}
+
+NP2_inline bool SciCall_GetUseTabs() {
+	return (bool)SciCall(SCI_GETUSETABS, 0, 0);
 }
 
 NP2_inline void SciCall_SetIndent(int indentSize) {

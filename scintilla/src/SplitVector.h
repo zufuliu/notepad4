@@ -23,7 +23,7 @@ constexpr bool InRangeInclusive(size_t index, size_t length) noexcept {
 }
 
 constexpr bool InRangeExclusive(size_t index, size_t length) noexcept {
-	return index <= length;
+	return index < length;
 }
 
 constexpr bool IsValidIndex(size_t index, size_t length) noexcept {

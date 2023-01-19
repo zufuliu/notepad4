@@ -670,6 +670,9 @@ get CaseVisible StyleGetCase=2489(int style,)
 # Get the character get of the font in a style.
 get CharacterSet StyleGetCharacterSet=2490(int style,)
 
+# Get is a style strike or not.
+get bool StyleGetStrike=2283(int style,)
+
 # Get is a style visible or not.
 get bool StyleGetVisible=2491(int style,)
 

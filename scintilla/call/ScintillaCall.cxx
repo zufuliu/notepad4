@@ -582,6 +582,10 @@ CharacterSet ScintillaCall::StyleGetCharacterSet(int style) {
 	return static_cast<Scintilla::CharacterSet>(Call(Message::StyleGetCharacterSet, style));
 }
 
+bool ScintillaCall::StyleGetStrike(int style) {
+	return Call(Message::StyleGetStrike, style);
+}
+
 bool ScintillaCall::StyleGetVisible(int style) {
 	return Call(Message::StyleGetVisible, style);
 }

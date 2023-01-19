@@ -3187,6 +3187,10 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		UpdateToolbar();
 		break;
 
+	case IDM_EDIT_COPYRTF:
+		EditCopyAsRTF(hwndMain);
+		break;
+
 	case IDM_EDIT_PASTE:
 	//case IDM_EDIT_PASTE_BINARY:
 		SciCall_Paste(LOWORD(wParam) == IDM_EDIT_PASTE_BINARY);

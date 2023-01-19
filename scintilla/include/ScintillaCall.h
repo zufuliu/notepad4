@@ -185,6 +185,7 @@ public:
 	bool StyleGetUnderline(int style);
 	Scintilla::CaseVisible StyleGetCase(int style);
 	Scintilla::CharacterSet StyleGetCharacterSet(int style);
+	bool StyleGetStrike(int style);
 	bool StyleGetVisible(int style);
 	bool StyleGetChangeable(int style);
 	bool StyleGetHotSpot(int style);

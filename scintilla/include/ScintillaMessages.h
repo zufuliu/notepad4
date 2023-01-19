@@ -122,6 +122,7 @@ enum class Message {
 	StyleGetUnderline = 2488,
 	StyleGetCase = 2489,
 	StyleGetCharacterSet = 2490,
+	StyleGetStrike = 2283,
 	StyleGetVisible = 2491,
 	StyleGetChangeable = 2492,
 	StyleGetHotSpot = 2493,
