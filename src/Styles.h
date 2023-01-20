@@ -69,7 +69,7 @@ typedef struct StyleDefinition {
 	bool eolFilled;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
-	char fontFace[LF_FACESIZE * 3 /*kMaxMultiByteCount*/];
+	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
 } StyleDefinition;
 
 extern PEDITLEXER pLexCurrent;

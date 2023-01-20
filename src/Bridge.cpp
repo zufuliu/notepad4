@@ -27,7 +27,6 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <string>
-#include <string_view>
 #include <memory>
 
 #include "SciCall.h"
@@ -38,6 +37,7 @@ extern "C" {
 #include "Helpers.h"
 #include "Dialogs.h"
 #include "Notepad2.h"
+#include "Edit.h"
 #include "Styles.h"
 
 #if !NP2_FORCE_COMPILE_C_AS_CPP
@@ -600,19 +600,11 @@ namespace {
 struct OutputStringStream {
 	std::string str;
 
-	OutputStringStream& operator<<(char value) {
+	void operator<<(char value) {
 		str.push_back(value);
-		return *this;
 	}
-	OutputStringStream& operator<<(int value) {
-		char fmt[16];
-		const int len = sprintf(fmt, "%d", value);
-		str.append(std::string_view(fmt, len));
-		return *this;
-	}
-	OutputStringStream& operator<<(std::string_view value) {
+	void operator<<(const char *value) {
 		str.append(value);
-		return *this;
 	}
 };
 
@@ -630,9 +622,9 @@ void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 }
 
 int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) noexcept {
-	static_assert(STYLE_DEFAULT == 0);
 	static_assert(__is_standard_layout(StyleDefinition));
-	memset(styleMap, STYLE_DEFAULT, STYLE_MAX + 1);
+	// unlike STYLE_DEFAULT, style 0 is default style in all lexer
+	memset(styleMap, 0, STYLE_MAX + 1);
 	memset(styleList, 0, (STYLE_MAX + 1)*sizeof(StyleDefinition));
 
 	int styleCount = 0;
@@ -649,7 +641,7 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 				break;
 			}
 		}
-		styleMap[style] = (uint8_t)index;
+		styleMap[style] = static_cast<uint8_t>(index);
 		if (index == styleCount) {
 			styleCount++;
 		}
@@ -659,14 +651,15 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 
 // code based SciTE's ExportRTF.cxx
 
-#define RTF_HEADEROPEN "{\\rtf1\\ansi\\deff0\\deftab720"
+// RTF version, character set and ANSI code page, default font, default tab width
+#define RTF_HEADEROPEN "{\\rtf1\\ansi\\ansicpg%u\\deff0\\deftab720"
 #define RTF_FONTDEFOPEN "{\\fonttbl"
 #define RTF_FONTDEFCLOSE "}"
 #define RTF_COLORDEFOPEN "{\\colortbl"
 #define RTF_COLORDEFCLOSE "}"
 #define RTF_HEADERCLOSE "\n"
 #define RTF_BODYOPEN ""
-#define RTF_BODYCLOSE "}"
+#define RTF_BODYCLOSE '}'
 
 #define RTF_SETFONTFACE "\\f"
 #define RTF_SETFONTSIZE "\\fs"
@@ -710,8 +703,8 @@ void GetRTFNextControl(const char **style, char *control) noexcept {
 
 // extracts control words that are different between two styles
 std::string GetRTFStyleChange(const char *last, const char *current) { // \f0\fs20\cf0\highlight0\b0\i0
-	char lastControl[RTF_MAX_STYLEDEF] = "";
-	char currentControl[RTF_MAX_STYLEDEF] = "";
+	char lastControl[RTF_MAX_STYLEDEF]{};
+	char currentControl[RTF_MAX_STYLEDEF]{};
 	const char *lastPos = last;
 	const char *currentPos = current;
 	std::string delta;
@@ -739,33 +732,42 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 	const std::unique_ptr<StyleDefinition[]> styleList(new StyleDefinition[STYLE_MAX + 1]);
 	const int styleCount = GetDocumentUniqueStyleList(styleMap, styleList.get());
 	const std::unique_ptr<std::string[]> styles = std::make_unique<std::string[]>(styleCount);
-	const std::unique_ptr<LPCWSTR[]> fontList(new LPCWSTR[styleCount]);
+	const std::unique_ptr<LPCSTR[]> fontList(new LPCSTR[styleCount]);
 	const std::unique_ptr<COLORREF[]> colorList(new COLORREF[2*styleCount]);
+
+	const UINT cpEdit = SciCall_GetCodePage();
+	UINT legacyACP = cpEdit;
+	const bool isUTF8 = cpEdit == SC_CP_UTF8;
+	if (isUTF8 || cpEdit == 0) {
+		legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
+	}
+
+	char fmtbuf[128];
+	(void)sprintf(fmtbuf, RTF_HEADEROPEN RTF_FONTDEFOPEN, legacyACP);
+	os << fmtbuf;
 
 	int fontCount = 0;
 	int colorCount = 0;
-	os << RTF_HEADEROPEN RTF_FONTDEFOPEN;
 	for (int styleIndex = 0; styleIndex < styleCount; styleIndex++) {
-		OutputStringStream osStyle;
 		StyleDefinition &definition = styleList[styleIndex];
 
-		MultiByteToWideChar(CP_UTF8, 0, definition.fontFace, -1, definition.fontWide, COUNTOF(definition.fontWide));
 		int iFont = -1;
 		for (int index = 0; index < fontCount; index++) {
-			if (StrCmpIW(fontList[index], definition.fontWide) == 0) {
+			if (_stricmp(fontList[index], definition.fontFace) == 0) {
 				iFont = index;
 				break;
 			}
 		}
 		if (iFont < 0) {
 			iFont = fontCount;
-			fontList[fontCount++] = definition.fontWide;
+			fontList[fontCount++] = definition.fontFace;
 			// convert fontFace to ANSI code page
-			WideCharToMultiByte(CP_ACP, 0, definition.fontWide, -1, definition.fontFace, COUNTOF(definition.fontFace), nullptr, nullptr);
-			os << "{\\f" << iFont << "\\fnil\\fcharset" << definition.charset << ' ' << definition.fontFace << ";}";
+			char fontFace[LF_FACESIZE]{};
+			MultiByteToWideChar(CP_UTF8, 0, definition.fontFace, -1, definition.fontWide, COUNTOF(definition.fontWide));
+			WideCharToMultiByte(legacyACP, 0, definition.fontWide, -1, fontFace, COUNTOF(fontFace), nullptr, nullptr);
+			(void)sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s ;}", iFont, definition.charset, fontFace);
+			os << fmtbuf;
 		}
-		osStyle << RTF_SETFONTFACE << iFont;
-		osStyle << RTF_SETFONTSIZE << GetRTFFontSize(definition.fontSize);
 
 		int iFore = -1;
 		for (int index = 0; index < colorCount; index++) {
@@ -778,7 +780,6 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			iFore = colorCount;
 			colorList[colorCount++] = definition.foreColor;
 		}
-		osStyle << RTF_SETCOLOR << iFore;
 
 		// PL: highlights doesn't seems to follow a distinct table, at least with WordPad and Word 97
 		// Perhaps it is different for Word 6?
@@ -793,8 +794,12 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			iBack = colorCount;
 			colorList[colorCount++] = definition.backColor;
 		}
-		osStyle << RTF_SETBACKGROUND << iBack;
 
+		(void)sprintf(fmtbuf, RTF_SETFONTFACE "%d" RTF_SETFONTSIZE "%d" RTF_SETCOLOR "%d" RTF_SETBACKGROUND "%d",
+			iFont, GetRTFFontSize(definition.fontSize), iFore, iBack);
+
+		OutputStringStream osStyle;
+		osStyle << fmtbuf;
 		osStyle << ((definition.weight >= FW_SEMIBOLD) ? RTF_BOLD_ON : RTF_BOLD_OFF);
 		osStyle << (definition.italic ? RTF_ITALIC_ON : RTF_ITALIC_OFF);
 		osStyle << (definition.underline ? RTF_UNDERLINE_ON : RTF_UNDERLINE_OFF);
@@ -805,13 +810,12 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 	os << RTF_FONTDEFCLOSE RTF_COLORDEFOPEN;
 	for (int i = 0; i < colorCount; i++) {
 		const COLORREF color = colorList[i];
-		os << "\\red" << static_cast<int>(color & 0xff)
-			<< "\\green" << static_cast<int>((color >> 8) & 0xff)
-			<< "\\blue" << static_cast<int>((color >> 16) & 0xff) << ";";
+		(void)sprintf(fmtbuf, "\\red%d\\green%d\\blue%d;",
+			static_cast<int>(color & 0xff), static_cast<int>((color >> 8) & 0xff), static_cast<int>((color >> 16) & 0xff));
+		os << fmtbuf;
 	}
 	os << RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
 
-	const bool isUTF8 = SciCall_GetCodePage() == SC_CP_UTF8;
 	const bool useTabs = SciCall_GetUseTabs();
 	const int tabSize = SciCall_GetTabWidth();
 
@@ -829,7 +833,7 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			const std::string deltaStyle = GetRTFStyleChange(lastStyle, currentStyle);
 			lastStyle = currentStyle;
 			if (!deltaStyle.empty()) {
-				os << deltaStyle;
+				os << deltaStyle.c_str();
 			}
 		}
 
@@ -876,11 +880,13 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 				const unsigned int u32 = SciCall_GetCharacterAndWidth(startPos, &width);
 				startPos += width - 1;
 				if (u32 < 0x10000) {
-					os << "\\u" << static_cast<short>(u32) << "?";
+					(void)sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
 				} else {
-					os << "\\u" << static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800) << "?";
-					os << "\\u" << static_cast<short>((u32 & 0x3ff) + 0xDC00) << "?";
+					(void)sprintf(fmtbuf, "\\u%d?\\u%d?",
+						static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800),
+						static_cast<short>((u32 & 0x3ff) + 0xDC00));
 				}
+				os << fmtbuf;
 			} else {
 				os << static_cast<char>(ch);
 			}
