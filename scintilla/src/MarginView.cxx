@@ -333,15 +333,13 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 			yposScreen + vs.lineHeight);
 		if (marginStyle.style == MarginType::Number) {
 			if (firstSubLine) {
-				std::string sNumber;
-				if (lineDoc >= 0) {
-					sNumber = std::to_string(lineDoc + 1);
-				}
+				char number[32]{};
+				std::string_view sNumber;
 				if (FlagSet(model.foldFlags, (FoldFlag::LevelNumbers | FoldFlag::LineState))) {
-					char number[100] = "";
+					int length;
 					if (FlagSet(model.foldFlags, FoldFlag::LevelNumbers)) {
 						const FoldLevel lev = model.pdoc->GetFoldLevel(lineDoc);
-						sprintf(number, "%c%c %03X %03X",
+						length = sprintf(number, "%c%c %03X %03X",
 							LevelIsHeader(lev) ? 'H' : '_',
 							LevelIsWhitespace(lev) ? 'W' : '_',
 							LevelNumber(lev),
@@ -349,9 +347,11 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 						);
 					} else {
 						const int state = model.pdoc->GetLineState(lineDoc);
-						sprintf(number, "%0X", state);
+						length = sprintf(number, "%0X", state);
 					}
-					sNumber = number;
+					sNumber = std::string_view(number, length);
+				} else {
+					sNumber = FormatNumber(number, static_cast<size_t>(lineDoc + 1));
 				}
 				PRectangle rcNumber = rcMarker;
 				// Right justify

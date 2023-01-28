@@ -40,6 +40,18 @@ enum class LayoutLineOption {
 	Printing,
 };
 
+inline std::string_view FormatNumber(char (&number)[32], size_t value) noexcept {
+	//const auto [ptr, error] = std::to_chars(number, std::end(number), value);
+	//return std::string_view(number, ptr - number);
+	char * const end = number + (10*sizeof(size_t) + 2)/4;
+	char *ptr = end;
+	do {
+		*--ptr = static_cast<char>((value % 10) + '0');
+		value /= 10;
+	} while (value != 0);
+	return std::string_view(ptr, end - ptr);
+}
+
 bool ValidStyledText(const ViewStyle &vs, size_t styleOffset, const StyledText &st) noexcept;
 int WidestLineWidth(Surface *surface, const ViewStyle &vs, int styleOffset, const StyledText &st);
 void DrawTextNoClipPhase(Surface *surface, PRectangle rc, const Style &style, XYPOSITION ybase,

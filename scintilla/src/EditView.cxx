@@ -3222,7 +3222,11 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 		if (draw && lineNumberWidth &&
 			(ypos + vsPrint.lineHeight <= rc.bottom) &&
 			(visibleLine >= 0)) {
-			const std::string number = std::to_string(lineDoc + 1) + lineNumberPrintSpace;
+			char buf[32]{};
+			static_assert(sizeof(lineNumberPrintSpace) == std::size(lineNumberPrintSpace));
+			std::string_view number = FormatNumber(buf, static_cast<size_t>(lineDoc + 1));
+			memcpy(const_cast<char *>(number.data()) + number.length(), lineNumberPrintSpace, sizeof(lineNumberPrintSpace));
+			number = std::string_view(number.data(), number.length() + sizeof(lineNumberPrintSpace) - 1);
 			PRectangle rcNumber = rcLine;
 			rcNumber.right = rcNumber.left + lineNumberWidth;
 			// Right justify
