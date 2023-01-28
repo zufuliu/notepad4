@@ -52,8 +52,6 @@ extern bool		bAutoStripBlanks;
 #if NP2_ENABLE_APP_LOCALIZATION_DLL
 extern LANGID uiLanguage;
 #endif
-extern FILEVARS fvCurFile;
-extern EditTabSettings tabSettings;
 extern int iWrapColumn;
 extern bool bUseXPFileDialog;
 

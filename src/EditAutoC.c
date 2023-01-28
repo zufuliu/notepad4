@@ -409,6 +409,7 @@ void WordList_AddListEx(struct WordList *pWList, LPCSTR pList) {
 			break;
 		}
 		if (ch == '^') {
+			// ^ is used for prefix match in lexer (see scintilla/lexlib/WordList.cxx)
 			word[len++] = ' ';
 		} else if (!ok && ch != '.') {
 			len = 0;
@@ -2102,8 +2103,6 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	}
 	return endPart;
 }
-
-extern FILEVARS fvCurFile;
 
 void EditAutoIndent(void) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();

@@ -113,8 +113,6 @@ extern bool bReadOnlyMode;
 #if defined(_WIN64)
 extern bool bLargeFileMode;
 #endif
-extern FILEVARS fvCurFile;
-extern EditTabSettings tabSettings;
 extern int iWrapColumn;
 extern int iWordWrapIndent;
 
@@ -3552,11 +3550,11 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 					char tchComment[1024] = "";
 					Sci_Position tab = 0;
 					Sci_Position count = iCommentCol;
-					const int tabWidth = fvCurFile.iTabWidth;
-					if (!fvCurFile.bTabsAsSpaces && tabWidth > 0) {
+					if (!fvCurFile.bTabsAsSpaces) {
+						const int tabWidth = fvCurFile.iTabWidth;
 						tab = iCommentCol / tabWidth;
-						memset(tchComment, '\t', tab);
 						count -= tab * tabWidth;
+						memset(tchComment, '\t', tab);
 					}
 					memset(tchComment + tab, ' ', count);
 					strcat(tchComment, mszComment);

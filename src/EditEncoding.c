@@ -25,7 +25,6 @@ extern int iDefaultCharSet;
 extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
 extern int iCurrentEncoding;
-extern FILEVARS fvCurFile;
 
 int g_DOSEncoding;
 

@@ -623,7 +623,7 @@ void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 
 int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) noexcept {
 	static_assert(__is_standard_layout(StyleDefinition));
-	// unlike STYLE_DEFAULT, style 0 is default style in all lexer
+	// unlike STYLE_DEFAULT, style 0 is default style in most lexer
 	memset(styleMap, 0, STYLE_MAX + 1);
 	memset(styleList, 0, (STYLE_MAX + 1)*sizeof(StyleDefinition));
 
@@ -650,6 +650,8 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 }
 
 // code based SciTE's ExportRTF.cxx
+// Rich Text Format (RTF) Specification Version 1.9.1
+// https://www.loc.gov/preservation/digital/formats/fdd/fdd000473.shtml
 
 // RTF version, character set and ANSI code page, default font, default tab width
 #define RTF_HEADEROPEN "{\\rtf1\\ansi\\ansicpg%u\\deff0\\deftab720"
@@ -751,15 +753,13 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 	for (int styleIndex = 0; styleIndex < styleCount; styleIndex++) {
 		StyleDefinition &definition = styleList[styleIndex];
 
-		int iFont = -1;
-		for (int index = 0; index < fontCount; index++) {
-			if (_stricmp(fontList[index], definition.fontFace) == 0) {
-				iFont = index;
+		int iFont = 0;
+		for (; iFont < fontCount; iFont++) {
+			if (_stricmp(fontList[iFont], definition.fontFace) == 0) {
 				break;
 			}
 		}
-		if (iFont < 0) {
-			iFont = fontCount;
+		if (iFont == fontCount) {
 			fontList[fontCount++] = definition.fontFace;
 			// convert fontFace to ANSI code page
 			char fontFace[LF_FACESIZE]{};
@@ -769,29 +769,25 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			os << fmtbuf;
 		}
 
-		int iFore = -1;
-		for (int index = 0; index < colorCount; index++) {
-			if (colorList[index] == definition.foreColor) {
-				iFore = index;
+		int iFore = 0;
+		for (; iFore < colorCount; iFore++) {
+			if (colorList[iFore] == definition.foreColor) {
 				break;
 			}
 		}
-		if (iFore < 0)	 {
-			iFore = colorCount;
+		if (iFore == colorCount) {
 			colorList[colorCount++] = definition.foreColor;
 		}
 
 		// PL: highlights doesn't seems to follow a distinct table, at least with WordPad and Word 97
 		// Perhaps it is different for Word 6?
-		int iBack = -1;
-		for (int index = 0; index < colorCount; index++) {
-			if (colorList[index] == definition.backColor) {
-				iBack = index;
+		int iBack = 1;
+		for (; iBack < colorCount; iBack++) {
+			if (colorList[iBack] == definition.backColor) {
 				break;
 			}
 		}
-		if (iBack < 0) {
-			iBack = colorCount;
+		if (iBack == colorCount) {
 			colorList[colorCount++] = definition.backColor;
 		}
 
@@ -815,9 +811,6 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 		os << fmtbuf;
 	}
 	os << RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
-
-	const bool useTabs = SciCall_GetUseTabs();
-	const int tabSize = SciCall_GetTabWidth();
 
 	const char *lastStyle = "";
 	bool prevCR = false;
@@ -851,10 +844,11 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			break;
 
 		case '\t':
-			if (useTabs) {
+			if (!fvCurFile.bTabsAsSpaces) {
 				os << RTF_TAB;
 			} else {
-				const int ts = tabSize - (column % tabSize);
+				const int tabWidth = fvCurFile.iTabWidth;
+				const int ts = tabWidth - (column % tabWidth);
 				for (int itab = 0; itab < ts; itab++) {
 					os << ' ';
 				}

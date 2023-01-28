@@ -558,6 +558,8 @@ typedef struct FILEVARS {
 } FILEVARS, *LPFILEVARS;
 
 typedef const FILEVARS * LPCFILEVARS;
+extern EditTabSettings tabSettings;
+extern FILEVARS fvCurFile;
 
 void	EditSetWrapStartIndent(int tabWidth, int indentWidth);
 void	EditSetWrapIndentMode(int tabWidth, int indentWidth);

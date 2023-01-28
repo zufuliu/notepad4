@@ -346,10 +346,6 @@ extern int	iDefaultCharSet;
 extern LineHighlightMode iHighlightCurrentLine;
 extern bool	bShowBookmarkMargin;
 extern int	iZoomLevel;
-
-extern FILEVARS fvCurFile;
-extern EditTabSettings tabSettings;
-
 extern bool bUseXPFileDialog;
 
 // LF_FACESIZE is 32, LOCALE_NAME_MAX_LENGTH is 85
