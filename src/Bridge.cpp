@@ -765,7 +765,12 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			char fontFace[LF_FACESIZE]{};
 			MultiByteToWideChar(CP_UTF8, 0, definition.fontFace, -1, definition.fontWide, COUNTOF(definition.fontWide));
 			WideCharToMultiByte(legacyACP, 0, definition.fontWide, -1, fontFace, COUNTOF(fontFace), nullptr, nullptr);
-			(void)sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s ;}", iFont, definition.charset, fontFace);
+			const int charset = definition.charset;
+			if (charset == DEFAULT_CHARSET || charset == ANSI_CHARSET) {
+				(void)sprintf(fmtbuf, "{\\f%d\\fnil %s;}", iFont, fontFace);
+			} else {
+				(void)sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s;}", iFont, charset, fontFace);
+			}
 			os << fmtbuf;
 		}
 
