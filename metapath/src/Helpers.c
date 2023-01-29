@@ -1513,7 +1513,7 @@ bool SearchPathEx(LPCWSTR lpFileName, DWORD nBufferLength, LPWSTR lpBuffer) {
 //
 //  FormatNumber()
 //
-void FormatNumber(LPWSTR lpNumberStr, int value) {
+void FormatNumber(LPWSTR lpNumberStr, UINT value) {
 	_ltow(value, lpNumberStr, 10);
 	if (value < 1000) {
 		return;

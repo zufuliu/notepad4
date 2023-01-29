@@ -829,8 +829,12 @@ DWORD_PTR SHGetFileInfo2(LPCWSTR pszPath, DWORD dwFileAttributes,
 // remove '&' from access key, i.e. SHStripMneumonic().
 void	StripMnemonic(LPWSTR pszMenu);
 
-void	FormatNumberStr(LPWSTR lpNumberStr);
-void	FormatNumber(LPWSTR lpNumberStr, ptrdiff_t Value);
+void	FormatNumber(LPWSTR lpNumberStr, size_t Value);
+#if defined(_WIN64)
+#define FormatNumber64(lpNumberStr, Value)	FormatNumber(lpNumberStr, Value)
+#else
+void	FormatNumber64(LPWSTR lpNumberStr, uint64_t Value);
+#endif
 
 UINT	GetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPSTR lpString, int nMaxCount);
 void	SetDlgItemTextA2W(UINT uCP, HWND hDlg, int nIDDlgItem, LPCSTR lpString);

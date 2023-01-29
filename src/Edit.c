@@ -1009,15 +1009,8 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 		WCHAR tchMaxBytes[32];
 		StrFormatByteSize(fileSize.QuadPart, tchDocSize, COUNTOF(tchDocSize));
 		StrFormatByteSize(maxFileSize, tchMaxSize, COUNTOF(tchMaxSize));
-#ifdef _WIN64
-		FormatNumber(tchDocBytes, fileSize.QuadPart);
-		FormatNumber(tchMaxBytes, maxFileSize);
-#else
-		_i64tow(fileSize.QuadPart, tchDocBytes, 10);
-		_i64tow(maxFileSize, tchMaxBytes, 10);
-		FormatNumberStr(tchDocBytes);
-		FormatNumberStr(tchMaxBytes);
-#endif
+		FormatNumber64(tchDocBytes, fileSize.QuadPart);
+		FormatNumber64(tchMaxBytes, maxFileSize);
 		MsgBoxWarn(MB_OK, IDS_WARNLOADBIGFILE, pszFile, tchDocSize, tchDocBytes, tchMaxSize, tchMaxBytes);
 		return false;
 	}

@@ -2214,15 +2214,16 @@ void StripMnemonic(LPWSTR pszMenu) {
 
 //=============================================================================
 //
-// FormatNumberStr()
+// FormatNumber()
 //
 #ifndef _WIN64
-void FormatNumberStr(LPWSTR lpNumberStr) {
-	const int i = lstrlen(lpNumberStr);
-	if (i <= 3) {
+void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) {
+	_i64tow(value, lpNumberStr, 10);
+	if (value < 1000) {
 		return;
 	}
 
+	const int i = lstrlen(lpNumberStr);
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sthousand
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sgrouping
 	WCHAR szSep[4];
@@ -2244,33 +2245,52 @@ void FormatNumberStr(LPWSTR lpNumberStr) {
 }
 #endif
 
-void FormatNumber(LPWSTR lpNumberStr, ptrdiff_t value) {
-#ifdef _WIN64
-	_i64tow(value, lpNumberStr, 10);
-	if (value < 1000) {
+void FormatNumber(LPWSTR lpNumberStr, size_t value) {
+	if (value < 10) {
+		lpNumberStr[0] = (WCHAR)(value + L'0');
+		lpNumberStr[1] = L'\0';
 		return;
 	}
 
-	WCHAR szSep[4];
-	const WCHAR sep = GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
-
-	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
-	WCHAR *end = c;
-	lpNumberStr += 3;
-	do {
-		c -= 3;
-		memmove(c + 1, c, sizeof(WCHAR) * (end - c + 1));
-		*c = sep;
-		++end;
-	} while (c > lpNumberStr);
-
+	WCHAR sep = L',';
+	if (value >= 1000) {
+		WCHAR szSep[4];
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		if (GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))) {
+			sep = szSep[0];
+		}
 #else
-	_ltow(value, lpNumberStr, 10);
-	if (value < 1000) {
-		return;
-	}
-	FormatNumberStr(lpNumberStr);
+		if (GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))) {
+			sep = szSep[0];
+		}
 #endif
+	}
+
+#if defined(_WIN64)
+	uint32_t len = np2_ilog10_upper64(value);
+#else
+	uint32_t len = np2_ilog10_upper(value);
+#endif
+	len += (len - 1)/3;
+
+	WCHAR * const end = lpNumberStr + len;
+	WCHAR *ptr = end;
+	int count = 0;
+	*ptr = L'\0';
+	do {
+		if (count == 3) {
+			count = 0;
+			*--ptr = sep;
+		}
+		++count;
+		*--ptr = (WCHAR)((value % 10) + L'0');
+		value /= 10;
+	} while (value != 0);
+	if (ptr != lpNumberStr) {
+		do {
+			*lpNumberStr++ = *ptr++;
+		} while (ptr <= end);
+	}
 }
 
 //=============================================================================

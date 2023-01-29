@@ -337,7 +337,7 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	frPrint.rc.bottom	-= footerLineHeight + footerLineHeight / 2;
 
 	// Print each page
-	int pageNum = 1;
+	UINT pageNum = 1;
 	WCHAR tchPageFormat[128];
 	WCHAR tchPageStatus[128];
 	GetString(IDS_PRINT_PAGENUM, tchPageFormat, COUNTOF(tchPageFormat));
