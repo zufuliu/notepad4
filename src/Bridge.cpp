@@ -596,18 +596,6 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 
 namespace {
 
-// simplified version of std::ostringstream
-struct OutputStringStream {
-	std::string str;
-
-	void operator<<(char value) {
-		str.push_back(value);
-	}
-	void operator<<(const char *value) {
-		str.append(value);
-	}
-};
-
 void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 	// not use Style_Parse() here due to lexer combination and style inheritance.
 	definition.fontSize = SciCall_StyleGetSizeFractional(style);
@@ -704,12 +692,12 @@ void GetRTFNextControl(const char **style, char *control) noexcept {
 }
 
 // extracts control words that are different between two styles
-std::string GetRTFStyleChange(const char *last, const char *current) { // \f0\fs20\cf0\highlight0\b0\i0
+void GetRTFStyleChange(std::string &delta, const char *last, const char *current) { // \f0\fs20\cf0\highlight0\b0\i0
 	char lastControl[RTF_MAX_STYLEDEF]{};
 	char currentControl[RTF_MAX_STYLEDEF]{};
 	const char *lastPos = last;
 	const char *currentPos = current;
-	std::string delta;
+	const size_t len = delta.length();
 	for (int i = 0; i < RTF_MAX_STYLEPROP; i++) {
 		GetRTFNextControl(&lastPos, lastControl);
 		GetRTFNextControl(&currentPos, currentControl);
@@ -717,17 +705,16 @@ std::string GetRTFStyleChange(const char *last, const char *current) { // \f0\fs
 			delta += currentControl;
 		}
 	}
-	if (!delta.empty()) {
+	if (len != delta.length()) {
 		delta += ' ';
 	}
-	return delta;
 }
 
 constexpr int GetRTFFontSize(int size) noexcept {
 	return size / (SC_FONT_SIZE_MULTIPLIER / 2);
 }
 
-void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position endPos) {
+std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 	SciCall_EnsureStyledTo(endPos);
 
 	uint8_t styleMap[STYLE_MAX + 1];
@@ -745,8 +732,8 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 	}
 
 	char fmtbuf[128];
-	(void)sprintf(fmtbuf, RTF_HEADEROPEN RTF_FONTDEFOPEN, legacyACP);
-	os << fmtbuf;
+	unsigned fmtlen = sprintf(fmtbuf, RTF_HEADEROPEN RTF_FONTDEFOPEN, legacyACP);
+	std::string os(fmtbuf, fmtlen);
 
 	int fontCount = 0;
 	int colorCount = 0;
@@ -771,7 +758,7 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			} else {
 				(void)sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s;}", iFont, charset, fontFace);
 			}
-			os << fmtbuf;
+			os += fmtbuf;
 		}
 
 		int iFore = 0;
@@ -796,26 +783,25 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 			colorList[colorCount++] = definition.backColor;
 		}
 
-		(void)sprintf(fmtbuf, RTF_SETFONTFACE "%d" RTF_SETFONTSIZE "%d" RTF_SETCOLOR "%d" RTF_SETBACKGROUND "%d",
+		fmtlen = sprintf(fmtbuf, RTF_SETFONTFACE "%d" RTF_SETFONTSIZE "%d" RTF_SETCOLOR "%d" RTF_SETBACKGROUND "%d",
 			iFont, GetRTFFontSize(definition.fontSize), iFore, iBack);
 
-		OutputStringStream osStyle;
-		osStyle << fmtbuf;
-		osStyle << ((definition.weight >= FW_SEMIBOLD) ? RTF_BOLD_ON : RTF_BOLD_OFF);
-		osStyle << (definition.italic ? RTF_ITALIC_ON : RTF_ITALIC_OFF);
-		osStyle << (definition.underline ? RTF_UNDERLINE_ON : RTF_UNDERLINE_OFF);
-		osStyle << (definition.strike ? RTF_STRIKE_ON : RTF_STRIKE_OFF);
-		styles[styleIndex] = std::move(osStyle.str);
+		std::string osStyle(fmtbuf, fmtlen);
+		osStyle += ((definition.weight >= FW_SEMIBOLD) ? RTF_BOLD_ON : RTF_BOLD_OFF);
+		osStyle += (definition.italic ? RTF_ITALIC_ON : RTF_ITALIC_OFF);
+		osStyle += (definition.underline ? RTF_UNDERLINE_ON : RTF_UNDERLINE_OFF);
+		osStyle += (definition.strike ? RTF_STRIKE_ON : RTF_STRIKE_OFF);
+		styles[styleIndex] = std::move(osStyle);
 	}
 
-	os << RTF_FONTDEFCLOSE RTF_COLORDEFOPEN;
+	os += RTF_FONTDEFCLOSE RTF_COLORDEFOPEN;
 	for (int i = 0; i < colorCount; i++) {
 		const COLORREF color = colorList[i];
 		(void)sprintf(fmtbuf, "\\red%d\\green%d\\blue%d;",
 			static_cast<int>(color & 0xff), static_cast<int>((color >> 8) & 0xff), static_cast<int>((color >> 16) & 0xff));
-		os << fmtbuf;
+		os += fmtbuf;
 	}
-	os << RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
+	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
 
 	const char *lastStyle = "";
 	bool prevCR = false;
@@ -827,35 +813,32 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 		style = styleMap[style];
 		if (style != styleCurrent) {
 			styleCurrent = style;
-			const char *currentStyle = styles[style].c_str();
-			const std::string deltaStyle = GetRTFStyleChange(lastStyle, currentStyle);
+			const char * const currentStyle = styles[style].c_str();
+			GetRTFStyleChange(os, lastStyle, currentStyle);
 			lastStyle = currentStyle;
-			if (!deltaStyle.empty()) {
-				os << deltaStyle.c_str();
-			}
 		}
 
 		switch (ch) {
 		case '{':
-			os << "\\{";
+			os += "\\{";
 			break;
 
 		case '}':
-			os << "\\}";
+			os += "\\}";
 			break;
 
 		case '\\':
-			os << "\\\\";
+			os += "\\\\";
 			break;
 
 		case '\t':
 			if (!fvCurFile.bTabsAsSpaces) {
-				os << RTF_TAB;
+				os += RTF_TAB;
 			} else {
 				const int tabWidth = fvCurFile.iTabWidth;
 				const int ts = tabWidth - (column % tabWidth);
 				for (int itab = 0; itab < ts; itab++) {
-					os << ' ';
+					os += ' ';
 				}
 				column += ts - 1;
 			}
@@ -863,13 +846,13 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 
 		case '\n':
 			if (!prevCR) {
-				os << RTF_EOLN;
+				os += RTF_EOLN;
 				column = -1;
 			}
 			break;
 
 		case '\r':
-			os << RTF_EOLN;
+			os += RTF_EOLN;
 			column = -1;
 			break;
 
@@ -885,9 +868,9 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 						static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800),
 						static_cast<short>((u32 & 0x3ff) + 0xDC00));
 				}
-				os << fmtbuf;
+				os += fmtbuf;
 			} else {
-				os << static_cast<char>(ch);
+				os += static_cast<char>(ch);
 			}
 			break;
 		}
@@ -895,7 +878,8 @@ void SaveToStreamRTF(OutputStringStream &os, Sci_Position startPos, Sci_Position
 		prevCR = ch == '\r';
 	}
 
-	os << RTF_BODYCLOSE;
+	os += RTF_BODYCLOSE;
+	return os;
 }
 
 }
@@ -908,9 +892,7 @@ extern "C" void EditCopyAsRTF(HWND hwnd) {
 		return;
 	}
 	try {
-		OutputStringStream os;
-		SaveToStreamRTF(os, startPos, endPos);
-		const std::string &rtf = os.str;
+		const std::string rtf = SaveToStreamRTF(startPos, endPos);
 		//printf("%s:\n%s\n", __func__, rtf.c_str());
 		const size_t len = rtf.length() + 1; // +1 for NUL
 		HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len);
