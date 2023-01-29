@@ -2,6 +2,7 @@ images:
 	Visual Studio Image Library 2017
 	https://www.microsoft.com/en-us/download/details.aspx?id=35825
 
+	https://learn.microsoft.com/en-us/windows/win32/uxguide/vis-icons
 	https://learn.microsoft.com/en-us/windows/apps/design/style/iconography/app-icon-construction#icon-scaling
 
 	res/Encoding.bmp

@@ -1,14 +1,14 @@
 import os.path
 import re
 
-from Bitmap import Bitmap, ResizeMethod
+from Bitmap import *
 
-def save_bitmap(bmp, path):
+def save_bitmap(bmp, path, colorDepth=None):
 	ext = os.path.splitext(path)[1].lower()
 	if ext == '.bmp':
-		bmp.save(path)
+		bmp.save(path, colorDepth)
 	else:
-		img = bmp.toImage()
+		img = bmp.toImage(colorDepth)
 		img.save(path)
 
 def dump_bitmap(path):
@@ -26,18 +26,43 @@ def dump_bitmap(path):
 	print('write:', dump_path)
 	bmp.save(dump_path)
 
-def convert_image(path, out_path=None):
+def _quantize_extern(path, out_path, colorCount, method):
+	temp = f'{out_path}-{method.name}{colorCount}.png'
+	if method == QuantizeMethod.PngQuant:
+		# https://pngquant.org/
+		command = f'pngquant --force --verbose {colorCount} --output {temp} {path}'
+	elif method == QuantizeMethod.ImageMagick:
+		# https://imagemagick.org/script/command-line-options.php#colors
+		command = f'magick "{path}" -verbose -colors {colorCount} "{temp}"'
+	print('Run:', command)
+	os.system(command)
+	bmp = Bitmap.fromFileEx(temp)
+	#os.remove(temp);
+	return bmp
+
+def convert_image(path, out_path=None, colorDepth=None, method=None):
 	if not out_path:
 		name, ext = os.path.splitext(path)
-		if ext.lower() == 'bmp':
-			out_path = name + '-converted' + '.bmp'
+		if ext.lower() == '.bmp':
+			out_path = name + '-converted.bmp'
 		else:
 			out_path = name + '.bmp'
 
-	print('convert image:', path, '=>', out_path)
+	print(f'convert image: {path} => {out_path}')
 	bmp = Bitmap.fromFileEx(path)
 	#bmp.resolution = (96, 96)
-	save_bitmap(bmp, out_path)
+	if colorDepth:
+		colorCount = 1 << colorDepth
+		current = bmp.colorUsed
+		if current > colorCount:
+			if method and method > QuantizeMethod.Naive:
+				bmp = _quantize_extern(path, out_path, colorCount, method)
+			else:
+				bmp = bmp.quantize(colorCount, method, False)
+			name = method.name if method != None else 'Default'
+			count = bmp.colorUsed
+			print(f'quantize image {name}: {current} => {count}')
+	save_bitmap(bmp, out_path, colorDepth)
 
 
 def concat_images(horizontal, paths, out_path):
@@ -242,6 +267,7 @@ def make_all_notepad2_toolbar_bitmap():
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()
 #convert_image('images/16x16/Open.png', 'OpenFolder.bmp')
+#convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 4, QuantizeMethod.PngQuant)
 #concat_horizontal(['../res/Toolbar.bmp', 'images/16x16/AlwaysOnTop.png'], 'Toolbar.bmp')
 
 #split_horizontal('Toolbar.bmp', '16x40')
