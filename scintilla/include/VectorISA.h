@@ -185,6 +185,12 @@
 #endif
 #endif
 
+// https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
+#define np2_ilog10_lower(x)		(((uint32_t)np2_bsr(x) + 1)*77 >> 8)
+#define np2_ilog10_upper(x)		(np2_ilog10_lower(x) + 1)
+#define np2_ilog10_lower64(x)	(((uint32_t)np2_bsr64(x) + 1)*77 >> 8)
+#define np2_ilog10_upper64(x)	(np2_ilog10_lower64(x) + 1)
+
 // https://stackoverflow.com/questions/32945410/sse2-intrinsics-comparing-unsigned-integers
 #if NP2_USE_AVX2
 #define mm256_cmpge_epu8(a, b) \
