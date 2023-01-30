@@ -39,6 +39,7 @@
 #include <shlobj.h>
 #include <shellapi.h>
 
+#define DebugCopyAsRichTextFormat		0
 #define DebugDragAndDropDataFormat		0
 #define MaxDragAndDropDataFormatCount	6
 /*
@@ -434,6 +435,9 @@ class ScintillaWin final :
 #if Enable_ChromiumWebCustomMIMEDataFormat
 	CLIPFORMAT cfChromiumCustomMIME;
 #endif
+#if DebugCopyAsRichTextFormat
+	CLIPFORMAT cfRTF;
+#endif
 
 	// supported drag & drop format
 	CLIPFORMAT dropFormat[MaxDragAndDropDataFormatCount];
@@ -677,6 +681,9 @@ ScintillaWin::ScintillaWin(HWND hwnd) noexcept {
 #endif
 #if Enable_ChromiumWebCustomMIMEDataFormat
 	cfChromiumCustomMIME = GetClipboardFormat(L"Chromium Web Custom MIME Data Format");
+#endif
+#if DebugCopyAsRichTextFormat
+	cfRTF = GetClipboardFormat(L"Rich Text Format");
 #endif
 
 	UINT index = 0;
@@ -958,7 +965,7 @@ inline int WideCharLenFromMultiByte(UINT codePage, std::string_view sv) noexcept
 
 std::string StringEncode(const std::wstring_view wsv, int codePage) {
 	const int cchMulti = wsv.length() ? MultiByteLenFromWideChar(codePage, wsv) : 0;
-	std::string sMulti(cchMulti, 0);
+	std::string sMulti(cchMulti, '\0');
 	if (cchMulti) {
 		MultiByteFromWideChar(codePage, wsv, sMulti.data(), cchMulti);
 	}
@@ -1577,7 +1584,7 @@ UINT ScintillaWin::CodePageOfDocument() const noexcept {
 std::string ScintillaWin::EncodeWString(std::wstring_view wsv) {
 	if (IsUnicodeMode()) {
 		const size_t len = UTF8Length(wsv);
-		std::string putf(len, 0);
+		std::string putf(len, '\0');
 		UTF8FromUTF16(wsv, putf.data(), len);
 		return putf;
 	} else {
@@ -2894,6 +2901,11 @@ void ScintillaWin::Copy(bool asBinary) {
 bool ScintillaWin::CanPaste() noexcept {
 	if (!Editor::CanPaste())
 		return false;
+#if DebugCopyAsRichTextFormat
+	if (::IsClipboardFormatAvailable(cfRTF)) {
+		return true;
+	}
+#endif
 	return ::IsClipboardFormatAvailable(CF_UNICODETEXT);
 }
 
@@ -3004,6 +3016,18 @@ void ScintillaWin::Paste(bool asBinary) {
 			return;
 		}
 	}
+
+#if DebugCopyAsRichTextFormat
+	if (::IsClipboardFormatAvailable(cfRTF)) {
+		GlobalMemory memUSelection(::GetClipboardData(cfRTF));
+		if (const char *ptr = static_cast<const char *>(memUSelection.ptr)) {
+			NewLine();
+			InsertPasteShape(ptr, strlen(ptr), PasteShape::stream);
+			memUSelection.Unlock();
+			NewLine();
+		}
+	}
+#endif
 
 	// Use CF_UNICODETEXT if available
 	GlobalMemory memUSelection(::GetClipboardData(CF_UNICODETEXT));

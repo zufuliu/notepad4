@@ -640,6 +640,7 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 // code based SciTE's ExportRTF.cxx
 // Rich Text Format (RTF) Specification Version 1.9.1
 // https://www.loc.gov/preservation/digital/formats/fdd/fdd000473.shtml
+// https://latex2rtf.sourceforge.net/RTF-Spec-1.2.pdf
 
 // RTF version, character set and ANSI code page, default font, default tab width
 #define RTF_HEADEROPEN "{\\rtf1\\ansi\\ansicpg%u\\deff0\\deftab720"
@@ -648,8 +649,9 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 #define RTF_COLORDEFOPEN "{\\colortbl"
 #define RTF_COLORDEFCLOSE "}"
 #define RTF_HEADERCLOSE "\n"
-#define RTF_BODYOPEN ""
-#define RTF_BODYCLOSE '}'
+// single box paragraph with background color set to style 0 (STYLE_DEFAULT)
+#define RTF_BODYOPEN "\\box\\cbpat1"
+#define RTF_BODYCLOSE "\\par}"
 
 #define RTF_SETFONTFACE "\\f"
 #define RTF_SETFONTSIZE "\\fs"
@@ -664,7 +666,7 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 #define RTF_STRIKE_ON "\\strike"
 #define RTF_STRIKE_OFF "\\strike0"
 
-#define RTF_EOLN "\\par\n"
+#define RTF_EOL "\\line\n"
 #define RTF_TAB "\\tab "
 
 // font face, size, color, background, bold, italic, underline, strike
@@ -846,13 +848,13 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 
 		case '\n':
 			if (!prevCR) {
-				os += RTF_EOLN;
+				os += RTF_EOL;
 				column = -1;
 			}
 			break;
 
 		case '\r':
-			os += RTF_EOLN;
+			os += RTF_EOL;
 			column = -1;
 			break;
 
