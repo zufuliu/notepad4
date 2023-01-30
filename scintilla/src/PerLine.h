@@ -61,6 +61,7 @@ public:
 
 class LineLevels final : public PerLine {
 	SplitVector<int> levels;
+	Scintilla::FoldLevel GetFoldLevel(Sci::Line line) const noexcept;
 public:
 	LineLevels() = default;
 	void Init() override;
@@ -73,6 +74,7 @@ public:
 	void ClearLevels();
 	int SetLevel(Sci::Line line, int level, Sci::Line lines);
 	int GetLevel(Sci::Line line) const noexcept;
+	Sci::Line GetFoldParent(Sci::Line line) const noexcept;
 };
 
 class LineState final : public PerLine {

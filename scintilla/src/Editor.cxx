@@ -5479,7 +5479,7 @@ void Editor::FoldLine(Sci::Line line, FoldAction action) {
 		FoldLevel level = pdoc->GetFoldLevel(line);
 		if (action == FoldAction::Toggle) {
 			if (!LevelIsHeader(level)) {
-				line = pdoc->GetFoldParent(line, level);
+				line = pdoc->GetFoldParent(line);
 				if (line < 0) {
 					return;
 				}
@@ -5577,7 +5577,7 @@ void Editor::EnsureLineVisible(Sci::Line lineDoc, bool enforcePolicy) {
 		while ((lookLine > 0) && LevelIsWhitespace(lookLineLevel)) {
 			lookLineLevel = pdoc->GetFoldLevel(--lookLine);
 		}
-		Sci::Line lineParent = pdoc->GetFoldParent(lookLine, lookLineLevel);
+		Sci::Line lineParent = pdoc->GetFoldParent(lookLine);
 		if (lineParent < 0) {
 			// Backed up to a top level line, so try to find parent of initial line
 			lineParent = pdoc->GetFoldParent(lineDoc);
@@ -5684,7 +5684,7 @@ void Editor::FoldChanged(Sci::Line line, FoldLevel levelNow, FoldLevel levelPrev
 
 		// Combining two blocks where the first block is collapsed (e.g. by deleting the line(s) which separate(s) the two blocks)
 		if ((LevelNumber(prevLineLevel) == LevelNumber(levelNow)) && !pcs->GetVisible(prevLine))
-			FoldLine(pdoc->GetFoldParent(prevLine, prevLineLevel), FoldAction::Expand);
+			FoldLine(pdoc->GetFoldParent(prevLine), FoldAction::Expand);
 
 		if (!pcs->GetExpanded(line)) {
 			// Removing the fold from one that has been contracted so should expand

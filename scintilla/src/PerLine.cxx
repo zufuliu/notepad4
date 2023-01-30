@@ -268,9 +268,28 @@ int LineLevels::SetLevel(Sci::Line line, int level, Sci::Line lines) {
 int LineLevels::GetLevel(Sci::Line line) const noexcept {
 	if (IsValidIndex(line, levels.Length())) {
 		return levels[line];
-	} else {
-		return static_cast<int>(Scintilla::FoldLevel::Base);
 	}
+	return static_cast<int>(Scintilla::FoldLevel::Base);
+}
+
+Scintilla::FoldLevel LineLevels::GetFoldLevel(Sci::Line line) const noexcept {
+	return static_cast<Scintilla::FoldLevel>(levels[line]);
+}
+
+Sci::Line LineLevels::GetFoldParent(Sci::Line line) const noexcept {
+	if (IsValidIndex(line, levels.Length())) {
+		const FoldLevel level = LevelNumberPart(GetFoldLevel(line));
+		if (level == FoldLevel::Base) {
+			return -1;
+		}
+		for (Sci::Line lineLook = line - 1; lineLook >= 0; lineLook--) {
+			const FoldLevel levelTry = GetFoldLevel(lineLook);
+			if (LevelIsHeader(levelTry) && LevelNumberPart(levelTry) < level) {
+				return lineLook;
+			}
+		}
+	}
+	return -1;
 }
 
 void LineState::Init() {
