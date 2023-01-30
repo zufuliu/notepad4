@@ -2219,11 +2219,6 @@ void StripMnemonic(LPWSTR pszMenu) {
 #ifndef _WIN64
 void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) {
 	_i64tow(value, lpNumberStr, 10);
-	if (value < 1000) {
-		return;
-	}
-
-	const int i = lstrlen(lpNumberStr);
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sthousand
 	// https://docs.microsoft.com/en-us/windows/desktop/Intl/locale-sgrouping
 	WCHAR szSep[4];
@@ -2233,7 +2228,7 @@ void FormatNumber64(LPWSTR lpNumberStr, uint64_t value) {
 	const WCHAR sep = GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, szSep, COUNTOF(szSep))? szSep[0] : L',';
 #endif
 
-	WCHAR *c = lpNumberStr + i;
+	WCHAR *c = lpNumberStr + lstrlen(lpNumberStr);
 	WCHAR *end = c;
 	lpNumberStr += 3;
 	do {

@@ -14,6 +14,17 @@
 // g++ -S -std=gnu++20 -DNDEBUG -O3 -fno-rtti -Wall -Wextra -march=x86-64-v3 FormatNumberTest.cpp
 
 // https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog10
+/*
+LOG2_10 = math.log2(10)
+[(j, int((1 << j)/LOG2_10)) for j in range(17) if all(int(i/LOG2_10) == i*int((1 << j)/LOG2_10) >> j for i in range(65))]
+
+[(8, 77), (9, 154), (10, 308), (11, 616), (12, 1233), (13, 2466), (14, 4932), (15, 9864), (16, 19728)]
+
+[i for i in range(1024) if int(i/LOG2_10) != i*77 >> 8]
+
+[i for i in range(1024) if int(i/LOG2_10) != i*1233 >> 12]
+*/
+
 namespace {
 
 constexpr uint64_t PowersOf10[20 + 1] = {
@@ -58,6 +69,7 @@ FormatResult FormatNumber(char *number, uint64_t value) noexcept {
 		number[1] = '\0';
 		return {0, 1};
 	}
+
 	char * const end = number + GetWidth(value);
 	char *ptr = end;
 	*ptr = '\0';
@@ -81,6 +93,7 @@ FormatResult FormatComma(char *number, uint64_t value) noexcept {
 		number[1] = '\0';
 		return {0, 1};
 	}
+
 	char * const end = number + GetComma(value);
 	char *ptr = end;
 	int count = 0;
