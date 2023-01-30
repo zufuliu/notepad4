@@ -26,11 +26,11 @@ def dump_bitmap(path):
 	print('write:', dump_path)
 	bmp.save(dump_path)
 
-def _quantize_extern(path, out_path, colorCount, method):
+def quantize_external(path, out_path, colorCount, method):
 	temp = f'{out_path}-{method.name}{colorCount}.png'
 	if method == QuantizeMethod.PngQuant:
 		# https://pngquant.org/
-		command = f'pngquant --force --verbose {colorCount} --output {temp} {path}'
+		command = f'pngquant --force --verbose {colorCount} --output "{temp}" "{path}"'
 	elif method == QuantizeMethod.ImageMagick:
 		# https://imagemagick.org/script/command-line-options.php#colors
 		command = f'magick "{path}" -verbose -colors {colorCount} "{temp}"'
@@ -51,12 +51,12 @@ def convert_image(path, out_path=None, colorDepth=None, method=None):
 	print(f'convert image: {path} => {out_path}')
 	bmp = Bitmap.fromFileEx(path)
 	#bmp.resolution = (96, 96)
-	if colorDepth:
+	if colorDepth in (1, 4, 8):
 		colorCount = 1 << colorDepth
 		current = bmp.colorUsed
 		if current > colorCount:
 			if method and method > QuantizeMethod.Naive:
-				bmp = _quantize_extern(path, out_path, colorCount, method)
+				bmp = quantize_external(path, out_path, colorCount, method)
 			else:
 				bmp = bmp.quantize(colorCount, method, False)
 			name = method.name if method != None else 'Default'

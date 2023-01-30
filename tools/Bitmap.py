@@ -220,7 +220,7 @@ class Bitmap:
 	def _set_data(self, buf, palette=None):
 		sizeImage = len(buf)
 		assert sizeImage == self.height*self.rowSize
-		if True and self.data:
+		if False and self.data:
 			count = 0
 			for i, value in enumerate(self.data):
 				if value != buf[i]:
@@ -549,12 +549,15 @@ class Bitmap:
 	def setColor(self, x, y, color):
 		if len(color) == 3:
 			color = (*color, 0xFF)
-		elif len(color) != 4:
-			raise ValueError(f'Set invalid color: {color} for pixel at ({x}, {y})')
 		self.palette = None
 		self.rows[y][x] = color
 
 	def save(self, path, colorDepth=None):
+		if colorDepth == 24 and not self.opaque():
+			bmp = Bitmap.fromImage(self.toImage(24, False))
+			bmp.save(path)
+			return
+
 		infoHeader = self.infoHeader
 		self.bitsPerPixel = colorDepth
 		if hasattr(path, 'write'):
@@ -610,15 +613,15 @@ class Bitmap:
 			for color in row:
 				alpha = color[3]
 				count += alpha & 1
-				if alpha not in (0, 0xff):
+				if alpha not in (0, 0xFF):
 					return False
 				if color == _TransparentColor:
 					transparent += 1
 		total = self.width*self.height
 		return transparent != total and (count == 0 or count == total)
 
-	def toImage(self, colorDepth=None):
-		if self.opaque(colorDepth):
+	def toImage(self, colorDepth=None, check=True):
+		if check and self.opaque(colorDepth):
 			image = Image.new('RGB', self.size)
 			data = []
 			for row in self.rows:
@@ -631,21 +634,22 @@ class Bitmap:
 			for row in self.rows:
 				data.extend(row)
 			image.putdata(data)
+			if colorDepth == 24:
+				image = image.convert('RGB')
 		return image
 
 	def resize(self, size, method=ResizeMethod.Lanczos):
 		image = self.toImage()
 		image = image.resize(size, resample=method)
-		bmp = Bitmap.fromImage(image)
-		return bmp
+		return Bitmap.fromImage(image)
 
 	def quantize(self, colorCount, method=None, check=True):
 		if check and self.colorUsed <= colorCount:
 			return self
 		if method and method >= QuantizeMethod.Naive:
 			return self
-		image = self.toImage().quantize(colorCount, method=method);
-		return self.fromImage(image)
+		image = self.toImage().quantize(colorCount, method=method)
+		return Bitmap.fromImage(image)
 
 	@staticmethod
 	def fromFileEx(path):
