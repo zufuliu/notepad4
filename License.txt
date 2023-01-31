@@ -185,11 +185,9 @@ https://github.com/zwegner/faster-utf8-validator
 
 ================================================================================
 
-Visual Studio 2017 Image Library
+Visual Studio Image Library 2017, 2022
 
 https://www.microsoft.com/en-us/download/details.aspx?id=35825
-https://download.microsoft.com/download/0/6/0/0607D8EA-9BB7-440B-A36A-A24EB8C9C67E/Visual%20Studio%202017%20Image%20Library%20EULA.RTF
-
 
 ================================================================================
 

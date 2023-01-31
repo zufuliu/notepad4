@@ -16,6 +16,7 @@ def dump_bitmap(path):
 	bmp = Bitmap.fromFile(path)
 	print(bmp.fileHeader)
 	print(bmp.infoHeader)
+	print('colorCount:', bmp.colorUsed)
 
 	data_path = path + '.data'
 	print('write:', data_path, len(bmp.data))
