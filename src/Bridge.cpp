@@ -598,7 +598,7 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 namespace {
 
 #if (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L)) && ( \
-	(defined(_MSC_VER) && _MSC_VER >= 1920 && (defined(_WIN64) || !defined(__clang__)) || \
+	(defined(_MSC_VER) && _MSC_VER >= 1920 && (defined(_WIN64) || !defined(__clang__))) || \
 	(defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 16000) || \
 	(!defined(_LIBCPP_VERSION) && defined(__GNUC__) && __GNUC__ >= 11) )
 using std::make_unique_for_overwrite; // requires C++20 library support
