@@ -449,7 +449,7 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 	if (GetObject(hbmp, sizeof(BITMAP), &bmp)) {
 		// assume 16x16 at 100% scaling
 		const int height = (g_uCurrentDPI*16) / USER_DEFAULT_SCREEN_DPI;
-		if (height == bmp.bmHeight) {
+		if (height == bmp.bmHeight && bmp.bmBitsPixel == 32) {
 			return hbmp;
 		}
 		// keep aspect ratio

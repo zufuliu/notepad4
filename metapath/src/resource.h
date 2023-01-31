@@ -14,7 +14,12 @@
 #define IDI_CROSS1						107
 #define IDI_CROSS2						108
 // Bitmap
-#define IDB_OPEN_FOLDER					101
+#define IDB_TOOLBAR16					100
+#define IDB_TOOLBAR24					101
+#define IDB_TOOLBAR32					102
+#define IDB_TOOLBAR40					103
+#define IDB_TOOLBAR48					104
+#define IDB_OPEN_FOLDER					105
 // Cursor
 #define IDC_CROSSHAIR					100
 // Common
@@ -200,6 +205,7 @@
 #define IDM_VIEW_OPTIONS				40216
 #define IDM_VIEW_ALWAYSONTOP			40217
 #define IDM_VIEW_ABOUT					40218
+#define IDM_VIEW_AUTO_SCALE_TOOLBAR		40219
 #define IDM_SORT_NAME					40301
 #define IDM_SORT_SIZE					40302
 #define IDM_SORT_TYPE					40303

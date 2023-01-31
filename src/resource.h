@@ -10,11 +10,16 @@
 #define IDI_RUN							101
 #define IDI_STYLES						102
 // Bitmap
-#define IDB_OPEN_FOLDER					101
-#define IDB_PREV						102
-#define IDB_NEXT						103
-#define IDB_PICK						104
-#define IDB_ENCODING					105
+#define IDB_TOOLBAR16					100
+#define IDB_TOOLBAR24					101
+#define IDB_TOOLBAR32					102
+#define IDB_TOOLBAR40					103
+#define IDB_TOOLBAR48					104
+#define IDB_OPEN_FOLDER					105
+#define IDB_PREV						106
+#define IDB_NEXT						107
+#define IDB_PICK						108
+#define IDB_ENCODING					109
 // Cursor
 #define IDC_COPY						100
 // Common
