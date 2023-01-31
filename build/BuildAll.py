@@ -16,7 +16,7 @@ metapath_rc = os.path.abspath('../metapath/src/metapath.rc')
 activeLocaleList = ['i18n', 'en', 'it', 'ja', 'ko', 'zh-Hans', 'zh-Hant']
 defaultConfig = {
 	'NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS': 0,
-	'NP2_ENABLE_HIDPI_TOOLBAR_IMAGE': 1,
+	'NP2_ENABLE_HIDPI_IMAGE_RESOURCE': 1,
 
 	'NP2_ENABLE_DOT_LOG_FEATURE': 0,
 
@@ -29,7 +29,7 @@ defaultConfig = {
 def get_locale_override_config(locale, hd):
 	override = {}
 	if not hd:
-		override['NP2_ENABLE_HIDPI_TOOLBAR_IMAGE'] = 0
+		override['NP2_ENABLE_HIDPI_IMAGE_RESOURCE'] = 0
 	if locale != 'i18n':
 		override['NP2_ENABLE_APP_LOCALIZATION_DLL'] = 0
 	if locale == 'en':

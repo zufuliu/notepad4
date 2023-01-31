@@ -902,7 +902,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		bExternalBitmap = true;
 	} else {
 		int resource = IDB_TOOLBAR16;
-#if NP2_ENABLE_HIDPI_TOOLBAR_IMAGE
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 		if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI) {
 			NP2_static_assert(IDB_TOOLBAR48 - IDB_TOOLBAR16 == 6 - 2);
 			int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);

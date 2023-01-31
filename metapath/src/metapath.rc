@@ -38,7 +38,11 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\metapath.exe.manifest"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\res\\metapath.ico"
+#else
+IDR_MAINWND             ICON                    "..\\res\\metapath_min.ico"
+#endif
 IDI_RUN                 ICON                    "..\\res\\Run.ico"
 IDI_PROGS               ICON                    "..\\res\\Progs.ico"
 IDI_OPTIONS             ICON                    "..\\res\\Options.ico"
@@ -56,12 +60,12 @@ IDI_CROSS2              ICON                    "..\\res\\cross2.ico"
 IDB_TOOLBAR16           BITMAP                  "..\\res\\Toolbar16.bmp"
 IDB_OPEN_FOLDER         BITMAP                  "..\\res\\OpenFolder.bmp"
 
-#if NP2_ENABLE_HIDPI_TOOLBAR_IMAGE
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDB_TOOLBAR24           BITMAP                  "..\\res\\Toolbar24.bmp"
 IDB_TOOLBAR32           BITMAP                  "..\\res\\Toolbar32.bmp"
 IDB_TOOLBAR40           BITMAP                  "..\\res\\Toolbar40.bmp"
 IDB_TOOLBAR48           BITMAP                  "..\\res\\Toolbar48.bmp"
-#endif // NP2_ENABLE_HIDPI_TOOLBAR_IMAGE
+#endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////
 //

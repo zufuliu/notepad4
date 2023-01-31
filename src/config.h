@@ -4,15 +4,15 @@
 
 //! Enable customize toolbar labels
 // When enabled, user can change toolbar button tooltip text
-// in the "Toolbar Labels" (without quotes) section in Notepad2.ini
+// inside [Toolbar Labels] section in Notepad2.ini
 #define NP2_ENABLE_CUSTOMIZE_TOOLBAR_LABELS		0
 
-//! Enable building with Hi-DPI toolbar images.
-// When disabled, only build with 16px Toolbar16.bmp
-#define NP2_ENABLE_HIDPI_TOOLBAR_IMAGE			1
+//! Enable building with Hi-DPI image resources.
+// When disabled, only build with image resources at 100% scaling.
+#define NP2_ENABLE_HIDPI_IMAGE_RESOURCE			1
 
 //! Enable the .LOG feature
-// When enabled and Notepad2 opens a file starts with ".LOG" (without quotes, in upper case),
+// When enabled and Notepad2 opens a file starts with .LOG,
 // Notepad2 will append current time to the file.
 // This is a hiden feature in Windows Notepad.
 #define NP2_ENABLE_DOT_LOG_FEATURE				0
