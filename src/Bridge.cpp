@@ -653,11 +653,16 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 	++maxStyle;
 	static_assert(__is_standard_layout(StyleDefinition));
 	//static_assert(STYLE_DEFAULT == 0); //! STYLE_DEFAULT should be put at styleList[0]
-	// unlike STYLE_DEFAULT, style 0 is default style in most lexer
 	memset(styleMap, 0, STYLE_MAX + 1);
 
 	unsigned styleCount = 0;
 	std::unique_ptr<StyleDefinition[]> styleList = std::make_unique<StyleDefinition[]>(maxStyle);
+	if constexpr (STYLE_DEFAULT != 0) {
+		styleCount = 1;
+		styleUsed[STYLE_DEFAULT >> 5] &= ~(1 << (STYLE_DEFAULT & 31));
+		GetStyleDefinitionFor(STYLE_DEFAULT, styleList[0]);
+	}
+
 	for (unsigned style = 0; style < maxStyle; style++) {
 		if (!BitTestEx(styleUsed, style)) {
 			continue;
