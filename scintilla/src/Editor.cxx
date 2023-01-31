@@ -1875,9 +1875,7 @@ Sci::Position Editor::FormatRange([[maybe_unused]] Scintilla::Message iMessage, 
 	}
 
 	const bool draw = wParam != 0;
-	void *const ptr = PtrFromSPtr(lParam);
-	// FormatRangeFull
-	RangeToFormatFull *pfr = static_cast<RangeToFormatFull *>(ptr);
+	const RangeToFormatFull *pfr = static_cast<const RangeToFormatFull *>(PtrFromSPtr(lParam));
 	const AutoSurface surface(pfr->hdc, this, true);
 	const AutoSurface surfaceMeasure(pfr->hdcTarget, this, true);
 	return view.FormatRange(draw, pfr->chrg, pfr->rc, surface, surfaceMeasure, *this, vs);
@@ -6404,7 +6402,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return FindTextFull(wParam, lParam);
 
 	case Message::GetTextRangeFull:
-		if (TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam))) {
+		if (const TextRangeFull *tr = static_cast<const TextRangeFull *>(PtrFromSPtr(lParam))) {
 			return GetTextRange(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax);
 		}
 		return 0;
@@ -6658,7 +6656,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		break;
 
 	case Message::GetStyledTextFull:
-		if (TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam))) {
+		if (const TextRangeFull *tr = static_cast<TextRangeFull *>(PtrFromSPtr(lParam))) {
 			return GetStyledText(tr->lpstrText, tr->chrg.cpMin, tr->chrg.cpMax);
 		}
 		return 0;

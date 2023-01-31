@@ -16,10 +16,10 @@ typeAliases = {
 	"cells": "const char *",
 	"colour": "Colour",
 	"colouralpha": "ColourAlpha",
-	"findtext": "void *",
-	"findtextfull": "void *",
-	"formatrange": "void *",
-	"formatrangefull": "void *",
+	"findtext": "TextToFindFull *",
+	"findtextfull": "TextToFindFull *",
+	"formatrange": "const RangeToFormatFull *",
+	"formatrangefull": "const RangeToFormatFull *",
 	"int": "int",
 	"keymod": "int",
 	"line": "Line",
@@ -27,8 +27,8 @@ typeAliases = {
 	"position": "Position",
 	"string": "const char *",
 	"stringresult": "char *",
-	"textrange": "void *",
-	"textrangefull": "void *",
+	"textrange": "const TextRangeFull *",
+	"textrangefull": "const TextRangeFull *",
 }
 
 basicTypes = [
@@ -98,6 +98,8 @@ def ParametersArgsCallname(v):
 		if param2Type.endswith("*"):
 			if param2Type == "const char *":
 				callName = "CallString"
+			elif param2Type.startswith('const '):
+				callName = "CallConstPointer"
 			else:
 				callName = "CallPointer"
 		elif param2Type not in basicTypes:

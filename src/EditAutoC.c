@@ -867,7 +867,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, bool bIgnoreCase, char pre
 				char wordBuf[NP2_AUTOC_WORD_BUFFER_SIZE];
 				char *pWord = wordBuf + NP2DefaultPointerAlignment;
 				bool bChanged = false;
-				struct Sci_TextRangeFull tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
+				const struct Sci_TextRangeFull tr = { { iPosFind, min_pos(iPosFind + NP2_AUTOC_MAX_WORD_LENGTH, wordEnd) }, pWord };
 				int wordLength = (int)SciCall_GetTextRangeFull(&tr);
 
 				const Sci_Position before = SciCall_PositionBefore(iPosFind);
@@ -1521,7 +1521,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		pRoot = (char *)NP2HeapAlloc(iCurrentPos - iStartWordPos + 1);
 	}
 
-	struct Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
+	const struct Sci_TextRangeFull tr = { { iStartWordPos, iCurrentPos }, pRoot };
 	SciCall_GetTextRangeFull(&tr);
 	iRootLen = (int)strlen(pRoot);
 
@@ -1882,7 +1882,7 @@ void EditAutoCloseXMLTag(void) {
 	}
 
 	if (shouldAutoClose) {
-		struct Sci_TextRangeFull tr = { { iStartPos, iCurPos }, tchBuf };
+		const struct Sci_TextRangeFull tr = { { iStartPos, iCurPos }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
 		if (tchBuf[iSize - 2] != '/') {

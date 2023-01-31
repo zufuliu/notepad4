@@ -1319,7 +1319,7 @@ static inline char *EditGetTextRange(Sci_Position iStartPos, Sci_Position iEndPo
 	}
 
 	char *mszBuf = (char *)NP2HeapAlloc(len + 1);
-	struct Sci_TextRangeFull tr = { { iStartPos, iEndPos }, mszBuf };
+	const struct Sci_TextRangeFull tr = { { iStartPos, iEndPos }, mszBuf };
 	SciCall_GetTextRangeFull(&tr);
 	return mszBuf;
 }
@@ -2535,7 +2535,7 @@ void EditTabsToSpaces(int nTabWidth, bool bOnlyIndentingWS) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
-	struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText};
+	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText};
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -2604,7 +2604,7 @@ void EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
-	struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -3501,7 +3501,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 		}
 
 		char tchBuf[32] = "";
-		struct Sci_TextRangeFull tr = { { iIndentPos, iIndentPos + min_i(31, cchComment) }, tchBuf };
+		const struct Sci_TextRangeFull tr = { { iIndentPos, iIndentPos + min_i(31, cchComment) }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
 		Sci_Position iCommentPos;
@@ -4029,7 +4029,7 @@ void EditWrapToColumn(int nColumn/*, int nTabWidth*/) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1 + 2) * sizeof(WCHAR));
 
-	struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const UINT cpEdit = SciCall_GetCodePage();
@@ -4157,7 +4157,7 @@ void EditJoinLinesEx(void) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 1 + 2);
 	char *pszJoin = (char *)NP2HeapAlloc(NP2HeapSize(pszText));
 
-	struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 
 	const int iEOLMode = SciCall_GetEOLMode();
@@ -4603,7 +4603,7 @@ void EditGetExcerpt(LPWSTR lpszExcerpt, DWORD cchExcerpt) {
 	char *pszText = (char *)NP2HeapAlloc(iSelCount + 2);
 	LPWSTR pszTextW = (LPWSTR)NP2HeapAlloc((iSelCount + 1) * sizeof(WCHAR));
 
-	struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
+	const struct Sci_TextRangeFull tr = { { iSelStart, iSelEnd }, pszText };
 	SciCall_GetTextRangeFull(&tr);
 	const UINT cpEdit = SciCall_GetCodePage();
 	MultiByteToWideChar(cpEdit, 0, pszText, (int)iSelCount, pszTextW, (int)(NP2HeapSize(pszTextW) / sizeof(WCHAR)));

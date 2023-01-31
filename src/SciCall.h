@@ -101,7 +101,7 @@ NP2_inline bool SciCall_GetReadOnly(void) NP2_noexcept {
 	return (bool)SciCall(SCI_GETREADONLY, 0, 0);
 }
 
-NP2_inline Sci_Position SciCall_GetTextRangeFull(struct Sci_TextRangeFull *tr) NP2_noexcept {
+NP2_inline Sci_Position SciCall_GetTextRangeFull(const struct Sci_TextRangeFull *tr) NP2_noexcept {
 	return SciCall(SCI_GETTEXTRANGEFULL, 0, (LPARAM)tr);
 }
 
@@ -1260,7 +1260,7 @@ NP2_inline void SciCall_UsePopUp(int popUpMode) NP2_noexcept {
 
 // Printing
 
-NP2_inline Sci_Position SciCall_FormatRangeFull(bool draw, struct Sci_RangeToFormatFull *fr) NP2_noexcept {
+NP2_inline Sci_Position SciCall_FormatRangeFull(bool draw, const struct Sci_RangeToFormatFull *fr) NP2_noexcept {
 	return SciCall(SCI_FORMATRANGEFULL, draw, (LPARAM)fr);
 }
 

@@ -15,8 +15,8 @@
 
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
-#include "ScintillaCall.h"
 #include "ScintillaStructures.h"
+#include "ScintillaCall.h"
 
 namespace Scintilla {
 
@@ -48,6 +48,10 @@ intptr_t ScintillaCall::CallPointer(Message msg, uintptr_t wParam, void *s) {
 }
 
 intptr_t ScintillaCall::CallString(Message msg, uintptr_t wParam, const char *s) {
+	return Call(msg, wParam, reinterpret_cast<intptr_t>(s));
+}
+
+intptr_t ScintillaCall::CallConstPointer(Message msg, uintptr_t wParam, const void *s) {
 	return Call(msg, wParam, reinterpret_cast<intptr_t>(s));
 }
 
@@ -99,7 +103,7 @@ std::string ScintillaCall::StringOfSpan(Span span) {
 	std::string text;
 	if (span.Length() != 0) {
 		text.resize(span.Length());
-		TextRangeFull tr{ {span.start, span.end}, text.data() };
+		const TextRangeFull tr { {span.start, span.end}, text.data() };
 		GetTextRangeFull(&tr);
 	}
 	return text;
@@ -210,8 +214,8 @@ void ScintillaCall::SetSavePoint() {
 	Call(Message::SetSavePoint);
 }
 
-Position ScintillaCall::GetStyledTextFull(void *tr) {
-	return CallPointer(Message::GetStyledTextFull, 0, tr);
+Position ScintillaCall::GetStyledTextFull(const TextRangeFull *tr) {
+	return CallConstPointer(Message::GetStyledTextFull, 0, tr);
 }
 
 bool ScintillaCall::CanRedo() {
@@ -1010,7 +1014,7 @@ Position ScintillaCall::CountCharacters(Position start, Position end) {
 	return Call(Message::CountCharacters, start, end);
 }
 
-void ScintillaCall::CountCharactersAndColumns(void *ft) {
+void ScintillaCall::CountCharactersAndColumns(TextToFindFull *ft) {
 	CallPointer(Message::CountCharactersAndColumns, 0, ft);
 }
 
@@ -1094,12 +1098,12 @@ PrintOption ScintillaCall::PrintColourMode() {
 	return static_cast<Scintilla::PrintOption>(Call(Message::GetPrintColourMode));
 }
 
-Position ScintillaCall::FindTextFull(Scintilla::FindOption searchFlags, void *ft) {
+Position ScintillaCall::FindTextFull(Scintilla::FindOption searchFlags, TextToFindFull *ft) {
 	return CallPointer(Message::FindTextFull, static_cast<uintptr_t>(searchFlags), ft);
 }
 
-Position ScintillaCall::FormatRangeFull(bool draw, void *fr) {
-	return CallPointer(Message::FormatRangeFull, draw, fr);
+Position ScintillaCall::FormatRangeFull(bool draw, const RangeToFormatFull *fr) {
+	return CallConstPointer(Message::FormatRangeFull, draw, fr);
 }
 
 void ScintillaCall::SetChangeHistory(Scintilla::ChangeHistoryOption changeHistory) {
@@ -1162,8 +1166,8 @@ std::string ScintillaCall::GetSelText(bool asBinary) {
 	return CallReturnString(Message::GetSelText, asBinary);
 }
 
-Position ScintillaCall::GetTextRangeFull(void *tr) {
-	return CallPointer(Message::GetTextRangeFull, 0, tr);
+Position ScintillaCall::GetTextRangeFull(const TextRangeFull *tr) {
+	return CallConstPointer(Message::GetTextRangeFull, 0, tr);
 }
 
 void ScintillaCall::HideSelection(bool hide) {
