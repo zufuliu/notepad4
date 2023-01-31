@@ -30,6 +30,7 @@
 #include <memory>
 
 #include "SciCall.h"
+#include "VectorISA.h"
 #if !NP2_FORCE_COMPILE_C_AS_CPP
 extern "C" {
 #endif
@@ -596,8 +597,29 @@ extern "C" void EditPrintSetup(HWND hwnd) {
 
 namespace {
 
+#if (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L)) && ( \
+	(defined(_MSC_VER) && _MSC_VER >= 1920) || \
+	(defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 16000) || \
+	(!defined(_LIBCPP_VERSION) && defined(__GNUC__) && __GNUC__ >= 11) )
+using std::make_unique_for_overwrite; // requires C++20 library support
+#else
+// https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique
+template<class T>
+std::enable_if_t<std::is_array_v<T>, std::unique_ptr<T>>
+make_unique_for_overwrite(std::size_t n) {
+	return std::unique_ptr<T>(new std::remove_extent_t<T>[n]);
+}
+#endif
+
+struct DocumentStyledText {
+	std::unique_ptr<char[]> styledText;
+	std::unique_ptr<StyleDefinition[]> styleList;
+	size_t textLength;
+	unsigned styleCount;
+	UINT cpEdit;
+};
+
 void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
-	// not use Style_Parse() here due to lexer combination and style inheritance.
 	definition.fontSize = SciCall_StyleGetSizeFractional(style);
 	definition.foreColor = SciCall_StyleGetFore(style);
 	definition.backColor = SciCall_StyleGetBack(style);
@@ -609,20 +631,41 @@ void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 	SciCall_StyleGetFont(style, definition.fontFace);
 }
 
-int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) noexcept {
+DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci_Position startPos, Sci_Position endPos) noexcept {
+	SciCall_EnsureStyledTo(endPos);
+	std::unique_ptr<char[]> styledText = make_unique_for_overwrite<char[]>(2*(endPos - startPos + 1));
+	const UINT cpEdit = SciCall_GetCodePage();
+	const Sci_TextRangeFull tr { { startPos, endPos }, styledText.get() };
+	const size_t textLength = SciCall_GetStyledTextFull(&tr);
+
+	uint32_t styleUsed[8]{}; // bitmap for styles used in the range
+	styleUsed[STYLE_DEFAULT >> 5] |= (1 << (STYLE_DEFAULT & 31));
+	unsigned maxStyle = STYLE_DEFAULT;
+
+	for (size_t offset = 1; offset < textLength; offset += 2) {
+		const uint8_t style = styledText[offset];
+		styleUsed[style >> 5] |= (1 << (style & 31));
+		if (style > maxStyle) {
+			maxStyle = style;
+		}
+	}
+
+	++maxStyle;
 	static_assert(__is_standard_layout(StyleDefinition));
+	//static_assert(STYLE_DEFAULT == 0); //! STYLE_DEFAULT should be put at styleList[0]
 	// unlike STYLE_DEFAULT, style 0 is default style in most lexer
 	memset(styleMap, 0, STYLE_MAX + 1);
-	memset(styleList, 0, (STYLE_MAX + 1)*sizeof(StyleDefinition));
 
-	int styleCount = 0;
-	for (int style = 0; style < STYLE_MAX + 1; style++) {
-		if (style > STYLE_FIRSTPREDEFINED && style <= STYLE_LASTPREDEFINED) {
+	unsigned styleCount = 0;
+	std::unique_ptr<StyleDefinition[]> styleList = std::make_unique<StyleDefinition[]>(maxStyle);
+	for (unsigned style = 0; style < maxStyle; style++) {
+		if (!BitTestEx(styleUsed, style)) {
 			continue;
 		}
+
 		StyleDefinition &definition = styleList[styleCount];
 		GetStyleDefinitionFor(style, definition);
-		int index = 0;
+		unsigned index = 0;
 		for (; index < styleCount; index++) {
 			// NOLINTNEXTLINE(bugprone-suspicious-memory-comparison)
 			if (memcmp(&definition, &styleList[index], sizeof(StyleDefinition)) == 0) {
@@ -634,7 +677,8 @@ int GetDocumentUniqueStyleList(uint8_t styleMap[], StyleDefinition *styleList) n
 			styleCount++;
 		}
 	}
-	return styleCount;
+
+	return { std::move(styledText), std::move(styleList), textLength, styleCount, cpEdit };
 }
 
 // code based SciTE's ExportRTF.cxx
@@ -694,9 +738,12 @@ void GetRTFNextControl(const char **style, char *control) noexcept {
 }
 
 // extracts control words that are different between two styles
-void GetRTFStyleChange(std::string &delta, const char *last, const char *current) { // \f0\fs20\cf0\highlight0\b0\i0
-	char lastControl[RTF_MAX_STYLEDEF]{};
-	char currentControl[RTF_MAX_STYLEDEF]{};
+// \f0\fs20\cf0\highlight0\b0\i0
+void GetRTFStyleChange(std::string &delta, const char *last, const char *current) {
+	char lastControl[RTF_MAX_STYLEDEF];
+	char currentControl[RTF_MAX_STYLEDEF];
+	lastControl[0] = '\0';
+	currentControl[0] = '\0';
 	const char *lastPos = last;
 	const char *currentPos = current;
 	const size_t len = delta.length();
@@ -717,29 +764,26 @@ constexpr int GetRTFFontSize(int size) noexcept {
 }
 
 std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
-	SciCall_EnsureStyledTo(endPos);
-
 	uint8_t styleMap[STYLE_MAX + 1];
-	const std::unique_ptr<StyleDefinition[]> styleList(new StyleDefinition[STYLE_MAX + 1]);
-	const int styleCount = GetDocumentUniqueStyleList(styleMap, styleList.get());
-	const std::unique_ptr<std::string[]> styles = std::make_unique<std::string[]>(styleCount);
-	const std::unique_ptr<LPCSTR[]> fontList(new LPCSTR[styleCount]);
-	const std::unique_ptr<COLORREF[]> colorList(new COLORREF[2*styleCount]);
+	const auto [styledText, styleList, textLength, styleCount, cpEdit] = GetDocumentStyledText(styleMap, startPos, endPos);
+	const std::unique_ptr<std::string[]> styles = make_unique_for_overwrite<std::string[]>(styleCount);
+	const std::unique_ptr<LPCSTR[]> fontList = make_unique_for_overwrite<LPCSTR[]>(styleCount);
+	const std::unique_ptr<COLORREF[]> colorList = make_unique_for_overwrite<COLORREF[]>(2*styleCount);
 
-	const UINT cpEdit = SciCall_GetCodePage();
 	UINT legacyACP = cpEdit;
 	const bool isUTF8 = cpEdit == SC_CP_UTF8;
 	if (isUTF8 || cpEdit == 0) {
 		legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 	}
 
-	char fmtbuf[128];
+	char fmtbuf[RTF_MAX_STYLEDEF];
+	fmtbuf[0] = '\0';
 	unsigned fmtlen = sprintf(fmtbuf, RTF_HEADEROPEN RTF_FONTDEFOPEN, legacyACP);
 	std::string os(fmtbuf, fmtlen);
 
 	int fontCount = 0;
 	int colorCount = 0;
-	for (int styleIndex = 0; styleIndex < styleCount; styleIndex++) {
+	for (unsigned styleIndex = 0; styleIndex < styleCount; styleIndex++) {
 		StyleDefinition &definition = styleList[styleIndex];
 
 		int iFont = 0;
@@ -809,9 +853,9 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 	bool prevCR = false;
 	int styleCurrent = -1;
 	int column = 0;
-	for (; startPos < endPos; startPos++) {
-		const int ch = SciCall_GetCharAt(startPos);
-		int style = SciCall_GetStyleIndexAt(startPos);
+	for (size_t offset = 0; offset < textLength; offset += 2) {
+		const char ch = styledText[offset];
+		uint8_t style = styledText[offset + 1];
 		style = styleMap[style];
 		if (style != styleCurrent) {
 			styleCurrent = style;
@@ -859,10 +903,11 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			break;
 
 		default:
-			if (isUTF8 && ch > 0x7f) {
+			if (isUTF8 && static_cast<signed char>(ch) < 0) {
+				const Sci_Position pos = startPos + offset/2;
 				Sci_Position width = 0;
-				const unsigned int u32 = SciCall_GetCharacterAndWidth(startPos, &width);
-				startPos += width - 1;
+				const unsigned int u32 = SciCall_GetCharacterAndWidth(pos, &width);
+				offset += 2*(width - 1);
 				if (u32 < 0x10000) {
 					(void)sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
 				} else {
@@ -872,7 +917,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 				}
 				os += fmtbuf;
 			} else {
-				os += static_cast<char>(ch);
+				os += ch;
 			}
 			break;
 		}

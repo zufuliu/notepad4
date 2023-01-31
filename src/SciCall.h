@@ -137,6 +137,10 @@ NP2_inline int SciCall_GetStyleIndexAt(Sci_Position position) NP2_noexcept {
 	return (int)SciCall(SCI_GETSTYLEINDEXAT, position, 0);
 }
 
+NP2_inline size_t SciCall_GetStyledTextFull(const struct Sci_TextRangeFull *tr) NP2_noexcept {
+	return SciCall(SCI_GETSTYLEDTEXTFULL, 0, (LPARAM)(tr));
+}
+
 NP2_inline int SciCall_GetCharacterAndWidth(Sci_Position position, Sci_Position *width) NP2_noexcept {
 	return (int)SciCall(SCI_GETCHARACTERANDWIDTH, position, (LPARAM)width);
 }
