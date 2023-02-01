@@ -40,7 +40,11 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\res\\Notepad2.exe.manif
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2.ico"
+#else
+IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2_min.ico"
+#endif
 IDI_RUN                 ICON                    "..\\..\\res\\Run.ico"
 IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 
@@ -49,12 +53,19 @@ IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 // Bitmap
 //
 
-IDR_MAINWND             BITMAP                  "..\\..\\res\\Toolbar.bmp"
+IDB_TOOLBAR16           BITMAP                  "..\\..\\res\\Toolbar16.bmp"
 IDB_OPEN_FOLDER         BITMAP                  "..\\..\\res\\OpenFolder.bmp"
 IDB_NEXT                BITMAP                  "..\\..\\res\\Next.bmp"
 IDB_PREV                BITMAP                  "..\\..\\res\\Prev.bmp"
 IDB_PICK                BITMAP                  "..\\..\\res\\Pick.bmp"
 IDB_ENCODING            BITMAP                  "..\\..\\res\\Encoding.bmp"
+
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+IDB_TOOLBAR24           BITMAP                  "..\\..\\res\\Toolbar24.bmp"
+IDB_TOOLBAR32           BITMAP                  "..\\..\\res\\Toolbar32.bmp"
+IDB_TOOLBAR40           BITMAP                  "..\\..\\res\\Toolbar40.bmp"
+IDB_TOOLBAR48           BITMAP                  "..\\..\\res\\Toolbar48.bmp"
+#endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -102,19 +113,6 @@ BEGIN
 			MENUITEM "&Mode gros fichier",			IDM_FILE_LARGE_FILE_MODE_RELOAD
 #endif
 		END
-		POPUP "&Lancer"
-		BEGIN
-			MENUITEM "Ouvrir le répertoire du &fichier",		IDM_FILE_OPEN_CONTAINING_FOLDER
-			MENUITEM "Ouvrir en tant qu'&adminitrateur",		IDM_FILE_RELAUNCH_ELEVATED
-			MENUITEM SEPARATOR
-			MENUITEM "&Nouvelle fenêtre\tAlt+N",			IDM_FILE_NEWWINDOW
-			MENUITEM "F&enêtre vide\tAlt+0",		IDM_FILE_NEWWINDOW2
-			MENUITEM "&&Redémarrer",					IDM_FILE_RESTART
-			MENUITEM SEPARATOR
-			MENUITEM "Exécuter le &document\tCtrl+L",	IDM_FILE_LAUNCH
-			MENUITEM "Ouvrir avec...",				IDM_FILE_OPENWITH
-			MENUITEM "Lancer une &commande...\tCtrl+R",			IDM_FILE_RUN
-		END
 		MENUITEM SEPARATOR
 		POPUP "&Encodage"
 		BEGIN
@@ -140,6 +138,7 @@ BEGIN
 		MENUITEM "Im&primer...\tCtrl+P",				IDM_FILE_PRINT
 		MENUITEM SEPARATOR
 		MENUITEM "Propr&iétés...",					IDM_FILE_PROPERTIES
+		MENUITEM "Ouvrir le répertoire du &fichier",		IDM_FILE_OPEN_CONTAINING_FOLDER
 		MENUITEM "Créer un lien sur le bureau",			IDM_FILE_CREATELINK
 		MENUITEM SEPARATOR
 		MENUITEM "Parc&ourir...\tCtrl+M",				IDM_FILE_BROWSE
@@ -241,25 +240,6 @@ BEGIN
 			MENUITEM "Inverser la casse\tCtrl+Alt+U",		IDM_EDIT_INVERTCASE
 			MENUITEM "Casse de titre\tCtrl+Alt+I",			IDM_EDIT_TITLECASE
 			MENUITEM "&Casse de phrase\tCtrl+Alt+O",		IDM_EDIT_SENTENCECASE
-			POPUP "autres conversions"
-			BEGIN
-				MENUITEM "Format demi-large à large",		IDM_EDIT_MAP_FULLWIDTH
-				MENUITEM "Format large à demi-large",		IDM_EDIT_MAP_HALFWIDTH
-				MENUITEM SEPARATOR
-				MENUITEM "Chinois traditionnel à &simplifié",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
-				MENUITEM "Chinois simplifié to &traditionnel",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
-				MENUITEM SEPARATOR
-				MENUITEM "Japanonais Katakana à &Hiragana",		IDM_EDIT_MAP_HIRAGANA
-				MENUITEM "Japanonais Hiragana à &Katakana",		IDM_EDIT_MAP_KATAKANA
-				MENUITEM SEPARATOR
-				MENUITEM "Coréen Han&ja à Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
-				MENUITEM "Coréen Han&gul décomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
-				MENUITEM SEPARATOR
-				MENUITEM "&Bengali à Latin",					IDM_EDIT_MAP_BENGALI_LATIN
-				MENUITEM "C&yrillic à Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
-				MENUITEM "&Devanagari à Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
-				MENUITEM "&Malayalam à Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
-			END
 			MENUITEM SEPARATOR
 			MENUITEM "&Tabuler la sélection\tCtrl+Shift+T",		IDM_EDIT_CONVERTSPACES
 			MENUITEM "Détabuler la sélection\tCtrl+Shift+S",	IDM_EDIT_CONVERTTABS
@@ -332,19 +312,9 @@ BEGIN
 			MENUITEM "Ca&ractères en hexa\tCtrl+Alt+X",				IDM_EDIT_CHAR2HEX
 			MENUITEM "Hex en Ca&ractères\tCtrl+Alt+C",				IDM_EDIT_HEX2CHAR
 			MENUITEM "&Montrer les codes exadécimaux",							IDM_EDIT_SHOW_HEX
+			MENUITEM SEPARATOR
 			MENUITEM "Neutraliser les caractères C\tCtrl+Alt+E",				IDM_EDIT_ESCAPECCHARS
 			MENUITEM "&Rétablir les caractères C\tCtrl+Alt+R",			IDM_EDIT_UNESCAPECCHARS
-			MENUITEM SEPARATOR
-			POPUP "Base&64"
-			BEGIN
-				MENUITEM "Encodage standard",							IDM_EDIT_BASE64_ENCODE
-				MENUITEM "Encodage sans risque des URL",							IDM_EDIT_BASE64_SAFE_ENCODE
-				MENUITEM "&Décoder",										IDM_EDIT_BASE64_DECODE
-				MENUITEM "Decoder (forme hexadécimale)",								IDM_EDIT_BASE64_DECODE_AS_HEX
-			END
-			MENUITEM SEPARATOR
-			MENUITEM "Encodage des URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
-			MENUITEM "Décodage des URL\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 			MENUITEM "Neutraliser les caractères HT&ML/XML \tAlt+Shift+X",		IDM_EDIT_XHTML_ESCAPE_CHAR
 			MENUITEM "Rétablir les caractères HTML/&XML\tAlt+Shift+H",	IDM_EDIT_XHTML_UNESCAPE_CHAR
 			MENUITEM SEPARATOR
@@ -354,18 +324,6 @@ BEGIN
 			MENUITEM "Effacer le mot suivant\tCtrl+Del",			CMD_CTRLDEL
 			MENUITEM SEPARATOR
 			MENUITEM "Mise à jour des  &Timestamps\tShift+F5",			CMD_TIMESTAMPS
-		END
-		POPUP "Action &sur sélection"
-		BEGIN
-			MENUITEM "&Ouvrir un fichier, dossier, lien, etc.",		CMD_OPEN_PATH_OR_LINK
-			MENUITEM "Ouvrir le répertoire contenant",				CMD_OPEN_CONTAINING_FOLDER
-			MENUITEM SEPARATOR
-			MENUITEM "Rechercher avec &Google",					CMD_ONLINE_SEARCH_GOOGLE
-			MENUITEM "Rechercher avec &Bing",					CMD_ONLINE_SEARCH_BING
-			MENUITEM "Rechercher avec &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
-			MENUITEM SEPARATOR
-			MENUITEM "Action sur mesure &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
-			MENUITEM "Action sur mesure &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Rechercher et remplacer"
@@ -472,23 +430,23 @@ BEGIN
 			MENUITEM "Bloc courant\tAlt+C",		IDM_VIEW_FOLD_CURRENT_BLOCK
 			MENUITEM "Niveau courant",				IDM_VIEW_FOLD_CURRENT_LEVEL
 			MENUITEM SEPARATOR
-			MENUITEM "Niveau &1\tAlt+1",				IDM_VIEW_FOLD_Niveau1
-			MENUITEM "Niveau &2\tAlt+2",				IDM_VIEW_FOLD_Niveau2
-			MENUITEM "Niveau &3\tAlt+3",				IDM_VIEW_FOLD_Niveau3
-			MENUITEM "Niveau &4\tAlt+4",				IDM_VIEW_FOLD_Niveau4
-			MENUITEM "Niveau &5\tAlt+5",				IDM_VIEW_FOLD_Niveau5
-			MENUITEM "Niveau &6\tAlt+6",				IDM_VIEW_FOLD_Niveau6
-			MENUITEM "Niveau &7\tAlt+7",				IDM_VIEW_FOLD_Niveau7
-			MENUITEM "Niveau &8\tAlt+8",				IDM_VIEW_FOLD_Niveau8
-			MENUITEM "Niveau &9\tAlt+9",				IDM_VIEW_FOLD_Niveau9
-			MENUITEM "Niveau 1&0",					IDM_VIEW_FOLD_Niveau10
+			MENUITEM "Niveau &1\tAlt+1",				IDM_VIEW_FOLD_LEVEL1
+			MENUITEM "Niveau &2\tAlt+2",				IDM_VIEW_FOLD_LEVEL2
+			MENUITEM "Niveau &3\tAlt+3",				IDM_VIEW_FOLD_LEVEL3
+			MENUITEM "Niveau &4\tAlt+4",				IDM_VIEW_FOLD_LEVEL4
+			MENUITEM "Niveau &5\tAlt+5",				IDM_VIEW_FOLD_LEVEL5
+			MENUITEM "Niveau &6\tAlt+6",				IDM_VIEW_FOLD_LEVEL6
+			MENUITEM "Niveau &7\tAlt+7",				IDM_VIEW_FOLD_LEVEL7
+			MENUITEM "Niveau &8\tAlt+8",				IDM_VIEW_FOLD_LEVEL8
+			MENUITEM "Niveau &9\tAlt+9",				IDM_VIEW_FOLD_LEVEL9
+			MENUITEM "Niveau 1&0",					IDM_VIEW_FOLD_LEVEL10
 		END
 		MENUITEM SEPARATOR
 		POPUP "&Zoom"
 		BEGIN
 			MENUITEM "Zoom +\tCtrl++",			IDM_VIEW_ZOOMIN
 			MENUITEM "Zoom -\tCtrl+-",			IDM_VIEW_ZOOMOUT
-			MENUITEM "Zoom de niveau...",				IDM_VIEW_ZOOM_Niveau
+			MENUITEM "Zoom de niveau...",				IDM_VIEW_ZOOM_LEVEL
 			MENUITEM "Reset du niveau de zoom\tCtrl+\\",		IDM_VIEW_RESETZOOM
 		END
 		MENUITEM "Basculer en mode plein écran\tF11 [Esc]",	IDM_VIEW_TOGGLE_FULLSCREEN
@@ -651,6 +609,7 @@ BEGIN
 				MENUITEM "Chinois simplifié",				IDM_LANG_CHINESE_SIMPLIFIED
 			END
 #endif
+			MENUITEM "Utiliser l'ancien style Windows &XP de dialogue d'ouverture/fermeture",	IDM_SET_USE_XP_FILE_DIALOG
 		END
 		POPUP "Options de la fenêtre Notepad2"
 		BEGIN
@@ -682,10 +641,6 @@ BEGIN
 		BEGIN
 			MENUITEM "Se rappeler des fichiers récents",		IDM_VIEW_NOSAVERECENT
 			MENUITEM "Option de mémorisation et de recherche",	IDM_VIEW_NOSAVEFINDREPL
-			MENUITEM "Sauver automatiquement avant d'exécuter",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
-			MENUITEM SEPARATOR
-			MENUITEM "&Utiliser l'ancien style Windows XP de dialogue d'ouverture/fermeture",	IDM_SET_USE_XP_FILE_DIALOG
-			MENUITEM "Utiliser Metapath pour ouvrir les répertoires",IDM_SET_OPEN_FOLDER_METAPATH
 		END
 		MENUITEM SEPARATOR
 		POPUP "Réglages avancés"
@@ -722,6 +677,61 @@ BEGIN
 		END
 		MENUITEM "Sauver les réglages en quittant l'application",			IDM_VIEW_SAVESETTINGS
 		MENUITEM "Sauver les réglages maintenant\tF7",			IDM_VIEW_SAVESETTINGSNOW
+	END
+	POPUP "&Tools"
+	BEGIN
+		MENUITEM "Sauver automatiquement avant d'exécuter",	IDM_VIEW_SAVEBEFORERUNNINGTOOLS
+		MENUITEM "Utiliser Metapath pour ouvrir les répertoires",IDM_SET_OPEN_FOLDER_METAPATH
+		MENUITEM SEPARATOR
+		MENUITEM "Ouvrir en tant qu'&adminitrateur",		IDM_FILE_RELAUNCH_ELEVATED
+		MENUITEM "&&Redémarrer",					IDM_FILE_RESTART
+		MENUITEM "&Nouvelle fenêtre\tAlt+N",			IDM_FILE_NEWWINDOW
+		MENUITEM "F&enêtre vide\tAlt+0",		IDM_FILE_NEWWINDOW2
+		MENUITEM SEPARATOR
+		MENUITEM "Exécuter le &document\tCtrl+L",	IDM_FILE_LAUNCH
+		MENUITEM "Ouvrir avec...",				IDM_FILE_OPENWITH
+		MENUITEM "Lancer une &commande...\tCtrl+R",			IDM_FILE_RUN
+		MENUITEM SEPARATOR
+		POPUP "Action &sur sélection"
+		BEGIN
+			MENUITEM "&Ouvrir un fichier, dossier, lien, etc.",		CMD_OPEN_PATH_OR_LINK
+			MENUITEM "Ouvrir le répertoire contenant",				CMD_OPEN_CONTAINING_FOLDER
+			MENUITEM SEPARATOR
+			MENUITEM "Rechercher avec &Google",					CMD_ONLINE_SEARCH_GOOGLE
+			MENUITEM "Rechercher avec &Bing",					CMD_ONLINE_SEARCH_BING
+			MENUITEM "Rechercher avec &Wikipedia",				CMD_ONLINE_SEARCH_WIKI
+			MENUITEM SEPARATOR
+			MENUITEM "Action sur mesure &1\tCtrl+Shift+1",		CMD_CUSTOM_ACTION1
+			MENUITEM "Action sur mesure &2\tCtrl+Shift+2",		CMD_CUSTOM_ACTION2
+		END
+		POPUP "&Base64"
+		BEGIN
+			MENUITEM "Encodage standard",							IDM_EDIT_BASE64_ENCODE
+			MENUITEM "Encodage sans risque des URL",							IDM_EDIT_BASE64_SAFE_ENCODE
+			MENUITEM "&Décoder",										IDM_EDIT_BASE64_DECODE
+			MENUITEM "Decoder (forme hexadécimale)",								IDM_EDIT_BASE64_DECODE_AS_HEX
+		END
+		POPUP "Text &Transliteration"
+		BEGIN
+			MENUITEM "Format demi-large à large",		IDM_EDIT_MAP_FULLWIDTH
+			MENUITEM "Format large à demi-large",		IDM_EDIT_MAP_HALFWIDTH
+			MENUITEM SEPARATOR
+			MENUITEM "Chinois traditionnel à &simplifié",	IDM_EDIT_MAP_SIMPLIFIED_CHINESE
+			MENUITEM "Chinois simplifié to &traditionnel",	IDM_EDIT_MAP_TRADITIONAL_CHINESE
+			MENUITEM SEPARATOR
+			MENUITEM "Japanonais Katakana à &Hiragana",		IDM_EDIT_MAP_HIRAGANA
+			MENUITEM "Japanonais Hiragana à &Katakana",		IDM_EDIT_MAP_KATAKANA
+			MENUITEM SEPARATOR
+			MENUITEM "Coréen Han&ja à Hangul",		        IDM_EDIT_MAP_HANJA_HANGUL
+			MENUITEM "Coréen Han&gul décomposition",		IDM_EDIT_MAP_HANGUL_DECOMPOSITION
+			MENUITEM SEPARATOR
+			MENUITEM "&Bengali à Latin",					IDM_EDIT_MAP_BENGALI_LATIN
+			MENUITEM "C&yrillic à Latin",					IDM_EDIT_MAP_CYRILLIC_LATIN
+			MENUITEM "&Devanagari à Latin",				IDM_EDIT_MAP_DEVANAGARI_LATIN
+			MENUITEM "&Malayalam à Latin",					IDM_EDIT_MAP_MALAYALAM_LATIN
+		END
+		MENUITEM "Encodage des &URL\tCtrl+Shift+E",				IDM_EDIT_URLENCODE
+		MENUITEM "Décodage des UR&L\tCtrl+Shift+R",				IDM_EDIT_URLDECODE
 	END
 	POPUP "Aide"
 	BEGIN
@@ -775,18 +785,18 @@ BEGIN
 		MENUITEM "Niveaux par défaut",				IDM_VIEW_FOLD_DEFAULT
 		MENUITEM "Tous les niveaux",					IDM_VIEW_FOLD_ALL
 		MENUITEM "Bloc actuel",				IDM_VIEW_FOLD_CURRENT_BLOCK
-		MENUITEM "Niveau actuel",				IDM_VIEW_FOLD_CURRENT_Niveau
+		MENUITEM "Niveau actuel",				IDM_VIEW_FOLD_CURRENT_LEVEL
 		MENUITEM SEPARATOR
-		MENUITEM "Niveau &1",					IDM_VIEW_FOLD_Niveau1
-		MENUITEM "Niveau &2",					IDM_VIEW_FOLD_Niveau2
-		MENUITEM "Niveau &3",					IDM_VIEW_FOLD_Niveau3
-		MENUITEM "Niveau &4",					IDM_VIEW_FOLD_Niveau4
-		MENUITEM "Niveau &5",					IDM_VIEW_FOLD_Niveau5
-		MENUITEM "Niveau &6",					IDM_VIEW_FOLD_Niveau6
-		MENUITEM "Niveau &7",					IDM_VIEW_FOLD_Niveau7
-		MENUITEM "Niveau &8",					IDM_VIEW_FOLD_Niveau8
-		MENUITEM "Niveau &9",					IDM_VIEW_FOLD_Niveau9
-		MENUITEM "Niveau 1&0",					IDM_VIEW_FOLD_Niveau10
+		MENUITEM "Niveau &1",					IDM_VIEW_FOLD_LEVEL1
+		MENUITEM "Niveau &2",					IDM_VIEW_FOLD_LEVEL2
+		MENUITEM "Niveau &3",					IDM_VIEW_FOLD_LEVEL3
+		MENUITEM "Niveau &4",					IDM_VIEW_FOLD_LEVEL4
+		MENUITEM "Niveau &5",					IDM_VIEW_FOLD_LEVEL5
+		MENUITEM "Niveau &6",					IDM_VIEW_FOLD_LEVEL6
+		MENUITEM "Niveau &7",					IDM_VIEW_FOLD_LEVEL7
+		MENUITEM "Niveau &8",					IDM_VIEW_FOLD_LEVEL8
+		MENUITEM "Niveau &9",					IDM_VIEW_FOLD_LEVEL9
+		MENUITEM "Niveau 1&0",					IDM_VIEW_FOLD_LEVEL10
 	END
 END
 
@@ -1161,7 +1171,7 @@ BEGIN
     CONTROL         "<a>Cliquez ici pour sélectionner l'encodage par défaut</a>",IDC_ENCODING_LINK,"SysLink",WS_TABSTOP,7,38,195,10
     AUTOCHECKBOX    "Passer l'étape de détection unicode (UTF-16).",IDC_NOUNICODEDETECTION,7,52,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Ouvrir les fichiers ASCII 7-bit en mode UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
-    AUTOCHECKBOX    "Ouvrir les fichiers ANSI à l'encodage inconnu en mode UTF-8.",IDC_ASCIIASUTF8,7,62,195,10,WS_TABSTOP
+    AUTOCHECKBOX    "Ouvrir les fichiers ANSI à l'encodage inconnu en mode UTF-8.",IDC_ANSIASUTF8,7,62,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Ouvrir les fichiers de type ANSI Art (*.&nfo, *.diz)en mode DOS-437 (IBM PC).",IDC_NFOASOEM,7,82,195,10,WS_TABSTOP
     AUTOCHECKBOX    "Ne pas interpréter les balises.",IDC_ENCODINGFROMFILEVARS,7,92,195,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,96,108,50,14
@@ -1303,7 +1313,7 @@ BEGIN
     EDITTEXT        IDC_SCHEME_INDENT_WIDTH,78,71,30,12,ES_NUMBER | ES_AUTOHSCROLL
     AUTOCHECKBOX    "Insérer les tabulation comme une série d'espaces équivalent.",IDC_SCHEME_TAB_AS_SPACE,118,58,101,10,WS_TABSTOP
     AUTOCHECKBOX    "Utiliser les réglages globaux.",IDC_SCHEME_USE_GLOBAL_TAB,118,72,101,10,WS_TABSTOP
-	GROUPBOX		",IDC_FILE_TAB_GROUPBOX,7,91,218,38
+	GROUPBOX		"",IDC_FILE_TAB_GROUPBOX,7,91,218,38
     LTEXT           "Largeur de tabulation :",IDC_STATIC,14,101,67,8
     EDITTEXT        IDC_FILE_TAB_WIDTH,78,99,30,12,ES_NUMBER | ES_AUTOHSCROLL
     LTEXT           "Taille d'indentation :",IDC_STATIC,14,115,69,8
@@ -1343,7 +1353,7 @@ BEGIN
     PUSHBUTTON      "Annuler",IDCANCEL,193,118,50,14
     GROUPBOX        "Pour ligne césurée",IDC_STATIC,7,74,235,38
     AUTOCHECKBOX    "Sélectionner seulement les lignes sous jacentes lors de la sélection via la marge de gauche.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
-    AUTOCHECKBOX    "Sélectionner seulement les lignes sous jacentes lors de la sélection de la ligne courante.",IDC_WRAP_SELECT_SUBLINE,14,84,220,10,WS_TABSTOP
+    AUTOCHECKBOX    "Sélectionner seulement les lignes sous jacentes lors de la sélection de la ligne courante.",IDC_WRAP_HIGHLIGHT_SUBLINE,14,84,220,10,WS_TABSTOP
 END
 
 IDD_PAGESETUP DIALOGEX 5, 5, 356, 260
@@ -1731,7 +1741,7 @@ Syntaxe expérimentale :\n\
 \\h\tDébut d'un mot, en accord avec IsWordStartAt()\n\
 \\H\tFin d'un mot, en accord avec IsWordEndAt()\n\
 \\i\tTrouvera 1 caractère ou plus jusqu'à la fin du mot\n\
-\\i?\tTrouvera 0 caractère ou plus jusqu'à la fin du mot\n\
+\\i?\tTrouvera 0 caractère ou plus jusqu'à la fin du mot"
 
 	IDS_WILDCARDHELP		"Jocker de recherche\n\n\
 *\tTrouvera zéro ou plus de caractères.\n\
@@ -1931,7 +1941,7 @@ BEGIN
 	IDS_ENCODING_TIS620				"Thailandais (TIS-620, Windows-874, ISO 8859-11);TIS-620"				// Southeast Asia
 	IDS_ENCODING_DOS857				"turc OEM (DOS-857);DOS-857"											// turkish
 	IDS_ENCODING_ISO8859_9			"Latin-5 (ISO 8859-9);ISO 8859-9"										// turkish
-	IDS_ENCODING_MAC_turkish		"turc Mac;Turc Mac"														// turkish
+	IDS_ENCODING_MAC_TURKISH		"turc Mac;Turc Mac"														// turkish
 	IDS_ENCODING_WINDOWS1254		"Windows-1254;Windows-1254"												// turkish
 	IDS_ENCODING_MAC_UKRAINIAN		"Ukrainien Mac;Ukrainien Mac"											// Cyrillic
 	IDS_ENCODING_WINDOWS1258		"Vietnamien (Windows-1258);Windows-1258"								// Southeast Asia
@@ -1948,7 +1958,7 @@ BEGIN
 	IDS_ENCODING_DOS437				"Etats-unis d'Amérique OEM (DOS-437);DOS-437"							// Western European
 	IDS_ENCODING_DOS858				"Latin-1 OEM + symbole de l'euro (DOS-858);DOS-858"						// Western European
 	IDS_ENCODING_DOS860				"Portugais OEM (DOS-860);DOS-860"										// Western European
-	IDS_ENCODING_MAC_arabic			"arabe Mac;arabe Mac"													// arabic
+	IDS_ENCODING_MAC_ARABIC			"arabe Mac;arabe Mac"													// arabic
 	IDS_ENCODING_DOS864				"arabe OEM (DOS-864);arabe OEM"											// arabic
 	IDS_ENCODING_MAC_ROMANIAN		"Romain Mac;Romain Mac"													// South European
 	IDS_ENCODING_DOS865				"OEM Nordique (DOS-865);DOS-865"										// Northern European
@@ -1971,7 +1981,7 @@ BEGIN
 
 	IDS_ENCODINGGROUP_UNICODE		"Unicode"
 	IDS_ENCODINGGROUP_WESTERNEURO	"Europe de l'ouest"
-	IDS_ENCODINGGROUP_arabic		"arabe"
+	IDS_ENCODINGGROUP_ARABIC		"arabe"
 	IDS_ENCODINGGROUP_NORTHERNEURO	"Balte et nord européen"
 	IDS_ENCODINGGROUP_CENTRALEURO	"Europe centrale et de l'est"
 	IDS_ENCODINGGROUP_CHINESE		"Chinois"
@@ -1982,7 +1992,7 @@ BEGIN
 	IDS_ENCODINGGROUP_KOREAN		"Coréen"
 	IDS_ENCODINGGROUP_SOUTHEURO		"Europe du sud"
 	IDS_ENCODINGGROUP_SOUTHASIA		"Asie de lu sud est"
-	IDS_ENCODINGGROUP_turkish		"turc"
+	IDS_ENCODINGGROUP_TURKISH		"turc"
 	IDS_ENCODINGGROUP_EBCDIC		"IBM EBCDIC"
 END
 
