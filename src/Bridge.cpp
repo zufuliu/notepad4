@@ -639,12 +639,12 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 	const size_t textLength = SciCall_GetStyledTextFull(&tr);
 
 	uint32_t styleUsed[8]{}; // bitmap for styles used in the range
-	styleUsed[STYLE_DEFAULT >> 5] |= (1 << (STYLE_DEFAULT & 31));
+	styleUsed[STYLE_DEFAULT >> 5] |= (1U << (STYLE_DEFAULT & 31));
 	unsigned maxStyle = STYLE_DEFAULT;
 
 	for (size_t offset = 1; offset < textLength; offset += 2) {
 		const uint8_t style = styledText[offset];
-		styleUsed[style >> 5] |= (1 << (style & 31));
+		styleUsed[style >> 5] |= (1U << (style & 31));
 		if (style > maxStyle) {
 			maxStyle = style;
 		}
@@ -659,7 +659,7 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 	std::unique_ptr<StyleDefinition[]> styleList = std::make_unique<StyleDefinition[]>(maxStyle);
 	if constexpr (STYLE_DEFAULT != 0) {
 		styleCount = 1;
-		styleUsed[STYLE_DEFAULT >> 5] &= ~(1 << (STYLE_DEFAULT & 31));
+		styleUsed[STYLE_DEFAULT >> 5] &= ~(1U << (STYLE_DEFAULT & 31));
 		GetStyleDefinitionFor(STYLE_DEFAULT, styleList[0]);
 	}
 
@@ -698,9 +698,11 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 #define RTF_COLORDEFOPEN "{\\colortbl"
 #define RTF_COLORDEFCLOSE "}"
 #define RTF_HEADERCLOSE "\n"
-// single box paragraph with background color set to style 0 (STYLE_DEFAULT)
-#define RTF_BODYOPEN "\\box\\cbpat1"
-#define RTF_BODYCLOSE "\\par}"
+#define RTF_BODYOPEN ""
+#define RTF_BODYCLOSE "}"
+// box paragraph with background color set to style 0 (STYLE_DEFAULT)
+#define RTF_PARAGRAPH_BEGIN "\\pard\\box\\cbpat1"
+#define RTF_PARAGRAPH_END "\\par\n"
 
 #define RTF_SETFONTFACE "\\f"
 #define RTF_SETFONTSIZE "\\fs"
@@ -805,11 +807,11 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			WideCharToMultiByte(legacyACP, 0, definition.fontWide, -1, fontFace, COUNTOF(fontFace), nullptr, nullptr);
 			const int charset = definition.charset;
 			if (charset == DEFAULT_CHARSET || charset == ANSI_CHARSET) {
-				(void)sprintf(fmtbuf, "{\\f%d\\fnil %s;}", iFont, fontFace);
+				fmtlen = sprintf(fmtbuf, "{\\f%d\\fnil %s;}", iFont, fontFace);
 			} else {
-				(void)sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s;}", iFont, charset, fontFace);
+				fmtlen = sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s;}", iFont, charset, fontFace);
 			}
-			os += fmtbuf;
+			os += {fmtbuf, fmtlen};
 		}
 
 		int iFore = 0;
@@ -848,11 +850,11 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 	os += RTF_FONTDEFCLOSE RTF_COLORDEFOPEN;
 	for (int i = 0; i < colorCount; i++) {
 		const COLORREF color = colorList[i];
-		(void)sprintf(fmtbuf, "\\red%d\\green%d\\blue%d;",
+		fmtlen = sprintf(fmtbuf, "\\red%d\\green%d\\blue%d;",
 			static_cast<int>(color & 0xff), static_cast<int>((color >> 8) & 0xff), static_cast<int>((color >> 16) & 0xff));
-		os += fmtbuf;
+		os += {fmtbuf, fmtlen};
 	}
-	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
+	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN RTF_PARAGRAPH_BEGIN;
 
 	const char *lastStyle = "";
 	bool prevCR = false;
@@ -914,13 +916,13 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 				const unsigned int u32 = SciCall_GetCharacterAndWidth(pos, &width);
 				offset += 2*(width - 1);
 				if (u32 < 0x10000) {
-					(void)sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
+					fmtlen = sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
 				} else {
-					(void)sprintf(fmtbuf, "\\u%d?\\u%d?",
+					fmtlen = sprintf(fmtbuf, "\\u%d?\\u%d?",
 						static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800),
 						static_cast<short>((u32 & 0x3ff) + 0xDC00));
 				}
-				os += fmtbuf;
+				os += {fmtbuf, fmtlen};
 			} else {
 				os += ch;
 			}
@@ -930,7 +932,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		prevCR = ch == '\r';
 	}
 
-	os += RTF_BODYCLOSE;
+	os += RTF_PARAGRAPH_END RTF_BODYCLOSE;
 	return os;
 }
 
