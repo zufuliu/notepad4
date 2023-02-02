@@ -628,6 +628,7 @@ void GetStyleDefinitionFor(int style, StyleDefinition &definition) noexcept {
 	definition.italic = SciCall_StyleGetItalic(style);
 	definition.underline = SciCall_StyleGetUnderline(style);
 	definition.strike = SciCall_StyleGetStrike(style);
+	definition.eolFilled = SciCall_StyleGetEOLFilled(style);
 	definition.charset = SciCall_StyleGetCharacterSet(style);
 	SciCall_StyleGetFont(style, definition.fontFace);
 }
@@ -701,8 +702,8 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 #define RTF_HEADERCLOSE "\n"
 #define RTF_BODYOPEN ""
 #define RTF_BODYCLOSE "}"
-// box paragraph with background color set to style 0 (STYLE_DEFAULT)
-#define RTF_PARAGRAPH_BEGIN "\\pard\\box\\cbpat1"
+// box paragraph with background color
+#define RTF_PARAGRAPH_BEGIN "\\pard\\box\\cbpat%u"
 #define RTF_PARAGRAPH_END "\\par\n"
 
 #define RTF_SETFONTFACE "\\f"
@@ -836,6 +837,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			colorList[colorCount++] = definition.backColor;
 		}
 
+		definition.backIndex = static_cast<uint16_t>(iBack);
 		fmtlen = sprintf(fmtbuf, RTF_SETFONTFACE "%d" RTF_SETFONTSIZE "%d" RTF_SETCOLOR "%d" RTF_SETBACKGROUND "%d",
 			iFont, GetRTFFontSize(definition.fontSize), iFore, iBack);
 
@@ -854,11 +856,29 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			static_cast<int>(color & 0xff), static_cast<int>((color >> 8) & 0xff), static_cast<int>((color >> 16) & 0xff));
 		os += {fmtbuf, fmtlen};
 	}
-	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN RTF_PARAGRAPH_BEGIN;
+	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
 
 	const char *lastStyle = "";
 	unsigned styleCurrent = STYLE_MAX + 1;
 	unsigned column = 0;
+	// check eolFilled on first line
+	bool eolFilled = false;
+	unsigned background = 1; // STYLE_DEFAULT
+	{
+		const Sci_Line line = SciCall_LineFromPosition(startPos);
+		const Sci_Position pos = SciCall_PositionFromLine(line + 1);
+		if (pos < endPos) {
+			uint8_t eolStyle = styledText[2*(pos - startPos) - 1];
+			eolStyle = styleMap[eolStyle];
+			eolFilled = styleList[eolStyle].eolFilled;
+			if (eolFilled) {
+				background = styleList[eolStyle].backIndex;
+			}
+		}
+		fmtlen = sprintf(fmtbuf, RTF_PARAGRAPH_BEGIN, background);
+		os += {fmtbuf, fmtlen};
+	}
+
 	for (size_t offset = 0; offset < textLength; offset += 2) {
 		const char ch = styledText[offset];
 		uint8_t style = styledText[offset + 1];
@@ -879,13 +899,12 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		} else if (ch == '\\') {
 			sv = "\\\\";
 		} else if (ch == '\t') {
-			const unsigned tabWidth = fvCurFile.iTabWidth;
-			unsigned padding = column - 1;
-			column = tabWidth*(1 + padding/tabWidth);
 			if (!fvCurFile.bTabsAsSpaces) {
 				sv = RTF_TAB;
 			} else {
-				padding = column - padding;
+				const unsigned tabWidth = fvCurFile.iTabWidth;
+				const unsigned padding = tabWidth - ((column - 1) % tabWidth);
+				column += padding;
 				for (unsigned itab = 0; itab < padding; itab++) {
 					os += ' ';
 				}
@@ -895,6 +914,30 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			column = 0;
 			if (ch == '\r' && styledText[offset + 2] == '\n') {
 				offset += 2;
+			}
+			// check eolFilled on next line
+			const Sci_Line line = SciCall_LineFromPosition(startPos + offset/2);
+			const Sci_Position pos = SciCall_PositionFromLine(line + 2);
+			if (pos < endPos) {
+				uint8_t eolStyle = styledText[2*(pos - startPos) - 1];
+				eolStyle = styleMap[eolStyle];
+				bool changed = styleList[eolStyle].eolFilled;
+				if (changed) {
+					eolFilled = true;
+					const unsigned backIndex = styleList[eolStyle].backIndex;
+					changed = backIndex != background;
+					background = backIndex;
+				} else if (eolFilled) {
+					changed = true;
+					eolFilled = false;
+					background = 1; // STYLE_DEFAULT
+				}
+				if (changed) {
+					lastStyle = "";
+					styleCurrent = STYLE_MAX + 1;
+					fmtlen = sprintf(fmtbuf, RTF_PARAGRAPH_END RTF_PARAGRAPH_BEGIN, background);
+					sv = {fmtbuf, fmtlen};
+				}
 			}
 		} else if (static_cast<signed char>(ch) < 0 && cpEdit == SC_CP_UTF8) {
 			const Sci_Position pos = startPos + offset/2;

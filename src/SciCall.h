@@ -731,6 +731,10 @@ NP2_inline void SciCall_StyleSetEOLFilled(int style, bool eolFilled) NP2_noexcep
 	SciCall(SCI_STYLESETEOLFILLED, style, eolFilled);
 }
 
+NP2_inline bool SciCall_StyleGetEOLFilled(int style) NP2_noexcept {
+	return (bool)SciCall(SCI_STYLEGETEOLFILLED, style, 0);
+}
+
 NP2_inline void SciCall_StyleSetCharacterSet(int style, int characterSet) NP2_noexcept {
 	SciCall(SCI_STYLESETCHARACTERSET, style, characterSet);
 }

@@ -67,6 +67,8 @@ typedef struct StyleDefinition {
 	bool strike;
 	bool overline;
 	bool eolFilled;
+	uint8_t unused;
+	uint16_t backIndex;
 	int charset;
 	WCHAR fontWide[LF_FACESIZE];
 	char fontFace[LF_FACESIZE * kMaxMultiByteCount];
