@@ -456,6 +456,13 @@ HBITMAP ResizeImageForCurrentDPI(HBITMAP hbmp) {
 		const int width = MulDiv(height, bmp.bmWidth, bmp.bmHeight);
 		HBITMAP hCopy = (HBITMAP)CopyImage(hbmp, IMAGE_BITMAP, width, height, LR_COPYRETURNORG | LR_COPYDELETEORG);
 		if (hCopy != NULL) {
+#if 0
+			BITMAP bmp2;
+			if (GetObject(hCopy, sizeof(BITMAP), &bmp2)) {
+				printf("%s %u: (%d x %d, %d) => (%d x %d, %d)\n", __func__, g_uCurrentDPI,
+				bmp.bmWidth, bmp.bmHeight, bmp.bmBitsPixel, bmp2.bmWidth, bmp2.bmHeight, bmp2.bmBitsPixel);
+			}
+#endif
 			hbmp = hCopy;
 		}
 	}

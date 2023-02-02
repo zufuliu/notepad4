@@ -339,6 +339,7 @@ class Bitmap:
 			counter = self.countColor()
 			if len(counter) > colorCount and (method == None or method < QuantizeMethod.Naive):
 				bmp = self.quantize(colorCount, method, False)
+				print(f'quantize {len(counter)} => {bmp.colorUsed}')
 				return bmp._build_palette(QuantizeMethod.Naive)
 
 			table = [item[0] for item in sorted(counter.items(), key=lambda m: (m[1], m[0]), reverse=True)][:colorCount]

@@ -27,6 +27,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <string>
+#include <string_view>
 #include <memory>
 
 #include "SciCall.h"
@@ -778,8 +779,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 	const std::unique_ptr<COLORREF[]> colorList = make_unique_for_overwrite<COLORREF[]>(2*styleCount);
 
 	UINT legacyACP = cpEdit;
-	const bool isUTF8 = cpEdit == SC_CP_UTF8;
-	if (isUTF8 || cpEdit == 0) {
+	if (legacyACP == SC_CP_UTF8 || legacyACP == 0) {
 		legacyACP = mEncoding[CPI_DEFAULT].uCodePage;
 	}
 
@@ -857,9 +857,8 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN RTF_PARAGRAPH_BEGIN;
 
 	const char *lastStyle = "";
-	bool prevCR = false;
-	int styleCurrent = -1;
-	int column = 0;
+	unsigned styleCurrent = STYLE_MAX + 1;
+	unsigned column = 0;
 	for (size_t offset = 0; offset < textLength; offset += 2) {
 		const char ch = styledText[offset];
 		uint8_t style = styledText[offset + 1];
@@ -871,65 +870,54 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			lastStyle = currentStyle;
 		}
 
-		switch (ch) {
-		case '{':
-			os += "\\{";
-			break;
-
-		case '}':
-			os += "\\}";
-			break;
-
-		case '\\':
-			os += "\\\\";
-			break;
-
-		case '\t':
+		std::string_view sv;
+		column++;
+		if (ch == '{') {
+			sv = "\\{";
+		} else if (ch == '{') {
+			sv = "\\}";
+		} else if (ch == '\\') {
+			sv = "\\\\";
+		} else if (ch == '\t') {
+			const unsigned tabWidth = fvCurFile.iTabWidth;
+			unsigned padding = column - 1;
+			column = tabWidth*(1 + padding/tabWidth);
 			if (!fvCurFile.bTabsAsSpaces) {
-				os += RTF_TAB;
+				sv = RTF_TAB;
 			} else {
-				const int tabWidth = fvCurFile.iTabWidth;
-				const int ts = tabWidth - (column % tabWidth);
-				for (int itab = 0; itab < ts; itab++) {
+				padding = column - padding;
+				for (unsigned itab = 0; itab < padding; itab++) {
 					os += ' ';
 				}
-				column += ts - 1;
 			}
-			break;
-
-		case '\n':
-			if (!prevCR) {
-				os += RTF_EOL;
-				column = -1;
+		} else if (ch == '\r' || ch == '\n') {
+			sv = RTF_EOL;
+			column = 0;
+			if (ch == '\r' && styledText[offset + 2] == '\n') {
+				offset += 2;
 			}
-			break;
-
-		case '\r':
-			os += RTF_EOL;
-			column = -1;
-			break;
-
-		default:
-			if (isUTF8 && static_cast<signed char>(ch) < 0) {
-				const Sci_Position pos = startPos + offset/2;
-				Sci_Position width = 0;
-				const unsigned int u32 = SciCall_GetCharacterAndWidth(pos, &width);
-				offset += 2*(width - 1);
-				if (u32 < 0x10000) {
-					fmtlen = sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
-				} else {
-					fmtlen = sprintf(fmtbuf, "\\u%d?\\u%d?",
-						static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800),
-						static_cast<short>((u32 & 0x3ff) + 0xDC00));
-				}
-				os += {fmtbuf, fmtlen};
+		} else if (static_cast<signed char>(ch) < 0 && cpEdit == SC_CP_UTF8) {
+			const Sci_Position pos = startPos + offset/2;
+			Sci_Position width = 0;
+			const unsigned int u32 = SciCall_GetCharacterAndWidth(pos, &width);
+			offset += 2*(width - 1);
+			if (u32 < 0x10000) {
+				fmtlen = sprintf(fmtbuf, "\\u%d?", static_cast<short>(u32));
 			} else {
+				fmtlen = sprintf(fmtbuf, "\\u%d?\\u%d?",
+					static_cast<short>(((u32 - 0x10000) >> 10) + 0xD800),
+					static_cast<short>((u32 & 0x3ff) + 0xDC00));
+			}
+			sv = {fmtbuf, fmtlen};
+		}
+
+		if (sv.empty()) {
+			if (ch != '\t') {
 				os += ch;
 			}
-			break;
+		} else {
+			os += sv;
 		}
-		column++;
-		prevCR = ch == '\r';
 	}
 
 	os += RTF_PARAGRAPH_END RTF_BODYCLOSE;
