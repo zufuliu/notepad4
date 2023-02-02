@@ -9,7 +9,7 @@
 
 //! Enable building with Hi-DPI image resources.
 // When disabled, only build with image resources at 100% scaling.
-#define NP2_ENABLE_HIDPI_IMAGE_RESOURCE			0
+#define NP2_ENABLE_HIDPI_IMAGE_RESOURCE			1
 
 //! Enable localization with satellite resource DLLs.
 #define NP2_ENABLE_APP_LOCALIZATION_DLL			1
