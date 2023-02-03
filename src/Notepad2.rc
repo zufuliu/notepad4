@@ -42,10 +42,11 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\Notepad2.exe.manifest"
 // remains consistent on all systems.
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\res\\Notepad2.ico"
+IDI_RUN                 ICON                    "..\\res\\Run.ico"
 #else
 IDR_MAINWND             ICON                    "..\\res\\Notepad2_min.ico"
-#endif
 IDI_RUN                 ICON                    "..\\res\\Run_min.ico"
+#endif
 IDI_STYLES              ICON                    "..\\res\\Styles.ico"
 
 /////////////////////////////////////////////////////////////////////////////

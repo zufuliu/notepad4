@@ -40,10 +40,11 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\metapath.exe.manifest"
 // remains consistent on all systems.
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\res\\metapath.ico"
+IDI_RUN                 ICON                    "..\\res\\Run.ico"
 #else
 IDR_MAINWND             ICON                    "..\\res\\metapath_min.ico"
-#endif
 IDI_RUN                 ICON                    "..\\res\\Run_min.ico"
+#endif
 IDI_PROGS               ICON                    "..\\res\\Progs.ico"
 IDI_OPTIONS             ICON                    "..\\res\\Options.ico"
 IDI_OPTIONS2            ICON                    "..\\res\\Options2.ico"
