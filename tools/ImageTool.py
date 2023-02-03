@@ -41,7 +41,7 @@ def quantize_external(path, out_path, colorCount, method):
 	#os.remove(temp);
 	return bmp
 
-def convert_image(path, out_path=None, colorDepth=None, method=None):
+def convert_image(path, out_path=None, colorDepth=None, quantize=True, method=None):
 	if not out_path:
 		name, ext = os.path.splitext(path)
 		if ext.lower() == '.bmp':
@@ -52,7 +52,7 @@ def convert_image(path, out_path=None, colorDepth=None, method=None):
 	print(f'convert image: {path} => {out_path}')
 	bmp = Bitmap.fromFileEx(path)
 	#bmp.resolution = (96, 96)
-	if colorDepth in (1, 4, 8):
+	if quantize and colorDepth in (1, 4, 8):
 		colorCount = 1 << colorDepth
 		current = bmp.colorUsed
 		if current > colorCount:

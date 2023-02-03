@@ -326,7 +326,7 @@ class Bitmap:
 					counter[color] = 1
 		return counter
 
-	def _build_palette(self, method=QuantizeMethod.Naive):
+	def _build_palette(self, method=None):
 		colorCount = 1 << self.bitsPerPixel
 		palette = self.palette
 		colorMap = {}
@@ -340,6 +340,7 @@ class Bitmap:
 			if len(counter) > colorCount and (method == None or method < QuantizeMethod.Naive):
 				bmp = self.quantize(colorCount, method, False)
 				print(f'quantize {len(counter)} => {bmp.colorUsed}')
+				bmp.bitsPerPixel = self.bitsPerPixel
 				return bmp._build_palette(QuantizeMethod.Naive)
 
 			table = [item[0] for item in sorted(counter.items(), key=lambda m: (m[1], m[0]), reverse=True)][:colorCount]
@@ -554,9 +555,9 @@ class Bitmap:
 		self.rows[y][x] = color
 
 	def save(self, path, colorDepth=None):
-		if colorDepth == 24 and not self.opaque():
-			bmp = Bitmap.fromImage(self.toImage(24, False))
-			bmp.save(path)
+		if colorDepth not in (None, 32) and not self.isOpaque():
+			bmp = self.asOpaque()
+			bmp.save(path, colorDepth)
 			return
 
 		infoHeader = self.infoHeader
@@ -602,7 +603,16 @@ class Bitmap:
 						bmp[x, y] = color
 		return bmp
 
-	def opaque(self, colorDepth=None):
+	def asOpaque(self, backColor=0xffffffff):
+		image = self.toImage(32, False)
+		background = Image.new('RGBA', image.size, color=backColor)
+		image = Image.alpha_composite(background, image)
+		#image = image.convert('RGB')
+		bmp = Bitmap.fromImage(image)
+		bmp.bitsPerPixel = 24
+		return bmp
+
+	def isOpaque(self, colorDepth=None):
 		colorDepth = colorDepth or self.bitsPerPixel
 		if colorDepth == 32:
 			return False
@@ -622,7 +632,7 @@ class Bitmap:
 		return transparent != total and (count == 0 or count == total)
 
 	def toImage(self, colorDepth=None, check=True):
-		if check and self.opaque(colorDepth):
+		if check and self.isOpaque(colorDepth):
 			image = Image.new('RGB', self.size)
 			data = []
 			for row in self.rows:
@@ -635,8 +645,6 @@ class Bitmap:
 			for row in self.rows:
 				data.extend(row)
 			image.putdata(data)
-			if colorDepth == 24:
-				image = image.convert('RGB')
 		return image
 
 	def resize(self, size, method=ResizeMethod.Lanczos):
