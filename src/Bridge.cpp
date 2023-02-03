@@ -676,6 +676,7 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 		for (; index < styleCount; index++) {
 			// NOLINTNEXTLINE(bugprone-suspicious-memory-comparison)
 			if (memcmp(&definition, &styleList[index], sizeof(StyleDefinition)) == 0) {
+				memset(definition.fontFace, 0, COUNTOF(definition.fontFace));
 				break;
 			}
 		}
@@ -694,10 +695,11 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 // https://latex2rtf.sourceforge.net/RTF-Spec-1.2.pdf
 
 // RTF version, character set and ANSI code page, default font, default tab width
-#define RTF_HEADEROPEN "{\\rtf1\\ansi\\ansicpg%u\\deff0\\deftab720"
+#define RTF_HEADEROPEN "{\\rtf1\\ansi\\ansicpg%u\\deff0\\deftab420"
 #define RTF_FONTDEFOPEN "{\\fonttbl"
 #define RTF_FONTDEFCLOSE "}"
-#define RTF_COLORDEFOPEN "{\\colortbl"
+// omitted definition for first color, which is used to turn off background highlighting
+#define RTF_COLORDEFOPEN "{\\colortbl;"
 #define RTF_COLORDEFCLOSE "}"
 #define RTF_HEADERCLOSE "\n"
 #define RTF_BODYOPEN ""
@@ -722,8 +724,8 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 #define RTF_EOL "\\line\n"
 #define RTF_TAB "\\tab "
 
-// font face, size, color, background, bold, italic, underline, strike
-#define RTF_MAX_STYLEPROP 8
+// font face, size, color, bold, italic, underline, strike
+#define RTF_MAX_STYLEPROP 7
 #define RTF_MAX_STYLEDEF 128
 #ifndef CF_RTF
 #define CF_RTF TEXT("Rich Text Format")
@@ -837,9 +839,9 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			colorList[colorCount++] = definition.backColor;
 		}
 
-		definition.backIndex = static_cast<uint16_t>(iBack);
-		fmtlen = sprintf(fmtbuf, RTF_SETFONTFACE "%d" RTF_SETFONTSIZE "%d" RTF_SETCOLOR "%d" RTF_SETBACKGROUND "%d",
-			iFont, GetRTFFontSize(definition.fontSize), iFore, iBack);
+		definition.backIndex = static_cast<uint16_t>(iBack + 1);
+		fmtlen = sprintf(fmtbuf, RTF_SETFONTFACE "%d" RTF_SETFONTSIZE "%d" RTF_SETCOLOR "%d",
+			iFont, GetRTFFontSize(definition.fontSize), iFore + 1);
 
 		std::string osStyle(fmtbuf, fmtlen);
 		osStyle += ((definition.weight >= FW_SEMIBOLD) ? RTF_BOLD_ON : RTF_BOLD_OFF);
@@ -862,8 +864,10 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 	unsigned styleCurrent = STYLE_MAX + 1;
 	unsigned column = 0;
 	// check eolFilled on first line
+	constexpr uint8_t defaultBackground = 2; // omitted default, STYLE_DEFAULT foreColor, STYLE_DEFAULT backColor
 	bool eolFilled = false;
-	unsigned background = 1; // STYLE_DEFAULT
+	unsigned background = defaultBackground;
+	unsigned highlight = 0;
 	{
 		const Sci_Line line = SciCall_LineFromPosition(startPos);
 		const Sci_Position pos = SciCall_PositionFromLine(line + 1);
@@ -888,6 +892,14 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			const char * const currentStyle = styles[style].c_str();
 			GetRTFStyleChange(os, lastStyle, currentStyle);
 			lastStyle = currentStyle;
+			// detect background color change
+			unsigned backIndex = styleList[style].backIndex;
+			backIndex = (backIndex == background)? 0 : backIndex;
+			if (backIndex != highlight) {
+				highlight = backIndex;
+				fmtlen = sprintf(fmtbuf, RTF_SETBACKGROUND "%u ", backIndex);
+				os += {fmtbuf, fmtlen};
+			}
 		}
 
 		std::string_view sv;
@@ -930,7 +942,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 				} else if (eolFilled) {
 					changed = true;
 					eolFilled = false;
-					background = 1; // STYLE_DEFAULT
+					background = defaultBackground;
 				}
 				if (changed) {
 					lastStyle = "";
