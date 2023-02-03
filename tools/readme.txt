@@ -13,8 +13,8 @@ images:
 	res/OpenFolder.bmp	images/16x16/Open.png
 	metapath/res/OpenFolder.bmp
 
-	res/Run.ico			images/32x32/Launch.png
-	metapath/res/Run.ico
+	res/Run_min.ico		images/32x32/Launch.png
+	metapath/res/Run_min.ico
 
 	16 color bitmap:
 		res/Prev.bmp		Prev2_16x.png

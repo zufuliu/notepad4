@@ -45,7 +45,7 @@ IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2.ico"
 #else
 IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2_min.ico"
 #endif
-IDI_RUN                 ICON                    "..\\..\\res\\Run.ico"
+IDI_RUN                 ICON                    "..\\..\\res\\Run_min.ico"
 IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 
 /////////////////////////////////////////////////////////////////////////////

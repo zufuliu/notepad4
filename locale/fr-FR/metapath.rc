@@ -43,7 +43,7 @@ IDR_MAINWND             ICON                    "..\\..\\metapath\\res\\metapath
 #else
 IDR_MAINWND             ICON                    "..\\..\\metapath\\res\\metapath_min.ico"
 #endif
-IDI_RUN                 ICON                    "..\\..\\metapath\\res\\Run.ico"
+IDI_RUN                 ICON                    "..\\..\\metapath\\res\\Run_min.ico"
 IDI_PROGS               ICON                    "..\\..\\metapath\\res\\Progs.ico"
 IDI_OPTIONS             ICON                    "..\\..\\metapath\\res\\Options.ico"
 IDI_OPTIONS2            ICON                    "..\\..\\metapath\\res\\Options2.ico"
