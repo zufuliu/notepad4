@@ -17,5 +17,5 @@ images:
 	metapath/res/Run_min.ico
 
 	16 color bitmap:
-		res/Prev.bmp		Prev2_16x.png
-		res/Next.bmp		Next2_16x.png
+		res/Prev.bmp		Prev.svg
+		res/Next.bmp		Next.svg

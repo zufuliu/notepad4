@@ -265,12 +265,22 @@ def make_all_notepad2_toolbar_bitmap():
 	for size in (16, 24, 32, 40, 48):
 		make_notepad2_toolbar_bitmap(size)
 
+def make_other_bitmap():
+	convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 24)
+	for size in (24, 32, 40, 48):
+		convert_image(f'images/{size}x{size}/Open.png', f'OpenFolder{size}.bmp', 8)
+
+	for size in (16, 24, 32, 40, 48):
+		convert_image(f'images/{size}x{size}/Next.png', f'Next{size}.bmp', 4)
+		convert_image(f'images/{size}x{size}/Prev.png', f'Prev{size}.bmp', 4)
+
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()
-#convert_image('images/16x16/Open.png', 'OpenFolder.bmp')
-#convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 4, QuantizeMethod.PngQuant)
-#concat_horizontal(['../res/Toolbar.bmp', 'images/16x16/AlwaysOnTop.png'], 'Toolbar.bmp')
+#make_other_bitmap()
 
+#convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 4, QuantizeMethod.PngQuant)
+
+#concat_horizontal(['../res/Toolbar.bmp', 'images/16x16/AlwaysOnTop.png'], 'Toolbar.bmp')
 #split_horizontal('Toolbar.bmp', '16x40')
 
 #resize_toolbar_bitmap('../res/Toolbar.bmp', 200, ResizeMethod.Nearest)
