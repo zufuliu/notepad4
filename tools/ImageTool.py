@@ -266,13 +266,19 @@ def make_all_notepad2_toolbar_bitmap():
 		make_notepad2_toolbar_bitmap(size)
 
 def make_other_bitmap():
-	convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 24)
-	for size in (24, 32, 40, 48):
-		convert_image(f'images/{size}x{size}/Open.png', f'OpenFolder{size}.bmp', 8)
+	for size in (16, 24, 32, 40, 48):
+		colorDepth = 24 if size == 16 else 8
+		convert_image(f'images/{size}x{size}/Open.png', f'OpenFolder{size}.bmp', colorDepth)
 
 	for size in (16, 24, 32, 40, 48):
-		convert_image(f'images/{size}x{size}/Next.png', f'Next{size}.bmp', 4, False)
-		convert_image(f'images/{size}x{size}/Prev.png', f'Prev{size}.bmp', 4, False)
+		images = f'images/{size}x{size}'
+		convert_image(f'{images}/Next.png', f'Next{size}.bmp', 4, False)
+		convert_image(f'{images}/Prev.png', f'Prev{size}.bmp', 4, False)
+
+	for size in (16, 24, 32, 40, 48):
+		colorDepth = 24 if size == 16 else 8
+		images = f'images/{size}x{size}'
+		concat_horizontal([f'{images}/Encoding.png', f'{images}/EncodingGray.png'], f'Encoding{size}.bmp', colorDepth)
 
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()

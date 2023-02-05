@@ -5,7 +5,7 @@ images:
 	https://learn.microsoft.com/en-us/windows/win32/uxguide/vis-icons
 	https://learn.microsoft.com/en-us/windows/apps/design/style/iconography/app-icon-construction#icon-scaling
 
-	res/Encoding.bmp	images/Encoding.svg, Encoding_Gray.svg
+	res/Encoding.bmp	images/Encoding.svg, EncodingGray.svg
 		Top: Cyrillic letter Ya, я or Я
 		Bottom left: Latin small letter a
 		Bottom right: Chinese character 宇 (universal)

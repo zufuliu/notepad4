@@ -31,7 +31,11 @@
 #define IDB_NEXT40						118
 #define IDB_NEXT48						119
 #define IDB_PICK						120
-#define IDB_ENCODING					121
+#define IDB_ENCODING16					121
+#define IDB_ENCODING24					122
+#define IDB_ENCODING32					123
+#define IDB_ENCODING40					124
+#define IDB_ENCODING48					125
 
 // Cursor
 #define IDC_COPY						100

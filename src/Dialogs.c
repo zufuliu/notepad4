@@ -1933,7 +1933,8 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		// TODO: following code is buggy when icon size for shfi.hIcon is larger than bmp.bmHeight,
 		// we need to determine icon size first, then resize the encoding mask bitmap accordingly.
 
-		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(IDB_ENCODING), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_ENCODING16);
+		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		hbmp = ResizeImageForCurrentDPI(hbmp); // 32x16
 		BITMAP bmp;
 		GetObject(hbmp, sizeof(BITMAP), &bmp);

@@ -59,7 +59,7 @@ IDB_OPEN_FOLDER16       BITMAP                  "..\\res\\OpenFolder16.bmp"
 IDB_NEXT16              BITMAP                  "..\\res\\Next16.bmp"
 IDB_PREV16              BITMAP                  "..\\res\\Prev16.bmp"
 IDB_PICK                BITMAP                  "..\\res\\Pick.bmp"
-IDB_ENCODING            BITMAP                  "..\\res\\Encoding.bmp"
+IDB_ENCODING16          BITMAP                  "..\\res\\Encoding16.bmp"
 
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDB_TOOLBAR24           BITMAP                  "..\\res\\Toolbar24.bmp"
@@ -81,6 +81,11 @@ IDB_PREV24              BITMAP                  "..\\res\\Prev24.bmp"
 IDB_PREV32              BITMAP                  "..\\res\\Prev32.bmp"
 IDB_PREV40              BITMAP                  "..\\res\\Prev40.bmp"
 IDB_PREV48              BITMAP                  "..\\res\\Prev48.bmp"
+
+IDB_ENCODING24          BITMAP                  "..\\res\\Encoding24.bmp"
+IDB_ENCODING32          BITMAP                  "..\\res\\Encoding32.bmp"
+IDB_ENCODING40          BITMAP                  "..\\res\\Encoding40.bmp"
+IDB_ENCODING48          BITMAP                  "..\\res\\Encoding48.bmp"
 #endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////
