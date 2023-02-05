@@ -15,11 +15,24 @@
 #define IDB_TOOLBAR32					102
 #define IDB_TOOLBAR40					103
 #define IDB_TOOLBAR48					104
-#define IDB_OPEN_FOLDER					105
-#define IDB_PREV						106
-#define IDB_NEXT						107
-#define IDB_PICK						108
-#define IDB_ENCODING					109
+#define IDB_OPEN_FOLDER16				105
+#define IDB_OPEN_FOLDER24				106
+#define IDB_OPEN_FOLDER32				107
+#define IDB_OPEN_FOLDER40				108
+#define IDB_OPEN_FOLDER48				109
+#define IDB_PREV16						110
+#define IDB_PREV24						111
+#define IDB_PREV32						112
+#define IDB_PREV40						113
+#define IDB_PREV48						114
+#define IDB_NEXT16						115
+#define IDB_NEXT24						116
+#define IDB_NEXT32						117
+#define IDB_NEXT40						118
+#define IDB_NEXT48						119
+#define IDB_PICK						120
+#define IDB_ENCODING					121
+
 // Cursor
 #define IDC_COPY						100
 // Common

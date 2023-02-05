@@ -172,6 +172,19 @@ extern int SystemMetricsForDpi(int nIndex, UINT dpi) NP2_noexcept;
 extern BOOL AdjustWindowRectForDpi(LPRECT lpRect, DWORD dwStyle, DWORD dwExStyle, UINT dpi) NP2_noexcept;
 #endif
 
+#if defined(NP2_ENABLE_HIDPI_IMAGE_RESOURCE) && NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+NP2_inline int GetBitmapResourceIdForCurrentDPI(int resourceId)	{
+	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI + USER_DEFAULT_SCREEN_DPI/4) {
+		int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
+		scale = min_i(scale, 6);
+		resourceId += scale - 2;
+	}
+	return resourceId;
+}
+#else
+#define GetBitmapResourceIdForCurrentDPI(resourceId)	(resourceId)
+#endif
+
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
@@ -423,7 +436,7 @@ void ResizeDlg_Size(HWND hwnd, LPARAM lParam, int *cx, int *cy);
 void ResizeDlg_GetMinMaxInfo(HWND hwnd, LPARAM lParam);
 HDWP DeferCtlPos(HDWP hdwp, HWND hwndDlg, int nCtlId, int dx, int dy, UINT uFlags);
 void ResizeDlgCtl(HWND hwndDlg, int nCtlId, int dx, int dy);
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 void SetClipData(HWND hwnd, LPCWSTR pszData);
 void SetWindowTransparentMode(HWND hwnd, bool bTransparentMode, int iOpacityLevel);

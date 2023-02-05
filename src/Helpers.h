@@ -387,6 +387,19 @@ NP2_inline DWORD GetCurrentIconHandleFlags(void) {
 	return GetIconHandleFlagsForDPI(g_uCurrentDPI);
 }
 
+#if defined(NP2_ENABLE_HIDPI_IMAGE_RESOURCE) && NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+NP2_inline int GetBitmapResourceIdForCurrentDPI(int resourceId)	{
+	if (g_uCurrentDPI > USER_DEFAULT_SCREEN_DPI + USER_DEFAULT_SCREEN_DPI/4) {
+		int scale = (g_uCurrentDPI + USER_DEFAULT_SCREEN_DPI/4 - 1) / (USER_DEFAULT_SCREEN_DPI/2);
+		scale = min_i(scale, 6);
+		resourceId += scale - 2;
+	}
+	return resourceId;
+}
+#else
+#define GetBitmapResourceIdForCurrentDPI(resourceId)	(resourceId)
+#endif
+
 // https://docs.microsoft.com/en-us/windows/desktop/Memory/comparing-memory-allocation-methods
 // https://blogs.msdn.microsoft.com/oldnewthing/20120316-00/?p=8083/
 #define NP2HeapAlloc(size)			HeapAlloc(g_hDefaultHeap, HEAP_ZERO_MEMORY, (size))
@@ -692,7 +705,7 @@ void MultilineEditSetup(HWND hwndDlg, int nCtlId);
 // https://docs.microsoft.com/en-us/windows/desktop/Controls/en-change
 #define NotifyEditTextChanged(hwndDlg, nCtlId)	SendWMCommandEx(hwndDlg, nCtlId, EN_CHANGE)
 
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId);
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId);
 void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF crColor);
 void DeleteBitmapButton(HWND hwnd, int nCtlId);
 

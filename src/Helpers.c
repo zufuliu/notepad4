@@ -1258,7 +1258,12 @@ void MultilineEditSetup(HWND hwndDlg, int nCtlId) {
 //
 // MakeBitmapButton()
 //
-void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, WORD wBmpId) {
+void MakeBitmapButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, int wBmpId) {
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+	if (hInstance) {
+		wBmpId = GetBitmapResourceIdForCurrentDPI(wBmpId);
+	}
+#endif
 	HWND hwndCtl = GetDlgItem(hwnd, nCtlId);
 	HBITMAP hBmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(wBmpId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	hBmp = ResizeImageForCurrentDPI(hBmp);

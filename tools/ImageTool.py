@@ -66,7 +66,7 @@ def convert_image(path, out_path=None, colorDepth=None, quantize=True, method=No
 	save_bitmap(bmp, out_path, colorDepth)
 
 
-def concat_images(horizontal, paths, out_path):
+def concat_images(horizontal, paths, out_path, colorDepth=None):
 	if horizontal:
 		print('concat horizontal:', ', '.join(paths), '=>', out_path)
 	else:
@@ -81,13 +81,13 @@ def concat_images(horizontal, paths, out_path):
 		bmp = Bitmap.concatHorizontal(bmps)
 	else:
 		bmp = Bitmap.concatVertical(bmps)
-	save_bitmap(bmp, out_path)
+	save_bitmap(bmp, out_path, colorDepth)
 
-def concat_horizontal(paths, out_path):
-	concat_images(True, paths, out_path)
+def concat_horizontal(paths, out_path, colorDepth=None):
+	concat_images(True, paths, out_path, colorDepth)
 
-def concat_vertical(paths, out_path):
-	concat_images(False, paths, out_path)
+def concat_vertical(paths, out_path, colorDepth=None):
+	concat_images(False, paths, out_path, colorDepth)
 
 
 def save_bitmap_list(bmps, out_path, ext):
@@ -271,8 +271,8 @@ def make_other_bitmap():
 		convert_image(f'images/{size}x{size}/Open.png', f'OpenFolder{size}.bmp', 8)
 
 	for size in (16, 24, 32, 40, 48):
-		convert_image(f'images/{size}x{size}/Next.png', f'Next{size}.bmp', 4)
-		convert_image(f'images/{size}x{size}/Prev.png', f'Prev{size}.bmp', 4)
+		convert_image(f'images/{size}x{size}/Next.png', f'Next{size}.bmp', 4, False)
+		convert_image(f'images/{size}x{size}/Prev.png', f'Prev{size}.bmp', 4, False)
 
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()

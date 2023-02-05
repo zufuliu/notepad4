@@ -55,9 +55,9 @@ IDI_STYLES              ICON                    "..\\res\\Styles.ico"
 //
 
 IDB_TOOLBAR16           BITMAP                  "..\\res\\Toolbar16.bmp"
-IDB_OPEN_FOLDER         BITMAP                  "..\\res\\OpenFolder.bmp"
-IDB_NEXT                BITMAP                  "..\\res\\Next.bmp"
-IDB_PREV                BITMAP                  "..\\res\\Prev.bmp"
+IDB_OPEN_FOLDER16       BITMAP                  "..\\res\\OpenFolder16.bmp"
+IDB_NEXT16              BITMAP                  "..\\res\\Next16.bmp"
+IDB_PREV16              BITMAP                  "..\\res\\Prev16.bmp"
 IDB_PICK                BITMAP                  "..\\res\\Pick.bmp"
 IDB_ENCODING            BITMAP                  "..\\res\\Encoding.bmp"
 
@@ -66,6 +66,21 @@ IDB_TOOLBAR24           BITMAP                  "..\\res\\Toolbar24.bmp"
 IDB_TOOLBAR32           BITMAP                  "..\\res\\Toolbar32.bmp"
 IDB_TOOLBAR40           BITMAP                  "..\\res\\Toolbar40.bmp"
 IDB_TOOLBAR48           BITMAP                  "..\\res\\Toolbar48.bmp"
+
+IDB_OPEN_FOLDER24       BITMAP                  "..\\res\\OpenFolder24.bmp"
+IDB_OPEN_FOLDER32       BITMAP                  "..\\res\\OpenFolder32.bmp"
+IDB_OPEN_FOLDER40       BITMAP                  "..\\res\\OpenFolder40.bmp"
+IDB_OPEN_FOLDER48       BITMAP                  "..\\res\\OpenFolder48.bmp"
+
+IDB_NEXT24              BITMAP                  "..\\res\\Next24.bmp"
+IDB_NEXT32              BITMAP                  "..\\res\\Next32.bmp"
+IDB_NEXT40              BITMAP                  "..\\res\\Next40.bmp"
+IDB_NEXT48              BITMAP                  "..\\res\\Next48.bmp"
+
+IDB_PREV24              BITMAP                  "..\\res\\Prev24.bmp"
+IDB_PREV32              BITMAP                  "..\\res\\Prev32.bmp"
+IDB_PREV40              BITMAP                  "..\\res\\Prev40.bmp"
+IDB_PREV48              BITMAP                  "..\\res\\Prev48.bmp"
 #endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////

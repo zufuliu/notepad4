@@ -19,7 +19,11 @@
 #define IDB_TOOLBAR32					102
 #define IDB_TOOLBAR40					103
 #define IDB_TOOLBAR48					104
-#define IDB_OPEN_FOLDER					105
+#define IDB_OPEN_FOLDER16				105
+#define IDB_OPEN_FOLDER24				106
+#define IDB_OPEN_FOLDER32				107
+#define IDB_OPEN_FOLDER40				108
+#define IDB_OPEN_FOLDER48				109
 // Cursor
 #define IDC_CROSSHAIR					100
 // Common
