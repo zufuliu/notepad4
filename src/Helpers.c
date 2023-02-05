@@ -1295,12 +1295,6 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 	if (IsWindowEnabled(hwndCtl) && crColor != (COLORREF)(-1)) {
 		colormap[0].from = RGB(0x00, 0x00, 0x00);
 		colormap[0].to	 = GetSysColor(COLOR_3DSHADOW);
-	} else {
-		colormap[0].from = RGB(0x00, 0x00, 0x00);
-		colormap[0].to	 = RGB(0xFF, 0xFF, 0xFF);
-	}
-
-	if (IsWindowEnabled(hwndCtl) && crColor != (COLORREF)(-1)) {
 		if (crColor == RGB(0xFF, 0xFF, 0xFF)) {
 			crColor = RGB(0xFF, 0xFF, 0xFE);
 		}
@@ -1308,13 +1302,18 @@ void MakeColorPickButton(HWND hwnd, int nCtlId, HINSTANCE hInstance, COLORREF cr
 		colormap[1].from = RGB(0xFF, 0xFF, 0xFF);
 		colormap[1].to	 = crColor;
 	} else {
+		colormap[0].from = RGB(0x00, 0x00, 0x00);
+		colormap[0].to	 = RGB(0xFF, 0xFF, 0xFF);
 		colormap[1].from = RGB(0xFF, 0xFF, 0xFF);
 		colormap[1].to	 = RGB(0xFF, 0xFF, 0xFF);
 	}
 
 	HBITMAP hBmp = CreateMappedBitmap(hInstance, IDB_PICK, 0, colormap, 2);
+	hBmp = ResizeImageForCurrentDPI(hBmp);
+	BITMAP bmp;
+	GetObject(hBmp, sizeof(BITMAP), &bmp);
 
-	bi.himl = ImageList_Create(16, 16, ILC_COLORDDB | ILC_MASK, 1, 0);
+	bi.himl = ImageList_Create(bmp.bmWidth, bmp.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 	ImageList_AddMasked(bi.himl, hBmp, RGB(0xFF, 0xFF, 0xFF));
 	DeleteObject(hBmp);
 
