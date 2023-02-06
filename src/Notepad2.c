@@ -67,6 +67,7 @@ HWND	hDlgFindReplace = NULL;
 static bool bInitDone = false;
 static HACCEL hAccMain;
 static HACCEL hAccFindReplace;
+static HICON hTrayIcon = NULL;
 
 // tab width for notification text
 #define TAB_WIDTH_NOTIFICATION		8
@@ -473,6 +474,9 @@ static void CleanUpResources(bool initialized) {
 	Edit_ReleaseResources();
 	Scintilla_ReleaseResources();
 
+	if (hTrayIcon) {
+		DestroyIcon(hTrayIcon);
+	}
 	if (initialized) {
 		UnregisterClass(wchWndClass, g_hInstance);
 	}
@@ -2129,6 +2133,11 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const RECT* const rc = (RECT *)lParam;
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
+
+	if (hTrayIcon && IsWindowVisible(hwnd)) {
+		DestroyIcon(hTrayIcon);
+		hTrayIcon = NULL;
+	}
 
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -8513,9 +8522,13 @@ void SnapToDefaultPos(HWND hwnd) {
 //
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) {
-	static HICON hIcon;
-	if (!hIcon) {
-		hIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	if (!hTrayIcon) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		LoadIconMetric(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
+#else
+		const int size = GetSystemMetrics(SM_CXSMICON);
+		hTrayIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+#endif
 	}
 
 	NOTIFYICONDATA nid;
@@ -8525,7 +8538,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	nid.uID = 0;
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	nid.uCallbackMessage = APPM_TRAYMESSAGE;
-	nid.hIcon = hIcon;
+	nid.hIcon = hTrayIcon;
 	lstrcpy(nid.szTip, WC_NOTEPAD2);
 	Shell_NotifyIcon(bAdd ? NIM_ADD : NIM_DELETE, &nid);
 }

@@ -70,6 +70,7 @@ static TBBUTTON tbbMainWnd[] = {
 static HWND hwndDriveBox;
 HWND	hwndDirList;
 HWND	hwndMain;
+static HICON hTrayIcon = NULL;
 
 static HANDLE hChangeHandle = NULL;
 HISTORY	mHistory;
@@ -232,6 +233,9 @@ static void CleanUpResources(bool initialized) {
 	}
 	if (tchToolbarBitmapDisabled != NULL) {
 		LocalFree(tchToolbarBitmapDisabled);
+	}
+	if (hTrayIcon) {
+		DestroyIcon(hTrayIcon);
 	}
 	if (initialized) {
 		UnregisterClass(WC_METAPATH, g_hInstance);
@@ -1058,6 +1062,11 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
+
+	if (hTrayIcon && IsWindowVisible(hwnd)) {
+		DestroyIcon(hTrayIcon);
+		hTrayIcon = NULL;
+	}
 
 	// recreate toolbar and statusbar
 	WCHAR chStatus[255];
@@ -3547,9 +3556,13 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 //
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) {
-	static HICON hIcon;
-	if (!hIcon) {
-		hIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	if (!hTrayIcon) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		LoadIconMetric(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
+#else
+		const int size = GetSystemMetrics(SM_CXSMICON);
+		hTrayIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+#endif
 	}
 
 	NOTIFYICONDATA nid;
@@ -3559,7 +3572,7 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 	nid.uID = 0;
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	nid.uCallbackMessage = APPM_TRAYMESSAGE;
-	nid.hIcon = hIcon;
+	nid.hIcon = hTrayIcon;
 	lstrcpy(nid.szTip, WC_METAPATH);
 	Shell_NotifyIcon(bAdd ? NIM_ADD : NIM_DELETE, &nid);
 }
