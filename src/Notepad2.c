@@ -68,6 +68,7 @@ static bool bInitDone = false;
 static HACCEL hAccMain;
 static HACCEL hAccFindReplace;
 static HICON hTrayIcon = NULL;
+static UINT uTrayIconDPI = 0;
 
 // tab width for notification text
 #define TAB_WIDTH_NOTIFICATION		8
@@ -2133,11 +2134,6 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const RECT* const rc = (RECT *)lParam;
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
-
-	if (hTrayIcon && IsWindowVisible(hwnd)) {
-		DestroyIcon(hTrayIcon);
-		hTrayIcon = NULL;
-	}
 
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
@@ -8522,11 +8518,16 @@ void SnapToDefaultPos(HWND hwnd) {
 //
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) {
-	if (!hTrayIcon) {
+	if (bAdd && (hTrayIcon == NULL || uTrayIconDPI != g_uCurrentDPI)) {
+		if (hTrayIcon) {
+			DestroyIcon(hTrayIcon);
+			hTrayIcon = NULL;
+		}
+		uTrayIconDPI = g_uCurrentDPI;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LoadIconMetric(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
 #else
-		const int size = GetSystemMetrics(SM_CXSMICON);
+		const int size = SystemMetricsForDpi(SM_CXSMICON, uTrayIconDPI);
 		hTrayIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
 #endif
 	}

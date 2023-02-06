@@ -71,6 +71,7 @@ static HWND hwndDriveBox;
 HWND	hwndDirList;
 HWND	hwndMain;
 static HICON hTrayIcon = NULL;
+static UINT uTrayIconDPI = 0;
 
 static HANDLE hChangeHandle = NULL;
 HISTORY	mHistory;
@@ -1062,11 +1063,6 @@ void RecreateBars(HWND hwnd, HINSTANCE hInstance) {
 void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	g_uCurrentDPI = HIWORD(wParam);
 	const RECT* const rc = (RECT *)lParam;
-
-	if (hTrayIcon && IsWindowVisible(hwnd)) {
-		DestroyIcon(hTrayIcon);
-		hTrayIcon = NULL;
-	}
 
 	// recreate toolbar and statusbar
 	WCHAR chStatus[255];
@@ -3556,11 +3552,16 @@ void GetRelaunchParameters(LPWSTR szParameters) {
 //
 //
 void ShowNotifyIcon(HWND hwnd, bool bAdd) {
-	if (!hTrayIcon) {
+	if (bAdd && (hTrayIcon == NULL || uTrayIconDPI != g_uCurrentDPI)) {
+		if (hTrayIcon) {
+			DestroyIcon(hTrayIcon);
+			hTrayIcon = NULL;
+		}
+		uTrayIconDPI = g_uCurrentDPI;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
 		LoadIconMetric(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
 #else
-		const int size = GetSystemMetrics(SM_CXSMICON);
+		const int size = SystemMetricsForDpi(SM_CXSMICON, uTrayIconDPI);
 		hTrayIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
 #endif
 	}
