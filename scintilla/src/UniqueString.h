@@ -33,7 +33,7 @@ template <typename T>
 inline std::unique_ptr<T[]> UniqueCopy(const T *data, size_t length) {
 	std::unique_ptr<T[]> copy = make_unique_for_overwrite<T[]>(length);
 	memcpy(copy.get(), data, length * sizeof(T));
-	return std::move(copy);
+	return copy;
 }
 
 using UniqueString = std::unique_ptr<const char[]>;

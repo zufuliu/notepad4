@@ -814,7 +814,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			} else {
 				fmtlen = sprintf(fmtbuf, "{\\f%d\\fnil\\fcharset%d %s;}", iFont, charset, fontFace);
 			}
-			os += {fmtbuf, fmtlen};
+			os += std::string_view{fmtbuf, fmtlen};
 		}
 
 		int iFore = 0;
@@ -856,7 +856,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		const COLORREF color = colorList[i];
 		fmtlen = sprintf(fmtbuf, "\\red%d\\green%d\\blue%d;",
 			static_cast<int>(color & 0xff), static_cast<int>((color >> 8) & 0xff), static_cast<int>((color >> 16) & 0xff));
-		os += {fmtbuf, fmtlen};
+		os += std::string_view{fmtbuf, fmtlen};
 	}
 	os += RTF_COLORDEFCLOSE RTF_HEADERCLOSE RTF_BODYOPEN;
 
@@ -880,7 +880,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			}
 		}
 		fmtlen = sprintf(fmtbuf, RTF_PARAGRAPH_BEGIN, background);
-		os += {fmtbuf, fmtlen};
+		os += std::string_view{fmtbuf, fmtlen};
 	}
 
 	for (size_t offset = 0; offset < textLength; offset += 2) {
@@ -898,7 +898,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			if (backIndex != highlight) {
 				highlight = backIndex;
 				fmtlen = sprintf(fmtbuf, RTF_SETBACKGROUND "%u ", backIndex);
-				os += {fmtbuf, fmtlen};
+				os += std::string_view{fmtbuf, fmtlen};
 			}
 		}
 
