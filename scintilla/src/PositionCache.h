@@ -44,7 +44,6 @@ public:
  */
 class LineLayout final {
 private:
-	friend class LineLayoutCache;
 	std::unique_ptr<int[]> lineStarts;
 	/// Drawing is only performed for @a maxLineLength characters on each line.
 	const Sci::Line lineNumber;
@@ -114,7 +113,10 @@ public:
 	int SCICALL FindPositionFromX(XYPOSITION x, Range range, bool charPosition) const noexcept;
 	Point PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const noexcept;
 	XYPOSITION XInLine(Sci::Position index) const noexcept;
+	Interval Span(int start, int end) const noexcept;
+	Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
+	void WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION width, bool partialLine);
 };
 
 struct ScreenLine : public IScreenLine {

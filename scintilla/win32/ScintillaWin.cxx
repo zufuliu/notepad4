@@ -530,17 +530,17 @@ class ScintillaWin final :
 	std::string UTF8FromEncoded(std::string_view encoded) const override;
 	std::string EncodedFromUTF8(std::string_view utf8) const override;
 
-	std::string EncodeWString(std::wstring_view wsv);
+	std::string EncodeWString(std::wstring_view wsv) const;
 	sptr_t DefWndProc(Message iMessage, uptr_t wParam, sptr_t lParam) noexcept override;
 	void IdleWork() override;
 	void QueueIdleWork(WorkItems items, Sci::Position upTo) noexcept override;
 	bool SetIdle(bool on) noexcept override;
 	UINT_PTR timers[static_cast<int>(TickReason::dwell) + 1]{};
-	bool FineTickerRunning(TickReason reason) noexcept override;
+	bool FineTickerRunning(TickReason reason) const noexcept override;
 	void FineTickerStart(TickReason reason, int millis, int tolerance) noexcept override;
 	void FineTickerCancel(TickReason reason) noexcept override;
 	void SetMouseCapture(bool on) noexcept override;
-	bool HaveMouseCapture() noexcept override;
+	bool HaveMouseCapture() const noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
 	void UpdateBaseElements() override;
 	bool SCICALL PaintContains(PRectangle rc) const noexcept override;
@@ -560,8 +560,8 @@ class ScintillaWin final :
 	void NotifyDoubleClick(Point pt, KeyMod modifiers) override;
 	void NotifyURIDropped(const char *list) noexcept;
 	std::unique_ptr<CaseFolder> CaseFolderForEncoding() override;
-	std::string CaseMapString(const std::string &s, CaseMapping caseMapping) override;
-	void Copy(bool asBinary) override;
+	std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const override;
+	void Copy(bool asBinary) const override;
 	bool CanPaste() noexcept override;
 	void Paste(bool asBinary) override;
 	void SCICALL CreateCallTipWindow(PRectangle rc) noexcept override;
@@ -577,8 +577,8 @@ class ScintillaWin final :
 	};
 
 	void GetIntelliMouseParameters() noexcept;
-	void CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding);
-	void CopyToClipboard(const SelectionText &selectedText) override;
+	void CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) const;
+	void CopyToClipboard(const SelectionText &selectedText) const override;
 	void ScrollMessage(WPARAM wParam);
 	void HorizontalScrollMessage(WPARAM wParam);
 	void FullPaint();
@@ -1581,7 +1581,7 @@ UINT ScintillaWin::CodePageOfDocument() const noexcept {
 	return pdoc->dbcsCodePage; // see Message::GetCodePage in Editor.cxx
 }
 
-std::string ScintillaWin::EncodeWString(std::wstring_view wsv) {
+std::string ScintillaWin::EncodeWString(std::wstring_view wsv) const {
 	if (IsUnicodeMode()) {
 		const size_t len = UTF8Length(wsv);
 		std::string putf(len, '\0');
@@ -2485,7 +2485,7 @@ sptr_t ScintillaWin::DefWndProc(Message iMessage, uptr_t wParam, sptr_t lParam) 
 	return ::DefWindowProc(MainHWND(), static_cast<unsigned int>(iMessage), wParam, lParam);
 }
 
-bool ScintillaWin::FineTickerRunning(TickReason reason) noexcept {
+bool ScintillaWin::FineTickerRunning(TickReason reason) const noexcept {
 	return timers[static_cast<size_t>(reason)] != 0;
 }
 
@@ -2558,7 +2558,7 @@ void ScintillaWin::SetMouseCapture(bool on) noexcept {
 	capturedMouse = on;
 }
 
-bool ScintillaWin::HaveMouseCapture() noexcept {
+bool ScintillaWin::HaveMouseCapture() const noexcept {
 	// Cannot just see if GetCapture is this window as the scroll bar also sets capture for the window
 	return capturedMouse;
 	//return capturedMouse && (::GetCapture() == MainHWND());
@@ -2864,7 +2864,7 @@ std::unique_ptr<CaseFolder> ScintillaWin::CaseFolderForEncoding() {
 	}
 }
 
-std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMapping) {
+std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMapping) const {
 	if (s.empty() || (caseMapping == CaseMapping::same))
 		return s;
 
@@ -2888,7 +2888,7 @@ std::string ScintillaWin::CaseMapString(const std::string &s, CaseMapping caseMa
 	return sConverted;
 }
 
-void ScintillaWin::Copy(bool asBinary) {
+void ScintillaWin::Copy(bool asBinary) const {
 	//Platform::DebugPrintf("Copy\n");
 	if (!sel.Empty()) {
 		SelectionText selectedText;
@@ -3407,7 +3407,7 @@ void ScintillaWin::GetIntelliMouseParameters() noexcept {
 	}
 }
 
-void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) {
+void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) const {
 	const std::string_view svSelected(selectedText.Data(), selectedText.LengthWithTerminator());
 	switch (encoding) {
 	case CopyEncoding::Unicode: {
@@ -3446,7 +3446,7 @@ void ScintillaWin::CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &se
 	}
 }
 
-void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) {
+void ScintillaWin::CopyToClipboard(const SelectionText &selectedText) const {
 	if (!::OpenClipboardRetry(MainHWND())) {
 		return;
 	}

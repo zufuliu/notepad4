@@ -78,6 +78,12 @@ struct SelectionSegment {
 	Sci::Position Length() const noexcept {
 		return end.Position() - start.Position();
 	}
+	SelectionSegment Subtract(Sci::Position increment) const noexcept {
+		SelectionSegment ret(start, end);
+		ret.start.Add(-increment);
+		ret.end.Add(-increment);
+		return ret;
+	}
 };
 
 struct SelectionRange {

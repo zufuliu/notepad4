@@ -23,7 +23,6 @@
 namespace Scintilla::Internal {
 
 typedef double XYPOSITION;
-typedef double XYACCUMULATOR;
 
 // https://secret.club/2021/04/09/std-clamp.html
 // https://bugs.llvm.org/show_bug.cgi?id=49909
@@ -89,6 +88,9 @@ public:
 	constexpr bool Intersects(Interval other) const noexcept {
 		return (right > other.left) && (left < other.right);
 	}
+	constexpr Interval Offset(XYPOSITION offset) const noexcept {
+		return {left + offset, right + offset};
+	}
 };
 
 /**
@@ -134,6 +136,10 @@ public:
 		return (right > other.left) && (left < other.right) &&
 			(bottom > other.top) && (top < other.bottom);
 	}
+	constexpr bool Intersects(Interval horizontalBounds) const noexcept {
+		return (right > horizontalBounds.left) && (left < horizontalBounds.right);
+	}
+
 	void Move(XYPOSITION xDelta, XYPOSITION yDelta) noexcept {
 		left += xDelta;
 		top += yDelta;
@@ -152,6 +158,10 @@ public:
 	}
 	constexpr PRectangle Deflate(int xDelta, int yDelta) const noexcept {
 		return Inflate(-xDelta, -yDelta);
+	}
+
+	PRectangle WithHorizontalBounds(Interval horizontal) const noexcept {
+		return PRectangle(horizontal.left, top, horizontal.right, bottom);
 	}
 
 	constexpr PRectangle Inset(XYPOSITION delta) const noexcept {

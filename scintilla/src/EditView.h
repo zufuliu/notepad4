@@ -146,16 +146,16 @@ public:
 
 private:
 	void SCICALL DrawEOL(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-		Sci::Line line, int xStart, PRectangle rcLine, int subLine, Sci::Position lineEnd, XYACCUMULATOR subLineStart, ColourOptional background) const;
+		Sci::Line line, int xStart, PRectangle rcLine, int subLine, Sci::Position lineEnd, XYPOSITION subLineStart, ColourOptional background) const;
 	void SCICALL DrawFoldDisplayText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase);
+		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYPOSITION subLineStart, DrawPhase phase);
 	void SCICALL DrawEOLAnnotationText(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
-		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYACCUMULATOR subLineStart, DrawPhase phase);
+		Sci::Line line, int xStart, PRectangle rcLine, int subLine, XYPOSITION subLineStart, DrawPhase phase);
 	void SCICALL DrawAnnotation(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line line, int xStart, PRectangle rcLine, int subLine, DrawPhase phase);
 	void SCICALL DrawCarets(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		Sci::Line lineDoc, int xStart, PRectangle rcLine, int subLine) const;
-	void SCICALL DrawIndentGuide(Surface *surface, Sci::Line lineVisible, int lineHeight, XYPOSITION start, PRectangle rcSegment, bool highlight) const;
+	void SCICALL DrawIndentGuide(Surface *surface, XYPOSITION start, PRectangle rcSegment, bool highlight, bool offset) const;
 	void SCICALL DrawForeground(Surface *surface, const EditModel &model, const ViewStyle &vsDraw, const LineLayout *ll,
 		int xStart, PRectangle rcLine, int subLine, Sci::Line lineVisible, Range lineRange, Sci::Position posLineStart,
 		ColourOptional background) const;

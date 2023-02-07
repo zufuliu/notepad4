@@ -153,4 +153,4 @@ def updateUnicodeLineBreak(filename):
 			fd.write(f'{ch :02X} {value}; {category} {prop} {lb.name}; {uch} {name}\n')
 
 if __name__ == '__main__':
-	updateUnicodeLineBreak("../src/EditView.cxx")
+	updateUnicodeLineBreak("../src/PositionCache.cxx")

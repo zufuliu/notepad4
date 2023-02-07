@@ -932,7 +932,7 @@ void Editor::MovePositionTo(Sci::Position newPos, Selection::SelTypes selt, bool
 	MovePositionTo(SelectionPosition(newPos), selt, ensureVisible);
 }
 
-SelectionPosition Editor::MovePositionSoVisible(SelectionPosition pos, int moveDir) noexcept {
+SelectionPosition Editor::MovePositionSoVisible(SelectionPosition pos, int moveDir) const noexcept {
 	pos = ClampPositionIntoDocument(pos);
 	pos = MovePositionOutsideChar(pos, moveDir);
 	const Sci::Line lineDoc = pdoc->SciLineFromPosition(pos.Position());
@@ -953,7 +953,7 @@ SelectionPosition Editor::MovePositionSoVisible(SelectionPosition pos, int moveD
 	}
 }
 
-SelectionPosition Editor::MovePositionSoVisible(Sci::Position pos, int moveDir) noexcept {
+SelectionPosition Editor::MovePositionSoVisible(Sci::Position pos, int moveDir) const noexcept {
 	return MovePositionSoVisible(SelectionPosition(pos), moveDir);
 }
 
@@ -2259,7 +2259,7 @@ void Editor::ClearDocumentStyle() {
 	pdoc->ClearLevels();
 }
 
-void Editor::CopyAllowLine() {
+void Editor::CopyAllowLine() const {
 	SelectionText selectedText;
 	CopySelectionRange(selectedText, true);
 	CopyToClipboard(selectedText);
@@ -4260,7 +4260,7 @@ Sci::Position Editor::SearchText(
 	return pos;
 }
 
-std::string Editor::CaseMapString(const std::string &s, CaseMapping caseMapping) {
+std::string Editor::CaseMapString(const std::string &s, CaseMapping caseMapping) const {
 	std::string ret(s);
 	for (char &ch : ret) {
 		switch (caseMapping) {
@@ -4327,7 +4327,7 @@ std::string Editor::RangeText(Sci::Position start, Sci::Position end) const {
 	return {};
 }
 
-void Editor::CopySelectionRange(SelectionText &ss, bool allowLineCopy) {
+void Editor::CopySelectionRange(SelectionText &ss, bool allowLineCopy) const {
 	if (sel.Empty()) {
 		if (allowLineCopy) {
 			const Sci::Line currentLine = pdoc->SciLineFromPosition(sel.MainCaret());
@@ -4355,7 +4355,7 @@ void Editor::CopySelectionRange(SelectionText &ss, bool allowLineCopy) {
 	}
 }
 
-void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool lineCopy) {
+void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool lineCopy) const {
 	start = pdoc->ClampPositionIntoDocument(start);
 	end = pdoc->ClampPositionIntoDocument(end);
 	SelectionText selectedText;
@@ -4364,7 +4364,7 @@ void Editor::CopyRangeToClipboard(Sci::Position start, Sci::Position end, bool l
 	CopyToClipboard(selectedText);
 }
 
-void Editor::CopyText(size_t length, const char *text) {
+void Editor::CopyText(size_t length, const char *text) const {
 	SelectionText selectedText;
 	selectedText.Copy(std::string(text, length), pdoc->dbcsCodePage, false, false);
 	CopyToClipboard(selectedText);
@@ -4480,7 +4480,7 @@ void Editor::DropAt(SelectionPosition position, const char *value, bool moving, 
 /**
  * @return true if given position is inside the selection,
  */
-bool Editor::PositionInSelection(Sci::Position pos) noexcept {
+bool Editor::PositionInSelection(Sci::Position pos) const noexcept {
 	pos = MovePositionOutsideChar(pos, sel.MainCaret() - pos);
 	for (size_t r = 0; r < sel.Count(); r++) {
 		if (sel.Range(r).Contains(pos))
@@ -5150,7 +5150,7 @@ void Editor::TickFor(TickReason reason) {
 
 // FineTickerStart is be overridden by subclasses that support fine ticking so
 // this method should never be called.
-bool Editor::FineTickerRunning(TickReason) noexcept {
+bool Editor::FineTickerRunning(TickReason) const noexcept {
 	assert(false);
 	return false;
 }
