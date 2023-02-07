@@ -749,7 +749,7 @@ void GetRTFNextControl(const char **style, char *control) noexcept {
 }
 
 // extracts control words that are different between two styles
-// \f0\fs20\cf0\highlight0\b0\i0
+// \f0\fs20\cf0\b0\i0
 void GetRTFStyleChange(std::string &delta, const char *last, const char *current) {
 	char lastControl[RTF_MAX_STYLEDEF];
 	char currentControl[RTF_MAX_STYLEDEF];
@@ -906,7 +906,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 		column++;
 		if (ch == '{') {
 			sv = "\\{";
-		} else if (ch == '{') {
+		} else if (ch == '}') {
 			sv = "\\}";
 		} else if (ch == '\\') {
 			sv = "\\\\";
@@ -947,6 +947,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 				if (changed) {
 					lastStyle = "";
 					styleCurrent = STYLE_MAX + 1;
+					highlight = 0;
 					fmtlen = sprintf(fmtbuf, RTF_PARAGRAPH_END RTF_PARAGRAPH_BEGIN, background);
 					sv = {fmtbuf, fmtlen};
 				}
