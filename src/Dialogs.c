@@ -401,7 +401,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		ResizeDlg_InitX(hwnd, cxRunDlg, IDC_RESIZEGRIP3);
-		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_hInstance, IDB_OPEN_FOLDER16);
+		MakeBitmapButton(hwnd, IDC_SEARCHEXE, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		HWND hwndCtl = GetDlgItem(hwnd, IDC_COMMANDLINE);
 		Edit_LimitText(hwndCtl, MAX_PATH - 1);
@@ -592,7 +592,7 @@ static INT_PTR CALLBACK OpenWithDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPA
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_hInstance, IDB_OPEN_FOLDER16);
+		MakeBitmapButton(hwnd, IDC_GETOPENWITHDIR, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -768,7 +768,7 @@ static INT_PTR CALLBACK FavoritesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LP
 		DirList_StartIconThread(hwndLV);
 		ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-		MakeBitmapButton(hwnd, IDC_GETFAVORITESDIR, g_hInstance, IDB_OPEN_FOLDER16);
+		MakeBitmapButton(hwnd, IDC_GETFAVORITESDIR, g_exeInstance, IDB_OPEN_FOLDER16);
 
 		CenterDlgInParent(hwnd);
 	}
@@ -1934,7 +1934,7 @@ static INT_PTR CALLBACK SelectEncodingDlgProc(HWND hwnd, UINT umsg, WPARAM wPara
 		// we need to determine icon size first, then resize the encoding mask bitmap accordingly.
 
 		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_ENCODING16);
-		HBITMAP hbmp = (HBITMAP)LoadImage(g_hInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		HBITMAP hbmp = (HBITMAP)LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 		hbmp = ResizeImageForCurrentDPI(hbmp);
 		BITMAP bmp;
 		GetObject(hbmp, sizeof(BITMAP), &bmp);

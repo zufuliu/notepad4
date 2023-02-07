@@ -344,6 +344,9 @@ static struct CachedStatusItem cachedStatusItem;
 #define DisableDelayedStatusBarRedraw()		cachedStatusItem.updateMask |= (1 << StatusItem_ItemCount)
 
 HINSTANCE	g_hInstance;
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+HINSTANCE	g_exeInstance;
+#endif
 HANDLE		g_hDefaultHeap;
 HANDLE		g_hScintilla;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
@@ -527,6 +530,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	// Set global variable g_hInstance
 	g_hInstance = hInstance;
+#if NP2_ENABLE_APP_LOCALIZATION_DLL
+	g_exeInstance = hInstance;
+#endif
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	// Set the Windows version global variable
 	NP2_COMPILER_WARNING_PUSH
@@ -1974,7 +1980,7 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 		bExternalBitmap = true;
 	} else {
 		const int resource = GetBitmapResourceIdForCurrentDPI(IDB_TOOLBAR16);
-		hbmp = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+		hbmp = (HBITMAP)LoadImage(g_exeInstance, MAKEINTRESOURCE(resource), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
 	}
 	if (bAutoScaleToolbar) {
 		hbmp = ResizeImageForCurrentDPI(hbmp);
@@ -8525,10 +8531,10 @@ void ShowNotifyIcon(HWND hwnd, bool bAdd) {
 		}
 		uTrayIconDPI = g_uCurrentDPI;
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-		LoadIconMetric(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
+		LoadIconMetric(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), LIM_SMALL, &hTrayIcon);
 #else
 		const int size = SystemMetricsForDpi(SM_CXSMICON, uTrayIconDPI);
-		hTrayIcon = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
+		hTrayIcon = (HICON)LoadImage(g_exeInstance, MAKEINTRESOURCE(IDR_MAINWND), IMAGE_ICON, size, size, LR_DEFAULTCOLOR);
 #endif
 	}
 

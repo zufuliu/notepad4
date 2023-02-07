@@ -261,6 +261,11 @@ void DebugPrintf(const char *fmt, ...);
 #endif
 
 extern HINSTANCE g_hInstance;
+#if defined(NP2_ENABLE_APP_LOCALIZATION_DLL) && NP2_ENABLE_APP_LOCALIZATION_DLL
+extern HINSTANCE g_exeInstance;
+#else
+#define g_exeInstance	g_hInstance
+#endif
 extern HANDLE g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 extern DWORD g_uWinVer;

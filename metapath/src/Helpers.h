@@ -77,6 +77,11 @@ NP2_inline bool CRTStrToInt(LPCWSTR str, int *value) {
 int ParseCommaList(LPCWSTR str, int result[], int count);
 
 extern HINSTANCE g_hInstance;
+#if defined(NP2_ENABLE_APP_LOCALIZATION_DLL) && NP2_ENABLE_APP_LOCALIZATION_DLL
+extern HINSTANCE g_exeInstance;
+#else
+#define g_exeInstance	g_hInstance
+#endif
 extern HANDLE g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_VISTA
 extern DWORD g_uWinVer;

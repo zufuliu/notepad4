@@ -49,6 +49,7 @@ IDI_RUN                 ICON                    "..\\..\\res\\Run_min.ico"
 #endif
 IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -94,6 +95,7 @@ IDB_ENCODING48          BITMAP                  "..\\..\\res\\Encoding48.bmp"
 //
 
 IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
+#endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////
 //

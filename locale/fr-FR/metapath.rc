@@ -53,6 +53,7 @@ IDI_ITEMS               ICON                    "..\\..\\metapath\\res\\Items.ic
 IDI_CROSS1              ICON                    "..\\..\\metapath\\res\\cross1.ico"
 IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\cross2.ico"
 
+#if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -79,6 +80,7 @@ IDB_OPEN_FOLDER48       BITMAP                  "..\\..\\metapath\\res\\OpenFold
 //
 
 IDC_CROSSHAIR           CURSOR                  "..\\..\\metapath\\res\\crosshair.cur"
+#endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 
 /////////////////////////////////////////////////////////////////////////////
 //

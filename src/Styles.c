@@ -4155,8 +4155,8 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 		MultilineEditSetup(hwnd, IDC_STYLEVALUE_DEFAULT);
 		SendDlgItemMessage(hwnd, IDC_STYLEEDIT, EM_LIMITTEXT, MAX_LEXER_STYLE_EDIT_SIZE - 1, 0);
 
-		MakeBitmapButton(hwnd, IDC_PREVSTYLE, g_hInstance, IDB_PREV16);
-		MakeBitmapButton(hwnd, IDC_NEXTSTYLE, g_hInstance, IDB_NEXT16);
+		MakeBitmapButton(hwnd, IDC_PREVSTYLE, g_exeInstance, IDB_PREV16);
+		MakeBitmapButton(hwnd, IDC_NEXTSTYLE, g_exeInstance, IDB_NEXT16);
 
 		// Setup title font
 		HFONT hFontTitle = (HFONT)SendDlgItemMessage(hwnd, IDC_TITLE, WM_GETFONT, 0, 0);
@@ -4369,7 +4369,7 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 				//ImageList_BeginDrag(himl, 0, 0, 0);
 				//ImageList_DragEnter(hwndTV, lpnmtv->ptDrag.x, lpnmtv->ptDrag.y);
 				if (pCurrentStyle) {
-					DestroyCursor(SetCursor(LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_COPY))));
+					DestroyCursor(SetCursor(LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_COPY))));
 				} else {
 					DestroyCursor(SetCursor(LoadCursor(NULL, IDC_NO)));
 				}
@@ -4574,11 +4574,11 @@ static INT_PTR CALLBACK Style_ConfigDlgProc(HWND hwnd, UINT umsg, WPARAM wParam,
 
 				COLORREF cr = (COLORREF)(-1);
 				Style_StrGetForeColor(tch, &cr);
-				MakeColorPickButton(hwnd, IDC_STYLEFORE, g_hInstance, cr);
+				MakeColorPickButton(hwnd, IDC_STYLEFORE, g_exeInstance, cr);
 
 				cr = (COLORREF)(-1);
 				Style_StrGetBackColor(tch, &cr);
-				MakeColorPickButton(hwnd, IDC_STYLEBACK, g_hInstance, cr);
+				MakeColorPickButton(hwnd, IDC_STYLEBACK, g_exeInstance, cr);
 			}
 			break;
 
@@ -5052,7 +5052,7 @@ static INT_PTR CALLBACK Style_SelectLexerDlgProc(HWND hwnd, UINT umsg, WPARAM wP
 				// prevent dragging group folder or Text File
 				if (lpnmtv->itemNew.lParam != 0 && TreeView_GetParent(hwndTV, lpnmtv->itemNew.hItem) != NULL) {
 					hDraggingNode = lpnmtv->itemNew.hItem;
-					DestroyCursor(SetCursor(LoadCursor(g_hInstance, MAKEINTRESOURCE(IDC_COPY))));
+					DestroyCursor(SetCursor(LoadCursor(g_exeInstance, MAKEINTRESOURCE(IDC_COPY))));
 				} else {
 					hDraggingNode = NULL;
 					DestroyCursor(SetCursor(LoadCursor(NULL, IDC_NO)));
