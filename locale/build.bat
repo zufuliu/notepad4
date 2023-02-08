@@ -113,29 +113,37 @@ IF /I "%ARCH%" == "ARM" GOTO ARM
 
 
 :Win32
+SETLOCAL
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=x86 -host_arch=%HOST_ARCH%
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug Win32 && CALL :SUBMSVC %BUILDTYPE% Release Win32) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% Win32)
+ENDLOCAL
 IF /I "%ARCH%" == "Win32" GOTO END
 
 
 :x64
+SETLOCAL
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=amd64 -host_arch=%HOST_ARCH%
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug x64 && CALL :SUBMSVC %BUILDTYPE% Release x64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% x64)
+ENDLOCAL
 IF /I "%ARCH%" == "x64" GOTO END
 IF /I "%CONFIG%" == "all" (CALL :COPY_x64_AVX2 Debug && CALL :COPY_x64_AVX2 Release) ELSE (CALL :COPY_x64_AVX2 %CONFIG%)
 IF /I "%ARCH%" == "AVX2" GOTO END
 
 
 :ARM64
+SETLOCAL
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm64 -host_arch=%HOST_ARCH%
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM64 && CALL :SUBMSVC %BUILDTYPE% Release ARM64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM64)
+ENDLOCAL
 IF /I "%ARCH%" == "ARM64" GOTO END
 IF /I %NO_ARM% == 1 GOTO END
 
 
 :ARM
+SETLOCAL
 CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm -host_arch=%HOST_ARCH%
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM && CALL :SUBMSVC %BUILDTYPE% Release ARM) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM)
+ENDLOCAL
 
 
 :END
