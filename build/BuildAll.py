@@ -201,11 +201,15 @@ def build_locale_project(arch):
 	command = f'call build.bat Build {arch} Release'
 	run_command_in_folder(command, localeDir)
 
-def make_release_artifact(locale, suffix=''):
+def make_release_artifact(locale, suffix='', hd=False):
 	app_version = buildEnv['app_version']
 	zipDir = buildEnv['temp_zip_dir']
 	outDir = os.path.join(buildFolder, 'bin', 'Release')
-	for arch in ['ARM', 'ARM64', 'AVX2', 'Win32', 'x64']:
+	archList = ['ARM', 'ARM64', 'AVX2', 'Win32', 'x64']
+	if hd:
+		archList.remove('ARM')
+		archList.remove('Win32')
+	for arch in archList:
 		if arch == 'ARM' and locale not in ('i18n', 'en'):
 			# 32-bit ARM is only built for i18n and en
 			continue
@@ -235,14 +239,16 @@ def build_release_artifact(hd, suffix=''):
 		override = get_locale_override_config(locale, hd)
 		update_config_file(override)
 		if locale in ('i18n', 'en'):
-			build_main_project('all')
+			arch = 'No32bit' if hd else 'all'
+			build_main_project(arch)
 			if locale == 'i18n':
-				build_locale_project('all')
+				build_locale_project(arch)
 		else:
 			copy_back_localized_resources(locale)
 			# 32-bit ARM is only built for i18n and en
-			build_main_project('NoARM')
-		make_release_artifact(locale, suffix)
+			arch = 'No32bit' if hd else 'NoARM'
+			build_main_project(arch)
+		make_release_artifact(locale, suffix, hd)
 	copy_back_localized_resources('en')
 
 def build_all_release_artifact():

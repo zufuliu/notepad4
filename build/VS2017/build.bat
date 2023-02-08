@@ -26,6 +26,7 @@ IF /I "%~1" == "/?"     GOTO SHOWHELP
 @rem default arguments
 SET "BUILDTYPE=Build"
 SET "ARCH=all"
+SET NO_32BIT=0
 SET NO_ARM=0
 SET "CONFIG=Release"
 
@@ -76,6 +77,10 @@ IF /I "%~1" == "all"     SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "/all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "-all"    SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "--all"   SET "ARCH=all"   & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "No32bit"   SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "/No32bit"  SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "-No32bit"  SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
+IF /I "%~1" == "--No32bit" SET "ARCH=all" & SET NO_ARM=1 & SET NO_32BIT=1 & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "NoARM"   SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "/NoARM"  SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
 IF /I "%~1" == "-NoARM"  SET "ARCH=all"   & SET NO_ARM=1 & SHIFT & GOTO CheckThirdArg
@@ -125,6 +130,7 @@ IF /I "%processor_architecture%" == "AMD64" (
 	SET "HOST_ARCH=x86"
 )
 
+IF %NO_32BIT% == 1 GOTO x64
 IF /I "%ARCH%" == "AVX2" GOTO AVX2
 IF /I "%ARCH%" == "x64" GOTO x64
 IF /I "%ARCH%" == "Win32" GOTO Win32
@@ -162,7 +168,7 @@ CALL "%VS_PATH%\Common7\Tools\vsdevcmd" -no_logo -arch=arm64 -host_arch=%HOST_AR
 IF /I "%CONFIG%" == "all" (CALL :SUBMSVC %BUILDTYPE% Debug ARM64 && CALL :SUBMSVC %BUILDTYPE% Release ARM64) ELSE (CALL :SUBMSVC %BUILDTYPE% %CONFIG% ARM64)
 ENDLOCAL
 IF /I "%ARCH%" == "ARM64" GOTO END
-IF /I %NO_ARM% == 1 GOTO END
+IF %NO_ARM% == 1 GOTO END
 
 
 :ARM
@@ -213,7 +219,7 @@ EXIT /B
 :SHOWHELP
 TITLE %~nx0 %1
 ECHO. & ECHO.
-ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|ARM^|all^|NoARM] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
+ECHO Usage: %~nx0 [Clean^|Build^|Rebuild] [Win32^|x64^|AVX2^|ARM64^|ARM^|all^|NoARM^|No32bit] [Debug^|Release^|LLVMDebug^|LLVMRelease^|all]
 ECHO.
 ECHO Notes: You can also prefix the commands with "-", "--" or "/".
 ECHO        The arguments are not case sensitive.
