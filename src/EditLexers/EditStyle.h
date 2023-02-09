@@ -135,18 +135,14 @@
 #define NP2STYLE_ArrayVar				63502
 #define NP2STYLE_HashVar				63503
 #define NP2STYLE_SymbolTableVar			63504
-#define NP2STYLE_Regex_mre				63505
-#define NP2STYLE_Substitution_re		63506
-// 63507
+#define NP2STYLE_SymbolArray			63505
+
 #define NP2STYLE_HeredocDelimiter		63508
 #define NP2STYLE_HeredocSingleQuoted	63509
 #define NP2STYLE_HeredocDoubleQuoted	63510
 #define NP2STYLE_HeredocBackticks		63511
-#define NP2STYLE_SingleQuotedString_q	63512
-#define NP2STYLE_DoubleQuotedString_qq	63513
-#define NP2STYLE_Backticks_qx			63514
-#define NP2STYLE_Regex_qr				63515
-#define NP2STYLE_Array_qw				63516
+
+#define NP2STYLE_StringArray			63516
 #define NP2STYLE_Prototype				63517
 #define NP2STYLE_FormatIdentifier		63518
 #define NP2STYLE_FormatBody				63519

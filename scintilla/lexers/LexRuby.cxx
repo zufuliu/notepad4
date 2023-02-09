@@ -300,6 +300,26 @@ public:
 	}
 };
 
+constexpr bool IsPercentLiteral(int state) noexcept {
+	return state == SCE_RB_STRING_Q
+		|| state == SCE_RB_STRING_QQ
+		// excluded SCE_RB_STRING_QR
+		|| state == SCE_RB_STRING_W
+		|| state == SCE_RB_STRING_QW
+		|| state == SCE_RB_STRING_I
+		|| state == SCE_RB_STRING_QI
+		|| state == SCE_RB_STRING_QS
+		|| state == SCE_RB_STRING_QX;
+}
+
+constexpr bool IsInterpolableLiteral(int state) noexcept {
+	return state != SCE_RB_STRING_Q
+		&& state != SCE_RB_STRING_W
+		&& state != SCE_RB_STRING_I
+		&& state != SCE_RB_STRING_QS
+		&& state != SCE_RB_STRING_SQ;
+}
+
 void enterInnerExpression(int *p_inner_string_types,
 								int *p_inner_expn_brace_counts,
 								QuoteCls *p_inner_quotes,
@@ -706,12 +726,15 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	styler.StartSegment(startPos);
 
 	constexpr uint64_t q_states = SCE_RB_STRING_Q
-							 | ((uint64_t)SCE_RB_STRING_QQ << 8)
-							 | ((uint64_t)SCE_RB_STRING_QR << 16)
+							 | ((uint64_t)SCE_RB_STRING_QQ << 6)
+							 | ((uint64_t)SCE_RB_STRING_QR << 12)
+							 | ((uint64_t)SCE_RB_STRING_W << 18)
 							 | ((uint64_t)SCE_RB_STRING_QW << 24)
-							 | ((uint64_t)SCE_RB_STRING_QW << 32)
-							 | ((uint64_t)SCE_RB_STRING_QX << 48);
-	constexpr const char* q_chars = "qQrwWx";
+							 | ((uint64_t)SCE_RB_STRING_QX << 30)
+							 | ((uint64_t)SCE_RB_STRING_I << 36)
+							 | ((uint64_t)SCE_RB_STRING_QI << 42)
+							 | ((uint64_t)SCE_RB_STRING_QS << 48);
+	constexpr const char* q_chars = "qQrwWxiIs";
 
 	// In most cases a value of 2 should be ample for the code in the
 	// Ruby library, and the code the user is likely to enter.
@@ -1002,7 +1025,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				if (hit && !isSafeWordcharOrHigh(chNext2)) {
 					Quote.New();
 					{
-						state = (int)((q_states >> ((hit - q_chars)*8)) & 0xff);
+						state = (int)((q_states >> ((hit - q_chars)*6)) & 0x3f);
 						Quote.Open(chNext2);
 						i += 2;
 						ch = chNext2;
@@ -1425,8 +1448,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				}
 			}
 			// Quotes of all kinds...
-		} else if (state == SCE_RB_STRING_Q || state == SCE_RB_STRING_QQ ||
-				state == SCE_RB_STRING_QX || state == SCE_RB_STRING_QW ||
+		} else if (IsPercentLiteral(state) ||
 				state == SCE_RB_STRING_DQ || state == SCE_RB_STRING_SQ ||
 				state == SCE_RB_BACKTICKS) {
 			if (!Quote.Down && !isspacechar(ch)) {
@@ -1445,8 +1467,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				Quote.Count++;
 			} else if (ch == '#' && chNext == '{'
 					&& inner_string_count < INNER_STRINGS_MAX_COUNT
-					&& state != SCE_RB_STRING_SQ
-					&& state != SCE_RB_STRING_Q) {
+					&& IsInterpolableLiteral(state)) {
 				// process #{ ... }
 				styler.ColorTo(i, state);
 				styler.ColorTo(i + 2, SCE_RB_OPERATOR);
@@ -1787,10 +1808,11 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			} else if (styleNext == SCE_RB_DEFAULT) {
 				levelCurrent--;
 			}
-		} else if (style == SCE_RB_STRING_QW) {
+		} else if (style == SCE_RB_STRING_QW || style == SCE_RB_STRING_W) {
 			if (stylePrev != style) {
 				levelCurrent++;
-			} else if (styleNext != style) {
+			}
+			if (styleNext != style) {
 				levelCurrent--;
 			}
 		}
