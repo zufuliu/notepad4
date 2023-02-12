@@ -116,7 +116,7 @@ public:
 	Interval Span(int start, int end) const noexcept;
 	Interval SpanByte(int index) const noexcept;
 	int EndLineStyle() const noexcept;
-	void WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION width, bool partialLine);
+	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine);
 };
 
 struct ScreenLine : public IScreenLine {
@@ -209,6 +209,13 @@ public:
 	}
 };
 
+constexpr char repsC0[][4] = {
+	"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
+	"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
+	"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
+	"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "BAD"
+};
+
 class SpecialRepresentations {
 	std::map<unsigned int, Representation> mapReprs;
 	unsigned char startByteHasReprs[0x100] {};
@@ -228,6 +235,7 @@ public:
 		return startByteHasReprs[ch] != 0;
 	}
 	void Clear() noexcept;
+	void SetDefaultRepresentations(int dbcsCodePage);
 };
 
 struct TextSegment {

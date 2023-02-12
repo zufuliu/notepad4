@@ -380,17 +380,18 @@ constexpr WrapBreak GetWrapBreakEx(unsigned int ch, bool isUtf8) noexcept {
 
 }
 
-void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION width, bool partialLine) {
+void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine) {
 	Sci::Position lastLineStart = 0;
-	XYPOSITION startOffset = width;
+	XYPOSITION startOffset = wrapWidth;
 	Sci::Position p = 0;
-	if (partialLine) {
+	if (partialLine && lines > 2 && wrapIndent == wrapIndent_) {
 		lastLineStart = LineStart(lines - 2);
 		lines -= 2;
 		p = lastLineStart + 1;
-		startOffset += positions[lastLineStart] - wrapIndent;
+		startOffset += positions[lastLineStart] - wrapIndent_;
 	} else {
 		lines = 0;
+		wrapIndent = wrapIndent_;
 	}
 
 	const bool isUtf8 = CpUtf8 == pdoc->dbcsCodePage;
@@ -473,13 +474,13 @@ void LineLayout::WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap
 			AddLineStart(lastLineStart);
 			startOffset = positions[lastLineStart];
 			// take into account the space for start wrap mark and indent
-			startOffset += width - wrapIndent;
+			startOffset += wrapWidth - wrapIndent;
 			p = lastLineStart + 1;
 		}
 	}
 	lines++;
 }
-	
+
 ScreenLine::ScreenLine(
 	const LineLayout *ll_,
 	int subLine,
@@ -920,6 +921,57 @@ void SpecialRepresentations::Clear() noexcept {
 	std::fill(startByteHasReprs, std::end(startByteHasReprs), none);
 	maxKey = 0;
 	crlf = false;
+}
+
+void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
+	Clear();
+
+	// C0 control set
+	for (size_t j = 0; j < std::size(repsC0) - 1; j++) {
+		const char c[2] = { static_cast<char>(j), '\0' };
+		const char *rep = repsC0[j];
+		SetRepresentation(std::string_view(c, 1), std::string_view(rep, (rep[2] == '\0') ? 2 : 3));
+	}
+
+	struct CharacterRepresentation {
+		char code[4];
+		char rep[4];
+	};
+	static constexpr CharacterRepresentation repsMisc[] = {
+		{ "\x7f", "DEL" },
+		{ "\xe2\x80\xa8", "LS" },
+		{ "\xe2\x80\xa9", "PS" },
+	};
+	SetRepresentation(std::string_view(repsMisc[0].code, 1), std::string_view(repsMisc[0].rep, 3));
+
+	// C1 control set
+	// As well as Unicode mode, ISO-8859-1 should use these
+	if (CpUtf8 == dbcsCodePage) {
+		static constexpr char repsC1[][5] = {
+			"PAD", "HOP", "BPH", "NBH", "IND", "NEL", "SSA", "ESA",
+			"HTS", "HTJ", "VTS", "PLD", "PLU", "RI", "SS2", "SS3",
+			"DCS", "PU1", "PU2", "STS", "CCH", "MW", "SPA", "EPA",
+			"SOS", "SGCI", "SCI", "CSI", "ST", "OSC", "PM", "APC"
+		};
+		for (size_t j = 0; j < std::size(repsC1); j++) {
+			const char c1[3] = { '\xc2',  static_cast<char>(0x80 + j), '\0' };
+			const char *rep = repsC1[j];
+			const size_t len = (rep[2] == '\0') ? 2 : ((rep[3] == '\0') ? 3 : 4);
+			SetRepresentation(std::string_view(c1, 2), std::string_view(rep, len));
+		}
+		SetRepresentation(std::string_view(repsMisc[1].code, 3), std::string_view(repsMisc[1].rep, 2));
+		SetRepresentation(std::string_view(repsMisc[2].code, 3), std::string_view(repsMisc[2].rep, 2));
+	}
+	if (dbcsCodePage) {
+		// UTF-8 invalid bytes or DBCS invalid single bytes.
+		for (int k = 0x80; k < 0x100; k++) {
+			if (!IsDBCSValidSingleByte(dbcsCodePage, k)) {
+				const char hiByte[2] = { static_cast<char>(k), '\0' };
+				const char hexits[4] = { 'x', "0123456789ABCDEF"[k >> 4], "0123456789ABCDEF"[k & 15], '\0' };
+				SetRepresentation(std::string_view(hiByte, 1), std::string_view(hexits, 3));
+			}
+		}
+	}
 }
 
 void BreakFinder::Insert(Sci::Position val) {

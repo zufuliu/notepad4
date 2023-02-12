@@ -743,7 +743,6 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			ll->lines = 1;
 		} else {
 			//const ElapsedPeriod period;
-			const XYPOSITION wrapIndent = ll->wrapIndent;
 			const XYPOSITION aveCharWidth = vstyle.aveCharWidth;
 			if (FlagSet(vstyle.wrap.visualFlags, WrapVisualFlag::End)) {
 				width -= static_cast<int>(aveCharWidth); // take into account the space for end wrap mark
@@ -762,26 +761,24 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 			default:	// No additional indent for WrapIndentMode::Fixed
 				break;
 			}
-			ll->wrapIndent = wrapAddIndent;
+			XYPOSITION wrapIndent = wrapAddIndent;
 			if (vstyle.wrap.indentMode != WrapIndentMode::Fixed) {
 				for (int i = 0; i < ll->lastSegmentEnd; i++) {
 					if (!IsSpaceOrTab(ll->chars[i])) {
-						ll->wrapIndent += ll->positions[i]; // Add line indent
+						wrapIndent += ll->positions[i]; // Add line indent
 						break;
 					}
 				}
 			}
 			// Check for text width minimum
-			if (ll->wrapIndent > width - static_cast<int>(aveCharWidth) * 15) {
-				ll->wrapIndent = wrapAddIndent;
+			if (wrapIndent > width - static_cast<int>(aveCharWidth) * 15) {
+				wrapIndent = wrapAddIndent;
 			}
 			// Check for wrapIndent minimum
-			if ((FlagSet(vstyle.wrap.visualFlags, WrapVisualFlag::Start)) && (ll->wrapIndent < vstyle.aveCharWidth)) {
-				ll->wrapIndent = aveCharWidth; // Indent to show start visual
+			if ((FlagSet(vstyle.wrap.visualFlags, WrapVisualFlag::Start)) && (wrapIndent < aveCharWidth)) {
+				wrapIndent = aveCharWidth; // Indent to show start visual
 			}
-
-			ll->WrapLine(model.pdoc, posLineStart, vstyle.wrap.state, width,
-				(partialLine && ll->lines > 2 && wrapIndent == ll->wrapIndent));
+			ll->WrapLine(model.pdoc, posLineStart, vstyle.wrap.state, width, wrapIndent, partialLine);
 			//const double duration = period.Duration()*1e3;
 			//printf("wrap line=%zd duration=%f\n", line + 1, duration);
 		}
@@ -929,10 +926,10 @@ SelectionPosition EditView::SPositionFromLocation(Surface *surface, const EditMo
 
 				const ScreenLine screenLine(ll, subLine, vs, rcClient.right, tabWidthMinimumPixels);
 				const std::unique_ptr<IScreenLineLayout> slLayout = surface->Layout(&screenLine);
-				positionInLine = slLayout->PositionFromX(static_cast<XYPOSITION>(pt.x), charPosition) +
+				positionInLine = slLayout->PositionFromX(pt.x, charPosition) +
 					rangeSubLine.start;
 			} else {
-				positionInLine = ll->FindPositionFromX(static_cast<XYPOSITION>(pt.x + subLineStart),
+				positionInLine = ll->FindPositionFromX(pt.x + subLineStart,
 					rangeSubLine, charPosition);
 			}
 			if (positionInLine < rangeSubLine.end) {
@@ -1092,14 +1089,7 @@ ColourRGBA TextBackground(const EditModel &model, const ViewStyle &vsDraw, const
 }
 
 inline std::string_view ControlCharacterString(unsigned char ch) noexcept {
-	// C0 control set, same as Editor::SetRepresentations()
-	static constexpr char reps[][4] = {
-		"NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL",
-		"BS", "HT", "LF", "VT", "FF", "CR", "SO", "SI",
-		"DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB",
-		"CAN", "EM", "SUB", "ESC", "FS", "GS", "RS", "US", "BAD"
-	};
-	const char *rep = reps[std::min(ch, static_cast<unsigned char>(std::size(reps) - 1))];
+	const char *rep = repsC0[std::min(ch, static_cast<unsigned char>(std::size(repsC0) - 1))];
 	return std::string_view(rep, (rep[2] == '\0') ? 2 : 3);
 }
 
@@ -1168,7 +1158,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 		const XYPOSITION spaceWidth = vsDraw.styles[ll->EndLineStyle()].spaceWidth;
 		virtualSpace = model.sel.VirtualSpaceFor(model.pdoc->LineEnd(line)) * spaceWidth;
 	}
-	const XYPOSITION xEol = static_cast<XYPOSITION>(ll->positions[lineEnd] - subLineStart);
+	const XYPOSITION xEol = ll->positions[lineEnd] - subLineStart;
 
 	// Fill the virtual space and show selections within it
 	if (virtualSpace > 0.0f) {
@@ -1185,9 +1175,9 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 				if (!portion.Empty()) {
 					const XYPOSITION spaceWidth = vsDraw.styles[ll->EndLineStyle()].spaceWidth;
 					rcSegment.left = xStart + ll->positions[portion.start.Position() - posLineStart] -
-						static_cast<XYPOSITION>(subLineStart)+portion.start.VirtualSpace() * spaceWidth;
+						subLineStart + portion.start.VirtualSpace() * spaceWidth;
 					rcSegment.right = xStart + ll->positions[portion.end.Position() - posLineStart] -
-						static_cast<XYPOSITION>(subLineStart)+portion.end.VirtualSpace() * spaceWidth;
+						subLineStart + portion.end.VirtualSpace() * spaceWidth;
 					rcSegment.left = (rcSegment.left > rcLine.left) ? rcSegment.left : rcLine.left;
 					rcSegment.right = (rcSegment.right < rcLine.right) ? rcSegment.right : rcLine.right;
 					surface->FillRectangleAligned(rcSegment, Fill(
@@ -1330,14 +1320,15 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 
 	if (drawWrapMarkEnd) {
 		PRectangle rcPlace = rcSegment;
+		const XYPOSITION maxLeft = rcPlace.right - vsDraw.aveCharWidth;
 
 		if (FlagSet(vsDraw.wrap.visualFlagsLocation, WrapVisualLocation::EndByText)) {
-			rcPlace.left = xEol + xStart + virtualSpace;
+			rcPlace.left = std::min(xEol + xStart + virtualSpace, maxLeft);
 			rcPlace.right = rcPlace.left + vsDraw.aveCharWidth;
 		} else {
 			// rcLine is clipped to text area
 			rcPlace.right = rcLine.right;
-			rcPlace.left = rcPlace.right - vsDraw.aveCharWidth;
+			rcPlace.left = maxLeft;
 		}
 		if (!customDrawWrapMarker) {
 			DrawWrapMarker(surface, rcPlace, true, vsDraw.WrapColour());
@@ -1371,7 +1362,7 @@ void EditView::DrawFoldDisplayText(Surface *surface, const EditModel &model, con
 	const XYPOSITION spaceWidth = vsDraw.styles[ll->EndLineStyle()].spaceWidth;
 	const XYPOSITION virtualSpace = model.sel.VirtualSpaceFor(
 		model.pdoc->LineEnd(line)) * spaceWidth;
-	rcSegment.left = xStart + static_cast<XYPOSITION>(ll->positions[ll->numCharsInLine] - subLineStart) + virtualSpace + vsDraw.aveCharWidth;
+	rcSegment.left = xStart + ll->positions[ll->numCharsInLine] - subLineStart + virtualSpace + vsDraw.aveCharWidth;
 	rcSegment.right = rcSegment.left + widthFoldDisplayText + margin*2;
 
 	const ColourOptional background = vsDraw.Background(model.GetMark(line), model.caret.active, ll->containsCaret);
@@ -1496,7 +1487,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 	const XYPOSITION virtualSpace = model.sel.VirtualSpaceFor(
 		model.pdoc->LineEnd(line)) * spaceWidth;
 	rcSegment.left = xStart +
-		static_cast<XYPOSITION>(ll->positions[ll->numCharsInLine] - subLineStart)
+		ll->positions[ll->numCharsInLine] - subLineStart
 		+ virtualSpace + vsDraw.aveCharWidth;
 
 	const char *textFoldDisplay = model.GetFoldDisplayText(line, ll->PartialPosition());
@@ -2361,8 +2352,8 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 	bool inIndentation = subLine == 0;	// Do not handle indentation except on first subline.
 
 	const XYPOSITION subLineStart = ll->positions[lineRange.start];
-	const XYPOSITION indentWidth = model.pdoc->IndentSize() * vsDraw.aveCharWidth;
 	const XYPOSITION horizontalOffset = xStart - subLineStart;
+	const XYPOSITION indentWidth = model.pdoc->IndentSize() * vsDraw.spaceWidth;
 
 	// Does not take margin into account but not significant
 	const XYPOSITION xStartVisible = -horizontalOffset;
@@ -2558,6 +2549,7 @@ void EditView::DrawForeground(Surface *surface, const EditModel &model, const Vi
 				if (inHotspot && vsDraw.hotspotUnderline) {
 					colourUnderline = vsDraw.ElementColour(Element::HotSpotActive).value_or(colourUnderline);
 				}
+				surface->FillRectangleAligned(rcUL, Fill(colourUnderline));
 			} else if (vsDraw.styles[styleMain].strike) { // 2011-12-20
 				PRectangle rcUL = rcSegment;
 				rcUL.top = rcUL.top + std::ceil((rcUL.bottom - rcUL.top) / 2);

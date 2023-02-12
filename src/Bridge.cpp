@@ -676,7 +676,7 @@ DocumentStyledText GetDocumentStyledText(uint8_t (&styleMap)[STYLE_MAX + 1], Sci
 		for (; index < styleCount; index++) {
 			// NOLINTNEXTLINE(bugprone-suspicious-memory-comparison)
 			if (memcmp(&definition, &styleList[index], sizeof(StyleDefinition)) == 0) {
-				memset(definition.fontFace, 0, COUNTOF(definition.fontFace));
+				memset(definition.fontFace, 0, sizeof(definition.fontFace));
 				break;
 			}
 		}

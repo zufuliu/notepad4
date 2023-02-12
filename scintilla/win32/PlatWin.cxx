@@ -644,18 +644,18 @@ bool SurfaceGDI::Initialised() const noexcept {
 }
 
 void SurfaceGDI::Init(WindowID wid) noexcept {
-	logPixelsY = DpiForWindow(wid);
 	hdc = ::CreateCompatibleDC({});
 	hdcOwned = true;
 	::SetTextAlign(hdc, TA_BASELINE);
+	logPixelsY = DpiForWindow(wid);
 }
 
 void SurfaceGDI::Init(SurfaceID sid, WindowID wid, bool printing) noexcept {
 	hdc = static_cast<HDC>(sid);
+	::SetTextAlign(hdc, TA_BASELINE);
 	// Windows on screen are scaled but printers are not.
 	//const bool printing = (::GetDeviceCaps(hdc, TECHNOLOGY) != DT_RASDISPLAY);
 	logPixelsY = printing ? ::GetDeviceCaps(hdc, LOGPIXELSY) : DpiForWindow(wid);
-	::SetTextAlign(hdc, TA_BASELINE);
 }
 
 std::unique_ptr<Surface> SurfaceGDI::AllocatePixMap(int width, int height) {

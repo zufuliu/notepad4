@@ -237,6 +237,38 @@ constexpr MarkerMask FoldingMark(FoldLevel level, FoldLevel levelNext, bool firs
 	return 0;
 }
 
+LineMarker::FoldPart PartForFoldHighlight(const HighlightDelimiter &highlightDelimiter, Sci::Line lineDoc, bool firstSubLine, bool headWithTail, bool isExpanded) noexcept {
+	if (highlightDelimiter.IsFoldBlockHighlighted(lineDoc)) {
+		if (highlightDelimiter.IsBodyOfFoldBlock(lineDoc)) {
+			return LineMarker::FoldPart::body;
+		}
+		if (highlightDelimiter.IsHeadOfFoldBlock(lineDoc)) {
+			if (firstSubLine) {
+				return headWithTail ? LineMarker::FoldPart::headWithTail : LineMarker::FoldPart::head;
+			}
+			if (isExpanded || headWithTail) {
+				return LineMarker::FoldPart::body;
+			}
+		} else if (highlightDelimiter.IsTailOfFoldBlock(lineDoc)) {
+			return LineMarker::FoldPart::tail;
+		}
+	}
+	return LineMarker::FoldPart::undefined;
+}
+
+constexpr LineMarker::FoldPart PartForBar(bool markBefore, bool markAfter) noexcept {
+	if (markBefore) {
+		if (markAfter) {
+			return LineMarker::FoldPart::body;
+		}
+		return LineMarker::FoldPart::tail;
+	}
+	if (markAfter) {
+		return LineMarker::FoldPart::head;
+	}
+	return LineMarker::FoldPart::headWithTail;
+}
+
 }
 
 void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOneMargin, const MarginStyle &marginStyle,
@@ -289,25 +321,27 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 		}
 
 		bool headWithTail = false;
+		bool isExpanded = false;
 
 		if (marginStyle.ShowsFolding()) {
 			// Decide which fold indicator should be displayed
 			const FoldLevel level = model.pdoc->GetFoldLevel(lineDoc);
 			const FoldLevel levelNext = model.pdoc->GetFoldLevel(lineDoc + 1);
-			const FoldLevel levelNum = LevelNumberPart(level);
-			const FoldLevel levelNextNum = LevelNumberPart(levelNext);
-			const bool isExpanded = model.pcs->GetExpanded(lineDoc);
+			isExpanded = model.pcs->GetExpanded(lineDoc);
 
 			marks |= FoldingMark(level, levelNext, firstSubLine, lastSubLine,
 				isExpanded, needWhiteClosure, folderOpenMid, folderEnd);
 
+			const FoldLevel levelNum = LevelNumberPart(level);
+			const FoldLevel levelNextNum = LevelNumberPart(levelNext);
+
 			// Change needWhiteClosure and headWithTail if needed
 			if (LevelIsHeader(level)) {
 				needWhiteClosure = false;
-				const Sci::Line firstFollowupLine = model.pcs->DocFromDisplay(model.pcs->DisplayFromDoc(lineDoc + 1));
-				const FoldLevel firstFollowupLineLevel = model.pdoc->GetFoldLevel(firstFollowupLine);
-				const FoldLevel secondFollowupLineLevelNum = LevelNumberPart(model.pdoc->GetFoldLevel(firstFollowupLine + 1));
 				if (!isExpanded) {
+					const Sci::Line firstFollowupLine = model.pcs->DocFromDisplay(model.pcs->DisplayFromDoc(lineDoc + 1));
+					const FoldLevel firstFollowupLineLevel = model.pdoc->GetFoldLevel(firstFollowupLine);
+					const FoldLevel secondFollowupLineLevelNum = LevelNumberPart(model.pdoc->GetFoldLevel(firstFollowupLine + 1));
 					if (LevelIsWhitespace(firstFollowupLineLevel) &&
 						(levelNum > secondFollowupLineLevelNum))
 						needWhiteClosure = true;
@@ -392,45 +426,27 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 		}
 
 		marks &= marginStyle.mask;
+
 		if (marks) {
+			// Draw all the bar markers first so they are underneath as they often cover
+			// multiple lines for change history and other markers mark individual lines.
+			MarkerMask marksBar = marks;
+			for (int markBit = 0; (markBit < MarkerBitCount) && marksBar; markBit++) {
+				if ((marksBar & 1) && (vs.markers[markBit].markType == MarkerSymbol::Bar)) {
+					const MarkerMask mask = 1U << markBit;
+					const bool markBefore = firstSubLine ? (model.GetMark(lineDoc - 1) & mask) : true;
+					const bool markAfter = lastSubLine ? (model.GetMark(lineDoc + 1) & mask) : true;
+					vs.markers[markBit].Draw(surface, rcMarker, lineNumberStyle.font.get(),
+						PartForBar(markBefore, markAfter), marginStyle.style);
+				}
+				marksBar >>= 1;
+			}
+			// Draw all the other markers over the bar markers
 			for (int markBit = 0; (markBit < MarkerBitCount) && marks; markBit++) {
-				if (marks & 1) {
-					LineMarker::FoldPart part = LineMarker::FoldPart::undefined;
-					if (marginStyle.ShowsFolding() && highlightDelimiter.IsFoldBlockHighlighted(lineDoc)) {
-						if (highlightDelimiter.IsBodyOfFoldBlock(lineDoc)) {
-							part = LineMarker::FoldPart::body;
-						} else if (highlightDelimiter.IsHeadOfFoldBlock(lineDoc)) {
-							if (firstSubLine) {
-								part = headWithTail ? LineMarker::FoldPart::headWithTail : LineMarker::FoldPart::head;
-							} else {
-								if (model.pcs->GetExpanded(lineDoc) || headWithTail) {
-									part = LineMarker::FoldPart::body;
-								} else {
-									part = LineMarker::FoldPart::undefined;
-								}
-							}
-						} else if (highlightDelimiter.IsTailOfFoldBlock(lineDoc)) {
-							part = LineMarker::FoldPart::tail;
-						}
-					}
-					if (vs.markers[markBit].markType == MarkerSymbol::Bar) {
-						const MarkerMask mask = 1U << markBit;
-						const bool markBefore = firstSubLine ? (model.GetMark(lineDoc - 1) & mask) : true;
-						const bool markAfter = lastSubLine ? (model.GetMark(lineDoc + 1) & mask) : true;
-						if (markBefore) {
-							if (markAfter) {
-								part = LineMarker::FoldPart::body;
-							} else {
-								part = LineMarker::FoldPart::tail;
-							}
-						} else {
-							if (markAfter) {
-								part = LineMarker::FoldPart::head;
-							} else {
-								part = LineMarker::FoldPart::headWithTail;
-							}
-						}
-					}
+				if ((marks & 1) && (vs.markers[markBit].markType != MarkerSymbol::Bar)) {
+					const LineMarker::FoldPart part = marginStyle.ShowsFolding() ?
+						PartForFoldHighlight(highlightDelimiter, lineDoc, firstSubLine, headWithTail, isExpanded) :
+						LineMarker::FoldPart::undefined;
 					vs.markers[markBit].Draw(surface, rcMarker, lineNumberStyle.font.get(), part, marginStyle.style);
 				}
 				marks >>= 1;
@@ -438,7 +454,7 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 		}
 
 		visibleLine++;
-		yposScreen = rcMarker.bottom;
+		yposScreen += vs.lineHeight;
 	}
 }
 
