@@ -1018,28 +1018,18 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				bool have_string = false;
 				const char *hit = strchr(q_chars, chNext);
 				if (hit && !isSafeWordcharOrHigh(chNext2)) {
+					state = (int)((q_states >> ((hit - q_chars)*6)) & 0x3f);
+					Quote.Open(chNext2);
 					Quote.New();
-					{
-						state = (int)((q_states >> ((hit - q_chars)*6)) & 0x3f);
-						Quote.Open(chNext2);
-						i += 2;
-						ch = chNext2;
-						chNext = styler.SafeGetCharAt(i + 1);
-						have_string = true;
-					}
-				} else if (preferRE && !isSafeWordcharOrHigh(chNext)) {
-					// Ruby doesn't allow high bit chars here,
-					// but the editor host might
-					Quote.New();
-					state = SCE_RB_STRING_QQ;
-					Quote.Open(chNext);
-					advance_char(i, ch, chNext, chNext2); // pass by ref
+					i += 2;
+					ch = chNext2;
+					chNext = styler.SafeGetCharAt(i + 1);
 					have_string = true;
-				} else if (!isSafeWordcharOrHigh(chNext) && !IsASpaceOrTab(chNext) && !IsEOLChar(chNext)) {
+				} else if ((preferRE || (IsAGraphic(chNext) && chNext != '=')) && !isSafeWordcharOrHigh(chNext)) {
 					// Ruby doesn't allow high bit chars here,
 					// but the editor host might
-					Quote.New();
 					state = SCE_RB_STRING_QQ;
+					Quote.New();
 					Quote.Open(chNext);
 					advance_char(i, ch, chNext, chNext2); // pass by ref
 					have_string = true;
