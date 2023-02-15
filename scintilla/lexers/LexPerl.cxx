@@ -1595,6 +1595,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 	char chNext = styler[startPos];
 	char chPrev = styler.SafeGetCharAt(startPos - 1);
 	int styleNext = styler.StyleAt(startPos);
+	int stylePrevCh = styler.StyleAt(startPos - 1);
 	// Used at end of line to determine if the line was a package definition
 	bool isPackageLine = false;
 	int podHeading = 0;
@@ -1603,7 +1604,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		chNext = styler.SafeGetCharAt(i + 1);
 		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		const int stylePrevCh = (i) ? styler.StyleAt(i - 1) : SCE_PL_DEFAULT;
 		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		const bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
 		// Comment folding
@@ -1721,6 +1721,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			levelPrev = levelCurrent;
 		}
 		chPrev = ch;
+		stylePrevCh = style;
 	}
 	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
 	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;

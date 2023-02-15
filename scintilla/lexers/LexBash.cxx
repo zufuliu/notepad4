@@ -843,7 +843,6 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 	const bool isCShell = styler.GetPropertyBool("lexer.lang");
 
 	const Sci_PositionU endPos = startPos + length;
-	int skipHereCh = 0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
@@ -899,16 +898,10 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 		if (style == SCE_SH_HERE_DELIM) {
 			if (ch == '<' && chNext == '<') {
 				if (styler.SafeGetCharAt(i + 2) == '<') {
-					skipHereCh = 1;
-				} else {
-					if (skipHereCh == 0) {
-						levelCurrent++;
-					} else {
-						skipHereCh = 0;
-					}
+					levelCurrent++;
 				}
 			}
-		} else if (style == SCE_SH_HERE_Q && styler.StyleAt(i + 1) == SCE_SH_DEFAULT) {
+		} else if (style == SCE_SH_HERE_Q && styleNext == SCE_SH_DEFAULT) {
 			levelCurrent--;
 		}
 		if (atEOL) {

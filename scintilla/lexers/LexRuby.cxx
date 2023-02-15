@@ -1298,16 +1298,15 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		} else if (state == SCE_RB_HERE_Q || state == SCE_RB_HERE_QQ || state == SCE_RB_HERE_QX) {
 			if (ch == '\\' && !IsEOLChar(chNext)) {
 				advance_char(i, ch, chNext, chNext2);
-			} else if (ch == '#' && state != SCE_RB_HERE_Q) {
-				if (chNext == '{' && innerExpr.canEnter()) {
-					// process #{ ... }
-					styler.ColorTo(i, state);
-					styler.ColorTo(i + 2, SCE_RB_OPERATOR);
-					innerExpr.enter(state, Quote);
-					preferRE = true;
-					// Skip one
-					advance_char(i, ch, chNext, chNext2);
-				}
+			} else if (ch == '#' && state != SCE_RB_HERE_Q
+				&& chNext == '{' && innerExpr.canEnter()) {
+				// process #{ ... }
+				styler.ColorTo(i, state);
+				styler.ColorTo(i + 2, SCE_RB_OPERATOR);
+				innerExpr.enter(state, Quote);
+				preferRE = true;
+				// Skip one
+				advance_char(i, ch, chNext, chNext2);
 			}
 
 			// Not needed: HereDoc.State == 2
@@ -1736,7 +1735,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	uint8_t chPrev = '\0';
 	uint8_t chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
-	int stylePrev = startPos <= 1 ? SCE_RB_DEFAULT : styler.StyleAt(startPos - 1);
+	int stylePrev = styler.StyleAt(startPos - 1);
 	// detect endless method definition to fix up code folding
 	enum class MethodDefinition {
 		None,
@@ -1747,6 +1746,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	};
 	MethodDefinition method_definition = MethodDefinition::None;
 	int argument_paren_count = 0;
+	bool heredocOpen = false;
 
 	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		const uint8_t ch = chNext;
@@ -1789,10 +1789,15 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				levelCurrent++;
 			}
 		} else if (style == SCE_RB_HERE_DELIM) {
-			if (styler.SafeGetCharAt(i - 2) == '<' && styler.SafeGetCharAt(i - 1) == '<') {
+			if (stylePrev == SCE_RB_OPERATOR && chPrev == '<' && styler.SafeGetCharAt(i - 2) == '<') {
 				levelCurrent++;
-			} else if (styleNext == SCE_RB_DEFAULT) {
-				levelCurrent--;
+				heredocOpen = true;
+			} else if (styleNext != SCE_RB_HERE_DELIM) {
+				if (heredocOpen) {
+					heredocOpen = false;
+				} else {
+					levelCurrent--;
+				}
 			}
 		} else if (style == SCE_RB_STRING_QW || style == SCE_RB_STRING_W) {
 			if (stylePrev != style) {
