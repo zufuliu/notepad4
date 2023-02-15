@@ -553,7 +553,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	public:
 		int Rep;
 		int Count;
-		int Up, Down;
+		int Up;
+		int Down;
 		QuoteCls() noexcept {
 			New(1);
 		}

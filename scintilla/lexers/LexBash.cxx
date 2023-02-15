@@ -26,6 +26,8 @@
 
 using namespace Lexilla;
 
+namespace {
+
 #define HERE_DELIM_MAX			256
 
 // define this if you want 'invalid octals' to be marked as errors
@@ -58,8 +60,6 @@ using namespace Lexilla;
 #define BASH_DELIM_BACKTICK		5
 
 #define BASH_DELIM_STACK_MAX	7
-
-namespace {
 
 constexpr int translateBashDigit(int ch) noexcept {
 	if (ch >= '0' && ch <= '9') {
@@ -203,9 +203,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	HereDocCls HereDoc;
 
 	class QuoteCls {	// Class to manage quote pairs (simplified vs LexPerl)
-		public:
+	public:
 		int Count;
-		int Up, Down;
+		int Up;
+		int Down;
 		QuoteCls() noexcept {
 			Count = 0;
 			Up    = '\0';
@@ -224,9 +225,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	QuoteCls Quote;
 
 	class QuoteStackCls {	// Class to manage quote pairs that nest
-		public:
+	public:
 		int Count;
-		int Up, Down;
+		int Up;
+		int Down;
 		int Style;
 		int Depth;			// levels pushed
 		int CountStack[BASH_DELIM_STACK_MAX];

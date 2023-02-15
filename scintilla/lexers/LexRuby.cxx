@@ -320,34 +320,6 @@ constexpr bool IsInterpolableLiteral(int state) noexcept {
 		&& state != SCE_RB_STRING_SQ;
 }
 
-void enterInnerExpression(int *p_inner_string_types,
-								int *p_inner_expn_brace_counts,
-								QuoteCls *p_inner_quotes,
-								int &inner_string_count,
-								int &state,
-								int &brace_counts,
-								const QuoteCls &curr_quote) noexcept {
-	p_inner_string_types[inner_string_count] = state;
-	state = SCE_RB_DEFAULT;
-	p_inner_expn_brace_counts[inner_string_count] = brace_counts;
-	brace_counts = 0;
-	p_inner_quotes[inner_string_count] = curr_quote;
-	++inner_string_count;
-}
-
-void exitInnerExpression(const int *p_inner_string_types,
-								const int *p_inner_expn_brace_counts,
-								const QuoteCls *p_inner_quotes,
-								int &inner_string_count,
-								int &state,
-								int &brace_counts,
-								QuoteCls &curr_quote) noexcept {
-	--inner_string_count;
-	state = p_inner_string_types[inner_string_count];
-	brace_counts = p_inner_expn_brace_counts[inner_string_count];
-	curr_quote = p_inner_quotes[inner_string_count];
-}
-
 bool isEmptyLine(Sci_Position pos, Accessor &styler) noexcept {
 	const Sci_Line lineCurrent = styler.GetLine(pos);
 	const int indentCurrent = styler.IndentAmount(lineCurrent);
@@ -754,13 +726,39 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	// is invoked.
 
 #define INNER_STRINGS_MAX_COUNT 5
-	// These vars track our instances of "...#{,,,%Q<..#{,,,}...>,,,}..."
-	int inner_string_types[INNER_STRINGS_MAX_COUNT] {};
-	// Track # braces when we push a new #{ thing
-	int inner_expn_brace_counts[INNER_STRINGS_MAX_COUNT] {};
-	QuoteCls inner_quotes[INNER_STRINGS_MAX_COUNT];
-	int inner_string_count = 0;
-	int brace_counts = 0;	// Number of #{ ... } things within an expression
+	class InnerExpression {
+		// These vars track our instances of "...#{,,,%Q<..#{,,,}...>,,,}..."
+		int inner_string_types[INNER_STRINGS_MAX_COUNT] {};
+		// Track # braces when we push a new #{ thing
+		int inner_expn_brace_counts[INNER_STRINGS_MAX_COUNT] {};
+		QuoteCls inner_quotes[INNER_STRINGS_MAX_COUNT];
+		int inner_string_count = 0;
+
+	public:
+		int brace_counts = 0;	// Number of #{ ... } things within an expression
+
+		bool canEnter() const noexcept {
+			return inner_string_count < INNER_STRINGS_MAX_COUNT;
+		}
+		bool canExit() const noexcept {
+			return inner_string_count > 0;
+		}
+		void enter(int &state, const QuoteCls &curr_quote) noexcept {
+			inner_string_types[inner_string_count] = state;
+			state = SCE_RB_DEFAULT;
+			inner_expn_brace_counts[inner_string_count] = brace_counts;
+			brace_counts = 0;
+			inner_quotes[inner_string_count] = curr_quote;
+			++inner_string_count;
+		}
+		void exit(int &state, QuoteCls &curr_quote) noexcept {
+			--inner_string_count;
+			state = inner_string_types[inner_string_count];
+			brace_counts = inner_expn_brace_counts[inner_string_count];
+			curr_quote = inner_quotes[inner_string_count];
+		}
+	};
+	InnerExpression innerExpr;
 
 	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		char ch = chNext;
@@ -794,7 +792,14 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			}
 			// Don't check for a missing quote, just jump into
 			// the here-doc state
-			state = SCE_RB_HERE_Q;
+			state = SCE_RB_HERE_QQ;
+			if (HereDoc.Quoted) {
+				if (HereDoc.Quote == '\'') {
+					state = SCE_RB_HERE_Q;
+				} else if (HereDoc.Quote == '`') {
+					state = SCE_RB_HERE_QX;
+				}
+			}
 		}
 
 		// Regular transitions
@@ -1019,8 +1024,8 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				const char *hit = strchr(q_chars, chNext);
 				if (hit && !isSafeWordcharOrHigh(chNext2)) {
 					state = (int)((q_states >> ((hit - q_chars)*6)) & 0x3f);
-					Quote.Open(chNext2);
 					Quote.New();
+					Quote.Open(chNext2);
 					i += 2;
 					ch = chNext2;
 					chNext = styler.SafeGetCharAt(i + 1);
@@ -1086,16 +1091,12 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				// like : << / are unary operators.
 
 				if (ch == '{') {
-					++brace_counts;
+					++innerExpr.brace_counts;
 					preferRE = true;
-				} else if (ch == '}' && --brace_counts < 0
-					&& inner_string_count > 0) {
+				} else if (ch == '}' && --innerExpr.brace_counts < 0
+					&& innerExpr.canExit()) {
 					styler.ColorTo(i + 1, SCE_RB_OPERATOR);
-					exitInnerExpression(inner_string_types,
-										inner_expn_brace_counts,
-										inner_quotes,
-										inner_string_count,
-										state, brace_counts, Quote);
+					innerExpr.exit(state, Quote);
 				} else {
 					preferRE = !AnyOf(ch, ')', '}', ']', '.');
 				}
@@ -1294,14 +1295,28 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					preferRE = false;
 				}
 			}
-		} else if (state == SCE_RB_HERE_Q) {
+		} else if (state == SCE_RB_HERE_Q || state == SCE_RB_HERE_QQ || state == SCE_RB_HERE_QX) {
+			if (ch == '\\' && !IsEOLChar(chNext)) {
+				advance_char(i, ch, chNext, chNext2);
+			} else if (ch == '#' && state != SCE_RB_HERE_Q) {
+				if (chNext == '{' && innerExpr.canEnter()) {
+					// process #{ ... }
+					styler.ColorTo(i, state);
+					styler.ColorTo(i + 2, SCE_RB_OPERATOR);
+					innerExpr.enter(state, Quote);
+					preferRE = true;
+					// Skip one
+					advance_char(i, ch, chNext, chNext2);
+				}
+			}
+
 			// Not needed: HereDoc.State == 2
 			// Indentable here docs: look backwards
 			// Non-indentable: look forwards, like in Perl
 			//
 			// Why: so we can quickly resolve things like <<-" abc"
 
-			if (!HereDoc.CanBeIndented) {
+			else if (!HereDoc.CanBeIndented) {
 				if (IsEOLChar(chPrev)
 					&& isMatch(styler, lengthDoc, i, HereDoc.Delimiter)) {
 					styler.ColorTo(i, state);
@@ -1389,20 +1404,12 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (ch == Quote.Up) {
 				// Only if close quoter != open quoter
 				Quote.Count++;
-
 			} else if (ch == '#') {
-				if (chNext == '{'
-					&& inner_string_count < INNER_STRINGS_MAX_COUNT) {
+				if (chNext == '{' && innerExpr.canEnter()) {
 					// process #{ ... }
 					styler.ColorTo(i, state);
 					styler.ColorTo(i + 2, SCE_RB_OPERATOR);
-					enterInnerExpression(inner_string_types,
-										inner_expn_brace_counts,
-										inner_quotes,
-										inner_string_count,
-										state,
-										brace_counts,
-										Quote);
+					innerExpr.enter(state, Quote);
 					preferRE = true;
 					// Skip one
 					advance_char(i, ch, chNext, chNext2);
@@ -1451,18 +1458,12 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			} else if (ch == Quote.Up) {
 				Quote.Count++;
 			} else if (ch == '#' && chNext == '{'
-					&& inner_string_count < INNER_STRINGS_MAX_COUNT
+					&& innerExpr.canEnter()
 					&& IsInterpolableLiteral(state)) {
 				// process #{ ... }
 				styler.ColorTo(i, state);
 				styler.ColorTo(i + 2, SCE_RB_OPERATOR);
-				enterInnerExpression(inner_string_types,
-									inner_expn_brace_counts,
-									inner_quotes,
-									inner_string_count,
-									state,
-									brace_counts,
-									Quote);
+				innerExpr.enter(state, Quote);
 				preferRE = true;
 				// Skip one
 				advance_char(i, ch, chNext, chNext2);
