@@ -250,7 +250,7 @@ void advance_char(Sci_Position &i, char &ch, char &chNext, char chNext2) noexcep
 }
 
 // precondition: startPos points to one after the EOL char
-bool currLineContainsHereDelims(Sci_Position &startPos, Accessor &styler) {
+bool currLineContainsHereDelims(Sci_Position &startPos, Accessor &styler) noexcept {
 	if (startPos <= 1)
 		return false;
 
@@ -1023,7 +1023,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				bool have_string = false;
 				const char *hit = strchr(q_chars, chNext);
 				if (hit && !isSafeWordcharOrHigh(chNext2)) {
-					state = (int)((q_states >> ((hit - q_chars)*6)) & 0x3f);
+					state = (q_states >> ((hit - q_chars)*6)) & 0x3f;
 					Quote.New();
 					Quote.Open(chNext2);
 					i += 2;
@@ -1132,7 +1132,10 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				} else if (ch == ':'
 					&& isSafeWordcharOrHigh(chPrev)
 					&& IsASpace(chNext)) {
-					state = SCE_RB_SYMBOL;
+					// keyword argument, symbol Hash key
+					styler.ColorTo(i + 1, SCE_RB_SYMBOL);
+					state = SCE_RB_DEFAULT;
+					preferRE = true;
 				} else if ((ch == '?' || ch == '!')
 					&& isSafeWordcharOrHigh(chPrev)
 					&& !isSafeWordcharOrHigh(chNext)) {
@@ -1166,12 +1169,11 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 						break;
 
 					default:
-						preferRE = false;
+						preferRE = word_style == SCE_RB_DEF_NAME;
 						break;
 					}
 					if (ch == '.') {
 						// We might be redefining an operator-method
-						preferRE = false;
 						afterDef = word_style == SCE_RB_DEF_NAME;
 					}
 					// And if it's the first
@@ -1788,16 +1790,12 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			} else if (keywordLists[KeywordIndex_CodeFolding].InList(prevWord)) {
 				levelCurrent++;
 			}
-		} else if (style == SCE_RB_HERE_DELIM) {
+		} else if (style == SCE_RB_HERE_DELIM && !heredocOpen) {
 			if (stylePrev == SCE_RB_OPERATOR && chPrev == '<' && styler.SafeGetCharAt(i - 2) == '<') {
 				levelCurrent++;
 				heredocOpen = true;
 			} else if (styleNext != SCE_RB_HERE_DELIM) {
-				if (heredocOpen) {
-					heredocOpen = false;
-				} else {
-					levelCurrent--;
-				}
+				levelCurrent--;
 			}
 		} else if (style == SCE_RB_STRING_QW || style == SCE_RB_STRING_W) {
 			if (stylePrev != style) {
@@ -1866,6 +1864,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			levelPrev = levelCurrent;
 			method_definition = MethodDefinition::None;
 			argument_paren_count = 0;
+			heredocOpen = false;
 		}
 		chPrev = ch;
 		stylePrev = style;
