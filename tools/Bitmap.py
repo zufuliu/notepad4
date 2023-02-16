@@ -189,7 +189,7 @@ class Bitmap:
 		self.palette = None
 		# color palette after header
 		if self.infoHeader.bitsPerPixel < 24:
-			paletteSize = (4 << self.infoHeader.bitsPerPixel)
+			paletteSize = 4 << self.infoHeader.bitsPerPixel
 			self.palette = fd.read(paletteSize)
 
 		current = fd.tell()
@@ -337,7 +337,7 @@ class Bitmap:
 					colorMap[color] = index
 		else:
 			counter = self.countColor()
-			if len(counter) > colorCount and (method == None or method < QuantizeMethod.Naive):
+			if len(counter) > colorCount and (method is None or method < QuantizeMethod.Naive):
 				bmp = self.quantize(colorCount, method, False)
 				print(f'quantize {len(counter)} => {bmp.colorUsed}')
 				bmp.bitsPerPixel = self.bitsPerPixel

@@ -60,7 +60,7 @@ def convert_image(path, out_path=None, colorDepth=None, quantize=True, method=No
 				bmp = quantize_external(path, out_path, colorCount, method)
 			else:
 				bmp = bmp.quantize(colorCount, method, False)
-			name = method.name if method != None else 'Default'
+			name = 'Default' if method is None else method.name
 			count = bmp.colorUsed
 			print(f'quantize image {name}: {current} => {count}')
 	save_bitmap(bmp, out_path, colorDepth)

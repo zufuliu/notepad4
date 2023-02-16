@@ -35,7 +35,7 @@ def GenerateBase64Table():
 	decoding[ord('_')] = encoding.index('/')
 	output = []
 	for i in range(0, len(decoding), 16):
-		line = ', '.join('%3d' % ch for ch in decoding[i:i+16])
+		line = ', '.join(f'{ch:3d}' for ch in decoding[i:i+16])
 		output.append(line + ',')
 	print('base64 decoding:')
 	print('\n'.join(output))
@@ -44,4 +44,3 @@ if __name__ == '__main__':
 	GenerateBraceMatchTable()
 	GenerateDefaultWordCharSet()
 	GenerateBase64Table()
-

@@ -50,7 +50,7 @@ def UpdateFile(filename, updated):
         newOrChanged = "New"
     with open(filename, "w", encoding="utf-8", newline='') as outfile:
         outfile.write(updated)
-    print("%s:0: %s" % (filename, newOrChanged))
+    print(f"{filename}:0: {newOrChanged}")
 
 # Automatically generated sections contain start and end comments,
 # a definition line and the results.
