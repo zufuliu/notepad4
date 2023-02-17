@@ -49,7 +49,7 @@ bool StyleContext::MatchIgnoreCase(const char *s) const noexcept {
 	}
 	s++;
 	for (Sci_PositionU pos = currentPos + 2; *s; s++, pos++) {
-		if (*s != MakeLowerCase(styler.SafeGetCharAt(pos))) {
+		if (*s != MakeLowerCase(styler[pos])) {
 			return false;
 		}
 	}
@@ -66,11 +66,48 @@ bool StyleContext::MatchLowerCase(const char *s) const noexcept {
 	}
 	s++;
 	for (Sci_PositionU pos = currentPos + 2; *s; s++, pos++) {
-		if (*s != UnsafeLower(styler.SafeGetCharAt(pos))) {
+		if (*s != UnsafeLower(styler[pos])) {
 			return false;
 		}
 	}
 	return true;
+}
+
+int StyleContext::GetDocNextChar(bool ignoreCurrent) const noexcept {
+	if (!ignoreCurrent && !IsWhiteSpace(ch)) {
+		return ch;
+	}
+	if (!IsWhiteSpace(chNext)) {
+		return chNext;
+	}
+	// currentPos + width + widthNext
+	for (Sci_PositionU pos = currentPos + 2; ; pos++) {
+		const unsigned char chPos = styler[pos];
+		if (!IsWhiteSpace(chPos)) {
+			return chPos;
+		}
+	}
+}
+
+int StyleContext::GetLineNextChar(bool ignoreCurrent) const noexcept {
+	if (!ignoreCurrent && !IsWhiteSpace(ch)) {
+		return ch;
+	}
+	// currentPos + width for Unicode line ending
+	if (currentPos + 1 == lineStartNext) {
+		return '\0';
+	}
+	if (!IsWhiteSpace(chNext)) {
+		return chNext;
+	}
+	// currentPos + width + widthNext
+	for (Sci_PositionU pos = currentPos + 2; pos < lineStartNext; pos++) {
+		const unsigned char chPos = styler[pos];
+		if (!IsWhiteSpace(chPos)) {
+			return chPos;
+		}
+	}
+	return '\0';
 }
 
 namespace {

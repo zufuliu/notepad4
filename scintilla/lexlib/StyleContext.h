@@ -173,17 +173,17 @@ public:
 		return (ch == static_cast<unsigned char>(ch0)) && (chNext == static_cast<unsigned char>(ch1));
 	}
 	bool Match(char ch0, char ch1, char ch2) const noexcept {
-		return Match(ch0, ch1) && ch2 == styler.SafeGetCharAt(currentPos + 2);
+		return Match(ch0, ch1) && ch2 == styler[currentPos + 2];
 	}
 	bool Match(char ch0, char ch1, char ch2, char ch3) const noexcept {
-		return Match(ch0, ch1, ch2) && ch3 == styler.SafeGetCharAt(currentPos + 3);
+		return Match(ch0, ch1, ch2) && ch3 == styler[currentPos + 3];
 	}
 
 	bool MatchNext(char ch0, char ch1) const noexcept {
-		return chNext == static_cast<unsigned char>(ch0) && ch1 == styler.SafeGetCharAt(currentPos + 2);
+		return chNext == static_cast<unsigned char>(ch0) && ch1 == styler[currentPos + 2];
 	}
 	bool MatchNext(char ch0, char ch1, char ch2) const noexcept {
-		return MatchNext(ch0, ch1) && ch2 == styler.SafeGetCharAt(currentPos + 3);
+		return MatchNext(ch0, ch1) && ch2 == styler[currentPos + 3];
 	}
 
 	bool Match(const char *s) const noexcept {
@@ -199,7 +199,7 @@ public:
 		}
 		s++;
 		for (Sci_PositionU pos = currentPos + 2; *s; s++, pos++) {
-			if (*s != styler.SafeGetCharAt(pos)) {
+			if (*s != styler[pos]) {
 				return false;
 			}
 		}
@@ -280,31 +280,8 @@ public:
 		return chPrev;
 	}
 
-	int GetDocNextChar(bool ignoreCurrent = false) const noexcept {
-		if (!ignoreCurrent && !IsWhiteSpace(ch)) {
-			return ch;
-		}
-		if (!IsWhiteSpace(chNext)) {
-			return chNext;
-		}
-		// currentPos + width + widthNext
-		return LexGetNextChar(styler, currentPos + 2);
-	}
-
-	int GetLineNextChar(bool ignoreCurrent = false) const noexcept {
-		if (!ignoreCurrent && !IsWhiteSpace(ch)) {
-			return ch;
-		}
-		// currentPos + width for Unicode line ending
-		if (currentPos + 1 == lineStartNext) {
-			return '\0';
-		}
-		if (!IsWhiteSpace(chNext)) {
-			return chNext;
-		}
-		// currentPos + width + widthNext
-		return LexGetNextChar(styler, currentPos + 2, lineStartNext);
-	}
+	int GetDocNextChar(bool ignoreCurrent = false) const noexcept;
+	int GetLineNextChar(bool ignoreCurrent = false) const noexcept;
 };
 
 bool HighlightTaskMarker(StyleContext &sc, int &visibleChars, int visibleCharsBefore, int markerStyle);

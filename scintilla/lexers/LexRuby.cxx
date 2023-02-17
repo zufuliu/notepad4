@@ -186,27 +186,12 @@ int ClassifyWordRb(Sci_PositionU start, Sci_PositionU end, char ch, char chNext,
 	return chAttr;
 }
 
-
-//XXX Identical to Perl, put in common area
-bool isMatch(Accessor &styler, Sci_Position lengthDoc, Sci_Position pos, const char *val) noexcept {
-	if ((pos + static_cast<Sci_Position>(strlen(val))) >= lengthDoc) {
-		return false;
-	}
-	while (*val) {
-		if (*val != styler[pos++]) {
-			return false;
-		}
-		val++;
-	}
-	return true;
-}
-
 // Do Ruby better -- find the end of the line, work back,
 // and then check for leading white space
 
 // Precondition: the here-doc target can be indented
-bool lookingAtHereDocDelim(Accessor &styler, Sci_Position pos, Sci_Position lengthDoc, const char *HereDocDelim) noexcept {
-	if (!isMatch(styler, lengthDoc, pos, HereDocDelim)) {
+bool lookingAtHereDocDelim(Accessor &styler, Sci_Position pos, const char *HereDocDelim) noexcept {
+	if (!styler.Match(pos, HereDocDelim)) {
 		return false;
 	}
 	while (--pos > 0) {
@@ -318,12 +303,6 @@ constexpr bool IsInterpolableLiteral(int state) noexcept {
 		&& state != SCE_RB_STRING_I
 		&& state != SCE_RB_STRING_QS
 		&& state != SCE_RB_STRING_SQ;
-}
-
-bool isEmptyLine(Sci_Position pos, Accessor &styler) noexcept {
-	const Sci_Line lineCurrent = styler.GetLine(pos);
-	const int indentCurrent = styler.IndentAmount(lineCurrent);
-	return (indentCurrent & SC_FOLDLEVELWHITEFLAG) != 0;
 }
 
 // This routine looks for false positives like
@@ -602,9 +581,8 @@ bool sureThisIsNotHeredoc(Sci_Position lt2StartPos, Accessor &styler) {
 // move to the start of the first line that is not in a
 // multi-line construct
 
-void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &initStyle,
-	Accessor &styler, bool skipWhiteSpace = false) {
-
+void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &initStyle, Accessor &styler, bool skipWhiteSpace = false) {
+#if 0
 	styler.Flush();
 	const int style = styler.StyleAt(startPos);
 	switch (style) {
@@ -614,6 +592,7 @@ void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &in
 		// Don't do anything else with these.
 		return;
 	}
+#endif
 
 	Sci_Position pos = startPos;
 	// Quick way to characterize each line
@@ -637,7 +616,7 @@ void synchronizeDocStart(Sci_PositionU & startPos, Sci_Position &length, int &in
 		} else if (currLineContainsHereDelims(pos, styler)) {
 			// Keep going, with pos and length now pointing
 			// at the end of the here-doc delimiter
-		} else if (skipWhiteSpace && isEmptyLine(pos, styler)) {
+		} else if (skipWhiteSpace && IsLexEmptyLine(styler, lineStart - 1)) {
 			// Keep going
 		} else {
 			break;
@@ -679,8 +658,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 	int numDots = 0;  // For numbers --
 					  // Don't start lexing in the middle of a num
 
-	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
-		false);
+	synchronizeDocStart(startPos, length, initStyle, styler, false);
 
 	bool preferRE = true;
 	bool afterDef = false;
@@ -1144,8 +1122,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// <name>, (op, ?), <name>
 					// Same with <name>! to indicate a method that
 					// modifies its target
-				} else if (IsEOLChar(ch)
-					&& isMatch(styler, lengthDoc, i - 7, "__END__")) {
+				} else if (IsEOLChar(ch) && styler.Match(i - 7, "__END__")) {
 					styler.ColorTo(i + 1, SCE_RB_DATASECTION);
 					state = SCE_RB_DATASECTION;
 					// No need to handle this state -- we'll just move to the end
@@ -1318,8 +1295,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			// Why: so we can quickly resolve things like <<-" abc"
 
 			else if (!HereDoc.CanBeIndented) {
-				if (IsEOLChar(chPrev)
-					&& isMatch(styler, lengthDoc, i, HereDoc.Delimiter)) {
+				if (IsEOLChar(chPrev) && styler.Match(i, HereDoc.Delimiter)) {
 					styler.ColorTo(i, state);
 					i += HereDoc.DelimiterLength - 1;
 					chNext = styler.SafeGetCharAt(i + 1);
@@ -1332,10 +1308,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					// Otherwise we skipped through the here doc faster.
 				}
 			} else if (IsEOLChar(chNext)
-				&& lookingAtHereDocDelim(styler,
-					i + 1 - HereDoc.DelimiterLength,
-					lengthDoc,
-					HereDoc.Delimiter)) {
+				&& lookingAtHereDocDelim(styler, i + 1 - HereDoc.DelimiterLength, HereDoc.Delimiter)) {
 				styler.ColorTo(i + 1 - HereDoc.DelimiterLength, state);
 				styler.ColorTo(i + 1, SCE_RB_HERE_DELIM);
 				state = SCE_RB_DEFAULT;
@@ -1380,7 +1353,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			if (IsASpace(ch)
 				&& i > 5
 				&& IsEOLChar(styler[i - 5])
-				&& isMatch(styler, lengthDoc, i - 4, "=end")) {
+				&& styler.Match(i - 4, "=end")) {
 				styler.ColorTo(i, state);
 				state = SCE_RB_DEFAULT;
 				preferRE = false;
@@ -1728,8 +1701,7 @@ bool keywordDoStartsLoop(Sci_Position pos, Accessor &styler) {
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_RB_COMMENTLINE)
 
 void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
-	synchronizeDocStart(startPos, length, initStyle, styler, // ref args
-		false);
+	synchronizeDocStart(startPos, length, initStyle, styler, false);
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = startPos == 0 ? 0 : (styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK & ~SC_FOLDLEVELBASE);
@@ -1762,18 +1734,20 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 		}
 		if (style == SCE_RB_POD) {
 			if (ch == '=') {
-				if (styler.Match(i + 1, "begin"))
+				if (styler.Match(i + 1, "begin")) {
 					levelCurrent++;
-				else if (styler.Match(i + 1, "end"))
+				} else if (styler.Match(i + 1, "end")) {
 					levelCurrent--;
+				}
 			}
 		} else if (style == SCE_RB_OPERATOR) {
 			if (ch == '(' || ch == '{' || ch == '[') {
 				levelCurrent++;
 			} else if (ch == ')' || ch == '}' || ch == ']') {
 				// Don't decrement below 0
-				if (levelCurrent > 0)
+				if (levelCurrent > 0) {
 					levelCurrent--;
+				}
 			}
 		} else if (style == SCE_RB_WORD && styleNext != SCE_RB_WORD) {
 			// Look at the keyword on the left and decide what to do
