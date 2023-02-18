@@ -1,4 +1,5 @@
-# Ruby 3.1.1 https://www.ruby-lang.org/en/documentation/
+# Ruby 3.2 https://www.ruby-lang.org/en/documentation/
+# https://docs.ruby-lang.org/en/
 # https://ruby-doc.org/
 # https://rubyreferences.github.io/
 
@@ -100,20 +101,21 @@ end end end
 
 #! built-in			===========================================================
 module Kernel
-	def Array(arg) = array
+	def Array(arg) = object or new_array
 	def Complex(x[, y], exception: true) = numeric or nil
 	def Float(arg, exception: true) = float or nil
-	def Hash(arg) = hash
+	def Hash(arg) = object or new_hash
 	def Integer(arg, base=0, exception: true) = integer or nil
 	def Rational(arg, exception: true) = rational or nil
-	def String(arg) = string
+	def String(arg) = object or new_string
 	def __callee__ = symbol
 	def __dir__ = string
 	def __method__ = symbol
 
-	def abort(*args) =
+	def abort([msg]) =
 	def at_exit = proc
-	def autoload(module_, filename) = nil
+	def autoload(const, filename) = nil
+	def autoload?(name, inherit=true) = String or nil
 	def binding = a_binding
 	def block_given? = true or false
 	def callcc = obj
@@ -124,12 +126,12 @@ module Kernel
 	def chop = $_
 	def clone(freeze: nil) = an_object
 	def eval(string [, binding [, filename [,lineno]]]) = obj
-	def exec(*args) =
-	def exit(*args) =
-	def exit!(*args) =
+	def exec([env,] command... [,options]) =
+	def exit(status=true) =
+	def exit!(status=false) =
 	def fail(exception [, string [, array]], cause: $!) =
 	def fork = integer or nil
-	def format(format_string [, arguments...] ) = string
+	def format(*args) = string
 	def frozen? = true or false
 	def gets(sep, limit [, getline_args]) = string or nil
 	def global_variables = array
@@ -139,33 +141,33 @@ module Kernel
 	def local_variables = array
 	def loop = an_enumerator
 	def open(path [, mode [, perm]] [, opt]) = io or nil
-	def print(obj, ...) = nil
-	def printf(io, string [, obj ... ]) = nil
+	def print(*objects) = nil
+	def printf(io, format_string, *objects) = nil
 	def proc = a_proc
 	def putc(int) = int
-	def puts(obj, ...) = nil
+	def puts(*objects) = nil
 	def raise(exception [, string [, array]], cause: $!) =
 	def rand(max=0) = number
-	def readline(sep, limit) = string
-	def readlines(sep, limit) = array
+	def readline(sep, limit, chomp: false) = string
+	def readlines(sep, limit, chomp: false, **enc_opts) = array
 	def require(name) = true or false
 	def require_relative(string) = true or false
-	def select(read_array [, write_array [, error_array [, timeout]]]) = array or nil
+	def select(read_ios, write_ios = [], error_ios = [], timeout = nil) = array or nil
 	def set_trace_func(proc) = proc
 	def sleep([duration]) = integer
 	def spawn([env,] command... [,options]) = pid
-	def sprintf(format_string [, arguments...] ) = string
+	def sprintf(format_string *objects) = string
 	def srand(number = Random.new_seed) = old_seed
 	def sub(pattern, replacement) = $_
-	def syscall(num [, args...]) = integer
+	def syscall(integer_callno, *arguments) = integer
 	def system([env,] command... [,options], exception: false) = true, false or nil
 	def tap = obj
-	def test(cmd, file1 [, file2] ) = obj
+	def test(cmd, file1 [, file2]) = obj
 	def then = an_object
 	def throw(tag [, obj]) =
-	def trace_var(symbol, cmd ) = nil
-	def trap( signal, command ) = obj
-	def untrace_var(symbol [, cmd] ) = array or nil
+	def trace_var(symbol, cmd) = nil
+	def trap(signal, command) = obj
+	def untrace_var(symbol [, cmd]) = array or nil
 	def warn(*msgs, uplevel: nil, category: nil) = nil
 	def yield_self = an_object
 end
@@ -177,19 +179,16 @@ class BasicObject
 	def send(symbol [, args...]) = obj
 	def __send__(symbol [, args...]) = obj
 	def equal?(other) = true or false
-	def instance_eval(string [, filename [, lineno]] ) = obj
+	def instance_eval(string [, filename [, lineno]]) = obj
 	def instance_exec(arg...) = obj
 
-	def method_missing(symbol [, *args] ) = result
+	def method_missing(symbol [, *args]) = result
 	def singleton_method_added(symbol) =
 	def singleton_method_removed(symbol) =
 	def singleton_method_undefined(symbol) =
 end
 
 class Object < BasicObject
-	def const_missing(c) =
-
-	def callable_methods() =
 	def define_singleton_method(symbol, method) = symbol
 	def display(port=$>) = nil
 	def dup = an_object
@@ -207,7 +206,6 @@ class Object < BasicObject
 	def is_a?(class_) = true or false
 	def itself = obj
 	def kind_of?(class_) = true or false
-	def matching_methods(s = '', m = callable_methods) =
 	def method(sym) = method
 	def methods(regular=true) = array
 	def nil? = true or false
@@ -219,21 +217,11 @@ class Object < BasicObject
 	def remove_instance_variable(symbol) = obj
 	def respond_to?(symbol, include_all=false) = true or false
 	def respond_to_missing?(symbol, include_all) = true or false
-	def shortest_abbreviation(s = '', m = callable_methods) =
 	def singleton_class = class_
 	def singleton_method(sym) = method
 	def singleton_methods(all=true) = array
-	def taint = obj
-	def tainted? = false
 	def to_enum(method = :each, *args) = enum
 	def to_s = string
-	def trust = obj
-	def untaint = obj
-	def untrust = obj
-	def untrusted? = false
-
-	def do_until() =
-	def do_while() =
 end
 
 class Module
@@ -242,6 +230,7 @@ class Module
 	def nesting = array
 	def new = mod
 	def used_modules = array
+	def used_refinements = array
 
 	def alias_method(new_name, old_name) = symbol
 	def ancestors = array
@@ -249,6 +238,7 @@ class Module
 	def attr_accessor(symbol, ...) = array
 	def attr_reader(symbol, ...) = array
 	def attr_writer(symbol, ...) = array
+	def autoload(const, filename) = nil
 	def autoload?(name, inherit=true) = String or nil
 	def class_eval(string [, filename [, lineno]]) = obj
 	def class_exec(arg...) = obj
@@ -261,6 +251,7 @@ class Module
 	def const_missing(sym) = obj
 	def const_set(sym, obj) = obj
 	def const_source_location(sym, inherit=true) = [String, Integer]
+	def constants(inherit=true) = array
 	def define_method(symbol, method) = symbol
 	def deprecate_constant(symbol, ...) => mod
 	def freeze = mod
@@ -286,13 +277,16 @@ class Module
 	def public_instance_method(symbol) = unbound_method
 	def public_instance_methods(include_super=true) = array
 	def public_method_defined?(symbol, inherit=true) = true or false
+	def refinements = array
 	def remove_class_variable(sym) = obj
 	def remove_method(symbol) = self
 	def singleton_class? = true or false
 	def to_s = string
 	def undef_method(symbol) = self
+	def undefined_instance_methods = array
 
 	def append_features(mod) = mod
+	def const_added(const_name) =
 	def extend_object(obj) = obj
 	def extended(othermod) =
 	def included(othermod) =
@@ -302,8 +296,11 @@ class Module
 	def module_function(method_name, method_name, ...) = array
 	def prepend_features(mod) = mod
 	def prepended(othermod) =
+	def private = nil
 	def private(method_name, method_name, ...) = array
+	def protected = nil
 	def protected(method_name, method_name, ...) = array
+	def public = nil
 	def public(method_name, method_name, ...) = array
 	def refine(mod) = module_
 	def remove_const(sym) = obj
@@ -312,6 +309,7 @@ class Module
 
 	class Refinement < Module
 		def import_methods(module_, ...) = self
+		def refined_class =
 	end
 end
 
@@ -425,7 +423,7 @@ class FalseClass
 end
 
 class Fiber
-	class SchedulerInterface
+	class Scheduler
 	end
 end
 
@@ -436,7 +434,7 @@ class File < IO
 	end
 end
 
-module FileTest
+module FileUtils
 end
 
 module GC
@@ -450,7 +448,9 @@ class IO
 		class AllocationError end
 		class InvalidatedError end
 		class LockedError end
+		class MaskError end
 	end
+	class TimeoutError end
 	module WaitReadable
 		class EAGAINWaitReadable end
 		class EINPROGRESSWaitReadable end
