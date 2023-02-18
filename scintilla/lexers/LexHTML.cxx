@@ -34,11 +34,11 @@ namespace {
 enum script_type { eScriptNone = 0, eScriptJS, eScriptVBS, eScriptXML, eScriptSGML, eScriptSGMLblock, eScriptComment };
 enum script_mode { eHtml = 0, eNonHtmlScript, eNonHtmlPreProc, eNonHtmlScriptPreProc };
 
-inline void GetTextSegment(Accessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
+inline void GetTextSegment(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, char *s, size_t len) noexcept {
 	styler.GetRangeLowered(start, end, s, len);
 }
 
-script_type segIsScriptingIndicator(Accessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
+script_type segIsScriptingIndicator(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, script_type prevValue) {
 	char s[128];
 	GetTextSegment(styler, start, end, s, sizeof(s));
 	//Platform::DebugPrintf("Scripting indicator [%s]\n", s);
@@ -140,7 +140,7 @@ constexpr bool isCommentASPState(int state) noexcept {
 		|| state == SCE_HB_COMMENTLINE;
 }
 
-bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU start, Sci_PositionU end, const WordList &keywords, const WordList &keywordsEvent, Accessor &styler) {
+bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU start, Sci_PositionU end, const WordList &keywords, const WordList &keywordsEvent, LexAccessor &styler) {
 	char chAttr = SCE_H_ATTRIBUTEUNKNOWN;
 	bool isLanguageType = false;
 	if (IsNumberChar(styler[start])) {
@@ -177,8 +177,7 @@ bool isHTMLCustomElement(const char *tag, size_t length) noexcept {
 	return true;
 }
 
-int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
-	const WordList &keywords, Accessor &styler, bool &tagDontFold,
+int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, bool &tagDontFold,
 	bool caseSensitive, bool isXml, bool allowScripts) {
 	char withSpace[126 + 2] = " ";
 	const char *tag = withSpace + 1;
@@ -246,8 +245,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end,
 	return chAttr;
 }
 
-void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end,
-	const WordList &keywords, Accessor &styler, script_mode inScriptType) {
+void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	char s[127 + 1];
 	styler.GetRange(start, end, s, sizeof(s));
 	char chAttr = SCE_HJ_WORD;
@@ -257,7 +255,7 @@ void classifyWordHTJS(Sci_PositionU start, Sci_PositionU end,
 	styler.ColorTo(end, statePrintForState(chAttr, inScriptType));
 }
 
-int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler, script_mode inScriptType) {
+int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, script_mode inScriptType) {
 	char chAttr = SCE_HB_IDENTIFIER;
 	char s[128];
 	GetTextSegment(styler, start, end, s, sizeof(s));
@@ -273,13 +271,13 @@ int classifyWordHTVB(Sci_PositionU start, Sci_PositionU end, const WordList &key
 		return SCE_HB_DEFAULT;
 }
 
-bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, Accessor &styler) noexcept {
+bool isWordHSGML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler) noexcept {
 	char s[63 + 1];
 	styler.GetRange(start, end + 1, s, sizeof(s));
 	return keywords.InList(s);
 }
 
-inline bool isWordCdata(Sci_PositionU start, Accessor &styler) noexcept {
+inline bool isWordCdata(Sci_PositionU start, LexAccessor &styler) noexcept {
 	return styler.Match(start, "[CDATA[");
 }
 
@@ -342,8 +340,7 @@ constexpr bool IsOKBeforeJSRE(int ch) noexcept {
 	return AnyOf(ch, '(', '[', '{', '=', ',', ':', ';', '!', '%', '^', '&', '*', '|', '?', '~', '>');
 }
 
-void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists,
-                                  Accessor &styler, bool isXml) {
+void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler, bool isXml) {
 	const WordList &keywordsTag = keywordLists[0];
 	const WordList &keywordsJS = keywordLists[1];
 	const WordList &keywordsVBS = keywordLists[2];
