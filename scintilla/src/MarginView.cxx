@@ -377,7 +377,7 @@ void MarginView::PaintOneMargin(Surface *surface, PRectangle rc, PRectangle rcOn
 							LevelIsHeader(lev) ? 'H' : '_',
 							LevelIsWhitespace(lev) ? 'W' : '_',
 							LevelNumber(lev),
-							static_cast<int>(lev) >> 16
+							static_cast<unsigned int>(lev) >> 16
 						);
 					} else {
 						const int state = model.pdoc->GetLineState(lineDoc);

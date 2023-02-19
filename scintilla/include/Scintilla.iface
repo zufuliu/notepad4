@@ -3224,7 +3224,7 @@ get int GetProperty=4008(string key, stringresult value)
 # Retrieve a "property" value previously set with SetProperty,
 # with "$()" variable replacement on returned buffer.
 # Result is NUL-terminated.
-get int GetPropertyExpanded=4009(string key, stringresult value)
+#get int GetPropertyExpanded=4009(string key, stringresult value)
 
 # Retrieve a "property" value previously set with SetProperty,
 # interpreted as an int AFTER any "$()" variable replacement.

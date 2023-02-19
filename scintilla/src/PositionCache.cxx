@@ -1073,13 +1073,29 @@ TextSegment BreakFinder::Next() {
 			int charWidth = 1;
 			const char * const chars = &ll->chars[nextBreak];
 			const unsigned char ch = chars[0];
+			//bool characterStyleConsistent = true;	// All bytes of character in same style?
 			if (!UTF8IsAscii(ch) && encodingFamily != EncodingFamily::eightBit) {
 				if (encodingFamily == EncodingFamily::unicode) {
 					charWidth = UTF8DrawBytes(chars, endPos - nextBreak);
 				} else {
 					charWidth = pdoc->DBCSDrawBytes(chars, endPos - nextBreak);
 				}
+				//for (int trail = 1; trail < charWidth; trail++) {
+				//	if (ll->styles[nextBreak] != ll->styles[nextBreak + trail]) {
+				//		characterStyleConsistent = false;
+				//	}
+				//}
 			}
+			//if (!characterStyleConsistent) {
+			//	if (nextBreak == prev) {
+			//		// Show first character representation bytes since it has inconsistent styles.
+			//		charWidth = 1;
+			//	} else {
+			//		// Return segment before nextBreak but allow to be split up if too long
+			//		// If not split up, next call will hit the above 'charWidth = 1;' and display bytes.
+			//		break;
+			//	}
+ 			//}
 			repr = nullptr;
 			if (reprs.MayContains(ch)) {
 				// Special case \r\n line ends if there is a representation

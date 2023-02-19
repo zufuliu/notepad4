@@ -13,6 +13,11 @@ namespace Scintilla {
 
 enum class Message;	// Declare in case ScintillaMessages.h not included
 
+// Declare in case ScintillaStructures.h not included
+struct TextRangeFull;
+struct TextToFindFull;
+struct RangeToFormatFull;
+
 using FunctionDirect = intptr_t(*)(intptr_t ptr, unsigned int iMessage, uintptr_t wParam, intptr_t lParam, int *pStatus);
 
 struct Failure {
@@ -829,8 +834,6 @@ public:
 	void SetKeyWords(int keyWordSet, const char *keyWords);
 	int Property(const char *key, char *value);
 	std::string Property(const char *key);
-	int PropertyExpanded(const char *key, char *value);
-	std::string PropertyExpanded(const char *key);
 	int PropertyInt(const char *key, int defaultValue);
 	int LexerLanguage(char *language);
 	std::string LexerLanguage();

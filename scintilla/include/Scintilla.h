@@ -1135,7 +1135,6 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define KEYWORDSET_MAX 15
 #define SCI_SETKEYWORDS 4005
 #define SCI_GETPROPERTY 4008
-#define SCI_GETPROPERTYEXPANDED 4009
 #define SCI_GETPROPERTYINT 4010
 #define SCI_GETLEXERLANGUAGE 4012
 #define SCI_PRIVATELEXERCALL 4013

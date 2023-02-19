@@ -745,7 +745,6 @@ enum class Message {
 	SetProperty = 4004,
 	SetKeyWords = 4005,
 	GetProperty = 4008,
-	GetPropertyExpanded = 4009,
 	GetPropertyInt = 4010,
 	GetLexerLanguage = 4012,
 	PrivateLexerCall = 4013,

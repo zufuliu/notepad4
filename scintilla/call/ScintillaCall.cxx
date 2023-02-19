@@ -3158,14 +3158,6 @@ std::string ScintillaCall::Property(const char *key) {
 	return CallReturnString(Message::GetProperty, reinterpret_cast<uintptr_t>(key));
 }
 
-int ScintillaCall::PropertyExpanded(const char *key, char *value) {
-	return static_cast<int>(CallPointer(Message::GetPropertyExpanded, reinterpret_cast<uintptr_t>(key), value));
-}
-
-std::string ScintillaCall::PropertyExpanded(const char *key) {
-	return CallReturnString(Message::GetPropertyExpanded, reinterpret_cast<uintptr_t>(key));
-}
-
 int ScintillaCall::PropertyInt(const char *key, int defaultValue) {
 	return static_cast<int>(Call(Message::GetPropertyInt, reinterpret_cast<uintptr_t>(key), defaultValue));
 }
