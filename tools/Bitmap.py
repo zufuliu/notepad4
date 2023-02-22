@@ -1,9 +1,11 @@
 import os.path
 import struct
+import io
 from enum import IntEnum
 from PIL import Image
 
-__all__ = ['Bitmap', 'Image', 'ResizeMethod', 'QuantizeMethod']
+__all__ = ['Bitmap', 'Icon', 'Image', 'ResizeMethod', 'QuantizeMethod']
+# https://pillow.readthedocs.io/en/stable/index.html
 
 # https://en.wikipedia.org/wiki/BMP_file_format
 # https://learn.microsoft.com/en-us/windows/win32/gdi/bitmaps
@@ -39,7 +41,8 @@ class BitmapFileHeader:
 
 _InchesPerMetre = 0.0254
 _TransparentColor = (0, 0, 0, 0)
-_SupportedColorDepth = (1, 4, 8, 24, 32)
+_SupportedColorDepth = (1, 4, 8, 24, 32, 'png')
+_PngMagic = b'\x89PNG'
 
 def _find_color_index_naive(table, color):
 	result = 0
@@ -52,6 +55,67 @@ def _find_color_index_naive(table, color):
 			diff = distance
 			result = index
 	return result
+
+def _drawMaskRow(maskRow):
+	result = ['o']*8*len(maskRow)
+	index = 0
+	for mask in maskRow:
+		for i in range(8):
+			if mask & 0x80:
+				result[index + i] = '.'
+			mask <<= 1
+		index += 8
+	return result
+
+def _diffMaskData(name, referData, maskData, rowSize, save=False):
+	if not referData or referData == maskData:
+		return 0
+	if not save:
+		total = 0
+		diff = 0
+		count = 0
+		for i, refer in enumerate(referData):
+			mask = maskData[i]
+			diff <<= 8
+			diff |= refer ^ mask
+			count += 1
+			if count == 8:
+				count = 0
+				total += diff.bit_count()
+				diff = 0
+		print(f'{name} mask diff: {total} {len(referData)*8}')
+		return total
+
+	total = 0
+	output = []
+	referList = [referData[i:i+rowSize] for i in range(0, len(referData), rowSize)]
+	maskList = [maskData[i:i+rowSize] for i in range(0, len(maskData), rowSize)]
+	referList.reverse()
+	maskList.reverse()
+	for i, row in enumerate(referList):
+		left = _drawMaskRow(row)
+		right = _drawMaskRow(maskList[i])
+		for j, ch in enumerate(right):
+			if ch != left[j]:
+				total += 1
+				ch = '=' if ch == '.' else '*'
+				right[j] = ch
+		left = ''.join(left)
+		right = ''.join(right)
+		output.append(f'{left} | {right}\n')
+	print(f'{name} mask diff: {total} {len(referData)*8}')
+	doc = ''.join(output)
+	with open(f'{name}.log', 'wb') as fd:
+		fd.write(doc.encode('utf-8'))
+	return total
+
+def _showMaskImage(maskList, rowSize, height, title=None):
+	rows = [maskList[i:i+rowSize] for i in range(0, len(maskList), rowSize)]
+	maskList = []
+	for row in reversed(rows):
+		maskList.extend(row)
+	image = Image.frombuffer('1', (rowSize*8, height), bytes(maskList), "raw", '1', 0, 1)
+	image.show(title)
 
 class ResizeMethod(IntEnum):
 	Nearest = Image.Resampling.NEAREST
@@ -103,20 +167,24 @@ class BitmapInfoHeader:
 		self.colorUsed = 0
 		self.colorImportant = 0
 
-	def read(self, fd):
+	def read(self, fd, iconFile=False):
 		magic, self.width, self.height = struct.unpack('<III', fd.read(4*3))
+		if iconFile:
+			self.height //= 2
 		assert magic == BitmapInfoHeader.StructureSize
 		self.planes, self.bitsPerPixel = struct.unpack('<HH', fd.read(2*2))
 		assert self.planes == 1
 		assert self.bitsPerPixel in _SupportedColorDepth, self.bitsPerPixel
 		self.compression, self.sizeImage = struct.unpack('<II', fd.read(4*2))
 		assert self.compression == CompressionMethod.BI_RGB
-		assert self.sizeImage == 0 or self.sizeImage == self.height*self.rowSize
 		self._resolutionX, self._resolutionY = struct.unpack('<II', fd.read(4*2))
 		self.colorUsed, self.colorImportant = struct.unpack('<II', fd.read(4*2))
 
-	def write(self, fd):
-		fd.write(struct.pack('<III', BitmapInfoHeader.StructureSize, self.width, self.height))
+	def write(self, fd, iconFile=False):
+		height = self.height
+		if iconFile:
+			height *= 2
+		fd.write(struct.pack('<III', BitmapInfoHeader.StructureSize, self.width, height))
 		fd.write(struct.pack('<HH', self.planes, self.bitsPerPixel))
 		fd.write(struct.pack('<II', self.compression, self.sizeImage))
 		fd.write(struct.pack('<II', self._resolutionX, self._resolutionY))
@@ -144,6 +212,12 @@ class BitmapInfoHeader:
 		value = self.bitsPerPixel*self.width
 		# 4 byte aligned
 		aligned = (value + 31) & ~31
+		return aligned >> 3
+
+	@property
+	def maskRowSize(self):
+		# 4 byte aligned
+		aligned = (self.width + 31) & ~31
 		return aligned >> 3
 
 	@property
@@ -176,40 +250,50 @@ class Bitmap:
 		self.rows = [] # RGBA tuple
 		self.palette = None
 		self.data = None
+		self.maskData = None
 
 		if width and height:
 			for y in range(height):
 				row = [_TransparentColor] * width
 				self.rows.append(row)
 
-	def read(self, fd):
+	def read(self, fd, iconFile=False):
 		start = fd.tell()
-		self.fileHeader.read(fd)
-		self.infoHeader.read(fd)
+		if not iconFile:
+			self.fileHeader.read(fd)
+		self.infoHeader.read(fd, iconFile)
 		self.palette = None
 		# color palette after header
 		if self.infoHeader.bitsPerPixel < 24:
 			paletteSize = 4 << self.infoHeader.bitsPerPixel
 			self.palette = fd.read(paletteSize)
 
-		current = fd.tell()
-		# enable reading from stream
-		offset = self.fileHeader.offset - (current - start)
-		if offset != 0:
-			fd.seek(offset, os.SEEK_CUR)
+		if not iconFile:
+			current = fd.tell()
+			# enable reading from stream
+			offset = self.fileHeader.offset - (current - start)
+			if offset != 0:
+				fd.seek(offset, os.SEEK_CUR)
 		# infoHeader.sizeImage maybe zero
 		sizeImage = self.height * self.rowSize
 		self.data = fd.read(sizeImage)
 		assert len(self.data) == sizeImage
 		self.decode()
 
-	def write(self, fd):
+	def write(self, fd, iconFile=False):
 		self.encode()
-		self.fileHeader.write(fd)
-		self.infoHeader.write(fd)
+		maskData = self.maskData
+		if iconFile:
+			if maskData:
+				self.infoHeader.sizeImage += len(maskData)
+		else:
+			self.fileHeader.write(fd)
+		self.infoHeader.write(fd, iconFile)
 		if self.palette:
 			fd.write(self.palette)
 		fd.write(self.data)
+		if iconFile and maskData:
+			fd.write(maskData)
 
 	def decode(self):
 		getattr(self, f'_decode_{self.bitsPerPixel}bit')()
@@ -494,6 +578,58 @@ class Bitmap:
 				buf.append(value)
 		self._set_data(buf, palette)
 
+	def apply_alpha_mask(self, maskData):
+		self.maskData = maskData
+		if self.bitsPerPixel == 32:
+			return
+		width = self.width
+		rowSize = self.infoHeader.maskRowSize
+		maskList = [maskData[i:i+rowSize] for i in range(0, len(maskData), rowSize)]
+		index = 0
+		for row in reversed(self.rows):
+			maskRow = maskList[index]
+			index += 1
+			offset = 0
+			for mask in maskRow:
+				for i in range(8):
+					red, green, blue, alpha = row[offset]
+					alpha = 0 if (mask & 0x80) else 0xff
+					row[offset] = (red, green, blue, alpha)
+					mask <<= 1
+					offset += 1
+					if offset == width:
+						break
+				if offset == width:
+					break
+
+	def build_alpha_mask(self, method=0):
+		rowSize = self.infoHeader.maskRowSize
+		maskList = []
+		for row in reversed(self.rows):
+			maskRow = [0] * rowSize
+			mask = 0
+			offset = 0
+			count = 0
+			for color in row:
+				mask <<= 1
+				if method == 0:
+					mask |= color[3] == 0
+				else:
+					mask |= (color[3] >> 7) ^ 1
+				count += 1
+				if count == 8:
+					count = 0
+					maskRow[offset] = mask
+					mask = 0
+					offset += 1
+			if count:
+				count = 8 - count
+				mask <<= count
+				maskRow[offset] = mask
+			maskList.extend(maskRow)
+		#_showMaskImage(maskList, rowSize, self.height, f'method {method}')
+		return maskList
+
 	@property
 	def width(self):
 		return self.infoHeader.width
@@ -611,6 +747,17 @@ class Bitmap:
 		bmp = Bitmap.fromImage(image)
 		bmp.bitsPerPixel = 24
 		return bmp
+
+	def asIcon(self, colorDepth=None, method=0):
+		maskData = self.build_alpha_mask(method=method)
+		if colorDepth not in (None, 32) and not self.isOpaque():
+			bmp = self.asOpaque()
+			bmp.maskData = maskData
+			bmp.bitsPerPixel = colorDepth
+			return bmp
+		self.maskData = mask
+		self.bitsPerPixel = colorDepth
+		return self
 
 	def isOpaque(self, colorDepth=None):
 		colorDepth = colorDepth or self.bitsPerPixel
@@ -794,3 +941,175 @@ class Bitmap:
 		for row in reversed(self.rows):
 			bmp.rows.append(row[:])
 		return bmp
+
+
+class IconCursorType(IntEnum):
+	Icon = 1
+	Cursor = 2
+
+class IconDirectoryEntry:
+	StructureSize = 16
+
+	def __init__(self, width=0, height=0, bitsPerPixel=32):
+		self.width = width
+		self.height = height
+		self.colorCount = (1 << bitsPerPixel) & 0xff
+		self.reserved = 0
+		self.planes = 1
+		self.bitsPerPixel = bitsPerPixel
+		self.sizeImage = 0
+		self.imageOffset = 0
+
+	def read(self, fd):
+		self.width, self.height = fd.read(2)
+		if self.width == 0:
+			self.width = 256
+		if self.height == 0:
+			self.height = 256
+		self.colorCount, self.reserved = fd.read(2)
+		self.planes, self.bitsPerPixel = struct.unpack('<HH', fd.read(2*2))
+		self.sizeImage, self.imageOffset = struct.unpack('<II', fd.read(4*2))
+
+	def write(self, fd):
+		fd.write(bytes(self.width & 255, self.height & 255))
+		fd.write(bytes(self.colorCount, self.reserved))
+		fd.write(struct.pack('<HH', self.planes, self.bitsPerPixel))
+		fd.write(struct.pack('<II', self.sizeImage, self.imageOffset))
+
+	@property
+	def hotspot(self):
+		return (self.planes, self.bitsPerPixel)
+
+	@hotspot.setter
+	def hotspot(self, value):
+		self.planes, self.bitsPerPixel = value
+
+	def __str__(self):
+		return f'''IconDirectoryEntry {{
+	width: {self.width :02X} {self.width}
+	height: {self.height :02X} {self.height}
+	colorCount: {self.colorCount :02X} {self.colorCount}
+	reserved: {self.reserved :02X} {self.reserved}
+	planes/X: {self.planes :04X} {self.planes}
+	bitsPerPixel/Y: {self.bitsPerPixel :04X} {self.bitsPerPixel}
+	sizeImage: {self.sizeImage :08X} {self.sizeImage}
+	imageOffset: {self.imageOffset :08X} {self.imageOffset}
+}}'''
+
+class IconDirectory:
+	StructureSize = 6
+
+	def __init__(self, imageType=IconCursorType.Icon):
+		self.reserved = 0
+		self.imageType = imageType
+		self.entryList = []
+
+	def read(self, fd):
+		self.reserved, imageType, count = struct.unpack('<HHH', fd.read(2*3))
+		assert imageType in (IconCursorType.Icon, IconCursorType.Cursor)
+		self.imageType = IconCursorType(imageType)
+		self.entryList = [None] * count
+		for i in range(count):
+			entry = IconDirectoryEntry()
+			entry.read(fd)
+			self.entryList[i] = entry
+
+	def write(self, fd):
+		fd.write(struct.pack('<HHH', self.reserved, self.imageType, len(self.entryList)))
+		for entry in self.entryList:
+			entry.write(fd)
+
+	def __str__(self):
+		entry = '\n'.join(str(entry) for entry in self.entryList)
+		return f'''{{
+	reserved: {self.reserved :04X} {self.reserved}
+	imageType: {self.imageType :04X} {self.imageType} {self.imageType.name}
+	entryCount:{len(self.entryList):04X} {len(self.entryList)}
+	entryList:
+{entry}
+}}'''
+
+class Icon:
+	def __init__(self, imageType=IconCursorType.Icon):
+		self.directory = IconDirectory(imageType)
+		self.imageList = []
+
+	def read(self, fd):
+		self.directory.read(fd)
+		self.imageList = []
+		for entry in self.directory.entryList:
+			#print(entry)
+			fd.seek(entry.imageOffset, os.SEEK_SET)
+			current = fd.tell()
+			magic = fd.read(4)
+			fd.seek(current, os.SEEK_SET)
+			if magic == _PngMagic:
+				raw = fd.read(entry.sizeImage)
+				assert len(raw) == entry.sizeImage
+				stream = io.BytesIO(raw)
+				image = Image.open(stream)
+				#print(f'{image.width}x{image.height} png')
+				#with open(f'{image.width}x{image.height}.png', 'wb') as out:
+				#	out.write(raw)
+				self.imageList.append((image, 'png', raw))
+				continue
+
+			bmp = Bitmap()
+			bmp.read(fd, iconFile=True)
+			end = fd.tell()
+			remain = entry.sizeImage - (end - current)
+			if remain == 0:
+				assert bmp.bitsPerPixel == 32
+			else:
+				maskSize = bmp.height * bmp.infoHeader.maskRowSize
+				assert remain == maskSize, (remain, maskSize)
+				maskData = fd.read(maskSize)
+				assert len(maskData) == maskSize
+				bmp.apply_alpha_mask(maskData)
+			#print(bmp.infoHeader, bmp.colorUsed)
+			if False:
+				mask0 = bmp.build_alpha_mask(0)
+				mask1 = bmp.build_alpha_mask(1)
+				rowSize = bmp.infoHeader.maskRowSize
+				_diffMaskData(f'{bmp.width}x{bmp.height}@{bmp.bitsPerPixel}-0', bmp.maskData, mask0, rowSize)
+				_diffMaskData(f'{bmp.width}x{bmp.height}@{bmp.bitsPerPixel}-1', bmp.maskData, mask1, rowSize)
+			self.imageList.append((bmp, bmp.bitsPerPixel, None))
+
+	def write(self, fd):
+		self.directory.write(fd)
+		for bmp, fmt, data in self.imageList:
+			if fmt == 'png':
+				fd.write(data)
+			else:
+				bmp.write(fd, iconFile=True)
+
+	def save(self, path):
+		if hasattr(path, 'write'):
+			self.write(path)
+		else:
+			with open(path, 'wb') as fd:
+				self.write(fd)
+
+	@property
+	def imageType(self):
+		return self.directory.imageType
+
+	@staticmethod
+	def fromFile(path):
+		icon = Icon()
+		if hasattr(path, 'read'):
+			icon.read(path)
+		else:
+			with open(path, 'rb') as fd:
+				icon.read(fd)
+		return icon
+
+	@staticmethod
+	def makeIcon(args):
+		icon = Icon()
+		return icon
+
+	@staticmethod
+	def makeCursor(args):
+		cursor = Icon(imageType=IconCursorType.Cursor)
+		return cursor

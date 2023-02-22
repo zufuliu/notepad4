@@ -31,7 +31,7 @@ def quantize_external(path, out_path, colorCount, method):
 	temp = f'{out_path}-{method.name}{colorCount}.png'
 	if method == QuantizeMethod.PngQuant:
 		# https://pngquant.org/
-		command = f'pngquant --force --verbose {colorCount} --output "{temp}" "{path}"'
+		command = f'pngquant --force --verbose {colorCount} --strip --output "{temp}" "{path}"'
 	elif method == QuantizeMethod.ImageMagick:
 		# https://imagemagick.org/script/command-line-options.php#colors
 		command = f'magick "{path}" -verbose -colors {colorCount} "{temp}"'
