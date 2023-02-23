@@ -8,7 +8,7 @@ __all__ = ['Bitmap', 'Icon', 'Image', 'ResizeMethod', 'QuantizeMethod']
 # https://pillow.readthedocs.io/en/stable/index.html
 
 # https://en.wikipedia.org/wiki/BMP_file_format
-# https://learn.microsoft.com/en-us/windows/win32/gdi/bitmaps
+# https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi
 class BitmapFileHeader:
 	StructureSize = 14
 
@@ -41,6 +41,7 @@ class BitmapFileHeader:
 
 _InchesPerMetre = 0.0254
 _TransparentColor = (0, 0, 0, 0)
+_WhiteColor = (255, 255, 255, 255)
 _SupportedColorDepth = (1, 4, 8, 24, 32, 'png')
 _PngMagic = b'\x89PNG'
 
@@ -67,10 +68,10 @@ def _drawMaskRow(maskRow):
 		index += 8
 	return result
 
-def _diffMaskData(name, referData, maskData, rowSize, save=False):
+def _diffMaskData(name, referData, maskData, rowSize, saveLog=False):
 	if not referData or referData == maskData:
 		return 0
-	if not save:
+	if not saveLog:
 		total = 0
 		diff = 0
 		count = 0
@@ -423,7 +424,8 @@ class Bitmap:
 			counter = self.countColor()
 			if len(counter) > colorCount and (method is None or method < QuantizeMethod.Naive):
 				bmp = self.quantize(colorCount, method, False)
-				print(f'quantize {len(counter)} => {bmp.colorUsed}')
+				name = 'Default' if method is None else method.name
+				print(f'{name} reduce {bmp.width}x{bmp.height} bitmap color: {len(counter)} => {bmp.colorUsed}')
 				bmp.bitsPerPixel = self.bitsPerPixel
 				return bmp._build_palette(QuantizeMethod.Naive)
 
@@ -602,7 +604,7 @@ class Bitmap:
 				if offset == width:
 					break
 
-	def build_alpha_mask(self, method=0):
+	def build_alpha_mask(self, threshold=0):
 		rowSize = self.infoHeader.maskRowSize
 		maskList = []
 		for row in reversed(self.rows):
@@ -612,10 +614,7 @@ class Bitmap:
 			count = 0
 			for color in row:
 				mask <<= 1
-				if method == 0:
-					mask |= color[3] == 0
-				else:
-					mask |= (color[3] >> 7) ^ 1
+				mask |= color[3] <= threshold
 				count += 1
 				if count == 8:
 					count = 0
@@ -627,8 +626,28 @@ class Bitmap:
 				mask <<= count
 				maskRow[offset] = mask
 			maskList.extend(maskRow)
-		#_showMaskImage(maskList, rowSize, self.height, f'method {method}')
+		#_showMaskImage(maskList, rowSize, self.height, f'threshold {threshold}')
 		return maskList
+
+	def make_transparent(self, maskData):
+		width = self.width
+		rowSize = self.infoHeader.maskRowSize
+		maskList = [maskData[i:i+rowSize] for i in range(0, len(maskData), rowSize)]
+		index = 0
+		for row in reversed(self.rows):
+			maskRow = maskList[index]
+			index += 1
+			offset = 0
+			for mask in maskRow:
+				for i in range(8):
+					if mask & 0x80:
+						row[offset] = _TransparentColor
+					mask <<= 1
+					offset += 1
+					if offset == width:
+						break
+				if offset == width:
+					break
 
 	@property
 	def width(self):
@@ -739,7 +758,7 @@ class Bitmap:
 						bmp[x, y] = color
 		return bmp
 
-	def asOpaque(self, backColor=0xffffffff):
+	def asOpaque(self, backColor=_WhiteColor):
 		image = self.toImage(32, False)
 		background = Image.new('RGBA', image.size, color=backColor)
 		image = Image.alpha_composite(background, image)
@@ -748,17 +767,52 @@ class Bitmap:
 		bmp.bitsPerPixel = 24
 		return bmp
 
-	def asIcon(self, colorDepth=None, method=0):
-		maskData = self.build_alpha_mask(method=method)
+	def reduce_icon_color(self, colorDepth, maskData, method=None):
+		colorCount = 1 << colorDepth
+		counter = self.countColor()
+		current = len(counter)
+		if current < colorCount:
+			self.make_transparent(maskData)
+			return
+
+		rows = []
+		for row in self.rows:
+			rows.append(row[:])
+		if current == colorCount:
+			self.make_transparent(maskData)
+			counter = self.countColor()
+			if len(counter) <= colorCount:
+				return
+			self.rows = rows
+
+		reduced = colorCount
+		while reduced:
+			bmp = self.quantize(reduced, method, False)
+			bmp.make_transparent(maskData)
+			counter = bmp.countColor()
+			if len(counter) <= colorCount:
+				break
+			reduced -= 1
+			self.rows = rows
+
+		self.rows = bmp.rows
+		name = 'Default' if method is None else method.name
+		print(f'{name} reduce {bmp.width}x{bmp.height} icon color: {current} => {reduced}, {len(counter)}')
+
+	def asIcon(self, colorDepth=None, method=None, threshold=0, backColor=_WhiteColor):
+		maskData = self.build_alpha_mask(threshold)
 		maskData = bytes(maskData)
+		bmp = self
 		if colorDepth not in (None, 32) and not self.isOpaque():
-			bmp = self.asOpaque()
-			bmp.maskData = maskData
-			bmp.bitsPerPixel = colorDepth
-			return bmp
-		self.maskData = maskData
-		self.bitsPerPixel = colorDepth
-		return self
+			bmp = self.asOpaque(backColor)
+		colorDepth = colorDepth or bmp.bitsPerPixel
+		if colorDepth < 24:
+			bmp.reduce_icon_color(colorDepth, maskData, method)
+		elif colorDepth == 24:
+			bmp.make_transparent(maskData)
+		bmp.bitsPerPixel = colorDepth
+		bmp.maskData = maskData
+		return bmp
 
 	def isOpaque(self, colorDepth=None):
 		colorDepth = colorDepth or self.bitsPerPixel
@@ -1070,7 +1124,7 @@ class Icon:
 			#print(bmp.infoHeader, bmp.colorUsed)
 			if False:
 				mask0 = bmp.build_alpha_mask(0)
-				mask1 = bmp.build_alpha_mask(1)
+				mask1 = bmp.build_alpha_mask(127)
 				rowSize = bmp.infoHeader.maskRowSize
 				_diffMaskData(f'{bmp.width}x{bmp.height}@{bmp.bitsPerPixel}-0', bmp.maskData, mask0, rowSize)
 				_diffMaskData(f'{bmp.width}x{bmp.height}@{bmp.bitsPerPixel}-1', bmp.maskData, mask1, rowSize)
@@ -1088,7 +1142,7 @@ class Icon:
 			with open(path, 'wb') as fd:
 				self.write(fd)
 
-	def _build(self, args):
+	def _build(self, args, method=None, threshold=0):
 		imageList = {}
 		for path, colorDepth, hotspot in args:
 			index = _SupportedColorDepth.index(colorDepth)
@@ -1097,10 +1151,12 @@ class Icon:
 					raw = fd.read()
 				stream = io.BytesIO(raw)
 				image = Image.open(stream)
+				assert image.width == image.height, (path, image.width, image.height)
 				imageList[(image.width, image.height, index)] = (image, colorDepth, raw, hotspot)
 			else:
 				bmp = Bitmap.fromFileEx(path)
-				bmp = bmp.asIcon(colorDepth=colorDepth)
+				assert bmp.width == bmp.height, (path, bmp.width, bmp.height)
+				bmp = bmp.asIcon(colorDepth, method, threshold)
 				stream = io.BytesIO()
 				bmp.write(stream, iconFile=True)
 				raw = stream.getvalue()
@@ -1136,18 +1192,18 @@ class Icon:
 		return icon
 
 	@staticmethod
-	def makeIcon(args, path=None):
+	def makeIcon(args, path=None, method=None, threshold=0):
 		icon = Icon()
 		args = [(*arg, None) for arg in args]
-		icon._build(args)
+		icon._build(args, method, threshold)
 		if path:
 			icon.save(path)
 		return icon
 
 	@staticmethod
-	def makeCursor(args, path=None):
-		icon = Icon(imageType=IconCursorType.Cursor)
-		icon._build(args)
+	def makeCursor(args, path=None, method=None, threshold=0):
+		icon = Icon(IconCursorType.Cursor)
+		icon._build(args, method, threshold)
 		if path:
 			icon.save(path)
 		return icon

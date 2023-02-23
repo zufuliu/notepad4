@@ -61,8 +61,7 @@ def convert_image(path, out_path=None, colorDepth=None, quantize=True, method=No
 			else:
 				bmp = bmp.quantize(colorCount, method, False)
 			name = 'Default' if method is None else method.name
-			count = bmp.colorUsed
-			print(f'quantize image {name}: {current} => {count}')
+			print(f'quantize {bmp.width}x{bmp.height} image {name}: {current} => {bmp.colorUsed}')
 	save_bitmap(bmp, out_path, colorDepth)
 
 
@@ -280,9 +279,47 @@ def make_other_bitmap():
 		images = f'images/{size}x{size}'
 		concat_horizontal([f'{images}/Encoding.png', f'{images}/EncodingGray.png'], f'Encoding{size}.bmp', colorDepth)
 
+def make_notepad2_icon_and_cursor():
+	folder = 'images/icon/Notepad2'
+	Icon.makeIcon([
+		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32),
+		(f'{folder}/24.png', 32), (f'{folder}/32.png', 32),
+		(f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
+		(f'{folder}/64.png', 32),
+		(f'{folder}/256.png', 'png'),
+	], 'Notepad2.ico')
+	Icon.makeIcon([
+		(f'{folder}/16.png', 32), (f'{folder}/24.png', 32),
+		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
+	], 'Notepad2_min.ico')
+
+	folder = 'images/icon/Run/'
+	Icon.makeIcon([
+		('images/32x32/Launch.png', 4), ('images/48x48/Launch.png', 4),
+		(f'{folder}/64.png', 4), (f'{folder}/80.png', 4),
+		(f'{folder}/96.png', 4),
+	], 'Run.ico')
+	Icon.makeIcon([('images/32x32/Launch.png', 4)], 'Run_min.ico')
+
+def make_metapath_icon_and_cursor():
+	folder = 'images/metapath/icon/metapath'
+	Icon.makeIcon([
+		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32),
+		(f'{folder}/24.png', 32), (f'{folder}/32.png', 32),
+		(f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
+		(f'{folder}/64.png', 32),
+		(f'{folder}/256.png', 'png'),
+	], 'metapath.ico')
+	Icon.makeIcon([
+		(f'{folder}/16.png', 32), (f'{folder}/24.png', 32),
+		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
+	], 'metapath_min.ico')
+
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()
 #make_other_bitmap()
+#make_notepad2_icon_and_cursor()
+#make_metapath_icon_and_cursor()
 
 #convert_image('images/16x16/Open.png', 'OpenFolder16.bmp', 4, QuantizeMethod.PngQuant)
 
