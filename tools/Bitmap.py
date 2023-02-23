@@ -750,12 +750,13 @@ class Bitmap:
 
 	def asIcon(self, colorDepth=None, method=0):
 		maskData = self.build_alpha_mask(method=method)
+		maskData = bytes(maskData)
 		if colorDepth not in (None, 32) and not self.isOpaque():
 			bmp = self.asOpaque()
 			bmp.maskData = maskData
 			bmp.bitsPerPixel = colorDepth
 			return bmp
-		self.maskData = mask
+		self.maskData = maskData
 		self.bitsPerPixel = colorDepth
 		return self
 
@@ -810,7 +811,7 @@ class Bitmap:
 	@staticmethod
 	def fromFileEx(path):
 		ext = os.path.splitext(path)[0].lower()
-		if ext in ['.bmp', '.dib']:
+		if ext in ('.bmp', '.dib'):
 			try:
 				return Bitmap.fromFile(path)
 			except Exception:
@@ -971,8 +972,8 @@ class IconDirectoryEntry:
 		self.sizeImage, self.imageOffset = struct.unpack('<II', fd.read(4*2))
 
 	def write(self, fd):
-		fd.write(bytes(self.width & 255, self.height & 255))
-		fd.write(bytes(self.colorCount, self.reserved))
+		fd.write(bytes((self.width & 255, self.height & 255)))
+		fd.write(bytes((self.colorCount, self.reserved)))
 		fd.write(struct.pack('<HH', self.planes, self.bitsPerPixel))
 		fd.write(struct.pack('<II', self.sizeImage, self.imageOffset))
 
@@ -1043,10 +1044,10 @@ class Icon:
 			current = fd.tell()
 			magic = fd.read(4)
 			fd.seek(current, os.SEEK_SET)
+			raw = fd.read(entry.sizeImage)
+			assert len(raw) == entry.sizeImage
+			stream = io.BytesIO(raw)
 			if magic == _PngMagic:
-				raw = fd.read(entry.sizeImage)
-				assert len(raw) == entry.sizeImage
-				stream = io.BytesIO(raw)
 				image = Image.open(stream)
 				#print(f'{image.width}x{image.height} png')
 				#with open(f'{image.width}x{image.height}.png', 'wb') as out:
@@ -1055,15 +1056,15 @@ class Icon:
 				continue
 
 			bmp = Bitmap()
-			bmp.read(fd, iconFile=True)
-			end = fd.tell()
-			remain = entry.sizeImage - (end - current)
+			bmp.read(stream, iconFile=True)
+			current = stream.tell()
+			remain = entry.sizeImage - current
 			if remain == 0:
 				assert bmp.bitsPerPixel == 32
 			else:
 				maskSize = bmp.height * bmp.infoHeader.maskRowSize
 				assert remain == maskSize, (remain, maskSize)
-				maskData = fd.read(maskSize)
+				maskData = stream.read(maskSize)
 				assert len(maskData) == maskSize
 				bmp.apply_alpha_mask(maskData)
 			#print(bmp.infoHeader, bmp.colorUsed)
@@ -1073,15 +1074,12 @@ class Icon:
 				rowSize = bmp.infoHeader.maskRowSize
 				_diffMaskData(f'{bmp.width}x{bmp.height}@{bmp.bitsPerPixel}-0', bmp.maskData, mask0, rowSize)
 				_diffMaskData(f'{bmp.width}x{bmp.height}@{bmp.bitsPerPixel}-1', bmp.maskData, mask1, rowSize)
-			self.imageList.append((bmp, bmp.bitsPerPixel, None))
+			self.imageList.append((bmp, bmp.bitsPerPixel, raw))
 
 	def write(self, fd):
 		self.directory.write(fd)
-		for bmp, fmt, data in self.imageList:
-			if fmt == 'png':
-				fd.write(data)
-			else:
-				bmp.write(fd, iconFile=True)
+		for _, _, data in self.imageList:
+			fd.write(data)
 
 	def save(self, path):
 		if hasattr(path, 'write'):
@@ -1089,6 +1087,39 @@ class Icon:
 		else:
 			with open(path, 'wb') as fd:
 				self.write(fd)
+
+	def _build(self, args):
+		imageList = {}
+		for path, colorDepth, hotspot in args:
+			index = _SupportedColorDepth.index(colorDepth)
+			if colorDepth == 'png':
+				with open(path, 'rb') as fd:
+					raw = fd.read()
+				stream = io.BytesIO(raw)
+				image = Image.open(stream)
+				imageList[(image.width, image.height, index)] = (image, colorDepth, raw, hotspot)
+			else:
+				bmp = Bitmap.fromFileEx(path)
+				bmp = bmp.asIcon(colorDepth=colorDepth)
+				stream = io.BytesIO()
+				bmp.write(stream, iconFile=True)
+				raw = stream.getvalue()
+				imageList[(bmp.width, bmp.height, index)] = (bmp, colorDepth, raw, hotspot)
+
+		imageList = [item[1] for item in sorted(imageList.items(), reverse=True)]
+		imageOffset = IconDirectory.StructureSize + IconDirectoryEntry.StructureSize*len(imageList)
+		imageType = self.imageType
+		for image, colorDepth, raw, hotspot in imageList:
+			self.imageList.append((image, colorDepth, raw))
+			bitsPerPixel = 32 if colorDepth == 'png' else colorDepth
+			entry = IconDirectoryEntry(image.width, image.height, bitsPerPixel)
+			sizeImage = len(raw)
+			entry.imageOffset = imageOffset
+			entry.sizeImage = sizeImage
+			imageOffset += sizeImage
+			if imageType == IconCursorType.Cursor:
+				entry.hotspot = hotspot
+			self.directory.entryList.append(entry)
 
 	@property
 	def imageType(self):
@@ -1105,11 +1136,18 @@ class Icon:
 		return icon
 
 	@staticmethod
-	def makeIcon(args):
+	def makeIcon(args, path=None):
 		icon = Icon()
+		args = [(*arg, None) for arg in args]
+		icon._build(args)
+		if path:
+			icon.save(path)
 		return icon
 
 	@staticmethod
-	def makeCursor(args):
-		cursor = Icon(imageType=IconCursorType.Cursor)
-		return cursor
+	def makeCursor(args, path=None):
+		icon = Icon(imageType=IconCursorType.Cursor)
+		icon._build(args)
+		if path:
+			icon.save(path)
+		return icon
