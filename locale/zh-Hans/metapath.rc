@@ -41,17 +41,19 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\metapath\\res\\metapath
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\..\\metapath\\res\\metapath.ico"
 IDI_RUN                 ICON                    "..\\..\\metapath\\res\\Run.ico"
+IDI_CROSS1              ICON                    "..\\..\\metapath\\res\\Cross1.ico"
+IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\Cross2.ico"
 #else
 IDR_MAINWND             ICON                    "..\\..\\metapath\\res\\metapath_min.ico"
 IDI_RUN                 ICON                    "..\\..\\metapath\\res\\Run_min.ico"
+IDI_CROSS1              ICON                    "..\\..\\metapath\\res\\Cross1_min.ico"
+IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\Cross2_min.ico"
 #endif
 IDI_PROGS               ICON                    "..\\..\\metapath\\res\\Progs.ico"
 IDI_OPTIONS             ICON                    "..\\..\\metapath\\res\\Options.ico"
 IDI_OPTIONS2            ICON                    "..\\..\\metapath\\res\\Options2.ico"
 IDI_GOTO                ICON                    "..\\..\\metapath\\res\\Goto.ico"
 IDI_ITEMS               ICON                    "..\\..\\metapath\\res\\Items.ico"
-IDI_CROSS1              ICON                    "..\\..\\metapath\\res\\cross1.ico"
-IDI_CROSS2              ICON                    "..\\..\\metapath\\res\\cross2.ico"
 
 #if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
@@ -79,8 +81,13 @@ IDB_OPEN_FOLDER48       BITMAP                  "..\\..\\metapath\\res\\OpenFold
 // Cursor
 //
 
-IDC_CROSSHAIR           CURSOR                  "..\\..\\metapath\\res\\crosshair.cur"
-#endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+IDC_CROSSHAIR           CURSOR                  "..\\..\\metapath\\res\\Crosshair.cur"
+#else
+IDC_CROSSHAIR           CURSOR                  "..\\..\\metapath\\res\\Crosshair_min.cur"
+#endif
+
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //

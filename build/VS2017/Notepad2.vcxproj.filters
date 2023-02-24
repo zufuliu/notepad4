@@ -853,22 +853,22 @@
     <None Include="..\..\res\Copy.cur">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\res\Encoding.bmp">
+    <None Include="..\..\res\Encoding16.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\res\Next.bmp">
+    <None Include="..\..\res\Next16.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\res\Notepad2.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\res\OpenFolder.bmp">
+    <None Include="..\..\res\OpenFolder16.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\res\Pick.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\res\Prev.bmp">
+    <None Include="..\..\res\Prev16.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\res\Run.ico">
@@ -877,7 +877,7 @@
     <None Include="..\..\res\Styles.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\res\Toolbar.bmp">
+    <None Include="..\..\res\Toolbar16.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\src\Notepad2.ver">

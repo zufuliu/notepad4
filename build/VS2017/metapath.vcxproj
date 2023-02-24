@@ -1008,19 +1008,19 @@
     <ResourceCompile Include="..\..\metapath\src\metapath.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\metapath\res\cross1.ico" />
-    <None Include="..\..\metapath\res\cross2.ico" />
-    <None Include="..\..\metapath\res\crosshair.cur" />
+    <None Include="..\..\metapath\res\Cross1.ico" />
+    <None Include="..\..\metapath\res\Cross2.ico" />
+    <None Include="..\..\metapath\res\Crosshair.cur" />
     <None Include="..\..\metapath\res\Folder.ico" />
     <None Include="..\..\metapath\res\Goto.ico" />
     <None Include="..\..\metapath\res\Items.ico" />
     <None Include="..\..\metapath\res\metapath.ico" />
-    <None Include="..\..\metapath\res\OpenFolder.bmp" />
+    <None Include="..\..\metapath\res\OpenFolder16.bmp" />
     <None Include="..\..\metapath\res\Options.ico" />
     <None Include="..\..\metapath\res\Options2.ico" />
     <None Include="..\..\metapath\res\Progs.ico" />
     <None Include="..\..\metapath\res\Run.ico" />
-    <None Include="..\..\metapath\res\Toolbar.bmp" />
+    <None Include="..\..\metapath\res\Toolbar16.bmp" />
     <None Include="..\..\metapath\src\metapath.ver" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -22,19 +22,19 @@
     <File Name="../../metapath/src/VersionRev.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Resource Files">
-    <File Name="../../metapath/res/cross1.ico"/>
-    <File Name="../../metapath/res/cross2.ico"/>
-    <File Name="../../metapath/res/crosshair.cur"/>
+    <File Name="../../metapath/res/Cross1.ico"/>
+    <File Name="../../metapath/res/Cross2.ico"/>
+    <File Name="../../metapath/res/Crosshair.cur"/>
     <File Name="../../metapath/res/Folder.ico"/>
     <File Name="../../metapath/res/Goto.ico"/>
     <File Name="../../metapath/res/Items.ico"/>
     <File Name="../../metapath/res/metapath.ico"/>
-    <File Name="../../metapath/res/OpenFolder.bmp"/>
+    <File Name="../../metapath/res/OpenFolder16.bmp"/>
     <File Name="../../metapath/res/Options.ico"/>
     <File Name="../../metapath/res/Options2.ico"/>
     <File Name="../../metapath/res/Progs.ico"/>
     <File Name="../../metapath/res/Run.ico"/>
-    <File Name="../../metapath/res/Toolbar.bmp"/>
+    <File Name="../../metapath/res/Toolbar16.bmp"/>
     <File Name="../../metapath/src/metapath.rc"/>
     <File Name="../../metapath/src/metapath.ver"/>
   </VirtualDirectory>

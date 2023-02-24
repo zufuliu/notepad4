@@ -292,15 +292,15 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Resource Files">
     <File Name="../../res/Copy.cur"/>
-    <File Name="../../res/Encoding.bmp"/>
-    <File Name="../../res/Next.bmp"/>
+    <File Name="../../res/Encoding16.bmp"/>
+    <File Name="../../res/Next16.bmp"/>
     <File Name="../../res/Notepad2.ico"/>
-    <File Name="../../res/OpenFolder.bmp"/>
+    <File Name="../../res/OpenFolder16.bmp"/>
     <File Name="../../res/Pick.bmp"/>
-    <File Name="../../res/Prev.bmp"/>
+    <File Name="../../res/Prev16.bmp"/>
     <File Name="../../res/Run.ico"/>
     <File Name="../../res/Styles.ico"/>
-    <File Name="../../res/Toolbar.bmp"/>
+    <File Name="../../res/Toolbar16.bmp"/>
     <File Name="../../src/Notepad2.rc"/>
     <File Name="../../src/Notepad2.ver"/>
   </VirtualDirectory>

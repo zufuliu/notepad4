@@ -43,11 +43,12 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\..\\res\\Notepad2.exe.manif
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2.ico"
 IDI_RUN                 ICON                    "..\\..\\res\\Run.ico"
+IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 #else
 IDR_MAINWND             ICON                    "..\\..\\res\\Notepad2_min.ico"
 IDI_RUN                 ICON                    "..\\..\\res\\Run_min.ico"
+IDI_STYLES              ICON                    "..\\..\\res\\Styles_min.ico"
 #endif
-IDI_STYLES              ICON                    "..\\..\\res\\Styles.ico"
 
 #if !NP2_ENABLE_APP_LOCALIZATION_DLL
 /////////////////////////////////////////////////////////////////////////////
@@ -94,8 +95,13 @@ IDB_ENCODING48          BITMAP                  "..\\..\\res\\Encoding48.bmp"
 // Cursor
 //
 
+#if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDC_COPY                CURSOR                  "..\\..\\res\\Copy.cur"
-#endif // NP2_ENABLE_HIDPI_IMAGE_RESOURCE
+#else
+IDC_COPY                CURSOR                  "..\\..\\res\\Copy_min.cur"
+#endif
+
+#endif // NP2_ENABLE_APP_LOCALIZATION_DLL
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -74,13 +74,13 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\metapath\res\cross1.ico">
+    <None Include="..\..\metapath\res\Cross1.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\metapath\res\cross2.ico">
+    <None Include="..\..\metapath\res\Cross2.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\metapath\res\crosshair.cur">
+    <None Include="..\..\metapath\res\Crosshair.cur">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\metapath\res\Folder.ico">
@@ -95,7 +95,7 @@
     <None Include="..\..\metapath\res\metapath.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\metapath\res\OpenFolder.bmp">
+    <None Include="..\..\metapath\res\OpenFolder16.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\metapath\res\Options.ico">
@@ -110,7 +110,7 @@
     <None Include="..\..\metapath\res\Run.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\metapath\res\Toolbar.bmp">
+    <None Include="..\..\metapath\res\Toolbar16.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\metapath\src\metapath.ver">

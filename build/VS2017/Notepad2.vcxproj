@@ -1280,15 +1280,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\res\Copy.cur" />
-    <None Include="..\..\res\Encoding.bmp" />
-    <None Include="..\..\res\Next.bmp" />
+    <None Include="..\..\res\Encoding16.bmp" />
+    <None Include="..\..\res\Next16.bmp" />
     <None Include="..\..\res\Notepad2.ico" />
-    <None Include="..\..\res\OpenFolder.bmp" />
+    <None Include="..\..\res\OpenFolder16.bmp" />
     <None Include="..\..\res\Pick.bmp" />
-    <None Include="..\..\res\Prev.bmp" />
+    <None Include="..\..\res\Prev16.bmp" />
     <None Include="..\..\res\Run.ico" />
     <None Include="..\..\res\Styles.ico" />
-    <None Include="..\..\res\Toolbar.bmp" />
+    <None Include="..\..\res\Toolbar16.bmp" />
     <None Include="..\..\src\Notepad2.ver" />
   </ItemGroup>
   <ItemGroup>
