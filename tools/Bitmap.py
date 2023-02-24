@@ -392,7 +392,7 @@ class Bitmap:
 				buf.extend(padding)
 		self._set_data(buf)
 
-	def _decode_palette(self):
+	def decode_palette(self):
 		palette = self.palette
 		table = []
 		for i in range(0, len(palette), 4):
@@ -413,12 +413,12 @@ class Bitmap:
 					counter[color] = 1
 		return counter
 
-	def _build_palette(self, method=None):
+	def build_palette(self, method=None):
 		colorCount = 1 << self.bitsPerPixel
 		palette = self.palette
 		colorMap = {}
 		if palette and len(palette) == 4*colorCount:
-			table = self._decode_palette()
+			table = self.decode_palette()
 			for index, color in enumerate(table):
 				if color not in colorMap:
 					colorMap[color] = index
@@ -429,7 +429,7 @@ class Bitmap:
 				name = 'Default' if method is None else method.name
 				print(f'{name} reduce {bmp.width}x{bmp.height} bitmap color: {len(counter)} => {bmp.colorUsed}')
 				bmp.bitsPerPixel = self.bitsPerPixel
-				return bmp._build_palette(QuantizeMethod.Naive)
+				return bmp.build_palette(QuantizeMethod.Naive)
 
 			table = [item[0] for item in sorted(counter.items(), key=lambda m: (m[1], m[0]), reverse=True)][:colorCount]
 			for index, color in enumerate(table):
@@ -467,7 +467,7 @@ class Bitmap:
 		buf = self.data
 		padding = self.rowPadding
 		rows = []
-		table = self._decode_palette()
+		table = self.decode_palette()
 		for y in range(height):
 			row = []
 			for x in range(width):
@@ -482,7 +482,7 @@ class Bitmap:
 	def _encode_8bit(self):
 		padding = [0] * self.rowPadding
 		buf = []
-		palette, indexData = self._build_palette()
+		palette, indexData = self.build_palette()
 		for row in reversed(indexData):
 			buf.extend(row)
 			if padding:
@@ -499,7 +499,7 @@ class Bitmap:
 		rows = []
 		padded = width & 1
 		octet = (width + padded) >> 1
-		table = self._decode_palette()
+		table = self.decode_palette()
 		for y in range(height):
 			row = []
 			for x in range(octet):
@@ -520,7 +520,7 @@ class Bitmap:
 		padding = [0] * (2*self.rowPadding + padded)
 		octet = width + len(padding)
 		buf = []
-		palette, indexData = self._build_palette()
+		palette, indexData = self.build_palette()
 		for row in reversed(indexData):
 			if padding:
 				row.extend(padding)
@@ -539,7 +539,7 @@ class Bitmap:
 		rows = []
 		padded = (8 - (width & 7)) & 7
 		octet = (width + padded) >> 3
-		table = self._decode_palette()
+		table = self.decode_palette()
 		for y in range(height):
 			row = []
 			for x in range(octet):
@@ -566,7 +566,7 @@ class Bitmap:
 		padding = [0] * (8*self.rowPadding + padded)
 		octet = width + len(padding)
 		buf = []
-		palette, indexData = self._build_palette()
+		palette, indexData = self.build_palette()
 		for row in reversed(indexData):
 			if padding:
 				row.extend(padding)
@@ -1145,7 +1145,7 @@ class Icon:
 			with open(path, 'wb') as fd:
 				self.write(fd)
 
-	def _build(self, args, method=None, threshold=0):
+	def build(self, args, method=None, threshold=0):
 		imageList = {}
 		for path, colorDepth, hotspot in args:
 			index = _SupportedColorDepth.index(colorDepth)
@@ -1202,7 +1202,7 @@ class Icon:
 		args = [(*arg, None) for arg in args]
 		if path:
 			print('make icon:', path)
-		icon._build(args, method, threshold)
+		icon.build(args, method, threshold)
 		if path:
 			icon.save(path)
 		return icon
@@ -1212,7 +1212,7 @@ class Icon:
 		icon = Icon(IconCursorType.Cursor)
 		if path:
 			print('make cursor:', path)
-		icon._build(args, method, threshold)
+		icon.build(args, method, threshold)
 		if path:
 			icon.save(path)
 		return icon

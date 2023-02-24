@@ -288,9 +288,8 @@ def make_other_bitmap():
 def make_notepad2_icon_and_cursor():
 	folder = 'images/icon/Notepad2'
 	Icon.makeIcon([
-		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32),
-		(f'{folder}/24.png', 32), (f'{folder}/32.png', 32),
-		(f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
+		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32), (f'{folder}/24.png', 32),
+		(f'{folder}/32.png', 32), (f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
 		(f'{folder}/64.png', 32),
 		(f'{folder}/256.png', 'png'),
 	], 'Notepad2.ico')
@@ -322,9 +321,8 @@ def make_notepad2_icon_and_cursor():
 def make_metapath_icon_and_cursor():
 	folder = 'images/metapath/icon/metapath'
 	Icon.makeIcon([
-		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32),
-		(f'{folder}/24.png', 32), (f'{folder}/32.png', 32),
-		(f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
+		(f'{folder}/16.png', 32), (f'{folder}/20.png', 32), (f'{folder}/24.png', 32),
+		(f'{folder}/32.png', 32), (f'{folder}/40.png', 32), (f'{folder}/48.png', 32),
 		(f'{folder}/64.png', 32),
 		(f'{folder}/256.png', 'png'),
 	], 'metapath.ico')
