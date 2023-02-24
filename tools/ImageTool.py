@@ -41,7 +41,7 @@ def quantize_external(path, out_path, colorCount, method):
 	#os.remove(temp);
 	return bmp
 
-def convert_image(path, out_path=None, colorDepth=None, quantize=True, method=None):
+def convert_image(path, out_path=None, colorDepth=None, quantize=1, method=None):
 	if not out_path:
 		name, ext = os.path.splitext(path)
 		if ext.lower() == '.bmp':
@@ -56,12 +56,16 @@ def convert_image(path, out_path=None, colorDepth=None, quantize=True, method=No
 		colorCount = 1 << colorDepth
 		current = bmp.colorUsed
 		if current > colorCount:
+			if quantize == 2:
+				ext = os.path.splitext(out_path)[1].lower()
+				if ext == '.bmp':
+					bmp = bmp.asOpaque()
 			if method and method > QuantizeMethod.Naive:
 				bmp = quantize_external(path, out_path, colorCount, method)
 			else:
 				bmp = bmp.quantize(colorCount, method, False)
 			name = 'Default' if method is None else method.name
-			print(f'quantize {bmp.width}x{bmp.height} image {name}: {current} => {bmp.colorUsed}')
+			print(f'quantize {quantize} {bmp.width}x{bmp.height} image {name}: {current} => {bmp.colorUsed}')
 	save_bitmap(bmp, out_path, colorDepth)
 
 
@@ -96,8 +100,8 @@ def save_bitmap_list(bmps, out_path, ext):
 		path = os.path.join(out_path, f'{index}{ext}')
 		save_bitmap(bmp, path)
 
-def _parse_split_dims(item):
-	items = item.split()
+def _parse_split_dims(text):
+	items = text.split()
 	dims = []
 	for item in items:
 		m = re.match(r'(\d+)(x(\d+))?', item)
@@ -203,6 +207,8 @@ def resize_toolbar_bitmap_each(path, percent, method=ResizeMethod.Bicubic, out_p
 	save_bitmap(bmp, out_path)
 
 resize_toolbar_bitmap = resize_toolbar_bitmap_whole
+all_bitmap_size = (16, 24, 32, 40, 48)
+all_icon_size = (32, 48, 64, 80, 96)
 
 def make_metapath_toolbar_bitmap(size):
 	images = f'images/metapath/{size}x{size}'
@@ -226,7 +232,7 @@ def make_metapath_toolbar_bitmap(size):
 	], f'Toolbar{size}.bmp')
 
 def make_all_metapath_toolbar_bitmap():
-	for size in (16, 24, 32, 40, 48):
+	for size in all_bitmap_size:
 		make_metapath_toolbar_bitmap(size)
 
 def make_notepad2_toolbar_bitmap(size):
@@ -261,20 +267,20 @@ def make_notepad2_toolbar_bitmap(size):
 	], f'Toolbar{size}.bmp')
 
 def make_all_notepad2_toolbar_bitmap():
-	for size in (16, 24, 32, 40, 48):
+	for size in all_bitmap_size:
 		make_notepad2_toolbar_bitmap(size)
 
 def make_other_bitmap():
-	for size in (16, 24, 32, 40, 48):
+	for size in all_bitmap_size:
 		colorDepth = 24 if size == 16 else 8
 		convert_image(f'images/{size}x{size}/Open.png', f'OpenFolder{size}.bmp', colorDepth)
 
-	for size in (16, 24, 32, 40, 48):
+	for size in all_bitmap_size:
 		images = f'images/{size}x{size}'
 		convert_image(f'{images}/Next.png', f'Next{size}.bmp', 4, False)
 		convert_image(f'{images}/Prev.png', f'Prev{size}.bmp', 4, False)
 
-	for size in (16, 24, 32, 40, 48):
+	for size in all_bitmap_size:
 		colorDepth = 24 if size == 16 else 8
 		images = f'images/{size}x{size}'
 		concat_horizontal([f'{images}/Encoding.png', f'{images}/EncodingGray.png'], f'Encoding{size}.bmp', colorDepth)
@@ -293,13 +299,25 @@ def make_notepad2_icon_and_cursor():
 		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
 	], 'Notepad2_min.ico')
 
-	folder = 'images/icon/Run/'
+	folder = 'images/icon/Run'
 	Icon.makeIcon([
 		('images/32x32/Launch.png', 4), ('images/48x48/Launch.png', 4),
 		(f'{folder}/64.png', 4), (f'{folder}/80.png', 4),
 		(f'{folder}/96.png', 4),
 	], 'Run.ico')
 	Icon.makeIcon([('images/32x32/Launch.png', 4)], 'Run_min.ico')
+
+	folder = 'images/icon/Styles'
+	Icon.makeIcon([(f'{folder}/{size}.png', 4) for size in all_icon_size], 'Styles.ico')
+	Icon.makeIcon([(f'{folder}/32.png', 4)], 'Styles_min.ico')
+
+	folder = 'images/cursor/Copy'
+	Icon.makeCursor([
+		(f'{folder}/32.png', 4, (5, 9)), (f'{folder}/48.png', 4, (8, 13)),
+		(f'{folder}/64.png', 4, (10, 17)), (f'{folder}/80.png', 4, (13, 21)),
+		(f'{folder}/96.png', 4, (15, 25)),
+	], 'Copy.cur')
+	Icon.makeCursor([(f'{folder}/32.png', 4, (5, 9))], 'Copy_min.cur')
 
 def make_metapath_icon_and_cursor():
 	folder = 'images/metapath/icon/metapath'
@@ -314,6 +332,19 @@ def make_metapath_icon_and_cursor():
 		(f'{folder}/16.png', 32), (f'{folder}/24.png', 32),
 		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
 	], 'metapath_min.ico')
+
+	for name in ('Cross1', 'Cross2'):
+		folder = f'images/metapath/icon/{name}'
+		Icon.makeIcon([(f'{folder}/{size}.png', 4) for size in all_icon_size], f'{name}.ico')
+		Icon.makeIcon([(f'{folder}/32.png', 4)], f'{name}_min.ico')
+
+	folder = 'images/metapath/cursor/Crosshair'
+	Icon.makeCursor([
+		(f'{folder}/32.png', 4, (15, 16)), (f'{folder}/48.png', 4, (22, 24)),
+		(f'{folder}/64.png', 4, (30, 32)), (f'{folder}/80.png', 4, (37, 40)),
+		(f'{folder}/96.png', 4, (45, 48)),
+	], 'Crosshair.cur')
+	Icon.makeCursor([(f'{folder}/32.png', 4, (15, 16))], 'Crosshair_min.cur')
 
 #make_all_metapath_toolbar_bitmap()
 #make_all_notepad2_toolbar_bitmap()

@@ -284,6 +284,8 @@ class Bitmap:
 	def write(self, fd, iconFile=False):
 		self.encode()
 		maskData = self.maskData
+		#if self.bitsPerPixel == 32:
+		#	maskData = None # mask is not required
 		if iconFile:
 			if maskData:
 				self.infoHeader.sizeImage += len(maskData)
@@ -710,7 +712,7 @@ class Bitmap:
 		self.rows[y][x] = color
 
 	def save(self, path, colorDepth=None):
-		if colorDepth not in (None, 32) and not self.isOpaque():
+		if colorDepth and colorDepth != 32 and not self.isOpaque():
 			bmp = self.asOpaque()
 			bmp.save(path, colorDepth)
 			return
@@ -775,25 +777,26 @@ class Bitmap:
 			self.make_transparent(maskData)
 			return
 
-		rows = []
-		for row in self.rows:
-			rows.append(row[:])
 		if current == colorCount:
+			rows = []
+			for row in self.rows:
+				rows.append(row[:])
 			self.make_transparent(maskData)
 			counter = self.countColor()
 			if len(counter) <= colorCount:
 				return
 			self.rows = rows
 
+		image = self.toImage()
 		reduced = colorCount
 		while reduced:
-			bmp = self.quantize(reduced, method, False)
+			img = image.quantize(reduced, method=method)
+			bmp = Bitmap.fromImage(img)
 			bmp.make_transparent(maskData)
 			counter = bmp.countColor()
 			if len(counter) <= colorCount:
 				break
 			reduced -= 1
-			self.rows = rows
 
 		self.rows = bmp.rows
 		name = 'Default' if method is None else method.name
@@ -803,9 +806,9 @@ class Bitmap:
 		maskData = self.build_alpha_mask(threshold)
 		maskData = bytes(maskData)
 		bmp = self
-		if colorDepth not in (None, 32) and not self.isOpaque():
+		colorDepth = colorDepth or self.bitsPerPixel
+		if colorDepth != 32 and not self.isOpaque():
 			bmp = self.asOpaque(backColor)
-		colorDepth = colorDepth or bmp.bitsPerPixel
 		if colorDepth < 24:
 			bmp.reduce_icon_color(colorDepth, maskData, method)
 		elif colorDepth == 24:
@@ -997,7 +1000,7 @@ class Bitmap:
 			bmp.rows.append(row[:])
 		return bmp
 
-
+# https://en.wikipedia.org/wiki/ICO_(file_format)
 class IconCursorType(IntEnum):
 	Icon = 1
 	Cursor = 2
@@ -1151,11 +1154,13 @@ class Icon:
 					raw = fd.read()
 				stream = io.BytesIO(raw)
 				image = Image.open(stream)
+				if image.getpalette():
+					print(f'ERROR: {image.width}x{image.height} icon png with palette: {path}')
 				assert image.width == image.height, (path, image.width, image.height)
 				imageList[(image.width, image.height, index)] = (image, colorDepth, raw, hotspot)
 			else:
 				bmp = Bitmap.fromFileEx(path)
-				assert bmp.width == bmp.height, (path, bmp.width, bmp.height)
+				assert bmp.width == bmp.height and bmp.width < 256 and bmp.height < 256, (path, bmp.width, bmp.height)
 				bmp = bmp.asIcon(colorDepth, method, threshold)
 				stream = io.BytesIO()
 				bmp.write(stream, iconFile=True)
@@ -1195,6 +1200,8 @@ class Icon:
 	def makeIcon(args, path=None, method=None, threshold=0):
 		icon = Icon()
 		args = [(*arg, None) for arg in args]
+		if path:
+			print('make icon:', path)
 		icon._build(args, method, threshold)
 		if path:
 			icon.save(path)
@@ -1203,6 +1210,8 @@ class Icon:
 	@staticmethod
 	def makeCursor(args, path=None, method=None, threshold=0):
 		icon = Icon(IconCursorType.Cursor)
+		if path:
+			print('make cursor:', path)
 		icon._build(args, method, threshold)
 		if path:
 			icon.save(path)
