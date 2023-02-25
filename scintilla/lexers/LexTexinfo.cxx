@@ -24,11 +24,13 @@ using namespace Lexilla;
 
 namespace {
 
-constexpr bool IsTexiSpec(int ch) noexcept {
-	return ch == '@' || ch == '{' || ch == '}' ||
-		ch == '*' || ch == '/' || ch == '-' ||
-		ch == ':' || ch == '.' || ch == '?' || ch == '?' ||
-		ch == '\"' || ch == '\'' || ch == ',' || ch == '=' || ch == '~';
+constexpr bool IsTexiSpecial(char ch) noexcept {
+	// https://www.gnu.org/software/texinfo/manual/texinfo/html_node/Command-List.html
+	return AnyOf(ch,
+		' ', '\t', '\r', '\n',
+		'!', '\"', '\'', '&', '*', ',', '-', '.', '/', ':',
+		'=', '?', '@', '\\', '^', '`', '{', '}', '~'
+	);
 }
 
 #define MAX_WORD_LENGTH	31
@@ -131,7 +133,7 @@ void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				buf[0] = ch;
 				wordLen = 1;
 			} else if (ch == '@') {
-				if (IsTexiSpec(chNext)) {
+				if (IsTexiSpecial(chNext)) {
 					styler.ColorTo(i, state);
 					state = SCE_L_SPECIAL;
 				} else if (IsAlpha(chNext)) {
