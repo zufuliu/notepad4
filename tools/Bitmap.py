@@ -1107,8 +1107,6 @@ class Icon:
 			if magic == _PngMagic:
 				image = Image.open(stream)
 				#print(f'{image.width}x{image.height} png')
-				#with open(f'{image.width}x{image.height}.png', 'wb') as out:
-				#	out.write(raw)
 				self.imageList.append((image, 'png', raw))
 				continue
 
@@ -1181,6 +1179,25 @@ class Icon:
 			if imageType == IconCursorType.Cursor:
 				entry.hotspot = hotspot
 			self.directory.entryList.append(entry)
+
+	def extract(self, folder='.', dims=None):
+		if not os.path.exists(folder):
+			os.makedirs(folder)
+		for image, fmt, data in self.imageList:
+			dim = f'{image.width}x{image.height}'
+			if dims and dim not in dims:
+				continue
+			if fmt == 'png':
+				path = f'{folder}/{dim}.png'
+			else:
+				path = f'{folder}/{dim}@{fmt}.png'
+			if data and fmt == 'png':
+				with open(path, 'wb') as fd:
+					fd.write(data)
+			else:
+				if isinstance(image, Bitmap):
+					image = image.toImage(32)
+				image.save(path)
 
 	@property
 	def imageType(self):
