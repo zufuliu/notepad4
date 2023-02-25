@@ -331,7 +331,7 @@ def make_metapath_icon_and_cursor():
 		(f'{folder}/32.png', 32), (f'{folder}/48.png', 32),
 	], 'metapath_min.ico')
 
-	for name in ('Cross1', 'Cross2', 'Progs'):
+	for name in ('Cross1', 'Cross2', 'Progs', 'Items'):
 		folder = f'images/metapath/icon/{name}'
 		Icon.makeIcon([(f'{folder}/{size}.png', 4) for size in all_icon_size], f'{name}.ico')
 		Icon.makeIcon([(f'{folder}/32.png', 4)], f'{name}_min.ico')
