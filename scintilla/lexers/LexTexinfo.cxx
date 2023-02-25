@@ -27,7 +27,7 @@ namespace {
 constexpr bool IsTexiSpec(int ch) noexcept {
 	return ch == '@' || ch == '{' || ch == '}' ||
 		ch == '*' || ch == '/' || ch == '-' ||
-		ch == ':' || ch == '.' || ch == '?' || ch == '?' ||
+		ch == ':' || ch == '.' || ch == '?' ||
 		ch == '\"' || ch == '\'' || ch == ',' || ch == '=' || ch == '~';
 }
 
