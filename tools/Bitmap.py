@@ -711,9 +711,9 @@ class Bitmap:
 		self.palette = None
 		self.rows[y][x] = color
 
-	def save(self, path, colorDepth=None):
+	def save(self, path, colorDepth=None, backColor=_WhiteColor):
 		if colorDepth and colorDepth != 32 and not self.isOpaque():
-			bmp = self.asOpaque()
+			bmp = self.asOpaque(backColor)
 			bmp.save(path, colorDepth)
 			return
 
@@ -762,9 +762,11 @@ class Bitmap:
 
 	def asOpaque(self, backColor=_WhiteColor):
 		image = self.toImage(32, False)
-		background = Image.new('RGBA', image.size, color=backColor)
-		image = Image.alpha_composite(background, image)
-		#image = image.convert('RGB')
+		if backColor is None:
+			image = image.convert('RGB')
+		else:
+			background = Image.new('RGBA', image.size, color=backColor)
+			image = Image.alpha_composite(background, image)
 		bmp = Bitmap.fromImage(image)
 		bmp.bitsPerPixel = 24
 		return bmp
@@ -1143,7 +1145,7 @@ class Icon:
 			with open(path, 'wb') as fd:
 				self.write(fd)
 
-	def build(self, args, method=None, threshold=0):
+	def build(self, args, method=None, threshold=0, backColor=_WhiteColor):
 		imageList = {}
 		for path, colorDepth, hotspot in args:
 			index = _SupportedColorDepth.index(colorDepth)
@@ -1159,7 +1161,7 @@ class Icon:
 			else:
 				bmp = Bitmap.fromFileEx(path)
 				assert bmp.width == bmp.height and bmp.width < 256 and bmp.height < 256, (path, bmp.width, bmp.height)
-				bmp = bmp.asIcon(colorDepth, method, threshold)
+				bmp = bmp.asIcon(colorDepth, method, threshold, backColor)
 				stream = io.BytesIO()
 				bmp.write(stream, iconFile=True)
 				raw = stream.getvalue()
@@ -1214,22 +1216,22 @@ class Icon:
 		return icon
 
 	@staticmethod
-	def makeIcon(args, path=None, method=None, threshold=0):
+	def makeIcon(args, path=None, method=None, threshold=0, backColor=_WhiteColor):
 		icon = Icon()
 		args = [(*arg, None) for arg in args]
 		if path:
 			print('make icon:', path)
-		icon.build(args, method, threshold)
+		icon.build(args, method, threshold, backColor)
 		if path:
 			icon.save(path)
 		return icon
 
 	@staticmethod
-	def makeCursor(args, path=None, method=None, threshold=0):
+	def makeCursor(args, path=None, method=None, threshold=0, backColor=_WhiteColor):
 		icon = Icon(IconCursorType.Cursor)
 		if path:
 			print('make cursor:', path)
-		icon.build(args, method, threshold)
+		icon.build(args, method, threshold, backColor)
 		if path:
 			icon.save(path)
 		return icon
