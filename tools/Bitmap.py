@@ -2,6 +2,7 @@ import os.path
 import struct
 import io
 from enum import IntEnum
+import ctypes
 from PIL import Image
 
 __all__ = ['Bitmap', 'Color', 'Icon', 'Image', 'ResizeMethod', 'QuantizeMethod']
@@ -23,6 +24,13 @@ class Color:
 				diff = distance
 				result = index
 		return result
+
+	# https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getsyscolor
+	@staticmethod
+	def GetSysColor(index):
+		value = ctypes.windll.user32.GetSysColor(index)
+		red, green, blue = value & 0xff, (value >> 8) & 0xff, (value >> 16) & 0xff
+		return (red, green, blue, 0xff)
 
 def _drawMaskRow(maskRow):
 	result = ['o']*8*len(maskRow)
