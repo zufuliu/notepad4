@@ -1,5 +1,7 @@
 # Notepad2 and metapath
 
+Notepad2-zufuliu is a light-weight Scintilla based text editor for Windows with syntax highlighting, code folding, auto-completion and API list for many programming languages and documents.
+
 > *Notepad2-zufuliu* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](https://www.flos-freeware.ch/archive.html).
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad2/total.svg)](https://github.com/zufuliu/notepad2/releases)
@@ -203,6 +205,3 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [한국어](https://github.com/VenusGirl/notepad2) by [@VenusGirl](https://github.com/VenusGirl)
 	* [한국어](https://teus.me/category/IT/Notepad2) by [@bluenlive](https://github.com/bluenlive)
 * [Notepad2 Wiki](https://github.com/zufuliu/notepad2/wiki)
-* Other projects based on (original) Notepad2 or Notepad2-mod:
-	* [Notepad3](https://github.com/rizonesoft/Notepad3)
-	* [Notepad2e](https://github.com/ProgerXP/Notepad2e)
