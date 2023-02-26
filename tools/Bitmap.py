@@ -802,15 +802,22 @@ class Bitmap:
 			self.rows = rows
 
 		image = self.toImage()
-		reduced = colorCount
-		while reduced:
-			img = image.quantize(reduced, method=method)
+		reduced = {}
+		count = colorCount
+		while count:
+			img = image.quantize(count, method=method)
 			bmp = Bitmap.fromImage(img)
 			bmp.make_transparent(maskData)
 			counter = bmp.countColor()
-			if len(counter) <= colorCount:
+			result = len(counter)
+			reduced[count] = result
+			if result == colorCount:
 				break
-			reduced -= 1
+			if result > colorCount:
+				count -= 1
+			else:
+				count += 1
+			assert count not in reduced, (count, reduced)
 
 		self.rows = bmp.rows
 		name = 'Default' if method is None else method.name
