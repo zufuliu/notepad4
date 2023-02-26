@@ -41,6 +41,8 @@ IDR_RT_MANIFEST         RT_MANIFEST             "..\\res\\metapath.exe.manifest"
 #if NP2_ENABLE_HIDPI_IMAGE_RESOURCE
 IDR_MAINWND             ICON                    "..\\res\\metapath.ico"
 IDI_RUN                 ICON                    "..\\res\\Run.ico"
+IDI_OPTIONS             ICON                    "..\\res\\Options.ico"
+IDI_OPTIONS2            ICON                    "..\\res\\Options2.ico"
 IDI_ITEMS               ICON                    "..\\res\\Items.ico"
 IDI_PROGS               ICON                    "..\\res\\Progs.ico"
 IDI_CROSS1              ICON                    "..\\res\\Cross1.ico"
@@ -48,13 +50,13 @@ IDI_CROSS2              ICON                    "..\\res\\Cross2.ico"
 #else
 IDR_MAINWND             ICON                    "..\\res\\metapath_min.ico"
 IDI_RUN                 ICON                    "..\\res\\Run_min.ico"
+IDI_OPTIONS             ICON                    "..\\res\\Options_min.ico"
+IDI_OPTIONS2            ICON                    "..\\res\\Options2_min.ico"
 IDI_ITEMS               ICON                    "..\\res\\Items_min.ico"
 IDI_PROGS               ICON                    "..\\res\\Progs_min.ico"
 IDI_CROSS1              ICON                    "..\\res\\Cross1_min.ico"
 IDI_CROSS2              ICON                    "..\\res\\Cross2_min.ico"
 #endif
-IDI_OPTIONS             ICON                    "..\\res\\Options.ico"
-IDI_OPTIONS2            ICON                    "..\\res\\Options2.ico"
 IDI_GOTO                ICON                    "..\\res\\Goto.ico"
 
 //#if !NP2_ENABLE_APP_LOCALIZATION_DLL
