@@ -100,7 +100,7 @@ def save_bitmap_list(bmps, out_path, ext):
 		path = os.path.join(out_path, f'{index}{ext}')
 		save_bitmap(bmp, path)
 
-def _parse_split_dims(text):
+def parse_split_dims(text):
 	items = text.split()
 	dims = []
 	for item in items:
@@ -125,7 +125,7 @@ def split_image(horizontal, path, dims=None, out_path=None, ext=None):
 		ext = old_ext
 
 	if isinstance(dims, str):
-		dims = _parse_split_dims(dims)
+		dims = parse_split_dims(dims)
 	if horizontal:
 		print('split horizontal:', path, dims, '=>', out_path)
 	else:

@@ -4,58 +4,25 @@ import io
 from enum import IntEnum
 from PIL import Image
 
-__all__ = ['Bitmap', 'Icon', 'Image', 'ResizeMethod', 'QuantizeMethod']
-# https://pillow.readthedocs.io/en/stable/index.html
+__all__ = ['Bitmap', 'Color', 'Icon', 'Image', 'ResizeMethod', 'QuantizeMethod']
 
-# https://en.wikipedia.org/wiki/BMP_file_format
-# https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi
-class BitmapFileHeader:
-	StructureSize = 14
+class Color:
+	Transparent = (0, 0, 0, 0)
+	Black = (0, 0, 0, 255)
+	White = (255, 255, 255, 255)
 
-	def __init__(self):
-		self.size = 0
-		self.reserved1 = 0
-		self.reserved2 = 0
-		self.offset = 54
-
-	def read(self, fd):
-		magic = fd.read(2)
-		assert magic == b'BM'
-		self.size = struct.unpack('<I', fd.read(4))[0]
-		self.reserved1, self.reserved2 = struct.unpack('<HH', fd.read(2*2))
-		self.offset = struct.unpack('<I', fd.read(4))[0]
-		assert self.offset >= 54, self.offset
-
-	def write(self, fd):
-		fd.write(b'BM')
-		fd.write(struct.pack('<I', self.size))
-		fd.write(struct.pack('<HH', self.reserved1, self.reserved2))
-		fd.write(struct.pack('<I', self.offset))
-
-	def __str__(self):
-		return f'''BitmapFileHeader {{
-	size: {self.size :08X} {self.size}
-	reserved: {self.reserved1 :04X} {self.reserved2 :04X}
-	offset: {self.offset :08X} {self.offset}
-}}'''
-
-_InchesPerMetre = 0.0254
-_TransparentColor = (0, 0, 0, 0)
-_WhiteColor = (255, 255, 255, 255)
-_SupportedColorDepth = (1, 4, 8, 24, 32, 'png')
-_PngMagic = b'\x89PNG'
-
-def _find_color_index_naive(table, color):
-	result = 0
-	diff = 1 << 18 # 4*255*255
-	red, green, blue, alpha = color
-	for index, item in enumerate(table):
-		R, G, B, A = item
-		distance = (red - R)**2 + (green - G)**2 + (blue - B)**2 + (alpha - A)**2
-		if distance < diff:
-			diff = distance
-			result = index
-	return result
+	@staticmethod
+	def find_color_index_naive(table, color):
+		result = 0
+		diff = 1 << 18 # 4*255*255
+		red, green, blue, alpha = color
+		for index, item in enumerate(table):
+			R, G, B, A = item
+			distance = (red - R)**2 + (green - G)**2 + (blue - B)**2 + (alpha - A)**2
+			if distance < diff:
+				diff = distance
+				result = index
+		return result
 
 def _drawMaskRow(maskRow):
 	result = ['o']*8*len(maskRow)
@@ -110,6 +77,7 @@ def _diffMaskData(name, referData, maskData, rowSize, saveLog=False):
 		fd.write(doc.encode('utf-8'))
 	return total
 
+# https://pillow.readthedocs.io/en/stable/index.html
 def _showMaskImage(maskList, rowSize, height, title=None):
 	rows = [maskList[i:i+rowSize] for i in range(0, len(maskList), rowSize)]
 	maskList = []
@@ -135,6 +103,12 @@ class QuantizeMethod(IntEnum):
 	PngQuant = 101
 	ImageMagick = 102
 
+# https://en.wikipedia.org/wiki/BMP_file_format
+# https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi
+_InchesPerMetre = 0.0254
+_SupportedColorDepth = (1, 4, 8, 24, 32, 'png')
+_PngMagic = b'\x89PNG'
+
 class CompressionMethod(IntEnum):
 	BI_RGB = 0
 	BI_RLE8 = 1
@@ -153,6 +127,36 @@ class CompressionMethod(IntEnum):
 			return CompressionMethod(value).name
 		except ValueError:
 			return f'Unknown-{value}'
+
+class BitmapFileHeader:
+	StructureSize = 14
+
+	def __init__(self):
+		self.size = 0
+		self.reserved1 = 0
+		self.reserved2 = 0
+		self.offset = 54
+
+	def read(self, fd):
+		magic = fd.read(2)
+		assert magic == b'BM'
+		self.size = struct.unpack('<I', fd.read(4))[0]
+		self.reserved1, self.reserved2 = struct.unpack('<HH', fd.read(2*2))
+		self.offset = struct.unpack('<I', fd.read(4))[0]
+		assert self.offset >= 54, self.offset
+
+	def write(self, fd):
+		fd.write(b'BM')
+		fd.write(struct.pack('<I', self.size))
+		fd.write(struct.pack('<HH', self.reserved1, self.reserved2))
+		fd.write(struct.pack('<I', self.offset))
+
+	def __str__(self):
+		return f'''BitmapFileHeader {{
+	size: {self.size :08X} {self.size}
+	reserved: {self.reserved1 :04X} {self.reserved2 :04X}
+	offset: {self.offset :08X} {self.offset}
+}}'''
 
 class BitmapInfoHeader:
 	StructureSize = 40
@@ -254,9 +258,9 @@ class Bitmap:
 		self.maskData = None
 
 		if width and height:
+			row = [Color.Transparent] * width
 			for y in range(height):
-				row = [_TransparentColor] * width
-				self.rows.append(row)
+				self.rows.append(row[:])
 
 	def read(self, fd, iconFile=False):
 		start = fd.tell()
@@ -437,7 +441,7 @@ class Bitmap:
 			if len(counter) > colorCount:
 				for color in counter:
 					if color not in colorMap:
-						index = _find_color_index_naive(table, color)
+						index = Color.find_color_index_naive(table, color)
 						colorMap[color] = index
 
 			palette = []
@@ -643,7 +647,7 @@ class Bitmap:
 			for mask in maskRow:
 				for i in range(8):
 					if mask & 0x80:
-						row[offset] = _TransparentColor
+						row[offset] = Color.Transparent
 					mask <<= 1
 					offset += 1
 					if offset == width:
@@ -711,7 +715,7 @@ class Bitmap:
 		self.palette = None
 		self.rows[y][x] = color
 
-	def save(self, path, colorDepth=None, backColor=_WhiteColor):
+	def save(self, path, colorDepth=None, backColor=Color.White):
 		if colorDepth and colorDepth != 32 and not self.isOpaque():
 			bmp = self.asOpaque(backColor)
 			bmp.save(path, colorDepth)
@@ -755,12 +759,12 @@ class Bitmap:
 					color = data[x, y]
 					# TODO: fix transparent color
 					if color[3] == 0:
-						bmp[x, y] = _TransparentColor
+						bmp[x, y] = Color.Transparent
 					else:
 						bmp[x, y] = color
 		return bmp
 
-	def asOpaque(self, backColor=_WhiteColor):
+	def asOpaque(self, backColor=Color.White):
 		image = self.toImage(32, False)
 		if backColor is None:
 			image = image.convert('RGB')
@@ -804,7 +808,7 @@ class Bitmap:
 		name = 'Default' if method is None else method.name
 		print(f'{name} reduce {bmp.width}x{bmp.height} icon color: {current} => {reduced}, {len(counter)}')
 
-	def asIcon(self, colorDepth=None, method=None, threshold=0, backColor=_WhiteColor):
+	def asIcon(self, colorDepth=None, method=None, threshold=0, backColor=Color.White):
 		maskData = self.build_alpha_mask(threshold)
 		maskData = bytes(maskData)
 		bmp = self
@@ -833,7 +837,7 @@ class Bitmap:
 				count += alpha & 1
 				if alpha not in (0, 0xFF):
 					return False
-				if color == _TransparentColor:
+				if color == Color.Transparent:
 					transparent += 1
 		total = self.width*self.height
 		return transparent != total and (count == 0 or count == total)
@@ -1145,7 +1149,7 @@ class Icon:
 			with open(path, 'wb') as fd:
 				self.write(fd)
 
-	def build(self, args, method=None, threshold=0, backColor=_WhiteColor):
+	def build(self, args, method=None, threshold=0, backColor=Color.White):
 		imageList = {}
 		for path, colorDepth, hotspot in args:
 			index = _SupportedColorDepth.index(colorDepth)
@@ -1182,7 +1186,7 @@ class Icon:
 				entry.hotspot = hotspot
 			self.directory.entryList.append(entry)
 
-	def extract(self, folder='.', dims=None):
+	def extract(self, folder='.', prefix='', dims=None):
 		if not os.path.exists(folder):
 			os.makedirs(folder)
 		for image, fmt, data in self.imageList:
@@ -1190,9 +1194,9 @@ class Icon:
 			if dims and dim not in dims:
 				continue
 			if fmt == 'png':
-				path = f'{folder}/{dim}.png'
+				path = f'{folder}/{prefix}{dim}.png'
 			else:
-				path = f'{folder}/{dim}@{fmt}.png'
+				path = f'{folder}/{prefix}{dim}@{fmt}.png'
 			if data and fmt == 'png':
 				with open(path, 'wb') as fd:
 					fd.write(data)
@@ -1216,7 +1220,7 @@ class Icon:
 		return icon
 
 	@staticmethod
-	def makeIcon(args, path=None, method=None, threshold=0, backColor=_WhiteColor):
+	def makeIcon(args, path=None, method=None, threshold=0, backColor=Color.White):
 		icon = Icon()
 		args = [(*arg, None) for arg in args]
 		if path:
@@ -1227,7 +1231,7 @@ class Icon:
 		return icon
 
 	@staticmethod
-	def makeCursor(args, path=None, method=None, threshold=0, backColor=_WhiteColor):
+	def makeCursor(args, path=None, method=None, threshold=0, backColor=Color.White):
 		icon = Icon(IconCursorType.Cursor)
 		if path:
 			print('make cursor:', path)
