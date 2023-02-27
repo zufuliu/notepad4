@@ -41,7 +41,7 @@ def quantize_external(path, out_path, colorCount, method):
 	#os.remove(temp);
 	return bmp
 
-def convert_image(path, out_path=None, colorDepth=None, quantize=1, method=None):
+def convert_image(path, out_path=None, colorDepth=None, quantize=False, method=None):
 	if not out_path:
 		name, ext = os.path.splitext(path)
 		if ext.lower() == '.bmp':
@@ -277,8 +277,8 @@ def make_other_bitmap():
 
 	for size in all_bitmap_size:
 		images = f'images/{size}x{size}'
-		convert_image(f'{images}/Next.png', f'Next{size}.bmp', 4, False)
-		convert_image(f'{images}/Prev.png', f'Prev{size}.bmp', 4, False)
+		convert_image(f'{images}/Next.png', f'Next{size}.bmp', 4)
+		convert_image(f'{images}/Prev.png', f'Prev{size}.bmp', 4)
 
 	for size in all_bitmap_size:
 		colorDepth = 24 if size == 16 else 8

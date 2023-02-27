@@ -437,9 +437,9 @@ class Bitmap:
 		else:
 			counter = self.countColor()
 			if len(counter) > colorCount and (method is None or method < QuantizeMethod.Naive):
-				bmp = self.quantize(colorCount, method, False)
+				reduced, result, count, bmp = self.reduce_color(colorCount, method)
 				name = 'Default' if method is None else method.name
-				print(f'{name} reduce {bmp.width}x{bmp.height} bitmap color: {len(counter)} => {bmp.colorUsed}')
+				print(f'{name} reduce {bmp.width}x{bmp.height} bitmap color: {len(counter)} => {reduced}, {(count, result)}')
 				bmp.bitsPerPixel = self.bitsPerPixel
 				return bmp.build_palette(QuantizeMethod.Naive)
 
@@ -801,27 +801,38 @@ class Bitmap:
 				return
 			self.rows = rows
 
+		reduced, result, count, bmp = self.reduce_color(colorCount, method, maskData)
+		self.rows = bmp.rows
+		name = 'Default' if method is None else method.name
+		print(f'{name} reduce {bmp.width}x{bmp.height} icon color: {current} => {reduced}, {(count, result)}')
+
+	def reduce_color(self, colorCount, method=None, maskData=None):
 		image = self.toImage()
 		reduced = {}
+		best = None
 		count = colorCount
-		while count:
+		while count and count <= 256:
 			img = image.quantize(count, method=method)
 			bmp = Bitmap.fromImage(img)
-			bmp.make_transparent(maskData)
+			if maskData:
+				bmp.make_transparent(maskData)
 			counter = bmp.countColor()
 			result = len(counter)
-			reduced[count] = result
+			reduced[count] = (result, count, bmp)
 			if result == colorCount:
+				best = (result, count, bmp)
 				break
 			if result > colorCount:
 				count -= 1
 			else:
 				count += 1
-			assert count not in reduced, (count, reduced)
+			if count in reduced:
+				break
 
-		self.rows = bmp.rows
-		name = 'Default' if method is None else method.name
-		print(f'{name} reduce {bmp.width}x{bmp.height} icon color: {current} => {reduced}, {len(counter)}')
+		if not best:
+			best = sorted(value for value in reduced.values() if value[0] < colorCount)[-1]
+		reduced = dict((key, value[0]) for key, value in reduced.items())
+		return reduced, *best
 
 	def asIcon(self, colorDepth=None, method=None, threshold=0, backColor=Color.White):
 		maskData = self.build_alpha_mask(threshold)
@@ -883,8 +894,8 @@ class Bitmap:
 			return self
 		if method and method >= QuantizeMethod.Naive:
 			return self
-		image = self.toImage().quantize(colorCount, method=method)
-		return Bitmap.fromImage(image)
+		result = self.reduce_color(colorCount, method)
+		return result[-1]
 
 	@staticmethod
 	def fromFileEx(path):
