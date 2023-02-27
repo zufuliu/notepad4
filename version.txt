@@ -17,12 +17,6 @@ hg clone http://hg.code.sf.net/p/scintilla/scite
 5.3.3
 2023-02-15 6066:92a076039ea8
 
-Notepad3 (3-clause BSD)
-https://github.com/rizonesoft/Notepad3
-
-Notepad2e (3-clause BSD)
-https://github.com/ProgerXP/Notepad2e
-
 init submodule:
 	git submodule init
 update submodule:

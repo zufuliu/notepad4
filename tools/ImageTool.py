@@ -336,6 +336,14 @@ def make_metapath_icon_and_cursor():
 		Icon.makeIcon([(f'{folder}/{size}.png', 4) for size in all_icon_size], f'{name}.ico')
 		Icon.makeIcon([(f'{folder}/32.png', 4)], f'{name}_min.ico')
 
+	folder = 'images/metapath/icon/Goto'
+	Icon.makeIcon([
+		('images/32x32/Open.png', 4), ('images/48x48/Open.png', 4),
+		(f'{folder}/64.png', 4), (f'{folder}/80.png', 4),
+		(f'{folder}/96.png', 4),
+	], 'Goto.ico', threshold=127, backColor=None)
+	Icon.makeIcon([('images/32x32/Open.png', 4)], 'Goto_min.ico', threshold=127, backColor=None)
+
 	folder = 'images/metapath/cursor/Crosshair'
 	Icon.makeCursor([
 		(f'{folder}/32.png', 4, (15, 16)), (f'{folder}/48.png', 4, (22, 24)),

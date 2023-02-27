@@ -1,4 +1,4 @@
-# Notepad2 and metapath
+# Notepad2-zufuliu and metapath
 
 Notepad2-zufuliu is a light-weight Scintilla based text editor for Windows with syntax highlighting, code folding, auto-completion and API list for many programming languages and documents.
 

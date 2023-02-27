@@ -12,6 +12,7 @@ images:
 
 	res/OpenFolder.bmp	images/Open.svg
 	metapath/res/OpenFolder.bmp
+	metapath/res/Goto.ico
 
 	res/Run.ico			images/Launch.svg
 	metapath/res/Run.ico
