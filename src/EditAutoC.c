@@ -1241,6 +1241,9 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		if (ch == '@' || (ch == '<' && rid == NP2LEX_TYPESCRIPT)) {
 			if (iCurrentStyle >= SCE_JS_COMMENTLINE && iCurrentStyle <= SCE_JS_TASKMARKER) {
 				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
+				if (rid != NP2LEX_JAVASCRIPT) {
+					WordList_AddList(pWList, lexJavaScript.pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
+				}
 				return AddWordResult_Finish;
 			}
 #if 0

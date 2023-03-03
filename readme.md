@@ -1,8 +1,6 @@
-# Notepad2-zufuliu and metapath
+# Notepad2-zufuliu and metapath-zufuliu
 
-Notepad2-zufuliu is a light-weight Scintilla based text editor for Windows with syntax highlighting, code folding, auto-completion and API list for many programming languages and documents.
-
-> *Notepad2-zufuliu* is a modified version (fork) of [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). *metapath* is a bug-fixed version of original [metapath](https://www.flos-freeware.ch/archive.html).
+Notepad2-zufuliu is a light-weight Scintilla based text editor for Windows with syntax highlighting, code folding, auto-completion and API list for many programming languages and documents, it's based on official [Notepad2](https://www.flos-freeware.ch/notepad2.html) and [Notepad2-mod](https://xhmikosr.github.io/notepad2-mod/). metapath-zufuliu is a file browser plugin and based on official [metapath](https://www.flos-freeware.ch/archive.html).
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](License.txt) [![Latest release](https://img.shields.io/github/release/zufuliu/notepad2.svg)](https://github.com/zufuliu/notepad2/releases) [![Downloads](https://img.shields.io/github/downloads/zufuliu/notepad2/total.svg)](https://github.com/zufuliu/notepad2/releases)
 
@@ -131,7 +129,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* Texinfo
 	* [TOML File](https://toml.io/)
-	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 4.9.
+	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 5.0.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
