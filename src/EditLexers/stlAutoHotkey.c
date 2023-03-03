@@ -118,10 +118,11 @@ static KEYWORDLIST Keywords_AHK = {{
 
 , // 7 misc
 "AtEOF BackColor Break "
-"C Capacity Case CaseSense Catch ClassNN ClickCount Com Comment Comments Contains Continue Count Critical Default "
-"Else Enabled Encoding Exit False Files Finally Focused FocusedCtrl For Global Goto "
+"Capacity Case CaseSense Catch ClassNN ClickCount Com Comment Comments Contains Continue Count Critical Default "
+"Else Enabled Encoding EndChars Exit False Files Finally Focused FocusedCtrl For Force Global Goto "
 "HKCU HKEY_CLASSES_ROOT HKEY_CURRENT_CONFIG HKEY_CURRENT_USER HKEY_LOCAL_MACHINE HKEY_USERS HKLM Handle Hwnd "
-"If IsBuiltIn IsVariadic Join LTrim Len Length Local Loop MarginX MarginY Mark MaxParams MinParams Name Parse Pos Ptr "
+"If Ignore IsBuiltIn IsVariadic Join LTrim Len Length Local Loop MarginX MarginY Mark MaxParams MinParams Name NoMouse "
+"Off Parse Pos Prompt Ptr "
 "REG_BINARY REG_DWORD REG_DWORD_BIG_ENDIAN REG_EXPAND_SZ REG_FULL_RESOURCE_DESCRIPTOR REG_LINK REG_MULTI_SZ REG_QWORD "
 "REG_RESOURCE_LIST REG_RESOURCE_REQUIREMENTS_LIST REG_SZ RTrim Read Reg Reload Return "
 "Size Static Suspend Switch Thread Throw Title True Try Type Until Value Visible While "

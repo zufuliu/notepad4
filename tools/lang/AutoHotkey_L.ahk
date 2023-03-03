@@ -1,9 +1,9 @@
+; https://www.autohotkey.com/docs/v2/
 ; https://github.com/Lexikos/AutoHotkey_L-Docs.git
-; AutoHotkey_L https://lexikos.github.io/v2/docs/AutoHotkey.htm
 
 ;! keywords			===========================================================
-; https://lexikos.github.io/v2/docs/Concepts.htm#names
-; https://lexikos.github.io/v2/docs/v2-changes.htm
+; https://www.autohotkey.com/docs/v2/Concepts.htm#names
+; https://www.autohotkey.com/docs/v2/v2-changes.htm
 as and
 Contains
 False
@@ -81,7 +81,7 @@ While Expression
 #WinActivateForce
 
 ;! Script Compiler Directives
-; https://lexikos.github.io/v2/docs/misc/Ahk2ExeDirectives.htm
+; https://www.autohotkey.com/docs/v2/misc/Ahk2ExeDirectives.htm
 /*@Ahk2Exe-Keep */
 /*@Ahk2Exe-IgnoreBegin */
 /*@Ahk2Exe-IgnoreEnd */
@@ -101,7 +101,7 @@ While Expression
 /*@Ahk2Exe-UseResourceLang LangCode */
 
 ;! Built-in Variables	=======================================================
-; https://lexikos.github.io/v2/docs/Variables.htm#BuiltIn
+; https://www.autohotkey.com/docs/v2/Variables.htm#BuiltIn
 ; Special Characters
 A_Space
 A_Tab
@@ -223,12 +223,12 @@ A_Index
 A_LoopFileName
 A_LoopReadLine
 A_LoopField
-; https://lexikos.github.io/v2/docs/commands/LoopReg.htm
+; https://www.autohotkey.com/docs/v2/commands/LoopReg.htm
 A_LoopRegName
 A_LoopRegType
 A_LoopRegKey
 A_LoopRegTimeModified
-; https://lexikos.github.io/v2/docs/commands/LoopFiles.htm
+; https://www.autohotkey.com/docs/v2/commands/LoopFiles.htm
 A_LoopFileName
 A_LoopFileExt
 A_LoopFilePath
@@ -245,7 +245,7 @@ A_LoopFileSizeKB
 A_LoopFileSizeMB
 
 ;! Keys				===========================================================
-; https://lexikos.github.io/v2/docs/KeyList.htm
+; https://www.autohotkey.com/docs/v2/KeyList.htm
 ; Mouse
 LButton RButton MButton
 XButton1 XButton2
@@ -322,7 +322,7 @@ JoyPOV JoyName JoyButtons JoyAxes JoyInfo
 
 ;! Functions		===========================================================
 ; Drive
-; https://lexikos.github.io/v2/docs/commands/Drive.htm
+; https://www.autohotkey.com/docs/v2/commands/Drive.htm
 DriveEject [Drive]
 DriveRetract [Drive]
 DriveGetCapacity(Path)
@@ -426,7 +426,7 @@ TraySetIcon([FileName, IconNumber, Freeze])
 TrayTip [Text, Title, Options]
 
 ; Math
-; https://lexikos.github.io/v2/docs/commands/Math.htm
+; https://www.autohotkey.com/docs/v2/commands/Math.htm
 Abs(Number)
 Ceil(Number)
 DateAdd(DateTime, Time, TimeUnits)
@@ -452,7 +452,7 @@ ACos(Number)
 ATan(Number)
 
 ; Monitor
-; https://lexikos.github.io/v2/docs/commands/Monitor.htm
+; https://www.autohotkey.com/docs/v2/commands/Monitor.htm
 MonitorGet([N, Left, Top, Right, Bottom])
 MonitorGetCount()
 MonitorGetName([N])
@@ -460,7 +460,7 @@ MonitorGetPrimary()
 MonitorGetWorkArea([N, Left, Top, Right, Bottom])
 
 ; Mouse and Keyboard
-; https://lexikos.github.io/v2/docs/Hotkeys.htm
+; https://www.autohotkey.com/docs/v2/Hotkeys.htm
 HotIf ["Expression"]
 HotIf [Function]
 Hotkey KeyName [, Action, Options]
@@ -493,7 +493,7 @@ MouseClick [WhichButton, X, Y, ClickCount, Speed, DownOrUp, Relative]
 MouseClickDrag WhichButton, X1, Y1, X2, Y2 [, Speed, Relative]
 MouseGetPos [OutputVarX, OutputVarY, OutputVarWin, OutputVarControl, Flag]
 MouseMove X, Y [, Speed, Relative]
-; https://lexikos.github.io/v2/docs/commands/Send.htm
+; https://www.autohotkey.com/docs/v2/commands/Send.htm
 Send Keys
 SendText Keys
 SendInput Keys
@@ -537,7 +537,7 @@ OutputDebug Text
 Persistent [Persist]
 
 ; Process
-; https://lexikos.github.io/v2/docs/commands/Process.htm
+; https://www.autohotkey.com/docs/v2/commands/Process.htm
 ProcessClose PIDOrName
 ProcessExist([PIDOrName])
 ProcessSetPriority Level [, PIDOrName]
@@ -562,7 +562,7 @@ PixelGetColor(X, Y [, Mode])
 PixelSearch OutputVarX, OutputVarY, X1, Y1, X2, Y2, ColorID [, Variation]
 
 ; Sound
-; https://lexikos.github.io/v2/docs/commands/Sound.htm
+; https://www.autohotkey.com/docs/v2/commands/Sound.htm
 SoundBeep [Frequency, Duration]
 SoundGetInterface(IID [, Component, Device])
 SoundGetMute([Component, Device])
@@ -600,7 +600,7 @@ VarSetStrCapacity(TargetVar [, RequestedCapacity])
 VerCompare(VersionA, VersionB)
 
 ; Window
-; https://lexikos.github.io/v2/docs/commands/Win.htm
+; https://www.autohotkey.com/docs/v2/commands/Win.htm
 GroupActivate(GroupName [, Mode])
 GroupAdd GroupName [, WinTitle, WinText, ExcludeTitle, ExcludeText]
 GroupClose GroupName [, Mode]
@@ -662,7 +662,7 @@ WinWaitNotActive [WinTitle, WinText, Timeout, ExcludeTitle, ExcludeText]
 WinWaitClose [WinTitle, WinText, Timeout, ExcludeTitle, ExcludeText]
 
 ; Control
-; https://lexikos.github.io/v2/docs/commands/Control.htm
+; https://www.autohotkey.com/docs/v2/commands/Control.htm
 ControlAddItem String, Control [, WinTitle, WinText, ExcludeTitle, ExcludeText]
 ControlChooseIndex N, Control [, WinTitle, WinText, ExcludeTitle, ExcludeText]
 ControlChooseString String, Control [, WinTitle, WinText, ExcludeTitle, ExcludeText]
@@ -708,8 +708,8 @@ SendMessage(Msg [, wParam, lParam, Control, WinTitle, WinText, ExcludeTitle, Exc
 SetControlDelay Delay
 
 ; Object Types
-; https://lexikos.github.io/v2/docs/objects/index.htm
-; https://lexikos.github.io/v2/docs/Objects.htm
+; https://www.autohotkey.com/docs/v2/objects/index.htm
+; https://www.autohotkey.com/docs/v2/Objects.htm
 __Enum(NumberOfVars)
 __Item[name]
 __New()
@@ -719,13 +719,13 @@ __Get(Name, Params)
 __Set(Name, Params, Value)
 __Call(Name, Params)
 Call(Params*)
-; https://lexikos.github.io/v2/docs/objects/Any.htm
+; https://www.autohotkey.com/docs/v2/objects/Any.htm
 GetMethod(Name)
 HasBase(BaseObj)
 HasMethod(Name)
 HasProp(Name)
 ObjGetBase(Value)
-; https://lexikos.github.io/v2/docs/objects/Object.htm
+; https://www.autohotkey.com/docs/v2/objects/Object.htm
 Clone()
 DefineProp(Name, Desc)
 DeleteProp(Name)
@@ -736,20 +736,20 @@ ObjSetBase(Obj, BaseObj)
 ObjOwnPropCount(Obj)
 ObjSetCapacity(Obj, MaxProps)
 ObjGetCapacity(Obj)
-; https://lexikos.github.io/v2/docs/objects/Array.htm
+; https://www.autohotkey.com/docs/v2/objects/Array.htm
 Delete(Index)
 Has(Index)
 InsertAt(Index, Value1 [, Value2, ... ValueN])
 Pop()
 Push([Value, Value2, ..., ValueN])
 RemoveAt(Index [, Length])
-; https://lexikos.github.io/v2/docs/objects/Map.htm
+; https://www.autohotkey.com/docs/v2/objects/Map.htm
 Clear()
 Delete(Key)
 Get(Key [, Default])
 Has(Key)
 Set([Key, Value, Key2, Value2, ...])
-; https://lexikos.github.io/v2/docs/objects/File.htm
+; https://www.autohotkey.com/docs/v2/objects/File.htm
 Read([Characters])
 Write(String)
 ReadLine()
@@ -760,12 +760,12 @@ RawRead(Buffer [, Bytes])
 RawWrite(Data [, Bytes])
 Seek(Distance [, Origin := 0])
 Close()
-; https://lexikos.github.io/v2/docs/objects/Func.htm
+; https://www.autohotkey.com/docs/v2/objects/Func.htm
 Bind(Param1, Param2, ...)
 IsByRef([ParamIndex])
 IsOptional([ParamIndex])
 
-; https://lexikos.github.io/v2/docs/objects/Gui.htm
+; https://www.autohotkey.com/docs/v2/objects/Gui.htm
 Add(ControlType [, Options, Text])
 AddControlType([Options, Text])
 Destroy()
@@ -782,7 +782,7 @@ Opt(Options)
 SetFont([Options, FontName])
 Show([Options])
 Submit([Hide := true])
-; https://lexikos.github.io/v2/docs/objects/GuiControl.htm
+; https://www.autohotkey.com/docs/v2/objects/GuiControl.htm
 Add(Items)
 Choose(Value)
 Delete([Value])
@@ -797,7 +797,7 @@ SetFont([Options, FontName])
 SetFormat([Format])
 UseTab([Value, ExactMatch := false])
 
-; https://lexikos.github.io/v2/docs/objects/Menu.htm
+; https://www.autohotkey.com/docs/v2/objects/Menu.htm
 Add([MenuItemName, Function-or-Submenu, Options])
 Check(MenuItemName)
 Delete([MenuItemName])
@@ -814,7 +814,7 @@ Uncheck(MenuItemName)
 AddStandard()
 
 ;! Objects			===========================================================
-; https://lexikos.github.io/v2/docs/objects/index.htm
+; https://www.autohotkey.com/docs/v2/objects/index.htm
 Any
 	Object
 		Array
@@ -882,6 +882,10 @@ Any
 		ComValueRef
 
 ;! Misc				===========================================================
+; Directives
+NoMouse EndChars
+Force Ignore Prompt Off
+
 ; Properties
 ; Array
 Length Capacity
@@ -903,12 +907,12 @@ ClickCount Default Handle
 Pos Len Name Count Mark
 
 ; Continuation section
-; https://lexikos.github.io/v2/docs/Scripts.htm#continuation-section
-Join LTrim RTrim Comments Comment Com C
+; https://www.autohotkey.com/docs/v2/Scripts.htm#continuation-section
+Join LTrim RTrim Comments Comment Com
 ; Loop
 Files Parse Read Reg
 ; Loop Reg
-; https://lexikos.github.io/v2/docs/commands/LoopReg.htm
+; https://www.autohotkey.com/docs/v2/commands/LoopReg.htm
 HKEY_LOCAL_MACHINE HKEY_USERS HKEY_CURRENT_USER HKEY_CLASSES_ROOT HKEY_CURRENT_CONFIG
 HKLM HKCU
 REG_SZ REG_EXPAND_SZ REG_MULTI_SZ REG_DWORD REG_QWORD REG_BINARY REG_LINK REG_RESOURCE_LIST REG_FULL_RESOURCE_DESCRIPTOR REG_RESOURCE_REQUIREMENTS_LIST REG_DWORD_BIG_ENDIAN
