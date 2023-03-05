@@ -665,7 +665,7 @@ typedef struct ENCODINGENTRY {
 } ENCODINGENTRY, *PENCODINGENTRY;
 
 static int __cdecl CmpEncoding(const void *s1, const void *s2) {
-	return StrCmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
+	return wcscmp(((PENCODINGENTRY)s1)->wch, ((PENCODINGENTRY)s2)->wch);
 }
 
 int Encoding_GetIndex(UINT codePage) {

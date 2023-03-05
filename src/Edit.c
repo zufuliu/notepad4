@@ -4209,11 +4209,10 @@ void EditJoinLinesEx(void) {
 typedef struct SORTLINE {
 	LPCWSTR pwszLine;
 	LPCWSTR pwszSortEntry;
-	Sci_Line iLine;
+	LPCWSTR pwszSortLine;
+	int iLine;
 	EditSortFlag iSortFlags;
 } SORTLINE;
-
-typedef int (__stdcall *FNSTRCMP)(LPCWSTR, LPCWSTR);
 
 static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
@@ -4223,18 +4222,17 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 	if (iSortFlags & EditSortFlag_LogicalNumber) {
 		cmp = StrCmpLogicalW(s1->pwszSortEntry, s2->pwszSortEntry);
 		if (cmp == 0 && (iSortFlags & (EditSortFlag_ColumnSort | EditSortFlag_GroupByFileType))) {
-			cmp = StrCmpLogicalW(s1->pwszLine, s2->pwszLine);
+			cmp = StrCmpLogicalW(s1->pwszSortLine, s2->pwszSortLine);
 		}
 	}
 	if (cmp == 0) {
-		FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
-		cmp = pfnStrCmp(s1->pwszSortEntry, s2->pwszSortEntry);
+		cmp = wcscmp(s1->pwszSortEntry, s2->pwszSortEntry);
 		if (cmp == 0 && (iSortFlags & (EditSortFlag_ColumnSort | EditSortFlag_GroupByFileType))) {
-			cmp = pfnStrCmp(s1->pwszLine, s2->pwszLine);
+			cmp = wcscmp(s1->pwszSortLine, s2->pwszSortLine);
 		}
 		if (cmp == 0) {
 			// stable sort for duplicate lines
-			cmp = (int)(s1->iLine - s2->iLine);
+			cmp = s1->iLine - s2->iLine;
 			if (iSortFlags & EditSortFlag_MergeDuplicate) {
 				cmp = -cmp; // reverse order to keep first line
 			}
@@ -4249,7 +4247,7 @@ static int __cdecl CmpSortLine(const void *p1, const void *p2) {
 static int __cdecl DontSortLine(const void *p1, const void *p2) {
 	const SORTLINE *s1 = (const SORTLINE *)p1;
 	const SORTLINE *s2 = (const SORTLINE *)p2;
-	return (int)(s1->iLine - s2->iLine);
+	return s1->iLine - s2->iLine;
 }
 
 void EditSortLines(EditSortFlag iSortFlags) {
@@ -4311,9 +4309,13 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	Sci_Position iTargetStart = SciCall_PositionFromLine(iLineStart);
 	Sci_Position iTargetEnd = SciCall_PositionFromLine(iLineEnd + 1);
 	const size_t cbPmszBuf = iTargetEnd - iTargetStart + 2*iLineCount + 1; // 2 for CR LF
+	size_t cchTextW = cbPmszBuf*sizeof(WCHAR) + iLineCount*NP2_alignof(WCHAR *);
+	if (iSortFlags & EditSortFlag_IgnoreCase) {
+		cchTextW += cchTextW;
+	}
 	char * const pmszBuf = (char *)NP2HeapAlloc(cbPmszBuf);
 	SORTLINE * const pLines = (SORTLINE *)NP2HeapAlloc(sizeof(SORTLINE) * iLineCount);
-	WCHAR * const pszTextW = (WCHAR *)NP2HeapAlloc(cbPmszBuf*sizeof(WCHAR) + iLineCount*NP2_alignof(WCHAR *));
+	WCHAR * const pszTextW = (WCHAR *)NP2HeapAlloc(cchTextW);
 	size_t cchTotal = NP2_alignof(WCHAR *)/sizeof(WCHAR); // first pointer reserved for empty line
 
 	for (Sci_Line i = 0, iLine = iLineStart; iLine <= iLineEnd; i++, iLine++) {
@@ -4334,7 +4336,16 @@ void EditSortLines(EditSortFlag iSortFlags) {
 			const UINT cchLine = MultiByteToWideChar(cpEdit, 0, pmszBuf, -1, pwszLine, (int)cbPmszBuf);
 			cchTotal += NP2_align_up(cchLine, NP2_alignof(WCHAR *)/sizeof(WCHAR));
 			pLines[i].pwszLine = pwszLine;
+			if (iSortFlags & EditSortFlag_IgnoreCase) {
+				// convert to uppercase for case insensitive comparison
+				// https://learn.microsoft.com/en-us/dotnet/api/system.string.toupper?view=net-7.0#system-string-toupper
+				LPWSTR pwszSortLine = pszTextW + cchTotal;
+				const UINT charsConverted = LCMapString(LOCALE_USER_DEFAULT, LCMAP_UPPERCASE, pwszLine, cchLine, pwszSortLine, (int)cbPmszBuf);
+				cchTotal += NP2_align_up(charsConverted, NP2_alignof(WCHAR *)/sizeof(WCHAR));
+				pwszLine = pwszSortLine;
+			}
 
+			pLines[i].pwszSortLine = pwszLine;
 			if (iSortFlags & EditSortFlag_ColumnSort) {
 				const int tabWidth = fvCurFile.iTabWidth;
 				Sci_Position col = 0;
@@ -4362,12 +4373,13 @@ void EditSortLines(EditSortFlag iSortFlags) {
 				pwszLine = PathFindExtension(pwszLine);
 			}
 			pLines[i].pwszSortEntry = pwszLine;
-			pLines[i].iLine = iLine;
+			pLines[i].iLine = (int)iLine;
 			pLines[i].iSortFlags = iSortFlags;
 		} else {
 			pLines[i].pwszLine = pszTextW;
 			pLines[i].pwszSortEntry = pszTextW;
-			pLines[i].iLine = iLine;
+			pLines[i].pwszSortLine = pszTextW;
+			pLines[i].iLine = (int)iLine;
 			pLines[i].iSortFlags = iSortFlags;
 		}
 	}
@@ -4383,11 +4395,10 @@ void EditSortLines(EditSortFlag iSortFlags) {
 	} else {
 		qsort(pLines, iLineCount, sizeof(SORTLINE), CmpSortLine);
 		if (iSortFlags > EditSortFlag_Shuffle) {
-			FNSTRCMP pfnStrCmp = (iSortFlags & EditSortFlag_IgnoreCase) ? StrCmpIW : StrCmpW;
 			bool bLastDup = false;
 			for (Sci_Line i = 0; i < iLineCount; i++) {
 				BOOL bDropLine;
-				if (i + 1 < iLineCount && pfnStrCmp(pLines[i].pwszLine, pLines[i + 1].pwszLine) == 0) {
+				if (i + 1 < iLineCount && wcscmp(pLines[i].pwszSortLine, pLines[i + 1].pwszSortLine) == 0) {
 					bLastDup = true;
 					bDropLine = EditSortFlag_MergeDuplicate | EditSortFlag_RemoveDuplicate;
 				} else {
