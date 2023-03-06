@@ -1389,7 +1389,7 @@ def parse_javascript_api_file(path):
 			items = re.findall(r'@(\w+)', doc)
 			keywordMap[key] = items
 		elif key == 'api':
-			classes = set(['JSON', 'jQuery'])
+			classes = set(['JSON'])
 			constant = set()
 			functions = set()
 			properties = set(['URL'])

@@ -24,7 +24,7 @@ NULL
 "FinalizationRegistry Float32Array Float64Array FormData Function GeneratorFunction Int16Array Int32Array Int8Array JSON "
 "Map Math Number Object Promise Proxy RangeError ReferenceError Reflect RegExp "
 "Set SharedArrayBuffer String Symbol SyntaxError TypeError URIError Uint16Array Uint32Array Uint8Array Uint8ClampedArray "
-"VBArray WScript WeakMap WeakRef WeakSet Worker XMLHttpRequest jQuery "
+"VBArray WScript WeakMap WeakRef WeakSet Worker XMLHttpRequest "
 
 , // 5 enumeration
 NULL
