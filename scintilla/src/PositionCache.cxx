@@ -23,11 +23,7 @@
 #include <iterator>
 #include <memory>
 
-#include <windows.h>
-#ifndef _WIN32_WINNT_VISTA
-#define _WIN32_WINNT_VISTA	0x0600
-#endif
-
+#include "ParallelSupport.h"
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
 #include "ILoader.h"
@@ -112,6 +108,13 @@ void LineLayout::Resize(int maxLineLength_) {
 	}
 }
 
+void LineLayout::Reset(Sci::Line lineNumber_, Sci::Position maxLineLength_) {
+	lineNumber = lineNumber_;
+	Resize(static_cast<int>(maxLineLength_));
+	lines = 0;
+	Invalidate(ValidLevel::invalid);
+}
+
 void LineLayout::EnsureBidiData() {
 	if (!bidiData) {
 		bidiData = std::make_unique<BidiData>();
@@ -124,6 +127,7 @@ void LineLayout::Free() noexcept {
 	styles.reset();
 	positions.reset();
 	lineStarts.reset();
+	lenLineStarts = 0;
 	bidiData.reset();
 }
 
@@ -540,6 +544,21 @@ XYPOSITION ScreenLine::TabPositionAfter(XYPOSITION xPosition) const noexcept {
 	return (std::floor((xPosition + TabWidthMinimumPixels()) / TabWidth()) + 1) * TabWidth();
 }
 
+bool SignificantLines::LineMayCache(Sci::Line line) const noexcept {
+	switch (level) {
+	case LineCache::None:
+		return false;
+	case LineCache::Caret:
+		return line == lineCaret;
+	case LineCache::Page:
+		return (abs(line - lineCaret) <= 2*linesOnScreen)
+			|| (abs(line - lineTop) <= 2*linesOnScreen);
+	case LineCache::Document:
+	default:
+		return true;
+	}
+}
+
 LineLayoutCache::LineLayoutCache() noexcept:
 	lastCaretSlot(SIZE_MAX),
 	level(LineCache::None),
@@ -738,7 +757,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 
 	size_t pos = 0;
 	LineLayout *ret = nullptr;
-	const int useLongCache = maxChars >> (20 + 1); // 2MiB
+	const int useLongCache = UseLongCache(maxChars);
 	if (useLongCache) {
 		for (const auto &ll : longCache) {
 			if (ll->LineNumber() == lineNumber) {
@@ -1218,60 +1237,9 @@ size_t PositionCache::GetSize() const noexcept {
 }
 
 namespace {
-// std::shared_mutex
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-SRWLOCK cacheLock = SRWLOCK_INIT;
-struct CacheWriteLock {
-	CacheWriteLock() noexcept {
-		AcquireSRWLockExclusive(&cacheLock);
-	}
-	~CacheWriteLock() {
-		ReleaseSRWLockExclusive(&cacheLock);
-	}
-};
 
-// https://stackoverflow.com/questions/13206414/why-slim-reader-writer-exclusive-lock-outperformance-the-shared-one
-#if 0
-struct CacheReadLock {
-	CacheReadLock() noexcept {
-		AcquireSRWLockShared(&cacheLock);
-	}
-	~CacheReadLock() {
-		ReleaseSRWLockShared(&cacheLock);
-	}
-};
-#else
-using CacheReadLock = CacheWriteLock;
-#endif
+NativeMutex cacheLock;
 
-#else
-struct CriticalSection {
-	CRITICAL_SECTION section;
-	CriticalSection() noexcept {
-		InitializeCriticalSectionAndSpinCount(&section, 4);
-	}
-	void lock() noexcept {
-		EnterCriticalSection(&section);
-	}
-	void unlock() noexcept {
-		LeaveCriticalSection(&section);
-	}
-	~CriticalSection() {
-		DeleteCriticalSection(&section);
-	}
-};
-
-CriticalSection cacheLock;
-struct CacheWriteLock {
-	CacheWriteLock() noexcept  {
-		cacheLock.lock();
-	}
-	~CacheWriteLock() {
-		cacheLock.unlock();
-	}
-};
-using CacheReadLock = CacheWriteLock;
-#endif
 }
 
 void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions) {
@@ -1344,7 +1312,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 		const size_t probe = hashValue & mask;
 		entry = &pces[probe];
 
-		const CacheReadLock readLock;
+		const LockGuard<NativeMutex> readLock(cacheLock);
 		if (entry->Retrieve(styleNumber, sv, positions)) {
 			return;
 		}
@@ -1366,7 +1334,7 @@ void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t
 		memcpy(&positions_[offset], sv.data(), length);
 
 		// Store into cache
-		const CacheWriteLock writeLock;
+		const LockGuard<NativeMutex> writeLock(cacheLock);
 		// Choose the oldest of the two slots to replace
 		if (entry->NewerThan(*entry2)) {
 			entry = entry2;

@@ -271,6 +271,11 @@ Sci::Line Editor::TopLineOfMain() const noexcept {
 		return topLine;
 }
 
+//Point Editor::ClientSize() const noexcept {
+//	const PRectangle rcClient = GetClientRectangle();
+//	return Point(rcClient.Width(), rcClient.Height());
+//}
+
 PRectangle Editor::GetClientRectangle() const noexcept {
 	return wMain.GetClientPosition();
 }
@@ -287,8 +292,10 @@ PRectangle Editor::GetTextRectangle() const noexcept {
 }
 
 Sci::Line Editor::LinesOnScreen() const noexcept {
+	//const Point sizeClient = ClientSize();
+	//const int htClient = static_cast<int>(sizeClient.y);
 	const PRectangle rcClient = GetClientRectangle();
-	const int htClient = static_cast<int>(rcClient.bottom - rcClient.top);
+	const int htClient = static_cast<int>(rcClient.Height());
 	//Platform::DebugPrintf("lines on screen = %d\n", htClient / vs.lineHeight + 1);
 	return htClient / vs.lineHeight;
 }

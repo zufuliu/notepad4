@@ -746,6 +746,9 @@
     <ClInclude Include="..\..\scintilla\src\MarginView.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scintilla\src\ParallelSupport.h">
+      <Filter>Scintilla\src</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\scintilla\src\Partitioning.h">
       <Filter>Scintilla\src</Filter>
     </ClInclude>

@@ -38,6 +38,8 @@ enum class LayoutLineOption {
 	ManualUpdate,
 	KeepPosition,
 	Printing,
+	CallerMultiThreaded = 8,
+	DisablePartialLayout = 16,
 };
 
 inline std::string_view FormatNumber(char (&number)[32], size_t value) noexcept {

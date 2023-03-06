@@ -314,6 +314,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Point GetVisibleOriginInMain() const noexcept override;
 	PointDocument SCICALL DocumentPointFromView(Point ptView) const noexcept;  // Convert a point from view space to document
 	Sci::Line TopLineOfMain() const noexcept final;   // Return the line at Main's y coordinate 0
+	//virtual Point ClientSize() const noexcept;
 	virtual PRectangle GetClientRectangle() const noexcept;
 	virtual PRectangle GetClientDrawingRectangle() const noexcept;
 	PRectangle GetTextRectangle() const noexcept;

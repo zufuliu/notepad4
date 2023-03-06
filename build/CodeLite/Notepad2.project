@@ -151,6 +151,7 @@
       <File Name="../../scintilla/src/LineMarker.h"/>
       <File Name="../../scintilla/src/MarginView.cxx"/>
       <File Name="../../scintilla/src/MarginView.h"/>
+      <File Name="../../scintilla/src/ParallelSupport.h"/>
       <File Name="../../scintilla/src/Partitioning.h"/>
       <File Name="../../scintilla/src/PerLine.cxx"/>
       <File Name="../../scintilla/src/PerLine.h"/>

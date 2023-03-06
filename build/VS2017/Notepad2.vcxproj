@@ -1243,6 +1243,7 @@
     <ClInclude Include="..\..\scintilla\src\KeyMap.h" />
     <ClInclude Include="..\..\scintilla\src\LineMarker.h" />
     <ClInclude Include="..\..\scintilla\src\MarginView.h" />
+    <ClInclude Include="..\..\scintilla\src\ParallelSupport.h" />
     <ClInclude Include="..\..\scintilla\src\Partitioning.h" />
     <ClInclude Include="..\..\scintilla\src\PerLine.h" />
     <ClInclude Include="..\..\scintilla\src\Platform.h" />

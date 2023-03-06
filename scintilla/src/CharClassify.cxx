@@ -657,7 +657,7 @@ void CharClassify::InitUnicodeData() noexcept {
 
 namespace {
 
-inline void SetRange(bool bs[256], int low, int high) noexcept {
+inline void SetRange(bool (&bs)[256], int low, int high) noexcept {
 	memset(bs + low, true, high - low + 1);
 }
 
