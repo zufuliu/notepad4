@@ -3935,7 +3935,7 @@ void EditCompressSpaces(void) {
 		}
 		SciCall_ReplaceTarget(-1, pszOut);
 		const Sci_Position iTargetStart = SciCall_GetTargetStart();
-		const Sci_Position iTargetEnd = SciCall_GetTargetStart();
+		const Sci_Position iTargetEnd = SciCall_GetTargetEnd();
 		if (iCurPos > iAnchorPos) {
 			iCurPos = iTargetEnd;
 			iAnchorPos = iTargetStart;
