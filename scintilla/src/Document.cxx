@@ -147,7 +147,6 @@ Document::Document(DocumentOption options) :
 	eolMode = EndOfLine::Lf;
 #endif
 	dbcsCodePage = CpUtf8;
-	dbcsCharClass = nullptr;
 	lineEndBitSet = LineEndType::Default;
 	endStyled = 0;
 	styleClock = 0;
@@ -263,13 +262,20 @@ LineEndType Document::LineEndTypesSupported() const noexcept {
 		return LineEndType::Default;
 }
 
+static inline std::unique_ptr<DBCSCharClassify> GetDBCSCharClassify(int codePage) {
+	if (codePage != 0 && codePage != CpUtf8) {
+		return std::make_unique<DBCSCharClassify>(codePage);
+	}
+	return {};
+}
+
 bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 	if (dbcsCodePage != dbcsCodePage_) {
 		dbcsCodePage = dbcsCodePage_;
 		pcf.reset();
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
-		dbcsCharClass = DBCSCharClassify::Get(dbcsCodePage_);
+		dbcsCharClass = GetDBCSCharClassify(dbcsCodePage_);
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
 	} else {

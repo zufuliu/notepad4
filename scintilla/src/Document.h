@@ -285,6 +285,7 @@ private:
 	int enteredStyling;
 	int enteredReadOnlyCount;
 
+	bool matchesValid;
 	bool insertionSet;
 	std::string insertion;
 
@@ -302,10 +303,9 @@ private:
 	LineAnnotation *Annotations() const noexcept;
 	LineAnnotation *EOLAnnotations() const noexcept;
 
-	bool matchesValid;
 	std::unique_ptr<RegexSearchBase> regex;
 	std::unique_ptr<LexInterface> pli;
-	const DBCSCharClassify *dbcsCharClass;
+	std::unique_ptr<DBCSCharClassify> dbcsCharClass;
 
 public:
 

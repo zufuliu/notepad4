@@ -2589,13 +2589,12 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			positions[i++] = lastPos;
 		}
 	} else {
-		const DBCSCharClassify *dbcs = DBCSCharClassify::Get(mode.codePage);
-		if (dbcs) {
+		if (mode.codePage) {
 			// May be one or two bytes per position
 			UINT ui = 0;
 			for (size_t i = 0; i < text.length() && ui < tbuf.length();) {
 				positions[i] = poses[ui];
-				if (dbcs->IsLeadByte(text[i])) {
+				if (DBCSIsLeadByte(mode.codePage, text[i])) {
 					positions[i + 1] = poses[ui];
 					i += 2;
 				} else {

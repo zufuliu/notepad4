@@ -8,6 +8,8 @@
 
 namespace Scintilla::Internal {
 
+bool DBCSIsLeadByte(int codePage, unsigned char uch) noexcept;
+
 constexpr bool IsDBCSCodePage(int codePage) noexcept {
 	return codePage == 932
 		|| codePage == 936
@@ -135,7 +137,7 @@ private:
 
 class DBCSCharClassify {
 public:
-	static const DBCSCharClassify* Get(int codePage);
+	explicit DBCSCharClassify(int codePage_) noexcept;
 
 	bool IsLeadByte(unsigned char ch) const noexcept {
 		return leadByte[ch];
@@ -160,8 +162,6 @@ public:
 	}
 
 private:
-	explicit DBCSCharClassify(int codePage_) noexcept;
-
 	const int codePage;
 	int minTrailByte;
 	bool leadByte[256];

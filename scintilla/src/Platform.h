@@ -169,7 +169,7 @@ public:
  */
 struct SurfaceMode final {
 	int codePage = 0;
-	bool bidiR2L = false;
+	//bool bidiR2L = false;
 };
 
 /**
