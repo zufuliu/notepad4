@@ -2,8 +2,6 @@
 // See License.txt for details about distribution and modification.
 #pragma once
 
-#include <atomic>
-//#include <future>
 #include <windows.h>
 
 #ifndef _WIN32_WINNT_VISTA
@@ -24,11 +22,8 @@
 
 namespace Scintilla::Internal {
 
-template<typename T>
-inline void UpdateMaximum(std::atomic<T> &maximum, const T &value) noexcept {
-	// https://stackoverflow.com/questions/16190078/how-to-atomically-update-a-maximum-value
-	T prev = maximum;
-	while(prev < value && !maximum.compare_exchange_weak(prev, value)) {}
+inline bool WaitableTimerExpired(HANDLE timer) noexcept {
+	return WaitForSingleObject(timer, 0) == WAIT_OBJECT_0;
 }
 
 // std::shared_mutex

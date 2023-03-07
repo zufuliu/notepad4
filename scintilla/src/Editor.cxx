@@ -25,6 +25,7 @@
 #include <memory>
 #include <chrono>
 
+#include "ParallelSupport.h"
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
 #include "ScintillaStructures.h"

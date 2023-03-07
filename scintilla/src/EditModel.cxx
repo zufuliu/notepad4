@@ -21,8 +21,7 @@
 #include <algorithm>
 #include <memory>
 
-#include <windows.h>
-
+#include "ParallelSupport.h"
 #include "ScintillaTypes.h"
 #include "ILoader.h"
 #include "ILexer.h"
@@ -142,7 +141,7 @@ void EditModel::SetIdleTaskTime(uint32_t milliseconds) const noexcept {
 }
 
 bool EditModel::IdleTaskTimeExpired() const noexcept {
-	return WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0;
+	return WaitableTimerExpired(idleTaskTimer);
 }
 
 void EditModel::UpdateParallelLayoutThreshold() noexcept {

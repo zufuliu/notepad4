@@ -312,6 +312,7 @@ public:
 
 class PositionCache {
 	std::vector<PositionCacheEntry> pces;
+	NativeMutex cacheLock;
 	uint32_t clock;
 	bool allClear;
 public:

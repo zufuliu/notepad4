@@ -24,6 +24,8 @@
 #include <iterator>
 #include <memory>
 #include <chrono>
+#include <atomic>
+//#include <future>
 
 #include "ParallelSupport.h"
 #include "ScintillaTypes.h"
@@ -352,6 +354,13 @@ namespace {
 
 constexpr XYPOSITION epsilon = 0.0001f;	// A small nudge to avoid floating point precision issues
 
+template<typename T>
+inline void UpdateMaximum(std::atomic<T> &maximum, const T &value) noexcept {
+	// https://stackoverflow.com/questions/16190078/how-to-atomically-update-a-maximum-value
+	T prev = maximum;
+	while(prev < value && !maximum.compare_exchange_weak(prev, value)) {}
+}
+
 struct LayoutWorker {
 	LineLayout * const ll;
 	const ViewStyle &vstyle;
@@ -499,7 +508,7 @@ struct LayoutWorker {
 			processed += ts.length;
 			if (processed >= blockSize) {
 				processed = 0;
-				if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
+				if (ts.end() > maxPosInLine && WaitableTimerExpired(idleTaskTimer)) {
 					break;
 				}
 			}
@@ -539,7 +548,7 @@ struct LayoutWorker {
 			processed += ts.length;
 			if (processed >= blockSize) {
 				processed = 0;
-				if (ts.end() > maxPosInLine && WaitForSingleObject(idleTaskTimer, 0) == WAIT_OBJECT_0) {
+				if (ts.end() > maxPosInLine && WaitableTimerExpired(idleTaskTimer)) {
 					break;
 				}
 			}

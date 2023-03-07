@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <memory>
 
+#include "ParallelSupport.h"
 #include "ScintillaTypes.h"
 #include "ScintillaMessages.h"
 #include "ScintillaStructures.h"

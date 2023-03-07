@@ -1236,12 +1236,6 @@ size_t PositionCache::GetSize() const noexcept {
 	return pces.size();
 }
 
-namespace {
-
-NativeMutex cacheLock;
-
-}
-
 void PositionCache::MeasureWidths(Surface *surface, const Style &style, uint16_t styleNumber, std::string_view sv, XYPOSITION *positions) {
 	if (style.monospaceASCII && AllGraphicASCII(sv)) {
 		const XYPOSITION characterWidth = style.aveCharWidth;
