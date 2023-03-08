@@ -289,12 +289,20 @@ extern "C" bool EditPrint(HWND hwnd, LPCWSTR pszDocTitle) {
 	SYSTEMTIME st;
 	WCHAR dateString[256];
 	GetLocalTime(&st);
-	GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, dateString, 256);
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, dateString, COUNTOF(dateString), nullptr);
+#else
+	GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, dateString, COUNTOF(dateString));
+#endif
 
 	// Get current time...
 	if (iPrintHeader == PrintHeaderOption_FilenameAndDateTime) {
 		WCHAR timeString[128];
-		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, timeString, 128);
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, timeString, COUNTOF(timeString));
+#else
+		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, timeString, COUNTOF(timeString));
+#endif
 		lstrcat(dateString, L" ");
 		lstrcat(dateString, timeString);
 	}

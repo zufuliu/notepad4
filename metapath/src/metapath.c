@@ -2177,8 +2177,13 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					SYSTEMTIME st;
 					FileTimeToLocalFileTime(&fd.ftLastWriteTime, &ft);
 					FileTimeToSystemTime(&ft, &st);
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+					GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, tchdate, COUNTOF(tchdate), NULL);
+					GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchtime));
+#else
 					GetDateFormat(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, NULL, tchdate, COUNTOF(tchdate));
-					GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchdate));
+					GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, tchtime, COUNTOF(tchtime));
+#endif
 
 					WCHAR tchattr[6];
 					tchattr[0] = (fd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE) ? L'A' : L'-';

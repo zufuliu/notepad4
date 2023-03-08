@@ -983,6 +983,15 @@ std::wstring StringDecode(const std::string_view sv, int codePage) {
 }
 
 std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+	const int charsConverted = ::LCMapStringEx(LOCALE_NAME_USER_DEFAULT, mapFlags,
+		wsv.data(), static_cast<int>(wsv.length()), nullptr, 0, nullptr, nullptr, 0);
+	std::wstring wsConverted(charsConverted, 0);
+	if (charsConverted) {
+		::LCMapStringEx(LOCALE_NAME_USER_DEFAULT, mapFlags,
+			wsv.data(), static_cast<int>(wsv.length()), wsConverted.data(), charsConverted, nullptr, nullptr, 0);
+	}
+#else
 	const int charsConverted = ::LCMapStringW(LOCALE_USER_DEFAULT, mapFlags,
 		wsv.data(), static_cast<int>(wsv.length()), nullptr, 0);
 	std::wstring wsConverted(charsConverted, 0);
@@ -990,6 +999,7 @@ std::wstring StringMapCase(const std::wstring_view wsv, DWORD mapFlags) {
 		::LCMapStringW(LOCALE_USER_DEFAULT, mapFlags,
 			wsv.data(), static_cast<int>(wsv.length()), wsConverted.data(), charsConverted);
 	}
+#endif
 	return wsConverted;
 }
 

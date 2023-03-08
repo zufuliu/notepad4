@@ -1623,9 +1623,17 @@ void EditMapTextCase(int menu) {
 			charsConverted = TransliterateText(pGuid, pszTextW, cchTextW, &pszMappedW);
 		}
 		if (pszMappedW == NULL && flags != 0) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+			charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, NULL, 0, NULL, NULL, 0);
+#else
 			charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, NULL, 0);
+#endif
 			if (charsConverted) {
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+				charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted, NULL, NULL, 0);
+#else
 				pszMappedW = (LPWSTR)NP2HeapAlloc((charsConverted + 1)*sizeof(WCHAR));
+#endif
 				charsConverted = LCMapString(LOCALE_USER_DEFAULT, flags, pszTextW, cchTextW, pszMappedW, charsConverted);
 			}
 		}
@@ -4340,7 +4348,11 @@ void EditSortLines(EditSortFlag iSortFlags) {
 				// convert to uppercase for case insensitive comparison
 				// https://learn.microsoft.com/en-us/dotnet/api/system.string.toupper?view=net-7.0#system-string-toupper
 				LPWSTR pwszSortLine = pszTextW + cchTotal;
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+				const UINT charsConverted = LCMapStringEx(LOCALE_NAME_USER_DEFAULT, LCMAP_UPPERCASE, pwszLine, cchLine, pwszSortLine, (int)cbPmszBuf, NULL, NULL, 0);
+#else
 				const UINT charsConverted = LCMapString(LOCALE_USER_DEFAULT, LCMAP_UPPERCASE, pwszLine, cchLine, pwszSortLine, (int)cbPmszBuf);
+#endif
 				cchTotal += NP2_align_up(charsConverted, NP2_alignof(WCHAR *)/sizeof(WCHAR));
 				pwszLine = pwszSortLine;
 			}
@@ -6713,10 +6725,13 @@ void EditInsertDateTime(bool bShort) {
 	} else {
 		WCHAR tchDate[128];
 		WCHAR tchTime[128];
-		GetDateFormat(LOCALE_USER_DEFAULT, bShort ? DATE_SHORTDATE : DATE_LONGDATE,
-					  &st, NULL, tchDate, COUNTOF(tchDate));
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+		GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, bShort ? DATE_SHORTDATE : DATE_LONGDATE, &st, NULL, tchDate, COUNTOF(tchDate), NULL);
+		GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, TIME_NOSECONDS, &st, NULL, tchTime, COUNTOF(tchTime));
+#else
+		GetDateFormat(LOCALE_USER_DEFAULT, bShort ? DATE_SHORTDATE : DATE_LONGDATE, &st, NULL, tchDate, COUNTOF(tchDate));
 		GetTimeFormat(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, NULL, tchTime, COUNTOF(tchTime));
-
+#endif
 		wsprintf(tchDateTime, L"%s %s", tchTime, tchDate);
 	}
 
