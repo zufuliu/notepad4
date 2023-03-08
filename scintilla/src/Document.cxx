@@ -274,7 +274,7 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		pcf.reset();
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
-		dbcsCharClass = GetDBCSCharClassify(dbcsCodePage_);
+		dbcsCharClass = GetDBCSCharClassify(dbcsCodePage);
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
 	} else {

@@ -2047,8 +2047,8 @@ void SurfaceD2D::Stadium(PRectangle rc, FillStroke fillStroke, Ends ends) {
 		D2DPenColourAlpha(fillStroke.stroke.colour);
 		pRenderTarget->DrawGeometry(pathGeometry, pBrush, fillStroke.stroke.WidthF());
 		ReleaseUnknown(pathGeometry);
- 	}
- }
+	}
+}
 
 void SurfaceD2D::Copy(PRectangle rc, Point from, Surface &surfaceSource) {
 	SurfaceD2D &surfOther = down_cast<SurfaceD2D &>(surfaceSource);
@@ -2606,13 +2606,11 @@ void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSIT
 			UINT ui = 0;
 			for (size_t i = 0; i < text.length() && ui < tbuf.length();) {
 				positions[i] = poses[ui];
-				if (DBCSIsLeadByte(mode.codePage, text[i])) {
-					positions[i + 1] = poses[ui];
-					i += 2;
-				} else {
-					i++;
+				const unsigned char uch = text[i++];
+				if (!UTF8IsAscii(uch) && DBCSIsLeadByte(mode.codePage, uch)) {
+					positions[i] = poses[ui];
+					i += 1;
 				}
-
 				ui++;
 			}
 		} else {
