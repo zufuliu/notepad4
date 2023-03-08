@@ -164,6 +164,18 @@ D2D1_DRAW_TEXT_OPTIONS d2dDrawTextOptions = D2D1_DRAW_TEXT_OPTIONS_NONE;
 static HMODULE hDLLD2D {};
 static HMODULE hDLLDWrite {};
 
+int64_t QueryPerformanceFrequency() noexcept {
+	LARGE_INTEGER freq;
+	::QueryPerformanceFrequency(&freq);
+	return freq.QuadPart;
+}
+
+int64_t QueryPerformanceCounter() noexcept {
+	LARGE_INTEGER count;
+	::QueryPerformanceCounter(&count);
+	return count.QuadPart;
+}
+
 extern "C" const GUID __declspec(selectany) IID_IDWriteFactory2 = // 0439fc60-ca44-4994-8dee-3a9af7b732ec
 { 0x0439fc60, 0xca44, 0x4994, { 0x8d, 0xee, 0x3a, 0x9a, 0xf7, 0xb7, 0x32, 0xec } };
 

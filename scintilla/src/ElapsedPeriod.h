@@ -6,9 +6,12 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 #pragma once
 
+//#include <chrono>
+
 namespace Scintilla::Internal {
 
 // Simplified access to high precision timing.
+#if 0
 class ElapsedPeriod {
 	using ElapsedClock = std::chrono::steady_clock;
 	ElapsedClock::time_point tp;
@@ -29,5 +32,34 @@ public:
 		return duration.count();
 	}
 };
+
+#else
+extern int64_t QueryPerformanceFrequency() noexcept;
+extern int64_t QueryPerformanceCounter() noexcept;
+
+class ElapsedPeriod {
+	int64_t freq;
+	int64_t begin;
+public:
+	ElapsedPeriod() noexcept {
+		freq = QueryPerformanceFrequency();
+		begin = QueryPerformanceCounter();
+	}
+	double Reset() noexcept {
+		const int64_t end = QueryPerformanceCounter();
+		const int64_t diff = end - begin;
+		const double duration = diff / static_cast<double>(freq);
+		begin = end;
+		return duration;
+	}
+	double Duration() const noexcept {
+		const int64_t end = QueryPerformanceCounter();
+		const int64_t diff = end - begin;
+		const double duration = diff / static_cast<double>(freq);
+		return duration;
+	}
+};
+
+#endif
 
 }

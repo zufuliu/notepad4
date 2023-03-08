@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
-#include <chrono>
 
 #include "ParallelSupport.h"
 #include "ScintillaTypes.h"

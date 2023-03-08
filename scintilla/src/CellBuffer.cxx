@@ -19,7 +19,6 @@
 #include <optional>
 #include <algorithm>
 #include <memory>
-#include <chrono>
 
 #include "ScintillaTypes.h"
 
@@ -35,7 +34,7 @@
 #include "ChangeHistory.h"
 #include "CellBuffer.h"
 #include "UniConversion.h"
-#include "ElapsedPeriod.h"
+//#include "ElapsedPeriod.h"
 
 namespace Scintilla::Internal {
 

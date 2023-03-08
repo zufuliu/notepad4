@@ -23,7 +23,6 @@
 #include <optional>
 #include <algorithm>
 #include <memory>
-#include <chrono>
 //#include <mutex>
 
 // WIN32_LEAN_AND_MEAN is defined to avoid including commdlg.h
@@ -91,7 +90,7 @@ Used by VSCode, Atom etc.
 #include "MarginView.h"
 #include "EditView.h"
 #include "Editor.h"
-#include "ElapsedPeriod.h"
+//#include "ElapsedPeriod.h"
 
 #include "AutoComplete.h"
 #include "ScintillaBase.h"
