@@ -6702,6 +6702,18 @@ void EditInsertTagDlg(HWND hwnd) {
 	ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_INSERTTAG), hwnd, EditInsertTagDlgProc, 0);
 }
 
+static inline int GetDaylightSavingTimeFlag(void) {
+	// https://en.cppreference.com/w/c/chrono/tm
+	// https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/nf-timezoneapi-gettimezoneinformation
+#if 0//_WIN32_WINNT >= _WIN32_WINNT_VISTA
+	DYNAMIC_TIME_ZONE_INFORMATION info;
+	return GetDynamicTimeZoneInformation(&info) - 1;
+#else
+	TIME_ZONE_INFORMATION info;
+	return GetTimeZoneInformation(&info) - 1;
+#endif
+}
+
 void EditInsertDateTime(bool bShort) {
 	WCHAR tchDateTime[256];
 	WCHAR tchTemplate[256];
@@ -6712,7 +6724,7 @@ void EditInsertDateTime(bool bShort) {
 	if (IniGetString(INI_SECTION_NAME_FLAGS, bShort ? L"DateTimeShort" : L"DateTimeLong",
 					 L"", tchTemplate, COUNTOF(tchTemplate))) {
 		struct tm sst;
-		sst.tm_isdst	= -1;
+		sst.tm_isdst	= GetDaylightSavingTimeFlag();
 		sst.tm_sec		= (int)st.wSecond;
 		sst.tm_min		= (int)st.wMinute;
 		sst.tm_hour		= (int)st.wHour;
@@ -6720,7 +6732,6 @@ void EditInsertDateTime(bool bShort) {
 		sst.tm_mon		= (int)st.wMonth - 1;
 		sst.tm_year		= (int)st.wYear - 1900;
 		sst.tm_wday		= (int)st.wDayOfWeek;
-		mktime(&sst);
 		wcsftime(tchDateTime, COUNTOF(tchDateTime), tchTemplate, &sst);
 	} else {
 		WCHAR tchDate[128];
@@ -6762,7 +6773,7 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 	SYSTEMTIME st;
 	struct tm sst;
 	GetLocalTime(&st);
-	sst.tm_isdst = -1;
+	sst.tm_isdst = GetDaylightSavingTimeFlag();
 	sst.tm_sec	 = (int)st.wSecond;
 	sst.tm_min	 = (int)st.wMinute;
 	sst.tm_hour	 = (int)st.wHour;
@@ -6770,7 +6781,6 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 	sst.tm_mon	 = (int)st.wMonth - 1;
 	sst.tm_year	 = (int)st.wYear - 1900;
 	sst.tm_wday	 = (int)st.wDayOfWeek;
-	mktime(&sst);
 
 	WCHAR wchReplace[256];
 	wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);

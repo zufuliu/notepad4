@@ -27,7 +27,6 @@
 #include <commdlg.h>
 #include <uxtheme.h>
 #include <stdio.h>
-#include <time.h>
 #include <inttypes.h>
 #include "SciCall.h"
 #include "VectorISA.h"
