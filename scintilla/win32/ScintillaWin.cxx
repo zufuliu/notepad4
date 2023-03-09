@@ -2844,10 +2844,9 @@ std::unique_ptr<CaseFolder> ScintillaWin::CaseFolderForEncoding() {
 			std::unique_ptr<CaseFolderTable> pcf = std::make_unique<CaseFolderTable>();
 			// Only for single byte encodings
 			for (int i = 0x80; i < 0x100; i++) {
-				char sCharacter[2] = "A";
-				sCharacter[0] = static_cast<char>(i);
+				const char sCharacter[2] = {static_cast<char>(i), '\0'};
 				wchar_t wCharacter[20];
-				const unsigned int lengthUTF16 = WideCharFromMultiByte(cpDest, sCharacter,
+				const unsigned int lengthUTF16 = WideCharFromMultiByte(cpDest, std::string_view(sCharacter, 1),
 					wCharacter, std::size(wCharacter));
 				if (lengthUTF16 == 1) {
 					const char *caseFolded = CaseConvert(wCharacter[0], CaseConversion::fold);

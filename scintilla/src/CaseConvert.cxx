@@ -686,9 +686,7 @@ public:
 	void SetupConversions(CaseConversion conversion);
 };
 
-CaseConverter caseConvFold;
-CaseConverter caseConvUp;
-CaseConverter caseConvLow;
+CaseConverter caseConvList[3];
 
 void CaseConverter::AddSymmetric(CaseConversion conversion, int lower, int upper) {
 	const int character = (conversion == CaseConversion::upper) ? lower : upper;
@@ -773,19 +771,9 @@ void CaseConverter::SetupConversions(CaseConversion conversion) {
 }
 
 const CaseConverter *ConverterForConversion(CaseConversion conversion) {
-	CaseConverter *pCaseConv;
-	switch (conversion) {
-	case CaseConversion::fold:
-		pCaseConv = &caseConvFold;
-		break;
-	case CaseConversion::upper:
-		pCaseConv = &caseConvUp;
-		break;
-	case CaseConversion::lower:
-	default:
-		pCaseConv = &caseConvLow;
-		break;
-	}
+	const unsigned index = static_cast<unsigned>(conversion);
+	assert(index < std::size(caseConvList));
+	CaseConverter *pCaseConv = &caseConvList[index];
 	if (!pCaseConv->Initialised()) {
 		pCaseConv->SetupConversions(conversion);
 	}
