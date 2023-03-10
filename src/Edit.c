@@ -3202,6 +3202,13 @@ void EditAlignText(EditAlignMode nMode) {
 	}
 
 	if (iMaxLength < BUFSIZE_ALIGN) {
+		typedef struct EditAlignTextVar {
+			char tchLineBuf[BUFSIZE_ALIGN * kMaxMultiByteCount];
+			WCHAR wchLineBuf[BUFSIZE_ALIGN];
+			LPWSTR pWords[BUFSIZE_ALIGN];
+			WCHAR wchNewLineBuf[BUFSIZE_ALIGN * 3];
+		} EditAlignTextVar;
+		EditAlignTextVar * const var = (EditAlignTextVar *)NP2HeapAlloc(sizeof(EditAlignTextVar));
 		SciCall_BeginUndoAction();
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iIndentPos = SciCall_GetLineIndentPosition(iLine);
@@ -3211,16 +3218,18 @@ void EditAlignText(EditAlignMode nMode) {
 				const Sci_Position iStartPos = SciCall_PositionFromLine(iLine);
 				SciCall_DeleteRange(iStartPos, iEndPos - iStartPos);
 			} else {
-				char tchLineBuf[BUFSIZE_ALIGN * kMaxMultiByteCount] = "";
-				WCHAR wchLineBuf[BUFSIZE_ALIGN] = L"";
-				WCHAR *pWords[BUFSIZE_ALIGN];
+				char* const tchLineBuf = var->tchLineBuf;
+				WCHAR* const wchLineBuf = var->wchLineBuf;
+				LPWSTR* const pWords = var->pWords;
+				WCHAR * const wchNewLineBuf = var->wchNewLineBuf;
 				WCHAR *p = wchLineBuf;
 
-				int iWords = 0;
 				Sci_Position iWordsLength = 0;
 				const Sci_Position cchLine = SciCall_GetLine(iLine, tchLineBuf);
 
-				MultiByteToWideChar(cpEdit, 0, tchLineBuf, (int)cchLine, wchLineBuf, COUNTOF(wchLineBuf));
+				int iWords = MultiByteToWideChar(cpEdit, 0, tchLineBuf, (int)cchLine, wchLineBuf, COUNTOF(var->wchLineBuf));
+				wchLineBuf[iWords] = L'\0';
+				iWords = 0;
 				StrTrim(wchLineBuf, L"\r\n\t ");
 
 				while (*p) {
@@ -3232,7 +3241,7 @@ void EditAlignText(EditAlignMode nMode) {
 							iWordsLength++;
 						}
 					} else {
-						*p++ = 0;
+						*p++ = L'\0';
 					}
 				}
 
@@ -3259,41 +3268,38 @@ void EditAlignText(EditAlignMode nMode) {
 							const Sci_Position iSpacesPerGap = (iMaxLength - iMinIndent - iWordsLength) / iGaps;
 							const Sci_Position iExtraSpaces = (iMaxLength - iMinIndent - iWordsLength) % iGaps;
 
-							WCHAR wchNewLineBuf[BUFSIZE_ALIGN * 3];
 							lstrcpy(wchNewLineBuf, pWords[0]);
 							p = StrEnd(wchNewLineBuf);
 
 							for (int i = 1; i < iWords; i++) {
 								for (Sci_Position j = 0; j < iSpacesPerGap; j++) {
 									*p++ = L' ';
-									*p = 0;
 								}
 								if (i > iGaps - iExtraSpaces) {
 									*p++ = L' ';
-									*p = 0;
 								}
+								*p = L'\0';
 								lstrcat(p, pWords[i]);
 								p = StrEnd(p);
 							}
 
-							WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(tchLineBuf), NULL, NULL);
+							WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(var->tchLineBuf), NULL, NULL);
 
 							SciCall_SetTargetRange(SciCall_PositionFromLine(iLine), SciCall_GetLineEndPosition(iLine));
 							SciCall_ReplaceTarget(-1, tchLineBuf);
 							SciCall_SetLineIndentation(iLine, iMinIndent);
 						} else {
-							WCHAR wchNewLineBuf[BUFSIZE_ALIGN];
 							lstrcpy(wchNewLineBuf, pWords[0]);
 							p = StrEnd(wchNewLineBuf);
 
 							for (int i = 1; i < iWords; i++) {
 								*p++ = L' ';
-								*p = 0;
+								*p = L'\0';
 								lstrcat(wchNewLineBuf, pWords[i]);
 								p = StrEnd(p);
 							}
 
-							WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(tchLineBuf), NULL, NULL);
+							WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(var->tchLineBuf), NULL, NULL);
 
 							SciCall_SetTargetRange(SciCall_PositionFromLine(iLine), SciCall_GetLineEndPosition(iLine));
 							SciCall_ReplaceTarget(-1, tchLineBuf);
@@ -3303,23 +3309,20 @@ void EditAlignText(EditAlignMode nMode) {
 						const Sci_Position iExtraSpaces = iMaxLength - iMinIndent - iWordsLength - iWords + 1;
 						Sci_Position iOddSpaces = iExtraSpaces % 2;
 
-						WCHAR wchNewLineBuf[BUFSIZE_ALIGN * 3] = L"";
 						p = wchNewLineBuf;
-
 						if (nMode == EditAlignMode_Right) {
 							for (Sci_Position i = 0; i < iExtraSpaces; i++) {
 								*p++ = L' ';
 							}
-							*p = 0;
 						}
 
 						if (nMode == EditAlignMode_Center) {
 							for (Sci_Position i = 1; i < iExtraSpaces - iOddSpaces; i += 2) {
 								*p++ = L' ';
 							}
-							*p = 0;
 						}
 
+						*p = L'\0';
 						for (int i = 0; i < iWords; i++) {
 							lstrcat(p, pWords[i]);
 							if (i < iWords - 1) {
@@ -3332,7 +3335,7 @@ void EditAlignText(EditAlignMode nMode) {
 							p = StrEnd(p);
 						}
 
-						WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(tchLineBuf), NULL, NULL);
+						WideCharToMultiByte(cpEdit, 0, wchNewLineBuf, -1, tchLineBuf, COUNTOF(var->tchLineBuf), NULL, NULL);
 
 						Sci_Position iPos;
 						if (nMode == EditAlignMode_Right || nMode == EditAlignMode_Center) {
@@ -3352,6 +3355,7 @@ void EditAlignText(EditAlignMode nMode) {
 			}
 		}
 		SciCall_EndUndoAction();
+		NP2HeapFree(var);
 	} else {
 		MsgBoxInfo(MB_OK, IDS_BUFFERTOOSMALL);
 	}
