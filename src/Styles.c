@@ -713,7 +713,7 @@ static int __cdecl CmpEditLexerByOrder(const void *p1, const void *p2) {
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 #endif
 	if (cmp == 0) {
-		cmp = wcscmp(pLex1->pszName, pLex2->pszName);
+		cmp = _wcsicmp(pLex1->pszName, pLex2->pszName);
 	}
 	return cmp;
 }
@@ -724,7 +724,7 @@ static int __cdecl CmpEditLexerByName(const void *p1, const void *p2) {
 	// TODO: sort by localized name
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 #endif
-	const int cmp = wcscmp(pLex1->pszName, pLex2->pszName);
+	const int cmp = _wcsicmp(pLex1->pszName, pLex2->pszName);
 	return cmp;
 }
 
