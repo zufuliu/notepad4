@@ -175,7 +175,7 @@ inline bool MatchSealed(LexAccessor &styler, Sci_PositionU pos, Sci_PositionU en
 	styler.GetRange(pos, endPos, s, sizeof(s));
 	if (StrStartsWith(s, "ealed")) {
 		const uint8_t ch = s[CStrLen("ealed")];
-		return ch == '\0' || isspacechar(ch) || ch == '/'; // space or comment
+		return ch <= ' ' || ch == '/'; // space or comment
 	}
 	return false;
 }
