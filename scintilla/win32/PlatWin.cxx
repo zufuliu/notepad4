@@ -3057,9 +3057,9 @@ class ListBoxX final : public ListBox {
 	HWND GetHWND() const noexcept;
 	void AppendListItem(const char *text, const char *numword, unsigned int len);
 	void AdjustWindowRect(PRectangle *rc) const noexcept;
-	int ItemHeight() const;
+	int ItemHeight() const noexcept;
 	int MinClientWidth() const noexcept;
-	int TextOffset() const;
+	int TextOffset() const noexcept;
 	POINT GetClientExtent() const noexcept;
 	POINT MinTrackSize() const;
 	POINT MaxTrackSize() const;
@@ -3095,7 +3095,7 @@ public:
 	void SetVisibleRows(int rows) noexcept override;
 	int GetVisibleRows() const noexcept override;
 	PRectangle GetDesiredRect() override;
-	int CaretFromEdge() const override;
+	int CaretFromEdge() const noexcept override;
 	void Clear() noexcept override;
 	void Append(const char *s, int type = -1) const noexcept override;
 	int Length() const noexcept override;
@@ -3215,12 +3215,12 @@ PRectangle ListBoxX::GetDesiredRect() {
 	return rcDesired;
 }
 
-int ListBoxX::TextOffset() const {
+int ListBoxX::TextOffset() const noexcept {
 	const int pixWidth = images.GetWidth();
 	return static_cast<int>(pixWidth == 0 ? ItemInset.x : ItemInset.x + pixWidth + (ImageInset.x * 2));
 }
 
-int ListBoxX::CaretFromEdge() const {
+int ListBoxX::CaretFromEdge() const noexcept {
 	PRectangle rc;
 	AdjustWindowRect(&rc);
 	return TextOffset() + static_cast<int>(TextInset.x + (0 - rc.left) - 1);
@@ -3460,7 +3460,7 @@ void ListBoxX::AdjustWindowRect(PRectangle *rc) const noexcept {
 #endif
 }
 
-int ListBoxX::ItemHeight() const {
+int ListBoxX::ItemHeight() const noexcept {
 	int itemHeight = lineHeight + (static_cast<int>(TextInset.y) * 2);
 	const int pixHeight = images.GetHeight() + (static_cast<int>(ImageInset.y) * 2);
 	if (itemHeight < pixHeight) {

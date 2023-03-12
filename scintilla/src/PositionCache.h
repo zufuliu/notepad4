@@ -154,6 +154,8 @@ struct SignificantLines {
 	Sci::Line lineCaret;
 	Sci::Line lineTop;
 	Sci::Line linesOnScreen;
+	Sci::Line linesTotal;
+	int styleClock;
 	Scintilla::LineCache level;
 	bool LineMayCache(Sci::Line line) const noexcept;
 };
@@ -185,6 +187,12 @@ public:
 	}
 	LineLayout* SCICALL Retrieve(Sci::Line lineNumber, Sci::Line lineCaret, int maxChars, int styleClock_,
 		Sci::Line linesOnScreen, Sci::Line linesInDoc, Sci::Line topLine);
+	LineLayout* Retrieve(Sci::Line lineNumber, const SignificantLines &significantLines, int maxChars) {
+		return Retrieve(lineNumber, significantLines.lineCaret,
+			maxChars, significantLines.styleClock,
+			significantLines.linesOnScreen, significantLines.linesTotal, significantLines.lineTop);
+	}
+
 	static constexpr int UseLongCache(unsigned maxChars) noexcept {
 		return maxChars >> (20 + 1); // 2MiB
 	}

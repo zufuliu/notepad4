@@ -970,7 +970,7 @@ void Editor::HorizontalScrollTo(int xPos) {
 	}
 }
 
-void Editor::VerticalCentreCaret() noexcept {
+void Editor::VerticalCentreCaret() {
 	const Sci::Line lineDoc =
 		pdoc->SciLineFromPosition(sel.IsRectangular() ? sel.Rectangular().caret.Position() : sel.MainCaret());
 	const Sci::Line lineDisplay = pcs->DisplayFromDoc(lineDoc);
@@ -1490,6 +1490,72 @@ void Editor::OnLineWrapped(Sci::Line lineDoc, int linesWrapped) {
 	}
 }
 
+bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToWrapEnd, Sci::Line &partialLine) {
+	const size_t linesBeingWrapped = static_cast<size_t>(lineToWrapEnd - lineToWrap);
+	const std::unique_ptr<int[]> linesAfterWrap = std::make_unique<int[]>(linesBeingWrapped);
+
+	// Lines that are less likely to be re-examined should not be read from or written to the cache.
+	const Sci::Position caretPosition = sel.MainCaret();
+	const SignificantLines significantLines {
+		pdoc->SciLineFromPosition(caretPosition),
+		pcs->DocFromDisplay(topLine),
+		LinesOnScreen() + 1,
+		pdoc->LinesTotal(),
+		pdoc->GetStyleClock(),
+		view.llc.GetLevel(),
+	};
+
+	const ElapsedPeriod epWrapping;
+	SetIdleTaskTime(IdleLineWrapTime);
+
+	// Wrap all the long lines in the main thread.
+	// LayoutLine may then multi-thread over segments in each line.
+	uint32_t wrappedBytesAllThread = 0;
+	uint32_t wrappedBytesOneThread = 0;
+	for (size_t index = 0; index < linesBeingWrapped; index++) {
+		const Sci::Line lineNumber = lineToWrap + index;
+		const Sci::Position lineStart = pdoc->LineStart(lineNumber);
+		const Sci::Position lineEnd = pdoc->LineStart(lineNumber + 1);
+		const int lengthLine = static_cast<int>(lineEnd - lineStart);
+		LineLayout * const ll = view.llc.Retrieve(lineNumber, significantLines, lengthLine);
+		if (lineNumber == significantLines.lineCaret) {
+			ll->caretPosition = static_cast<int>(caretPosition - lineStart);
+		} else {
+			ll->caretPosition = 0;
+		}
+		const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
+		wrappedBytesAllThread += wrappedBytes & UINT32_MAX;
+		wrappedBytesOneThread += wrappedBytes >> 32;
+		linesAfterWrap[index] = ll->lines;
+		if (ll->PartialPosition()) {
+			partialLine = lineNumber;
+			break;
+		}
+	}
+
+	const double duration = epWrapping.Duration();
+	durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
+	durationWrapOneThread.AddSample(wrappedBytesOneThread, duration);
+	UpdateParallelLayoutThreshold();
+
+	bool wrapOccurred = false;
+	for (size_t index = 0; index < linesBeingWrapped; index++) {
+		const Sci::Line lineNumber = lineToWrap + index;
+		int linesWrapped = linesAfterWrap[index];
+		if (vs.annotationVisible != AnnotationVisible::Hidden) {
+			linesWrapped += pdoc->AnnotationLines(lineNumber);
+		}
+		if (pcs->SetHeight(lineNumber, linesWrapped)) {
+			wrapOccurred = true;
+		}
+		if (lineNumber == partialLine) {
+			break;
+		}
+		wrapPending.Wrapped(lineNumber);
+	}
+	return wrapOccurred;;
+}
+
 // Perform  wrapping for a subset of the lines needing wrapping.
 // wsAll: wrap all lines which need wrapping in this single call
 // wsVisible: wrap currently visible lines
@@ -1551,12 +1617,11 @@ bool Editor::WrapLines(WrapScope ws) {
 
 		const Sci::Line lineEndNeedWrap = std::min(wrapPending.end, maxEditorLine);
 		lineToWrapEnd = std::min(lineToWrapEnd, lineEndNeedWrap);
-		bool partialLine = false;
+		Sci::Line partialLine = Sci::invalidPosition;
 		// Ensure all lines being wrapped are styled.
 		pdoc->EnsureStyledTo(pdoc->LineStart(lineToWrapEnd));
 
 		if (lineToWrap < lineToWrapEnd) {
-
 			PRectangle rcTextArea = GetClientRectangle();
 			rcTextArea.left = static_cast<XYPOSITION>(vs.textStart);
 			rcTextArea.right -= vs.rightMarginWidth;
@@ -1565,41 +1630,14 @@ bool Editor::WrapLines(WrapScope ws) {
 			const AutoSurface surface(this);
 			if (surface) {
 				//Platform::DebugPrintf("Wraplines: scope=%0d need=%0d..%0d perform=%0d..%0d\n", ws, wrapPending.start, wrapPending.end, lineToWrap, lineToWrapEnd);
-				const ElapsedPeriod epWrapping;
-				SetIdleTaskTime(IdleLineWrapTime);
-				uint32_t wrappedBytesAllThread = 0;
-				uint32_t wrappedBytesOneThread = 0;
-				while (lineToWrap < lineToWrapEnd) {
-					LineLayout * const ll = view.RetrieveLineLayout(lineToWrap, *this);
-					const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
-					wrappedBytesAllThread += wrappedBytes & UINT32_MAX;
-					wrappedBytesOneThread += wrappedBytes >> 32;
-					int linesWrapped = ll->lines;
-					if (vs.annotationVisible != AnnotationVisible::Hidden) {
-						linesWrapped += pdoc->AnnotationLines(lineToWrap);
-					}
-					if (pcs->SetHeight(lineToWrap, linesWrapped)) {
-						wrapOccurred = true;
-					}
-					if (ll->PartialPosition()) {
-						partialLine = true;
-						break;
-					}
-					wrapPending.Wrapped(lineToWrap);
-					lineToWrap++;
-				}
-				const double duration = epWrapping.Duration();
-				durationWrapOneUnit.AddSample(wrappedBytesAllThread, duration);
-				durationWrapOneThread.AddSample(wrappedBytesOneThread, duration);
-				UpdateParallelLayoutThreshold();
-
+				wrapOccurred = WrapBlock(surface, lineToWrap, lineToWrapEnd, partialLine);
 				goodTopLine = pcs->DisplayFromDoc(lineDocTop) + std::min(
 					subLineTop, static_cast<Sci::Line>(pcs->GetHeight(lineDocTop) - 1));
 			}
 		}
 
 		// If wrapping is done, bring it to resting position
-		if (!partialLine && wrapPending.start >= lineEndNeedWrap) {
+		if (partialLine < 0 && wrapPending.start >= lineEndNeedWrap) {
 			wrapPending.Reset();
 		}
 #if 0
@@ -2566,7 +2604,7 @@ bool Editor::NotifyMarginClick(Point pt, KeyMod modifiers) {
 	}
 }
 
-bool Editor::NotifyMarginRightClick(Point pt, KeyMod modifiers) {
+bool Editor::NotifyMarginRightClick(Point pt, KeyMod modifiers) noexcept {
 	const int marginRightClicked = vs.MarginFromLocation(pt);
 	if ((marginRightClicked >= 0) && vs.ms[marginRightClicked].sensitive) {
 		const Sci::Position position = pdoc->LineStart(LineFromLocation(pt));
@@ -5131,10 +5169,6 @@ void Editor::SetFocusState(bool focusState) {
 		CancelModes();
 	}
 	ShowCaretAtCurrentPosition();
-}
-
-void Editor::UpdateBaseElements() {
-	// Overridden by subclasses
 }
 
 Sci::Position Editor::PositionAfterArea(PRectangle rcArea) const noexcept {

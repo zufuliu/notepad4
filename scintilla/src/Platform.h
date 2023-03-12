@@ -333,7 +333,7 @@ public:
 	virtual void SetVisibleRows(int rows) noexcept = 0;
 	virtual int GetVisibleRows() const noexcept = 0;
 	virtual PRectangle GetDesiredRect() = 0;
-	virtual int CaretFromEdge() const = 0;
+	virtual int CaretFromEdge() const noexcept = 0;
 	virtual void Clear() noexcept = 0;
 	virtual void Append(const char *s, int type = -1) const noexcept = 0;
 	virtual int Length() const noexcept = 0;

@@ -379,7 +379,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ScrollTo(Sci::Line line, bool moveThumb = true);
 	virtual void ScrollText(Sci::Line linesToMove);
 	void HorizontalScrollTo(int xPos);
-	void VerticalCentreCaret() noexcept;
+	void VerticalCentreCaret();
 	void MoveSelectedLines(int lineDelta);
 	void MoveSelectedLinesUp();
 	void MoveSelectedLinesDown();
@@ -408,6 +408,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	bool Wrapping() const noexcept;
 	void NeedWrapping(Sci::Line docLineStart = 0, Sci::Line docLineEnd = WrapPending::lineLarge, bool invalidate = true) noexcept;
 	bool WrapOneLine(Surface *surface, Sci::Position positionInsert);
+	bool WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToWrapEnd, Sci::Line &partialLine);
 	enum class WrapScope {
 		wsAll, wsVisible, wsIdle
 	};
@@ -475,7 +476,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void NotifyPainted() noexcept;
 	void NotifyIndicatorClick(bool click, Sci::Position position, Scintilla::KeyMod modifiers) noexcept;
 	bool NotifyMarginClick(Point pt, Scintilla::KeyMod modifiers);
-	bool NotifyMarginRightClick(Point pt, Scintilla::KeyMod modifiers);
+	bool NotifyMarginRightClick(Point pt, Scintilla::KeyMod modifiers) noexcept;
 	void NotifyNeedShown(Sci::Position pos, Sci::Position len) noexcept;
 	void NotifyCodePageChanged(int oldCodePage) noexcept;
 	void NotifyDwelling(Point pt, bool state);
@@ -565,7 +566,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual void SetMouseCapture(bool on) noexcept = 0;
 	virtual bool HaveMouseCapture() const noexcept = 0;
 	void SetFocusState(bool focusState);
-	virtual void UpdateBaseElements();
+	virtual void UpdateBaseElements() = 0;
 
 	Sci::Position SCICALL PositionAfterArea(PRectangle rcArea) const noexcept;
 	void StyleToPositionInView(Sci::Position pos);
