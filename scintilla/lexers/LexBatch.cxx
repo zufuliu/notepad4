@@ -368,7 +368,7 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			// https://ss64.com/nt/goto.html
 			if (sc.atLineStart) {
 				sc.SetState(SCE_BAT_DEFAULT);
-			} else if (IsSpaceOrTab(sc.ch) && sc.GetLineNextChar() != '\0') {
+			} else if (IsGraphic(sc.ch) && !(IsAGraphic(sc.chPrev) && IsLabelChar(sc.ch))) {
 				if (outerStyle == SCE_BAT_NOT_BATCH) {
 					sc.ChangeState(SCE_BAT_NOT_BATCH);
 					labelLine = false;
