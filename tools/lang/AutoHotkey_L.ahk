@@ -1,4 +1,4 @@
-; https://www.autohotkey.com/docs/v2/
+; 2.0.2 https://www.autohotkey.com/docs/v2/
 ; https://github.com/Lexikos/AutoHotkey_L-Docs.git
 
 ;! keywords			===========================================================
@@ -76,6 +76,7 @@ While Expression
 #NoTrayIcon
 #Requires Requirement
 #SingleInstance [Force Ignore Prompt Off]
+#SuspendExempt [Exempt]
 #UseHook [Setting]
 #Warn [WarningType, WarningMode]
 #WinActivateForce
@@ -87,15 +88,17 @@ While Expression
 /*@Ahk2Exe-IgnoreEnd */
 /*@Ahk2Exe-AddResource FileName , ResourceName */
 /*@Ahk2Exe-Bin [Path\]Name , [Exe_path\][Name], Codepage */
+/*@Ahk2Exe-Base [Path\]Name , [Exe_path\][Name], Codepage */
 /*@Ahk2Exe-ConsoleApp */
 /*@Ahk2Exe-Cont Text */
 /*@Ahk2Exe-Debug Text */
 /*@Ahk2Exe-ExeName [Path\][Name] */
 /*@Ahk2Exe-Let Name = Value , Name = Value, ... */
+/*@Ahk2Exe-Nop [Text] */
 /*@Ahk2Exe-Obey Name, CmdOrExp , Extra */
 /*@Ahk2Exe-PostExec Program [parameters] , When, WorkingDir, Hidden, IgnoreErrors */
-/*@Ahk2Exe-SetMainIcon IcoFile */
-/*@Ahk2Exe-SetProp Value */
+/*@Ahk2Exe-ResourceID Name */
+/*@Ahk2Exe-SetMainIcon [IcoFile] */
 /*@Ahk2Exe-Set Prop, Value */
 /*@Ahk2Exe-UpdateManifest RequireAdmin , Name, Version, UIAccess */
 /*@Ahk2Exe-UseResourceLang LangCode */
@@ -223,12 +226,12 @@ A_Index
 A_LoopFileName
 A_LoopReadLine
 A_LoopField
-; https://www.autohotkey.com/docs/v2/commands/LoopReg.htm
+; https://www.autohotkey.com/docs/v2/lib/LoopReg.htm
 A_LoopRegName
 A_LoopRegType
 A_LoopRegKey
 A_LoopRegTimeModified
-; https://www.autohotkey.com/docs/v2/commands/LoopFiles.htm
+; https://www.autohotkey.com/docs/v2/lib/LoopFiles.htm
 A_LoopFileName
 A_LoopFileExt
 A_LoopFilePath
@@ -322,7 +325,7 @@ JoyPOV JoyName JoyButtons JoyAxes JoyInfo
 
 ;! Functions		===========================================================
 ; Drive
-; https://www.autohotkey.com/docs/v2/commands/Drive.htm
+; https://www.autohotkey.com/docs/v2/lib/Drive.htm
 DriveEject [Drive]
 DriveRetract [Drive]
 DriveGetCapacity(Path)
@@ -378,9 +381,9 @@ ObjRelease(Ptr)
 DirCopy Source, Dest [, Overwrite]
 DirCreate DirName
 DirDelete DirName [, Recurse]
-AttributeString := DirExist(FilePattern)
+DirExist(FilePattern)
 DirMove Source, Dest [, Flag]
-SelectedFolder := DirSelect([StartingFolder, Options, Prompt])
+DirSelect([StartingFolder, Options, Prompt])
 FileAppend Text [, Filename, Options]
 FileCopy SourcePattern, DestPattern [, Overwrite]
 FileCreateShortcut Target, LinkFile [, WorkingDir, Args, Description, IconFile, ShortcutKey, IconNumber, RunState]
@@ -426,7 +429,7 @@ TraySetIcon([FileName, IconNumber, Freeze])
 TrayTip [Text, Title, Options]
 
 ; Math
-; https://www.autohotkey.com/docs/v2/commands/Math.htm
+; https://www.autohotkey.com/docs/v2/lib/Math.htm
 Abs(Number)
 Ceil(Number)
 DateAdd(DateTime, Time, TimeUnits)
@@ -452,7 +455,7 @@ ACos(Number)
 ATan(Number)
 
 ; Monitor
-; https://www.autohotkey.com/docs/v2/commands/Monitor.htm
+; https://www.autohotkey.com/docs/v2/lib/Monitor.htm
 MonitorGet([N, Left, Top, Right, Bottom])
 MonitorGetCount()
 MonitorGetName([N])
@@ -493,7 +496,7 @@ MouseClick [WhichButton, X, Y, ClickCount, Speed, DownOrUp, Relative]
 MouseClickDrag WhichButton, X1, Y1, X2, Y2 [, Speed, Relative]
 MouseGetPos [OutputVarX, OutputVarY, OutputVarWin, OutputVarControl, Flag]
 MouseMove X, Y [, Speed, Relative]
-; https://www.autohotkey.com/docs/v2/commands/Send.htm
+; https://www.autohotkey.com/docs/v2/lib/Send.htm
 Send Keys
 SendText Keys
 SendInput Keys
@@ -537,9 +540,12 @@ OutputDebug Text
 Persistent [Persist]
 
 ; Process
-; https://www.autohotkey.com/docs/v2/commands/Process.htm
+; https://www.autohotkey.com/docs/v2/lib/Process.htm
 ProcessClose PIDOrName
 ProcessExist([PIDOrName])
+ProcessGetName([PIDOrName])
+ProcessGetPath([PIDOrName])
+ProcessGetParent([PIDOrName])
 ProcessSetPriority Level [, PIDOrName]
 ProcessWait(PIDOrName [, Timeout])
 ProcessWaitClose(PIDOrName [, Timeout])
@@ -549,6 +555,7 @@ RunAs [User, Password, Domain]
 Shutdown Flag
 
 ; Registry
+RegCreateKey KeyName
 RegDelete [KeyName, ValueName]
 RegDeleteKey [KeyName]
 RegRead([KeyName, ValueName, Default])
@@ -562,7 +569,7 @@ PixelGetColor(X, Y [, Mode])
 PixelSearch OutputVarX, OutputVarY, X1, Y1, X2, Y2, ColorID [, Variation]
 
 ; Sound
-; https://www.autohotkey.com/docs/v2/commands/Sound.htm
+; https://www.autohotkey.com/docs/v2/lib/Sound.htm
 SoundBeep [Frequency, Duration]
 SoundGetInterface(IID [, Component, Device])
 SoundGetMute([Component, Device])
@@ -600,7 +607,7 @@ VarSetStrCapacity(TargetVar [, RequestedCapacity])
 VerCompare(VersionA, VersionB)
 
 ; Window
-; https://www.autohotkey.com/docs/v2/commands/Win.htm
+; https://www.autohotkey.com/docs/v2/lib/Win.htm
 GroupActivate(GroupName [, Mode])
 GroupAdd GroupName [, WinTitle, WinText, ExcludeTitle, ExcludeText]
 GroupClose GroupName [, Mode]
@@ -662,7 +669,7 @@ WinWaitNotActive [WinTitle, WinText, Timeout, ExcludeTitle, ExcludeText]
 WinWaitClose [WinTitle, WinText, Timeout, ExcludeTitle, ExcludeText]
 
 ; Control
-; https://www.autohotkey.com/docs/v2/commands/Control.htm
+; https://www.autohotkey.com/docs/v2/lib/Control.htm
 ControlAddItem String, Control [, WinTitle, WinText, ExcludeTitle, ExcludeText]
 ControlChooseIndex N, Control [, WinTitle, WinText, ExcludeTitle, ExcludeText]
 ControlChooseString String, Control [, WinTitle, WinText, ExcludeTitle, ExcludeText]
@@ -708,8 +715,7 @@ SendMessage(Msg [, wParam, lParam, Control, WinTitle, WinText, ExcludeTitle, Exc
 SetControlDelay Delay
 
 ; Object Types
-; https://www.autohotkey.com/docs/v2/objects/index.htm
-; https://www.autohotkey.com/docs/v2/Objects.htm
+; https://www.autohotkey.com/docs/v2/ObjList.htm
 __Enum(NumberOfVars)
 __Item[name]
 __New()
@@ -719,13 +725,13 @@ __Get(Name, Params)
 __Set(Name, Params, Value)
 __Call(Name, Params)
 Call(Params*)
-; https://www.autohotkey.com/docs/v2/objects/Any.htm
-GetMethod(Name)
+; https://www.autohotkey.com/docs/v2/lib/Any.htm
+GetMethod([Name, ParamCount])
 HasBase(BaseObj)
-HasMethod(Name)
+HasMethod([Name, ParamCount])
 HasProp(Name)
 ObjGetBase(Value)
-; https://www.autohotkey.com/docs/v2/objects/Object.htm
+; https://www.autohotkey.com/docs/v2/lib/Object.htm
 Clone()
 DefineProp(Name, Desc)
 DeleteProp(Name)
@@ -736,36 +742,35 @@ ObjSetBase(Obj, BaseObj)
 ObjOwnPropCount(Obj)
 ObjSetCapacity(Obj, MaxProps)
 ObjGetCapacity(Obj)
-; https://www.autohotkey.com/docs/v2/objects/Array.htm
+; https://www.autohotkey.com/docs/v2/lib/Array.htm
 Delete(Index)
+Get(Index [, Default])
 Has(Index)
 InsertAt(Index, Value1 [, Value2, ... ValueN])
 Pop()
 Push([Value, Value2, ..., ValueN])
 RemoveAt(Index [, Length])
-; https://www.autohotkey.com/docs/v2/objects/Map.htm
+; https://www.autohotkey.com/docs/v2/lib/Map.htm
 Clear()
 Delete(Key)
 Get(Key [, Default])
 Has(Key)
 Set([Key, Value, Key2, Value2, ...])
-; https://www.autohotkey.com/docs/v2/objects/File.htm
+; https://www.autohotkey.com/docs/v2/lib/File.htm
 Read([Characters])
 Write(String)
 ReadLine()
 WriteLine([String])
-ReadNumType()
-WriteNumType(Num)
 RawRead(Buffer [, Bytes])
 RawWrite(Data [, Bytes])
 Seek(Distance [, Origin := 0])
 Close()
-; https://www.autohotkey.com/docs/v2/objects/Func.htm
+; https://www.autohotkey.com/docs/v2/lib/Func.htm
 Bind(Param1, Param2, ...)
 IsByRef([ParamIndex])
 IsOptional([ParamIndex])
 
-; https://www.autohotkey.com/docs/v2/objects/Gui.htm
+; https://www.autohotkey.com/docs/v2/lib/Gui.htm
 Add(ControlType [, Options, Text])
 AddControlType([Options, Text])
 Destroy()
@@ -782,7 +787,7 @@ Opt(Options)
 SetFont([Options, FontName])
 Show([Options])
 Submit([Hide := true])
-; https://www.autohotkey.com/docs/v2/objects/GuiControl.htm
+; https://www.autohotkey.com/docs/v2/lib/GuiControl.htm
 Add(Items)
 Choose(Value)
 Delete([Value])
@@ -797,8 +802,9 @@ SetFont([Options, FontName])
 SetFormat([Format])
 UseTab([Value, ExactMatch := false])
 
-; https://www.autohotkey.com/docs/v2/objects/Menu.htm
+; https://www.autohotkey.com/docs/v2/lib/Menu.htm
 Add([MenuItemName, Function-or-Submenu, Options])
+AddStandard()
 Check(MenuItemName)
 Delete([MenuItemName])
 Disable(MenuItemName)
@@ -811,10 +817,9 @@ Show([X, Y])
 ToggleCheck(MenuItemName)
 ToggleEnable(MenuItemName)
 Uncheck(MenuItemName)
-AddStandard()
 
 ;! Objects			===========================================================
-; https://www.autohotkey.com/docs/v2/objects/index.htm
+; https://www.autohotkey.com/docs/v2/ObjList.htm
 Any
 	Object
 		Array
@@ -822,17 +827,18 @@ Any
 			ClipboardAll
 		Class
 		Error
-			IndexError
-				KeyError
-			MemberError
-				PropertyError
-				MethodError
 			MemoryError
 			OSError
 			TargetError
 			TimeoutError
 			TypeError
+			UnsetError
+				MemberError
+					PropertyError
+					MethodError
+				UnsetItemError
 			ValueError
+				IndexError
 			ZeroDivisionError
 		File
 		Func
@@ -912,7 +918,7 @@ Join LTrim RTrim Comments Comment Com
 ; Loop
 Files Parse Read Reg
 ; Loop Reg
-; https://www.autohotkey.com/docs/v2/commands/LoopReg.htm
+; https://www.autohotkey.com/docs/v2/lib/LoopReg.htm
 HKEY_LOCAL_MACHINE HKEY_USERS HKEY_CURRENT_USER HKEY_CLASSES_ROOT HKEY_CURRENT_CONFIG
 HKLM HKCU
 REG_SZ REG_EXPAND_SZ REG_MULTI_SZ REG_DWORD REG_QWORD REG_BINARY REG_LINK REG_RESOURCE_LIST REG_FULL_RESOURCE_DESCRIPTOR REG_RESOURCE_REQUIREMENTS_LIST REG_DWORD_BIG_ENDIAN

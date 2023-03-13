@@ -10,20 +10,22 @@ static KEYWORDLIST Keywords_AHK = {{
 , // 1 directives
 "ClipboardTimeout CriticalObjectSleepTime CriticalObjectTimeOut DefineDefaultObjectValue DllImport DllLoad ErrorStdOut "
 "HotIf HotIfTimeout Hotstring Include IncludeAgain InputLevel MaxThreads MaxThreadsBuffer MaxThreadsPerHotkey NoTrayIcon "
-"Requires SingleInstance UseHook Warn WarnContinuableException WinActivateForce WindowClassGui WindowClassMain "
+"Requires SingleInstance SuspendExempt UseHook "
+"Warn WarnContinuableException WinActivateForce WindowClassGui WindowClassMain "
 
 , // 2 compiler directives
-"Ahk2Exe-AddResource Ahk2Exe-Bin Ahk2Exe-ConsoleApp Ahk2Exe-Cont Ahk2Exe-Debug Ahk2Exe-ExeName "
-"Ahk2Exe-IgnoreBegin Ahk2Exe-IgnoreEnd Ahk2Exe-Keep Ahk2Exe-Let Ahk2Exe-Obey Ahk2Exe-PostExec "
-"Ahk2Exe-Set Ahk2Exe-SetMainIcon Ahk2Exe-SetProp Ahk2Exe-UpdateManifest Ahk2Exe-UseResourceLang "
+"Ahk2Exe-AddResource Ahk2Exe-Base Ahk2Exe-Bin Ahk2Exe-ConsoleApp Ahk2Exe-Cont Ahk2Exe-Debug Ahk2Exe-ExeName "
+"Ahk2Exe-IgnoreBegin Ahk2Exe-IgnoreEnd Ahk2Exe-Keep Ahk2Exe-Let Ahk2Exe-Nop Ahk2Exe-Obey Ahk2Exe-PostExec "
+"Ahk2Exe-ResourceID Ahk2Exe-Set Ahk2Exe-SetMainIcon Ahk2Exe-UpdateManifest Ahk2Exe-UseResourceLang "
 
 , // 3 objects
 "ActiveX Any Array BoundFunc Buffer Button "
 "CheckBox Class ClipboardAll Closure ComboBox ComObjArray ComObject ComValue ComValueRef Control Custom DateTime DDL "
-"Edit Enumerator Error File Float Func GroupBox Gui Hotkey IndexError InputHook Integer KeyError "
-"Link List ListBox ListView Map MemberError MemoryError Menu MenuBar MethodError MonthCal Number Object OSError "
+"Edit Enumerator Error File Float Func GroupBox Gui Hotkey IndexError InputHook Integer Link List ListBox ListView "
+"Map MemberError MemoryError Menu MenuBar MethodError MonthCal Number Object OSError "
 "Pic Primitive Progress PropertyError Radio RegExMatchInfo Slider StatusBar String "
-"Tab TargetError Text TimeoutError TreeView TypeError UpDown ValueError VarRef ZeroDivisionError "
+"Tab TargetError Text TimeoutError TreeView TypeError UnsetError UnsetItemError UpDown ValueError VarRef "
+"ZeroDivisionError "
 
 , // 4 built-in variables
 "A_AhkPath A_AhkVersion A_AllowMainWindow A_AppData A_AppDataCommon A_Args A_Clipboard A_ComputerName A_ComSpec "
@@ -60,8 +62,8 @@ static KEYWORDLIST Keywords_AHK = {{
 "Volume_Down Volume_Mute Volume_Up WheelDown WheelLeft WheelRight WheelUp XButton1 XButton2 "
 
 , // 6 functions
-"__Call( __Delete( __Enum( __Get( __Init( __Item __New( __Set( "
-"Abs( ACos( Add( AddControlType( AddStandard( ASin( ATan( AttributeString Bind( BlockInput "
+"__Call( __Delete( __Enum( __Get( __Init( __Item __New( __Set( Abs( ACos( Add( AddControlType( AddStandard( ASin( ATan( "
+"Bind( BlockInput "
 "Call( CallbackCreate( CaretGetPos( Ceil( Check( Choose( Chr( Clear( Click ClipboardAll( ClipWait Clone( Close( ComCall( "
 "ComObjActive( ComObjArray( ComObjConnect ComObject( ComObjFlags( ComObjFromPtr( ComObjGet( ComObjQuery( ComObjType( "
 "ComObjValue( ComValue( ControlAddItem ControlChooseIndex ControlChooseString ControlClick ControlDeleteItem "
@@ -71,7 +73,7 @@ static KEYWORDLIST Keywords_AHK = {{
 "ControlSend ControlSendText ControlSetChecked ControlSetEnabled ControlSetExStyle ControlSetStyle ControlSetText "
 "ControlShow ControlShowDropDown CoordMode Cos( "
 "DateAdd( DateDiff( DefineProp( Delete( DeleteProp( Destroy( DetectHiddenText DetectHiddenWindows "
-"DirCopy DirCreate DirDelete DirMove DirSelect( Disable( DllCall( Download DriveEject DriveGetCapacity( "
+"DirCopy DirCreate DirDelete DirExist( DirMove DirSelect( Disable( DllCall( Download DriveEject DriveGetCapacity( "
 "DriveGetFileSystem( DriveGetLabel( DriveGetList( DriveGetSerial( DriveGetSpaceFree( DriveGetStatus( DriveGetStatusCD( "
 "DriveGetType( DriveLock DriveRetract DriveSetLabel DriveUnlock "
 "Edit EditGetCurrentCol( EditGetCurrentLine( EditGetLine( EditGetLineCount( EditGetSelectedText( EditPaste "
@@ -94,12 +96,12 @@ static KEYWORDLIST Keywords_AHK = {{
 "Number( NumGet( NumPut "
 "ObjAddRef( ObjGetBase( ObjGetCapacity( ObjOwnPropCount( ObjRelease( ObjSetBase( ObjSetCapacity( "
 "OnClipboardChange OnEvent( OnMessage OnNotify( Opt( Ord( OutputDebug OwnProps( "
-"Persistent PixelGetColor( PixelSearch Pop( PostMessage "
-"ProcessClose ProcessExist( ProcessSetPriority ProcessWait( ProcessWaitClose( Push( "
-"Random( RawRead( RawWrite( Read( ReadLine( ReadNumType( Redraw( "
-"RegDelete RegDeleteKey RegExMatch( RegExReplace( RegRead( RegWrite RemoveAt( Rename( Restore( Round( RTrim( "
-"Run RunAs RunWait( "
-"Seek( SelectedFolder Send SendEvent SendInput SendLevel SendMessage( SendMode SendPlay SendText Set( "
+"Persistent PixelGetColor( PixelSearch Pop( PostMessage ProcessClose ProcessExist( "
+"ProcessGetName( ProcessGetParent( ProcessGetPath( ProcessSetPriority ProcessWait( ProcessWaitClose( Push( "
+"Random( RawRead( RawWrite( Read( ReadLine( Redraw( "
+"RegCreateKey RegDelete RegDeleteKey RegExMatch( RegExReplace( RegRead( RegWrite RemoveAt( Rename( Restore( Round( "
+"RTrim( Run RunAs RunWait( "
+"Seek( Send SendEvent SendInput SendLevel SendMessage( SendMode SendPlay SendText Set( "
 "SetCapsLockState SetColor( SetControlDelay SetDefaultMouseSpeed SetFont( SetFormat( SetIcon( SetKeyDelay SetMouseDelay "
 "SetNumLockState SetRegView SetScrollLockState SetStoreCapsLockMode SetTitleMatchMode SetWinDelay SetWorkingDir "
 "Show( Shutdown Sin( "
@@ -114,7 +116,7 @@ static KEYWORDLIST Keywords_AHK = {{
 "WinGetText( WinGetTitle( WinGetTransColor( WinGetTransparent( WinHide WinKill "
 "WinMaximize WinMinimize WinMinimizeAll WinMinimizeAllUndo WinMove WinMoveBottom WinMoveTop WinRedraw WinRestore "
 "WinSetAlwaysOnTop WinSetEnabled WinSetExStyle WinSetRegion WinSetStyle WinSetTitle WinSetTransColor WinSetTransparent "
-"WinShow WinWait WinWaitActive WinWaitClose WinWaitNotActive Write( WriteLine( WriteNumType( "
+"WinShow WinWait WinWaitActive WinWaitClose WinWaitNotActive Write( WriteLine( "
 
 , // 7 misc
 "AtEOF BackColor Break "
