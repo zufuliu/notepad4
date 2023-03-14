@@ -84,6 +84,12 @@ struct EscapeSequence {
 	}
 };
 
+enum class FormattedStringPart {
+	None,
+	FormatSpec,
+	End,
+};
+
 struct FormattedStringState {
 	int state;
 	int nestedLevel;
@@ -386,7 +392,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	bool prevLineContinuation = false;
 	bool lineContinuation = false;
 	bool insideUrl = false;
-	bool insideFStringFormatSpec = false;
+	FormattedStringPart fstringPart = FormattedStringPart::None;
 	EscapeSequence escSeq;
 
 	std::vector<FormattedStringState> nestedState;
@@ -494,7 +500,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 		case SCE_PY_TRIPLE_RAWBYTES_SQ:
 		case SCE_PY_TRIPLE_RAWBYTES_DQ:
 			if (sc.atLineStart && !lineContinuation) {
-				if (!IsPyTripleQuotedString(sc.state)) {
+				if (fstringPart == FormattedStringPart::None && !IsPyTripleQuotedString(sc.state)) {
 					sc.SetState(SCE_PY_DEFAULT);
 					break;
 				}
@@ -558,7 +564,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						} else {
 							nestedState.back().nestedLevel += 1;
 						}
-						insideFStringFormatSpec = false;
+						fstringPart = FormattedStringPart::None;
 						sc.SetState(SCE_PY_OPERATOR2);
 						sc.ForwardSetState(SCE_PY_DEFAULT);
 					} else if (sc.chNext == '}' || sc.chNext == '!' || sc.chNext == ':' || IsIdentifierCharEx(sc.chNext)) {
@@ -584,7 +590,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							const int state = sc.state;
 							sc.SetState(SCE_PY_OPERATOR2);
 							sc.ForwardSetState(state);
-							insideFStringFormatSpec = false;
+							fstringPart = FormattedStringPart::None;
 							continue;
 						}
 					}
@@ -638,7 +644,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 			case '!':
 			case ':':
-				if (insideFStringFormatSpec) {
+				if (fstringPart == FormattedStringPart::FormatSpec) {
 					const Sci_Position length = CheckBraceFormatSpecifier(sc, styler);
 					if (length != 0) {
 						const int state = sc.state;
@@ -807,7 +813,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (interpolating) {
 					const FormattedStringState &state = nestedState.back();
 					if (state.parenCount == 0 && IsPyFormattedStringEnd(sc, braceCount)) {
-						insideFStringFormatSpec = sc.ch != '}';
+						fstringPart = (sc.ch == '}') ? FormattedStringPart::End : FormattedStringPart::FormatSpec;
 						sc.SetState(state.state);
 						continue;
 					}
@@ -860,7 +866,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			styler.SetLineState(sc.currentLine, lineState);
 			lineState = 0;
 			kwType = KeywordType::None;
-			insideFStringFormatSpec = false;
+			fstringPart = FormattedStringPart::None;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			indentCount = 0;
