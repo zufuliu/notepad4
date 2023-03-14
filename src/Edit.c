@@ -77,14 +77,25 @@ static DStringW wchAppendLines;
 #define NP2_DYNAMIC_LOAD_ELSCORE_DLL	1
 #endif
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
-#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
-#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
-#else
-extern DWORD kSystemLibraryLoadFlags;
-#endif
 static HMODULE hELSCoreDLL = NULL;
 #else
 #pragma comment(lib, "elscore.lib")
+#endif
+
+#define NP2_DYNAMIC_LOAD_wcsftime	1
+#if NP2_DYNAMIC_LOAD_wcsftime
+static HMODULE hCrtDLL = NULL;
+
+typedef size_t (__cdecl *wcsftimeSig)(wchar_t *str, size_t count, const wchar_t *format, const struct tm *time);
+wcsftimeSig GetFunctionPointer_wcsftime(void) {
+	if (hCrtDLL == NULL) {
+		hCrtDLL = LoadLibraryExW(L"ucrtbase.dll", NULL, kSystemLibraryLoadFlags);
+		if (hCrtDLL == NULL) {
+			hCrtDLL = LoadLibraryExW(L"msvcrt.dll", NULL, kSystemLibraryLoadFlags);
+		}
+	}
+	return DLLFunction(wcsftimeSig, hCrtDLL, "wcsftime");
+}
 #endif
 
 void Edit_ReleaseResources(void) {
@@ -95,6 +106,11 @@ void Edit_ReleaseResources(void) {
 #if NP2_DYNAMIC_LOAD_ELSCORE_DLL
 	if (hELSCoreDLL != NULL) {
 		FreeLibrary(hELSCoreDLL);
+	}
+#endif
+#if NP2_DYNAMIC_LOAD_wcsftime
+	if (hCrtDLL) {
+		FreeLibrary(hCrtDLL);
 	}
 #endif
 }
@@ -6725,8 +6741,7 @@ void EditInsertDateTime(bool bShort) {
 	SYSTEMTIME st;
 	GetLocalTime(&st);
 
-	if (IniGetString(INI_SECTION_NAME_FLAGS, bShort ? L"DateTimeShort" : L"DateTimeLong",
-					 L"", tchTemplate, COUNTOF(tchTemplate))) {
+	if (IniGetString(INI_SECTION_NAME_FLAGS, bShort ? L"DateTimeShort" : L"DateTimeLong", L"", tchTemplate, COUNTOF(tchTemplate))) {
 		struct tm sst;
 		sst.tm_isdst	= GetDaylightSavingTimeFlag();
 		sst.tm_sec		= (int)st.wSecond;
@@ -6736,7 +6751,12 @@ void EditInsertDateTime(bool bShort) {
 		sst.tm_mon		= (int)st.wMonth - 1;
 		sst.tm_year		= (int)st.wYear - 1900;
 		sst.tm_wday		= (int)st.wDayOfWeek;
+#if NP2_DYNAMIC_LOAD_wcsftime
+		wcsftimeSig pfn = GetFunctionPointer_wcsftime();
+		pfn(tchDateTime, COUNTOF(tchDateTime), tchTemplate, &sst);
+#else
 		wcsftime(tchDateTime, COUNTOF(tchDateTime), tchTemplate, &sst);
+#endif
 	} else {
 		WCHAR tchDate[128];
 		WCHAR tchTime[128];
@@ -6787,7 +6807,12 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 	sst.tm_wday	 = (int)st.wDayOfWeek;
 
 	WCHAR wchReplace[256];
+#if NP2_DYNAMIC_LOAD_wcsftime
+	wcsftimeSig pfn = GetFunctionPointer_wcsftime();
+	pfn(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
+#else
 	wcsftime(wchReplace, COUNTOF(wchReplace), wchTemplate, &sst);
+#endif
 
 	const UINT cpEdit = SciCall_GetCodePage();
 #if NP2_USE_DESIGNATED_INITIALIZER

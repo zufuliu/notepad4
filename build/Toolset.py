@@ -43,6 +43,27 @@ def update_all_project_toolset():
 	for path in glob.glob('../locale/*/*.vcxproj'):
 		update_project_toolset(path)
 
+def dump_static_linked_function(path):
+	result = {}
+	with open(path, encoding='utf-8') as fd:
+		for line in fd.readlines():
+			if line.count(':') > 1:
+				items = line.split()
+				func = items[1]
+				obj = items[-1]
+				if items[3] == 'f' and '<lambda_' not in func and items[4] != 'i':
+					if obj in result:
+						result[obj].append(func)
+					else:
+						result[obj] = [func]
+
+	path, ext = os.path.splitext(path)
+	path = f'{path}-crt{ext}'
+	print('write:', path)
+	with open(path, 'w', encoding='utf-8') as fd:
+		for obj, items in sorted(result.items()):
+			fd.write(obj + '\n')
+			fd.write(''.join(f'\t{func}\n' for func in sorted(items)))
 
 def quote_path(path):
 	return f'"{path}"' if ' ' in path else path
@@ -134,6 +155,8 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		fd.write(json.dumps(commands, indent='\t', ensure_ascii=False))
 
 #update_all_project_toolset()
+#dump_static_linked_function('bin/Release/x64/metapath.map')
+#dump_static_linked_function('bin/Release/x64/Notepad2.map')
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
 #run-clang-tidy -quiet -j4 1>tidy.log

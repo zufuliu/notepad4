@@ -269,6 +269,9 @@ extern HINSTANCE g_exeInstance;
 extern HANDLE g_hDefaultHeap;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 extern DWORD g_uWinVer;
+extern DWORD kSystemLibraryLoadFlags;
+#else
+#define kSystemLibraryLoadFlags		LOAD_LIBRARY_SEARCH_SYSTEM32
 #endif
 extern WCHAR szIniFile[MAX_PATH];
 
