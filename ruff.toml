@@ -1,0 +1,3 @@
+# https://github.com/charliermarsh/ruff#configuration
+line-length = 1024
+ignore = ['F403', 'F405']

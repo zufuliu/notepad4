@@ -1067,7 +1067,7 @@ def parse_graphviz_api_file(path):
 			keywordMap['attributes'].extend(attributes)
 			keywordMap['values'].extend(values)
 		elif key == 'color names':
-			items = [item for item in doc.split() if not item[-1] in string.digits]
+			items = [item for item in doc.split() if item[-1] not in string.digits]
 			ColorNameList.update(items)
 		elif key == 'labels':
 			labels = re.findall(r'<(\w+)', doc)

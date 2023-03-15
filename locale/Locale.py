@@ -397,7 +397,7 @@ class StringExtractor:
 							block_caption = caption
 					elif block_type == Block_StringTable:
 						lineno = self.parse_string_table_item(lineno, line, block_items)
-				except Exception as ex:
+				except Exception:
 					print(f'parse {block_type} {block_name} fail at {lineno} for {self.path}')
 					raise
 
