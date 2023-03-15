@@ -470,8 +470,8 @@ typedef struct IniKeyValueNode {
 #define IniSectionImplUseSentinelNode	1
 
 typedef struct IniSection {
-	int count;
-	int capacity;
+	UINT count;
+	UINT capacity;
 	IniKeyValueNode *head;
 #if IniSectionImplUseSentinelNode
 	IniKeyValueNode *sentinel;
@@ -479,7 +479,7 @@ typedef struct IniSection {
 	IniKeyValueNode *nodeList;
 } IniSection;
 
-NP2_inline void IniSectionInit(IniSection *section, int capacity) {
+NP2_inline void IniSectionInit(IniSection *section, UINT capacity) {
 	section->count = 0;
 	section->capacity = capacity;
 	section->head = NULL;

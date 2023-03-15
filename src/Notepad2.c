@@ -2049,9 +2049,9 @@ void CreateBars(HWND hwnd, HINSTANCE hInstance) {
 	IniSectionInit(pIniSection, COUNTOF(tbbMainWnd));
 	LoadIniSection(INI_SECTION_NAME_TOOLBAR_LABELS, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
-	const int count = pIniSection->count;
+	const UINT count = pIniSection->count;
 
-	for (int i = 0; i < count; i++) {
+	for (UINT i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		const UINT n = (UINT)wcstol(node->key, NULL, 10);
 		if (n == 0 || n >= COUNTOF(tbbMainWnd)) {

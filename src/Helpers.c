@@ -110,9 +110,9 @@ bool IniSectionParseArray(IniSection *section, LPWSTR lpCachedIniSection, BOOL q
 		return false;
 	}
 
-	const int capacity = section->capacity;
+	const UINT capacity = section->capacity;
 	LPWSTR p = lpCachedIniSection;
-	int count = 0;
+	UINT count = 0;
 
 	do {
 		LPWSTR v = StrChr(p, L'=');
@@ -143,9 +143,9 @@ bool IniSectionParse(IniSection *section, LPWSTR lpCachedIniSection) {
 		return false;
 	}
 
-	const int capacity = section->capacity;
+	const UINT capacity = section->capacity;
 	LPWSTR p = lpCachedIniSection;
-	int count = 0;
+	UINT count = 0;
 
 	do {
 		LPWSTR v = StrChr(p, L'=');
@@ -2508,10 +2508,10 @@ bool MRU_Load(LPMRULIST pmru) {
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf, pmru->iFlags & MRUFlags_QuoteValue);
-	const int count = pIniSection->count;
-	const int size = pmru->iSize;
+	const UINT count = pIniSection->count;
+	const UINT size = pmru->iSize;
 
-	for (int i = 0, n = 0; i < count && n < size; i++) {
+	for (UINT i = 0, n = 0; i < count && n < size; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {

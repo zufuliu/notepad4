@@ -820,8 +820,8 @@ static void Style_LoadAll(bool bReload) {
 		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
 		IniSectionParseArray(pIniSection, pIniSectionBuf, FALSE);
 
-		const int count = min_i(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
-		for (int i = 0; i < count; i++) {
+		const UINT count = min_u(pIniSection->count, MAX_CUSTOM_COLOR_COUNT);
+		for (UINT i = 0; i < count; i++) {
 			const IniKeyValueNode *node = &pIniSection->nodeList[i];
 			const UINT n = (UINT)(wcstol(node->key, NULL, 10) - 1);
 			LPCWSTR wch = node->value;
