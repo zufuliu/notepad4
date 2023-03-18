@@ -52,12 +52,13 @@ NULL
 "abbr accept accept-charset accesskey action allow allowfullscreen allowpaymentrequest alt as async autocapitalize autocomplete autofocus autoplay "
 "blocking border challenge charset checked cite class cols colspan command content "
 "contenteditable contextmenu controls coords crossorigin data datetime decoding default "
-"defer dir dirname disabled download draggable dropzone enctype enterkeyhint for form formaction "
+"defer dir dirname disabled download draggable dropzone enctype enterkeyhint fetchpriority for form formaction "
 "formenctype formmethod formnovalidate formtarget headers height hidden inputmode high href hreflang "
 "http-equiv icon id imagesrcset imagesizes inert integrity is ismap itemid itemprop itemref itemscope itemtype "
 "keytype kind label lang list loading longdesc loop low nonce minlength manifest max "
-"maxlength media mediagroup method min multiple muted name nomodule novalidate open "
-"optimum pattern placeholder playsinline poster preload radiogroup readonly referrerpolicy rel required "
+"maxlength media mediagroup method min multiple muted name nomodule novalidate open optimum "
+"pattern placeholder playsinline poster preload popover popoverhidetarget popovershowtarget popovertoggletarget "
+"radiogroup readonly referrerpolicy rel required "
 "rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size slot span "
 "src srcdoc srclang srcset start step style tabindex target title translate type "
 "typemustmatch usemap value width wrap "
@@ -80,7 +81,7 @@ NULL
 "urn valign valuetype version vlink vspace "
 
 , // 7 Event Handler
-"onaddtrack onabort onafterprint onauxclick onbeforematch onbeforeprint onbeforeunload onblur "
+"onaddtrack onabort onafterprint onauxclick onbeforeinput onbeforematch onbeforeprint onbeforetoggle onbeforeunload onblur "
 "oncancel oncanplay oncanplaythrough onchange onclick onclose "
 "oncontextmenu oncopy oncuechange oncut ondblclick ondrag ondragend ondragenter ondragexit ondragleave "
 "ondragover ondragstart ondrop ondurationchange onemptied onended onerror onenter onexit "
@@ -88,7 +89,7 @@ NULL
 "onfocus onformdata onhashchange oninput oninvalid onkeydown onkeypress onkeyup onlanguagechange onload onloadeddata "
 "onloadedmetadata onloadend onloadstart onmousedown onmouseenter onmouseleave onmousemove onmouseout onmouseover "
 "onmouseup onmousewheel onwheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
-"onscroll onsecuritypolicyviolation onseeked onseeking onselect onslotchange onshow onstalled onstorage onsubmit onsuspend "
+"onscroll onscrollend onsecuritypolicyviolation onseeked onseeking onselect onslotchange onshow onstalled onstorage onsubmit onsuspend "
 "ontimeupdate ontoggle onvolumechange onunhandledrejection onunload onwaiting "
 "onanimationcancel onanimationend onanimationiteration oncontextlost oncontextrestored ongotpointercapture onlostpointercapture "
 "onpointercancel onpointerdown onpointerenter onpointerleave onpointermove onpointerout onpointerover onpointerup "
@@ -96,7 +97,7 @@ NULL
 
 , // 8 Value
 // metadata names
-"application-name author description generator keywords referrer theme-color "
+"application-name author description generator keywords referrer theme-color color-scheme "
 // Link types
 "alternate canonical author bookmark dns-prefetch external help icon modulepreload license next nofollow noopener noreferrer opener "
 "pingback preconnect prefetch preload prerender prev search stylesheet tag "

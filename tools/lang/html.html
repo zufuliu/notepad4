@@ -1,10 +1,11 @@
 <!--
-https://whatwg.org/ 7 September 2022
+https://whatwg.org/ 17 March 2023
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 -->
 <!DOCTYPE html>
 <!-- Global https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
+<!-- https://html.spec.whatwg.org/multipage/popover.html#the-popover-attribute -->
 <html
 	class id slot
 	accesskey
@@ -26,6 +27,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	lang="en"
 	manifest
 	nonce
+	popover popoverhidetarget popovershowtarget popovertoggletarget
 	spellcheck
 	style
 	tabindex
@@ -37,7 +39,8 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<!-- https://html.spec.whatwg.org/multipage/semantics.html -->
 		<base href target>
 		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes
-		alternate canonical author bookmark dns-prefetch external help icon modulepreload license next nofollow noopener noreferrer opener
+		alternate canonical author bookmark dns-prefetch external help icon
+		manifest modulepreload license next nofollow noopener noreferrer opener
 		pingback preconnect prefetch preload prerender prev search stylesheet tag
 		-->
 		<link href
@@ -45,11 +48,12 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 			rel="alternate author dns-prefetch help icon license modulepreload next pingback preconnect prefetch preload prerender prev search stylesheet"
 			media integrity hreflang type="text/plain text/css"
 			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin"
-			sizes imagesrcset imagesizes as blocking color disabled>
+			sizes imagesrcset imagesizes as blocking color disabled
+			fetchpriority="high low auto">
 		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#document-metadata#standard-metadata-names
 		application-name author description generator keywords
 		referrer[never default always origin-when-crossorigin]
-		theme-color
+		theme-color color-scheme
 		-->
 		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
 			content charset="utf-8" media>
@@ -64,7 +68,9 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		onanimationend
 		onanimationiteration
 		onauxclick
-    onbeforematch
+		onbeforeinput
+		onbeforematch
+		onbeforetoggle
 		onblur*
 		oncancel
 		oncanplay
@@ -129,6 +135,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		onreset
 		onresize*
 		onscroll*
+		onscrollend*
 		onsecuritypolicyviolation
 		onseeked
 		onseeking
@@ -238,7 +245,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<!-- Embedded content https://html.spec.whatwg.org/multipage/embedded-content.html -->
 		<picture></picture>
 		<source src type srcset sizes media width height>
-		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy decoding loading>
+		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy decoding loading fetchpriority>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
 		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy loading></iframe>
 		<embed src type width height>
@@ -307,7 +314,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<dialog open></dialog>
 		<!-- Scripting https://html.spec.whatwg.org/multipage/scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
-			charset nomodule async defer crossorigin integrity referrerpolicy blocking></script>
+			charset nomodule async defer crossorigin integrity referrerpolicy blocking fetchpriority></script>
 		<noscript></noscript>
 		<template></template>
 		<slot name></slot>
