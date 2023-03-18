@@ -1,5 +1,5 @@
-// 2022 https://www.w3.org/TR/CSS/
-// 2023-01-07 https://drafts.csswg.org/
+// 2023 https://www.w3.org/TR/CSS/ 14 February 2023
+// 2023-03-18 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -10,22 +10,25 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 11 October 2018
+// CSS Animations Level 2 https://www.w3.org/TR/css-animations-2/ 2 March 2023
+// CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 2 March 2023
 @keyframes
 from to
 {
 	animation-name: none;
-	animation-duration:;
+	animation-duration: ease;
 	animation-timing-function:;
 	animation-iteration-count:;
 	animation-direction: normal | reverse | alternate | alternate-reverse;
 	animation-play-state: running | paused;
 	animation-delay:;
 	animation-fill-mode: none | forwards | backwards | both;
+	animation-composition: replace | add | accumulate;
+	animation-timeline: auto | none | scroll() | view();
 	animation:;
 }
 
-// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 26 July 2021
+// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 14 February 2023
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
 	background-color: transparent;
@@ -110,7 +113,7 @@ from to
 }
 
 // CSS Box Model Module Level 4 https://www.w3.org/TR/css-box-4/ 3 November 2022
-// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 3 November 2022
+// CSS Box Model Module Level 3 https://www.w3.org/TR/css-box-3/ 16 February 2023
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
 	margin-top: auto;
@@ -127,7 +130,7 @@ from to
 	padding: inherit;
 }
 
-// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 24 December 2021
+// CSS Box Alignment Module Level 3 https://www.w3.org/TR/css-align-3/ 17 February 2023
 {
 	align-content: normal | first | last | baseline | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end;
 	justify-content: normal | space-between | space-around | space-evenly | stretch | unsafe | safe | center | start | end | flex-start | flex-end | left | right;
@@ -148,9 +151,9 @@ from to
     place-items:;
     row-gap: normal;
     grid-row-gap: normal;
+    gap:;
     column-gap: normal;
     grid-column-gap: normal;
-    gap:;
     grid-gap:;
 }
 
@@ -306,7 +309,7 @@ var()
 	visibility: visible | hidden | collapse;
 }
 
-// CSS Easing Functions Level 1 https://www.w3.org/TR/css-easing-1/ 1 April 2021
+// CSS Easing Functions Level 1 https://www.w3.org/TR/css-easing-1/ 13 February 2023
 linear ease ease-in ease-out ease-in-out cubic-bezier()
 step-start step-end steps()
 
@@ -500,9 +503,17 @@ override-colors:;
 	grid-area: auto;
 }
 
+// CSS Images Module Level 4 https://www.w3.org/TR/css-images-4/ 7 March 2023
 // CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 17 December 2020
+url() image-set() type()
+image() ltr rtl
+cross-fade() element()
+linear-gradient() to left right top bottom
+radial-gradient() at
+conic-gradient() from at
+stripes()
 {
-	background-image: url(), linear-gradient(), radial-gradient(), repeating-linear-gradient(), repeating-radial-gradient();
+	background-image: repeating-linear-gradient(), repeating-radial-gradient(), repeating-conic-gradient();
 	object-fit: fill | contain | cover | none | scale-down;
 	object-position:;
 	image-orientation: from-image | none | flip;
@@ -749,7 +760,8 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 // CSS Namespaces Module Level 3 https://www.w3.org/TR/css3-namespace/ 20 March 2014
 @namespace ;
 
-// CSS Nesting Module https://www.w3.org/TR/css-nesting-1/ 31 August 2021
+// CSS Nesting Module https://www.w3.org/TR/css-nesting-1/ 14 February 2023
+@scope {}
 @nest {}
 
 // CSS Overflow Module Level 4 https://www.w3.org/TR/css-overflow-4/ 31 December 2022
@@ -828,7 +840,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
-// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 1 September 2022
+// CSS Positioned Layout Module Level 3 https://www.w3.org/TR/css-position-3/ 17 February 2023
 {
 	position: static | relative | absolute | sticky | fixed;
 	top: auto;
@@ -1097,7 +1109,7 @@ view()
 	spatial-navigation-function: normal | grid;
 }
 
-// CSS Speech Module https://www.w3.org/TR/css-speech-1/ 10 March 2020
+// CSS Speech Module https://www.w3.org/TR/css-speech-1/ 14 February 2023
 {
 	voice-volume: silent | x-soft | soft | medium | loud | x-loud;
 	voice-balance: left | center | right | leftwards | rightwards;
@@ -1143,8 +1155,8 @@ view()
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 31 December 2022
-// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 5 May 2022
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 1 March 2023
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 13 February 2023
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
@@ -1171,11 +1183,13 @@ view()
 	text-align: start | end | left | right | center | justify | match-parent | justify-all;
 	text-align-all: start | end | left | right | center | justify | match-parent;
 	text-align-last: auto | start | end | left | right | center | justify | match-parent;
-	text-justify: auto | none | inter-word | inter-character;
+	text-justify: auto | none | inter-word | inter-character | no-compress;
 	text-group-align: none | start | end | left | right | center;
 	word-spacing: normal;
 	letter-spacing: normal;
 	line-padding:;
+	text-autospace: normal | no-autospace | ideograph-alpha | ideograph-numeric | punctuation | insert | replace;
+	text-spacing-trim: auto | space-all | trim-auto | allow-end | space-first;
 	text-spacing: normal | none | no-compress | trim-start | space-start | space-first | trim-end | space-end | allow-end | trim-adjacent | space-adjacent | ideograph-alpha | ideograph-numeric | punctuation;
 	text-indent: hanging | each-line;
 	hanging-punctuation: none | first | force-end | allow-end | last;
