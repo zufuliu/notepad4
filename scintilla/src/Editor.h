@@ -254,6 +254,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	SelectionPosition posDrop;
 	Sci::Position hotSpotClickPos;
 	int lastXChosen;
+	int autoInsertMask;
 	Sci::Position lineAnchorPos;
 	Sci::Position originalAnchorPos;
 	Sci::Position wordSelectAnchorStartPos;

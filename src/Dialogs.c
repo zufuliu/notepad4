@@ -2431,6 +2431,7 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			autoCompletionConfig.fAutoInsertMask = mask;
 			autoCompletionConfig.iAsmLineCommentChar = GetCheckedRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT) - IDC_ASM_LINE_COMMENT_SEMICOLON;
 			EditCompleteUpdateConfig();
+			SciCall_SetAutoInsertMask(mask);
 			EndDialog(hwnd, IDOK);
 		}
 		break;

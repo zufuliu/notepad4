@@ -946,6 +946,10 @@ bool ScintillaCall::AutoCGetDropRestOfWord() {
 	return Call(Message::AutoCGetDropRestOfWord);
 }
 
+void ScintillaCall::SetAutoInsertMask(int mask) {
+	Call(Message::SetAutoInsertMask, mask);
+}
+
 void ScintillaCall::RegisterImage(int type, const char *xpmData) {
 	CallString(Message::RegisterImage, type, xpmData);
 }

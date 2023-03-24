@@ -210,6 +210,7 @@ enum class Message {
 	AutoCGetOptions = 2639,
 	AutoCSetDropRestOfWord = 2270,
 	AutoCGetDropRestOfWord = 2271,
+	SetAutoInsertMask = 2474,
 	RegisterImage = 2405,
 	ClearRegisteredImages = 2408,
 	AutoCGetTypeSeparator = 2285,

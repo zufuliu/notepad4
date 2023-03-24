@@ -1142,6 +1142,10 @@ NP2_inline void SciCall_AutoCSetMaxHeight(int rowCount) NP2_noexcept {
 	SciCall(SCI_AUTOCSETMAXHEIGHT, rowCount, 0);
 }
 
+NP2_inline void SciCall_SetAutoInsertMask(int mask) NP2_noexcept {
+	SciCall(SCI_SETAUTOINSERTMASK, mask, 0);
+}
+
 // Call tips
 
 NP2_inline void SciCall_CallTipShow(Sci_Position pos, const char *definition) NP2_noexcept {

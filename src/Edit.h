@@ -285,6 +285,16 @@ enum {
 };
 
 // auto insert
+typedef enum AutoInsertCharacter {
+	AutoInsertCharacterParenthesis,
+	AutoInsertCharacterBrace,
+	AutoInsertCharacterSquareBracket,
+	AutoInsertCharacterAngleBracket,
+	AutoInsertCharacterDoubleQuote,
+	AutoInsertCharacterSingleQuote,
+	AutoInsertCharacterBacktick,
+	AutoInsertCharacterComma,
+} AutoInsertCharacter;
 enum {
 	AutoInsertParenthesis = 1,			// ()
 	AutoInsertBrace = 2,				// {}
@@ -342,7 +352,7 @@ bool	IsDocWordChar(uint32_t ch);
 bool	IsAutoCompletionWordCharacter(uint32_t ch);
 void	EditCompleteWord(int iCondition, bool autoInsert);
 bool	EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos);
-void	EditAutoCloseBraceQuote(int ch);
+void	EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what);
 void	EditAutoCloseXMLTag(void);
 void	EditAutoIndent(void);
 void	EditToggleCommentLine(void);

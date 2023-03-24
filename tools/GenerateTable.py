@@ -40,7 +40,49 @@ def GenerateBase64Table():
 	print('base64 decoding:')
 	print('\n'.join(output))
 
+def GenerateAutoInsertMask(ignore=''):
+	items = {
+		'(': (0, ')'),
+		'{': (1, '}'),
+		'[': (2, ']'),
+		'<': (3, '>'),
+		'"': (4, '"'),
+		"'": (5, "'"),
+		'`': (6, '`'),
+		',': (7, ' '),
+	}
+	for ch in ignore:
+		del items[ch]
+
+	minCh = min(items.keys())
+	test, maxBit = 0, 0
+	extra = []
+	delta = 0
+	transform = 0
+	unique = []
+	for ch, item in items.items():
+		bit = ord(ch) - ord(minCh)
+		if bit < 64:
+			maxBit = max(bit, maxBit)
+			test |= 1 << bit
+		else:
+			extra.append((bit, ch))
+		diff = ord(item[1]) - ord(ch)
+		assert diff < 3
+		if diff > 0:
+			delta |= diff << (2*item[0])
+		if ignore:
+			diff = 3*((bit + (bit >> 5)) & 7)
+		else:
+			diff = 4*((bit + (bit >> 4)) & 15)
+		assert diff not in unique
+		unique.append(diff)
+		transform |= item[0] << diff
+	print(f'AutoInsertMask[{ignore}]:', minCh, hex(test), maxBit, extra, hex(transform), delta)
+
 if __name__ == '__main__':
 	GenerateBraceMatchTable()
 	GenerateDefaultWordCharSet()
 	GenerateBase64Table()
+	GenerateAutoInsertMask()
+	GenerateAutoInsertMask('<,')

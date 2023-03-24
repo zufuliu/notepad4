@@ -1870,6 +1870,7 @@ void EditCreate(HWND hwndParent) {
 	// Nonprinting characters
 	SciCall_SetViewWS((bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
 	SciCall_SetViewEOL(bViewEOLs);
+	SciCall_SetAutoInsertMask(autoCompletionConfig.fAutoInsertMask);
 }
 
 void EditReplaceDocument(HANDLE pdoc) {
@@ -5145,9 +5146,12 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					return 0;
 				}
 				// Auto close braces/quotes
-				if (ch == '(' || ch == '[' || ch == '{' || ch == '<' || ch == '\"' || ch == '\'' || ch == '`' || ch == ',') {
-					if (autoCompletionConfig.fAutoInsertMask) {
-						EditAutoCloseBraceQuote(ch);
+				uint32_t index = ch - '\"';
+				if (index == '{' - '\"' || (index < 63 && (UINT64_C(0x4200000004000461) & (UINT64_C(1) << index)))) {
+					index = (index + (index >> 4)) & 15;
+					index = (UINT64_C(0x102370000500064) >> (4*index)) & 15;
+					if (autoCompletionConfig.fAutoInsertMask & (1U << index)) {
+						EditAutoCloseBraceQuote(ch, (AutoInsertCharacter)index);
 					}
 					return 0;
 				}

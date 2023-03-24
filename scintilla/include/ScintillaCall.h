@@ -281,6 +281,7 @@ public:
 	Scintilla::AutoCompleteOption AutoCGetOptions();
 	void AutoCSetDropRestOfWord(bool dropRestOfWord);
 	bool AutoCGetDropRestOfWord();
+	void SetAutoInsertMask(int mask);
 	void RegisterImage(int type, const char *xpmData);
 	void ClearRegisteredImages();
 	int AutoCGetTypeSeparator();

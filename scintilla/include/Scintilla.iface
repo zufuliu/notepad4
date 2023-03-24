@@ -1100,6 +1100,9 @@ set void AutoCSetDropRestOfWord=2270(bool dropRestOfWord,)
 # after the inserted text upon completion.
 get bool AutoCGetDropRestOfWord=2271(,)
 
+# Set auto insert mask
+set void SetAutoInsertMask=2474(int mask,)
+
 # Register an XPM image for use in autocompletion lists.
 fun void RegisterImage=2405(int type, string xpmData)
 

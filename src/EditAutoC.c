@@ -1728,7 +1728,7 @@ bool EditIsOpenBraceMatched(Sci_Position pos, Sci_Position startPos) {
 	return false;
 }
 
-void EditAutoCloseBraceQuote(int ch) {
+void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) {
 	const Sci_Position iCurPos = SciCall_GetCurrentPos();
 	const int chPrev = SciCall_GetCharAt(iCurPos - 2);
 	const int chNext = SciCall_GetCharAt(iCurPos);
@@ -1756,80 +1756,59 @@ void EditAutoCloseBraceQuote(int ch) {
 		}
 	}
 
-	const int mask = autoCompletionConfig.fAutoInsertMask;
-	char fillChar = '\0';
-	bool closeBrace = false;
-	switch (ch) {
-	case '(':
-		if (mask & AutoInsertParenthesis) {
-			fillChar = ')';
-			closeBrace = true;
+	ch += (169U >> (2*what)) & 3; // 0b10101001
+	switch (what) {
+	case AutoInsertCharacterSquareBracket:
+		if (pLexCurrent->iLexer == SCLEX_SMALI) { // JVM array type
+			ch = 0;
 		}
 		break;
-	case '[':
-		if ((mask & AutoInsertSquareBracket) && !(pLexCurrent->iLexer == SCLEX_SMALI)) { // JVM array type
-			fillChar = ']';
-			closeBrace = true;
-		}
-		break;
-	case '{':
-		if (mask & AutoInsertBrace) {
-			fillChar = '}';
-			closeBrace = true;
-		}
-		break;
-	case '<':
-		if ((mask & AutoInsertAngleBracket) && IsGenericTypeStyle(iPrevStyle)) {
+	case AutoInsertCharacterAngleBracket:
+		if (!IsGenericTypeStyle(iPrevStyle)) {
 			// geriatric type, template
-			fillChar = '>';
+			ch = 0;
 		}
 		break;
-	case '\"':
-		if ((mask & AutoInsertDoubleQuote)) {
-			fillChar = '\"';
+	case AutoInsertCharacterSingleQuote:
+		if (!CanAutoCloseSingleQuote(chPrev, iPrevStyle)) {
+			ch = 0;
 		}
 		break;
-	case '\'':
-		if ((mask & AutoInsertSingleQuote) && CanAutoCloseSingleQuote(chPrev, iPrevStyle)) {
-			fillChar = '\'';
-		}
-		break;
-	case '`':
+	case AutoInsertCharacterBacktick:
 		//if (pLexCurrent->iLexer == SCLEX_BASH
 		//|| pLexCurrent->iLexer == SCLEX_JULIA
 		//|| pLexCurrent->iLexer == SCLEX_MAKEFILE
 		//|| pLexCurrent->iLexer == SCLEX_SQL
 		//) {
-		//	fillChar = '`';
+		//	ch = '`';
 		//} else if (0) {
-		//	fillChar = '\'';
+		//	ch = '\'';
 		//}
-		if ((mask & AutoInsertBacktick) && pLexCurrent->iLexer != SCLEX_VERILOG && pLexCurrent->iLexer != SCLEX_VHDL) {
-			fillChar = '`';
+		if (pLexCurrent->iLexer == SCLEX_VERILOG || pLexCurrent->iLexer == SCLEX_VHDL) {
+			ch = 0;
 		}
 		break;
-	case ',':
-		if ((mask & AutoInsertSpaceAfterComma) && !(chNext == ' ' || chNext == '\t' || (chPrev == '\'' && chNext == '\'') || (chPrev == '\"' && chNext == '\"'))) {
-			fillChar = ' ';
+	case AutoInsertCharacterComma:
+		ch = ' ';
+		if ((chNext == ' ' || chNext == '\t' || (chPrev == '\'' && chNext == '\'') || (chPrev == '\"' && chNext == '\"'))) {
+			ch = 0;
 		}
 		break;
 	default:
 		break;
 	}
 
-	if (fillChar) {
-		if (closeBrace && EditIsOpenBraceMatched(iCurPos - 1, iCurPos)) {
+	if (ch) {
+		if (what < AutoInsertCharacterAngleBracket && EditIsOpenBraceMatched(iCurPos - 1, iCurPos)) {
 			return;
 		}
 		// TODO: auto escape quotes inside string
-		//else if (ch == fillChar) {
-		//}
 
-		const char tchIns[4] = { fillChar };
+		const char tchIns[4] = { (char)(ch) };
 		SciCall_ReplaceSel(tchIns);
-		const Sci_Position iCurrentPos = (ch == ',') ? iCurPos + 1 : iCurPos;
+		const Sci_Position iCurrentPos = (what == AutoInsertCharacterComma) ? iCurPos + 1 : iCurPos;
 		SciCall_SetSel(iCurrentPos, iCurrentPos);
-		if (closeBrace) {
+		if (what < AutoInsertCharacterAngleBracket) {
 			// fix brace matching
 			SciCall_EnsureStyledTo(iCurPos + 1);
 		}
