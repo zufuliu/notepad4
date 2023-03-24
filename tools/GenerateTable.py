@@ -72,7 +72,7 @@ def GenerateAutoInsertMask(ignore=''):
 		if diff > 0:
 			delta |= diff << (2*item[0])
 		if ignore:
-			diff = 3*((bit + (bit >> 5)) & 7)
+			diff = 4*((bit + (bit >> 5)) & 7)
 		else:
 			diff = 4*((bit + (bit >> 4)) & 15)
 		assert diff not in unique

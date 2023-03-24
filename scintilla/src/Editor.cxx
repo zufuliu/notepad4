@@ -1973,7 +1973,7 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 			uint32_t index = ch - '\"';
 			if (index == '{' - '\"' || (index < 63 && (UINT64_C(0x4200000000000061) & (UINT64_C(1) << index)))) {
 				index = (index + (index >> 5)) & 7;
-				index = (0xc28284U >> (3*index)) & 7;
+				index = (0x60501204U >> (4*index)) & 15;
 				if (autoInsertMask & (1U << index)) {
 					encloseCh = ch + ((41U >> (index*2)) & 3); // 0b101001
 				}

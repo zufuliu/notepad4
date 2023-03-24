@@ -1870,14 +1870,24 @@ void EditAutoCloseXMLTag(void) {
 		if (tchBuf[iSize - 2] != '/') {
 			char tchIns[516] = "</";
 			int cchIns = 2;
-			const char *pBegin = tchBuf;
 			const char *pCur = tchBuf + iSize - 2;
-
-			while (pCur > pBegin && *pCur != '<' && *pCur != '>') {
+			while (pCur > tchBuf && *pCur != '<' && *pCur != '>') {
 				--pCur;
 			}
 
 			if (*pCur == '<') {
+				const Sci_Position iPos = iStartPos + (pCur - tchBuf);
+				const int style = SciCall_GetStyleIndexAt(iPos);
+				if (style) {
+					if (style == pLexCurrent->operatorStyle || style == pLexCurrent->operatorStyle2) {
+						return;
+					}
+					if (pLexCurrent->iLexer == SCLEX_PHPSCRIPT
+						&& (style == js_style(SCE_JS_OPERATOR) || style == js_style(SCE_JS_OPERATOR2))) {
+						return;
+					}
+				}
+
 				pCur++;
 				while (IsHtmlTagChar(*pCur)) {
 					tchIns[cchIns++] = *pCur;
