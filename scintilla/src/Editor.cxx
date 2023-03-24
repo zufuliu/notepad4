@@ -1956,18 +1956,6 @@ void Editor::FilterSelections() {
 	}
 }
 
-static constexpr char EncloseSelectionCharacter(uint8_t ch, uint32_t autoInsertMask) noexcept {
-	uint32_t index = ch - '\"';
-	if (index == '{' - '\"' || (index < 63 && (UINT64_C(0x4200000000000061) & (UINT64_C(1) << index)))) {
-		index = (index + (index >> 5)) & 7;
-		index = (0xc28284U >> (3*index)) & 7;
-		if (autoInsertMask & (1U << index)) {
-			return ch + ((41U >> (index*2)) & 3); // 0b101001
-		}
-	}
-	return '\0';
-}
-
 // InsertCharacter inserts a character encoded in document code page.
 void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	if (sv.empty()) {
@@ -1979,8 +1967,18 @@ void Editor::InsertCharacter(std::string_view sv, CharacterSource charSource) {
 	{
 		const UndoGroup ug(pdoc, (sel.Count() > 1) || !sel.Empty() || inOverstrike);
 		// enclose selection on typing punctuation, empty selection will be handled in Notification::CharAdded.
-		const char encloseCh = (charSource != CharacterSource::DirectInput || sv.length() != 1
-			|| sel.IsRectangular() || sel.Empty()) ? '\0' : EncloseSelectionCharacter(sv[0], autoInsertMask);
+		char encloseCh = '\0';
+		if (charSource == CharacterSource::DirectInput && sv.length() == 1 && !sel.Empty() && !sel.IsRectangular()) {
+			const uint8_t ch = sv[0];
+			uint32_t index = ch - '\"';
+			if (index == '{' - '\"' || (index < 63 && (UINT64_C(0x4200000000000061) & (UINT64_C(1) << index)))) {
+				index = (index + (index >> 5)) & 7;
+				index = (0xc28284U >> (3*index)) & 7;
+				if (autoInsertMask & (1U << index)) {
+					encloseCh = ch + ((41U >> (index*2)) & 3); // 0b101001
+				}
+			}
+		}
 
 		// Vector elements point into selection in order to change selection.
 		std::vector<SelectionRange *> selPtrs;
