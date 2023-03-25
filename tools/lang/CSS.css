@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 14 February 2023
-// 2023-03-18 https://drafts.csswg.org/
+// 2023-03-25 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -140,21 +140,21 @@ from to
 	place-self: auto;
 	justify-items: normal | stretch | left | right | legacy | center;
 	align-items: normal | stretch first | last | baseline | unsafe | safe | center | start | end | self-start | self-end | flex-start | flex-end;
-    align-content: normal;
-    justify-content: normal | left | right;
-    place-content: normal;
-    justify-self: auto | normal | stretch | left | right;
-    align-self: auto | normal | stretch;
-    place-self: auto;
-    justify-items: normal | stretch | left | right | legacy | center;
-    align-items: normal | stretch;
-    place-items:;
-    row-gap: normal;
-    grid-row-gap: normal;
-    gap:;
-    column-gap: normal;
-    grid-column-gap: normal;
-    grid-gap:;
+	align-content: normal;
+	justify-content: normal | left | right;
+	place-content: normal;
+	justify-self: auto | normal | stretch | left | right;
+	align-self: auto | normal | stretch;
+	place-self: auto;
+	justify-items: normal | stretch | left | right | legacy | center;
+	align-items: normal | stretch;
+	place-items:;
+	row-gap: normal;
+	grid-row-gap: normal;
+	gap:;
+	column-gap: normal;
+	grid-column-gap: normal;
+	grid-gap:;
 }
 
 // CSS Box Sizing Module Level 4 https://www.w3.org/TR/css-sizing-4/ 20 May 2021
@@ -391,6 +391,7 @@ step-start step-end steps()
 	font-size: xx-small | x-small | small | medium | large | x-large | xx-large | larger | smaller;
 	font-size-adjust: none | ex-height | cap-height | ch-width | ic-width | ic-height | from-font;
 	font: caption | icon | menu | message-box | small-caption | status-bar;
+
 	font-synthesis-weight:auto | none;
 	font-synthesis-style:auto | none;
 	font-synthesis-small-caps:auto | none;
@@ -404,6 +405,7 @@ step-start step-end steps()
 	font-variant-alternates: normal, stylistic(), historical-forms | styleset() | character-variant() | swash() | ornaments() | annotation();
 	font-variant-east-asian: normal, jis78, jis90, jis04, simplified, traditional, full-width, proportional-width | ruby;
 	font-variant: normal | none | petite-caps | all-petite-caps | unicase | titling-caps | ordinal | slashed-zero | ruby | sub | super;
+
 	font-optical-sizing: auto | none;
 	font-palette: none | normal | light | dark;
 }
@@ -433,9 +435,10 @@ step-start step-end steps()
 @swash {}
 @ornaments {}
 @annotation {}
-
-base-palette:;
-override-colors:;
+}
+@font-palette-values {
+	base-palette:;
+	override-colors:;
 }
 
 // CSS Fragmentation Module Level 4 https://www.w3.org/TR/css-break-4/ 18 December 2018
@@ -1372,4 +1375,13 @@ aural speech
 	stroke-dashoffset:;
 	stroke-dashcorner: none;
 	stroke-dashadjust: one | stretch | compress | dashes | gaps;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/@document
+@document {
+	url()
+	url-prefix()
+	domain()
+	media-document()
+	regexp()
 }

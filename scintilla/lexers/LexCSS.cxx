@@ -158,7 +158,8 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						const int chNext = sc.GetDocNextChar(sc.ch == '(');
 						if (sc.ch == '(') {
 							sc.ChangeState(SCE_CSS_FUNCTION);
-							if (StrEqual(s, "url") && !(chNext == '\'' || chNext == '\"' || (chNext == '$' && preprocessor == Preprocessor::Scss))) {
+							if (StrEqualsAny(s, "url", "url-prefix")
+								&& !(chNext == '\'' || chNext == '\"' || (chNext == '$' && preprocessor == Preprocessor::Scss))) {
 								levelNext++;
 								parenCount++;
 								sc.SetState(SCE_CSS_OPERATOR);
