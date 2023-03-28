@@ -8749,7 +8749,11 @@ void CALLBACK PasteBoardTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTi
 				SciCall_NewLine();
 			}
 			SciCall_Paste(false);
-			SciCall_NewLine();
+			const Sci_Position length = SciCall_GetLength();
+			const int ch = SciCall_GetCharAt(length - 1);
+			if (!IsEOLChar(ch)) {
+				SciCall_NewLine();
+			}
 			SciCall_EndUndoAction();
 			EditEnsureSelectionVisible();
 			autoCompletionConfig.bIndentText = back;
