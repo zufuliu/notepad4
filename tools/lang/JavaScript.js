@@ -412,6 +412,8 @@ String(value) {
 		strike()
 		sub()
 		sup()
+		trimLeft()
+		trimRight()
 
 }
 

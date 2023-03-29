@@ -90,7 +90,8 @@ NULL
 "table( tan( tanh( terminate( test( then( throw( time( timeEnd( timeLog( toArray( toDateString( toExponential( toFixed( "
 "toGMTString( toISOString( toJSON( "
 "toLocaleDateString( toLocaleLowerCase( toLocaleString( toLocaleTimeString( toLocaleUpperCase( toLowerCase( toPrecision( "
-"toString( toTimeString( toUTCString( toUpperCase( toggleAttribute( trace( trim( trimEnd( trimStart( trunc( "
+"toString( toTimeString( toUTCString( toUpperCase( toggleAttribute( "
+"trace( trim( trimEnd( trimLeft( trimRight( trimStart( trunc( "
 "ubound( unescape( unregister( unshift( valueOf( values( wait( wake( warn( write( writeln( xor( "
 
 , // 9 properties
@@ -145,7 +146,7 @@ static EDITSTYLE Styles_JS[] = {
 	{ SCE_JS_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_JS_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_JS_CONSTANT, NP2StyleX_Constant, L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_JS_COMMENTLINE, SCE_JS_COMMENTBLOCK, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ MULTI_STYLE(SCE_JS_COMMENTLINE, SCE_JS_COMMENTBLOCK, SCE_JS_HTMLCOMMENT, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_JS_COMMENTLINEDOC, SCE_JS_COMMENTBLOCKDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },
 	{ MULTI_STYLE(SCE_JS_COMMENTTAGAT, SCE_JS_COMMENTTAGXML, 0, 0), NP2StyleX_DocCommentTag, L"fore:#408080" },
 	{ SCE_JS_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
