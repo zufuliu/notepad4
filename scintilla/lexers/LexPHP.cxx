@@ -180,7 +180,7 @@ struct PHPLexer {
 	int lineContinuation = 0;
 	int propertyValue = 0;
 	int parenCount = 0;
-	int operatorBefore = 0;
+	int chBefore = 0;
 
 	PHPLexer(Sci_PositionU startPos, Sci_PositionU lengthDoc, int initStyle, Accessor &styler):
 		sc(startPos, lengthDoc, initStyle, styler) {}
@@ -224,9 +224,9 @@ struct PHPLexer {
 	bool HighlightInnerString();
 	bool HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite);
 
-	int ClassifyJSWord(LexerWordList keywordLists, int visibleChars);
+	int ClassifyJSWord(LexerWordList keywordLists);
 	void HighlightJsInnerString();
-	bool ClassifyCssWord(int chBefore);
+	bool ClassifyCssWord();
 };
 
 void PHPLexer::ClassifyHtmlTag() {
@@ -436,7 +436,7 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 				} else if (chNext == '$') {
 					// type $variable
 					sc.ChangeState(SCE_PHP_CLASS);
-				} else if (lineStateAttribute == 0 && sc.ch == ':' && visibleChars == sc.LengthCurrent()) {
+				} else if (lineStateAttribute == 0 && sc.ch == ':' && IsJumpLabelPrevChar(chBefore)) {
 					sc.ChangeState(SCE_PHP_LABEL);
 				} else if (kwType != KeywordType::None) {
 					if (kwType == KeywordType::Const) {
@@ -701,7 +701,7 @@ constexpr int GetCommentTagStyle(int state) noexcept {
 	return (state < SCE_PHP_LABEL) ? SCE_PHP_COMMENTTAGAT : js_style(SCE_JS_COMMENTTAGAT);
 }
 
-int PHPLexer::ClassifyJSWord(LexerWordList keywordLists, int visibleChars) {
+int PHPLexer::ClassifyJSWord(LexerWordList keywordLists) {
 	char s[16];
 	sc.GetCurrent(s, sizeof(s));
 	if (keywordLists[KeywordIndex_Javascript].InList(s)) {
@@ -714,11 +714,10 @@ int PHPLexer::ClassifyJSWord(LexerWordList keywordLists, int visibleChars) {
 			}
 		}
 	} else if (sc.ch == ':') {
-		if (visibleChars == sc.LengthCurrent()) {
-			const int chNext = sc.GetLineNextChar(true);
-			if (IsJumpLabelNextChar(chNext)) {
-				sc.ChangeState(js_style(SCE_JS_LABEL));
-			}
+		if (chBefore == ',' || chBefore == '{') {
+			sc.ChangeState(js_style(SCE_JS_KEY));
+		} else if (IsJumpLabelPrevASI(chBefore)) {
+			sc.ChangeState(js_style(SCE_JS_LABEL));
 		}
 	} else {
 		const int chNext = sc.GetDocNextChar();
@@ -768,7 +767,7 @@ void PHPLexer::HighlightJsInnerString() {
 	} else {
 		if (sc.ch == ((sc.state == js_style(SCE_JS_STRING_SQ) ? '\'' : '\"'))) {
 			sc.Forward();
-			if (operatorBefore == ',' || operatorBefore == '{') {
+			if (chBefore == ',' || chBefore == '{') {
 				// json key
 				const int chNext = sc.GetLineNextChar();
 				if (chNext == ':') {
@@ -780,7 +779,7 @@ void PHPLexer::HighlightJsInnerString() {
 	}
 }
 
-bool PHPLexer::ClassifyCssWord(int chBefore) {
+bool PHPLexer::ClassifyCssWord() {
 	char s[16];
 	sc.GetCurrentLowered(s, sizeof(s));
 	const int chNext = sc.GetDocNextChar(sc.ch == '(');
@@ -830,7 +829,6 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
-	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_H_DEFAULT;
 	DocTagState docTagState = DocTagState::None;
@@ -1125,7 +1123,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (sc.Match('\\', 'u')) {
 				sc.Forward();
 			} else if (!IsJsIdentifierChar(sc.ch)) {
-				stylePrevNonWhite = lexer.ClassifyJSWord(keywordLists, visibleChars);
+				stylePrevNonWhite = lexer.ClassifyJSWord(keywordLists);
 			}
 			break;
 
@@ -1171,7 +1169,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case css_style(SCE_CSS_PSEUDOCLASS):
 		case css_style(SCE_CSS_PSEUDOELEMENT):
 			if (!IsCssIdentifierChar(sc.ch)) {
-				if (sc.state == css_style(SCE_CSS_IDENTIFIER) && lexer.ClassifyCssWord(chBefore)) {
+				if (sc.state == css_style(SCE_CSS_IDENTIFIER) && lexer.ClassifyCssWord()) {
 					continue;
 				}
 
@@ -1332,6 +1330,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				escSeq.outerState = SCE_PHP_DEFAULT;
 				sc.SetState(SCE_PHP_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				lexer.chBefore = chPrevNonWhite;
 				sc.SetState(SCE_PHP_IDENTIFIER);
 			} else if (IsAGraphic(sc.ch)) {
 				if (lexer.HighlightOperator(HtmlTextBlock::PHP, stylePrevNonWhite)) {
@@ -1366,7 +1365,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					sc.SetState(js_style(SCE_JS_OPERATOR));
 				}
 			} else if (sc.ch == '\'' || sc.ch == '\"') {
-				lexer.operatorBefore = (stylePrevNonWhite == js_style(SCE_JS_OPERATOR)) ? chPrevNonWhite : 0;
+				lexer.chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '\'') ? js_style(SCE_JS_STRING_SQ) : js_style(SCE_JS_STRING_DQ));
 			} else if (sc.ch == '`') {
 				sc.SetState(js_style(SCE_JS_STRING_BT));
@@ -1374,6 +1373,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				escSeq.outerState = js_style(SCE_JS_DEFAULT);
 				sc.SetState(js_style(SCE_JS_NUMBER));
 			} else if (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u')) {
+				lexer.chBefore = chPrevNonWhite;
 				sc.SetState(js_style(SCE_JS_IDENTIFIER));
 			} else if (sc.ch == '+' || sc.ch == '-') {
 				if (sc.ch == sc.chNext) {
@@ -1414,7 +1414,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(css_style(SCE_CSS_UNICODE_RANGE));
 				sc.Forward();
 			} else if (IsCssIdentifierStart(sc.ch, sc.chNext)) {
-				chBefore = chPrevNonWhite;
+				lexer.chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '@') ? css_style(SCE_CSS_AT_RULE) : css_style(SCE_CSS_IDENTIFIER));
 			} else if (sc.Match(':', ':') && IsCssIdentifierNext(sc.GetRelative(2))) {
 				sc.SetState(css_style(SCE_CSS_PSEUDOELEMENT));

@@ -382,7 +382,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	KeywordType kwType = KeywordType::None;
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
-	int operatorBefore = 0;
+	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_PY_DEFAULT;
 	int prevIndentCount = 0;
@@ -539,7 +539,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							nestedState.pop_back();
 						}
 						if ((sc.state == SCE_PY_STRING_SQ || sc.state == SCE_PY_STRING_DQ)
-							&& (operatorBefore == ',' || operatorBefore == '{')) {
+							&& (chBefore == ',' || chBefore == '{')) {
 							// dict string key
 							const int chNext = sc.GetLineNextChar();
 							if (chNext == ':') {
@@ -765,7 +765,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.SetState((sc.ch == '\'') ? SCE_PY_TRIPLE_STRING_SQ : SCE_PY_TRIPLE_STRING_DQ);
 					sc.Advance(2);
 				} else {
-					operatorBefore = (stylePrevNonWhite == SCE_PY_OPERATOR) ? chPrevNonWhite : 0;
+					chBefore = chPrevNonWhite;
 					sc.SetState((sc.ch == '\'') ? SCE_PY_STRING_SQ : SCE_PY_STRING_DQ);
 				}
 			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {

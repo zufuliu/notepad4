@@ -131,7 +131,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
-	int operatorBefore = 0;
+	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_JS_DEFAULT;
 	DocTagState docTagState = DocTagState::None;
@@ -236,11 +236,10 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 						sc.ChangeState(SCE_JS_CONSTANT);
 					} else if (sc.ch == ':') {
-						if (visibleChars == sc.LengthCurrent()) {
-							const int chNext = sc.GetLineNextChar(true);
-							if (IsJumpLabelNextChar(chNext)) {
-								sc.ChangeState(SCE_JS_LABEL);
-							}
+						if (chBefore == ',' || chBefore == '{') {
+							sc.ChangeState(SCE_JS_KEY);
+						} else if (IsJumpLabelPrevASI(chBefore)) {
+							sc.ChangeState(SCE_JS_LABEL);
 						}
 					} else if (sc.ch != '.') {
 						if (kwType != KeywordType::None) {
@@ -297,7 +296,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if ((sc.ch == '\'' && (sc.state == SCE_JS_STRING_SQ || sc.state == SCE_JSX_STRING_SQ))
 				|| (sc.ch == '"' && (sc.state == SCE_JS_STRING_DQ || sc.state == SCE_JSX_STRING_DQ))) {
 				sc.Forward();
-				if (operatorBefore == ',' || operatorBefore == '{') {
+				if (chBefore == ',' || chBefore == '{') {
 					// json key
 					const int chNext = sc.GetLineNextChar();
 					if (chNext == ':') {
@@ -450,7 +449,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.ForwardSetState(SCE_JSX_TEXT);
 				continue;
 			} else if ((sc.ch == '\'' || sc.ch == '\"') && insideJsxTag) {
-				operatorBefore = 0;
+				chBefore = 0;
 				sc.SetState((sc.ch == '\'') ? SCE_JSX_STRING_SQ : SCE_JSX_STRING_DQ);
 			} else if (insideJsxTag && (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u'))) {
 				sc.SetState(SCE_JSX_ATTRIBUTE);
@@ -498,7 +497,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				}
 			}
 			else if (sc.ch == '\'' || sc.ch == '\"') {
-				operatorBefore = (stylePrevNonWhite == SCE_JS_OPERATOR) ? chPrevNonWhite : 0;
+				chBefore = chPrevNonWhite;
 				sc.SetState((sc.ch == '\'') ? SCE_JS_STRING_SQ : SCE_JS_STRING_DQ);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_JS_STRING_BT);
@@ -507,6 +506,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (sc.ch == '@' && IsJsIdentifierStartNext(sc)) {
 				sc.SetState((sc.chPrev == '.') ? SCE_JSX_ATTRIBUTE_AT : SCE_JS_DECORATOR);
 			} else if (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u')) {
+				chBefore = chPrevNonWhite;
 				if (sc.chPrev != '.') {
 					chBeforeIdentifier = sc.chPrev;
 				}

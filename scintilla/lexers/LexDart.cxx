@@ -114,11 +114,17 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		if (lineState) {
 			UnpackLineState(lineState, nestedState);
 		}
-	} else if (startPos == 0 && sc.Match('#', '!')) {
-		// Shell Shebang at beginning of file
-		sc.SetState(SCE_DART_COMMENTLINE);
-		sc.Forward();
-		lineStateLineType = DartLineStateMaskLineComment;
+	}
+	if (startPos == 0) {
+		if (sc.Match('#', '!')) {
+			// Shell Shebang at beginning of file
+			sc.SetState(SCE_DART_COMMENTLINE);
+			sc.Forward();
+			lineStateLineType = DartLineStateMaskLineComment;
+		}
+	} else if (IsSpaceEquiv(initStyle)) {
+		int stylePrevNonWhite = SCE_DART_DEFAULT;
+		LookbackNonWhite(styler, startPos, SCE_DART_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
 	}
 
 	while (sc.More()) {
@@ -186,11 +192,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (keywordLists[KeywordIndex_Enumeration].InList(s)) {
 						sc.ChangeState(SCE_DART_ENUM);
 					} else if (sc.ch == ':') {
-						if (visibleChars == sc.LengthCurrent()) {
-							const int chNext = sc.GetLineNextChar(true);
-							if (IsJumpLabelNextChar(chNext)) {
-								sc.ChangeState(SCE_DART_LABEL);
-							}
+						if (IsJumpLabelPrevChar(chBefore)) {
+							sc.ChangeState(SCE_DART_LABEL);
 						}
 					} else if (sc.ch != '.') {
 						if (kwType > KeywordType::None && kwType < KeywordType::Return) {

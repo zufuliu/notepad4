@@ -259,10 +259,16 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int chBefore = 0;
+	int chPrevNonWhite = 0;
 	bool insideUrl = false;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
+	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
+		int stylePrevNonWhite = SCE_GO_DEFAULT;
+		LookbackNonWhite(styler, startPos, SCE_GO_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+	}
 
 	Sci_Position identifierStartPos = 0;
 	Sci_Position lineStartCurrent = styler.LineStart(sc.currentLine);
@@ -318,14 +324,13 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					sc.ChangeState(SCE_GO_INTERFACE);
 				} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 					sc.ChangeState(SCE_GO_CONSTANT);
+				} else if (sc.ch == ':') {
+					if (sc.chNext != '=' && IsJumpLabelPrevASI(chBefore)) {
+						sc.ChangeState(SCE_GO_LABEL);
+					}
 				} else {
-					const bool ignoreCurrent = sc.ch == ':' && visibleChars == sc.LengthCurrent();
-					const int chNext = sc.GetLineNextChar(ignoreCurrent);
-					if (ignoreCurrent) {
-						if (IsJumpLabelNextChar(chNext)) {
-							sc.ChangeState(SCE_GO_LABEL);
-						}
-					} else if (chNext == '(') {
+					const int chNext = sc.GetLineNextChar();
+					if (chNext == '(') {
 						if (funcState != GoFunction::None) {
 							funcState = GoFunction::Name;
 							sc.ChangeState(SCE_GO_FUNCTION_DEFINITION);
@@ -467,6 +472,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_GO_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				chBefore = chPrevNonWhite;
 				if (sc.chPrev != '.') {
 					identifierStartPos = sc.currentPos;
 				}
@@ -511,6 +517,9 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+			}
 		}
 		if (sc.atLineEnd) {
 			styler.SetLineState(sc.currentLine, lineStateLineComment);

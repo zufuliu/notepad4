@@ -403,13 +403,12 @@ constexpr bool IsInvalidUrlChar(int ch) noexcept {
 	return ch <= 32 || AnyOf(ch, '"', '<', '>', '\\', '^', '`', '{', '|', '}', 127);
 }
 
-// characters can follow jump `label:`, based on Swift's document Labeled Statement at
-// https://docs.swift.org/swift-book/ReferenceManual/Statements.html#grammar_labeled-statement
-// good coding style should place left aligned label on it's own line.
-constexpr bool IsJumpLabelNextChar(int chNext) noexcept {
-	// own line, comment, for, foreach, while, do, if, switch, repeat
-	// TODO: match each word exactly like HighlightTaskMarker().
-	return AnyOf(chNext, '\0', '/', 'f', 'w', 'd', 'i', 's', 'r');
+constexpr bool IsJumpLabelPrevChar(int chPrev) noexcept {
+	return chPrev == ';' || chPrev == '{' || chPrev == '}';
+}
+constexpr bool IsJumpLabelPrevASI(int chPrev) noexcept {
+	// TODO: automatic semicolon insertion
+	return chPrev == ';' || chPrev == '{' || chPrev == '}' || chPrev == ')' || chPrev == ']';
 }
 
 constexpr bool IsInterfaceName(char ch, char chNext) noexcept {

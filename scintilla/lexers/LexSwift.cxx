@@ -126,6 +126,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int chBefore = 0;
 	int chPrevNonWhite = 0;
 	int stylePrevNonWhite = SCE_SWIFT_DEFAULT;
 	bool insideRegexRange = false; // inside regex character range []
@@ -225,11 +226,8 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 				if (sc.state == SCE_SWIFT_IDENTIFIER || sc.state == SCE_SWIFT_IDENTIFIER_BT) {
 					if (sc.ch == ':') {
-						if (visibleChars == sc.LengthCurrent()) {
-							const int chNext = sc.GetLineNextChar(true);
-							if (IsJumpLabelNextChar(chNext)) {
-								sc.ChangeState(SCE_SWIFT_LABEL);
-							}
+						if (IsJumpLabelPrevASI(chBefore)) {
+							sc.ChangeState(SCE_SWIFT_LABEL);
 						}
 					} else if (sc.ch != '.') {
 						if (kwType != KeywordType::None) {
@@ -402,6 +400,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_SWIFT_NUMBER);
 			} else if ((sc.ch == '@' || sc.ch == '`') && IsIdentifierStartEx(sc.chNext)) {
+				chBefore = chPrevNonWhite;
 				if (sc.chPrev != '.') {
 					chBeforeIdentifier = sc.chPrev;
 				}
@@ -427,6 +426,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 				}
 			} else if (IsIdentifierStartEx(sc.ch)) {
+				chBefore = chPrevNonWhite;
 				if (sc.chPrev != '.') {
 					chBeforeIdentifier = sc.chPrev;
 				}

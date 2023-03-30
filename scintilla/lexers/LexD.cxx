@@ -311,11 +311,17 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		*/
 		asmState = static_cast<InlineAssembler>((lineState >> 3) & 3);
 		nestedLevel = (lineState >> 8) & 0xff;
-	} else if (startPos == 0 && sc.Match('#', '!')) {
-		// Shell Shebang at beginning of file
-		sc.SetState(SCE_D_COMMENTLINE);
-		sc.Forward();
-		lineStateLineType = DLineStateMaskLineComment;
+	}
+	if (startPos == 0) {
+		if (sc.Match('#', '!')) {
+			// Shell Shebang at beginning of file
+			sc.SetState(SCE_D_COMMENTLINE);
+			sc.Forward();
+			lineStateLineType = DLineStateMaskLineComment;
+		}
+	} else if (IsSpaceEquiv(initStyle)) {
+		int stylePrevNonWhite = SCE_D_DEFAULT;
+		LookbackNonWhite(styler, startPos, SCE_D_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
 	}
 
 	while (sc.More()) {
@@ -393,7 +399,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 							sc.ChangeState((sc.ch == ':')? SCE_D_LABEL : SCE_D_ASM_INSTRUCTION);
 						}
 					} else if (sc.ch == ':') {
-						if (visibleChars == sc.LengthCurrent()) {
+						if (IsJumpLabelPrevChar(chBefore)) {
 							sc.ChangeState(SCE_D_LABEL);
 						}
 					} else if (sc.ch != '.') {

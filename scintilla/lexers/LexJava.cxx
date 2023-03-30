@@ -195,11 +195,16 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
-	if (startPos == 0 && sc.Match('#', '!')) {
-		// Shell Shebang at beginning of file
-		sc.SetState(SCE_JAVA_COMMENTLINE);
-		sc.Forward();
-		lineStateLineType = JavaLineStateMaskLineComment;
+	if (startPos == 0) {
+		if (sc.Match('#', '!')) {
+			// Shell Shebang at beginning of file
+			sc.SetState(SCE_JAVA_COMMENTLINE);
+			sc.Forward();
+			lineStateLineType = JavaLineStateMaskLineComment;
+		}
+	} else if (IsSpaceEquiv(initStyle)) {
+		int stylePrevNonWhite = SCE_JAVA_DEFAULT;
+		LookbackNonWhite(styler, startPos, SCE_JAVA_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
 	}
 
 	while (sc.More()) {
@@ -283,7 +288,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						if (sc.chNext == ':') {
 							// type::method
 							sc.ChangeState(SCE_JAVA_CLASS);
-						} else if (visibleChars == sc.LengthCurrent()) {
+						} else if (IsJumpLabelPrevChar(chBefore)) {
 							sc.ChangeState(SCE_JAVA_LABEL);
 						}
 					} else if (sc.ch != '.') {

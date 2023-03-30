@@ -229,11 +229,17 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 		stringDelimiterCount = (lineState >> 4) & 0xff;
 		stringInterpolatorCount = (lineState >> 12) & 0xff;
 		parenCount = lineState >> 20;
-	} else if (startPos == 0 && sc.Match('#', '!')) {
-		// Shell Shebang at beginning of file
-		sc.SetState(SCE_CSHARP_COMMENTLINE);
-		sc.Forward();
-		lineStateLineType = CSharpLineStateMaskLineComment;
+	}
+	if (startPos == 0) {
+		if (sc.Match('#', '!')) {
+			// Shell Shebang at beginning of file
+			sc.SetState(SCE_CSHARP_COMMENTLINE);
+			sc.Forward();
+			lineStateLineType = CSharpLineStateMaskLineComment;
+		}
+	} else if (IsSpaceEquiv(initStyle)) {
+		int stylePrevNonWhite = SCE_CSHARP_DEFAULT;
+		LookbackNonWhite(styler, startPos, SCE_CSHARP_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
 	}
 
 	while (sc.More()) {
@@ -338,7 +344,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 				if (ppKind == PreprocessorKind::None && sc.state == SCE_CSHARP_IDENTIFIER) {
 					if (sc.ch == ':') {
-						if (parenCount == 0 && visibleChars == sc.LengthCurrent()) {
+						if (parenCount == 0 && IsJumpLabelPrevChar(chBefore)) {
 							sc.ChangeState(SCE_CSHARP_LABEL);
 						} else if (chBefore == '[') {
 							// [target: Attribute]
