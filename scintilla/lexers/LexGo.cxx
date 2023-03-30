@@ -325,8 +325,12 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				} else if (keywordLists[KeywordIndex_Constant].InList(s)) {
 					sc.ChangeState(SCE_GO_CONSTANT);
 				} else if (sc.ch == ':') {
-					if (sc.chNext != '=' && IsJumpLabelPrevASI(chBefore)) {
-						sc.ChangeState(SCE_GO_LABEL);
+					if (sc.chNext != '=') {
+						if (chBefore == ',' || chBefore == '{') {
+							sc.ChangeState(SCE_GO_KEY);
+						} else if (IsJumpLabelPrevASI(chBefore)) {
+							sc.ChangeState(SCE_GO_LABEL);
+						}
 					}
 				} else {
 					const int chNext = sc.GetLineNextChar();
@@ -421,7 +425,14 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					continue;
 				}
 			} else if ((sc.state == SCE_GO_STRING && sc.ch == '\"') || (sc.state == SCE_GO_RAW_STRING && sc.ch == '`')) {
-				sc.ForwardSetState(SCE_GO_DEFAULT);
+				sc.Forward();
+				if (sc.state == SCE_GO_STRING && (chBefore == ',' || chBefore == '{')) {
+					const int chNext = sc.GetLineNextChar();
+					if (chNext == ':') {
+						sc.ChangeState(SCE_GO_KEY);
+					}
+				}
+				sc.SetState(SCE_GO_DEFAULT);
 			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
 				insideUrl = true;
 			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
@@ -463,6 +474,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.Forward();
 			} else if (sc.ch == '\"') {
 				insideUrl = false;
+				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_GO_STRING);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_GO_CHARACTER);
