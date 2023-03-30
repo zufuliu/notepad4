@@ -853,11 +853,19 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			sc.SetState(SCE_PHP_COMMENTLINE);
 			sc.Forward();
 		}
-	} else if (IsJsSpaceEquiv(initStyle)) {
+	} else {
+		unsigned marker = SCE_H_DEFAULT;
 		// look back for better regex colouring
-		LookbackNonWhite(styler, startPos, js_style(SCE_JS_TASKMARKER), chPrevNonWhite, stylePrevNonWhite);
-	} else if (IsCssSpaceEquiv(initStyle)) {
-		LookbackNonWhite(styler, startPos, css_style(SCE_CSS_CDO_CDC), chPrevNonWhite, stylePrevNonWhite);
+		if (IsJsSpaceEquiv(initStyle)) {
+			marker = (js_style(SCE_JS_DEFAULT) << 8) | js_style(SCE_JS_TASKMARKER);
+		} else if (IsCssSpaceEquiv(initStyle)) {
+			marker = (css_style(SCE_CSS_DEFAULT) << 8) | css_style(SCE_CSS_CDO_CDC);
+		} else if (IsSpaceEquiv(initStyle)) {
+			marker = (SCE_PHP_DEFAULT << 8) | SCE_PHP_TASKMARKER;
+		}
+		if (marker != SCE_H_DEFAULT) {
+			LookbackNonWhite(styler, startPos, marker, chPrevNonWhite, stylePrevNonWhite);
+		}
 	}
 
 	while (sc.More()) {

@@ -77,8 +77,7 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		lineState &= VHDLLineStateMaskAttribute | VHDLLineStateMaskCodeFolding;
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
-		int stylePrevNonWhite = SCE_VHDL_DEFAULT;
-		LookbackNonWhite(styler, startPos, SCE_VHDL_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_VHDL_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	while (sc.More()) {

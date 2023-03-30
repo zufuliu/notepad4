@@ -123,8 +123,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			lineStateLineType = DartLineStateMaskLineComment;
 		}
 	} else if (IsSpaceEquiv(initStyle)) {
-		int stylePrevNonWhite = SCE_DART_DEFAULT;
-		LookbackNonWhite(styler, startPos, SCE_DART_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_DART_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	while (sc.More()) {

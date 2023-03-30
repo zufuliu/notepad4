@@ -238,8 +238,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			lineStateLineType = CSharpLineStateMaskLineComment;
 		}
 	} else if (IsSpaceEquiv(initStyle)) {
-		int stylePrevNonWhite = SCE_CSHARP_DEFAULT;
-		LookbackNonWhite(styler, startPos, SCE_CSHARP_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_CSHARP_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	while (sc.More()) {

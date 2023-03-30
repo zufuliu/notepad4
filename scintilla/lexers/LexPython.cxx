@@ -384,7 +384,6 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int visibleCharsBefore = 0;
 	int chBefore = 0;
 	int chPrevNonWhite = 0;
-	int stylePrevNonWhite = SCE_PY_DEFAULT;
 	int prevIndentCount = 0;
 	int indentCount = 0;
 	int parenCount = 0;
@@ -413,7 +412,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	}
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
 		// look back for better dict key colouring
-		LookbackNonWhite(styler, startPos, SCE_PY_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_PY_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	while (sc.More()) {
@@ -834,7 +833,6 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			visibleChars++;
 			if (!IsSpaceEquiv(sc.state)) {
 				chPrevNonWhite = sc.ch;
-				stylePrevNonWhite = sc.state;
 			}
 		}
 		if (sc.atLineEnd) {

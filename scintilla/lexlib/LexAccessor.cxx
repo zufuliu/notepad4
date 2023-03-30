@@ -247,13 +247,18 @@ void BacktrackToStart(const LexAccessor &styler, int stateMask, Sci_PositionU &s
 	}
 }
 
-Sci_PositionU LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, int maxSpaceStyle, int &chPrevNonWhite, int &stylePrevNonWhite) noexcept {
-	 do {
+Sci_PositionU LookbackNonWhite(LexAccessor &styler, Sci_PositionU startPos, unsigned maxSpaceStyle, int &chPrevNonWhite, int &stylePrevNonWhite) noexcept {
+	const unsigned startStyle = maxSpaceStyle >> 8;
+	maxSpaceStyle &= 0xff;
+	do {
 		--startPos;
-		const int style = styler.StyleAt(startPos);
+		const unsigned style = styler.StyleAt(startPos);
 		if (style > maxSpaceStyle) {
 			stylePrevNonWhite = style;
 			chPrevNonWhite = static_cast<unsigned char>(styler[startPos]);
+			break;
+		}
+		if (style < startStyle) {
 			break;
 		}
 	} while (startPos != 0);

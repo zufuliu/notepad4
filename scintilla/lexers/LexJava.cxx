@@ -203,8 +203,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			lineStateLineType = JavaLineStateMaskLineComment;
 		}
 	} else if (IsSpaceEquiv(initStyle)) {
-		int stylePrevNonWhite = SCE_JAVA_DEFAULT;
-		LookbackNonWhite(styler, startPos, SCE_JAVA_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_JAVA_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	while (sc.More()) {

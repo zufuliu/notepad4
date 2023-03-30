@@ -320,8 +320,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			lineStateLineType = DLineStateMaskLineComment;
 		}
 	} else if (IsSpaceEquiv(initStyle)) {
-		int stylePrevNonWhite = SCE_D_DEFAULT;
-		LookbackNonWhite(styler, startPos, SCE_D_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_D_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	while (sc.More()) {

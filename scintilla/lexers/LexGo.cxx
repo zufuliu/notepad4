@@ -266,8 +266,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
 	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
-		int stylePrevNonWhite = SCE_GO_DEFAULT;
-		LookbackNonWhite(styler, startPos, SCE_GO_TASKMARKER, chPrevNonWhite, stylePrevNonWhite);
+		LookbackNonWhite(styler, startPos, SCE_GO_TASKMARKER, chPrevNonWhite, initStyle);
 	}
 
 	Sci_Position identifierStartPos = 0;
