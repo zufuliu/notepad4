@@ -1,4 +1,4 @@
-// Java SE 18 https://docs.oracle.com/en/java/javase/index.html
+// Java SE 20 https://docs.oracle.com/en/java/javase/index.html
 // JDK https://openjdk.java.net/projects/
 // https://docs.oracle.com/javase/specs/index.html
 // https://github.com/beanshell/beanshell/wiki/Basic-syntax
@@ -53,7 +53,7 @@ provides with
 transitive static
 
 //! API				===========================================================
-// https://docs.oracle.com/en/java/javase/18/docs/api/index.html
+// https://docs.oracle.com/en/java/javase/20/docs/api/index.html
 
 module java.base {
 
@@ -588,7 +588,7 @@ module gradle {
 }
 
 //! Javadoc			===========================================================
-// https://docs.oracle.com/en/java/javase/18/docs/specs/javadoc/doc-comment-spec.html
+// https://docs.oracle.com/en/java/javase/20/docs/specs/javadoc/doc-comment-spec.html
 /**
  * @author name-text
  * {@code text}
@@ -616,11 +616,17 @@ module gradle {
  * @since since-text
  * {@snippet attributes }									JDK 18
  * {@snippet attributes: body }								JDK 18
+ * 	@start													JDK 18
+ * 	@highlight												JDK 18
+ * 	@replace												JDK 18
+ * 	@link													JDK 18
+ * 	@end													JDK 18
+ * @spec URL title											JDK 20
  * {@summary text }											JDK 10
  * {@systemProperty property-name }							JDK 12
  * @throws class-name description
  * @uses service-type description							JDK 9
- * {@value package.class#field}
+ * {@value format field-reference }
  * @version version-text
  *
  * used by Android
