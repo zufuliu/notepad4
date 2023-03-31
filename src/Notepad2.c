@@ -3150,7 +3150,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
 			iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
-			EditJumpTo(iCurLine, iCol);
+			EditJumpTo(iCurLine + 1, iCol);
 		} else {
 			SciCall_Cut(false);
 		}
