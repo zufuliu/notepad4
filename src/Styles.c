@@ -2496,7 +2496,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 				pLexNew = &lexINI;
 #endif
 			} else {
-				pLexNew = &lexTextFile;
+				//pLexNew = &lexTextFile;
 			}
 			return pLexNew;
 		}
