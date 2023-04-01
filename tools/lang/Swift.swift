@@ -1,11 +1,10 @@
-// 5.7 https://docs.swift.org/
-// https://docs.swift.org/swift-book/
+// 5.8 https://www.swift.org/
 // https://swift.org/documentation/
 // https://github.com/apple/swift
 
 //! keywords		===========================================================
 // Keywords and Punctuation
-// https://docs.swift.org/swift-book/ReferenceManual/LexicalStructure.html
+// https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure
 // Keywords used in declarations
 associatedtype
 class
@@ -35,7 +34,7 @@ switch
 where while
 
 // Keywords used in expressions and types
-Any as
+Any as await
 catch
 false
 is
@@ -63,12 +62,15 @@ Type
 unowned
 weak willSet
 
-async await
+// Asynchronous Functions and Methods
+async
+// Actor Declaration
+actor nonisolated
 
 //! directive		===========================================================
 // Keywords that begin with a number sign
 // Compiler Control Statements
-// https://docs.swift.org/swift-book/ReferenceManual/Statements.html
+// https://docs.swift.org/swift-book/documentation/the-swift-programming-language/statements#Compiler-Control-Statements
 #if
 #elseif
 #else
@@ -79,7 +81,7 @@ async await
 #available(availability-arguments)
 
 // Literal Expression
-// https://docs.swift.org/swift-book/ReferenceManual/Expressions.html
+// https://docs.swift.org/swift-book/documentation/the-swift-programming-language/expressions#Literal-Expression
 #file
 #fileID
 #filePath
@@ -100,7 +102,7 @@ async await
 #keyPath(property name)
 
 //! attribute		===========================================================
-// https://docs.swift.org/swift-book/ReferenceManual/Attributes.html
+// https://docs.swift.org/swift-book/documentation/the-swift-programming-language/attributes
 // Declaration Attributes
 @available()
 @discardableResult
@@ -121,6 +123,7 @@ async await
 @requires_stored_property_inits
 @testable
 @UIApplicationMain
+@unchecked
 @usableFromInline
 @warn_unqualified_access
 
@@ -128,13 +131,14 @@ async await
 @autoclosure
 @convention
 @escaping
+@Sendable
 
 // Switch Case Attributes
 @unknown
 
 //! library			===========================================================
 // Swift Standard Library
-// https://developer.apple.com/documentation/swift/swift_standard_library/
+// https://developer.apple.com/documentation/swift/swift-standard-library
 // Numbers and Basic Values
 @frozen struct Bool
 @frozen struct Int
