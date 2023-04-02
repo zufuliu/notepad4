@@ -191,11 +191,33 @@ def group_powershell_commands(path):
 				fd.write(f'\t{category}\t\t{name}\n')
 			fd.write('}\n')
 
+def find_new_texinfo_commands(path, lang):
+	with open(lang, encoding='utf-8') as fd:
+		doc = fd.read()
+	existing = set(re.findall(r'@(\w+)', doc))
+	with open(path, encoding='utf-8') as fd:
+		doc = fd.read()
+
+	doc = re.sub(r'@c\W.+', '', doc)
+	doc = re.sub(r'@comment\W.+', '', doc)
+	macros = re.findall(r'@r?macro\s+(\w+)', doc)
+	macros.extend(re.findall(r'@alias\s+(\w+)', doc))
+	commands = re.findall(r'@(\w+)', doc)
+	commands = set(commands) - set(macros)
+	with open('texinfo-new.texi', 'w', encoding='utf-8') as fd:
+		doc = '\n@'.join(sorted(commands - existing))
+		fd.write('mew commands:\n')
+		fd.write(f'@{doc}\n')
+		fd.write('\nunknown commands:\n')
+		doc = '\n@'.join(sorted(existing - commands))
+		fd.write(f'@{doc}\n')
+
 #increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
-check_encoding_list('../src/EditEncoding.c')
+#check_encoding_list('../src/EditEncoding.c')
 #diff_iso_encoding('iso-8859.log')
 
 # https://www.w3.org/Style/CSS/all-properties.en.json
 #dump_all_css_properties('all-properties.en.json', 'property', 'title', 'url')
 # https://www.w3.org/Style/CSS/all-descriptors.en.json
 #dump_all_css_properties('all-descriptors.en.json', 'descriptor', 'specification', 'URL')
+#find_new_texinfo_commands(r'texinfo.texi', 'lang/Texinfo.texi')

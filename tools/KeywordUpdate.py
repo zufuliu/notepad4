@@ -92,7 +92,7 @@ lexerList = [
 	('NP2LEX_SWIFT', 'stlSwift.c', 'LexSwift.cxx', 'Swift.swift', 0, parse_swift_api_file),
 
 	('NP2LEX_TCL', 'stlTcl.c', 'LexTCL.cxx', '', 0, None),
-	('NP2LEX_TEXINFO', 'stlTexinfo.c', 'LexTexinfo.cxx', '', 0, None),
+	('NP2LEX_TEXINFO', 'stlTexinfo.c', 'LexTexinfo.cxx', 'Texinfo.texi', 0, parse_texinfo_api_file),
 	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, parse_toml_api_file),
 
 	('NP2LEX_VBSCRIPT', 'stlVBS.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),

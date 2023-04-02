@@ -1,0 +1,471 @@
+\input macro-definitions-file
+@c 7.0.3 https://www.gnu.org/software/texinfo/
+@c https://www.gnu.org/software/texinfo/manual/texinfo/html_node/Command-List.html
+
+@chapter A
+@ampchar{}
+@atchar{}
+@backslashchar{}
+@lbracechar{}
+@rbracechar{}
+@AA{}
+@aa{}
+@abbr{abbreviation}
+@acronym{acronym}
+@AE{}
+@ae{}
+@afivepaper
+@afourlatex
+@afourpaper
+@afourwide
+@alias new=existing
+@allowcodebreaks true-false
+@anchor{name}
+
+@appendix title
+@appendixsec title
+@appendixsection title
+@appendixsubsec title
+@appendixsubsubsec title
+@arrow{}
+@asis
+@author author
+
+@chapter B
+@b{text}
+@bullet{}
+@bsixpaper
+@bye
+
+@chapter C
+@c comment
+@caption
+@cartouche
+@end cartouche
+@center line-of-text
+@centerchap line-of-text
+@chapheading title
+@chapter title
+@cindex entry
+@cite{reference}
+@clear flag
+@click{}
+@clicksequence{action @click{} action}
+@clickstyle
+@code{sample-code}
+@codequotebacktick on-off
+@codequoteundirected on-off
+@columnfractions
+@comma{}
+@command{command-name}
+@comment comment
+@contents
+@copying
+@end copying
+@copyright{}
+
+@chapter D
+@defcodeindex index-name
+@defcv category class name
+@end defcv
+@defcvx category class name
+@deffn category name arguments…
+@end deffn
+@deffnx category name arguments…
+@defindex index-name
+@definfoenclose newcmd, before, after
+@defivar class instance-variable-name
+@end defivar
+@defivarx class instance-variable-name
+@defmac macroname arguments…
+@end defmac
+@defmacx macroname arguments…
+@defmethod class method-name arguments…
+@end defmethod
+@defmethodx class method-name arguments…
+@defop category class name arguments…
+@defopx category class name arguments…
+@defopt option-name
+@defoptx option-name
+@defspec special-form-name arguments…
+@defspecx special-form-name arguments…
+@deftp category name-of-type attributes…
+@end deftp
+@deftpx category name-of-type attributes…
+@deftypecv category class data-type name
+@end deftypecv
+@deftypecvx category class data-type name
+@deftypefn category data-type name arguments…
+@end deftypefn
+@deftypefnx category data-type name arguments…
+@deftypefnnewline on-off
+@deftypefun data-type function-name arguments…
+@end deftypefun
+@deftypefunx data-type function-name arguments…
+@deftypeivar class data-type variable-name
+@end deftypeivar
+@deftypeivarx class data-type variable-name
+@deftypemethod class data-type method-name arguments…
+@deftypemethodx class data-type method-name arguments…
+@deftypeop category class data-type name arguments…
+@deftypeopx category class data-type name arguments…
+@deftypevar data-type variable-name
+@end deftypevar
+@deftypevarx data-type variable-name
+@deftypevr category data-type name
+@end deftypevr
+@deftypevrx category data-type name
+@defun function-name arguments…
+@end defun
+@defunx function-name arguments…
+@defvar variable-name
+@end defvar
+@defvarx variable-name
+@defvr category name
+@end defvr
+@defvrx category name
+@detailmenu
+@end detailmenu
+@dfn{term}
+@DH{}
+@dh{}
+@dircategory dirpart
+@direntry
+@end direntry
+@display
+@end display
+@displaymath
+@end displaymath
+@dmn{dimension}
+@docbook
+@end docbook
+@documentdescription
+@end documentdescription
+@documentencoding enc
+@documentlanguage CC
+@dotaccent{c}
+@dotless{i-or-j}
+@dots{}
+@enddots{}
+
+@chapter E
+@email{address[, displayed-text]}
+@emph{text}
+@enumerate [number-or-letter]
+@end enumerate
+@env{environment-variable}
+@equiv{}
+@error{}
+@errormsg{msg}
+@euro{}
+@evenfooting [left] @| [center] @| [right]
+@evenheading [left] @| [center] @| [right]
+@everyfooting [left] @| [center] @| [right]
+@everyheading [left] @| [center] @| [right]
+@evenfootingmarks ref
+@evenheadingmarks ref
+@everyfootingmarks ref
+@everyheadingmarks ref
+@example
+@end example
+@exampleindent indent
+@exclamdown{}
+@exdent line-of-text
+@expansion{}
+
+@chapter F
+@file{filename}
+@finalout
+@findex entry
+@firstparagraphindent word
+@float
+@end float
+@flushleft
+@end flushleft
+@flushright
+@end flushright
+@fonttextsize 10-11
+@footnote{text-of-footnote}
+@footnotestyle style
+@format
+@end format
+@frenchspacing on-off
+@ftable formatting-command
+@end ftable
+
+@chapter G
+@geq{}
+@group
+@end group
+@guillemetleft{}
+@guillemetright{}
+@guillemotleft{}
+@guillemotright{}
+@guilsinglleft{}
+@guilsinglright{}
+
+@chapter H
+@H{c}
+@hashchar{}
+@heading title
+@headings on-off-single-double
+@headitem
+@headitemfont{text}
+@html
+@end html
+@hyphenation{hy-phen-a-ted words}
+
+@chapter I
+@i{text}
+@ifclear txivar
+@end ifclear
+@ifcommanddefined txicmd
+@end ifcommanddefined
+@ifcommandnotdefined txicmd
+@end ifcommandnotdefined
+@ifdocbook
+@end ifdocbook
+@ifhtml
+@end ifhtml
+@ifinfo
+@end ifinfo
+@iflatex
+@end iflatex
+@ifplaintext
+@end ifplaintext
+@ifxml
+@end ifxml
+@ifnotdocbook
+@end ifnotdocbook
+@ifnothtml
+@end ifnothtml
+@ifnotlatex
+@end ifnotlatex
+@ifnotplaintext
+@end ifnotplaintext
+@ifnottex
+@end ifnottex
+@ifnotxml
+@end ifnotxml
+@ifnotinfo
+@end ifnotinfo
+@ifset txivar
+@end ifset
+@iftex
+@end iftex
+@ignore
+@end ignore
+@image{filename, [width], [height], [alt], [ext]}
+@include filename
+@indent
+@indentedblock
+@end indentedblock
+@indicateurl{indicateurl}
+@inforef{node-name, [entry-name], info-file-name}
+@inlinefmt{fmt, text}
+@inlinefmtifelse{fmt, text, else-text}
+@inlineifclear{var, text}
+@inlineifset{var, text}
+@inlineraw{fmt, raw-text}
+@insertcopying
+@item
+@itemize mark-generating-character-or-command
+@end itemize
+@itemx
+
+@chapter K
+@kbd{keyboard-characters}
+@kbdinputstyle style
+@key{key-name}
+@kindex entry
+
+@chapter L
+@L{}
+@l{}
+@LaTeX{}
+@latex
+@end latex
+@leq{}
+@lisp
+@end lisp
+@listoffloats
+@lowersections
+
+@chapter M
+@macro macroname {params}
+@end macro
+@majorheading title
+@math{mathematical-expression}
+@menu
+@end menu
+@microtype on-off
+@minus{}
+@multitable column-width-spec
+@end multitable
+
+@chapter N
+@need n
+@node name, [next], [previous], [up]
+@noindent
+@novalidate
+
+@chapter O
+@O{}
+@o{}
+@oddfooting [left] @| [center] @| [right]
+@oddheading [left] @| [center] @| [right]
+@oddfootingmarks ref
+@oddheadingmarks ref
+@OE{}
+@oe{}
+@ogonek{c}
+@option{option-name}
+@ordf{}
+@ordm{}
+
+@chapter P
+@page
+@pagesizes [width][, height]
+@paragraphindent indent
+@part title
+@pindex entry
+@point{}
+@pounds{}
+@print{}
+@printindex index-name
+@pxref{node, [entry], [node-title], [info-file], [printed-manual]}
+
+@chapter Q
+@questiondown{}
+@quotation
+@end quotation
+@quotedblleft{}
+@quotedblright{}
+@quoteleft{}
+@quoteright{}
+@quotedblbase{}
+@quotesinglbase{}
+
+@chapter R
+@r{text}
+@raggedright
+@end raggedright
+@raisesections
+@ref{node, [entry], [node-title], [info-file], [printed-manual]}
+@registeredsymbol{}
+@result{}
+@rmacro
+@end rmacro
+@ringaccent{c}
+
+@chapter S
+@samp{text}
+@sansserif{text}
+@sc{text}
+
+@section title
+@seealso{index-text}
+@seeentry{index-text}
+@set txivar [string]
+@setchapternewpage on-off-odd
+@setfilename info-file-name
+@settitle title
+@shortcaption
+@shortcontents
+@shorttitlepage title
+@slanted{text}
+@smallbook
+@smalldisplay
+@end smalldisplay
+@smallexample
+@end smallexample
+@smallformat
+@end smallformat
+@smallindentedblock
+@end smallindentedblock
+@smalllisp
+@end smalllisp
+@smallquotation
+@end smallquotation
+@sortas{key}
+@sp n
+@ss{}
+@strong{text}
+@sub{text}
+@subentry
+@subheading title
+@subsection title
+@subsubheading title
+@subsubsection title
+@subtitle title
+@summarycontents
+@sup{text}
+@syncodeindex from-index to-index
+@synindex from-index to-index
+
+@chapter T
+@t{text}
+@tab
+@table formatting-command
+@end table
+@TeX{}
+@tex
+@end tex
+@textdegree{}
+@thischapter
+@thischaptername
+@thischapternum
+@thissection
+@thissectionname
+@thissectionnum
+@thisfile
+@thispage
+@thistitle
+@TH{}
+@th{}
+@tie{}
+@tieaccent{cc}
+@tindex entry
+@title title
+@titlefont{text}
+@titlepage
+@end titlepage
+@today{}
+@top title
+
+@chapter U
+@U{hex}
+@u{c}
+@ubaraccent{c}
+@udotaccent{c}
+@unmacro macroname
+@unnumbered title
+@unnumberedsec title
+@unnumberedsubsec title
+@unnumberedsubsubsec title
+@uref{url[, displayed-text][, replacement}
+@url{url[, displayed-text][, replacement}
+@urefbreakstyle style
+
+@chapter V
+@v{c}
+@value{txivar}
+@var{metasyntactic-variable}
+@verb{.delim literal delim.}
+@verbatim
+@end verbatim
+@verbatiminclude filename
+@vindex entry
+@vskip amount
+@vtable formatting-command
+@end vtable
+
+@w{text}
+@xml
+@end xml
+@xref{node, [entry], [node-title], [info-file], [printed-manual]}
+@xrefautomaticsectiontitle on-off
+
+@c misc				===========================================================
+texinfo
+true false on off

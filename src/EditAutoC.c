@@ -688,6 +688,9 @@ enum {
 	SmaliKeywordIndex_Directive = 9,
 	SwiftKeywordIndex_Directive = 1,
 	SwiftKeywordIndex_Attribute = 2,
+	TexinfoKeywordIndex_Command = 0,
+	TexinfoKeywordIndex_CodeFolding = 1,
+	TexinfoKeywordIndex_TexCommand = 2,
 	VBKeywordIndex_Preprocessor = 3,
 	VHDLKeywordIndex_Directive = 3,
 	VHDLKeywordIndex_Attribute = 4,
@@ -1277,8 +1280,18 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 
 	case NP2LEX_LATEX:
 	case NP2LEX_TEXINFO:
-		if ((ch == '\\' || (chPrev == '\\' && ch == '^')) && !autoCompletionConfig.bLaTeXInputMethod) {
-			WordList_AddListEx(pWList, LaTeXInputSequenceString);
+		if (ch == '\\' || (chPrev == '\\' && ch == '^')) {
+			if (!autoCompletionConfig.bLaTeXInputMethod) {
+				WordList_AddListEx(pWList, LaTeXInputSequenceString);
+			}
+			if (ch == '\\' && rid == NP2LEX_TEXINFO) {
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_TexCommand]);
+			}
+			return AddWordResult_IgnoreLexer;
+		}
+		if (ch == '@' && rid == NP2LEX_TEXINFO) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_Command]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_CodeFolding]);
 			return AddWordResult_IgnoreLexer;
 		}
 		break;
@@ -1453,7 +1466,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 				chPrev2 = SciCall_GetCharAt(before2);
 			}
 			// word after escape character or format specifier
-			if (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart) {
+			if (pLexCurrent->iLexer != SCLEX_TEXINFO && (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart)) {
 				const int style = SciCall_GetStyleIndexAt(iStartWordPos);
 				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, style, false)) {
 					++iStartWordPos;
@@ -1775,17 +1788,8 @@ void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) {
 		}
 		break;
 	case AutoInsertCharacterBacktick:
-		//if (pLexCurrent->iLexer == SCLEX_BASH
-		//|| pLexCurrent->iLexer == SCLEX_JULIA
-		//|| pLexCurrent->iLexer == SCLEX_MAKEFILE
-		//|| pLexCurrent->iLexer == SCLEX_SQL
-		//) {
-		//	ch = '`';
-		//} else if (0) {
-		//	ch = '\'';
-		//}
 		if (pLexCurrent->iLexer == SCLEX_VERILOG || pLexCurrent->iLexer == SCLEX_VHDL) {
-			ch = 0;
+			ch = 0; // directive and macro
 		}
 		break;
 	case AutoInsertCharacterComma:
@@ -2618,6 +2622,10 @@ void EditToggleCommentBlock(void) {
 
 	case NP2LEX_TCL:
 		EditEncloseSelectionNewLine(L"if (0) {", L"}");
+		break;
+
+	case NP2LEX_TEXINFO:
+		EditEncloseSelectionNewLine(L"@ignore", L"@end ignore");
 		break;
 
 	case NP2LEX_WASM:

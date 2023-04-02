@@ -765,6 +765,9 @@ LexerConfigMap = {
 	},
 	'NP2LEX_TEXINFO': {
 		'line_comment_string': '@c ',
+		'block_comment_string': ('@ignore', '@end ignore'),
+		'block_comment_on_new_line': True,
+		'default_fold_level': ['chapter', 'section', 'subsection'],
 		'escape_char_start': '@',
 		'escape_char_style': 'SCE_L_SPECIAL',
 		'operator_style': ['SCE_L_OPERATOR'],

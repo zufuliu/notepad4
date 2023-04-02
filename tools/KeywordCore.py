@@ -2206,6 +2206,23 @@ def parse_swift_api_file(path):
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
 	]
 
+def parse_texinfo_api_file(path):
+	doc = read_file(path)
+	commands = set(re.findall(r'@(\w+)', doc))
+	folding = set(re.findall(r'@end\s+(\w+)', doc))
+	latex = re.findall(r'\\(\w+)', doc)
+	doc = doc[doc.index('@c misc'):]
+	doc = re.sub(r'@c\s+.+', '', doc)
+	misc = doc.split()
+	if diff := folding - commands:
+		print('unknown Texinfo commands:', ', '.join(sorted(diff)))
+	return [
+		('commands', commands - folding, KeywordAttr.Special),
+		('code folding', folding, KeywordAttr.Special),
+		('TeX command', latex, KeywordAttr.NoLexer | KeywordAttr.Special),
+		('misc', misc, KeywordAttr.NoLexer)
+	]
+
 def parse_toml_api_file(path):
 	keywords = 'false inf nan true'.split()
 	return [

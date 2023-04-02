@@ -287,10 +287,10 @@
 #define NP2StyleX_Chapter				EDITSTYLE_HOLE(Chapter, L"Chapter")
 #define NP2StyleX_Document				EDITSTYLE_HOLE(Document, L"Document")
 #define NP2StyleX_Package				EDITSTYLE_HOLE(Package, L"Package")
-
+#define NP2StyleX_Subection				EDITSTYLE_HOLE(Subection, L"Subection")
 #define NP2StyleX_StandardFunction		EDITSTYLE_HOLE(StandardFunction, L"Standard Function")
 #define NP2StyleX_StandardType			EDITSTYLE_HOLE(StandardType, L"Standard Type")
-
+#define NP2StyleX_Subsubection			EDITSTYLE_HOLE(Subsubection, L"Subsubection")
 #define NP2StyleX_SystemTaskFunction	EDITSTYLE_HOLE(SystemTaskFunction, L"System Task and Function")
 #define NP2StyleX_Intrinsic				EDITSTYLE_HOLE(Intrinsic, L"Intrinsic")
 #define NP2StyleX_Metadata				EDITSTYLE_HOLE(Metadata, L"Metadata")
