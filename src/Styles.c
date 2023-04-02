@@ -2452,7 +2452,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, bool bCheckNames) {
 
 				const WCHAR ch = (p2 == p1)? L'\0' : p2[-1];
 				p2 += cch;
-				if ((ch == L';' || ch == ' ' || ch == L'\0') && (*p2 == L';' || *p2 == L' ' || *p2 == L'\0')) {
+				if ((ch == L';' || ch <= L' ') && (*p2 == L';' || *p2 <= L' ')) {
 					return pLex;
 				}
 				p1 = StrChr(p2, L';');
