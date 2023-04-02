@@ -129,6 +129,7 @@ void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				kwType = KeywordType::None;
 				if (keywordLists[KeywordIndex_CodeFolding].InList(p)) {
 					levelNext++;
+					braceCount = 0;
 					if (StrEqual(p, "ignore")) {
 						state = SCE_L_COMMENT2;
 					} else if (StrEqual(p, "verbatim")) {
@@ -145,6 +146,7 @@ void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					kwType = KeywordType::End;
 					state = SCE_L_DEFAULT;
 					lineState = 0;
+					braceCount = 0;
 				} else if (StrEqualsAny(p, "chapter", "chapheading", "majorheading")) {
 					state = SCE_L_CHAPTER;
 				} else if (StrEqualsAny(p, "section", "heading")) {
@@ -285,6 +287,7 @@ void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			styler.SetLineState(sc.currentLine, lineState | (braceCount << 8));
 			visibleChars = 0;
 			kwType = KeywordType::None;
+			mathBraceCount = 0;
 		}
 		sc.Forward();
 	}
