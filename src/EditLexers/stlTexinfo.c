@@ -59,17 +59,17 @@ static KEYWORDLIST Keywords_TEXI = {{
 
 static EDITSTYLE Styles_TEXI[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_L_COMMAND, SCE_L_TAG, SCE_L_TAG2, 0), NP2StyleX_Command, L"fore:#0000FF" },
-	{ SCE_L_MARCO, NP2StyleX_Macro, L"fore:#FF8000" },
-	{ MULTI_STYLE(SCE_L_COMMENT, SCE_L_COMMENT2, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
-	{ SCE_L_CHAPTER, NP2StyleX_Chapter, L"bold; fore:#0080FF" },
-	{ SCE_L_SECTION, NP2StyleX_Section, L"bold; fore:#0066CC" },
-	{ SCE_L_SECTION1, NP2StyleX_Subection, L"bold; fore:#0080C0" },
-	{ SCE_L_SECTION2, NP2StyleX_Subsubection, L"bold; fore:#007F7F" },
-	{ SCE_L_TITLE, NP2StyleX_Title, L"bold; fore:#408080" },
-	{ MULTI_STYLE(SCE_L_VERBATIM, SCE_L_VERBATIM2, 0, 0), NP2StyleX_VerbatimSegment, L"fore:#666666" },
-	{ SCE_L_SPECIAL, NP2StyleX_SpecialCharacter, L"fore:#3A6EA5" },
-	{ SCE_L_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_TEXINFO_COMMAND, SCE_TEXINFO_TEX_COMMAND, SCE_TEXINFO_END_TAG, 0), NP2StyleX_Command, L"fore:#0000FF" },
+	{ SCE_TEXINFO_MARCO, NP2StyleX_Macro, L"fore:#FF8000" },
+	{ MULTI_STYLE(SCE_TEXINFO_COMMENT, SCE_TEXINFO_COMMENT2, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_TEXINFO_CHAPTER, NP2StyleX_Chapter, L"bold; fore:#0080FF" },
+	{ SCE_TEXINFO_SECTION, NP2StyleX_Section, L"bold; fore:#0066CC" },
+	{ SCE_TEXINFO_SECTION1, NP2StyleX_Subection, L"bold; fore:#0080C0" },
+	{ SCE_TEXINFO_SECTION2, NP2StyleX_Subsubection, L"bold; fore:#007F7F" },
+	{ SCE_TEXINFO_TITLE, NP2StyleX_Title, L"bold; fore:#408080" },
+	{ MULTI_STYLE(SCE_TEXINFO_VERBATIM, SCE_TEXINFO_VERBATIM2, 0, 0), NP2StyleX_VerbatimSegment, L"fore:#666666" },
+	{ SCE_TEXINFO_SPECIAL, NP2StyleX_SpecialCharacter, L"fore:#3A6EA5" },
+	{ SCE_TEXINFO_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexTexinfo = {
@@ -80,10 +80,10 @@ EDITLEXER lexTexinfo = {
 		TAB_WIDTH_4, INDENT_WIDTH_4,
 		(1 << 0) | (1 << 1) | (1 << 2), // chapter, section, subsection
 		0,
-		'@', SCE_L_SPECIAL, 0,
+		'@', SCE_TEXINFO_SPECIAL, 0,
 		0,
 		0, 0,
-		SCE_L_OPERATOR, 0
+		SCE_TEXINFO_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // commands
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // code folding
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // TeX command
