@@ -2218,7 +2218,7 @@ def parse_texinfo_api_file(path):
 		print('unknown Texinfo commands:', ', '.join(sorted(diff)))
 	return [
 		('commands', commands - folding, KeywordAttr.Special),
-		('code folding', folding, KeywordAttr.Special),
+		('block command', folding, KeywordAttr.Special),
 		('TeX command', latex, KeywordAttr.NoLexer | KeywordAttr.Special),
 		('misc', misc, KeywordAttr.NoLexer)
 	]

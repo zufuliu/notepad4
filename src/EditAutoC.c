@@ -689,7 +689,7 @@ enum {
 	SwiftKeywordIndex_Directive = 1,
 	SwiftKeywordIndex_Attribute = 2,
 	TexinfoKeywordIndex_Command = 0,
-	TexinfoKeywordIndex_CodeFolding = 1,
+	TexinfoKeywordIndex_BlockCommand = 1,
 	TexinfoKeywordIndex_TexCommand = 2,
 	VBKeywordIndex_Preprocessor = 3,
 	VHDLKeywordIndex_Directive = 3,
@@ -1291,7 +1291,7 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		}
 		if (ch == '@' && rid == NP2LEX_TEXINFO) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_Command]);
-			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_CodeFolding]);
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_BlockCommand]);
 			return AddWordResult_IgnoreLexer;
 		}
 		break;

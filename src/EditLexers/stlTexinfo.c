@@ -35,7 +35,7 @@ static KEYWORDLIST Keywords_TEXI = {{
 "u ubaraccent udotaccent unmacro unnumbered unnumberedsec unnumberedsubsec unnumberedsubsubsec uref urefbreakstyle url "
 "v value var verb verbatiminclude vindex vskip w xref xrefautomaticsectiontitle "
 
-, // 1 code folding
+, // 1 block command
 "cartouche copying "
 "defcv deffn defivar defmac defmethod deftp deftypecv deftypefn deftypefun deftypeivar deftypevar deftypevr defun "
 "defvar defvr detailmenu direntry display displaymath docbook documentdescription "
@@ -85,7 +85,7 @@ EDITLEXER lexTexinfo = {
 		0, 0,
 		SCE_TEXINFO_OPERATOR, 0
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // commands
-		| KeywordAttr32(1, KeywordAttr_PreSorted) // code folding
+		| KeywordAttr32(1, KeywordAttr_PreSorted) // block command
 		| KeywordAttr32(2, KeywordAttr_NoLexer) // TeX command
 		| KeywordAttr32(3, KeywordAttr_NoLexer) // misc
 	},
