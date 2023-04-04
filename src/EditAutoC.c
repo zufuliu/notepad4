@@ -1466,7 +1466,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 				chPrev2 = SciCall_GetCharAt(before2);
 			}
 			// word after escape character or format specifier
-			if (pLexCurrent->iLexer != SCLEX_TEXINFO && (chPrev == '%' || chPrev == pLexCurrent->escapeCharacterStart)) {
+			if (chPrev == '%' || (chPrev == pLexCurrent->escapeCharacterStart && (pLexCurrent->lexerAttr & LexerAttr_EscapePunctuation) == 0)) {
 				const int style = SciCall_GetStyleIndexAt(iStartWordPos);
 				if (IsEscapeCharOrFormatSpecifier(before, ch, chPrev, style, false)) {
 					++iStartWordPos;

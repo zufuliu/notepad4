@@ -39,6 +39,7 @@ enum {
 	LexerAttr_AngleBracketGeneric = 1 << 7,
 	LexerAttr_CppPreprocessor = 1 << 8,
 	LexerAttr_CharacterPrefix = 1 << 9,
+	LexerAttr_EscapePunctuation = 1 << 10,
 };
 
 enum {

@@ -28,6 +28,7 @@ printf_format_specifier: has C printf like format specifier, default is False.
 format_specifier_style: style for format specifier.
 escape_char_start: character used to escape special characters, default is backslash.
 escape_char_style: style for escape character.
+escape_punctuation: only escape with punctuation.
 raw_string_style: styles where backslash is treated literally.
 character_style: styles for character literal.
 character_prefix: prefix for character literal or single quoted string.
@@ -58,6 +59,7 @@ class LexerAttr(IntFlag):
 	AngleBracketGeneric = 1 << 7	# angle_bracket_generic
 	CppPreprocessor = 1 << 8		# cpp_preprocessor
 	CharacterPrefix = 1 << 9		# character_prefix
+	EscapePunctuation = 1 << 10		# escape_punctuation
 
 class KeywordAttr(IntFlag):
 	Default = 0
@@ -207,6 +209,7 @@ LexerConfigMap = {
 		'line_comment_at_line_start': True,
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_BAT_ESCAPECHAR',
+		'escape_punctuation': True,
 		'operator_style': ['SCE_BAT_OPERATOR'],
 		'extra_word_char': '-$',
 	},
@@ -230,6 +233,7 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'block_comment_string': ('#[[', ']]'),
 		'escape_char_style': 'SCE_CMAKE_ESCAPECHAR',
+		'escape_punctuation': True,
 		'angle_bracket_generic': True, # for bracket argument $<>
 		'operator_style': ['SCE_CMAKE_OPERATOR'],
 		'auto_ident_word_style': ['SCE_CMAKE_WORD'],
@@ -353,6 +357,7 @@ LexerConfigMap = {
 	'NP2LEX_GN': {
 		'line_comment_string': '#',
 		'escape_char_style': 'SCE_GN_ESCAPECHAR',
+		'escape_punctuation': True,
 		'operator_style': ['SCE_GN_OPERATOR', 'SCE_GN_OPERATOR2'],
 		'extra_word_char': '-$',
 		#'ignore_word_style': ['SCE_GN_KEYWORD', 'SCE_GN_BUILTIN_FUNCTION', 'SCE_GN_BUILTIN_VARIABLE'],
@@ -515,6 +520,7 @@ LexerConfigMap = {
 		'block_comment_on_new_line': True,
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_L_SPECIAL',
+		'escape_punctuation': True,
 		'operator_style': ['SCE_L_OPERATOR'],
 	},
 	'NP2LEX_LISP': {
@@ -553,6 +559,7 @@ LexerConfigMap = {
 		'block_comment_string': ('<!--', '-->'),
 		'default_fold_level': ['header1', 'header2'],
 		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
+		'escape_punctuation': True,
 	},
 	'NP2LEX_MATLAB': {
 		'line_comment_string': ['%', '//'],
@@ -770,6 +777,7 @@ LexerConfigMap = {
 		'default_fold_level': ['chapter', 'section', 'subsection'],
 		'escape_char_start': '@',
 		'escape_char_style': 'SCE_TEXINFO_SPECIAL',
+		'escape_punctuation': True,
 		'operator_style': ['SCE_TEXINFO_OPERATOR'],
 	},
 	'NP2LEX_TOML': {
@@ -978,6 +986,8 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		flag |= LexerAttr.CppPreprocessor
 	if config.get('character_prefix', None):
 		flag |= LexerAttr.CharacterPrefix
+	if config.get('escape_punctuation', None):
+		flag |= LexerAttr.EscapePunctuation
 
 	output = ['\t{']
 	indent = '\t\t'
