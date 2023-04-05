@@ -24,6 +24,7 @@ Checks: >
     -modernize-use-trailing-return-type,
     -modernize-use-using,
     -performance-no-int-to-ptr,
+    -readability-avoid-unconditional-preprocessor-if,
     -readability-function-cognitive-complexity,
     -readability-identifier-length,
     -readability-implicit-bool-conversion,
