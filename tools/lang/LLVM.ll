@@ -1,4 +1,4 @@
-; LLVM 15 https://llvm.org/docs/LangRef.html
+; LLVM 16 https://llvm.org/docs/LangRef.html
 
 ;! Keywords			===========================================================
 ; Linkage Types
@@ -140,6 +140,7 @@ local_unnamed_addr
 no_sanitize_address
 no_sanitize_hwaddress
 sanitize_address_dyninit
+sanitize_memtag
 
 ; Comdats
 ; https://llvm.org/docs/LangRef.html#comdats
@@ -159,6 +160,7 @@ byval(<ty>)
 preallocated(<ty>)
 inalloca
 sret
+elementtype(<ty>)
 align <n>
 align(<n>)
 noalias
@@ -174,9 +176,13 @@ swiftasync
 swifterror
 immarg
 noundef
+nofpclass(<test mask>)
 alignstack(<n>)
 allocalign
 allocptr
+readnone
+readonly
+writeonly
 
 ; Prologue Data
 ; https://llvm.org/docs/LangRef.html#prologue-data
@@ -188,6 +194,7 @@ personality
 ; Function Attributes
 ; https://llvm.org/docs/LangRef.html#function-attributes
 alignstack(<n>)
+alloc-family
 allockind("KIND")
 allocsize(<EltSizeParam>[, <NumEltsParam>])
 alwaysinline
@@ -200,21 +207,23 @@ dontcall-warn
 frame-pointer
 fn_ret_thunk_extern
 hot
-inaccessiblememonly
-inaccessiblemem_or_argmemonly
 inlinehint
 jumptable
+memory(...)
 minsize
 naked
 no-inline-line-tables
 no-jump-tables
 nobuiltin
+nocallback
 noduplicate
 nofree
 noimplicitfloat
 noinline
 nomerge
 nonlazybind
+noprofile
+skipprofile
 noredzone
 indirect-tls-seg-refs
 noreturn
@@ -230,12 +239,8 @@ optnone
 optsize
 patchable-function
 probe-stack
-readnone
-readonly
 stack-probe-size
 no-stack-arg-probe
-writeonly
-argmemonly
 returns_twice
 safestack
 sanitize_address
@@ -252,13 +257,14 @@ strictfp
 denormal-fp-math
 denormal-fp-math-f32
 thunk
+tls-load-hoist
 uwtable
 nocf_check
 shadowcallstack
 mustprogress
 warn-stack-size
 vscale_range(<min>[, <max>])
-min-legal-vector-width
+nooutline
 
 ; Call Site Attributes
 ; https://llvm.org/docs/LangRef.html#call-site-attributes
@@ -271,6 +277,10 @@ no_sanitize_address
 no_sanitize_hwaddress
 sanitize_memtag
 sanitize_address_dyninit
+
+; Assume Operand Bundles
+; https://llvm.org/docs/LangRef.html#assume-operand-bundles
+separate_storage(<val1>, <val2>)
 
 ; Atomic Memory Ordering Constraints
 ; https://llvm.org/docs/LangRef.html#atomic-memory-ordering-constraints
@@ -331,7 +341,7 @@ invoke [cconv] [ret attrs] [addrspace(<num>)] <ty>|<fnty> <fnptrval>(<function a
 	[operand bundles] to label <normal label>
 	unwind label <exception label>
 callbr [cconv] [ret attrs] [addrspace(<num>)] <ty>|<fnty> <fnptrval>(<function args>) [fn attrs]
-	[operand bundles] to label <normal label> [other labels]
+	[operand bundles] to label <fallthrough label> [indirect labels]
 resume <type> <value>
 catchswitch
 	within <parent> [ label <handler1>, label <handler2>, ... ] unwind to
@@ -426,6 +436,8 @@ atomicrmw [volatile] <operation> ptr <pointer>, <ty> <value> [syncscope("<target
 	fsub
 	fmax
 	fmin
+	uinc_wrap
+	udec_wrap
 getelementptr <ty>, ptr <ptrval>{, [inrange] <ty> <idx>}*
 getelementptr inbounds <ty>, ptr <ptrval>{, [inrange] <ty> <idx>}*
 getelementptr <ty>, <N x ptr> <ptrval>, [inrange] <vector index type> <idx>; Conversion Operations
