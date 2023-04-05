@@ -487,6 +487,13 @@ def parse_awk_api_file(path):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
+def parse_bash_api_file(path):
+	return [
+		('keywords', [], KeywordAttr.Default),
+		('bash struct', [], KeywordAttr.Default),
+		('variables', [], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
 def parse_batch_api_file(path):
 	sections = read_api_file(path, '::')
 	keywordMap = {
@@ -1653,6 +1660,8 @@ def parse_nsis_api_file(path):
 					item = item[3:]
 				functions.append(item)
 			items = functions
+		elif key == 'predefined variables':
+			items = [item[2:-1] if item[-1] == '}' else item[1:] for item in items]
 		keywordMap[key] = items
 
 	RemoveDuplicateKeyword(keywordMap, [
@@ -1660,7 +1669,6 @@ def parse_nsis_api_file(path):
 		'instructions',
 		'attributes',
 		'functions',
-		'predefined variables',
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
@@ -1668,7 +1676,7 @@ def parse_nsis_api_file(path):
 		('instruction', keywordMap['instructions'], KeywordAttr.NoLexer),
 		('attribute', keywordMap['attributes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
-		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer),
+		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
 def parse_php_api_file(path):
@@ -1681,7 +1689,7 @@ def parse_php_api_file(path):
 			keywordMap[key] = doc.split()
 		elif key == 'predefined variable':
 			items = doc.split()
-			keywordMap[key] = [item for item in items if item[0] == '$']
+			keywordMap[key] = [item[1:] for item in items if item[0] == '$']
 			keywordMap['misc'] = [item for item in items if item[0].isalpha()]
 		elif key == 'api':
 			items = re.findall(r'\w+\(', doc)
@@ -1716,7 +1724,7 @@ def parse_php_api_file(path):
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.MakeLower),
 		('interface', keywordMap['interface'], KeywordAttr.MakeLower),
-		('predefined variable', keywordMap['predefined variable'], KeywordAttr.Default),
+		('predefined variable', keywordMap['predefined variable'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('magic constant', keywordMap['magic constant'], KeywordAttr.Default),
 		('magic method', keywordMap['magic method'], KeywordAttr.MakeLower),
 		('constant', keywordMap['constant'], KeywordAttr.NoLexer),
@@ -1943,6 +1951,8 @@ def parse_ruby_api_file(path):
 				keywordMap['function'].extend(items)
 		else:
 			items = set(doc.split())
+			if key == 'pre-defined variables':
+				items = [item[1:] for item in items]
 			keywordMap[key] = items
 
 	folding = keywordMap['code folding']
@@ -1962,7 +1972,7 @@ def parse_ruby_api_file(path):
 		('code folding', folding, KeywordAttr.NoAutoComp),
 		('regex', keywordMap['regex'], KeywordAttr.NoAutoComp),
 		('pre-defined constants', keywordMap['pre-defined constants'], KeywordAttr.Default),
-		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer),
+		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('module', keywordMap['module'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('built-in function', keywordMap['built-in function'], KeywordAttr.Default),
@@ -2197,8 +2207,8 @@ def parse_swift_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directive', keywordMap['directive'], KeywordAttr.Special),
-		('attribute', keywordMap['attribute'], KeywordAttr.Special),
+		('directive', keywordMap['directive'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attribute', keywordMap['attribute'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('struct', keywordMap['struct'], KeywordAttr.Default),
 		('protocol', keywordMap['protocol'], KeywordAttr.Default),

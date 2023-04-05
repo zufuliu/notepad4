@@ -20,7 +20,7 @@ static KEYWORDLIST Keywords_Ruby = {{
 "SCRIPT_LINES__ STDERR STDIN STDOUT TOPLEVEL_BINDING TRUE "
 
 , // 4 pre-defined variables
-"$DEBUG $FILENAME $LOADED_FEATURES $LOAD_PATH $VERBOSE $stderr $stdin $stdout "
+"DEBUG FILENAME LOADED_FEATURES LOAD_PATH VERBOSE stderr stdin stdout "
 
 , // 5 module
 "AbstractSyntaxTree Comparable Constants Continuation Enumerable Errno FileUtils Formatter GC GID Kernel Marshal Math "
@@ -128,7 +128,7 @@ EDITLEXER lexRuby = {
 		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // code folding
 		| KeywordAttr32(2, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // regex
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // pre-defined constants
-		| KeywordAttr32(4, KeywordAttr_NoLexer) // pre-defined variables
+		| KeywordAttr32(4, KeywordAttr_NoLexer | KeywordAttr_NoAutoComp) // pre-defined variables
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // module
 		| KeywordAttr32(6, KeywordAttr_PreSorted) // class
 		| KeywordAttr64(7, KeywordAttr_PreSorted) // built-in function

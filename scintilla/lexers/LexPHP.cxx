@@ -382,7 +382,7 @@ bool PHPLexer::ClassifyPHPWord(LexerWordList keywordLists, int visibleChars) {
 		sc.GetCurrent(s, sizeof(s));
 		// variable, constant and enum name is case-sensitive
 		if (sc.state == SCE_PHP_VARIABLE) {
-			if (keywordLists[KeywordIndex_PredefinedVariable].InList(s)) {
+			if (keywordLists[KeywordIndex_PredefinedVariable].InList(s + 1)) {
 				sc.ChangeState(SCE_PHP_PREDEFINED_VARIABLE);
 			}
 		} else if (keywordLists[KeywordIndex_MagicConstant].InList(s)) {

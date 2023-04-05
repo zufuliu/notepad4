@@ -47,7 +47,7 @@ static KEYWORDLIST Keywords_PHP = {{
 "Throwable Traversable UnitEnum "
 
 , // 4 predefined variable
-"$GLOBALS $_COOKIE $_ENV $_FILES $_GET $_POST $_REQUEST $_SERVER $_SESSION $argc $argv $http_response_header $this "
+"GLOBALS _COOKIE _ENV _FILES _GET _POST _REQUEST _SERVER _SESSION argc argv http_response_header this "
 
 , // 5 magic constant
 "__CLASS__ __COMPILER_HALT_OFFSET__ __DIR__ __FILE__ __FUNCTION__ __LINE__ __METHOD__ __NAMESPACE__ __TRAIT__ "
@@ -451,7 +451,7 @@ EDITLEXER lexPHP = {
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // type
 		| KeywordAttr32(2, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // class
 		| KeywordAttr32(3, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // interface
-		| KeywordAttr32(4, KeywordAttr_PreSorted) // predefined variable
+		| KeywordAttr32(4, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // predefined variable
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // magic constant
 		| KeywordAttr32(6, KeywordAttr_MakeLower | KeywordAttr_PreSorted) // magic method
 		| KeywordAttr64(7, KeywordAttr_NoLexer) // constant

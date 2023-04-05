@@ -80,8 +80,8 @@ EDITLEXER lexSwift = {
 		0, 0,
 		SCE_SWIFT_OPERATOR, SCE_SWIFT_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
-		| KeywordAttr32(1, KeywordAttr_PreSorted) // directive
-		| KeywordAttr32(2, KeywordAttr_PreSorted) // attribute
+		| KeywordAttr32(1, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // directive
+		| KeywordAttr32(2, KeywordAttr_PreSorted | KeywordAttr_NoAutoComp) // attribute
 		| KeywordAttr32(3, KeywordAttr_PreSorted) // class
 		| KeywordAttr32(4, KeywordAttr_PreSorted) // struct
 		| KeywordAttr32(5, KeywordAttr_PreSorted) // protocol

@@ -651,6 +651,7 @@ enum {
 	AutoIt3KeywordIndex_Macro = 2,
 	AutoIt3KeywordIndex_Directive = 4,
 	AutoIt3KeywordIndex_Special = 5,
+	BashKeywordIndex_Variable = 2,
 	CPPKeywordIndex_Preprocessor = 2,
 	CPPKeywordIndex_Directive = 3,
 	CSSKeywordIndex_AtRule = 1,
@@ -679,10 +680,13 @@ enum {
 	JuliaKeywordIndex_Macro = 6,
 	KotlinKeywordIndex_Annotation = 4,
 	KotlinKeywordIndex_Kdoc = 6,
+	NSISKeywordIndex_PredefinedVariable = 5,
+	PHPKeywordIndex_PredefinedVariable = 4,
 	PHPKeywordIndex_Phpdoc = 11,
 	PowerShellKeywordIndex_PredefinedVariable = 4,
 	PythonKeywordIndex_Decorator = 7,
 	RebolKeywordIndex_Directive = 1,
+	RubyKeywordIndex_PredefinedVariable = 4,
 	ScalaKeywordIndex_Annotation = 3,
 	ScalaKeywordIndex_Scaladoc = 5,
 	SmaliKeywordIndex_Directive = 9,
@@ -1091,6 +1095,13 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		}
 		break;
 
+	case NP2LEX_BASH:
+		if (ch == '$') {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[BashKeywordIndex_Variable]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
 	case NP2LEX_CSS:
 		if (ch == '@' && iCurrentStyle == SCE_CSS_DEFAULT) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CSSKeywordIndex_AtRule]);
@@ -1120,18 +1131,13 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 			}
 		} else if (iCurrentStyle == SCE_C_DEFAULT) {
 			if (ch == '#') { // #preprocessor
-				const char *pKeywords = pLex->pKeyWords->pszKeyWords[CPPKeywordIndex_Preprocessor];
-				if (StrNotEmptyA(pKeywords)) {
-					WordList_AddListEx(pWList, pKeywords);
-					return AddWordResult_Finish;
-				}
-			} else if (ch == '@') { // @directive, @annotation, @decorator
-				const char *pKeywords = pLex->pKeyWords->pszKeyWords[CPPKeywordIndex_Directive];
-				if (StrNotEmptyA(pKeywords)) {
-					WordList_AddListEx(pWList, pKeywords);
-					// user defined annotation
-					return AddWordResult_IgnoreLexer;
-				}
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CPPKeywordIndex_Preprocessor]);
+				return AddWordResult_Finish;
+			}
+			if (ch == '@') { // @directive, @annotation, @decorator
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[CPPKeywordIndex_Directive]);
+				// user defined annotation
+				return AddWordResult_IgnoreLexer;
 			}
 			//else if (chPrev == ':' && ch == ':') {
 			//	WordList_AddList(pWList, "C++/namespace C++/Java8/PHP/static SendMessage()");
@@ -1296,12 +1302,22 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		}
 		break;
 
+	case NP2LEX_NSIS:
+		if (ch == '$') {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[NSISKeywordIndex_PredefinedVariable]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
 	case NP2LEX_PHP:
 		if (ch == '@') {
 			if (iCurrentStyle >= SCE_PHP_COMMENTLINE && iCurrentStyle <= SCE_PHP_TASKMARKER) {
 				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[PHPKeywordIndex_Phpdoc]);
 				return AddWordResult_Finish;
 			}
+		} else if (ch == '$') {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[PHPKeywordIndex_PredefinedVariable]);
+			return AddWordResult_IgnoreLexer;
 		}
 		break;
 
@@ -1314,17 +1330,21 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 
 	case NP2LEX_PYTHON:
 		if (ch == '@' && iCurrentStyle == SCE_PY_DEFAULT) {
-			const char *pKeywords = pLex->pKeyWords->pszKeyWords[PythonKeywordIndex_Decorator];
-			if (StrNotEmptyA(pKeywords)) {
-				WordList_AddListEx(pWList, pKeywords);
-				return AddWordResult_IgnoreLexer;
-			}
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[PythonKeywordIndex_Decorator]);
+			return AddWordResult_IgnoreLexer;
 		}
 		break;
 
 	case NP2LEX_REBOL:
 		if (ch == '#' && iCurrentStyle == SCE_REBOL_DEFAULT) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[RebolKeywordIndex_Directive]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
+	case NP2LEX_RUBY:
+		if (ch == '$') {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[RubyKeywordIndex_PredefinedVariable]);
 			return AddWordResult_IgnoreLexer;
 		}
 		break;
@@ -1378,13 +1398,13 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 
 	case NP2LEX_VISUALBASIC:
 		if (ch == '#' && iCurrentStyle == SCE_B_DEFAULT) {
-			const char *pKeywords = pLex->pKeyWords->pszKeyWords[VBKeywordIndex_Preprocessor];
-			if (StrNotEmptyA(pKeywords)) {
-				WordList_AddListEx(pWList, pKeywords);
-				return AddWordResult_Finish;
-			}
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[VBKeywordIndex_Preprocessor]);
+			return AddWordResult_Finish;
 		}
 		break;
+	}
+	if ((ch == '$') && IsDocWordChar(ch)) {
+		return AddWordResult_IgnoreLexer;
 	}
 	return AddWordResult_None;
 }
