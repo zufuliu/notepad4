@@ -287,8 +287,8 @@ public:
 };
 
 // InputLanguage() and SetCandidateWindowPos() are based on Chromium's IMM32Manager and InputMethodWinImm32.
-// https://github.com/chromium/chromium/blob/master/ui/base/ime/win/imm32_manager.cc
-// See License.txt or https://github.com/chromium/chromium/blob/master/LICENSE for license details.
+// https://github.com/chromium/chromium/blob/main/ui/base/ime/win/imm32_manager.cc
+// See License.txt or https://github.com/chromium/chromium/blob/main/LICENSE for license details.
 
 // See Chromium's IMM32Manager::SetInputLanguage()
 LANGID InputLanguage() noexcept {

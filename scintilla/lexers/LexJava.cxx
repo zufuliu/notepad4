@@ -94,7 +94,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 }
 
 // for java.util.Formatter
-// https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/util/Formatter.html
+// https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/Formatter.html
 
 constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'a', 'A',
@@ -462,7 +462,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_JAVA_PLACEHOLDER:
 			// for java.text.MessageFormat, only simplest form: {num}
-			// https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/text/MessageFormat.html
+			// https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/text/MessageFormat.html
 			if (!IsADigit(sc.ch)) {
 				if (sc.ch != '}') {
 					sc.Rewind();
