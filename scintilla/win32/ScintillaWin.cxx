@@ -209,7 +209,6 @@ class FormatEnumerator final : public IEnumFORMATETC {
 
 public:
 	FormatEnumerator(ULONG pos_, const CLIPFORMAT formats_[], size_t formatsLen_);
-	virtual ~FormatEnumerator() = default;
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
@@ -228,8 +227,6 @@ public:
 class DropSource final : public IDropSource {
 public:
 	ScintillaWin *sci = nullptr;
-	DropSource() noexcept = default;
-	virtual ~DropSource() = default;
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
@@ -246,8 +243,6 @@ public:
 class DataObject final : public IDataObject {
 public:
 	ScintillaWin *sci = nullptr;
-	DataObject() noexcept = default;
-	virtual ~DataObject() = default;
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
@@ -271,8 +266,6 @@ public:
 class DropTarget final : public IDropTarget {
 public:
 	ScintillaWin *sci = nullptr;
-	DropTarget() noexcept = default;
-	virtual ~DropTarget() = default;
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;

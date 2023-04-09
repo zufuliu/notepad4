@@ -21,8 +21,6 @@
 
 class CDropSource final : public IDropSource {
 public:
-	CDropSource() noexcept;
-	virtual ~CDropSource() = default;
 
 	/* IUnknown methods */
 	STDMETHODIMP QueryInterface(REFIID riid, PVOID *ppv) noexcept override;
@@ -34,5 +32,5 @@ public:
 	STDMETHODIMP GiveFeedback(DWORD /*dwEffect*/) noexcept override;
 
 private:
-	ULONG m_refs;
+	ULONG m_refs = 1;
 };

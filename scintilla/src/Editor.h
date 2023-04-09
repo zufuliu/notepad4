@@ -49,7 +49,6 @@ public:
 	WorkItems items = WorkItems::none;
 	Sci::Position upTo = 0;
 
-	WorkNeeded() noexcept = default;
 	void Reset() noexcept {
 		items = WorkItems::none;
 		upTo = 0;
