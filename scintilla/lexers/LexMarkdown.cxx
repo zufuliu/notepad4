@@ -2228,7 +2228,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		case SCE_H_VALUE:
 		case SCE_H_SGML_1ST_PARAM:
-			if (IsHtmlInvalidAttrCharEx(sc.ch, sc.chNext)) {
+			if (IsHtmlInvalidAttrChar(sc.ch)) {
 				const int outer = (sc.state == SCE_H_VALUE) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
 				sc.SetState(outer);
 				if (outer != SCE_MARKDOWN_DEFAULT) {

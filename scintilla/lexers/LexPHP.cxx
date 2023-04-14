@@ -1035,7 +1035,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_H_VALUE:
 		case SCE_H_SGML_1ST_PARAM:
-			if (IsHtmlInvalidAttrCharEx(sc.ch, sc.chNext)) {
+			if (IsHtmlInvalidAttrChar(sc.ch)) {
 				const int outer = (sc.state == SCE_H_VALUE) ? SCE_H_DEFAULT : SCE_H_SGML_DEFAULT;
 				sc.SetState(outer);
 				if (outer != SCE_H_DEFAULT) {
@@ -1088,6 +1088,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			if (sc.Match('-', '-')) {
 				sc.Forward();
 				sc.ForwardSetState(SCE_H_SGML_DEFAULT);
+				continue;
 			}
 			break;
 
