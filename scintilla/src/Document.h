@@ -202,7 +202,7 @@ public:
 	bool UseContainerLexing() const noexcept;
 };
 
-struct RegexError : public std::runtime_error {
+struct RegexError final : public std::runtime_error {
 	RegexError() : std::runtime_error("regex failure") {}
 };
 

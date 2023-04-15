@@ -4893,7 +4893,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, KeyMod modifiers) {
 	if (HaveMouseCapture()) {
 
 		// Slow down autoscrolling/selection
-		autoScrollTimer.ticksToWait -= timer.tickSize;
+		autoScrollTimer.ticksToWait -= Timer::tickSize;
 		if (autoScrollTimer.ticksToWait > 0)
 			return;
 		autoScrollTimer.ticksToWait = autoScrollDelay;
