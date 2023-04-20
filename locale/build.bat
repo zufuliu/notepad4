@@ -110,7 +110,7 @@ IF /I "%processor_architecture%" == "AMD64" (
 	SET "HOST_ARCH=x86"
 )
 
-IF %NO_32BIT% == 1 GOTO ARCH_x64
+IF %NO_32BIT% == 1 GOTO x64
 IF /I "%ARCH%" == "AVX2" GOTO x64
 IF /I "%ARCH%" == "x64" GOTO x64
 IF /I "%ARCH%" == "Win32" GOTO Win32
