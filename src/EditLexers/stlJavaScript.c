@@ -50,8 +50,8 @@ NULL
 "dimensions( dir( dirxml( dispatchEvent( "
 "elementFromPoint( elementsFromPoint( encodeURI( encodeURIComponent( endsWith( entries( error( escape( "
 "eval( evaluate( every( exception( exchange( exec( exitFullscreen( exitPictureInPicture( exp( expm1( "
-"fetch( fill( filter( finally( find( findIndex( fixed( flat( flatMap( floor( focus( fontcolor( fontsize( for( forEach( "
-"freeze( from( fromCharCode( fromCodePoint( fromEntries( fround( function( "
+"fetch( fill( filter( finally( find( findIndex( findLast( findLastIndex( fixed( flat( flatMap( floor( "
+"focus( fontcolor( fontsize( for( forEach( freeze( from( fromCharCode( fromCodePoint( fromEntries( fround( function( "
 "get( getAll( getAllResponseHeaders( getAnimations( "
 "getAttribute( getAttributeNS( getAttributeNames( getAttributeNode( getAttributeNodeNS( "
 "getBigInt64( getBigUint64( getBoundingClientRect( getClientRects( getComputedStyle( getDate( getDay( "
@@ -90,9 +90,9 @@ NULL
 "table( tan( tanh( terminate( test( then( throw( time( timeEnd( timeLog( toArray( toDateString( toExponential( toFixed( "
 "toGMTString( toISOString( toJSON( "
 "toLocaleDateString( toLocaleLowerCase( toLocaleString( toLocaleTimeString( toLocaleUpperCase( toLowerCase( toPrecision( "
-"toString( toTimeString( toUTCString( toUpperCase( toggleAttribute( "
+"toReversed( toSorted( toSpliced( toString( toTimeString( toUTCString( toUpperCase( toggleAttribute( "
 "trace( trim( trimEnd( trimLeft( trimRight( trimStart( trunc( "
-"ubound( unescape( unregister( unshift( valueOf( values( wait( wake( warn( write( writeln( xor( "
+"ubound( unescape( unregister( unshift( valueOf( values( wait( wake( warn( with( write( writeln( xor( "
 
 , // 9 properties
 "URL __proto__ activeElement assignedSlot asyncIterator attributes baseURI body buffer byteLength byteOffset "
