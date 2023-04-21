@@ -54,7 +54,7 @@ EDITLEXER lexMarkdown = {
 		LexerAttr_NoLineComment |
 		LexerAttr_EscapePunctuation,
 		TAB_WIDTH_4, INDENT_WIDTH_4,
-		(1 << 0) | (1 << 1), // header1, header2
+		(1 << 0) | (1 << 1) | (1 << 2), // header1, header2, header3
 		0,
 		'\\', SCE_MARKDOWN_ESCAPECHAR, 0,
 		0,

@@ -552,7 +552,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
-		'default_fold_level': ['header1', 'header2'],
+		'default_fold_level': ['header1', 'header2', 'header3'],
 		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
 		'escape_punctuation': True,
 	},
