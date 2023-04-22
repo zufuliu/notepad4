@@ -457,13 +457,13 @@ action:
     string  extract all resource string or updated strings since specific reversion.
 """)
 
-def main():
-	if len(sys.argv) < 3:
+def main(argv):
+	if len(argv) < 3:
 		show_help()
 		return
 
-	action = sys.argv[1]
-	language = sys.argv[2]
+	action = argv[1]
+	language = argv[2]
 	availableLocales = get_available_locales()
 	if action == 'new':
 		if language in availableLocales:
@@ -479,10 +479,10 @@ def main():
 		if language != 'en' and language not in availableLocales:
 			print(f'{app}: language {language} not localized [{", ".join(availableLocales)}].')
 			return
-		reversion = sys.argv[3] if len(sys.argv) > 3 else ''
+		reversion = argv[3] if len(argv) > 3 else ''
 		extract_resource_string(language, reversion)
 	else:
 		show_help()
 
 if __name__ == '__main__':
-	main()
+	main(sys.argv)

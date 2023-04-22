@@ -1,3 +1,4 @@
+import sys
 import os.path
 import time
 import shutil
@@ -275,13 +276,28 @@ def upload_all_release_artifact(tag):
 			if entry.is_file() and name.endswith('.zip'):
 				files.append(name)
 
-	print('total artifact:', len(files))
+	print(tag, 'total artifact:', len(files))
 	files = ' '.join(files)
 	command = f'gh release upload {tag} {files}'
 	startTime = time.perf_counter()
 	run_command_in_folder(command, buildFolder)
 	endTime = time.perf_counter()
-	print('total upload time:', format_duration(endTime - startTime))
+	print(tag, 'total upload time:', format_duration(endTime - startTime))
 
-build_all_release_artifact()
-#upload_all_release_artifact('')
+def main(argv):
+	if len(argv) < 2:
+		print(f"Usage: {os.path.basename(__file__)} [build | list | upload <tag>]")
+		return
+
+	action = argv[1]
+	if action == 'build':
+		build_all_release_artifact()
+	elif action == 'list':
+		run_command_in_folder('gh release list -L 2', buildFolder)
+	elif action == 'upload':
+		if len(argv) > 3:
+			tag = argv[2]
+			upload_all_release_artifact(tag)
+
+if __name__ == '__main__':
+	main(sys.argv)
