@@ -901,7 +901,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 		// Here Document folding
 		if (style == SCE_SH_HERE_DELIM) {
 			if (ch == '<' && chNext == '<') {
-				if (styler.SafeGetCharAt(i + 2) == '<') {
+				if (styler.SafeGetCharAt(i + 2) != '<') {
 					levelCurrent++;
 				}
 			}
