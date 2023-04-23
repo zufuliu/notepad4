@@ -59,7 +59,8 @@ def build_enum_name(comment):
 			singly = item[:-1]
 			SinglyWordMap[item] = singly
 		items[-1] = singly
-	return ''.join(item.title() for item in items)
+	items = [item if item[0].isupper() else item.title() for item in items]
+	return ''.join(items)
 
 def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	output = []

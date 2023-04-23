@@ -664,7 +664,7 @@ enum {
 	DartKeywordIndex_Metadata = 4,
 	GraphVizKeywordIndex_HtmlLabel = 1,
 	GroovyKeywordIndex_Annotation = 7,
-	GroovyKeywordIndex_Groovydoc = 9,
+	GroovyKeywordIndex_GroovyDoc = 9,
 	HTMLKeywordIndex_Tag = 0,
 	HTMLKeywordIndex_Attribute = 6,
 	HTMLKeywordIndex_EventHandler = 7,
@@ -675,11 +675,11 @@ enum {
 	JavaKeywordIndex_Annotation = 7,
 	JavaKeywordIndex_Javadoc = 9,
 	JavaScriptKeywordIndex_Decorator = 7,
-	JavaScriptKeywordIndex_Jsdoc = 10,
+	JavaScriptKeywordIndex_JSDoc = 10,
 	JuliaKeywordIndex_CodeFolding = 1,
 	JuliaKeywordIndex_Macro = 6,
 	KotlinKeywordIndex_Annotation = 4,
-	KotlinKeywordIndex_Kdoc = 6,
+	KotlinKeywordIndex_KDoc = 6,
 	NSISKeywordIndex_PredefinedVariable = 5,
 	PHPKeywordIndex_PredefinedVariable = 4,
 	PHPKeywordIndex_Phpdoc = 11,
@@ -694,7 +694,7 @@ enum {
 	SwiftKeywordIndex_Attribute = 2,
 	TexinfoKeywordIndex_Command = 0,
 	TexinfoKeywordIndex_BlockCommand = 1,
-	TexinfoKeywordIndex_TexCommand = 2,
+	TexinfoKeywordIndex_TeXCommand = 2,
 	VBKeywordIndex_Preprocessor = 3,
 	VHDLKeywordIndex_Directive = 3,
 	VHDLKeywordIndex_Attribute = 4,
@@ -1232,7 +1232,7 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 	case NP2LEX_JAVA:
 		if (ch == '@') {
 			NP2_static_assert(JavaKeywordIndex_Annotation == GroovyKeywordIndex_Annotation);
-			NP2_static_assert(JavaKeywordIndex_Javadoc == GroovyKeywordIndex_Groovydoc);
+			NP2_static_assert(JavaKeywordIndex_Javadoc == GroovyKeywordIndex_GroovyDoc);
 			if (iCurrentStyle == SCE_JAVA_DEFAULT) {
 				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaKeywordIndex_Annotation]);
 				return AddWordResult_IgnoreLexer;
@@ -1249,9 +1249,9 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 	case NP2LEX_TYPESCRIPT:
 		if (ch == '@' || (ch == '<' && rid == NP2LEX_TYPESCRIPT)) {
 			if (iCurrentStyle >= SCE_JS_COMMENTLINE && iCurrentStyle <= SCE_JS_TASKMARKER) {
-				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[JavaScriptKeywordIndex_JSDoc]);
 				if (rid != NP2LEX_JAVASCRIPT) {
-					WordList_AddList(pWList, lexJavaScript.pKeyWords->pszKeyWords[JavaScriptKeywordIndex_Jsdoc]);
+					WordList_AddList(pWList, lexJavaScript.pKeyWords->pszKeyWords[JavaScriptKeywordIndex_JSDoc]);
 				}
 				return AddWordResult_Finish;
 			}
@@ -1278,7 +1278,7 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 				return AddWordResult_IgnoreLexer;
 			}
 			if (iCurrentStyle >= SCE_KOTLIN_COMMENTLINE && iCurrentStyle <= SCE_KOTLIN_TASKMARKER) {
-				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[KotlinKeywordIndex_Kdoc]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[KotlinKeywordIndex_KDoc]);
 				return AddWordResult_Finish;
 			}
 		}
@@ -1291,7 +1291,7 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 				WordList_AddListEx(pWList, LaTeXInputSequenceString);
 			}
 			if (ch == '\\' && rid == NP2LEX_TEXINFO) {
-				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_TexCommand]);
+				WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[TexinfoKeywordIndex_TeXCommand]);
 			}
 			return AddWordResult_IgnoreLexer;
 		}
