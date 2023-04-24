@@ -843,32 +843,28 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, SCE_SH_COMMENTLINE)
 
-void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
+void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const bool isCShell = styler.GetPropertyBool("lexer.lang");
 
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
-	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
+	int style = initStyle;
 
 	char word[8]; // foreach
 	constexpr int MaxFoldWordLength = sizeof(word) - 1;
 	int wordlen = 0;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
-		const int style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		// Comment folding
-		if (atEOL && IsCommentLine(lineCurrent)) {
-			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-		}
+	while (startPos < endPos) {
+		const char ch = styler[startPos];
+		const int stylePrev = style;
+		style = styleNext;
+		styleNext = styler.StyleAt(++startPos);
 
-		if (style == SCE_SH_WORD) {
+		switch (style) {
+		case SCE_SH_WORD:
 			if (wordlen < MaxFoldWordLength) {
 				word[wordlen++] = ch;
 			}
@@ -889,29 +885,41 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList
 					}
 				}
 			}
-		}
+			break;
 
-		if (style == SCE_SH_OPERATOR) {
+		case SCE_SH_OPERATOR:
 			if (ch == '{' || ch == '[') {
 				levelCurrent++;
 			} else if (ch == '}' || ch == ']') {
 				levelCurrent--;
 			}
-		}
-		// Here Document folding
-		if (style == SCE_SH_HERE_DELIM) {
-			if (ch == '<' && chNext == '<') {
-				if (styler.SafeGetCharAt(i + 2) != '<') {
+			break;
+
+		case SCE_SH_HERE_DELIM:
+			if (stylePrev != SCE_SH_HERE_DELIM) {
+				if (ch == '<' && styler[startPos + 1] != '<') {
 					levelCurrent++;
 				}
 			}
-		} else if (style == SCE_SH_HERE_Q && styleNext == SCE_SH_DEFAULT) {
-			levelCurrent--;
+			break;
+
+		case SCE_SH_HERE_Q:
+			if (style == SCE_SH_HERE_Q && styleNext == SCE_SH_DEFAULT) {
+				levelCurrent--;
+			}
+			break;
 		}
-		if (atEOL) {
+
+		if (ch == '\n' || (ch == '\r' && styler[startPos] != '\n')) {
+			// Comment folding
+			if (IsCommentLine(lineCurrent)) {
+				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			}
+
 			int lev = levelPrev;
-			if ((levelCurrent > levelPrev))
+			if ((levelCurrent > levelPrev)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
+			}
 			if (lev != styler.LevelAt(lineCurrent)) {
 				styler.SetLevel(lineCurrent, lev);
 			}
