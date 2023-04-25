@@ -197,7 +197,6 @@ void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWord
 
 		if (sc.atLineEnd) {
 			lineState = LS_DEFAULT;
-			currentLine = styler.GetLine(sc.currentPos);
 			if (sc.state != SCE_TCL_COMMENT && isComment(sc.state)) {
 				if (currentLevel == 0) {
 					++currentLevel;
@@ -213,7 +212,7 @@ void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWord
 			int flag = 0;
 			if (currentLevel > previousLevel)
 				flag = SC_FOLDLEVELHEADERFLAG;
-			styler.SetLevel(currentLine, flag + previousLevel + SC_FOLDLEVELBASE + (currentLevel << 17) + (commentLevel << 16));
+			styler.SetLevel(sc.currentLine, flag + previousLevel + SC_FOLDLEVELBASE + (currentLevel << 17) + (commentLevel << 16));
 
 			// Update the line state, so it can be seen by next line
 			if (sc.state == SCE_TCL_IN_QUOTE) {
@@ -225,7 +224,7 @@ void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWord
 				} else if (sc.state == SCE_TCL_COMMENT_BOX)
 					lineState = LS_COMMENT_BOX;
 			}
-			styler.SetLineState(currentLine,
+			styler.SetLineState(sc.currentLine,
 				(subBrace ? LS_BRACE_ONLY : 0) |
 				(expected ? LS_COMMAND_EXPECTED : 0) | lineState);
 			if (lineState == LS_COMMENT_BOX)

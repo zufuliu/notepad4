@@ -298,7 +298,6 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	for (; sc.More(); sc.Forward()) {
 		// handle line continuation, updates per-line stored state
 		if (sc.atLineStart) {
-			ln = styler.GetLine(sc.currentPos);
 			if (sc.state == SCE_SH_STRING_DQ
 				|| sc.state == SCE_SH_BACKTICKS
 				|| sc.state == SCE_SH_STRING_SQ
@@ -306,16 +305,16 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				|| sc.state == SCE_SH_COMMENTLINE
 				|| sc.state == SCE_SH_PARAM) {
 				// force backtrack while retaining cmdState
-				styler.SetLineState(ln, BASH_CMD_BODY);
+				styler.SetLineState(sc.currentLine, BASH_CMD_BODY);
 			} else {
-				if (ln > 0) {
+				if (sc.currentLine > 0) {
 					if ((sc.GetRelative(-3) == '\\' && sc.GetRelative(-2) == '\r' && sc.chPrev == '\n')
 						|| sc.GetRelative(-2) == '\\') {	// handle '\' line continuation
 						   // retain last line's state
 					} else
 						cmdState = BASH_CMD_START;
 				}
-				styler.SetLineState(ln, cmdState);
+				styler.SetLineState(sc.currentLine, cmdState);
 			}
 		}
 
@@ -834,7 +833,6 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 		}// sc.state
 	}
-	sc.Complete();
 	if (sc.state == SCE_SH_HERE_Q) {
 		styler.ChangeLexerState(sc.currentPos, styler.Length());
 	}
@@ -910,7 +908,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			break;
 		}
 
-		if (ch == '\n' || (ch == '\r' && styler[startPos] != '\n')) {
+		if (ch == '\n' || (ch == '\r' && styler[startPos] != '\n') || startPos == endPos) {
 			// Comment folding
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
@@ -927,9 +925,6 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			levelPrev = levelCurrent;
 		}
 	}
-	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
-	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
-	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 
 }

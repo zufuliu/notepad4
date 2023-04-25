@@ -1558,7 +1558,6 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 		}
 	}
-	sc.Complete();
 	if (sc.state == SCE_PL_HERE_Q
 		|| sc.state == SCE_PL_HERE_QQ
 		|| sc.state == SCE_PL_HERE_QX
@@ -1694,7 +1693,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			break;
 		}
 
-		if (atEOL) {
+		if (atEOL || (i == endPos - 1)) {
 			int lev = levelPrev;
 			// POD headings occupy bits 7-4, leaving some breathing room for
 			// non-standard practice -- POD sections stuck in blocks, etc.
@@ -1723,9 +1722,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		chPrev = ch;
 		stylePrevCh = style;
 	}
-	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
-	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
-	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 
 }

@@ -139,10 +139,10 @@ bool IsContinuationLine(LexAccessor &styler, Sci_Line szLine) noexcept {
 // syntax highlighting logic
 void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	// find the first previous line without continuation character at the end
-	Sci_Line lineCurrent = styler.GetLine(startPos);
 	const Sci_Position s_startPos = startPos;
 	// When not inside a Block comment: find First line without _
 	if (!(initStyle == SCE_AU3_COMMENTBLOCK)) {
+		Sci_Line lineCurrent = styler.GetLine(startPos);
 		while ((lineCurrent > 0 && IsContinuationLine(styler, lineCurrent)) ||
 			(lineCurrent > 1 && IsContinuationLine(styler, lineCurrent - 1))) {
 			lineCurrent--;
@@ -362,8 +362,7 @@ void ColouriseAU3Doc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 			if (sc.atLineEnd) {
 				si = 0;
 				// at line end and not found a continuation char then reset to default
-				lineCurrent = styler.GetLine(sc.currentPos);
-				if (!IsContinuationLine(styler, lineCurrent)) {
+				if (!IsContinuationLine(styler, sc.currentLine)) {
 					sc.SetState(SCE_AU3_DEFAULT);
 					break;
 				}

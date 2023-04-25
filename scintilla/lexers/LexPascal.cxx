@@ -118,8 +118,7 @@ void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 	for (; sc.More(); sc.Forward()) {
 		if (sc.atLineEnd) {
 			// Update the line state, so it can be seen by next line
-			curLine = styler.GetLine(sc.currentPos);
-			styler.SetLineState(curLine, curLineState);
+			styler.SetLineState(sc.currentLine, curLineState);
 		}
 
 		// Determine if the current state should terminate.
@@ -423,7 +422,7 @@ void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, L
 			}
 		}
 
-		if (atEOL) {
+		if (atEOL || (i == endPos - 1)) {
 			int lev = levelPrev;
 			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
@@ -436,10 +435,6 @@ void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, L
 			levelPrev = levelCurrent;
 		}
 	}
-
-	// If we didn't reach the EOL in previous loop, store line level and whitespace information.
-	// The rest will be filled in later...
-	styler.SetLevel(lineCurrent, levelPrev);
 }
 
 }
