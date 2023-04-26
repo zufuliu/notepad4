@@ -562,16 +562,9 @@ int GetStyleFirstWord(LexAccessor &styler, Sci_Line szLine) noexcept {
 }
 
 void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList, Accessor &styler) {
-	const Sci_Position endPos = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	constexpr bool foldInComment = false;
-	// Backtrack to previous line in case need to fix its fold status
 	Sci_Line lineCurrent = styler.GetLine(startPos);
-	if (startPos > 0) {
-		if (lineCurrent > 0) {
-			lineCurrent--;
-			startPos = styler.LineStart(lineCurrent);
-		}
-	}
 	// vars for style of previous/current/next lines
 	int style = GetStyleFirstWord(styler, lineCurrent);
 	int stylePrev = 0;
@@ -597,16 +590,14 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 	if (lineCurrent > 0) {
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
 	}
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	lineStartNext = sci::min(lineStartNext, endPos);
 	int levelNext = levelCurrent;
-	//
-	int chNext = static_cast<unsigned char>(styler.SafeGetCharAt(startPos));
-	int chPrev = ' ';
-	//
-	for (Sci_Position i = startPos; i < endPos; i++) {
-		const int ch = chNext;
-		chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
+	char chPrev = ' ';
+	while (startPos < endPos) {
+		const char ch = styler[startPos];
 		// get the syle for the current character neede to check in comment
-		const int stylech = styler.StyleAt(i);
+		const int stylech = styler.StyleAt(startPos);
 		// get first word for the line for indent check max 9 characters
 		if (FirstWordStart && (!(FirstWordEnd))) {
 			if (!IsAu3WordChar(ch)) {
@@ -614,7 +605,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 				szKeyword[szKeywordlen] = '\0';
 			} else {
 				if (szKeywordlen < 10) {
-					szKeyword[szKeywordlen++] = static_cast<char>(UnsafeLower(ch));
+					szKeyword[szKeywordlen++] = UnsafeLower(ch);
 				}
 			}
 		}
@@ -622,7 +613,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 		if (!(FirstWordStart)) {
 			if (IsAu3WordChar(ch) || IsAu3WordStart(ch) || ch == ';') {
 				FirstWordStart = true;
-				szKeyword[szKeywordlen++] = static_cast<char>(UnsafeLower(ch));
+				szKeyword[szKeywordlen++] = UnsafeLower(ch);
 			}
 		}
 		// only process this logic when not in comment section
@@ -638,12 +629,12 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 					szThen[0] = szThen[1];
 					szThen[1] = szThen[2];
 					szThen[2] = szThen[3];
-					szThen[3] = static_cast<char>(UnsafeLower(ch));
+					szThen[3] = UnsafeLower(ch);
 					if (StrEqual(szThen, "then")) {
 						ThenFoundLast = true;
 					}
 				} else {
-					szThen[szThenlen++] = static_cast<char>(UnsafeLower(ch));
+					szThen[szThenlen++] = UnsafeLower(ch);
 					if (szThenlen == 5) {
 						szThen[4] = '\0';
 					}
@@ -651,7 +642,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 			}
 		}
 		// End of Line found so process the information
-		if ((ch == '\r' && chNext != '\n') || (ch == '\n') || (i == endPos)) {
+		if (startPos == lineStartNext) {
 			// **************************
 			// Folding logic for Keywords
 			// **************************
@@ -739,6 +730,8 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 			}
 			// reset values for the next line
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			stylePrev = style;
 			style = styleNext;
 			levelCurrent = levelNext;
@@ -752,7 +745,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 			}
 		}
 		// save the last processed character
-		if (!isspacechar(ch)) {
+		if (static_cast<unsigned char>(ch) > ' ') {
 			chPrev = ch;
 		}
 	}

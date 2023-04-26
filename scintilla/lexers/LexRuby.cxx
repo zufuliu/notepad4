@@ -1759,6 +1759,8 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	uint8_t chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrev = styler.StyleAt(startPos - 1);
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	lineStartNext = sci::min(lineStartNext, endPos);
 	// detect endless method definition to fix up code folding
 	enum class MethodDefinition {
 		None,
@@ -1771,21 +1773,17 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	int argument_paren_count = 0;
 	bool heredocOpen = false;
 
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const uint8_t ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
+		chNext = styler[++startPos];
 		const int style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		styleNext = styler.StyleAt(startPos);
 
-		if (atEOL && IsCommentLine(lineCurrent)) {
-			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-		}
 		if (style == SCE_RB_POD) {
 			if (ch == '=') {
-				if (styler.Match(i + 1, "begin")) {
+				if (styler.Match(startPos, "begin")) {
 					levelCurrent++;
-				} else if (styler.Match(i + 1, "end")) {
+				} else if (styler.Match(startPos, "end")) {
 					levelCurrent--;
 				}
 			}
@@ -1802,7 +1800,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			// Look at the keyword on the left and decide what to do
 			char prevWord[MAX_KEYWORD_LENGTH + 1]; // 1 byte for zero
 			prevWord[0] = 0;
-			getPrevWord(i, prevWord, styler, SCE_RB_WORD);
+			getPrevWord(startPos - 1, prevWord, styler, SCE_RB_WORD);
 			if (StrEqual(prevWord, "end")) {
 				// Don't decrement below 0
 				if (levelCurrent > 0)
@@ -1814,7 +1812,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				levelCurrent++;
 			}
 		} else if (style == SCE_RB_HERE_DELIM && !heredocOpen) {
-			if (stylePrev == SCE_RB_OPERATOR && chPrev == '<' && styler.SafeGetCharAt(i - 2) == '<') {
+			if (stylePrev == SCE_RB_OPERATOR && chPrev == '<' && styler.SafeGetCharAt(startPos - 3) == '<') {
 				levelCurrent++;
 				heredocOpen = true;
 			} else if (styleNext != SCE_RB_HERE_DELIM) {
@@ -1878,12 +1876,18 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				break;
 			}
 		}
-		if (atEOL || (i == endPos - 1)) {
+		if (startPos == lineStartNext) {
+			if (IsCommentLine(lineCurrent)) {
+				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			}
+
 			int lev = levelPrev;
 			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			styler.SetLevel(lineCurrent, lev | SC_FOLDLEVELBASE);
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 			method_definition = MethodDefinition::None;
 			argument_paren_count = 0;

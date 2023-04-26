@@ -320,6 +320,8 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	lineStartNext = sci::min(lineStartNext, endPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	int style = initStyle;
@@ -362,7 +364,7 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			}
 		}
 
-		if (ch == '\n' || (ch == '\r' && styler[startPos] != '\n') || startPos == endPos) {
+		if (startPos == lineStartNext) {
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			}
@@ -375,6 +377,8 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 		}
 	}

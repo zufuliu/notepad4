@@ -1579,14 +1579,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 
-	// Backtrack to previous line in case need to fix its fold status
-	if (startPos > 0) {
-		if (lineCurrent > 0) {
-			lineCurrent--;
-			startPos = styler.LineStart(lineCurrent);
-		}
-	}
-
 	int levelPrev = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelPrev = styler.LevelAt(lineCurrent - 1) >> 16;
@@ -1596,19 +1588,16 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrevCh = styler.StyleAt(startPos - 1);
 	// Used at end of line to determine if the line was a package definition
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	lineStartNext = sci::min(lineStartNext, endPos);
 	bool isPackageLine = false;
+	bool atLineStart = true;
 	int podHeading = 0;
-	for (Sci_PositionU i = startPos; i < endPos; i++) {
+	while (startPos < endPos) {
 		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
+		chNext = styler[startPos + 1];
 		const int style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		const bool atLineStart = ((chPrev == '\r') || (chPrev == '\n')) || i == 0;
-		// Comment folding
-		if (atEOL && IsCommentLine(lineCurrent)) {
-			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-		}
+		styleNext = styler.StyleAt(startPos + 1);
 		// {} [] block folding
 		if (style == SCE_PL_OPERATOR) {
 			if (ch == '{') {
@@ -1639,17 +1628,17 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			if (style == SCE_PL_POD) {
 				if (stylePrevCh != SCE_PL_POD && stylePrevCh != SCE_PL_POD_VERB)
 					levelCurrent++;
-				else if (styler.Match(i, "=cut"))
+				else if (styler.Match(startPos, "=cut"))
 					levelCurrent = (levelCurrent & ~PERL_HEADFOLD_MASK) - 1;
-				else if (styler.Match(i, "=head"))
-					podHeading = PodHeadingLevel(styler, i);
+				else if (styler.Match(startPos, "=head"))
+					podHeading = PodHeadingLevel(styler, startPos);
 			} else if (style == SCE_PL_DATASECTION) {
 				if (ch == '=' && IsAlpha(chNext) && levelCurrent == SC_FOLDLEVELBASE)
 					levelCurrent++;
-				else if (styler.Match(i, "=cut") && levelCurrent > SC_FOLDLEVELBASE)
+				else if (styler.Match(startPos, "=cut") && levelCurrent > SC_FOLDLEVELBASE)
 					levelCurrent = (levelCurrent & ~PERL_HEADFOLD_MASK) - 1;
-				else if (styler.Match(i, "=head"))
-					podHeading = PodHeadingLevel(styler, i);
+				else if (styler.Match(startPos, "=head"))
+					podHeading = PodHeadingLevel(styler, startPos);
 				// if package used or unclosed brace, level > SC_FOLDLEVELBASE!
 				// reset needed as level test is vs. SC_FOLDLEVELBASE
 				else if (stylePrevCh != SCE_PL_DATASECTION)
@@ -1693,7 +1682,14 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			break;
 		}
 
-		if (atEOL || (i == endPos - 1)) {
+		++startPos;
+		atLineStart = startPos == lineStartNext;
+		if (atLineStart) {
+			// Comment folding
+			if (IsCommentLine(lineCurrent)) {
+				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			}
+
 			int lev = levelPrev;
 			// POD headings occupy bits 7-4, leaving some breathing room for
 			// non-standard practice -- POD sections stuck in blocks, etc.
@@ -1717,6 +1713,8 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 		}
 		chPrev = ch;
