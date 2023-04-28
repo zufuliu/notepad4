@@ -525,23 +525,15 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 	class HereDocCls {	// Class to manage HERE doc sequence
 	public:
-		int State;
+		int State = 0;
 		// 0: '<<' encountered
 		// 1: collect the delimiter
 		// 2: here doc text (lines after the delimiter)
-		int Quote;		// the char after '<<'
-		bool Quoted;		// true if Quote in ('\'','"','`')
-		bool StripIndent;	// true if '<<~' requested to strip leading whitespace
-		int DelimiterLength;	// strlen(Delimiter)
-		char Delimiter[HERE_DELIM_MAX];	// the Delimiter
-		HereDocCls() noexcept {
-			State = 0;
-			Quote = 0;
-			Quoted = false;
-			StripIndent = false;
-			DelimiterLength = 0;
-			Delimiter[0] = '\0';
-		}
+		int Quote = '\0';		// the char after '<<'
+		bool Quoted = false;		// true if Quote in ('\'','"','`')
+		bool StripIndent = false;	// true if '<<~' requested to strip leading whitespace
+		int DelimiterLength = 0;	// strlen(Delimiter)
+		char Delimiter[HERE_DELIM_MAX]{};	// the Delimiter
 		void Append(int ch) noexcept {
 			Delimiter[DelimiterLength++] = static_cast<char>(ch);
 			Delimiter[DelimiterLength] = '\0';
@@ -551,13 +543,10 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 	class QuoteCls {	// Class to manage quote pairs
 	public:
-		int Rep;
-		int Count;
-		int Up;
-		int Down;
-		QuoteCls() noexcept {
-			New(1);
-		}
+		int Rep = 1;
+		int Count = 0;
+		int Up = '\0';
+		int Down = '\0';
 		void New(int r = 1) noexcept {
 			Rep   = r;
 			Count = 0;
@@ -1584,7 +1573,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		levelPrev = styler.LevelAt(lineCurrent - 1) >> 16;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
-	char chPrev = styler.SafeGetCharAt(startPos - 1);
 	int styleNext = styler.StyleAt(startPos);
 	int stylePrevCh = styler.StyleAt(startPos - 1);
 	// Used at end of line to determine if the line was a package definition
@@ -1682,6 +1670,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			break;
 		}
 
+		stylePrevCh = style;
 		++startPos;
 		atLineStart = startPos == lineStartNext;
 		if (atLineStart) {
@@ -1717,8 +1706,6 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 		}
-		chPrev = ch;
-		stylePrevCh = style;
 	}
 }
 

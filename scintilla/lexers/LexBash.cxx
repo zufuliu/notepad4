@@ -183,22 +183,14 @@ constexpr bool IsBashCmdDelimiter(int ch, int chNext) noexcept {
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	class HereDocCls {	// Class to manage HERE document elements
 	public:
-		int State;		// 0: '<<' encountered
+		int State = 0;		// 0: '<<' encountered
 		// 1: collect the delimiter
 		// 2: here doc text (lines after the delimiter)
-		int Quote;		// the char after '<<'
-		bool Quoted;		// true if Quote in ('\'','"','`')
-		bool Indent;		// indented delimiter (for <<-)
-		int DelimiterLength;	// strlen(Delimiter)
-		char Delimiter[HERE_DELIM_MAX];	// the Delimiter
-		HereDocCls() noexcept {
-			State = 0;
-			Quote = 0;
-			Quoted = false;
-			Indent = false;
-			DelimiterLength = 0;
-			Delimiter[0] = '\0';
-		}
+		int Quote = '\0';		// the char after '<<'
+		bool Quoted = false;		// true if Quote in ('\'','"','`')
+		bool Indent = false;		// indented delimiter (for <<-)
+		int DelimiterLength = 0;	// strlen(Delimiter)
+		char Delimiter[HERE_DELIM_MAX]{};	// the Delimiter
 		void Append(int ch) noexcept {
 			Delimiter[DelimiterLength++] = static_cast<char>(ch);
 			Delimiter[DelimiterLength] = '\0';

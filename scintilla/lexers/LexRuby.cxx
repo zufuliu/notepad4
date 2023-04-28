@@ -267,12 +267,9 @@ bool currLineContainsHereDelims(Sci_Position &startPos, LexAccessor &styler) noe
 
 class QuoteCls {
 public:
-	int	 Count;
-	char Up;
-	char Down;
-	QuoteCls() noexcept {
-		New();
-	}
+	int	Count = 0;
+	char Up = '\0';
+	char Down = '\0';
 	void New() noexcept {
 		Count = 0;
 		Up	  = '\0';
@@ -684,9 +681,9 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 		// 2: here doc text (lines after the delimiter)
 		char Quote = '\0';		// the char after '<<'
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
+		bool CanBeIndented = false;
 		int DelimiterLength = 0;	// strlen(Delimiter)
 		char Delimiter[256] {};	// the Delimiter, limit of 256: from Perl
-		bool CanBeIndented = false;
 	};
 	HereDocCls HereDoc;
 
@@ -1876,6 +1873,9 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 				break;
 			}
 		}
+
+		chPrev = ch;
+		stylePrev = style;
 		if (startPos == lineStartNext) {
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
@@ -1893,8 +1893,6 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			argument_paren_count = 0;
 			heredocOpen = false;
 		}
-		chPrev = ch;
-		stylePrev = style;
 	}
 }
 
