@@ -58,15 +58,19 @@ enum {
 #define BASH_CMD_DELIM			5
 
 // state constants for nested delimiter pairs, used by
-// SCE_SH_STRING_DQ and SCE_SH_BACKTICKS processing
-#define BASH_DELIM_LITERAL		0
-#define BASH_DELIM_STRING		1
-#define BASH_DELIM_CSTRING		2
-#define BASH_DELIM_LSTRING		3
-#define BASH_DELIM_COMMAND		4
-#define BASH_DELIM_BACKTICK		5
+// SCE_SH_STRING_DQ, SCE_SH_BACKTICKS and SCE_SH_PARAM processing
+enum class QuoteStyle {
+	Literal,		// ''
+	CString,		// $''
+	String,			// ""
+	LString,		// $""
+	Backtick,		// ``, $``
+	Parameter,		// ${}
+	Command,		// $()
+	Arithmetic,		// $(()), $[]
+};
 
-#define BASH_DELIM_STACK_MAX	7
+#define BASH_QUOTE_STACK_MAX	7
 
 constexpr int translateBashDigit(int ch) noexcept {
 	if (ch >= '0' && ch <= '9') {
@@ -180,6 +184,55 @@ constexpr bool IsBashCmdDelimiter(int ch, int chNext) noexcept {
 		|| (ch == '|' && chNext == '&');
 }
 
+class QuoteCls {	// Class to manage quote pairs (simplified vs LexPerl)
+public:
+	int Count = 0;
+	int Up = '\0';
+	int Down = '\0';
+	QuoteStyle Style = QuoteStyle::Literal;
+	void Clear() noexcept {
+		Count = 0;
+		Up	  = '\0';
+		Down  = '\0';
+		Style = QuoteStyle::Literal;
+	}
+	void Open(int u, QuoteStyle s) noexcept {
+		Count++;
+		Up    = u;
+		Down  = opposite(Up);
+		Style = s;
+	}
+	void Start(int u, QuoteStyle s) noexcept {
+		Count = 0;
+		Open(u, s);
+	}
+};
+
+class QuoteStackCls {	// Class to manage quote pairs that nest
+public:
+	int Depth = 0;
+	QuoteCls Current;
+	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
+	void Start(int u, QuoteStyle s) noexcept {
+		Current.Start(u, s);
+	}
+	void Push(int u, QuoteStyle s) noexcept {
+		if (Depth >= BASH_QUOTE_STACK_MAX) {
+			return;
+		}
+		Stack[Depth] = Current;
+		Depth++;
+		Current.Start(u, s);
+	}
+	void Pop() noexcept {
+		if (Depth <= 0) {
+			return;
+		}
+		Depth--;
+		Current = Stack[Depth];
+	}
+};
+
 void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	class HereDocCls {	// Class to manage HERE document elements
 	public:
@@ -198,73 +251,6 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	};
 	HereDocCls HereDoc;
 
-	class QuoteCls {	// Class to manage quote pairs (simplified vs LexPerl)
-	public:
-		int Count;
-		int Up;
-		int Down;
-		QuoteCls() noexcept {
-			Count = 0;
-			Up    = '\0';
-			Down  = '\0';
-		}
-		void Open(int u) noexcept {
-			Count++;
-			Up    = u;
-			Down  = opposite(Up);
-		}
-		void Start(int u) noexcept {
-			Count = 0;
-			Open(u);
-		}
-	};
-	QuoteCls Quote;
-
-	class QuoteStackCls {	// Class to manage quote pairs that nest
-	public:
-		int Count;
-		int Up;
-		int Down;
-		int Style;
-		int Depth;			// levels pushed
-		int CountStack[BASH_DELIM_STACK_MAX];
-		int UpStack   [BASH_DELIM_STACK_MAX];
-		int StyleStack[BASH_DELIM_STACK_MAX];
-		QuoteStackCls() noexcept {
-			Count = 0;
-			Up    = '\0';
-			Down  = '\0';
-			Style = 0;
-			Depth = 0;
-		}
-		void Start(int u, int s) noexcept {
-			Count = 1;
-			Up    = u;
-			Down  = opposite(Up);
-			Style = s;
-		}
-		void Push(int u, int s) noexcept {
-			if (Depth >= BASH_DELIM_STACK_MAX)
-				return;
-			CountStack[Depth] = Count;
-			UpStack   [Depth] = Up;
-			StyleStack[Depth] = Style;
-			Depth++;
-			Count = 1;
-			Up    = u;
-			Down  = opposite(Up);
-			Style = s;
-		}
-		void Pop() noexcept {
-			if (Depth <= 0)
-				return;
-			Depth--;
-			Count = CountStack[Depth];
-			Up    = UpStack   [Depth];
-			Style = StyleStack[Depth];
-			Down  = opposite(Up);
-		}
-	};
 	QuoteStackCls QuoteStack;
 
 	int numBase = 0;
@@ -290,7 +276,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	for (; sc.More(); sc.Forward()) {
 		// handle line continuation, updates per-line stored state
 		if (sc.atLineStart) {
-			if (sc.state == SCE_SH_STRING_DQ
+			if (QuoteStack.Depth != 0
+				|| sc.state == SCE_SH_STRING_DQ
 				|| sc.state == SCE_SH_BACKTICKS
 				|| sc.state == SCE_SH_STRING_SQ
 				|| sc.state == SCE_SH_HERE_Q
@@ -562,71 +549,60 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			break;
 		case SCE_SH_STRING_DQ:	// delimited styles, can nest
 		case SCE_SH_BACKTICKS:
-			if (sc.ch == '\\' && QuoteStack.Up != '\\') {
-				if (QuoteStack.Style != BASH_DELIM_LITERAL)
+		case SCE_SH_PARAM: // ${parameter}
+			if (sc.ch == '\\') {
+				if (QuoteStack.Current.Style != QuoteStyle::Literal) {
 					sc.Forward();
-			} else if (sc.ch == QuoteStack.Down) {
-				QuoteStack.Count--;
-				if (QuoteStack.Count == 0) {
+				}
+			} else if (sc.ch == QuoteStack.Current.Down) {
+				QuoteStack.Current.Count--;
+				if (QuoteStack.Current.Count == 0) {
 					if (QuoteStack.Depth > 0) {
 						QuoteStack.Pop();
-					} else
+					} else {
 						sc.ForwardSetState(SCE_SH_DEFAULT);
+					}
 				}
-			} else if (sc.ch == QuoteStack.Up) {
-				QuoteStack.Count++;
+			} else if (sc.ch == QuoteStack.Current.Up) {
+				QuoteStack.Current.Count++;
 			} else {
-				if (QuoteStack.Style == BASH_DELIM_STRING ||
-					QuoteStack.Style == BASH_DELIM_LSTRING
+				if (QuoteStack.Current.Style == QuoteStyle::String ||
+					QuoteStack.Current.Style == QuoteStyle::LString
 					) {	// do nesting for "string", $"locale-string"
 					if (sc.ch == '`') {
-						QuoteStack.Push(sc.ch, BASH_DELIM_BACKTICK);
+						QuoteStack.Push(sc.ch, QuoteStyle::Backtick);
 					} else if (sc.ch == '$' && sc.chNext == '(') {
 						sc.Forward();
-						QuoteStack.Push(sc.ch, BASH_DELIM_COMMAND);
+						QuoteStack.Push(sc.ch, QuoteStyle::Command);
 					}
-				} else if (QuoteStack.Style == BASH_DELIM_COMMAND ||
-					QuoteStack.Style == BASH_DELIM_BACKTICK
-					) {	// do nesting for $(command), `command`
+				} else if (QuoteStack.Current.Style == QuoteStyle::Command
+					|| QuoteStack.Current.Style == QuoteStyle::Backtick
+					|| QuoteStack.Current.Style == QuoteStyle::Parameter
+					) {	// do nesting for $(command), `command`, ${parameter}
 					if (sc.ch == '\'') {
-						QuoteStack.Push(sc.ch, BASH_DELIM_LITERAL);
+						QuoteStack.Push(sc.ch, QuoteStyle::Literal);
 					} else if (sc.ch == '\"') {
-						QuoteStack.Push(sc.ch, BASH_DELIM_STRING);
+						QuoteStack.Push(sc.ch, QuoteStyle::String);
 					} else if (sc.ch == '`') {
-						QuoteStack.Push(sc.ch, BASH_DELIM_BACKTICK);
+						QuoteStack.Push(sc.ch, QuoteStyle::Backtick);
 					} else if (sc.ch == '$') {
 						if (sc.chNext == '\'') {
 							sc.Forward();
-							QuoteStack.Push(sc.ch, BASH_DELIM_CSTRING);
+							QuoteStack.Push(sc.ch, QuoteStyle::CString);
 						} else if (sc.chNext == '\"') {
 							sc.Forward();
-							QuoteStack.Push(sc.ch, BASH_DELIM_LSTRING);
+							QuoteStack.Push(sc.ch, QuoteStyle::LString);
 						} else if (sc.chNext == '(') {
 							sc.Forward();
-							QuoteStack.Push(sc.ch, BASH_DELIM_COMMAND);
+							QuoteStack.Push(sc.ch, QuoteStyle::Command);
 						}
 					}
 				}
 			}
 			break;
-		case SCE_SH_PARAM: // ${parameter}
-			if (sc.ch == '\\' && Quote.Up != '\\') {
-				sc.Forward();
-			} else if (sc.ch == Quote.Down) {
-				Quote.Count--;
-				if (Quote.Count == 0) {
-					sc.ForwardSetState(SCE_SH_DEFAULT);
-				}
-			} else if (sc.ch == Quote.Up) {
-				Quote.Count++;
-			}
-			break;
 		case SCE_SH_STRING_SQ: // singly-quoted strings
-			if (sc.ch == Quote.Down) {
-				Quote.Count--;
-				if (Quote.Count == 0) {
-					sc.ForwardSetState(SCE_SH_DEFAULT);
-				}
+			if (sc.ch == '\'') {
+				sc.ForwardSetState(SCE_SH_DEFAULT);
 			}
 			break;
 		}
@@ -713,13 +689,12 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_SH_STRING_DQ);
-				QuoteStack.Start(sc.ch, BASH_DELIM_STRING);
+				QuoteStack.Start(sc.ch, QuoteStyle::String);
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_SH_STRING_SQ);
-				Quote.Start(sc.ch);
 			} else if (sc.ch == '`') {
 				sc.SetState(SCE_SH_BACKTICKS);
-				QuoteStack.Start(sc.ch, BASH_DELIM_BACKTICK);
+				QuoteStack.Start(sc.ch, QuoteStyle::Backtick);
 			} else if (sc.ch == '$') {
 				if (sc.chNext == '(' || sc.chNext == '[') {
 					sc.SetState(SCE_SH_OPERATOR);	// handle '((' later
@@ -729,19 +704,19 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.Forward();
 				if (sc.ch == '{') {
 					sc.ChangeState(SCE_SH_PARAM);
-					Quote.Start(sc.ch);
+					QuoteStack.Start(sc.ch, QuoteStyle::Parameter);
 				} else if (sc.ch == '\'') {
 					sc.ChangeState(SCE_SH_STRING_DQ);
-					QuoteStack.Start(sc.ch, BASH_DELIM_CSTRING);
+					QuoteStack.Start(sc.ch, QuoteStyle::CString);
 				} else if (sc.ch == '"') {
 					sc.ChangeState(SCE_SH_STRING_DQ);
-					QuoteStack.Start(sc.ch, BASH_DELIM_LSTRING);
+					QuoteStack.Start(sc.ch, QuoteStyle::LString);
 				} else if (sc.ch == '(') {
 					sc.ChangeState(SCE_SH_BACKTICKS);
-					QuoteStack.Start(sc.ch, BASH_DELIM_COMMAND);
+					QuoteStack.Start(sc.ch, QuoteStyle::Command);
 				} else if (sc.ch == '`') {	// $` seen in a configure script, valid?
 					sc.ChangeState(SCE_SH_BACKTICKS);
-					QuoteStack.Start(sc.ch, BASH_DELIM_BACKTICK);
+					QuoteStack.Start(sc.ch, QuoteStyle::Backtick);
 				} else {
 					continue;	// scalar has no delimiter pair
 				}
