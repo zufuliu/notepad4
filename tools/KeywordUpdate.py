@@ -15,7 +15,7 @@ lexerList = [
 	('NP2LEX_AVISYNTH', 'stlAviSynth.c', 'LexAviSynth.cxx', 'AviSynth.avs', 0, parse_avisynth_api_file),
 	('NP2LEX_AWK', 'stlAwk.c', 'LexAwk.cxx', 'Awk.awk', 1, parse_awk_api_file),
 
-	('NP2LEX_BASH', 'stlBash.c', 'LexBash.cxx', '', 0, parse_bash_api_file),
+	('NP2LEX_BASH', 'stlBash.c', 'LexBash.cxx', ['Bash.sh', 'CShell.csh'], 0, parse_bash_api_file),
 	('NP2LEX_BATCH', 'stlBatch.c', 'LexBatch.cxx', 'Batch.bat', 0, parse_batch_api_file),
 
 	('NP2LEX_CIL', 'stlCIL.c', 'LexCIL.cxx', '', 0, None),

@@ -488,11 +488,26 @@ def parse_awk_api_file(path):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
-def parse_bash_api_file(path):
+def parse_bash_api_file(pathList):
+	keywordMap = {
+		'keywords': [],
+		'variables': [],
+		'commands': ['m4', 'dnl'], # M4
+	}
+	for path in pathList:
+		sections = read_api_file(path, '#')
+		for key, doc in sections:
+			if key not in keywordMap:
+				continue
+			items = doc.split()
+			if key == 'variables':
+				items = [item[1:] for item in items]
+			keywordMap[key].extend(items)
+	keywordMap['keywords'].extend(keywordMap['commands'])
 	return [
-		('keywords', [], KeywordAttr.Default),
-		('bash struct', [], KeywordAttr.Default),
-		('variables', [], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('bash struct', "if elif fi while until else then do done esac eval".split(), KeywordAttr.NoAutoComp),
+		('variables', keywordMap['variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
 def parse_batch_api_file(path):

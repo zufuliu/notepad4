@@ -115,8 +115,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Rust](tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
 	* Shell Script
-		* Bash likes (sh, bash, dash, ash, zsh, ksh), [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
-		* C Shell (csh, tcsh)
+		* [Bash](tools/lang/Bash.sh) likes (sh, bash, dash, ash, zsh, ksh), up date to Bash 5.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
+		* [C Shell](tools/lang/CShell.csh) (csh, tcsh), up date to tcsh 6.24.
 		* M4 Macro, limited support
 	* SQL Query
 		* [SQL Standard](tools/lang/SQL.sql), up to SQL:2016.
