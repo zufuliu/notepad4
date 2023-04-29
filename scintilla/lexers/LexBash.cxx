@@ -592,36 +592,26 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			// HereDoc.State == 2
 			if (sc.atLineStart) {
 				sc.SetState(SCE_SH_HERE_Q);
-				int prefixws = 0;
-				while (sc.ch == '\t' && !sc.MatchLineEnd()) {	// tabulation prefix
-					sc.Forward();
-					prefixws++;
-				}
-				if (prefixws > 0) {
-					sc.SetState(SCE_SH_HERE_Q);
-				}
-				while (sc.More() && !sc.MatchLineEnd()) {
-					sc.Forward();
-				}
-				char s[HERE_DELIM_MAX];
-				sc.GetCurrent(s, sizeof(s));
-				if (sc.LengthCurrent() == 0) {  // '' or "" delimiters
-					if ((prefixws == 0 || HereDoc.Indent) &&
-						HereDoc.Quoted && HereDoc.DelimiterLength == 0) {
-						sc.SetState(SCE_SH_DEFAULT);
+				if (HereDoc.Indent) { // tabulation prefix
+					while (sc.ch == '\t') {
+						sc.Forward();
 					}
+				}
+				if ((HereDoc.DelimiterLength == 0 && sc.MatchLineEnd())
+					|| (styler.Match(sc.currentPos, HereDoc.Delimiter) && IsEOLChar(sc.GetRelative(HereDoc.DelimiterLength)))) {
+					sc.Forward(HereDoc.DelimiterLength);
+					sc.SetState(SCE_SH_DEFAULT);
 					break;
 				}
-				char *p = s + strlen(s) - 1;
-				if (*p == '\r') {
-					*p = '\0';
-				}
-				if (strequ(HereDoc.Delimiter, s)) {
-					if ((prefixws == 0) ||	// indentation rule
-						(prefixws > 0 && HereDoc.Indent)) {
-						sc.SetState(SCE_SH_DEFAULT);
-						break;
-					}
+			}
+			if (!HereDoc.Quoted) {
+				if (sc.ch == '\\') {
+					sc.Forward();
+				} else if (sc.ch == '`') {
+					QuoteStack.Start(sc.ch, QuoteStyle::Backtick, sc.state);
+					sc.SetState(SCE_SH_BACKTICKS);
+				} else if (sc.ch == '$') {
+					QuoteStack.Expand(sc, cmdState);
 				}
 			}
 			break;
