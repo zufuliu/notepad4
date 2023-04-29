@@ -309,6 +309,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		// 2: here doc text (lines after the delimiter)
 		int Quote = '\0';		// the char after '<<'
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
+		bool Escaped = false;		// backslash in delimiter
 		bool Indent = false;		// indented delimiter (for <<-)
 		int DelimiterLength = 0;	// strlen(Delimiter)
 		char Delimiter[HERE_DELIM_MAX]{};	// the Delimiter
@@ -538,8 +539,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (HereDoc.State == 0) { // '<<' encountered
 				HereDoc.Quote = sc.chNext;
 				HereDoc.Quoted = false;
+				HereDoc.Escaped = false;
 				HereDoc.DelimiterLength = 0;
-				HereDoc.Delimiter[HereDoc.DelimiterLength] = '\0';
+				HereDoc.Delimiter[0] = '\0';
 				if (sc.chNext == '\'' || sc.chNext == '\"') {	// a quoted here-doc delimiter (' or ")
 					sc.Forward();
 					HereDoc.Quoted = true;
@@ -573,6 +575,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				} else if (HereDoc.Quoted && sc.ch == HereDoc.Quote) {	// closing quote => end of delimiter
 					sc.ForwardSetState(SCE_SH_DEFAULT);
 				} else if (sc.ch == '\\') {
+					HereDoc.Escaped = true;
 					if (HereDoc.Quoted && sc.chNext != HereDoc.Quote && sc.chNext != '\\') {
 						// in quoted prefixes only \ and the quote eat the escape
 						HereDoc.Append(sc.ch);
@@ -604,7 +607,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					break;
 				}
 			}
-			if (!HereDoc.Quoted) {
+			if (!(HereDoc.Quoted | HereDoc.Escaped)) {
 				if (sc.ch == '\\') {
 					sc.Forward();
 				} else if (sc.ch == '`') {

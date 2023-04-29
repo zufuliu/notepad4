@@ -800,7 +800,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				HereDoc.Quoted = false;
 				HereDoc.StripIndent = false;
 				HereDoc.DelimiterLength = 0;
-				HereDoc.Delimiter[HereDoc.DelimiterLength] = '\0';
+				HereDoc.Delimiter[0] = '\0';
 				if (delim_ch == '~') { // was actually '<<~'
 					sc.Forward();
 					HereDoc.StripIndent = true;
