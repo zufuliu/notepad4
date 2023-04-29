@@ -256,9 +256,14 @@ public:
 		Outer = SCE_SH_DEFAULT;
 		Current.Clear();
 	}
-	bool CountDown(StyleContext &sc) {
+	bool CountDown(StyleContext &sc, CmdState &cmdState) {
 		Current.Count--;
+		if (Current.Count == 1 && sc.Match(')', ')')) {
+			Current.Count--;
+			sc.Forward();
+		}
 		if (Current.Count == 0) {
+			cmdState = CmdState::Body;
 			const int outer = Current.Outer;
 			if (Depth > 0) {
 				Pop();
@@ -272,35 +277,40 @@ public:
 	}
 	void Expand(StyleContext &sc, CmdState &cmdState) {
 		const int state = sc.state;
+		QuoteStyle style = QuoteStyle::Literal;
 		Outer = state;
 		sc.SetState(SCE_SH_SCALAR);
 		sc.Forward();
 		if (sc.ch == '{') {
-			Start(sc.ch, QuoteStyle::Parameter, state);
+			style = QuoteStyle::Parameter;
 			sc.ChangeState(SCE_SH_PARAM);
 		} else if (sc.ch == '\'') {
-			Start(sc.ch, QuoteStyle::CString, state);
+			style = QuoteStyle::CString;
 			sc.ChangeState(SCE_SH_STRING_DQ);
 		} else if (sc.ch == '"') {
-			Start(sc.ch, QuoteStyle::LString, state);
+			style = QuoteStyle::LString;
 			sc.ChangeState(SCE_SH_STRING_DQ);
 		} else if (sc.ch == '(' || sc.ch == '[') {
 			sc.ChangeState(SCE_SH_OPERATOR);
 			if (sc.ch == '[' || sc.chNext == '(') {
 				cmdState = CmdState::Arithmetic;
+				style = QuoteStyle::Arithmetic;
 			} else {
 				cmdState = CmdState::Delimiter;
+				style = QuoteStyle::Command;
 			}
-			if (state != SCE_SH_DEFAULT || Depth != 0) {
-				const QuoteStyle style = (cmdState == CmdState::Arithmetic)? QuoteStyle::Arithmetic : QuoteStyle::Command;
-				Start(sc.ch, style, state);
+			if (state == SCE_SH_DEFAULT && Depth == 0) {
+				return;
 			}
 		} else if (sc.ch == '`') {	// $` seen in a configure script, valid?
-			Start(sc.ch, QuoteStyle::Backtick, state);
+			style = QuoteStyle::Backtick;
 			sc.ChangeState(SCE_SH_BACKTICKS);
 		} else {
 			// scalar has no delimiter pair
+			return;
 		}
+		Start(sc.ch, style, state);
+		sc.Forward();
 	}
 };
 
@@ -618,6 +628,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					sc.SetState(SCE_SH_BACKTICKS);
 				} else if (sc.ch == '$') {
 					QuoteStack.Expand(sc, cmdState);
+					continue;
 				}
 			}
 			break;
@@ -635,11 +646,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		case SCE_SH_BACKTICKS:
 		case SCE_SH_PARAM: // ${parameter}
 			if (sc.ch == '\\') {
-				if (QuoteStack.Current.Style != QuoteStyle::Literal) {
-					sc.Forward();
-				}
+				sc.Forward();
 			} else if (sc.ch == QuoteStack.Current.Down) {
-				if (QuoteStack.CountDown(sc)) {
+				if (QuoteStack.CountDown(sc, cmdState)) {
 					continue;
 				}
 			} else if (sc.ch == QuoteStack.Current.Up) {
@@ -653,6 +662,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.SetState(SCE_SH_BACKTICKS);
 					} else if (sc.ch == '$') {
 						QuoteStack.Expand(sc, cmdState);
+						continue;
 					}
 				} else if (QuoteStack.Current.Style == QuoteStyle::Command
 					|| QuoteStack.Current.Style == QuoteStyle::Backtick
@@ -669,6 +679,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.SetState(SCE_SH_BACKTICKS);
 					} else if (sc.ch == '$') {
 						QuoteStack.Expand(sc, cmdState);
+						continue;
 					}
 				}
 			}
@@ -772,7 +783,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.SetState(SCE_SH_BACKTICKS);
 			} else if (sc.ch == '$') {
 				QuoteStack.Expand(sc, cmdState);
-			} else if (sc.Match('<', '<')) {
+				continue;
+			} else if (cmdState != CmdState::Arithmetic && sc.Match('<', '<')) {
 				sc.SetState(SCE_SH_HERE_DELIM);
 				HereDoc.State = 0;
 				if (sc.GetRelative(2) == '-') {	// <<- indent case
@@ -792,7 +804,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				// command substitution and arithmetic expansion
 				if (QuoteStack.Current.Style >= QuoteStyle::Command) {
 					if (sc.ch == QuoteStack.Current.Down) {
-						if (QuoteStack.CountDown(sc)) {
+						if (QuoteStack.CountDown(sc, cmdState)) {
 							continue;
 						}
 					} else if (sc.ch == QuoteStack.Current.Up) {
