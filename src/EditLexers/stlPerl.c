@@ -37,12 +37,10 @@ static KEYWORDLIST Keywords_Perl = {{
 
 static EDITSTYLE Styles_Perl[] = {
 	EDITSTYLE_DEFAULT,
-	{ SCE_PL_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_PL_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ SCE_PL_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_PL_STRING_SQ, SCE_PL_STRING_Q, 0, 0), NP2StyleX_SingleQuotedString, L"fore:#008000" },
 	{ MULTI_STYLE(SCE_PL_STRING_DQ, SCE_PL_STRING_QQ, 0, 0), NP2StyleX_DoubleQuotedString, L"fore:#008000" },
-	{ SCE_PL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_PL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_PL_SCALAR, SCE_PL_STRING_VAR, 0, 0), NP2StyleX_ScalarVar, L"fore:#0000FF" },
 	{ SCE_PL_ARRAY, NP2StyleX_ArrayVar, L"fore:#FF0080" },
 	{ SCE_PL_HASH, NP2StyleX_HashVar, L"fore:#B000B0" },
@@ -61,6 +59,8 @@ static EDITSTYLE Styles_Perl[] = {
 	{ SCE_PL_POD, NP2StyleX_PODCommon, L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_PL_POD_VERB, NP2StyleX_PODVerbatim, L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_PL_DATASECTION, NP2StyleX_DataSection, L"fore:#A46000; back:#FFFFC0; eolfilled" },
+	{ SCE_PL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_PL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_PL_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#FFFF80" },
 	// {SCE_PL_XLAT},
 	//{ SCE_PL_PUNCTUATION, EDITSTYLE_HOLE(L"Symbols / Punctuation (not used)"), L"" },

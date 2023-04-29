@@ -38,10 +38,10 @@ static EDITSTYLE Styles_Tcl[] = {
 	{ MULTI_STYLE(SCE_TCL_WORD, SCE_TCL_WORD2, SCE_TCL_WORD3, SCE_TCL_WORD_IN_QUOTE), NP2StyleX_Keyword, L"bold; fore:#FF8000" },
 	{ MULTI_STYLE(SCE_TCL_COMMENT, SCE_TCL_COMMENTLINE, SCE_TCL_COMMENT_BOX, SCE_TCL_BLOCK_COMMENT), NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_TCL_IN_QUOTE, NP2StyleX_String, L"fore:#008000" },
-	{ SCE_TCL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_TCL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_TCL_SUBSTITUTION, SCE_TCL_SUB_BRACE, 0, 0), NP2StyleX_Substitution, L"fore:#0080FF" },
 	{ SCE_TCL_MODIFIER, NP2StyleX_Modifier, L"fore:#FF00FF" },
+	{ SCE_TCL_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_TCL_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexTcl = {

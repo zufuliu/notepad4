@@ -47,17 +47,17 @@ static KEYWORDLIST Keywords_Bash = {{
 
 static EDITSTYLE Styles_Bash[] = {
 	EDITSTYLE_DEFAULT,
-	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_SH_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
+	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_SH_STRING_DQ, NP2StyleX_DoubleQuotedString, L"fore:#008080" },
 	{ SCE_SH_STRING_SQ, NP2StyleX_SingleQuotedString, L"fore:#008000" },
-	{ SCE_SH_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_SH_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_SH_SCALAR, NP2StyleX_ScalarVar, L"fore:#808000" },
 	{ SCE_SH_PARAM, NP2StyleX_ParameterExpansion, L"fore:#9E4D2A" },
 	{ SCE_SH_BACKTICKS, NP2StyleX_Backticks, L"fore:#FF0080" },
 	{ SCE_SH_HERE_DELIM, NP2StyleX_HeredocDelimiter, L"fore:#A46000; back:#FFFFC0; eolfilled" },
 	{ SCE_SH_HERE_Q, NP2StyleX_HeredocSingleQuoted, L"fore:#A46000; back:#FFFFC0; eolfilled" },
+	{ SCE_SH_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_SH_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_SH_ERROR, NP2StyleX_ParsingError, L"fore:#C80000; back:#FFFF80" },
 };
 
