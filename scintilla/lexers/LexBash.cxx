@@ -286,11 +286,14 @@ public:
 			sc.ChangeState(SCE_SH_STRING_DQ);
 		} else if (sc.ch == '(' || sc.ch == '[') {
 			sc.ChangeState(SCE_SH_OPERATOR);
-			if (state != SCE_SH_DEFAULT || Depth != 0) {
-				Start(sc.ch, QuoteStyle::Arithmetic, state);
-			}
 			if (sc.ch == '[' || sc.chNext == '(') {
 				cmdState = CmdState::Arithmetic;
+			} else {
+				cmdState = CmdState::Delimiter;
+			}
+			if (state != SCE_SH_DEFAULT || Depth != 0) {
+				const QuoteStyle style = (cmdState == CmdState::Arithmetic)? QuoteStyle::Arithmetic : QuoteStyle::Command;
+				Start(sc.ch, style, state);
 			}
 		} else if (sc.ch == '`') {	// $` seen in a configure script, valid?
 			Start(sc.ch, QuoteStyle::Backtick, state);
@@ -347,8 +350,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	while (sc.More()) {
 		// handle line continuation, updates per-line stored state
 		if (sc.atLineStart) {
-			if (QuoteStack.Depth != 0
-				|| sc.state == SCE_SH_STRING_DQ
+			if (sc.state == SCE_SH_STRING_DQ
 				|| sc.state == SCE_SH_BACKTICKS
 				|| sc.state == SCE_SH_STRING_SQ
 				|| sc.state == SCE_SH_HERE_Q
@@ -365,7 +367,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						cmdState = CmdState::Start;
 					}
 				}
-				styler.SetLineState(sc.currentLine, static_cast<int>(cmdState));
+				const int state = static_cast<int>((QuoteStack.Depth == 0) ? cmdState : CmdState::Body);
+				styler.SetLineState(sc.currentLine, state);
 			}
 		}
 
@@ -607,7 +610,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					break;
 				}
 			}
-			if (!(HereDoc.Quoted | HereDoc.Escaped)) {
+			if (!HereDoc.Quoted && !HereDoc.Escaped) {
 				if (sc.ch == '\\') {
 					sc.Forward();
 				} else if (sc.ch == '`') {
