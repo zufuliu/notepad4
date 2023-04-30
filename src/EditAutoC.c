@@ -683,6 +683,7 @@ enum {
 	NSISKeywordIndex_PredefinedVariable = 5,
 	PHPKeywordIndex_PredefinedVariable = 4,
 	PHPKeywordIndex_Phpdoc = 11,
+	PerlKeywordIndex_Variable = 2,
 	PowerShellKeywordIndex_PredefinedVariable = 4,
 	PythonKeywordIndex_Decorator = 7,
 	RebolKeywordIndex_Directive = 1,
@@ -1305,6 +1306,13 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 	case NP2LEX_NSIS:
 		if (ch == '$') {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[NSISKeywordIndex_PredefinedVariable]);
+			return AddWordResult_IgnoreLexer;
+		}
+		break;
+
+	case NP2LEX_PERL:
+		if (ch == '$' || ch == '@' || (chPrev == '$' && ch == '^')) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[PerlKeywordIndex_Variable]);
 			return AddWordResult_IgnoreLexer;
 		}
 		break;

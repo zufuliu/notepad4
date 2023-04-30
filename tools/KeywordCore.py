@@ -1790,6 +1790,22 @@ def parse_powershell_api_file(path):
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
 	]
 
+def parse_perl_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '#')
+	for key, doc in sections:
+		if key == 'variables':
+			items = re.findall(r'\w+', doc)
+		else:
+			items = doc.split()
+		keywordMap[key] = items
+	keywordMap['keywords'].extend('__DATA__ __END__ package'.split())
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('regex', keywordMap['regex'], KeywordAttr.NoAutoComp),
+		('variables', keywordMap['variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
+	]
+
 def parse_python_api_file(path):
 	keywordMap = {
 		'modules': [],

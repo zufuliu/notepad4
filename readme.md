@@ -104,7 +104,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Gnuplot
 	* [Nullsoft Scriptable Install System](tools/lang/NSIS.nsi), up to NSIS 3.09.
 	* Pascal, Delphi
-	* Perl, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
+	* [Perl](tools/lang/Perl.pl), up to Per 5.36. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.
 	* [Python](tools/lang/Python.py), up to Python 3.11. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
 	* [PHP Script](tools/lang/PHP.php), up to PHP 8.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
@@ -115,8 +115,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Rust](tools/lang/Rust.rs), up to Rust 1.38. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#rust)
 	* [Scala](tools/lang/Scala.scala), up to Scala 3.2.
 	* Shell Script
-		* [Bash](tools/lang/Bash.sh) likes (sh, bash, dash, ash, zsh, ksh), up date to Bash 5.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
-		* [C Shell](tools/lang/CShell.csh) (csh, tcsh), up date to tcsh 6.24.
+		* [Bash](tools/lang/Bash.sh) likes (sh, bash, dash, ash, zsh, ksh), up to Bash 5.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#shell-script)
+		* [C Shell](tools/lang/CShell.csh) (csh, tcsh), up to tcsh 6.24.
 		* M4 Macro, limited support
 	* SQL Query
 		* [SQL Standard](tools/lang/SQL.sql), up to SQL:2016.
