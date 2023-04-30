@@ -173,7 +173,7 @@ constexpr bool IsBashSingleCharOperator(int ch) noexcept {
 }
 
 constexpr bool IsBashParamChar(int ch) noexcept {
-	return IsIdentifierChar(ch) || ch == '$';
+	return IsIdentifierChar(ch);
 }
 
 constexpr bool IsBashHereDoc(int ch) noexcept {
@@ -377,8 +377,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						cmdState = CmdState::Start;
 					}
 				}
-				const int state = static_cast<int>((QuoteStack.Depth == 0) ? cmdState : CmdState::Body);
-				styler.SetLineState(sc.currentLine, state);
+				const CmdState state = (QuoteStack.Depth == 0) ? cmdState : CmdState::Body;
+				styler.SetLineState(sc.currentLine, static_cast<int>(state));
 			}
 		}
 
@@ -609,7 +609,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (sc.atLineStart) {
 				sc.SetState(SCE_SH_HERE_Q);
 				if (HereDoc.Indent) { // tabulation prefix
-					while (sc.ch == '\t') {
+					while (sc.ch == '\t' && sc.More()) {
 						sc.Forward();
 					}
 				}
