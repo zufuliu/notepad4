@@ -289,7 +289,7 @@ void WordList_Init(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen, bool bI
 	pWList->iStartLen = iRootLen;
 
 	if (bIgnoreCase) {
-		pWList->WL_strcmp = _stricmp;
+		pWList->WL_strcmp = strcmp;
 		pWList->WL_strncmp = _strnicmp;
 #if NP2_AUTOC_USE_STRING_ORDER
 		pWList->WL_OrderFunc = WordList_OrderCase;
@@ -1657,9 +1657,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		SciCall_AutoCSetOptions(SC_AUTOCOMPLETE_FIXED_SIZE);
 		SciCall_AutoCSetOrder(SC_ORDER_PRESORTED); // pre-sorted
 		SciCall_AutoCSetIgnoreCase(bIgnoreCase); // case sensitivity
-		//if (bIgnoreCase) {
-		//	SciCall_AutoCSetCaseInsensitiveBehaviour(SC_CASEINSENSITIVEBEHAVIOUR_IGNORECASE);
-		//}
+		SciCall_AutoCSetCaseInsensitiveBehaviour(bIgnoreCase);
 		//SciCall_AutoCSetSeparator('\n');
 		//SciCall_AutoCSetTypeSeparator('\t');
 		SciCall_AutoCSetFillUps(autoCompletionConfig.szAutoCompleteFillUp);
