@@ -43,6 +43,7 @@ struct WordList {
 	UINT iStartLen;
 #if NP2_AUTOC_USE_STRING_ORDER
 	UINT orderStart;
+	bool bIgnoreOrder;
 #endif
 	UINT nWordCount;
 	UINT nTotalLen;
@@ -191,7 +192,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 			path[top++] = iter;
 #if NP2_AUTOC_USE_STRING_ORDER
 			dir = (int)(iter->order - order);
-			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH)) {
+			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH || pWList->bIgnoreOrder)) {
 				dir = pWList->WL_strcmp(WordNode_GetWord(iter), pWord);
 			}
 #else
@@ -303,6 +304,7 @@ void WordList_Init(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen, bool bI
 	}
 #if NP2_AUTOC_USE_STRING_ORDER
 	pWList->orderStart = pWList->WL_OrderFunc(pRoot, iRootLen);
+	pWList->bIgnoreOrder = bIgnoreCase;
 #endif
 
 	pWList->capacity = NP2_AUTOC_INIT_BUFFER_SIZE;
