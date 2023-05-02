@@ -1,6 +1,6 @@
 --! keywords		===========================================================
--- 8.0.32 https://dev.mysql.com/doc/refman/8.0/en/keywords.html
--- 5.7.40 https://dev.mysql.com/doc/refman/5.7/en/keywords.html
+-- 8.0.34 https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+-- 5.7.42 https://dev.mysql.com/doc/refman/5.7/en/keywords.html
 -- 5.6.51 https://dev.mysql.com/doc/refman/5.6/en/keywords.html
 -- 5.5.8 https://dev.mysql.com/doc/refman/5.5/en/keywords.html
 -- 2022-09-15 10.9.2 https://mariadb.com/kb/en/library/reserved-words/
@@ -52,6 +52,7 @@ BOOLEAN
 BOTH (R)
 BTREE
 BUCKETS					-- added in 8.0.2 (nonreserved)
+BULK					-- added in 8.0.32 (nonreserved)
 BY (R)
 BYTE
 -- C
@@ -232,6 +233,7 @@ FULLTEXT (R)
 FUNCTION (R)			-- became reserved in 8.0.1
 -- G
 GENERAL					-- added in 5.5.3 (reserved); became nonreserved in 5.5.8
+GENERATE				-- added in 8.0.32 (nonreserved)
 GENERATED (R)			-- added in 5.7.6 (reserved)
 GEOMCOLLECTION			-- added in 8.0.11 (nonreserved)
 GEOMETRY
@@ -754,6 +756,7 @@ UNSIGNED (R)
 UNTIL
 UPDATE (R)
 UPGRADE
+URL						-- added in 8.0.32 (nonreserved)
 USAGE (R)
 USE (R)
 USER
