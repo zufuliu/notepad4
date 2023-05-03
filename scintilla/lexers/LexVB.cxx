@@ -46,6 +46,11 @@ constexpr bool IsVBNumberPrefix(int ch) noexcept {
 		|| ch == 'b' || ch == 'B';	// Binary
 }
 
+constexpr bool PreferStringConcat(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
+	return chPrevNonWhite == '\"' || chPrevNonWhite == ')' || chPrevNonWhite == ']'
+		|| (stylePrevNonWhite != SCE_B_KEYWORD && IsIdentifierChar(chPrevNonWhite));
+}
+
 constexpr bool IsVBNumber(int ch, int chPrev) noexcept {
 	return IsHexDigit(ch)|| ch == '_'
 		|| (ch == '.' && chPrev != '.')
@@ -82,10 +87,15 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	int fileNbDigits = 0;
 	int visibleChars = 0;
+	int chPrevNonWhite = 0;
+	int stylePrevNonWhite = SCE_B_DEFAULT;
 	bool isIfThenPreprocessor = false;
 	bool isEndPreprocessor = false;
 
 	StyleContext sc(startPos, length, initStyle, styler);
+	if (startPos != 0 && IsSpaceEquiv(initStyle)) {
+		LookbackNonWhite(styler, startPos, SCE_B_COMMENT, chPrevNonWhite, stylePrevNonWhite);
+	}
 
 	for (; sc.More(); sc.Forward()) {
 
@@ -220,7 +230,7 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					sc.SetState(SCE_B_IDENTIFIER);
 				else
 					sc.SetState(SCE_B_FILENUMBER);
-			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext)) {
+			} else if (sc.ch == '&' && IsVBNumberPrefix(sc.chNext) && !PreferStringConcat(chPrevNonWhite, stylePrevNonWhite)) {
 				sc.SetState(SCE_B_NUMBER);
 				sc.Forward();
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
@@ -234,8 +244,12 @@ void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 			}
 		}
 
-		if (!(isspacechar(sc.ch) || IsSpaceEquiv(sc.state))) {
+		if (!isspacechar(sc.ch)) {
 			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+				stylePrevNonWhite = sc.state;
+			}
 		}
 	}
 
