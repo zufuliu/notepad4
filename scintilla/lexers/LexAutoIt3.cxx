@@ -642,6 +642,7 @@ void FoldAU3Doc(Sci_PositionU startPos, Sci_Position length, int, LexerWordList,
 			}
 		}
 		// End of Line found so process the information
+		++startPos;
 		if (startPos == lineStartNext) {
 			// **************************
 			// Folding logic for Keywords
