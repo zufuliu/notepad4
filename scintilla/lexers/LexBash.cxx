@@ -66,7 +66,7 @@ enum class TestExprType {
 };
 
 // state constants for nested delimiter pairs, used by
-// SCE_SH_STRING_DQ, SCE_SH_BACKTICKS and SCE_SH_PARAM processing
+// SCE_SH_STRING, SCE_SH_PARAM and SCE_SH_BACKTICKS processing
 enum class QuoteStyle {
 	Literal,		// ''
 	CString,		// $''
@@ -210,23 +210,19 @@ public:
 		Style = QuoteStyle::Literal;
 		Outer = SCE_SH_DEFAULT;
 	}
-	void Open(int u, QuoteStyle s, int outer) noexcept {
-		Count++;
+	void Start(int u, QuoteStyle s, int outer) noexcept {
+		Count = 1;
 		Up    = u;
 		Down  = opposite(Up);
 		Style = s;
 		Outer = outer;
-	}
-	void Start(int u, QuoteStyle s, int outer) noexcept {
-		Count = 0;
-		Open(u, s, outer);
 	}
 };
 
 class QuoteStackCls {	// Class to manage quote pairs that nest
 public:
 	int Depth = 0;
-	int Outer = SCE_SH_DEFAULT;
+	int State = SCE_SH_DEFAULT;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
 	void Start(int u, QuoteStyle s, int outer) noexcept {
@@ -253,7 +249,7 @@ public:
 	}
 	void Clear() noexcept {
 		Depth = 0;
-		Outer = SCE_SH_DEFAULT;
+		State = SCE_SH_DEFAULT;
 		Current.Clear();
 	}
 	bool CountDown(StyleContext &sc, CmdState &cmdState) {
@@ -278,7 +274,7 @@ public:
 	void Expand(StyleContext &sc, CmdState &cmdState) {
 		const int state = sc.state;
 		QuoteStyle style = QuoteStyle::Literal;
-		Outer = state;
+		State = state;
 		sc.SetState(SCE_SH_SCALAR);
 		sc.Forward();
 		if (sc.ch == '{') {
@@ -293,13 +289,14 @@ public:
 		} else if (sc.ch == '(' || sc.ch == '[') {
 			sc.ChangeState(SCE_SH_OPERATOR);
 			if (sc.ch == '[' || sc.chNext == '(') {
-				cmdState = CmdState::Arithmetic;
 				style = QuoteStyle::Arithmetic;
+				cmdState = CmdState::Arithmetic;
 			} else {
-				cmdState = CmdState::Delimiter;
 				style = QuoteStyle::Command;
+				cmdState = CmdState::Delimiter;
 			}
 			if (state == SCE_SH_DEFAULT && Depth == 0) {
+				// optimized to avoid track nested delimiter pairs
 				return;
 			}
 		} else if (sc.ch == '`') {	// $` seen in a configure script, valid?
@@ -377,14 +374,15 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						cmdState = CmdState::Start;
 					}
 				}
+				// force backtrack when nesting
 				const CmdState state = (QuoteStack.Depth == 0) ? cmdState : CmdState::Body;
 				styler.SetLineState(sc.currentLine, static_cast<int>(state));
 			}
 		}
 
 		// controls change of cmdState at the end of a non-whitespace element
-		// states BODY|TEST|ARITH persist until the end of a command segment
-		// state WORD persist, but ends with 'in' or 'do' construct keywords
+		// states Body|Test|Arithmetic persist until the end of a command segment
+		// state Word persist, but ends with 'in' or 'do' construct keywords
 		CmdState cmdStateNew = CmdState::Body;
 		if (cmdState == CmdState::Test || cmdState == CmdState::Arithmetic || cmdState == CmdState::Word) {
 			cmdStateNew = cmdState;
@@ -609,7 +607,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (sc.atLineStart) {
 				sc.SetState(SCE_SH_HERE_Q);
 				if (HereDoc.Indent) { // tabulation prefix
-					while (sc.ch == '\t' && sc.More()) {
+					while (sc.ch == '\t') {
 						sc.Forward();
 					}
 				}
@@ -638,13 +636,13 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					// Special variable: $(, $_ etc.
 					sc.Forward();
 				}
-				sc.SetState(QuoteStack.Outer);
+				sc.SetState(QuoteStack.State);
 				continue;
 			}
 			break;
 		case SCE_SH_STRING_DQ:	// delimited styles, can nest
-		case SCE_SH_BACKTICKS:
 		case SCE_SH_PARAM: // ${parameter}
+		case SCE_SH_BACKTICKS:
 			if (sc.ch == '\\') {
 				sc.Forward();
 			} else if (sc.ch == QuoteStack.Current.Down) {
@@ -665,11 +663,11 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						continue;
 					}
 				} else if (QuoteStack.Current.Style == QuoteStyle::Command
-					|| QuoteStack.Current.Style == QuoteStyle::Backtick
 					|| QuoteStack.Current.Style == QuoteStyle::Parameter
+					|| QuoteStack.Current.Style == QuoteStyle::Backtick
 					) {	// do nesting for $(command), `command`, ${parameter}
 					if (sc.ch == '\'') {
-						QuoteStack.Outer = sc.state;
+						QuoteStack.State = sc.state;
 						sc.SetState(SCE_SH_STRING_SQ);
 					} else if (sc.ch == '\"') {
 						QuoteStack.Push(sc.ch, QuoteStyle::String, sc.state);
@@ -686,7 +684,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			break;
 		case SCE_SH_STRING_SQ: // singly-quoted strings
 			if (sc.ch == '\'') {
-				sc.ForwardSetState(QuoteStack.Outer);
+				sc.ForwardSetState(QuoteStack.State);
 				continue;
 			}
 			break;
@@ -776,7 +774,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
-				QuoteStack.Outer = SCE_SH_DEFAULT;
+				QuoteStack.State = SCE_SH_DEFAULT;
 				sc.SetState(SCE_SH_STRING_SQ);
 			} else if (sc.ch == '`') {
 				QuoteStack.Start(sc.ch, QuoteStyle::Backtick, SCE_SH_DEFAULT);
@@ -801,7 +799,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.Forward();
 			} else if (IsBashOperatorLast(sc.ch)) {
 				sc.SetState(SCE_SH_OPERATOR);
-				// command substitution and arithmetic expansion
+				// arithmetic expansion and command substitution
 				if (QuoteStack.Current.Style >= QuoteStyle::Command) {
 					if (sc.ch == QuoteStack.Current.Down) {
 						if (QuoteStack.CountDown(sc, cmdState)) {
