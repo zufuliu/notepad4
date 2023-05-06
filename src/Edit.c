@@ -7603,16 +7603,16 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
 	int indent = 0;
 	switch (iWordWrapIndent) {
-	case EditWrapIndentOneCharacter:
+	case EditWrapIndent_OneCharacter:
 		indent = 1;
 		break;
-	case EditWrapIndentTwoCharacter:
+	case EditWrapIndent_TwoCharacter:
 		indent = 2;
 		break;
-	case EditWrapIndentOneLevel:
+	case EditWrapIndent_OneLevel:
 		indent = indentWidth ? indentWidth : tabWidth;
 		break;
-	case EditWrapIndentTwoLevel:
+	case EditWrapIndent_TwoLevel:
 		indent = indentWidth ? 2 * indentWidth : 2 * tabWidth;
 		break;
 	}
@@ -7622,13 +7622,13 @@ void EditSetWrapStartIndent(int tabWidth, int indentWidth) {
 void EditSetWrapIndentMode(int tabWidth, int indentWidth) {
 	int indentMode;
 	switch (iWordWrapIndent) {
-	case EditWrapIndentSameAsSubline:
+	case EditWrapIndent_SameAsSubline:
 		indentMode = SC_WRAPINDENT_SAME;
 		break;
-	case EditWrapIndentOneLevelThanSubline:
+	case EditWrapIndent_OneLevelThanSubline:
 		indentMode = SC_WRAPINDENT_INDENT;
 		break;
-	case EditWrapIndentTwoLevelThanSubline:
+	case EditWrapIndent_TwoLevelThanSubline:
 		indentMode = SC_WRAPINDENT_DEEPINDENT;
 		break;
 	default:

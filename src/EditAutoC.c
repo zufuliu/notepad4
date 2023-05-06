@@ -43,7 +43,7 @@ struct WordList {
 	UINT iStartLen;
 #if NP2_AUTOC_USE_STRING_ORDER
 	UINT orderStart;
-	bool bIgnoreOrder;
+	bool bIgnoreCase;
 #endif
 	UINT nWordCount;
 	UINT nTotalLen;
@@ -192,7 +192,7 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 			path[top++] = iter;
 #if NP2_AUTOC_USE_STRING_ORDER
 			dir = (int)(iter->order - order);
-			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH || pWList->bIgnoreOrder)) {
+			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH || pWList->bIgnoreCase)) {
 				dir = pWList->WL_strcmp(WordNode_GetWord(iter), pWord);
 			}
 #else
@@ -304,7 +304,7 @@ void WordList_Init(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen, bool bI
 	}
 #if NP2_AUTOC_USE_STRING_ORDER
 	pWList->orderStart = pWList->WL_OrderFunc(pRoot, iRootLen);
-	pWList->bIgnoreOrder = bIgnoreCase;
+	pWList->bIgnoreCase = bIgnoreCase;
 #endif
 
 	pWList->capacity = NP2_AUTOC_INIT_BUFFER_SIZE;
@@ -1422,11 +1422,11 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 void EditCompleteUpdateConfig(void) {
 	int i = 0;
 	const int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
-	if (mask & AutoCompleteFillUpSpace) {
+	if (mask & AutoCompleteFillUpMask_Space) {
 		autoCompletionConfig.szAutoCompleteFillUp[i++] = ' ';
 	}
 
-	const BOOL punctuation = mask & AutoCompleteFillUpPunctuation;
+	const BOOL punctuation = mask & AutoCompleteFillUpMask_Punctuation;
 	int k = 0;
 	for (UINT j = 0; j < COUNTOF(autoCompletionConfig.wszAutoCompleteFillUp); j++) {
 		const WCHAR c = autoCompletionConfig.wszAutoCompleteFillUp[j];
@@ -1799,28 +1799,28 @@ void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) {
 
 	ch += (169U >> (2*what)) & 3; // 0b10101001
 	switch (what) {
-	case AutoInsertCharacterSquareBracket:
+	case AutoInsertCharacter_SquareBracket:
 		if (pLexCurrent->iLexer == SCLEX_SMALI) { // JVM array type
 			ch = 0;
 		}
 		break;
-	case AutoInsertCharacterAngleBracket:
+	case AutoInsertCharacter_AngleBracket:
 		if (!IsGenericTypeStyle(iPrevStyle)) {
 			// geriatric type, template
 			ch = 0;
 		}
 		break;
-	case AutoInsertCharacterSingleQuote:
+	case AutoInsertCharacter_SingleQuote:
 		if (!CanAutoCloseSingleQuote(chPrev, iPrevStyle)) {
 			ch = 0;
 		}
 		break;
-	case AutoInsertCharacterBacktick:
+	case AutoInsertCharacter_Backtick:
 		if (pLexCurrent->iLexer == SCLEX_VERILOG || pLexCurrent->iLexer == SCLEX_VHDL) {
 			ch = 0; // directive and macro
 		}
 		break;
-	case AutoInsertCharacterComma:
+	case AutoInsertCharacter_Comma:
 		ch = ' ';
 		if ((chNext == ' ' || chNext == '\t' || (chPrev == '\'' && chNext == '\'') || (chPrev == '\"' && chNext == '\"'))) {
 			ch = 0;
@@ -1831,16 +1831,16 @@ void EditAutoCloseBraceQuote(int ch, AutoInsertCharacter what) {
 	}
 
 	if (ch) {
-		if (what < AutoInsertCharacterAngleBracket && EditIsOpenBraceMatched(iCurPos - 1, iCurPos)) {
+		if (what < AutoInsertCharacter_AngleBracket && EditIsOpenBraceMatched(iCurPos - 1, iCurPos)) {
 			return;
 		}
 		// TODO: auto escape quotes inside string
 
 		const char tchIns[4] = { (char)(ch) };
 		SciCall_ReplaceSel(tchIns);
-		const Sci_Position iCurrentPos = (what == AutoInsertCharacterComma) ? iCurPos + 1 : iCurPos;
+		const Sci_Position iCurrentPos = (what == AutoInsertCharacter_Comma) ? iCurPos + 1 : iCurPos;
 		SciCall_SetSel(iCurrentPos, iCurrentPos);
-		if (what < AutoInsertCharacterAngleBracket) {
+		if (what < AutoInsertCharacter_AngleBracket) {
 			// fix brace matching
 			SciCall_EnsureStyledTo(iCurPos + 1);
 		}
@@ -2300,17 +2300,17 @@ void EditToggleCommentLine(void) {
 	case NP2LEX_ASM: {
 		LPCWSTR ch;
 		switch (autoCompletionConfig.iAsmLineCommentChar) {
-		case AsmLineCommentCharSemicolon:
+		case AsmLineCommentChar_Semicolon:
 		default:
 			ch = L";";
 			break;
-		case AsmLineCommentCharSharp:
+		case AsmLineCommentChar_Sharp:
 			ch = L"# ";
 			break;
-		case AsmLineCommentCharSlash:
+		case AsmLineCommentChar_Slash:
 			ch = L"//";
 			break;
-		case AsmLineCommentCharAt:
+		case AsmLineCommentChar_At:
 			ch = L"@ ";
 			break;
 		}

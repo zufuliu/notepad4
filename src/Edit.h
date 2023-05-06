@@ -71,36 +71,35 @@ typedef enum EditSortFlag {
 
 // wrap indent
 enum {
-	EditWrapIndentNone = 0,
-	EditWrapIndentOneCharacter = 1,
-	EditWrapIndentTwoCharacter = 2,
-	EditWrapIndentOneLevel = 3,
-	EditWrapIndentTwoLevel = 4,
+	EditWrapIndent_None = 0,
+	EditWrapIndent_OneCharacter = 1,
+	EditWrapIndent_TwoCharacter = 2,
+	EditWrapIndent_OneLevel = 3,
+	EditWrapIndent_TwoLevel = 4,
 
-	EditWrapIndentSameAsSubline = 5,
-	EditWrapIndentOneLevelThanSubline = 6,
-	EditWrapIndentTwoLevelThanSubline = 7,
+	EditWrapIndent_SameAsSubline = 5,
+	EditWrapIndent_OneLevelThanSubline = 6,
+	EditWrapIndent_TwoLevelThanSubline = 7,
 
-	EditWrapIndentMaxValue = EditWrapIndentTwoLevelThanSubline,
-	EditWrapIndentDefaultValue = EditWrapIndentNone,
+	EditWrapIndent_MaxValue = EditWrapIndent_TwoLevelThanSubline,
+	EditWrapIndent_DefaultValue = EditWrapIndent_None,
 };
 
 // wrap symbol
 enum {
-	EditWrapSymbolBeforeNone = 0,
-	EditWrapSymbolBeforeNearText = 1,
-	EditWrapSymbolBeforeNearBorder = 2,
+	EditWrapSymbolBefore_None = 0,
+	EditWrapSymbolBefore_NearText = 1,
+	EditWrapSymbolBefore_NearBorder = 2,
+	EditWrapSymbolBefore_MaxValue = EditWrapSymbolBefore_NearBorder,
 
-	EditWrapSymbolAfterNone = 0,
-	EditWrapSymbolAfterNearText = 1,
-	EditWrapSymbolAfterNearBorder = 2,
-	EditWrapSymbolLineNumberMargin = 3,
+	EditWrapSymbolAfter_None = 0,
+	EditWrapSymbolAfter_NearText = 1,
+	EditWrapSymbolAfter_NearBorder = 2,
+	EditWrapSymbolAfter_LineNumberMargin = 3,
+	EditWrapSymbolAfter_MaxValue = EditWrapSymbolAfter_LineNumberMargin,
 
-	EditWrapSymbolBeforeMaxValue = EditWrapSymbolBeforeNearBorder,
-	EditWrapSymbolAfterMaxValue = EditWrapSymbolLineNumberMargin,
-
-	EditWrapSymbolMaxValue = EditWrapSymbolBeforeMaxValue + 10 * EditWrapSymbolAfterMaxValue,
-	EditWrapSymbolDefaultValue = EditWrapSymbolBeforeNearBorder,
+	EditWrapSymbol_MaxValue = EditWrapSymbolBefore_MaxValue + 10 * EditWrapSymbolAfter_MaxValue,
+	EditWrapSymbol_DefaultValue = EditWrapSymbolBefore_NearBorder,
 };
 
 void	Edit_ReleaseResources(void);
@@ -276,44 +275,44 @@ void EditBookmarkSelectAll(void);
 #define AUTOC_SCAN_WORDS_MIN_TIMEOUT		50
 #define AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT	500
 enum {
-	AutoCompleteFillUpEnter = 1,
-	AutoCompleteFillUpTab = 2,
-	AutoCompleteFillUpSpace = 4,
-	AutoCompleteFillUpPunctuation = 8,
+	AutoCompleteFillUpMask_Enter = 1,
+	AutoCompleteFillUpMask_Tab = 2,
+	AutoCompleteFillUpMask_Space = 4,
+	AutoCompleteFillUpMask_Punctuation = 8,
 	// default settings
-	AutoCompleteFillUpDefault = 15,
+	AutoCompleteFillUpMask_Default = 15,
 };
 
 // auto insert
 typedef enum AutoInsertCharacter {
-	AutoInsertCharacterParenthesis,
-	AutoInsertCharacterBrace,
-	AutoInsertCharacterSquareBracket,
-	AutoInsertCharacterAngleBracket,
-	AutoInsertCharacterDoubleQuote,
-	AutoInsertCharacterSingleQuote,
-	AutoInsertCharacterBacktick,
-	AutoInsertCharacterComma,
+	AutoInsertCharacter_Parenthesis,
+	AutoInsertCharacter_Brace,
+	AutoInsertCharacter_SquareBracket,
+	AutoInsertCharacter_AngleBracket,
+	AutoInsertCharacter_DoubleQuote,
+	AutoInsertCharacter_SingleQuote,
+	AutoInsertCharacter_Backtick,
+	AutoInsertCharacter_Comma,
 } AutoInsertCharacter;
 enum {
-	AutoInsertParenthesis = 1,			// ()
-	AutoInsertBrace = 2,				// {}
-	AutoInsertSquareBracket = 4,		// []
-	AutoInsertAngleBracket = 8,			// <>
-	AutoInsertDoubleQuote = 16,			// ""
-	AutoInsertSingleQuote = 32,			// ''
-	AutoInsertBacktick = 64,			// ``
-	AutoInsertSpaceAfterComma = 128,	// ', '
+	AutoInsertMask_Parenthesis = 1,			// ()
+	AutoInsertMask_Brace = 2,				// {}
+	AutoInsertMask_SquareBracket = 4,		// []
+	AutoInsertMask_AngleBracket = 8,		// <>
+	AutoInsertMask_DoubleQuote = 16,		// ""
+	AutoInsertMask_SingleQuote = 32,		// ''
+	AutoInsertMask_Backtick = 64,			// ``
+	AutoInsertMask_SpaceAfterComma = 128,	// ', '
 	// default settings
-	AutoInsertDefaultMask = 255,
+	AutoInsertMask_Default = 255,
 };
 
 // asm line comment
 enum {
-	AsmLineCommentCharSemicolon = 0,	// ';'
-	AsmLineCommentCharSharp = 1,		// '#'
-	AsmLineCommentCharSlash = 2,		// '//'
-	AsmLineCommentCharAt = 3,			// '@'
+	AsmLineCommentChar_Semicolon = 0,	// ';'
+	AsmLineCommentChar_Sharp = 1,		// '#'
+	AsmLineCommentChar_Slash = 2,		// '//'
+	AsmLineCommentChar_At = 3,			// '@'
 };
 
 #define MIN_AUTO_COMPLETION_VISIBLE_ITEM_COUNT	8
