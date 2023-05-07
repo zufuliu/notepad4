@@ -2309,7 +2309,28 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		wsprintf(wch, L"%u ms", autoCompletionConfig.dwScanWordsTimeout);
 		SetDlgItemText(hwnd, IDC_AUTOC_SCAN_WORDS_TIMEOUT, wch);
 
-		int mask = autoCompletionConfig.fAutoCompleteFillUpMask;
+		int mask = autoCompletionConfig.fCompleteScope;
+		if (mask & AutoCompleteScope_Commont) {
+			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_INSIDE_COMMONT, BST_CHECKED);
+		}
+		if (mask & AutoCompleteScope_String) {
+			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_INSIDE_STRING, BST_CHECKED);
+		}
+		if (mask & AutoCompleteScope_PlainText) {
+			CheckDlgButton(hwnd, IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT, BST_CHECKED);
+		}
+		mask = autoCompletionConfig.fScanWordScope;
+		if (mask & AutoCompleteScope_Commont) {
+			CheckDlgButton(hwnd, IDC_SCAN_WORD_INSIDE_COMMONT, BST_CHECKED);
+		}
+		if (mask & AutoCompleteScope_String) {
+			CheckDlgButton(hwnd, IDC_SCAN_WORD_INSIDE_STRING, BST_CHECKED);
+		}
+		if (mask & AutoCompleteScope_PlainText) {
+			CheckDlgButton(hwnd, IDC_SCAN_WORD_INSIDE_PLAINTEXT, BST_CHECKED);
+		}
+
+		mask = autoCompletionConfig.fAutoCompleteFillUpMask;
 		if (mask & AutoCompleteFillUpMask_Enter) {
 			CheckDlgButton(hwnd, IDC_AUTOC_FILLUP_ENTER, BST_CHECKED);
 		}
@@ -2384,6 +2405,30 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			if (CRTStrToInt(wch, &mask)) {
 				autoCompletionConfig.dwScanWordsTimeout = max_i(mask, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
 			}
+
+			mask = AutoCompleteScope_Other;
+			if (IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_INSIDE_COMMONT)) {
+				mask |= AutoCompleteScope_Commont;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_INSIDE_STRING)) {
+				mask |= AutoCompleteScope_String;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_COMPLETE_INSIDE_PLAINTEXT)) {
+				mask |= AutoCompleteScope_PlainText;
+			}
+			autoCompletionConfig.fCompleteScope = mask;
+
+			mask = AutoCompleteScope_Other;
+			if (IsButtonChecked(hwnd, IDC_SCAN_WORD_INSIDE_COMMONT)) {
+				mask |= AutoCompleteScope_Commont;
+			}
+			if (IsButtonChecked(hwnd, IDC_SCAN_WORD_INSIDE_STRING)) {
+				mask |= AutoCompleteScope_String;
+			}
+			if (IsButtonChecked(hwnd, IDC_SCAN_WORD_INSIDE_PLAINTEXT)) {
+				mask |= AutoCompleteScope_PlainText;
+			}
+			autoCompletionConfig.fScanWordScope = mask;
 
 			mask = 0;
 			if (IsButtonChecked(hwnd, IDC_AUTOC_FILLUP_ENTER)) {

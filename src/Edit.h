@@ -275,6 +275,14 @@ void EditBookmarkSelectAll(void);
 #define AUTOC_SCAN_WORDS_MIN_TIMEOUT		50
 #define AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT	500
 enum {
+	AutoCompleteScope_None = 0,
+	AutoCompleteScope_Commont = 1,
+	AutoCompleteScope_String = 2,
+	AutoCompleteScope_PlainText = 4,
+	AutoCompleteScope_Other = 8,
+	AutoCompleteScope_Default = 0xff,
+};
+enum {
 	AutoCompleteFillUpMask_Enter = 1,
 	AutoCompleteFillUpMask_Tab = 2,
 	AutoCompleteFillUpMask_Space = 4,
@@ -324,6 +332,8 @@ typedef struct EditAutoCompletionConfig {
 	bool bCloseTags;
 	bool bCompleteWord;
 	bool bScanWordsInDocument;
+	int fCompleteScope;
+	int fScanWordScope;
 	UINT dwScanWordsTimeout;
 	bool bEnglistIMEModeOnly;
 	bool bIgnoreCase;
