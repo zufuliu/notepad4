@@ -59,12 +59,10 @@ enum {
 typedef struct EDITSTYLE {
 	const int iStyle;
 	// set with EDITSTYLE_HOLE() or EDITSTYLE_HOLEX()
-	struct {
-		const int rid;
-		const int iNameLen;
-		const wchar_t * const pszName;
-		wchar_t *szValue;
-	};
+	const uint16_t rid;
+	const uint16_t iNameLen;
+	const wchar_t * const pszName;
+	wchar_t *szValue;
 	const wchar_t * const pszDefault;
 } EDITSTYLE, *PEDITSTYLE;
 

@@ -54,7 +54,7 @@ static KEYWORDLIST Keywords_Bash = {{
 static EDITSTYLE Styles_Bash[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_SH_WORD, NP2StyleX_Keyword, L"bold; fore:#FF8000" },
-	{ MULTI_STYLE(SCE_SH_COMMENTLINE, 0, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
+	{ SCE_SH_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ SCE_SH_STRING_DQ, NP2StyleX_DoubleQuotedString, L"fore:#008080" },
 	{ SCE_SH_STRING_SQ, NP2StyleX_SingleQuotedString, L"fore:#008000" },
 	{ SCE_SH_SCALAR, NP2StyleX_ScalarVar, L"fore:#808000" },
