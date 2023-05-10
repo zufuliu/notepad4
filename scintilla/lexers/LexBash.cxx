@@ -295,7 +295,7 @@ public:
 				style = QuoteStyle::Command;
 				cmdState = CmdState::Delimiter;
 			}
-			if (state == SCE_SH_DEFAULT && Depth == 0) {
+			if (sc.ch == '(' && state == SCE_SH_DEFAULT && Depth == 0) {
 				// optimized to avoid track nested delimiter pairs
 				return;
 			}
