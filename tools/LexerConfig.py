@@ -14,6 +14,8 @@ line_comment_at_line_start: put start string at line start, default is False.
 block_comment_string: block comment start and end string.
 block_comment_on_new_line: put start and end string on new line, default is False.
 cpp_style_comment: shortcut to use C++ style line and block comment, default is False.
+comment_style_list: comment style list.
+comment_style_marker: comment style only inside [1, marker].
 shebang_exe_name: executable name for shebang.
 
 indent_based_folding: code folding is indentation based, default is False.
@@ -121,10 +123,12 @@ LexerConfigMap = {
 
 	'NP2LEX_ABAQUS': {
 		'line_comment_string': '**',
+		'comment_style_marker': 'SCE_APDL_COMMENT',
 		'operator_style': ['SCE_APDL_OPERATOR'],
 	},
 	'NP2LEX_ACTIONSCRIPT': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_JS_ESCAPECHAR',
@@ -136,16 +140,19 @@ LexerConfigMap = {
 	},
 	'NP2LEX_APDL': {
 		'line_comment_string': '!',
+		'comment_style_marker': 'SCE_APDL_COMMENT',
 		'operator_style': ['SCE_APDL_OPERATOR'],
 	},
 	'NP2LEX_ASM': {
 		'line_comment_string': [';', '# ', '//', '@ '],
 		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_ASM_TASKMARKER',
 		'operator_style': ['SCE_ASM_OPERATOR'],
 		#'cpp_preprocessor': True,
 	},
 	'NP2LEX_ASYMPTOTE': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_ASY_TASKMARKER',
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_ASY_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_ASY_ESCAPECHAR',
@@ -155,6 +162,7 @@ LexerConfigMap = {
 	'NP2LEX_AUTOHOTKEY': {
 		'line_comment_string': ';',
 		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_AHK_TASKMARKER',
 		#'block_comment_on_new_line': True,
 		'default_fold_level': ['class', 'function'],
 		'printf_format_specifier': True,
@@ -166,6 +174,7 @@ LexerConfigMap = {
 	'NP2LEX_AUTOIT3': {
 		'line_comment_string': ';',
 		'block_comment_string': ('#cs', '#ce'),
+		'comment_style_marker': 'SCE_AU3_COMMENTBLOCK',
 		'block_comment_on_new_line': True,
 		'operator_style': ['SCE_AU3_OPERATOR'],
 		'extra_word_char': '$',
@@ -174,12 +183,14 @@ LexerConfigMap = {
 	'NP2LEX_AVISYNTH': {
 		'line_comment_string': '#',
 		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_AVS_TASKMARKER',
 		'default_fold_level': ['function'],
 		'escape_char_style': 'SCE_AVS_ESCAPECHAR',
 		'operator_style': ['SCE_AVS_OPERATOR'],
 	},
 	'NP2LEX_AWK': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_AWK_TASKMARKER',
 		'shebang_exe_name': 'awk',
 		'default_fold_level': ['namespace', 'function'],
 		'default_fold_ignore_inner': 'SCE_AWK_FUNCTION_DEFINITION',
@@ -195,6 +206,7 @@ LexerConfigMap = {
 		'default_encoding': 'utf-8',
 		'default_line_ending': 'LF',
 		'line_comment_string': ['#', 'dnl '],
+		'comment_style_marker': 'SCE_SH_COMMENTLINE',
 		'shebang_exe_name': ['bash', 'm4', 'csh'],
 		'raw_string_style': ['SCE_SH_STRING_SQ'],
 		'operator_style': ['SCE_SH_OPERATOR'],
@@ -206,6 +218,7 @@ LexerConfigMap = {
 		'default_line_ending': 'CRLF',
 		'line_comment_string': '@rem ',
 		'line_comment_at_line_start': True,
+		'comment_style_marker': 'SCE_BAT_COMMENT',
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_BAT_ESCAPECHAR',
 		'escape_punctuation': True,
@@ -215,6 +228,7 @@ LexerConfigMap = {
 	'NP2LEX_BLOCKDIAG': {
 		'line_comment_string': '//',
 		'block_comment_string': [('/*', '*/'), ('<!--', '-->')],
+		'comment_style_marker': 'SCE_GRAPHVIZ_TASKMARKER',
 		'default_fold_level': ['graph', 'subgraph'],
 		'escape_char_style': 'SCE_GRAPHVIZ_ESCAPECHAR',
 		'operator_style': ['SCE_GRAPHVIZ_OPERATOR'],
@@ -224,6 +238,7 @@ LexerConfigMap = {
 
 	'NP2LEX_CIL': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_C_COMMENTLINE',
 		'operator_style': ['SCE_C_OPERATOR'],
 		'cpp_preprocessor': True,
 		'extra_word_char': '$',
@@ -231,6 +246,7 @@ LexerConfigMap = {
 	'NP2LEX_CMAKE': {
 		'line_comment_string': '#',
 		'block_comment_string': ('#[[', ']]'),
+		'comment_style_marker': 'SCE_CMAKE_TASKMARKER',
 		'escape_char_style': 'SCE_CMAKE_ESCAPECHAR',
 		'escape_punctuation': True,
 		'angle_bracket_generic': True, # for bracket argument $<>
@@ -240,6 +256,7 @@ LexerConfigMap = {
 	'NP2LEX_COFFEESCRIPT': {
 		'line_comment_string': '#',
 		'block_comment_string': ('###', '###'),
+		'comment_style_marker': 'SCE_COFFEESCRIPT_TASKMARKER',
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['class', 'function'],
@@ -249,6 +266,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_CONFIG': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_CONF_COMMENT',
 		'operator_style': ['SCE_CONF_OPERATOR'],
 	},
 	'NP2LEX_CSV': {
@@ -257,6 +275,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_CPP': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_C_COMMENTDOC_TAG_XML',
 		'default_fold_level': ['preprocessor', 'namespace', 'class', 'method'],
 		'printf_format_specifier': True,
 		'escape_char_style': 'SCE_C_ESCAPECHAR',
@@ -275,6 +294,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_CSHARP': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_CSHARP_TASKMARKER',
 		'default_fold_level': ['namespace', 'class', 'method'],
 		'default_fold_ignore_inner': 'SCE_CSHARP_FUNCTION_DEFINITION',
 		'format_specifier_style': 'SCE_CSHARP_FORMAT_SPECIFIER',
@@ -293,6 +313,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_CSS': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_CSS_CDO_CDC',
 		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
 		'operator_style': ['SCE_CSS_OPERATOR'],
 		'extra_word_char': '-$@',
@@ -301,6 +322,7 @@ LexerConfigMap = {
 
 	'NP2LEX_DLANG': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_D_TASKMARKER',
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_D_FUNCTION_DEFINITION',
 		'printf_format_specifier': True,
@@ -314,6 +336,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_DART': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_DART_TASKMARKER',
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_DART_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_DART_ESCAPECHAR',
@@ -328,6 +351,7 @@ LexerConfigMap = {
 		#'ignore_word_style': ['SCE_DART_WORD', 'SCE_DART_WORD2'],
 	},
 	'NP2LEX_DIFF': {
+		'comment_style_marker': 'SCE_DIFF_COMMENT',
 		'default_fold_level': ['command', '[file]', 'diff'],
 		'escape_char_start': NoEscapeCharacter,
 	},
@@ -337,6 +361,7 @@ LexerConfigMap = {
 		'line_comment_string': ['!'], # omited '*'
 		'block_comment_string': ('#if 0', '#endif'),
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_F_COMMENT',
 		'escape_char_style': 'SCE_F_ESCAPECHAR',
 		'character_prefix': ['b', 'B', 'o', 'O', 'z', 'Z'],
 		'operator_style': ['SCE_F_OPERATOR', 'SCE_F_OPERATOR2'],
@@ -346,6 +371,7 @@ LexerConfigMap = {
 	'NP2LEX_FSHARP': {
 		'line_comment_string': '//',
 		'block_comment_string': ('(*', '*)'),
+		'comment_style_marker': 'SCE_FSHARP_COMMENTLINE',
 		'operator_style': ['SCE_FSHARP_OPERATOR'],
 		'cpp_preprocessor': True,
 		'autoc_extra_keyword': 'kwNETDoc',
@@ -353,6 +379,7 @@ LexerConfigMap = {
 
 	'NP2LEX_GN': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_GN_COMMENT',
 		'escape_char_style': 'SCE_GN_ESCAPECHAR',
 		'escape_punctuation': True,
 		'operator_style': ['SCE_GN_OPERATOR', 'SCE_GN_OPERATOR2'],
@@ -361,6 +388,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_GO': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_GO_TASKMARKER',
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_GO_FUNCTION_DEFINITION',
 		'printf_format_specifier': True,
@@ -373,6 +401,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_GRADLE': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_GROOVY_TASKMARKER',
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_GROOVY_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_GROOVY_ESCAPECHAR',
@@ -385,6 +414,7 @@ LexerConfigMap = {
 	'NP2LEX_GRAPHVIZ': {
 		'line_comment_string': '//',
 		'block_comment_string': [('/*', '*/'), ('<!--', '-->')],
+		'comment_style_marker': 'SCE_GRAPHVIZ_TASKMARKER',
 		'default_fold_level': ['graph', 'subgraph'],
 		'escape_char_style': 'SCE_GRAPHVIZ_ESCAPECHAR',
 		'operator_style': ['SCE_GRAPHVIZ_OPERATOR'],
@@ -393,6 +423,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_GROOVY': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_GROOVY_TASKMARKER',
 		'shebang_exe_name': 'groovy',
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_GROOVY_FUNCTION_DEFINITION',
@@ -406,6 +437,7 @@ LexerConfigMap = {
 
 	'NP2LEX_HAXE': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_HAXE_TASKMARKER',
 		'default_fold_level': ['class', 'method'],
 		'default_fold_ignore_inner': 'SCE_HAXE_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_HAXE_ESCAPECHAR',
@@ -419,6 +451,10 @@ LexerConfigMap = {
 		'tab_settings': TabSettings_Space2,
 		'line_comment_string': ['//', "'", '#'],
 		'block_comment_string': [('<!--', '-->'), ('/*', '*/'), ('--', '--')],
+		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_XCCOMMENT', 'SCE_H_SGML_COMMENT', 'SCE_H_SGML_1ST_PARAM_COMMENT',
+			'SCE_HJ_COMMENT', 'SCE_HJ_COMMENTLINE', 'SCE_HJ_COMMENTDOC',
+			'SCE_HJA_COMMENT', 'SCE_HJA_COMMENTLINE', 'SCE_HJA_COMMENTDOC',
+			'SCE_HB_COMMENTLINE', 'SCE_HBA_COMMENTLINE'],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		#'escape_char_start': NoEscapeCharacter, # backslash for embedded script or style
 		'extra_word_char': '-:',
@@ -426,12 +462,14 @@ LexerConfigMap = {
 
 	'NP2LEX_INI': {
 		'line_comment_string': ';',
+		'comment_style_marker': 'SCE_PROPS_COMMENT',
 		'default_fold_level': ['section', 'comment'],
 		'escape_char_start': NoEscapeCharacter,
 	},
 	'NP2LEX_INNOSETUP': {
 		'line_comment_string': [';', '//'],
 		'block_comment_string': [('/*', '*/'), ('{', '}'), ('(*', '*)')],
+		'comment_style_marker': 'SCE_INNO_TASKMARKER',
 		'default_fold_level': ['section', 'code'],
 		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_INNO_OPERATOR'],
@@ -442,12 +480,14 @@ LexerConfigMap = {
 	'NP2LEX_JAMFILE': {
 		'line_comment_string': '#',
 		'block_comment_string': ('#|', '|#'),
+		'comment_style_marker': 'SCE_JAM_TASKMARKER',
 		'escape_char_style': 'SCE_JAM_ESCAPECHAR',
 		'operator_style': ['SCE_JAM_OPERATOR'],
 		#'ignore_word_style': ['SCE_JAM_WORD'],
 	},
 	'NP2LEX_JAVA': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_JAVA_TASKMARKER',
 		'default_fold_level': ['class', 'inner class', 'method'],
 		'default_fold_ignore_inner': 'SCE_JAVA_FUNCTION_DEFINITION',
 		'printf_format_specifier': True,
@@ -462,6 +502,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_JAVASCRIPT': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'shebang_exe_name': 'node',
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
@@ -472,6 +513,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_JSON': {
 		'cpp_style_comment': True,
+		'comment_style_list': ['SCE_JSON_LINECOMMENT', 'SCE_JSON_BLOCKCOMMENT'],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		'escape_char_style': 'SCE_JSON_ESCAPECHAR',
 		'operator_style': ['SCE_JSON_OPERATOR'],
@@ -480,6 +522,7 @@ LexerConfigMap = {
 	'NP2LEX_JULIA': {
 		'line_comment_string': '#',
 		'block_comment_string': ('#=', '=#'),
+		'comment_style_marker': 'SCE_JULIA_TASKMARKER',
 		'default_fold_level': ['struct', 'method'],
 		'default_fold_ignore_inner': 'SCE_JULIA_FUNCTION_DEFINITION',
 		'printf_format_specifier': True,
@@ -496,6 +539,7 @@ LexerConfigMap = {
 
 	'NP2LEX_KOTLIN': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_KOTLIN_TASKMARKER',
 		#'shebang_exe_name': 'kotlin',
 		'default_fold_level': ['class', 'inner class', 'method'],
 		'default_fold_ignore_inner': 'SCE_KOTLIN_FUNCTION_DEFINITION',
@@ -513,6 +557,7 @@ LexerConfigMap = {
 		'line_comment_string': '%',
 		'block_comment_string': ('\\begin{comment}', '\\end{comment}'),
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_L_COMMENT2',
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_L_SPECIAL',
 		'escape_punctuation': True,
@@ -521,12 +566,14 @@ LexerConfigMap = {
 	'NP2LEX_LISP': {
 		'line_comment_string': ';',
 		'block_comment_string': ('#|',  '|#'),
+		'comment_style_marker': 'SCE_C_COMMENTLINE',
 		'none_quote_style': 'SCE_C_OPERATOR',
 		'operator_style': ['SCE_C_OPERATOR'],
 		'extra_word_char': '-',
 	},
 	'NP2LEX_LLVM': {
 		'line_comment_string': ';',
+		'comment_style_marker': 'SCE_LLVM_TASKMARKER',
 		'escape_char_style': 'SCE_LLVM_ESCAPECHAR',
 		'operator_style': ['SCE_LLVM_OPERATOR'],
 		'extra_word_char': '-@%$',
@@ -534,6 +581,7 @@ LexerConfigMap = {
 	'NP2LEX_LUA': {
 		'line_comment_string': '--',
 		'block_comment_string': ('--[[', '--]]'),
+		'comment_style_marker': 'SCE_LUA_COMMENTDOC',
 		'shebang_exe_name': 'lua',
 		'default_fold_level': ['class', 'function'],
 		'printf_format_specifier': True,
@@ -545,6 +593,7 @@ LexerConfigMap = {
 	'NP2LEX_MAKEFILE': {
 		'tab_settings': TabSettings_Tab4,
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_MAKE_COMMENT',
 		'escape_char_start': NoEscapeCharacter,
 		'operator_style': ['SCE_MAKE_OPERATOR'],
 		'extra_word_char': '-$!',
@@ -552,6 +601,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
+		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT'],
 		'default_fold_level': ['header1', 'header2', 'header3'],
 		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
 		'escape_punctuation': True,
@@ -560,6 +610,7 @@ LexerConfigMap = {
 		'line_comment_string': ['%', '//'],
 		'block_comment_string': [('%{', '}%'), ('/*', '*/')],
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_MAT_TASKMARKER',
 		'printf_format_specifier': True,
 		#'escape_char_start': NoEscapeCharacter, # backslash for Octave escape character
 		'none_quote_style': 'SCE_MAT_OPERATOR',
@@ -571,6 +622,7 @@ LexerConfigMap = {
 	'NP2LEX_NSIS': {
 		'line_comment_string': ['#'], # omited ';'
 		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_NSIS_TASKMARKER',
 		'default_fold_level': ['section', 'function'],
 		'escape_char_style': 'SCE_NSIS_ESCAPECHAR',
 		'operator_style': ['SCE_NSIS_OPERATOR'],
@@ -581,11 +633,13 @@ LexerConfigMap = {
 	'NP2LEX_PASCAL': {
 		'line_comment_string': '//',
 		'block_comment_string': [('{', '}')], # omited ('(*', '*)')
+		'comment_style_marker': 'SCE_PAS_TASKMARKER',
 		'operator_style': ['SCE_PAS_OPERATOR'],
 		#'auto_ident_word_style': ['SCE_PAS_PREPROCESSOR'],
 	},
 	'NP2LEX_PERL': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_PL_COMMENTLINE',
 		'shebang_exe_name': 'perl',
 		'printf_format_specifier': True,
 		'raw_string_style': ['SCE_PL_STRING_SQ'],
@@ -596,6 +650,11 @@ LexerConfigMap = {
 	'NP2LEX_PHP': {
 		'line_comment_string': ['//', '#'],
 		'block_comment_string': [('/*', '*/'), ('<!--', '-->'), ('--', '--')],
+		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT',
+			'SCE_PHP_COMMENTLINE', 'SCE_PHP_COMMENTBLOCK', 'SCE_PHP_COMMENTBLOCKDOC', 'SCE_PHP_COMMENTTAGAT', 'SCE_PHP_TASKMARKER',
+			'js_style(SCE_JS_COMMENTLINE)', 'js_style(SCE_JS_COMMENTBLOCK)', 'js_style(SCE_JS_COMMENTBLOCKDOC)',
+			'js_style(SCE_JS_COMMENTTAGAT)', 'js_style(SCE_JS_TASKMARKER)',
+			'css_style(SCE_CSS_COMMENTBLOCK)', 'css_style(SCE_CSS_CDO_CDC)'],
 		'shebang_exe_name': 'php',
 		'default_fold_level': ['[php tag]', 'class', 'method'],
 		'default_fold_ignore_inner': 'SCE_PHP_FUNCTION_DEFINITION',
@@ -609,6 +668,7 @@ LexerConfigMap = {
 	'NP2LEX_POWERSHELL': {
 		'line_comment_string': '#',
 		'block_comment_string': ('<#', '#>'),
+		'comment_style_marker': 'SCE_POWERSHELL_TASKMARKER',
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_POWERSHELL_FUNCTION_DEFINITION',
 		'escape_char_start': '`',
@@ -620,6 +680,7 @@ LexerConfigMap = {
 	'NP2LEX_PYTHON': {
 		'line_comment_string': '#',
 		'shebang_exe_name': 'python3',
+		'comment_style_marker': 'SCE_PY_TASKMARKER',
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['class', 'function'],
@@ -644,6 +705,7 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'block_comment_string': ('if (FALSE) {', '}'),
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_R_TASKMARKER',
 		'shebang_exe_name': 'Rscript',
 		'default_fold_level': ['function'],
 		'printf_format_specifier': True,
@@ -658,6 +720,7 @@ LexerConfigMap = {
 		'line_comment_string': ';',
 		'block_comment_string': ('comment {', '}'),
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_REBOL_TASKMARKER',
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_REBOL_ESCAPECHAR',
 		'none_quote_style': 'SCE_REBOL_SYMBOL',
@@ -668,6 +731,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_RESOURCESCRIPT': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_C_COMMENTDOC_TAG_XML',
 		'default_fold_level': ['preprocessor', 'resource'],
 		'printf_format_specifier': True,
 		'escape_char_style': 'SCE_C_ESCAPECHAR',
@@ -682,6 +746,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_RUBY': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_RB_COMMENTLINE',
 		'shebang_exe_name': 'ruby',
 		'default_fold_level': ['module', 'class', 'method'],
 		'default_fold_ignore_inner': 'SCE_RB_DEF_NAME',
@@ -694,6 +759,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_RUST': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_RUST_TASKMARKER',
 		#'shebang_exe_name': 'rust',
 		'default_fold_level': ['struct', 'function'],
 		'default_fold_ignore_inner': 'SCE_RUST_FUNCTION_DEFINITION',
@@ -712,6 +778,7 @@ LexerConfigMap = {
 
 	'NP2LEX_SCALA': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_SCALA_TASKMARKER',
 		'shebang_exe_name': 'scala',
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
@@ -725,6 +792,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_SMALI': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_SMALI_COMMENTLINE',
 		'default_fold_level': ['.method', '.switch'],
 		'operator_style': ['SCE_SMALI_OPERATOR'],
 		'extra_word_char': '-',
@@ -733,6 +801,7 @@ LexerConfigMap = {
 	'NP2LEX_SQL': {
 		'line_comment_string': '-- ', # extra space
 		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_SQL_COMMENTLINEDOC',
 		'default_fold_level': ['function'],
 		'escape_char_style': 'SCE_SQL_ESCAPECHAR',
 		'character_prefix': ['q', 'Q', 'x', 'X', 'b', 'B'],
@@ -743,6 +812,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_SWIFT': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_SWIFT_TASKMARKER',
 		'default_fold_level': ['class', 'function'],
 		'default_fold_ignore_inner': 'SCE_SWIFT_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_SWIFT_ESCAPECHAR',
@@ -758,6 +828,7 @@ LexerConfigMap = {
 		'line_comment_string': '#',
 		'block_comment_string': ('if (0) {', '}'),
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_TCL_TASKMARKER',
 		'shebang_exe_name': 'wish',
 		'printf_format_specifier': True,
 		'operator_style': ['SCE_TCL_MODIFIER'],
@@ -767,6 +838,7 @@ LexerConfigMap = {
 		'line_comment_string': '@c ',
 		'block_comment_string': ('@ignore', '@end ignore'),
 		'block_comment_on_new_line': True,
+		'comment_style_marker': 'SCE_TEXINFO_COMMENT2',
 		'default_fold_level': ['chapter', 'section', 'subsection'],
 		'escape_char_start': '@',
 		'escape_char_style': 'SCE_TEXINFO_SPECIAL',
@@ -775,12 +847,14 @@ LexerConfigMap = {
 	},
 	'NP2LEX_TOML': {
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_TOML_COMMENT',
 		'default_fold_level': ['table', 'comment'],
 		'escape_char_style': 'SCE_TOML_ESCAPECHAR',
 		'operator_style': ['SCE_TOML_OPERATOR'],
 	},
 	'NP2LEX_TYPESCRIPT': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'default_fold_level': ['class', 'anonymous object', 'method'],
 		'default_fold_ignore_inner': 'SCE_JS_FUNCTION_DEFINITION',
 		'escape_char_style': 'SCE_JS_ESCAPECHAR',
@@ -793,6 +867,7 @@ LexerConfigMap = {
 
 	'NP2LEX_VBSCRIPT': {
 		'line_comment_string': "'",
+		'comment_style_marker': 'SCE_B_COMMENT',
 		'default_fold_level': ['function'],
 		'escape_char_start': NoEscapeCharacter,
 		'none_quote_style': 'SCE_B_COMMENT',
@@ -801,6 +876,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_VERILOG': {
 		'cpp_style_comment': True,
+		'comment_style_marker': 'SCE_V_TASKMARKER',
 		'none_quote_style': 'SCE_V_NUMBER',
 		'printf_format_specifier': True,
 		'format_specifier_style': 'SCE_V_FORMAT_SPECIFIER',
@@ -813,6 +889,7 @@ LexerConfigMap = {
 		'default_encoding': 'iso-8859-1',
 		'line_comment_string': '--',
 		'block_comment_string': ('/*', '*/'),
+		'comment_style_marker': 'SCE_VHDL_TASKMARKER',
 		'escape_char_start': NoEscapeCharacter,
 		'character_style': ['SCE_VHDL_CHARACTER'],
 		'raw_string_style': ['SCE_VHDL_STRING'],
@@ -821,12 +898,14 @@ LexerConfigMap = {
 	},
 	'NP2LEX_VIM': {
 		'line_comment_string': '"',
+		'comment_style_marker': 'SCE_VIM_TASKMARKER',
 		'escape_char_style': 'SCE_YAML_ESCAPECHAR',
 		'raw_string_style': ['SCE_VIM_STRING_SQ'],
 		'operator_style': ['SCE_VIM_OPERATOR'],
 	},
 	'NP2LEX_VISUALBASIC': {
 		'line_comment_string': "'",
+		'comment_style_marker': 'SCE_B_COMMENT',
 		'default_fold_level': ['class', 'function'],
 		'escape_char_start': NoEscapeCharacter,
 		'none_quote_style': 'SCE_B_COMMENT',
@@ -839,6 +918,7 @@ LexerConfigMap = {
 	'NP2LEX_WASM': {
 		'line_comment_string': ';;',
 		'block_comment_string': ('(;', ';)'),
+		'comment_style_marker': 'SCE_WASM_TASKMARKER',
 		'escape_char_style': 'SCE_WASM_ESCAPECHAR',
 		'operator_style': ['SCE_WASM_OPERATOR'],
 		'extra_word_char': '-@%$',
@@ -846,6 +926,10 @@ LexerConfigMap = {
 	'NP2LEX_XML': {
 		'line_comment_string': ['//', "'", '#'],
 		'block_comment_string': [('<!--', '-->'), ('/*', '*/'), ('--', '--')],
+		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_XCCOMMENT', 'SCE_H_SGML_COMMENT', 'SCE_H_SGML_1ST_PARAM_COMMENT',
+			'SCE_HJ_COMMENT', 'SCE_HJ_COMMENTLINE', 'SCE_HJ_COMMENTDOC',
+			'SCE_HJA_COMMENT', 'SCE_HJA_COMMENTLINE', 'SCE_HJA_COMMENTDOC',
+			'SCE_HB_COMMENTLINE', 'SCE_HBA_COMMENTLINE'],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-:',
@@ -853,6 +937,7 @@ LexerConfigMap = {
 	'NP2LEX_YAML': {
 		'tab_settings': TabSettings_Space2,
 		'line_comment_string': '#',
+		'comment_style_marker': 'SCE_YAML_COMMENT',
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
@@ -980,7 +1065,7 @@ def BuildLexerConfigContent(rid, keywordAttr):
 	if config.get('escape_punctuation', None):
 		flag |= LexerAttr.EscapePunctuation
 
-	output = ['\t{']
+	output = []
 	indent = '\t\t'
 	expr = get_enum_flag_expr(flag, merge=False)
 	if isinstance(expr, str):
@@ -1034,8 +1119,12 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		expr = get_enum_flag_expr(KeywordAttr.Default)
 		output.append(indent + expr)
 
-	suffix = '\t},'
+	# style marker
+	style = config.get('comment_style_marker', '0')
+	output.append(f"{indent}, {style},")
+
 	if not rid:
+		output[-1] = output[-1][:-1]
 		# right align continuation backslash in multi-line macro
 		indent_count = len(indent)
 		max_width = max(len(line) for line in output) - indent_count
@@ -1045,11 +1134,8 @@ def BuildLexerConfigContent(rid, keywordAttr):
 			width = len(line) - indent_count
 			width = (width + 4) & ~3
 			padding = (max_width - width) // 4
-			padding += index == 0
 			result.append(line + '\t'*padding + '\\')
 		output = result
-		suffix = suffix[:-1]
-	output.append(suffix)
 	return output
 
 def BuildLexerCommentString():
@@ -1155,6 +1241,8 @@ def BuildAutoCompletionCache():
 			make_all_bit_set(output, 'GenericTypeStyleMask', styles)
 		if styles := config.get('ignore_word_style', None):
 			make_all_bit_set(output, 'IgnoreWordStyleMask', styles)
+		if styles := config.get('comment_style_list', None):
+			make_all_bit_set(output, 'CommentStyleMask', styles)
 
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')

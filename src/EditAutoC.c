@@ -527,6 +527,7 @@ static uint32_t CharacterPrefixMask[8];
 static uint32_t RawStringStyleMask[8];
 static uint32_t GenericTypeStyleMask[8];
 static uint32_t IgnoreWordStyleMask[8];
+static uint32_t CommentStyleMask[8];
 
 // from scintilla/lexlib/DocUtils.h
 #define js_style(style)		((style) + SCE_PHP_LABEL + 1)
@@ -550,10 +551,6 @@ static inline bool IsRawStringStyle(int style) {
 
 static inline bool IsGenericTypeStyle(int style) {
 	return BitTestEx(GenericTypeStyleMask, style);
-}
-
-static inline bool IsWordStyleToIgnore(int style) {
-	return BitTestEx(IgnoreWordStyleMask, style);
 }
 
 bool IsAutoCompletionWordCharacter(uint32_t ch) {
@@ -780,7 +777,7 @@ void EscapeRegex(LPSTR pszOut, LPCSTR pszIn) {
 	*pszOut++ = '\0';
 }
 
-static void AutoC_AddDocWord(struct WordList *pWList, bool bIgnoreCase, char prefix) {
+static void AutoC_AddDocWord(struct WordList *pWList, const uint32_t ignoredStyleMask[8], bool bIgnoreCase, char prefix) {
 	LPCSTR const pRoot = pWList->pWordStart;
 	const int iRootLen = pWList->iStartLen;
 
@@ -827,7 +824,7 @@ static void AutoC_AddDocWord(struct WordList *pWList, bool bIgnoreCase, char pre
 		Sci_Position wordEnd = iPosFind + iRootLen;
 		const int style = SciCall_GetStyleIndexAt(wordEnd - 1);
 		wordEnd = ft.chrgText.cpMax;
-		if (iPosFind != iCurrentPos && !IsWordStyleToIgnore(style)) {
+		if (iPosFind != iCurrentPos && !BitTestEx(ignoredStyleMask, style)) {
 			// find all word after '::', '->', '.' and '-'
 			bool bSubWord = false;
 			while (wordEnd < iDocLen) {
@@ -1447,7 +1444,7 @@ void EditCompleteUpdateConfig(void) {
 
 static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	const int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
+	int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
 
@@ -1604,20 +1601,38 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		}
 	}
 
-	bool retry = false;
+	if (iCurrentStyle == 0) {
+		// word not yet styled, or is plain text
+		iCurrentStyle = SciCall_GetStyleIndexAt(iStartWordPos);
+	}
+
+	bool retry = true;
+	uint32_t ignoredStyleMask[8];
 	const bool bScanWordsInDocument = autoCompletionConfig.bScanWordsInDocument;
-	do {
+	if (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_Commont) && BitTestEx(CommentStyleMask, iCurrentStyle)) {
+		retry = false;
+	}
+	if (retry && bScanWordsInDocument) {
+		memcpy(ignoredStyleMask, IgnoreWordStyleMask, sizeof(IgnoreWordStyleMask));
+		if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_Commont) && !BitTestEx(CommentStyleMask, iCurrentStyle)) {
+			for (UINT i = 0; i < 8; i++) {
+				ignoredStyleMask[i] |= CommentStyleMask[i];
+			}
+		}
+	}
+
+	while (retry) {
 		if (!bIgnoreLexer) {
 			// keywords
 			AutoC_AddKeyword(&pWList, iCurrentStyle);
 		}
 		if (bScanWordsInDocument) {
 			if (!bIgnoreDoc || pWList.nWordCount == 0) {
-				AutoC_AddDocWord(&pWList, bIgnoreCase, prefix);
+				AutoC_AddDocWord(&pWList, ignoredStyleMask, bIgnoreCase, prefix);
 			}
 			if (prefix && pWList.nWordCount == 0) {
 				prefix = '\0';
-				AutoC_AddDocWord(&pWList, bIgnoreCase, prefix);
+				AutoC_AddDocWord(&pWList, ignoredStyleMask, bIgnoreCase, prefix);
 			}
 		}
 
@@ -1638,7 +1653,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 				}
 			}
 		}
-	} while (retry);
+	}
 
 #if 0
 	StopWatch_Stop(watch);
@@ -2773,6 +2788,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	memset(RawStringStyleMask, 0, sizeof(RawStringStyleMask));
 	memset(GenericTypeStyleMask, 0, sizeof(GenericTypeStyleMask));
 	memset(IgnoreWordStyleMask, 0, sizeof(IgnoreWordStyleMask));
+	memset(CommentStyleMask, 0, sizeof(CommentStyleMask));
 	memcpy(CurrentWordCharSet, DefaultWordCharSet, sizeof(DefaultWordCharSet));
 	//CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 
@@ -2935,6 +2951,18 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['-' >> 5] |= (1 << ('-' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
+		CommentStyleMask[SCE_H_COMMENT >> 5] |= (1U << (SCE_H_COMMENT & 31));
+		CommentStyleMask[SCE_H_XCCOMMENT >> 5] |= (1U << (SCE_H_XCCOMMENT & 31));
+		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
+		CommentStyleMask[SCE_H_SGML_1ST_PARAM_COMMENT >> 5] |= (1U << (SCE_H_SGML_1ST_PARAM_COMMENT & 31));
+		CommentStyleMask[SCE_HJ_COMMENT >> 5] |= (1U << (SCE_HJ_COMMENT & 31));
+		CommentStyleMask[SCE_HJ_COMMENTLINE >> 5] |= (1U << (SCE_HJ_COMMENTLINE & 31));
+		CommentStyleMask[SCE_HJ_COMMENTDOC >> 5] |= (1U << (SCE_HJ_COMMENTDOC & 31));
+		CommentStyleMask[SCE_HJA_COMMENT >> 5] |= (1U << (SCE_HJA_COMMENT & 31));
+		CommentStyleMask[SCE_HJA_COMMENTLINE >> 5] |= (1U << (SCE_HJA_COMMENTLINE & 31));
+		CommentStyleMask[SCE_HJA_COMMENTDOC >> 5] |= (1U << (SCE_HJA_COMMENTDOC & 31));
+		CommentStyleMask[SCE_HB_COMMENTLINE >> 5] |= (1U << (SCE_HB_COMMENTLINE & 31));
+		CommentStyleMask[SCE_HBA_COMMENTLINE >> 5] |= (1U << (SCE_HBA_COMMENTLINE & 31));
 		break;
 
 	case NP2LEX_JAVA:
@@ -2951,6 +2979,12 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
+		break;
+
+	case NP2LEX_JSON:
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CommentStyleMask[SCE_JSON_LINECOMMENT >> 5] |= (1U << (SCE_JSON_LINECOMMENT & 31));
+		CommentStyleMask[SCE_JSON_BLOCKCOMMENT >> 5] |= (1U << (SCE_JSON_BLOCKCOMMENT & 31));
 		break;
 
 	case NP2LEX_JULIA:
@@ -2988,6 +3022,12 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
 		break;
 
+	case NP2LEX_MARKDOWN:
+		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
+		CommentStyleMask[SCE_H_COMMENT >> 5] |= (1U << (SCE_H_COMMENT & 31));
+		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
+		break;
+
 	case NP2LEX_PERL:
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
@@ -3002,6 +3042,20 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet[':' >> 5] |= (1 << (':' & 31));
 		RawStringStyleMask[SCE_PHP_STRING_SQ >> 5] |= (1U << (SCE_PHP_STRING_SQ & 31));
 		RawStringStyleMask[SCE_PHP_NOWDOC >> 5] |= (1U << (SCE_PHP_NOWDOC & 31));
+		CommentStyleMask[SCE_H_COMMENT >> 5] |= (1U << (SCE_H_COMMENT & 31));
+		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
+		CommentStyleMask[SCE_PHP_COMMENTLINE >> 5] |= (1U << (SCE_PHP_COMMENTLINE & 31));
+		CommentStyleMask[SCE_PHP_COMMENTBLOCK >> 5] |= (1U << (SCE_PHP_COMMENTBLOCK & 31));
+		CommentStyleMask[SCE_PHP_COMMENTBLOCKDOC >> 5] |= (1U << (SCE_PHP_COMMENTBLOCKDOC & 31));
+		CommentStyleMask[SCE_PHP_COMMENTTAGAT >> 5] |= (1U << (SCE_PHP_COMMENTTAGAT & 31));
+		CommentStyleMask[SCE_PHP_TASKMARKER >> 5] |= (1U << (SCE_PHP_TASKMARKER & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTLINE) >> 5] |= (1U << (js_style(SCE_JS_COMMENTLINE) & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTBLOCK) >> 5] |= (1U << (js_style(SCE_JS_COMMENTBLOCK) & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTBLOCKDOC) >> 5] |= (1U << (js_style(SCE_JS_COMMENTBLOCKDOC) & 31));
+		CommentStyleMask[js_style(SCE_JS_COMMENTTAGAT) >> 5] |= (1U << (js_style(SCE_JS_COMMENTTAGAT) & 31));
+		CommentStyleMask[js_style(SCE_JS_TASKMARKER) >> 5] |= (1U << (js_style(SCE_JS_TASKMARKER) & 31));
+		CommentStyleMask[css_style(SCE_CSS_COMMENTBLOCK) >> 5] |= (1U << (css_style(SCE_CSS_COMMENTBLOCK) & 31));
+		CommentStyleMask[css_style(SCE_CSS_CDO_CDC) >> 5] |= (1U << (css_style(SCE_CSS_CDO_CDC) & 31));
 		break;
 
 	case NP2LEX_POWERSHELL:
@@ -3153,6 +3207,11 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		break;
 
 //Cache--Autogenerated -- end of section automatically generated
+	}
+
+	const uint32_t marker = pLex->commentStyleMarker;
+	if (marker) {
+		CommentStyleMask[0] |= (1U << (marker + 1)) - 2;
 	}
 
 	UpdateLexerExtraKeywords();

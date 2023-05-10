@@ -59,10 +59,10 @@ enum {
 typedef struct EDITSTYLE {
 	const int iStyle;
 	// set with EDITSTYLE_HOLE() or EDITSTYLE_HOLEX()
-	const uint16_t rid;
-	const uint16_t iNameLen;
-	const wchar_t * const pszName;
-	wchar_t *szValue;
+		const uint16_t rid;
+		const uint16_t iNameLen;
+		const wchar_t * const pszName;
+		wchar_t *szValue;
 	const wchar_t * const pszDefault;
 } EDITSTYLE, *PEDITSTYLE;
 
@@ -79,7 +79,6 @@ typedef struct EDITLEXER {
 	const int iLexer;
 	const int rid;
 	// default settings for this scheme, auto generated from LexerConfig.py
-	struct {
 		const uint32_t lexerAttr;
 		const uint8_t defaultTabWidth;
 		const uint8_t defaultIndentWidth;
@@ -96,9 +95,9 @@ typedef struct EDITLEXER {
 		const uint8_t operatorStyle2;
 
 		const uint64_t keywordAttr;
-	};
-	// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
-	struct {
+
+		const uint8_t commentStyleMarker;
+		// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
 		uint8_t iStyleTheme;
 		bool bStyleChanged;
 		bool bUseDefaultCodeStyle;
@@ -109,7 +108,6 @@ typedef struct EDITLEXER {
 		const wchar_t * const pszName;
 		wchar_t *szExtensions;
 		wchar_t *szStyleBuf;
-	};
 	const wchar_t * const pszDefExt;
 	const KEYWORDLIST * const pKeyWords;
 	EDITSTYLE * const Styles;
