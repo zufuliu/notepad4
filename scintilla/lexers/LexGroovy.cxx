@@ -233,7 +233,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 						if (sc.chNext == ':') {
 							// type::method
 							sc.ChangeState(SCE_GROOVY_CLASS);
-						} else if (bracketCount == 0 && nestedState.empty() && chBefore != ',' && chBefore != '{' && visibleChars == sc.LengthCurrent()) {
+						} else if (bracketCount == 0 && nestedState.empty() && !AnyOf(chBefore, ',', '{', '(') && visibleChars == sc.LengthCurrent()) {
 							const int chNext = sc.GetDocNextChar(true);
 							if (IsADigit(chNext) || chNext == '\'' || chNext == '\"') {
 								sc.ChangeState(SCE_GROOVY_PROPERTY);
