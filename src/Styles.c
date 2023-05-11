@@ -2914,6 +2914,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			break;
 		// Markdown
 		case NP2LEX_MARKDOWN:
+			update = false;
 			lang = IDM_LEXER_MARKDOWN_GITHUB;
 			break;
 		// Math

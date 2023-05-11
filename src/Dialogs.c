@@ -1637,17 +1637,8 @@ static INT_PTR CALLBACK TabSettingsDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, 
 	switch (umsg) {
 	case WM_INITDIALOG: {
 		WCHAR wch[MAX_EDITLEXER_NAME_SIZE];
-		LPCWSTR pszName;
 		Style_LoadTabSettings(pLexCurrent);
-#if NP2_ENABLE_LOCALIZE_LEXER_NAME
-		if (GetString(pLexCurrent->rid, wch, COUNTOF(wch))) {
-			pszName = wch;
-		} else {
-			pszName = pLexCurrent->pszName;
-		}
-#else
-		pszName = pLexCurrent->pszName;
-#endif
+		LPCWSTR pszName = Style_GetCurrentLexerName(wch, COUNTOF(wch));
 		SetDlgItemText(hwnd, IDC_SCHEME_TAB_GROUPBOX, pszName);
 		if (StrIsEmpty(szCurFile)) {
 			GetString(IDS_UNTITLED, wch, COUNTOF(wch));

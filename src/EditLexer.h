@@ -97,7 +97,7 @@ typedef struct EDITLEXER {
 		const uint64_t keywordAttr;
 
 		const uint8_t commentStyleMarker;
-		// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
+	// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
 		uint8_t iStyleTheme;
 		bool bStyleChanged;
 		bool bUseDefaultCodeStyle;
