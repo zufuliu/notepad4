@@ -1223,12 +1223,11 @@ def BuildAutoCompletionCache():
 			output.append(make_bit_set(table, value))
 
 	for rid, config in LexerConfigMap.items():
-		charset = []
+		output = []
 		if word := config.get('extra_word_char', None):
 			assert '.' not in word, (rid, word)
-			make_all_char_set(charset, 'CurrentWordCharSet', word + '.')
+			make_all_char_set(output, 'CurrentWordCharSet', word)
 
-		output = []
 		if word := config.get('character_prefix', None):
 			prefix = [item for item in word if len(item) == 1]
 			if len(prefix) != len(word):
@@ -1247,15 +1246,11 @@ def BuildAutoCompletionCache():
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')
 
-		if output or charset:
-			if not charset:
-				charset = [make_char_set('CurrentWordCharSet', '.')]
-			charset.extend(output)
-			output = charset
+		if output:
 			output.append(indent + 'break;')
 			output.append('')
 			cache[rid] = tuple(output)
 
-	cache['default'] = (make_char_set('CurrentWordCharSet', '.'), indent + 'break;', '')
+	cache['default'] = (indent + 'break;', '')
 	output = MergeSwitchCaseList(cache)
 	return output
