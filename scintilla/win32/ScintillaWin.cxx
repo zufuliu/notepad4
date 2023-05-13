@@ -1307,35 +1307,23 @@ void ScintillaWin::ToggleHanja() {
 namespace {
 
 // https://docs.microsoft.com/en-us/windows/desktop/Intl/composition-string
-std::vector<int> MapImeIndicators(const std::vector<BYTE> &inputStyle, int &indicatorMask) {
-	const size_t attrLen = inputStyle.size();
-	std::vector<int> imeIndicator(attrLen, IndicatorUnknown);
+int MapImeIndicators(std::vector<BYTE> &inputStyle) noexcept {
 	int mask = 0;
-
-	for (size_t i = 0; i < attrLen; i++) {
-		switch (inputStyle.at(i)) {
-		case ATTR_INPUT:
-			imeIndicator[i] = IndicatorInput;
-			mask |= 1 << (IndicatorInput - IndicatorInput);
-			break;
-		case ATTR_TARGET_NOTCONVERTED:
-		case ATTR_TARGET_CONVERTED:
-			imeIndicator[i] = IndicatorTarget;
-			mask |= 1 << (IndicatorTarget - IndicatorInput);
-			break;
-		case ATTR_CONVERTED:
-			imeIndicator[i] = IndicatorConverted;
-			mask |= 1 << (IndicatorConverted - IndicatorInput);
-			break;
-		default:
-			imeIndicator[i] = IndicatorUnknown;
+	static_assert(ATTR_INPUT < 4 && ATTR_TARGET_CONVERTED < 4 && ATTR_CONVERTED < 4 && ATTR_TARGET_NOTCONVERTED < 4);
+	constexpr unsigned indicatorMask = (IndicatorInput << (8*ATTR_INPUT))
+		| (IndicatorTarget << (8*ATTR_TARGET_CONVERTED))
+		| (IndicatorConverted << (8*ATTR_CONVERTED))
+		| (IndicatorTarget << (8*ATTR_TARGET_NOTCONVERTED));
+	for (BYTE &style : inputStyle) {
+		if (style > 3) {
+			style = IndicatorUnknown;
 			mask |= 1 << (IndicatorUnknown - IndicatorInput);
-			break;
+		} else {
+			style = (indicatorMask >> (8*style)) & 0xff;
+			mask |= 1 << (style - IndicatorInput);
 		}
 	}
-
-	indicatorMask = mask;
-	return imeIndicator;
+	return mask;
 }
 
 }
@@ -1497,8 +1485,8 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		SetCandidateWindowPos();
 		pdoc->TentativeStart(); // TentativeActive from now on.
 
-		int indicatorMask = 0;
-		std::vector<int> imeIndicator = MapImeIndicators(imc.GetImeAttributes(), indicatorMask);
+		std::vector<BYTE> imeIndicator = imc.GetImeAttributes();
+		const int indicatorMask = MapImeIndicators(imeIndicator);
 
 		const UINT codePage = CodePageOfDocument();
 		char inBufferCP[16];
@@ -1514,7 +1502,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 			i += ucWidth;
 		}
 
-		// Japanese IME after pressing Tab replaces input string with first candidate item (target string);
+		// Japanese IME after pressing Space or Tab replaces input string with first candidate item (target string);
 		// when selecting other candidate item, previous item will be replaced with current one.
 		// After candidate item been added, it's looks like been full selected, it's better to keep caret
 		// at end of "selection" (end of input) instead of jump to beginning of input ("selection").
