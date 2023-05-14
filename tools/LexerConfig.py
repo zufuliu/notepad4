@@ -45,6 +45,8 @@ extra_word_char: extra identifier characters excludes dot.
 ignore_word_style: word styles to be ignored for auto-completion word scanning.
 autoc_extra_keyword: [deprecated] extra keyword for auto-completion.
 auto_ident_word_style: word styles that supports auto ident.
+plain_text_file: treat as plain text file for auto-completion.
+plain_text_style: plain text styles.
 """
 
 from enum import IntFlag
@@ -62,6 +64,7 @@ class LexerAttr(IntFlag):
 	CppPreprocessor = 1 << 8		# cpp_preprocessor
 	CharacterPrefix = 1 << 9		# character_prefix
 	EscapePunctuation = 1 << 10		# escape_punctuation
+	PlainTextFile = 1 << 11			# plain_text_file
 
 class KeywordAttr(IntFlag):
 	Default = 0
@@ -105,12 +108,14 @@ LexerConfigMap = {
 		'indent_guide_style': 'forward',
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
+		'plain_text_file': True,
 	},
 	'NP2LEX_2NDTEXTFILE': {
 		'indent_based_folding': True,
 		'indent_guide_style': 'forward',
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
+		'plain_text_file': True,
 	},
 	'NP2LEX_ANSI': {
 		'default_encoding': 'DOS-437',
@@ -119,6 +124,7 @@ LexerConfigMap = {
 		'indent_guide_style': 'forward',
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
+		'plain_text_file': True,
 	},
 
 	'NP2LEX_ABAQUS': {
@@ -272,6 +278,7 @@ LexerConfigMap = {
 	'NP2LEX_CSV': {
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-',
+		'plain_text_file': True,
 	},
 	'NP2LEX_CPP': {
 		'cpp_style_comment': True,
@@ -354,6 +361,7 @@ LexerConfigMap = {
 		'comment_style_marker': 'SCE_DIFF_COMMENT',
 		'default_fold_level': ['command', '[file]', 'diff'],
 		'escape_char_start': NoEscapeCharacter,
+		'plain_text_file': True,
 	},
 
 	'NP2LEX_FORTRAN': {
@@ -458,6 +466,7 @@ LexerConfigMap = {
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		#'escape_char_start': NoEscapeCharacter, # backslash for embedded script or style
 		'extra_word_char': '-:',
+		'plain_text_style': ['SCE_H_DEFAULT'],
 	},
 
 	'NP2LEX_INI': {
@@ -562,6 +571,8 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_L_SPECIAL',
 		'escape_punctuation': True,
 		'operator_style': ['SCE_L_OPERATOR'],
+		'plain_text_style': ['SCE_L_DEFAULT', 'SCE_L_VERBATIM2', 'SCE_L_VERBATIM',
+			'SCE_L_TITLE', 'SCE_L_CHAPTER', 'SCE_L_SECTION', 'SCE_L_SECTION1', 'SCE_L_SECTION2'],
 	},
 	'NP2LEX_LISP': {
 		'line_comment_string': ';',
@@ -605,6 +616,7 @@ LexerConfigMap = {
 		'default_fold_level': ['header1', 'header2', 'header3'],
 		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
 		'escape_punctuation': True,
+		'plain_text_style': ['SCE_H_DEFAULT'],
 	},
 	'NP2LEX_MATLAB': {
 		'line_comment_string': ['%', '//'],
@@ -664,6 +676,7 @@ LexerConfigMap = {
 		'raw_string_style': ['SCE_PHP_STRING_SQ', 'SCE_PHP_NOWDOC'],
 		'operator_style': ['SCE_PHP_OPERATOR', 'SCE_PHP_OPERATOR2'],
 		'extra_word_char': '-$:',
+		'plain_text_style': ['SCE_H_DEFAULT'],
 	},
 	'NP2LEX_POWERSHELL': {
 		'line_comment_string': '#',
@@ -844,6 +857,8 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_TEXINFO_SPECIAL',
 		'escape_punctuation': True,
 		'operator_style': ['SCE_TEXINFO_OPERATOR'],
+		'plain_text_style': ['SCE_TEXINFO_DEFAULT', 'SCE_TEXINFO_VERBATIM2', 'SCE_TEXINFO_VERBATIM',
+			'SCE_TEXINFO_TITLE', 'SCE_TEXINFO_CHAPTER', 'SCE_TEXINFO_SECTION', 'SCE_TEXINFO_SECTION1', 'SCE_TEXINFO_SECTION2'],
 	},
 	'NP2LEX_TOML': {
 		'line_comment_string': '#',
@@ -933,6 +948,7 @@ LexerConfigMap = {
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
 		'escape_char_start': NoEscapeCharacter,
 		'extra_word_char': '-:',
+		'plain_text_style': ['SCE_H_DEFAULT'],
 	},
 	'NP2LEX_YAML': {
 		'tab_settings': TabSettings_Space2,
@@ -1064,6 +1080,8 @@ def BuildLexerConfigContent(rid, keywordAttr):
 		flag |= LexerAttr.CharacterPrefix
 	if config.get('escape_punctuation', None):
 		flag |= LexerAttr.EscapePunctuation
+	if config.get('plain_text_file', None):
+		flag |= LexerAttr.PlainTextFile
 
 	output = []
 	indent = '\t\t'
@@ -1242,6 +1260,11 @@ def BuildAutoCompletionCache():
 			make_all_bit_set(output, 'IgnoreWordStyleMask', styles)
 		if styles := config.get('comment_style_list', None):
 			make_all_bit_set(output, 'CommentStyleMask', styles)
+		if styles := config.get('plain_text_style', None):
+			make_all_bit_set(output, 'PlainTextStyleMask', styles)
+		if rid == 'NP2LEX_MARKDOWN':
+			for i in range(1, 4):
+				output.append(f'{indent}PlainTextStyleMask[{i}] = UINT32_MAX;')
 
 		if word := config.get('autoc_extra_keyword', None):
 			output.append(f'{indent}np2_LexKeyword = &{word};')

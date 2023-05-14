@@ -40,6 +40,7 @@ enum {
 	LexerAttr_CppPreprocessor = 1 << 8,
 	LexerAttr_CharacterPrefix = 1 << 9,
 	LexerAttr_EscapePunctuation = 1 << 10,
+	LexerAttr_PlainTextFile = 1 << 11,
 };
 
 enum {
