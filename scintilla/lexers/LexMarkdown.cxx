@@ -47,7 +47,6 @@ enum class Markdown {
 
 enum class HtmlTagState {
 	None,
-	Inline,
 	Open,
 	Value,
 };
@@ -353,7 +352,7 @@ bool CheckThematicBreak(LexAccessor &styler, Sci_PositionU pos, int delimiter) n
 		if (ch == delimiter) {
 			++count;
 		} else if (!IsSpaceOrTab(ch)) {
-			if (IsEOLChar(ch))  {
+			if (IsEOLChar(ch)) {
 				break;
 			}
 			return false;
@@ -1361,8 +1360,6 @@ bool MarkdownLexer::HandleHtmlTag(HtmlTagType tagType) {
 			if (sc.state == STYLE_LINK) {
 				autoLink = AutoLink::Angle;
 				periodCount = 0;
-			} else if (tagState != HtmlTagState::Open) {
-				tagState = HtmlTagState::Inline;
 			}
 			SaveOuterStyle(current);
 		}
@@ -1510,7 +1507,7 @@ int MarkdownLexer::HighlightBlockText(uint32_t lineState) {
 			sc.SetState(SCE_MARKDOWN_HEADER1);
 			return SCE_MARKDOWN_HEADER1;
 		}
-		if (sc.chNext == '#')  {
+		if (sc.chNext == '#') {
 			int headerLevel = CheckATXHeading(sc.styler, sc.currentPos);
 			if (headerLevel != 0) {
 				headerLevel += SCE_MARKDOWN_HEADER1 - 1;
@@ -2195,9 +2192,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				continue;
 			}
 			if (!IsHtmlTagChar(sc.ch)) {
-				if (lexer.tagState == HtmlTagState::Open && IsASpace(sc.ch)) {
+				if (IsASpace(sc.ch)) {
 					// tag attribute
-					sc.SetState(SCE_MARKDOWN_DEFAULT);
+					sc.SetState(SCE_H_OTHER);
 				} else {
 					lexer.tagState = HtmlTagState::None;
 					lexer.periodCount = 0;
@@ -2222,49 +2219,63 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		case SCE_H_ATTRIBUTE:
 			if (!IsHtmlAttrChar(sc.ch)) {
-				sc.SetState(SCE_MARKDOWN_DEFAULT);
+				sc.SetState(SCE_H_OTHER);
+				continue;
 			}
 			break;
 
 		case SCE_H_VALUE:
 		case SCE_H_SGML_1ST_PARAM:
 			if (IsHtmlInvalidAttrChar(sc.ch)) {
-				const int outer = (sc.state == SCE_H_VALUE) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
+				const int outer = (sc.state == SCE_H_VALUE) ? SCE_H_OTHER : SCE_H_SGML_DEFAULT;
 				sc.SetState(outer);
-				if (outer != SCE_MARKDOWN_DEFAULT) {
-					continue;
-				}
+				continue;
 			}
 			break;
 
 		case SCE_H_SINGLESTRING:
 		case SCE_H_SGML_SIMPLESTRING:
 			if (sc.ch == '\'') {
-				const int outer = (sc.state == SCE_H_SINGLESTRING) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
+				const int outer = (sc.state == SCE_H_SINGLESTRING) ? SCE_H_OTHER : SCE_H_SGML_DEFAULT;
 				sc.ForwardSetState(outer);
-				if (outer != SCE_MARKDOWN_DEFAULT) {
-					continue;
-				}
-			} else {
-				lexer.DetectAutoLink();
+				continue;
 			}
+			lexer.DetectAutoLink();
 			break;
 
 		case SCE_H_DOUBLESTRING:
 		case SCE_H_SGML_DOUBLESTRING:
 			if (sc.ch == '\"') {
-				const int outer = (sc.state == SCE_H_DOUBLESTRING) ? SCE_MARKDOWN_DEFAULT : SCE_H_SGML_DEFAULT;
+				const int outer = (sc.state == SCE_H_DOUBLESTRING) ? SCE_H_OTHER : SCE_H_SGML_DEFAULT;
 				sc.ForwardSetState(outer);
-				if (outer != SCE_MARKDOWN_DEFAULT) {
-					continue;
-				}
-			} else {
-				lexer.DetectAutoLink();
+				continue;
 			}
+			lexer.DetectAutoLink();
 			break;
 
 		case SCE_H_OTHER:
-			sc.SetState(SCE_MARKDOWN_DEFAULT);
+			if (sc.ch == '>' || sc.Match('/', '>')) {
+				lexer.tagState = HtmlTagState::None;
+				sc.SetState(SCE_H_TAG);
+				sc.Forward((sc.ch == '/') ? 2 : 1);
+				sc.SetState(lexer.TryTakeOuterStyle());
+				break;
+			}
+			if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
+				// html tag on typing, TODO: check other block start characters
+				lexer.tagState = HtmlTagState::None;
+				sc.SetState(SCE_MARKDOWN_DEFAULT);
+				break;
+			}
+			if (sc.ch == '\'') {
+				sc.SetState(SCE_H_SINGLESTRING);
+			} else if (sc.ch == '\"') {
+				sc.SetState(SCE_H_DOUBLESTRING);
+			} else if (IsHtmlAttrStart(sc.ch)) {
+				sc.SetState(SCE_H_ATTRIBUTE);
+			} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
+				sc.SetState(SCE_H_VALUE);
+			}
 			break;
 
 		case SCE_H_COMMENT:
@@ -2355,55 +2366,26 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		}
 
 		if (sc.state == SCE_MARKDOWN_DEFAULT) {
-			if  (lexer.tagState == HtmlTagState::None) {
-				if (sc.ch > ' ') {
-					if (visibleBefore == 0) {
-						if (indentCurrent != indentPrevious) {
-							lexer.UpdateParentIndentCount(indentCurrent);
-						}
-						const int indentCount = indentCurrent - lexer.indentParent;
-						if (indentCount < 4) {
-							headerLevel = lexer.HighlightBlockText(lineState);
-							if (headerLevel == SCE_MARKDOWN_SETEXT_H1 || headerLevel == SCE_MARKDOWN_SETEXT_H2) {
-								lineState |= LineStateSetextFirstLine;
-							}
-							if (headerLevel != 0 && lexer.indentParent != 0) {
-								headerLevel = 0; // avoid code folding inside container
-							}
-						} else {
-							lineState = lexer.HighlightIndentedText(lineState, indentCount);
-						}
+			if (sc.ch > ' ') {
+				if (visibleBefore == 0) {
+					if (indentCurrent != indentPrevious) {
+						lexer.UpdateParentIndentCount(indentCurrent);
 					}
-					if (sc.state == SCE_MARKDOWN_DEFAULT) {
-						lexer.HighlightInlineText();
+					const int indentCount = indentCurrent - lexer.indentParent;
+					if (indentCount < 4) {
+						headerLevel = lexer.HighlightBlockText(lineState);
+						if (headerLevel == SCE_MARKDOWN_SETEXT_H1 || headerLevel == SCE_MARKDOWN_SETEXT_H2) {
+							lineState |= LineStateSetextFirstLine;
+						}
+						if (headerLevel != 0 && lexer.indentParent != 0) {
+							headerLevel = 0; // avoid code folding inside container
+						}
+					} else {
+						lineState = lexer.HighlightIndentedText(lineState, indentCount);
 					}
 				}
-			} else {
-				if (sc.ch == '>' || sc.Match('/', '>')) {
-					lexer.tagState = HtmlTagState::None;
-					sc.SetState(SCE_H_TAG);
-					sc.Forward((sc.ch == '/') ? 2 : 1);
-					sc.SetState(lexer.TryTakeOuterStyle());
-					continue;
-				}
-				if (sc.ch == '<' || (visibleBefore == 0 && (sc.ch == '#' || sc.ch == '*'))) {
-					// html tag on typing, TODO: check other block start characters
-					lexer.tagState = HtmlTagState::None;
-					continue;
-				}
-				if (sc.ch == '\'') {
-					sc.SetState(SCE_H_SINGLESTRING);
-				} else if (sc.ch == '\"') {
-					sc.SetState(SCE_H_DOUBLESTRING);
-				} else if (sc.ch == '=') {
-					sc.SetState(SCE_H_OTHER);
-				} else if (lexer.tagState == HtmlTagState::Open && IsHtmlAttrStart(sc.ch)) {
-					sc.SetState(SCE_H_ATTRIBUTE);
-				} else if (!IsHtmlInvalidAttrChar(sc.ch)) {
-					sc.SetState(SCE_H_VALUE);
-				}
-				if (sc.state != SCE_MARKDOWN_DEFAULT) {
-					lexer.tagState = (sc.state == SCE_H_OTHER) ? HtmlTagState::Value : HtmlTagState::Open;
+				if (sc.state == SCE_MARKDOWN_DEFAULT) {
+					lexer.HighlightInlineText();
 				}
 			}
 		}
