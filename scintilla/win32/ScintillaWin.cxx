@@ -552,7 +552,6 @@ class ScintillaWin final :
 	int GetCtrlID() const noexcept override;
 	void NotifyParent(NotificationData scn) noexcept override;
 	void NotifyDoubleClick(Point pt, KeyMod modifiers) override;
-	void NotifyURIDropped(const char *list) noexcept;
 	std::unique_ptr<CaseFolder> CaseFolderForEncoding() override;
 	std::string CaseMapString(const std::string &s, CaseMapping caseMapping) const override;
 	void Copy(bool asBinary) const override;
@@ -2752,14 +2751,6 @@ void ScintillaWin::NotifyDoubleClick(Point pt, KeyMod modifiers) {
 		MAKELPARAM(pt.x, pt.y));
 }
 
-void ScintillaWin::NotifyURIDropped(const char *list) noexcept {
-	NotificationData scn = {};
-	scn.nmhdr.code = Notification::URIDropped;
-	scn.text = list;
-
-	NotifyParent(scn);
-}
-
 namespace {
 
 class CaseFolderDBCS final : public CaseFolderTable {
@@ -3867,7 +3858,6 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 		SetDragPosition(SelectionPosition(Sci::invalidPosition));
 
 		std::string putf;
-		bool fileDrop = false;
 		HRESULT hr = DV_E_FORMATETC;
 
 		//EnumDataSourceFormat("Drop", pIDataSource);
@@ -3884,24 +3874,8 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 					|| fmt == cfVSStgProjectItem || fmt == cfVSRefProjectItem
 #endif
 					) {
-					WCHAR pathDropped[1024];
 					HDROP hDrop = static_cast<HDROP>(medium.hGlobal);
-					if (::DragQueryFileW(hDrop, 0, pathDropped, sizeof(pathDropped)/sizeof(WCHAR)) > 0) {
-						WCHAR *p = pathDropped;
-#if EnableDrop_VisualStudioProjectItem
-						if (fmt == cfVSStgProjectItem || fmt == cfVSRefProjectItem) {
-							// {UUID}|Solution\Project.[xx]proj|path
-							WCHAR *t = StrRChrW(p, nullptr, L'|');
-							if (t) {
-								p = t + 1;
-							}
-						}
-#endif
-						putf = StringEncode(p, CP_UTF8);
-						fileDrop = true;
-					}
-					// TODO: This seems not required, MSDN only says it need be called in WM_DROPFILES
-					::DragFinish(hDrop);
+					::SendMessage(::GetParent(MainHWND()), WM_DROPFILES, reinterpret_cast<WPARAM>(hDrop), 0);
 				}
 #if Enable_ChromiumWebCustomMIMEDataFormat
 				else if (fmt == cfChromiumCustomMIME) {
@@ -3953,9 +3927,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 			return S_OK;
 		}
 
-		if (fileDrop) {
-			NotifyURIDropped(putf.c_str());
-		} else {
+		{
 			FORMATETC fmtr = { cfColumnSelect, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
 			const bool isRectangular = S_OK == pIDataSource->QueryGetData(&fmtr);
 

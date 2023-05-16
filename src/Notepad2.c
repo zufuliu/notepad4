@@ -1246,14 +1246,18 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DROPFILES: {
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
-
-		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
-		OnDropOneFile(hwnd, szBuf);
-
+		if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
+			WCHAR *p = szBuf;
+			// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
+			WCHAR *t = StrRChrW(p, NULL, L'|');
+			if (t) {
+				p = t + 1;
+			}
+			OnDropOneFile(hwnd, p);
+		}
 		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
 		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
 		//}
-
 		DragFinish(hDrop);
 	}
 	break;
@@ -5303,14 +5307,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bDocumentModified = true;
 			UpdateDocumentModificationStatus();
 			break;
-
-		case SCN_URIDROPPED: {
-			WCHAR szBuf[MAX_PATH + 40];
-			if (MultiByteToWideChar(CP_UTF8, 0, scn->text, -1, szBuf, COUNTOF(szBuf)) > 0) {
-				OnDropOneFile(hwnd, szBuf);
-			}
-		}
-		break;
 
 		case SCN_CODEPAGECHANGED:
 			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, &efrData);
