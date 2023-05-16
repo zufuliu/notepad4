@@ -225,8 +225,11 @@ public:
 	int State = SCE_SH_DEFAULT;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
+	[[nodiscard]] bool Empty() const noexcept {
+		return Current.Up == '\0';
+	}
 	void Start(int u, QuoteStyle s, int outer) noexcept {
-		if (Current.Up == '\0') {
+		if (Empty()) {
 			Current.Start(u, s, outer);
 		} else {
 			Push(u, s, outer);
@@ -319,7 +322,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		// 2: here doc text (lines after the delimiter)
 		int Quote = '\0';		// the char after '<<'
 		bool Quoted = false;		// true if Quote in ('\'','"','`')
-		bool Escaped = false;		// backslash in delimiter
+		bool Escaped = false;		// backslash in delimiter, common in configure script
 		bool Indent = false;		// indented delimiter (for <<-)
 		int DelimiterLength = 0;	// strlen(Delimiter)
 		char Delimiter[HERE_DELIM_MAX]{};	// the Delimiter
@@ -375,7 +378,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					}
 				}
 				// force backtrack when nesting
-				const CmdState state = (QuoteStack.Depth == 0) ? cmdState : CmdState::Body;
+				const CmdState state = QuoteStack.Empty() ? cmdState : CmdState::Body;
 				styler.SetLineState(sc.currentLine, static_cast<int>(state));
 			}
 		}
