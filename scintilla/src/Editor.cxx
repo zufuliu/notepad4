@@ -2378,12 +2378,12 @@ bool Editor::BackspaceUnindent(Sci::Position lineCurrentPos, Sci::Position caret
 		if (indentationChange == 0) {
 			indentationChange = indentationStep;
 		}
-		if (column <= indentation && pdoc->backspaceUnindents) {
+		if (column <= indentation && (pdoc->backspaceUnindents & 1)) {
 			//const UndoGroup ugInner(pdoc, !ug.Needed());
 			*posSelect = pdoc->SetLineIndentation(lineCurrentPos, indentation - indentationChange);
 			return true;
 		}
-		if (indentationChange > 1) {
+		if (indentationChange > 1 && (pdoc->backspaceUnindents & 2)) {
 			const Sci_Position minPos = std::max(lineCurrentPos, caretPosition - indentationChange);
 			Sci::Position pos = caretPosition - 1;
 			while (pos >= minPos && pdoc->CharAt(pos) == ' ') {
@@ -6857,7 +6857,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		return pdoc->tabIndents;
 
 	case Message::SetBackSpaceUnIndents:
-		pdoc->backspaceUnindents = wParam != 0;
+		pdoc->backspaceUnindents = static_cast<uint8_t>(wParam);
 		break;
 
 	case Message::GetBackSpaceUnIndents:
