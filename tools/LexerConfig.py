@@ -658,6 +658,7 @@ LexerConfigMap = {
 		'none_quote_style': 'SCE_PL_OPERATOR',
 		'operator_style': ['SCE_PL_OPERATOR'],
 		'extra_word_char': '$@',
+		'plain_text_style': ['SCE_PL_POD', 'SCE_PL_POD_VERB', 'SCE_PL_DATASECTION'],
 	},
 	'NP2LEX_PHP': {
 		'line_comment_string': ['//', '#'],
@@ -769,6 +770,7 @@ LexerConfigMap = {
 		'extra_word_char': '$@?!',
 		#'ignore_word_style': ['SCE_RB_WORD', 'SCE_RB_WORD_DEMOTED'],
 		'auto_ident_word_style': ['SCE_RB_WORD'],
+		'plain_text_style': ['SCE_RB_DATASECTION'],
 	},
 	'NP2LEX_RUST': {
 		'cpp_style_comment': True,

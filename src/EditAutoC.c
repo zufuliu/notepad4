@@ -1445,7 +1445,6 @@ void EditCompleteUpdateConfig(void) {
 
 static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
 
@@ -1581,6 +1580,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	bool bIgnoreDoc = false;
 	char prefix = '\0';
 
+	int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	if (!bIgnoreLexer && IsSpecialStartChar(ch, chPrev)) {
 		int iPrevStyle = 0;
 		if (ch == ':' && chPrev != ':') {
@@ -3038,6 +3038,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		RawStringStyleMask[SCE_PL_STRING_SQ >> 5] |= (1U << (SCE_PL_STRING_SQ & 31));
+		PlainTextStyleMask[SCE_PL_POD >> 5] |= (1U << (SCE_PL_POD & 31));
+		PlainTextStyleMask[SCE_PL_POD_VERB >> 5] |= (1U << (SCE_PL_POD_VERB & 31));
+		PlainTextStyleMask[SCE_PL_DATASECTION >> 5] |= (1U << (SCE_PL_DATASECTION & 31));
 		break;
 
 	case NP2LEX_PHP:
@@ -3138,6 +3141,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['?' >> 5] |= (1U << ('?' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		RawStringStyleMask[SCE_RB_STRING_SQ >> 5] |= (1U << (SCE_RB_STRING_SQ & 31));
+		PlainTextStyleMask[SCE_RB_DATASECTION >> 5] |= (1U << (SCE_RB_DATASECTION & 31));
 		break;
 
 	case NP2LEX_RUST:
