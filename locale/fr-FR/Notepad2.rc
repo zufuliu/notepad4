@@ -1324,7 +1324,7 @@ BEGIN
     SCROLLBAR       IDC_RESIZEGRIP3,7,217,10,10
 END
 
-IDD_TABSETTINGS DIALOGEX 0, 0, 232, 197
+IDD_TABSETTINGS DIALOGEX 0, 0, 232, 209
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Réglage de tabulation"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
@@ -1351,9 +1351,10 @@ BEGIN
     AUTOCHECKBOX    "Utiliser les réglages du thème.",IDC_FILE_USE_SCHEME_TAB,118,114,101,10,WS_TABSTOP
     AUTOCHECKBOX    "La touche tabulation permet de reformater les indentations.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
     AUTOCHECKBOX    "La touche retour arrière permet de reformater les indentations.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Détecter automatiquement les réglages de tabulation et d'indentation.",IDC_DETECT_INDENTATION,7,159,160,10,WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,119,176,50,14
-    PUSHBUTTON      "Annuler",IDCANCEL,175,176,50,14
+    AUTOCHECKBOX    "Backspace key sma&rt delete spaces.",IDC_BACKSPACE_SMARTDEL,7,159,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "Détecter automatiquement les réglages de tabulation et d'indentation.",IDC_DETECT_INDENTATION,7,171,160,10,WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,119,188,50,14
+    PUSHBUTTON      "Annuler",IDCANCEL,175,188,50,14
 END
 
 IDD_LONGLINES DIALOGEX 0, 0, 184, 55

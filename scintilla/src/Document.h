@@ -318,7 +318,7 @@ public:
 	int actualIndentInChars;
 	bool useTabs;
 	bool tabIndents;
-	bool backspaceUnindents;
+	uint8_t backspaceUnindents;
 	ActionDuration durationStyleOneUnit;
 
 	std::unique_ptr<IDecorationList> decorations;

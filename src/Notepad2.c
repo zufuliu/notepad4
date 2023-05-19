@@ -1246,14 +1246,18 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DROPFILES: {
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
-
-		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
-		OnDropOneFile(hwnd, szBuf);
-
+		if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
+			WCHAR *p = szBuf;
+			// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
+			WCHAR *t = StrRChrW(p, NULL, L'|');
+			if (t) {
+				p = t + 1;
+			}
+			OnDropOneFile(hwnd, p);
+		}
 		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
 		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
 		//}
-
 		DragFinish(hDrop);
 	}
 	break;
@@ -5304,14 +5308,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			UpdateDocumentModificationStatus();
 			break;
 
-		case SCN_URIDROPPED: {
-			WCHAR szBuf[MAX_PATH + 40];
-			if (MultiByteToWideChar(CP_UTF8, 0, scn->text, -1, szBuf, COUNTOF(szBuf)) > 0) {
-				OnDropOneFile(hwnd, szBuf);
-			}
-		}
-		break;
-
 		case SCN_CODEPAGECHANGED:
 			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, &efrData);
 			break;
@@ -5617,7 +5613,7 @@ void LoadSettings(void) {
 	tabSettings.globalIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 	tabSettings.globalTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", false);
 	tabSettings.bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", true);
-	tabSettings.bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", false);
+	tabSettings.bBackspaceUnindents = (uint8_t)IniSectionGetInt(pIniSection, L"BackspaceUnindents", 2);
 	tabSettings.bDetectIndentation = IniSectionGetBool(pIniSection, L"DetectIndentation", true);
 	// for toolbar state
 	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
@@ -5946,7 +5942,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.globalIndentWidth, INDENT_WIDTH_4);
 	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, false);
 	IniSectionSetBoolEx(pIniSection, L"TabIndents", tabSettings.bTabIndents, true);
-	IniSectionSetBoolEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, false);
+	IniSectionSetIntEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 2);
 	IniSectionSetBoolEx(pIniSection, L"DetectIndentation", tabSettings.bDetectIndentation, true);
 	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, false);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);

@@ -956,7 +956,7 @@ NP2_inline void SciCall_SetTabIndents(bool tabIndents) NP2_noexcept {
 	SciCall(SCI_SETTABINDENTS, tabIndents, 0);
 }
 
-NP2_inline void SciCall_SetBackSpaceUnIndents(bool bsUnIndents) NP2_noexcept {
+NP2_inline void SciCall_SetBackSpaceUnIndents(uint8_t bsUnIndents) NP2_noexcept {
 	SciCall(SCI_SETBACKSPACEUNINDENTS, bsUnIndents, 0);
 }
 
