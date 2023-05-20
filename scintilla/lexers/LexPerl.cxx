@@ -92,6 +92,14 @@ enum {
 // all interpolated styles are different from their parent styles by a constant difference
 // we also assume SCE_PL_STRING_VAR is the interpolated style with the smallest value
 #define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING_DQ)
+static_assert(INTERPOLATE_SHIFT == SCE_PL_REGEX_VAR - SCE_PL_REGEX);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_REGSUBST_VAR - SCE_PL_REGSUBST);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_BACKTICKS_VAR - SCE_PL_BACKTICKS);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_HERE_QQ_VAR - SCE_PL_HERE_QQ);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_HERE_QX_VAR - SCE_PL_HERE_QX);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_STRING_QQ_VAR - SCE_PL_STRING_QQ);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_STRING_QX_VAR - SCE_PL_STRING_QX);
+static_assert(INTERPOLATE_SHIFT == SCE_PL_STRING_QR_VAR - SCE_PL_STRING_QR);
 
 bool isPerlKeyword(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
@@ -155,7 +163,7 @@ void skipWhitespaceComment(const LexAccessor &styler, Sci_PositionU &p) noexcept
 	// when backtracking, we need to skip whitespace and comments
 	while (p > 0) {
 		const int style = styler.StyleAt(p);
-		if (style != SCE_PL_DEFAULT && style != SCE_PL_COMMENTLINE)
+		if (style > SCE_PL_COMMENTLINE)
 			break;
 		p--;
 	}
@@ -215,8 +223,7 @@ int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	}
 	while (bk > 0) {
 		const int bkstyle = styler.StyleAt(bk);
-		if (bkstyle == SCE_PL_DEFAULT
-			|| bkstyle == SCE_PL_COMMENTLINE) {
+		if (bkstyle <= SCE_PL_COMMENTLINE) {
 			// skip whitespace, comments
 		} else if (bkstyle == SCE_PL_OPERATOR) {
 			// test for "->" and "::"

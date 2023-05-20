@@ -244,7 +244,8 @@ public:
 		Current.Start(u, s, outer);
 	}
 	void Pop() noexcept {
-		if (Depth <= 0) {
+		if (Depth == 0) {
+			Clear();
 			return;
 		}
 		Depth--;
@@ -264,11 +265,7 @@ public:
 		if (Current.Count == 0) {
 			cmdState = CmdState::Body;
 			const int outer = Current.Outer;
-			if (Depth > 0) {
-				Pop();
-			} else {
-				Clear();
-			}
+			Pop();
 			sc.ForwardSetState(outer);
 			return true;
 		}
