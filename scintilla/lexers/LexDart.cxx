@@ -299,14 +299,15 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 			} else if (sc.ch == '$') {
-				if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
+				if (sc.chNext == '{' || sc.chNext == '(') {
+					if (sc.chNext == '(') {
+						simpleStringInterpolation = true;
+						escSeq.outerState = sc.state;
+					} else {
+						nestedState.push_back(sc.state);
+					}
 					sc.SetState(SCE_DART_OPERATOR2);
 					sc.Forward();
-				} else if (sc.chNext == '(') {
-					simpleStringInterpolation = true;
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_DART_OPERATOR2);
 				} else if (IsIdentifierStartEx(sc.chNext)) {
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_DART_VARIABLE2);
@@ -404,6 +405,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_DART_OPERATOR);
 				if (simpleStringInterpolation && sc.ch == ')') {
 					simpleStringInterpolation = false;
+					sc.ChangeState(SCE_DART_OPERATOR2);
 					sc.ForwardSetState(escSeq.outerState);
 					continue;
 				}
