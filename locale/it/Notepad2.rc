@@ -1352,8 +1352,8 @@ BEGIN
     AUTOCHECKBOX    "Usa impostazioni sche&ma.",IDC_FILE_USE_SCHEME_TAB,133,114,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Tasto Tab riformatta indenta&zione.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
     AUTOCHECKBOX    "Tasto &Backspace riformatta indentazione.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Backspace key sma&rt delete spaces.",IDC_BACKSPACE_SMARTDEL,7,159,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Rileva automati&camente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,171,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Eliminazione intelligente spazi con tasto Backspace.",IDC_BACKSPACE_SMARTDEL,7,159,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rileva automati&camente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,171,200,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,188,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,175,188,50,14
 END
