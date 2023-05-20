@@ -528,6 +528,7 @@ static uint32_t RawStringStyleMask[8];
 static uint32_t GenericTypeStyleMask[8];
 static uint32_t IgnoreWordStyleMask[8];
 static uint32_t CommentStyleMask[8];
+static uint32_t AllStringStyleMask[8];
 static uint32_t PlainTextStyleMask[8];
 
 // from scintilla/lexlib/DocUtils.h
@@ -1618,6 +1619,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		}
 	} else {
 		if ((!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_Commont) && BitTestEx(CommentStyleMask, iCurrentStyle))
+			|| (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_String) && BitTestEx(AllStringStyleMask, iCurrentStyle))
 			|| (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_PlainText) && BitTestEx(PlainTextStyleMask, iCurrentStyle))) {
 			retry = false;
 		}
@@ -1626,6 +1628,11 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_Commont) && !BitTestEx(CommentStyleMask, iCurrentStyle)) {
 				for (UINT i = 0; i < 8; i++) {
 					ignoredStyleMask[i] |= CommentStyleMask[i];
+				}
+			}
+			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_String) && !BitTestEx(AllStringStyleMask, iCurrentStyle)) {
+				for (UINT i = 0; i < 8; i++) {
+					ignoredStyleMask[i] |= AllStringStyleMask[i];
 				}
 			}
 			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_PlainText) && !BitTestEx(PlainTextStyleMask, iCurrentStyle)) {
@@ -2804,6 +2811,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	memset(GenericTypeStyleMask, 0, sizeof(GenericTypeStyleMask));
 	memset(IgnoreWordStyleMask, 0, sizeof(IgnoreWordStyleMask));
 	memset(CommentStyleMask, 0, sizeof(CommentStyleMask));
+	memset(AllStringStyleMask, 0, sizeof(AllStringStyleMask));
 	memset(PlainTextStyleMask, 0, sizeof(PlainTextStyleMask));
 	memcpy(CurrentWordCharSet, DefaultWordCharSet, sizeof(DefaultWordCharSet));
 
@@ -2961,6 +2969,20 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CommentStyleMask[SCE_HJA_COMMENTDOC >> 5] |= (1U << (SCE_HJA_COMMENTDOC & 31));
 		CommentStyleMask[SCE_HB_COMMENTLINE >> 5] |= (1U << (SCE_HB_COMMENTLINE & 31));
 		CommentStyleMask[SCE_HBA_COMMENTLINE >> 5] |= (1U << (SCE_HBA_COMMENTLINE & 31));
+		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
+		AllStringStyleMask[SCE_HJ_DOUBLESTRING >> 5] |= (1U << (SCE_HJ_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_HJ_SINGLESTRING >> 5] |= (1U << (SCE_HJ_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_HJ_REGEX >> 5] |= (1U << (SCE_HJ_REGEX & 31));
+		AllStringStyleMask[SCE_HJ_TEMPLATELITERAL >> 5] |= (1U << (SCE_HJ_TEMPLATELITERAL & 31));
+		AllStringStyleMask[SCE_HJA_DOUBLESTRING >> 5] |= (1U << (SCE_HJA_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_HJA_SINGLESTRING >> 5] |= (1U << (SCE_HJA_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_HJA_REGEX >> 5] |= (1U << (SCE_HJA_REGEX & 31));
+		AllStringStyleMask[SCE_HJA_TEMPLATELITERAL >> 5] |= (1U << (SCE_HJA_TEMPLATELITERAL & 31));
+		AllStringStyleMask[SCE_HB_STRING >> 5] |= (1U << (SCE_HB_STRING & 31));
+		AllStringStyleMask[SCE_HBA_STRING >> 5] |= (1U << (SCE_HBA_STRING & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		break;
 
@@ -2981,6 +3003,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_JSON:
 		CommentStyleMask[SCE_JSON_LINECOMMENT >> 5] |= (1U << (SCE_JSON_LINECOMMENT & 31));
 		CommentStyleMask[SCE_JSON_BLOCKCOMMENT >> 5] |= (1U << (SCE_JSON_BLOCKCOMMENT & 31));
+		AllStringStyleMask[SCE_JSON_STRING_DQ >> 5] |= (1U << (SCE_JSON_STRING_DQ & 31));
+		AllStringStyleMask[SCE_JSON_STRING_SQ >> 5] |= (1U << (SCE_JSON_STRING_SQ & 31));
+		AllStringStyleMask[SCE_JSON_ESCAPECHAR >> 5] |= (1U << (SCE_JSON_ESCAPECHAR & 31));
 		break;
 
 	case NP2LEX_JULIA:
@@ -3028,6 +3053,10 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_MARKDOWN:
 		CommentStyleMask[SCE_H_COMMENT >> 5] |= (1U << (SCE_H_COMMENT & 31));
 		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
+		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		PlainTextStyleMask[1] = UINT32_MAX;
 		PlainTextStyleMask[2] = UINT32_MAX;
@@ -3063,6 +3092,19 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CommentStyleMask[js_style(SCE_JS_TASKMARKER) >> 5] |= (1U << (js_style(SCE_JS_TASKMARKER) & 31));
 		CommentStyleMask[css_style(SCE_CSS_COMMENTBLOCK) >> 5] |= (1U << (css_style(SCE_CSS_COMMENTBLOCK) & 31));
 		CommentStyleMask[css_style(SCE_CSS_CDO_CDC) >> 5] |= (1U << (css_style(SCE_CSS_CDO_CDC) & 31));
+		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_SQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_SQ) & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_DQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_DQ) & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_BT) >> 5] |= (1U << (js_style(SCE_JS_STRING_BT) & 31));
+		AllStringStyleMask[js_style(SCE_JS_REGEX) >> 5] |= (1U << (js_style(SCE_JS_REGEX) & 31));
+		AllStringStyleMask[js_style(SCE_JS_ESCAPECHAR) >> 5] |= (1U << (js_style(SCE_JS_ESCAPECHAR) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_ESCAPECHAR) >> 5] |= (1U << (css_style(SCE_CSS_ESCAPECHAR) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_STRING_SQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_SQ) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_STRING_DQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_DQ) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_URL) >> 5] |= (1U << (css_style(SCE_CSS_URL) & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		break;
 
@@ -3104,6 +3146,8 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		IgnoreWordStyleMask[SCE_PY_BUILTIN_FUNCTION >> 5] |= (1U << (SCE_PY_BUILTIN_FUNCTION & 31));
 		IgnoreWordStyleMask[SCE_PY_ATTRIBUTE >> 5] |= (1U << (SCE_PY_ATTRIBUTE & 31));
 		IgnoreWordStyleMask[SCE_PY_OBJECT_FUNCTION >> 5] |= (1U << (SCE_PY_OBJECT_FUNCTION & 31));
+		AllStringStyleMask[SCE_PY_ESCAPECHAR >> 5] |= (1U << (SCE_PY_ESCAPECHAR & 31));
+		AllStringStyleMask[SCE_PY_FORMAT_SPECIFIER >> 5] |= (1U << (SCE_PY_FORMAT_SPECIFIER & 31));
 		break;
 
 	case NP2LEX_REBOL:
@@ -3216,9 +3260,25 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	}
 
 	CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
-	const uint32_t marker = pLex->commentStyleMarker;
+	uint32_t marker = pLex->commentStyleMarker;
 	if (marker) {
 		CommentStyleMask[0] |= (1U << (marker + 1)) - 2;
+	}
+
+	marker = pLex->stringStyleLast;
+	if (marker) {
+		uint32_t start = pLex->stringStyleFirst;
+#if 1	// all inside [0, 31] or [40, 63]
+		marker = marker - start + 1;
+		const uint32_t mask = ((1U << marker) - 1) << (start & 31);
+		start >>= 5;
+		AllStringStyleMask[start] |= mask;
+#else
+		++marker;
+		do {
+			AllStringStyleMask[start >> 5] |= (1U << (start & 31));
+		} while (start < marker);
+#endif
 	}
 
 	UpdateLexerExtraKeywords();
