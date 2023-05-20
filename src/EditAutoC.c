@@ -3277,6 +3277,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		++marker;
 		do {
 			AllStringStyleMask[start >> 5] |= (1U << (start & 31));
+			++start;
 		} while (start < marker);
 #endif
 	}
