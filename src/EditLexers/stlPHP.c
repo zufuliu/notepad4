@@ -390,7 +390,7 @@ static KEYWORDLIST Keywords_PHP = {{
 
 , // 10 JavaScript
 "Infinity NaN arguments async await break case catch class const continue debugger default delete do else export extends "
-"false finally for function globalThis if import in instanceof let new null return static super switch "
+"false finally for function get globalThis if import in instanceof let new null of return set static super switch "
 "this throw true try typeof undefined var void while with yield "
 
 , // 11 phpdoc
