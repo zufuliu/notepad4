@@ -1,4 +1,4 @@
--- 3.39 https://sqlite.org/lang.html
+-- 3.41 https://sqlite.org/lang.html
 --! keywords		===========================================================
 -- https://sqlite.org/lang_keywords.html
 ABORT
@@ -278,6 +278,8 @@ total_changes()
 trim(X)
 trim(X, Y)
 typeof(X)
+unhex(X)
+unhex(X, Y)
 unicode(X)
 unlikely(X)
 upper(X)

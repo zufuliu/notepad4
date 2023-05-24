@@ -2932,7 +2932,7 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 /**
  * Implementation of RegexSearchBase for the default built-in regular expression engine
  */
-class BuiltinRegex : public RegexSearchBase {
+class BuiltinRegex final : public RegexSearchBase {
 public:
 	explicit BuiltinRegex(const CharClassify *charClassTable) : search(charClassTable) {}
 
@@ -2994,19 +2994,12 @@ public:
 };
 
 // Define a way for the Regular Expression code to access the document
-class DocumentIndexer : public CharacterIndexer {
+class DocumentIndexer final : public CharacterIndexer {
 	const Document *pdoc;
 	Sci::Position end;
 public:
 	DocumentIndexer(const Document *pdoc_, Sci::Position end_) noexcept :
 		pdoc(pdoc_), end(end_) {}
-
-	DocumentIndexer(const DocumentIndexer &) = delete;
-	DocumentIndexer(DocumentIndexer &&) = delete;
-	DocumentIndexer &operator=(const DocumentIndexer &) = delete;
-	DocumentIndexer &operator=(DocumentIndexer &&) = delete;
-
-	~DocumentIndexer() override = default;
 
 	char CharAt(Sci::Position index) const noexcept override {
 		if (IsValidIndex(index, end))

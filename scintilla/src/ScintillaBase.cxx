@@ -605,7 +605,7 @@ void ScintillaBase::RightButtonDownWithModifiers(Point pt, unsigned int curTime,
 
 namespace Scintilla::Internal {
 
-class LexState : public LexInterface {
+class LexState final : public LexInterface {
 public:
 	explicit LexState(Document *pdoc_) noexcept;
 	void SetInstance(ILexer5 *instance_);

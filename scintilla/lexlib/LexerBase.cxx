@@ -29,8 +29,6 @@ using namespace Lexilla;
 LexerBase::LexerBase(const LexerModule *module_) : lexer(*module_) {
 }
 
-LexerBase::~LexerBase() = default;
-
 void SCI_METHOD LexerBase::Release() noexcept {
 	delete this;
 }

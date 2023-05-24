@@ -30,12 +30,7 @@ constexpr bool IsHtmlAttrChar(int ch) noexcept {
 
 constexpr bool IsHtmlInvalidAttrChar(int ch) noexcept {
 	// characters not allowed in unquoted attribute value
-	return ch <= 32 || AnyOf(ch, '"', '\'', '\\', '`', '=', '<', '>', 127);
-}
-
-constexpr bool IsHtmlInvalidAttrCharEx(int ch, int chNext) noexcept {
-	return IsHtmlInvalidAttrChar(ch)
-		|| (chNext == '>' && (ch == '/' || ch == '?'));
+	return ch <= 32 || AnyOf(ch, '"', '\'', '\\', '`', '=', '<', '>');
 }
 
 inline bool IsHtmlCommentDelimiter(const StyleContext &sc) noexcept {

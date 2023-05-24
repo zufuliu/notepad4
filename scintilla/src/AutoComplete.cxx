@@ -103,6 +103,8 @@ char AutoComplete::GetTypesep() const noexcept {
 	return typesep;
 }
 
+namespace {
+
 struct Sorter {
 	const AutoComplete *ac;
 	const char *list;
@@ -154,6 +156,8 @@ struct Sorter {
 		return cmp < 0;
 	}
 };
+
+}
 
 void AutoComplete::SetList(const char *list) {
 	if (autoSort == Ordering::PreSorted) {

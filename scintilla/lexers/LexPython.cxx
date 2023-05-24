@@ -552,18 +552,18 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 
 			case '{':
 				if (IsPyString(sc.state)) {
-					if (sc.chNext == '{') {
+					if (sc.chNext == '{' && fstringPart == FormattedStringPart::None) {
 						escSeq.outerState = sc.state;
 						escSeq.digitsLeft = 1;
 						sc.SetState(SCE_PY_ESCAPECHAR);
 						sc.Forward();
 					} else if (IsPyFormattedString(sc.state)) {
 						if (nestedState.empty()) {
+							fstringPart = FormattedStringPart::None;
 							nestedState.push_back({sc.state, 1, 0});
 						} else {
 							nestedState.back().nestedLevel += 1;
 						}
-						fstringPart = FormattedStringPart::None;
 						sc.SetState(SCE_PY_OPERATOR2);
 						sc.ForwardSetState(SCE_PY_DEFAULT);
 					} else if (sc.chNext == '}' || sc.chNext == '!' || sc.chNext == ':' || IsIdentifierCharEx(sc.chNext)) {
@@ -582,6 +582,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							if (state.nestedLevel > 1) {
 								--state.nestedLevel;
 							} else {
+								fstringPart = FormattedStringPart::None;
 								nestedState.pop_back();
 							}
 						}
@@ -589,7 +590,6 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							const int state = sc.state;
 							sc.SetState(SCE_PY_OPERATOR2);
 							sc.ForwardSetState(state);
-							fstringPart = FormattedStringPart::None;
 							continue;
 						}
 					}

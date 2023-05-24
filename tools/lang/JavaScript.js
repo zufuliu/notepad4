@@ -3,9 +3,11 @@
 // 2020 https://tc39.es/ecma262/2020/
 // 2021 https://tc39.es/ecma262/2021/
 // 2022 https://tc39.es/ecma262/2022/
-// 2023 https://tc39.es/ecma262/
+// 2023 https://tc39.es/ecma262/2023/
+// 2024 https://tc39.es/ecma262/
 
 //! keywords
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#keywords
 async await
 break
 case catch class const continue
@@ -29,6 +31,7 @@ Infinity
 NaN
 undefined
 arguments
+get set of
 
 //! future reserved words
 enum implements interface package private protected public
@@ -450,6 +453,8 @@ Array(...items) {
 		filter(callbackfn [, thisArg])
 		find(predicate [, thisArg])
 		findIndex(predicate [, thisArg])
+		findLast(predicate [, thisArg]) // 2023
+		findLastIndex(predicate [, thisArg]) // 2023
 		flat([depth]) // 2019
 		flatMap(mapperFunction [, thisArg]) // 2019
 		forEach(callbackfn [, thisArg])
@@ -469,8 +474,12 @@ Array(...items) {
 		some(callbackfn [, thisArg])
 		sort(comparefn)
 		splice(start, deleteCount, ...items)
+		toReversed() // 2023
+		toSorted(comparefn) // 2023
+		toSpliced(start, skipCount, ...items) // 2023
 		unshift(...items)
 		values()
+		with(index, value) // 2023
 		iterator
 		unscopables
 

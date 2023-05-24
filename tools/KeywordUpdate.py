@@ -15,7 +15,7 @@ lexerList = [
 	('NP2LEX_AVISYNTH', 'stlAviSynth.c', 'LexAviSynth.cxx', 'AviSynth.avs', 0, parse_avisynth_api_file),
 	('NP2LEX_AWK', 'stlAwk.c', 'LexAwk.cxx', 'Awk.awk', 1, parse_awk_api_file),
 
-	('NP2LEX_BASH', 'stlBash.c', 'LexBash.cxx', '', 0, None),
+	('NP2LEX_BASH', 'stlBash.c', 'LexBash.cxx', ['Bash.sh', 'CShell.csh'], 0, parse_bash_api_file),
 	('NP2LEX_BATCH', 'stlBatch.c', 'LexBatch.cxx', 'Batch.bat', 0, parse_batch_api_file),
 
 	('NP2LEX_CIL', 'stlCIL.c', 'LexCIL.cxx', '', 0, None),
@@ -67,7 +67,7 @@ lexerList = [
 	('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
 
 	('NP2LEX_PASCAL', 'stlPascal.c', 'LexPascal.cxx', '', 0, None),
-	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', '', 0, None),
+	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', 'Perl.pl', 0, parse_perl_api_file),
 	('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
 	('NP2LEX_POWERSHELL', 'stlPowerShell.c', 'LexPowerShell.cxx', 'PowerShell.ps1', 0, parse_powershell_api_file),
 	('NP2LEX_PYTHON', 'stlPython.c', 'LexPython.cxx', 'Python.py', 0, parse_python_api_file),
@@ -92,7 +92,7 @@ lexerList = [
 	('NP2LEX_SWIFT', 'stlSwift.c', 'LexSwift.cxx', 'Swift.swift', 0, parse_swift_api_file),
 
 	('NP2LEX_TCL', 'stlTcl.c', 'LexTCL.cxx', '', 0, None),
-	('NP2LEX_TEXINFO', 'stlTexinfo.c', 'LexTexinfo.cxx', '', 0, None),
+	('NP2LEX_TEXINFO', 'stlTexinfo.c', 'LexTexinfo.cxx', 'Texinfo.texi', 0, parse_texinfo_api_file),
 	('NP2LEX_TOML', 'stlTOML.c', 'LexTOML.cxx', '', 0, parse_toml_api_file),
 
 	('NP2LEX_VBSCRIPT', 'stlVBS.c', 'LexVB.cxx', '', 0, parse_visual_basic_api_file),

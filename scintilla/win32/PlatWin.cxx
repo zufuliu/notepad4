@@ -2089,7 +2089,6 @@ class BlobInline final : public IDWriteInlineObject {
 		DWRITE_BREAK_CONDITION *breakConditionAfter) override;
 public:
 	explicit BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
-	virtual ~BlobInline() noexcept = default;
 };
 
 /// Implement IUnknown

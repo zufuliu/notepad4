@@ -1246,14 +1246,18 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 	case WM_DROPFILES: {
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
-
-		DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf));
-		OnDropOneFile(hwnd, szBuf);
-
+		if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
+			WCHAR *p = szBuf;
+			// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
+			WCHAR *t = StrRChrW(p, NULL, L'|');
+			if (t) {
+				p = t + 1;
+			}
+			OnDropOneFile(hwnd, p);
+		}
 		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
 		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
 		//}
-
 		DragFinish(hDrop);
 	}
 	break;
@@ -1681,26 +1685,26 @@ void SetWrapVisualFlags(void) {
 		int wrapVisualFlags = 0;
 		int wrapVisualFlagsLocation = 0;
 		if (iWordWrapSymbols == 0) {
-			iWordWrapSymbols = EditWrapSymbolDefaultValue;
+			iWordWrapSymbols = EditWrapSymbol_DefaultValue;
 		}
 		switch (iWordWrapSymbols % 10) {
-		case EditWrapSymbolBeforeNearText:
+		case EditWrapSymbolBefore_NearText:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
 			wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_END_BY_TEXT;
 			break;
-		case EditWrapSymbolBeforeNearBorder:
+		case EditWrapSymbolBefore_NearBorder:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_END;
 			break;
 		}
 		switch (iWordWrapSymbols / 10) {
-		case EditWrapSymbolAfterNearText:
+		case EditWrapSymbolAfter_NearText:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
 			wrapVisualFlagsLocation |= SC_WRAPVISUALFLAGLOC_START_BY_TEXT;
 			break;
-		case EditWrapSymbolAfterNearBorder:
+		case EditWrapSymbolAfter_NearBorder:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_START;
 			break;
-		case EditWrapSymbolLineNumberMargin:
+		case EditWrapSymbolAfter_LineNumberMargin:
 			wrapVisualFlags |= SC_WRAPVISUALFLAG_MARGIN;
 			if (!bShowLineNumbers) {
 				bShowLineNumbers = true;
@@ -5173,8 +5177,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case SCN_AUTOCSELECTION:
 		case SCN_USERLISTSELECTION: {
-			if ((scn->listCompletionMethod == SC_AC_NEWLINE && !(autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpEnter))
-			|| (scn->listCompletionMethod == SC_AC_TAB && !(autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpTab))) {
+			if ((scn->listCompletionMethod == SC_AC_NEWLINE && !(autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpMask_Enter))
+			|| (scn->listCompletionMethod == SC_AC_TAB && !(autoCompletionConfig.fAutoCompleteFillUpMask & AutoCompleteFillUpMask_Tab))) {
 				SciCall_AutoCCancel();
 				if (scn->listCompletionMethod == SC_AC_NEWLINE) {
 					SciCall_NewLine();
@@ -5303,14 +5307,6 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			bDocumentModified = true;
 			UpdateDocumentModificationStatus();
 			break;
-
-		case SCN_URIDROPPED: {
-			WCHAR szBuf[MAX_PATH + 40];
-			if (MultiByteToWideChar(CP_UTF8, 0, scn->text, -1, szBuf, COUNTOF(szBuf)) > 0) {
-				OnDropOneFile(hwnd, szBuf);
-			}
-		}
-		break;
 
 		case SCN_CODEPAGECHANGED:
 			EditOnCodePageChanged(scn->oldCodePage, bShowUnicodeControlCharacter, &efrData);
@@ -5555,12 +5551,12 @@ void LoadSettings(void) {
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_AUTO);
 	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_AUTO);
 
-	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", EditWrapIndentDefaultValue);
-	iWordWrapIndent = clamp_i(iValue, EditWrapIndentNone, EditWrapIndentMaxValue);
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapIndent", EditWrapIndent_DefaultValue);
+	iWordWrapIndent = clamp_i(iValue, EditWrapIndent_None, EditWrapIndent_MaxValue);
 
-	iValue = IniSectionGetInt(pIniSection, L"WordWrapSymbols", EditWrapSymbolDefaultValue);
-	iValue = clamp_i(iValue, 0, EditWrapSymbolMaxValue);
-	iWordWrapSymbols = clamp_i(iValue % 10, EditWrapSymbolBeforeNone, EditWrapSymbolBeforeMaxValue) + (iValue / 10) * 10;
+	iValue = IniSectionGetInt(pIniSection, L"WordWrapSymbols", EditWrapSymbol_DefaultValue);
+	iValue = clamp_i(iValue, 0, EditWrapSymbol_MaxValue);
+	iWordWrapSymbols = clamp_i(iValue % 10, EditWrapSymbolBefore_None, EditWrapSymbolBefore_MaxValue) + (iValue / 10) * 10;
 
 	bShowWordWrapSymbols = IniSectionGetBool(pIniSection, L"ShowWordWrapSymbols", false);
 	bWordWrapSelectSubLine = IniSectionGetBool(pIniSection, L"WordWrapSelectSubLine", false);
@@ -5577,6 +5573,9 @@ void LoadSettings(void) {
 	autoCompletionConfig.bCloseTags = IniSectionGetBool(pIniSection, L"AutoCloseTags", true);
 	autoCompletionConfig.bCompleteWord = IniSectionGetBool(pIniSection, L"AutoCompleteWords", true);
 	autoCompletionConfig.bScanWordsInDocument = IniSectionGetBool(pIniSection, L"AutoCScanWordsInDocument", true);
+	iValue = IniSectionGetInt(pIniSection, L"AutoCompleteScope", AutoCompleteScope_Default);
+	autoCompletionConfig.fCompleteScope = iValue & 15;
+	autoCompletionConfig.fScanWordScope = iValue >> 4;
 	iValue = IniSectionGetInt(pIniSection, L"AutoCScanWordsTimeout", AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
 	autoCompletionConfig.dwScanWordsTimeout = max_i(iValue, AUTOC_SCAN_WORDS_MIN_TIMEOUT);
 	autoCompletionConfig.bEnglistIMEModeOnly = IniSectionGetBool(pIniSection, L"AutoCEnglishIMEModeOnly", false);
@@ -5588,10 +5587,10 @@ void LoadSettings(void) {
 	autoCompletionConfig.iMinWordLength = max_i(iValue, MIN_AUTO_COMPLETION_WORD_LENGTH);
 	iValue = IniSectionGetInt(pIniSection, L"AutoCMinNumberLength", 3);
 	autoCompletionConfig.iMinNumberLength = max_i(iValue, MIN_AUTO_COMPLETION_NUMBER_LENGTH);
-	autoCompletionConfig.fAutoCompleteFillUpMask = IniSectionGetInt(pIniSection, L"AutoCFillUpMask", AutoCompleteFillUpDefault);
-	autoCompletionConfig.fAutoInsertMask = IniSectionGetInt(pIniSection, L"AutoInsertMask", AutoInsertDefaultMask);
-	iValue = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentCharSemicolon);
-	autoCompletionConfig.iAsmLineCommentChar = clamp_i(iValue, AsmLineCommentCharSemicolon, AsmLineCommentCharAt);
+	autoCompletionConfig.fAutoCompleteFillUpMask = IniSectionGetInt(pIniSection, L"AutoCFillUpMask", AutoCompleteFillUpMask_Default);
+	autoCompletionConfig.fAutoInsertMask = IniSectionGetInt(pIniSection, L"AutoInsertMask", AutoInsertMask_Default);
+	iValue = IniSectionGetInt(pIniSection, L"AsmLineCommentChar", AsmLineCommentChar_Semicolon);
+	autoCompletionConfig.iAsmLineCommentChar = clamp_i(iValue, AsmLineCommentChar_Semicolon, AsmLineCommentChar_At);
 	strValue = IniSectionGetValue(pIniSection, L"AutoCFillUpPunctuation");
 	if (StrIsEmpty(strValue)) {
 		lstrcpy(autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
@@ -5614,7 +5613,7 @@ void LoadSettings(void) {
 	tabSettings.globalIndentWidth = clamp_i(iValue, INDENT_WIDTH_MIN, INDENT_WIDTH_MAX);
 	tabSettings.globalTabsAsSpaces = IniSectionGetBool(pIniSection, L"TabsAsSpaces", false);
 	tabSettings.bTabIndents = IniSectionGetBool(pIniSection, L"TabIndents", true);
-	tabSettings.bBackspaceUnindents = IniSectionGetBool(pIniSection, L"BackspaceUnindents", false);
+	tabSettings.bBackspaceUnindents = (uint8_t)IniSectionGetInt(pIniSection, L"BackspaceUnindents", 2);
 	tabSettings.bDetectIndentation = IniSectionGetBool(pIniSection, L"DetectIndentation", true);
 	// for toolbar state
 	fvCurFile.bTabsAsSpaces = tabSettings.globalTabsAsSpaces;
@@ -5905,8 +5904,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, true);
 	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
-	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, EditWrapIndentNone);
-	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbolDefaultValue);
+	IniSectionSetIntEx(pIniSection, L"WordWrapIndent", iWordWrapIndent, EditWrapIndent_None);
+	IniSectionSetIntEx(pIniSection, L"WordWrapSymbols", iWordWrapSymbols, EditWrapSymbol_DefaultValue);
 	IniSectionSetBoolEx(pIniSection, L"ShowWordWrapSymbols", bShowWordWrapSymbols, false);
 	IniSectionSetBoolEx(pIniSection, L"WordWrapSelectSubLine", bWordWrapSelectSubLine, false);
 	IniSectionSetBoolEx(pIniSection, L"ShowUnicodeControlCharacter", bShowUnicodeControlCharacter, false);
@@ -5920,6 +5919,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AutoCloseTags", autoCompletionConfig.bCloseTags, true);
 	IniSectionSetBoolEx(pIniSection, L"AutoCompleteWords", autoCompletionConfig.bCompleteWord, true);
 	IniSectionSetBoolEx(pIniSection, L"AutoCScanWordsInDocument", autoCompletionConfig.bScanWordsInDocument, true);
+	iValue = autoCompletionConfig.fCompleteScope | (autoCompletionConfig.fScanWordScope << 4);
+	IniSectionSetIntEx(pIniSection, L"AutoCompleteScope", iValue, AutoCompleteScope_Default);
 	IniSectionSetIntEx(pIniSection, L"AutoCScanWordsTimeout", autoCompletionConfig.dwScanWordsTimeout, AUTOC_SCAN_WORDS_DEFAULT_TIMEOUT);
 	IniSectionSetBoolEx(pIniSection, L"AutoCEnglishIMEModeOnly", autoCompletionConfig.bEnglistIMEModeOnly, false);
 	IniSectionSetBoolEx(pIniSection, L"AutoCIgnoreCase", autoCompletionConfig.bIgnoreCase, false);
@@ -5927,9 +5928,9 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"AutoCVisibleItemCount", autoCompletionConfig.iVisibleItemCount, 16);
 	IniSectionSetIntEx(pIniSection, L"AutoCMinWordLength", autoCompletionConfig.iMinWordLength, 1);
 	IniSectionSetIntEx(pIniSection, L"AutoCMinNumberLength", autoCompletionConfig.iMinNumberLength, 3);
-	IniSectionSetIntEx(pIniSection, L"AutoCFillUpMask", autoCompletionConfig.fAutoCompleteFillUpMask, AutoCompleteFillUpDefault);
-	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertDefaultMask);
-	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentCharSemicolon);
+	IniSectionSetIntEx(pIniSection, L"AutoCFillUpMask", autoCompletionConfig.fAutoCompleteFillUpMask, AutoCompleteFillUpMask_Default);
+	IniSectionSetIntEx(pIniSection, L"AutoInsertMask", autoCompletionConfig.fAutoInsertMask, AutoInsertMask_Default);
+	IniSectionSetIntEx(pIniSection, L"AsmLineCommentChar", autoCompletionConfig.iAsmLineCommentChar, AsmLineCommentChar_Semicolon);
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
 	IniSectionSetIntEx(pIniSection, L"SelectOption", iSelectOption, SelectOption_Default);
 	IniSectionSetIntEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
@@ -5941,7 +5942,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.globalIndentWidth, INDENT_WIDTH_4);
 	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, false);
 	IniSectionSetBoolEx(pIniSection, L"TabIndents", tabSettings.bTabIndents, true);
-	IniSectionSetBoolEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, false);
+	IniSectionSetIntEx(pIniSection, L"BackspaceUnindents", tabSettings.bBackspaceUnindents, 2);
 	IniSectionSetBoolEx(pIniSection, L"DetectIndentation", tabSettings.bDetectIndentation, true);
 	IniSectionSetBoolEx(pIniSection, L"MarkLongLines", bMarkLongLines, false);
 	IniSectionSetIntEx(pIniSection, L"LongLinesLimit", iLongLinesLimitG, 80);

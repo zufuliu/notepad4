@@ -17,7 +17,6 @@ public:
 	virtual Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept = 0;
 	virtual Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept = 0;
 	virtual Sci::Position ExtendWordSelect(Sci::Position pos, int delta) const noexcept = 0;
-	virtual ~CharacterIndexer() = default;
 };
 
 class RESearch {

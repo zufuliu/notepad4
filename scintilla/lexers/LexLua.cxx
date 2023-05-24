@@ -76,7 +76,6 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	const WordList &keywords7 = keywordLists[6];
 	const WordList &keywords8 = keywordLists[7];
 
-	Sci_Line currentLine = styler.GetLine(startPos);
 	// Initialize long string [[ ... ]] or block comment --[[ ... ]],
 	// if we are inside such a string. Block comment was introduced in Lua 5.0,
 	// blocks with separators [=[ ... ]=] in Lua 5.1.
@@ -85,6 +84,7 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	int stringWs = 0;
 	if (initStyle == SCE_LUA_LITERALSTRING || initStyle == SCE_LUA_COMMENT ||
 		initStyle == SCE_LUA_STRING_DQ || initStyle == SCE_LUA_STRING_SQ) {
+		const Sci_Line currentLine = styler.GetLine(startPos);
 		const int lineState = styler.GetLineState(currentLine - 1);
 		sepCount = lineState & 0xFF;
 		stringWs = lineState & 0x100;
@@ -103,18 +103,17 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	for (; sc.More(); sc.Forward()) {
 		if (sc.atLineEnd) {
 			// Update the line state, so it can be seen by next line
-			currentLine = styler.GetLine(sc.currentPos);
 			switch (sc.state) {
 			case SCE_LUA_LITERALSTRING:
 			case SCE_LUA_COMMENT:
 			case SCE_LUA_STRING_DQ:
 			case SCE_LUA_STRING_SQ:
 				// Inside a literal string, block comment or string, we set the line state
-				styler.SetLineState(currentLine, stringWs | sepCount);
+				styler.SetLineState(sc.currentLine, stringWs | sepCount);
 				break;
 			default:
 				// Reset the line state
-				styler.SetLineState(currentLine, 0);
+				styler.SetLineState(sc.currentLine, 0);
 				break;
 			}
 		}
@@ -319,31 +318,26 @@ void ColouriseLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 #define IsCommentLine(line)	IsLexCommentLine(styler, line, MultiStyle(SCE_LUA_COMMENTLINE, SCE_LUA_COMMENT))
 
 void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
-	const Sci_PositionU lengthDoc = startPos + length;
+	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
+	Sci_PositionU lineStartNext = styler.LineStart(lineCurrent + 1);
+	lineStartNext = sci::min(lineStartNext, endPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
-	char chNext = styler[startPos];
 	int style = initStyle;
 	int styleNext = styler.StyleAt(startPos);
 
-	for (Sci_PositionU i = startPos; i < lengthDoc; i++) {
-		const char ch = chNext;
-		chNext = styler.SafeGetCharAt(i + 1);
+	while (startPos < endPos) {
+		const char ch = styler[startPos];
 		const int stylePrev = style;
 		style = styleNext;
-		styleNext = styler.StyleAt(i + 1);
-		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-
-		if (atEOL && IsCommentLine(lineCurrent)) {
-			levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
-		}
+		styleNext = styler.StyleAt(++startPos);
 
 		if (style == SCE_LUA_WORD) {
 			if (ch == 'i' || ch == 'd' || ch == 'f' || ch == 'e' || ch == 'r' || ch == 'u') {
 				char s[10] = "";
 				for (Sci_PositionU j = 0; j < 8; j++) {
-					const char c = styler[i + j];
+					const char c = styler[startPos + j - 1];
 					if (!IsLowerCase(c)) {
 						break;
 					}
@@ -370,7 +364,11 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			}
 		}
 
-		if (atEOL) {
+		if (startPos == lineStartNext) {
+			if (IsCommentLine(lineCurrent)) {
+				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
+			}
+
 			int lev = levelPrev;
 			if ((levelCurrent > levelPrev)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
@@ -379,13 +377,11 @@ void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 				styler.SetLevel(lineCurrent, lev);
 			}
 			lineCurrent++;
+			lineStartNext = styler.LineStart(lineCurrent + 1);
+			lineStartNext = sci::min(lineStartNext, endPos);
 			levelPrev = levelCurrent;
 		}
 	}
-	// Fill in the real level of the next line, keeping the current flags as they will be filled in later
-
-	const int flagsNext = styler.LevelAt(lineCurrent) & ~SC_FOLDLEVELNUMBERMASK;
-	styler.SetLevel(lineCurrent, levelPrev | flagsNext);
 }
 
 }

@@ -202,7 +202,7 @@ public:
 	bool UseContainerLexing() const noexcept;
 };
 
-struct RegexError : public std::runtime_error {
+struct RegexError final : public std::runtime_error {
 	RegexError() : std::runtime_error("regex failure") {}
 };
 
@@ -318,7 +318,7 @@ public:
 	int actualIndentInChars;
 	bool useTabs;
 	bool tabIndents;
-	bool backspaceUnindents;
+	uint8_t backspaceUnindents;
 	ActionDuration durationStyleOneUnit;
 
 	std::unique_ptr<IDecorationList> decorations;

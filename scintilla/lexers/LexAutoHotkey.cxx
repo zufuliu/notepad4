@@ -67,7 +67,7 @@ constexpr bool IsAHKNumber(int base, int chPrev, int ch, int chNext) noexcept {
 }
 
 constexpr bool IsHotStringOptionChar(int ch) noexcept {
-	// https://lexikos.github.io/v2/docs/Hotstrings.htm#Options
+	// https://www.autohotkey.com/docs/v2/Hotstrings.htm#Options
 	return IsAlphaNumeric(ch) || ch == '*' || ch == '?' || ch == ' ';
 }
 
@@ -140,7 +140,7 @@ constexpr bool IsSectionCommentOption(const char (&buffer)[128], size_t length) 
 	return length <= comment && __builtin_memcmp(buffer, "comments", length) == 0;
 }
 
-// https://lexikos.github.io/v2/docs/commands/Format.htm
+// https://www.autohotkey.com/docs/v2/lib/Format.htm
 constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'a', 'A',
 					'c',
@@ -205,7 +205,7 @@ inline Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &st
 bool HighlightBrace(StyleContext &sc, int &outerStyle) {
 	const int state = sc.state;
 	if (sc.ch == '{' && AnyOf(sc.chNext, '!', '#', '+', '^', '{', '}') && sc.GetRelative(2) == '}') {
-		// https://lexikos.github.io/v2/docs/commands/Send.htm
+		// https://www.autohotkey.com/docs/v2/lib/Send.htm
 		sc.SetState(SCE_AHK_SENTKEY);
 		sc.Advance(2);
 		sc.ForwardSetState(state);

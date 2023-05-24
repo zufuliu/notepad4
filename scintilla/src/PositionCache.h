@@ -120,7 +120,7 @@ public:
 	void SCICALL WrapLine(const Document *pdoc, Sci::Position posLineStart, Wrap wrapState, XYPOSITION wrapWidth, XYPOSITION wrapIndent_, bool partialLine);
 };
 
-struct ScreenLine : public IScreenLine {
+struct ScreenLine final : public IScreenLine {
 	const LineLayout *ll;
 	size_t start;
 	size_t len;

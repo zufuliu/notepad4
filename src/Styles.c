@@ -1705,16 +1705,6 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 		Style_SetAllStyle(pLexNew, 0);
 
 		switch (rid) {
-		case NP2LEX_PERL:
-#if defined(_WIN64)
-			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE8(SCE_PL_REGEX_VAR, SCE_PL_REGSUBST_VAR, SCE_PL_BACKTICKS_VAR, SCE_PL_HERE_QQ_VAR,
-				SCE_PL_HERE_QX_VAR, SCE_PL_STRING_QQ_VAR, SCE_PL_STRING_QX_VAR, SCE_PL_STRING_QR_VAR));
-#else
-			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE(SCE_PL_REGEX_VAR, SCE_PL_REGSUBST_VAR, SCE_PL_BACKTICKS_VAR, SCE_PL_HERE_QQ_VAR));
-			SciCall_CopyStyles(SCE_PL_SCALAR, MULTI_STYLE(SCE_PL_HERE_QX_VAR, SCE_PL_STRING_QQ_VAR, SCE_PL_STRING_QX_VAR, SCE_PL_STRING_QR_VAR));
-#endif
-			break;
-
 		case NP2LEX_REBOL:
 			SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_REBOL_URL, SCE_REBOL_EMAIL, 0, 0));
 			break;
@@ -2452,7 +2442,7 @@ PEDITLEXER Style_MatchLexer(LPCWSTR lpszMatch, bool bCheckNames) {
 
 				const WCHAR ch = (p2 == p1)? L'\0' : p2[-1];
 				p2 += cch;
-				if ((ch == L';' || ch == ' ' || ch == L'\0') && (*p2 == L';' || *p2 == L' ' || *p2 == L'\0')) {
+				if ((ch == L';' || ch <= L' ') && (*p2 == L';' || *p2 <= L' ')) {
 					return pLex;
 				}
 				p1 = StrChr(p2, L';');
@@ -2491,24 +2481,22 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		if (StrCaseEqual(lpszExt, L"txt")) {
 			if (StrCaseEqual(lpszName, L"CMakeLists.txt") || StrCaseEqual(lpszName, L"CMakeCache.txt")) {
 				pLexNew = &lexCMake;
-#if 0 // LLVMBuild.txt were removed from LLVM project
-			} else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
-				pLexNew = &lexINI;
-#endif
-			} else {
-				//pLexNew = &lexTextFile;
 			}
-			return pLexNew;
+#if 0 // LLVMBuild.txt were removed from LLVM project
+			else if (StrCaseEqual(lpszName, L"LLVMBuild.txt")) {
+				pLexNew = &lexINI;
+			}
+#endif
 		}
 
-		if (bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
+		else if (bCGIGuess && (StrCaseEqual(lpszExt, L"cgi") || StrCaseEqual(lpszExt, L"fcgi"))) {
 			char tchText[256] = "";
 			SciCall_GetText(COUNTOF(tchText) - 1, tchText);
 			pLexNew = Style_SniffShebang(tchText);
 		}
 
 		// autoconf / automake
-		if (!pLexNew && pDotFile != NULL && StrCaseEqual(lpszExt, L"in")) {
+		else if (pDotFile != NULL && StrCaseEqual(lpszExt, L"in")) {
 			WCHAR tchCopy[MAX_PATH];
 			lstrcpyn(tchCopy, lpszFile, COUNTOF(tchCopy));
 			PathRemoveExtension(tchCopy);
@@ -2516,7 +2504,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		}
 
 		// MySQL ini/cnf
-		if (!pLexNew && StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
+		else if (StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexConfig;
 		}
 		else if (StrCaseEqual(lpszName, L"web.config")) {
@@ -2532,7 +2520,7 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 			Style_UpdateLexerLang(pLexNew, lpszExt, lpszName);
 		}
 		// dot file
-		if (StrCaseEqual(lpszExt - 1, lpszName)) {
+		if (lpszName[0] == L'.') {
 			if (pDotFile) {
 				*pDotFile = TRUE;
 			}
@@ -2914,6 +2902,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			break;
 		// Markdown
 		case NP2LEX_MARKDOWN:
+			update = false;
 			lang = IDM_LEXER_MARKDOWN_GITHUB;
 			break;
 		// Math

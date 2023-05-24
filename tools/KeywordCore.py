@@ -59,7 +59,8 @@ def build_enum_name(comment):
 			singly = item[:-1]
 			SinglyWordMap[item] = singly
 		items[-1] = singly
-	return ''.join(item.title() for item in items)
+	items = [item if item[0].isupper() else item.title() for item in items]
+	return ''.join(items)
 
 def BuildKeywordContent(rid, lexer, keywordList, keywordCount=16):
 	output = []
@@ -485,6 +486,28 @@ def parse_awk_api_file(path):
 		('built-in function', keywordMap['built-in functions'], KeywordAttr.Default),
 		('library function', keywordMap['library functions'], KeywordAttr.NoLexer),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
+def parse_bash_api_file(pathList):
+	keywordMap = {
+		'keywords': [],
+		'variables': [],
+		'commands': ['m4', 'dnl'], # M4
+	}
+	for path in pathList:
+		sections = read_api_file(path, '#')
+		for key, doc in sections:
+			if key not in keywordMap:
+				continue
+			items = doc.split()
+			if key == 'variables':
+				items = [item[1:] for item in items]
+			keywordMap[key].extend(items)
+	keywordMap['keywords'].extend(keywordMap['commands'])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('bash struct', "if elif fi while until else then do done esac eval".split(), KeywordAttr.NoAutoComp),
+		('variables', keywordMap['variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
 def parse_batch_api_file(path):
@@ -1632,7 +1655,7 @@ def parse_llvm_api_file(path):
 
 def parse_markdown_api_file(path):
 	blockTag = ['pre', 'script', 'style', 'textarea'] # type 1
-	type6 = "address, article, aside, base, basefont, blockquote, body, caption, center, col, colgroup, dd, details, dialog, dir, div, dl, dt, fieldset, figcaption, figure, footer, form, frame, frameset, h1, h2, h3, h4, h5, h6, head, header, hr, html, iframe, legend, li, link, main, menu, menuitem, nav, noframes, ol, optgroup, option, p, param, section, source, summary, table, tbody, td, tfoot, th, thead, title, tr, track, ul"
+	type6 = "address, article, aside, base, basefont, blockquote, body, caption, center, col, colgroup, dd, details, dialog, dir, div, dl, dt, fieldset, figcaption, figure, footer, form, frame, frameset, h1, h2, h3, h4, h5, h6, head, header, hr, html, iframe, legend, li, link, main, menu, menuitem, nav, noframes, ol, optgroup, option, p, param, search, section, summary, table, tbody, td, tfoot, th, thead, title, tr, track, ul"
 	blockTag.extend(type6.replace(',', ' ').split())
 	return [
 		('html block tag', blockTag, KeywordAttr.NoAutoComp),
@@ -1653,6 +1676,8 @@ def parse_nsis_api_file(path):
 					item = item[3:]
 				functions.append(item)
 			items = functions
+		elif key == 'predefined variables':
+			items = [item[2:-1] if item[-1] == '}' else item[1:] for item in items]
 		keywordMap[key] = items
 
 	RemoveDuplicateKeyword(keywordMap, [
@@ -1660,7 +1685,6 @@ def parse_nsis_api_file(path):
 		'instructions',
 		'attributes',
 		'functions',
-		'predefined variables',
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.MakeLower),
@@ -1668,7 +1692,7 @@ def parse_nsis_api_file(path):
 		('instruction', keywordMap['instructions'], KeywordAttr.NoLexer),
 		('attribute', keywordMap['attributes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
-		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer),
+		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
 def parse_php_api_file(path):
@@ -1681,7 +1705,7 @@ def parse_php_api_file(path):
 			keywordMap[key] = doc.split()
 		elif key == 'predefined variable':
 			items = doc.split()
-			keywordMap[key] = [item for item in items if item[0] == '$']
+			keywordMap[key] = [item[1:] for item in items if item[0] == '$']
 			keywordMap['misc'] = [item for item in items if item[0].isalpha()]
 		elif key == 'api':
 			items = re.findall(r'\w+\(', doc)
@@ -1716,7 +1740,7 @@ def parse_php_api_file(path):
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.MakeLower),
 		('interface', keywordMap['interface'], KeywordAttr.MakeLower),
-		('predefined variable', keywordMap['predefined variable'], KeywordAttr.Default),
+		('predefined variable', keywordMap['predefined variable'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('magic constant', keywordMap['magic constant'], KeywordAttr.Default),
 		('magic method', keywordMap['magic method'], KeywordAttr.MakeLower),
 		('constant', keywordMap['constant'], KeywordAttr.NoLexer),
@@ -1764,6 +1788,22 @@ def parse_powershell_api_file(path):
 		#('parameters', keywordMap['parameters'], KeywordAttr.NoLexer),
 		('parameters', [], KeywordAttr.NoLexer),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
+def parse_perl_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '#')
+	for key, doc in sections:
+		if key == 'variables':
+			items = re.findall(r'\w+', doc)
+		else:
+			items = doc.split()
+		keywordMap[key] = items
+	keywordMap['keywords'].extend('__DATA__ __END__ package'.split())
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('regex', keywordMap['regex'], KeywordAttr.NoAutoComp),
+		('variables', keywordMap['variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
 def parse_python_api_file(path):
@@ -1943,6 +1983,8 @@ def parse_ruby_api_file(path):
 				keywordMap['function'].extend(items)
 		else:
 			items = set(doc.split())
+			if key == 'pre-defined variables':
+				items = [item[1:] for item in items]
 			keywordMap[key] = items
 
 	folding = keywordMap['code folding']
@@ -1962,7 +2004,7 @@ def parse_ruby_api_file(path):
 		('code folding', folding, KeywordAttr.NoAutoComp),
 		('regex', keywordMap['regex'], KeywordAttr.NoAutoComp),
 		('pre-defined constants', keywordMap['pre-defined constants'], KeywordAttr.Default),
-		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer),
+		('pre-defined variables', keywordMap['pre-defined variables'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('module', keywordMap['module'], KeywordAttr.Default),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('built-in function', keywordMap['built-in function'], KeywordAttr.Default),
@@ -2197,13 +2239,30 @@ def parse_swift_api_file(path):
 	])
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
-		('directive', keywordMap['directive'], KeywordAttr.Special),
-		('attribute', keywordMap['attribute'], KeywordAttr.Special),
+		('directive', keywordMap['directive'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attribute', keywordMap['attribute'], KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('class', keywordMap['class'], KeywordAttr.Default),
 		('struct', keywordMap['struct'], KeywordAttr.Default),
 		('protocol', keywordMap['protocol'], KeywordAttr.Default),
 		('enumeration', keywordMap['enumeration'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.NoLexer),
+	]
+
+def parse_texinfo_api_file(path):
+	doc = read_file(path)
+	commands = set(re.findall(r'@(\w+)', doc))
+	folding = set(re.findall(r'@end\s+(\w+)', doc))
+	latex = re.findall(r'\\(\w+)', doc)
+	doc = doc[doc.index('@c misc'):]
+	doc = re.sub(r'@c\s+.+', '', doc)
+	misc = doc.split()
+	if diff := folding - commands:
+		print('unknown Texinfo commands:', ', '.join(sorted(diff)))
+	return [
+		('commands', commands - folding, KeywordAttr.Special),
+		('block command', folding, KeywordAttr.Special),
+		('TeX command', latex, KeywordAttr.NoLexer | KeywordAttr.Special),
+		('misc', misc, KeywordAttr.NoLexer)
 	]
 
 def parse_toml_api_file(path):
