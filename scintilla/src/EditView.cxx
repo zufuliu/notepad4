@@ -477,18 +477,7 @@ struct LayoutWorker {
 			for (uint32_t i = 0; i < threadCount; i++) {
 				QueueUserWorkItem(ThreadProc, this, WT_EXECUTEDEFAULT);
 			}
-			while (true) {
-				const DWORD result = WaitForSingleObject(finishedEvent, 0);
-				if (result == WAIT_OBJECT_0) {
-					if (runningThread.load(std::memory_order_relaxed) == 0) {
-						break;
-					}
-				} else if (result == WAIT_TIMEOUT) {
-				}
-				SwitchToThread();
-				//Sleep(0);
-				//YieldProcessor();
-			}
+			WaitForSingleObject(finishedEvent, INFINITE);
 			CloseHandle(finishedEvent);
 #endif // USE_WIN32_WORK_ITEM
 			return threadCount;
@@ -555,8 +544,10 @@ struct LayoutWorker {
 
 		UpdateMaximum(finishedCount, finished);
 #if USE_WIN32_WORK_ITEM
-		SetEvent(finishedEvent);
 		runningThread.fetch_sub(1, std::memory_order_relaxed);
+		if (runningThread.load(std::memory_order_relaxed) == 0) {
+			SetEvent(finishedEvent);
+		}
 #endif
 	}
 
