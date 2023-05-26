@@ -544,8 +544,8 @@ struct LayoutWorker {
 
 		UpdateMaximum(finishedCount, finished);
 #if USE_WIN32_WORK_ITEM
-		runningThread.fetch_sub(1, std::memory_order_relaxed);
-		if (runningThread.load(std::memory_order_relaxed) == 0) {
+		const uint32_t prev = runningThread.fetch_sub(1, std::memory_order_release);
+		if (prev == 1) {
 			SetEvent(finishedEvent);
 		}
 #endif
