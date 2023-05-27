@@ -612,7 +612,7 @@ SplitView::SplitView(const SplitVector<char> &instance) noexcept {
 		// Assign segment2 to segment1 / length1 to avoid useless test against 0 length1
 		length1 = length;
 	}
-	segment1  = instance.ElementPointer(0);
+	segment1 = instance.ElementPointer(0);
 	segment2 = instance.ElementPointer(length1) - length1;
 }
 

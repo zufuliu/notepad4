@@ -301,7 +301,7 @@ bool IsCharacterCaseSensitive(uint32_t ch) {
 			if (ch < range.low) {
 				return false;
 			}
-			if (range.offset)  {
+			if (range.offset) {
 				ch -= range.low;
 				return BitTestEx(UnicodeCaseSensitivityMask + range.offset, ch);
 			}

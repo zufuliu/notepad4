@@ -456,12 +456,12 @@ void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = false) {
 }
 
 constexpr bool IsPerlSingleCharOperator(int ch) noexcept {
-	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B',  'M', 'A', 'C');
+	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B', 'M', 'A', 'C');
 }
 
 constexpr bool IsPerlOperator(int ch) noexcept {
 	// lexing of "%*</" operators is non-trivial; these are missing in the set below
-	return AnyOf(ch, '^', '&', '\\', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>',  ',', '?', '!', '.', '~');
+	return AnyOf(ch, '^', '&', '\\', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>', ',', '?', '!', '.', '~');
 }
 
 constexpr bool IsPerlQDelimiter(int ch) noexcept {

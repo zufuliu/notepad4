@@ -1247,9 +1247,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
 		if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
-			WCHAR *p = szBuf;
+			LPCWSTR p = szBuf;
 			// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
-			WCHAR *t = StrRChrW(p, NULL, L'|');
+			LPCWSTR t = StrRChrW(p, NULL, L'|');
 			if (t) {
 				p = t + 1;
 			}

@@ -472,8 +472,6 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.ForwardSetState(SCE_SH_DEFAULT);
 			} else if (!IsBashWordChar(sc.ch)) {
 				sc.SetState(SCE_SH_DEFAULT);
-			} else if (cmdState == CmdState::Arithmetic && !IsIdentifierStart(sc.ch)) {
-				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
 		case SCE_SH_NUMBER:

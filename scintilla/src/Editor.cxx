@@ -7955,7 +7955,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		InvalidateStyleRedraw();
 		break;
 
-	case  Message::GetEdgeColour:
+	case Message::GetEdgeColour:
 		return vs.theEdge.colour.OpaqueRGB();
 
 	case Message::SetEdgeColour:
@@ -8319,7 +8319,7 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			return st.style;
 		}
 
-	case  Message::MarginSetStyles:
+	case Message::MarginSetStyles:
 		pdoc->MarginSetStyles(LineFromUPtr(wParam), ConstUCharPtrFromSPtr(lParam));
 		break;
 

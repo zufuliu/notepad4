@@ -356,7 +356,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 				} else {
 					if (kwType == KeywordType::None && sc.ch == '[') {
 						if (visibleChars == 0
-							|| stylePrevNonWhite ==  SCE_POWERSHELL_PARAMETER // operator
+							|| stylePrevNonWhite == SCE_POWERSHELL_PARAMETER // operator
 							|| !PreferArrayIndex(chPrevNonWhite)) {
 							kwType = KeywordType::Attribute;
 						}

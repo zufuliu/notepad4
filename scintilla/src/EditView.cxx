@@ -1271,7 +1271,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	rcSegment.left = std::max(rcSegment.right, rcLine.left);
 	rcSegment.right = rcLine.right;
 
-	const bool drawEOLAnnotationStyledText = (vsDraw.eolAnnotationVisible !=  EOLAnnotationVisible::Hidden) && model.pdoc->EOLAnnotationStyledText(line).text;
+	const bool drawEOLAnnotationStyledText = (vsDraw.eolAnnotationVisible != EOLAnnotationVisible::Hidden) && model.pdoc->EOLAnnotationStyledText(line).text;
 	const bool fillRemainder = (!lastSubLine || (!model.GetFoldDisplayText(line, ll->PartialPosition()) && !drawEOLAnnotationStyledText));
 	if (fillRemainder) {
 		// Fill the remainder of the line
@@ -1405,7 +1405,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 	if (!lastSubLine)
 		return;
 
-	if (vsDraw.eolAnnotationVisible ==  EOLAnnotationVisible::Hidden) {
+	if (vsDraw.eolAnnotationVisible == EOLAnnotationVisible::Hidden) {
 		return;
 	}
 	const StyledText stEOLAnnotation = model.pdoc->EOLAnnotationStyledText(line);

@@ -133,7 +133,7 @@ void MarginView::RefreshPixMaps(Surface *surfaceWindow, const ViewStyle &vsDraw)
 		// between the window chrome and the content area. And it works in low colour depths.
 		const PRectangle rcPattern = PRectangle::FromInts(0, 0, patternSize, patternSize);
 
-		// Initialize default colours based on the chrome colour scheme.  Typically the highlight is white.
+		// Initialize default colours based on the chrome colour scheme. Typically the highlight is white.
 		ColourRGBA colourFMFill = vsDraw.selbar;
 		ColourRGBA colourFMStripes = vsDraw.selbarlight;
 

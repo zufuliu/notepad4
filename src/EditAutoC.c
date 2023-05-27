@@ -88,12 +88,12 @@ uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
 	const uint8_t *ptr = (const uint8_t *)pWord;
 	len = min_u(len, NP2_AUTOC_ORDER_LENGTH);
 	for (uint32_t i = 0; i < len; i++) {
-		uint8_t ch = *ptr++;
+		const uint8_t ch = *ptr++;
+		high = (high << 8) | ch;
 		// convert to lower case to match _stricmp() / strcasecmp().
 		if (ch >= 'A' && ch <= 'Z') {
-			ch = ch + 'a' - 'A';
+			high += 'a' - 'A';
 		}
-		high = (high << 8) | ch;
 	}
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
 		NP2_assume(len != 0); // suppress [clang-analyzer-core.uninitialized.Assign]
@@ -321,16 +321,11 @@ static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, UI
 
 static inline bool WordList_StartsWith(const struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
-	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
-		return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+	if (pWList->iStartLen <= NP2_AUTOC_ORDER_LENGTH) {
+		return pWList->orderStart == pWList->WL_OrderFunc(pWord, pWList->iStartLen);
 	}
-	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen)) {
-		return false;
-	}
-	return true;
-#else
-	return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 #endif
+	return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 }
 
 static inline bool WordList_IsSeparator(uint8_t ch) {
@@ -2067,7 +2062,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	case NP2LEX_JULIA: {
 		LPCSTR pKeywords = pLex->pKeyWords->pszKeyWords[JuliaKeywordIndex_CodeFolding];
 		LPCSTR p = strstr(pKeywords, word);
-		if (p == pKeywords || (p != NULL &&  p[-1] == ' ')) {
+		if (p == pKeywords || (p != NULL && p[-1] == ' ')) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
@@ -2580,7 +2575,7 @@ void EditToggleCommentBlock(void) {
 
 	case NP2LEX_INNOSETUP: {
 		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
-		if (lineState &  InnoLineStateCodeSection) {
+		if (lineState & InnoLineStateCodeSection) {
 			EditEncloseSelection(L"{", L"}");
 		} else if (lineState & InnoLineStatePreprocessor) {
 			EditEncloseSelection(L"/*", L"*/");

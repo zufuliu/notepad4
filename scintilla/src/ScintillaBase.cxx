@@ -439,7 +439,7 @@ void ScintillaBase::AutoCompleteCompleted(char ch, CompletionMethods completionM
 	ac.Show(false);
 
 	NotificationData scn = {};
-	scn.nmhdr.code = listType > 0 ?  Notification::UserListSelection : Notification::AutoCSelection;
+	scn.nmhdr.code = listType > 0 ? Notification::UserListSelection : Notification::AutoCSelection;
 	scn.ch = static_cast<uint8_t>(ch);
 	scn.listCompletionMethod = completionMethod;
 	scn.wParam = listType;
@@ -1030,7 +1030,7 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			ConstCharPtrFromSPtr(lParam));
 		break;
 
-	case  Message::CallTipCancel:
+	case Message::CallTipCancel:
 		ct.CallTipCancel();
 		break;
 
