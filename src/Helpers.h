@@ -156,6 +156,12 @@ NP2_inline int ToLowerA(int ch) {
 	return (ch >= 'A' && ch <= 'Z') ? (ch - 'A' + 'a') : ch;
 }
 
+NP2_inline bool IsHexDigit(int ch) {
+	return (ch >= '0' && ch <= '9')
+		|| (ch >= 'A' && ch <= 'F')
+		|| (ch >= 'a' && ch <= 'f');
+}
+
 NP2_inline int GetHexDigit(int ch) {
 	unsigned int diff = ch - '0';
 	if (diff < 10) {

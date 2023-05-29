@@ -428,7 +428,6 @@ BEGIN
 		MENUITEM "Mostra te&rminazioni di linea\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
 		MENUITEM "Mostra sim&boli a capo\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
 		MENUITEM "Carattere di controllo &Unicode",				IDM_VIEW_UNICODE_CONTROL_CHAR
-		//MENUITEM "S&how CallTips",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
 		MENUITEM "Corrispondenza &visiva delle parentesi\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
 		MENUITEM "&Evidenzia blocco corrente",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
@@ -446,6 +445,14 @@ BEGIN
 			MENUITEM "Segna &maiuscole\\minuscole",					IDM_VIEW_MARKOCCURRENCES_CASE
 			MENUITEM "Segna solo &parola intera",		IDM_VIEW_MARKOCCURRENCES_WORD
 			MENUITEM "&Segnalibro e linea abbinata",		IDM_VIEW_MARKOCCURRENCES_BOOKMARK
+		END
+		POPUP "Show CallTi&p"
+		BEGIN
+			MENUITEM "&Off",						IDM_VIEW_SHOWCALLTIP_OFF
+			MENUITEM "&RGBA Color",					IDM_VIEW_SHOWCALLTIP_RGBA
+			MENUITEM "AR&GB Color",					IDM_VIEW_SHOWCALLTIP_ARGB
+			MENUITEM "&BGRA Color",					IDM_VIEW_SHOWCALLTIP_BGRA
+			MENUITEM "&ABGR Color",					IDM_VIEW_SHOWCALLTIP_ABGR
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "&Numeri linee\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS

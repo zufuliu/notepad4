@@ -367,7 +367,33 @@ void	EditAutoIndent(void);
 void	EditToggleCommentLine(void);
 void	EditToggleCommentBlock(void);
 void	EditInsertScriptShebangLine(void);
-void	EditShowCallTips(Sci_Position position);
+
+typedef enum CallTipType {
+	CallTipType_None,
+	CallTipType_Notification,
+	CallTipType_ColorHex,
+} CallTipType;
+
+typedef enum ShowCallTip {
+	ShowCallTip_None,
+	ShowCallTip_ColorRGBA,
+	ShowCallTip_ColorARGB,
+	ShowCallTip_ColorBGRA,
+	ShowCallTip_ColorABGR,
+} ShowCallTip;
+
+struct CallTipInfo {
+	ShowCallTip showCallTip;
+	CallTipType type;
+	Sci_Position startPos;
+	Sci_Position endPos;
+	Sci_Position hexStart;
+	COLORREF currentColor;
+	//COLORREF backColor;
+	//COLORREF foreColor;
+};
+void	EditShowCallTip(Sci_Position position);
+void	EditClickCallTip(HWND hwnd);
 
 #define NCP_DEFAULT					1
 #define NCP_UTF8					2

@@ -979,7 +979,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	// embedded script
 	LPCEDITLEXER pLex = NULL;
 	if (iLexer == SCLEX_HTML || iLexer == SCLEX_PHPSCRIPT) {
-		const int block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 		switch (block) {
 		case HtmlTextBlock_JavaScript:
 			pLex = &lexJavaScript;
@@ -2361,7 +2361,7 @@ void EditToggleCommentLine(void) {
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
-		const int block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
 		switch (block) {
 		case HtmlTextBlock_VBScript:
 			EditToggleLineComments(L"'", false);
@@ -2548,7 +2548,7 @@ void EditToggleCommentBlock(void) {
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
-		const int block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
 		switch (block) {
 		case HtmlTextBlock_Tag:
 			EditEncloseSelection(L"<!--", L"-->");
@@ -2779,24 +2779,6 @@ void EditInsertScriptShebangLine(void) {
 		strcat(line, lineEnd);
 	}
 	SciCall_ReplaceSel(line);
-}
-
-void EditShowCallTips(Sci_Position position) {
-	const Sci_Line iLine = SciCall_LineFromPosition(position);
-	const Sci_Position iDocLen = SciCall_GetLineLength(iLine);
-	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
-	SciCall_GetLine(iLine, pLine);
-	StrTrimA(pLine, " \t\r\n");
-	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
-#if defined(_WIN64)
-	sprintf(text, "ShowCallTips(%" PRId64 ", %" PRId64 ", %" PRId64 ")\n\n\002%s", iLine + 1, position, iDocLen, pLine);
-#else
-	sprintf(text, "ShowCallTips(%d, %d, %d)\n\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
-#endif
-	SciCall_CallTipUseStyle(fvCurFile.iTabWidth);
-	SciCall_CallTipShow(position, text);
-	NP2HeapFree(pLine);
-	NP2HeapFree(text);
 }
 
 void InitAutoCompletionCache(LPCEDITLEXER pLex) {

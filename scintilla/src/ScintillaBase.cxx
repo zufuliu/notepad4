@@ -1051,28 +1051,28 @@ sptr_t ScintillaBase::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::CallTipSetBack:
 		ct.colourBG = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
 		vs.styles[StyleCallTip].back = ct.colourBG;
-		InvalidateStyleRedraw();
+		//InvalidateStyleRedraw();
 		break;
 
 	case Message::CallTipSetFore:
 		ct.colourUnSel = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
 		vs.styles[StyleCallTip].fore = ct.colourUnSel;
-		InvalidateStyleRedraw();
+		//InvalidateStyleRedraw();
 		break;
 
 	case Message::CallTipSetForeHlt:
 		ct.colourSel = ColourRGBA::FromIpRGB(SPtrFromUPtr(wParam));
-		InvalidateStyleRedraw();
+		//InvalidateStyleRedraw();
 		break;
 
 	case Message::CallTipUseStyle:
 		ct.SetTabSize(static_cast<int>(std::lround(wParam * vs.aveCharWidth)));
-		InvalidateStyleRedraw();
+		//InvalidateStyleRedraw();
 		break;
 
 	case Message::CallTipSetPosition:
 		ct.SetPosition(wParam != 0);
-		InvalidateStyleRedraw();
+		//InvalidateStyleRedraw();
 		break;
 
 #if SCI_EnablePopupMenu
