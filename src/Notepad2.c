@@ -2183,13 +2183,6 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusbar();
 }
 
-static inline void OnStyleThemeChanged(int theme) {
-	if (theme == np2StyleTheme) {
-		return;
-	}
-	Style_OnStyleThemeChanged(theme);
-}
-
 //=============================================================================
 //
 // MsgSize() - Handles WM_SIZE
@@ -4011,7 +4004,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_STYLE_THEME_DEFAULT:
 	case IDM_VIEW_STYLE_THEME_DARK:
-		OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
