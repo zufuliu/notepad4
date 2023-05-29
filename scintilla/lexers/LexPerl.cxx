@@ -89,10 +89,6 @@ enum {
 #define SUB_HAS_MODULE	3	// sub name can have a ::identifier part
 #define SUB_HAS_SUB		4	// 'sub' keyword
 
-// all interpolated styles are different from their parent styles by a constant difference
-// we also assume SCE_PL_STRING_VAR is the interpolated style with the smallest value
-#define	INTERPOLATE_SHIFT	(SCE_PL_STRING_VAR - SCE_PL_STRING_DQ)
-
 bool isPerlKeyword(LexAccessor &styler, Sci_PositionU start, Sci_PositionU end, const WordList &keywords) noexcept {
 	// old-style keyword matcher; needed because GetCurrent() needs
 	// current segment to be committed, but we may abandon early...
@@ -155,7 +151,7 @@ void skipWhitespaceComment(const LexAccessor &styler, Sci_PositionU &p) noexcept
 	// when backtracking, we need to skip whitespace and comments
 	while (p > 0) {
 		const int style = styler.StyleAt(p);
-		if (style != SCE_PL_DEFAULT && style != SCE_PL_COMMENTLINE)
+		if (style > SCE_PL_COMMENTLINE)
 			break;
 		p--;
 	}
@@ -215,8 +211,7 @@ int styleCheckIdentifier(LexAccessor &styler, Sci_PositionU bk) noexcept {
 	}
 	while (bk > 0) {
 		const int bkstyle = styler.StyleAt(bk);
-		if (bkstyle == SCE_PL_DEFAULT
-			|| bkstyle == SCE_PL_COMMENTLINE) {
+		if (bkstyle <= SCE_PL_COMMENTLINE) {
 			// skip whitespace, comments
 		} else if (bkstyle == SCE_PL_OPERATOR) {
 			// test for "->" and "::"
@@ -372,7 +367,7 @@ void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = false) {
 	// interpolate a segment (with no active backslashes or delimiters within)
 	// switch in or out of an interpolation style or continue current style
 	// commit variable patterns if found, trim segment, repeat until done
-
+	const int outer = sc.state;
 	while (maxSeg > 0) {
 		bool isVar = false;
 		int sLen = 0;
@@ -442,28 +437,31 @@ void InterpolateSegment(StyleContext &sc, int maxSeg, bool isPattern = false) {
 			}
 		}
 		if (isVar) {	// commit as interpolated variable or normal character
-			if (sc.state < SCE_PL_STRING_VAR)
-				sc.SetState(sc.state + INTERPOLATE_SHIFT);
+			if (sc.state != SCE_PL_STRING_VAR) {
+				sc.SetState(SCE_PL_STRING_VAR);
+			}
 			sc.Forward(sLen);
 			maxSeg -= sLen;
 		} else {
-			if (sc.state >= SCE_PL_STRING_VAR)
-				sc.SetState(sc.state - INTERPOLATE_SHIFT);
+			if (sc.state == SCE_PL_STRING_VAR) {
+				sc.SetState(outer);
+			}
 			sc.Forward();
 			maxSeg--;
 		}
 	}
-	if (sc.state >= SCE_PL_STRING_VAR)
-		sc.SetState(sc.state - INTERPOLATE_SHIFT);
+	if (sc.state == SCE_PL_STRING_VAR) {
+		sc.SetState(outer);
+	}
 }
 
 constexpr bool IsPerlSingleCharOperator(int ch) noexcept {
-	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B',  'M', 'A', 'C');
+	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B', 'M', 'A', 'C');
 }
 
 constexpr bool IsPerlOperator(int ch) noexcept {
 	// lexing of "%*</" operators is non-trivial; these are missing in the set below
-	return AnyOf(ch, '^', '&', '\\', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>',  ',', '?', '!', '.', '~');
+	return AnyOf(ch, '^', '&', '\\', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>', ',', '?', '!', '.', '~');
 }
 
 constexpr bool IsPerlQDelimiter(int ch) noexcept {
@@ -578,8 +576,6 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		|| initStyle == SCE_PL_HERE_QQ
 		|| initStyle == SCE_PL_HERE_QX
 		|| initStyle == SCE_PL_FORMAT
-		|| initStyle == SCE_PL_HERE_QQ_VAR
-		|| initStyle == SCE_PL_HERE_QX_VAR
 		) {
 		// backtrack through multiple styles to reach the delimiter start
 		const int delim = (initStyle == SCE_PL_FORMAT) ? SCE_PL_FORMAT_IDENT : SCE_PL_HERE_DELIM;
@@ -596,20 +592,11 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		|| initStyle == SCE_PL_REGEX
 		|| initStyle == SCE_PL_STRING_QR
 		|| initStyle == SCE_PL_REGSUBST
-		|| initStyle == SCE_PL_STRING_VAR
-		|| initStyle == SCE_PL_STRING_QQ_VAR
-		|| initStyle == SCE_PL_BACKTICKS_VAR
-		|| initStyle == SCE_PL_STRING_QX_VAR
-		|| initStyle == SCE_PL_REGEX_VAR
-		|| initStyle == SCE_PL_STRING_QR_VAR
-		|| initStyle == SCE_PL_REGSUBST_VAR
 		) {
 		// for interpolation, must backtrack through a mix of two different styles
-		const int otherStyle = (initStyle >= SCE_PL_STRING_VAR) ?
-			initStyle - INTERPOLATE_SHIFT : initStyle + INTERPOLATE_SHIFT;
 		while (startPos > 1) {
 			const int st = styler.StyleAt(startPos - 1);
-			if ((st != initStyle) && (st != otherStyle))
+			if ((st != initStyle) && (st != SCE_PL_STRING_VAR))
 				break;
 			startPos--;
 		}

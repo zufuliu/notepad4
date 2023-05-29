@@ -217,7 +217,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								continue;
 							}
 							const char *p = s;
-							if (*p == '#')  {
+							if (*p == '#') {
 								++p;
 							}
 							if (StrEqual(p, "include")) {

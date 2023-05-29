@@ -317,7 +317,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					}
 					if (sc.LengthCurrent() > 1) {
 						const char *p = s;
-						if (*p == '#')  {
+						if (*p == '#') {
 							++p;
 						}
 						if (StrEqualsAny(p, "pragma", "line", "nullable")) {

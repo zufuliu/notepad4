@@ -244,7 +244,8 @@ public:
 		Current.Start(u, s, outer);
 	}
 	void Pop() noexcept {
-		if (Depth <= 0) {
+		if (Depth == 0) {
+			Clear();
 			return;
 		}
 		Depth--;
@@ -264,11 +265,7 @@ public:
 		if (Current.Count == 0) {
 			cmdState = CmdState::Body;
 			const int outer = Current.Outer;
-			if (Depth > 0) {
-				Pop();
-			} else {
-				Clear();
-			}
+			Pop();
 			sc.ForwardSetState(outer);
 			return true;
 		}
@@ -474,8 +471,6 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (sc.chPrev == '\\') {	// for escaped chars
 				sc.ForwardSetState(SCE_SH_DEFAULT);
 			} else if (!IsBashWordChar(sc.ch)) {
-				sc.SetState(SCE_SH_DEFAULT);
-			} else if (cmdState == CmdState::Arithmetic && !IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;

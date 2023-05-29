@@ -98,14 +98,16 @@ typedef struct EDITLEXER {
 		const uint64_t keywordAttr;
 
 		const uint8_t commentStyleMarker;
+		const uint8_t stringStyleFirst;
+		const uint8_t stringStyleLast;
 	// set with EDITLEXER_HOLE() or EDITLEXER_TEXT()
 		uint8_t iStyleTheme;
 		bool bStyleChanged;
 		bool bUseDefaultCodeStyle;
 		int iFavoriteOrder;
 
-		const unsigned int iStyleCount;
-		const int iNameLen;
+		const uint16_t iStyleCount;
+		const uint16_t iNameLen;
 		const wchar_t * const pszName;
 		wchar_t *szExtensions;
 		wchar_t *szStyleBuf;

@@ -7,6 +7,7 @@
 // 2024 https://tc39.es/ecma262/
 
 //! keywords
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#keywords
 async await
 break
 case catch class const continue
@@ -30,6 +31,7 @@ Infinity
 NaN
 undefined
 arguments
+get set of
 
 //! future reserved words
 enum implements interface package private protected public

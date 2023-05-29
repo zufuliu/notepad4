@@ -59,7 +59,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Apache Configuration File
 	* [CSV File](https://www.rfc-editor.org/rfc/rfc4180)
 	* [D](tools/lang/D.d), up to D language 2.0.
-	* [Dart](tools/lang/Dart.dart), up to Dart 2.12.
+	* [Dart](tools/lang/Dart.dart), up to Dart 3.0.
 	* Diff/Patch File
 	* F#
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2018.

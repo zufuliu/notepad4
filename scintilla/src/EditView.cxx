@@ -477,18 +477,7 @@ struct LayoutWorker {
 			for (uint32_t i = 0; i < threadCount; i++) {
 				QueueUserWorkItem(ThreadProc, this, WT_EXECUTEDEFAULT);
 			}
-			while (true) {
-				const DWORD result = WaitForSingleObject(finishedEvent, 0);
-				if (result == WAIT_OBJECT_0) {
-					if (runningThread.load(std::memory_order_relaxed) == 0) {
-						break;
-					}
-				} else if (result == WAIT_TIMEOUT) {
-				}
-				SwitchToThread();
-				//Sleep(0);
-				//YieldProcessor();
-			}
+			WaitForSingleObject(finishedEvent, INFINITE);
 			CloseHandle(finishedEvent);
 #endif // USE_WIN32_WORK_ITEM
 			return threadCount;
@@ -555,8 +544,10 @@ struct LayoutWorker {
 
 		UpdateMaximum(finishedCount, finished);
 #if USE_WIN32_WORK_ITEM
-		SetEvent(finishedEvent);
-		runningThread.fetch_sub(1, std::memory_order_relaxed);
+		const uint32_t prev = runningThread.fetch_sub(1, std::memory_order_release);
+		if (prev == 1) {
+			SetEvent(finishedEvent);
+		}
 #endif
 	}
 
@@ -1280,7 +1271,7 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 	rcSegment.left = std::max(rcSegment.right, rcLine.left);
 	rcSegment.right = rcLine.right;
 
-	const bool drawEOLAnnotationStyledText = (vsDraw.eolAnnotationVisible !=  EOLAnnotationVisible::Hidden) && model.pdoc->EOLAnnotationStyledText(line).text;
+	const bool drawEOLAnnotationStyledText = (vsDraw.eolAnnotationVisible != EOLAnnotationVisible::Hidden) && model.pdoc->EOLAnnotationStyledText(line).text;
 	const bool fillRemainder = (!lastSubLine || (!model.GetFoldDisplayText(line, ll->PartialPosition()) && !drawEOLAnnotationStyledText));
 	if (fillRemainder) {
 		// Fill the remainder of the line
@@ -1414,7 +1405,7 @@ void EditView::DrawEOLAnnotationText(Surface *surface, const EditModel &model, c
 	if (!lastSubLine)
 		return;
 
-	if (vsDraw.eolAnnotationVisible ==  EOLAnnotationVisible::Hidden) {
+	if (vsDraw.eolAnnotationVisible == EOLAnnotationVisible::Hidden) {
 		return;
 	}
 	const StyledText stEOLAnnotation = model.pdoc->EOLAnnotationStyledText(line);

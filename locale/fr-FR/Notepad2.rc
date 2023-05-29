@@ -428,7 +428,6 @@ BEGIN
 		MENUITEM "Afficher les fin de lignes\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
 		MENUITEM "Afficher la marque de retour à la ligne automatique\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
 		MENUITEM "Afficher les caractères de contrôle unicode",				IDM_VIEW_UNICODE_CONTROL_CHAR
-		//MENUITEM "Afficher les astuces de call",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
 		MENUITEM "Visualisation de la paranthèse fermante\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
 		MENUITEM "Surligner la ligne courante",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
@@ -446,6 +445,14 @@ BEGIN
 			MENUITEM "Casse correspondante",					IDM_VIEW_MARKOCCURRENCES_CASE
 			MENUITEM "Mot correspondant seulement",		IDM_VIEW_MARKOCCURRENCES_WORD
 			MENUITEM "Marque-page ligne correspondante",		IDM_VIEW_MARKOCCURRENCES_BOOKMARK
+		END
+		POPUP "Show CallTi&p"
+		BEGIN
+			MENUITEM "&Off",						IDM_VIEW_SHOWCALLTIP_OFF
+			MENUITEM "&RGBA Color",					IDM_VIEW_SHOWCALLTIP_RGBA
+			MENUITEM "AR&GB Color",					IDM_VIEW_SHOWCALLTIP_ARGB
+			MENUITEM "&BGRA Color",					IDM_VIEW_SHOWCALLTIP_BGRA
+			MENUITEM "&ABGR Color",					IDM_VIEW_SHOWCALLTIP_ABGR
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "Voir les numéros de ligne\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS

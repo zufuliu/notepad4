@@ -88,12 +88,12 @@ uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
 	const uint8_t *ptr = (const uint8_t *)pWord;
 	len = min_u(len, NP2_AUTOC_ORDER_LENGTH);
 	for (uint32_t i = 0; i < len; i++) {
-		uint8_t ch = *ptr++;
+		const uint8_t ch = *ptr++;
+		high = (high << 8) | ch;
 		// convert to lower case to match _stricmp() / strcasecmp().
 		if (ch >= 'A' && ch <= 'Z') {
-			ch = ch + 'a' - 'A';
+			high += 'a' - 'A';
 		}
-		high = (high << 8) | ch;
 	}
 	if (len < NP2_AUTOC_ORDER_LENGTH) {
 		NP2_assume(len != 0); // suppress [clang-analyzer-core.uninitialized.Assign]
@@ -321,16 +321,11 @@ static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, UI
 
 static inline bool WordList_StartsWith(const struct WordList *pWList, LPCSTR pWord) {
 #if NP2_AUTOC_USE_STRING_ORDER
-	if (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) {
-		return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
+	if (pWList->iStartLen <= NP2_AUTOC_ORDER_LENGTH) {
+		return pWList->orderStart == pWList->WL_OrderFunc(pWord, pWList->iStartLen);
 	}
-	if (pWList->orderStart != pWList->WL_OrderFunc(pWord, pWList->iStartLen)) {
-		return false;
-	}
-	return true;
-#else
-	return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 #endif
+	return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
 }
 
 static inline bool WordList_IsSeparator(uint8_t ch) {
@@ -528,6 +523,7 @@ static uint32_t RawStringStyleMask[8];
 static uint32_t GenericTypeStyleMask[8];
 static uint32_t IgnoreWordStyleMask[8];
 static uint32_t CommentStyleMask[8];
+static uint32_t AllStringStyleMask[8];
 static uint32_t PlainTextStyleMask[8];
 
 // from scintilla/lexlib/DocUtils.h
@@ -983,7 +979,7 @@ static void AutoC_AddKeyword(struct WordList *pWList, int iCurrentStyle) {
 	// embedded script
 	LPCEDITLEXER pLex = NULL;
 	if (iLexer == SCLEX_HTML || iLexer == SCLEX_PHPSCRIPT) {
-		const int block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
 		switch (block) {
 		case HtmlTextBlock_JavaScript:
 			pLex = &lexJavaScript;
@@ -1445,7 +1441,6 @@ void EditCompleteUpdateConfig(void) {
 
 static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos();
-	int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	const Sci_Line iLine = SciCall_LineFromPosition(iCurrentPos);
 	const Sci_Position iLineStartPos = SciCall_PositionFromLine(iLine);
 
@@ -1581,6 +1576,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 	bool bIgnoreDoc = false;
 	char prefix = '\0';
 
+	int iCurrentStyle = SciCall_GetStyleIndexAt(iCurrentPos);
 	if (!bIgnoreLexer && IsSpecialStartChar(ch, chPrev)) {
 		int iPrevStyle = 0;
 		if (ch == ':' && chPrev != ':') {
@@ -1618,6 +1614,7 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 		}
 	} else {
 		if ((!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_Commont) && BitTestEx(CommentStyleMask, iCurrentStyle))
+			|| (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_String) && BitTestEx(AllStringStyleMask, iCurrentStyle))
 			|| (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_PlainText) && BitTestEx(PlainTextStyleMask, iCurrentStyle))) {
 			retry = false;
 		}
@@ -1626,6 +1623,11 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_Commont) && !BitTestEx(CommentStyleMask, iCurrentStyle)) {
 				for (UINT i = 0; i < 8; i++) {
 					ignoredStyleMask[i] |= CommentStyleMask[i];
+				}
+			}
+			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_String) && !BitTestEx(AllStringStyleMask, iCurrentStyle)) {
+				for (UINT i = 0; i < 8; i++) {
+					ignoredStyleMask[i] |= AllStringStyleMask[i];
 				}
 			}
 			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_PlainText) && !BitTestEx(PlainTextStyleMask, iCurrentStyle)) {
@@ -2060,7 +2062,7 @@ static const char *EditKeywordIndent(LPCEDITLEXER pLex, const char *head, AutoIn
 	case NP2LEX_JULIA: {
 		LPCSTR pKeywords = pLex->pKeyWords->pszKeyWords[JuliaKeywordIndex_CodeFolding];
 		LPCSTR p = strstr(pKeywords, word);
-		if (p == pKeywords || (p != NULL &&  p[-1] == ' ')) {
+		if (p == pKeywords || (p != NULL && p[-1] == ' ')) {
 			*indent = AutoIndentType_IndentAndClose;
 			endPart = "end";
 		}
@@ -2359,7 +2361,7 @@ void EditToggleCommentLine(void) {
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
-		const int block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
 		switch (block) {
 		case HtmlTextBlock_VBScript:
 			EditToggleLineComments(L"'", false);
@@ -2546,7 +2548,7 @@ void EditToggleCommentBlock(void) {
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
-		const int block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
+		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
 		switch (block) {
 		case HtmlTextBlock_Tag:
 			EditEncloseSelection(L"<!--", L"-->");
@@ -2573,7 +2575,7 @@ void EditToggleCommentBlock(void) {
 
 	case NP2LEX_INNOSETUP: {
 		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
-		if (lineState &  InnoLineStateCodeSection) {
+		if (lineState & InnoLineStateCodeSection) {
 			EditEncloseSelection(L"{", L"}");
 		} else if (lineState & InnoLineStatePreprocessor) {
 			EditEncloseSelection(L"/*", L"*/");
@@ -2779,24 +2781,6 @@ void EditInsertScriptShebangLine(void) {
 	SciCall_ReplaceSel(line);
 }
 
-void EditShowCallTips(Sci_Position position) {
-	const Sci_Line iLine = SciCall_LineFromPosition(position);
-	const Sci_Position iDocLen = SciCall_GetLineLength(iLine);
-	char *pLine = (char *)NP2HeapAlloc(iDocLen + 1);
-	SciCall_GetLine(iLine, pLine);
-	StrTrimA(pLine, " \t\r\n");
-	char *text = (char *)NP2HeapAlloc(iDocLen + 1 + 128);
-#if defined(_WIN64)
-	sprintf(text, "ShowCallTips(%" PRId64 ", %" PRId64 ", %" PRId64 ")\n\n\002%s", iLine + 1, position, iDocLen, pLine);
-#else
-	sprintf(text, "ShowCallTips(%d, %d, %d)\n\n\002%s", (int)(iLine + 1), (int)position, (int)iDocLen, pLine);
-#endif
-	SciCall_CallTipUseStyle(fvCurFile.iTabWidth);
-	SciCall_CallTipShow(position, text);
-	NP2HeapFree(pLine);
-	NP2HeapFree(text);
-}
-
 void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	np2_LexKeyword = NULL;
 	memset(CharacterPrefixMask, 0, sizeof(CharacterPrefixMask));
@@ -2804,6 +2788,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	memset(GenericTypeStyleMask, 0, sizeof(GenericTypeStyleMask));
 	memset(IgnoreWordStyleMask, 0, sizeof(IgnoreWordStyleMask));
 	memset(CommentStyleMask, 0, sizeof(CommentStyleMask));
+	memset(AllStringStyleMask, 0, sizeof(AllStringStyleMask));
 	memset(PlainTextStyleMask, 0, sizeof(PlainTextStyleMask));
 	memcpy(CurrentWordCharSet, DefaultWordCharSet, sizeof(DefaultWordCharSet));
 
@@ -2961,6 +2946,20 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CommentStyleMask[SCE_HJA_COMMENTDOC >> 5] |= (1U << (SCE_HJA_COMMENTDOC & 31));
 		CommentStyleMask[SCE_HB_COMMENTLINE >> 5] |= (1U << (SCE_HB_COMMENTLINE & 31));
 		CommentStyleMask[SCE_HBA_COMMENTLINE >> 5] |= (1U << (SCE_HBA_COMMENTLINE & 31));
+		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
+		AllStringStyleMask[SCE_HJ_DOUBLESTRING >> 5] |= (1U << (SCE_HJ_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_HJ_SINGLESTRING >> 5] |= (1U << (SCE_HJ_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_HJ_REGEX >> 5] |= (1U << (SCE_HJ_REGEX & 31));
+		AllStringStyleMask[SCE_HJ_TEMPLATELITERAL >> 5] |= (1U << (SCE_HJ_TEMPLATELITERAL & 31));
+		AllStringStyleMask[SCE_HJA_DOUBLESTRING >> 5] |= (1U << (SCE_HJA_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_HJA_SINGLESTRING >> 5] |= (1U << (SCE_HJA_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_HJA_REGEX >> 5] |= (1U << (SCE_HJA_REGEX & 31));
+		AllStringStyleMask[SCE_HJA_TEMPLATELITERAL >> 5] |= (1U << (SCE_HJA_TEMPLATELITERAL & 31));
+		AllStringStyleMask[SCE_HB_STRING >> 5] |= (1U << (SCE_HB_STRING & 31));
+		AllStringStyleMask[SCE_HBA_STRING >> 5] |= (1U << (SCE_HBA_STRING & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		break;
 
@@ -2981,6 +2980,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_JSON:
 		CommentStyleMask[SCE_JSON_LINECOMMENT >> 5] |= (1U << (SCE_JSON_LINECOMMENT & 31));
 		CommentStyleMask[SCE_JSON_BLOCKCOMMENT >> 5] |= (1U << (SCE_JSON_BLOCKCOMMENT & 31));
+		AllStringStyleMask[SCE_JSON_STRING_DQ >> 5] |= (1U << (SCE_JSON_STRING_DQ & 31));
+		AllStringStyleMask[SCE_JSON_STRING_SQ >> 5] |= (1U << (SCE_JSON_STRING_SQ & 31));
+		AllStringStyleMask[SCE_JSON_ESCAPECHAR >> 5] |= (1U << (SCE_JSON_ESCAPECHAR & 31));
 		break;
 
 	case NP2LEX_JULIA:
@@ -3028,6 +3030,10 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_MARKDOWN:
 		CommentStyleMask[SCE_H_COMMENT >> 5] |= (1U << (SCE_H_COMMENT & 31));
 		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
+		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		PlainTextStyleMask[1] = UINT32_MAX;
 		PlainTextStyleMask[2] = UINT32_MAX;
@@ -3038,6 +3044,9 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['$' >> 5] |= (1 << ('$' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		RawStringStyleMask[SCE_PL_STRING_SQ >> 5] |= (1U << (SCE_PL_STRING_SQ & 31));
+		PlainTextStyleMask[SCE_PL_POD >> 5] |= (1U << (SCE_PL_POD & 31));
+		PlainTextStyleMask[SCE_PL_POD_VERB >> 5] |= (1U << (SCE_PL_POD_VERB & 31));
+		PlainTextStyleMask[SCE_PL_DATASECTION >> 5] |= (1U << (SCE_PL_DATASECTION & 31));
 		break;
 
 	case NP2LEX_PHP:
@@ -3060,6 +3069,19 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CommentStyleMask[js_style(SCE_JS_TASKMARKER) >> 5] |= (1U << (js_style(SCE_JS_TASKMARKER) & 31));
 		CommentStyleMask[css_style(SCE_CSS_COMMENTBLOCK) >> 5] |= (1U << (css_style(SCE_CSS_COMMENTBLOCK) & 31));
 		CommentStyleMask[css_style(SCE_CSS_CDO_CDC) >> 5] |= (1U << (css_style(SCE_CSS_CDO_CDC) & 31));
+		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
+		AllStringStyleMask[SCE_H_SGML_SIMPLESTRING >> 5] |= (1U << (SCE_H_SGML_SIMPLESTRING & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_SQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_SQ) & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_DQ) >> 5] |= (1U << (js_style(SCE_JS_STRING_DQ) & 31));
+		AllStringStyleMask[js_style(SCE_JS_STRING_BT) >> 5] |= (1U << (js_style(SCE_JS_STRING_BT) & 31));
+		AllStringStyleMask[js_style(SCE_JS_REGEX) >> 5] |= (1U << (js_style(SCE_JS_REGEX) & 31));
+		AllStringStyleMask[js_style(SCE_JS_ESCAPECHAR) >> 5] |= (1U << (js_style(SCE_JS_ESCAPECHAR) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_ESCAPECHAR) >> 5] |= (1U << (css_style(SCE_CSS_ESCAPECHAR) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_STRING_SQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_SQ) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_STRING_DQ) >> 5] |= (1U << (css_style(SCE_CSS_STRING_DQ) & 31));
+		AllStringStyleMask[css_style(SCE_CSS_URL) >> 5] |= (1U << (css_style(SCE_CSS_URL) & 31));
 		PlainTextStyleMask[SCE_H_DEFAULT >> 5] |= (1U << (SCE_H_DEFAULT & 31));
 		break;
 
@@ -3101,6 +3123,8 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		IgnoreWordStyleMask[SCE_PY_BUILTIN_FUNCTION >> 5] |= (1U << (SCE_PY_BUILTIN_FUNCTION & 31));
 		IgnoreWordStyleMask[SCE_PY_ATTRIBUTE >> 5] |= (1U << (SCE_PY_ATTRIBUTE & 31));
 		IgnoreWordStyleMask[SCE_PY_OBJECT_FUNCTION >> 5] |= (1U << (SCE_PY_OBJECT_FUNCTION & 31));
+		AllStringStyleMask[SCE_PY_ESCAPECHAR >> 5] |= (1U << (SCE_PY_ESCAPECHAR & 31));
+		AllStringStyleMask[SCE_PY_FORMAT_SPECIFIER >> 5] |= (1U << (SCE_PY_FORMAT_SPECIFIER & 31));
 		break;
 
 	case NP2LEX_REBOL:
@@ -3138,6 +3162,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['?' >> 5] |= (1U << ('?' & 31));
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		RawStringStyleMask[SCE_RB_STRING_SQ >> 5] |= (1U << (SCE_RB_STRING_SQ & 31));
+		PlainTextStyleMask[SCE_RB_DATASECTION >> 5] |= (1U << (SCE_RB_DATASECTION & 31));
 		break;
 
 	case NP2LEX_RUST:
@@ -3212,9 +3237,26 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	}
 
 	CurrentWordCharSet['.' >> 5] |= (1 << ('.' & 31));
-	const uint32_t marker = pLex->commentStyleMarker;
+	uint32_t marker = pLex->commentStyleMarker;
 	if (marker) {
 		CommentStyleMask[0] |= (1U << (marker + 1)) - 2;
+	}
+
+	marker = pLex->stringStyleLast;
+	if (marker) {
+		uint32_t start = pLex->stringStyleFirst;
+#if 1	// all inside [0, 31] or [40, 63]
+		marker = marker - start + 1;
+		const uint32_t mask = ((1U << marker) - 1) << (start & 31);
+		start >>= 5;
+		AllStringStyleMask[start] |= mask;
+#else
+		++marker;
+		do {
+			AllStringStyleMask[start >> 5] |= (1U << (start & 31));
+			++start;
+		} while (start < marker);
+#endif
 	}
 
 	UpdateLexerExtraKeywords();

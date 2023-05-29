@@ -314,7 +314,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				const int state = sc.state;
 				sc.SetState(SCE_SWIFT_ESCAPECHAR);
 				sc.Forward();
-				const DelimiterResult result =  CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Escape, delimiterCount);
+				const DelimiterResult result = CheckSwiftStringDelimiter(styler, sc.currentPos, DelimiterCheck::Escape, delimiterCount);
 				if (result != DelimiterResult::False) {
 					sc.Advance(delimiterCount);
 					if (sc.ch == '(') {

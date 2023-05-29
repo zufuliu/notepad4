@@ -428,7 +428,6 @@ BEGIN
 		MENUITEM "Mostra te&rminazioni di linea\tCtrl+Shift+9",		IDM_VIEW_SHOWEOLS
 		MENUITEM "Mostra sim&boli a capo\tCtrl+Shift+0",		IDM_VIEW_WORDWRAPSYMBOLS
 		MENUITEM "Carattere di controllo &Unicode",				IDM_VIEW_UNICODE_CONTROL_CHAR
-		//MENUITEM "S&how CallTips",						IDM_VIEW_SHOWCALLTIPS
 		MENUITEM SEPARATOR
 		MENUITEM "Corrispondenza &visiva delle parentesi\tCtrl+Shift+V",	IDM_VIEW_MATCHBRACES
 		MENUITEM "&Evidenzia blocco corrente",				IDM_VIEW_HIGHLIGHTCURRENT_BLOCK
@@ -446,6 +445,14 @@ BEGIN
 			MENUITEM "Segna &maiuscole\\minuscole",					IDM_VIEW_MARKOCCURRENCES_CASE
 			MENUITEM "Segna solo &parola intera",		IDM_VIEW_MARKOCCURRENCES_WORD
 			MENUITEM "&Segnalibro e linea abbinata",		IDM_VIEW_MARKOCCURRENCES_BOOKMARK
+		END
+		POPUP "Show CallTi&p"
+		BEGIN
+			MENUITEM "&Off",						IDM_VIEW_SHOWCALLTIP_OFF
+			MENUITEM "&RGBA Color",					IDM_VIEW_SHOWCALLTIP_RGBA
+			MENUITEM "AR&GB Color",					IDM_VIEW_SHOWCALLTIP_ARGB
+			MENUITEM "&BGRA Color",					IDM_VIEW_SHOWCALLTIP_BGRA
+			MENUITEM "&ABGR Color",					IDM_VIEW_SHOWCALLTIP_ABGR
 		END
 		MENUITEM SEPARATOR
 		MENUITEM "&Numeri linee\tCtrl+Shift+N",		IDM_VIEW_LINENUMBERS
@@ -1352,8 +1359,8 @@ BEGIN
     AUTOCHECKBOX    "Usa impostazioni sche&ma.",IDC_FILE_USE_SCHEME_TAB,133,114,90,10,WS_TABSTOP
     AUTOCHECKBOX    "Tasto Tab riformatta indenta&zione.",IDC_TAB_INDENT,7,135,160,10,WS_TABSTOP
     AUTOCHECKBOX    "Tasto &Backspace riformatta indentazione.",IDC_BACKSPACE_UNINDENT,7,147,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Backspace key sma&rt delete spaces.",IDC_BACKSPACE_SMARTDEL,7,159,160,10,WS_TABSTOP
-    AUTOCHECKBOX    "Rileva automati&camente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,171,160,10,WS_TABSTOP
+    AUTOCHECKBOX    "&Eliminazione intelligente spazi con tasto Backspace.",IDC_BACKSPACE_SMARTDEL,7,159,180,10,WS_TABSTOP
+    AUTOCHECKBOX    "Rileva automati&camente impostazioni Tab e indentazione.",IDC_DETECT_INDENTATION,7,171,200,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,119,188,50,14
     PUSHBUTTON      "Annulla",IDCANCEL,175,188,50,14
 END

@@ -1160,6 +1160,14 @@ NP2_inline bool SciCall_CallTipActive(void) NP2_noexcept {
 	return (bool)SciCall(SCI_CALLTIPACTIVE, 0, 0);
 }
 
+NP2_inline void SciCall_CallTipSetBack(COLORREF back) NP2_noexcept {
+	SciCall(SCI_CALLTIPSETBACK, back, 0);
+}
+
+NP2_inline void SciCall_CallTipSetFore(COLORREF fore) NP2_noexcept {
+	SciCall(SCI_CALLTIPSETFORE, fore, 0);
+}
+
 NP2_inline void SciCall_CallTipUseStyle(int tabSize) NP2_noexcept {
 	SciCall(SCI_CALLTIPUSESTYLE, tabSize, 0);
 }

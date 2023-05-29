@@ -973,7 +973,7 @@ void SpecialRepresentations::SetDefaultRepresentations(int dbcsCodePage) {
 			"SOS", "SGCI", "SCI", "CSI", "ST", "OSC", "PM", "APC"
 		};
 		for (size_t j = 0; j < std::size(repsC1); j++) {
-			const char c1[3] = { '\xc2',  static_cast<char>(0x80 + j), '\0' };
+			const char c1[3] = { '\xc2', static_cast<char>(0x80 + j), '\0' };
 			const char *rep = repsC1[j];
 			const size_t len = (rep[2] == '\0') ? 2 : ((rep[3] == '\0') ? 3 : 4);
 			SetRepresentation(std::string_view(c1, 2), std::string_view(rep, len));

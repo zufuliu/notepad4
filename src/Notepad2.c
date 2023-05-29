@@ -45,9 +45,6 @@
 //! show fold level
 #define NP2_DEBUG_FOLD_LEVEL		0
 
-//! Enable CallTips (not yet implemented)
-#define NP2_ENABLE_SHOW_CALLTIPS	0
-
 /******************************************************************************
 *
 * Local and global Variables for Notepad2.c
@@ -70,7 +67,8 @@ static HICON hTrayIcon = NULL;
 static UINT uTrayIconDPI = 0;
 
 // tab width for notification text
-#define TAB_WIDTH_NOTIFICATION		8
+#define CallTipTabWidthNotification		8
+#define CallTipDefaultMouseDwellTime	250
 
 #define TOOLBAR_COMMAND_BASE	IDT_FILE_NEW
 #define DefaultToolbarButtons	L"22 3 0 1 2 0 4 18 19 0 5 6 0 7 8 9 20 0 10 11 0 12 0 24 0 13 14 0 15 16 0 17"
@@ -146,10 +144,7 @@ EditAutoCompletionConfig autoCompletionConfig;
 int iSelectOption;
 static int iLineSelectionMode;
 static bool bShowCodeFolding;
-#if NP2_ENABLE_SHOW_CALLTIPS
-static bool bShowCallTips = true;
-static int iCallTipsWaitTime = 500; // 500 ms
-#endif
+extern struct CallTipInfo callTipInfo;
 static bool bViewWhiteSpace;
 static bool bViewEOLs;
 
@@ -1247,9 +1242,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		WCHAR szBuf[MAX_PATH + 40];
 		HDROP hDrop = (HDROP)wParam;
 		if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
-			WCHAR *p = szBuf;
+			LPCWSTR p = szBuf;
 			// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
-			WCHAR *t = StrRChrW(p, NULL, L'|');
+			LPCWSTR t = StrRChrW(p, NULL, L'|');
 			if (t) {
 				p = t + 1;
 			}
@@ -1865,11 +1860,8 @@ void EditCreate(HWND hwndParent) {
 	SciCall_BraceHighlightIndicator(true, IndicatorNumber_MatchBrace);
 	SciCall_BraceBadLightIndicator(true, IndicatorNumber_MatchBraceError);
 
-	// CallTips
-	SciCall_CallTipUseStyle(TAB_WIDTH_NOTIFICATION);
-#if NP2_ENABLE_SHOW_CALLTIPS
-	SciCall_SetMouseDwellTime(bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER);
-#endif
+	// CallTip
+	SciCall_SetMouseDwellTime((callTipInfo.showCallTip == ShowCallTip_None)? SC_TIME_FOREVER : CallTipDefaultMouseDwellTime);
 
 	// Nonprinting characters
 	SciCall_SetViewWS((bViewWhiteSpace) ? SCWS_VISIBLEALWAYS : SCWS_INVISIBLE);
@@ -2640,15 +2632,14 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_CASE, bMarkOccurrences);
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_WORD, bMarkOccurrences);
 	EnableCmd(hmenu, IDM_VIEW_MARKOCCURRENCES_BOOKMARK, bMarkOccurrences);
+	i = IDM_VIEW_SHOWCALLTIP_OFF + (int)callTipInfo.showCallTip;
+	CheckMenuRadioItem(hmenu, IDM_VIEW_SHOWCALLTIP_OFF, IDM_VIEW_SHOWCALLTIP_ABGR, i, MF_BYCOMMAND);
 
 	CheckCmd(hmenu, IDM_VIEW_SHOWWHITESPACE, bViewWhiteSpace);
 	CheckCmd(hmenu, IDM_VIEW_SHOWEOLS, bViewEOLs);
 	CheckCmd(hmenu, IDM_VIEW_WORDWRAPSYMBOLS, bShowWordWrapSymbols);
 	EnableCmd(hmenu, IDM_VIEW_UNICODE_CONTROL_CHAR, iCurrentEncoding != CPI_DEFAULT);
 	CheckCmd(hmenu, IDM_VIEW_UNICODE_CONTROL_CHAR, bShowUnicodeControlCharacter);
-#if NP2_ENABLE_SHOW_CALLTIPS
-	CheckCmd(hmenu, IDM_VIEW_SHOWCALLTIPS, bShowCallTips);
-#endif
 	CheckCmd(hmenu, IDM_VIEW_MENU, bShowMenu);
 	CheckCmd(hmenu, IDM_VIEW_TOOLBAR, bShowToolbar);
 	EnableCmd(hmenu, IDM_VIEW_CUSTOMIZE_TOOLBAR, bShowToolbar);
@@ -3154,7 +3145,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			SciCall_LineCut(iLineSelectionMode & LineSelectionMode_VisualStudio);
 			iCurrentPos = SciCall_GetCurrentPos();
 			const Sci_Line iCurLine = SciCall_LineFromPosition(iCurrentPos);
-			EditJumpTo(iCurLine, iCol);
+			EditJumpTo(iCurLine + 1, iCol);
 		} else {
 			SciCall_Cut(false);
 		}
@@ -4235,12 +4226,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		InvalidateStyleRedraw();
 		break;
 
-#if NP2_ENABLE_SHOW_CALLTIPS
-	case IDM_VIEW_SHOWCALLTIPS:
-		bShowCallTips = !bShowCallTips;
-		SciCall_SetMouseDwellTime(bShowCallTips? iCallTipsWaitTime : SC_TIME_FOREVER);
+	case IDM_VIEW_SHOWCALLTIP_OFF:
+	case IDM_VIEW_SHOWCALLTIP_RGBA:
+	case IDM_VIEW_SHOWCALLTIP_ARGB:
+	case IDM_VIEW_SHOWCALLTIP_BGRA:
+	case IDM_VIEW_SHOWCALLTIP_ABGR:
+		callTipInfo.showCallTip = (ShowCallTip)(LOWORD(wParam) - IDM_VIEW_SHOWCALLTIP_OFF);
+		SciCall_SetMouseDwellTime((callTipInfo.showCallTip == ShowCallTip_None)? SC_TIME_FOREVER : CallTipDefaultMouseDwellTime);
 		break;
-#endif
 
 	case IDM_VIEW_MATCHBRACES:
 		bMatchBraces = !bMatchBraces;
@@ -5246,22 +5239,15 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			autoCompletionConfig.iPreviousItemCount = 0;
 			break;
 
-#if NP2_ENABLE_SHOW_CALLTIPS
 		case SCN_DWELLSTART:
-			// show "Ctrl + click to follow link"?
-			if (bShowCallTips && scn->position >= 0) {
-				EditShowCallTips(scn->position);
-			}
+			EditShowCallTip(scn->position);
 			break;
 
-		case SCN_DWELLEND:
-			// if calltip source changed
-			SciCall_CallTipCancel();
-			break;
-#endif
+		//case SCN_DWELLEND:
+		//	break;
 
 		case SCN_CALLTIPCLICK:
-			SciCall_CallTipCancel();
+			EditClickCallTip(hwnd);
 			break;
 
 		case SCN_MODIFIED:
@@ -5601,11 +5587,6 @@ void LoadSettings(void) {
 
 	iSelectOption = IniSectionGetInt(pIniSection, L"SelectOption", SelectOption_Default);
 	iLineSelectionMode = IniSectionGetInt(pIniSection, L"LineSelection", LineSelectionMode_VisualStudio);
-#if NP2_ENABLE_SHOW_CALLTIPS
-	bShowCallTips = IniSectionGetBool(pIniSection, L"ShowCallTips", true);
-	iValue = IniSectionGetInt(pIniSection, L"CallTipsWaitTime", 500);
-	iCallTipsWaitTime = max_i(iValue, 100);
-#endif
 
 	iValue = IniSectionGetInt(pIniSection, L"TabWidth", TAB_WIDTH_4);
 	tabSettings.globalTabWidth = clamp_i(iValue, TAB_WIDTH_MIN, TAB_WIDTH_MAX);
@@ -5639,6 +5620,7 @@ void LoadSettings(void) {
 
 	bViewWhiteSpace = IniSectionGetBool(pIniSection, L"ViewWhiteSpace", false);
 	bViewEOLs = IniSectionGetBool(pIniSection, L"ViewEOLs", false);
+	callTipInfo.showCallTip = (ShowCallTip)IniSectionGetInt(pIniSection, L"ShowCallTip", ShowCallTip_None);
 
 	iValue = IniSectionGetInt(pIniSection, L"DefaultEncoding", -1);
 	iDefaultEncoding = Encoding_MapIniSetting(true, iValue);
@@ -5934,10 +5916,6 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetStringEx(pIniSection, L"AutoCFillUpPunctuation", autoCompletionConfig.wszAutoCompleteFillUp, AUTO_COMPLETION_FILLUP_DEFAULT);
 	IniSectionSetIntEx(pIniSection, L"SelectOption", iSelectOption, SelectOption_Default);
 	IniSectionSetIntEx(pIniSection, L"LineSelection", iLineSelectionMode, LineSelectionMode_VisualStudio);
-#if NP2_ENABLE_SHOW_CALLTIPS
-	IniSectionSetBoolEx(pIniSection, L"ShowCallTips", bShowCallTips, true);
-	IniSectionSetIntEx(pIniSection, L"CallTipsWaitTime", iCallTipsWaitTime, 500);
-#endif
 	IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.globalTabWidth, TAB_WIDTH_4);
 	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.globalIndentWidth, INDENT_WIDTH_4);
 	IniSectionSetBoolEx(pIniSection, L"TabsAsSpaces", tabSettings.globalTabsAsSpaces, false);
@@ -5957,6 +5935,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"MarkOccurrencesBookmark", bMarkOccurrencesBookmark, false);
 	IniSectionSetBoolEx(pIniSection, L"ViewWhiteSpace", bViewWhiteSpace, false);
 	IniSectionSetBoolEx(pIniSection, L"ViewEOLs", bViewEOLs, false);
+	IniSectionSetIntEx(pIniSection, L"ShowCallTip", (int)callTipInfo.showCallTip, ShowCallTip_None);
 
 	if (iDefaultEncoding != CPI_GLOBAL_DEFAULT) {
 		iValue = Encoding_MapIniSetting(false, iDefaultEncoding);
@@ -8587,7 +8566,10 @@ void SetNotifyIconTitle(HWND hwnd) {
 }
 
 void ShowNotificationA(int notifyPos, LPCSTR lpszText) {
-	SciCall_CallTipUseStyle(TAB_WIDTH_NOTIFICATION);
+	callTipInfo.type = CallTipType_Notification;
+	//SciCall_CallTipSetBack(callTipInfo.backColor);
+	//SciCall_CallTipSetFore(callTipInfo.foreColor);
+	SciCall_CallTipUseStyle(CallTipTabWidthNotification);
 	SciCall_ShowNotification(notifyPos, lpszText);
 }
 
