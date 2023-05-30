@@ -36,7 +36,7 @@ static inline uint32_t ColorFromARGBHex(uint32_t hex) NP2_noexcept {
 }
 
 static inline uint32_t ColorFromBGRAHex(uint32_t hex) NP2_noexcept {
-	return rotl8(hex);
+	return rotr8(hex);
 }
 
 static inline uint32_t ColorToRGBQuad(uint32_t color) NP2_noexcept {

@@ -5327,19 +5327,21 @@ void EditShowCallTip(Sci_Position position) {
 						color = ColorFromBGRAHex(color);
 					}
 				} else {
+					// always treated as #RGBA or #ARGB
 					uint32_t alpha = 0;
 					if (len == 4) {
-						alpha = color & 15;
-						alpha |= alpha << 4;
-						color >>= 4;
+						if (colorFormat == ShowCallTip_ColorARGB) {
+							alpha = color >> 12;
+						} else {
+							alpha = color & 15;
+							color >>= 4;
+						}
 					}
-					uint32_t red = (color >> 8) & 15;
-					uint32_t green = (color >> 4) & 15;
-					uint32_t blue = color & 15;
-					red |= red << 4;
-					green |= green << 4;
-					blue |= blue << 4;
+					const uint32_t red = (color >> 8) & 15;
+					const uint32_t green = (color >> 4) & 15;
+					const uint32_t blue = color & 15;
 					color = red | (green << 8) | (blue << 16) | (alpha << 24);
+					color *= 0x11;
 				}
 				if (*s != '#') {
 					--s;
