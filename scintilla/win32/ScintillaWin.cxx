@@ -3029,7 +3029,7 @@ void ScintillaWin::Paste(bool asBinary) {
 
 void ScintillaWin::CreateCallTipWindow(PRectangle) noexcept {
 	if (!ct.wCallTip.Created()) {
-		HWND wnd = ::CreateWindow(callClassName, L"ACallTip",
+		HWND wnd = ::CreateWindow(callClassName, callClassName,
 			WS_POPUP, 100, 100, 150, 20,
 			MainHWND(), nullptr,
 			GetWindowInstance(MainHWND()),

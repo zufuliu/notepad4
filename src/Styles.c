@@ -5354,7 +5354,6 @@ void EditShowCallTip(Sci_Position position) {
 				callTipInfo.endPos = position + len + 1;
 				callTipInfo.hexStart = position + 1;
 				callTipInfo.currentColor = color;
-				SciCall_CallTipCancel();
 				SciCall_CallTipSetBack(color);
 				SciCall_CallTipSetFore(~color);
 				SciCall_CallTipShow(position, s);
