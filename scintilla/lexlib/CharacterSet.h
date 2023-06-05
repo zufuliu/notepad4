@@ -282,7 +282,7 @@ constexpr bool IsFloatExponent(int chPrev, int ch, int chNext) noexcept {
 
 constexpr bool IsISODateTime(int ch, int chNext) noexcept {
 	return ((ch == '+' || ch == '-' || ch == ':' || ch == '.') && IsADigit(chNext))
-		|| (ch == ' ' && (chNext == '-' || IsADigit(chNext)));
+		|| (ch == ' ' && (chNext == '+' || chNext == '-' || IsADigit(chNext)));
 }
 
 //[[deprecated]]
