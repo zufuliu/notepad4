@@ -280,6 +280,11 @@ constexpr bool IsFloatExponent(int chPrev, int ch, int chNext) noexcept {
 		&& (ch == '+' || ch == '-') && IsADigit(chNext);
 }
 
+constexpr bool IsISODateTime(int ch, int chNext) noexcept {
+	return ((ch == '+' || ch == '-' || ch == ':' || ch == '.') && IsADigit(chNext))
+		|| (ch == ' ' && (chNext == '-' || IsADigit(chNext)));
+}
+
 //[[deprecated]]
 //constexpr bool IsASCII(int ch) noexcept {
 //	return ch >= 0 && ch < 0x80;
