@@ -553,7 +553,7 @@ void ScintillaBase::CallTipShow(Point pt, NotificationPosition notifyPos, const 
 	// Now display the window.
 	CreateCallTipWindow(rc);
 	ct.wCallTip.SetPositionRelative(rc, &wMain);
-	//ct.wCallTip.InvalidateAll();
+	ct.wCallTip.InvalidateAll();
 	ct.wCallTip.Show();
 }
 
