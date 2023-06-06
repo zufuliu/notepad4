@@ -335,8 +335,8 @@ public:
 		return attr;
 	}
 
-	LONG HasCompositionString(DWORD dwIndex) const noexcept {
-		return hIMC ? ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) : 0;
+	bool HasCompositionString(DWORD dwIndex) const noexcept {
+		return ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) > 0;
 	}
 
 	std::wstring GetCompositionString(DWORD dwIndex) const {
@@ -1437,6 +1437,13 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// Copy & paste by johnsonj with a lot of helps of Neil.
 	// Great thanks for my foreruners, jiniya and BLUEnLIVE.
 	const IMContext imc(MainHWND());
+	if (!imc.hIMC) {
+		return 0;
+	}
+	if (pdoc->IsReadOnly() || SelectionContainsProtected()) {
+		::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+		return 0;
+	}
 
 	bool initialCompose = false;
 	if (pdoc->TentativeActive()) {
@@ -1450,14 +1457,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	}
 
 	view.imeCaretBlockOverride = false;
-
-	if (!imc.hIMC) {
-		return 0;
-	}
-	if (pdoc->IsReadOnly() || SelectionContainsProtected()) {
-		::ImmNotifyIME(imc.hIMC, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
-		return 0;
-	}
 
 	// See Chromium's InputMethodWinImm32::OnImeComposition()
 	//
