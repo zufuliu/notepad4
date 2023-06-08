@@ -1445,15 +1445,11 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		return 0;
 	}
 
-	bool initialCompose = false;
-	if (pdoc->TentativeActive()) {
-		// GCS_COMPSTR is set on pressing Esc, but without composition string.
-		const bool pending = (lParam & GCS_COMPSTR) && imc.HasCompositionString(GCS_COMPSTR);
-		pdoc->TentativeUndo(pending);
-	} else {
-		// No tentative undo means start of this composition so
-		// fill in any virtual spaces.
-		initialCompose = true;
+
+	const DelaySavePoint delay(pdoc);
+	const bool tentative = pdoc->TentativeActive();
+	if (tentative) {
+		pdoc->TentativeUndo();
 	}
 
 	view.imeCaretBlockOverride = false;
@@ -1465,17 +1461,18 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// by the start of another composition.
 	if (lParam & GCS_RESULTSTR) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ImeResult);
-		initialCompose = true;
 	}
 
 	if (lParam & GCS_COMPSTR) {
 		const std::wstring wcs = imc.GetCompositionString(GCS_COMPSTR);
+		// GCS_COMPSTR is set on pressing Esc, but without composition string.
 		if (wcs.empty()) {
 			ShowCaretAtCurrentPosition();
 			return 0;
 		}
 
-		if (initialCompose) {
+		// No tentative undo means start of this composition so fill in any virtual spaces.
+		if (!tentative) {
 			ClearBeforeTentativeStart();
 		}
 

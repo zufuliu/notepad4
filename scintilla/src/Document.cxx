@@ -303,7 +303,7 @@ void Document::SetSavePoint() noexcept {
 	NotifySavePoint(true);
 }
 
-void Document::TentativeUndo(bool pendingUpdate) {
+void Document::TentativeUndo() {
 	if (!TentativeActive())
 		return;
 	CheckReadOnly();
@@ -355,7 +355,7 @@ void Document::TentativeUndo(bool pendingUpdate) {
 			}
 
 			const bool endSavePoint = cb.IsSavePoint();
-			if (startSavePoint != endSavePoint && !pendingUpdate) {
+			if (startSavePoint != endSavePoint) {
 				NotifySavePoint(endSavePoint);
 			}
 
@@ -2725,7 +2725,23 @@ void Document::NotifyModifyAttempt() noexcept {
 	}
 }
 
+void Document::BeginDelaySavePoint() noexcept {
+	delaySavePoint = cb.IsSavePoint();
+}
+
+void Document::EndDelaySavePoint() noexcept {
+	const bool startSavePoint = *delaySavePoint;
+	delaySavePoint.reset();
+	const bool endSavePoint = cb.IsSavePoint();
+	if (startSavePoint != endSavePoint) {
+		NotifySavePoint(endSavePoint);
+	}
+}
+
 void Document::NotifySavePoint(bool atSavePoint) noexcept {
+	if (delaySavePoint) {
+		return;
+	}
 	for (const auto &watcher : watchers) {
 		watcher.watcher->NotifySavePoint(this, watcher.userData, atSavePoint);
 	}

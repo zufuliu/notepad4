@@ -287,6 +287,7 @@ private:
 
 	bool matchesValid;
 	bool insertionSet;
+	std::optional<bool> delaySavePoint;
 	std::string insertion;
 
 	std::vector<WatcherWithUserData> watchers;
@@ -428,6 +429,8 @@ public:
 	bool IsSavePoint() const noexcept {
 		return cb.IsSavePoint();
 	}
+	void BeginDelaySavePoint() noexcept;
+	void EndDelaySavePoint() noexcept;
 
 	void TentativeStart() noexcept {
 		cb.TentativeStart();
@@ -435,7 +438,7 @@ public:
 	void TentativeCommit() noexcept {
 		cb.TentativeCommit();
 	}
-	void TentativeUndo(bool pendingUpdate = false);
+	void TentativeUndo();
 	bool TentativeActive() const noexcept {
 		return cb.TentativeActive();
 	}
@@ -645,6 +648,17 @@ private:
 	void NotifyModifyAttempt() noexcept;
 	void NotifySavePoint(bool atSavePoint) noexcept;
 	void NotifyModified(DocModification mh);
+};
+
+class DelaySavePoint {
+	Document *pdoc;
+public:
+	explicit DelaySavePoint(Document *pdoc_) noexcept : pdoc{pdoc_} {
+		pdoc->BeginDelaySavePoint();
+	}
+	~DelaySavePoint() {
+		pdoc->EndDelaySavePoint();
+	}
 };
 
 class UndoGroup {
