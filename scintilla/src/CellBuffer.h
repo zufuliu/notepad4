@@ -37,12 +37,15 @@ public:
 	ActionType at = ActionType::insert;
 	bool mayCoalesce = false;
 	Sci::Position position = 0;
-	std::unique_ptr<char[]> data;
 	Sci::Position lenData = 0;
+	std::unique_ptr<char[]> data;
 
 	Action() noexcept = default;
 	void Create(ActionType at_, Sci::Position position_ = 0, const char *data_ = nullptr, Sci::Position lenData_ = 0, bool mayCoalesce_ = true);
 	void Clear() noexcept;
+	const char *Data() const noexcept {
+		return data.get();
+	}
 };
 
 /**

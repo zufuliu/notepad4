@@ -344,8 +344,8 @@ void Action::Create(ActionType at_, Sci::Position position_, const char *data_, 
 }
 
 void Action::Clear() noexcept {
-	data = nullptr;
 	lenData = 0;
+	data = nullptr;
 }
 
 // The undo history stores a sequence of user operations that represent the user's view of the
@@ -461,7 +461,7 @@ const char *UndoHistory::AppendAction(ActionType at, Sci::Position position, con
 	currentAction++;
 	actions[currentAction].Create(ActionType::start);
 	maxAction = currentAction;
-	return actions[actionWithData].data.get();
+	return actions[actionWithData].Data();
 }
 
 void UndoHistory::BeginUndoAction() {
@@ -1579,7 +1579,7 @@ void CellBuffer::PerformUndoStep() {
 		if (changeHistory) {
 			changeHistory->UndoDeleteStep(actionStep.position, actionStep.lenData, uh.AfterDetachPoint());
 		}
-		BasicInsertString(actionStep.position, actionStep.data.get(), actionStep.lenData);
+		BasicInsertString(actionStep.position, actionStep.Data(), actionStep.lenData);
 	}
 	uh.CompletedUndoStep();
 }
@@ -1603,7 +1603,7 @@ void CellBuffer::PerformRedoStep() {
 			changeHistory->Insert(actionStep.position, actionStep.lenData, collectingUndo,
 				uh.BeforeSavePoint() && !uh.AfterDetachPoint());
 		}
-		BasicInsertString(actionStep.position, actionStep.data.get(), actionStep.lenData);
+		BasicInsertString(actionStep.position, actionStep.Data(), actionStep.lenData);
 	} else if (actionStep.at == ActionType::remove) {
 		if (changeHistory) {
 			changeHistory->DeleteRangeSavingHistory(actionStep.position, actionStep.lenData,
