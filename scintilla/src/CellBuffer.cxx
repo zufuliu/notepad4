@@ -26,7 +26,6 @@
 #include "VectorISA.h"
 
 #include "Position.h"
-#include "UniqueString.h"
 #include "SplitVector.h"
 #include "Partitioning.h"
 #include "RunStyles.h"
@@ -333,14 +332,20 @@ public:
 };
 
 void Action::Create(ActionType at_, Sci::Position position_, const char *data_, Sci::Position lenData_, bool mayCoalesce_) {
-	position = position_;
 	at = at_;
 	mayCoalesce = mayCoalesce_;
+	position = position_;
 	lenData = lenData_;
-	data = nullptr;
+	char *ptr = nullptr;
 	if (lenData_) {
-		data = UniqueCopy(data_, lenData_);
+		char *text = smallData;
+		if (lenData_ > smallSize) {
+			text = new char[lenData_];
+			ptr = text;
+		}
+		memcpy(text, data_, lenData_);
 	}
+	data.reset(ptr);
 }
 
 void Action::Clear() noexcept {

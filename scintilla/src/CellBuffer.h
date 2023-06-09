@@ -33,9 +33,11 @@ enum class ActionType : uint8_t { insert, remove, start, container };
  * Actions are used to store all the information required to perform one undo/redo step.
  */
 class Action {
+	static constexpr Sci::Position smallSize = sizeof(size_t) - 2;
 public:
 	ActionType at = ActionType::insert;
 	bool mayCoalesce = false;
+	char smallData[smallSize]{};
 	Sci::Position position = 0;
 	Sci::Position lenData = 0;
 	std::unique_ptr<char[]> data;
@@ -44,7 +46,7 @@ public:
 	void Create(ActionType at_, Sci::Position position_ = 0, const char *data_ = nullptr, Sci::Position lenData_ = 0, bool mayCoalesce_ = true);
 	void Clear() noexcept;
 	const char *Data() const noexcept {
-		return data.get();
+		return (lenData <= smallSize) ? smallData : data.get();
 	}
 };
 
