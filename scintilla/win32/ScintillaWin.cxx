@@ -1828,6 +1828,7 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 
 	case WM_CHAR:
 		//printf("%s:%d WM_CHAR %u, consumed=%d\n", __func__, __LINE__, (UINT)wParam, lastKeyDownConsumed);
+		HideCursorIfPreferred();
 		if (wParam >= ' ' || !lastKeyDownConsumed) {
 			// filter out control characters
 			// https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input#character-messages
@@ -1853,7 +1854,6 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 				lastHighSurrogateChar = 0;
 				wclen = 2;
 			}
-			HideCursorIfPreferred();
 			AddWString(std::wstring_view(wcs, wclen), CharacterSource::DirectInput);
 		}
 		return 0;
