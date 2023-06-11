@@ -611,7 +611,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				if ((HereDoc.DelimiterLength == 0 && sc.MatchLineEnd())
 					|| (styler.Match(sc.currentPos, HereDoc.Delimiter) && IsEOLChar(sc.GetRelative(HereDoc.DelimiterLength)))) {
-					sc.Forward(HereDoc.DelimiterLength);
+					if (HereDoc.DelimiterLength != 0) {
+						sc.SetState(SCE_SH_HERE_DELIM);
+						sc.Forward(HereDoc.DelimiterLength);
+					}
 					sc.SetState(SCE_SH_DEFAULT);
 					break;
 				}
@@ -937,7 +940,9 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			break;
 
 		case SCE_SH_HERE_DELIM:
-			if (stylePrev != SCE_SH_HERE_DELIM) {
+			if (stylePrev == SCE_SH_HERE_Q) {
+				levelCurrent--;
+			} else if (stylePrev != SCE_SH_HERE_DELIM) {
 				if (ch == '<' && styler[startPos + 1] != '<') {
 					levelCurrent++;
 				}
