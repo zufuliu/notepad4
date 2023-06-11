@@ -237,19 +237,19 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Idler idler;
 
 	Point lastClick;
-	unsigned int lastClickTime;
 	Point doubleClickCloseThreshold;
+	unsigned int lastClickTime;
 	int dwellDelay;
 	int ticksToDwell;
 	bool dwelling;
+	bool dropWentOutside;
 	enum class TextUnit {
 		character, word, subLine, wholeLine
 	} selectionUnit;
-	Point ptMouseLast;
 	enum class DragDrop {
 		none, initial, dragging
 	} inDragDrop;
-	bool dropWentOutside;
+	Point ptMouseLast;
 	SelectionPosition posDrop;
 	Sci::Position hotSpotClickPos;
 	int lastXChosen;
@@ -278,19 +278,18 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	Scintilla::IdleStyling idleStyling;
 	bool needIdleStyling;
 
+	bool recordingMacro;
+	bool convertPastes;
+
 	bool commandEvents;
 	Scintilla::ModificationFlags modEventMask;
 
 	SelectionText drag;
 
 	CaretPolicies caretPolicies;
-
 	VisiblePolicySlop visiblePolicy;
 
 	Sci::Position searchAnchor;
-
-	bool recordingMacro;
-	bool convertPastes;
 
 	Scintilla::AutomaticFold foldAutomatic;
 

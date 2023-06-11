@@ -400,11 +400,13 @@ class ScintillaWin final :
 
 	bool capturedMouse = false;
 	bool trackedMouseLeave = false;
+	bool cursorIsHidden = false;
 	bool hasOKText = false;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	SetCoalescableTimerSig SetCoalescableTimerFn = nullptr;
 #endif
 
+	BOOL typingWithoutCursor = FALSE;
 	UINT linesPerScroll = 0;	///< Intellimouse support
 	UINT charsPerScroll = 0;	///< Intellimouse support
 	MouseWheelDelta verticalWheelDelta;
@@ -536,6 +538,7 @@ class ScintillaWin final :
 	void SetMouseCapture(bool on) noexcept override;
 	bool HaveMouseCapture() const noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
+	void HideCursorIfPreferred() noexcept;
 	void UpdateBaseElements() override;
 	bool SCICALL PaintContains(PRectangle rc) const noexcept override;
 	void ScrollText(Sci::Line linesToMove) override;
@@ -569,7 +572,7 @@ class ScintillaWin final :
 		Binary,		// used in Copy & Paste for asBinary
 	};
 
-	void GetIntelliMouseParameters() noexcept;
+	void GetMouseParameters() noexcept;
 	void CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) const;
 	void CopyToClipboard(const SelectionText &selectedText) const override;
 	void ScrollMessage(WPARAM wParam);
@@ -1524,6 +1527,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		}
 
 		view.imeCaretBlockOverride = KoreanIME();
+		HideCursorIfPreferred();
 	}
 
 	EnsureCaretVisible();
@@ -1704,6 +1708,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 	break;
 
 	case WM_MOUSEMOVE: {
+		cursorIsHidden = false; // to be shown by ButtonMoveWithModifiers
 		const Point pt = PointFromLParam(lParam);
 
 		// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
@@ -1848,6 +1853,7 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 				lastHighSurrogateChar = 0;
 				wclen = 2;
 			}
+			HideCursorIfPreferred();
 			AddWString(std::wstring_view(wcs, wclen), CharacterSource::DirectInput);
 		}
 		return 0;
@@ -2210,8 +2216,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_CREATE:
 			ctrlID = ::GetDlgCtrlID(MainHWND());
 			UpdateBaseElements();
-			// Get Intellimouse scroll line parameters
-			GetIntelliMouseParameters();
+			GetMouseParameters();
 			::RegisterDragDrop(MainHWND(), &dt);
 			break;
 
@@ -2272,10 +2277,12 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 		case WM_SETCURSOR:
 			if (LOWORD(lParam) == HTCLIENT) {
-				POINT pt;
-				if (::GetCursorPos(&pt)) {
-					::ScreenToClient(MainHWND(), &pt);
-					DisplayCursor(ContextCursor(PointFromPOINTEx(pt)));
+				if (!cursorIsHidden) {
+					POINT pt;
+					if (::GetCursorPos(&pt)) {
+						::ScreenToClient(MainHWND(), &pt);
+						DisplayCursor(ContextCursor(PointFromPOINTEx(pt)));
+					}
 				}
 				return TRUE;
 			}
@@ -2293,8 +2300,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			//Platform::DebugPrintf("Setting Changed\n");
 			UpdateRenderingParams(true);
 			UpdateBaseElements();
-			// Get Intellimouse scroll line parameters
-			GetIntelliMouseParameters();
+			GetMouseParameters();
 			InvalidateStyleRedraw();
 			//printf("%s after %s\n", GetCurrentLogTime(), "WM_SETTINGCHANGE");
 			break;
@@ -2564,6 +2570,14 @@ void ScintillaWin::SetTrackMouseLeaveEvent(bool on) noexcept {
 		TrackMouseEvent(&tme);
 	}
 	trackedMouseLeave = on;
+}
+
+void ScintillaWin::HideCursorIfPreferred() noexcept {
+	// SPI_GETMOUSEVANISH from OS.
+	if (typingWithoutCursor && !cursorIsHidden) {
+		::SetCursor(nullptr);
+		cursorIsHidden = true;
+	}
 }
 
 void ScintillaWin::UpdateBaseElements() {
@@ -3432,7 +3446,8 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 	return rcSize; // MS API says reconv structure to be returned.
 }
 
-void ScintillaWin::GetIntelliMouseParameters() noexcept {
+void ScintillaWin::GetMouseParameters() noexcept {
+	::SystemParametersInfo(SPI_GETMOUSEVANISH, 0, &typingWithoutCursor, 0);
 	// This retrieves the number of lines per scroll as configured in the Mouse Properties sheet in Control Panel
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);
 	if (!::SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &charsPerScroll, 0)) {

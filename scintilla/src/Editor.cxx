@@ -129,15 +129,15 @@ Editor::Editor() {
 	mouseDownCaptures = true;
 	mouseWheelCaptures = true;
 
-	lastClickTime = 0;
 	doubleClickCloseThreshold = Point(3, 3);
+	lastClickTime = 0;
 	dwellDelay = TimeForever;
 	ticksToDwell = TimeForever;
 	dwelling = false;
+	dropWentOutside = false;
+	inDragDrop = DragDrop::none;
 	ptMouseLast.x = 0;
 	ptMouseLast.y = 0;
-	inDragDrop = DragDrop::none;
-	dropWentOutside = false;
 	posDrop = SelectionPosition(Sci::invalidPosition);
 	hotSpotClickPos = Sci::invalidPosition;
 	selectionUnit = TextUnit::character;
@@ -188,15 +188,15 @@ Editor::Editor() {
 	idleStyling = IdleStyling::None;
 	needIdleStyling = false;
 
+	recordingMacro = false;
+	convertPastes = true;
+
 	commandEvents = true;
 	modEventMask = ModificationFlags::EventMaskAll;
 
-	pdoc->AddWatcher(this, nullptr);
-
-	recordingMacro = false;
-	convertPastes = true;
 	foldAutomatic = AutomaticFold::None;
 
+	pdoc->AddWatcher(this, nullptr);
 	SetRepresentations();
 }
 
