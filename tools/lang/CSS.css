@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 14 February 2023
-// 2023-04-15 https://drafts.csswg.org/
+// 2023-06-17 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -10,7 +10,7 @@
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
 
-// CSS Animations Level 2 https://www.w3.org/TR/css-animations-2/ 2 March 2023
+// CSS Animations Level 2 https://www.w3.org/TR/css-animations-2/ 2 June 2023
 // CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 2 March 2023
 @keyframes
 from to
@@ -739,7 +739,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	max-device-aspect-ratio:;
 }
 
-// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 22 June 2022
+// CSS Mobile Text Size Adjustment Module Level 1 https://drafts.csswg.org/css-size-adjust/ 23 June 2022
 {
 	text-size-adjust: auto | none;
 }
@@ -998,7 +998,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	scrollbar-width: auto | thin | none;
 }
 
-// Scroll-driven Animations https://www.w3.org/TR/scroll-animations-1/ 6 April 2023
+// Scroll-driven Animations https://www.w3.org/TR/scroll-animations-1/ 6 June 2023
 {
 	scroll-timeline-name: none;
 	scroll-timeline-axis: block | inline | vertical | horizontal;
@@ -1012,6 +1012,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	animation-range:;
 	animation-range-start:;
 	animation-range-end:;
+	timeline-scope:;
 }
 scroll()
 block inline vertical horizontal
@@ -1279,10 +1280,15 @@ pow() sqrt() hypot() log() exp()
 abs() sign()
 pi infinity NaN
 
-// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 24 November 2022
+// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 30 May 2023
 {
 	view-transition-name: none;
 }
+::view-transition
+::view-transition-group()
+::view-transition-image-pair()
+::view-transition-old()
+::view-transition-new()
 
 // Visual formatting model https://www.w3.org/TR/CSS22/visuren.html
 {
@@ -1323,7 +1329,7 @@ pi infinity NaN
 	visibility: visible | hidden | collapse;
 }
 
-// Web Animations https://www.w3.org/TR/web-animations-1/ 8 September 2022
+// Web Animations https://www.w3.org/TR/web-animations-1/ 5 June 2023
 
 // CSS Will Change Module Level 1 https://www.w3.org/TR/css-will-change-1/ 5 May 2022
 {
@@ -1367,7 +1373,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 27 March 2023
+// Compatibility https://compat.spec.whatwg.org/ 18 May 2023
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

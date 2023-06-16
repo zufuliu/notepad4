@@ -113,7 +113,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "text-emphasis text-emphasis-color text-emphasis-position text-emphasis-skip text-emphasis-style text-group-align "
 "text-indent text-justify text-orientation text-overflow text-rendering "
 "text-shadow text-size-adjust text-spacing text-spacing-trim text-transform "
-"text-underline-offset text-underline-position text-wrap top touch-action "
+"text-underline-offset text-underline-position text-wrap timeline-scope top touch-action "
 "transform transform-box transform-origin transform-style "
 "transition transition-delay transition-duration transition-property transition-timing-function translate "
 "unicode-bidi unicode-range update user-select user-zoom "
@@ -149,6 +149,7 @@ static KEYWORDLIST Keywords_CSS = {{
 "^-moz- ^-ms- ^-o- ^-webkit- after before blank( content "
 "file-selector-button first-letter first-line footnote-call footnote-marker grammar-error highlight( marker "
 "nth-fragment( part( placeholder postfix prefix region selection shadow slot( spelling-error target-text "
+"view-transition view-transition-group( view-transition-image-pair( view-transition-new( view-transition-old( "
 
 , // 4 color names
 "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood "
