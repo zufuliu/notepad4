@@ -1448,7 +1448,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		return 0;
 	}
 
-
 	const DelaySavePoint delay(pdoc);
 	const bool tentative = pdoc->TentativeActive();
 	if (tentative) {

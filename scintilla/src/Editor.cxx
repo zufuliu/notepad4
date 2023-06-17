@@ -1554,7 +1554,7 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 		}
 		wrapPending.Wrapped(lineNumber);
 	}
-	return wrapOccurred;;
+	return wrapOccurred;
 }
 
 // Perform  wrapping for a subset of the lines needing wrapping.
