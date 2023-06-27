@@ -22,7 +22,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * [Context-based auto-completion for some words](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#context-based-auto-completion)
 * [Enhanced auto indentation](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-indent-text)
 * [Auto completion for braces, brackets and quotes](https://github.com/zufuliu/notepad2/wiki/Auto-Completion-in-Notepad2#auto-insert-text)
-* Previewing colour via CallTip and opening the colour dialogue box by clicking on CallTip
+* [Color preview via CallTip and click CallTip to open color dialog](https://github.com/zufuliu/notepad2/wiki/CallTip)
 * Support Base64 encoding and decoding
 * Syntax highlighting, code folding and API list for (see built-in [file extension list](doc/FileExt.txt)):
 	* Plain Text
