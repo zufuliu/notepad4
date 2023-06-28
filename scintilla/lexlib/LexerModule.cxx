@@ -70,6 +70,7 @@ extern LexerModule lmLua;
 extern LexerModule lmMakefile;
 extern LexerModule lmMarkdown;
 extern LexerModule lmMatlab;
+extern LexerModule lmNim;
 extern LexerModule lmNsis;
 extern LexerModule lmNull;
 extern LexerModule lmPascal;
@@ -147,6 +148,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmMakefile,
 	&lmMarkdown,
 	&lmMatlab,
+	&lmNim,
 	&lmNsis,
 	&lmNull,
 	&lmPascal,

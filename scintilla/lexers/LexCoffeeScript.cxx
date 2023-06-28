@@ -489,6 +489,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			if (!nestedState.empty() || !(jsxTagLevel == 0 && jsxTagLevels.empty())) {
 				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
 			} else if (IsMultilineStyle(sc.state)) {
+				lineState &= ~PyLineStateMaskCommentLine;
 				lineState |= PyLineStateMaskTripleQuote;
 			} else if (visibleChars == 0) {
 				lineState |= PyLineStateMaskEmptyLine;

@@ -472,14 +472,14 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 		}
 		if (sc.atLineEnd) {
-			lineState |= (commentLevel << 8) | (indentCount << 16);
 			if (!nestedState.empty() || xmlTagLevel != 0) {
-				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
+				lineState = PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
 			} else if (IsMultilineStyle(sc.state)) {
-				lineState |= PyLineStateMaskTripleQuote;
+				lineState = PyLineStateMaskTripleQuote;
 			} else if (visibleChars == 0) {
-				lineState |= PyLineStateMaskEmptyLine;
+				lineState = PyLineStateMaskEmptyLine;
 			}
+			lineState |= (commentLevel << 8) | (indentCount << 16);
 			styler.SetLineState(sc.currentLine, lineState);
 			lineState = 0;
 			indentCount = 0;

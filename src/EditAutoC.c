@@ -2458,6 +2458,7 @@ void EditToggleCommentLine(void) {
 	case NP2LEX_JAMFILE:
 	case NP2LEX_JULIA:
 	case NP2LEX_MAKEFILE:
+	case NP2LEX_NIM:
 	case NP2LEX_NSIS:
 	case NP2LEX_PERL:
 	case NP2LEX_POWERSHELL:
@@ -2662,6 +2663,10 @@ void EditToggleCommentBlock(void) {
 
 	case NP2LEX_MARKDOWN:
 		EditEncloseSelection(L"<!--", L"-->");
+		break;
+
+	case NP2LEX_NIM:
+		EditEncloseSelection(L"#[", L"]#");
 		break;
 
 	case NP2LEX_PASCAL:
@@ -3038,6 +3043,13 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		PlainTextStyleMask[1] = UINT32_MAX;
 		PlainTextStyleMask[2] = UINT32_MAX;
 		PlainTextStyleMask[3] = UINT32_MAX;
+		break;
+
+	case NP2LEX_NIM:
+		RawStringStyleMask[SCE_NIM_RAWSTRING >> 5] |= (1U << (SCE_NIM_RAWSTRING & 31));
+		RawStringStyleMask[SCE_NIM_RAWFMTSTRING >> 5] |= (1U << (SCE_NIM_RAWFMTSTRING & 31));
+		RawStringStyleMask[SCE_NIM_TRIPLE_STRING >> 5] |= (1U << (SCE_NIM_TRIPLE_STRING & 31));
+		RawStringStyleMask[SCE_NIM_TRIPLE_FMTSTRING >> 5] |= (1U << (SCE_NIM_TRIPLE_FMTSTRING & 31));
 		break;
 
 	case NP2LEX_PERL:

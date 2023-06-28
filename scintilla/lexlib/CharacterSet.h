@@ -238,6 +238,10 @@ constexpr bool IsOctalOrHex(int ch, bool hex) noexcept {
 	return diff < 8 || (hex && (diff < 10 || Between(UnsafeLower(ch), 'a', 'f')));
 }
 
+constexpr bool IsDecimalOrHex(int ch, bool hex) noexcept {
+	return IsADigit(ch) || (hex && Between(UnsafeLower(ch), 'a', 'f'));
+}
+
 constexpr bool IsADigitEx(int ch, int base) noexcept {
 	if (base <= 10) {
 		return (ch >= '0' && ch < '0' + base);

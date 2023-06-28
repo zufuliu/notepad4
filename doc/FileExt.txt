@@ -389,7 +389,7 @@ LLVM IR
 Lua Script
 	lua
 	wlua
-	nse
+	nse				https://nmap.org
 	luadoc
 	luax
 
@@ -423,6 +423,11 @@ MATLAB Code
 	sce				Scilab
 	sci				Scilab
 
+
+Nim Script
+	nim
+	nimble
+	nimrod
 
 Nsis Setup Script
 	nsi				NSIS Script

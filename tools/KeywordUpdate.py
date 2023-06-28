@@ -64,6 +64,7 @@ lexerList = [
 	('NP2LEX_MATLAB', 'stlMatlab.c', 'LexMatlab.cxx', '', 0, None),
 	('NP2LEX_MARKDOWN', 'stlMarkdown.c', 'LexMarkdown.cxx', '', 0, parse_markdown_api_file),
 
+	('NP2LEX_NIM', 'stlNim.c', 'LexNim.cxx', 'Nim.nim', 0, parse_nim_api_file),
 	('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
 
 	('NP2LEX_PASCAL', 'stlPascal.c', 'LexPascal.cxx', '', 0, None),

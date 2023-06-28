@@ -59,6 +59,7 @@
       <File Name="../../scintilla/lexers/LexMakefile.cxx"/>
       <File Name="../../scintilla/lexers/LexMarkdown.cxx"/>
       <File Name="../../scintilla/lexers/LexMatlab.cxx"/>
+      <File Name="../../scintilla/lexers/LexNim.cxx"/>
       <File Name="../../scintilla/lexers/LexNSIS.cxx"/>
       <File Name="../../scintilla/lexers/LexNull.cxx"/>
       <File Name="../../scintilla/lexers/LexPascal.cxx"/>
@@ -236,6 +237,7 @@
       <File Name="../../src/EditLexers/stlMake.c"/>
       <File Name="../../src/EditLexers/stlMarkdown.c"/>
       <File Name="../../src/EditLexers/stlMATLAB.c"/>
+      <File Name="../../src/EditLexers/stlNim.c"/>
       <File Name="../../src/EditLexers/stlNsis.c"/>
       <File Name="../../src/EditLexers/stlPascal.c"/>
       <File Name="../../src/EditLexers/stlPerl.c"/>

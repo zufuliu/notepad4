@@ -110,6 +110,7 @@ extern EDITLEXER lexMakefile;
 extern EDITLEXER lexMarkdown;
 extern EDITLEXER lexMatlab;
 
+extern EDITLEXER lexNim;
 extern EDITLEXER lexNsis;
 
 extern EDITLEXER lexPascal;
@@ -214,6 +215,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexMarkdown,
 	&lexMatlab,
 
+	&lexNim,
 	&lexNsis,
 
 	&lexPascal,

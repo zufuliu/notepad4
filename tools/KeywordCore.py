@@ -1661,6 +1661,27 @@ def parse_markdown_api_file(path):
 		('html block tag', blockTag, KeywordAttr.NoAutoComp),
 	]
 
+def parse_nim_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '#')
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+		elif key == 'api':
+			items = re.findall(r'(proc|func|method|iterator|macro|template|converter)\s+(\w+)', doc)
+			items = [item[1] + '()' for item in items]
+			keywordMap['functions'] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'types',
+		'keywords',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
+	]
+
 def parse_nsis_api_file(path):
 	keywordMap = {}
 	sections = read_api_file(path, ';')

@@ -518,6 +518,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexMakefile.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMarkdown.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMatlab.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexNim.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexNSIS.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexNull.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPascal.cxx" />
@@ -639,6 +640,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlMarkdown.c" />
     <ClCompile Include="..\..\src\EditLexers\stlMATLAB.c" />
     <ClCompile Include="..\..\src\EditLexers\stlNsis.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlNim.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPascal.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPerl.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPHP.c" />

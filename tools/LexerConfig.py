@@ -676,6 +676,25 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_MAT_STRING', 'SCE_MAT_DOUBLEQUOTESTRING'],
 	},
 
+	'NP2LEX_NIM': {
+		'line_comment_string': '#',
+		'block_comment_string': ('#[', ']#'),
+		'comment_style_marker': 'SCE_NIM_TASKMARKER',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['type', 'function'],
+		'default_fold_ignore_inner': 'SCE_NIM_FUNCTION_DEFINITION',
+		#'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_NIM_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_NIM_ESCAPECHAR',
+		'raw_string_style': ['SCE_NIM_RAWSTRING', 'SCE_NIM_RAWFMTSTRING',
+			'SCE_NIM_TRIPLE_STRING', 'SCE_NIM_TRIPLE_FMTSTRING',
+		],
+		'character_style': ['SCE_NIM_CHARACTER'],
+		'none_quote_style': 'SCE_NIM_NUMBER',
+		'operator_style': ['SCE_NIM_OPERATOR', 'SCE_NIM_OPERATOR2'],
+		'string_style_range': ['SCE_NIM_CHARACTER', 'SCE_NIM_FORMAT_SPECIFIER'],
+	},
 	'NP2LEX_NSIS': {
 		'line_comment_string': ['#'], # omited ';'
 		'block_comment_string': ('/*', '*/'),
