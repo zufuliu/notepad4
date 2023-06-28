@@ -112,7 +112,6 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int indentCount = 0;
 	int xmlTagLevel = 0;
 	bool insideXmlTag = false;
-	bool singleLineComment = false;
 
 	int chBefore = 0;
 	int visibleCharsBefore = 0;
@@ -242,8 +241,8 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				--commentLevel;
 				if (commentLevel == 0) {
 					sc.ForwardSetState(SCE_SCALA_DEFAULT);
-					if (singleLineComment && sc.GetLineNextChar() == '\0') {
-						lineState |= PyLineStateMaskCommentLine;
+					if (lineState == PyLineStateMaskCommentLine && sc.GetLineNextChar() != '\0') {
+						lineState = 0;
 					}
 				}
 			} else if (sc.Match('/', '*')) {
@@ -390,7 +389,9 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.Match('/', '*')) {
 				commentLevel = 1;
 				visibleCharsBefore = visibleChars;
-				singleLineComment = visibleChars == 0;
+				if (visibleChars == 0) {
+					lineState = PyLineStateMaskCommentLine;
+				}
 				sc.SetState(SCE_SCALA_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == '*' && sc.chNext != '*') {
@@ -482,7 +483,6 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			styler.SetLineState(sc.currentLine, lineState);
 			lineState = 0;
 			indentCount = 0;
-			singleLineComment = false;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			kwType = KeywordType::None;

@@ -767,7 +767,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					chBefore = chPrevNonWhite;
 					sc.SetState((sc.ch == '\'') ? SCE_PY_STRING_SQ : SCE_PY_STRING_DQ);
 				}
-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_PY_NUMBER);
 			} else if (IsPyStringPrefix(sc.ch)) {
 				insideUrl = false;

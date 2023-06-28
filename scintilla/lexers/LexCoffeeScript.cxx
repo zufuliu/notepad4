@@ -106,7 +106,6 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 	int indentCount = 0;
 	bool prevLineContinuation = false;
 	bool lineContinuation = false;
-	bool singleLineComment = false;
 	int lineState = 0;
 
 	int chPrevNonWhite = 0;
@@ -315,8 +314,8 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			if (sc.Match('#', '#', '#')) {
 				sc.Advance(2);
 				sc.ForwardSetState(SCE_COFFEESCRIPT_DEFAULT);
-				if (singleLineComment && sc.GetLineNextChar() == '\0') {
-					lineState |= PyLineStateMaskCommentLine;
+				if (lineState == PyLineStateMaskCommentLine && sc.GetLineNextChar() != '\0') {
+					lineState = 0;
 				}
 			}
 			break;
@@ -365,14 +364,13 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 
 		if (sc.state == SCE_COFFEESCRIPT_DEFAULT) {
 			if (sc.ch == '#') {
+				if (visibleChars == 0) {
+					lineState = PyLineStateMaskCommentLine;
+				}
 				if (sc.MatchNext('#', '#')) {
-					singleLineComment = visibleChars == 0;
 					sc.SetState(SCE_COFFEESCRIPT_COMMENTBLOCK);
 					sc.Advance(2);
 				} else {
-					if (visibleChars == 0) {
-						lineState = PyLineStateMaskCommentLine;
-					}
 					sc.SetState(SCE_COFFEESCRIPT_COMMENTLINE);
 				}
 			} else if (sc.ch == '\'') {
@@ -498,7 +496,6 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			styler.SetLineState(sc.currentLine, lineState);
 			lineState = 0;
 			insideRegexRange = false;
-			singleLineComment = false;
 			visibleChars = 0;
 			indentCount = 0;
 		}
