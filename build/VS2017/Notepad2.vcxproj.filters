@@ -240,6 +240,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexZig.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx">
       <Filter>Scintilla\lexlib</Filter>
     </ClCompile>
@@ -607,6 +610,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlYAML.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlZig.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
   </ItemGroup>

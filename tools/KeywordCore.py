@@ -2537,6 +2537,31 @@ def parse_yaml_api_file(path):
 		('keywords', keywords, KeywordAttr.Default),
 	]
 
+def parse_zig_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '//')
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+		elif key == 'builtin':
+			items = re.findall(r'@(\w+\()', doc)
+			keywordMap[key] = items
+		elif key == 'api':
+			items = re.findall(r'\Wfn\s+(\w+)', doc)
+			items = [item + '()' for item in items]
+			keywordMap['functions'] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('built-in functions', keywordMap['builtin'], KeywordAttr.NoLexer | KeywordAttr.Special),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
+	]
+
 def UpdateLexerKeywordAttr(indexPath, lexerPath):
 	#print(SinglyWordMap)
 	output = []

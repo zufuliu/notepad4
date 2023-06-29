@@ -544,6 +544,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexVim.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexWASM.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexZig.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\DefaultLexer.cxx" />
@@ -667,6 +668,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlWASM.c" />
     <ClCompile Include="..\..\src\EditLexers\stlXML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlYAML.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlZig.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\scintilla\include\GraphicUtils.h" />

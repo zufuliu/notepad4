@@ -1058,6 +1058,19 @@ LexerConfigMap = {
 		'escape_char_style': 'SCE_YAML_ESCAPECHAR',
 		'operator_style': ['SCE_YAML_OPERATOR'],
 	},
+	'NP2LEX_ZIG': {
+		'line_comment_string': '//',
+		'comment_style_marker': 'SCE_ZIG_TASKMARKER',
+		'default_fold_level': ['class', 'function'],
+		'default_fold_ignore_inner': 'SCE_ZIG_FUNCTION_DEFINITION',
+		#'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_ZIG_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_ZIG_ESCAPECHAR',
+		'raw_string_style': ['SCE_ZIG_MULTISTRING'],
+		'character_style': ['SCE_ZIG_CHARACTER'],
+		'operator_style': ['SCE_ZIG_OPERATOR'],
+		'string_style_range': ['SCE_ZIG_CHARACTER', 'SCE_ZIG_FORMAT_SPECIFIER'],
+	},
 }
 
 def get_enum_flag_expr(flag, merge=True, separator='_'):

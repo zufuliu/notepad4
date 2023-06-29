@@ -427,6 +427,7 @@ MATLAB Code
 Nim Script
 	nim
 	nimble
+	nims
 	nimrod
 
 Nsis Setup Script
@@ -579,6 +580,8 @@ YAML Document
 	apinotes		Swift API Notes
 	ifs				LLVM IFS (Interface Stubs)
 
+Zig Source
+	zig
 
 https://en.wikipedia.org/wiki/List_of_filename_extensions
 https://fileinfo.com/

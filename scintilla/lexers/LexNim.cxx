@@ -35,7 +35,7 @@ constexpr bool IsTripleString(int state) noexcept {
 
 // https://nim-lang.org/docs/manual.html#lexical-analysis-string-literals
 struct EscapeSequence {
-	int outerState = SCE_PY_DEFAULT;
+	int outerState = SCE_NIM_DEFAULT;
 	int digitsLeft = 0;
 	bool hex = false;
 	bool brace = false;

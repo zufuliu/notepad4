@@ -85,6 +85,7 @@
       <File Name="../../scintilla/lexers/LexVim.cxx"/>
       <File Name="../../scintilla/lexers/LexWASM.cxx"/>
       <File Name="../../scintilla/lexers/LexYAML.cxx"/>
+      <File Name="../../scintilla/lexers/LexZig.cxx"/>
     </VirtualDirectory>
     <VirtualDirectory Name="lexlib">
       <File Name="../../scintilla/lexlib/Accessor.cxx"/>
@@ -265,6 +266,7 @@
       <File Name="../../src/EditLexers/stlWASM.c"/>
       <File Name="../../src/EditLexers/stlXML.c"/>
       <File Name="../../src/EditLexers/stlYAML.c"/>
+      <File Name="../../src/EditLexers/stlZig.c"/>
     </VirtualDirectory>
     <File Name="../../src/Bridge.cpp"/>
     <File Name="../../src/Dialogs.c"/>
