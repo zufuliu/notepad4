@@ -406,9 +406,9 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						state.parenCount += 1;
 					} else if (sc.ch == ')') {
 						state.parenCount -= 1;
-					} else if (state.parenCount == 0 && (sc.ch == ':' || sc.ch == '=' || (sc.ch == '}' && sc.chPrev != '\\'))) {
+					} else if (state.parenCount <= 0 && (sc.ch == ':' || sc.ch == '=' || (sc.ch == '}' && sc.chPrev != '\\'))) {
 						fmtPart = (sc.ch == '}') ? FormatStringPart::End : FormatStringPart::FormatSpec;
-						sc.SetState(state.state);
+						sc.ChangeState(state.state);
 						continue;
 					}
 				} else if (visibleChars == 0 && (sc.ch == '}' || sc.ch == ']' || sc.ch == ')')) {

@@ -4,8 +4,6 @@
 
 namespace Lexilla {
 
-// TODO: change packed line state to NestedStateStack (convert lexer to class).
-
 template<int valueBit, int maxStateCount, int countBit, int baseStyle>
 int PackLineState(const std::vector<int>& states) noexcept {
 	constexpr size_t countMask = (1 << countBit) - 1;
@@ -97,30 +95,5 @@ inline T TryPopAndPeek(std::vector<T>& states, T value = {}) {
 	}
 	return value;
 }
-
-#if 0
-
-// nested state stack on each line
-using NestedStateStack = std::map<Sci_Line, std::vector<int>>;
-
-inline void GetNestedState(const NestedStateStack& stateStack, Sci_Line line, std::vector<int>& states) {
-	const auto it = stateStack.find(line);
-	if (it != stateStack.end()) {
-		states = it->second;
-	}
-}
-
-inline void SaveNestedState(NestedStateStack& stateStack, Sci_Line line, const std::vector<int>& states) {
-	if (states.empty()) {
-		auto it = stateStack.find(line);
-		if (it != stateStack.end()) {
-			stateStack.erase(it);
-		}
-	} else {
-		stateStack[line] = states;
-	}
-}
-
-#endif
 
 }

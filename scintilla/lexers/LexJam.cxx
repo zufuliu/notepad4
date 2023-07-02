@@ -194,7 +194,9 @@ void ColouriseJamDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_JAM_IDENTIFIER);
 			} else if (sc.Match('$', '(')) {
-				nestedState.push_back(SCE_JAM_DEFAULT);
+				if (!nestedState.empty()) {
+					nestedState.push_back(SCE_JAM_DEFAULT);
+				}
 				sc.SetState(SCE_JAM_OPERATOR);
 				sc.Forward();
 			} else if (sc.ch == '<' && (sc.chNext == '.' || IsIdentifierStart(sc.chNext))) {

@@ -722,9 +722,7 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				} else if (sc.ch == ')' || sc.ch == ']') {
 					if (interpolating) {
 						InterpolatedStringState &state = nestedState.back();
-						if (state.parenCount > 0) {
-							--state.parenCount;
-						}
+						--state.parenCount;
 					} else {
 						if (parenCount > 0) {
 							--parenCount;
@@ -733,15 +731,11 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				}
 				if (interpolating) {
 					const InterpolatedStringState &state = nestedState.back();
-					if (state.parenCount == 0 && IsInterpolatedStringEnd(sc)) {
+					if (state.parenCount <= 0 && IsInterpolatedStringEnd(sc)) {
+						escSeq.outerState = state.state;
 						stringDelimiterCount = state.delimiterCount;
 						stringInterpolatorCount = state.interpolatorCount;
-						if (sc.ch == '}') {
-							sc.SetState(state.state);
-						} else {
-							escSeq.outerState = state.state;
-							sc.SetState(SCE_CSHARP_FORMAT_SPECIFIER);
-						}
+						sc.SetState((sc.ch == '}') ? state.state : SCE_CSHARP_FORMAT_SPECIFIER);
 						continue;
 					}
 				} else {
