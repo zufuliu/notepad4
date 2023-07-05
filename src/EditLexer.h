@@ -201,6 +201,7 @@ typedef const EDITLEXER *LPCEDITLEXER;
 #define NP2LEX_CSV			63080	// SCLEX_CSV		CSV File
 #define NP2LEX_NIM			63081	// SCLEX_NIM		Nim Script
 #define NP2LEX_ZIG			63082	// SCLEX_ZIG		Zig Source
+#define NP2LEX_OCAML		63083	// SCLEX_OCAML		OCaml Source
 
 #define NP2LEX_AVISYNTH		63087	// SCLEX_AVISYNTH	AviSynth Script
 #define NP2LEX_TEKEXTHEX	63088	// SCLEX_TEKEXTHEX	Tektronix extended HEX

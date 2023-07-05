@@ -1727,6 +1727,22 @@ def parse_nsis_api_file(path):
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
 	]
 
+def parse_ocaml_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '(*')
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'types',
+		'keywords',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+	]
+
 def parse_php_api_file(path):
 	keywordMap = {}
 	sections = read_api_file(path, '//')

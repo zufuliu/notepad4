@@ -1752,7 +1752,7 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 			}
 		}
 	} else {
-		if (iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
+		if (iCurrentStyle == pLexCurrent->noneSingleQuotedStyle || iCurrentStyle == pLexCurrent->operatorStyle) {
 			return false;
 		}
 	}

@@ -74,6 +74,7 @@ extern LexerModule lmMatlab;
 extern LexerModule lmNim;
 extern LexerModule lmNsis;
 extern LexerModule lmNull;
+extern LexerModule lmOCaml;
 extern LexerModule lmPascal;
 extern LexerModule lmPerl;
 extern LexerModule lmPHPScript;
@@ -154,6 +155,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmNim,
 	&lmNsis,
 	&lmNull,
+	&lmOCaml,
 	&lmPascal,
 	&lmPerl,
 	&lmPHPScript,

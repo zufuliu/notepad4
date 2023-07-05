@@ -107,6 +107,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Gnuplot
 	* [Nim Script](tools/lang/Nim.nim), up to Nim 1.6.
 	* [Nullsoft Scriptable Install System](tools/lang/NSIS.nsi), up to NSIS 3.09.
+	* [OCaml](tools/lang/OCaml.ml), up to OCaml 5.0.
 	* Pascal, Delphi
 	* [Perl](tools/lang/Perl.pl), up to Perl 5.36. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.

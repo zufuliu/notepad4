@@ -63,6 +63,7 @@
       <File Name="../../scintilla/lexers/LexNim.cxx"/>
       <File Name="../../scintilla/lexers/LexNSIS.cxx"/>
       <File Name="../../scintilla/lexers/LexNull.cxx"/>
+      <File Name="../../scintilla/lexers/LexOCaml.cxx"/>
       <File Name="../../scintilla/lexers/LexPascal.cxx"/>
       <File Name="../../scintilla/lexers/LexPerl.cxx"/>
       <File Name="../../scintilla/lexers/LexPHP.cxx"/>
@@ -241,6 +242,7 @@
       <File Name="../../src/EditLexers/stlMATLAB.c"/>
       <File Name="../../src/EditLexers/stlNim.c"/>
       <File Name="../../src/EditLexers/stlNsis.c"/>
+      <File Name="../../src/EditLexers/stlOCaml.c"/>
       <File Name="../../src/EditLexers/stlPascal.c"/>
       <File Name="../../src/EditLexers/stlPerl.c"/>
       <File Name="../../src/EditLexers/stlPHP.c"/>

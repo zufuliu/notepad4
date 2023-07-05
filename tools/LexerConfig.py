@@ -716,6 +716,22 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_NSIS_STRINGDQ', 'SCE_NSIS_ESCAPECHAR'],
 	},
 
+	'NP2LEX_OCAML': {
+		'block_comment_string': ('(*', '*)'),
+		'comment_style_marker': 'SCE_OCAML_COMMENT',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['function'],
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_OCAML_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_OCAML_ESCAPECHAR',
+		'raw_string_style': ['SCE_OCAML_QUOTED_STRING'],
+		'character_style': ['SCE_OCAML_CHARACTER'],
+		'none_quote_style': 'SCE_OCAML_IDENTIFIER',
+		'operator_style': ['SCE_OCAML_OPERATOR'],
+		'string_style_range': ['SCE_OCAML_CHARACTER', 'SCE_OCAML_FORMAT_SPECIFIER'],
+	},
+
 	'NP2LEX_PASCAL': {
 		'line_comment_string': '//',
 		'block_comment_string': [('{', '}')], # omited ('(*', '*)')

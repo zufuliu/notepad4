@@ -74,7 +74,7 @@ void ColouriseMathematicaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int
 				if (sc.state == SCE_MATHEMATICA_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
-					if (keywordLists[0].InList(s)) {
+					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						sc.ChangeState(SCE_MATHEMATICA_KEYWORD);
 					}
 					sc.SetState(SCE_MATHEMATICA_DEFAULT);

@@ -114,6 +114,8 @@ extern EDITLEXER lexMatlab;
 extern EDITLEXER lexNim;
 extern EDITLEXER lexNsis;
 
+extern EDITLEXER lexOCaml;
+
 extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
 extern EDITLEXER lexPowerShell;
@@ -221,6 +223,8 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexNim,
 	&lexNsis,
+
+	&lexOCaml,
 
 	&lexPascal,
 	&lexPerl,

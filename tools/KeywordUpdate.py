@@ -68,6 +68,8 @@ lexerList = [
 	('NP2LEX_NIM', 'stlNim.c', 'LexNim.cxx', 'Nim.nim', 0, parse_nim_api_file),
 	('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
 
+	('NP2LEX_OCAML', 'stlOCaml.c', 'LexOCaml.cxx', 'OCaml.ml', 0, parse_ocaml_api_file),
+
 	('NP2LEX_PASCAL', 'stlPascal.c', 'LexPascal.cxx', '', 0, None),
 	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', 'Perl.pl', 0, parse_perl_api_file),
 	('NP2LEX_PHP', 'stlPHP.c', 'LexPHP.cxx', 'PHP.php', 1, parse_php_api_file),
