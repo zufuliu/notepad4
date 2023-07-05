@@ -108,6 +108,7 @@ extern EDITLEXER lexLua;
 
 extern EDITLEXER lexMakefile;
 extern EDITLEXER lexMarkdown;
+extern EDITLEXER lexMathematica;
 extern EDITLEXER lexMatlab;
 
 extern EDITLEXER lexNim;
@@ -215,6 +216,7 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexMakefile,
 	&lexMarkdown,
+	&lexMathematica,
 	&lexMatlab,
 
 	&lexNim,
@@ -2146,7 +2148,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 		case '(':
 			++p;
 			if (*p == '*') { // Mathematica comment
-				return &lexFSharp;
+				return &lexMathematica;
 			}
 			break;
 		case '@':	// ObjC keyword or Matlab command

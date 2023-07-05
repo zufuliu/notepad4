@@ -290,11 +290,6 @@ F# Source
 	fsscript		F# Script
 	fsl
 	fsy
-	m				Mathematica Module
-	ml				OCaml
-	mli				OCaml
-	sml				OCaml
-	nb				Mathematica Notebook
 
 
 GN Build Script
@@ -418,6 +413,12 @@ Markdown
 
 	litcoffee		Literate CoffeeScript
 
+Mathematica
+	m				Module
+	nb				Notebook
+	wl				WolframScript
+	wls				WolframScript
+
 MATLAB Code
 	m				MATLAB / Octave
 	sce				Scilab
@@ -434,6 +435,14 @@ Nsis Setup Script
 	nsi				NSIS Script
 	nsh				NSIS Header File
 	nlf				NSIS Language File
+
+
+OCaml Source
+	ml
+	mli
+	mll
+	mly
+	sml				Standard ML
 
 
 Pascal Source

@@ -653,6 +653,15 @@ LexerConfigMap = {
 		'extra_word_char': '-$!',
 		'auto_ident_word_style': ['SCE_MAKE_PREPROCESSOR'],
 	},
+	'NP2LEX_MATHEMATICA': {
+		'block_comment_string': ('(*', '*)'),
+		'comment_style_marker': 'SCE_MATHEMATICA_COMMENT',
+		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
+		'escape_punctuation': True,
+		'none_quote_style': 'SCE_MATHEMATICA_OPERATOR',
+		'operator_style': ['SCE_MATHEMATICA_OPERATOR'],
+		'string_style_range': ['SCE_MATHEMATICA_STRING', 'SCE_MATHEMATICA_ESCAPECHAR'],
+	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
 		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT'],

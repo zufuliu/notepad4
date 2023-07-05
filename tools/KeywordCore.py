@@ -160,7 +160,7 @@ def UpdateAutoCompletionCache(path):
 
 def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
-		doc = re.sub(comment + r'[^!].+', '', doc) # normal comment
+		doc = re.sub(re.escape(comment) + r'[^!].+', '', doc) # normal comment
 	sections = []
 	items = doc.split(comment + "!") #! section name
 	for section in items:
@@ -1651,6 +1651,17 @@ def parse_llvm_api_file(path):
 		('type', keywordMap['type'], KeywordAttr.Default),
 		('attribute', keywordMap['attribute'], KeywordAttr.Default),
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
+	]
+
+def parse_mathematica_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '(*')
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 	]
 
 def parse_markdown_api_file(path):

@@ -2650,6 +2650,7 @@ void EditToggleCommentBlock(void) {
 		break;
 
 	case NP2LEX_FSHARP:
+	case NP2LEX_MATHEMATICA:
 		EditEncloseSelection(L"(*", L"*)");
 		break;
 
