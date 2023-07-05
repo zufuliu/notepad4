@@ -2651,6 +2651,7 @@ void EditToggleCommentBlock(void) {
 
 	case NP2LEX_FSHARP:
 	case NP2LEX_MATHEMATICA:
+	case NP2LEX_OCAML:
 		EditEncloseSelection(L"(*", L"*)");
 		break;
 
@@ -3060,6 +3061,10 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		RawStringStyleMask[SCE_NIM_RAWFMTSTRING >> 5] |= (1U << (SCE_NIM_RAWFMTSTRING & 31));
 		RawStringStyleMask[SCE_NIM_TRIPLE_STRING >> 5] |= (1U << (SCE_NIM_TRIPLE_STRING & 31));
 		RawStringStyleMask[SCE_NIM_TRIPLE_FMTSTRING >> 5] |= (1U << (SCE_NIM_TRIPLE_FMTSTRING & 31));
+		break;
+
+	case NP2LEX_OCAML:
+		RawStringStyleMask[SCE_OCAML_QUOTED_STRING >> 5] |= (1U << (SCE_OCAML_QUOTED_STRING & 31));
 		break;
 
 	case NP2LEX_PERL:
