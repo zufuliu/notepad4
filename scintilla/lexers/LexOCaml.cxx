@@ -280,6 +280,9 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_OCAML_COMMENT:
+			if (sc.atLineStart) {
+				lineState = PyLineStateMaskCommentLine;
+			}
 			if (sc.Match('(', '*')) {
 				commentLevel++;
 				sc.Forward();
@@ -363,9 +366,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				lineState = PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
 			} else if (sc.state == SCE_OCAML_STRING) {
 				lineState |= PyLineStateMaskTripleQuote;
-			} else if (sc.state == SCE_OCAML_COMMENT) {
-				lineState = PyLineStateMaskTripleQuote;
-			} else if (visibleChars == 0) {
+			} else if (lineState == 0 && visibleChars == 0) {
 				lineState = PyLineStateMaskEmptyLine;
 			}
 			lineState |= (indentCount << 16) | (commentLevel << 8);

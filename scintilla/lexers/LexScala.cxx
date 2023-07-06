@@ -75,19 +75,16 @@ constexpr bool IsSingleLineString(int state) noexcept {
 	return state == SCE_SCALA_STRING || state == SCE_SCALA_INTERPOLATED_STRING;
 }
 
+constexpr bool IsTripleString(int state) noexcept {
+	return state == SCE_SCALA_TRIPLE_STRING || state == SCE_SCALA_TRIPLE_INTERPOLATED_STRING;
+}
+
 constexpr bool IsInterpolatedString(int state) noexcept {
 	return state == SCE_SCALA_INTERPOLATED_STRING || state == SCE_SCALA_TRIPLE_INTERPOLATED_STRING;
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_SCALA_TASKMARKER;
-}
-
-constexpr bool IsMultilineStyle(int style) noexcept {
-	return style == SCE_SCALA_COMMENTBLOCK
-		|| style == SCE_SCALA_COMMENTBLOCKDOC
-		|| style == SCE_SCALA_TRIPLE_STRING
-		|| style == SCE_SCALA_TRIPLE_INTERPOLATED_STRING;
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
@@ -236,6 +233,9 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SCALA_COMMENTBLOCK:
 		case SCE_SCALA_COMMENTBLOCKDOC:
+			if (sc.atLineStart) {
+				lineState  = PyLineStateMaskCommentLine;
+			}
 			if (sc.Match('*', '/')) {
 				sc.Forward();
 				--commentLevel;
@@ -474,9 +474,9 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		if (sc.atLineEnd) {
 			if (!nestedState.empty() || xmlTagLevel != 0) {
 				lineState = PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
-			} else if (IsMultilineStyle(sc.state)) {
+			} else if (IsTripleString(sc.state)) {
 				lineState = PyLineStateMaskTripleQuote;
-			} else if (visibleChars == 0) {
+			} else if (lineState == 0 && visibleChars == 0) {
 				lineState = PyLineStateMaskEmptyLine;
 			}
 			lineState |= (commentLevel << 8) | (indentCount << 16);
