@@ -244,7 +244,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
 					insideUrl = false;
 				} else if (sc.ch == '%') {
-					const Sci_Position length = CheckFormatSpecifier(sc, sc.styler, insideUrl);
+					const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
 					if (length != 0) {
 						const int state = sc.state;
 						sc.SetState(SCE_OCAML_FORMAT_SPECIFIER);
@@ -331,7 +331,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				backPos = sc.currentPos;
 				sc.SetState(SCE_OCAML_QUOTED_STRING);
 				sc.ForwardSetState(SCE_OCAML_QUOTED_STRINGID);
-			} else if (IsNumberStart(sc.ch, sc.chNext) || (sc.ch == '#' && IsADigit(sc.chNext))) {
+			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext) || (sc.ch == '#' && IsADigit(sc.chNext))) {
 				sc.SetState(SCE_OCAML_NUMBER);
 			} else if (sc.ch == '`' && IsUpperCase(sc.chNext)) {
 				sc.SetState(SCE_OCAML_TAGNAME);
@@ -362,8 +362,11 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			visibleChars++;
 		}
 		if (sc.atLineEnd) {
-			if (sc.state == SCE_OCAML_QUOTED_STRINGID) {
-				lineState = PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
+			if (sc.state == SCE_OCAML_QUOTED_STRING) {
+				lineState = PyLineStateMaskTripleQuote;
+				if (!quotedStringId.empty()) {
+					lineState |= PyLineStateStringInterpolation;
+				}
 			} else if (sc.state == SCE_OCAML_STRING) {
 				lineState |= PyLineStateMaskTripleQuote;
 			} else if (lineState == 0 && visibleChars == 0) {
