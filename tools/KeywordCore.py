@@ -21,6 +21,7 @@ SpecialKeywordIndexList = {}
 LexerKeywordIndexList = {}
 # X11 and SVG color names
 ColorNameList = set()
+CSharpKeywordMap = {}
 JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
 GroovyKeyword = []
@@ -749,6 +750,7 @@ def parse_csharp_api_file(path):
 		'enumeration',
 		'vala types',
 	])
+	CSharpKeywordMap.update(keywordMap)
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
@@ -933,6 +935,29 @@ def parse_fortran_api_file(path):
 		('attribute', keywordMap['attribute'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.Default),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
+def parse_fsharp_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		items = []
+		if key in ('keywords', 'types'):
+			items = doc.split()
+		elif key == 'preprocessor':
+			items = re.findall(r'#(\w+)', doc)
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attributes', [], KeywordAttr.NoLexer),
+		('comment tag', CSharpKeywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_gn_api_file(path):

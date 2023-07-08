@@ -317,7 +317,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else if (sc.chNext != '\\') {
 					const int after = sc.GetCharAfterNext();
 					if (after != '\'') {
-						state = SCE_OCAML_OPERATOR;
+						state = IsIdentifierStart(sc.chNext) ? SCE_OCAML_IDENTIFIER : SCE_OCAML_OPERATOR;
 					}
 				}
 				sc.SetState(state);

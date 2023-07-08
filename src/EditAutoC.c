@@ -658,6 +658,8 @@ enum {
 	DKeywordIndex_Preprocessor = 2,
 	DKeywordIndex_Attribute = 3,
 	DartKeywordIndex_Metadata = 4,
+	FSharpKeywordIndex_Preprocessor = 2,
+	FSharpKeywordIndex_CommentTag = 4,
 	GraphVizKeywordIndex_HtmlLabel = 1,
 	GroovyKeywordIndex_Annotation = 7,
 	GroovyKeywordIndex_GroovyDoc = 9,
@@ -1196,6 +1198,17 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 	case NP2LEX_FORTRAN:
 		if (ch == '#' && iCurrentStyle == SCE_F_PREPROCESSOR) {
 			WordList_AddList(pWList, lexCPP.pKeyWords->pszKeyWords[CPPKeywordIndex_Preprocessor]);
+			return AddWordResult_Finish;
+		}
+		break;
+
+	case NP2LEX_FSHARP:
+		if (ch == '#' && iCurrentStyle == SCE_FSHARP_PREPROCESSOR) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[FSharpKeywordIndex_Preprocessor]);
+			return AddWordResult_Finish;
+		}
+		if ((ch == '<' || (chPrev == '<' && ch == '/')) && (iCurrentStyle > SCE_FSHARP_DEFAULT && iCurrentStyle < SCE_FSHARP_TASKMARKER)) {
+			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[FSharpKeywordIndex_CommentTag]);
 			return AddWordResult_Finish;
 		}
 		break;
@@ -1752,7 +1765,7 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 			}
 		}
 	} else {
-		if (iCurrentStyle == pLexCurrent->noneSingleQuotedStyle || iCurrentStyle == pLexCurrent->operatorStyle) {
+		if (iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
 			return false;
 		}
 	}
@@ -2919,7 +2932,10 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		break;
 
 	case NP2LEX_FSHARP:
-		np2_LexKeyword = &kwNETDoc;
+		RawStringStyleMask[SCE_FSHARP_VERBATIM_STRING >> 5] |= (1U << (SCE_FSHARP_VERBATIM_STRING & 31));
+		RawStringStyleMask[SCE_FSHARP_INTERPOLATED_VERBATIM_STRING >> 5] |= (1U << (SCE_FSHARP_INTERPOLATED_VERBATIM_STRING & 31));
+		RawStringStyleMask[SCE_FSHARP_TRIPLE_STRING >> 5] |= (1U << (SCE_FSHARP_TRIPLE_STRING & 31));
+		RawStringStyleMask[SCE_FSHARP_INTERPOLATED_TRIPLE_STRING >> 5] |= (1U << (SCE_FSHARP_INTERPOLATED_TRIPLE_STRING & 31));
 		break;
 
 	case NP2LEX_GN:

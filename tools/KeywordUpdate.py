@@ -23,6 +23,7 @@ lexerList = [
 	('NP2LEX_CONFIG', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 	('NP2LEX_CPP', 'stlCPP.c', 'LexCPP.cxx', ['CPP.cpp', 'C.c', 'POSIX.c'], 1, parse_cpp_api_file),
 	('NP2LEX_CSHARP', 'stlCSharp.c', 'LexCSharp.cxx', 'CSharp.cs', 1, parse_csharp_api_file),
+		('NP2LEX_FSHARP', 'stlFSharp.c', 'LexFSharp.cxx', 'FSharp.fs', 0, parse_fsharp_api_file),
 	('NP2LEX_CSV', 'stlDefault.c', 'LexCSV.cxx', '', (0, 'CSV'), None),
 
 	('NP2LEX_DLANG', 'stlD.c', 'LexD.cxx', 'D.d', 1, parse_dlang_api_file),
@@ -30,7 +31,6 @@ lexerList = [
 	('NP2LEX_DIFF', 'stlDefault.c', 'LexDiff.cxx', '', (0, 'Diff'), None),
 
 	('NP2LEX_FORTRAN', 'stlFortran.c', 'LexFortran.cxx', 'Fortran.f', 0, parse_fortran_api_file),
-	('NP2LEX_FSHARP', 'stlFSharp.c', 'LexFSharp.cxx', '', 0, None),
 
 	('NP2LEX_GN', 'stlGN.c', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),
 	('NP2LEX_GRAPHVIZ', 'stlGraphViz.c', 'LexGraphViz.cxx', 'GraphViz.dot', 0, parse_graphviz_api_file),

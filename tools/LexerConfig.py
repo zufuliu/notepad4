@@ -401,11 +401,20 @@ LexerConfigMap = {
 	'NP2LEX_FSHARP': {
 		'line_comment_string': '//',
 		'block_comment_string': ('(*', '*)'),
-		'comment_style_marker': 'SCE_FSHARP_COMMENTLINE',
+		'comment_style_marker': 'SCE_FSHARP_TASKMARKER',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['function'],
+		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_FSHARP_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_FSHARP_ESCAPECHAR',
+		'raw_string_style': ['SCE_FSHARP_VERBATIM_STRING', 'SCE_FSHARP_INTERPOLATED_VERBATIM_STRING',
+			'SCE_FSHARP_TRIPLE_STRING', 'SCE_FSHARP_INTERPOLATED_TRIPLE_STRING'],
+		'character_style': ['SCE_FSHARP_CHARACTER'],
+		'none_quote_style': 'SCE_FSHARP_IDENTIFIER',
 		'operator_style': ['SCE_FSHARP_OPERATOR'],
 		'cpp_preprocessor': True,
-		'autoc_extra_keyword': 'kwNETDoc',
-		'string_style_range': ['SCE_FSHARP_CHARACTER', 'SCE_FSHARP_STRING'],
+		'string_style_range': ['SCE_FSHARP_CHARACTER', 'SCE_FSHARP_FORMAT_SPECIFIER'],
 	},
 
 	'NP2LEX_GN': {
