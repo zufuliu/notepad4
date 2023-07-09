@@ -44,16 +44,15 @@ struct EscapeSequence {
 	void resetEscapeState(int state, int chNext) noexcept {
 		outerState = state;
 		digitsLeft = 0;
-		hex = false;
+		hex = true;
 		brace = false;
 		if (chNext == 'x') {
 			digitsLeft = 3;
-			hex = true;
 		} else if (chNext == 'u') {
 			digitsLeft = 5;
-			hex = true;
 		} else if (IsADigit(chNext)) {
 			digitsLeft = 7;
+			hex = false;
 		} else {
 			digitsLeft = 1;
 		}

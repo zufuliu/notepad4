@@ -643,14 +643,18 @@ LexerConfigMap = {
 	'NP2LEX_LUA': {
 		'line_comment_string': '--',
 		'block_comment_string': ('--[[', '--]]'),
-		'comment_style_marker': 'SCE_LUA_COMMENTDOC',
+		'comment_style_marker': 'SCE_LUA_COMMENTLINE',
 		'shebang_exe_name': 'lua',
 		'default_fold_level': ['class', 'function'],
+		'default_fold_ignore_inner': 'SCE_LUA_FUNCTION_DEFINITION',
 		'printf_format_specifier': True,
+		'format_specifier_style': 'SCE_LUA_FORMAT_SPECIFIER',
+		'escape_char_style': 'SCE_LUA_ESCAPECHAR',
+		'raw_string_style': ['SCE_LUA_LITERALSTRING'],
 		'operator_style': ['SCE_LUA_OPERATOR'],
 		#'ignore_word_style': ['SCE_LUA_WORD'],
 		'auto_ident_word_style': ['SCE_LUA_WORD'],
-		'string_style_range': ['SCE_LUA_STRING_DQ', 'SCE_LUA_LITERALSTRING'],
+		'string_style_range': ['SCE_LUA_STRING_SQ', 'SCE_LUA_LITERALSTRING'],
 	},
 
 	'NP2LEX_MAKEFILE': {

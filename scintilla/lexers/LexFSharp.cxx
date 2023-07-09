@@ -200,6 +200,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 	if (startPos == 0 && sc.Match('#', '!')) {
 		// F# 6.0 shebang
+		lineState = PyLineStateMaskCommentLine;
 		sc.SetState(SCE_FSHARP_COMMENTLINE);
 		sc.Forward();
 	}

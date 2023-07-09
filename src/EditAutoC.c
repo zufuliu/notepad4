@@ -3052,6 +3052,10 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 		CurrentWordCharSet['@' >> 5] |= (1 << ('@' & 31));
 		break;
 
+	case NP2LEX_LUA:
+		RawStringStyleMask[SCE_LUA_LITERALSTRING >> 5] |= (1U << (SCE_LUA_LITERALSTRING & 31));
+		break;
+
 	case NP2LEX_MAKEFILE:
 	case NP2LEX_NSIS:
 		CurrentWordCharSet['!' >> 5] |= (1 << ('!' & 31));
