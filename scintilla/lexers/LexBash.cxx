@@ -552,7 +552,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				} else if (sc.ch == '`') {
 					QuoteStack.Start(sc.ch, QuoteStyle::Backtick, sc.state);
 					sc.SetState(SCE_SH_BACKTICKS);
-				} else if (sc.ch == '$') {
+				} else if (sc.ch == '$' && !AnyOf(sc.chNext, '\"', '\'')) {
 					QuoteStack.Expand(sc, cmdState);
 					continue;
 				}
@@ -586,7 +586,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					if (sc.ch == '`') {
 						QuoteStack.Push(sc.ch, QuoteStyle::Backtick, sc.state);
 						sc.SetState(SCE_SH_BACKTICKS);
-					} else if (sc.ch == '$') {
+					} else if (sc.ch == '$' && !AnyOf(sc.chNext, '\"', '\'')) {
 						QuoteStack.Expand(sc, cmdState);
 						continue;
 					}
