@@ -92,8 +92,6 @@ static EDITSTYLE Styles_Ruby[] = {
 	{ SCE_RB_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
 	{ SCE_RB_BUILTIN_CONSTANT, NP2StyleX_BuiltInConstant, L"bold; fore:#008080" },
 	{ SCE_RB_BUILTIN_FUNCTION, NP2StyleX_BuiltInFunction, L"fore:#0080C0" },
-	{ SCE_RB_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_RB_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_RB_COMMENTLINE, NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_RB_STRING_SQ, SCE_RB_STRING_Q, 0, 0), NP2StyleX_SingleQuotedString, L"fore:#008000" },
 	{ MULTI_STYLE(SCE_RB_STRING_DQ, SCE_RB_STRING_QQ, 0, 0), NP2StyleX_DoubleQuotedString, L"fore:#008000" },
@@ -109,6 +107,8 @@ static EDITSTYLE Styles_Ruby[] = {
 	{ MULTI_STYLE(SCE_RB_STRING_QW, SCE_RB_STRING_W, 0, 0), NP2StyleX_StringArray, L"fore:#003CE6" },
 	{ MULTI_STYLE(SCE_RB_STRING_I, SCE_RB_STRING_QI, 0, 0), NP2STYLEX_SymbolArray, L"fore:#E24000" },
 	{ SCE_RB_DATASECTION, NP2StyleX_DataSection, L"fore:#600000; back:#FFF0D8; eolfilled" },
+	{ SCE_RB_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_RB_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexRuby = {

@@ -28,11 +28,11 @@ static EDITSTYLE Styles_VIM[] = {
 	{ SCE_VIM_BLOB_HEX, NP2StyleX_HexString, L"fore:#C08000" },
 	{ SCE_VIM_REGEX, NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8" },
 	{ SCE_VIM_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
-	{ SCE_VIM_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_VIM_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_VIM_ENV_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
 	{ SCE_VIM_REGISTER, NP2StyleX_Register, L"fore:#808000" },
 	{ SCE_VIM_OPTION, NP2StyleX_Option, L"fore:#0C71C3" },
+	{ SCE_VIM_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_VIM_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexVim = {

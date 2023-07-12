@@ -163,7 +163,7 @@ enum {
 
 enum class KeywordType {
 	None = SCE_LUA_DEFAULT,
-	Function = SCE_LUA_FUNCTION,	// function name()
+	Function = SCE_LUA_FUNCTION_DEFINITION,
 	Attribute = SCE_LUA_ATTRIBUTE,	// < name >
 	Goto = SCE_LUA_LABEL,	// goto name
 	Colon,					// :: name ::

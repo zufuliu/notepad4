@@ -16,10 +16,10 @@ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 static EDITSTYLE Styles_LISP[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_C_WORD, NP2StyleX_Keyword, L"fore:#FF8000" },
+	{ MULTI_STYLE(SCE_C_COMMENTLINE, SCE_C_COMMENT, 0, 0), NP2StyleX_Comment, L"fore:#008000" },
 	{ MULTI_STYLE(SCE_C_STRING, SCE_C_CHARACTER, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_C_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_C_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
-	{ MULTI_STYLE(SCE_C_COMMENTLINE, SCE_C_COMMENT, 0, 0), NP2StyleX_Comment, L"fore:#008000" },
 };
 
 EDITLEXER lexLisp = {

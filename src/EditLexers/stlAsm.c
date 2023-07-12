@@ -162,8 +162,6 @@ static EDITSTYLE Styles_ASM[] = {
 	{ MULTI_STYLE(SCE_ASM_COMMENT, SCE_ASM_COMMENTLINE, SCE_ASM_COMMENT2, SCE_ASM_COMMENTDIRECTIVE), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_ASM_STRING, SCE_ASM_CHARACTER, SCE_ASM_STRINGEOL, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_ASM_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
-	{ SCE_ASM_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_ASM_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_ASM_CPUINSTRUCTION, NP2StyleX_CPUInstruction, L"fore:#0080FF" },
 	{ SCE_ASM_MATHINSTRUCTION, NP2StyleX_FPUInstruction, L"fore:#FF0080" },
 	{ SCE_ASM_EXTINSTRUCTION, NP2StyleX_ExtendedInstruction, L"fore:#8000FF" },
@@ -171,6 +169,8 @@ static EDITSTYLE Styles_ASM[] = {
 	{ SCE_ASM_DIRECTIVEOPERAND, NP2StyleX_DirectiveOperand, L"fore:#0000FF" },
 	{ SCE_ASM_REGISTER, NP2StyleX_Register, L"fore:#FF8000" },
 	{ SCE_ASM_LABEL, NP2StyleX_Label, L"back:#FFC040" },
+	{ SCE_ASM_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
+	{ SCE_ASM_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexASM = {

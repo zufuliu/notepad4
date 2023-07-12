@@ -53,11 +53,11 @@ static KEYWORDLIST Keywords_Lua = {{
 static EDITSTYLE Styles_Lua[] = {
 	EDITSTYLE_DEFAULT,
 	{ SCE_LUA_WORD, NP2StyleX_Keyword, L"fore:#0000FF" },
+	{ SCE_LUA_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
 	{ SCE_LUA_BUILTIN_FUNC, NP2StyleX_BasicFunction, L"fore:#FF8000" },
 	{ SCE_LUA_METAMETHOD, NP2StyleX_Metamethod, L"fore:#0080FF" },
 	{ SCE_LUA_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#A46000" },
 	{ SCE_LUA_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
-	{ SCE_LUA_ATTRIBUTE, NP2StyleX_Attribute, L"fore:#FF8000" },
 	{ MULTI_STYLE(SCE_LUA_COMMENT, SCE_LUA_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_LUA_STRING_SQ, SCE_LUA_STRING_DQ, SCE_LUA_LITERALSTRING, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_LUA_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
