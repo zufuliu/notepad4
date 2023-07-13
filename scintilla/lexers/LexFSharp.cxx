@@ -199,7 +199,7 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 	}
 
 	if (startPos == 0 && sc.Match('#', '!')) {
-		// F# 6.0 shebang
+		// F# shebang
 		lineState = PyLineStateMaskCommentLine;
 		sc.SetState(SCE_FSHARP_COMMENTLINE);
 		sc.Forward();
@@ -317,19 +317,23 @@ void ColouriseFSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
 					insideUrl = false;
 				} else if (sc.ch == '%') {
-					if (sc.state == SCE_FSHARP_INTERPOLATED_TRIPLE_STRING && stringInterpolatorCount > 1) {
+					const int state = sc.state;
+					if (state == SCE_FSHARP_INTERPOLATED_TRIPLE_STRING && stringInterpolatorCount > 1) {
+						// https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/interpolated-strings
 						const int interpolatorCount = GetMatchedDelimiterCount(styler, sc.currentPos, '%');
-						if (interpolatorCount >= stringInterpolatorCount) {
-							sc.Advance(interpolatorCount - stringInterpolatorCount);
+						if (interpolatorCount == stringInterpolatorCount) {
+							insideUrl = false;
+							sc.SetState(SCE_FSHARP_FORMAT_SPECIFIER);
+							sc.Advance(interpolatorCount - 2);
 							sc.Forward();
 						} else {
+							// content or syntax error
 							sc.Advance(interpolatorCount);
 							continue;
 						}
 					}
 					const Sci_Position length = CheckPercentFormatSpecifier(sc, styler, insideUrl);
-					if (length != 0) {
-						const int state = sc.state;
+					if (length != 0 || sc.state == SCE_FSHARP_FORMAT_SPECIFIER) {
 						sc.SetState(SCE_FSHARP_FORMAT_SPECIFIER);
 						sc.Advance(length);
 						sc.SetState(state);
