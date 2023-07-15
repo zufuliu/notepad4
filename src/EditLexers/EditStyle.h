@@ -191,6 +191,7 @@
 #define NP2STYLE_Event					63602
 #define NP2STYLE_Parameter				63603
 #define NP2STYLE_InlineExpansion		63604
+#define NP2STYLE_Pragma					63605
 
 #define NP2STYLE_Section				63611
 #define NP2STYLE_Assignment				63612

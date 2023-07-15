@@ -26,7 +26,7 @@ static EDITSTYLE Styles_Nim[] = {
 	{ SCE_NIM_TYPE, NP2StyleX_Type, L"fore:#0080FF" },
 	{ SCE_NIM_FUNCTION_DEFINITION, NP2StyleX_FunctionDefinition, L"bold; fore:#0080C0" },
 	{ SCE_NIM_FUNCTION, NP2StyleX_Function, L"fore:#A46000" },
-	{ SCE_NIM_PRAGMA, NP2StyleX_Directive, L"fore:#FF8000" },
+	{ SCE_NIM_PRAGMA, NP2StyleX_Pragma, L"fore:#FF8000" },
 	{ MULTI_STYLE(SCE_NIM_COMMENT, SCE_NIM_COMMENTLINE, 0, 0), NP2StyleX_Comment, L"fore:#608060" },
 	{ MULTI_STYLE(SCE_NIM_COMMENTDOC, SCE_NIM_COMMENTLINEDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },
 	{ MULTI_STYLE(SCE_NIM_CHARACTER, SCE_NIM_STRING, SCE_NIM_FMTSTRING, 0), NP2StyleX_String, L"fore:#008000" },

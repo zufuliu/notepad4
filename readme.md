@@ -71,7 +71,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Gradle](tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* [GraphViz Dot](tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 4.0.
-	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.2
+	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
+	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.2.
 	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) June 2023. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
