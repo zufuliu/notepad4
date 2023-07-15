@@ -1213,6 +1213,13 @@ static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyl
 		}
 		break;
 
+	case NP2LEX_HASKELL:
+		if (ch == '#' && iCurrentStyle == SCE_HA_DEFAULT) {
+			WordList_AddList(pWList, lexCPP.pKeyWords->pszKeyWords[CPPKeywordIndex_Preprocessor]);
+			return AddWordResult_Finish;
+		}
+		break;
+
 	case NP2LEX_HAXE:
 		if (ch == '#' && iCurrentStyle == SCE_HAXE_DEFAULT) {
 			WordList_AddList(pWList, pLex->pKeyWords->pszKeyWords[HaxeKeywordIndex_Preprocessor]);
@@ -2498,13 +2505,14 @@ void EditToggleCommentLine(void) {
 		EditToggleLineComments(L"@rem ", true);
 		break;
 
-	case NP2LEX_LATEX:
-		EditToggleLineComments(L"%", false);
-		break;
-
+	case NP2LEX_HASKELL:
 	case NP2LEX_LUA:
 	case NP2LEX_VHDL:
 		EditToggleLineComments(L"--", false);
+		break;
+
+	case NP2LEX_LATEX:
+		EditToggleLineComments(L"%", false);
 		break;
 
 	case NP2LEX_SQL:
@@ -2666,6 +2674,10 @@ void EditToggleCommentBlock(void) {
 	case NP2LEX_MATHEMATICA:
 	case NP2LEX_OCAML:
 		EditEncloseSelection(L"(*", L"*)");
+		break;
+
+	case NP2LEX_HASKELL:
+		EditEncloseSelection(L"{-", L"-}");
 		break;
 
 	case NP2LEX_JAMFILE:

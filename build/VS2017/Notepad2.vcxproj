@@ -502,6 +502,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGroovy.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexHaskell.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
@@ -626,6 +627,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlGradle.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGraphViz.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGroovy.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlHaskell.c" />
     <ClCompile Include="..\..\src\EditLexers\stlHaxe.c" />
     <ClCompile Include="..\..\src\EditLexers\stlHTML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlInno.c" />

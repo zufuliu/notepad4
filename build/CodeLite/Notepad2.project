@@ -43,6 +43,7 @@
       <File Name="../../scintilla/lexers/LexGo.cxx"/>
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
       <File Name="../../scintilla/lexers/LexGroovy.cxx"/>
+      <File Name="../../scintilla/lexers/LexHaskell.cxx"/>
       <File Name="../../scintilla/lexers/LexHaxe.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
@@ -223,6 +224,7 @@
       <File Name="../../src/EditLexers/stlGradle.c"/>
       <File Name="../../src/EditLexers/stlGraphViz.c"/>
       <File Name="../../src/EditLexers/stlGroovy.c"/>
+      <File Name="../../src/EditLexers/stlHaskell.c"/>
       <File Name="../../src/EditLexers/stlHaxe.c"/>
       <File Name="../../src/EditLexers/stlHTML.c"/>
       <File Name="../../src/EditLexers/stlInno.c"/>

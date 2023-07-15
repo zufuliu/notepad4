@@ -91,6 +91,7 @@ extern EDITLEXER lexGradle;
 extern EDITLEXER lexGraphViz;
 extern EDITLEXER lexGroovy;
 
+extern EDITLEXER lexHaskell;
 extern EDITLEXER lexHaxe;
 
 extern EDITLEXER lexINI;
@@ -201,6 +202,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexGraphViz,
 	&lexGroovy,
 
+	&lexHaskell,
 	&lexHaxe,
 
 	&lexINI,

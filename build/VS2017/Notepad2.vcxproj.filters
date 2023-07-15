@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGroovy.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\scintilla\lexers\LexHaskell.cxx">
+      <Filter>Scintilla\lexers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx">
       <Filter>Scintilla\lexers</Filter>
     </ClCompile>
@@ -484,6 +487,9 @@
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlGroovy.c">
+      <Filter>Source Files\EditLexers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\EditLexers\stlHaskell.c">
       <Filter>Source Files\EditLexers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\EditLexers\stlHaxe.c">

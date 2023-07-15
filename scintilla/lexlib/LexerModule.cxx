@@ -54,6 +54,7 @@ extern LexerModule lmGN;
 extern LexerModule lmGo;
 extern LexerModule lmGraphViz;
 extern LexerModule lmGroovy;
+extern LexerModule lmHaskell;
 extern LexerModule lmHaxe;
 extern LexerModule lmHTML;
 extern LexerModule lmInnoSetup;
@@ -135,6 +136,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmGo,
 	&lmGraphViz,
 	&lmGroovy,
+	&lmHaskell,
 	&lmHaxe,
 	&lmHTML,
 	&lmInnoSetup,

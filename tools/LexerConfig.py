@@ -480,6 +480,19 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_GROOVY_STRING_DQ', 'SCE_GROOVY_ESCAPECHAR'],
 	},
 
+	'NP2LEX_HASKELL': {
+		'line_comment_string': '--',
+		'block_comment_string': ('{-', '-}'),
+		'comment_style_marker': 'SCE_HA_COMMENTBLOCK',
+		'indent_based_folding': True,
+		'indent_guide_style': 'forward',
+		'default_fold_level': ['function'],
+		'escape_char_style': 'SCE_HA_ESCAPECHAR',
+		'character_style': ['SCE_HA_CHARACTER'],
+		'none_quote_style': 'SCE_HA_IDENTIFIER',
+		'operator_style': ['SCE_HA_OPERATOR'],
+		'string_style_range': ['SCE_HA_CHARACTER', 'SCE_HA_ESCAPECHAR'],
+	},
 	'NP2LEX_HAXE': {
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_HAXE_TASKMARKER',

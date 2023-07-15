@@ -1165,6 +1165,22 @@ def parse_groovy_api_file(path):
 		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
+def parse_haskell_api_file(path):
+	sections = read_api_file(path, '--')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'class'):
+			keywordMap[key] = doc.split()
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'class',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
+	]
+
 def parse_haxe_api_file(path):
 	sections = read_api_file(path, '//')
 	keywordMap = {}

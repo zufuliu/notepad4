@@ -317,6 +317,10 @@ Groovy Script
 	grunit			GrUnit
 
 
+Haskell Source
+	hs
+	lhs				Literate Haskell
+
 Haxe Script
 	hx
 

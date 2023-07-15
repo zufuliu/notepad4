@@ -38,6 +38,7 @@ lexerList = [
 		('NP2LEX_CSS', 'stlCSS.c', 'LexCSS.cxx', ['CSS.css', 'SCSS.scss', 'Less.less', 'HSS.hss'], 0, parse_css_api_file),
 	('NP2LEX_GO', 'stlGo.c', 'LexGo.cxx', 'Go.go', 0, parse_go_api_file),
 
+	('NP2LEX_HASKELL', 'stlHaskell.c', 'LexHaskell.cxx', 'Haskell.hs', 0, parse_haskell_api_file),
 	('NP2LEX_HAXE', 'stlHaxe.c', 'LexHaxe.cxx', 'Haxe.hx', 1, parse_haxe_api_file),
 	('NP2LEX_HTML', 'stlHTML.c', 'LexHTML.cxx', 'html.html', 1, parse_html_api_file),
 
