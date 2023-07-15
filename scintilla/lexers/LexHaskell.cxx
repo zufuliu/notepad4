@@ -203,8 +203,11 @@ void ColouriseHaskellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 					lineState = HaskellLineStatePragma;
 					sc.ChangeState(SCE_HA_PRAGMA);
 					sc.Forward();
-				} else if (visibleChars == 0) {
-					lineState |= PyLineStateMaskCommentLine;
+				} else {
+					commentLevel = 1;
+					if (visibleChars == 0) {
+						lineState |= PyLineStateMaskCommentLine;
+					}
 				}
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_HA_STRING);
