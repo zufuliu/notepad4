@@ -28,6 +28,7 @@ namespace {
 enum {
 	CsvOption_BackslashEscape = 1 << 15,
 	CsvOption_MergeDelimiter = 1 << 16,
+	CsvRowGroup = 100,
 };
 
 constexpr uint32_t asU4(const char *s) noexcept {
@@ -35,15 +36,18 @@ constexpr uint32_t asU4(const char *s) noexcept {
 }
 
 void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
+	const bool fold = styler.GetPropertyBool("fold");
 	const char * const option = styler.GetProperty("lexer.lang");
 	const uint32_t csvOption = asU4(option);
 	const uint8_t delimiter = csvOption & 0xff;
 	const uint8_t quoteChar = (csvOption >> 8) & 0x7f;
 
 	bool quoted = false;
+	int rows = 0;
 	initStyle = SCE_CSV_COLUMN_0;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	if (lineCurrent > 0) {
+		rows = static_cast<int>(lineCurrent % CsvRowGroup);
 		const int lineState = styler.GetLineState(lineCurrent - 1);
 		if (lineState) {
 			quoted = true;
@@ -104,6 +108,16 @@ void ColouriseCSVDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		}
 
 		if (startPos == lineStartNext) {
+			if (fold) {
+				++rows;
+				int lev = SC_FOLDLEVELBASE + 1;
+				if (rows == CsvRowGroup || lineCurrent == 0) {
+					rows = 0;
+					lev = SC_FOLDLEVELBASE | SC_FOLDLEVELHEADERFLAG;
+				}
+				styler.SetLevel(lineCurrent, lev);
+			}
+
 			chPrev = 0;
 			chPrevNonWhite = delimiter;
 			styler.ColorTo(startPos, initStyle);
