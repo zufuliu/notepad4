@@ -150,12 +150,23 @@ constexpr bool IsBashOperatorLast(int ch) noexcept {
 	return IsAGraphic(ch) && !(ch == '/'); // remaining graphic characters
 }
 
-constexpr bool IsBashSingleCharOperator(int ch) noexcept {
-	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B', 'M', 'A', 'C', 'a', 'h', 'G', 'L', 'N', 'n');
+constexpr bool IsTestOperator(const char *s) noexcept {
+	return s[2] == '\0' || (s[3] == '\0' && IsLowerCase(s[1]) && IsLowerCase(s[2]));
 }
 
 constexpr bool IsBashParamChar(int ch) noexcept {
 	return IsIdentifierChar(ch);
+}
+
+constexpr bool IsBashParamStart(int ch, bool isCShell) noexcept {
+	// https://www.gnu.org/software/bash/manual/bash.html#Special-Parameters
+	// https://zsh.sourceforge.io/Doc/Release/Parameters.html#Parameters
+	// https://man.archlinux.org/man/dash.1#Special_Parameters
+	// https://man.archlinux.org/man/ksh.1#Parameter_Expansion.
+	return IsBashParamChar(ch) || AnyOf(ch, '*', '@', '#', '?', '-', '$', '!')
+	// https://man.archlinux.org/man/tcsh.1.en#Variable_substitution_without_modifiers
+		|| (isCShell && AnyOf(ch, '%', '<'))
+	;
 }
 
 constexpr bool IsBashHereDoc(int ch) noexcept {
@@ -210,6 +221,7 @@ public:
 	int State = SCE_SH_DEFAULT;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
+	bool isCShell = false;
 	[[nodiscard]] bool Empty() const noexcept {
 		return Current.Up == '\0';
 	}
@@ -290,6 +302,9 @@ public:
 			sc.ChangeState(SCE_SH_BACKTICKS);
 		} else {
 			// scalar has no delimiter pair
+			if (!IsBashParamStart(sc.ch, isCShell)) {
+				sc.ChangeState(state); // not scalar
+			}
 			return;
 		}
 		Start(sc.ch, style, state, current);
@@ -323,6 +338,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	CmdState cmdState = CmdState::Start;
 	TestExprType testExprType = TestExprType::Test;
 
+	QuoteStack.isCShell = styler.GetPropertyBool("lexer.lang");
 	// Always backtracks to the start of a line that is not a continuation
 	// of the previous line (i.e. start of a bash command segment)
 	Sci_Line ln = styler.GetLine(startPos);
@@ -430,7 +446,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				// disambiguate option items and file test operators
 				else if (s[0] == '-') {
-					if (cmdState != CmdState::Test) {
+					if (cmdState != CmdState::Test || !IsTestOperator(s)) {
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 					}
 				}
@@ -565,7 +581,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		case SCE_SH_SCALAR:	// variable names
 			if (!IsBashParamChar(sc.ch)) {
 				if (sc.LengthCurrent() == 1) {
-					// Special variable: $(, $_ etc.
+					// Special variable
 					sc.Forward();
 				}
 				sc.SetState(QuoteStack.State);
@@ -725,9 +741,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				} else {
 					HereDoc.Indent = false;
 				}
-			} else if (sc.ch == '-'	&&	// one-char file test operators
-				IsBashSingleCharOperator(sc.chNext) &&
-				!IsBashWordChar(sc.GetRelative(2)) &&
+			} else if (sc.ch == '-' && // test operator or short and long option
+				(IsAlpha(sc.chNext) || sc.chNext == '-') &&
 				IsASpace(sc.chPrev)) {
 				sc.SetState(SCE_SH_WORD);
 				sc.Forward();
