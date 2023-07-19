@@ -126,6 +126,7 @@ constexpr bool stateAllowsTermination(int state, int ch) noexcept {
 	if (allowTermination) {
 		switch (state) {
 		case SCE_HB_COMMENTLINE:
+		case SCE_HJ_COMMENTLINE:
 			allowTermination = ch == '%'; // %>
 		}
 	}
@@ -536,7 +537,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			case SCE_HJ_COMMENTDOC:
 			//case SCE_HJ_COMMENTLINE: // removed as this is a common thing done to hide
 			// the end of script marker from some JS interpreters.
-			case SCE_HB_COMMENTLINE:
+			//case SCE_HB_COMMENTLINE:
 			case SCE_HBA_COMMENTLINE:
 			case SCE_HJ_DOUBLESTRING:
 			case SCE_HJ_SINGLESTRING:
@@ -548,7 +549,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			default :
 				// check if the closing tag is a script tag
 				{
-					const bool match = (state == SCE_HJ_COMMENTLINE || isXml) ? styler.MatchLowerCase(i + 2, "script")
+					const bool match = (state == SCE_HJ_COMMENTLINE || state == SCE_HB_COMMENTLINE || isXml) ? styler.MatchLowerCase(i + 2, "script")
 						: ((state == SCE_H_COMMENT) ? styler.MatchLowerCase(i + 2, "comment") : true);
 					if (!match) {
 						break;
