@@ -1282,7 +1282,7 @@ BEGIN
     AUTORADIOBUTTON "&Nessuna.",IDC_CHANGENOTIFY_NONE,7,7,37,10,WS_GROUP | WS_TABSTOP
     AUTORADIOBUTTON "&Mostra messaggio.",IDC_CHANGENOTIFY_SHOW_MSG,7,19,71,10,WS_TABSTOP
     AUTORADIOBUTTON "Ricarica &automatica (non modificata).",IDC_CHANGENOTIFY_AUTO_RELOAD,7,31,125,10,WS_TABSTOP
-    AUTOCHECKBOX    "&Monitor continuously updated file (e.g. log file).",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
+    AUTOCHECKBOX    "Monitoraggio &continuo modifiche file (ad es. file di log).",IDC_CHANGENOTIFY_LOG_FILE,7,48,184,10,WS_TABSTOP
     AUTOCHECKBOX    "Resta alla &fine del documento dopo il ricaricamento.",IDC_CHANGENOTIFY_KEEP_AT_END,7,60,184,10,WS_TABSTOP
     AUTOCHECKBOX    "&Reimposta se viene aperto un nuovo file.",IDC_CHANGENOTIFY_RESET_WATCH,7,72,184,10,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,139,7,50,14
