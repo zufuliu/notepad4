@@ -1765,15 +1765,14 @@ static bool CanAutoCloseSingleQuote(int chPrev, int iCurrentStyle) {
 		if (iLexer == SCLEX_VISUALBASIC || iLexer == SCLEX_VBSCRIPT) {
 			return false; // comment
 		}
-		if (iLexer == SCLEX_HTML) {
-			const HtmlTextBlock block = GetCurrentHtmlTextBlockEx(iLexer, iCurrentStyle);
-			if (block == HtmlTextBlock_VBScript) {
-				return false;
-			}
-		}
 	} else {
 		if (iCurrentStyle == pLexCurrent->noneSingleQuotedStyle) {
 			return false;
+		}
+		if (iLexer == SCLEX_HTML) {
+			if (iCurrentStyle == SCE_HB_DEFAULT || iCurrentStyle == SCE_HBA_DEFAULT) {
+				return false; // comment
+			}
 		}
 	}
 
