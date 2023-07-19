@@ -73,7 +73,7 @@ void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		case SCE_C_ASM_INSTRUCTION:
 			if (!IsCILWordChar(ch)) {
 				styler.ColorTo(i, state);
-				state = SCE_L_DEFAULT;
+				state = SCE_C_DEFAULT;
 			}
 			break;
 		case SCE_C_IDENTIFIER:
