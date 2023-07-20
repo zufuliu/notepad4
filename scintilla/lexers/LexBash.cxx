@@ -60,6 +60,7 @@ enum class QuoteStyle {
 	CString,		// $''
 	String,			// ""
 	LString,		// $""
+	HereDoc,		// here document
 	Backtick,		// ``, $``
 	Parameter,		// ${}
 	Command,		// $()
@@ -405,8 +406,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (!IsBashWordChar(sc.ch) || sc.Match('+', '=')) {
 				char s[128];
 				sc.GetCurrent(s, sizeof(s));
-				// allow keywords ending in a whitespace or command delimiter
-				const bool keywordEnds = IsASpace(sc.ch) || IsBashCmdDelimiter(sc.ch, 0);
+				// allow keywords ending in a whitespace, meta character or command delimiter
+				const bool keywordEnds = IsBashMetaCharacter(sc.ch) || AnyOf(sc.ch, '{', '}');
 				// 'in' or 'do' may be construct keywords
 				if (cmdState == CmdState::Word) {
 					if (StrEqual(s, "in") && keywordEnds) {
@@ -452,7 +453,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				// disambiguate keywords and identifiers
 				else if (cmdState != CmdState::Start
-					|| !(keywordLists[KeywordIndex_Keyword].InList(s) && keywordEnds)) {
+					|| !keywordEnds || !keywordLists[KeywordIndex_Keyword].InList(s)) {
 					sc.ChangeState(SCE_SH_IDENTIFIER);
 				}
 
@@ -547,9 +548,19 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 			}
 			break;
+		case SCE_SH_SCALAR:	// variable names
+			if (!IsBashParamChar(sc.ch)) {
+				if (sc.LengthCurrent() == 1) {
+					// Special variable
+					sc.Forward();
+				}
+				sc.SetState(QuoteStack.State);
+				continue;
+			}
+			break;
 		case SCE_SH_HERE_Q:
 			// HereDoc.State == 2
-			if (sc.atLineStart) {
+			if (sc.atLineStart/* && QuoteStack.Current.Style == QuoteStyle::HereDoc*/) {
 				sc.SetState(SCE_SH_HERE_Q);
 				if (HereDoc.Indent) { // tabulation prefix
 					while (sc.ch == '\t') {
@@ -562,32 +573,16 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.SetState(SCE_SH_HERE_DELIM);
 						sc.Forward(HereDoc.DelimiterLength);
 					}
+					QuoteStack.Pop();
 					sc.SetState(SCE_SH_DEFAULT);
 					break;
 				}
 			}
-			if (!HereDoc.Quoted && !HereDoc.Escaped) {
-				if (sc.ch == '\\') {
-					sc.Forward();
-				} else if (sc.ch == '`') {
-					QuoteStack.Start(sc.ch, QuoteStyle::Backtick, sc.state, cmdState);
-					sc.SetState(SCE_SH_BACKTICKS);
-				} else if (sc.ch == '$' && !AnyOf(sc.chNext, '\"', '\'')) {
-					QuoteStack.Expand(sc, cmdState);
-					continue;
-				}
+			if (HereDoc.Quoted || HereDoc.Escaped) {
+				break;
 			}
-			break;
-		case SCE_SH_SCALAR:	// variable names
-			if (!IsBashParamChar(sc.ch)) {
-				if (sc.LengthCurrent() == 1) {
-					// Special variable
-					sc.Forward();
-				}
-				sc.SetState(QuoteStack.State);
-				continue;
-			}
-			break;
+			// fall through to handle nested shell expansions
+			[[fallthrough]];
 		case SCE_SH_STRING_DQ:	// delimited styles, can nest
 		case SCE_SH_PARAM: // ${parameter}
 		case SCE_SH_BACKTICKS:
@@ -601,8 +596,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				QuoteStack.Current.Count++;
 			} else {
 				if (QuoteStack.Current.Style == QuoteStyle::String ||
+					QuoteStack.Current.Style == QuoteStyle::HereDoc ||
 					QuoteStack.Current.Style == QuoteStyle::LString
-					) {	// do nesting for "string", $"locale-string"
+					) {	// do nesting for "string", $"locale-string", heredoc
 					if (sc.ch == '`') {
 						QuoteStack.Push(sc.ch, QuoteStyle::Backtick, sc.state, cmdState);
 						sc.SetState(SCE_SH_BACKTICKS);
@@ -653,6 +649,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				} else {
 					// HereDoc.Quote always == '\''
 					sc.SetState(SCE_SH_HERE_Q);
+					QuoteStack.Start(-1, QuoteStyle::HereDoc, SCE_SH_DEFAULT, cmdState);
 				}
 			} else if (HereDoc.DelimiterLength == 0) {
 				// no delimiter, illegal (but '' and "" are legal)
@@ -660,6 +657,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.SetState(SCE_SH_DEFAULT);
 			} else {
 				sc.SetState(SCE_SH_HERE_Q);
+				QuoteStack.Start(-1, QuoteStyle::HereDoc, SCE_SH_DEFAULT, cmdState);
 			}
 		}
 
