@@ -123,8 +123,8 @@ constexpr bool isStringState(int state) noexcept {
 
 constexpr bool stateAllowsTermination(int state, int ch) noexcept {
 	if (!isStringState(state)) {
-		if (state == SCE_H_ASP || state == SCE_H_ASPAT || state >= SCE_HJ_START) {
-			return ch == '%'; // ASP %>
+		if (state == SCE_H_ASP || state == SCE_H_ASPAT || state == SCE_H_XCCOMMENT || state >= SCE_HJ_START) {
+			return ch == '%'; // ASP, JSP %>
 		}
 		return ch == '?'; // XML ?>
 	}
