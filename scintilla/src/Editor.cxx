@@ -129,15 +129,15 @@ Editor::Editor() {
 	mouseDownCaptures = true;
 	mouseWheelCaptures = true;
 
-	lastClickTime = 0;
 	doubleClickCloseThreshold = Point(3, 3);
+	lastClickTime = 0;
 	dwellDelay = TimeForever;
 	ticksToDwell = TimeForever;
 	dwelling = false;
+	dropWentOutside = false;
+	inDragDrop = DragDrop::none;
 	ptMouseLast.x = 0;
 	ptMouseLast.y = 0;
-	inDragDrop = DragDrop::none;
-	dropWentOutside = false;
 	posDrop = SelectionPosition(Sci::invalidPosition);
 	hotSpotClickPos = Sci::invalidPosition;
 	selectionUnit = TextUnit::character;
@@ -188,15 +188,15 @@ Editor::Editor() {
 	idleStyling = IdleStyling::None;
 	needIdleStyling = false;
 
+	recordingMacro = false;
+	convertPastes = true;
+
 	commandEvents = true;
 	modEventMask = ModificationFlags::EventMaskAll;
 
-	pdoc->AddWatcher(this, nullptr);
-
-	recordingMacro = false;
-	convertPastes = true;
 	foldAutomatic = AutomaticFold::None;
 
+	pdoc->AddWatcher(this, nullptr);
 	SetRepresentations();
 }
 
@@ -912,7 +912,7 @@ SelectionPosition Editor::MovePositionSoVisible(Sci::Position pos, int moveDir) 
 }
 
 Point Editor::PointMainCaret() {
-	return LocationFromPosition(sel.Range(sel.Main()).caret);
+	return LocationFromPosition(sel.RangeMain().caret);
 }
 
 /**
@@ -1554,7 +1554,7 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 		}
 		wrapPending.Wrapped(lineNumber);
 	}
-	return wrapOccurred;;
+	return wrapOccurred;
 }
 
 // Perform  wrapping for a subset of the lines needing wrapping.
@@ -3308,7 +3308,7 @@ void Editor::CursorUpOrDown(int direction, Selection::SelTypes selt) {
 	if ((selt == Selection::SelTypes::none) && sel.MoveExtends()) {
 		selt = !sel.IsRectangular() ? Selection::SelTypes::stream : Selection::SelTypes::rectangle;
 	}
-	SelectionPosition caretToUse = sel.Range(sel.Main()).caret;
+	SelectionPosition caretToUse = sel.RangeMain().caret;
 	if (sel.IsRectangular()) {
 		if (selt == Selection::SelTypes::none) {
 			caretToUse = (direction > 0) ? sel.Limits().end : sel.Limits().start;
@@ -3332,7 +3332,7 @@ void Editor::CursorUpOrDown(int direction, Selection::SelTypes selt) {
 		// Calculate new caret position and call SetSelection(), which will ensure whole lines are selected.
 		const SelectionPosition posNew = MovePositionSoVisible(
 			PositionUpOrDown(caretToUse, direction, -1), direction);
-		SetSelection(posNew, sel.Range(sel.Main()).anchor);
+		SetSelection(posNew, sel.RangeMain().anchor);
 	} else {
 		InvalidateWholeSelection();
 		if (!additionalSelectionTyping || (sel.IsRectangular())) {

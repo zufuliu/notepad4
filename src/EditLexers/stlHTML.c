@@ -57,7 +57,7 @@ NULL
 "http-equiv icon id imagesrcset imagesizes inert integrity is ismap itemid itemprop itemref itemscope itemtype "
 "keytype kind label lang list loading longdesc loop low nonce minlength manifest max "
 "maxlength media mediagroup method min multiple muted name nomodule novalidate open optimum "
-"pattern placeholder playsinline poster preload popover popoverhidetarget popovershowtarget popovertoggletarget "
+"pattern placeholder playsinline poster preload popover popovertarget popovertargetaction "
 "radiogroup readonly referrerpolicy rel required "
 "rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size slot span "
 "src srcdoc srclang srcset start step style tabindex target title translate type "

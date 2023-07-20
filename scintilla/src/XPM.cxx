@@ -56,27 +56,10 @@ size_t MeasureLength(const char *s) noexcept {
 	return i;
 }
 
-constexpr unsigned int GetHexDigit(unsigned char ch) noexcept {
-	unsigned int diff = ch - '0';
-	if (diff < 10) {
-		return diff;
-	}
-	diff = (ch | 0x20) - 'a';
-	if (diff < 6) {
-		return diff + 10;
-	}
-	return 0;
-}
-
-constexpr unsigned int GetHexValue(unsigned char ch1, unsigned char ch2) noexcept {
-	return (GetHexDigit(ch1) << 4) | GetHexDigit(ch2);
-}
-
-constexpr ColourRGBA ColourFromHex(const char *val) noexcept {
-	const unsigned int r = GetHexValue(val[0], val[1]);
-	const unsigned int g = GetHexValue(val[2], val[3]);
-	const unsigned int b = GetHexValue(val[4], val[5]);
-	return ColourRGBA(r, g, b);
+inline ColourRGBA ColourFromHex(const char *val) noexcept {
+	unsigned color = strtoul(val, nullptr, 16);
+	color = ColorFromRGBHex(color);
+	return ColourRGBA(color);
 }
 
 constexpr bool IsPixelIndex(unsigned index, unsigned dimension) noexcept {

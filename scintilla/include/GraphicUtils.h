@@ -36,7 +36,7 @@ static inline uint32_t ColorFromARGBHex(uint32_t hex) NP2_noexcept {
 }
 
 static inline uint32_t ColorFromBGRAHex(uint32_t hex) NP2_noexcept {
-	return rotl8(hex);
+	return rotr8(hex);
 }
 
 static inline uint32_t ColorToRGBQuad(uint32_t color) NP2_noexcept {
@@ -55,8 +55,8 @@ static inline uint32_t ColorToARGBHex(uint32_t color) NP2_noexcept {
 	return rotr8(bswap32(color));
 }
 
-static inline uint32_t ColorToBGRAHex(uint32_t hex) NP2_noexcept {
-	return rotl8(hex);
+static inline uint32_t ColorToBGRAHex(uint32_t color) NP2_noexcept {
+	return rotl8(color);
 }
 
 // see https://docs.microsoft.com/en-us/windows/win32/uxguide/vis-icons#size-requirements

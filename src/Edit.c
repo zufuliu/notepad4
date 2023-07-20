@@ -7304,6 +7304,11 @@ void EditOpenSelection(OpenSelectionType type) {
 		LPWSTR back = link + cchTextW - 1;
 
 		LPWSTR p = back;
+		if (*p == L'.') {
+			*p = L'\0';
+			--p;
+			--back;
+		}
 		if (*p == L')') {
 			--p;
 			--back;

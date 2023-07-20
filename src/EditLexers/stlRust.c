@@ -239,8 +239,8 @@ static EDITSTYLE Styles_Rust[] = {
 	{ SCE_RUST_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_RUST_PLACEHOLDER, NP2StyleX_Placeholder, L"fore:#8080FF" },
 	{ SCE_RUST_LIFETIME, NP2StyleX_Lifetime, L"fore:#7C5AF3" },
-	{ SCE_RUST_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_RUST_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
+	{ SCE_RUST_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_RUST_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 

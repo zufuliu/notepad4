@@ -81,8 +81,9 @@ class OptionSet {
 			it->second = option;
 		} else {
 			nameToDef.emplace(name, option);
-			if (!names.empty())
-				names += "\n";
+			if (!names.empty()) {
+				names += '\n';
+			}
 			names += name;
 		}
 	}
@@ -133,8 +134,9 @@ public:
 	void DefineWordListSets(const char *const wordListDescriptions[]) {
 		if (wordListDescriptions) {
 			for (size_t wl = 0; wordListDescriptions[wl]; wl++) {
-				if (!wordLists.empty())
-					wordLists += "\n";
+				if (wl != 0) {
+					wordLists += '\n';
+				}
 				wordLists += wordListDescriptions[wl];
 			}
 		}

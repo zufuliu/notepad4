@@ -94,7 +94,7 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_ASY_NUMBER:
-			if (!(IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)))) {
+			if (!IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_ASY_DEFAULT);
 			}
 			break;

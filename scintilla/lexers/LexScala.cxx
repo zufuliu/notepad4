@@ -75,19 +75,16 @@ constexpr bool IsSingleLineString(int state) noexcept {
 	return state == SCE_SCALA_STRING || state == SCE_SCALA_INTERPOLATED_STRING;
 }
 
+constexpr bool IsTripleString(int state) noexcept {
+	return state == SCE_SCALA_TRIPLE_STRING || state == SCE_SCALA_TRIPLE_INTERPOLATED_STRING;
+}
+
 constexpr bool IsInterpolatedString(int state) noexcept {
 	return state == SCE_SCALA_INTERPOLATED_STRING || state == SCE_SCALA_TRIPLE_INTERPOLATED_STRING;
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_SCALA_TASKMARKER;
-}
-
-constexpr bool IsMultilineStyle(int style) noexcept {
-	return style == SCE_SCALA_COMMENTBLOCK
-		|| style == SCE_SCALA_COMMENTBLOCKDOC
-		|| style == SCE_SCALA_TRIPLE_STRING
-		|| style == SCE_SCALA_TRIPLE_INTERPOLATED_STRING;
 }
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
@@ -112,7 +109,6 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int indentCount = 0;
 	int xmlTagLevel = 0;
 	bool insideXmlTag = false;
-	bool singleLineComment = false;
 
 	int chBefore = 0;
 	int visibleCharsBefore = 0;
@@ -237,13 +233,16 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SCALA_COMMENTBLOCK:
 		case SCE_SCALA_COMMENTBLOCKDOC:
+			if (sc.atLineStart) {
+				lineState  = PyLineStateMaskCommentLine;
+			}
 			if (sc.Match('*', '/')) {
 				sc.Forward();
 				--commentLevel;
 				if (commentLevel == 0) {
 					sc.ForwardSetState(SCE_SCALA_DEFAULT);
-					if (singleLineComment && sc.GetLineNextChar() == '\0') {
-						lineState |= PyLineStateMaskCommentLine;
+					if (lineState == PyLineStateMaskCommentLine && sc.GetLineNextChar() != '\0') {
+						lineState = 0;
 					}
 				}
 			} else if (sc.Match('/', '*')) {
@@ -390,7 +389,9 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.Match('/', '*')) {
 				commentLevel = 1;
 				visibleCharsBefore = visibleChars;
-				singleLineComment = visibleChars == 0;
+				if (visibleChars == 0) {
+					lineState = PyLineStateMaskCommentLine;
+				}
 				sc.SetState(SCE_SCALA_COMMENTBLOCK);
 				sc.Forward(2);
 				if (sc.ch == '*' && sc.chNext != '*') {
@@ -471,18 +472,17 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 		}
 		if (sc.atLineEnd) {
-			lineState |= (commentLevel << 8) | (indentCount << 16);
 			if (!nestedState.empty() || xmlTagLevel != 0) {
-				lineState |= PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
-			} else if (IsMultilineStyle(sc.state)) {
-				lineState |= PyLineStateMaskTripleQuote;
-			} else if (visibleChars == 0) {
-				lineState |= PyLineStateMaskEmptyLine;
+				lineState = PyLineStateStringInterpolation | PyLineStateMaskTripleQuote;
+			} else if (IsTripleString(sc.state)) {
+				lineState = PyLineStateMaskTripleQuote;
+			} else if (lineState == 0 && visibleChars == 0) {
+				lineState = PyLineStateMaskEmptyLine;
 			}
+			lineState |= (commentLevel << 8) | (indentCount << 16);
 			styler.SetLineState(sc.currentLine, lineState);
 			lineState = 0;
 			indentCount = 0;
-			singleLineComment = false;
 			visibleChars = 0;
 			visibleCharsBefore = 0;
 			kwType = KeywordType::None;

@@ -59,11 +59,6 @@ constexpr bool IsYAMLAnchorChar(int ch) noexcept {
 	return IsGraphic(ch) && !IsYAMLFlowIndicator(ch);
 }
 
-constexpr bool IsYAMLDateTime(int ch, int chNext) noexcept {
-	return ((ch == '-' || ch == ':' || ch == '.') && IsADigit(chNext))
-		|| (ch == ' ' && (chNext == '-' || IsADigit(chNext)));
-}
-
 bool IsYAMLText(StyleContext& sc, int braceCount, const WordList *kwList) {
 	const int state = sc.state;
 	const Sci_Position endPos = braceCount? sc.styler.Length() : sc.lineStartNext;
@@ -216,7 +211,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_YAML_NUMBER:
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
-				if (IsYAMLDateTime(sc.ch, sc.chNext)) {
+				if (IsISODateTime(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_YAML_DATETIME);
 				} else if (IsYAMLText(sc, braceCount, nullptr)) {
 					continue;
@@ -225,7 +220,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_YAML_DATETIME:
-			if (!(IsIdentifierChar(sc.ch) || IsYAMLDateTime(sc.ch, sc.chNext))) {
+			if (!(IsIdentifierChar(sc.ch) || IsISODateTime(sc.ch, sc.chNext))) {
 				 if (IsYAMLText(sc, braceCount, nullptr)) {
 					continue;
 				}

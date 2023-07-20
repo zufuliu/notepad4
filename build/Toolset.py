@@ -159,4 +159,4 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 #dump_static_linked_function('bin/Release/x64/Notepad2.map')
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
 #generate_compile_commands('x86_64-w64-windows-gnu')
-#run-clang-tidy -quiet -j4 1>tidy.log
+#run-clang-tidy --quiet -j4 1>tidy.log

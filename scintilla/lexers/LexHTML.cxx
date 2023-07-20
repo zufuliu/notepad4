@@ -121,15 +121,14 @@ constexpr bool isStringState(int state) noexcept {
 	}
 }
 
-constexpr bool stateAllowsTermination(int state) noexcept {
-	bool allowTermination = !isStringState(state);
-	if (allowTermination) {
-		switch (state) {
-		case SCE_HB_COMMENTLINE:
-			allowTermination = false;
+constexpr bool stateAllowsTermination(int state, int ch) noexcept {
+	if (!isStringState(state)) {
+		if (state == SCE_H_ASP || state == SCE_H_ASPAT || state >= SCE_HJ_START) {
+			return ch == '%'; // ASP %>
 		}
+		return ch == '?'; // XML ?>
 	}
-	return allowTermination;
+	return false;
 }
 
 // not really well done, since it's only comments that should lex the %> and <%
@@ -165,31 +164,32 @@ bool classifyAttribHTML(script_mode inScriptType, Sci_PositionU start, Sci_Posit
 }
 
 // https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts
-bool isHTMLCustomElement(const char *tag, size_t length) noexcept {
+bool isHTMLCustomElement(const char *tag, size_t length, bool dashColon) noexcept {
 	// check valid HTML custom element name: starts with an ASCII lower alpha and contains hyphen.
 	// IsAlpha() is used for `html.tags.case.sensitive=1`.
 	if (length < 2 || !IsAlpha(tag[0])) {
 		return false;
 	}
-	if (strchr(tag, '-') == nullptr) {
-		return false;
-	}
-	return true;
+	return dashColon;
 }
 
 int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keywords, LexAccessor &styler, bool &tagDontFold,
-	bool caseSensitive, bool isXml, bool allowScripts) {
+	bool isXml, bool allowScripts) {
 	char withSpace[126 + 2] = " ";
 	const char *tag = withSpace + 1;
 	// Copy after the '<' and stop before space
 	Sci_PositionU i = 1;
+	bool dashColon = false;
 	for (Sci_PositionU cPos = start; cPos < end && i < sizeof(withSpace) - 2; cPos++) {
 		const char ch = styler[cPos];
-		if (IsASpace(ch)) {
+		if (static_cast<unsigned char>(ch) <= ' ') {
 			break;
 		}
 		if ((ch != '<') && (ch != '/')) {
-			withSpace[i++] = caseSensitive ? ch : MakeLowerCase(ch);
+			withSpace[i++] = isXml ? ch : MakeLowerCase(ch);
+			if (ch == ':' || ch == '-') {
+				dashColon = true;
+			}
 		}
 	}
 
@@ -213,7 +213,7 @@ int classifyTagHTML(Sci_PositionU start, Sci_PositionU end, const WordList &keyw
 		chAttr = SCE_H_SGML_DEFAULT;
 	} else if (!keywords || keywords.InList(tag)) {
 		chAttr = SCE_H_TAG;
-	} else if (!isXml && isHTMLCustomElement(tag, i - 1)) {
+	} else if (!isXml && isHTMLCustomElement(tag, i - 1, dashColon)) {
 		customElement = true;
 		chAttr = SCE_H_TAG;
 	}
@@ -420,11 +420,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 	//	The default is on.
 	const bool foldXmlAtTagOpen = isXml & fold;// && styler.GetPropertyBool("fold.xml.at.tag.open", true);
 
-	// property html.tags.case.sensitive
-	//	For XML and HTML, setting this property to 1 will make tags match in a case
-	//	sensitive way which is the expected behaviour for XML and XHTML.
-	constexpr bool caseSensitive = false;//styler.GetPropertyBool("html.tags.case.sensitive", false);
-
 	// property lexer.xml.allow.scripts
 	//	Set to 0 to disable scripts in XML.
 	const bool allowScripts = styler.GetPropertyBool("lexer.xml.allow.scripts", true);
@@ -540,7 +535,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			case SCE_HJ_COMMENTDOC:
 			//case SCE_HJ_COMMENTLINE: // removed as this is a common thing done to hide
 			// the end of script marker from some JS interpreters.
-			case SCE_HB_COMMENTLINE:
+			//case SCE_HB_COMMENTLINE:
 			case SCE_HBA_COMMENTLINE:
 			case SCE_HJ_DOUBLESTRING:
 			case SCE_HJ_SINGLESTRING:
@@ -552,7 +547,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			default :
 				// check if the closing tag is a script tag
 				{
-					const bool match = (state == SCE_HJ_COMMENTLINE || isXml) ? styler.MatchLowerCase(i + 2, "script")
+					const bool match = (state == SCE_HJ_COMMENTLINE || state == SCE_HB_COMMENTLINE || isXml) ? styler.MatchLowerCase(i + 2, "script")
 						: ((state == SCE_H_COMMENT) ? styler.MatchLowerCase(i + 2, "comment") : true);
 					if (!match) {
 						break;
@@ -671,8 +666,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		// handle the end of a pre-processor = Non-HTML
 		else if ((((inScriptType == eNonHtmlPreProc) || (inScriptType == eNonHtmlScriptPreProc)) &&
-				  (((scriptLanguage != eScriptNone) && stateAllowsTermination(state))) &&
-				  (((ch == '%') || (ch == '?')) && (chNext == '>'))) ||
+				  ((scriptLanguage != eScriptNone) && (chNext == '>') && stateAllowsTermination(state, ch))) ||
 		         ((scriptLanguage == eScriptSGML) && (ch == '>') && (state != SCE_H_SGML_COMMENT))) {
 			if (state == SCE_H_ASPAT) {
 				aspScript = segIsScriptingIndicator(styler, styler.GetStartSegment(), i, aspScript);
@@ -900,7 +894,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 		case SCE_H_TAGUNKNOWN:
 			if (!IsTagContinue(ch) && !((ch == '/') && (chPrev == '<'))) {
 				int eClass = classifyTagHTML(styler.GetStartSegment(),
-					i, keywordsTag, styler, tagDontFold, caseSensitive, isXml, allowScripts);
+					i, keywordsTag, styler, tagDontFold, isXml, allowScripts);
 				if (eClass == SCE_H_SCRIPT || eClass == SCE_H_COMMENT) {
 					if (!tagClosing) {
 						inScriptType = eNonHtmlScript;

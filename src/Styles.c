@@ -91,6 +91,7 @@ extern EDITLEXER lexGradle;
 extern EDITLEXER lexGraphViz;
 extern EDITLEXER lexGroovy;
 
+extern EDITLEXER lexHaskell;
 extern EDITLEXER lexHaxe;
 
 extern EDITLEXER lexINI;
@@ -108,9 +109,13 @@ extern EDITLEXER lexLua;
 
 extern EDITLEXER lexMakefile;
 extern EDITLEXER lexMarkdown;
+extern EDITLEXER lexMathematica;
 extern EDITLEXER lexMatlab;
 
+extern EDITLEXER lexNim;
 extern EDITLEXER lexNsis;
+
+extern EDITLEXER lexOCaml;
 
 extern EDITLEXER lexPascal;
 extern EDITLEXER lexPerl;
@@ -139,6 +144,8 @@ extern EDITLEXER lexVisualBasic;
 extern EDITLEXER lexWASM;
 
 extern EDITLEXER lexYAML;
+
+extern EDITLEXER lexZig;
 
 // This array holds all the lexers...
 static PEDITLEXER pLexArray[] = {
@@ -195,6 +202,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexGraphViz,
 	&lexGroovy,
 
+	&lexHaskell,
 	&lexHaxe,
 
 	&lexINI,
@@ -212,9 +220,13 @@ static PEDITLEXER pLexArray[] = {
 
 	&lexMakefile,
 	&lexMarkdown,
+	&lexMathematica,
 	&lexMatlab,
 
+	&lexNim,
 	&lexNsis,
+
+	&lexOCaml,
 
 	&lexPascal,
 	&lexPerl,
@@ -243,6 +255,8 @@ static PEDITLEXER pLexArray[] = {
 	&lexWASM,
 
 	&lexYAML,
+
+	&lexZig,
 };
 
 // the two global styles at the beginning of the array not visible in
@@ -313,7 +327,7 @@ static const COLORREF defaultCustomColor[MAX_CUSTOM_COLOR_COUNT] = {
 };
 static COLORREF customColor[MAX_CUSTOM_COLOR_COUNT];
 struct CallTipInfo callTipInfo;
-static BOOL iCustomColorLoaded = FALSE;
+static bool bCustomColorLoaded = false;
 
 bool	bUse2ndGlobalStyle;
 int		np2StyleTheme;
@@ -811,10 +825,9 @@ static void Style_LoadAll(bool bReload, bool onlyCustom) {
 	IniSectionInit(pIniSection, 128);
 
 	// Custom colors
-	const int value = (np2StyleTheme << 1) | 1;
-	if (bReload || iCustomColorLoaded != value) {
+	if (bReload || !bCustomColorLoaded) {
+		bCustomColorLoaded = true;
 		LPCWSTR themePath = GetStyleThemeFilePath();
-		iCustomColorLoaded = value;
 		memcpy(customColor, defaultCustomColor, MAX_CUSTOM_COLOR_COUNT * sizeof(COLORREF));
 
 		GetPrivateProfileSection(INI_SECTION_NAME_CUSTOM_COLORS, pIniSectionBuf, cchIniSection, themePath);
@@ -1168,6 +1181,9 @@ void Style_OnDPIChanged(PEDITLEXER pLex) {
 }
 
 void Style_OnStyleThemeChanged(int theme) {
+	if (theme == np2StyleTheme) {
+		return;
+	}
 	if (theme != StyleTheme_Default) {
 		if (!PathIsFile(darkStyleThemeFilePath)) {
 			FindDarkThemeFile();
@@ -1178,6 +1194,7 @@ void Style_OnStyleThemeChanged(int theme) {
 		SaveSettingsNow(true, true);
 	}
 	np2StyleTheme = theme;
+	bCustomColorLoaded = false;
 	Style_SetLexer(pLexCurrent, false);
 }
 
@@ -2137,7 +2154,7 @@ PEDITLEXER Style_DetectObjCAndMatlab(void) {
 		case '(':
 			++p;
 			if (*p == '*') { // Mathematica comment
-				return &lexFSharp;
+				return &lexMathematica;
 			}
 			break;
 		case '@':	// ObjC keyword or Matlab command
@@ -3567,6 +3584,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
 	}
 
 	iRGBResult = cc.rgbResult;
+	iRGBResult = ColorToRGBHex(iRGBResult);
 
 	// Rebuild style string
 	WCHAR szNewStyle[MAX_LEXER_STYLE_EDIT_SIZE];
@@ -3590,7 +3608,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"fore:#%06X", ColorToRGBHex(iRGBResult));
+		wsprintf(tch, L"fore:#%06X", iRGBResult);
 		lstrcat(szNewStyle, tch);
 		Style_StrCopyBack(szNewStyle, lpszStyle, tch);
 	} else {
@@ -3598,7 +3616,7 @@ bool Style_SelectColor(HWND hwnd, LPWSTR lpszStyle, int cchStyle, bool bFore) {
 		if (StrNotEmpty(szNewStyle)) {
 			lstrcat(szNewStyle, L"; ");
 		}
-		wsprintf(tch, L"back:#%06X", ColorToRGBHex(iRGBResult));
+		wsprintf(tch, L"back:#%06X", iRGBResult);
 		lstrcat(szNewStyle, tch);
 	}
 
@@ -5276,10 +5294,11 @@ bool SelectCSVOptionsDlg(void) {
 }
 
 void EditShowCallTip(Sci_Position position) {
-	if (callTipInfo.type != CallTipType_Notification && SciCall_CallTipActive()) {
-		if (position >= callTipInfo.startPos && position < callTipInfo.endPos) {
+	if (callTipInfo.type > CallTipType_Notification) {
+		if (SciCall_CallTipActive() && position >= callTipInfo.startPos && position < callTipInfo.endPos) {
 			return;
 		}
+		callTipInfo.type = CallTipType_None;
 		SciCall_CallTipCancel();
 	}
 	if (position < 0) {
@@ -5289,11 +5308,11 @@ void EditShowCallTip(Sci_Position position) {
 	const ShowCallTip colorFormat = callTipInfo.showCallTip;
 	if (colorFormat != ShowCallTip_None) {
 		char text[32] = {0};
-		const Sci_Position startPos = max_pos(0, position - 12);
-		const Sci_Position endPos = min_pos(position + 12, SciCall_GetLength());
-		const struct Sci_TextRangeFull tr = { { startPos, endPos }, text};
+		const Sci_Position startPos = max_pos(0, position - 10);
+		const Sci_Position endPos = min_pos(position + 10, SciCall_GetLength());
+		const struct Sci_TextRangeFull tr = { { startPos, endPos }, text + 8};
 		SciCall_GetTextRangeFull(&tr);
-		char * const p = text + position - startPos;
+		char * const p = text + 8 + position - startPos;
 		char *s = p;
 		while (IsHexDigit(*s)) {
 			--s;
@@ -5308,7 +5327,7 @@ void EditShowCallTip(Sci_Position position) {
 				*t++ = '\n';
 				*t = '\0';
 				position -= p - s;
-				uint32_t color = (uint32_t)strtoul(s + 1, NULL, 16);
+				uint32_t color = strtoul(s + 1, NULL, 16);
 				if (len == 6) {
 					if (colorFormat == ShowCallTip_ColorRGBA || colorFormat == ShowCallTip_ColorARGB) {
 						color = ColorFromRGBHex(color);
@@ -5322,19 +5341,21 @@ void EditShowCallTip(Sci_Position position) {
 						color = ColorFromBGRAHex(color);
 					}
 				} else {
+					// always treated as #RGBA or #ARGB
 					uint32_t alpha = 0;
 					if (len == 4) {
-						alpha = color & 15;
-						alpha |= alpha << 4;
-						color >>= 4;
+						if (colorFormat == ShowCallTip_ColorARGB) {
+							alpha = color >> 12;
+						} else {
+							alpha = color & 15;
+							color >>= 4;
+						}
 					}
-					uint32_t red = (color >> 8) & 15;
-					uint32_t green = (color >> 4) & 15;
-					uint32_t blue = color & 15;
-					red |= red << 4;
-					green |= green << 4;
-					blue |= blue << 4;
+					const uint32_t red = (color >> 8) & 15;
+					const uint32_t green = (color >> 4) & 15;
+					const uint32_t blue = color & 15;
 					color = red | (green << 8) | (blue << 16) | (alpha << 24);
+					color *= 0x11;
 				}
 				if (*s != '#') {
 					--s;
@@ -5347,7 +5368,6 @@ void EditShowCallTip(Sci_Position position) {
 				callTipInfo.endPos = position + len + 1;
 				callTipInfo.hexStart = position + 1;
 				callTipInfo.currentColor = color;
-				SciCall_CallTipCancel();
 				SciCall_CallTipSetBack(color);
 				SciCall_CallTipSetFore(~color);
 				SciCall_CallTipShow(position, s);
@@ -5360,10 +5380,13 @@ void EditShowCallTip(Sci_Position position) {
 
 void EditClickCallTip(HWND hwnd) {
 	SciCall_CallTipCancel();
-	if (callTipInfo.type == CallTipType_ColorHex) {
-		if (!iCustomColorLoaded) {
+	const CallTipType type = callTipInfo.type;
+	callTipInfo.type = CallTipType_None;
+	if (type == CallTipType_ColorHex) {
+		if (!bCustomColorLoaded) {
 			Style_LoadAll(false, true);
 		}
+
 		const unsigned back = callTipInfo.currentColor;
 		unsigned color = back & 0xffffffU;
 		CHOOSECOLOR cc;

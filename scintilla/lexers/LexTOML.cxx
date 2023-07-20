@@ -53,11 +53,6 @@ constexpr bool IsTOMLOperator(int ch) noexcept {
 	return AnyOf(ch, '[', ']', '{', '}', ',', '=', '.', '+', '-');
 }
 
-constexpr bool IsTOMLDateTime(int ch, int chNext) noexcept {
-	return ((ch == '-' || ch == ':' || ch == '.') && IsADigit(chNext))
-		|| (ch == ' ' && (chNext == '-' || IsADigit(chNext)));
-}
-
 constexpr bool IsTOMLUnquotedKey(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '-';
 }
@@ -124,7 +119,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_TOML_NUMBER:
 			if (!IsDecimalNumber(sc.chPrev, sc.ch, sc.chNext)) {
-				if (IsTOMLDateTime(sc.ch, sc.chNext)) {
+				if (IsISODateTime(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_TOML_DATETIME);
 				} else if (IsTOMLKey(sc, braceCount, nullptr)) {
 					continue;
@@ -133,7 +128,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_TOML_DATETIME:
-			if (!(IsIdentifierChar(sc.ch) || IsTOMLDateTime(sc.ch, sc.chNext))) {
+			if (!(IsIdentifierChar(sc.ch) || IsISODateTime(sc.ch, sc.chNext))) {
 				if (IsTOMLKey(sc, braceCount, nullptr)) {
 					continue;
 				}

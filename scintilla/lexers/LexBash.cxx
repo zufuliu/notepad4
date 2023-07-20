@@ -37,18 +37,6 @@ enum {
 
 #define HERE_DELIM_MAX			256
 
-// define this if you want 'invalid octals' to be marked as errors
-// usually, this is not a good idea, permissive lexing is better
-#undef PEDANTIC_OCTAL
-
-#define BASH_BASE_ERROR			65
-#define BASH_BASE_DECIMAL		66
-#define BASH_BASE_HEX			67
-#ifdef PEDANTIC_OCTAL
-#define BASH_BASE_OCTAL			68
-#define	BASH_BASE_OCTAL_ERROR	69
-#endif
-
 // state constants for parts of a bash command segment
 enum class CmdState {
 	Body,
@@ -80,6 +68,7 @@ enum class QuoteStyle {
 
 #define BASH_QUOTE_STACK_MAX	7
 
+// https://www.gnu.org/software/bash/manual/bash.html#Shell-Arithmetic
 constexpr int translateBashDigit(int ch) noexcept {
 	if (ch >= '0' && ch <= '9') {
 		return ch - '0';
@@ -96,20 +85,12 @@ constexpr int translateBashDigit(int ch) noexcept {
 	if (ch == '_') {
 		return 63;
 	}
-	return BASH_BASE_ERROR;
+	return 64;
 }
 
-int getBashNumberBase(const char *s) noexcept {
-	int i = 0;
-	int base = 0;
-	while (*s) {
-		base = base * 10 + (*s++ - '0');
-		i++;
-	}
-	if (base > 64 || i > 2) {
-		return BASH_BASE_ERROR;
-	}
-	return base;
+constexpr bool IsBashNumber(int ch, int base) noexcept {
+	const int digit = translateBashDigit(ch);
+	return digit < base || (digit >= 36 && base <= 36 && digit - 26 < base);
 }
 
 constexpr int opposite(int ch) noexcept {
@@ -123,14 +104,15 @@ constexpr int opposite(int ch) noexcept {
 int GlobScan(StyleContext &sc) noexcept {
 	// forward scan for zsh globs, disambiguate versus bash arrays
 	// complex expressions may still fail, e.g. unbalanced () '' "" etc
-	int c;
 	int sLen = 0;
 	int pCount = 0;
 	int hash = 0;
-	while ((c = sc.GetRelativeCharacter(++sLen)) != 0) {
-		if (IsASpace(c)) {
+	while (true) {
+		const int c = sc.GetRelativeCharacter(++sLen);
+		if (c <= ' ') {
 			return 0;
-		} else if (c == '\'' || c == '\"') {
+		}
+		if (c == '\'' || c == '\"') {
 			if (hash != 2) {
 				return 0;
 			}
@@ -168,12 +150,23 @@ constexpr bool IsBashOperatorLast(int ch) noexcept {
 	return IsAGraphic(ch) && !(ch == '/'); // remaining graphic characters
 }
 
-constexpr bool IsBashSingleCharOperator(int ch) noexcept {
-	return AnyOf(ch, 'r', 'w', 'x', 'o', 'R', 'W', 'X', 'O', 'e', 'z', 's', 'f', 'd', 'l', 'p', 'S', 'b', 'c', 't', 'u', 'g', 'k', 'T', 'B', 'M', 'A', 'C', 'a', 'h', 'G', 'L', 'N', 'n');
+constexpr bool IsTestOperator(const char *s) noexcept {
+	return s[2] == '\0' || (s[3] == '\0' && IsLowerCase(s[1]) && IsLowerCase(s[2]));
 }
 
 constexpr bool IsBashParamChar(int ch) noexcept {
 	return IsIdentifierChar(ch);
+}
+
+constexpr bool IsBashParamStart(int ch, bool isCShell) noexcept {
+	// https://www.gnu.org/software/bash/manual/bash.html#Special-Parameters
+	// https://zsh.sourceforge.io/Doc/Release/Parameters.html#Parameters
+	// https://man.archlinux.org/man/dash.1#Special_Parameters
+	// https://man.archlinux.org/man/ksh.1#Parameter_Expansion.
+	return IsBashParamChar(ch) || AnyOf(ch, '*', '@', '#', '?', '-', '$', '!')
+	// https://man.archlinux.org/man/tcsh.1.en#Variable_substitution_without_modifiers
+		|| (isCShell && AnyOf(ch, '%', '<'))
+	;
 }
 
 constexpr bool IsBashHereDoc(int ch) noexcept {
@@ -203,19 +196,22 @@ public:
 	int Down = '\0';
 	QuoteStyle Style = QuoteStyle::Literal;
 	int Outer = SCE_SH_DEFAULT;
+	CmdState State = CmdState::Body;
 	void Clear() noexcept {
 		Count = 0;
 		Up	  = '\0';
 		Down  = '\0';
 		Style = QuoteStyle::Literal;
 		Outer = SCE_SH_DEFAULT;
+		State = CmdState::Body;
 	}
-	void Start(int u, QuoteStyle s, int outer) noexcept {
+	void Start(int u, QuoteStyle s, int outer, CmdState state) noexcept {
 		Count = 1;
 		Up    = u;
 		Down  = opposite(Up);
 		Style = s;
 		Outer = outer;
+		State = state;
 	}
 };
 
@@ -225,23 +221,24 @@ public:
 	int State = SCE_SH_DEFAULT;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
+	bool isCShell = false;
 	[[nodiscard]] bool Empty() const noexcept {
 		return Current.Up == '\0';
 	}
-	void Start(int u, QuoteStyle s, int outer) noexcept {
+	void Start(int u, QuoteStyle s, int outer, CmdState state) noexcept {
 		if (Empty()) {
-			Current.Start(u, s, outer);
+			Current.Start(u, s, outer, state);
 		} else {
-			Push(u, s, outer);
+			Push(u, s, outer, state);
 		}
 	}
-	void Push(int u, QuoteStyle s, int outer) noexcept {
+	void Push(int u, QuoteStyle s, int outer, CmdState state) noexcept {
 		if (Depth >= BASH_QUOTE_STACK_MAX) {
 			return;
 		}
 		Stack[Depth] = Current;
 		Depth++;
-		Current.Start(u, s, outer);
+		Current.Start(u, s, outer, state);
 	}
 	void Pop() noexcept {
 		if (Depth == 0) {
@@ -263,7 +260,7 @@ public:
 			sc.Forward();
 		}
 		if (Current.Count == 0) {
-			cmdState = CmdState::Body;
+			cmdState = Current.State;
 			const int outer = Current.Outer;
 			Pop();
 			sc.ForwardSetState(outer);
@@ -272,6 +269,7 @@ public:
 		return false;
 	}
 	void Expand(StyleContext &sc, CmdState &cmdState) {
+		const CmdState current = cmdState;
 		const int state = sc.state;
 		QuoteStyle style = QuoteStyle::Literal;
 		State = state;
@@ -295,7 +293,7 @@ public:
 				style = QuoteStyle::Command;
 				cmdState = CmdState::Delimiter;
 			}
-			if (sc.ch == '(' && state == SCE_SH_DEFAULT && Depth == 0) {
+			if (current == CmdState::Body && sc.ch == '(' && state == SCE_SH_DEFAULT && Depth == 0) {
 				// optimized to avoid track nested delimiter pairs
 				return;
 			}
@@ -304,9 +302,12 @@ public:
 			sc.ChangeState(SCE_SH_BACKTICKS);
 		} else {
 			// scalar has no delimiter pair
+			if (!IsBashParamStart(sc.ch, isCShell)) {
+				sc.ChangeState(state); // not scalar
+			}
 			return;
 		}
-		Start(sc.ch, style, state);
+		Start(sc.ch, style, state, current);
 		sc.Forward();
 	}
 };
@@ -333,11 +334,11 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	QuoteStackCls QuoteStack;
 
 	int numBase = 0;
-	int digit;
 	const Sci_PositionU endPos = startPos + length;
 	CmdState cmdState = CmdState::Start;
 	TestExprType testExprType = TestExprType::Test;
 
+	QuoteStack.isCShell = styler.GetPropertyBool("lexer.lang");
 	// Always backtracks to the start of a line that is not a continuation
 	// of the previous line (i.e. start of a bash command segment)
 	Sci_Line ln = styler.GetLine(startPos);
@@ -445,7 +446,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				// disambiguate option items and file test operators
 				else if (s[0] == '-') {
-					if (cmdState != CmdState::Test) {
+					if (cmdState != CmdState::Test || !IsTestOperator(s)) {
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 					}
 				}
@@ -475,63 +476,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			break;
 		case SCE_SH_NUMBER:
-			digit = translateBashDigit(sc.ch);
-			if (numBase == BASH_BASE_DECIMAL) {
-				if (sc.ch == '#') {
-					char s[10];
-					sc.GetCurrent(s, sizeof(s));
-					numBase = getBashNumberBase(s);
-					if (numBase != BASH_BASE_ERROR) {
-						break;
-					}
-				} else if (IsADigit(sc.ch)) {
-					break;
-				}
-			} else if (numBase == BASH_BASE_HEX) {
-				if (IsHexDigit(sc.ch)) {
-					break;
-				}
-#ifdef PEDANTIC_OCTAL
-			} else if (numBase == BASH_BASE_OCTAL ||
-				numBase == BASH_BASE_OCTAL_ERROR) {
-				if (digit <= 7) {
-					break;
-				}
-				if (digit <= 9) {
-					numBase = BASH_BASE_OCTAL_ERROR;
-					break;
-				}
-#endif
-			} else if (numBase == BASH_BASE_ERROR) {
-				if (digit <= 9) {
-					break;
-				}
-			} else {	// DD#DDDD number style handling
-				if (digit != BASH_BASE_ERROR) {
-					if (numBase <= 36) {
-						// case-insensitive if base<=36
-						if (digit >= 36) {
-							digit -= 26;
-						}
-					}
-					if (digit < numBase) {
-						break;
-					}
-					if (digit <= 9) {
-						numBase = BASH_BASE_ERROR;
-						break;
-					}
-				}
+			if (!IsBashNumber(sc.ch, numBase)) {
+				sc.SetState(SCE_SH_DEFAULT);
 			}
-			// fallthrough when number is at an end or error
-			if (numBase == BASH_BASE_ERROR
-#ifdef PEDANTIC_OCTAL
-				|| numBase == BASH_BASE_OCTAL_ERROR
-#endif
-				) {
-				sc.ChangeState(SCE_SH_ERROR);
-			}
-			sc.SetState(SCE_SH_DEFAULT);
 			break;
 		case SCE_SH_COMMENTLINE:
 			if (sc.MatchLineEnd() && sc.chPrev != '\\') {
@@ -611,7 +558,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				if ((HereDoc.DelimiterLength == 0 && sc.MatchLineEnd())
 					|| (styler.Match(sc.currentPos, HereDoc.Delimiter) && IsEOLChar(sc.GetRelative(HereDoc.DelimiterLength)))) {
-					sc.Forward(HereDoc.DelimiterLength);
+					if (HereDoc.DelimiterLength != 0) {
+						sc.SetState(SCE_SH_HERE_DELIM);
+						sc.Forward(HereDoc.DelimiterLength);
+					}
 					sc.SetState(SCE_SH_DEFAULT);
 					break;
 				}
@@ -620,9 +570,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				if (sc.ch == '\\') {
 					sc.Forward();
 				} else if (sc.ch == '`') {
-					QuoteStack.Start(sc.ch, QuoteStyle::Backtick, sc.state);
+					QuoteStack.Start(sc.ch, QuoteStyle::Backtick, sc.state, cmdState);
 					sc.SetState(SCE_SH_BACKTICKS);
-				} else if (sc.ch == '$') {
+				} else if (sc.ch == '$' && !AnyOf(sc.chNext, '\"', '\'')) {
 					QuoteStack.Expand(sc, cmdState);
 					continue;
 				}
@@ -631,7 +581,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		case SCE_SH_SCALAR:	// variable names
 			if (!IsBashParamChar(sc.ch)) {
 				if (sc.LengthCurrent() == 1) {
-					// Special variable: $(, $_ etc.
+					// Special variable
 					sc.Forward();
 				}
 				sc.SetState(QuoteStack.State);
@@ -654,9 +604,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					QuoteStack.Current.Style == QuoteStyle::LString
 					) {	// do nesting for "string", $"locale-string"
 					if (sc.ch == '`') {
-						QuoteStack.Push(sc.ch, QuoteStyle::Backtick, sc.state);
+						QuoteStack.Push(sc.ch, QuoteStyle::Backtick, sc.state, cmdState);
 						sc.SetState(SCE_SH_BACKTICKS);
-					} else if (sc.ch == '$') {
+					} else if (sc.ch == '$' && !AnyOf(sc.chNext, '\"', '\'')) {
 						QuoteStack.Expand(sc, cmdState);
 						continue;
 					}
@@ -668,10 +618,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						QuoteStack.State = sc.state;
 						sc.SetState(SCE_SH_STRING_SQ);
 					} else if (sc.ch == '\"') {
-						QuoteStack.Push(sc.ch, QuoteStyle::String, sc.state);
+						QuoteStack.Push(sc.ch, QuoteStyle::String, sc.state, cmdState);
 						sc.SetState(SCE_SH_STRING_DQ);
 					} else if (sc.ch == '`') {
-						QuoteStack.Push(sc.ch, QuoteStyle::Backtick, sc.state);
+						QuoteStack.Push(sc.ch, QuoteStyle::Backtick, sc.state, cmdState);
 						sc.SetState(SCE_SH_BACKTICKS);
 					} else if (sc.ch == '$') {
 						QuoteStack.Expand(sc, cmdState);
@@ -728,17 +678,19 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_SH_NUMBER);
-				numBase = BASH_BASE_DECIMAL;
-				if (sc.ch == '0') {	// hex, octal
-					if (sc.chNext == 'x' || sc.chNext == 'X') {
-						numBase = BASH_BASE_HEX;
+				numBase = 10;
+				if (sc.ch == '0' && (sc.chNext == 'x' || sc.chNext == 'X')) {
+					numBase = 16;
+					sc.Forward();
+				} else if (IsADigit(sc.chNext) || sc.chNext == '#') {
+					int base = sc.ch - '0';
+					if (sc.chNext != '#') {
+						base = base*10 + sc.chNext - '0';
 						sc.Forward();
-					} else if (IsADigit(sc.chNext)) {
-#ifdef PEDANTIC_OCTAL
-						numBase = BASH_BASE_OCTAL;
-#else
-						numBase = BASH_BASE_HEX;
-#endif
+					}
+					if (sc.chNext == '#' && base >= 2 && base <= 64) {
+						numBase = base;
+						sc.Forward();
 					}
 				}
 			} else if (IsIdentifierStart(sc.ch)) {
@@ -769,13 +721,13 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					}
 				}
 			} else if (sc.ch == '\"') {
-				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT);
+				QuoteStack.Start(sc.ch, QuoteStyle::String, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_STRING_DQ);
 			} else if (sc.ch == '\'') {
 				QuoteStack.State = SCE_SH_DEFAULT;
 				sc.SetState(SCE_SH_STRING_SQ);
 			} else if (sc.ch == '`') {
-				QuoteStack.Start(sc.ch, QuoteStyle::Backtick, SCE_SH_DEFAULT);
+				QuoteStack.Start(sc.ch, QuoteStyle::Backtick, SCE_SH_DEFAULT, cmdState);
 				sc.SetState(SCE_SH_BACKTICKS);
 			} else if (sc.ch == '$') {
 				QuoteStack.Expand(sc, cmdState);
@@ -789,9 +741,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				} else {
 					HereDoc.Indent = false;
 				}
-			} else if (sc.ch == '-'	&&	// one-char file test operators
-				IsBashSingleCharOperator(sc.chNext) &&
-				!IsBashWordChar(sc.GetRelative(2)) &&
+			} else if (sc.ch == '-' && // test operator or short and long option
+				(IsAlpha(sc.chNext) || sc.chNext == '-') &&
 				IsASpace(sc.chPrev)) {
 				sc.SetState(SCE_SH_WORD);
 				sc.Forward();
@@ -937,7 +888,9 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			break;
 
 		case SCE_SH_HERE_DELIM:
-			if (stylePrev != SCE_SH_HERE_DELIM) {
+			if (stylePrev == SCE_SH_HERE_Q) {
+				levelCurrent--;
+			} else if (stylePrev != SCE_SH_HERE_DELIM) {
 				if (ch == '<' && styler[startPos + 1] != '<') {
 					levelCurrent++;
 				}

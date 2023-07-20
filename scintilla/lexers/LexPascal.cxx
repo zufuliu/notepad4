@@ -109,11 +109,12 @@ constexpr bool IsPascalOperator(int ch) noexcept {
 
 void ColourisePascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	constexpr bool bSmartHighlighting = true; //styler.GetPropertyBool("lexer.pascal.smart.highlighting", true);
-
-	Sci_Line curLine = styler.GetLine(startPos);
-	int curLineState = curLine > 0 ? styler.GetLineState(curLine - 1) : 0;
+	int curLineState = 0;
 
 	StyleContext sc(startPos, length, initStyle, styler);
+	if (sc.currentLine > 0) {
+		curLineState = styler.GetLineState(sc.currentLine - 1);
+	}
 
 	for (; sc.More(); sc.Forward()) {
 		if (sc.atLineEnd) {

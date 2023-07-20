@@ -335,8 +335,8 @@ public:
 		return attr;
 	}
 
-	LONG HasCompositionString(DWORD dwIndex) const noexcept {
-		return hIMC ? ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) : 0;
+	bool HasCompositionString(DWORD dwIndex) const noexcept {
+		return ::ImmGetCompositionStringW(hIMC, dwIndex, nullptr, 0) > 0;
 	}
 
 	std::wstring GetCompositionString(DWORD dwIndex) const {
@@ -400,11 +400,13 @@ class ScintillaWin final :
 
 	bool capturedMouse = false;
 	bool trackedMouseLeave = false;
+	bool cursorIsHidden = false;
 	bool hasOKText = false;
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
 	SetCoalescableTimerSig SetCoalescableTimerFn = nullptr;
 #endif
 
+	BOOL typingWithoutCursor = FALSE;
 	UINT linesPerScroll = 0;	///< Intellimouse support
 	UINT charsPerScroll = 0;	///< Intellimouse support
 	MouseWheelDelta verticalWheelDelta;
@@ -536,6 +538,7 @@ class ScintillaWin final :
 	void SetMouseCapture(bool on) noexcept override;
 	bool HaveMouseCapture() const noexcept override;
 	void SetTrackMouseLeaveEvent(bool on) noexcept;
+	void HideCursorIfPreferred() noexcept;
 	void UpdateBaseElements() override;
 	bool SCICALL PaintContains(PRectangle rc) const noexcept override;
 	void ScrollText(Sci::Line linesToMove) override;
@@ -569,7 +572,7 @@ class ScintillaWin final :
 		Binary,		// used in Copy & Paste for asBinary
 	};
 
-	void GetIntelliMouseParameters() noexcept;
+	void GetMouseParameters() noexcept;
 	void CopyToGlobal(GlobalMemory &gmUnicode, const SelectionText &selectedText, CopyEncoding encoding) const;
 	void CopyToClipboard(const SelectionText &selectedText) const override;
 	void ScrollMessage(WPARAM wParam);
@@ -1437,20 +1440,6 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// Copy & paste by johnsonj with a lot of helps of Neil.
 	// Great thanks for my foreruners, jiniya and BLUEnLIVE.
 	const IMContext imc(MainHWND());
-
-	bool initialCompose = false;
-	if (pdoc->TentativeActive()) {
-		// GCS_COMPSTR is set on pressing Esc, but without composition string.
-		const bool pending = (lParam & GCS_COMPSTR) && imc.HasCompositionString(GCS_COMPSTR);
-		pdoc->TentativeUndo(pending);
-	} else {
-		// No tentative undo means start of this composition so
-		// fill in any virtual spaces.
-		initialCompose = true;
-	}
-
-	view.imeCaretBlockOverride = false;
-
 	if (!imc.hIMC) {
 		return 0;
 	}
@@ -1459,6 +1448,14 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		return 0;
 	}
 
+	const DelaySavePoint delay(pdoc);
+	const bool tentative = pdoc->TentativeActive();
+	if (tentative) {
+		pdoc->TentativeUndo();
+	}
+
+	view.imeCaretBlockOverride = false;
+
 	// See Chromium's InputMethodWinImm32::OnImeComposition()
 	//
 	// Japanese IMEs send a message containing both GCS_RESULTSTR and
@@ -1466,17 +1463,18 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 	// by the start of another composition.
 	if (lParam & GCS_RESULTSTR) {
 		AddWString(imc.GetCompositionString(GCS_RESULTSTR), CharacterSource::ImeResult);
-		initialCompose = true;
 	}
 
 	if (lParam & GCS_COMPSTR) {
 		const std::wstring wcs = imc.GetCompositionString(GCS_COMPSTR);
+		// GCS_COMPSTR is set on pressing Esc, but without composition string.
 		if (wcs.empty()) {
 			ShowCaretAtCurrentPosition();
 			return 0;
 		}
 
-		if (initialCompose) {
+		// No tentative undo means start of this composition so fill in any virtual spaces.
+		if (!tentative) {
 			ClearBeforeTentativeStart();
 		}
 
@@ -1528,6 +1526,7 @@ sptr_t ScintillaWin::HandleCompositionInline(uptr_t, sptr_t lParam) {
 		}
 
 		view.imeCaretBlockOverride = KoreanIME();
+		HideCursorIfPreferred();
 	}
 
 	EnsureCaretVisible();
@@ -1708,6 +1707,7 @@ sptr_t ScintillaWin::MouseMessage(unsigned int iMessage, uptr_t wParam, sptr_t l
 	break;
 
 	case WM_MOUSEMOVE: {
+		cursorIsHidden = false; // to be shown by ButtonMoveWithModifiers
 		const Point pt = PointFromLParam(lParam);
 
 		// Windows might send WM_MOUSEMOVE even though the mouse has not been moved:
@@ -1827,6 +1827,7 @@ sptr_t ScintillaWin::KeyMessage(unsigned int iMessage, uptr_t wParam, sptr_t lPa
 
 	case WM_CHAR:
 		//printf("%s:%d WM_CHAR %u, consumed=%d\n", __func__, __LINE__, (UINT)wParam, lastKeyDownConsumed);
+		HideCursorIfPreferred();
 		if (wParam >= ' ' || !lastKeyDownConsumed) {
 			// filter out control characters
 			// https://docs.microsoft.com/en-us/windows/win32/learnwin32/keyboard-input#character-messages
@@ -2214,8 +2215,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_CREATE:
 			ctrlID = ::GetDlgCtrlID(MainHWND());
 			UpdateBaseElements();
-			// Get Intellimouse scroll line parameters
-			GetIntelliMouseParameters();
+			GetMouseParameters();
 			::RegisterDragDrop(MainHWND(), &dt);
 			break;
 
@@ -2276,10 +2276,12 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 
 		case WM_SETCURSOR:
 			if (LOWORD(lParam) == HTCLIENT) {
-				POINT pt;
-				if (::GetCursorPos(&pt)) {
-					::ScreenToClient(MainHWND(), &pt);
-					DisplayCursor(ContextCursor(PointFromPOINTEx(pt)));
+				if (!cursorIsHidden) {
+					POINT pt;
+					if (::GetCursorPos(&pt)) {
+						::ScreenToClient(MainHWND(), &pt);
+						DisplayCursor(ContextCursor(PointFromPOINTEx(pt)));
+					}
 				}
 				return TRUE;
 			}
@@ -2297,8 +2299,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 			//Platform::DebugPrintf("Setting Changed\n");
 			UpdateRenderingParams(true);
 			UpdateBaseElements();
-			// Get Intellimouse scroll line parameters
-			GetIntelliMouseParameters();
+			GetMouseParameters();
 			InvalidateStyleRedraw();
 			//printf("%s after %s\n", GetCurrentLogTime(), "WM_SETTINGCHANGE");
 			break;
@@ -2568,6 +2569,14 @@ void ScintillaWin::SetTrackMouseLeaveEvent(bool on) noexcept {
 		TrackMouseEvent(&tme);
 	}
 	trackedMouseLeave = on;
+}
+
+void ScintillaWin::HideCursorIfPreferred() noexcept {
+	// SPI_GETMOUSEVANISH from OS.
+	if (typingWithoutCursor && !cursorIsHidden) {
+		::SetCursor(nullptr);
+		cursorIsHidden = true;
+	}
 }
 
 void ScintillaWin::UpdateBaseElements() {
@@ -3029,7 +3038,7 @@ void ScintillaWin::Paste(bool asBinary) {
 
 void ScintillaWin::CreateCallTipWindow(PRectangle) noexcept {
 	if (!ct.wCallTip.Created()) {
-		HWND wnd = ::CreateWindow(callClassName, L"ACallTip",
+		HWND wnd = ::CreateWindow(callClassName, callClassName,
 			WS_POPUP, 100, 100, 150, 20,
 			MainHWND(), nullptr,
 			GetWindowInstance(MainHWND()),
@@ -3258,7 +3267,7 @@ void ScintillaWin::ImeStartComposition() {
 		// Move IME Window to current caret position
 		const IMContext imc(MainHWND());
 		const Point pos = PointMainCaret();
-		COMPOSITIONFORM CompForm;
+		COMPOSITIONFORM CompForm {};
 		CompForm.dwStyle = CFS_POINT;
 		CompForm.ptCurrentPos = POINTFromPointEx(pos);
 
@@ -3411,7 +3420,7 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 	}
 
 	wchar_t *rcFeedStart = reinterpret_cast<wchar_t*>(rc + 1);
-	memcpy(rcFeedStart, &rcFeed[0], rcFeedLen);
+	memcpy(rcFeedStart, rcFeed.data(), rcFeedLen);
 
 	const IMContext imc(MainHWND());
 	if (!imc.hIMC) {
@@ -3436,7 +3445,8 @@ LRESULT ScintillaWin::ImeOnDocumentFeed(LPARAM lParam) const {
 	return rcSize; // MS API says reconv structure to be returned.
 }
 
-void ScintillaWin::GetIntelliMouseParameters() noexcept {
+void ScintillaWin::GetMouseParameters() noexcept {
+	::SystemParametersInfo(SPI_GETMOUSEVANISH, 0, &typingWithoutCursor, 0);
 	// This retrieves the number of lines per scroll as configured in the Mouse Properties sheet in Control Panel
 	::SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &linesPerScroll, 0);
 	if (!::SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &charsPerScroll, 0)) {

@@ -43,6 +43,7 @@
       <File Name="../../scintilla/lexers/LexGo.cxx"/>
       <File Name="../../scintilla/lexers/LexGraphViz.cxx"/>
       <File Name="../../scintilla/lexers/LexGroovy.cxx"/>
+      <File Name="../../scintilla/lexers/LexHaskell.cxx"/>
       <File Name="../../scintilla/lexers/LexHaxe.cxx"/>
       <File Name="../../scintilla/lexers/LexHTML.cxx"/>
       <File Name="../../scintilla/lexers/LexInno.cxx"/>
@@ -58,9 +59,12 @@
       <File Name="../../scintilla/lexers/LexLua.cxx"/>
       <File Name="../../scintilla/lexers/LexMakefile.cxx"/>
       <File Name="../../scintilla/lexers/LexMarkdown.cxx"/>
+      <File Name="../../scintilla/lexers/LexMathematica.cxx"/>
       <File Name="../../scintilla/lexers/LexMatlab.cxx"/>
+      <File Name="../../scintilla/lexers/LexNim.cxx"/>
       <File Name="../../scintilla/lexers/LexNSIS.cxx"/>
       <File Name="../../scintilla/lexers/LexNull.cxx"/>
+      <File Name="../../scintilla/lexers/LexOCaml.cxx"/>
       <File Name="../../scintilla/lexers/LexPascal.cxx"/>
       <File Name="../../scintilla/lexers/LexPerl.cxx"/>
       <File Name="../../scintilla/lexers/LexPHP.cxx"/>
@@ -84,6 +88,7 @@
       <File Name="../../scintilla/lexers/LexVim.cxx"/>
       <File Name="../../scintilla/lexers/LexWASM.cxx"/>
       <File Name="../../scintilla/lexers/LexYAML.cxx"/>
+      <File Name="../../scintilla/lexers/LexZig.cxx"/>
     </VirtualDirectory>
     <VirtualDirectory Name="lexlib">
       <File Name="../../scintilla/lexlib/Accessor.cxx"/>
@@ -105,7 +110,6 @@
       <File Name="../../scintilla/lexlib/PropSetSimple.cxx"/>
       <File Name="../../scintilla/lexlib/PropSetSimple.h"/>
       <File Name="../../scintilla/lexlib/SparseState.h"/>
-      <File Name="../../scintilla/lexlib/StringCopy.h"/>
       <File Name="../../scintilla/lexlib/StringUtils.h"/>
       <File Name="../../scintilla/lexlib/StyleContext.cxx"/>
       <File Name="../../scintilla/lexlib/StyleContext.h"/>
@@ -220,6 +224,7 @@
       <File Name="../../src/EditLexers/stlGradle.c"/>
       <File Name="../../src/EditLexers/stlGraphViz.c"/>
       <File Name="../../src/EditLexers/stlGroovy.c"/>
+      <File Name="../../src/EditLexers/stlHaskell.c"/>
       <File Name="../../src/EditLexers/stlHaxe.c"/>
       <File Name="../../src/EditLexers/stlHTML.c"/>
       <File Name="../../src/EditLexers/stlInno.c"/>
@@ -235,8 +240,11 @@
       <File Name="../../src/EditLexers/stlLua.c"/>
       <File Name="../../src/EditLexers/stlMake.c"/>
       <File Name="../../src/EditLexers/stlMarkdown.c"/>
+      <File Name="../../src/EditLexers/stlMathematica.c"/>
       <File Name="../../src/EditLexers/stlMATLAB.c"/>
+      <File Name="../../src/EditLexers/stlNim.c"/>
       <File Name="../../src/EditLexers/stlNsis.c"/>
+      <File Name="../../src/EditLexers/stlOCaml.c"/>
       <File Name="../../src/EditLexers/stlPascal.c"/>
       <File Name="../../src/EditLexers/stlPerl.c"/>
       <File Name="../../src/EditLexers/stlPHP.c"/>
@@ -263,6 +271,7 @@
       <File Name="../../src/EditLexers/stlWASM.c"/>
       <File Name="../../src/EditLexers/stlXML.c"/>
       <File Name="../../src/EditLexers/stlYAML.c"/>
+      <File Name="../../src/EditLexers/stlZig.c"/>
     </VirtualDirectory>
     <File Name="../../src/Bridge.cpp"/>
     <File Name="../../src/Dialogs.c"/>

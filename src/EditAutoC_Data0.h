@@ -1,15 +1,5 @@
 typedef const char * const NP2_KEYWORDS[4];
 
-// C# Doc
-static NP2_KEYWORDS kwNETDoc = {
-"code example exception include inheritdoc list para param paramref permission remarks returns "
-"see seealso summary typeparam typeparamref value listheader item term description ",
-"cref file path type name "
-, // attribute
-"bullet number table"
-, NULL
-};
-
 // Doxygen
 static NP2_KEYWORDS kwDoxyDoc = {
 "a addindex addtogroup anchor arg attention author authors b brief bug c callgraph callergraph category cite class code cond copybrief copydetails copydoc copyright date def defgroup deprecated details dir docbookonly dontinclude dot dotfile e else elseif em endcode endcond enddocbookonly enddot endhtmlonly endif endinternal endlatexonly endlink endmanonly endmsc endrtfonly endsecreflist endverbatim endxmlonly enum example exception extends file fn headerfile hideinitializer htmlinclude htmlonly idlexcept if ifnot image implements include includelineno ingroup internal invariant interface latexonly li line link mainpage manonly memberof msc mscfile n name namespace nosubgrouping note overload p package page par paragraph param post pre private privatesection property protected protectedsection protocol public publicsection pure ref refitem related relates relatedalso relatesalso remark remarks result return returns retval rtfonly sa secreflist section see short showinitializer since skip skipline snippet struct subpage subsection subsubsection tableofcontents test throw throws todo tparam typedef union until var verbatim verbinclude version vhdlflow warning weakgroup xmlonly xrefitem "

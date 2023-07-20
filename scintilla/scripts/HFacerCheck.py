@@ -1,3 +1,5 @@
+import os.path
+import glob
 import re
 
 def findHoles(asc):
@@ -82,11 +84,16 @@ def checkLexerDefinition():
 	# ensure style number is unique within same lexer and not used by StylesCommon
 	prefixMap = {} # {prefix: lexer}
 	result = re.findall(r'lex\s+(?P<name>\w+)\s*=(.+)+', ifaceDoc)
+	stylePrefix = {} # {lexer: [prefix]}
 	for name, value in result:
 		if name == 'XML':
 			name = 'HTML'
-		for item in value.split():
+		items = value.split()
+		for item in items:
 			prefixMap[item] = name
+		lexer = items[0]
+		assert lexer not in stylePrefix
+		stylePrefix[lexer] = items[1:]
 
 	lexrList = {} # {lexer: {value: [name]}}
 	result = re.findall(r'val\s+(?P<name>SCE_\w+)\s*=\s*(?P<value>\d+)', ifaceDoc)
@@ -101,6 +108,21 @@ def checkLexerDefinition():
 		if values:
 			print(f'duplicate value: {value} {name} {" ".join(values)}')
 		values.append(name)
+
+	for path in glob.glob('../lexers/Lex*.cxx'):
+		path = os.path.normpath(path)
+		name = os.path.basename(path)
+
+		with open(path, encoding='utf-8') as fd:
+			doc = fd.read()
+		prefix = set()
+		lexers = re.findall(r'SCLEX_\w+', doc)
+		for lexer in lexers:
+			if lexer in stylePrefix:
+				prefix |= set(stylePrefix[lexer])
+		items = set(re.findall(r'SCE_\w+?_', doc))
+		if unknown := items - prefix:
+			print(name, 'unknown style:', ', '.join(sorted(unknown)))
 
 findAPIHoles()
 checkLexerDefinition()

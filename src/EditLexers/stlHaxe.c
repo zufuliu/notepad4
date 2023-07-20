@@ -60,8 +60,8 @@ static EDITSTYLE Styles_Haxe[] = {
 	{ MULTI_STYLE(SCE_HAXE_STRINGDQ, SCE_HAXE_STRINGSQ, 0, 0), NP2StyleX_String, L"fore:#008000" },
 	{ SCE_HAXE_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_HAXE_REGEX, NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8" },
-	{ SCE_HAXE_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_HAXE_VARIABLE, SCE_HAXE_VARIABLE2, 0, 0), NP2StyleX_Variable, L"fore:#9E4D2A" },
+	{ SCE_HAXE_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_HAXE_OPERATOR, SCE_HAXE_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 

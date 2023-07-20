@@ -155,7 +155,7 @@ void ColouriseWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.Forward();
 				--commentLevel;
 				if (commentLevel == 0) {
-					sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
+					sc.ForwardSetState(SCE_WASM_DEFAULT);
 				}
 			} else if (sc.Match('(', ';')) {
 				sc.Forward();

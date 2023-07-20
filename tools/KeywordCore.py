@@ -21,6 +21,7 @@ SpecialKeywordIndexList = {}
 LexerKeywordIndexList = {}
 # X11 and SVG color names
 ColorNameList = set()
+CSharpKeywordMap = {}
 JavaKeywordMap = {}
 JavaScriptKeywordMap = {}
 GroovyKeyword = []
@@ -160,7 +161,7 @@ def UpdateAutoCompletionCache(path):
 
 def split_api_section(doc, comment, commentKind=0):
 	if commentKind == 0:
-		doc = re.sub(comment + r'[^!].+', '', doc) # normal comment
+		doc = re.sub(re.escape(comment) + r'[^!].+', '', doc) # normal comment
 	sections = []
 	items = doc.split(comment + "!") #! section name
 	for section in items:
@@ -749,6 +750,7 @@ def parse_csharp_api_file(path):
 		'enumeration',
 		'vala types',
 	])
+	CSharpKeywordMap.update(keywordMap)
 	return [
 		('keywords', keywordMap['keywords'], KeywordAttr.Default),
 		('types', keywordMap['types'], KeywordAttr.Default),
@@ -933,6 +935,29 @@ def parse_fortran_api_file(path):
 		('attribute', keywordMap['attribute'], KeywordAttr.Default),
 		('function', keywordMap['function'], KeywordAttr.Default),
 		('misc', keywordMap['misc'], KeywordAttr.NoLexer),
+	]
+
+def parse_fsharp_api_file(path):
+	sections = read_api_file(path, '//')
+	keywordMap = {}
+	for key, doc in sections:
+		items = []
+		if key in ('keywords', 'types'):
+			items = doc.split()
+		elif key == 'preprocessor':
+			items = re.findall(r'#(\w+)', doc)
+		keywordMap[key] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('preprocessor', keywordMap['preprocessor'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+		('attributes', [], KeywordAttr.NoLexer),
+		('comment tag', CSharpKeywordMap['comment tag'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 	]
 
 def parse_gn_api_file(path):
@@ -1138,6 +1163,22 @@ def parse_groovy_api_file(path):
 		('annotation', JavaKeywordMap['annotation'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
 		('function', [], KeywordAttr.NoLexer),
 		('GroovyDoc', JavaKeywordMap['javadoc'], KeywordAttr.NoLexer | KeywordAttr.NoAutoComp | KeywordAttr.Special),
+	]
+
+def parse_haskell_api_file(path):
+	sections = read_api_file(path, '--')
+	keywordMap = {}
+	for key, doc in sections:
+		if key in ('keywords', 'class'):
+			keywordMap[key] = doc.split()
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'class',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('class', keywordMap['class'], KeywordAttr.Default),
 	]
 
 def parse_haxe_api_file(path):
@@ -1653,12 +1694,44 @@ def parse_llvm_api_file(path):
 		('instruction', keywordMap['instruction'], KeywordAttr.Default),
 	]
 
+def parse_mathematica_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '(*')
+	for key, doc in sections:
+		if key == 'keywords':
+			keywordMap[key] = doc.split()
+
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+	]
+
 def parse_markdown_api_file(path):
 	blockTag = ['pre', 'script', 'style', 'textarea'] # type 1
 	type6 = "address, article, aside, base, basefont, blockquote, body, caption, center, col, colgroup, dd, details, dialog, dir, div, dl, dt, fieldset, figcaption, figure, footer, form, frame, frameset, h1, h2, h3, h4, h5, h6, head, header, hr, html, iframe, legend, li, link, main, menu, menuitem, nav, noframes, ol, optgroup, option, p, param, search, section, summary, table, tbody, td, tfoot, th, thead, title, tr, track, ul"
 	blockTag.extend(type6.replace(',', ' ').split())
 	return [
 		('html block tag', blockTag, KeywordAttr.NoAutoComp),
+	]
+
+def parse_nim_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '#')
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+		elif key == 'api':
+			items = re.findall(r'(proc|func|method|iterator|macro|template|converter)\s+(\w+)', doc)
+			items = [item[1] + '()' for item in items]
+			keywordMap['functions'] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'types',
+		'keywords',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
 
 def parse_nsis_api_file(path):
@@ -1693,6 +1766,22 @@ def parse_nsis_api_file(path):
 		('attribute', keywordMap['attributes'], KeywordAttr.NoLexer),
 		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 		('predefined variables', keywordMap['predefined variables'], KeywordAttr.NoLexer | KeywordAttr.Special),
+	]
+
+def parse_ocaml_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '(*')
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'types',
+		'keywords',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
 	]
 
 def parse_php_api_file(path):
@@ -2514,6 +2603,31 @@ def parse_yaml_api_file(path):
 	keywords = '.inf .nan Inf NaN None false inf nan no none null off on true yes'.split()
 	return [
 		('keywords', keywords, KeywordAttr.Default),
+	]
+
+def parse_zig_api_file(path):
+	keywordMap = {}
+	sections = read_api_file(path, '//')
+	for key, doc in sections:
+		if key in ('keywords', 'types'):
+			keywordMap[key] = doc.split()
+		elif key == 'builtin':
+			items = re.findall(r'@(\w+\()', doc)
+			keywordMap[key] = items
+		elif key == 'api':
+			items = re.findall(r'\Wfn\s+(\w+)', doc)
+			items = [item + '()' for item in items]
+			keywordMap['functions'] = items
+
+	RemoveDuplicateKeyword(keywordMap, [
+		'keywords',
+		'types',
+	])
+	return [
+		('keywords', keywordMap['keywords'], KeywordAttr.Default),
+		('types', keywordMap['types'], KeywordAttr.Default),
+		('built-in functions', keywordMap['builtin'], KeywordAttr.NoLexer | KeywordAttr.Special),
+		('function', keywordMap['functions'], KeywordAttr.NoLexer),
 	]
 
 def UpdateLexerKeywordAttr(indexPath, lexerPath):

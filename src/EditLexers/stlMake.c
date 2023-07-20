@@ -54,8 +54,8 @@ static EDITSTYLE Styles_MAK[] = {
 	{ SCE_MAKE_PREPROCESSOR, NP2StyleX_Preprocessor, L"fore:#FF8000" },
 	{ SCE_MAKE_FUNCTION, NP2StyleX_Function, L"fore:#FF8000" },
 	{ MULTI_STYLE(SCE_MAKE_VARIABLE, SCE_MAKE_VARIABLE2, SCE_MAKE_VARIABLE3, 0), NP2StyleX_Variable, L"fore:#003CE6" },
-	{ SCE_MAKE_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 	{ SCE_MAKE_TARGET, NP2StyleX_Target, L"fore:#003CE6; back:#FFC000" },
+	{ SCE_MAKE_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexMakefile = {

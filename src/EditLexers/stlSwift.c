@@ -61,8 +61,8 @@ static EDITSTYLE Styles_Swift[] = {
 	{ MULTI_STYLE(SCE_SWIFT_REGEX, SCE_SWIFT_REGEX_ED, 0, 0), NP2StyleX_Regex, L"fore:#006633; back:#FFF1A8; eolfilled" },
 	{ SCE_SWIFT_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_SWIFT_LABEL, NP2StyleX_Label, L"back:#FFC040" },
-	{ SCE_SWIFT_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_SWIFT_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
+	{ SCE_SWIFT_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_SWIFT_OPERATOR, SCE_SWIFT_OPERATOR2, SCE_SWIFT_OPERATOR_PF, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 

@@ -148,7 +148,7 @@ void ColouriseSmaliDoc(Sci_PositionU startPos, Sci_Position length, int initStyl
 					}
 				}
 				styler.ColorTo(i, state);
-				state = SCE_L_DEFAULT;
+				state = SCE_SMALI_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}

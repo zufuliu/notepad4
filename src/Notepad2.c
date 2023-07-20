@@ -2183,13 +2183,6 @@ void MsgThemeChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	UpdateStatusbar();
 }
 
-static inline void OnStyleThemeChanged(int theme) {
-	if (theme == np2StyleTheme) {
-		return;
-	}
-	Style_OnStyleThemeChanged(theme);
-}
-
 //=============================================================================
 //
 // MsgSize() - Handles WM_SIZE
@@ -4011,7 +4004,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_STYLE_THEME_DEFAULT:
 	case IDM_VIEW_STYLE_THEME_DARK:
-		OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
+		Style_OnStyleThemeChanged(LOWORD(wParam) - IDM_VIEW_STYLE_THEME_DEFAULT);
 		break;
 
 	case IDM_VIEW_DEFAULT_CODE_FONT:
@@ -7869,28 +7862,35 @@ void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
 // OpenFileDlg()
 //
 //
-BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
-	WCHAR tchInitialDir[MAX_PATH] = L"";
-	if (!lpstrInitialDir) {
-		if (StrNotEmpty(szCurFile)) {
-			lstrcpy(tchInitialDir, szCurFile);
-			PathRemoveFileSpec(tchInitialDir);
-		} else if (StrNotEmpty(tchDefaultDir)) {
-			ExpandEnvironmentStrings(tchDefaultDir, tchInitialDir, COUNTOF(tchInitialDir));
-			if (PathIsRelative(tchInitialDir)) {
-				WCHAR tchModule[MAX_PATH];
-				GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
-				PathRemoveFileSpec(tchModule);
-				PathAppend(tchModule, tchInitialDir);
-				PathCanonicalize(tchInitialDir, tchModule);
-			}
-		} else {
-			lstrcpy(tchInitialDir, g_wchWorkingDirectory);
+void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR lpstrInitialDir) {
+	tchInitialDir[0] = L'\0';
+	if (StrNotEmpty(lpstrInitialDir)) {
+		lstrcpy(tchInitialDir, lpstrInitialDir);
+	} else if (StrNotEmpty(szCurFile)) {
+		lstrcpy(tchInitialDir, szCurFile);
+		PathRemoveFileSpec(tchInitialDir);
+	} else if (StrNotEmpty(tchDefaultDir)) {
+		ExpandEnvironmentStrings(tchDefaultDir, tchInitialDir, cchInitialDir);
+		if (PathIsRelative(tchInitialDir)) {
+			WCHAR tchModule[MAX_PATH];
+			GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
+			PathRemoveFileSpec(tchModule);
+			PathAppend(tchModule, tchInitialDir);
+			PathCanonicalize(tchInitialDir, tchModule);
 		}
+	} else if (StrNotEmpty(pFileMRU->pszItems[0])) {
+		lstrcpy(tchInitialDir, pFileMRU->pszItems[0]);
+		PathRemoveFileSpec(tchInitialDir);
+	} else {
+		lstrcpy(tchInitialDir, g_wchWorkingDirectory);
 	}
+}
 
+BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
+	WCHAR tchInitialDir[MAX_PATH];
+	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szFile[MAX_PATH];
-	StrCpyExW(szFile, L"");
+	szFile[0] = L'\0';
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index
 	LPWSTR szFilter = Style_GetOpenDlgFilterStr(true, szCurFile, lexers);
 
@@ -7900,7 +7900,7 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 	ofn.hwndOwner = hwndMain;
 	ofn.lpstrFilter = szFilter;
 	ofn.lpstrFile = szFile;
-	ofn.lpstrInitialDir = (lpstrInitialDir) ? lpstrInitialDir : tchInitialDir;
+	ofn.lpstrInitialDir = tchInitialDir;
 	ofn.lpstrDefExt = L""; // auto add first extension from current filter
 	ofn.nMaxFile = COUNTOF(szFile);
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | /* OFN_NOCHANGEDIR |*/
@@ -7928,25 +7928,8 @@ BOOL OpenFileDlg(LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
 //
 //
 BOOL SaveFileDlg(bool Untitled, LPWSTR lpstrFile, int cchFile, LPCWSTR lpstrInitialDir) {
-	WCHAR tchInitialDir[MAX_PATH] = L"";
-	if (StrNotEmpty(lpstrInitialDir)) {
-		lstrcpy(tchInitialDir, lpstrInitialDir);
-	} else if (StrNotEmpty(szCurFile)) {
-		lstrcpy(tchInitialDir, szCurFile);
-		PathRemoveFileSpec(tchInitialDir);
-	} else if (StrNotEmpty(tchDefaultDir)) {
-		ExpandEnvironmentStrings(tchDefaultDir, tchInitialDir, COUNTOF(tchInitialDir));
-		if (PathIsRelative(tchInitialDir)) {
-			WCHAR tchModule[MAX_PATH];
-			GetModuleFileName(NULL, tchModule, COUNTOF(tchModule));
-			PathRemoveFileSpec(tchModule);
-			PathAppend(tchModule, tchInitialDir);
-			PathCanonicalize(tchInitialDir, tchModule);
-		}
-	} else {
-		lstrcpy(tchInitialDir, g_wchWorkingDirectory);
-	}
-
+	WCHAR tchInitialDir[MAX_PATH];
+	SetupInitialOpenSaveDir(tchInitialDir, COUNTOF(tchInitialDir), lpstrInitialDir);
 	WCHAR szNewFile[MAX_PATH];
 	lstrcpy(szNewFile, lpstrFile);
 	int lexers[1 + OPENDLG_MAX_LEXER_COUNT] = {0}; // 1-based filter index

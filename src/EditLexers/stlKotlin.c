@@ -101,8 +101,8 @@ static EDITSTYLE Styles_Kotlin[] = {
 	{ SCE_KOTLIN_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_KOTLIN_BACKTICKS, NP2StyleX_Backticks, L"fore:#9E4D2A" },
 	{ SCE_KOTLIN_LABEL, NP2StyleX_Label, L"fore:#7C5AF3" },
-	{ SCE_KOTLIN_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ SCE_KOTLIN_VARIABLE, NP2StyleX_Variable, L"fore:#9E4D2A" },
+	{ SCE_KOTLIN_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
 	{ MULTI_STYLE(SCE_KOTLIN_OPERATOR, SCE_KOTLIN_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 

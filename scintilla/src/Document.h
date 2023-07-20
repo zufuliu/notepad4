@@ -285,6 +285,7 @@ private:
 	int enteredStyling;
 	int enteredReadOnlyCount;
 
+	std::optional<bool> delaySavePoint;
 	bool matchesValid;
 	bool insertionSet;
 	std::string insertion;
@@ -428,6 +429,8 @@ public:
 	bool IsSavePoint() const noexcept {
 		return cb.IsSavePoint();
 	}
+	void BeginDelaySavePoint() noexcept;
+	void EndDelaySavePoint() noexcept;
 
 	void TentativeStart() noexcept {
 		cb.TentativeStart();
@@ -435,7 +438,7 @@ public:
 	void TentativeCommit() noexcept {
 		cb.TentativeCommit();
 	}
-	void TentativeUndo(bool pendingUpdate = false);
+	void TentativeUndo();
 	bool TentativeActive() const noexcept {
 		return cb.TentativeActive();
 	}
@@ -647,6 +650,17 @@ private:
 	void NotifyModified(DocModification mh);
 };
 
+class DelaySavePoint {
+	Document *pdoc;
+public:
+	explicit DelaySavePoint(Document *pdoc_) noexcept : pdoc{pdoc_} {
+		pdoc->BeginDelaySavePoint();
+	}
+	~DelaySavePoint() {
+		pdoc->EndDelaySavePoint();
+	}
+};
+
 class UndoGroup {
 	Document *pdoc;
 	bool groupNeeded;
@@ -712,7 +726,7 @@ public:
 		position(act.position),
 		length(act.lenData),
 		linesAdded(linesAdded_),
-		text(act.data.get()),
+		text(act.Data()),
 		line(0),
 		foldLevelNow(Scintilla::FoldLevel::None),
 		foldLevelPrev(Scintilla::FoldLevel::None),

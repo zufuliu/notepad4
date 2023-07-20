@@ -502,6 +502,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexGo.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGraphViz.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexGroovy.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexHaskell.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHaxe.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexHTML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexInno.cxx" />
@@ -517,9 +518,12 @@
     <ClCompile Include="..\..\scintilla\lexers\LexLua.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMakefile.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMarkdown.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexMathematica.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexMatlab.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexNim.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexNSIS.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexNull.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexOCaml.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPascal.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPerl.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexPHP.cxx" />
@@ -543,6 +547,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexVim.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexWASM.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexZig.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\CharacterCategory.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\DefaultLexer.cxx" />
@@ -622,6 +627,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlGradle.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGraphViz.c" />
     <ClCompile Include="..\..\src\EditLexers\stlGroovy.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlHaskell.c" />
     <ClCompile Include="..\..\src\EditLexers\stlHaxe.c" />
     <ClCompile Include="..\..\src\EditLexers\stlHTML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlInno.c" />
@@ -637,8 +643,11 @@
     <ClCompile Include="..\..\src\EditLexers\stlLua.c" />
     <ClCompile Include="..\..\src\EditLexers\stlMake.c" />
     <ClCompile Include="..\..\src\EditLexers\stlMarkdown.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlMathematica.c" />
     <ClCompile Include="..\..\src\EditLexers\stlMATLAB.c" />
     <ClCompile Include="..\..\src\EditLexers\stlNsis.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlNim.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlOCaml.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPascal.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPerl.c" />
     <ClCompile Include="..\..\src\EditLexers\stlPHP.c" />
@@ -665,6 +674,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlWASM.c" />
     <ClCompile Include="..\..\src\EditLexers\stlXML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlYAML.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlZig.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\scintilla\include\GraphicUtils.h" />
@@ -690,7 +700,6 @@
     <ClInclude Include="..\..\scintilla\lexlib\OptionSet.h" />
     <ClInclude Include="..\..\scintilla\lexlib\PropSetSimple.h" />
     <ClInclude Include="..\..\scintilla\lexlib\SparseState.h" />
-    <ClInclude Include="..\..\scintilla\lexlib\StringCopy.h" />
     <ClInclude Include="..\..\scintilla\lexlib\StringUtils.h" />
     <ClInclude Include="..\..\scintilla\lexlib\StyleContext.h" />
     <ClInclude Include="..\..\scintilla\lexlib\SubStyles.h" />

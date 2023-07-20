@@ -23,6 +23,7 @@ lexerList = [
 	('NP2LEX_CONFIG', 'stlDefault.c', 'LexConfig.cxx', '', (0, 'Config'), None),
 	('NP2LEX_CPP', 'stlCPP.c', 'LexCPP.cxx', ['CPP.cpp', 'C.c', 'POSIX.c'], 1, parse_cpp_api_file),
 	('NP2LEX_CSHARP', 'stlCSharp.c', 'LexCSharp.cxx', 'CSharp.cs', 1, parse_csharp_api_file),
+		('NP2LEX_FSHARP', 'stlFSharp.c', 'LexFSharp.cxx', 'FSharp.fs', 0, parse_fsharp_api_file),
 	('NP2LEX_CSV', 'stlDefault.c', 'LexCSV.cxx', '', (0, 'CSV'), None),
 
 	('NP2LEX_DLANG', 'stlD.c', 'LexD.cxx', 'D.d', 1, parse_dlang_api_file),
@@ -30,7 +31,6 @@ lexerList = [
 	('NP2LEX_DIFF', 'stlDefault.c', 'LexDiff.cxx', '', (0, 'Diff'), None),
 
 	('NP2LEX_FORTRAN', 'stlFortran.c', 'LexFortran.cxx', 'Fortran.f', 0, parse_fortran_api_file),
-	('NP2LEX_FSHARP', 'stlFSharp.c', 'LexFSharp.cxx', '', 0, None),
 
 	('NP2LEX_GN', 'stlGN.c', 'LexGN.cxx', 'GN.gn', 0, parse_gn_api_file),
 	('NP2LEX_GRAPHVIZ', 'stlGraphViz.c', 'LexGraphViz.cxx', 'GraphViz.dot', 0, parse_graphviz_api_file),
@@ -38,6 +38,7 @@ lexerList = [
 		('NP2LEX_CSS', 'stlCSS.c', 'LexCSS.cxx', ['CSS.css', 'SCSS.scss', 'Less.less', 'HSS.hss'], 0, parse_css_api_file),
 	('NP2LEX_GO', 'stlGo.c', 'LexGo.cxx', 'Go.go', 0, parse_go_api_file),
 
+	('NP2LEX_HASKELL', 'stlHaskell.c', 'LexHaskell.cxx', 'Haskell.hs', 0, parse_haskell_api_file),
 	('NP2LEX_HAXE', 'stlHaxe.c', 'LexHaxe.cxx', 'Haxe.hx', 1, parse_haxe_api_file),
 	('NP2LEX_HTML', 'stlHTML.c', 'LexHTML.cxx', 'html.html', 1, parse_html_api_file),
 
@@ -61,10 +62,14 @@ lexerList = [
 	('NP2LEX_LUA', 'stlLua.c', 'LexLua.cxx', 'Lua.lua', 0, parse_lua_api_file),
 
 	('NP2LEX_MAKEFILE', 'stlMake.c', 'LexMakefile.cxx', '', 0, None),
-	('NP2LEX_MATLAB', 'stlMatlab.c', 'LexMatlab.cxx', '', 0, None),
 	('NP2LEX_MARKDOWN', 'stlMarkdown.c', 'LexMarkdown.cxx', '', 0, parse_markdown_api_file),
+	('NP2LEX_MATHEMATICA', 'stlMathematica.c', 'LexMathematica.cxx', 'Mathematica.nb', 0, parse_mathematica_api_file),
+	('NP2LEX_MATLAB', 'stlMatlab.c', 'LexMatlab.cxx', '', 0, None),
 
+	('NP2LEX_NIM', 'stlNim.c', 'LexNim.cxx', 'Nim.nim', 0, parse_nim_api_file),
 	('NP2LEX_NSIS', 'stlNsis.c', 'LexNSIS.cxx', 'NSIS.nsi', 0, parse_nsis_api_file),
+
+	('NP2LEX_OCAML', 'stlOCaml.c', 'LexOCaml.cxx', 'OCaml.ml', 0, parse_ocaml_api_file),
 
 	('NP2LEX_PASCAL', 'stlPascal.c', 'LexPascal.cxx', '', 0, None),
 	('NP2LEX_PERL', 'stlPerl.c', 'LexPerl.cxx', 'Perl.pl', 0, parse_perl_api_file),
@@ -105,6 +110,7 @@ lexerList = [
 	('NP2LEX_WASM', 'stlWASM.c', 'LexWASM.cxx', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),
 	('NP2LEX_XML', 'stlXML.c', 'LexHTML.cxx', '', 0, parse_xml_api_file),
 	('NP2LEX_YAML', 'stlYAML.c', 'LexYAML.cxx', '', 0, parse_yaml_api_file),
+	('NP2LEX_ZIG', 'stlZig.c', 'LexZig.cxx', 'Zig.zig', 0, parse_zig_api_file),
 ]
 
 def update_all_keyword():

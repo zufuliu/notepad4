@@ -243,6 +243,14 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.state == SCE_JULIA_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));
+					if (sc.ch == '\"' && StrEqual(s, "raw")) {
+						sc.ChangeState(SCE_JULIA_RAWSTRING);
+						if (sc.MatchNext('"', '"')) {
+							sc.ChangeState(SCE_JULIA_TRIPLE_RAWSTRING);
+							sc.Advance(2);
+						}
+						break;
+					}
 					if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 						if (StrEqual(s, "type")) {
 							// only in `abstract type` or `primitive type`
@@ -449,14 +457,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ChangeState(SCE_JULIA_TRIPLE_REGEX);
 					sc.Advance(2);
 				}
-			} else if (sc.Match('r', 'a', 'w', '"')) {
-				insideUrl = false;
-				sc.SetState(SCE_JULIA_RAWSTRING);
-				sc.Advance(3);
-				if (sc.MatchNext('"', '"')) {
-					sc.ChangeState(SCE_JULIA_TRIPLE_RAWSTRING);
-					sc.Advance(2);
-				}
 			} else if (sc.Match('b', '\"')) {
 				insideUrl = false;
 				sc.SetState(SCE_JULIA_BYTESTRING);
@@ -495,7 +495,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				chBeforeIdentifier = sc.chPrev;
 				isTransposeOperator = true;
 				sc.SetState(SCE_JULIA_IDENTIFIER);
-			} else if (isoperator(sc.ch) || sc.ch == '@' || sc.ch == '\\' || sc.ch == '$') {
+			} else if (IsAGraphic(sc.ch)) {
 				if (sc.ch == '{' || sc.ch == '[' || sc.ch == '(') {
 					++braceCount;
 				} else if (sc.ch == '}' || sc.ch == ']' || sc.ch == ')') {

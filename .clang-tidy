@@ -32,6 +32,7 @@ Checks: >
     -readability-suspicious-call-argument,
     -readability-uppercase-literal-suffix,
     -misc-confusable-identifiers,
+    -misc-include-cleaner,
     -misc-non-private-member-variables-in-classes,
 
 WarningsAsErrors: ''

@@ -110,9 +110,9 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_VIM_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
 				char s[128];
-				sc.GetCurrent(s, sizeof(s));
 				const KeywordType kwPrev = kwType;
 				kwType = KeywordType::None;
+				sc.GetCurrent(s, sizeof(s));
 				if (keywordLists[KeywordIndex_Keyword].InList(s)) {
 					if (!(lineState & VimLineStateMaskAutoCommand) && logicalVisibleChars == sc.LengthCurrent()) {
 						sc.ChangeState(SCE_VIM_WORD);

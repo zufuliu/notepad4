@@ -295,7 +295,7 @@ def main(argv):
 	elif action == 'list':
 		run_command_in_folder('gh release list -L 2', buildFolder)
 	elif action == 'upload':
-		if len(argv) > 3:
+		if len(argv) > 2:
 			tag = argv[2]
 			upload_all_release_artifact(tag)
 

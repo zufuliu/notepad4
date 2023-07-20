@@ -165,11 +165,11 @@ EDITLEXER lexANSI = {
 
 static EDITSTYLE Styles_Config[] = {
 	EDITSTYLE_DEFAULT,
+	{ SCE_CONF_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
 	{ SCE_CONF_DIRECTIVE, NP2StyleX_Directive, L"fore:#003CE6" },
 	{ SCE_CONF_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
 	{ SCE_CONF_STRING, NP2StyleX_String, L"fore:#B000B0" },
 	{ MULTI_STYLE(SCE_CONF_NUMBER, SCE_CONF_HEXNUM, 0, 0), NP2StyleX_Number, L"fore:#FF4000" },
-	{ SCE_CONF_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
 	//{ SCE_CONF_IP, EDITSTYLE_HOLE(L"IP Address"), L"bold; fore:#FF4000" },
 	//{ SCE_CONF_IDENTIFIER, EDITSTYLE_HOLE(L"Identifier"), L"" },
 	{ SCE_CONF_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
@@ -272,9 +272,9 @@ EDITLEXER lexDiff = {
 
 static EDITSTYLE Styles_INI[] = {
 	EDITSTYLE_DEFAULT,
+	{ SCE_PROPS_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
 	{ SCE_PROPS_KEY, NP2StyleX_Property, L"fore:#A46000" },
 	{ SCE_PROPS_COMMENT, NP2StyleX_Comment, L"fore:#008000" },
-	{ SCE_PROPS_SECTION, NP2StyleX_Section, L"bold; back:#FFC040; eolfilled" },
 	{ SCE_PROPS_ASSIGNMENT, NP2StyleX_Assignment, L"fore:#FF0000" },
 	{ SCE_PROPS_DEFVAL, NP2StyleX_DefaultValue, L"fore:#FF0000" },
 };
