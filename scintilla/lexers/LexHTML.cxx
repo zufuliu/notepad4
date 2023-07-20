@@ -122,15 +122,13 @@ constexpr bool isStringState(int state) noexcept {
 }
 
 constexpr bool stateAllowsTermination(int state, int ch) noexcept {
-	bool allowTermination = !isStringState(state);
-	if (allowTermination) {
-		switch (state) {
-		case SCE_HB_COMMENTLINE:
-		case SCE_HJ_COMMENTLINE:
-			allowTermination = ch == '%'; // %>
+	if (!isStringState(state)) {
+		if (state == SCE_H_ASP || state == SCE_H_ASPAT || state >= SCE_HJ_START) {
+			return ch == '%'; // ASP %>
 		}
+		return ch == '?'; // XML ?>
 	}
-	return allowTermination;
+	return false;
 }
 
 // not really well done, since it's only comments that should lex the %> and <%
@@ -668,8 +666,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 
 		// handle the end of a pre-processor = Non-HTML
 		else if ((((inScriptType == eNonHtmlPreProc) || (inScriptType == eNonHtmlScriptPreProc)) &&
-				  (((scriptLanguage != eScriptNone) && stateAllowsTermination(state, ch))) &&
-				  (((ch == '%') || (ch == '?')) && (chNext == '>'))) ||
+				  ((scriptLanguage != eScriptNone) && (chNext == '>') && stateAllowsTermination(state, ch))) ||
 		         ((scriptLanguage == eScriptSGML) && (ch == '>') && (state != SCE_H_SGML_COMMENT))) {
 			if (state == SCE_H_ASPAT) {
 				aspScript = segIsScriptingIndicator(styler, styler.GetStartSegment(), i, aspScript);
