@@ -254,11 +254,11 @@
 #define SCE_H_XMLSTART 12
 #define SCE_H_XMLEND 13
 #define SCE_H_SCRIPT 14
-#define SCE_H_ASP 15
-#define SCE_H_ASPAT 16
-#define SCE_H_CDATA 17
-#define SCE_H_QUESTION 18
-#define SCE_H_VALUE 19
+#define SCE_H_CDATA 15
+#define SCE_H_QUESTION 16
+#define SCE_H_VALUE 17
+#define SCE_H_ASP 18
+#define SCE_H_ASPAT 19
 #define SCE_H_XCCOMMENT 20
 #define SCE_H_SGML_DEFAULT 21
 #define SCE_H_SGML_COMMAND 22

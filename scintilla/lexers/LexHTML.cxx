@@ -62,7 +62,7 @@ script_type segIsScriptingIndicator(LexAccessor &styler, Sci_PositionU start, Sc
 }
 
 script_type ScriptOfState(int state) noexcept {
-	if ((state >= SCE_HB_START) && (state <= SCE_HB_OPERATOR)) {
+	if ((state >= SCE_HB_START && state <= SCE_HB_OPERATOR) || state == SCE_H_ASPAT || state == SCE_H_XCCOMMENT) {
 		return eScriptVBS;
 	}
 	if ((state >= SCE_HJ_START) && (state <= SCE_HJ_TEMPLATELITERAL)) {
@@ -607,7 +607,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				inScriptType = eNonHtmlScriptPreProc;
 			else
 				inScriptType = eNonHtmlPreProc;
-
+			// fold whole script
+			if (foldHTMLPreprocessor) {
+				levelCurrent++;
+			}
 			if (chNext2 == '@') {
 				i += 2; // place as if it was the second next char treated
 				state = SCE_H_ASPAT;
@@ -628,9 +631,6 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				scriptLanguage = aspScript;
 			}
 			styler.ColorTo(i + 1, SCE_H_ASP);
-			// fold whole script
-			if (foldHTMLPreprocessor)
-				levelCurrent++;
 			// should be better
 			ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
 			continue;
