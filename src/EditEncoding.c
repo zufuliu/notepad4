@@ -2389,7 +2389,7 @@ int EditDetermineEncoding(LPCWSTR pszFile, char *lpData, DWORD cbData, int *enco
 		} else if (!Encoding_IsUnicode(iDefaultEncoding)) {
 			iEncoding = iDefaultEncoding;
 		}
-		return iEncoding;
+		return (iEncoding == CPI_UTF8SIGN) ? CPI_UTF8 : iEncoding;
 	}
 
 	// reload with specific encoding
