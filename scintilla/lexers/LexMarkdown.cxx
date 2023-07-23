@@ -2203,13 +2203,13 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_H_ENTITY:
-			if (sc.ch == ';') {
-				sc.ForwardSetState(lexer.TakeOuterStyle());
-				continue;
-			}
-			// https://html.spec.whatwg.org/entities.json
 			if (!IsAlphaNumeric(sc.ch)) {
-				sc.ChangeState(lexer.TakeOuterStyle());
+				if (sc.ch == ';') {
+					sc.Forward();
+				} else {
+					sc.ChangeState(SCE_H_TAGUNKNOWN);
+				}
+				sc.SetState(lexer.TakeOuterStyle());
 				continue;
 			}
 			break;

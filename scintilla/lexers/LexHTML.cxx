@@ -105,6 +105,11 @@ constexpr bool IsNumberChar(char ch) noexcept {
 	return IsADigit(ch) || ch == '.' || ch == '-' || ch == '#';
 }
 
+constexpr bool IsEntityChar(int ch) noexcept {
+	// Only allow [A-Za-z0-9.#-_:] in entities
+	return IsAlphaNumeric(ch) || AnyOf(ch, '#', '.', '-', '_', ':');
+}
+
 constexpr bool isStringState(int state) noexcept {
 	switch (state) {
 	case SCE_HJ_DOUBLESTRING:
@@ -726,7 +731,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i, StateToPrint);
 				if (chNext != '!')
 					state = SCE_H_TAGUNKNOWN;
-			} else if (ch == '&') {
+			} else if (ch == '&' && (IsAlpha(chNext) || chNext == '#')) {
 				styler.ColorTo(i, SCE_H_DEFAULT);
 				state = SCE_H_ENTITY;
 			}
@@ -869,24 +874,19 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			break;
 		case SCE_H_SGML_ENTITY:
-			if (ch == ';') {
-				styler.ColorTo(i + 1, StateToPrint);
-				state = SCE_H_SGML_DEFAULT;
-			} else if (!(IsAlphaNumeric(ch) || ch == '-' || ch == '.')) {
-				styler.ColorTo(i + 1, SCE_H_SGML_ERROR);
+			if (!(IsAlphaNumeric(ch) || ch == '-' || ch == '.')) {
+				styler.ColorTo(i + 1, ((ch == ';') ? StateToPrint : SCE_H_SGML_ERROR));
 				state = SCE_H_SGML_DEFAULT;
 			}
 			break;
 		case SCE_H_ENTITY:
-			if (ch == ';') {
-				styler.ColorTo(i + 1, StateToPrint);
+			if (!IsEntityChar(ch)) {
+				styler.ColorTo(i + (ch == ';'), ((ch == ';') ? StateToPrint : SCE_H_TAGUNKNOWN));
 				state = SCE_H_DEFAULT;
-			}
-			else if (ch != '#' && !IsAlphaNumeric(ch)	// Should check that '#' follows '&', but it is unlikely anyway...
-				&& ch != '.' && ch != '-' && ch != '_' && ch != ':') { // valid in XML
-				// Possibly start of a multibyte character so don't allow this byte to be in entity style
-				styler.ColorTo(i + IsAGraphic(ch), SCE_H_TAGUNKNOWN);
-				state = SCE_H_DEFAULT;
+				if (ch != ';') {
+					--i;
+					continue;
+				}
 			}
 			break;
 		case SCE_H_TAGUNKNOWN:
