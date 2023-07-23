@@ -1616,12 +1616,9 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	case '&':
-		if (IsAlpha(sc.chNext)) {
+		if (IsAlpha(sc.chNext) || sc.chNext == '#') {
 			sc.SetState(SCE_H_ENTITY);
-		} else if (sc.chNext == '#') {
-			const int chNext = sc.GetRelative(2);
-			if (IsADigit(chNext) || ((chNext == 'x' || chNext == 'X') && IsHexDigit(sc.GetRelative(3)))) {
-				sc.SetState(SCE_H_ENTITY);
+			if (sc.chNext == '#') {
 				sc.Forward();
 			}
 		}

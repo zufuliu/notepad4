@@ -1234,12 +1234,9 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					}
 				}
 			} else if (sc.ch == '&') {
-				if (IsAlpha(sc.chNext)) {
+				if (IsAlpha(sc.chNext) || sc.chNext == '#') {
 					sc.SetState(SCE_H_ENTITY);
-				} else if (sc.chNext == '#') {
-					const int chNext = sc.GetRelative(2);
-					if (IsADigit(chNext) || (UnsafeLower(chNext) == 'x' && IsHexDigit(sc.GetRelative(3)))) {
-						sc.SetState(SCE_H_ENTITY);
+					if (sc.chNext == '#') {
 						sc.Forward();
 					}
 				}

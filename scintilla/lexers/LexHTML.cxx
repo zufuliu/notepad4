@@ -882,12 +882,10 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i + 1, StateToPrint);
 				state = SCE_H_DEFAULT;
 			}
-			if (ch != '#' && !IsAlphaNumeric(ch)	// Should check that '#' follows '&', but it is unlikely anyway...
+			else if (ch != '#' && !IsAlphaNumeric(ch)	// Should check that '#' follows '&', but it is unlikely anyway...
 				&& ch != '.' && ch != '-' && ch != '_' && ch != ':') { // valid in XML
-				if (ch >= 0x80)	// Possibly start of a multibyte character so don't allow this byte to be in entity style
-					styler.ColorTo(i, SCE_H_TAGUNKNOWN);
-				else
-					styler.ColorTo(i + 1, SCE_H_TAGUNKNOWN);
+				// Possibly start of a multibyte character so don't allow this byte to be in entity style
+				styler.ColorTo(i + IsAGraphic(ch), SCE_H_TAGUNKNOWN);
 				state = SCE_H_DEFAULT;
 			}
 			break;
