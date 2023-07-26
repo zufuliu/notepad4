@@ -95,7 +95,7 @@ constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexc
 
 inline bool IsXmlTagStart(const StyleContext &sc, int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return ((sc.chPrev == '(' || sc.chPrev == '{')
-		|| (sc.chPrev <= ' ' && (stylePrevNonWhite == SCE_SCALA_WORD || !FollowExpression(chPrevNonWhite, stylePrevNonWhite))))
+		|| (sc.chPrev <= ' ' && (stylePrevNonWhite == SCE_SCALA_XML_TAG || stylePrevNonWhite == SCE_SCALA_WORD || !FollowExpression(chPrevNonWhite, stylePrevNonWhite))))
 		&& (IsScalaIdentifierChar(sc.chNext) || sc.chNext == '!' || sc.chNext == '?');
 }
 

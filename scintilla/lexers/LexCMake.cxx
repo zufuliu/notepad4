@@ -178,6 +178,7 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			break;
 
 		case SCE_CMAKE_BLOCK_COMMENT:
+		case SCE_CMAKE_BRACKET_ARGUMENT:
 			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
 				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
 					sc.Advance(1 + bracketNumber);
@@ -215,16 +216,6 @@ void ColouriseCMakeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_CMAKE_ESCAPECHAR:
 			sc.SetState(outerStyle);
 			continue;
-
-		case SCE_CMAKE_BRACKET_ARGUMENT:
-			if (sc.ch == ']' && (sc.chNext == '=' || sc.chNext == ']')) {
-				if (IsBracketArgument(styler, sc.currentPos, false, bracketNumber)) {
-					sc.Advance(1 + bracketNumber);
-					sc.ForwardSetState(SCE_CMAKE_DEFAULT);
-					bracketNumber = 0;
-				}
-			}
-			break;
 
 		case SCE_CMAKE_VARIABLE:
 			if (sc.ch == '}') {

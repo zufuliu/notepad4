@@ -108,7 +108,7 @@ constexpr bool IsRegexStart(int chPrevNonWhite, int stylePrevNonWhite) noexcept 
 inline bool IsJsxTagStart(const StyleContext &sc, int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	// https://facebook.github.io/jsx/
 	// https://reactjs.org/docs/jsx-in-depth.html
-	return IsRegexStart(chPrevNonWhite, stylePrevNonWhite)
+	return (stylePrevNonWhite == SCE_JSX_TAG || IsRegexStart(chPrevNonWhite, stylePrevNonWhite))
 		&& (IsJsIdentifierStartNext(sc) || sc.chNext == '>' || sc.chNext == '{');
 }
 
