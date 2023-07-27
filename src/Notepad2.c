@@ -4014,24 +4014,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_WORDWRAP: {
 		fWordWrapG = fvCurFile.fWordWrap = !fvCurFile.fWordWrap;
-		const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
-		const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 		SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
-		SciCall_SetFirstVisibleLine(iVisTopLine);
-		SciCall_EnsureVisible(iDocTopLine);
 		UpdateToolbar();
 	} break;
 
 	case IDM_VIEW_WORDWRAPSETTINGS:
 		if (WordWrapSettingsDlg(hwnd)) {
-			const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
-			const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
 			SciCall_SetMarginOptions(bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE);
 			EditSetWrapIndentMode(fvCurFile.iTabWidth, fvCurFile.iIndentWidth);
 			SetWrapVisualFlags();
-			SciCall_SetFirstVisibleLine(iVisTopLine);
-			SciCall_EnsureVisible(iDocTopLine);
 			UpdateToolbar();
 		}
 		break;
