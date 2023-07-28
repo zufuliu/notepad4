@@ -49,6 +49,22 @@ struct EscapeSequence {
 	}
 };
 
+constexpr bool IsTripleString(int state) noexcept {
+	return state > SCE_TOML_STRING_DQ;
+}
+
+constexpr bool IsDoubleQuoted(int state) noexcept {
+	if constexpr (SCE_TOML_STRING_DQ & 1) {
+		return state & true;
+	} else {
+		return (state & 1) == 0;
+	}
+}
+
+constexpr int GetStringQuote(int state) noexcept {
+	return IsDoubleQuoted(state) ? '\"' : '\'';
+}
+
 constexpr bool IsTOMLOperator(int ch) noexcept {
 	return AnyOf(ch, '[', ']', '{', '}', ',', '=', '.', '+', '-');
 }
@@ -203,50 +219,25 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_TOML_STRING_SQ:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_TOML_DEFAULT);
-			} else if (sc.ch == '\'') {
-				sc.Forward();
-				if (IsTOMLKey(sc, braceCount, nullptr)) {
-					continue;
-				}
-				sc.SetState(SCE_TOML_DEFAULT);
-			}
-			break;
-
 		case SCE_TOML_STRING_DQ:
-			if (sc.atLineStart) {
+		case SCE_TOML_TRIPLE_STRING_SQ:
+		case SCE_TOML_TRIPLE_STRING_DQ:
+			if (sc.atLineStart && !IsTripleString(sc.state)) {
 				sc.SetState(SCE_TOML_DEFAULT);
-			} else if (sc.ch == '\\') {
+			} else if (sc.ch == '\\' && IsDoubleQuoted(sc.state)) {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_TOML_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '\"') {
+			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
+				if (IsTripleString(sc.state)) {
+					sc.Advance(2);
+				}
 				sc.Forward();
-				if (IsTOMLKey(sc, braceCount, nullptr)) {
+				if (!IsTripleString(sc.state) && IsTOMLKey(sc, braceCount, nullptr)) {
 					continue;
 				}
 				sc.SetState(SCE_TOML_DEFAULT);
-			}
-			break;
-
-		case SCE_TOML_TRIPLE_STRING_SQ:
-			if (sc.Match('\'', '\'', '\'')) {
-				sc.Advance(2);
-				sc.ForwardSetState(SCE_TOML_DEFAULT);
-			}
-			break;
-
-		case SCE_TOML_TRIPLE_STRING_DQ:
-			if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_TOML_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.Match('"', '"', '"')) {
-				sc.Advance(2);
-				sc.ForwardSetState(SCE_TOML_DEFAULT);
 			}
 			break;
 

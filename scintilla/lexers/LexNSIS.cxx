@@ -43,6 +43,10 @@ constexpr bool IsEscapeChar(int ch) noexcept {
 	return AnyOf(ch, '\'', '"', '`', 'n', 'r', 't');
 }
 
+constexpr int GetStringQuote(int state) noexcept {
+	return (state == SCE_NSIS_STRINGSQ) ? '\'' : ((state == SCE_NSIS_STRINGDQ) ? '\"' : '`');
+}
+
 void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int visibleChars = 0;
 	int lineContinuation = 0;
@@ -118,9 +122,7 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					variableOuter = sc.state;
 					sc.SetState(SCE_NSIS_VARIABLE);
 				}
-			} else if ((sc.state == SCE_NSIS_STRINGSQ && sc.ch == '\'')
-				|| (sc.state == SCE_NSIS_STRINGDQ && sc.ch == '"')
-				|| (sc.state == SCE_NSIS_STRINGBT && sc.ch == '`')) {
+			} else if (sc.ch == GetStringQuote(sc.state)) {
 				sc.ForwardSetState(SCE_NSIS_DEFAULT);
 			}
 			break;
@@ -134,8 +136,7 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		case SCE_NSIS_VARIABLE_BRACE:
 		case SCE_NSIS_VARIABLE_PAREN:
-			if ((sc.state == SCE_NSIS_VARIABLE_BRACE && sc.ch == '}')
-				|| (sc.state == SCE_NSIS_VARIABLE_PAREN && sc.ch == ')')) {
+			if (sc.ch == ((sc.state == SCE_NSIS_VARIABLE_BRACE) ? '}' : ')')) {
 				sc.ForwardSetState(variableOuter);
 				continue;
 			}

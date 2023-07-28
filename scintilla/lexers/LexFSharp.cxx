@@ -139,7 +139,7 @@ constexpr bool IsVerbatimString(int state) noexcept {
 
 constexpr bool IsInterpolatedString(int state) noexcept {
 	if constexpr (SCE_FSHARP_INTERPOLATED_STRING & 1) {
-		return (state & 1);
+		return state & true;
 	} else {
 		return (state & 1) == 0;
 	}

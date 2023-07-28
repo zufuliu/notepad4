@@ -249,42 +249,34 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			}
 			break;
 
+		case SCE_KOTLIN_CHARACTER:
 		case SCE_KOTLIN_STRING:
 		case SCE_KOTLIN_RAWSTRING:
-			if (sc.state == SCE_KOTLIN_STRING && sc.atLineStart) {
+			if (sc.atLineStart && sc.state != SCE_KOTLIN_RAWSTRING) {
 				sc.SetState(SCE_KOTLIN_DEFAULT);
-			} else if (sc.state == SCE_KOTLIN_STRING && sc.ch == '\\') {
+			} else if (sc.ch == '\\' && sc.state != SCE_KOTLIN_RAWSTRING) {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_KOTLIN_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '$') {
-				if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_KOTLIN_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_KOTLIN_VARIABLE);
-				}
-			} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.MatchNext('"', '"'))) {
-				if (sc.state == SCE_KOTLIN_RAWSTRING) {
-					sc.Advance(2);
-				}
+			} else if (sc.ch == '\'' && sc.state == SCE_KOTLIN_CHARACTER) {
 				sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
-			}
-			break;
-
-		case SCE_KOTLIN_CHARACTER:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_KOTLIN_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_KOTLIN_ESCAPECHAR);
-					sc.Forward();
+			} else if (sc.state != SCE_KOTLIN_CHARACTER) {
+				if (sc.ch == '$') {
+					if (sc.chNext == '{') {
+						nestedState.push_back(sc.state);
+						sc.SetState(SCE_KOTLIN_OPERATOR2);
+						sc.Forward();
+					} else if (IsIdentifierStartEx(sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_KOTLIN_VARIABLE);
+					}
+				} else if (sc.ch == '\"' && (sc.state == SCE_KOTLIN_STRING || sc.MatchNext('"', '"'))) {
+					if (sc.state == SCE_KOTLIN_RAWSTRING) {
+						sc.Advance(2);
+					}
+					sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 				}
-			} else if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_KOTLIN_DEFAULT);
 			}
 			break;
 

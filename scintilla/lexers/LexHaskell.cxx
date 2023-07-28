@@ -151,7 +151,7 @@ void ColouriseHaskellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 					sc.SetState(SCE_HA_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if ((sc.ch == '\'' && sc.state == SCE_HA_CHARACTER) || (sc.ch == '\"' && sc.state == SCE_HA_STRING)) {
+			} else if (sc.ch == ((sc.state == SCE_HA_CHARACTER) ? '\'' : '\"')) {
 				sc.ForwardSetState(SCE_HA_DEFAULT);
 			}
 			break;

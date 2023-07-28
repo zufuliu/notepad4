@@ -56,6 +56,18 @@ constexpr bool IsJsIdentifierChar(int ch) noexcept {
 	return IsIdentifierCharEx(ch) || ch == '$';
 }
 
+constexpr bool IsInterpolatedString(int state) noexcept {
+	return state == SCE_COFFEESCRIPT_STRING_DQ || state == SCE_COFFEESCRIPT_XML_STRING_DQ || state == SCE_COFFEESCRIPT_TRIPLE_STRING_DQ;
+}
+
+constexpr int GetStringQuote(int state) noexcept {
+	return (state < SCE_COFFEESCRIPT_STRING_DQ) ? '\'' : ((state < SCE_COFFEESCRIPT_BACKTICKS) ? '\"' : '`');
+}
+
+constexpr bool IsTripleString(int state) noexcept {
+	return state == SCE_COFFEESCRIPT_TRIPLE_STRING_SQ || state == SCE_COFFEESCRIPT_TRIPLE_STRING_DQ || state == SCE_COFFEESCRIPT_TRIPLE_BACKTICKS;
+}
+
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_COFFEESCRIPT_TASKMARKER;
 }
@@ -191,52 +203,9 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 		case SCE_COFFEESCRIPT_STRING_SQ:
 		case SCE_COFFEESCRIPT_XML_STRING_SQ:
 		case SCE_COFFEESCRIPT_TRIPLE_STRING_SQ:
-			if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_COFFEESCRIPT_ESCAPECHAR);
-					sc.Forward();
-					if (sc.Match('u', '{')) {
-						escSeq.brace = true;
-						escSeq.digitsLeft = 9; // Unicode code point
-						sc.Forward();
-					}
-				}
-			} else if (sc.ch == '\'' && (sc.state != SCE_COFFEESCRIPT_TRIPLE_STRING_SQ || sc.MatchNext('\'', '\''))) {
-				if (sc.state == SCE_COFFEESCRIPT_TRIPLE_STRING_SQ) {
-					sc.Advance(2);
-				}
-				sc.Forward();
-				sc.SetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_SQ) ? SCE_COFFEESCRIPT_XML_TEXT : SCE_COFFEESCRIPT_DEFAULT);
-				continue;
-			}
-			break;
-
 		case SCE_COFFEESCRIPT_STRING_DQ:
 		case SCE_COFFEESCRIPT_XML_STRING_DQ:
 		case SCE_COFFEESCRIPT_TRIPLE_STRING_DQ:
-			if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_COFFEESCRIPT_ESCAPECHAR);
-					sc.Forward();
-					if (sc.Match('u', '{')) {
-						escSeq.brace = true;
-						escSeq.digitsLeft = 9; // Unicode code point
-						sc.Forward();
-					}
-				}
-			} else if (sc.ch == '\"' && (sc.state != SCE_COFFEESCRIPT_TRIPLE_STRING_DQ || sc.MatchNext('\"', '\"'))) {
-				if (sc.state == SCE_COFFEESCRIPT_TRIPLE_STRING_DQ) {
-					sc.Advance(2);
-				}
-				sc.Forward();
-				sc.SetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_DQ) ? SCE_COFFEESCRIPT_XML_TEXT : SCE_COFFEESCRIPT_DEFAULT);
-				continue;
-			} else if (sc.Match('#', '{')) {
-				nestedState.push_back(sc.state);
-				sc.ForwardSetState(SCE_COFFEESCRIPT_OPERATOR2);
-			}
-			break;
-
 		case SCE_COFFEESCRIPT_BACKTICKS:
 		case SCE_COFFEESCRIPT_TRIPLE_BACKTICKS:
 			if (sc.ch == '\\') {
@@ -249,11 +218,15 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 						sc.Forward();
 					}
 				}
-			} else if (sc.ch == '`' && (sc.state != SCE_COFFEESCRIPT_TRIPLE_BACKTICKS || sc.MatchNext('`', '`'))) {
-				if (sc.state == SCE_COFFEESCRIPT_TRIPLE_BACKTICKS) {
+			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
+				if (IsTripleString(sc.state)) {
 					sc.Advance(2);
 				}
-				sc.ForwardSetState(SCE_COFFEESCRIPT_DEFAULT);
+				sc.ForwardSetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_SQ || sc.state == SCE_COFFEESCRIPT_XML_STRING_DQ) ? SCE_COFFEESCRIPT_XML_TEXT : SCE_COFFEESCRIPT_DEFAULT);
+				continue;
+			} else if (sc.Match('#', '{') && IsInterpolatedString(sc.state)) {
+				nestedState.push_back(sc.state);
+				sc.ForwardSetState(SCE_COFFEESCRIPT_OPERATOR2);
 			}
 			break;
 

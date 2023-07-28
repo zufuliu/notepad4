@@ -144,26 +144,17 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			break;
 
 		case SCE_POWERSHELL_STRING_DQ:
-			if (sc.ch == '`' || sc.Match('\"', '\"')) {
+		case SCE_POWERSHELL_HERE_STRING_DQ:
+			if (sc.ch == '`' || (sc.state == SCE_POWERSHELL_STRING_DQ && sc.Match('\"', '\"'))) {
 				outerStyle = SCE_POWERSHELL_STRING_DQ;
 				sc.SetState(SCE_POWERSHELL_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '$') {
 				HighlightVariable(sc, nestedState);
-			} else if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
-			}
-			break;
-
-		case SCE_POWERSHELL_HERE_STRING_DQ:
-			if (sc.ch == '`') {
-				outerStyle = SCE_POWERSHELL_HERE_STRING_DQ;
-				sc.SetState(SCE_POWERSHELL_ESCAPECHAR);
-				sc.Forward();
-			} else if (sc.ch == '$') {
-				HighlightVariable(sc, nestedState);
-			} else if (sc.Match('\"', '@')) {
-				sc.Forward();
+			} else if (sc.ch == '\"' && (sc.state != SCE_POWERSHELL_HERE_STRING_DQ || sc.chNext == '@')) {
+				if (sc.state == SCE_POWERSHELL_HERE_STRING_DQ) {
+					sc.Forward();
+				}
 				sc.ForwardSetState(SCE_POWERSHELL_DEFAULT);
 			}
 			break;

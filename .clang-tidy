@@ -16,6 +16,7 @@ Checks: >
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-narrowing-conversions,
+    -bugprone-switch-missing-default-case,
     -bugprone-unchecked-optional-access,
     -modernize-avoid-c-arrays,
     -modernize-macro-to-enum,
@@ -23,6 +24,7 @@ Checks: >
     -modernize-use-nodiscard,
     -modernize-use-trailing-return-type,
     -modernize-use-using,
+    -performance-enum-size,
     -performance-no-int-to-ptr,
     -readability-avoid-unconditional-preprocessor-if,
     -readability-function-cognitive-complexity,
@@ -37,5 +39,4 @@ Checks: >
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
-AnalyzeTemporaryDtors: false
 FormatStyle: none

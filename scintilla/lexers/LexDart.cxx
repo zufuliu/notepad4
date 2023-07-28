@@ -85,6 +85,18 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_DART_TASKMARKER;
 }
 
+constexpr bool IsTripleString(int state) noexcept {
+	return ((state - SCE_DART_STRING_SQ) & 3) > 1;
+}
+
+constexpr int GetStringQuote(int state) noexcept {
+	if constexpr (SCE_DART_STRING_SQ & 1) {
+		return (state & 1) ? '\'' : '\"';
+	} else {
+		return (state & 1) ? '\"' : '\'';
+	}
+}
+
 void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler) {
 	int lineStateLineType = 0;
 	int commentLevel = 0;	// nested block comment level
@@ -263,32 +275,17 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			}
 			break;
 
-		case SCE_DART_RAWSTRING_SQ:
-		case SCE_DART_RAWSTRING_DQ:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_DART_DEFAULT);
-			} else if ((sc.state == SCE_DART_RAWSTRING_SQ && sc.ch == '\'')
-				|| (sc.state == SCE_DART_RAWSTRING_DQ && sc.ch == '"')) {
-				sc.ForwardSetState(SCE_DART_DEFAULT);
-			}
-			break;
-
-		case SCE_DART_TRIPLE_RAWSTRING_SQ:
-		case SCE_DART_TRIPLE_RAWSTRING_DQ:
-			if ((sc.state == SCE_DART_TRIPLE_RAWSTRING_SQ && sc.Match('\'', '\'', '\''))
-				|| (sc.state == SCE_DART_TRIPLE_RAWSTRING_DQ && sc.Match('"', '"', '"'))) {
-				sc.Advance(2);
-				sc.ForwardSetState(SCE_DART_DEFAULT);
-			}
-			break;
-
 		case SCE_DART_STRING_SQ:
 		case SCE_DART_STRING_DQ:
 		case SCE_DART_TRIPLE_STRING_SQ:
 		case SCE_DART_TRIPLE_STRING_DQ:
-			if ((sc.state == SCE_DART_STRING_SQ || sc.state == SCE_DART_STRING_DQ) && sc.atLineStart) {
+		case SCE_DART_RAWSTRING_SQ:
+		case SCE_DART_RAWSTRING_DQ:
+		case SCE_DART_TRIPLE_RAWSTRING_SQ:
+		case SCE_DART_TRIPLE_RAWSTRING_DQ:
+			if (sc.atLineStart && !IsTripleString(sc.state)) {
 				sc.SetState(SCE_DART_DEFAULT);
-			} else if (sc.ch == '\\') {
+			} else if (sc.ch == '\\' && sc.state < SCE_DART_RAWSTRING_SQ) {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_DART_ESCAPECHAR);
 					sc.Forward();
@@ -298,7 +295,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.Forward();
 					}
 				}
-			} else if (sc.ch == '$') {
+			} else if (sc.ch == '$' && sc.state < SCE_DART_RAWSTRING_SQ) {
 				if (sc.chNext == '{' || sc.chNext == '(') {
 					if (sc.chNext == '(') {
 						simpleStringInterpolation = true;
@@ -312,13 +309,12 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_DART_VARIABLE2);
 				}
-			} else if ((sc.ch == '\'' && (sc.state == SCE_DART_STRING_SQ || (sc.state == SCE_DART_TRIPLE_STRING_SQ && sc.MatchNext('\'', '\''))))
-					|| (sc.ch == '"' && (sc.state == SCE_DART_STRING_DQ || (sc.state == SCE_DART_TRIPLE_STRING_DQ && sc.MatchNext('"', '"'))))) {
-				if (sc.state == SCE_DART_TRIPLE_STRING_SQ || sc.state == SCE_DART_TRIPLE_STRING_DQ) {
+			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
+				if (IsTripleString(sc.state)) {
 					sc.Advance(2);
 				}
 				sc.Forward();
-				if ((sc.state == SCE_DART_STRING_SQ || sc.state == SCE_DART_STRING_DQ) && (chBefore == ',' || chBefore == '{')) {
+				if (sc.state <= SCE_DART_STRING_DQ && (chBefore == ',' || chBefore == '{')) {
 					const int chNext = sc.GetLineNextChar();
 					if (chNext == ':') {
 						sc.ChangeState(SCE_DART_KEY);

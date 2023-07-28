@@ -104,24 +104,21 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_INNO_STRING_DQ:
+		case SCE_INNO_STRING_SQ:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_INNO_DEFAULT);
-			} else if (ppKind == PreprocessorKind::Include) {
-				if (sc.ch == '\"') {
-					ppKind = PreprocessorKind::None;
-					sc.ForwardSetState(SCE_INNO_DEFAULT);
-				}
-			} else if (sc.ch == '\"' || sc.ch == '{') {
-				if (sc.ch == sc.chNext) {
+			} else if (sc.ch == '{' || sc.ch == ((sc.state == SCE_INNO_STRING_DQ) ? '\"' : '\'')) {
+				if (sc.ch == sc.chNext && ppKind != PreprocessorKind::Include) {
 					sc.Forward();
-				} else if (sc.ch == '\"') {
+				} else if (sc.ch != '{') {
+					ppKind = PreprocessorKind::None;
 					sc.ForwardSetState(SCE_INNO_DEFAULT);
 				} else if (IsExpansionStartChar(sc.chNext)) {
 					++expansionLevel;
 					outerState = SCE_INNO_STRING_DQ;
 					sc.SetState(SCE_INNO_INLINE_EXPANSION);
 				}
-			} else if (sc.ch == '%') {
+			} else if (sc.ch == '%' && sc.state == SCE_INNO_STRING_DQ) {
 				if (sc.chNext == '%') {
 					sc.Forward();
 				} else if (sc.chNext == 'n' || IsADigit(sc.chNext)) {
@@ -268,22 +265,6 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				}
 				sc.SetState(SCE_INNO_DEFAULT);
-			}
-			break;
-
-		case SCE_INNO_STRING_SQ:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_INNO_DEFAULT);
-			} else if (sc.ch == '\'' || sc.ch == '{') {
-				if (sc.ch == sc.chNext) {
-					sc.Forward();
-				} else if (sc.ch == '\'') {
-					sc.ForwardSetState(SCE_INNO_DEFAULT);
-				} else if (IsExpansionStartChar(sc.chNext)) {
-					++expansionLevel;
-					outerState = SCE_INNO_STRING_SQ;
-					sc.SetState(SCE_INNO_INLINE_EXPANSION);
-				}
 			}
 			break;
 

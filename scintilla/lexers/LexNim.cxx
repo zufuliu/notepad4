@@ -26,7 +26,11 @@ using namespace Lexilla;
 namespace {
 
 constexpr bool IsFmtString(int state) noexcept {
-	return state == SCE_NIM_FMTSTRING || state == SCE_NIM_RAWFMTSTRING || state == SCE_NIM_TRIPLE_FMTSTRING;
+	if constexpr (SCE_NIM_FMTSTRING & 1) {
+		return state & true;
+	} else {
+		return (state & 1) == 0;
+	}
 }
 
 constexpr bool IsTripleString(int state) noexcept {
@@ -228,14 +232,14 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_NIM_CHARACTER:
 		case SCE_NIM_STRING:
 		case SCE_NIM_FMTSTRING:
-		case SCE_NIM_RAWFMTSTRING:
 		case SCE_NIM_RAWSTRING:
+		case SCE_NIM_RAWFMTSTRING:
 		case SCE_NIM_TRIPLE_STRING:
 		case SCE_NIM_TRIPLE_FMTSTRING:
-			if (sc.atLineStart && !IsTripleString(sc.state)) {
+			if (sc.atLineStart && sc.state < SCE_NIM_TRIPLE_STRING) {
 				sc.SetState(SCE_NIM_DEFAULT);
 			} else if (sc.ch == '\\') {
-				if (sc.state == SCE_NIM_CHARACTER || sc.state == SCE_NIM_STRING || sc.state == SCE_NIM_FMTSTRING) {
+				if (sc.state <= SCE_NIM_FMTSTRING) {
 					escSeq.resetEscapeState(sc.state, sc.chNext);
 					sc.SetState(SCE_NIM_ESCAPECHAR);
 					sc.Forward();
@@ -249,54 +253,56 @@ void ColouriseNimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					escSeq.resetEscapeState(sc.state);
 					sc.SetState(SCE_NIM_ESCAPECHAR);
 					sc.Forward();
-				} else if (!IsTripleString(sc.state) || sc.MatchNext('\"', '\"')) {
-					if (IsTripleString(sc.state)) {
+				} else if (sc.state < SCE_NIM_TRIPLE_STRING || sc.MatchNext('\"', '\"')) {
+					if (sc.state >= SCE_NIM_TRIPLE_STRING) {
 						sc.Forward(2);
 					}
 					sc.ForwardSetState(SCE_NIM_DEFAULT);
 				}
-			} else if (IsFmtString(sc.state)) {
-				if (sc.ch == '{') {
-					if (sc.chNext == '{') {
-						escSeq.resetEscapeState(sc.state);
-						sc.SetState(SCE_NIM_ESCAPECHAR);
-						sc.Forward();
-					} else {
-						fmtPart = FormatStringPart::None;
-						nestedState.push_back({sc.state, 0});
-						sc.SetState(SCE_NIM_OPERATOR2);
-					}
-				} else if (sc.ch == '}') {
-					if (nestedState.empty()) {
-						if (sc.chNext == '}') {
+			} else if (sc.state != SCE_NIM_CHARACTER) {
+				if (IsFmtString(sc.state)) {
+					if (sc.ch == '{') {
+						if (sc.chNext == '{') {
 							escSeq.resetEscapeState(sc.state);
 							sc.SetState(SCE_NIM_ESCAPECHAR);
 							sc.Forward();
+						} else {
+							fmtPart = FormatStringPart::None;
+							nestedState.push_back({sc.state, 0});
+							sc.SetState(SCE_NIM_OPERATOR2);
 						}
-					} else {
-						fmtPart = FormatStringPart::None;
-						const int state = sc.state;
-						nestedState.pop_back();
-						sc.SetState(SCE_NIM_OPERATOR2);
-						sc.ForwardSetState(state);
-						continue;
+					} else if (sc.ch == '}') {
+						if (nestedState.empty()) {
+							if (sc.chNext == '}') {
+								escSeq.resetEscapeState(sc.state);
+								sc.SetState(SCE_NIM_ESCAPECHAR);
+								sc.Forward();
+							}
+						} else {
+							fmtPart = FormatStringPart::None;
+							const int state = sc.state;
+							nestedState.pop_back();
+							sc.SetState(SCE_NIM_OPERATOR2);
+							sc.ForwardSetState(state);
+							continue;
+						}
+					} else if (sc.ch == ':' && fmtPart == FormatStringPart::FormatSpec) {
+						fmtPart = FormatStringPart::End;
+						const Sci_Position length = CheckBraceFormatSpecifier(sc, styler);
+						if (length != 0) {
+							const int state = sc.state;
+							sc.SetState(SCE_NIM_FORMAT_SPECIFIER);
+							sc.Advance(length);
+							sc.SetState(state);
+							continue;
+						}
 					}
-				} else if (sc.ch == ':' && fmtPart == FormatStringPart::FormatSpec) {
-					fmtPart = FormatStringPart::End;
-					const Sci_Position length = CheckBraceFormatSpecifier(sc, styler);
-					if (length != 0) {
-						const int state = sc.state;
-						sc.SetState(SCE_NIM_FORMAT_SPECIFIER);
-						sc.Advance(length);
-						sc.SetState(state);
-						continue;
+				} else if (sc.ch == '$') {
+					if (sc.chNext == '#' || IsADigit(sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_NIM_PLACEHOLDER);
+						sc.Forward();
 					}
-				}
-			} else if (sc.ch == '$') {
-				if (sc.chNext == '#' || IsADigit(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_NIM_PLACEHOLDER);
-					sc.Forward();
 				}
 			}
 			break;

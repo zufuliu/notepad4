@@ -919,7 +919,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_RUST_OPERATOR'],
 		'extra_word_char': '$:',
 		#'ignore_word_style': ['SCE_RUST_WORD', 'SCE_RUST_WORD2'],
-		'string_style_range': ['SCE_RUST_STRING', 'SCE_RUST_BYTE_CHARACTER'],
+		'string_style_range': ['SCE_RUST_CHARACTER', 'SCE_RUST_FORMAT_SPECIFIER'],
 	},
 
 	'NP2LEX_SCALA': {
@@ -935,7 +935,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_SCALA_OPERATOR', 'SCE_SCALA_OPERATOR2'],
 		'extra_word_char': '$',
 		#'ignore_word_style': ['SCE_SCALA_KEYWORD'],
-		'string_style_range': ['SCE_SCALA_CHARACTER', 'SCE_SCALA_XML_STRING_DQ'],
+		'string_style_range': ['SCE_SCALA_BACKTICKS', 'SCE_SCALA_ESCAPECHAR'],
 	},
 	'NP2LEX_SMALI': {
 		'line_comment_string': '#',
@@ -1003,7 +1003,7 @@ LexerConfigMap = {
 		'default_fold_level': ['table', 'comment'],
 		'escape_char_style': 'SCE_TOML_ESCAPECHAR',
 		'operator_style': ['SCE_TOML_OPERATOR'],
-		'string_style_range': ['SCE_TOML_STRING_SQ', 'SCE_TOML_TRIPLE_STRING_DQ'],
+		'string_style_range': ['SCE_TOML_STRING_SQ', 'SCE_TOML_ESCAPECHAR'],
 	},
 	'NP2LEX_TYPESCRIPT': {
 		'cpp_style_comment': True,

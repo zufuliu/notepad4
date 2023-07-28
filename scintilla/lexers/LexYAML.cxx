@@ -271,8 +271,15 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_YAML_STRING_SQ:
-			if (sc.ch == '\'') {
-				if (sc.chNext == '\'') {
+		case SCE_YAML_STRING_DQ:
+			if (sc.ch == '\\' && sc.state == SCE_YAML_STRING_DQ) {
+				if (!IsEOLChar(sc.chNext)) {
+					escSeq.resetEscapeState(sc.chNext);
+					sc.SetState(SCE_YAML_ESCAPECHAR);
+					sc.Forward();
+				}
+			} else if (sc.ch == ((sc.state == SCE_YAML_STRING_SQ) ? '\'' : '\"')) {
+				if (sc.chNext == '\'' && sc.state == SCE_YAML_STRING_SQ) {
 					sc.SetState(SCE_YAML_ESCAPECHAR);
 					sc.Advance(2);
 					sc.SetState(SCE_YAML_STRING_SQ);
@@ -280,22 +287,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 
 				sc.Forward();
-				if (sc.GetDocNextChar() == ':') {
-					hasKey = true;
-					sc.ChangeState(SCE_YAML_KEY);
-				}
-				sc.SetState((sc.ch == ':')? SCE_YAML_OPERATOR : SCE_YAML_DEFAULT);
-			}
-			break;
-
-		case SCE_YAML_STRING_DQ:
-			if (sc.ch == '\\' && !IsEOLChar(sc.chNext)) {
-				escSeq.resetEscapeState(sc.chNext);
-				sc.SetState(SCE_YAML_ESCAPECHAR);
-				sc.Forward();
-			} else if (sc.ch == '\"') {
-				sc.Forward();
-				if (sc.GetDocNextChar() == ':') {
+				if (sc.GetLineNextChar() == ':') {
 					hasKey = true;
 					sc.ChangeState(SCE_YAML_KEY);
 				}

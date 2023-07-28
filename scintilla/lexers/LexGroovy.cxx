@@ -88,6 +88,22 @@ static_assert(DefaultNestedStateBaseStyle + 2 == SCE_GROOVY_TRIPLE_STRING_DQ);
 static_assert(DefaultNestedStateBaseStyle + 3 == SCE_GROOVY_SLASHY_STRING);
 static_assert(DefaultNestedStateBaseStyle + 4 == SCE_GROOVY_DOLLAR_SLASHY);
 
+constexpr bool IsInterpolatedString(int state) noexcept {
+	return state < SCE_GROOVY_STRING_SQ;
+}
+
+constexpr int GetStringQuote(int state) noexcept {
+	return (state < SCE_GROOVY_STRING_SQ) ? '\"' : '\'';
+}
+
+constexpr bool IsTripleString(int state) noexcept {
+	if constexpr (SCE_GROOVY_TRIPLE_STRING_DQ & 1) {
+		return state & true;
+	} else {
+		return (state & 1) == 0;
+	}
+}
+
 constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_GROOVY_TASKMARKER;
 }
@@ -369,31 +385,16 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 
 		case SCE_GROOVY_STRING_SQ:
 		case SCE_GROOVY_TRIPLE_STRING_SQ:
-			if (sc.state == SCE_GROOVY_STRING_SQ && sc.atLineStart) {
-				sc.SetState(SCE_GROOVY_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_GROOVY_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.ch == '\'' && (sc.state == SCE_GROOVY_STRING_SQ || sc.MatchNext('\'', '\''))) {
-				if (sc.state == SCE_GROOVY_TRIPLE_STRING_SQ) {
-					sc.Advance(2);
-				}
-				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
-			}
-			break;
-
 		case SCE_GROOVY_STRING_DQ:
 		case SCE_GROOVY_TRIPLE_STRING_DQ:
-			if (sc.state == SCE_GROOVY_STRING_DQ && sc.atLineStart) {
+			if (sc.atLineStart && !IsTripleString(sc.state)) {
 				sc.SetState(SCE_GROOVY_DEFAULT);
 			} else if (sc.ch == '\\') {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_GROOVY_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '$') {
+			} else if (sc.ch == '$' && IsInterpolatedString(sc.state)) {
 				if (sc.chNext == '{') {
 					nestedState.push_back(sc.state);
 					sc.SetState(SCE_GROOVY_OPERATOR2);
@@ -402,8 +403,8 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_GROOVY_VARIABLE);
 				}
-			} else if (sc.ch == '"' && (sc.state == SCE_GROOVY_STRING_DQ || sc.MatchNext('"', '"'))) {
-				if (sc.state == SCE_GROOVY_TRIPLE_STRING_DQ) {
+			} else if (sc.ch == GetStringQuote(sc.state) && (!IsTripleString(sc.state) || sc.MatchNext())) {
+				if (IsTripleString(sc.state)) {
 					sc.Advance(2);
 				}
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
@@ -411,7 +412,8 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 			break;
 
 		case SCE_GROOVY_SLASHY_STRING:
-			if (sc.Match('\\', '/')) {
+		case SCE_GROOVY_DOLLAR_SLASHY:
+			if (sc.Match('\\', '/') && sc.state == SCE_GROOVY_SLASHY_STRING) {
 				sc.SetState(SCE_GROOVY_ESCAPECHAR);
 				sc.Forward();
 				sc.ForwardSetState(SCE_GROOVY_SLASHY_STRING);
@@ -424,29 +426,16 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				} else if (IsIdentifierStartEx(sc.chNext)) {
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_GROOVY_VARIABLE);
-				}
-			} else if (sc.ch == '/') {
-				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
-			}
-			break;
-
-		case SCE_GROOVY_DOLLAR_SLASHY:
-			if (sc.ch == '$') {
-				if (sc.chNext == '{') {
-					nestedState.push_back(sc.state);
-					sc.SetState(SCE_GROOVY_OPERATOR2);
-					sc.Forward();
-				} else if (IsIdentifierStartEx(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_GROOVY_VARIABLE);
-				} else if (sc.chNext == '$' || sc.chNext == '/') {
+				} else if ((sc.chNext == '$' || sc.chNext == '/') && sc.state == SCE_GROOVY_DOLLAR_SLASHY) {
 					sc.SetState(SCE_GROOVY_ESCAPECHAR);
 					sc.Forward();
 					sc.ForwardSetState(SCE_GROOVY_DOLLAR_SLASHY);
 					continue;
 				}
-			} else if (sc.Match('/', '$')) {
-				sc.Forward();
+			} else if (sc.ch == '/' && (sc.state != SCE_GROOVY_DOLLAR_SLASHY || sc.chNext == '$')) {
+				if (sc.state == SCE_GROOVY_DOLLAR_SLASHY) {
+					sc.Forward();
+				}
 				sc.ForwardSetState(SCE_GROOVY_DEFAULT);
 			}
 			break;

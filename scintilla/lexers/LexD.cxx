@@ -102,6 +102,10 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_D_TASKMARKER;
 }
 
+constexpr int GetStringQuote(int state) noexcept {
+	return (state == SCE_D_CHARACTER) ? '\'' : ((state == SCE_D_STRING_BT) ? '`' : '\"');
+}
+
 constexpr bool IsDStringPostfix(int ch) noexcept {
 	return ch == 'c' || ch == 'w' || ch == 'd';
 }
@@ -256,19 +260,21 @@ bool HandleInnerStringStyle(StyleContext &sc, EscapeSequence &escSeq, bool &insi
 				sc.Forward();
 			}
 		}
-	} else if (sc.ch == '%') {
-		const Sci_Position length = CheckFormatSpecifier(sc, sc.styler, insideUrl);
-		if (length != 0) {
-			const int state = sc.state;
-			sc.SetState(SCE_D_FORMAT_SPECIFIER);
-			sc.Advance(length);
-			sc.SetState(state);
-			return true;
+	} else if (sc.state != SCE_D_CHARACTER) {
+		if (sc.ch == '%') {
+			const Sci_Position length = CheckFormatSpecifier(sc, sc.styler, insideUrl);
+			if (length != 0) {
+				const int state = sc.state;
+				sc.SetState(SCE_D_FORMAT_SPECIFIER);
+				sc.Advance(length);
+				sc.SetState(state);
+				return true;
+			}
+		} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+			insideUrl = true;
+		} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+			insideUrl = false;
 		}
-	} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
-		insideUrl = true;
-	} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
-		insideUrl = false;
 	}
 	return false;
 }
@@ -472,25 +478,15 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			break;
 
 		case SCE_D_CHARACTER:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_D_DEFAULT);
-			} else if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_D_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_D_ESCAPECHAR);
-					sc.Forward();
-				}
-			}
-			break;
-
 		case SCE_D_STRING:
 		case SCE_D_HEXSTRING:
 		case SCE_D_RAWSTRING:
 		case SCE_D_STRING_BT:
-			if ((sc.ch == '\"' && sc.state != SCE_D_STRING_BT) || (sc.ch == '`' && sc.state == SCE_D_STRING_BT)) {
+			if (sc.atLineStart && sc.state == SCE_D_CHARACTER) {
+				sc.SetState(SCE_D_DEFAULT);
+			} else if (sc.ch == GetStringQuote(sc.state)) {
 				sc.Forward();
-				if (IsDStringPostfix(sc.ch)) {
+				if (sc.state != SCE_D_CHARACTER && IsDStringPostfix(sc.ch)) {
 					sc.Forward();
 				}
 				sc.SetState(SCE_D_DEFAULT);

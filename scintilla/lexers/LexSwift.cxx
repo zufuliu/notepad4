@@ -283,7 +283,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SWIFT_STRING:
 		case SCE_SWIFT_TRIPLE_STRING:
-			if (sc.state == SCE_SWIFT_STRING && sc.atLineStart) {
+			if (sc.atLineStart && sc.state == SCE_SWIFT_STRING) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			} else if (sc.ch == '\\') {
 				if (sc.chNext == '(') {
@@ -297,8 +297,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					sc.ForwardSetState(state);
 					continue;
 				}
-			} else if (sc.ch == '"' && (sc.state == SCE_SWIFT_STRING
-				|| (sc.state == SCE_SWIFT_TRIPLE_STRING && sc.MatchNext('"', '"')))) {
+			} else if (sc.ch == '"' && (sc.state == SCE_SWIFT_STRING || sc.MatchNext('"', '"'))) {
 				if (sc.state == SCE_SWIFT_TRIPLE_STRING) {
 					sc.Advance(2);
 				}
@@ -308,7 +307,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SWIFT_STRING_ED:
 		case SCE_SWIFT_TRIPLE_STRING_ED:
-			if (sc.state == SCE_SWIFT_STRING_ED && sc.atLineStart) {
+			if (sc.atLineStart && sc.state == SCE_SWIFT_STRING_ED) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			} else if (sc.Match('\\', '#')) {
 				const int state = sc.state;
@@ -342,7 +341,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 
 		case SCE_SWIFT_REGEX:
 		case SCE_SWIFT_REGEX_ED:
-			if (sc.state == SCE_SWIFT_REGEX && sc.atLineStart) {
+			if (sc.atLineStart && sc.state == SCE_SWIFT_REGEX) {
 				sc.SetState(SCE_SWIFT_DEFAULT);
 			} else if (sc.ch == '\\') {
 				sc.Forward();

@@ -423,6 +423,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		case SCE_AHK_STRING_SQ:
 		case SCE_AHK_STRING_DQ:
+		case SCE_AHK_HOTSTRING_VALUE:
 			if (sc.atLineStart) {
 				sc.SetState(SCE_AHK_DEFAULT);
 			} else if (sc.ch == '`' && !IsEOLChar(sc.chNext)) {
@@ -431,22 +432,31 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.Forward();
 				sc.ForwardSetState(state);
 				continue;
-			} else if (sc.ch == '%' && IsIdentifierCharEx(sc.chNext)) {
-				outerStyle = sc.state;
-				sc.SetState(SCE_AHK_DYNAMIC_VARIABLE);
 			} else if (sc.ch == '{' || sc.ch == '}') {
 				if (HighlightBrace(sc, outerStyle)) {
 					continue;
 				}
-			} else if (sc.ch == stringQuoteChar) {
-				if (sc.ch == sc.chNext) {
-					const int state = sc.state;
-					sc.SetState(SCE_AHK_ESCAPECHAR);
-					sc.Forward();
-					sc.ForwardSetState(state);
-					continue;
+			} else if (sc.state != SCE_AHK_HOTSTRING_VALUE) {
+				if (sc.ch == '%' && IsIdentifierCharEx(sc.chNext)) {
+					outerStyle = sc.state;
+					sc.SetState(SCE_AHK_DYNAMIC_VARIABLE);
+				} else if (sc.ch == stringQuoteChar) {
+					if (sc.ch == sc.chNext) {
+						const int state = sc.state;
+						sc.SetState(SCE_AHK_ESCAPECHAR);
+						sc.Forward();
+						sc.ForwardSetState(state);
+						continue;
+					}
+					sc.ForwardSetState(SCE_AHK_DEFAULT);
 				}
-				sc.ForwardSetState(SCE_AHK_DEFAULT);
+			} else {
+				if (IsASpaceOrTab(sc.ch)) {
+					const int chNext = sc.GetLineNextChar(true);
+					if (chNext == ';' || chNext == '\0') {
+						sc.SetState(SCE_AHK_DEFAULT);
+					}
+				}
 			}
 			break;
 
@@ -490,26 +500,6 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (!IsGraphic(sc.ch)) {
 				sc.Rewind();
 				sc.ChangeState(SCE_AHK_DEFAULT);
-			}
-			break;
-
-		case SCE_AHK_HOTSTRING_VALUE:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_AHK_DEFAULT);
-			} else if (sc.ch == '`' && !IsEOLChar(sc.chNext)) {
-				sc.SetState(SCE_AHK_ESCAPECHAR);
-				sc.Forward();
-				sc.ForwardSetState(SCE_AHK_HOTSTRING_VALUE);
-				continue;
-			} else if (sc.ch == '{' || sc.ch == '}') {
-				if (HighlightBrace(sc, outerStyle)) {
-					continue;
-				}
-			} else if (IsASpaceOrTab(sc.ch)) {
-				const int chNext = sc.GetLineNextChar(true);
-				if (chNext == ';' || chNext == '\0') {
-					sc.SetState(SCE_AHK_DEFAULT);
-				}
 			}
 			break;
 

@@ -179,6 +179,9 @@ public:
 		return Match(ch0, ch1, ch2) && ch3 == styler[currentPos + 3];
 	}
 
+	bool MatchNext() const noexcept {
+		return ch == chNext && ch == static_cast<unsigned char>(styler[currentPos + 2]);
+	}
 	bool MatchNext(char ch0, char ch1) const noexcept {
 		return chNext == static_cast<unsigned char>(ch0) && ch1 == styler[currentPos + 2];
 	}

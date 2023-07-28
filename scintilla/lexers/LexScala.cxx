@@ -72,7 +72,11 @@ constexpr bool IsScalaIdentifierChar(int ch) noexcept {
 }
 
 constexpr bool IsSingleLineString(int state) noexcept {
-	return state == SCE_SCALA_STRING || state == SCE_SCALA_INTERPOLATED_STRING;
+	return state <= SCE_SCALA_INTERPOLATED_STRING;
+}
+
+constexpr int GetStringQuote(int state) noexcept {
+	return (state == SCE_SCALA_BACKTICKS) ? '`' : ((state < SCE_SCALA_XML_STRING_DQ) ? '\'' : '\"');
 }
 
 constexpr bool IsTripleString(int state) noexcept {
@@ -262,12 +266,14 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			}
 			break;
 
+		case SCE_SCALA_BACKTICKS:
+		case SCE_SCALA_CHARACTER:
+		case SCE_SCALA_XML_STRING_SQ:
+		case SCE_SCALA_XML_STRING_DQ:
 		case SCE_SCALA_STRING:
 		case SCE_SCALA_TRIPLE_STRING:
 		case SCE_SCALA_INTERPOLATED_STRING:
 		case SCE_SCALA_TRIPLE_INTERPOLATED_STRING:
-		case SCE_SCALA_XML_STRING_SQ:
-		case SCE_SCALA_XML_STRING_DQ:
 			if (sc.atLineStart && IsSingleLineString(sc.state)) {
 				sc.SetState(SCE_SCALA_DEFAULT);
 			} else if (sc.ch == '\\') {
@@ -292,30 +298,12 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_SCALA_IDENTIFIER);
 				}
-			} else if (sc.state == SCE_SCALA_XML_STRING_SQ || sc.state == SCE_SCALA_XML_STRING_DQ) {
-				if (sc.ch == ((sc.state == SCE_SCALA_XML_STRING_SQ) ? '\'' : '\"')) {
-					sc.ForwardSetState(SCE_SCALA_XML_TEXT);
-					continue;
-				}
-			} else if (sc.ch == '"' && (IsSingleLineString(sc.state) || sc.MatchNext('"', '"'))) {
+			} else if (sc.ch == GetStringQuote(sc.state) && (IsSingleLineString(sc.state) || sc.MatchNext('"', '"'))) {
 				if (!IsSingleLineString(sc.state)) {
 					sc.Advance(2);
 				}
-				sc.ForwardSetState(SCE_SCALA_DEFAULT);
-			}
-			break;
-
-		case SCE_SCALA_CHARACTER:
-		case SCE_SCALA_BACKTICKS:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_SCALA_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_SCALA_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.ch == ((sc.state == SCE_SCALA_CHARACTER) ? '\'' : '`')) {
-				sc.ForwardSetState(SCE_SCALA_DEFAULT);
+				sc.ForwardSetState((sc.state == SCE_SCALA_XML_STRING_SQ || sc.state == SCE_SCALA_XML_STRING_DQ) ? SCE_SCALA_XML_TEXT : SCE_SCALA_DEFAULT);
+				continue;
 			}
 			break;
 
