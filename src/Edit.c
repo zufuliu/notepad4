@@ -2881,7 +2881,7 @@ static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) {
 //
 // EditModifyLines()
 //
-void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
+void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine) {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3062,6 +3062,12 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(iPrefixLen, iAppendLen) * kMaxMultiByteCount + 1);
 	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
+		const Sci_Position iStartPos = SciCall_PositionFromLine(iLineDest);
+		Sci_Position iEndPos = SciCall_GetLineEndPosition(iLineDest);
+		if (skipEmptyLine && iStartPos == iEndPos) {
+			continue;
+		}
+
 		if (iPrefixLen != 0) {
 			strcpy(mszInsert, mszPrefix1);
 
@@ -3085,8 +3091,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				iPrefixNum++;
 			}
 
-			const Sci_Position iPos = SciCall_PositionFromLine(iLineDest);
-			SciCall_SetTargetRange(iPos, iPos);
+			SciCall_SetTargetRange(iStartPos, iStartPos);
 			SciCall_ReplaceTarget(-1, mszInsert);
 			iLineDest += iPrefixLine;
 		}
@@ -3114,8 +3119,10 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend) {
 				iAppendNum++;
 			}
 
-			const Sci_Position iPos = SciCall_GetLineEndPosition(iLineDest);
-			SciCall_SetTargetRange(iPos, iPos);
+			if (iPrefixLen) {
+				iEndPos = SciCall_GetLineEndPosition(iLineDest);
+			}
+			SciCall_SetTargetRange(iEndPos, iEndPos);
 			SciCall_ReplaceTarget(-1, mszInsert);
 			iLineDest += iAppendLine;
 		}
@@ -6276,6 +6283,7 @@ extern int cyInsertTagDlg;
 static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	static DWORD id_hover;
 	static DWORD id_capture;
+	static bool skipEmptyLine;
 	static HFONT hFontHover;
 
 	switch (umsg) {
@@ -6299,6 +6307,9 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_PREFIX, wchPrefixLines.buffer);
 		MultilineEditSetup(hwnd, IDC_MODIFY_LINE_APPEND);
 		SetDlgItemText(hwnd, IDC_MODIFY_LINE_APPEND, wchAppendLines.buffer);
+		if (skipEmptyLine) {
+			CheckDlgButton(hwnd, IDC_MODIFY_LINE_SKIP_EMPTY, BST_CHECKED);
+		}
 		CenterDlgInParent(hwnd);
 	}
 	return TRUE;
@@ -6321,6 +6332,7 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_PREFIX, dx, cy, SWP_NOMOVE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_APPEND, 0, cy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP2, 0, cy, SWP_NOSIZE);
+		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_SKIP_EMPTY, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_DLN_NP, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_DLN_ZP, 0, dy, SWP_NOSIZE);
 		hdwp = DeferCtlPos(hdwp, hwnd, IDC_MODIFY_LINE_TIP_DLN, 0, dy, SWP_NOSIZE);
@@ -6446,8 +6458,8 @@ static INT_PTR CALLBACK EditModifyLinesDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		case IDOK: {
 			DStringW_GetDlgItemText(&wchPrefixLines, hwnd, IDC_MODIFY_LINE_PREFIX);
 			DStringW_GetDlgItemText(&wchAppendLines, hwnd, IDC_MODIFY_LINE_APPEND);
-
-			EditModifyLines(wchPrefixLines.buffer, wchAppendLines.buffer);
+			skipEmptyLine = IsButtonChecked(hwnd, IDC_MODIFY_LINE_SKIP_EMPTY);
+			EditModifyLines(wchPrefixLines.buffer, wchAppendLines.buffer, skipEmptyLine);
 			EndDialog(hwnd, IDOK);
 		}
 		break;
