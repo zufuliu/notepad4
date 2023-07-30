@@ -864,10 +864,10 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			sc.Complete();
 			if (HereDoc.StripIndent) {
 				// skip whitespace
-				while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
+				while (IsASpaceOrTab(sc.ch))
 					sc.Forward();
 			}
-			if (HereDoc.DelimiterLength == 0 || sc.Match(HereDoc.Delimiter)) {
+			if (HereDoc.DelimiterLength == 0 || styler.Match(sc.currentPos, HereDoc.Delimiter)) {
 				const int c = sc.GetRelative(HereDoc.DelimiterLength);
 				if (c == '\r' || c == '\n') {	// peek first, do not consume match
 					sc.ForwardBytes(HereDoc.DelimiterLength);
@@ -1316,8 +1316,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.SetState(SCE_PL_ARRAY);
 				if (IsPerlArrayChar(sc.chNext)) {
 					// no special treatment
-				} else if (sc.chNext == ':' && sc.GetRelative(2) == ':') {
-					sc.ForwardBytes(2);
+				} else if (sc.MatchNext(':', ':')) {
+					sc.Forward(2);
 				} else if (sc.chNext == '{' || sc.chNext == '[') {
 					sc.ForwardSetState(SCE_PL_OPERATOR);
 				} else {
@@ -1441,8 +1441,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				} else if (sc.ch == '*') {	// handle '*', typeglob
 					if (preferRE) {
 						sc.SetState(SCE_PL_SYMBOLTABLE);
-						if (sc.chNext == ':' && sc.GetRelative(2) == ':') {
-							sc.ForwardBytes(2);
+						if (sc.MatchNext(':', ':')) {
+							sc.Forward(2);
 						} else if (sc.chNext == '{') {
 							sc.ForwardSetState(SCE_PL_OPERATOR);
 						} else {
@@ -1458,8 +1458,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.SetState(SCE_PL_HASH);
 						if (IsPerlHashChar(sc.chNext)) {
 							sc.Forward();
-						} else if (sc.chNext == ':' && sc.GetRelative(2) == ':') {
-							sc.ForwardBytes(2);
+						} else if (sc.MatchNext(':', ':')) {
+							sc.Forward(2);
 						} else if (sc.chNext == '{') {
 							sc.ForwardSetState(SCE_PL_OPERATOR);
 						} else {

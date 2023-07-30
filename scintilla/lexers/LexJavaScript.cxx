@@ -88,7 +88,7 @@ static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JS_STRING_BT);
 static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JSX_TEXT);
 
 inline bool IsJsIdentifierStartNext(const StyleContext &sc) noexcept {
-	return IsJsIdentifierStart(sc.chNext) || (sc.chNext == '\\' && sc.GetRelative(2) == 'u');
+	return IsJsIdentifierStart(sc.chNext) || sc.MatchNext('\\', 'u');
 }
 
 constexpr bool IsSpaceEquiv(int state) noexcept {

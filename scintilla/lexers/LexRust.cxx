@@ -303,14 +303,13 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ForwardSetState(SCE_RUST_DEFAULT);
 				}
 			} else if (sc.Match('/', '*')) {
+				sc.Forward();
 				// TODO: nested block comment
-				//const int chNext = sc.GetRelative(2);
-				//if (chNext == '!' || (chNext == '*' && sc.GetRelative(3) != '*')) {
+				//if (sc.chNext == '!' || (sc.chNext == '*' && sc.GetRelative(2) != '*')) {
 				//	sc.SetState(SCE_RUST_COMMENTBLOCKDOC);
 				//} else {
 				//	sc.SetState(SCE_RUST_COMMENTBLOCK);
 				//}
-				sc.Forward();
 				++commentLevel;
 			} else if (HighlightTaskMarker(sc, visibleChars, visibleCharsBefore, SCE_RUST_TASKMARKER)) {
 				continue;

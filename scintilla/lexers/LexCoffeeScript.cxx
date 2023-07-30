@@ -377,20 +377,17 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			} else if (IsJsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_COFFEESCRIPT_IDENTIFIER);
 			} else if (sc.ch == '/') {
+				sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				if (sc.chNext == '/') {
-					if (sc.GetRelative(2) == '/') {
+					sc.Forward();
+					if (sc.chNext == '/') {
 						insideRegexRange = false;
-						sc.SetState(SCE_COFFEESCRIPT_TRIPLE_REGEX);
-						sc.Advance(2);
-					} else {
-						sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
+						sc.ChangeState(SCE_COFFEESCRIPT_TRIPLE_REGEX);
 						sc.Forward();
 					}
 				} else if (IsRegexStart(sc, chPrevNonWhite, stylePrevNonWhite)) {
 					insideRegexRange = false;
-					sc.SetState(SCE_COFFEESCRIPT_REGEX);
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
+					sc.ChangeState(SCE_COFFEESCRIPT_REGEX);
 				}
 			} else if (sc.ch == '+' || sc.ch == '-') {
 				if (sc.ch == sc.chNext) {

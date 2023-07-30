@@ -1896,7 +1896,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		case '+': // TOML
 		case ';': // JSON
-			if (lexer.markdown == Markdown::GitLab && sc.ch == sc.chNext && sc.ch == sc.GetRelative(2)) {
+			if (lexer.markdown == Markdown::GitLab && sc.MatchNext()) {
 				initStyle = (sc.ch == '+') ? SCE_MARKDOWN_METADATA_TOML : SCE_MARKDOWN_METADATA_JSON;
 			}
 			break;
@@ -2029,9 +2029,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_METADATA_TOML:
 		case SCE_MARKDOWN_METADATA_JSON:
 			if (sc.atLineStart) {
-				const int delimiter = static_cast<uint8_t>((sc.state == SCE_MARKDOWN_METADATA_YAML) ? '-'
-					: ((sc.state == SCE_MARKDOWN_METADATA_TOML) ? '+' : ';'));
-				if ((sc.ch == delimiter && sc.chNext == delimiter && sc.GetRelative(2) == delimiter)
+				const char delimiter = (sc.state == SCE_MARKDOWN_METADATA_YAML) ? '-'
+					: ((sc.state == SCE_MARKDOWN_METADATA_TOML) ? '+' : ';');
+				if (sc.MatchNext(delimiter, delimiter, delimiter)
 					|| (sc.state == SCE_MARKDOWN_METADATA_YAML && sc.Match('.', '.', '.'))) {
 					// `...` YAML document end marker, used by Pandoc
 					lineState |= LineStateBlockEndLine;

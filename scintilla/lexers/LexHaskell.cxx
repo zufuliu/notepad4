@@ -230,7 +230,7 @@ void ColouriseHaskellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 				sc.SetState(SCE_HA_IDENTIFIER);
 			} else if (sc.ch == '#') {
 				const bool pragma = (lineState & HaskellLineStatePragma) != 0;
-				if (pragma && sc.chNext == '-' && sc.GetRelative(2) == '}') {
+				if (pragma && sc.MatchNext('-', '}')) {
 					lineState = 0;
 					sc.SetState(SCE_HA_PRAGMA);
 					sc.Forward(2);

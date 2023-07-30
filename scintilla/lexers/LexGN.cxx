@@ -32,7 +32,7 @@ struct EscapeSequence {
 				digitsLeft = 1;
 				return true;
 			}
-		} else if (sc.ch == '$' && sc.chNext == '0' && sc.GetRelative(2) == 'x') {
+		} else if (sc.ch == '$' && sc.MatchNext('0', 'x')) {
 			digitsLeft = 3;
 			return true;
 		}
