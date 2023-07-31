@@ -2895,26 +2895,23 @@ typedef struct EditModifyLinesText {
 	int numWidth;
 	Sci_Line number;
 	char *mszPrefix;
-	char *mszSuffix;
+	const char *mszSuffix;
 } EditModifyLinesText;
 
-static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszTextW, UINT cpEdit, int iEOLMode, Sci_Line iLineStart, Sci_Line iLineEnd) {
+static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszTextW, Sci_Line iLineStart, Sci_Line iLineEnd, UINT cpEdit, int iEOLMode) {
 	memset(text, 0, sizeof(EditModifyLinesText));
-	const int length = lstrlen(pszTextW);
+	int length = lstrlen(pszTextW);
 	if (length == 0) {
 		return;
 	}
 
-	const int size = length * kMaxMultiByteCount + 1;
-	char *mszPrefix = (char *)NP2HeapAlloc(size);
-	WideCharToMultiByte(cpEdit, 0, pszTextW, -1, mszPrefix, size, NULL, NULL);
+	length = length * kMaxMultiByteCount + 1;
+	char *mszPrefix = (char *)NP2HeapAlloc(length);
+	WideCharToMultiByte(cpEdit, 0, pszTextW, -1, mszPrefix, length, NULL, NULL);
 	ConvertWinEditLineEndingsEx(mszPrefix, iEOLMode, &(text->lineCount));
 
-	char *mszSuffix = (char *)NP2HeapAlloc(length * kMaxMultiByteCount + 1);
 	text->length = length;
 	text->mszPrefix = mszPrefix;
-	text->mszSuffix = mszSuffix;
-
 	char *p = mszPrefix;
 	while ((p = strstr(p, "$(")) != NULL) {
 		char * const back = p;
@@ -2925,7 +2922,6 @@ static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszText
 		}
 		if ((*p == 'L' || *p == 'N' || *p == 'I') && p[1] == ')') {
 			*back = '\0';
-			strcpy(mszSuffix, p + 2);
 			Sci_Line number = 0;
 			Sci_Line lineCount;
 			const uint8_t substitution = *p;
@@ -2945,6 +2941,7 @@ static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszText
 			text->padZero = padZero;
 			text->numWidth = numWidth;
 			text->number = number;
+			text->mszSuffix = p + 2;
 			break;
 		}
 	}
@@ -3012,10 +3009,10 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 
 	EditModifyLinesText prefix;
 	EditModifyLinesText suffix;
-	EditModifyLinesText_Parse(&prefix, pwszPrefix, cpEdit, iEOLMode, iLineStart, iLineEnd);
-	EditModifyLinesText_Parse(&suffix, pwszAppend, cpEdit, iEOLMode, iLineStart, iLineEnd);
+	EditModifyLinesText_Parse(&prefix, pwszPrefix, iLineStart, iLineEnd, cpEdit, iEOLMode);
+	EditModifyLinesText_Parse(&suffix, pwszAppend, iLineStart, iLineEnd, cpEdit, iEOLMode);
 
-	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(prefix.length, suffix.length) * kMaxMultiByteCount + 1);
+	char *mszInsert = (char *)NP2HeapAlloc(prefix.length + suffix.length + 64);
 	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
 		const Sci_Position iStartPos = SciCall_PositionFromLine(iLineDest);
@@ -3069,9 +3066,7 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 
 	EndWaitCursor();
 	NP2HeapFree(prefix.mszPrefix);
-	NP2HeapFree(prefix.mszSuffix);
 	NP2HeapFree(suffix.mszPrefix);
-	NP2HeapFree(suffix.mszSuffix);
 	NP2HeapFree(mszInsert);
 }
 
