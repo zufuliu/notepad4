@@ -2880,6 +2880,104 @@ static inline void ConvertWinEditLineEndings(char *s, int iEOLMode) {
 	ConvertWinEditLineEndingsEx(s, iEOLMode, NULL);
 }
 
+enum {
+	EditModifyLinesSubstitution_None = '\0',
+	EditModifyLinesSubstitution_LineNumber = 'L',
+	EditModifyLinesSubstitution_NumberOne = 'N',
+	EditModifyLinesSubstitution_NumberZero = 'I',
+};
+
+typedef struct EditModifyLinesText {
+	int length;
+	int lineCount;
+	uint8_t substitution;
+	bool padZero;
+	int numWidth;
+	Sci_Line number;
+	char *mszPrefix;
+	char *mszSuffix;
+} EditModifyLinesText;
+
+static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszTextW, UINT cpEdit, int iEOLMode, Sci_Line iLineStart, Sci_Line iLineEnd) {
+	memset(text, 0, sizeof(EditModifyLinesText));
+	const int length = lstrlen(pszTextW);
+	if (length == 0) {
+		return;
+	}
+
+	const int size = length * kMaxMultiByteCount + 1;
+	char *mszPrefix = (char *)NP2HeapAlloc(size);
+	WideCharToMultiByte(cpEdit, 0, pszTextW, -1, mszPrefix, size, NULL, NULL);
+	ConvertWinEditLineEndingsEx(mszPrefix, iEOLMode, &(text->lineCount));
+
+	char *mszSuffix = (char *)NP2HeapAlloc(length * kMaxMultiByteCount + 1);
+	text->length = length;
+	text->mszPrefix = mszPrefix;
+	text->mszSuffix = mszSuffix;
+
+	char *p = mszPrefix;
+	while ((p = strstr(p, "$(")) != NULL) {
+		char * const back = p;
+		p += CSTRLEN("$(");
+		const bool padZero = *p == '0';
+		if (padZero) {
+			p++;
+		}
+		if ((*p == 'L' || *p == 'N' || *p == 'I') && p[1] == ')') {
+			*back = '\0';
+			strcpy(mszSuffix, p + 2);
+			Sci_Line number = 0;
+			Sci_Line lineCount;
+			const uint8_t substitution = *p;
+			if (substitution == EditModifyLinesSubstitution_LineNumber) {
+				lineCount = iLineEnd + 1;
+			} else {
+				number = substitution == EditModifyLinesSubstitution_NumberOne;
+				lineCount = iLineEnd - iLineStart + number;
+			}
+			int numWidth = 1;
+			while (lineCount >= 10) {
+				++numWidth;
+				lineCount /= 10;
+			}
+
+			text->substitution = substitution;
+			text->padZero = padZero;
+			text->numWidth = numWidth;
+			text->number = number;
+			break;
+		}
+	}
+}
+
+static void EditModifyLinesText_Insert(EditModifyLinesText *text, char *mszInsert, Sci_Position iLine, Sci_Position position) {
+	strcpy(mszInsert, text->mszPrefix);
+	if (text->substitution != EditModifyLinesSubstitution_None) {
+		char tchNum[64];
+		const int numWidth = text->numWidth;
+		const Sci_Line number = (text->substitution == EditModifyLinesSubstitution_LineNumber) ? iLine + 1 : text->number;
+#if defined(_WIN64)
+		if (text->padZero) {
+			sprintf(tchNum, "%0*" PRId64, numWidth, number);
+		} else {
+			sprintf(tchNum, "%*" PRId64, numWidth, number);
+		}
+#else
+		if (text->padZero) {
+			sprintf(tchNum, "%0*d", numWidth, (int)(number));
+		} else {
+			sprintf(tchNum, "%*d", numWidth, (int)(number));
+		}
+#endif
+		strcat(mszInsert, tchNum);
+		strcat(mszInsert, text->mszSuffix);
+		text->number++;
+	}
+
+	SciCall_SetTargetRange(position, position);
+	SciCall_ReplaceTarget(-1, mszInsert);
+}
+
 //=============================================================================
 //
 // EditModifyLines()
@@ -2897,30 +2995,8 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 
 	const UINT cpEdit = SciCall_GetCodePage();
 	const int iEOLMode = SciCall_GetEOLMode();
-
-	const int iPrefixLen = lstrlen(pwszPrefix);
-	char *mszPrefix1 = NULL;
-	int iPrefixLine = 0;
-	if (iPrefixLen != 0) {
-		const int size = iPrefixLen * kMaxMultiByteCount + 1;
-		mszPrefix1 = (char *)NP2HeapAlloc(size);
-		WideCharToMultiByte(cpEdit, 0, pwszPrefix, -1, mszPrefix1, size, NULL, NULL);
-		ConvertWinEditLineEndingsEx(mszPrefix1, iEOLMode, &iPrefixLine);
-	}
-
-	const int iAppendLen = lstrlen(pwszAppend);
-	char *mszAppend1 = NULL;
-	int iAppendLine = 0;
-	if (iAppendLen != 0) {
-		const int size = iAppendLen * kMaxMultiByteCount + 1;
-		mszAppend1 = (char *)NP2HeapAlloc(size);
-		WideCharToMultiByte(cpEdit, 0, pwszAppend, -1, mszAppend1, size, NULL, NULL);
-		ConvertWinEditLineEndingsEx(mszAppend1, iEOLMode, &iAppendLine);
-	}
-
 	const Sci_Position iSelStart = SciCall_GetSelectionStart();
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
-
 	const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
 	Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
 
@@ -2934,135 +3010,12 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 		}
 	}
 
-	bool bPrefixNumPadZero = false;
-	char *mszPrefix2 = NULL;
-	Sci_Line iPrefixNum = 0;
-	int iPrefixNumWidth = 1;
-	bool bPrefixNum = false;
+	EditModifyLinesText prefix;
+	EditModifyLinesText suffix;
+	EditModifyLinesText_Parse(&prefix, pwszPrefix, cpEdit, iEOLMode, iLineStart, iLineEnd);
+	EditModifyLinesText_Parse(&suffix, pwszAppend, cpEdit, iEOLMode, iLineStart, iLineEnd);
 
-	bool bAppendNumPadZero = false;
-	char *mszAppend2 = NULL;
-	Sci_Line iAppendNum = 0;
-	int iAppendNumWidth = 1;
-	bool bAppendNum = false;
-
-	if (iPrefixLen != 0) {
-		char *p = mszPrefix1;
-		Sci_Line lineCount = 0;
-		mszPrefix2 = (char *)NP2HeapAlloc(iPrefixLen * kMaxMultiByteCount + 1);
-		while (!bPrefixNum && (p = strstr(p, "$(")) != NULL) {
-			if (StrStartsWith(p, "$(I)")) {
-				*p = 0;
-				strcpy(mszPrefix2, p + CSTRLEN("$(I)"));
-				bPrefixNum = true;
-				iPrefixNum = 0;
-				lineCount = iLineEnd - iLineStart;
-				bPrefixNumPadZero = false;
-			} else if (StrStartsWith(p, "$(0I)")) {
-				*p = 0;
-				strcpy(mszPrefix2, p + CSTRLEN("$(0I)"));
-				bPrefixNum = true;
-				iPrefixNum = 0;
-				lineCount = iLineEnd - iLineStart;
-				bPrefixNumPadZero = true;
-			} else if (StrStartsWith(p, "$(N)")) {
-				*p = 0;
-				strcpy(mszPrefix2, p + CSTRLEN("$(N)"));
-				bPrefixNum = true;
-				iPrefixNum = 1;
-				lineCount = iLineEnd - iLineStart + 1;
-				bPrefixNumPadZero = false;
-			} else if (StrStartsWith(p, "$(0N)")) {
-				*p = 0;
-				strcpy(mszPrefix2, p + CSTRLEN("$(0N)"));
-				bPrefixNum = true;
-				iPrefixNum = 1;
-				lineCount = iLineEnd - iLineStart + 1;
-				bPrefixNumPadZero = true;
-			} else if (StrStartsWith(p, "$(L)")) {
-				*p = 0;
-				strcpy(mszPrefix2, p + CSTRLEN("$(L)"));
-				bPrefixNum = true;
-				iPrefixNum = iLineStart + 1;
-				lineCount = iLineEnd + 1;
-				bPrefixNumPadZero = false;
-			} else if (StrStartsWith(p, "$(0L)")) {
-				*p = 0;
-				strcpy(mszPrefix2, p + CSTRLEN("$(0L)"));
-				bPrefixNum = true;
-				iPrefixNum = iLineStart + 1;
-				lineCount = iLineEnd + 1;
-				bPrefixNumPadZero = true;
-			}
-			p += CSTRLEN("$(");
-		}
-		if (bPrefixNum) {
-			while (lineCount >= 10) {
-				++iPrefixNumWidth;
-				lineCount /= 10;
-			}
-		}
-	}
-
-	if (iAppendLen != 0) {
-		char *p = mszAppend1;
-		Sci_Line lineCount = 0;
-		mszAppend2 = (char *)NP2HeapAlloc(iAppendLen * kMaxMultiByteCount + 1);
-		while (!bAppendNum && (p = strstr(p, "$(")) != NULL) {
-			if (StrStartsWith(p, "$(I)")) {
-				*p = 0;
-				strcpy(mszAppend2, p + CSTRLEN("$(I)"));
-				bAppendNum = true;
-				iAppendNum = 0;
-				lineCount = iLineEnd - iLineStart;
-				bAppendNumPadZero = false;
-			} else if (StrStartsWith(p, "$(0I)")) {
-				*p = 0;
-				strcpy(mszAppend2, p + CSTRLEN("$(0I)"));
-				bAppendNum = true;
-				iAppendNum = 0;
-				lineCount = iLineEnd - iLineStart;
-				bAppendNumPadZero = true;
-			} else if (StrStartsWith(p, "$(N)")) {
-				*p = 0;
-				strcpy(mszAppend2, p + CSTRLEN("$(N)"));
-				bAppendNum = true;
-				iAppendNum = 1;
-				lineCount = iLineEnd - iLineStart + 1;
-				bAppendNumPadZero = false;
-			} else if (StrStartsWith(p, "$(0N)")) {
-				*p = 0;
-				strcpy(mszAppend2, p + CSTRLEN("$(0N)"));
-				bAppendNum = true;
-				iAppendNum = 1;
-				lineCount = iLineEnd - iLineStart + 1;
-				bAppendNumPadZero = true;
-			} else if (StrStartsWith(p, "$(L)")) {
-				*p = 0;
-				strcpy(mszAppend2, p + CSTRLEN("$(L)"));
-				bAppendNum = true;
-				iAppendNum = iLineStart + 1;
-				lineCount = iLineEnd + 1;
-				bAppendNumPadZero = false;
-			} else if (StrStartsWith(p, "$(0L)")) {
-				*p = 0;
-				strcpy(mszAppend2, p + CSTRLEN("$(0L)"));
-				bAppendNum = true;
-				iAppendNum = iLineStart + 1;
-				lineCount = iLineEnd + 1;
-				bAppendNumPadZero = true;
-			}
-			p += CSTRLEN("$(");
-		}
-		if (bAppendNum) {
-			while (lineCount >= 10) {
-				++iAppendNumWidth;
-				lineCount /= 10;
-			}
-		}
-	}
-
-	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(iPrefixLen, iAppendLen) * kMaxMultiByteCount + 1);
+	char *mszInsert = (char *)NP2HeapAlloc(2 * max_i(prefix.length, suffix.length) * kMaxMultiByteCount + 1);
 	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart, iLineDest = iLineStart; iLine <= iLineEnd; iLine++, iLineDest++) {
 		const Sci_Position iStartPos = SciCall_PositionFromLine(iLineDest);
@@ -3070,64 +3023,16 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 		if (skipEmptyLine && iStartPos == iEndPos) {
 			continue;
 		}
-
-		if (iPrefixLen != 0) {
-			strcpy(mszInsert, mszPrefix1);
-
-			if (bPrefixNum) {
-				char tchNum[64];
-#if defined(_WIN64)
-				if (bPrefixNumPadZero) {
-					sprintf(tchNum, "%0*" PRId64, iPrefixNumWidth, iPrefixNum);
-				} else {
-					sprintf(tchNum, "%*" PRId64, iPrefixNumWidth, iPrefixNum);
-				}
-#else
-				if (bPrefixNumPadZero) {
-					sprintf(tchNum, "%0*d", iPrefixNumWidth, (int)iPrefixNum);
-				} else {
-					sprintf(tchNum, "%*d", iPrefixNumWidth, (int)iPrefixNum);
-				}
-#endif
-				strcat(mszInsert, tchNum);
-				strcat(mszInsert, mszPrefix2);
-				iPrefixNum++;
-			}
-
-			SciCall_SetTargetRange(iStartPos, iStartPos);
-			SciCall_ReplaceTarget(-1, mszInsert);
-			iLineDest += iPrefixLine;
+		if (prefix.length != 0) {
+			iLineDest += prefix.lineCount;
+			EditModifyLinesText_Insert(&prefix, mszInsert, iLine, iStartPos);
 		}
-
-		if (iAppendLen != 0) {
-			strcpy(mszInsert, mszAppend1);
-
-			if (bAppendNum) {
-				char tchNum[64];
-#if defined(_WIN64)
-				if (bAppendNumPadZero) {
-					sprintf(tchNum, "%0*" PRId64, iAppendNumWidth, iAppendNum);
-				} else {
-					sprintf(tchNum, "%*" PRId64, iAppendNumWidth, iAppendNum);
-				}
-#else
-				if (bAppendNumPadZero) {
-					sprintf(tchNum, "%0*d", iAppendNumWidth, (int)iAppendNum);
-				} else {
-					sprintf(tchNum, "%*d", iAppendNumWidth, (int)iAppendNum);
-				}
-#endif
-				strcat(mszInsert, tchNum);
-				strcat(mszInsert, mszAppend2);
-				iAppendNum++;
-			}
-
-			if (iPrefixLen) {
+		if (suffix.length != 0) {
+			if (prefix.length != 0) {
 				iEndPos = SciCall_GetLineEndPosition(iLineDest);
 			}
-			SciCall_SetTargetRange(iEndPos, iEndPos);
-			SciCall_ReplaceTarget(-1, mszInsert);
-			iLineDest += iAppendLine;
+			iLineDest += suffix.lineCount;
+			EditModifyLinesText_Insert(&suffix, mszInsert, iLine, iEndPos);
 		}
 	}
 	SciCall_EndUndoAction();
@@ -3163,18 +3068,10 @@ void EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine)
 	}
 
 	EndWaitCursor();
-	if (mszPrefix1 != NULL) {
-		NP2HeapFree(mszPrefix1);
-	}
-	if (mszAppend1 != NULL) {
-		NP2HeapFree(mszAppend1);
-	}
-	if (mszPrefix2 != NULL) {
-		NP2HeapFree(mszPrefix2);
-	}
-	if (mszAppend2 != NULL) {
-		NP2HeapFree(mszAppend2);
-	}
+	NP2HeapFree(prefix.mszPrefix);
+	NP2HeapFree(prefix.mszSuffix);
+	NP2HeapFree(suffix.mszPrefix);
+	NP2HeapFree(suffix.mszSuffix);
 	NP2HeapFree(mszInsert);
 }
 
