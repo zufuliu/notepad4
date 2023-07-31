@@ -2297,6 +2297,9 @@ void EditBase64Decode(bool decodeAsHex) {
 					}
 				}
 			} while (i < outLen);
+			if ((i & 15) != 0) {
+				--t;
+			}
 			outLen = t - input;
 			NP2HeapFree(output);
 			output = (uint8_t *)input;
