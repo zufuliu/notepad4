@@ -4841,11 +4841,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_INCREASENUM:
-		EditModifyNumber(true);
-		break;
-
 	case CMD_DECREASENUM:
-		EditModifyNumber(false);
+		EditModifyNumber(LOWORD(wParam) == CMD_INCREASENUM);
 		break;
 
 	case CMD_JUMP2SELSTART:

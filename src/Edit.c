@@ -2087,29 +2087,28 @@ void EditChar2Hex(void) {
 	WCHAR *wch = (WCHAR *)NP2HeapAlloc(count * sizeof(WCHAR));
 	SciCall_GetSelText(ch);
 
+	int outLen = 0;
 	if (ch[0] == '\0') {
+		outLen = 4;
 		strcpy(ch, "\\x00");
 	} else {
 		const UINT cpEdit = SciCall_GetCodePage();
 		count = MultiByteToWideChar(cpEdit, 0, ch, -1, wch, (int)count) - 1; // '\0'
-		int j = 0;
 		for (Sci_Position i = 0; i < count; i++) {
 			const WCHAR c = wch[i];
 			if (c <= 0xFF) {
-				sprintf(ch + j, "\\x%02X", c); // \xHH
-				j += 4;
+				outLen += sprintf(ch + outLen, "\\x%02X", c); // \xHH
 			} else {
-				sprintf(ch + j, "\\u%04X", c); // \uHHHH
-				j += 6;
+				outLen += sprintf(ch + outLen, "\\u%04X", c); // \uHHHH
 			}
 		}
 		if (count == 2 && IS_SURROGATE_PAIR(wch[0], wch[1])) {
 			const UINT value = UTF16_TO_UTF32(wch[0], wch[1]);
-			sprintf(ch + j, " U+%X", value);
+			outLen += sprintf(ch + outLen, " U+%X", value);
 		}
 	}
 
-	EditReplaceMainSelection(strlen(ch), ch);
+	EditReplaceMainSelection(outLen, ch);
 	NP2HeapFree(ch);
 	NP2HeapFree(wch);
 }
@@ -2506,36 +2505,32 @@ void EditModifyNumber(bool bIncrease) {
 	if (iSelCount < 32) {
 		char chNumber[32] = "";
 		SciCall_GetSelText(chNumber);
-		if (strchr(chNumber, '-')) {
-			return;
-		}
 
 		const char *ptr = strpbrk(chNumber, "xX");
 		const int radix = (ptr != NULL) ? 16 : 10;
 		char *end;
-		int iNumber = (int)strtol(chNumber, &end, radix);
-		if (end == chNumber || iNumber < 0) {
+		unsigned iNumber = strtoul(chNumber, &end, radix);
+		if (end == chNumber) {
 			return;
 		}
 
-		if (bIncrease && iNumber < INT_MAX) {
+		if (bIncrease && iNumber < UINT_MAX) {
 			iNumber++;
-		}
-		if (!bIncrease && iNumber > 0) {
+		} else if (!bIncrease && iNumber > 0) {
 			iNumber--;
 		}
 
-		const int iWidth = (int)strlen(chNumber) - ((ptr != NULL) ? 2 : 0);
+		int iWidth = (int)strlen(chNumber) - ((ptr != NULL) ? 2 : 0);
 		if (ptr != NULL) {
 			if (*ptr == 'X') {
-				sprintf(chNumber, "%#0*X", iWidth, iNumber);
+				iWidth = sprintf(chNumber, "%#0*X", iWidth, iNumber);
 			} else {
-				sprintf(chNumber, "%#0*x", iWidth, iNumber);
+				iWidth = sprintf(chNumber, "%#0*x", iWidth, iNumber);
 			}
 		} else {
-			sprintf(chNumber, "%0*i", iWidth, iNumber);
+			iWidth = sprintf(chNumber, "%0*u", iWidth, iNumber);
 		}
-		EditReplaceMainSelection(strlen(chNumber), chNumber);
+		EditReplaceMainSelection(iWidth, chNumber);
 	}
 }
 
@@ -2947,7 +2942,7 @@ static void EditModifyLinesText_Parse(EditModifyLinesText *text, LPCWSTR pszText
 	}
 }
 
-static void EditModifyLinesText_Insert(EditModifyLinesText *text, char *mszInsert, Sci_Position iLine, Sci_Position position) {
+static void EditModifyLinesText_Insert(EditModifyLinesText *text, char *mszInsert, Sci_Line iLine, Sci_Position position) {
 	strcpy(mszInsert, text->mszPrefix);
 	if (text->substitution != EditModifyLinesSubstitution_None) {
 		char tchNum[64];
