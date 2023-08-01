@@ -320,7 +320,7 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					indentCount = 0;
 					lineType = YAMLLineType::CommentLine;
 				}
-			} else if (sc.atLineStart && (sc.Match('-', '-', '-') || sc.Match('.', '.', '.'))) {
+			} else if (sc.atLineStart && (sc.ch == '-' || sc.ch == '.') && sc.MatchNext()) {
 				// reset document state
 				braceCount = 0;
 				visibleChars = 1;

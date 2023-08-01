@@ -81,3 +81,10 @@ def flattenUnicodePropertyTable(table, propertyList):
 				while start <= end:
 					table[start] = name
 					start += 1
+
+def flattenPropertyMap(propertyMap):
+	result = {}
+	for key, items in propertyMap.items():
+		for value in items:
+			result[value] = key
+	return result

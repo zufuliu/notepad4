@@ -2029,10 +2029,9 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 		case SCE_MARKDOWN_METADATA_TOML:
 		case SCE_MARKDOWN_METADATA_JSON:
 			if (sc.atLineStart) {
-				const char delimiter = (sc.state == SCE_MARKDOWN_METADATA_YAML) ? '-'
-					: ((sc.state == SCE_MARKDOWN_METADATA_TOML) ? '+' : ';');
-				if (sc.Match(delimiter, delimiter, delimiter)
-					|| (sc.state == SCE_MARKDOWN_METADATA_YAML && sc.Match('.', '.', '.'))) {
+				const int delimiter = static_cast<uint8_t>((sc.state == SCE_MARKDOWN_METADATA_YAML) ? '-'
+					: ((sc.state == SCE_MARKDOWN_METADATA_TOML) ? '+' : ';'));
+				if ((sc.ch == delimiter || (sc.ch == '.' && sc.state == SCE_MARKDOWN_METADATA_YAML)) && sc.MatchNext()) {
 					// `...` YAML document end marker, used by Pandoc
 					lineState |= LineStateBlockEndLine;
 					break;

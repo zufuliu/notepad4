@@ -724,7 +724,7 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 					}
 				} else {
 					int incr;
-					int c = GetBackslashExpression(p, incr);
+					const int c = GetBackslashExpression(p, incr);
 					i += incr;
 					p += incr;
 					if (c >= 0) {

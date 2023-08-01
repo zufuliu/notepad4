@@ -36,6 +36,15 @@ Checks: >
     -misc-confusable-identifiers,
     -misc-include-cleaner,
     -misc-non-private-member-variables-in-classes,
+#     -misc-use-anonymous-namespace,
+#     -modernize-deprecated-headers,
+#     -modernize-return-braced-init-list,
+#     -modernize-use-auto,
+#     -modernize-use-default-member-init,
+#     -readability-braces-around-statements,
+#     -readability-else-after-return,
+#     -readability-named-parameter,
+#     -readability-simplify-boolean-expr,
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'

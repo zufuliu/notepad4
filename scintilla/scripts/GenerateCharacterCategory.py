@@ -74,11 +74,7 @@ CharClassifyMap = {
 	],
 }
 
-CategoryClassifyMap = {}
-for key, items in CharClassifyMap.items():
-	for category in items:
-		CategoryClassifyMap[category] = key
-
+CategoryClassifyMap = flattenPropertyMap(CharClassifyMap)
 
 # https://en.wikipedia.org/wiki/Private_Use_Areas
 # Category: Other, private use (Co)
