@@ -1,4 +1,4 @@
-// 5.0 https://www.typescriptlang.org/docs/
+// 5.2 https://www.typescriptlang.org/docs/
 // 1.8 https://github.com/microsoft/TypeScript/blob/main/doc/
 
 //! keywords		===========================================================
@@ -19,7 +19,7 @@ package private protected public
 readonly return
 satisfies set static super switch
 this throw true try type typeof
-undefined unique
+undefined unique using
 var
 while with
 yield

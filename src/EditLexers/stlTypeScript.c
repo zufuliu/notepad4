@@ -7,7 +7,7 @@ static KEYWORDLIST Keywords_TS = {{
 "debugger declare default delete do else enum extends false finally for function get global "
 "if implements in infer instanceof interface intrinsic is keyof let new null of out override "
 "package private protected public readonly return satisfies set static super switch this throw true try type typeof "
-"undefined unique var while with yield "
+"undefined unique using var while with yield "
 
 , // 1 types
 "any bigint boolean never number object string symbol unknown void "
