@@ -878,7 +878,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			if (!IsEntityChar(ch)) {
 				styler.ColorTo(i + (ch == ';'), ((ch == ';') ? StateToPrint : SCE_H_TAGUNKNOWN));
 				state = SCE_H_DEFAULT;
-				if (ch != ';') {
+				if (ch != ';' && IsAGraphic(ch)) {
+					// Retreat one byte so the character that is invalid inside entity
+					// may start something else like a tag.
 					--i;
 					continue;
 				}
