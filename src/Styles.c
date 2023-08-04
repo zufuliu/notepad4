@@ -2726,6 +2726,9 @@ void Style_SetLexerByLangIndex(int lang) {
 		break;
 
 	// Math
+	case IDM_LEXER_MATHEMATICA:
+		pLex = &lexMathematica;
+		break;
 	case IDM_LEXER_MATLAB:
 	case IDM_LEXER_OCTAVE:
 	case IDM_LEXER_SCILAB:
@@ -2795,6 +2798,9 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			lang = IDM_LEXER_MARKDOWN_GITHUB;
 			break;
 		// Math
+		case NP2LEX_MATHEMATICA:
+			lang = IDM_LEXER_MATHEMATICA;
+			break;
 		case NP2LEX_MATLAB:
 			lang = IDM_LEXER_MATLAB;
 			break;
