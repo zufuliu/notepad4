@@ -1408,9 +1408,11 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			dialect = 1;
 			break;
 
-		case NP2LEX_BASH:
-			dialect = np2LexLangIndex == IDM_LEXER_CSHELL;
-			break;
+		case NP2LEX_BASH: {
+			NP2_static_assert(IDM_LEXER_CSHELL - IDM_LEXER_BASH == 1);
+			NP2_static_assert(IDM_LEXER_M4 - IDM_LEXER_BASH == 2);
+			dialect = np2LexLangIndex - IDM_LEXER_BASH;
+		} break;
 
 		case NP2LEX_CSS: {
 			NP2_static_assert(IDM_LEXER_SCSS - IDM_LEXER_CSS == 1);
@@ -1937,30 +1939,11 @@ int Style_GetDocTypeLanguage(void) {
 		if (StrStartsWithCase(p, "html")) {
 			return IDM_LEXER_WEB;
 		}
-		if (StrStartsWith(p, "struts") || StrStartsWith(p, "xwork") || StrStartsWith(p, "validators")) {
-			return IDM_LEXER_STRUTS;
-		}
-		if (StrStartsWith(p, "hibernate")) {
-			p += CSTRLEN("hibernate-");
-			if (*p == 'm') {
-				return IDM_LEXER_HIB_MAP;
-			}
-			return IDM_LEXER_HIB_CFG;
-		}
 		//if (StrStartsWith(p, "plist")) {
 		//	return IDM_LEXER_PROPERTY_LIST;
 		//}
 		if (StrStartsWith(p, "schema")) {
 			return IDM_LEXER_XSD;
-		}
-		if (StrStartsWith(p, "jboss")) {
-			return IDM_LEXER_JBOSS;
-		}
-		if (StrStartsWith(p, "beans")) {
-			return IDM_LEXER_SPRING_BEANS;
-		}
-		if (StrStartsWithCase(p, "module")) {
-			return IDM_LEXER_CHECKSTYLE;
 		}
 	}
 
@@ -1989,120 +1972,62 @@ int Style_GetDocTypeLanguage(void) {
 				return IDM_LEXER_ASP_JS;
 			}
 			if (StrStartsWithCase(p, "Java")) {
-				return IDM_LEXER_JSP;
+				p += CSTRLEN("Java");
+				return (UnsafeLower(*p) == 's') ? IDM_LEXER_ASP_JS : IDM_LEXER_JSP;
 			}
 		}
 	}
 
 	// find root tag
-	p = tchText;
-	while (p - tchText < (ptrdiff_t)COUNTOF(tchText)) {
-		p = strchr(p, '<');
-		if (p == NULL) {
-			return 0;
-		}
-		if (StrStartsWith(p, "<!--")) {
-			p += CSTRLEN("<!--");
-			p = strstr(p, "-->");
-			if (p != NULL) {
-				p += CSTRLEN("-->");
-			} else {
-				return 0;
-			}
-		} else if (StrStartsWith(p, "<?") || StrStartsWith(p, "<!")) {
-			p += CSTRLEN("<?");
-			p = strchr(p, '>');
-			if (p != NULL) {
-				p++;
-			} else {
-				return 0;
-			}
-		} else {
-			break;
-		}
-	}
-	if (*p == '<') {
-		p++;
-		if (!IsAlpha(*p)) {
-			return 0;
-		}
-	} else {
-		return 0;
-	}
+	//p = tchText;
+	//while (p - tchText < (ptrdiff_t)COUNTOF(tchText)) {
+	//	p = strchr(p, '<');
+	//	if (p == NULL) {
+	//		return 0;
+	//	}
+	//	if (StrStartsWith(p, "<!--")) {
+	//		p += CSTRLEN("<!--");
+	//		p = strstr(p, "-->");
+	//		if (p != NULL) {
+	//			p += CSTRLEN("-->");
+	//		} else {
+	//			return 0;
+	//		}
+	//	} else if (StrStartsWith(p, "<?") || StrStartsWith(p, "<!")) {
+	//		p += CSTRLEN("<?");
+	//		p = strchr(p, '>');
+	//		if (p != NULL) {
+	//			p++;
+	//		} else {
+	//			return 0;
+	//		}
+	//	} else {
+	//		break;
+	//	}
+	//}
+	//if (*p == '<') {
+	//	p++;
+	//	if (!IsAlpha(*p)) {
+	//		return 0;
+	//	}
+	//} else {
+	//	return 0;
+	//}
 
 	//if (StrStartsWithCase(p, "html"))
 	//	return IDM_LEXER_WEB;
-	if (StrStartsWith(p, "schema")) {
-		return IDM_LEXER_XSD;
-	}
+	//if (StrStartsWith(p, "schema")) {
+	//	return IDM_LEXER_XSD;
+	//}
 	//if (StrStartsWith(p, "schema") || StrStartsWith(p, "xsd:schema") || StrStartsWith(p, "xs:schema"))
 	//	return IDM_LEXER_XSD;
 	//if (StrStartsWith(p, "xsl:stylesheet"))
 	//	return IDM_LEXER_XSLT;
 
-	if (StrStartsWith(p, "project")) {
-		return IDM_LEXER_ANT_BUILD;
-	}
-	//if (StrStartsWith(p, "project")) {
-	//	p += CSTRLEN("project");
-	//	if (strstr(p, "maven") && strstr(p, "POM"))
-	//		return IDM_LEXER_MAVEN_POM;
-	//	return IDM_LEXER_ANT_BUILD;
-	//}
-	if (StrStartsWith(p, "settings")) {
-		return IDM_LEXER_MAVEN_SETTINGS;
-	}
-	if (StrStartsWith(p, "ivy")) {
-		if (*(p + CSTRLEN("ivy")) == '-') {
-			return IDM_LEXER_IVY_MODULE;
-		}
-		return IDM_LEXER_IVY_SETTINGS;
-	}
-	if (StrStartsWith(p, "ruleset")) {
-		return IDM_LEXER_PMD_RULESET;
-	}
-	if (StrStartsWith(p, "module")) {
-		return IDM_LEXER_CHECKSTYLE;
-	}
-
-	//if (StrStartsWith(p, "Server"))
-	//	return IDM_LEXER_TOMCAT;
-	//if (StrStartsWith(p, "web-app"))
-	//	return IDM_LEXER_WEB_JAVA;
-	if (StrStartsWith(p, "struts") || StrStartsWith(p, "xwork") || StrStartsWith(p, "validators")) {
-		return IDM_LEXER_STRUTS;
-	}
-	if (StrStartsWith(p, "hibernate")) {
-		if (p[CSTRLEN("hibernate-")] == 'm') {
-			return IDM_LEXER_HIB_MAP;
-		}
-		return IDM_LEXER_HIB_CFG;
-	}
-	if (StrStartsWith(p, "jboss")) {
-		return IDM_LEXER_JBOSS;
-	}
-	if (StrStartsWith(p, "beans")) {
-		return IDM_LEXER_SPRING_BEANS;
-	}
-
-	//if (StrStartsWith(p, "configuration"))
-	//	return IDM_LEXER_WEB_NET;
-	//if (StrStartsWith(p, "root"))
-	//	return IDM_LEXER_RESX;
-	//if (StrStartsWith(p, "Canvas"))
-	//	return IDM_LEXER_XAML;
-
 	//if (StrStartsWith(p, "plist"))
 	//	return IDM_LEXER_PROPERTY_LIST;
-	//if (StrStartsWith(p, "manifest"))
-	//	return IDM_LEXER_ANDROID_MANIFEST;
 	//if (StrStartsWith(p, "svg"))
 	//	return IDM_LEXER_SVG;
-	if (strstr(p, "xmlns:android") != NULL
-		&& (strstr(p, "Layout") != NULL || strstr(p, "View") != NULL || strstr(p, "menu") != NULL)) {
-		return IDM_LEXER_ANDROID_LAYOUT;
-	}
-
 	return 0;
 }
 
@@ -2381,47 +2306,17 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 
 	case NP2LEX_XML:
 		if (StrCaseEqual(L"xml", lpszExt)) {
-			if (StrCaseEqual(lpszName, L"build.xml") || StrCaseEqual(lpszName, L"javadoc.xml")) {
-				np2LexLangIndex = IDM_LEXER_ANT_BUILD;
-			} else if (StrCaseEqual(lpszName, L"pom.xml")) {
-				np2LexLangIndex = IDM_LEXER_MAVEN_POM;
-			} else if (StrCaseEqual(lpszName, L"settings.xml")) {
-				np2LexLangIndex = IDM_LEXER_MAVEN_SETTINGS;
-			} else if (StrCaseEqual(lpszName, L"AndroidManifest.xml")) {
-				np2LexLangIndex = IDM_LEXER_ANDROID_MANIFEST;
-			} else if (StrCaseEqual(lpszName, L"server.xml")) {
-				np2LexLangIndex = IDM_LEXER_TOMCAT;
-			} else if (StrCaseEqual(lpszName, L"web.xml")) {
-				np2LexLangIndex = IDM_LEXER_WEB_JAVA;
-			} else if (StrCaseEqual(lpszName, L"struts.xml") || StrCaseEqual(lpszName, L"struts-config.xml")) {
-				np2LexLangIndex = IDM_LEXER_STRUTS;
-			} else if (StrCaseEqual(lpszName, L"hibernate.cfg.xml")) {
-				np2LexLangIndex = IDM_LEXER_HIB_CFG;
-			} else if (StrCaseEqual(lpszName, L"ivy.xml")) {
-				np2LexLangIndex = IDM_LEXER_IVY_MODULE;
-			} else if (StrCaseEqual(lpszName, L"ivysettings.xml")) {
-				np2LexLangIndex = IDM_LEXER_IVY_SETTINGS;
-			} else if (StrCaseEqual(lpszName, L"pmd.xml")) {
-				np2LexLangIndex = IDM_LEXER_PMD_RULESET;
-			} else {
-				np2LexLangIndex = Style_GetDocTypeLanguage();
-			}
+			np2LexLangIndex = Style_GetDocTypeLanguage();
 		} else if (StrCaseEqual(L"xsd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_XSD;
 		} else if (StrHasPrefixCase(lpszExt, L"xsl")) {
 			np2LexLangIndex = IDM_LEXER_XSLT;
 		} else if (StrCaseEqual(L"dtd", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_DTD;
-		} else if (StrCaseEqual(L"pom", lpszExt)) {
-			np2LexLangIndex = IDM_LEXER_MAVEN_POM;
-		} else if (StrCaseEqual(L"resx", lpszExt)) {
-			np2LexLangIndex = IDM_LEXER_RESX;
-		} else if (StrCaseEqual(L"xaml", lpszExt)) {
-			np2LexLangIndex = IDM_LEXER_XAML;
 		} else if (StrCaseEqual(L"plist", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_PROPERTY_LIST;
-		} else if (StrCaseEqual(L"svg", lpszExt)) {
-			np2LexLangIndex = IDM_LEXER_SVG;
+		//} else if (StrCaseEqual(L"svg", lpszExt)) {
+		//	np2LexLangIndex = IDM_LEXER_SVG;
 		}
 		break;
 	}
@@ -2527,10 +2422,6 @@ static PEDITLEXER Style_GetLexerFromFile(LPCWSTR lpszFile, bool bCGIGuess, LPCWS
 		// MySQL ini/cnf
 		else if (StrHasPrefixCase(lpszName, L"my") && (StrCaseEqual(lpszExt, L"ini") || StrCaseEqual(lpszExt, L"cnf"))) {
 			pLexNew = &lexConfig;
-		}
-		else if (StrCaseEqual(lpszName, L"web.config")) {
-			pLexNew = &lexXML;
-			np2LexLangIndex = IDM_LEXER_WEB_NET;
 		}
 
 		// check associated extensions
@@ -2853,31 +2744,8 @@ void Style_SetLexerByLangIndex(int lang) {
 	case IDM_LEXER_XSD:
 	case IDM_LEXER_XSLT:
 	case IDM_LEXER_DTD:
-
-	case IDM_LEXER_ANT_BUILD:
-	case IDM_LEXER_MAVEN_POM:
-	case IDM_LEXER_MAVEN_SETTINGS:
-	case IDM_LEXER_IVY_MODULE:
-	case IDM_LEXER_IVY_SETTINGS:
-	case IDM_LEXER_PMD_RULESET:
-	case IDM_LEXER_CHECKSTYLE:
-
-	case IDM_LEXER_TOMCAT:
-	case IDM_LEXER_WEB_JAVA:
-	case IDM_LEXER_STRUTS:
-	case IDM_LEXER_HIB_CFG:
-	case IDM_LEXER_HIB_MAP:
-	case IDM_LEXER_SPRING_BEANS:
-	case IDM_LEXER_JBOSS:
-
-	case IDM_LEXER_WEB_NET:
-	case IDM_LEXER_RESX:
-	case IDM_LEXER_XAML:
-
 	case IDM_LEXER_PROPERTY_LIST:
-	case IDM_LEXER_ANDROID_MANIFEST:
-	case IDM_LEXER_ANDROID_LAYOUT:
-	case IDM_LEXER_SVG:
+	//case IDM_LEXER_SVG:
 		if (lang == IDM_LEXER_XML) {
 			np2LexLangIndex = Style_GetDocTypeLanguage();
 		}
@@ -2949,7 +2817,7 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 			np2LexLangIndex = lang;
 		}
 	}
-	for (int i = IDM_LEXER_TEXTFILE; i < IDM_LEXER_LAST_LEXER; i++) {
+	for (int i = IDM_LEXER_TEXTFILE; i < IDM_LEXER_LEXER_COUNT; i++) {
 		CheckCmd(hmenu, i, FALSE);
 	}
 	if (lang >= IDM_LEXER_TEXTFILE) {

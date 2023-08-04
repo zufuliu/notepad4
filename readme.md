@@ -146,20 +146,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* XML Schema
 		* XML Stylesheet
 		* SGML and DTD
-		* Ant Build
-		* Maven POM
-		* Maven Settings
-		* Ivy Module
-		* Ivy Settings
-		* PMD Ruleset
-		* Checkstyle Module
-		* Tomcat Config
-		* Java web.xml
-		* Struts config
-		* Hibernate config and mapping
-		* Spring Beans
 		* Apple Property List
-		* Android Manifest
 	* [YAML Document](https://yaml.org/)
 	* [Zig](tools/lang/Zig.zig), up to Zig 0.11.
 	* Many Others

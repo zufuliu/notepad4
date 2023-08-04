@@ -523,6 +523,7 @@ BEGIN
 			MENUITEM "ASP.NET (&VB.NET)",			IDM_LEXER_ASPX_VB
 			MENUITEM "ASP (V&BScript)",				IDM_LEXER_ASP_VBS
 			MENUITEM "ASP (J&Script)",				IDM_LEXER_ASP_JS
+			MENUITEM "Configuration Apache",				IDM_LEXER_APACHE
 		END
 		POPUP "Mark&down"
 		BEGIN
@@ -549,39 +550,7 @@ BEGIN
 			MENUITEM "Schéma XML",					IDM_LEXER_XSD
 			MENUITEM "Feuille de style XSLT",			IDM_LEXER_XSLT
 			MENUITEM "DTD XML",					IDM_LEXER_DTD
-		END
-		POPUP "XML (&Java)"
-		BEGIN
-			MENUITEM "Ant &Build",					IDM_LEXER_ANT_BUILD
-			MENUITEM "Maven &POM",					IDM_LEXER_MAVEN_POM
-			MENUITEM "Réglages Maven",				IDM_LEXER_MAVEN_SETTINGS
-			MENUITEM "Module I&vy",					IDM_LEXER_IVY_MODULE
-			MENUITEM "régalges &Ivy",				IDM_LEXER_IVY_SETTINGS
-			MENUITEM "Ensemble de règles PMD",				IDM_LEXER_PMD_RULESET
-			MENUITEM "&Checkstyle",					IDM_LEXER_CHECKSTYLE
-		END
-		POPUP "Configuration Web"
-		BEGIN
-			MENUITEM "Configuration Apache",				IDM_LEXER_APACHE
-			MENUITEM "Configuration Tomcat",				IDM_LEXER_TOMCAT
-			MENUITEM "Configuration web",					IDM_LEXER_WEB_JAVA
-			MENUITEM "Configuration struts",				IDM_LEXER_STRUTS
-			MENUITEM "Configuration Hibernate",			IDM_LEXER_HIB_CFG
-			MENUITEM "Mapping Hibernate",			IDM_LEXER_HIB_MAP
-			MENUITEM "Spring &Beans",				IDM_LEXER_SPRING_BEANS
-			MENUITEM "Configuration &JBoss",				IDM_LEXER_JBOSS
-		END
-		//POPUP "XML (.&NET)"
-		//BEGIN
-		//	MENUITEM "Configuration web",					IDM_LEXER_WEB_NET
-		//	MENUITEM "Ressources &ResX",				IDM_LEXER_RESX
-		//	MENUITEM "WPF &XAML",					IDM_LEXER_XAML
-		//END
-		POPUP "XML (Autres)"
-		BEGIN
 			MENUITEM "Liste de propriétés",				IDM_LEXER_PROPERTY_LIST
-			MENUITEM "Manifest Android",			IDM_LEXER_ANDROID_MANIFEST
-			MENUITEM "Mise en page Android",				IDM_LEXER_ANDROID_LAYOUT
 			//MENUITEM "Document SV&G",				IDM_LEXER_SVG
 		END
 	END
