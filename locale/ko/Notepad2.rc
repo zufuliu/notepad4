@@ -514,6 +514,13 @@ BEGIN
 			MENUITEM "Less 스타일 시트(&L)",			IDM_LEXER_LESS
 			MENUITEM "HSS 스타일 시트(&H)",			IDM_LEXER_HSS
 		END
+		POPUP "&JavaScript"
+		BEGIN
+			MENUITEM "&JavaScript",				IDM_LEXER_JAVASCRIPT
+			MENUITEM "Java&Script JSX",			IDM_LEXER_JAVASCRIPT_JSX
+			MENUITEM "&TypeScript",				IDM_LEXER_TYPESCRIPT
+			MENUITEM "TypeScript TS&X",			IDM_LEXER_TYPESCRIPT_TSX
+		END
 		POPUP "웹 소스 코드(&W)"
 		BEGIN
 			MENUITEM "웹 소스코드(&W)",			IDM_LEXER_WEB
@@ -2121,3 +2128,4 @@ END
 #include "../../src/Notepad2.ver"
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

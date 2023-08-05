@@ -4695,6 +4695,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_SCSS:
 	case IDM_LEXER_LESS:
 	case IDM_LEXER_HSS:
+	// JavaScript
+	case IDM_LEXER_JAVASCRIPT:
+	case IDM_LEXER_JAVASCRIPT_JSX:
+	case IDM_LEXER_TYPESCRIPT:
+	case IDM_LEXER_TYPESCRIPT_TSX:
 	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_PHP:

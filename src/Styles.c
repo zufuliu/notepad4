@@ -1425,12 +1425,9 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			dialect = iCsvOption;
 			break;
 
-		case NP2LEX_JAVASCRIPT:
-		case NP2LEX_TYPESCRIPT: {
-			LPCWSTR lpszExt = PathFindExtension(szCurFile);
-			if (StrNotEmpty(lpszExt) && (StrCaseEqual(lpszExt, L".jsx") || StrCaseEqual(lpszExt, L".tsx"))) {
-				dialect = 1;
-			}
+		case NP2LEX_JAVASCRIPT: {
+			NP2_static_assert(IDM_LEXER_JAVASCRIPT_JSX - IDM_LEXER_JAVASCRIPT == 1);
+			dialect = np2LexLangIndex - IDM_LEXER_JAVASCRIPT;
 		} break;
 
 		case NP2LEX_MARKDOWN: {
@@ -1445,11 +1442,16 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 			dialect = np2LexLangIndex - IDM_LEXER_MATLAB;
 		} break;
 
-		// see LexCPP.cxx
 		case NP2LEX_RESOURCESCRIPT:
-			dialect = 1;
+			dialect = 1; // see LexCPP.cxx
 			break;
+
+		case NP2LEX_TYPESCRIPT: {
+			NP2_static_assert(IDM_LEXER_TYPESCRIPT_TSX - IDM_LEXER_TYPESCRIPT == 1);
+			dialect = np2LexLangIndex - IDM_LEXER_TYPESCRIPT;
+		} break;
 		}
+
 		if (dialect > 0) {
 			char lang[4];
 			if (dialect < 10) {
@@ -2298,9 +2300,21 @@ static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpsz
 		}
 		break;
 
+	case NP2LEX_JAVASCRIPT:
+		if (StrCaseEqual(L"jsx", lpszExt)) {
+			np2LexLangIndex = IDM_LEXER_JAVASCRIPT_JSX;
+		}
+		break;
+
 	case NP2LEX_MATLAB:
 		if (StrCaseEqual(L"sce", lpszExt) || StrCaseEqual(L"sci", lpszExt)) {
 			np2LexLangIndex = IDM_LEXER_SCILAB;
+		}
+		break;
+
+	case NP2LEX_TYPESCRIPT:
+		if (StrCaseEqual(L"tsx", lpszExt)) {
+			np2LexLangIndex = IDM_LEXER_TYPESCRIPT_TSX;
 		}
 		break;
 
@@ -2702,6 +2716,16 @@ void Style_SetLexerByLangIndex(int lang) {
 		pLex = &lexCSS;
 		break;
 
+	// JavaScript
+	case IDM_LEXER_JAVASCRIPT:
+	case IDM_LEXER_JAVASCRIPT_JSX:
+		pLex = &lexJavaScript;
+		break;
+	case IDM_LEXER_TYPESCRIPT:
+	case IDM_LEXER_TYPESCRIPT_TSX:
+		pLex = &lexTypeScript;
+		break;
+
 	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_JSP:
@@ -2787,6 +2811,13 @@ void Style_UpdateSchemeMenu(HMENU hmenu) {
 		// CSS Style Sheet
 		case NP2LEX_CSS:
 			lang = IDM_LEXER_CSS;
+			break;
+		// JavaScript
+		case NP2LEX_JAVASCRIPT:
+			lang = IDM_LEXER_JAVASCRIPT;
+			break;
+		case NP2LEX_TYPESCRIPT:
+			lang = IDM_LEXER_TYPESCRIPT;
 			break;
 		// Web Source Code
 		case NP2LEX_HTML:
