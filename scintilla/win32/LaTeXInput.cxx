@@ -24,7 +24,7 @@ constexpr uint32_t array_size([[maybe_unused]] const T (&a)[N]) noexcept {
 
 #if 0
 uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
-#if EnableLaTeXLikeEmojiInput
+#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	static_assert(LaTeXHashMultiplier == EmojiHashMultiplier);
 	const char firstChar = *sequence;
 	if (firstChar != ':') {
@@ -48,7 +48,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	}
 #endif
 
-#if EnableLaTeXLikeEmojiInput
+#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	const char *sequenceString;
 	const InputSequence *sequenceList;
 #endif
@@ -60,7 +60,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	do {
 		value = value*LaTeXHashMultiplier + static_cast<uint8_t>(*ptr++);
 	} while (ptr < end);
-#if EnableLaTeXLikeEmojiInput
+#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	if (firstChar != ':') {
 		value %= array_size(LaTeXHashTable);
 		value = LaTeXHashTable[value];
@@ -77,7 +77,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	value = LaTeXHashTable[value];
 #endif
 	if (value) {
-#if !EnableLaTeXLikeEmojiInput
+#if !NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 		const char * const sequenceString = LaTeXInputSequenceString;
 		const InputSequence * const sequenceList = LaTeXInputSequenceList;
 #endif
@@ -111,7 +111,7 @@ uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 #else
 uint32_t GetLaTeXInputUnicodeCharacter(const char *sequence, size_t length) {
 	uint8_t firstChar = sequence[0];
-#if EnableLaTeXLikeEmojiInput
+#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	uint32_t start;
 	uint32_t offset;
 	const char *sequenceString;
