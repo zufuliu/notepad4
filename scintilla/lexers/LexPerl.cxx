@@ -114,7 +114,7 @@ int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw
 		moreback = true;
 	// look backwards at last significant lexed item for disambiguation
 	bk = backPos - 1;
-	int ch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
+	int ch = styler.SafeGetUCharAt(bk);
 	if (ch == '{' && !moreback) {
 		// {bareword: possible variable spec
 		brace = true;
@@ -133,7 +133,7 @@ int disambiguateBareword(LexAccessor &styler, Sci_PositionU bk, Sci_PositionU fw
 	// if ch isn't one of '[{(,' we can skip the test
 	if ((ch == '{' || ch == '(' || ch == '[' || ch == ',')
 		&& fw < endPos) {
-		while (IsASpaceOrTab(ch = static_cast<unsigned char>(styler.SafeGetCharAt(fw)))
+		while (IsASpaceOrTab(ch = styler.SafeGetUCharAt(fw))
 			&& fw < endPos) {
 			fw++;
 		}
@@ -181,7 +181,7 @@ int styleBeforeBracePair(LexAccessor &styler, Sci_PositionU bk) noexcept {
 		return SCE_PL_DEFAULT;
 	while (--bk > 0) {
 		if (styler.StyleAt(bk) == SCE_PL_OPERATOR) {
-			const int bkch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
+			const int bkch = styler.SafeGetUCharAt(bk);
 			if (bkch == ';') {	// early out
 				break;
 			} else if (bkch == '}') {
@@ -228,7 +228,7 @@ int podLineScan(LexAccessor &styler, Sci_PositionU &pos, Sci_PositionU endPos) n
 	// forward scan the current line to classify line for POD style
 	int state = -1;
 	while (pos < endPos) {
-		const int ch = static_cast<unsigned char>(styler.SafeGetCharAt(pos));
+		const int ch = styler.SafeGetUCharAt(pos);
 		if (ch == '\n' || ch == '\r') {
 			if (ch == '\r' && styler.SafeGetCharAt(pos + 1) == '\n') pos++;
 			break;
@@ -332,7 +332,7 @@ bool IsPackageLine(LexAccessor &styler, Sci_Line line) noexcept {
 }
 
 int PodHeadingLevel(LexAccessor &styler, Sci_Position pos) noexcept {
-	const int lvl = static_cast<unsigned char>(styler.SafeGetCharAt(pos + 5));
+	const int lvl = styler.SafeGetUCharAt(pos + 5);
 	if (lvl >= '1' && lvl <= '4') {
 		return lvl - '0';
 	}
@@ -801,7 +801,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					Sci_PositionU i = sc.currentPos + 1;
 					while ((i < endPos) && IsASpaceOrTab(delim_ch)) {
 						i++;
-						delim_ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
+						delim_ch = styler.SafeGetUCharAt(i);
 					}
 					ws_skip = i - sc.currentPos - 1;
 				}
@@ -1263,7 +1263,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				// if it's really one; if yes, disambiguation test is performed
 				// otherwise it is always a bareword and we skip a lot of scanning
 				if (sc.state == SCE_PL_WORD) {
-					while (IsIdentifierCharEx(static_cast<unsigned char>(styler.SafeGetCharAt(fw))))
+					while (IsIdentifierCharEx(styler.SafeGetUCharAt(fw)))
 						fw++;
 					if (!isPerlKeyword(styler, styler.GetStartSegment(), fw, keywordLists[KeywordIndex_Keyword])) {
 						sc.ChangeState(SCE_PL_IDENTIFIER);
@@ -1342,7 +1342,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					preferRE = true;
 				} else {
 					int bkstyle = styler.StyleAt(bk);
-					const int bkch = static_cast<unsigned char>(styler.SafeGetCharAt(bk));
+					const int bkch = styler.SafeGetUCharAt(bk);
 					switch (bkstyle) {
 					case SCE_PL_OPERATOR:
 						preferRE = true;
@@ -1360,8 +1360,8 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 								preferRE = false;
 							}
 						} else if (bkch == '+' || bkch == '-') {
-							if (bkch == static_cast<unsigned char>(styler.SafeGetCharAt(bk - 1))
-								&& bkch != static_cast<unsigned char>(styler.SafeGetCharAt(bk - 2)))
+							if (bkch == styler.SafeGetUCharAt(bk - 1)
+								&& bkch != styler.SafeGetUCharAt(bk - 2))
 								// exceptions for operators: unary suffixes ++, --
 								preferRE = false;
 						}

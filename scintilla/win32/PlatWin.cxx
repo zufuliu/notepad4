@@ -2073,7 +2073,7 @@ class BlobInline final : public IDWriteInlineObject {
 	STDMETHODIMP_(ULONG)Release() noexcept override;
 
 	// IDWriteInlineObject
-	COM_DECLSPEC_NOTHROW STDMETHODIMP Draw(
+	STDMETHODIMP Draw(
 		void *clientDrawingContext,
 		IDWriteTextRenderer *renderer,
 		FLOAT originX,
@@ -2081,12 +2081,10 @@ class BlobInline final : public IDWriteInlineObject {
 		BOOL isSideways,
 		BOOL isRightToLeft,
 		IUnknown *clientDrawingEffect
-	) override;
-	COM_DECLSPEC_NOTHROW STDMETHODIMP GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) override;
-	COM_DECLSPEC_NOTHROW STDMETHODIMP GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) override;
-	COM_DECLSPEC_NOTHROW STDMETHODIMP GetBreakConditions(
-		DWRITE_BREAK_CONDITION *breakConditionBefore,
-		DWRITE_BREAK_CONDITION *breakConditionAfter) override;
+	) noexcept override;
+	STDMETHODIMP GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) noexcept override;
+	STDMETHODIMP GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) noexcept override;
+	STDMETHODIMP GetBreakConditions(DWRITE_BREAK_CONDITION *breakConditionBefore, DWRITE_BREAK_CONDITION *breakConditionAfter) noexcept override;
 public:
 	explicit BlobInline(XYPOSITION width_ = 0.0f) noexcept : width(width_) {}
 };
@@ -2118,23 +2116,21 @@ STDMETHODIMP_(ULONG) BlobInline::Release() noexcept {
 }
 
 /// Implement IDWriteInlineObject
-COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::Draw(
+STDMETHODIMP BlobInline::Draw(
 	void*,
 	IDWriteTextRenderer*,
 	FLOAT,
 	FLOAT,
 	BOOL,
 	BOOL,
-	IUnknown*) {
+	IUnknown*) noexcept {
 	// Since not performing drawing, not necessary to implement
 	// Could be implemented by calling back into platform-independent code.
 	// This would allow more of the drawing to be mediated through DirectWrite.
 	return S_OK;
 }
 
-COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
-	DWRITE_INLINE_OBJECT_METRICS *metrics
-) {
+STDMETHODIMP BlobInline::GetMetrics(DWRITE_INLINE_OBJECT_METRICS *metrics) noexcept {
 	if (!metrics) {
 		return E_POINTER;
 	}
@@ -2145,9 +2141,7 @@ COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetMetrics(
 	return S_OK;
 }
 
-COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
-	DWRITE_OVERHANG_METRICS *overhangs
-) {
+STDMETHODIMP BlobInline::GetOverhangMetrics(DWRITE_OVERHANG_METRICS *overhangs) noexcept {
 	if (!overhangs) {
 		return E_POINTER;
 	}
@@ -2158,10 +2152,7 @@ COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetOverhangMetrics(
 	return S_OK;
 }
 
-COM_DECLSPEC_NOTHROW HRESULT STDMETHODCALLTYPE BlobInline::GetBreakConditions(
-	DWRITE_BREAK_CONDITION *breakConditionBefore,
-	DWRITE_BREAK_CONDITION *breakConditionAfter
-) {
+STDMETHODIMP BlobInline::GetBreakConditions(DWRITE_BREAK_CONDITION *breakConditionBefore, DWRITE_BREAK_CONDITION *breakConditionAfter) noexcept {
 	if (!breakConditionBefore || !breakConditionAfter) {
 		return E_POINTER;
 	}
@@ -2535,15 +2526,16 @@ void SurfaceD2D::DrawTextTransparent(PRectangle rc, const Font *font_, XYPOSITIO
 
 namespace {
 
-HRESULT MeasurePositions(TextPositions &poses, const TextWide &tbuf, IDWriteTextFormat *pTextFormat) {
-	if (!pTextFormat) {
+HRESULT MeasurePositions(const Font *font_, TextPositions &poses, const TextWide &tbuf) {
+	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
+	if (!pfm->pTextFormat) {
 		// Unexpected failure like no access to DirectWrite so give up.
 		return E_FAIL;
 	}
 
 	// Create a layout
 	IDWriteTextLayout *pTextLayout = nullptr;
-	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pTextFormat, 10000.0, 1000.0, &pTextLayout);
+	const HRESULT hrCreate = pIDWriteFactory->CreateTextLayout(tbuf.data(), tbuf.length(), pfm->pTextFormat, 10000.0, 1000.0, &pTextLayout);
 	if (!SUCCEEDED(hrCreate)) {
 		return hrCreate;
 	}
@@ -2576,10 +2568,9 @@ HRESULT MeasurePositions(TextPositions &poses, const TextWide &tbuf, IDWriteText
 }
 
 void SurfaceD2D::MeasureWidths(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
 	const TextWide tbuf(text, mode.codePage);
 	TextPositions poses(tbuf.length());
-	if (FAILED(MeasurePositions(poses, tbuf, pfm->pTextFormat))) {
+	if (FAILED(MeasurePositions(font_, poses, tbuf))) {
 		return;
 	}
 	if (mode.codePage == CpUtf8) {
@@ -2673,10 +2664,9 @@ void SurfaceD2D::DrawTextTransparentUTF8(PRectangle rc, const Font *font_, XYPOS
 }
 
 void SurfaceD2D::MeasureWidthsUTF8(const Font *font_, std::string_view text, XYPOSITION *positions) {
-	const FontDirectWrite *pfm = down_cast<const FontDirectWrite *>(font_);
 	const TextWide tbuf(text, CpUtf8);
 	TextPositions poses(tbuf.length());
-	if (FAILED(MeasurePositions(poses, tbuf, pfm->pTextFormat))) {
+	if (FAILED(MeasurePositions(font_, poses, tbuf))) {
 		return;
 	}
 	// Map the widths given for UTF-16 characters back onto the UTF-8 input string

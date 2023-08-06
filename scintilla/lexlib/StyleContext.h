@@ -26,7 +26,7 @@ private:
 
 	void GetNextChar() noexcept {
 		if (!multiByteAccess) {
-			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + 1));
+			chNext = styler.SafeGetUCharAt(currentPos + 1);
 		} else {
 			chNext = styler.GetCharacterAndWidth(currentPos + width, &widthNext);
 		}
@@ -124,12 +124,12 @@ public:
 		return currentPos - styler.GetStartSegment();
 	}
 	int GetRelative(Sci_Position n) const noexcept {
-		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
+		return styler.SafeGetUCharAt(currentPos + n);
 	}
 #if 0
 	[[deprecated]]
 	int GetRelative(Sci_Position n, char chDefault) const noexcept {
-		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n, chDefault));
+		return styler.SafeGetUCharAt(currentPos + n, chDefault);
 	}
 #endif
 	int GetRelativeCharacter(Sci_Position n) noexcept {
@@ -154,7 +154,7 @@ public:
 		}
 #endif
 		// fast version for single byte encodings
-		return static_cast<unsigned char>(styler.SafeGetCharAt(currentPos + n));
+		return styler.SafeGetUCharAt(currentPos + n);
 	}
 	bool AtDocumentEnd() const noexcept {
 		return currentPos == static_cast<Sci_PositionU>(styler.Length());
@@ -224,7 +224,7 @@ public:
 		chPrev = 0;
 		if (!multiByteAccess) {
 			ch = static_cast<unsigned char>(styler[startPos]);
-			chNext = static_cast<unsigned char>(styler.SafeGetCharAt(startPos + 1));
+			chNext = styler.SafeGetUCharAt(startPos + 1);
 		} else {
 			ch = styler.GetCharacterAndWidth(startPos, &widthNext);
 			width = widthNext;
@@ -273,7 +273,7 @@ public:
 		if (chNext >= 0x80 && styler.Encoding() == EncodingType::unicode) {
 			styler.GetCharacterAndWidth(pos, &widthNext_);
 		}
-		return static_cast<unsigned char>(styler.SafeGetCharAt(pos + widthNext_));
+		return styler.SafeGetUCharAt(pos + widthNext_);
 	}
 
 	int GetLineLastChar() const noexcept {

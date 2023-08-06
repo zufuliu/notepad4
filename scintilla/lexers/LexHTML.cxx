@@ -446,7 +446,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				break;
 		}
 		if (style == SCE_HJ_SYMBOLS) {
-			chPrevNonWhite = static_cast<unsigned char>(styler.SafeGetCharAt(back));
+			chPrevNonWhite = styler.SafeGetUCharAt(back);
 		}
 	}
 
@@ -459,8 +459,8 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			state != SCE_HJ_COMMENTLINE && state != SCE_HJ_COMMENTDOC)
 			chPrevNonWhite = ch;
 		ch = static_cast<unsigned char>(styler[i]);
-		int chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
-		const int chNext2 = static_cast<unsigned char>(styler.SafeGetCharAt(i + 2));
+		int chNext = styler.SafeGetUCharAt(i + 1);
+		const int chNext2 = styler.SafeGetUCharAt(i + 2);
 
 		// Handle DBCS codepages
 		if (styler.IsLeadByte(static_cast<unsigned char>(ch))) {
@@ -600,7 +600,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				levelCurrent++;
 			}
 			// should be better
-			ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
+			ch = styler.SafeGetUCharAt(i);
 			continue;
 		}
 
@@ -637,7 +637,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			}
 			styler.ColorTo(i + 1, SCE_H_ASP);
 			// should be better
-			ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
+			ch = styler.SafeGetUCharAt(i);
 			continue;
 		}
 
@@ -804,11 +804,11 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				styler.ColorTo(i, defaultStateForSGML(scriptLanguage));
 				// find the length of the word
 				int size = 1;
-				while (IsHTMLWordChar(static_cast<unsigned char>(styler.SafeGetCharAt(i + size))))
+				while (IsHTMLWordChar(styler.SafeGetUCharAt(i + size)))
 					size++;
 				styler.ColorTo(i + size, StateToPrint);
 				i += size - 1;
-				ch = static_cast<unsigned char>(styler.SafeGetCharAt(i));
+				ch = styler.SafeGetUCharAt(i);
 				state = defaultStateForSGML(scriptLanguage);
 				continue;
 			} else if (ch == '\"' || ch == '\'') {
@@ -1198,7 +1198,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 					while (IsLowerCase(chNext)) {   // gobble regex flags
 						i++;
 						ch = chNext;
-						chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
+						chNext = styler.SafeGetUCharAt(i + 1);
 					}
 				}
 				styler.ColorTo(i + 1, StateToPrint);
@@ -1208,7 +1208,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				if (chNext == '\\' || chNext == '/') {
 					i++;
 					ch = chNext;
-					chNext = static_cast<unsigned char>(styler.SafeGetCharAt(i + 1));
+					chNext = styler.SafeGetUCharAt(i + 1);
 				}
 			}
 			break;
