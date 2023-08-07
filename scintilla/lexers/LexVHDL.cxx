@@ -220,14 +220,19 @@ void ColouriseVHDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (sc.state == SCE_VHDL_DEFAULT) {
 			if (sc.Match('-', '-') || sc.Match('/', '*')) {
+				sc.SetState((sc.ch == '-') ? SCE_VHDL_COMMENTLINE : SCE_VHDL_COMMENTBLOCK);
 				sc.Forward();
 				if (sc.ch == '-') {
 					if (visibleChars == 0) {
 						lineState = VHDLLineStateMaskLineComment;
 					}
-					sc.SetState((sc.chNext == '!') ? SCE_VHDL_COMMENTLINEDOC : SCE_VHDL_COMMENTLINE);
+					if (sc.chNext == '!') {
+						sc.ChangeState(SCE_VHDL_COMMENTLINEDOC);
+					}
 				} else {
-					sc.SetState((sc.chNext == '!' || sc.chNext == '*') ? SCE_VHDL_COMMENTBLOCKDOC : SCE_VHDL_COMMENTBLOCK);
+					if (sc.chNext == '!' || sc.chNext == '*') {
+						sc.ChangeState(SCE_VHDL_COMMENTBLOCKDOC);
+					}
 				}
 			} else if (sc.ch == '\'' && !IsEOLChar(sc.chNext)) {
 				int state = SCE_VHDL_CHARACTER;
