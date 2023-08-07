@@ -112,7 +112,6 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 	int visibleChars = 0;
 	int indentCount = 0;
 	int xmlTagLevel = 0;
-	bool insideXmlTag = false;
 
 	int chBefore = 0;
 	int visibleCharsBefore = 0;
@@ -302,7 +301,7 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (!IsSingleLineString(sc.state)) {
 					sc.Advance(2);
 				}
-				sc.ForwardSetState((sc.state == SCE_SCALA_XML_STRING_SQ || sc.state == SCE_SCALA_XML_STRING_DQ) ? SCE_SCALA_XML_TEXT : SCE_SCALA_DEFAULT);
+				sc.ForwardSetState((sc.state == SCE_SCALA_XML_STRING_SQ || sc.state == SCE_SCALA_XML_STRING_DQ) ? SCE_SCALA_XML_OTHER : SCE_SCALA_DEFAULT);
 				continue;
 			}
 			break;
@@ -322,46 +321,41 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				sc.ForwardSetState(state);
 			}
 			if (!(IsScalaIdentifierChar(sc.ch) || sc.ch == '-')) {
-				sc.SetState(SCE_SCALA_XML_TEXT);
+				sc.SetState(SCE_SCALA_XML_OTHER);
 				continue;
 			}
 			break;
 
 		case SCE_SCALA_XML_TEXT:
+		case SCE_SCALA_XML_OTHER:
 			if (sc.ch == '>' || sc.Match('/', '>')) {
-				insideXmlTag = false;
 				sc.SetState(SCE_SCALA_XML_TAG);
 				if (sc.ch == '/') {
 					// self closing <tag />
 					--xmlTagLevel;
 					sc.Forward();
 				}
-				sc.Forward();
-				if (xmlTagLevel == 0) {
-					sc.SetState(SCE_SCALA_DEFAULT);
-				} else {
-					sc.SetState(SCE_SCALA_XML_TEXT);
-					continue;
-				}
-			} else if (sc.ch == '=' && insideXmlTag) {
-				sc.SetState(SCE_SCALA_OPERATOR2);
-				sc.ForwardSetState(SCE_SCALA_XML_TEXT);
+				chPrevNonWhite = '>';
+				stylePrevNonWhite = SCE_SCALA_XML_TAG;
+				sc.ForwardSetState((xmlTagLevel == 0) ? SCE_SCALA_DEFAULT : SCE_SCALA_XML_TEXT);
 				continue;
-			} else if ((sc.ch == '\'' || sc.ch == '\"') && insideXmlTag) {
+			} else if (sc.ch == '=' && (sc.state == SCE_SCALA_XML_OTHER)) {
+				sc.SetState(SCE_SCALA_OPERATOR2);
+				sc.ForwardSetState(SCE_SCALA_XML_OTHER);
+				continue;
+			} else if ((sc.ch == '\'' || sc.ch == '\"') && (sc.state == SCE_SCALA_XML_OTHER)) {
 				sc.SetState((sc.ch == '\'') ? SCE_SCALA_XML_STRING_SQ : SCE_SCALA_XML_STRING_DQ);
-			} else if (insideXmlTag && IsScalaIdentifierStart(sc.ch)) {
+			} else if ((sc.state == SCE_SCALA_XML_OTHER) && IsScalaIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_SCALA_XML_ATTRIBUTE);
 			} else if (sc.ch == '{') {
 				nestedState.push_back(sc.state);
 				sc.SetState(SCE_SCALA_OPERATOR2);
 			} else if (sc.Match('<', '/')) {
 				--xmlTagLevel;
-				insideXmlTag = false;
 				sc.SetState(SCE_SCALA_XML_TAG);
 				sc.Forward();
 			} else if (sc.ch == '<') {
 				++xmlTagLevel;
-				insideXmlTag = true;
 				sc.SetState(SCE_SCALA_XML_TAG);
 			}
 			break;
@@ -406,12 +400,10 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '<') {
 				// <tag></tag>
 				if (sc.chNext == '/') {
-					insideXmlTag = false;
 					--xmlTagLevel;
 					sc.SetState(SCE_SCALA_XML_TAG);
 					sc.Forward();
 				} else if (IsXmlTagStart(sc, chPrevNonWhite, stylePrevNonWhite)) {
-					insideXmlTag = true;
 					++xmlTagLevel;
 					sc.SetState(SCE_SCALA_XML_TAG);
 				} else {

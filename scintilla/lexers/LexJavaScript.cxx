@@ -84,8 +84,9 @@ enum class DocTagState {
 	XmlClose,		/// </param>, No this (C# like) style
 };
 
-static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JS_STRING_BT);
-static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JSX_TEXT);
+static_assert(DefaultNestedStateBaseStyle + 1 == SCE_JSX_OTHER);
+static_assert(DefaultNestedStateBaseStyle + 2 == SCE_JSX_TEXT);
+static_assert(DefaultNestedStateBaseStyle + 3 == SCE_JS_STRING_BT);
 
 inline bool IsJsIdentifierStartNext(const StyleContext &sc) noexcept {
 	return IsJsIdentifierStart(sc.chNext) || sc.MatchNext('\\', 'u');
@@ -132,7 +133,6 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	int chBeforeIdentifier = 0;
 
 	std::vector<int> nestedState; // string interpolation "${}"
-	bool insideJsxTag = false;
 	int jsxTagLevel = 0;
 	std::vector<int> jsxTagLevels;// nested JSX tag in expression
 
@@ -274,7 +274,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						kwType = KeywordType::None;
 					}
 				}
-				sc.SetState((sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+				sc.SetState((sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 				continue;
 			}
 			break;
@@ -288,7 +288,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (lineContinuation) {
 					lineContinuation = 0;
 				} else {
-					sc.SetState((sc.state >= SCE_JSX_STRING_SQ) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+					sc.SetState((sc.state >= SCE_JSX_STRING_SQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 					continue;
 				}
 			}
@@ -314,7 +314,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_JS_KEY);
 					}
 				}
-				sc.SetState((sc.state >= SCE_JSX_STRING_SQ) ? SCE_JSX_TEXT : SCE_JS_DEFAULT);
+				sc.SetState((sc.state >= SCE_JSX_STRING_SQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 				continue;
 			} else if (sc.state == SCE_JS_STRING_BT && sc.Match('$', '{')) {
 				nestedState.push_back(sc.state);
@@ -423,29 +423,26 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			break;
 
 		case SCE_JSX_TEXT:
+		case SCE_JSX_OTHER:
 			if (sc.ch == '>' || sc.Match('/', '>')) {
-				insideJsxTag = false;
 				sc.SetState(SCE_JSX_TAG);
 				if (sc.ch == '/') {
 					// self closing <tag />
 					--jsxTagLevel;
 					sc.Forward();
 				}
-				sc.Forward();
-				if (jsxTagLevel == 0) {
-					sc.SetState(SCE_JS_DEFAULT);
-				} else {
-					sc.SetState(SCE_JSX_TEXT);
-					continue;
-				}
-			} else if (sc.ch == '=' && insideJsxTag) {
-				sc.SetState(SCE_JS_OPERATOR2);
-				sc.ForwardSetState(SCE_JSX_TEXT);
+				chPrevNonWhite = '>';
+				stylePrevNonWhite = SCE_JSX_TAG;
+				sc.ForwardSetState((jsxTagLevel == 0) ? SCE_JS_DEFAULT : SCE_JSX_TEXT);
 				continue;
-			} else if ((sc.ch == '\'' || sc.ch == '\"') && insideJsxTag) {
+			} else if (sc.ch == '=' && (sc.state == SCE_JSX_OTHER)) {
+				sc.SetState(SCE_JS_OPERATOR2);
+				sc.ForwardSetState(SCE_JSX_OTHER);
+				continue;
+			} else if ((sc.ch == '\'' || sc.ch == '\"') && (sc.state == SCE_JSX_OTHER)) {
 				chBefore = 0;
 				sc.SetState((sc.ch == '\'') ? SCE_JSX_STRING_SQ : SCE_JSX_STRING_DQ);
-			} else if (insideJsxTag && (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u'))) {
+			} else if ((sc.state == SCE_JSX_OTHER) && (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u'))) {
 				sc.SetState(SCE_JSX_ATTRIBUTE);
 			} else if (sc.ch == '{') {
 				jsxTagLevels.push_back(jsxTagLevel);
@@ -454,12 +451,10 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				jsxTagLevel = 0;
 			} else if (sc.Match('<', '/')) {
 				--jsxTagLevel;
-				insideJsxTag = false;
 				sc.SetState(SCE_JSX_TAG);
 				sc.Forward();
 			} else if (sc.ch == '<') {
 				++jsxTagLevel;
-				insideJsxTag = true;
 				sc.SetState(SCE_JSX_TAG);
 			}
 			break;
@@ -517,12 +512,10 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			} else if (sc.ch == '<' && enableJsx) {
 				// <tag></tag>
 				if (sc.chNext == '/') {
-					insideJsxTag = false;
 					--jsxTagLevel;
 					sc.SetState(SCE_JSX_TAG);
 					sc.Forward();
 				} else if (IsJsxTagStart(sc, chPrevNonWhite, stylePrevNonWhite)) {
-					insideJsxTag = true;
 					++jsxTagLevel;
 					sc.SetState(SCE_JSX_TAG);
 				} else {

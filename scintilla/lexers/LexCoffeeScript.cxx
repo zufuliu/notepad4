@@ -125,7 +125,6 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 
 	EscapeSequence escSeq;
 	std::vector<int> nestedState;
-	bool insideJsxTag = false;
 	int jsxTagLevel = 0;
 	std::vector<int> jsxTagLevels;// nested JSX tag in expression
 
@@ -195,7 +194,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				sc.ForwardSetState(state);
 			}
 			if (!(IsJsIdentifierChar(sc.ch) || sc.ch == '-')) {
-				sc.SetState(SCE_COFFEESCRIPT_XML_TEXT);
+				sc.SetState(SCE_COFFEESCRIPT_XML_OTHER);
 				continue;
 			}
 			break;
@@ -222,7 +221,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				if (IsTripleString(sc.state)) {
 					sc.Advance(2);
 				}
-				sc.ForwardSetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_SQ || sc.state == SCE_COFFEESCRIPT_XML_STRING_DQ) ? SCE_COFFEESCRIPT_XML_TEXT : SCE_COFFEESCRIPT_DEFAULT);
+				sc.ForwardSetState((sc.state == SCE_COFFEESCRIPT_XML_STRING_SQ || sc.state == SCE_COFFEESCRIPT_XML_STRING_DQ) ? SCE_COFFEESCRIPT_XML_OTHER : SCE_COFFEESCRIPT_DEFAULT);
 				continue;
 			} else if (sc.Match('#', '{') && IsInterpolatedString(sc.state)) {
 				nestedState.push_back(sc.state);
@@ -297,28 +296,25 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			break;
 
 		case SCE_COFFEESCRIPT_XML_TEXT:
+		case SCE_COFFEESCRIPT_XML_OTHER:
 			if (sc.ch == '>' || sc.Match('/', '>')) {
-				insideJsxTag = false;
 				sc.SetState(SCE_COFFEESCRIPT_XML_TAG);
 				if (sc.ch == '/') {
 					// self closing <tag />
 					--jsxTagLevel;
 					sc.Forward();
 				}
-				sc.Forward();
-				if (jsxTagLevel == 0) {
-					sc.SetState(SCE_COFFEESCRIPT_DEFAULT);
-				} else {
-					sc.SetState(SCE_COFFEESCRIPT_XML_TEXT);
-					continue;
-				}
-			} else if (sc.ch == '=' && insideJsxTag) {
-				sc.SetState(SCE_COFFEESCRIPT_OPERATOR2);
-				sc.ForwardSetState(SCE_COFFEESCRIPT_XML_TEXT);
+				chPrevNonWhite = '>';
+				stylePrevNonWhite = SCE_COFFEESCRIPT_XML_TAG;
+				sc.ForwardSetState((jsxTagLevel == 0) ? SCE_COFFEESCRIPT_DEFAULT : SCE_COFFEESCRIPT_XML_TEXT);
 				continue;
-			} else if ((sc.ch == '\'' || sc.ch == '"') && insideJsxTag) {
+			} else if (sc.ch == '=' && (sc.state == SCE_COFFEESCRIPT_XML_OTHER)) {
+				sc.SetState(SCE_COFFEESCRIPT_OPERATOR2);
+				sc.ForwardSetState(SCE_COFFEESCRIPT_XML_OTHER);
+				continue;
+			} else if ((sc.ch == '\'' || sc.ch == '"') && (sc.state == SCE_COFFEESCRIPT_XML_OTHER)) {
 				sc.SetState((sc.ch == '\'') ? SCE_COFFEESCRIPT_XML_STRING_SQ : SCE_COFFEESCRIPT_XML_STRING_DQ);
-			} else if (insideJsxTag && IsJsIdentifierStart(sc.ch)) {
+			} else if ((sc.state == SCE_COFFEESCRIPT_XML_OTHER) && IsJsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_COFFEESCRIPT_XML_ATTRIBUTE);
 			} else if (sc.ch == '{') {
 				jsxTagLevels.push_back(jsxTagLevel);
@@ -327,12 +323,10 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				jsxTagLevel = 0;
 			} else if (sc.Match('<', '/')) {
 				--jsxTagLevel;
-				insideJsxTag = false;
 				sc.SetState(SCE_COFFEESCRIPT_XML_TAG);
 				sc.Forward();
 			} else if (sc.ch == '<') {
 				++jsxTagLevel;
-				insideJsxTag = true;
 				sc.SetState(SCE_COFFEESCRIPT_XML_TAG);
 			}
 			break;
@@ -400,12 +394,10 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 			} else if (sc.ch == '<') {
 				// <tag></tag>
 				if (sc.chNext == '/') {
-					insideJsxTag = false;
 					--jsxTagLevel;
 					sc.SetState(SCE_COFFEESCRIPT_XML_TAG);
 					sc.Forward();
 				} else if (IsJsxTagStart(sc.chNext)) {
-					insideJsxTag = true;
 					++jsxTagLevel;
 					sc.SetState(SCE_COFFEESCRIPT_XML_TAG);
 				} else {
