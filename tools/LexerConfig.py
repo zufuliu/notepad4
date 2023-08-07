@@ -935,7 +935,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_SCALA_OPERATOR', 'SCE_SCALA_OPERATOR2'],
 		'extra_word_char': '$',
 		#'ignore_word_style': ['SCE_SCALA_KEYWORD'],
-		'string_style_range': ['SCE_SCALA_BACKTICKS', 'SCE_SCALA_ESCAPECHAR'],
+		'string_style_range': ['SCE_SCALA_BACKTICKS', 'SCE_SCALA_XML_TEXT'],
 	},
 	'NP2LEX_SMALI': {
 		'line_comment_string': '#',

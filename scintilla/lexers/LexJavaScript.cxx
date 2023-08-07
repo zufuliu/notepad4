@@ -206,9 +206,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_JS_OPERATOR2);
 				sc.ForwardSetState(state);
 			}
-			if (sc.Match('\\', 'u') || (sc.ch == '-' && (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE))) {
-				sc.Forward();
-			} else if (!IsJsIdentifierChar(sc.ch)) {
+			if (!IsJsIdentifierChar(sc.ch) && !sc.Match('\\', 'u') && !(sc.ch == '-' && (sc.state == SCE_JSX_TAG || sc.state == SCE_JSX_ATTRIBUTE))) {
 				if (sc.state == SCE_JS_IDENTIFIER) {
 					char s[128];
 					sc.GetCurrent(s, sizeof(s));

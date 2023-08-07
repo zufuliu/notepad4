@@ -157,17 +157,16 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_SCALA_IDENTIFIER:
 		case SCE_SCALA_ANNOTATION:
 		case SCE_SCALA_SYMBOL:
-			if (!IsScalaIdentifierChar(sc.ch)) {
-				switch (sc.state) {
-				case SCE_SCALA_ANNOTATION:
-					if (sc.ch == '.') {
-						sc.SetState(SCE_SCALA_OPERATOR);
-						sc.ForwardSetState(SCE_SCALA_ANNOTATION);
-						continue;
-					}
-					break;
-
-				case SCE_SCALA_IDENTIFIER:
+		case SCE_SCALA_XML_TAG:
+		case SCE_SCALA_XML_ATTRIBUTE:
+			if ((sc.ch == '.' && !(sc.state == SCE_SCALA_IDENTIFIER || sc.state == SCE_SCALA_SYMBOL))
+				|| (sc.ch == ':' && (sc.state == SCE_SCALA_XML_TAG || sc.state == SCE_SCALA_XML_ATTRIBUTE))) {
+				const int state = sc.state;
+				sc.SetState(SCE_SCALA_OPERATOR2);
+				sc.ForwardSetState(state);
+			}
+			if (!IsScalaIdentifierChar(sc.ch) && !(sc.ch == '-' && (sc.state == SCE_SCALA_XML_TAG || sc.state == SCE_SCALA_XML_ATTRIBUTE))) {
+				if (sc.state == SCE_SCALA_IDENTIFIER) {
 					if (escSeq.outerState == SCE_SCALA_DEFAULT) {
 						char s[128];
 						sc.GetCurrent(s, sizeof(s));
@@ -222,7 +221,8 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 						continue;
 					}
 				}
-				sc.SetState(SCE_SCALA_DEFAULT);
+				sc.SetState((sc.state == SCE_SCALA_XML_TAG || sc.state == SCE_SCALA_XML_ATTRIBUTE) ? SCE_SCALA_XML_OTHER : SCE_SCALA_DEFAULT);
+				continue;
 			}
 			break;
 
@@ -309,19 +309,6 @@ void ColouriseScalaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		case SCE_SCALA_ESCAPECHAR:
 			if (escSeq.atEscapeEnd(sc.ch)) {
 				sc.SetState(escSeq.outerState);
-				continue;
-			}
-			break;
-
-		case SCE_SCALA_XML_TAG:
-		case SCE_SCALA_XML_ATTRIBUTE:
-			if (sc.ch == '.' || sc.ch == ':') {
-				const int state = sc.state;
-				sc.SetState(SCE_SCALA_OPERATOR2);
-				sc.ForwardSetState(state);
-			}
-			if (!(IsScalaIdentifierChar(sc.ch) || sc.ch == '-')) {
-				sc.SetState(SCE_SCALA_XML_OTHER);
 				continue;
 			}
 			break;
