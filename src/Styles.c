@@ -2129,7 +2129,8 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 	int sharpCount = 0;
 	bool maybeIni = false;
 	bool maybeJson = false;
-	BOOL notJson = FALSE;
+	uint8_t notJson = 0;
+	uint8_t shellWord = 0;
 
 	while (*p) {
 		if (*p == '[') {
@@ -2149,8 +2150,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 			while (*p == ' ' || *p == '\t') {
 				++p;
 			}
-			switch (*p) {
-			case '#': // C/C++ preprocessor, comment
+			if (*p == '#') { // C/C++ preprocessor, comment
 				if (!(p == tchText && shebang)) {
 					++p;
 					while (*p == ' ' || *p == '\t') {
@@ -2162,8 +2162,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 						++sharpCount;
 					}
 				}
-				break;
-			case '/': // C/C++ style comment
+			} else if (*p == '/') { // C/C++ style comment
 				++p;
 				if (*p == '/' || *p == '*') {
 					++cppCount;
@@ -2171,21 +2170,22 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 						return &lexCPP;
 					}
 				}
-				break;
-
-			case '{':
-			case '}':
-			case ']':
+			} else if (*p == '{' || *p == '}' || *p == '[') {
 				maybeJson = true;
-				break;
-			case '\"':
+			} else if (*p == '\"') {
 				maybeJson |= maybeIni;
-				break;
-
-			default:
+			} else {
 				// not a normal JSON file: line not starts with any of `{}[]"`, possible JSON with unquoted keys, which is rare.
 				notJson |= *p;
-				break;
+				if (shellWord != 3) {
+					if (StrStartsWith(p, "if") || StrStartsWith(p, "fi") || StrStartsWith(p, "do")) {
+						if (((uint8_t)p[2]) <= ' ') {
+							shellWord |= (p[0] == 'f') ? 2 : 1;
+						} else if (StrStartsWith(p, "done") && ((uint8_t)p[4]) <= ' ') {
+							shellWord |= 2;
+						}
+					}
+				}
 			}
 		}
 
@@ -2202,7 +2202,7 @@ PEDITLEXER Style_AutoDetect(BOOL bDotFile) {
 		return &lexCPP;
 	}
 	if (sharpCount) {
-		return shebang ? &lexBash : &lexConfig;
+		return (shebang || shellWord == 3) ? &lexBash : &lexConfig;
 	}
 	if (maybeJson && !notJson) {
 		return &lexJSON;
