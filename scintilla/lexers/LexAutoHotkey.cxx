@@ -432,7 +432,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.Forward();
 				sc.ForwardSetState(state);
 				continue;
-			} else if (sc.ch == '{' || sc.ch == '}') {
+			} else if (AnyOf<'{', '}'>(sc.ch)) {
 				if (HighlightBrace(sc, outerStyle)) {
 					continue;
 				}
@@ -607,9 +607,8 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					}
 					break;
 
-				case '{':
-				case '}':
-					if (HighlightBrace(sc, outerStyle)) {
+				default:
+					if (AnyOf<'{', '}'>(sc.ch) && HighlightBrace(sc, outerStyle)) {
 						continue;
 					}
 					break;

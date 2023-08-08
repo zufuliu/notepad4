@@ -2893,26 +2893,16 @@ Sci::Position Document::ExtendStyleRange(Sci::Position pos, int delta, bool sing
 }
 
 static constexpr char BraceOpposite(char ch) noexcept {
-	switch (ch) {
-	case '(':
-		return ')';
-	case ')':
-		return '(';
-	case '[':
-		return ']';
-	case ']':
-		return '[';
-	case '{':
-		return '}';
-	case '}':
-		return '{';
-	case '<':
-		return '>';
-	case '>':
-		return '<';
-	default:
-		return '\0';
+	if (AnyOf<'(', ')'>(ch)) {
+		return '(' + ')' - ch;
 	}
+	if (AnyOf<'[', ']', '{', '}'>(ch)) {
+		return ('[' + ']' + (ch & 32)*2) - ch;
+	}
+	if (AnyOf<'<', '>'>(ch)) {
+		return '<' + '>' - ch;
+	}
+	return '\0';
 }
 
 // TODO: should be able to extend styled region to find matching brace

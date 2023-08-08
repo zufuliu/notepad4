@@ -594,11 +594,9 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 				return true;
 			}
 		} else if (variableType == VariableType::Complex) {
-			VariableExpansion &expansion = nestedExpansion.back();
-			if (sc.ch == '{') {
-				++expansion.braceCount;
-			} else if (sc.ch == '}') {
-				--expansion.braceCount;
+			if (AnyOf<'{', '}'>(sc.ch)) {
+				VariableExpansion &expansion = nestedExpansion.back();
+				expansion.braceCount += ('{' + '}')/2 - sc.ch;
 				if (expansion.braceCount == 0) {
 					ExitExpansion();
 					sc.ForwardSetState(TakeOuterStyle());
@@ -622,35 +620,24 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 		}
 	} else if (block == HtmlTextBlock::Style) {
 		sc.SetState(css_style(SCE_CSS_OPERATOR));
-		switch (sc.ch) {
-		case '{':
-		case '}':
+		if (AnyOf<'{', '}'>(sc.ch)) {
 			propertyValue = 0;
 			lineStateAttribute = 0;
 			parenCount = 0;
-			break;
-		case '[':
-			lineStateAttribute = LineStateAttributeLine;
-			break;
-		case ']':
-			lineStateAttribute = 0;
-			break;
-		case '(':
-			parenCount++;
-			break;
-		case ')':
-			parenCount--;
-			break;
-		case ':':
-			if (parenCount == 0 && !IsCssProperty(stylePrevNonWhite)) {
-				propertyValue = CssLineStatePropertyValue;
+		} else if (AnyOf<'[', ']'>(sc.ch)) {
+			lineStateAttribute = (sc.ch & 4) ? 0 : LineStateAttributeLine;
+		} else if (AnyOf<'(', ')'>(sc.ch)) {
+			parenCount += ('(' - sc.ch) | 1;
+		} else if (AnyOf<':', ';'>(sc.ch) && parenCount == 0) {
+			if (sc.ch == ':') {
+				if (!IsCssProperty(stylePrevNonWhite)) {
+					propertyValue = CssLineStatePropertyValue;
+				}
+			} else {
+				if (lineStateAttribute == 0) {
+					propertyValue = 0;
+				}
 			}
-			break;
-		case ';':
-			if (parenCount == 0 && lineStateAttribute == 0) {
-				propertyValue = 0;
-			}
-			break;
 		}
 	}
 	return false;

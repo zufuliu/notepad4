@@ -164,34 +164,24 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_INNO_DEFAULT);
 				break;
 			}
-			switch (sc.ch) {
-			case '{':
-				++expansionLevel;
-				break;
-
-			case '}':
-				--expansionLevel;
+			if (AnyOf<'{', '}'>(sc.ch)) {
+				expansionLevel += ('{' + '}')/2 - sc.ch;
 				if (expansionLevel == 0) {
 					sc.ForwardSetState(outerState);
 					continue;
 				}
-				break;
-
-			case '\"':
+			} else if (sc.ch == '\"') {
 				if (outerState == SCE_INNO_STRING_DQ) {
 					expansionLevel = 0;
 					sc.ChangeState(SCE_INNO_STRING_DQ);
 					continue;
 				}
-				break;
-
-			case '\'':
+			} else if (sc.ch == '\'') {
 				if (outerState == SCE_INNO_STRING_SQ) {
 					expansionLevel = 0;
 					sc.ChangeState(SCE_INNO_STRING_SQ);
 					continue;
 				}
-				break;
 			}
 			break;
 

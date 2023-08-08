@@ -206,10 +206,8 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				sc.Forward();
 			} else if (IsGraphVizOperator(sc.ch)) {
 				sc.SetState(SCE_GRAPHVIZ_OPERATOR);
-				if (sc.ch == '{' || sc.ch == '[') {
-					++levelNext;
-				} else if (sc.ch == '}' || sc.ch == ']') {
-					--levelNext;
+				if (AnyOf<'[', ']', '{', '}'>(sc.ch)) {
+					levelNext += (('[' + ']')/2 + (sc.ch & 32)) - sc.ch;
 				} else if (sc.ch == '<' && chPrevNonWhite == '=' && (sc.GetDocNextChar(true) == '<' || IsAttributeValue(styler, startPos))) {
 					// label = < text <tag> ... </tag> >
 					htmlTagLevel = 1;

@@ -484,10 +484,9 @@ void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 
 		if (style == SCE_B_OPERATOR) {
 			// Anonymous With { ... }
-			if (ch == '{')
-				levelNext++;
-			else if (ch == '}')
-				levelNext--;
+			if (AnyOf<'{', '}'>(ch)) {
+				levelNext += ('{' + '}')/2 - ch;
+			}
 		}
 
 		if (visibleChars == 0 && !isspacechar(ch))

@@ -315,10 +315,8 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_TOML_IDENTIFIER);
 				} else if (IsTOMLOperator(sc.ch)) {
 					sc.SetState(SCE_TOML_OPERATOR);
-					if (sc.ch == '[' || sc.ch == '{') {
-						++braceCount;
-					} else if (sc.ch == ']' || sc.ch == '}') {
-						--braceCount;
+					if (AnyOf<'[', ']', '{', '}'>(sc.ch)) {
+						braceCount += (('[' + ']')/2 + (sc.ch & 32)) - sc.ch;
 					}
 				} else if (braceCount && IsTOMLUnquotedKey(sc.ch)) {
 					// Inline Table

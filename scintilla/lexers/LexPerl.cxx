@@ -1578,19 +1578,9 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		styleNext = styler.StyleAt(startPos + 1);
 		// {} [] block folding
 		if (style == SCE_PL_OPERATOR) {
-			if (ch == '{') {
+			if (ch == '{' || ch == '[' || ch == '(') {
 				levelCurrent++;
-			} else if (ch == '}') {
-				levelCurrent--;
-			}
-			if (ch == '[') {
-				levelCurrent++;
-			} else if (ch == ']') {
-				levelCurrent--;
-			}
-			if (ch == '(') {
-				levelCurrent++;
-			} else if (ch == ')') {
+			} else if (ch == '}' || ch == ']' || ch == ')') {
 				levelCurrent--;
 			}
 		}

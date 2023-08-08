@@ -244,10 +244,8 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (braceCount && IsYAMLFlowIndicator(sc.ch)) {
 				sc.SetState(SCE_YAML_OPERATOR);
-				if (sc.ch == '{' || sc.ch == '[') {
-					++braceCount;
-				} else if (sc.ch == '}' || sc.ch == ']') {
-					--braceCount;
+				if (sc.ch != ',') {
+					braceCount += (('[' + ']')/2 + (sc.ch & 32)) - sc.ch;
 				}
 			} else if (sc.ch == '#' && isspacechar(sc.chPrev)) {
 				sc.SetState(SCE_YAML_COMMENT);
@@ -361,10 +359,8 @@ void ColouriseYAMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_YAML_IDENTIFIER);
 			} else if (IsYAMLOperator(sc.ch, braceCount) || (sc.ch == '?' && sc.chNext == ' ') || (sc.ch == ':' && isspacechar(sc.chNext))) {
 				sc.SetState(SCE_YAML_OPERATOR);
-				if (sc.ch == '{' || sc.ch == '[') {
-					++braceCount;
-				} else if (sc.ch == '}' || sc.ch == ']') {
-					--braceCount;
+				if (AnyOf<'[', ']', '{', '}'>(sc.ch)) {
+					braceCount += (('[' + ']')/2 + (sc.ch & 32)) - sc.ch;
 				}
 			} else if (sc.ch == '+' || sc.ch == '-' || sc.ch == '.') {
 				if ((sc.ch == '-' && isspacechar(sc.chNext))) {
