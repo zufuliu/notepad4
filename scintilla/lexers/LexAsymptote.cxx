@@ -31,8 +31,14 @@ struct EscapeSequence {
 
 	// highlight any character as escape sequence.
 	bool resetEscapeState(int state, int chNext) noexcept {
-		if (IsEOLChar(chNext)) {
-			return false;
+		if (state == SCE_ASY_STRING_DQ) {
+			if (!AnyOf(chNext, '\\', '\"')) {
+				return false;
+			}
+		} else {
+			if (IsEOLChar(chNext)) {
+				return false;
+			}
 		}
 		outerState = state;
 		digitsLeft = 1;
@@ -155,25 +161,13 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_ASY_STRING_DQ:
-			if (sc.ch == '\\') {
-				if (sc.chNext == '\\' || sc.chNext == '\"') {
-					escSeq.outerState = SCE_ASY_STRING_DQ;
-					escSeq.digitsLeft = 1;
-					sc.SetState(SCE_ASY_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_ASY_DEFAULT);
-			}
-			break;
-
 		case SCE_ASY_STRING_SQ:
 			if (sc.ch == '\\') {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_ASY_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '\'') {
+			} else if (sc.ch == ((sc.state == SCE_ASY_STRING_DQ) ? '\"' : '\'')) {
 				sc.ForwardSetState(SCE_ASY_DEFAULT);
 			}
 			break;

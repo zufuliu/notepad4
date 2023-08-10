@@ -16,6 +16,7 @@ Checks: >
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-narrowing-conversions,
+    -bugprone-switch-missing-default-case,
     -bugprone-unchecked-optional-access,
     -modernize-avoid-c-arrays,
     -modernize-macro-to-enum,
@@ -23,6 +24,7 @@ Checks: >
     -modernize-use-nodiscard,
     -modernize-use-trailing-return-type,
     -modernize-use-using,
+    -performance-enum-size,
     -performance-no-int-to-ptr,
     -readability-avoid-unconditional-preprocessor-if,
     -readability-function-cognitive-complexity,
@@ -34,8 +36,16 @@ Checks: >
     -misc-confusable-identifiers,
     -misc-include-cleaner,
     -misc-non-private-member-variables-in-classes,
+#     -misc-use-anonymous-namespace,
+#     -modernize-deprecated-headers,
+#     -modernize-return-braced-init-list,
+#     -modernize-use-auto,
+#     -modernize-use-default-member-init,
+#     -readability-braces-around-statements,
+#     -readability-else-after-return,
+#     -readability-named-parameter,
+#     -readability-simplify-boolean-expr,
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
-AnalyzeTemporaryDtors: false
 FormatStyle: none

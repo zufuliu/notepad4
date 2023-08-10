@@ -1616,12 +1616,9 @@ void MarkdownLexer::HighlightInlineText() {
 		break;
 
 	case '&':
-		if (IsAlpha(sc.chNext)) {
+		if (IsAlpha(sc.chNext) || sc.chNext == '#') {
 			sc.SetState(SCE_H_ENTITY);
-		} else if (sc.chNext == '#') {
-			const int chNext = sc.GetRelative(2);
-			if (IsADigit(chNext) || ((chNext == 'x' || chNext == 'X') && IsHexDigit(sc.GetRelative(3)))) {
-				sc.SetState(SCE_H_ENTITY);
+			if (sc.chNext == '#') {
 				sc.Forward();
 			}
 		}
@@ -1899,7 +1896,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 
 		case '+': // TOML
 		case ';': // JSON
-			if (lexer.markdown == Markdown::GitLab && sc.ch == sc.chNext && sc.ch == sc.GetRelative(2)) {
+			if (lexer.markdown == Markdown::GitLab && sc.MatchNext()) {
 				initStyle = (sc.ch == '+') ? SCE_MARKDOWN_METADATA_TOML : SCE_MARKDOWN_METADATA_JSON;
 			}
 			break;
@@ -2034,8 +2031,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			if (sc.atLineStart) {
 				const int delimiter = static_cast<uint8_t>((sc.state == SCE_MARKDOWN_METADATA_YAML) ? '-'
 					: ((sc.state == SCE_MARKDOWN_METADATA_TOML) ? '+' : ';'));
-				if ((sc.ch == delimiter && sc.chNext == delimiter && sc.GetRelative(2) == delimiter)
-					|| (sc.state == SCE_MARKDOWN_METADATA_YAML && sc.Match('.', '.', '.'))) {
+				if ((sc.ch == delimiter || (sc.ch == '.' && sc.state == SCE_MARKDOWN_METADATA_YAML)) && sc.MatchNext()) {
 					// `...` YAML document end marker, used by Pandoc
 					lineState |= LineStateBlockEndLine;
 					break;
@@ -2206,13 +2202,13 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			break;
 
 		case SCE_H_ENTITY:
-			if (sc.ch == ';') {
-				sc.ForwardSetState(lexer.TakeOuterStyle());
-				continue;
-			}
-			// https://html.spec.whatwg.org/entities.json
 			if (!IsAlphaNumeric(sc.ch)) {
-				sc.ChangeState(lexer.TakeOuterStyle());
+				if (sc.ch == ';') {
+					sc.Forward();
+				} else {
+					sc.ChangeState(SCE_H_TAGUNKNOWN);
+				}
+				sc.SetState(lexer.TakeOuterStyle());
 				continue;
 			}
 			break;

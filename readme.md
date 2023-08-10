@@ -101,12 +101,12 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* [GitHub Flavored Markdown](https://github.github.com/gfm/)
 		* [GitLab Flavored Markdown](https://docs.gitlab.com/ee/user/markdown.html)
 		* [Pandoc’s Markdown](https://pandoc.org/MANUAL.html#pandocs-markdown)
-	* [Mathematica](tools/lang/Mathematica.nb)
+	* [Mathematica](tools/lang/Mathematica.nb) and [WolframScript](https://www.wolfram.com/wolframscript/)
 	* MATLAB, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#matlab-octave)
 		* Octave
 		* Scilab
 		* Gnuplot
-	* [Nim Script](tools/lang/Nim.nim), up to Nim 1.6.
+	* [Nim Script](tools/lang/Nim.nim), up to Nim 2.0.
 	* [Nullsoft Scriptable Install System](tools/lang/NSIS.nsi), up to NSIS 3.09.
 	* [OCaml](tools/lang/OCaml.ml), up to OCaml 5.0.
 	* Pascal, Delphi
@@ -135,7 +135,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* TCL, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#tcl)
 	* [Texinfo](tools/lang/Texinfo.texi), up to Texinfo 7.0.
 	* [TOML File](https://toml.io/)
-	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 5.0.
+	* [TypeScript](tools/lang/TypeScript.ts), TypeScript 5.2.
 	* Visual Basic, VB6, VB.NET
 	* VBScript
 	* [VHDL](tools/lang/VHDL.vhdl), up to VHDL 2019.
@@ -146,20 +146,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* XML Schema
 		* XML Stylesheet
 		* SGML and DTD
-		* Ant Build
-		* Maven POM
-		* Maven Settings
-		* Ivy Module
-		* Ivy Settings
-		* PMD Ruleset
-		* Checkstyle Module
-		* Tomcat Config
-		* Java web.xml
-		* Struts config
-		* Hibernate config and mapping
-		* Spring Beans
 		* Apple Property List
-		* Android Manifest
 	* [YAML Document](https://yaml.org/)
 	* [Zig](tools/lang/Zig.zig), up to Zig 0.11.
 	* Many Others

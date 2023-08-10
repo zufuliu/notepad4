@@ -1029,7 +1029,7 @@ typedef enum AddWordResult {
 } AddWordResult;
 
 static AddWordResult AutoC_AddSpecWord(struct WordList *pWList, int iCurrentStyle, int iPrevStyle, int ch, int chPrev) {
-#if EnableLaTeXLikeEmojiInput
+#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 	if ((ch == '\\' || (chPrev == '\\' && (ch == '^' || ch == ':'))) && autoCompletionConfig.bLaTeXInputMethod) {
 		if (ch != ':') {
 			WordList_AddListEx(pWList, LaTeXInputSequenceString);

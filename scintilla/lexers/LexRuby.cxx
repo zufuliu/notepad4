@@ -1626,14 +1626,7 @@ bool keywordIsModifier(const char *word, Sci_Position pos, LexAccessor &styler) 
 	// a << if x then y else z
 
 	const char ch = styler[pos];
-	switch (ch) {
-	case ')':
-	case ']':
-	case '}':
-		return true;
-	default:
-		return false;
-	}
+	return AnyOf(ch, ')', ']', '}');
 }
 
 #define WHILE_BACKWARDS "elihw"

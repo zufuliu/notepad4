@@ -4014,24 +4014,16 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 	case IDM_VIEW_WORDWRAP: {
 		fWordWrapG = fvCurFile.fWordWrap = !fvCurFile.fWordWrap;
-		const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
-		const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 		SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
-		SciCall_SetFirstVisibleLine(iVisTopLine);
-		SciCall_EnsureVisible(iDocTopLine);
 		UpdateToolbar();
 	} break;
 
 	case IDM_VIEW_WORDWRAPSETTINGS:
 		if (WordWrapSettingsDlg(hwnd)) {
-			const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
-			const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 			SciCall_SetWrapMode(fvCurFile.fWordWrap ? iWordWrapMode : SC_WRAP_NONE);
 			SciCall_SetMarginOptions(bWordWrapSelectSubLine ? SC_MARGINOPTION_SUBLINESELECT : SC_MARGINOPTION_NONE);
 			EditSetWrapIndentMode(fvCurFile.iTabWidth, fvCurFile.iIndentWidth);
 			SetWrapVisualFlags();
-			SciCall_SetFirstVisibleLine(iVisTopLine);
-			SciCall_EnsureVisible(iDocTopLine);
 			UpdateToolbar();
 		}
 		break;
@@ -4703,6 +4695,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_SCSS:
 	case IDM_LEXER_LESS:
 	case IDM_LEXER_HSS:
+	// JavaScript
+	case IDM_LEXER_JAVASCRIPT:
+	case IDM_LEXER_JAVASCRIPT_JSX:
+	case IDM_LEXER_TYPESCRIPT:
+	case IDM_LEXER_TYPESCRIPT_TSX:
 	// Web Source Code
 	case IDM_LEXER_WEB:
 	case IDM_LEXER_PHP:
@@ -4711,11 +4708,13 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_ASPX_VB:
 	case IDM_LEXER_ASP_VBS:
 	case IDM_LEXER_ASP_JS:
+	case IDM_LEXER_APACHE:
 	// Markdown
 	case IDM_LEXER_MARKDOWN_GITHUB:
 	case IDM_LEXER_MARKDOWN_GITLAB:
 	case IDM_LEXER_MARKDOWN_PANDOC:
 	// Math
+	case IDM_LEXER_MATHEMATICA:
 	case IDM_LEXER_MATLAB:
 	case IDM_LEXER_OCTAVE:
 	case IDM_LEXER_SCILAB:
@@ -4728,28 +4727,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDM_LEXER_XSD:
 	case IDM_LEXER_XSLT:
 	case IDM_LEXER_DTD:
-	case IDM_LEXER_ANT_BUILD:
-	case IDM_LEXER_MAVEN_POM:
-	case IDM_LEXER_MAVEN_SETTINGS:
-	case IDM_LEXER_IVY_MODULE:
-	case IDM_LEXER_IVY_SETTINGS:
-	case IDM_LEXER_PMD_RULESET:
-	case IDM_LEXER_CHECKSTYLE:
-	case IDM_LEXER_TOMCAT:
-	case IDM_LEXER_WEB_JAVA:
-	case IDM_LEXER_STRUTS:
-	case IDM_LEXER_HIB_CFG:
-	case IDM_LEXER_HIB_MAP:
-	case IDM_LEXER_SPRING_BEANS:
-	case IDM_LEXER_JBOSS:
-	case IDM_LEXER_WEB_NET:
-	case IDM_LEXER_RESX:
-	case IDM_LEXER_XAML:
 	case IDM_LEXER_PROPERTY_LIST:
-	case IDM_LEXER_ANDROID_MANIFEST:
-	case IDM_LEXER_ANDROID_LAYOUT:
-	case IDM_LEXER_SVG:
-	case IDM_LEXER_APACHE:
+	//case IDM_LEXER_SVG:
 		Style_SetLexerByLangIndex(LOWORD(wParam));
 		break;
 
@@ -4849,11 +4828,8 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		break;
 
 	case CMD_INCREASENUM:
-		EditModifyNumber(true);
-		break;
-
 	case CMD_DECREASENUM:
-		EditModifyNumber(false);
+		EditModifyNumber(LOWORD(wParam) == CMD_INCREASENUM);
 		break;
 
 	case CMD_JUMP2SELSTART:

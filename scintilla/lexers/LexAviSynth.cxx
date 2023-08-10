@@ -120,27 +120,19 @@ void ColouriseAvsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			break;
 
 		case SCE_AVS_STRING:
-			if (sc.ch == '\"') {
-				sc.ForwardSetState(SCE_AVS_DEFAULT);
-			}
-			break;
-
 		case SCE_AVS_ESCAPESTRING:
-			if (sc.ch == '\\') {
+		case SCE_AVS_TRIPLESTRING:
+			if (sc.ch == '\\' && sc.state == SCE_AVS_ESCAPESTRING) {
 				// highlight any character as escape sequence.
 				sc.SetState(SCE_AVS_ESCAPECHAR);
 				sc.Forward();
-				sc.ForwardSetState(SCE_AVS_STRING);
+				sc.ForwardSetState(SCE_AVS_ESCAPESTRING);
 				continue;
 			}
-			if (sc.ch == '"') {
-				sc.ForwardSetState(SCE_AVS_DEFAULT);
-			}
-			break;
-
-		case SCE_AVS_TRIPLESTRING:
-			if (sc.Match('"', '"', '"')) {
-				sc.Advance(2);
+			if (sc.ch == '"' && (sc.state != SCE_AVS_TRIPLESTRING || sc.MatchNext('"', '"'))) {
+				if (sc.state == SCE_AVS_TRIPLESTRING) {
+					sc.Advance(2);
+				}
 				sc.ForwardSetState(SCE_AVS_DEFAULT);
 			}
 			break;

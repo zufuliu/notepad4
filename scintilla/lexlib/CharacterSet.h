@@ -104,7 +104,7 @@ public:
 template <typename T, typename... Args>
 constexpr bool AnyOf(T t, Args... args) noexcept {
 #if defined(__clang__)
-	static_assert(__is_integral(T));
+	static_assert(__is_integral(T) || __is_enum(T));
 #endif
 	return ((t == args) || ...);
 }

@@ -422,15 +422,19 @@ void ColouriseVerilogDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int ini
 
 		if (sc.state == SCE_V_DEFAULT) {
 			if (sc.ch == '/' && (sc.chNext == '/' || sc.chNext == '*')) {
-				const int chNext = sc.GetRelative(2);
-				if (sc.chNext == '/') {
-					sc.SetState((chNext == '!') ? SCE_V_COMMENTLINEDOC : SCE_V_COMMENTLINE);
+				sc.SetState((sc.chNext == '/') ? SCE_V_COMMENTLINE : SCE_V_COMMENTBLOCK);
+				sc.Forward();
+				if (sc.ch == '/') {
 					if (visibleChars == 0) {
 						lineState |= VerilogLineStateMaskLineComment;
 					}
+					if (sc.chNext == '!') {
+						sc.ChangeState(SCE_V_COMMENTLINEDOC);
+					}
 				} else {
-					sc.SetState((chNext == '!' || chNext == '*') ? SCE_V_COMMENTBLOCKDOC : SCE_V_COMMENTBLOCK);
-					sc.Forward();
+					if (sc.chNext == '!' || sc.chNext == '*') {
+						sc.ChangeState(SCE_V_COMMENTBLOCKDOC);
+					}
 				}
 			} else if (sc.ch == '\"') {
 				insideUrl = false;

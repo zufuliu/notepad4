@@ -90,6 +90,10 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 	return state <= SCE_GO_TASKMARKER;
 }
 
+constexpr int GetStringQuote(int state) noexcept {
+	return (state == SCE_GO_CHARACTER) ? '\'' : ((state == SCE_GO_RAW_STRING) ? '`' : '\"');
+}
+
 // https://pkg.go.dev/fmt
 
 constexpr bool IsFormatSpecifier(char ch) noexcept {
@@ -405,25 +409,17 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 			}
 			break;
 
+		case SCE_GO_CHARACTER:
 		case SCE_GO_STRING:
 		case SCE_GO_RAW_STRING:
-			if (sc.state == SCE_GO_STRING && sc.atLineStart) {
+			if (sc.atLineStart && sc.state != SCE_GO_RAW_STRING) {
 				sc.SetState(SCE_GO_DEFAULT);
-			} else if (sc.state == SCE_GO_STRING && sc.ch == '\\') {
+			} else if (sc.ch == '\\' && sc.state != SCE_GO_RAW_STRING) {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_GO_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
-				if (length != 0) {
-					const int state = sc.state;
-					sc.SetState(SCE_GO_FORMAT_SPECIFIER);
-					sc.Advance(length);
-					sc.SetState(state);
-					continue;
-				}
-			} else if ((sc.state == SCE_GO_STRING && sc.ch == '\"') || (sc.state == SCE_GO_RAW_STRING && sc.ch == '`')) {
+			} else if (sc.ch == GetStringQuote(sc.state)) {
 				sc.Forward();
 				if (sc.state == SCE_GO_STRING && (chBefore == ',' || chBefore == '{')) {
 					const int chNext = sc.GetLineNextChar();
@@ -432,23 +428,21 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					}
 				}
 				sc.SetState(SCE_GO_DEFAULT);
-			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
-				insideUrl = true;
-			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
-				insideUrl = false;
-			}
-			break;
-
-		case SCE_GO_CHARACTER:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_GO_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_GO_ESCAPECHAR);
-					sc.Forward();
+			} else if (sc.state != SCE_GO_CHARACTER) {
+				if (sc.ch == '%' && sc.state != SCE_GO_CHARACTER) {
+					const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
+					if (length != 0) {
+						const int state = sc.state;
+						sc.SetState(SCE_GO_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(state);
+						continue;
+					}
+				} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+					insideUrl = true;
+				} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+					insideUrl = false;
 				}
-			} else if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_GO_DEFAULT);
 			}
 			break;
 

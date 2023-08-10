@@ -406,50 +406,42 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			break;
 
 		case SCE_JAVA_CHARACTER:
-			if (sc.atLineStart) {
-				sc.SetState(SCE_JAVA_DEFAULT);
-			} else if (sc.ch == '\\') {
-				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
-					sc.SetState(SCE_JAVA_ESCAPECHAR);
-					sc.Forward();
-				}
-			} else if (sc.ch == '\'') {
-				sc.ForwardSetState(SCE_JAVA_DEFAULT);
-			}
-			break;
-
 		case SCE_JAVA_STRING:
 		case SCE_JAVA_TRIPLE_STRING:
-			if (sc.state == SCE_JAVA_STRING && sc.atLineStart) {
+			if (sc.atLineStart && sc.state != SCE_JAVA_TRIPLE_STRING) {
 				sc.SetState(SCE_JAVA_DEFAULT);
 			} else if (sc.ch == '\\') {
 				if (escSeq.resetEscapeState(sc.state, sc.chNext)) {
 					sc.SetState(SCE_JAVA_ESCAPECHAR);
 					sc.Forward();
 				}
-			} else if (sc.ch == '%') {
-				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
-				if (length != 0) {
-					const int state = sc.state;
-					sc.SetState(SCE_JAVA_FORMAT_SPECIFIER);
-					sc.Advance(length);
-					sc.SetState(state);
-					continue;
-				}
-			} else if (sc.ch == '{') {
-				if (IsADigit(sc.chNext)) {
-					escSeq.outerState = sc.state;
-					sc.SetState(SCE_JAVA_PLACEHOLDER);
-				}
-			} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.MatchNext('"', '"'))) {
-				if (sc.state == SCE_JAVA_TRIPLE_STRING) {
-					sc.Advance(2);
-				}
+			} else if (sc.ch == '\'' && sc.state == SCE_JAVA_CHARACTER) {
 				sc.ForwardSetState(SCE_JAVA_DEFAULT);
-			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
-				insideUrl = true;
-			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
-				insideUrl = false;
+			} else if (sc.state != SCE_JAVA_CHARACTER) {
+				if (sc.ch == '%') {
+					const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
+					if (length != 0) {
+						const int state = sc.state;
+						sc.SetState(SCE_JAVA_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(state);
+						continue;
+					}
+				} else if (sc.ch == '{') {
+					if (IsADigit(sc.chNext)) {
+						escSeq.outerState = sc.state;
+						sc.SetState(SCE_JAVA_PLACEHOLDER);
+					}
+				} else if (sc.ch == '"' && (sc.state == SCE_JAVA_STRING || sc.MatchNext('"', '"'))) {
+					if (sc.state == SCE_JAVA_TRIPLE_STRING) {
+						sc.Advance(2);
+					}
+					sc.ForwardSetState(SCE_JAVA_DEFAULT);
+				} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+					insideUrl = true;
+				} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+					insideUrl = false;
+				}
 			}
 			break;
 

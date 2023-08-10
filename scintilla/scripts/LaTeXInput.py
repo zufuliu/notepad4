@@ -455,7 +455,7 @@ static inline bool IsLaTeXInputSequenceChar(char ch) {{
 		|| (ch >= 'A' && ch <= 'Z')
 		|| (ch >= '0' && ch <= '9')
 {latex_charset}
-#if EnableLaTeXLikeEmojiInput
+#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
 {emoji_charset}
 #endif
 	;
@@ -478,7 +478,7 @@ def update_latex_input_header(latex_map, emoji_map):
 	min_emoji_len, max_emoji_len = get_input_map_size_info('Emoji', emoji_map)
 	prefix = ':'
 	suffix = ':'
-	output.append('#if EnableLaTeXLikeEmojiInput')
+	output.append('#if NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT')
 	output.append(f'\tEmojiInputSequencePrefixLength = {len(prefix)},')
 	output.append(f'\tEmojiInputSequenceSuffixLength = {len(suffix)},')
 	output.append(f'\tMinEmojiInputSequenceLength = {min_emoji_len} + EmojiInputSequencePrefixLength, // suffix is optional')

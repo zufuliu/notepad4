@@ -222,7 +222,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 						sc.Forward();
 					}
 				}
-			} else if (sc.state == SCE_HAXE_STRINGSQ && sc.ch == '$') {
+			} else if (sc.ch == '$' && sc.state == SCE_HAXE_STRINGSQ) {
 				if (sc.chNext == '{') {
 					nestedState.push_back(sc.state);
 					sc.SetState(SCE_HAXE_OPERATOR2);
@@ -231,8 +231,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					escSeq.outerState = sc.state;
 					sc.SetState(SCE_HAXE_VARIABLE2);
 				}
-			} else if ((sc.state == SCE_HAXE_STRINGDQ && sc.ch == '"')
-				|| (sc.state == SCE_HAXE_STRINGSQ && sc.ch == '\'')) {
+			} else if (sc.ch == ((sc.state == SCE_HAXE_STRINGDQ) ? '"' : '\'')) {
 				sc.ForwardSetState(SCE_HAXE_DEFAULT);
 			}
 			break;

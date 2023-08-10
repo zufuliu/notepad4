@@ -63,6 +63,10 @@ constexpr bool IsRawString(int state) noexcept {
 	return state >= SCE_R_RAWSTRING_SQ;
 }
 
+constexpr int GetStringQuote(int state) noexcept {
+	return (state == SCE_R_BACKTICKS) ? '`' : ((state == SCE_R_STRING_SQ) ? '\'' : '\"');
+}
+
 inline int CheckRawString(const StyleContext &sc, int &dashCount) noexcept {
 	Sci_PositionU pos = sc.currentPos + 2;
 	dashCount = 0;
@@ -220,7 +224,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 		case SCE_R_STRING_DQ:
 		case SCE_R_RAWSTRING_SQ:
 		case SCE_R_RAWSTRING_DQ:
-			if (!IsRawString(sc.state) && sc.ch == '\\') {
+			if (sc.ch == '\\' && !IsRawString(sc.state)) {
 				escSeq.resetEscapeState(sc.state, sc.chNext);
 				sc.SetState(SCE_R_ESCAPECHAR);
 				sc.Forward();
@@ -232,18 +236,7 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 					// escapeSeq.outerState is lost when editing on next line.
 					sc.SetState(escSeq.outerState);
 				}
-			} else if (sc.ch == '%' && sc.state != SCE_R_BACKTICKS) {
-				const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
-				if (length != 0) {
-					const int state = sc.state;
-					sc.SetState(SCE_R_FORMAT_SPECIFIER);
-					sc.Advance(length);
-					sc.SetState(state);
-					continue;
-				}
-			} else if ((sc.state == SCE_R_STRING_SQ && sc.ch == '\'')
-				|| (sc.state == SCE_R_STRING_DQ && sc.ch == '\"')
-				|| (sc.state == SCE_R_BACKTICKS && sc.ch == '`')) {
+			} else if (!IsRawString(sc.state) && sc.ch == GetStringQuote(sc.state)) {
 				sc.ForwardSetState(SCE_R_DEFAULT);
 			} else if (IsRawString(sc.state) && sc.ch == matchingDelimiter) {
 				insideUrl = insideUrl && sc.ch != '}';
@@ -260,10 +253,21 @@ void ColouriseRDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 				} else {
 					continue;
 				}
-			} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
-				insideUrl = true;
-			} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
-				insideUrl = false;
+			} else if (sc.state != SCE_R_BACKTICKS) {
+				if (sc.ch == '%') {
+					const Sci_Position length = CheckFormatSpecifier(sc, styler, insideUrl);
+					if (length != 0) {
+						const int state = sc.state;
+						sc.SetState(SCE_R_FORMAT_SPECIFIER);
+						sc.Advance(length);
+						sc.SetState(state);
+						continue;
+					}
+				} else if (sc.Match(':', '/', '/') && IsLowerCase(sc.chPrev)) {
+					insideUrl = true;
+				} else if (insideUrl && IsInvalidUrlChar(sc.ch)) {
+					insideUrl = false;
+				}
 			}
 			break;
 

@@ -526,7 +526,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if ((sc.ch == '\'') ^ IsPyDoubleQuotedString(sc.state)) {
 					int offset = 0;
 					if (IsPyTripleQuotedString(sc.state)) {
-						if (sc.chNext == sc.ch && sc.GetRelative(2) == sc.ch) {
+						if (sc.MatchNext()) {
 							offset = 3;
 						}
 					} else {
@@ -760,7 +760,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState(SCE_PY_COMMENTLINE);
 			} else if (sc.ch == '\'' || sc.ch == '\"') {
 				insideUrl = false;
-				if (sc.ch == sc.chNext && sc.ch == sc.GetRelative(2)) {
+				if (sc.MatchNext()) {
 					sc.SetState((sc.ch == '\'') ? SCE_PY_TRIPLE_STRING_SQ : SCE_PY_TRIPLE_STRING_DQ);
 					sc.Advance(2);
 				} else {

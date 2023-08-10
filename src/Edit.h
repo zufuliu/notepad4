@@ -160,7 +160,7 @@ void	EditSpacesToTabs(int nTabWidth, bool bOnlyIndentingWS);
 
 void	EditMoveUp(void);
 void	EditMoveDown(void);
-void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend);
+void	EditModifyLines(LPCWSTR pwszPrefix, LPCWSTR pwszAppend, bool skipEmptyLine);
 void	EditAlignText(EditAlignMode nMode);
 void	EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose);
 void	EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart);

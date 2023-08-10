@@ -101,6 +101,9 @@ public:
 		}
 		return buf[position - startPos];
 	}
+	unsigned char SafeGetUCharAt(Sci_Position position) noexcept {
+		return SafeGetCharAt(position);
+	}
 #if 0
 	[[deprecated]]
 	char SafeGetCharAt(Sci_Position position, char chDefault) noexcept {
@@ -112,6 +115,9 @@ public:
 			}
 		}
 		return buf[position - startPos];
+	}
+	unsigned char SafeGetUCharAt(Sci_Position position, char chDefault) noexcept {
+		return SafeGetCharAt(position, chDefault);
 	}
 #endif
 	bool IsLeadByte(unsigned char ch) const noexcept {

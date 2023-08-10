@@ -76,10 +76,7 @@ LineBreakPropertyMap = {
 	],
 }
 
-LineBreakMap = {}
-for key, items in LineBreakPropertyMap.items():
-	for prop in items:
-		LineBreakMap[prop] = key
+LineBreakMap = flattenPropertyMap(LineBreakPropertyMap)
 
 def updateUnicodeLineBreak(filename):
 	lineBreakTable = ['XX'] * UnicodeCharacterCount	# @missing

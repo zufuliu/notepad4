@@ -12,6 +12,25 @@ def increase_style_resource_id_value(path, delta=100):
 	with open(path, 'w', encoding='utf-8', newline='\n') as fp:
 		fp.write(updated)
 
+def generate_lexer_menu_resource_id(path):
+	dummy = {'id': 41000}
+	def get_value():
+		result = str(dummy['id'])
+		dummy['id'] += 1
+		return result
+
+	with open(path, encoding='utf-8') as fd:
+		doc = fd.read()
+	start = doc.index('#define IDM_LEXER_TEXTFILE')
+	end = doc.index('\n', doc.index('#define IDM_LEXER_LEXER_COUNT'))
+	menu = doc[start:end]
+	updated = re.sub(r'\d{5}', lambda m: get_value(), menu)
+	if updated != menu:
+		print('update:', path)
+		doc = doc[:start] + updated + doc[end:]
+		with open(path, 'w', encoding='utf-8') as fp:
+			fp.write(doc)
+
 def check_encoding_list(path):
 	def is_tag_char(ch):
 		return (ch >= 'a' and ch <= 'z') or (ch >= '0' and ch <= '9')
@@ -231,6 +250,7 @@ def find_new_texinfo_commands(path, lang):
 		fd.write(f'@{doc}\n')
 
 #increase_style_resource_id_value('../src/EditLexers/EditStyle.h')
+#generate_lexer_menu_resource_id('../src/resource.h')
 #check_encoding_list('../src/EditEncoding.c')
 #diff_iso_encoding('iso-8859.log')
 

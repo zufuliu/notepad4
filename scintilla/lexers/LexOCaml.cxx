@@ -228,7 +228,7 @@ void ColouriseOCamlDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				}
 			} else if ((sc.ch == '\'' && sc.state == SCE_OCAML_CHARACTER) || (sc.ch == '\"' && sc.state == SCE_OCAML_STRING)) {
 				sc.ForwardSetState(SCE_OCAML_DEFAULT);
-			} else if (sc.state == SCE_OCAML_QUOTED_STRING && sc.ch == '|') {
+			} else if (sc.ch == '|' && sc.state == SCE_OCAML_QUOTED_STRING) {
 				if (quotedStringId.empty()) {
 					if (sc.chNext == '}') {
 						sc.Forward();
