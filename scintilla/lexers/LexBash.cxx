@@ -104,18 +104,19 @@ constexpr int opposite(int ch) noexcept {
 	if (ch == '(') return ')';
 	if (ch == '[') return ']';
 	if (ch == '{') return '}';
-	if (ch == '<') return '>';
 	return ch;
 }
 
-int GlobScan(StyleContext &sc) noexcept {
+int GlobScan(const StyleContext &sc) noexcept {
 	// forward scan for zsh globs, disambiguate versus bash arrays
 	// complex expressions may still fail, e.g. unbalanced () '' "" etc
 	int sLen = 0;
 	int pCount = 0;
 	int hash = 0;
+	Sci_Position pos = sc.currentPos;
 	while (true) {
-		const int c = sc.GetRelativeCharacter(++sLen);
+		++sLen;
+		const uint8_t c = sc.styler[++pos];
 		if (c <= ' ') {
 			return 0;
 		}
@@ -226,6 +227,7 @@ class QuoteStackCls {	// Class to manage quote pairs that nest
 public:
 	int Depth = 0;
 	int State = SCE_SH_DEFAULT;
+	int backtickLevel = 0;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
 	bool isCShell = false;
@@ -235,6 +237,9 @@ public:
 	void Start(int u, QuoteStyle s, int outer, CmdState state) noexcept {
 		if (Empty()) {
 			Current.Start(u, s, outer, state);
+			if (s == QuoteStyle::Backtick) {
+				++backtickLevel;
+			}
 		} else {
 			Push(u, s, outer, state);
 		}
@@ -246,6 +251,9 @@ public:
 		Stack[Depth] = Current;
 		Depth++;
 		Current.Start(u, s, outer, state);
+		if (s == QuoteStyle::Backtick) {
+			++backtickLevel;
+		}
 	}
 	void Pop() noexcept {
 		if (Depth == 0) {
@@ -258,6 +266,7 @@ public:
 	void Clear() noexcept {
 		Depth = 0;
 		State = SCE_SH_DEFAULT;
+		backtickLevel = 0;
 		Current.Clear();
 	}
 	bool CountDown(StyleContext &sc, CmdState &cmdState) {
@@ -269,6 +278,9 @@ public:
 		if (Current.Count == 0) {
 			cmdState = Current.State;
 			const int outer = Current.Outer;
+			if (backtickLevel != 0 && Current.Style == QuoteStyle::Backtick) {
+				--backtickLevel;
+			}
 			Pop();
 			sc.ForwardSetState(outer);
 			return true;
@@ -316,6 +328,50 @@ public:
 		}
 		Start(sc.ch, style, state, current);
 		sc.Forward();
+	}
+	void Escape(StyleContext &sc) {
+		int count = 1;
+		while (sc.chNext == '\\') {
+			++count;
+			sc.Forward();
+		}
+		bool escaped = count & 1; // odd backslash escape next character
+		if (backtickLevel > 0 && !isCShell) {
+			/*
+			for $k$ level substitutio with $N$ backslashes:
+			* when $N/2^k$ is odd, following dollar is escaped.
+			* when $(N - 1)/2^k$ is even, following quote is escaped.
+			* when $N = n\times 2^{k + 1} - 1$, following backtick is escaped.
+			* when $N = n\times 2^{k + 1} + 2^k - 1$, following backtick starts inner substitution.
+			* when $N = m\times 2^k + 2^{k - 1} - 1$ and $k > 1$, following backtick ends current substitution.
+			*/
+			if (sc.chNext == '$') {
+				escaped = (count >> backtickLevel) & 1;
+			} else if (sc.chNext == '\"' || sc.chNext == '\'') {
+				escaped = (((count - 1) >> backtickLevel) & 1) == 0;
+			} else if (sc.chNext == '`' && escaped) {
+				int mask = 1 << (backtickLevel + 1);
+				count += 1;
+				escaped = (count & (mask - 1)) == 0;
+				if (!escaped) {
+					int remain = count - (mask >> 1);
+					if (remain >= 0 && (remain & (mask - 1)) == 0) {
+						escaped = true;
+						++backtickLevel;
+					} else if (backtickLevel > 1) {
+						mask >>= 1;
+						remain = count - (mask >> 1);
+						if (remain >= 0 && (remain & (mask - 1)) == 0) {
+							escaped = true;
+							--backtickLevel;
+						}
+					}
+				}
+			}
+		}
+		if (escaped) {
+			sc.Forward();
+		}
 	}
 };
 
@@ -476,9 +532,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			break;
 		case SCE_SH_IDENTIFIER:
-			if (sc.chPrev == '\\') {	// for escaped chars
-				sc.ForwardSetState(SCE_SH_DEFAULT);
-			} else if (!IsBashWordChar(sc.ch)) {
+			if (sc.chPrev == '\\' || !IsBashWordChar(sc.ch)) {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
@@ -593,7 +647,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		case SCE_SH_PARAM: // ${parameter}
 		case SCE_SH_BACKTICKS:
 			if (sc.ch == '\\') {
-				sc.Forward();
+				QuoteStack.Escape(sc);
 			} else if (sc.ch == QuoteStack.Current.Down) {
 				if (QuoteStack.CountDown(sc, cmdState)) {
 					continue;
@@ -679,6 +733,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				if (IsEOLChar(sc.chNext)) {
 					//sc.SetState(SCE_SH_OPERATOR);
 					sc.SetState(SCE_SH_DEFAULT);
+				} else {
+					QuoteStack.Escape(sc);
 				}
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_SH_NUMBER);
