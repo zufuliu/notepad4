@@ -1458,7 +1458,7 @@ BEGIN
     EDITTEXT        IDC_MODIFY_LINE_PREFIX,7,18,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
     LTEXT           "行の後ろの文字列(&A):",IDC_MODIFY_LINE_TIP2,7,41,97,8
     EDITTEXT        IDC_MODIFY_LINE_APPEND,7,52,246,18,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN
-    AUTOCHECKBOX    "&Skip empty lines.",IDC_MODIFY_LINE_SKIP_EMPTY,7,108,96,14,WS_TABSTOP
+    AUTOCHECKBOX    "空の行を飛ばす(&S)",IDC_MODIFY_LINE_SKIP_EMPTY,7,108,96,14,WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,147,108,50,14
     PUSHBUTTON     "キャンセル",IDCANCEL,203,108,50,14
     LTEXT           "$(L)",IDC_MODIFY_LINE_DLN_NP,7,76,21,8
@@ -1877,7 +1877,7 @@ BEGIN
     IDS_ASK_SAVE            "「%s」\nの編集を保存しますか？"
     IDS_ASK_REVERT          "最後に保存された内容で再読み込みします。それ以降の変更内容は失われますがよろしいですか？"
     IDS_ASK_RECODE          "読み直しはファイルを再読み込みするため、変更内容は失われます。続行しますか？"
-    IDS_ASK_CREATE          "「%s」は存在しません。\nこのファイルを作成しますか？"
+    IDS_ASK_CREATE          "次のファイルは存在しません。作成しますか？\n%s "
     IDS_PRINT_HEADER        "ファイル名, 現在の日付と時刻|ファイル名, 現在の日付|ファイル名|空欄とする"
     IDS_PRINT_FOOTER        "ページ番号|空欄とする"
     IDS_PRINT_COLOR         "通常|明るさの反転 (暗い背景)|白背景に黒|白背景にカラー|白背景にカラー (行番号以外)|モニタ通りの見ている色 (WYSIWYG)"
