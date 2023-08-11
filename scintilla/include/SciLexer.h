@@ -771,8 +771,8 @@
 #define SCE_SH_IDENTIFIER 4
 #define SCE_SH_WORD 5
 #define SCE_SH_SCALAR 6
-#define SCE_SH_HERE_Q 7
-#define SCE_SH_HERE_DELIM 8
+#define SCE_SH_HERE_DELIM 7
+#define SCE_SH_HERE_Q 8
 #define SCE_SH_STRING_SQ 9
 #define SCE_SH_STRING_DQ 10
 #define SCE_SH_PARAM 11

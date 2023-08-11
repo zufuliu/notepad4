@@ -189,12 +189,17 @@ constexpr bool IsBashLeftShift(int ch) noexcept {
 	return IsADigit(ch) || ch == '$';
 }
 
+constexpr bool IsBashCmdDelimiter(int ch) noexcept {
+	return AnyOf(ch, '|', '&', ';', '(', ')', '{', '}');
+}
+
 constexpr bool IsBashCmdDelimiter(int ch, int chNext) noexcept {
-	if (chNext == 0) {
-		return AnyOf(ch, '|', '&', ';', '(', ')', '{', '}');
-	}
 	return (ch == chNext && (ch == '|' || ch == '&' || ch == ';'))
 		|| (ch == '|' && chNext == '&');
+}
+
+constexpr bool StyleForceBacktrack(int state) noexcept {
+	return AnyOf(state, SCE_SH_HERE_Q, SCE_SH_STRING_SQ, SCE_SH_STRING_DQ, SCE_SH_PARAM, SCE_SH_BACKTICKS);
 }
 
 class QuoteCls {	// Class to manage quote pairs (simplified vs LexPerl)
@@ -230,6 +235,7 @@ public:
 	int backtickLevel = 0;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
+	bool lineContinuation = false;
 	bool isCShell = false;
 	[[nodiscard]] bool Empty() const noexcept {
 		return Current.Up == '\0';
@@ -336,9 +342,16 @@ public:
 			sc.Forward();
 		}
 		bool escaped = count & 1; // odd backslash escape next character
+		if (escaped && IsEOLChar(sc.chNext)) {
+			lineContinuation = true;
+			if (sc.state == SCE_SH_IDENTIFIER) {
+				sc.SetState(SCE_SH_OPERATOR);
+			}
+			return;
+		}
 		if (backtickLevel > 0 && !isCShell) {
 			/*
-			for $k$ level substitutio with $N$ backslashes:
+			for $k$ level substitution with $N$ backslashes:
 			* when $N/2^k$ is odd, following dollar is escaped.
 			* when $(N - 1)/2^k$ is even, following quote is escaped.
 			* when $N = n\times 2^{k + 1} - 1$, following backtick is escaped.
@@ -421,27 +434,17 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	while (sc.More()) {
 		// handle line continuation, updates per-line stored state
 		if (sc.atLineStart) {
-			if (sc.state == SCE_SH_STRING_DQ
-				|| sc.state == SCE_SH_BACKTICKS
-				|| sc.state == SCE_SH_STRING_SQ
-				|| sc.state == SCE_SH_HERE_Q
-				|| sc.state == SCE_SH_COMMENTLINE
-				|| sc.state == SCE_SH_PARAM) {
-				// force backtrack while retaining cmdState
-				styler.SetLineState(sc.currentLine, static_cast<int>(CmdState::Body));
-			} else {
-				if (sc.currentLine > 0) {
-					if ((sc.GetRelative(-3) == '\\' && sc.GetRelative(-2) == '\r' && sc.chPrev == '\n')
-						|| sc.GetRelative(-2) == '\\') {	// handle '\' line continuation
-						   // retain last line's state
-					} else {
-						cmdState = CmdState::Start;
-					}
+			CmdState state = CmdState::Body;	// force backtrack while retaining cmdState
+			if (!StyleForceBacktrack(sc.state)) {
+				if (!QuoteStack.lineContinuation) {	// retain last line's state
+					cmdState = CmdState::Start;
 				}
-				// force backtrack when nesting
-				const CmdState state = QuoteStack.Empty() ? cmdState : CmdState::Body;
-				styler.SetLineState(sc.currentLine, static_cast<int>(state));
+				if (QuoteStack.Empty()) {	// force backtrack when nesting
+					state = cmdState;
+				}
 			}
+			QuoteStack.lineContinuation = false;
+			styler.SetLineState(sc.currentLine, static_cast<int>(state));
 		}
 
 		// controls change of cmdState at the end of a non-whitespace element
@@ -542,7 +545,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			break;
 		case SCE_SH_COMMENTLINE:
-			if (sc.MatchLineEnd() && sc.chPrev != '\\') {
+			if (sc.MatchLineEnd()) {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
@@ -730,12 +733,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			if (sc.ch == '\\') {
 				// Bash can escape any non-newline as a literal
 				sc.SetState(SCE_SH_IDENTIFIER);
-				if (IsEOLChar(sc.chNext)) {
-					//sc.SetState(SCE_SH_OPERATOR);
-					sc.SetState(SCE_SH_DEFAULT);
-				} else {
-					QuoteStack.Escape(sc);
-				}
+				QuoteStack.Escape(sc);
 			} else if (IsADigit(sc.ch)) {
 				sc.SetState(SCE_SH_NUMBER);
 				numBase = 10;
@@ -860,7 +858,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						}
 					}
 					if (!isCmdDelim) {
-						isCmdDelim = IsBashCmdDelimiter(sc.ch, 0);
+						isCmdDelim = IsBashCmdDelimiter(sc.ch);
 					}
 					if (isCmdDelim) {
 						cmdState = CmdState::Delimiter;
