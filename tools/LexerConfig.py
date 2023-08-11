@@ -229,7 +229,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_SH_OPERATOR'],
 		'extra_word_char': '-$',
 		'auto_ident_word_style': ['SCE_SH_WORD'],
-		'string_style_range': ['SCE_SH_HERE_Q', 'SCE_SH_STRING_DQ'],
+		'string_style_range': ['SCE_SH_HERE_DELIM', 'SCE_SH_STRING_DQ'],
 	},
 	'NP2LEX_BATCH': {
 		'default_encoding': 'ANSI',

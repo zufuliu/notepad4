@@ -213,8 +213,6 @@ constexpr char opposite(char ch) noexcept {
 		return ']';
 	if (ch == '{')
 		return '}';
-	if (ch == '<')
-		return '>';
 	return ch;
 }
 
