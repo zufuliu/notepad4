@@ -286,7 +286,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				if (lineContinuation) {
 					lineContinuation = 0;
 				} else {
-					sc.SetState((sc.state >= SCE_JSX_STRING_SQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
+					sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 					continue;
 				}
 			}
@@ -312,7 +312,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 						sc.ChangeState(SCE_JS_KEY);
 					}
 				}
-				sc.SetState((sc.state >= SCE_JSX_STRING_SQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
+				sc.SetState((sc.state == SCE_JSX_STRING_SQ || sc.state == SCE_JSX_STRING_DQ) ? SCE_JSX_OTHER : SCE_JS_DEFAULT);
 				continue;
 			} else if (sc.state == SCE_JS_STRING_BT && sc.Match('$', '{')) {
 				nestedState.push_back(sc.state);
