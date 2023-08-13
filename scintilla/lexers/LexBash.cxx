@@ -799,9 +799,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					HereDoc.Indent = false;
 				}
 			} else if (sc.ch == '-' && // test operator or short and long option
+				cmdState != CmdState::Arithmetic &&
 				(IsAlpha(sc.chNext) || sc.chNext == '-') &&
 				IsASpace(sc.chPrev)) {
-				sc.SetState((cmdState == CmdState::Arithmetic)? SCE_SH_OPERATOR : SCE_SH_WORD);
+				sc.SetState(SCE_SH_WORD);
 				sc.Forward();
 			} else if (IsAGraphic(sc.ch) && (sc.ch != '/' || cmdState == CmdState::Arithmetic)) {
 				sc.SetState(SCE_SH_OPERATOR);

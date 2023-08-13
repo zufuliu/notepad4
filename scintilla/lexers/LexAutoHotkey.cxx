@@ -713,7 +713,7 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.Forward();
 				sc.ForwardSetState(SCE_AHK_DEFAULT);
 				continue;
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				int state;
 				if (sc.ch == '(' && visibleChars == 0 && IsSectionOptionStart(sc)) {
 					sectionState = AHKSectionState::Header;

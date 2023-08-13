@@ -510,7 +510,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					: ((sc.chPrev == '.') ? SCE_GROOVY_ATTRIBUTE_AT
 						: ((sc.chNext == 'i') ? SCE_GROOVY_IDENTIFIER : SCE_GROOVY_ANNOTATION));
 				sc.SetState(state);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_GROOVY_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '{') {

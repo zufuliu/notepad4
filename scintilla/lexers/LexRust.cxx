@@ -479,7 +479,7 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					chBeforeIdentifier = sc.chPrev;
 				}
 				sc.SetState(SCE_RUST_IDENTIFIER);
-			} else if (isoperator(sc.ch) || sc.ch == '$' || sc.ch == '@') {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_RUST_OPERATOR);
 				if (lineStateAttribute) {
 					if (sc.ch == '[') {

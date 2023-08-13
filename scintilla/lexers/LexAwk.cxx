@@ -371,7 +371,7 @@ void ColouriseAwkDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				}
 			} else if (sc.ch == '$' && IsIdentifierChar(sc.chNext)) {
 				sc.SetState(SCE_AWK_VARIABLE);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_AWK_OPERATOR);
 			}
 		}

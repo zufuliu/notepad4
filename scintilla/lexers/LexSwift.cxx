@@ -438,7 +438,7 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else {
 					sc.SetState(SCE_SWIFT_OPERATOR);
 				}
-			} else if (isoperator(sc.ch) || sc.ch == '\\') {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_SWIFT_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '(') {

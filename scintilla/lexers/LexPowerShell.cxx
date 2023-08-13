@@ -331,7 +331,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_POWERSHELL_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '(') {

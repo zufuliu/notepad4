@@ -336,7 +336,7 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_KOTLIN_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_KOTLIN_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '{') {

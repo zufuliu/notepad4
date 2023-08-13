@@ -74,10 +74,6 @@ bool IsNestedCommentStart(int lexType, StyleContext &sc, int visibleChars) noexc
 	return IsNestedCommentStart(lexType, sc.ch, sc.chNext, visibleChars, sc.styler, sc.currentPos);
 }
 
-constexpr bool IsMatOperator(int ch) noexcept {
-	return isoperator(ch) || ch == '@' || ch == '\\' || ch == '$';
-}
-
 constexpr bool IsInvalidFileName(int ch) noexcept {
 	return isspacechar(ch) || ch == '<' || ch == '>' || ch == '/' || ch == '\\' || ch == '\'' || ch == '\"'
 		|| ch == '|' || ch == '*' || ch == '?';
@@ -260,7 +256,7 @@ void ColouriseMatlabDoc(Sci_PositionU startPos, Sci_Position length, int initSty
 			} else if (IsIdentifierStart(sc.ch)) {
 				isTransposeOperator = true;
 				sc.SetState(SCE_MAT_IDENTIFIER);
-			} else if (IsMatOperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_MAT_OPERATOR);
 				isTransposeOperator = sc.ch == ')' || sc.ch == ']' || sc.ch == '}' || sc.ch == '.';
 			}

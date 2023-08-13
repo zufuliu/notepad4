@@ -1076,7 +1076,7 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					state = SCE_RB_NUMBER;
 					is_real_number = false;
 				}
-			} else if (isoperator(ch) || ch == '.') {
+			} else if (isoperator(ch)) {
 				styler.ColorTo(i, state);
 				if (afterDef && ch != '.') {
 					afterDef = false;

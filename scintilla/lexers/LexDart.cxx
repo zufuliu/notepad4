@@ -397,7 +397,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_DART_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_DART_OPERATOR);
 				if (simpleStringInterpolation && sc.ch == ')') {
 					simpleStringInterpolation = false;

@@ -1345,7 +1345,7 @@ void ColourisePHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				} else {
 					sc.SetState(js_style(SCE_JS_OPERATOR));
 				}
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				if (lexer.HighlightOperator(HtmlTextBlock::Script, stylePrevNonWhite)) {
 					continue;
 				}

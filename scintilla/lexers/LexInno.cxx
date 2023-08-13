@@ -355,7 +355,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_INNO_IDENTIFIER);
 				} else if (IsADigit(sc.ch) || ((sc.ch == '&' || sc.ch == '#' || sc.ch == '$') && IsADigit(sc.chNext))) {
 					sc.SetState(SCE_INNO_NUMBER);
-				} else if (isoperator(sc.ch) || sc.ch == '@' || sc.ch == '#') {
+				} else if (IsAGraphic(sc.ch)) {
 					if (checkParameter && sc.ch == ';') {
 						checkParameter = false;
 						paramState = InnoParameterState::Key;

@@ -403,7 +403,7 @@ void ColouriseCoffeeScriptDoc(Sci_PositionU startPos, Sci_Position lengthDoc, in
 				} else {
 					sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				}
-			} else if (isoperator(sc.ch) || sc.ch == '@') {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_COFFEESCRIPT_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '{') {

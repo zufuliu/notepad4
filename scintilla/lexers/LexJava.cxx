@@ -503,7 +503,7 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState(SCE_JAVA_IDENTIFIER);
 			} else if (sc.ch == '@' && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_JAVA_ANNOTATION);
-			} else if (isoperator(sc.ch) || sc.ch == '$') {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_JAVA_OPERATOR);
 			}
 		}

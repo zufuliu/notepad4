@@ -630,7 +630,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 						} else {
 							sc.SetState(SCE_C_OPERATOR);
 						}
-					} else if (isoperator(sc.ch) || sc.ch == '@') {
+					} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 						sc.SetState(SCE_C_OPERATOR);
 						isPragmaPreprocessor = false;
 

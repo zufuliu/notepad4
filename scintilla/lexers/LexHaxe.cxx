@@ -326,7 +326,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (sc.ch == '$' && IsIdentifierStartEx(sc.chNext)) {
 				sc.SetState(SCE_HAXE_VARIABLE);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_HAXE_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '{') {

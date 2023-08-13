@@ -482,7 +482,7 @@ void ColouriseGoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 					identifierStartPos = sc.currentPos;
 				}
 				sc.SetState(SCE_GO_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_GO_OPERATOR);
 				if (funcState != GoFunction::None) {
 					switch (sc.ch) {
