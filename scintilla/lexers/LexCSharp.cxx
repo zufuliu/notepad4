@@ -514,6 +514,8 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							if (!nestedState.empty() && nestedState.back().state == sc.state) {
 								nestedState.pop_back();
 							}
+						} else {
+							continue;
 						}
 					}
 				} else if (sc.ch == '{') {
@@ -651,11 +653,12 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					Sci_PositionU pos = sc.currentPos;
 					chNext = sc.ch;
 					if (chNext == '$') {
+						interpolatorCount = 1;
 						if (sc.chNext == '\"') {
 							chNext = '\"';
 							pos += 1;
 						} else if (sc.chNext == '$') {
-							interpolatorCount = GetMatchedDelimiterCount(styler, pos + 1, '$') + 1;
+							interpolatorCount += GetMatchedDelimiterCount(styler, pos + 1, '$');
 							pos += interpolatorCount;
 							chNext = static_cast<uint8_t>(styler[pos]);
 						}
@@ -669,16 +672,16 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 							stringInterpolatorCount = interpolatorCount;
 							state = (chNext == '\0') ? SCE_CSHARP_RAWSTRING_ML : SCE_CSHARP_RAWSTRING_SL;
 							if (interpolatorCount) {
+								delimiterCount += interpolatorCount;
 								state += SCE_CSHARP_INTERPOLATED_RAWSTRING_SL - SCE_CSHARP_RAWSTRING_SL;
 							}
 						} else {
-							delimiterCount = 1;
+							delimiterCount = 1 + interpolatorCount;
 							stringDelimiterCount = 0;
-							stringInterpolatorCount = interpolatorCount = sc.ch == '$';
+							stringInterpolatorCount = interpolatorCount;
 							state = interpolatorCount + SCE_CSHARP_STRING;
 						}
 						sc.SetState(state);
-						sc.Advance(interpolatorCount);
 						sc.Advance(delimiterCount - 1);
 					}
 				}
