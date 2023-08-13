@@ -330,7 +330,8 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 		case SCE_AHK_DYNAMIC_VARIABLE:
 		case SCE_AHK_DIRECTIVE_SHARP:
 		case SCE_AHK_SECTION_OPTION:
-			if (!IsIdentifierCharEx(sc.ch)) {
+		case SCE_AHK_DIRECTIVE_AT:
+			if (!(IsIdentifierCharEx(sc.ch) || (sc.ch == '-' && sc.state == SCE_AHK_DIRECTIVE_AT))) {
 				if (sc.state == SCE_AHK_DYNAMIC_VARIABLE) {
 					if (sc.ch == '%') {
 						sc.Forward();
@@ -401,23 +402,17 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					}
 					sc.SetState(outerStyle);
 					continue;
+				} else if (sc.state == SCE_AHK_DIRECTIVE_AT) {
+					if (StrStartsWith(s, "@ahk2exe-")) {
+						sc.SetState(outerStyle);
+					} else {
+						sc.ChangeState(outerStyle);
+					}
+					continue;
 				} else {
 					hotString = StrEqual(s, "#hotstring");
 					sc.SetState(SCE_AHK_DEFAULT);
 				}
-			}
-			break;
-
-		case SCE_AHK_DIRECTIVE_AT:
-			if (!(IsIdentifierChar(sc.ch) || sc.ch == '-')) {
-				char s[12];
-				sc.GetCurrentLowered(s, sizeof(s));
-				if (StrStartsWith(s, "@ahk2exe-")) {
-					sc.SetState(outerStyle);
-				} else {
-					sc.ChangeState(outerStyle);
-				}
-				continue;
 			}
 			break;
 
@@ -661,17 +656,23 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 						lineStateLineComment = AHKLineStateMaskLineComment;
 					}
 					sc.SetState(SCE_AHK_COMMENTLINE);
-					if (visibleChars == 0 && sc.chNext == '@' && styler.MatchLower(sc.currentPos + 2, 'a')) {
-						outerStyle = SCE_AHK_COMMENTLINE;
-						sc.ForwardSetState(SCE_AHK_DIRECTIVE_AT);
+					if (visibleChars == 0 && sc.chNext == '@') {
+						sc.Forward();
+						if (UnsafeLower(sc.chNext) == 'a') {
+							outerStyle = sc.state;
+							sc.SetState(SCE_AHK_DIRECTIVE_AT);
+						}
 					}
 				}
 			} else if (sc.Match('/', '*') && visibleChars == 0) {
 				sc.SetState(SCE_AHK_COMMENTBLOCK);
 				sc.Forward();
-				if (sc.chNext == '@' && styler.MatchLower(sc.currentPos + 2, 'a')) {
-					outerStyle = SCE_AHK_COMMENTBLOCK;
-					sc.ForwardSetState(SCE_AHK_DIRECTIVE_AT);
+				if (sc.chNext == '@') {
+					sc.Forward();
+					if (UnsafeLower(sc.chNext) == 'a') {
+						outerStyle = sc.state;
+						sc.SetState(SCE_AHK_DIRECTIVE_AT);
+					}
 				}
 			} else if (sc.ch == '\"' || sc.ch == '\'') {
 				stringQuoteChar = sc.ch;
