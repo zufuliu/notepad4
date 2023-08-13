@@ -146,16 +146,16 @@ constexpr bool IsBashWordChar(int ch) noexcept {
 	return IsIdentifierChar(ch) || ch == '.' || ch == '+' || ch == '-';
 }
 
+constexpr bool IsBashWordChar(int ch, CmdState cmdState) noexcept {
+	return IsIdentifierChar(ch) || (cmdState !=  CmdState::Arithmetic && (ch == '.' || ch == '+' || ch == '-'));
+}
+
 constexpr bool IsBashMetaCharacter(int ch) noexcept {
 	return ch <= 32 || AnyOf(ch, '|', '&', ';', '(', ')', '<', '>');
 }
 
 constexpr bool IsBashOperator(int ch) noexcept {
 	return AnyOf(ch, '^', '&', '%', '(', ')', '-', '+', '=', '|', '{', '}', '[', ']', ':', ';', '>', ',', '*', '<', '?', '!', '.', '~', '@');
-}
-
-constexpr bool IsBashOperatorLast(int ch) noexcept {
-	return IsAGraphic(ch) && !(ch == '/'); // remaining graphic characters
 }
 
 constexpr bool IsTestOperator(const char *s) noexcept {
@@ -529,13 +529,12 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 						sc.SetState(SCE_SH_DEFAULT);
 					}
 				} else {
-					const int nextState = sc.Match('+', '=') ? SCE_SH_OPERATOR : SCE_SH_DEFAULT;
-					sc.SetState(nextState);
+					sc.SetState(SCE_SH_DEFAULT);
 				}
 			}
 			break;
 		case SCE_SH_IDENTIFIER:
-			if (sc.chPrev == '\\' || !IsBashWordChar(sc.ch)) {
+			if (sc.chPrev == '\\' || !IsBashWordChar(sc.ch, cmdState)) {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
@@ -752,7 +751,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					}
 				}
 			} else if (IsIdentifierStart(sc.ch)) {
-				sc.SetState(SCE_SH_WORD);
+				sc.SetState((cmdState == CmdState::Arithmetic)? SCE_SH_IDENTIFIER : SCE_SH_WORD);
 			//} else if (sc.ch == '#' || (sc.ch == '/' && sc.chNext == '/')) {
 			} else if (sc.ch == '#') {
 				if (stylePrev != SCE_SH_WORD && stylePrev != SCE_SH_IDENTIFIER &&
@@ -802,9 +801,9 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			} else if (sc.ch == '-' && // test operator or short and long option
 				(IsAlpha(sc.chNext) || sc.chNext == '-') &&
 				IsASpace(sc.chPrev)) {
-				sc.SetState(SCE_SH_WORD);
+				sc.SetState((cmdState == CmdState::Arithmetic)? SCE_SH_OPERATOR : SCE_SH_WORD);
 				sc.Forward();
-			} else if (IsBashOperatorLast(sc.ch)) {
+			} else if (IsAGraphic(sc.ch) && (sc.ch != '/' || cmdState == CmdState::Arithmetic)) {
 				sc.SetState(SCE_SH_OPERATOR);
 				// arithmetic expansion and command substitution
 				if (QuoteStack.Current.Style >= QuoteStyle::Command) {
