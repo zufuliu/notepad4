@@ -146,7 +146,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 		case SCE_POWERSHELL_STRING_DQ:
 		case SCE_POWERSHELL_HERE_STRING_DQ:
 			if (sc.ch == '`' || (sc.state == SCE_POWERSHELL_STRING_DQ && sc.Match('\"', '\"'))) {
-				outerStyle = SCE_POWERSHELL_STRING_DQ;
+				outerStyle = sc.state;
 				sc.SetState(SCE_POWERSHELL_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '$') {
