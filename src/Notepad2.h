@@ -115,6 +115,7 @@ enum {
 // TODO: WM_COPYDATA is blocked by the User Interface Privilege Isolation
 // https://www.codeproject.com/tips/1017834/how-to-send-data-from-one-process-to-another-in-cs
 #define APPM_COPYDATA				(WM_APP + 6)
+#define APPM_DROPFILES				(WM_APP + 7)	// ScintillaWin::Drop()
 
 #define ID_WATCHTIMER				0xA000	// file watch timer
 #define ID_PASTEBOARDTIMER			0xA001	// paste board timer
