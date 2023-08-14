@@ -1,5 +1,5 @@
 # https://julialang.org/
-# 1.3 https://docs.julialang.org/
+# 1.9 https://docs.julialang.org/
 
 #! Keywords			===========================================================
 # https://docs.julialang.org/en/v1/base/base/#Keywords-1
@@ -9,11 +9,13 @@ export
 finally
 global
 else elseif
-import
+import in isa
 local
+outer
 return
 using
 var
+where
 
 # reserved two-word sequences
 abstract type
@@ -22,11 +24,6 @@ mutable struct
 end
 primitive type
 end
-
-# others
-where
-in
-isa
 
 #! Constant
 ans
@@ -63,8 +60,8 @@ end
 
 #! Core				===========================================================
 # https://docs.julialang.org/en/v1/base/base/
-# base/boot.jl
 module Core
+	@kwdef
 	isa(x, type) -> Bool
 	ifelse(condition::Bool, x, y)
 	typeassert(x, type)
@@ -149,7 +146,6 @@ module Main end
 
 #! Modules			===========================================================
 # https://docs.julialang.org/en/v1/base/base/
-# base/exports.jl
 module Base
 	exit(code=0)
 	atexit(f)

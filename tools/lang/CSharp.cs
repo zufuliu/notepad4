@@ -1,4 +1,4 @@
-// C# 11.0 https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/
+// C# 12.0 https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/
 // https://github.com/dotnet/roslyn/blob/main/docs/Language%20Feature%20Status.md
 // https://wiki.gnome.org/Projects/Vala
 // https://wiki.gnome.org/Projects/Vala/Manual
@@ -25,7 +25,7 @@ virtual volatile
 while
 
 // Contextual keywords
-add and alias ascending async await
+add and alias args ascending async await
 by descending
 equals
 file from
