@@ -534,7 +534,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 			}
 			break;
 		case SCE_SH_IDENTIFIER:
-			if (sc.chPrev == '\\' || !IsBashWordChar(sc.ch, cmdState)) {
+			if (!IsBashWordChar(sc.ch, cmdState)) {
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
