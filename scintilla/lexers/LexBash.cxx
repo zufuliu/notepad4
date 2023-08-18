@@ -230,9 +230,9 @@ public:
 
 class QuoteStackCls {	// Class to manage quote pairs that nest
 public:
-	int Depth = 0;
+	unsigned Depth = 0;
 	int State = SCE_SH_DEFAULT;
-	int backtickLevel = 0;
+	unsigned backtickLevel = 0;
 	QuoteCls Current;
 	QuoteCls Stack[BASH_QUOTE_STACK_MAX];
 	bool lineContinuation = false;
@@ -336,12 +336,12 @@ public:
 		sc.Forward();
 	}
 	void Escape(StyleContext &sc) {
-		int count = 1;
+		unsigned count = 1;
 		while (sc.chNext == '\\') {
 			++count;
 			sc.Forward();
 		}
-		bool escaped = count & 1; // odd backslash escape next character
+		bool escaped = count & 1U; // odd backslash escape next character
 		if (escaped && IsEOLChar(sc.chNext)) {
 			lineContinuation = true;
 			if (sc.state == SCE_SH_IDENTIFIER) {
@@ -359,22 +359,22 @@ public:
 			* when $N = m\times 2^k + 2^{k - 1} - 1$ and $k > 1$, following backtick ends current substitution.
 			*/
 			if (sc.chNext == '$') {
-				escaped = (count >> backtickLevel) & 1;
+				escaped = (count >> backtickLevel) & 1U;
 			} else if (sc.chNext == '\"' || sc.chNext == '\'') {
-				escaped = (((count - 1) >> backtickLevel) & 1) == 0;
+				escaped = (((count - 1) >> backtickLevel) & 1U) == 0;
 			} else if (sc.chNext == '`' && escaped) {
-				int mask = 1 << (backtickLevel + 1);
+				unsigned mask = 1U << (backtickLevel + 1);
 				count += 1;
 				escaped = (count & (mask - 1)) == 0;
 				if (!escaped) {
-					int remain = count - (mask >> 1);
-					if (remain >= 0 && (remain & (mask - 1)) == 0) {
+					unsigned remain = count - (mask >> 1U);
+					if (static_cast<int>(remain) >= 0 && (remain & (mask - 1)) == 0) {
 						escaped = true;
 						++backtickLevel;
 					} else if (backtickLevel > 1) {
-						mask >>= 1;
-						remain = count - (mask >> 1);
-						if (remain >= 0 && (remain & (mask - 1)) == 0) {
+						mask >>= 1U;
+						remain = count - (mask >> 1U);
+						if (static_cast<int>(remain) >= 0 && (remain & (mask - 1)) == 0) {
 							escaped = true;
 							--backtickLevel;
 						}
