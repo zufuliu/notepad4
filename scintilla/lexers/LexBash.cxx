@@ -95,8 +95,7 @@ constexpr int translateBashDigit(int ch) noexcept {
 	return 64;
 }
 
-constexpr bool IsBashNumber(int ch, int base) noexcept {
-	const int digit = translateBashDigit(ch);
+constexpr bool IsBashNumber(int digit, int base) noexcept {
 	return digit < base || (digit >= 36 && base <= 36 && digit - 26 < base);
 }
 
@@ -538,11 +537,16 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				sc.SetState(SCE_SH_DEFAULT);
 			}
 			break;
-		case SCE_SH_NUMBER:
-			if (!IsBashNumber(sc.ch, numBase)) {
-				sc.SetState(SCE_SH_DEFAULT);
+		case SCE_SH_NUMBER: {
+			const int digit = translateBashDigit(sc.ch);
+			if (!IsBashNumber(digit, numBase)) {
+				if (digit < 62 || digit == 63) {
+					sc.ChangeState(SCE_SH_IDENTIFIER);
+				} else {
+					sc.SetState(SCE_SH_DEFAULT);
+				}
 			}
-			break;
+		} break;
 		case SCE_SH_COMMENTLINE:
 			if (sc.MatchLineEnd()) {
 				sc.SetState(SCE_SH_DEFAULT);
