@@ -321,9 +321,6 @@ public:
 				// optimized to avoid track nested delimiter pairs
 				return;
 			}
-		//} else if (sc.ch == '`' && backtickLevel == 0) {	// $` seen in a configure script, valid?
-		//	style = QuoteStyle::Backtick;
-		//	sc.ChangeState(SCE_SH_BACKTICKS);
 		} else {
 			// scalar has no delimiter pair
 			if (!IsBashParamStart(sc.ch, isCShell)) {
