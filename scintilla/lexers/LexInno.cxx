@@ -115,7 +115,7 @@ void ColouriseInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.ForwardSetState(SCE_INNO_DEFAULT);
 				} else if (IsExpansionStartChar(sc.chNext)) {
 					++expansionLevel;
-					outerState = SCE_INNO_STRING_DQ;
+					outerState = sc.state;
 					sc.SetState(SCE_INNO_INLINE_EXPANSION);
 				}
 			} else if (sc.ch == '%' && sc.state == SCE_INNO_STRING_DQ) {

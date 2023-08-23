@@ -67,7 +67,7 @@ enum class QuoteStyle {
 	String,			// ""
 	LString,		// $""
 	HereDoc,		// here document
-	Backtick,		// ``, $``
+	Backtick,		// ``
 	Parameter,		// ${}
 	Command,		// $()
 	Arithmetic,		// $(()), $[]
