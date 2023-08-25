@@ -175,6 +175,7 @@ void EditSetNewText(LPCSTR lpstrText, DWORD cbText, Sci_Line lineCount) {
 #endif
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+		InvalidateRect(hwndEdit, NULL, TRUE);
 	}
 
 	SciCall_SetUndoCollection(true);
@@ -226,6 +227,7 @@ bool EditConvertText(UINT cpSource, UINT cpDest, bool bSetSavePoint) {
 		SciCall_AppendText(cbText, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+		InvalidateRect(hwndEdit, NULL, TRUE);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
@@ -273,6 +275,7 @@ void EditConvertToLargeMode(void) {
 		SciCall_AppendText(length, pchText);
 		SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 		SendMessage(hwndEdit, WM_SETREDRAW, TRUE, 0);
+		InvalidateRect(hwndEdit, NULL, TRUE);
 	}
 	if (pchText != NULL) {
 		NP2HeapFree(pchText);
