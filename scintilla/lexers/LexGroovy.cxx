@@ -110,7 +110,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| stylePrevNonWhite == SCE_GROOVY_OPERATOR_PF
+		|| (stylePrevNonWhite >= SCE_GROOVY_OPERATOR_PF && stylePrevNonWhite <= SCE_GROOVY_NUMBER)
 		|| IsIdentifierCharEx(chPrevNonWhite);
 }
 

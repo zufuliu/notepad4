@@ -1,4 +1,4 @@
-// 6.8.2 https://gradle.org/
+// 8.3 https://gradle.org/
 
 //! api
 // https://docs.gradle.org/current/dsl/index.html
@@ -10,12 +10,10 @@ class Project {
 	Set<Project> allprojects
 	AntBuilder ant
 	ArtifactHandler artifacts
-	File buildDir
 	File buildFile
 	ScriptHandler buildscript
 	Map<String, Project> childProjects
 	ConfigurationContainer configurations
-	Convention convention
 	List<String> defaultTasks
 	DependencyHandler dependencies
 	DependencyLockingHandler dependencyLocking
@@ -23,6 +21,7 @@ class Project {
 	ExtensionContainer extensions
 	Gradle gradle
 	Object group
+	ProjectLayout layout
 	Logger logger
 	LoggingManager logging
 	String name
@@ -110,7 +109,6 @@ class Project {
 	URI uri(Object path)
 	FileTree zipTree(Object zipPath)
 	// Methods added by the java plugin
-	void disableAutoTargetJvm()
 	Manifest manifest()
 	Manifest manifest(Closure closure)
 	Manifest manifest(Action<? super Manifest> action)
@@ -137,7 +135,6 @@ class Task {
 	// Properties
 	List<Action<? super Task>> actions
 	AntBuilder ant
-	Convention convention
 	Set<Object> dependsOn
 	String description
 	TaskDestroyables destroyables
@@ -159,6 +156,7 @@ class Task {
 	TaskState state
 	TaskDependency taskDependencies
 	File temporaryDir
+	Property<Duration> timeout
 
 	// Methods
 	Task dependsOn(Object... paths)
@@ -168,6 +166,7 @@ class Task {
 	Task doLast(Closure action)
 	Task doLast(String actionName, Action<? super Task> action)
 	Task doLast(Action<? super Task> action)
+	void doNotTrackState(String reasonNotToTrackState)
 	Task finalizedBy(Object... paths)
 	boolean hasProperty(String propertyName)
 	Task mustRunAfter(Object... paths)
@@ -176,11 +175,13 @@ class Task {
 	Object property(String propertyName)
 	void setProperty(String name, Object value)
 	TaskDependency shouldRunAfter(Object... paths)
+	void usesService(Provider<? extends BuildService<?>> service)
 }
 
 // https://docs.gradle.org/current/dsl/org.gradle.api.invocation.Gradle.html
 class Gradle {
 	// Properties
+	ExtensionContainer extensions
 	Gradle gradle
 	File gradleHomeDir
 	File gradleUserHomeDir
@@ -315,10 +316,10 @@ class Copy {
 	// Properties
 	boolean caseSensitive
 	File destinationDir
-	Integer dirMode
+	Property<ConfigurableFilePermissions> dirPermissions
 	DuplicatesStrategy duplicatesStrategy
 	Set<String> excludes
-	Integer fileMode
+	Property<ConfigurableFilePermissions> filePermissions
 	boolean includeEmptyDirs
 	Set<String> includes
 	FileCollection source
@@ -360,9 +361,12 @@ class Copy {
 class JavaCompile {
 	// Properties
 	FileCollection classpath
+	DirectoryProperty destinationDirectory
 	Set<String> excludes
 	Set<String> includes
+	Property<JavaCompiler> javaCompiler
 	CompileOptions options
+	FileTree source
 	String sourceCompatibility
 	String targetCompatibility
 

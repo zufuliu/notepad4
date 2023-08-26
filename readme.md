@@ -66,13 +66,13 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [F#](tools/lang/FSharp.fs), up to F# 7.0.
 	* [Fortran](tools/lang/Fortran.f), up to Fortran 2018.
 	* [GN Build](tools/lang/GN.gn), up to GN 2019-03-13.
-	* [Go](tools/lang/Go.go), up to Go 1.14.
+	* [Go](tools/lang/Go.go), up to Go 1.21.
 		* [Go+ (GoPlus)](https://goplus.org/) and the Q language
-	* [Gradle](tools/lang/Gradle.gradle), up to Gradle 6.8, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
+	* [Gradle](tools/lang/Gradle.gradle), up to Gradle 8.3, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#gradle)
 	* [GraphViz Dot](tools/lang/GraphViz.dot), up to GraphViz 2.49, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#graphviz)
-	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 4.0.
+	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
-	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.2.
+	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
 	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) June 2023. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
@@ -86,7 +86,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [JavaScript](tools/lang/JavaScript.js), up to ECMAScript 2023 with [JSX](https://facebook.github.io/jsx/) and [Web APIs](https://developer.mozilla.org/en-US/docs/Web/API).
 	* [JSON](https://www.json.org) and [JSON5](https://json5.org/) Document
 	* [Julia Script](tools/lang/Julia.jl), up to Julia 1.9. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#julia)
-	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 1.7.
+	* [Kotlin](tools/lang/Kotlin.kt), up to Kotlin 1.9.
 	* LaTeX
 	* Lisp Script (Common Lisp, Clojure, Scheme, etc.)
 	* [LLVM IR](tools/lang/LLVM.ll), up to LLVM 16.
