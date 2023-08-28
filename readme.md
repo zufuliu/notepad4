@@ -165,7 +165,8 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Experimental support for RTL layout (GDI) and bidirectional (Direct2D), useful for Arabic and Hebrew
 * Support using fractional font size
 * Support full screen mode
-* Extra support for drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
+* Support copy as RTF
+* Support drag and drop file from Visual Studio, Android Studio, IntelliJ IDEA, etc.
 * Other various major or minor changes and tweaks
 
 ## Supported Operating Systems:
