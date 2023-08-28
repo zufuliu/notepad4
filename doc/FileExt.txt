@@ -108,6 +108,7 @@ Python Script
 	bzl				Bazel BUILD file, https://docs.bazel.build/versions/main/build-ref.html
 	bazel
 	BUILD
+	mojo			https://docs.modular.com/mojo/programming-manual.html
 
 Ruby Script
 	rb
