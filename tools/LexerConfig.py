@@ -235,7 +235,6 @@ LexerConfigMap = {
 		'default_encoding': 'ANSI',
 		'default_line_ending': 'CRLF',
 		'line_comment_string': '@rem ',
-		'line_comment_at_line_start': True,
 		'comment_style_marker': 'SCE_BAT_COMMENT',
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_BAT_ESCAPECHAR',
@@ -1054,7 +1053,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_VHDL_CHARACTER', 'SCE_VHDL_STRING'],
 	},
 	'NP2LEX_VIM': {
-		'line_comment_string': '"',
+		'line_comment_string': ('"', '#'),
 		'comment_style_marker': 'SCE_VIM_TASKMARKER',
 		'escape_char_style': 'SCE_YAML_ESCAPECHAR',
 		'raw_string_style': ['SCE_VIM_STRING_SQ'],
