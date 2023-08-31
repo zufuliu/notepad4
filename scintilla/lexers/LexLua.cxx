@@ -84,6 +84,7 @@ bool IsLongBracket(LexAccessor &styler, Sci_PositionU pos, bool start, int &deli
 }
 
 // https://en.cppreference.com/w/c/io/fprintf
+// 6.4 – String Manipulation https://www.lua.org/manual/5.4/manual.html#6.4
 constexpr bool IsFormatSpecifier(char ch) noexcept {
 	return AnyOf(ch, 'a', 'A',
 					'c',
@@ -92,10 +93,13 @@ constexpr bool IsFormatSpecifier(char ch) noexcept {
 					'f', 'F',
 					'g', 'G',
 					'i',
+					'l',
 					'o',
 					'P',
+					'q',
 					's',
 					'u',
+					'w',
 					'x', 'X');
 }
 
