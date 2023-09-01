@@ -417,6 +417,7 @@ Markdown
 	mkd
 
 	litcoffee		Literate CoffeeScript
+	Rmd				R Markdown, https://rmarkdown.rstudio.com/
 
 Mathematica
 	m				Module
