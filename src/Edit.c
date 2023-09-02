@@ -3384,11 +3384,12 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 	const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 	Sci_Position iCurPos = SciCall_GetCurrentPos();
 
-	char mszComment[256] = "";
+	char mszComment[32] = "";
 	const UINT cpEdit = SciCall_GetCodePage();
-	WideCharToMultiByte(cpEdit, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL);
+	int cchComment = WideCharToMultiByte(cpEdit, 0, pwszComment, -1, mszComment, COUNTOF(mszComment), NULL, NULL) - 1;
+	const bool requiresSpace = mszComment[cchComment - 1] == ' ';
+	cchComment -= requiresSpace;
 
-	const int cchComment = (int)strlen(mszComment);
 	const Sci_Line iLineStart = SciCall_LineFromPosition(iSelStart);
 	Sci_Line iLineEnd = SciCall_LineFromPosition(iSelEnd);
 
@@ -3400,7 +3401,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 
 	Sci_Position iCommentCol = 0;
 	if (!bInsertAtStart) {
-		iCommentCol = 1024;
+		iCommentCol = 1024 - 1 - cchComment;
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
 			const Sci_Position iLineIndentPos = SciCall_GetLineIndentPosition(iLine);
@@ -3421,41 +3422,39 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 	SciCall_BeginUndoAction();
 	for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 		const Sci_Position iIndentPos = SciCall_GetLineIndentPosition(iLine);
-		bool bWhitespaceLine = false;
-		// a line with [space/tab] only
-		if (iCommentCol && iIndentPos == SciCall_GetLineEndPosition(iLine)) {
-			//continue;
-			bWhitespaceLine = true;
-		}
+		const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
 
 		char tchBuf[32] = "";
-		const struct Sci_TextRangeFull tr = { { iIndentPos, iIndentPos + min_i(31, cchComment) }, tchBuf };
+		const struct Sci_TextRangeFull tr = { { iIndentPos, min_pos(iIndentPos + 31, iLineEndPos) }, tchBuf };
 		SciCall_GetTextRangeFull(&tr);
 
-		Sci_Position iCommentPos;
-		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment)) {
-			int ch;
+		if (StrStartsWithCaseEx(tchBuf, mszComment, cchComment) && (!requiresSpace || (uint8_t)(tchBuf[cchComment]) <= ' ')) {
 			switch (iAction) {
 			case CommentAction_None:
 				iAction = CommentAction_Delete;
 				FALLTHROUGH_ATTR;
 				// fall through
-			case CommentAction_Delete:
-				iCommentPos = iIndentPos;
+			case CommentAction_Delete: {
+				Sci_Position iCommentPos = iIndentPos;
+				Sci_Position iEndPos = iIndentPos + cchComment;
 				// a line with [space/tab] comment only
-				ch = SciCall_GetCharAt(iIndentPos + cchComment);
-				if (ch == '\n' || ch == '\r') {
+				if (tchBuf[cchComment] == ' ') {
+					// TODO: detect indentation space and alignment space
+					++iEndPos;
+				}
+				if (iEndPos == iLineEndPos) {
 					iCommentPos = SciCall_PositionFromLine(iLine);
 				}
-				SciCall_DeleteRange(iCommentPos, iIndentPos + cchComment - iCommentPos);
-				break;
-			case CommentAction_Add:
-				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
-				ch = SciCall_GetCharAt(iCommentPos);
+				SciCall_DeleteRange(iCommentPos, iEndPos - iCommentPos);
+			} break;
+			case CommentAction_Add: {
+				const Sci_Position iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
+				const int ch = SciCall_GetCharAt(iCommentPos);
 				if (ch == '\t' || ch == ' ') {
+					mszComment[cchComment] = ' ';
 					SciCall_InsertText(iCommentPos, mszComment);
 				}
-				break;
+			} break;
 			}
 		} else {
 			switch (iAction) {
@@ -3463,25 +3462,28 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 				iAction = CommentAction_Add;
 				FALLTHROUGH_ATTR;
 				// fall through
-			case CommentAction_Add:
-				iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
-				if (!bWhitespaceLine || (iLineStart == iLineEnd)) {
+			case CommentAction_Add: {
+				const Sci_Position iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
+				if (iCommentCol == 0 || iLineStart == iLineEnd || iIndentPos != iLineEndPos) {
+					mszComment[cchComment] = (iCommentPos == iLineEndPos) ? '\0' : ' ';
 					SciCall_InsertText(iCommentPos, mszComment);
+					mszComment[cchComment] = ' ';
 				} else {
 					char tchComment[1024] = "";
 					Sci_Position tab = 0;
 					Sci_Position count = iCommentCol;
 					if (!fvCurFile.bTabsAsSpaces) {
 						const int tabWidth = fvCurFile.iTabWidth;
-						tab = iCommentCol / tabWidth;
-						count -= tab * tabWidth;
+						tab = count / tabWidth;
+						count %= tabWidth;
 						memset(tchComment, '\t', tab);
 					}
 					memset(tchComment + tab, ' ', count);
-					strcat(tchComment, mszComment);
+					memcpy(tchComment + tab + count, mszComment, cchComment);
+					tchComment[tab + count + cchComment] = '\0';
 					SciCall_InsertText(iCommentPos, tchComment);
 				}
-				break;
+			} break;
 			case CommentAction_Delete:
 				break;
 			}
