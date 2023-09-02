@@ -7471,14 +7471,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));
 	PathGetLnkPath(szFileName, szFileName);
 
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EditFileIOStatus status = {
-		.iEncoding = iCurrentEncoding,
-		.iEOLMode = iCurrentEOLMode,
-	};
-#else
-	EditFileIOStatus status = { iCurrentEncoding, iCurrentEOLMode };
-#endif
+	EditFileIOStatus status;
+	memset(&status, 0, sizeof(status));
+	status.iEncoding = iCurrentEncoding;
+	status.iEOLMode = iCurrentEOLMode;
 
 	// Ask to create a new file...
 	if (!(loadFlag & FileLoadFlag_Reload) && !PathIsFile(szFileName)) {
@@ -7689,14 +7685,10 @@ bool FileSave(FileSaveFlag saveFlag) {
 
 	bool fSuccess = false;
 	WCHAR tchFile[MAX_PATH];
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EditFileIOStatus status = {
-		.iEncoding = iCurrentEncoding,
-		.iEOLMode = iCurrentEOLMode,
-	};
-#else
-	EditFileIOStatus status = { iCurrentEncoding, iCurrentEOLMode };
-#endif
+	EditFileIOStatus status;
+	memset(&status, 0, sizeof(status));
+	status.iEncoding = iCurrentEncoding;
+	status.iEOLMode = iCurrentEOLMode;
 
 	// Read only...
 	if (!(saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) && !Untitled) {

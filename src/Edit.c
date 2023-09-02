@@ -1877,14 +1877,9 @@ void EditEscapeCChars(HWND hwnd) {
 		return;
 	}
 
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EDITFINDREPLACE efr = {
-		.hwnd = hwnd,
-	};
-#else
-	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
-#endif
-
+	EDITFINDREPLACE efr;
+	memset(&efr, 0, sizeof(efr));
+	efr.hwnd = hwnd;
 	SciCall_BeginUndoAction();
 
 	strcpy(efr.szFind, "\\");
@@ -1915,14 +1910,9 @@ void EditUnescapeCChars(HWND hwnd) {
 		return;
 	}
 
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EDITFINDREPLACE efr = {
-		.hwnd = hwnd,
-	};
-#else
-	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
-#endif
-
+	EDITFINDREPLACE efr;
+	memset(&efr, 0, sizeof(efr));
+	efr.hwnd = hwnd;
 	SciCall_BeginUndoAction();
 
 	strcpy(efr.szFind, "\\\\");
@@ -1962,14 +1952,9 @@ void EditEscapeXHTMLChars(HWND hwnd) {
 		return;
 	}
 
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EDITFINDREPLACE efr = {
-		.hwnd = hwnd,
-	};
-#else
-	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
-#endif
-
+	EDITFINDREPLACE efr;
+	memset(&efr, 0, sizeof(efr));
+	efr.hwnd = hwnd;
 	SciCall_BeginUndoAction();
 
 	strcpy(efr.szFind, "&");
@@ -2018,14 +2003,9 @@ void EditUnescapeXHTMLChars(HWND hwnd) {
 		return;
 	}
 
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EDITFINDREPLACE efr = {
-		.hwnd = hwnd,
-	};
-#else
-	EDITFINDREPLACE efr = { "", "", "", "", hwnd };
-#endif
-
+	EDITFINDREPLACE efr;
+	memset(&efr, 0, sizeof(efr));
+	efr.hwnd = hwnd;
 	SciCall_BeginUndoAction();
 
 	strcpy(efr.szFind, "&quot;");
@@ -3715,15 +3695,11 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangleSelection()) {
-#if NP2_USE_DESIGNATED_INITIALIZER
-			const EDITFINDREPLACE efrTrim = {
-				.szFind = "[ \t]+$",
-				.hwnd = hwnd,
-				.fuFlags = SCFIND_REGEXP,
-			};
-#else
-			const EDITFINDREPLACE efrTrim = { "[ \t]+$", "", "", "", hwnd, SCFIND_REGEXP };
-#endif
+			EDITFINDREPLACE efrTrim;
+			memset(&efrTrim, 0, sizeof(efrTrim));
+			memcpy(efrTrim.szFind, "[ \t]+$", CSTRLEN("[ \t]+$"));
+			efrTrim.hwnd = hwnd;
+			efrTrim.fuFlags = SCFIND_REGEXP;
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
 				return;
 			}
@@ -3758,15 +3734,11 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	// Check if there is any selection... simply use a regular expression replace!
 	if (!bIgnoreSelection && !SciCall_IsSelectionEmpty()) {
 		if (!SciCall_IsRectangleSelection()) {
-#if NP2_USE_DESIGNATED_INITIALIZER
-			const EDITFINDREPLACE efrTrim = {
-				.szFind = "^[ \t]+",
-				.hwnd = hwnd,
-				.fuFlags = SCFIND_REGEXP,
-			};
-#else
-			const EDITFINDREPLACE efrTrim = { "^[ \t]+", "", "", "", hwnd, SCFIND_REGEXP };
-#endif
+			EDITFINDREPLACE efrTrim;
+			memset(&efrTrim, 0, sizeof(efrTrim));
+			memcpy(efrTrim.szFind, "^[ \t]+", CSTRLEN("^[ \t]+"));
+			efrTrim.hwnd = hwnd;
+			efrTrim.fuFlags = SCFIND_REGEXP;
 			if (EditReplaceAllInSelection(hwnd, &efrTrim, false)) {
 				return;
 			}
@@ -6722,14 +6694,10 @@ void EditUpdateTimestampMatchTemplate(HWND hwnd) {
 #endif
 
 	const UINT cpEdit = SciCall_GetCodePage();
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EDITFINDREPLACE efrTS = {
-		.hwnd = hwnd,
-		.fuFlags = SCFIND_REGEXP,
-	};
-#else
-	EDITFINDREPLACE efrTS = { "", "", "", "", hwnd, SCFIND_REGEXP };
-#endif
+	EDITFINDREPLACE efrTS;
+	memset(&efrTS, 0, sizeof(efrTS));
+	efrTS.hwnd = hwnd;
+	efrTS.fuFlags = SCFIND_REGEXP;
 
 	WideCharToMultiByte(cpEdit, 0, wchFind, -1, efrTS.szFind, COUNTOF(efrTS.szFind), NULL, NULL);
 	WideCharToMultiByte(cpEdit, 0, wchReplace, -1, efrTS.szReplace, COUNTOF(efrTS.szReplace), NULL, NULL);
