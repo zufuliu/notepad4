@@ -3429,8 +3429,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 			} break;
 			case CommentAction_Add: {
 				const Sci_Position iCommentPos = SciCall_FindColumn(iLine, iCommentCol);
-				const int ch = SciCall_GetCharAt(iCommentPos);
-				if (ch == '\t' || ch == ' ') {
+				if (iCommentPos != iIndentPos) {
 					mszComment[cchComment] = ' ';
 					SciCall_InsertText(iCommentPos, mszComment);
 				}
@@ -3447,7 +3446,6 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 				if (iCommentCol == 0 || iLineStart == iLineEnd || iIndentPos != iLineEndPos) {
 					mszComment[cchComment] = (iCommentPos == iLineEndPos) ? '\0' : ' ';
 					SciCall_InsertText(iCommentPos, mszComment);
-					mszComment[cchComment] = ' ';
 				} else {
 					char tchComment[1024] = "";
 					Sci_Position tab = 0;
@@ -3460,7 +3458,6 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 					}
 					memset(tchComment + tab, ' ', count);
 					memcpy(tchComment + tab + count, mszComment, cchComment);
-					tchComment[tab + count + cchComment] = '\0';
 					SciCall_InsertText(iCommentPos, tchComment);
 				}
 			} break;
@@ -3750,15 +3747,9 @@ void EditStripLeadingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	const Sci_Line maxLines = SciCall_GetLineCount();
 	for (Sci_Line line = 0; line < maxLines; line++) {
 		const Sci_Position lineStart = SciCall_PositionFromLine(line);
-		const Sci_Position lineEnd = SciCall_GetLineEndPosition(line);
-		Sci_Position i = lineStart;
-		int ch = SciCall_GetCharAt(i);
-		while ((i <= lineEnd - 1) && (ch == ' ' || ch == '\t')) {
-			i++;
-			ch = SciCall_GetCharAt(i);
-		}
-		if (i > lineStart) {
-			SciCall_DeleteRange(lineStart, i - lineStart);
+		const Sci_Position lineEnd = SciCall_GetLineIndentPosition(line);
+		if (lineEnd > lineStart) {
+			SciCall_DeleteRange(lineStart, lineEnd - lineStart);
 		}
 	}
 	SciCall_EndUndoAction();
