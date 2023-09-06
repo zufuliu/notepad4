@@ -1,6 +1,14 @@
 #!/bin/bash
 # 5.2 https://www.gnu.org/software/bash/manual/
+# https://en.wikipedia.org/wiki/Almquist_shell
 # https://en.wikipedia.org/wiki/Bourne_shell
+# https://man.archlinux.org/man/dash.1
+# http://kornshell.com/
+# https://en.wikipedia.org/wiki/KornShell
+# https://man.archlinux.org/man/ksh.1.en
+# https://zsh.sourceforge.io/
+# https://en.wikipedia.org/wiki/Z_shell
+# https://man.archlinux.org/man/zsh.1.en
 
 #! keywords 			=======================================================
 # Reserved Words

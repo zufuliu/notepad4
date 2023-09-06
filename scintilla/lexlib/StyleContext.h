@@ -221,7 +221,7 @@ public:
 	void SeekTo(Sci_PositionU startPos) noexcept {
 		assert(startPos < lineStartNext && startPos >= static_cast<Sci_PositionU>(styler.LineStart(currentLine)));
 		currentPos = startPos;
-		chPrev = 0;
+		chPrev = 0; // GetRelativeCharacter(-1)
 		if (!multiByteAccess) {
 			ch = static_cast<unsigned char>(styler[startPos]);
 			chNext = styler.SafeGetUCharAt(startPos + 1);
