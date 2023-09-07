@@ -100,7 +100,7 @@ void ColouriseWinHexDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 				sc.SetState(SCE_WINHEX_NUMBER);
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_WINHEX_IDENTIFIER);
-			} else if (IsAGraphic(sc.ch)) {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_WINHEX_OPERATOR);
 				if (sc.ch == '{') {
 					++levelNext;

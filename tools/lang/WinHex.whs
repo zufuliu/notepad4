@@ -1,4 +1,5 @@
-// 20.9 http://www.winhex.com/winhex/index-m.html
+// 20.9 https://www.x-ways.net/winhex/index-m.html
+// http://www.winhex.com/winhex/index-m.html
 
 //! keywords		===========================================================
 // Template Definition
@@ -158,6 +159,8 @@ unlimited
 
 //! misc			===========================================================
 true false On Off
+// applies_to
+file disk RAM
 // Convert
 ANSI IBM Binary HexASCII IntelHex MotorolaS Base64 UUCode LowerCase UpperCase
 hiberfil

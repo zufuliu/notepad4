@@ -1086,6 +1086,8 @@ LexerConfigMap = {
 		'line_comment_string': '//',
 		'comment_style_marker': 'SCE_WINHEX_COMMENTLINE',
 		'operator_style': ['SCE_WINHEX_OPERATOR'],
+		'escape_char_style': 'SCE_WINHEX_ESCAPECHAR',
+		'escape_punctuation': True,
 		'extra_word_char': '-',
 		'string_style_range': ['SCE_WINHEX_STRING', 'SCE_WINHEX_ESCAPECHAR'],
 	},
