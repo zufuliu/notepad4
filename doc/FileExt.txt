@@ -585,6 +585,10 @@ WebAssembly
 	wat
 	wast
 
+WinHex Script
+	whs
+	tpl				Template Definition
+
 YAML Document
 	yml
 	yaml

@@ -142,6 +142,7 @@ extern EDITLEXER lexVim;
 extern EDITLEXER lexVisualBasic;
 
 extern EDITLEXER lexWASM;
+extern EDITLEXER lexWinHex;
 
 extern EDITLEXER lexYAML;
 
@@ -253,6 +254,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexVisualBasic,
 
 	&lexWASM,
+	&lexWinHex,
 
 	&lexYAML,
 

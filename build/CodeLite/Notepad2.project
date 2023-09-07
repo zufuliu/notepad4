@@ -87,6 +87,7 @@
       <File Name="../../scintilla/lexers/LexVHDL.cxx"/>
       <File Name="../../scintilla/lexers/LexVim.cxx"/>
       <File Name="../../scintilla/lexers/LexWASM.cxx"/>
+      <File Name="../../scintilla/lexers/LexWinHex.cxx"/>
       <File Name="../../scintilla/lexers/LexYAML.cxx"/>
       <File Name="../../scintilla/lexers/LexZig.cxx"/>
     </VirtualDirectory>
@@ -269,6 +270,7 @@
       <File Name="../../src/EditLexers/stlVHDL.c"/>
       <File Name="../../src/EditLexers/stlVim.c"/>
       <File Name="../../src/EditLexers/stlWASM.c"/>
+      <File Name="../../src/EditLexers/stlWinHex.c"/>
       <File Name="../../src/EditLexers/stlXML.c"/>
       <File Name="../../src/EditLexers/stlYAML.c"/>
       <File Name="../../src/EditLexers/stlZig.c"/>

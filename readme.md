@@ -142,6 +142,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* Verilog HDL, up to [Verilog](tools/lang/Verilog.v) 2005 and [SystemVerilog](tools/lang/SystemVerilog.sv) 2017.
 	* [Vim Script](tools/lang/Vim.vim)
 	* [WebAssembly](https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt), up to wabt 1.0.
+	* [WinHex Script](tools/lang/WinHex.whs) and template, up to WinHex 20.9.
 	* XML Document, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#xml)
 		* XML Schema
 		* XML Stylesheet

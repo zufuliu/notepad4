@@ -1082,6 +1082,13 @@ LexerConfigMap = {
 		'extra_word_char': '-@%$',
 		'string_style_range': ['SCE_WASM_STRING', 'SCE_WASM_ESCAPECHAR'],
 	},
+	'NP2LEX_WINHEX': {
+		'line_comment_string': '//',
+		'comment_style_marker': 'SCE_WINHEX_COMMENTLINE',
+		'operator_style': ['SCE_WINHEX_OPERATOR'],
+		'extra_word_char': '-',
+		'string_style_range': ['SCE_WINHEX_STRING', 'SCE_WINHEX_ESCAPECHAR'],
+	},
 	'NP2LEX_XML': {
 		'line_comment_string': ['//', "'", '#'],
 		'block_comment_string': [('<!--', '-->'), ('/*', '*/'), ('--', '--')],

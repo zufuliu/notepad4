@@ -2471,6 +2471,7 @@ void EditToggleCommentLine(void) {
 	case NP2LEX_SWIFT:
 	case NP2LEX_TYPESCRIPT:
 	case NP2LEX_VERILOG:
+	case NP2LEX_WINHEX:
 	case NP2LEX_ZIG:
 		EditToggleLineComments(L"//", false);
 		break;
@@ -2851,6 +2852,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_LISP:
 	case NP2LEX_SMALI:
 	case NP2LEX_TEXTFILE:
+	case NP2LEX_WINHEX:
 		CurrentWordCharSet['-' >> 5] |= (1 << ('-' & 31));
 		break;
 
