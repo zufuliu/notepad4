@@ -426,8 +426,10 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		// handle line continuation, updates per-line stored state
 		if (sc.atLineStart) {
 			CmdState state = CmdState::Body;	// force backtrack while retaining cmdState
-			if (!StyleForceBacktrack(sc.state) && !AnyOf(cmdState, CmdState::DoubleBracket, CmdState::Arithmetic)) {
-				if (!QuoteStack.lineContinuation) {	// retain last line's state
+			if (!StyleForceBacktrack(sc.state)) {
+				// retain last line's state
+				// arithmetic expression and double bracket test can span multiline without line continuation
+				if (!QuoteStack.lineContinuation && !AnyOf(cmdState, CmdState::DoubleBracket, CmdState::Arithmetic)) {
 					cmdState = CmdState::Start;
 				}
 				if (QuoteStack.Empty()) {	// force backtrack when nesting
@@ -502,7 +504,8 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 				}
 				// disambiguate option items and file test operators
 				else if (s[0] == '-') {
-					if (!AnyOf(cmdState, CmdState::Test, CmdState::SingleBracket, CmdState::DoubleBracket) || !keywordEnds || !IsTestOperator(s)) {
+					if (!AnyOf(cmdState, CmdState::Test, CmdState::SingleBracket, CmdState::DoubleBracket)
+						|| !keywordEnds || !IsTestOperator(s)) {
 						sc.ChangeState(SCE_SH_IDENTIFIER);
 					}
 				}
@@ -821,7 +824,7 @@ void ColouriseBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 					}
 				}
 				// handle opening delimiters for test/arithmetic expressions - ((,[[,[
-				if (cmdState == CmdState::Start || cmdState == CmdState::Body) {
+				if (cmdState <= CmdState::Start) {
 					if (sc.Match('(', '(')) {
 						cmdState = CmdState::Arithmetic;
 						sc.Forward();
