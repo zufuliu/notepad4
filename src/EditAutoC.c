@@ -2387,6 +2387,12 @@ void EditToggleCommentLine(void) {
 		}
 		break;
 
+	case NP2LEX_CSS:
+		if (np2LexLangIndex > IDM_LEXER_CSS) {
+			EditToggleLineComments(L"//", false);
+		}
+		break;
+
 	case NP2LEX_HTML:
 	case NP2LEX_PHP:
 	case NP2LEX_XML: {
@@ -2451,7 +2457,6 @@ void EditToggleCommentLine(void) {
 	case NP2LEX_CIL:
 	case NP2LEX_CPP:
 	case NP2LEX_CSHARP:
-	case NP2LEX_CSS:
 	case NP2LEX_DART:
 	case NP2LEX_DLANG:
 	case NP2LEX_FSHARP:

@@ -336,7 +336,8 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_CSHARP_CHARACTER', 'SCE_CSHARP_PREPROCESSOR_MESSAGE'],
 	},
 	'NP2LEX_CSS': {
-		'cpp_style_comment': True,
+		'line_comment_string': ('', '//'),
+		'block_comment_string': ('/*', '*/'),
 		'comment_style_marker': 'SCE_CSS_CDO_CDC',
 		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
 		'operator_style': ['SCE_CSS_OPERATOR'],
