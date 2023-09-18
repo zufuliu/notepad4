@@ -422,7 +422,7 @@ enum ANSIArtStyleIndex {
 #define SC_INDICATOR_UNKNOWN	INDICATOR_IME_MAX
 
 #define IMEIndicatorDefaultColor	RGB(0x10, 0x80, 0x10)
-#define MarkOccurrencesDefaultAlpha	100
+#define MarkOccurrencesDefaultAlpha	25
 #define SelectionDefaultAlpha		95
 
 #define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
