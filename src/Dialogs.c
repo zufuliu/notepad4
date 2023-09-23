@@ -2369,6 +2369,9 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 		if (mask & AutoInsertMask_SpaceAfterComma) {
 			CheckDlgButton(hwnd, IDC_AUTO_INSERT_SPACE_COMMA, BST_CHECKED);
 		}
+		if (mask & AutoInsertMask_SpaceAfterComment) {
+			CheckDlgButton(hwnd, IDC_AUTO_INSERT_SPACE_COMMENT, BST_CHECKED);
+		}
 
 		mask = autoCompletionConfig.iAsmLineCommentChar;
 		CheckRadioButton(hwnd, IDC_ASM_LINE_COMMENT_SEMICOLON, IDC_ASM_LINE_COMMENT_AT, IDC_ASM_LINE_COMMENT_SEMICOLON + mask);
@@ -2468,6 +2471,9 @@ static INT_PTR CALLBACK AutoCompletionSettingsDlgProc(HWND hwnd, UINT umsg, WPAR
 			}
 			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_SPACE_COMMA)) {
 				mask |= AutoInsertMask_SpaceAfterComma;
+			}
+			if (IsButtonChecked(hwnd, IDC_AUTO_INSERT_SPACE_COMMENT)) {
+				mask |= AutoInsertMask_SpaceAfterComment;
 			}
 
 			autoCompletionConfig.fAutoInsertMask = mask;

@@ -311,8 +311,9 @@ enum {
 	AutoInsertMask_SingleQuote = 32,		// ''
 	AutoInsertMask_Backtick = 64,			// ``
 	AutoInsertMask_SpaceAfterComma = 128,	// ', '
+	AutoInsertMask_SpaceAfterComment = 256,	// '// '
 	// default settings
-	AutoInsertMask_Default = 255,
+	AutoInsertMask_Default = 511,
 };
 
 // asm line comment
