@@ -100,6 +100,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 	int visibleChars = 0;
 	int visibleCharsBefore = 0;
+	int chPrevNonWhite = 0;
 	EscapeSequence escSeq;
 
 	StyleContext sc(startPos, lengthDoc, initStyle, styler);
@@ -315,8 +316,8 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsNumberStartEx(sc.chPrev, sc.ch, sc.chNext)) {
 				sc.SetState(SCE_HAXE_NUMBER);
 			} else if (IsIdentifierStartEx(sc.ch) || (sc.ch == '#' && (sc.chNext == 'e' || sc.chNext == 'i'))) {
-				if (sc.chPrev != '.') {
-					chBeforeIdentifier = sc.chPrev;
+				if (chPrevNonWhite != '.') {
+					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_HAXE_IDENTIFIER);
 			} else if (sc.ch == '@' && (sc.chNext == ':' || IsIdentifierStartEx(sc.chNext))) {
@@ -345,6 +346,9 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 
 		if (!isspacechar(sc.ch)) {
 			visibleChars++;
+			if (!IsSpaceEquiv(sc.state)) {
+				chPrevNonWhite = sc.ch;
+			}
 		}
 		if (sc.atLineEnd) {
 			int lineState = lineStateLineType;

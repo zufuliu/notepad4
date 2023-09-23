@@ -494,8 +494,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				sc.SetState((sc.chPrev == '.') ? SCE_JSX_ATTRIBUTE_AT : SCE_JS_DECORATOR);
 			} else if (IsJsIdentifierStart(sc.ch) || sc.Match('\\', 'u')) {
 				chBefore = chPrevNonWhite;
-				if (sc.chPrev != '.') {
-					chBeforeIdentifier = sc.chPrev;
+				if (chPrevNonWhite != '.') {
+					chBeforeIdentifier = chPrevNonWhite;
 				}
 				sc.SetState(SCE_JS_IDENTIFIER);
 			}
