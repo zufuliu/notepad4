@@ -468,7 +468,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 
 		case SCE_C_CHARACTER:
 		case SCE_C_STRING:
-			if (sc.atLineStart) {
+			if (sc.atLineStart && !continuationLine) {
 				isMessagePreprocessor = false;
 				isIncludePreprocessor = false;
 				outerStyle = SCE_C_DEFAULT;
