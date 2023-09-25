@@ -217,7 +217,7 @@ BEGIN
 			MENUITEM "&Dupliquer\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
 			MENUITEM "Déplier les commentaires\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Commenter un bloc\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
+			MENUITEM "Toggle Block &Comment\tCtrl+Q",	IDM_EDIT_STREAMCOMMENT
 			MENUITEM "&Indenter\tTab",					IDM_EDIT_INDENT
 			MENUITEM "&Désindenter\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR

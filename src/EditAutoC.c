@@ -550,6 +550,10 @@ static inline bool IsGenericTypeStyle(int style) {
 	return BitTestEx(GenericTypeStyleMask, style);
 }
 
+static inline bool IsCommentStyle(int style) {
+	return BitTestEx(CommentStyleMask, style);
+}
+
 bool IsAutoCompletionWordCharacter(uint32_t ch) {
 	if (ch < 0x80) {
 		return IsDocWordChar(ch);
@@ -1643,14 +1647,14 @@ static bool EditCompleteWordCore(int iCondition, bool autoInsert) {
 			retry = false;
 		}
 	} else {
-		if ((!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_Commont) && BitTestEx(CommentStyleMask, iCurrentStyle))
+		if ((!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_Commont) && IsCommentStyle(iCurrentStyle))
 			|| (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_String) && BitTestEx(AllStringStyleMask, iCurrentStyle))
 			|| (!(autoCompletionConfig.fCompleteScope & AutoCompleteScope_PlainText) && BitTestEx(PlainTextStyleMask, iCurrentStyle))) {
 			retry = false;
 		}
 		if (retry && bScanWordsInDocument) {
 			memcpy(ignoredStyleMask, IgnoreWordStyleMask, sizeof(IgnoreWordStyleMask));
-			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_Commont) && !BitTestEx(CommentStyleMask, iCurrentStyle)) {
+			if (!(autoCompletionConfig.fScanWordScope & AutoCompleteScope_Commont) && !IsCommentStyle(iCurrentStyle)) {
 				for (UINT i = 0; i < 8; i++) {
 					ignoredStyleMask[i] |= CommentStyleMask[i];
 				}
@@ -2577,15 +2581,87 @@ void EditEncloseSelectionNewLine(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	EditEncloseSelection(start, end);
 }
 
+static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine) {
+	const Sci_Position iSelStart = SciCall_GetSelectionStart();
+	int style = SciCall_GetStyleIndexAt(iSelStart);
+	if (IsCommentStyle(style)) {
+		const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
+		Sci_Position iStartPos = iSelStart;
+		Sci_Position iEndPos = iSelEnd;
+		// find comment block, TODO: add IsBlockCommentStyle()
+		style = SciCall_GetStyleIndexAt(iEndPos);
+		if (!IsCommentStyle(style)) {
+			style = SciCall_GetStyleIndexAt(iEndPos - 1);
+			if (!IsCommentStyle(style)) {
+				return false;
+			}
+		} else {
+			do {
+				++iEndPos;
+				style = SciCall_GetStyleIndexAt(iEndPos);
+			} while (IsCommentStyle(style));
+		}
+		do {
+			--iStartPos;
+			style = SciCall_GetStyleIndexAt(iStartPos);
+		} while (IsCommentStyle(style));
+
+		const UINT cpEdit = SciCall_GetCodePage();
+		char mszOpen[64] = "";
+		char mszClose[64] = "";
+		WideCharToMultiByte(cpEdit, 0, pwszOpen, -1, mszOpen, COUNTOF(mszOpen), NULL, NULL);
+		WideCharToMultiByte(cpEdit, 0, pwszClose, -1, mszClose, COUNTOF(mszClose), NULL, NULL);
+
+		// find inner most comment block for current selection
+		struct Sci_TextToFindFull ttfClose = { { iSelStart, iEndPos }, mszClose, { 0, 0 } };
+		iEndPos = SciCall_FindTextFull(SCFIND_NONE, &ttfClose);
+		if (iEndPos < 0) {
+			return false;
+		}
+
+		struct Sci_TextToFindFull ttfOpen = { { iSelEnd, iStartPos + 1 }, mszOpen, { 0, 0 } };
+		iStartPos = SciCall_FindTextFull(SCFIND_NONE, &ttfOpen);
+		if (iStartPos < 0 || ttfOpen.chrgText.cpMax > iEndPos) {
+			return false;
+		}
+
+		if (newLine) {
+			const Sci_Line iStartLine = SciCall_LineFromPosition(iStartPos);
+			const Sci_Line iEndLine = SciCall_LineFromPosition(iEndPos);
+			if (iStartLine == iEndLine) {
+				return false;
+			}
+			if (SciCall_GetLineIndentPosition(iStartLine) != iStartPos
+				|| SciCall_GetLineIndentPosition(iEndLine) != iEndPos) {
+				return false;
+			}
+			iStartPos = SciCall_PositionFromLine(iStartLine);
+			iEndPos = SciCall_PositionFromLine(iEndLine);
+			ttfOpen.chrgText.cpMax = SciCall_PositionFromLine(iStartLine + 1);
+			ttfClose.chrgText.cpMax = SciCall_PositionFromLine(iEndLine + 1);
+		}
+
+		SciCall_BeginUndoAction();
+		SciCall_DeleteRange(iEndPos, ttfClose.chrgText.cpMax - iEndPos);
+		SciCall_DeleteRange(iStartPos, ttfOpen.chrgText.cpMax - iStartPos);
+		SciCall_EndUndoAction();
+		return true;
+	}
+	return false;
+}
+
 void EditToggleCommentBlock(void) {
+	LPCWSTR pwszOpen = NULL;
+	LPCWSTR pwszClose = NULL;
+	bool newLine = false;
 	switch (pLexCurrent->rid) {
 	case NP2LEX_BLOCKDIAG:
 	case NP2LEX_GRAPHVIZ: {
 		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
 		if (lineState) {
-			EditEncloseSelection(L"<!--", L"-->");
+			pwszOpen = L"<!--"; pwszClose = L"-->";
 		} else {
-			EditEncloseSelection(L"/*", L"*/");
+			pwszOpen = L"/*"; pwszClose = L"*/";
 		}
 	} break;
 
@@ -2595,20 +2671,20 @@ void EditToggleCommentBlock(void) {
 		const HtmlTextBlock block = GetCurrentHtmlTextBlock(pLexCurrent->iLexer);
 		switch (block) {
 		case HtmlTextBlock_Tag:
-			EditEncloseSelection(L"<!--", L"-->");
+			pwszOpen = L"<!--"; pwszClose = L"-->";
 			break;
 
 		case HtmlTextBlock_CDATA:
 		case HtmlTextBlock_JavaScript:
 		case HtmlTextBlock_PHP:
 		case HtmlTextBlock_CSS:
-			EditEncloseSelection(L"/*", L"*/");
+			pwszOpen = L"/*"; pwszClose = L"*/";
 			break;
 
 		case HtmlTextBlock_SGML:
 			// A brief SGML tutorial
 			// https://www.w3.org/TR/WD-html40-970708/intro/sgmltut.html
-			EditEncloseSelection(L"--", L"--");
+			pwszOpen = L"--"; pwszClose = L"--";
 			break;
 
 		default:
@@ -2620,18 +2696,18 @@ void EditToggleCommentBlock(void) {
 	case NP2LEX_INNOSETUP: {
 		const int lineState = SciCall_GetLineState(SciCall_LineFromPosition(SciCall_GetSelectionStart()));
 		if (lineState & InnoLineStateCodeSection) {
-			EditEncloseSelection(L"{", L"}");
+			pwszOpen = L"{"; pwszClose = L"}";
 		} else if (lineState & InnoLineStatePreprocessor) {
-			EditEncloseSelection(L"/*", L"*/");
+			pwszOpen = L"/*"; pwszClose = L"*/";
 		}
 	}
 	break;
 
 	case NP2LEX_MATLAB:
 		if (np2LexLangIndex == IDM_LEXER_SCILAB) {
-			EditEncloseSelection(L"/*", L"*/");
+			pwszOpen = L"/*"; pwszClose = L"*/";
 		} else {
-			EditEncloseSelectionNewLine(L"%{", L"%}");
+			pwszOpen = L"%{"; pwszClose = L"%}"; newLine = true;
 		}
 		break;
 
@@ -2664,89 +2740,97 @@ void EditToggleCommentBlock(void) {
 	case NP2LEX_TYPESCRIPT:
 	case NP2LEX_VERILOG:
 	case NP2LEX_VHDL:
-		EditEncloseSelection(L"/*", L"*/");
+		pwszOpen = L"/*"; pwszClose = L"*/";
 		break;
 
 	case NP2LEX_AUTOIT3:
-		EditEncloseSelectionNewLine(L"#cs", L"#ce");
+		pwszOpen = L"#cs"; pwszClose = L"#ce";; newLine = true;
 		break;
 
 	case NP2LEX_CMAKE:
-		EditEncloseSelection(L"#[[", L"]]");
+		pwszOpen = L"#[["; pwszClose = L"]]";
 		break;
 
 	case NP2LEX_COFFEESCRIPT:
-		EditEncloseSelection(L"###", L"###");
+		pwszOpen = L"###"; pwszClose = L"###";
 		break;
 
 	case NP2LEX_FORTRAN:
-		EditEncloseSelectionNewLine(L"#if 0", L"#endif");
+		pwszOpen = L"#if 0"; pwszClose = L"#endif";; newLine = true;
 		break;
 
 	case NP2LEX_FSHARP:
 	case NP2LEX_MATHEMATICA:
 	case NP2LEX_OCAML:
-		EditEncloseSelection(L"(*", L"*)");
+		pwszOpen = L"(*"; pwszClose = L"*)";
 		break;
 
 	case NP2LEX_HASKELL:
-		EditEncloseSelection(L"{-", L"-}");
+		pwszOpen = L"{-"; pwszClose = L"-}";
 		break;
 
 	case NP2LEX_JAMFILE:
 	case NP2LEX_LISP:
-		EditEncloseSelection(L"#|", L"|#");
+		pwszOpen = L"#|"; pwszClose = L"|#";
 		break;
 
 	case NP2LEX_JULIA:
-		EditEncloseSelection(L"#=", L"=#");
+		pwszOpen = L"#="; pwszClose = L"=#";
 		break;
 
 	case NP2LEX_LATEX:
-		EditEncloseSelectionNewLine(L"\\begin{comment}", L"\\end{comment}");
+		pwszOpen = L"\\begin{comment}"; pwszClose = L"\\end{comment}";; newLine = true;
 		break;
 
 	case NP2LEX_LUA:
-		EditEncloseSelection(L"--[[", L"--]]");
+		pwszOpen = L"--[["; pwszClose = L"--]]";
 		break;
 
 	case NP2LEX_MARKDOWN:
-		EditEncloseSelection(L"<!--", L"-->");
+		pwszOpen = L"<!--"; pwszClose = L"-->";
 		break;
 
 	case NP2LEX_NIM:
-		EditEncloseSelection(L"#[", L"]#");
+		pwszOpen = L"#["; pwszClose = L"]#";
 		break;
 
 	case NP2LEX_PASCAL:
-		EditEncloseSelection(L"{", L"}");
+		pwszOpen = L"{"; pwszClose = L"}";
 		break;
 
 	case NP2LEX_POWERSHELL:
-		EditEncloseSelection(L"<#", L"#>");
+		pwszOpen = L"<#"; pwszClose = L"#>";
 		break;
 
 	case NP2LEX_REBOL:
-		EditEncloseSelectionNewLine(L"comment {", L"}");
+		pwszOpen = L"comment {"; pwszClose = L"}";; newLine = true;
 		break;
 
 	case NP2LEX_RLANG:
-		EditEncloseSelectionNewLine(L"if (FALSE) {", L"}");
+		pwszOpen = L"if (FALSE) {"; pwszClose = L"}";; newLine = true;
 		break;
 
 	case NP2LEX_TCL:
-		EditEncloseSelectionNewLine(L"if (0) {", L"}");
+		pwszOpen = L"if (0) {"; pwszClose = L"}";; newLine = true;
 		break;
 
 	case NP2LEX_TEXINFO:
-		EditEncloseSelectionNewLine(L"@ignore", L"@end ignore");
+		pwszOpen = L"@ignore"; pwszClose = L"@end ignore";; newLine = true;
 		break;
 
 	case NP2LEX_WASM:
-		EditEncloseSelection(L"(;", L";)");
+		pwszOpen = L"(;"; pwszClose = L";)";
 		break;
 
 //CommentBlock--Autogenerated -- end of section automatically generated
+	}
+
+	if (pwszOpen != NULL && !EditUncommentBlock(pwszOpen, pwszClose, newLine)) {
+		if (newLine) {
+			EditEncloseSelectionNewLine(pwszOpen, pwszClose);
+		} else {
+			EditEncloseSelection(pwszOpen, pwszClose);
+		}
 	}
 }
 
