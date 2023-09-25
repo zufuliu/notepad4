@@ -1374,7 +1374,7 @@ def BuildLexerCommentString():
 			if isinstance(block_comment_string, tuple):
 				assert len(block_comment_string) == 2, (rid, block_comment_string)
 				newline = config.get('block_comment_on_new_line', False)
-				suffix = '; newLine = true;' if newline else ''
+				suffix = ' newLine = true;' if newline else ''
 				start, end = escape_c_string(block_comment_string[0]), escape_c_string(block_comment_string[1])
 				code = (f'{indent}pwszOpen = L"{start}"; pwszClose = L"{end}";{suffix}', indent + 'break;', '')
 				commentBlock[rid] = code

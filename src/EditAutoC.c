@@ -2589,6 +2589,7 @@ static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine
 		Sci_Position iStartPos = iSelStart;
 		Sci_Position iEndPos = iSelEnd;
 		// find comment block, TODO: add IsBlockCommentStyle()
+		// ignore other style (e.g. URL) inside current selection
 		style = SciCall_GetStyleIndexAt(iEndPos);
 		if (!IsCommentStyle(style)) {
 			style = SciCall_GetStyleIndexAt(iEndPos - 1);
@@ -2744,7 +2745,7 @@ void EditToggleCommentBlock(void) {
 		break;
 
 	case NP2LEX_AUTOIT3:
-		pwszOpen = L"#cs"; pwszClose = L"#ce";; newLine = true;
+		pwszOpen = L"#cs"; pwszClose = L"#ce"; newLine = true;
 		break;
 
 	case NP2LEX_CMAKE:
@@ -2756,7 +2757,7 @@ void EditToggleCommentBlock(void) {
 		break;
 
 	case NP2LEX_FORTRAN:
-		pwszOpen = L"#if 0"; pwszClose = L"#endif";; newLine = true;
+		pwszOpen = L"#if 0"; pwszClose = L"#endif"; newLine = true;
 		break;
 
 	case NP2LEX_FSHARP:
@@ -2779,7 +2780,7 @@ void EditToggleCommentBlock(void) {
 		break;
 
 	case NP2LEX_LATEX:
-		pwszOpen = L"\\begin{comment}"; pwszClose = L"\\end{comment}";; newLine = true;
+		pwszOpen = L"\\begin{comment}"; pwszClose = L"\\end{comment}"; newLine = true;
 		break;
 
 	case NP2LEX_LUA:
@@ -2803,19 +2804,19 @@ void EditToggleCommentBlock(void) {
 		break;
 
 	case NP2LEX_REBOL:
-		pwszOpen = L"comment {"; pwszClose = L"}";; newLine = true;
+		pwszOpen = L"comment {"; pwszClose = L"}"; newLine = true;
 		break;
 
 	case NP2LEX_RLANG:
-		pwszOpen = L"if (FALSE) {"; pwszClose = L"}";; newLine = true;
+		pwszOpen = L"if (FALSE) {"; pwszClose = L"}"; newLine = true;
 		break;
 
 	case NP2LEX_TCL:
-		pwszOpen = L"if (0) {"; pwszClose = L"}";; newLine = true;
+		pwszOpen = L"if (0) {"; pwszClose = L"}"; newLine = true;
 		break;
 
 	case NP2LEX_TEXINFO:
-		pwszOpen = L"@ignore"; pwszClose = L"@end ignore";; newLine = true;
+		pwszOpen = L"@ignore"; pwszClose = L"@end ignore"; newLine = true;
 		break;
 
 	case NP2LEX_WASM:
