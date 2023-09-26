@@ -2748,10 +2748,6 @@ void EditToggleCommentBlock(void) {
 		pwszOpen = L"###"; pwszClose = L"###";
 		break;
 
-	case NP2LEX_FORTRAN:
-		pwszOpen = L"#if 0"; pwszClose = L"#endif"; newLine = true;
-		break;
-
 	case NP2LEX_FSHARP:
 	case NP2LEX_MATHEMATICA:
 	case NP2LEX_OCAML:
@@ -2797,14 +2793,6 @@ void EditToggleCommentBlock(void) {
 
 	case NP2LEX_REBOL:
 		pwszOpen = L"comment {"; pwszClose = L"}"; newLine = true;
-		break;
-
-	case NP2LEX_RLANG:
-		pwszOpen = L"if (FALSE) {"; pwszClose = L"}"; newLine = true;
-		break;
-
-	case NP2LEX_TCL:
-		pwszOpen = L"if (0) {"; pwszClose = L"}"; newLine = true;
 		break;
 
 	case NP2LEX_TEXINFO:

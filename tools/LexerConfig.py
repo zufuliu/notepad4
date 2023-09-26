@@ -388,8 +388,6 @@ LexerConfigMap = {
 	'NP2LEX_FORTRAN': {
 		'default_fold_ignore_inner': 'SCE_F_FUNCTION_DEFINITION',
 		'line_comment_string': ['!'], # omited '*'
-		'block_comment_string': ('#if 0', '#endif'),
-		'block_comment_on_new_line': True,
 		'comment_style_marker': 'SCE_F_COMMENT',
 		'escape_char_style': 'SCE_F_ESCAPECHAR',
 		'character_prefix': ['b', 'B', 'o', 'O', 'z', 'Z'],
@@ -843,8 +841,6 @@ LexerConfigMap = {
 
 	'NP2LEX_RLANG': {
 		'line_comment_string': '#',
-		'block_comment_string': ('if (FALSE) {', '}'),
-		'block_comment_on_new_line': True,
 		'comment_style_marker': 'SCE_R_TASKMARKER',
 		'shebang_exe_name': 'Rscript',
 		'default_fold_level': ['function'],
@@ -976,8 +972,6 @@ LexerConfigMap = {
 
 	'NP2LEX_TCL': {
 		'line_comment_string': '#',
-		'block_comment_string': ('if (0) {', '}'),
-		'block_comment_on_new_line': True,
 		'comment_style_marker': 'SCE_TCL_TASKMARKER',
 		'shebang_exe_name': 'wish',
 		'printf_format_specifier': True,
