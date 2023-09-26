@@ -2587,20 +2587,14 @@ static bool EditUncommentBlock(LPCWSTR pwszOpen, LPCWSTR pwszClose, bool newLine
 	if (IsCommentStyle(style)) {
 		const Sci_Position iSelEnd = SciCall_GetSelectionEnd();
 		Sci_Position iStartPos = iSelStart;
-		Sci_Position iEndPos = iSelEnd;
+		Sci_Position iEndPos = iSelStart;
 		// find comment block, TODO: add IsBlockCommentStyle()
-		// ignore other style (e.g. URL) inside current selection
-		style = SciCall_GetStyleIndexAt(iEndPos);
-		if (!IsCommentStyle(style)) {
-			style = SciCall_GetStyleIndexAt(iEndPos - 1);
-			if (!IsCommentStyle(style)) {
-				return false;
-			}
-		} else {
-			do {
-				++iEndPos;
-				style = SciCall_GetStyleIndexAt(iEndPos);
-			} while (IsCommentStyle(style));
+		do {
+			++iEndPos;
+			style = SciCall_GetStyleIndexAt(iEndPos);
+		} while (IsCommentStyle(style));
+		if (iEndPos < iSelEnd) {
+			return false;
 		}
 		do {
 			--iStartPos;
