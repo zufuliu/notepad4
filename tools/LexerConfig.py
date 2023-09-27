@@ -1355,9 +1355,9 @@ def BuildLexerCommentString():
 				line_comment_string = line_comment_string[0]
 			if isinstance(line_comment_string, str):
 				start = config.get('line_comment_at_line_start', False)
-				argument = 'true' if start else 'false'
+				argument = ' lineStart = true;' if start else ''
 				start = escape_c_string(line_comment_string)
-				code = (f'{indent}EditToggleLineComments(L"{start}", {argument});', indent + 'break;', '')
+				code = (f'{indent}pwszComment = L"{start}";{argument}', indent + 'break;', '')
 				commentLine[rid] = code
 			else:
 				complexLine.append(rid)

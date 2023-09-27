@@ -3714,11 +3714,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_EDIT_LINECOMMENT:
-		EditToggleCommentLine();
+		EditToggleCommentLine(false);
 		break;
 
 	case IDM_EDIT_STREAMCOMMENT:
-		EditToggleCommentBlock();
+		EditToggleCommentBlock(false);
 		break;
 
 	case IDM_EDIT_URLENCODE:

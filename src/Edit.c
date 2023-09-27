@@ -3348,12 +3348,11 @@ void EditEncloseSelection(LPCWSTR pwszOpen, LPCWSTR pwszClose) {
 	}
 }
 
-extern EditAutoCompletionConfig autoCompletionConfig;
 //=============================================================================
 //
 // EditToggleLineComments()
 //
-void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
+void EditToggleLineComments(LPCWSTR pwszComment, int commentFlag) {
 	if (SciCall_IsRectangleSelection()) {
 		NotifyRectangleSelection();
 		return;
@@ -3372,7 +3371,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 	char commentPad = ' ';
 	if (commentEnd == ' ') {
 		cchComment -= 1;
-	} else if ((autoCompletionConfig.fAutoInsertMask & AutoInsertMask_SpaceAfterComment) == 0) {
+	} else if ((commentFlag & AutoInsertMask_SpaceAfterComment) == 0) {
 		commentPad = '\0';
 	}
 
@@ -3386,7 +3385,7 @@ void EditToggleLineComments(LPCWSTR pwszComment, bool bInsertAtStart) {
 	}
 
 	Sci_Position iCommentCol = 0;
-	if (!bInsertAtStart) {
+	if ((commentFlag & AutoInsertMask_CommentAtStart) == 0) {
 		iCommentCol = 1024 - 1 - cchComment;
 		for (Sci_Line iLine = iLineStart; iLine <= iLineEnd; iLine++) {
 			const Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
