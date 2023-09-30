@@ -159,7 +159,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 * Display caret location and length of selected text in count of characters
 * Improved support for NFO ANSI art
 * Support various [Windows system integration](https://github.com/zufuliu/notepad2/wiki/System-Integration)
-* Per-Monitor DPI-Aware, improved high DPI display
+* Support high DPI display with HD version
 * Support rendering using Direct2D DirectWrite, and switch between GDI and Direct2D
 * Support font ligature with font like [FiraCode](https://github.com/tonsky/FiraCode) in Direct2D mode
 * Support color font (Windows 8.1 and above) in Direct2D mode, useful to display color [Emoji](https://unicode.org/emoji/charts/full-emoji-list.html) 😊 and others
