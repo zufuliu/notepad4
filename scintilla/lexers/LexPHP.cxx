@@ -645,7 +645,7 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| stylePrevNonWhite == js_style(SCE_JS_OPERATOR_PF)
+		|| (stylePrevNonWhite >= js_style(SCE_JS_NUMBER) && stylePrevNonWhite <= js_style(SCE_JS_OPERATOR_PF))
 		|| IsJsIdentifierChar(chPrevNonWhite);
 }
 

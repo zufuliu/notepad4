@@ -186,7 +186,7 @@ Sci_Position CheckFormatSpecifier(const StyleContext &sc, LexAccessor &styler, b
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| stylePrevNonWhite == SCE_AWK_OPERATOR_PF
+		|| (stylePrevNonWhite >= SCE_AWK_OPERATOR_PF && stylePrevNonWhite < SCE_AWK_WORD)
 		|| IsIdentifierChar(chPrevNonWhite);
 }
 

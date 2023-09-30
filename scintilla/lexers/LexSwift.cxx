@@ -64,7 +64,7 @@ constexpr bool IsEscapeSequence(int ch) noexcept {
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| stylePrevNonWhite == SCE_SWIFT_OPERATOR_PF
+		|| (stylePrevNonWhite >= SCE_SWIFT_OPERATOR_PF && stylePrevNonWhite <= SCE_SWIFT_NUMBER)
 		|| IsIdentifierCharEx(chPrevNonWhite);
 }
 
