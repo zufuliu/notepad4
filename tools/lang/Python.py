@@ -26,7 +26,9 @@ try
 while with
 yield
 
+# soft keywords
 case match
+type
 # https://docs.python.org/2.7/reference/lexical_analysis.html#identifiers
 exec print
 
@@ -43,84 +45,103 @@ builtins
 	abs(x)
 	aiter(async_iterable)
 	all(iterable)
-	anext(async_iterator[, default])
+	anext(async_iterator)
+	anext(async_iterator, default)
 	any(iterable)
 	ascii(object)
 	bin(x)
-	class bool([x])
+	class bool(x=False)
 	breakpoint(*args, **kws)
-	class bytearray([source[, encoding[, errors]]]):
-	class bytes([source[, encoding[, errors]]]):
+	class bytearray(source=b'')
+	class bytearray(source, encoding)
+	class bytearray(source, encoding, errors):
+	class bytes(source=b'')
+	class bytes(source, encoding)
+	class bytes(source, encoding, errors):
 	callable(object)
 	chr(i)
 	@classmethod
 	classmethod()
 	compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)
-	class complex([real[, imag]])
+	class complex(real=0, imag=0)
+	class complex(string)
 	delattr(object, name)
 	class dict(**kwarg)
 	class dict(mapping, **kwarg)
 	class dict(iterable, **kwarg):
-	dir([object])
+	dir()
+	dir(object)
 	divmod(a, b)
 	enumerate(iterable, start=0)
-	eval(expression[, globals[, locals]])
-	exec(object[, globals[, locals]])
+	eval(expression, globals=None, locals=None)
+	exec(object, globals=None, locals=None, /, *, closure=None)
 	filter(function, iterable)
-	class float([x]):
-	format(value[, format_spec])
-	class frozenset([iterable])
-	getattr(object, name[, default])
+	class float(x=0.0)
+	format(value, format_spec='')
+	class frozenset(iterable=set())
+	getattr(object, name)
+	getattr(object, name, default)
 	globals()
 	hasattr(object, name)
 	hash(object)
-	help([object])
+	help()
+	help(request)
 	hex(x)
 	id(object)
-	input([prompt])
-	class int([x]):
+	input()
+	input(prompt)
+	class int(x=0)
 	class int(x, base=10)
 	isinstance(object, classinfo)
 	issubclass(class, classinfo)
-	iter(object[, sentinel])
+	iter(object)
+	iter(object, sentinel)
 	len(s)
-	class list([iterable]):
+	class list
+	class list(iterable)
 	locals()
-	map(function, iterable, ...)
-	max(iterable, *[, key, default])
-	max(arg1, arg2, *args[, key])
+	map(function, iterable, *iterables)
+	max(iterable, *, key=None)
+	max(iterable, *, default, key=None)
+	max(arg1, arg2, *args, key=None)
 	class memoryview(object):
-	min(iterable, *[, key, default])
-	min(arg1, arg2, *args[, key])
-	next(iterator[, default])
+	min(iterable, *, key=None)
+	min(iterable, *, default, key=None)
+	min(arg1, arg2, *args, key=None)
+	next(iterator)
+	next(iterator, default)
 	class object
 	oct(x)
-	open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
+	open(file, mode='r', buffering=- 1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
 	ord(c)
-	pow(base, exp[, mod])
-	print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
-	class property(fget=None, fset=None, fdel=None, doc=None):
+	pow(base, exp, mod=None)
+	print(*objects, sep=' ', end='\n', file=None, flush=False)
+	class property(fget=None, fset=None, fdel=None, doc=None)
 	@property
 	class range(stop)
-	class range(start, stop[, step])
+	class range(start, stop, step=1)
 	repr(object)
 	reversed(seq)
-	round(number[, ndigits])
-	class set([iterable]):
+	round(number, ndigits=None)
+	class set
+	class set(iterable):
 	setattr(object, name, value)
 	class slice(stop)
-	class slice(start, stop[, step])
-	sorted(iterable, *, key=None, reverse=False)
+	class slice(start, stop, step=None)
+	sorted(iterable, /, *, key=None, reverse=False)
 	@staticmethod
 	staticmethod(function)
 	class str(object='')
 	class str(object=b'', encoding='utf-8', errors='strict'):
 	sum(iterable, /, start=0)
-	class super([type[, object-or-type]])
-	class tuple([iterable])
+	class super
+	class super(type, object_or_type=None)
+	class tuple
+	class tuple(iterable)
 	class type(object)
 	class type(name, bases, dict, **kwds)
-	vars([object])
+	vars()
+	vars(object)
 	zip(*iterables, strict=False)
 	__import__(name, globals=None, locals=None, fromlist=(), level=0)
 
@@ -166,6 +187,7 @@ __dict__
 __closure__
 __annotations__
 __kwdefaults__
+__type_params__
 __self__
 __func__
 # Modules
@@ -183,16 +205,18 @@ __dict__
 __bases__
 __doc__
 __annotations__
+__type_params__
 # Special Attributes
 # https://docs.python.org/3/library/stdtypes.html#special-attributes
 __dict__
 __class__
 __bases__
+__name__
+__qualname__
+__type_params__
 __mro__
 mro()
 __subclasses__()
-__name__
-__qualname__
 
 # module attributes
 # https://docs.python.org/3/reference/import.html#import-related-module-attributes
@@ -238,6 +262,7 @@ object:
 	# Customizing class creation
 	__init_subclass__(cls)
 	__set_name__(self, owner, name)
+	__mro_entries__(self, bases)
 	# Emulating generic types
 	__class_getitem__(cls, key)
 	# Emulating callable objects
@@ -318,6 +343,9 @@ object:
 	__exit__(self, exc_type, exc_value, traceback)
 	# Pattern Matching
 	__match_args__
+	# Emulating buffer types
+	__buffer__(self, flags)
+	__release_buffer__(self, buffer)
 	# Coroutines
 	__await__(self)
 	# Asynchronous Iterators
@@ -423,9 +451,10 @@ BaseException
 int:
 	bit_length()
 	bit_count()
-	to_bytes(length, byteorder, *, signed=False)
-	from_bytes(bytes, byteorder, *, signed=False)
+	to_bytes(length=1, byteorder='big', *, signed=False)
+	from_bytes(bytes, byteorder='big', *, signed=False)
 	as_integer_ratio()
+	is_integer()
 float:
 	as_integer_ratio()
 	is_integer()
@@ -441,7 +470,8 @@ list:
 	copy()
 	extend(t)
 	insert(i, x)
-	pop([i])
+	pop()
+	pop(i)
 	remove(x)
 	reverse()
 	sort(*, key=None, reverse=False)
@@ -541,7 +571,7 @@ bytes:
 	zfill(width)
 memoryview:
 	__eq__(exporter)
-	tobytes(order=None)
+	tobytes(order='C')
 	hex([sep[, bytes_per_sep]])
 	tolist()
 	toreadonly()
@@ -822,9 +852,9 @@ codecs
 		writelines(list)
 		reset()
 	class StreamReader(stream, errors='strict'):
-		read([size[, chars[, firstline]]])
-		readline([size[, keepends]])
-		readlines([sizehint[, keepends]])
+		read(size=- 1, chars=- 1, firstline=False)
+		readline(size=None, keepends=True)
+		readlines(sizehint=None, keepends=True)
 		reset()
 	class StreamReaderWriter(stream, Reader, Writer, errors='strict')
 	class StreamRecoder(stream, encode, decode, Reader, Writer, errors='strict')
@@ -848,6 +878,7 @@ datetime
 		fromisocalendar(year, week, day)
 		min
 		max
+		resolution
 		year
 		month
 		day
@@ -860,12 +891,11 @@ datetime
 		isoformat()
 		ctime()
 		strftime(format)
+		__format__(format)
 	class datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0):
 		today()
 		now(tz=None)
-		utcnow()
 		fromtimestamp(timestamp, tz=None)
-		utcfromtimestamp(timestamp)
 		fromordinal(ordinal)
 		combine(date, time, tzinfo=self.tzinfo)
 		fromisoformat(date_string)
@@ -892,7 +922,6 @@ datetime
 		dst()
 		tzname()
 		timetuple()
-		utctimetuple()
 		toordinal()
 		timestamp()
 		weekday()
@@ -901,6 +930,7 @@ datetime
 		isoformat(sep='T', timespec='auto')
 		ctime()
 		strftime(format)
+		__format__(format)
 	class time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None, *, fold=0):
 		min
 		max
@@ -991,6 +1021,7 @@ collections.abc
 		__iter__()
 		__next__()
 	class Reversible
+		__reversed__()
 	# https://docs.python.org/3/reference/expressions.html#generator-iterator-methods
 	class Generator:
 		__next__()
@@ -1026,6 +1057,8 @@ collections.abc
 		asend(value)
 		athrow(type[, value[, traceback]])
 		aclose()
+	class Buffer:
+		__buffer__()
 heapq
 	heappush(heap, item)
 	heappop(heap)
@@ -1128,6 +1161,7 @@ math
 	perm(n, k=None)
 	prod(iterable, *, start=1)
 	remainder(x, y)
+	sumprod(p, q)
 	trunc(x)
 	ulp(x)
 	# Power and logarithmic functions
@@ -1367,6 +1401,7 @@ fractions
 		numerator
 		denominator
 		as_integer_ratio()
+		is_integer()
 		from_float(flt)
 		from_decimal(dec)
 		limit_denominator(max_denominator=1000000)
@@ -1374,6 +1409,7 @@ fractions
 		__ceil__()
 		__round__()
 		__round__(ndigits)
+		__format__(format_spec, /)
 random
 	seed(a=None, version=2)
 	getstate()
@@ -1387,6 +1423,7 @@ random
 	choices(population, weights=None, *, cum_weights=None, k=1)
 	shuffle(x[, random])
 	sample(population, k, *, counts=None)
+	binomialvariate(n=1, p=0.5)
 	random()
 	uniform(a, b)
 	triangular(low, high, mode)
@@ -1440,6 +1477,7 @@ statistics
 # https://docs.python.org/3/library/functional.html
 itertools
 	accumulate(iterable[, func, *, initial=None])
+	batched(iterable, n)
 	chain(*iterables)
 	from_iterable(iterable)
 	combinations(iterable, r)
@@ -1504,6 +1542,7 @@ pathlib
 		with_name(name)
 		with_stem(stem)
 		with_suffix(suffix)
+		with_segments(*pathsegments)
 	class PurePosixPath(*pathsegments)
 	class PureWindowsPath(*pathsegments)
 	class Path(*pathsegments):
@@ -1517,6 +1556,7 @@ pathlib
 		group()
 		is_dir()
 		is_file()
+		is_junction()
 		is_mount()
 		is_symlink()
 		is_socket()
@@ -1524,9 +1564,10 @@ pathlib
 		is_block_device()
 		is_char_device()
 		iterdir()
+		walk(top_down=True, on_error=None, follow_symlinks=False)
 		lchmod(mode)
 		lstat()
-		mkdir(mode=511, parents=False, exist_ok=False)
+		mkdir(mode=0o777, parents=False, exist_ok=False)
 		open(mode='r', buffering=- 1, encoding=None, errors=None, newline=None)
 		owner()
 		read_bytes()
@@ -1534,6 +1575,7 @@ pathlib
 		readlink()
 		rename(target)
 		replace(target)
+		absolute()
 		resolve(strict=False)
 		rglob(pattern)
 		rmdir()
@@ -1564,8 +1606,10 @@ os.path
 	isabs(path)
 	isfile(path)
 	isdir(path)
+	isjunction(path)
 	islink(path)
 	ismount(path)
+	isdevdrive(path)
 	join(path, *paths)
 	normcase(path)
 	normpath(path)
@@ -1576,11 +1620,12 @@ os.path
 	samestat(stat1, stat2)
 	split(path)
 	splitdrive(path)
+	splitroot(path)
 	splitext(path)
 	supports_unicode_filenames
 glob
-	glob(pathname, *, root_dir=None, dir_fd=None, recursive=False)
-	iglob(pathname, *, root_dir=None, dir_fd=None, recursive=False)
+	glob(pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False)
+	iglob(pathname, *, root_dir=None, dir_fd=None, recursive=False, include_hidden=False)
 	escape(pathname)
 fnmatch
 	fnmatch(filename, pattern)
@@ -1654,6 +1699,8 @@ sqlite3
 		row_factory
 		text_factory
 		total_changes
+		autocommit
+		in_transaction
 		cursor(factory=Cursor)
 		blobopen(table, column, row, /, \*, readonly=False, name="main")
 		commit()
@@ -1676,6 +1723,8 @@ sqlite3
 		backup(target, *, pages=- 1, progress=None, name='main', sleep=0.25)
 		getlimit(category, /)
 		setlimit(category, limit, /)
+		getconfig(op, /)
+		setconfig(op, enable=True, /)
 		serialize(\*, name="main")
 		deserialize(data, /, \*, name="main")
 	class Cursor:
@@ -1758,6 +1807,7 @@ os
 	seteuid(euid)
 	setgid(gid)
 	setgroups(groups)
+	setns(fd, nstype=0)
 	setpgrp()
 	setpgid(pid, pgrp)
 	setpriority(which, who, priority)
@@ -1773,6 +1823,7 @@ os
 	umask(mask)
 	uname()
 	unsetenv(key)
+	unshare(flags)
 	# File Object Creation
 	fdopen(fd, *args, **kwargs)
 	# File Descriptor Operations
@@ -1797,6 +1848,7 @@ os
 	F_TLOCK
 	F_ULOCK
 	F_TEST
+	login_tty(fd, /)
 	lseek(fd, pos, how)
 	SEEK_SET
 	SEEK_CUR
@@ -1902,6 +1954,9 @@ os
 	lchown(path, uid, gid)
 	link(src, dst, *, src_dir_fd=None, dst_dir_fd=None, follow_symlinks=True)
 	listdir(path='.')
+	listdrives()
+	listmounts(volume)
+	listvolumes()
 	lstat(path, *, dir_fd=None)
 	mkdir(path, mode=511, *, dir_fd=None)
 	makedirs(name, mode=511, exist_ok=False)
@@ -1927,6 +1982,7 @@ os
 		is_dir(*, follow_symlinks=True)
 		is_file(*, follow_symlinks=True)
 		is_symlink()
+		is_junction()
 		stat(*, follow_symlinks=True)
 	stat(path, *, dir_fd=None, follow_symlinks=True)
 	class stat_result:
@@ -1943,12 +1999,13 @@ os
 		st_atime_ns
 		st_mtime_ns
 		st_ctime_ns
+		st_birthtime
+		st_birthtime_ns
 		st_blocks
 		st_blksize
 		st_rdev
 		st_flags
 		st_gen
-		st_birthtime
 		st_fstype
 		st_rsize
 		st_creator
@@ -2291,6 +2348,7 @@ logging
 		isEnabledFor(level)
 		getEffectiveLevel()
 		getChild(suffix)
+		getChildren()
 		debug(msg, *args, **kwargs)
 		info(msg, *args, **kwargs)
 		warning(msg, *args, **kwargs)
@@ -2334,12 +2392,17 @@ logging
 		formatTime(record, datefmt=None)
 		formatException(exc_info)
 		formatStack(stack_info)
+	class BufferingFormatter(linefmt=None):
+		formatHeader(records)
+		formatFooter(records)
+		format(records)
 	class Filter(name=''):
 		filter(record)
 	class LogRecord(name, level, pathname, lineno, msg, args, exc_info, func=None, sinfo=None):
 		getMessage()
 	class LoggerAdapter(logger, extra)
 		process(msg, kwargs)
+		manager
 	getLogger(name=None)
 	getLoggerClass()
 	getLogRecordFactory()
@@ -2352,7 +2415,10 @@ logging
 	log(level, msg, *args, **kwargs)
 	disable(level=CRITICAL)
 	addLevelName(level, levelName)
+	getLevelNamesMapping()
 	getLevelName(level)
+	getHandlerByName(name)
+	getHandlerNames()
 	makeLogRecord(attrdict)
 	basicConfig(**kwargs)
 		filename
@@ -2710,6 +2776,7 @@ sys
 	float_info
 	float_repr_style
 	getallocatedblocks()
+	getunicodeinternedsize()
 	getandroidapilevel()
 	getdefaultencoding()
 	getdlopenflags()
@@ -2757,6 +2824,9 @@ sys
 	settrace(tracefunc)
 	set_asyncgen_hooks(firstiter, finalizer)
 	set_coroutine_origin_tracking_depth(depth)
+	activate_stack_trampoline(backend, /)
+	deactivate_stack_trampoline()
+	is_stack_trampoline_active()
 	_enablelegacywindowsfsencoding()
 	stdin
 	stdout
@@ -2773,6 +2843,7 @@ sys
 	version_info
 	warnoptions
 	winver
+	monitoring
 	_xoptions
 warnings
 	warn(message, category=None, stacklevel=1, source=None)
@@ -2784,7 +2855,7 @@ warnings
 	resetwarnings()
 	class catch_warnings(*, record=False, module=None, action=None, category=Warning, lineno=0, append=False)
 dataclasses
-	@dataclassdataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
+	@dataclass(*, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
 	field(*, default=MISSING, default_factory=MISSING, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=MISSING)
 	class Field
 	fields(class_or_instance)
@@ -2796,6 +2867,7 @@ dataclasses
 	MISSING
 	KW_ONLY
 	exception FrozenInstanceError
+	__post_init__()
 contextlib
 	class AbstractContextManager
 	class AbstractAsyncContextManager
@@ -2874,6 +2946,7 @@ traceback
 		extract(frame_gen, *, limit=None, lookup_lines=True, capture_locals=False)
 		from_list(a_list)
 		format()
+		format_frame_summary(frame_summary)
 	class FrameSummary(filename, lineno, name, lookup_line=True, locals=None, line=None)
 __future__
 	nested_scopes
