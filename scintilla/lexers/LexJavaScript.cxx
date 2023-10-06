@@ -263,6 +263,8 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 								// type<type>
 								// type<type?>
 								// type<type<type>>
+								// type<type, type>
+								// class type implements interface, interface {}
 								sc.ChangeState(SCE_JS_CLASS);
 							}
 						}

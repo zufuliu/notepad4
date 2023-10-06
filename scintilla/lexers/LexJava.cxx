@@ -319,6 +319,8 @@ void ColouriseJavaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								// type<>, type<?>, type<? super T>
 								// type<type>
 								// type<type<type>>
+								// type<type, type>
+								// class type implements interface, interface {}
 								// type identifier
 								sc.ChangeState(SCE_JAVA_CLASS);
 							}

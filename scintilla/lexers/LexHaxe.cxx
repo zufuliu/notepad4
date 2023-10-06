@@ -198,6 +198,7 @@ void ColouriseHaxeDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								// type[]
 								// type<type>
 								// type<type<type>>
+								// type<type, type>
 								sc.ChangeState(SCE_HAXE_CLASS);
 							}
 						}

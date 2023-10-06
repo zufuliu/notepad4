@@ -182,7 +182,7 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 							if (visibleChars == sc.LengthCurrent()) {
 								lineStateLineType = DartLineStateMaskImport;
 							}
-						} else if (StrEqualsAny(s, "class", "extends", "implements", "new", "throw", "as", "is")) {
+						} else if (StrEqualsAny(s, "class", "extends", "implements", "new", "throw", "with", "as", "is", "on")) {
 							kwType = KeywordType::Class;
 						} else if (StrEqual(s, "enum")) {
 							kwType = KeywordType::Enum;
@@ -228,6 +228,8 @@ void ColouriseDartDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 								// type<type>
 								// type<type?>
 								// type<type<type>>
+								// type<type, type>
+								// class type implements interface, interface {}
 								// type identifier
 								// type? identifier
 								sc.ChangeState(SCE_DART_CLASS);

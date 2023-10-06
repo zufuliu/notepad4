@@ -378,6 +378,8 @@ void ColouriseCSharpDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								// type<type>
 								// type<type?>
 								// type<type<type>>
+								// type<type, type>
+								// class type: type, interface {}
 								// type identifier
 								sc.ChangeState(IsInterfaceName(s[0], s[1]) ? SCE_CSHARP_INTERFACE : SCE_CSHARP_CLASS);
 							}

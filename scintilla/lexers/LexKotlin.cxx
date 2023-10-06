@@ -202,6 +202,8 @@ void ColouriseKotlinDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								// type<type>
 								// type<type?>
 								// type<type<type>>
+								// type<type, type>
+								// class type: type, interface {}
 								sc.ChangeState(SCE_KOTLIN_CLASS);
 							}
 						}

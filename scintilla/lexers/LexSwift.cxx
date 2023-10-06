@@ -241,8 +241,10 @@ void ColouriseSwiftDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 								// type<type>
 								// type<type?>
 								// type<type<type>>
+								// type<type, type>
 								// [type]()
 								// [[type]]()
+								// class type: protocol, protocol {}
 								sc.ChangeState(SCE_SWIFT_CLASS);
 							}
 						}

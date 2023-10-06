@@ -289,6 +289,8 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								// type<>, type<?>, type<? super T>
 								// type<type>
 								// type<type<type>>
+								// type<type, type>
+								// class type implements interface, interface {}
 								sc.ChangeState(SCE_GROOVY_CLASS);
 							} else if (IsIdentifierStartEx(chNext)) {
 								// type identifier
