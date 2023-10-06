@@ -145,7 +145,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	bool isAssignStmt = false;
 	EscapeSequence escSeq;
 
-	if (initStyle == SCE_C_COMMENTLINE || initStyle == SCE_C_COMMENTLINEDOC || initStyle == SCE_C_PREPROCESSOR) {
+	if (AnyOf(initStyle, SCE_C_COMMENTLINE, SCE_C_COMMENTLINEDOC, SCE_C_PREPROCESSOR, SCE_C_STRING, SCE_C_CHARACTER)) {
 		// Set continuationLine if last character of previous line is '\'
 		if (lineCurrent > 0) {
 			const char chBack = styler.SafeGetCharAt(startPos - 1);
