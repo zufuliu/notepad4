@@ -277,13 +277,13 @@ void CallTip::MouseClick(Point pt) noexcept {
 }
 
 PRectangle CallTip::CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
-	Surface *surfaceMeasure, std::shared_ptr<Font> font_) {
+	Surface *surfaceMeasure, const std::shared_ptr<Font> &font_) {
 	clickPlace = 0;
 	val = defn;
 	highlight = Chunk();
 	inCallTipMode = true;
 	posStartCallTip = pos;
-	font = std::move(font_);
+	font = font_;
 	// Look for multiple lines in the text
 	// Only support \n here - simply means container must avoid \r!
 	const int numLines = 1 + static_cast<int>(std::count(val.begin(), val.end(), '\n'));
