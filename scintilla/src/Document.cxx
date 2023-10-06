@@ -2951,16 +2951,12 @@ public:
 
 	const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
 
-#ifdef NO_CXX11_REGEX
 	void ClearCache() noexcept override {
 		search.ClearCache();
 	}
-#endif
 
 private:
-#ifdef NO_CXX11_REGEX
 	RESearch search;
-#endif
 	std::string substituted;
 };
 
@@ -3020,24 +3016,8 @@ public:
 			return '\0';
 	}
 
-	bool IsWordStartAt(Sci::Position pos) const noexcept override {
-		return pdoc->IsWordStartAt(pos);
-	}
-
-	bool IsWordEndAt(Sci::Position pos) const noexcept override {
-		return pdoc->IsWordEndAt(pos);
-	}
-
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
 		return pdoc->MovePositionOutsideChar(pos, moveDir, true);
-	}
-
-	Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept override {
-		return pdoc->NextPosition(pos, moveDir);
-	}
-
-	Sci::Position ExtendWordSelect(Sci::Position pos, int delta) const noexcept override {
-		return pdoc->ExtendWordSelect(pos, delta, true);
 	}
 };
 
@@ -3365,11 +3345,13 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 #endif // NO_CXX11_REGEX
 
 Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
-	bool caseSensitive, [[maybe_unused]] FindOption flags, Sci::Position *length) {
+	bool caseSensitive, FindOption flags, Sci::Position *length) {
 
 #ifndef NO_CXX11_REGEX
-	return Cxx11RegexFindText(doc, minPos, maxPos, s, caseSensitive, length, search);
-#else
+	if (FlagSet(flags, FindOption::Cxx11RegEx)) {
+		return Cxx11RegexFindText(doc, minPos, maxPos, s, caseSensitive, length, search);
+	}
+#endif
 
 	const RESearchRange resr(doc, minPos, maxPos);
 
@@ -3442,7 +3424,6 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 	}
 	*length = lenRet;
 	return pos;
-#endif // NO_CXX11_REGEX
 }
 
 const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) {

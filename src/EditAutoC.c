@@ -788,38 +788,24 @@ static void AutoC_AddDocWord(struct WordList *pWList, const uint32_t ignoredStyl
 	const int iRootLen = pWList->iStartLen;
 
 	// optimization for small string
-	char onStack[128];
+	char onStack[64];
 	char *pFind;
-	if (iRootLen * 2 + 32 < (int)sizeof(onStack)) {
+	if (iRootLen + 2 <= (int)sizeof(onStack)) {
 		memset(onStack, 0, sizeof(onStack));
 		pFind = onStack;
 	} else {
-		pFind = (char *)NP2HeapAlloc(iRootLen * 2 + 32);
+		pFind = (char *)NP2HeapAlloc(iRootLen + 2);
 	}
 
-	if (prefix) {
-		char buf[2] = { prefix, '\0' };
-		EscapeRegex(pFind, buf);
-	}
-	if (iRootLen == 0) {
-		// find an identifier
-		strcat(pFind, "[A-Za-z0-9_]");
-		strcat(pFind, "\\i?");
-	} else {
-		if (IsDefaultWordChar((uint8_t)pRoot[0])) {
-			strcat(pFind, "\\h");
-		}
-		EscapeRegex(pFind + strlen(pFind), pRoot);
-		if (IsDefaultWordChar((uint8_t)pRoot[iRootLen - 1])) {
-			strcat(pFind, "\\i?");
-		} else {
-			strcat(pFind, "\\i");
-		}
+	pFind[0] = prefix;
+	memcpy(pFind + (prefix != '\0'), pRoot, iRootLen);
+	int findFlag = (bIgnoreCase ? SCFIND_NONE : SCFIND_MATCHCASE) | SCFIND_MATCH_TO_WORD_END;
+	if (IsDefaultWordChar((uint8_t)pRoot[0])) {
+		findFlag |= SCFIND_WORDSTART;
 	}
 
 	const Sci_Position iCurrentPos = SciCall_GetCurrentPos() - iRootLen - (prefix ? 1 : 0);
 	const Sci_Position iDocLen = SciCall_GetLength();
-	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX | (bIgnoreCase ? 0 : SCFIND_MATCHCASE);
 	struct Sci_TextToFindFull ft = { { 0, iDocLen }, pFind, { 0, 0 } };
 
 	Sci_Position iPosFind = SciCall_FindTextFull(findFlag, &ft);

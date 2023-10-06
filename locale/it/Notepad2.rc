@@ -1764,12 +1764,7 @@ $\tFine di una linea\n\
 *? o +?\tCorrispondenza inaccurata di quantificatori ""?"" e ""+""\n\
 (\tInizio di un'area\n\
 )\tFine di un'area\n\
-\\n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
-Sintassi sperimentale:\n\
-\\h\tInizio di una parola, secondo IsWordStartAt()\n\
-\\H\tFine di una parola, secondo IsWordEndAt()\n\
-\\i\tCorrisponde a 1 o più caratteri alla fine di una \t\tparola\n\
-\\i?\tCorrisponde a 0 o più caratteri alla fine di una \t\tparola"
+\\n\tRiferimento a un'area quando sostituita (n è 1-9)"
 
 	IDS_WILDCARDHELP		"Ricerca con caratteri Jolly\n\n\
 *\tCorrisponde a zero o più caratteri.\n\

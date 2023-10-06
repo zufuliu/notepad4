@@ -1764,12 +1764,7 @@ $\tEnd of a line\n\
 *? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
 (\tStart of a region\n\
 )\tEnd of a region\n\
-\\n\tRefers to a region when replacing (n is 1-9)\n\n\
-Experimental Syntax:\n\
-\\h\tStart of a word, according to IsWordStartAt()\n\
-\\H\tEnd of a word, according to IsWordEndAt()\n\
-\\i\tMatches 1 or more characters to the end of a word\n\
-\\i?\tMatches 0 or more characters to the end of a word"
+\\n\tRefers to a region when replacing (n is 1-9)"
 
 	IDS_WILDCARDHELP		"Wildcard Search\n\n\
 *\tMatches zero or more characters.\n\

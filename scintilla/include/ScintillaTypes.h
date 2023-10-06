@@ -271,6 +271,7 @@ enum class FindOption {
 	None = 0x0,
 	WholeWord = 0x2,
 	MatchCase = 0x4,
+	MatchToWordEnd = 0x8,
 	WordStart = 0x00100000,
 	RegExp = 0x00200000,
 	Posix = 0x00400000,

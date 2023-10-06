@@ -1764,12 +1764,7 @@ $\tfind e ligne\n\
 *? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
 (\tDébut d'une région\n\
 )\tFin  d'une région\n\
-\\n\tSe réfère à une région lors du remplacement (avec n étant compris entre 1 et 9)\n\n\
-Syntaxe expérimentale :\n\
-\\h\tDébut d'un mot, en accord avec IsWordStartAt()\n\
-\\H\tFin d'un mot, en accord avec IsWordEndAt()\n\
-\\i\tTrouvera 1 caractère ou plus jusqu'à la fin du mot\n\
-\\i?\tTrouvera 0 caractère ou plus jusqu'à la fin du mot"
+\\n\tSe réfère à une région lors du remplacement (avec n étant compris entre 1 et 9)"
 
 	IDS_WILDCARDHELP		"Jocker de recherche\n\n\
 *\tTrouvera zéro ou plus de caractères.\n\
