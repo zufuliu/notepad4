@@ -2935,6 +2935,10 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	return -1;
 }
 
+#ifndef SCI_OWNREGEX
+
+namespace {
+
 /**
  * Implementation of RegexSearchBase for the default built-in regular expression engine
  */
@@ -2947,16 +2951,18 @@ public:
 
 	const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
 
+#ifdef NO_CXX11_REGEX
 	void ClearCache() noexcept override {
 		search.ClearCache();
 	}
+#endif
 
 private:
+#ifdef NO_CXX11_REGEX
 	RESearch search;
+#endif
 	std::string substituted;
 };
-
-namespace {
 
 /**
 * RESearchRange keeps track of search range.
@@ -3233,7 +3239,7 @@ public:
 	}
 };
 
-#endif
+#endif // WCHAR_T_IS_16
 
 std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
@@ -3356,18 +3362,14 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 	}
 }
 
-#endif
-
-}
+#endif // NO_CXX11_REGEX
 
 Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
-	bool caseSensitive, FindOption flags, Sci::Position *length) {
+	bool caseSensitive, [[maybe_unused]] FindOption flags, Sci::Position *length) {
 
 #ifndef NO_CXX11_REGEX
-	if (FlagSet(flags, FindOption::Cxx11RegEx)) {
-		return Cxx11RegexFindText(doc, minPos, maxPos, s, caseSensitive, length, search);
-	}
-#endif
+	return Cxx11RegexFindText(doc, minPos, maxPos, s, caseSensitive, length, search);
+#else
 
 	const RESearchRange resr(doc, minPos, maxPos);
 
@@ -3440,6 +3442,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 	}
 	*length = lenRet;
 	return pos;
+#endif // NO_CXX11_REGEX
 }
 
 const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) {
@@ -3494,10 +3497,10 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 	return substituted.c_str();
 }
 
-#ifndef SCI_OWNREGEX
+}
 
 RegexSearchBase *Scintilla::Internal::CreateRegexSearch(const CharClassify *charClassTable) {
 	return new BuiltinRegex(charClassTable);
 }
 
-#endif
+#endif // SCI_OWNREGEX

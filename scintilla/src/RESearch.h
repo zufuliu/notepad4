@@ -6,6 +6,7 @@
 // Based on the work of Ozan S. Yigit.
 // This file is in the public domain.
 #pragma once
+#if !defined(SCI_OWNREGEX) && defined(NO_CXX11_REGEX)
 
 namespace Scintilla::Internal {
 
@@ -70,3 +71,5 @@ private:
 };
 
 }
+
+#endif // SCI_OWNREGEX
