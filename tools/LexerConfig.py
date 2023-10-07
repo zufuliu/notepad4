@@ -256,11 +256,11 @@ LexerConfigMap = {
 
 	'NP2LEX_CIL': {
 		'cpp_style_comment': True,
-		'comment_style_marker': 'SCE_C_COMMENTLINE',
-		'operator_style': ['SCE_C_OPERATOR'],
+		'comment_style_marker': 'SCE_CIL_COMMENTBLOCK',
+		'operator_style': ['SCE_CIL_OPERATOR'],
 		'cpp_preprocessor': True,
 		'extra_word_char': '$',
-		'string_style_range': ['SCE_C_CHARACTER', 'SCE_C_STRING'],
+		'string_style_range': ['SCE_CIL_CHARACTER', 'SCE_CIL_STRING'],
 	},
 	'NP2LEX_CMAKE': {
 		'line_comment_string': '#',
@@ -637,11 +637,11 @@ LexerConfigMap = {
 	'NP2LEX_LISP': {
 		'line_comment_string': ';',
 		'block_comment_string': ('#|',  '|#'),
-		'comment_style_marker': 'SCE_C_COMMENTLINE',
-		'none_quote_style': 'SCE_C_OPERATOR',
-		'operator_style': ['SCE_C_OPERATOR'],
+		'comment_style_marker': 'SCE_LISP_TASKMARKER',
+		'none_quote_style': 'SCE_LISP_OPERATOR',
+		'operator_style': ['SCE_LISP_OPERATOR'],
 		'extra_word_char': '-',
-		'string_style_range': ['SCE_C_CHARACTER', 'SCE_C_STRING'],
+		'string_style_range': ['SCE_LISP_CHARACTER', 'SCE_LISP_STRING'],
 	},
 	'NP2LEX_LLVM': {
 		'line_comment_string': ';',
