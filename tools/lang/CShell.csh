@@ -1,5 +1,5 @@
 #!/bin/tcsh
-# 6.24 https://man.archlinux.org/man/tcsh.1.en
+# 6.24 https://man.archlinux.org/man/tcsh.1
 # https://en.wikipedia.org/wiki/C_shell
 
 #! keywords 			=======================================================

@@ -100,6 +100,7 @@ Used by VSCode, Atom etc.
 #include "HanjaDic.h"
 #include "LaTeXInput.h"
 
+#define APPM_DROPFILES				(WM_APP + 7)
 #ifndef WM_DPICHANGED
 #define WM_DPICHANGED				0x02E0
 #endif
@@ -683,7 +684,9 @@ ScintillaWin::ScintillaWin(HWND hwnd) noexcept {
 #endif
 
 	UINT index = 0;
+#if defined(_WIN64) && (_WIN32_WINNT < _WIN32_WINNT_WIN10)
 	dropFormat[index++] = CF_HDROP;
+#endif
 #if EnableDrop_VisualStudioProjectItem
 	dropFormat[index++] = cfVSStgProjectItem;
 	dropFormat[index++] = cfVSRefProjectItem;
@@ -960,7 +963,7 @@ inline int WideCharLenFromMultiByte(UINT codePage, std::string_view sv) noexcept
 }
 
 std::string StringEncode(const std::wstring_view wsv, int codePage) {
-	const int cchMulti = wsv.length() ? MultiByteLenFromWideChar(codePage, wsv) : 0;
+	const int cchMulti = wsv.empty() ? 0: MultiByteLenFromWideChar(codePage, wsv);
 	std::string sMulti(cchMulti, '\0');
 	if (cchMulti) {
 		MultiByteFromWideChar(codePage, wsv, sMulti.data(), cchMulti);
@@ -969,7 +972,7 @@ std::string StringEncode(const std::wstring_view wsv, int codePage) {
 }
 
 std::wstring StringDecode(const std::string_view sv, int codePage) {
-	const int cchWide = sv.length() ? WideCharLenFromMultiByte(codePage, sv) : 0;
+	const int cchWide = sv.empty() ? 0: WideCharLenFromMultiByte(codePage, sv);
 	std::wstring sWide(cchWide, 0);
 	if (cchWide) {
 		WideCharFromMultiByte(codePage, sv, sWide.data(), cchWide);
@@ -3885,7 +3888,7 @@ STDMETHODIMP ScintillaWin::Drop(LPDATAOBJECT pIDataSource, DWORD grfKeyState, PO
 #endif
 					) {
 					HDROP hDrop = static_cast<HDROP>(medium.hGlobal);
-					::SendMessage(::GetParent(MainHWND()), WM_DROPFILES, reinterpret_cast<WPARAM>(hDrop), 0);
+					::SendMessage(::GetParent(MainHWND()), APPM_DROPFILES, reinterpret_cast<WPARAM>(hDrop), 0);
 				}
 #if Enable_ChromiumWebCustomMIMEDataFormat
 				else if (fmt == cfChromiumCustomMIME) {

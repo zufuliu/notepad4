@@ -146,7 +146,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 		case SCE_POWERSHELL_STRING_DQ:
 		case SCE_POWERSHELL_HERE_STRING_DQ:
 			if (sc.ch == '`' || (sc.state == SCE_POWERSHELL_STRING_DQ && sc.Match('\"', '\"'))) {
-				outerStyle = SCE_POWERSHELL_STRING_DQ;
+				outerStyle = sc.state;
 				sc.SetState(SCE_POWERSHELL_ESCAPECHAR);
 				sc.Forward();
 			} else if (sc.ch == '$') {
@@ -331,7 +331,7 @@ void ColourisePowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int 
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_POWERSHELL_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_POWERSHELL_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '(') {

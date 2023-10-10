@@ -546,6 +546,7 @@
     <ClCompile Include="..\..\scintilla\lexers\LexVHDL.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexVim.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexWASM.cxx" />
+    <ClCompile Include="..\..\scintilla\lexers\LexWinHex.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexYAML.cxx" />
     <ClCompile Include="..\..\scintilla\lexers\LexZig.cxx" />
     <ClCompile Include="..\..\scintilla\lexlib\Accessor.cxx" />
@@ -672,6 +673,7 @@
     <ClCompile Include="..\..\src\EditLexers\stlVHDL.c" />
     <ClCompile Include="..\..\src\EditLexers\stlVim.c" />
     <ClCompile Include="..\..\src\EditLexers\stlWASM.c" />
+    <ClCompile Include="..\..\src\EditLexers\stlWinHex.c" />
     <ClCompile Include="..\..\src\EditLexers\stlXML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlYAML.c" />
     <ClCompile Include="..\..\src\EditLexers\stlZig.c" />

@@ -142,6 +142,7 @@ extern EDITLEXER lexVim;
 extern EDITLEXER lexVisualBasic;
 
 extern EDITLEXER lexWASM;
+extern EDITLEXER lexWinHex;
 
 extern EDITLEXER lexYAML;
 
@@ -253,6 +254,7 @@ static PEDITLEXER pLexArray[] = {
 	&lexVisualBasic,
 
 	&lexWASM,
+	&lexWinHex,
 
 	&lexYAML,
 
@@ -420,7 +422,7 @@ enum ANSIArtStyleIndex {
 #define SC_INDICATOR_UNKNOWN	INDICATOR_IME_MAX
 
 #define IMEIndicatorDefaultColor	RGB(0x10, 0x80, 0x10)
-#define MarkOccurrencesDefaultAlpha	100
+#define MarkOccurrencesDefaultAlpha	25
 #define SelectionDefaultAlpha		95
 
 #define	BookmarkImageDefaultColor	RGB(0x40, 0x80, 0x40)
@@ -1740,7 +1742,7 @@ void Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged) {
 				Style_LoadOne(&lexHTML);
 			}
 			if (rid == NP2LEX_MARKDOWN) {
-				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, 0));
+				SciCall_CopyStyles(STYLE_LINK, MULTI_STYLE(SCE_MARKDOWN_PLAIN_LINK, SCE_MARKDOWN_PAREN_LINK, SCE_MARKDOWN_ANGLE_LINK, SCE_MARKDOWN_COMMENT_LINK));
 			} else {
 				Style_SetAllStyle(&lexJavaScript, SCE_PHP_LABEL + 1);
 				Style_SetAllStyle(&lexCSS, SCE_PHP_LABEL + SCE_JS_LABEL + 2);

@@ -597,7 +597,7 @@ void ColouriseDDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle
 			} else if (IsIdentifierStartEx(sc.ch)) {
 				chBefore = chPrevNonWhite;
 				sc.SetState(SCE_D_IDENTIFIER);
-			} else if (isoperator(sc.ch) || sc.ch == '@' || sc.ch == '$') {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_D_OPERATOR);
 				if (asmState == InlineAssembler::Keyword && sc.ch == '{') {
 					const int chNext = sc.GetDocNextChar(true);

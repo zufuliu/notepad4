@@ -217,7 +217,7 @@ BEGIN
 			MENUITEM "&Duplica\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
 			MENUITEM "Rimu&ovi linea commento\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "&Commenta blocco\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
+			MENUITEM "Toggle Block &Comment\tCtrl+Q",	IDM_EDIT_STREAMCOMMENT
 			MENUITEM "&Indenta\tTab",					IDM_EDIT_INDENT
 			MENUITEM "Rim&uovi indentazione\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
@@ -1629,13 +1629,14 @@ BEGIN
     AUTOCHECKBOX    "Indenta automaticamente testo.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Chiudi automaticamente i tag HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Inserisci automaticamente 1 spazio dopo la virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
-    GROUPBOX        "Chiudi automaticamente parentesi graffe e virgolette",IDC_STATIC,231,44,218,61
-    AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "< >",IDC_AUTO_INSERT_ANGLE_BRACKET,394,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "Virgolette ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,68,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Apostrofi ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,238,80,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Insert space after comment marker on toggle line comment.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
+    GROUPBOX        "Chiudi automaticamente parentesi graffe e virgolette",IDC_STATIC,231,56,218,49
+    AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "< >",IDC_AUTO_INSERT_ANGLE_BRACKET,394,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "Virgolette ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,80,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Apostrofi ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,342,80,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Backticks (``).",IDC_AUTO_INSERT_BACKTICK,238,92,100,10,WS_TABSTOP
 
     GROUPBOX        "Scansiona parole per l'autocompletamento in:",IDC_STATIC,231,111,218,26
@@ -1763,12 +1764,7 @@ $\tFine di una linea\n\
 *? o +?\tCorrispondenza inaccurata di quantificatori ""?"" e ""+""\n\
 (\tInizio di un'area\n\
 )\tFine di un'area\n\
-\\n\tRiferimento a un'area quando sostituita (n è 1-9)\n\n\
-Sintassi sperimentale:\n\
-\\h\tInizio di una parola, secondo IsWordStartAt()\n\
-\\H\tFine di una parola, secondo IsWordEndAt()\n\
-\\i\tCorrisponde a 1 o più caratteri alla fine di una \t\tparola\n\
-\\i?\tCorrisponde a 0 o più caratteri alla fine di una \t\tparola"
+\\n\tRiferimento a un'area quando sostituita (n è 1-9)"
 
 	IDS_WILDCARDHELP		"Ricerca con caratteri Jolly\n\n\
 *\tCorrisponde a zero o più caratteri.\n\

@@ -784,7 +784,7 @@ void ColourisePyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 				} else {
 					sc.SetState(SCE_PY_OPERATOR);
 				}
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				const bool interpolating = !nestedState.empty();
 				int braceCount = 0;
 				if (sc.ch == '{' || sc.ch == '[' || sc.ch == '(') {

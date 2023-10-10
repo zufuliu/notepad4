@@ -1231,7 +1231,11 @@ void PathAbsoluteFromApp(LPCWSTR lpszSrc, LPWSTR lpszDest, bool bExpandEnv) {
 		if (S_OK != SHGetKnownFolderPath(KnownFolderId_Documents, KF_FLAG_DEFAULT, NULL, &pszPath)) {
 			return;
 		}
-		PathCombine(wchPath, pszPath, lpszSrc + CSTRLEN("%CSIDL:MYDOCUMENTS%"));
+		lpszSrc += CSTRLEN("%CSIDL:MYDOCUMENTS%");
+		if (*lpszSrc == L'\\' || *lpszSrc == L'/') {
+			++lpszSrc;
+		}
+		PathCombine(wchPath, pszPath, lpszSrc);
 		CoTaskMemFree(pszPath);
 #else
 		if (S_OK != SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, wchPath)) {

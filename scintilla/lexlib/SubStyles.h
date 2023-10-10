@@ -10,14 +10,14 @@ namespace Lexilla {
 
 class WordClassifier {
 	int baseStyle;
-	int firstStyle;
-	int lenStyles;
+	int firstStyle = 0;
+	int lenStyles = 0;
 	using WordStyleMap = std::map<std::string, int, std::less<>>;
 	WordStyleMap wordToStyle;
 
 public:
 
-	explicit WordClassifier(int baseStyle_) noexcept : baseStyle(baseStyle_), firstStyle(0), lenStyles(0) {
+	explicit WordClassifier(int baseStyle_) noexcept : baseStyle(baseStyle_) {
 	}
 
 	void Allocate(int firstStyle_, int lenStyles_) noexcept {
@@ -77,10 +77,10 @@ public:
 			return;
 		while (*identifiers) {
 			const char *cpSpace = identifiers;
-			while (*cpSpace && !(*cpSpace == ' ' || *cpSpace == '\t' || *cpSpace == '\r' || *cpSpace == '\n'))
+			while (*cpSpace && static_cast<uint8_t>(*cpSpace) > ' ')
 				cpSpace++;
 			if (cpSpace > identifiers) {
-				std::string word(identifiers, cpSpace - identifiers);
+				const std::string word(identifiers, cpSpace - identifiers);
 				wordToStyle[word] = style;
 			}
 			identifiers = cpSpace;

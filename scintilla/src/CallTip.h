@@ -71,7 +71,7 @@ public:
 
 	/// Setup the calltip and return a rectangle of the area required.
 	PRectangle SCICALL CallTipStart(Sci::Position pos, Point pt, int textHeight, const char *defn,
-		Surface *surfaceMeasure, std::shared_ptr<Font> font_);
+		Surface *surfaceMeasure, const std::shared_ptr<Font> &font_);
 
 	void CallTipCancel() noexcept;
 

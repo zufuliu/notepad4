@@ -93,7 +93,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| stylePrevNonWhite == SCE_SCALA_OPERATOR_PF
+		|| (stylePrevNonWhite >= SCE_SCALA_OPERATOR_PF && stylePrevNonWhite <= SCE_SCALA_IDENTIFIER)
 		|| IsScalaIdentifierChar(chPrevNonWhite);
 }
 

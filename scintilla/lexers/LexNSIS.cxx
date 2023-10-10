@@ -181,7 +181,7 @@ void ColouriseNSISDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				sc.SetState((sc.chNext == '{') ? SCE_NSIS_VARIABLE_BRACE : SCE_NSIS_VARIABLE_PAREN);
 			} else if ((visibleChars == 0 && sc.ch == '!') || IsIdentifierStart(sc.ch)) {
 				sc.SetState(SCE_NSIS_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch) && sc.ch != '\\') {
 				sc.SetState(SCE_NSIS_OPERATOR);
 			}
 		}

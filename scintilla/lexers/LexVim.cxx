@@ -250,7 +250,7 @@ void ColouriseVimDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 			} else if (sc.ch == '/' && preferRegex && !IsEOLChar(sc.chNext)) {
 				insideRegexRange = false;
 				sc.SetState(SCE_VIM_REGEX);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_VIM_OPERATOR);
 				if (sc.ch == '|' && sc.chNext != '|' && !(lineState & VimLineStateMaskAutoCommand)) {
 					// pipe, change logicalVisibleChars to 0 in next block

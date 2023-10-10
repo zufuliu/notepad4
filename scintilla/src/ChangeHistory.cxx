@@ -27,42 +27,80 @@ namespace Scintilla::Internal {
 
 void ChangeStack::Clear() noexcept {
 	steps.clear();
-	insertions.clear();
+	changes.clear();
 }
 
 void ChangeStack::AddStep() {
 	steps.push_back(0);
 }
 
-void ChangeStack::PushDeletion(Sci::Position positionDeletion, int edition) {
-	steps.back()++;
-	insertions.push_back({ positionDeletion, 0, edition, InsertionSpan::Direction::deletion });
+namespace {
+
+constexpr bool InsertionSpanSameDeletion(const ChangeSpan &is, Sci::Position positionDeletion, int edition) noexcept {
+	// Equal except for count
+	return
+		is.direction == ChangeSpan::Direction::deletion &&
+		is.start == positionDeletion &&
+		is.length == 0 &&
+		is.edition == edition;
+};
+
+}
+
+void ChangeStack::PushDeletion(Sci::Position positionDeletion, const EditionCount &ec) {
+	steps.back() += ec.count;
+	if (changes.empty() || !InsertionSpanSameDeletion(changes.back(), positionDeletion, ec.edition)) {
+		changes.push_back({ positionDeletion, 0, ec.edition, ec.count, ChangeSpan::Direction::deletion });
+	} else {
+		changes.back().count += ec.count;
+	}
 }
 
 void ChangeStack::PushInsertion(Sci::Position positionInsertion, Sci::Position length, int edition) {
 	steps.back()++;
-	insertions.push_back({ positionInsertion, length, edition, InsertionSpan::Direction::insertion });
+	changes.push_back({ positionInsertion, length, edition, 1, ChangeSpan::Direction::insertion });
 }
 
-size_t ChangeStack::PopStep() noexcept {
-	const size_t spans = steps.back();
+int ChangeStack::PopStep() noexcept {
+	const int spans = steps.back();
 	steps.pop_back();
 	return spans;
 }
 
-InsertionSpan ChangeStack::PopSpan() noexcept {
-	const InsertionSpan span = insertions.back();
-	insertions.pop_back();
+ChangeSpan ChangeStack::PopSpan(int maxSteps) noexcept {
+	ChangeSpan span = changes.back();
+	const int remove = std::min(maxSteps, span.count);
+	if (span.count == remove) {
+		changes.pop_back();
+	} else {
+		changes.back().count -= remove;
+		span.count = remove;
+	}
 	return span;
 }
 
 void ChangeStack::SetSavePoint() noexcept {
 	// Switch changeUnsaved to changeSaved
-	for (InsertionSpan &x : insertions) {
+	for (ChangeSpan &x : changes) {
 		if (x.edition == changeModified) {
 			x.edition = changeSaved;
 		}
 	}
+}
+
+void ChangeStack::Check() const noexcept {
+#ifdef _DEBUG
+	// Ensure count in steps same as insertions;
+	int sizeSteps = 0;
+	for (const int c : steps) {
+		sizeSteps += c;
+	}
+	int sizeInsertions = 0;
+	for (const ChangeSpan &is: changes) {
+		sizeInsertions += is.count;
+	}
+	assert(sizeSteps == sizeInsertions);
+#endif
 }
 
 void ChangeLog::Clear(Sci::Position length) {
@@ -104,8 +142,8 @@ void ChangeLog::CollapseRange(Sci::Position position, Sci::Position deleteLength
 		EditionSetOwned empty{};
 		const EditionSetOwned &editions = deleteEdition.ValueOr(positionDeletion, empty);
 		if (editions) {
-			for (const int ed : *editions) {
-				PushDeletionAt(position, ed);
+			for (const EditionCount &ec : *editions) {
+				PushDeletionAt(position, ec);
 			}
 			deleteEdition.SetValueAt(positionDeletion, std::move(empty));
 		}
@@ -113,28 +151,59 @@ void ChangeLog::CollapseRange(Sci::Position position, Sci::Position deleteLength
 	}
 }
 
-void ChangeLog::Add(Sci::Position position, int edition, bool front) {
+namespace {
+
+// EditionSets have repeat counts on items so push and pop may just
+// manipulate the count field or may push/pop items.
+
+void EditionSetPush(EditionSet &set, EditionCount ec) {
+	if (set.empty() || (set.back().edition != ec.edition)) {
+		set.push_back(ec);
+	} else {
+		set.back().count += ec.count;
+	}
+}
+
+void EditionSetPop(EditionSet &set) noexcept {
+	if (set.back().count == 1) {
+		set.pop_back();
+	} else {
+		set.back().count--;
+	}
+}
+
+int EditionSetCount(const EditionSet &set) noexcept {
+	int count = 0;
+	for (const EditionCount &ec : set) {
+		count += ec.count;
+	}
+	return count;
+}
+
+}
+
+void ChangeLog::Add(Sci::Position position, EditionCount ec, bool front) {
 	const EditionSetOwned empty{};
 	const EditionSetOwned &editions = deleteEdition.ValueOr(position, empty);
 	if (editions) {
 		if (front) {
-			const_cast<EditionSetOwned &>(editions)->insert(editions->begin(), edition);
+			const_cast<EditionSetOwned &>(editions)->insert(editions->begin(), ec);
 		} else {
-			const_cast<EditionSetOwned &>(editions)->push_back(edition);
+			EditionSetPush(*const_cast<EditionSetOwned &>(editions), ec);
 		}
 	} else {
 		EditionSetOwned editionSet = std::make_unique<EditionSet>();
-		editionSet->push_back(edition);
+		editionSet->push_back(ec);
 		deleteEdition.SetValueAt(position, std::move(editionSet));
 	}
 }
 
-void ChangeLog::PushDeletionAt(Sci::Position position, int edition) {
-	Add(position, edition, false);
+void ChangeLog::PushDeletionAt(Sci::Position position, EditionCount ec) {
+	Add(position, ec, false);
 }
 
-void ChangeLog::InsertFrontDeletionAt(Sci::Position position, int edition) {
-	Add(position, edition, true);
+void ChangeLog::InsertFrontDeletionAt(Sci::Position position, EditionCount ec) {
+	Add(position, ec, true);
 }
 
 void ChangeLog::SaveRange(Sci::Position position, Sci::Position length) {
@@ -157,8 +226,8 @@ void ChangeLog::SaveRange(Sci::Position position, Sci::Position length) {
 		const EditionSetOwned empty{};
 		const EditionSetOwned &editions = deleteEdition.ValueOr(positionDeletion, empty);
 		if (editions) {
-			for (const int ed : *editions) {
-				changeStack.PushDeletion(positionDeletion, ed);
+			for (const EditionCount &ec : *editions) {
+				changeStack.PushDeletion(positionDeletion, ec);
 			}
 		}
 		positionDeletion = deleteEdition.PositionNext(positionDeletion);
@@ -173,17 +242,25 @@ void ChangeLog::PopDeletion(Sci::Position position, Sci::Position deleteLength) 
 	const EditionSetOwned empty{};
 	const EditionSetOwned &editions = deleteEdition.ValueOr(position, empty);
 	assert(editions);
-	editions->pop_back();
-	const size_t inserts = changeStack.PopStep();
-	for (size_t i = 0; i < inserts; i++) {
-		const InsertionSpan span = changeStack.PopSpan();
-		if (span.direction == InsertionSpan::Direction::insertion) {
+	EditionSetPop(*editions);
+	const int inserts = changeStack.PopStep();
+	for (int i = 0; i < inserts;) {
+		const ChangeSpan span = changeStack.PopSpan(inserts);
+		if (span.direction == ChangeSpan::Direction::insertion) {
+			assert(span.count == 1);	// Insertions are never compressed
 			insertEdition.FillRange(span.start, span.edition, span.length);
+			i++;
 		} else {
 			assert(editions);
-			assert(editions->back() == span.edition);
-			editions->pop_back();
-			InsertFrontDeletionAt(span.start, span.edition);
+			assert(editions->back().edition == span.edition);
+			for (int j = 0; j < span.count; j++) {
+				EditionSetPop(*editions);
+			}
+			// Iterating backwards (pop) through changeStack, reverse order of insertion
+			// and original deletion list.
+			// Therefore need to insert at front to recreate original order.
+			InsertFrontDeletionAt(span.start, { span.edition, span.count });
+			i += span.count;
 		}
 	}
 
@@ -223,9 +300,9 @@ void ChangeLog::SetSavePoint() {
 		const EditionSetOwned empty{};
 		const EditionSetOwned &editions = deleteEdition.ValueOr(positionDeletion, empty);
 		if (editions) {
-			for (int &ed : *editions) {
-				if (ed == changeModified) {
-					ed = changeSaved;
+			for (EditionCount &ec : *editions) {
+				if (ec.edition == changeModified) {
+					ec.edition = changeSaved;
 				}
 			}
 		}
@@ -244,7 +321,7 @@ size_t ChangeLog::DeletionCount(Sci::Position start, Sci::Position length) const
 		const EditionSetOwned empty{};
 		const EditionSetOwned &editions = deleteEdition.ValueOr(start, empty);
 		if (editions) {
-			count += editions->size();
+			count += EditionSetCount(*editions);
 		}
 		start = deleteEdition.PositionNext(start);
 	}
@@ -253,6 +330,7 @@ size_t ChangeLog::DeletionCount(Sci::Position start, Sci::Position length) const
 
 void ChangeLog::Check() const noexcept {
 	assert(insertEdition.Length() == deleteEdition.Length());
+	changeStack.Check();
 }
 
 ChangeHistory::ChangeHistory(Sci::Position length) {
@@ -281,7 +359,7 @@ void ChangeHistory::DeleteRange(Sci::Position position, Sci::Position deleteLeng
 	if (changeLogReversions) {
 		changeLogReversions->DeleteRangeSavingHistory(position, deleteLength);
 		if (reverting) {
-			changeLogReversions->PushDeletionAt(position, 1);
+			changeLogReversions->PushDeletionAt(position, { changeRevertedOriginal, 1 });
 		}
 	}
 	Check();
@@ -289,7 +367,7 @@ void ChangeHistory::DeleteRange(Sci::Position position, Sci::Position deleteLeng
 
 void ChangeHistory::DeleteRangeSavingHistory(Sci::Position position, Sci::Position deleteLength, bool beforeSave, bool isDetached) {
 	changeLog.DeleteRangeSavingHistory(position, deleteLength);
-	changeLog.PushDeletionAt(position, beforeSave ? changeSaved : changeModified);
+	changeLog.PushDeletionAt(position, { beforeSave ? changeSaved : changeModified, 1 });
 	if (changeLogReversions) {
 		if (isDetached) {
 			changeLogReversions->SaveHistoryForDelete(position, deleteLength);
@@ -343,7 +421,7 @@ void ChangeHistory::EditionCreateHistory(Sci::Position start, Sci::Position leng
 		if (length) {
 			changeLog.insertEdition.FillRange(start, historicEpoch, length);
 		} else {
-			changeLog.PushDeletionAt(start, historicEpoch);
+			changeLog.PushDeletionAt(start, { historicEpoch, 1 });
 		}
 	}
 }
@@ -360,9 +438,10 @@ int ChangeHistory::EditionAt(Sci::Position pos) const noexcept {
 	if (changeLogReversions) {
 		const int editionReversion = changeLogReversions->insertEdition.ValueAt(pos);
 		if (editionReversion) {
-			if (edition < 0)
-				return 1;
-			return edition ? 4 : 1;
+			if (edition < 0) {	// Historical revision
+				return changeRevertedOriginal;
+			}
+			return edition ? changeRevertedToChange : changeRevertedOriginal;
 		}
 	}
 	return edition;
@@ -384,8 +463,8 @@ unsigned int ChangeHistory::EditionDeletesAt(Sci::Position pos) const noexcept {
 	const EditionSetOwned empty{};
 	const EditionSetOwned &editionSetDeletions = changeLog.deleteEdition.ValueOr(pos, empty);
 	if (editionSetDeletions) {
-		for (const unsigned int ed : *editionSetDeletions) {
-			editionSet = editionSet | (1U << (ed - 1));
+		for (const EditionCount &ec : *editionSetDeletions) {
+			editionSet = editionSet | (1u << (ec.edition-1));
 		}
 	}
 	if (changeLogReversions) {

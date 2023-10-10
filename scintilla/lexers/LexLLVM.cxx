@@ -244,7 +244,7 @@ void ColouriseLLVMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			} else if (IsIdentifierStart(sc.ch)) {
 				sc.SetState((sc.ch == 'x' && isspacechar(sc.chNext)) ? SCE_LLVM_OPERATOR : SCE_LLVM_IDENTIFIER);
 				sc.SetState(SCE_LLVM_IDENTIFIER);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_LLVM_OPERATOR);
 			}
 		}

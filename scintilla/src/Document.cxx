@@ -2935,6 +2935,10 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	return -1;
 }
 
+#ifndef SCI_OWNREGEX
+
+namespace {
+
 /**
  * Implementation of RegexSearchBase for the default built-in regular expression engine
  */
@@ -2955,8 +2959,6 @@ private:
 	RESearch search;
 	std::string substituted;
 };
-
-namespace {
 
 /**
 * RESearchRange keeps track of search range.
@@ -3014,24 +3016,8 @@ public:
 			return '\0';
 	}
 
-	bool IsWordStartAt(Sci::Position pos) const noexcept override {
-		return pdoc->IsWordStartAt(pos);
-	}
-
-	bool IsWordEndAt(Sci::Position pos) const noexcept override {
-		return pdoc->IsWordEndAt(pos);
-	}
-
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
 		return pdoc->MovePositionOutsideChar(pos, moveDir, true);
-	}
-
-	Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept override {
-		return pdoc->NextPosition(pos, moveDir);
-	}
-
-	Sci::Position ExtendWordSelect(Sci::Position pos, int delta) const noexcept override {
-		return pdoc->ExtendWordSelect(pos, delta, true);
 	}
 };
 
@@ -3233,7 +3219,7 @@ public:
 	}
 };
 
-#endif
+#endif // WCHAR_T_IS_16
 
 std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
@@ -3356,9 +3342,7 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 	}
 }
 
-#endif
-
-}
+#endif // NO_CXX11_REGEX
 
 Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
 	bool caseSensitive, FindOption flags, Sci::Position *length) {
@@ -3494,10 +3478,10 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 	return substituted.c_str();
 }
 
-#ifndef SCI_OWNREGEX
+}
 
 RegexSearchBase *Scintilla::Internal::CreateRegexSearch(const CharClassify *charClassTable) {
 	return new BuiltinRegex(charClassTable);
 }
 
-#endif
+#endif // SCI_OWNREGEX

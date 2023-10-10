@@ -217,7 +217,7 @@ BEGIN
 			MENUITEM "&Dupliquer\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
 			MENUITEM "Déplier les commentaires\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Commenter un bloc\tCtrl+Q",			IDM_EDIT_STREAMCOMMENT
+			MENUITEM "Toggle Block &Comment\tCtrl+Q",	IDM_EDIT_STREAMCOMMENT
 			MENUITEM "&Indenter\tTab",					IDM_EDIT_INDENT
 			MENUITEM "&Désindenter\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
@@ -1629,13 +1629,14 @@ BEGIN
     AUTOCHECKBOX    "Indentation automatique du texte.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Fermeture automatique des balises HTML et XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Instertion automatique d'espace après avoir tapé une virgule (,) si approprié.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,218,10,WS_TABSTOP
-    GROUPBOX        "Ajout automatique des parenthèses et guillemets fermants",IDC_STATIC,231,44,218,61
-    AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "< >",IDC_AUTO_INSERT_ANGLE_BRACKET,394,56,40,10,WS_TABSTOP
-    AUTOCHECKBOX    "Double guillemets ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,68,100,10,WS_TABSTOP
-    AUTOCHECKBOX    "Simple guillemets ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,238,80,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Insert space after comment marker on toggle line comment.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
+    GROUPBOX        "Ajout automatique des parenthèses et guillemets fermants",IDC_STATIC,231,56,218,49
+    AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "[ ]",IDC_AUTO_INSERT_SQUARE_BRACKET,342,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "< >",IDC_AUTO_INSERT_ANGLE_BRACKET,394,68,40,10,WS_TABSTOP
+    AUTOCHECKBOX    "Double guillemets ("""").",IDC_AUTO_INSERT_DOUBLE_QUOTE,238,80,100,10,WS_TABSTOP
+    AUTOCHECKBOX    "Simple guillemets ('').",IDC_AUTO_INSERT_SINGLE_QUOTE,342,80,100,10,WS_TABSTOP
     AUTOCHECKBOX    "Backticks (``).",IDC_AUTO_INSERT_BACKTICK,238,92,100,10,WS_TABSTOP
 
     GROUPBOX        "Auto completion scanning word inside:",IDC_STATIC,231,111,218,26
@@ -1763,12 +1764,7 @@ $\tfind e ligne\n\
 *? or +?\tNon-greedy matching of quantifiers ""?"" and ""+""\n\
 (\tDébut d'une région\n\
 )\tFin  d'une région\n\
-\\n\tSe réfère à une région lors du remplacement (avec n étant compris entre 1 et 9)\n\n\
-Syntaxe expérimentale :\n\
-\\h\tDébut d'un mot, en accord avec IsWordStartAt()\n\
-\\H\tFin d'un mot, en accord avec IsWordEndAt()\n\
-\\i\tTrouvera 1 caractère ou plus jusqu'à la fin du mot\n\
-\\i?\tTrouvera 0 caractère ou plus jusqu'à la fin du mot"
+\\n\tSe réfère à une région lors du remplacement (avec n étant compris entre 1 et 9)"
 
 	IDS_WILDCARDHELP		"Jocker de recherche\n\n\
 *\tTrouvera zéro ou plus de caractères.\n\

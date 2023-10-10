@@ -127,11 +127,6 @@ public:
 		return encodingType;
 	}
 
-	bool MatchLower(Sci_Position pos, char ch0) noexcept {
-		const char ch = (*this)[pos];
-		return (ch | 0x20) == ch0;
-	}
-
 	bool Match(Sci_Position pos, const char *s) noexcept {
 		for (; *s; s++, pos++) {
 			if (*s != (*this)[pos]) {

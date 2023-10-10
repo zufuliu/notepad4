@@ -2,6 +2,7 @@
 /** @file RESearch.cxx
  ** Regular expression search library.
  **/
+#ifndef SCI_OWNREGEX
 
 /*
  * regex - Regular expression pattern matching and replacement
@@ -236,12 +237,6 @@ using namespace Scintilla::Internal;
 #define CLO     11
 #define CLQ     12 /* 0 to 1 closure */
 #define LCLO    13 /* lazy closure */
-
-// experimental
-#define EXP_MATCH_WORD_START	14
-#define EXP_MATCH_WORD_END		15
-#define EXP_MATCH_TO_WORD_END		16
-#define EXP_MATCH_TO_WORD_END_OPT	17
 
 #define END     0
 
@@ -639,11 +634,6 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 				break;
 			}
 
-			if (*p == '?' && *lp == EXP_MATCH_TO_WORD_END) {
-				*lp = EXP_MATCH_TO_WORD_END_OPT;
-				break;
-			}
-
 			if (*p == '+') {
 				for (sp = mp; lp < sp; lp++) {
 					*mp++ = *lp;
@@ -673,17 +663,6 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 				if (*sp == BOW)
 					return badpat("Null pattern inside \\<\\>");
 				*mp++ = EOW;
-				break;
-			case 'h':
-				*mp++ = EXP_MATCH_WORD_START;
-				break;
-			case 'H':
-				if (*sp == EXP_MATCH_WORD_START)
-					return badpat("Null pattern inside \\h\\H");
-				*mp++ = EXP_MATCH_WORD_END;
-				break;
-			case 'i':
-				*mp++ = EXP_MATCH_TO_WORD_END;
 				break;
 			case '1':
 			case '2':
@@ -840,11 +819,10 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 	}
 	default:			/* regular matching all the way. */
 		while (lp < endp) {
-			Sci::Position offset = 1;
-			ep = PMatch(ci, lp, endp, ap, 1, &offset);
+			ep = PMatch(ci, lp, endp, ap);
 			if (ep != NOTFOUND)
 				break;
-			lp += offset;
+			lp++;
 		}
 		break;
 	case END:			/* munged automaton. fail always */
@@ -897,7 +875,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 #define CHRSKIP 3	/* [CLO] CHR chr END      */
 #define CCLSKIP 34	/* [CLO] CCL 32 bytes END */
 
-Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap, int moveDir, Sci::Position *offset) {
+Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap) {
 	uint8_t op;
 
 	while ((op = *ap++) != END) {
@@ -942,39 +920,6 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			if (lp == bol || !iswordc(ci.CharAt(lp - 1)) || iswordc(ci.CharAt(lp)))
 				return NOTFOUND;
 			break;
-		case EXP_MATCH_WORD_START:
-			if (!ci.IsWordStartAt(lp)) {
-				if (offset) {
-					Sci::Position e = ci.MovePositionOutsideChar(lp, moveDir);
-					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
-					*offset = (e == 0) ? moveDir : e;
-				}
-				return NOTFOUND;
-			}
-			break;
-		case EXP_MATCH_WORD_END:
-			if (lp == bol || !ci.IsWordEndAt(lp)) {
-				if (offset) {
-					Sci::Position e = ci.MovePositionOutsideChar(lp, moveDir);
-					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
-					*offset = (e == 0) ? moveDir : e;
-				}
-				return NOTFOUND;
-			}
-			break;
-		case EXP_MATCH_TO_WORD_END:
-		case EXP_MATCH_TO_WORD_END_OPT: {
-			Sci::Position e = ci.ExtendWordSelect(lp, moveDir);
-			if ((e == lp && op != EXP_MATCH_TO_WORD_END_OPT) || !ci.IsWordEndAt(e)) {
-				if (offset) {
-					e = (e == lp) ? ci.NextPosition(lp, moveDir) - lp : e - lp;
-					*offset = (e == 0) ? moveDir : e;
-				}
-				return NOTFOUND;
-			}
-			lp = e;
-		}
-		break;
 		case REF: {
 			const int n = static_cast<uint8_t>(*ap++);
 			Sci::Position bp = bopat[n];	/* beginning of subpat... */
@@ -1028,15 +973,14 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			Sci::Position llp = lp;	/* lazy lp for LCLO       */
 			Sci::Position e = NOTFOUND; /* extra pointer for CLO  */
 			while (llp >= are) {
-				Sci::Position qoff = -1;
-				const Sci::Position q = PMatch(ci, llp, endp, ap, -1, &qoff);
+				const Sci::Position q = PMatch(ci, llp, endp, ap);
 				if (q != NOTFOUND) {
 					e = q;
 					lp = llp;
 					if (op != LCLO) return e;
 				}
 				if (*ap == END) return e;
-				llp += qoff;
+				--llp;
 			}
 			if (*ap == EOT)
 				PMatch(ci, lp, endp, ap);
@@ -1049,3 +993,5 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 	}
 	return lp;
 }
+
+#endif // SCI_OWNREGEX

@@ -235,7 +235,6 @@ LexerConfigMap = {
 		'default_encoding': 'ANSI',
 		'default_line_ending': 'CRLF',
 		'line_comment_string': '@rem ',
-		'line_comment_at_line_start': True,
 		'comment_style_marker': 'SCE_BAT_COMMENT',
 		'escape_char_start': '^',
 		'escape_char_style': 'SCE_BAT_ESCAPECHAR',
@@ -257,11 +256,11 @@ LexerConfigMap = {
 
 	'NP2LEX_CIL': {
 		'cpp_style_comment': True,
-		'comment_style_marker': 'SCE_C_COMMENTLINE',
-		'operator_style': ['SCE_C_OPERATOR'],
+		'comment_style_marker': 'SCE_CIL_COMMENTBLOCK',
+		'operator_style': ['SCE_CIL_OPERATOR'],
 		'cpp_preprocessor': True,
 		'extra_word_char': '$',
-		'string_style_range': ['SCE_C_CHARACTER', 'SCE_C_STRING'],
+		'string_style_range': ['SCE_CIL_CHARACTER', 'SCE_CIL_STRING'],
 	},
 	'NP2LEX_CMAKE': {
 		'line_comment_string': '#',
@@ -337,7 +336,8 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_CSHARP_CHARACTER', 'SCE_CSHARP_PREPROCESSOR_MESSAGE'],
 	},
 	'NP2LEX_CSS': {
-		'cpp_style_comment': True,
+		'line_comment_string': ('', '//'),
+		'block_comment_string': ('/*', '*/'),
 		'comment_style_marker': 'SCE_CSS_CDO_CDC',
 		'escape_char_style': 'SCE_CSS_ESCAPECHAR',
 		'operator_style': ['SCE_CSS_OPERATOR'],
@@ -388,8 +388,6 @@ LexerConfigMap = {
 	'NP2LEX_FORTRAN': {
 		'default_fold_ignore_inner': 'SCE_F_FUNCTION_DEFINITION',
 		'line_comment_string': ['!'], # omited '*'
-		'block_comment_string': ('#if 0', '#endif'),
-		'block_comment_on_new_line': True,
 		'comment_style_marker': 'SCE_F_COMMENT',
 		'escape_char_style': 'SCE_F_ESCAPECHAR',
 		'character_prefix': ['b', 'B', 'o', 'O', 'z', 'Z'],
@@ -639,11 +637,11 @@ LexerConfigMap = {
 	'NP2LEX_LISP': {
 		'line_comment_string': ';',
 		'block_comment_string': ('#|',  '|#'),
-		'comment_style_marker': 'SCE_C_COMMENTLINE',
-		'none_quote_style': 'SCE_C_OPERATOR',
-		'operator_style': ['SCE_C_OPERATOR'],
+		'comment_style_marker': 'SCE_LISP_TASKMARKER',
+		'none_quote_style': 'SCE_LISP_OPERATOR',
+		'operator_style': ['SCE_LISP_OPERATOR'],
 		'extra_word_char': '-',
-		'string_style_range': ['SCE_C_CHARACTER', 'SCE_C_STRING'],
+		'string_style_range': ['SCE_LISP_CHARACTER', 'SCE_LISP_STRING'],
 	},
 	'NP2LEX_LLVM': {
 		'line_comment_string': ';',
@@ -690,7 +688,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
-		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT'],
+		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT', 'SCE_MARKDOWN_COMMENT_LINK'],
 		'default_fold_level': ['header1', 'header2', 'header3'],
 		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
 		'escape_punctuation': True,
@@ -843,8 +841,6 @@ LexerConfigMap = {
 
 	'NP2LEX_RLANG': {
 		'line_comment_string': '#',
-		'block_comment_string': ('if (FALSE) {', '}'),
-		'block_comment_on_new_line': True,
 		'comment_style_marker': 'SCE_R_TASKMARKER',
 		'shebang_exe_name': 'Rscript',
 		'default_fold_level': ['function'],
@@ -976,8 +972,6 @@ LexerConfigMap = {
 
 	'NP2LEX_TCL': {
 		'line_comment_string': '#',
-		'block_comment_string': ('if (0) {', '}'),
-		'block_comment_on_new_line': True,
 		'comment_style_marker': 'SCE_TCL_TASKMARKER',
 		'shebang_exe_name': 'wish',
 		'printf_format_specifier': True,
@@ -1054,7 +1048,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_VHDL_CHARACTER', 'SCE_VHDL_STRING'],
 	},
 	'NP2LEX_VIM': {
-		'line_comment_string': '"',
+		'line_comment_string': ('"', '#'),
 		'comment_style_marker': 'SCE_VIM_TASKMARKER',
 		'escape_char_style': 'SCE_YAML_ESCAPECHAR',
 		'raw_string_style': ['SCE_VIM_STRING_SQ'],
@@ -1082,6 +1076,15 @@ LexerConfigMap = {
 		'operator_style': ['SCE_WASM_OPERATOR'],
 		'extra_word_char': '-@%$',
 		'string_style_range': ['SCE_WASM_STRING', 'SCE_WASM_ESCAPECHAR'],
+	},
+	'NP2LEX_WINHEX': {
+		'line_comment_string': '//',
+		'comment_style_marker': 'SCE_WINHEX_COMMENTLINE',
+		'operator_style': ['SCE_WINHEX_OPERATOR'],
+		'escape_char_style': 'SCE_WINHEX_ESCAPECHAR',
+		'escape_punctuation': True,
+		'extra_word_char': '-',
+		'string_style_range': ['SCE_WINHEX_STRING', 'SCE_WINHEX_ESCAPECHAR'],
 	},
 	'NP2LEX_XML': {
 		'line_comment_string': ['//', "'", '#'],
@@ -1352,9 +1355,9 @@ def BuildLexerCommentString():
 				line_comment_string = line_comment_string[0]
 			if isinstance(line_comment_string, str):
 				start = config.get('line_comment_at_line_start', False)
-				argument = 'true' if start else 'false'
+				argument = ' lineStart = true;' if start else ''
 				start = escape_c_string(line_comment_string)
-				code = (f'{indent}EditToggleLineComments(L"{start}", {argument});', indent + 'break;', '')
+				code = (f'{indent}pwszComment = L"{start}";{argument}', indent + 'break;', '')
 				commentLine[rid] = code
 			else:
 				complexLine.append(rid)
@@ -1365,9 +1368,9 @@ def BuildLexerCommentString():
 			if isinstance(block_comment_string, tuple):
 				assert len(block_comment_string) == 2, (rid, block_comment_string)
 				newline = config.get('block_comment_on_new_line', False)
-				suffix = 'NewLine' if newline else ''
+				suffix = ' newLine = true;' if newline else ''
 				start, end = escape_c_string(block_comment_string[0]), escape_c_string(block_comment_string[1])
-				code = (f'{indent}EditEncloseSelection{suffix}(L"{start}", L"{end}");', indent + 'break;', '')
+				code = (f'{indent}pwszOpen = L"{start}"; pwszClose = L"{end}";{suffix}', indent + 'break;', '')
 				commentBlock[rid] = code
 			else:
 				complexBlock.append(rid)

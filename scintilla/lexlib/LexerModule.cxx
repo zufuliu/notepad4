@@ -99,6 +99,7 @@ extern LexerModule lmVHDL;
 extern LexerModule lmVim;
 extern LexerModule lmVisualBasic;
 extern LexerModule lmWASM;
+extern LexerModule lmWinHex;
 extern LexerModule lmXML;
 extern LexerModule lmYAML;
 extern LexerModule lmZig;
@@ -181,6 +182,7 @@ const LexerModule * const lexerCatalogue[] = {
 	&lmVim,
 	&lmVisualBasic,
 	&lmWASM,
+	&lmWinHex,
 	&lmXML,
 	&lmYAML,
 	&lmZig,

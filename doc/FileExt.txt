@@ -108,6 +108,7 @@ Python Script
 	bzl				Bazel BUILD file, https://docs.bazel.build/versions/main/build-ref.html
 	bazel
 	BUILD
+	mojo			https://docs.modular.com/mojo/programming-manual.html
 
 Ruby Script
 	rb
@@ -416,6 +417,7 @@ Markdown
 	mkd
 
 	litcoffee		Literate CoffeeScript
+	Rmd				R Markdown, https://rmarkdown.rstudio.com/
 
 Mathematica
 	m				Module
@@ -582,6 +584,10 @@ Visual Basic
 WebAssembly
 	wat
 	wast
+
+WinHex Script
+	whs
+	tpl				Template Definition
 
 YAML Document
 	yml

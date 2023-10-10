@@ -1033,21 +1033,51 @@ static inline void ExitApplication(HWND hwnd) {
 	}
 }
 
-void OnDropOneFile(HWND hwnd, LPCWSTR szBuf) {
-	// Reset Change Notify
-	//bPendingChangeNotify = false;
-	if (IsIconic(hwnd)) {
-		ShowWindow(hwnd, SW_RESTORE);
-	}
-	//SetForegroundWindow(hwnd);
-	if (PathIsDirectory(szBuf)) {
-		WCHAR tchFile[MAX_PATH];
-		if (OpenFileDlg(tchFile, COUNTOF(tchFile), szBuf)) {
-			FileLoad(FileLoadFlag_Default, tchFile);
+void MsgDropFiles(HWND hwnd, UINT umsg, WPARAM wParam) {
+	UNREFERENCED_PARAMETER(umsg);
+	HDROP hDrop = (HDROP)wParam;
+	// fix drag & drop file from 32-bit app to 64-bit Notepad2 before Win 10
+#if defined(_WIN64) && (_WIN32_WINNT < _WIN32_WINNT_WIN10)
+	if (umsg == WM_DROPFILES) {
+		POINT pt;
+		if (DragQueryPoint(hDrop, &pt)) { // client area
+			RECT rc;
+			ClientToScreen(hwnd, &pt);
+			GetWindowRect(hwndEdit, &rc);
+			if (PtInRect(&rc, pt)) { // already processed APPM_DROPFILES
+				DragFinish(hDrop);
+				return;
+			}
 		}
-	} else {
-		FileLoad(FileLoadFlag_Default, szBuf);
 	}
+#endif
+	//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
+	//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
+	//}
+	WCHAR szBuf[MAX_PATH + 40];
+	if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
+		LPCWSTR path = szBuf;
+		// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
+		LPCWSTR t = StrRChrW(path, NULL, L'|');
+		if (t) {
+			path = t + 1;
+		}
+		// Reset Change Notify
+		//bPendingChangeNotify = false;
+		if (IsIconic(hwnd)) {
+			ShowWindow(hwnd, SW_RESTORE);
+		}
+		//SetForegroundWindow(hwnd);
+		if (PathIsDirectory(path)) {
+			WCHAR tchFile[MAX_PATH];
+			if (OpenFileDlg(tchFile, COUNTOF(tchFile), path)) {
+				FileLoad(FileLoadFlag_Default, tchFile);
+			}
+		} else {
+			FileLoad(FileLoadFlag_Default, path);
+		}
+	}
+	DragFinish(hDrop);
 }
 
 #if NP2_ENABLE_DOT_LOG_FEATURE
@@ -1238,24 +1268,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		//	PostMessage(hwnd, APPM_CHANGENOTIFY, 0, 0);
 		break;
 
-	case WM_DROPFILES: {
-		WCHAR szBuf[MAX_PATH + 40];
-		HDROP hDrop = (HDROP)wParam;
-		if (DragQueryFile(hDrop, 0, szBuf, COUNTOF(szBuf))) {
-			LPCWSTR p = szBuf;
-			// Visual Studio: {UUID}|Solution\Project.[xx]proj|path
-			LPCWSTR t = StrRChrW(p, NULL, L'|');
-			if (t) {
-				p = t + 1;
-			}
-			OnDropOneFile(hwnd, p);
-		}
-		//if (DragQueryFile(hDrop, (UINT)(-1), NULL, 0) > 1) {
-		//	MsgBoxWarn(MB_OK, IDS_ERR_DROP);
-		//}
-		DragFinish(hDrop);
-	}
-	break;
+	case WM_DROPFILES:
+	case APPM_DROPFILES:
+		MsgDropFiles(hwnd, umsg, wParam);
+		break;
 
 	case WM_COPYDATA: {
 		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
@@ -1940,6 +1956,12 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	SetDlgItemInt(hwnd, IDC_REUSELOCK, GetTickCount(), FALSE);
 
 	// Drag & Drop
+#if 0//_WIN32_WINNT >= _WIN32_WINNT_WIN7
+	// enable drop file onto non-client area for elevated Notepad2
+	ChangeWindowMessageFilterEx(hwnd, WM_DROPFILES, MSGFLT_ADD, NULL);
+	ChangeWindowMessageFilterEx(hwnd, WM_COPYDATA, MSGFLT_ADD, NULL);
+	ChangeWindowMessageFilterEx(hwnd, 0x0049 /*WM_COPYGLOBALDATA*/, MSGFLT_ADD, NULL);
+#endif
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
@@ -3692,11 +3714,11 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_EDIT_LINECOMMENT:
-		EditToggleCommentLine();
+		EditToggleCommentLine(false);
 		break;
 
 	case IDM_EDIT_STREAMCOMMENT:
-		EditToggleCommentBlock();
+		EditToggleCommentBlock(false);
 		break;
 
 	case IDM_EDIT_URLENCODE:
@@ -7449,14 +7471,10 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 	GetLongPathName(szFileName, szFileName, COUNTOF(szFileName));
 	PathGetLnkPath(szFileName, szFileName);
 
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EditFileIOStatus status = {
-		.iEncoding = iCurrentEncoding,
-		.iEOLMode = iCurrentEOLMode,
-	};
-#else
-	EditFileIOStatus status = { iCurrentEncoding, iCurrentEOLMode };
-#endif
+	EditFileIOStatus status;
+	memset(&status, 0, sizeof(status));
+	status.iEncoding = iCurrentEncoding;
+	status.iEOLMode = iCurrentEOLMode;
 
 	// Ask to create a new file...
 	if (!(loadFlag & FileLoadFlag_Reload) && !PathIsFile(szFileName)) {
@@ -7667,14 +7685,10 @@ bool FileSave(FileSaveFlag saveFlag) {
 
 	bool fSuccess = false;
 	WCHAR tchFile[MAX_PATH];
-#if NP2_USE_DESIGNATED_INITIALIZER
-	EditFileIOStatus status = {
-		.iEncoding = iCurrentEncoding,
-		.iEOLMode = iCurrentEOLMode,
-	};
-#else
-	EditFileIOStatus status = { iCurrentEncoding, iCurrentEOLMode };
-#endif
+	EditFileIOStatus status;
+	memset(&status, 0, sizeof(status));
+	status.iEncoding = iCurrentEncoding;
+	status.iEOLMode = iCurrentEOLMode;
 
 	// Read only...
 	if (!(saveFlag & (FileSaveFlag_SaveAs | FileSaveFlag_SaveCopy)) && !Untitled) {

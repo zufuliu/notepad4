@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 14 February 2023
-// 2023-06-17 https://drafts.csswg.org/
+// 2023-08-12 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -9,6 +9,21 @@
 @charset ;
 // https://www.w3.org/TR/css-syntax-3/ 24 December 2021
 !important
+
+// CSS Anchor Positioning https://www.w3.org/TR/css-anchor-position-1/ 29 June 2023
+{
+	anchor-name:;
+	anchor-default: implicit;
+	anchor-scroll: none | default;
+	position-fallback: none;
+	position-fallback-bounds: normal;
+}
+anchor()
+auto auto-same top left right bottom start end self-start self-end center
+anchor-size()
+width height block inline self-block self-inline
+@position-fallback {}
+@try {}
 
 // CSS Animations Level 2 https://www.w3.org/TR/css-animations-2/ 2 June 2023
 // CSS Animations Level 1 https://www.w3.org/TR/css-animations-1/ 2 March 2023
@@ -1170,7 +1185,7 @@ view()
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 1 March 2023
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 29 March 2023
 // CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 13 February 2023
 // Text https://www.w3.org/TR/CSS22/text.html
 {
@@ -1280,7 +1295,7 @@ pow() sqrt() hypot() log() exp()
 abs() sign()
 pi infinity NaN
 
-// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 30 May 2023
+// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 3 August 2023
 {
 	view-transition-name: none;
 }
@@ -1373,7 +1388,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 18 May 2023
+// Compatibility https://compat.spec.whatwg.org/ 19 June 2023
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

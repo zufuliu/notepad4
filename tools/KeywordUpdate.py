@@ -108,6 +108,7 @@ lexerList = [
 
 	# https://github.com/WebAssembly/wabt/blob/main/src/lexer-keywords.txt
 	('NP2LEX_WASM', 'stlWASM.c', 'LexWASM.cxx', 'wasm-lexer-keywords.txt', 0, parse_wasm_lexer_keywords),
+	('NP2LEX_WINHEX', 'stlWinHex.c', 'LexWinHex.cxx', 'WinHex.whs', 0, parse_winhex_api_file),
 	('NP2LEX_XML', 'stlXML.c', 'LexHTML.cxx', '', 0, parse_xml_api_file),
 	('NP2LEX_YAML', 'stlYAML.c', 'LexYAML.cxx', '', 0, parse_yaml_api_file),
 	('NP2LEX_ZIG', 'stlZig.c', 'LexZig.cxx', 'Zig.zig', 0, parse_zig_api_file),

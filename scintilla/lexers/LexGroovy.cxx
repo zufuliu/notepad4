@@ -110,7 +110,7 @@ constexpr bool IsSpaceEquiv(int state) noexcept {
 
 constexpr bool FollowExpression(int chPrevNonWhite, int stylePrevNonWhite) noexcept {
 	return chPrevNonWhite == ')' || chPrevNonWhite == ']'
-		|| stylePrevNonWhite == SCE_GROOVY_OPERATOR_PF
+		|| (stylePrevNonWhite >= SCE_GROOVY_OPERATOR_PF && stylePrevNonWhite <= SCE_GROOVY_NUMBER)
 		|| IsIdentifierCharEx(chPrevNonWhite);
 }
 
@@ -289,6 +289,8 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 								// type<>, type<?>, type<? super T>
 								// type<type>
 								// type<type<type>>
+								// type<type, type>
+								// class type implements interface, interface {}
 								sc.ChangeState(SCE_GROOVY_CLASS);
 							} else if (IsIdentifierStartEx(chNext)) {
 								// type identifier
@@ -510,7 +512,7 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					: ((sc.chPrev == '.') ? SCE_GROOVY_ATTRIBUTE_AT
 						: ((sc.chNext == 'i') ? SCE_GROOVY_IDENTIFIER : SCE_GROOVY_ANNOTATION));
 				sc.SetState(state);
-			} else if (isoperator(sc.ch)) {
+			} else if (IsAGraphic(sc.ch)) {
 				sc.SetState(SCE_GROOVY_OPERATOR);
 				if (!nestedState.empty()) {
 					if (sc.ch == '{') {

@@ -6,17 +6,14 @@
 // Based on the work of Ozan S. Yigit.
 // This file is in the public domain.
 #pragma once
+#ifndef SCI_OWNREGEX
 
 namespace Scintilla::Internal {
 
 class CharacterIndexer {
 public:
 	virtual char CharAt(Sci::Position index) const noexcept = 0;
-	virtual bool IsWordStartAt(Sci::Position pos) const noexcept = 0;
-	virtual bool IsWordEndAt(Sci::Position pos) const noexcept = 0;
 	virtual Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept = 0;
-	virtual Sci::Position NextPosition(Sci::Position pos, int moveDir) const noexcept = 0;
-	virtual Sci::Position ExtendWordSelect(Sci::Position pos, int delta) const noexcept = 0;
 };
 
 class RESearch {
@@ -48,7 +45,7 @@ private:
 	int GetBackslashExpression(const char *pattern, int &incr) noexcept;
 
 	const char *DoCompile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept;
-	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap, int moveDir = 1, Sci::Position *offset = nullptr);
+	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap);
 
 	Sci::Position bol;
 	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */
@@ -70,3 +67,5 @@ private:
 };
 
 }
+
+#endif // SCI_OWNREGEX

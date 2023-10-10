@@ -1,0 +1,169 @@
+// 20.9 https://www.x-ways.net/winhex/index-m.html
+// http://www.winhex.com/winhex/index-m.html
+
+//! keywords		===========================================================
+// Template Definition
+template "title"
+description "description"
+applies_to (file/disk/RAM)
+fixed_start offset
+sector-aligned
+requires offset "hex values"
+big-endian
+hexadecimal
+octal
+read-only
+multiple fixed overall size
+begin
+end
+numbering
+section "...Section Title..."
+endsection
+
+// modifier
+big-endian
+little-endian
+hexadecimal
+decimal
+octal
+read-only
+read-write
+
+//! type			===========================================================
+int8 uint8 byte int16 uint16 int24 uint24 int32
+uint32 uint48 int64
+uint_flex
+binary
+float single real double longdouble extended
+char char16 string string16
+zstring zstring16
+boole8 boolean boole16 boole32
+hex
+DOSDateTime FileTime OLEDateTime SQLDateTime UNIXDateTime
+time_t JavaDateTime AppleDateTime
+GUID
+uint_flex
+
+//! commands		===========================================================
+Create "D:\My File.txt" 1000
+Open "D:\My File.txt"
+Open "D:\*.txt"
+Open C:
+Open D:
+Open 80h
+Open 81h
+Open 9Eh
+CreateBackup
+CreateBackupEx 0 100000 650 true "F:\My backup.whx"
+Goto 0x128
+Goto MyVariable
+Move -100
+Write "Test"
+Write 0x0D0A
+Write MyVariable
+Write2
+Insert "Test"
+Read MyVariable 10
+ReadLn MyVariable
+Close
+CloseAll
+Save
+SaveAs "C:\New Name.txt"
+SaveAll
+Terminate
+Exit
+ExitIfNoFilesOpen
+Block 100 200
+Block "My Variable 1" "My Variable 2"
+Block1 0x100
+Block2 0x200
+Copy
+Cut
+Remove
+CopyIntoNewFile "D:\New File.dat"
+CopyIntoNewFile "D:\File +MyVariable+.dat"
+Paste
+WriteClipboard
+Convert Param1 Param2
+AESEncrypt "My Password"
+AESDecrypt "My Password"
+Find "John" [MatchCase MatchWord Down Up BlockOnly SaveAllPos Unicode Wildcards]
+Find 0x1234 [Down Up BlockOnly SaveAllPos Wildcards]
+ReplaceAll "Jon" "Don" [MatchCase MatchWord Down Up BlockOnly Unicode Wildcards]
+ReplaceAll 0x0A 0x0D0A [Down Up BlockOnly Wildcards]
+IfFound
+EndIf
+IfEqual MyVariable "Hello World"
+EndIf
+IfEqual 0x12345678 MyVariable
+EndIf
+IfEqual MyVariable 1000
+EndIf
+IfEqual MyVariable MyOtherVariable
+EndIf
+IfEqual MyVariable (10*MyOtherVariable)
+EndIf
+IfGreater MyVariable "Hello World"
+EndIf
+IfGreater 0x12345678 MyVariable
+EndIf
+IfGreater MyVariable 1000
+EndIf
+IfGreater MyVariable MyOtherVariable
+EndIf
+IfGreater MyVariable (10*MyOtherVariable)
+Else
+EndIf
+ExitLoop
+Label ContinueHere
+JumpTo ContinueHere
+NextObj
+ForAllObjDo
+CopyFile C:\A.dat D:\B.dat
+MoveFile C:\A.dat D:\B.dat
+DeleteFile C:\A.dat
+InitFreeSpace
+InitSlackSpace
+InitMFTRecords
+Assign MyVariable 12345
+Assign MyVariable 0x0D0A
+Assign MyVariable "I like WinHex"
+Assign MyVariable MyOtherVariable
+Release MyVariable
+SetVarSize MyVariable 1
+SetVarSize MyVariable 4
+GetUserInput MyVariable "Please enter your name:"
+GetUserInputI MyIntegerVariable "Please enter your age:"
+Inc MyVariable
+Dec MyVariable
+IntToStr MyStr MyInt
+IntToStr MyStr 12345
+StrToInt MyInt MyStr
+StrCat MyString MyString2
+StrCat MyString ".txt"
+GetClusterAlloc MyStr
+GetClusterAllocEx IntVar
+GetClusterSize IntVar
+InterpretImageAsDisk
+CalcHash HashType MyVariable
+CalcHashEx HashType MyVariable
+MessageBox "Caution"
+ExecuteScript "ScriptName"
+Turbo On
+Turbo Off
+Debug
+UseLogFile
+CurrentPos
+GetSize
+unlimited
+
+//! misc			===========================================================
+true false On Off
+// applies_to
+file disk RAM
+// Convert
+ANSI IBM Binary HexASCII IntelHex MotorolaS Base64 UUCode LowerCase UpperCase
+hiberfil
+// Find
+MatchCase MatchWord Down Up BlockOnly SaveAllPos Unicode Wildcards
+Down Up BlockOnly SaveAllPos Wildcards

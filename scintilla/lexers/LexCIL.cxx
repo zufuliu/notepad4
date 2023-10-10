@@ -59,103 +59,103 @@ void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 		}
 
 		switch (state) {
-		case SCE_C_OPERATOR:
+		case SCE_CIL_OPERATOR:
 			styler.ColorTo(i, state);
-			state = SCE_C_DEFAULT;
+			state = SCE_CIL_DEFAULT;
 			break;
-		case SCE_C_NUMBER:
+		case SCE_CIL_NUMBER:
 			if (!IsDecimalNumber(chPrev, ch, chNext)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 			}
 			break;
-		case SCE_C_DIRECTIVE:
-		case SCE_C_ASM_INSTRUCTION:
+		case SCE_CIL_DIRECTIVE:
+		case SCE_CIL_INSTRUCTION:
 			if (!IsCILWordChar(ch)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 			}
 			break;
-		case SCE_C_IDENTIFIER:
+		case SCE_CIL_IDENTIFIER:
 			if (!(iswordstart(ch) || ch == '$')) {
 				buf[wordLen] = '\0';
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 				if (keywords.InList(buf)) {
-					styler.ColorTo(i, SCE_C_WORD);
+					styler.ColorTo(i, SCE_CIL_WORD);
 				} else if (keywords2.InList(buf)) {
-					styler.ColorTo(i, SCE_C_WORD2);
+					styler.ColorTo(i, SCE_CIL_WORD2);
 				} else if (kwInstruction.InList(buf)) {
-					state = SCE_C_ASM_INSTRUCTION;
+					state = SCE_CIL_INSTRUCTION;
 				} else if (ch == ':' && chNext != ':') {
-					styler.ColorTo(i, SCE_C_LABEL);
+					styler.ColorTo(i, SCE_CIL_LABEL);
 				}
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
-		case SCE_C_STRING:
-		case SCE_C_CHARACTER:
+		case SCE_CIL_STRING:
+		case SCE_CIL_CHARACTER:
 			if (atLineStart) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 			} else if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
-			} else if ((state == SCE_C_STRING && ch == '\"') || (state == SCE_C_CHARACTER && ch == '\'')) {
+			} else if ((state == SCE_CIL_STRING && ch == '\"') || (state == SCE_CIL_CHARACTER && ch == '\'')) {
 				styler.ColorTo(i + 1, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 				continue;
 			}
 			break;
-		case SCE_C_COMMENTLINE:
+		case SCE_CIL_COMMENTLINE:
 			if (atLineStart) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 			}
 			break;
-		case SCE_C_COMMENT:
+		case SCE_CIL_COMMENTBLOCK:
 			if (ch == '*' && chNext == '/') {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 				styler.ColorTo(i + 1, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_CIL_DEFAULT;
 				continue;
 			}
 			break;
 		}
 
-		if (state == SCE_C_DEFAULT) {
+		if (state == SCE_CIL_DEFAULT) {
 			if (ch == '/' && chNext == '/') {
 				styler.ColorTo(i, state);
-				state = SCE_C_COMMENTLINE;
+				state = SCE_CIL_COMMENTLINE;
 			} else if (ch == '/' && chNext == '*') {
 				styler.ColorTo(i, state);
-				state = SCE_C_COMMENT;
+				state = SCE_CIL_COMMENTBLOCK;
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
 				styler.ColorTo(i, state);
-				state = SCE_C_STRING;
+				state = SCE_CIL_STRING;
 			} else if (ch == '\'') {
 				styler.ColorTo(i, state);
-				state = SCE_C_CHARACTER;
+				state = SCE_CIL_CHARACTER;
 			} else if (IsNumberStart(ch, chNext)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_NUMBER;
+				state = SCE_CIL_NUMBER;
 			} else if (ch == '.' && IsAlpha(chNext) && (IsCILOp(chPrev) || IsASpace(chPrev))) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DIRECTIVE;
+				state = SCE_CIL_DIRECTIVE;
 			} else if (iswordstart(ch)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_IDENTIFIER;
+				state = SCE_CIL_IDENTIFIER;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 			} else if (IsCILOp(ch)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_OPERATOR;
+				state = SCE_CIL_OPERATOR;
 			}
 		}
 	}
@@ -164,8 +164,8 @@ void ColouriseCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	styler.ColorTo(endPos, state);
 }
 
-#define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_C_COMMENTLINE)
-#define IsStreamCommentStyle(style)	((style) == SCE_C_COMMENT)
+#define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_CIL_COMMENTLINE)
+#define IsStreamCommentStyle(style)	((style) == SCE_CIL_COMMENTBLOCK)
 void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -197,7 +197,7 @@ void FoldCILDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			}
 		}
 
-		if (style == SCE_C_OPERATOR) {
+		if (style == SCE_CIL_OPERATOR) {
 			if (ch == '{' || ch == '[' || ch == '(') {
 				levelNext++;
 			} else if (ch == '}' || ch == ']' || ch == ')') {

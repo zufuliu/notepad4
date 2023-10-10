@@ -59,89 +59,89 @@ void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 		}
 
 		switch (state) {
-		case SCE_C_OPERATOR:
+		case SCE_LISP_OPERATOR:
 			styler.ColorTo(i, state);
-			state = SCE_C_DEFAULT;
+			state = SCE_LISP_DEFAULT;
 			break;
-		case SCE_C_NUMBER:
+		case SCE_LISP_NUMBER:
 			if (!IsDecimalNumber(chPrev, ch, chNext)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_LISP_DEFAULT;
 			}
 			break;
-		case SCE_C_IDENTIFIER:
+		case SCE_LISP_IDENTIFIER:
 			if (!(iswordchar(ch) || ch == '-')) {
 				buf[wordLen] = '\0';
 				if (keywords.InList(buf)) {
-					styler.ColorTo(i, SCE_C_WORD);
+					styler.ColorTo(i, SCE_LISP_KEYWORD);
 				}
-				state = SCE_C_DEFAULT;
+				state = SCE_LISP_DEFAULT;
 			} else if (wordLen < MAX_WORD_LENGTH) {
 				buf[wordLen++] = static_cast<char>(ch);
 			}
 			break;
-		case SCE_C_CHARACTER:
+		case SCE_LISP_CHARACTER:
 			styler.ColorTo(i + 1, state);
-			state = SCE_C_DEFAULT;
+			state = SCE_LISP_DEFAULT;
 			continue;
-		case SCE_C_STRING:
+		case SCE_LISP_STRING:
 			if (ch == '\\' && (chNext == '\\' || chNext == '\"')) {
 				i++;
 				ch = chNext;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (ch == '\"') {
 				styler.ColorTo(i + 1, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_LISP_DEFAULT;
 				continue;
 			}
 			break;
-		case SCE_C_COMMENTLINE:
+		case SCE_LISP_COMMENTLINE:
 			if (atLineStart) {
 				styler.ColorTo(i, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_LISP_DEFAULT;
 			}
 			break;
-		case SCE_C_COMMENT:
+		case SCE_LISP_COMMENTBLOCK:
 			if (ch == '|' && chNext == '#') {
 				i++;
 				chNext = styler.SafeGetCharAt(i + 1);
 				styler.ColorTo(i + 1, state);
-				state = SCE_C_DEFAULT;
+				state = SCE_LISP_DEFAULT;
 				continue;
 			}
 			break;
 		}
 
-		if (state == SCE_C_DEFAULT) {
+		if (state == SCE_LISP_DEFAULT) {
 			if (((ch == '?' || ch == '#') && chNext == '\\') || (ch == '?' && IsGraphic(chNext))) {
 				styler.ColorTo(i, state);
-				state = SCE_C_CHARACTER;
+				state = SCE_LISP_CHARACTER;
 				if (chNext == '\\') {
 					i++;
 					chNext = styler.SafeGetCharAt(i + 1);
 				}
 			} else if (ch == ';') {
 				styler.ColorTo(i, state);
-				state = SCE_C_COMMENTLINE;
+				state = SCE_LISP_COMMENTLINE;
 			} else if (ch == '\"') {
 				styler.ColorTo(i, state);
-				state = SCE_C_STRING;
+				state = SCE_LISP_STRING;
 			} else if (ch == '#' && chNext == '|') {
 				styler.ColorTo(i, state);
-				state = SCE_C_COMMENT;
+				state = SCE_LISP_COMMENTBLOCK;
 				i++;
 				chNext = styler.SafeGetCharAt(i + 1);
 			} else if (IsNumberStart(ch, chNext)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_NUMBER;
+				state = SCE_LISP_NUMBER;
 			} else if (iswordstart(ch)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_IDENTIFIER;
+				state = SCE_LISP_IDENTIFIER;
 				buf[0] = static_cast<char>(ch);
 				wordLen = 1;
 			} else if (IsLispOp(ch)) {
 				styler.ColorTo(i, state);
-				state = SCE_C_OPERATOR;
+				state = SCE_LISP_OPERATOR;
 			}
 		}
 	}
@@ -150,9 +150,9 @@ void ColouriseLispDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 	styler.ColorTo(endPos, state);
 }
 
-#define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_C_COMMENTLINE)
-#define IsStreamStyle(style)		((style) == SCE_C_STRING)
-#define IsStreamCommantStyle(style)	((style) == SCE_C_COMMENT)
+#define IsCommentLine(line)			IsLexCommentLine(styler, line, SCE_LISP_COMMENTLINE)
+#define IsStreamStyle(style)		((style) == SCE_LISP_STRING)
+#define IsStreamCommantStyle(style)	((style) == SCE_LISP_COMMENTBLOCK)
 void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, LexerWordList, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
@@ -190,7 +190,7 @@ void FoldListDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			}
 		}
 
-		if (style == SCE_C_OPERATOR) {
+		if (style == SCE_LISP_OPERATOR) {
 			if (ch == '(')
 				levelNext++;
 			else if (ch == ')')

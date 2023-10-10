@@ -15,7 +15,8 @@ class SparseState {
 	struct State {
 		Sci_Position position;
 		T value;
-		explicit State(Sci_Position position_, T value_) noexcept : position(position_), value(value_) {
+		constexpr State(Sci_Position position_, T value_) noexcept :
+			position(position_), value(std::move(value_)) {
 		}
 		inline bool operator<(const State &other) const noexcept {
 			return position < other.position;

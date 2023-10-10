@@ -4181,8 +4181,12 @@ Sci::Position Editor::FindTextFull(
 			static_cast<FindOption>(wParam),
 			&lengthFound);
 		if (pos >= 0) {
+			Sci::Position endPos = pos + lengthFound;
+			if (wParam & static_cast<int>(FindOption::MatchToWordEnd)) {
+				endPos = pdoc->ExtendWordSelect(endPos, 1, true);
+			}
 			ft->chrgText.cpMin = pos;
-			ft->chrgText.cpMax = pos + lengthFound;
+			ft->chrgText.cpMax = endPos;
 		}
 		return pos;
 	} catch (const RegexError &) {
