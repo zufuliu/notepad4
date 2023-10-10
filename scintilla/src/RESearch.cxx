@@ -247,7 +247,11 @@ using namespace Scintilla::Internal;
 #define BLKIND  0370
 #define BITIND  07
 
+#ifndef NDEBUG
 #define badpat(x)	(*nfa = END, x)
+#else
+#define badpat(x)	(*nfa = END, "")
+#endif
 
 /*
  * Character classification table for word boundary operators BOW
@@ -261,8 +265,6 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	charClass = charClassTable;
 	sta = NOP;                  /* status of lastpat */
 	bol = 0;
-	previousPattern = nullptr;
-	previousLength = 0;
 	previousFlags = FindOption::None;
 	constexpr unsigned char nul = 0;
 	std::fill(bittab, std::end(bittab), nul);
@@ -271,31 +273,9 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	Clear();
 }
 
-void RESearch::ClearCache() noexcept {
-	sta = NOP;
-	previousPattern = nullptr;
-	previousLength = 0;
-	previousFlags = FindOption::None;
-}
-
 void RESearch::Clear() noexcept {
-	for (int i = 0; i < MAXTAG; i++) {
-		pat[i].clear();
-		bopat[i] = NOTFOUND;
-		eopat[i] = NOTFOUND;
-	}
-}
-
-void RESearch::GrabMatches(const CharacterIndexer &ci) {
-	for (unsigned int i = 0; i < MAXTAG; i++) {
-		if ((bopat[i] != NOTFOUND) && (eopat[i] != NOTFOUND)) {
-			const Sci::Position len = eopat[i] - bopat[i];
-			pat[i].resize(len);
-			for (Sci::Position j = 0; j < len; j++) {
-				pat[i][j] = ci.CharAt(bopat[i] + j);
-			}
-		}
-	}
+	std::fill(bopat, std::end(bopat), NOTFOUND);
+	std::fill(eopat, std::end(eopat), NOTFOUND);
 }
 
 void RESearch::ChSet(unsigned char c) noexcept {
@@ -359,9 +339,7 @@ constexpr int isinset(const char *ap, unsigned char c) noexcept {
  * @return the char if it resolves to a simple char,
  * or -1 for a char class. In this case, bittab is changed.
  */
-int RESearch::GetBackslashExpression(
-	const char *pattern,
-	int &incr) noexcept {
+int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 	// Since error reporting is primitive and messages are not used anyway,
 	// I choose to interpret unexpected syntax in a logical way instead
 	// of reporting errors. Otherwise, we can stick on, eg., PCRE behaviour.
@@ -445,20 +423,15 @@ int RESearch::GetBackslashExpression(
 }
 
 const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, FindOption flags) {
-	if (sta == OKP && (pattern == nullptr || length == 0
-		|| (pattern == previousPattern
-			&& length == previousLength
-			&& flags == previousFlags
-			&& memcmp(pattern, cachedPattern.data(), length) == 0)
-	)) {
+	if (sta == OKP && (flags == previousFlags
+		&& static_cast<size_t>(length) == cachedPattern.length()
+		&& memcmp(pattern, cachedPattern.data(), length) == 0)) {
 		return nullptr;
 	}
 
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	const char * const errmsg = DoCompile(pattern, length, caseSensitive, posix);
 	if (errmsg == nullptr) {
-		previousPattern = pattern;
-		previousLength = length;
 		previousFlags = flags;
 		cachedPattern.assign(pattern, length);
 	}

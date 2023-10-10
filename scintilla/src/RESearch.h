@@ -21,8 +21,6 @@ public:
 	explicit RESearch(const CharClassify *charClassTable);
 	// No dynamic allocation so default copy constructor and assignment operator are OK.
 	void Clear() noexcept;
-	void ClearCache() noexcept;
-	void GrabMatches(const CharacterIndexer &ci);
 	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, Scintilla::FindOption flags);
 	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
 
@@ -31,7 +29,6 @@ public:
 
 	Sci::Position bopat[MAXTAG];
 	Sci::Position eopat[MAXTAG];
-	std::string pat[MAXTAG];
 
 private:
 	static constexpr int MAXNFA = 4096;
@@ -54,8 +51,6 @@ private:
 	int failure;
 
 	// cache for previous pattern with same address, length and flags
-	const char *previousPattern;
-	Sci::Position previousLength;
 	Scintilla::FindOption previousFlags;
 	std::string cachedPattern;
 
