@@ -3068,12 +3068,6 @@ public:
 // appear to allow specializing basic_regex over these.
 
 #ifdef _WIN32
-#define WCHAR_T_IS_16 1
-#else
-#define WCHAR_T_IS_16 0
-#endif
-
-#if WCHAR_T_IS_16
 
 // On Windows, report non-BMP characters as 2 separate surrogates as that
 // matches wregex since it is based on wchar_t.
@@ -3215,7 +3209,7 @@ public:
 	}
 };
 
-#endif // WCHAR_T_IS_16
+#endif // _WIN32
 
 std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
@@ -3237,42 +3231,40 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	// mode and libc++ and libstdc++ always in single-line mode.
 	// If multiline regex worked well then the line by line iteration could be removed
 	// for the forwards case and replaced with the following 4 lines:
-#ifdef REGEX_MULTILINE
-	Iterator itStart(doc, resr.startPos);
-	Iterator itEnd(doc, resr.endPos);
-	const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
-	const bool matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
-#else
-	// Line by line.
 	bool matched = false;
-	for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
-		const Range lineRange = resr.LineRange(line);
-		Iterator itStart(doc, lineRange.start);
-		Iterator itEnd(doc, lineRange.end);
-		std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
+	if (resr.increment > 0) {
+		Iterator itStart(doc, resr.startPos);
+		Iterator itEnd(doc, resr.endPos);
+		const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
 		matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
-		// Check for the last match on this line.
-		if (matched) {
-			if (resr.increment < 0) {
-				while (matched) {
+	} else {
+		// Line by line.
+		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
+			const Range lineRange = resr.LineRange(line);
+			Iterator itStart(doc, lineRange.start);
+			Iterator itEnd(doc, lineRange.end);
+			std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
+			matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
+			// Check for the last match on this line.
+			if (matched) {
+				while (true) {
 					Iterator itNext(doc, match[0].second.PosRoundUp());
 					flagsMatch = MatchFlags(doc, itNext.Pos(), lineRange.end);
 					std::match_results<Iterator> matchNext;
-					matched = std::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch);
-					if (matched) {
+					if (std::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
 						if (match[0].first == match[0].second) {
 							// Empty match means failure so exit
 							return false;
 						}
 						match = matchNext;
+					} else {
+						break;
 					}
 				}
-				matched = true;
+				break;
 			}
-			break;
 		}
 	}
-#endif
 	if (matched) {
 		const size_t maxTag = std::min<size_t>(match.size(), RESearch::MAXTAG);
 		for (size_t co = 0; co < maxTag; co++) {
@@ -3294,7 +3286,7 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 		if (!caseSensitive)
 			flagsRe = flagsRe | std::regex::icase;
 
-#if defined(REGEX_MULTILINE)
+#if !defined(_MSC_VER)
 		flagsRe = flagsRe | std::regex::multiline;
 #endif
 
