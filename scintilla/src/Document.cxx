@@ -23,7 +23,10 @@
 #include <algorithm>
 #include <memory>
 
-#ifndef NO_CXX11_REGEX
+#if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
+#include <windows.h>
+#include <boost/regex.hpp>
+#elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
 #include <regex>
 #endif
 
@@ -48,7 +51,9 @@
 #include "Decoration.h"
 #include "CaseFolder.h"
 #include "Document.h"
+#ifndef SCI_OWNREGEX
 #include "RESearch.h"
+#endif
 #include "UniConversion.h"
 #include "ElapsedPeriod.h"
 
@@ -2935,16 +2940,60 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 	return -1;
 }
 
+namespace {
+
 #ifndef SCI_OWNREGEX
 
-namespace {
+// Define a way for the Regular Expression code to access the document
+class DocumentIndexer final : public CharacterIndexer {
+	const Document *pdoc;
+	Sci::Position end;
+public:
+	DocumentIndexer(const Document *pdoc_, Sci::Position end_) noexcept :
+		pdoc(pdoc_), end(end_) {}
+
+	char CharAt(Sci::Position index) const noexcept override {
+		if (IsValidIndex(index, end))
+			return pdoc->CharAt(index);
+		else
+			return '\0';
+	}
+
+	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
+		return pdoc->MovePositionOutsideChar(pos, moveDir, false);
+	}
+};
+
+#else
+
+// class to track sub matched positions
+class RESearch {
+public:
+	RESearch() {
+		Clear();
+	}
+	void Clear() noexcept {
+		std::fill(bopat, std::end(bopat), NOTFOUND);
+		std::fill(eopat, std::end(eopat), NOTFOUND);
+	}
+
+	static constexpr int MAXTAG = 10;
+	static constexpr int NOTFOUND = -1;
+
+	Sci::Position bopat[MAXTAG];
+	Sci::Position eopat[MAXTAG];
+};
+
+#endif // SCI_OWNREGEX
 
 /**
  * Implementation of RegexSearchBase for the default built-in regular expression engine
  */
 class BuiltinRegex final : public RegexSearchBase {
 public:
+#ifndef SCI_OWNREGEX
 	explicit BuiltinRegex(const CharClassify *charClassTable) : search(charClassTable) {}
+#endif
 
 	Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
 		bool caseSensitive, FindOption flags, Sci::Position *length) override;
@@ -2997,27 +3046,7 @@ public:
 	}
 };
 
-// Define a way for the Regular Expression code to access the document
-class DocumentIndexer final : public CharacterIndexer {
-	const Document *pdoc;
-	Sci::Position end;
-public:
-	DocumentIndexer(const Document *pdoc_, Sci::Position end_) noexcept :
-		pdoc(pdoc_), end(end_) {}
-
-	char CharAt(Sci::Position index) const noexcept override {
-		if (IsValidIndex(index, end))
-			return pdoc->CharAt(index);
-		else
-			return '\0';
-	}
-
-	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
-		return pdoc->MovePositionOutsideChar(pos, moveDir, false);
-	}
-};
-
-#ifndef NO_CXX11_REGEX
+#if defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
 
 class ByteIterator {
 public:
@@ -3209,6 +3238,10 @@ public:
 
 #endif // _WIN32
 
+#if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
+
+#elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+
 std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
 	if (!doc->IsLineStartPosition(startPos))
@@ -3245,13 +3278,14 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 			matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 			// Check for the last match on this line.
 			if (matched) {
+				flagsMatch |= std::regex_constants::match_not_bol;
 				Sci::Position endPos = match[0].second.PosRoundUp();
 				while (endPos < lineRange.end) {
 					if (match[0].first == match[0].second) {
+						// empty match
 						endPos = doc->NextPosition(endPos, 1);
 					}
 					Iterator itNext(doc, endPos);
-					flagsMatch = MatchFlags(doc, itNext.Pos(), lineRange.end);
 					std::match_results<Iterator> matchNext;
 					if (std::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
 						match = matchNext;
@@ -3324,7 +3358,11 @@ Sci::Position Cxx11RegexFindText(const Document *doc, Sci::Position minPos, Sci:
 	}
 }
 
-#endif // NO_CXX11_REGEX
+#endif // SCI_OWNREGEX
+
+#endif // SCI_OWNREGEX || !NO_CXX11_REGEX
+
+#ifndef SCI_OWNREGEX
 
 Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
 	bool caseSensitive, FindOption flags, Sci::Position *length) {
@@ -3336,7 +3374,6 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 #endif
 
 	const RESearchRange resr(doc, minPos, maxPos);
-
 	const char *errmsg = search.Compile(s, *length, caseSensitive, flags);
 	if (errmsg) {
 		return -1;
@@ -3393,6 +3430,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 					memcpy(bopat, search.bopat, sizeof(bopat));
 					memcpy(eopat, search.eopat, sizeof(eopat));
 					if (lenRet == 0) {
+						// empty match
 						endPos = doc->NextPosition(endPos, 1);
 					}
 					success = search.Execute(di, endPos, endOfLine);
@@ -3417,6 +3455,18 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 	*length = lenRet;
 	return pos;
 }
+
+#else
+
+Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *s,
+	bool caseSensitive, [[maybe_unused]] FindOption flags, Sci::Position *length) {
+#ifdef BOOST_REGEX_STANDALONE
+#else
+	return Cxx11RegexFindText(doc, minPos, maxPos, s, caseSensitive, length, search);
+#endif
+}
+
+#endif // SCI_OWNREGEX
 
 const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) {
 	substituted.clear();
@@ -3473,8 +3523,10 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 
 }
 
-RegexSearchBase *Scintilla::Internal::CreateRegexSearch(const CharClassify *charClassTable) {
+RegexSearchBase *Scintilla::Internal::CreateRegexSearch([[maybe_unused]] const CharClassify *charClassTable) {
+#ifndef SCI_OWNREGEX
 	return new BuiltinRegex(charClassTable);
+#else
+	return new BuiltinRegex();
+#endif
 }
-
-#endif // SCI_OWNREGEX
