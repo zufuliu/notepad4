@@ -804,6 +804,8 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 	if (ep == NOTFOUND)
 		return 0;
 
+	lp = ci.MovePositionOutsideChar(lp, -1);
+	ep = ci.MovePositionOutsideChar(ep, 1);
 	bopat[0] = lp;
 	eopat[0] = ep;
 	return 1;

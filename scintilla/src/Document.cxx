@@ -3013,7 +3013,7 @@ public:
 	}
 
 	Sci::Position MovePositionOutsideChar(Sci::Position pos, Sci::Position moveDir) const noexcept override {
-		return pdoc->MovePositionOutsideChar(pos, moveDir, true);
+		return pdoc->MovePositionOutsideChar(pos, moveDir, false);
 	}
 };
 
@@ -3048,16 +3048,16 @@ public:
 		return *this;
 	}
 	bool operator==(const ByteIterator &other) const noexcept {
-		return doc == other.doc && position == other.position;
+		return position == other.position;
 	}
 	bool operator!=(const ByteIterator &other) const noexcept {
-		return doc != other.doc || position != other.position;
+		return position != other.position;
 	}
 	Sci::Position Pos() const noexcept {
-		return position;
+		return doc->MovePositionOutsideChar(position, -1, false);
 	}
 	Sci::Position PosRoundUp() const noexcept {
-		return position;
+		return doc->MovePositionOutsideChar(position, 1, false);
 	}
 };
 
@@ -3130,14 +3130,12 @@ public:
 	}
 	bool operator==(const UTF8Iterator &other) const noexcept {
 		// Only test the determining fields, not the character widths and values derived from this
-		return doc == other.doc &&
-			position == other.position &&
+		return position == other.position &&
 			characterIndex == other.characterIndex;
 	}
 	bool operator!=(const UTF8Iterator &other) const noexcept {
 		// Only test the determining fields, not the character widths and values derived from this
-		return doc != other.doc ||
-			position != other.position ||
+		return position != other.position ||
 			characterIndex != other.characterIndex;
 	}
 	Sci::Position Pos() const noexcept {
@@ -3196,10 +3194,10 @@ public:
 		return *this;
 	}
 	bool operator==(const UTF8Iterator &other) const noexcept {
-		return doc == other.doc && position == other.position;
+		return position == other.position;
 	}
 	bool operator!=(const UTF8Iterator &other) const noexcept {
-		return doc != other.doc || position != other.position;
+		return position != other.position;
 	}
 	Sci::Position Pos() const noexcept {
 		return position;
@@ -3247,16 +3245,17 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 			matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 			// Check for the last match on this line.
 			if (matched) {
-				while (true) {
-					Iterator itNext(doc, match[0].second.PosRoundUp());
+				Sci::Position endPos = match[0].second.PosRoundUp();
+				while (endPos < lineRange.end) {
+					if (match[0].first == match[0].second) {
+						endPos = doc->NextPosition(endPos, 1);
+					}
+					Iterator itNext(doc, endPos);
 					flagsMatch = MatchFlags(doc, itNext.Pos(), lineRange.end);
 					std::match_results<Iterator> matchNext;
 					if (std::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
-						if (match[0].first == match[0].second) {
-							// Empty match means failure so exit
-							return false;
-						}
 						match = matchNext;
+						endPos = match[0].second.PosRoundUp();
 					} else {
 						break;
 					}
@@ -3383,23 +3382,33 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 		int success = search.Execute(di, startOfLine, endOfLine);
 		if (success) {
 			pos = search.bopat[0];
-			// Ensure only whole characters selected
-			search.eopat[0] = doc->MovePositionOutsideChar(search.eopat[0], 1, false);
-			lenRet = search.eopat[0] - search.bopat[0];
+			lenRet = search.eopat[0] - pos;
 			// There can be only one start of a line, so no need to look for last match in line
 			if ((resr.increment < 0) && !searchforLineStart) {
 				// Check for the last match on this line.
-				int repetitions = 1000;	// Break out of infinite loop
-				while (success && (search.eopat[0] <= endOfLine) && (repetitions--)) {
-					success = search.Execute(di, pos + 1, endOfLine);
+				Sci::Position endPos = search.eopat[0];
+				Sci::Position bopat[RESearch::MAXTAG];
+				Sci::Position eopat[RESearch::MAXTAG];
+				while (success && (endPos < endOfLine)) {
+					memcpy(bopat, search.bopat, sizeof(bopat));
+					memcpy(eopat, search.eopat, sizeof(eopat));
+					if (lenRet == 0) {
+						endPos = doc->NextPosition(endPos, 1);
+					}
+					success = search.Execute(di, endPos, endOfLine);
 					if (success) {
-						if (search.eopat[0] <= minPos) {
+						endPos = search.eopat[0];
+						if (endPos <= minPos) {
 							pos = search.bopat[0];
-							lenRet = search.eopat[0] - search.bopat[0];
+							lenRet = endPos - pos;
 						} else {
 							success = 0;
 						}
 					}
+				}
+				if (!success) {
+					memcpy(search.bopat, bopat, sizeof(bopat));
+					memcpy(search.eopat, eopat, sizeof(eopat));
 				}
 			}
 			break;
