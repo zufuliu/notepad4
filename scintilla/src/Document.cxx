@@ -25,7 +25,9 @@
 #include <memory>
 
 #if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
+#ifdef _WIN32
 #include <windows.h>
+#endif
 #include <boost/regex.hpp>
 #elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
 #include <regex>
@@ -3260,37 +3262,56 @@ public:
 
 #if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
 boost::regex_constants::match_flag_type MatchFlags(const Document* doc, Sci::Position startPos, Sci::Position endPos) noexcept {
-	boost::regex_constants::match_flag_type flagsMatch = boost::regex_constants::match_default | boost::regex_constants::match_not_dot_newline;
+	boost::regex_constants::match_flag_type flagsMatch =
+		boost::regex_constants::match_default | boost::regex_constants::match_not_dot_newline;
 	if (!doc->IsLineStartPosition(startPos))
-		flagsMatch |= boost::regex_constants::match_not_bol;
+		flagsMatch |= boost::regex_constants::match_not_bol | boost::regex_constants::match_not_bow;
 	if (!doc->IsLineEndPosition(endPos))
-		flagsMatch |= boost::regex_constants::match_not_eol;
+		flagsMatch |= boost::regex_constants::match_not_eol | boost::regex_constants::match_not_eow;
 	return flagsMatch;
 }
 
 template<typename Iterator, typename Regex>
 bool MatchOnLines(const Document* doc, const Regex& regexp, const RESearchRange& resr, RESearch& search) {
-	boost::match_results<Iterator> match, lastMatch;
-	const bool findForward = resr.startPos <= resr.endPos;
-	bool matched;
-	Iterator itStart(doc, resr.startPos);
-	Iterator itEnd(doc, resr.endPos);
-	const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
-
-	if (findForward) {
+	boost::match_results<Iterator> match;
+	bool matched = false;
+	if (resr.increment > 0) {
+		Iterator itStart(doc, resr.startPos);
+		Iterator itEnd(doc, resr.endPos);
+		const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
 		matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 	}
 	else {
-		while (boost::regex_search(itEnd, itStart, match, regexp, flagsMatch)) {
-			lastMatch = match;
-			const size_t maxTag = std::min<size_t>(match.size(), RESearch::MAXTAG);
-			itEnd = match[maxTag].second;
+		// Line by line.
+		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
+			const Range lineRange = resr.LineRange(line);
+			Iterator itStart(doc, lineRange.start);
+			Iterator itEnd(doc, lineRange.end);
+			boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
+			matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
+			// Check for the last match on this line.
+			if (matched) {
+				Sci::Position endPos = match[0].second.PosRoundUp();
+				while (endPos < lineRange.end) {
+					if (match[0].first == match[0].second) {
+						endPos = doc->NextPosition(endPos, 1);
+					}
+					Iterator itNext(doc, endPos);
+					flagsMatch = MatchFlags(doc, itNext.Pos(), lineRange.end);
+					boost::match_results<Iterator> matchNext;
+					if (boost::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
+						match = matchNext;
+						endPos = match[0].second.PosRoundUp();
+					}
+					else {
+						break;
+					}
+				}
+				break;
+			}
 		}
-		matched = (lastMatch.size() != 0);
 	}
-
 	if (matched) {
-		if (!findForward) match = lastMatch;
 		const size_t maxTag = std::min<size_t>(match.size(), RESearch::MAXTAG);
 		for (size_t co = 0; co < maxTag; co++) {
 			search.bopat[co] = match[co].first.Pos();
