@@ -261,10 +261,11 @@ using namespace Scintilla::Internal;
  */
 
 RESearch::RESearch(const CharClassify *charClassTable) {
-	failure = 0;
 	charClass = charClassTable;
+	lineStartPos = 0;
+	lineEndPos = 0;
 	sta = NOP;                  /* status of lastpat */
-	bol = 0;
+	failure = 0;
 	previousFlags = FindOption::None;
 	constexpr unsigned char nul = 0;
 	std::fill(bittab, std::end(bittab), nul);
@@ -761,9 +762,8 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
  */
 int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp) {
 	Sci::Position ep = NOTFOUND;
-	char *ap = nfa;
+	const char *ap = nfa;
 
-	bol = lp;
 	failure = 0;
 
 	Clear();
@@ -774,7 +774,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 		ep = PMatch(ci, lp, endp, ap);
 		break;
 	case EOL:			/* just searching for end of line normal path doesn't work */
-		if (*(ap + 1) == END) {
+		if (endp == lineEndPos && ap[1] == END) {
 			lp = endp;
 			ep = lp;
 			break;
@@ -782,7 +782,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 			return 0;
 		}
 	case CHR: {			/* ordinary char: locate it fast */
-		const unsigned char c = *(ap + 1);
+		const unsigned char c = ap[1];
 		while ((lp < endp) && (static_cast<unsigned char>(ci.CharAt(lp)) != c)) {
 			lp++;
 		}
@@ -801,8 +801,20 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 	case END:			/* munged automaton. fail always */
 		return 0;
 	}
-	if (ep == NOTFOUND)
-		return 0;
+	if (ep == NOTFOUND) {
+		/* similar to EOL, match EOW at line end */
+		if (endp == lineEndPos && *ap == EOW) {
+			++ap;
+			if ((*ap == END || ((*ap == EOL && ap[1] == END))) && iswordc(ci.CharAt(lp - 1))) {
+				lp = endp;
+				ep = lp;
+			} else {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
+	}
 
 	lp = ci.MovePositionOutsideChar(lp, -1);
 	ep = ci.MovePositionOutsideChar(ep, 1);
@@ -850,7 +862,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 #define CHRSKIP 3	/* [CLO] CHR chr END      */
 #define CCLSKIP 34	/* [CLO] CCL 32 bytes END */
 
-Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap) {
+Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, const char *ap) {
 	uint8_t op;
 
 	while ((op = *ap++) != END) {
@@ -872,11 +884,11 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			ap += BITBLK;
 			break;
 		case BOL:
-			if (lp != bol)
+			if (lp != lineStartPos)
 				return NOTFOUND;
 			break;
 		case EOL:
-			if (lp < endp)
+			if (lp < lineEndPos)
 				return NOTFOUND;
 			break;
 		case BOT:
@@ -888,11 +900,11 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			eopat[static_cast<unsigned char>(*ap++)] = lp;
 			break;
 		case BOW:
-			if ((lp != bol && iswordc(ci.CharAt(lp - 1))) || !iswordc(ci.CharAt(lp)))
+			if ((lp != lineStartPos && iswordc(ci.CharAt(lp - 1))) || !iswordc(ci.CharAt(lp)))
 				return NOTFOUND;
 			break;
 		case EOW:
-			if (lp == bol || !iswordc(ci.CharAt(lp - 1)) || iswordc(ci.CharAt(lp)))
+			if (lp == lineStartPos || !iswordc(ci.CharAt(lp - 1)) || iswordc(ci.CharAt(lp)))
 				return NOTFOUND;
 			break;
 		case REF: {
@@ -922,7 +934,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 				n = ANYSKIP;
 				break;
 			case CHR: {
-				const char c = *(ap + 1);
+				const char c = ap[1];
 				if (op == CLO || op == LCLO) {
 					while ((lp < endp) && (c == ci.CharAt(lp))) {
 						lp++;

@@ -30,6 +30,10 @@ public:
 	Sci::Position bopat[MAXTAG];
 	Sci::Position eopat[MAXTAG];
 
+	// positions to match line start and line end
+	Sci::Position lineStartPos;
+	Sci::Position lineEndPos;
+
 private:
 	static constexpr int MAXNFA = 4096;
 	// The following constants are not meant to be changeable.
@@ -42,9 +46,8 @@ private:
 	int GetBackslashExpression(const char *pattern, int &incr) noexcept;
 
 	const char *DoCompile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept;
-	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, char *ap);
+	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, const char *ap);
 
-	Sci::Position bol;
 	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */
 	char nfa[MAXNFA];    /* automaton */
 	int sta;
