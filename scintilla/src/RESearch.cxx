@@ -762,7 +762,7 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
  */
 int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp) {
 	Sci::Position ep = NOTFOUND;
-	const char *ap = nfa;
+	const char * const ap = nfa;
 
 	failure = 0;
 
@@ -804,8 +804,7 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 	if (ep == NOTFOUND) {
 		/* similar to EOL, match EOW at line end */
 		if (endp == lineEndPos && *ap == EOW) {
-			++ap;
-			if ((*ap == END || ((*ap == EOL && ap[1] == END))) && iswordc(ci.CharAt(lp - 1))) {
+			if ((ap[1] == END || ((ap[1] == EOL && ap[2] == END))) && iswordc(ci.CharAt(lp - 1))) {
 				lp = endp;
 				ep = lp;
 			} else {

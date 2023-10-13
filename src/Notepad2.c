@@ -942,7 +942,7 @@ void InitInstance(HINSTANCE hInstance, int nCmdShow) {
 			WideCharToMultiByte(CP_UTF8, 0, lpMatchArg, -1, efrData.szFindUTF8, COUNTOF(efrData.szFindUTF8), NULL, NULL);
 
 			if (flagMatchText & MatchTextFlag_Regex) {
-				efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
+				efrData.fuFlags |= NP2_RegexDefaultFlags;
 			} else if (flagMatchText & MatchTextFlag_TransformBS) {
 				efrData.bTransformBS = true;
 			}
@@ -4805,7 +4805,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				strcpy(efrData.szFindUTF8, mszSelection);
 			}
 
-			efrData.fuFlags &= (~(SCFIND_REGEXP | SCFIND_POSIX));
+			efrData.fuFlags &= ~NP2_RegexDefaultFlags;
 			efrData.bTransformBS = false;
 
 			switch (LOWORD(wParam)) {
@@ -5484,7 +5484,7 @@ void LoadSettings(void) {
 			efrData.fuFlags |= SCFIND_WORDSTART;
 		}
 		if (IniSectionGetBool(pIniSection, L"FindReplaceRegExpSearch", false)) {
-			efrData.fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
+			efrData.fuFlags |= NP2_RegexDefaultFlags;
 		}
 		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", false);
 		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", false);
@@ -5864,7 +5864,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchCase", (efrData.fuFlags & SCFIND_MATCHCASE), false);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchWholeWorldOnly", (efrData.fuFlags & SCFIND_WHOLEWORD), false);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceMatchBeginingWordOnly", (efrData.fuFlags & SCFIND_WORDSTART), false);
-		IniSectionSetBoolEx(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & (SCFIND_REGEXP | SCFIND_POSIX)), false);
+		IniSectionSetBoolEx(pIniSection, L"FindReplaceRegExpSearch", (efrData.fuFlags & SCFIND_REGEXP), false);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS, false);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, false);
 	}

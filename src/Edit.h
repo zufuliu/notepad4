@@ -25,6 +25,8 @@
 #define NP2_FIND_REPLACE_LIMIT	2048
 #define NP2_LONG_LINE_LIMIT		4096
 
+//#define NP2_RegexDefaultFlags	(SCFIND_REGEXP | SCFIND_CXX11REGEX) // use std::regex
+#define NP2_RegexDefaultFlags	(SCFIND_REGEXP | SCFIND_POSIX) // use builtin regex
 #define NP2_InvalidSearchFlags	(-1)
 #define NP2_MarkAllMultiline	0x00001000
 #define NP2_MarkAllBookmark		0x00002000

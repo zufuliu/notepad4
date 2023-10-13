@@ -5033,7 +5033,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			}
 
 			if (IsButtonChecked(hwnd, IDC_FINDREGEXP)) {
-				lpefr->fuFlags |= SCFIND_REGEXP | SCFIND_POSIX;
+				lpefr->fuFlags |= NP2_RegexDefaultFlags;
 			}
 
 			lpefr->bTransformBS = IsButtonChecked(hwnd, IDC_FINDTRANSFORMBS);
@@ -7051,7 +7051,7 @@ char* EditGetStringAroundCaret(LPCSTR delimiters) {
 	}
 
 	struct Sci_TextToFindFull ft = { { iCurrentPos, 0 }, delimiters, { 0, 0 } };
-	const int findFlag = SCFIND_REGEXP | SCFIND_POSIX;
+	const int findFlag = NP2_RegexDefaultFlags;
 
 	// forward
 	if (iCurrentPos < iLineEnd) {
@@ -7339,13 +7339,13 @@ void EditOpenSelection(OpenSelectionType type) {
 				strcat(lpstrText, "[\'\"]?");
 
 				struct Sci_TextToFindFull ft = { { 0, SciCall_GetLength() }, mszSelection, { 0, 0 } };
-				Sci_Position iPos = SciCall_FindTextFull(SCFIND_REGEXP | SCFIND_POSIX, &ft);
+				Sci_Position iPos = SciCall_FindTextFull(NP2_RegexDefaultFlags, &ft);
 				if (iPos < 0) {
 					lpstrText = mszSelection + 2;
 					lpstrText[0] = 'i';
 					lpstrText[1] = 'd';
 					ft.lpstrText = lpstrText;
-					iPos = SciCall_FindTextFull(SCFIND_REGEXP | SCFIND_POSIX, &ft);
+					iPos = SciCall_FindTextFull(NP2_RegexDefaultFlags, &ft);
 				}
 				NP2HeapFree(mszSelection);
 				if (iPos >= 0) {
