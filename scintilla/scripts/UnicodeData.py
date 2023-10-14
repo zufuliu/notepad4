@@ -52,7 +52,7 @@ def readUnicodePropertyFile(path, propertyIndex=1):
 				else:
 					propertyList[propertyName] = [code]
 
-	print(path, version, 'property:', ', '.join(propertyList.keys()))
+	print(path, version, 'property:', ', '.join(sorted(propertyList.keys())))
 	return version, propertyList
 
 def updateUnicodePropertyTable(table, propertyMap, propertyList):

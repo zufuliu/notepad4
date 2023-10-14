@@ -43,26 +43,26 @@ def buildGraphemeClusterBoundary():
 	table = graphemeClusterBoundary
 
 	# https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html
-	notBreak = [
-		['Other', 'Extend', 'SpacingMark', 'ZWJ'],
-		['CR', 'LF'],
-		['Extend', 'Extend', 'SpacingMark', 'ZWJ'],
-		['RI', 'Extend', 'RI', 'SpacingMark', 'ZWJ'],
-		['Prepend', 'Other', 'Extend', 'RI', 'Prepend', 'SpacingMark', 'L', 'V', 'T', 'LV', 'LVT', 'ExtPict', 'ZWJ'],
-		['SpacingMark', 'Extend', 'SpacingMark', 'ZWJ'],
-		['L', 'Extend', 'SpacingMark', 'L', 'V', 'LV', 'LVT', 'ZWJ'],
-		['V', 'Extend', 'SpacingMark', 'V', 'T', 'ZWJ'],
-		['T', 'Extend', 'SpacingMark', 'T', 'ZWJ'],
-		['LV', 'Extend', 'SpacingMark', 'V', 'T', 'ZWJ'],
-		['LVT', 'Extend', 'SpacingMark', 'T', 'ZWJ'],
-		['ExtPict', 'Extend', 'SpacingMark', 'ZWJ'],
-		#['ZWJ', 'Extend', 'SpacingMark', 'ZWJ'],
-		['ZWJ', 'Extend', 'SpacingMark', 'ExtPict', 'ZWJ'],
-	]
+	notBreak = {
+		'Other': ['Extend', 'SpacingMark', 'ZWJ'],
+		'CR': ['LF'],
+		'Extend': ['Extend', 'SpacingMark', 'ZWJ'],
+		'RI': ['Extend', 'RI', 'SpacingMark', 'ZWJ'],
+		'Prepend': ['Other', 'Extend', 'RI', 'Prepend', 'SpacingMark', 'L', 'V', 'T', 'LV', 'LVT', 'ExtPict', 'ZWJ'],
+		'SpacingMark': ['Extend', 'SpacingMark', 'ZWJ'],
+		'L': ['Extend', 'SpacingMark', 'L', 'V', 'LV', 'LVT', 'ZWJ'],
+		'V': ['Extend', 'SpacingMark', 'V', 'T', 'ZWJ'],
+		'T': ['Extend', 'SpacingMark', 'T', 'ZWJ'],
+		'LV': ['Extend', 'SpacingMark', 'V', 'T', 'ZWJ'],
+		'LVT': ['Extend', 'SpacingMark', 'T', 'ZWJ'],
+		'ExtPict': ['Extend', 'SpacingMark', 'ZWJ'],
+		#'ZWJ': ['Extend', 'SpacingMark', 'ZWJ'],
+		'ZWJ': ['Extend', 'SpacingMark', 'ExtPict', 'ZWJ'],
+	}
 
-	for row in notBreak:
-		first = GraphemeBreakPropertyMap[row[0]]
-		for item in row[1:]:
+	for key, row in notBreak.items():
+		first = GraphemeBreakPropertyMap[key]
+		for item in row:
 			second = GraphemeBreakPropertyMap[item]
 			table[first] &= ~(1 << second)
 

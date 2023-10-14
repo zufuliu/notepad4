@@ -22,8 +22,9 @@ class LineBreak(IntFlag):
 # https://www.unicode.org/reports/tr14/#Properties
 LineBreakPropertyMap = {
 	LineBreak.NonBreak: [
+		'AK',	# Aksara (XB/XA)
 		'AL',	# Ordinary Alphabetic and Symbol Characters (XP)
-		'B2',	# Break Opportunity Before and After (B/A/XP)
+		'AS',	# Aksara Start (XB/XA)
 		'EM',	# Emoji Modifier (A), Do not break between an emoji base and an emoji modifier.
 		'GL', 	# Non-breaking (“Glue”) (XB/XA) (Non-tailorable)
 		'HL', 	# Hebrew Letter (XB)
@@ -34,11 +35,13 @@ LineBreakPropertyMap = {
 		'RI',	# Regional Indicator (B/A/XP)
 		'SA',	# Complex-Context Dependent (South East Asian) (P)
 		'SG', 	# Surrogate (XP) (Non-tailorable)
+		'VI',	# Virama (XB/XA)
 		'WJ',	# Word Joiner (XB/XA) (Non-tailorable)
 		'XX',	# Unknown (XP)
 		'ZWJ',	# Zero Width Joiner (XA/XB) (Non-tailorable)
 	],
 	LineBreak.BreakBefore: [
+		'AP',	# Aksara Pre-Base (B/XA)
 		'BB',	# Break Before (B)
 		'EB',	# Emoji Base (B/A), may followed by emoji modifier
 
@@ -63,9 +66,11 @@ LineBreakPropertyMap = {
 		'IS',	# Infix Numeric Separator (XB)
 		'NS',	# Nonstarters (XB)
 		'PO',	# Postfix Numeric (XB)
+		'VF',	# Virama Final (XB/A)
 	],
 	LineBreak.BreakAny: [
 		'AI',	# Ambiguous (Alphabetic or Ideograph)
+		'B2',	# Break Opportunity Before and After (B/A/XP)
 		'CB',	# Contingent Break Opportunity (B/A)
 		'CJ',	# Conditional Japanese Starter, treat as ID: CSS normal breaking
 		'H2',	# Hangul LV Syllable (B/A)

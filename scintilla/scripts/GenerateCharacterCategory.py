@@ -102,7 +102,7 @@ CJKBlockList = [
 	(0x2B820, 0x2CEAF), # U+2B820..U+2CEAF CJK Unified Ideographs Extension E
 	(0x2CEB0, 0x2EBEF), # U+2CEB0..U+2EBEF CJK Unified Ideographs Extension F
 	(0x2F800, 0x2FA1F), # U+2F800..U+2FA1F CJK Compatibility Ideographs Supplement
-	(0x2EBF0, 0x2EE5D), # U+2EBF0..U+2EE5D CJK Unified Ideographs Extension I
+	(0x2EBF0, 0x2EE5F), # U+2EBF0..U+2EE5F CJK Unified Ideographs Extension I
 	(0x30000, 0x3134F), # U+30000..U+3134F CJK Unified Ideographs Extension G
 	(0x31350, 0x323AF), # U+31350..U+323AF CJK Unified Ideographs Extension H
 

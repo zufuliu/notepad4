@@ -53,7 +53,7 @@ private:
 	int sta;
 	int failure;
 
-	// cache for previous pattern with same address, length and flags
+	// cache for previous pattern to avoid recompile
 	Scintilla::FindOption previousFlags;
 	std::string cachedPattern;
 
