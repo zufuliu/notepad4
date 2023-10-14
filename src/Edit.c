@@ -4740,7 +4740,9 @@ static bool CopySelectionAsFindText(HWND hwnd, LPEDITFINDREPLACE lpefr, bool bFi
 		//}
 
 		char *lpszEscSel = (char *)NP2HeapAlloc((2 * NP2_FIND_REPLACE_LIMIT));
-		lpefr->bTransformBS = AddBackslashA(lpszEscSel, lpszSelection);
+		if (AddBackslashA(lpszEscSel, lpszSelection)) {
+			lpefr->bTransformBS = !(lpefr->fuFlags & SCFIND_REGEXP);
+		}
 
 		SetDlgItemTextA2W(cpEdit, hwnd, IDC_FINDTEXT, lpszEscSel);
 		NP2HeapFree(lpszEscSel);
