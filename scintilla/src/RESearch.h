@@ -27,8 +27,9 @@ public:
 	static constexpr int MAXTAG = 10;
 	static constexpr int NOTFOUND = -1;
 
-	Sci::Position bopat[MAXTAG];
-	Sci::Position eopat[MAXTAG];
+	using MatchPositions = std::array<Sci::Position, MAXTAG>;
+	MatchPositions bopat;
+	MatchPositions eopat;
 
 	// positions to match line start and line end
 	Sci::Position lineStartPos;

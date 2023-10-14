@@ -208,6 +208,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <array>
 #include <algorithm>
 #include <iterator>
 
@@ -275,8 +276,8 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 }
 
 void RESearch::Clear() noexcept {
-	std::fill(bopat, std::end(bopat), NOTFOUND);
-	std::fill(eopat, std::end(eopat), NOTFOUND);
+	bopat.fill(NOTFOUND);
+	eopat.fill(NOTFOUND);
 }
 
 void RESearch::ChSet(unsigned char c) noexcept {
@@ -447,12 +448,6 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 	int tagi = 0;          /* tag stack index   */
 	int tagc = 1;          /* actual tag count  */
 
-	if (pattern == nullptr || length == 0) {
-		if (sta)
-			return nullptr;
-		else
-			return badpat("No previous regular expression");
-	}
 	sta = NOP;
 
 	const char *p = pattern;     /* pattern pointer   */
@@ -788,8 +783,8 @@ int RESearch::Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Positio
 		}
 		if (lp >= endp)	/* if EOS, fail, else fall through. */
 			return 0;
-		[[fallthrough]];
 	}
+	[[fallthrough]];
 	default:			/* regular matching all the way. */
 		while (lp < endp) {
 			ep = PMatch(ci, lp, endp, ap);

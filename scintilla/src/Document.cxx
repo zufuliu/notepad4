@@ -18,6 +18,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <array>
 #include <forward_list>
 #include <optional>
 #include <algorithm>
@@ -2973,15 +2974,16 @@ public:
 		Clear();
 	}
 	void Clear() noexcept {
-		std::fill(bopat, std::end(bopat), NOTFOUND);
-		std::fill(eopat, std::end(eopat), NOTFOUND);
+		bopat.fill(NOTFOUND);
+		eopat.fill(NOTFOUND);
 	}
 
 	static constexpr int MAXTAG = 10;
 	static constexpr int NOTFOUND = -1;
 
-	Sci::Position bopat[MAXTAG];
-	Sci::Position eopat[MAXTAG];
+	using MatchPositions = std::array<Sci::Position, MAXTAG>;
+	MatchPositions bopat;
+	MatchPositions eopat;
 };
 
 #endif // SCI_OWNREGEX
@@ -3104,11 +3106,11 @@ class UTF8Iterator {
 	// These 3 fields determine the iterator position and are used for comparisons
 	const Document *doc;
 	Sci::Position position;
-	size_t characterIndex;
+	unsigned int characterIndex = 0;
 	// Remaining fields are derived from the determining fields so are excluded in comparisons
-	unsigned int lenBytes;
-	size_t lenCharacters;
-	wchar_t buffered[2];
+	unsigned int lenBytes = 0;
+	unsigned int lenCharacters = 0;
+	wchar_t buffered[2]{};
 public:
 	using iterator_category = std::bidirectional_iterator_tag;
 	using value_type = wchar_t;
@@ -3117,7 +3119,7 @@ public:
 	using reference = wchar_t&;
 
 	explicit UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0) noexcept :
-		doc(doc_), position(position_), characterIndex(0), lenBytes(0), lenCharacters(0), buffered{} {
+		doc(doc_), position(position_) {
 		if (doc) {
 			ReadCharacter();
 		}
@@ -3429,11 +3431,11 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 			if ((resr.increment < 0) && !searchforLineStart) {
 				// Check for the last match on this line.
 				Sci::Position endPos = search.eopat[0];
-				Sci::Position bopat[RESearch::MAXTAG];
-				Sci::Position eopat[RESearch::MAXTAG];
+				RESearch::MatchPositions bopat{};
+				RESearch::MatchPositions eopat{};
 				while (success && (endPos < endOfLine)) {
-					memcpy(bopat, search.bopat, sizeof(bopat));
-					memcpy(eopat, search.eopat, sizeof(eopat));
+					bopat = search.bopat;
+					eopat = search.eopat;
 					if (lenRet == 0) {
 						// empty match
 						endPos = doc->NextPosition(endPos, 1);
@@ -3450,8 +3452,8 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 					}
 				}
 				if (!success) {
-					memcpy(search.bopat, bopat, sizeof(bopat));
-					memcpy(search.eopat, eopat, sizeof(eopat));
+					search.bopat = bopat;
+					search.eopat = eopat;
 				}
 			}
 			break;
