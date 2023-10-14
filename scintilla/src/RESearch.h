@@ -21,7 +21,7 @@ public:
 	explicit RESearch(const CharClassify *charClassTable);
 	// No dynamic allocation so default copy constructor and assignment operator are OK.
 	void Clear() noexcept;
-	const char *Compile(const char *pattern, Sci::Position length, bool caseSensitive, Scintilla::FindOption flags);
+	const char *Compile(const char *pattern, size_t length, Scintilla::FindOption flags);
 	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
 
 	static constexpr int MAXTAG = 10;
@@ -46,7 +46,7 @@ private:
 	void ChSetWithCase(unsigned char c, bool caseSensitive) noexcept;
 	int GetBackslashExpression(const char *pattern, int &incr) noexcept;
 
-	const char *DoCompile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept;
+	const char *DoCompile(const char *pattern, size_t length, Scintilla::FindOption flags) noexcept;
 	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, const char *ap);
 
 	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */

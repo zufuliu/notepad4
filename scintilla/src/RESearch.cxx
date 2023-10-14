@@ -35,8 +35,7 @@
  * Interfaces:
  *  RESearch::Compile:      compile a regular expression into a NFA.
  *
- *          const char *RESearch::Compile(const char *pattern, int length,
- *                                        bool caseSensitive, bool posix)
+ *          const char *RESearch::Compile(const char *pattern, int length, int flags)
  *
  * Returns a short error string if they fail.
  *
@@ -424,15 +423,14 @@ int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 	return result;
 }
 
-const char *RESearch::Compile(const char *pattern, Sci::Position length, bool caseSensitive, FindOption flags) {
+const char *RESearch::Compile(const char *pattern, size_t length, FindOption flags) {
 	if (sta == OKP && (flags == previousFlags
-		&& static_cast<size_t>(length) == cachedPattern.length()
+		&& length == cachedPattern.length()
 		&& memcmp(pattern, cachedPattern.data(), length) == 0)) {
 		return nullptr;
 	}
 
-	const bool posix = FlagSet(flags, FindOption::Posix);
-	const char * const errmsg = DoCompile(pattern, length, caseSensitive, posix);
+	const char * const errmsg = DoCompile(pattern, length, flags);
 	if (errmsg == nullptr) {
 		previousFlags = flags;
 		cachedPattern.assign(pattern, length);
@@ -440,7 +438,9 @@ const char *RESearch::Compile(const char *pattern, Sci::Position length, bool ca
 	return errmsg;
 }
 
-const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool caseSensitive, bool posix) noexcept {
+const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
+	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
+	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
 	char *sp = nfa;          /* another one       */
 	const char *mpMax = mp + MAXNFA - BITBLK - 10;
@@ -451,7 +451,7 @@ const char *RESearch::DoCompile(const char *pattern, Sci::Position length, bool 
 	sta = NOP;
 
 	const char *p = pattern;     /* pattern pointer   */
-	for (int i = 0; i < length; i++, p++) {
+	for (unsigned int i = 0; i < length; i++, p++) {
 		if (mp > mpMax)
 			return badpat("Pattern too long");
 		char *lp = mp;			/* saved pointer     */
