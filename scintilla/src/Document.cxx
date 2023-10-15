@@ -3265,11 +3265,14 @@ public:
 #if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
 boost::regex_constants::match_flag_type MatchFlags(const Document* doc, Sci::Position startPos, Sci::Position endPos) noexcept {
 	boost::regex_constants::match_flag_type flagsMatch =
-		boost::regex_constants::match_default | boost::regex_constants::match_not_dot_newline;
+		boost::regex_constants::match_default
+		| boost::regex_constants::match_not_dot_newline
+		| boost::regex_constants::match_not_bol
+		| boost::regex_constants::match_not_eol;
 	if (!doc->IsLineStartPosition(startPos))
-		flagsMatch |= boost::regex_constants::match_not_bol | boost::regex_constants::match_not_bow;
+		flagsMatch |= boost::regex_constants::match_not_bow;
 	if (!doc->IsLineEndPosition(endPos))
-		flagsMatch |= boost::regex_constants::match_not_eol | boost::regex_constants::match_not_eow;
+		flagsMatch |= boost::regex_constants::match_not_eow;
 	return flagsMatch;
 }
 
