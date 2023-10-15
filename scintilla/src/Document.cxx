@@ -3014,6 +3014,8 @@ public:
 
 private:
 #if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
+	boost::wregex regexUTF8;
+	boost::regex regexByte;
 #elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
 	std::wregex regexUTF8;
 	std::regex regexByte;
@@ -3557,26 +3559,35 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 #ifdef BOOST_REGEX_STANDALONE
 	const RESearchRange resr(doc, minPos, maxPos);
 	try {
-		// const ElapsedPeriod ep;
+		//const ElapsedPeriod ep;
 		boost::regex::flag_type flagsRe = boost::regex::ECMAScript;
-
-		if (!caseSensitive)
+		// Flags that appear to have no effect:
+		// | std::regex::collate | std::regex::extended;
+		if (!FlagSet(flags, FindOption::MatchCase))
 			flagsRe = flagsRe | boost::regex::icase;
 
 		// Clear the RESearch so can fill in matches
 		search.Clear();
 
-		bool matched = false;
+		const size_t patternLen = *length;
+		bool matched = flags != previousFlags || patternLen != cachedPattern.length()
+			|| memcmp(pattern, cachedPattern.data(), patternLen) != 0;
 		if (CpUtf8 == doc->dbcsCodePage) {
-			const std::wstring ws = WStringFromUTF8(s);
-			boost::wregex regexp;
-			regexp.assign(ws, flagsRe);
-			matched = MatchOnLines<UTF8Iterator>(doc, regexp, resr, search);
+			if (matched) {
+				const std::wstring ws = WStringFromUTF8(pattern);
+				regexUTF8.assign(ws, flagsRe);
+				previousFlags = flags;
+				cachedPattern.assign(pattern, patternLen);
+			}
+			matched = MatchOnLines<UTF8Iterator>(doc, regexUTF8, resr, search);
 		}
 		else {
-			boost::regex regexp;
-			regexp.assign(s, flagsRe);
-			matched = MatchOnLines<ByteIterator>(doc, regexp, resr, search);
+			if (matched) {
+				regexByte.assign(pattern, patternLen, flagsRe);
+				previousFlags = flags;
+				cachedPattern.assign(pattern, patternLen);
+			}
+			matched = MatchOnLines<ByteIterator>(doc, regexByte, resr, search);
 		}
 
 		Sci::Position posMatch = -1;
@@ -3587,10 +3598,10 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 		// Example - search in doc/ScintillaHistory.html for
 		// [[:upper:]]eta[[:space:]]
 		// On MacBook, normally around 1 second but with locale imbued -> 14 seconds.
-		// const double durSearch = ep.Duration();
-		// Platform::DebugPrintf("Search:%9.6g \n", durSearch);
+		//const double durSearch = ep.Duration();
+		//Platform::DebugPrintf("Search:%9.6g \n", durSearch);
 		return posMatch;
-}
+	}
 	catch (const boost::regex_error&) {
 		// Failed to create regular expression
 		throw RegexError();
