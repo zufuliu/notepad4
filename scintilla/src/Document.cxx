@@ -3262,12 +3262,18 @@ public:
 
 #elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
 
+#ifdef _MSC_VER
+#define REGEX_MULTILINE
+#endif
+
 std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
-	if (!doc->IsLineStartPosition(startPos))
+	if (!doc->IsLineStartPosition(startPos)) {
 		flagsMatch |= std::regex_constants::match_not_bol;
-	if (!doc->IsLineEndPosition(endPos))
+	}
+	if (!doc->IsLineEndPosition(endPos)) {
 		flagsMatch |= std::regex_constants::match_not_eol;
+	}
 	return flagsMatch;
 }
 
@@ -3283,12 +3289,16 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	// If multiline regex worked well then the line by line iteration could be removed
 	// for the forwards case and replaced with the following 4 lines:
 	bool matched = false;
+#ifdef REGEX_MULTILINE
 	if (resr.increment > 0) {
 		Iterator itStart(doc, resr.startPos);
 		Iterator itEnd(doc, resr.endPos);
 		const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
 		matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
-	} else {
+		goto labelMatched;
+	}
+#endif
+	{
 		// Line by line.
 		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
 			const Range lineRange = resr.LineRange(line);
@@ -3298,6 +3308,9 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 			matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 			// Check for the last match on this line.
 			if (matched) {
+#ifndef REGEX_MULTILINE
+			if (resr.increment < 0) {
+#endif
 				flagsMatch |= std::regex_constants::match_not_bol;
 				Sci::Position endPos = match[0].second.PosRoundUp();
 				while (endPos < lineRange.end) {
@@ -3314,10 +3327,16 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 						break;
 					}
 				}
-				break;
+#ifndef REGEX_MULTILINE
+			}
+#endif
+			break;
 			}
 		}
 	}
+#ifdef REGEX_MULTILINE
+labelMatched:
+#endif
 	if (matched) {
 		const size_t maxTag = std::min<size_t>(match.size(), RESearch::MAXTAG);
 		for (size_t co = 0; co < maxTag; co++) {
@@ -3336,10 +3355,11 @@ Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position 
 		std::regex::flag_type flagsRe = std::regex::ECMAScript;
 		// Flags that appear to have no effect:
 		// | std::regex::collate | std::regex::extended;
-		if (!FlagSet(flags, FindOption::MatchCase))
+		if (!FlagSet(flags, FindOption::MatchCase)) {
 			flagsRe = flagsRe | std::regex::icase;
+		}
 
-#if !defined(_MSC_VER)
+#if defined(REGEX_MULTILINE) && !defined(_MSC_VER)
 		flagsRe = flagsRe | std::regex::multiline;
 #endif
 
