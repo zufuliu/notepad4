@@ -238,3 +238,31 @@ The Julia language is licensed under the MIT License. The "language" consists of
     The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+================================================================================
+
+License for Boost regex library
+
+https://www.boost.org/doc/libs/1_83_0/libs/regex/doc/html/index.html
+https://www.boost.org/LICENSE_1_0.txt
+
+/*
+ *
+ * Copyright (c) 1998-2002
+ * John Maddock
+ *
+ * Use, modification and distribution are subject to the 
+ * Boost Software License, Version 1.0. (See accompanying file 
+ * LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ *
+ */
+
+ /*
+  *   LOCATION:    see http://www.boost.org/libs/regex for documentation.
+  *   FILE         regex.cpp
+  *   VERSION      see <boost/version.hpp>
+  *   DESCRIPTION: Declares boost::basic_regex<> and associated
+  *                functions and classes. This header is the main
+  *                entry point for the template regex code.
+  */
