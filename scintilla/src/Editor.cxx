@@ -4170,6 +4170,7 @@ Sci::Position Editor::FindTextFull(
 	sptr_t lParam) {	///< @c TextToFindFull structure: The text to search for in the given range.
 
 	TextToFindFull *ft = static_cast<TextToFindFull *>(PtrFromSPtr(lParam));
+#if 1
 	Sci::Position lengthFound = strlen(ft->lpstrText);
 	if (!pdoc->HasCaseFolder())
 		pdoc->SetCaseFolder(CaseFolderForEncoding());
@@ -4193,6 +4194,48 @@ Sci::Position Editor::FindTextFull(
 		errorStatus = Status::RegEx;
 		return -1;
 	}
+#else
+	const ElapsedPeriod period;
+	uint32_t count = 0;
+	// wParam |= static_cast<int>(FindOption::Cxx11RegEx);
+	while (true) {
+		Sci::Position lengthFound = strlen(ft->lpstrText);
+		if (!pdoc->HasCaseFolder())
+			pdoc->SetCaseFolder(CaseFolderForEncoding());
+		try {
+			const Sci::Position pos = pdoc->FindText(
+				ft->chrg.cpMin,
+				ft->chrg.cpMax,
+				ft->lpstrText,
+				static_cast<FindOption>(wParam),
+				&lengthFound);
+			if (pos >= 0) {
+				++count;
+				Sci::Position endPos = pos + lengthFound;
+				if (wParam & static_cast<int>(FindOption::MatchToWordEnd)) {
+					endPos = pdoc->ExtendWordSelect(endPos, 1, true);
+				}
+				ft->chrgText.cpMin = pos;
+				ft->chrgText.cpMax = endPos;
+				if (pos == endPos) {
+					endPos = pdoc->NextPosition(endPos, 1);
+				}
+				if (endPos >= pdoc->LengthNoExcept()) {
+					break;
+				}
+				ft->chrg.cpMin = endPos;
+			} else {
+				break;
+			}
+		} catch (const RegexError &) {
+			errorStatus = Status::RegEx;
+			return -1;
+		}
+	}
+	const double duration = period.Duration()*1e3;
+	printf("%s(%s, %u) duration=%.6f\n", __func__, ft->lpstrText, count, duration);
+	return -1;
+#endif
 }
 
 /**

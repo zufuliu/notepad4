@@ -3200,12 +3200,7 @@ private:
 	void ReadCharacter() noexcept {
 		const CharacterExtracted charExtracted = doc->ExtractCharacter(position);
 		lenBytes = charExtracted.widthBytes;
-		if (charExtracted.character == unicodeReplacementChar) {
-			lenCharacters = 1;
-			buffered[0] = static_cast<wchar_t>(charExtracted.character);
-		} else {
-			lenCharacters = UTF16FromUTF32Character(charExtracted.character, buffered);
-		}
+		lenCharacters = UTF16FromUTF32Character(charExtracted.character, buffered);
 	}
 };
 
