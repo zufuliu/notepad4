@@ -279,9 +279,7 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
 		dbcsCharClass = GetDBCSCharClassify(dbcsCodePage);
-#if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 		regex.reset();
-#endif
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
 	} else {
@@ -2155,9 +2153,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		//const bool forward = direction >= 0;
 		const int increment = (direction >= 0) ? 1 : -1;
 		// table for the condition: forward ? (pos < endSearch) : (pos >= endSearch)
-        //                   direction >= 0  direction < 0
-        // pos >= endSearch: break           continue
-        // pos < endSearch:  continue        break
+		//                   direction >= 0  direction < 0
+		// pos >= endSearch: break           continue
+		// pos < endSearch:  continue        break
 		// i.e. continue search when direction and (pos - endSearch) have opposite signs,
 		// which can be wrote as: (direction ^ (pos - endSearch)) < 0
 
@@ -2425,21 +2423,18 @@ void Document::AllocateLines(Sci::Line lines) {
 
 void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	charClass.SetDefaultCharClasses(includeWordClass);
-	regex.reset();
 }
 
 void Document::SetCharClasses(const unsigned char *chars, CharacterClass newCharClass) noexcept {
 	charClass.SetCharClasses(chars, newCharClass);
-	regex.reset();
 }
 
 void Document::SetCharClassesEx(const unsigned char *chars, size_t length) noexcept {
 	charClass.SetCharClassesEx(chars, length);
-	regex.reset();
 }
 
 int Document::GetCharsOfClass(CharacterClass characterClass, unsigned char *buffer) const noexcept {
-    return charClass.GetCharsOfClass(characterClass, buffer);
+	return charClass.GetCharsOfClass(characterClass, buffer);
 }
 
 #if 0
