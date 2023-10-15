@@ -2,7 +2,6 @@
 /** @file RESearch.cxx
  ** Regular expression search library.
  **/
-#ifndef SCI_OWNREGEX
 
 /*
  * regex - Regular expression pattern matching and replacement
@@ -974,5 +973,3 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 	}
 	return lp;
 }
-
-#endif // SCI_OWNREGEX

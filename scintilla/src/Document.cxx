@@ -24,10 +24,10 @@
 #include <algorithm>
 #include <memory>
 
-#if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
+#if defined(BOOST_REGEX_STANDALONE)
 #include <windows.h>
 #include <boost/regex.hpp>
-#elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+#elif !defined(NO_CXX11_REGEX)
 #include <regex>
 #endif
 
@@ -52,9 +52,7 @@
 #include "Decoration.h"
 #include "CaseFolder.h"
 #include "Document.h"
-#ifndef SCI_OWNREGEX
 #include "RESearch.h"
-#endif
 #include "UniConversion.h"
 #include "ElapsedPeriod.h"
 
@@ -281,7 +279,7 @@ bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
 		dbcsCharClass = GetDBCSCharClassify(dbcsCodePage);
-#if defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+#if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 		regex.reset();
 #endif
 		ModifiedAt(0);	// Need to restyle whole document
@@ -2427,23 +2425,17 @@ void Document::AllocateLines(Sci::Line lines) {
 
 void Document::SetDefaultCharClasses(bool includeWordClass) noexcept {
 	charClass.SetDefaultCharClasses(includeWordClass);
-#ifndef SCI_OWNREGEX
 	regex.reset();
-#endif
 }
 
 void Document::SetCharClasses(const unsigned char *chars, CharacterClass newCharClass) noexcept {
 	charClass.SetCharClasses(chars, newCharClass);
-#ifndef SCI_OWNREGEX
 	regex.reset();
-#endif
 }
 
 void Document::SetCharClassesEx(const unsigned char *chars, size_t length) noexcept {
 	charClass.SetCharClassesEx(chars, length);
-#ifndef SCI_OWNREGEX
 	regex.reset();
-#endif
 }
 
 int Document::GetCharsOfClass(CharacterClass characterClass, unsigned char *buffer) const noexcept {
@@ -2946,8 +2938,6 @@ Sci::Position Document::BraceMatch(Sci::Position position, Sci::Position /*maxRe
 
 namespace {
 
-#ifndef SCI_OWNREGEX
-
 // Define a way for the Regular Expression code to access the document
 class DocumentIndexer final : public CharacterIndexer {
 	const Document *pdoc;
@@ -2968,56 +2958,31 @@ public:
 	}
 };
 
-#else
-
-// class to track regex matched positions
-class RESearch {
-public:
-	RESearch() {
-		Clear();
-	}
-	void Clear() noexcept {
-		bopat.fill(NOTFOUND);
-		eopat.fill(NOTFOUND);
-	}
-
-	static constexpr int MAXTAG = 10;
-	static constexpr int NOTFOUND = -1;
-
-	using MatchPositions = std::array<Sci::Position, MAXTAG>;
-	MatchPositions bopat;
-	MatchPositions eopat;
-};
-
-#endif // SCI_OWNREGEX
-
 /**
  * Implementation of RegexSearchBase for the default built-in regular expression engine
  */
 class BuiltinRegex final : public RegexSearchBase {
 public:
-#ifndef SCI_OWNREGEX
 	explicit BuiltinRegex(const CharClassify *charClassTable) : search(charClassTable) {}
-#endif
 
 	Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
 		FindOption flags, Sci::Position *length) override;
 
 	const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
 
-#if (defined(SCI_OWNREGEX) && !defined(BOOST_REGEX_STANDALONE)) || !defined(NO_CXX11_REGEX)
+#if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 	Sci::Position CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
 		FindOption flags, Sci::Position *length);
 #endif
 
 private:
-#if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
-#elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+#if defined(BOOST_REGEX_STANDALONE)
+#elif !defined(NO_CXX11_REGEX)
 	std::wregex regexUTF8;
 	std::regex regexByte;
 #endif
 	RESearch search;
-#if defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+#if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 	// cache for previous pattern to avoid recompile
 	FindOption previousFlags;
 	std::string cachedPattern;
@@ -3066,7 +3031,7 @@ public:
 	}
 };
 
-#if defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+#if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 
 class ByteIterator {
 public:
@@ -3253,9 +3218,9 @@ public:
 
 #endif // _WIN32
 
-#if defined(SCI_OWNREGEX) && defined(BOOST_REGEX_STANDALONE)
+#if defined(BOOST_REGEX_STANDALONE)
 
-#elif defined(SCI_OWNREGEX) || !defined(NO_CXX11_REGEX)
+#elif !defined(NO_CXX11_REGEX)
 
 #ifdef _MSC_VER
 #define REGEX_MULTILINE
@@ -3401,16 +3366,14 @@ Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position 
 	}
 }
 
-#endif // SCI_OWNREGEX
+#endif // BOOST_REGEX_STANDALONE
 
-#endif // SCI_OWNREGEX || !NO_CXX11_REGEX
-
-#ifndef SCI_OWNREGEX
+#endif // BOOST_REGEX_STANDALONE || !NO_CXX11_REGEX
 
 Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
 	FindOption flags, Sci::Position *length) {
 
-#ifndef NO_CXX11_REGEX
+#if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 	if (FlagSet(flags, FindOption::Cxx11RegEx)) {
 		return CxxRegexFindText(doc, minPos, maxPos, pattern, flags, length);
 	}
@@ -3505,18 +3468,6 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 	return pos;
 }
 
-#else
-
-Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-	FindOption flags, Sci::Position *length) {
-#ifdef BOOST_REGEX_STANDALONE
-#else
-	return CxxRegexFindText(doc, minPos, maxPos, pattern, flags, length);
-#endif
-}
-
-#endif // SCI_OWNREGEX
-
 const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) {
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {
@@ -3572,10 +3523,6 @@ const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, 
 
 }
 
-RegexSearchBase *Scintilla::Internal::CreateRegexSearch([[maybe_unused]] const CharClassify *charClassTable) {
-#ifndef SCI_OWNREGEX
+RegexSearchBase *Scintilla::Internal::CreateRegexSearch(const CharClassify *charClassTable) {
 	return new BuiltinRegex(charClassTable);
-#else
-	return new BuiltinRegex();
-#endif
 }
