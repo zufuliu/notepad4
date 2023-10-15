@@ -329,6 +329,7 @@
         <Preprocessor Value="STRICT_TYPED_ITEMIDS"/>
         <Preprocessor Value="UNICODE"/>
         <Preprocessor Value="_UNICODE"/>
+        <Preprocessor Value="BOOST_REGEX_STANDALONE"/>
         <Preprocessor Value="NO_CXX11_REGEX"/>
       </Compiler>
       <Linker Options="-mwindows;-municode">

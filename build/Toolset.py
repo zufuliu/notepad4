@@ -93,7 +93,9 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 	cxxflags = []
 	# flags to run clang-tidy via vscode-clangd plugin, see https://clangd.llvm.org/
 	defines = ['NDEBUG', '_WINDOWS', 'NOMINMAX', 'WIN32_LEAN_AND_MEAN', 'STRICT_TYPED_ITEMIDS',
-		'UNICODE', '_UNICODE', '_CRT_SECURE_NO_WARNINGS', '_SCL_SECURE_NO_WARNINGS']
+		'UNICODE', '_UNICODE', '_CRT_SECURE_NO_WARNINGS', '_SCL_SECURE_NO_WARNINGS',
+		'BOOST_REGEX_STANDALONE', 'NO_CXX11_REGEX',
+	]
 	warnings = ['-Wextra', '-Wshadow', '-Wimplicit-fallthrough', '-Wformat=2', '-Wundef', '-Wcomma']
 
 	target_flag = '--target=' + target

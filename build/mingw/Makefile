@@ -5,7 +5,8 @@
 
 # Default flags for all configurations and architectures
 
-export CPPFLAGS += -D_WINDOWS -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DSTRICT_TYPED_ITEMIDS -DUNICODE -D_UNICODE
+export CPPFLAGS += -D_WINDOWS -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DSTRICT_TYPED_ITEMIDS -DUNICODE -D_UNICODE \
+	-DBOOST_REGEX_STANDALONE -DNO_CXX11_REGEX
 export CFLAGS += -std=gnu17 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef $(if $(CLANG),-Wcomma,)
 export CXXFLAGS += -std=gnu++20 -municode -Wall -Wextra -Wshadow -Wimplicit-fallthrough -Wformat=2 -Wundef $(if $(CLANG),-Wcomma,)
 export LDFLAGS += -mwindows -municode
