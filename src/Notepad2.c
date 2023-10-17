@@ -1038,7 +1038,7 @@ void MsgDropFiles(HWND hwnd, UINT umsg, WPARAM wParam) {
 	HDROP hDrop = (HDROP)wParam;
 	// fix drag & drop file from 32-bit app to 64-bit Notepad2 before Win 10
 #if defined(_WIN64) && (_WIN32_WINNT < _WIN32_WINNT_WIN10)
-	if (umsg == WM_DROPFILES) {
+	if (umsg == WM_DROPFILES && !bReadOnlyMode) {
 		POINT pt;
 		if (DragQueryPoint(hDrop, &pt)) { // client area
 			RECT rc;

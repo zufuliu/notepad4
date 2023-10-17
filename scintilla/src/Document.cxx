@@ -2979,7 +2979,7 @@ private:
 	RESearch search;
 #if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 	// cache for previous pattern to avoid recompile
-	FindOption previousFlags;
+	FindOption previousFlags = FindOption::None;
 	std::string cachedPattern;
 #endif
 	std::string substituted;
