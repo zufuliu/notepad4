@@ -51,7 +51,6 @@ private:
 	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */
 	char nfa[MAXNFA];    /* automaton */
 	int sta;
-	int failure;
 
 	// cache for previous pattern to avoid recompile
 	Scintilla::FindOption previousFlags;
