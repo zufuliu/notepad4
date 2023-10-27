@@ -3042,7 +3042,7 @@ public:
 
 	const Document *doc;
 	Sci::Position position;
-	explicit ByteIterator(const Document *doc_ = nullptr, Sci::Position position_ = 0) noexcept :
+	explicit ByteIterator(const Document *doc_ = nullptr, Sci::Position position_ = 0, [[maybe_unused]] bool start = false) noexcept :
 		doc(doc_), position(position_) {}
 	char operator*() const noexcept {
 		return doc->CharAt(position);
@@ -3100,9 +3100,9 @@ public:
 	using pointer = wchar_t*;
 	using reference = wchar_t&;
 
-	explicit UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0) noexcept :
+	explicit UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0, bool start = false) noexcept :
 		doc(doc_), position(position_) {
-		if (doc) {
+		if (start) {
 			ReadCharacter();
 		}
 	}
@@ -3182,7 +3182,7 @@ public:
 	using pointer = wchar_t*;
 	using reference = wchar_t&;
 
-	explicit UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0) noexcept :
+	explicit UTF8Iterator(const Document *doc_ = nullptr, Sci::Position position_ = 0, [[maybe_unused]] bool start = false) noexcept :
 		doc(doc_), position(position_) {}
 	wchar_t operator*() const noexcept {
 		const CharacterExtracted charExtracted = doc->ExtractCharacter(position);
@@ -3237,7 +3237,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 
 	bool matched = false;
 	if (resr.increment > 0) {
-		Iterator itStart(doc, resr.startPos);
+		Iterator itStart(doc, resr.startPos, true);
 		Iterator itEnd(doc, resr.endPos);
 		const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
 		matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
@@ -3245,7 +3245,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 		// Line by line.
 		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
 			const Range lineRange = resr.LineRange(line);
-			Iterator itStart(doc, lineRange.start);
+			Iterator itStart(doc, lineRange.start, true);
 			Iterator itEnd(doc, lineRange.end);
 			boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
 			matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
@@ -3258,7 +3258,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 						// empty match
 						endPos = doc->NextPosition(endPos, 1);
 					}
-					Iterator itNext(doc, endPos);
+					Iterator itNext(doc, endPos, true);
 					boost::match_results<Iterator> matchNext;
 					if (boost::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
 						match = matchNext;
@@ -3359,7 +3359,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	bool matched = false;
 #ifdef REGEX_MULTILINE
 	if (resr.increment > 0) {
-		Iterator itStart(doc, resr.startPos);
+		Iterator itStart(doc, resr.startPos, true);
 		Iterator itEnd(doc, resr.endPos);
 		const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
 		matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
@@ -3370,7 +3370,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 		// Line by line.
 		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
 			const Range lineRange = resr.LineRange(line);
-			Iterator itStart(doc, lineRange.start);
+			Iterator itStart(doc, lineRange.start, true);
 			Iterator itEnd(doc, lineRange.end);
 			std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
 			matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
@@ -3386,7 +3386,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 						// empty match
 						endPos = doc->NextPosition(endPos, 1);
 					}
-					Iterator itNext(doc, endPos);
+					Iterator itNext(doc, endPos, true);
 					std::match_results<Iterator> matchNext;
 					if (std::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
 						match = matchNext;
