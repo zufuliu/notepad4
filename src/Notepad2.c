@@ -5731,7 +5731,10 @@ void LoadSettings(void) {
 	// window position section
 	{
 		WCHAR sectionName[96];
-		HMONITOR hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTONEAREST);
+		POINT pt;
+		pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
+		pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
+		HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
 		GetWindowPositionSectionName(hMonitor, sectionName);
 		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
@@ -5846,6 +5849,10 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	WCHAR wchTmp[MAX_PATH];
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	if (!bStickyWindowPosition) {
+		SaveWindowPosition(pIniSectionBuf);
+	}
+
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave * const pIniSection = &section;
 
@@ -5983,11 +5990,12 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
 	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
+	if (!bStickyWindowPosition) {
+		IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+		IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+	}
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-	if (!bStickyWindowPosition) {
-		SaveWindowPosition(pIniSectionBuf);
-	}
 	NP2HeapFree(pIniSectionBuf);
 	// Scintilla Styles
 	Style_Save();

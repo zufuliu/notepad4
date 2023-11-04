@@ -2394,8 +2394,7 @@ bool ChangeDirectory(HWND hwnd, LPCWSTR lpszNewDir, bool bUpdateHistory) {
 	return true;
 }
 
-static void GetWindowPositionSectionName(WCHAR sectionName[96]) {
-	HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+static void GetWindowPositionSectionName(HMONITOR hMonitor, WCHAR sectionName[96]) {
 	MONITORINFO mi;
 	mi.cbSize = sizeof(mi);
 	GetMonitorInfo(hMonitor, &mi);
@@ -2651,7 +2650,11 @@ void LoadSettings(void) {
 	// window position section
 	{
 		WCHAR sectionName[96];
-		GetWindowPositionSectionName(sectionName);
+		POINT pt;
+		pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
+		pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
+		HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+		GetWindowPositionSectionName(hMonitor, sectionName);
 		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
 
@@ -2754,6 +2757,8 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	WCHAR wchTmp[MAX_PATH];
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	SaveWindowPosition(pIniSectionBuf);
+
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave * const pIniSection = &section;
 
@@ -2805,9 +2810,10 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, true);
+	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-	SaveWindowPosition(pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
 }
 
@@ -2817,7 +2823,8 @@ void SaveWindowPosition(WCHAR *pIniSectionBuf) {
 	IniSectionOnSave * const pIniSection = &section;
 
 	WCHAR sectionName[96];
-	GetWindowPositionSectionName(sectionName);
+	HMONITOR hMonitor = MonitorFromWindow(hwndMain, MONITOR_DEFAULTTONEAREST);
+	GetWindowPositionSectionName(hMonitor, sectionName);
 
 	// query window dimensions when window is not minimized
 	if (!IsIconic(hwndMain)) {
