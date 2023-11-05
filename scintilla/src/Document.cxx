@@ -475,32 +475,11 @@ Range Document::LineRange(Sci::Line line) const noexcept {
 }
 
 bool Document::IsLineStartPosition(Sci::Position position) const noexcept {
-	return LineStart(SciLineFromPosition(position)) == position;
+	return LineStartPosition(position) == position;
 }
 
 Sci_Position SCI_METHOD Document::LineEnd(Sci_Line line) const noexcept {
-	Sci::Position position = LineStart(line + 1);
-	if (line < LinesTotal() - 1) {
-		if (cb.GetLineEndTypes() != LineEndType::Default) {
-			const unsigned char bytes[] = {
-				cb.UCharAt(position - 3),
-				cb.UCharAt(position - 2),
-				cb.UCharAt(position - 1),
-			};
-			if (UTF8IsSeparator(bytes)) {
-				return position - UTF8SeparatorLength;
-			}
-			if (UTF8IsNEL(bytes + 1)) {
-				return position - UTF8NELLength;
-			}
-		}
-		position--; // Back over CR or LF
-		// When line terminator is CR+LF, may need to go back one more
-		if ((position > LineStart(line)) && (cb.CharAt(position - 1) == '\r')) {
-			position--;
-		}
-	}
-	return position;
+	return cb.LineEnd(line);
 }
 
 void SCI_METHOD Document::SetErrorStatus(int status) noexcept {
@@ -519,16 +498,20 @@ Sci::Line Document::SciLineFromPosition(Sci::Position pos) const noexcept {
 	return cb.LineFromPosition(pos);
 }
 
+Sci::Position Document::LineStartPosition(Sci::Position position) const noexcept {
+	return cb.LineStart(cb.LineFromPosition(position));
+}
+
 Sci::Position Document::LineEndPosition(Sci::Position position) const noexcept {
-	return LineEnd(SciLineFromPosition(position));
+	return cb.LineEnd(cb.LineFromPosition(position));
 }
 
 bool Document::IsLineEndPosition(Sci::Position position) const noexcept {
-	return LineEnd(SciLineFromPosition(position)) == position;
+	return LineEndPosition(position) == position;
 }
 
 bool Document::IsPositionInLineEnd(Sci::Position position) const noexcept {
-	return position >= LineEnd(SciLineFromPosition(position));
+	return position >= LineEndPosition(position);
 }
 
 Sci::Position Document::VCHomePosition(Sci::Position position) const noexcept {
@@ -826,7 +809,7 @@ Sci::Position Document::MovePositionOutsideChar(Sci::Position pos, Sci::Position
 		} else {
 			// Anchor DBCS calculations at start of line because start of line can
 			// not be a DBCS trail byte.
-			const Sci::Position posStartLine = LineStart(cb.LineFromPosition(pos));
+			const Sci::Position posStartLine = LineStartPosition(pos);
 			if (pos == posStartLine)
 				return pos;
 
@@ -911,7 +894,7 @@ Sci::Position Document::NextPosition(Sci::Position pos, int moveDir) const noexc
 			} else {
 				// Anchor DBCS calculations at start of line because start of line can
 				// not be a DBCS trail byte.
-				const Sci::Position posStartLine = cb.LineStart(cb.LineFromPosition(pos));
+				const Sci::Position posStartLine = LineStartPosition(pos);
 				// How to Go Backward in a DBCS String
 				// https://msdn.microsoft.com/en-us/library/cc194792.aspx
 				// DBCS-Enabled Programs vs. Non-DBCS-Enabled Programs
@@ -2500,8 +2483,7 @@ void Document::EnsureStyledTo(Sci::Position pos) {
 	if ((enteredStyling == 0) && (pos > GetEndStyled())) {
 		IncrementStyleClock();
 		if (pli && !pli->UseContainerLexing()) {
-			const Sci::Line lineEndStyled = SciLineFromPosition(GetEndStyled());
-			const Sci::Position endStyledTo = LineStart(lineEndStyled);
+			const Sci::Position endStyledTo = LineStartPosition(GetEndStyled());
 			pli->Colourise(endStyledTo, pos);
 		} else {
 			// Ask the watchers to style, and stop as soon as one responds.
@@ -3421,8 +3403,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 		}
 
 		const DocumentIndexer di(doc, endOfLine);
-		search.lineStartPos = lineStartPos;
-		search.lineEndPos = lineEndPos;
+		search.SetLineRange(lineStartPos, lineEndPos);
 		int success = search.Execute(di, startOfLine, endOfLine);
 		if (success) {
 			pos = search.bopat[0];

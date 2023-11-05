@@ -528,6 +528,7 @@ public:
 	[[nodiscard]] Range LineRange(Sci::Line line) const noexcept;
 	bool IsLineStartPosition(Sci::Position position) const noexcept;
 	Sci_Position SCI_METHOD LineEnd(Sci_Line line) const noexcept override;
+	Sci::Position LineStartPosition(Sci::Position position) const noexcept;
 	Sci::Position LineEndPosition(Sci::Position position) const noexcept;
 	bool IsLineEndPosition(Sci::Position position) const noexcept;
 	bool IsPositionInLineEnd(Sci::Position position) const noexcept;

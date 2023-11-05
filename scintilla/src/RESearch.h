@@ -22,6 +22,10 @@ public:
 	void Clear() noexcept;
 	const char *Compile(const char *pattern, size_t length, Scintilla::FindOption flags);
 	int Execute(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp);
+	void SetLineRange(Sci::Position startPos, Sci::Position endPos) noexcept {
+		lineStartPos = startPos;
+		lineEndPos = endPos;
+	}
 
 	static constexpr int MAXTAG = 10;
 	static constexpr int NOTFOUND = -1;
@@ -29,10 +33,6 @@ public:
 	using MatchPositions = std::array<Sci::Position, MAXTAG>;
 	MatchPositions bopat;
 	MatchPositions eopat;
-
-	// positions to match line start and line end
-	Sci::Position lineStartPos;
-	Sci::Position lineEndPos;
 
 private:
 	static constexpr int MAXNFA = 4096;
@@ -48,6 +48,9 @@ private:
 	const char *DoCompile(const char *pattern, size_t length, Scintilla::FindOption flags) noexcept;
 	Sci::Position PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci::Position endp, const char *ap);
 
+	// positions to match line start and line end
+	Sci::Position lineStartPos;
+	Sci::Position lineEndPos;
 	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */
 	char nfa[MAXNFA];    /* automaton */
 	int sta;

@@ -1000,13 +1000,13 @@ Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &m
 
 namespace {
 
-constexpr ColourRGBA bugColour = ColourRGBA(0xff, 0, 0xfe, 0xf0);
+constexpr ColourRGBA colourBug(0xff, 0, 0xfe, 0xf0);
 
 // Selection background colours are always defined, the value_or is to show if bug
 
 ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
 	if (inSelection == InSelection::inNone)
-		return bugColour;	// Not selected is a bug
+		return colourBug;	// Not selected is a bug
 
 	Element element = Element::SelectionBack;
 	if (inSelection == InSelection::inAdditional)
@@ -1019,7 +1019,7 @@ ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, 
 			return *colour;
 		}
 	}
-	return vsDraw.ElementColour(element).value_or(bugColour);
+	return vsDraw.ElementColour(element).value_or(colourBug);
 }
 
 ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
@@ -1609,9 +1609,9 @@ void EditView::DrawAnnotation(Surface *surface, const EditModel &model, const Vi
 		}
 	} else {
 #ifndef NDEBUG
-		// No annotation to draw so show bug with bugColour
+		// No annotation to draw so show bug with colourBug
 		if (FlagSet(phase, DrawPhase::back)) {
-			surface->FillRectangle(rcSegment, bugColour.Opaque());
+			surface->FillRectangle(rcSegment, colourBug.Opaque());
 		}
 #endif
 	}
@@ -2300,7 +2300,7 @@ ColourRGBA InvertedLight(ColourRGBA orig) noexcept {
 	const unsigned int l = (r + g + b) / 3; 	// There is a better calculation for this that matches human eye
 	const unsigned int il = 0xff - l;
 	if (l == 0)
-		return ColourRGBA(0xff, 0xff, 0xff);
+		return white;
 	r = r * il / l;
 	g = g * il / l;
 	b = b * il / l;
@@ -2945,15 +2945,15 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 			it->fore = InvertedLight(it->fore);
 			it->back = InvertedLight(it->back);
 		} else if (colourMode == PrintOption::BlackOnWhite) {
-			it->fore = ColourRGBA(0, 0, 0);
-			it->back = ColourRGBA(0xff, 0xff, 0xff);
+			it->fore = black;
+			it->back = white;
 		} else if (colourMode == PrintOption::ColourOnWhite || colourMode == PrintOption::ColourOnWhiteDefaultBG) {
-			it->back = ColourRGBA(0xff, 0xff, 0xff);
+			it->back = white;
 		}
 	}
 	// White background for the line numbers if PrintOption::ScreenColours isn't used
 	if (colourMode != PrintOption::ScreenColours) {
-		vsPrint.styles[StyleLineNumber].back = ColourRGBA(0xff, 0xff, 0xff);
+		vsPrint.styles[StyleLineNumber].back = white;
 	}
 
 	// Printing uses different margins, so reset screen margins
