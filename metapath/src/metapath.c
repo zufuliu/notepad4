@@ -2508,35 +2508,9 @@ void LoadSettings(void) {
 	IniSectionParse(pIniSection, pIniSectionBuf);
 
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", true);
-	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", true);
-	bOpenFileInSameWindow = IniSectionGetBool(pIniSection, L"OpenFileInSameWindow", false);
-	iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
-	iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
-
-	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", true);
-	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", false);
-	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", true);
-	fNoConfirmDelete = IniSectionGetBool(pIniSection, L"NoConfirmDelete", false);
-	bClearReadOnly = IniSectionGetBool(pIniSection, L"ClearReadOnly", true);
-	bRenameOnCollision = IniSectionGetBool(pIniSection, L"RenameOnCollision", false);
-	bFocusEdit = IniSectionGetBool(pIniSection, L"FocusEdit", true);
-	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", false);
-	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", false);
-	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", false);
-	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", false);
-
-	int iValue = IniSectionGetInt(pIniSection, L"EscFunction", EscFunction_None);
-	iEscFunction = (EscFunction)clamp_i(iValue, EscFunction_None, EscFunction_Exit);
-
-	if (IsVistaAndAbove()) {
-		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", false);
-	} else {
-		bUseXPFileDialog = true;
-	}
-
-	iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", StartupDirectory_MRU);
+	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
+	int iValue = IniSectionGetInt(pIniSection, L"StartupDirectory", StartupDirectory_MRU);
 	iStartupDir = (StartupDirectory)clamp_i(iValue, StartupDirectory_None, StartupDirectory_Favorite);
-
 	IniSectionGetString(pIniSection, L"MRUDirectory", L"", szMRUDirectory, COUNTOF(szMRUDirectory));
 
 	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
@@ -2579,8 +2553,37 @@ void LoadSettings(void) {
 	}
 
 	bHasQuickview = PathIsFile(szQuickview);
-	IniSectionGetString(pIniSection, L"QuikviewParams", L"",
-						szQuickviewParams, COUNTOF(szQuickviewParams));
+	IniSectionGetString(pIniSection, L"QuikviewParams", L"", szQuickviewParams, COUNTOF(szQuickviewParams));
+
+	POINT pt;
+	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
+	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
+
+	bSingleClick = IniSectionGetBool(pIniSection, L"SingleClick", true);
+	bOpenFileInSameWindow = IniSectionGetBool(pIniSection, L"OpenFileInSameWindow", false);
+	iDefaultOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENSAME : IDM_FILE_OPENNEW;
+	iShiftOpenMenu = bOpenFileInSameWindow ? IDM_FILE_OPENNEW : IDM_FILE_OPENSAME;
+
+	bTrackSelect = IniSectionGetBool(pIniSection, L"TrackSelect", true);
+	bFullRowSelect = IniSectionGetBool(pIniSection, L"FullRowSelect", false);
+	fUseRecycleBin = IniSectionGetBool(pIniSection, L"UseRecycleBin", true);
+	fNoConfirmDelete = IniSectionGetBool(pIniSection, L"NoConfirmDelete", false);
+	bClearReadOnly = IniSectionGetBool(pIniSection, L"ClearReadOnly", true);
+	bRenameOnCollision = IniSectionGetBool(pIniSection, L"RenameOnCollision", false);
+	bFocusEdit = IniSectionGetBool(pIniSection, L"FocusEdit", true);
+	bAlwaysOnTop = IniSectionGetBool(pIniSection, L"AlwaysOnTop", false);
+	bMinimizeToTray = IniSectionGetBool(pIniSection, L"MinimizeToTray", false);
+	bTransparentMode = IniSectionGetBool(pIniSection, L"TransparentMode", false);
+	bWindowLayoutRTL = IniSectionGetBool(pIniSection, L"WindowLayoutRTL", false);
+
+	iValue = IniSectionGetInt(pIniSection, L"EscFunction", EscFunction_None);
+	iEscFunction = (EscFunction)clamp_i(iValue, EscFunction_None, EscFunction_Exit);
+
+	if (IsVistaAndAbove()) {
+		bUseXPFileDialog = IniSectionGetBool(pIniSection, L"UseXPFileDialog", false);
+	} else {
+		bUseXPFileDialog = true;
+	}
 
 	dwFillMask = IniSectionGetInt(pIniSection, L"FillMask", DL_ALLOBJECTS);
 	if (dwFillMask & ~DL_ALLOBJECTS) {
@@ -2627,10 +2630,6 @@ void LoadSettings(void) {
 	bAutoScaleToolbar = IniSectionGetBool(pIniSection, L"AutoScaleToolbar", true);
 	bShowStatusbar = IniSectionGetBool(pIniSection, L"ShowStatusbar", true);
 	bShowDriveBox = IniSectionGetBool(pIniSection, L"ShowDriveBox", true);
-
-	POINT pt;
-	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
-	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
 
 	// toolbar image
 	{
@@ -2765,6 +2764,20 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionOnSave * const pIniSection = &section;
 
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
+	IniSectionSetIntEx(pIniSection, L"StartupDirectory", (int)iStartupDir, StartupDirectory_MRU);
+	if (iStartupDir == StartupDirectory_MRU) {
+		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
+	}
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
+	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
+	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
+	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+
 	IniSectionSetBoolEx(pIniSection, L"SingleClick", bSingleClick, true);
 	IniSectionSetBoolEx(pIniSection, L"OpenFileInSameWindow", bOpenFileInSameWindow, false);
 	IniSectionSetBoolEx(pIniSection, L"TrackSelect", bTrackSelect, true);
@@ -2784,19 +2797,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"UseXPFileDialog", bUseXPFileDialog, false);
 	}
 
-	IniSectionSetIntEx(pIniSection, L"StartupDirectory", (int)iStartupDir, StartupDirectory_MRU);
-	if (iStartupDir == StartupDirectory_MRU) {
-		IniSectionSetString(pIniSection, L"MRUDirectory", szCurDir);
-	}
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	PathRelativeToApp(szQuickview, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Quikview.exe", wchTmp);
-	IniSectionSetStringEx(pIniSection, L"QuikviewParams", szQuickviewParams, L"");
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
 	IniSectionSetIntEx(pIniSection, L"FillMask", dwFillMask, DL_ALLOBJECTS);
-
 	IniSectionSetIntEx(pIniSection, L"SortOptions", nSortFlags, DS_NAME);
 	IniSectionSetBoolEx(pIniSection, L"SortReverse", fSortRev, false);
 	IniSectionSetStringEx(pIniSection, L"FileFilter", tchFilter, L"*.*");
@@ -2812,8 +2813,6 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowDriveBox", bShowDriveBox, true);
-	IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-	IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);

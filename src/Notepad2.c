@@ -5462,34 +5462,7 @@ void LoadSettings(void) {
 
 	//const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", true);
-	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", false);
-	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", false);
-	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", true);
-	bFindReplaceUseMonospacedFont = IniSectionGetBool(pIniSection, L"FindReplaceUseMonospacedFont", false);
-	bFindReplaceFindAllBookmark = IniSectionGetBool(pIniSection, L"FindReplaceFindAllBookmark", false);
-
-	efrData.bFindClose = IniSectionGetBool(pIniSection, L"CloseFind", false);
-	efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"CloseReplace", false);
-	efrData.bNoFindWrap = IniSectionGetBool(pIniSection, L"NoFindWrap", false);
-
-	if (bSaveFindReplace) {
-		efrData.fuFlags = 0;
-		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchCase", false)) {
-			efrData.fuFlags |= SCFIND_MATCHCASE;
-		}
-		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", false)) {
-			efrData.fuFlags |= SCFIND_WHOLEWORD;
-		}
-		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", false)) {
-			efrData.fuFlags |= SCFIND_WORDSTART;
-		}
-		if (IniSectionGetBool(pIniSection, L"FindReplaceRegExpSearch", false)) {
-			efrData.fuFlags |= NP2_RegexDefaultFlags;
-		}
-		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", false);
-		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", false);
-	}
-
+	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
 	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -5523,8 +5496,39 @@ void LoadSettings(void) {
 	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", TitlePathNameFormat_NameFirst);
 	iPathNameFormat = (TitlePathNameFormat)clamp_i(iValue, TitlePathNameFormat_NameOnly, TitlePathNameFormat_FullPath);
 
-	fWordWrapG = IniSectionGetBool(pIniSection, L"WordWrap", true);
+	POINT pt;
+	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
+	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
 
+	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", false);
+	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", false);
+	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", true);
+	bFindReplaceUseMonospacedFont = IniSectionGetBool(pIniSection, L"FindReplaceUseMonospacedFont", false);
+	bFindReplaceFindAllBookmark = IniSectionGetBool(pIniSection, L"FindReplaceFindAllBookmark", false);
+
+	efrData.bFindClose = IniSectionGetBool(pIniSection, L"CloseFind", false);
+	efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"CloseReplace", false);
+	efrData.bNoFindWrap = IniSectionGetBool(pIniSection, L"NoFindWrap", false);
+
+	if (bSaveFindReplace) {
+		efrData.fuFlags = 0;
+		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchCase", false)) {
+			efrData.fuFlags |= SCFIND_MATCHCASE;
+		}
+		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", false)) {
+			efrData.fuFlags |= SCFIND_WHOLEWORD;
+		}
+		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", false)) {
+			efrData.fuFlags |= SCFIND_WORDSTART;
+		}
+		if (IniSectionGetBool(pIniSection, L"FindReplaceRegExpSearch", false)) {
+			efrData.fuFlags |= NP2_RegexDefaultFlags;
+		}
+		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", false);
+		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", false);
+	}
+
+	fWordWrapG = IniSectionGetBool(pIniSection, L"WordWrap", true);
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_AUTO);
 	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_AUTO);
 
@@ -5709,10 +5713,6 @@ void LoadSettings(void) {
 	iFullScreenMode = iValue;
 	bInFullScreenMode = iValue & FullScreenMode_OnStartup;
 
-	POINT pt;
-	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
-	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
-
 	// toolbar image section
 	{
 		LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cchIniSection);
@@ -5860,9 +5860,19 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	//IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
+
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
+	IniSectionSetIntEx(pIniSection, L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
+	if (!bStickyWindowPosition) {
+		IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+		IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+	}
+
 	IniSectionSetBoolEx(pIniSection, L"SaveRecentFiles", bSaveRecentFiles, false);
 	IniSectionSetBoolEx(pIniSection, L"SaveFindReplace", bSaveFindReplace, false);
-
 	IniSectionSetBoolEx(pIniSection, L"CloseFind", efrData.bFindClose, false);
 	IniSectionSetBoolEx(pIniSection, L"CloseReplace", efrData.bReplaceClose, false);
 	IniSectionSetBoolEx(pIniSection, L"NoFindWrap", efrData.bNoFindWrap, false);
@@ -5877,12 +5887,6 @@ void SaveSettings(bool bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS, false);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, false);
 	}
-
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	IniSectionSetIntEx(pIniSection, L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
 
 	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, true);
 	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
@@ -5992,10 +5996,6 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetBoolEx(pIniSection, L"AutoScaleToolbar", bAutoScaleToolbar, true);
 	IniSectionSetBoolEx(pIniSection, L"ShowStatusbar", bShowStatusbar, true);
 	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
-	if (!bStickyWindowPosition) {
-		IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
-		IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
-	}
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
