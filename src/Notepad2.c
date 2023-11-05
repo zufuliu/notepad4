@@ -5709,6 +5709,10 @@ void LoadSettings(void) {
 	iFullScreenMode = iValue;
 	bInFullScreenMode = iValue & FullScreenMode_OnStartup;
 
+	POINT pt;
+	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
+	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
+
 	// toolbar image section
 	{
 		LoadIniSection(INI_SECTION_NAME_TOOLBAR_IMAGES, pIniSectionBuf, cchIniSection);
@@ -5731,9 +5735,6 @@ void LoadSettings(void) {
 	// window position section
 	{
 		WCHAR sectionName[96];
-		POINT pt;
-		pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
-		pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
 		HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
 		GetWindowPositionSectionName(hMonitor, sectionName);
 		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
@@ -5851,6 +5852,7 @@ void SaveSettings(bool bSaveSettingsNow) {
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
 	if (!bStickyWindowPosition) {
 		SaveWindowPosition(pIniSectionBuf);
+		memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 	}
 
 	IniSectionOnSave section = { pIniSectionBuf };
@@ -6002,7 +6004,6 @@ void SaveSettings(bool bSaveSettingsNow) {
 }
 
 void SaveWindowPosition(WCHAR *pIniSectionBuf) {
-	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave *const pIniSection = &section;
 
