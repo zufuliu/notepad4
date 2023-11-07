@@ -614,10 +614,7 @@ void MRU_Destroy(LPMRULIST pmru);
 bool MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 bool MRU_Delete(LPMRULIST pmru, int iIndex);
 void MRU_Empty(LPMRULIST pmru);
-int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
-	return MRU_Enum(pmru, 0, NULL, 0);
-}
+int MRU_GetCount(LPCMRULIST pmru);
 bool MRU_Load(LPMRULIST pmru);
 bool MRU_Save(LPCMRULIST pmru);
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);

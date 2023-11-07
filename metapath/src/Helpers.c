@@ -1929,20 +1929,12 @@ void MRU_Empty(LPMRULIST pmru) {
 	}
 }
 
-int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
-	if (pszItem == NULL || cchItem == 0) {
-		int i = 0;
-		while (i < pmru->iSize && pmru->pszItems[i]) {
-			i++;
-		}
-		return i;
+int MRU_GetCount(LPCMRULIST pmru) {
+	int i = 0;
+	while (i < pmru->iSize && pmru->pszItems[i]) {
+		i++;
 	}
-
-	if (iIndex < 0 || iIndex >= pmru->iSize || pmru->pszItems[iIndex] == NULL) {
-		return -1;
-	}
-	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
-	return TRUE;
+	return i;
 }
 
 bool MRU_Load(LPMRULIST pmru) {
@@ -2003,12 +1995,15 @@ bool MRU_Save(LPCMRULIST pmru) {
 }
 
 void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
-	WCHAR tch[MAX_PATH];
 	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
 	MRU_Load(pmru);
-	for (int i = 0; i < MRU_GetCount(pmru); i++) {
-		MRU_Enum(pmru, i, tch, COUNTOF(tch));
-		ComboBox_AddString(hwnd, tch);
+	for (int i = 0; i < pmru->iSize; i++) {
+		LPCWSTR path = pmru->pszItems[i];
+		if (path) {
+			ComboBox_AddString(hwnd, path);
+		} else {
+			break;
+		}
 	}
 	MRU_Destroy(pmru);
 }
