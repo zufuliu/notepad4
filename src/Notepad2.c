@@ -75,7 +75,7 @@ static UINT uTrayIconDPI = 0;
 static TBBUTTON tbbMainWnd[] = {
 	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, BTNS_DROPDOWN, {0}, 0, 0},
 	{2, 	IDT_FILE_BROWSE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{3, 	IDT_FILE_SAVE, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{4, 	IDT_EDIT_UNDO, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -5017,6 +5017,20 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_VIEW_ALWAYSONTOP:
 		SendWMCommandOrBeep(hwnd, IDM_VIEW_ALWAYSONTOP);
 		break;
+
+	default: {
+		const UINT index = LOWORD(wParam) - IDM_RECENT_HISTORY_START;
+		if (index < MRU_MAXITEMS) {
+			LPCWSTR path = pFileMRU->pszItems[index];
+			if (StrNotEmpty(path)) {
+				if (FileSave(FileSaveFlag_Ask)) {
+					WCHAR tchFile[MAX_PATH];
+					PathAbsoluteFromApp(path, tchFile, true);
+					FileLoad(FileLoadFlag_DontSave, tchFile);
+				}
+			}
+		}
+	} break;
 	}
 
 	return 0;
@@ -5324,7 +5338,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case TBN_GETBUTTONINFO: {
 			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
-			if (lpTbNotify->iItem < (int)COUNTOF(tbbMainWnd)) {
+			if ((UINT)lpTbNotify->iItem < COUNTOF(tbbMainWnd)) {
 				WCHAR tch[256];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
@@ -5340,16 +5354,34 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case TBN_DROPDOWN: {
 			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
-			RECT rc;
-			SendMessage(hwndToolbar, TB_GETRECT, lpTbNotify->iItem, (LPARAM)&rc);
-			MapWindowPoints(hwndToolbar, HWND_DESKTOP, (LPPOINT)&rc, 2);
-			HMENU hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+			HMENU hmenu = NULL;
+			HMENU subMenu = NULL;
+			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
+				NP2_static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
+				const int count = MRU_GetCount(pFileMRU);
+				if (count <= 0) {
+					return TBDDRET_TREATPRESSED;
+				}
+				hmenu = subMenu = CreatePopupMenu();
+				WCHAR tch[MAX_PATH];
+				for (int i = 0; i < count; i++) {
+					LPCWSTR path = pFileMRU->pszItems[i];
+					if (StrNotEmpty(path)) {
+						PathAbsoluteFromApp(path, tch, true);
+						AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, tch);
+					}
+				}
+			} else {
+				hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+				subMenu = GetSubMenu(hmenu, IDP_POPUP_SUBMENU_FOLD);
+			}
 			TPMPARAMS tpm;
 			tpm.cbSize = sizeof(TPMPARAMS);
-			tpm.rcExclude = rc;
-			TrackPopupMenuEx(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_FOLD),
+			SendMessage(hwndToolbar, TB_GETRECT, lpTbNotify->iItem, (LPARAM)&tpm.rcExclude);
+			MapWindowPoints(hwndToolbar, HWND_DESKTOP, (LPPOINT)&tpm.rcExclude, 2);
+			TrackPopupMenuEx(subMenu,
 							TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-							rc.left, rc.bottom, hwnd, &tpm);
+							tpm.rcExclude.left, tpm.rcExclude.bottom, hwnd, &tpm);
 			DestroyMenu(hmenu);
 		}
 		return FALSE;
