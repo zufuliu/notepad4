@@ -1238,12 +1238,16 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			lvi.iImage = shfi.iIcon;
 
 			WCHAR tch[MAX_PATH];
-			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
-				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
-				PathAbsoluteFromApp(tch, tch, true);
-				lvi.iItem = i;
-				lvi.pszText = tch;
-				ListView_InsertItem(hwndLV, &lvi);
+			for (int i = 0; i < pFileMRU->iSize; i++) {
+				LPCWSTR path = pFileMRU->pszItems[i];
+				if (path) {
+					PathAbsoluteFromApp(path, tch, true);
+					lvi.iItem = i;
+					lvi.pszText = tch;
+					ListView_InsertItem(hwndLV, &lvi);
+				} else {
+					break;
+				}
 			}
 
 			ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);

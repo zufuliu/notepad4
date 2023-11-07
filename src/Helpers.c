@@ -2443,6 +2443,7 @@ bool MRU_Delete(LPMRULIST pmru, int iIndex) {
 	}
 	if (pmru->pszItems[iIndex]) {
 		LocalFree(pmru->pszItems[iIndex]);
+		pmru->pszItems[iIndex] = NULL;
 	}
 	for (int i = iIndex; i < pmru->iSize - 1; i++) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];
@@ -2452,18 +2453,26 @@ bool MRU_Delete(LPMRULIST pmru, int iIndex) {
 }
 
 bool MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
-	int i = 0;
 	WCHAR wchItem[MAX_PATH];
 
 	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruStore);
 
-	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) >= 0) {
-		PathAbsoluteFromApp(wchItem, wchItem, true);
+	for (int index = 0; index < pmruStore->iSize; ) {
+		LPCWSTR path = pmruStore->pszItems[index];
+		if (path == NULL) {
+			break;
+		}
+		PathAbsoluteFromApp(path, wchItem, true);
 		if (PathEqual(wchItem, pszFile)) {
-			MRU_Delete(pmruStore, i);
+			LocalFree(pmruStore->pszItems[index]);
+			pmruStore->pszItems[index] = NULL;
+			for (int i = index; i < pmruStore->iSize - 1; i++) {
+				pmruStore->pszItems[i] = pmruStore->pszItems[i + 1];
+				pmruStore->pszItems[i + 1] = NULL;
+			}
 		} else {
-			i++;
+			index++;
 		}
 	}
 
@@ -2481,20 +2490,12 @@ void MRU_Empty(LPMRULIST pmru) {
 	}
 }
 
-int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
-	if (pszItem == NULL || cchItem == 0) {
-		int i = 0;
-		while (i < pmru->iSize && pmru->pszItems[i]) {
-			i++;
-		}
-		return i;
+int MRU_GetCount(LPCMRULIST pmru) {
+	int i = 0;
+	while (i < pmru->iSize && pmru->pszItems[i]) {
+		i++;
 	}
-
-	if (iIndex < 0 || iIndex >= pmru->iSize || pmru->pszItems[iIndex] == NULL) {
-		return -1;
-	}
-	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
-	return TRUE;
+	return i;
 }
 
 bool MRU_Load(LPMRULIST pmru) {
@@ -2582,6 +2583,17 @@ bool MRU_MergeSave(LPCMRULIST pmru, bool bAddFiles, bool bRelativePath, bool bUn
 	MRU_Save(pmruBase);
 	MRU_Destroy(pmruBase);
 	return true;
+}
+
+void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
+	for (int i = 0; i < pmru->iSize; i++) {
+		LPCWSTR str = pmru->pszItems[i];
+		if (str) {
+			ComboBox_AddString(hwnd, str);
+		} else {
+			break;
+		}
+	}
 }
 
 /*

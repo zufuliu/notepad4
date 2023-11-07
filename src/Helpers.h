@@ -896,13 +896,11 @@ bool	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, bool bRelativePath, bool bUnex
 bool	MRU_Delete(LPMRULIST pmru, int iIndex);
 bool	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
 void	MRU_Empty(LPMRULIST pmru);
-int 	MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
-	return MRU_Enum(pmru, 0, NULL, 0);
-}
+int MRU_GetCount(LPCMRULIST pmru);
 bool	MRU_Load(LPMRULIST pmru);
 bool	MRU_Save(LPCMRULIST pmru);
 bool	MRU_MergeSave(LPCMRULIST pmru, bool bAddFiles, bool bRelativePath, bool bUnexpandMyDocs);
+void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX

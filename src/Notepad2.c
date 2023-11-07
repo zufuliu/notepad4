@@ -5022,7 +5022,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		const UINT index = LOWORD(wParam) - IDM_RECENT_HISTORY_START;
 		if (index < MRU_MAXITEMS) {
 			LPCWSTR path = pFileMRU->pszItems[index];
-			if (StrNotEmpty(path)) {
+			if (path) {
 				if (FileSave(FileSaveFlag_Ask)) {
 					WCHAR tchFile[MAX_PATH];
 					PathAbsoluteFromApp(path, tchFile, true);
@@ -5366,10 +5366,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				WCHAR tch[MAX_PATH];
 				for (int i = 0; i < count; i++) {
 					LPCWSTR path = pFileMRU->pszItems[i];
-					if (StrNotEmpty(path)) {
-						PathAbsoluteFromApp(path, tch, true);
-						AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, tch);
-					}
+					PathAbsoluteFromApp(path, tch, true);
+					AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, tch);
 				}
 			} else {
 				hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));

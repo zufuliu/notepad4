@@ -1761,8 +1761,8 @@ void History_Uninit(PHISTORY ph) {
 	for (int i = 0; i < HISTORY_ITEMS; i++) {
 		if (ph->psz[i]) {
 			LocalFree(ph->psz[i]);
+			ph->psz[i] = NULL;
 		}
-		ph->psz[i] = NULL;
 	}
 }
 
@@ -1779,8 +1779,8 @@ bool History_Add(PHISTORY ph, LPCWSTR pszNew) {
 		for (int i = ph->iCurItem; i < HISTORY_ITEMS; i++) {
 			if (ph->psz[i]) {
 				LocalFree(ph->psz[i]);
+				ph->psz[i] = NULL;
 			}
-			ph->psz[i] = NULL;
 		}
 	} else {
 		// Shift
@@ -1912,6 +1912,7 @@ bool MRU_Delete(LPMRULIST pmru, int iIndex) {
 	}
 	if (pmru->pszItems[iIndex]) {
 		LocalFree(pmru->pszItems[iIndex]);
+		pmru->pszItems[iIndex] = NULL;
 	}
 	for (int i = iIndex; i < pmru->iSize - 1; i++) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];

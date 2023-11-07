@@ -4776,10 +4776,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		AddBackslashComboBoxSetup(hwnd, IDC_FINDTEXT);
 
 		// Load MRUs
-		for (int i = 0; i < MRU_GetCount(mruFind); i++) {
-			MRU_Enum(mruFind, i, tch, COUNTOF(tch));
-			ComboBox_AddString(hwndFind, tch);
-		}
+		MRU_AddToCombobox(mruFind, hwndFind);
 
 		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
 		// don't copy selection after toggle find & replace on this window.
@@ -4797,11 +4794,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 		if (hwndRepl) {
 			AddBackslashComboBoxSetup(hwnd, IDC_REPLACETEXT);
-			for (int i = 0; i < MRU_GetCount(mruReplace); i++) {
-				MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
-				ComboBox_AddString(hwndRepl, tch);
-			}
-
+			MRU_AddToCombobox(mruReplace, hwndRepl);
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
@@ -5077,16 +5070,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			// Reload MRUs
 			ComboBox_ResetContent(hwndFind);
 			ComboBox_ResetContent(hwndRepl);
-
-			for (int i = 0; i < MRU_GetCount(mruFind); i++) {
-				MRU_Enum(mruFind, i, tch, COUNTOF(tch));
-				ComboBox_AddString(hwndFind, tch);
-			}
-
-			for (int i = 0; i < MRU_GetCount(mruReplace); i++) {
-				MRU_Enum(mruReplace, i, tch, COUNTOF(tch));
-				ComboBox_AddString(hwndRepl, tch);
-			}
+			MRU_AddToCombobox(mruFind, hwndFind);
+			MRU_AddToCombobox(mruReplace, hwndRepl);
 
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
