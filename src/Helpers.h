@@ -895,11 +895,11 @@ bool	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
 bool	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, bool bRelativePath, bool bUnexpandMyDocs);
 bool	MRU_Delete(LPMRULIST pmru, int iIndex);
 bool	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
-void	MRU_Empty(LPMRULIST pmru);
+void	MRU_Empty(LPMRULIST pmru, bool save);
 int MRU_GetCount(LPCMRULIST pmru);
 bool	MRU_Load(LPMRULIST pmru);
 bool	MRU_Save(LPCMRULIST pmru);
-bool	MRU_MergeSave(LPCMRULIST pmru, bool bAddFiles, bool bRelativePath, bool bUnexpandMyDocs);
+bool	MRU_MergeSave(LPCMRULIST pmru, bool bRelativePath, bool bUnexpandMyDocs);
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================

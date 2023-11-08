@@ -613,13 +613,11 @@ LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 void MRU_Destroy(LPMRULIST pmru);
 bool MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 bool MRU_Delete(LPMRULIST pmru, int iIndex);
-void MRU_Empty(LPMRULIST pmru);
+void MRU_Empty(LPMRULIST pmru, bool save);
 int MRU_GetCount(LPCMRULIST pmru);
 bool MRU_Load(LPMRULIST pmru);
 bool MRU_Save(LPCMRULIST pmru);
-void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
-void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem);
-void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey);
+void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX

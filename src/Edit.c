@@ -5212,23 +5212,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				//ShowNotificationMessage(SC_NOTIFICATIONPOSITION_CENTER, IDS_WILDCARDHELP);
 				break;
 
-			case IDC_CLEAR_FIND: {
-				HWND hwndFind = GetDlgItem(hwnd, IDC_FINDTEXT);
+			case IDC_CLEAR_FIND:
+			case IDC_CLEAR_REPLACE: {
+				HWND hwndFind = GetDlgItem(hwnd, (pnmhdr->idFrom == IDC_CLEAR_FIND) ? IDC_FINDTEXT : IDC_REPLACETEXT);
 				ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
 				ComboBox_ResetContent(hwndFind);
-				MRU_Empty(mruFind);
-				MRU_Save(mruFind);
+				MRU_Empty((pnmhdr->idFrom == IDC_CLEAR_FIND) ? mruFind : mruReplace, true);
 				ComboBox_SetText(hwndFind, tch);
-			}
-			break;
-
-			case IDC_CLEAR_REPLACE: {
-				HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
-				ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
-				ComboBox_ResetContent(hwndRepl);
-				MRU_Empty(mruReplace);
-				MRU_Save(mruReplace);
-				ComboBox_SetText(hwndRepl, tch);
 			}
 			break;
 

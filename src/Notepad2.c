@@ -1155,21 +1155,18 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 
 				// Cleanup unwanted MRU's
 				if (!bSaveRecentFiles) {
-					MRU_Empty(pFileMRU);
-					MRU_Save(pFileMRU);
+					MRU_Empty(pFileMRU, true);
 				} else {
-					MRU_MergeSave(pFileMRU, true, flagRelativeFileMRU, flagPortableMyDocs);
+					MRU_MergeSave(pFileMRU, flagRelativeFileMRU, flagPortableMyDocs);
 				}
 				MRU_Destroy(pFileMRU);
 
 				if (!bSaveFindReplace) {
-					MRU_Empty(mruFind);
-					MRU_Empty(mruReplace);
-					MRU_Save(mruFind);
-					MRU_Save(mruReplace);
+					MRU_Empty(mruFind, true);
+					MRU_Empty(mruReplace, true);
 				} else {
-					MRU_MergeSave(mruFind, false, false, false);
-					MRU_MergeSave(mruReplace, false, false, false);
+					MRU_MergeSave(mruFind, false, false);
+					MRU_MergeSave(mruReplace, false, false);
 				}
 				MRU_Destroy(mruFind);
 				MRU_Destroy(mruReplace);

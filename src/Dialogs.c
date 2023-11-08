@@ -1208,7 +1208,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				MRU_Empty(pFileMRU);
+				MRU_Empty(pFileMRU, false);
 				if (StrNotEmpty(szCurFile)) {
 					MRU_Add(pFileMRU, szCurFile);
 				}

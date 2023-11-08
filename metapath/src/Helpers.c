@@ -1921,12 +1921,15 @@ bool MRU_Delete(LPMRULIST pmru, int iIndex) {
 	return true;
 }
 
-void MRU_Empty(LPMRULIST pmru) {
+void MRU_Empty(LPMRULIST pmru, bool save) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
 			LocalFree(pmru->pszItems[i]);
 			pmru->pszItems[i] = NULL;
 		}
+	}
+	if (save) {
+		MRU_Save(pmru);
 	}
 }
 
@@ -1948,7 +1951,7 @@ bool MRU_Load(LPMRULIST pmru) {
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection * const pIniSection = &section;
 
-	MRU_Empty(pmru);
+	MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
@@ -1995,9 +1998,7 @@ bool MRU_Save(LPCMRULIST pmru) {
 	return true;
 }
 
-void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
-	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
-	MRU_Load(pmru);
+void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		LPCWSTR path = pmru->pszItems[i];
 		if (path) {
@@ -2006,26 +2007,6 @@ void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey) {
 			break;
 		}
 	}
-	MRU_Destroy(pmru);
-}
-
-void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem) {
-	if (StrNotEmpty(pszNewItem)) {
-		LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
-		MRU_Load(pmru);
-		MRU_Add(pmru, pszNewItem);
-		MRU_Save(pmru);
-		MRU_Destroy(pmru);
-	}
-}
-
-void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey) {
-	LPMRULIST pmru = MRU_Create(pszKey, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
-	MRU_Load(pmru);
-	MRU_Empty(pmru);
-	MRU_Save(pmru);
-	MRU_Destroy(pmru);
-	ComboBox_ResetContent(hwnd);
 }
 
 /*

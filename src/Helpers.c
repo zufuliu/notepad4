@@ -2481,12 +2481,15 @@ bool MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 	return true;
 }
 
-void MRU_Empty(LPMRULIST pmru) {
+void MRU_Empty(LPMRULIST pmru, bool save) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		if (pmru->pszItems[i]) {
 			LocalFree(pmru->pszItems[i]);
 			pmru->pszItems[i] = NULL;
 		}
+	}
+	if (save) {
+		MRU_Save(pmru);
 	}
 }
 
@@ -2508,7 +2511,7 @@ bool MRU_Load(LPMRULIST pmru) {
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection * const pIniSection = &section;
 
-	MRU_Empty(pmru);
+	MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
@@ -2560,11 +2563,11 @@ bool MRU_Save(LPCMRULIST pmru) {
 	return true;
 }
 
-bool MRU_MergeSave(LPCMRULIST pmru, bool bAddFiles, bool bRelativePath, bool bUnexpandMyDocs) {
+bool MRU_MergeSave(LPCMRULIST pmru, bool bRelativePath, bool bUnexpandMyDocs) {
 	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruBase);
 
-	if (bAddFiles) {
+	if (pmru->iFlags & MRUFlags_FilePath) {
 		for (int i = pmru->iSize - 1; i >= 0; i--) {
 			if (pmru->pszItems[i]) {
 				WCHAR wchItem[MAX_PATH];
