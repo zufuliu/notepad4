@@ -874,6 +874,8 @@ enum {
 	MRUFlags_Default = 0,
 	MRUFlags_FilePath = 1,
 	MRUFlags_QuoteValue = 2,
+	MRUFlags_RelativePath = 4,
+	MRUFlags_PortableMyDocs = 8,
 };
 
 // MRU_MAXITEMS * (MAX_PATH + 4)
@@ -892,14 +894,13 @@ LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
 void	MRU_Destroy(LPMRULIST pmru);
 bool	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 bool	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
-bool	MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, bool bRelativePath, bool bUnexpandMyDocs);
 bool	MRU_Delete(LPMRULIST pmru, int iIndex);
 bool	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
 void	MRU_Empty(LPMRULIST pmru, bool save);
 int MRU_GetCount(LPCMRULIST pmru);
 bool	MRU_Load(LPMRULIST pmru);
 bool	MRU_Save(LPCMRULIST pmru);
-bool	MRU_MergeSave(LPCMRULIST pmru, bool bRelativePath, bool bUnexpandMyDocs);
+bool	MRU_MergeSave(LPCMRULIST pmru);
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================

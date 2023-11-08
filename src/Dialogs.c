@@ -1237,13 +1237,11 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 						  SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 			lvi.iImage = shfi.iIcon;
 
-			WCHAR tch[MAX_PATH];
 			for (int i = 0; i < pFileMRU->iSize; i++) {
-				LPCWSTR path = pFileMRU->pszItems[i];
+				LPWSTR path = pFileMRU->pszItems[i];
 				if (path) {
-					PathAbsoluteFromApp(path, tch, true);
 					lvi.iItem = i;
-					lvi.pszText = tch;
+					lvi.pszText = path;
 					ListView_InsertItem(hwndLV, &lvi);
 				} else {
 					break;

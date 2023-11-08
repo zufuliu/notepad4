@@ -2401,42 +2401,6 @@ bool MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew) {
 	return true;
 }
 
-bool MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, bool bRelativePath, bool bUnexpandMyDocs) {
-	int i;
-	for (i = 0; i < pmru->iSize; i++) {
-		WCHAR * const item = pmru->pszItems[i];
-		if (item == NULL) {
-			break;
-		}
-		if (PathEqual(item, pszFile)) {
-			LocalFree(item);
-			break;
-		}
-		{
-			WCHAR wchItem[MAX_PATH];
-			PathAbsoluteFromApp(item, wchItem, true);
-			if (PathEqual(wchItem, pszFile)) {
-				LocalFree(item);
-				break;
-			}
-		}
-	}
-	i = min_i(i, pmru->iSize - 1);
-	for (; i > 0; i--) {
-		pmru->pszItems[i] = pmru->pszItems[i - 1];
-	}
-
-	if (bRelativePath) {
-		WCHAR wchFile[MAX_PATH];
-		PathRelativeToApp(pszFile, wchFile, 0, true, bUnexpandMyDocs);
-		pmru->pszItems[0] = StrDup(wchFile);
-	} else {
-		pmru->pszItems[0] = StrDup(pszFile);
-	}
-
-	return true;
-}
-
 bool MRU_Delete(LPMRULIST pmru, int iIndex) {
 	if (iIndex < 0 || iIndex >= pmru->iSize) {
 		return false;
@@ -2453,8 +2417,6 @@ bool MRU_Delete(LPMRULIST pmru, int iIndex) {
 }
 
 bool MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
-	WCHAR wchItem[MAX_PATH];
-
 	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruStore);
 
@@ -2463,8 +2425,7 @@ bool MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 		if (path == NULL) {
 			break;
 		}
-		PathAbsoluteFromApp(path, wchItem, true);
-		if (PathEqual(wchItem, pszFile)) {
+		if (PathEqual(path, pszFile)) {
 			LocalFree(pmruStore->pszItems[index]);
 			pmruStore->pszItems[index] = NULL;
 			for (int i = index; i < pmruStore->iSize - 1; i++) {
@@ -2510,12 +2471,13 @@ bool MRU_Load(LPMRULIST pmru) {
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection * const pIniSection = &section;
+	const int iFlags = pmru->iFlags;
 
 	MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf, pmru->iFlags & MRUFlags_QuoteValue);
+	IniSectionParseArray(pIniSection, pIniSectionBuf, iFlags & MRUFlags_QuoteValue);
 	const UINT count = pIniSection->count;
 	const UINT size = pmru->iSize;
 
@@ -2523,6 +2485,11 @@ bool MRU_Load(LPMRULIST pmru) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {
+			WCHAR tchPath[MAX_PATH];
+			if ((iFlags & MRUFlags_FilePath) != 0 && PathIsRelative(tchItem)) {
+				PathAbsoluteFromApp(tchItem, tchPath, true);
+				tchItem = tchPath;
+			}
 			pmru->pszItems[n++] = StrDup(tchItem);
 		}
 	}
@@ -2545,15 +2512,21 @@ bool MRU_Save(LPCMRULIST pmru) {
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave * const pIniSection = &section;
-	const BOOL quoted = pmru->iFlags & MRUFlags_QuoteValue;
+	const int iFlags = pmru->iFlags;
 
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (StrNotEmpty(pmru->pszItems[i])) {
+		LPCWSTR tchItem = pmru->pszItems[i];
+		if (StrNotEmpty(tchItem)) {
 			wsprintf(tchName, L"%02i", i + 1);
-			if (quoted) {
-				IniSectionSetQuotedString(pIniSection, tchName, pmru->pszItems[i]);
+			if (iFlags & MRUFlags_QuoteValue) {
+				IniSectionSetQuotedString(pIniSection, tchName, tchItem);
 			} else {
-				IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
+				WCHAR tchPath[MAX_PATH];
+				if (iFlags & MRUFlags_RelativePath) {
+					PathRelativeToApp(tchItem, tchPath, 0, true, iFlags & MRUFlags_PortableMyDocs);
+					tchItem = tchPath;
+				}
+				IniSectionSetString(pIniSection, tchName, tchItem);
 			}
 		}
 	}
@@ -2563,23 +2536,13 @@ bool MRU_Save(LPCMRULIST pmru) {
 	return true;
 }
 
-bool MRU_MergeSave(LPCMRULIST pmru, bool bRelativePath, bool bUnexpandMyDocs) {
+bool MRU_MergeSave(LPCMRULIST pmru) {
 	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
 	MRU_Load(pmruBase);
 
-	if (pmru->iFlags & MRUFlags_FilePath) {
-		for (int i = pmru->iSize - 1; i >= 0; i--) {
-			if (pmru->pszItems[i]) {
-				WCHAR wchItem[MAX_PATH];
-				PathAbsoluteFromApp(pmru->pszItems[i], wchItem, true);
-				MRU_AddFile(pmruBase, wchItem, bRelativePath, bUnexpandMyDocs);
-			}
-		}
-	} else {
-		for (int i = pmru->iSize - 1; i >= 0; i--) {
-			if (pmru->pszItems[i]) {
-				MRU_Add(pmruBase, pmru->pszItems[i]);
-			}
+	for (int i = pmru->iSize - 1; i >= 0; i--) {
+		if (pmru->pszItems[i]) {
+			MRU_Add(pmruBase, pmru->pszItems[i]);
 		}
 	}
 

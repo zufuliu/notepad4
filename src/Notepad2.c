@@ -1157,7 +1157,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 				if (!bSaveRecentFiles) {
 					MRU_Empty(pFileMRU, true);
 				} else {
-					MRU_MergeSave(pFileMRU, flagRelativeFileMRU, flagPortableMyDocs);
+					MRU_MergeSave(pFileMRU);
 				}
 				MRU_Destroy(pFileMRU);
 
@@ -1165,8 +1165,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 					MRU_Empty(mruFind, true);
 					MRU_Empty(mruReplace, true);
 				} else {
-					MRU_MergeSave(mruFind, false, false);
-					MRU_MergeSave(mruReplace, false, false);
+					MRU_MergeSave(mruFind);
+					MRU_MergeSave(mruReplace);
 				}
 				MRU_Destroy(mruFind);
 				MRU_Destroy(mruReplace);
@@ -1962,7 +1962,8 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRUFlags_FilePath, MRU_MAX_RECENT_FILES);
+	int flags = MRUFlags_FilePath | (flagRelativeFileMRU ? MRUFlags_RelativePath : 0) | (flagPortableMyDocs ? MRUFlags_PortableMyDocs : 0);
+	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, flags, MRU_MAX_RECENT_FILES);
 	MRU_Load(pFileMRU);
 	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue, MRU_MAX_RECENT_FIND);
 	MRU_Load(mruFind);
@@ -5021,9 +5022,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			LPCWSTR path = pFileMRU->pszItems[index];
 			if (path) {
 				if (FileSave(FileSaveFlag_Ask)) {
-					WCHAR tchFile[MAX_PATH];
-					PathAbsoluteFromApp(path, tchFile, true);
-					FileLoad(FileLoadFlag_DontSave, tchFile);
+					FileLoad(FileLoadFlag_DontSave, path);
 				}
 			}
 		}
@@ -5360,11 +5359,9 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 					return TBDDRET_TREATPRESSED;
 				}
 				hmenu = subMenu = CreatePopupMenu();
-				WCHAR tch[MAX_PATH];
 				for (int i = 0; i < count; i++) {
 					LPCWSTR path = pFileMRU->pszItems[i];
-					PathAbsoluteFromApp(path, tch, true);
-					AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, tch);
+					AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, path);
 				}
 			} else {
 				hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
@@ -7586,7 +7583,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			UpdateLineNumberWidth();
 		}
 
-		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
+		MRU_Add(pFileMRU, szFileName);
 		if (flagUseSystemMRU == TripleBoolean_True) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
@@ -7796,7 +7793,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 			bDocumentModified = false;
 			iOriginalEncoding = iCurrentEncoding;
-			MRU_AddFile(pFileMRU, szCurFile, flagRelativeFileMRU, flagPortableMyDocs);
+			MRU_Add(pFileMRU, szCurFile);
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
