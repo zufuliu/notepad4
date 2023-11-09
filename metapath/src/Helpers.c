@@ -1858,19 +1858,17 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 //
 //  MRU functions
 //
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
+LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags) {
 	LPMRULIST pmru = (LPMRULIST)NP2HeapAlloc(sizeof(MRULIST));
-	pmru->szRegKey = pszRegKey;
 	pmru->iFlags = iFlags;
-	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
+	pmru->szRegKey = pszRegKey;
+	MRU_Load(pmru);
 	return pmru;
 }
 
 void MRU_Destroy(LPMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
-			LocalFree(pmru->pszItems[i]);
-		}
+		LocalFree(pmru->pszItems[i]);
 	}
 
 	memset(pmru, 0, sizeof(MRULIST));
@@ -1889,7 +1887,7 @@ void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	const int flags = pmru->iFlags;
 	LPWSTR tchItem = NULL;
 	int i;
-	for (i = 0; i < pmru->iSize; i++) {
+	for (i = 0; i < MRU_MAXITEMS; i++) {
 		WCHAR * const item = pmru->pszItems[i];
 		if (item == NULL) {
 			break;
@@ -1899,9 +1897,11 @@ void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 			break;
 		}
 	}
-	if (i == pmru->iSize) {
+	if (i == MRU_MAXITEMS) {
 		--i;
 		LocalFree(pmru->pszItems[i]);
+	} else if (i == pmru->iSize) {
+		pmru->iSize += 1;
 	}
 	for (; i > 0; i--) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
@@ -1916,11 +1916,10 @@ void MRU_Delete(LPMRULIST pmru, int iIndex) {
 	if (iIndex < 0 || iIndex >= pmru->iSize) {
 		return;
 	}
-	if (pmru->pszItems[iIndex]) {
-		LocalFree(pmru->pszItems[iIndex]);
-		pmru->pszItems[iIndex] = NULL;
-	}
-	for (int i = iIndex; i < pmru->iSize - 1; i++) {
+	LocalFree(pmru->pszItems[iIndex]);
+	pmru->pszItems[iIndex] = NULL;
+	pmru->iSize -= 1;
+	for (int i = iIndex; i < pmru->iSize; i++) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];
 		pmru->pszItems[i + 1] = NULL;
 	}
@@ -1928,22 +1927,13 @@ void MRU_Delete(LPMRULIST pmru, int iIndex) {
 
 void MRU_Empty(LPMRULIST pmru, bool save) {
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
-			LocalFree(pmru->pszItems[i]);
-			pmru->pszItems[i] = NULL;
-		}
+		LocalFree(pmru->pszItems[i]);
+		pmru->pszItems[i] = NULL;
 	}
+	pmru->iSize = 0;
 	if (save) {
 		MRU_Save(pmru);
 	}
-}
-
-int MRU_GetCount(LPCMRULIST pmru) {
-	int i = 0;
-	while (i < pmru->iSize && pmru->pszItems[i]) {
-		i++;
-	}
-	return i;
 }
 
 void MRU_Load(LPMRULIST pmru) {
@@ -1956,15 +1946,15 @@ void MRU_Load(LPMRULIST pmru) {
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection * const pIniSection = &section;
 
-	MRU_Empty(pmru, false);
+	//MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const UINT count = pIniSection->count;
-	const UINT size = pmru->iSize;
+	UINT n = 0;
 
-	for (UINT i = 0, n = 0; i < count && n < size; i++) {
+	for (UINT i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {
@@ -1972,6 +1962,7 @@ void MRU_Load(LPMRULIST pmru) {
 		}
 	}
 
+	pmru->iSize = n;
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
 }
@@ -1980,7 +1971,7 @@ void MRU_Save(LPCMRULIST pmru) {
 	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
-	if (MRU_GetCount(pmru) == 0) {
+	if (pmru->iSize <= 0) {
 		IniClearSection(pmru->szRegKey);
 		return;
 	}
@@ -1991,9 +1982,10 @@ void MRU_Save(LPCMRULIST pmru) {
 	IniSectionOnSave * const pIniSection = &section;
 
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (StrNotEmpty(pmru->pszItems[i])) {
+		LPCWSTR tchItem = pmru->pszItems[i];
+		if (StrNotEmpty(tchItem)) {
 			wsprintf(tchName, L"%02i", i + 1);
-			IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
+			IniSectionSetString(pIniSection, tchName, tchItem);
 		}
 	}
 
@@ -2004,11 +1996,7 @@ void MRU_Save(LPCMRULIST pmru) {
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		LPCWSTR path = pmru->pszItems[i];
-		if (path) {
-			ComboBox_AddString(hwnd, path);
-		} else {
-			break;
-		}
+		ComboBox_AddString(hwnd, path);
 	}
 }
 

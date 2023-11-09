@@ -2344,19 +2344,17 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
 //
 // MRU functions
 //
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
+LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags) {
 	LPMRULIST pmru = (LPMRULIST)NP2HeapAlloc(sizeof(MRULIST));
-	pmru->szRegKey = pszRegKey;
 	pmru->iFlags = iFlags;
-	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
+	pmru->szRegKey = pszRegKey;
+	MRU_Load(pmru);
 	return pmru;
 }
 
 void MRU_Destroy(LPMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
-			LocalFree(pmru->pszItems[i]);
-		}
+		LocalFree(pmru->pszItems[i]);
 	}
 
 	memset(pmru, 0, sizeof(MRULIST));
@@ -2375,7 +2373,7 @@ void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	const int flags = pmru->iFlags;
 	LPWSTR tchItem = NULL;
 	int i;
-	for (i = 0; i < pmru->iSize; i++) {
+	for (i = 0; i < MRU_MAXITEMS; i++) {
 		WCHAR * const item = pmru->pszItems[i];
 		if (item == NULL) {
 			break;
@@ -2385,9 +2383,11 @@ void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 			break;
 		}
 	}
-	if (i == pmru->iSize) {
+	if (i == MRU_MAXITEMS) {
 		--i;
 		LocalFree(pmru->pszItems[i]);
+	} else if (i == pmru->iSize) {
+		pmru->iSize += 1;
 	}
 	for (; i > 0; i--) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
@@ -2410,26 +2410,23 @@ void MRU_Delete(LPMRULIST pmru, int iIndex) {
 	if (iIndex < 0 || iIndex >= pmru->iSize) {
 		return;
 	}
-	if (pmru->pszItems[iIndex]) {
-		LocalFree(pmru->pszItems[iIndex]);
-		pmru->pszItems[iIndex] = NULL;
-	}
-	for (int i = iIndex; i < pmru->iSize - 1; i++) {
+	LocalFree(pmru->pszItems[iIndex]);
+	pmru->pszItems[iIndex] = NULL;
+	pmru->iSize -= 1;
+	for (int i = iIndex; i < pmru->iSize; i++) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];
 		pmru->pszItems[i + 1] = NULL;
 	}
 }
 
 void MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
-	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
-	MRU_Load(pmruStore);
+	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags);
+	int deleted = 0;
 
 	for (int index = 0; index < pmruStore->iSize; ) {
 		LPCWSTR path = pmruStore->pszItems[index];
-		if (path == NULL) {
-			break;
-		}
 		if (PathEqual(path, pszFile)) {
+			deleted += 1;
 			LocalFree(pmruStore->pszItems[index]);
 			pmruStore->pszItems[index] = NULL;
 			for (int i = index; i < pmruStore->iSize - 1; i++) {
@@ -2441,28 +2438,20 @@ void MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
 		}
 	}
 
+	pmruStore->iSize -= deleted;
 	MRU_Save(pmruStore);
 	MRU_Destroy(pmruStore);
 }
 
 void MRU_Empty(LPMRULIST pmru, bool save) {
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
-			LocalFree(pmru->pszItems[i]);
-			pmru->pszItems[i] = NULL;
-		}
+		LocalFree(pmru->pszItems[i]);
+		pmru->pszItems[i] = NULL;
 	}
+	pmru->iSize = 0;
 	if (save) {
 		MRU_Save(pmru);
 	}
-}
-
-int MRU_GetCount(LPCMRULIST pmru) {
-	int i = 0;
-	while (i < pmru->iSize && pmru->pszItems[i]) {
-		i++;
-	}
-	return i;
 }
 
 void MRU_Load(LPMRULIST pmru) {
@@ -2476,15 +2465,15 @@ void MRU_Load(LPMRULIST pmru) {
 	IniSection * const pIniSection = &section;
 	const int iFlags = pmru->iFlags;
 
-	MRU_Empty(pmru, false);
+	//MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf, iFlags & MRUFlags_QuoteValue);
 	const UINT count = pIniSection->count;
-	const UINT size = pmru->iSize;
+	UINT n = 0;
 
-	for (UINT i = 0, n = 0; i < count && n < size; i++) {
+	for (UINT i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {
@@ -2497,6 +2486,7 @@ void MRU_Load(LPMRULIST pmru) {
 		}
 	}
 
+	pmru->iSize = n;
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
 }
@@ -2505,7 +2495,7 @@ void MRU_Save(LPCMRULIST pmru) {
 	if (StrIsEmpty(szIniFile)) {
 		return;
 	}
-	if (MRU_GetCount(pmru) == 0) {
+	if (pmru->iSize <= 0) {
 		IniClearSection(pmru->szRegKey);
 		return;
 	}
@@ -2537,14 +2527,18 @@ void MRU_Save(LPCMRULIST pmru) {
 	NP2HeapFree(pIniSectionBuf);
 }
 
-void MRU_MergeSave(LPCMRULIST pmru) {
-	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
-	MRU_Load(pmruBase);
+void MRU_MergeSave(LPMRULIST pmru, bool keep) {
+	if (!keep) {
+		MRU_Empty(pmru, true);
+		return;
+	}
+	if (pmru->iSize <= 0) {
+		return;
+	}
+	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags);
 
 	for (int i = pmru->iSize - 1; i >= 0; i--) {
-		if (pmru->pszItems[i]) {
-			MRU_Add(pmruBase, pmru->pszItems[i]);
-		}
+		MRU_Add(pmruBase, pmru->pszItems[i]);
 	}
 
 	MRU_Save(pmruBase);
@@ -2554,11 +2548,7 @@ void MRU_MergeSave(LPCMRULIST pmru) {
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
 	for (int i = 0; i < pmru->iSize; i++) {
 		LPCWSTR str = pmru->pszItems[i];
-		if (str) {
-			ComboBox_AddString(hwnd, str);
-		} else {
-			break;
-		}
+		ComboBox_AddString(hwnd, str);
 	}
 }
 

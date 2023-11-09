@@ -363,12 +363,13 @@ INT_PTR CALLBACK GotoDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		ComboBox_SetExtendedUI(hwndGoto, TRUE);
 
 		for (int i = 0; i < HISTORY_ITEMS; i++) {
-			if (mHistory.psz[i]) {
-				const int iItem = ComboBox_FindStringExact(hwndGoto, -1, mHistory.psz[i]);
+			LPCWSTR path = mHistory.psz[i];
+			if (path) {
+				const int iItem = ComboBox_FindStringExact(hwndGoto, -1, path);
 				if (iItem != CB_ERR) {
 					ComboBox_DeleteString(hwndGoto, iItem);
 				}
-				ComboBox_InsertString(hwndGoto, 0, mHistory.psz[i]);
+				ComboBox_InsertString(hwndGoto, 0, path);
 			}
 		}
 
@@ -1810,7 +1811,7 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	}
 
 	FILEOPDLGDATA fod;
-	fod.pmru = MRU_Create(MRU_KEY_COPY_MOVE_HISTORY, MRUFlags_FilePath, MRU_MAX_COPY_MOVE_HISTORY);
+	fod.pmru = MRU_Create(MRU_KEY_COPY_MOVE_HISTORY, MRUFlags_FilePath);
 	fod.wFunc = *wFunc;
 	lstrcpy(fod.szSource, PathFindFileName(dli.szFileName));
 

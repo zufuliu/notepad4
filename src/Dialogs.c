@@ -1239,13 +1239,9 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 
 			for (int i = 0; i < pFileMRU->iSize; i++) {
 				LPWSTR path = pFileMRU->pszItems[i];
-				if (path) {
-					lvi.iItem = i;
-					lvi.pszText = path;
-					ListView_InsertItem(hwndLV, &lvi);
-				} else {
-					break;
-				}
+				lvi.iItem = i;
+				lvi.pszText = path;
+				ListView_InsertItem(hwndLV, &lvi);
 			}
 
 			ListView_SetItemState(hwndLV, 0, LVIS_FOCUSED, LVIS_FOCUSED);

@@ -2256,7 +2256,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case TBN_GETBUTTONINFO: {
 			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
 			if (lpTbNotify->iItem < (int)COUNTOF(tbbMainWnd)) {
-				WCHAR tch[256];
+				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
 				memcpy(&lpTbNotify->tbButton, &tbbMainWnd[lpTbNotify->iItem], sizeof(TBBUTTON));
@@ -2278,7 +2278,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (pTTT->uFlags & TTF_IDISHWND) {
 				PathCompactPathEx(pTTT->szText, szCurDir, COUNTOF(pTTT->szText), 0);
 			} else {
-				WCHAR tch[256];
+				WCHAR tch[128];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
 				lstrcpyn(pTTT->szText, tch, COUNTOF(pTTT->szText));
 			}

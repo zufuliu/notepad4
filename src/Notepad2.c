@@ -1152,23 +1152,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SaveSettings(false);
 
 			if (StrNotEmpty(szIniFile)) {
-
 				// Cleanup unwanted MRU's
-				if (!bSaveRecentFiles) {
-					MRU_Empty(pFileMRU, true);
-				} else {
-					MRU_MergeSave(pFileMRU);
-				}
+				MRU_MergeSave(pFileMRU, bSaveRecentFiles);
 				MRU_Destroy(pFileMRU);
-
-				if (!bSaveFindReplace) {
-					MRU_Empty(mruFind, true);
-					MRU_Empty(mruReplace, true);
-				} else {
-					MRU_MergeSave(mruFind);
-					MRU_MergeSave(mruReplace);
-				}
+				MRU_MergeSave(mruFind, bSaveFindReplace);
 				MRU_Destroy(mruFind);
+				MRU_MergeSave(mruReplace, bSaveFindReplace);
 				MRU_Destroy(mruReplace);
 			}
 
@@ -1962,13 +1951,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	int flags = MRUFlags_FilePath | (flagRelativeFileMRU ? MRUFlags_RelativePath : 0) | (flagPortableMyDocs ? MRUFlags_PortableMyDocs : 0);
-	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, flags, MRU_MAX_RECENT_FILES);
-	MRU_Load(pFileMRU);
-	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue, MRU_MAX_RECENT_FIND);
-	MRU_Load(mruFind);
-	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue, MRU_MAX_RECENT_REPLACE);
-	MRU_Load(mruReplace);
+	int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
+	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, flags);
+	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
+	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
 	return 0;
 }
 
@@ -2463,7 +2449,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_LINEENDINGS_CRLF + iCurrentEOLMode;
 	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_LF, i, MF_BYCOMMAND);
 
-	EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_GetCount(pFileMRU) > 0));
+	EnableCmd(hmenu, IDM_FILE_RECENT, (pFileMRU->iSize > 0));
 
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo());
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo());
@@ -3036,7 +3022,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RECENT:
-		if (MRU_GetCount(pFileMRU) > 0) {
+		if (pFileMRU->iSize > 0) {
 			if (FileSave(FileSaveFlag_Ask)) {
 				WCHAR tchFile[MAX_PATH];
 				if (FileMRUDlg(hwnd, tchFile)) {
@@ -5335,7 +5321,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		case TBN_GETBUTTONINFO: {
 			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
 			if ((UINT)lpTbNotify->iItem < COUNTOF(tbbMainWnd)) {
-				WCHAR tch[256];
+				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
 				memcpy(&lpTbNotify->tbButton, &tbbMainWnd[lpTbNotify->iItem], sizeof(TBBUTTON));
@@ -5354,7 +5340,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			HMENU subMenu = NULL;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
 				NP2_static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
-				const int count = MRU_GetCount(pFileMRU);
+				const int count = pFileMRU->iSize;
 				if (count <= 0) {
 					return TBDDRET_TREATPRESSED;
 				}
@@ -5444,7 +5430,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (pTTT->uFlags & TTF_IDISHWND) {
 				//nop;
 			} else {
-				WCHAR tch[256];
+				WCHAR tch[128];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
 				lstrcpyn(pTTT->szText, tch, COUNTOF(pTTT->szText));
 			}

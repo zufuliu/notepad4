@@ -882,25 +882,24 @@ enum {
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
 
 typedef struct MRULIST {
-	LPCWSTR szRegKey;
-	int		iFlags;
 	int		iSize;
+	int		iFlags;
+	LPCWSTR szRegKey;
 	LPWSTR pszItems[MRU_MAXITEMS];
 } MRULIST, *PMRULIST, *LPMRULIST;
 
 typedef const MRULIST * LPCMRULIST;
 
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
+LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags);
 void	MRU_Destroy(LPMRULIST pmru);
 void	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 void	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
 void	MRU_Delete(LPMRULIST pmru, int iIndex);
 void	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
 void	MRU_Empty(LPMRULIST pmru, bool save);
-int MRU_GetCount(LPCMRULIST pmru);
 void	MRU_Load(LPMRULIST pmru);
 void	MRU_Save(LPCMRULIST pmru);
-void	MRU_MergeSave(LPCMRULIST pmru);
+void	MRU_MergeSave(LPMRULIST pmru, bool keep);
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================
