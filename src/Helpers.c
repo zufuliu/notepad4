@@ -2911,57 +2911,48 @@ bool AddBackslashA(char *pszOut, const char *pszInput) {
 	char *lpszEsc = pszOut;
 	const char *lpsz = pszInput;
 	while (*lpsz) {
-		switch (*lpsz) {
+		char ch = *lpsz++;
+		bool escape = true;
+		switch (ch) {
 		case '\n':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'n';
-			hasEscapeChar = true;
+			ch = 'n';
 			break;
 		case '\r':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'r';
-			hasEscapeChar = true;
+			ch = 'r';
 			break;
 		case '\t':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 't';
-			hasEscapeChar = true;
-			break;
-		case '\\':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = '\\';
-			hasSlash = true;
+			ch = 't';
 			break;
 		case '\f':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'f';
-			hasEscapeChar = true;
+			ch = 'f';
 			break;
 		case '\v':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'v';
-			hasEscapeChar = true;
+			ch = 'v';
 			break;
 		case '\a':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'b';
-			hasEscapeChar = true;
+			ch = 'b';
 			break;
 		case '\b':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'a';
-			hasEscapeChar = true;
-			break;
-		case '\x1B':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'e';
-			hasEscapeChar = true;
+			ch = 'a';
 			break;
 		default:
-			*lpszEsc++ = *lpsz;
+			if (ch == '\x1B') {
+				ch = 'e';
+			} else {
+				escape = false;
+				*lpszEsc++ = ch;
+				if (ch == '\\') {
+					hasSlash = true;
+					*lpszEsc++ = ch;
+				}
+			}
 			break;
 		}
-		lpsz++;
+		if (escape) {
+			hasEscapeChar = true;
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = ch;
+		}
 	}
 
 	if (hasSlash && !hasEscapeChar) {
@@ -2976,57 +2967,48 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
 	LPWSTR lpszEsc = pszOut;
 	LPCWSTR lpsz = pszInput;
 	while (*lpsz) {
-		switch (*lpsz) {
+		WCHAR ch = *lpsz++;
+		bool escape = true;
+		switch (ch) {
 		case '\n':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'n';
-			hasEscapeChar = true;
+			ch = 'n';
 			break;
 		case '\r':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'r';
-			hasEscapeChar = true;
+			ch = 'r';
 			break;
 		case '\t':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 't';
-			hasEscapeChar = true;
-			break;
-		case '\\':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = '\\';
-			hasSlash = true;
+			ch = 't';
 			break;
 		case '\f':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'f';
-			hasEscapeChar = true;
+			ch = 'f';
 			break;
 		case '\v':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'v';
-			hasEscapeChar = true;
+			ch = 'v';
 			break;
 		case '\a':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'b';
-			hasEscapeChar = true;
+			ch = 'b';
 			break;
 		case '\b':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'a';
-			hasEscapeChar = true;
-			break;
-		case '\x1B':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'e';
-			hasEscapeChar = true;
+			ch = 'a';
 			break;
 		default:
-			*lpszEsc++ = *lpsz;
+			if (ch == '\x1B') {
+				ch = 'e';
+			} else {
+				escape = false;
+				*lpszEsc++ = ch;
+				if (ch == '\\') {
+					hasSlash = true;
+					*lpszEsc++ = ch;
+				}
+			}
 			break;
 		}
-		lpsz++;
+		if (escape) {
+			hasEscapeChar = true;
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = ch;
+		}
 	}
 
 	if (hasSlash && !hasEscapeChar) {
