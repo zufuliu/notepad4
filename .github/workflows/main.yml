@@ -11,7 +11,7 @@ jobs:
     name: Visual C++ 2019
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -75,7 +75,7 @@ jobs:
     name: Visual C++ 2022
     runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -155,7 +155,7 @@ jobs:
     name: LLVM (Visual C++ 2019)
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -209,7 +209,7 @@ jobs:
     name: LLVM (Visual C++ 2022)
     runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -279,7 +279,7 @@ jobs:
     name: llvm-mingw
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -343,7 +343,7 @@ jobs:
     name: ucrt GCC and Clang
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -397,7 +397,7 @@ jobs:
     name: 64-bit GCC and Clang
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
@@ -451,7 +451,7 @@ jobs:
     name: 32-bit GCC and Clang
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Update Version Hash
       run: |
