@@ -2912,46 +2912,22 @@ bool AddBackslashA(char *pszOut, const char *pszInput) {
 	const char *lpsz = pszInput;
 	while (*lpsz) {
 		char ch = *lpsz++;
-		bool escape = true;
-		switch (ch) {
-		case '\n':
-			ch = 'n';
-			break;
-		case '\r':
-			ch = 'r';
-			break;
-		case '\t':
-			ch = 't';
-			break;
-		case '\f':
-			ch = 'f';
-			break;
-		case '\v':
-			ch = 'v';
-			break;
-		case '\a':
-			ch = 'b';
-			break;
-		case '\b':
-			ch = 'a';
-			break;
-		default:
-			if (ch == '\x1B') {
-				ch = 'e';
-			} else {
-				escape = false;
-				*lpszEsc++ = ch;
-				if (ch == '\\') {
-					hasSlash = true;
-					*lpszEsc++ = ch;
-				}
-			}
-			break;
-		}
-		if (escape) {
+		const uint8_t index = ch - '\a';
+		if (index <= '\r' - '\a') {
+			ch = "abtnvfr"[index];
 			hasEscapeChar = true;
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = ch;
+		} else if (ch == '\x1B') {
+			hasEscapeChar = true;
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'e';
+		} else {
+			*lpszEsc++ = ch;
+			if (ch == '\\') {
+				hasSlash = true;
+				*lpszEsc++ = ch;
+			}
 		}
 	}
 
@@ -2968,46 +2944,22 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
 	LPCWSTR lpsz = pszInput;
 	while (*lpsz) {
 		WCHAR ch = *lpsz++;
-		bool escape = true;
-		switch (ch) {
-		case '\n':
-			ch = 'n';
-			break;
-		case '\r':
-			ch = 'r';
-			break;
-		case '\t':
-			ch = 't';
-			break;
-		case '\f':
-			ch = 'f';
-			break;
-		case '\v':
-			ch = 'v';
-			break;
-		case '\a':
-			ch = 'b';
-			break;
-		case '\b':
-			ch = 'a';
-			break;
-		default:
-			if (ch == '\x1B') {
-				ch = 'e';
-			} else {
-				escape = false;
-				*lpszEsc++ = ch;
-				if (ch == '\\') {
-					hasSlash = true;
-					*lpszEsc++ = ch;
-				}
-			}
-			break;
-		}
-		if (escape) {
+		const WCHAR index = ch - '\a';
+		if (index <= '\r' - '\a') {
+			ch = (uint8_t)("abtnvfr"[index]);
 			hasEscapeChar = true;
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = ch;
+		} else if (ch == '\x1B') {
+			hasEscapeChar = true;
+			*lpszEsc++ = '\\';
+			*lpszEsc++ = 'e';
+		} else {
+			*lpszEsc++ = ch;
+			if (ch == '\\') {
+				hasSlash = true;
+				*lpszEsc++ = ch;
+			}
 		}
 	}
 
