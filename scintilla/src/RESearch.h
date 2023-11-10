@@ -51,7 +51,6 @@ private:
 	// positions to match line start and line end
 	Sci::Position lineStartPos;
 	Sci::Position lineEndPos;
-	Sci::Position tagstk[MAXTAG];  /* subpat tag stack */
 	char nfa[MAXNFA];    /* automaton */
 	int sta;
 

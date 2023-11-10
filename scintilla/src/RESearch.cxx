@@ -265,10 +265,8 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	lineEndPos = 0;
 	sta = NOP;                  /* status of lastpat */
 	previousFlags = FindOption::None;
-	constexpr unsigned char nul = 0;
-	std::fill(bittab, std::end(bittab), nul);
-	std::fill(tagstk, std::end(tagstk), 0);
-	std::fill(nfa, std::end(nfa), '\0');
+	memset(nfa, 0, 4);
+	memset(bittab, 0, BITBLK);
 	Clear();
 }
 
@@ -437,6 +435,8 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 }
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
+	std::fill(nfa, std::end(nfa), '\0');
+	int tagstk[MAXTAG]{};  /* subpat tag stack */
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
@@ -480,11 +480,11 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 		case '[': {               /* match char class */
 			*mp++ = CCL;
 			int prevChar = 0;
-			char mask = 0;          /* xor mask -CCL/NCL */
+			bool negative = false;          /* xor mask -CCL/NCL */
 
 			i++;
 			if (*++p == '^') {
-				mask = '\377';
+				negative = true;
 				i++;
 				p++;
 			}
@@ -575,9 +575,15 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			if (!*p)
 				return badpat("Missing ]");
 
-			for (int n = 0; n < BITBLK; bittab[n++] = 0) {
-				*mp++ = static_cast<char>(mask ^ bittab[n]);
+			if (negative) {
+				size_t * const ptr = reinterpret_cast<size_t *>(bittab);
+				for (unsigned n = 0; n < BITBLK / sizeof(size_t); n++) {
+					ptr[n] = ~ptr[n];
+				}
 			}
+			memcpy(mp, bittab, BITBLK);
+			mp += BITBLK;
+			memset(bittab, 0, BITBLK);
 		} break;
 
 		case '*':               /* match 0 or more... */
@@ -678,10 +684,8 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 						*mp++ = static_cast<char>(c);
 					} else {
 						*mp++ = CCL;
-						constexpr char mask = 0;
-						for (int n = 0; n < BITBLK; bittab[n++] = 0) {
-							*mp++ = static_cast<char>(mask ^ bittab[n]);
-						}
+						// omitted zero bittab
+						mp += BITBLK;
 					}
 				}
 			}
@@ -715,10 +719,9 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 				} else {
 					*mp++ = CCL;
 					ChSetWithCase(c, false);
-					constexpr char mask = 0;
-					for (int n = 0; n < BITBLK; bittab[n++] = 0) {
-						*mp++ = static_cast<char>(mask ^ bittab[n]);
-					}
+					memcpy(mp, bittab, BITBLK);
+					mp += BITBLK;
+					memset(bittab, 0, BITBLK);
 				}
 			}
 			break;
