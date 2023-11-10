@@ -435,14 +435,14 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 }
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
-	std::fill(nfa, std::end(nfa), '\0');
-	int tagstk[MAXTAG]{};  /* subpat tag stack */
+	memset(nfa, '\0', sizeof(nfa));
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
 	char *sp = nfa;          /* another one       */
 	const char *mpMax = mp + MAXNFA - BITBLK - 10;
 
+	int tagstk[MAXTAG]{};  /* subpat tag stack */
 	int tagi = 0;          /* tag stack index   */
 	int tagc = 1;          /* actual tag count  */
 
@@ -478,7 +478,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			break;
 
 		case '[': {               /* match char class */
-			*mp++ = CCL;
+			memset(bittab, 0, BITBLK);
 			int prevChar = 0;
 			bool negative = false;          /* xor mask -CCL/NCL */
 
@@ -581,9 +581,10 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					ptr[n] = ~ptr[n];
 				}
 			}
+
+			*mp++ = CCL;
 			memcpy(mp, bittab, BITBLK);
 			mp += BITBLK;
-			memset(bittab, 0, BITBLK);
 		} break;
 
 		case '*':               /* match 0 or more... */
@@ -717,11 +718,11 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					*mp++ = CHR;
 					*mp++ = static_cast<char>(c);
 				} else {
-					*mp++ = CCL;
+					memset(bittab, 0, BITBLK);
 					ChSetWithCase(c, false);
+					*mp++ = CCL;
 					memcpy(mp, bittab, BITBLK);
 					mp += BITBLK;
-					memset(bittab, 0, BITBLK);
 				}
 			}
 			break;
