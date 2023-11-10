@@ -127,7 +127,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* SQL Query
 		* [SQL Standard](tools/lang/SQL.sql), up to SQL:2016.
 		* [MySQL](tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.9.
-		* [SQLite3](tools/lang/SQLite3.sql), up to 3.41.
+		* [SQLite3](tools/lang/SQLite3.sql), up to 3.44.
 		* [PostgreSQL](tools/lang/PostgreSQL.sql), PostgreSQL 14.
 		* [Transact-SQL](tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.

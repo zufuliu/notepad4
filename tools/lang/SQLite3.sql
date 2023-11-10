@@ -1,4 +1,4 @@
--- 3.41 https://sqlite.org/lang.html
+-- 3.44 https://sqlite.org/lang.html
 --! keywords		===========================================================
 -- https://sqlite.org/lang_keywords.html
 ABORT
@@ -200,6 +200,7 @@ count(*)
 count(X)
 group_concat(X)
 group_concat(X, Y)
+string_agg(X, Y)
 max(X)
 min(X)
 sum(X)
@@ -212,6 +213,7 @@ datetime(timestring, modifier, modifier, ...)
 julianday(timestring, modifier, modifier, ...)
 unixepoch(time-value, modifier, modifier, ...)
 strftime(format, timestring, modifier, modifier, ...)
+timediff(time-value, time-value)
 -- Built-in Window Functions
 -- https://sqlite.org/windowfunctions.html#biwinfunc
 row_number()
@@ -235,6 +237,8 @@ abs(X)
 changes()
 char(X1, X2, ..., XN)
 coalesce(X, Y, ...)
+concat(X,...)
+concat_ws(SEP,X,...)
 format(FORMAT,...)
 glob(X, Y)
 hex(X)
@@ -255,6 +259,7 @@ ltrim(X, Y)
 max(X, Y, ...)
 min(X, Y, ...)
 nullif(X, Y)
+octet_length(X)
 printf(FORMAT, ...)
 quote(X)
 random()
