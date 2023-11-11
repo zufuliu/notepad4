@@ -436,6 +436,7 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
 	memset(nfa, '\0', sizeof(nfa));
+	memset(bittab, 0, BITBLK);
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
@@ -478,7 +479,6 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			break;
 
 		case '[': {               /* match char class */
-			memset(bittab, 0, BITBLK);
 			int prevChar = 0;
 			bool negative = false;          /* xor mask -CCL/NCL */
 
@@ -584,6 +584,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 
 			*mp++ = CCL;
 			memcpy(mp, bittab, BITBLK);
+			memset(bittab, 0, BITBLK);
 			mp += BITBLK;
 		} break;
 
@@ -685,7 +686,8 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 						*mp++ = static_cast<char>(c);
 					} else {
 						*mp++ = CCL;
-						// omitted zero bittab
+						memcpy(mp, bittab, BITBLK);
+						memset(bittab, 0, BITBLK);
 						mp += BITBLK;
 					}
 				}
@@ -718,10 +720,10 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					*mp++ = CHR;
 					*mp++ = static_cast<char>(c);
 				} else {
-					memset(bittab, 0, BITBLK);
 					ChSetWithCase(c, false);
 					*mp++ = CCL;
 					memcpy(mp, bittab, BITBLK);
+					memset(bittab, 0, BITBLK);
 					mp += BITBLK;
 				}
 			}
