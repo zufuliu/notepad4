@@ -14,7 +14,7 @@ static KEYWORDLIST Keywords_VBS = {{
 "Static Stop Sub Then To True Type Unload Until Wend While With WithEvents Xor"
 
 , // 1 Type Keyword
-"Boolean Byte Currency Date Double Integer Long Object Single String Variant "
+"Boolean Byte Char Currency Date Decimal Double Integer Long LongLong LongPtr Object Single String Variant "
 "RegExp "
 
 , // 2 not used keyword
