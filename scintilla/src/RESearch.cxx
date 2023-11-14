@@ -441,7 +441,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
 	char *sp = nfa;          /* another one       */
-	const char *mpMax = mp + MAXNFA - BITBLK - 10;
+	const char * const mpMax = mp + MAXNFA - BITBLK - 10;
 
 	int tagstk[MAXTAG]{};  /* subpat tag stack */
 	int tagi = 0;          /* tag stack index   */

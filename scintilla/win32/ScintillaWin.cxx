@@ -1433,7 +1433,7 @@ bool ScintillaWin::HandleLaTeXTabCompletion() {
 
 	targetRange.start.SetPosition(pos);
 	targetRange.end.SetPosition(main);
-	ReplaceTarget(ReplaceType::basic, std::string_view(buffer, len));
+	ReplaceTarget(Message::ReplaceTarget, len, reinterpret_cast<sptr_t>(buffer));
 	// move caret after character
 	SetEmptySelection(pos + len);
 	return true;

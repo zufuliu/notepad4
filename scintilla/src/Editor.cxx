@@ -5749,9 +5749,10 @@ Sci::Position Editor::GetTag(char *tagValue, int tagNumber) {
 	return length;
 }
 
-Sci::Position Editor::ReplaceTarget(ReplaceType replaceType, std::string_view text) {
+Sci::Position Editor::ReplaceTarget(Message iMessage, uptr_t wParam, sptr_t lParam) {
+	std::string_view text = ViewFromParams(lParam, wParam);
 	const UndoGroup ug(pdoc);
-	if (replaceType == ReplaceType::patterns) {
+	if (iMessage == Message::ReplaceTargetRE) {
 		Sci::Position length = text.length();
 		const char *p = pdoc->SubstituteByPosition(text.data(), &length);
 		if (!p) {
@@ -5760,7 +5761,7 @@ Sci::Position Editor::ReplaceTarget(ReplaceType replaceType, std::string_view te
 		text = std::string_view(p, length);
 	}
 
-	if (replaceType == ReplaceType::minimal) {
+	if (iMessage == Message::ReplaceTargetMinimal) {
 		// Check for prefix and suffix and reduce text and target to match.
 		// This is performed with Range which doesn't support virtual space.
 		Range range(targetRange.start.Position(), targetRange.end.Position());
@@ -6311,16 +6312,10 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		}
 
 	case Message::ReplaceTarget:
-		PLATFORM_ASSERT(lParam);
-		return ReplaceTarget(ReplaceType::basic, ViewFromParams(lParam, wParam));
-
 	case Message::ReplaceTargetRE:
-		PLATFORM_ASSERT(lParam);
-		return ReplaceTarget(ReplaceType::patterns, ViewFromParams(lParam, wParam));
-
 	case Message::ReplaceTargetMinimal:
 		PLATFORM_ASSERT(lParam);
-		return ReplaceTarget(ReplaceType::minimal, ViewFromParams(lParam, wParam));
+		return ReplaceTarget(iMessage, wParam, lParam);
 
 	case Message::SearchInTarget:
 		PLATFORM_ASSERT(lParam);
