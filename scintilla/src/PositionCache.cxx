@@ -562,7 +562,7 @@ bool SignificantLines::LineMayCache(Sci::Line line) const noexcept {
 LineLayoutCache::LineLayoutCache() noexcept:
 	lastCaretSlot(SIZE_MAX),
 	level(LineCache::None),
-	allInvalidated(false), styleClock(-1) {
+	maxValidity(LineLayout::ValidLevel::invalid), styleClock(-1) {
 }
 
 LineLayoutCache::~LineLayoutCache() = default;
@@ -703,7 +703,7 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 		lengthForLevel = NP2_align_up(linesInDoc, 64);
 	}
 	if (lengthForLevel != shortCache.size()) {
-		allInvalidated = false;
+		maxValidity = LineLayout::ValidLevel::lines;
 		shortCache.resize(lengthForLevel);
 		//printf("%s level=%d, size=%zu/%zu, LineLayout=%zu/%zu, BidiData=%zu, XYPOSITION=%zu\n",
 		//	__func__, level, shortCache.size(), shortCache.capacity(), sizeof(LineLayout),
@@ -713,13 +713,15 @@ void LineLayoutCache::AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesI
 }
 
 void LineLayoutCache::Deallocate() noexcept {
+	maxValidity = LineLayout::ValidLevel::invalid;
+	lastCaretSlot = SIZE_MAX;
 	shortCache.clear();
 	longCache.clear();
-	lastCaretSlot = SIZE_MAX;
 }
 
 void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
-	if (!allInvalidated) {
+	if (maxValidity > validity_) {
+		maxValidity = validity_;
 		for (const auto &ll : shortCache) {
 			if (ll) {
 				ll->Invalidate(validity_);
@@ -730,19 +732,16 @@ void LineLayoutCache::Invalidate(LineLayout::ValidLevel validity_) noexcept {
 				ll->Invalidate(validity_);
 			}
 		}
-		if (validity_ == LineLayout::ValidLevel::invalid) {
-			allInvalidated = true;
-		}
 	}
 }
 
 void LineLayoutCache::SetLevel(LineCache level_) noexcept {
 	if (level != level_) {
 		level = level_;
-		allInvalidated = false;
+		maxValidity = LineLayout::ValidLevel::invalid;
+		lastCaretSlot = SIZE_MAX;
 		shortCache.clear();
 		longCache.clear();
-		lastCaretSlot = SIZE_MAX;
 	}
 }
 
@@ -753,7 +752,7 @@ LineLayout *LineLayoutCache::Retrieve(Sci::Line lineNumber, Sci::Line lineCaret,
 		Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
 		styleClock = styleClock_;
 	}
-	allInvalidated = false;
+	maxValidity = LineLayout::ValidLevel::lines;
 
 	size_t pos = 0;
 	LineLayout *ret = nullptr;
