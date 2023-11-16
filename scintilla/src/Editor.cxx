@@ -2653,18 +2653,25 @@ void Editor::NotifySavePoint(Document *, void *, bool atSavePoint) noexcept {
 	NotifySavePoint(atSavePoint);
 }
 
-void Editor::CheckModificationForWrap(DocModification mh) {
-	if (FlagSet(mh.modificationType, ModificationFlags::InsertText | ModificationFlags::DeleteText)) {
-		view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
-		const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
-		const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
-		if (Wrapping()) {
-			NeedWrapping(lineDoc, lineDoc + lines + 1);
+void Editor::CheckModificationForShow(const DocModification &mh) {
+	const Sci::Line lineOfPos = pdoc->SciLineFromPosition(mh.position);
+	Sci::Position endNeedShown = mh.position;
+	if (FlagSet(mh.modificationType, ModificationFlags::BeforeInsert)) {
+		if (pdoc->ContainsLineEnd(mh.text, mh.length) && (mh.position != pdoc->LineStart(lineOfPos)))
+			endNeedShown = pdoc->LineStart(lineOfPos + 1);
+	} else {
+		// If the deletion includes any EOL then we extend the need shown area.
+		endNeedShown = mh.position + mh.length;
+		Sci::Line lineLast = pdoc->SciLineFromPosition(mh.position + mh.length);
+		for (Sci::Line line = lineOfPos + 1; line <= lineLast; line++) {
+			const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
+			if (lineLast < lineMaxSubord) {
+				lineLast = lineMaxSubord;
+				endNeedShown = pdoc->LineEnd(lineLast);
+			}
 		}
-		RefreshStyleData();
-		// Fix up annotation heights
-		SetAnnotationHeights(lineDoc, lineDoc + lines + 2);
 	}
+	NeedShown(mh.position, endNeedShown - mh.position);
 }
 
 namespace {
@@ -2750,24 +2757,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 		}
 		if (FlagSet(mh.modificationType, (ModificationFlags::BeforeInsert | ModificationFlags::BeforeDelete)) && pcs->HiddenLines()) {
 			// Some lines are hidden so may need shown.
-			const Sci::Line lineOfPos = pdoc->SciLineFromPosition(mh.position);
-			Sci::Position endNeedShown = mh.position;
-			if (FlagSet(mh.modificationType, ModificationFlags::BeforeInsert)) {
-				if (pdoc->ContainsLineEnd(mh.text, mh.length) && (mh.position != pdoc->LineStart(lineOfPos)))
-					endNeedShown = pdoc->LineStart(lineOfPos + 1);
-			} else {
-				// If the deletion includes any EOL then we extend the need shown area.
-				endNeedShown = mh.position + mh.length;
-				Sci::Line lineLast = pdoc->SciLineFromPosition(mh.position + mh.length);
-				for (Sci::Line line = lineOfPos + 1; line <= lineLast; line++) {
-					const Sci::Line lineMaxSubord = pdoc->GetLastChild(line);
-					if (lineLast < lineMaxSubord) {
-						lineLast = lineMaxSubord;
-						endNeedShown = pdoc->LineEnd(lineLast);
-					}
-				}
-			}
-			NeedShown(mh.position, endNeedShown - mh.position);
+			CheckModificationForShow(mh);
 		}
 		if (mh.linesAdded != 0) {
 			// Update contraction state for inserted and removed lines
@@ -2796,7 +2786,18 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 				Redraw();
 			}
 		}
-		CheckModificationForWrap(mh);
+		//CheckModificationForWrap(mh);
+		if (FlagSet(mh.modificationType, ModificationFlags::InsertText | ModificationFlags::DeleteText)) {
+			view.llc.Invalidate(LineLayout::ValidLevel::checkTextAndStyle);
+			const Sci::Line lineDoc = pdoc->SciLineFromPosition(mh.position);
+			const Sci::Line lines = std::max<Sci::Line>(0, mh.linesAdded);
+			if (Wrapping()) {
+				NeedWrapping(lineDoc, lineDoc + lines + 1);
+			}
+			RefreshStyleData();
+			// Fix up annotation heights
+			SetAnnotationHeights(lineDoc, lineDoc + lines + 2);
+		}
 		if (mh.linesAdded != 0) {
 			// Avoid scrolling of display if change before current display
 			if (mh.position < posTopLine && !CanDeferToLastStep(mh)) {

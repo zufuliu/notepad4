@@ -483,7 +483,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void NotifyModifyAttempt(Document *document, void *userData) noexcept override;
 	void NotifySavePoint(Document *document, void *userData, bool atSavePoint) noexcept override;
-	void CheckModificationForWrap(DocModification mh);
+	void CheckModificationForShow(const DocModification &mh);
 	void NotifyModified(Document *document, DocModification mh, void *userData) override;
 	void NotifyDeleted(Document *document, void *userData) noexcept override;
 	void NotifyStyleNeeded(Document *doc, void *userData, Sci::Position endStyleNeeded) override;
