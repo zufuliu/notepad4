@@ -2266,17 +2266,11 @@ void DrawFoldLines(Surface *surface, const EditModel &model, const ViewStyle &vs
 			vsDraw.markers[static_cast<int>(MarkerOutline::Folder)].fore);
 		// Paint the line above the fold
 		// Paint the line above the fold
-		if ((subLine == 0) &&
-			((expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeExpanded)))
-			||
-			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeContracted))))) {
+		if ((subLine == 0) && FlagSet(model.foldFlags, (expanded ? FoldFlag::LineBeforeContracted : FoldFlag::LineBeforeExpanded))) {
 			surface->FillRectangleAligned(Side(rcLine, Edge::top, 1.0), foldLineColour);
 		}
 		// Paint the line below the fold
-		if (lastSubLine &&
-			((expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterExpanded)))
-			||
-			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterContracted))))) {
+		if (lastSubLine && FlagSet(model.foldFlags, (expanded ? FoldFlag::LineAfterExpanded : FoldFlag::LineAfterContracted))) {
 			surface->FillRectangleAligned(Side(rcLine, Edge::bottom, 1.0), foldLineColour);
 			// If contracted fold line drawn then don't overwrite with hidden line
 			// as fold lines are more specific then hidden lines.

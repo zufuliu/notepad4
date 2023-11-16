@@ -92,11 +92,11 @@ constexpr bool CanEliminate(const DocModification &mh) noexcept {
 	in a [possibly lengthy] multi-step Undo/Redo sequence
 */
 constexpr bool IsLastStep(const DocModification &mh) noexcept {
-	return
-		FlagSet(mh.modificationType, (ModificationFlags::Undo | ModificationFlags::Redo))
-		&& FlagSet(mh.modificationType, ModificationFlags::MultiStepUndoRedo)
-		&& FlagSet(mh.modificationType, ModificationFlags::LastStepInUndoRedo)
-		&& FlagSet(mh.modificationType, ModificationFlags::MultilineUndoRedo);
+	constexpr ModificationFlags finalMask = ModificationFlags::MultiStepUndoRedo
+		| ModificationFlags::LastStepInUndoRedo
+		| ModificationFlags::MultilineUndoRedo;
+	return FlagSet(mh.modificationType, (ModificationFlags::Undo | ModificationFlags::Redo))
+		&& ((mh.modificationType & finalMask) == finalMask);
 }
 
 }
@@ -2755,7 +2755,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 			if (FlagSet(mh.modificationType, ModificationFlags::BeforeInsert)) {
 				if (pdoc->ContainsLineEnd(mh.text, mh.length) && (mh.position != pdoc->LineStart(lineOfPos)))
 					endNeedShown = pdoc->LineStart(lineOfPos + 1);
-			} else if (FlagSet(mh.modificationType, ModificationFlags::BeforeDelete)) {
+			} else {
 				// If the deletion includes any EOL then we extend the need shown area.
 				endNeedShown = mh.position + mh.length;
 				Sci::Line lineLast = pdoc->SciLineFromPosition(mh.position + mh.length);
@@ -2830,7 +2830,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 		SetScrollBars();
 	}
 
-	if ((FlagSet(mh.modificationType, ModificationFlags::ChangeMarker)) || (FlagSet(mh.modificationType, ModificationFlags::ChangeMargin))) {
+	if (FlagSet(mh.modificationType, (ModificationFlags::ChangeMarker | ModificationFlags::ChangeMargin))) {
 		if ((!willRedrawAll) && ((paintState == PaintState::notPainting) || !PaintContainsMargin())) {
 			if (FlagSet(mh.modificationType, ModificationFlags::ChangeFold)) {
 				// Fold changes can affect the drawing of following lines so redraw whole margin
@@ -4632,8 +4632,7 @@ void Editor::MouseLeave() {
 }
 
 static constexpr bool AllowVirtualSpace(VirtualSpace virtualSpaceOptions, bool rectangular) noexcept {
-	return (!rectangular && (FlagSet(virtualSpaceOptions, VirtualSpace::UserAccessible)))
-		|| (rectangular && (FlagSet(virtualSpaceOptions, VirtualSpace::RectangularSelection)));
+	return FlagSet(virtualSpaceOptions, (rectangular ? VirtualSpace::RectangularSelection : VirtualSpace::UserAccessible));
 }
 
 void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, KeyMod modifiers) {
