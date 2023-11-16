@@ -5842,7 +5842,6 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 	// Show wait cursor...
 	BeginWaitCursor();
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
-	SciCall_SetModEventMask(SC_MOD_NONE);
 #if 0
 	StopWatch watch;
 	StopWatch_Start(watch);
@@ -5889,7 +5888,6 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 	StopWatch_Stop(watch);
 	StopWatch_ShowLog(&watch, "EditReplaceAll() time");
 #endif
-	SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		EditEnsureSelectionVisible();
@@ -5929,7 +5927,6 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 	// Show wait cursor...
 	BeginWaitCursor();
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
-	SciCall_SetModEventMask(SC_MOD_NONE);
 
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
@@ -5972,7 +5969,6 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 		}
 	}
 
-	SciCall_SetModEventMask(SC_MOD_INSERTTEXT | SC_MOD_DELETETEXT);
 	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		const Sci_Position iPos = SciCall_GetTargetEnd();
