@@ -86,6 +86,7 @@ EditModel::EditModel() : durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0
 	GetNativeSystemInfo(&info);
 	hardwareConcurrency = info.dwNumberOfProcessors;
 	idleTaskTimer = CreateWaitableTimer(nullptr, true, nullptr);
+	SetIdleTaskTime(IdleLineWrapTime);
 	UpdateParallelLayoutThreshold();
 }
 

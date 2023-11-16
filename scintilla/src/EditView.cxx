@@ -430,13 +430,16 @@ struct LayoutWorker {
 		}
 	}
 
-	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine) {
+	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine, LayoutLineOption option) {
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
 		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
 			posInLine = std::max<uint32_t>(posInLine, ll->caretPosition) + blockSize;
 			if (posInLine > static_cast<uint32_t>(endPos)) {
 				posInLine = endPos;
+			} else if (option < LayoutLineOption::IdleUpdate) {
+				// layout as much as possible to avoid unexpected scrolling
+				model.SetIdleTaskTime(EditModel::IdleLineWrapTime);
 			}
 		} else {
 			posInLine = endPos;
@@ -663,7 +666,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		//const ElapsedPeriod period;
 		//posInLine = ll->numCharsInLine; // whole line
 		LayoutWorker worker{ ll, vstyle, surface, posCache, model, {}};
-		const uint32_t threadCount = worker.Start(posLineStart, posInLine);
+		const uint32_t threadCount = worker.Start(posLineStart, posInLine, option);
 
 		// Accumulate absolute positions from relative positions within segments and expand tabs
 		const uint32_t finishedCount = worker.finishedCount.load(std::memory_order_relaxed);

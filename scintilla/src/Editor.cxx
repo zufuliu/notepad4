@@ -1525,7 +1525,7 @@ bool Editor::WrapBlock(Surface *surface, Sci::Line lineToWrap, Sci::Line lineToW
 		} else {
 			ll->caretPosition = 0;
 		}
-		const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::ManualUpdate);
+		const uint64_t wrappedBytes = view.LayoutLine(*this, surface, vs, ll, wrapWidth, LayoutLineOption::IdleUpdate);
 		wrappedBytesAllThread += wrappedBytes & UINT32_MAX;
 		wrappedBytesOneThread += wrappedBytes >> 32;
 		linesAfterWrap[index] = ll->lines;
@@ -3014,8 +3014,6 @@ void Editor::NotifyMacroRecord(Message iMessage, uptr_t wParam, sptr_t lParam) n
 // Something has changed that the container should know about
 void Editor::ContainerNeedsUpdate(Update flags) noexcept {
 	needUpdateUI = needUpdateUI | flags;
-	// layout as much as possible inside LayoutLine() to avoid unexpected scrolling
-	SetIdleTaskTime(ActiveLineWrapTime);
 }
 
 /**

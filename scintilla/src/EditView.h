@@ -36,6 +36,7 @@ enum class DrawPhase {
 enum class LayoutLineOption {
 	AutoUpdate,
 	ManualUpdate,
+	IdleUpdate,
 	KeepPosition,
 	Printing,
 	CallerMultiThreaded = 8,

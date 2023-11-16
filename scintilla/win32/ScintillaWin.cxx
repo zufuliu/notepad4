@@ -2351,6 +2351,7 @@ sptr_t ScintillaWin::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		case WM_SETREDRAW:
 			::DefWindowProc(MainHWND(), msg, wParam, lParam);
 			if (wParam) {
+				SetIdleTaskTime(IdleLineWrapTime);
 				SetScrollBars();
 				SetVerticalScrollPos();
 				SetHorizontalScrollPos();
