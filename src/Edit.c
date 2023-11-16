@@ -5842,6 +5842,10 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 	// Show wait cursor...
 	BeginWaitCursor();
 	SendMessage(hwnd, WM_SETREDRAW, FALSE, 0);
+#if 0
+	StopWatch watch;
+	StopWatch_Start(watch);
+#endif
 
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFindFull ttf = { { 0, SciCall_GetLength() }, szFind2, { 0, 0 } };
@@ -5855,7 +5859,8 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 		const Sci_Position iReplacedLen = SciCall_ReplaceTargetEx(bReplaceRE, -1, pszReplace2);
 
 		ttf.chrg.cpMin = (ttf.chrgText.cpMin + iReplacedLen);
-		ttf.chrg.cpMax = SciCall_GetLength();
+		// document length change: iReplacedLen - (ttf.chrgText.cpMax - ttf.chrgText.cpMin)
+		ttf.chrg.cpMax += ttf.chrg.cpMin - ttf.chrgText.cpMax;
 
 		if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
 			break;
@@ -5879,6 +5884,10 @@ bool EditReplaceAll(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowInfo) {
 		}
 	}
 
+#if 0
+	StopWatch_Stop(watch);
+	StopWatch_ShowLog(&watch, "EditReplaceAll() time");
+#endif
 	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		EditEnsureSelectionVisible();
@@ -5922,9 +5931,8 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 	const bool bRegexStartOfLine = bReplaceRE && (szFind2[0] == '^');
 	struct Sci_TextToFindFull ttf = { { SciCall_GetSelectionStart(), SciCall_GetLength() }, szFind2, { 0, 0 } };
 	Sci_Position iCount = 0;
-	bool fCancel = false;
-	while (!fCancel && SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
-		if (ttf.chrgText.cpMin >= SciCall_GetSelectionStart() && ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
+	while (SciCall_FindTextFull(searchFlags, &ttf) >= 0) {
+		if (ttf.chrgText.cpMax <= SciCall_GetSelectionEnd()) {
 			if (++iCount == 1) {
 				SciCall_BeginUndoAction();
 			}
@@ -5933,10 +5941,11 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 			const Sci_Position iReplacedLen = SciCall_ReplaceTargetEx(bReplaceRE, -1, pszReplace2);
 
 			ttf.chrg.cpMin = (ttf.chrgText.cpMin + iReplacedLen);
-			ttf.chrg.cpMax = SciCall_GetLength();
+			// document length change: iReplacedLen - (ttf.chrgText.cpMax - ttf.chrgText.cpMin)
+			ttf.chrg.cpMax += ttf.chrg.cpMin - ttf.chrgText.cpMax;
 
 			if (ttf.chrg.cpMin == ttf.chrg.cpMax) {
-				fCancel = true;
+				break;
 			}
 
 			if (ttf.chrgText.cpMin == ttf.chrgText.cpMax && !bRegexStartOfLine) {
@@ -5956,14 +5965,14 @@ bool EditReplaceAllInSelection(HWND hwnd, LPCEDITFINDREPLACE lpefr, bool bShowIn
 				}
 			}
 		} else { // gone across selection, cancel
-			fCancel = true;
+			break;
 		}
 	}
 
 	SendMessage(hwnd, WM_SETREDRAW, TRUE, 0);
 	if (iCount) {
 		const Sci_Position iPos = SciCall_GetTargetEnd();
-		if (SciCall_GetSelectionEnd() <	iPos) {
+		if (SciCall_GetSelectionEnd() < iPos) {
 			Sci_Position iAnchorPos = SciCall_GetAnchor();
 			Sci_Position iCurrentPos = SciCall_GetCurrentPos();
 
