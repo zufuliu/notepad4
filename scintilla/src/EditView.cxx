@@ -430,13 +430,16 @@ struct LayoutWorker {
 		}
 	}
 
-	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine) {
+	uint32_t Start(Sci::Position posLineStart, uint32_t posInLine, LayoutLineOption option) {
 		const int startPos = ll->lastSegmentEnd;
 		const int endPos = ll->numCharsInLine;
 		if (endPos - startPos > blockSize*2 && !model.BidirectionalEnabled()) {
 			posInLine = std::max<uint32_t>(posInLine, ll->caretPosition) + blockSize;
 			if (posInLine > static_cast<uint32_t>(endPos)) {
 				posInLine = endPos;
+			} else if (option < LayoutLineOption::IdleUpdate) {
+				// layout as much as possible to avoid unexpected scrolling
+				model.SetIdleTaskTime(EditModel::IdleLineWrapTime);
 			}
 		} else {
 			posInLine = endPos;
@@ -663,7 +666,7 @@ uint64_t EditView::LayoutLine(const EditModel &model, Surface *surface, const Vi
 		//const ElapsedPeriod period;
 		//posInLine = ll->numCharsInLine; // whole line
 		LayoutWorker worker{ ll, vstyle, surface, posCache, model, {}};
-		const uint32_t threadCount = worker.Start(posLineStart, posInLine);
+		const uint32_t threadCount = worker.Start(posLineStart, posInLine, option);
 
 		// Accumulate absolute positions from relative positions within segments and expand tabs
 		const uint32_t finishedCount = worker.finishedCount.load(std::memory_order_relaxed);
@@ -1000,13 +1003,13 @@ Sci::Position EditView::StartEndDisplayLine(Surface *surface, const EditModel &m
 
 namespace {
 
-constexpr ColourRGBA bugColour = ColourRGBA(0xff, 0, 0xfe, 0xf0);
+constexpr ColourRGBA colourBug(0xff, 0, 0xfe, 0xf0);
 
 // Selection background colours are always defined, the value_or is to show if bug
 
 ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
 	if (inSelection == InSelection::inNone)
-		return bugColour;	// Not selected is a bug
+		return colourBug;	// Not selected is a bug
 
 	Element element = Element::SelectionBack;
 	if (inSelection == InSelection::inAdditional)
@@ -1019,7 +1022,7 @@ ColourRGBA SelectionBackground(const EditModel &model, const ViewStyle &vsDraw, 
 			return *colour;
 		}
 	}
-	return vsDraw.ElementColour(element).value_or(bugColour);
+	return vsDraw.ElementColour(element).value_or(colourBug);
 }
 
 ColourOptional SelectionForeground(const EditModel &model, const ViewStyle &vsDraw, InSelection inSelection) {
@@ -1609,9 +1612,9 @@ void EditView::DrawAnnotation(Surface *surface, const EditModel &model, const Vi
 		}
 	} else {
 #ifndef NDEBUG
-		// No annotation to draw so show bug with bugColour
+		// No annotation to draw so show bug with colourBug
 		if (FlagSet(phase, DrawPhase::back)) {
-			surface->FillRectangle(rcSegment, bugColour.Opaque());
+			surface->FillRectangle(rcSegment, colourBug.Opaque());
 		}
 #endif
 	}
@@ -2266,17 +2269,11 @@ void DrawFoldLines(Surface *surface, const EditModel &model, const ViewStyle &vs
 			vsDraw.markers[static_cast<int>(MarkerOutline::Folder)].fore);
 		// Paint the line above the fold
 		// Paint the line above the fold
-		if ((subLine == 0) &&
-			((expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeExpanded)))
-			||
-			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineBeforeContracted))))) {
+		if ((subLine == 0) && FlagSet(model.foldFlags, (expanded ? FoldFlag::LineBeforeContracted : FoldFlag::LineBeforeExpanded))) {
 			surface->FillRectangleAligned(Side(rcLine, Edge::top, 1.0), foldLineColour);
 		}
 		// Paint the line below the fold
-		if (lastSubLine &&
-			((expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterExpanded)))
-			||
-			(!expanded && (FlagSet(model.foldFlags, FoldFlag::LineAfterContracted))))) {
+		if (lastSubLine && FlagSet(model.foldFlags, (expanded ? FoldFlag::LineAfterExpanded : FoldFlag::LineAfterContracted))) {
 			surface->FillRectangleAligned(Side(rcLine, Edge::bottom, 1.0), foldLineColour);
 			// If contracted fold line drawn then don't overwrite with hidden line
 			// as fold lines are more specific then hidden lines.
@@ -2300,7 +2297,7 @@ ColourRGBA InvertedLight(ColourRGBA orig) noexcept {
 	const unsigned int l = (r + g + b) / 3; 	// There is a better calculation for this that matches human eye
 	const unsigned int il = 0xff - l;
 	if (l == 0)
-		return ColourRGBA(0xff, 0xff, 0xff);
+		return white;
 	r = r * il / l;
 	g = g * il / l;
 	b = b * il / l;
@@ -2945,15 +2942,15 @@ Sci::Position EditView::FormatRange(bool draw, CharacterRangeFull chrg, Scintill
 			it->fore = InvertedLight(it->fore);
 			it->back = InvertedLight(it->back);
 		} else if (colourMode == PrintOption::BlackOnWhite) {
-			it->fore = ColourRGBA(0, 0, 0);
-			it->back = ColourRGBA(0xff, 0xff, 0xff);
+			it->fore = black;
+			it->back = white;
 		} else if (colourMode == PrintOption::ColourOnWhite || colourMode == PrintOption::ColourOnWhiteDefaultBG) {
-			it->back = ColourRGBA(0xff, 0xff, 0xff);
+			it->back = white;
 		}
 	}
 	// White background for the line numbers if PrintOption::ScreenColours isn't used
 	if (colourMode != PrintOption::ScreenColours) {
-		vsPrint.styles[StyleLineNumber].back = ColourRGBA(0xff, 0xff, 0xff);
+		vsPrint.styles[StyleLineNumber].back = white;
 	}
 
 	// Printing uses different margins, so reset screen margins

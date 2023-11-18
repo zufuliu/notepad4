@@ -168,7 +168,7 @@ private:
 	std::vector<std::unique_ptr<LineLayout>> longCache;
 	size_t lastCaretSlot;
 	Scintilla::LineCache level;
-	bool allInvalidated;
+	LineLayout::ValidLevel maxValidity;
 	int styleClock;
 	void AllocateForLevel(Sci::Line linesOnScreen, Sci::Line linesInDoc);
 public:

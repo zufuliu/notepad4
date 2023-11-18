@@ -58,7 +58,6 @@ public:
 	ActionDuration durationWrapOneUnit;
 	ActionDuration durationWrapOneThread;
 	static constexpr uint32_t IdleLineWrapTime = 250;
-	static constexpr uint32_t ActiveLineWrapTime = 500;
 	void *idleTaskTimer;
 
 	EditModel();

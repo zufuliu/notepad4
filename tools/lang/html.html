@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 9 June 2023
+https://whatwg.org/ 16 November 2023
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 -->
@@ -310,14 +310,14 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 			</fieldset>
 		</form>
 		<!-- Interactive elements https://html.spec.whatwg.org/multipage/interactive-elements.html -->
-		<details open></details>
+		<details name open></details>
 		<summary></summary>
 		<dialog open></dialog>
 		<!-- Scripting https://html.spec.whatwg.org/multipage/scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
 			charset nomodule async defer crossorigin integrity referrerpolicy blocking fetchpriority></script>
 		<noscript></noscript>
-		<template></template>
+		<template shadowrootmode="open closed" shadowrootdelegatesfocus></template>
 		<slot name></slot>
 		<!-- https://html.spec.whatwg.org/multipage/canvas.html -->
 		<canvas width height></canvas>

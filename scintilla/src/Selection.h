@@ -47,6 +47,9 @@ public:
 	void Add(Sci::Position increment) noexcept {
 		position = position + increment;
 	}
+	void AddVirtualSpace(Sci::Position increment) noexcept {
+		SetVirtualSpace(virtualSpace + increment);
+	}
 	bool IsValid() const noexcept {
 		return position >= 0;
 	}

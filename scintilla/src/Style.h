@@ -38,8 +38,8 @@ constexpr size_t maxInvisibleStyleRepresentationLength = 6;
 
 // used to optimize style copy.
 struct StylePod {
-	ColourRGBA fore = ColourRGBA(0, 0, 0);
-	ColourRGBA back = ColourRGBA(0xff, 0xff, 0xff);
+	ColourRGBA fore = black;
+	ColourRGBA back = white;
 	bool eolFilled = false;
 	bool underline = false;
 	bool strike = false;

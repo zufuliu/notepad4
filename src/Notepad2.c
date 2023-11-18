@@ -75,7 +75,7 @@ static UINT uTrayIconDPI = 0;
 static TBBUTTON tbbMainWnd[] = {
 	{0, 	0, 					0, 				 TBSTYLE_SEP, {0}, 0, 0},
 	{0, 	IDT_FILE_NEW, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
-	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
+	{1, 	IDT_FILE_OPEN, 		TBSTATE_ENABLED, BTNS_DROPDOWN, {0}, 0, 0},
 	{2, 	IDT_FILE_BROWSE, 	TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{3, 	IDT_FILE_SAVE, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
 	{4, 	IDT_EDIT_UNDO, 		TBSTATE_ENABLED, TBSTYLE_BUTTON, {0}, 0, 0},
@@ -1152,26 +1152,12 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			SaveSettings(false);
 
 			if (StrNotEmpty(szIniFile)) {
-
 				// Cleanup unwanted MRU's
-				if (!bSaveRecentFiles) {
-					MRU_Empty(pFileMRU);
-					MRU_Save(pFileMRU);
-				} else {
-					MRU_MergeSave(pFileMRU, true, flagRelativeFileMRU, flagPortableMyDocs);
-				}
+				MRU_MergeSave(pFileMRU, bSaveRecentFiles);
 				MRU_Destroy(pFileMRU);
-
-				if (!bSaveFindReplace) {
-					MRU_Empty(mruFind);
-					MRU_Empty(mruReplace);
-					MRU_Save(mruFind);
-					MRU_Save(mruReplace);
-				} else {
-					MRU_MergeSave(mruFind, false, false, false);
-					MRU_MergeSave(mruReplace, false, false, false);
-				}
+				MRU_MergeSave(mruFind, bSaveFindReplace);
 				MRU_Destroy(mruFind);
+				MRU_MergeSave(mruReplace, bSaveFindReplace);
 				MRU_Destroy(mruReplace);
 			}
 
@@ -1965,12 +1951,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, MRUFlags_FilePath, MRU_MAX_RECENT_FILES);
-	MRU_Load(pFileMRU);
-	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue, MRU_MAX_RECENT_FIND);
-	MRU_Load(mruFind);
-	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue, MRU_MAX_RECENT_REPLACE);
-	MRU_Load(mruReplace);
+	int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
+	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, flags);
+	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
+	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
 	return 0;
 }
 
@@ -2465,7 +2449,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_LINEENDINGS_CRLF + iCurrentEOLMode;
 	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_LF, i, MF_BYCOMMAND);
 
-	EnableCmd(hmenu, IDM_FILE_RECENT, (MRU_GetCount(pFileMRU) > 0));
+	EnableCmd(hmenu, IDM_FILE_RECENT, (pFileMRU->iSize > 0));
 
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo());
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo());
@@ -3038,7 +3022,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RECENT:
-		if (MRU_GetCount(pFileMRU) > 0) {
+		if (pFileMRU->iSize > 0) {
 			if (FileSave(FileSaveFlag_Ask)) {
 				WCHAR tchFile[MAX_PATH];
 				if (FileMRUDlg(hwnd, tchFile)) {
@@ -5017,6 +5001,18 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	case IDT_VIEW_ALWAYSONTOP:
 		SendWMCommandOrBeep(hwnd, IDM_VIEW_ALWAYSONTOP);
 		break;
+
+	default: {
+		const UINT index = LOWORD(wParam) - IDM_RECENT_HISTORY_START;
+		if (index < MRU_MAXITEMS) {
+			LPCWSTR path = pFileMRU->pszItems[index];
+			if (path) {
+				if (FileSave(FileSaveFlag_Ask)) {
+					FileLoad(FileLoadFlag_DontSave, path);
+				}
+			}
+		}
+	} break;
 	}
 
 	return 0;
@@ -5324,8 +5320,8 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case TBN_GETBUTTONINFO: {
 			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
-			if (lpTbNotify->iItem < (int)COUNTOF(tbbMainWnd)) {
-				WCHAR tch[256];
+			if ((UINT)lpTbNotify->iItem < COUNTOF(tbbMainWnd)) {
+				WCHAR tch[128];
 				GetString(tbbMainWnd[lpTbNotify->iItem].idCommand, tch, COUNTOF(tch));
 				lstrcpyn(lpTbNotify->pszText, tch, lpTbNotify->cchText);
 				memcpy(&lpTbNotify->tbButton, &tbbMainWnd[lpTbNotify->iItem], sizeof(TBBUTTON));
@@ -5340,16 +5336,30 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
 		case TBN_DROPDOWN: {
 			LPTBNOTIFY lpTbNotify = (LPTBNOTIFY)lParam;
-			RECT rc;
-			SendMessage(hwndToolbar, TB_GETRECT, lpTbNotify->iItem, (LPARAM)&rc);
-			MapWindowPoints(hwndToolbar, HWND_DESKTOP, (LPPOINT)&rc, 2);
-			HMENU hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+			HMENU hmenu = NULL;
+			HMENU subMenu = NULL;
+			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
+				NP2_static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
+				const int count = pFileMRU->iSize;
+				if (count <= 0) {
+					return TBDDRET_TREATPRESSED;
+				}
+				hmenu = subMenu = CreatePopupMenu();
+				for (int i = 0; i < count; i++) {
+					LPCWSTR path = pFileMRU->pszItems[i];
+					AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, path);
+				}
+			} else {
+				hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
+				subMenu = GetSubMenu(hmenu, IDP_POPUP_SUBMENU_FOLD);
+			}
 			TPMPARAMS tpm;
 			tpm.cbSize = sizeof(TPMPARAMS);
-			tpm.rcExclude = rc;
-			TrackPopupMenuEx(GetSubMenu(hmenu, IDP_POPUP_SUBMENU_FOLD),
+			SendMessage(hwndToolbar, TB_GETRECT, lpTbNotify->iItem, (LPARAM)&tpm.rcExclude);
+			MapWindowPoints(hwndToolbar, HWND_DESKTOP, (LPPOINT)&tpm.rcExclude, 2);
+			TrackPopupMenuEx(subMenu,
 							TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-							rc.left, rc.bottom, hwnd, &tpm);
+							tpm.rcExclude.left, tpm.rcExclude.bottom, hwnd, &tpm);
 			DestroyMenu(hmenu);
 		}
 		return FALSE;
@@ -5420,7 +5430,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			if (pTTT->uFlags & TTF_IDISHWND) {
 				//nop;
 			} else {
-				WCHAR tch[256];
+				WCHAR tch[128];
 				GetString((UINT)pnmh->idFrom, tch, COUNTOF(tch));
 				lstrcpyn(pTTT->szText, tch, COUNTOF(pTTT->szText));
 			}
@@ -5462,34 +5472,7 @@ void LoadSettings(void) {
 
 	//const int iSettingsVersion = IniSectionGetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	bSaveSettings = IniSectionGetBool(pIniSection, L"SaveSettings", true);
-	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", false);
-	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", false);
-	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", true);
-	bFindReplaceUseMonospacedFont = IniSectionGetBool(pIniSection, L"FindReplaceUseMonospacedFont", false);
-	bFindReplaceFindAllBookmark = IniSectionGetBool(pIniSection, L"FindReplaceFindAllBookmark", false);
-
-	efrData.bFindClose = IniSectionGetBool(pIniSection, L"CloseFind", false);
-	efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"CloseReplace", false);
-	efrData.bNoFindWrap = IniSectionGetBool(pIniSection, L"NoFindWrap", false);
-
-	if (bSaveFindReplace) {
-		efrData.fuFlags = 0;
-		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchCase", false)) {
-			efrData.fuFlags |= SCFIND_MATCHCASE;
-		}
-		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", false)) {
-			efrData.fuFlags |= SCFIND_WHOLEWORD;
-		}
-		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", false)) {
-			efrData.fuFlags |= SCFIND_WORDSTART;
-		}
-		if (IniSectionGetBool(pIniSection, L"FindReplaceRegExpSearch", false)) {
-			efrData.fuFlags |= NP2_RegexDefaultFlags;
-		}
-		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", false);
-		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", false);
-	}
-
+	// TODO: sort loading order by item frequency to reduce IniSectionUnsafeGetValue() calls
 	LPCWSTR strValue = IniSectionGetValue(pIniSection, L"OpenWithDir");
 	if (StrIsEmpty(strValue)) {
 #if _WIN32_WINNT >= _WIN32_WINNT_VISTA
@@ -5523,8 +5506,39 @@ void LoadSettings(void) {
 	int iValue = IniSectionGetInt(pIniSection, L"PathNameFormat", TitlePathNameFormat_NameFirst);
 	iPathNameFormat = (TitlePathNameFormat)clamp_i(iValue, TitlePathNameFormat_NameOnly, TitlePathNameFormat_FullPath);
 
-	fWordWrapG = IniSectionGetBool(pIniSection, L"WordWrap", true);
+	POINT pt;
+	pt.x = IniSectionGetInt(pIniSection, L"WindowPosX", 0);
+	pt.y = IniSectionGetInt(pIniSection, L"WindowPosY", 0);
 
+	bSaveRecentFiles = IniSectionGetBool(pIniSection, L"SaveRecentFiles", false);
+	bSaveFindReplace = IniSectionGetBool(pIniSection, L"SaveFindReplace", false);
+	bFindReplaceTransparentMode = IniSectionGetBool(pIniSection, L"FindReplaceTransparentMode", true);
+	bFindReplaceUseMonospacedFont = IniSectionGetBool(pIniSection, L"FindReplaceUseMonospacedFont", false);
+	bFindReplaceFindAllBookmark = IniSectionGetBool(pIniSection, L"FindReplaceFindAllBookmark", false);
+
+	efrData.bFindClose = IniSectionGetBool(pIniSection, L"CloseFind", false);
+	efrData.bReplaceClose = IniSectionGetBool(pIniSection, L"CloseReplace", false);
+	efrData.bNoFindWrap = IniSectionGetBool(pIniSection, L"NoFindWrap", false);
+
+	if (bSaveFindReplace) {
+		efrData.fuFlags = 0;
+		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchCase", false)) {
+			efrData.fuFlags |= SCFIND_MATCHCASE;
+		}
+		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchWholeWorldOnly", false)) {
+			efrData.fuFlags |= SCFIND_WHOLEWORD;
+		}
+		if (IniSectionGetBool(pIniSection, L"FindReplaceMatchBeginingWordOnly", false)) {
+			efrData.fuFlags |= SCFIND_WORDSTART;
+		}
+		if (IniSectionGetBool(pIniSection, L"FindReplaceRegExpSearch", false)) {
+			efrData.fuFlags |= NP2_RegexDefaultFlags;
+		}
+		efrData.bTransformBS = IniSectionGetBool(pIniSection, L"FindReplaceTransformBackslash", false);
+		efrData.bWildcardSearch = IniSectionGetBool(pIniSection, L"FindReplaceWildcardSearch", false);
+	}
+
+	fWordWrapG = IniSectionGetBool(pIniSection, L"WordWrap", true);
 	iValue = IniSectionGetInt(pIniSection, L"WordWrapMode", SC_WRAP_AUTO);
 	iWordWrapMode = clamp_i(iValue, SC_WRAP_WORD, SC_WRAP_AUTO);
 
@@ -5731,7 +5745,7 @@ void LoadSettings(void) {
 	// window position section
 	{
 		WCHAR sectionName[96];
-		HMONITOR hMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTONEAREST);
+		HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
 		GetWindowPositionSectionName(hMonitor, sectionName);
 		LoadIniSection(sectionName, pIniSectionBuf, cchIniSection);
 		IniSectionParse(pIniSection, pIniSectionBuf);
@@ -5846,14 +5860,29 @@ void SaveSettings(bool bSaveSettingsNow) {
 
 	WCHAR wchTmp[MAX_PATH];
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_SETTINGS);
+	if (!bStickyWindowPosition) {
+		SaveWindowPosition(pIniSectionBuf);
+		memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
+	}
+
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave * const pIniSection = &section;
 
 	//IniSectionSetInt(pIniSection, L"SettingsVersion", NP2SettingsVersion_Current);
 	IniSectionSetBoolEx(pIniSection, L"SaveSettings", bSaveSettings, true);
+
+	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
+	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
+	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
+	IniSectionSetIntEx(pIniSection, L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
+	if (!bStickyWindowPosition) {
+		IniSectionSetInt(pIniSection, L"WindowPosX", wi.x);
+		IniSectionSetInt(pIniSection, L"WindowPosY", wi.y);
+	}
+
 	IniSectionSetBoolEx(pIniSection, L"SaveRecentFiles", bSaveRecentFiles, false);
 	IniSectionSetBoolEx(pIniSection, L"SaveFindReplace", bSaveFindReplace, false);
-
 	IniSectionSetBoolEx(pIniSection, L"CloseFind", efrData.bFindClose, false);
 	IniSectionSetBoolEx(pIniSection, L"CloseReplace", efrData.bReplaceClose, false);
 	IniSectionSetBoolEx(pIniSection, L"NoFindWrap", efrData.bNoFindWrap, false);
@@ -5868,12 +5897,6 @@ void SaveSettings(bool bSaveSettingsNow) {
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceTransformBackslash", efrData.bTransformBS, false);
 		IniSectionSetBoolEx(pIniSection, L"FindReplaceWildcardSearch", efrData.bWildcardSearch, false);
 	}
-
-	PathRelativeToApp(tchOpenWithDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"OpenWithDir", wchTmp);
-	PathRelativeToApp(tchFavoritesDir, wchTmp, FILE_ATTRIBUTE_DIRECTORY, true, flagPortableMyDocs);
-	IniSectionSetString(pIniSection, L"Favorites", wchTmp);
-	IniSectionSetIntEx(pIniSection, L"PathNameFormat", (int)iPathNameFormat, TitlePathNameFormat_NameFirst);
 
 	IniSectionSetBoolEx(pIniSection, L"WordWrap", fWordWrapG, true);
 	IniSectionSetIntEx(pIniSection, L"WordWrapMode", iWordWrapMode, SC_WRAP_AUTO);
@@ -5985,16 +6008,12 @@ void SaveSettings(bool bSaveSettingsNow) {
 	IniSectionSetIntEx(pIniSection, L"FullScreenMode", iFullScreenMode, FullScreenMode_Default);
 
 	SaveIniSection(INI_SECTION_NAME_SETTINGS, pIniSectionBuf);
-	if (!bStickyWindowPosition) {
-		SaveWindowPosition(pIniSectionBuf);
-	}
 	NP2HeapFree(pIniSectionBuf);
 	// Scintilla Styles
 	Style_Save();
 }
 
 void SaveWindowPosition(WCHAR *pIniSectionBuf) {
-	memset(pIniSectionBuf, 0, 2*sizeof(WCHAR));
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave *const pIniSection = &section;
 
@@ -7550,7 +7569,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			UpdateLineNumberWidth();
 		}
 
-		MRU_AddFile(pFileMRU, szFileName, flagRelativeFileMRU, flagPortableMyDocs);
+		MRU_Add(pFileMRU, szFileName);
 		if (flagUseSystemMRU == TripleBoolean_True) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
@@ -7760,7 +7779,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 			bDocumentModified = false;
 			iOriginalEncoding = iCurrentEncoding;
-			MRU_AddFile(pFileMRU, szCurFile, flagRelativeFileMRU, flagPortableMyDocs);
+			MRU_Add(pFileMRU, szCurFile);
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}

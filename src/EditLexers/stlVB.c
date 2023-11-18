@@ -26,10 +26,11 @@ static KEYWORDLIST Keywords_VB = {{
 
 , // 1 Type Keyword
 "Boolean Byte CBool CByte CChar CDate CDbl CDec Char CInt CLng CObj CSByte CShort CSng CStr CType CUInt "
-"CULng CUShort Date Decimal Double Integer Long Object SByte Short Single String UInteger ULong UShort"
+"CULng CUShort Date Decimal Double Integer Long Object SByte Short Single String UInteger ULong UShort "
+"Currency LongLong LongPtr Variant Empty Null CCur CLngLng CLngPtr CVar CVDate CVErr "
 
 , // 2 not used keyword, used in VBScript
-"EndIf GoSub Variant Wend "
+"EndIf GoSub Wend "
 
 , // 3 Preprocessor
 "If Else ElseIf End Const Region ExternalChecksum ExternalSource "

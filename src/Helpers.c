@@ -2344,19 +2344,17 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
 //
 // MRU functions
 //
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize) {
+LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags) {
 	LPMRULIST pmru = (LPMRULIST)NP2HeapAlloc(sizeof(MRULIST));
-	pmru->szRegKey = pszRegKey;
 	pmru->iFlags = iFlags;
-	pmru->iSize = min_i(iSize, MRU_MAXITEMS);
+	pmru->szRegKey = pszRegKey;
+	MRU_Load(pmru);
 	return pmru;
 }
 
 void MRU_Destroy(LPMRULIST pmru) {
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
-			LocalFree(pmru->pszItems[i]);
-		}
+		LocalFree(pmru->pszItems[i]);
 	}
 
 	memset(pmru, 0, sizeof(MRULIST));
@@ -2371,217 +2369,187 @@ static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
 #endif
 }
 
-bool MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
+void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew) {
 	const int flags = pmru->iFlags;
+	LPWSTR tchItem = NULL;
 	int i;
-	for (i = 0; i < pmru->iSize; i++) {
+	for (i = 0; i < MRU_MAXITEMS; i++) {
 		WCHAR * const item = pmru->pszItems[i];
 		if (item == NULL) {
 			break;
 		}
 		if (MRU_Equal(flags, item, pszNew)) {
-			LocalFree(item);
+			tchItem = item;
 			break;
 		}
 	}
-	i = min_i(i, pmru->iSize - 1);
+	if (i == MRU_MAXITEMS) {
+		--i;
+		LocalFree(pmru->pszItems[i]);
+	} else if (i == pmru->iSize) {
+		pmru->iSize += 1;
+	}
 	for (; i > 0; i--) {
 		pmru->pszItems[i] = pmru->pszItems[i - 1];
 	}
-	pmru->pszItems[0] = StrDup(pszNew);
-	return true;
+	if (tchItem == NULL) {
+		tchItem = StrDup(pszNew);
+	}
+	pmru->pszItems[0] = tchItem;
 }
 
-bool MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew) {
+void MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew) {
 	const int len = lstrlen(pszNew);
 	LPWSTR lpszEsc = (LPWSTR)NP2HeapAlloc((2*len + 1)*sizeof(WCHAR));
 	AddBackslashW(lpszEsc, pszNew);
 	MRU_Add(pmru, lpszEsc);
 	NP2HeapFree(lpszEsc);
-	return true;
 }
 
-bool MRU_AddFile(LPMRULIST pmru, LPCWSTR pszFile, bool bRelativePath, bool bUnexpandMyDocs) {
-	int i;
-	for (i = 0; i < pmru->iSize; i++) {
-		WCHAR * const item = pmru->pszItems[i];
-		if (item == NULL) {
-			break;
-		}
-		if (PathEqual(item, pszFile)) {
-			LocalFree(item);
-			break;
-		}
-		{
-			WCHAR wchItem[MAX_PATH];
-			PathAbsoluteFromApp(item, wchItem, true);
-			if (PathEqual(wchItem, pszFile)) {
-				LocalFree(item);
-				break;
-			}
-		}
-	}
-	i = min_i(i, pmru->iSize - 1);
-	for (; i > 0; i--) {
-		pmru->pszItems[i] = pmru->pszItems[i - 1];
-	}
-
-	if (bRelativePath) {
-		WCHAR wchFile[MAX_PATH];
-		PathRelativeToApp(pszFile, wchFile, 0, true, bUnexpandMyDocs);
-		pmru->pszItems[0] = StrDup(wchFile);
-	} else {
-		pmru->pszItems[0] = StrDup(pszFile);
-	}
-
-	return true;
-}
-
-bool MRU_Delete(LPMRULIST pmru, int iIndex) {
+void MRU_Delete(LPMRULIST pmru, int iIndex) {
 	if (iIndex < 0 || iIndex >= pmru->iSize) {
-		return false;
+		return;
 	}
-	if (pmru->pszItems[iIndex]) {
-		LocalFree(pmru->pszItems[iIndex]);
-	}
-	for (int i = iIndex; i < pmru->iSize - 1; i++) {
+	LocalFree(pmru->pszItems[iIndex]);
+	pmru->pszItems[iIndex] = NULL;
+	pmru->iSize -= 1;
+	for (int i = iIndex; i < pmru->iSize; i++) {
 		pmru->pszItems[i] = pmru->pszItems[i + 1];
 		pmru->pszItems[i + 1] = NULL;
 	}
-	return true;
 }
 
-bool MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
-	int i = 0;
-	WCHAR wchItem[MAX_PATH];
+void MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
+	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags);
+	int deleted = 0;
 
-	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
-	MRU_Load(pmruStore);
-
-	while (MRU_Enum(pmruStore, i, wchItem, COUNTOF(wchItem)) >= 0) {
-		PathAbsoluteFromApp(wchItem, wchItem, true);
-		if (PathEqual(wchItem, pszFile)) {
-			MRU_Delete(pmruStore, i);
+	for (int index = 0; index < pmruStore->iSize; ) {
+		LPCWSTR path = pmruStore->pszItems[index];
+		if (PathEqual(path, pszFile)) {
+			deleted += 1;
+			LocalFree(pmruStore->pszItems[index]);
+			pmruStore->pszItems[index] = NULL;
+			for (int i = index; i < pmruStore->iSize - 1; i++) {
+				pmruStore->pszItems[i] = pmruStore->pszItems[i + 1];
+				pmruStore->pszItems[i + 1] = NULL;
+			}
 		} else {
-			i++;
+			index++;
 		}
 	}
 
+	pmruStore->iSize -= deleted;
 	MRU_Save(pmruStore);
 	MRU_Destroy(pmruStore);
-	return true;
 }
 
-void MRU_Empty(LPMRULIST pmru) {
+void MRU_Empty(LPMRULIST pmru, bool save) {
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (pmru->pszItems[i]) {
-			LocalFree(pmru->pszItems[i]);
-			pmru->pszItems[i] = NULL;
-		}
+		LocalFree(pmru->pszItems[i]);
+		pmru->pszItems[i] = NULL;
+	}
+	pmru->iSize = 0;
+	if (save) {
+		MRU_Save(pmru);
 	}
 }
 
-int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem) {
-	if (pszItem == NULL || cchItem == 0) {
-		int i = 0;
-		while (i < pmru->iSize && pmru->pszItems[i]) {
-			i++;
-		}
-		return i;
-	}
-
-	if (iIndex < 0 || iIndex >= pmru->iSize || pmru->pszItems[iIndex] == NULL) {
-		return -1;
-	}
-	lstrcpyn(pszItem, pmru->pszItems[iIndex], cchItem);
-	return TRUE;
-}
-
-bool MRU_Load(LPMRULIST pmru) {
+void MRU_Load(LPMRULIST pmru) {
 	if (StrIsEmpty(szIniFile)) {
-		return true;
+		return;
 	}
 
 	IniSection section;
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection * const pIniSection = &section;
+	const int iFlags = pmru->iFlags;
 
-	MRU_Empty(pmru);
+	//MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
 
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
-	IniSectionParseArray(pIniSection, pIniSectionBuf, pmru->iFlags & MRUFlags_QuoteValue);
+	IniSectionParseArray(pIniSection, pIniSectionBuf, iFlags & MRUFlags_QuoteValue);
 	const UINT count = pIniSection->count;
-	const UINT size = pmru->iSize;
+	UINT n = 0;
 
-	for (UINT i = 0, n = 0; i < count && n < size; i++) {
+	for (UINT i = 0; i < count; i++) {
 		const IniKeyValueNode *node = &pIniSection->nodeList[i];
 		LPCWSTR tchItem = node->value;
 		if (StrNotEmpty(tchItem)) {
+			WCHAR tchPath[MAX_PATH];
+			if ((iFlags & MRUFlags_FilePath) != 0 && PathIsRelative(tchItem)) {
+				PathAbsoluteFromApp(tchItem, tchPath, true);
+				tchItem = tchPath;
+			}
 			pmru->pszItems[n++] = StrDup(tchItem);
 		}
 	}
 
+	pmru->iSize = n;
 	IniSectionFree(pIniSection);
 	NP2HeapFree(pIniSectionBuf);
-	return true;
 }
 
-bool MRU_Save(LPCMRULIST pmru) {
+void MRU_Save(LPCMRULIST pmru) {
 	if (StrIsEmpty(szIniFile)) {
-		return true;
+		return;
 	}
-	if (MRU_GetCount(pmru) == 0) {
+	if (pmru->iSize <= 0) {
 		IniClearSection(pmru->szRegKey);
-		return true;
+		return;
 	}
 
 	WCHAR tchName[16];
 	WCHAR *pIniSectionBuf = (WCHAR *)NP2HeapAlloc(sizeof(WCHAR) * MAX_INI_SECTION_SIZE_MRU);
 	IniSectionOnSave section = { pIniSectionBuf };
 	IniSectionOnSave * const pIniSection = &section;
-	const BOOL quoted = pmru->iFlags & MRUFlags_QuoteValue;
+	const int iFlags = pmru->iFlags;
 
 	for (int i = 0; i < pmru->iSize; i++) {
-		if (StrNotEmpty(pmru->pszItems[i])) {
+		LPCWSTR tchItem = pmru->pszItems[i];
+		if (StrNotEmpty(tchItem)) {
 			wsprintf(tchName, L"%02i", i + 1);
-			if (quoted) {
-				IniSectionSetQuotedString(pIniSection, tchName, pmru->pszItems[i]);
+			if (iFlags & MRUFlags_QuoteValue) {
+				IniSectionSetQuotedString(pIniSection, tchName, tchItem);
 			} else {
-				IniSectionSetString(pIniSection, tchName, pmru->pszItems[i]);
+				WCHAR tchPath[MAX_PATH];
+				if (iFlags & MRUFlags_RelativePath) {
+					PathRelativeToApp(tchItem, tchPath, 0, true, iFlags & MRUFlags_PortableMyDocs);
+					tchItem = tchPath;
+				}
+				IniSectionSetString(pIniSection, tchName, tchItem);
 			}
 		}
 	}
 
 	SaveIniSection(pmru->szRegKey, pIniSectionBuf);
 	NP2HeapFree(pIniSectionBuf);
-	return true;
 }
 
-bool MRU_MergeSave(LPCMRULIST pmru, bool bAddFiles, bool bRelativePath, bool bUnexpandMyDocs) {
-	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags, pmru->iSize);
-	MRU_Load(pmruBase);
+void MRU_MergeSave(LPMRULIST pmru, bool keep) {
+	if (!keep) {
+		MRU_Empty(pmru, true);
+		return;
+	}
+	if (pmru->iSize <= 0) {
+		return;
+	}
+	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags);
 
-	if (bAddFiles) {
-		for (int i = pmru->iSize - 1; i >= 0; i--) {
-			if (pmru->pszItems[i]) {
-				WCHAR wchItem[MAX_PATH];
-				PathAbsoluteFromApp(pmru->pszItems[i], wchItem, true);
-				MRU_AddFile(pmruBase, wchItem, bRelativePath, bUnexpandMyDocs);
-			}
-		}
-	} else {
-		for (int i = pmru->iSize - 1; i >= 0; i--) {
-			if (pmru->pszItems[i]) {
-				MRU_Add(pmruBase, pmru->pszItems[i]);
-			}
-		}
+	for (int i = pmru->iSize - 1; i >= 0; i--) {
+		MRU_Add(pmruBase, pmru->pszItems[i]);
 	}
 
 	MRU_Save(pmruBase);
 	MRU_Destroy(pmruBase);
-	return true;
+}
+
+void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
+	for (int i = 0; i < pmru->iSize; i++) {
+		LPCWSTR str = pmru->pszItems[i];
+		ComboBox_AddString(hwnd, str);
+	}
 }
 
 /*
@@ -2943,57 +2911,24 @@ bool AddBackslashA(char *pszOut, const char *pszInput) {
 	char *lpszEsc = pszOut;
 	const char *lpsz = pszInput;
 	while (*lpsz) {
-		switch (*lpsz) {
-		case '\n':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'n';
+		char ch = *lpsz++;
+		const uint8_t index = ch - '\a';
+		if (index <= '\r' - '\a') {
+			ch = "abtnvfr"[index];
 			hasEscapeChar = true;
-			break;
-		case '\r':
 			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'r';
+			*lpszEsc++ = ch;
+		} else if (ch == '\x1B') {
 			hasEscapeChar = true;
-			break;
-		case '\t':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 't';
-			hasEscapeChar = true;
-			break;
-		case '\\':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = '\\';
-			hasSlash = true;
-			break;
-		case '\f':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'f';
-			hasEscapeChar = true;
-			break;
-		case '\v':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'v';
-			hasEscapeChar = true;
-			break;
-		case '\a':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'b';
-			hasEscapeChar = true;
-			break;
-		case '\b':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'a';
-			hasEscapeChar = true;
-			break;
-		case '\x1B':
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = 'e';
-			hasEscapeChar = true;
-			break;
-		default:
-			*lpszEsc++ = *lpsz;
-			break;
+		} else {
+			*lpszEsc++ = ch;
+			if (ch == '\\') {
+				hasSlash = true;
+				*lpszEsc++ = ch;
+			}
 		}
-		lpsz++;
 	}
 
 	if (hasSlash && !hasEscapeChar) {
@@ -3008,57 +2943,24 @@ bool AddBackslashW(LPWSTR pszOut, LPCWSTR pszInput) {
 	LPWSTR lpszEsc = pszOut;
 	LPCWSTR lpsz = pszInput;
 	while (*lpsz) {
-		switch (*lpsz) {
-		case '\n':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'n';
+		WCHAR ch = *lpsz++;
+		const WCHAR index = ch - '\a';
+		if (index <= '\r' - '\a') {
+			ch = (uint8_t)("abtnvfr"[index]);
 			hasEscapeChar = true;
-			break;
-		case '\r':
 			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'r';
+			*lpszEsc++ = ch;
+		} else if (ch == '\x1B') {
 			hasEscapeChar = true;
-			break;
-		case '\t':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 't';
-			hasEscapeChar = true;
-			break;
-		case '\\':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = '\\';
-			hasSlash = true;
-			break;
-		case '\f':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'f';
-			hasEscapeChar = true;
-			break;
-		case '\v':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'v';
-			hasEscapeChar = true;
-			break;
-		case '\a':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'b';
-			hasEscapeChar = true;
-			break;
-		case '\b':
-			*lpszEsc++ = '\\';
-			*lpszEsc++ = 'a';
-			hasEscapeChar = true;
-			break;
-		case '\x1B':
 			*lpszEsc++ = '\\';
 			*lpszEsc++ = 'e';
-			hasEscapeChar = true;
-			break;
-		default:
-			*lpszEsc++ = *lpsz;
-			break;
+		} else {
+			*lpszEsc++ = ch;
+			if (ch == '\\') {
+				hasSlash = true;
+				*lpszEsc++ = ch;
+			}
 		}
-		lpsz++;
 	}
 
 	if (hasSlash && !hasEscapeChar) {

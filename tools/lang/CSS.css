@@ -1,5 +1,5 @@
 // 2023 https://www.w3.org/TR/CSS/ 14 February 2023
-// 2023-08-12 https://drafts.csswg.org/
+// 2023-11-18 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -839,7 +839,7 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	float-offset:;
 }
 
-// CSS Paged Media Module Level 3 https://www.w3.org/TR/css-page-3/ 18 October 2018
+// CSS Paged Media Module Level 3 https://www.w3.org/TR/css-page-3/ 14 September 2023
 @page {}
 @top-left-corner {}
 @top-left {}
@@ -866,7 +866,6 @@ all continuous paged visual audio speech tactile grid bitmap interactive static
 	marks: none | crop | cross;
 	bleed: auto;
 	page: auto;
-	// https://drafts.csswg.org/css-page-3/
 	page-orientation: upright | rotate-left | rotate-right;
 }
 
@@ -1185,18 +1184,21 @@ view()
 	chains: none;
 }
 
-// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 29 March 2023
-// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 13 February 2023
+// CSS Text Module Level 4 https://www.w3.org/TR/css-text-4/ 20 October 2023
+// CSS Text Module Level 3 https://www.w3.org/TR/css-text-3/ 3 September 2023
 // Text https://www.w3.org/TR/CSS22/text.html
 {
 	text-transform: none | capitalize | uppercase | lowercase | full-width | full-size-kana;
+	word-space-transform: none | space | ideographic-space | auto-phrase;
 	word-boundary-detection: normal | manual | auto();
 	word-boundary-expansion: none | space | ideographic-space;
+
 	white-space: normal | pre | nowrap | pre-wrap | break-spaces | pre-line;
 	white-space-collapse: collapse | discard | preserve | preserve-breaks | preserve-spaces;
 	white-space-trim: none | trim-inner | discard-before | discard-after;
 	tab-size:;
-	word-break: normal | keep-all | break-all | break-word;
+
+	word-break: normal | keep-all | break-all | manual | auto-phrase | break-word;
 	line-break: auto | loose | normal | strict | anywhere;
 	hyphens: none | manual | auto;
 	hyphenate-character: auto;
@@ -1206,21 +1208,27 @@ view()
 	hyphenate-limit-last: none | always | column | page | spread;
 	overflow-wrap: normal | break-word | anywhere;
 	word-wrap: normal | break-word | anywhere;
+
+	text-wrap-mode: wrap | nowrap;
+	text-wrap-style: auto| balance | stable | pretty;
 	text-wrap: wrap | nowrap | balance | stable | pretty;
 	wrap-before: auto | avoid | avoid-line | avoid-flex | line | flex;
 	wrap-after: auto | avoid | avoid-line | avoid-flex | line | flex;
 	wrap-inside: auto | avoid;
+
 	text-align: start | end | left | right | center | justify | match-parent | justify-all;
 	text-align-all: start | end | left | right | center | justify | match-parent;
 	text-align-last: auto | start | end | left | right | center | justify | match-parent;
 	text-justify: auto | none | inter-word | inter-character | no-compress;
 	text-group-align: none | start | end | left | right | center;
+
 	word-spacing: normal;
 	letter-spacing: normal;
 	line-padding:;
 	text-autospace: normal | no-autospace | ideograph-alpha | ideograph-numeric | punctuation | insert | replace;
-	text-spacing-trim: auto | space-all | trim-auto | allow-end | space-first;
+	text-spacing-trim: auto | space-all | trim-auto | allow-end | space-first | trim-all;
 	text-spacing: normal | none | no-compress | trim-start | space-start | space-first | trim-end | space-end | allow-end | trim-adjacent | space-adjacent | ideograph-alpha | ideograph-numeric | punctuation;
+
 	text-indent: hanging | each-line;
 	hanging-punctuation: none | first | force-end | allow-end | last;
 }
@@ -1280,7 +1288,7 @@ view()
 	transition:;
 }
 
-// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 6 April 2023
+// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 27 October 2023
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 01 December 2022
 mix()
 initial nherit unset
@@ -1295,7 +1303,7 @@ pow() sqrt() hypot() log() exp()
 abs() sign()
 pi infinity NaN
 
-// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 3 August 2023
+// CSS View Transitions Module Level 1 https://www.w3.org/TR/css-view-transitions-1/ 5 September 2023
 {
 	view-transition-name: none;
 }
@@ -1388,7 +1396,7 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 19 June 2023
+// Compatibility https://compat.spec.whatwg.org/ 27 September 2023
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }

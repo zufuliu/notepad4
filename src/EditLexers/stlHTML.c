@@ -60,7 +60,7 @@ NULL
 "pattern placeholder playsinline poster preload popover popovertarget popovertargetaction "
 "radiogroup readonly referrerpolicy rel required "
 "rev reversed rows rowspan sandbox sizes spellcheck scope scoped seamless selected shape size slot span "
-"src srcdoc srclang srcset start step style tabindex target title translate type "
+"shadowrootmode shadowrootdelegatesfocus src srcdoc srclang srcset start step style tabindex target title translate type "
 "typemustmatch usemap value width wrap "
 
 // Other Attribute

@@ -573,8 +573,8 @@ bool ExecDDECommand(LPCWSTR lpszCmdLine, LPCWSTR lpszDDEMsg, LPCWSTR lpszDDEApp,
 #define HISTORY_ITEMS 50
 
 typedef struct HISTORY {
-	WCHAR *psz[HISTORY_ITEMS]; // Strings
 	int  iCurItem;            // Current Item
+	WCHAR *psz[HISTORY_ITEMS]; // Strings
 } HISTORY, *PHISTORY, *LPHISTORY;
 
 typedef const HISTORY *LCPHISTORY;
@@ -596,33 +596,26 @@ enum {
 	MRUFlags_FilePath = 1,
 };
 
-#define MRU_MAX_COPY_MOVE_HISTORY	24
 // MRU_MAXITEMS * (MAX_PATH + 4)
 #define MAX_INI_SECTION_SIZE_MRU	(8 * 1024)
 
 typedef struct MRULIST {
-	LPCWSTR szRegKey;
-	int		iFlags;
 	int		iSize;
+	int		iFlags;
+	LPCWSTR szRegKey;
 	LPWSTR pszItems[MRU_MAXITEMS];
 } MRULIST, *PMRULIST, *LPMRULIST;
 
 typedef const MRULIST *LPCMRULIST;
 
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags, int iSize);
+LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags);
 void MRU_Destroy(LPMRULIST pmru);
-bool MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
-bool MRU_Delete(LPMRULIST pmru, int iIndex);
-void MRU_Empty(LPMRULIST pmru);
-int MRU_Enum(LPCMRULIST pmru, int iIndex, LPWSTR pszItem, int cchItem);
-NP2_inline int MRU_GetCount(LPCMRULIST pmru) {
-	return MRU_Enum(pmru, 0, NULL, 0);
-}
-bool MRU_Load(LPMRULIST pmru);
-bool MRU_Save(LPCMRULIST pmru);
-void MRU_LoadToCombobox(HWND hwnd, LPCWSTR pszKey);
-void MRU_AddOneItem(LPCWSTR pszKey, LPCWSTR pszNewItem);
-void MRU_ClearCombobox(HWND hwnd, LPCWSTR pszKey);
+void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
+void MRU_Delete(LPMRULIST pmru, int iIndex);
+void MRU_Empty(LPMRULIST pmru, bool save);
+void MRU_Load(LPMRULIST pmru);
+void MRU_Save(LPCMRULIST pmru);
+void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX

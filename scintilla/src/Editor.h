@@ -483,7 +483,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 
 	void NotifyModifyAttempt(Document *document, void *userData) noexcept override;
 	void NotifySavePoint(Document *document, void *userData, bool atSavePoint) noexcept override;
-	void CheckModificationForWrap(DocModification mh);
+	void CheckModificationForShow(const DocModification &mh);
 	void NotifyModified(Document *document, DocModification mh, void *userData) override;
 	void NotifyDeleted(Document *document, void *userData) noexcept override;
 	void NotifyStyleNeeded(Document *doc, void *userData, Sci::Position endStyleNeeded) override;
@@ -507,9 +507,12 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void ParaUpOrDown(int direction, Selection::SelTypes selt);
 	Range RangeDisplayLine(Sci::Line lineVisible);
 	Sci::Position StartEndDisplayLine(Sci::Position pos, bool start);
+	Sci::Position HomeWrapPosition(Sci::Position position);
 	Sci::Position VCHomeDisplayPosition(Sci::Position position);
 	Sci::Position VCHomeWrapPosition(Sci::Position position);
 	Sci::Position LineEndWrapPosition(Sci::Position position);
+	SelectionPosition PositionMove(Scintilla::Message iMessage, SelectionPosition spCaretNow);
+	SelectionRange SelectionMove(Scintilla::Message iMessage, size_t r);
 	int HorizontalMove(Scintilla::Message iMessage);
 	int DelWordOrLine(Scintilla::Message iMessage);
 	virtual int KeyCommand(Scintilla::Message iMessage);
@@ -602,8 +605,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void FoldAll(Scintilla::FoldAction action);
 
 	Sci::Position GetTag(char *tagValue, int tagNumber);
-	enum class ReplaceType {basic, patterns, minimal};
-	Sci::Position ReplaceTarget(ReplaceType replaceType, std::string_view text);
+	Sci::Position ReplaceTarget(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
 
 	bool PositionIsHotspot(Sci::Position position) const noexcept;
 	bool SCICALL PointIsHotspot(Point pt);

@@ -1208,7 +1208,7 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				MRU_Empty(pFileMRU);
+				MRU_Empty(pFileMRU, false);
 				if (StrNotEmpty(szCurFile)) {
 					MRU_Add(pFileMRU, szCurFile);
 				}
@@ -1237,12 +1237,10 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 						  SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 			lvi.iImage = shfi.iIcon;
 
-			WCHAR tch[MAX_PATH];
-			for (int i = 0; i < MRU_GetCount(pFileMRU); i++) {
-				MRU_Enum(pFileMRU, i, tch, COUNTOF(tch));
-				PathAbsoluteFromApp(tch, tch, true);
+			for (int i = 0; i < pFileMRU->iSize; i++) {
+				LPWSTR path = pFileMRU->pszItems[i];
 				lvi.iItem = i;
-				lvi.pszText = tch;
+				lvi.pszText = path;
 				ListView_InsertItem(hwndLV, &lvi);
 			}
 

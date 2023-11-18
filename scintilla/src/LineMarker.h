@@ -15,8 +15,8 @@ typedef void (*DrawLineMarkerFn)(Surface *surface, PRectangle rcWhole, const Fon
 
 struct LineMarkerPod {
 	Scintilla::MarkerSymbol markType = Scintilla::MarkerSymbol::Circle;
-	ColourRGBA fore = ColourRGBA(0, 0, 0);
-	ColourRGBA back = ColourRGBA(0xff, 0xff, 0xff);
+	ColourRGBA fore = black;
+	ColourRGBA back = white;
 	ColourRGBA backSelected = ColourRGBA(0xff, 0x00, 0x00);
 	Scintilla::Layer layer = Scintilla::Layer::Base;
 	XYPOSITION strokeWidth = 1.0f;

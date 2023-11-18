@@ -17,7 +17,7 @@
 #include "EditAutoC_Data0.h"
 #include "LaTeXInput.h"
 
-#define NP2_AUTOC_USE_STRING_ORDER	1
+#define NP2_AUTOC_CACHE_SORT_KEY	1
 #define NP2_AUTOC_USE_WORD_POINTER	0	// used for debug
 // scintilla/src/AutoComplete.h AutoComplete::maxItemLen
 #define NP2_AUTOC_MAX_WORD_LENGTH	(1024 - 3 - 1 - 16)	// SP + '(' + ')' + '\0'
@@ -34,15 +34,15 @@ struct WordNode;
 struct WordList {
 	int (__cdecl *WL_strcmp)(LPCSTR, LPCSTR);
 	int (__cdecl *WL_strncmp)(LPCSTR, LPCSTR, size_t);
-#if NP2_AUTOC_USE_STRING_ORDER
-	uint32_t (*WL_OrderFunc)(const void *, uint32_t);
+#if NP2_AUTOC_CACHE_SORT_KEY
+	uint32_t (*WL_SortKeyFunc)(const void *, uint32_t);
 #endif
 
 	struct WordNode *pListHead;
 	LPCSTR pWordStart;
 	UINT iStartLen;
-#if NP2_AUTOC_USE_STRING_ORDER
-	UINT orderStart;
+#if NP2_AUTOC_CACHE_SORT_KEY
+	UINT sortKey;
 	bool bIgnoreCase;
 #endif
 	UINT nWordCount;
@@ -56,25 +56,25 @@ struct WordList {
 // TODO: replace _stricmp() and _strnicmp() with other functions
 // which correctly case insensitively compares UTF-8 string and ANSI string.
 
-#if NP2_AUTOC_USE_STRING_ORDER
-#define NP2_AUTOC_ORDER_LENGTH	4
+#if NP2_AUTOC_CACHE_SORT_KEY
+#define NP2_AUTOC_SORT_KEY_LENGTH	4
 
-uint32_t WordList_Order(const void *pWord, uint32_t len) {
+uint32_t WordList_SortKey(const void *pWord, uint32_t len) {
 #if 0
 	uint32_t high = 0;
 	const uint8_t *ptr = (const uint8_t *)pWord;
-	len = min_u(len, NP2_AUTOC_ORDER_LENGTH);
+	len = min_u(len, NP2_AUTOC_SORT_KEY_LENGTH);
 	for (uint32_t i = 0; i < len; i++) {
 		high = (high << 8) | *ptr++;
 	}
-	if (len < NP2_AUTOC_ORDER_LENGTH) {
+	if (len < NP2_AUTOC_SORT_KEY_LENGTH) {
 		NP2_assume(len != 0); // suppress [clang-analyzer-core.uninitialized.Assign]
-		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
+		high <<= (NP2_AUTOC_SORT_KEY_LENGTH - len)*8;
 	}
 
 #else
 	uint32_t high = loadle_u32(pWord);
-	if (len < NP2_AUTOC_ORDER_LENGTH) {
+	if (len < NP2_AUTOC_SORT_KEY_LENGTH) {
 		high = bit_zero_high_u32(high, len*8);
 	}
 	high = bswap32(high);
@@ -82,11 +82,11 @@ uint32_t WordList_Order(const void *pWord, uint32_t len) {
 	return high;
 }
 
-uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
+uint32_t WordList_SortKeyCase(const void *pWord, uint32_t len) {
 #if 1
 	uint32_t high = 0;
 	const uint8_t *ptr = (const uint8_t *)pWord;
-	len = min_u(len, NP2_AUTOC_ORDER_LENGTH);
+	len = min_u(len, NP2_AUTOC_SORT_KEY_LENGTH);
 	for (uint32_t i = 0; i < len; i++) {
 		const uint8_t ch = *ptr++;
 		high = (high << 8) | ch;
@@ -95,15 +95,15 @@ uint32_t WordList_OrderCase(const void *pWord, uint32_t len) {
 			high += 'a' - 'A';
 		}
 	}
-	if (len < NP2_AUTOC_ORDER_LENGTH) {
+	if (len < NP2_AUTOC_SORT_KEY_LENGTH) {
 		NP2_assume(len != 0); // suppress [clang-analyzer-core.uninitialized.Assign]
-		high <<= (NP2_AUTOC_ORDER_LENGTH - len)*8;
+		high <<= (NP2_AUTOC_SORT_KEY_LENGTH - len)*8;
 	}
 
 #else
 	uint32_t high = loadle_u32(pWord);
 	high |= 0x20202020U; // only works for ASCII letters
-	if (len < NP2_AUTOC_ORDER_LENGTH) {
+	if (len < NP2_AUTOC_SORT_KEY_LENGTH) {
 		high = bit_zero_high_u32(high, len*8);
 	}
 	high = bswap32(high);
@@ -124,8 +124,8 @@ struct WordNode {
 #if NP2_AUTOC_USE_WORD_POINTER
 	char *word;
 #endif
-#if NP2_AUTOC_USE_STRING_ORDER
-	UINT order;
+#if NP2_AUTOC_CACHE_SORT_KEY
+	UINT sortKey;
 #endif
 	UINT len;
 	UINT level;
@@ -165,8 +165,8 @@ static inline void WordList_AddBuffer(struct WordList *pWList) {
 
 void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 	struct WordNode *root = pWList->pListHead;
-#if NP2_AUTOC_USE_STRING_ORDER
-	const UINT order = (pWList->iStartLen > NP2_AUTOC_ORDER_LENGTH) ? 0 : pWList->WL_OrderFunc(pWord, len);
+#if NP2_AUTOC_CACHE_SORT_KEY
+	const UINT sortKey = (pWList->iStartLen > NP2_AUTOC_SORT_KEY_LENGTH) ? 0 : pWList->WL_SortKeyFunc(pWord, len);
 #endif
 	if (root == NULL) {
 		struct WordNode *node = WordList_AddNode(pWList);
@@ -175,8 +175,8 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 #if NP2_AUTOC_USE_WORD_POINTER
 		node->word = word;
 #endif
-#if NP2_AUTOC_USE_STRING_ORDER
-		node->order = order;
+#if NP2_AUTOC_CACHE_SORT_KEY
+		node->sortKey = sortKey;
 #endif
 		node->len = len;
 		node->level = 1;
@@ -190,9 +190,9 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 		// find a spot and save the path
 		for (;;) {
 			path[top++] = iter;
-#if NP2_AUTOC_USE_STRING_ORDER
-			dir = (int)(iter->order - order);
-			if (dir == 0 && (len > NP2_AUTOC_ORDER_LENGTH || iter->len > NP2_AUTOC_ORDER_LENGTH || pWList->bIgnoreCase)) {
+#if NP2_AUTOC_CACHE_SORT_KEY
+			dir = (int)(iter->sortKey - sortKey);
+			if (dir == 0 && (len > NP2_AUTOC_SORT_KEY_LENGTH || iter->len > NP2_AUTOC_SORT_KEY_LENGTH || pWList->bIgnoreCase)) {
 				dir = pWList->WL_strcmp(WordNode_GetWord(iter), pWord);
 			}
 #else
@@ -219,8 +219,8 @@ void WordList_AddWord(struct WordList *pWList, LPCSTR pWord, UINT len) {
 #if NP2_AUTOC_USE_WORD_POINTER
 		node->word = word;
 #endif
-#if NP2_AUTOC_USE_STRING_ORDER
-		node->order = order;
+#if NP2_AUTOC_CACHE_SORT_KEY
+		node->sortKey = sortKey;
 #endif
 		node->len = len;
 		node->level = 1;
@@ -292,18 +292,18 @@ void WordList_Init(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen, bool bI
 	if (bIgnoreCase) {
 		pWList->WL_strcmp = strcmp;
 		pWList->WL_strncmp = _strnicmp;
-#if NP2_AUTOC_USE_STRING_ORDER
-		pWList->WL_OrderFunc = WordList_OrderCase;
+#if NP2_AUTOC_CACHE_SORT_KEY
+		pWList->WL_SortKeyFunc = WordList_SortKeyCase;
 #endif
 	} else {
 		pWList->WL_strcmp = strcmp;
 		pWList->WL_strncmp = strncmp;
-#if NP2_AUTOC_USE_STRING_ORDER
-		pWList->WL_OrderFunc = WordList_Order;
+#if NP2_AUTOC_CACHE_SORT_KEY
+		pWList->WL_SortKeyFunc = WordList_SortKey;
 #endif
 	}
-#if NP2_AUTOC_USE_STRING_ORDER
-	pWList->orderStart = pWList->WL_OrderFunc(pRoot, iRootLen);
+#if NP2_AUTOC_CACHE_SORT_KEY
+	pWList->sortKey = pWList->WL_SortKeyFunc(pRoot, iRootLen);
 	pWList->bIgnoreCase = bIgnoreCase;
 #endif
 
@@ -314,15 +314,15 @@ void WordList_Init(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen, bool bI
 static inline void WordList_UpdateRoot(struct WordList *pWList, LPCSTR pRoot, UINT iRootLen) {
 	pWList->pWordStart = pRoot;
 	pWList->iStartLen = iRootLen;
-#if NP2_AUTOC_USE_STRING_ORDER
-	pWList->orderStart = pWList->WL_OrderFunc(pRoot, iRootLen);
+#if NP2_AUTOC_CACHE_SORT_KEY
+	pWList->sortKey = pWList->WL_SortKeyFunc(pRoot, iRootLen);
 #endif
 }
 
 static inline bool WordList_StartsWith(const struct WordList *pWList, LPCSTR pWord) {
-#if NP2_AUTOC_USE_STRING_ORDER
-	if (pWList->iStartLen <= NP2_AUTOC_ORDER_LENGTH) {
-		return pWList->orderStart == pWList->WL_OrderFunc(pWord, pWList->iStartLen);
+#if NP2_AUTOC_CACHE_SORT_KEY
+	if (pWList->iStartLen <= NP2_AUTOC_SORT_KEY_LENGTH) {
+		return pWList->sortKey == pWList->WL_SortKeyFunc(pWord, pWList->iStartLen);
 	}
 #endif
 	return pWList->WL_strncmp(pWList->pWordStart, pWord, pWList->iStartLen) == 0;
@@ -682,8 +682,8 @@ enum {
 	JavaScriptKeywordIndex_JSDoc = 10,
 	JuliaKeywordIndex_CodeFolding = 1,
 	JuliaKeywordIndex_Macro = 6,
-	KotlinKeywordIndex_Annotation = 4,
-	KotlinKeywordIndex_KDoc = 6,
+	KotlinKeywordIndex_Annotation = 6,
+	KotlinKeywordIndex_KDoc = 8,
 	NSISKeywordIndex_PredefinedVariable = 5,
 	PHPKeywordIndex_PredefinedVariable = 4,
 	PHPKeywordIndex_Phpdoc = 11,

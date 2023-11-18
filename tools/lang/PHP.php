@@ -1,5 +1,5 @@
 <?php
-// 8.2 https://www.php.net/
+// 8.3 https://www.php.net/
 // https://wiki.php.net/rfc
 // https://php.watch/versions
 
@@ -1315,6 +1315,7 @@ mb_regex_encoding(?string $encoding = null): string|bool
 mb_regex_set_options(?string $options = null): string
 mb_send_mail(string $to, string $subject, string $message, array|string $additional_headers = [], ?string $additional_params = null): bool
 mb_split(string $pattern, string $string, int $limit = -1): array|false
+mb_str_pad(string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT, ?string $encoding = null): string
 mb_str_split(string $string, int $length = 1, ?string $encoding = null): array
 mb_strcut(string $string, int $start, ?int $length = null, ?string $encoding = null): string
 mb_strimwidth(string $string, int $start, int $width, string $trim_marker = "", ?string $encoding = null): string
@@ -1565,6 +1566,7 @@ json_decode(string $json, ?bool $associative = null, int $depth = 512, int $flag
 json_encode(mixed $value, int $flags = 0, int $depth = 512): string|false
 json_last_error_msg(): string
 json_last_error(): int
+json_validate(string $json, int $depth = 512, int $flags = 0): bool
 }
 
 { // Miscellaneous Functions

@@ -50,7 +50,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 		* Objective-C/C++, [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#objective-cc)
 		* [C Standard Library](tools/lang/C.c), up to C2x.
 		* [C++ STL](tools/lang/CPP.cpp), up to C++20.
-	* [CSS Style Sheet](tools/lang/CSS.css), up to August 2023 snapshot.
+	* [CSS Style Sheet](tools/lang/CSS.css), up to November 2023 snapshot.
 		* [SCSS Style Sheet](tools/lang/SCSS.scss), up to Dart Sass 1.50.
 		* [Less Style Sheet](tools/lang/Less.less), up to Less 4.1.
 		* [HSS Style Sheet](tools/lang/HSS.hss)
@@ -73,7 +73,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Groovy](tools/lang/Groovy.groovy), up to Groovy 5.0.
 	* [Haskell](tools/lang/Haskell.hs), up to GHC 9.6.
 	* [Haxe](tools/lang/Haxe.hx), up to Haxe 4.3.
-	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) June 2023. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
+	* [HTML](tools/lang/html.html), up to [WHATWG](https://html.spec.whatwg.org/multipage/) November 2023. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#html)
 		* ASP
 		* ASP.NET
 		* JSP
@@ -113,7 +113,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* [Perl](tools/lang/Perl.pl), up to Perl 5.36. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#perl)
 	* [PowerShell](tools/lang/PowerShell.ps1), up to PowerShell 7.2.
 	* [Python](tools/lang/Python.py), up to Python 3.12. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#python)
-	* [PHP Script](tools/lang/PHP.php), up to PHP 8.2. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
+	* [PHP Script](tools/lang/PHP.php), up to PHP 8.3. [Screenshots](https://github.com/zufuliu/notepad2/wiki/Screenshots#php)
 	* Windows Rescouce Script
 	* [R](tools/lang/R.r), up to R 4.2.
 	* [REBOL](tools/lang/Rebol.r) 3 and [Red](tools/lang/Red.red)
@@ -127,7 +127,7 @@ Latest development builds (artifacts in Release configuration for each compiler 
 	* SQL Query
 		* [SQL Standard](tools/lang/SQL.sql), up to SQL:2016.
 		* [MySQL](tools/lang/MySQL.sql), up to MySQL 8.0, MariaDB 10.9.
-		* [SQLite3](tools/lang/SQLite3.sql), up to 3.41.
+		* [SQLite3](tools/lang/SQLite3.sql), up to 3.44.
 		* [PostgreSQL](tools/lang/PostgreSQL.sql), PostgreSQL 14.
 		* [Transact-SQL](tools/lang/Transact-SQL.sql), SQL Server 2019.
 		* [Oracle](tools/lang/Oracle.sql), Oracle 20, incomplete.

@@ -223,6 +223,7 @@ using namespace Scintilla::Internal;
 #define OKP     1
 #define NOP     0
 
+#define END     0
 #define CHR     1
 #define ANY     2
 #define CCL     3
@@ -236,8 +237,6 @@ using namespace Scintilla::Internal;
 #define CLO     11
 #define CLQ     12 /* 0 to 1 closure */
 #define LCLO    13 /* lazy closure */
-
-#define END     0
 
 /*
  * The following defines are not meant to be changeable.
@@ -265,10 +264,8 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	lineEndPos = 0;
 	sta = NOP;                  /* status of lastpat */
 	previousFlags = FindOption::None;
-	constexpr unsigned char nul = 0;
-	std::fill(bittab, std::end(bittab), nul);
-	std::fill(tagstk, std::end(tagstk), 0);
-	std::fill(nfa, std::end(nfa), '\0');
+	memset(nfa, 0, 4);
+	memset(bittab, 0, BITBLK);
 	Clear();
 }
 
@@ -437,12 +434,15 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 }
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
+	memset(nfa, 0, 4);
+	memset(bittab, 0, BITBLK);
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
-	char *sp = nfa;          /* another one       */
-	const char *mpMax = mp + MAXNFA - BITBLK - 10;
+	char *sp = nfa;          /* another saved pointer */
+	const char * const mpMax = mp + MAXNFA - BITBLK - 10;
 
+	int tagstk[MAXTAG]{};  /* subpat tag stack */
 	int tagi = 0;          /* tag stack index   */
 	int tagc = 1;          /* actual tag count  */
 
@@ -469,7 +469,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			break;
 
 		case '$':               /* match endofline */
-			if (!*(p + 1)) {
+			if (!p[1]) {
 				*mp++ = EOL;
 			} else {
 				*mp++ = CHR;
@@ -478,13 +478,13 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			break;
 
 		case '[': {               /* match char class */
-			*mp++ = CCL;
 			int prevChar = 0;
-			char mask = 0;          /* xor mask -CCL/NCL */
+			bool negative = false;          /* xor mask -CCL/NCL */
 
 			i++;
-			if (*++p == '^') {
-				mask = '\377';
+			++p;
+			if (*p == '^') {
+				negative = true;
 				i++;
 				p++;
 			}
@@ -507,13 +507,14 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 						// Previous def. was a char class like \d, take dash literally
 						prevChar = '-';
 						ChSet('-');
-					} else if (*(p + 1)) {
-						if (*(p + 1) != ']') {
+					} else if (p[1]) {
+						if (p[1] != ']') {
 							int c1 = prevChar + 1;
 							i++;
-							int c2 = static_cast<unsigned char>(*++p);
+							++p;
+							int c2 = static_cast<unsigned char>(*p);
 							if (c2 == '\\') {
-								if (!*(p + 1)) {	// End of RE
+								if (!p[1]) {	// End of RE
 									return badpat("Missing ]");
 								} else {
 									i++;
@@ -550,7 +551,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					} else {
 						return badpat("Missing ]");
 					}
-				} else if (*p == '\\' && *(p + 1)) {
+				} else if (*p == '\\' && p[1]) {
 					i++;
 					p++;
 					int incr;
@@ -575,30 +576,30 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			if (!*p)
 				return badpat("Missing ]");
 
-			for (int n = 0; n < BITBLK; bittab[n++] = 0) {
-				*mp++ = static_cast<char>(mask ^ bittab[n]);
+			if (negative) {
+				size_t * const ptr = reinterpret_cast<size_t *>(bittab);
+				for (unsigned n = 0; n < BITBLK / sizeof(size_t); n++) {
+					ptr[n] = ~ptr[n];
+				}
 			}
+
+			*mp++ = CCL;
+			memcpy(mp, bittab, BITBLK);
+			memset(bittab, 0, BITBLK);
+			mp += BITBLK;
 		} break;
 
 		case '*':               /* match 0 or more... */
 		case '+':               /* match 1 or more... */
-		case '?':
+		case '?': {
 			if (p == pattern)
 				return badpat("Empty closure");
 			lp = sp;		/* previous opcode */
-			if (*lp == CLO || *lp == LCLO)		/* equivalence... */
+			const uint8_t opcode = *sp;
+			if (opcode == CLO || opcode == LCLO)		/* equivalence... */
 				break;
-			switch (*lp) {
-
-			case BOL:
-			case BOT:
-			case EOT:
-			case BOW:
-			case EOW:
-			case REF:
+			if ((opcode >= BOL && opcode <= REF) && opcode != EOL) {
 				return badpat("Illegal closure");
-			default:
-				break;
 			}
 
 			if (*p == '+') {
@@ -614,15 +615,16 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 				*mp = mp[-1];
 			}
 			if (*p == '?')          *mp = CLQ;
-			else if (*(p + 1) == '?') *mp = LCLO;
+			else if (p[1] == '?') *mp = LCLO;
 			else                    *mp = CLO;
 
 			mp = sp;
-			break;
+		} break;
 
 		case '\\':              /* tags, backrefs... */
 			i++;
-			switch (*++p) {
+			++p;
+			switch (*p) {
 			case '<':
 				*mp++ = BOW;
 				break;
@@ -678,10 +680,9 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 						*mp++ = static_cast<char>(c);
 					} else {
 						*mp++ = CCL;
-						constexpr char mask = 0;
-						for (int n = 0; n < BITBLK; bittab[n++] = 0) {
-							*mp++ = static_cast<char>(mask ^ bittab[n]);
-						}
+						memcpy(mp, bittab, BITBLK);
+						memset(bittab, 0, BITBLK);
+						mp += BITBLK;
 					}
 				}
 			}
@@ -713,12 +714,11 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					*mp++ = CHR;
 					*mp++ = static_cast<char>(c);
 				} else {
-					*mp++ = CCL;
 					ChSetWithCase(c, false);
-					constexpr char mask = 0;
-					for (int n = 0; n < BITBLK; bittab[n++] = 0) {
-						*mp++ = static_cast<char>(mask ^ bittab[n]);
-					}
+					*mp++ = CCL;
+					memcpy(mp, bittab, BITBLK);
+					memset(bittab, 0, BITBLK);
+					mp += BITBLK;
 				}
 			}
 			break;
