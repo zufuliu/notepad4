@@ -223,6 +223,7 @@ using namespace Scintilla::Internal;
 #define OKP     1
 #define NOP     0
 
+#define END     0
 #define CHR     1
 #define ANY     2
 #define CCL     3
@@ -236,8 +237,6 @@ using namespace Scintilla::Internal;
 #define CLO     11
 #define CLQ     12 /* 0 to 1 closure */
 #define LCLO    13 /* lazy closure */
-
-#define END     0
 
 /*
  * The following defines are not meant to be changeable.
@@ -324,10 +323,6 @@ constexpr int GetHexValue(unsigned char ch1, unsigned char ch2) noexcept {
 
 constexpr int isinset(const char *ap, unsigned char c) noexcept {
 	return ap[c >> 3] & (1 << (c & BITIND));
-}
-
-constexpr char GetOpCode(const char *sp, const char *mp) noexcept {
-	return (sp < mp) ? *sp : END;
 }
 
 }
@@ -439,11 +434,12 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 }
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
+	memset(nfa, 0, 4);
 	memset(bittab, 0, BITBLK);
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
 	char *mp = nfa;          /* nfa pointer       */
-	char *sp = nfa;          /* another one       */
+	char *sp = nfa;          /* another saved pointer */
 	const char * const mpMax = mp + MAXNFA - BITBLK - 10;
 
 	int tagstk[MAXTAG]{};  /* subpat tag stack */
@@ -473,7 +469,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			break;
 
 		case '$':               /* match endofline */
-			if (!*(p + 1)) {
+			if (!p[1]) {
 				*mp++ = EOL;
 			} else {
 				*mp++ = CHR;
@@ -486,7 +482,8 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			bool negative = false;          /* xor mask -CCL/NCL */
 
 			i++;
-			if (*++p == '^') {
+			++p;
+			if (*p == '^') {
 				negative = true;
 				i++;
 				p++;
@@ -510,13 +507,14 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 						// Previous def. was a char class like \d, take dash literally
 						prevChar = '-';
 						ChSet('-');
-					} else if (*(p + 1)) {
-						if (*(p + 1) != ']') {
+					} else if (p[1]) {
+						if (p[1] != ']') {
 							int c1 = prevChar + 1;
 							i++;
-							int c2 = static_cast<unsigned char>(*++p);
+							++p;
+							int c2 = static_cast<unsigned char>(*p);
 							if (c2 == '\\') {
-								if (!*(p + 1)) {	// End of RE
+								if (!p[1]) {	// End of RE
 									return badpat("Missing ]");
 								} else {
 									i++;
@@ -553,7 +551,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					} else {
 						return badpat("Missing ]");
 					}
-				} else if (*p == '\\' && *(p + 1)) {
+				} else if (*p == '\\' && p[1]) {
 					i++;
 					p++;
 					int incr;
@@ -597,20 +595,11 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 			if (p == pattern)
 				return badpat("Empty closure");
 			lp = sp;		/* previous opcode */
-			const char opcode = GetOpCode(sp, mp);
+			const uint8_t opcode = *sp;
 			if (opcode == CLO || opcode == LCLO)		/* equivalence... */
 				break;
-			switch (opcode) {
-
-			case BOL:
-			case BOT:
-			case EOT:
-			case BOW:
-			case EOW:
-			case REF:
+			if ((opcode >= BOL && opcode <= REF) && opcode != EOL) {
 				return badpat("Illegal closure");
-			default:
-				break;
 			}
 
 			if (*p == '+') {
@@ -626,7 +615,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 				*mp = mp[-1];
 			}
 			if (*p == '?')          *mp = CLQ;
-			else if (*(p + 1) == '?') *mp = LCLO;
+			else if (p[1] == '?') *mp = LCLO;
 			else                    *mp = CLO;
 
 			mp = sp;
@@ -634,12 +623,13 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 
 		case '\\':              /* tags, backrefs... */
 			i++;
-			switch (*++p) {
+			++p;
+			switch (*p) {
 			case '<':
 				*mp++ = BOW;
 				break;
 			case '>':
-				if (GetOpCode(sp, mp) == BOW)
+				if (*sp == BOW)
 					return badpat("Null pattern inside \\<\\>");
 				*mp++ = EOW;
 				break;
@@ -672,7 +662,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 						return badpat("Too many \\(\\) pairs");
 					}
 				} else if (!posix && *p == ')') {
-					if (GetOpCode(sp, mp) == BOT)
+					if (*sp == BOT)
 						return badpat("Null pattern inside \\(\\)");
 					if (tagi > 0) {
 						*mp++ = EOT;
@@ -708,7 +698,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					return badpat("Too many () pairs");
 				}
 			} else if (posix && *p == ')') {
-				if (GetOpCode(sp, mp) == BOT)
+				if (*sp == BOT)
 					return badpat("Null pattern inside ()");
 				if (tagi > 0) {
 					*mp++ = EOT;
