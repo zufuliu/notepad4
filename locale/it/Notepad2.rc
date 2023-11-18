@@ -217,7 +217,7 @@ BEGIN
 			MENUITEM "&Duplica\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
 			MENUITEM "Aggiungi\\Rimu&ovi commento linea\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Aggiungi\\Rimu&ovi commento blocco\tCtrl+&Q",	IDM_EDIT_STREAMCOMMENT
+			MENUITEM "Aggiungi\\Rimuovi commento blocco\tCtrl+&Q",	IDM_EDIT_STREAMCOMMENT
 			MENUITEM "&Indenta\tTab",					IDM_EDIT_INDENT
 			MENUITEM "Rim&uovi indentazione\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
