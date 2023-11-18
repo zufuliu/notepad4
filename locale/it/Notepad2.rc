@@ -216,8 +216,8 @@ BEGIN
 		BEGIN
 			MENUITEM "&Duplica\tAlt+D",				IDM_EDIT_SELECTIONDUPLICATE
 			MENUITEM SEPARATOR
-			MENUITEM "Rimu&ovi linea commento\tCtrl+/",	IDM_EDIT_LINECOMMENT
-			MENUITEM "Toggle Block &Comment\tCtrl+Q",	IDM_EDIT_STREAMCOMMENT
+			MENUITEM "Aggiungi\\Rimu&ovi commento linea\tCtrl+/",	IDM_EDIT_LINECOMMENT
+			MENUITEM "Aggiungi\\Rimuovi commento blocco\tCtrl+&Q",	IDM_EDIT_STREAMCOMMENT
 			MENUITEM "&Indenta\tTab",					IDM_EDIT_INDENT
 			MENUITEM "Rim&uovi indentazione\tShift+Tab",			IDM_EDIT_UNINDENT
 			MENUITEM SEPARATOR
@@ -1629,7 +1629,7 @@ BEGIN
     AUTOCHECKBOX    "Indenta automaticamente testo.",IDC_AUTO_INDENT_TEXT,231,7,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Chiudi automaticamente i tag HTML and XML.",IDC_AUTO_CLOSE_TAGS,231,19,200,10,WS_TABSTOP
     AUTOCHECKBOX    "Inserisci automaticamente 1 spazio dopo la virgola (,) se opportuno.",IDC_AUTO_INSERT_SPACE_COMMA,231,31,222,10,WS_TABSTOP
-    AUTOCHECKBOX    "Insert space after comment marker on toggle line comment.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,218,10,WS_TABSTOP
+    AUTOCHECKBOX    "Inserisci 1 spazio dopo il marcatore di commento nella linea.",IDC_AUTO_INSERT_SPACE_COMMENT,231,43,222,10,WS_TABSTOP
     GROUPBOX        "Chiudi automaticamente parentesi graffe e virgolette",IDC_STATIC,231,56,218,49
     AUTOCHECKBOX    "( )",IDC_AUTO_INSERT_PARENTHESIS,238,68,40,10,WS_TABSTOP
     AUTOCHECKBOX    "{ }",IDC_AUTO_INSERT_BRACE,290,68,40,10,WS_TABSTOP
