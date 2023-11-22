@@ -231,7 +231,8 @@ int CallTip::PaintContents(Surface *surfaceWindow, bool draw) {
 		chunkHighlight.start -= lineStart;
 		chunkHighlight.end -= lineStart;
 
-		rcClient.top = static_cast<XYPOSITION>(ytext - ascent - 1);
+		const int top = ytext - ascent - 1;
+		rcClient.top = top;
 
 		int x = offsetText;     // start each line at this inset
 

@@ -479,7 +479,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 
 		case '[': {               /* match char class */
 			int prevChar = 0;
-			bool negative = false;          /* xor mask -CCL/NCL */
+			bool negative = false;/* xor mask -CCL/NCL */
 
 			i++;
 			++p;
@@ -907,7 +907,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			break;
 		case REF: {
 			const int n = static_cast<uint8_t>(*ap++);
-			Sci::Position bp = bopat[n];	/* beginning of subpat... */
+			Sci::Position bp = bopat[n];		/* beginning of subpat... */
 			const Sci::Position ep = eopat[n];	/* ending of subpat...    */
 			while (bp < ep) {
 				if (ci.CharAt(bp++) != ci.CharAt(lp++))
@@ -954,7 +954,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			}
 			ap += n;
 
-			Sci::Position llp = lp;	/* lazy lp for LCLO       */
+			Sci::Position llp = lp;		/* lazy lp for LCLO       */
 			Sci::Position e = NOTFOUND; /* extra pointer for CLO  */
 			while (llp >= are) {
 				const Sci::Position q = PMatch(ci, llp, endp, ap);
