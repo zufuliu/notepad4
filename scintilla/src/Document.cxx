@@ -156,6 +156,7 @@ Document::Document(DocumentOption options) :
 	enteredModification = 0;
 	enteredStyling = 0;
 	enteredReadOnlyCount = 0;
+	matchesValid = false;
 	insertionSet = false;
 	tabInChars = 8;
 	indentInChars = 0;
@@ -163,8 +164,6 @@ Document::Document(DocumentOption options) :
 	useTabs = true;
 	tabIndents = true;
 	backspaceUnindents = false;
-
-	matchesValid = false;
 
 	perLineData[ldMarkers] = std::make_unique<LineMarkers>();
 	perLineData[ldLevels] = std::make_unique<LineLevels>();

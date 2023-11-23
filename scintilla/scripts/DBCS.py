@@ -1,5 +1,6 @@
 import sys
 from enum import IntFlag
+import MultiStageTable
 
 DBCSCodePages = [
 	'cp932', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213',
@@ -8,6 +9,45 @@ DBCSCodePages = [
 	'cp950', 'big5', 'big5hkscs',
 	'cp1361', 'johab',
 ]
+
+# Byte ranges found in Wikipedia articles with relevant search strings in each case
+DBCSByteRanges = {
+	'cp932': {
+		'lead': [(0x81, 0x9F), (0xE0, 0xFC)],
+		'trail': [(0x40, 0x7E), (0x80, 0xFC)],
+	},
+	'cp936': {
+		'lead': [(0x81, 0xFE)],
+		'trail': [(0x40, 0x7E), (0x80, 0xFE)],
+	},
+	'cp949': {
+		'lead': [(0x81, 0xFE)],
+		'trail': [(0x41, 0x5A), (0x61, 0x7A), (0x81, 0xFE)],
+	},
+	'cp950': {
+		'lead': [(0x81, 0xFE)],
+		'trail': [(0x40, 0x7E), (0xA1, 0xFE)],
+	},
+	'cp1361': {
+		'lead': [(0x84, 0xD3), (0xD8, 0xDE), (0xE0, 0xF9)],
+		'trail': [(0x31, 0x7E), (0x81, 0xFE)],
+	},
+}
+
+def print_dbcs_byte_ranges():
+	for codePage, ranges in DBCSByteRanges.items():
+		table = [0]*256
+		for start, end in ranges['lead']:
+			while start <= end:
+				table[start] = 1
+				start += 1
+		for start, end in ranges['trail']:
+			while start <= end:
+				table[start] |= 2
+				start += 1
+		valueBit, totalBit, data = MultiStageTable.runLengthEncode(codePage, table)
+		data = MultiStageTable.dumpArray(data, 20)
+		print(f'{{{data[0]}}}')
 
 def to_byte_ranges(items):
 	ranges = []
@@ -140,5 +180,6 @@ def print_dbcs_valid_bytes():
 		print('    lead:', format_byte_ranges(validLead))
 		print('   trail:', format_byte_ranges(validTrail))
 
+#print_dbcs_byte_ranges()
 #print_dbcs_test_char(DBCSTrailKind.All)
-print_dbcs_valid_bytes()
+#print_dbcs_valid_bytes()

@@ -140,10 +140,10 @@ public:
 	explicit DBCSCharClassify(int codePage_) noexcept;
 
 	bool IsLeadByte(unsigned char ch) const noexcept {
-		return leadByte[ch];
+		return leadByte[ch] & true;
 	}
 	bool IsTrailByte(unsigned char ch) const noexcept {
-		return trailByte[ch];
+		return leadByte[ch] & 2;
 	}
 
 	CharacterClass ClassifyCharacter(uint32_t ch) const noexcept {
@@ -164,8 +164,7 @@ public:
 private:
 	const int codePage;
 	int minTrailByte;
-	bool leadByte[256];
-	bool trailByte[256];
+	uint8_t leadByte[256];
 	unsigned char classifyMap[0xffff + 1];
 };
 

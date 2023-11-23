@@ -479,7 +479,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 
 		case '[': {               /* match char class */
 			int prevChar = 0;
-			bool negative = false;/* xor mask -CCL/NCL */
+			bool negative = false;
 
 			i++;
 			++p;
