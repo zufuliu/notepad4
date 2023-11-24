@@ -317,6 +317,8 @@ public:
 	int actualIndentInChars;
 	bool useTabs;
 	bool tabIndents;
+	uint8_t forwardSafeChar;
+	uint8_t backwardSafeChar;
 	uint8_t backspaceUnindents;
 	ActionDuration durationStyleOneUnit;
 

@@ -154,16 +154,7 @@ public:
 		return CharacterClass::space;
 	}
 
-	constexpr int CodePage() const noexcept {
-		return codePage;
-	}
-	constexpr int MinTrailByte() const noexcept {
-		return minTrailByte;
-	}
-
 private:
-	const int codePage;
-	int minTrailByte;
 	uint8_t leadByte[256];
 	unsigned char classifyMap[0xffff + 1];
 };

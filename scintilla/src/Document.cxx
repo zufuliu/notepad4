@@ -163,6 +163,8 @@ Document::Document(DocumentOption options) :
 	actualIndentInChars = 8;
 	useTabs = true;
 	tabIndents = true;
+	forwardSafeChar = 0x80;
+	backwardSafeChar = 0x80;
 	backspaceUnindents = false;
 
 	perLineData[ldMarkers] = std::make_unique<LineMarkers>();
@@ -264,20 +266,35 @@ LineEndType Document::LineEndTypesSupported() const noexcept {
 		return LineEndType::Default;
 }
 
-static inline std::unique_ptr<DBCSCharClassify> GetDBCSCharClassify(int codePage) {
-	if (codePage != 0 && codePage != CpUtf8) {
-		return std::make_unique<DBCSCharClassify>(codePage);
-	}
-	return {};
-}
-
 bool Document::SetDBCSCodePage(int dbcsCodePage_) {
 	if (dbcsCodePage != dbcsCodePage_) {
 		dbcsCodePage = dbcsCodePage_;
 		pcf.reset();
 		cb.SetLineEndTypes(lineEndBitSet & LineEndTypesSupported());
 		cb.SetUTF8Substance(CpUtf8 == dbcsCodePage);
-		dbcsCharClass = GetDBCSCharClassify(dbcsCodePage);
+		DBCSCharClassify *classify = nullptr;
+		forwardSafeChar = 0xff;
+		backwardSafeChar = 0xff;
+		if (dbcsCodePage) {
+			forwardSafeChar = 0x80;
+			backwardSafeChar = 0x80;
+			if (CpUtf8 != dbcsCodePage) {
+				// minimum trail byte
+				switch (dbcsCodePage) {
+				default:
+					backwardSafeChar = 0x40 - 1;
+					break;
+				case 949:
+					backwardSafeChar = 0x41 - 1;
+					break;
+				case 1361:
+					backwardSafeChar = 0x31 - 1;
+					break;
+				}
+				classify = new DBCSCharClassify(dbcsCodePage);
+			}
+		}
+		dbcsCharClass.reset(classify);
 		regex.reset();
 		ModifiedAt(0);	// Need to restyle whole document
 		return true;
@@ -2148,10 +2165,6 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		// Compute actual search ranges needed
 		const Sci::Position lengthFind = *length;
 
-		// character less than safeChar is encoded in single byte in the encoding.
-		constexpr int safeCharASCII = 0x80;		// UTF-8 forward & backward search, DBCS forward search
-		constexpr int safeCharSBCS = 256;		// all
-
 		//Platform::DebugPrintf("Find %d %d %s %d\n", startPos, endPos, search, lengthFind);
 		const Sci::Position limitPos = std::max(startPos, endPos);
 		Sci::Position pos = startPos;
@@ -2162,10 +2175,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		const SplitView cbView = cb.AllView();
 		SearchThing searchThing;
 		if (caseSensitive) {
-			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
 			const unsigned char * const searchData = reinterpret_cast<const unsigned char *>(search);
-			const unsigned char charStartSearch = searchData[0];
-			const int safeChar = (0 == dbcsCodePage) ? safeCharSBCS : ((direction >= 0 || CpUtf8 == dbcsCodePage) ? safeCharASCII : dbcsCharClass->MinTrailByte());
 			// Boyer-Moore-Horspool-Sunday Algorithm / Quick Search Algorithm
 			// https://www-igm.univ-mlv.fr/~lecroq/string/index.html
 			// https://www-igm.univ-mlv.fr/~lecroq/string/node19.html
@@ -2194,6 +2204,9 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 			}
 
+			const Sci::Position endSearch = (startPos <= endPos) ? endPos - lengthFind + 1 : endPos;
+			const unsigned char charStartSearch = searchData[0];
+			const unsigned char safeChar = (direction >= 0) ? forwardSafeChar : backwardSafeChar;
 			const Sci::Position skip = (direction >= 0) ? lengthFind : -1;
 			if (direction < 0) {
 				pos = MovePositionOutsideChar(pos - lengthFind, -1, false);
@@ -2213,7 +2226,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				}
 
 				if (lengthFind == 1) {
-					if (leadByte < safeChar) {
+					if (leadByte <= safeChar) {
 						pos += increment;
 					} else {
 						if (!NextCharacter(pos, increment)) {
@@ -2223,7 +2236,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 				} else {
 					const unsigned char nextByte = cbView.CharAt(pos + skip);
 					pos += shiftTable[nextByte];
-					if (nextByte >= safeChar) {
+					if (nextByte > safeChar) {
 						pos = MovePositionOutsideChar(pos, increment, false);
 					}
 				}
