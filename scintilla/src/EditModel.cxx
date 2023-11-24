@@ -61,14 +61,14 @@ Caret::Caret() noexcept :
 EditModel::EditModel() : durationWrapOneUnit(0.01 / 64), durationWrapOneThread(0.01 / 16) {
 	inOverstrike = false;
 	trackLineWidth = false;
+	hasFocus = false;
+	primarySelection = true;
 	xOffset = 0;
 	posDrag = SelectionPosition(Sci::invalidPosition);
 	braces[0] = Sci::invalidPosition;
 	braces[1] = Sci::invalidPosition;
 	bracesMatchStyle = StyleBraceBad;
 	highlightGuideColumn = 0;
-	hasFocus = false;
-	primarySelection = true;
 	imeInteraction = IMEInteraction::Windowed;
 	bidirectional = Bidirectional::Disabled;
 	foldFlags = FoldFlag::None;

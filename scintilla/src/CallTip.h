@@ -39,9 +39,9 @@ class CallTip {
 	int NextTabPos(int x) const noexcept;
 
 public:
+	bool inCallTipMode;
 	Window wCallTip;
 	Window wDraw;
-	bool inCallTipMode;
 	Sci::Position posStartCallTip;
 	ColourRGBA colourBG;
 	ColourRGBA colourUnSel;

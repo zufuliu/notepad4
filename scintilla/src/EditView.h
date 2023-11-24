@@ -72,7 +72,6 @@ class LineTabstops;
 */
 class EditView final {
 public:
-	PrintParameters printParameters;
 	std::unique_ptr<LineTabstops> ldTabstops;
 	int tabWidthMinimumPixels;
 
@@ -101,6 +100,7 @@ public:
 
 	LineLayoutCache llc;
 	PositionCache posCache;
+	PrintParameters printParameters;
 
 	int tabArrowHeight; // draw arrow heads this many pixels above/below line midpoint
 	/** Some platforms, notably PLAT_CURSES, do not support Scintilla's native

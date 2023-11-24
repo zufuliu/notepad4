@@ -134,7 +134,7 @@ void XPM::Init(const char *const *linesForm) {
 
 	for (int c = 0; c < nColours; c++) {
 		const char *colourDef = linesForm[c + 1];
-		const char code = colourDef[0];
+		const unsigned char code = colourDef[0];
 		colourDef += 4;
 		ColourRGBA colour(0, 0, 0);
 		if (*colourDef == '#') {
@@ -142,7 +142,7 @@ void XPM::Init(const char *const *linesForm) {
 		} else {
 			codeTransparent = code;
 		}
-		colourCodeTable[static_cast<unsigned char>(code)] = colour;
+		colourCodeTable[code] = colour;
 	}
 
 	for (int y = 0; y < height; y++) {

@@ -24,6 +24,8 @@ public:
 	Document *pdoc;
 	bool inOverstrike;
 	bool trackLineWidth;
+	bool hasFocus;
+	bool primarySelection;
 	int xOffset;		///< Horizontal scrolled amount in pixels
 
 	SpecialRepresentations reprs;
@@ -32,8 +34,6 @@ public:
 	Sci::Position braces[2];
 	int bracesMatchStyle;
 	int highlightGuideColumn;
-	bool hasFocus;
-	bool primarySelection;
 	Selection sel;
 
 	Scintilla::IMEInteraction imeInteraction;
