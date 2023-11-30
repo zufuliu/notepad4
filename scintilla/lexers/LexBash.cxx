@@ -272,7 +272,7 @@ public:
 	}
 	bool CountDown(StyleContext &sc, CmdState &cmdState) {
 		Current.Count--;
-		if (Current.Count == 1 && sc.Match(')', ')')) {
+		while (Current.Count > 0 && sc.chNext == Current.Down) {
 			Current.Count--;
 			sc.Forward();
 		}
@@ -312,10 +312,6 @@ public:
 			} else {
 				style = QuoteStyle::Command;
 				cmdState = CmdState::Delimiter;
-			}
-			if (current == CmdState::Body && sc.ch == '(' && state == SCE_SH_DEFAULT && Depth == 0) {
-				// optimized to avoid track nested delimiter pairs
-				return;
 			}
 		} else {
 			// scalar has no delimiter pair
