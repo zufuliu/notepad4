@@ -5007,7 +5007,12 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 		if (index < MRU_MAXITEMS) {
 			LPCWSTR path = pFileMRU->pszItems[index];
 			if (path) {
-				if (FileSave(FileSaveFlag_Ask)) {
+				if (!PathIsFile(path)) {
+					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
+						MRU_DeleteFileFromStore(pFileMRU, path);
+						MRU_Delete(pFileMRU, index);
+					}
+				} else if (FileSave(FileSaveFlag_Ask)) {
 					FileLoad(FileLoadFlag_DontSave, path);
 				}
 			}
