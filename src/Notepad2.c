@@ -1151,11 +1151,9 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// call SaveSettings() when hwndToolbar is still valid
 			SaveSettings(false);
 
-			if (StrNotEmpty(szIniFile)) {
-				MRU_MergeSave(&mruFile, bSaveRecentFiles);
-				MRU_MergeSave(&mruFind, bSaveFindReplace);
-				MRU_MergeSave(&mruReplace, bSaveFindReplace);
-			}
+			MRU_MergeSave(&mruFile, bSaveRecentFiles);
+			MRU_MergeSave(&mruFind, bSaveFindReplace);
+			MRU_MergeSave(&mruReplace, bSaveFindReplace);
 
 			// Remove tray icon if necessary
 			ShowNotifyIcon(hwnd, false);

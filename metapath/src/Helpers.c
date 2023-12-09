@@ -1922,8 +1922,8 @@ void MRU_Empty(LPMRULIST pmru, bool save) {
 		pmru->pszItems[i] = NULL;
 	}
 	pmru->iSize = 0;
-	if (save) {
-		MRU_Save(pmru);
+	if (save && StrNotEmpty(szIniFile)) {
+		IniClearSection(pmru->szRegKey);
 	}
 }
 

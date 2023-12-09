@@ -2441,8 +2441,8 @@ void MRU_Empty(LPMRULIST pmru, bool save) {
 		pmru->pszItems[i] = NULL;
 	}
 	pmru->iSize = 0;
-	if (save) {
-		MRU_Save(pmru);
+	if (save && StrNotEmpty(szIniFile)) {
+		IniClearSection(pmru->szRegKey);
 	}
 }
 
@@ -2518,7 +2518,7 @@ void MRU_Save(LPCMRULIST pmru) {
 }
 
 void MRU_MergeSave(LPMRULIST pmru, bool keep) {
-	if (!keep) {
+	if (!keep || StrIsEmpty(szIniFile)) {
 		MRU_Empty(pmru, true);
 		return;
 	}
@@ -2534,6 +2534,7 @@ void MRU_MergeSave(LPMRULIST pmru, bool keep) {
 
 	MRU_Save(&mruBase);
 	MRU_Empty(&mruBase, false);
+	MRU_Empty(pmru, false);
 }
 
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
