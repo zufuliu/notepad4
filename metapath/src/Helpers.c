@@ -1757,7 +1757,7 @@ void History_Init(PHISTORY ph) {
 	ph->iCurItem = -1;
 }
 
-void History_Uninit(PHISTORY ph) {
+void History_Empty(PHISTORY ph) {
 	for (int i = 0; i < HISTORY_ITEMS; i++) {
 		if (ph->psz[i]) {
 			LocalFree(ph->psz[i]);
@@ -1858,21 +1858,12 @@ void History_UpdateToolbar(LCPHISTORY ph, HWND hwnd, int cmdBack, int cmdForward
 //
 //  MRU functions
 //
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags) {
-	LPMRULIST pmru = (LPMRULIST)NP2HeapAlloc(sizeof(MRULIST));
+void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags) {
+	pmru->iSize = 0;
 	pmru->iFlags = iFlags;
 	pmru->szRegKey = pszRegKey;
+	memset(pmru->pszItems, 0, sizeof(pmru->pszItems));
 	MRU_Load(pmru);
-	return pmru;
-}
-
-void MRU_Destroy(LPMRULIST pmru) {
-	for (int i = 0; i < pmru->iSize; i++) {
-		LocalFree(pmru->pszItems[i]);
-	}
-
-	memset(pmru, 0, sizeof(MRULIST));
-	NP2HeapFree(pmru);
 }
 
 static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
@@ -1946,9 +1937,7 @@ void MRU_Load(LPMRULIST pmru) {
 	const int cchIniSection = (int)(NP2HeapSize(pIniSectionBuf) / sizeof(WCHAR));
 	IniSection * const pIniSection = &section;
 
-	//MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
-
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf);
 	const UINT count = pIniSection->count;

@@ -890,16 +890,15 @@ typedef struct MRULIST {
 
 typedef const MRULIST * LPCMRULIST;
 
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags);
-void	MRU_Destroy(LPMRULIST pmru);
-void	MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
-void	MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
-void	MRU_Delete(LPMRULIST pmru, int iIndex);
-void	MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
-void	MRU_Empty(LPMRULIST pmru, bool save);
-void	MRU_Load(LPMRULIST pmru);
-void	MRU_Save(LPCMRULIST pmru);
-void	MRU_MergeSave(LPMRULIST pmru, bool keep);
+void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags);
+void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
+void MRU_AddMultiline(LPMRULIST pmru, LPCWSTR pszNew);
+void MRU_Delete(LPMRULIST pmru, int iIndex);
+void MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile);
+void MRU_Empty(LPMRULIST pmru, bool save);
+void MRU_Load(LPMRULIST pmru);
+void MRU_Save(LPCMRULIST pmru);
+void MRU_MergeSave(LPMRULIST pmru, bool keep);
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
 //==== Themed Dialogs =========================================================

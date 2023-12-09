@@ -62,8 +62,8 @@ extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
 extern int iCurrentEncoding;
 
-extern LPMRULIST mruFind;
-extern LPMRULIST mruReplace;
+extern MRULIST mruFind;
+extern MRULIST mruReplace;
 
 static DStringW wchPrefixSelection;
 static DStringW wchAppendSelection;
@@ -4776,7 +4776,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		AddBackslashComboBoxSetup(hwnd, IDC_FINDTEXT);
 
 		// Load MRUs
-		MRU_AddToCombobox(mruFind, hwndFind);
+		MRU_AddToCombobox(&mruFind, hwndFind);
 
 		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
 		// don't copy selection after toggle find & replace on this window.
@@ -4794,7 +4794,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 		if (hwndRepl) {
 			AddBackslashComboBoxSetup(hwnd, IDC_REPLACETEXT);
-			MRU_AddToCombobox(mruReplace, hwndRepl);
+			MRU_AddToCombobox(&mruReplace, hwndRepl);
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
@@ -5044,13 +5044,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			if (StrNotEmptyA(lpefr->szFind)) {
 				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
 					ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
-					MRU_AddMultiline(mruFind, tch);
+					MRU_AddMultiline(&mruFind, tch);
 				}
 			}
 			if (StrNotEmptyA(lpefr->szReplace)) {
 				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
 					ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
-					MRU_AddMultiline(mruReplace, tch);
+					MRU_AddMultiline(&mruReplace, tch);
 				}
 			} else {
 				strcpy(lpefr->szReplaceUTF8, "");
@@ -5070,8 +5070,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			// Reload MRUs
 			ComboBox_ResetContent(hwndFind);
 			ComboBox_ResetContent(hwndRepl);
-			MRU_AddToCombobox(mruFind, hwndFind);
-			MRU_AddToCombobox(mruReplace, hwndRepl);
+			MRU_AddToCombobox(&mruFind, hwndFind);
+			MRU_AddToCombobox(&mruReplace, hwndRepl);
 
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
@@ -5217,7 +5217,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				HWND hwndFind = GetDlgItem(hwnd, (pnmhdr->idFrom == IDC_CLEAR_FIND) ? IDC_FINDTEXT : IDC_REPLACETEXT);
 				ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
 				ComboBox_ResetContent(hwndFind);
-				MRU_Empty((pnmhdr->idFrom == IDC_CLEAR_FIND) ? mruFind : mruReplace, true);
+				MRU_Empty((pnmhdr->idFrom == IDC_CLEAR_FIND) ? &mruFind : &mruReplace, true);
 				ComboBox_SetText(hwndFind, tch);
 			}
 			break;

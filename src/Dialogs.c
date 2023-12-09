@@ -980,7 +980,7 @@ bool AddToFavDlg(HWND hwnd, LPCWSTR lpszName, LPCWSTR lpszTarget) {
 // FileMRUDlgProc()
 //
 //
-extern LPMRULIST pFileMRU;
+extern MRULIST mruFile;
 extern bool bSaveRecentFiles;
 extern int cxFileMRUDlg;
 extern int cyFileMRUDlg;
@@ -1208,11 +1208,11 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 			}
 		} else if (pnmhdr->idFrom == IDC_EMPTY_MRU) {
 			if ((pnmhdr->code == NM_CLICK || pnmhdr->code == NM_RETURN)) {
-				MRU_Empty(pFileMRU, false);
+				MRU_Empty(&mruFile, false);
 				if (StrNotEmpty(szCurFile)) {
-					MRU_Add(pFileMRU, szCurFile);
+					MRU_Add(&mruFile, szCurFile);
 				}
-				MRU_Save(pFileMRU);
+				MRU_Save(&mruFile);
 				SendWMCommand(hwnd, IDC_FILEMRU_UPDATE_VIEW);
 			}
 		}
@@ -1237,8 +1237,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 						  SHGFI_USEFILEATTRIBUTES | SHGFI_SMALLICON | SHGFI_SYSICONINDEX);
 			lvi.iImage = shfi.iIcon;
 
-			for (int i = 0; i < pFileMRU->iSize; i++) {
-				LPWSTR path = pFileMRU->pszItems[i];
+			for (int i = 0; i < mruFile.iSize; i++) {
+				LPWSTR path = mruFile.pszItems[i];
 				lvi.iItem = i;
 				lvi.pszText = path;
 				ListView_InsertItem(hwndLV, &lvi);
@@ -1274,8 +1274,8 @@ static INT_PTR CALLBACK FileMRUDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPAR
 				if (!PathIsFile(tch)) {
 					// Ask...
 					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
-						MRU_DeleteFileFromStore(pFileMRU, tch);
-						MRU_Delete(pFileMRU, lvi.iItem);
+						MRU_DeleteFileFromStore(&mruFile, tch);
+						MRU_Delete(&mruFile, lvi.iItem);
 
 						// must use recreate the list, index might change...
 						//ListView_DeleteItem(hwndLV, lvi.iItem);
