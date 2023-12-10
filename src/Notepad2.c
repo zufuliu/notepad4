@@ -5352,13 +5352,14 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				BitmapCache_StartUse(&bitmapCache);
 				MENUITEMINFO mii;
 				mii.cbSize = sizeof(MENUITEMINFO);
-				mii.fMask = MIIM_STRING | MIIM_BITMAP;
+				mii.fMask = MIIM_ID | MIIM_STRING | MIIM_BITMAP;
 				for (int i = 0; i < count; i++) {
 					LPCWSTR path = mruFile.pszItems[i];
 					HBITMAP hbmp = BitmapCache_Get(&bitmapCache, path);
+					mii.wID = i + IDM_RECENT_HISTORY_START;
 					mii.dwTypeData = (LPWSTR)path;
 					mii.hbmpItem = hbmp;
-					InsertMenuItem(subMenu, i + IDM_RECENT_HISTORY_START, FALSE, &mii);
+					InsertMenuItem(subMenu, i, TRUE, &mii);
 				}
 			} else {
 				hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
