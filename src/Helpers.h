@@ -901,6 +901,23 @@ void MRU_Save(LPCMRULIST pmru);
 void MRU_MergeSave(LPMRULIST pmru, bool keep);
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd);
 
+typedef struct BitmapCache {
+	UINT count;
+	UINT used;
+	bool invalid;
+	int iconIndex[MRU_MAXITEMS];
+	HBITMAP items[MRU_MAXITEMS];
+} BitmapCache;
+
+static inline void BitmapCache_Invalidate(BitmapCache *cache) {
+	cache->invalid = true; // mark all cache as invalid
+}
+static inline void BitmapCache_StartUse(BitmapCache *cache) {
+	cache->used = 0; // mark all cache as unused
+}
+void BitmapCache_Empty(BitmapCache *cache);
+HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path);
+
 //==== Themed Dialogs =========================================================
 #ifndef DLGTEMPLATEEX
 #pragma pack(push, 1)

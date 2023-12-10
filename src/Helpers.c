@@ -2544,6 +2544,61 @@ void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
 	}
 }
 
+void BitmapCache_Empty(BitmapCache *cache) {
+	for (UINT i = 0; i < cache->count; i++) {
+		DeleteObject(cache->items[i]);
+	}
+	memset(cache, 0, sizeof(BitmapCache));
+}
+
+HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
+	if (cache->invalid) {
+		BitmapCache_Empty(cache);
+	}
+
+	SHFILEINFO shfi;
+	HIMAGELIST imageList = (HIMAGELIST)SHGetFileInfo(path, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
+	const int iIcon = shfi.iIcon;
+	UINT index = 0;
+	for (; index < cache->count; index++) {
+		if (cache->iconIndex[index] == iIcon) {
+			break;
+		}
+	}
+	if (index == cache->count) {
+		NP2_static_assert(sizeof(cache->used)*8 >= MRU_MAXITEMS);
+		if (index < MRU_MAXITEMS) {
+			cache->count += 1;
+		} else {
+			// find first zero bit in used, omitted zero check as used can't be UINT32_MAX
+			// index = __builtin_stdc_first_trailing_one(cache->used);
+			index = np2_ctz(~cache->used);
+			DeleteObject(cache->items[index]);
+			cache->items[index] = NULL;
+		}
+		cache->iconIndex[index] = iIcon;
+	}
+
+	cache->used |= 1U << index;
+	HBITMAP hbmp = cache->items[index];
+	if (hbmp == NULL) {
+		HDC hDC = GetDC(NULL);
+		HDC bitmapDC = CreateCompatibleDC(hDC);
+		RECT rect = { 0, 0, 0, 0 };
+		ImageList_GetIconSize(imageList, (int *)(&rect.right), (int *)(&rect.bottom));
+		hbmp = CreateCompatibleBitmap(hDC, rect.right, rect.bottom);
+		HBITMAP oldBitmap = (HBITMAP)SelectObject(bitmapDC, hbmp);
+		FillRect(bitmapDC, &rect, (HBRUSH)(COLOR_MENU + 1));
+		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
+		SelectBitmap(bitmapDC, oldBitmap);
+		DeleteDC(bitmapDC);
+		ReleaseDC(NULL, hDC);
+		cache->items[index] = hbmp;
+	}
+
+	return hbmp;
+}
+
 /*
 
  Themed Dialogs
