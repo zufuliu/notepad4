@@ -3003,8 +3003,8 @@ public:
 		lineRangeEnd = doc->SciLineFromPosition(endPos);
 		lineRangeBreak = lineRangeEnd + increment;
 	}
-	Range LineRange(Sci::Line line) const noexcept {
-		Range range(doc->LineStart(line), doc->LineEnd(line));
+	Range LineRange(Sci::Line line, Sci::Position lineStartPos, Sci::Position lineEndPos) const noexcept {
+		Range range(lineStartPos, lineEndPos);
 		if (increment > 0) {
 			if (line == lineRangeStart)
 				range.start = startPos;
@@ -3215,13 +3215,16 @@ public:
 #define REGEX_MULTILINE
 #endif
 
-std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
+std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos, Sci::Position lineStartPos, Sci::Position lineEndPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
-	if (!doc->IsLineStartPosition(startPos)) {
-		flagsMatch |= std::regex_constants::match_not_bol;
+	if (startPos != lineStartPos) {
+		flagsMatch |= std::regex_constants::match_prev_avail;
 	}
-	if (!doc->IsLineEndPosition(endPos)) {
+	if (endPos != lineEndPos) {
 		flagsMatch |= std::regex_constants::match_not_eol;
+		if (!doc->IsWordEndAt(endPos)) {
+			flagsMatch |= std::regex_constants::match_not_eow;
+		}
 	}
 	return flagsMatch;
 }
@@ -3236,13 +3239,15 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	// has not been implemented by compiler runtimes with MSVC always in multiline
 	// mode and libc++ and libstdc++ always in single-line mode.
 	// If multiline regex worked well then the line by line iteration could be removed
-	// for the forwards case and replaced with the following 4 lines:
+	// for the forwards case and replaced with the following:
 	bool matched = false;
 #ifdef REGEX_MULTILINE
 	if (resr.increment > 0) {
+		const Sci::Position lineStartPos = doc->LineStart(resr.lineRangeStart);
+		const Sci::Position lineEndPos = doc->LineEnd(resr.lineRangeEnd);
 		Iterator itStart(doc, resr.startPos);
 		Iterator itEnd(doc, resr.endPos);
-		const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
+		const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos, lineStartPos, lineEndPos);
 		matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 		goto labelMatched;
 	}
@@ -3250,36 +3255,24 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	{
 		// Line by line.
 		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
-			const Range lineRange = resr.LineRange(line);
+			const Sci::Position lineStartPos = doc->LineStart(line);
+			const Sci::Position lineEndPos = doc->LineEnd(line);
+			const Range lineRange = resr.LineRange(line, lineStartPos, lineEndPos);
 			Iterator itStart(doc, lineRange.start);
 			Iterator itEnd(doc, lineRange.end);
-			std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
-			matched = std::regex_search(itStart, itEnd, match, regexp, flagsMatch);
-			// Check for the last match on this line.
-			if (matched) {
+			const std::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end, lineStartPos, lineEndPos);
+			std::regex_iterator<Iterator> it(itStart, itEnd, regexp, flagsMatch);
+			for (const std::regex_iterator<Iterator> last; it != last; ++it) {
+				match = *it;
+				matched = true;
 #ifndef REGEX_MULTILINE
-			if (resr.increment < 0) {
-#endif
-				flagsMatch |= std::regex_constants::match_not_bol;
-				Sci::Position endPos = match[0].second.PosRoundUp();
-				while (endPos < lineRange.end) {
-					if (match[0].first == match[0].second) {
-						// empty match
-						endPos = doc->NextPosition(endPos, 1);
-					}
-					Iterator itNext(doc, endPos);
-					std::match_results<Iterator> matchNext;
-					if (std::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
-						match = matchNext;
-						endPos = match[0].second.PosRoundUp();
-					} else {
-						break;
-					}
+				if (resr.increment > 0) {
+					break;
 				}
-#ifndef REGEX_MULTILINE
-			}
 #endif
-			break;
+			}
+			if (matched) {
+				break;
 			}
 		}
 	}

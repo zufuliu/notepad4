@@ -264,7 +264,7 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	lineEndPos = 0;
 	sta = NOP;                  /* status of lastpat */
 	previousFlags = FindOption::None;
-	memset(nfa, 0, 4);
+	memset(nfa, END, 4);
 	memset(bittab, 0, BITBLK);
 	Clear();
 }
@@ -434,7 +434,7 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 }
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
-	memset(nfa, 0, 4);
+	memset(nfa, END, 4);
 	memset(bittab, 0, BITBLK);
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
