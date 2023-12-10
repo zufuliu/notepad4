@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
+#include <climits>
 
 #include <stdexcept>
 #include <string>
@@ -758,6 +759,9 @@ const char *CellBuffer::DeleteChars(Sci::Position position, Sci::Position delete
 }
 
 void CellBuffer::Allocate(Sci::Position newSize) {
+	//if (!largeDocument && (newSize > INT32_MAX)) {
+	//	throw std::runtime_error("CellBuffer::Allocate: size of standard document limited to 2G.");
+	//}
 	substance.ReAllocate(newSize);
 	if (hasStyles) {
 		style.ReAllocate(newSize);

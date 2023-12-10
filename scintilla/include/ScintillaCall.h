@@ -616,7 +616,9 @@ public:
 	void CopyRange(Position start, Position end);
 	void CopyText(Position length, const char *text);
 	void SetSelectionMode(Scintilla::SelectionMode selectionMode);
+	void ChangeSelectionMode(Scintilla::SelectionMode selectionMode);
 	Scintilla::SelectionMode SelectionMode();
+	void SetMoveExtendsSelection(bool moveExtendsSelection);
 	bool MoveExtendsSelection();
 	Position GetLineSelStartPosition(Line line);
 	Position GetLineSelEndPosition(Line line);
@@ -741,6 +743,7 @@ public:
 	void ClearSelections();
 	void SetSelection(Position caret, Position anchor);
 	void AddSelection(Position caret, Position anchor);
+	int SelectionFromPoint(int x, int y);
 	void DropSelectionN(int selection);
 	void SetMainSelection(int selection);
 	int MainSelection();

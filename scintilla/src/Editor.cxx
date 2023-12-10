@@ -4414,8 +4414,6 @@ bool Editor::DragThreshold(Point ptStart, Point ptNow) noexcept {
 
 void Editor::StartDrag() {
 	// Always handled by subclasses
-	//SetMouseCapture(true);
-	//DisplayCursor(Window::Cursor::::arrow);
 }
 
 void Editor::DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular) {
@@ -4522,6 +4520,28 @@ bool Editor::PointInSelection(Point pt) {
 	return false;
 }
 
+ptrdiff_t Editor::SelectionFromPoint(Point pt) {
+	// Prioritize checking inside non-empty selections since each character will be inside only 1
+	const SelectionPosition posChar = SPositionFromLocation(pt, true, true);
+	for (size_t r = 0; r < sel.Count(); r++) {
+		if (sel.Range(r).ContainsCharacter(posChar)) {
+			return r;
+		}
+	}
+
+	// Then check if near empty selections as may be near more than 1
+	const SelectionPosition pos = SPositionFromLocation(pt, true, false);
+	for (size_t r = 0; r < sel.Count(); r++) {
+		const SelectionRange &range = sel.Range(r);
+		if ((range.Empty()) && (pos == range.caret)) {
+			return r;
+		}
+	}
+
+	// No selection at point
+	return -1;
+}
+
 bool Editor::PointInSelMargin(Point pt) const noexcept {
 	// Really means: "Point in a margin"
 	if (vs.fixedColumnWidth > 0) {	// There is a margin
@@ -4544,6 +4564,12 @@ Window::Cursor Editor::GetMarginCursor(Point pt) const noexcept {
 		x += m.width;
 	}
 	return Window::Cursor::reverseArrow;
+}
+
+void Editor::DropSelection(size_t part) noexcept {
+	sel.DropSelection(part);
+	ContainerNeedsUpdate(Update::Selection);
+	Redraw();
 }
 
 void Editor::TrimAndSetSelection(Sci::Position currentPos_, Sci::Position anchor_) {
@@ -4641,10 +4667,10 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, KeyMod modi
 	const bool ctrl = FlagSet(modifiers, KeyMod::Ctrl);
 	const bool shift = FlagSet(modifiers, KeyMod::Shift);
 	const bool alt = FlagSet(modifiers, KeyMod::Alt);
-	SelectionPosition newPos = SPositionFromLocation(pt, false, false, AllowVirtualSpace(virtualSpaceOptions, alt));
-	newPos = MovePositionOutsideChar(newPos, sel.MainCaret() - newPos.Position());
-	SelectionPosition newCharPos = SPositionFromLocation(pt, false, true, false);
-	newCharPos = MovePositionOutsideChar(newCharPos, -1);
+	const SelectionPosition clickPos = SPositionFromLocation(pt, false, false, AllowVirtualSpace(virtualSpaceOptions, alt));
+	const SelectionPosition newPos = MovePositionOutsideChar(clickPos, sel.MainCaret() - clickPos.Position());
+	const SelectionPosition newCharPos = MovePositionOutsideChar(
+		SPositionFromLocation(pt, false, true, false), -1);
 	inDragDrop = DragDrop::none;
 	sel.SetMoveExtends(false);
 
@@ -4653,21 +4679,22 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, KeyMod modi
 
 	NotifyIndicatorClick(true, newPos.Position(), modifiers);
 
+	const bool multiClick = (curTime < (lastClickTime + Platform::DoubleClickTime())) && Close(pt, lastClick, doubleClickCloseThreshold);
+	lastClickTime = curTime;
+	lastClick = pt;
+
 	const bool inSelMargin = PointInSelMargin(pt);
 	// In margin ctrl+(double)click should always select everything
 	if (ctrl && inSelMargin) {
 		SelectAll();
-		lastClickTime = curTime;
-		lastClick = pt;
 		return;
 	}
 	if (shift && !inSelMargin) {
 		SetSelection(newPos);
 	}
-	if ((curTime < (lastClickTime + Platform::DoubleClickTime())) && Close(pt, lastClick, doubleClickCloseThreshold)) {
+	if (multiClick) {
 		//Platform::DebugPrintf("Double click %d %d = %d\n", curTime, lastClickTime, curTime - lastClickTime);
-		SetMouseCapture(true);
-		FineTickerStart(TickReason::scroll, 100, 10);
+		ChangeMouseCapture(true);
 		if (!ctrl || !multipleSelection || (selectionUnit != TextUnit::character && selectionUnit != TextUnit::word))
 			SetEmptySelection(newPos.Position());
 		bool doubleClick = false;
@@ -4765,21 +4792,32 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, KeyMod modi
 			}
 
 			SetDragPosition(SelectionPosition(Sci::invalidPosition));
-			SetMouseCapture(true);
-			FineTickerStart(TickReason::scroll, 100, 10);
+			ChangeMouseCapture(true);
 		} else {
 			if (PointIsHotspot(pt)) {
 				NotifyHotSpotClicked(newCharPos.Position(), modifiers);
 				hotSpotClickPos = newCharPos.Position();
 			}
 			if (!shift) {
-				if (PointInSelection(pt) && !SelectionEmpty())
-					inDragDrop = DragDrop::initial;
-				else
-					inDragDrop = DragDrop::none;
+				const ptrdiff_t selectionPart = SelectionFromPoint(pt);
+				if (selectionPart >= 0) {
+					if (multipleSelection && ctrl) {
+						// Deselect
+						if (sel.Count() > 1) {
+							DropSelection(selectionPart);
+							// Completed: don't want any more processing of this click
+							return;
+						} else {
+							// Switch to just the click position
+							SetSelection(newPos, newPos);
+						}
+					}
+					if (!sel.Range(selectionPart).Empty()) {
+						inDragDrop = DragDrop::initial;
+					}
+				}
 			}
-			SetMouseCapture(true);
-			FineTickerStart(TickReason::scroll, 100, 10);
+			ChangeMouseCapture(true);
 			if (inDragDrop != DragDrop::initial) {
 				SetDragPosition(SelectionPosition(Sci::invalidPosition));
 				if (!shift) {
@@ -4809,8 +4847,6 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, KeyMod modi
 			}
 		}
 	}
-	lastClickTime = curTime;
-	lastClick = pt;
 	lastXChosen = static_cast<int>(pt.x) + xOffset;
 	ShowCaretAtCurrentPosition();
 }
@@ -4896,8 +4932,7 @@ void Editor::ButtonMoveWithModifiers(Point pt, unsigned int, KeyMod modifiers) {
 
 	if (inDragDrop == DragDrop::initial) {
 		if (DragThreshold(ptMouseLast, pt)) {
-			SetMouseCapture(false);
-			FineTickerCancel(TickReason::scroll);
+			ChangeMouseCapture(false);
 			SetDragPosition(movePos);
 			CopySelectionRange(drag);
 			StartDrag();
@@ -5039,8 +5074,7 @@ void Editor::ButtonUpWithModifiers(Point pt, unsigned int curTime, KeyMod modifi
 			SetHotSpotRange(nullptr);
 		}
 		ptMouseLast = pt;
-		SetMouseCapture(false);
-		FineTickerCancel(TickReason::scroll);
+		ChangeMouseCapture(false);
 		NotifyIndicatorClick(false, newPos.Position(), modifiers);
 		if (inDragDrop == DragDrop::dragging) {
 			const SelectionPosition selStart = SelectionStart();
@@ -5171,6 +5205,16 @@ void Editor::FineTickerStart(TickReason, int, int) noexcept {
 // this method should never be called.
 void Editor::FineTickerCancel(TickReason) noexcept {
 	assert(false);
+}
+
+void Editor::ChangeMouseCapture(bool on) noexcept {
+	SetMouseCapture(on);
+	// While mouse captured want timer to scroll automatically
+	if (on) {
+		FineTickerStart(TickReason::scroll, 100, 10);
+	} else {
+		FineTickerCancel(TickReason::scroll);
+	}
 }
 
 void Editor::SetFocusState(bool focusState) {
@@ -6032,6 +6076,33 @@ void Editor::SetSelectionNMessage(Message iMessage, uptr_t wParam, sptr_t lParam
 
 	InvalidateRange(sel.Range(wParam).Start().Position(), sel.Range(wParam).End().Position());
 	ContainerNeedsUpdate(Update::Selection);
+}
+
+namespace {
+
+constexpr Selection::SelTypes SelTypeFromMode(SelectionMode mode) noexcept {
+	return static_cast<Selection::SelTypes>(static_cast<int>(mode) + 1);
+}
+
+}
+
+void Editor::SetSelectionMode(uptr_t wParam, bool setMoveExtends) {
+	const Selection::SelTypes newSelType = SelTypeFromMode(static_cast<SelectionMode>(wParam));
+	if (setMoveExtends) {
+		sel.SetMoveExtends(!sel.MoveExtends() || (sel.selType != newSelType));
+	}
+	sel.selType = newSelType;
+	switch (sel.selType) {
+	case Selection::SelTypes::rectangle:
+		sel.Rectangular() = sel.RangeMain(); // adjust current selection
+		break;
+	case Selection::SelTypes::lines:
+		SetSelection(sel.RangeMain().caret, sel.RangeMain().anchor); // adjust current selection
+		break;
+	default:
+		break;
+	}
+	InvalidateWholeSelection();
 }
 
 sptr_t Editor::StringResult(sptr_t lParam, const char *val) noexcept {
@@ -8069,33 +8140,12 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 	case Message::SelectionIsRectangle:
 		return sel.selType == Selection::SelTypes::rectangle ? 1 : 0;
 
-	case Message::SetSelectionMode: {
-			switch (static_cast<SelectionMode>(wParam)) {
-			case SelectionMode::Stream:
-				sel.SetMoveExtends(!sel.MoveExtends() || (sel.selType != Selection::SelTypes::stream));
-				sel.selType = Selection::SelTypes::stream;
-				break;
-			case SelectionMode::Rectangle:
-				sel.SetMoveExtends(!sel.MoveExtends() || (sel.selType != Selection::SelTypes::rectangle));
-				sel.selType = Selection::SelTypes::rectangle;
-				sel.Rectangular() = sel.RangeMain(); // adjust current selection
-				break;
-			case SelectionMode::Lines:
-				sel.SetMoveExtends(!sel.MoveExtends() || (sel.selType != Selection::SelTypes::lines));
-				sel.selType = Selection::SelTypes::lines;
-				SetSelection(sel.RangeMain().caret, sel.RangeMain().anchor); // adjust current selection
-				break;
-			case SelectionMode::Thin:
-				sel.SetMoveExtends(!sel.MoveExtends() || (sel.selType != Selection::SelTypes::thin));
-				sel.selType = Selection::SelTypes::thin;
-				break;
-			default:
-				sel.SetMoveExtends(!sel.MoveExtends() || (sel.selType != Selection::SelTypes::stream));
-				sel.selType = Selection::SelTypes::stream;
-			}
-			InvalidateWholeSelection();
-			break;
-		}
+	case Message::SetSelectionMode:
+		SetSelectionMode(wParam, true);
+		break;
+	case Message::ChangeSelectionMode:
+		SetSelectionMode(wParam, false);
+		break;
 	case Message::GetSelectionMode:
 		switch (sel.selType) {
 		case Selection::SelTypes::stream:
@@ -8109,6 +8159,9 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		default:	// ?!
 			return static_cast<sptr_t>(SelectionMode::Stream);
 		}
+	case Message::SetMoveExtendsSelection:
+		sel.SetMoveExtends(wParam != 0);
+		break;
 	case Message::GetMoveExtendsSelection:
 		return sel.MoveExtends();
 	case Message::GetLineSelStartPosition:
@@ -8519,10 +8572,11 @@ sptr_t Editor::WndProc(Message iMessage, uptr_t wParam, sptr_t lParam) {
 		Redraw();
 		break;
 
+	case Message::SelectionFromPoint:
+		return SelectionFromPoint(PointFromParameters(wParam, lParam));
+
 	case Message::DropSelectionN:
-		sel.DropSelection(PositionFromUPtr(wParam));
-		ContainerNeedsUpdate(Update::Selection);
-		Redraw();
+		DropSelection(wParam);
 		break;
 
 	case Message::SetMainSelection:
