@@ -2571,7 +2571,7 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 			cache->count += 1;
 		} else {
 			// find first zero bit in used, omitted zero check as used can't be UINT32_MAX
-			// index = __builtin_stdc_first_trailing_one(cache->used);
+			// index = __builtin_stdc_trailing_ones(cache->used);
 			index = np2_ctz(~cache->used);
 			DeleteObject(cache->items[index]);
 			cache->items[index] = NULL;
@@ -2586,9 +2586,9 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 		HDC bitmapDC = CreateCompatibleDC(hDC);
 		RECT rect = { 0, 0, 0, 0 };
 		ImageList_GetIconSize(imageList, (int *)(&rect.right), (int *)(&rect.bottom));
-		hbmp = CreateCompatibleBitmap(hDC, rect.right, rect.bottom);
+		const BITMAPINFO bmi = { {sizeof(BITMAPINFOHEADER), rect.right, rect.bottom, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{ 0, 0, 0, 0 }} };
+		hbmp = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, NULL, NULL, 0);
 		HBITMAP oldBitmap = (HBITMAP)SelectObject(bitmapDC, hbmp);
-		FillRect(bitmapDC, &rect, (HBRUSH)(COLOR_MENU + 1));
 		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
 		SelectBitmap(bitmapDC, oldBitmap);
 		DeleteDC(bitmapDC);
