@@ -2584,9 +2584,10 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 	if (hbmp == NULL) {
 		HDC hDC = GetDC(NULL);
 		HDC bitmapDC = CreateCompatibleDC(hDC);
-		RECT rect = { 0, 0, 0, 0 };
-		ImageList_GetIconSize(imageList, (int *)(&rect.right), (int *)(&rect.bottom));
-		const BITMAPINFO bmi = { {sizeof(BITMAPINFOHEADER), rect.right, rect.bottom, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{ 0, 0, 0, 0 }} };
+		int width = 0;
+		int height = 0;
+		ImageList_GetIconSize(imageList, &width, &height);
+		const BITMAPINFO bmi = { {sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{ 0, 0, 0, 0 }} };
 		hbmp = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, NULL, NULL, 0);
 		HBITMAP oldBitmap = (HBITMAP)SelectObject(bitmapDC, hbmp);
 		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);

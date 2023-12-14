@@ -2954,14 +2954,12 @@ class BuiltinRegex final : public RegexSearchBase {
 public:
 	explicit BuiltinRegex(const CharClassify *charClassTable) : search(charClassTable) {}
 
-	Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-		FindOption flags, Sci::Position *length) override;
+	Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) override;
 
-	const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) override;
+	const char *SubstituteByPosition(const Document *doc, const char *text, Sci::Position *length) override;
 
 #if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
-	Sci::Position CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-		FindOption flags, Sci::Position *length);
+	Sci::Position CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length);
 #endif
 
 private:
@@ -3218,7 +3216,14 @@ public:
 std::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos, Sci::Position lineStartPos, Sci::Position lineEndPos) noexcept {
 	std::regex_constants::match_flag_type flagsMatch = std::regex_constants::match_default;
 	if (startPos != lineStartPos) {
+#if defined(_LIBCPP_VERSION)
+		flagsMatch |= std::regex_constants::match_not_bol;
+		if (!doc->IsWordStartAt(startPos)) {
+			flagsMatch |= std::regex_constants::match_not_bow;
+		}
+#else
 		flagsMatch |= std::regex_constants::match_prev_avail;
+#endif
 	}
 	if (endPos != lineEndPos) {
 		flagsMatch |= std::regex_constants::match_not_eol;
@@ -3289,8 +3294,7 @@ labelMatched:
 	return matched;
 }
 
-Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-	FindOption flags, Sci::Position *length) {
+Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
 	const RESearchRange resr(doc, minPos, maxPos);
 	try {
 		//const ElapsedPeriod ep;
@@ -3352,9 +3356,7 @@ Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position 
 
 #endif // BOOST_REGEX_STANDALONE || !NO_CXX11_REGEX
 
-Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-	FindOption flags, Sci::Position *length) {
-
+Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
 #if defined(BOOST_REGEX_STANDALONE) || !defined(NO_CXX11_REGEX)
 	if (FlagSet(flags, FindOption::Cxx11RegEx)) {
 		return CxxRegexFindText(doc, minPos, maxPos, pattern, flags, length);
@@ -3411,37 +3413,29 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 		search.SetLineRange(lineStartPos, lineEndPos);
 		int success = search.Execute(di, startOfLine, endOfLine);
 		if (success) {
-			pos = search.bopat[0];
-			lenRet = search.eopat[0] - pos;
+			Sci::Position endPos = search.eopat[0];
 			// There can be only one start of a line, so no need to look for last match in line
 			if ((resr.increment < 0) && !searchforLineStart) {
 				// Check for the last match on this line.
-				Sci::Position endPos = search.eopat[0];
-				RESearch::MatchPositions bopat{};
-				RESearch::MatchPositions eopat{};
 				while (success && (endPos < endOfLine)) {
-					bopat = search.bopat;
-					eopat = search.eopat;
-					if (lenRet == 0) {
+					const RESearch::MatchPositions bopat = search.bopat;
+					const RESearch::MatchPositions eopat = search.eopat;
+					pos = endPos;
+					if (pos == bopat[0]) {
 						// empty match
-						endPos = doc->NextPosition(endPos, 1);
+						pos = doc->NextPosition(pos, 1);
 					}
-					success = search.Execute(di, endPos, endOfLine);
+					success = search.Execute(di, pos, endOfLine);
 					if (success) {
 						endPos = search.eopat[0];
-						if (endPos <= minPos) {
-							pos = search.bopat[0];
-							lenRet = endPos - pos;
-						} else {
-							success = 0;
-						}
+					} else {
+						search.bopat = bopat;
+						search.eopat = eopat;
 					}
 				}
-				if (!success) {
-					search.bopat = bopat;
-					search.eopat = eopat;
-				}
 			}
+			pos = search.bopat[0];
+			lenRet = endPos - pos;
 			break;
 		}
 	}
@@ -3449,7 +3443,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 	return pos;
 }
 
-const char *BuiltinRegex::SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) {
+const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *text, Sci::Position *length) {
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {
 		if (text[j] == '\\') {
