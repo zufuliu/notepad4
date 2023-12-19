@@ -3081,17 +3081,18 @@ void EditAlignText(EditAlignMode nMode) {
 		Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
 		const Sci_Position iLineIndentPos = SciCall_GetLineIndentPosition(iLine);
 
-		if (iLineIndentPos != iLineEndPos) {
-			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
-			Sci_Position iTail = iLineEndPos - 1;
-			int ch = SciCall_GetCharAt(iTail);
-			while (iTail >= iLineStart && (ch == ' ' || ch == '\t')) {
-				iTail--;
-				ch = SciCall_GetCharAt(iTail);
+		if (iLineIndentPos < iLineEndPos) {
+			while (iLineEndPos >= iLineIndentPos) {
 				iLineEndPos--;
+				const int ch = SciCall_GetCharAt(iLineEndPos);
+				if (!IsASpaceOrTab(ch)) {
+					break;
+				}
 			}
 
+			++iLineEndPos;
 			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos);
+			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
 			iMinIndent = min_pos(iMinIndent, iIndentCol);
 			iMaxLength = max_pos(iMaxLength, iEndCol);
 		}
@@ -3714,11 +3715,13 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	for (Sci_Line line = 0; line < maxLines; line++) {
 		const Sci_Position lineStart = SciCall_PositionFromLine(line);
 		const Sci_Position lineEnd = SciCall_GetLineEndPosition(line);
-		Sci_Position i = lineEnd - 1;
-		int ch = SciCall_GetCharAt(i);
-		while ((i >= lineStart) && (ch == ' ' || ch == '\t')) {
+		Sci_Position i = lineEnd;
+		while (i >= lineStart) {
 			i--;
-			ch = SciCall_GetCharAt(i);
+			const int ch = SciCall_GetCharAt(i);
+			if (!IsASpaceOrTab(ch)) {
+				break;
+			}
 		}
 		i++;
 		if (i < lineEnd) {
