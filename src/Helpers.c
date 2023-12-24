@@ -2582,8 +2582,7 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 	cache->used |= 1U << index;
 	HBITMAP hbmp = cache->items[index];
 	if (hbmp == NULL) {
-		HDC hDC = GetDC(NULL);
-		HDC bitmapDC = CreateCompatibleDC(hDC);
+		HDC bitmapDC = CreateCompatibleDC(NULL);
 		int width = 0;
 		int height = 0;
 		ImageList_GetIconSize(imageList, &width, &height);
@@ -2593,7 +2592,6 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
 		SelectBitmap(bitmapDC, oldBitmap);
 		DeleteDC(bitmapDC);
-		ReleaseDC(NULL, hDC);
 		cache->items[index] = hbmp;
 	}
 

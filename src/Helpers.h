@@ -110,6 +110,10 @@ NP2_inline bool IsASpaceOrTab(int ch) {
 	return ch == ' ' || ch == '\t';
 }
 
+NP2_inline bool IsADigit(int ch) {
+	return ch >= '0' && ch <= '9';
+}
+
 NP2_inline bool IsOctalDigit(int ch) {
 	return ch >= '0' && ch <= '7';
 }

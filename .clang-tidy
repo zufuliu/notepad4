@@ -13,6 +13,7 @@ Checks: >
     misc-*,
     -clang-analyzer-security.insecureAPI.strcpy,
     -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+    -clang-analyzer-optin.core.EnumCastOutOfRange,
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-narrowing-conversions,
