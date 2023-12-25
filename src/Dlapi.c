@@ -189,7 +189,7 @@ int DirList_Fill(HWND hwnd, LPCWSTR lpszDir, DWORD grfFlags, LPCWSTR lpszFileSpe
 #if defined(__cplusplus)
 		if (S_OK == lpsfDesktop->ParseDisplayName(hwnd, nullptr, wszDir, &chParsed, &pidl, &dwAttributes)) {
 			// Bind pidl to IShellFolder
-			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, (void **)(&lpsf))) {
+			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, reinterpret_cast<void **>(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				LPENUMIDLIST lpe = nullptr;
 				if (S_OK == lpsf->EnumObjects(hwnd, grfFlags, &lpe)) {
@@ -333,7 +333,7 @@ DWORD WINAPI DirList_IconThread(LPVOID lpParam) {
 	// Get IShellIcon
 	IShellIcon *lpshi;
 #if defined(__cplusplus)
-	lpdl->lpsf->QueryInterface(IID_IShellIcon, (void **)(&lpshi));
+	lpdl->lpsf->QueryInterface(IID_IShellIcon, reinterpret_cast<void **>(&lpshi));
 #else
 	lpdl->lpsf->lpVtbl->QueryInterface(lpdl->lpsf, &IID_IShellIcon, (void **)(&lpshi));
 #endif
@@ -659,7 +659,7 @@ bool DirList_PropertyDlg(HWND hwnd, int iItem) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IContextMenu, nullptr, (void **)(&lpcm))) {
+	if (S_OK == lplvid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lplvid->pidl), IID_IContextMenu, nullptr, reinterpret_cast<void **>(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;
@@ -890,7 +890,7 @@ int DriveBox_Fill(HWND hwnd) {
 			// Bind pidl to IShellFolder
 			LPSHELLFOLDER lpsf; // Workspace == CSIDL_DRIVES
 #if defined(__cplusplus)
-			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, (void **)(&lpsf))) {
+			if (S_OK == lpsfDesktop->BindToObject(pidl, nullptr, IID_IShellFolder, reinterpret_cast<void **>(&lpsf))) {
 				// Create an Enumeration object for lpsf
 				const DWORD grfFlags = SHCONTF_FOLDERS;
 				LPENUMIDLIST lpe;
@@ -1105,7 +1105,7 @@ bool DriveBox_PropertyDlg(HWND hwnd) {
 	LPCONTEXTMENU lpcm;
 
 #if defined(__cplusplus)
-	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), IID_IContextMenu, nullptr, (void **)(&lpcm))) {
+	if (S_OK == lpdcid->lpsf->GetUIObjectOf(GetParent(hwnd), 1, (PCUITEMID_CHILD_ARRAY)(&lpdcid->pidl), IID_IContextMenu, nullptr, reinterpret_cast<void **>(&lpcm))) {
 		CMINVOKECOMMANDINFO cmi;
 		cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
 		cmi.fMask = 0;

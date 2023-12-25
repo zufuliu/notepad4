@@ -1949,7 +1949,7 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
+	const int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
 	MRU_Init(&mruFile, MRU_KEY_RECENT_FILES, flags);
 	MRU_Init(&mruFind, MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
 	MRU_Init(&mruReplace, MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
@@ -5344,8 +5344,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			HMENU subMenu = NULL;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
 				NP2_static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
-				const int count = mruFile.iSize;
-				if (count <= 0) {
+				if (mruFile.iSize <= 0) {
 					return TBDDRET_TREATPRESSED;
 				}
 				hmenu = subMenu = CreatePopupMenu();
@@ -5353,7 +5352,7 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 				MENUITEMINFO mii;
 				mii.cbSize = sizeof(MENUITEMINFO);
 				mii.fMask = MIIM_ID | MIIM_STRING | MIIM_BITMAP;
-				for (int i = 0; i < count; i++) {
+				for (int i = 0; i < mruFile.iSize; i++) {
 					LPCWSTR path = mruFile.pszItems[i];
 					HBITMAP hbmp = BitmapCache_Get(&bitmapCache, path);
 					mii.wID = i + IDM_RECENT_HISTORY_START;
@@ -7216,7 +7215,7 @@ void UpdateStatusbar(void) {
 		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
-	memset((void *)(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
+	memset(NP2_void_pointer(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {
@@ -7232,7 +7231,7 @@ void UpdateStatusbar(void) {
 	}
 
 	items[index] = start;
-	memcpy((void *)(&items[StatusItem_Lexer]), &cachedStatusItem.pszLexerName, (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
+	memcpy(NP2_void_pointer(&items[StatusItem_Lexer]), NP2_void_pointer(&cachedStatusItem.pszLexerName), (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
 	items[StatusItem_Zoom] = cachedStatusItem.tchZoom;
 	items[StatusItem_DocSize] = tchDocSize;
 
@@ -8784,7 +8783,7 @@ void AutoSave_Stop(BOOL keepBackup) {
 		}
 
 		autoSaveCount = 0;
-		memset(autoSavePathList, 0, sizeof(LPWSTR) * AllAutoSaveCount);
+		memset(NP2_void_pointer(autoSavePathList), 0, sizeof(LPWSTR) * AllAutoSaveCount);
 	}
 }
 
@@ -8937,7 +8936,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) {
 				}
 				LocalFree(old);
 			}
-			memmove(autoSavePathList, autoSavePathList + 1, (AllAutoSaveCount - 1) * sizeof(LPWSTR));
+			memmove(NP2_void_pointer(autoSavePathList), NP2_void_pointer(autoSavePathList + 1), (AllAutoSaveCount - 1) * sizeof(LPWSTR));
 			autoSavePathList[AllAutoSaveCount - 1] = NULL;
 			--autoSaveCount;
 		}

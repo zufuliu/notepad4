@@ -1801,10 +1801,10 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	tchPath[0] = L'\0';
 
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			if (SUCCEEDED(ppf->Load(pszLnkFile, STGM_READ))) {
 				hr = psl->GetPath(tchPath, COUNTOF(tchPath), nullptr, 0);
 			}
@@ -1897,10 +1897,10 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 	IShellLink *psl;
 	bool bSucceeded = false;
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			psl->SetPath(tchExeFile);
 			psl->SetArguments(tchArguments);
 			psl->SetDescription(tchDescription);
@@ -1959,10 +1959,10 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	IShellLink *psl;
 	bool bSucceeded = false;
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			psl->SetPath(pszTarget);
 			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
 				bSucceeded = true;
@@ -2348,7 +2348,7 @@ void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags) {
 	pmru->iSize = 0;
 	pmru->iFlags = iFlags;
 	pmru->szRegKey = pszRegKey;
-	memset(pmru->pszItems, 0, sizeof(pmru->pszItems));
+	memset(NP2_void_pointer(pmru->pszItems), 0, sizeof(pmru->pszItems));
 	MRU_Load(pmru);
 }
 
@@ -2588,7 +2588,7 @@ HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
 		ImageList_GetIconSize(imageList, &width, &height);
 		const BITMAPINFO bmi = { {sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{ 0, 0, 0, 0 }} };
 		hbmp = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, NULL, NULL, 0);
-		HBITMAP oldBitmap = (HBITMAP)SelectObject(bitmapDC, hbmp);
+		HBITMAP oldBitmap = SelectBitmap(bitmapDC, hbmp);
 		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
 		SelectBitmap(bitmapDC, oldBitmap);
 		DeleteDC(bitmapDC);

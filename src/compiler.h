@@ -49,6 +49,13 @@ typedef _Bool	bool;
 #define NP2_static_assert(expr)		_STATIC_ASSERT(expr)
 #endif
 
+// suppress clang-tidy [bugprone-multi-level-implicit-pointer-conversion] warning
+#if defined(__cplusplus)
+#define NP2_void_pointer(expr)		(reinterpret_cast<void *>(expr))
+#else
+#define NP2_void_pointer(expr)		((void *)(expr))
+#endif
+
 #if (defined(__GNUC__) || defined(__clang__)) && !defined(__cplusplus)
 // https://stackoverflow.com/questions/19452971/array-size-macro-that-rejects-pointers
 // trigger error for pointer: GCC: void value not ignored as it ought to be. Clang: invalid operands to binary expression.

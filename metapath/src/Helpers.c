@@ -1288,10 +1288,10 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	tchPath[0] = L'\0';
 
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			if (SUCCEEDED(ppf->Load(pszLnkFile, STGM_READ))) {
 				hr = psl->GetPath(tchPath, COUNTOF(tchPath), nullptr, 0);
 			}
@@ -1347,10 +1347,10 @@ bool PathCreateLnk(LPCWSTR pszLnkDir, LPCWSTR pszPath) {
 	bool bSucceeded = false;
 
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			psl->SetPath(pszPath);
 
 			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
@@ -1788,7 +1788,7 @@ bool History_Add(PHISTORY ph, LPCWSTR pszNew) {
 			LocalFree(ph->psz[0]);
 		}
 
-		memmove(ph->psz, ph->psz + 1, (HISTORY_ITEMS - 1) * sizeof(WCHAR *));
+		memmove(NP2_void_pointer(ph->psz), NP2_void_pointer(ph->psz + 1), (HISTORY_ITEMS - 1) * sizeof(WCHAR *));
 	}
 
 	ph->psz[ph->iCurItem] = StrDup(pszNew);
@@ -1862,7 +1862,7 @@ void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags) {
 	pmru->iSize = 0;
 	pmru->iFlags = iFlags;
 	pmru->szRegKey = pszRegKey;
-	memset(pmru->pszItems, 0, sizeof(pmru->pszItems));
+	memset(NP2_void_pointer(pmru->pszItems), 0, sizeof(pmru->pszItems));
 	MRU_Load(pmru);
 }
 
