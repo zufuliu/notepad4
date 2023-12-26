@@ -53,12 +53,16 @@ deadValues = [
 ]
 
 def ActualTypeName(typeName, identifier=None):
+	if typeName == "pointer" and identifier in ["doc", "DocPointer", "CreateDocument"]:
+		return "IDocumentEditable *"
 	if typeName in typeAliases:
 		return typeAliases[typeName]
 	return typeName
 
 def IsEnumeration(s):
 	if s in ["Position", "Line", "Colour", "ColourAlpha"]:
+		return False
+	if s.endswith("*"):
 		return False
 	return s[:1].isupper()
 
@@ -217,7 +221,7 @@ def HMethods(f):
 			if featureType in ["fun", "get", "set"]:
 				if featureType == "get" and name.startswith("Get"):
 					name = name[len("Get"):]
-				retType = ActualTypeName(v["ReturnType"])
+				retType = ActualTypeName(v["ReturnType"], name)
 				if IsEnumeration(retType):
 					retType = namespace + retType
 				parameters, args, callName = ParametersArgsCallname(v)
@@ -240,20 +244,20 @@ def CXXMethods(f):
 				msgName = "Message::" + name
 				if featureType == "get" and name.startswith("Get"):
 					name = name[len("Get"):]
-				retType = ActualTypeName(v["ReturnType"])
+				retType = ActualTypeName(v["ReturnType"], name)
 				parameters, args, callName = ParametersArgsCallname(v)
 				returnIfNeeded = "return " if retType != "void" else ""
 
 				out.append(JoinTypeAndIdentifier(retType, "ScintillaCall::" + name) + "(" + parameters + ")" + " {")
 				retCast = ""
 				retCastEnd = ""
-				if retType not in basicTypes or retType in ["int", "Colour", "ColourAlpha"]:
+				if retType.endswith("*"):
+					retCast = "reinterpret_cast<" + retType + ">("
+					retCastEnd = ")"
+				elif retType not in basicTypes or retType in ["int", "Colour", "ColourAlpha"]:
 					if IsEnumeration(retType):
 						retType = namespace + retType
 					retCast = "static_cast<" + retType + ">("
-					retCastEnd = ")"
-				elif retType in ["void *"]:
-					retCast = "reinterpret_cast<" + retType + ">("
 					retCastEnd = ")"
 				out.append("\t" + returnIfNeeded + retCast + callName + "(" + msgName + args + ")" + retCastEnd + ";")
 				out.append("}")

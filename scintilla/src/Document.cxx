@@ -187,7 +187,7 @@ Document::~Document() {
 }
 
 // Increase reference count and return its previous value.
-int Document::AddRef() noexcept {
+int SCI_METHOD Document::AddRef() noexcept {
 	return refCount++;
 }
 
@@ -1397,7 +1397,7 @@ int SCI_METHOD Document::AddData(const char *data, Sci_Position length) {
 }
 
 void * SCI_METHOD Document::ConvertToDocument() noexcept {
-	return this;
+	return AsDocumentEditable();
 }
 
 Sci::Position Document::Undo() {

@@ -18,6 +18,8 @@ struct TextRangeFull;
 struct TextToFindFull;
 struct RangeToFormatFull;
 
+class IDocumentEditable;
+
 using FunctionDirect = intptr_t(*)(intptr_t ptr, unsigned int iMessage, uintptr_t wParam, intptr_t lParam, int *pStatus);
 
 struct Failure {
@@ -547,8 +549,8 @@ public:
 	Position BraceMatchNext(Position pos, Position startPos);
 	bool ViewEOL();
 	void SetViewEOL(bool visible);
-	void *DocPointer();
-	void SetDocPointer(void *doc);
+	IDocumentEditable *DocPointer();
+	void SetDocPointer(IDocumentEditable *doc);
 	void SetModEventMask(Scintilla::ModificationFlags eventMask);
 	Position EdgeColumn();
 	void SetEdgeColumn(Position column);
@@ -567,9 +569,9 @@ public:
 	bool SelectionIsRectangle();
 	void SetZoom(int zoomInPoints);
 	int Zoom();
-	void *CreateDocument(Position bytes, Scintilla::DocumentOption documentOptions);
-	void AddRefDocument(void *doc);
-	void ReleaseDocument(void *doc);
+	IDocumentEditable *CreateDocument(Position bytes, Scintilla::DocumentOption documentOptions);
+	void AddRefDocument(IDocumentEditable *doc);
+	void ReleaseDocument(IDocumentEditable *doc);
 	Scintilla::DocumentOption DocumentOptions();
 	Scintilla::ModificationFlags ModEventMask();
 	void SetCommandEvents(bool commandEvents);

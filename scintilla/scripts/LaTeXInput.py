@@ -394,13 +394,13 @@ def update_latex_input_data_linear(input_name, input_map, path, param):
 	for i in range(0, groupCount, 10):
 		line = ', '.join(f'0x{value:08x}' for value in groupList[i:i+10])
 		output.append(line + ',')
-	output.append(f"}};")
+	output.append("}};")
 	output.append('')
 	output.append(f"static const uint16_t {input_name}OffsetTable[] = {{")
 	for i in range(0, groupCount, 10):
 		line = ', '.join(f'0x{value:04x}' for value in offsetList[i:i+10])
 		output.append(line + ',')
-	output.append(f"}};")
+	output.append("}};")
 	Regenerate(data_path, f'//{input_name} hash', output)
 
 	lines = MakeKeywordLines(key_list)

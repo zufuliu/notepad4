@@ -2010,11 +2010,11 @@ void ScintillaCall::SetViewEOL(bool visible) {
 	Call(Message::SetViewEOL, visible);
 }
 
-void *ScintillaCall::DocPointer() {
-	return reinterpret_cast<void *>(Call(Message::GetDocPointer));
+IDocumentEditable *ScintillaCall::DocPointer() {
+	return reinterpret_cast<IDocumentEditable *>(Call(Message::GetDocPointer));
 }
 
-void ScintillaCall::SetDocPointer(void *doc) {
+void ScintillaCall::SetDocPointer(IDocumentEditable *doc) {
 	CallPointer(Message::SetDocPointer, 0, doc);
 }
 
@@ -2090,15 +2090,15 @@ int ScintillaCall::Zoom() {
 	return static_cast<int>(Call(Message::GetZoom));
 }
 
-void *ScintillaCall::CreateDocument(Position bytes, Scintilla::DocumentOption documentOptions) {
-	return reinterpret_cast<void *>(Call(Message::CreateDocument, bytes, static_cast<intptr_t>(documentOptions)));
+IDocumentEditable *ScintillaCall::CreateDocument(Position bytes, Scintilla::DocumentOption documentOptions) {
+	return reinterpret_cast<IDocumentEditable *>(Call(Message::CreateDocument, bytes, static_cast<intptr_t>(documentOptions)));
 }
 
-void ScintillaCall::AddRefDocument(void *doc) {
+void ScintillaCall::AddRefDocument(IDocumentEditable *doc) {
 	CallPointer(Message::AddRefDocument, 0, doc);
 }
 
-void ScintillaCall::ReleaseDocument(void *doc) {
+void ScintillaCall::ReleaseDocument(IDocumentEditable *doc) {
 	CallPointer(Message::ReleaseDocument, 0, doc);
 }
 
