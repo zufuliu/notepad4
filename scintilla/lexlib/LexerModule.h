@@ -13,8 +13,7 @@ class WordList;
 
 typedef const WordList (&LexerWordList)[KEYWORDSET_MAX];
 
-typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle,
-	LexerWordList keywordLists, Accessor &styler);
+typedef void (*LexerFunction)(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList keywordLists, Accessor &styler);
 typedef Scintilla::ILexer5 *(*LexerFactoryFunction)();
 
 /**
