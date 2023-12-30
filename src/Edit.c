@@ -1002,10 +1002,10 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
 	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
-	LONGLONG maxFileSize = INT64_C(0x100000000);
+	LONGLONG maxFileSize = INT64_C(4) << 30;
 #else
 	// 2 GiB: ptrdiff_t / Sci_Position used in Scintilla
-	LONGLONG maxFileSize = INT64_C(0x80000000);
+	LONGLONG maxFileSize = INT64_C(2) << 30;
 #endif
 
 	MEMORYSTATUSEX statex;

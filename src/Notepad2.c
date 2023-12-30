@@ -7820,7 +7820,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 	return fSuccess;
 }
 
-void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
+void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) {
 	int iEncoding;
 	int iEOLMode;
 	switch (pLex->rid) {
