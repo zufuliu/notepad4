@@ -24,6 +24,7 @@ Checks: >
     -modernize-macro-to-enum,
     -modernize-redundant-void-arg,
     -modernize-use-nodiscard,
+    -modernize-use-std-numbers,
     -modernize-use-trailing-return-type,
     -modernize-use-using,
     -performance-enum-size,
@@ -47,6 +48,8 @@ Checks: >
 #     -readability-else-after-return,
 #     -readability-named-parameter,
 #     -readability-simplify-boolean-expr,
+#     -bugprone-reserved-identifier,
+#     -misc-const-correctness,
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
