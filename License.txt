@@ -244,7 +244,7 @@ The Julia language is licensed under the MIT License. The "language" consists of
 
 License for Boost regex library
 
-https://www.boost.org/doc/libs/1_83_0/libs/regex/doc/html/index.html
+https://www.boost.org/doc/libs/1_84_0/libs/regex/doc/html/index.html
 https://www.boost.org/LICENSE_1_0.txt
 
 Boost Software License - Version 1.0 - August 17th, 2003

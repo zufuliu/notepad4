@@ -3211,14 +3211,17 @@ public:
 
 #if defined(BOOST_REGEX_STANDALONE)
 
-boost::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos) noexcept {
+boost::regex_constants::match_flag_type MatchFlags(const Document *doc, Sci::Position startPos, Sci::Position endPos, Sci::Position lineStartPos, Sci::Position lineEndPos) noexcept {
 	boost::regex_constants::match_flag_type flagsMatch = boost::regex_constants::match_default
 		| boost::regex_constants::match_not_dot_newline;
-	if (!doc->IsLineStartPosition(startPos)) {
-		flagsMatch |= boost::regex_constants::match_not_bol;
+	if (startPos != lineStartPos) {
+		flagsMatch |= boost::regex_constants::match_prev_avail;
 	}
-	if (!doc->IsLineEndPosition(endPos)) {
+	if (endPos != lineEndPos) {
 		flagsMatch |= boost::regex_constants::match_not_eol;
+		if (!doc->IsWordEndAt(endPos)) {
+			flagsMatch |= boost::regex_constants::match_not_eow;
+		}
 	}
 	return flagsMatch;
 }
@@ -3229,36 +3232,30 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 
 	bool matched = false;
 	if (resr.increment > 0) {
+		const Sci::Position lineStartPos = doc->LineStart(resr.lineRangeStart);
+		const Sci::Position lineEndPos = doc->LineEnd(resr.lineRangeEnd);
 		Iterator itStart(doc, resr.startPos, true);
 		Iterator itEnd(doc, resr.endPos);
-		const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos);
+		const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, resr.startPos, resr.endPos, lineStartPos, lineEndPos);
 		matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
 	} else {
 		// Line by line.
 		for (Sci::Line line = resr.lineRangeStart; line != resr.lineRangeBreak; line += resr.increment) {
-			const Range lineRange = resr.LineRange(line);
+			const Sci::Position lineStartPos = doc->LineStart(line);
+			const Sci::Position lineEndPos = doc->LineEnd(line);
+			const Range lineRange = resr.LineRange(line, lineStartPos, lineEndPos);
 			Iterator itStart(doc, lineRange.start, true);
 			Iterator itEnd(doc, lineRange.end);
-			boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end);
-			matched = boost::regex_search(itStart, itEnd, match, regexp, flagsMatch);
-			// Check for the last match on this line.
-			if (matched) {
-				flagsMatch |= boost::regex_constants::match_not_bol;
-				Sci::Position endPos = match[0].second.PosRoundUp();
-				while (endPos < lineRange.end) {
-					if (match[0].first == match[0].second) {
-						// empty match
-						endPos = doc->NextPosition(endPos, 1);
-					}
-					Iterator itNext(doc, endPos, true);
-					boost::match_results<Iterator> matchNext;
-					if (boost::regex_search(itNext, itEnd, matchNext, regexp, flagsMatch)) {
-						match = matchNext;
-						endPos = match[0].second.PosRoundUp();
-					} else {
-						break;
-					}
+			const boost::regex_constants::match_flag_type flagsMatch = MatchFlags(doc, lineRange.start, lineRange.end, lineStartPos, lineEndPos);
+			boost::regex_iterator<Iterator> it(itStart, itEnd, regexp, flagsMatch);
+			for (const boost::regex_iterator<Iterator> last; it != last; ++it) {
+				match = *it;
+				matched = true;
+				if (resr.increment > 0) {
+					break;
 				}
+			}
+			if (matched) {
 				break;
 			}
 		}
@@ -3273,8 +3270,7 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 	return matched;
 }
 
-Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-	FindOption flags, Sci::Position *length) {
+Sci::Position BuiltinRegex::CxxRegexFindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, FindOption flags, Sci::Position *length) {
 	const RESearchRange resr(doc, minPos, maxPos);
 	try {
 		boost::regex::flag_type flagsRe = boost::regex::ECMAScript;
@@ -3559,7 +3555,7 @@ Sci::Position BuiltinRegex::FindText(const Document *doc, Sci::Position minPos, 
 const char *BuiltinRegex::SubstituteByPosition(const Document *doc, const char *text, Sci::Position *length) {
 	// boost::regex or std::regex version of this function should be substituted by wrapping format method of
 	// match_results for max compatibility. eg. catch group $0-$9. see detail:
-	// https://www.boost.org/doc/libs/1_83_0/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
+	// https://www.boost.org/doc/libs/1_84_0/libs/regex/doc/html/boost_regex/format/boost_format_syntax.html
 	// https://en.cppreference.com/w/cpp/regex/match_results/format
 	substituted.clear();
 	for (Sci::Position j = 0; j < *length; j++) {

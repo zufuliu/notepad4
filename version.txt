@@ -17,6 +17,9 @@ hg clone http://hg.code.sf.net/p/scintilla/scite
 5.4.1
 2023-12-27 6241:d6037a19b287
 
+Boost regex 7.0.1
+1.84 https://github.com/boostorg/regex
+
 init submodule:
 	git submodule init
 update submodule:

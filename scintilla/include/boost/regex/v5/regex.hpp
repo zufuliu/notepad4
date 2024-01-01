@@ -63,7 +63,7 @@ typedef match_results<std::wstring::const_iterator> wsmatch;
 
 //#include <boost/regex/v5/regex_match.hpp>
 #include <boost/regex/v5/regex_search.hpp>
-//#include <boost/regex/v5/regex_iterator.hpp>
+#include <boost/regex/v5/regex_iterator.hpp>
 //#include <boost/regex/v5/regex_token_iterator.hpp>
 //#include <boost/regex/v5/regex_grep.hpp>
 //#include <boost/regex/v5/regex_replace.hpp>
