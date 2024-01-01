@@ -31,7 +31,7 @@
 #define VERSION_FILEVERSION_NUM		VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD_NUM,VERSION_REV
 #define VERSION_FILEVERSION			STRINGIFY(VERSION_MAJOR) "." STRINGIFY(VERSION_MINOR) "." \
 									STRINGIFY(VERSION_BUILD) "." STRINGIFY(VERSION_REV)
-#define VERSION_LEGALCOPYRIGHT		L"\xA9 1996-2023 Florian Balmer and all contributors"
+#define VERSION_LEGALCOPYRIGHT		L"\xA9 1996-2024 Florian Balmer and all contributors"
 #define VERSION_COMPANYNAME			L"Florian Balmer et al."
 #define VERSION_WEBPAGE_DISPLAY		L"flo's freeware - https://www.flos-freeware.ch"
 #define VERSION_EMAIL_DISPLAY		L"florian.balmer@gmail.com"

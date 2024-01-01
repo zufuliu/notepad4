@@ -1051,7 +1051,7 @@ BEGIN
     LTEXT           "Copyright © 2010-2017 XhmikosR 및 모든 기여자들",IDC_STATIC,45,60,200,8
     LTEXT           "",IDC_MOD_PAGE_TEXT,45,68,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_MOD_PAGE_LINK,"SysLink",WS_TABSTOP,45,68,200,10
-    LTEXT           "Copyright © 2011-2023 Zufu Liu 및 모든 기여자들",IDC_STATIC,45,80,200,8
+    LTEXT           "Copyright © 2011-2024 Zufu Liu 및 모든 기여자들",IDC_STATIC,45,80,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,80,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,88,200,10
     LTEXT           "Florian Balmer에게 연락:",IDC_STATIC,45,100,94,8

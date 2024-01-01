@@ -263,7 +263,7 @@ BEGIN
     LTEXT           "Copyright © 1996-2012 Florian Balmer.",IDC_STATIC,45,30,200,8
     LTEXT           "",IDC_WEBPAGE_TEXT,45,40,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_WEBPAGE_LINK,"SysLink",WS_TABSTOP,45,40,200,10
-    LTEXT           "Copyright © 2011-2023 Zufu Liu and all contributors.",IDC_STATIC,45,52,200,8
+    LTEXT           "Copyright © 2011-2024 Zufu Liu and all contributors.",IDC_STATIC,45,52,200,8
     LTEXT           "",IDC_NEW_PAGE_TEXT,45,60,200,8,NOT WS_VISIBLE | WS_DISABLED
     CONTROL         "",IDC_NEW_PAGE_LINK,"SysLink",WS_TABSTOP,45,60,200,10
     LTEXT           "Florian Balmer에게 연락:",IDC_STATIC,45,72,94,8

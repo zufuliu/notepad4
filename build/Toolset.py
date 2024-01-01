@@ -1,6 +1,8 @@
 import os.path
 import glob
 import json
+import re
+import datetime
 
 toolset_msvc = """
     <PlatformToolset Condition="'$(VisualStudioVersion)'=='15.0'">v141</PlatformToolset>
@@ -42,6 +44,32 @@ def update_all_project_toolset():
 		update_project_toolset(path)
 	for path in glob.glob('../locale/*/*.vcxproj'):
 		update_project_toolset(path)
+
+def update_copyright_year(path, year):
+	with open(path, encoding='utf-8', newline='\n') as fd:
+		doc = fd.read()
+	updated = re.sub(rf'(\d{{4}}-){year - 1}', lambda m: f'{m.group(1)}{year}', doc)
+	if updated != doc:
+		print('update:', path)
+		with open(path, 'w', encoding='utf-8', newline='\n') as fp:
+			fp.write(updated)
+
+def update_all_copyright_year():
+	year = datetime.datetime.now().year
+	print('update copyright year to:', year)
+	for path in [
+		'../doc/License.txt',
+		'../metapath/doc/License.txt',
+		'../metapath/src/metapath.rc',
+		'../metapath/src/version.h',
+		'../scintilla/License.txt',
+		'../src/Notepad2.rc',
+		'../src/Version.h',
+		'../License.txt']:
+		update_copyright_year(path, year)
+
+	for path in glob.glob('../locale/*/*.rc'):
+		update_copyright_year(path, year)
 
 def dump_static_linked_function(path):
 	result = {}
@@ -155,6 +183,7 @@ def generate_compile_commands(target, avx2=False, cxx=False):
 		fd.write(json.dumps(commands, indent='\t', ensure_ascii=False))
 
 #update_all_project_toolset()
+#update_all_copyright_year()
 #dump_static_linked_function('bin/Release/x64/metapath.map')
 #dump_static_linked_function('bin/Release/x64/Notepad2.map')
 generate_compile_commands('x86_64-pc-windows-msvc', cxx=True)
