@@ -1811,8 +1811,10 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 	}
 
 	FILEOPDLGDATA fod;
-	fod.pmru = MRU_Create(MRU_KEY_COPY_MOVE_HISTORY, MRUFlags_FilePath);
+	MRULIST mru;
+	fod.pmru = &mru;
 	fod.wFunc = *wFunc;
+	MRU_Init(&mru, MRU_KEY_COPY_MOVE_HISTORY, MRUFlags_FilePath);
 	lstrcpy(fod.szSource, PathFindFileName(dli.szFileName));
 
 	const INT_PTR result = ThemedDialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_COPYMOVE), hwnd, CopyMoveDlgProc, (LPARAM)&fod);
@@ -1832,8 +1834,8 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		}
 
 		// Save item
-		MRU_Add(fod.pmru, fod.szDestination);
-		MRU_Save(fod.pmru);
+		MRU_Add(&mru, fod.szDestination);
+		MRU_Save(&mru);
 		ExpandEnvironmentStringsEx(fod.szDestination, COUNTOF(fod.szDestination));
 
 		// Double null terminated strings are essential!!!
@@ -1869,7 +1871,7 @@ bool CopyMoveDlg(HWND hwnd, UINT *wFunc) {
 		*wFunc = fod.wFunc; // save state for next call
 	}
 
-	MRU_Destroy(fod.pmru);
+	MRU_Empty(&mru, false);
 	return result == IDOK;
 }
 

@@ -264,7 +264,7 @@ RESearch::RESearch(const CharClassify *charClassTable) {
 	lineEndPos = 0;
 	sta = NOP;                  /* status of lastpat */
 	previousFlags = FindOption::None;
-	memset(nfa, 0, 4);
+	memset(nfa, END, 4);
 	memset(bittab, 0, BITBLK);
 	Clear();
 }
@@ -360,8 +360,8 @@ int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 		result = escapeValue(bsc);
 		break;
 	case 'x': {
-		const unsigned char hd1 = *(pattern + 1);
-		const unsigned char hd2 = *(pattern + 2);
+		const unsigned char hd1 = pattern[1];
+		const unsigned char hd2 = pattern[2];
 		const int hexValue = GetHexValue(hd1, hd2);
 		if (hexValue >= 0) {
 			result = hexValue;
@@ -434,7 +434,7 @@ const char *RESearch::Compile(const char *pattern, size_t length, FindOption fla
 }
 
 const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption flags) noexcept {
-	memset(nfa, 0, 4);
+	memset(nfa, END, 4);
 	memset(bittab, 0, BITBLK);
 	const bool caseSensitive = FlagSet(flags, FindOption::MatchCase);
 	const bool posix = FlagSet(flags, FindOption::Posix);
@@ -479,7 +479,7 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 
 		case '[': {               /* match char class */
 			int prevChar = 0;
-			bool negative = false;          /* xor mask -CCL/NCL */
+			bool negative = false;
 
 			i++;
 			++p;
@@ -521,15 +521,12 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 									p++;
 									int incr;
 									c2 = GetBackslashExpression(p, incr);
+									prevChar = c2;
 									i += incr;
 									p += incr;
 									if (c2 >= 0) {
 										// Convention: \c (c is any char) is case sensitive, whatever the option
 										ChSet(static_cast<unsigned char>(c2));
-										prevChar = c2;
-									} else {
-										// bittab is already changed
-										prevChar = -1;
 									}
 								}
 							}
@@ -556,15 +553,12 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					p++;
 					int incr;
 					const int c = GetBackslashExpression(p, incr);
+					prevChar = c;
 					i += incr;
 					p += incr;
 					if (c >= 0) {
 						// Convention: \c (c is any char) is case sensitive, whatever the option
 						ChSet(static_cast<unsigned char>(c));
-						prevChar = c;
-					} else {
-						// bittab is already changed
-						prevChar = -1;
 					}
 				} else {
 					prevChar = static_cast<unsigned char>(*p);
@@ -907,7 +901,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			break;
 		case REF: {
 			const int n = static_cast<uint8_t>(*ap++);
-			Sci::Position bp = bopat[n];	/* beginning of subpat... */
+			Sci::Position bp = bopat[n];		/* beginning of subpat... */
 			const Sci::Position ep = eopat[n];	/* ending of subpat...    */
 			while (bp < ep) {
 				if (ci.CharAt(bp++) != ci.CharAt(lp++))
@@ -954,7 +948,7 @@ Sci::Position RESearch::PMatch(const CharacterIndexer &ci, Sci::Position lp, Sci
 			}
 			ap += n;
 
-			Sci::Position llp = lp;	/* lazy lp for LCLO       */
+			Sci::Position llp = lp;		/* lazy lp for LCLO       */
 			Sci::Position e = NOTFOUND; /* extra pointer for CLO  */
 			while (llp >= are) {
 				const Sci::Position q = PMatch(ci, llp, endp, ap);

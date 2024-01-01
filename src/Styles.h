@@ -84,14 +84,14 @@ void	Style_Load(void);
 void	Style_Save(void);
 bool	Style_Import(HWND hwnd);
 bool	Style_Export(HWND hwnd);
-void	Style_LoadTabSettings(PEDITLEXER pLex);
-void	Style_SaveTabSettings(PEDITLEXER pLex);
-void	EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged);
+void	Style_LoadTabSettings(LPCEDITLEXER pLex);
+void	Style_SaveTabSettings(LPCEDITLEXER pLex);
+void	EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged);
 void	InitAutoCompletionCache(LPCEDITLEXER pLex);
 
 void	Style_DetectBaseFontSize(HMONITOR hMonitor);
 HFONT	Style_CreateCodeFont(UINT dpi);
-void	Style_OnDPIChanged(PEDITLEXER pLex);
+void	Style_OnDPIChanged(LPCEDITLEXER pLex);
 void	Style_OnStyleThemeChanged(int theme);
 void	Style_InitDefaultColor(void);
 void	Style_SetLexer(PEDITLEXER pLexNew, BOOL bLexerChanged);

@@ -62,8 +62,8 @@ extern int iSrcEncoding;
 extern int iWeakSrcEncoding;
 extern int iCurrentEncoding;
 
-extern LPMRULIST mruFind;
-extern LPMRULIST mruReplace;
+extern MRULIST mruFind;
+extern MRULIST mruReplace;
 
 static DStringW wchPrefixSelection;
 static DStringW wchAppendSelection;
@@ -1002,10 +1002,10 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
 	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
-	LONGLONG maxFileSize = INT64_C(0x100000000);
+	LONGLONG maxFileSize = INT64_C(4) << 30;
 #else
 	// 2 GiB: ptrdiff_t / Sci_Position used in Scintilla
-	LONGLONG maxFileSize = INT64_C(0x80000000);
+	LONGLONG maxFileSize = INT64_C(2) << 30;
 #endif
 
 	MEMORYSTATUSEX statex;
@@ -3081,17 +3081,18 @@ void EditAlignText(EditAlignMode nMode) {
 		Sci_Position iLineEndPos = SciCall_GetLineEndPosition(iLine);
 		const Sci_Position iLineIndentPos = SciCall_GetLineIndentPosition(iLine);
 
-		if (iLineIndentPos != iLineEndPos) {
-			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
-			Sci_Position iTail = iLineEndPos - 1;
-			int ch = SciCall_GetCharAt(iTail);
-			while (iTail >= iLineStart && (ch == ' ' || ch == '\t')) {
-				iTail--;
-				ch = SciCall_GetCharAt(iTail);
+		if (iLineIndentPos < iLineEndPos) {
+			while (iLineEndPos >= iLineIndentPos) {
 				iLineEndPos--;
+				const int ch = SciCall_GetCharAt(iLineEndPos);
+				if (!IsASpaceOrTab(ch)) {
+					break;
+				}
 			}
 
+			++iLineEndPos;
 			const Sci_Position iEndCol = SciCall_GetColumn(iLineEndPos);
+			const Sci_Position iIndentCol = SciCall_GetLineIndentation(iLine);
 			iMinIndent = min_pos(iMinIndent, iIndentCol);
 			iMaxLength = max_pos(iMaxLength, iEndCol);
 		}
@@ -3714,11 +3715,13 @@ void EditStripTrailingBlanks(HWND hwnd, bool bIgnoreSelection) {
 	for (Sci_Line line = 0; line < maxLines; line++) {
 		const Sci_Position lineStart = SciCall_PositionFromLine(line);
 		const Sci_Position lineEnd = SciCall_GetLineEndPosition(line);
-		Sci_Position i = lineEnd - 1;
-		int ch = SciCall_GetCharAt(i);
-		while ((i >= lineStart) && (ch == ' ' || ch == '\t')) {
+		Sci_Position i = lineEnd;
+		while (i >= lineStart) {
 			i--;
-			ch = SciCall_GetCharAt(i);
+			const int ch = SciCall_GetCharAt(i);
+			if (!IsASpaceOrTab(ch)) {
+				break;
+			}
 		}
 		i++;
 		if (i < lineEnd) {
@@ -4776,7 +4779,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		AddBackslashComboBoxSetup(hwnd, IDC_FINDTEXT);
 
 		// Load MRUs
-		MRU_AddToCombobox(mruFind, hwndFind);
+		MRU_AddToCombobox(&mruFind, hwndFind);
 
 		LPEDITFINDREPLACE lpefr = (LPEDITFINDREPLACE)lParam;
 		// don't copy selection after toggle find & replace on this window.
@@ -4794,7 +4797,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 		HWND hwndRepl = GetDlgItem(hwnd, IDC_REPLACETEXT);
 		if (hwndRepl) {
 			AddBackslashComboBoxSetup(hwnd, IDC_REPLACETEXT);
-			MRU_AddToCombobox(mruReplace, hwndRepl);
+			MRU_AddToCombobox(&mruReplace, hwndRepl);
 			ComboBox_LimitText(hwndRepl, NP2_FIND_REPLACE_LIMIT);
 			ComboBox_SetExtendedUI(hwndRepl, TRUE);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
@@ -5044,13 +5047,13 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			if (StrNotEmptyA(lpefr->szFind)) {
 				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8, COUNTOF(lpefr->szFindUTF8))) {
 					ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
-					MRU_AddMultiline(mruFind, tch);
+					MRU_AddMultiline(&mruFind, tch);
 				}
 			}
 			if (StrNotEmptyA(lpefr->szReplace)) {
 				if (GetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8, COUNTOF(lpefr->szReplaceUTF8))) {
 					ComboBox_GetText(hwndRepl, tch, COUNTOF(tch));
-					MRU_AddMultiline(mruReplace, tch);
+					MRU_AddMultiline(&mruReplace, tch);
 				}
 			} else {
 				strcpy(lpefr->szReplaceUTF8, "");
@@ -5070,8 +5073,8 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 			// Reload MRUs
 			ComboBox_ResetContent(hwndFind);
 			ComboBox_ResetContent(hwndRepl);
-			MRU_AddToCombobox(mruFind, hwndFind);
-			MRU_AddToCombobox(mruReplace, hwndRepl);
+			MRU_AddToCombobox(&mruFind, hwndFind);
+			MRU_AddToCombobox(&mruReplace, hwndRepl);
 
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_FINDTEXT, lpefr->szFindUTF8);
 			SetDlgItemTextA2W(CP_UTF8, hwnd, IDC_REPLACETEXT, lpefr->szReplaceUTF8);
@@ -5217,7 +5220,7 @@ static INT_PTR CALLBACK EditFindReplaceDlgProc(HWND hwnd, UINT umsg, WPARAM wPar
 				HWND hwndFind = GetDlgItem(hwnd, (pnmhdr->idFrom == IDC_CLEAR_FIND) ? IDC_FINDTEXT : IDC_REPLACETEXT);
 				ComboBox_GetText(hwndFind, tch, COUNTOF(tch));
 				ComboBox_ResetContent(hwndFind);
-				MRU_Empty((pnmhdr->idFrom == IDC_CLEAR_FIND) ? mruFind : mruReplace, true);
+				MRU_Empty((pnmhdr->idFrom == IDC_CLEAR_FIND) ? &mruFind : &mruReplace, true);
 				ComboBox_SetText(hwndFind, tch);
 			}
 			break;

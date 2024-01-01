@@ -5,8 +5,8 @@ Notepad2, metapath and Notepad2-mod are licensed under the BSD 3-Clause License
 https://www.flos-freeware.ch
 https://xhmikosr.github.io/notepad2-mod/
 
-metapath Copyright © 1996-2012 Florian Balmer, 2011-2023 Zufu Liu and All contributors.
-Notepad2 Copyright © 2004-2012 Florian Balmer, 2011-2023 Zufu Liu and All contributors.
+metapath Copyright © 1996-2012 Florian Balmer, 2011-2024 Zufu Liu and All contributors.
+Notepad2 Copyright © 2004-2012 Florian Balmer, 2011-2024 Zufu Liu and All contributors.
 Notepad2-mod Copyright © 2010-2017 XhmikosR and All contributors.
 All rights reserved.
 
@@ -45,7 +45,7 @@ License for Lexilla, Scintilla, and SciTE
 https://www.scintilla.org/
 https://www.scintilla.org/License.txt
 
-Copyright 1998-2023 by Neil Hodgson <neilh@scintilla.org>
+Copyright 1998-2024 by Neil Hodgson <neilh@scintilla.org>
 
 All Rights Reserved
 
@@ -229,7 +229,7 @@ https://github.com/JuliaLang/julia/blob/master/LICENSE.md
 
 The Julia language is licensed under the MIT License. The "language" consists of the compiler (the contents of src/), most of the standard library (base/), and some utilities (most of the rest of the files in this repository). See below for exceptions.
 
-    Copyright (c) 2009-2023: Jeff Bezanson, Stefan Karpinski, Viral B. Shah, and other contributors:
+    Copyright (c) 2009-2024: Jeff Bezanson, Stefan Karpinski, Viral B. Shah, and other contributors:
 
     https://github.com/JuliaLang/julia/contributors
 

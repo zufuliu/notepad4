@@ -1,11 +1,12 @@
 ---
 # https://clang.llvm.org/extra/clang-tidy/index.html
 # https://clang.llvm.org/extra/clang-tidy/checks/list.html
+# --enable-check-profile
+# Checks: -*,clang-diagnostic-*,
 Checks: >
     clang-diagnostic-*,
     clang-analyzer-*,
     bugprone-*,
-    cert-*,
     cppcoreguidelines-slicing,
     modernize-*,
     performance-*,
@@ -13,6 +14,7 @@ Checks: >
     misc-*,
     -clang-analyzer-security.insecureAPI.strcpy,
     -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+    -clang-analyzer-optin.core.EnumCastOutOfRange,
     -bugprone-easily-swappable-parameters,
     -bugprone-implicit-widening-of-multiplication-result,
     -bugprone-narrowing-conversions,
@@ -22,6 +24,7 @@ Checks: >
     -modernize-macro-to-enum,
     -modernize-redundant-void-arg,
     -modernize-use-nodiscard,
+    -modernize-use-std-numbers,
     -modernize-use-trailing-return-type,
     -modernize-use-using,
     -performance-enum-size,
@@ -45,6 +48,8 @@ Checks: >
 #     -readability-else-after-return,
 #     -readability-named-parameter,
 #     -readability-simplify-boolean-expr,
+#     -bugprone-reserved-identifier,
+#     -misc-const-correctness,
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'

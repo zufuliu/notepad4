@@ -602,7 +602,7 @@ void Style_ReleaseResources(void) {
 	}
 }
 
-static inline bool IsStyleLoaded(PEDITLEXER pLex) {
+static inline bool IsStyleLoaded(LPCEDITLEXER pLex) {
 	return pLex->iStyleTheme == np2StyleTheme && pLex->szStyleBuf != NULL;
 }
 
@@ -614,7 +614,7 @@ static inline void FindDarkThemeFile(void) {
 	FindExtraIniFile(darkStyleThemeFilePath, L"Notepad2 DarkTheme.ini", L"DarkTheme.ini");
 }
 
-void Style_LoadTabSettings(PEDITLEXER pLex) {
+void Style_LoadTabSettings(LPCEDITLEXER pLex) {
 	LPCWSTR lpSection = pLex->pszName;
 	const UINT lexerAttr = pLex->lexerAttr;
 	int iValue = IniGetInt(lpSection, L"TabWidth", pLex->defaultTabWidth);
@@ -625,7 +625,7 @@ void Style_LoadTabSettings(PEDITLEXER pLex) {
 	tabSettings.schemeUseGlobalTabSettings = IniGetInt(lpSection, L"UseGlobalTabSettings", LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
 
-void Style_SaveTabSettings(PEDITLEXER pLex) {
+void Style_SaveTabSettings(LPCEDITLEXER pLex) {
 	LPCWSTR lpSection = pLex->pszName;
 	const UINT lexerAttr = pLex->lexerAttr;
 	IniSetIntEx(lpSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
@@ -634,7 +634,7 @@ void Style_SaveTabSettings(PEDITLEXER pLex) {
 	IniSetBoolEx(lpSection, L"UseGlobalTabSettings", tabSettings.schemeUseGlobalTabSettings, LexerAttr_GetGlobalTabSettings(lexerAttr));
 }
 
-static inline void SaveLexTabSettings(IniSectionOnSave *pIniSection, PEDITLEXER pLex) {
+static inline void SaveLexTabSettings(IniSectionOnSave *pIniSection, LPCEDITLEXER pLex) {
 	const UINT lexerAttr = pLex->lexerAttr;
 	IniSectionSetIntEx(pIniSection, L"TabWidth", tabSettings.schemeTabWidth, pLex->defaultTabWidth);
 	IniSectionSetIntEx(pIniSection, L"IndentWidth", tabSettings.schemeIndentWidth, pLex->defaultIndentWidth);
@@ -1132,7 +1132,7 @@ static inline int ScaleStylePixel(int value, int scale, int minValue) {
 	SC_MARKNUM_FOLDERMIDTAIL, 0)
 
 // styles depend on current DPI or zoom level.
-void Style_OnDPIChanged(PEDITLEXER pLex) {
+void Style_OnDPIChanged(LPCEDITLEXER pLex) {
 	const int scale = g_uCurrentDPI*iZoomLevel;
 
 	// whitespace dot size
@@ -1319,7 +1319,7 @@ void Style_InitDefaultColor(void) {
 	}
 }
 
-LPCWSTR Style_FindStyleValue(PEDITLEXER pLex, UINT style) {
+LPCWSTR Style_FindStyleValue(LPCEDITLEXER pLex, UINT style) {
 	const UINT iStyleCount = pLex->iStyleCount;
 	// first style is the default style.
 	for (UINT i = 1; i < iStyleCount; i++) {
@@ -2260,7 +2260,7 @@ LPCWSTR Style_GetCurrentLexerName(LPWSTR lpszName, int cchName) {
 	return pLexCurrent->pszName;
 }
 
-static void Style_UpdateLexerLang(PEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpszName) {
+static void Style_UpdateLexerLang(LPCEDITLEXER pLex, LPCWSTR lpszExt, LPCWSTR lpszName) {
 	switch (pLex->rid) {
 	case NP2LEX_BASH:
 		if (StrCaseEqual(L"m4", lpszExt) || StrCaseEqual(L"ac", lpszExt)) {
@@ -3758,7 +3758,7 @@ int Style_GetLexerIconId(LPCEDITLEXER pLex, DWORD iconFlags) {
 //
 // Style_AddLexerToTreeView()
 //
-HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, HTREEITEM hParent, HTREEITEM hInsertAfter, bool withStyles) {
+HTREEITEM Style_AddLexerToTreeView(HWND hwnd, LPCEDITLEXER pLex, DWORD iconFlags, HTREEITEM hParent, HTREEITEM hInsertAfter, bool withStyles) {
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME || NP2_ENABLE_LOCALIZE_STYLE_NAME
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
@@ -3818,7 +3818,7 @@ HTREEITEM Style_AddLexerToTreeView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags, 
 //
 // Style_AddLexerToListView()
 //
-void Style_AddLexerToListView(HWND hwnd, PEDITLEXER pLex, DWORD iconFlags) {
+void Style_AddLexerToListView(HWND hwnd, LPCEDITLEXER pLex, DWORD iconFlags) {
 #if NP2_ENABLE_LOCALIZE_LEXER_NAME
 	WCHAR tch[MAX_EDITLEXER_NAME_SIZE];
 #endif
@@ -3884,12 +3884,12 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 
 	// all general schemes
 	PEDITLEXER generalLex[GENERAL_LEXER_COUNT];
-	memcpy(generalLex, pLexArray + LEXER_INDEX_GENERAL, sizeof(generalLex));
-	qsort(generalLex, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
+	memcpy(NP2_void_pointer(generalLex), NP2_void_pointer(pLexArray + LEXER_INDEX_GENERAL), sizeof(generalLex));
+	qsort(NP2_void_pointer(generalLex), GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByName);
 
 	iLexer = 0;
 	while (iLexer < GENERAL_LEXER_COUNT) {
-		PEDITLEXER pLex = generalLex[iLexer++];
+		LPCEDITLEXER pLex = generalLex[iLexer++];
 		int count = 1;
 		const int group = Lexer_GetSchemeGroup(pLex);
 		while (iLexer < GENERAL_LEXER_COUNT && group == Lexer_GetSchemeGroup(generalLex[iLexer])) {
@@ -3970,7 +3970,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 		if (group <= SchemeGroup_Favorite) {
 			HTREEITEM hTreeNode = TVI_FIRST;
 			for (int j = 0; j < count; j++) {
-				PEDITLEXER pLex = pLexArray[iLexer++];
+				LPCEDITLEXER pLex = pLexArray[iLexer++];
 				hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hParent, hTreeNode, withStyles);
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
@@ -3995,7 +3995,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 		} else {
 			HTREEITEM hTreeNode = TVI_FIRST;
 			for (int j = 0; j < count; j++) {
-				PEDITLEXER pLex = generalLex[iLexer++];
+				LPCEDITLEXER pLex = generalLex[iLexer++];
 				hTreeNode = Style_AddLexerToTreeView(hwndTV, pLex, iconFlags, hParent, hTreeNode, withStyles);
 				if (hSelNode == NULL && pLex == pLexCurrent) {
 					hSelNode = hTreeNode;
@@ -4017,7 +4017,7 @@ static HTREEITEM Style_AddAllLexerToTreeView(HWND hwndTV, bool withStyles, bool 
 	return hFavoriteNode;
 }
 
-static void Style_ResetStyle(PEDITLEXER pLex, PEDITSTYLE pStyle) {
+static void Style_ResetStyle(LPCEDITLEXER pLex, PEDITSTYLE pStyle) {
 	if (np2StyleTheme != StyleTheme_Default) {
 		// reload style from external file
 		LPCWSTR themePath = GetStyleThemeFilePath();
@@ -4852,7 +4852,7 @@ static void Style_GetFavoriteSchemesFromTreeView(HWND hwndTV, HTREEITEM hFavorit
 		wch[len] = L'\0';
 	}
 
-	qsort(pLexArray + LEXER_INDEX_GENERAL, GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByOrder);
+	qsort(NP2_void_pointer(pLexArray + LEXER_INDEX_GENERAL), GENERAL_LEXER_COUNT, sizeof(PEDITLEXER), CmpEditLexerByOrder);
 }
 
 //=============================================================================

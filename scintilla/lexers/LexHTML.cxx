@@ -1180,7 +1180,9 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 				state = SCE_HJ_DEFAULT;
 			} else if (state != SCE_HJ_TEMPLATELITERAL && IsEOLChar(ch)) {
 				styler.ColorTo(i, StateToPrint);
-				state = SCE_HJ_STRINGEOL;
+				if (chPrev != '\\' && (chPrev2 != '\\' || chPrev != '\r' || ch != '\n')) {
+					state = SCE_HJ_STRINGEOL;
+				}
 			}
 			break;
 		case SCE_HJ_STRINGEOL:

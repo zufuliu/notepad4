@@ -2268,8 +2268,7 @@ void DrawFoldLines(Surface *surface, const EditModel &model, const ViewStyle &vs
 		const ColourRGBA foldLineColour = vsDraw.ElementColour(Element::FoldLine).value_or(
 			vsDraw.markers[static_cast<int>(MarkerOutline::Folder)].fore);
 		// Paint the line above the fold
-		// Paint the line above the fold
-		if ((subLine == 0) && FlagSet(model.foldFlags, (expanded ? FoldFlag::LineBeforeContracted : FoldFlag::LineBeforeExpanded))) {
+		if ((subLine == 0) && FlagSet(model.foldFlags, (expanded ? FoldFlag::LineBeforeExpanded : FoldFlag::LineBeforeContracted))) {
 			surface->FillRectangleAligned(Side(rcLine, Edge::top, 1.0), foldLineColour);
 		}
 		// Paint the line below the fold

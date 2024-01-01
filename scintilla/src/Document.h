@@ -98,11 +98,10 @@ class RegexSearchBase {
 public:
 	virtual ~RegexSearchBase() = default;
 
-	virtual Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern,
-		Scintilla::FindOption flags, Sci::Position *length) = 0;
+	virtual Sci::Position FindText(const Document *doc, Sci::Position minPos, Sci::Position maxPos, const char *pattern, Scintilla::FindOption flags, Sci::Position *length) = 0;
 
 	///@return String with the substitutions, must remain valid until the next call or destruction
-	virtual const char *SubstituteByPosition(Document *doc, const char *text, Sci::Position *length) = 0;
+	virtual const char *SubstituteByPosition(const Document *doc, const char *text, Sci::Position *length) = 0;
 };
 
 /// Factory function for RegexSearchBase
@@ -255,7 +254,7 @@ struct CharacterExtracted {
 
 /**
  */
-class Document : PerLine, public Scintilla::IDocument, public Scintilla::ILoader {
+class Document : PerLine, public Scintilla::IDocument, public Scintilla::ILoader, public Scintilla::IDocumentEditable {
 
 public:
 	/** Used to pair watcher pointer with user data. */
@@ -317,6 +316,8 @@ public:
 	int actualIndentInChars;
 	bool useTabs;
 	bool tabIndents;
+	uint8_t forwardSafeChar;
+	uint8_t backwardSafeChar;
 	uint8_t backspaceUnindents;
 	ActionDuration durationStyleOneUnit;
 
@@ -330,7 +331,7 @@ public:
 	Document &operator=(Document &&) = delete;
 	~Document() override;
 
-	int AddRef() noexcept;
+	int SCI_METHOD AddRef() noexcept override;
 	int SCI_METHOD Release() noexcept override;
 
 	// From PerLine
@@ -352,6 +353,9 @@ public:
 
 	int SCI_METHOD Version() const noexcept override {
 		return Scintilla::dvRelease4;
+	}
+	int SCI_METHOD DEVersion() const noexcept override {
+		return Scintilla::deRelease0;
 	}
 
 	void SCI_METHOD SetErrorStatus(int status) noexcept override;
@@ -396,6 +400,9 @@ public:
 	Sci::Position InsertString(Sci::Position position, std::string_view sv);
 	void ChangeInsertion(const char *s, Sci::Position length);
 	int SCI_METHOD AddData(const char *data, Sci_Position length) override;
+	IDocumentEditable *AsDocumentEditable() noexcept {
+		return this;
+	}
 	void * SCI_METHOD ConvertToDocument() noexcept override;
 	Sci::Position Undo();
 	Sci::Position Redo();

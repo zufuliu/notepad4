@@ -43,7 +43,7 @@ constexpr bool InsertionSpanSameDeletion(const ChangeSpan &is, Sci::Position pos
 		is.start == positionDeletion &&
 		is.length == 0 &&
 		is.edition == edition;
-};
+}
 
 }
 

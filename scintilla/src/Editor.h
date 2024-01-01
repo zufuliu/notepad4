@@ -542,8 +542,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	/** PositionInSelection returns true if position in selection. */
 	bool PositionInSelection(Sci::Position pos) const noexcept;
 	bool SCICALL PointInSelection(Point pt);
+	ptrdiff_t SCICALL SelectionFromPoint(Point pt);
 	bool SCICALL PointInSelMargin(Point pt) const noexcept;
 	Window::Cursor GetMarginCursor(Point pt) const noexcept;
+	void DropSelection(size_t part) noexcept;
 	void TrimAndSetSelection(Sci::Position currentPos_, Sci::Position anchor_);
 	void LineSelection(Sci::Position lineCurrentPos_, Sci::Position lineAnchorPos_, bool wholeLine);
 	void WordSelection(Sci::Position pos);
@@ -565,6 +567,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	virtual bool SetIdle(bool) noexcept {
 		return false;
 	}
+	void ChangeMouseCapture(bool on) noexcept;
 	virtual void SetMouseCapture(bool on) noexcept = 0;
 	virtual bool HaveMouseCapture() const noexcept = 0;
 	void SetFocusState(bool focusState);
@@ -630,6 +633,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void StyleSetMessage(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
 	Scintilla::sptr_t StyleGetMessage(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam);
 	void SetSelectionNMessage(Scintilla::Message iMessage, Scintilla::uptr_t wParam, Scintilla::sptr_t lParam) noexcept;
+	void SetSelectionMode(uptr_t wParam, bool setMoveExtends);
 
 	// Coercion functions for transforming WndProc parameters into pointers
 	static void *PtrFromSPtr(Scintilla::sptr_t lParam) noexcept {

@@ -121,6 +121,7 @@ struct SelectionRange {
 	bool Contains(Sci::Position pos) const noexcept;
 	bool Contains(SelectionPosition sp) const noexcept;
 	bool ContainsCharacter(Sci::Position posCharacter) const noexcept;
+	bool ContainsCharacter(SelectionPosition spCharacter) const noexcept;
 	SelectionSegment Intersect(SelectionSegment check) const noexcept;
 	SelectionPosition Start() const noexcept {
 		return (anchor < caret) ? anchor : caret;
@@ -150,7 +151,7 @@ public:
 	};
 	SelTypes selType;
 
-	Selection() noexcept;
+	Selection();
 	bool IsRectangular() const noexcept;
 	Sci::Position MainCaret() const noexcept;
 	Sci::Position MainAnchor() const noexcept;
@@ -176,18 +177,18 @@ public:
 	void MovePositions(bool insertion, Sci::Position startChange, Sci::Position length) noexcept;
 	void TrimSelection(SelectionRange range) noexcept;
 	void TrimOtherSelections(size_t r, SelectionRange range) noexcept;
-	void SetSelection(SelectionRange range);
+	void SetSelection(SelectionRange range) noexcept;
 	void AddSelection(SelectionRange range);
 	void AddSelectionWithoutTrim(SelectionRange range);
 	void DropSelection(size_t r) noexcept;
-	void DropAdditionalRanges();
+	void DropAdditionalRanges() noexcept;
 	void TentativeSelection(SelectionRange range);
 	void CommitTentative() noexcept;
 	InSelection RangeType(size_t r) const noexcept;
 	InSelection CharacterInSelection(Sci::Position posCharacter) const noexcept;
 	InSelection InSelectionForEOL(Sci::Position pos) const noexcept;
 	Sci::Position VirtualSpaceFor(Sci::Position pos) const noexcept;
-	void Clear();
+	void Clear() noexcept;
 	void Reset() noexcept;
 	void RemoveDuplicates() noexcept;
 	void RotateMain() noexcept;

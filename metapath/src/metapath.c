@@ -526,7 +526,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			DirList_Destroy(hwndDirList);
 			DragAcceptFiles(hwnd, FALSE);
 
-			History_Uninit(&mHistory);
+			History_Empty(&mHistory);
 
 			SaveSettings(false);
 

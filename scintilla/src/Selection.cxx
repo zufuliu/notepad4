@@ -124,6 +124,13 @@ bool SelectionRange::ContainsCharacter(Sci::Position posCharacter) const noexcep
 		return (posCharacter >= anchor.Position()) && (posCharacter < caret.Position());
 }
 
+bool SelectionRange::ContainsCharacter(SelectionPosition spCharacter) const noexcept {
+	if (anchor > caret)
+		return (spCharacter >= caret) && (spCharacter < anchor);
+	else
+		return (spCharacter >= anchor) && (spCharacter < caret);
+}
+
 SelectionSegment SelectionRange::Intersect(SelectionSegment check) const noexcept {
 	const SelectionSegment inOrder(caret, anchor);
 	if ((inOrder.start <= check.end) || (inOrder.end >= check.start)) {
@@ -191,7 +198,7 @@ void SelectionRange::MinimizeVirtualSpace() noexcept {
 	}
 }
 
-Selection::Selection() noexcept : mainRange(0), moveExtends(false), tentativeMain(false), selType(SelTypes::stream) {
+Selection::Selection() : mainRange(0), moveExtends(false), tentativeMain(false), selType(SelTypes::stream) {
 	AddSelection(SelectionRange(SelectionPosition(0)));
 }
 
@@ -212,16 +219,13 @@ SelectionRange& Selection::Rectangular() noexcept {
 }
 
 SelectionSegment Selection::Limits() const noexcept {
-	if (ranges.empty()) {
-		return SelectionSegment();
-	} else {
-		SelectionSegment sr(ranges[0].anchor, ranges[0].caret);
-		for (size_t i = 1; i < ranges.size(); i++) {
-			sr.Extend(ranges[i].anchor);
-			sr.Extend(ranges[i].caret);
-		}
-		return sr;
+	PLATFORM_ASSERT(!ranges.empty());
+	SelectionSegment sr(ranges[0].anchor, ranges[0].caret);
+	for (size_t i = 1; i < ranges.size(); i++) {
+		sr.Extend(ranges[i].anchor);
+		sr.Extend(ranges[i].caret);
 	}
+	return sr;
 }
 
 SelectionSegment Selection::LimitsForRectangularElseMain() const noexcept {
@@ -337,10 +341,12 @@ void Selection::TrimOtherSelections(size_t r, SelectionRange range) noexcept {
 	}
 }
 
-void Selection::SetSelection(SelectionRange range) {
-	ranges.clear();
-	ranges.push_back(range);
-	mainRange = ranges.size() - 1;
+void Selection::SetSelection(SelectionRange range) noexcept {
+	if (ranges.size() > 1) {
+		ranges.erase(ranges.begin() + 1, ranges.end());
+	}
+	ranges[0] = range;
+	mainRange = 0;
 }
 
 void Selection::AddSelection(SelectionRange range) {
@@ -369,7 +375,7 @@ void Selection::DropSelection(size_t r) noexcept {
 	}
 }
 
-void Selection::DropAdditionalRanges() {
+void Selection::DropAdditionalRanges() noexcept {
 	SetSelection(RangeMain());
 }
 
@@ -419,10 +425,11 @@ Sci::Position Selection::VirtualSpaceFor(Sci::Position pos) const noexcept {
 	return virtualSpace;
 }
 
-void Selection::Clear() {
-	ranges.clear();
-	ranges.emplace_back();
-	mainRange = ranges.size() - 1;
+void Selection::Clear() noexcept {
+	if (ranges.size() > 1) {
+		ranges.erase(ranges.begin() + 1, ranges.end());
+	}
+	mainRange = 0;
 	selType = SelTypes::stream;
 	moveExtends = false;
 	ranges[mainRange].Reset();
@@ -457,4 +464,3 @@ void Selection::RemoveDuplicates() noexcept {
 void Selection::RotateMain() noexcept {
 	mainRange = (mainRange + 1) % ranges.size();
 }
-

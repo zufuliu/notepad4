@@ -252,9 +252,10 @@ static LPWSTR lpFileArg = NULL;
 static LPWSTR lpSchemeArg = NULL;
 static LPWSTR lpMatchArg = NULL;
 static LPWSTR lpEncodingArg = NULL;
-LPMRULIST	pFileMRU;
-LPMRULIST	mruFind;
-LPMRULIST	mruReplace;
+MRULIST mruFile;
+MRULIST mruFind;
+MRULIST mruReplace;
+static BitmapCache bitmapCache;
 
 DWORD	dwLastIOError;
 WCHAR	szCurFile[MAX_PATH + 40];
@@ -1151,15 +1152,10 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 			// call SaveSettings() when hwndToolbar is still valid
 			SaveSettings(false);
 
-			if (StrNotEmpty(szIniFile)) {
-				// Cleanup unwanted MRU's
-				MRU_MergeSave(pFileMRU, bSaveRecentFiles);
-				MRU_Destroy(pFileMRU);
-				MRU_MergeSave(mruFind, bSaveFindReplace);
-				MRU_Destroy(mruFind);
-				MRU_MergeSave(mruReplace, bSaveFindReplace);
-				MRU_Destroy(mruReplace);
-			}
+			MRU_MergeSave(&mruFile, bSaveRecentFiles);
+			MRU_MergeSave(&mruFind, bSaveFindReplace);
+			MRU_MergeSave(&mruReplace, bSaveFindReplace);
+			BitmapCache_Empty(&bitmapCache);
 
 			// Remove tray icon if necessary
 			ShowNotifyIcon(hwnd, false);
@@ -1208,12 +1204,14 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SETTINGCHANGE:
+		BitmapCache_Invalidate(&bitmapCache);
 		// TODO: detect system theme and high contrast mode changes
 		SendMessage(hwndEdit, WM_SETTINGCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
 		break;
 
 	case WM_SYSCOLORCHANGE:
+		BitmapCache_Invalidate(&bitmapCache);
 		SendMessage(hwndToolbar, WM_SYSCOLORCHANGE, wParam, lParam);
 		SendMessage(hwndEdit, WM_SYSCOLORCHANGE, wParam, lParam);
 		Style_SetLexer(pLexCurrent, false); // override base elements
@@ -1951,10 +1949,10 @@ LRESULT MsgCreate(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	DragAcceptFiles(hwnd, TRUE);
 
 	// File MRU
-	int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
-	pFileMRU = MRU_Create(MRU_KEY_RECENT_FILES, flags);
-	mruFind = MRU_Create(MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
-	mruReplace = MRU_Create(MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
+	const int flags = MRUFlags_FilePath | (((int)flagRelativeFileMRU) * MRUFlags_RelativePath) | (((int)flagPortableMyDocs) * MRUFlags_PortableMyDocs);
+	MRU_Init(&mruFile, MRU_KEY_RECENT_FILES, flags);
+	MRU_Init(&mruFind, MRU_KEY_RECENT_FIND, MRUFlags_QuoteValue);
+	MRU_Init(&mruReplace, MRU_KEY_RECENT_REPLACE, MRUFlags_QuoteValue);
 	return 0;
 }
 
@@ -2143,6 +2141,7 @@ void MsgDPIChanged(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	const Sci_Line iVisTopLine = SciCall_GetFirstVisibleLine();
 	const Sci_Line iDocTopLine = SciCall_DocLineFromVisible(iVisTopLine);
 
+	BitmapCache_Invalidate(&bitmapCache);
 	// recreate toolbar and statusbar
 	RecreateBars(hwnd, g_hInstance);
 	const int cx = rc->right - rc->left;
@@ -2449,7 +2448,7 @@ void MsgInitMenu(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	i = IDM_LINEENDINGS_CRLF + iCurrentEOLMode;
 	CheckMenuRadioItem(hmenu, IDM_LINEENDINGS_CRLF, IDM_LINEENDINGS_LF, i, MF_BYCOMMAND);
 
-	EnableCmd(hmenu, IDM_FILE_RECENT, (pFileMRU->iSize > 0));
+	EnableCmd(hmenu, IDM_FILE_RECENT, (mruFile.iSize > 0));
 
 	EnableCmd(hmenu, IDM_EDIT_UNDO, SciCall_CanUndo());
 	EnableCmd(hmenu, IDM_EDIT_REDO, SciCall_CanRedo());
@@ -3022,7 +3021,7 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	break;
 
 	case IDM_FILE_RECENT:
-		if (pFileMRU->iSize > 0) {
+		if (mruFile.iSize > 0) {
 			if (FileSave(FileSaveFlag_Ask)) {
 				WCHAR tchFile[MAX_PATH];
 				if (FileMRUDlg(hwnd, tchFile)) {
@@ -5005,9 +5004,14 @@ LRESULT MsgCommand(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 	default: {
 		const UINT index = LOWORD(wParam) - IDM_RECENT_HISTORY_START;
 		if (index < MRU_MAXITEMS) {
-			LPCWSTR path = pFileMRU->pszItems[index];
+			LPCWSTR path = mruFile.pszItems[index];
 			if (path) {
-				if (FileSave(FileSaveFlag_Ask)) {
+				if (!PathIsFile(path)) {
+					if (IDYES == MsgBoxWarn(MB_YESNO, IDS_ERR_MRUDLG)) {
+						MRU_DeleteFileFromStore(&mruFile, path);
+						MRU_Delete(&mruFile, index);
+					}
+				} else if (FileSave(FileSaveFlag_Ask)) {
 					FileLoad(FileLoadFlag_DontSave, path);
 				}
 			}
@@ -5340,14 +5344,21 @@ LRESULT MsgNotify(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 			HMENU subMenu = NULL;
 			if (lpTbNotify->iItem == IDT_FILE_OPEN) {
 				NP2_static_assert(IDM_RECENT_HISTORY_START + MRU_MAXITEMS == IDM_RECENT_HISTORY_END);
-				const int count = pFileMRU->iSize;
-				if (count <= 0) {
+				if (mruFile.iSize <= 0) {
 					return TBDDRET_TREATPRESSED;
 				}
 				hmenu = subMenu = CreatePopupMenu();
-				for (int i = 0; i < count; i++) {
-					LPCWSTR path = pFileMRU->pszItems[i];
-					AppendMenu(subMenu, MF_STRING, i + IDM_RECENT_HISTORY_START, path);
+				BitmapCache_StartUse(&bitmapCache);
+				MENUITEMINFO mii;
+				mii.cbSize = sizeof(MENUITEMINFO);
+				mii.fMask = MIIM_ID | MIIM_STRING | MIIM_BITMAP;
+				for (int i = 0; i < mruFile.iSize; i++) {
+					LPCWSTR path = mruFile.pszItems[i];
+					HBITMAP hbmp = BitmapCache_Get(&bitmapCache, path);
+					mii.wID = i + IDM_RECENT_HISTORY_START;
+					mii.dwTypeData = (LPWSTR)path;
+					mii.hbmpItem = hbmp;
+					InsertMenuItem(subMenu, i, TRUE, &mii);
 				}
 			} else {
 				hmenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_POPUPMENU));
@@ -7204,7 +7215,7 @@ void UpdateStatusbar(void) {
 		tchSelChar, tchSelByte, tchLinesSelected, tchMatchesCount);
 
 	LPCWSTR items[StatusItem_ItemCount];
-	memset((void *)(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
+	memset(NP2_void_pointer(&items[0]), 0, StatusItem_Lexer * sizeof(LPCWSTR));
 	LPWSTR start = itemText;
 	UINT index = 0;
 	for (int i = 0; i < len; i++) {
@@ -7220,7 +7231,7 @@ void UpdateStatusbar(void) {
 	}
 
 	items[index] = start;
-	memcpy((void *)(&items[StatusItem_Lexer]), &cachedStatusItem.pszLexerName, (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
+	memcpy(NP2_void_pointer(&items[StatusItem_Lexer]), NP2_void_pointer(&cachedStatusItem.pszLexerName), (StatusItem_Zoom - StatusItem_Lexer)*sizeof(LPCWSTR));
 	items[StatusItem_Zoom] = cachedStatusItem.tchZoom;
 	items[StatusItem_DocSize] = tchDocSize;
 
@@ -7569,7 +7580,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			UpdateLineNumberWidth();
 		}
 
-		MRU_Add(pFileMRU, szFileName);
+		MRU_Add(&mruFile, szFileName);
 		if (flagUseSystemMRU == TripleBoolean_True) {
 			SHAddToRecentDocs(SHARD_PATHW, szFileName);
 		}
@@ -7779,7 +7790,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 		if (!(saveFlag & FileSaveFlag_SaveCopy)) {
 			bDocumentModified = false;
 			iOriginalEncoding = iCurrentEncoding;
-			MRU_Add(pFileMRU, szCurFile);
+			MRU_Add(&mruFile, szCurFile);
 			if (flagUseSystemMRU == TripleBoolean_True) {
 				SHAddToRecentDocs(SHARD_PATHW, szCurFile);
 			}
@@ -7809,7 +7820,7 @@ bool FileSave(FileSaveFlag saveFlag) {
 	return fSuccess;
 }
 
-void EditApplyDefaultEncoding(PEDITLEXER pLex, BOOL bLexerChanged) {
+void EditApplyDefaultEncoding(LPCEDITLEXER pLex, BOOL bLexerChanged) {
 	int iEncoding;
 	int iEOLMode;
 	switch (pLex->rid) {
@@ -7887,8 +7898,8 @@ void SetupInitialOpenSaveDir(LPWSTR tchInitialDir, DWORD cchInitialDir, LPCWSTR 
 			PathAppend(tchModule, tchInitialDir);
 			PathCanonicalize(tchInitialDir, tchModule);
 		}
-	} else if (StrNotEmpty(pFileMRU->pszItems[0])) {
-		lstrcpy(tchInitialDir, pFileMRU->pszItems[0]);
+	} else if (StrNotEmpty(mruFile.pszItems[0])) {
+		lstrcpy(tchInitialDir, mruFile.pszItems[0]);
 		PathRemoveFileSpec(tchInitialDir);
 	} else {
 		lstrcpy(tchInitialDir, g_wchWorkingDirectory);
@@ -8772,7 +8783,7 @@ void AutoSave_Stop(BOOL keepBackup) {
 		}
 
 		autoSaveCount = 0;
-		memset(autoSavePathList, 0, sizeof(LPWSTR) * AllAutoSaveCount);
+		memset(NP2_void_pointer(autoSavePathList), 0, sizeof(LPWSTR) * AllAutoSaveCount);
 	}
 }
 
@@ -8925,7 +8936,7 @@ void AutoSave_DoWork(FileSaveFlag saveFlag) {
 				}
 				LocalFree(old);
 			}
-			memmove(autoSavePathList, autoSavePathList + 1, (AllAutoSaveCount - 1) * sizeof(LPWSTR));
+			memmove(NP2_void_pointer(autoSavePathList), NP2_void_pointer(autoSavePathList + 1), (AllAutoSaveCount - 1) * sizeof(LPWSTR));
 			autoSavePathList[AllAutoSaveCount - 1] = NULL;
 			--autoSaveCount;
 		}

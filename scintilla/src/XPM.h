@@ -15,9 +15,9 @@ class XPM final {
 	int height = 1;
 	int width = 1;
 	int nColours = 1;
+	int codeTransparent = ' ';
 	std::vector<unsigned char> pixels;
 	ColourRGBA colourCodeTable[256];
-	char codeTransparent = ' ';
 	ColourRGBA ColourFromCode(int ch) const noexcept;
 	void FillRun(Surface *surface, int code, int startX, int y, int x) const;
 public:

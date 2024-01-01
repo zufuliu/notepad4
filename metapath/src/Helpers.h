@@ -580,7 +580,7 @@ typedef struct HISTORY {
 typedef const HISTORY *LCPHISTORY;
 
 void History_Init(PHISTORY ph);
-void History_Uninit(PHISTORY ph);
+void History_Empty(PHISTORY ph);
 bool History_Add(PHISTORY ph, LPCWSTR pszNew);
 bool History_Forward(PHISTORY ph, LPWSTR pszItem, int cItem);
 bool History_Back(PHISTORY ph, LPWSTR pszItem, int cItem);
@@ -608,8 +608,7 @@ typedef struct MRULIST {
 
 typedef const MRULIST *LPCMRULIST;
 
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags);
-void MRU_Destroy(LPMRULIST pmru);
+void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags);
 void MRU_Add(LPMRULIST pmru, LPCWSTR pszNew);
 void MRU_Delete(LPMRULIST pmru, int iIndex);
 void MRU_Empty(LPMRULIST pmru, bool save);

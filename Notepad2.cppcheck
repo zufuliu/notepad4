@@ -2,10 +2,14 @@
 <project version="1">
     <platform>win64</platform>
     <importproject>build/VS2017/Notepad2.sln</importproject>
-    <analyze-all-vs-configs>true</analyze-all-vs-configs>
+    <analyze-all-vs-configs>false</analyze-all-vs-configs>
     <check-headers>true</check-headers>
     <check-unused-templates>false</check-unused-templates>
     <max-ctu-depth>10</max-ctu-depth>
+    <max-template-recursion>100</max-template-recursion>
+    <vs-configurations>
+        <config>Release</config>
+    </vs-configurations>
     <libraries>
         <library>windows</library>
     </libraries>

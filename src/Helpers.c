@@ -1801,10 +1801,10 @@ bool PathGetLnkPath(LPCWSTR pszLnkFile, LPWSTR pszResPath) {
 	tchPath[0] = L'\0';
 
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			if (SUCCEEDED(ppf->Load(pszLnkFile, STGM_READ))) {
 				hr = psl->GetPath(tchPath, COUNTOF(tchPath), nullptr, 0);
 			}
@@ -1897,10 +1897,10 @@ bool PathCreateDeskLnk(LPCWSTR pszDocument) {
 	IShellLink *psl;
 	bool bSucceeded = false;
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			psl->SetPath(tchExeFile);
 			psl->SetArguments(tchArguments);
 			psl->SetDescription(tchDescription);
@@ -1959,10 +1959,10 @@ bool PathCreateFavLnk(LPCWSTR pszName, LPCWSTR pszTarget, LPCWSTR pszDir) {
 	IShellLink *psl;
 	bool bSucceeded = false;
 #if defined(__cplusplus)
-	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID *)(&psl)))) {
+	if (SUCCEEDED(CoCreateInstance(IID_IShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLink, reinterpret_cast<LPVOID *>(&psl)))) {
 		IPersistFile *ppf;
 
-		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, (void **)(&ppf)))) {
+		if (SUCCEEDED(psl->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&ppf)))) {
 			psl->SetPath(pszTarget);
 			if (SUCCEEDED(ppf->Save(tchLnkFileName, TRUE))) {
 				bSucceeded = true;
@@ -2344,21 +2344,12 @@ void ComboBox_AddStringA2W(UINT uCP, HWND hwnd, LPCSTR lpString) {
 //
 // MRU functions
 //
-LPMRULIST MRU_Create(LPCWSTR pszRegKey, int iFlags) {
-	LPMRULIST pmru = (LPMRULIST)NP2HeapAlloc(sizeof(MRULIST));
+void MRU_Init(LPMRULIST pmru, LPCWSTR pszRegKey, int iFlags) {
+	pmru->iSize = 0;
 	pmru->iFlags = iFlags;
 	pmru->szRegKey = pszRegKey;
+	memset(NP2_void_pointer(pmru->pszItems), 0, sizeof(pmru->pszItems));
 	MRU_Load(pmru);
-	return pmru;
-}
-
-void MRU_Destroy(LPMRULIST pmru) {
-	for (int i = 0; i < pmru->iSize; i++) {
-		LocalFree(pmru->pszItems[i]);
-	}
-
-	memset(pmru, 0, sizeof(MRULIST));
-	NP2HeapFree(pmru);
 }
 
 static inline bool MRU_Equal(int flags, LPCWSTR psz1, LPCWSTR psz2) {
@@ -2420,27 +2411,28 @@ void MRU_Delete(LPMRULIST pmru, int iIndex) {
 }
 
 void MRU_DeleteFileFromStore(LPCMRULIST pmru, LPCWSTR pszFile) {
-	LPMRULIST pmruStore = MRU_Create(pmru->szRegKey, pmru->iFlags);
+	MRULIST mruStore;
+	MRU_Init(&mruStore, pmru->szRegKey, pmru->iFlags);
 	int deleted = 0;
 
-	for (int index = 0; index < pmruStore->iSize; ) {
-		LPCWSTR path = pmruStore->pszItems[index];
+	for (int index = 0; index < mruStore.iSize; ) {
+		LPCWSTR path = mruStore.pszItems[index];
 		if (PathEqual(path, pszFile)) {
 			deleted += 1;
-			LocalFree(pmruStore->pszItems[index]);
-			pmruStore->pszItems[index] = NULL;
-			for (int i = index; i < pmruStore->iSize - 1; i++) {
-				pmruStore->pszItems[i] = pmruStore->pszItems[i + 1];
-				pmruStore->pszItems[i + 1] = NULL;
+			LocalFree(mruStore.pszItems[index]);
+			mruStore.pszItems[index] = NULL;
+			for (int i = index; i < mruStore.iSize - 1; i++) {
+				mruStore.pszItems[i] = mruStore.pszItems[i + 1];
+				mruStore.pszItems[i + 1] = NULL;
 			}
 		} else {
 			index++;
 		}
 	}
 
-	pmruStore->iSize -= deleted;
-	MRU_Save(pmruStore);
-	MRU_Destroy(pmruStore);
+	mruStore.iSize -= deleted;
+	MRU_Save(&mruStore);
+	MRU_Empty(&mruStore, false);
 }
 
 void MRU_Empty(LPMRULIST pmru, bool save) {
@@ -2449,8 +2441,8 @@ void MRU_Empty(LPMRULIST pmru, bool save) {
 		pmru->pszItems[i] = NULL;
 	}
 	pmru->iSize = 0;
-	if (save) {
-		MRU_Save(pmru);
+	if (save && StrNotEmpty(szIniFile)) {
+		IniClearSection(pmru->szRegKey);
 	}
 }
 
@@ -2465,9 +2457,7 @@ void MRU_Load(LPMRULIST pmru) {
 	IniSection * const pIniSection = &section;
 	const int iFlags = pmru->iFlags;
 
-	//MRU_Empty(pmru, false);
 	IniSectionInit(pIniSection, MRU_MAXITEMS);
-
 	LoadIniSection(pmru->szRegKey, pIniSectionBuf, cchIniSection);
 	IniSectionParseArray(pIniSection, pIniSectionBuf, iFlags & MRUFlags_QuoteValue);
 	const UINT count = pIniSection->count;
@@ -2528,21 +2518,23 @@ void MRU_Save(LPCMRULIST pmru) {
 }
 
 void MRU_MergeSave(LPMRULIST pmru, bool keep) {
-	if (!keep) {
+	if (!keep || StrIsEmpty(szIniFile)) {
 		MRU_Empty(pmru, true);
 		return;
 	}
 	if (pmru->iSize <= 0) {
 		return;
 	}
-	LPMRULIST pmruBase = MRU_Create(pmru->szRegKey, pmru->iFlags);
 
+	MRULIST mruBase;
+	MRU_Init(&mruBase, pmru->szRegKey, pmru->iFlags);
 	for (int i = pmru->iSize - 1; i >= 0; i--) {
-		MRU_Add(pmruBase, pmru->pszItems[i]);
+		MRU_Add(&mruBase, pmru->pszItems[i]);
 	}
 
-	MRU_Save(pmruBase);
-	MRU_Destroy(pmruBase);
+	MRU_Save(&mruBase);
+	MRU_Empty(&mruBase, false);
+	MRU_Empty(pmru, false);
 }
 
 void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
@@ -2550,6 +2542,60 @@ void MRU_AddToCombobox(LPCMRULIST pmru, HWND hwnd) {
 		LPCWSTR str = pmru->pszItems[i];
 		ComboBox_AddString(hwnd, str);
 	}
+}
+
+void BitmapCache_Empty(BitmapCache *cache) {
+	for (UINT i = 0; i < cache->count; i++) {
+		DeleteObject(cache->items[i]);
+	}
+	memset(cache, 0, sizeof(BitmapCache));
+}
+
+HBITMAP BitmapCache_Get(BitmapCache *cache, LPCWSTR path) {
+	if (cache->invalid) {
+		BitmapCache_Empty(cache);
+	}
+
+	SHFILEINFO shfi;
+	HIMAGELIST imageList = (HIMAGELIST)SHGetFileInfo(path, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_USEFILEATTRIBUTES | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
+	const int iIcon = shfi.iIcon;
+	UINT index = 0;
+	for (; index < cache->count; index++) {
+		if (cache->iconIndex[index] == iIcon) {
+			break;
+		}
+	}
+	if (index == cache->count) {
+		NP2_static_assert(sizeof(cache->used)*8 >= MRU_MAXITEMS);
+		if (index < MRU_MAXITEMS) {
+			cache->count += 1;
+		} else {
+			// find first zero bit in used, omitted zero check as used can't be UINT32_MAX
+			// index = __builtin_stdc_trailing_ones(cache->used);
+			index = np2_ctz(~cache->used);
+			DeleteObject(cache->items[index]);
+			cache->items[index] = NULL;
+		}
+		cache->iconIndex[index] = iIcon;
+	}
+
+	cache->used |= 1U << index;
+	HBITMAP hbmp = cache->items[index];
+	if (hbmp == NULL) {
+		HDC bitmapDC = CreateCompatibleDC(NULL);
+		int width = 0;
+		int height = 0;
+		ImageList_GetIconSize(imageList, &width, &height);
+		const BITMAPINFO bmi = { {sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{ 0, 0, 0, 0 }} };
+		hbmp = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, NULL, NULL, 0);
+		HBITMAP oldBitmap = SelectBitmap(bitmapDC, hbmp);
+		ImageList_Draw(imageList, iIcon, bitmapDC, 0, 0, ILD_TRANSPARENT);
+		SelectBitmap(bitmapDC, oldBitmap);
+		DeleteDC(bitmapDC);
+		cache->items[index] = hbmp;
+	}
+
+	return hbmp;
 }
 
 /*

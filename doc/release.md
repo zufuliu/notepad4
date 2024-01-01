@@ -9,11 +9,11 @@
 ## File List
 | Localization | Language | Architecture | Minimum System |
 |--|--|--|--|
-| en | English | ARM64 | Windows 10 on ARM |
-| it | Italiano | ARM | legacy Windows RT (Windows 8 on ARM) |
-| ja | 日本語 | AVX2 | 64-bit Windows 7, Server 2008 R2 |
-| ko | 한국어 | x64 | legacy 64-bit Windows Vista, Server 2008 |
-| zh-Hans | 中文 (简体) | Win32 | legacy Windows XP, Server 2003 |
+| en | English | ARM64 | 🟢Windows 10 on ARM |
+| it | Italiano | ARM | 🔴legacy Windows RT (Windows 8 on ARM) |
+| ja | 日本語 | AVX2 | 🟢64-bit Windows 7, Server 2008 R2 |
+| ko | 한국어 | x64 | 🟡legacy 64-bit Windows Vista, Server 2008 |
+| zh-Hans | 中文 (简体) | Win32 | 🟠legacy Windows XP, Server 2003 |
 | zh-Hant | 中文 (繁體) |
 | i18n | all above languages include French | winget | `winget install -e "Notepad2"` |
 | 한국어 | https://teus.me/category/IT/Notepad2 | winget | `winget install zufuliu.notepad2` |

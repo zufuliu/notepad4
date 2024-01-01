@@ -905,10 +905,9 @@ DIBSection::DIBSection(HDC hdc, SIZE size_) noexcept {
 	size = size_;
 
 	// -size.y makes bitmap start from top
-	const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), size.cx, -size.cy, 1, 32, BI_RGB, 0, 0, 0, 0, 0},
-		{{0, 0, 0, 0}} };
+	const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), size.cx, -size.cy, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{0, 0, 0, 0}} };
 	void *image = nullptr;
-	hbmMem = CreateDIBSection(hMemDC, &bpih, DIB_RGB_COLORS, &image, {}, 0);
+	hbmMem = CreateDIBSection(hMemDC, &bpih, DIB_RGB_COLORS, &image, nullptr, 0);
 	if (!hbmMem || !image) {
 		return;
 	}
@@ -3850,8 +3849,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 		::InflateRect(&client, -ListBoxXFakeFrameSize + 1, -ListBoxXFakeFrameSize + 1);
 
 		HDC hMemDC = CreateCompatibleDC(hDC);
-		const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), width, height, 1, 32, BI_RGB, 0, 0, 0, 0, 0},
-			{{0, 0, 0, 0}} };
+		const BITMAPINFO bpih = { {sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB, 0, 0, 0, 0, 0}, {{0, 0, 0, 0}} };
 		HBITMAP hbmMem = CreateDIBSection(hMemDC, &bpih, DIB_RGB_COLORS, nullptr, nullptr, 0);
 
 		if (hbmMem) {
