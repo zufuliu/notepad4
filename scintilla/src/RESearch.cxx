@@ -360,8 +360,8 @@ int RESearch::GetBackslashExpression(const char *pattern, int &incr) noexcept {
 		result = escapeValue(bsc);
 		break;
 	case 'x': {
-		const unsigned char hd1 = *(pattern + 1);
-		const unsigned char hd2 = *(pattern + 2);
+		const unsigned char hd1 = pattern[1];
+		const unsigned char hd2 = pattern[2];
 		const int hexValue = GetHexValue(hd1, hd2);
 		if (hexValue >= 0) {
 			result = hexValue;
@@ -521,15 +521,12 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 									p++;
 									int incr;
 									c2 = GetBackslashExpression(p, incr);
+									prevChar = c2;
 									i += incr;
 									p += incr;
 									if (c2 >= 0) {
 										// Convention: \c (c is any char) is case sensitive, whatever the option
 										ChSet(static_cast<unsigned char>(c2));
-										prevChar = c2;
-									} else {
-										// bittab is already changed
-										prevChar = -1;
 									}
 								}
 							}
@@ -556,15 +553,12 @@ const char *RESearch::DoCompile(const char *pattern, size_t length, FindOption f
 					p++;
 					int incr;
 					const int c = GetBackslashExpression(p, incr);
+					prevChar = c;
 					i += incr;
 					p += incr;
 					if (c >= 0) {
 						// Convention: \c (c is any char) is case sensitive, whatever the option
 						ChSet(static_cast<unsigned char>(c));
-						prevChar = c;
-					} else {
-						// bittab is already changed
-						prevChar = -1;
 					}
 				} else {
 					prevChar = static_cast<unsigned char>(*p);
