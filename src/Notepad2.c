@@ -7652,7 +7652,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			// file with unknown lexer and unknown encoding
 			bUnknownFile = bUnknownFile && (iCurrentEncoding == CPI_DEFAULT);
 			// Set default button to "No" for diff/patch and unknown file.
-			// diff/patch file may contains content from files with different line endings.
+			// diff/patch file may contain content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
 				const int iNewEOLMode = GetScintillaEOLMode(status.iEOLMode);

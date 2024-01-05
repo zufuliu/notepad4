@@ -158,7 +158,7 @@ struct HanjaDicCloser {
 };
 
 bool GetHangulOfHanja(std::wstring &inout) noexcept {
-	// Convert every hanja to hangul.
+	// Convert every Hanja to Hangul.
 	// Return whether any character been converted.
 	// Hanja linked to different notes in Hangul have different codes,
 	// so current character based conversion is enough.

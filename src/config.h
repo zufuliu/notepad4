@@ -14,7 +14,7 @@
 //! Enable the .LOG feature
 // When enabled and Notepad2 opens a file starts with .LOG,
 // Notepad2 will append current time to the file.
-// This is a hiden feature in Windows Notepad.
+// This is a hidden feature in Windows Notepad.
 #define NP2_ENABLE_DOT_LOG_FEATURE				0
 
 //! Enable localization with satellite resource DLLs.

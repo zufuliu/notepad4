@@ -90,6 +90,6 @@ def find_free_access_key(menu, path):
 		print('required access key:', sorted(required))
 
 # line starts with '//' is line comment
-# line ends with '//#' is frozen, access key should not changed
+# line ends with '//#' is frozen, access key should not change
 find_free_access_key('''
 ''', 'access_key.log')

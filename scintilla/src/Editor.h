@@ -118,7 +118,7 @@ struct WrapPending {
 		lineLarge = 0x7ffffff
 	};
 	Sci::Line start;	// When there are wraps pending, will be in document range
-	Sci::Line end;	// May be lineLarge to indicate all of document after start
+	Sci::Line end;	// May be lineLarge to indicate all of the document after start
 	WrapPending() noexcept {
 		start = lineLarge;
 		end = lineLarge;

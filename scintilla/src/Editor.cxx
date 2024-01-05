@@ -2761,7 +2761,7 @@ void Editor::NotifyModified(Document *, DocModification mh, void *) {
 		}
 		if (mh.linesAdded != 0) {
 			// Update contraction state for inserted and removed lines
-			// lineOfPos should be calculated in context of state before modification, shouldn't it
+			// lineOfPos should be calculated in context of state before modification
 			Sci::Line lineOfPos = pdoc->SciLineFromPosition(mh.position);
 			if (mh.position > pdoc->LineStart(lineOfPos))
 				lineOfPos++;	// Affecting subsequent lines

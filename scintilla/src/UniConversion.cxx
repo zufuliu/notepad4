@@ -138,7 +138,7 @@ size_t UTF16FromUTF8(std::string_view svu8, wchar_t *tbuf, size_t tlen) {
 
 		const size_t outLen = UTF16LengthFromUTF8ByteCount(byteCount);
 		if (ui + outLen > tlen) {
-			throw std::runtime_error("UTF16FromUTF8: attempted write beyond end");
+			throw std::runtime_error("UTF16FromUTF8: attempted to write beyond end");
 		}
 
 		ptr++;
@@ -209,7 +209,7 @@ size_t UTF32FromUTF8(std::string_view svu8, unsigned int *tbuf, size_t tlen) {
 		}
 
 		if (ui == tlen) {
-			throw std::runtime_error("UTF32FromUTF8: attempted write beyond end");
+			throw std::runtime_error("UTF32FromUTF8: attempted to write beyond end");
 		}
 
 		ptr++;

@@ -515,7 +515,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 				}
 			}
 
-			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
@@ -596,7 +596,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 				}
 			}
 
-			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
 			const uint64_t maskCRLF = maskCR & maskLF; // CR+LF
@@ -676,7 +676,7 @@ void EditDetectEOLMode(LPCSTR lpData, DWORD cbData, EditFileIOStatus *status) {
 				}
 			}
 
-			// maskCR and maskLF never have some bit set. after shifting maskCR by 1 bit,
+			// maskCR and maskLF never have some bit set, after shifting maskCR by 1 bit,
 			// the bits both set in maskCR and maskLF represents CR+LF;
 			// the bits only set in maskCR or maskLF represents individual CR or LF.
 			const uint32_t maskCRLF = maskCR & maskLF; // CR+LF
@@ -998,7 +998,7 @@ bool EditLoadFile(LPWSTR pszFile, EditFileIOStatus *status) {
 	//        i.e. when default scheme is Text File or 2nd Text File, memory required to load the file
 	//        is about fileSize*2, buffers we allocated below can be reused by system to served
 	//        as Scintilla's style buffer when calling SciCall_SetLexer() inside Style_SetLexer().
-	//     3. Extra memory when moving gaps on editing, it may requires more than 2/3 physical memory.
+	//     3. Extra memory when moving gaps on editing, it may require more than 2/3 physical memory.
 	// large file TODO: https://github.com/zufuliu/notepad2/issues/125
 	// [ ] [> 4 GiB] use SetFilePointerEx() and ReadFile()/WriteFile() to read/write file.
 	// [-] [> 2 GiB] fix encoding conversion with MultiByteToWideChar() and WideCharToMultiByte().
@@ -7456,7 +7456,7 @@ void FileVars_Init(LPCSTR lpData, DWORD cbData, LPFILEVARS lpfv) {
 	}
 	if (mask & FV_ENCODING) {
 		int iEncoding = Encoding_MatchA(lpfv->tchEncoding);
-		// should never matches UTF-16 or UTF-32.
+		// should never match UTF-16 or UTF-32.
 		if (Encoding_IsUnicode(iEncoding)) {
 			iEncoding = CPI_NONE;
 		}

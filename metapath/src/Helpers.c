@@ -2224,8 +2224,8 @@ UINT_PTR CALLBACK OpenSaveFileDlgHookProc(HWND hwnd, UINT umsg, WPARAM wParam, L
 // me a line if you use them!
 //
 // 1.0 29.06.2000 Initial version
-// 1.1 01.07.2000 The window retains it's place in the Z-order of windows
-//     when minimized/hidden. This means that when restored/shown, it doen't
+// 1.1 01.07.2000 The window retains its place in the Z-order of windows
+//     when minimized/hidden. This means that when restored/shown, it doesn't
 //     always appear as the foreground window unless we call SetForegroundWindow
 //
 // Copyright 2000 Matthew Ellis <m.t.ellis@bigfoot.com>
@@ -2279,7 +2279,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) {
 	appBarData.cbSize = sizeof(appBarData);
 	if (SHAppBarMessage(ABM_GETTASKBARPOS, &appBarData)) {
 		// We know the edge the taskbar is connected to, so guess the rect of the
-		// system tray. Use various fudge factor to make it look good
+		// system tray. Use various fudge factors to make it look good
 		switch (appBarData.uEdge) {
 		case ABE_LEFT:
 		case ABE_RIGHT:
@@ -2311,7 +2311,7 @@ static void GetTrayWndRect(LPRECT lpTrayRect) {
 	// on the 3rd party shell's Shell_TrayWnd doing the same, in fact, we can't
 	// rely on it being any size. The best we can do is just blindly use the
 	// window rect, perhaps limiting the width and height to, say 150 square.
-	// Note that if the 3rd party shell supports the same configuraion as
+	// Note that if the 3rd party shell supports the same configuration as
 	// explorer (the icons hosted in NotifyTrayWnd, which is a child window of
 	// Shell_TrayWnd), we would already have caught it above
 	hShellTrayWnd = FindWindowEx(NULL, NULL, L"Shell_TrayWnd", NULL);

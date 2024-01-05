@@ -1,6 +1,6 @@
 // Scintilla source code edit control
 /** @file EditModel.h
- ** Defines the editor state that must be visible to EditorView.
+ ** Defines the editor state that must be visible to EditView.
  **/
 // Copyright 1998-2014 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.

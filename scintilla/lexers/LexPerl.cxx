@@ -570,7 +570,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 	// Backtrack to beginning of style if required...
 	// If in a long distance lexical state, backtrack to find quote characters.
-	// Includes strings (may be multi-line), numbers (additional state), format
+	// Includes strings (maybe multi-line), numbers (additional state), format
 	// bodies, as well as POD sections.
 	if (initStyle == SCE_PL_HERE_Q
 		|| initStyle == SCE_PL_HERE_QQ

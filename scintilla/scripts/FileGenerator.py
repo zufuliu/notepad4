@@ -191,7 +191,7 @@ def UpdateLineInFile(path, linePrefix, lineReplace):
     UpdateFile(path, contents)
 
 def ReadFileAsList(path):
-    """Read all the lnes in the file and return as a list of strings without line ends.
+    """Read all the lines in the file and return as a list of strings without line ends.
     """
     with open(path, "r", encoding="utf-8") as f:
         return [line.rstrip('\n') for line in f]
@@ -229,9 +229,9 @@ def FindSectionInList(lines, markers):
                 state = 3
     # Check that section was found
     if start < 0:
-        raise Exception("Could not find start marker(s) |" + markers[0] + "|" + markers[1] + "|")
+        raise Exception(f"Could not find start marker(s) | {markers[0]} | {markers[1]} |")
     if end < 0:
-        raise Exception("Could not find end marker " + markers[2])
+        raise Exception(f"Could not find end marker {markers[2]}")
     return slice(start, end)
 
 def ReplaceREInFile(path, match, replace, count=1):

@@ -70,7 +70,7 @@ class LexerAttr(IntFlag):
 
 class KeywordAttr(IntFlag):
 	Default = 0
-	MakeLower = 1	# need convert to lower case for lexer.
+	MakeLower = 1	# need converted to lower case for lexer.
 	PreSorted = 2	# word list is presorted.
 	NoLexer = 4		# not used by lexer, listed for auto-completion.
 	NoAutoComp = 8	# don't add to default auto-completion list.

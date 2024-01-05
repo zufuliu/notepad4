@@ -1187,8 +1187,8 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 					prev = current;
 					it += UTF8BytesOfLead(static_cast<unsigned char>(*it));
 				} while (it < end);
-				// no boundary between last two code points, assume text ends with a longest sequence.
-				it -= longestUnicodeCharacterSquenceBytes + UTF8MaxBytes;
+				// no boundary between last two code points, assume text ends with the longest sequence.
+				it -= longestUnicodeCharacterSequenceBytes + UTF8MaxBytes;
 			}
 #endif
 		}
@@ -2094,7 +2094,7 @@ bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 }
 
 /**
- * Check that the given range is has transitions between character classes at both
+ * Check that the given range has transitions between character classes at both
  * ends and where the characters on the inside are word or punctuation characters.
  */
 bool Document::IsWordAt(Sci::Position start, Sci::Position end) const noexcept {
@@ -2156,7 +2156,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		// pos >= endSearch: break           continue
 		// pos < endSearch:  continue        break
 		// i.e. continue search when direction and (pos - endSearch) have opposite signs,
-		// which can be wrote as: (direction ^ (pos - endSearch)) < 0
+		// which can be written as: (direction ^ (pos - endSearch)) < 0
 
 		// Range endpoints should not be inside DBCS characters, but just in case, move them.
 		const Sci::Position startPos = MovePositionOutsideChar(minPos, increment, false);

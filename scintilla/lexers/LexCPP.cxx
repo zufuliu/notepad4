@@ -1,6 +1,6 @@
 // This file is part of Notepad2.
 // See License.txt for details about distribution and modification.
-//! Lexer for C/C++, Rescouce Script, Objective C/C++, IDL/ODL
+//! Lexer for C/C++, Resource Script, Objective C/C++, IDL/ODL
 
 #include <cassert>
 #include <cstring>
@@ -25,7 +25,7 @@ using namespace Lexilla;
 namespace {
 
 #define		LEX_CPP		0	// C/C++
-#define		LEX_RC		1	// Resouce Script
+#define		LEX_RC		1	// Resource Script
 #define		LEX_OBJC	2	// Objective C/C++
 
 struct EscapeSequence {
@@ -170,7 +170,7 @@ void ColouriseCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
 	while (sc.More()) {
 
 		if (sc.atLineStart) {
-			// Reset states to begining of colourise so no surprises
+			// Reset states to beginning of colourise so no surprises
 			// if different sets of lines lexed.
 			visibleChars = 0;
 			docTagType = 0;
@@ -935,7 +935,7 @@ void FoldCppDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 		}
 
 		if (style == SCE_C_OPERATOR && !(IsCppInDefine(styler, i))) {
-			// maybe failed in multi-line define section, MFC's afx.h is a example
+			// maybe failed in multi-line define section, MFC's afx.h is an example
 			if (ch == '{' && !(lineCurrent > 0 && visibleChars == 0 && IsOpenBraceLine(styler, lineCurrent))) {
 				levelNext++;
 			} else if (ch == '}') {

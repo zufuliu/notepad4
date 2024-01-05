@@ -859,7 +859,7 @@ val SCE_LISP_KEYWORD=
 #val SCE_FORTH_STRING=10
 #val SCE_FORTH_LOCALE=11
 # Lexical states for SCLEX_MATLAB
-lex MatLab=SCLEX_MATLAB SCE_MAT_
+lex Matlab=SCLEX_MATLAB SCE_MAT_
 val SCE_MAT_DEFAULT=
 val SCE_MAT_COMMENT=
 val SCE_MAT_COMMENTBLOCK=
@@ -1241,7 +1241,7 @@ val SCE_YAML_DOCUMENT=20
 #val SCE_ERLANG_MODULES=23
 #val SCE_ERLANG_MODULES_ATT=24
 #val SCE_ERLANG_UNKNOWN=31
-# Lexical states for SCLEX_OCTAVE are identical to MatLab
+# Lexical states for SCLEX_OCTAVE are identical to Matlab
 #lex Octave=SCLEX_OCTAVE SCE_MAT_
 # Lexical states for SCLEX_MSSQL
 #lex MSSQL=SCLEX_MSSQL SCE_MSSQL_

@@ -51,8 +51,8 @@ enum class GraphemeBreakProperty {
 };
 
 constexpr int maxUnicodeGraphemeBreakCharacter = 0xe1000;
-constexpr int longestUnicodeCharacterSquenceCount = 10;
-constexpr int longestUnicodeCharacterSquenceBytes = 35;
+constexpr int longestUnicodeCharacterSequenceCount = 10;
+constexpr int longestUnicodeCharacterSequenceBytes = 35;
 
 constexpr uint16_t graphemeClusterBoundary[] = {
 0b10111111'01101111, // Other

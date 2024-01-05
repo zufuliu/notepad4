@@ -1,6 +1,6 @@
 @ECHO OFF
 @rem used for GitHub Actions
-@rem need adjust path for MSYS2, mingw64, mingw32 and llvm-mingw for local use.
+@rem adjust path for MSYS2, mingw64, mingw32 and llvm-mingw for local use.
 
 SETLOCAL ENABLEEXTENSIONS
 CD /D %~dp0

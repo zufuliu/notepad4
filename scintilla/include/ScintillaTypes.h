@@ -820,7 +820,7 @@ inline ModificationFlags &operator|=(ModificationFlags &self, ModificationFlags 
 	return self;
 }
 
-// Functions to manipulate fields from a Update
+// Functions to manipulate fields from an Update
 
 constexpr Update operator|(Update a, Update b) noexcept {
 	return static_cast<Update>(static_cast<int>(a) | static_cast<int>(b));

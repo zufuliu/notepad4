@@ -1,4 +1,4 @@
-## First line may be used for shbang
+## First line may be used for shebang
 
 ## This file defines the interface to Scintilla
 
@@ -6,7 +6,7 @@
 ## The License.txt file describes the conditions under which this software may be distributed.
 
 ## A line starting with ## is a pure comment and should be stripped by readers.
-## A line starting with #! is for future shbang use
+## A line starting with #! is for future shebang use
 ## A line starting with # followed by a space is a documentation comment and refers
 ## to the next feature definition.
 
@@ -2331,7 +2331,7 @@ enu CaretPolicy=CARET_
 # often dependent on that line.
 val CARET_SLOP=0x01
 # If CARET_STRICT is set, the policy is enforced... strictly.
-# The caret is centred on the display if slop is not set,
+# The caret is centered on the display if slop is not set,
 # and cannot go in the UZ if slop is set.
 val CARET_STRICT=0x04
 # If CARET_JUMPS is set, the display is moved more energetically

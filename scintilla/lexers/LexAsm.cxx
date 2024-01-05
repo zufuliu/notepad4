@@ -49,7 +49,7 @@ constexpr bool IsAsmNumber(int ch, int chPrev) noexcept {
 	"Directives",
 	"Directive operands",
 	"Extended instructions",
-	"Directives for foldig start",
+	"Directives for fold start",
 	"Directives for fold end",
 	"GNU Assembler directives ",
 	0

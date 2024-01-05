@@ -1903,7 +1903,7 @@ static inline bool IsHtmlVoidTag(const char *word, int length) {
 	const char *p = StrStrIA(
 		// void elements
 		" area base basefont br col command embed frame hr img input isindex keygen link meta param source track wbr "
-		// end tag may omittd
+		// end tag can be omitted
 		" p "
 		, word);
 	return p != NULL && p[-1] == ' ' && p[length] == ' ';

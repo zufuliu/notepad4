@@ -469,7 +469,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			continue;
 		}
 
-		// decide what is the current state to print (depending of the script tag)
+		// decide what is the current state to print (depending on the script tag)
 		StateToPrint = statePrintForState(state, inScriptType);
 
 		// handle script folding
