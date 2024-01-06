@@ -12,7 +12,11 @@ def printLexHFile(f):
 	STYLE_FIRSTPREDEFINED = 32
 	STYLE_LASTPREDEFINED = 39
 
-	out = []
+	out = [
+		'#define STYLE_LINK 33',
+		'#define STYLE_COMMENT_LINK 34',
+		'#define STYLE_STRING_LINK 35',
+	]
 	autoValue = 0
 	valueMap = {}
 	for name in f.order:

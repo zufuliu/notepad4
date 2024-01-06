@@ -538,8 +538,7 @@ get int GetMargins=2253(,)
 # Styles in range 32..39 are predefined for parts of the UI and are not used as normal styles.
 enu StylesCommon=STYLE_
 val STYLE_DEFAULT=0
-val STYLE_LINK=32
-val STYLE_LINENUMBER=33
+val STYLE_LINENUMBER=32
 val STYLE_BRACELIGHT=34
 val STYLE_BRACEBAD=35
 val STYLE_CONTROLCHAR=36

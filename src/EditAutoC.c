@@ -3155,7 +3155,7 @@ void InitAutoCompletionCache(LPCEDITLEXER pLex) {
 	case NP2LEX_MARKDOWN:
 		CommentStyleMask[SCE_H_COMMENT >> 5] |= (1U << (SCE_H_COMMENT & 31));
 		CommentStyleMask[SCE_H_SGML_COMMENT >> 5] |= (1U << (SCE_H_SGML_COMMENT & 31));
-		CommentStyleMask[SCE_MARKDOWN_COMMENT_LINK >> 5] |= (1U << (SCE_MARKDOWN_COMMENT_LINK & 31));
+		CommentStyleMask[STYLE_COMMENT_LINK >> 5] |= (1U << (STYLE_COMMENT_LINK & 31));
 		AllStringStyleMask[SCE_H_DOUBLESTRING >> 5] |= (1U << (SCE_H_DOUBLESTRING & 31));
 		AllStringStyleMask[SCE_H_SINGLESTRING >> 5] |= (1U << (SCE_H_SINGLESTRING & 31));
 		AllStringStyleMask[SCE_H_SGML_DOUBLESTRING >> 5] |= (1U << (SCE_H_SGML_DOUBLESTRING & 31));
