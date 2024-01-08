@@ -7,7 +7,7 @@ static KEYWORDLIST Keywords_Gradle = {{
 "false final finally for goto if implements import in instanceof interface it native new non-sealed null owner "
 "package parcelable permits println private protected public record return "
 "sealed static strictfp super switch synchronized this threadsafe throw throws trait transient true try var volatile "
-"while yield "
+"when while yield "
 
 , // 1 types
 "boolean byte char double float int long short void "
