@@ -422,9 +422,7 @@ void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, L
 			int lev = levelPrev;
 			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
+			styler.SetLevel(lineCurrent, lev);
 			const int newLineState = (styler.GetLineState(lineCurrent) & ~stateFoldMaskAll) | lineFoldStateCurrent;
 			styler.SetLineState(lineCurrent, newLineState);
 			lineCurrent++;

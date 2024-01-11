@@ -129,9 +129,7 @@ void ColourisePropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else {
 				nextLevel = prevLevel;
 			}
-			if (nextLevel != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, nextLevel);
-			}
+			styler.SetLevel(lineCurrent, nextLevel);
 			prevLevel = nextLevel;
 		}
 #endif
@@ -194,10 +192,7 @@ void FoldPropsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyl
 			}
 		}
 
-		if (nextLevel != styler.LevelAt(lineCurrent)) {
-			styler.SetLevel(lineCurrent, nextLevel);
-		}
-
+		styler.SetLevel(lineCurrent, nextLevel);
 		prevLevel = nextLevel;
 		prev2State = prevState;
 		prevState = initStyle;

@@ -410,10 +410,7 @@ void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			}
 		}
 
-		if (nextLevel != styler.LevelAt(lineCurrent)) {
-			styler.SetLevel(lineCurrent, nextLevel);
-		}
-
+		styler.SetLevel(lineCurrent, nextLevel);
 		prevLevel = nextLevel;
 		prev2Type = prevType;
 		prevType = lineType;

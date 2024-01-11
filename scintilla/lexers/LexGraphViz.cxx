@@ -244,9 +244,7 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 				if (levelUse < levelNext) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
 				}
-				if (lev != styler.LevelAt(sc.currentLine)) {
-					styler.SetLevel(sc.currentLine, lev);
-				}
+				styler.SetLevel(sc.currentLine, lev);
 				levelCurrent = levelNext;
 			}
 		}
