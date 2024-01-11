@@ -505,6 +505,7 @@ void FoldInnoDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, 
 
 		if (startPos == lineStartNext) {
 			const int lineStateNext = styler.GetLineState(lineCurrent + 1);
+			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 			if (lineState & InnoLineStateSectionHeader) {
 				levelCurrent = SC_FOLDLEVELBASE;
 				levelNext = SC_FOLDLEVELBASE + 1;

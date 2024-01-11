@@ -420,6 +420,7 @@ void FoldPascalDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, L
 
 		if (atEOL || (i == endPos - 1)) {
 			int lev = levelPrev;
+			levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			styler.SetLevel(lineCurrent, lev);

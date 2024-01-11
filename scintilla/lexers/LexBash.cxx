@@ -955,6 +955,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 		}
 
 		if (startPos == lineStartNext) {
+			levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 			// Comment folding
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);

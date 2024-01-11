@@ -511,6 +511,7 @@ void ColouriseHyperTextDoc(Sci_PositionU startPos, Sci_Position length, int init
 			// Avoid triggering two times on Dos/Win
 			// New line -> record any line state onto /next/ line
 			if (fold) {
+				levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 				int lev = levelPrev;
 				if ((levelCurrent > levelPrev))
 					lev |= SC_FOLDLEVELHEADERFLAG;

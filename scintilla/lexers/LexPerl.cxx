@@ -1655,6 +1655,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		atLineStart = startPos == lineStartNext;
 		if (atLineStart) {
 			// Comment folding
+			levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			}
