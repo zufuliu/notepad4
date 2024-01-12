@@ -71,17 +71,26 @@ class OptionSet {
 			return value.c_str();
 		}
 	};
-	using OptionMap = std::map<std::string, Option, std::less<>>;
+	using OptionMap = std::map<std::string_view, Option, std::less<>>;
 	OptionMap nameToDef;
 	std::string names;
 	std::string wordLists;
 
 	void AddProperty(const char *name, Option option) {
-		nameToDef[name] = std::move(option);
+		const std::string_view sv = name;
+		nameToDef[sv] = std::move(option);
 		if (!names.empty()) {
 			names += '\n';
 		}
-		names += name;
+		names += sv;
+	}
+	const Option *GetProperty(const char *name) const {
+		const std::string_view sv = name;
+		const auto it = nameToDef.find(sv);
+		if (it != nameToDef.end()) {
+			return &it->second;
+		}
+		return nullptr;
 	}
 public:
 	void DefineProperty(const char *name, plcob pb, const char *description = "") {
@@ -107,32 +116,28 @@ public:
 		return names.c_str();
 	}
 	int PropertyType(const char *name) const {
-		const auto it = nameToDef.find(name);
-		if (it != nameToDef.end()) {
-			return it->second.opType;
+		if (const Option *option = GetProperty(name)) {
+			return option->opType;
 		}
 		return SC_TYPE_BOOLEAN;
 	}
 	const char *DescribeProperty(const char *name) const {
-		const auto it = nameToDef.find(name);
-		if (it != nameToDef.end()) {
-			return it->second.description;
+		if (const Option *option = GetProperty(name)) {
+			return option->description;
 		}
 		return "";
 	}
 
 	bool PropertySet(T *base, const char *name, const char *val) {
-		const auto it = nameToDef.find(name);
-		if (it != nameToDef.end()) {
-			return it->second.Set(base, val);
+		if (Option *option = const_cast<Option *>(GetProperty(name))) {
+			return option->Set(base, val);
 		}
 		return false;
 	}
 
 	const char *PropertyGet(const char *name) const {
-		const auto it = nameToDef.find(name);
-		if (it != nameToDef.end()) {
-			return it->second.Get();
+		if (const Option *option = GetProperty(name)) {
+			return option->Get();
 		}
 		return nullptr;
 	}

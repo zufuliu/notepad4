@@ -948,7 +948,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			break;
 
 		case SCE_SH_HERE_Q:
-			if (style == SCE_SH_HERE_Q && styleNext == SCE_SH_DEFAULT) {
+			if (styleNext == SCE_SH_DEFAULT) {
 				levelCurrent--;
 			}
 			break;
