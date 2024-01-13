@@ -687,9 +687,6 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	QuoteCls Quote;
 
-	int numDots = 0;  // For numbers --
-					  // Don't start lexing in the middle of a num
-
 	synchronizeDocStart(startPos, length, initStyle, styler, false);
 	const Sci_Position lengthDoc = startPos + length;
 
@@ -815,7 +812,6 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				styler.ColorTo(i, state);
 				state = SCE_RB_NUMBER;
 				is_real_number = true;
-				numDots = 0;
 			} else if (isHighBitChar(ch) || iswordstart(ch)) {
 				styler.ColorTo(i, state);
 				state = SCE_RB_WORD;
@@ -1218,14 +1214,11 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					preferRE = false;
 					advance_char(i, ch, chNext, chNext2);
 				}
-			} else if (isSafeAlnumOrHigh(ch) || ch == '_') {
+			} else if (isSafeAlnumOrHigh(ch) || ch == '_' || (ch == '.' && isSafeDigit(chNext))) {
 				// Keep going
 			} else if (ch == '.' && chNext == '.') {
-				++numDots;
 				styler.ColorTo(i, state);
 				redo_char(i, ch, chNext, chNext2, state); // pass by ref
-			} else if (ch == '.' && ++numDots == 1) {
-				// Keep going
 			} else {
 				styler.ColorTo(i, state);
 				redo_char(i, ch, chNext, chNext2, state); // pass by ref
