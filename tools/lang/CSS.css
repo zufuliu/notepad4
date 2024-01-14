@@ -1,5 +1,5 @@
-// 2023 https://www.w3.org/TR/CSS/ 14 February 2023
-// 2023-11-18 https://drafts.csswg.org/
+// 2023 https://www.w3.org/TR/CSS/ 7 December 2023
+// 2024-01-14 https://drafts.csswg.org/
 // https://github.com/w3c/csswg-drafts/
 // https://www.w3.org/Style/CSS/all-properties
 // https://www.w3.org/Style/CSS/all-descriptors
@@ -43,7 +43,7 @@ from to
 	animation:;
 }
 
-// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 14 February 2023
+// CSS Backgrounds and Borders Module Level 3 https://www.w3.org/TR/css-backgrounds-3/ 19 December 2023
 // Box model https://www.w3.org/TR/CSS22/box.html
 {
 	background-color: transparent;
@@ -527,7 +527,7 @@ step-start step-end steps()
 }
 
 // CSS Images Module Level 4 https://www.w3.org/TR/css-images-4/ 17 February 2023
-// CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 17 December 2020
+// CSS Images Module Level 3 https://www.w3.org/TR/css-images-3/ 18 December 2023
 url() image-set() type()
 image() ltr rtl
 cross-fade() element()
@@ -1288,7 +1288,7 @@ view()
 	transition:;
 }
 
-// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 27 October 2023
+// CSS Values and Units Module Level 4 https://www.w3.org/TR/css-values-4/ 18 December 2023
 // CSS Values and Units Module Level 3 https://www.w3.org/TR/css-values-3/ 01 December 2022
 mix()
 initial nherit unset
@@ -1396,12 +1396,12 @@ aural speech
 	speak-header: once | always;
 }
 
-// Compatibility https://compat.spec.whatwg.org/ 27 September 2023
+// Compatibility https://compat.spec.whatwg.org/ 10 January 2024
 {
 	touch-action: auto | none | pan-x | pan-left | pan-right | pan-y | pan-up | pan-down | pinch-zoom | manipulation;
 }
 
-// Scalable Vector Graphics (SVG) 2 https://www.w3.org/TR/SVG2/ 4 October 2018
+// Scalable Vector Graphics (SVG) 2 https://www.w3.org/TR/SVG2/ 04 October 2018
 {
 	inline-size:;
 	shape-inside: auto;

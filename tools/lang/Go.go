@@ -1,4 +1,5 @@
 // Go 1.21 https://golang.org/
+// https://go.dev/ref/spec
 // https://github.com/golang/go/blob/master/doc/go_spec.html
 
 //! Keywords

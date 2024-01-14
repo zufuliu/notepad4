@@ -88,7 +88,7 @@ NULL
 "onformchange onforminput onmessage onmessageerror onpopstate onreadystatechange onredo onresize onundo "
 "onfocus onformdata onhashchange oninput oninvalid onkeydown onkeypress onkeyup onlanguagechange onload onloadeddata "
 "onloadedmetadata onloadend onloadstart onmousedown onmouseenter onmouseleave onmousemove onmouseout onmouseover "
-"onmouseup onmousewheel onwheel onoffline ononline onpagehide onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
+"onmouseup onmousewheel onwheel onoffline ononline onpagehide onpagereveal onpageshow onpause onplay onplaying onprogress onpaste onratechange onrejectionhandled onremovetrack onreset "
 "onscroll onscrollend onsecuritypolicyviolation onseeked onseeking onselect onslotchange onshow onstalled onstorage onsubmit onsuspend "
 "ontimeupdate ontoggle onvolumechange onunhandledrejection onunload onwaiting "
 "onanimationcancel onanimationend onanimationiteration oncontextlost oncontextrestored ongotpointercapture onlostpointercapture "
