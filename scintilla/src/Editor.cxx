@@ -1445,12 +1445,6 @@ void Editor::InvalidateCaret() {
 	UpdateSystemCaret();
 }
 
-void Editor::NotifyCaretMove() noexcept {
-}
-
-void Editor::UpdateSystemCaret() {
-}
-
 bool Editor::Wrapping() const noexcept {
 	return vs.wrap.state != Wrap::None;
 }
@@ -4412,10 +4406,6 @@ bool Editor::DragThreshold(Point ptStart, Point ptNow) noexcept {
 	return distanceSquared > 16.0f;
 }
 
-void Editor::StartDrag() {
-	// Always handled by subclasses
-}
-
 void Editor::DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular) {
 	//Platform::DebugPrintf("DropAt %d %d\n", inDragDrop, position);
 	if (inDragDrop == DragDrop::dragging)
@@ -5186,25 +5176,6 @@ void Editor::TickFor(TickReason reason) {
 		// tickPlatform handled by subclass
 		break;
 	}
-}
-
-// FineTickerStart is be overridden by subclasses that support fine ticking so
-// this method should never be called.
-bool Editor::FineTickerRunning(TickReason) const noexcept {
-	assert(false);
-	return false;
-}
-
-// FineTickerStart is be overridden by subclasses that support fine ticking so
-// this method should never be called.
-void Editor::FineTickerStart(TickReason, int, int) noexcept {
-	assert(false);
-}
-
-// FineTickerCancel is be overridden by subclasses that support fine ticking so
-// this method should never be called.
-void Editor::FineTickerCancel(TickReason) noexcept {
-	assert(false);
 }
 
 void Editor::ChangeMouseCapture(bool on) noexcept {

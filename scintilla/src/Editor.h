@@ -401,8 +401,8 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void DropCaret();
 	void CaretSetPeriod(int period);
 	void InvalidateCaret();
-	virtual void NotifyCaretMove() noexcept;
-	virtual void UpdateSystemCaret();
+	virtual void NotifyCaretMove() noexcept = 0;
+	virtual void UpdateSystemCaret() = 0;
 
 	bool Wrapping() const noexcept;
 	void NeedWrapping(Sci::Line docLineStart = 0, Sci::Line docLineEnd = WrapPending::lineLarge, bool invalidate = true) noexcept;
@@ -536,7 +536,7 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 	void SetDragPosition(SelectionPosition newPos);
 	virtual void DisplayCursor(Window::Cursor c) noexcept;
 	virtual bool SCICALL DragThreshold(Point ptStart, Point ptNow) noexcept;
-	virtual void StartDrag();
+	virtual void StartDrag() = 0;
 	void DropAt(SelectionPosition position, const char *value, size_t lengthValue, bool moving, bool rectangular);
 	void DropAt(SelectionPosition position, const char *value, bool moving, bool rectangular);
 	/** PositionInSelection returns true if position in selection. */
@@ -561,12 +561,10 @@ protected:	// ScintillaBase subclass needs access to much of Editor
 		caret, scroll, widen, dwell, platform
 	};
 	virtual void TickFor(TickReason reason);
-	virtual bool FineTickerRunning(TickReason reason) const noexcept;
-	virtual void FineTickerStart(TickReason reason, int millis, int tolerance) noexcept;
-	virtual void FineTickerCancel(TickReason reason) noexcept;
-	virtual bool SetIdle(bool) noexcept {
-		return false;
-	}
+	virtual bool FineTickerRunning(TickReason reason) const noexcept = 0;
+	virtual void FineTickerStart(TickReason reason, int millis, int tolerance) noexcept = 0;
+	virtual void FineTickerCancel(TickReason reason) noexcept = 0;
+	virtual bool SetIdle(bool on) noexcept = 0;
 	void ChangeMouseCapture(bool on) noexcept;
 	virtual void SetMouseCapture(bool on) noexcept = 0;
 	virtual bool HaveMouseCapture() const noexcept = 0;
