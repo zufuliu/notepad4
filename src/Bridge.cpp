@@ -835,7 +835,7 @@ std::string SaveToStreamRTF(Sci_Position startPos, Sci_Position endPos) {
 			colorList[colorCount++] = definition.foreColor;
 		}
 
-		// PL: highlights doesn't seems to follow a distinct table, at least with WordPad and Word 97
+		// PL: highlights seems doesn't follow a distinct table, at least with WordPad and Word 97
 		// Perhaps it is different for Word 6?
 		int iBack = 1;
 		for (; iBack < colorCount; iBack++) {

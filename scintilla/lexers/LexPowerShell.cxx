@@ -470,6 +470,7 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 		}
 		if (startPos == lineStartNext) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
+			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
 			} else if (visibleChars) {
@@ -487,9 +488,7 @@ void FoldPowerShellDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
+			styler.SetLevel(lineCurrent, lev);
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);

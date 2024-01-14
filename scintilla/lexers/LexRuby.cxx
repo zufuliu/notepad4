@@ -687,9 +687,6 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 
 	QuoteCls Quote;
 
-	int numDots = 0;  // For numbers --
-					  // Don't start lexing in the middle of a num
-
 	synchronizeDocStart(startPos, length, initStyle, styler, false);
 	const Sci_Position lengthDoc = startPos + length;
 
@@ -815,7 +812,6 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 				styler.ColorTo(i, state);
 				state = SCE_RB_NUMBER;
 				is_real_number = true;
-				numDots = 0;
 			} else if (isHighBitChar(ch) || iswordstart(ch)) {
 				styler.ColorTo(i, state);
 				state = SCE_RB_WORD;
@@ -1218,14 +1214,11 @@ void ColouriseRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, 
 					preferRE = false;
 					advance_char(i, ch, chNext, chNext2);
 				}
-			} else if (isSafeAlnumOrHigh(ch) || ch == '_') {
+			} else if (isSafeAlnumOrHigh(ch) || ch == '_' || (ch == '.' && isSafeDigit(chNext))) {
 				// Keep going
 			} else if (ch == '.' && chNext == '.') {
-				++numDots;
 				styler.ColorTo(i, state);
 				redo_char(i, ch, chNext, chNext2, state); // pass by ref
-			} else if (ch == '.' && ++numDots == 1) {
-				// Keep going
 			} else {
 				styler.ColorTo(i, state);
 				redo_char(i, ch, chNext, chNext2, state); // pass by ref
@@ -1741,7 +1734,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 	synchronizeDocStart(startPos, length, initStyle, styler, false);
 	const Sci_PositionU endPos = startPos + length;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
-	int levelPrev = startPos == 0 ? 0 : (styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK & ~SC_FOLDLEVELBASE);
+	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	uint8_t chPrev = '\0';
 	uint8_t chNext = styler[startPos];
@@ -1779,10 +1772,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			if (ch == '(' || ch == '{' || ch == '[') {
 				levelCurrent++;
 			} else if (ch == ')' || ch == '}' || ch == ']') {
-				// Don't decrement below 0
-				if (levelCurrent > 0) {
-					levelCurrent--;
-				}
+				levelCurrent--;
 			}
 		} else if (style == SCE_RB_WORD && styleNext != SCE_RB_WORD) {
 			// Look at the keyword on the left and decide what to do
@@ -1790,9 +1780,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			prevWord[0] = 0;
 			getPrevWord(startPos - 1, prevWord, styler, SCE_RB_WORD);
 			if (StrEqual(prevWord, "end")) {
-				// Don't decrement below 0
-				if (levelCurrent > 0)
-					levelCurrent--;
+				levelCurrent--;
 			} else if (StrEqual(prevWord, "def")) {
 				levelCurrent++;
 				method_definition = MethodDefinition::Define;
@@ -1868,6 +1856,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 		chPrev = ch;
 		stylePrev = style;
 		if (startPos == lineStartNext) {
+			levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			}
@@ -1875,7 +1864,7 @@ void FoldRbDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexer
 			int lev = levelPrev;
 			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
-			styler.SetLevel(lineCurrent, lev | SC_FOLDLEVELBASE);
+			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
 			lineStartNext = sci::min(lineStartNext, endPos);

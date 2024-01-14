@@ -948,13 +948,14 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			break;
 
 		case SCE_SH_HERE_Q:
-			if (style == SCE_SH_HERE_Q && styleNext == SCE_SH_DEFAULT) {
+			if (styleNext == SCE_SH_DEFAULT) {
 				levelCurrent--;
 			}
 			break;
 		}
 
 		if (startPos == lineStartNext) {
+			levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 			// Comment folding
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
@@ -964,9 +965,7 @@ void FoldBashDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lex
 			if ((levelCurrent > levelPrev)) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
+			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
 			lineStartNext = sci::min(lineStartNext, endPos);

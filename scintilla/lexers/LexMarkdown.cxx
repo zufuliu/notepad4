@@ -1128,7 +1128,7 @@ bool MarkdownLexer::DetectAutoLink() {
 		periodCount = 0;
 		autoLink = result;
 		SaveOuterStyle(sc.state);
-		sc.SetState((sc.state == SCE_H_COMMENT)? SCE_MARKDOWN_COMMENT_LINK : STYLE_LINK);
+		sc.SetState((sc.state == SCE_H_COMMENT)? STYLE_COMMENT_LINK : STYLE_LINK);
 		sc.Advance(offset);
 		return true;
 	}
@@ -2111,7 +2111,7 @@ void ColouriseMarkdownDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			continue;
 
 		case STYLE_LINK:
-		case SCE_MARKDOWN_COMMENT_LINK:
+		case STYLE_COMMENT_LINK:
 			if (lexer.HighlightAutoLink()) {
 				continue;
 			}

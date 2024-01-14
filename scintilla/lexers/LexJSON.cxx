@@ -256,14 +256,13 @@ void ColouriseJSONDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		atLineStart = startPos == lineStartNext;
 		if (atLineStart) {
 			if (fold) {
+				levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
 				}
-				if (lev != styler.LevelAt(lineCurrent)) {
-					styler.SetLevel(lineCurrent, lev);
-				}
+				styler.SetLevel(lineCurrent, lev);
 				levelCurrent = levelNext;
 			}
 			lineCurrent++;

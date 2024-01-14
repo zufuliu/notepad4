@@ -333,7 +333,9 @@ void ColouriseTCLDoc(Sci_PositionU startPos, Sci_Position length, int, LexerWord
 				case '}':
 					sc.SetState(SCE_TCL_OPERATOR);
 					expected = true;
-					--currentLevel;
+					if (currentLevel > 0) {
+						--currentLevel;
+					}
 					break;
 				case '[':
 					expected = true;

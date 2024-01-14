@@ -761,13 +761,12 @@ void FoldSqlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, Lexe
 			}
 		}
 		if (atEOL || (i == endPos - 1)) {
+			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 			const int levelUse = levelCurrent;
 			int lev = levelUse | levelNext << 16;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
+			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			levelCurrent = levelNext;
 			statementFound = false;

@@ -70,7 +70,7 @@ class LexerAttr(IntFlag):
 
 class KeywordAttr(IntFlag):
 	Default = 0
-	MakeLower = 1	# need convert to lower case for lexer.
+	MakeLower = 1	# need converted to lower case for lexer.
 	PreSorted = 2	# word list is presorted.
 	NoLexer = 4		# not used by lexer, listed for auto-completion.
 	NoAutoComp = 8	# don't add to default auto-completion list.
@@ -560,7 +560,7 @@ LexerConfigMap = {
 		'character_style': ['SCE_JAVA_CHARACTER'],
 		'angle_bracket_generic': True,
 		'generic_type_style': ['SCE_JAVA_CLASS', 'SCE_JAVA_INTERFACE', 'SCE_JAVA_ENUM'],
-		'operator_style': ['SCE_JAVA_OPERATOR'],
+		'operator_style': ['SCE_JAVA_OPERATOR', 'SCE_JAVA_OPERATOR2'],
 		'extra_word_char': '$:',
 		#'ignore_word_style': ['SCE_JAVA_WORD', 'SCE_JAVA_WORD2', 'SCE_JAVA_DIRECTIVE'],
 		'string_style_range': ['SCE_JAVA_CHARACTER', 'SCE_JAVA_PLACEHOLDER'],
@@ -688,7 +688,7 @@ LexerConfigMap = {
 	},
 	'NP2LEX_MARKDOWN': {
 		'block_comment_string': ('<!--', '-->'),
-		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT', 'SCE_MARKDOWN_COMMENT_LINK'],
+		'comment_style_list': ['SCE_H_COMMENT', 'SCE_H_SGML_COMMENT', 'STYLE_COMMENT_LINK'],
 		'default_fold_level': ['header1', 'header2', 'header3'],
 		'escape_char_style': 'SCE_MARKDOWN_ESCAPECHAR',
 		'escape_punctuation': True,

@@ -570,7 +570,7 @@ void ColourisePerlDoc(Sci_PositionU startPos, Sci_Position length, int initStyle
 
 	// Backtrack to beginning of style if required...
 	// If in a long distance lexical state, backtrack to find quote characters.
-	// Includes strings (may be multi-line), numbers (additional state), format
+	// Includes strings (maybe multi-line), numbers (additional state), format
 	// bodies, as well as POD sections.
 	if (initStyle == SCE_PL_HERE_Q
 		|| initStyle == SCE_PL_HERE_QQ
@@ -1655,6 +1655,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 		atLineStart = startPos == lineStartNext;
 		if (atLineStart) {
 			// Comment folding
+			levelCurrent = sci::max(levelCurrent, SC_FOLDLEVELBASE);
 			if (IsCommentLine(lineCurrent)) {
 				levelCurrent += IsCommentLine(lineCurrent + 1) - IsCommentLine(lineCurrent - 1);
 			}
@@ -1678,9 +1679,7 @@ void FoldPerlDoc(Sci_PositionU startPos, Sci_Position length, int /*initStyle*/,
 			lev |= levelCurrent << 16;
 			if ((levelCurrent > levelPrev))
 				lev |= SC_FOLDLEVELHEADERFLAG;
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
+			styler.SetLevel(lineCurrent, lev);
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
 			lineStartNext = sci::min(lineStartNext, endPos);

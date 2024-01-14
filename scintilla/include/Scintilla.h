@@ -209,8 +209,7 @@ typedef sptr_t (*SciFnDirectStatus)(sptr_t ptr, unsigned int iMessage, uptr_t wP
 #define SCI_SETMARGINS 2252
 #define SCI_GETMARGINS 2253
 #define STYLE_DEFAULT 0
-#define STYLE_LINK 32
-#define STYLE_LINENUMBER 33
+#define STYLE_LINENUMBER 32
 #define STYLE_BRACELIGHT 34
 #define STYLE_BRACEBAD 35
 #define STYLE_CONTROLCHAR 36

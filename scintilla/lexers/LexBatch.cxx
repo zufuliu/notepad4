@@ -643,14 +643,13 @@ void ColouriseBatchDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 					}
 				}
 
+				levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
 				}
-				if (lev != styler.LevelAt(sc.currentLine)) {
-					styler.SetLevel(sc.currentLine, lev);
-				}
+				styler.SetLevel(sc.currentLine, lev);
 				levelPrev = lev;
 				levelCurrent = levelNext;
 				prev2LineState = prevLineState;

@@ -14,7 +14,7 @@
 //! Enable the .LOG feature
 // When enabled and Notepad2 opens a file starts with .LOG,
 // Notepad2 will append current time to the file.
-// This is a hiden feature in Windows Notepad.
+// This is a hidden feature in Windows Notepad.
 #define NP2_ENABLE_DOT_LOG_FEATURE				0
 
 //! Enable localization with satellite resource DLLs.
@@ -26,3 +26,6 @@
 #define NP2_ENABLE_LOCALIZE_LEXER_NAME			1
 //! Enable localization for scheme/lexer style names.
 #define NP2_ENABLE_LOCALIZE_STYLE_NAME			1
+
+// scintilla\include\LaTeXInput.h defined
+// NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT

@@ -239,14 +239,13 @@ void ColouriseGraphVizDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int in
 			styler.SetLineState(sc.currentLine, (htmlTagLevel << 4) | htmlCommentStyle);
 			visibleChars = 0;
 			if (fold) {
+				levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext) {
 					lev |= SC_FOLDLEVELHEADERFLAG;
 				}
-				if (lev != styler.LevelAt(sc.currentLine)) {
-					styler.SetLevel(sc.currentLine, lev);
-				}
+				styler.SetLevel(sc.currentLine, lev);
 				levelCurrent = levelNext;
 			}
 		}

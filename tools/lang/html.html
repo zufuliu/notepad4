@@ -1,5 +1,5 @@
 <!--
-https://whatwg.org/ 16 November 2023
+https://whatwg.org/ 12 January 2024
 HTML 4.01 https://www.w3.org/TR/html4/ 27 March 2018
 XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 -->
@@ -11,11 +11,11 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	accesskey
 	autocapitalize="off none on sentences words characters"
 	autofocus
-	contenteditable
+	contenteditable="true false plaintext-only"
 	dir="ltr rtl auto"
 	draggable
 	enterkeyhint="enter done go next previous search send"
-	hidden
+	hidden="hidden until-found"
 	inert
 	inputmode="none text tel url email numeric decimal search"
 	is
@@ -27,8 +27,8 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 	lang="en"
 	manifest
 	nonce
-	popover popovertarget="toggle show hide" popovertargetaction
-	spellcheck
+	popover="auto manual" popovertarget="toggle show hide" popovertargetaction
+	spellcheck="true false"
 	style
 	tabindex
 	title
@@ -38,26 +38,19 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<title>HTML5</title>
 		<!-- https://html.spec.whatwg.org/multipage/semantics.html -->
 		<base href target>
-		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes
-		alternate canonical author bookmark dns-prefetch external help icon
-		manifest modulepreload license next nofollow noopener noreferrer opener
-		pingback preconnect prefetch preload prerender prev search stylesheet tag
-		-->
+		<!-- Link types https://html.spec.whatwg.org/multipage/links.html#linkTypes -->
 		<link href
 			crossorigin="anonymous use-credentials"
-			rel="alternate author dns-prefetch help icon license modulepreload next pingback preconnect prefetch preload prerender prev search stylesheet"
+			rel="alternate canonical author bookmark dns-prefetch external help icon manifest modulepreload license next nofollow noopener noreferrer opener pingback preconnect prefetch preload prerender prev privacy-policy search stylesheet tag terms-of-service"
 			media integrity hreflang type="text/plain text/css"
-			referrerpolicy="no-referrer no-referrer-when-downgrade unsafe-url origin-when-cross-origin"
+			referrerpolicy="no-referrer no-referrer-when-downgrade same-origin origin strict-origin origin-when-cross-origin strict-origin-when-cross-origin unsafe-url"
 			sizes imagesrcset imagesizes as blocking color disabled
 			fetchpriority="high low auto">
-		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#document-metadata#standard-metadata-names
-		application-name author description generator keywords
-		referrer[never default always origin-when-crossorigin]
-		theme-color color-scheme
-		-->
-		<meta name http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
-			content charset="utf-8" media>
-		<style media blocking type="text/css" title></style>
+		<!-- Standard metadata names https://html.spec.whatwg.org/multipage/semantics.html#standard-metadata-names -->
+		<meta name="application-name author description generator keywords referrer theme-color color-scheme "
+			http-equiv="content-language content-type default-style refresh set-cookie x-ua-compatible content-security-policy"
+			content="never default always origin-when-crossorigin" charset="utf-8" media>
+		<style media blocking="render" type="text/css" title></style>
 	</head>
 	<!-- event handler content attributes https://html.spec.whatwg.org/multipage/dom.html#global-attributes -->
 	<!-- https://html.spec.whatwg.org/multipage/webappapis.html#events -->
@@ -167,6 +160,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		onoffline
 		ononline
 		onpagehide
+		onpagereveal
 		onpageshow
 		onpopstate
 		onrejectionhandled
@@ -210,8 +204,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<!-- Text-level semantics https://html.spec.whatwg.org/multipage/text-level-semantics.html -->
 		<a href="about:, blob:, data:, http:, https:, mailto:, sms:, urn:, tel:"
 		target="_blank _self _parent _top" download ping
-		rel="alternate author bookmark external help license next nofollow noopener noreferrer prev search tag"
-		rev hreflang type referrerpolicy></a>
+		rel rev hreflang type referrerpolicy></a>
 		<em></em>
 		<strong></strong>
 		<small></small>
@@ -245,8 +238,9 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<del cite datetime></del>
 		<!-- Embedded content https://html.spec.whatwg.org/multipage/embedded-content.html -->
 		<picture></picture>
-		<source src type srcset sizes media width height>
-		<img alt src srcset sizes crossorigin usemap ismap width height referrerpolicy decoding loading fetchpriority>
+		<source src type srcset sizes="auto" media width height>
+		<img alt src srcset sizes crossorigin usemap ismap width height
+		decoding="sync async auto" loading="lazy eager" fetchpriority>
 		<!-- https://html.spec.whatwg.org/multipage/iframe-embed-object.html -->
 		<iframe src srcdoc name sandbox allow allowfullscreen allowpaymentrequest width height referrerpolicy loading></iframe>
 		<embed src type width height>
@@ -276,7 +270,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 				<col span>
 			</colgroup>
 			<thead>
-				<tr><th colspan rowspan headers scope abbr></th></tr>
+				<tr><th colspan rowspan headers scope="row col rowgroup colgroup auto" abbr></th></tr>
 			</thead>
 			<tbody>
 				<tr><td colspan rowspan headers></td></tr>
@@ -284,7 +278,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 			<tfoot></tfoot>
 		</table>
 		<!-- https://html.spec.whatwg.org/multipage/forms.html -->
-		<form accept-charset action autocomplete
+		<form accept-charset action autocomplete="on off"
 			enctype="application/x-www-form-urlencoded multipart/form-data text/plain" method name novalidate target rel>
 			<label for></label>
 			<!-- https://html.spec.whatwg.org/multipage/input.html#the-input-element -->
@@ -301,7 +295,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 				</optgroup>
 			</select>
 			<datalist></datalist>
-			<textarea autocomplete cols dirname disabled form maxlength minlength name placeholder readonly required rows wrap></textarea>
+			<textarea autocomplete cols dirname disabled form maxlength minlength name placeholder readonly required rows wrap="soft hard"></textarea>
 			<output for form name></output>
 			<progress value max></progress>
 			<meter value min max low high optimum></meter>
@@ -315,7 +309,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 		<dialog open></dialog>
 		<!-- Scripting https://html.spec.whatwg.org/multipage/scripting.html -->
 		<script src type="text/javascript text/ecmascript text/jscript text/livescript module text/plain text/xml application/octet-stream application/xml"
-			charset nomodule async defer crossorigin integrity referrerpolicy blocking fetchpriority></script>
+			charset nomodule async defer crossorigin integrity referrerpolicy blocking="render" fetchpriority></script>
 		<noscript></noscript>
 		<template shadowrootmode="open closed" shadowrootdelegatesfocus></template>
 		<slot name></slot>
@@ -414,7 +408,7 @@ XHTML 2.0 https://www.w3.org/TR/xhtml2/ 16 December 2010
 				</ul>
 			</body>
 		</html>
-		<!-- RDFa https://www.w3.org/TR/xhtml-rdfa-primer/ -->
+		<!-- RDFa https://www.w3.org/TR/xhtml-rdfa-primer/ 17 March 2015 -->
 		<meta property vocab resource typeof content datatype>
 	</body>
 </html>

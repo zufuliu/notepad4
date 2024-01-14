@@ -1189,8 +1189,8 @@ size_t Document::SafeSegment(const char *text, size_t lengthSegment, EncodingFam
 					prev = current;
 					it += UTF8BytesOfLead(static_cast<unsigned char>(*it));
 				} while (it < end);
-				// no boundary between last two code points, assume text ends with a longest sequence.
-				it -= longestUnicodeCharacterSquenceBytes + UTF8MaxBytes;
+				// no boundary between last two code points, assume text ends with the longest sequence.
+				it -= longestUnicodeCharacterSequenceBytes + UTF8MaxBytes;
 			}
 #endif
 		}
@@ -1412,10 +1412,7 @@ Sci::Position Document::Undo() {
 			bool multiLine = false;
 			const int steps = cb.StartUndo();
 			//Platform::DebugPrintf("Steps=%d\n", steps);
-			Sci::Position coalescedRemovePos = -1;
-			Sci::Position coalescedRemoveLen = 0;
-			Sci::Position prevRemoveActionPos = -1;
-			Sci::Position prevRemoveActionLen = 0;
+			Range coalescedRemove;	// Default is empty at 0
 			for (int step = 0; step < steps; step++) {
 				const Sci::Line prevLinesTotal = LinesTotal();
 				const Action &action = cb.GetUndoStep();
@@ -1426,12 +1423,6 @@ Sci::Position Document::Undo() {
 					DocModification dm(ModificationFlags::Container | ModificationFlags::Undo);
 					dm.token = action.position;
 					NotifyModified(dm);
-					if (!action.mayCoalesce) {
-						coalescedRemovePos = -1;
-						coalescedRemoveLen = 0;
-						prevRemoveActionPos = -1;
-						prevRemoveActionLen = 0;
-					}
 				} else {
 					NotifyModified(DocModification(
 						ModificationFlags::BeforeDelete | ModificationFlags::Undo, action));
@@ -1447,22 +1438,15 @@ Sci::Position Document::Undo() {
 				if (action.at == ActionType::remove) {
 					newPos += action.lenData;
 					modFlags |= ModificationFlags::InsertText;
-					if ((coalescedRemoveLen > 0) &&
-						(action.position == prevRemoveActionPos || action.position == (prevRemoveActionPos + prevRemoveActionLen))) {
-						coalescedRemoveLen += action.lenData;
-						newPos = coalescedRemovePos + coalescedRemoveLen;
+					if (coalescedRemove.Contains(action.position)) {
+						coalescedRemove.end += action.lenData;
+						newPos = coalescedRemove.end;
 					} else {
-						coalescedRemovePos = action.position;
-						coalescedRemoveLen = action.lenData;
+						coalescedRemove = Range(action.position, action.position + action.lenData);
 					}
-					prevRemoveActionPos = action.position;
-					prevRemoveActionLen = action.lenData;
 				} else if (action.at == ActionType::insert) {
 					modFlags |= ModificationFlags::DeleteText;
-					coalescedRemovePos = -1;
-					coalescedRemoveLen = 0;
-					prevRemoveActionPos = -1;
-					prevRemoveActionLen = 0;
+					coalescedRemove = Range();
 				}
 				if (steps > 1)
 					modFlags |= ModificationFlags::MultiStepUndoRedo;
@@ -2096,7 +2080,7 @@ bool Document::IsWordEndAt(Sci::Position pos) const noexcept {
 }
 
 /**
- * Check that the given range is has transitions between character classes at both
+ * Check that the given range has transitions between character classes at both
  * ends and where the characters on the inside are word or punctuation characters.
  */
 bool Document::IsWordAt(Sci::Position start, Sci::Position end) const noexcept {
@@ -2158,7 +2142,7 @@ Sci::Position Document::FindText(Sci::Position minPos, Sci::Position maxPos, con
 		// pos >= endSearch: break           continue
 		// pos < endSearch:  continue        break
 		// i.e. continue search when direction and (pos - endSearch) have opposite signs,
-		// which can be wrote as: (direction ^ (pos - endSearch)) < 0
+		// which can be written as: (direction ^ (pos - endSearch)) < 0
 
 		// Range endpoints should not be inside DBCS characters, but just in case, move them.
 		const Sci::Position startPos = MovePositionOutsideChar(minPos, increment, false);
@@ -2407,11 +2391,11 @@ LineCharacterIndexType Document::LineCharacterIndex() const noexcept {
 }
 
 void Document::AllocateLineCharacterIndex(LineCharacterIndexType lineCharacterIndex) {
-	return cb.AllocateLineCharacterIndex(lineCharacterIndex);
+	cb.AllocateLineCharacterIndex(lineCharacterIndex);
 }
 
 void Document::ReleaseLineCharacterIndex(LineCharacterIndexType lineCharacterIndex) {
-	return cb.ReleaseLineCharacterIndex(lineCharacterIndex);
+	cb.ReleaseLineCharacterIndex(lineCharacterIndex);
 }
 
 void Document::AllocateLines(Sci::Line lines) {
@@ -3251,9 +3235,6 @@ bool MatchOnLines(const Document *doc, const Regex &regexp, const RESearchRange 
 			for (const boost::regex_iterator<Iterator> last; it != last; ++it) {
 				match = *it;
 				matched = true;
-				if (resr.increment > 0) {
-					break;
-				}
 			}
 			if (matched) {
 				break;

@@ -334,6 +334,7 @@ void ColouriseTexiDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					levelCurrent = levelNext - 1;
 					headerLevel = 0;
 				}
+				levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 				const int levelUse = levelCurrent;
 				int lev = levelUse | levelNext << 16;
 				if (levelUse < levelNext) {

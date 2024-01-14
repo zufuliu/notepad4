@@ -17,9 +17,9 @@ size_t UTF8PositionFromUTF16Position(std::string_view u8Text, size_t positionUTF
 void UTF8FromUTF16(std::wstring_view wsv, char *putf, size_t len) noexcept;
 void UTF8FromUTF32Character(int uch, char *putf) noexcept;
 size_t UTF16Length(std::string_view svu8) noexcept;
-size_t UTF16FromUTF8(std::string_view svu8, wchar_t *tbuf, size_t tlen);
+size_t UTF16FromUTF8(std::string_view svu8, wchar_t *tbuf, size_t tlen) noexcept;
 size_t UTF32Length(std::string_view svu8) noexcept;
-size_t UTF32FromUTF8(std::string_view svu8, unsigned int *tbuf, size_t tlen);
+size_t UTF32FromUTF8(std::string_view svu8, unsigned int *tbuf, size_t tlen) noexcept;
 // WStringFromUTF8 does the right thing when wchar_t is 2 or 4 bytes so
 // works on both Windows and Unix.
 std::wstring WStringFromUTF8(std::string_view svu8);

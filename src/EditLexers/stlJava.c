@@ -6,7 +6,7 @@ static KEYWORDLIST Keywords_Java = {{
 "abstract assert break case catch class const continue default do else enum extends false final finally for goto "
 "if implements import instanceof interface native new non-sealed null "
 "package parcelable permits private protected public record return sealed static strictfp super switch synchronized "
-"this throw throws transient true try var volatile while yield "
+"this throw throws transient true try var volatile when while yield "
 
 , // 1 types
 "boolean byte char double float int long short void "
@@ -103,14 +103,14 @@ static EDITSTYLE Styles_Java[] = {
 	{ MULTI_STYLE(SCE_JAVA_COMMENTLINEDOC, SCE_JAVA_COMMENTBLOCKDOC, 0, 0), NP2StyleX_DocComment, L"fore:#408040" },
 	{ MULTI_STYLE(SCE_JAVA_COMMENTTAGAT, SCE_JAVA_COMMENTTAGHTML, 0, 0), NP2StyleX_DocCommentTag, L"fore:#408080" },
 	{ SCE_JAVA_TASKMARKER, NP2StyleX_TaskMarker, L"bold; fore:#408080" },
-	{ MULTI_STYLE(SCE_JAVA_CHARACTER, SCE_JAVA_STRING, 0, 0), NP2StyleX_String, L"fore:#008000" },
-	{ SCE_JAVA_TRIPLE_STRING, NP2StyleX_TextBlock, L"fore:#F08000" },
+	{ MULTI_STYLE(SCE_JAVA_CHARACTER, SCE_JAVA_STRING, SCE_JAVA_TEMPLATE, 0), NP2StyleX_String, L"fore:#008000" },
+	{ MULTI_STYLE(SCE_JAVA_TRIPLE_STRING, SCE_JAVA_TRIPLE_TEMPLATE, 0, 0), NP2StyleX_TextBlock, L"fore:#F08000" },
 	{ SCE_JAVA_ESCAPECHAR, NP2StyleX_EscapeSequence, L"fore:#0080C0" },
 	{ SCE_JAVA_FORMAT_SPECIFIER, NP2StyleX_FormatSpecifier, L"fore:#7C5AF3" },
 	{ SCE_JAVA_PLACEHOLDER, NP2StyleX_Placeholder, L"fore:#8080FF" },
 	{ SCE_JAVA_LABEL, NP2StyleX_Label, L"back:#FFC040" },
 	{ SCE_JAVA_NUMBER, NP2StyleX_Number, L"fore:#FF0000" },
-	{ SCE_JAVA_OPERATOR, NP2StyleX_Operator, L"fore:#B000B0" },
+	{ MULTI_STYLE(SCE_JAVA_OPERATOR, SCE_JAVA_OPERATOR2, 0, 0), NP2StyleX_Operator, L"fore:#B000B0" },
 };
 
 EDITLEXER lexJava = {
@@ -124,7 +124,7 @@ EDITLEXER lexJava = {
 		'\\', SCE_JAVA_ESCAPECHAR, SCE_JAVA_FORMAT_SPECIFIER,
 		0,
 		SCE_JAVA_CHARACTER, 0,
-		SCE_JAVA_OPERATOR, 0
+		SCE_JAVA_OPERATOR, SCE_JAVA_OPERATOR2
 		, KeywordAttr32(0, KeywordAttr_PreSorted) // keywords
 		| KeywordAttr32(1, KeywordAttr_PreSorted) // types
 		| KeywordAttr32(2, KeywordAttr_PreSorted) // directive

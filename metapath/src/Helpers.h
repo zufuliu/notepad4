@@ -123,7 +123,7 @@ extern DWORD g_uWinVer;
 #define LOAD_LIBRARY_AS_IMAGE_RESOURCE	0x00000020
 #endif
 
-#if defined(__GNUC__) && __GNUC__ >= 8
+#if (defined(__GNUC__) && __GNUC__ >= 8) || (defined(__clang__) && __clang_major__ >= 18)
 // GCC statement expression
 #define DLLFunction(funcSig, hModule, funcName) __extension__({			\
 	_Pragma("GCC diagnostic push")										\

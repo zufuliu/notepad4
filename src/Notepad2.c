@@ -42,8 +42,8 @@
 #define SM_CXPADDEDBORDER	92
 #endif
 
-//! show fold level
-#define NP2_DEBUG_FOLD_LEVEL		0
+//! show code folding level and state on line number margin
+#define NP2_DEBUG_CODE_FOLDING		0
 
 /******************************************************************************
 *
@@ -1848,7 +1848,7 @@ void EditCreate(HWND hwndParent) {
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEREND, SC_MARK_BOXPLUSCONNECTED);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDEROPENMID, SC_MARK_BOXMINUSCONNECTED);
 	SciCall_MarkerDefine(SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_TCORNER);
-#if NP2_DEBUG_FOLD_LEVEL
+#if NP2_DEBUG_CODE_FOLDING
 	SciCall_SetFoldFlags(SC_FOLDFLAG_LEVELNUMBERS);
 #endif
 	SciCall_SetAutomaticFold(SC_AUTOMATICFOLD_SHOW | SC_AUTOMATICFOLD_CLICK | SC_AUTOMATICFOLD_CHANGE);
@@ -7301,7 +7301,7 @@ void UpdateStatusbar(void) {
 void UpdateLineNumberWidth(void) {
 	int width = 0;
 	if (bShowLineNumbers) {
-#if NP2_DEBUG_FOLD_LEVEL
+#if NP2_DEBUG_CODE_FOLDING
 		width = 100;
 #else
 		char tchLines[32];
@@ -7652,7 +7652,7 @@ bool FileLoad(FileLoadFlag loadFlag, LPCWSTR lpszFile) {
 			// file with unknown lexer and unknown encoding
 			bUnknownFile = bUnknownFile && (iCurrentEncoding == CPI_DEFAULT);
 			// Set default button to "No" for diff/patch and unknown file.
-			// diff/patch file may contains content from files with different line endings.
+			// diff/patch file may contain content from files with different line endings.
 			status.bLineEndingsDefaultNo = bUnknownFile || pLexCurrent->iLexer == SCLEX_DIFF;
 			if (WarnLineEndingDlg(hwndMain, &status)) {
 				const int iNewEOLMode = GetScintillaEOLMode(status.iEOLMode);

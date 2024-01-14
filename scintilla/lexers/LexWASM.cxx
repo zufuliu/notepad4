@@ -253,6 +253,7 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 
 		if (startPos == lineStartNext) {
 			const int lineCommentNext = GetLineCommentState(styler.GetLineState(lineCurrent + 1));
+			levelNext = sci::max(levelNext, SC_FOLDLEVELBASE);
 			if (lineCommentCurrent) {
 				levelNext += lineCommentNext - lineCommentPrev;
 			}
@@ -262,9 +263,7 @@ void FoldWASMDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle
 			if (levelUse < levelNext) {
 				lev |= SC_FOLDLEVELHEADERFLAG;
 			}
-			if (lev != styler.LevelAt(lineCurrent)) {
-				styler.SetLevel(lineCurrent, lev);
-			}
+			styler.SetLevel(lineCurrent, lev);
 
 			lineCurrent++;
 			lineStartNext = styler.LineStart(lineCurrent + 1);
