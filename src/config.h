@@ -27,5 +27,4 @@
 //! Enable localization for scheme/lexer style names.
 #define NP2_ENABLE_LOCALIZE_STYLE_NAME			1
 
-// scintilla\include\LaTeXInput.h defined
-// NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT
+// scintilla\include\LaTeXInput.h defined NP2_ENABLE_LATEX_LIKE_EMOJI_INPUT

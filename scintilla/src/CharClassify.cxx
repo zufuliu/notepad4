@@ -118,8 +118,26 @@ int CharClassify::GetCharsOfClass(CharacterClass characterClass, unsigned char *
 
 namespace {
 
-template <typename DataType, size_t DataSize, typename ValueType, size_t BufferSize, int ValueBit=3>
-void ExpandRLE(const DataType (&data)[DataSize], ValueType (&buffer)[BufferSize]) noexcept {
+template <typename DataType, size_t DataSize, typename ValueType, size_t BufferSize>
+void ExpandRLE2(const DataType (&data)[DataSize], ValueType (&buffer)[BufferSize]) noexcept {
+	constexpr int ValueBit = 2;
+	constexpr DataType mask = (1 << ValueBit) - 1;
+	ValueType *p = buffer;
+
+	for (DataType count : data) {
+		const ValueType value = count & mask;
+		count >>= ValueBit;
+		assert(p + count <= buffer + BufferSize);
+		memset(p, value, count);
+		p += count;
+	}
+	// ensure full expanded
+	assert(p == buffer + BufferSize);
+}
+
+template <typename DataType, size_t DataSize, typename ValueType, size_t BufferSize>
+void ExpandRLE3(const DataType (&data)[DataSize], ValueType (&buffer)[BufferSize]) noexcept {
+	constexpr int ValueBit = 3;
 	constexpr DataType mask = (1 << ValueBit) - 1;
 	ValueType *p = buffer;
 
@@ -673,7 +691,7 @@ const uint8_t CharClassify::GraphemeBreakTable[] = {
 uint8_t CharClassify::classifyMap[0xffff + 1];
 
 void CharClassify::InitUnicodeData() noexcept {
-	ExpandRLE(CharClassifyRLE_BMP, classifyMap);
+	ExpandRLE3(CharClassifyRLE_BMP, classifyMap);
 }
 
 namespace {
@@ -890,39 +908,39 @@ DBCSCharClassify::DBCSCharClassify(int codePage_) noexcept {
 	case 932: {
 		// Shift-JIS
 		constexpr uint8_t BytesRLE_CP932[] = {252, 4, 254, 4, 6, 127, 254, 6, 119, 12,};
-		ExpandRLE(BytesRLE_CP932, leadByte);
+		ExpandRLE2(BytesRLE_CP932, leadByte);
 
-		ExpandRLE(CharClassifyRLE_CP932, classifyMap);
+		ExpandRLE3(CharClassifyRLE_CP932, classifyMap);
 	} break;
 
 	case 936: {
 		// GBK
 		constexpr uint8_t BytesRLE_CP936[] = {252, 4, 254, 4, 6, 255, 255, 4,};
-		ExpandRLE(BytesRLE_CP936, leadByte);
+		ExpandRLE2(BytesRLE_CP936, leadByte);
 
-		ExpandRLE(CharClassifyRLE_CP936, classifyMap);
+		ExpandRLE3(CharClassifyRLE_CP936, classifyMap);
 	} break;
 
 	case 949: {
 		// Korean Unified Hangul Code, Wansung KS C-5601-1987
 		constexpr uint8_t BytesRLE_CP949[] = {252, 8, 106, 24, 106, 24, 255, 255, 4,};
-		ExpandRLE(BytesRLE_CP949, leadByte);
+		ExpandRLE2(BytesRLE_CP949, leadByte);
 
-		ExpandRLE(CharClassifyRLE_CP949, classifyMap);
+		ExpandRLE3(CharClassifyRLE_CP949, classifyMap);
 	} break;
 
 	case 950: {
 		// Big5
 		constexpr uint8_t BytesRLE_CP950[] = {252, 4, 254, 8, 129, 255, 127, 4,};
-		ExpandRLE(BytesRLE_CP950, leadByte);
+		ExpandRLE2(BytesRLE_CP950, leadByte);
 
-		ExpandRLE(CharClassifyRLE_CP950, classifyMap);
+		ExpandRLE3(CharClassifyRLE_CP950, classifyMap);
 	} break;
 
 	default: {
 		// Korean Johab, KS C-5601-1992
 		constexpr uint8_t BytesRLE_CP1361[] = {196, 254, 62, 8, 14, 255, 71, 18, 31, 6, 107, 22, 4,};
-		ExpandRLE(BytesRLE_CP1361, leadByte);
+		ExpandRLE2(BytesRLE_CP1361, leadByte);
 
 		ExpandRunBlock(CharClassify_CP1361Index, CharClassify_CP1361Data, classifyMap,
 			CharClassify_CP1361IndexBit, CharClassify_CP1361BlockBit);
