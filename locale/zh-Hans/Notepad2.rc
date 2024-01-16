@@ -1743,7 +1743,7 @@ BEGIN
 \\xHH\t十六进制值\n\
 \\\\\t反斜线"
 
-	IDS_REGEXPHELP			"正则表达式 (RegExp) 语法 (单行模式)\n\n\
+	IDS_REGEXPHELP			"通用正则表达式 (RegExp) 语法\n\n\
 .\t任何字符\n\
 ^\t行开始\n\
 $\t行结束\n\
@@ -1764,7 +1764,11 @@ $\t行结束\n\
 *? 或 +?\t对限量词 ""?"" 和 ""+"" 做非贪婪匹配\n\
 (\t区域开始\n\
 )\t区域结束\n\
-\\n\t替换时引用的区域(n 为 1-9)"
+\\n\t替换时引用的区域(n 为 1-9)\n\n\
+Boost Perl 正则表达式语法:\n\
+a|b\t匹配 a 或 b。\n\
+{n}\t精确匹配 n 次。\n\
+{n,m}\t匹配 n 至 m 次。"
 
 	IDS_WILDCARDHELP		"通配符搜索\n\n\
 *\t匹配 0 个或多个字符\n\

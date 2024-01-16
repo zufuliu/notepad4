@@ -1743,7 +1743,7 @@ BEGIN
 \\xHH\t16進数表記\n\
 \\\\\tバックスラッシュ自体"
 
-	IDS_REGEXPHELP			"正規表現の構文 (単一行のみ)\n\n\
+	IDS_REGEXPHELP			"Common 正規表現の構文\n\n\
 .\t何らかの1文字\n\
 ^\t行の先頭\n\
 $\t行の末尾\n\
@@ -1764,7 +1764,11 @@ $\t行の末尾\n\
 *? か +?\t上記記号の ""?"" と ""+"" を最長合致ではなくする\n\
 (\t範囲指定の括弧開始\n\
 )\t範囲指定の閉じ括弧\n\
-\\n\t置換時に対応括弧内の文字列を呼出 (n は 1-9)"
+\\n\t置換時に対応括弧内の文字列を呼出 (n は 1-9)\n\n\
+Boost Perl Regex Syntax:\n\
+a|b\tMatches either a or b\n\
+{n}\tMatches preceding exactly n times\n\
+{n,m}\tMatches preceding between n and m times"
 
 	IDS_WILDCARDHELP		"ワイルドカード検索\n\n\
 *\t0文字以上の文字列に合致\n\
