@@ -138,6 +138,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				if (IsISODateTime(sc.ch, sc.chNext)) {
 					sc.ChangeState(SCE_TOML_DATETIME);
 				} else if (IsTOMLKey(sc, braceCount, nullptr)) {
+					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
 			}
@@ -146,6 +147,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_TOML_DATETIME:
 			if (!(IsIdentifierChar(sc.ch) || IsISODateTime(sc.ch, sc.chNext))) {
 				if (IsTOMLKey(sc, braceCount, nullptr)) {
+					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
 			}
@@ -154,6 +156,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		case SCE_TOML_IDENTIFIER:
 			if (!IsIdentifierChar(sc.ch)) {
 				if (IsTOMLKey(sc, braceCount, &keywordLists[0])) {
+					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
 			}
@@ -167,16 +170,16 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				switch (keyState) {
 				case TOMLKeyState::Literal:
 					if (sc.ch == '\'') {
-						sc.Forward();
 						keyState = TOMLKeyState::Unquoted;
+						sc.Forward();
 					}
 					break;
 				case TOMLKeyState::Quoted:
 					if (sc.ch == '\\') {
 						sc.Forward();
 					} else if (sc.ch == '\"') {
-						sc.Forward();
 						keyState = TOMLKeyState::Unquoted;
+						sc.Forward();
 					}
 					break;
 				default:
@@ -188,11 +191,13 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					} else if (sc.ch == '\"') {
 						keyState = TOMLKeyState::Quoted;
 					} else if (sc.ch == '.') {
-						if (sc.state == SCE_TOML_KEY) {
+						if (sc.state == SCE_TOML_TABLE) {
+							++tableLevel;
+						} else {
 							sc.SetState(SCE_TOML_OPERATOR);
 							sc.ForwardSetState(SCE_TOML_KEY);
-						} else {
-							++tableLevel;
+							// TODO: skip space after dot
+							continue;
 						}
 					} else if (sc.state == SCE_TOML_KEY && sc.ch == '=') {
 						keyState = TOMLKeyState::End;
@@ -235,6 +240,7 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 				sc.Forward();
 				if (!IsTripleString(sc.state) && IsTOMLKey(sc, braceCount, nullptr)) {
+					keyState = TOMLKeyState::Unquoted;
 					continue;
 				}
 				sc.SetState(SCE_TOML_DEFAULT);
@@ -267,11 +273,13 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 		}
 
 		if (sc.state == SCE_TOML_DEFAULT) {
-			if (visibleChars == 0 && !braceCount) {
-				if (sc.ch == '#') {
-					sc.SetState(SCE_TOML_COMMENT);
+			if (sc.ch == '#') {
+				sc.SetState(SCE_TOML_COMMENT);
+				if (visibleChars == 0) {
 					lineType = TOMLLineType::CommentLine;
-				} else if (sc.ch == '[') {
+				}
+			} else if (visibleChars == 0 && braceCount == 0) {
+				if (sc.ch == '[') {
 					tableLevel = 0;
 					sc.SetState(SCE_TOML_TABLE);
 					if (sc.chNext == '[') {
@@ -280,22 +288,17 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					keyState = TOMLKeyState::Unquoted;
 					lineType = TOMLLineType::Table;
 				} else if (sc.ch == '\'' || sc.ch == '\"') {
-					sc.SetState(SCE_TOML_KEY);
 					keyState = (sc.ch == '\'')? TOMLKeyState::Literal : TOMLKeyState::Quoted;
-				} else if (IsTOMLUnquotedKey(sc.ch)) {
 					sc.SetState(SCE_TOML_KEY);
+				} else if (IsTOMLUnquotedKey(sc.ch)) {
 					keyState = TOMLKeyState::Unquoted;
+					sc.SetState(SCE_TOML_KEY);
 				} else if (!isspacechar(sc.ch)) {
 					// each line must be: key = value
 					sc.SetState(SCE_TOML_ERROR);
 				}
 			} else {
-				if (sc.ch == '#') {
-					sc.SetState(SCE_TOML_COMMENT);
-					if (visibleChars == 0) {
-						lineType = TOMLLineType::CommentLine;
-					}
-				} else if (sc.ch == '\'') {
+				 if (sc.ch == '\'') {
 					if (sc.MatchNext('\'', '\'')) {
 						sc.SetState(SCE_TOML_TRIPLE_STRING_SQ);
 						sc.Advance(2);
@@ -320,8 +323,8 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					}
 				} else if (braceCount && IsTOMLUnquotedKey(sc.ch)) {
 					// Inline Table
-					sc.SetState(SCE_TOML_KEY);
 					keyState = TOMLKeyState::Unquoted;
+					sc.SetState(SCE_TOML_KEY);
 				}
 			}
 		}
