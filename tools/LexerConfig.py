@@ -336,6 +336,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_CSHARP_CHARACTER', 'SCE_CSHARP_PREPROCESSOR_MESSAGE'],
 	},
 	'NP2LEX_CSS': {
+		'tab_settings': TabSettings_Space2,
 		'line_comment_string': ('', '//'),
 		'block_comment_string': ('/*', '*/'),
 		'comment_style_marker': 'SCE_CSS_CDO_CDC',
@@ -566,6 +567,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_JAVA_CHARACTER', 'SCE_JAVA_PLACEHOLDER'],
 	},
 	'NP2LEX_JAVASCRIPT': {
+		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'shebang_exe_name': 'node',
@@ -578,6 +580,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_JSX_TEXT', 'SCE_JS_ESCAPECHAR'],
 	},
 	'NP2LEX_JSON': {
+		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
 		'comment_style_list': ['SCE_JSON_LINECOMMENT', 'SCE_JSON_BLOCKCOMMENT'],
 		'default_fold_level': ['level1', 'level2', 'level13', 'level4'],
@@ -1000,6 +1003,7 @@ LexerConfigMap = {
 		'string_style_range': ['SCE_TOML_STRING_SQ', 'SCE_TOML_ESCAPECHAR'],
 	},
 	'NP2LEX_TYPESCRIPT': {
+		'tab_settings': TabSettings_Space2,
 		'cpp_style_comment': True,
 		'comment_style_marker': 'SCE_JS_TASKMARKER',
 		'default_fold_level': ['class', 'anonymous object', 'method'],
