@@ -992,6 +992,7 @@ LexerConfigMap = {
 			'SCE_TEXINFO_TITLE', 'SCE_TEXINFO_CHAPTER', 'SCE_TEXINFO_SECTION', 'SCE_TEXINFO_SECTION1', 'SCE_TEXINFO_SECTION2'],
 	},
 	'NP2LEX_TOML': {
+		'tab_settings': TabSettings_Space2,
 		'line_comment_string': '#',
 		'comment_style_marker': 'SCE_TOML_COMMENT',
 		'default_fold_level': ['table', 'comment'],
