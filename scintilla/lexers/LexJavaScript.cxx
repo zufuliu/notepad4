@@ -132,7 +132,7 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 	KeywordType kwType = KeywordType::None;
 	int chBeforeIdentifier = 0;
 
-	std::vector<int> nestedState; // string interpolation "${}"
+	std::vector<int> nestedState; // string interpolation `${}`
 	int jsxTagLevel = 0;
 	std::vector<int> jsxTagLevels;// nested JSX tag in expression
 
@@ -598,7 +598,7 @@ constexpr bool IsMultilineStringStyle(int style) noexcept {
 		|| style == SCE_JS_ESCAPECHAR;
 }
 
-void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);

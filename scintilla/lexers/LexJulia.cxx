@@ -490,8 +490,10 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				if (sc.ch == '{' || sc.ch == '[' || sc.ch == '(') {
 					++braceCount;
 				} else if (sc.ch == '}' || sc.ch == ']' || sc.ch == ')') {
-					--braceCount;
 					isTransposeOperator = true;
+					if (braceCount > 0) {
+						--braceCount;
+					}
 				}
 
 				sc.SetState(SCE_JULIA_OPERATOR);

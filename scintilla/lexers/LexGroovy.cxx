@@ -529,7 +529,9 @@ void ColouriseGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int init
 					if (sc.ch == '[' || sc.ch == '(') {
 						++bracketCount;
 					} else if (sc.ch == ']' || sc.ch == ')') {
-						--bracketCount;
+						if (bracketCount > 0) {
+							--bracketCount;
+						}
 					}
 				}
 			}
@@ -587,7 +589,7 @@ constexpr bool IsMultilineStringStyle(int style) noexcept {
 		|| style == SCE_GROOVY_ESCAPECHAR;
 }
 
-void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldGroovyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	FoldLineState foldPrev(0);

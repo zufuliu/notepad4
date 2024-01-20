@@ -626,8 +626,12 @@ bool PHPLexer::HighlightOperator(HtmlTextBlock block, int stylePrevNonWhite) {
 			parenCount = 0;
 		} else if (AnyOf<'[', ']'>(sc.ch)) {
 			lineStateAttribute = (sc.ch & 4) ? 0 : LineStateAttributeLine;
-		} else if (AnyOf<'(', ')'>(sc.ch)) {
-			parenCount += ('(' - sc.ch) | 1;
+		} else if (sc.ch == '(') {
+			++parenCount;
+		} else if (sc.ch == ')') {
+			if (parenCount > 0) {
+				--parenCount;
+			}
 		} else if (AnyOf<':', ';'>(sc.ch) && parenCount == 0) {
 			if (sc.ch == ':') {
 				if (!IsCssProperty(stylePrevNonWhite)) {
@@ -1432,7 +1436,7 @@ constexpr bool IsMultilineJsStringStyle(int style) noexcept {
 		|| style == SCE_H_QUESTION;
 }
 
-void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {
+void FoldPHPDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_PositionU endPos = startPos + lengthDoc;
 	Sci_Line lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;

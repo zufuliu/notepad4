@@ -318,8 +318,12 @@ void ColouriseTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 					sc.SetState(SCE_TOML_IDENTIFIER);
 				} else if (IsTOMLOperator(sc.ch)) {
 					sc.SetState(SCE_TOML_OPERATOR);
-					if (AnyOf<'[', ']', '{', '}'>(sc.ch)) {
-						braceCount += (('[' + ']')/2 + (sc.ch & 32)) - sc.ch;
+					if (sc.ch == '[' || sc.ch == '{') {
+						++braceCount;
+					} else if (sc.ch == ']' || sc.ch == '}') {
+						if (braceCount > 0) {
+							--braceCount;
+						}
 					}
 				} else if (braceCount && IsTOMLUnquotedKey(sc.ch)) {
 					// Inline Table
@@ -355,7 +359,7 @@ constexpr int GetTableLevel(int lineState) noexcept {
 }
 
 // code folding based on LexProps
-void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList, Accessor &styler) {
+void FoldTOMLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int /*initStyle*/, LexerWordList /*keywordLists*/, Accessor &styler) {
 	const Sci_Line endPos = startPos + lengthDoc;
 	const Sci_Line maxLines = styler.GetLine((endPos == styler.Length()) ? endPos : endPos - 1);
 

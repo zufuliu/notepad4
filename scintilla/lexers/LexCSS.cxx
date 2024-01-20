@@ -331,7 +331,9 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					break;
 				case ']':
 					levelNext--;
-					bracketCount--;
+					if (bracketCount > 0) {
+						bracketCount--;
+					}
 					break;
 				case '(':
 					levelNext++;
@@ -339,7 +341,9 @@ void ColouriseCssDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 					break;
 				case ')':
 					levelNext--;
-					parenCount--;
+					if (parenCount > 0) {
+						parenCount--;
+					}
 					break;
 				case ':':
 					if (parenCount == 0 && !IsProperty(stylePrevNonWhite)) {
