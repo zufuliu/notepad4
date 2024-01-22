@@ -652,15 +652,15 @@ void ColouriseAHKDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 				sc.SetState(SCE_AHK_HOTSTRING_VALUE);
 			} else if (sc.ch == ';') {
 				if (visibleChars == 0 || IsASpaceOrTab(sc.chPrev)) {
+					sc.SetState(SCE_AHK_COMMENTLINE);
 					if (visibleChars == 0) {
 						lineStateLineComment = AHKLineStateMaskLineComment;
-					}
-					sc.SetState(SCE_AHK_COMMENTLINE);
-					if (visibleChars == 0 && sc.chNext == '@') {
-						sc.Forward();
-						if (UnsafeLower(sc.chNext) == 'a') {
-							outerStyle = sc.state;
-							sc.SetState(SCE_AHK_DIRECTIVE_AT);
+						if (sc.chNext == '@') {
+							sc.Forward();
+							if (UnsafeLower(sc.chNext) == 'a') {
+								outerStyle = sc.state;
+								sc.SetState(SCE_AHK_DIRECTIVE_AT);
+							}
 						}
 					}
 				}

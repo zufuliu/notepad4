@@ -141,10 +141,10 @@ void ColouriseAPDLDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 				}
 			} else if (IsNumberStart(sc.ch, sc.chNext)) {
 				sc.SetState(SCE_APDL_NUMBER);
+				commandValue = 0;
 				if (visibleChars == 0) {
 					lineStateLineType = APDLLineStateDataLine;
 				}
-				commandValue = 0;
 			} else if (sc.ch == '"' || sc.ch == '\'') {
 				sc.SetState(SCE_APDL_STRING);
 				stringStartChar = sc.ch;

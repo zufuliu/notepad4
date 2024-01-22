@@ -116,6 +116,7 @@ public:
 		}
 		return buf[position - startPos];
 	}
+	[[deprecated]]
 	unsigned char SafeGetUCharAt(Sci_Position position, char chDefault) noexcept {
 		return SafeGetCharAt(position, chDefault);
 	}

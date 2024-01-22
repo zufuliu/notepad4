@@ -466,7 +466,6 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 			} else if (sc.ch == '0') {
 				numBase = 10;
 				isTransposeOperator = true;
-				sc.SetState(SCE_JULIA_NUMBER);
 				const int chNext = UnsafeLower(sc.chNext);
 				if (chNext == 'x') {
 					numBase = 16;
@@ -475,6 +474,7 @@ void ColouriseJuliaDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initS
 				} else if (chNext == 'o') {
 					numBase = 8;
 				}
+				sc.SetState(SCE_JULIA_NUMBER);
 				if (numBase != 10) {
 					sc.Forward();
 				}

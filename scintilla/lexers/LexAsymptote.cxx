@@ -182,10 +182,10 @@ void ColouriseAsyDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSty
 
 		if (sc.state == SCE_ASY_DEFAULT) {
 			if (sc.Match('/', '/')) {
+				sc.SetState(SCE_ASY_COMMENTLINE);
 				if (visibleChars == 0) {
 					lineStateLineType = AsymptoteLineStateMaskLineComment;
 				}
-				sc.SetState(SCE_ASY_COMMENTLINE);
 			} else if (sc.Match('/', '*')) {
 				sc.SetState(SCE_ASY_COMMENTBLOCK);
 				sc.Forward();
