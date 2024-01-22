@@ -29,6 +29,7 @@ Checks: >
     -modernize-use-using,
     -performance-enum-size,
     -performance-no-int-to-ptr,
+    -readability-avoid-nested-conditional-operator,
     -readability-avoid-unconditional-preprocessor-if,
     -readability-function-cognitive-complexity,
     -readability-identifier-length,

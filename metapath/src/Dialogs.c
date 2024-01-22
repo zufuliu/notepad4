@@ -195,7 +195,7 @@ INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) 
 		DLITEM dli;
 		dli.mask = DLI_FILENAME;
 		if (DirList_GetItem(hwndDirList, -1, &dli) >= 0) {
-			LPWSTR psz = (LPWSTR)PathFindFileName(dli.szFileName);
+			LPWSTR psz = PathFindFileName(dli.szFileName);
 			PathQuoteSpaces(psz);
 			Edit_SetText(hwndCtl, psz);
 		}
@@ -1653,7 +1653,7 @@ bool RenameFileDlg(HWND hwnd) {
 
 		// Generate fully qualified destination
 		lstrcpy(szFullDestination, dli.szFileName);
-		*((LPWSTR)PathFindFileName(szFullDestination)) = L'\0';
+		*(PathFindFileName(szFullDestination)) = L'\0';
 		lstrcat(szFullDestination, fod.szDestination);
 
 		// Double null terminated strings are essential!!!

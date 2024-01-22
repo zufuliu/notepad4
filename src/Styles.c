@@ -4616,7 +4616,9 @@ void Style_ConfigDlg(HWND hwnd) {
 					++count;
 				}
 			}
-			fStylesModified |= (count == 0) ? STYLESMODIFIED_NONE : ((count == ALL_LEXER_COUNT) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE);
+			if (count != 0) {
+				fStylesModified |= (count == ALL_LEXER_COUNT) ? STYLESMODIFIED_ALL_STYLE : STYLESMODIFIED_SOME_STYLE;
+			}
 		}
 
 		if (!param.bApply) {

@@ -1219,8 +1219,8 @@ void EditView::DrawEOL(Surface *surface, const EditModel &model, const ViewStyle
 				}
 			}
 
-			rcSegment.left = xStart + ll->positions[eolPos] - static_cast<XYPOSITION>(subLineStart) + virtualSpace;
-			rcSegment.right = xStart + ll->positions[eolPos + widthBytes] - static_cast<XYPOSITION>(subLineStart) + virtualSpace;
+			rcSegment.left = xStart + ll->positions[eolPos] - subLineStart + virtualSpace;
+			rcSegment.right = xStart + ll->positions[eolPos + widthBytes] - subLineStart + virtualSpace;
 			blobsWidth += rcSegment.Width();
 			ColourRGBA textBack = TextBackground(model, vsDraw, ll, background, eolInSelection, false, styleMain, eolPos);
 			if (drawEOLSelection) {
