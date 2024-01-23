@@ -445,8 +445,9 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 			WCHAR szFile[MAX_PATH * 2];
 
 			GetDlgItemText(hwnd, IDC_COMMANDLINE, szArgs, COUNTOF(szArgs));
-			ExpandEnvironmentStringsEx(szArgs, COUNTOF(szArgs));
 			ExtractFirstArgument(szArgs, szFile, szArg2);
+			ExpandEnvironmentStringsEx(szFile, COUNTOF(szFile));
+			ExpandEnvironmentStringsEx(szArg2, COUNTOF(szArg2));
 
 			WCHAR szFilter[256];
 			GetString(IDS_FILTER_EXE, szFilter, COUNTOF(szFilter));
