@@ -501,7 +501,6 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				bool bQuickExit = false;
 				WCHAR arg2[MAX_PATH];
 
-				ExpandEnvironmentStringsEx(arg1, COUNTOF(arg1));
 				ExtractFirstArgument(arg1, arg1, arg2);
 
 				if (StrCaseEqual(arg1, L"notepad2") || StrCaseEqual(arg1, L"notepad2.exe")) {
@@ -518,7 +517,7 @@ static INT_PTR CALLBACK RunDlgProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				SHELLEXECUTEINFO sei;
 				memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 				sei.cbSize = sizeof(SHELLEXECUTEINFO);
-				sei.fMask = 0;
+				sei.fMask = SEE_MASK_DOENVSUBST;
 				sei.hwnd = hwnd;
 				sei.lpVerb = NULL;
 				sei.lpFile = arg1;
