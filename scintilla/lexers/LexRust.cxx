@@ -325,13 +325,8 @@ void ColouriseRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initSt
 			if (sc.atLineStart && IsCharacterStyle(sc.state)) {
 				sc.SetState(SCE_RUST_DEFAULT);
 			} else if (sc.ch == '\\' && sc.state < SCE_RUST_RAW_STRING) {
-				const int state = sc.state;
-				if (IsEOLChar(sc.chNext)) {
-					if (!IsCharacterStyle(state)) {
-						sc.SetState(SCE_RUST_LINE_CONTINUATION);
-						sc.ForwardSetState(state);
-					}
-				} else {
+				if (!IsEOLChar(sc.chNext)) {
+					const int state = sc.state;
 					escSeq.resetEscapeState(state, sc.chNext);
 					sc.SetState(SCE_RUST_ESCAPECHAR);
 					sc.Forward();
@@ -528,8 +523,7 @@ constexpr bool IsMultilineStringStyle(int style) noexcept {
 		|| style == SCE_RUST_RAW_BYTESTRING
 		|| style == SCE_RUST_ESCAPECHAR
 		|| style == SCE_RUST_FORMAT_SPECIFIER
-		|| style == SCE_RUST_PLACEHOLDER
-		|| style == SCE_RUST_LINE_CONTINUATION;
+		|| style == SCE_RUST_PLACEHOLDER;
 }
 
 void FoldRustDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyle, LexerWordList, Accessor &styler) {

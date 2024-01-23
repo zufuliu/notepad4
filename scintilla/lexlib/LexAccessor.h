@@ -157,8 +157,8 @@ public:
 	// Return style value from buffer when in buffer, else retrieve from document.
 	// This is faster and can avoid calls to Flush() as that may be expensive.
 	unsigned char BufferStyleAt(Sci_Position position) const noexcept {
-		const Sci_Position index = position - startPosStyling;
-		if (index >= 0 && index < validLen) {
+		const size_t index = position - startPosStyling;
+		if (index < static_cast<size_t>(validLen)) {
 			return styleBuf[index];
 		}
 		return pAccess->StyleAt(position);
