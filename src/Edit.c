@@ -6930,7 +6930,6 @@ void EditSelectionAction(int action) {
 	LPWSTR lpszCommand = (LPWSTR)NP2HeapAlloc(sizeof(WCHAR) * (cchEscapedW + COUNTOF(szCmdTemplate) + MAX_PATH + 32));
 	const size_t cbCommand = NP2HeapSize(lpszCommand);
 	wsprintf(lpszCommand, szCmdTemplate, pszEscapedW);
-	ExpandEnvironmentStringsEx(lpszCommand, (DWORD)(cbCommand / sizeof(WCHAR)));
 
 	LPWSTR lpszArgs = (LPWSTR)NP2HeapAlloc(cbCommand);
 	ExtractFirstArgument(lpszCommand, lpszCommand, lpszArgs);
@@ -6944,7 +6943,7 @@ void EditSelectionAction(int action) {
 	SHELLEXECUTEINFO sei;
 	memset(&sei, 0, sizeof(SHELLEXECUTEINFO));
 	sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	sei.fMask = SEE_MASK_NOZONECHECKS;
+	sei.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_NOZONECHECKS;
 	sei.hwnd = NULL;
 	sei.lpVerb = NULL;
 	sei.lpFile = lpszCommand;
