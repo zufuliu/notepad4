@@ -74,6 +74,7 @@ enum class KeywordType {
 	Enum = SCE_JS_ENUM,
 	Function = SCE_JS_FUNCTION_DEFINITION,
 	Label = SCE_JS_LABEL,
+	Return = 0x40,
 };
 
 enum class DocTagState {
@@ -227,8 +228,10 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							kwType = KeywordType::Enum;
 						} else if (StrEqualsAny(s, "break", "continue")) {
 							kwType = KeywordType::Label;
+						} else if (StrEqualsAny(s, "return", "yield")) {
+							kwType = KeywordType::Return;
 						}
-						if (kwType != KeywordType::None) {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							const int chNext = sc.GetLineNextChar();
 							if (!(IsJsIdentifierStart(chNext) || chNext == '\\')) {
 								kwType = KeywordType::None;
@@ -251,12 +254,16 @@ void ColouriseJsDoc(Sci_PositionU startPos, Sci_Position lengthDoc, int initStyl
 							sc.ChangeState(SCE_JS_LABEL);
 						}
 					} else if (sc.ch != '.') {
-						if (kwType != KeywordType::None) {
+						if (kwType > KeywordType::None && kwType < KeywordType::Return) {
 							sc.ChangeState(static_cast<int>(kwType));
 						} else {
 							const int chNext = sc.GetDocNextChar(sc.ch == '?');
 							if (chNext == '(') {
-								sc.ChangeState(SCE_JS_FUNCTION);
+								if (kwType != KeywordType::Return && (IsIdentifierCharEx(chBeforeIdentifier) || chBeforeIdentifier == ']')) {
+									sc.ChangeState(SCE_JS_FUNCTION_DEFINITION);
+								} else {
+									sc.ChangeState(SCE_JS_FUNCTION);
+								}
 							} else if (sc.Match('[', ']')
 								|| (chBeforeIdentifier == '<' && (chNext == '>' || chNext == '<'))) {
 								// type[]

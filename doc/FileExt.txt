@@ -552,7 +552,7 @@ TypeScript
 	tsx		TypeScript with JSX
 	cts		cjs
 	mts		mjs
-	ets		HarmonyOS ArkTS, https://developer.harmonyos.com/cn/develop/arkts/
+	ets		HarmonyOS ArkTS, https://developer.huawei.com/consumer/cn/arkts/
 
 
 VBScript
