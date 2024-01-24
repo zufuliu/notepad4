@@ -564,7 +564,7 @@ LexerConfigMap = {
 		'operator_style': ['SCE_JAVA_OPERATOR', 'SCE_JAVA_OPERATOR2'],
 		'extra_word_char': '$:',
 		#'ignore_word_style': ['SCE_JAVA_WORD', 'SCE_JAVA_WORD2', 'SCE_JAVA_DIRECTIVE'],
-		'string_style_range': ['SCE_JAVA_CHARACTER', 'SCE_JAVA_PLACEHOLDER'],
+		'string_style_range': ['SCE_JAVA_STRING', 'SCE_JAVA_CHARACTER'],
 	},
 	'NP2LEX_JAVASCRIPT': {
 		'tab_settings': TabSettings_Space2,
